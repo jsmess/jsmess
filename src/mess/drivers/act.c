@@ -1,8 +1,13 @@
 /***************************************************************************
 
-        ACT Apricot series
+	ACT Apricot series
 
-        07/2009 Skeleton driver.
+	preliminary driver by Angelo Salese
+
+	TODO:
+	- I'm not entirely convinced that Apricot Xi/PC and F1/F10 should stay
+	  in the same driver, they looks to have uncompatible devices and
+	  probably uncompatible software too.
 
 ****************************************************************************/
 
@@ -12,14 +17,16 @@
 #include "machine/8255ppi.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
+#include "cpu/z80/z80daisy.h"
+#include "machine/z80ctc.h"
 
-static UINT16 *act_vram,*act_scrollram;
+static UINT16 *act_vram,*act_scrollram,*act_ram;
 
-static VIDEO_START( act )
+static VIDEO_START( act_f1 )
 {
 }
 
-static VIDEO_UPDATE( act )
+static VIDEO_UPDATE( act_f1 )
 {
 	int x,y,i;
 	int x_count;
@@ -48,6 +55,43 @@ static VIDEO_UPDATE( act )
 		}
 	}
 
+	return 0;
+}
+
+static VIDEO_START( act_xi )
+{
+}
+
+static VIDEO_UPDATE( act_xi )
+{
+	int y,x,xi,yi;
+
+	for (y=0;y<25;y++)
+	{
+		for (x=0;x<80;x++)
+		{
+			int tile = act_vram[(x+y*80)] & 0x03ff;
+
+			//0x8000: reverse
+			//0x4000: bright
+			//0x2000: underline
+			//0x1000: strikethrough
+
+			for(yi=0;yi<16;yi++)
+			{
+				for(xi=0;xi<10;xi++)
+				{
+					int color;
+
+					color = (act_ram[(tile*16)+(yi)]>>(xi) & 1) ? 7 : 0;
+
+					//FIXME: X should actually be multiplied by 10.
+					if((x*8+xi)<=video_screen_get_visible_area(screen)->max_x && ((y*16+yi))<video_screen_get_visible_area(screen)->max_y)
+						*BITMAP_ADDR16(bitmap, y*16+yi, x*8+xi) = screen->machine->pens[color];
+				}
+			}
+		}
+	}
 	return 0;
 }
 
@@ -146,12 +190,19 @@ static WRITE16_HANDLER( act_pal_w )
 	}
 }
 
-static ADDRESS_MAP_START(act_mem, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(act_f1_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x01e00,0x01fff) AM_RAM AM_BASE(&act_scrollram)
 	AM_RANGE(0xe0000,0xe001f) AM_READWRITE(act_pal_r,act_pal_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x00000,0xeffff) AM_RAM AM_BASE(&act_vram)
 	AM_RANGE(0xf0000,0xf7fff) AM_RAM
+	AM_RANGE(0xf8000,0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(act_xi_mem, ADDRESS_SPACE_PROGRAM, 16)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00000,0xeffff) AM_RAM AM_BASE(&act_ram)
+	AM_RANGE(0xf0000,0xf0fff) AM_MIRROR(0x7000) AM_RAM AM_BASE(&act_vram)
 	AM_RANGE(0xf8000,0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -207,9 +258,9 @@ static WRITE8_HANDLER( actf1_sys_w )
 static ADDRESS_MAP_START( act_f1_io , ADDRESS_SPACE_IO, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_WRITE8(actf1_sys_w,0x00ff)
-//	AM_RANGE(0x0010, 0x0017) z80 ctc (!)
-	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(act_sio_r,act_sio_w,0x00ff)
-//	AM_RANGE(0x0030, 0x0030) ctc & sio opcode (serial port for a z80?)
+	AM_RANGE(0x0010, 0x0017) AM_DEVREADWRITE8("ctc",z80ctc_r,z80ctc_w,0x00ff)
+//	AM_RANGE(0x0020, 0x0027) z80 sio (!)
+//	AM_RANGE(0x0030, 0x0031) AM_WRITE8(ctc_ack_w,0x00ff)
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(act_fdc_r, act_fdc_w,0x00ff)
 //	AM_RANGE(0x01e0, 0x01ff) winchester
 ADDRESS_MAP_END
@@ -261,25 +312,68 @@ static const gfx_layout charset_8x8 =
 
 static const gfx_layout charset_16x16 =
 {
-	16,16,
+	10,16,
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 7,6,5,4,3,2,1,0 , 15,14,13,12,11,10,9,8 },
+	{ 7,6,5,4,3,2,1,0 , 15,14 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
 	16*16
 };
 
-static GFXDECODE_START( act )
+static GFXDECODE_START( act_f1 )
 	GFXDECODE_ENTRY( "gfx",   0x00000, charset_8x8,    0x000, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START( act_xi )
 	GFXDECODE_ENTRY( "gfx",   0x00000, charset_16x16,    0x000, 1 )
 GFXDECODE_END
+
+static Z80CTC_INTERFACE( ctc_intf )
+{
+	0,					// timer disables
+	DEVCB_NULL,		// interrupt handler
+	DEVCB_NULL,		// ZC/TO0 callback
+	DEVCB_NULL,		// ZC/TO1 callback
+	DEVCB_NULL,		// ZC/TO2 callback
+};
+
+#if 0
+
+static const z80sio_interface sio_intf =
+{
+	0,					/* interrupt handler */
+	0,					/* DTR changed handler */
+	0,					/* RTS changed handler */
+	0,					/* BREAK changed handler */
+	0,					/* transmit handler */
+	0					/* receive handler */
+};
+#endif
+
+#if 0
+static const z80_daisy_chain x1_daisy[] =
+{
+	{ "ctc" },
+	{ NULL }
+};
+#endif
+
+static INTERRUPT_GEN( act_f1_irq )
+{
+	//if(input_code_pressed(device->machine, KEYCODE_C))
+	//	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x60);
+}
 
 static MACHINE_DRIVER_START( act_f1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8086, 4670000)
-	MDRV_CPU_PROGRAM_MAP(act_mem)
+	MDRV_CPU_PROGRAM_MAP(act_f1_mem)
 	MDRV_CPU_IO_MAP(act_f1_io)
+	MDRV_CPU_VBLANK_INT("screen",act_f1_irq )
+//	MDRV_CPU_CONFIG(x1_daisy)
+
+	MDRV_Z80CTC_ADD( "ctc", 4670000 , ctc_intf )
 
 	MDRV_MACHINE_RESET(act)
 
@@ -298,16 +392,16 @@ static MACHINE_DRIVER_START( act_f1 )
 //	MDRV_PPI8255_ADD("ppi8255_0", ppi8255_intf )
 	MDRV_WD2793_ADD("fdc", act_wd2797_interface )
 
-	MDRV_GFXDECODE(act)
+	MDRV_GFXDECODE(act_f1)
 
-	MDRV_VIDEO_START(act)
-	MDRV_VIDEO_UPDATE(act)
+	MDRV_VIDEO_START(act_f1)
+	MDRV_VIDEO_UPDATE(act_f1)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( act_xi )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8086, 4670000)
-	MDRV_CPU_PROGRAM_MAP(act_mem)
+	MDRV_CPU_PROGRAM_MAP(act_xi_mem)
 	MDRV_CPU_IO_MAP(act_xi_io)
 
 	MDRV_MACHINE_RESET(act)
@@ -317,8 +411,8 @@ static MACHINE_DRIVER_START( act_xi )
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
+	MDRV_SCREEN_SIZE(640, 375)
+	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 375-1)
 	MDRV_PALETTE_LENGTH(16)
 //	MDRV_PALETTE_INIT(black_and_white)
 
@@ -327,11 +421,10 @@ static MACHINE_DRIVER_START( act_xi )
 	MDRV_PPI8255_ADD("ppi8255_0", ppi8255_intf )
 	MDRV_WD2793_ADD("fdc", act_wd2797_interface )
 
-	MDRV_GFXDECODE(act)
+	MDRV_GFXDECODE(act_xi)
 
-	/* completely different video HW too? */
-	MDRV_VIDEO_START(act)
-	MDRV_VIDEO_UPDATE(act)
+	MDRV_VIDEO_START(act_xi)
+	MDRV_VIDEO_UPDATE(act_xi)
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -343,8 +436,8 @@ ROM_START( aprixi )
 	ROM_LOAD16_BYTE( "hi_ve007.u9",  0xfc001, 0x2000, CRC(b04fb83e) SHA1(cc2b2392f1b4c04bb6ec8ee26f8122242c02e572) )	// Labelled HI Ve007 03.04.84
 	ROM_RELOAD(						 0xf8001, 0x2000 )
 
-	ROM_REGION( 0x01000, "gfx", ROMREGION_ERASEFF )
-	ROM_COPY( "maincpu", 0xf8800, 0x00000, 0x01000 )
+	ROM_REGION( 0x08000, "gfx", ROMREGION_ERASEFF )
+//	ROM_COPY( "maincpu", 0xf8800, 0x00000, 0x01000 )
 ROM_END
 
 ROM_START( aprif1 )
