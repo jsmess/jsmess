@@ -29,7 +29,7 @@
 			<bounds x="0" y="0" width="192" height="22" />
 		</screen>
 		<screen index="0">
-			<bounds x="0" y="22" width="384" height="262" />
+			<bounds x="0" y="22" width="384" height="288" />
 		</screen>
 	</view>
 	
