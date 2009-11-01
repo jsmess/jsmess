@@ -49,7 +49,7 @@ static bitmap_t* lcdbitmap;
 
 #define ENABLE_UART_PRINTING (0)
 
-#define VERBOSE_LEVEL	(5)
+#define VERBOSE_LEVEL	(6)
 
 #define ENABLE_VERBOSE_LOG (1)
 
@@ -1669,7 +1669,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				(rounded_next_msf & 0x000f0000) >> 16,
 				(rounded_next_msf & 0x00f00000) >> 20
 			};
-			cdic_regs.time = next_msf << 8;
+
 			lba = nybbles[0] + nybbles[1]*10 + ((nybbles[2] + nybbles[3]*10)*75) + ((nybbles[4] + nybbles[5]*10)*75*60);
 
 			cdrom_read_data(cdic_regs.cd, lba, buffer, CD_TRACK_RAW_DONTCARE);
@@ -1683,6 +1683,21 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				cdda_start_audio(devtag_get_device(machine, "cdda"), lba, rounded_next_msf);
 
 			}
+
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x924/2] = 0x0001;								//	CTRL
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x926/2] = 0x0001; 								//  TRACK
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x928/2] = 0x0000;								// 	INDEX
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x92a/2] = (cdic_regs.time >> 24) & 0x000000ff;	// 	MIN
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x92c/2] = (cdic_regs.time >> 16) & 0x000000ff;	// 	SEC
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x92e/2] = (cdic_regs.time >>  8) & 0x0000007f;	// 	FRAC
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x930/2] = 0x0000;								//  ZERO
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x932/2] = (cdic_regs.time >> 24) & 0x000000ff;	// 	AMIN
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x934/2] = (cdic_regs.time >> 16) & 0x000000ff;	// 	ASEC
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x936/2] = (cdic_regs.time >>  8) & 0x0000007f;	// 	AFRAC
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x938/2] = 0x0000;								//  CRC1
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x93a/2] = 0x0000;								//  CRC2
+
+			cdic_regs.time = next_msf << 8;
 
 			timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0);
 
@@ -1730,18 +1745,18 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
 			}
 
-			cdram[0x924/2] = 0x0041;								//	CTRL
-			cdram[0x926/2] = 0x0001; 								//  TRACK
-			cdram[0x928/2] = 0x0000;								// 	INDEX
-			cdram[0x92a/2] = (cdic_regs.time >> 24) & 0x000000ff;	// 	MIN
-			cdram[0x92c/2] = (cdic_regs.time >> 16) & 0x000000ff;	// 	SEC
-			cdram[0x92e/2] = (cdic_regs.time >>  8) & 0x0000007f;	// 	FRAC
-			cdram[0x930/2] = 0x0000;								//  ZERO
-			cdram[0x932/2] = (cdic_regs.time >> 24) & 0x000000ff;	// 	AMIN
-			cdram[0x934/2] = (cdic_regs.time >> 16) & 0x000000ff;	// 	ASEC
-			cdram[0x936/2] = (cdic_regs.time >>  8) & 0x0000007f;	// 	AFRAC
-			cdram[0x938/2] = 0x0000;								//  CRC1
-			cdram[0x93a/2] = 0x0000;								//  CRC2
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x924/2] = 0x0041;								//	CTRL
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x926/2] = 0x0001; 								//  TRACK
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x928/2] = 0x0000;								// 	INDEX
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x92a/2] = (cdic_regs.time >> 24) & 0x000000ff;	// 	MIN
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x92c/2] = (cdic_regs.time >> 16) & 0x000000ff;	// 	SEC
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x92e/2] = (cdic_regs.time >>  8) & 0x0000007f;	// 	FRAC
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x930/2] = 0x0000;								//  ZERO
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x932/2] = (cdic_regs.time >> 24) & 0x000000ff;	// 	AMIN
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x934/2] = (cdic_regs.time >> 16) & 0x000000ff;	// 	ASEC
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x936/2] = (cdic_regs.time >>  8) & 0x0000007f;	// 	AFRAC
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x938/2] = 0x0000;								//  CRC1
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x93a/2] = 0x0000;								//  CRC2
 
 			cdic_regs.time = next_msf << 8;
 
@@ -2478,6 +2493,9 @@ static mcd212_t mcd212;
 #define MCD212_RC_OP				0xf00000	// Operation
 #define MCD212_RC_OP_SHIFT			20
 
+#define MCD212_CSR1W_ST				0x0002	// Standard
+#define MCD212_CSR1W_BE				0x0001 	// Bus Error
+
 #define MCD212_CSR2R_IT1			0x0004	// Interrupt 1
 #define MCD212_CSR2R_IT2			0x0002	// Interrupt 2
 #define MCD212_CSR2R_BE				0x0001	// Bus Error
@@ -2611,6 +2629,26 @@ static READ16_HANDLER(mcd212_r)
 	return 0;
 }
 
+static void mcd212_update_visible_area(running_machine *machine)
+{
+	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+    attoseconds_t period = video_screen_get_frame_period(machine->primary_screen).attoseconds;
+	int width = 0;
+
+	if((mcd212.channel[0].dcr & (MCD212_DCR_CF | MCD212_DCR_FD)) && (mcd212.channel[0].csrw & MCD212_CSR1W_ST))
+	{
+		width = 360;
+	}
+	else
+	{
+		width = 384;
+	}
+
+	visarea.max_x = width-1;
+
+    video_screen_configure(machine->primary_screen, width, 262, &visarea, period);
+}
+
 static WRITE16_HANDLER(mcd212_w)
 {
 	switch(offset)
@@ -2619,11 +2657,13 @@ static WRITE16_HANDLER(mcd212_w)
 		case 0x10/2:
 			verboselog(space->machine, 2, "mcd212_w: Status Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
 			COMBINE_DATA(&mcd212.channel[1 - (offset / 8)].csrw);
+			mcd212_update_visible_area(space->machine);
 			break;
 		case 0x02/2:
 		case 0x12/2:
 			verboselog(space->machine, 2, "mcd212_w: Display Command Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
 			COMBINE_DATA(&mcd212.channel[1 - (offset / 8)].dcr);
+			mcd212_update_visible_area(space->machine);
 			break;
 		case 0x04/2:
 		case 0x14/2:
@@ -3328,6 +3368,15 @@ static void mcd212_update_region_arrays(running_machine *machine)
 	}
 }
 
+static int mcd212_get_screen_width(running_machine *machine)
+{
+	if((mcd212.channel[0].dcr & (MCD212_DCR_CF | MCD212_DCR_FD)) && (mcd212.channel[0].csrw & MCD212_CSR1W_ST))
+	{
+		return 720;
+	}
+	return 768;
+}
+
 static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pixels_r, UINT8 *pixels_g, UINT8 *pixels_b)
 {
 	UINT8 *data = channel ? (UINT8*)planeb : (UINT8*)planea;
@@ -3343,15 +3392,16 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 	UINT8 mosaic_enable = ((mcd212.channel[channel].ddr & MCD212_DDR_FT) == MCD212_DDR_FT_MOSAIC);
 	UINT8 mosaic_factor = 1 << (((mcd212.channel[channel].ddr & MCD212_DDR_MT) >> MCD212_DDR_MT_SHIFT) + 1);
 	int mosaic_index = 0;
+	int width = mcd212_get_screen_width(machine);
 
 	//printf( "vsr before: %08x: ", vsr );
 	//fflush(stdout);
 
 	if(!icm || !vsr)
 	{
-		memset(pixels_r, 0x10, 768);
-		memset(pixels_g, 0x10, 768);
-		memset(pixels_b, 0x10, 768);
+		memset(pixels_r, 0x10, width);
+		memset(pixels_g, 0x10, width);
+		memset(pixels_b, 0x10, width);
 		return;
 	}
 
@@ -3393,7 +3443,7 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 								bY = bU = bV = 0x80;
 								break;
 						}
-						for(; x < 768; x += 2)
+						for(; x < width; x += 2)
 						{
             				BYTE68K b0 = byte;
             				BYTE68K bU1 = bU + mcd212_abDeltaUV[b0];
@@ -3470,7 +3520,7 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 					}
 					else if(icm == 1 || icm == 3 || icm == 4)
 					{
-						for(; x < 768; x += 2)
+						for(; x < width; x += 2)
 						{
 							UINT8 clut_entry = BYTE_TO_CLUT(channel, icm, byte);
 							pixels_r[x + 0] = clut_r[clut_entry];
@@ -3499,7 +3549,7 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 					}
 					else if(icm == 11)
 					{
-						for(; x < 768; x += 2)
+						for(; x < width; x += 2)
 						{
 							UINT8 even_entry = BYTE_TO_CLUT(channel, icm, byte >> 4);
 							UINT8 odd_entry = BYTE_TO_CLUT(channel, icm, byte);
@@ -3535,7 +3585,7 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 					}
 					else
 					{
-						for(; x < 768; x++)
+						for(; x < width; x++)
 						{
 							pixels_r[x] = 0x10;
 							pixels_g[x] = 0x10;
@@ -3564,7 +3614,7 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 							UINT8 g = clut_g[clut_entry];
 							UINT8 b = clut_b[clut_entry];
 							// Go to the end of the line
-							for(; x < 768; x++)
+							for(; x < width; x++)
 							{
 								pixels_r[x] = r;
 								pixels_g[x] = g;
@@ -3584,7 +3634,7 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 							UINT8 r = clut_r[clut_entry];
 							UINT8 g = clut_g[clut_entry];
 							UINT8 b = clut_b[clut_entry];
-							for(; x < end && x < 768; x++)
+							for(; x < end && x < width; x++)
 							{
 								pixels_r[x] = r;
 								pixels_g[x] = g;
@@ -3594,7 +3644,7 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 								pixels_g[x] = g;
 								pixels_b[x] = b;
 							}
-							if(x >= 768)
+							if(x >= width)
 							{
 								done = 1;
 								mcd212_set_vsr(channel, vsr);
@@ -3613,7 +3663,7 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 						pixels_g[x] = clut_g[clut_entry];
 						pixels_b[x] = clut_b[clut_entry];
 						x++;
-						if(x >= 768)
+						if(x >= width)
 						{
 							done = 1;
 							mcd212_set_vsr(channel, vsr);
