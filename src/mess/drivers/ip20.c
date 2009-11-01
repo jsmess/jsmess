@@ -130,7 +130,7 @@ static READ32_HANDLER( hpc_r )
 		verboselog(machine, 2, "HPC Endianness Read: %08x (%08x)\n", 0x0000001f, mem_mask );
 		return 0x0000001f;
 	case 0x0120:
-		if (!(mem_mask & 0x0000ff00))
+		if (ACCESSING_BITS_8_15)
 		{
 			return ( wd33c93_r( space, 0 ) << 8 );
 		}
@@ -139,7 +139,7 @@ static READ32_HANDLER( hpc_r )
 			return 0;
 		}
 	case 0x0124:
-		if (!(mem_mask & 0x0000ff00))
+		if (ACCESSING_BITS_8_15)
 		{
 			return ( wd33c93_r( space, 1 ) << 8 );
 		}
@@ -286,7 +286,7 @@ static WRITE32_HANDLER( hpc_w )
 		nHPC_ParBufPtr = data;
 		break;
 	case 0x0120:
-		if (!(mem_mask & 0x0000ff00))
+		if (ACCESSING_BITS_8_15)
 		{
 			verboselog(machine, 2, "HPC SCSI Controller Register Write: %08x\n", ( data >> 8 ) & 0x000000ff );
 			wd33c93_w( space, 0, ( data >> 8 ) & 0x000000ff );
@@ -297,7 +297,7 @@ static WRITE32_HANDLER( hpc_w )
 		}
 		break;
 	case 0x0124:
-		if (!(mem_mask & 0x0000ff00))
+		if (ACCESSING_BITS_8_15)
 		{
 			verboselog(machine, 2, "HPC SCSI Controller Data Write: %08x\n", ( data >> 8 ) & 0x000000ff );
 			wd33c93_w( space, 1, ( data >> 8 ) & 0x000000ff );

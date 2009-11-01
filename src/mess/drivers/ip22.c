@@ -424,7 +424,7 @@ static READ32_HANDLER( hpc3_hd0_r )
 	case 0x0000/4:
 	case 0x4000/4:
 //      verboselog(machine, 2, "HPC3 HD0 Status Read: %08x (%08x): %08x\n", 0x1fb90000 + ( offset << 2), mem_mask, nHPC3_hd0_regs[0x17] );
-		if (!(mem_mask & 0xffffff00))
+		if (ACCESSING_BITS_0_7)
 		{
 			return wd33c93_r( space, 0 );
 		}
@@ -435,7 +435,7 @@ static READ32_HANDLER( hpc3_hd0_r )
 	case 0x0004/4:
 	case 0x4004/4:
 //      verboselog(machine, 2, "HPC3 HD0 Register Read: %08x (%08x): %08x\n", 0x1fb90000 + ( offset << 2), mem_mask, nHPC3_hd0_regs[nHPC3_hd0_register] );
-		if (!(mem_mask & 0xffffff00))
+		if (ACCESSING_BITS_0_7)
 		{
 			return wd33c93_r( space, 1 );
 		}
@@ -459,7 +459,7 @@ static WRITE32_HANDLER( hpc3_hd0_w )
 	case 0x0000/4:
 	case 0x4000/4:
 //      verboselog(machine, 2, "HPC3 HD0 Register Select Write: %08x\n", data );
-		if (!(mem_mask & 0xffffff00))
+		if (ACCESSING_BITS_0_7)
 		{
 			wd33c93_w( space, 0, data & 0x000000ff );
 		}
@@ -467,7 +467,7 @@ static WRITE32_HANDLER( hpc3_hd0_w )
 	case 0x0004/4:
 	case 0x4004/4:
 //      verboselog(machine, 2, "HPC3 HD0 Register %d Write: %08x\n", nHPC3_hd0_register, data );
-		if (!(mem_mask & 0xffffff00))
+		if (ACCESSING_BITS_0_7)
 		{
 			wd33c93_w( space, 1,  data & 0x000000ff );
 		}
