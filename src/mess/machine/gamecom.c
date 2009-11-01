@@ -298,6 +298,7 @@ WRITE8_HANDLER( gamecom_internal_w )
 	case SM8521_DMPL:
 		break;
 	case SM8521_DMBR:
+		data &= 0x7f;
 		break;
 	case SM8521_DMVP:
 		break;
