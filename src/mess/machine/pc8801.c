@@ -18,6 +18,7 @@
 #include "driver.h"
 #include "machine/i8255a.h"
 #include "includes/pc8801.h"
+#include "machine/upd1990a.h"
 #include "machine/upd765.h"
 #include "sound/beep.h"
 
@@ -43,65 +44,17 @@ static int enable_FM_IRQ;
 static int FM_IRQ_save;
 #define FM_IRQ_LEVEL 4
 
-/*
-  calender IC (PD1990)
-  */
-
-static UINT8 calender_reg[5];
-static int calender_save;
-static int calender_hold;
-
-WRITE8_HANDLER(pc8801_calender)
+WRITE8_HANDLER( pc8801_calender )
 {
-  calender_save=data;
-  /* printer (not yet) */
-  /* UOP3 (bit 7 -- not yet) */
-}
+	pc88_state *state = space->machine->driver_data;
 
-static void calender_strobe(running_machine *machine)
-{
-	mame_system_time systime;
+	upd1990a_c0_w(state->upd1990a, BIT(data, 0));
+	upd1990a_c1_w(state->upd1990a, BIT(data, 1));
+	upd1990a_c2_w(state->upd1990a, BIT(data, 2));
+	upd1990a_data_w(state->upd1990a, BIT(data, 3));
 
-	switch(calender_save&0x07)
-	{
-		case 0:
-			calender_hold = 1;
-			break;
-		case 1:
-			calender_hold = 0;
-			break;
-		case 2:
-			/* time set (not yet) */
-			calender_hold = 1;
-			break;
-		case 3:
-			/* get the current date/time from the core */
-			mame_get_current_datetime(machine, &systime);
-
-			calender_reg[4] = (systime.local_time.month + 1) * 16 + systime.local_time.weekday;
-			calender_reg[3] = dec_2_bcd(systime.local_time.mday);
-			calender_reg[2] = dec_2_bcd(systime.local_time.hour);
-			calender_reg[1] = dec_2_bcd(systime.local_time.minute);
-			calender_reg[0] = dec_2_bcd(systime.local_time.second);
-			calender_hold = 1;
-			break;
-	}
-}
-
-static void calender_shift(void)
-{
-  if(!calender_hold) {
-    calender_reg[0] = (calender_reg[0] >> 1) | ((calender_reg[1] << 7) & 0x80);
-    calender_reg[1] = (calender_reg[1] >> 1) | ((calender_reg[2] << 7) & 0x80);
-    calender_reg[2] = (calender_reg[2] >> 1) | ((calender_reg[3] << 7) & 0x80);
-    calender_reg[3] = (calender_reg[3] >> 1) | ((calender_reg[4] << 7) & 0x80);
-    calender_reg[4] = (calender_reg[4] >> 1) | ((calender_save << 4) & 0x80);
-  }
-}
-
-static int calender_data(void)
-{
-  return (calender_reg[0]&0x01)!=0x00;
+	/* printer (not yet) */
+	/* UOP3 (bit 7 -- not yet) */
 }
 
 /* interrupt staff */
@@ -184,15 +137,14 @@ WRITE8_HANDLER(pc88sr_outport_30)
 }
 
 WRITE8_HANDLER(pc88sr_outport_40)
+{
      /* bit 3,4,6 not implemented */
      /* bit 7 incorrect behavior */
-{
+	pc88_state *state = space->machine->driver_data;
 	const device_config *speaker = devtag_get_device(space->machine, "beep");
-	static int port_save;
 
-	if((port_save&0x02) == 0x00 && (data&0x02) != 0x00) calender_strobe(space->machine);
-	if((port_save&0x04) == 0x00 && (data&0x04) != 0x00) calender_shift();
-	port_save=data;
+	upd1990a_stb_w(state->upd1990a, BIT(data, 1));
+	upd1990a_clk_w(state->upd1990a, BIT(data, 2));
 
 	if((input_port_read(space->machine, "DSW1") & 0x40) == 0x00) data&=0x7f;
 
@@ -216,13 +168,15 @@ WRITE8_HANDLER(pc88sr_outport_40)
 READ8_HANDLER(pc88sr_inport_40)
      /* bit0, 2 not implemented */
 {
-  int r;
+	pc88_state *state = space->machine->driver_data;
+	int r;
 
-  r = pc8801_is_24KHz ? 0x00 : 0x02;
-  r |= use_5FD ? 0x00 : 0x08;
-  r |= calender_data() ? 0x10 : 0x00;
-  if(video_screen_get_vblank(space->machine->primary_screen)) r|=0x20;
-  return r|0xc0;
+	r = pc8801_is_24KHz ? 0x00 : 0x02;
+	r |= use_5FD ? 0x00 : 0x08;
+	r |= state->rtc_data ? 0x10 : 0x00;
+	if(video_screen_get_vblank(space->machine->primary_screen)) r|=0x20;
+
+	return r|0xc0;
 }
 
 READ8_HANDLER(pc88sr_inport_30)
@@ -710,9 +664,26 @@ static void pc88sr_ch_reset (running_machine *machine, int hireso)
 	pc88sr_init_fmsound();
 }
 
+MACHINE_START( pc88srl )
+{
+	pc88_state *state = machine->driver_data;
+
+	/* find devices */
+	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
+
+	/* initialize RTC */
+	upd1990a_cs_w(state->upd1990a, 1);
+	upd1990a_oe_w(state->upd1990a, 1);
+}
+
 MACHINE_RESET( pc88srl )
 {
 	pc88sr_ch_reset(machine, 0);
+}
+
+MACHINE_START( pc88srh )
+{
+	MACHINE_START_CALL(pc88srl);
 }
 
 MACHINE_RESET( pc88srh )

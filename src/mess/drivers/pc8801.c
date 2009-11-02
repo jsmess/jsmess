@@ -87,6 +87,7 @@
 #include "sound/beep.h"
 #include "machine/i8255a.h"
 #include "includes/pc8801.h"
+#include "machine/upd1990a.h"
 #include "machine/upd765.h"
 #include "devices/flopdrv.h"
 #include "sound/2203intf.h"
@@ -554,6 +555,20 @@ static ADDRESS_MAP_START( pc8801fd_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w )
 ADDRESS_MAP_END
 
+/* uPD1990A Interface */
+
+static WRITE_LINE_DEVICE_HANDLER( rtc_data_w )
+{
+	pc88_state *driver_state = device->machine->driver_data;
+
+	driver_state->rtc_data = state;
+}
+
+static UPD1990A_INTERFACE( pc88_upd1990a_intf )
+{
+	DEVCB_LINE(rtc_data_w),
+	DEVCB_NULL
+};
 
 static READ8_DEVICE_HANDLER(opn_dummy_input) { return 0xff; }
 
@@ -583,6 +598,8 @@ static const floppy_config pc88_floppy_config =
 };
 
 static MACHINE_DRIVER_START( pc88srl )
+	MDRV_DRIVER_DATA(pc88_state)
+
 	/* basic machine hardware */
 
 	/* main CPU */
@@ -599,10 +616,10 @@ static MACHINE_DRIVER_START( pc88srl )
 
 	MDRV_QUANTUM_TIME(HZ(300000))
 
+	MDRV_MACHINE_START( pc88srl )
 	MDRV_MACHINE_RESET( pc88srl )
 
 	MDRV_I8255A_ADD( "ppi8255_0", pc8801_8255_config_0 )
-
 	MDRV_I8255A_ADD( "ppi8255_1", pc8801_8255_config_1 )
 
 	/* video hardware */
@@ -629,6 +646,7 @@ static MACHINE_DRIVER_START( pc88srl )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MDRV_UPD765A_ADD("upd765", pc8801_fdc_interface)
+	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc88_upd1990a_intf)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(pc88_floppy_config)
 MACHINE_DRIVER_END
@@ -638,6 +656,7 @@ static MACHINE_DRIVER_START( pc88srh )
 	MDRV_IMPORT_FROM( pc88srl )
 	MDRV_QUANTUM_TIME(HZ(360000))
 
+	MDRV_MACHINE_START( pc88srh )
 	MDRV_MACHINE_RESET( pc88srh )
 
 	MDRV_SCREEN_MODIFY("screen")

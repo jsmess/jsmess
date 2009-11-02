@@ -4,11 +4,22 @@
  *
  ****************************************************************************/
 
-#ifndef PC8801_H_
-#define PC8801_H_
+#ifndef __PC8801__
+#define __PC8801__
+
+#define UPD1990A_TAG	"upd1990a"
 
 #include "machine/upd765.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
+
+typedef struct _pc88_state pc88_state;
+struct _pc88_state
+{
+	/* RTC state */
+	int rtc_data;
+
+	const device_config *upd1990a;
+};
 
 /*----------- defined in machine/pc8801.c -----------*/
 
@@ -33,6 +44,8 @@ READ8_HANDLER(pc88sr_inport_71);
 WRITE8_HANDLER(pc88sr_outport_71);
 
 extern INTERRUPT_GEN( pc8801_interrupt );
+extern MACHINE_START( pc88srl );
+extern MACHINE_START( pc88srh );
 extern MACHINE_RESET( pc88srl );
 extern MACHINE_RESET( pc88srh );
 
@@ -48,7 +61,6 @@ READ8_HANDLER(pc8801_read_kanji2);
 WRITE8_HANDLER(pc8801_calender);
 READ8_HANDLER(pc8801_read_extmem);
 WRITE8_HANDLER(pc8801_write_extmem);
-
 
 /*----------- defined in video/pc8801.c -----------*/
 
@@ -72,6 +84,5 @@ WRITE8_HANDLER(pc88sr_disp_31);
 WRITE8_HANDLER(pc88sr_disp_32);
 WRITE8_HANDLER(pc88sr_alu);
 WRITE8_HANDLER(pc8801_palette_out);
-
 
 #endif /* PC8801_H_ */
