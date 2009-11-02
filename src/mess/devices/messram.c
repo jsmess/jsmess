@@ -136,21 +136,13 @@ static DEVICE_START( messram )
 	/* allocate space for the ram */
 	messram->ram = auto_alloc_array(device->machine, UINT8, messram->size);
 
+	/* reset ram to the default value */
+	memset(messram->ram, config->default_value, messram->size);
+
 	/* register for state saving */
 	state_save_register_device_item(device, 0, messram->size);
 	state_save_register_device_item_pointer(device, 0, messram->ram, messram->size);
 }
-
-
-static DEVICE_RESET( messram )
-{
-	messram_state *messram = get_safe_token(device);
-	ram_config *config = device->inline_config;
-
-	/* reset ram to the default value */
-	memset(messram->ram, config->default_value, messram->size);
-}
-
 
 static DEVICE_VALIDITY_CHECK( messram )
 {
@@ -266,7 +258,7 @@ DEVICE_GET_INFO( messram )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(messram);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(messram);	break;
+		case DEVINFO_FCT_RESET:							/* Nothing */								break;
 		case DEVINFO_FCT_VALIDITY_CHECK:				info->validity_check = DEVICE_VALIDITY_CHECK_NAME(messram); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
