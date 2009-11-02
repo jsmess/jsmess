@@ -2239,9 +2239,9 @@ MACHINE_START( macscsi )
 
 DRIVER_INIT(macplus)
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "user1");
+//	UINT32 *ROM = (UINT32 *)memory_region(machine, "user1");
 
-	ROM[0x1aefc/4] = 0x6bbe709e;	// change bpl to bmi
+//	ROM[0x1aefc/4] = 0x6bbe709e;	// AppleTalk: change bpl to bmi
 
 	mac_driver_init(machine, MODEL_MAC_PLUS);
 }
