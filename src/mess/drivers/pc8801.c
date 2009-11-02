@@ -85,7 +85,9 @@
 #include "includes/pc8801.h"
 #include "cpu/z80/z80.h"
 #include "cpu/v30mz/nec.h"
+#include "devices/cassette.h"
 #include "devices/flopdrv.h"
+#include "formats/d88_dsk.h"
 #include "machine/ctronics.h"
 #include "machine/i8255a.h"
 #include "machine/upd1990a.h"
@@ -594,8 +596,15 @@ static const floppy_config pc88_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(default),
+	FLOPPY_OPTIONS_NAME(d88),
 	DO_NOT_KEEP_GEOMETRY
+};
+
+static const cassette_config pc88_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
 };
 
 static MACHINE_DRIVER_START( pc88srl )
@@ -649,6 +658,7 @@ static MACHINE_DRIVER_START( pc88srl )
 	MDRV_UPD765A_ADD("upd765", pc8801_fdc_interface)
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc88_upd1990a_intf)
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, pc88_cassette_config)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(pc88_floppy_config)
 MACHINE_DRIVER_END

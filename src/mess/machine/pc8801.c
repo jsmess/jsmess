@@ -142,8 +142,8 @@ WRITE8_HANDLER(pc88sr_outport_30)
 
 WRITE8_HANDLER(pc88sr_outport_40)
 {
-     /* bit 3,4,6 not implemented */
-     /* bit 7 incorrect behavior */
+	/* bit 3,4,6 not implemented */
+	/* bit 7 incorrect behavior */
 	pc88_state *state = space->machine->driver_data;
 	const device_config *speaker = devtag_get_device(space->machine, "beep");
 
@@ -174,8 +174,8 @@ WRITE8_HANDLER(pc88sr_outport_40)
 }
 
 READ8_HANDLER(pc88sr_inport_40)
-     /* bit0, 2 not implemented */
 {
+	/* bit 2 not implemented */
 	pc88_state *state = space->machine->driver_data;
 	int r;
 
@@ -679,6 +679,7 @@ MACHINE_START( pc88srl )
 
 	/* find devices */
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
 	/* initialize RTC */
@@ -767,13 +768,14 @@ const upd765_interface pc8801_fdc_interface =
 static void pc8801_init_5fd(running_machine *machine)
 {
 	use_5FD = (input_port_read(machine, "DSW2") & 0x80) != 0x00;
+	
 	if (!use_5FD)
 		cputag_suspend(machine, "sub", SUSPEND_REASON_DISABLE, 1);
 	else
 		cputag_resume(machine, "sub", SUSPEND_REASON_DISABLE);
+
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "sub"), 0, 0);
 	
-	logerror("READY 1\n");
 	floppy_drive_set_motor_state(floppy_get_device(machine, 0), 1);
 	floppy_drive_set_motor_state(floppy_get_device(machine, 1), 1);
 	floppy_drive_set_ready_state(floppy_get_device(machine, 0), 1, 1);

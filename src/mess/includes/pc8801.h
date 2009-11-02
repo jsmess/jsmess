@@ -8,6 +8,7 @@
 #define __PC8801__
 
 #define UPD1990A_TAG	"upd1990a"
+#define CASSETTE_TAG	"cassette"
 #define CENTRONICS_TAG	"centronics"
 
 #include "machine/upd765.h"
@@ -20,6 +21,7 @@ struct _pc88_state
 	int rtc_data;
 
 	const device_config *upd1990a;
+	const device_config *cassette;
 	const device_config *centronics;
 };
 
