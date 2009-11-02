@@ -47,7 +47,6 @@ extern const upd765_interface pc8801_fdc_interface;
 
 WRITE8_HANDLER(pc8801_write_interrupt_level);
 WRITE8_HANDLER(pc8801_write_interrupt_mask);
-READ8_HANDLER(pc88sr_inport_30);
 READ8_HANDLER(pc88sr_inport_31);
 READ8_HANDLER(pc88sr_inport_32);
 WRITE8_HANDLER(pc88sr_outport_30);

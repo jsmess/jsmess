@@ -187,34 +187,6 @@ READ8_HANDLER( pc88sr_inport_40 )
 	return r|0xc0;
 }
 
-READ8_HANDLER( pc88sr_inport_30 )
-     /* DIP-SW1
-    bit 0: BASIC selection (0 = N-BASIC, 1 = N88-BASIC)
-    bit 1: terminal mode (0 = terminal mode, 1 = BASIC mode)
-    bit 2: startup text width (0 = 80chars/line, 1 = 40chars/line)
-    bit 3: startup text height (0 = 25lines/screen, 1 = 20lines/screen)
-    bit 4: S parameter (0 = enable, 1 = disable)
-    bit 5: operation when recevied DEL code (0 = handle DEL code,
-                         1 = ignore DEL code)
-    bit 6: universal input port 1 (currently always 1)
-    bit 7: universal input port 2 (currently always 1)
-      */
-{
-  int r;
-
-  /* read DIP-SW */
-  r=input_port_read(space->machine, "DSW1")<<1;
-  /* change bit 0 according BASIC mode */
-  if(is_Nbasic) {
-    r&=0xfe;
-  } else {
-    r|=0x01;
-  }
-  /* force set bit 6, 7 */
-  r|=0xc0;
-  return r;
-}
-
 READ8_HANDLER( pc88sr_inport_31 )
      /* DIP-SW2
     bit 0: serial parity (0 = enable, 1 = disable)

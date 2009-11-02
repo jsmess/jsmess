@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( pc88sr_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("KEY15")
 	AM_RANGE(0x10, 0x10) AM_WRITE(pc88_rtc_w)
 //	AM_RANGE(0x20, 0x21) AM_NOP										/* RS-232C and cassette (not yet) */
-	AM_RANGE(0x30, 0x30) AM_READWRITE(pc88sr_inport_30, pc88sr_outport_30)	/* DIP-SW1 */
+	AM_RANGE(0x30, 0x30) AM_READ_PORT("DSW1") AM_WRITE(pc88sr_outport_30)
 	AM_RANGE(0x31, 0x31) AM_READWRITE(pc88sr_inport_31, pc88sr_outport_31)	/* DIP-SW2 */
 	AM_RANGE(0x32, 0x32) AM_READWRITE(pc88sr_inport_32, pc88sr_outport_32)
 	AM_RANGE(0x34, 0x35) AM_WRITE(pc88sr_alu)
@@ -222,7 +222,7 @@ About natural keyboards: currently,
 - "Help" is mapped to 'F8'
  */
 
-static INPUT_PORTS_START( pc88sr )
+static INPUT_PORTS_START( pc8001 )
 	PORT_START("KEY0")
 	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)		PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
 	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)		PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
@@ -351,26 +351,29 @@ static INPUT_PORTS_START( pc88sr )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Terminal mode" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x01, 0x00, "BASIC" )
+	PORT_DIPSETTING(    0x01, "N88-BASIC" )
+	PORT_DIPSETTING(    0x00, "N-BASIC" )
+	PORT_DIPNAME( 0x02, 0x02, "Terminal mode" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Text width" )
-	PORT_DIPSETTING(    0x02, "40 chars/line" )
+	PORT_DIPNAME( 0x04, 0x00, "Text width" )
+	PORT_DIPSETTING(    0x04, "40 chars/line" )
 	PORT_DIPSETTING(    0x00, "80 chars/line" )
-	PORT_DIPNAME( 0x04, 0x00, "Text height" )
-	PORT_DIPSETTING(    0x04, "20 lines/screen" )
+	PORT_DIPNAME( 0x08, 0x00, "Text height" )
+	PORT_DIPSETTING(    0x08, "20 lines/screen" )
 	PORT_DIPSETTING(    0x00, "25 lines/screen" )
-	PORT_DIPNAME( 0x08, 0x08, "Enable S parameter" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Enable DEL code" )
+	PORT_DIPNAME( 0x10, 0x10, "Enable S parameter" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Memory wait" )
+	PORT_DIPNAME( 0x20, 0x00, "Enable DEL code" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Disable CMD SING" )
+	PORT_DIPNAME( 0x40, 0x40, "Memory wait" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Disable CMD SING" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
@@ -437,6 +440,15 @@ static INPUT_PORTS_START( pc88sr )
 	PORT_CONFSETTING(    0x0b, "1.1M (PIO-8234H-1M x 1 + PC-8801-02N x 1)" )
 	PORT_CONFSETTING(    0x0c, "2.1M (PIO-8234H-2M x 1 + PC-8801-02N x 1)" )
 	PORT_CONFSETTING(    0x0d, "4.1M (PIO-8234H-2M x 2 + PC-8801-02N x 1)" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pc88sr )
+	PORT_INCLUDE( pc8001 )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "BASIC" )
+	PORT_DIPSETTING(    0x01, "N88-BASIC" )
+	PORT_DIPSETTING(    0x00, "N-BASIC" )
 INPUT_PORTS_END
 
 /* Graphics Layouts */
@@ -946,8 +958,8 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    INIT  CONFIG  COMPANY FULLNAME */
-COMP( 1979, pc8001,    0,        0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8001", GAME_NOT_WORKING )
-COMP( 1983, pc8001m2,  0,        0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8001 Mk2", GAME_NOT_WORKING )	// not sure about this dump
+COMP( 1979, pc8001,    0,        0,     pc88srl,  pc8001,  0,    0,   "NEC",  "PC-8001", GAME_NOT_WORKING )
+COMP( 1983, pc8001m2,  0,        0,     pc88srl,  pc8001,  0,    0,   "NEC",  "PC-8001 Mk2", GAME_NOT_WORKING )	// not sure about this dump
 
 COMP( 1981, pc8801,    0,        0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8801", GAME_NOT_WORKING )
 COMP( 1983, pc88m2,    pc8801,   0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8801 MkII", GAME_NOT_WORKING )	// not sure about this dump
