@@ -23,7 +23,6 @@
 #include "machine/upd765.h"
 #include "sound/beep.h"
 
-
 static int ROMmode,RAMmode,maptvram;
 static int no4throm,no4throm2,port71_save;
 static unsigned char *mainROM;
@@ -45,7 +44,7 @@ static int enable_FM_IRQ;
 static int FM_IRQ_save;
 #define FM_IRQ_LEVEL 4
 
-WRITE8_HANDLER( pc8801_calender )
+WRITE8_HANDLER( pc88_rtc_w )
 {
 	pc88_state *state = space->machine->driver_data;
 
@@ -83,7 +82,7 @@ static void pc8801_update_interrupt(running_machine *machine)
 	}
 }
 
-static IRQ_CALLBACK(pc8801_interrupt_callback)
+static IRQ_CALLBACK( pc8801_interrupt_callback )
 {
 	int level, i;
 
@@ -97,13 +96,13 @@ static IRQ_CALLBACK(pc8801_interrupt_callback)
 	return level*2;
 }
 
-WRITE8_HANDLER(pc8801_write_interrupt_level)
+WRITE8_HANDLER( pc8801_write_interrupt_level )
 {
 	interrupt_level_reg = data&0x0f;
 	pc8801_update_interrupt(space->machine);
 }
 
-WRITE8_HANDLER(pc8801_write_interrupt_mask)
+WRITE8_HANDLER( pc8801_write_interrupt_mask )
 {
 	interrupt_mask_reg = ((data&0x01)<<2) | (data&0x02)
 		| ((data&0x04)>>2) | 0xf8;
@@ -120,7 +119,7 @@ INTERRUPT_GEN( pc8801_interrupt )
 	pc8801_raise_interrupt(device->machine, 1);
 }
 
-static TIMER_CALLBACK(pc8801_timer_interrupt)
+static TIMER_CALLBACK( pc8801_timer_interrupt )
 {
 	pc8801_raise_interrupt(machine, 2);
 }
@@ -134,13 +133,13 @@ static void pc8801_init_interrupt(running_machine *machine)
 	timer_pulse(machine, ATTOTIME_IN_HZ(600), NULL, 0, pc8801_timer_interrupt);
 }
 
-WRITE8_HANDLER(pc88sr_outport_30)
+WRITE8_HANDLER( pc88sr_outport_30 )
 {
 	/* bit 1-5 not implemented yet */
 	pc88sr_disp_30(space, offset,data);
 }
 
-WRITE8_HANDLER(pc88sr_outport_40)
+WRITE8_HANDLER( pc88sr_outport_40 )
 {
 	/* bit 3,4,6 not implemented */
 	/* bit 7 incorrect behavior */
@@ -173,11 +172,11 @@ WRITE8_HANDLER(pc88sr_outport_40)
 	}
 }
 
-READ8_HANDLER(pc88sr_inport_40)
+READ8_HANDLER( pc88sr_inport_40 )
 {
 	/* bit 2 not implemented */
 	pc88_state *state = space->machine->driver_data;
-	int r;
+	UINT8 r;
 
 	r = centronics_busy_r(state->centronics);
 	r |= pc8801_is_24KHz ? 0x00 : 0x02;
@@ -188,7 +187,7 @@ READ8_HANDLER(pc88sr_inport_40)
 	return r|0xc0;
 }
 
-READ8_HANDLER(pc88sr_inport_30)
+READ8_HANDLER( pc88sr_inport_30 )
      /* DIP-SW1
     bit 0: BASIC selection (0 = N-BASIC, 1 = N88-BASIC)
     bit 1: terminal mode (0 = terminal mode, 1 = BASIC mode)
@@ -216,7 +215,7 @@ READ8_HANDLER(pc88sr_inport_30)
   return r;
 }
 
-READ8_HANDLER(pc88sr_inport_31)
+READ8_HANDLER( pc88sr_inport_31 )
      /* DIP-SW2
     bit 0: serial parity (0 = enable, 1 = disable)
     bit 1: parity type (0 = even parity, 1 = odd parity)
@@ -247,22 +246,22 @@ READ8_HANDLER(pc88sr_inport_31)
   return r;
 }
 
-static WRITE8_HANDLER ( pc8801_writemem1 )
+static WRITE8_HANDLER( pc8801_writemem1 )
 {
   pc8801_mainRAM[offset]=data;
 }
 
-static WRITE8_HANDLER ( pc8801_writemem2 )
+static WRITE8_HANDLER( pc8801_writemem2 )
 {
   pc8801_mainRAM[offset+0x6000]=data;
 }
 
-static READ8_HANDLER ( pc8801_read_textwindow )
+static READ8_HANDLER( pc8801_read_textwindow )
 {
   return pc8801_mainRAM[(offset+text_window*0x100)&0xffff];
 }
 
-static WRITE8_HANDLER ( pc8801_write_textwindow )
+static WRITE8_HANDLER( pc8801_write_textwindow )
 {
   pc8801_mainRAM[(offset+text_window*0x100)&0xffff]=data;
 }
@@ -432,20 +431,20 @@ void pc8801_update_bank(running_machine *machine)
 	}
 }
 
-READ8_HANDLER(pc8801_read_extmem)
+READ8_HANDLER( pc88_extmem_r )
 {
 	UINT8 ret[2];
 	select_extmem(NULL,NULL,ret);
 	return ret[offset];
 }
 
-WRITE8_HANDLER(pc8801_write_extmem)
+WRITE8_HANDLER( pc88_extmem_w )
 {
   extmem_ctrl[offset]=data;
   pc8801_update_bank(space->machine);
 }
 
-WRITE8_HANDLER(pc88sr_outport_31)
+WRITE8_HANDLER( pc88sr_outport_31 )
 {
   /* bit 5 not implemented */
   RAMmode=((data&0x02)!=0);
@@ -454,12 +453,12 @@ WRITE8_HANDLER(pc88sr_outport_31)
   pc88sr_disp_31(space, offset,data);
 }
 
-READ8_HANDLER(pc88sr_inport_32)
+READ8_HANDLER( pc88sr_inport_32 )
 {
   return(port32_save);
 }
 
-WRITE8_HANDLER(pc88sr_outport_32)
+WRITE8_HANDLER( pc88sr_outport_32 )
 {
   /* bit 2, 3 not implemented */
   port32_save=data;
@@ -471,29 +470,29 @@ WRITE8_HANDLER(pc88sr_outport_32)
   pc8801_update_bank(space->machine);
 }
 
-READ8_HANDLER(pc8801_inport_70)
+READ8_HANDLER( pc8801_inport_70 )
 {
   return text_window;
 }
 
-WRITE8_HANDLER(pc8801_outport_70)
+WRITE8_HANDLER( pc8801_outport_70 )
 {
   text_window=data;
   pc8801_update_bank(space->machine);
 }
 
-WRITE8_HANDLER(pc8801_outport_78)
+WRITE8_HANDLER( pc8801_outport_78 )
 {
   text_window=((text_window+1)&0xff);
   pc8801_update_bank(space->machine);
 }
 
-READ8_HANDLER(pc88sr_inport_71)
+READ8_HANDLER( pc88sr_inport_71 )
 {
   return(port71_save);
 }
 
-WRITE8_HANDLER(pc88sr_outport_71)
+WRITE8_HANDLER( pc88sr_outport_71 )
 /* bit 1-7 not implemented (no ROMs) */
 {
   port71_save=data;
@@ -655,7 +654,7 @@ static void fix_V1V2(void)
   }
 }
 
-static void pc88sr_ch_reset (running_machine *machine, int hireso)
+static void pc88sr_ch_reset(running_machine *machine, int hireso)
 {
 	const device_config *speaker = devtag_get_device(machine, "beep");
 	int a;
@@ -674,48 +673,20 @@ static void pc88sr_ch_reset (running_machine *machine, int hireso)
 	pc88sr_init_fmsound();
 }
 
-MACHINE_START( pc88srl )
-{
-	pc88_state *state = machine->driver_data;
-
-	/* find devices */
-	state->upd765 = devtag_get_device(machine, UPD765_TAG);
-	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
-
-	/* initialize RTC */
-	upd1990a_cs_w(state->upd1990a, 1);
-	upd1990a_oe_w(state->upd1990a, 1);
-}
-
-MACHINE_RESET( pc88srl )
-{
-	pc88sr_ch_reset(machine, 0);
-}
-
-MACHINE_START( pc88srh )
-{
-	MACHINE_START_CALL(pc88srl);
-}
-
-MACHINE_RESET( pc88srh )
-{
-	pc88sr_ch_reset(machine, 1);
-}
-
 /* 5 inch floppy drive */
-
-static UINT8 i8255_0_pc, i8255_1_pc;
 
 static READ8_DEVICE_HANDLER( cpu_8255_c_r )
 {
-	return i8255_1_pc >> 4;
+	pc88_state *state = device->machine->driver_data;
+
+	return state->i8255_1_pc >> 4;
 }
 
 static WRITE8_DEVICE_HANDLER( cpu_8255_c_w )
 {
-	i8255_0_pc = data;
+	pc88_state *state = device->machine->driver_data;
+
+	state->i8255_0_pc = data;
 }
 
 I8255A_INTERFACE( pc8801_8255_config_0 )
@@ -730,12 +701,16 @@ I8255A_INTERFACE( pc8801_8255_config_0 )
 
 static READ8_DEVICE_HANDLER( fdc_8255_c_r )
 {
-	return i8255_0_pc >> 4;
+	pc88_state *state = device->machine->driver_data;
+
+	return state->i8255_0_pc >> 4;
 }
 
 static WRITE8_DEVICE_HANDLER( fdc_8255_c_w )
 {
-	i8255_1_pc = data;
+	pc88_state *state = device->machine->driver_data;
+
+	state->i8255_1_pc = data;
 }
 
 I8255A_INTERFACE( pc8801_8255_config_1 )
@@ -748,7 +723,7 @@ I8255A_INTERFACE( pc8801_8255_config_1 )
 	DEVCB_HANDLER(fdc_8255_c_w)			// Port C write
 };
 
-READ8_HANDLER(pc8801fd_upd765_tc)
+READ8_HANDLER( pc8801fd_upd765_tc )
 {
 	pc88_state *state = space->machine->driver_data;
 
@@ -805,54 +780,86 @@ void pc88sr_sound_interupt(const device_config *device, int irq)
   KANJI ROM
   */
 
-static UINT8 kanji_high,kanji_low;
-
-WRITE8_HANDLER(pc8801_write_kanji1)
+READ8_HANDLER( pc88_kanji_r )
 {
-  switch(offset) {
-  case 0:
-    kanji_low=data;
-    break;
-  case 1:
-    kanji_high=data;
-    break;
-  }
+	pc88_state *state = space->machine->driver_data;
+
+	UINT8 *kanji = memory_region(space->machine, "gfx1");
+	UINT32 addr = (state->kanji << 1) | !offset;
+
+	return kanji[addr];
 }
 
-READ8_HANDLER(pc8801_read_kanji1)
+WRITE8_HANDLER( pc88_kanji_w )
 {
-  switch(offset) {
-  case 0:
-    return *(memory_region(space->machine, "gfx1")+kanji_high*0x200+kanji_low*0x2+1);
-  case 1:
-    return *(memory_region(space->machine, "gfx1")+kanji_high*0x200+kanji_low*0x2+0);
-  default:
-    return 0xff;
-  }
+	pc88_state *state = space->machine->driver_data;
+
+	switch (offset)
+	{
+	case 0:
+		state->kanji = (state->kanji & 0xff00) | data;
+		break;
+
+	case 1:
+		state->kanji = (data << 8) | (state->kanji & 0xff);
+		break;
+	}
 }
 
-static UINT8 kanji_high2,kanji_low2;
-
-WRITE8_HANDLER(pc8801_write_kanji2)
+READ8_HANDLER( pc88_kanji2_r )
 {
-  switch(offset) {
-  case 0:
-    kanji_low2=data;
-    break;
-  case 1:
-    kanji_high2=data;
-    break;
-  }
+	pc88_state *state = space->machine->driver_data;
+
+	UINT8 *kanji2 = memory_region(space->machine, "kanji2");
+	UINT32 addr = (state->kanji2 << 1) | !offset;
+
+	return kanji2[addr];
 }
 
-READ8_HANDLER(pc8801_read_kanji2)
+WRITE8_HANDLER( pc88_kanji2_w )
 {
-  switch(offset) {
-  case 0:
-    return *(memory_region(space->machine, "gfx1")+kanji_high2*0x200+kanji_low2*0x2+1+0x20000);
-  case 1:
-    return *(memory_region(space->machine, "gfx1")+kanji_high2*0x200+kanji_low2*0x2+0+0x20000);
-  default:
-    return 0xff;
-  }
+	pc88_state *state = space->machine->driver_data;
+
+	switch (offset)
+	{
+	case 0:
+		state->kanji2 = (state->kanji2 & 0xff00) | data;
+		break;
+
+	case 1:
+		state->kanji2 = (data << 8) | (state->kanji2 & 0xff);
+		break;
+	}
+}
+
+/* Machine Initialization */
+
+MACHINE_START( pc88srl )
+{
+	pc88_state *state = machine->driver_data;
+
+	/* find devices */
+	state->upd765 = devtag_get_device(machine, UPD765_TAG);
+	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
+
+	/* initialize RTC */
+	upd1990a_cs_w(state->upd1990a, 1);
+	upd1990a_oe_w(state->upd1990a, 1);
+}
+
+MACHINE_RESET( pc88srl )
+{
+	pc88sr_ch_reset(machine, 0);
+}
+
+MACHINE_START( pc88srh )
+{
+	MACHINE_START_CALL(pc88srl);
+}
+
+MACHINE_RESET( pc88srh )
+{
+	pc88sr_ch_reset(machine, 1);
 }

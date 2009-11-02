@@ -81,6 +81,18 @@
 
 *****************************************************************************************************/
 
+/*
+	
+	TODO:
+
+	- fix floppy
+	- rewrite memory banking
+	- rewrite extended memory handling
+	- remove MEM port
+	- remove CFG port
+
+*/
+
 #include "driver.h"
 #include "includes/pc8801.h"
 #include "cpu/z80/z80.h"
@@ -94,193 +106,100 @@
 #include "sound/2203intf.h"
 #include "sound/beep.h"
 
-static const gfx_layout char_layout_40L_h =
-{
-	8, 4,						/* 16 x 4 graphics */
-	1024,						/* 256 codes */
-	1,							/* 1 bit per pixel */
-	{ 0x1000*8 },				/* no bitplanes */
-	{ 0, 0, 1, 1, 2, 2, 3, 3 },
-	{ 0*8, 0*8, 1*8, 1*8 },
-	8 * 2						/* code takes 8 times 8 bits */
-};
+/* Memory Maps */
 
-static const gfx_layout char_layout_40R_h =
-{
-	8, 4,						/* 16 x 4 graphics */
-	1024,						/* 256 codes */
-	1,							/* 1 bit per pixel */
-	{ 0x1000*8 },				/* no bitplanes */
-	{ 4, 4, 5, 5, 6, 6, 7, 7 },
-	{ 0*8, 0*8, 1*8, 1*8 },
-	8 * 2						/* code takes 8 times 8 bits */
-};
+static ADDRESS_MAP_START( pc8801_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_RAMBANK(1)
+	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK(2)
+	AM_RANGE(0x8000, 0x83ff) AM_RAMBANK(3)
+	AM_RANGE(0x8400, 0xbfff) AM_RAMBANK(4)
+	AM_RANGE(0xc000, 0xefff) AM_RAMBANK(5)
+	AM_RANGE(0xf000, 0xffff) AM_RAMBANK(6)
+ADDRESS_MAP_END
 
-static const gfx_layout char_layout_80_h =
-{
-	8, 4,           /* 16 x 4 graphics */
-	1024,            /* 256 codes */
-	1,                      /* 1 bit per pixel */
-	{ 0x1000*8 },          /* no bitplanes */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 0*8, 1*8, 1*8 },
-	8 * 2           /* code takes 8 times 8 bits */
-};
+static ADDRESS_MAP_START( pc88sr_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("KEY0")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("KEY1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("KEY2")
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("KEY3")
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("KEY4")
+	AM_RANGE(0x05, 0x05) AM_READ_PORT("KEY5")
+	AM_RANGE(0x06, 0x06) AM_READ_PORT("KEY6")
+	AM_RANGE(0x07, 0x07) AM_READ_PORT("KEY7")
+	AM_RANGE(0x08, 0x08) AM_READ_PORT("KEY8")
+	AM_RANGE(0x09, 0x09) AM_READ_PORT("KEY9")
+	AM_RANGE(0x0a, 0x0a) AM_READ_PORT("KEY10")
+	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("KEY11")
+	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("KEY12")
+	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("KEY13")
+	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("KEY14")
+	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("KEY15")
+	AM_RANGE(0x10, 0x10) AM_WRITE(pc88_rtc_w)
+//	AM_RANGE(0x20, 0x21) AM_NOP										/* RS-232C and cassette (not yet) */
+	AM_RANGE(0x30, 0x30) AM_READWRITE(pc88sr_inport_30, pc88sr_outport_30)	/* DIP-SW1 */
+	AM_RANGE(0x31, 0x31) AM_READWRITE(pc88sr_inport_31, pc88sr_outport_31)	/* DIP-SW2 */
+	AM_RANGE(0x32, 0x32) AM_READWRITE(pc88sr_inport_32, pc88sr_outport_32)
+	AM_RANGE(0x34, 0x35) AM_WRITE(pc88sr_alu)
+	AM_RANGE(0x40, 0x40) AM_READWRITE(pc88sr_inport_40, pc88sr_outport_40)
+	AM_RANGE(0x44, 0x45) AM_DEVREAD(YM2203_TAG, ym2203_r)
+//	AM_RANGE(0x46, 0x47) AM_NOP										/* OPNA extra port (not yet) */
+	AM_RANGE(0x50, 0x51) AM_READWRITE(pc88_crtc_r, pc88_crtc_w)
+	AM_RANGE(0x52, 0x5b) AM_WRITE(pc88_palette_w)
+	AM_RANGE(0x5c, 0x5c) AM_READ(pc88_vramtest_r)
+	AM_RANGE(0x5c, 0x5f) AM_WRITE(pc88_vramsel_w)
+	AM_RANGE(0x60, 0x68) AM_READWRITE(pc88_dmac_r, pc88_dmac_w)
+//	AM_RANGE(0x6e, 0x6e) AM_NOP										/* CPU clock info (not yet) */
+//	AM_RANGE(0x6f, 0x6f) AM_NOP										/* RS-232C speed ctrl (not yet) */
+	AM_RANGE(0x70, 0x70) AM_READWRITE(pc8801_inport_70, pc8801_outport_70)
+	AM_RANGE(0x71, 0x71) AM_READWRITE(pc88sr_inport_71, pc88sr_outport_71)
+	AM_RANGE(0x78, 0x78) AM_WRITE(pc8801_outport_78)				/* text window increment */
+//	AM_RANGE(0x90, 0x9f) AM_NOP 									/* CD-ROM (unknown -- not yet) */
+//	AM_RANGE(0xa0, 0xa3) AM_NOP 									/* music & network (unknown -- not yet) */
+//	AM_RANGE(0xa8, 0xad) AM_NOP										/* second sound board (not yet) */
+//	AM_RANGE(0xb4, 0xb5) AM_NOP 									/* Video art board (unknown -- not yet) */
+//	AM_RANGE(0xc1, 0xc1) AM_NOP										/* (unknown -- not yet) */
+//	AM_RANGE(0xc2, 0xcf) AM_NOP 									/* music (unknown -- not yet) */
+//	AM_RANGE(0xd0, 0xd7) AM_NOP 									/* music & GP-IB (unknown -- not yet) */
+//	AM_RANGE(0xd8, 0xd8) AM_NOP 									/* GP-IB (unknown -- not yet) */
+//	AM_RANGE(0xdc, 0xdf) AM_NOP 									/* MODEM (unknown -- not yet) */
+	AM_RANGE(0xe2, 0xe3) AM_READWRITE(pc88_extmem_r, pc88_extmem_w) /* expand RAM select */
+	AM_RANGE(0xe4, 0xe4) AM_WRITE(pc8801_write_interrupt_level)
+	AM_RANGE(0xe6, 0xe6) AM_WRITE(pc8801_write_interrupt_mask)
+//	AM_RANGE(0xe7, 0xe7) AM_NOP 									/* (unknown -- not yet) */
+	AM_RANGE(0xe8, 0xeb) AM_READWRITE(pc88_kanji_r, pc88_kanji_w)
+	AM_RANGE(0xec, 0xed) AM_READWRITE(pc88_kanji2_r, pc88_kanji2_w) /* JIS level2 Kanji ROM */
+//	AM_RANGE(0xf0, 0xf1) AM_NOP 									/* Kana to Kanji dictionary ROM select (not yet) */
+//	AM_RANGE(0xf3, 0xf3) AM_NOP 									/* DMA floppy (unknown -- not yet) */
+//	AM_RANGE(0xf4, 0xf7) AM_NOP										/* DMA 5'floppy (may be not released) */
+//	AM_RANGE(0xf8, 0xfb) AM_NOP 									/* DMA 8'floppy (unknown -- not yet) */
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(CPU_I8255A_TAG, i8255a_r, i8255a_w)
+ADDRESS_MAP_END
 
-static const gfx_layout char_layout_40L_l =
-{
-	8, 2,           /* 16 x 4 graphics */
-	1024,            /* 256 codes */
-	1,                      /* 1 bit per pixel */
-	{ 0x1000*8 },          /* no bitplanes */
-	{ 0, 0, 1, 1, 2, 2, 3, 3 },
-	{ 0*8, 1*8 },
-	8 * 2           /* code takes 8 times 8 bits */
-};
+static ADDRESS_MAP_START( pc88va_mem, ADDRESS_SPACE_PROGRAM, 8 )
+ADDRESS_MAP_END
 
-static const gfx_layout char_layout_40R_l =
-{
-	8, 2,           /* 16 x 4 graphics */
-	1024,            /* 256 codes */
-	1,                      /* 1 bit per pixel */
-	{ 0x1000*8 },          /* no bitplanes */
-	{ 4, 4, 5, 5, 6, 6, 7, 7 },
-	{ 0*8, 1*8 },
-	8 * 2           /* code takes 8 times 8 bits */
-};
+static ADDRESS_MAP_START( pc88va_io, ADDRESS_SPACE_IO, 8 )
+ADDRESS_MAP_END
 
-static const gfx_layout char_layout_80_l =
-{
-	8, 2,           /* 16 x 4 graphics */
-	1024,            /* 256 codes */
-	1,                      /* 1 bit per pixel */
-	{ 0x1000*8 },          /* no bitplanes */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8 },
-	8 * 2           /* code takes 8 times 8 bits */
-};
+static ADDRESS_MAP_START( pc88va_v30_mem, ADDRESS_SPACE_PROGRAM, 8 )
+ADDRESS_MAP_END
 
-static GFXDECODE_START( pc8801 )
-	GFXDECODE_ENTRY( "gfx1", 0, char_layout_80_l, 0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, char_layout_40L_l, 0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, char_layout_40R_l, 0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, char_layout_80_h, 0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, char_layout_40L_h, 0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, char_layout_40R_h, 0, 16 )
-GFXDECODE_END
+static ADDRESS_MAP_START( pc8801fd_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_ROM
+	AM_RANGE(0x4000, 0x7fff) AM_RAM
+ADDRESS_MAP_END
 
-/* Macro for DIPSW-1 */
-#define DIPSW_1_1 \
-	PORT_DIPNAME( 0x01, 0x01, "Terminal mode" ) \
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-#define DIPSW_1_2 \
-	PORT_DIPNAME( 0x02, 0x00, "Text width" ) \
-	PORT_DIPSETTING(    0x02, "40 chars/line" ) \
-	PORT_DIPSETTING(    0x00, "80 chars/line" )
-#define DIPSW_1_3 \
-	PORT_DIPNAME( 0x04, 0x00, "Text height" ) \
-	PORT_DIPSETTING(    0x04, "20 lines/screen" ) \
-	PORT_DIPSETTING(    0x00, "25 lines/screen" )
-#define DIPSW_1_4 \
-	PORT_DIPNAME( 0x08, 0x08, "Enable S parameter" ) \
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-#define DIPSW_1_5 \
-	PORT_DIPNAME( 0x10, 0x00, "Enable DEL code" ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-#define DIPSW_1_6 \
-	PORT_DIPNAME( 0x20, 0x20, "Memory wait" ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-#define DIPSW_1_7 \
-	PORT_DIPNAME( 0x40, 0x40, "Disable CMD SING" ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+static ADDRESS_MAP_START( pc8801fd_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xf8, 0xf8) AM_READ(pc8801fd_upd765_tc)
+	AM_RANGE(0xfa, 0xfa) AM_DEVREAD(UPD765_TAG, upd765_status_r )
+	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE(UPD765_TAG, upd765_data_r, upd765_data_w )
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(FDC_I8255A_TAG, i8255a_r, i8255a_w )
+ADDRESS_MAP_END
 
-/* Macro for DIPSW-2 */
-#define DIPSW_2_1 \
-	PORT_DIPNAME( 0x01, 0x01, "Parity generate" ) \
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-#define DIPSW_2_2 \
-	PORT_DIPNAME( 0x02, 0x00, "Parity type" ) \
-	PORT_DIPSETTING(    0x00, "Even" ) \
-	PORT_DIPSETTING(    0x02, "Odd" )
-#define DIPSW_2_3 \
-	PORT_DIPNAME( 0x04, 0x00, "Serial character length" ) \
-	PORT_DIPSETTING(    0x04, "7 bits/char" ) \
-	PORT_DIPSETTING(    0x00, "8 bits/char" )
-#define DIPSW_2_4 \
-	PORT_DIPNAME( 0x08, 0x08, "Stop bit length" ) \
-	PORT_DIPSETTING(    0x08, "1" ) \
-	PORT_DIPSETTING(    0x00, "2" )
-#define DIPSW_2_5 \
-	PORT_DIPNAME( 0x10, 0x10, "Enable X parameter" ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-#define DIPSW_2_6 \
-	PORT_DIPNAME( 0x20, 0x20, "Duplex mode" ) \
-	PORT_DIPSETTING(    0x20, "half duplex" ) \
-	PORT_DIPSETTING(    0x00, "full duplex" )
-#define DIPSW_2_7 \
-	PORT_DIPNAME( 0x40, 0x00, "Boot from internal FD" ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-#define DIPSW_2_8 \
-	PORT_DIPNAME( 0x80, 0x80, "Disable internal FD" ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-/* Macro for other switch */
-#define SW_V1V2N \
-	PORT_DIPNAME( 0x03, 0x01, "Basic mode" ) \
-	PORT_DIPSETTING(    0x02, "N-BASIC" ) \
-	PORT_DIPSETTING(    0x03, "N88-BASIC (V1)" ) \
-	PORT_DIPSETTING(    0x01, "N88-BASIC (V2)" )
-
-#define SW_HS \
-	PORT_DIPNAME( 0x04, 0x04, "Speed mode" ) \
-	PORT_DIPSETTING(    0x00, "Slow" ) \
-	PORT_DIPSETTING(    0x04, DEF_STR( High ) )
-
-#define SW_8MHZ \
-	PORT_DIPNAME( 0x08, 0x00, "Main CPU clock" ) \
-	PORT_DIPSETTING(    0x00, "4MHz" ) \
-	PORT_DIPSETTING(    0x08, "8MHz" )
-
-#define SW_4MHZ_ONLY \
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-#define SW_SERIAL \
-	PORT_DIPNAME( 0xf0, 0x80, "Serial speed" ) \
-	PORT_DIPSETTING(    0x10, "75bps" ) \
-	PORT_DIPSETTING(    0x20, "150bps" ) \
-	PORT_DIPSETTING(    0x30, "300bps" ) \
-	PORT_DIPSETTING(    0x40, "600bps" ) \
-	PORT_DIPSETTING(    0x50, "1200bps" ) \
-	PORT_DIPSETTING(    0x60, "2400bps" ) \
-	PORT_DIPSETTING(    0x70, "4800bps" ) \
-	PORT_DIPSETTING(    0x80, "9600bps" ) \
-	PORT_DIPSETTING(    0x90, "19200bps" )
-
-#define SW_EXTMEM \
-	PORT_DIPNAME( 0x1f, 0x00, "Extension memory" ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) ) \
-	PORT_DIPSETTING(    0x01, "32KB (PC-8012-02 x 1)" ) \
-	PORT_DIPSETTING(    0x02, "64KB (PC-8012-02 x 2)" ) \
-	PORT_DIPSETTING(    0x03, "128KB (PC-8012-02 x 4)" ) \
-	PORT_DIPSETTING(    0x04, "128KB (PC-8801-02N x 1)" ) \
-	PORT_DIPSETTING(    0x05, "256KB (PC-8801-02N x 2)" ) \
-	PORT_DIPSETTING(    0x06, "512KB (PC-8801-02N x 4)" ) \
-	PORT_DIPSETTING(    0x07, "1M (PIO-8234H-1M x 1)" ) \
-	PORT_DIPSETTING(    0x08, "2M (PIO-8234H-2M x 1)" ) \
-	PORT_DIPSETTING(    0x09, "4M (PIO-8234H-2M x 2)" ) \
-	PORT_DIPSETTING(    0x0a, "8M (PIO-8234H-2M x 4)" ) \
-	PORT_DIPSETTING(    0x0b, "1.1M (PIO-8234H-1M x 1 + PC-8801-02N x 1)" ) \
-	PORT_DIPSETTING(    0x0c, "2.1M (PIO-8234H-2M x 1 + PC-8801-02N x 1)" ) \
-	PORT_DIPSETTING(    0x0d, "4.1M (PIO-8234H-2M x 2 + PC-8801-02N x 1)" )
+/* Input Ports */
 
 /* 2008-05 FP:
 Small note about the strange default mapping of function keys:
@@ -385,10 +304,10 @@ static INPUT_PORTS_START( pc88sr )
 	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("  _") PORT_CODE(KEYCODE_DEL)			PORT_CHAR(0) PORT_CHAR('_')
 
 	PORT_START("KEY8")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Clr  Home") PORT_CODE(KEYCODE_HOME)		PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)								PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)							PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del  Ins") PORT_CODE(KEYCODE_BACKSPACE)	PORT_CHAR(UCHAR_MAMEKEY(DEL)) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Clr Home") PORT_CODE(KEYCODE_HOME)		PORT_CHAR(UCHAR_MAMEKEY(HOME))
+	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x86\x91") PORT_CODE(KEYCODE_UP)	PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x86\x92") PORT_CODE(KEYCODE_RIGHT)	PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del Ins") PORT_CODE(KEYCODE_BACKSPACE)	PORT_CHAR(UCHAR_MAMEKEY(DEL)) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Grph") PORT_CODE(KEYCODE_LALT)	PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(F7))
 	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Kana") PORT_CODE(KEYCODE_LCONTROL) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(F6))
 	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
@@ -406,8 +325,8 @@ static INPUT_PORTS_START( pc88sr )
 
 	PORT_START("KEY10")
 	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)								PORT_CHAR('\t')
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)							PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)							PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x86\x93") PORT_CODE(KEYCODE_DOWN)	PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x86\x90") PORT_CODE(KEYCODE_LEFT)	PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Help") PORT_CODE(KEYCODE_END)			PORT_CHAR(UCHAR_MAMEKEY(F8))
 	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Copy") PORT_CODE(KEYCODE_F2)			PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))
 	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)						PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
@@ -431,131 +350,171 @@ static INPUT_PORTS_START( pc88sr )
 	PORT_START("KEY15")		/* port 0x0f */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Terminal mode" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Text width" )
+	PORT_DIPSETTING(    0x02, "40 chars/line" )
+	PORT_DIPSETTING(    0x00, "80 chars/line" )
+	PORT_DIPNAME( 0x04, 0x00, "Text height" )
+	PORT_DIPSETTING(    0x04, "20 lines/screen" )
+	PORT_DIPSETTING(    0x00, "25 lines/screen" )
+	PORT_DIPNAME( 0x08, 0x08, "Enable S parameter" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Enable DEL code" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Memory wait" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Disable CMD SING" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Parity generate" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Parity type" )
+	PORT_DIPSETTING(    0x00, "Even" )
+	PORT_DIPSETTING(    0x02, "Odd" )
+	PORT_DIPNAME( 0x04, 0x00, "Serial character length" )
+	PORT_DIPSETTING(    0x04, "7 bits/char" )
+	PORT_DIPSETTING(    0x00, "8 bits/char" )
+	PORT_DIPNAME( 0x08, 0x08, "Stop bit length" )
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0x10, 0x10, "Enable X parameter" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Duplex" )
+	PORT_DIPSETTING(    0x20, "Half" )
+	PORT_DIPSETTING(    0x00, "Full" )
+	PORT_DIPNAME( 0x40, 0x00, "Boot from floppy" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Disable floppy" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_START("CFG")		/* EXSWITCH */
-	SW_V1V2N
-	SW_HS
-	SW_4MHZ_ONLY
-	SW_SERIAL
+	PORT_DIPNAME( 0x03, 0x01, "Basic mode" )
+	PORT_DIPSETTING(    0x02, "N-BASIC" )
+	PORT_DIPSETTING(    0x03, "N88-BASIC (V1)" )
+	PORT_DIPSETTING(    0x01, "N88-BASIC (V2)" )
+	PORT_DIPNAME( 0x04, 0x04, "Speed mode" )
+	PORT_DIPSETTING(    0x00, "Slow" )
+	PORT_DIPSETTING(    0x04, DEF_STR( High ) )
+	PORT_DIPNAME( 0x08, 0x00, "Main CPU clock" )
+	PORT_DIPSETTING(    0x00, "4MHz" )
+	PORT_DIPSETTING(    0x08, "8MHz" )
+	PORT_DIPNAME( 0xf0, 0x80, "Serial speed" )
+	PORT_DIPSETTING(    0x10, "75bps" )
+	PORT_DIPSETTING(    0x20, "150bps" )
+	PORT_DIPSETTING(    0x30, "300bps" )
+	PORT_DIPSETTING(    0x40, "600bps" )
+	PORT_DIPSETTING(    0x50, "1200bps" )
+	PORT_DIPSETTING(    0x60, "2400bps" )
+	PORT_DIPSETTING(    0x70, "4800bps" )
+	PORT_DIPSETTING(    0x80, "9600bps" )
+	PORT_DIPSETTING(    0x90, "19200bps" )
 
-	PORT_START("DSW1")		/* DIP-SW1 */
-	DIPSW_1_1
-	DIPSW_1_2
-	DIPSW_1_3
-	DIPSW_1_4
-	DIPSW_1_5
-	DIPSW_1_6
-	DIPSW_1_7
-
-	PORT_START("DSW2")		/* DIP-SW2 */
-	DIPSW_2_1
-	DIPSW_2_2
-	DIPSW_2_3
-	DIPSW_2_4
-	DIPSW_2_5
-	DIPSW_2_6
-	DIPSW_2_7
-	DIPSW_2_8
-
-	PORT_START("MEM")		/* extension memory setting */
-	SW_EXTMEM
-
+	PORT_START("MEM")
+	PORT_CONFNAME( 0x1f, 0x00, "Extension memory" )
+	PORT_CONFSETTING(    0x00, DEF_STR( None ) )
+	PORT_CONFSETTING(    0x01, "32KB (PC-8012-02 x 1)" )
+	PORT_CONFSETTING(    0x02, "64KB (PC-8012-02 x 2)" )
+	PORT_CONFSETTING(    0x03, "128KB (PC-8012-02 x 4)" )
+	PORT_CONFSETTING(    0x04, "128KB (PC-8801-02N x 1)" )
+	PORT_CONFSETTING(    0x05, "256KB (PC-8801-02N x 2)" )
+	PORT_CONFSETTING(    0x06, "512KB (PC-8801-02N x 4)" )
+	PORT_CONFSETTING(    0x07, "1M (PIO-8234H-1M x 1)" )
+	PORT_CONFSETTING(    0x08, "2M (PIO-8234H-2M x 1)" )
+	PORT_CONFSETTING(    0x09, "4M (PIO-8234H-2M x 2)" )
+	PORT_CONFSETTING(    0x0a, "8M (PIO-8234H-2M x 4)" )
+	PORT_CONFSETTING(    0x0b, "1.1M (PIO-8234H-1M x 1 + PC-8801-02N x 1)" )
+	PORT_CONFSETTING(    0x0c, "2.1M (PIO-8234H-2M x 1 + PC-8801-02N x 1)" )
+	PORT_CONFSETTING(    0x0d, "4.1M (PIO-8234H-2M x 2 + PC-8801-02N x 1)" )
 INPUT_PORTS_END
 
+/* Graphics Layouts */
 
-static ADDRESS_MAP_START( pc8801_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_RAMBANK(1)
-	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK(2)
-	AM_RANGE(0x8000, 0x83ff) AM_RAMBANK(3)
-	AM_RANGE(0x8400, 0xbfff) AM_RAMBANK(4)
-	AM_RANGE(0xc000, 0xefff) AM_RAMBANK(5)
-	AM_RANGE(0xf000, 0xffff) AM_RAMBANK(6)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pc88sr_io, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_READ_PORT( "KEY0" )  					/* keyboard */
-	AM_RANGE(0x01, 0x01) AM_READ_PORT( "KEY1" )  					/* keyboard */
-	AM_RANGE(0x02, 0x02) AM_READ_PORT( "KEY2" )  					/* keyboard */
-	AM_RANGE(0x03, 0x03) AM_READ_PORT( "KEY3" )  					/* keyboard */
-	AM_RANGE(0x04, 0x04) AM_READ_PORT( "KEY4" )  					/* keyboard */
-	AM_RANGE(0x05, 0x05) AM_READ_PORT( "KEY5" ) 					/* keyboard */
-	AM_RANGE(0x06, 0x06) AM_READ_PORT( "KEY6" )  					/* keyboard */
-	AM_RANGE(0x07, 0x07) AM_READ_PORT( "KEY7" )  					/* keyboard */
-	AM_RANGE(0x08, 0x08) AM_READ_PORT( "KEY8" ) 					/* keyboard */
-	AM_RANGE(0x09, 0x09) AM_READ_PORT( "KEY9" ) 					/* keyboard */
-	AM_RANGE(0x0a, 0x0a) AM_READ_PORT( "KEY10" ) 					/* keyboard */
-	AM_RANGE(0x0b, 0x0b) AM_READ_PORT( "KEY11" ) 					/* keyboard */
-	AM_RANGE(0x0c, 0x0c) AM_READ_PORT( "KEY12" ) 					/* keyboard */
-	AM_RANGE(0x0d, 0x0d) AM_READ_PORT( "KEY13" ) 					/* keyboard */
-	AM_RANGE(0x0e, 0x0e) AM_READ_PORT( "KEY14" ) 					/* keyboard */
-	AM_RANGE(0x0f, 0x0f) AM_READ_PORT( "KEY15" )					/* keyboard */
-	AM_RANGE(0x10, 0x10) AM_WRITE( pc8801_calender ) 				/* printer and clock and UOP3 */
-	AM_RANGE(0x20, 0x21) AM_NOP										/* RS-232C and cassette (not yet) */
-	AM_RANGE(0x30, 0x30) AM_READWRITE( pc88sr_inport_30, pc88sr_outport_30 )	/* DIP-SW1 */
-	AM_RANGE(0x31, 0x31) AM_READWRITE( pc88sr_inport_31, pc88sr_outport_31 )	/* DIP-SW2 */
-	AM_RANGE(0x32, 0x32) AM_READWRITE( pc88sr_inport_32, pc88sr_outport_32 )
-	AM_RANGE(0x34, 0x35) AM_WRITE( pc88sr_alu )
-	AM_RANGE(0x40, 0x40) AM_READWRITE( pc88sr_inport_40, pc88sr_outport_40 )
-	AM_RANGE(0x44, 0x45) AM_DEVREAD( YM2203_TAG, ym2203_r )
-	AM_RANGE(0x46, 0x47) AM_NOP										/* OPNA extra port (not yet) */
-	AM_RANGE(0x50, 0x51) AM_READWRITE( pc8801_crtc_read, pc8801_crtc_write )
-	AM_RANGE(0x52, 0x5b) AM_WRITE( pc8801_palette_out )
-	AM_RANGE(0x5c, 0x5c) AM_READ( pc8801_vramtest )
-	AM_RANGE(0x5c, 0x5f) AM_WRITE( pc8801_vramsel )
-	AM_RANGE(0x60, 0x68) AM_READWRITE( pc8801_dmac_read, pc8801_dmac_write )
-	AM_RANGE(0x6e, 0x6e) AM_NOP										/* CPU clock info (not yet) */
-	AM_RANGE(0x6f, 0x6f) AM_NOP										/* RS-232C speed ctrl (not yet) */
-	AM_RANGE(0x70, 0x70) AM_READWRITE( pc8801_inport_70, pc8801_outport_70 )
-	AM_RANGE(0x71, 0x71) AM_READWRITE( pc88sr_inport_71, pc88sr_outport_71 )
-	AM_RANGE(0x78, 0x78) AM_WRITE( pc8801_outport_78 )				/* text window increment */
-	AM_RANGE(0x90, 0x9f) AM_NOP 									/* CD-ROM (unknown -- not yet) */
-	AM_RANGE(0xa0, 0xa3) AM_NOP 									/* music & network (unknown -- not yet) */
-	AM_RANGE(0xa8, 0xad) AM_NOP										/* second sound board (not yet) */
-	AM_RANGE(0xb4, 0xb5) AM_NOP 									/* Video art board (unknown -- not yet) */
-	AM_RANGE(0xc1, 0xc1) AM_NOP										/* (unknown -- not yet) */
-	AM_RANGE(0xc2, 0xcf) AM_NOP 									/* music (unknown -- not yet) */
-	AM_RANGE(0xd0, 0xd7) AM_NOP 									/* music & GP-IB (unknown -- not yet) */
-	AM_RANGE(0xd8, 0xd8) AM_NOP 									/* GP-IB (unknown -- not yet) */
-	AM_RANGE(0xdc, 0xdf) AM_NOP 									/* MODEM (unknown -- not yet) */
-	AM_RANGE(0xe2, 0xe3) AM_READWRITE( pc8801_read_extmem, pc8801_write_extmem ) /* expand RAM select */
-	AM_RANGE(0xe4, 0xe4) AM_WRITE( pc8801_write_interrupt_level )
-	AM_RANGE(0xe6, 0xe6) AM_WRITE( pc8801_write_interrupt_mask )
-	AM_RANGE(0xe7, 0xe7) AM_NOP 									/* (unknown -- not yet) */
-	AM_RANGE(0xe8, 0xeb) AM_READWRITE( pc8801_read_kanji1, pc8801_write_kanji1 )
-	AM_RANGE(0xec, 0xed) AM_READWRITE( pc8801_read_kanji2, pc8801_write_kanji2 ) /* JIS level2 Kanji ROM */
-	AM_RANGE(0xf0, 0xf1) AM_NOP 									/* Kana to Kanji dictionary ROM select (not yet) */
-	AM_RANGE(0xf3, 0xf3) AM_NOP 									/* DMA floppy (unknown -- not yet) */
-	AM_RANGE(0xf4, 0xf7) AM_NOP										/* DMA 5'floppy (may be not released) */
-	AM_RANGE(0xf8, 0xfb) AM_NOP 									/* DMA 8'floppy (unknown -- not yet) */
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(CPU_I8255A_TAG, i8255a_r, i8255a_w )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pc88va_mem, ADDRESS_SPACE_PROGRAM, 8 )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pc88va_io, ADDRESS_SPACE_IO, 8)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pc88va_v30_mem, ADDRESS_SPACE_PROGRAM, 8 )
-ADDRESS_MAP_END
-
-static INTERRUPT_GEN( pc8801fd_interrupt )
+static const gfx_layout char_layout_40L_h =
 {
-}
+	8, 4,						/* 16 x 4 graphics */
+	1024,						/* 256 codes */
+	1,							/* 1 bit per pixel */
+	{ 0x1000*8 },				/* no bitplanes */
+	{ 0, 0, 1, 1, 2, 2, 3, 3 },
+	{ 0*8, 0*8, 1*8, 1*8 },
+	8 * 2						/* code takes 8 times 8 bits */
+};
 
-static ADDRESS_MAP_START( pc8801fd_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x07ff) AM_ROM
-	AM_RANGE( 0x4000, 0x7fff) AM_RAM
-ADDRESS_MAP_END
+static const gfx_layout char_layout_40R_h =
+{
+	8, 4,						/* 16 x 4 graphics */
+	1024,						/* 256 codes */
+	1,							/* 1 bit per pixel */
+	{ 0x1000*8 },				/* no bitplanes */
+	{ 4, 4, 5, 5, 6, 6, 7, 7 },
+	{ 0*8, 0*8, 1*8, 1*8 },
+	8 * 2						/* code takes 8 times 8 bits */
+};
 
-static ADDRESS_MAP_START( pc8801fd_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf8, 0xf8) AM_READ( pc8801fd_upd765_tc )
-	AM_RANGE(0xfa, 0xfa) AM_DEVREAD(UPD765_TAG, upd765_status_r )
-	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE(UPD765_TAG, upd765_data_r, upd765_data_w )
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(FDC_I8255A_TAG, i8255a_r, i8255a_w )
-ADDRESS_MAP_END
+static const gfx_layout char_layout_80_h =
+{
+	8, 4,           /* 16 x 4 graphics */
+	1024,            /* 256 codes */
+	1,                      /* 1 bit per pixel */
+	{ 0x1000*8 },          /* no bitplanes */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 0*8, 1*8, 1*8 },
+	8 * 2           /* code takes 8 times 8 bits */
+};
+
+static const gfx_layout char_layout_40L_l =
+{
+	8, 2,           /* 16 x 4 graphics */
+	1024,            /* 256 codes */
+	1,                      /* 1 bit per pixel */
+	{ 0x1000*8 },          /* no bitplanes */
+	{ 0, 0, 1, 1, 2, 2, 3, 3 },
+	{ 0*8, 1*8 },
+	8 * 2           /* code takes 8 times 8 bits */
+};
+
+static const gfx_layout char_layout_40R_l =
+{
+	8, 2,           /* 16 x 4 graphics */
+	1024,            /* 256 codes */
+	1,                      /* 1 bit per pixel */
+	{ 0x1000*8 },          /* no bitplanes */
+	{ 4, 4, 5, 5, 6, 6, 7, 7 },
+	{ 0*8, 1*8 },
+	8 * 2           /* code takes 8 times 8 bits */
+};
+
+static const gfx_layout char_layout_80_l =
+{
+	8, 2,           /* 16 x 4 graphics */
+	1024,            /* 256 codes */
+	1,                      /* 1 bit per pixel */
+	{ 0x1000*8 },          /* no bitplanes */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8 },
+	8 * 2           /* code takes 8 times 8 bits */
+};
+
+static GFXDECODE_START( pc8801 )
+	GFXDECODE_ENTRY( "gfx1", 0, char_layout_80_l, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, char_layout_40L_l, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, char_layout_40R_l, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, char_layout_80_h, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, char_layout_40L_h, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, char_layout_40R_h, 0, 16 )
+GFXDECODE_END
 
 /* uPD1990A Interface */
 
@@ -572,7 +531,9 @@ static UPD1990A_INTERFACE( pc88_upd1990a_intf )
 	DEVCB_NULL
 };
 
-static READ8_DEVICE_HANDLER(opn_dummy_input) { return 0xff; }
+/* YM2203 Interface */
+
+static READ8_DEVICE_HANDLER( opn_dummy_input ) { return 0xff; }
 
 static const ym2203_interface pc88_ym2203_intf =
 {
@@ -587,6 +548,8 @@ static const ym2203_interface pc88_ym2203_intf =
 	pc88sr_sound_interupt
 };
 
+/* Floppy Configuration */
+
 static const floppy_config pc88_floppy_config =
 {
 	DEVCB_NULL,
@@ -599,12 +562,16 @@ static const floppy_config pc88_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+/* Cassette Configuration */
+
 static const cassette_config pc88_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
 	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
 };
+
+/* Machine Drivers */
 
 static MACHINE_DRIVER_START( pc88srl )
 	MDRV_DRIVER_DATA(pc88_state)
@@ -621,7 +588,6 @@ static MACHINE_DRIVER_START( pc88srl )
 	MDRV_CPU_ADD("sub", Z80, 4000000)		/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(pc8801fd_mem)
 	MDRV_CPU_IO_MAP(pc8801fd_io)
-	MDRV_CPU_VBLANK_INT(SCREEN_TAG, pc8801fd_interrupt)
 
 	MDRV_QUANTUM_TIME(HZ(300000))
 
@@ -662,7 +628,6 @@ static MACHINE_DRIVER_START( pc88srl )
 	MDRV_FLOPPY_2_DRIVES_ADD(pc88_floppy_config)
 MACHINE_DRIVER_END
 
-
 static MACHINE_DRIVER_START( pc88srh )
 	MDRV_IMPORT_FROM( pc88srl )
 	MDRV_QUANTUM_TIME(HZ(360000))
@@ -678,15 +643,15 @@ static MACHINE_DRIVER_START( pc88srh )
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 MACHINE_DRIVER_END
 
-
 static MACHINE_DRIVER_START( pc88va )
+	MDRV_DRIVER_DATA(pc88_state)
+
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)        /* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(pc88va_mem)
 	MDRV_CPU_IO_MAP(pc88va_io)
 
 	MDRV_CPU_ADD("cpu2", V30MZ, 8000000)        /* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(pc88va_v30_mem)
-
 
 	/* No accurate at all, it's just skeleton code */
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -698,6 +663,8 @@ static MACHINE_DRIVER_START( pc88va )
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_PALETTE_INIT( pc8801 )
 MACHINE_DRIVER_END
+
+/* ROMs */
 
 ROM_START( pc8001 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -817,7 +784,9 @@ ROM_START( pc88m2mr )
 
 	ROM_REGION( 0x40000, "gfx1", 0)
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
-	ROM_LOAD( "m2mr_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
+
+	ROM_REGION( 0x20000, "kanji2", 0)
+	ROM_LOAD( "m2mr_kanji2.rom", 0x00000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 ROM_END
 
 ROM_START( pc8801mh )
@@ -838,7 +807,9 @@ ROM_START( pc8801mh )
 
 	ROM_REGION( 0x40000, "gfx1", 0)
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
-	ROM_LOAD( "mh_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
+
+	ROM_REGION( 0x20000, "kanji2", 0)
+	ROM_LOAD( "mh_kanji2.rom", 0x00000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 ROM_END
 
 ROM_START( pc8801fa )
@@ -859,7 +830,9 @@ ROM_START( pc8801fa )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
-	ROM_LOAD( "fa_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
+
+	ROM_REGION( 0x20000, "kanji2", 0)
+	ROM_LOAD( "fa_kanji2.rom", 0x00000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 ROM_END
 
 ROM_START( pc8801ma )
@@ -880,7 +853,9 @@ ROM_START( pc8801ma )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
-	ROM_LOAD( "ma_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
+
+	ROM_REGION( 0x20000, "kanji2", 0)
+	ROM_LOAD( "ma_kanji2.rom", 0x00000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 
 	/* 32 banks, to be loaded at 0xc000 - 0xffff */
 	ROM_REGION( 0x80000, "dictionary", 0 )
@@ -905,7 +880,9 @@ ROM_START( pc8801ma2 )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
-	ROM_LOAD( "ma2_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
+
+	ROM_REGION( 0x20000, "kanji2", 0)
+	ROM_LOAD( "ma2_kanji2.rom", 0x00000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 
 	/* 32 banks, to be loaded at 0xc000 - 0xffff */
 	ROM_REGION( 0x80000, "dictionary", 0 )
@@ -933,7 +910,9 @@ ROM_START( pc8801mc )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
-	ROM_LOAD( "mc_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
+
+	ROM_REGION( 0x20000, "kanji2", 0)
+	ROM_LOAD( "mc_kanji2.rom", 0x00000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 
 	/* 32 banks, to be loaded at 0xc000 - 0xffff */
 	ROM_REGION( 0x80000, "dictionary", 0 )
@@ -964,13 +943,14 @@ ROM_START( pc88va )
 	ROM_LOAD( "vadic.rom", 0x00000, 0x80000, CRC(a6108f4d) SHA1(3665db538598abb45d9dfe636423e6728a812b12) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    INIT  CONFIG  COMPANY FULLNAME */
+/* System Drivers */
 
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    INIT  CONFIG  COMPANY FULLNAME */
 COMP( 1979, pc8001,    0,        0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8001", GAME_NOT_WORKING )
 COMP( 1983, pc8001m2,  0,        0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8001 Mk2", GAME_NOT_WORKING )	// not sure about this dump
 
 COMP( 1981, pc8801,    0,        0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8801", GAME_NOT_WORKING )
-COMP( 1983, pc88m2,    pc8801,   0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8001 MkII", GAME_NOT_WORKING )	// not sure about this dump
+COMP( 1983, pc88m2,    pc8801,   0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8801 MkII", GAME_NOT_WORKING )	// not sure about this dump
 COMP( 1985, pc88m2sl,  0,        0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8801 MkIISR", 0 )
 COMP( 1985, pc88m2sh,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801 MkIISR (High Resolution)", 0 )
 COMP( 1985, pc88m2fr,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801 MkIIFR", 0 )

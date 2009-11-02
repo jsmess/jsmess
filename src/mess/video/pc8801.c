@@ -399,7 +399,7 @@ WRITE8_HANDLER( pc88sr_alu )
 	pc8801_update_bank(space->machine);
 }
 
-WRITE8_HANDLER( pc8801_vramsel )
+WRITE8_HANDLER( pc88_vramsel_w )
 {
 	if (offset == 3)
 		selected_vram = 0;
@@ -409,7 +409,7 @@ WRITE8_HANDLER( pc8801_vramsel )
 	pc8801_update_bank(space->machine);
 }
 
-READ8_HANDLER( pc8801_vramtest )
+READ8_HANDLER( pc88_vramtest_r )
 {
 	switch (selected_vram)
 	{
@@ -734,7 +734,7 @@ PALETTE_INIT( pc8801 )
 	}
 }
 
-WRITE8_HANDLER( pc8801_crtc_write )
+WRITE8_HANDLER( pc88_crtc_w )
 {
 	if (offset == 1)
 	{
@@ -884,7 +884,7 @@ WRITE8_HANDLER( pc8801_crtc_write )
 	}
 }
 
-READ8_HANDLER( pc8801_crtc_read )
+READ8_HANDLER( pc88_crtc_r )
 {
 	if (offset == 0)
 	{
@@ -909,7 +909,7 @@ READ8_HANDLER( pc8801_crtc_read )
 	}
 }
 
-WRITE8_HANDLER( pc8801_dmac_write )
+WRITE8_HANDLER( pc88_dmac_w )
 {
 	switch (offset)
 	{
@@ -952,7 +952,7 @@ WRITE8_HANDLER( pc8801_dmac_write )
 	}
 }
 
-READ8_HANDLER( pc8801_dmac_read )
+READ8_HANDLER( pc88_dmac_r )
 {
 	switch (offset)
 	{
@@ -1023,7 +1023,7 @@ WRITE8_HANDLER( pc88sr_disp_31 )
 		gmode = gmode_new;
 }
 
-WRITE8_HANDLER(pc8801_palette_out)
+WRITE8_HANDLER(pc88_palette_w)
 {
 	int palno;
 	int i;
