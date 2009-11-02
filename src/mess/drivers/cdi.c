@@ -13,19 +13,15 @@
 
 STATUS:
 
-Some games will start up, but fail horribly.
+Some games are playable, but many suffer from bugs and/or crashes.
 
 TODO:
 
--Proper handling of the 68070 (68k with 32 address lines instead of 24)
- & handle the extra features properly (UART,DMA,Timers etc.)
+- Proper handling of the 68070's internal devices (UART,DMA,Timers etc.)
 
--Full emulation of the 66470 and/or MCD212 Video Chip (still many unhandled features)
-
--Unknown sound chip (CD-i ADPCM);
+- Full emulation of the 66470 and/or MCD212 Video Chip
 
 *******************************************************************************/
-
 
 #define CLOCK_A	XTAL_30MHz
 #define CLOCK_B	XTAL_19_6608MHz
@@ -49,9 +45,9 @@ static bitmap_t* lcdbitmap;
 
 #define ENABLE_UART_PRINTING (0)
 
-#define VERBOSE_LEVEL	(6)
+#define VERBOSE_LEVEL	(5)
 
-#define ENABLE_VERBOSE_LOG (1)
+#define ENABLE_VERBOSE_LOG (0)
 
 #if ENABLE_VERBOSE_LOG
 INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)
@@ -310,11 +306,12 @@ typedef struct
 typedef struct
 {
 	UINT16 lir;
+	UINT8 picr1;
+	UINT8 picr2;
+
 	scc68070_i2c_regs_t i2c;
 	scc68070_uart_regs_t uart;
 	scc68070_timer_regs_t timers;
-	UINT8 picr1;
-	UINT8 picr2;
 	scc68070_dma_regs_t dma;
 	scc68070_mmu_regs_t mmu;
 } scc68070_regs_t;
@@ -885,6 +882,58 @@ static WRITE16_HANDLER( scc68070_periphs_w )
 	}
 }
 
+static void scc68070_init(running_machine *machine, scc68070_regs_t *scc68070)
+{
+	int index = 0;
+	scc68070->lir = 0;
+
+	scc68070->picr1 = 0;
+	scc68070->picr2 = 0;
+
+	scc68070->i2c.data_register = 0;
+	scc68070->i2c.address_register = 0;
+	scc68070->i2c.status_register = 0;
+	scc68070->i2c.control_register = 0;
+	scc68070->i2c.clock_control_register = 0;
+
+	scc68070->uart.mode_register = 0;
+	scc68070->uart.status_register = 0;
+	scc68070->uart.clock_select = 0;
+	scc68070->uart.command_register = 0;
+	scc68070->uart.transmit_holding_register = 0;
+	scc68070->uart.receive_holding_register = 0;
+
+	scc68070->timers.timer_status_register = 0;
+	scc68070->timers.timer_control_register = 0;
+	scc68070->timers.reload_register = 0;
+	scc68070->timers.timer0 = 0;
+	scc68070->timers.timer1 = 0;
+	scc68070->timers.timer2 = 0;
+
+	for(index = 0; index < 2; index++)
+	{
+		scc68070->dma.channel[index].channel_status = 0;
+		scc68070->dma.channel[index].channel_error = 0;
+		scc68070->dma.channel[index].device_control = 0;
+		scc68070->dma.channel[index].operation_control = 0;
+		scc68070->dma.channel[index].sequence_control = 0;
+		scc68070->dma.channel[index].channel_control = 0;
+		scc68070->dma.channel[index].transfer_counter = 0;
+		scc68070->dma.channel[index].memory_address_counter = 0;
+		scc68070->dma.channel[index].device_address_counter = 0;
+	}
+
+	scc68070->mmu.status = 0;
+	scc68070->mmu.control = 0;
+	for(index = 0; index < 8; index++)
+	{
+		scc68070->mmu.desc[index].attr = 0;
+		scc68070->mmu.desc[index].length = 0;
+		scc68070->mmu.desc[index].segment = 0;
+		scc68070->mmu.desc[index].base = 0;
+	}
+}
+
 #if ENABLE_UART_PRINTING
 static READ16_HANDLER( uart_loopback_enable )
 {
@@ -896,7 +945,6 @@ static READ16_HANDLER( uart_loopback_enable )
 
 typedef struct
 {
-	UINT16 busy_clear_countdown;
 	UINT16 command; 			// CDIC Command Register (0x303c00)
 	UINT32 time;				// CDIC Time Register (0x303c02)
 	UINT16 file;				// CDIC File Register (0x303c06)
@@ -909,8 +957,6 @@ typedef struct
 	UINT16 z_buffer;			// CDIC Z-Buffer Register (0x303ffa)
 	UINT16 interrupt_vector;	// CDIC Interrupt Vector Register (0x303ffc)
 	UINT16 data_buffer;			// CDIC Data Buffer Register (0x303ffe)
-
-	UINT8 buffer_target;
 
 	emu_timer *interrupt_timer;
 	cdrom_file *cd;
@@ -1227,7 +1273,7 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 	int bits = 4;
 	int index = 0;
 	INT16 samples[18*28*16+16];
-	FILE* temp_adpcm = fopen("temp_adpcm.bin","ab");
+	//FILE* temp_adpcm = fopen("temp_adpcm.bin","ab");
 
 	//printf( "%02x\n", hdr[2] & 0x3f );
 
@@ -1235,13 +1281,13 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 	{
 		// Don't play
 		//timer_adjust_oneshot(cdic_regs.audio_sample_timer, attotime_never, 0);
-		fclose(temp_adpcm);
+		//fclose(temp_adpcm);
 		return;
 	}
 
 	verboselog(machine, 0, "cdic_decode_audio_sector, got header type %02x\n", hdr[2] );
 
-	fseek(temp_adpcm, 0, SEEK_END);
+	//fseek(temp_adpcm, 0, SEEK_END);
 	switch(hdr[2] & 0x3f)	// ignore emphasis and reserved bits
 	{
 		case 0:
@@ -1328,7 +1374,7 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 					cdic_decode_xa_stereo(hdr + 4, samples);
 					samples[18*28*8 + 0] = samples[18*28*8 + 2] = samples[18*28*8 + 4] = samples[18*28*8 + 6] = samples[18*28*8 + 8] = samples[18*28*8 + 10] = samples[18*28*8 + 12] = samples[18*28*8 + 14] = samples[18*28*8 - 2];
 					samples[18*28*8 + 1] = samples[18*28*8 + 3] = samples[18*28*8 + 5] = samples[18*28*8 + 7] = samples[18*28*8 + 9] = samples[18*28*8 + 11] = samples[18*28*8 + 13] = samples[18*28*8 + 15] = samples[18*28*8 - 1];
-					fwrite(samples, 1, 18*28*4*cdic_regs.audio_sample_size, temp_adpcm);
+					//fwrite(samples, 1, 18*28*4*cdic_regs.audio_sample_size, temp_adpcm);
 					break;
 				case 8:
 					cdic_decode_xa_stereo8(hdr + 4, samples);
@@ -1341,7 +1387,7 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 
     dmadac_transfer(&dmadac[0], 2, 1, 2, 18*28*2*cdic_regs.audio_sample_size, samples);
 
-	fclose(temp_adpcm);
+	//fclose(temp_adpcm);
 }
 
 // After an appropriate delay for decoding to take place...
@@ -2017,6 +2063,24 @@ static WRITE16_HANDLER( cdic_w )
 	}
 }
 
+static void cdic_init(running_machine *machine, cdic_regs_t *cdic)
+{
+	cdic->command = 0;
+	cdic->time = 0;
+	cdic->file = 0;
+	cdic->channel = 0xffffffff;
+	cdic->audio_channel = 0xffff;
+	cdic->audio_buffer = 0;
+	cdic->x_buffer = 0;
+	cdic->dma_control = 0;
+	cdic->z_buffer = 0;
+	cdic->interrupt_vector = 0;
+	cdic->data_buffer = 0;
+
+	cdic->audio_sample_freq = 0;
+	cdic->audio_sample_size = 0;
+}
+
 typedef struct
 {
 	UINT8 out_buf[4];
@@ -2394,6 +2458,37 @@ static WRITE16_HANDLER( slave_w )
 	}
 }
 
+static void slave_init(running_machine *machine, slave_regs_t *slave)
+{
+	int index = 0;
+	for(index = 0; index < 4; index++)
+	{
+		slave->channel[index].out_buf[0] = 0;
+		slave->channel[index].out_buf[1] = 0;
+		slave->channel[index].out_buf[2] = 0;
+		slave->channel[index].out_buf[3] = 0;
+		slave->channel[index].out_index = 0;
+		slave->channel[index].out_count = 0;
+		slave->channel[index].out_cmd = 0;
+	}
+
+	memset(slave->in_buf, 0, 17);
+	slave->in_index = 0;
+	slave->in_count = 0;
+
+	slave->polling_active = 0;
+
+	slave->xbus_interrupt_enable = 0;
+
+	memset(slave->lcd_state, 0, 16);
+
+	slave->real_mouse_x = 0;
+	slave->real_mouse_y = 0;
+
+	slave->fake_mouse_x = 0;
+	slave->fake_mouse_y = 0;
+}
+
 /*************************
 *     Video Hardware     *
 *************************/
@@ -2440,9 +2535,9 @@ typedef struct
 	emu_timer *scan_timer;
 	UINT8 region_flag_0[768];
 	UINT8 region_flag_1[768];
-} mcd212_t;
+} mcd212_regs_t;
 
-static mcd212_t mcd212;
+static mcd212_regs_t mcd212_regs;
 
 #define MCD212_CURCNT_COLOR			0x00000f	// Cursor color
 #define MCD212_CURCNT_CUW			0x008000	// Cursor width
@@ -2578,17 +2673,17 @@ static READ16_HANDLER(mcd212_r)
 		case 0x10/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(space->machine, 12, "mcd212_r: Status Register %d: %02x & %04x\n", channel + 1, mcd212.channel[1 - (offset / 8)].csrr, mem_mask);
+				verboselog(space->machine, 12, "mcd212_r: Status Register %d: %02x & %04x\n", channel + 1, mcd212_regs.channel[1 - (offset / 8)].csrr, mem_mask);
 				if(channel == 0)
 				{
-					return mcd212.channel[0].csrr;
+					return mcd212_regs.channel[0].csrr;
 				}
 				else
 				{
-					UINT8 old_csr = mcd212.channel[1].csrr;
+					UINT8 old_csr = mcd212_regs.channel[1].csrr;
 					UINT8 interrupt1 = (scc68070_regs.lir >> 4) & 7;
 					//UINT8 interrupt2 = scc68070_regs.lir & 7;
-					mcd212.channel[1].csrr &= ~(MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2);
+					mcd212_regs.channel[1].csrr &= ~(MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2);
 					if(interrupt1)
 					{
 						cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_1 + (interrupt1 - 1), CLEAR_LINE);
@@ -2607,20 +2702,20 @@ static READ16_HANDLER(mcd212_r)
 			break;
 		case 0x02/2:
 		case 0x12/2:
-			verboselog(space->machine, 2, "mcd212_r: Display Command Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212.channel[1 - (offset / 8)].dcr, mem_mask);
-			return mcd212.channel[1 - (offset / 8)].dcr;
+			verboselog(space->machine, 2, "mcd212_r: Display Command Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212_regs.channel[1 - (offset / 8)].dcr, mem_mask);
+			return mcd212_regs.channel[1 - (offset / 8)].dcr;
 		case 0x04/2:
 		case 0x14/2:
-			verboselog(space->machine, 2, "mcd212_r: Video Start Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212.channel[1 - (offset / 8)].vsr, mem_mask);
-			return mcd212.channel[1 - (offset / 8)].vsr;
+			verboselog(space->machine, 2, "mcd212_r: Video Start Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212_regs.channel[1 - (offset / 8)].vsr, mem_mask);
+			return mcd212_regs.channel[1 - (offset / 8)].vsr;
 		case 0x08/2:
 		case 0x18/2:
-			verboselog(space->machine, 2, "mcd212_r: Display Decoder Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212.channel[1 - (offset / 8)].ddr, mem_mask);
-			return mcd212.channel[1 - (offset / 8)].ddr;
+			verboselog(space->machine, 2, "mcd212_r: Display Decoder Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212_regs.channel[1 - (offset / 8)].ddr, mem_mask);
+			return mcd212_regs.channel[1 - (offset / 8)].ddr;
 		case 0x0a/2:
 		case 0x1a/2:
-			verboselog(space->machine, 2, "mcd212_r: DCA Pointer Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212.channel[1 - (offset / 8)].dcp, mem_mask);
-			return mcd212.channel[1 - (offset / 8)].dcp;
+			verboselog(space->machine, 2, "mcd212_r: DCA Pointer Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212_regs.channel[1 - (offset / 8)].dcp, mem_mask);
+			return mcd212_regs.channel[1 - (offset / 8)].dcp;
 		default:
 			verboselog(space->machine, 2, "mcd212_r: Unknown Register %d & %04x\n", (1 - (offset / 8)) + 1, mem_mask);
 			break;
@@ -2635,7 +2730,7 @@ static void mcd212_update_visible_area(running_machine *machine)
     attoseconds_t period = video_screen_get_frame_period(machine->primary_screen).attoseconds;
 	int width = 0;
 
-	if((mcd212.channel[0].dcr & (MCD212_DCR_CF | MCD212_DCR_FD)) && (mcd212.channel[0].csrw & MCD212_CSR1W_ST))
+	if((mcd212_regs.channel[0].dcr & (MCD212_DCR_CF | MCD212_DCR_FD)) && (mcd212_regs.channel[0].csrw & MCD212_CSR1W_ST))
 	{
 		width = 360;
 	}
@@ -2656,29 +2751,29 @@ static WRITE16_HANDLER(mcd212_w)
 		case 0x00/2:
 		case 0x10/2:
 			verboselog(space->machine, 2, "mcd212_w: Status Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
-			COMBINE_DATA(&mcd212.channel[1 - (offset / 8)].csrw);
+			COMBINE_DATA(&mcd212_regs.channel[1 - (offset / 8)].csrw);
 			mcd212_update_visible_area(space->machine);
 			break;
 		case 0x02/2:
 		case 0x12/2:
 			verboselog(space->machine, 2, "mcd212_w: Display Command Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
-			COMBINE_DATA(&mcd212.channel[1 - (offset / 8)].dcr);
+			COMBINE_DATA(&mcd212_regs.channel[1 - (offset / 8)].dcr);
 			mcd212_update_visible_area(space->machine);
 			break;
 		case 0x04/2:
 		case 0x14/2:
 			verboselog(space->machine, 2, "mcd212_w: Video Start Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
-			COMBINE_DATA(&mcd212.channel[1 - (offset / 8)].vsr);
+			COMBINE_DATA(&mcd212_regs.channel[1 - (offset / 8)].vsr);
 			break;
 		case 0x08/2:
 		case 0x18/2:
 			verboselog(space->machine, 2, "mcd212_w: Display Decoder Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
-			COMBINE_DATA(&mcd212.channel[1 - (offset / 8)].ddr);
+			COMBINE_DATA(&mcd212_regs.channel[1 - (offset / 8)].ddr);
 			break;
 		case 0x0a/2:
 		case 0x1a/2:
 			verboselog(space->machine, 2, "mcd212_w: DCA Pointer Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
-			COMBINE_DATA(&mcd212.channel[1 - (offset / 8)].dcp);
+			COMBINE_DATA(&mcd212_regs.channel[1 - (offset / 8)].dcp);
 			break;
 		default:
 			verboselog(space->machine, 2, "mcd212_w: Unknown Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, data, mem_mask);
@@ -2698,97 +2793,97 @@ static void mcd212_set_register(running_machine *machine, int channel, UINT8 reg
 		case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 		case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
-			verboselog(machine, 11, "          %04xxxxx: %d: CLUT[%d] = %08x\n", channel * 0x20, channel, mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80), value );
-			mcd212.channel[0].clut_r[mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (UINT8)(value >> 16) & 0xfc;
-			mcd212.channel[0].clut_g[mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (UINT8)(value >>  8) & 0xfc;
-			mcd212.channel[0].clut_b[mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (UINT8)(value >>  0) & 0xfc;
+			verboselog(machine, 11, "          %04xxxxx: %d: CLUT[%d] = %08x\n", channel * 0x20, channel, mcd212_regs.channel[channel].clut_bank * 0x40 + (reg - 0x80), value );
+			mcd212_regs.channel[0].clut_r[mcd212_regs.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (UINT8)(value >> 16) & 0xfc;
+			mcd212_regs.channel[0].clut_g[mcd212_regs.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (UINT8)(value >>  8) & 0xfc;
+			mcd212_regs.channel[0].clut_b[mcd212_regs.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (UINT8)(value >>  0) & 0xfc;
 			break;
 		case 0xc0: // Image Coding Method
 			if(channel == 0)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Image Coding Method = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].image_coding_method = value;
+				mcd212_regs.channel[channel].image_coding_method = value;
 			}
 			break;
 		case 0xc1: // Transparency Control
 			if(channel == 0)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Transparency Control = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].transparency_control = value;
+				mcd212_regs.channel[channel].transparency_control = value;
 			}
 			break;
 		case 0xc2: // Plane Order
 			if(channel == 0)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Plane Order = %08x\n", channel * 0x20, channel, value & 7);
-				mcd212.channel[channel].plane_order = value & 0x00000007;
+				mcd212_regs.channel[channel].plane_order = value & 0x00000007;
 			}
 			break;
 		case 0xc3: // CLUT Bank Register
 			verboselog(machine, 6, "          %04xxxxx: %d: CLUT Bank Register = %08x\n", channel * 0x20, channel, value & 3);
-			mcd212.channel[channel].clut_bank = channel ? (2 | (value & 0x00000001)) : (value & 0x00000003);
+			mcd212_regs.channel[channel].clut_bank = channel ? (2 | (value & 0x00000001)) : (value & 0x00000003);
 			break;
 		case 0xc4: // Transparent Color A
 			if(channel == 0)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Transparent Color A = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].transparent_color_a = value & 0xfcfcfc;
+				mcd212_regs.channel[channel].transparent_color_a = value & 0xfcfcfc;
 			}
 			break;
 		case 0xc6: // Transparent Color B
 			if(channel == 1)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Transparent Color B = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].transparent_color_b = value & 0xfcfcfc;
+				mcd212_regs.channel[channel].transparent_color_b = value & 0xfcfcfc;
 			}
 			break;
 		case 0xc7: // Mask Color A
 			if(channel == 0)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Mask Color A = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].mask_color_a = value & 0xfcfcfc;
+				mcd212_regs.channel[channel].mask_color_a = value & 0xfcfcfc;
 			}
 			break;
 		case 0xc9: // Mask Color B
 			if(channel == 1)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Mask Color B = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].mask_color_b = value & 0xfcfcfc;
+				mcd212_regs.channel[channel].mask_color_b = value & 0xfcfcfc;
 			}
 			break;
 		case 0xca: // Delta YUV Absolute Start Value A
 			if(channel == 0)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Delta YUV Absolute Start Value A = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].dyuv_abs_start_a = value;
+				mcd212_regs.channel[channel].dyuv_abs_start_a = value;
 			}
 			break;
 		case 0xcb: // Delta YUV Absolute Start Value B
 			if(channel == 1)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Delta YUV Absolute Start Value B = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].dyuv_abs_start_b = value;
+				mcd212_regs.channel[channel].dyuv_abs_start_b = value;
 			}
 			break;
 		case 0xcd: // Cursor Position
 			if(channel == 0)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Cursor Position = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].cursor_position = value;
+				mcd212_regs.channel[channel].cursor_position = value;
 			}
 			break;
 		case 0xce: // Cursor Control
 			if(channel == 0)
 			{
 				verboselog(machine, 11, "          %04xxxxx: %d: Cursor Control = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].cursor_control = value;
+				mcd212_regs.channel[channel].cursor_control = value;
 			}
 			break;
 		case 0xcf: // Cursor Pattern
 			if(channel == 0)
 			{
 				verboselog(machine, 11, "          %04xxxxx: %d: Cursor Pattern[%d] = %04x\n", channel * 0x20, channel, (value >> 16) & 0x000f, value & 0x0000ffff);
-				mcd212.channel[channel].cursor_pattern[(value >> 16) & 0x000f] = value & 0x0000ffff;
+				mcd212_regs.channel[channel].cursor_pattern[(value >> 16) & 0x000f] = value & 0x0000ffff;
 			}
 			break;
 		case 0xd0: // Region Control 0-7
@@ -2800,35 +2895,35 @@ static void mcd212_set_register(running_machine *machine, int channel, UINT8 reg
 		case 0xd6:
 		case 0xd7:
 			verboselog(machine, 6, "          %04xxxxx: %d: Region Control %d = %08x\n", channel * 0x20, channel, reg & 7, value );
-			mcd212.channel[0].region_control[reg & 7] = value;
+			mcd212_regs.channel[0].region_control[reg & 7] = value;
 			mcd212_update_region_arrays(machine);
 			break;
 		case 0xd8: // Backdrop Color
 			if(channel == 0)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Backdrop Color = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].backdrop_color = value;
+				mcd212_regs.channel[channel].backdrop_color = value;
 			}
 			break;
 		case 0xd9: // Mosaic Pixel Hold Factor A
 			if(channel == 0)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Mosaic Pixel Hold Factor A = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].mosaic_hold_a = value;
+				mcd212_regs.channel[channel].mosaic_hold_a = value;
 			}
 			break;
 		case 0xda: // Mosaic Pixel Hold Factor B
 			if(channel == 1)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Mosaic Pixel Hold Factor B = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].mosaic_hold_b = value;
+				mcd212_regs.channel[channel].mosaic_hold_b = value;
 			}
 			break;
 		case 0xdb: // Weight Factor A
 			if(channel == 0)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Weight Factor A = %08x\n", channel * 0x20, channel, value );
-				memset(mcd212.channel[channel].weight_factor_a, value & 0x000000ff, 768);
+				memset(mcd212_regs.channel[channel].weight_factor_a, value & 0x000000ff, 768);
 				mcd212_update_region_arrays(machine);
 			}
 			break;
@@ -2836,7 +2931,7 @@ static void mcd212_set_register(running_machine *machine, int channel, UINT8 reg
 			if(channel == 1)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Weight Factor B = %08x\n", channel * 0x20, channel, value );
-				memset(mcd212.channel[channel].weight_factor_b, value & 0x000000ff, 768);
+				memset(mcd212_regs.channel[channel].weight_factor_b, value & 0x000000ff, 768);
 				mcd212_update_region_arrays(machine);
 			}
 			break;
@@ -2845,34 +2940,34 @@ static void mcd212_set_register(running_machine *machine, int channel, UINT8 reg
 
 static void mcd212_set_vsr(int channel, UINT32 value)
 {
-	mcd212.channel[channel].vsr = value & 0x0000ffff;
-	mcd212.channel[channel].dcr &= 0xffc0;
-	mcd212.channel[channel].dcr |= (value >> 16) & 0x003f;
+	mcd212_regs.channel[channel].vsr = value & 0x0000ffff;
+	mcd212_regs.channel[channel].dcr &= 0xffc0;
+	mcd212_regs.channel[channel].dcr |= (value >> 16) & 0x003f;
 }
 
 static UINT32 mcd212_get_vsr(int channel)
 {
-	return ((mcd212.channel[channel].dcr & 0x3f) << 16) | mcd212.channel[channel].vsr;
+	return ((mcd212_regs.channel[channel].dcr & 0x3f) << 16) | mcd212_regs.channel[channel].vsr;
 }
 
 static void mcd212_set_dcp(int channel, UINT32 value)
 {
-	mcd212.channel[channel].dcp = value & 0x0000ffff;
-	mcd212.channel[channel].ddr &= 0xffc0;
-	mcd212.channel[channel].ddr |= (value >> 16) & 0x003f;
+	mcd212_regs.channel[channel].dcp = value & 0x0000ffff;
+	mcd212_regs.channel[channel].ddr &= 0xffc0;
+	mcd212_regs.channel[channel].ddr |= (value >> 16) & 0x003f;
 }
 
 static UINT32 mcd212_get_dcp(int channel)
 {
-	return ((mcd212.channel[channel].ddr & 0x3f) << 16) | mcd212.channel[channel].dcp;
+	return ((mcd212_regs.channel[channel].ddr & 0x3f) << 16) | mcd212_regs.channel[channel].dcp;
 }
 
 static void mcd212_set_display_parameters(int channel, UINT8 value)
 {
-	mcd212.channel[channel].ddr &= 0xf0ff;
-	mcd212.channel[channel].ddr |= (value & 0x0f) << 8;
-	mcd212.channel[channel].dcr &= 0xf7ff;
-	mcd212.channel[channel].dcr |= (value & 0x10) << 7;
+	mcd212_regs.channel[channel].ddr &= 0xf0ff;
+	mcd212_regs.channel[channel].ddr |= (value & 0x0f) << 8;
+	mcd212_regs.channel[channel].dcr &= 0xf7ff;
+	mcd212_regs.channel[channel].dcr |= (value & 0x10) << 7;
 }
 
 static void mcd212_process_ica(running_machine *machine, int channel)
@@ -2921,8 +3016,8 @@ static void mcd212_process_ica(running_machine *machine, int channel)
 			case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67: // INTERRUPT
 			case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 				verboselog(machine, 11, "%08x: %08x: ICA %d: INTERRUPT\n", addr * 2 + channel * 0x200000, cmd, channel );
-				mcd212.channel[1].csrr |= 1 << (2 - channel);
-				if(mcd212.channel[1].csrr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
+				mcd212_regs.channel[1].csrr |= 1 << (2 - channel);
+				if(mcd212_regs.channel[1].csrr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
 				{
 					UINT8 interrupt = (scc68070_regs.lir >> 4) & 7;
 					if(interrupt)
@@ -2932,7 +3027,7 @@ static void mcd212_process_ica(running_machine *machine, int channel)
 					}
 				}
 				/*
-				if(mcd212.channel[1].csrr & MCD212_CSR2R_IT2)
+				if(mcd212_regs.channel[1].csrr & MCD212_CSR2R_IT2)
 				{
 					UINT8 interrupt = scc68070_regs.lir & 7;
 					if(interrupt)
@@ -2961,7 +3056,7 @@ static void mcd212_process_ica(running_machine *machine, int channel)
 static void mcd212_process_dca(running_machine *machine, int channel)
 {
 	UINT16 *dca = channel ? planeb : planea;
-	UINT32 addr = (mcd212.channel[channel].dca & 0x0007ffff) / 2; //(mcd212_get_dcp(channel) & 0x0007ffff) / 2; // mcd212.channel[channel].dca / 2;
+	UINT32 addr = (mcd212_regs.channel[channel].dca & 0x0007ffff) / 2; //(mcd212_get_dcp(channel) & 0x0007ffff) / 2; // mcd212_regs.channel[channel].dca / 2;
 	UINT32 cmd = 0;
 	UINT32 count = 0;
 	UINT32 max = 64;
@@ -3010,8 +3105,8 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 			case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67: // INTERRUPT
 			case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 				verboselog(machine, 11, "%08x: %08x: DCA %d: INTERRUPT\n", addr * 2 + channel * 0x200000, cmd, channel );
-				mcd212.channel[1].csrr |= 1 << (2 - channel);
-				if(mcd212.channel[1].csrr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
+				mcd212_regs.channel[1].csrr |= 1 << (2 - channel);
+				if(mcd212_regs.channel[1].csrr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
 				{
 					UINT8 interrupt = (scc68070_regs.lir >> 4) & 7;
 					if(interrupt)
@@ -3021,7 +3116,7 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 					}
 				}
 				/*
-				if(mcd212.channel[1].csrr & MCD212_CSR2R_IT2)
+				if(mcd212_regs.channel[1].csrr & MCD212_CSR2R_IT2)
 				{
 					UINT8 interrupt = scc68070_regs.lir & 7;
 					if(interrupt)
@@ -3052,7 +3147,7 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 			addr += (max - count) >> 1;
 		}
 	}
-	mcd212.channel[channel].dca = addr * 2;
+	mcd212_regs.channel[channel].dca = addr * 2;
 }
 
 typedef UINT8 BYTE68K;
@@ -3143,12 +3238,12 @@ static void mcd212_update_region_arrays(running_machine *machine)
 
 	int latched_rf0 = 0;
 	int latched_rf1 = 0;
-	int latched_wfa = mcd212.channel[0].weight_factor_a[0];
-	int latched_wfb = mcd212.channel[1].weight_factor_b[0];
+	int latched_wfa = mcd212_regs.channel[0].weight_factor_a[0];
+	int latched_wfb = mcd212_regs.channel[1].weight_factor_b[0];
 	int reg = 0;
 	for(x = 0; x < 768; x++)
 	{
-		if(mcd212.channel[0].image_coding_method & MCD212_ICM_NR)
+		if(mcd212_regs.channel[0].image_coding_method & MCD212_ICM_NR)
 		{
 			int reg = 0;
 			int flag = 0;
@@ -3157,13 +3252,13 @@ static void mcd212_update_region_arrays(running_machine *machine)
 			{
 				for(reg = 0; reg < 4; reg++)
 				{
-					if(mcd212.channel[0].region_control[reg] == 0)
+					if(mcd212_regs.channel[0].region_control[reg] == 0)
 					{
 						break;
 					}
-					if(x == (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_X))
+					if(x == (mcd212_regs.channel[0].region_control[flag*4 + reg] & MCD212_RC_X))
 					{
-						switch((mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_OP) >> MCD212_RC_OP_SHIFT)
+						switch((mcd212_regs.channel[0].region_control[flag*4 + reg] & MCD212_RC_OP) >> MCD212_RC_OP_SHIFT)
 						{
 							case 0: // End of region control for line
 								break;
@@ -3172,12 +3267,12 @@ static void mcd212_update_region_arrays(running_machine *machine)
 							case 3: // Not used
 								break;
 							case 4: // Change weight of plane A
-								latched_wfa = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								latched_wfa = (mcd212_regs.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 								break;
 							case 5:	// Not used
 								break;
 							case 6: // Change weight of plane B
-								latched_wfb = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								latched_wfb = (mcd212_regs.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 								break;
 							case 7:	// Not used
 								break;
@@ -3205,7 +3300,7 @@ static void mcd212_update_region_arrays(running_machine *machine)
 							case 11:	// Not used
 								break;
 							case 12: // Reset region flag and change weight of plane A
-								latched_wfa = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								latched_wfa = (mcd212_regs.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 								if(flag)
 								{
 									latched_rf1 = 0;
@@ -3216,7 +3311,7 @@ static void mcd212_update_region_arrays(running_machine *machine)
 								}
 								break;
 							case 13: // Set region flag and change weight of plane A
-								latched_wfa = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								latched_wfa = (mcd212_regs.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 								if(flag)
 								{
 									latched_rf1 = 1;
@@ -3227,7 +3322,7 @@ static void mcd212_update_region_arrays(running_machine *machine)
 								}
 								break;
 							case 14: // Reset region flag and change weight of plane B
-								latched_wfb = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								latched_wfb = (mcd212_regs.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 								if(flag)
 								{
 									latched_rf1 = 0;
@@ -3238,7 +3333,7 @@ static void mcd212_update_region_arrays(running_machine *machine)
 								}
 								break;
 							case 15: // Set region flag and change weight of plane B
-								latched_wfb = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								latched_wfb = (mcd212_regs.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 								if(flag)
 								{
 									latched_rf1 = 1;
@@ -3257,21 +3352,21 @@ static void mcd212_update_region_arrays(running_machine *machine)
 		{
 			if(reg < 8)
 			{
-				int flag = (mcd212.channel[0].region_control[reg] & MCD212_RC_RF) >> MCD212_RC_RF_SHIFT;
-				if(!(mcd212.channel[0].region_control[reg] & MCD212_RC_OP))
+				int flag = (mcd212_regs.channel[0].region_control[reg] & MCD212_RC_RF) >> MCD212_RC_RF_SHIFT;
+				if(!(mcd212_regs.channel[0].region_control[reg] & MCD212_RC_OP))
 				{
 					for(; x < 768; x++)
 					{
-						mcd212.channel[0].weight_factor_a[x] = latched_wfa;
-						mcd212.channel[1].weight_factor_b[x] = latched_wfb;
-						mcd212.region_flag_0[x] = latched_rf0;
-						mcd212.region_flag_1[x] = latched_rf1;
+						mcd212_regs.channel[0].weight_factor_a[x] = latched_wfa;
+						mcd212_regs.channel[1].weight_factor_b[x] = latched_wfb;
+						mcd212_regs.region_flag_0[x] = latched_rf0;
+						mcd212_regs.region_flag_1[x] = latched_rf1;
 					}
 					break;
 				}
-				if(x == (mcd212.channel[0].region_control[reg] & MCD212_RC_X))
+				if(x == (mcd212_regs.channel[0].region_control[reg] & MCD212_RC_X))
 				{
-					switch((mcd212.channel[0].region_control[reg] & MCD212_RC_OP) >> MCD212_RC_OP_SHIFT)
+					switch((mcd212_regs.channel[0].region_control[reg] & MCD212_RC_OP) >> MCD212_RC_OP_SHIFT)
 					{
 						case 0: // End of region control for line
 							break;
@@ -3280,12 +3375,12 @@ static void mcd212_update_region_arrays(running_machine *machine)
 						case 3: // Not used
 							break;
 						case 4: // Change weight of plane A
-							latched_wfa = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+							latched_wfa = (mcd212_regs.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 							break;
 						case 5:	// Not used
 							break;
 						case 6: // Change weight of plane B
-							latched_wfb = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+							latched_wfb = (mcd212_regs.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 							break;
 						case 7:	// Not used
 							break;
@@ -3313,7 +3408,7 @@ static void mcd212_update_region_arrays(running_machine *machine)
 						case 11:	// Not used
 							break;
 						case 12: // Reset region flag and change weight of plane A
-							latched_wfa = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+							latched_wfa = (mcd212_regs.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 							if(flag)
 							{
 								latched_rf1 = 0;
@@ -3324,7 +3419,7 @@ static void mcd212_update_region_arrays(running_machine *machine)
 							}
 							break;
 						case 13: // Set region flag and change weight of plane A
-							latched_wfa = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+							latched_wfa = (mcd212_regs.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 							if(flag)
 							{
 								latched_rf1 = 1;
@@ -3335,7 +3430,7 @@ static void mcd212_update_region_arrays(running_machine *machine)
 							}
 							break;
 						case 14: // Reset region flag and change weight of plane B
-							latched_wfb = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+							latched_wfb = (mcd212_regs.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 							if(flag)
 							{
 								latched_rf1 = 0;
@@ -3346,7 +3441,7 @@ static void mcd212_update_region_arrays(running_machine *machine)
 							}
 							break;
 						case 15: // Set region flag and change weight of plane B
-							latched_wfb = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+							latched_wfb = (mcd212_regs.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 							if(flag)
 							{
 								latched_rf1 = 1;
@@ -3361,16 +3456,16 @@ static void mcd212_update_region_arrays(running_machine *machine)
 				}
 			}
 		}
-		mcd212.channel[0].weight_factor_a[x] = latched_wfa;
-		mcd212.channel[1].weight_factor_b[x] = latched_wfb;
-		mcd212.region_flag_0[x] = latched_rf0;
-		mcd212.region_flag_1[x] = latched_rf1;
+		mcd212_regs.channel[0].weight_factor_a[x] = latched_wfa;
+		mcd212_regs.channel[1].weight_factor_b[x] = latched_wfb;
+		mcd212_regs.region_flag_0[x] = latched_rf0;
+		mcd212_regs.region_flag_1[x] = latched_rf1;
 	}
 }
 
 static int mcd212_get_screen_width(running_machine *machine)
 {
-	if((mcd212.channel[0].dcr & (MCD212_DCR_CF | MCD212_DCR_FD)) && (mcd212.channel[0].csrw & MCD212_CSR1W_ST))
+	if((mcd212_regs.channel[0].dcr & (MCD212_DCR_CF | MCD212_DCR_FD)) && (mcd212_regs.channel[0].csrw & MCD212_CSR1W_ST))
 	{
 		return 720;
 	}
@@ -3385,12 +3480,12 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 	int x = 0;
 	UINT32 icm_mask = channel ? MCD212_ICM_MODE2 : MCD212_ICM_MODE1;
 	UINT32 icm_shift = channel ? MCD212_ICM_MODE2_SHIFT : MCD212_ICM_MODE1_SHIFT;
-	UINT8 icm = (mcd212.channel[0].image_coding_method & icm_mask) >> icm_shift;
-	UINT8 *clut_r = mcd212.channel[0].clut_r;
-	UINT8 *clut_g = mcd212.channel[0].clut_g;
-	UINT8 *clut_b = mcd212.channel[0].clut_b;
-	UINT8 mosaic_enable = ((mcd212.channel[channel].ddr & MCD212_DDR_FT) == MCD212_DDR_FT_MOSAIC);
-	UINT8 mosaic_factor = 1 << (((mcd212.channel[channel].ddr & MCD212_DDR_MT) >> MCD212_DDR_MT_SHIFT) + 1);
+	UINT8 icm = (mcd212_regs.channel[0].image_coding_method & icm_mask) >> icm_shift;
+	UINT8 *clut_r = mcd212_regs.channel[0].clut_r;
+	UINT8 *clut_g = mcd212_regs.channel[0].clut_g;
+	UINT8 *clut_b = mcd212_regs.channel[0].clut_b;
+	UINT8 mosaic_enable = ((mcd212_regs.channel[channel].ddr & MCD212_DDR_FT) == MCD212_DDR_FT_MOSAIC);
+	UINT8 mosaic_factor = 1 << (((mcd212_regs.channel[channel].ddr & MCD212_DDR_MT) >> MCD212_DDR_MT_SHIFT) + 1);
 	int mosaic_index = 0;
 	int width = mcd212_get_screen_width(machine);
 
@@ -3409,12 +3504,12 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 	{
 		UINT8 byte = data[(vsr & 0x0007ffff) ^ 1];
 		vsr++;
-		switch(mcd212.channel[channel].ddr & MCD212_DDR_FT)
+		switch(mcd212_regs.channel[channel].ddr & MCD212_DDR_FT)
 		{
 			case MCD212_DDR_FT_BMP:
 			case MCD212_DDR_FT_BMP2:
 			case MCD212_DDR_FT_MOSAIC:
-				if(mcd212.channel[channel].dcr & MCD212_DCR_CM)
+				if(mcd212_regs.channel[channel].dcr & MCD212_DCR_CM)
 				{
 					// 4-bit Bitmap
 					verboselog(machine, 0, "Unsupported display mode: 4-bit Bitmap\n" );
@@ -3430,14 +3525,14 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 						switch(channel)
 						{
 							case 0:
-								bY = (mcd212.channel[0].dyuv_abs_start_a >> 16) & 0x000000ff;
-								bU = (mcd212.channel[0].dyuv_abs_start_a >>  8) & 0x000000ff;
-								bV = (mcd212.channel[0].dyuv_abs_start_a >>  0) & 0x000000ff;
+								bY = (mcd212_regs.channel[0].dyuv_abs_start_a >> 16) & 0x000000ff;
+								bU = (mcd212_regs.channel[0].dyuv_abs_start_a >>  8) & 0x000000ff;
+								bV = (mcd212_regs.channel[0].dyuv_abs_start_a >>  0) & 0x000000ff;
 								break;
 							case 1:
-								bY = (mcd212.channel[1].dyuv_abs_start_b >> 16) & 0x000000ff;
-								bU = (mcd212.channel[1].dyuv_abs_start_b >>  8) & 0x000000ff;
-								bV = (mcd212.channel[1].dyuv_abs_start_b >>  0) & 0x000000ff;
+								bY = (mcd212_regs.channel[1].dyuv_abs_start_b >> 16) & 0x000000ff;
+								bU = (mcd212_regs.channel[1].dyuv_abs_start_b >>  8) & 0x000000ff;
+								bV = (mcd212_regs.channel[1].dyuv_abs_start_b >>  0) & 0x000000ff;
 								break;
 							default:
 								bY = bU = bV = 0x80;
@@ -3596,7 +3691,7 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 				done = 1;
 				break;
 			case MCD212_DDR_FT_RLE:
-				if(mcd212.channel[channel].dcr & MCD212_DCR_CM)
+				if(mcd212_regs.channel[channel].dcr & MCD212_DCR_CM)
 				{
 					verboselog(machine, 0, "Unsupported display mode: 4-bit RLE\n" );
 					done = 1;
@@ -3686,20 +3781,20 @@ static const UINT32 mcd212_4bpp_color[16] =
 
 static void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y)
 {
-	if(mcd212.channel[0].cursor_control & MCD212_CURCNT_EN)
+	if(mcd212_regs.channel[0].cursor_control & MCD212_CURCNT_EN)
 	{
-		UINT16 curx =  mcd212.channel[0].cursor_position        & 0x3ff;
-		UINT16 cury = ((mcd212.channel[0].cursor_position >> 12) & 0x3ff) + 22;
+		UINT16 curx =  mcd212_regs.channel[0].cursor_position        & 0x3ff;
+		UINT16 cury = ((mcd212_regs.channel[0].cursor_position >> 12) & 0x3ff) + 22;
 		UINT32 x = 0;
 		if(y >= cury && y < (cury + 16))
 		{
-			UINT32 color = mcd212_4bpp_color[mcd212.channel[0].cursor_control & MCD212_CURCNT_COLOR];
+			UINT32 color = mcd212_4bpp_color[mcd212_regs.channel[0].cursor_control & MCD212_CURCNT_COLOR];
 			y -= cury;
-			if(mcd212.channel[0].cursor_control & MCD212_CURCNT_CUW)
+			if(mcd212_regs.channel[0].cursor_control & MCD212_CURCNT_CUW)
 			{
 				for(x = curx; x < curx + 64 && x < 768; x++)
 				{
-					if(mcd212.channel[0].cursor_pattern[y] & (1 << (15 - ((x - curx) >> 2))))
+					if(mcd212_regs.channel[0].cursor_pattern[y] & (1 << (15 - ((x - curx) >> 2))))
 					{
 						scanline[(x++)/2] = color;
 						scanline[(x++)/2] = color;
@@ -3715,7 +3810,7 @@ static void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y
 			{
 				for(x = curx; x < curx + 32 && x < 768; x++)
 				{
-					if(mcd212.channel[0].cursor_pattern[y] & (1 << (15 - ((x - curx) >> 1))))
+					if(mcd212_regs.channel[0].cursor_pattern[y] & (1 << (15 - ((x - curx) >> 1))))
 					{
 						scanline[(x++)/2] = color;
 						scanline[x/2] = color;
@@ -3732,31 +3827,31 @@ static void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y
 static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *plane_a_g, UINT8 *plane_a_b, UINT8 *plane_b_r, UINT8 *plane_b_g, UINT8 *plane_b_b, UINT32 *out)
 {
 	int x = 0;
-	UINT32 backdrop = mcd212_4bpp_color[mcd212.channel[0].backdrop_color];
-	UINT8 transparency_mode_a = (mcd212.channel[0].transparency_control >> 0) & 0x0f;
-	UINT8 transparency_mode_b = (mcd212.channel[0].transparency_control >> 8) & 0x0f;
-	UINT8 transparent_color_a_r = (UINT8)(mcd212.channel[0].transparent_color_a >> 16);
-	UINT8 transparent_color_a_g = (UINT8)(mcd212.channel[0].transparent_color_a >>  8);
-	UINT8 transparent_color_a_b = (UINT8)(mcd212.channel[0].transparent_color_a >>  0);
-	UINT8 transparent_color_b_r = (UINT8)(mcd212.channel[1].transparent_color_b >> 16);
-	UINT8 transparent_color_b_g = (UINT8)(mcd212.channel[1].transparent_color_b >>  8);
-	UINT8 transparent_color_b_b = (UINT8)(mcd212.channel[1].transparent_color_b >>  0);
-	UINT8 image_coding_method_a = mcd212.channel[0].image_coding_method & 0x0000000f;
-	UINT8 image_coding_method_b = (mcd212.channel[0].image_coding_method >> 8) & 0x0000000f;
+	UINT32 backdrop = mcd212_4bpp_color[mcd212_regs.channel[0].backdrop_color];
+	UINT8 transparency_mode_a = (mcd212_regs.channel[0].transparency_control >> 0) & 0x0f;
+	UINT8 transparency_mode_b = (mcd212_regs.channel[0].transparency_control >> 8) & 0x0f;
+	UINT8 transparent_color_a_r = (UINT8)(mcd212_regs.channel[0].transparent_color_a >> 16);
+	UINT8 transparent_color_a_g = (UINT8)(mcd212_regs.channel[0].transparent_color_a >>  8);
+	UINT8 transparent_color_a_b = (UINT8)(mcd212_regs.channel[0].transparent_color_a >>  0);
+	UINT8 transparent_color_b_r = (UINT8)(mcd212_regs.channel[1].transparent_color_b >> 16);
+	UINT8 transparent_color_b_g = (UINT8)(mcd212_regs.channel[1].transparent_color_b >>  8);
+	UINT8 transparent_color_b_b = (UINT8)(mcd212_regs.channel[1].transparent_color_b >>  0);
+	UINT8 image_coding_method_a = mcd212_regs.channel[0].image_coding_method & 0x0000000f;
+	UINT8 image_coding_method_b = (mcd212_regs.channel[0].image_coding_method >> 8) & 0x0000000f;
 	UINT8 dyuv_enable_a = (image_coding_method_a == 5);
 	UINT8 dyuv_enable_b = (image_coding_method_b == 5);
-	UINT8 mosaic_enable_a = (mcd212.channel[0].mosaic_hold_a & 0x800000) >> 23;
-	UINT8 mosaic_enable_b = (mcd212.channel[1].mosaic_hold_b & 0x800000) >> 23;
-	UINT8 mosaic_count_a = (mcd212.channel[0].mosaic_hold_a & 0x0000ff) << 1;
-	UINT8 mosaic_count_b = (mcd212.channel[1].mosaic_hold_b & 0x0000ff) << 1;
+	UINT8 mosaic_enable_a = (mcd212_regs.channel[0].mosaic_hold_a & 0x800000) >> 23;
+	UINT8 mosaic_enable_b = (mcd212_regs.channel[1].mosaic_hold_b & 0x800000) >> 23;
+	UINT8 mosaic_count_a = (mcd212_regs.channel[0].mosaic_hold_a & 0x0000ff) << 1;
+	UINT8 mosaic_count_b = (mcd212_regs.channel[1].mosaic_hold_b & 0x0000ff) << 1;
 	for(x = 0; x < 768; x++)
 	{
 		out[x] = backdrop;
-		if(!(mcd212.channel[0].transparency_control & MCD212_TCR_DISABLE_MX))
+		if(!(mcd212_regs.channel[0].transparency_control & MCD212_TCR_DISABLE_MX))
 		{
-			UINT8 abr = MCD212_LIM(((MCD212_LIM((INT32)plane_a_r[x] - 16) * mcd212.channel[0].weight_factor_a[x]) >> 6) + ((MCD212_LIM((INT32)plane_b_r[x] - 16) * mcd212.channel[1].weight_factor_b[x]) >> 6) + 16);
-			UINT8 abg = MCD212_LIM(((MCD212_LIM((INT32)plane_a_g[x] - 16) * mcd212.channel[0].weight_factor_a[x]) >> 6) + ((MCD212_LIM((INT32)plane_b_g[x] - 16) * mcd212.channel[1].weight_factor_b[x]) >> 6) + 16);
-			UINT8 abb = MCD212_LIM(((MCD212_LIM((INT32)plane_a_b[x] - 16) * mcd212.channel[0].weight_factor_a[x]) >> 6) + ((MCD212_LIM((INT32)plane_b_b[x] - 16) * mcd212.channel[1].weight_factor_b[x]) >> 6) + 16);
+			UINT8 abr = MCD212_LIM(((MCD212_LIM((INT32)plane_a_r[x] - 16) * mcd212_regs.channel[0].weight_factor_a[x]) >> 6) + ((MCD212_LIM((INT32)plane_b_r[x] - 16) * mcd212_regs.channel[1].weight_factor_b[x]) >> 6) + 16);
+			UINT8 abg = MCD212_LIM(((MCD212_LIM((INT32)plane_a_g[x] - 16) * mcd212_regs.channel[0].weight_factor_a[x]) >> 6) + ((MCD212_LIM((INT32)plane_b_g[x] - 16) * mcd212_regs.channel[1].weight_factor_b[x]) >> 6) + 16);
+			UINT8 abb = MCD212_LIM(((MCD212_LIM((INT32)plane_a_b[x] - 16) * mcd212_regs.channel[0].weight_factor_a[x]) >> 6) + ((MCD212_LIM((INT32)plane_b_b[x] - 16) * mcd212_regs.channel[1].weight_factor_b[x]) >> 6) + 16);
 			out[x] = (abr << 16) | (abg << 8) | abb;
 		}
 		else
@@ -3778,16 +3873,16 @@ static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *
 					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b);
 					break;
 				case 3:
-					plane_enable_a = !mcd212.region_flag_0[x];
+					plane_enable_a = !mcd212_regs.region_flag_0[x];
 					break;
 				case 4:
-					plane_enable_a = !mcd212.region_flag_1[x];
+					plane_enable_a = !mcd212_regs.region_flag_1[x];
 					break;
 				case 5:
-					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b) && (dyuv_enable_a || mcd212.region_flag_0[x] == 0);
+					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b) && (dyuv_enable_a || mcd212_regs.region_flag_0[x] == 0);
 					break;
 				case 6:
-					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b) && (dyuv_enable_a || mcd212.region_flag_1[x] == 0);
+					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b) && (dyuv_enable_a || mcd212_regs.region_flag_1[x] == 0);
 					break;
 				case 8:
 					plane_enable_a = 1;
@@ -3796,16 +3891,16 @@ static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *
 					plane_enable_a = (plane_a_r_cur == transparent_color_a_r && plane_a_g_cur == transparent_color_a_g && plane_a_b_cur == transparent_color_a_b);
 					break;
 				case 11:
-					plane_enable_a = mcd212.region_flag_0[x];
+					plane_enable_a = mcd212_regs.region_flag_0[x];
 					break;
 				case 12:
-					plane_enable_a = mcd212.region_flag_1[x];
+					plane_enable_a = mcd212_regs.region_flag_1[x];
 					break;
 				case 13:
-					plane_enable_a = (plane_a_r_cur == transparent_color_a_r && plane_a_g_cur == transparent_color_a_g && plane_a_b_cur == transparent_color_a_b) || dyuv_enable_a || mcd212.region_flag_0[x] == 1;
+					plane_enable_a = (plane_a_r_cur == transparent_color_a_r && plane_a_g_cur == transparent_color_a_g && plane_a_b_cur == transparent_color_a_b) || dyuv_enable_a || mcd212_regs.region_flag_0[x] == 1;
 					break;
 				case 14:
-					plane_enable_a = (plane_a_r_cur == transparent_color_a_r && plane_a_g_cur == transparent_color_a_g && plane_a_b_cur == transparent_color_a_b) || dyuv_enable_a || mcd212.region_flag_1[x] == 1;
+					plane_enable_a = (plane_a_r_cur == transparent_color_a_r && plane_a_g_cur == transparent_color_a_g && plane_a_b_cur == transparent_color_a_b) || dyuv_enable_a || mcd212_regs.region_flag_1[x] == 1;
 					break;
 				default:
 					verboselog(machine, 0, "Unhandled transparency mode for plane A: %d\n", transparency_mode_a);
@@ -3821,16 +3916,16 @@ static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *
 					plane_enable_b = (plane_b_r_cur != transparent_color_b_r || plane_b_g_cur != transparent_color_b_g || plane_b_b_cur != transparent_color_b_b);
 					break;
 				case 3:
-					plane_enable_b = !mcd212.region_flag_0[x];
+					plane_enable_b = !mcd212_regs.region_flag_0[x];
 					break;
 				case 4:
-					plane_enable_b = !mcd212.region_flag_1[x];
+					plane_enable_b = !mcd212_regs.region_flag_1[x];
 					break;
 				case 5:
-					plane_enable_b = (plane_b_r_cur != transparent_color_b_r || plane_b_g_cur != transparent_color_b_g || plane_b_b_cur != transparent_color_b_b) && (dyuv_enable_b || mcd212.region_flag_0[x] == 0);
+					plane_enable_b = (plane_b_r_cur != transparent_color_b_r || plane_b_g_cur != transparent_color_b_g || plane_b_b_cur != transparent_color_b_b) && (dyuv_enable_b || mcd212_regs.region_flag_0[x] == 0);
 					break;
 				case 6:
-					plane_enable_b = (plane_b_r_cur != transparent_color_b_r || plane_b_g_cur != transparent_color_b_g || plane_b_b_cur != transparent_color_b_b) && (dyuv_enable_b || mcd212.region_flag_1[x] == 0);
+					plane_enable_b = (plane_b_r_cur != transparent_color_b_r || plane_b_g_cur != transparent_color_b_g || plane_b_b_cur != transparent_color_b_b) && (dyuv_enable_b || mcd212_regs.region_flag_1[x] == 0);
 					break;
 				case 8:
 					plane_enable_b = 1;
@@ -3839,29 +3934,29 @@ static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *
 					plane_enable_b = (plane_b_r_cur == transparent_color_b_r && plane_b_g_cur == transparent_color_b_g && plane_b_b_cur == transparent_color_b_b);
 					break;
 				case 11:
-					plane_enable_b = mcd212.region_flag_0[x];
+					plane_enable_b = mcd212_regs.region_flag_0[x];
 					break;
 				case 12:
-					plane_enable_b = mcd212.region_flag_1[x];
+					plane_enable_b = mcd212_regs.region_flag_1[x];
 					break;
 				case 13:
-					plane_enable_b = (plane_b_r_cur == transparent_color_b_r && plane_b_g_cur == transparent_color_b_g && plane_b_b_cur == transparent_color_b_b) || dyuv_enable_b || mcd212.region_flag_0[x] == 1;
+					plane_enable_b = (plane_b_r_cur == transparent_color_b_r && plane_b_g_cur == transparent_color_b_g && plane_b_b_cur == transparent_color_b_b) || dyuv_enable_b || mcd212_regs.region_flag_0[x] == 1;
 					break;
 				case 14:
-					plane_enable_b = (plane_b_r_cur == transparent_color_b_r && plane_b_g_cur == transparent_color_b_g && plane_b_b_cur == transparent_color_b_b) || dyuv_enable_b || mcd212.region_flag_1[x] == 1;
+					plane_enable_b = (plane_b_r_cur == transparent_color_b_r && plane_b_g_cur == transparent_color_b_g && plane_b_b_cur == transparent_color_b_b) || dyuv_enable_b || mcd212_regs.region_flag_1[x] == 1;
 					break;
 				default:
 					verboselog(machine, 0, "Unhandled transparency mode for plane B: %d\n", transparency_mode_b);
 					plane_enable_b = 1;
 					break;
 			}
-			plane_a_r_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_a_r_cur - 16) * mcd212.channel[0].weight_factor_a[x]) >> 6) + 16);
-			plane_a_g_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_a_g_cur - 16) * mcd212.channel[0].weight_factor_a[x]) >> 6) + 16);
-			plane_a_b_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_a_b_cur - 16) * mcd212.channel[0].weight_factor_a[x]) >> 6) + 16);
-			plane_b_r_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_b_r_cur - 16) * mcd212.channel[1].weight_factor_b[x]) >> 6) + 16);
-			plane_b_g_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_b_g_cur - 16) * mcd212.channel[1].weight_factor_b[x]) >> 6) + 16);
-			plane_b_b_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_b_b_cur - 16) * mcd212.channel[1].weight_factor_b[x]) >> 6) + 16);
-			switch(mcd212.channel[0].plane_order)
+			plane_a_r_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_a_r_cur - 16) * mcd212_regs.channel[0].weight_factor_a[x]) >> 6) + 16);
+			plane_a_g_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_a_g_cur - 16) * mcd212_regs.channel[0].weight_factor_a[x]) >> 6) + 16);
+			plane_a_b_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_a_b_cur - 16) * mcd212_regs.channel[0].weight_factor_a[x]) >> 6) + 16);
+			plane_b_r_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_b_r_cur - 16) * mcd212_regs.channel[1].weight_factor_b[x]) >> 6) + 16);
+			plane_b_g_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_b_g_cur - 16) * mcd212_regs.channel[1].weight_factor_b[x]) >> 6) + 16);
+			plane_b_b_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_b_b_cur - 16) * mcd212_regs.channel[1].weight_factor_b[x]) >> 6) + 16);
+			switch(mcd212_regs.channel[0].plane_order)
 			{
 				case MCD212_POR_AB:
 					if(plane_enable_a)
@@ -3911,17 +4006,17 @@ static void mcd212_draw_scanline(running_machine *machine, int y)
 static TIMER_CALLBACK( mcd212_perform_scan )
 {
 	int scanline = video_screen_get_vpos(machine->primary_screen);
-	if(/*mcd212.channel[0].dcr & MCD212_DCR_DE*/1)
+	if(/*mcd212_regs.channel[0].dcr & MCD212_DCR_DE*/1)
 	{
 		if(scanline == 0)
 		{
 			// Process ICA
 			int index = 0;
 			verboselog(machine, 6, "Frame Start\n" );
-			mcd212.channel[0].csrr &= 0x7f;
+			mcd212_regs.channel[0].csrr &= 0x7f;
 			for(index = 0; index < 2; index++)
 			{
-				if(mcd212.channel[index].dcr & MCD212_DCR_ICA)
+				if(mcd212_regs.channel[index].dcr & MCD212_DCR_ICA)
 				{
 					mcd212_process_ica(machine, index);
 				}
@@ -3935,28 +4030,67 @@ static TIMER_CALLBACK( mcd212_perform_scan )
 		else if(scanline >= 22)
 		{
 			int index = 0;
-			mcd212.channel[0].csrr |= 0x80;
+			mcd212_regs.channel[0].csrr |= 0x80;
 			// Process VSR
 			mcd212_draw_scanline(machine, scanline);
 			// Process DCA
 			for(index = 0; index < 2; index++)
 			{
-				if(mcd212.channel[index].dcr & MCD212_DCR_DCA)
+				if(mcd212_regs.channel[index].dcr & MCD212_DCR_DCA)
 				{
 					if(scanline == 22)
 					{
-						mcd212.channel[index].dca = mcd212_get_dcp(index);
+						mcd212_regs.channel[index].dca = mcd212_get_dcp(index);
 					}
 					mcd212_process_dca(machine, index);
 				}
 			}
 			if(scanline == 261)
 			{
-				mcd212.channel[0].csrr ^= 0x20;
+				mcd212_regs.channel[0].csrr ^= 0x20;
 			}
 		}
 	}
-	timer_adjust_oneshot(mcd212.scan_timer, video_screen_get_time_until_pos(machine->primary_screen, ( scanline + 1 ) % 262, 0), 0);
+	timer_adjust_oneshot(mcd212_regs.scan_timer, video_screen_get_time_until_pos(machine->primary_screen, ( scanline + 1 ) % 262, 0), 0);
+}
+
+static void mcd212_init(running_machine *machine, mcd212_regs_t *mcd212)
+{
+	int index = 0;
+	for(index = 0; index < 2; index++)
+	{
+		mcd212->channel[index].csrr = 0;
+		mcd212->channel[index].csrw = 0;
+		mcd212->channel[index].dcr = 0;
+		mcd212->channel[index].vsr = 0;
+		mcd212->channel[index].ddr = 0;
+		mcd212->channel[index].dcp = 0;
+		mcd212->channel[index].dca = 0;
+		memset(mcd212->channel[index].clut_r, 0, 768);
+		memset(mcd212->channel[index].clut_g, 0, 768);
+		memset(mcd212->channel[index].clut_b, 0, 768);
+		mcd212->channel[index].image_coding_method = 0;
+		mcd212->channel[index].transparency_control = 0;
+		mcd212->channel[index].plane_order = 0;
+		mcd212->channel[index].clut_bank = 0;
+		mcd212->channel[index].transparent_color_a = 0;
+		mcd212->channel[index].transparent_color_b = 0;
+		mcd212->channel[index].mask_color_a = 0;
+		mcd212->channel[index].mask_color_b = 0;
+		mcd212->channel[index].dyuv_abs_start_a = 0;
+		mcd212->channel[index].dyuv_abs_start_b = 0;
+		mcd212->channel[index].cursor_position = 0;
+		mcd212->channel[index].cursor_control = 0;
+		memset((UINT8*)&mcd212->channel[index].cursor_pattern, 0, 16 * sizeof(UINT32));
+		memset((UINT8*)&mcd212->channel[index].region_control, 0, 8 * sizeof(UINT32));
+		mcd212->channel[index].backdrop_color = 0;
+		mcd212->channel[index].mosaic_hold_a = 0;
+		mcd212->channel[index].mosaic_hold_b = 0;
+		memset(mcd212->channel[index].weight_factor_a, 0, 768);
+		memset(mcd212->channel[index].weight_factor_b, 0, 768);
+	}
+	memset(mcd212->region_flag_0, 0, 768);
+	memset(mcd212->region_flag_1, 0, 768);
 }
 
 static VIDEO_START(cdi)
@@ -3993,12 +4127,9 @@ static VIDEO_START(cdi)
 	}
 
 	VIDEO_START_CALL(generic_bitmapped);
-	mcd212.channel[0].csrr = 0x00;
-	mcd212.channel[1].csrr = 0x00;
-	mcd212.channel[0].clut_bank = 0;
-	mcd212.channel[1].clut_bank = 0;
-	mcd212.scan_timer = timer_alloc(machine, mcd212_perform_scan, 0);
-	timer_adjust_oneshot(mcd212.scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	mcd212_init(machine, &mcd212_regs);
+	mcd212_regs.scan_timer = timer_alloc(machine, mcd212_perform_scan, 0);
+	timer_adjust_oneshot(mcd212_regs.scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
 	lcdbitmap = video_screen_auto_bitmap_alloc(devtag_get_device(machine, "lcd"));
 }
@@ -4094,10 +4225,14 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( cdi )
 {
-	UINT16 *src   = (UINT16*)memory_region( machine, "maincpu" );
+	UINT16 *src   = (UINT16*)memory_region(machine, "maincpu");
 	UINT16 *dst   = planea;
 	const device_config *cdrom_dev = devtag_get_device(machine, "cdrom");
 	memcpy(dst, src, 0x8);
+
+	scc68070_init(machine, &scc68070_regs);
+	cdic_init(machine, &cdic_regs);
+	slave_init(machine, &slave_regs);
 
 	scc68070_regs.timers.timer0_timer = timer_alloc(machine, scc68070_timer0_callback, 0);
 	timer_adjust_oneshot(scc68070_regs.timers.timer0_timer, attotime_never, 0);
@@ -4114,14 +4249,6 @@ static MACHINE_RESET( cdi )
 	cdic_regs.audio_sample_timer = timer_alloc(machine, audio_sample_trigger, 0);
 	timer_adjust_oneshot(cdic_regs.audio_sample_timer, attotime_never, 0);
 
-	/*
-	memset(cdic_regs.audio_stream_samples, 0, 18*28*16*CDIC_BUFFERED_SECTORS * sizeof(INT16));
-	cdic_regs.audio_stream_queued = 0;
-	cdic_regs.audio_stream_index = 0;
-	cdic_regs.audio_stream_end = 0;
-	cdic_regs.audio_stream_playing = 0;
-	*/
-
 	if( cdrom_dev )
 	{
 		cdic_regs.cd = mess_cd_get_cdrom_file(cdrom_dev);
@@ -4129,10 +4256,6 @@ static MACHINE_RESET( cdi )
 	}
 
 	device_reset(cputag_get_cpu(machine, "maincpu"));
-
-	cdic_regs.z_buffer = 0;
-	cdic_regs.channel = 0xffffffff;
-	cdic_regs.audio_channel = 0xffff;
 
 	dmadac[0] = devtag_get_device(machine, "dac1");
 	dmadac[1] = devtag_get_device(machine, "dac2");
