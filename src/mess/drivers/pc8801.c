@@ -967,19 +967,19 @@ ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    INIT  CONFIG  COMPANY FULLNAME */
 
-COMP( 1979, pc8001,    0,        0,     pc88srl,  pc88sr,  0,    0,   "Nippon Electronic Company",  "PC-8001 (Lores display, VSYNC 15KHz)", GAME_NOT_WORKING )
-COMP( 1983, pc8001m2,  0,        0,     pc88srl,  pc88sr,  0,    0,   "Nippon Electronic Company",  "PC-8001 Mk2 (Lores display, VSYNC 15KHz)", GAME_NOT_WORKING )	// not sure about this dump
+COMP( 1979, pc8001,    0,        0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8001", GAME_NOT_WORKING )
+COMP( 1983, pc8001m2,  0,        0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8001 Mk2", GAME_NOT_WORKING )	// not sure about this dump
 
-COMP( 1981, pc8801,    0,        0,     pc88srl,  pc88sr,  0,    0,   "Nippon Electronic Company",  "PC-8801 (Lores display, VSYNC 15KHz)", GAME_NOT_WORKING )
-COMP( 1983, pc88m2,    pc8801,   0,     pc88srl,  pc88sr,  0,    0,   "Nippon Electronic Company",  "PC-8001 MkII (Lores display, VSYNC 15KHz)", GAME_NOT_WORKING )	// not sure about this dump
-COMP( 1985, pc88m2sl,  0,        0,     pc88srl,  pc88sr,  0,    0,   "Nippon Electronic Company",  "PC-8801 MkIISR (Lores display, VSYNC 15KHz)", 0 )
-COMP( 1985, pc88m2sh,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "Nippon Electronic Company",  "PC-8801 MkIISR (Hires display, VSYNC 24KHz)", 0 )
-COMP( 1985, pc88m2fr,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "Nippon Electronic Company",  "PC-8801 MkIIFR (Hires display, VSYNC 24KHz)", 0 )
-COMP( 1985, pc88m2mr,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "Nippon Electronic Company",  "PC-8801 MkIIMR (Hires display, VSYNC 24KHz)", 0 )
-COMP( 1986, pc8801mh,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,	 0,   "Nippon Electronic Company",  "PC-8801 MH (Hires display, VSYNC 24KHz)", 0 )
-COMP( 1987, pc8801fa,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "Nippon Electronic Company",  "PC-8801 FA (Hires display, VSYNC 24KHz)", 0 )
-COMP( 1987, pc8801ma,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "Nippon Electronic Company",  "PC-8801 MA (Hires display, VSYNC 24KHz)", 0 )
-COMP( 1988, pc8801ma2, pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "Nippon Electronic Company",  "PC-8801 MA2 (Hires display, VSYNC 24KHz)", 0 )
-COMP( 1989, pc8801mc,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "Nippon Electronic Company",  "PC-8801 MC (Hires display, VSYNC 24KHz)", 0 )
+COMP( 1981, pc8801,    0,        0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8801", GAME_NOT_WORKING )
+COMP( 1983, pc88m2,    pc8801,   0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8001 MkII", GAME_NOT_WORKING )	// not sure about this dump
+COMP( 1985, pc88m2sl,  0,        0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8801 MkIISR", 0 )
+COMP( 1985, pc88m2sh,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801 MkIISR (High Resolution)", 0 )
+COMP( 1985, pc88m2fr,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801 MkIIFR", 0 )
+COMP( 1985, pc88m2mr,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801 MkIIMR", 0 )
+COMP( 1986, pc8801mh,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,	 0,   "NEC",  "PC-8801 MH", 0 )
+COMP( 1987, pc8801fa,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801 FA", 0 )
+COMP( 1987, pc8801ma,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801 MA", 0 )
+COMP( 1988, pc8801ma2, pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801 MA2", 0 )
+COMP( 1989, pc8801mc,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801 MC", 0 )
 
-COMP( 1987, pc88va,    0,        0,     pc88va,   pc88sr,  0,    0,      "Nippon Electronic Company",  "PC-88 VA", GAME_NOT_WORKING )
+COMP( 1987, pc88va,    0,        0,     pc88va,   pc88sr,  0,    0,   "NEC",  "PC-88 VA", GAME_NOT_WORKING )
