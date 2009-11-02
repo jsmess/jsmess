@@ -3827,7 +3827,12 @@ static void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y
 static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *plane_a_g, UINT8 *plane_a_b, UINT8 *plane_b_r, UINT8 *plane_b_g, UINT8 *plane_b_b, UINT32 *out)
 {
 	int x = 0;
-	UINT32 backdrop = mcd212_4bpp_color[mcd212_regs.channel[0].backdrop_color];
+	UINT8 debug_mode = input_port_read(machine, "DEBUG");
+	UINT8 global_plane_a_disable = debug_mode & 1;
+	UINT8 global_plane_b_disable = debug_mode & 2;
+	UINT8 debug_backdrop_enable = debug_mode & 4;
+	UINT8 debug_backdrop_index = debug_mode >> 4;
+	UINT32 backdrop = debug_backdrop_enable ? mcd212_4bpp_color[debug_backdrop_index] : mcd212_4bpp_color[mcd212_regs.channel[0].backdrop_color];
 	UINT8 transparency_mode_a = (mcd212_regs.channel[0].transparency_control >> 0) & 0x0f;
 	UINT8 transparency_mode_b = (mcd212_regs.channel[0].transparency_control >> 8) & 0x0f;
 	UINT8 transparent_color_a_r = (UINT8)(mcd212_regs.channel[0].transparent_color_a >> 16);
@@ -3950,6 +3955,14 @@ static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *
 					plane_enable_b = 1;
 					break;
 			}
+			if(global_plane_a_disable)
+			{
+				plane_enable_a = 0;
+			}
+			if(global_plane_b_disable)
+			{
+				plane_enable_b = 0;
+			}
 			plane_a_r_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_a_r_cur - 16) * mcd212_regs.channel[0].weight_factor_a[x]) >> 6) + 16);
 			plane_a_g_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_a_g_cur - 16) * mcd212_regs.channel[0].weight_factor_a[x]) >> 6) + 16);
 			plane_a_b_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_a_b_cur - 16) * mcd212_regs.channel[0].weight_factor_a[x]) >> 6) + 16);
@@ -3991,15 +4004,17 @@ static void mcd212_draw_scanline(running_machine *machine, int y)
 	UINT32 out[768];
 	UINT32 *scanline = BITMAP_ADDR32(bitmap, y, 0);
 	int x;
+
 	mcd212_process_vsr(machine, 0, plane_a_r, plane_a_g, plane_a_b);
 	mcd212_process_vsr(machine, 1, plane_b_r, plane_b_g, plane_b_b);
+
 	mcd212_mix_lines(machine, plane_a_r, plane_a_g, plane_a_b, plane_b_r, plane_b_g, plane_b_b, out);
+
 	for(x = 0; x < 384; x++)
 	{
 		scanline[x] = out[x*2];
-		//scanline[x] = (plane_a_r[x*2] << 16) | (plane_a_g[x*2] << 8) | plane_a_b[x*2];
-		//scanline[x+384] = (plane_b_r[x*2] << 16) | (plane_b_g[x*2] << 8) | plane_b_b[x*2];
 	}
+
 	mcd212_draw_cursor(machine, scanline, y);
 }
 
@@ -4221,6 +4236,34 @@ static INPUT_PORTS_START( cdi )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED(mouse_update, 0)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CHANGED(mouse_update, 0)
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("DEBUG")
+	PORT_DIPNAME( 0x01, 0x00, "Plane A Disable")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Plane B Disable")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Force Backdrop Color")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0xf0, 0x00, "Backdrop Color")
+	PORT_DIPSETTING(    0x00, "Black" )
+	PORT_DIPSETTING(    0x10, "Half-Bright Blue" )
+	PORT_DIPSETTING(    0x20, "Half-Bright Green" )
+	PORT_DIPSETTING(    0x30, "Half-Bright Cyan" )
+	PORT_DIPSETTING(    0x40, "Half-Bright Red" )
+	PORT_DIPSETTING(    0x50, "Half-Bright Magenta" )
+	PORT_DIPSETTING(    0x60, "Half-Bright Yellow" )
+	PORT_DIPSETTING(    0x70, "Half-Bright White" )
+	PORT_DIPSETTING(    0x80, "Black (Alternate)" )
+	PORT_DIPSETTING(    0x90, "Blue" )
+	PORT_DIPSETTING(    0xa0, "Green" )
+	PORT_DIPSETTING(    0xb0, "Cyan" )
+	PORT_DIPSETTING(    0xc0, "Red" )
+	PORT_DIPSETTING(    0xd0, "Magenta" )
+	PORT_DIPSETTING(    0xe0, "Yellow" )
+	PORT_DIPSETTING(    0xf0, "White" )
 INPUT_PORTS_END
 
 static MACHINE_RESET( cdi )
