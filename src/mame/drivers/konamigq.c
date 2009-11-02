@@ -330,7 +330,7 @@ static void scsi_dma_write( running_machine *machine, UINT32 n_address, INT32 n_
 
 static void scsi_irq(running_machine *machine)
 {
-	psx_irq_set(machine, 0x400);
+	psx_irq_set(machine, PSX_IRQ_EXTCD);
 }
 
 static const SCSIConfigTable dev_table =

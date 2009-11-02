@@ -1441,7 +1441,7 @@ static void atpsx_interrupt(const device_config *device, int state)
 {
 	if (state)
 	{
-	 	psx_irq_set(device->machine, 0x400);
+	 	psx_irq_set(device->machine, PSX_IRQ_EXTCD);
 	}
 }
 
@@ -2008,7 +2008,7 @@ static void jdredd_ide_interrupt(const device_config *device, int state)
 {
 	if (state)
 	{
-	 	psx_irq_set(device->machine, 0x400);
+	 	psx_irq_set(device->machine, PSX_IRQ_EXTCD);
 	}
 }
 
@@ -2111,7 +2111,7 @@ static WRITE32_HANDLER( acpsx_10_w )
 static WRITE32_HANDLER( nbajamex_80_w )
 {
 	verboselog( space->machine, 0, "nbajamex_80_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	psx_irq_set(space->machine, 0x400);
+	psx_irq_set(space->machine, PSX_IRQ_EXTCD);
 }
 
 static READ32_HANDLER( nbajamex_08_r )

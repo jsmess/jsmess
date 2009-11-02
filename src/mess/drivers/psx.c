@@ -21,6 +21,21 @@
 #include "debugger.h"
 #include "zlib.h"
 
+#define VERBOSE_LEVEL ( 0 )
+
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
+{
+	if( VERBOSE_LEVEL >= n_level )
+	{
+		va_list v;
+		char buf[ 32768 ];
+		va_start( v, s_fmt );
+		vsprintf( buf, s_fmt, v );
+		va_end( v );
+		logerror( "%s: %s", cpuexec_describe_context(machine), buf );
+	}
+}
+
 static cdrom_file *psx_cdrom;
 static UINT8 *exe_buffer;
 static int exe_size;
@@ -612,121 +627,121 @@ static UINT8 cd_result[8];
 
 /* ----------------------------------------------------------------------- */
 
-static void psx_cdcmd_sync(void)
+static void psx_cdcmd_sync(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: Sync: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_nop(void)
+static void psx_cdcmd_nop(running_machine *machine)
 {
-	/* NYI */
+	cd_stat = 0x02;
 }
 
-static void psx_cdcmd_setloc(void)
+static void psx_cdcmd_setloc(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: Setloc: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_play(void)
+static void psx_cdcmd_play(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: Play: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_forward(void)
+static void psx_cdcmd_forward(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: Forward: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_backward(void)
+static void psx_cdcmd_backward(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: Backward: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_readn(void)
+static void psx_cdcmd_readn(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: ReadN: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_standby(void)
+static void psx_cdcmd_standby(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: Standby: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_stop(void)
+static void psx_cdcmd_stop(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: Stop: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_pause(void)
+static void psx_cdcmd_pause(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: Pause: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_init(void)
+static void psx_cdcmd_init(running_machine *machine)
 {
 	cd_result_p = 0;
 	cd_result_c = 1;
 	cd_stat = 0x02;
 	cd_result[0] = cd_stat;
-	/* NYI */
+	verboselog(machine, 0, "CD Command: Init: Not fully implemented\n" );
 }
 
-static void psx_cdcmd_mute(void)
+static void psx_cdcmd_mute(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: Mute: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_demute(void)
+static void psx_cdcmd_demute(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: Demute: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_setfilter(void)
+static void psx_cdcmd_setfilter(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: Setfilter: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_setmode(void)
+static void psx_cdcmd_setmode(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: Setmode: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_getparam(void)
+static void psx_cdcmd_getparam(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: Getparam: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_getlocl(void)
+static void psx_cdcmd_getlocl(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: GetlocL: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_getlocp(void)
+static void psx_cdcmd_getlocp(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: GetlocP: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_gettn(void)
+static void psx_cdcmd_gettn(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: GetTN: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_gettd(void)
+static void psx_cdcmd_gettd(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: GetTD: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_seekl(void)
+static void psx_cdcmd_seekl(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: SeekL: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_seekp(void)
+static void psx_cdcmd_seekp(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: SeekP: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_test(void)
+static void psx_cdcmd_test(running_machine *machine)
 {
 	static const UINT8 test20[] = { 0x98, 0x06, 0x10, 0xC3 };
 	static const UINT8 test22[] = { 0x66, 0x6F, 0x72, 0x20, 0x45, 0x75, 0x72, 0x6F };
@@ -756,27 +771,27 @@ static void psx_cdcmd_test(void)
 	cd_stat = 3;
 }
 
-static void psx_cdcmd_id(void)
+static void psx_cdcmd_id(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: ID: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_reads(void)
+static void psx_cdcmd_reads(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: ReadS: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_reset(void)
+static void psx_cdcmd_reset(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: Reset: Not yet implemented\n" );
 }
 
-static void psx_cdcmd_readtoc(void)
+static void psx_cdcmd_readtoc(running_machine *machine)
 {
-	/* NYI */
+	verboselog(machine, 0, "CD Command: ReadTOC: Not yet implemented\n" );
 }
 
-static void (*const psx_cdcmds[])(void) =
+static void (*const psx_cdcmds[])(running_machine *machine) =
 {
 	psx_cdcmd_sync,
 	psx_cdcmd_nop,
@@ -867,7 +882,7 @@ static READ32_HANDLER( psx_cd_r )
 
 static WRITE32_HANDLER( psx_cd_w )
 {
-	void (*psx_cdcmd)(void);
+	void (*psx_cdcmd)(running_machine* machine);
 
 	if( ACCESSING_BITS_0_7 )
 	{
@@ -900,7 +915,7 @@ static WRITE32_HANDLER( psx_cd_w )
 			psx_cdcmd = NULL;
 
 		if (psx_cdcmd)
-			psx_cdcmd();
+			psx_cdcmd(space->machine);
 
 		psx_irq_set(space->machine, 0x0004);
 	}
