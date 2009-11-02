@@ -606,6 +606,19 @@ VIDEO_START( odyssey2 )
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 
+	memset(o2_vdc.reg, 0, 0x100);
+
+	o2_snd_shift[0] = o2_snd_shift[1] = 0;
+	x_beam_pos = 0;
+	y_beam_pos = 0;
+	control_status = 0;
+	collision_status = 0;
+	iff = 0;
+	start_vpos = 0;
+	start_vblank = 0;
+	lum = 0;
+	lfsr = 0;
+
 	o2_snd_shift[0] = machine->sample_rate / 983;
 	o2_snd_shift[1] = machine->sample_rate / 3933;
 
