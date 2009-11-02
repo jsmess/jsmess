@@ -885,6 +885,32 @@ READ32_HANDLER (macii_scsi_drq_r)
 	return 0;
 }
 
+WRITE32_HANDLER (macii_scsi_drq_w)
+{
+	switch (mem_mask)
+	{
+		case 0xff000000:
+			ncr5380_w(space, R5380_OUTDATA_DTACK, data>>24);
+			break;
+
+		case 0xffff0000:
+			ncr5380_w(space, R5380_OUTDATA_DTACK, data>>24);
+			ncr5380_w(space, R5380_OUTDATA_DTACK, data>>16);
+			break;
+
+		case 0xffffffff:
+			ncr5380_w(space, R5380_OUTDATA_DTACK, data>>24);
+			ncr5380_w(space, R5380_OUTDATA_DTACK, data>>16);
+			ncr5380_w(space, R5380_OUTDATA_DTACK, data>>8);
+			ncr5380_w(space, R5380_OUTDATA_DTACK, data&0xff);
+			break;
+
+		default:
+			logerror("macii_scsi_drq_w: unknown mem_mask %08x\n", mem_mask);
+			break;
+	}
+}
+
 WRITE16_HANDLER ( macplus_scsi_w )
 {
 	int reg = (offset>>3) & 0xf;
@@ -1041,7 +1067,7 @@ static void rtc_init(void)
 {
 	rtc_rTCClk = 0;
 
-	rtc_write_protect = TRUE;	/* Mmmmh... Should be saved with the NVRAM, actually... */
+	rtc_write_protect = 0;
 	rtc_rTCEnb = 0;
 	rtc_write_rTCEnb(1);
 	rtc_state = RTC_STATE_NORMAL;
@@ -1126,7 +1152,7 @@ static void rtc_execute_cmd(int data)
 		{
 			// read command
 			if (LOG_RTC)
-				logerror("RTC: Reading extended address %x\n", rtc_xpaddr);
+				logerror("RTC: Reading extended address %x = %x\n", rtc_xpaddr, rtc_ram[rtc_xpaddr]);
 
 			rtc_data_dir = 1;
 			rtc_data_byte = rtc_ram[rtc_xpaddr];
@@ -1181,7 +1207,7 @@ static void rtc_execute_cmd(int data)
 		case 13:
 			/* Write-protect register  */
 			if (LOG_RTC)
-				logerror("RTC write to write-protect register, data = %X\n", (int) rtc_data_byte);
+				logerror("RTC write to write-protect register, data = %X\n", (int) rtc_data_byte&0x80);
 			rtc_write_protect = (rtc_data_byte & 0x80) ? TRUE : FALSE;
 			break;
 
@@ -1195,7 +1221,7 @@ static void rtc_execute_cmd(int data)
 			break;
 
 		default:
-			logerror("Unknown RTC write command : %X, data = %d\n", (int) rtc_cmd, (int) rtc_data_byte);
+			printf("Unknown RTC write command : %X, data = %d\n", (int) rtc_cmd, (int) rtc_data_byte);
 			break;
 		}
 	}
@@ -1230,7 +1256,7 @@ static void rtc_execute_cmd(int data)
 
 					case 8: case 9: case 10: case 11:
 						if (LOG_RTC)
-							logerror("RTC RAM read, address = %X\n", (i & 3) + 0x10);
+							logerror("RTC RAM read, address = %X data = %x\n", (i & 3) + 0x10, rtc_ram[(i & 3) + 0x10]);
 						rtc_data_byte = rtc_ram[(i & 3) + 0x10];
 						break;
 
@@ -1239,7 +1265,7 @@ static void rtc_execute_cmd(int data)
 					case 24: case 25: case 26: case 27:
 					case 28: case 29: case 30: case 31:
 						if (LOG_RTC)
-							logerror("RTC RAM read, address = %X\n", i & 15);
+							logerror("RTC RAM read, address = %X data = %x\n", i & 15, rtc_ram[i & 15]);
 						rtc_data_byte = rtc_ram[i & 15];
 						break;
 
@@ -1446,8 +1472,6 @@ static void mac_adb_talk(running_machine *machine)
 
 	if (adb_waiting_cmd)
 	{
-		const device_config *via_0 = devtag_get_device(machine, "via6522_0");
-
 		switch ((adb_command>>2)&3)
 		{
 			case 0:
@@ -1455,14 +1479,22 @@ static void mac_adb_talk(running_machine *machine)
 				switch (reg)
 				{
 					case ADB_CMD_RESET:
+						#if LOG_ADB
+						printf("ADB RESET: reg %x address %x\n", reg, addr);
+						#endif
 						adb_direction = 0;
 						adb_send = 0;
 						break;
 
 					case ADB_CMD_FLUSH:
+						#if LOG_ADB
+						printf("ADB FLUSH: reg %x address %x\n", reg, addr);
+						#endif
+
 						adb_direction = 0;
 						adb_send = 0;
 
+						#if 0
 						adb_buffer[0] = 0xff;
 						adb_datasize = 1;
 
@@ -1471,6 +1503,7 @@ static void mac_adb_talk(running_machine *machine)
 						via_cb1_w(via_0, 0, adb_extclock);
 						adb_extclock ^= 1;
 						via_cb1_w(via_0, 0, adb_extclock);
+						#endif
 						break;
 
 					default:	// reserved/unused
@@ -1479,28 +1512,35 @@ static void mac_adb_talk(running_machine *machine)
 				break;
 
 			case 2:	// listen
-//              printf("ADB LISTEN: reg %x address %x\n", reg, addr);
+				#if LOG_ADB
+				printf("ADB LISTEN: reg %x address %x\n", reg, addr);
+				#endif
+
 				adb_direction = 1;	// input from Mac
 				adb_listenreg = reg;
 				adb_listenaddr = addr;
 				break;
 
 			case 3: // talk
-//              printf("ADB TALK: reg %x address %x\n", reg, addr);
+				#if LOG_ADB
+				printf("ADB TALK: reg %x address %x\n", reg, addr);
+				#endif
 
 				adb_direction = 0;    	// output to Mac
 				if (addr == adb_mouseaddr)
 				{
 					UINT8 mouseX, mouseY;
 
-//                  printf("Talking to mouse, register %x\n", reg);
+					#if LOG_ADB
+					printf("Talking to mouse, register %x\n", reg);
+					#endif
 
 					switch (reg)
 					{
 						// read mouse
 						case 0:
 							mac_adb_accummouse(machine, &mouseX, &mouseY);
-							adb_buffer[0] = (input_port_read(machine, "MOUSE0") & 0x01) ? 0x00 : 0x80;
+							adb_buffer[0] = (adb_lastbutton & 0x01) ? 0x00 : 0x80;
 							adb_buffer[0] |= mouseX & 0x7f;
 							adb_buffer[1] = mouseY & 0x7f;
 							adb_datasize = 2;
@@ -1521,7 +1561,9 @@ static void mac_adb_talk(running_machine *machine)
 				}
 				else if (addr == adb_keybaddr)
 				{
-//                  printf("Talking to keyboard, register %x\n", reg);
+					#if LOG_ADB
+					printf("Talking to keyboard, register %x\n", reg);
+					#endif
 
 					switch (reg)
 					{
@@ -1553,15 +1595,9 @@ static void mac_adb_talk(running_machine *machine)
 				}
 				else
 				{
-//					printf("talking to unconnected device\n");
+					printf("talking to unconnected device\n");
 					adb_buffer[0] = adb_buffer[1] = 0xff;
 					adb_datasize = 0;
-				}
-
-				// if the mouse has new data and it's not what we're polling, yank SRQ
-				if ((addr != adb_mouseaddr) && (adb_mouse_initialized))
-				{
-					mac_adb_pollmouse(machine);
 				}
 				break;
 		}
@@ -1661,18 +1697,15 @@ static void mac_adb_newaction(int state)
 				}
 				else
 				{
-					adb_send = 0xff;	// try pulling up?
+					adb_send = 0;
 				}
+
 				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 				break;
 
 			case ADB_STATE_IDLE:
-				adb_send = 0xff;
 				break;
 		}
-
-		// no matter what, generate 8 clocks (should this happen on IDLE?)
-//		timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 	}
 }
 
@@ -1692,6 +1725,10 @@ static void adb_vblank(running_machine *machine)
 
 		if ((adb_state == ADB_STATE_IDLE) && (adb_mouse_wanted_srq))
 		{
+			// repeat last TALK to get updated data
+			adb_waiting_cmd = 1;
+			mac_adb_talk(machine);
+
 			adb_timer_ticks = 8;
 			timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 			adb_mouse_wanted_srq = 0;
@@ -2202,6 +2239,10 @@ MACHINE_START( macscsi )
 
 DRIVER_INIT(macplus)
 {
+	UINT32 *ROM = (UINT32 *)memory_region(machine, "user1");
+
+	ROM[0x1aefc/4] = 0x6bbe709e;	// change bpl to bmi
+
 	mac_driver_init(machine, MODEL_MAC_PLUS);
 }
 
@@ -2255,12 +2296,23 @@ DRIVER_INIT(maciix)
 
 DRIVER_INIT(maciici)
 {
+	UINT32 *ROM = (UINT32 *)memory_region(machine, "user1");
+
+	ROM[0x4569c/4] = 0x4ed64e71;	// jmp (a6) / nop (skip FPU test)
+	ROM[0x446b4/4] = 0x4e714e71;	// nop nop - disable ROM checksum
+	ROM[0x446b8/4] = 0x4e714ed6;	// nop jmp (a6) - disable ROM checksum
+
 	mac_driver_init(machine, MODEL_MAC_IICI);
 }
 
 DRIVER_INIT(maciisi)
 {
 	mac_driver_init(machine, MODEL_MAC_IISI);
+}
+
+DRIVER_INIT(macii)
+{
+	mac_driver_init(machine, MODEL_MAC_II);
 }
 
 DRIVER_INIT(macse30)

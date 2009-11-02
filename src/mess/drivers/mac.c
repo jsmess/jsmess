@@ -288,15 +288,26 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(macii_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x40000000, 0x4003ffff) AM_ROM AM_REGION("user1", 0) AM_MIRROR(0x0ffc0000)
 
+	// MMU remaps I/O without the F
+	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
+	AM_RANGE(0x50002000, 0x50003fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff)
+	AM_RANGE(0x50004000, 0x50005fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
+	AM_RANGE(0x50006000, 0x50006003) AM_WRITE(macii_scsi_drq_w)
+	AM_RANGE(0x50006060, 0x50006063) AM_READ(macii_scsi_drq_r)
+	AM_RANGE(0x50010000, 0x50011fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
+	AM_RANGE(0x50012060, 0x50012063) AM_READ(macii_scsi_drq_r)
+	AM_RANGE(0x50014000, 0x50015fff) AM_READ8(mac_asc_r, 0xffffffff) AM_WRITE8(mac_asc_w, 0xffffffff)
+	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff)
+
 	AM_RANGE(0x50f00000, 0x50f01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
 	AM_RANGE(0x50f02000, 0x50f03fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff)
 	AM_RANGE(0x50f04000, 0x50f05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
+	AM_RANGE(0x50f06000, 0x50f06003) AM_WRITE(macii_scsi_drq_w)
 	AM_RANGE(0x50f06060, 0x50f06063) AM_READ(macii_scsi_drq_r)
 
 	AM_RANGE(0x50f10000, 0x50f11fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
 	AM_RANGE(0x50f12060, 0x50f12063) AM_READ(macii_scsi_drq_r)
 	AM_RANGE(0x50f14000, 0x50f15fff) AM_READ8(mac_asc_r, 0xffffffff) AM_WRITE8(mac_asc_w, 0xffffffff)
-//	AM_RANGE(0x50f16000, 0x50f17fff) AM_READ(mac_swim_r) AM_WRITENOP
 	AM_RANGE(0x50f16000, 0x50f17fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff)
 
 	AM_RANGE(0x50f40000, 0x50f41fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)	// mirror
@@ -329,6 +340,7 @@ static ADDRESS_MAP_START(maciici_map, ADDRESS_SPACE_PROGRAM, 32)
 
 	AM_RANGE(0x50f00000, 0x50f01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
 	AM_RANGE(0x50f04000, 0x50f05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
+	AM_RANGE(0x50f06000, 0x50f06003) AM_WRITE(macii_scsi_drq_w)
 	AM_RANGE(0x50f06060, 0x50f06063) AM_READ(macii_scsi_drq_r)
 
 	AM_RANGE(0x50f10000, 0x50f11fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
@@ -353,6 +365,7 @@ static ADDRESS_MAP_START(macse30_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x50f00000, 0x50f01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
 	AM_RANGE(0x50f02000, 0x50f03fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff)
 	AM_RANGE(0x50f04000, 0x50f05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
+	AM_RANGE(0x50f06000, 0x50f06003) AM_WRITE(macii_scsi_drq_w)
 	AM_RANGE(0x50f06060, 0x50f06063) AM_READ(macii_scsi_drq_r)
 
 	AM_RANGE(0x50f10000, 0x50f11fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
@@ -374,6 +387,7 @@ static ADDRESS_MAP_START(macclas2_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x50f04000, 0x50f05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
 
 	AM_RANGE(0x50f10000, 0x50f11fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
+	AM_RANGE(0x50f06000, 0x50f06003) AM_WRITE(macii_scsi_drq_w)
 	AM_RANGE(0x50f12060, 0x50f12063) AM_READ(macii_scsi_drq_r)
 	AM_RANGE(0x50f14000, 0x50f15fff) AM_READ8(mac_asc_r, 0xffffffff) AM_WRITE8(mac_asc_w, 0xffffffff)
 	AM_RANGE(0x50f16000, 0x50f17fff) AM_READ(mac_swim_r) AM_WRITENOP
@@ -520,7 +534,7 @@ static MACHINE_DRIVER_START( macse )
 	MDRV_RAM_EXTRA_OPTIONS("2M,2560K,4M")
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( mac2fdhd )
+static MACHINE_DRIVER_START( macii )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68020_68851, 7833600*2)
 	MDRV_CPU_PROGRAM_MAP(macii_map)
@@ -576,6 +590,10 @@ static MACHINE_DRIVER_START( mac2fdhd )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("2M")
 	MDRV_RAM_EXTRA_OPTIONS("4M,6M,8M,10M")	
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( mac2fdhd )
+	MDRV_IMPORT_FROM( macii )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( maclc )
@@ -881,8 +899,8 @@ ROM_START( macse )
 ROM_END
 
 ROM_START( macclasc )
-	ROM_REGION16_BE(0x40000, "user1", 0)
-	ROM_LOAD16_WORD( "classic.rom",  0x00000, 0x40000, CRC(b14ddcde) SHA1(f710e73e8e0f99d9d0e9e79e71f67a6c3648bf06) )
+	ROM_REGION16_BE(0x80000, "user1", 0)
+        ROM_LOAD( "a49f9914.rom", 0x000000, 0x080000, CRC(510d7d38) SHA1(ccd10904ddc0fb6a1d216b2e9effd5ec6cf5a83d) )
 ROM_END
 
 ROM_START( maclc )
@@ -948,19 +966,19 @@ ROM_START( maclc2 )
 	ROM_LOAD( "35c28f5f.rom", 0x000000, 0x080000, CRC(a92145b3) SHA1(d5786182b62a8ffeeb9fd3f80b5511dba70318a0) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT	 CONFIG		COMPANY			FULLNAME */
-COMP( 1984, mac128k,  0, 	0,	mac128k,  macplus,  mac128k512k, 0,		"Apple Computer",	"Macintosh 128k",  GAME_NOT_WORKING )
-COMP( 1984, mac512k,  mac128k,  0,	mac512ke, macplus,  mac128k512k, 0,		"Apple Computer",	"Macintosh 512k",  GAME_NOT_WORKING )
-COMP( 1986, mac512ke, macplus,  0,	mac512ke, macplus,  mac512ke,	 0,		"Apple Computer",	"Macintosh 512ke", 0 )
-COMP( 1986, macplus,  0,	0,	macplus,  macplus,  macplus,	 0,		"Apple Computer",	"Macintosh Plus",  0 )
-COMP( 1987, macse,    0,	0,	macse,    macplus,  macse,	 0,		"Apple Computer",	"Macintosh SE",  0 )
-COMP( 1988, mac2fdhd, 0,	0,	mac2fdhd, macplus,  maciifdhd,	 0,		"Apple Computer",	"Macintosh II (FDHD)",  GAME_NOT_WORKING )
-COMP( 1988, maciix,   mac2fdhd, 0,	maciix,   macplus,  maciix,	 0,		"Apple Computer",	"Macintosh IIx",  GAME_NOT_WORKING )
-COMP( 1989, macse30,  mac2fdhd, 0,	macse30,  macplus,  macse30,	 0,		"Apple Computer",	"Macintosh SE/30",  GAME_NOT_WORKING )
-COMP( 1989, maciicx,  mac2fdhd, 0,	maciix,   macplus,  maciicx,	 0,		"Apple Computer",	"Macintosh IIcx",  GAME_NOT_WORKING )
-COMP( 1989, maciici,  0,		0,	maciici,  macplus,  maciici,	 0, 	"Apple Computer",	"Macintosh IIci",  GAME_NOT_WORKING )
-COMP( 1990, macclasc, 0,		0,	macse,    macplus,  macclassic,	 0,	"Apple Computer",	"Macintosh Classic",  GAME_NOT_WORKING )
-COMP( 1990, maclc,    0,		0,	maclc,    macplus,  maclc,	 	 0,		"Apple Computer",	"Macintosh LC",  GAME_NOT_WORKING )
-COMP( 1990, maciisi,  0,		0,	maciisi,  macplus,  maciici,	 0,	"Apple Computer",	"Macintosh IIsi",  GAME_NOT_WORKING )
-COMP( 1991, macclas2, 0,		0,	macclas2, macplus,  macclassic2, 0,    	"Apple Computer",	"Macintosh Classic II",  GAME_NOT_WORKING )
-COMP( 1991, maclc2,   0,		0,	maclc2,   macplus,  maclc2,	 	 0,      "Apple Computer",	"Macintosh LC II",  GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT	 CONFIG	COMPANY		  FULLNAME */
+COMP( 1984, mac128k,  0, 	0,	mac128k,  macplus,  mac128k512k, 0,     "Apple Computer", "Macintosh 128k",  GAME_NOT_WORKING )
+COMP( 1984, mac512k,  mac128k,  0,	mac512ke, macplus,  mac128k512k, 0,     "Apple Computer", "Macintosh 512k",  GAME_NOT_WORKING )
+COMP( 1986, mac512ke, macplus,  0,	mac512ke, macplus,  mac512ke,	 0,     "Apple Computer", "Macintosh 512ke", 0 )
+COMP( 1986, macplus,  0,	0,	macplus,  macplus,  macplus,	 0,     "Apple Computer", "Macintosh Plus",  0 )
+COMP( 1987, macse,    0,	0,	macse,    macplus,  macse,	 0,     "Apple Computer", "Macintosh SE",  0 )
+COMP( 1988, mac2fdhd, 0,	0,	mac2fdhd, macplus,  maciifdhd,	 0,     "Apple Computer", "Macintosh II (FDHD)",  GAME_NOT_WORKING )
+COMP( 1988, maciix,   mac2fdhd, 0,	maciix,   macplus,  maciix,	 0,     "Apple Computer", "Macintosh IIx",  GAME_NOT_WORKING )
+COMP( 1989, macse30,  mac2fdhd, 0,	macse30,  macplus,  macse30,	 0,     "Apple Computer", "Macintosh SE/30",  GAME_NOT_WORKING )
+COMP( 1989, maciicx,  mac2fdhd, 0,	maciix,   macplus,  maciicx,	 0,     "Apple Computer", "Macintosh IIcx",  GAME_NOT_WORKING )
+COMP( 1989, maciici,  0,	0,	maciici,  macplus,  maciici,	 0,     "Apple Computer", "Macintosh IIci",  GAME_NOT_WORKING )
+COMP( 1990, macclasc, 0,	0,	macse,    macplus,  macclassic,	 0,     "Apple Computer", "Macintosh Classic",  GAME_NOT_WORKING )
+COMP( 1990, maclc,    0,	0,	maclc,    macplus,  maclc,	 0,     "Apple Computer", "Macintosh LC",  GAME_NOT_WORKING )
+COMP( 1990, maciisi,  0,	0,	maciisi,  macplus,  maciici,	 0,     "Apple Computer", "Macintosh IIsi",  GAME_NOT_WORKING )
+COMP( 1991, macclas2, 0,	0,	macclas2, macplus,  macclassic2, 0,     "Apple Computer", "Macintosh Classic II",  GAME_NOT_WORKING )
+COMP( 1991, maclc2,   0,	0,	maclc2,   macplus,  maclc2,	 0,     "Apple Computer", "Macintosh LC II",  GAME_NOT_WORKING )
