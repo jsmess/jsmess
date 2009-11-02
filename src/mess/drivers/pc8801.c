@@ -87,7 +87,6 @@
 #include "cpu/v30mz/nec.h"
 #include "devices/cassette.h"
 #include "devices/flopdrv.h"
-#include "formats/d88_dsk.h"
 #include "machine/ctronics.h"
 #include "machine/i8255a.h"
 #include "machine/upd1990a.h"
@@ -498,7 +497,7 @@ static ADDRESS_MAP_START( pc88sr_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x32, 0x32) AM_READWRITE( pc88sr_inport_32, pc88sr_outport_32 )
 	AM_RANGE(0x34, 0x35) AM_WRITE( pc88sr_alu )
 	AM_RANGE(0x40, 0x40) AM_READWRITE( pc88sr_inport_40, pc88sr_outport_40 )
-	AM_RANGE(0x44, 0x45) AM_DEVREAD( "ym2203", ym2203_r )
+	AM_RANGE(0x44, 0x45) AM_DEVREAD( YM2203_TAG, ym2203_r )
 	AM_RANGE(0x46, 0x47) AM_NOP										/* OPNA extra port (not yet) */
 	AM_RANGE(0x50, 0x51) AM_READWRITE( pc8801_crtc_read, pc8801_crtc_write )
 	AM_RANGE(0x52, 0x5b) AM_WRITE( pc8801_palette_out )
@@ -529,7 +528,7 @@ static ADDRESS_MAP_START( pc88sr_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xf3, 0xf3) AM_NOP 									/* DMA floppy (unknown -- not yet) */
 	AM_RANGE(0xf4, 0xf7) AM_NOP										/* DMA 5'floppy (may be not released) */
 	AM_RANGE(0xf8, 0xfb) AM_NOP 									/* DMA 8'floppy (unknown -- not yet) */
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w )
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(CPU_I8255A_TAG, i8255a_r, i8255a_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc88va_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -553,9 +552,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pc8801fd_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_READ( pc8801fd_upd765_tc )
-	AM_RANGE(0xfa, 0xfa) AM_DEVREAD("upd765", upd765_status_r )
-	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w )
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w )
+	AM_RANGE(0xfa, 0xfa) AM_DEVREAD(UPD765_TAG, upd765_status_r )
+	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE(UPD765_TAG, upd765_data_r, upd765_data_w )
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(FDC_I8255A_TAG, i8255a_r, i8255a_w )
 ADDRESS_MAP_END
 
 /* uPD1990A Interface */
@@ -575,7 +574,7 @@ static UPD1990A_INTERFACE( pc88_upd1990a_intf )
 
 static READ8_DEVICE_HANDLER(opn_dummy_input) { return 0xff; }
 
-static const ym2203_interface pc8801_ym2203_interface =
+static const ym2203_interface pc88_ym2203_intf =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -596,7 +595,7 @@ static const floppy_config pc88_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(d88),
+	FLOPPY_OPTIONS_NAME(default),
 	DO_NOT_KEEP_GEOMETRY
 };
 
@@ -616,24 +615,24 @@ static MACHINE_DRIVER_START( pc88srl )
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(pc8801_mem)
 	MDRV_CPU_IO_MAP(pc88sr_io)
-	MDRV_CPU_VBLANK_INT("screen", pc8801_interrupt)
+	MDRV_CPU_VBLANK_INT(SCREEN_TAG, pc8801_interrupt)
 
 	/* sub CPU(5 inch floppy drive) */
 	MDRV_CPU_ADD("sub", Z80, 4000000)		/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(pc8801fd_mem)
 	MDRV_CPU_IO_MAP(pc8801fd_io)
-	MDRV_CPU_VBLANK_INT("screen", pc8801fd_interrupt)
+	MDRV_CPU_VBLANK_INT(SCREEN_TAG, pc8801fd_interrupt)
 
 	MDRV_QUANTUM_TIME(HZ(300000))
 
 	MDRV_MACHINE_START( pc88srl )
 	MDRV_MACHINE_RESET( pc88srl )
 
-	MDRV_I8255A_ADD( "ppi8255_0", pc8801_8255_config_0 )
-	MDRV_I8255A_ADD( "ppi8255_1", pc8801_8255_config_1 )
+	MDRV_I8255A_ADD( CPU_I8255A_TAG, pc8801_8255_config_0 )
+	MDRV_I8255A_ADD( FDC_I8255A_TAG, pc8801_8255_config_1 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -649,13 +648,13 @@ static MACHINE_DRIVER_START( pc88srl )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ym2203", YM2203, 3993600)
-	MDRV_SOUND_CONFIG(pc8801_ym2203_interface)	/* Should be accurate */
+	MDRV_SOUND_ADD(YM2203_TAG, YM2203, 3993600)
+	MDRV_SOUND_CONFIG(pc88_ym2203_intf)	/* Should be accurate */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_UPD765A_ADD("upd765", pc8801_fdc_interface)
+	MDRV_UPD765A_ADD(UPD765_TAG, pc8801_fdc_interface)
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc88_upd1990a_intf)
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, pc88_cassette_config)
@@ -671,7 +670,7 @@ static MACHINE_DRIVER_START( pc88srh )
 	MDRV_MACHINE_START( pc88srh )
 	MDRV_MACHINE_RESET( pc88srh )
 
-	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_MODIFY(SCREEN_TAG)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/*MDRV_ASPECT_RATIO(8, 5)*/
@@ -690,7 +689,7 @@ static MACHINE_DRIVER_START( pc88va )
 
 
 	/* No accurate at all, it's just skeleton code */
-	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/*MDRV_ASPECT_RATIO(8, 5)*/

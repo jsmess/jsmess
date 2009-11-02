@@ -7,9 +7,14 @@
 #ifndef __PC8801__
 #define __PC8801__
 
+#define CPU_I8255A_TAG	"ppi8255_0"
+#define FDC_I8255A_TAG	"ppi8255_1"
+#define UPD765_TAG		"upd765"
 #define UPD1990A_TAG	"upd1990a"
+#define YM2203_TAG		"ym2203"
 #define CASSETTE_TAG	"cassette"
 #define CENTRONICS_TAG	"centronics"
+#define SCREEN_TAG		"screen"
 
 #include "machine/upd765.h"
 #include "machine/i8255a.h"
@@ -20,6 +25,7 @@ struct _pc88_state
 	/* RTC state */
 	int rtc_data;
 
+	const device_config *upd765;
 	const device_config *upd1990a;
 	const device_config *cassette;
 	const device_config *centronics;

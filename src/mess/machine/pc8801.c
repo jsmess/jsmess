@@ -340,6 +340,7 @@ static void select_extmem(char **r,char **w,UINT8 *ret_ctrl)
 
 void pc8801_update_bank(running_machine *machine)
 {
+	const address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	char *ext_r,*ext_w;
 
 	select_extmem(&ext_r,&ext_w,NULL);
@@ -357,14 +358,14 @@ void pc8801_update_bank(running_machine *machine)
 		if(ext_w==NULL)
 		{
 			/* read only mode */
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, SMH_NOP);
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_NOP);
+			memory_install_write8_handler(program, 0x0000, 0x5fff, 0, 0, SMH_NOP);
+			memory_install_write8_handler(program, 0x6000, 0x7fff, 0, 0, SMH_NOP);
 		}
 		else
 		{
 			/* r/w mode */
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, SMH_BANK(1));
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK(2));
+			memory_install_write8_handler(program, 0x0000, 0x5fff, 0, 0, SMH_BANK(1));
+			memory_install_write8_handler(program, 0x6000, 0x7fff, 0, 0, SMH_BANK(2));
 			if(ext_w!=ext_r) logerror("differnt between read and write bank of extension memory.\n");
 		}
 	}
@@ -374,8 +375,8 @@ void pc8801_update_bank(running_machine *machine)
 		if(RAMmode)
 		{
 			/* RAM */
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, SMH_BANK(1));
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK(2));
+			memory_install_write8_handler(program, 0x0000, 0x5fff, 0, 0, SMH_BANK(1));
+			memory_install_write8_handler(program, 0x6000, 0x7fff, 0, 0, SMH_BANK(2));
 			memory_set_bankptr(machine, 1, pc8801_mainRAM + 0x0000);
 			memory_set_bankptr(machine, 2, pc8801_mainRAM + 0x6000);
 		}
@@ -383,8 +384,8 @@ void pc8801_update_bank(running_machine *machine)
 		{
 			/* ROM */
 			/* write through to main RAM */
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, pc8801_writemem1);
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, pc8801_writemem2);
+			memory_install_write8_handler(program, 0x0000, 0x5fff, 0, 0, pc8801_writemem1);
+			memory_install_write8_handler(program, 0x6000, 0x7fff, 0, 0, pc8801_writemem2);
 			if(ROMmode)
 			{
 				/* N-BASIC */
@@ -406,8 +407,8 @@ void pc8801_update_bank(running_machine *machine)
 	}
 
 	/* 0x8000 to 0xffff */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x83ff, 0, 0, (RAMmode || ROMmode) ? SMH_BANK(3) : pc8801_read_textwindow);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x83ff, 0, 0, (RAMmode || ROMmode) ? SMH_BANK(3) : pc8801_write_textwindow);
+	memory_install_read8_handler(program, 0x8000, 0x83ff, 0, 0, (RAMmode || ROMmode) ? SMH_BANK(3) : pc8801_read_textwindow);
+	memory_install_write8_handler(program, 0x8000, 0x83ff, 0, 0, (RAMmode || ROMmode) ? SMH_BANK(3) : pc8801_write_textwindow);
 
 	memory_set_bankptr(machine, 4, pc8801_mainRAM + 0x8400);
 
@@ -418,10 +419,10 @@ void pc8801_update_bank(running_machine *machine)
 	}
 	else
 	{
-		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, SMH_BANK(5));
-		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, SMH_BANK(5));
-		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, SMH_BANK(6));
-		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, SMH_BANK(6));
+		memory_install_read8_handler(program, 0xc000, 0xefff, 0, 0, SMH_BANK(5));
+		memory_install_write8_handler(program, 0xc000, 0xefff, 0, 0, SMH_BANK(5));
+		memory_install_read8_handler(program, 0xf000, 0xffff, 0, 0, SMH_BANK(6));
+		memory_install_write8_handler(program, 0xf000, 0xffff, 0, 0, SMH_BANK(6));
 
 		memory_set_bankptr(machine, 5, pc8801_mainRAM + 0xc000);
 		if(maptvram)
@@ -678,6 +679,7 @@ MACHINE_START( pc88srl )
 	pc88_state *state = machine->driver_data;
 
 	/* find devices */
+	state->upd765 = devtag_get_device(machine, UPD765_TAG);
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
@@ -718,7 +720,7 @@ static WRITE8_DEVICE_HANDLER( cpu_8255_c_w )
 
 I8255A_INTERFACE( pc8801_8255_config_0 )
 {
-	DEVCB_DEVICE_HANDLER("ppi8255_1", i8255a_pb_r),	// Port A read
+	DEVCB_DEVICE_HANDLER(FDC_I8255A_TAG, i8255a_pb_r),	// Port A read
 	DEVCB_NULL,							// Port B read
 	DEVCB_HANDLER(cpu_8255_c_r),		// Port C read
 	DEVCB_NULL,							// Port A write
@@ -738,7 +740,7 @@ static WRITE8_DEVICE_HANDLER( fdc_8255_c_w )
 
 I8255A_INTERFACE( pc8801_8255_config_1 )
 {
-	DEVCB_DEVICE_HANDLER("ppi8255_0", i8255a_pb_r),	// Port A read
+	DEVCB_DEVICE_HANDLER(CPU_I8255A_TAG, i8255a_pb_r),	// Port A read
 	DEVCB_NULL,							// Port B read
 	DEVCB_HANDLER(fdc_8255_c_r),		// Port C read
 	DEVCB_NULL,							// Port A write
@@ -748,10 +750,10 @@ I8255A_INTERFACE( pc8801_8255_config_1 )
 
 READ8_HANDLER(pc8801fd_upd765_tc)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "upd765");
+	pc88_state *state = space->machine->driver_data;
 
-	upd765_tc_w(fdc, 1);
-	upd765_tc_w(fdc, 0);
+	upd765_tc_w(state->upd765, 1);
+	upd765_tc_w(state->upd765, 0);
 
 	return 0;
 }

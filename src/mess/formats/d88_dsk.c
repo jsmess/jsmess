@@ -333,7 +333,3 @@ FLOPPY_CONSTRUCT(d88_dsk_construct)
 
 	return FLOPPY_ERROR_SUCCESS;
 }
-
-FLOPPY_OPTIONS_START( d88 )
-	FLOPPY_OPTION( d88, "d88", "D88 disk image", d88_dsk_identify, d88_dsk_construct, NULL )
-FLOPPY_OPTIONS_END
