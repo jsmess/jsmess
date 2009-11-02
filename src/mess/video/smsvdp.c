@@ -235,14 +235,14 @@ READ8_DEVICE_HANDLER( sms_vdp_vcount_r )
 READ8_DEVICE_HANDLER( sms_vdp_hcount_latch_r )
 {
 	smsvdp_t *smsvdp = get_safe_token(device);
-	
+
 	return smsvdp->hcounter;
 }
 
 WRITE8_DEVICE_HANDLER( sms_vdp_hcount_latch_w )
 {
 	smsvdp_t *smsvdp = get_safe_token(device);
-	
+
 	smsvdp->hcounter = data;
 }
 
@@ -639,7 +639,7 @@ static void sms_refresh_line_mode4( smsvdp_t *smsvdp, int *line_buffer, int line
 			if (palette_selected)
 				pen_selected |= 0x10;
 
-			
+
 			if (!horiz_selected)
 			{
 				pixel_plot_x = pixel_x;
@@ -1320,26 +1320,34 @@ UINT32 smsvdp_update( const device_config *device, bitmap_t *bitmap, const recta
 	int height = video_screen_get_height(screen);
 	int x, y;
 
-	if (smsvdp->prev_bitmap_saved)
+	if (IS_GAMEGEAR_VDP)
 	{
 		for (y = 0; y < height; y++)
 		{
+			UINT32 *line0 = BITMAP_ADDR32(smsvdp->tmpbitmap, y, 0);
+			UINT32 *line1 = BITMAP_ADDR32(smsvdp->prev_bitmap, y, 0);
 			for (x = 0; x < width; x++)
 			{
-				*BITMAP_ADDR32(bitmap, y, x) = (*BITMAP_ADDR32(smsvdp->tmpbitmap, y, x) + *BITMAP_ADDR32(smsvdp->prev_bitmap, y, x)) >> 2;
-				logerror("%x %x %x\n", *BITMAP_ADDR32(smsvdp->tmpbitmap, y, x), *BITMAP_ADDR32(smsvdp->prev_bitmap, y, x), (*BITMAP_ADDR32(smsvdp->tmpbitmap, y, x) + *BITMAP_ADDR32(smsvdp->prev_bitmap, y, x)) >> 2);
+				UINT32 color0 = line0[x];
+				UINT32 color1 = line1[x];
+				UINT16 r0 = (color0 >> 16) & 0x000000ff;
+				UINT16 g0 = (color0 >>  8) & 0x000000ff;
+				UINT16 b0 = (color0 >>  0) & 0x000000ff;
+				UINT16 r1 = (color1 >> 16) & 0x000000ff;
+				UINT16 g1 = (color1 >>  8) & 0x000000ff;
+				UINT16 b1 = (color1 >>  0) & 0x000000ff;
+				UINT8 r = (UINT8)((r0 + r1) >> 1);
+				UINT8 g = (UINT8)((g0 + g1) >> 1);
+				UINT8 b = (UINT8)((b0 + b1) >> 1);
+				*BITMAP_ADDR32(bitmap, y, x) = (r << 16) | (g << 8) | b;
 			}
 		}
+
+		copybitmap(smsvdp->prev_bitmap, smsvdp->tmpbitmap, 0, 0, 0, 0, cliprect);
 	}
 	else
 	{
 		copybitmap(bitmap, smsvdp->tmpbitmap, 0, 0, 0, 0, cliprect);
-	}
-
-	if (!smsvdp->prev_bitmap_saved)
-	{
-		copybitmap(smsvdp->prev_bitmap, smsvdp->tmpbitmap, 0, 0, 0, 0, cliprect);
-	//smsvdp->prev_bitmap_saved = 1;
 	}
 
 	return 0;
@@ -1424,10 +1432,10 @@ static DEVICE_RESET( smsvdp )
 	smsvdp->line_counter = 0;
 	smsvdp->prev_bitmap_saved = 0;
 
-	/* for light gun input with "Hang-On & Safari Hunt", hcounter seems to 
+	/* for light gun input with "Hang-On & Safari Hunt", hcounter seems to
 	 need initialization to some value */
-	smsvdp->hcounter = 0x40; 
-	
+	smsvdp->hcounter = 0x40;
+
 	for (i = 0; i < 0x20; i++)
 		smsvdp->current_palette[i] = 0;
 
