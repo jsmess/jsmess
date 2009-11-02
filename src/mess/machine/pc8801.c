@@ -16,7 +16,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "includes/pc8801.h"
 #include "machine/upd765.h"
 #include "sound/beep.h"
@@ -722,104 +722,65 @@ MACHINE_RESET( pc88srh )
 
 /* 5 inch floppy drive */
 
-static UINT8 load_8255_A(running_machine *machine, int chip)
+static UINT8 i8255_0_pc, i8255_1_pc;
+
+static READ8_DEVICE_HANDLER( cpu_8255_c_r )
 {
-	return use_5FD ? ppi8255_get_port_b(devtag_get_device(machine, chip? "ppi8255_0" : "ppi8255_1" ) ) : 0xff;
+	return i8255_1_pc >> 4;
 }
 
-static UINT8 load_8255_B(running_machine *machine, int chip)
+static WRITE8_DEVICE_HANDLER( cpu_8255_c_w )
 {
-	return use_5FD ? ppi8255_get_port_a(devtag_get_device(machine, chip? "ppi8255_0" : "ppi8255_1" ) ) : 0xff;
+	i8255_0_pc = data;
 }
 
-static UINT8 load_8255_C(running_machine *machine, int chip)
+I8255A_INTERFACE( pc8801_8255_config_0 )
 {
-	UINT8 result = 0xFF;
-	UINT8 port_c;
-
-	if (use_5FD)
-	{
-		port_c = ppi8255_get_port_c(devtag_get_device(machine, chip? "ppi8255_0" : "ppi8255_1" ) );
-		result = ((port_c >> 4) & 0x0F) | ((port_c << 4) & 0xF0);
-	}
-
-	/* NPW 11-Feb-2006 - This is a brutal no-good hack to work around bug #759
-     *
-     * The problem is that in MESS 0.96, a regression was introduced that
-     * prevented the PC8801 from booting up.  The source of this regression
-     * was the 8255 PPI rewrite.
-     *
-     * What seems to happen is CPU #0 does a write to 8255 #0 port C at PC=37CF
-     * and this causes a communication to be made to CPU #1.  Under the
-     * previous 8255 code, this write would not actually make it to the the
-     * slave CPU, CPU #1.  After examining the data sheet, all indications are
-     * that the new 8255 behavior is indeed correct.
-     *
-     * So what I'm doing is an ugly hack so that when the slave CPU #1 sees the
-     * value written to it, I actually change this to the previous value,
-     * cloaking the communication.  So the PC8801 now boots up, but hopefully
-     * a correct fix can be made.
-     */
-	if ((chip == 1) && (result == 0xF8))
-		result = 0xF0;
-
-	return result;
-}
-
-static READ8_DEVICE_HANDLER( load_8255_chip0_A )	{ return load_8255_A(device->machine, 0); }
-static READ8_DEVICE_HANDLER( load_8255_chip1_A )	{ return load_8255_A(device->machine, 1); }
-static READ8_DEVICE_HANDLER( load_8255_chip0_B )	{ return load_8255_B(device->machine, 0); }
-static READ8_DEVICE_HANDLER( load_8255_chip1_B )	{ return load_8255_B(device->machine, 1); }
-static READ8_DEVICE_HANDLER( load_8255_chip0_C )	{ return load_8255_C(device->machine, 0); }
-static READ8_DEVICE_HANDLER( load_8255_chip1_C )	{ return load_8255_C(device->machine, 1); }
-
-
-const ppi8255_interface pc8801_8255_config_0 =
-{
-	DEVCB_HANDLER(load_8255_chip0_A),
-	DEVCB_HANDLER(load_8255_chip0_B),
-	DEVCB_HANDLER(load_8255_chip0_C),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DEVICE_HANDLER("ppi8255_1", i8255a_pb_r),	// Port A read
+	DEVCB_NULL,							// Port B read
+	DEVCB_HANDLER(cpu_8255_c_r),		// Port C read
+	DEVCB_NULL,							// Port A write
+	DEVCB_NULL,							// Port B write
+	DEVCB_HANDLER(cpu_8255_c_w)			// Port C write
 };
 
-const ppi8255_interface pc8801_8255_config_1 =
+static READ8_DEVICE_HANDLER( fdc_8255_c_r )
 {
-	DEVCB_HANDLER(load_8255_chip1_A),
-	DEVCB_HANDLER(load_8255_chip1_B),
-	DEVCB_HANDLER(load_8255_chip1_C),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	return i8255_0_pc >> 4;
+}
+
+static WRITE8_DEVICE_HANDLER( fdc_8255_c_w )
+{
+	i8255_1_pc = data;
+}
+
+I8255A_INTERFACE( pc8801_8255_config_1 )
+{
+	DEVCB_DEVICE_HANDLER("ppi8255_0", i8255a_pb_r),	// Port A read
+	DEVCB_NULL,							// Port B read
+	DEVCB_HANDLER(fdc_8255_c_r),		// Port C read
+	DEVCB_NULL,							// Port A write
+	DEVCB_NULL,							// Port B write
+	DEVCB_HANDLER(fdc_8255_c_w)			// Port C write
 };
 
 READ8_HANDLER(pc8801fd_upd765_tc)
 {
-  const device_config *fdc = devtag_get_device(space->machine, "upd765");
-  upd765_tc_w(fdc, 1);
-  upd765_tc_w(fdc, 0);
-  return 0;
+	const device_config *fdc = devtag_get_device(space->machine, "upd765");
+
+	upd765_tc_w(fdc, 1);
+	upd765_tc_w(fdc, 0);
+
+	return 0;
 }
 
-/* callback for /INT output from FDC */
-static WRITE_LINE_DEVICE_HANDLER( pc8801_fdc_interrupt )
+const upd765_interface pc8801_fdc_interface =
 {
-    cputag_set_input_line(device->machine, "sub", 0, state ? HOLD_LINE : CLEAR_LINE);
-}
-
-/* callback for /DRQ output from FDC */
-static UPD765_DMA_REQUEST( pc8801_fdc_dma_drq )
-{
-}
-
-const upd765_interface pc8801_fdc_interface=
-{
-	DEVCB_LINE(pc8801_fdc_interrupt),
-	pc8801_fdc_dma_drq,
+	DEVCB_CPU_INPUT_LINE("sub", INPUT_LINE_IRQ0),
+	NULL,
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
 static void pc8801_init_5fd(running_machine *machine)
@@ -830,10 +791,12 @@ static void pc8801_init_5fd(running_machine *machine)
 	else
 		cputag_resume(machine, "sub", SUSPEND_REASON_DISABLE);
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "sub"), 0, 0);
+	
+	logerror("READY 1\n");
 	floppy_drive_set_motor_state(floppy_get_device(machine, 0), 1);
 	floppy_drive_set_motor_state(floppy_get_device(machine, 1), 1);
-	floppy_drive_set_ready_state(floppy_get_device(machine, 0), 1,0);
-	floppy_drive_set_ready_state(floppy_get_device(machine, 1), 1,0);
+	floppy_drive_set_ready_state(floppy_get_device(machine, 0), 1, 1);
+	floppy_drive_set_ready_state(floppy_get_device(machine, 1), 1, 1);
 }
 
 /*

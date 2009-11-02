@@ -85,7 +85,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/v30mz/nec.h"
 #include "sound/beep.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "includes/pc8801.h"
 #include "machine/upd765.h"
 #include "devices/flopdrv.h"
@@ -525,7 +525,7 @@ static ADDRESS_MAP_START( pc88sr_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xf3, 0xf3) AM_NOP 									/* DMA floppy (unknown -- not yet) */
 	AM_RANGE(0xf4, 0xf7) AM_NOP										/* DMA 5'floppy (may be not released) */
 	AM_RANGE(0xf8, 0xfb) AM_NOP 									/* DMA 8'floppy (unknown -- not yet) */
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w )
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc88va_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -551,7 +551,7 @@ static ADDRESS_MAP_START( pc8801fd_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xf8, 0xf8) AM_READ( pc8801fd_upd765_tc )
 	AM_RANGE(0xfa, 0xfa) AM_DEVREAD("upd765", upd765_status_r )
 	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w )
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w )
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w )
 ADDRESS_MAP_END
 
 
@@ -601,9 +601,9 @@ static MACHINE_DRIVER_START( pc88srl )
 
 	MDRV_MACHINE_RESET( pc88srl )
 
-	MDRV_PPI8255_ADD( "ppi8255_0", pc8801_8255_config_0 )
+	MDRV_I8255A_ADD( "ppi8255_0", pc8801_8255_config_0 )
 
-	MDRV_PPI8255_ADD( "ppi8255_1", pc8801_8255_config_1 )
+	MDRV_I8255A_ADD( "ppi8255_1", pc8801_8255_config_1 )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
