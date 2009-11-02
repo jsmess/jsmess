@@ -2112,7 +2112,7 @@ static const floppy_config x1_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_DS_80,
+	FLOPPY_DRIVE_DS_40,
 	FLOPPY_OPTIONS_NAME(x1),
 	DO_NOT_KEEP_GEOMETRY
 };

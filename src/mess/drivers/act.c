@@ -19,8 +19,20 @@
 #include "devices/flopdrv.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
+#include "machine/pit8253.h"
+#include "machine/pic8259.h"
+
+#include "devices/flopdrv.h"
+#include "formats/basicdsk.h"
 
 static UINT16 *act_vram,*act_scrollram,*act_ram;
+static struct
+{
+	UINT8 disp_en; 		//bit 3
+	UINT8 gfx_mode; 	//bit 4
+	UINT8 fdrv_num;		//bit 6
+	UINT8 p_input_dir;	//bit 7
+}xi_sys_ctrl;
 
 static VIDEO_START( act_f1 )
 {
@@ -66,32 +78,43 @@ static VIDEO_UPDATE( act_xi )
 {
 	int y,x,xi,yi;
 
-	for (y=0;y<25;y++)
+	if(xi_sys_ctrl.disp_en)
+		return 0;
+
+	if(xi_sys_ctrl.gfx_mode)
 	{
-		for (x=0;x<80;x++)
+		for (y=0;y<25;y++)
 		{
-			int tile = act_vram[(x+y*80)] & 0x03ff;
-
-			//0x8000: reverse
-			//0x4000: bright
-			//0x2000: underline
-			//0x1000: strikethrough
-
-			for(yi=0;yi<16;yi++)
+			for (x=0;x<80;x++)
 			{
-				for(xi=0;xi<10;xi++)
+				int tile = act_vram[(x+y*80)] & 0x03ff;
+
+				//0x8000: reverse
+				//0x4000: bright
+				//0x2000: underline
+				//0x1000: strikethrough
+
+				for(yi=0;yi<16;yi++)
 				{
-					int color;
+					for(xi=0;xi<10;xi++)
+					{
+						int color;
 
-					color = (act_ram[(tile*16)+(yi)]>>(xi) & 1) ? 7 : 0;
+						color = (act_ram[(tile*16)+(yi)]>>(xi) & 1) ? 7 : 0;
 
-					//FIXME: X should actually be multiplied by 10.
-					if((x*8+xi)<=video_screen_get_visible_area(screen)->max_x && ((y*16+yi))<video_screen_get_visible_area(screen)->max_y)
-						*BITMAP_ADDR16(bitmap, y*16+yi, x*8+xi) = screen->machine->pens[color];
+						//FIXME: X should actually be multiplied by 10.
+						if((x*8+xi)<=video_screen_get_visible_area(screen)->max_x && ((y*16+yi))<video_screen_get_visible_area(screen)->max_y)
+							*BITMAP_ADDR16(bitmap, y*16+yi, x*8+xi) = screen->machine->pens[color];
+					}
 				}
 			}
 		}
 	}
+	else
+	{
+		//...
+	}
+
 	return 0;
 }
 
@@ -113,21 +136,23 @@ static WRITE8_HANDLER( act_sio_w )
 
 static READ8_HANDLER( act_fdc_r )
 {
-//	const device_config* dev = devtag_get_device(space->machine,"fdc");
+	const device_config* dev = devtag_get_device(space->machine,"fdc");
 
 //	printf("%02x\n",offset);
+
+	floppy_drive_set_motor_state(floppy_get_device(space->machine, xi_sys_ctrl.fdrv_num), 1);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, xi_sys_ctrl.fdrv_num), 1,0);
 
 	switch(offset)
 	{
 		case 0:
-			return mame_rand(space->machine);
-//			return wd17xx_status_r(dev,offset);
-//		case 1:
-//			return wd17xx_track_r(dev,offset);
-//		case 2:
-//			return wd17xx_sector_r(dev,offset);
-//		case 3:
-//			return wd17xx_data_r(dev,offset);
+			return wd17xx_status_r(dev,offset);
+		case 1:
+			return wd17xx_track_r(dev,offset);
+		case 2:
+			return wd17xx_sector_r(dev,offset);
+		case 3:
+			return wd17xx_data_r(dev,offset);
 		default:
 			logerror("FDC: read from %04x\n",offset);
 			return 0xff;
@@ -138,24 +163,27 @@ static READ8_HANDLER( act_fdc_r )
 
 static WRITE8_HANDLER( act_fdc_w )
 {
-//	const device_config* dev = devtag_get_device(space->machine,"fdc");
+	const device_config* dev = devtag_get_device(space->machine,"fdc");
 
 //	printf("%02x %02x\n",offset,data);
 
+	floppy_drive_set_motor_state(floppy_get_device(space->machine, xi_sys_ctrl.fdrv_num), 1);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, xi_sys_ctrl.fdrv_num), 1,0);
+
 	switch(offset)
 	{
-//		case 0:
-//			wd17xx_command_w(dev,offset,data);
-//			break;
-//		case 1:
-//			wd17xx_track_w(dev,offset,data);
-//			break;
-//		case 2:
-//			wd17xx_sector_w(dev,offset,data);
-//			break;
-//		case 3:
-//			wd17xx_data_w(dev,offset,data);
-//			break;
+		case 0:
+			wd17xx_command_w(dev,offset,data);
+			break;
+		case 1:
+			wd17xx_track_w(dev,offset,data);
+			break;
+		case 2:
+			wd17xx_sector_w(dev,offset,data);
+			break;
+		case 3:
+			wd17xx_data_w(dev,offset,data);
+			break;
 		default:
 			logerror("FDC: write to %04x = %02x\n",offset,data);
 			break;
@@ -208,14 +236,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( act_xi_io , ADDRESS_SPACE_IO, 16)
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(0x0000, 0x0003) pic
+	AM_RANGE(0x0000, 0x0003) AM_DEVREADWRITE8("pic8259_master",pic8259_r, pic8259_w,0x00ff)
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(act_fdc_r, act_fdc_w,0x00ff)
 	AM_RANGE(0x0048, 0x004f) AM_DEVREADWRITE8("ppi8255_0", ppi8255_r, ppi8255_w,0x00ff)
 //	AM_RANGE(0x0050, 0x0051) sound gen
-//	AM_RANGE(0x0058, 0x005f) pit
+	AM_RANGE(0x0058, 0x005f) AM_DEVREADWRITE8("pit8253",pit8253_r,pit8253_w,0x00ff)
 	AM_RANGE(0x0060, 0x0067) AM_READWRITE8(act_sio_r,act_sio_w,0x00ff)
 	AM_RANGE(0x0068, 0x0069) AM_DEVWRITE8("crtc", mc6845_address_w,0x00ff)
-	AM_RANGE(0x006a, 0x006b) AM_DEVWRITE8("crtc", mc6845_register_w,0x00ff)
+	AM_RANGE(0x006a, 0x006b) AM_DEVREADWRITE8("crtc", mc6845_register_r,mc6845_register_w,0x00ff)
 //	AM_RANGE(0x0070, 0x0073) 8089
 ADDRESS_MAP_END
 
@@ -289,14 +317,41 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
+static READ8_DEVICE_HANDLER( act_portb_r )
+{
+	return 0xff;
+}
+
+/*
+	x--- ---- Parallel Input Direction
+	-x-- ---- FDC Drive select
+	---x ---- Text/GFX Mode
+	---- x--- Display Enable
+	---- -x-- FDC Side load
+	---- ---x CRTC reset
+*/
+static WRITE8_DEVICE_HANDLER( act_portb_w )
+{
+	const device_config* dev = devtag_get_device(device->machine,"fdc");
+
+//	printf("PPI Port B write %02x\n",data);
+	xi_sys_ctrl.disp_en = (data & 8)>>3;
+	xi_sys_ctrl.gfx_mode = (data & 0x10)>>4;
+	xi_sys_ctrl.p_input_dir = (data & 0x80)>>7;
+	xi_sys_ctrl.fdrv_num = (data & 0x40)>>6;
+
+	wd17xx_set_drive(dev,xi_sys_ctrl.fdrv_num);
+	wd17xx_set_side(dev,(data & 0x04)>>2);
+}
+
 static const ppi8255_interface ppi8255_intf =
 {
-	DEVCB_NULL,						/* Port A read */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL						/* Port C write */
+	DEVCB_NULL,									/* Port A read */
+	DEVCB_HANDLER(act_portb_r),					/* Port B read */
+	DEVCB_NULL,									/* Port C read */
+	DEVCB_NULL,									/* Port A write */
+	DEVCB_HANDLER(act_portb_w),					/* Port B write */
+	DEVCB_NULL									/* Port C write */
 };
 
 static const gfx_layout charset_8x8 =
@@ -365,6 +420,58 @@ static INTERRUPT_GEN( act_f1_irq )
 	//	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x60);
 }
 
+static PIC8259_SET_INT_LINE( pc98_master_set_int_line ) {
+	//printf("%02x\n",interrupt);
+	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+}
+
+
+static const struct pic8259_interface pic8259_master_config = {
+	pc98_master_set_int_line
+};
+
+static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
+{
+	pic8259_set_irq_line(devtag_get_device( device->machine, "pic8259_master" ), 0, state);
+}
+
+static const struct pit8253_config pit8253_config =
+{
+	{
+		{
+			4670000,				/* heartbeat IRQ */
+			pc_timer0_w
+		}, {
+			4670000,				/* dram refresh */
+			NULL
+		}, {
+			4670000,				/* pio port c pin 4, and speaker polling enough */
+			NULL
+		}
+	}
+};
+
+static FLOPPY_OPTIONS_START( act )
+	FLOPPY_OPTION( img2hd, "dsk", "2HD disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config act_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(act),
+	DO_NOT_KEEP_GEOMETRY
+};
+
 static MACHINE_DRIVER_START( act_f1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8086, 4670000)
@@ -420,11 +527,15 @@ static MACHINE_DRIVER_START( act_xi )
 
 	MDRV_PPI8255_ADD("ppi8255_0", ppi8255_intf )
 	MDRV_WD2793_ADD("fdc", act_wd2797_interface )
+	MDRV_PIC8259_ADD( "pic8259_master", pic8259_master_config )
+	MDRV_PIT8253_ADD( "pit8253", pit8253_config )
 
 	MDRV_GFXDECODE(act_xi)
 
 	MDRV_VIDEO_START(act_xi)
 	MDRV_VIDEO_UPDATE(act_xi)
+
+	MDRV_FLOPPY_2_DRIVES_ADD(act_floppy_config)
 MACHINE_DRIVER_END
 
 /* ROM definition */
