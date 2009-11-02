@@ -14,7 +14,7 @@
 #include "driver.h"
 #include "cpu/i86/i86.h"
 #include "video/mc6845.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 #include "cpu/z80/z80daisy.h"
@@ -238,7 +238,7 @@ static ADDRESS_MAP_START( act_xi_io , ADDRESS_SPACE_IO, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0003) AM_DEVREADWRITE8("pic8259_master",pic8259_r, pic8259_w,0x00ff)
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(act_fdc_r, act_fdc_w,0x00ff)
-	AM_RANGE(0x0048, 0x004f) AM_DEVREADWRITE8("ppi8255_0", ppi8255_r, ppi8255_w,0x00ff)
+	AM_RANGE(0x0048, 0x004f) AM_DEVREADWRITE8("ppi8255_0", i8255a_r, i8255a_w,0x00ff)
 //	AM_RANGE(0x0050, 0x0051) sound gen
 	AM_RANGE(0x0058, 0x005f) AM_DEVREADWRITE8("pit8253",pit8253_r,pit8253_w,0x00ff)
 	AM_RANGE(0x0060, 0x0067) AM_READWRITE8(act_sio_r,act_sio_w,0x00ff)
@@ -344,7 +344,7 @@ static WRITE8_DEVICE_HANDLER( act_portb_w )
 	wd17xx_set_side(dev,(data & 0x04)>>2);
 }
 
-static const ppi8255_interface ppi8255_intf =
+static I8255A_INTERFACE( ppi8255_intf )
 {
 	DEVCB_NULL,									/* Port A read */
 	DEVCB_HANDLER(act_portb_r),					/* Port B read */
@@ -496,7 +496,7 @@ static MACHINE_DRIVER_START( act_f1 )
 
 //	MDRV_MC6845_ADD("crtc", MC6845, XTAL_3_579545MHz/2, mc6845_intf)	/* hand tuned to get ~50 fps */
 
-//	MDRV_PPI8255_ADD("ppi8255_0", ppi8255_intf )
+//	MDRV_I8255A_ADD("ppi8255_0", ppi8255_intf )
 	MDRV_WD2793_ADD("fdc", act_wd2797_interface )
 
 	MDRV_GFXDECODE(act_f1)
@@ -525,7 +525,7 @@ static MACHINE_DRIVER_START( act_xi )
 
 	MDRV_MC6845_ADD("crtc", MC6845, XTAL_3_579545MHz/2, mc6845_intf)	/* hand tuned to get ~50 fps */
 
-	MDRV_PPI8255_ADD("ppi8255_0", ppi8255_intf )
+	MDRV_I8255A_ADD("ppi8255_0", ppi8255_intf )
 	MDRV_WD2793_ADD("fdc", act_wd2797_interface )
 	MDRV_PIC8259_ADD( "pic8259_master", pic8259_master_config )
 	MDRV_PIT8253_ADD( "pit8253", pit8253_config )

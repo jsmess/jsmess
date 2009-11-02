@@ -225,7 +225,7 @@
 
 #include "driver.h"
 #include "cpu/i386/i386.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "machine/8237dma.h"
 #include "machine/pic8259.h"
@@ -317,7 +317,7 @@ static READ8_HANDLER( sys_port_r )
 		return 0x18; //FIXME: kludge to get over a probable PPI bug.
 
 	if(offset & 1)
-		return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), (offset & 6) >> 1);
+		return i8255a_r(devtag_get_device(space->machine, "ppi8255_0"), (offset & 6) >> 1);
 
 	logerror("RS-232c R access %02x\n",offset >> 1);
 	return 0xff;
@@ -327,7 +327,7 @@ static READ8_HANDLER( sys_port_r )
 static WRITE8_HANDLER( sys_port_w )
 {
 	if(offset & 1)
-		ppi8255_w(devtag_get_device(space->machine, "ppi8255_0"), (offset & 6) >> 1, data);
+		i8255a_w(devtag_get_device(space->machine, "ppi8255_0"), (offset & 6) >> 1, data);
 	else
 		logerror("RS-232c W access %02x %02x\n",offset >> 1,data);
 }
@@ -335,7 +335,7 @@ static WRITE8_HANDLER( sys_port_w )
 static READ8_HANDLER( sio_port_r )
 {
 	if(!(offset & 1))
-		return ppi8255_r(devtag_get_device(space->machine, "ppi8255_1"), (offset & 6) >> 1);
+		return i8255a_r(devtag_get_device(space->machine, "ppi8255_1"), (offset & 6) >> 1);
 
 	logerror("keyboard R access %02x\n",offset >> 1);
 	return 0xff;
@@ -345,7 +345,7 @@ static READ8_HANDLER( sio_port_r )
 static WRITE8_HANDLER( sio_port_w )
 {
 	if(!(offset & 1))
-		ppi8255_w(devtag_get_device(space->machine, "ppi8255_1"), (offset & 6) >> 1, data);
+		i8255a_w(devtag_get_device(space->machine, "ppi8255_1"), (offset & 6) >> 1, data);
 	else
 		logerror("keyboard W access %02x %02x\n",offset >> 1,data);
 }
@@ -780,7 +780,7 @@ static WRITE8_DEVICE_HANDLER( pc98_portc_w )
 	//printf("PPI Port C write %02x\n",data);
 }
 
-static const ppi8255_interface ppi8255_intf =
+static I8255A_INTERFACE( ppi8255_intf )
 {
 	DEVCB_HANDLER(pc98_porta_r),					/* Port A read */
 	DEVCB_HANDLER(pc98_portb_r),					/* Port B read */
@@ -810,7 +810,7 @@ static READ8_DEVICE_HANDLER( printer_portc_r )
 }
 
 
-static const ppi8255_interface printer_intf =
+static I8255A_INTERFACE( printer_intf )
 {
 	DEVCB_HANDLER(printer_porta_r),					/* Port A read */
 	DEVCB_HANDLER(printer_portb_r),					/* Port B read */
@@ -950,8 +950,8 @@ static MACHINE_DRIVER_START( pc9801 )
 
 	MDRV_MACHINE_RESET(pc9801)
 
-	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf )
-	MDRV_PPI8255_ADD( "ppi8255_1", printer_intf )
+	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf )
+	MDRV_I8255A_ADD( "ppi8255_1", printer_intf )
 	MDRV_PIT8253_ADD( "pit8253", pit8253_config )
 	MDRV_DMA8237_ADD( "dma8237_1", dma8237_1_config )
 	MDRV_PIC8259_ADD( "pic8259_master", pic8259_master_config )
