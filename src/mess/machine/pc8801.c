@@ -16,8 +16,9 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "machine/i8255a.h"
 #include "includes/pc8801.h"
+#include "machine/ctronics.h"
+#include "machine/i8255a.h"
 #include "machine/upd1990a.h"
 #include "machine/upd765.h"
 #include "sound/beep.h"
@@ -48,12 +49,15 @@ WRITE8_HANDLER( pc8801_calender )
 {
 	pc88_state *state = space->machine->driver_data;
 
+	/* real time clock */
 	upd1990a_c0_w(state->upd1990a, BIT(data, 0));
 	upd1990a_c1_w(state->upd1990a, BIT(data, 1));
 	upd1990a_c2_w(state->upd1990a, BIT(data, 2));
 	upd1990a_data_w(state->upd1990a, BIT(data, 3));
 
-	/* printer (not yet) */
+	/* printer */
+	centronics_data_w(state->centronics, 0, data);
+
 	/* UOP3 (bit 7 -- not yet) */
 }
 
@@ -143,6 +147,10 @@ WRITE8_HANDLER(pc88sr_outport_40)
 	pc88_state *state = space->machine->driver_data;
 	const device_config *speaker = devtag_get_device(space->machine, "beep");
 
+	/* printer */
+	centronics_strobe_w(state->centronics, BIT(data, 0));
+
+	/* real time clock */
 	upd1990a_stb_w(state->upd1990a, BIT(data, 1));
 	upd1990a_clk_w(state->upd1990a, BIT(data, 2));
 
@@ -171,7 +179,8 @@ READ8_HANDLER(pc88sr_inport_40)
 	pc88_state *state = space->machine->driver_data;
 	int r;
 
-	r = pc8801_is_24KHz ? 0x00 : 0x02;
+	r = centronics_busy_r(state->centronics);
+	r |= pc8801_is_24KHz ? 0x00 : 0x02;
 	r |= use_5FD ? 0x00 : 0x08;
 	r |= state->rtc_data ? 0x10 : 0x00;
 	if(video_screen_get_vblank(space->machine->primary_screen)) r|=0x20;
@@ -670,6 +679,7 @@ MACHINE_START( pc88srl )
 
 	/* find devices */
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
+	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);
