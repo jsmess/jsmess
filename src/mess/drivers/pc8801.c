@@ -694,7 +694,7 @@ ROM_START( pc8001 )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
 ROM_END
 
-ROM_START( pc8001m2 )
+ROM_START( pc8001mk2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "n80_2.rom", 0x00000, 0x8000, CRC(03cce7b6) SHA1(c12d34e42021110930fed45a8af98db52136f1fb) )
 
@@ -720,7 +720,7 @@ ROM_END
 
 /* The dump only included "maincpu". Other roms arbitrariely taken from PC-8801 & PC-8801 MkIISR (there should be
 at least 1 Kanji ROM). */
-ROM_START( pc88m2 )
+ROM_START( pc8801mk2 )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "m2_n80.rom",   0x00000, 0x8000, CRC(91d84b1a) SHA1(d8a1abb0df75936b3fc9d226ccdb664a9070ffb1) )
 	ROM_LOAD( "m2_n88.rom",   0x08000, 0x8000, CRC(f35169eb) SHA1(ef1f067f819781d9fb2713836d195866f0f81501) )
@@ -734,11 +734,11 @@ ROM_START( pc88m2 )
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 ROM_END
 
-ROM_START( pc88m2sl )
+ROM_START( pc8001mk2sr )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
-	ROM_LOAD( "n88.rom",   0x08000, 0x8000, CRC(a0fc0473) SHA1(3b31fc68fa7f47b21c1a1cb027b86b9e87afbfff) )
-	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
+	ROM_LOAD( "mk2sr_n80.rom",   0x00000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
+	ROM_LOAD( "mk2sr_n88.rom",   0x08000, 0x8000, CRC(a0fc0473) SHA1(3b31fc68fa7f47b21c1a1cb027b86b9e87afbfff) )
+	ROM_LOAD( "mk2sr_n88_0.rom", 0x10000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
 	ROM_LOAD( "n88_1.rom", 0x12000, 0x2000, CRC(c0bd2aa6) SHA1(8528eef7946edf6501a6ccb1f416b60c64efac7c) )
 	ROM_LOAD( "n88_2.rom", 0x14000, 0x2000, CRC(af2b6efa) SHA1(b7c8bcea219b77d9cc3ee0efafe343cc307425d1) )
 	ROM_LOAD( "n88_3.rom", 0x16000, 0x2000, CRC(7713c519) SHA1(efce0b51cab9f0da6cf68507757f1245a2867a72) )
@@ -756,13 +756,13 @@ ROM_START( pc88m2sl )
 ROM_END
 
 /* They differ for the monitor resolution */
-#define rom_pc88m2sh		rom_pc88m2sl
+#define rom_pc8801mk2sr		rom_pc8001mk2sr
 
-ROM_START( pc88m2fr )
+ROM_START( pc8801mk2fr )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "m2fr_n80.rom",   0x00000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
 	ROM_LOAD( "m2fr_n88.rom",   0x08000, 0x8000, CRC(b9daf1aa) SHA1(696a480232bcf8c827c7aeea8329db5c44420d2a) )
-	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
+	ROM_LOAD( "m2fr_n88_0.rom", 0x10000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
 	ROM_LOAD( "m2fr_n88_1.rom", 0x12000, 0x2000, CRC(e3e78a37) SHA1(85ecd287fe72b56e54c8b01ea7492ca4a69a7470) )
 	ROM_LOAD( "m2fr_n88_2.rom", 0x14000, 0x2000, CRC(98c3a7b2) SHA1(fc4980762d3caa56964d0ae583424756f511d186) )
 	ROM_LOAD( "m2fr_n88_3.rom", 0x16000, 0x2000, CRC(0ca08abd) SHA1(a5a42d0b7caa84c3bc6e337c9f37874d82f9c14b) )
@@ -778,11 +778,11 @@ ROM_START( pc88m2fr )
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 ROM_END
 
-ROM_START( pc88m2mr )
+ROM_START( pc8801mk2mr )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "m2mr_n80.rom",   0x00000, 0x8000, CRC(f074b515) SHA1(ebe9cf4cf57f1602c887f609a728267f8d953dce) )
 	ROM_LOAD( "m2mr_n88.rom",   0x08000, 0x8000, CRC(69caa38e) SHA1(3c64090237152ee77c76e04d6f36bad7297bea93) )
-	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
+	ROM_LOAD( "m2mr_n88_0.rom", 0x10000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
 	ROM_LOAD( "m2mr_n88_1.rom", 0x12000, 0x2000, CRC(e3e78a37) SHA1(85ecd287fe72b56e54c8b01ea7492ca4a69a7470) )
 	ROM_LOAD( "m2mr_n88_2.rom", 0x14000, 0x2000, CRC(11176e0b) SHA1(f13f14f3d62df61498a23f7eb624e1a646caea45) )
 	ROM_LOAD( "m2mr_n88_3.rom", 0x16000, 0x2000, CRC(0ca08abd) SHA1(a5a42d0b7caa84c3bc6e337c9f37874d82f9c14b) )
@@ -957,20 +957,30 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    INIT  CONFIG  COMPANY FULLNAME */
-COMP( 1979, pc8001,    0,        0,     pc88srl,  pc8001,  0,    0,   "NEC",  "PC-8001", GAME_NOT_WORKING )
-COMP( 1983, pc8001m2,  0,        0,     pc88srl,  pc8001,  0,    0,   "NEC",  "PC-8001 Mk2", GAME_NOT_WORKING )	// not sure about this dump
+/*    YEAR  NAME			PARENT	COMPAT  MACHINE   INPUT    INIT  CONFIG  COMPANY FULLNAME */
+COMP( 1979, pc8001,			0,		0,     pc88srl,  pc8001,  0,    0,   "NEC",  "PC-8001", GAME_NOT_WORKING )
+COMP( 1983, pc8001mk2,		pc8001,	0,     pc88srl,  pc8001,  0,    0,   "NEC",  "PC-8001mkII", GAME_NOT_WORKING )	// not sure about this dump
+COMP( 1985, pc8001mk2sr,	pc8001,	0,     pc88srl,  pc8001,  0,    0,   "NEC",  "PC-8001mkIISR", 0 )
 
-COMP( 1981, pc8801,    0,        0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8801", GAME_NOT_WORKING )
-COMP( 1983, pc88m2,    pc8801,   0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8801 MkII", GAME_NOT_WORKING )	// not sure about this dump
-COMP( 1985, pc88m2sl,  0,        0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8801 MkIISR", 0 )
-COMP( 1985, pc88m2sh,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801 MkIISR (High Resolution)", 0 )
-COMP( 1985, pc88m2fr,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801 MkIIFR", 0 )
-COMP( 1985, pc88m2mr,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801 MkIIMR", 0 )
-COMP( 1986, pc8801mh,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,	 0,   "NEC",  "PC-8801 MH", 0 )
-COMP( 1987, pc8801fa,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801 FA", 0 )
-COMP( 1987, pc8801ma,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801 MA", 0 )
-COMP( 1988, pc8801ma2, pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801 MA2", 0 )
-COMP( 1989, pc8801mc,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801 MC", 0 )
+COMP( 1981, pc8801,			0,		0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8801", GAME_NOT_WORKING )
+COMP( 1983, pc8801mk2,		pc8801,	0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8801mkII", GAME_NOT_WORKING )	// not sure about this dump
+COMP( 1985, pc8801mk2sr,	pc8801,	0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801mkIISR", 0 )
+//COMP( 1985, pc8801mk2tr,	pc8801,	0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801mkIITR", 0 )
+COMP( 1985, pc8801mk2fr,	pc8801,	0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801mkIIFR", 0 )
+COMP( 1985, pc8801mk2mr,	pc8801,	0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801mkIIMR", 0 )
 
-COMP( 1987, pc88va,    0,        0,     pc88va,   pc88sr,  0,    0,   "NEC",  "PC-88 VA", GAME_NOT_WORKING )
+//COMP( 1986, pc8801fh,		0,		0,     pc88srh,  pc88sr,  0,	0,   "NEC",  "PC-8801FH", 0 )
+COMP( 1986, pc8801mh,		pc8801,	0,     pc88srh,  pc88sr,  0,	0,   "NEC",  "PC-8801MH", 0 )
+COMP( 1987, pc8801fa,		pc8801,	0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801FA", 0 )
+COMP( 1987, pc8801ma,		pc8801,	0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801MA", 0 )
+//COMP( 1988, pc8801fe,		pc8801,	0,     pc88srh,  pc88sr,  0,	0,   "NEC",  "PC-8801FE", 0 )
+COMP( 1988, pc8801ma2,		pc8801,	0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801MA2", 0 )
+//COMP( 1989, pc8801fe2,	pc8801,	0,     pc88srh,  pc88sr,  0,	0,   "NEC",  "PC-8801FE2", 0 )
+COMP( 1989, pc8801mc,		pc8801,	0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801MC", 0 )
+
+COMP( 1987, pc88va,			0,		0,     pc88va,   pc88sr,  0,    0,   "NEC",  "PC-88VA", GAME_NOT_WORKING )
+//COMP( 1988, pc88va2,		pc88va,	0,     pc88va,   pc88sr,  0,    0,   "NEC",  "PC-88VA2", GAME_NOT_WORKING )
+//COMP( 1988, pc88va3,		pc88va,	0,     pc88va,   pc88sr,  0,    0,   "NEC",  "PC-88VA3", GAME_NOT_WORKING )
+
+//COMP( 1989, pc98do,		0,		0,     pc88va,   pc88sr,  0,    0,   "NEC",  "PC-98DO", GAME_NOT_WORKING )
+//COMP( 1990, pc98dop,		0,		0,     pc88va,   pc88sr,  0,    0,   "NEC",  "PC-98DO+", GAME_NOT_WORKING )

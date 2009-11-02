@@ -691,22 +691,21 @@ const game_driver * const drivers[] =
     DRIVER( pc6001sr )
     DRIVER( pc6600 )
     DRIVER( pc6600sr )
-    DRIVER( pc8001 )    /* PC-8001                                          */
-    DRIVER( pc8001m2 )  /* PC-8001mkII                                      */
-    DRIVER( pc8801 )    /* PC-8801                                          */
-    DRIVER( pc88m2 )    /* PC-8801mkII (Low res display, VSYNC 15 kHz)      */
-    DRIVER( pc88m2sl )  /* PC-8801mkIISR (Low res display, VSYNC 15 kHz)    */
-    DRIVER( pc88m2sh )  /* PC-8801mkIISR (High res display, VSYNC 24 kHz)   */
-    DRIVER( pc88m2fr )  /* PC-8801mkIIFR (High res display, VSYNC 24 kHz)   */
-    DRIVER( pc88m2mr )  /* PC-8801mkIIMR (High res display, VSYNC 24 kHz)   */
-    DRIVER( pc8801mh )  /* PC-8801MH (High res display, VSYNC 24 kHz)       */
-    DRIVER( pc8801fa )  /* PC-8801FA (High res display, VSYNC 24 kHz)       */
-    DRIVER( pc8801ma )  /* PC-8801MA (High res display, VSYNC 24 kHz)       */
-    DRIVER( pc8801ma2 ) /* PC-8801MA2 (High res display, VSYNC 24 kHz)      */
-    DRIVER( pc8801mc )  /* PC-8801MC (High res display, VSYNC 24 kHz)       */
-    DRIVER( pc88va )    /* PC-88 VA                                         */
-    DRIVER( pc9801 )    /* PC-9801                                          */
-    DRIVER( pc9821 )    /* PC-9821                                          */
+    DRIVER( pc8001 )
+    DRIVER( pc8001mk2 )
+    DRIVER( pc8801 )
+    DRIVER( pc8801mk2 )
+    DRIVER( pc8801mk2sr )
+    DRIVER( pc8801mk2fr )
+    DRIVER( pc8801mk2mr )
+    DRIVER( pc8801mh )
+    DRIVER( pc8801fa )
+    DRIVER( pc8801ma )
+    DRIVER( pc8801ma2 )
+    DRIVER( pc8801mc )
+    DRIVER( pc88va )
+    DRIVER( pc9801 )
+    DRIVER( pc9821 )
 
     /* Cantab */
     DRIVER( jupiter )   /* Jupiter Ace                                      */
