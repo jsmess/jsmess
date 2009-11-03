@@ -360,7 +360,7 @@ static MACHINE_DRIVER_START( cbm600 )
 	MDRV_SCREEN_SIZE(640, 200)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MDRV_GFXDECODE( cbm600 )
-	MDRV_PALETTE_LENGTH(sizeof (cbm700_palette) / sizeof (cbm700_palette[0]) / 3)
+	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(cbm700_palette) / 3)
 	MDRV_PALETTE_INIT( cbm700 )
 
 	MDRV_MC6845_ADD("crtc", MC6845, XTAL_18MHz / 8 /*?*/ /*  I do not know if this is correct, please verify */, cbm600_crtc)

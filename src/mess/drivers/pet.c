@@ -669,7 +669,7 @@ static MACHINE_DRIVER_START( pet_general )
 	MDRV_SCREEN_SIZE(320, 200)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320 - 1, 0, 200 - 1)
 	MDRV_GFXDECODE( pet )
-	MDRV_PALETTE_LENGTH(sizeof (pet_palette) / sizeof (pet_palette[0]) / 3)
+	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(pet_palette) / 3)
 	MDRV_PALETTE_INIT( pet )
 
 	MDRV_VIDEO_UPDATE( pet )

@@ -1711,7 +1711,7 @@ void cbm_drive_reset( running_machine* machine )
 
 	if (vc1541_drive.type == type_1541)
 	{
-		for (i = 0; i < sizeof (serial.atn) / sizeof (serial.atn[0]); i++)
+		for (i = 0; i < ARRAY_LENGTH(serial.atn); i++)
 		{
 			serial.atn[i] = serial.data[i] = serial.clock[i] = 1;
 		}
