@@ -184,7 +184,7 @@ static BOOL ListViewNotify(HWND hWnd, LPNMHDR lpNmHdr)
 	POINT pt;
 
 	// This code is for using bitmap in the background
-	// Invalidate the right side of the control when a column is resized			
+	// Invalidate the right side of the control when a column is resized
 	if (lpNmHdr->code == HDN_ITEMCHANGINGA || lpNmHdr->code == HDN_ITEMCHANGINGW)
 	{
 		dwPos = GetMessagePos();
@@ -416,7 +416,7 @@ static void Picker_InternalResetColumnDisplay(HWND hWnd, BOOL bFirstTime)
 	else
 		ListView_SetTextColor(hWnd, GetListFontColor());
 
-done:		
+done:
 	if (widths)
 		free(widths);
 	if (order)
@@ -463,7 +463,7 @@ static void CALLBACK Picker_TimerProc(HWND hwndPicker, UINT uMsg,
 	// This idle procedure will loop until either idling is over, or until
 	// a specified amount of time elapses (in this case, 50ms).  This frees
 	// idle callbacks of any responsibility for balancing their workloads; the
-	// picker code will 
+	// picker code will
 	do
 	{
 		if (pPickerInfo->pCallbacks->pfnOnIdle)
@@ -1086,7 +1086,7 @@ BOOL Picker_HandleNotify(LPNMHDR lpNmHdr)
 			{
 				// retrieve item text
 				nColumn = Picker_GetRealColumnFromViewColumn(hWnd, pDispInfo->item.iSubItem);
-				
+
 				s = Picker_CallGetItemString(hWnd, nItem, nColumn,
 					pDispInfo->item.pszText, pDispInfo->item.cchTextMax);
 
@@ -1152,7 +1152,7 @@ int Picker_GetNumColumns(HWND hWnd)
 	pPickerInfo->pCallbacks->pfnGetColumnShown(shown);
 	hwndHeader = ListView_GetHeader(hWnd);
 
-	if (GetUseOldControl() || (nColumnCount = Header_GetItemCount(hWnd)) < 1)
+	if (GetUseOldControl() || (nColumnCount = Header_GetItemCount(hwndHeader)) < 1)
 	{
 		nColumnCount = 0;
 		for (i = 0; i < pPickerInfo->nColumnCount ; i++ )
@@ -1161,7 +1161,7 @@ int Picker_GetNumColumns(HWND hWnd)
 				nColumnCount++;
 		}
 	}
-	
+
 	free(shown);
 	return nColumnCount;
 }
@@ -1383,7 +1383,7 @@ void Picker_HandleDrawItem(HWND hWnd, LPDRAWITEMSTRUCT lpDrawItemStruct)
 	if (bDrawAsChild)
 	{
 		RECT rect;
-		
+
 		ListView_GetItemRect(hWnd, nItem, &rect, LVIR_ICON);
 
 		/* indent width of icon + the space between the icon and text
@@ -1422,12 +1422,12 @@ void Picker_HandleDrawItem(HWND hWnd, LPDRAWITEMSTRUCT lpDrawItemStruct)
 		if (hBackground == NULL)
 		{
 			HBRUSH hBrush;
-			
+
 			hBrush = CreateSolidBrush(GetSysColor(COLOR_WINDOW));
 			FillRect(hDC, &rcAllLabels, hBrush);
 			DeleteBrush(hBrush);
 		}
-		
+
 		if (pPickerInfo->pCallbacks->pfnGetOffsetChildren && pPickerInfo->pCallbacks->pfnGetOffsetChildren())
 		{
 			if (bDrawAsChild || bColorChild)
