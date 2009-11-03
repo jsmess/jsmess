@@ -1595,7 +1595,9 @@ static void mac_adb_talk(running_machine *machine)
 				}
 				else
 				{
-					printf("talking to unconnected device\n");
+					#if LOG_ADB
+					printf("ADB: talking to unconnected device\n");
+					#endif
 					adb_buffer[0] = adb_buffer[1] = 0xff;
 					adb_datasize = 0;
 				}

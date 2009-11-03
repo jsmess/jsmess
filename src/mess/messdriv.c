@@ -332,6 +332,7 @@ const game_driver * const drivers[] =
     DRIVER( mac512ke )  /* 1986 Apple Macintosh 512ke                       */
     DRIVER( macplus )   /* 1986 Apple Macintosh Plus                        */
     DRIVER( macse )     /* 1987 Apple Macintosh SE                          */
+    DRIVER( macii )     /* 1987 Apple Macintosh II */
     DRIVER( mac2fdhd )	/* 1988 Apple Macintosh II (FDHD) */
     DRIVER( maciix )	/* 1988 Apple Macintosh IIx */
     DRIVER( macse30 )	/* 1989 Apple Macintosh SE/30 */

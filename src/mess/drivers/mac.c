@@ -592,12 +592,8 @@ static MACHINE_DRIVER_START( macii )
 	MDRV_RAM_EXTRA_OPTIONS("4M,6M,8M,10M")	
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( mac2fdhd )
-	MDRV_IMPORT_FROM( macii )
-MACHINE_DRIVER_END
-
 static MACHINE_DRIVER_START( maclc )
-	MDRV_IMPORT_FROM( mac2fdhd )
+	MDRV_IMPORT_FROM( macii )
 
 	MDRV_CPU_REPLACE("maincpu", M68020, 7833600*2)
 	MDRV_CPU_PROGRAM_MAP(maclc_map)
@@ -609,7 +605,7 @@ static MACHINE_DRIVER_START( maclc )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( maciix )
-	MDRV_IMPORT_FROM( mac2fdhd )
+	MDRV_IMPORT_FROM( macii )
 
 	MDRV_CPU_REPLACE("maincpu", M68030, 7833600*2)
 	MDRV_CPU_PROGRAM_MAP(macii_map)
@@ -698,7 +694,7 @@ static MACHINE_DRIVER_START( maclc2 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( maciici )
-	MDRV_IMPORT_FROM( mac2fdhd )
+	MDRV_IMPORT_FROM( macii )
 
 	MDRV_CPU_REPLACE("maincpu", M68030, 7833600*2)
 	MDRV_CPU_PROGRAM_MAP(maciici_map)
@@ -715,7 +711,7 @@ static MACHINE_DRIVER_START( maciici )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( maciisi )
-	MDRV_IMPORT_FROM( mac2fdhd )
+	MDRV_IMPORT_FROM( macii )
 
 	MDRV_CPU_REPLACE("maincpu", M68030, 25000000)
 	MDRV_CPU_PROGRAM_MAP(maciici_map)
@@ -908,6 +904,16 @@ ROM_START( maclc )
         ROM_LOAD("350eacf0.rom", 0x000000, 0x080000, CRC(71681726) SHA1(6bef5853ae736f3f06c2b4e79772f65910c3b7d4))
 ROM_END
 
+ROM_START( macii )
+	ROM_REGION32_BE(0x40000, "user1", 0)
+	ROM_LOAD( "9779d2c4.rom", 0x000000, 0x040000, CRC(4df6d054) SHA1(db6b504744281369794e26ba71a6e385cf6227fa) )
+
+	// RasterOps "ColorBoard 264" NuBus video card
+	ROM_REGION32_BE(0x8000, "rops264", 0)
+        ROM_LOAD32_BYTE( "264-1914.bin", 0x000003, 0x002000, CRC(d5fbd5ad) SHA1(98d35ed3fb0bca4a9bee1cdb2af0d3f22b379386) )
+        ROM_LOAD32_BYTE( "264-1915.bin", 0x000002, 0x002000, CRC(26c19ee5) SHA1(2b2853d04cc6b0258e85eccd23ebfd4f4f63a084) )
+ROM_END
+
 ROM_START( mac2fdhd )	// same ROM for II FDHD, IIx, IIcx, and SE/30
 	ROM_REGION32_BE(0x40000, "user1", 0)
         ROM_LOAD( "97221136.rom", 0x000000, 0x040000, CRC(ce3b966f) SHA1(753b94351d94c369616c2c87b19d568dc5e2764e) )
@@ -972,10 +978,11 @@ COMP( 1984, mac512k,  mac128k,  0,	mac512ke, macplus,  mac128k512k, 0,     "Appl
 COMP( 1986, mac512ke, macplus,  0,	mac512ke, macplus,  mac512ke,	 0,     "Apple Computer", "Macintosh 512ke", 0 )
 COMP( 1986, macplus,  0,	0,	macplus,  macplus,  macplus,	 0,     "Apple Computer", "Macintosh Plus",  0 )
 COMP( 1987, macse,    0,	0,	macse,    macplus,  macse,	 0,     "Apple Computer", "Macintosh SE",  0 )
-COMP( 1988, mac2fdhd, 0,	0,	mac2fdhd, macplus,  maciifdhd,	 0,     "Apple Computer", "Macintosh II (FDHD)",  GAME_NOT_WORKING )
-COMP( 1988, maciix,   mac2fdhd, 0,	maciix,   macplus,  maciix,	 0,     "Apple Computer", "Macintosh IIx",  GAME_NOT_WORKING )
-COMP( 1989, macse30,  mac2fdhd, 0,	macse30,  macplus,  macse30,	 0,     "Apple Computer", "Macintosh SE/30",  GAME_NOT_WORKING )
-COMP( 1989, maciicx,  mac2fdhd, 0,	maciix,   macplus,  maciicx,	 0,     "Apple Computer", "Macintosh IIcx",  GAME_NOT_WORKING )
+COMP( 1987, macii,    0,	0,	macii,    macplus,  macii,	 0,     "Apple Computer", "Macintosh II",  GAME_NOT_WORKING )
+COMP( 1988, mac2fdhd, macii,	0,	macii,    macplus,  maciifdhd,	 0,     "Apple Computer", "Macintosh II (FDHD)",  GAME_NOT_WORKING )
+COMP( 1988, maciix,   macii, 	0,	maciix,   macplus,  maciix,	 0,     "Apple Computer", "Macintosh IIx",  GAME_NOT_WORKING )
+COMP( 1989, macse30,  macii, 	0,	macse30,  macplus,  macse30,	 0,     "Apple Computer", "Macintosh SE/30",  GAME_NOT_WORKING )
+COMP( 1989, maciicx,  macii, 	0,	maciix,   macplus,  maciicx,	 0,     "Apple Computer", "Macintosh IIcx",  GAME_NOT_WORKING )
 COMP( 1989, maciici,  0,	0,	maciici,  macplus,  maciici,	 0,     "Apple Computer", "Macintosh IIci",  GAME_NOT_WORKING )
 COMP( 1990, macclasc, 0,	0,	macse,    macplus,  macclassic,	 0,     "Apple Computer", "Macintosh Classic",  GAME_NOT_WORKING )
 COMP( 1990, maclc,    0,	0,	maclc,    macplus,  maclc,	 0,     "Apple Computer", "Macintosh LC",  GAME_NOT_WORKING )
