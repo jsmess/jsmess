@@ -212,7 +212,7 @@ static void apple2_lores_draw(running_machine *machine, bitmap_t *bitmap, const 
 			for (y = 4; y < 8; y++)
 			{
 				for (x = 0; x < 14; x++)
-					*BITMAP_ADDR16(bitmap, row + y, col * 14 + x) = (code >> 0) & 0x0F;
+					*BITMAP_ADDR16(bitmap, row + y, col * 14 + x) = (code >> 4) & 0x0F;
 			}
 		}
 	}
