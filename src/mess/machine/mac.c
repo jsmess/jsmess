@@ -1363,9 +1363,9 @@ READ16_HANDLER ( mac_iwm_r )
 	const device_config *fdc = devtag_get_device(space->machine, "fdc");
 
 	if (LOG_MAC_IWM)
-		logerror("mac_iwm_r: offset=0x%08x (PC %x)\n", offset>>8, cpu_get_pc(space->cpu));
+		logerror("mac_iwm_r: offset=0x%08x mem_mask %04x (PC %x)\n", offset, mem_mask, cpu_get_pc(space->cpu));
 
-	result = applefdc_r(fdc, offset >> 8);
+	result = applefdc_r(fdc, (offset >> 8));
 	return (result << 8) | result;
 }
 
@@ -1374,10 +1374,12 @@ WRITE16_HANDLER ( mac_iwm_w )
 	const device_config *fdc = devtag_get_device(space->machine, "fdc");
 
 	if (LOG_MAC_IWM)
-		logerror("mac_iwm_w: offset=0x%08x data=0x%04x (PC=%x)\n", offset>>8, data, cpu_get_pc(space->cpu));
+		logerror("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu));
 
 	if (ACCESSING_BITS_0_7)
-		applefdc_w(fdc, offset >> 8, data & 0xff);
+		applefdc_w(fdc, (offset >> 8), data & 0xff);
+	else
+		applefdc_w(fdc, (offset >> 8), data<<8);
 }
 
 /* *************************************************************************
