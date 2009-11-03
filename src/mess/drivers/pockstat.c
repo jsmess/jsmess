@@ -2,32 +2,56 @@
 
     Sony PocketStation
 
-    05/2009 Skeleton driver.
+    05/2009 Skeleton driver written.
+	11/2009 Initial bring-up commenced by Harmony.
 
-
-    This should be emulated alongside PS1 (and especially its memory cards,
-    since Pocket Station games were dowloaded from PS1 games into flash RAM
-    after the unit had been inserted in the memory card slot).
-    While waiting for full PS1 emulation in MESS, we collect here info on the
-    system and its BIOS.
+    PocketStation games were dowloaded from PS1 games into flash RAM after
+    the unit had been inserted in the memory card slot, and so this should
+    be emulated alongside the PS1.  However, as many flash dumps exist, it
+    is possible to emulate the PocketStation in the meantime.
 
     CPU: ARM7T (32 bit RISC Processor)
-    Memory: SRAM 2K bytes, Flash RAM 128K bytes
-    Graphics: 32 x 32 dot monochrome LCD
-    Sound: Miniature speaker (12 bit PCM) x 1 unit
+    Memory: 2Kbytes of SRAM, 128Kbytes of FlashROM
+    Graphics: 32x32 monochrome LCD
+    Sound: 1 12-bit PCM channel
     Input: 5 input buttons, 1 reset button
-    Infrared communication: Bi-directional (supports IrDA based and
-        conventional remote control systems)
+    Infrared communication: Bi-directional and uni-directional comms
     Other: 1 LED indicator
 
     Info available at:
       * http://exophase.devzero.co.uk/ps_info.txt
       * http://members.at.infoseek.co.jp/DrHell/pocket/index.html
 
+	The current reason why the driver fails to run is:
+		- The BIOS is displeased by the RTC data that it is getting.
+
 ****************************************************************************/
 
 #include "driver.h"
 #include "cpu/arm7/arm7.h"
+#include "cpu/arm7/arm7core.h"
+
+#define DEFAULT_CLOCK	8000000
+
+static const int CPU_FREQ[16] =
+{
+	0x00f800,
+	0x01f000,
+	0x03e000,
+	0x07c000,
+	0x0f8000,
+	0x1e8000,
+	0x3d0000,
+	0x7a0000,
+	0x7a0000,
+	0x7a0000,
+	0x7a0000,
+	0x7a0000,
+	0x7a0000,
+	0x7a0000,
+	0x7a0000,
+	0x7a0000
+};
 
 #define VERBOSE_LEVEL ( 99 )
 
@@ -44,6 +68,25 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 	}
 }
 
+// Flash TLB
+static READ32_HANDLER( ps_ftlb_r );
+static WRITE32_HANDLER( ps_ftlb_w );
+
+// Interrupt Controller
+static void ps_intc_set_interrupt_line(running_machine *machine, UINT32 line, int state);
+static READ32_HANDLER( ps_intc_r );
+static WRITE32_HANDLER( ps_intc_w );
+
+// Timers
+static TIMER_CALLBACK( timer_tick );
+static void ps_timer_start(running_machine *machine, int index);
+static READ32_HANDLER( ps_timer_r );
+static WRITE32_HANDLER( ps_timer_w );
+
+// Clock
+static READ32_HANDLER( ps_clock_r );
+static WRITE32_HANDLER( ps_clock_w );
+
 typedef struct
 {
 	UINT32 control;
@@ -55,7 +98,68 @@ typedef struct
 	UINT32 serial;
 } ps_ftlb_regs_t;
 
+typedef struct
+{
+	UINT32 hold;
+	UINT32 status;
+	UINT32 enable;
+	UINT32 mask;
+} ps_intc_regs_t;
+
+#define PS_INT_BTN_DECISION		0x00000001 // "Decision button" ???
+#define PS_INT_BTN_RIGHT		0x00000002 // "Right button"
+#define PS_INT_BTN_LEFT			0x00000004 // "Left button"
+#define PS_INT_BTN_DOWN			0x00000008 // "Down button"
+#define PS_INT_BTN_ON			0x00000010 // "Button on" ???
+#define PS_INT_UNKNOWN			0x00000020 // "Unknown"
+#define PS_INT_COM				0x00000040 // "COM" ???
+#define PS_INT_TIMER0			0x00000080 // "Timer 0"
+#define PS_INT_TIMER1			0x00000100 // "Timer 1"
+#define PS_INT_RTC				0x00000200 // "RTC"
+#define PS_INT_BATTERY			0x00000400 // "Battery Monitor"
+#define PS_INT_IOP				0x00000800 // "IOP"
+#define PS_INT_IRDA				0x00001000 // "IrDA"
+#define PS_INT_TIMER2			0x00002000 // "Timer 2"
+#define PS_INT_IRQ_MASK			0x00001fbf
+#define PS_INT_FIQ_MASK			0x00002040
+
+#define MAX_PS_TIMERS	3
+
+typedef struct
+{
+	UINT32 period;
+	UINT32 count;
+	UINT32 control;
+	emu_timer *timer;
+} ps_timer_t;
+
+typedef struct
+{
+	ps_timer_t timer[MAX_PS_TIMERS];
+} ps_timer_regs_t;
+
+typedef struct
+{
+	UINT32 mode;
+	UINT32 control;
+} ps_clock_regs_t;
+
+#define PS_CLOCK_STEADY		0x10
+
+typedef struct
+{
+	UINT32 mode;
+	UINT32 control;
+	UINT32 time;
+	UINT32 date;
+	emu_timer *timer;
+} ps_rtc_regs_t;
+
 static ps_ftlb_regs_t ftlb_regs;
+static ps_intc_regs_t intc_regs;
+static ps_timer_regs_t timer_regs;
+static ps_clock_regs_t clock_regs;
+static ps_rtc_regs_t rtc_regs;
 
 static READ32_HANDLER( ps_ftlb_r )
 {
@@ -151,33 +255,49 @@ static WRITE32_HANDLER( ps_ftlb_w )
 			verboselog(space->machine, 0, "ps_ftlb_w: Unknown (F_SN) = %08x & %08x\n", data, mem_mask );
 			COMBINE_DATA(&ftlb_regs.serial);
 			break;
+		default:
+			verboselog(space->machine, 0, "ps_ftlb_w: Unknown Register %08x = %08x & %08x\n", 0x06000000 + (offset << 2), data, mem_mask );
+			break;
 	}
 }
 
-typedef struct
+static void ps_intc_set_interrupt_line(running_machine *machine, UINT32 line, int state)
 {
-	UINT32 hold;
-	UINT32 status;
-	UINT32 enable;
-	UINT32 mask;
-} ps_intc_regs_t;
-
-#define PS_INT_BTN_DECISION		0x00000001 // "Decision button" ???
-#define PS_INT_BTN_RIGHT		0x00000002 // "Right button"
-#define PS_INT_BTN_LEFT			0x00000004 // "Left button"
-#define PS_INT_BTN_DOWN			0x00000008 // "Down button"
-#define PS_INT_BTN_ON			0x00000010 // "Button on" ???
-#define PS_INT_UNKNOWN			0x00000020 // "Unknown"
-#define PS_INT_COM				0x00000040 // "COM" ???
-#define PS_INT_TIMER0			0x00000080 // "Timer 0"
-#define PS_INT_TIMER1			0x00000100 // "Timer 1"
-#define PS_INT_RTC				0x00000200 // "RTC"
-#define PS_INT_BATTERY			0x00000400 // "Battery Monitor"
-#define PS_INT_IOP				0x00000800 // "IOP"
-#define PS_INT_IRDA				0x00001000 // "IrDA"
-#define PS_INT_TIMER2			0x00002000 // "Timer 2"
-
-static ps_intc_regs_t intc_regs;
+	line &= intc_regs.enable;
+	if(line)
+	{
+		if(state)
+		{
+			// This is not right, but I can't find a better description of the difference between "hold" and "status".
+			//printf( "Setting %08x\n", line );
+			intc_regs.hold |= line;
+			intc_regs.status |= line;
+		}
+		else
+		{
+			// This is not right, but I can't find a better description of the difference between "hold" and "status".
+			//printf( "Setting %08x\n", line );
+			intc_regs.hold &= ~line;
+			intc_regs.status  &= ~line;
+		}
+	}
+	if(intc_regs.status & PS_INT_IRQ_MASK)
+	{
+		cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+	}
+	else
+	{
+		cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
+	}
+	if(intc_regs.status & PS_INT_FIQ_MASK)
+	{
+		cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), ARM7_FIRQ_LINE, ASSERT_LINE);
+	}
+	else
+	{
+		cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), ARM7_FIRQ_LINE, CLEAR_LINE);
+	}
+}
 
 static READ32_HANDLER( ps_intc_r )
 {
@@ -190,8 +310,8 @@ static READ32_HANDLER( ps_intc_r )
 			verboselog(space->machine, 0, "ps_intc_r: Interrupt Status = %08x & %08x\n", intc_regs.status, mem_mask );
 			return intc_regs.status;
 		case 0x0008/4:
-			verboselog(space->machine, 0, "ps_intc_r: Interrupt Enable = %08x & %08x\n", intc_regs.mask, mem_mask );
-			return intc_regs.mask;
+			verboselog(space->machine, 0, "ps_intc_r: Interrupt Enable = %08x & %08x\n", intc_regs.enable, mem_mask );
+			return intc_regs.enable;
 		case 0x000c/4:
 			verboselog(space->machine, 0, "ps_intc_r: Interrupt Mask (Invalid Read) = %08x & %08x\n", 0, mem_mask );
 			return 0;
@@ -218,67 +338,76 @@ static WRITE32_HANDLER( ps_intc_w )
 		case 0x0008/4:
 			verboselog(space->machine, 0, "ps_intc_w: Interrupt Enable = %08x & %08x\n", data, mem_mask );
 			COMBINE_DATA(&intc_regs.enable);
+			intc_regs.mask &= ~intc_regs.enable;
 			break;
 		case 0x000c/4:
 			verboselog(space->machine, 0, "ps_intc_w: Interrupt Mask = %08x & %08x\n", data, mem_mask );
 			COMBINE_DATA(&intc_regs.mask);
+			intc_regs.enable &= ~intc_regs.mask;
 			break;
 		case 0x0010/4:
 			verboselog(space->machine, 0, "ps_intc_w: Interrupt Acknowledge = %08x & %08x\n", data, mem_mask );
+			ps_intc_set_interrupt_line(space->machine, data, 0);
 			//COMBINE_DATA(&intc_regs.acknowledge);
 			break;
 		default:
-			verboselog(space->machine, 0, "ps_intc_w: Unknown Register %08x & %08x\n", 0x0a000000 + (offset << 2), mem_mask );
+			verboselog(space->machine, 0, "ps_intc_w: Unknown Register %08x = %08x & %08x\n", 0x0a000000 + (offset << 2), data, mem_mask );
 			break;
 	}
 }
 
-typedef struct
+static TIMER_CALLBACK( timer_tick )
 {
-	UINT32 timer0_period;
-	UINT32 timer0_count;
-	UINT32 timer0_control;
-	UINT32 timer1_period;
-	UINT32 timer1_count;
-	UINT32 timer1_control;
-	UINT32 timer2_period;
-	UINT32 timer2_count;
-	UINT32 timer2_control;
-} ps_timer_regs_t;
+	ps_intc_set_interrupt_line(machine, param == 2 ? PS_INT_TIMER2 : (param == 1 ? PS_INT_TIMER1 : PS_INT_TIMER0), 1);
+	timer_regs.timer[param].count = timer_regs.timer[param].period;
+	ps_timer_start(machine, param);
+}
 
-static ps_timer_regs_t timer_regs;
+static void ps_timer_start(running_machine *machine, int index)
+{
+	int divisor = 1;
+	attotime period;
+	switch(timer_regs.timer[index].control & 3)
+	{
+		case 0:
+		case 3:
+			divisor = 1;
+			break;
+		case 1:
+			divisor = 16;
+			break;
+		case 2:
+			divisor = 256;
+			break;
+	}
+	period = attotime_mul(ATTOTIME_IN_HZ(CPU_FREQ[clock_regs.mode & 0x0f] / 2), divisor);
+	period = attotime_mul(period, timer_regs.timer[index].count);
+	timer_adjust_oneshot(timer_regs.timer[index].timer, period, 0);
+}
 
 static READ32_HANDLER( ps_timer_r )
 {
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(space->machine, 0, "ps_timer_r: Timer 0 Period = %08x & %08x\n", timer_regs.timer0_period, mem_mask );
-			return timer_regs.timer0_period;
-		case 0x0004/4:
-			verboselog(space->machine, 0, "ps_timer_r: Timer 0 Count = %08x & %08x\n", timer_regs.timer0_count, mem_mask );
-			return timer_regs.timer0_count;
-		case 0x0008/4:
-			verboselog(space->machine, 0, "ps_timer_r: Timer 0 Control = %08x & %08x\n", timer_regs.timer0_control, mem_mask );
-			return timer_regs.timer0_control;
 		case 0x0010/4:
-			verboselog(space->machine, 0, "ps_timer_r: Timer 1 Period = %08x & %08x\n", timer_regs.timer1_period, mem_mask );
-			return timer_regs.timer1_period;
-		case 0x0014/4:
-			verboselog(space->machine, 0, "ps_timer_r: Timer 1 Count = %08x & %08x\n", timer_regs.timer1_count, mem_mask );
-			return timer_regs.timer1_count;
-		case 0x0018/4:
-			verboselog(space->machine, 0, "ps_timer_r: Timer 1 Control = %08x & %08x\n", timer_regs.timer1_control, mem_mask );
-			return timer_regs.timer1_control;
 		case 0x0020/4:
-			verboselog(space->machine, 0, "ps_timer_r: Timer 2 Period = %08x & %08x\n", timer_regs.timer2_period, mem_mask );
-			return timer_regs.timer2_period;
+			verboselog(space->machine, 0, "ps_timer_r: Timer %d Period = %08x & %08x\n", offset / (0x10/4), timer_regs.timer[offset / (0x10/4)].period, mem_mask );
+			return timer_regs.timer[offset / (0x10/4)].period;
+		case 0x0004/4:
+		case 0x0014/4:
 		case 0x0024/4:
-			verboselog(space->machine, 0, "ps_timer_r: Timer 2 Count = %08x & %08x\n", timer_regs.timer2_count, mem_mask );
-			return timer_regs.timer2_count;
+ 			verboselog(space->machine, 0, "ps_timer_r: Timer %d Count = %08x & %08x\n", offset / (0x10/4), timer_regs.timer[offset / (0x10/4)].count, mem_mask );
+ 			if(timer_regs.timer[offset / (0x10/4)].control & 4)
+ 			{
+				return --timer_regs.timer[offset / (0x10/4)].count;
+			}
+			return timer_regs.timer[offset / (0x10/4)].count;
+		case 0x0008/4:
+		case 0x0018/4:
 		case 0x0028/4:
-			verboselog(space->machine, 0, "ps_timer_r: Timer 2 Control = %08x & %08x\n", timer_regs.timer2_control, mem_mask );
-			return timer_regs.timer2_control;
+			verboselog(space->machine, 0, "ps_timer_r: Timer %d Control = %08x & %08x\n", offset / (0x10/4), timer_regs.timer[offset / (0x10/4)].control, mem_mask );
+			return timer_regs.timer[offset / (0x10/4)].control;
 		default:
 			verboselog(space->machine, 0, "ps_timer_r: Unknown Register %08x & %08x\n", 0x0a800000 + (offset << 2), mem_mask );
 			break;
@@ -291,58 +420,126 @@ static WRITE32_HANDLER( ps_timer_w )
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(space->machine, 0, "ps_timer_w: Timer 0 Period = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&timer_regs.timer0_period);
+		case 0x0010/4:
+		case 0x0020/4:
+			verboselog(space->machine, 0, "ps_timer_w: Timer %d Period = %08x & %08x\n", offset / (0x10/4), data, mem_mask );
+			COMBINE_DATA(&timer_regs.timer[offset / (0x10/4)].period);
 			break;
 		case 0x0004/4:
-			verboselog(space->machine, 0, "ps_timer_w: Timer 0 Count = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&timer_regs.timer0_count);
+		case 0x0014/4:
+		case 0x0024/4:
+			verboselog(space->machine, 0, "ps_timer_w: Timer %d Count = %08x & %08x\n", offset / (0x10/4), data, mem_mask );
+			COMBINE_DATA(&timer_regs.timer[offset / (0x10/4)].count);
 			break;
 		case 0x0008/4:
-			verboselog(space->machine, 0, "ps_timer_w: Timer 0 Control = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&timer_regs.timer0_control);
-			break;
-		case 0x0010/4:
-			verboselog(space->machine, 0, "ps_timer_w: Timer 1 Period = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&timer_regs.timer1_period);
-			break;
-		case 0x0014/4:
-			verboselog(space->machine, 0, "ps_timer_w: Timer 1 Count = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&timer_regs.timer1_count);
-			break;
 		case 0x0018/4:
-			verboselog(space->machine, 0, "ps_timer_w: Timer 1 Control = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&timer_regs.timer1_control);
-			break;
-		case 0x0020/4:
-			verboselog(space->machine, 0, "ps_timer_w: Timer 2 Period = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&timer_regs.timer2_period);
-			break;
-		case 0x0024/4:
-			verboselog(space->machine, 0, "ps_timer_w: Timer 2 Count = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&timer_regs.timer2_count);
-			break;
 		case 0x0028/4:
-			verboselog(space->machine, 0, "ps_timer_w: Timer 2 Control = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&timer_regs.timer2_control);
+			verboselog(space->machine, 0, "ps_timer_w: Timer %d Control = %08x & %08x\n", offset / (0x10/4), data, mem_mask );
+			COMBINE_DATA(&timer_regs.timer[offset / (0x10/4)].control);
+			if(timer_regs.timer[offset / (0x10/4)].control & 4)
+			{
+				ps_timer_start(space->machine, offset / (0x10/4));
+			}
+			else
+			{
+				timer_adjust_oneshot(timer_regs.timer[offset / (0x10/4)].timer, attotime_never, 0);
+			}
 			break;
 		default:
-			verboselog(space->machine, 0, "ps_timer_w: Unknown Register %08x & %08x\n", 0x0a800000 + (offset << 2), mem_mask );
+			verboselog(space->machine, 0, "ps_timer_w: Unknown Register %08x = %08x & %08x\n", 0x0a800000 + (offset << 2), data, mem_mask );
 			break;
 	}
 }
 
-static UINT32 ps_unknown1;
-
-static READ32_HANDLER( ps_unk1_r )
+static READ32_HANDLER( ps_clock_r )
 {
-	verboselog(space->machine, 0, "ps_unk1_r: Unknown 1: %08x & %08x\n", ps_unknown1 | 0x10, mem_mask );
-	return ps_unknown1 | 0x10;
+	switch(offset)
+	{
+		case 0x0000/4:
+			verboselog(space->machine, 0, "ps_clock_r: Clock Mode = %08x & %08x\n", clock_regs.mode | 0x10, mem_mask );
+			return clock_regs.mode | PS_CLOCK_STEADY;
+		case 0x0004/4:
+			verboselog(space->machine, 0, "ps_clock_r: Clock Control = %08x & %08x\n", clock_regs.control, mem_mask );
+			return clock_regs.control;
+		default:
+			verboselog(space->machine, 0, "ps_clock_r: Unknown Register %08x & %08x\n", 0x0b000000 + (offset << 2), mem_mask );
+			break;
+	}
+	return 0;
 }
 
-static WRITE32_HANDLER( ps_unk1_w )
+static WRITE32_HANDLER( ps_clock_w )
 {
-	verboselog(space->machine, 0, "ps_unk1_w: Unknown 1: %08x & %08x\n", data, mem_mask );
+	switch(offset)
+	{
+		case 0x0000/4:
+			verboselog(space->machine, 0, "ps_clock_w: Clock Mode = %08x & %08x\n", data, mem_mask );
+			COMBINE_DATA(&clock_regs.mode);
+			cputag_set_clock(space->machine, "maincpu", CPU_FREQ[clock_regs.mode & 0x0f]);
+			break;
+		case 0x0004/4:
+			verboselog(space->machine, 0, "ps_clock_w: Clock Control = %08x & %08x\n", data, mem_mask );
+			COMBINE_DATA(&clock_regs.control);
+			break;
+		default:
+			verboselog(space->machine, 0, "ps_clock_w: Unknown Register %08x = %08x & %08x\n", 0x0b000000 + (offset << 2), data, mem_mask );
+			break;
+	}
+}
+
+static TIMER_CALLBACK( rtc_tick )
+{
+	ps_intc_set_interrupt_line(machine, PS_INT_RTC, 1);
+	timer_adjust_oneshot(rtc_regs.timer, ATTOTIME_IN_HZ(1), 0);
+}
+
+static READ32_HANDLER( ps_rtc_r )
+{
+	switch(offset)
+	{
+		case 0x0000/4:
+			verboselog(space->machine, 0, "ps_rtc_r: RTC Mode = %08x & %08x\n", rtc_regs.mode, mem_mask );
+			return rtc_regs.mode;
+		case 0x0004/4:
+			verboselog(space->machine, 0, "ps_rtc_r: RTC Control = %08x & %08x\n", rtc_regs.control, mem_mask );
+			return rtc_regs.control;
+		case 0x0008/4:
+			verboselog(space->machine, 0, "ps_rtc_r: RTC Time = %08x & %08x\n", 0x01010101, mem_mask );
+			return 0x01010101;
+		case 0x000c/4:
+			verboselog(space->machine, 0, "ps_rtc_r: RTC Date = %08x & %08x\n", 0x00990101, mem_mask );
+			return 0x00990101;
+		default:
+			verboselog(space->machine, 0, "ps_rtc_r: Unknown Register %08x & %08x\n", 0x0b800000 + (offset << 2), mem_mask );
+			break;
+	}
+	return 0;
+}
+
+static WRITE32_HANDLER( ps_rtc_w )
+{
+	switch(offset)
+	{
+		case 0x0000/4:
+			verboselog(space->machine, 0, "ps_rtc_w: RTC Mode = %08x & %08x\n", data, mem_mask );
+			COMBINE_DATA(&rtc_regs.mode);
+			if(rtc_regs.mode & 1)
+			{
+				timer_adjust_oneshot(rtc_regs.timer, ATTOTIME_IN_HZ(1), 0);
+			}
+			else
+			{
+				timer_adjust_oneshot(rtc_regs.timer, attotime_never, 0);
+			}
+			break;
+		case 0x0004/4:
+			verboselog(space->machine, 0, "ps_rtc_w: RTC Control = %08x & %08x\n", data, mem_mask );
+			COMBINE_DATA(&rtc_regs.control);
+			break;
+		default:
+			verboselog(space->machine, 0, "ps_rtc_w: Unknown Register %08x = %08x & %08x\n", 0x0b800000 + (offset << 2), data, mem_mask );
+			break;
+	}
 }
 
 static ADDRESS_MAP_START(pockstat_mem, ADDRESS_SPACE_PROGRAM, 32)
@@ -351,7 +548,8 @@ static ADDRESS_MAP_START(pockstat_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x06000000, 0x06000307) AM_READWRITE(ps_ftlb_r, ps_ftlb_w)
 	AM_RANGE(0x0a000000, 0x0a000013) AM_READWRITE(ps_intc_r, ps_intc_w)
 	AM_RANGE(0x0a800000, 0x0a80002b) AM_READWRITE(ps_timer_r, ps_timer_w)
-	AM_RANGE(0x0b000000, 0x0b000003) AM_READWRITE(ps_unk1_r, ps_unk1_w)
+	AM_RANGE(0x0b000000, 0x0b000007) AM_READWRITE(ps_clock_r, ps_clock_w)
+	AM_RANGE(0x0b800000, 0x0b80000f) AM_READWRITE(ps_rtc_r, ps_rtc_w)
 /*  AM_RANGE(0x02000000, 0x0201ffff) Flash ROM
     AM_RANGE(0x08000000, 0x0801ffff) Same as 0x02 above. Mirrors every 128KB.
     AM_RANGE(0x0b000000, 0x0b000003) Internal CPU Clock control
@@ -367,6 +565,18 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( pockstat )
 INPUT_PORTS_END
 
+static MACHINE_START( pockstat )
+{
+	int index = 0;
+	for(index = 0; index < 3; index++)
+	{
+		timer_regs.timer[index].timer = timer_alloc(machine, timer_tick, 0);
+		timer_adjust_oneshot(timer_regs.timer[index].timer, attotime_never, index);
+	}
+
+	rtc_regs.timer = timer_alloc(machine, rtc_tick, 0);
+	timer_adjust_oneshot(rtc_regs.timer, attotime_never, index);
+}
 
 static MACHINE_RESET( pockstat )
 {
@@ -384,10 +594,11 @@ static VIDEO_UPDATE( pockstat )
 
 static MACHINE_DRIVER_START( pockstat )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", ARM7, 7900000)	// ??
+	MDRV_CPU_ADD("maincpu", ARM7, DEFAULT_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(pockstat_mem)
 
 	MDRV_MACHINE_RESET(pockstat)
+	MDRV_MACHINE_START(pockstat)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", LCD)
