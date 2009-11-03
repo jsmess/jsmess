@@ -1507,7 +1507,7 @@ static WRITE16_HANDLER( a2600_tia_vsync_callback )
 {
 	int i;
 
-	for ( i = 0; i < sizeof( supported_screen_heights ) / sizeof( supported_screen_heights[0] ); i++ )
+	for ( i = 0; i < ARRAY_LENGTH(supported_screen_heights); i++ )
 	{
 		if ( data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3 )
 		{
@@ -1524,7 +1524,7 @@ static WRITE16_HANDLER( a2600_tia_vsync_callback_pal )
 {
 	int i;
 
-	for ( i = 0; i < sizeof( supported_screen_heights ) / sizeof( supported_screen_heights[0] ); i++ )
+	for ( i = 0; i < ARRAY_LENGTH(supported_screen_heights); i++ )
 	{
 		if ( data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3 )
 		{

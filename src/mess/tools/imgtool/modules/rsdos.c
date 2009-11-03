@@ -321,8 +321,8 @@ eof:
 
 		get_dirent_fname(fname, &rsent);
 
-		snprintf(ent->filename, sizeof(ent->filename) / sizeof(ent->filename[0]), "%s", fname);
-		snprintf(ent->attr, sizeof(ent->attr) / sizeof(ent->attr[0]), "%d %c", (int) rsent.ftype, (char) (rsent.asciiflag + 'B'));
+		snprintf(ent->filename, ARRAY_LENGTH(ent->filename), "%s", fname);
+		snprintf(ent->attr, ARRAY_LENGTH(ent->attr), "%d %c", (int) rsent.ftype, (char) (rsent.asciiflag + 'B'));
 	}
 	return IMGTOOLERR_SUCCESS;
 }

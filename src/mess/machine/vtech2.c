@@ -109,7 +109,7 @@ DRIVER_INIT(laser)
 	laser_latch = -1;
     mem = memory_region(machine, "maincpu");
 
-	for (i = 0; i < sizeof(laser_bank) / sizeof(laser_bank[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(laser_bank); i++)
 		laser_bank[i] = -1;
 }
 
@@ -124,7 +124,7 @@ static void laser_machine_init(running_machine *machine, int bank_mask, int vide
 	videoram = mem + laser_video_bank * 0x04000;
 	logerror("laser_machine_init(): bank mask $%04X, video %d [$%05X]\n", laser_bank_mask, laser_video_bank, laser_video_bank * 0x04000);
 
-	for (i = 0; i < sizeof(laser_bank) / sizeof(laser_bank[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(laser_bank); i++)
 		laser_bank_select_w(cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), i, 0);
 }
 

@@ -84,7 +84,7 @@ static void hexview_paint(HWND hexview)
 		SelectObject(dc, info->font);
 	SetBkColor(dc, GetSysColor(COLOR_WINDOW));
 
-	_sntprintf(offset_format, sizeof(offset_format) / sizeof(offset_format[0]),
+	_sntprintf(offset_format, ARRAY_LENGTH(offset_format),
 		TEXT("%%0%dX"), info->index_width);
 
 	// figure out how many bytes go in one row
@@ -103,7 +103,7 @@ static void hexview_paint(HWND hexview)
 	end_row = (ps.rcPaint.bottom + scroll_y - 1) / metrics.tmHeight;
 	for (row = begin_row; row <= end_row; row++)
 	{
-		_sntprintf(buf, sizeof(buf) / sizeof(buf[0]), offset_format, row * bytes_per_row);
+		_sntprintf(buf, ARRAY_LENGTH(buf), offset_format, row * bytes_per_row);
 
 		r.top = row * metrics.tmHeight - scroll_y;
 		r.left = 0;
@@ -122,7 +122,7 @@ static void hexview_paint(HWND hexview)
 				r.left = (info->index_width + col * (2 + info->byte_spacing)) * metrics.tmMaxCharWidth
 					+ info->left_margin;
 				r.right = r.left + metrics.tmMaxCharWidth * 2;
-				_sntprintf(buf, sizeof(buf) / sizeof(buf[0]), TEXT("%02X"), b);
+				_sntprintf(buf, ARRAY_LENGTH(buf), TEXT("%02X"), b);
 				DrawText(dc, buf, -1, &r, DT_LEFT);
 
 				r.left = (info->index_width + bytes_per_row * (2 + info->byte_spacing) + col) * metrics.tmMaxCharWidth

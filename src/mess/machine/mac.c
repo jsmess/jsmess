@@ -3257,7 +3257,7 @@ static const char *lookup_trap(UINT16 opcode)
 
 	int i;
 
-	for (i = 0; i < (sizeof(traps) / sizeof(traps[0])); i++)
+	for (i = 0; i < ARRAY_LENGTH(traps); i++)
 	{
 		if (traps[i].trap == opcode)
 			return traps[i].name;
@@ -3354,7 +3354,7 @@ static void mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 		csCode = *((UINT16*) (mem + a0 + 26));
 		sprintf(s, " ioVRefNum=%i ioCRefNum=%i csCode=%i", ioVRefNum, ioCRefNum, csCode);
 
-		for (i = 0; i < (sizeof(cscodes) / sizeof(cscodes[0])); i++)
+		for (i = 0; i < ARRAY_LENGTH(cscodes); i++)
 		{
 			if (cscodes[i].csCode == csCode)
 			{
@@ -3390,7 +3390,7 @@ static void mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 
 	case 0xa815:	/* _SCSIDispatch */
 		i = *((UINT16*) (mem + a7));
-		if (i < (sizeof(scsisels) / sizeof(scsisels[0])))
+		if (i < ARRAY_LENGTH(scsisels))
 			if (scsisels[i])
 				sprintf(s, " (%s)", scsisels[i]);
 		break;

@@ -1329,11 +1329,11 @@ static imgtoolerr_t fat_read_dirent(imgtool_partition *partition, fat_file *file
 				lfn_checksum = entry[13];
 			}
 			lfn_lastentry = entry[0] & 0x3F;
-			prepend_lfn_bytes(lfn_buf, sizeof(lfn_buf) / sizeof(lfn_buf[0]),
+			prepend_lfn_bytes(lfn_buf, ARRAY_LENGTH(lfn_buf),
 				&lfn_len, entry, 28, 2);
-			prepend_lfn_bytes(lfn_buf, sizeof(lfn_buf) / sizeof(lfn_buf[0]),
+			prepend_lfn_bytes(lfn_buf, ARRAY_LENGTH(lfn_buf),
 				&lfn_len, entry, 14, 6);
-			prepend_lfn_bytes(lfn_buf, sizeof(lfn_buf) / sizeof(lfn_buf[0]),
+			prepend_lfn_bytes(lfn_buf, ARRAY_LENGTH(lfn_buf),
 				&lfn_len, entry,  1, 5);
 		}
 		else if (freeent && (freeent->position == ~0))
@@ -1375,8 +1375,8 @@ static imgtoolerr_t fat_read_dirent(imgtool_partition *partition, fat_file *file
 			j = 0;
 			do
 			{
-				i += uchar_from_utf16(&ch, &lfn_buf[i], sizeof(lfn_buf) / sizeof(lfn_buf[0]) - i);
-				j += utf8_from_uchar(&ent->long_filename[j], sizeof(ent->long_filename) / sizeof(ent->long_filename[0]) - j, ch);
+				i += uchar_from_utf16(&ch, &lfn_buf[i], ARRAY_LENGTH(lfn_buf) - i);
+				j += utf8_from_uchar(&ent->long_filename[j], ARRAY_LENGTH(ent->long_filename) - j, ch);
 			}
 			while(ch != 0);
 		}
@@ -1834,7 +1834,7 @@ static imgtoolerr_t fat_partition_nextenum(imgtool_directory *enumeration, imgto
 		return err;
 
 	/* copy stuff from the FAT dirent to the Imgtool dirent */
-	snprintf(ent->filename, sizeof(ent->filename) / sizeof(ent->filename[0]), "%s", fatent.long_filename[0]
+	snprintf(ent->filename, ARRAY_LENGTH(ent->filename), "%s", fatent.long_filename[0]
 		? fatent.long_filename : fatent.short_filename);
 	ent->filesize = fatent.filesize;
 	ent->directory = fatent.directory;

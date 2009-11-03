@@ -10665,7 +10665,7 @@ static const mmc mmc_list[] =
 const mmc *nes_mapper_lookup( int mapper )
 {
 	int i;
-	for (i = 0; i < sizeof(mmc_list) / sizeof(mmc_list[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(mmc_list); i++)
 	{
 		if (mmc_list[i].iNesMapper == nes.mapper)
 			return &mmc_list[i];

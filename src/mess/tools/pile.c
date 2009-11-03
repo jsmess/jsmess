@@ -10,6 +10,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "osdcomm.h"
 #include "pile.h"
 
 void pile_init(mess_pile *pile)
@@ -100,7 +101,7 @@ int pile_vprintf(mess_pile *pile, const char *fmt, va_list args)
 	int count;
 	char buf[1024];
 
-	count = vsnprintf(buf, sizeof(buf) / sizeof(buf[0]), fmt, args);
+	count = vsnprintf(buf, ARRAY_LENGTH(buf), fmt, args);
 	if (pile_write(pile, buf, count * sizeof(*buf)))
 		return 0;
 	return count;

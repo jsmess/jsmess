@@ -334,7 +334,7 @@ static void node_checkdirectory(struct imgtooltest_state *state, xml_data_node *
 
 	for (child_node = xml_get_sibling(node->child, "entry"); child_node; child_node = xml_get_sibling(child_node->next, "entry"))
 	{
-		if (entry_count >= sizeof(entries) / sizeof(entries[0]))
+		if (entry_count >= ARRAY_LENGTH(entries))
 		{
 			report_message(MSG_FAILURE, "Too many directory entries");
 			return;
@@ -354,7 +354,7 @@ static void node_checkdirectory(struct imgtooltest_state *state, xml_data_node *
 	for (i = 0; i < entry_count; i++)
 	{
 		append_to_list(expected_listing,
-			sizeof(expected_listing) / sizeof(expected_listing[0]),
+			ARRAY_LENGTH(expected_listing),
 			entries[i].filename);
 	}
 
@@ -379,7 +379,7 @@ static void node_checkdirectory(struct imgtooltest_state *state, xml_data_node *
 		if (!ent.eof)
 		{
 			append_to_list(actual_listing,
-				sizeof(actual_listing) / sizeof(actual_listing[0]),
+				ARRAY_LENGTH(actual_listing),
 				ent.filename);
 
 			if (i < entry_count && (strcmp(ent.filename, entries[i].filename)))

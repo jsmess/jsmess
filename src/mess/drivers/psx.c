@@ -909,7 +909,7 @@ static WRITE32_HANDLER( psx_cd_w )
 		data = (data >> 8) & 0xff;
 		logerror( "%08x cd1 write %02x\n", cpu_get_pc(space->cpu), data );
 
-		if (data <= sizeof(psx_cdcmds) / sizeof(psx_cdcmds[0]))
+		if (data <= ARRAY_LENGTH(psx_cdcmds))
 			psx_cdcmd = psx_cdcmds[data];
 		else
 			psx_cdcmd = NULL;

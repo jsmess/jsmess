@@ -200,7 +200,7 @@ static UINT8 apple525_process_byte(const device_config *img, int write_value)
 	}
 
 	disk->position++;
-	disk->position %= (sizeof(disk->track_data) / sizeof(disk->track_data[0]));
+	disk->position %= ARRAY_LENGTH(disk->track_data);
 
 	/* when writing; save the current track after every full sector write */
 	if ((write_value >= 0) && ((disk->position % APPLE2_NIBBLE_SIZE) == 0))

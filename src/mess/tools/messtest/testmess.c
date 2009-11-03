@@ -216,7 +216,7 @@ static void dump_screenshot(running_machine *machine, int write_file)
 	if (write_file)
 	{
 		/* dump a screenshot */
-		snprintf(buf, sizeof(buf) / sizeof(buf[0]),
+		snprintf(buf, ARRAY_LENGTH(buf),
 			(screenshot_num >= 0) ? "_%s_%d.png" : "_%s.png",
 			current_testcase.name, screenshot_num);
 		filerr = mame_fopen(SEARCHPATH_SCREENSHOT, buf, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &fp);
@@ -280,7 +280,7 @@ static void messtest_output_error(void *param, const char *format, va_list argpt
 	char *s;
 	int pos, nextpos;
 
-	vsnprintf(buffer, sizeof(buffer) / sizeof(buffer[0]), format, argptr);
+	vsnprintf(buffer, ARRAY_LENGTH(buffer), format, argptr);
 
 	pos = 0;
 	while(buffer[pos] != '\0')
@@ -451,7 +451,7 @@ int osd_start_audio_stream(int stereo)
 
 	if (current_testcase.wavwrite)
 	{
-		snprintf(buf, sizeof(buf) / sizeof(buf[0]), "snap/_%s.wav", current_testcase.name);
+		snprintf(buf, ARRAY_LENGTH(buf), "snap/_%s.wav", current_testcase.name);
 		wavptr = wav_open(buf, machine->sample_rate, 2);
 	}
 	else
@@ -777,7 +777,7 @@ static void command_image_loadcreate(running_machine *machine)
 	filename = current_command->u.image_args.filename;
 	if (!filename)
 	{
-		snprintf(buf, sizeof(buf) / sizeof(buf[0]),	"%s.%s",
+		snprintf(buf, ARRAY_LENGTH(buf),	"%s.%s",
 			current_testcase.name, file_extensions);
 		osd_get_temp_filename(buf, ARRAY_LENGTH(buf), buf);
 		filename = buf;
@@ -951,9 +951,9 @@ static void command_trace(running_machine *machine)
 	for (cpu = cpu_first(machine->config); cpu != NULL; cpu = cpu_next(cpu))
 	{
 		if (cpu_next(cpu_first(machine->config)) == NULL)
-			snprintf(filename, sizeof(filename) / sizeof(filename[0]), "_%s.tr", current_testcase.name);
+			snprintf(filename, ARRAY_LENGTH(filename), "_%s.tr", current_testcase.name);
 		else
-			snprintf(filename, sizeof(filename) / sizeof(filename[0]), "_%s.%d.tr", current_testcase.name, cpunum);
+			snprintf(filename, ARRAY_LENGTH(filename), "_%s.%d.tr", current_testcase.name, cpunum);
 
 		file = fopen(filename, "w");
 		if (file)
@@ -1055,7 +1055,7 @@ void osd_update(running_machine *machine, int skip_redraw)
 		return;
 	}
 
-	for (i = 0; i < sizeof(commands) / sizeof(commands[i]); i++)
+	for (i = 0; i < ARRAY_LENGTH(commands); i++)
 	{
 		if (current_command->command_type == commands[i].command_type)
 		{

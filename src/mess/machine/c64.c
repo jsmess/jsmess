@@ -1094,10 +1094,10 @@ static DEVICE_IMAGE_LOAD( c64_cart )
 		int j;
 		unsigned short c64_cart_type;
 
-		for (i = 0; (i < sizeof(c64_cbm_cart) / sizeof(c64_cbm_cart[0])) && (c64_cbm_cart[i].size != 0); i++)
+		for (i = 0; (i < ARRAY_LENGTH(c64_cbm_cart)) && (c64_cbm_cart[i].size != 0); i++)
 		;
 
-		if (i >= sizeof(c64_cbm_cart) / sizeof(c64_cbm_cart[0]))
+		if (i >= ARRAY_LENGTH(c64_cbm_cart))
 			return INIT_FAIL;
 
 		/* Start to parse the .crt header */

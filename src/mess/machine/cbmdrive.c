@@ -1779,7 +1779,7 @@ static void cbm_drive_open( void )
 	cbm_drive_open_helper();
 
 	cbm_serial.count = 0;
-	for (i = 0; i < sizeof(cbm_serial.atn) / sizeof(int); i++)
+	for (i = 0; i < ARRAY_LENGTH(cbm_serial.atn); i++)
 
 	{
 		cbm_serial.atn[i] =
@@ -1793,7 +1793,7 @@ static void cbm_drive_close( void )
 	int i;
 
 	cbm_serial.count = 0;
-	for (i = 0; i < sizeof(cbm_drive) / sizeof(CBM_Drive); i++)
+	for (i = 0; i < ARRAY_LENGTH(cbm_drive); i++)
 	{
 		cbm_drive[i].interface = 0;
 

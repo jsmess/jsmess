@@ -662,12 +662,12 @@ imgtoolerr_t imgtool_partition_open(imgtool_image *image, int partition_index, i
 	if (image->module->list_partitions)
 	{
 		/* this image supports partitions */
-		if ((partition_index < 0) || (partition_index >= (sizeof(partition_info) / sizeof(partition_info[0]))))
+		if ((partition_index < 0) || (partition_index >= ARRAY_LENGTH(partition_info)))
 			return IMGTOOLERR_INVALIDPARTITION;
 
 		/* retrieve the info on the partitions */
 		memset(partition_info, '\0', sizeof(partition_info));
-		err = image->module->list_partitions(image, partition_info, sizeof(partition_info) / sizeof(partition_info[0]));
+		err = image->module->list_partitions(image, partition_info, ARRAY_LENGTH(partition_info));
 		if (err)
 			return err;
 
@@ -1020,7 +1020,7 @@ char *imgtool_temp_str(void)
 {
 	static int index;
 	static char temp_string_pool[32][256];
-	return temp_string_pool[index++ % (sizeof(temp_string_pool) / sizeof(temp_string_pool[0]))];
+	return temp_string_pool[index++ % ARRAY_LENGTH(temp_string_pool)];
 }
 
 
@@ -1750,7 +1750,7 @@ imgtoolerr_t imgtool_partition_get_chain_string(imgtool_partition *partition, co
 	chain[0].block = ~0;
 	last_block = chain[0].block;
 
-	err = imgtool_partition_get_chain(partition, path, chain, sizeof(chain) / sizeof(chain[0]));
+	err = imgtool_partition_get_chain(partition, path, chain, ARRAY_LENGTH(chain));
 	if (err)
 		return err;
 

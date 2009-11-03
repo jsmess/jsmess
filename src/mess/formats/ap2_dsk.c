@@ -65,7 +65,7 @@ static const UINT8 *get_untranslate6_map(void)
 	if (!map_inited)
 	{
 		memset(map, 0xff, sizeof(map));
-		for (i = 0; i < sizeof(translate6) / sizeof(translate6[0]); i++)
+		for (i = 0; i < ARRAY_LENGTH(translate6); i++)
 			map[translate6[i]] = i;
 		map_inited = 1;
 	}

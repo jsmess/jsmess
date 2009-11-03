@@ -512,7 +512,7 @@ static DEVICE_IMAGE_LOAD(cbmb_cart)
 
 	/* Finally load the cart */
 //  This could be needed with .crt support
-//  for (i = 0; (i < sizeof(pet_cbm_cart) / sizeof(pet_cbm_cart[0])) && (pet_cbm_cart[i].size != 0); i++)
+//  for (i = 0; (i < ARRAY_LENGTH(pet_cbm_cart)) && (pet_cbm_cart[i].size != 0); i++)
 //      memcpy(cbmb_memory + cbmb_cbm_cart[i].addr + 0xf0000, cbmb_cbm_cart[i].chip, cbmb_cbm_cart[i].size);
 	memcpy(cbmb_memory + cbmb_cbm_cart[0].addr + 0xf0000, cbmb_cbm_cart[0].chip, cbmb_cbm_cart[0].size);
 

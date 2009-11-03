@@ -410,7 +410,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 	if ((device != NULL) && (image_device_getinfo(pPickerInfo->config->mconfig, device).has_partial_hash != 0))
 		nCrc = 0;
 	if (nCrc != 0)
-		snprintf(pInfo->hash_string, sizeof(pInfo->hash_string) / sizeof(pInfo->hash_string[0]), "c:%08x#", nCrc);
+		snprintf(pInfo->hash_string, ARRAY_LENGTH(pInfo->hash_string), "c:%08x#", nCrc);
 
 	// set up zip entry name length, if specified
 	if (nZipEntryNameLength > 0)

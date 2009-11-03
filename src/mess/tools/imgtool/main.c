@@ -96,7 +96,7 @@ static int parse_options(int argc, char *argv[], int minunnamed, int maxunnamed,
 				if (*fork)
 					goto optionalreadyspecified;
 
-				snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%s", value);
+				snprintf(buf, ARRAY_LENGTH(buf), "%s", value);
 				*fork = buf;
 			}
 			else
@@ -567,7 +567,7 @@ static int cmd_identify(const struct command *c, int argc, char *argv[])
 	imgtoolerr_t err;
 	int i;
 
-	err = imgtool_identify_file(argv[0], modules, sizeof(modules) / sizeof(modules[0]));
+	err = imgtool_identify_file(argv[0], modules, ARRAY_LENGTH(modules));
 	if (err)
 		goto error;
 
@@ -786,7 +786,7 @@ static void listoptions(const option_guide *opt_guide, const char *opt_spec)
 	while(opt_guide->option_type != OPTIONTYPE_END)
 	{
 		range_buffer[0] = 0;
-		snprintf(opt_name, sizeof(opt_name) / sizeof(opt_name[0]), "--%s", opt_guide->identifier);
+		snprintf(opt_name, ARRAY_LENGTH(opt_name), "--%s", opt_guide->identifier);
 		opt_desc = opt_guide->display_name;
 
 		/* is this option relevant? */
@@ -799,11 +799,11 @@ static void listoptions(const option_guide *opt_guide, const char *opt_spec)
 		switch(opt_guide->option_type) {
 		case OPTIONTYPE_INT:
 			option_resolution_listranges(opt_spec, opt_guide->parameter,
-				range, sizeof(range) / sizeof(range[0]));
+				range, ARRAY_LENGTH(range));
 
 			for (i = 0; range[i].max >= 0; i++)
 			{
-				snprintf(buf, sizeof(buf) / sizeof(buf[0]),
+				snprintf(buf, ARRAY_LENGTH(buf),
 					(range[i].min == range[i].max) ? "%i" : "%i-%i",
 					range[i].min,
 					range[i].max);
@@ -938,7 +938,7 @@ int CLIB_DECL main(int argc, char *argv[])
 	if (argc > 1)
 	{
 		/* figure out what command they are running, and run it */
-		for (i = 0; i < (sizeof(cmds) / sizeof(cmds[0])); i++)
+		for (i = 0; i < ARRAY_LENGTH(cmds); i++)
 		{
 			c = &cmds[i];
 			if (!mame_stricmp(c->name, argv[1]))
@@ -977,7 +977,7 @@ int CLIB_DECL main(int argc, char *argv[])
 
 	/* Usage */
 	fprintf(stderr, "imgtool - Generic image manipulation tool for use with MESS\n\n");
-	for (i = 0; i < (sizeof(cmds) / sizeof(cmds[0])); i++)
+	for (i = 0; i < ARRAY_LENGTH(cmds); i++)
 	{
 		writeusage(stdout, (i == 0), &cmds[i], argv);
 	}

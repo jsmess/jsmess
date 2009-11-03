@@ -542,7 +542,7 @@ optreserr_t option_resolution_isvalidvalue(const char *specification, int option
 	struct OptionRange ranges[256];
 	int i;
 
-	err = option_resolution_listranges(specification, option_char, ranges, sizeof(ranges) / sizeof(ranges[0]));
+	err = option_resolution_listranges(specification, option_char, ranges, ARRAY_LENGTH(ranges));
 	if (err)
 		return err;
 
@@ -578,7 +578,7 @@ const char *option_resolution_error_string(optreserr_t err)
 		"Internal error"							/* OPTIONRESOLTUION_ERROR_INTERNAL */
 	};
 
-	if ((err < 0) || (err >= sizeof(errors) / sizeof(errors[0])))
+	if ((err < 0) || (err >= ARRAY_LENGTH(errors)))
 		return NULL;
 	return errors[err];
 }

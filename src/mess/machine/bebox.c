@@ -224,7 +224,7 @@ WRITE64_HANDLER( bebox_crossproc_interrupts_w )
 
 	bebox_mbreg32_w(&bebox_crossproc_interrupts, data, mem_mask);
 
-	for (i = 0; i < sizeof(crossproc_map) / sizeof(crossproc_map[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(crossproc_map); i++)
 	{
 		if ((old_crossproc_interrupts ^ bebox_crossproc_interrupts) & crossproc_map[i].mask)
 		{

@@ -1052,7 +1052,7 @@ static int attr_index_from_attribute(UINT8 attr)
 		| ((attr & (M6847_GM1 | M6847_GM0)) << 5);
 
 	/* sanity check */
-	assert(result < sizeof(m6847->fontdata) / sizeof(m6847->fontdata[0]));
+	assert(result < ARRAY_LENGTH(m6847->fontdata));
 	return result;
 }
 
@@ -1062,7 +1062,7 @@ static UINT8 attribute_from_attr_index(int attr_index)
 {
 	/* sanity check */
 	assert(attr_index >= 0);
-	assert(attr_index < sizeof(m6847->fontdata) / sizeof(m6847->fontdata[0]));
+	assert(attr_index < ARRAY_LENGTH(m6847->fontdata));
 
 	return (UINT8) ((attr_index & 0x1F) << 3)
 		| ((attr_index & 0x60) >> 5);
@@ -1794,7 +1794,7 @@ static void build_fontdata(const m6847_variant *v)
 	int byte;
 	const UINT8 *char_data;
 
-	for (attr_index = 0; attr_index < sizeof(m6847->fontdata) / sizeof(m6847->fontdata[0]); attr_index++)
+	for (attr_index = 0; attr_index < ARRAY_LENGTH(m6847->fontdata); attr_index++)
 	{
 		UINT8 attr = attribute_from_attr_index(attr_index);
 
@@ -1833,7 +1833,7 @@ void m6847_init(running_machine *machine, const m6847_config *cfg)
 	double total_scanlines;
 
 	/* identify proper M6847 variant */
-	assert(cfg->type < sizeof(variants) / sizeof(variants[0]));
+	assert(cfg->type < ARRAY_LENGTH(variants));
 	v = &variants[cfg->type];
 
 	/* allocate instance */

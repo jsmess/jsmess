@@ -75,7 +75,7 @@ static int create_option_controls(HWND dialog, HFONT font, int margin, int *y,
 		for (i = 0; guide[i].option_type != OPTIONTYPE_END; i++)
 		{
 			// set up label control
-			snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%s:", guide[i].display_name);
+			snprintf(buf, ARRAY_LENGTH(buf), "%s:", guide[i].display_name);
 			control = win_create_window_ex_utf8(0, "STATIC", buf, WS_CHILD | WS_VISIBLE,
 				margin, *y + 2, label_width, control_height, dialog, NULL, NULL, NULL);
 			SendMessage(control, WM_SETFONT, (WPARAM) font, 0);

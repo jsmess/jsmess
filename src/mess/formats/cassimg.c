@@ -692,12 +692,12 @@ static const INT8 *choose_wave(const struct CassetteModulation *modulation, size
 
 	if (modulation->flags & CASSETTE_MODULATION_SINEWAVE)
 	{
-		*wave_bytes_length = sizeof(sine_wave) / sizeof(sine_wave[0]);
+		*wave_bytes_length = ARRAY_LENGTH(sine_wave);
 		return sine_wave;
 	}
 	else
 	{
-		*wave_bytes_length = sizeof(square_wave) / sizeof(square_wave[0]);
+		*wave_bytes_length = ARRAY_LENGTH(square_wave);
 		return square_wave;
 	}
 }

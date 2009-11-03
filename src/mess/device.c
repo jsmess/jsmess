@@ -151,7 +151,7 @@ const char *device_brieftypename(iodevice_t type)
 iodevice_t device_typeid(const char *name)
 {
 	int i;
-	for (i = 0; i < sizeof(device_info_array) / sizeof(device_info_array[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(device_info_array); i++)
 	{
 		if (!mame_stricmp(name, device_info_array[i].name) || !mame_stricmp(name, device_info_array[i].shortname))
 			return device_info_array[i].type;
@@ -467,7 +467,7 @@ static void create_mess_device(running_machine *machine, device_config **listhea
 void mess_devices_setup(running_machine *machine, machine_config *config, const game_driver *gamedrv)
 {
 	device_getinfo_handler handlers[64];
-	int count_overrides[sizeof(handlers) / sizeof(handlers[0])];
+	int count_overrides[ARRAY_LENGTH(handlers)];
 	int i, position = 0;
 
 	memset(handlers, 0, sizeof(handlers));
@@ -479,7 +479,7 @@ void mess_devices_setup(running_machine *machine, machine_config *config, const 
 		struct SystemConfigurationParamBlock params;
 
 		memset(&params, 0, sizeof(params));
-		params.device_slotcount = sizeof(handlers) / sizeof(handlers[0]);
+		params.device_slotcount = ARRAY_LENGTH(handlers);
 		params.device_handlers = handlers;
 		params.device_countoverrides = count_overrides;
 		gamedrv->sysconfig_ctor(&params);
@@ -572,7 +572,7 @@ int device_valididtychecks(void)
 	int i;
 
 	/* Check the device struct array */
-	for (i = 0; i < sizeof(device_info_array) / sizeof(device_info_array[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(device_info_array); i++)
 	{
 		if (!device_info_array[i].name)
 		{

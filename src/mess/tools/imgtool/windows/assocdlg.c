@@ -96,7 +96,7 @@ static INT_PTR CALLBACK win_association_dialog_proc(HWND dialog, UINT message,
 			{
 				style = WS_CHILD | WS_VISIBLE | BS_CHECKBOX | BS_AUTOCHECKBOX;
 				t_extension = tstring_from_utf8(dlginfo->extensions[i]);
-				_sntprintf(buf, sizeof(buf) / sizeof(buf[0]), TEXT(".%s"), t_extension);
+				_sntprintf(buf, ARRAY_LENGTH(buf), TEXT(".%s"), t_extension);
 				free(t_extension);
 
 				control = CreateWindow(TEXT("BUTTON"), buf, style,
@@ -141,7 +141,7 @@ static INT_PTR CALLBACK win_association_dialog_proc(HWND dialog, UINT message,
 							is_set = SendMessage(GetDlgItem(dialog, CONTROL_START + i), BM_GETCHECK, 0, 0);
 
 							t_extension = tstring_from_utf8(dlginfo->extensions[i]);
-							_sntprintf(buf, sizeof(buf) / sizeof(buf[0]), TEXT(".%s"), t_extension);
+							_sntprintf(buf, ARRAY_LENGTH(buf), TEXT(".%s"), t_extension);
 							free(t_extension);
 							currently_set = win_is_extension_associated(&assoc_info, buf);
 

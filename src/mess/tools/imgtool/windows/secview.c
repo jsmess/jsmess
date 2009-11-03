@@ -216,19 +216,19 @@ static void set_sector_text(HWND dialog)
 	info = get_sectorview_info(dialog);
 
 	if (info->track != ~0)
-		snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%u", (unsigned int) info->track);
+		snprintf(buf, ARRAY_LENGTH(buf), "%u", (unsigned int) info->track);
 	else
 		buf[0] = '\0';
 	win_set_window_text_utf8(GetDlgItem(dialog, IDC_TRACKEDIT), buf);
 
 	if (info->head != ~0)
-		snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%u", (unsigned int) info->head);
+		snprintf(buf, ARRAY_LENGTH(buf), "%u", (unsigned int) info->head);
 	else
 		buf[0] = '\0';
 	win_set_window_text_utf8(GetDlgItem(dialog, IDC_HEADEDIT), buf);
 
 	if (info->sector != ~0)
-		snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%u", (unsigned int) info->sector);
+		snprintf(buf, ARRAY_LENGTH(buf), "%u", (unsigned int) info->sector);
 	else
 		buf[0] = '\0';
 	win_set_window_text_utf8(GetDlgItem(dialog, IDC_SECTOREDIT), buf);
@@ -245,11 +245,11 @@ static void change_sector(HWND dialog)
 
 	info = get_sectorview_info(dialog);
 
-	GetWindowText(GetDlgItem(dialog, IDC_TRACKEDIT), buf, sizeof(buf) / sizeof(buf[0]));
+	GetWindowText(GetDlgItem(dialog, IDC_TRACKEDIT), buf, ARRAY_LENGTH(buf));
 	new_track = (UINT32) _ttoi(buf);
-	GetWindowText(GetDlgItem(dialog, IDC_HEADEDIT), buf, sizeof(buf) / sizeof(buf[0]));
+	GetWindowText(GetDlgItem(dialog, IDC_HEADEDIT), buf, ARRAY_LENGTH(buf));
 	new_head = (UINT32) _ttoi(buf);
-	GetWindowText(GetDlgItem(dialog, IDC_SECTOREDIT), buf, sizeof(buf) / sizeof(buf[0]));
+	GetWindowText(GetDlgItem(dialog, IDC_SECTOREDIT), buf, ARRAY_LENGTH(buf));
 	new_sector = (UINT32) _ttoi(buf);
 
 	if ((info->track != new_track) || (info->head != new_head) || (info->sector != new_sector))

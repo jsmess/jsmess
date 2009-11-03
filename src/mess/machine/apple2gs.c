@@ -400,7 +400,7 @@ static int adb_address_mouse;
 
 static UINT8 adb_read_memory(UINT32 address)
 {
-	if (address < (sizeof(adb_memory) / sizeof(adb_memory[0])))
+	if (address < ARRAY_LENGTH(adb_memory))
 		return adb_memory[address];
 	else
 		return 0x00;
@@ -410,7 +410,7 @@ static UINT8 adb_read_memory(UINT32 address)
 
 static void adb_write_memory(UINT32 address, UINT8 data)
 {
-	if (address < (sizeof(adb_memory) / sizeof(adb_memory[0])))
+	if (address < ARRAY_LENGTH(adb_memory))
 		adb_memory[address] = data;
 }
 
@@ -432,7 +432,7 @@ static void adb_set_config(UINT8 b1, UINT8 b2, UINT8 b3)
 
 static void adb_post_response(const UINT8 *bytes, size_t length)
 {
-	assert(length < (sizeof(adb_response_bytes) / sizeof(adb_response_bytes[0])));
+	assert(length < ARRAY_LENGTH(adb_response_bytes));
 	memcpy(adb_response_bytes, bytes, length);
 
 	adb_state = ADBSTATE_INRESPONSE;
@@ -666,7 +666,7 @@ static void adb_write_datareg(running_machine *machine, UINT8 data)
 			break;
 
 		case ADBSTATE_INCOMMAND:
-			assert(adb_command_pos < (sizeof(adb_command_bytes) / sizeof(adb_command_bytes[0])));
+			assert(adb_command_pos < ARRAY_LENGTH(adb_command_bytes));
 			adb_command_bytes[adb_command_pos++] = data;
 			break;
 

@@ -1292,7 +1292,7 @@ static CPU_DISASSEMBLE(dgnbeta_dasm_override)
 	if ((oprom[0] == 0x10) && (oprom[1] == 0x3F))
 	{
 		call = oprom[2];
-		if ((call >= 0) && (call < sizeof(os9syscalls) / sizeof(os9syscalls[0])) && os9syscalls[call])
+		if ((call >= 0) && (call < ARRAY_LENGTH(os9syscalls)) && os9syscalls[call])
 		{
 			sprintf(buffer, "OS9   %s", os9syscalls[call]);
 			result = 3;

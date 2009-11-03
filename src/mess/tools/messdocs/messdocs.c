@@ -117,8 +117,8 @@ static char *make_path(const char *dir, const char *filepath)
 	char buf[1024];
 	char *path;
 
-	snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%s", dir);
-	combine_path(buf, sizeof(buf) / sizeof(buf[0]), filepath);
+	snprintf(buf, ARRAY_LENGTH(buf), "%s", dir);
+	combine_path(buf, ARRAY_LENGTH(buf), filepath);
 
 	path = malloc(strlen(buf) + 1);
 	if (!path)
@@ -294,8 +294,8 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 			return;
 		}
 
-		snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%s", state->dest_dir);
-		combine_path(buf, sizeof(buf) / sizeof(buf[0]), destpath);
+		snprintf(buf, ARRAY_LENGTH(buf), "%s", state->dest_dir);
+		combine_path(buf, ARRAY_LENGTH(buf), destpath);
 		osd_mkdir(buf);
 
 		sysinfo_array = NULL;
@@ -304,7 +304,7 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 
 		while(!feof(datfile))
 		{
-			fgets(buf, sizeof(buf) / sizeof(buf[0]), datfile);
+			fgets(buf, ARRAY_LENGTH(buf), datfile);
 			s = strchr(buf, '\n');
 			if (s)
 				*s = '\0';
@@ -352,7 +352,7 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 				if (!sysfile)
 					break;
 
-				html_encode(buf, sizeof(buf) / sizeof(buf[0]));
+				html_encode(buf, ARRAY_LENGTH(buf));
 
 				if (!strncmp(buf, "======", 6) && lineno == 0)
 				{

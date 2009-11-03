@@ -376,7 +376,7 @@ static const char_info charinfo[] =
 static const char_info *find_charinfo(unicode_char target_char)
 {
 	int low = 0;
-	int high = sizeof(charinfo) / sizeof(charinfo[0]);
+	int high = ARRAY_LENGTH(charinfo);
 	int i;
 	unicode_char ch;
 
@@ -592,7 +592,7 @@ int mess_validate_natural_keyboard_statics(void)
 	const char_info *ci;
 
 	/* check to make sure that charinfo is in order */
-	for (i = 0; i < sizeof(charinfo) / sizeof(charinfo[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(charinfo); i++)
 	{
 		if (last_char >= charinfo[i].ch)
 		{
@@ -603,7 +603,7 @@ int mess_validate_natural_keyboard_statics(void)
 	}
 
 	/* check to make sure that I can look up everything on alternate_charmap */
-	for (i = 0; i < sizeof(charinfo) / sizeof(charinfo[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(charinfo); i++)
 	{
 		ci = find_charinfo(charinfo[i].ch);
 		if (ci != &charinfo[i])
@@ -815,7 +815,7 @@ static void internal_post_key(running_machine *machine, unicode_char ch)
 	}
 
 	keybuf->buffer[keybuf->end_pos++] = ch;
-	keybuf->end_pos %= sizeof(keybuf->buffer) / sizeof(keybuf->buffer[0]);
+	keybuf->end_pos %= ARRAY_LENGTH(keybuf->buffer);
 }
 
 
@@ -824,7 +824,7 @@ static int buffer_full(running_machine *machine)
 {
 	key_buffer *keybuf;
 	keybuf = get_buffer(machine);
-	return ((keybuf->end_pos + 1) % (sizeof(keybuf->buffer) / sizeof(keybuf->buffer[0]))) == keybuf->begin_pos;
+	return ((keybuf->end_pos + 1) % ARRAY_LENGTH(keybuf->buffer)) == keybuf->begin_pos;
 }
 
 
@@ -901,7 +901,7 @@ static TIMER_CALLBACK(inputx_timerproc)
 		while((keybuf->begin_pos != keybuf->end_pos) && queue_chars(&keybuf->buffer[keybuf->begin_pos], 1))
 		{
 			keybuf->begin_pos++;
-			keybuf->begin_pos %= sizeof(keybuf->buffer) / sizeof(keybuf->buffer[0]);
+			keybuf->begin_pos %= ARRAY_LENGTH(keybuf->buffer);
 
 			if (attotime_compare(current_rate, attotime_zero) != 0)
 				break;
@@ -914,7 +914,7 @@ static TIMER_CALLBACK(inputx_timerproc)
 		{
 			keybuf->status_keydown = FALSE;
 			keybuf->begin_pos++;
-			keybuf->begin_pos %= sizeof(keybuf->buffer) / sizeof(keybuf->buffer[0]);
+			keybuf->begin_pos %= ARRAY_LENGTH(keybuf->buffer);
 		}
 		else
 		{
@@ -1106,7 +1106,7 @@ void inputx_postn_coded_rate(running_machine *machine, const char *text, size_t 
 
 		if (ch == '{')
 		{
-			for (j = 0; j < sizeof(codes) / sizeof(codes[0]); j++)
+			for (j = 0; j < ARRAY_LENGTH(codes); j++)
 			{
 				key_len = strlen(codes[j].key);
 				if (i + key_len + 2 <= text_len)
@@ -1181,7 +1181,7 @@ void inputx_postn_utf16_rate(running_machine *machine, const utf16_char *text, s
 
 	while(text_len > 0)
 	{
-		if (len == (sizeof(buf) / sizeof(buf[0])))
+		if (len == ARRAY_LENGTH(buf))
 		{
 			inputx_postn(machine, buf, len);
 			len = 0;
@@ -1260,7 +1260,7 @@ void inputx_postn_utf8_rate(running_machine *machine, const char *text, size_t t
 
 	while(text_len > 0)
 	{
-		if (len == (sizeof(buf) / sizeof(buf[0])))
+		if (len == ARRAY_LENGTH(buf))
 		{
 			inputx_postn(machine, buf, len);
 			len = 0;

@@ -21,7 +21,7 @@ WAVEMODULE(
 	IMGMODULE_FLAG_FILENAMES_PREFERUCASE,
 	1200, 1600, 2400,						/* 0=1200 Hz, 1=2400 Hz, threshold=1600 Hz */
 	WAVEIMAGE_LSB_FIRST,
-	blockheader, sizeof(blockheader) / sizeof(blockheader[0]),
+	blockheader, ARRAY_LENGTH(blockheader),
 	cococas_initalt,						/* alternate initializer */
 	cococas_nextfile,						/* enumerate next */
 	cococas_readfile						/* read file */

@@ -45,7 +45,7 @@ imgtoolerr_t imgtool_create_cannonical_library(int omit_untested, imgtool_librar
 	}
 
 	/* create all modules */
-	for (i = 0; i < sizeof(modules) / sizeof(modules[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(modules); i++)
 		imgtool_library_add(lib, modules[i]);
 
 	/* remove irrelevant modules */

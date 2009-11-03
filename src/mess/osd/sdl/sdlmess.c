@@ -454,7 +454,7 @@ char *osd_get_clipboard_text(void)
 	types[0] = XInternAtom( display, "UTF8_STRING", False );
 	types[1] = XA_STRING; /* latin-1 */
 
-	for ( i = 0; i < sizeof( types ) / sizeof( types[0] ); i++ )
+	for ( i = 0; i < ARRAY_LENGTH(types); i++ )
 	{
 
 		XConvertSelection( display, XA_PRIMARY, types[i], types[i], our_win, CurrentTime );

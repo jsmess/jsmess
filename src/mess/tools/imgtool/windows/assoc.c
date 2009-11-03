@@ -52,10 +52,10 @@ BOOL win_association_exists(const struct win_association_info *assoc)
 	if (RegOpenKey(key1, TEXT("shell\\open\\command"), &key2))
 		goto done;
 
-	if (reg_query_string(key2, buf, sizeof(buf) / sizeof(buf[0])))
+	if (reg_query_string(key2, buf, ARRAY_LENGTH(buf)))
 		goto done;
 
-	get_open_command(assoc, expected, sizeof(expected) / sizeof(expected[0]));
+	get_open_command(assoc, expected, ARRAY_LENGTH(expected));
 	rc = !_tcscmp(expected, buf);
 
 done:
@@ -82,7 +82,7 @@ BOOL win_is_extension_associated(const struct win_association_info *assoc,
 	if (RegOpenKey(HKEY_CLASSES_ROOT, extension, &key))
 		goto done;
 
-	if (reg_query_string(key, buf, sizeof(buf) / sizeof(buf[0])))
+	if (reg_query_string(key, buf, ARRAY_LENGTH(buf)))
 		goto done;
 
 	rc = !_tcscmp(buf, assoc->file_class);
@@ -131,7 +131,7 @@ BOOL win_associate_extension(const struct win_association_info *assoc,
 					KEY_ALL_ACCESS, NULL, &key4, &disposition))
 				goto done;
 
-			get_open_command(assoc, buf, sizeof(buf) / sizeof(buf[0]));
+			get_open_command(assoc, buf, ARRAY_LENGTH(buf));
 			if (RegSetValue(key4, NULL, REG_SZ, buf, sizeof(buf)))
 				goto done;
 		}

@@ -1862,7 +1862,7 @@ static void upd765_setup_command(const device_config *device)
 
 	if (LOG_COMMAND)
 	{
-		if ((fdc->upd765_command_bytes[0] & 0x1f) < sizeof(commands) / sizeof(commands[0]))
+		if ((fdc->upd765_command_bytes[0] & 0x1f) < ARRAY_LENGTH(commands))
 			cmd = commands[fdc->upd765_command_bytes[0] & 0x1f];
 		logerror("upd765_setup_command(): Setting up command 0x%02X (%s)\n",
 			fdc->upd765_command_bytes[0] & 0x1f, cmd ? cmd : "???");

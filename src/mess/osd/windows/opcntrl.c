@@ -32,7 +32,7 @@ static int get_option_count(const option_guide *guide,
 	int count = 0, i;
 
 	option_resolution_listranges(optspec, guide->parameter,
-		ranges, sizeof(ranges) / sizeof(ranges[0]));
+		ranges, ARRAY_LENGTH(ranges));
 
 	for (i = 0; ranges[i].min >= 0; i++)
 		count += ranges[i].max - ranges[i].min + 1;
@@ -62,7 +62,7 @@ static BOOL prepare_combobox(HWND control, const option_guide *guide,
 			goto unexpected;
 
 		option_resolution_listranges(optspec, guide->parameter,
-			ranges, sizeof(ranges) / sizeof(ranges[0]));
+			ranges, ARRAY_LENGTH(ranges));
 		option_resolution_getdefault(optspec, guide->parameter, &default_value);
 
 		option_count = 0;
@@ -75,7 +75,7 @@ static BOOL prepare_combobox(HWND control, const option_guide *guide,
 			{
 				if (guide->option_type == OPTIONTYPE_INT)
 				{
-					_sntprintf(buf2, sizeof(buf2) / sizeof(buf2[0]), TEXT("%d"), j);
+					_sntprintf(buf2, ARRAY_LENGTH(buf2), TEXT("%d"), j);
 					SendMessage(control, CB_ADDSTRING, 0, (LPARAM) buf2);
 				}
 				else if (guide->option_type == OPTIONTYPE_ENUM_BEGIN)
@@ -157,7 +157,7 @@ static BOOL prepare_editbox(HWND control, const option_guide *guide,
 				err = option_resolution_getdefault(optspec, guide->parameter, &val);
 				if (err)
 					goto done;
-				_snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%d", val);
+				_snprintf(buf, ARRAY_LENGTH(buf), "%d", val);
 				break;
 
 			default:
@@ -194,7 +194,7 @@ static BOOL check_editbox(HWND control)
 	guide = (const option_guide *) GetProp(control, guide_prop);
 	optspec = (const char *) GetProp(control, spec_prop);
 
-	win_get_window_text_utf8(control, buf, sizeof(buf) / sizeof(buf[0]));
+	win_get_window_text_utf8(control, buf, ARRAY_LENGTH(buf));
 
 	switch(guide->option_type)
 	{
@@ -205,7 +205,7 @@ static BOOL check_editbox(HWND control)
 			{
 				h = GetProp(control, value_prop);
 				val = (FPTR) h;
-				_snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%d", val);
+				_snprintf(buf, ARRAY_LENGTH(buf), "%d", val);
 				win_set_window_text_utf8(control, buf);
 			}
 			else
@@ -283,9 +283,9 @@ BOOL win_adjust_option_control(HWND control, int delta)
 		return TRUE;
 
 	option_resolution_listranges(optspec, guide->parameter,
-		ranges, sizeof(ranges) / sizeof(ranges[0]));
+		ranges, ARRAY_LENGTH(ranges));
 
-	win_get_window_text_utf8(control, buf, sizeof(buf) / sizeof(buf[0]));
+	win_get_window_text_utf8(control, buf, ARRAY_LENGTH(buf));
 	original_val = atoi(buf);
 	val = original_val + delta;
 
@@ -306,7 +306,7 @@ BOOL win_adjust_option_control(HWND control, int delta)
 
 	if (val != original_val)
 	{
-		_snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%d", val);
+		_snprintf(buf, ARRAY_LENGTH(buf), "%d", val);
 		win_set_window_text_utf8(control, buf);
 	}
 	return TRUE;
@@ -323,7 +323,7 @@ optreserr_t win_add_resolution_parameter(HWND control, option_resolution *resolu
 	const char *old_text;
 	int i;
 
-	if (!win_get_window_text_utf8(control, buf, sizeof(buf) / sizeof(buf[0])))
+	if (!win_get_window_text_utf8(control, buf, ARRAY_LENGTH(buf)))
 	{
 		err = OPTIONRESOLTUION_ERROR_INTERNAL;
 		return err;

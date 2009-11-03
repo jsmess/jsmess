@@ -774,7 +774,7 @@ static int internal_floppy_device_load(const device_config *image, int create_fo
 	return INIT_PASS;
 
 error:
-	for (i = 0; i < sizeof(errmap) / sizeof(errmap[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(errmap); i++)
 	{
 		if (err == errmap[i].ferr)
 			image_seterror(image, errmap[i].ierr, errmap[i].message);

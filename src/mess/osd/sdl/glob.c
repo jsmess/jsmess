@@ -437,8 +437,7 @@ glob0(pattern, pglob)
 	int c, err, oldpathc;
 	Char *bufnext, patbuf[_MAX_PATH+1];
 
-	qpatnext = globtilde(pattern, patbuf, sizeof(patbuf) / sizeof(Char),
-	    pglob);
+	qpatnext = globtilde(pattern, patbuf, ARRAY_LENGTH(patbuf), pglob);
 	oldpathc = pglob->gl_pathc;
 	bufnext = patbuf;
 

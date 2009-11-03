@@ -187,7 +187,7 @@ void wimgtool_report_error(HWND window, imgtoolerr_t err, const char *imagename,
 	}
 
 	if (source)
-		snprintf(buffer, sizeof(buffer) / sizeof(buffer[0]), "%s: %s", source, error_text);
+		snprintf(buffer, ARRAY_LENGTH(buffer), "%s: %s", source, error_text);
 	else
 		message = error_text;
 	win_message_box_utf8(window, message, wimgtool_producttext, MB_OK);
@@ -314,7 +314,7 @@ static int append_associated_icon(HWND window, const char *extension)
 	info = get_wimgtool_info(window);
 
 	/* retrieve temporary file path */
-	GetTempPath(sizeof(file_path) / sizeof(file_path[0]), file_path);
+	GetTempPath(ARRAY_LENGTH(file_path), file_path);
 
 	if (extension != FOLDER_ICON)
 	{
@@ -449,12 +449,12 @@ static imgtoolerr_t append_dirent(HWND window, int index, const imgtool_dirent *
 
 	if (entry->directory)
 	{
-		_sntprintf(buffer, sizeof(buffer) / sizeof(buffer[0]), TEXT("<DIR>"));
+		_sntprintf(buffer, ARRAY_LENGTH(buffer), TEXT("<DIR>"));
 	}
 	else
 	{
 		// set the file size
-		_sntprintf(buffer, sizeof(buffer) / sizeof(buffer[0]),
+		_sntprintf(buffer, ARRAY_LENGTH(buffer),
 			TEXT("%d"), entry->filesize);
 	}
 	column_index = 1;
@@ -466,7 +466,7 @@ static imgtoolerr_t append_dirent(HWND window, int index, const imgtool_dirent *
 		if (entry->creation_time != 0)
 		{
 			local_time = localtime(&entry->creation_time);
-			_sntprintf(buffer, sizeof(buffer) / sizeof(buffer[0]), _tasctime(local_time));
+			_sntprintf(buffer, ARRAY_LENGTH(buffer), _tasctime(local_time));
 			tstring_rtrim(buffer);
 			ListView_SetItemText(info->listview, new_index, column_index, buffer);
 		}
@@ -479,7 +479,7 @@ static imgtoolerr_t append_dirent(HWND window, int index, const imgtool_dirent *
 		if (entry->lastmodified_time != 0)
 		{
 			local_time = localtime(&entry->lastmodified_time);
-			_sntprintf(buffer, sizeof(buffer) / sizeof(buffer[0]), _tasctime(local_time));
+			_sntprintf(buffer, ARRAY_LENGTH(buffer), _tasctime(local_time));
 			tstring_rtrim(buffer);
 			ListView_SetItemText(info->listview, new_index, column_index, buffer);
 		}
@@ -577,7 +577,7 @@ static imgtoolerr_t refresh_image(HWND window)
 			err = imgtool_partition_get_free_space(info->partition, &filesize);
 			if (err)
 				goto done;
-			snprintf(size_buf, sizeof(size_buf) / sizeof(size_buf[0]), "%u bytes free", (unsigned) filesize);
+			snprintf(size_buf, ARRAY_LENGTH(size_buf), "%u bytes free", (unsigned) filesize);
 		}
 
 	}
@@ -621,7 +621,7 @@ static imgtoolerr_t full_refresh_image(HWND window)
 	{
 		// get file title from Windows
 		t_filename = tstring_from_utf8(info->filename);
-		GetFileTitle(t_filename, file_title_buf, sizeof(file_title_buf) / sizeof(file_title_buf[0]));
+		GetFileTitle(t_filename, file_title_buf, ARRAY_LENGTH(file_title_buf));
 		free(t_filename);
 		file_title = utf8_from_tstring(file_title_buf);
 
@@ -639,19 +639,19 @@ static imgtoolerr_t full_refresh_image(HWND window)
 			// has a current directory
 			if (imageinfo)
 			{
-				snprintf(buf, sizeof(buf) / sizeof(buf[0]),
+				snprintf(buf, ARRAY_LENGTH(buf),
 					"%s (\"%s\") - %s", file_title, imageinfo, info->current_directory);
 			}
 			else
 			{
-				snprintf(buf, sizeof(buf) / sizeof(buf[0]),
+				snprintf(buf, ARRAY_LENGTH(buf),
 					"%s - %s", file_title, info->current_directory);
 			}
 		}
 		else
 		{
 			// no current directory
-			snprintf(buf, sizeof(buf) / sizeof(buf[0]),
+			snprintf(buf, ARRAY_LENGTH(buf),
 				imageinfo ? "%s (\"%s\")" : "%s",
 				file_title, imageinfo);
 		}
@@ -663,7 +663,7 @@ static imgtoolerr_t full_refresh_image(HWND window)
 	}
 	else
 	{
-		snprintf(buf, sizeof(buf) / sizeof(buf[0]),
+		snprintf(buf, ARRAY_LENGTH(buf),
 			"%s %s", wimgtool_producttext, build_version);
 		statusbar_text[0] = NULL;
 		statusbar_text[1] = NULL;
@@ -671,7 +671,7 @@ static imgtoolerr_t full_refresh_image(HWND window)
 
 	win_set_window_text_utf8(window, buf);
 
-	for (i = 0; i < sizeof(statusbar_text) / sizeof(statusbar_text[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(statusbar_text); i++)
 	{
 		TCHAR *tempstr = statusbar_text[i] ? tstring_from_utf8(statusbar_text[i]) : NULL;
 		SendMessage(info->statusbar, SB_SETTEXT, i, (LPARAM) tempstr);
@@ -897,7 +897,7 @@ static imgtoolerr_t get_recursive_directory(imgtool_partition *partition, const 
 
 		if (!entry.eof)
 		{
-			snprintf(local_subpath, sizeof(local_subpath) / sizeof(local_subpath[0]),
+			snprintf(local_subpath, ARRAY_LENGTH(local_subpath),
 				"%s\\%s", local_path, entry.filename);
 			subpath = imgtool_partition_path_concatenate(partition, path, entry.filename);
 
@@ -933,7 +933,7 @@ static imgtoolerr_t put_recursive_directory(imgtool_partition *partition, LPCTST
 	if (err)
 		goto done;
 
-	_sntprintf(local_subpath, sizeof(local_subpath) / sizeof(local_subpath[0]), TEXT("%s\\*.*"), local_path, wfd.cFileName);
+	_sntprintf(local_subpath, ARRAY_LENGTH(local_subpath), TEXT("%s\\*.*"), local_path, wfd.cFileName);
 
 	h = FindFirstFile(local_subpath, &wfd);
 	if (h && (h != INVALID_HANDLE_VALUE))
@@ -942,7 +942,7 @@ static imgtoolerr_t put_recursive_directory(imgtool_partition *partition, LPCTST
 		{
 			if (_tcscmp(wfd.cFileName, TEXT(".")) && _tcscmp(wfd.cFileName, TEXT("..")))
 			{
-				_sntprintf(local_subpath, sizeof(local_subpath) / sizeof(local_subpath[0]), TEXT("%s\\%s"), local_path, wfd.cFileName);
+				_sntprintf(local_subpath, ARRAY_LENGTH(local_subpath), TEXT("%s\\%s"), local_path, wfd.cFileName);
 				filename = utf8_from_tstring(wfd.cFileName);
 				subpath = imgtool_partition_path_concatenate(partition, path, filename);
 				free(filename);
@@ -1194,7 +1194,7 @@ static void menu_insert(HWND window)
 
 	/* figure out which filters are appropriate for this file */
 	imgtool_partition_suggest_file_filters(info->partition, NULL, stream, suggestion_info.suggestions,
-		sizeof(suggestion_info.suggestions) / sizeof(suggestion_info.suggestions[0]));
+		ARRAY_LENGTH(suggestion_info.suggestions));
 
 	/* do we need to show an option dialog? */
 	writefile_optguide = (const option_guide *) imgtool_partition_get_info_ptr(info->partition, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
@@ -1316,10 +1316,10 @@ static imgtoolerr_t menu_extract_proc(HWND window, const imgtool_dirent *entry, 
 	if (!entry->directory)
 	{
 		imgtool_partition_suggest_file_filters(info->partition, filename, NULL, suggestion_info.suggestions,
-			sizeof(suggestion_info.suggestions) / sizeof(suggestion_info.suggestions[0]));
+			ARRAY_LENGTH(suggestion_info.suggestions));
 
 		suggestion_info.selected = 0;
-		for (i = 0; i < sizeof(suggestion_info.suggestions) / sizeof(suggestion_info.suggestions[0]); i++)
+		for (i = 0; i < ARRAY_LENGTH(suggestion_info.suggestions); i++)
 		{
 			if (suggestion_info.suggestions[i].viability == SUGGESTION_RECOMMENDED)
 			{
@@ -1437,7 +1437,7 @@ static INT_PTR CALLBACK createdir_dialog_proc(HWND dialog, UINT message, WPARAM 
 
 				case EN_CHANGE:
 					GetWindowText(info->edit_box,
-						info->buf, sizeof(info->buf) / sizeof(info->buf[0]));
+						info->buf, ARRAY_LENGTH(info->buf));
 					EnableWindow(info->ok_button, info->buf[0] != '\0');
 					break;
 			}
@@ -1573,7 +1573,7 @@ static LRESULT wimgtool_create(HWND window, CREATESTRUCT *pcs)
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, window, NULL, NULL, NULL);
 	if (!info->statusbar)
 		return -1;
-	SendMessage(info->statusbar, SB_SETPARTS, sizeof(status_widths) / sizeof(status_widths[0]),
+	SendMessage(info->statusbar, SB_SETPARTS, ARRAY_LENGTH(status_widths),
 		(LPARAM) status_widths);
 
 	// create imagelists
@@ -1632,11 +1632,11 @@ static void drop_files(HWND window, HDROP drop)
 	count = DragQueryFile(drop, 0xFFFFFFFF, NULL, 0);
 	for (i = 0; i < count; i++)
 	{
-		DragQueryFile(drop, i, buffer, sizeof(buffer) / sizeof(buffer[0]));
+		DragQueryFile(drop, i, buffer, ARRAY_LENGTH(buffer));
 		filename = utf8_from_tstring(buffer);
 
 		// figure out the file/dir name on the image
-		snprintf(subpath, sizeof(subpath) / sizeof(subpath[0]), "%s%s",
+		snprintf(subpath, ARRAY_LENGTH(subpath), "%s%s",
 			info->current_directory ? info->current_directory : "", osd_basename(filename));
 
 		if (GetFileAttributes(buffer) & FILE_ATTRIBUTE_DIRECTORY)

@@ -463,7 +463,7 @@ VIDEO_UPDATE( coco3 )
 static void coco3_set_dirty(void)
 {
 	int i;
-	for (i = 0; i < sizeof(video->dirty) / sizeof(video->dirty[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(video->dirty); i++)
 		video->dirty[i] = TRUE;
 }
 

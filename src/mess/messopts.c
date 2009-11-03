@@ -108,7 +108,7 @@ static void add_device_options_for_device(core_options *opts, const game_driver 
 
 	/* retrieve info about the device instance */
 	info = image_device_getinfo(config, device);
-	snprintf(dev_full_name, sizeof(dev_full_name) / sizeof(dev_full_name[0]),
+	snprintf(dev_full_name, ARRAY_LENGTH(dev_full_name),
 		"%s;%s", info.instance_name, info.brief_instance_name);
 
 	/* add the option */

@@ -282,7 +282,7 @@ static int GetMessIcon(int drvindex, int nSoftwareType)
 		{
 			for (drv = drivers[drvindex]; drv; drv = driver_get_clone(drv))
 			{
-				_snprintf(buffer, sizeof(buffer) / sizeof(buffer[0]), "%s/%s", drv->name, iconname);
+				_snprintf(buffer, ARRAY_LENGTH(buffer), "%s/%s", drv->name, iconname);
 				hIcon = LoadIconFromFile(buffer);
 				if (hIcon)
 					break;
@@ -433,7 +433,7 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 			pszSoftware = GetSelectedSoftware(drvindex, config, dev);
 			if (!pszSoftware || !*pszSoftware)
 			{
-				snprintf(szMessage, sizeof(szMessage) / sizeof(szMessage[0]),
+				snprintf(szMessage, ARRAY_LENGTH(szMessage),
 					"System '%s' requires that device %s must have an image to load\n",
 					drivers[drvindex]->description,
 					device_typename(info.type));
@@ -815,7 +815,7 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config *de
 	// allocate the machine config
 	config = machine_config_alloc_with_mess_devices(drivers[drvindex]);
 
-	SetupImageTypes(config, imagetypes, sizeof(imagetypes) / sizeof(imagetypes[0]), TRUE, dev);
+	SetupImageTypes(config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
 
 	if (CommonFileImageDialog(last_directory, cfd, filename, config, imagetypes))
 	{
@@ -911,7 +911,7 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 	}
 
 	astring_free(as);
-	SetupImageTypes(config, imagetypes, sizeof(imagetypes) / sizeof(imagetypes[0]), TRUE, dev);
+	SetupImageTypes(config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
 	bResult = CommonFileImageDialog(s, GetOpenFileName, pszFilename, config, imagetypes);
 
 	return bResult;
@@ -972,7 +972,7 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 
 	astring_free(as);
 
-	SetupImageTypes(config, imagetypes, sizeof(imagetypes) / sizeof(imagetypes[0]), TRUE, dev);
+	SetupImageTypes(config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
 	bResult = CommonFileImageDialog(s, GetSaveFileName, pszFilename, config, imagetypes);
 
 	return bResult;
@@ -1104,7 +1104,7 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem)
 		MessSpecifyImage(drvindex, NULL, pszFullName);
 
 		// Set up s_szSelecteItem, for the benefit of UpdateScreenShot()
-		strncpyz(g_szSelectedItem, pszName, sizeof(g_szSelectedItem) / sizeof(g_szSelectedItem[0]));
+		strncpyz(g_szSelectedItem, pszName, ARRAY_LENGTH(g_szSelectedItem));
 		s = strrchr(g_szSelectedItem, '.');
 		if (s)
 			*s = '\0';
@@ -1355,7 +1355,7 @@ static void SetupSoftwareTabView(void)
 
 	memset(&opts, 0, sizeof(opts));
 	opts.pCallbacks = &s_softwareTabViewCallbacks;
-	opts.nTabCount = sizeof(s_tabs) / sizeof(s_tabs[0]);
+	opts.nTabCount = ARRAY_LENGTH(s_tabs);
 
 	SetupTabView(GetDlgItem(GetMainWindow(), IDC_SWTAB), &opts);
 }

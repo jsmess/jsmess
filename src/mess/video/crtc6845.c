@@ -242,7 +242,7 @@ UINT8 mscrtc6845_port_r(struct mscrtc6845 *crtc, int offset)
 	if (offset & 1)
 	{
 		idx = crtc->idx & 0x1f;
-		if (idx < (sizeof(crtc->reg) / sizeof(crtc->reg[0])))
+		if (idx < ARRAY_LENGTH(crtc->reg))
 			val = crtc->reg[idx] & mscrtc6845_reg_mask[crtc->config.personality][idx].read_mask;
 	}
 	else
@@ -262,7 +262,7 @@ int mscrtc6845_port_w(struct mscrtc6845 *crtc, int offset, UINT8 data)
 	{
 		/* write to a 6845 register, if supported */
 		idx = crtc->idx & 0x1f;
-		if (idx < (sizeof(crtc->reg) / sizeof(crtc->reg[0])))
+		if (idx < ARRAY_LENGTH(crtc->reg))
 		{
 			mask = mscrtc6845_reg_mask[crtc->config.personality][idx].store_mask;
 			/* Don't zero out bits not covered by the mask. */

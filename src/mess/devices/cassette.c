@@ -359,13 +359,13 @@ static void device_display_cassette(const device_config *image)
 	/* THE ANIMATION HASN'T WORKED SINCE 0.114 - LEFT HERE FOR REFERENCE */
 	/* NEVER SEEN THE PLAY / RECORD ICONS */
 	/* character pairs 2-3, 4-5, 6-7, 8-9 form little tape cassette images */
-	snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%c%c %c %02d:%02d (%04d) [%02d:%02d (%04d)]",
+	snprintf(buf, ARRAY_LENGTH(buf), "%c%c %c %02d:%02d (%04d) [%02d:%02d (%04d)]",
 		n * 2 + 2,								/* cassette icon left */
 		n * 2 + 3,								/* cassette icon right */
 		(uistate == CASSETTE_PLAY) ? 16 : 14,	/* play or record icon */
 #endif
 	/* Since you can have anything in a BDF file, we will use crude ascii characters instead */
-	snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%c%c %c %02d:%02d (%04d) [%02d:%02d (%04d)]",
+	snprintf(buf, ARRAY_LENGTH(buf), "%c%c %c %02d:%02d (%04d) [%02d:%02d (%04d)]",
 		shapes[n],					/* cassette icon left */
 		shapes[n|4],					/* cassette icon right */
 		(uistate == CASSETTE_PLAY) ? 0x50 : 0x52,	/* play (P) or record (R) */

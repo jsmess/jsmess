@@ -48,7 +48,7 @@ void artwork_use_device_art(const device_config *img, const char *defaultartfile
 
 	/* concatenate the strings; first calculate length of the string */
 	len = 1;
-	for (i = 0; i < sizeof(strs) / sizeof(strs[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(strs); i++)
 	{
 		if (strs[i])
 			len += strlen(strs[i]) + 1;
@@ -59,7 +59,7 @@ void artwork_use_device_art(const device_config *img, const char *defaultartfile
 
 	/* now actually concatenate the strings */
 	pos = 0;
-	for (i = 0; i < sizeof(strs) / sizeof(strs[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(strs); i++)
 	{
 		if (strs[i])
 		{
@@ -104,7 +104,7 @@ int artwork_get_inputscreen_customizations(png_info *png, artwork_cust_type cust
 		"misc.png",			"misc.ini"
 	};
 
-	if ((cust_type >= 0) && (cust_type < ((sizeof(cust_files) / sizeof(cust_files[0])) / 2)))
+	if ((cust_type >= 0) && (cust_type < (ARRAY_LENGTH(cust_files) / 2)))
 	{
 		png_filename = cust_files[cust_type * 2 + 0];
 		ini_filename = cust_files[cust_type * 2 + 1];
@@ -136,7 +136,7 @@ int artwork_get_inputscreen_customizations(png_info *png, artwork_cust_type cust
 				if (buffer[0] == '[')
 				{
 					strncpyz(current_section, &buffer[1],
-						sizeof(current_section) / sizeof(current_section[0]));
+						ARRAY_LENGTH(current_section));
 					p = strchr(current_section, ']');
 					if (!p)
 						continue;

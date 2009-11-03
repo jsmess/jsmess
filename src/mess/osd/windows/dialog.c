@@ -297,7 +297,7 @@ static INT_PTR CALLBACK dialog_proc(HWND dlgwnd, UINT msg, WPARAM wparam, LPARAM
 		case WM_COMMAND:
 			command = LOWORD(wparam);
 
-			win_get_window_text_utf8((HWND) lparam, buf, sizeof(buf) / sizeof(buf[0]));
+			win_get_window_text_utf8((HWND) lparam, buf, ARRAY_LENGTH(buf));
 			if (!strcmp(buf, DLGTEXT_OK))
 				command = IDOK;
 			else if (!strcmp(buf, DLGTEXT_CANCEL))
@@ -524,12 +524,12 @@ static int dialog_add_object(dialog_box *di, HGDIOBJ obj)
 	}
 
 
-	for (i = 0; i < sizeof(objpool->objects) / sizeof(objpool->objects[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(objpool->objects); i++)
 	{
 		if (!objpool->objects[i])
 			break;
 	}
-	if (i >= sizeof(objpool->objects) / sizeof(objpool->objects[0]))
+	if (i >= ARRAY_LENGTH(objpool->objects))
 		return 1;
 
 	objpool->objects[i] = obj;
@@ -622,7 +622,7 @@ static LRESULT dialog_get_combo_value(dialog_box *dialog, HWND dialog_item, UINT
 static LRESULT dialog_get_adjuster_value(dialog_box *dialog, HWND dialog_item, UINT message, WPARAM wparam, LPARAM lparam)
 {
 	TCHAR buf[32];
-	GetWindowText(dialog_item, buf, sizeof(buf) / sizeof(buf[0]));
+	GetWindowText(dialog_item, buf, ARRAY_LENGTH(buf));
 	return _ttoi(buf);
 }
 
@@ -873,7 +873,7 @@ static INT_PTR CALLBACK adjuster_sb_wndproc(HWND sbwnd, UINT msg, WPARAM wparam,
 		id = GetWindowLong(sbwnd, GWL_ID);
 		dlgwnd = GetParent(sbwnd);
 		editwnd = GetDlgItem(dlgwnd, id - 1);
-		win_get_window_text_utf8(editwnd, buf, sizeof(buf) / sizeof(buf[0]));
+		win_get_window_text_utf8(editwnd, buf, ARRAY_LENGTH(buf));
 		value = atoi(buf);
 
 		switch(wparam)
@@ -893,7 +893,7 @@ static INT_PTR CALLBACK adjuster_sb_wndproc(HWND sbwnd, UINT msg, WPARAM wparam,
 			value = stuff->min_value;
 		else if (value > stuff->max_value)
 			value = stuff->max_value;
-		_snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%d", value);
+		_snprintf(buf, ARRAY_LENGTH(buf), "%d", value);
 		win_set_window_text_utf8(editwnd, buf);
 		result = 0;
 	}
@@ -958,7 +958,7 @@ int win_dialog_add_adjuster(dialog_box *dialog, const char *item_label, int defa
 		goto error;
 	x += dialog->layout->combo_width - DIM_ADJUSTER_SCR_WIDTH;
 
-	_sntprintf(buf, sizeof(buf) / sizeof(buf[0]),
+	_sntprintf(buf, ARRAY_LENGTH(buf),
 		is_percentage ? TEXT("%d%%") : TEXT("%d"),
 		default_value);
 	s = win_dialog_tcsdup(dialog, buf);
@@ -1575,7 +1575,7 @@ void win_dialog_exit(dialog_box *dialog)
 	objpool = dialog->objpool;
 	if (objpool)
 	{
-		for (i = 0; i < sizeof(objpool->objects) / sizeof(objpool->objects[0]); i++)
+		for (i = 0; i < ARRAY_LENGTH(objpool->objects); i++)
 			DeleteObject(objpool->objects[i]);
 	}
 

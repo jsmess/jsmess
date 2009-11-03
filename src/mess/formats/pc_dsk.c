@@ -44,7 +44,7 @@ static floperr_t pc_dsk_compute_geometry(floppy_image *floppy, struct basicdsk_g
 	memset(geometry, 0, sizeof(*geometry));
 	size = floppy_image_size(floppy);
 
-	for (i = 0; i < sizeof(disk_sizes) / sizeof(disk_sizes[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(disk_sizes); i++)
 	{
 		if (disk_sizes[i].image_size == size)
 		{

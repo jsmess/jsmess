@@ -46,7 +46,7 @@ int cmd_testsuite(struct command *c, int argc, char *argv[])
 	while(!feof(inifile))
 	{
 		buffer[0] = '\0';
-		fgets(buffer, sizeof(buffer) / sizeof(buffer[0]), inifile);
+		fgets(buffer, ARRAY_LENGTH(buffer), inifile);
 
 		if (buffer[0] != '\0')
 		{

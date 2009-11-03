@@ -121,7 +121,7 @@ void DevView_Refresh(HWND hwndDevView)
 				pDevViewInfo->config->driver_index,
 				pDevViewInfo->config->mconfig,
 				pDevViewInfo->pEntries[i].dev,
-				szBuffer, sizeof(szBuffer) / sizeof(szBuffer[0]));
+				szBuffer, ARRAY_LENGTH(szBuffer));
 
 			if (!pszSelection)
 				pszSelection = TEXT("");
@@ -325,11 +325,11 @@ static void DevView_ButtonClick(HWND hwndDevView, struct DevViewEntry *pEnt, HWN
 	{
 		case 1:
 			b = pDevViewInfo->pCallbacks->pfnGetOpenFileName(hwndDevView, pDevViewInfo->config->mconfig, pEnt->dev,
-				szPath, sizeof(szPath) / sizeof(szPath[0]));
+				szPath, ARRAY_LENGTH(szPath));
 			break;
 		case 2:
 			b = pDevViewInfo->pCallbacks->pfnGetCreateFileName(hwndDevView, pDevViewInfo->config->mconfig, pEnt->dev,
-				szPath, sizeof(szPath) / sizeof(szPath[0]));
+				szPath, ARRAY_LENGTH(szPath));
 			break;
 		case 3:
 			memset(szPath, 0, sizeof(szPath));

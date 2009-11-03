@@ -1245,7 +1245,7 @@ static imgtoolerr_t ti990_image_nextenum(imgtool_directory *enumeration, imgtool
 	else
 	{
 #if 0
-		fname_to_str(ent->filename, iter->xdr[iter->level].fdr.fnm, sizeof(ent->filename) / sizeof(ent->filename[0]));
+		fname_to_str(ent->filename, iter->xdr[iter->level].fdr.fnm, ARRAY_LENGTH(ent->filename));
 #else
 		{
 			int i;
@@ -1255,11 +1255,11 @@ static imgtoolerr_t ti990_image_nextenum(imgtool_directory *enumeration, imgtool
 			for (i=0; i<iter->level; i++)
 			{
 				fname_to_str(buf, iter->xdr[i].fdr.fnm, 9);
-				strncat(ent->filename, buf, sizeof(ent->filename) / sizeof(ent->filename[0]) - 1);
-				strncat(ent->filename, ".", sizeof(ent->filename) / sizeof(ent->filename[0]) - 1);
+				strncat(ent->filename, buf, ARRAY_LENGTH(ent->filename) - 1);
+				strncat(ent->filename, ".", ARRAY_LENGTH(ent->filename) - 1);
 			}
 			fname_to_str(buf, iter->xdr[iter->level].fdr.fnm, 9);
-			strncat(ent->filename, buf, sizeof(ent->filename) / sizeof(ent->filename[0]) - 1);
+			strncat(ent->filename, buf, ARRAY_LENGTH(ent->filename) - 1);
 		}
 #endif
 
@@ -1267,7 +1267,7 @@ static imgtoolerr_t ti990_image_nextenum(imgtool_directory *enumeration, imgtool
 		flag = get_UINT16BE(iter->xdr[iter->level].fdr.flg);
 		if (flag & fdr_flg_cdr)
 		{
-			snprintf(ent->attr, sizeof(ent->attr) / sizeof(ent->attr[0]), "CHANNEL");
+			snprintf(ent->attr, ARRAY_LENGTH(ent->attr), "CHANNEL");
 
 			ent->filesize = 0;
 		}
@@ -1285,7 +1285,7 @@ static imgtoolerr_t ti990_image_nextenum(imgtool_directory *enumeration, imgtool
 
 			fname_to_str(buf, target_fdr.fnm, 9);
 
-			snprintf(ent->attr, sizeof(ent->attr) / sizeof(ent->attr[0]), "ALIAS OF %s", buf);
+			snprintf(ent->attr, ARRAY_LENGTH(ent->attr), "ALIAS OF %s", buf);
 
 			ent->filesize = 0;
 		}
@@ -1335,7 +1335,7 @@ static imgtoolerr_t ti990_image_nextenum(imgtool_directory *enumeration, imgtool
 				}
 				break;
 			}
-			snprintf(ent->attr, sizeof(ent->attr) / sizeof(ent->attr[0]),
+			snprintf(ent->attr, ARRAY_LENGTH(ent->attr),
 						"%s %c %s%s%s%s%s", fmt, (flag & fdr_flg_all) ? 'N' : 'C', type,
 							(flag & fdr_flg_blb) ? "" : " BLK",
 							(flag & fdr_flg_tmp) ? " TMP" : "",

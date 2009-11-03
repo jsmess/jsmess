@@ -40,7 +40,7 @@ static const char *const error_strings[] =
 
 static const char *chd_get_error_string(int chderr)
 {
-	if ((chderr < 0 ) || (chderr >= (sizeof(error_strings) / sizeof(error_strings[0]))))
+	if ((chderr < 0 ) || (chderr >= ARRAY_LENGTH(error_strings)))
 		return NULL;
 	return error_strings[chderr];
 }
