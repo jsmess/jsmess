@@ -894,6 +894,11 @@ ROM_START( macse )
 	ROM_LOAD16_WORD( "macse.rom",  0x00000, 0x40000, CRC(0f7ff80c) SHA1(58532b7d0d49659fd5228ac334a1b094f0241968))
 ROM_END
 
+ROM_START( macsefd )
+	ROM_REGION16_BE(0x40000, "user1", 0)
+        ROM_LOAD( "be06e171.rom", 0x000000, 0x040000, CRC(f530cb10) SHA1(d3670a90273d12e53d86d1228c068cb660b8c9d1) )
+ROM_END
+
 ROM_START( macclasc )
 	ROM_REGION16_BE(0x80000, "user1", 0)
         ROM_LOAD( "a49f9914.rom", 0x000000, 0x080000, CRC(510d7d38) SHA1(ccd10904ddc0fb6a1d216b2e9effd5ec6cf5a83d) )
@@ -978,6 +983,7 @@ COMP( 1984, mac512k,  mac128k,  0,	mac512ke, macplus,  mac128k512k, 0,     "Appl
 COMP( 1986, mac512ke, macplus,  0,	mac512ke, macplus,  mac512ke,	 0,     "Apple Computer", "Macintosh 512ke", 0 )
 COMP( 1986, macplus,  0,	0,	macplus,  macplus,  macplus,	 0,     "Apple Computer", "Macintosh Plus",  0 )
 COMP( 1987, macse,    0,	0,	macse,    macplus,  macse,	 0,     "Apple Computer", "Macintosh SE",  0 )
+COMP( 1987, macsefd,  0,	0,	macse,    macplus,  macse,	 0,     "Apple Computer", "Macintosh SE (FDHD)",  0 )
 COMP( 1987, macii,    0,	0,	macii,    macplus,  macii,	 0,     "Apple Computer", "Macintosh II",  GAME_NOT_WORKING )
 COMP( 1988, mac2fdhd, macii,	0,	macii,    macplus,  maciifdhd,	 0,     "Apple Computer", "Macintosh II (FDHD)",  GAME_NOT_WORKING )
 COMP( 1988, maciix,   macii, 	0,	maciix,   macplus,  maciix,	 0,     "Apple Computer", "Macintosh IIx",  GAME_NOT_WORKING )
