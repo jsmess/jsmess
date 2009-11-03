@@ -305,42 +305,47 @@ static STATE_POSTLOAD( apple2_update_memory_postload )
 
 READ8_HANDLER(apple2_c0xx_r)
 {
-	static const read8_space_func handlers[] =
+	if(!space->debugger_access)
 	{
-		apple2_c00x_r,
-		apple2_c01x_r,
-		apple2_c02x_r,
-		apple2_c03x_r,
-		NULL,
-		apple2_c05x_r,
-		apple2_c06x_r,
-		apple2_c07x_r
-	};
-	UINT8 result = 0x00;
-	int slotnum;
-	const device_config *slotdevice;
+		static const read8_space_func handlers[] =
+		{
+			apple2_c00x_r,
+			apple2_c01x_r,
+			apple2_c02x_r,
+			apple2_c03x_r,
+			NULL,
+			apple2_c05x_r,
+			apple2_c06x_r,
+			apple2_c07x_r
+		};
+		UINT8 result = 0x00;
+		int slotnum;
+		const device_config *slotdevice;
 
-	offset &= 0xFF;
+		offset &= 0xFF;
 
-	if (offset < 0x80)
-	{
-		/* normal handler */
-		if (handlers[offset / 0x10])
-			result = handlers[offset / 0x10](space, offset % 0x10);
+		if (offset < 0x80)
+		{
+			/* normal handler */
+			if (handlers[offset / 0x10])
+				result = handlers[offset / 0x10](space, offset % 0x10);
+		}
+		else
+		{
+			/* slot handler; identify the slot number */
+			slotnum = (offset - 0x80) / 0x10;
+
+			/* now identify the device */
+			slotdevice = apple2_slot(space->machine, slotnum);
+
+			/* and if we can, read from the slot */
+			if (slotdevice != NULL)
+				result = apple2_slot_r(slotdevice, offset % 0x10);
+		}
+		return result;
 	}
-	else
-	{
-		/* slot handler; identify the slot number */
-		slotnum = (offset - 0x80) / 0x10;
 
-		/* now identify the device */
-		slotdevice = apple2_slot(space->machine, slotnum);
-
-		/* and if we can, read from the slot */
-		if (slotdevice != NULL)
-			result = apple2_slot_r(slotdevice, offset % 0x10);
-	}
-	return result;
+	return 0;
 }
 
 
@@ -835,12 +840,15 @@ static WRITE8_HANDLER ( apple2_auxram2000_w )
 
 READ8_HANDLER ( apple2_c00x_r )
 {
-	UINT8 result;
+	UINT8 result = 0;
 
-	/* Read the keyboard data and strobe */
-	profiler_mark_start(PROFILER_C00X);
-	result = AY3600_keydata_strobe_r();
-	profiler_mark_end();
+	if(!space->debugger_access)
+	{
+		/* Read the keyboard data and strobe */
+		profiler_mark_start(PROFILER_C00X);
+		result = AY3600_keydata_strobe_r();
+		profiler_mark_end();
+	}
 
 	return result;
 }
@@ -885,30 +893,34 @@ READ8_HANDLER ( apple2_c01x_r )
 {
 	UINT8 result = apple2_getfloatingbusvalue(space->machine) & 0x7F;
 
-	profiler_mark_start(PROFILER_C01X);
-
-	LOG(("a2 softswitch_r: %04x\n", offset + 0xc010));
-	switch (offset)
+	if(!space->debugger_access)
 	{
-		case 0x00:			result |= AY3600_anykey_clearstrobe_r();		break;
-		case 0x01:			result |= (a2 & VAR_LCRAM2)		? 0x80 : 0x00;	break;
-		case 0x02:			result |= (a2 & VAR_LCRAM)		? 0x80 : 0x00;	break;
-		case 0x03:			result |= (a2 & VAR_RAMRD)		? 0x80 : 0x00;	break;
-		case 0x04:			result |= (a2 & VAR_RAMWRT)		? 0x80 : 0x00;	break;
-		case 0x05:			result |= (a2 & VAR_INTCXROM)	? 0x80 : 0x00;	break;
-		case 0x06:			result |= (a2 & VAR_ALTZP)		? 0x80 : 0x00;	break;
-		case 0x07:			result |= (a2 & VAR_SLOTC3ROM)	? 0x80 : 0x00;	break;
-		case 0x08:			result |= (a2 & VAR_80STORE)	? 0x80 : 0x00;	break;
-		case 0x09:			result |= !video_screen_get_vblank(space->machine->primary_screen)		? 0x80 : 0x00;	break;
-		case 0x0A:			result |= (a2 & VAR_TEXT)		? 0x80 : 0x00;	break;
-		case 0x0B:			result |= (a2 & VAR_MIXED)		? 0x80 : 0x00;	break;
-		case 0x0C:			result |= (a2 & VAR_PAGE2)		? 0x80 : 0x00;	break;
-		case 0x0D:			result |= (a2 & VAR_HIRES)		? 0x80 : 0x00;	break;
-		case 0x0E:			result |= (a2 & VAR_ALTCHARSET)	? 0x80 : 0x00;	break;
-		case 0x0F:			result |= (a2 & VAR_80COL)		? 0x80 : 0x00;	break;
+		profiler_mark_start(PROFILER_C01X);
+
+		LOG(("a2 softswitch_r: %04x\n", offset + 0xc010));
+		switch (offset)
+		{
+			case 0x00:			result |= AY3600_anykey_clearstrobe_r();		break;
+			case 0x01:			result |= (a2 & VAR_LCRAM2)		? 0x80 : 0x00;	break;
+			case 0x02:			result |= (a2 & VAR_LCRAM)		? 0x80 : 0x00;	break;
+			case 0x03:			result |= (a2 & VAR_RAMRD)		? 0x80 : 0x00;	break;
+			case 0x04:			result |= (a2 & VAR_RAMWRT)		? 0x80 : 0x00;	break;
+			case 0x05:			result |= (a2 & VAR_INTCXROM)	? 0x80 : 0x00;	break;
+			case 0x06:			result |= (a2 & VAR_ALTZP)		? 0x80 : 0x00;	break;
+			case 0x07:			result |= (a2 & VAR_SLOTC3ROM)	? 0x80 : 0x00;	break;
+			case 0x08:			result |= (a2 & VAR_80STORE)	? 0x80 : 0x00;	break;
+			case 0x09:			result |= !video_screen_get_vblank(space->machine->primary_screen)		? 0x80 : 0x00;	break;
+			case 0x0A:			result |= (a2 & VAR_TEXT)		? 0x80 : 0x00;	break;
+			case 0x0B:			result |= (a2 & VAR_MIXED)		? 0x80 : 0x00;	break;
+			case 0x0C:			result |= (a2 & VAR_PAGE2)		? 0x80 : 0x00;	break;
+			case 0x0D:			result |= (a2 & VAR_HIRES)		? 0x80 : 0x00;	break;
+			case 0x0E:			result |= (a2 & VAR_ALTCHARSET)	? 0x80 : 0x00;	break;
+			case 0x0F:			result |= (a2 & VAR_80COL)		? 0x80 : 0x00;	break;
+		}
+
+		profiler_mark_end();
 	}
 
-	profiler_mark_end();
 	return result;
 }
 
@@ -934,7 +946,10 @@ WRITE8_HANDLER( apple2_c01x_w )
 
 READ8_HANDLER( apple2_c02x_r )
 {
-	apple2_c02x_w(space, offset, 0);
+	if(!space->debugger_access)
+	{
+		apple2_c02x_w(space, offset, 0);
+	}
 	return apple2_getfloatingbusvalue(space->machine);
 }
 
@@ -962,15 +977,22 @@ WRITE8_HANDLER( apple2_c02x_w )
 
 READ8_HANDLER ( apple2_c03x_r )
 {
-	if (!offset)
+	if(!space->debugger_access)
 	{
-		const device_config *speaker_device = devtag_get_device(space->machine, "a2speaker");
+		if (!offset)
+		{
+			const device_config *speaker_device = devtag_get_device(space->machine, "a2speaker");
 
-		if (a2_speaker_state == 1)
-			a2_speaker_state = 0;
-		else
-			a2_speaker_state = 1;
-		speaker_level_w(speaker_device, a2_speaker_state);
+			if (a2_speaker_state == 1)
+			{
+				a2_speaker_state = 0;
+			}
+			else
+			{
+				a2_speaker_state = 1;
+			}
+			speaker_level_w(speaker_device, a2_speaker_state);
+		}
 	}
 	return apple2_getfloatingbusvalue(space->machine);
 }
@@ -994,14 +1016,19 @@ WRITE8_HANDLER ( apple2_c03x_w )
 
 READ8_HANDLER ( apple2_c05x_r )
 {
-	UINT32 mask;
+	if(!space->debugger_access)
+	{
+		UINT32 mask;
 
-	/* ANx has reverse SET logic */
-	if (offset >= 8)
-		offset ^= 1;
+		/* ANx has reverse SET logic */
+		if (offset >= 8)
+		{
+			offset ^= 1;
+		}
 
-	mask = 0x100 << (offset / 2);
-	apple2_setvar(space->machine, (offset & 1) ? mask : 0, mask);
+		mask = 0x100 << (offset / 2);
+		apple2_setvar(space->machine, (offset & 1) ? mask : 0, mask);
+	}
 	return apple2_getfloatingbusvalue(space->machine);
 }
 
@@ -1025,41 +1052,44 @@ WRITE8_HANDLER ( apple2_c05x_w )
 READ8_HANDLER ( apple2_c06x_r )
 {
 	int result = 0;
-	switch (offset & 0x0F)
+	if(!space->debugger_access)
 	{
-		case 0x01:
-			/* Open-Apple/Joystick button 0 */
-			result = apple2_pressed_specialkey(space->machine, SPECIALKEY_BUTTON0);
-			break;
-		case 0x02:
-			/* Closed-Apple/Joystick button 1 */
-			result = apple2_pressed_specialkey(space->machine, SPECIALKEY_BUTTON1);
-			break;
-		case 0x03:
-			/* Joystick button 2. Later revision motherboards connected this to SHIFT also */
-			result = apple2_pressed_specialkey(space->machine, SPECIALKEY_BUTTON2);
-			break;
-		case 0x04:
-			/* X Joystick 1 axis */
-			result = attotime_to_double(timer_get_time(space->machine)) < joystick_x1_time;
-			break;
-		case 0x05:
-			/* Y Joystick 1 axis */
-			result = attotime_to_double(timer_get_time(space->machine)) < joystick_y1_time;
-			break;
-		case 0x06:
-			/* X Joystick 2 axis */
-			result = attotime_to_double(timer_get_time(space->machine)) < joystick_x2_time;
-			break;
-		case 0x07:
-			/* Y Joystick 2 axis */
-			result = attotime_to_double(timer_get_time(space->machine)) < joystick_y2_time;
-			break;
-		default:
-			/* c060 Empty Cassette head read
-             * and any other non joystick c06 port returns this according to applewin
-             */
-			return apple2_getfloatingbusvalue(space->machine);
+		switch (offset & 0x0F)
+		{
+			case 0x01:
+				/* Open-Apple/Joystick button 0 */
+				result = apple2_pressed_specialkey(space->machine, SPECIALKEY_BUTTON0);
+				break;
+			case 0x02:
+				/* Closed-Apple/Joystick button 1 */
+				result = apple2_pressed_specialkey(space->machine, SPECIALKEY_BUTTON1);
+				break;
+			case 0x03:
+				/* Joystick button 2. Later revision motherboards connected this to SHIFT also */
+				result = apple2_pressed_specialkey(space->machine, SPECIALKEY_BUTTON2);
+				break;
+			case 0x04:
+				/* X Joystick 1 axis */
+				result = attotime_to_double(timer_get_time(space->machine)) < joystick_x1_time;
+				break;
+			case 0x05:
+				/* Y Joystick 1 axis */
+				result = attotime_to_double(timer_get_time(space->machine)) < joystick_y1_time;
+				break;
+			case 0x06:
+				/* X Joystick 2 axis */
+				result = attotime_to_double(timer_get_time(space->machine)) < joystick_x2_time;
+				break;
+			case 0x07:
+				/* Y Joystick 2 axis */
+				result = attotime_to_double(timer_get_time(space->machine)) < joystick_y2_time;
+				break;
+			default:
+				/* c060 Empty Cassette head read
+    	         * and any other non joystick c06 port returns this according to applewin
+    	         */
+				return apple2_getfloatingbusvalue(space->machine);
+		}
 	}
 	return result ? 0x80 : 0x00;
 }
@@ -1072,15 +1102,18 @@ READ8_HANDLER ( apple2_c06x_r )
 
 READ8_HANDLER ( apple2_c07x_r )
 {
-	double x_calibration = attotime_to_double(ATTOTIME_IN_USEC(12));
-	double y_calibration = attotime_to_double(ATTOTIME_IN_USEC(13));
-
-	if (offset == 0)
+	if(!space->debugger_access)
 	{
-		joystick_x1_time = attotime_to_double(timer_get_time(space->machine)) + x_calibration * input_port_read(space->machine, "joystick_1_x");
-		joystick_y1_time = attotime_to_double(timer_get_time(space->machine)) + y_calibration * input_port_read(space->machine, "joystick_1_y");
-		joystick_x2_time = attotime_to_double(timer_get_time(space->machine)) + x_calibration * input_port_read(space->machine, "joystick_2_x");
-		joystick_y2_time = attotime_to_double(timer_get_time(space->machine)) + y_calibration * input_port_read(space->machine, "joystick_2_y");
+		double x_calibration = attotime_to_double(ATTOTIME_IN_USEC(12));
+		double y_calibration = attotime_to_double(ATTOTIME_IN_USEC(13));
+
+		if (offset == 0)
+		{
+			joystick_x1_time = attotime_to_double(timer_get_time(space->machine)) + x_calibration * input_port_read(space->machine, "joystick_1_x");
+			joystick_y1_time = attotime_to_double(timer_get_time(space->machine)) + y_calibration * input_port_read(space->machine, "joystick_1_y");
+			joystick_x2_time = attotime_to_double(timer_get_time(space->machine)) + x_calibration * input_port_read(space->machine, "joystick_2_x");
+			joystick_y2_time = attotime_to_double(timer_get_time(space->machine)) + y_calibration * input_port_read(space->machine, "joystick_2_y");
+		}
 	}
 	return 0;
 }
