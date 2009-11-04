@@ -68,6 +68,8 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 	}
 }
 
+static UINT32 *lcd_buffer;
+
 // Flash TLB
 static READ32_HANDLER( ps_ftlb_r );
 static WRITE32_HANDLER( ps_ftlb_w );
@@ -86,6 +88,12 @@ static WRITE32_HANDLER( ps_timer_w );
 // Clock
 static READ32_HANDLER( ps_clock_r );
 static WRITE32_HANDLER( ps_clock_w );
+
+// RTC
+static TIMER_CALLBACK( rtc_int_reset );
+static TIMER_CALLBACK( rtc_tick );
+static READ32_HANDLER( ps_rtc_r );
+static WRITE32_HANDLER( ps_rtc_w );
 
 typedef struct
 {
@@ -131,6 +139,7 @@ typedef struct
 	UINT32 count;
 	UINT32 control;
 	emu_timer *timer;
+	emu_timer *int_reset_timer; // Probably not right
 } ps_timer_t;
 
 typedef struct
@@ -153,6 +162,7 @@ typedef struct
 	UINT32 time;
 	UINT32 date;
 	emu_timer *timer;
+	emu_timer *int_timer;
 } ps_rtc_regs_t;
 
 static ps_ftlb_regs_t ftlb_regs;
@@ -487,10 +497,16 @@ static WRITE32_HANDLER( ps_clock_w )
 	}
 }
 
+static TIMER_CALLBACK( rtc_int_reset )
+{
+	ps_intc_set_interrupt_line(machine, PS_INT_RTC, 0); // Probably not right
+}
+
 static TIMER_CALLBACK( rtc_tick )
 {
 	ps_intc_set_interrupt_line(machine, PS_INT_RTC, 1);
 	timer_adjust_oneshot(rtc_regs.timer, ATTOTIME_IN_HZ(1), 0);
+	timer_adjust_oneshot(rtc_regs.int_timer, ATTOTIME_IN_HZ(10000), 0); // Probably not right
 }
 
 static READ32_HANDLER( ps_rtc_r )
@@ -504,10 +520,10 @@ static READ32_HANDLER( ps_rtc_r )
 			verboselog(space->machine, 0, "ps_rtc_r: RTC Control = %08x & %08x\n", rtc_regs.control, mem_mask );
 			return rtc_regs.control;
 		case 0x0008/4:
-			verboselog(space->machine, 0, "ps_rtc_r: RTC Time = %08x & %08x\n", 0x01010101, mem_mask );
-			return 0x01010101;
+			verboselog(space->machine, 0, "ps_rtc_r: RTC Time = %08x & %08x\n", 0x01000000, mem_mask );
+			return 0x01000000;
 		case 0x000c/4:
-			verboselog(space->machine, 0, "ps_rtc_r: RTC Date = %08x & %08x\n", 0x00990101, mem_mask );
+			verboselog(space->machine, 0, "ps_rtc_r: RTC Date = %08x & %08x\n", 0x19990101, mem_mask );
 			return 0x00990101;
 		default:
 			verboselog(space->machine, 0, "ps_rtc_r: Unknown Register %08x & %08x\n", 0x0b800000 + (offset << 2), mem_mask );
@@ -550,6 +566,7 @@ static ADDRESS_MAP_START(pockstat_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x0a800000, 0x0a80002b) AM_READWRITE(ps_timer_r, ps_timer_w)
 	AM_RANGE(0x0b000000, 0x0b000007) AM_READWRITE(ps_clock_r, ps_clock_w)
 	AM_RANGE(0x0b800000, 0x0b80000f) AM_READWRITE(ps_rtc_r, ps_rtc_w)
+	AM_RANGE(0x0d000100, 0x0d00017f) AM_RAM AM_BASE(&lcd_buffer)
 /*  AM_RANGE(0x02000000, 0x0201ffff) Flash ROM
     AM_RANGE(0x08000000, 0x0801ffff) Same as 0x02 above. Mirrors every 128KB.
     AM_RANGE(0x0b000000, 0x0b000003) Internal CPU Clock control
@@ -576,6 +593,9 @@ static MACHINE_START( pockstat )
 
 	rtc_regs.timer = timer_alloc(machine, rtc_tick, 0);
 	timer_adjust_oneshot(rtc_regs.timer, attotime_never, index);
+
+	rtc_regs.int_timer = timer_alloc(machine, rtc_int_reset, 0);
+	timer_adjust_oneshot(rtc_regs.int_timer, attotime_never, index);
 }
 
 static MACHINE_RESET( pockstat )
@@ -583,12 +603,25 @@ static MACHINE_RESET( pockstat )
 	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, 0x4000000);
 }
 
-static VIDEO_START( pockstat )
-{
-}
-
 static VIDEO_UPDATE( pockstat )
 {
+	int x = 0;
+	int y = 0;
+	for(y = 0; y < 32; y++)
+	{
+		UINT32 *scanline = BITMAP_ADDR32(bitmap, y, 0);
+		for(x = 0; x < 32; x++)
+		{
+			if(lcd_buffer[y] & (1 << x))
+			{
+				scanline[x] = 0x00000000;
+			}
+			else
+			{
+				scanline[x] = 0x00ffffff;
+			}
+		}
+	}
 	return 0;
 }
 
@@ -604,13 +637,13 @@ static MACHINE_DRIVER_START( pockstat )
 	MDRV_SCREEN_ADD("screen", LCD)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32, 32)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32-1, 0, 32-1)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(pockstat)
+	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(pockstat)
 MACHINE_DRIVER_END
 
