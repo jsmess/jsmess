@@ -632,8 +632,9 @@ const game_driver * const drivers[] =
 
     DRIVER( x1 )        /* 1982 Sharp X1                                    */
     DRIVER( x1ck )      /* 1984 Sharp X1Ck                                  */
-    DRIVER( x1turbo )   /* 1984 Sharp X1 Turbo                              */
-    DRIVER( x1turboz )  /* 1986 Sharp X1 TurboZ                             */
+    DRIVER( x1turbo )   /* 1984 Sharp X1 Turbo (Model 10)                   */
+    DRIVER( x1turbo40 ) /* 1985 Sharp X1 Turbo (Model 40)                   */
+//  DRIVER( x1turboz )  /* 1986 Sharp X1 TurboZ                             */
 
     DRIVER( x68000 )    /* Sharp X68000 (1987)                              */
     DRIVER( x68kxvi )   /* Sharp X68000 XVI (1991)                          */

@@ -1001,11 +1001,12 @@ static READ8_HANDLER( x1_pcg_r )
 
 	if(addr == 0)
 	{
-		gfx_data = memory_region(space->machine, "cgrom");
-		res = gfx_data[0x0000+bios_offset+(pcg_write_addr*8)];
+		printf("%04x %02x\n",pcg_write_addr,bios_offset);
+		gfx_data = memory_region(space->machine, "font");
+		res = gfx_data[0x0800+bios_offset+(pcg_write_addr*0x20)];
 
 		bios_offset++;
-		bios_offset&=0x7;
+		bios_offset&=0x1f;
 		return res;
 	}
 	else
@@ -1228,14 +1229,14 @@ static UINT32 kanji_addr;
  */
 static READ8_HANDLER( x1_kanji_r )
 {
-	UINT8 *kanji_rom = memory_region(space->machine, "cgrom");
+	UINT8 *kanji_rom = memory_region(space->machine, "kanji");
 	UINT8 res;
 
 	//res = 0;
 
 	//printf("%08x\n",kanji_addr*0x20);
 
-	res = kanji_rom[(kanji_addr*0x20)+(kanji_count)+0x2800];
+	res = kanji_rom[(kanji_addr*0x20)+(kanji_count)];
 	kanji_count++;
 	kanji_count&=0x1f;
 
@@ -1246,7 +1247,8 @@ static READ8_HANDLER( x1_kanji_r )
 
 static WRITE8_HANDLER( x1_kanji_w )
 {
-	//printf("%04x %02x W\n",offset,data);
+//	if(offset < 2)
+//	printf("%04x %02x W\n",offset,data);
 	switch(offset)
 	{
 		case 0: kanji_addr_l = (data & 0xff); break;
@@ -1880,22 +1882,21 @@ static const gfx_layout x1_pcg_8x8 =
 
 static const gfx_layout x1_chars_16x16 =
 {
-	16,16,
+	8,8,
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	16*16
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
 };
 
 /* decoded for debugging purpose, this will be nuked in the end... */
 static GFXDECODE_START( x1 )
 	GFXDECODE_ENTRY( "cgrom",   0x00000, x1_chars_8x8,    0x200, 0x20 )
 	GFXDECODE_ENTRY( "pcg",     0x00000, x1_pcg_8x8,      0x000, 1 )
-	GFXDECODE_ENTRY( "cgrom",   0x01800, x1_chars_8x16,   0x200, 0x20 )
-//  GFXDECODE_ENTRY( "kanji",   0x27000, x1_chars_16x16,  0, 0x20 ) //needs to be checked when the ROM will be redumped
-	GFXDECODE_ENTRY( "cgrom",   0x02800, x1_chars_16x16,  0, 0x20 ) //needs to be checked when the ROM will be redumped
+	GFXDECODE_ENTRY( "font",    0x00000, x1_chars_8x16,   0x200, 0x20 )
+	GFXDECODE_ENTRY( "kanji",   0x00000, x1_chars_16x16,  0, 0x20 )
 GFXDECODE_END
 
 /*************************************
@@ -2198,13 +2199,17 @@ MACHINE_DRIVER_END
 
 	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
+	ROM_REGION(0x2000, "font", 0) //TODO: this contains 8x16 charset only, maybe it's possible that it derivates a 8x8 charset by skipping gfx lines?
+	ROM_LOAD( "ank.fnt", 0x0000, 0x2000, BAD_DUMP CRC(19689fbd) SHA1(0d4e072cd6195a24a1a9b68f1d37500caa60e599) )
+
 	ROM_REGION(0x4d600, "cgrom", 0)
 	ROM_LOAD("fnt0808.x1", 0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
 	ROM_RELOAD(            0x00800, 0x00800)
 	ROM_RELOAD(            0x01000, 0x00800)
-	ROM_LOAD("fnt0816.x1", 0x01800, 0x1000, BAD_DUMP CRC(34818d54) SHA1(2c5fdd73249421af5509e48a94c52c4e423402bf) )
 
-	ROM_REGION(0x4ac00, "kanji", ROMREGION_ERASEFF)
+	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x20000, "raw_kanji", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( x1ck )
@@ -2219,15 +2224,17 @@ ROM_START( x1ck )
 
 	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
+	ROM_REGION(0x2000, "font", 0) //TODO: this contains 8x16 charset only, maybe it's possible that it derivates a 8x8 charset by skipping gfx lines?
+	ROM_LOAD( "ank.fnt", 0x0000, 0x2000, BAD_DUMP CRC(19689fbd) SHA1(0d4e072cd6195a24a1a9b68f1d37500caa60e599) )
+
 	ROM_REGION(0x4d600, "cgrom", 0)
 	ROM_LOAD("fnt0808.x1", 0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
 	ROM_RELOAD(            0x00800, 0x00800)
 	ROM_RELOAD(            0x01000, 0x00800)
-	ROM_LOAD("fnt0816.x1", 0x01800, 0x01000, BAD_DUMP CRC(34818d54) SHA1(2c5fdd73249421af5509e48a94c52c4e423402bf) )
 
-	ROM_REGION(0x4ac00, "kanji", 0)
-	/* This is clearly a bad dump: size does not make sense and from 0x28000 on there are only 0xff */
-	ROM_LOAD("kanji2.rom", 0x0000, 0x4ac00, BAD_DUMP CRC(33800ef2) SHA1(fc07a31ee30db312c7995e887519a9173cb38c0d) )
+	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x20000, "raw_kanji", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( x1turbo )
@@ -2239,53 +2246,75 @@ ROM_START( x1turbo )
 
 	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
+	ROM_REGION(0x2000, "font", 0) //TODO: this contains 8x16 charset only, maybe it's possible that it derivates a 8x8 charset by skipping gfx lines?
+	ROM_LOAD( "ank.fnt", 0x0000, 0x2000, CRC(19689fbd) SHA1(0d4e072cd6195a24a1a9b68f1d37500caa60e599) )
+
 	ROM_REGION(0x4d600, "cgrom", 0)
-	/* This should be larger... hence, we are missing something (maybe part of the other fnt roms?) */
 	ROM_LOAD("fnt0808_turbo.x1", 0x00000, 0x00800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
 	ROM_RELOAD(            0x00800, 0x00800)
 	ROM_RELOAD(            0x01000, 0x00800)
-	ROM_LOAD("fnt0816.x1", 0x01800, 0x01000, BAD_DUMP CRC(34818d54) SHA1(2c5fdd73249421af5509e48a94c52c4e423402bf) )
-	ROM_LOAD("fnt1616.x1", 0x02800, 0x4ac00, BAD_DUMP CRC(46826745) SHA1(b9e6c320611f0842df6f45673c47c3e23bc14272) )
 
-	ROM_REGION(0x4ac00, "kanji", 0)
-	/* This is clearly a bad dump: size does not make sense and from 0x28000 on there are only 0xff */
-	ROM_LOAD("kanji2.rom", 0x0000, 0x4ac00, BAD_DUMP CRC(33800ef2) SHA1(fc07a31ee30db312c7995e887519a9173cb38c0d) )
+	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x20000, "raw_kanji", ROMREGION_ERASEFF)
+	ROM_LOAD("kanji4.rom", 0x00000, 0x8000, CRC(3e39de89) SHA1(d3fd24892bb1948c4697dedf5ff065ff3eaf7562) )
+	ROM_LOAD("kanji2.rom", 0x08000, 0x8000, CRC(e710628a) SHA1(103bbe459dc8da27a9400aa45b385255c18fcc75) )
+	ROM_LOAD("kanji3.rom", 0x10000, 0x8000, CRC(8cae13ae) SHA1(273f3329c70b332f6a49a3a95e906bbfe3e9f0a1) )
+	ROM_LOAD("kanji1.rom", 0x18000, 0x8000, CRC(5874f70b) SHA1(dad7ada1b70c45f1e9db11db273ef7b385ef4f17) )
 ROM_END
 
-/* X1 Turbo Z: IPL is supposed to be the same as X1 Turbo, but which dumps should be in "cgrom"?
-Many emulators come with fnt0816.x1 & fnt1616.x1 but I am not sure about what was present on the real
-X1 Turbo / Turbo Z */
-ROM_START( x1turboz )
+ROM_START( x1turbo40 )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "ipl.x1t", 0x0000, 0x8000, CRC(2e8b767c) SHA1(44620f57a25f0bcac2b57ca2b0f1ebad3bf305d3) )
+	ROM_LOAD( "ipl.bin", 0x0000, 0x8000, CRC(112f80a2) SHA1(646cc3fb5d2d24ff4caa5167b0892a4196e9f843) )
 
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x4d600, "cgrom", 0)
+	ROM_REGION(0x2000, "font", 0) //TODO: this contains 8x16 charset only, maybe it's possible that it derivates a 8x8 charset by skipping gfx lines?
+	ROM_LOAD( "ank.fnt", 0x0000, 0x2000, CRC(19689fbd) SHA1(0d4e072cd6195a24a1a9b68f1d37500caa60e599) )
+
+	ROM_REGION(0x1800, "cgrom", 0)
 	ROM_LOAD("fnt0808_turbo.x1", 0x0000, 0x0800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
 	ROM_RELOAD(            0x00800, 0x00800)
 	ROM_RELOAD(            0x01000, 0x00800)
-	ROM_SYSTEM_BIOS( 0, "font1", "Font set 1" )
-	ROMX_LOAD("fnt0816.x1", 0x1800, 0x1000, CRC(34818d54) SHA1(2c5fdd73249421af5509e48a94c52c4e423402bf), ROM_BIOS(1) )
-	/* I strongly suspect this is not genuine */
-	ROMX_LOAD("fnt1616.x1", 0x02800, 0x4ac00, BAD_DUMP CRC(46826745) SHA1(b9e6c320611f0842df6f45673c47c3e23bc14272), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "font2", "Font set 2" )
-	ROMX_LOAD("fnt0816_a.x1", 0x01800, 0x1000, BAD_DUMP CRC(98db5a6b) SHA1(adf1492ef326b0f8820a3caa1915ad5ab8138f49), ROM_BIOS(2) )
-	/* I strongly suspect this is not genuine */
-	ROMX_LOAD("fnt1616_a.x1", 0x02800, 0x4ac00, BAD_DUMP CRC(bc5689ae) SHA1(a414116e261eb92bbdd407f63c8513257cd5a86f), ROM_BIOS(2) )
 
-	ROM_REGION(0x4ac00, "kanji", 0)
-	/* This is clearly a bad dump: size does not make sense and from 0x28000 on there are only 0xff */
-	ROM_LOAD("kanji2.rom", 0x0000, 0x4ac00, BAD_DUMP CRC(33800ef2) SHA1(fc07a31ee30db312c7995e887519a9173cb38c0d) )
+	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x20000, "raw_kanji", ROMREGION_ERASEFF)
+	ROM_LOAD("kanji4.rom", 0x00000, 0x8000, CRC(3e39de89) SHA1(d3fd24892bb1948c4697dedf5ff065ff3eaf7562) )
+	ROM_LOAD("kanji2.rom", 0x08000, 0x8000, CRC(e710628a) SHA1(103bbe459dc8da27a9400aa45b385255c18fcc75) )
+	ROM_LOAD("kanji3.rom", 0x10000, 0x8000, CRC(8cae13ae) SHA1(273f3329c70b332f6a49a3a95e906bbfe3e9f0a1) )
+	ROM_LOAD("kanji1.rom", 0x18000, 0x8000, CRC(5874f70b) SHA1(dad7ada1b70c45f1e9db11db273ef7b385ef4f17) )
 ROM_END
 
+
+/* Convert the 8-bytes interleaving into something usable by the write handler */
+static DRIVER_INIT( kanji )
+{
+	UINT32 i,j,k,l;
+	UINT8 *kanji = memory_region(machine,"kanji");
+	UINT8 *raw_kanji = memory_region(machine,"raw_kanji");
+
+	k = 0;
+	for(l=0;l<2;l++)
+	{
+		for(j=l*8;j<(l*8)+0x10000;j+=16)
+		{
+			for(i=0;i<8;i++)
+			{
+				kanji[j+i] = raw_kanji[k];
+				kanji[j+i+0x10000] = raw_kanji[0x10000+k];
+				k++;
+			}
+		}
+	}
+}
 
 
 /*    YEAR  NAME       PARENT  COMPAT   MACHINE  INPUT  INIT  CONFIG COMPANY   FULLNAME      FLAGS */
 COMP( 1982, x1,        0,      0,       x1,      x1,    0,    0,    "Sharp",  "X1 (CZ-800C)",         0)
 COMP( 1984, x1ck,      x1,     0,       x1,      x1,    0,    0,    "Sharp",  "X1Ck (CZ-804C)",       0)
-COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1,    0,    0,    "Sharp",  "X1 Turbo (CZ-850C)",   GAME_NOT_WORKING)
-COMP( 1986, x1turboz,  x1,     0,       x1turbo, x1,    0,    0,    "Sharp",  "X1 Turbo Z (CZ-880C)", GAME_NOT_WORKING)
+COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1,    kanji,0,    "Sharp",  "X1 Turbo (CZ-850C)",   GAME_NOT_WORKING) //model 10
+COMP( 1985, x1turbo40, x1,     0,       x1turbo, x1,    kanji,0,    "Sharp",  "X1 Turbo (CZ-862C)",   GAME_NOT_WORKING) //model 40
