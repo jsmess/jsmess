@@ -994,6 +994,7 @@ static READ8_HANDLER( x1_pcg_r )
 {
 	int addr;
 	int calc_pcg_offset;
+	static UINT32 kanji_offset;
 	static UINT8 bios_offset,pcg_index_r[3],res;
 	UINT8 *gfx_data;
 
@@ -1001,9 +1002,12 @@ static READ8_HANDLER( x1_pcg_r )
 
 	if(addr == 0)
 	{
-		printf("%04x %02x\n",pcg_write_addr,bios_offset);
-		gfx_data = memory_region(space->machine, "font");
-		res = gfx_data[0x0800+bios_offset+(pcg_write_addr*0x20)];
+//		printf("%04x %04x %02x\n",pcg_write_addr*4*8,pcg_write_addr,bios_offset);
+		gfx_data = memory_region(space->machine, "kanji");
+		if(bios_offset == 0)
+			kanji_offset = pcg_write_addr*4*8;
+
+		res = gfx_data[0x0000+bios_offset+kanji_offset];
 
 		bios_offset++;
 		bios_offset&=0x1f;
@@ -1223,9 +1227,7 @@ static UINT8 kanji_addr_l,kanji_addr_h,kanji_count;
 static UINT32 kanji_addr;
 
 /*
- *  FIXME: recheck this once that the kanji rom is redumped, it's confirmed bad for the following reasons:
- *  - A game lets you type stuff that's typed with this function, the index doesn't match with the typed char;
- *  - It search for chars that are out of the rom range;
+ *  FIXME: this makes no sense atm, the only game that uses this function so far is Hyper Olympics '84 disk version
  */
 static READ8_HANDLER( x1_kanji_r )
 {
@@ -1234,7 +1236,7 @@ static READ8_HANDLER( x1_kanji_r )
 
 	//res = 0;
 
-	//printf("%08x\n",kanji_addr*0x20);
+	printf("%08x\n",kanji_addr*0x20+kanji_count);
 
 	res = kanji_rom[(kanji_addr*0x20)+(kanji_count)];
 	kanji_count++;
@@ -1248,7 +1250,8 @@ static READ8_HANDLER( x1_kanji_r )
 static WRITE8_HANDLER( x1_kanji_w )
 {
 //	if(offset < 2)
-//	printf("%04x %02x W\n",offset,data);
+		printf("%04x %02x W\n",offset,data);
+
 	switch(offset)
 	{
 		case 0: kanji_addr_l = (data & 0xff); break;
@@ -1257,7 +1260,7 @@ static WRITE8_HANDLER( x1_kanji_w )
 			if(data)
 			{
 				kanji_addr = (kanji_addr_h<<8) | (kanji_addr_l);
-				kanji_addr &= 0x3fff; //<- temp kludge until the rom is redumped.
+				//kanji_addr &= 0x3fff; //<- temp kludge until the rom is redumped.
 				//printf("%08x\n",kanji_addr);
 				//kanji_addr+= kanji_count;
 			}
@@ -2290,7 +2293,7 @@ ROM_START( x1turbo40 )
 ROM_END
 
 
-/* Convert the 8-bytes interleaving into something usable by the write handler */
+/* Convert the ROM interleaving into something usable by the write handlers */
 static DRIVER_INIT( kanji )
 {
 	UINT32 i,j,k,l;
@@ -2300,9 +2303,9 @@ static DRIVER_INIT( kanji )
 	k = 0;
 	for(l=0;l<2;l++)
 	{
-		for(j=l*8;j<(l*8)+0x10000;j+=16)
+		for(j=l*16;j<(l*16)+0x10000;j+=32)
 		{
-			for(i=0;i<8;i++)
+			for(i=0;i<16;i++)
 			{
 				kanji[j+i] = raw_kanji[k];
 				kanji[j+i+0x10000] = raw_kanji[0x10000+k];
