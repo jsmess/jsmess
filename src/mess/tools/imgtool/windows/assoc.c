@@ -2,7 +2,7 @@
 #include <tchar.h>
 #include <ctype.h>
 #include <shlwapi.h>
-
+#include "mame.h"
 #include "assoc.h"
 
 
