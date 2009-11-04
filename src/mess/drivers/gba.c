@@ -1588,7 +1588,7 @@ static WRITE32_HANDLER( gba_io_w )
 
 //              printf("%08x: DMA(%d): %x to reg %d (mask %08x)\n", activecpu_get_pc(), ch, data, offset%3, ~mem_mask);
 
-				if (((offset % 3) == 2) && !ACCESSING_BITS_0_15)
+				if (((offset % 3) == 2) && ((~mem_mask & 0xffff0000) == 0))
 				{
 					int ctrl = data>>16;
 
