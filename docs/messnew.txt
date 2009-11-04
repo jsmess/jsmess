@@ -33,6 +33,9 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
+- [A5200] Changed default start button mapping to match other drivers 
+  ("1" key by default). [Justin Kerk]
+
 - [AT] Fixed keyboard for at486 driver, so it boots into bios.[Miodrag 
   Milanovic]
 
