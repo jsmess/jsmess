@@ -503,6 +503,8 @@ static MACHINE_DRIVER_START( act_f1 )
 
 	MDRV_VIDEO_START(act_f1)
 	MDRV_VIDEO_UPDATE(act_f1)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(act_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( act_xi )
