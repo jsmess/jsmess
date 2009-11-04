@@ -510,6 +510,7 @@ MACHINE_RESET( intv )
 	/* These are actually the same vector, and INTR is unused */
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), CP1610_INT_INTRM, 0x1004);
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), CP1610_INT_INTR,  0x1004);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), CP1610_R7, 0x2000);
 
 	return;
 }
