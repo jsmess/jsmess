@@ -695,13 +695,19 @@ I8255A_INTERFACE( pc8801_8255_config_1 )
 	DEVCB_HANDLER(fdc_8255_c_w)			// Port C write
 };
 
+static TIMER_CALLBACK( pc8801fd_upd765_tc_to_zero )
+{
+	pc88_state *state = machine->driver_data;
+
+	upd765_tc_w(state->upd765, 0);
+}
+
 READ8_HANDLER( pc8801fd_upd765_tc )
 {
 	pc88_state *state = space->machine->driver_data;
 
 	upd765_tc_w(state->upd765, 1);
-	upd765_tc_w(state->upd765, 0);
-
+	timer_set(space->machine,  attotime_zero, NULL, 0, pc8801fd_upd765_tc_to_zero );	
 	return 0;
 }
 
