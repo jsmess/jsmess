@@ -326,7 +326,7 @@ static READ8_HANDLER( nvram_read ) // read from x2212 nvram chip and possibly do
 	UINT8 data = 0xFF;
 	data = dectalk.nvram_local[offset&0xff]; // TODO: should this be before or after a possible /RECALL? I'm guessing before.
 #ifdef NVRAM_LOG
-		logerror("m68k: nvram read at %08X: %02X\n", offset, data;
+		logerror("m68k: nvram read at %08X: %02X\n", offset, data);
 #endif
 	if (offset&0x200) // if a9 is set, do a /RECALL
 	dectalk_x2212_recall(space->machine);
