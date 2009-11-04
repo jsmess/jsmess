@@ -1026,6 +1026,8 @@ $(MESSOBJ)/nec.a:				\
 	$(MESS_DRIVERS)/pc6001.o	\
 	$(MESS_DRIVERS)/pc8401a.o	\
 	$(MESS_VIDEO)/pc8401a.o		\
+	$(MESS_DRIVERS)/pc8001.o	\
+	$(MESS_VIDEO)/upd3301.o		\
 	$(MESS_DRIVERS)/pc8801.o	\
 	$(MESS_MACHINE)/pc8801.o	\
 	$(MESS_VIDEO)/pc8801.o		\

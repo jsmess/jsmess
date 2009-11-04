@@ -678,33 +678,6 @@ MACHINE_DRIVER_END
 
 /* ROMs */
 
-ROM_START( pc8001 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_SYSTEM_BIOS( 0, "v101", "N80-BASIC v1.01" )
-	ROMX_LOAD( "n80v101.rom", 0x00000, 0x6000, CRC(a2cc9f22) SHA1(6d2d838de7fea20ddf6601660d0525d5b17bf8a3), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "v102", "N80-BASIC v1.02" )
-	ROMX_LOAD( "n80v102.rom", 0x00000, 0x6000, CRC(ed01ca3f) SHA1(b34a98941499d5baf79e7c0e5578b81dbede4a58), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "v110", "N80-BASIC v1.10" )
-	ROMX_LOAD( "n80v110.rom", 0x00000, 0x6000, CRC(1e02d93f) SHA1(4603cdb7a3833e7feb257b29d8052c872369e713), ROM_BIOS(3) )
-
-	/* hack - this should not be here, but we still don't support these early models*/
-	ROM_REGION( 0x10000, "sub", ROMREGION_ERASEFF)
-
-	ROM_REGION( 0x40000, "gfx1", 0)
-	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
-ROM_END
-
-ROM_START( pc8001mk2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "n80_2.rom", 0x00000, 0x8000, CRC(03cce7b6) SHA1(c12d34e42021110930fed45a8af98db52136f1fb) )
-
-	/* hack - this should not be here, but we still don't support these early models*/
-	ROM_REGION( 0x10000, "sub", ROMREGION_ERASEFF)
-
-	ROM_REGION( 0x40000, "gfx1", 0)
-	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
-ROM_END
-
 ROM_START( pc8801 )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(5cb8b584) SHA1(063609dd518c124a4fc9ba35d1bae35771666a34) )
@@ -958,9 +931,7 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME			PARENT	COMPAT  MACHINE   INPUT    INIT  CONFIG  COMPANY FULLNAME */
-COMP( 1979, pc8001,			0,		0,     pc88srl,  pc8001,  0,    0,   "NEC",  "PC-8001", GAME_NOT_WORKING )
-COMP( 1983, pc8001mk2,		pc8001,	0,     pc88srl,  pc8001,  0,    0,   "NEC",  "PC-8001mkII", GAME_NOT_WORKING )	// not sure about this dump
-COMP( 1985, pc8001mk2sr,	pc8001,	0,     pc88srl,  pc8001,  0,    0,   "NEC",  "PC-8001mkIISR", GAME_NOT_WORKING )
+COMP( 1985, pc8001mk2sr,	0,		0,     pc88srl,  pc8001,  0,    0,   "NEC",  "PC-8001mkIISR", GAME_NOT_WORKING )
 
 COMP( 1981, pc8801,			0,		0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8801", GAME_NOT_WORKING )
 COMP( 1983, pc8801mk2,		pc8801,	0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8801mkII", GAME_NOT_WORKING )	// not sure about this dump
