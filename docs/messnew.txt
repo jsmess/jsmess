@@ -117,11 +117,11 @@ System Driver Changes:
   * Hooked up slave PIC
   * Hooked up linear VRAM access at 0x80000000
 
-- [GAMECOM] Fixed error and crashes when loading a cart: you can now
-  reach title screens in some 1MB and 2MB carts. [Robbbert]
-
-- [GAMECOM] Added some DMA for carts, added crosshairs and mouseclick 
-  for stylus touch. Now some games are working. [Robbbert]
+- [GAMECOM] Some updates: [Robbbert]
+  * Fixed error and crashes when loading a cart.
+  * Added DMA for carts.
+  * Added crosshairs, and mouseclick for stylus touch.
+  * Lights Out game works, while some other games show title screens.
 
 - [GBCOLOR] Added BIOS. [Wilbert Pol]
 
@@ -132,6 +132,8 @@ System Driver Changes:
 
 - [I386] Implemented SLDT & STR opcodes (needed by PC98 as well) [Angelo
   Salese]
+
+- [INTV] Fixed bug 1884 - Multisession problem [Robbbert]
 
 - [IP22] Fixed crash in Indy driver: boot tune works, and you can get in 
   the boot menus. [Harmony]
