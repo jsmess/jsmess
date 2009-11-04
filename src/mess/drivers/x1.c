@@ -990,6 +990,16 @@ static UINT16 check_pcg_addr(running_machine *machine)
 	return 0x3ff;
 }
 
+static UINT16 check_chr_addr(running_machine *machine)
+{
+	if(!(colorram[0x7ff] & 0x20)) return 0x7ff;
+	if(!(colorram[0x3ff] & 0x20)) return 0x3ff;
+	if(!(colorram[0x5ff] & 0x20)) return 0x5ff;
+	if(!(colorram[0x1ff] & 0x20)) return 0x1ff;
+
+	return 0x3ff;
+}
+
 static READ8_HANDLER( x1_pcg_r )
 {
 	int addr;
@@ -1002,15 +1012,30 @@ static READ8_HANDLER( x1_pcg_r )
 
 	if(addr == 0)
 	{
-//		printf("%04x %04x %02x\n",pcg_write_addr*4*8,pcg_write_addr,bios_offset);
-		gfx_data = memory_region(space->machine, "kanji");
-		if(bios_offset == 0)
-			kanji_offset = pcg_write_addr*4*8;
+		if(scrn_reg.pcg_mode)
+		{
+			gfx_data = memory_region(space->machine, "kanji");
+			calc_pcg_offset = (videoram[check_chr_addr(space->machine)]+(videoram[check_chr_addr(space->machine)+0x800]<<8)) & 0xfff;
 
-		res = gfx_data[0x0000+bios_offset+kanji_offset];
+			kanji_offset = calc_pcg_offset*0x20;
 
-		bios_offset++;
-		bios_offset&=0x1f;
+			res = gfx_data[0x0000+bios_offset+kanji_offset];
+
+			bios_offset++;
+			bios_offset&=0x1f;
+		}
+		else
+		{
+//			printf("%04x %04x %02x\n",pcg_write_addr*4*8,pcg_write_addr,bios_offset);
+			gfx_data = memory_region(space->machine, "kanji");
+			if(bios_offset == 0)
+				kanji_offset = pcg_write_addr*4*8;//TODO: check me
+
+			res = gfx_data[0x0000+bios_offset+kanji_offset];
+
+			bios_offset++;
+			bios_offset&=0x1f;
+		}
 		return res;
 	}
 	else
@@ -1885,13 +1910,13 @@ static const gfx_layout x1_pcg_8x8 =
 
 static const gfx_layout x1_chars_16x16 =
 {
-	8,8,
+	8,16,
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16
 };
 
 /* decoded for debugging purpose, this will be nuked in the end... */
@@ -1899,7 +1924,7 @@ static GFXDECODE_START( x1 )
 	GFXDECODE_ENTRY( "cgrom",   0x00000, x1_chars_8x8,    0x200, 0x20 )
 	GFXDECODE_ENTRY( "pcg",     0x00000, x1_pcg_8x8,      0x000, 1 )
 	GFXDECODE_ENTRY( "font",    0x00000, x1_chars_8x16,   0x200, 0x20 )
-	GFXDECODE_ENTRY( "kanji",   0x00000, x1_chars_16x16,  0, 0x20 )
+	GFXDECODE_ENTRY( "kanji",   0x00000, x1_chars_16x16,  0x200, 0x20 )
 GFXDECODE_END
 
 /*************************************
