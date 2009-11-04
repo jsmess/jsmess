@@ -28,7 +28,7 @@ Skeleton drivers:
 - Amiga 3000
 - Cosmicos
 - Epson HX20
-
+- Robotron A7150
 
 
 System Driver Changes:

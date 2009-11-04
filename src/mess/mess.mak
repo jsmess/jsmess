@@ -1168,6 +1168,7 @@ $(MESSOBJ)/rca.a:				\
 $(MESSOBJ)/robotron.a:			\
 	$(MESS_DRIVERS)/a5105.o		\
 	$(MESS_DRIVERS)/a51xx.o		\
+	$(MESS_DRIVERS)/a7150.o		\
 	$(MESS_DRIVERS)/rt1715.o	\
 	$(MESS_MACHINE)/rt1715.o	\
 	$(MESS_VIDEO)/rt1715.o		\
