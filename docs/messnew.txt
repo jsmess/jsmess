@@ -1,4 +1,4 @@
-0.135
+﻿0.135
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -269,6 +269,9 @@ System Driver Changes:
 - [TI99] Added support for two new cartridge types. [Michael Zapf]
 
 - [TI99] Converted Smartmed and RS232 card to be devices. [Miodrag Milanovic]
+
+- [TI99] Changed TI99/4a to use SN94624 sound chip variant. [Justin Kerk,
+  Lord Nightmare]
 
 - [TRS80] Model 4 and 4P can boot from floppy disk. [Robbbert]
 
