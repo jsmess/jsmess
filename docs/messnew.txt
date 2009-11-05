@@ -18,6 +18,8 @@ Systems Promoted from GAME_NOT_WORKING:
 - Cosmicos [Curt Coder]
 - Microbee 56k [Robbbert]
 - Nokia MikroMikko 1 M6 [Curt Coder, Kara Trace]
+- Philips CD-i [Harmony]
+- Sony PocketStation [Harmony]
 - TRS-80 Model 4 [Robbbert]
 - TRS-80 Model 4P [Robbbert]
 
@@ -35,6 +37,8 @@ System Driver Changes:
 ----------------------
 - [A5200] Changed default start button mapping to match other drivers 
   ("1" key by default). [Justin Kerk]
+
+- [APPLE2] Fixed Bugzilla #1842, "Corrupt lo-res graphics". [Harmony]
 
 - [AT] Fixed keyboard for at486 driver, so it boots into bios.[Miodrag 
   Milanovic]
@@ -61,6 +65,9 @@ System Driver Changes:
   emulation with a floppy inserted [Fabio Priuli]
 
 - [CDI] Implemented support for a Mono-I class CD-i player. [Harmony]
+  * Contains basic CDIC + SLAVE implementation from a Mono-I board.
+  * Theoretically conatins the extra 1MByte of RAM of a DVC cartridge.
+  * Supports savestates.
 
 - [CDTV] Added workaround for crash due to CDDA failing initialization 
   (more work needed to properly fix this) and fixed CIA0 problem which 
@@ -122,6 +129,8 @@ System Driver Changes:
   * Added DMA for carts.
   * Added crosshairs, and mouseclick for stylus touch.
   * Lights Out game works, while some other games show title screens.
+
+- [GAMEGEAR] Added hacky LCD persistence support, fixes Bugzilla #65 [Harmony]
 
 - [GBCOLOR] Added BIOS. [Wilbert Pol]
 
@@ -194,6 +203,8 @@ System Driver Changes:
   * Added (very) preliminary support for the following UNIF only boards: 
     BMC-GS2004, BMC-GS2013, UNL-8237, UNL-KOF97.
 
+- [ODYSSEY2] Fixed a multisession issue, Bugzilla #1517 [Harmony]
+
 - [PC] Fixed some booting issues with Amstrad PC clones. [Miodrag Milanovic]
 
 - [PC6001] Various progresses: [Angelo Salese]
@@ -213,6 +224,12 @@ System Driver Changes:
   * Improved tilemap support and fixed resolution.
   * Added banked work ram & kludged Gate-A20 support.
 
+- [PocketStation] Many improvements: [Harmony]
+  * Implemented basic peripherals
+  * Implemented LCD
+  * Implemented ROM banking
+  * Driver supports savestates
+  
 - [PX4] Added external cassette support.  [Dirk Best]
 
 - [QX10] Driver boots and load CP/M from floppy image. [Mariusz Wojcieszek]
