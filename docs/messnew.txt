@@ -31,7 +31,7 @@ Skeleton drivers:
 - Cosmicos
 - Epson HX20
 - Robotron A7150
-
+- NeXT
 
 System Driver Changes:
 ----------------------

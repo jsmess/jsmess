@@ -1505,5 +1505,8 @@ const game_driver * const drivers[] =
     DRIVER( p8000_16 )
 	DRIVER( cosmicos )
 	DRIVER( a7150 )
+	DRIVER( next )
+	DRIVER( nextnt )
+	DRIVER( nexttrb )
 
 #endif /* DRIVER_RECURSIVE */
