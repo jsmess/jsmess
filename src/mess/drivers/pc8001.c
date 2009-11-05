@@ -5,15 +5,32 @@
 #include "devices/messram.h"
 #include "machine/8257dma.h"
 #include "machine/ctronics.h"
+#include "machine/i8214.h"
 #include "machine/i8255a.h"
+#include "machine/msm8251.h"
 #include "machine/upd1990a.h"
 #include "video/upd3301.h"
 #include "sound/speaker.h"
 
 /* Read/Write Handlers */
 
-WRITE8_HANDLER( port10_w )
+static WRITE8_HANDLER( port10_w )
 {
+	/*
+
+		bit		description
+
+		0		RTC C0
+		1		RTC C1
+		2		RTC C2
+		3		RTC DATA IN
+		4		unused
+		5		unused
+		6		unused
+		7		unused
+
+	*/
+
 	pc8001_state *state = space->machine->driver_data;
 
 	/* real time clock */
@@ -26,8 +43,59 @@ WRITE8_HANDLER( port10_w )
 	centronics_data_w(state->centronics, 0, data);
 }
 
+static WRITE8_HANDLER( port30_w )
+{
+	/*
+
+		bit		description
+
+		0		characters per line (0=40, 1=80)
+		1		color mode (0=color, 1=B&W)
+		2		CMT CHIN
+		3		CMT MOTOR (1=on)
+		4		CMT BS1
+		5		CMT BS2
+		6		unused
+		7		unused
+
+	*/
+}
+
+static WRITE8_HANDLER( pc8001mk2_port31_w )
+{
+	/*
+
+		bit		description
+
+		0		expansion ROM (0=expansion, 1=N80)
+		1		memory mode (0=ROM, 1=RAM)
+		2		color mode (0=attribute, 1=B&W)
+		3		graphics enable
+		4		resolution (0=640x200, 1=320x200)
+		5		background color
+		6		background color
+		7		background color
+
+	*/
+}
+
 static WRITE8_HANDLER( port40_w )
 {
+	/*
+
+		bit		description
+
+		0		PRT /STROBE
+		1		RTC STB
+		2		RTC CLK
+		3		CRT /CLDS CLK
+		4		unused
+		5		BEEP
+		6		unused
+		7		unused
+
+	*/
+
 	pc8001_state *state = space->machine->driver_data;
 
 	/* printer */
@@ -36,10 +104,28 @@ static WRITE8_HANDLER( port40_w )
 	/* real time clock */
 	upd1990a_stb_w(state->upd1990a, BIT(data, 1));
 	upd1990a_clk_w(state->upd1990a, BIT(data, 2));
+
+	/* beep */
+	speaker_level_w(state->speaker, BIT(data, 5));
 }
 
 static READ8_HANDLER( port40_r )
 {
+	/*
+
+		bit		description
+
+		0		PRT /READY
+		1		PRT /ACK
+		2		CMT CDIN
+		3		EXP /EXTON
+		4		RTC DATA OUT
+		5		CRT VRTC
+		6		unused
+		7		unused
+
+	*/
+
 	pc8001_state *state = space->machine->driver_data;
 	UINT8 data = 0xc0;
 
@@ -71,14 +157,66 @@ static ADDRESS_MAP_START( pc8001_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x07, 0x07) AM_READ_PORT("KEY7")
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("KEY8")
 	AM_RANGE(0x09, 0x09) AM_READ_PORT("KEY9")
-	AM_RANGE(0x10, 0x10) AM_WRITE(port10_w)
-//	AM_RANGE(0x30, 0x30) AM_WRITE(port30_w)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(port40_r, port40_w)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0f) AM_WRITE(port10_w)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0e) AM_DEVREADWRITE(I8251_TAG, msm8251_data_r, msm8251_data_w)
+	AM_RANGE(0x21, 0x21) AM_MIRROR(0x0e) AM_DEVREADWRITE(I8251_TAG, msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_WRITE(port30_w)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_READWRITE(port40_r, port40_w)
 	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE(UPD3301_TAG, upd3301_r, upd3301_w)
 	AM_RANGE(0x60, 0x68) AM_DEVREADWRITE(I8257_TAG, dma8257_r, dma8257_w)
-//	AM_RANGE(0xe4, 0xe4) AM_WRITE(irq_level_w)
+//	AM_RANGE(0x70, 0x7f) unused
+//	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) AM_WRITE(pc8011_ext0_w)
+//	AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) AM_WRITE(pc8011_ext1_w)
+//	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_WRITE(pc8011_ext2_w)
+//	AM_RANGE(0xb0, 0xb0) AM_READ(pc8011_gpio8_r)
+//	AM_RANGE(0xb1, 0xb1) AM_WRITE(pc8011_gpio8_w)
+//	AM_RANGE(0xb2, 0xb2) AM_READ(pc8011_gpio4_r)
+//	AM_RANGE(0xb3, 0xb3) AM_WRITE(pc8011_gpio4_w)
+//	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE(PC8011_CH1_I8251_TAG, msm8251_data_r, msm8251_data_w)
+//	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE(PC8011_CH1_I8251_TAG, msm8251_status_r, msm8251_control_w)
+//	AM_RANGE(0xc2, 0xc2) AM_DEVREADWRITE(PC8011_CH2_I8251_TAG, msm8251_data_r, msm8251_data_w)
+//	AM_RANGE(0xc3, 0xc3) AM_DEVREADWRITE(PC8011_CH2_I8251_TAG, msm8251_status_r, msm8251_control_w)
+//	AM_RANGE(0xc8, 0xc8) RS-232 output enable?
+//	AM_RANGE(0xca, 0xca) RS-232 output disable?
+//	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE(PC8011_IEEE488_I8255A_TAG, i8255a_r, i8255a_w)
+//	AM_RANGE(0xd8, 0xd8) AM_READ(pc8011_ieee488_control_signal_input_r)
+//	AM_RANGE(0xda, 0xda) AM_READ(pc8011_ieee488_bus_address_mode_r)
+//	AM_RANGE(0xdc, 0xdc) AM_WRITE(pc8011_ieee488_nrfd_w)
+//	AM_RANGE(0xde, 0xde) AM_WRITE(pc8011_ieee488_bus_mode_control_w)
+//	AM_RANGE(0xe0, 0xe3) AM_WRITE(expansion_storage_mode_w)
+//	AM_RANGE(0xe4, 0xe4) AM_MIRROR(0x01) AM_WRITE(irq_level_w)
 //	AM_RANGE(0xe6, 0xe6) AM_WRITE(irq_mask_w)
+//	AM_RANGE(0xe7, 0xe7) AM_WRITE(pc8012_memory_mode_w)
+//	AM_RANGE(0xe8, 0xfb) unused
 	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(I8255A_TAG, i8255a_r, i8255a_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pc8001mk2_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_RAMBANK(1)
+	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK(2)
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(3)
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK(4)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pc8001mk2_io, ADDRESS_SPACE_IO, 8 )
+	AM_IMPORT_FROM(pc8001_io)
+	AM_RANGE(0x30, 0x30) AM_WRITE(port30_w)
+	AM_RANGE(0x31, 0x31) AM_WRITE(pc8001mk2_port31_w)
+//	AM_RANGE(0x5c, 0x5c) AM_WRITE(pc8001mk2_gram_on_w)
+//	AM_RANGE(0x5f, 0x5f) AM_WRITE(pc8001mk2_gram_off_w)
+//	AM_RANGE(0xe8, 0xe8) kanji_address_lo_w, kanji_data_lo_r
+//	AM_RANGE(0xe9, 0xe9) kanji_address_hi_w, kanji_data_hi_r
+//	AM_RANGE(0xea, 0xea) kanji_readout_start_w
+//	AM_RANGE(0xeb, 0xeb) kanji_readout_end_w
+//	AM_RANGE(0xf3, 0xf3) DMA type disk unit interface selection port 
+//	AM_RANGE(0xf4, 0xf4) DMA type 8 inch control
+//	AM_RANGE(0xf5, 0xf5) DMA type 8 inch margin control
+//	AM_RANGE(0xf6, 0xf6) DMA type 8 inch FDC status
+//	AM_RANGE(0xf7, 0xf7) DMA type 8 inch FDC data register
+//	AM_RANGE(0xf8, 0xf8) DMA type 5 inch control
+//	AM_RANGE(0xf9, 0xf9) DMA type 5 inch margin control
+//	AM_RANGE(0xfa, 0xfa) DMA type 5 inch FDC status
+//	AM_RANGE(0xfb, 0xfb) DMA type 5 inch FDC data register
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -198,6 +336,8 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Roll Up") PORT_CODE(KEYCODE_F8)			PORT_CHAR(UCHAR_MAMEKEY(PGUP))
 	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Roll Down") PORT_CODE(KEYCODE_F9)		PORT_CHAR(UCHAR_MAMEKEY(PGDN))
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW1")
 INPUT_PORTS_END
 
 /* Video */
@@ -225,14 +365,30 @@ static UPD3301_DISPLAY_PIXELS( pc8001_display_pixels )
 {
 }
 
+static WRITE_LINE_DEVICE_HANDLER( pc8001_upd3301_drq_w )
+{
+	pc8001_state *driver_state = device->machine->driver_data;
+
+	dma8257_drq_w(driver_state->i8257, 2, state);
+}
+
 static UPD3301_INTERFACE( pc8001_upd3301_intf )
 {
 	SCREEN_TAG,
 	pc8001_display_pixels,
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_LINE(pc8001_upd3301_drq_w),
 	DEVCB_NULL,
 	DEVCB_NULL
+};
+
+/* 8251 Interface */
+
+static msm8251_interface pc8001_8251_intf = 
+{
+	NULL,
+	NULL,
+	NULL
 };
 
 /* 8255 Interface */
@@ -286,7 +442,7 @@ static MACHINE_START( pc8001 )
 	state->i8257 = devtag_get_device(machine, I8257_TAG);
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
 	state->upd3301 = devtag_get_device(machine, UPD3301_TAG);
-	//state->speaker = devtag_get_device(machine, SPEAKER_TAG);
+	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
 	/* find memory regions */
@@ -368,8 +524,12 @@ static MACHINE_DRIVER_START( pc8001 )
 	MDRV_VIDEO_UPDATE(pc8001)
 
 	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
+	MDRV_MSM8251_ADD(I8251_TAG, pc8001_8251_intf)
 	MDRV_I8255A_ADD(I8255A_TAG, pc8001_8255_intf)
 	MDRV_DMA8257_ADD(I8257_TAG, 4000000, pc8001_8257_intf)
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8001_upd1990a_intf)
@@ -385,6 +545,10 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc8001mk2 )
 	MDRV_IMPORT_FROM(pc8001)
+
+	MDRV_CPU_MODIFY(Z80_TAG)
+	MDRV_CPU_PROGRAM_MAP(pc8001mk2_mem)
+	MDRV_CPU_IO_MAP(pc8001mk2_io)
 
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
@@ -406,11 +570,13 @@ ROM_START( pc8001 )
 ROM_END
 
 ROM_START( pc8001mk2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x8000, "n80", 0 )
 	ROM_LOAD( "n80_2.rom", 0x00000, 0x8000, CRC(03cce7b6) SHA1(c12d34e42021110930fed45a8af98db52136f1fb) )
 
-	ROM_REGION( 0x40000, "gfx1", 0)
+	ROM_REGION( 0x800, "chargen", 0)
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
+
+	ROM_REGION( 0x20000, "kanji", 0)
 ROM_END
 
 /* System Drivers */
