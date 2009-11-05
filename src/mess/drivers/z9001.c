@@ -20,6 +20,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z9001_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -64,7 +65,7 @@ static VIDEO_UPDATE( z9001 )
 
 static MACHINE_DRIVER_START( z9001 )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
+    MDRV_CPU_ADD("maincpu",Z80, XTAL_9_8304MHz / 4)
     MDRV_CPU_PROGRAM_MAP(z9001_mem)
     MDRV_CPU_IO_MAP(z9001_io)
 
