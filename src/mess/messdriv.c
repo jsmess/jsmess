@@ -1508,5 +1508,6 @@ const game_driver * const drivers[] =
 	DRIVER( next )
 	DRIVER( nextnt )
 	DRIVER( nexttrb )
+	DRIVER( pda600 )
 
 #endif /* DRIVER_RECURSIVE */

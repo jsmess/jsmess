@@ -1505,6 +1505,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/p8k.o		\
 	$(MESS_DRIVERS)/cosmicos.o	\
 	$(MESS_DRIVERS)/next.o		\
+	$(MESS_DRIVERS)/pda600.o	\
 
 
 

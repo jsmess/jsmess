@@ -28,10 +28,11 @@ Systems Promoted from GAME_NOT_WORKING:
 Skeleton drivers: 
 -----------------
 - Amiga 3000
+- Amstrad PenPad PDA 600
 - Cosmicos
 - Epson HX20
-- Robotron A7150
 - NeXT
+- Robotron A7150
 
 System Driver Changes:
 ----------------------
