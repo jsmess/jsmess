@@ -934,6 +934,88 @@ static void scc68070_init(running_machine *machine, scc68070_regs_t *scc68070)
 	}
 }
 
+static void scc68070_register_globals(running_machine *machine)
+{
+	state_save_register_global(machine, scc68070_regs.lir);
+
+	state_save_register_global(machine, scc68070_regs.picr1);
+	state_save_register_global(machine, scc68070_regs.picr2);
+
+	state_save_register_global(machine, scc68070_regs.i2c.data_register);
+	state_save_register_global(machine, scc68070_regs.i2c.address_register);
+	state_save_register_global(machine, scc68070_regs.i2c.status_register);
+	state_save_register_global(machine, scc68070_regs.i2c.control_register);
+	state_save_register_global(machine, scc68070_regs.i2c.clock_control_register);
+
+	state_save_register_global(machine, scc68070_regs.uart.mode_register);
+	state_save_register_global(machine, scc68070_regs.uart.status_register);
+	state_save_register_global(machine, scc68070_regs.uart.clock_select);
+	state_save_register_global(machine, scc68070_regs.uart.command_register);
+	state_save_register_global(machine, scc68070_regs.uart.transmit_holding_register);
+	state_save_register_global(machine, scc68070_regs.uart.receive_holding_register);
+
+	state_save_register_global(machine, scc68070_regs.timers.timer_status_register);
+	state_save_register_global(machine, scc68070_regs.timers.timer_control_register);
+	state_save_register_global(machine, scc68070_regs.timers.reload_register);
+	state_save_register_global(machine, scc68070_regs.timers.timer0);
+	state_save_register_global(machine, scc68070_regs.timers.timer1);
+	state_save_register_global(machine, scc68070_regs.timers.timer2);
+
+	state_save_register_global(machine, scc68070_regs.dma.channel[0].channel_status);
+	state_save_register_global(machine, scc68070_regs.dma.channel[0].channel_error);
+	state_save_register_global(machine, scc68070_regs.dma.channel[0].device_control);
+	state_save_register_global(machine, scc68070_regs.dma.channel[0].operation_control);
+	state_save_register_global(machine, scc68070_regs.dma.channel[0].sequence_control);
+	state_save_register_global(machine, scc68070_regs.dma.channel[0].channel_control);
+	state_save_register_global(machine, scc68070_regs.dma.channel[0].transfer_counter);
+	state_save_register_global(machine, scc68070_regs.dma.channel[0].memory_address_counter);
+	state_save_register_global(machine, scc68070_regs.dma.channel[0].device_address_counter);
+	state_save_register_global(machine, scc68070_regs.dma.channel[1].channel_status);
+	state_save_register_global(machine, scc68070_regs.dma.channel[1].channel_error);
+	state_save_register_global(machine, scc68070_regs.dma.channel[1].device_control);
+	state_save_register_global(machine, scc68070_regs.dma.channel[1].operation_control);
+	state_save_register_global(machine, scc68070_regs.dma.channel[1].sequence_control);
+	state_save_register_global(machine, scc68070_regs.dma.channel[1].channel_control);
+	state_save_register_global(machine, scc68070_regs.dma.channel[1].transfer_counter);
+	state_save_register_global(machine, scc68070_regs.dma.channel[1].memory_address_counter);
+	state_save_register_global(machine, scc68070_regs.dma.channel[1].device_address_counter);
+
+	state_save_register_global(machine, scc68070_regs.mmu.status);
+	state_save_register_global(machine, scc68070_regs.mmu.control);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[0].attr);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[0].length);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[0].segment);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[0].base);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[1].attr);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[1].length);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[1].segment);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[1].base);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[2].attr);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[2].length);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[2].segment);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[2].base);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[3].attr);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[3].length);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[3].segment);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[3].base);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[4].attr);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[4].length);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[4].segment);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[4].base);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[5].attr);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[5].length);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[5].segment);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[5].base);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[6].attr);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[6].length);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[6].segment);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[6].base);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[7].attr);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[7].length);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[7].segment);
+	state_save_register_global(machine, scc68070_regs.mmu.desc[7].base);
+}
+
 #if ENABLE_UART_PRINTING
 static READ16_HANDLER( uart_loopback_enable )
 {
@@ -2081,6 +2163,24 @@ static void cdic_init(running_machine *machine, cdic_regs_t *cdic)
 	cdic->audio_sample_size = 0;
 }
 
+static void cdic_register_globals(running_machine *machine)
+{
+	state_save_register_global(machine, cdic_regs.command);
+	state_save_register_global(machine, cdic_regs.time);
+	state_save_register_global(machine, cdic_regs.file);
+	state_save_register_global(machine, cdic_regs.channel);
+	state_save_register_global(machine, cdic_regs.audio_channel);
+	state_save_register_global(machine, cdic_regs.audio_buffer);
+	state_save_register_global(machine, cdic_regs.x_buffer);
+	state_save_register_global(machine, cdic_regs.dma_control);
+	state_save_register_global(machine, cdic_regs.z_buffer);
+	state_save_register_global(machine, cdic_regs.interrupt_vector);
+	state_save_register_global(machine, cdic_regs.data_buffer);
+
+	state_save_register_global(machine, cdic_regs.audio_sample_freq);
+	state_save_register_global(machine, cdic_regs.audio_sample_size);
+}
+
 typedef struct
 {
 	UINT8 out_buf[4];
@@ -2487,6 +2587,54 @@ static void slave_init(running_machine *machine, slave_regs_t *slave)
 
 	slave->fake_mouse_x = 0;
 	slave->fake_mouse_y = 0;
+}
+
+static void slave_register_globals(running_machine *machine)
+{
+	state_save_register_global(machine, slave_regs.channel[0].out_buf[0]);
+	state_save_register_global(machine, slave_regs.channel[0].out_buf[1]);
+	state_save_register_global(machine, slave_regs.channel[0].out_buf[2]);
+	state_save_register_global(machine, slave_regs.channel[0].out_buf[3]);
+	state_save_register_global(machine, slave_regs.channel[0].out_index);
+	state_save_register_global(machine, slave_regs.channel[0].out_count);
+	state_save_register_global(machine, slave_regs.channel[0].out_cmd);
+	state_save_register_global(machine, slave_regs.channel[1].out_buf[0]);
+	state_save_register_global(machine, slave_regs.channel[1].out_buf[1]);
+	state_save_register_global(machine, slave_regs.channel[1].out_buf[2]);
+	state_save_register_global(machine, slave_regs.channel[1].out_buf[3]);
+	state_save_register_global(machine, slave_regs.channel[1].out_index);
+	state_save_register_global(machine, slave_regs.channel[1].out_count);
+	state_save_register_global(machine, slave_regs.channel[1].out_cmd);
+	state_save_register_global(machine, slave_regs.channel[2].out_buf[0]);
+	state_save_register_global(machine, slave_regs.channel[2].out_buf[1]);
+	state_save_register_global(machine, slave_regs.channel[2].out_buf[2]);
+	state_save_register_global(machine, slave_regs.channel[2].out_buf[3]);
+	state_save_register_global(machine, slave_regs.channel[2].out_index);
+	state_save_register_global(machine, slave_regs.channel[2].out_count);
+	state_save_register_global(machine, slave_regs.channel[2].out_cmd);
+	state_save_register_global(machine, slave_regs.channel[3].out_buf[0]);
+	state_save_register_global(machine, slave_regs.channel[3].out_buf[1]);
+	state_save_register_global(machine, slave_regs.channel[3].out_buf[2]);
+	state_save_register_global(machine, slave_regs.channel[3].out_buf[3]);
+	state_save_register_global(machine, slave_regs.channel[3].out_index);
+	state_save_register_global(machine, slave_regs.channel[3].out_count);
+	state_save_register_global(machine, slave_regs.channel[3].out_cmd);
+
+	state_save_register_global_array(machine, slave_regs.in_buf);
+	state_save_register_global(machine, slave_regs.in_index);
+	state_save_register_global(machine, slave_regs.in_count);
+
+	state_save_register_global(machine, slave_regs.polling_active);
+
+	state_save_register_global(machine, slave_regs.xbus_interrupt_enable);
+
+	state_save_register_global_array(machine, slave_regs.lcd_state);
+
+	state_save_register_global(machine, slave_regs.real_mouse_x);
+	state_save_register_global(machine, slave_regs.real_mouse_y);
+
+	state_save_register_global(machine, slave_regs.fake_mouse_x);
+	state_save_register_global(machine, slave_regs.fake_mouse_y);
 }
 
 /*************************
@@ -4106,6 +4254,67 @@ static void mcd212_init(running_machine *machine, mcd212_regs_t *mcd212)
 	}
 	memset(mcd212->region_flag_0, 0, 768);
 	memset(mcd212->region_flag_1, 0, 768);
+
+	state_save_register_global_array(machine, mcd212->region_flag_0);
+	state_save_register_global_array(machine, mcd212->region_flag_1);
+	state_save_register_global(machine, mcd212->channel[0].csrr);
+	state_save_register_global(machine, mcd212->channel[0].csrw);
+	state_save_register_global(machine, mcd212->channel[0].dcr);
+	state_save_register_global(machine, mcd212->channel[0].vsr);
+	state_save_register_global(machine, mcd212->channel[0].ddr);
+	state_save_register_global(machine, mcd212->channel[0].dcp);
+	state_save_register_global(machine, mcd212->channel[0].dca);
+	state_save_register_global_array(machine, mcd212->channel[0].clut_r);
+	state_save_register_global_array(machine, mcd212->channel[0].clut_g);
+	state_save_register_global_array(machine, mcd212->channel[0].clut_b);
+	state_save_register_global(machine, mcd212->channel[0].image_coding_method);
+	state_save_register_global(machine, mcd212->channel[0].transparency_control);
+	state_save_register_global(machine, mcd212->channel[0].plane_order);
+	state_save_register_global(machine, mcd212->channel[0].clut_bank);
+	state_save_register_global(machine, mcd212->channel[0].transparent_color_a);
+	state_save_register_global(machine, mcd212->channel[0].transparent_color_b);
+	state_save_register_global(machine, mcd212->channel[0].mask_color_a);
+	state_save_register_global(machine, mcd212->channel[0].mask_color_b);
+	state_save_register_global(machine, mcd212->channel[0].dyuv_abs_start_a);
+	state_save_register_global(machine, mcd212->channel[0].dyuv_abs_start_b);
+	state_save_register_global(machine, mcd212->channel[0].cursor_position);
+	state_save_register_global(machine, mcd212->channel[0].cursor_control);
+	state_save_register_global_array(machine, mcd212->channel[0].cursor_pattern);
+	state_save_register_global_array(machine, mcd212->channel[0].region_control);
+	state_save_register_global(machine, mcd212->channel[0].backdrop_color);
+	state_save_register_global(machine, mcd212->channel[0].mosaic_hold_a);
+	state_save_register_global(machine, mcd212->channel[0].mosaic_hold_b);
+	state_save_register_global_array(machine, mcd212->channel[0].weight_factor_a);
+	state_save_register_global_array(machine, mcd212->channel[0].weight_factor_b);
+	state_save_register_global(machine, mcd212->channel[1].csrr);
+	state_save_register_global(machine, mcd212->channel[1].csrw);
+	state_save_register_global(machine, mcd212->channel[1].dcr);
+	state_save_register_global(machine, mcd212->channel[1].vsr);
+	state_save_register_global(machine, mcd212->channel[1].ddr);
+	state_save_register_global(machine, mcd212->channel[1].dcp);
+	state_save_register_global(machine, mcd212->channel[1].dca);
+	state_save_register_global_array(machine, mcd212->channel[1].clut_r);
+	state_save_register_global_array(machine, mcd212->channel[1].clut_g);
+	state_save_register_global_array(machine, mcd212->channel[1].clut_b);
+	state_save_register_global(machine, mcd212->channel[1].image_coding_method);
+	state_save_register_global(machine, mcd212->channel[1].transparency_control);
+	state_save_register_global(machine, mcd212->channel[1].plane_order);
+	state_save_register_global(machine, mcd212->channel[1].clut_bank);
+	state_save_register_global(machine, mcd212->channel[1].transparent_color_a);
+	state_save_register_global(machine, mcd212->channel[1].transparent_color_b);
+	state_save_register_global(machine, mcd212->channel[1].mask_color_a);
+	state_save_register_global(machine, mcd212->channel[1].mask_color_b);
+	state_save_register_global(machine, mcd212->channel[1].dyuv_abs_start_a);
+	state_save_register_global(machine, mcd212->channel[1].dyuv_abs_start_b);
+	state_save_register_global(machine, mcd212->channel[1].cursor_position);
+	state_save_register_global(machine, mcd212->channel[1].cursor_control);
+	state_save_register_global_array(machine, mcd212->channel[1].cursor_pattern);
+	state_save_register_global_array(machine, mcd212->channel[1].region_control);
+	state_save_register_global(machine, mcd212->channel[1].backdrop_color);
+	state_save_register_global(machine, mcd212->channel[1].mosaic_hold_a);
+	state_save_register_global(machine, mcd212->channel[1].mosaic_hold_b);
+	state_save_register_global_array(machine, mcd212->channel[1].weight_factor_a);
+	state_save_register_global_array(machine, mcd212->channel[1].weight_factor_b);
 }
 
 static VIDEO_START(cdi)
@@ -4266,6 +4475,13 @@ static INPUT_PORTS_START( cdi )
 	PORT_CONFSETTING(    0xf0, "White" )
 INPUT_PORTS_END
 
+static MACHINE_START( cdi )
+{
+	scc68070_register_globals(machine);
+	cdic_register_globals(machine);
+	slave_register_globals(machine);
+}
+
 static MACHINE_RESET( cdi )
 {
 	UINT16 *src   = (UINT16*)memory_region(machine, "maincpu");
@@ -4337,6 +4553,7 @@ static MACHINE_DRIVER_START( cdimono1 )
 	MDRV_VIDEO_UPDATE(cdi)
 
 	MDRV_MACHINE_RESET(cdi)
+	MDRV_MACHINE_START(cdi)
 
 	MDRV_CDROM_ADD( "cdrom" )
 
@@ -4379,4 +4596,4 @@ ROM_END
 *************************/
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      CONFIG    COMPANY     FULLNAME   FLAGS */
-CONS( 1991, cdimono1, 0,        0,        cdimono1, cdi,      0,        0,        "Philips",  "CD-i (Mono-I)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+CONS( 1991, cdimono1, 0,        0,        cdimono1, cdi,      0,        0,        "Philips",  "CD-i (Mono-I)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
