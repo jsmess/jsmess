@@ -59,6 +59,9 @@ PAL frame timing
 #define STATUS_SPRCOL         0x20	/* Object collision flag */
 #define STATUS_HINT           0x02	/* Pending horizontal interrupt flag */
 
+#define HINT_HPOS             24
+#define VINT_HPOS             1	/* docs says should be near HINT time */
+
 #define GG_CRAM_SIZE          0x40	/* 32 colors x 2 bytes per color = 64 bytes */
 #define SMS_CRAM_SIZE         0x20	/* 32 colors x 1 bytes per color = 32 bytes */
 #define MAX_CRAM_SIZE         0x40
@@ -282,9 +285,10 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 	/* Check if we're on the last line of a frame */
 	if (vpos == vpos_limit - 1)
 	{
+		smsvdp->line_counter = smsvdp->reg[0x0a];
 		if (smsvdp->pause_callback)
 			smsvdp->pause_callback(machine);
-//		sms_check_pause_button(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM));
+
 		return;
 	}
 
@@ -293,6 +297,7 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 	/* Check if we're below the bottom border */
 	if (vpos >= vpos_limit)
 	{
+		smsvdp->line_counter = smsvdp->reg[0x0a];
 		return;
 	}
 
@@ -311,10 +316,17 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 				if (smsvdp->reg[0x00] & 0x10)
 				{
 					/* Delay triggering of interrupt to allow software to read the status bit before the irq */
-					timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen) + 1), smsvdp, 0, smsvdp_set_irq);
+					timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, vpos, HINT_HPOS), smsvdp, 0, smsvdp_set_irq);
 				}
 			}
-
+			else
+			{
+				smsvdp->line_counter -= 1;
+			}
+		}
+		else
+		{
+			smsvdp->line_counter = smsvdp->reg[0x0a];
 		}
 
 		if (vpos == vpos_limit + 1)
@@ -324,7 +336,7 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 			if (smsvdp->reg[0x01] & 0x20)
 			{
 				/* Delay triggering of interrupt to allow software to read the status bit before the irq */
-				timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen) + 1), smsvdp, 0, smsvdp_set_irq);
+				timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, vpos, VINT_HPOS), smsvdp, 0, smsvdp_set_irq);
 			}
 		}
 
@@ -352,9 +364,10 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 	/* Check if we're in the active display area */
 	if (vpos >= vpos_limit)
 	{
+		rgb_t border_color;
+
 		if (vpos == vpos_limit)
 		{
-			smsvdp->line_counter = smsvdp->reg[0x0a];
 			smsvdp->reg9copy = smsvdp->reg[0x09];
 		}
 
@@ -366,7 +379,7 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 			if (smsvdp->reg[0x00] & 0x10)
 			{
 				/* Delay triggering of interrupt to allow software to read the status bit before the irq */
-				timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen) + 1), smsvdp, 0, smsvdp_set_irq);
+				timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, vpos, HINT_HPOS), smsvdp, 0, smsvdp_set_irq);
 			}
 		}
 		else
@@ -378,25 +391,22 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 
 		/* Check if display is disabled */
 		if (!(smsvdp->reg[0x01] & 0x40))
-		{
-			/* set whole line to backdrop color */
-			rec.min_x = LBORDER_START;
-			rec.max_x = LBORDER_START + LBORDER_X_PIXELS + 255 + RBORDER_X_PIXELS;
-			bitmap_fill(smsvdp->tmpbitmap, &rec, machine->pens[smsvdp->current_palette[BACKDROP_COLOR]]);
-		}
+			border_color = RGB_BLACK;
 		else
-		{
-			/* Draw left border */
-			rec.min_x = LBORDER_START;
-			rec.max_x = LBORDER_START + LBORDER_X_PIXELS - 1;
-			bitmap_fill(smsvdp->tmpbitmap, &rec, machine->pens[smsvdp->current_palette[BACKDROP_COLOR]]);
+			border_color = machine->pens[smsvdp->current_palette[BACKDROP_COLOR]];
 
-			/* Draw right border */
-			rec.min_x = LBORDER_START + LBORDER_X_PIXELS + 256;
-			rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
-			bitmap_fill(smsvdp->tmpbitmap, &rec, machine->pens[smsvdp->current_palette[BACKDROP_COLOR]]);
-			sms_refresh_line(machine, smsvdp, smsvdp->tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit, vpos - vpos_limit);
-		}
+		/* Draw left border */
+		rec.min_x = LBORDER_START;
+		rec.max_x = LBORDER_START + LBORDER_X_PIXELS - 1;
+		bitmap_fill(smsvdp->tmpbitmap, &rec, border_color);
+
+		/* Draw right border */
+		rec.min_x = LBORDER_START + LBORDER_X_PIXELS + 256;
+		rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
+		bitmap_fill(smsvdp->tmpbitmap, &rec, border_color);
+
+		sms_refresh_line(machine, smsvdp, smsvdp->tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit, vpos - vpos_limit);
+
 		return;
 	}
 
@@ -405,6 +415,7 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 	/* Check if we're in the top border area */
 	if (vpos >= vpos_limit)
 	{
+		smsvdp->line_counter = smsvdp->reg[0x0a];
 		sms_update_palette(smsvdp);
 
 		/* Draw left border */
@@ -662,8 +673,7 @@ static void sms_refresh_line_mode4( smsvdp_t *smsvdp, int *line_buffer, int line
 	sprite_height = (smsvdp->reg[0x01] & 0x02 ? 16 : 8);
 	sprite_zoom = 1;
 
-	if (smsvdp->reg[0x01] & 0x01)
-		/* sprite doubling */
+	if (smsvdp->reg[0x01] & 0x01)		/* sprite doubling */
 		sprite_zoom = 2;
 
 	sprite_buffer_count = 0;
@@ -680,7 +690,7 @@ static void sms_refresh_line_mode4( smsvdp_t *smsvdp, int *line_buffer, int line
 			{
 				sprite_buffer[sprite_buffer_count] = sprite_index;
 			}
-			else
+			else if (line >= 0 && line < smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V])
 			{
 				/* Too many sprites per line */
 				smsvdp->status |= STATUS_SPROVR;
@@ -688,6 +698,10 @@ static void sms_refresh_line_mode4( smsvdp_t *smsvdp, int *line_buffer, int line
 			sprite_buffer_count++;
 		}
 	}
+
+	/* Check if display is disabled */
+	if (!(smsvdp->reg[0x01] & 0x40))
+		return;
 
 	if (sprite_buffer_count > 8)
 		sprite_buffer_count = 8;
@@ -868,7 +882,7 @@ static void sms_refresh_tms9918_sprites( smsvdp_t *smsvdp, int *line_buffer, int
 			{
 				sprite_buffer[sprite_buffer_count] = sprite_index;
 			}
-			else
+			else if (line >= 0 && line < smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V])
 			{
 				/* Too many sprites per line */
 				smsvdp->status |= STATUS_SPROVR;
@@ -876,6 +890,10 @@ static void sms_refresh_tms9918_sprites( smsvdp_t *smsvdp, int *line_buffer, int
 			sprite_buffer_count++;
 		}
 	}
+
+	/* Check if display is disabled */
+	if (!(smsvdp->reg[0x01] & 0x40))
+		return;
 
 	if (sprite_buffer_count > 4)
 		sprite_buffer_count = 4;
@@ -1154,29 +1172,35 @@ static void sms_refresh_line( running_machine *machine, smsvdp_t *smsvdp, bitmap
 	int x;
 	int *blitline_buffer = smsvdp->line_buffer;
 
-	if (line >= 0 && line < smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V])
+	switch( smsvdp->vdp_mode )
 	{
-		switch( smsvdp->vdp_mode )
-		{
-		case 0:
-			sms_refresh_line_mode0(smsvdp, blitline_buffer, line);
-			break;
+	case 0:
+		sms_refresh_line_mode0(smsvdp, blitline_buffer, line);
+		break;
 
-		case 2:
-			sms_refresh_line_mode2(smsvdp, blitline_buffer, line);
-			break;
+	case 2:
+		sms_refresh_line_mode2(smsvdp, blitline_buffer, line);
+		break;
 
-		case 4:
-		default:
-			sms_refresh_line_mode4(smsvdp, blitline_buffer, line);
-			break;
-		}
+	case 4:
+	default:
+		sms_refresh_line_mode4(smsvdp, blitline_buffer, line);
+		break;
 	}
-	else
+
+	if (line < 0 || line >= smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V])
 	{
 		for (x = 0; x < 256; x++)
 		{
 			blitline_buffer[x] = smsvdp->current_palette[BACKDROP_COLOR];
+		}
+	}
+	/* Check if display is disabled */
+	else if (!(smsvdp->reg[0x01] & 0x40))
+	{
+		for (x = 0; x < 256; x++)
+		{
+			blitline_buffer[x] = 0;
 		}
 	}
 

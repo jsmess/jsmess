@@ -33,13 +33,15 @@ Skeleton drivers:
 - Epson HX20
 - NeXT
 - Robotron A7150
+- SGI IP6 4D/PI workstation
+
 
 System Driver Changes:
 ----------------------
 - [A5200] Changed default start button mapping to match other drivers 
   ("1" key by default). [Justin Kerk]
 
-- [APPLE2] Fixed Bugzilla #1842, "Corrupt lo-res graphics". [Harmony]
+- [APPLE2] Fixed corrupt lo-res graphics (bug #1842). [Harmony]
 
 - [AT] Fixed keyboard for at486 driver, so it boots into bios.[Miodrag 
   Milanovic]
@@ -69,6 +71,9 @@ System Driver Changes:
   * Contains basic CDIC + SLAVE implementation from a Mono-I board.
   * Theoretically conatins the extra 1MByte of RAM of a DVC cartridge.
   * Supports savestates.
+
+- [CDI] Split LCD into a secondary screen, added appropriate default 
+  layouts. [Carlos]
 
 - [CDTV] Added workaround for crash due to CDDA failing initialization 
   (more work needed to properly fix this) and fixed CIA0 problem which 
@@ -102,11 +107,10 @@ System Driver Changes:
 - [EINSTEIN] Made it possible to select single or double sided disk 
   drives.  [Dirk Best]
 
-- [ELWRO800] Update :
-	* reworked keyboard mapping, added keys with Polish characters
-	* added network id
-	* added support for NMI firing (not used yet, as Junet is not working)
-	[Mariusz Wojcieszek]
+- [ELWRO800] Updates: [Mariusz Wojcieszek]
+  * reworked keyboard mapping, added keys with Polish characters
+  * added network id
+  * added support for NMI firing (not used yet, as Junet is not working)	
 
 - [EXIDY] Added SNP support for the 6 games commonly found on the net. 
   [RObbbert]
@@ -131,7 +135,7 @@ System Driver Changes:
   * Added crosshairs, and mouseclick for stylus touch.
   * Lights Out game works, while some other games show title screens.
 
-- [GAMEGEAR] Added hacky LCD persistence support, fixes Bugzilla #65 [Harmony]
+- [GAMEGEAR] Added hacky LCD persistence support (bug #65) [Harmony]
 
 - [GBCOLOR] Added BIOS. [Wilbert Pol]
 
@@ -143,7 +147,7 @@ System Driver Changes:
 - [I386] Implemented SLDT & STR opcodes (needed by PC98 as well) [Angelo
   Salese]
 
-- [INTV] Fixed bug 1884 - Multisession problem [Robbbert]
+- [INTV] Fixed multisession problem (bug #1884) [Robbbert]
 
 - [IP22] Fixed crash in Indy driver: boot tune works, and you can get in 
   the boot menus. [Harmony]
@@ -204,7 +208,7 @@ System Driver Changes:
   * Added (very) preliminary support for the following UNIF only boards: 
     BMC-GS2004, BMC-GS2013, UNL-8237, UNL-KOF97.
 
-- [ODYSSEY2] Fixed a multisession issue, Bugzilla #1517 [Harmony]
+- [ODYSSEY2] Fixed a multisession issue (bug #1517) [Harmony]
 
 - [PC] Fixed some booting issues with Amstrad PC clones. [Miodrag Milanovic]
 
@@ -229,6 +233,7 @@ System Driver Changes:
   * Implemented basic peripherals
   * Implemented LCD
   * Implemented ROM banking
+  * Implemented correct interrupts
   * Driver supports savestates
   
 - [PX4] Added external cassette support.  [Dirk Best]
@@ -239,10 +244,13 @@ System Driver Changes:
 
 - [SAMCOUPE] Improved Mode 1 graphics.  [Dirk Best]
 
-- [SMS] Fixed rapid-fire to only fire when buttons are pressed. (Bug #1864)  
-  [Enik Land]
-
-- [SMS] Added Light Phaser support. (Bug #1123)  [Enik Land]
+- [SMS] Various improvements: [Enik Land]
+  * Added Light Phaser support. (bug #1123)
+  * Fixed border and sprite problems (affecting e.g. Fantastic Dizzy,
+    bug #1773).
+  * Fixed rapid-fire to only fire when buttons are pressed. (bug #1864)  
+  * Improved Line IRQ Hcount emulation.
+  * Fixed various Hcounter problems.
 
 - [SMS] Converted SMS VDP to be a device [Fabio Priuli]
 
@@ -263,7 +271,7 @@ System Driver Changes:
 - [SPECIAL] Fixed floppy for Special MX, regressed since 0.124.
   [Miodrag Milanovic]
 
-- [SPECTRUM] Fixed bug #803 48K SNA load routine bad PC. [Miodrag Milanovic]
+- [SPECTRUM] Fixed 48K SNA load routine bad PC (bug #803). [Miodrag Milanovic]
 
 - [SUPERGB] Added BIOS.  [Wilbert Pol]
 
