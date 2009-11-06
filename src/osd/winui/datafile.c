@@ -28,7 +28,6 @@
 
 // MAME/MAMEUI headers
 #include "osdcomm.h"
-#include "osd_cpu.h"
 #include "driver.h"
 #include "datafile.h"
 #include "mui_opts.h" // For MameUIGlobal()

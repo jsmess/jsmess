@@ -15,7 +15,6 @@
 #define MUI_OPTS_H
 
 #include "osdcomm.h"
-#include "osd_cpu.h"
 #include "options.h"
 #include "inputseq.h" /* for input_seq definition */
 #include <video.h> /* for MAX_SCREENS Definition*/

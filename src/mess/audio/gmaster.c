@@ -4,7 +4,6 @@
 
 #include <assert.h>
 #include <math.h>
-#include "osd_cpu.h"
 #include "driver.h"
 #include "streams.h"
 #include "mame.h"
