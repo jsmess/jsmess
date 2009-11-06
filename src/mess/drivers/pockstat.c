@@ -58,7 +58,7 @@ static const int CPU_FREQ[16] =
 
 #define VERBOSE_LEVEL		(0)
 
-#define ENABLE_VERBOSE_LOG	(0)
+#define ENABLE_VERBOSE_LOG	(1)
 
 #if ENABLE_VERBOSE_LOG
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
@@ -281,7 +281,7 @@ static WRITE32_HANDLER( ps_ftlb_w )
 
 static UINT32 ps_intc_get_interrupt_line(running_machine *machine, UINT32 line)
 {
-	return intc_regs.hold & line;
+	return intc_regs.status & line;
 }
 
 static void ps_intc_set_interrupt_line(running_machine *machine, UINT32 line, int state)
@@ -291,17 +291,17 @@ static void ps_intc_set_interrupt_line(running_machine *machine, UINT32 line, in
 		if(state)
 		{
 			intc_regs.status |= line & PS_INT_STATUS_MASK;
-			line &= intc_regs.enable;
-			line &= ~intc_regs.mask;
-			intc_regs.hold |= line;
+			intc_regs.hold |= line &~ PS_INT_STATUS_MASK;
+			//printf( " Setting %08x, status = %08x, hold = %08x\n", line, intc_regs.status, intc_regs.hold );
 		}
 		else
 		{
 			intc_regs.status &= ~line;
 			intc_regs.hold &= ~line;
+			//printf( "Clearing %08x, status = %08x, hold = %08x\n", line, intc_regs.status, intc_regs.hold );
 		}
 	}
-	if(intc_regs.hold & PS_INT_IRQ_MASK)
+	if(intc_regs.hold & intc_regs.enable & PS_INT_IRQ_MASK)
 	{
 		cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
 	}
@@ -309,7 +309,7 @@ static void ps_intc_set_interrupt_line(running_machine *machine, UINT32 line, in
 	{
 		cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
 	}
-	if(intc_regs.hold & PS_INT_FIQ_MASK)
+	if(intc_regs.hold & intc_regs.enable & PS_INT_FIQ_MASK)
 	{
 		cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), ARM7_FIRQ_LINE, ASSERT_LINE);
 	}
@@ -357,13 +357,19 @@ static WRITE32_HANDLER( ps_intc_w )
 			break;
 		case 0x0008/4:
 			verboselog(space->machine, 0, "ps_intc_w: Interrupt Enable = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&intc_regs.enable);
-			intc_regs.mask &= ~intc_regs.enable;
+			intc_regs.enable |= data;
+			//COMBINE_DATA(&intc_regs.enable);
+			intc_regs.status &= intc_regs.enable;
+			intc_regs.hold &= intc_regs.enable;
+			ps_intc_set_interrupt_line(space->machine, 0, 0);
 			break;
 		case 0x000c/4:
 			verboselog(space->machine, 0, "ps_intc_w: Interrupt Mask = %08x & %08x\n", data, mem_mask );
+			intc_regs.enable &= ~data;
 			COMBINE_DATA(&intc_regs.mask);
-			intc_regs.enable &= ~intc_regs.mask;
+			intc_regs.status &= intc_regs.enable;
+			intc_regs.hold &= intc_regs.enable;
+			ps_intc_set_interrupt_line(space->machine, 0, 0);
 			break;
 		case 0x0010/4:
 			verboselog(space->machine, 0, "ps_intc_w: Interrupt Acknowledge = %08x & %08x\n", data, mem_mask );
@@ -423,7 +429,7 @@ static READ32_HANDLER( ps_timer_r )
  			verboselog(space->machine, 0, "ps_timer_r: Timer %d Count = %08x & %08x\n", offset / (0x10/4), timer_regs.timer[offset / (0x10/4)].count, mem_mask );
  			if(timer_regs.timer[offset / (0x10/4)].control & 4)
  			{
-				timer_regs.timer[offset / (0x10/4)].count -= 0x100;
+				timer_regs.timer[offset / (0x10/4)].count -= 0x10;
 				if(timer_regs.timer[offset / (0x10/4)].count > timer_regs.timer[offset / (0x10/4)].period)
 				{
 					timer_regs.timer[offset / (0x10/4)].count = timer_regs.timer[offset / (0x10/4)].period;
@@ -783,6 +789,17 @@ static WRITE32_HANDLER(ps_flash_w)
 	}
 }
 
+static READ32_HANDLER( ps_audio_r )
+{
+	verboselog(space->machine, 0, "ps_audio_r: Unknown Read: %08x = %08x & %08x\n", 0xd800000 + (offset << 2), 0x10, mem_mask);
+	return 0x10;
+}
+
+static WRITE32_HANDLER( ps_audio_w )
+{
+	verboselog(space->machine, 0, "ps_audio_w: Unknown Write: %08x = %08x & %08x\n", 0xd800000 + (offset << 2), data, mem_mask);
+}
+
 static ADDRESS_MAP_START(pockstat_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0x000007ff) AM_RAM
 	AM_RANGE(0x02000000, 0x02ffffff) AM_READ(ps_rombank_r)
@@ -795,6 +812,7 @@ static ADDRESS_MAP_START(pockstat_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x0b800000, 0x0b80000f) AM_READWRITE(ps_rtc_r, ps_rtc_w)
 	AM_RANGE(0x0d000000, 0x0d000003) AM_READWRITE(ps_lcd_r, ps_lcd_w)
 	AM_RANGE(0x0d000100, 0x0d00017f) AM_RAM AM_BASE(&lcd_buffer)
+	AM_RANGE(0x0d80000c, 0x0d80000f) AM_READWRITE(ps_audio_r, ps_audio_w)
 ADDRESS_MAP_END
 
 /* Input ports */
