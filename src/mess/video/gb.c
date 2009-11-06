@@ -1292,6 +1292,10 @@ void gb_video_init( running_machine *machine, int mode )
 
 	if (mode == GB_VIDEO_CGB) vram_size = 0x4000;
 
+	/* free regions if already allocated */
+	if (memory_region(machine, "gfx1"))		memory_region_free(machine, "gfx1");
+	if (memory_region(machine, "gfx2"))		memory_region_free(machine, "gfx2");
+
 	gb_lcd.gb_vram = memory_region_alloc( machine, "gfx1", vram_size, 0 );
 	gb_lcd.gb_oam = memory_region_alloc( machine, "gfx2", 0x100, 0 );
 	memset( gb_lcd.gb_vram, 0, vram_size );
@@ -2217,8 +2221,6 @@ READ8_HANDLER( gbc_video_r )
 
 WRITE8_HANDLER ( gbc_video_w )
 {
-	static UINT16 BP = 0, OP = 0;
-
 	switch( offset )
 	{
 	case 0x00:      /* LCDC - LCD Control */
@@ -2361,18 +2363,22 @@ WRITE8_HANDLER ( gbc_video_w )
 		}
 		break;
 	case 0x28:      /* BCPS - Background palette specification */
+		GBCBCPS = data;
+		if (data & 0x01)
+			GBCBCPD = gb_lcd.cgb_bpal[( data >> 1 ) & 0x1F] >> 8;
+		else
+			GBCBCPD = gb_lcd.cgb_bpal[( data >> 1 ) & 0x1F] & 0xFF;
 		break;
 	case 0x29:      /* BCPD - background palette data */
 		if ( gb_lcd.pal_locked == LOCKED )
 		{
 			return;
 		}
-		if( GBCBCPS & 0x1 )
-		{
-			gb_lcd.cgb_bpal[ ( GBCBCPS >> 1 ) & 0x1F ] = ( ( data & 0x7F ) << 8 ) | BP;
-		}
+		GBCBCPD = data;
+		if (GBCBCPS & 0x01)
+			gb_lcd.cgb_bpal[( GBCBCPS >> 1 ) & 0x1F] = ((data << 8) | (gb_lcd.cgb_bpal[( GBCBCPS >> 1 ) & 0x1F] & 0xFF)) & 0x7FFF;
 		else
-			BP = data;
+			gb_lcd.cgb_bpal[( GBCBCPS >> 1 ) & 0x1F] = ((gb_lcd.cgb_bpal[( GBCBCPS >> 1 ) & 0x1F] & 0xFF00) | data) & 0x7FFF;
 		if( GBCBCPS & 0x80 )
 		{
 			GBCBCPS++;
@@ -2380,18 +2386,22 @@ WRITE8_HANDLER ( gbc_video_w )
 		}
 		break;
 	case 0x2A:      /* OCPS - Object palette specification */
+		GBCOCPS = data;
+		if (data & 0x01)
+			GBCOCPD = gb_lcd.cgb_spal[( data >> 1 ) & 0x1F] >> 8;
+		else
+			GBCOCPD = gb_lcd.cgb_spal[( data >> 1 ) & 0x1F] & 0xFF;
 		break;
 	case 0x2B:      /* OCPD - Object palette data */
 		if ( gb_lcd.pal_locked == LOCKED )
 		{
 			return;
 		}
-		if( GBCOCPS & 0x1 )
-		{
-			gb_lcd.cgb_spal[ ( GBCOCPS >> 1 ) & 0x1F ] = ( ( data & 0x7F ) << 8 ) | OP;
-		}
+		GBCOCPD = data;
+		if (GBCOCPS & 0x01)
+			gb_lcd.cgb_spal[( GBCOCPS >> 1 ) & 0x1F] = ((data << 8) | (gb_lcd.cgb_spal[( GBCOCPS >> 1 ) & 0x1F] & 0xFF)) & 0x7FFF;
 		else
-			OP = data;
+			gb_lcd.cgb_spal[( GBCOCPS >> 1 ) & 0x1F] = ((gb_lcd.cgb_spal[( GBCOCPS >> 1 ) & 0x1F] & 0xFF00) | data) & 0x7FFF;
 		if( GBCOCPS & 0x80 )
 		{
 			GBCOCPS++;
