@@ -441,23 +441,6 @@ static UINT8 SMEM[4];
 #define SMPC_CONTROL_MODE_PORT_1 IOSEL1 = 0
 #define SMPC_CONTROL_MODE_PORT_2 IOSEL2 = 0
 
-static int DectoBCD(int num)
-{
-	int i, cnt = 0, tmp, res = 0;
-
-	while (num > 0)
-	{
-		tmp = num;
-		while (tmp >= 10) tmp %= 10;
-		for (i=0; i<cnt; i++)
-			tmp *= 16;
-		res += tmp;
-		cnt++;
-		num /= 10;
-	}
-
-	return res;
-}
 
 static void system_reset()
 {
@@ -698,13 +681,13 @@ static void stv_SMPC_w8(const address_space *space, int offset, UINT8 data)
 		                if(LOG_SMPC) logerror ("SMPC: Status Acquire (IntBack)\n");
 				smpc_ram[0x5f]=0x10;
 				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
-			  	smpc_ram[0x23] = DectoBCD(systime.local_time.year / 100);
-			    	smpc_ram[0x25] = DectoBCD(systime.local_time.year % 100);
+			  	smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
+			    	smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);
 		    		smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
-			    	smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
-			    	smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
-			    	smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
-			    	smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
+			    	smpc_ram[0x29] = dec_2_bcd(systime.local_time.mday);
+			    	smpc_ram[0x2b] = dec_2_bcd(systime.local_time.hour);
+			    	smpc_ram[0x2d] = dec_2_bcd(systime.local_time.minute);
+			    	smpc_ram[0x2f] = dec_2_bcd(systime.local_time.second);
 
 				smpc_ram[0x31]=0x00;  //?
 
@@ -2206,13 +2189,13 @@ static void saturn_init_driver(running_machine *machine, int rgn)
 	stv_scu = auto_alloc_array(machine, UINT32, 0x100/4);
 	scsp_regs = auto_alloc_array(machine, UINT16, 0x1000/2);
 
-	smpc_ram[0x23] = DectoBCD(systime.local_time.year / 100);
-	smpc_ram[0x25] = DectoBCD(systime.local_time.year % 100);
+	smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
+	smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);
 	smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
-	smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
-	smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
-	smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
-	smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
+	smpc_ram[0x29] = dec_2_bcd(systime.local_time.mday);
+	smpc_ram[0x2b] = dec_2_bcd(systime.local_time.hour);
+	smpc_ram[0x2d] = dec_2_bcd(systime.local_time.minute);
+	smpc_ram[0x2f] = dec_2_bcd(systime.local_time.second);
 	smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
 //  smpc_ram[0x33] = input_port_read(machine, "???");
  	smpc_ram[0x5f] = 0x10;
