@@ -20,7 +20,8 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
-(none)
+- [TI85/TI86] Converted the serial interface to a device.
+  [Wilbert Pol]
 
 
 
