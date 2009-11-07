@@ -146,7 +146,7 @@ System Driver Changes:
 
 - [GBCOLOR] Updates:  [Carlos]
   * Fixed multisession error.
-  * Improved handling of palette writes. Fixes bugs #1699 and #187.
+  * Improved handling of palette writes. Fixes bugs #187, #298, and #1699.
 
 - [I386] Implemented SLDT & STR opcodes (needed by PC98 as well) [Angelo
   Salese]
