@@ -190,6 +190,7 @@ TI-86 ports:
 #include "sound/speaker.h"
 #include "includes/ti85.h"
 #include "devices/snapquik.h"
+#include "formats/ti85_ser.h"
 
 /* port i/o functions */
 
@@ -517,6 +518,7 @@ static MACHINE_DRIVER_START( ti85 )
 	MDRV_CPU_IO_MAP(ti85_io)
 
 	MDRV_MACHINE_START( ti85 )
+	MDRV_MACHINE_RESET( ti85 )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(128, 64)
@@ -532,6 +534,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ti85d )
 	MDRV_IMPORT_FROM( ti85 )
 	MDRV_SNAPSHOT_ADD("snapshot", ti8x, "sav", 0)
+	MDRV_TI85SERIAL_ADD( "ti85serial" )
 MACHINE_DRIVER_END
 
 
@@ -541,6 +544,8 @@ static MACHINE_DRIVER_START( ti82 )
 	MDRV_CPU_IO_MAP(ti82_io)
 
 	MDRV_MACHINE_START( ti82 )
+	MDRV_MACHINE_RESET( ti85 )
+
 	MDRV_VIDEO_UPDATE( ti82 )
 MACHINE_DRIVER_END
 
@@ -550,6 +555,8 @@ static MACHINE_DRIVER_START( ti83 )
 	MDRV_CPU_IO_MAP(ti83_io)
 
 	MDRV_MACHINE_START( ti82 )
+	MDRV_MACHINE_RESET( ti85 )
+
 	MDRV_VIDEO_UPDATE( ti82 )
 MACHINE_DRIVER_END
 
@@ -560,6 +567,7 @@ static MACHINE_DRIVER_START( ti86 )
 	MDRV_CPU_IO_MAP(ti86_io)
 
 	MDRV_MACHINE_START( ti86 )
+	MDRV_MACHINE_RESET( ti85 )
 
 	MDRV_NVRAM_HANDLER( ti86 )
 MACHINE_DRIVER_END
@@ -573,6 +581,8 @@ static MACHINE_DRIVER_START( ti83p )
 	MDRV_CPU_IO_MAP(ti83p_io)
 
 	MDRV_MACHINE_START( ti83p )
+	MDRV_MACHINE_RESET( ti85 )
+
 	MDRV_VIDEO_UPDATE( ti82 )
 
 	MDRV_NVRAM_HANDLER(ti83p)
@@ -581,6 +591,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ti86d )
 	MDRV_IMPORT_FROM( ti86 )
 	MDRV_SNAPSHOT_ADD("snapshot", ti8x, "sav", 0)
+	MDRV_TI86SERIAL_ADD( "ti85serial" )
 MACHINE_DRIVER_END
 
 ROM_START (ti73)
@@ -719,65 +730,14 @@ ROM_START (ti84pse)
 	ROMX_LOAD( "ti84sev241.bin", 0x10000, 0x200000, CRC(5758db36) SHA1(7daa4f22e9b5dc8a1cc8fd31bceece9fa8b43515), ROM_BIOS(1) )
 ROM_END
 
-static void ti85_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* serial */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:					info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATABLE:					info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(ti85_serial); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(ti85_serial); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(ti85_serial); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "85p,85s,85i,85n,85c,85l,85k,85m,85v,85d,85e,85r,85g,85b"); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(ti85)
-	CONFIG_DEVICE(ti85_serial_getinfo)
-SYSTEM_CONFIG_END
-
-static void ti86_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* serial */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:					info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATABLE:					info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(ti85_serial); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(ti85_serial); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(ti85_serial); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "86p,86s,86i,86n,86c,86l,86k,86m,86v,86d,86e,86r,86g"); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(ti86)
-	CONFIG_DEVICE(ti86_serial_getinfo)
-SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                 FULLNAME                        FLAGS */
 COMP( 1990, ti81,       0,      0,      ti81,   ti81,   0,      0,		"Texas Instruments",    "TI-81",                        0 )
-COMP( 1992, ti85,       0,      0,      ti85d,  ti85,   0,      ti85,   "Texas Instruments",    "TI-85",                        0 )
+COMP( 1992, ti85,       0,      0,      ti85d,  ti85,   0,      0,      "Texas Instruments",    "TI-85",                        0 )
 COMP( 1993, ti82,       0,      0,      ti82,   ti82,   0,      0,		"Texas Instruments",    "TI-82",                        0 )
 COMP( 1994, ti81v2,     ti81,   0,      ti82,   ti81,   0,      0,		"Texas Instruments",    "TI-81 v2.0",                   0 )
 COMP( 1996, ti83,       0,      0,      ti83,   ti83,   0,      0,		"Texas Instruments",    "TI-83",                        0 )
-COMP( 1997, ti86,       0,      0,      ti86d,  ti85,   0,      ti86,   "Texas Instruments",    "TI-86",                        0 )
+COMP( 1997, ti86,       0,      0,      ti86d,  ti85,   0,      0,  	"Texas Instruments",    "TI-86",                        0 )
 COMP( 1998, ti73,       0,      0,      ti83p,  ti82,   0,      0,		"Texas Instruments",    "TI-73",                        GAME_NOT_WORKING )
 COMP( 1999, ti83p,      0,      0,      ti83p,  ti82,   0,      0,		"Texas Instruments",    "TI-83 Plus",                   0 )
 COMP( 2001, ti83pse,    0,      0,      ti85,   ti85,   0,      0,		"Texas Instruments",    "TI-83 Plus Silver Edition",    GAME_NOT_WORKING )

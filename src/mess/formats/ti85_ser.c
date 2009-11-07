@@ -1,23 +1,110 @@
+
 #include "driver.h"
+#include "device.h"
 #include "ti85_ser.h"
+
+enum
+{
+	TI85_SEND_STOP,
+	TI85_SEND_HEADER,
+	TI85_RECEIVE_OK_1,
+	TI85_RECEIVE_ANSWER_1,
+	TI85_RECEIVE_ANSWER_2,
+	TI85_RECEIVE_ANSWER_3,
+	TI85_SEND_OK,
+	TI85_SEND_DATA,
+	TI85_RECEIVE_OK_2,
+	TI85_SEND_END,
+	TI85_RECEIVE_OK_3,
+	TI85_RECEIVE_HEADER_1,
+	TI85_PREPARE_VARIABLE_DATA,
+	TI85_RECEIVE_HEADER_2,
+	TI85_SEND_OK_1,
+	TI85_SEND_CONTINUE,
+	TI85_RECEIVE_OK,
+	TI85_RECEIVE_DATA,
+	TI85_SEND_OK_2,
+	TI85_RECEIVE_END_OR_HEADER_1,
+	TI85_SEND_OK_3,
+	TI85_PREPARE_SCREEN_REQUEST,
+	TI85_SEND_SCREEN_REQUEST,
+	TI85_SEND_RESET
+};
+
+#define TI85_HEADER_SIZE		0x37
+
+#define TI85_SEND_VARIABLES		1
+#define TI85_SEND_BACKUP		2
+#define TI85_RECEIVE_BACKUP		3
+#define TI85_RECEIVE_VARIABLES	4
+#define TI85_RECEIVE_SCREEN		5
 
 #define TI85_PC_OK_PACKET_SIZE	4
 #define TI85_PC_END_PACKET_SIZE	4
 
-const UINT8 ti85_pc_ok_packet[] = {0x05, 0x56, 0x00, 0x00};
-const UINT8 ti86_pc_ok_packet[] = {0x06, 0x56, 0x00, 0x00};
-const UINT8 ti85_pc_continue_packet[] = {0x05, 0x09, 0x00, 0x00};
-const UINT8 ti86_pc_continue_packet[] = {0x06, 0x09, 0x00, 0x00};
-const UINT8 ti85_pc_screen_request_packet[] = {0x05, 0x6d, 0x00, 0x00};
+static const UINT8 ti85_pc_ok_packet[] = {0x05, 0x56, 0x00, 0x00};
+static const UINT8 ti86_pc_ok_packet[] = {0x06, 0x56, 0x00, 0x00};
+static const UINT8 ti85_pc_continue_packet[] = {0x05, 0x09, 0x00, 0x00};
+static const UINT8 ti86_pc_continue_packet[] = {0x06, 0x09, 0x00, 0x00};
+static const UINT8 ti85_pc_screen_request_packet[] = {0x05, 0x6d, 0x00, 0x00};
 static const UINT8 ti85_pc_end_packet[] = {0x05, 0x92, 0x00, 0x00};
 static const UINT8 ti86_pc_end_packet[] = {0x06, 0x92, 0x00, 0x00};
 
-const UINT8 ti85_file_signature[] = {0x2a, 0x2a, 0x54, 0x49, 0x38, 0x35, 0x2a, 0x2a, 0x1a, 0x0c, 0x00};
-const UINT8 ti86_file_signature[] = {0x2a, 0x2a, 0x54, 0x49, 0x38, 0x36, 0x2a, 0x2a, 0x1a, 0x0a, 0x00};
+static const UINT8 ti85_file_signature[] = {0x2a, 0x2a, 0x54, 0x49, 0x38, 0x35, 0x2a, 0x2a, 0x1a, 0x0c, 0x00};
+static const UINT8 ti86_file_signature[] = {0x2a, 0x2a, 0x54, 0x49, 0x38, 0x36, 0x2a, 0x2a, 0x1a, 0x0a, 0x00};
 
-int ti85_serial_transfer_type = TI85_SEND_VARIABLES;
+typedef struct {
+	UINT16 head_size;
+	UINT16 data_size;
+	unsigned char type;
+	unsigned char name_size;
+	unsigned int offset;
+} ti85_entry;
 
-UINT16 ti85_calculate_checksum(const UINT8* data, unsigned int size)
+
+typedef struct {
+	UINT8* header;
+	UINT16 header_size;
+	UINT8* ok;
+	UINT16 ok_size;
+	UINT8* data;
+	UINT32 data_size;
+} ti85_serial_variable;
+
+
+typedef struct {
+	ti85_serial_variable * variables;
+	UINT8* end;
+	UINT16 end_size;
+	UINT16 number_of_variables;
+} ti85_serial_data;
+
+
+typedef struct
+{
+	UINT8	status;
+	int		transfer_type;
+	UINT8	red_out;			/* signal line from machine */
+	UINT8	white_out;			/* signal line from machine */
+	UINT8	red_in;				/* signal line to machine */
+	UINT8	white_in;			/* signal line to machine */
+} ti85serial_state;
+
+static int ti85_serial_transfer_type = TI85_SEND_VARIABLES;
+static UINT8 * ti85_receive_buffer;
+static UINT8 * ti85_receive_data;
+static ti85_serial_data ti85_serial_stream;
+
+
+INLINE ti85serial_state *get_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->type == TI85SERIAL);
+	return (ti85serial_state *) device->token;
+}
+
+
+static UINT16 ti85_calculate_checksum(const UINT8* data, unsigned int size)
 {
 	UINT16 checksum = 0;
 	unsigned int i;
@@ -27,7 +114,8 @@ UINT16 ti85_calculate_checksum(const UINT8* data, unsigned int size)
 	return checksum;
 }
 
-UINT16 ti85_variables_count (const UINT8 * ti85_data, unsigned int ti85_data_size)
+
+static UINT16 ti85_variables_count (const UINT8 * ti85_data, unsigned int ti85_data_size)
 {
 	unsigned int pos, head_size, var_size;
 	UINT16 number_of_entries = 0;
@@ -41,6 +129,45 @@ UINT16 ti85_variables_count (const UINT8 * ti85_data, unsigned int ti85_data_siz
 	}
 	return number_of_entries;
 }
+
+
+static void ti85_free_serial_data_memory (running_machine *machine)
+{
+	if (ti85_receive_buffer)
+	{
+		free (ti85_receive_buffer);
+		ti85_receive_buffer = NULL;
+	}
+	if (ti85_receive_data)
+	{
+		free (ti85_receive_data);
+		ti85_receive_data = NULL;
+	}
+}
+
+
+static int ti85_alloc_serial_data_memory (UINT32 size)
+{
+	if (!ti85_receive_buffer)
+	{
+		ti85_receive_buffer = (UINT8*) malloc (8*size*sizeof(UINT8));
+		if (!ti85_receive_buffer)
+			return 0;
+	}
+
+	if (!ti85_receive_data)
+	{
+		ti85_receive_data = (UINT8*) malloc (size * sizeof(UINT8));
+		if (!ti85_receive_data)
+		{
+			free (ti85_receive_buffer);
+			ti85_receive_buffer = NULL;
+			return 0;
+	        }
+	}
+	return 1;
+}
+
 
 static void ti85_backup_read (const UINT8 * ti85_data, unsigned int ti85_data_size, ti85_entry * ti85_entries)
 {
@@ -59,7 +186,8 @@ static void ti85_backup_read (const UINT8 * ti85_data, unsigned int ti85_data_si
 	ti85_entries[2].offset = pos;
 }
 
-void ti85_variables_read (const UINT8 * ti85_data, unsigned int ti85_data_size, ti85_entry * ti85_entries)
+
+static void ti85_variables_read (const UINT8 * ti85_data, unsigned int ti85_data_size, ti85_entry * ti85_entries)
 {
 	unsigned int pos, i=0;
 
@@ -77,7 +205,75 @@ void ti85_variables_read (const UINT8 * ti85_data, unsigned int ti85_data_size, 
 }
 
 
-void ti85_convert_data_to_stream (const UINT8* file_data, unsigned int size, UINT8* serial_data)
+static int ti85_receive_serial (const device_config *device, UINT8* received_data, UINT32 received_data_size)
+{
+	ti85serial_state *ti85serial = get_token( device );
+	static UINT32 data_counter = 0;
+
+	if (data_counter >= received_data_size)
+	{
+		if (!ti85serial->red_out && !ti85serial->white_out)
+		{
+			ti85serial->red_in = ti85serial->white_in = 1;
+			data_counter = 0;
+			return 0;
+		}
+		return 1;
+	}
+
+	if (ti85serial->red_in && ti85serial->white_in && (ti85serial->red_out!=ti85serial->white_out))
+	{
+		ti85serial->white_in = ti85serial->white_out;
+		ti85serial->red_in = ti85serial->red_out;
+		received_data[data_counter] = ti85serial->white_out;
+		return 1;
+	}
+
+	if (ti85serial->red_in!=ti85serial->white_in && !ti85serial->red_out && !ti85serial->white_out)
+	{
+		ti85serial->red_in = ti85serial->white_in = 1;
+		data_counter ++;
+		return 1;
+	}
+	return 1;
+}
+
+
+static int ti85_send_serial(const device_config *device, UINT8* serial_data, UINT32 serial_data_size)
+{
+	ti85serial_state *ti85serial = get_token( device );
+	static UINT32 data_counter = 0;
+
+	if (data_counter>=serial_data_size)
+	{
+		if (!ti85serial->red_out && !ti85serial->white_out)
+		{
+			ti85serial->red_in = ti85serial->white_in = 1;
+			data_counter = 0;
+			return 0;
+		}
+		ti85serial->red_in = ti85serial->white_in = 1;
+		return 1;
+	}
+
+	if (ti85serial->red_in && ti85serial->white_in && !ti85serial->red_out && !ti85serial->white_out)
+	{
+		ti85serial->red_in =  serial_data[data_counter] ? 1 : 0;
+		ti85serial->white_in = serial_data[data_counter] ? 0 : 1;
+		return 1;
+	}
+
+	if ((ti85serial->red_in == ti85serial->red_out) && (ti85serial->white_in == ti85serial->white_out))
+	{
+		ti85serial->red_in = ti85serial->white_in = 1;
+		data_counter++;
+		return 1;
+	}
+	return 1;
+}
+
+
+static void ti85_convert_data_to_stream (const UINT8* file_data, unsigned int size, UINT8* serial_data)
 {
 	unsigned int i, bits;
 
@@ -86,7 +282,8 @@ void ti85_convert_data_to_stream (const UINT8* file_data, unsigned int size, UIN
 			serial_data[i*8+bits] = (file_data[i]>>bits) & 0x01;
 }
 
-void ti85_convert_stream_to_data (const UINT8* serial_data, UINT32 size, UINT8* data)
+
+static void ti85_convert_stream_to_data (const UINT8* serial_data, UINT32 size, UINT8* data)
 {
 	UINT32 i;
 	UINT8 bits;
@@ -101,7 +298,8 @@ void ti85_convert_stream_to_data (const UINT8* serial_data, UINT32 size, UINT8* 
 	}
 }
 
-int ti85_convert_file_data_to_serial_stream (const UINT8* file_data, unsigned int file_size, ti85_serial_data*  serial_data, char* calc_type)
+
+static int ti85_convert_file_data_to_serial_stream (const UINT8* file_data, unsigned int file_size, ti85_serial_data*  serial_data, char* calc_type)
 {
 	UINT16 i;
 	UINT16 number_of_entries;
@@ -288,7 +486,8 @@ int ti85_convert_file_data_to_serial_stream (const UINT8* file_data, unsigned in
 	return 1;
 }
 
-void ti85_free_serial_stream (ti85_serial_data*  serial_data)
+
+static void ti85_free_serial_stream (ti85_serial_data*  serial_data)
 {
 	UINT16 i;
 	if (serial_data->variables)
@@ -309,3 +508,863 @@ void ti85_free_serial_stream (ti85_serial_data*  serial_data)
 		serial_data->end = NULL;
 	}
 }
+
+
+static void ti85_send_variables (const device_config *device)
+{
+	ti85serial_state *ti85serial = get_token( device );
+	static UINT16 variable_number = 0;
+
+	if (!ti85_alloc_serial_data_memory(7))
+		ti85serial->status = TI85_SEND_STOP;
+
+	switch (ti85serial->status)
+	{
+		case TI85_SEND_HEADER:
+			if(!ti85_send_serial(device, ti85_serial_stream.variables[variable_number].header,ti85_serial_stream.variables[variable_number].header_size))
+			{
+				ti85serial->status = TI85_RECEIVE_OK_1;
+				memset (ti85_receive_data, 0, 7);
+				logerror ("Header sended\n");
+			}
+			break;
+		case TI85_RECEIVE_OK_1:
+			if(!ti85_receive_serial (device, ti85_receive_buffer, 4*8))
+			{
+				ti85_convert_stream_to_data (ti85_receive_buffer, 4*8, ti85_receive_data);
+				ti85serial->status = TI85_RECEIVE_ANSWER_1;
+				logerror ("OK received\n");
+			}
+			break;
+		case TI85_RECEIVE_ANSWER_1:
+			if(!ti85_receive_serial (device, ti85_receive_buffer, 4*8))
+			{
+				ti85_convert_stream_to_data (ti85_receive_buffer, 4*8, ti85_receive_data);
+				switch (ti85_receive_data[1])
+				{
+					case 0x09:	//continue
+						ti85serial->status = TI85_SEND_OK;
+						logerror ("Continue received\n");
+						break;
+					case 0x36:      //out of memory, skip or exit
+						ti85serial->status = TI85_RECEIVE_ANSWER_2;
+						break;
+				}
+			}
+			break;
+		case TI85_RECEIVE_ANSWER_2:
+			if(!ti85_receive_serial (device, ti85_receive_buffer+4*8, 1*8))
+			{
+				ti85_convert_stream_to_data (ti85_receive_buffer, 5*8, ti85_receive_data);
+				switch (ti85_receive_data[4])
+				{
+					case 0x01:	//exit
+					case 0x02:	//skip
+						ti85serial->status = TI85_RECEIVE_ANSWER_3;
+						break;
+					case 0x03:	//out of memory
+						variable_number = 0;
+						ti85_free_serial_data_memory(device->machine);
+						ti85serial->status = TI85_SEND_STOP;
+						break;
+				}
+			}
+			break;
+		case TI85_RECEIVE_ANSWER_3:
+			if(!ti85_receive_serial (device, ti85_receive_buffer+5*8, 2*8))
+			{
+				ti85_convert_stream_to_data (ti85_receive_buffer, 7*8, ti85_receive_data);
+				switch (ti85_receive_data[4])
+				{
+					case 0x01:	//exit
+						variable_number = 0;
+						ti85_free_serial_data_memory(device->machine);
+						ti85serial->status = TI85_SEND_STOP;
+						break;
+					case 0x02:	//skip
+						variable_number++;
+						ti85serial->status = TI85_SEND_OK;
+						break;
+				}
+			}
+			break;
+		case TI85_SEND_OK:
+			if(!ti85_send_serial(device, ti85_serial_stream.variables[variable_number].ok,ti85_serial_stream.variables[variable_number].ok_size))
+			{
+				ti85serial->status = (ti85_receive_data[4]==0x02) ?  ((variable_number < ti85_serial_stream.number_of_variables) ? TI85_SEND_HEADER : TI85_SEND_END) : TI85_SEND_DATA;
+				memset(ti85_receive_data, 0, 7);
+			}
+			break;
+		case TI85_SEND_DATA:
+			if(!ti85_send_serial(device, ti85_serial_stream.variables[variable_number].data,ti85_serial_stream.variables[variable_number].data_size))
+				ti85serial->status = TI85_RECEIVE_OK_2;
+			break;
+		case TI85_RECEIVE_OK_2:
+			if(!ti85_receive_serial (device, ti85_receive_buffer, 4*8))
+			{
+				variable_number++;
+				ti85_convert_stream_to_data (ti85_receive_buffer, 4*8, ti85_receive_data);
+				ti85serial->status = (variable_number < ti85_serial_stream.number_of_variables) ? TI85_SEND_HEADER : TI85_SEND_END;
+			}
+			break;
+		case TI85_SEND_END:
+			if(!ti85_send_serial(device, ti85_serial_stream.end,ti85_serial_stream.end_size))
+			{
+				logerror ("End sended\n");
+				variable_number = 0;
+				ti85serial->status = TI85_RECEIVE_OK_3;
+			}
+			break;
+		case TI85_RECEIVE_OK_3:
+			if(!ti85_receive_serial (device, ti85_receive_buffer, 4*8))
+			{
+				logerror ("OK received\n");
+				ti85_convert_stream_to_data (ti85_receive_buffer, 4*8, ti85_receive_data);
+				ti85_free_serial_data_memory(device->machine);
+				ti85serial->status = TI85_SEND_STOP;
+			}
+			break;
+		case TI85_SEND_RESET:
+			variable_number = 0;
+			break;
+	}
+}
+
+
+static void ti85_send_backup (const device_config *device)
+{
+	ti85serial_state *ti85serial = get_token( device );
+	static UINT16 variable_number = 0;
+
+	if (!ti85_alloc_serial_data_memory(7))
+		ti85serial->status = TI85_SEND_STOP;
+
+	switch (ti85serial->status)
+	{
+		case TI85_SEND_HEADER:
+			if(!ti85_send_serial(device, ti85_serial_stream.variables[variable_number].header,ti85_serial_stream.variables[variable_number].header_size))
+				ti85serial->status = TI85_RECEIVE_OK_1;
+			break;
+		case TI85_RECEIVE_OK_1:
+			if(!ti85_receive_serial (device, ti85_receive_buffer, 4*8))
+			{
+				ti85_convert_stream_to_data (ti85_receive_buffer, 4*8, ti85_receive_data);
+				ti85serial->status = TI85_RECEIVE_ANSWER_1;
+			}
+			break;
+		case TI85_RECEIVE_ANSWER_1:
+			if(!ti85_receive_serial (device, ti85_receive_buffer, 4*8))
+			{
+				ti85_convert_stream_to_data (ti85_receive_buffer, 4*8, ti85_receive_data);
+				switch (ti85_receive_data[1])
+				{
+					case 0x09:	//continue
+						ti85serial->status = TI85_SEND_OK;
+						break;
+					case 0x36:      //out of memory, skip or exit
+						ti85serial->status = TI85_RECEIVE_ANSWER_2;
+						break;
+				}
+			}
+			break;
+		case TI85_RECEIVE_ANSWER_2:
+			if(!ti85_receive_serial (device, ti85_receive_buffer+4*8, 3*8))
+			{
+				ti85_convert_stream_to_data (ti85_receive_buffer, 5*8, ti85_receive_data);
+				variable_number = 0;
+				ti85_free_serial_data_memory(device->machine);
+				ti85serial->status = TI85_SEND_STOP;
+			}
+			break;
+		case TI85_SEND_OK:
+			if(!ti85_send_serial(device, ti85_serial_stream.variables[variable_number].ok,ti85_serial_stream.variables[variable_number].ok_size))
+				ti85serial->status = TI85_SEND_DATA;
+			break;
+		case TI85_SEND_DATA:
+			if(!ti85_send_serial(device, ti85_serial_stream.variables[variable_number].data,ti85_serial_stream.variables[variable_number].data_size))
+				ti85serial->status = TI85_RECEIVE_OK_2;
+			break;
+		case TI85_RECEIVE_OK_2:
+			if(!ti85_receive_serial (device, ti85_receive_buffer, 4*8))
+			{
+				variable_number++;
+				ti85_convert_stream_to_data (ti85_receive_buffer, 4*8, ti85_receive_data);
+				ti85serial->status = (variable_number < ti85_serial_stream.number_of_variables) ? TI85_SEND_DATA : TI85_SEND_END;
+			}
+			break;
+		case TI85_SEND_END:
+			if(!ti85_send_serial(device, ti85_serial_stream.end,ti85_serial_stream.end_size))
+			{
+				variable_number = 0;
+				ti85_free_serial_data_memory(device->machine);
+				ti85serial->status = TI85_SEND_STOP;
+			}
+			break;
+		case TI85_SEND_RESET:
+			variable_number = 0;
+			break;
+	}
+}
+
+
+static void ti85_receive_variables (const device_config *device)
+{
+	ti85serial_state *ti85serial = get_token( device );
+	static UINT8* var_data = NULL;
+	static UINT32 var_file_number = 0;
+	char var_file_name[16];
+	static int variable_number = 0;
+	mame_file * var_file;
+	static UINT8* var_file_data = NULL;
+	UINT8* temp;
+	static int var_file_size = 0;
+	file_error filerr;
+
+	switch (ti85serial->status)
+	{
+		case TI85_RECEIVE_HEADER_1:
+			if(!ti85_receive_serial(device, ti85_receive_buffer+4*8, 3*8))
+			{
+				ti85_convert_stream_to_data (ti85_receive_buffer+4*8, 3*8, ti85_receive_data+4);
+				ti85serial->status = TI85_PREPARE_VARIABLE_DATA;
+			}
+			break;
+		case TI85_PREPARE_VARIABLE_DATA:
+			var_data = (UINT8*) malloc (ti85_receive_data[2]+2+ti85_receive_data[4]+ti85_receive_data[5]*256+2);
+			if(!var_data)
+				ti85serial->status = TI85_SEND_STOP;
+			memcpy (var_data, ti85_receive_data+2, 5);
+			ti85_free_serial_data_memory(device->machine);
+			if (!ti85_alloc_serial_data_memory(var_data[0]-1))
+			{
+				free(var_data); var_data = NULL;
+				free(var_file_data); var_file_data = NULL;
+				ti85serial->status = TI85_SEND_STOP;
+				return;
+			}
+			ti85serial->status = TI85_RECEIVE_HEADER_2;
+		case TI85_RECEIVE_HEADER_2:
+			if(!ti85_receive_serial(device, ti85_receive_buffer, (var_data[0]-1)*8))
+			{
+				ti85_convert_stream_to_data (ti85_receive_buffer, (var_data[0]-1)*8, ti85_receive_data);
+				memcpy (var_data+5, ti85_receive_data, var_data[0]-3);
+				ti85_free_serial_data_memory(device->machine);
+				if(!ti85_alloc_serial_data_memory (8))
+				{
+					free(var_data); var_data = NULL;
+					free(var_file_data); var_file_data = NULL;
+					ti85serial->status = TI85_SEND_STOP;
+					return;
+				}
+				ti85_convert_data_to_stream (ti85_pc_ok_packet, 4, ti85_receive_buffer);
+				ti85_convert_data_to_stream (ti85_pc_continue_packet, 4, ti85_receive_buffer+4*8);
+				ti85serial->status = TI85_SEND_OK_1;
+			}
+			break;
+		case TI85_SEND_OK_1:
+			if(!ti85_send_serial(device, ti85_receive_buffer, 4*8))
+				ti85serial->status = TI85_SEND_CONTINUE;
+			break;
+		case TI85_SEND_CONTINUE:
+			if(!ti85_send_serial(device, ti85_receive_buffer+4*8, 4*8))
+			{
+				ti85_free_serial_data_memory(device->machine);
+				if(!ti85_alloc_serial_data_memory(4))
+				{
+					free(var_data); var_data = NULL;
+					free(var_file_data); var_file_data = NULL;
+					ti85serial->status = TI85_SEND_STOP;
+					return;
+				}
+				ti85serial->status = TI85_RECEIVE_OK;
+			}
+			break;
+		case TI85_RECEIVE_OK:
+			if(!ti85_receive_serial (device, ti85_receive_buffer, 4*8))
+			{
+				ti85_convert_stream_to_data (ti85_receive_buffer, 4*8, ti85_receive_data);
+				ti85_free_serial_data_memory(device->machine);
+				if(!ti85_alloc_serial_data_memory(var_data[2]+var_data[3]*256+6))
+				{
+					free(var_data); var_data = NULL;
+					free(var_file_data); var_file_data = NULL;
+					ti85serial->status = TI85_SEND_STOP;
+					return;
+				}
+				ti85serial->status = TI85_RECEIVE_DATA;
+			}
+			break;
+		case TI85_RECEIVE_DATA:
+			if(!ti85_receive_serial (device, ti85_receive_buffer, (var_data[2]+var_data[3]*256+6)*8))
+			{
+				ti85_convert_stream_to_data (ti85_receive_buffer, (var_data[2]+var_data[3]*256+6)*8, ti85_receive_data);
+				memcpy (var_data+var_data[0]+2, ti85_receive_data+2, var_data[2]+var_data[3]*256+2);
+				ti85_free_serial_data_memory(device->machine);
+				if(!ti85_alloc_serial_data_memory (4))
+				{
+					free(var_data); var_data = NULL;
+					free(var_file_data); var_file_data = NULL;
+					ti85serial->status = TI85_SEND_STOP;
+					return;
+				}
+				ti85_convert_data_to_stream (ti85_pc_ok_packet, 4, ti85_receive_buffer);
+				ti85serial->status = TI85_SEND_OK_2;
+			}
+			break;
+		case TI85_SEND_OK_2:
+			if(!ti85_send_serial(device, ti85_receive_buffer, 4*8))
+			{
+				ti85_free_serial_data_memory(device->machine);
+				if(!ti85_alloc_serial_data_memory(7))
+				{
+					free(var_data); var_data = NULL;
+					free(var_file_data); var_file_data = NULL;
+					ti85serial->status = TI85_SEND_STOP;
+					return;
+				}
+				ti85serial->status =  TI85_RECEIVE_END_OR_HEADER_1;
+			}
+			break;
+		case TI85_RECEIVE_END_OR_HEADER_1:
+			if(!ti85_receive_serial (device, ti85_receive_buffer, 4*8))
+			{
+				if (variable_number == 0)
+				{
+					var_file_data = (UINT8*) malloc (0x39);
+					if (!var_file_data)
+					{
+						free (var_data); var_data = NULL;
+						free (var_file_data); var_file_data = NULL;
+						ti85serial->status = TI85_SEND_STOP;
+					}
+					else
+					{
+						memcpy(var_file_data, ti85_file_signature, 0x0b);
+						memcpy(var_file_data+0x0b, "File created by MESS", 0x14);
+						memset(var_file_data+0x1f, 0, 0x1a);
+						var_file_size = 0x39;
+					}
+				}
+				temp = malloc (var_file_size+var_data[0]+2+var_data[2]+var_data[3]*256+2);
+				if (temp)
+				{
+					memcpy (temp, var_file_data, var_file_size);
+					free (var_file_data);
+					var_file_data = temp;
+					memcpy (var_file_data + var_file_size -2, var_data, var_data[0]+2+var_data[2]+var_data[3]*256+2);
+					var_file_size += var_data[0]+2+var_data[2]+var_data[3]*256+2;
+					var_file_data[0x35] = (var_file_size-0x39)&0x00ff;
+					var_file_data[0x36] = ((var_file_size-0x39)&0xff00)>>8;
+					var_file_data[var_file_size-2] = ti85_calculate_checksum(var_file_data+0x37, var_file_size-0x39)&0x00ff;
+					var_file_data[var_file_size-1] = (ti85_calculate_checksum(var_file_data+0x37, var_file_size-0x39)&0xff00)>>8;
+				}
+				free (var_data);
+				var_data = NULL;
+				variable_number ++;
+
+				ti85_convert_stream_to_data (ti85_receive_buffer, 4*8, ti85_receive_data);
+				if (ti85_receive_data[1] == 0x06)
+					ti85serial->status = TI85_RECEIVE_HEADER_1;
+				else
+				{
+					ti85_free_serial_data_memory(device->machine);
+					if(!ti85_alloc_serial_data_memory (4))
+					{
+						free(var_data); var_data = NULL;
+						free(var_file_data); var_file_data = NULL;
+						ti85serial->status = TI85_SEND_STOP;
+						return;
+					}
+					ti85_convert_data_to_stream (ti85_pc_ok_packet, 4, ti85_receive_buffer);
+					ti85serial->status = TI85_SEND_OK_3;
+				}
+			}
+			break;
+		case TI85_SEND_OK_3:
+			if(!ti85_send_serial(device, ti85_receive_buffer, 4*8))
+			{
+				ti85_free_serial_data_memory(device->machine);
+				variable_number = 0;
+				ti85serial->status =  TI85_SEND_STOP;
+				sprintf (var_file_name, "%08d.85g", var_file_number);
+				filerr = mame_fopen(SEARCHPATH_IMAGE, var_file_name, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &var_file);
+				if (filerr == FILERR_NONE)
+				{
+					mame_fwrite(var_file, var_file_data, var_file_size);
+					mame_fclose(var_file);
+					free (var_file_data);
+					var_file_data = NULL;
+					var_file_size = 0;
+					var_file_number++;
+				}
+			}
+			break;
+		case TI85_SEND_RESET:
+		        if (var_data)
+			{
+				free(var_data); var_data = NULL;
+			}
+		        if (var_file_data)
+			{
+				free(var_file_data); var_file_data = NULL;
+			}
+			var_file_size = 0;
+			variable_number = 0;
+			break;
+	}
+}
+
+
+static void ti85_receive_backup (const device_config *device)
+{
+	ti85serial_state *ti85serial = get_token( device );
+	static int backup_variable_number = 0;
+	static int backup_data_size[3];
+
+	file_error filerr;
+	static UINT8* backup_file_data = NULL;
+	static UINT32 backup_file_number = 0;
+	char backup_file_name[] = "00000000.85b";
+	mame_file * backup_file;
+
+	switch (ti85serial->status)
+	{
+		case TI85_RECEIVE_HEADER_2:
+			if(!ti85_receive_serial(device, ti85_receive_buffer+7*8, 8*8))
+			{
+				ti85_convert_stream_to_data (ti85_receive_buffer+7*8, 8*8, ti85_receive_data+7);
+				backup_data_size[0] = ti85_receive_data[4] + ti85_receive_data[5]*256;
+				backup_data_size[1] = ti85_receive_data[7] + ti85_receive_data[8]*256;
+				backup_data_size[2] = ti85_receive_data[9] + ti85_receive_data[10]*256;
+				backup_file_data = malloc (0x42+0x06+backup_data_size[0]+backup_data_size[1]+backup_data_size[2]+0x02);
+				if(!backup_file_data)
+				{
+					backup_variable_number = 0;
+					ti85serial->status = TI85_SEND_STOP;
+					return;
+				}
+				memcpy(backup_file_data, ti85_file_signature, 0x0b);
+				memcpy(backup_file_data+0x0b, "File created by MESS", 0x14);
+				memset(backup_file_data+0x1f, 0, 0x16);
+				backup_file_data[0x35] = (backup_data_size[0]+backup_data_size[1]+backup_data_size[2]+0x11)&0x00ff;
+				backup_file_data[0x36] = ((backup_data_size[0]+backup_data_size[1]+backup_data_size[2]+0x11)&0xff00)>>8;
+				memcpy(backup_file_data+0x37, ti85_receive_data+0x02, 0x0b);
+				ti85_free_serial_data_memory(device->machine);
+				if(!ti85_alloc_serial_data_memory (8))
+				{
+					free(backup_file_data); backup_file_data = NULL;
+					backup_variable_number = 0;
+					ti85serial->status = TI85_SEND_STOP;
+					return;
+				}
+				ti85_convert_data_to_stream (ti85_pc_ok_packet, 4, ti85_receive_buffer);
+				ti85_convert_data_to_stream (ti85_pc_continue_packet, 4, ti85_receive_buffer+4*8);
+				ti85serial->status = TI85_SEND_OK_1;
+			}
+			break;
+		case TI85_SEND_OK_1:
+			if(!ti85_send_serial(device, ti85_receive_buffer, 4*8))
+				ti85serial->status = TI85_SEND_CONTINUE;
+			break;
+		case TI85_SEND_CONTINUE:
+			if(!ti85_send_serial(device, ti85_receive_buffer+4*8, 4*8))
+			{
+				ti85_free_serial_data_memory(device->machine);
+				if(!ti85_alloc_serial_data_memory(4))
+				{
+					free(backup_file_data); backup_file_data = NULL;
+					backup_variable_number = 0;
+					ti85serial->status = TI85_SEND_STOP;
+					return;
+				}
+				ti85serial->status = TI85_RECEIVE_OK;
+			}
+			break;
+		case TI85_RECEIVE_OK:
+			if(!ti85_receive_serial (device, ti85_receive_buffer, 4*8))
+			{
+				ti85_convert_stream_to_data (ti85_receive_buffer, 4*8, ti85_receive_data);
+				ti85_free_serial_data_memory(device->machine);
+				if(!ti85_alloc_serial_data_memory(backup_data_size[backup_variable_number]+6))
+				{
+					free(backup_file_data); backup_file_data = NULL;
+					backup_variable_number = 0;
+					ti85serial->status = TI85_SEND_STOP;
+					return;
+				}
+				ti85serial->status = TI85_RECEIVE_DATA;
+			}
+			break;
+		case TI85_RECEIVE_DATA:
+			if(!ti85_receive_serial (device, ti85_receive_buffer, (backup_data_size[backup_variable_number]+6)*8))
+			{
+				ti85_convert_stream_to_data (ti85_receive_buffer, (backup_data_size[backup_variable_number]+6)*8, ti85_receive_data);
+				switch (backup_variable_number)
+				{
+					case 0:
+						memcpy(backup_file_data+0x42, ti85_receive_data+0x02, backup_data_size[0]+0x02);
+						break;
+					case 1:
+						memcpy(backup_file_data+0x42+backup_data_size[0]+0x02, ti85_receive_data+0x02, backup_data_size[1]+0x02);
+						break;
+					case 2:
+						memcpy(backup_file_data+0x42+backup_data_size[0]+backup_data_size[1]+0x04, ti85_receive_data+0x02, backup_data_size[2]+0x02);
+						break;
+				}
+				ti85_free_serial_data_memory(device->machine);
+				if(!ti85_alloc_serial_data_memory (4))
+				{
+					free(backup_file_data); backup_file_data = NULL;
+					backup_variable_number = 0;
+					ti85serial->status = TI85_SEND_STOP;
+					return;
+				}
+				ti85_convert_data_to_stream (ti85_pc_ok_packet, 4, ti85_receive_buffer);
+				ti85serial->status = TI85_SEND_OK_2;
+			}
+			break;
+		case TI85_SEND_OK_2:
+			if(!ti85_send_serial(device, ti85_receive_buffer, 4*8))
+			{
+				ti85_free_serial_data_memory(device->machine);
+				backup_variable_number++;
+				if (backup_variable_number<3)
+				{
+					if(!ti85_alloc_serial_data_memory(backup_data_size[backup_variable_number]+6))
+					{
+						free(backup_file_data); backup_file_data = NULL;
+						backup_variable_number = 0;
+						ti85serial->status = TI85_SEND_STOP;
+						return;
+					}
+					ti85serial->status =  TI85_RECEIVE_DATA;
+				}
+				else
+				{
+					backup_variable_number = 0;
+					backup_file_data[0x42+0x06+backup_data_size[0]+backup_data_size[1]+backup_data_size[2]] = ti85_calculate_checksum(backup_file_data+0x37, 0x42+backup_data_size[0]+backup_data_size[1]+backup_data_size[2]+0x06-0x37)&0x00ff;
+					backup_file_data[0x42+0x06+backup_data_size[0]+backup_data_size[1]+backup_data_size[2]+0x01] = (ti85_calculate_checksum(backup_file_data+0x37, 0x42+backup_data_size[0]+backup_data_size[1]+backup_data_size[2]+0x06-0x37)&0xff00)>>8;
+					sprintf (backup_file_name, "%08d.85b", backup_file_number);
+					filerr = mame_fopen(SEARCHPATH_IMAGE, backup_file_name, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &backup_file);
+					if (filerr == FILERR_NONE)
+					{
+						mame_fwrite(backup_file, backup_file_data, 0x42+0x06+backup_data_size[0]+backup_data_size[1]+backup_data_size[2]+0x02);
+						mame_fclose(backup_file);
+						backup_file_number++;
+					}
+					free(backup_file_data); backup_file_data = NULL;
+					ti85serial->status =  TI85_SEND_STOP;
+				}
+			}
+			break;
+		case TI85_SEND_RESET:
+			if (backup_file_data)
+			{
+				free(backup_file_data); backup_file_data = NULL;
+			}
+			backup_variable_number = 0;
+			break;
+	}
+}
+
+static void ti85_receive_screen (const device_config *device)
+{
+	ti85serial_state *ti85serial = get_token( device );
+	static UINT32 image_file_number = 0;
+	char image_file_name[] = "00000000.85i";
+	file_error filerr;
+	mame_file * image_file;
+	UINT8 * image_file_data;
+
+	switch (ti85serial->status)
+	{
+		case TI85_PREPARE_SCREEN_REQUEST:
+			if(!ti85_alloc_serial_data_memory (4))
+			{
+				ti85serial->status = TI85_SEND_STOP;
+				return;
+			}
+			ti85_convert_data_to_stream (ti85_pc_screen_request_packet, 4, ti85_receive_buffer);
+			ti85serial->status = TI85_SEND_SCREEN_REQUEST;
+			break;
+		case TI85_SEND_SCREEN_REQUEST:
+			if(!ti85_send_serial(device, ti85_receive_buffer, 4*8))
+			{
+				ti85_free_serial_data_memory(device->machine);
+				if(!ti85_alloc_serial_data_memory (4))
+				{
+					ti85serial->status = TI85_SEND_STOP;
+					return;
+				}
+				ti85serial->status = TI85_RECEIVE_OK;
+			}
+			break;
+		case TI85_RECEIVE_OK:
+			if(!ti85_receive_serial (device, ti85_receive_buffer, 4*8))
+			{
+				ti85_convert_stream_to_data (ti85_receive_buffer, 4*8, ti85_receive_data);
+				ti85_free_serial_data_memory(device->machine);
+				if(!ti85_alloc_serial_data_memory (1030))
+				{
+					ti85serial->status = TI85_SEND_STOP;
+					return;
+				}
+				ti85serial->status = TI85_RECEIVE_DATA;
+			}
+			break;
+		case TI85_RECEIVE_DATA:
+			if(!ti85_receive_serial (device, ti85_receive_buffer, 1030*8))
+			{
+				ti85_convert_stream_to_data (ti85_receive_buffer, 1030*8, ti85_receive_data);
+				sprintf (image_file_name, "%08d.85i", image_file_number);
+				filerr = mame_fopen(SEARCHPATH_IMAGE, image_file_name, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &image_file);
+				if (filerr == FILERR_NONE)
+				{
+					image_file_data = malloc (0x49+1008);
+					if(!image_file_data)
+					{
+						ti85_free_serial_data_memory(device->machine);
+						ti85serial->status = TI85_SEND_OK;
+						return;
+					}
+					memcpy(image_file_data, ti85_file_signature, 0x0b);
+					memcpy(image_file_data+0x0b, "File created by MESS", 0x14);
+					memset(image_file_data+0x1f, 0, 0x16);
+					image_file_data[0x35] = 0x00;
+					image_file_data[0x36] = 0x04;
+					image_file_data[0x37] = 0x0a; //header size
+					image_file_data[0x38] = 0x00;
+					image_file_data[0x39] = 0xf2; //data size
+					image_file_data[0x3a] = 0x03;
+					image_file_data[0x3b] = 0x11; //data type
+					image_file_data[0x3c] = 0x06; //name size
+					memcpy(image_file_data+0x3d, "Screen", 0x06);
+					image_file_data[0x43] = 0xf2;
+					image_file_data[0x44] = 0x03;
+					image_file_data[0x45] = 0xf0;
+					image_file_data[0x46] = 0x03;
+					memcpy(image_file_data+0x47, ti85_receive_data+4, 1008);
+					image_file_data[1008+0x49-2] = ti85_calculate_checksum(image_file_data+0x37, 1008+0x10)&0x00ff;
+					image_file_data[1008+0x49-1] = (ti85_calculate_checksum(image_file_data+0x37, 1008+0x10)&0xff00)>>8;
+					mame_fwrite(image_file, image_file_data, 1008+0x49);
+					mame_fclose(image_file);
+					free(image_file_data);
+					image_file_number++;
+				}
+				ti85_free_serial_data_memory(device->machine);
+				if(!ti85_alloc_serial_data_memory (4))
+				{
+					ti85serial->status = TI85_SEND_STOP;
+					return;
+				}
+				ti85_convert_data_to_stream (ti85_pc_ok_packet, 4, ti85_receive_buffer);
+				ti85serial->status = TI85_SEND_OK;
+			}
+			break;
+		case TI85_SEND_OK:
+			if(!ti85_send_serial(device, ti85_receive_buffer, 4*8))
+			{
+				ti85_free_serial_data_memory(device->machine);
+				ti85serial->status = TI85_SEND_STOP;
+			}
+			break;
+	}
+}
+
+
+void ti85_update_serial (const device_config *device)
+{
+	ti85serial_state *ti85serial = get_token( device );
+
+	if (ti85serial->status == TI85_SEND_STOP)
+	{
+		if (input_port_read(device->machine, "SERIAL") & 0x01)
+		{
+			if(!ti85_alloc_serial_data_memory(15)) return;
+			if(!ti85_receive_serial (device, ti85_receive_buffer, 7*8))
+			{
+				ti85_convert_stream_to_data (ti85_receive_buffer, 7*8, ti85_receive_data);
+				if (ti85_receive_data[0]!=0x85 || ti85_receive_data[1]!=0x06)
+				{
+					ti85_receive_serial (device, NULL, 0);
+					return;
+				}
+				ti85_serial_transfer_type = (ti85_receive_data[6]==0x1d) ? TI85_RECEIVE_BACKUP : TI85_RECEIVE_VARIABLES;
+				ti85serial->status = (ti85_receive_data[6]==0x1d) ? TI85_RECEIVE_HEADER_2 : TI85_PREPARE_VARIABLE_DATA;
+			}
+		}
+		else
+		{
+			ti85_receive_serial(device, NULL, 0);
+			ti85_free_serial_data_memory(device->machine);
+			if (input_port_read(device->machine, "DUMP") & 0x01)
+			{
+				ti85serial->status = TI85_PREPARE_SCREEN_REQUEST;
+				ti85_serial_transfer_type = TI85_RECEIVE_SCREEN;
+			}
+			return;
+		}
+	}
+
+	switch (ti85_serial_transfer_type)
+	{
+		case TI85_SEND_VARIABLES:
+			ti85_send_variables(device);
+			break;
+		case TI85_SEND_BACKUP:
+			ti85_send_backup(device);
+			break;
+		case TI85_RECEIVE_BACKUP:
+			ti85_receive_backup(device);
+			break;
+		case TI85_RECEIVE_VARIABLES:
+			ti85_receive_variables(device);
+			break;
+		case TI85_RECEIVE_SCREEN:
+			ti85_receive_screen(device);
+			break;
+	}
+}
+
+
+WRITE8_DEVICE_HANDLER( ti85serial_red_out )
+{
+	ti85serial_state *ti85serial = get_token( device );
+
+	ti85serial->red_out = data;
+}
+
+
+WRITE8_DEVICE_HANDLER( ti85serial_white_out )
+{
+	ti85serial_state *ti85serial = get_token( device );
+
+	ti85serial->white_out = data;
+}
+
+
+READ8_DEVICE_HANDLER( ti85serial_red_in )
+{
+	ti85serial_state *ti85serial = get_token( device );
+
+	return ti85serial->red_in;
+}
+
+
+READ8_DEVICE_HANDLER( ti85serial_white_in )
+{
+	ti85serial_state *ti85serial = get_token( device );
+
+	return ti85serial->white_in;
+}
+
+
+static DEVICE_START( ti85serial )
+{
+	ti85serial_state *ti85serial = get_token( device );
+
+	ti85serial->status = TI85_SEND_STOP;
+	ti85serial->transfer_type = TI85_SEND_VARIABLES;
+
+	ti85_free_serial_data_memory(device->machine);
+	ti85_receive_serial (device, NULL,0);
+}
+
+
+static DEVICE_RESET( ti85serial )
+{
+	ti85serial_state *ti85serial = get_token( device );
+
+	ti85_receive_serial(device, NULL, 0);
+	ti85_send_serial(device, NULL, 0);
+	ti85_free_serial_data_memory(device->machine);
+//	ti85_PCR = 0xc0;
+	ti85serial->red_in = 0;
+	ti85serial->white_in = 0;
+	ti85serial->red_out = 1;
+	ti85serial->white_out = 1;
+	ti85serial->status = TI85_SEND_RESET;
+	ti85_send_variables(device);
+	ti85_send_backup(device);
+	ti85_receive_variables(device);
+	ti85_receive_backup(device);
+	ti85serial->status = TI85_SEND_STOP;
+}
+
+
+static DEVICE_IMAGE_LOAD( ti85serial )
+{
+	ti85serial_state *ti85serial = get_token( image );
+	UINT8* file_data;
+	UINT16 file_size;
+
+	if (ti85serial->status != TI85_SEND_STOP) return INIT_FAIL;
+
+	file_size = image_length(image);
+
+	if (file_size != 0)
+	{
+		file_data = auto_alloc_array(image->machine, UINT8, file_size);
+		image_fread(image, file_data, file_size);
+
+		if(!ti85_convert_file_data_to_serial_stream(file_data, file_size, &ti85_serial_stream, (char*)image->machine->gamedrv->name))
+		{
+			ti85_free_serial_stream (&ti85_serial_stream);
+			return INIT_FAIL;
+		}
+
+		ti85serial->status = TI85_SEND_HEADER;
+	}
+	else
+	{
+		return INIT_FAIL;
+	}
+	return INIT_PASS;
+}
+
+
+static DEVICE_IMAGE_UNLOAD( ti85serial )
+{
+	ti85serial_state *ti85serial = get_token( image );
+
+	ti85_free_serial_data_memory(image->machine);
+	ti85serial->status = TI85_SEND_STOP;
+	ti85_free_serial_stream (&ti85_serial_stream);
+}
+
+
+DEVICE_GET_INFO( ti85serial )
+{
+	switch ( state )
+	{
+	case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof( ti85serial_state );											break;
+	case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;																	break;
+	case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;												break;
+	case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_SERIAL;															break;
+	case DEVINFO_INT_IMAGE_READABLE:				info->i = 1;																	break;
+	case DEVINFO_INT_IMAGE_WRITEABLE:				info->i = 0;																	break;
+	case DEVINFO_INT_IMAGE_CREATABLE:				info->i = 0;																	break;
+	case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ti85serial );									break;
+	case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( ti85serial );									break;
+	case DEVINFO_FCT_IMAGE_LOAD:					info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( ti85serial );						break;
+	case DEVINFO_FCT_IMAGE_UNLOAD:					info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME( ti85serial );						break;
+	case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:		strcpy(info->s, "ser");															break;
+	case DEVINFO_STR_IMAGE_INSTANCE_NAME:
+	case DEVINFO_STR_NAME:							strcpy(info->s, "TI85 Serial");													break;
+	case DEVINFO_STR_FAMILY:						strcpy(info->s, "serial protocol");												break;
+	case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);														break;
+	case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, "85p,85s,85i,85n,85c,85l,85k,85m,85v,85d,85e,85r,85g,85b");		break;
+	}
+}
+
+
+DEVICE_GET_INFO( ti86serial )
+{
+	switch ( state )
+	{
+	case DEVINFO_STR_NAME:							strcpy(info->s, "TI86 Serial");													break;
+	case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, "86p,86s,86i,86n,86c,86l,86k,86m,86v,86d,86e,86r,86g");			break;
+	default:										DEVICE_GET_INFO_CALL( ti85serial );
+	}
+}
+

@@ -1,48 +1,26 @@
-#define TI85_HEADER_SIZE	0x37
 
-#define TI85_SEND_VARIABLES	1
-#define TI85_SEND_BACKUP	2
-#define TI85_RECEIVE_BACKUP	3
-#define TI85_RECEIVE_VARIABLES	4
-#define TI85_RECEIVE_SCREEN	5
+#ifndef __TI85SERIAL_H_
+#define __TI85SERIAL_H_
 
-typedef struct {
-	UINT16 head_size;
-	UINT16 data_size;
-	unsigned char type;
-	unsigned char name_size;
-	unsigned int offset;
-} ti85_entry;
+#include "device.h"
 
-typedef struct {
-	UINT8* header;
-	UINT16 header_size;
-	UINT8* ok;
-	UINT16 ok_size;
-	UINT8* data;
-	UINT32 data_size;
-} ti85_serial_variable;
+#define TI85SERIAL	DEVICE_GET_INFO_NAME(ti85serial)
+#define TI86SERIAL	DEVICE_GET_INFO_NAME(ti86serial)
 
-typedef struct {
-	ti85_serial_variable * variables;
-	UINT8* end;
-	UINT16 end_size;
-	UINT16 number_of_variables;
-} ti85_serial_data;
+DEVICE_GET_INFO(ti85serial);
+DEVICE_GET_INFO(ti86serial);
 
-extern const UINT8 ti85_file_signature[];
-extern const UINT8 ti86_file_signature[];
-extern const UINT8 ti85_pc_ok_packet[];
-extern const UINT8 ti86_pc_ok_packet[];
-extern const UINT8 ti85_pc_continue_packet[];
-extern const UINT8 ti86_pc_continue_packet[];
-extern const UINT8 ti85_pc_screen_request_packet[];
-extern int ti85_serial_transfer_type;
+extern void ti85_update_serial(const device_config *device);
 
-extern UINT16 ti85_calculate_checksum(const UINT8*, unsigned int);
-extern UINT16 ti85_variables_count (const UINT8 *, unsigned int);
-extern void ti85_variables_read (const UINT8 *, unsigned int, ti85_entry *);
-extern int ti85_convert_file_data_to_serial_stream (const UINT8*, UINT32, ti85_serial_data*, char*);
-extern void ti85_convert_data_to_stream (const UINT8*, unsigned int, UINT8*);
-extern void ti85_convert_stream_to_data (const UINT8*, unsigned int, UINT8*);
-extern void ti85_free_serial_stream (ti85_serial_data*);
+#define MDRV_TI85SERIAL_ADD( _tag ) \
+		MDRV_DEVICE_ADD( _tag, TI85SERIAL, 0 )
+
+#define MDRV_TI86SERIAL_ADD( _tag ) \
+		MDRV_DEVICE_ADD( _tag, TI86SERIAL, 0 )
+
+WRITE8_DEVICE_HANDLER( ti85serial_red_out );
+WRITE8_DEVICE_HANDLER( ti85serial_white_out );
+READ8_DEVICE_HANDLER( ti85serial_red_in );
+READ8_DEVICE_HANDLER( ti85serial_white_in );
+
+#endif
