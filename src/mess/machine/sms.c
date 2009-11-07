@@ -73,6 +73,9 @@ struct _sms_driver_data {
 	UINT16 lphaser_2_y;
 	int lphaser_x_offs;	/* Needed to 'calibrate' lphaser; set at cart loading */
 
+	/* Data needed for SegaScope (3D glasses) */
+	UINT8 sscope_state;
+
 	/* Cartridge slot info */
 	UINT8 current_cartridge;
 	struct
@@ -598,6 +601,18 @@ READ8_HANDLER( gg_input_port_2_r )
 {
 	//logerror("joy 2 read, val: %02x, pc: %04x\n", ((sms_state.is_region_japan ? 0x00 : 0x40) | (input_port_read(machine, "START") & 0x80)), activecpu_get_pc());
 	return ((sms_state.is_region_japan ? 0x00 : 0x40) | (input_port_read(space->machine, "START") & 0x80));
+}
+
+
+READ8_HANDLER( sms_sscope_r )
+{
+	return sms_state.sscope_state;
+}
+
+
+WRITE8_HANDLER( sms_sscope_w )
+{
+	sms_state.sscope_state = data;
 }
 
 
@@ -1450,6 +1465,8 @@ MACHINE_RESET( sms )
 	sms_state.lphaser_2_x = 0;
 	sms_state.lphaser_2_x = 0;
 
+	sms_state.sscope_state = 0;
+
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
 	timer_set(space->machine, attotime_zero, NULL, 0, lightgun_tick);
 }
@@ -1580,4 +1597,78 @@ DRIVER_INIT( gamegeaj )
 	sms_state.is_region_japan = 1;
 	sms_state.is_gamegear = 1;
 	sms_state.has_bios_0400 = 1;
+}
+
+
+/* This needs to be here to check if segascope has been enabled */
+VIDEO_UPDATE( sms1 )
+{
+	const device_config *main_scr = devtag_get_device(screen->machine, "screen");
+	const device_config *left_lcd = devtag_get_device(screen->machine, "left_lcd");
+	const device_config *right_lcd = devtag_get_device(screen->machine, "right_lcd");
+	const device_config *smsvdp = devtag_get_device(screen->machine, "sms_vdp");
+	UINT8 segascope = input_port_read_safe(screen->machine, "SEGASCOPE", 0x00);
+
+	if (screen == main_scr)
+	{
+		smsvdp_update(smsvdp, bitmap, cliprect);
+	}
+	else if (screen == left_lcd)
+	{
+		int width = video_screen_get_width(screen);
+		int height = video_screen_get_height(screen);
+		int x, y;
+
+		if (segascope)
+		{
+			if (sms_state.sscope_state & 0x01)  /* 1 = left screen ON, right screen OFF */
+				smsvdp_update(smsvdp, bitmap, cliprect);
+			else                                /* 0 = left screen OFF, right screen ON */
+			{
+				for (y = 0; y < height; y++)
+					for (x = 0; x < width; x++)
+						*BITMAP_ADDR32(bitmap, y, x) = MAKE_RGB(0,0,0);
+			}
+		}
+		else	/* We only use the second screen for SegaScope, if it not selected return a black screen */
+		{
+			for (y = 0; y < height; y++)
+				for (x = 0; x < width; x++)
+					*BITMAP_ADDR32(bitmap, y, x) = MAKE_RGB(0,0,0);
+		}
+	}
+	else if (screen == right_lcd)
+	{
+		int width = video_screen_get_width(screen);
+		int height = video_screen_get_height(screen);
+		int x, y;
+
+		if (segascope)
+		{
+			if (sms_state.sscope_state & 0x01)  /* 1 = left screen ON, right screen OFF */
+			{
+				for (y = 0; y < height; y++)
+					for (x = 0; x < width; x++)
+						*BITMAP_ADDR32(bitmap, y, x) = MAKE_RGB(0,0,0);
+			}
+			else                                /* 0 = left screen OFF, right screen ON */
+				smsvdp_update(smsvdp, bitmap, cliprect);
+		}
+		else	/* We only use the third screen for SegaScope, if it not selected return a black screen */
+		{
+			for (y = 0; y < height; y++)
+				for (x = 0; x < width; x++)
+					*BITMAP_ADDR32(bitmap, y, x) = MAKE_RGB(0,0,0);
+		}
+	}
+
+	return 0;
+}
+
+VIDEO_UPDATE( sms )
+{
+	const device_config *smsvdp = devtag_get_device(screen->machine, "sms_vdp");
+	smsvdp_update(smsvdp, bitmap, cliprect);
+
+	return 0;
 }

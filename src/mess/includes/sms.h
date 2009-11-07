@@ -27,6 +27,8 @@ WRITE8_HANDLER( sms_ym2413_register_port_0_w );
 WRITE8_HANDLER( sms_ym2413_data_port_0_w );
 WRITE8_HANDLER( sms_io_control_w );
 READ8_HANDLER( sms_count_r );
+WRITE8_HANDLER( sms_sscope_w );
+READ8_HANDLER( sms_sscope_r );
 WRITE8_HANDLER( sms_mapper_w );
 READ8_HANDLER( sms_mapper_r );
 WRITE8_HANDLER( sms_bios_w );
@@ -68,5 +70,7 @@ DRIVER_INIT( smssdisp );
 DRIVER_INIT( gamegear );
 DRIVER_INIT( gamegeaj );
 
+VIDEO_UPDATE( sms1 );
+VIDEO_UPDATE( sms );
 
 #endif /* SMS_H_ */

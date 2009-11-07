@@ -1570,6 +1570,7 @@ $(MESS_DRIVERS)/mmd1.o:		$(MESS_LAYOUT)/mmd1.lh \
 $(MESS_DRIVERS)/poly880.o:	$(MESS_LAYOUT)/poly880.lh
 $(MESS_VIDEO)/pc8401a.o:	$(MESS_LAYOUT)/pc8500.lh
 $(MESS_DRIVERS)/px4.o:		$(MESS_LAYOUT)/px4.lh
+$(MESS_DRIVERS)/sms.o:		$(MESS_LAYOUT)/sms1.lh
 $(MESS_DRIVERS)/stopthie.o:	$(MESS_LAYOUT)/stopthie.lh
 $(MESS_DRIVERS)/super80.o:	$(MESS_LAYOUT)/super80.lh
 $(MESS_DRIVERS)/svision.o:	$(MESS_LAYOUT)/svision.lh

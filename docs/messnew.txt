@@ -20,8 +20,12 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
-- [TI85/TI86] Converted the serial interface to a device.
-  [Wilbert Pol]
+- [SMS] Added SegaScope (3D-Glasses) support to Sega Master System I
+  drivers (i.e. sms1, sms1pal, smsj, sg1000m3). To enable this, enter
+  Driver Configuration menu and turn on SegaScope, then go in the Video
+  Options menu and choose one of the SegaScope views. [Fabio Priuli]
+
+- [TI85/TI86] Converted the serial interface to a device. [Wilbert Pol]
 
 
 
