@@ -76,6 +76,9 @@ struct _sms_driver_data {
 	/* Data needed for SegaScope (3D glasses) */
 	UINT8 sscope_state;
 
+	/* Data needed for Terebi Oekaki (TV Draw) */
+	UINT8 tvdraw_data;
+
 	/* Cartridge slot info */
 	UINT8 current_cartridge;
 	struct
@@ -156,27 +159,17 @@ static WRITE8_HANDLER( sms_input_write )
 
 static TIMER_CALLBACK( lightgun_tick )
 {
+	/* is there a Light Phaser in P1 port? */
 	if ((input_port_read_safe(machine, "CTRLSEL", 0x00) & 0x0f) == 0x01)
-	{
-			/* enable crosshair */
-			crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
-	}
+		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);   /* enable crosshair */
 	else
-	{
-			/* disable crosshair */
-			crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);
-	}
+		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);  /* disable crosshair */
 	
+	/* is there a Light Phaser in P2 port? */
 	if ((input_port_read_safe(machine, "CTRLSEL", 0x00) & 0xf0) == 0x10)
-	{
-			/* enable crosshair */
-			crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_ALL);
-	}
+		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_ALL);   /* enable crosshair */
 	else
-	{
-			/* disable crosshair */
-			crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_NONE);
-	}
+		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_NONE);  /* disable crosshair */
 }
 
 
@@ -619,6 +612,35 @@ WRITE8_HANDLER( sms_sscope_w )
 READ8_HANDLER( sms_mapper_r )
 {
 	return sms_state.mapper[offset];
+}
+
+/* Terebi Oekaki */
+/* The following code comes from sg1000.c. We should eventually merge these TV Draw implementations */
+static WRITE8_HANDLER( sms_tvdraw_axis_w )
+{
+	UINT8 tvboard_on = input_port_read_safe(space->machine, "TVDRAW", 0x00);
+	if (data & 0x01)
+	{
+		sms_state.tvdraw_data = tvboard_on ? input_port_read(space->machine, "TVDRAW_X") : 0x80;
+
+		if (sms_state.tvdraw_data < 4) sms_state.tvdraw_data = 4;
+		if (sms_state.tvdraw_data > 251) sms_state.tvdraw_data = 251;
+	}
+	else
+	{
+		sms_state.tvdraw_data = tvboard_on ? input_port_read(space->machine, "TVDRAW_Y") + 0x20 : 0x80;
+	}
+}
+
+static READ8_HANDLER( sms_tvdraw_status_r )
+{
+	UINT8 tvboard_on = input_port_read_safe(space->machine, "TVDRAW", 0x00);
+	return tvboard_on ? input_port_read(space->machine, "TVDRAW_PEN") : 0x01;
+}
+
+static READ8_HANDLER( sms_tvdraw_data_r )
+{
+	return sms_state.tvdraw_data;
 }
 
 
@@ -1133,6 +1155,18 @@ static int detect_korean_mapper( UINT8 *rom )
 	return 0;
 }
 
+
+static int detect_tvdraw( UINT8 *rom )
+{
+	static const UINT8 terebi_oekaki[7] = { 0x61, 0x6e, 0x6e, 0x61, 0x6b, 0x6d, 0x6e };	// "annakmn"
+
+	if (!memcmp(&rom[0x13b3], terebi_oekaki, 7))
+		return 1;
+
+	return 0;
+}
+
+
 static int detect_lphaser_xoffset( UINT8 *rom )
 {
 	static const UINT8 signatures[6][16] =
@@ -1291,7 +1325,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 			sms_state.cartridge[index].features |= CF_GG_SMS_MODE;
 
 		/* Check for 93C46 eeprom */
-		if (strstr( extrainfo, "93C46"))
+		if (strstr(extrainfo, "93C46"))
 			sms_state.cartridge[index].features |= CF_93C46_EEPROM;
 
 		/* Check for 8KB on-cart RAM */
@@ -1335,6 +1369,15 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	
 	/* For Light Phaser games, we have to detect the x offset */
 	sms_state.lphaser_x_offs = detect_lphaser_xoffset(sms_state.cartridge[index].ROM);
+
+	/* Terebi Oekaki (TV Draw) is a SG1000 game with special input device which is compatible with SG1000 Mark III */
+	if ((detect_tvdraw(sms_state.cartridge[index].ROM)) && sms_state.is_region_japan)
+	{
+		const address_space *program = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		memory_install_write8_handler(program, 0x6000, 0x6000, 0, 0, &sms_tvdraw_axis_w);
+		memory_install_read8_handler(program, 0x8000, 0x8000, 0, 0, &sms_tvdraw_status_r);
+		memory_install_readwrite8_handler(program, 0xa000, 0xa000, 0, 0, &sms_tvdraw_data_r, SMH_NOP);
+	}
 
 	/* Load battery backed RAM, if available */
 	image_battery_load(image, sms_state.cartridge[index].cartSRAM, sizeof(UINT8) * NVRAM_SIZE);
@@ -1466,6 +1509,8 @@ MACHINE_RESET( sms )
 	sms_state.lphaser_2_x = 0;
 
 	sms_state.sscope_state = 0;
+
+	sms_state.tvdraw_data = 0;
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
 	timer_set(space->machine, attotime_zero, NULL, 0, lightgun_tick);

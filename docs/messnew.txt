@@ -21,9 +21,15 @@ Skeleton drivers:
 System Driver Changes:
 ----------------------
 - [SMS] Added SegaScope (3D-Glasses) support to Sega Master System I
-  drivers (i.e. sms1, sms1pal, smsj, sg1000m3). To enable this, enter
+  drivers (i.e. sms1, sms1pal, smsj & sg1000m3). To enable this, enter
   Driver Configuration menu and turn on SegaScope, then go in the Video
   Options menu and choose one of the SegaScope views. [Fabio Priuli]
+
+- [SMS] Added Terebi Oekaki graphic board support to Japanese drivers 
+  (i.e. smsj & sg1000m3). To enable this, start emulation of "Terebi
+  Oekaki", then enter Driver Configuration menu and turn on the Tablet.
+  Once enabled, remappable controls will also appear in the Input (this 
+  System) menu. [Fabio Priuli]
 
 - [TI85/TI86] Converted the serial interface to a device. [Wilbert Pol]
 

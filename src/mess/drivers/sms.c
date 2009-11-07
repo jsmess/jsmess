@@ -252,6 +252,26 @@ static INPUT_PORTS_START( sms1 )
 	PORT_CONFSETTING( 0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( smsj )
+	PORT_INCLUDE( sms1 )
+
+	PORT_START("TVDRAW")
+	PORT_CONFNAME( 0x01, 0x00, "Terebi Oekaki Graphics Tablet" )
+	PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING( 0x01, DEF_STR( On ) )
+
+	PORT_START("TVDRAW_X")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_NAME("Tablet - X Axis") PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1) 
+		PORT_CONDITION("TVDRAW", 0x01, PORTCOND_EQUALS, 0x01)
+
+	PORT_START("TVDRAW_Y")
+	PORT_BIT( 0xff, 0x60, IPT_LIGHTGUN_Y ) PORT_NAME("Tablet - Y Axis") PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 191) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1) 
+		PORT_CONDITION("TVDRAW", 0x01, PORTCOND_EQUALS, 0x01)
+
+	PORT_START("TVDRAW_PEN")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Tablet - Pen") PORT_CONDITION("TVDRAW", 0x01, PORTCOND_EQUALS, 0x01)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( gg )
 	PORT_START("PORT_DC")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
@@ -796,11 +816,11 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE      INPUT   INIT      CONFIG    COMPANY     FULLNAME                            FLAGS */
-CONS( 1984, sg1000m3,   sms,        0,      sg1000m3,    sms1,   sg1000m3, 0,        "Sega",     "SG-1000 Mark III",                 0 )
+CONS( 1984, sg1000m3,   sms,        0,      sg1000m3,    smsj,   sg1000m3, 0,        "Sega",     "SG-1000 Mark III",                 0 )
 CONS( 1986, sms1,       sms,        0,      sms1_ntsc,   sms1,   sms1,     0,        "Sega",     "Master System I",                  0 )
 CONS( 1986, sms1pal,    sms,        0,      sms1_pal,    sms1,   sms1,     0,        "Sega",     "Master System I (PAL)" ,           0 )
 CONS( 1986, smssdisp,   sms,        0,      sms_sdisp,   sms,    smssdisp, 0,        "Sega",     "Master System Store Display Unit", GAME_NOT_WORKING )
-CONS( 1987, smsj,       sms,        0,      sms_fm,      sms1,   smsj,     0,        "Sega",     "Master System (Japan)",            0 )
+CONS( 1987, smsj,       sms,        0,      sms_fm,      smsj,   smsj,     0,        "Sega",     "Master System (Japan)",            0 )
 CONS( 1990, sms,        0,          0,      sms2_ntsc,   sms,    sms1,     0,        "Sega",     "Master System II",                 0 )
 CONS( 1990, smspal,     sms,        0,      sms2_pal,    sms,    sms1,     0,        "Sega",     "Master System II (PAL)",           0 )
 CONS( 1990, sms2kr,     sms,        0,      sms2_fm,     sms,    sms2kr,   0,        "Samsung",  "Gam*Boy II (Korea)",               0 )
