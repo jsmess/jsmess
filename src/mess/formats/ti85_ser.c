@@ -112,7 +112,7 @@ typedef struct
 INLINE ti85serial_state *get_token(const device_config *device)
 {
 	assert(device != NULL);
-	assert(device->type == TI85SERIAL);
+	assert((device->type == TI85SERIAL) || (device->type == TI86SERIAL));
 	return (ti85serial_state *) device->token;
 }
 
@@ -314,7 +314,7 @@ static void ti85_convert_stream_to_data (const UINT8* serial_data, UINT32 size, 
 }
 
 
-static int ti85_convert_file_data_to_serial_stream (const device_config *device, const UINT8* file_data, unsigned int file_size, ti85_serial_data*  serial_data, char* calc_type)
+static int ti85_convert_file_data_to_serial_stream (const device_config *device, const UINT8* file_data, unsigned int file_size, ti85_serial_data*  serial_data)
 {
 	ti85serial_state *ti85serial = get_token( device );
 	UINT16 i;
@@ -325,10 +325,10 @@ static int ti85_convert_file_data_to_serial_stream (const device_config *device,
 	UINT8* temp_data_to_convert = NULL;
 	UINT16 checksum;
 
-	if (!strncmp(calc_type, "ti85", 4))
+	if (device->type == TI85SERIAL)
 		if (strncmp((char *) file_data, (char *) ti85_file_signature, 11))
 			return 0;
-	if (!strncmp(calc_type, "ti86", 4))
+	if (device->type == TI86SERIAL)
 		if (strncmp((char *) file_data, (char *) ti86_file_signature, 11))
 			return 0;
 
@@ -417,9 +417,9 @@ static int ti85_convert_file_data_to_serial_stream (const device_config *device,
 			}
 			serial_data->variables[i].header_size = (10+ti85_entries[i].name_size)*8;
 
-			if (!strncmp(calc_type, "ti85", 4))
+			if (device->type == TI85SERIAL)
 				temp_data_to_convert[0] = 0x05;	//PC to TI-85
-			if (!strncmp(calc_type, "ti86", 4))
+			if (device->type == TI86SERIAL)
 				temp_data_to_convert[0] = 0x06;	//PC to TI-86
 			temp_data_to_convert[1] = 0x06;	//header
 			temp_data_to_convert[2] = (4+ti85_entries[i].name_size)&0x00ff;
@@ -443,9 +443,9 @@ static int ti85_convert_file_data_to_serial_stream (const device_config *device,
 			free (ti85_entries);
 			return 0;
 		}
-		if (!strncmp(calc_type, "ti85", 4))
+		if (device->type == TI85SERIAL)
 			ti85_convert_data_to_stream(ti85_pc_ok_packet, TI85_PC_OK_PACKET_SIZE, serial_data->variables[i].ok);
-		if (!strncmp(calc_type, "ti86", 4))
+		if (device->type == TI86SERIAL)
 			ti85_convert_data_to_stream(ti86_pc_ok_packet, TI85_PC_OK_PACKET_SIZE, serial_data->variables[i].ok);
 		serial_data->variables[i].ok_size = TI85_PC_OK_PACKET_SIZE*8;
 
@@ -465,9 +465,9 @@ static int ti85_convert_file_data_to_serial_stream (const device_config *device,
 		}
 		serial_data->variables[i].data_size = (6+ti85_entries[i].data_size)*8;
 
-		if (!strncmp(calc_type, "ti85", 4))
+		if (device->type == TI85SERIAL)
 			temp_data_to_convert[0] = 0x05;	//PC to TI-85
-		if (!strncmp(calc_type, "ti86", 4))
+		if (device->type == TI86SERIAL)
 			temp_data_to_convert[0] = 0x06;	//PC to TI-86
 		temp_data_to_convert[1] = 0x15;	//data
 		temp_data_to_convert[2] = (ti85_entries[i].data_size)&0x00ff;
@@ -491,9 +491,9 @@ static int ti85_convert_file_data_to_serial_stream (const device_config *device,
 		free (ti85_entries);
 		return 0;
 	}
-	if (!strncmp(calc_type, "ti85", 4))
+	if (device->type == TI85SERIAL)
 		ti85_convert_data_to_stream(ti85_pc_end_packet, TI85_PC_END_PACKET_SIZE, serial_data->end);
-	if (!strncmp(calc_type, "ti86", 4))
+	if (device->type == TI86SERIAL)
 		ti85_convert_data_to_stream(ti86_pc_end_packet, TI85_PC_END_PACKET_SIZE, serial_data->end);
 	serial_data->end_size = TI85_PC_END_PACKET_SIZE*8;
 
@@ -1278,7 +1278,6 @@ static DEVICE_RESET( ti85serial )
 	ti85serial->receive_data_counter = 0;
 	ti85serial->send_data_counter = 0;
 	ti85_free_serial_data_memory(device);
-//	ti85_PCR = 0xc0;
 	ti85serial->red_in = 0;
 	ti85serial->white_in = 0;
 	ti85serial->red_out = 1;
@@ -1310,7 +1309,7 @@ static DEVICE_IMAGE_LOAD( ti85serial )
 		file_data = auto_alloc_array(image->machine, UINT8, file_size);
 		image_fread(image, file_data, file_size);
 
-		if(!ti85_convert_file_data_to_serial_stream(image, file_data, file_size, &ti85serial->stream, (char*)image->machine->gamedrv->name))
+		if(!ti85_convert_file_data_to_serial_stream(image, file_data, file_size, &ti85serial->stream))
 		{
 			ti85_free_serial_stream (&ti85serial->stream);
 			return INIT_FAIL;
