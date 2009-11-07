@@ -58,7 +58,7 @@ static const int CPU_FREQ[16] =
 
 #define VERBOSE_LEVEL		(0)
 
-#define ENABLE_VERBOSE_LOG	(1)
+#define ENABLE_VERBOSE_LOG	(0)
 
 #if ENABLE_VERBOSE_LOG
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
@@ -286,6 +286,7 @@ static UINT32 ps_intc_get_interrupt_line(running_machine *machine, UINT32 line)
 
 static void ps_intc_set_interrupt_line(running_machine *machine, UINT32 line, int state)
 {
+	//printf( "%08x %d %08x %08x %08x\n", line, state, intc_regs.hold, intc_regs.status, intc_regs.enable );
 	if(line)
 	{
 		if(state)
@@ -359,16 +360,16 @@ static WRITE32_HANDLER( ps_intc_w )
 			verboselog(space->machine, 0, "ps_intc_w: Interrupt Enable = %08x & %08x\n", data, mem_mask );
 			intc_regs.enable |= data;
 			//COMBINE_DATA(&intc_regs.enable);
-			intc_regs.status &= intc_regs.enable;
-			intc_regs.hold &= intc_regs.enable;
+			//intc_regs.status &= intc_regs.enable;
+			//intc_regs.hold &= intc_regs.enable;
 			ps_intc_set_interrupt_line(space->machine, 0, 0);
 			break;
 		case 0x000c/4:
 			verboselog(space->machine, 0, "ps_intc_w: Interrupt Mask = %08x & %08x\n", data, mem_mask );
 			intc_regs.enable &= ~data;
 			COMBINE_DATA(&intc_regs.mask);
-			intc_regs.status &= intc_regs.enable;
-			intc_regs.hold &= intc_regs.enable;
+			//intc_regs.status &= intc_regs.enable;
+			//intc_regs.hold &= intc_regs.enable;
 			ps_intc_set_interrupt_line(space->machine, 0, 0);
 			break;
 		case 0x0010/4:
