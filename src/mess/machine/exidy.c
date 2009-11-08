@@ -399,7 +399,7 @@ SNAPSHOT_LOAD(exidy)
 {
 	UINT8 *ptr = memory_region(image->machine, "maincpu");
 	const device_config *cpu = cputag_get_cpu(image->machine, "maincpu");
-	const UINT8 header[28];
+	UINT8 header[28];
 
 	/* check size */
 	if (snapshot_size != 0x1001c)
