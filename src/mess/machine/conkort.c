@@ -630,63 +630,15 @@ static const z80_daisy_chain slow_daisy_chain[] =
 
 */
 
-static void dma_irq_callback(const device_config *device, int state)
+static Z80DMA_INTERFACE( dma_intf )
 {
-	fast_t *conkort = get_safe_token_machine_fast(device->machine);
-
-	cpu_set_input_line(conkort->cpu, INPUT_LINE_IRQ0, state);
-}
-
-static READ8_DEVICE_HANDLER( dma_port_a_r )
-{
-	fast_t *conkort = get_safe_token_machine_fast(device->machine);
-	const address_space *program = cpu_get_address_space(conkort->cpu, ADDRESS_SPACE_PROGRAM);
-
-	UINT8 data = 0xff;
-
-	data = memory_read_byte_8le(program, offset);
-
-	return data;
-}
-
-static WRITE8_DEVICE_HANDLER( dma_port_a_w )
-{
-	fast_t *conkort = get_safe_token_machine_fast(device->machine);
-	const address_space *program = cpu_get_address_space(conkort->cpu, ADDRESS_SPACE_PROGRAM);
-
-	memory_write_byte_8le(program, offset, data);
-}
-
-static READ8_DEVICE_HANDLER( dma_port_b_r )
-{
-	fast_t *conkort = get_safe_token_machine_fast(device->machine);
-	const address_space *io = cpu_get_address_space(conkort->cpu, ADDRESS_SPACE_IO);
-
-	UINT8 data = 0xff;
-
-	data = memory_read_byte_8le(io, offset);
-
-	return data;
-}
-
-static WRITE8_DEVICE_HANDLER( dma_port_b_w )
-{
-	fast_t *conkort = get_safe_token_machine_fast(device->machine);
-	const address_space *io = cpu_get_address_space(conkort->cpu, ADDRESS_SPACE_IO);
-
-	memory_write_byte_8le(io, offset, data);
-}
-
-static const z80dma_interface dma_intf =
-{
-	"conkort:5a",		/* cpu to HALT */
-	dma_port_a_r,		/* memory read */
-	dma_port_a_w,		/* memory write */
-	dma_port_a_r,		/* port A read */
-	dma_port_a_w,		/* port A write */
-	dma_port_b_r,		/* port B read */
-	dma_port_b_w,		/* port B write */
-	dma_irq_callback	/* interrupt callback */
+	DEVCB_CPU_INPUT_LINE("conkort:5a", INPUT_LINE_HALT),
+	DEVCB_CPU_INPUT_LINE("conkort:5a", INPUT_LINE_IRQ0),
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("conkort:5a", PROGRAM, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("conkort:5a", PROGRAM, memory_write_byte),
+	DEVCB_MEMORY_HANDLER("conkort:5a", IO, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("conkort:5a", IO, memory_write_byte)
 };
 
 static const z80_daisy_chain fast_daisy_chain[] =
@@ -715,7 +667,7 @@ static const wd17xx_interface slow_wd17xx_interface =
 static WRITE_LINE_DEVICE_HANDLER( fast_wd1793_drq_w )
 {
 	fast_t *conkort = get_safe_token_machine_fast(device->machine);
-	z80dma_rdy_w(conkort->z80dma, 0, state);
+	z80dma_rdy_w(conkort->z80dma, state);
 }
 
 static const wd17xx_interface fast_wd17xx_interface =

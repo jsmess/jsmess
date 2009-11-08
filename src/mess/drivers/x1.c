@@ -1578,39 +1578,15 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-static READ8_DEVICE_HANDLER(x1_dma_read_byte)
+static Z80DMA_INTERFACE( x1_dma )
 {
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	return memory_read_byte(space, offset);
-}
-
-static WRITE8_DEVICE_HANDLER(x1_dma_write_byte)
-{
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_write_byte(space, offset, data);
-}
-
-static READ8_DEVICE_HANDLER(x1_dma_read_io)
-{
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_IO);
-	return memory_read_byte(space, offset);
-}
-
-static WRITE8_DEVICE_HANDLER(x1_dma_write_io)
-{
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_IO);
-	memory_write_byte(space, offset, data);
-}
-
-
-static const z80dma_interface x1_dma =
-{
-	"maincpu",
-
-	x1_dma_read_byte,
-	x1_dma_write_byte,
-	x1_dma_read_io, x1_dma_write_io, x1_dma_read_io, x1_dma_write_io,
-	NULL
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", IO, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", IO, memory_write_byte)
 };
 
 /*************************************

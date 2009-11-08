@@ -206,26 +206,17 @@ static void p8k_daisy_interrupt(const device_config *device, int state)
 
 /* Z80 DMA */
 
-static READ8_DEVICE_HANDLER(p8k_dma_read_byte)
-{
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	return memory_read_byte(space, offset);
-}
-
-static WRITE8_DEVICE_HANDLER(p8k_dma_write_byte)
-{
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_write_byte(space, offset, data);
-}
-
 // still to implement: dma io read/write which handle FDC. also, the interrupt should deal with FDC as well, with p8k_daisy_interrupt as a fallback
-static const z80dma_interface p8k_dma_intf =
+
+static Z80DMA_INTERFACE( p8k_dma_intf )
 {
-	"maincpu",
-	p8k_dma_read_byte,
-	p8k_dma_write_byte,
-	NULL, NULL, NULL, NULL,
-	p8k_daisy_interrupt
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", IO, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", IO, memory_write_byte)
 };
 
 /* Z80 CTC 0 */
