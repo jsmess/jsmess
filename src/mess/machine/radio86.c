@@ -129,33 +129,15 @@ I8255A_INTERFACE( rk7007_ppi8255_interface )
 	DEVCB_HANDLER(radio86_8255_portc_w2),
 };
 
-static WRITE_LINE_DEVICE_HANDLER(radio86_video_dma_request) {
-	const device_config *dma8257 = devtag_get_device(device->machine, "dma8257");
-	dma8257_drq_w(dma8257, 2, state);
-}
-
-READ8_DEVICE_HANDLER(radio86_dma_read_byte)
+I8257_INTERFACE( radio86_dma )
 {
-	UINT8 result;
-	result = memory_read_byte(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset);
-	return result;
-}
-
-WRITE8_DEVICE_HANDLER(radio86_write_video)
-{
-	i8275_dack_w(devtag_get_device(device->machine, "i8275"), 0, data);
-}
-
-const dma8257_interface radio86_dma =
-{
-	0,
-
-	radio86_dma_read_byte,
-	0,
-
-	{ 0, 0, 0, 0 },
-	{ 0, 0, radio86_write_video, 0 },
-	{ 0, 0, 0, 0 }
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER("i8275", i8275_dack_w), DEVCB_NULL },
 };
 
 static TIMER_CALLBACK( radio86_reset )
@@ -248,7 +230,7 @@ const i8275_interface radio86_i8275_interface = {
 	"screen",
 	6,
 	0,
-	DEVCB_LINE(radio86_video_dma_request),
+	DEVCB_DEVICE_LINE("dma8257", i8257_drq2_w),
 	DEVCB_NULL,
 	radio86_display_pixels
 };
@@ -257,7 +239,7 @@ const i8275_interface mikrosha_i8275_interface = {
 	"screen",
 	6,
 	0,
-	DEVCB_LINE(radio86_video_dma_request),
+	DEVCB_DEVICE_LINE("dma8257", i8257_drq2_w),
 	DEVCB_NULL,
 	mikrosha_display_pixels
 };
@@ -266,7 +248,7 @@ const i8275_interface apogee_i8275_interface = {
 	"screen",
 	6,
 	0,
-	DEVCB_LINE(radio86_video_dma_request),
+	DEVCB_DEVICE_LINE("dma8257", i8257_drq2_w),
 	DEVCB_NULL,
 	apogee_display_pixels
 };
@@ -275,7 +257,7 @@ const i8275_interface partner_i8275_interface = {
 	"screen",
 	6,
 	1,
-	DEVCB_LINE(radio86_video_dma_request),
+	DEVCB_DEVICE_LINE("dma8257", i8257_drq2_w),
 	DEVCB_NULL,
 	partner_display_pixels
 };

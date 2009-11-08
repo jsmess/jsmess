@@ -28,7 +28,7 @@ static ADDRESS_MAP_START(mikrosha_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0xd000, 0xd001 ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w) AM_MIRROR(0x07fe) // video
     AM_RANGE( 0xd800, 0xd803 ) AM_DEVREADWRITE("pit8253", pit8253_r,pit8253_w) AM_MIRROR(0x07fc) // Timer
     AM_RANGE( 0xe000, 0xf7ff ) AM_READ(radio_cpu_state_r) // Not connected
-  	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE("dma8257", dma8257_w)	 // DMA
+  	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE("dma8257", i8257_w)	 // DMA
     AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
@@ -195,7 +195,7 @@ static MACHINE_DRIVER_START( mikrosha )
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_DMA8257_ADD("dma8257", XTAL_16MHz / 9, radio86_dma)
+	MDRV_I8257_ADD("dma8257", XTAL_16MHz / 9, radio86_dma)
 
 	MDRV_CASSETTE_ADD( "cassette", mikrosha_cassette_config )
 MACHINE_DRIVER_END

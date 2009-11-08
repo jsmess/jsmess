@@ -32,7 +32,7 @@ DRIVER_INIT(partner)
 static WRITE_LINE_DEVICE_HANDLER( partner_wd17xx_drq_w )
 {
 	if (state)
-		dma8257_drq_w(device, 0, 1);
+		i8257_drq0_w(device, 1);
 }
 
 const wd17xx_interface partner_wd17xx_interface =
@@ -345,33 +345,15 @@ WRITE8_HANDLER (partner_mem_page_w )
 	partner_bank_switch(space->machine);
 }
 
-static WRITE8_DEVICE_HANDLER(partner_dma_write_byte)
+I8257_INTERFACE( partner_dma )
 {
-	memory_write_byte(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset, data);
-}
-
-static READ8_DEVICE_HANDLER ( partner_wd17xx_data_r )
-{
-	const device_config *fdc = devtag_get_device(device->machine, "wd1793");
-	return wd17xx_data_r(fdc, offset);
-}
-
-static WRITE8_DEVICE_HANDLER ( partner_wd17xx_data_w )
-{
-	const device_config *fdc = devtag_get_device(device->machine, "wd1793");
-	wd17xx_data_w(fdc, offset, data);
-}
-
-const dma8257_interface partner_dma =
-{
-	0,
-
-	radio86_dma_read_byte,
-	partner_dma_write_byte,
-
-	{ partner_wd17xx_data_r,  0, 0, 0 },
-	{ partner_wd17xx_data_w, 0, radio86_write_video, 0 },
-	{ 0, 0, 0, 0 }
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
+	{ DEVCB_DEVICE_HANDLER("wd1793", wd17xx_data_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_DEVICE_HANDLER("wd1793", wd17xx_data_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("i8275", i8275_dack_w), DEVCB_NULL }
 };
 
 

@@ -43,7 +43,7 @@ extern const i8275_interface apogee_i8275_interface;
 extern WRITE8_HANDLER ( radio86_pagesel );
 extern READ8_DEVICE_HANDLER(radio86_dma_read_byte);
 extern WRITE8_DEVICE_HANDLER ( radio86_write_video );
-extern const dma8257_interface radio86_dma;
+extern const i8257_interface radio86_dma;
 
 extern UINT8 radio86_tape_value;
 
