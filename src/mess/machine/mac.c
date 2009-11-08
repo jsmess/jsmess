@@ -1438,13 +1438,13 @@ static int adb_keybinitialized, adb_keyb_wanted_srq;
 static const char *const adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
 #endif
 
-static void mac_adb_pollmouse(running_machine *machine)
+static int mac_adb_pollmouse(running_machine *machine)
 {
 	int NewX, NewY, NewButton;
 
 	if (!adb_mouse_initialized)
 	{
-		return;
+		return 0;
 	}
 
 	NewButton = input_port_read(machine, "MOUSE0") & 0x01;
@@ -1453,8 +1453,10 @@ static void mac_adb_pollmouse(running_machine *machine)
 
 	if ((NewX != adb_lastmousex) || (NewY != adb_lastmousey) || (NewButton != adb_lastbutton))
 	{
-		adb_mouse_wanted_srq = 1;
+		return 1;
 	}
+
+	return 0;
 }
 
 static void mac_adb_accummouse( running_machine *machine, UINT8 *MouseX, UINT8 *MouseY )
@@ -1646,7 +1648,7 @@ static void mac_adb_talk(running_machine *machine)
 		#if LOG_ADB
 		printf("Got LISTEN data %x for device %x reg %x\n", adb_command, adb_listenaddr, adb_listenreg);
 		#endif
-#if 0
+
 		if (adb_listenaddr == adb_mouseaddr)
 		{
 			if ((adb_listenreg == 3) && (adb_command > 0) && (adb_command < 16))
@@ -1667,7 +1669,6 @@ static void mac_adb_talk(running_machine *machine)
 				adb_keybaddr = adb_command&0x0f;
 			}
 		}
-#endif
 	}
 }
 
@@ -1775,7 +1776,6 @@ static void mac_adb_newaction(int state)
 
 			case ADB_STATE_IDLE:
 				adb_irq_pending = 0;
-				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 				break;
 		}
 	}
@@ -1812,10 +1812,7 @@ static void adb_vblank(running_machine *machine)
 	}
 	else
 	{
-		adb_irq_pending = 0;
-		mac_adb_pollmouse(machine);
-
-		if ((adb_state == ADB_STATE_IDLE) && (adb_mouse_wanted_srq))
+		if ((adb_state == ADB_STATE_IDLE) && (mac_adb_pollmouse(machine)))
 		{
 			// if the mouse was the last TALK, we can just send the new data
 			// otherwise we need to pull SRQ 
@@ -1829,17 +1826,14 @@ static void adb_vblank(running_machine *machine)
 				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 				adb_mouse_wanted_srq = 0;
 			}
-			#if 0
 			else
 			{
-				printf("IDLE, mouse moved, mouse not last TALK, pulling SRQ\n");
+//				printf("IDLE, mouse moved, mouse not last TALK, pulling SRQ\n");
 				adb_irq_pending = 1;
-
 				adb_command = adb_send = 0;
-				adb_timer_ticks = 8;
+				adb_timer_ticks = 1;	// one tick should be sufficient to make it see  the IRQ
 				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 			}
-			#endif
 		}
 	}
 }
