@@ -493,7 +493,7 @@ static READ8_HANDLER( port_00_r )
 	}
 
 	//logerror("DMA port $00 R access %02x\n",offset >> 1);
-	return dma8237_r(devtag_get_device(space->machine, "dma8237_1"), (offset & 0x1e) >> 1);
+	return i8237_r(devtag_get_device(space->machine, "dma8237_1"), (offset & 0x1e) >> 1);
 }
 
 static WRITE8_HANDLER( port_00_w )
@@ -506,7 +506,7 @@ static WRITE8_HANDLER( port_00_w )
 	else
 	{
 		//logerror("DMA port $00 W access %02x %02x\n",offset >> 1,data);
-		dma8237_w(devtag_get_device(space->machine, "dma8237_1"), (offset & 0x1e) >> 1, data);
+		i8237_w(devtag_get_device(space->machine, "dma8237_1"), (offset & 0x1e) >> 1, data);
 	}
 }
 

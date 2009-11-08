@@ -431,8 +431,8 @@ static ADDRESS_MAP_START( qx10_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x38, 0x39) AM_READWRITE(compis_gdc_r, compis_gdc_w)
 	AM_RANGE(0x3c, 0x3c) AM_READWRITE(mc146818_data_r, mc146818_data_w)
 	AM_RANGE(0x3d, 0x3d) AM_WRITE(mc146818_offset_w)
-	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("8237dma_1", dma8237_r, dma8237_w)
-	AM_RANGE(0x50, 0x5f) AM_DEVREADWRITE("8237dma_2", dma8237_r, dma8237_w)
+	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("8237dma_1", i8237_r, i8237_w)
+	AM_RANGE(0x50, 0x5f) AM_DEVREADWRITE("8237dma_2", i8237_r, i8237_w)
 ADDRESS_MAP_END
 
 /* Input ports */

@@ -402,7 +402,7 @@ static TIMER_CALLBACK( dma8237_timerproc )
 /* ----------------------------------------------------------------------- */
 
 
-READ8_DEVICE_HANDLER( dma8237_r )
+READ8_DEVICE_HANDLER( i8237_r )
 {
 	i8237_t	*i8237 = get_safe_token(device);
 	UINT8 data = 0xFF;
@@ -460,14 +460,14 @@ READ8_DEVICE_HANDLER( dma8237_r )
 
 
 
-WRITE8_DEVICE_HANDLER( dma8237_w )
+WRITE8_DEVICE_HANDLER( i8237_w )
 {
 	i8237_t	*i8237 = get_safe_token(device);
 	int channel;
 
 	offset &= 0x0F;
 
-	logerror("dma8237_w: offset = %02x, data = %02x\n", offset, data );
+	logerror("i8237_w: offset = %02x, data = %02x\n", offset, data );
 
 	switch(offset) {
 	case 0:

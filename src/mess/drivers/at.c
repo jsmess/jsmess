@@ -118,12 +118,12 @@ ADDRESS_MAP_END
 
 static READ8_DEVICE_HANDLER(at_dma8237_1_r)
 {
-	return dma8237_r( device, offset / 2);
+	return i8237_r( device, offset / 2);
 }
 
 static WRITE8_DEVICE_HANDLER(at_dma8237_1_w)
 {
-	dma8237_w( device, offset / 2, data);
+	i8237_w( device, offset / 2, data);
 }
 
 static READ16_DEVICE_HANDLER( at16_388_r )
@@ -162,7 +162,7 @@ static WRITE32_HANDLER( at_kbdc8042_32le_w )
 }
 
 static ADDRESS_MAP_START(at16_io, ADDRESS_SPACE_IO, 16)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", dma8237_r, dma8237_w, 0xffff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE8(at_kbdc8042_r,            at_kbdc8042_w, 0xffff)
@@ -190,7 +190,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(at386_io, ADDRESS_SPACE_IO, 32)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(at_kbdc8042_32le_r,      at_kbdc8042_32le_w)
@@ -212,7 +212,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(at586_io, ADDRESS_SPACE_IO, 32)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(at_kbdc8042_32le_r,      at_kbdc8042_32le_w)

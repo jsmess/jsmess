@@ -73,8 +73,8 @@ struct _i8237_interface
 ***************************************************************************/
 
 /* register access */
-READ8_DEVICE_HANDLER( dma8237_r );
-WRITE8_DEVICE_HANDLER( dma8237_w );
+READ8_DEVICE_HANDLER( i8237_r );
+WRITE8_DEVICE_HANDLER( i8237_w );
 
 /* hold acknowledge */
 WRITE_LINE_DEVICE_HANDLER( i8237_hlda_w );
