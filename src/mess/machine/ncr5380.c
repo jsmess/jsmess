@@ -317,6 +317,10 @@ READ8_HANDLER(ncr5380_r)
 					{
 						d_ptr++;
 					}
+					else
+					{
+						next_req_flag = 1;
+					}
 				}
 				else
 				{
