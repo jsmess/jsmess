@@ -1428,15 +1428,142 @@ static int adb_listenreg, adb_listenaddr, adb_last_talk;
 
 // ADB mouse state
 static int adb_mouseaddr = 3;
-static int adb_lastmousex, adb_lastmousey, adb_lastbutton, adb_mouse_wanted_srq, adb_mouse_initialized;
+static int adb_lastmousex, adb_lastmousey, adb_lastbutton, adb_mouse_initialized;
 
 // ADB keyboard state
 static int adb_keybaddr = 2;
-static int adb_keybinitialized, adb_keyb_wanted_srq;
+static int adb_keybinitialized, adb_currentkeys[2], adb_modifiers;
 
 #if LOG_ADB
 static const char *const adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
 #endif
+
+static int mac_adb_pollkbd(running_machine *machine, int update)
+{
+	int i, j, keybuf, report, codes[2], result;
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
+
+	codes[0] = codes[1] = 0x80;	// key up
+	report = result = 0;
+
+	for (i = 0; i < 6; i++)
+	{
+		keybuf = input_port_read(machine, keynames[i]); 
+		
+		// any changes in this row?
+		if ((keybuf != key_matrix[i]) && (report < 2))
+		{
+			// check each column bit
+			for (j=0; j<16; j++)
+			{
+				if (((keybuf ^ key_matrix[i]) >> j) & 1)
+				{
+					// update key_matrix
+					if (update)
+					{
+						key_matrix[i] = (key_matrix[i] & ~ (1 << j)) | (keybuf & (1 << j));
+					}
+
+					codes[report] = (i<<4)|j;
+					
+					// key up?
+					if (!(keybuf & (1 << j)))
+					{
+						codes[report] |= 0x80;
+					}
+
+					// update modifier state
+					if (update)
+					{
+						if (((i<<4)|j) == 0x39)
+						{
+							if (codes[report] & 0x80)
+							{
+								adb_modifiers &= ~0x20;
+							}
+							else 
+							{
+								adb_modifiers |= 0x20;
+							}
+						}
+						if (((i<<4)|j) == 0x36)
+						{
+							if (codes[report] & 0x80)
+							{
+								adb_modifiers &= ~0x8;
+							}
+							else 
+							{
+								adb_modifiers |= 0x08;
+							}
+						}
+						if (((i<<4)|j) == 0x38)
+						{
+							if (codes[report] & 0x80)
+							{
+								adb_modifiers &= ~0x4;
+							}
+							else 
+							{
+								adb_modifiers |= 0x04;
+							}
+						}
+						if (((i<<4)|j) == 0x3a)
+						{
+							if (codes[report] & 0x80)
+							{
+								adb_modifiers &= ~0x2;
+							}
+							else 
+							{
+								adb_modifiers |= 0x02;
+							}
+						}
+						if (((i<<4)|j) == 0x37)
+						{
+							if (codes[report] & 0x80)
+							{
+								adb_modifiers &= ~0x1;
+							}
+							else 
+							{
+								adb_modifiers |= 0x01;
+							}
+						}
+					}
+
+					// we run out of keys we can track?
+					report++;
+					if (report == 2)
+					{
+						break;
+					}
+				}
+			}
+
+			// we run out of keys we can track?
+			if (report == 2)
+			{
+				break;
+			}
+		}
+	}
+
+	// figure out if there was a change
+	if ((adb_currentkeys[0] != codes[0]) || (adb_currentkeys[1] != codes[1]))
+	{
+		result = 1;
+
+		// if we want to update the current read, do so
+		if (update)
+		{
+		 	adb_currentkeys[0] = codes[0];
+		 	adb_currentkeys[1] = codes[1];
+		}
+	}
+
+	return result;
+}
 
 static int mac_adb_pollmouse(running_machine *machine)
 {
@@ -1498,8 +1625,6 @@ static void mac_adb_accummouse( running_machine *machine, UINT8 *MouseX, UINT8 *
 	}
 
 	adb_lastbutton = input_port_read(machine, "MOUSE0") & 0x01;
-
-	adb_mouse_wanted_srq = 0;
 
 	*MouseX = (UINT8)MouseCountX;
 	*MouseY = (UINT8)MouseCountY;
@@ -1606,13 +1731,17 @@ static void mac_adb_talk(running_machine *machine)
 					{
 						// read keyboard
 						case 0:
-							adb_buffer[0] = adb_buffer[1] = 0x80;	  // nothing pressed
+							mac_adb_pollkbd(machine, 1);
+//							printf("keyboard = %02x %02x\n", adb_currentkeys[0], adb_currentkeys[1]);
+							adb_buffer[0] = adb_currentkeys[0];
+							adb_buffer[1] = adb_currentkeys[1];
 							adb_datasize = 2;
 							break;
 
 						// read modifier keys
 						case 2:
-							adb_buffer[0] = 0xff;	// nothing pressed
+							mac_adb_pollkbd(machine, 1);
+							adb_buffer[0] = adb_modifiers;	// nothing pressed
 							adb_buffer[1] = 0;
 							adb_datasize = 2;
 							break;
@@ -1803,16 +1932,9 @@ static void mac_egret_newaction(int state)
 
 static void adb_vblank(running_machine *machine)
 {
-	// if any device has a service request, show it on the VIA
-	// (no need to actually generate an IRQ, the Mac will see it)
-	if ((adb_mouse_wanted_srq) || (adb_keyb_wanted_srq))
+	if (adb_state == ADB_STATE_IDLE)
 	{
-//		printf("ADB IRQ: kb %d ms %d (last talk %d)\n", adb_keyb_wanted_srq, adb_mouse_wanted_srq, adb_last_talk);
-		adb_irq_pending = 1;
-	}
-	else
-	{
-		if ((adb_state == ADB_STATE_IDLE) && (mac_adb_pollmouse(machine)))
+		if (mac_adb_pollmouse(machine))
 		{
 			// if the mouse was the last TALK, we can just send the new data
 			// otherwise we need to pull SRQ 
@@ -1824,11 +1946,28 @@ static void adb_vblank(running_machine *machine)
 
 				adb_timer_ticks = 8;
 				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
-				adb_mouse_wanted_srq = 0;
 			}
 			else
 			{
-//				printf("IDLE, mouse moved, mouse not last TALK, pulling SRQ\n");
+				adb_irq_pending = 1;
+				adb_command = adb_send = 0;
+				adb_timer_ticks = 1;	// one tick should be sufficient to make it see  the IRQ
+				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+			}
+		}
+		else if (mac_adb_pollkbd(machine, 0))
+		{
+			if (adb_last_talk == adb_keybaddr)
+			{
+				// repeat last TALK to get updated data
+				adb_waiting_cmd = 1;
+				mac_adb_talk(machine);
+
+				adb_timer_ticks = 8;
+				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+			}
+			else
+			{
 				adb_irq_pending = 1;
 				adb_command = adb_send = 0;
 				adb_timer_ticks = 1;	// one tick should be sufficient to make it see  the IRQ
@@ -1840,6 +1979,8 @@ static void adb_vblank(running_machine *machine)
 
 static void adb_reset(void)
 {
+	int i;
+
 	adb_irq_pending = 0;		// no interrupt
 	adb_timer_ticks = 0;
 	adb_command = 0;
@@ -1854,13 +1995,17 @@ static void adb_reset(void)
 	// mouse
 	adb_mouseaddr = 3;
 	adb_lastmousex = adb_lastmousey = adb_lastbutton = 0;
-	adb_mouse_wanted_srq = 0;
 	adb_mouse_initialized = 0;
 
 	// keyboard
 	adb_keybaddr = 2;			     
-	adb_keyb_wanted_srq = 0;
 	adb_keybinitialized = 0;
+	adb_currentkeys[0] = adb_currentkeys[1] = 0x80;
+	adb_modifiers = 0;
+	for (i=0; i<7; i++)
+	{
+		key_matrix[i] = 0;
+	}
 }
 
 /* *************************************************************************
