@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "sound/speaker.h"
+#include "sound/dac.h"
 #include "sound/wave.h"
 #include "machine/ctronics.h"
 #include "devices/cassette.h"
@@ -257,12 +257,12 @@ WRITE8_HANDLER(exidy_fe_w)
 WRITE8_HANDLER(exidy_ff_w)
 {
 	const device_config *printer = devtag_get_device(space->machine, "centronics");
-	const device_config *speaker = devtag_get_device(space->machine, "speaker");
+	const device_config *dac_device = devtag_get_device(space->machine, "dac");
 	/* reading the config switch */
 	switch (input_port_read(space->machine, "CONFIG") & 0x06)
 	{
 		case 0: /* speaker */
-			speaker_level_w(speaker, (data) ? 1 : 0);
+			dac_data_w(dac_device, data);
 			break;
 
 		case 2: /* Centronics 7-bit printer */

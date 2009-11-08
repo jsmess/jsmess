@@ -138,7 +138,7 @@ The sorcerer has a UART device used by the serial interface and the cassette sys
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "sound/speaker.h"
+#include "sound/dac.h"
 #include "sound/wave.h"
 #include "machine/ctronics.h"
 #include "machine/wd17xx.h"
@@ -378,8 +378,8 @@ static MACHINE_DRIVER_START( exidy )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass1 speaker
 	MDRV_SOUND_WAVE_ADD("wave.2", "cassette2")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass2 speaker
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)	// speaker on parallel port
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)	// speaker or music card on parallel port
 
 	MDRV_AY31015_ADD( "ay_3_1015", exidy_ay31015_config )
 
