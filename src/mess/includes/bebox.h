@@ -10,12 +10,13 @@
 #define BEBOX_H_
 
 #include "machine/ins8250.h"
+#include "machine/8237dma.h"
 
 /*----------- defined in machine/bebox.c -----------*/
 
 extern const struct pit8253_config bebox_pit8254_config;
-extern const struct dma8237_interface bebox_dma8237_1_config;
-extern const struct dma8237_interface bebox_dma8237_2_config;
+extern const i8237_interface bebox_dma8237_1_config;
+extern const i8237_interface bebox_dma8237_2_config;
 extern const struct pic8259_interface bebox_pic8259_master_config;
 extern const struct pic8259_interface bebox_pic8259_slave_config;
 extern const ins8250_interface bebox_uart_inteface_0;

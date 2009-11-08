@@ -273,13 +273,6 @@ static PALETTE_INIT( mm1 )
 	palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00); /* bright green */
 }
 
-static WRITE_LINE_DEVICE_HANDLER( drqcrt_w )
-{
-	mm1_state *driver_state = device->machine->driver_data;
-
-	dma8237_drq_write(driver_state->i8237, DMA_CRT, state);
-}
-
 static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 {
 	mm1_state *state = device->machine->driver_data;
@@ -312,7 +305,7 @@ static const i8275_interface mm1_i8275_intf =
 	SCREEN_TAG,
 	8,
 	0,
-	DEVCB_LINE(drqcrt_w),
+	DEVCB_DEVICE_LINE(I8237_TAG, i8237_dreq0_w),
 	DEVCB_NULL,
 	crtc_display_pixels
 };
@@ -395,70 +388,35 @@ static I8212_INTERFACE( mm1_i8212_intf )
 
 /* 8237 Interface */
 
-static DMA8237_HRQ_CHANGED( dma_hrq_changed )
+static WRITE_LINE_DEVICE_HANDLER( dma_hrq_changed )
 {
 	cputag_set_input_line(device->machine, I8085A_TAG, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	dma8237_set_hlda(device, state);
+	i8237_hlda_w(device, state);
 }
 
-static DMA8237_MEM_READ( memory_dma_r )
-{
-	const address_space *program = cputag_get_address_space(device->machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
-
-	return memory_read_byte(program, offset);
-}
-
-static DMA8237_MEM_WRITE( memory_dma_w )
-{
-	const address_space *program = cputag_get_address_space(device->machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
-
-	memory_write_byte(program, offset, data);
-}
-
-static DMA8237_CHANNEL_WRITE( crtc_dack_w )
-{
-	mm1_state *state = device->machine->driver_data;
-
-	i8275_dack_w(state->i8275, 0, data);
-}
-
-static DMA8237_CHANNEL_READ( mpsc_dack_r )
+static READ8_DEVICE_HANDLER( mpsc_dack_r )
 {
 	mm1_state *state = device->machine->driver_data;
 
 	/* clear data request */
-	dma8237_drq_write(state->i8237, DMA_MPSC_RX, CLEAR_LINE);
+	i8237_dreq2_w(state->i8237, CLEAR_LINE);
 
-	return upd7201_dtra_r(state->upd7201);
+	return upd7201_dtra_r(device);
 }
 
-static DMA8237_CHANNEL_WRITE( mpsc_dack_w )
+static WRITE8_DEVICE_HANDLER( mpsc_dack_w )
 {
 	mm1_state *state = device->machine->driver_data;
 
-	upd7201_hai_w(state->upd7201, data);
+	upd7201_hai_w(device, data);
 
 	/* clear data request */
-	dma8237_drq_write(state->i8237, DMA_MPSC_TX, CLEAR_LINE);
+	i8237_dreq1_w(state->i8237, CLEAR_LINE);
 }
 
-static DMA8237_CHANNEL_READ( fdc_dack_r )
-{
-	mm1_state *state = device->machine->driver_data;
-
-	return upd765_dack_r(state->upd765, 0);
-}
-
-static DMA8237_CHANNEL_WRITE( fdc_dack_w )
-{
-	mm1_state *state = device->machine->driver_data;
-
-	upd765_dack_w(state->upd765, 0, data);
-}
-
-static DMA8237_OUT_EOP( tc_w )
+static WRITE_LINE_DEVICE_HANDLER( tc_w )
 {
 	mm1_state *driver_state = device->machine->driver_data;
 
@@ -468,15 +426,15 @@ static DMA8237_OUT_EOP( tc_w )
 	cputag_set_input_line(device->machine, I8085A_TAG, I8085_RST75_LINE, state);
 }
 
-static const struct dma8237_interface mm1_dma8237_intf =
+static I8237_INTERFACE( mm1_dma8237_intf )
 {
-	XTAL_6_144MHz/2/2,
-	dma_hrq_changed,
-	memory_dma_r,
-	memory_dma_w,
-	{ NULL, NULL, mpsc_dack_r, fdc_dack_r },
-	{ crtc_dack_w, mpsc_dack_w, NULL, fdc_dack_w },
-	tc_w
+	DEVCB_LINE(dma_hrq_changed),
+	DEVCB_LINE(tc_w),
+	DEVCB_MEMORY_HANDLER(I8085A_TAG, PROGRAM, memory_read_byte),
+	DEVCB_MEMORY_HANDLER(I8085A_TAG, PROGRAM, memory_write_byte),
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER(UPD7201_TAG, mpsc_dack_r), DEVCB_DEVICE_HANDLER(UPD765_TAG, upd765_dack_r) },
+	{ DEVCB_DEVICE_HANDLER(I8275_TAG, i8275_dack_w), DEVCB_DEVICE_HANDLER(UPD7201_TAG, mpsc_dack_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER(UPD765_TAG, upd765_dack_w) },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
 /* uPD765 Interface */
@@ -485,7 +443,7 @@ static UPD765_DMA_REQUEST( drq_w )
 {
 	mm1_state *driver_state = device->machine->driver_data;
 
-	dma8237_drq_write(driver_state->i8237, DMA_FDC, state);
+	i8237_dreq3_w(driver_state->i8237, state);
 }
 
 static const upd765_interface mm1_upd765_intf =
@@ -549,14 +507,14 @@ static WRITE_LINE_DEVICE_HANDLER( drq2_w )
 {
 	mm1_state *driver_state = device->machine->driver_data;
 
-	if (state) dma8237_drq_write(driver_state->i8237, DMA_MPSC_RX, ASSERT_LINE);
+	if (state) i8237_dreq2_w(driver_state->i8237, ASSERT_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( drq1_w )
 {
 	mm1_state *driver_state = device->machine->driver_data;
 
-	if (state) dma8237_drq_write(driver_state->i8237, DMA_MPSC_TX, ASSERT_LINE);
+	if (state) i8237_dreq1_w(driver_state->i8237, ASSERT_LINE);
 }
 
 static UPD7201_INTERFACE( mm1_upd7201_intf )
@@ -789,7 +747,7 @@ static MACHINE_DRIVER_START( mm1 )
 
 	/* peripheral hardware */
 	MDRV_I8212_ADD(I8212_TAG, mm1_i8212_intf)
-	MDRV_DMA8237_ADD(I8237_TAG, /* XTAL_6_144MHz/2, */ mm1_dma8237_intf)
+	MDRV_I8237_ADD(I8237_TAG, XTAL_6_144MHz/2, mm1_dma8237_intf)
 	MDRV_PIT8253_ADD(I8253_TAG, mm1_pit8253_intf)
 	MDRV_UPD765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2, */ mm1_upd765_intf)
 	MDRV_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mm1_upd7201_intf)

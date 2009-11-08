@@ -849,6 +849,7 @@ static PALETTE_INIT( pc9801 )
 		palette_set_color_rgb(machine, i+0x000, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
+static int dma_channel;
 static UINT8 dma_offset[2][4];
 
 #if 0
@@ -898,46 +899,46 @@ static WRITE8_HANDLER(at_page8_w)
 }
 #endif
 
-static DMA8237_HRQ_CHANGED( pc_dma_hrq_changed )
+static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	dma8237_set_hlda( device, state );
+	i8237_hlda_w( device, state );
 }
 
 
-static DMA8237_MEM_READ( pc_dma_read_byte )
+static READ8_HANDLER( pc_dma_read_byte )
 {
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
+	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
 		& 0xFF0000;
 
 	return memory_read_byte(space, page_offset + offset);
 }
 
 
-static DMA8237_MEM_WRITE( pc_dma_write_byte )
+static WRITE8_HANDLER( pc_dma_write_byte )
 {
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
+	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
 		& 0xFF0000;
 
 	memory_write_byte(space, page_offset + offset, data);
 }
 
+static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { if (state) dma_channel = 0; }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { if (state) dma_channel = 1; }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { if (state) dma_channel = 2; }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { if (state) dma_channel = 3; }
 
-static const struct dma8237_interface dma8237_1_config =
+static I8237_INTERFACE( dma8237_1_config )
 {
-	XTAL_14_31818MHz/3,
-
-	pc_dma_hrq_changed,
-	pc_dma_read_byte,
-	pc_dma_write_byte,
-
-	{ NULL, NULL, NULL, NULL },
-	{ NULL, NULL, NULL, NULL },
-	NULL
+	DEVCB_LINE(pc_dma_hrq_changed),
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
 };
 
 /* I suspect the dump for pc9801 comes from a i386 later model... the original machine would use a i8086 @ 5Mhz CPU (see notes at top) */
@@ -953,7 +954,7 @@ static MACHINE_DRIVER_START( pc9801 )
 	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf )
 	MDRV_I8255A_ADD( "ppi8255_1", printer_intf )
 	MDRV_PIT8253_ADD( "pit8253", pit8253_config )
-	MDRV_DMA8237_ADD( "dma8237_1", dma8237_1_config )
+	MDRV_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
 	MDRV_PIC8259_ADD( "pic8259_master", pic8259_master_config )
 	MDRV_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
 

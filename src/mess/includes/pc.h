@@ -9,6 +9,7 @@
 
 #include "machine/ins8250.h"
 #include "machine/i8255a.h"
+#include "machine/8237dma.h"
 	
 typedef struct _pc_state pc_state;
 struct _pc_state
@@ -21,6 +22,7 @@ struct _pc_state
 	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */
 	UINT8	u73_q2;
 	UINT8	out1;
+	int dma_channel;
 	UINT8 dma_offset[2][4];	
 	UINT8 pc_spkrdata;
 	UINT8 pc_input;		
@@ -40,7 +42,7 @@ struct _pc_state
 
 /*----------- defined in machine/pc.c -----------*/
 
-extern const struct dma8237_interface ibm5150_dma8237_config;
+extern const i8237_interface ibm5150_dma8237_config;
 extern const struct pit8253_config ibm5150_pit8253_config;
 extern const struct pit8253_config pcjr_pit8253_config;
 extern const struct pic8259_interface ibm5150_pic8259_config;

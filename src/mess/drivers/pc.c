@@ -1482,7 +1482,7 @@ static MACHINE_DRIVER_START( pcmda )
 
 	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
+	MDRV_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
 	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
@@ -1546,7 +1546,7 @@ static MACHINE_DRIVER_START( pcherc )
 
 	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
+	MDRV_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
 	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
@@ -1619,7 +1619,7 @@ static MACHINE_DRIVER_START( ibm5150 )
 
 	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
+	MDRV_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
 	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
@@ -1684,7 +1684,7 @@ static MACHINE_DRIVER_START( pccga )
 
 	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
+	MDRV_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
 	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
@@ -1745,7 +1745,7 @@ static MACHINE_DRIVER_START( europc )
 
 	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
+	MDRV_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
 	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
@@ -1799,7 +1799,7 @@ static MACHINE_DRIVER_START( ibm5160 )
 
 	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
+	MDRV_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
 	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
@@ -1860,7 +1860,7 @@ static MACHINE_DRIVER_START( pc200 )
 
 	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
+	MDRV_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
 	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
@@ -1913,7 +1913,7 @@ static MACHINE_DRIVER_START( ppc512 )
 
 	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
+	MDRV_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
 	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
@@ -1969,7 +1969,7 @@ static MACHINE_DRIVER_START( pc1512 )
 
 	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
+	MDRV_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
 	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
@@ -2018,7 +2018,7 @@ static MACHINE_DRIVER_START( pc1640 )
 
 	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
+	MDRV_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
 	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
@@ -2067,7 +2067,7 @@ static MACHINE_DRIVER_START( xtvga )
 
 	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
+	MDRV_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
 	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
@@ -2128,7 +2128,7 @@ static MACHINE_DRIVER_START( t1000hx )
 
 	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
+	MDRV_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
 	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
@@ -2177,7 +2177,7 @@ static MACHINE_DRIVER_START( t1000_16 )
 
 	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
+	MDRV_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
 	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 

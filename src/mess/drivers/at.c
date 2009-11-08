@@ -466,9 +466,9 @@ static MACHINE_DRIVER_START( ibm5170 )
 
 	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
 
-	MDRV_DMA8237_ADD( "dma8237_1", at_dma8237_1_config )
+	MDRV_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, at_dma8237_1_config )
 
-	MDRV_DMA8237_ADD( "dma8237_2", at_dma8237_2_config )
+	MDRV_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, at_dma8237_2_config )
 
 	MDRV_PIC8259_ADD( "pic8259_master", at_pic8259_master_config )
 
@@ -540,9 +540,9 @@ static MACHINE_DRIVER_START( ibm5162 )
 
 	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
 
-	MDRV_DMA8237_ADD( "dma8237_1", at_dma8237_1_config )
+	MDRV_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, at_dma8237_1_config )
 
-	MDRV_DMA8237_ADD( "dma8237_2", at_dma8237_2_config )
+	MDRV_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, at_dma8237_2_config )
 
 	MDRV_PIC8259_ADD( "pic8259_master", at_pic8259_master_config )
 
@@ -602,9 +602,9 @@ static MACHINE_DRIVER_START( ps2m30286 )
 
 	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
 
-	MDRV_DMA8237_ADD( "dma8237_1", at_dma8237_1_config )
+	MDRV_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, at_dma8237_1_config )
 
-	MDRV_DMA8237_ADD( "dma8237_2", at_dma8237_2_config )
+	MDRV_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, at_dma8237_2_config )
 
 	MDRV_PIC8259_ADD( "pic8259_master", at_pic8259_master_config )
 
@@ -674,9 +674,9 @@ static MACHINE_DRIVER_START( atvga )
 
 	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
 
-	MDRV_DMA8237_ADD( "dma8237_1", at_dma8237_1_config )
+	MDRV_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, at_dma8237_1_config )
 
-	MDRV_DMA8237_ADD( "dma8237_2", at_dma8237_2_config )
+	MDRV_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, at_dma8237_2_config )
 
 	MDRV_PIC8259_ADD( "pic8259_master", at_pic8259_master_config )
 
@@ -752,9 +752,9 @@ static MACHINE_DRIVER_START( at386 )
 
 	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
 
-	MDRV_DMA8237_ADD( "dma8237_1", at_dma8237_1_config )
+	MDRV_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, at_dma8237_1_config )
 
-	MDRV_DMA8237_ADD( "dma8237_2", at_dma8237_2_config )
+	MDRV_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, at_dma8237_2_config )
 
 	MDRV_PIC8259_ADD( "pic8259_master", at_pic8259_master_config )
 

@@ -127,9 +127,9 @@ static MACHINE_DRIVER_START( bebox )
 
 	MDRV_PIT8254_ADD( "pit8254", bebox_pit8254_config )
 
-	MDRV_DMA8237_ADD( "dma8237_1", bebox_dma8237_1_config )
+	MDRV_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, bebox_dma8237_1_config )
 
-	MDRV_DMA8237_ADD( "dma8237_2", bebox_dma8237_2_config )
+	MDRV_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, bebox_dma8237_2_config )
 
 	MDRV_PIC8259_ADD( "pic8259_master", bebox_pic8259_master_config )
 

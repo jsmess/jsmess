@@ -12,11 +12,6 @@
 #define UPD7220_TAG		"ic101"
 #define SPEAKER_TAG		"speaker"
 
-#define DMA_CRT			0
-#define DMA_MPSC_TX		1
-#define DMA_MPSC_RX		2
-#define DMA_FDC			3
-
 typedef struct _mm1_state mm1_state;
 struct _mm1_state
 {

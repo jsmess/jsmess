@@ -150,7 +150,7 @@ static UPD765_DMA_REQUEST( drq_w )
 {
 	qx10_state *driver_state = device->machine->driver_data;
 	//logerror("DMA Request from upd765: %d\n", state);
-	dma8237_drq_write(driver_state->dma8237_1, 0, !state);
+	i8237_dreq0_w(driver_state->dma8237_1, !state);
 }
 
 static const struct upd765_interface qx10_upd765_interface =
@@ -183,54 +183,24 @@ static READ8_HANDLER(qx10_30_r)
 /*
 	DMA8237
 */
-static DMA8237_HRQ_CHANGED( dma_hrq_changed )
+static WRITE_LINE_DEVICE_HANDLER( dma_hrq_changed )
 {
 	/* Assert HLDA */
-	dma8237_set_hlda(device, state);
+	i8237_hlda_w(device, state);
 }
 
-static DMA8237_MEM_READ( memory_dma_r )
-{
-	const address_space *program = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	//logerror("DMA read %04x\n", offset);
-	return memory_read_byte(program, offset);
-}
-
-static DMA8237_MEM_WRITE( memory_dma_w )
-{
-	const address_space *program = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	//logerror("DMA write %04x:%02x\n", offset, data);
-	memory_write_byte(program, offset, data);
-}
-
-static DMA8237_CHANNEL_READ( gdc_dack_r )
+static READ8_DEVICE_HANDLER( gdc_dack_r )
 {
 	logerror("GDC DACK read\n");
 	return 0;
 }
 
-static DMA8237_CHANNEL_WRITE( gdc_dack_w )
+static WRITE8_DEVICE_HANDLER( gdc_dack_w )
 {
 	logerror("GDC DACK write %02x\n", data);
 }
 
-static DMA8237_CHANNEL_READ( fdc_dack_r )
-{
-	qx10_state *state = device->machine->driver_data;
-	UINT8 data = upd765_dack_r(state->upd765, 0);
-	//logerror("FDC DACK read %02x\n", data);
-	return data;
-}
-
-static DMA8237_CHANNEL_WRITE( fdc_dack_w )
-{
-	qx10_state *state = device->machine->driver_data;
-	//logerror("FDC DACK write %02x\n", data);
-
-	upd765_dack_w(state->upd765, 0, data);
-}
-
-static DMA8237_OUT_EOP( tc_w )
+static WRITE_LINE_DEVICE_HANDLER( tc_w )
 {
 	qx10_state *driver_state = device->machine->driver_data;
 
@@ -244,17 +214,15 @@ static DMA8237_OUT_EOP( tc_w )
 	Channel 2: GDC
 	Channel 3: Option slots
 */
-static const struct dma8237_interface qx10_dma8237_1_interface =
+static I8237_INTERFACE( qx10_dma8237_1_interface )
 {
-	MAIN_CLK/4,		/* speed of DMA accesses (per byte) */
-	dma_hrq_changed,/* function that will be called when HRQ may have changed */
-	memory_dma_r,	/* accessors to main memory */
-	memory_dma_w,
-
-	{ fdc_dack_r, gdc_dack_r, NULL, NULL },	/* channel accesors */
-	{ fdc_dack_w, gdc_dack_w, NULL, NULL },
-
-	tc_w			/* function to call when DMA completes */
+	DEVCB_LINE(dma_hrq_changed),
+	DEVCB_LINE(tc_w),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
+	{ DEVCB_DEVICE_HANDLER("upd765", upd765_dack_r), DEVCB_HANDLER(gdc_dack_r),/*DEVCB_DEVICE_HANDLER("upd7220", upd7220_dack_r)*/ DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_DEVICE_HANDLER("upd765", upd765_dack_w), DEVCB_HANDLER(gdc_dack_w),/*DEVCB_DEVICE_HANDLER("upd7220", upd7220_dack_w)*/ DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
 /*
@@ -264,17 +232,15 @@ static const struct dma8237_interface qx10_dma8237_1_interface =
 	Channel 3: Option slots #3
 	Channel 4: Option slots #4
 */
-static const struct dma8237_interface qx10_dma8237_2_interface =
+static I8237_INTERFACE( qx10_dma8237_2_interface )
 {
-	MAIN_CLK/4,		/* speed of DMA accesses (per byte) */
-	NULL,			/* function that will be called when HRQ may have changed */
-	NULL,			/* accessors to main memory */
-	NULL,
-
-	{ NULL, NULL, NULL, NULL },	/* channel accesors */
-	{ NULL, NULL, NULL, NULL },
-
-	NULL			/* function to call when DMA completes */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
 /*
@@ -508,7 +474,7 @@ static MACHINE_RESET(qx10)
 {
 	qx10_state *state = machine->driver_data;
 
-	dma8237_drq_write(state->dma8237_1, 0, 1);
+	i8237_dreq0_w(state->dma8237_1, 1);
 
 	state->memprom = 0;
 	state->memcmos = 0;
@@ -531,8 +497,8 @@ static MACHINE_DRIVER_START( qx10 )
 	MDRV_PIC8259_ADD("pic8259_slave", qx10_pic8259_slave_config)
 	MDRV_UPD7201_ADD("upd7201", MAIN_CLK/4, qx10_upd7201_interface)
 	MDRV_I8255A_ADD("i8255", qx10_i8255_interface)
-	MDRV_DMA8237_ADD("8237dma_1", qx10_dma8237_1_interface)
-	MDRV_DMA8237_ADD("8237dma_2", qx10_dma8237_2_interface)
+	MDRV_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)
+	MDRV_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)
 	MDRV_UPD765A_ADD("upd765", qx10_upd765_interface)
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, qx10_floppy_config)
 

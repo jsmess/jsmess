@@ -437,7 +437,7 @@ static void execute_read(running_machine *machine)
 	}
 	else
 	{
-		dma8237_run_transfer(pc_hdc_dma8237, HDC_DMA);
+		i8237_run_transfer(pc_hdc_dma8237, HDC_DMA);
 	}
 }
 
@@ -469,7 +469,7 @@ static void execute_write(running_machine *machine)
 	}
 	else
 	{
-		dma8237_run_transfer(pc_hdc_dma8237, HDC_DMA);
+		i8237_run_transfer(pc_hdc_dma8237, HDC_DMA);
 	}
 }
 

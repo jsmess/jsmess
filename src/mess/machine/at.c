@@ -191,6 +191,7 @@ static void at_keyboard_interrupt(running_machine *machine, int state)
  *
  *************************************************************************/
 
+static int dma_channel;
 static UINT8 dma_offset[2][4];
 static UINT8 at_pages[0x10];
 
@@ -244,86 +245,86 @@ WRITE8_HANDLER(at_page8_w)
 }
 
 
-static DMA8237_HRQ_CHANGED( pc_dma_hrq_changed )
+static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 {
 	at_state *st = device->machine->driver_data;
 	cpu_set_input_line(st->maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	dma8237_set_hlda( device, state );
+	i8237_hlda_w( device, state );
 }
 
-static DMA8237_MEM_READ( pc_dma_read_byte )
+static READ8_HANDLER( pc_dma_read_byte )
 {
 	UINT8 result;
-	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
+	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
 		& 0xFF0000;
 
-	result = memory_read_byte(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), page_offset + offset);
+	result = memory_read_byte(space, page_offset + offset);
 	return result;
 }
 
 
-static DMA8237_MEM_WRITE( pc_dma_write_byte )
+static WRITE8_HANDLER( pc_dma_write_byte )
 {
-	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
+	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
 		& 0xFF0000;
 
-	memory_write_byte(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), page_offset + offset, data);
+	memory_write_byte(space, page_offset + offset, data);
 }
 
 
-static DMA8237_CHANNEL_READ( at_dma8237_fdc_dack_r ) {
+static READ8_DEVICE_HANDLER( at_dma8237_fdc_dack_r ) {
 	return pc_fdc_dack_r(device->machine);
 }
 
 
-static DMA8237_CHANNEL_READ( at_dma8237_hdc_dack_r ) {
+static READ8_DEVICE_HANDLER( at_dma8237_hdc_dack_r ) {
 	return pc_hdc_dack_r( device->machine );
 }
 
 
-static DMA8237_CHANNEL_WRITE( at_dma8237_fdc_dack_w ) {
+static WRITE8_DEVICE_HANDLER( at_dma8237_fdc_dack_w ) {
 	pc_fdc_dack_w( device->machine, data );
 }
 
 
-static DMA8237_CHANNEL_WRITE( at_dma8237_hdc_dack_w ) {
+static WRITE8_DEVICE_HANDLER( at_dma8237_hdc_dack_w ) {
 	pc_hdc_dack_w( device->machine, data );
 }
 
 
-static DMA8237_OUT_EOP( at_dma8237_out_eop ) {
+static WRITE_LINE_DEVICE_HANDLER( at_dma8237_out_eop ) {
 	pc_fdc_set_tc_state( device->machine, state );
 }
 
+static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { if (state) dma_channel = 0; }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { if (state) dma_channel = 1; }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { if (state) dma_channel = 2; }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { if (state) dma_channel = 3; }
 
-const struct dma8237_interface at_dma8237_1_config =
+I8237_INTERFACE( at_dma8237_1_config )
 {
-	XTAL_14_31818MHz/3,
-
-	pc_dma_hrq_changed,
-	pc_dma_read_byte,
-	pc_dma_write_byte,
-
-	{ 0, 0, at_dma8237_fdc_dack_r, at_dma8237_hdc_dack_r },
-	{ 0, 0, at_dma8237_fdc_dack_w, at_dma8237_hdc_dack_w },
-	at_dma8237_out_eop
+	DEVCB_LINE(pc_dma_hrq_changed),
+	DEVCB_LINE(at_dma8237_out_eop),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(at_dma8237_fdc_dack_r), DEVCB_HANDLER(at_dma8237_hdc_dack_r) },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(at_dma8237_fdc_dack_w), DEVCB_HANDLER(at_dma8237_hdc_dack_w) },
+	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
 };
 
 
 /* TODO: How is this hooked up in the actual machine? */
-const struct dma8237_interface at_dma8237_2_config =
+I8237_INTERFACE( at_dma8237_2_config )
 {
-	XTAL_14_31818MHz/3,
-
-	pc_dma_hrq_changed,
-	pc_dma_read_byte,
-	pc_dma_write_byte,
-
-	{ NULL, NULL, NULL, NULL },
-	{ NULL, NULL, NULL, NULL },
-	NULL
+	DEVCB_LINE(pc_dma_hrq_changed),
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
 
@@ -415,7 +416,7 @@ static void at_fdc_interrupt(running_machine *machine, int state)
 static void at_fdc_dma_drq(running_machine *machine, int state, int read_)
 {
 	at_state *st = machine->driver_data;
-	dma8237_drq_write( st->dma8237_1, FDC_DMA, state);
+	i8237_dreq2_w( st->dma8237_1, state);
 }
 
 static const device_config *at_get_device(running_machine *machine)
