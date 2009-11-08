@@ -632,13 +632,13 @@ static const z80_daisy_chain slow_daisy_chain[] =
 
 static Z80DMA_INTERFACE( dma_intf )
 {
-	DEVCB_CPU_INPUT_LINE("conkort:5a", INPUT_LINE_HALT),
-	DEVCB_CPU_INPUT_LINE("conkort:5a", INPUT_LINE_IRQ0),
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT),
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("conkort:5a", PROGRAM, memory_read_byte),
-	DEVCB_MEMORY_HANDLER("conkort:5a", PROGRAM, memory_write_byte),
-	DEVCB_MEMORY_HANDLER("conkort:5a", IO, memory_read_byte),
-	DEVCB_MEMORY_HANDLER("conkort:5a", IO, memory_write_byte)
+	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_read_byte),
+	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_write_byte),
+	DEVCB_MEMORY_HANDLER(Z80_TAG, IO, memory_read_byte),
+	DEVCB_MEMORY_HANDLER(Z80_TAG, IO, memory_write_byte)
 };
 
 static const z80_daisy_chain fast_daisy_chain[] =
@@ -652,6 +652,7 @@ static const z80_daisy_chain fast_daisy_chain[] =
 static WRITE_LINE_DEVICE_HANDLER( slow_wd1791_intrq_w )
 {
 	slow_t *conkort = get_safe_token_machine_slow(device->machine);
+
 	conkort->fdc_irq = state;
 }
 
@@ -659,22 +660,16 @@ static const wd17xx_interface slow_wd17xx_interface =
 {
 	DEVCB_LINE(slow_wd1791_intrq_w),
 	DEVCB_NULL,
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
 /* FD1793 */
 
-static WRITE_LINE_DEVICE_HANDLER( fast_wd1793_drq_w )
-{
-	fast_t *conkort = get_safe_token_machine_fast(device->machine);
-	z80dma_rdy_w(conkort->z80dma, state);
-}
-
 static const wd17xx_interface fast_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_LINE(fast_wd1793_drq_w),
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+	DEVCB_DEVICE_LINE(Z80DMA_TAG, z80dma_rdy_w),
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
 /* Machine Driver */
@@ -836,6 +831,10 @@ static DEVICE_START( luxor_55_21046 )
 
 static DEVICE_RESET( luxor_55_21046 )
 {
+	floppy_drive_set_motor_state(get_floppy_image(device->machine, 0), 1);
+	floppy_drive_set_motor_state(get_floppy_image(device->machine, 1), 1);
+	floppy_drive_set_ready_state(get_floppy_image(device->machine, 0), 1, 1);
+	floppy_drive_set_ready_state(get_floppy_image(device->machine, 1), 1, 1);
 }
 
 /*-------------------------------------------------
