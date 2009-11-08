@@ -35,7 +35,7 @@
 	        PB_EXT  from mouse Y circuitry
 	        PA_EXT  from mouse X circuitry
 
-RBV @ 43f80, alt 48000
+LC ram sizer: a46576, stores size at 7ffc
 
 ****************************************************************************/
 
@@ -192,9 +192,9 @@ static WRITE32_HANDLER( rbv_ramdac_w )
 		if (rbv_count == 3)
 		{
 			rbv_count = 0;
-			rbv_clutoffs++;
 			palette_set_color(space->machine, rbv_clutoffs, MAKE_RGB(rbv_colors[0], rbv_colors[1], rbv_colors[2]));
 			rbv_palette[rbv_clutoffs] = MAKE_RGB(rbv_colors[0], rbv_colors[1], rbv_colors[2]);
+			rbv_clutoffs++;
 		}
 	}
 }
@@ -244,6 +244,98 @@ static WRITE16_HANDLER ( mac_rbv_w )
 		via_w(via_1, offset, (data >> 8) & 0xff);
 }
 
+// LC/LC II "V8" video and friends
+
+static UINT8 v8_regs[256];
+static UINT32 v8_colors[3], v8_count, v8_clutoffs;
+static UINT32 v8_palette[256];
+
+static READ16_HANDLER ( mac_v8_r )
+{
+	int data, viaoffs;
+	const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
+
+	printf("v8_r: %x, mask %x (PC %x)\n", offset*2, mem_mask, cpu_get_pc(space->cpu));
+
+	viaoffs = (offset >> 8) & 0x0f;
+
+	switch (offset)
+	{
+		case 0:
+			data = via_r(via_1, viaoffs);
+			return (data<<8) | v8_regs[0];
+
+		default:
+			data = via_r(via_1, viaoffs);
+			return (data<<8)|data;
+	}
+
+}
+
+static WRITE16_HANDLER ( mac_v8_w )
+{
+	const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
+	int viaoffs;
+
+	printf("v8_w: %x to offset %x, mask %x (PC %x)\n", data, offset*2, mem_mask, cpu_get_pc(space->cpu));
+
+	viaoffs = (offset >> 8) & 0x0f;
+
+	switch (offset)
+	{
+		case 0:
+			if (ACCESSING_BITS_8_15)
+			{
+				via_w(via_1, viaoffs, (data >> 8) & 0xff);
+			}
+			else
+			{
+				v8_regs[0] = data&0xe7;
+			}
+			break;
+
+		default:
+			if (ACCESSING_BITS_8_15)
+			{
+				via_w(via_1, viaoffs, (data >> 8) & 0xff);
+			}
+			break;
+	}
+}
+
+static WRITE32_HANDLER( mac_v8_ramdac_w )
+{
+	if (mem_mask == 0xff000000)
+	{
+		v8_clutoffs = data>>24;
+		v8_count = 0;
+	}
+	else if (mem_mask == 0x00ff0000)
+	{
+		v8_colors[v8_count++] = data>>16;
+
+		if (v8_count == 3)
+		{
+			v8_count = 0;
+			palette_set_color(space->machine, v8_clutoffs, MAKE_RGB(v8_colors[0], v8_colors[1], v8_colors[2]));
+			v8_palette[v8_clutoffs] = MAKE_RGB(v8_colors[0], v8_colors[1], v8_colors[2]);
+			v8_clutoffs++;
+		}
+	}
+}
+
+static VIDEO_START( maclc )
+{
+	memset(v8_regs, 0, sizeof(v8_regs));
+
+	v8_regs[1] = 0x6;	// set init value
+}
+
+static VIDEO_UPDATE( maclc )
+{
+	return 0;
+}
+
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
@@ -279,8 +371,8 @@ static ADDRESS_MAP_START(maclc_map, ADDRESS_SPACE_PROGRAM, 32)
 	// 50f18000-9fff = PWMs
 
 	// 50f24000-5fff = VDAC (palette)
-	AM_RANGE(0x50f24000, 0x50f25fff) AM_RAM
-	AM_RANGE(0x50f26000, 0x50f27fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff)	// VIA2 (RBV)
+	AM_RANGE(0x50f24000, 0x50f24003) AM_WRITE(mac_v8_ramdac_w)
+	AM_RANGE(0x50f26000, 0x50f27fff) AM_READWRITE16(mac_v8_r, mac_v8_w, 0xffffffff)	// VIA2 (V8)
 
 	AM_RANGE(0xfeff8000, 0xfeffffff) AM_ROM AM_REGION("user1", 0x78000)
 ADDRESS_MAP_END
@@ -397,16 +489,6 @@ static ADDRESS_MAP_START(macclas2_map, ADDRESS_SPACE_PROGRAM, 32)
 	// mirror video declaration ROM
 	AM_RANGE(0xfeff8000, 0xfeffffff) AM_ROM AM_REGION("user1", 0x78000)
 ADDRESS_MAP_END
-
-static VIDEO_START( maclc )
-{
-}
-
-static VIDEO_UPDATE( maclc )
-{
-	return 0;
-}
-
 
 /***************************************************************************
     DEVICE CONFIG

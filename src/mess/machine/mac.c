@@ -42,7 +42,7 @@
           but A/UX can run 32.
         - There are 5 known kinds of host-side ADB hardware:
           * "Mac II ADB" used in the SE, II, IIx, IIcx, SE/30, IIci, Quadra 610, Quadra 650, Quadra 700,
-             Quadra 800, Centris 610 and Centris 650.  This is a dumb state machine using the VIA.
+             Quadra 800, Centris 610 and Centris 650.  This is a bit-banger using the VIA and a simple PIC.
           * "ADB-PMU" used in the Mac Portable and all 680x0-based PowerBooks.
           * "ADB-EGRET" used in the IIsi, IIvi, IIvx, Classic II, LC, LC II, LC III, Performa 460,
              and Performa 600.  This is a 68HC05 with a different internal ROM than CUDA.
@@ -50,7 +50,7 @@
             Quadra 900, and Quadra 950.
           * "ADB-CUDA" (Apple's CUDA chip, which is a 68HC05 MCU) used in the Color Classic, LC 520,
             LC 55x, LC 57x, LC 58x, Quadra 630, Quadra 660AV, Quadra 840AV, PowerMac 6100/7100/8100,
-            IIcx, IIci, and PowerMac 5200.
+            IIci, and PowerMac 5200.
 
 `    TODO:
         - Mac Portable and PowerBook 100 are similar to this hardware, but we need ROMs!
@@ -76,6 +76,9 @@
 #include "debug/debugcpu.h"
 #include "devices/messram.h"
 
+#define ADB_IS_BITBANG	(mac_model >= MODEL_MAC_SE && mac_model <= MODEL_MAC_CLASSIC) || (mac_model >= MODEL_MAC_II && mac_model <= MODEL_MAC_IICX) || (mac_model == MODEL_MAC_SE30)
+#define ADB_IS_EGRET	(mac_model >= MODEL_MAC_LC && mac_model <= MODEL_MAC_COLOR_CLASSIC) || (mac_model == MODEL_MAC_IICI) || (mac_model == MODEL_MAC_IISI)
+
 #ifdef MAME_DEBUG
 #define LOG_VIA			0
 #define LOG_RTC			0
@@ -99,6 +102,7 @@
 #define ADB_STATE_XFER_EVEN	(1)
 #define ADB_STATE_XFER_ODD	(2)
 #define ADB_STATE_IDLE		(3)
+#define ADB_STATE_NOTINIT	(4)
 
 // ADB commands
 #define ADB_CMD_RESET		(0)
@@ -229,7 +233,7 @@ static void mac_install_memory(running_machine *machine, offs_t memory_begin, of
 
 	memory_set_bankptr(machine,bank, memory_data);
 
-	if (LOG_MEMORY)
+	if (1) //LOG_MEMORY)
 	{
 		logerror("mac_install_memory(): bank=%d range=[0x%06x...0x%06x] mask=0x%06x ptr=0x%p\n",
 			bank, memory_begin, memory_end, memory_mask, memory_data);
@@ -369,7 +373,7 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 		/* install the memory */
 		if (((mac_model >= MODEL_MAC_LC) && (mac_model <= MODEL_MAC_COLOR_CLASSIC))|| (mac_model == MODEL_MAC_LC_II))
 		{
-			mac_install_memory(machine, 0x00000000, 0x009fffff, memory_size, memory_data, is_rom, 1);
+			mac_install_memory(machine, 0x00000000, memory_size-1, memory_size, memory_data, is_rom, 1);
 		}
 		else if ((mac_model == MODEL_MAC_IICI) || (mac_model == MODEL_MAC_IISI))
 		{
@@ -1312,6 +1316,37 @@ NVRAM_HANDLER( mac )
 		{
 			if (LOG_RTC)
 				logerror("trashing PRAM\n");
+
+			memset(rtc_ram, 0, sizeof(rtc_ram));
+
+			// some Mac ROMs are buggy in the presence of
+			// no NVRAM, so let's initialize it right
+			rtc_ram[0] = 0xa8;	// valid
+			rtc_ram[4] = 0xcc;
+			rtc_ram[5] = 0x0a;
+			rtc_ram[6] = 0xcc;
+			rtc_ram[7] = 0x0a;
+			rtc_ram[0xc] = 0x42; 	// XPRAM valid for Plus/SE
+			rtc_ram[0xd] = 0x75;
+			rtc_ram[0xe] = 0x67;
+			rtc_ram[0xf] = 0x73;
+			rtc_ram[0x10] = 0x18;
+			rtc_ram[0x11] = 0x88;
+			rtc_ram[0x12] = 0x01;
+			rtc_ram[0x13] = 0x4c;
+
+			if (mac_model >= MODEL_MAC_II)
+			{
+				rtc_ram[0xc] = 0x4e; 	// XPRAM valid is different for these
+				rtc_ram[0xd] = 0x75;
+				rtc_ram[0xe] = 0x4d;
+				rtc_ram[0xf] = 0x63;
+				rtc_ram[0x77] = 0x01;
+				rtc_ram[0x78] = 0xff;
+				rtc_ram[0x79] = 0xff;
+				rtc_ram[0x7a] = 0xff;
+				rtc_ram[0x7b] = 0xdf;
+			}
 		}
 
 		{
@@ -1387,9 +1422,9 @@ WRITE16_HANDLER ( mac_iwm_w )
  * *************************************************************************/
 
 // Mac ADB state
-static int adb_irq_pending, adb_waiting_cmd, adb_datasize, adb_buffer[8];
+static int adb_irq_pending, adb_waiting_cmd, adb_datasize, adb_buffer[16];
 static int adb_state, adb_command, adb_send, adb_timer_ticks, adb_extclock, adb_direction;
-static int adb_listenreg, adb_listenaddr;
+static int adb_listenreg, adb_listenaddr, adb_last_talk;
 
 // ADB mouse state
 static int adb_mouseaddr = 3;
@@ -1406,6 +1441,11 @@ static const char *const adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
 static void mac_adb_pollmouse(running_machine *machine)
 {
 	int NewX, NewY, NewButton;
+
+	if (!adb_mouse_initialized)
+	{
+		return;
+	}
 
 	NewButton = input_port_read(machine, "MOUSE0") & 0x01;
 	NewX = input_port_read(machine, "MOUSE2");
@@ -1495,17 +1535,6 @@ static void mac_adb_talk(running_machine *machine)
 
 						adb_direction = 0;
 						adb_send = 0;
-
-						#if 0
-						adb_buffer[0] = 0xff;
-						adb_datasize = 1;
-
-						// it's not documented how to respond, but yanking SRQ seems to work
-						adb_extclock ^= 1;
-						via_cb1_w(via_0, 0, adb_extclock);
-						adb_extclock ^= 1;
-						via_cb1_w(via_0, 0, adb_extclock);
-						#endif
 						break;
 
 					default:	// reserved/unused
@@ -1521,12 +1550,16 @@ static void mac_adb_talk(running_machine *machine)
 				adb_direction = 1;	// input from Mac
 				adb_listenreg = reg;
 				adb_listenaddr = addr;
+				adb_command = 0;
 				break;
 
 			case 3: // talk
 				#if LOG_ADB
 				printf("ADB TALK: reg %x address %x\n", reg, addr);
 				#endif
+
+				// keep track of what device the Mac last TALKed to
+				adb_last_talk = addr;
 
 				adb_direction = 0;    	// output to Mac
 				if (addr == adb_mouseaddr)
@@ -1600,7 +1633,7 @@ static void mac_adb_talk(running_machine *machine)
 					#if LOG_ADB
 					printf("ADB: talking to unconnected device\n");
 					#endif
-					adb_buffer[0] = adb_buffer[1] = 0xff;
+					adb_buffer[0] = adb_buffer[1] = 0;
 					adb_datasize = 0;
 				}
 				break;
@@ -1610,7 +1643,31 @@ static void mac_adb_talk(running_machine *machine)
 	}
 	else
 	{
-		printf("Got LISTEN data %x for device %x reg %x\n", adb_command, adb_listenreg, adb_listenaddr);
+		#if LOG_ADB
+		printf("Got LISTEN data %x for device %x reg %x\n", adb_command, adb_listenaddr, adb_listenreg);
+		#endif
+#if 0
+		if (adb_listenaddr == adb_mouseaddr)
+		{
+			if ((adb_listenreg == 3) && (adb_command > 0) && (adb_command < 16))
+			{
+				#if LOG_ADB
+			 	printf("MOUSE: moving to address %x\n", adb_command);
+				#endif
+				adb_mouseaddr = adb_command&0x0f;
+			}
+		}
+		else if (adb_listenaddr == adb_keybaddr)
+		{
+			if ((adb_listenreg == 3) && (adb_command > 0) && (adb_command < 16))
+			{
+				#if LOG_ADB
+			 	printf("KEYBOARD: moving to address %x\n", adb_command);
+				#endif
+				adb_keybaddr = adb_command&0x0f;
+			}
+		}
+#endif
 	}
 }
 
@@ -1629,9 +1686,15 @@ static TIMER_CALLBACK(mac_adb_tick)
 	{
 		timer_adjust_oneshot(mac_adb_timer, attotime_never, 0);
 
-		if (adb_direction)
+		if ((adb_direction) && (ADB_IS_BITBANG))
 		{
 			mac_adb_talk(machine);
+		}
+		else if (ADB_IS_EGRET)
+		{
+			#if LOG_ADB
+			printf("Egret ADB: got command byte %02x\n", adb_command);
+			#endif
 		}
 	}
 	else
@@ -1654,7 +1717,7 @@ static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2)
 
 static WRITE8_DEVICE_HANDLER(mac_adb_via_out_cb2)
 {
-//  printf("OUT CB2 = %x\n", data);
+//      printf("OUT CB2 = %x\n", data);
 	adb_command <<= 1;
 	adb_command |= data & 1;
 }
@@ -1676,6 +1739,7 @@ static void mac_adb_newaction(int state)
 				adb_command = adb_send = 0;
 				adb_direction = 1;	// Mac is shifting us a command
 				adb_waiting_cmd = 1;	// we're going to get a command
+				adb_irq_pending = 0;
 				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 				break;
 
@@ -1698,18 +1762,42 @@ static void mac_adb_newaction(int state)
 							adb_buffer[i] = adb_buffer[i+1];
 						}
 					}
+
 				}
 				else
 				{
 					adb_send = 0;
+					adb_irq_pending = 1;
 				}
 
 				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 				break;
 
 			case ADB_STATE_IDLE:
+				adb_irq_pending = 0;
+				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 				break;
 		}
+	}
+}
+
+static void mac_egret_newaction(int state)
+{
+	if (state != adb_state)
+	{
+		#if LOG_ADB
+		printf("ADB: New Egret state: SS %d VF %d XS %d\n", (state>>2)&1, (state>>1)&1, state&1);
+		#endif
+		
+		// rising edge of VIA bit 5 (bit 2 here) seems to mean the 68k wants to send something
+		if ((state & 0x04) && !(adb_state & 0x4))
+		{
+			adb_command = adb_send = 0;
+			adb_timer_ticks = 8;
+			timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+		}
+
+		adb_state = state;
 	}
 }
 
@@ -1719,7 +1807,7 @@ static void adb_vblank(running_machine *machine)
 	// (no need to actually generate an IRQ, the Mac will see it)
 	if ((adb_mouse_wanted_srq) || (adb_keyb_wanted_srq))
 	{
-//		printf("ADB IRQ: kb %d ms %d\n", adb_keyb_wanted_srq, adb_mouse_wanted_srq);
+//		printf("ADB IRQ: kb %d ms %d (last talk %d)\n", adb_keyb_wanted_srq, adb_mouse_wanted_srq, adb_last_talk);
 		adb_irq_pending = 1;
 	}
 	else
@@ -1729,13 +1817,29 @@ static void adb_vblank(running_machine *machine)
 
 		if ((adb_state == ADB_STATE_IDLE) && (adb_mouse_wanted_srq))
 		{
-			// repeat last TALK to get updated data
-			adb_waiting_cmd = 1;
-			mac_adb_talk(machine);
+			// if the mouse was the last TALK, we can just send the new data
+			// otherwise we need to pull SRQ 
+			if (adb_last_talk == adb_mouseaddr)
+			{
+				// repeat last TALK to get updated data
+				adb_waiting_cmd = 1;
+				mac_adb_talk(machine);
 
-			adb_timer_ticks = 8;
-			timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
-			adb_mouse_wanted_srq = 0;
+				adb_timer_ticks = 8;
+				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+				adb_mouse_wanted_srq = 0;
+			}
+			#if 0
+			else
+			{
+				printf("IDLE, mouse moved, mouse not last TALK, pulling SRQ\n");
+				adb_irq_pending = 1;
+
+				adb_command = adb_send = 0;
+				adb_timer_ticks = 8;
+				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+			}
+			#endif
 		}
 	}
 }
@@ -1748,10 +1852,11 @@ static void adb_reset(void)
 	adb_extclock = 0;
 	adb_send = 0;
 	adb_waiting_cmd = 0;
-	adb_state = ADB_STATE_IDLE;
+	adb_state = ADB_STATE_NOTINIT;
 	adb_direction = 0;
 	adb_datasize = 0;
-
+	adb_last_talk = -1;
+	
 	// mouse
 	adb_mouseaddr = 3;
 	adb_lastmousex = adb_lastmousey = adb_lastbutton = 0;
@@ -1759,7 +1864,7 @@ static void adb_reset(void)
 	adb_mouse_initialized = 0;
 
 	// keyboard
-	adb_keybaddr = 2;
+	adb_keybaddr = 2;			     
 	adb_keyb_wanted_srq = 0;
 	adb_keybinitialized = 0;
 }
@@ -1805,8 +1910,8 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 //	printf("VIA1 IN_A (PC %x)\n", cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
 
 	if ((mac_model == MODEL_MAC_CLASSIC) ||
-	    (mac_model == MODEL_MAC_LC_II) || (mac_model == MODEL_MAC_II) || 
-	    (mac_model == MODEL_MAC_II_FDHD) || (mac_model == MODEL_MAC_IIX))
+	    (mac_model == MODEL_MAC_II) || (mac_model == MODEL_MAC_II_FDHD) || 
+	    (mac_model == MODEL_MAC_IIX))
 	{
 		return 0x81;		// bit 0 must be set to avoid attempting to boot from AppleTalk
 	}
@@ -1816,7 +1921,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 		return 0x81 | PA6;
 	}
 
-	if (mac_model == MODEL_MAC_LC)
+	if ((mac_model == MODEL_MAC_LC) || (mac_model == MODEL_MAC_LC_II))	// these both use the V8 ASIC and should in theory ID the same
 	{
 		return 0x81 | PA6 | PA4 | PA2;
 	}
@@ -1848,13 +1953,11 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 {
 	int val = 0;
 
-//	printf("VIA1 IN_B (PC %x)\n", cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
-
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
 	if (video_screen_get_vpos(device->machine->primary_screen) >= MAC_V_VIS)
 		val |= 0x40;
 
-	if (has_adb())
+	if ((ADB_IS_BITBANG) || (ADB_IS_EGRET))
 	{
 		val |= adb_state<<4;
 
@@ -1874,6 +1977,8 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 	}
 	if (rtc_data_out)
 		val |= 1;
+
+//	printf("VIA1 IN_B = %02x (PC %x)\n", val, cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
 
 	return val;
 }
@@ -1947,9 +2052,13 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 		rtc_shift_data(data & 0x01);
 	rtc_rTCClk = new_rtc_rTCClk;
 
-	if (has_adb())
+	if (ADB_IS_BITBANG)
 	{
 		mac_adb_newaction((data & 0x30) >> 4);
+	}
+	else if (ADB_IS_EGRET)
+	{
+		mac_egret_newaction((data & 0x38) >> 3);
 	}
 }
 
@@ -2006,7 +2115,7 @@ READ16_HANDLER ( mac_via2_r )
 	offset &= 0x0f;
 
 	if (LOG_VIA)
-		logerror("mac_via2_r: offset=0x%02x\n", offset);
+		logerror("mac_via2_r: offset=0x%02x\n", offset*2);
 	data = via_r(via_1, offset);
 
 	return (data & 0xff) | (data << 8);
@@ -2020,7 +2129,7 @@ WRITE16_HANDLER ( mac_via2_w )
 	offset &= 0x0f;	 
 
 	if (LOG_VIA)
-		logerror("mac_via2_w: offset=0x%02x data=0x%08x\n", offset, data);
+		logerror("mac_via2_w: offset=%x data=0x%08x\n", offset, data);
 
 	if (ACCESSING_BITS_8_15)
 		via_w(via_1, offset, (data >> 8) & 0xff);
@@ -2043,6 +2152,11 @@ static READ8_DEVICE_HANDLER(mac_via2_in_b)
 {
 //	logerror("VIA2 IN B (PC %x)\n", cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
 
+	if ((mac_model == MODEL_MAC_LC) || (mac_model == MODEL_MAC_LC_II))
+	{
+		return 0x4f;
+	}
+
 	if (mac_model == MODEL_MAC_SE30)
 	{
 		return 0x87;	// bits 3 and 6 are tied low on SE/30
@@ -2061,6 +2175,8 @@ static WRITE8_DEVICE_HANDLER(mac_via2_out_b)
 	const device_config *via_0 = devtag_get_device(device->machine, "via6522_0");
 
 //	logerror("VIA2 OUT B: %02x (PC %x)\n", data, cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
+
+//	printf("VIA2 OUT B: %02x (MMU = %02x)\n", data, data & 0x08);
 
 	// chain 60.15 Hz to VIA1
 	via_ca1_w(via_0, 0, data>>7);
@@ -2175,7 +2291,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 	}
 	else if ((model == MODEL_MAC_LC) || (model == MODEL_MAC_LC_II))
 	{
-		mac_install_memory(machine, 0x000000, 0x9fffff, messram_get_size(devtag_get_device(machine, "messram")), messram_get_ptr(devtag_get_device(machine, "messram")), FALSE, 2);
+		mac_install_memory(machine, 0x000000, messram_get_size(devtag_get_device(machine, "messram"))-1, messram_get_size(devtag_get_device(machine, "messram")), messram_get_ptr(devtag_get_device(machine, "messram")), FALSE, 2);
 	}
 	else if ((mac_model == MODEL_MAC_CLASSIC_II) || ((mac_model >= MODEL_MAC_II) && (mac_model <= MODEL_MAC_SE30)))
 	{
