@@ -238,6 +238,35 @@ static floperr_t d88_read_indexed_sector(floppy_image *floppy, int head, int tra
 	return d88_read_sector(floppy,head,track,sec,buffer,buffer_len);
 }
 
+static floperr_t d88_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
+{
+	UINT64 offset;
+	UINT32 sector_length;
+
+	offset = d88_get_sector_offset(floppy,head,track,sector);
+
+	if(d88_get_sector_length(floppy,head,track,sector,&sector_length) != FLOPPY_ERROR_SUCCESS)
+		return FLOPPY_ERROR_SEEKERROR;
+
+	if(offset == 0)
+		return FLOPPY_ERROR_SEEKERROR;
+
+	if(buflen > sector_length)
+		return FLOPPY_ERROR_INTERNAL;
+
+	floppy_image_write(floppy,buffer,offset,sector_length);
+
+	return FLOPPY_ERROR_SUCCESS;
+}
+
+static floperr_t d88_write_indexed_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
+{
+	int sec;
+
+	sec = d88_get_sector_id(floppy,head,track,sector);
+	return d88_write_sector(floppy,head,track,sec,buffer,buflen,ddam);
+}
+
 static void d88_get_header(floppy_image* floppy,UINT32* size, UINT8* prot, UINT8* type, UINT32* offsets)
 {
 	UINT8 header[D88_HEADER_LEN];
@@ -327,6 +356,8 @@ FLOPPY_CONSTRUCT(d88_dsk_construct)
 	callbacks->get_sector_length = d88_get_sector_length;
 	callbacks->read_sector = d88_read_sector;
 	callbacks->read_indexed_sector = d88_read_indexed_sector;
+	callbacks->write_sector = d88_write_sector;
+	callbacks->write_indexed_sector = d88_write_indexed_sector;
 	callbacks->get_indexed_sector_info = d88_get_indexed_sector_info;
 	callbacks->get_sectors_per_track = d88_get_sectors_per_track;
 
