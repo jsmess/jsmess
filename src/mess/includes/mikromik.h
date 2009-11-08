@@ -31,7 +31,10 @@ struct _mm1_state
 	int tx21;
 	int rcl;
 
+	/* floppy state */
 	int recall;
+	int dack3;
+	int tc;
 
 	/* devices */
 	const device_config		*i8212;

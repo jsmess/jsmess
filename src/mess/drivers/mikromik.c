@@ -21,7 +21,6 @@
 	- NEC uPD7220 GDC
 	- accurate video timing
 	- floppy DRQ during RECALL = 0
-	- write floppy TC only during DACK
 	- PCB layout
 	- NEC uPD7201 MPSC
 
@@ -420,10 +419,28 @@ static WRITE_LINE_DEVICE_HANDLER( tc_w )
 {
 	mm1_state *driver_state = device->machine->driver_data;
 
-	/* floppy terminal count */
-	upd765_tc_w(driver_state->upd765, !state);
+	if (!driver_state->dack3)
+	{
+		/* floppy terminal count */
+		upd765_tc_w(driver_state->upd765, !state);
+	}
+
+	driver_state->tc = !state;
 
 	cputag_set_input_line(device->machine, I8085A_TAG, I8085_RST75_LINE, state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( dack3_w )
+{
+	mm1_state *driver_state = device->machine->driver_data;
+
+	driver_state->dack3 = state;
+
+	if (!driver_state->dack3)
+	{
+		/* floppy terminal count */
+		upd765_tc_w(driver_state->upd765, driver_state->tc);
+	}
 }
 
 static I8237_INTERFACE( mm1_dma8237_intf )
@@ -434,7 +451,7 @@ static I8237_INTERFACE( mm1_dma8237_intf )
 	DEVCB_MEMORY_HANDLER(I8085A_TAG, PROGRAM, memory_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER(UPD7201_TAG, mpsc_dack_r), DEVCB_DEVICE_HANDLER(UPD765_TAG, upd765_dack_r) },
 	{ DEVCB_DEVICE_HANDLER(I8275_TAG, i8275_dack_w), DEVCB_DEVICE_HANDLER(UPD7201_TAG, mpsc_dack_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER(UPD765_TAG, upd765_dack_w) },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_LINE(dack3_w) }
 };
 
 /* uPD765 Interface */
@@ -689,6 +706,7 @@ static MACHINE_START( mm1 )
 	state_save_register_global(machine, state->tx21);
 	state_save_register_global(machine, state->rcl);
 	state_save_register_global(machine, state->recall);
+	state_save_register_global(machine, state->dack3);
 }
 
 static MACHINE_RESET( mm1 )
