@@ -241,34 +241,6 @@ struct data_stream
 	unsigned long ByteCount;
 };
 
-/* a serial device */
-struct serial_device
-{
-	/* transmit data bit-stream */
-	struct data_stream transmit;
-	/* receive data bit-stream */
-	struct data_stream receive;
-
-	/* register to receive data */
-	struct serial_receive_register	receive_reg;
-	/* register to transmit data */
-	struct serial_transmit_register transmit_reg;
-
-	/* connection to transmit/receive data over */
-	struct serial_connection connection;
-
-	/* data form to transmit/receive */
-	struct data_form data_form;
-
-	int transmit_state;
-
-	/* baud rate */
-	unsigned long BaudRate;
-
-	/* baud rate timer */
-	void	*timer;
-};
-
 unsigned long serial_device_get_state(int id);
 
 /* connect this device to the emulated serial chip */

@@ -40,6 +40,36 @@ setup serial interface software in driver and let the transfer begin */
 of serial ports supported */
 #define MAX_SERIAL_DEVICES	4
 
+
+/* a serial device */
+struct serial_device
+{
+	/* transmit data bit-stream */
+	struct data_stream transmit;
+	/* receive data bit-stream */
+	struct data_stream receive;
+
+	/* register to receive data */
+	struct serial_receive_register	receive_reg;
+	/* register to transmit data */
+	struct serial_transmit_register transmit_reg;
+
+	/* connection to transmit/receive data over */
+	struct serial_connection connection;
+
+	/* data form to transmit/receive */
+	struct data_form data_form;
+
+	int transmit_state;
+
+	/* baud rate */
+	unsigned long BaudRate;
+
+	/* baud rate timer */
+	void	*timer;
+};
+
+
 /* the serial streams */
 static struct serial_device	serial_devices[MAX_SERIAL_DEVICES];
 static TIMER_CALLBACK(serial_device_baud_rate_callback);
