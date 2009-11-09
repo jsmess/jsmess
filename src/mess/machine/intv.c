@@ -328,7 +328,7 @@ static int intv_load_rom_file(const device_config *image)
 	UINT8 start_seg;
 	UINT8 end_seg;
 
-	UINT16 current_address;
+	UINT32 current_address;
 	UINT32 end_address;
 
 	UINT8 high_byte;
