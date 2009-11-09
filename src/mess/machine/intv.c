@@ -464,35 +464,8 @@ static int intv_load_rom_file(const device_config *image)
 	}
 }
 
-DEVICE_START( intv_cart )
-{
-	/* First, initialize these as empty so that the intellivision
-     * will think that the playcable and keyboard are not attached */
-	UINT8 *memory = memory_region(device->machine, "maincpu");
-
-	/* assume playcable is absent */
-	memory[0x4800 << 1] = 0xff;
-	memory[(0x4800 << 1) + 1] = 0xff;
-
-	/* assume keyboard is absent */
-	memory[0x7000 << 1] = 0xff;
-	memory[(0x7000 << 1) + 1] = 0xff;
-}
-
 DEVICE_IMAGE_LOAD( intv_cart )
 {
-	/* First, initialize these as empty so that the intellivision
-     * will think that the playcable and keyboard are not attached */
-	UINT8 *memory = memory_region(image->machine, "maincpu");
-
-	/* assume playcable is absent */
-	memory[0x4800 << 1] = 0xff;
-	memory[(0x4800 << 1) + 1] = 0xff;
-
-	/* assume keyboard is absent */
-	memory[0x7000 << 1] = 0xff;
-	memory[(0x7000 << 1) + 1] = 0xff;
-
 	return intv_load_rom_file(image);
 }
 
@@ -510,7 +483,9 @@ MACHINE_RESET( intv )
 	/* These are actually the same vector, and INTR is unused */
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), CP1610_INT_INTRM, 0x1004);
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), CP1610_INT_INTR,  0x1004);
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), CP1610_R7, 0x2000);
+
+	/* Set initial PC */
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), CP1610_R7, 0x1000);
 
 	return;
 }
@@ -570,7 +545,7 @@ READ8_HANDLER( intv_right_control_r )
 
 READ8_HANDLER( intv_left_control_r )
 {
-	return 0xff;
+	return intv_right_control_r(space, 0 ); //0xff; /* small patch to allow Frogger to be played */
 }
 
 /* Intellivision console + keyboard component */

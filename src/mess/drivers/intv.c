@@ -343,8 +343,8 @@ INPUT_PORTS_END
 
 static ADDRESS_MAP_START( intv_mem , ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x0000, 0x003f) AM_READWRITE( stic_r, stic_w )
-    AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
-    AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE("ay8910", AY8914_directread_port_0_lsb_r, AY8914_directwrite_port_0_lsb_w )
+	AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
+	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE("ay8910", AY8914_directread_port_0_lsb_r, AY8914_directwrite_port_0_lsb_w )
  	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM	AM_REGION("maincpu", 0x1000<<1)	/* Exec ROM, 10-bits wide */
 	AM_RANGE(0x3000, 0x37ff) AM_ROM	AM_REGION("maincpu", 0x3000<<1)	/* GROM,     8-bits wide */
@@ -354,8 +354,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( intvkbd_mem , ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x0000, 0x003f) AM_READWRITE( stic_r, stic_w )
-    AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
-    AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE("ay8910", AY8914_directread_port_0_lsb_r, AY8914_directwrite_port_0_lsb_w )
+	AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
+	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE("ay8910", AY8914_directread_port_0_lsb_r, AY8914_directwrite_port_0_lsb_w )
  	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM	AM_REGION("maincpu", 0x1000<<1)	/* Exec ROM, 10-bits wide */
 	AM_RANGE(0x3000, 0x37ff) AM_ROM	AM_REGION("maincpu", 0x3000<<1)	/* GROM,     8-bits wide */
@@ -374,9 +374,18 @@ static ADDRESS_MAP_START( intv2_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+/* This is needed because MAME core does not allow PULSE_LINE.
+	The time interval is not critical, although it should be below 1000. */
+
+static TIMER_CALLBACK(intv_interrupt2_complete)
+{
+	cputag_set_input_line(machine, "keyboard", 0, CLEAR_LINE);
+}
+
 static INTERRUPT_GEN( intv_interrupt2 )
 {
 	cputag_set_input_line(device->machine, "keyboard", 0, ASSERT_LINE);
+	timer_set(device->machine, cputag_clocks_to_attotime(device->machine, "keyboard", 100), NULL, 0, intv_interrupt2_complete);
 }
 
 static MACHINE_DRIVER_START( intv )
@@ -388,7 +397,7 @@ static MACHINE_DRIVER_START( intv )
 
 	MDRV_MACHINE_RESET( intv )
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.92)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -411,8 +420,6 @@ static MACHINE_DRIVER_START( intv )
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("int,rom,bin,itv")
-	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_START(intv_cart)
 	MDRV_CARTSLOT_LOAD(intv_cart)
 MACHINE_DRIVER_END
 
@@ -428,7 +435,7 @@ static MACHINE_DRIVER_START( intvkbd )
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_GFXDECODE(intvkbd)
 	MDRV_VIDEO_UPDATE(intvkbd)
 
@@ -445,19 +452,19 @@ static MACHINE_DRIVER_START( intvkbd )
 MACHINE_DRIVER_END
 
 ROM_START(intv)
-	ROM_REGION(0x10000<<1,"maincpu",0)
+	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD( "exec.bin", (0x1000<<1)+0, 0x2000, CRC(cbce86f7) SHA1(5a65b922b562cb1f57dab51b73151283f0e20c7a))
 	ROM_LOAD16_BYTE( "grom.bin", (0x3000<<1)+1, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
 ROM_END
 
 ROM_START(intvsrs)
-	ROM_REGION(0x10000<<1,"maincpu",0)
+	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD( "searsexc.bin", (0x1000<<1)+0, 0x2000, CRC(ea552a22) SHA1(834339de056d42a35571cae7fd5b04d1344001e9))
 	ROM_LOAD16_BYTE( "grom.bin", (0x3000<<1)+1, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
 ROM_END
 
 ROM_START(intvkbd)
-	ROM_REGION(0x10000<<1,"maincpu",0)
+	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD( "exec.bin", 0x1000<<1, 0x2000, CRC(cbce86f7) SHA1(5a65b922b562cb1f57dab51b73151283f0e20c7a))
 	ROM_LOAD16_BYTE( "grom.bin", (0x3000<<1)+1, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
 	ROM_LOAD16_WORD( "024.u60",  0x7000<<1, 0x1000, CRC(4f7998ec) SHA1(ec006d0ae9002e9d56d83a71f5f2eddd6a456a40))
@@ -503,6 +510,6 @@ static void intvkbd_cassette_getinfo(const mess_device_class *devclass, UINT32 s
 ***************************************************************************/
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT   INIT CONFIG COMPANY      FULLNAME */
-CONS( 1979, intv,		0,	0,	intv,     intv, 	0,	0,	"Mattel",    "Intellivision", 0 )
+CONS( 1979, intv,	0,	0,	intv,     intv, 	0,	0,	"Mattel",    "Intellivision", 0 )
 CONS( 1981, intvsrs,	intv,	0,	intv,     intv, 	0,	0,	"Mattel",    "Intellivision (Sears)", 0 )
 COMP( 1981, intvkbd,	intv,	0,	intvkbd,  intvkbd, 	0,	0,	"Mattel",    "Intellivision Keyboard Component (Unreleased)", GAME_NOT_WORKING)
