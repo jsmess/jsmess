@@ -227,20 +227,6 @@ unsigned char serial_helper_get_parity(unsigned char data);
 /*******************************************************************************/
 /**** SERIAL DEVICE ****/
 
-/* a read/write bit stream. used to transmit data and to receive data */
-struct data_stream
-{
-	/* pointer to buffer */
-	unsigned char *pData;
-	/* length of buffer */
-	unsigned long DataLength;
-
-	/* bit offset within current byte */
-	unsigned long BitCount;
-	/* byte offset within data */
-	unsigned long ByteCount;
-};
-
 unsigned long serial_device_get_state(int id);
 
 /* connect this device to the emulated serial chip */

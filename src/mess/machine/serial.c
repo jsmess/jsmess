@@ -41,6 +41,21 @@ of serial ports supported */
 #define MAX_SERIAL_DEVICES	4
 
 
+/* a read/write bit stream. used to transmit data and to receive data */
+struct data_stream
+{
+	/* pointer to buffer */
+	unsigned char *pData;
+	/* length of buffer */
+	unsigned long DataLength;
+
+	/* bit offset within current byte */
+	unsigned long BitCount;
+	/* byte offset within data */
+	unsigned long ByteCount;
+};
+
+
 /* a serial device */
 struct serial_device
 {
