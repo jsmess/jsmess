@@ -124,9 +124,6 @@ struct serial_connection
 /* setup out and in callbacks */
 void serial_connection_init(running_machine *machine, struct serial_connection *connection);
 
-/* set callback which will be executed when out status has changed */
-void serial_connection_set_out_callback(running_machine *machine, struct serial_connection *connection, void (*out_cb)(running_machine *machine, int id, unsigned long state));
-
 /* set callback which will be executed when in status has changed */
 void serial_connection_set_in_callback(running_machine *machine, struct serial_connection *connection, void (*in_cb)(running_machine *machine, int id, unsigned long state));
 
@@ -211,8 +208,6 @@ struct serial_transmit_register
 	unsigned long bit_count;
 };
 
-/* get a bit from the transmit register */
-int transmit_register_get_data_bit(struct serial_transmit_register *transmit_reg);
 /* setup transmit reg ready for transmit */
 void transmit_register_setup(struct serial_transmit_register *transmit_reg, struct data_form *data_form,unsigned char data_byte);
 void	transmit_register_send_bit(running_machine *machine, struct serial_transmit_register *transmit_reg, struct serial_connection *connection);
@@ -222,7 +217,6 @@ void	transmit_register_reset(struct serial_transmit_register *transmit_reg);
 /**** SERIAL HELPER ****/
 
 void serial_helper_setup(void);
-unsigned char serial_helper_get_parity(unsigned char data);
 
 /*******************************************************************************/
 /**** SERIAL DEVICE ****/

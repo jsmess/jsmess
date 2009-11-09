@@ -120,7 +120,7 @@ void serial_helper_setup(void)
 	}
 }
 
-unsigned char serial_helper_get_parity(unsigned char data)
+static unsigned char serial_helper_get_parity(unsigned char data)
 {
 	return serial_parity_table[data & 0x0ff];
 }
@@ -439,7 +439,9 @@ void transmit_register_setup(struct serial_transmit_register *transmit_reg, stru
 	}
 }
 
-int transmit_register_get_data_bit(struct serial_transmit_register *transmit_reg)
+
+/* get a bit from the transmit register */
+static int transmit_register_get_data_bit(struct serial_transmit_register *transmit_reg)
 {
 	int bit;
 
@@ -458,6 +460,7 @@ int transmit_register_get_data_bit(struct serial_transmit_register *transmit_reg
 
 	return bit;
 }
+
 
 void	transmit_register_send_bit(running_machine *machine, struct serial_transmit_register *transmit_reg, struct serial_connection *connection)
 {
@@ -670,12 +673,6 @@ void	serial_connection_init(running_machine *machine, struct serial_connection *
 {
 	connection->out_callback = NULL;
 	connection->in_callback = NULL;
-}
-
-/* set callback which will be executed when out status has changed */
-void	serial_connection_set_out_callback(running_machine *machine, struct serial_connection *connection, void (*out_cb)(running_machine *machine, int id, unsigned long state))
-{
-	connection->out_callback = out_cb;
 }
 
 /* set callback which will be executed when in status has changed */
