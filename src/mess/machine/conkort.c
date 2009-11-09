@@ -383,7 +383,22 @@ static ABCBUS_CARD_SELECT( luxor_55_21046 )
 
 static READ8_HANDLER( fast_ctrl_r )
 {
-	return 0xff; // TODO what is this?
+	/*
+
+        bit     description
+
+        0       
+        1
+        2
+        3		? (must be 1 to boot)
+        4
+        5
+        6       
+        7
+
+    */
+
+	return 0x08;
 }
 
 static READ8_HANDLER( fast_data_r )
@@ -433,15 +448,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fast_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0f, 0x0f) AM_READ(fast_data_r)
-	AM_RANGE(0x1f, 0x1f) AM_WRITE(fast_data_w)
-	AM_RANGE(0x2f, 0x2f) AM_WRITE(fast_status_w)
-//  AM_RANGE(0x3f, 0x3f) AM_WRITE()
-//  AM_RANGE(0x4f, 0x4f) AM_WRITE()
-	AM_RANGE(0x5d, 0x5d) AM_READ(fast_ctrl_r)
-	AM_RANGE(0x68, 0x6b) AM_DEVREAD(SAB1793_TAG, wd17xx_r)
-	AM_RANGE(0x78, 0x7b) AM_DEVWRITE(SAB1793_TAG, wd17xx_w)
-	AM_RANGE(0x87, 0x87) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0f) AM_READ(fast_data_r)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0f) AM_WRITE(fast_data_w)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_WRITE(fast_status_w)
+//  AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_WRITE()
+//  AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_WRITE()
+	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_READ(fast_ctrl_r)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0x0c) AM_DEVREAD(SAB1793_TAG, wd17xx_r)
+	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVWRITE(SAB1793_TAG, wd17xx_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_r, z80dma_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -496,13 +511,6 @@ INPUT_PORTS_START( luxor_55_21046 )
 INPUT_PORTS_END
 
 /* Z80 PIO */
-
-static void conkort_pio_interrupt(const device_config *device, int state)
-{
-	slow_t *conkort = get_safe_token_machine_slow(device->machine);
-
-	cpu_set_input_line(conkort->cpu, INPUT_LINE_IRQ0, state);
-}
 
 static READ8_DEVICE_HANDLER( conkort_pio_port_a_r )
 {
@@ -559,7 +567,7 @@ static WRITE8_DEVICE_HANDLER( conkort_pio_port_b_w )
 
 }
 
-static void conkort_pio_ardy_w(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( conkort_pio_ardy_w )
 {
 	slow_t *conkort = get_safe_token_machine_slow(device->machine);
 
@@ -568,7 +576,7 @@ static void conkort_pio_ardy_w(const device_config *device, int state)
 
 static const z80pio_interface conkort_pio_intf =
 {
-	DEVCB_LINE(conkort_pio_interrupt),		/* interrupt callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),		/* interrupt callback */
 	DEVCB_HANDLER(conkort_pio_port_a_r),	/* port A read callback */
 	DEVCB_HANDLER(conkort_pio_port_b_r),	/* port B read callback */
 	DEVCB_HANDLER(conkort_pio_port_a_w),	/* port A write callback */
@@ -681,7 +689,7 @@ static MACHINE_DRIVER_START( luxor_55_10828 )
 	MDRV_CPU_CONFIG(slow_daisy_chain)
 
 	MDRV_Z80PIO_ADD(Z80PIO_TAG, conkort_pio_intf)
-	MDRV_WD179X_ADD(WD1791_TAG, slow_wd17xx_interface )
+	MDRV_WD179X_ADD(WD1791_TAG, slow_wd17xx_interface)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( luxor_55_21046 )
@@ -691,7 +699,7 @@ static MACHINE_DRIVER_START( luxor_55_21046 )
 	MDRV_CPU_CONFIG(fast_daisy_chain)
 
 	MDRV_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
-	MDRV_WD1793_ADD(SAB1793_TAG, fast_wd17xx_interface )
+	MDRV_WD1793_ADD(SAB1793_TAG, fast_wd17xx_interface)
 MACHINE_DRIVER_END
 
 /* ROMs */
