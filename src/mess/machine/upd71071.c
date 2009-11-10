@@ -180,6 +180,7 @@ void upd71071_dmarq(const device_config* device, int state,int channel)
 	{
 		dmac->dmarq[channel] = 0;  // clear DMARQ line
 		dmac->reg.status &= ~(0x10 << channel);
+		dmac->reg.status |= (0x01 << channel);  // END or TC
 	}
 }
 
@@ -250,6 +251,7 @@ static READ8_DEVICE_HANDLER(upd71071_read)
 			break;
 		case 0x0b:  // Status
 			ret = dmac->reg.status;
+			dmac->reg.status &= ~0x0f;  // resets END/TC?
 			break;
 		case 0x0c:  // Temporary (low)
 			ret = dmac->reg.temp_h;
