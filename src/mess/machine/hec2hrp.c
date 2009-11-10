@@ -60,7 +60,7 @@ UINT8 CK_signal ;  // Synchro signal for K7
 
 UINT8 actions=0xff;               //  keyboard key off
 
-double Pin_Value[28][2]; // SN76477
+double Pin_Value[29][2]; // SN76477
 int AU[17];              // Pour les fils de bus audio du SN76477
 int ValMixer;            // for mixer
 int oldstate3000;        // Edge state mixer
