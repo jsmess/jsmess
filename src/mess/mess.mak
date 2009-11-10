@@ -299,6 +299,8 @@ DRVLIBS = \
 	$(MESSOBJ)/homebrew.a \
 	$(MESSOBJ)/homelab.a \
 	$(MESSOBJ)/hp.a \
+	$(MESSOBJ)/hec2hrp.a \
+	$(MESSOBJ)/interact.a \
 	$(MESSOBJ)/intel.a \
 	$(MESSOBJ)/intelgnt.a \
 	$(MESSOBJ)/interton.a \
@@ -886,7 +888,7 @@ $(MESSOBJ)/heathkit.a:			\
 	$(MESS_DRIVERS)/h8.o		\
 	$(MESS_DRIVERS)/h19.o		\
 	$(MESS_DRIVERS)/h89.o		\
-
+	
 $(MESSOBJ)/hegener.a:			\
 	$(MESS_DRIVERS)/glasgow.o	\
 	$(MESS_DRIVERS)/mephisto.o	\
@@ -906,6 +908,16 @@ $(MESSOBJ)/hp.a:				\
 	$(MESS_DEVICES)/xmodem.o	\
 	$(MESS_DEVICES)/kermit.o	\
 
+$(MESSOBJ)/hec2hrp.a:			\
+	$(MESS_DRIVERS)/hec2hrp.o	\
+	$(MESS_VIDEO)/hec2video.o	\
+	$(MESS_MACHINE)/hec2hrp.o   \
+
+$(MESSOBJ)/interact.a:			\
+	$(MESS_DRIVERS)/interact.o	\
+	$(MESS_VIDEO)/hec2video.o	\
+	$(MESS_MACHINE)/hec2hrp.o   \
+	
 $(MESSOBJ)/intel.a:				\
 	$(MESS_DRIVERS)/sdk86.o		\
 
@@ -1489,9 +1501,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_VIDEO)/busicom.o		\
 	$(MESS_DRIVERS)/d6809.o		\
 	$(MESS_DRIVERS)/elwro800.o	\
-	$(MESS_DRIVERS)/fk1.o		\
-	$(MESS_DRIVERS)/interact.o	\
-	$(MESS_DRIVERS)/hec2hrp.o	\
+	$(MESS_DRIVERS)/fk1.o		\	
 	$(MESS_DRIVERS)/sys2900.o	\
 	$(MESS_DRIVERS)/xor100.o	\
 	$(MESS_DRIVERS)/iq151.o		\

@@ -2,14 +2,16 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-(none)
-
+- Hector MX40c [JJ Stacino]
+- Hector MX80c [JJ Stacino]
 
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
-(none)
-
+- Hector 2HR+ [JJ Stacino]
+- Hector 2HR [JJ Stacino]
+- Hector HRX [JJ Stacino]
+- Victor [JJ Stacino]
 
 
 Skeleton drivers: 
