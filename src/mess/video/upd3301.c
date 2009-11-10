@@ -7,6 +7,20 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+
+	- FIFO
+	- screen display
+	- set_drq
+	- dack_w
+	- interrupts
+	- light pen
+	- reset counters
+
+*/
+
 #include "driver.h"
 #include "upd3301.h"
 
@@ -14,7 +28,30 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG 0
+#define LOG 1
+
+#define UPD3301_COMMAND_MASK					0xe0
+#define UPD3301_COMMAND_RESET					0x00
+#define UPD3301_COMMAND_START_DISPLAY			0x20
+#define UPD3301_COMMAND_SET_INTERRUPT_MASK		0x40
+#define UPD3301_COMMAND_READ_LIGHT_PEN			0x60
+#define UPD3301_COMMAND_LOAD_CURSOR_POSITION	0x80
+#define UPD3301_COMMAND_RESET_INTERRUPT			0xa0
+#define UPD3301_COMMAND_RESET_COUNTERS			0xc0
+
+#define UPD3301_STATUS_VE						0x10
+#define UPD3301_STATUS_U						0x08	/* not supported */
+#define UPD3301_STATUS_N						0x04	/* not supported */
+#define UPD3301_STATUS_E						0x02	/* not supported */
+#define UPD3301_STATUS_LP						0x01	/* not supported */
+
+enum
+{
+	MODE_NONE,
+	MODE_RESET,
+	MODE_READ_LIGHT_PEN,
+	MODE_LOAD_CURSOR_POSITION
+};
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -29,6 +66,33 @@ struct _upd3301_t
 	devcb_resolved_write_line	out_vrtc_func;
 
 	const device_config *screen;	/* screen */
+
+	int disp;
+	int mode;
+	UINT8 status;
+	int param_count;
+
+	UINT8 row_buffer[80][2];		/* row buffer */
+	UINT8 fifo[20][2];				/* FIFO */
+
+	int dma_mode;					/* DMA mode */
+	int h;							/* characters per line */
+	int b;							/* cursor blink time */
+	int l;							/* lines per screen */
+	int s;							/* display every other line */
+	int c;							/* cursor mode */
+	int r;							/* lines per character */
+	int v;							/* vertical blanking height */
+	int z;							/* horizontal blanking width */
+	int at1;						/*  */
+	int at0;						/*  */
+	int sc;							/*  */
+	int a;							/* attributes per row */
+	int mn;							/* disable special character interrupt */
+	int me;							/* disable end of screen interrupt */
+	int cm;							/* cursor visible */
+	int cx;							/* cursor column */
+	int cy;							/* cursor row */
 
 	/* timers */
 	emu_timer *vrtc_timer;			/* vertical sync timer */
@@ -59,13 +123,122 @@ INLINE const upd3301_interface *get_interface(const device_config *device)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    set_interrupt - set interrupt line state
+-------------------------------------------------*/
+
+static void set_interrupt(const device_config *device, int state)
+{
+	upd3301_t *upd3301 = get_safe_token(device);
+
+	if (LOG) logerror("UPD3301 '%s' Interrupt: %u\n", device->tag, state);
+
+	devcb_call_write_line(&upd3301->out_int_func, state);
+}
+
+/*-------------------------------------------------
+    set_display - set display state
+-------------------------------------------------*/
+
+static void set_display(const device_config *device, int state)
+{
+	upd3301_t *upd3301 = get_safe_token(device);
+
+	if (state)
+	{
+		upd3301->status |= UPD3301_STATUS_VE;
+	}
+	else
+	{
+		upd3301->status &= ~UPD3301_STATUS_VE;
+	}
+
+	upd3301->disp = state;
+}
+
+/*-------------------------------------------------
+    reset_counters - reset screen counters
+-------------------------------------------------*/
+
+static void reset_counters(const device_config *device)
+{
+	set_interrupt(device, 0);
+}
+
+/*-------------------------------------------------
+    update_hrtc_timer -
+-------------------------------------------------*/
+
+static void update_hrtc_timer(upd3301_t *upd3301, int state)
+{
+	int y = video_screen_get_vpos(upd3301->screen);
+
+	int next_x = state ? upd3301->h : 0;
+	int next_y = state ? y : ((y + 1) % ((upd3301->l + upd3301->v) * 8));
+
+	attotime duration = video_screen_get_time_until_pos(upd3301->screen, next_y, next_x);
+
+	timer_adjust_oneshot(upd3301->hrtc_timer, duration, !state);
+}
+
+/*-------------------------------------------------
+    update_vrtc_timer -
+-------------------------------------------------*/
+
+static void update_vrtc_timer(upd3301_t *upd3301, int state)
+{
+	int next_y = state ? (upd3301->l * upd3301->r) : 0;
+
+	attotime duration = video_screen_get_time_until_pos(upd3301->screen, next_y, 0);
+
+	timer_adjust_oneshot(upd3301->vrtc_timer, duration, !state);
+}
+
+/*-------------------------------------------------
+    recompute_parameters -
+-------------------------------------------------*/
+
+static void recompute_parameters(const device_config *device)
+{
+	upd3301_t *upd3301 = get_safe_token(device);
+
+	int horiz_pix_total = (upd3301->h + upd3301->z) * 8;
+	int vert_pix_total = (upd3301->l + upd3301->v) * upd3301->r;
+
+	attoseconds_t refresh = HZ_TO_ATTOSECONDS(device->clock) * horiz_pix_total * vert_pix_total;
+	
+	rectangle visarea;
+
+	visarea.min_x = 0;
+	visarea.min_y = 0;
+	visarea.max_x = (upd3301->h * 8) - 1;
+	visarea.max_y = (upd3301->l * upd3301->r) - 1;
+
+	if (LOG)
+	{
+		if (LOG) logerror("UPD3301 '%s' Screen: %u x %u @ %f Hz\n", device->tag, horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+		if (LOG) logerror("UPD3301 '%s' Visible Area: (%u, %u) - (%u, %u)\n", device->tag, visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+	}
+
+	video_screen_configure(upd3301->screen, horiz_pix_total, vert_pix_total, &visarea, refresh);
+	
+	update_hrtc_timer(upd3301, 0);
+	update_vrtc_timer(upd3301, 0);
+}
+
+/*-------------------------------------------------
     TIMER_CALLBACK( vrtc_tick )
 -------------------------------------------------*/
 
 static TIMER_CALLBACK( vrtc_tick )
 {
-//	const device_config *device = ptr;
-//	upd3301_t *upd3301 = get_safe_token(device);
+	const device_config *device = ptr;
+	upd3301_t *upd3301 = get_safe_token(device);
+
+	//if (LOG) logerror("UPD3301 '%s' VRTC: %u\n", device->tag, param);
+
+	devcb_call_write_line(&upd3301->out_vrtc_func, param);
+
+	update_vrtc_timer(upd3301, param);
 }
 
 /*-------------------------------------------------
@@ -74,8 +247,14 @@ static TIMER_CALLBACK( vrtc_tick )
 
 static TIMER_CALLBACK( hrtc_tick )
 {
-//	const device_config *device = ptr;
-//	upd3301_t *upd3301 = get_safe_token(device);
+	const device_config *device = ptr;
+	upd3301_t *upd3301 = get_safe_token(device);
+
+	//if (LOG) logerror("UPD3301 '%s' HRTC: %u\n", device->tag, param);
+
+	devcb_call_write_line(&upd3301->out_hrtc_func, param);
+
+	update_hrtc_timer(upd3301, param);
 }
 
 /*-------------------------------------------------
@@ -84,7 +263,20 @@ static TIMER_CALLBACK( hrtc_tick )
 
 READ8_DEVICE_HANDLER( upd3301_r )
 {
-	return 0;
+	upd3301_t *upd3301 = get_safe_token(device);
+	UINT8 data = 0;
+
+	switch (offset & 0x01)
+	{
+	case 0: /* data */
+		break;
+
+	case 1: /* status */
+		data = upd3301->status;
+		break;
+	}
+
+	return data;
 }
 
 /*-------------------------------------------------
@@ -93,6 +285,139 @@ READ8_DEVICE_HANDLER( upd3301_r )
 
 WRITE8_DEVICE_HANDLER( upd3301_w )
 {
+	upd3301_t *upd3301 = get_safe_token(device);
+
+	switch (offset & 0x01)
+	{
+	case 0: /* data */
+		switch (upd3301->mode)
+		{
+		case MODE_RESET:
+			switch (upd3301->param_count)
+			{
+			case 0:
+				upd3301->dma_mode = BIT(data, 7);
+				upd3301->h = (data & 0x7f) + 2;
+				if (LOG) logerror("UPD3301 '%s' DMA Mode: %s\n", device->tag, upd3301->dma_mode ? "character" : "burst");
+				if (LOG) logerror("UPD3301 '%s' H: %u\n", device->tag, upd3301->h);
+				break;
+
+			case 1:
+				upd3301->b = ((data >> 6) + 1) * 16;
+				upd3301->l = (data & 0x3f) + 1;
+				if (LOG) logerror("UPD3301 '%s' B: %u\n", device->tag, upd3301->b);
+				if (LOG) logerror("UPD3301 '%s' L: %u\n", device->tag, upd3301->l);
+				break;
+
+			case 2:
+				upd3301->s = BIT(data, 7);
+				upd3301->c = (data >> 4) & 0x03;
+				upd3301->r = (data & 0x1f) + 1;
+				if (LOG) logerror("UPD3301 '%s' S: %u\n", device->tag, upd3301->s);
+				if (LOG) logerror("UPD3301 '%s' C: %u\n", device->tag, upd3301->c);
+				if (LOG) logerror("UPD3301 '%s' R: %u\n", device->tag, upd3301->r);
+				break;
+
+			case 3:
+				upd3301->v = (data >> 5) + 1;
+				upd3301->z = (data & 0x1f) + 2;
+				if (LOG) logerror("UPD3301 '%s' V: %u\n", device->tag, upd3301->v);
+				if (LOG) logerror("UPD3301 '%s' Z: %u\n", device->tag, upd3301->z);
+				recompute_parameters(device);
+				break;
+
+			case 4:
+				upd3301->at1 = BIT(data, 7);
+				upd3301->at0 = BIT(data, 6);
+				upd3301->sc = BIT(data, 5);
+				upd3301->a = (data & 0x1f) + 1;
+				if (LOG) logerror("UPD3301 '%s' AT1: %u\n", device->tag, upd3301->at1);
+				if (LOG) logerror("UPD3301 '%s' AT0: %u\n", device->tag, upd3301->at0);
+				if (LOG) logerror("UPD3301 '%s' SC: %u\n", device->tag, upd3301->sc);
+				if (LOG) logerror("UPD3301 '%s' A: %u\n", device->tag, upd3301->a);
+
+				upd3301->mode = MODE_NONE;
+				break;
+			}
+
+			upd3301->param_count++;
+			break;
+
+		case MODE_LOAD_CURSOR_POSITION:
+			switch (upd3301->param_count)
+			{
+			case 0:
+				upd3301->cx = data & 0x7f;
+				if (LOG) logerror("UPD3301 '%s' CX: %u\n", device->tag, upd3301->cx);
+				break;
+
+			case 1:
+				upd3301->cy = data & 0x3f;
+				if (LOG) logerror("UPD3301 '%s' CY: %u\n", device->tag, upd3301->cy);
+
+				upd3301->mode = MODE_NONE;
+				break;
+			}
+
+			upd3301->param_count++;
+			break;
+		
+		default:
+			if (LOG) logerror("UPD3301 '%s' Invalid Parameter Byte %02x!\n", device->tag, data);
+		}
+		break;
+
+	case 1: /* command */
+		upd3301->mode = MODE_NONE;
+		upd3301->param_count = 0;
+
+		switch (data & 0xe0)
+		{
+		case UPD3301_COMMAND_RESET:
+			if (LOG) logerror("UPD3301 '%s' Reset\n", device->tag);
+			upd3301->mode = MODE_RESET;
+			set_display(device, 0);
+			set_interrupt(device, 0);
+			break;
+
+		case UPD3301_COMMAND_START_DISPLAY:
+			if (LOG) logerror("UPD3301 '%s' Start Display\n", device->tag);
+			set_display(device, 1);
+			reset_counters(device);
+			break;
+
+		case UPD3301_COMMAND_SET_INTERRUPT_MASK:
+			if (LOG) logerror("UPD3301 '%s' Set Interrupt Mask\n", device->tag);
+			upd3301->me = BIT(data, 0);
+			upd3301->mn = BIT(data, 1);
+			if (LOG) logerror("UPD3301 '%s' ME: %u\n", device->tag, upd3301->me);
+			if (LOG) logerror("UPD3301 '%s' MN: %u\n", device->tag, upd3301->mn);
+			break;
+
+		case UPD3301_COMMAND_READ_LIGHT_PEN:
+			if (LOG) logerror("UPD3301 '%s' Read Light Pen\n", device->tag);
+			upd3301->mode = MODE_READ_LIGHT_PEN;
+			break;
+
+		case UPD3301_COMMAND_LOAD_CURSOR_POSITION:
+			if (LOG) logerror("UPD3301 '%s' Load Cursor Position\n", device->tag);
+			upd3301->mode = MODE_LOAD_CURSOR_POSITION;
+			upd3301->cm = BIT(data, 0);
+			if (LOG) logerror("UPD3301 '%s' CM: %u\n", device->tag, upd3301->cm);
+			break;
+
+		case UPD3301_COMMAND_RESET_INTERRUPT:
+			if (LOG) logerror("UPD3301 '%s' Reset Interrupt\n", device->tag);
+			set_interrupt(device, 0);
+			break;
+
+		case UPD3301_COMMAND_RESET_COUNTERS:
+			if (LOG) logerror("UPD3301 '%s' Reset Counters\n", device->tag);
+			reset_counters(device);
+			break;
+		}
+		break;
+	}
 }
 
 /*-------------------------------------------------

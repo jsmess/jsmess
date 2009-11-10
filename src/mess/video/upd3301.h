@@ -59,6 +59,7 @@ typedef struct _upd3301_interface upd3301_interface;
 struct _upd3301_interface
 {
 	const char *screen_tag;		/* screen we are acting on */
+	int width;					/* char width in pixels */
 
 	upd3301_display_pixels_func	display_func;
 
