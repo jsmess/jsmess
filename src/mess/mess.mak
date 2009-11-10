@@ -1501,7 +1501,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_VIDEO)/busicom.o		\
 	$(MESS_DRIVERS)/d6809.o		\
 	$(MESS_DRIVERS)/elwro800.o	\
-	$(MESS_DRIVERS)/fk1.o		\	
+	$(MESS_DRIVERS)/fk1.o		\
 	$(MESS_DRIVERS)/sys2900.o	\
 	$(MESS_DRIVERS)/xor100.o	\
 	$(MESS_DRIVERS)/iq151.o		\
