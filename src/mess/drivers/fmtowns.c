@@ -22,7 +22,7 @@
 
     16/5/09:  Skeleton driver.
 
-    Issues: BIOS requires 386 protected mode.
+    Issues: requires 386 protected mode.
 
 */
 
@@ -50,10 +50,10 @@
  * 0x00b0-bf: DMA controller 2 (uPD71071)
  * 0x0200-0f: Floppy controller (MB8877A)
  * 0x0400   : Video / CRTC (unknown)
- * 0x0404   : Enable whole first MB of RAM (disable VRAM, CMOS, BIOS ROM)
+ * 0x0404   : Disable VRAM, CMOS, memory-mapped I/O (everything in low memory except the BIOS)
  * 0x0440-5f: Video / CRTC (unknown)
  * 0x0480 RW: bit 1 = disable BIOS ROM
- * 0x04c0-cf: CD-ROM controller (unknown? SCSI?)
+ * 0x04c0-cf: CD-ROM controller (unknown)
  * 0x04d5   : Sound mute
  * 0x04d8   : YM3438 control port A / status
  * 0x04da   : YM3438 data port A / status
@@ -135,6 +135,7 @@ static UINT8* towns_gfxvram;
 static UINT8* towns_txtvram;
 static UINT8 towns_vram_wplane;
 static UINT8 towns_vram_rplane;
+static UINT8 towns_vram_page_sel;
 static UINT8 towns_palette_select;
 static UINT8 towns_palette_r[256];
 static UINT8 towns_palette_g[256];
@@ -144,6 +145,7 @@ static UINT16 towns_kanji_offset;
 static UINT8 towns_kanji_code_h;
 static UINT8 towns_kanji_code_l;
 static int towns_selected_drive;
+static UINT8 towns_fdc_irq6mask;
 static UINT8* towns_serial_rom;
 static int towns_srom_position;
 static UINT8 towns_srom_clk;
@@ -155,7 +157,12 @@ static emu_timer* towns_rtc_timer;
 static UINT8 towns_timer_mask;
 static UINT8 towns_crtc_mix;
 static UINT16 towns_machine_id;  // default is 0x0101
-
+static UINT8 towns_kb_status;
+static UINT8 towns_kb_irq1_enable;
+static UINT8 towns_kb_output;  // key output
+static UINT8 towns_crtc_sel;  // selected CRTC register
+static UINT16 towns_crtc_reg[32];
+static UINT8 towns_tvram_enable;
 
 static void towns_update_video_banks(const address_space* space);
 static PIC8259_SET_INT_LINE( towns_pic_irq );
@@ -342,6 +349,13 @@ static WRITE8_HANDLER(towns_dma2_w)
  *  Floppy Disc Controller (MB8877A)
  */
 
+static WRITE_LINE_DEVICE_HANDLER( towns_mb8877a_irq_w )
+{
+	if(towns_fdc_irq6mask == 0)
+		state = 0;
+	pic8259_set_irq_line(device,6,state);  // IRQ6 = FDC
+}
+
 static WRITE_LINE_DEVICE_HANDLER( towns_mb8877a_drq_w )
 {
 	upd71071_dmarq(device, state, 0);
@@ -373,7 +387,7 @@ static READ8_HANDLER(towns_floppy_r)
 		default:
 			logerror("FDC: read from invalid or unimplemented register %02x\n",offset);
 	}
-	return 0x00;
+	return 0xff;
 }
 
 static WRITE8_HANDLER(towns_floppy_w)
@@ -401,17 +415,14 @@ static WRITE8_HANDLER(towns_floppy_w)
 			break;
 		case 0x08:
 			// bit 5 - CLKSEL
-			if(data & 0x10)
+			if(towns_selected_drive != 0 && towns_selected_drive < 2)
 			{
-				if(towns_selected_drive != 0 && towns_selected_drive < 2)
-				{
-					floppy_drive_set_motor_state(floppy_get_device(space->machine, towns_selected_drive-1), data & 0x10);
-					floppy_drive_set_ready_state(floppy_get_device(space->machine, towns_selected_drive-1), data & 0x10,0);
-				}
+				floppy_drive_set_motor_state(floppy_get_device(space->machine, towns_selected_drive-1), data & 0x10);
+				floppy_drive_set_ready_state(floppy_get_device(space->machine, towns_selected_drive-1), data & 0x10,0);
 			}
 			wd17xx_set_side(fdc,(data & 0x04)>>2);
-			// bit 1 - DDEN
-			// bit 0 - IRQMSK
+			wd17xx_set_density(fdc,(data & 0x02)>>1);
+			towns_fdc_irq6mask = data & 0x01;
 			logerror("FDC: write %02x to offset 0x08\n",data);
 			break;
 		case 0x0c:  // drive select
@@ -456,25 +467,78 @@ static void towns_fdc_dma_w(running_machine* machine, UINT16 data)
 	wd17xx_data_w(fdc,0,data);
 }
 
+/*
+ *  port 0x440-0x443 - CRTC
+ * 		0x440 = register select
+ * 		0x442/3 = register data (16-bit)
+ * 
+ */
 static READ8_HANDLER(towns_video_440_r)
 {
-	logerror("VID: read port %04x\n",offset+0x440);
+	switch(offset)
+	{
+		case 0x00:
+			return towns_crtc_sel;
+		case 0x02:
+			logerror("CRTC: reading register %i (0x442) [%04x]\n",towns_crtc_sel,towns_crtc_reg[towns_crtc_sel]);
+			return towns_crtc_reg[towns_crtc_sel] & 0x00ff;
+		case 0x03:
+			logerror("CRTC: reading register %i (0x443) [%04x]\n",towns_crtc_sel,towns_crtc_reg[towns_crtc_sel]);
+			return (towns_crtc_reg[towns_crtc_sel] & 0xff00) >> 8;
+		default:
+			logerror("VID: read port %04x\n",offset+0x440);
+	}
 	return 0x00;
 }
 
 static WRITE8_HANDLER(towns_video_440_w)
 {
-	logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0x440);
+	switch(offset)
+	{
+		case 0x00:
+			towns_crtc_sel = data;
+			break;
+		case 0x02:
+			logerror("CRTC: writing register %i (0x442) [%02x]\n",towns_crtc_sel,data);
+			towns_crtc_reg[towns_crtc_sel] = 
+				(towns_crtc_reg[towns_crtc_sel] & 0xff00) | data; 
+			break;
+		case 0x03:
+			logerror("CRTC: writing register %i (0x443) [%02x]\n",towns_crtc_sel,data);
+			towns_crtc_reg[towns_crtc_sel] = 
+				(towns_crtc_reg[towns_crtc_sel] & 0x00ff) | (data << 8); 
+			break;
+		default:
+			logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0x440);
+	}
 }
 
 static READ8_HANDLER(towns_video_5c8_r)
 {
 	logerror("VID: read port %04x\n",offset+0x5c8);
+	switch(offset)
+	{
+		case 0x00:  // 0x5c8 - disable TVRAM?
+		if(towns_tvram_enable != 0)
+		{
+			towns_tvram_enable = 0;
+			return 0x80;
+		}
+		else
+			return 0x00;
+	}
 	return 0x00;
 }
 
 static WRITE8_HANDLER(towns_video_5c8_w)
 {
+	const device_config* dev = devtag_get_device(space->machine,"pic8259_slave");
+	switch(offset)
+	{
+		case 0x02:  // 0x5ca - VSync clear?
+			pic8259_set_irq_line(dev,3,0);
+			break;
+	}
 	logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0x5c8);
 }
 
@@ -540,15 +604,48 @@ static WRITE8_HANDLER(towns_video_fd90_w)
 	logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
 }
 
+/*
+ *  Port 0x600-0x607 - Keyboard controller (8042 MCU)
+ * 
+ */
 static READ8_HANDLER(towns_keyboard_r)
 {
-	logerror("KB: read offset %02x\n",offset);
+	switch(offset)
+	{
+		case 0:  // scancode output
+			logerror("KB: read keyboard output port, returning %02x\n",towns_kb_output);
+			towns_kb_status &= ~0x01;
+			return towns_kb_output;
+		case 1:  // status
+			logerror("KB: read status port, returning %02x\n",towns_kb_status);
+			return towns_kb_status;
+		default:
+			logerror("KB: read offset %02x\n",offset);
+	}
 	return 0x00;
 }
 
 static WRITE8_HANDLER(towns_keyboard_w)
 {
-	logerror("KB: wrote 0x%02x to offset %02x\n",data,offset);
+	const device_config* dev = devtag_get_device(space->machine,"pic8259_master");
+
+	switch(offset)
+	{
+		case 0:  // command input
+			towns_kb_status &= ~0x08;
+			towns_kb_status |= 0x01;
+			break;
+		case 1:  // control
+			towns_kb_status |= 0x08;
+			break;
+		case 2:  // IRQ1 enable
+			towns_kb_irq1_enable = data & 0x01;
+			pic8259_set_irq_line(dev,1,1);
+			pic8259_set_irq_line(dev,1,0);
+			break;
+		default:
+			logerror("KB: wrote 0x%02x to offset %02x\n",data,offset);
+	}
 }
 
 /*
@@ -673,6 +770,17 @@ static WRITE8_HANDLER( towns_cmos_w )
 	towns_cmos[offset] = data;
 }
 
+static READ8_HANDLER( towns_gfx_r )
+{
+	if(towns_mainmem_enable != 0)
+		return messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset+0xc0000];
+
+	if(towns_vram_page_sel != 0)
+		offset += 0x20000;
+
+	return 0;
+}
+
 static WRITE8_HANDLER( towns_gfx_w )
 {
 	if(towns_mainmem_enable != 0)
@@ -680,14 +788,53 @@ static WRITE8_HANDLER( towns_gfx_w )
 		messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset+0xc0000] = data;
 		return;
 	}
-	if(towns_vram_wplane & 0x01)
-		towns_gfxvram[offset] = data;
-	if(towns_vram_wplane & 0x02)
-		towns_gfxvram[offset + 0x8000] = data;
-	if(towns_vram_wplane & 0x04)
-		towns_gfxvram[offset + 0x10000] = data;
+	offset = offset << 2;
+	if(towns_vram_page_sel != 0)
+		offset += 0x20000;
 	if(towns_vram_wplane & 0x08)
-		towns_gfxvram[offset + 0x18000] = data;
+	{
+		towns_gfxvram[offset] &= ~0x88;
+		towns_gfxvram[offset] |= ((data & 0x80) >> 4) | ((data & 0x40) << 1);
+		towns_gfxvram[offset + 1] &= ~0x88;
+		towns_gfxvram[offset + 1] |= ((data & 0x20) >> 2) | ((data & 0x10) << 3);
+		towns_gfxvram[offset + 2] &= ~0x88;
+		towns_gfxvram[offset + 2] |= ((data & 0x08)) | ((data & 0x04) << 5);
+		towns_gfxvram[offset + 3] &= ~0x88;
+		towns_gfxvram[offset + 3] |= ((data & 0x02) << 2) | ((data & 0x01) << 7);
+	}
+	if(towns_vram_wplane & 0x04)
+	{
+		towns_gfxvram[offset] &= ~0x44;
+		towns_gfxvram[offset] |= ((data & 0x80) >> 5) | ((data & 0x40));
+		towns_gfxvram[offset + 1] &= ~0x44;
+		towns_gfxvram[offset + 1] |= ((data & 0x20) >> 3) | ((data & 0x10) << 2);
+		towns_gfxvram[offset + 2] &= ~0x44;
+		towns_gfxvram[offset + 2] |= ((data & 0x08) >> 1) | ((data & 0x04) << 4);
+		towns_gfxvram[offset + 3] &= ~0x44;
+		towns_gfxvram[offset + 3] |= ((data & 0x02) << 1) | ((data & 0x01) << 6);
+	}
+	if(towns_vram_wplane & 0x02)
+	{
+		towns_gfxvram[offset] &= ~0x22;
+		towns_gfxvram[offset] |= ((data & 0x80) >> 6) | ((data & 0x40) >> 1);
+		towns_gfxvram[offset + 1] &= ~0x22;
+		towns_gfxvram[offset + 1] |= ((data & 0x20) >> 4) | ((data & 0x10) << 1);
+		towns_gfxvram[offset + 2] &= ~0x22;
+		towns_gfxvram[offset + 2] |= ((data & 0x08) >> 2) | ((data & 0x04) << 3);
+		towns_gfxvram[offset + 3] &= ~0x22;
+		towns_gfxvram[offset + 3] |= ((data & 0x02)) | ((data & 0x01) << 5);
+	}
+	if(towns_vram_wplane & 0x01)
+	{
+		towns_gfxvram[offset] &= ~0x11;
+		towns_gfxvram[offset] |= ((data & 0x80) >> 7) | ((data & 0x40) >> 2);
+		towns_gfxvram[offset + 1] &= ~0x11;
+		towns_gfxvram[offset + 1] |= ((data & 0x20) >> 5) | ((data & 0x10));
+		towns_gfxvram[offset + 2] &= ~0x11;
+		towns_gfxvram[offset + 2] |= ((data & 0x08) >> 3) | ((data & 0x04) << 2);
+		towns_gfxvram[offset + 3] &= ~0x11;
+		towns_gfxvram[offset + 3] |= ((data & 0x02) >> 1) | ((data & 0x01) << 4);
+	}
 }
 
 static READ8_HANDLER( towns_video_cff80_r )
@@ -702,6 +849,11 @@ static READ8_HANDLER( towns_video_cff80_r )
 			return towns_crtc_mix;
 		case 0x01:  // read/write plane select (bit 0-3 write, bit 6-7 read)
 			return ((towns_vram_rplane << 6) & 0xc0) | towns_vram_wplane;
+		case 0x03:  // VRAM page select (bit 5)
+			if(towns_vram_page_sel != 0)
+				return 0x10;
+			else
+				return 0x00;
 		case 0x16:  // Kanji character data
 			return ROM[(towns_kanji_offset << 1) + 0x180000];
 		case 0x17:  // Kanji character data
@@ -737,6 +889,9 @@ static WRITE8_HANDLER( towns_video_cff80_w )
 			towns_update_video_banks(space);
 			logerror("VGA: VRAM wplane select = 0x%02x\n",towns_vram_wplane);
 			break;
+		case 0x03:  // VRAM page select (bit 5)
+			towns_vram_page_sel = data & 0x10;
+			break;
 		case 0x14:  // Kanji offset (high)
 			towns_kanji_code_h = data & 0x7f;
 			break;
@@ -768,7 +923,7 @@ static WRITE8_HANDLER( towns_video_cff80_w )
 			}
 			break;
 		case 0x19:  // ANK CG ROM
-			towns_ankcg_enable = data & 0x00000100;
+			towns_ankcg_enable = data & 0x01;
 			towns_update_video_banks(space);
 			break;
 		default:
@@ -784,12 +939,12 @@ static void towns_update_video_banks(const address_space* space)
 	{
 		ROM = memory_region(space->machine,"user");
 
-		memory_set_bankptr(space->machine,1,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xc0000);
-		memory_set_bankptr(space->machine,2,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xc8000);
-		memory_set_bankptr(space->machine,3,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xc9000);
-		memory_set_bankptr(space->machine,4,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca000);
-		memory_set_bankptr(space->machine,5,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca000);
-		memory_set_bankptr(space->machine,10,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca800);
+//		memory_set_bankptr(space->machine,1,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xc0000);
+//		memory_set_bankptr(space->machine,2,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xc8000);
+//		memory_set_bankptr(space->machine,3,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xc9000);
+//		memory_set_bankptr(space->machine,4,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca000);
+//		memory_set_bankptr(space->machine,5,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca000);
+//		memory_set_bankptr(space->machine,10,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca800);
 		memory_set_bankptr(space->machine,6,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
 		memory_set_bankptr(space->machine,7,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
 		memory_set_bankptr(space->machine,8,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcc000);
@@ -804,16 +959,16 @@ static void towns_update_video_banks(const address_space* space)
 	{
 		ROM = memory_region(space->machine,"user");
 
-		memory_set_bankptr(space->machine,1,towns_gfxvram+(towns_vram_rplane*0x8000));
-		memory_set_bankptr(space->machine,2,towns_txtvram);
-		memory_set_bankptr(space->machine,3,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xc9000);
-		if(towns_ankcg_enable == 0)
-			memory_set_bankptr(space->machine,4,ROM+0x180000+0x3d000);  // ANK CG 8x8
-		else
-			memory_set_bankptr(space->machine,4,towns_txtvram+0x2000);
-		memory_set_bankptr(space->machine,5,towns_txtvram+0x2000);
-		memory_set_bankptr(space->machine,10,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca800);
-		if(towns_ankcg_enable == 0)
+//		memory_set_bankptr(space->machine,1,towns_gfxvram+(towns_vram_rplane*0x8000));
+//		memory_set_bankptr(space->machine,2,towns_txtvram);
+//		memory_set_bankptr(space->machine,3,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xc9000);
+//		if(towns_ankcg_enable != 0)
+//			memory_set_bankptr(space->machine,4,ROM+0x180000+0x3d000);  // ANK CG 8x8
+//		else
+//			memory_set_bankptr(space->machine,4,towns_txtvram+0x2000);
+//		memory_set_bankptr(space->machine,5,towns_txtvram+0x2000);
+//		memory_set_bankptr(space->machine,10,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca800);
+		if(towns_ankcg_enable != 0)
 			memory_set_bankptr(space->machine,6,ROM+0x180000+0x3d800);  // ANK CG 8x16
 		else
 			memory_set_bankptr(space->machine,6,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
@@ -864,9 +1019,11 @@ static WRITE32_HANDLER( towns_video_404_w )
 
 static READ32_HANDLER( towns_video_404_r )
 {
-	if(towns_mainmem_enable != 0)
-		return 0x00000080;
-
+	if(ACCESSING_BITS_0_7)
+	{
+		if(towns_mainmem_enable != 0)
+			return 0x00000080;
+	}
 	return 0;
 }
 
@@ -907,6 +1064,73 @@ static WRITE8_HANDLER(towns_cdrom_w)
 			logerror("CD: read port %02x\n",offset*2);
 	}
 }
+
+
+/*
+ *  Sprite RAM, low memory
+ *  Writing to 0xc8xxx or 0xcaxxx activates TVRAM mode
+ *  Writing to I/O port 0x5c8 disables TVRAM mode 
+ *     (bit 7 returns high is TVRAM mode was previously active)
+ * 
+ *  In TVRAM mode:
+ *    0xc8000-0xc8fff: ASCII text (2 bytes each: ISO646 code, then attribute)
+ *    0xca000-0xcafff: JIS code 
+ */
+static READ8_HANDLER(towns_spriteram_low_r)
+{
+	UINT8* RAM = messram_get_ptr(devtag_get_device(space->machine, "messram"));
+	UINT8* ROM = memory_region(space->machine,"user");
+	
+	if(offset < 0x1000)
+	{  // 0xc8000-0xc8fff
+		if(towns_mainmem_enable == 0)
+			return towns_txtvram[offset];
+		else
+			return RAM[offset + 0xc8000];
+	}
+	if(offset >= 0x1000 && offset < 0x2000)
+	{  // 0xc9000-0xc9fff
+		return RAM[offset + 0xc9000];
+	}
+	if(offset >= 0x2000 && offset < 0x3000)
+	{  // 0xca000-0xcafff
+		if(towns_mainmem_enable == 0)
+		{
+			if(towns_ankcg_enable != 0 && offset < 0x2800)
+				return ROM[0x180000 + 0x3d000 + (offset-0x2000)];
+			return towns_txtvram[offset];
+		}
+		else
+			return RAM[offset + 0xca000];
+	}
+	return 0x00;
+}
+
+static WRITE8_HANDLER(towns_spriteram_low_w)
+{
+	UINT8* RAM = messram_get_ptr(devtag_get_device(space->machine, "messram"));
+	if(offset < 0x1000)
+	{  // 0xc8000-0xc8fff
+		towns_tvram_enable = 1;
+		if(towns_mainmem_enable == 0)
+			towns_txtvram[offset] = data;
+		else
+			RAM[offset + 0xc8000] = data;
+	}
+	if(offset >= 0x1000 && offset < 0x2000)
+	{
+		RAM[offset + 0xc9000] = data;
+	}
+	if(offset >= 0x2000 && offset < 0x3000)
+	{  // 0xca000-0xcafff
+		towns_tvram_enable = 1;
+		if(towns_mainmem_enable == 0)
+			towns_txtvram[offset] = data;
+		else
+			RAM[offset + 0xca000] = data;
+	}
+}
+
 
 /* CMOS RTC
  * 0x70: Data port
@@ -1013,7 +1237,7 @@ static IRQ_CALLBACK( towns_irq_callback )
 static PIC8259_SET_INT_LINE( towns_pic_irq )
 {
 	cputag_set_input_line(device->machine,"maincpu",0,interrupt ? HOLD_LINE : CLEAR_LINE);
-	logerror("PIC#1: set IRQ line to %i\n",interrupt);
+//	logerror("PIC#1: set IRQ line to %i\n",interrupt);
 }
 
 static PIC8259_SET_INT_LINE( towns_slave_pic_irq )
@@ -1021,7 +1245,7 @@ static PIC8259_SET_INT_LINE( towns_slave_pic_irq )
 	const device_config* dev = devtag_get_device(device->machine,"pic8259_master");
 
 	pic8259_set_irq_line(dev,7,interrupt);
-	logerror("PIC#2: set IRQ line to %i\n",interrupt);
+//	logerror("PIC#2: set IRQ line to %i\n",interrupt);
 }
 
 static PIT8253_OUTPUT_CHANGED( towns_pit_out0_changed )
@@ -1036,11 +1260,11 @@ static PIT8253_OUTPUT_CHANGED( towns_pit_out0_changed )
 
 static PIT8253_OUTPUT_CHANGED( towns_pit_out1_changed )
 {
-	const device_config* dev = devtag_get_device(device->machine,"pic8259_master");
+//	const device_config* dev = devtag_get_device(device->machine,"pic8259_master");
 	
 	if(towns_timer_mask & 0x02)
 	{
-		pic8259_set_irq_line(dev,0,state);
+	//	pic8259_set_irq_line(dev,0,state);
 	}
 }
 
@@ -1048,8 +1272,35 @@ static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   // memory map based on FM-Towns/Bochs (Bochs modified to emulate the FM-Towns)
   // may not be (and probably is not) correct
   AM_RANGE(0x00000000, 0x000bffff) AM_RAM
-  AM_RANGE(0x000c0000, 0x000c7fff) AM_READ(SMH_BANK(1))
-  AM_RANGE(0x000c0000, 0x000c7fff) AM_WRITE8(towns_gfx_w,0xffffffff)
+  AM_RANGE(0x000c0000, 0x000c7fff) AM_READWRITE8(towns_gfx_r,towns_gfx_w,0xffffffff)
+//  AM_RANGE(0x000c8000, 0x000c8fff) AM_READWRITE(SMH_BANK(2),SMH_BANK(2))
+//  AM_RANGE(0x000c9000, 0x000c9fff) AM_READWRITE(SMH_BANK(3),SMH_BANK(3))
+//  AM_RANGE(0x000ca000, 0x000ca7ff) AM_READWRITE(SMH_BANK(4),SMH_BANK(5))
+//  AM_RANGE(0x000ca800, 0x000cafff) AM_READWRITE(SMH_BANK(10),SMH_BANK(10))
+  AM_RANGE(0x000c8000, 0x000cafff) AM_READWRITE8(towns_spriteram_low_r,towns_spriteram_low_w,0xffffffff)
+  AM_RANGE(0x000cb000, 0x000cbfff) AM_READWRITE(SMH_BANK(6),SMH_BANK(7))
+  AM_RANGE(0x000cc000, 0x000cff7f) AM_READWRITE(SMH_BANK(8),SMH_BANK(8))
+  AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_r,towns_video_cff80_w,0xffffffff)
+  AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
+  AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) // CMOS? RAM
+  AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
+  AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
+  AM_RANGE(0x000f8000, 0x000fffff) AM_READWRITE(SMH_BANK(11),SMH_BANK(12))
+  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM - seems to be needed to boot
+  AM_RANGE(0x80000000, 0x8003ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x1c0000) // VRAM
+  AM_RANGE(0x81000000, 0x8101ffff) AM_RAM  // Sprite RAM
+  AM_RANGE(0xc2000000, 0xc207ffff) AM_ROM AM_REGION("user",0x000000)  // OS ROM
+  AM_RANGE(0xc2080000, 0xc20fffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
+  AM_RANGE(0xc2100000, 0xc213ffff) AM_ROM AM_REGION("user",0x180000)  // FONT ROM
+  AM_RANGE(0xc2140000, 0xc2141fff) AM_READWRITE8(towns_cmos_r,towns_cmos_w,0xffffffff) // CMOS (mirror?)
+  AM_RANGE(0xc2180000, 0xc21fffff) AM_ROM AM_REGION("user",0x080000)  // F20 ROM
+  AM_RANGE(0xc2200000, 0xc2200fff) AM_NOP  // WAVE RAM
+  AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(marty_mem, ADDRESS_SPACE_PROGRAM, 32)
+  AM_RANGE(0x00000000, 0x000bffff) AM_RAM
+  AM_RANGE(0x000c0000, 0x000c7fff) AM_READWRITE8(towns_gfx_r,towns_gfx_w,0xffffffff)
   AM_RANGE(0x000c8000, 0x000c8fff) AM_READWRITE(SMH_BANK(2),SMH_BANK(2))
   AM_RANGE(0x000c9000, 0x000c9fff) AM_READWRITE(SMH_BANK(3),SMH_BANK(3))
   AM_RANGE(0x000ca000, 0x000ca7ff) AM_READWRITE(SMH_BANK(4),SMH_BANK(5))
@@ -1063,6 +1314,12 @@ static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
   AM_RANGE(0x000f8000, 0x000fffff) AM_READWRITE(SMH_BANK(11),SMH_BANK(12))
   AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM - seems to be needed to boot
+  AM_RANGE(0x00600000, 0x0067ffff) AM_ROM AM_REGION("user",0x000000)  // OS
+  AM_RANGE(0x00680000, 0x0087ffff) AM_ROM AM_REGION("user",0x280000)  // EX ROM
+  AM_RANGE(0x00a00000, 0x00a3ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x1c0000) // VRAM
+  AM_RANGE(0x00e80000, 0x00efffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
+  AM_RANGE(0x00f00000, 0x00f7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
+  AM_RANGE(0x00fc0000, 0x00ffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
   AM_RANGE(0x80000000, 0x8003ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x1c0000) // VRAM
   AM_RANGE(0x81000000, 0x8101ffff) AM_RAM  // Sprite RAM
   AM_RANGE(0xc2000000, 0xc207ffff) AM_ROM AM_REGION("user",0x000000)  // OS ROM
@@ -1132,12 +1389,18 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( towns )
 INPUT_PORTS_END
 
+static INTERRUPT_GEN( towns_vsync_irq )
+{
+	const device_config* dev = devtag_get_device(device->machine,"pic8259_slave");
+	pic8259_set_irq_line(dev,3,1);  // IRQ11 = VSync
+}
+
 static DRIVER_INIT( towns )
 {
 	towns_vram = auto_alloc_array(machine,UINT32,0x20000);
 	towns_cmos = auto_alloc_array(machine,UINT8,0x2000);
 	towns_gfxvram = auto_alloc_array(machine,UINT8,0x40000);
-	towns_txtvram = auto_alloc_array(machine,UINT8,0x8000);
+	towns_txtvram = auto_alloc_array(machine,UINT8,0x20000);
 	towns_serial_rom = auto_alloc_array(machine,UINT8,256/8);
 	towns_init_serial_rom(machine);
 	towns_init_rtc();
@@ -1162,6 +1425,8 @@ static MACHINE_RESET( towns )
 	towns_ram_enable = 0x00;
 	towns_update_video_banks(cpu_get_address_space(cputag_get_cpu(machine,"maincpu"),ADDRESS_SPACE_PROGRAM));
 	towns_vram_wplane = 0x00;
+	towns_kb_status = 0x18;
+	towns_kb_irq1_enable = 0;
 	timer_adjust_periodic(towns_rtc_timer,attotime_zero,0,ATTOTIME_IN_HZ(1));
 }
 
@@ -1172,30 +1437,86 @@ static VIDEO_START( towns )
 static VIDEO_UPDATE( towns )
 {
 	int x,y;
-	UINT8 dat1,dat2,dat3,dat4;
-	int bit;
 	UINT8 colour;
-
+	UINT8 row;  // JIS row number
+	UINT16 code;
+	int off = 0;
+	
+	if(towns_vram_page_sel != 0)
+		off = 0x20000;
 	for(y=0;y<480;y++)
 	{
-		for(x=0;x<640;x++)
+//		off = 0x50 * y;
+		for(x=0;x<640;x+=2)
 		{
-			bit = 7 - (x & 0x07);
-			dat1 = towns_gfxvram[(x/8) + (y*0x50)];
-			dat2 = towns_gfxvram[(x/8) + (y*0x50) + 0x8000];
-			dat3 = towns_gfxvram[(x/8) + (y*0x50) + 0x10000];
-			dat4 = towns_gfxvram[(x/8) + (y*0x50) + 0x18000];
-			colour = (dat1 & (1 << bit) ? 1 : 0)
-				| (dat2 & (1 << bit) ? 2 : 0)
-				| (dat3 & (1 << bit) ? 4 : 0)
-				| (dat4 & (1 << bit) ? 8 : 0);
+			colour = towns_gfxvram[off] >> 4; 
+			*BITMAP_ADDR32(bitmap,y,x+1) =
+				(towns_palette_r[colour] << 16)
+				| (towns_palette_g[colour] << 8)
+				| (towns_palette_b[colour]);
+			colour = towns_gfxvram[off] & 0x0f; 
 			*BITMAP_ADDR32(bitmap,y,x) =
 				(towns_palette_r[colour] << 16)
 				| (towns_palette_g[colour] << 8)
 				| (towns_palette_b[colour]);
+			off++;
+		}
+	}	
+	
+	// draw text layer
+	if(towns_tvram_enable != 0)
+	{
+		for(y=0;y<40;y++)
+		{
+			off = 160 * y;
+			for(x=0;x<80;x++)
+			{
+				colour = towns_txtvram[off+1] & 0x0f;
+				if((towns_txtvram[off+1] & 0xc0) != 0)
+				{	// double width
+					// TODO: work out exactly how these map to the font ROM
+					// Numbers are tiles 0x70-0x79
+					// lowercase characters are from tile 0x160
+					// uppercase characters are from tile 0x260
+					if(towns_txtvram[off+1] & 0x40)
+					{
+						row = (towns_txtvram[off+0x2000] - 32);
+						code = 0;
+						if(row <= 8)
+						{
+							code = (row & 0x07) * 0x20;
+							code += ((towns_txtvram[off+0x2001]-32) & 0x1f) 
+									| (((towns_txtvram[off+0x2001]-32) & 0x40) << 2)
+									| (((towns_txtvram[off+0x2001]-32) & 0x20) << 4);
+						}
+						if(row >= 16)  // Kanji
+						{
+							code = 0x400;
+							code += ((towns_txtvram[off+0x2001]) & 0x1f) 
+									+ (((towns_txtvram[off+0x2001]-32) & 0x60) << 4)
+									+ ((row & 0x0f) << 5)
+									+ (((row-16) & 0x70) * 0x60);
+						}
+						drawgfx_transpen_raw(bitmap,cliprect,screen->machine->gfx[1],code,
+							(towns_palette_r[colour] << 16)
+							| (towns_palette_g[colour] << 8)
+							| (towns_palette_b[colour]),
+							0,0,x*8,y*16,0);
+					}
+				}
+				else
+				{
+					drawgfx_transpen_raw(bitmap,cliprect,screen->machine->gfx[0],towns_txtvram[off],
+						(towns_palette_r[colour] << 16)
+						| (towns_palette_g[colour] << 8)
+						| (towns_palette_b[colour]),
+						0,0,x*8,y*16,0);
+				}
+				off += 2;
+			}
 		}
 	}
-
+		
     return 0;
 }
 
@@ -1230,9 +1551,9 @@ static const struct pic8259_interface towns_pic8259_slave_config =
 
 static const wd17xx_interface towns_mb8877a_interface =
 {
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE("pic8259_master",towns_mb8877a_irq_w),
 	DEVCB_DEVICE_LINE("dma_1", towns_mb8877a_drq_w),
-	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
+	{FLOPPY_0,FLOPPY_1,0,0}
 };
 
 static FLOPPY_OPTIONS_START( towns )
@@ -1265,7 +1586,7 @@ static const upd71071_intf towns_dma_config =
 };
 
 // for debugging
-static const gfx_layout x1_chars_16x16 =
+static const gfx_layout fnt_chars_16x16 =
 {
 	16,16,
 	RGN_FRAC(1,1),
@@ -1276,9 +1597,21 @@ static const gfx_layout x1_chars_16x16 =
 	16*16
 };
 
+static const gfx_layout text_chars =
+{
+	8,16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7, },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16
+};
+
 /* decoded for debugging purpose, this will be nuked in the end... */
 static GFXDECODE_START( towns )
-	GFXDECODE_ENTRY( "user",   0x180000, x1_chars_16x16,  0, 0x100 ) //needs to be checked when the ROM will be redumped
+	GFXDECODE_ENTRY( "user",   0x180000 + 0x3d800, text_chars,  0, 16 )
+	GFXDECODE_ENTRY( "user",   0x180000, fnt_chars_16x16,  0, 16 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( towns )
@@ -1286,6 +1619,7 @@ static MACHINE_DRIVER_START( towns )
     MDRV_CPU_ADD("maincpu",I386, 16000000)
     MDRV_CPU_PROGRAM_MAP(towns_mem)
     MDRV_CPU_IO_MAP(towns_io)
+	MDRV_CPU_VBLANK_INT("screen", towns_vsync_irq)
 
     MDRV_MACHINE_RESET(towns)
 
@@ -1293,6 +1627,7 @@ static MACHINE_DRIVER_START( towns )
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(60)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
     MDRV_SCREEN_SIZE(640, 480)
     MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
@@ -1327,6 +1662,14 @@ static MACHINE_DRIVER_START( towns )
 	MDRV_RAM_DEFAULT_SIZE("6M")
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( marty )
+	MDRV_IMPORT_FROM(towns)
+	
+	MDRV_CPU_REPLACE("maincpu",I386, 16000000)
+	MDRV_CPU_PROGRAM_MAP(marty_mem)
+	MDRV_CPU_IO_MAP(towns_io)
+MACHINE_DRIVER_END
+
 /* ROM definitions */
 ROM_START( fmtowns )
   ROM_REGION32_LE( 0x280000, "user", 0)
@@ -1347,9 +1690,11 @@ ROM_START( fmtownsa )
 ROM_END
 
 ROM_START( fmtmarty )
-  ROM_REGION32_LE( 0x400000, "user", 0)
-	ROM_LOAD("mrom.m36",  0x000000, 0x200000, CRC(9c0c060c) SHA1(5721c5f9657c570638352fa9acac57fa8d0b94bd) )
-	ROM_LOAD("mrom.m37",  0x200000, 0x180000, CRC(fb66bb56) SHA1(e273b5fa618373bdf7536495cd53c8aac1cce9a5) )
+  ROM_REGION32_LE( 0x480000, "user", 0)
+	ROM_LOAD("mrom.m36",  0x000000, 0x080000, CRC(9c0c060c) SHA1(5721c5f9657c570638352fa9acac57fa8d0b94bd) )
+	ROM_CONTINUE(0x280000,0x180000)
+	ROM_LOAD("mrom.m37",  0x400000, 0x080000, CRC(fb66bb56) SHA1(e273b5fa618373bdf7536495cd53c8aac1cce9a5) )
+	ROM_CONTINUE(0x80000,0x100000)
 	ROM_CONTINUE(0x180000,0x40000)
 	ROM_CONTINUE(0x200000,0x40000)
 ROM_END
@@ -1373,6 +1718,6 @@ ROM_END
 /*    YEAR  NAME    PARENT  COMPAT  	MACHINE     INPUT    INIT    CONFIG COMPANY      FULLNAME            FLAGS */
 COMP( 1989, fmtowns,  0,    	0, 		towns, 		towns, 	 towns,  	 0,  	"Fujitsu",   "FM-Towns",		 GAME_NOT_WORKING)
 COMP( 1989, fmtownsa, fmtowns,	0, 		towns, 		towns, 	 towns,  	 0,  	"Fujitsu",   "FM-Towns (alternate)", GAME_NOT_WORKING)
-CONS( 1993, fmtmarty, 0,    	0, 		towns, 		towns, 	 marty,  	 0,  	"Fujitsu",   "FM-Towns Marty",	 GAME_NOT_WORKING)
-CONS( 1994, carmarty, fmtmarty,	0, 		towns, 		towns, 	 towns,  	 0,  	"Fujitsu",   "FM-Towns Car Marty",	 GAME_NOT_WORKING)
+CONS( 1993, fmtmarty, 0,    	0, 		marty, 		towns, 	 marty,  	 0,  	"Fujitsu",   "FM-Towns Marty",	 GAME_NOT_WORKING)
+CONS( 1994, carmarty, fmtmarty,	0, 		marty, 		towns, 	 towns,  	 0,  	"Fujitsu",   "FM-Towns Car Marty",	 GAME_NOT_WORKING)
 
