@@ -477,6 +477,16 @@ static DEVICE_START( upd3301 )
 
 static DEVICE_RESET( upd3301 )
 {
+	upd3301_t *upd3301 = get_safe_token(device);
+
+	/* set some initial values so PC8001 will boot */
+	upd3301->h = 80;
+	upd3301->l = 20;
+	upd3301->r = 10;
+	upd3301->v = 6;
+	upd3301->z = 32;
+
+	recompute_parameters(device);
 }
 
 /*-------------------------------------------------
