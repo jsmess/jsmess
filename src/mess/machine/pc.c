@@ -161,7 +161,7 @@ static void set_dma_channel(const device_config *device, int channel, int state)
 {
 	pc_state *st = device->machine->driver_data;
 
-	if (state) st->dma_channel = channel;
+	if (!state) st->dma_channel = channel;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { set_dma_channel(device, 0, state); }
