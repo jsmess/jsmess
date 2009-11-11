@@ -490,6 +490,7 @@ static MACHINE_START( pc8001 )
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
 	state->upd3301 = devtag_get_device(machine, UPD3301_TAG);
 	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
 	/* find memory regions */
