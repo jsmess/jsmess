@@ -42,7 +42,7 @@
 #define UPD3301_STATUS_VE						0x10
 #define UPD3301_STATUS_U						0x08	/* not supported */
 #define UPD3301_STATUS_N						0x04	/* not supported */
-#define UPD3301_STATUS_E						0x02	/* not supported */
+#define UPD3301_STATUS_E						0x02
 #define UPD3301_STATUS_LP						0x01	/* not supported */
 
 enum
@@ -50,7 +50,8 @@ enum
 	MODE_NONE,
 	MODE_RESET,
 	MODE_READ_LIGHT_PEN,
-	MODE_LOAD_CURSOR_POSITION
+	MODE_LOAD_CURSOR_POSITION,
+	MODE_RESET_COUNTERS
 };
 
 /***************************************************************************
@@ -66,8 +67,8 @@ struct _upd3301_t
 	devcb_resolved_write_line	out_vrtc_func;
 
 	const device_config *screen;	/* screen */
+	int width;						/* character width */
 
-	int disp;
 	int mode;
 	UINT8 status;
 	int param_count;
@@ -133,6 +134,11 @@ static void set_interrupt(const device_config *device, int state)
 	if (LOG) logerror("UPD3301 '%s' Interrupt: %u\n", device->tag, state);
 
 	devcb_call_write_line(&upd3301->out_int_func, state);
+
+	if (!state)
+	{
+		upd3301->status &= ~(UPD3301_STATUS_N | UPD3301_STATUS_E);
+	}
 }
 
 /*-------------------------------------------------
@@ -151,8 +157,6 @@ static void set_display(const device_config *device, int state)
 	{
 		upd3301->status &= ~UPD3301_STATUS_VE;
 	}
-
-	upd3301->disp = state;
 }
 
 /*-------------------------------------------------
@@ -173,7 +177,7 @@ static void update_hrtc_timer(upd3301_t *upd3301, int state)
 	int y = video_screen_get_vpos(upd3301->screen);
 
 	int next_x = state ? upd3301->h : 0;
-	int next_y = state ? y : ((y + 1) % ((upd3301->l + upd3301->v) * 8));
+	int next_y = state ? y : ((y + 1) % ((upd3301->l + upd3301->v) * upd3301->width));
 
 	attotime duration = video_screen_get_time_until_pos(upd3301->screen, next_y, next_x);
 
@@ -201,7 +205,7 @@ static void recompute_parameters(const device_config *device)
 {
 	upd3301_t *upd3301 = get_safe_token(device);
 
-	int horiz_pix_total = (upd3301->h + upd3301->z) * 8;
+	int horiz_pix_total = (upd3301->h + upd3301->z) * upd3301->width;
 	int vert_pix_total = (upd3301->l + upd3301->v) * upd3301->r;
 
 	attoseconds_t refresh = HZ_TO_ATTOSECONDS(device->clock) * horiz_pix_total * vert_pix_total;
@@ -210,7 +214,7 @@ static void recompute_parameters(const device_config *device)
 
 	visarea.min_x = 0;
 	visarea.min_y = 0;
-	visarea.max_x = (upd3301->h * 8) - 1;
+	visarea.max_x = (upd3301->h * upd3301->width) - 1;
 	visarea.max_y = (upd3301->l * upd3301->r) - 1;
 
 	if (LOG)
@@ -237,6 +241,12 @@ static TIMER_CALLBACK( vrtc_tick )
 	//if (LOG) logerror("UPD3301 '%s' VRTC: %u\n", device->tag, param);
 
 	devcb_call_write_line(&upd3301->out_vrtc_func, param);
+
+	if (param && !upd3301->me)
+	{
+		upd3301->status |= UPD3301_STATUS_E;
+		set_interrupt(device, 1);
+	}
 
 	update_vrtc_timer(upd3301, param);
 }
@@ -434,6 +444,7 @@ WRITE_LINE_DEVICE_HANDLER( upd3301_lpen_w )
 
 WRITE8_DEVICE_HANDLER( upd3301_dack_w )
 {
+	logerror("DMA WRITE %02x\n", data);
 }
 
 /*-------------------------------------------------
@@ -442,6 +453,17 @@ WRITE8_DEVICE_HANDLER( upd3301_dack_w )
 
 void upd3301_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	upd3301_t *upd3301 = get_safe_token(device);
+
+	if (upd3301->status & UPD3301_STATUS_VE)
+	{
+		/* start DMA transfer */
+		//devcb_call_write_line(&upd3301->out_drq_func, 1);
+	}
+	else
+	{
+		bitmap_fill(bitmap, cliprect, get_black_pen(device->machine));
+	}
 }
 
 /*-------------------------------------------------
@@ -462,6 +484,9 @@ static DEVICE_START( upd3301 )
 	/* get the screen device */
 	upd3301->screen = devtag_get_device(device->machine, intf->screen_tag);
 	assert(upd3301->screen != NULL);
+
+	/* get character width */
+	upd3301->width = intf->width;
 
 	/* create the timers */
 	upd3301->vrtc_timer = timer_alloc(device->machine, vrtc_tick, (void *)device);
