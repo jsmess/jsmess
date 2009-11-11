@@ -29,7 +29,8 @@ extern MACHINE_START( pecom );
 extern MACHINE_RESET( pecom );
 extern WRITE8_HANDLER( pecom_bank_w );
 extern READ8_HANDLER (pecom_keyboard_r);
-extern const cdp1802_interface ( pecom64_cdp1802_config );
+
+extern const cdp1802_interface pecom64_cdp1802_config;
 
 /* ---------- defined in video/pecom.c ---------- */
 

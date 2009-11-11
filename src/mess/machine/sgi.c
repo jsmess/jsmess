@@ -68,7 +68,7 @@ static UINT32 nMC_DMAMode;
 static UINT32 nMC_DMAZoomByteCnt;
 static UINT32 nMC_DMARunning;
 
-READ32_HANDLER( mc_r )
+READ32_HANDLER( sgi_mc_r )
 {
 	offset <<= 2;
 	switch( offset )
@@ -264,7 +264,7 @@ READ32_HANDLER( mc_r )
 	return 0;
 }
 
-WRITE32_HANDLER( mc_w )
+WRITE32_HANDLER( sgi_mc_w )
 {
 	offset <<= 2;
 	switch( offset )
@@ -479,17 +479,17 @@ WRITE32_HANDLER( mc_w )
 	}
 }
 
-void mc_update(void)
+void sgi_mc_update(void)
 {
 	nMC_RPSSCounter += 1000;
 }
 
 static TIMER_CALLBACK(mc_update_callback)
 {
-	mc_update();
+	sgi_mc_update();
 }
 
-void mc_init(running_machine *machine)
+void sgi_mc_init(running_machine *machine)
 {
 	nMC_CPUControl0 = 0;
 	nMC_CPUControl1 = 0;

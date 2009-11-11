@@ -10,11 +10,11 @@
 #define _SGIMC_H
 
 
-void mc_init(running_machine *machine);
-void mc_update(void);
+void sgi_mc_init(running_machine *machine);
+void sgi_mc_update(void);
 
-READ32_HANDLER(mc_r);
-WRITE32_HANDLER(mc_w);
+READ32_HANDLER(sgi_mc_r);
+WRITE32_HANDLER(sgi_mc_w);
 
 
 #endif /* _SGIMC_H */

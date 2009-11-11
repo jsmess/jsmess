@@ -2526,7 +2526,7 @@ DRIVER_INIT(maclc2)
 }
 
 // make the appletalk init fail instead of hanging on the II FDHD/IIx/IIcx/SE30 ROM
-void patch_appletalk_iix(running_machine *machine)
+static void patch_appletalk_iix(running_machine *machine)
 {
 	UINT32 *ROM = (UINT32 *)memory_region(machine, "user1");
 

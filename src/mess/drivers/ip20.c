@@ -459,7 +459,7 @@ static ADDRESS_MAP_START( ip204415_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE( 0x0c000000, 0x0c7fffff ) AM_RAM AM_SHARE(8)
 	AM_RANGE( 0x10000000, 0x107fffff ) AM_RAM AM_SHARE(9)
 	AM_RANGE( 0x18000000, 0x187fffff ) AM_RAM AM_SHARE(1)
-	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_READWRITE( mc_r, mc_w )
+	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_READWRITE( sgi_mc_r, sgi_mc_w )
 	AM_RANGE( 0x1fb80000, 0x1fb8ffff ) AM_READWRITE( hpc_r, hpc_w )
 	AM_RANGE( 0x1fbd9000, 0x1fbd903f ) AM_READWRITE( int_r, int_w )
 	AM_RANGE( 0x1fc00000, 0x1fc7ffff ) AM_ROM AM_SHARE(2) AM_REGION( "user1", 0 )
@@ -472,7 +472,7 @@ static ADDRESS_MAP_START( ip204415_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE( 0xac000000, 0xac7fffff ) AM_RAM AM_SHARE(8)
 	AM_RANGE( 0xb0000000, 0xb07fffff ) AM_RAM AM_SHARE(9)
 	AM_RANGE( 0xb8000000, 0xb87fffff ) AM_RAM AM_SHARE(1)
-	AM_RANGE( 0xbfa00000, 0xbfa1ffff ) AM_READWRITE( mc_r, mc_w )
+	AM_RANGE( 0xbfa00000, 0xbfa1ffff ) AM_READWRITE( sgi_mc_r, sgi_mc_w )
 	AM_RANGE( 0xbfb80000, 0xbfb8ffff ) AM_READWRITE( hpc_r, hpc_w )
 	AM_RANGE( 0xbfbd9000, 0xbfbd903f ) AM_READWRITE( int_r, int_w )
 	AM_RANGE( 0xbfc00000, 0xbfc7ffff ) AM_ROM AM_SHARE(2) /* BIOS Mirror */
@@ -504,10 +504,10 @@ static DRIVER_INIT( ip204415 )
 	add_exit_callback(machine, ip204415_exit);
 }
 
-// mc_update wants once every millisecond (1/1000th of a second)
+// sgi_mc_update wants once every millisecond (1/1000th of a second)
 static TIMER_CALLBACK(ip20_timer)
 {
-	mc_update();
+	sgi_mc_update();
 
 	// update RTC every 10 milliseconds
 	nRTC_Temp++;
@@ -568,7 +568,7 @@ static MACHINE_RESET( ip204415 )
 {
 	wd33c93_init(machine, &scsi_intf);
 
-	mc_init(machine);
+	sgi_mc_init(machine);
 
 	nHPC_MiscStatus = 0;
 	nHPC_ParBufPtr = 0;

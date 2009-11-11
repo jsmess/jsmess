@@ -17,7 +17,7 @@
 /*----------- defined in drivers/trs80.c -----------*/
 
 extern UINT8 trs80_model4;
-extern UINT8 *gfxram;
+extern UINT8 *trs80_gfxram;
 
 /*----------- defined in machine/trs80.c -----------*/
 

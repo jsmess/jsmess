@@ -74,6 +74,7 @@
 #include "99_peb.h"
 #include "devices/ti99cart.h"
 #include "ti99_4x.h"
+#include "ti99pcod.h"
 
 static const int GROM_base = 0x1bfc;
 static int bank_select; // 0 or 1

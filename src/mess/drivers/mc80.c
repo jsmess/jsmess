@@ -41,12 +41,12 @@ static ADDRESS_MAP_START( mc8030_io , ADDRESS_SPACE_IO, 8)
 	//ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0x80, 0x84) AM_MIRROR(0xff00) AM_DEVREADWRITE("zve_ctc", z80ctc_r, z80ctc_w)
 	//AM_RANGE(0x84, 0x87) AM_MIRROR(0xff00) AM_DEVREADWRITE("zve_pio", z80pio_r, z80pio_w)
-	AM_RANGE(0x8c, 0x8c) AM_MIRROR(0xff00) AM_WRITE(zve_write_protect_w)
-	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(vis_w) AM_MASK(0xffff)
+	AM_RANGE(0x8c, 0x8c) AM_MIRROR(0xff00) AM_WRITE(mc8030_zve_write_protect_w)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(mc8030_vis_w) AM_MASK(0xffff)
 	//AM_RANGE(0xd0, 0xd3) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_sio", z80ctc_r, z80ctc_w)
 	AM_RANGE(0xd4, 0xd7) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0xd8, 0xdb) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_pio", z80pio_r, z80pio_w)
-	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(eprom_prog_w)
+	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(mc8030_eprom_prog_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -100,12 +100,12 @@ static MACHINE_DRIVER_START( mc8030 )
     MDRV_VIDEO_START(mc8030)
     MDRV_VIDEO_UPDATE(mc8030)
 
-    MDRV_Z80PIO_ADD( "zve_pio", zve_z80pio_intf )
-    MDRV_Z80CTC_ADD( "zve_ctc", XTAL_2_4576MHz, zve_z80ctc_intf )
+    MDRV_Z80PIO_ADD( "zve_pio", mc8030_zve_z80pio_intf )
+    MDRV_Z80CTC_ADD( "zve_ctc", XTAL_2_4576MHz, mc8030_zve_z80ctc_intf )
 
-	MDRV_Z80PIO_ADD( "asp_pio", asp_z80pio_intf )
-	MDRV_Z80CTC_ADD( "asp_ctc", XTAL_2_4576MHz, asp_z80ctc_intf )
-    MDRV_Z80SIO_ADD( "asp_sio", 4800, asp_z80sio_intf )
+    MDRV_Z80PIO_ADD( "asp_pio", mc8030_asp_z80pio_intf )
+    MDRV_Z80CTC_ADD( "asp_ctc", XTAL_2_4576MHz, mc8030_asp_z80ctc_intf )
+    MDRV_Z80SIO_ADD( "asp_sio", 4800, mc8030_asp_z80sio_intf )
 MACHINE_DRIVER_END
 
 /* ROM definition */

@@ -6,12 +6,14 @@ New System Drivers Supported (in no particular order):
 - Hector MX80c [JJ Stacino]
 
 
+
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
 - Hector 2HR+ [JJ Stacino]
 - Hector 2HR [JJ Stacino]
 - Hector HRX [JJ Stacino]
 - Victor [JJ Stacino]
+
 
 
 Skeleton drivers: 
@@ -45,7 +47,8 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-(none)
+- Cleanups (static qualifiers, headers, renames and more multisession
+  friendly init code).  [Atari Ace]
 
 
 

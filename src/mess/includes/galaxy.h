@@ -23,7 +23,7 @@ extern WRITE8_HANDLER( galaxy_latch_w );
 
 extern MACHINE_RESET( galaxyp );
 
-extern UINT8 gal_latch_value;
+extern UINT8 galaxy_latch_value;
 
 extern DRIVER_INIT( galaxyp );
 

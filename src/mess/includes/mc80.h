@@ -25,15 +25,15 @@ extern const z80pio_interface mc8020_z80pio_intf;
 /*                            Implementation for MC80.3x                     */
 /*****************************************************************************/
 
-extern WRITE8_HANDLER( zve_write_protect_w );
-extern WRITE8_HANDLER( vis_w );
-extern WRITE8_HANDLER( eprom_prog_w );
+extern WRITE8_HANDLER( mc8030_zve_write_protect_w );
+extern WRITE8_HANDLER( mc8030_vis_w );
+extern WRITE8_HANDLER( mc8030_eprom_prog_w );
 extern MACHINE_RESET(mc8030);
-extern const z80pio_interface zve_z80pio_intf;
-extern const z80pio_interface asp_z80pio_intf;
-extern const z80ctc_interface zve_z80ctc_intf;
-extern const z80ctc_interface asp_z80ctc_intf;
-extern const z80sio_interface asp_z80sio_intf;
+extern const z80pio_interface mc8030_zve_z80pio_intf;
+extern const z80pio_interface mc8030_asp_z80pio_intf;
+extern const z80ctc_interface mc8030_zve_z80ctc_intf;
+extern const z80ctc_interface mc8030_asp_z80ctc_intf;
+extern const z80sio_interface mc8030_asp_z80sio_intf;
 
 
 /*----------- defined in video/mc80.c -----------*/

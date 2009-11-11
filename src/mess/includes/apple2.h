@@ -111,7 +111,7 @@ PALETTE_INIT( apple2 );
 
 /*----------- defined in machine/apple2.c -----------*/
 
-extern UINT32 a2;
+extern UINT32 apple2_flags;
 
 extern const applefdc_interface apple2_fdc_interface;
 

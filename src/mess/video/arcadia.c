@@ -222,8 +222,7 @@ collisions, one is for sprite/sprite collisions.
 #include "driver.h"
 #include "includes/arcadia.h"
 
-static UINT8 arcadia_rectangle[0x40][8];
-static UINT8 chars[0x40][8]={
+static const UINT8 chars[0x40][8]={
     // read from the screen generated from a palladium
     { 0,0,0,0,0,0,0,0 },			// 00 (space)
     { 1,2,4,8,16,32,64,128 }, //           ; 01 (\)
@@ -297,6 +296,8 @@ static struct {
     int multicolor;
     struct { int x, y; } pos[4];
     UINT8 bg[262][16+2*XPOS/8];
+    UINT8 rectangle[0x40][8];
+    UINT8 chars[0x40][8];
     int breaker;
     union {
 	UINT8 data[0x400];
@@ -332,18 +333,19 @@ static struct {
 VIDEO_START( arcadia )
 {
 	int i;
+	memcpy(&arcadia_video.chars, chars, sizeof(chars));
 	for (i=0; i<0x40; i++)
 	{
-		arcadia_rectangle[i][0]=0;
-		arcadia_rectangle[i][4]=0;
-		if (i&1) arcadia_rectangle[i][0]|=3;
-		if (i&2) arcadia_rectangle[i][0]|=0x1c;
-		if (i&4) arcadia_rectangle[i][0]|=0xe0;
-		if (i&8) arcadia_rectangle[i][4]|=3;
-		if (i&0x10) arcadia_rectangle[i][4]|=0x1c;
-		if (i&0x20) arcadia_rectangle[i][4]|=0xe0;
-		arcadia_rectangle[i][1]=arcadia_rectangle[i][2]=arcadia_rectangle[i][3]=arcadia_rectangle[i][0];
-		arcadia_rectangle[i][5]=arcadia_rectangle[i][6]=arcadia_rectangle[i][7]=arcadia_rectangle[i][4];
+		arcadia_video.rectangle[i][0]=0;
+		arcadia_video.rectangle[i][4]=0;
+		if (i&1) arcadia_video.rectangle[i][0]|=3;
+		if (i&2) arcadia_video.rectangle[i][0]|=0x1c;
+		if (i&4) arcadia_video.rectangle[i][0]|=0xe0;
+		if (i&8) arcadia_video.rectangle[i][4]|=3;
+		if (i&0x10) arcadia_video.rectangle[i][4]|=0x1c;
+		if (i&0x20) arcadia_video.rectangle[i][4]|=0xe0;
+		arcadia_video.rectangle[i][1]=arcadia_video.rectangle[i][2]=arcadia_video.rectangle[i][3]=arcadia_video.rectangle[i][0];
+		arcadia_video.rectangle[i][5]=arcadia_video.rectangle[i][6]=arcadia_video.rectangle[i][7]=arcadia_video.rectangle[i][4];
 	}
 
 	{
@@ -439,7 +441,7 @@ WRITE8_HANDLER(arcadia_video_w)
 		case 0x1a8: case 0x1a9: case 0x1aa: case 0x1ab: case 0x1ac: case 0x1ad: case 0x1ae: case 0x1af:
 		case 0x1b0: case 0x1b1: case 0x1b2: case 0x1b3: case 0x1b4: case 0x1b5: case 0x1b6: case 0x1b7:
 		case 0x1b8: case 0x1b9: case 0x1ba: case 0x1bb: case 0x1bc: case 0x1bd: case 0x1be: case 0x1bf:
-			chars[0x38|((offset>>3)&7)][offset&7]=data;
+			arcadia_video.chars[0x38|((offset>>3)&7)][offset&7]=data;
 			break;
 		case 0x1f8:
 			arcadia_video.lines26=data&0x40;
@@ -537,9 +539,9 @@ INLINE void arcadia_vh_draw_line(running_machine *machine, bitmap_t *bitmap,
 			}
 		}
 		if (graphics)
-			arcadia_draw_char(machine, bitmap, arcadia_rectangle[ch&0x3f], ch, y, x);
+			arcadia_draw_char(machine, bitmap, arcadia_video.rectangle[ch&0x3f], ch, y, x);
 		else
-			arcadia_draw_char(machine, bitmap, chars[ch&0x3f], ch, y, x);
+			arcadia_draw_char(machine, bitmap, arcadia_video.chars[ch&0x3f], ch, y, x);
     }
 }
 

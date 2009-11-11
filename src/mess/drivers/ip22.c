@@ -841,14 +841,14 @@ static WRITE32_HANDLER( rtc_w )
 static WRITE32_HANDLER( ip22_write_ram )
 {
 	// if banks 2 or 3 are enabled, do nothing, we don't support that much memory
-	if (mc_r(space, 0xc8/4, 0xffffffff) & 0x10001000)
+	if (sgi_mc_r(space, 0xc8/4, 0xffffffff) & 0x10001000)
 	{
 		// a random perturbation so the memory test fails
 		data ^= 0xffffffff;
 	}
 
 	// if banks 0 or 1 have 2 subbanks, also kill it, we only want 128 MB
-	if (mc_r(space, 0xc0/4, 0xffffffff) & 0x40004000)
+	if (sgi_mc_r(space, 0xc0/4, 0xffffffff) & 0x40004000)
 	{
 		// a random perturbation so the memory test fails
 		data ^= 0xffffffff;
@@ -1134,7 +1134,7 @@ static ADDRESS_MAP_START( ip225015_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE( 0x00000000, 0x0007ffff ) AM_READWRITE( SMH_BANK(1), SMH_BANK(1) )	/* mirror of first 512k of main RAM */
 	AM_RANGE( 0x08000000, 0x0fffffff ) AM_SHARE(1) AM_BASE( &ip22_mainram ) AM_RAM_WRITE(ip22_write_ram)		/* 128 MB of main RAM */
 	AM_RANGE( 0x1f0f0000, 0x1f0f1fff ) AM_READWRITE( newport_rex3_r, newport_rex3_w )
-	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_READWRITE( mc_r, mc_w )
+	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_READWRITE( sgi_mc_r, sgi_mc_w )
 	AM_RANGE( 0x1fb90000, 0x1fb9ffff ) AM_READWRITE( hpc3_hd_enet_r, hpc3_hd_enet_w )
 	AM_RANGE( 0x1fbb0000, 0x1fbb0003 ) AM_RAM 	/* unknown, but read a lot and discarded */
 	AM_RANGE( 0x1fbc0000, 0x1fbc7fff ) AM_READWRITE( hpc3_hd0_r, hpc3_hd0_w )
@@ -1149,16 +1149,16 @@ ADDRESS_MAP_END
 
 static UINT32 nIntCounter;
 
-// mc_update wants once every millisecond (1/1000th of a second)
+// sgi_mc_update wants once every millisecond (1/1000th of a second)
 static TIMER_CALLBACK(ip22_timer)
 {
-	mc_update();
+	sgi_mc_update();
 	timer_set(machine, ATTOTIME_IN_MSEC(1), NULL, 0, ip22_timer);
 }
 
 static MACHINE_RESET( ip225015 )
 {
-	mc_init(machine);
+	sgi_mc_init(machine);
 	nHPC3_enetr_nbdp = 0x80000000;
 	nHPC3_enetr_cbp = 0x80000000;
 	nIntCounter = 0;

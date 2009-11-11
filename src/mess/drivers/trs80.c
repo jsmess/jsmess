@@ -157,7 +157,7 @@ There don't seem to be any JV1 boot disks for Model III/4.
 #include "devices/cassette.h"
 #include "formats/trs_cas.h"
 
-UINT8 *gfxram;
+UINT8 *trs80_gfxram;
 UINT8 trs80_model4;
 
 static ADDRESS_MAP_START( trs80_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -644,7 +644,7 @@ ROM_START(lnw80)
 	ROM_LOAD("lnw_chr.bin",  0x0000, 0x0800, CRC(c89b27df) SHA1(be2a009a07e4378d070002a558705e9a0de59389))
 
 	ROM_REGION(0x04400, "gfx2",0)
-	ROM_FILL(0, 0x4400, 0xff)	/* 0x4000 for gfxram + 0x400 for videoram */
+	ROM_FILL(0, 0x4400, 0xff)	/* 0x4000 for trs80_gfxram + 0x400 for videoram */
 ROM_END
 
 ROM_START(trs80m3)
@@ -762,7 +762,7 @@ static DRIVER_INIT( lnw80 )
 {
 	trs80_mode = 0;
 	trs80_model4 = 0;
-	gfxram = memory_region(machine, "gfx2");
+	trs80_gfxram = memory_region(machine, "gfx2");
 	videoram = memory_region(machine, "gfx2")+0x4000;
 }
 

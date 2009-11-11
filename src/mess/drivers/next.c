@@ -16,7 +16,7 @@ static ADDRESS_MAP_START(next_mem, ADDRESS_SPACE_PROGRAM, 32)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( next )
+static INPUT_PORTS_START( next )
 INPUT_PORTS_END
 
 

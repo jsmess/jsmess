@@ -83,11 +83,11 @@ const z80pio_interface mc8020_z80pio_intf =
 /*                            Implementation for MC80.3x                     */
 /*****************************************************************************/
 
-WRITE8_HANDLER( zve_write_protect_w )
+WRITE8_HANDLER( mc8030_zve_write_protect_w )
 {
 }
 
-WRITE8_HANDLER( vis_w )
+WRITE8_HANDLER( mc8030_vis_w )
 {
 	// reg C
 	// 7 6 5 4 -- module
@@ -108,7 +108,7 @@ WRITE8_HANDLER( vis_w )
 
 }
 
-WRITE8_HANDLER( eprom_prog_w )
+WRITE8_HANDLER( mc8030_eprom_prog_w )
 {
 }
 
@@ -140,7 +140,7 @@ static WRITE8_DEVICE_HANDLER (zve_port_b_w)
 {
 }
 
-const z80pio_interface zve_z80pio_intf =
+const z80pio_interface mc8030_zve_z80pio_intf =
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
 	DEVCB_HANDLER(zve_port_a_r),
@@ -169,7 +169,7 @@ static WRITE8_DEVICE_HANDLER (asp_port_b_w)
 {
 }
 
-const z80pio_interface asp_z80pio_intf =
+const z80pio_interface mc8030_asp_z80pio_intf =
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
 	DEVCB_HANDLER(asp_port_a_r),
@@ -180,7 +180,7 @@ const z80pio_interface asp_z80pio_intf =
 	DEVCB_NULL
 };
 
-Z80CTC_INTERFACE( zve_z80ctc_intf )
+Z80CTC_INTERFACE( mc8030_zve_z80ctc_intf )
 {
 	0,
 	DEVCB_NULL,
@@ -189,7 +189,7 @@ Z80CTC_INTERFACE( zve_z80ctc_intf )
 	DEVCB_NULL
 };
 
-Z80CTC_INTERFACE( asp_z80ctc_intf )
+Z80CTC_INTERFACE( mc8030_asp_z80ctc_intf )
 {
 	0,
 	DEVCB_NULL,
@@ -198,7 +198,7 @@ Z80CTC_INTERFACE( asp_z80ctc_intf )
 	DEVCB_NULL
 };
 
-const z80sio_interface asp_z80sio_intf =
+const z80sio_interface mc8030_asp_z80sio_intf =
 {
 	0,	/* interrupt handler */
 	0,			/* DTR changed handler */

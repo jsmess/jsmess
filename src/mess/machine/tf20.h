@@ -36,11 +36,13 @@ READ_LINE_DEVICE_HANDLER( tf20_rxs_r );
 WRITE_LINE_DEVICE_HANDLER( tf20_pouts_w );
 READ_LINE_DEVICE_HANDLER( tf20_pins_r );
 
+#ifdef UNUSED_FUNCTION
 /* serial interface out (to another terminal) */
 WRITE_LINE_DEVICE_HANDLER( tf20_txc_r );
 READ_LINE_DEVICE_HANDLER( tf20_rxc_w );
 WRITE_LINE_DEVICE_HANDLER( tf20_poutc_r );
 READ_LINE_DEVICE_HANDLER( tf20_pinc_w );
+#endif
 
 
 /***************************************************************************

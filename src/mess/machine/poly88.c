@@ -17,6 +17,9 @@ static UINT8 last_code = 0;
 static UINT8 int_vector = 0;
 static emu_timer * poly88_cassette_timer;
 static emu_timer * poly88_usart_timer;
+static int previous_level;
+static int clk_level;
+static int clk_level_tape;
 
 static TIMER_CALLBACK(poly88_usart_timer_callback)
 {
@@ -146,9 +149,6 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 {
 	int data;
 	int current_level;
-	static int previous_level = 0;
-	static int clk_level = 1;
-	static int clk_level_tape = 1;
 
 
 //  if (!(input_port_read(machine, "DSW0") & 0x02)) /* V.24 / Tape Switch */
@@ -209,6 +209,8 @@ static TIMER_CALLBACK( setup_machine_state )
 
 DRIVER_INIT ( poly88 )
 {
+	previous_level = 0;;
+	clk_level = clk_level_tape = 1;
 	poly88_cassette_timer = timer_alloc(machine, poly88_cassette_timer_callback, NULL);
 	timer_adjust_periodic(poly88_cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(600));
 
@@ -319,7 +321,7 @@ SNAPSHOT_LOAD( poly88 )
     				theend = 1;
 					break;
 			default: break;
-    	}
+		}
 
 		if (theend) {
 			break;

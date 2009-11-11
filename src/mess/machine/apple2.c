@@ -38,7 +38,7 @@
 #define PROFILER_A2INT	PROFILER_USER2
 
 /* softswitch */
-UINT32 a2;
+UINT32 apple2_flags;
 
 /* before the softswitch is changed, these are applied */
 static UINT32 a2_mask;
@@ -392,58 +392,58 @@ WRITE8_HANDLER(apple2_c0xx_w)
 
 static void apple2_mem_0000(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
-	meminfo->read_mem			= (a2 & VAR_ALTZP)	? 0x010000 : 0x000000;
-	meminfo->write_mem			= (a2 & VAR_ALTZP)	? 0x010000 : 0x000000;
+	meminfo->read_mem			= (apple2_flags & VAR_ALTZP)	? 0x010000 : 0x000000;
+	meminfo->write_mem			= (apple2_flags & VAR_ALTZP)	? 0x010000 : 0x000000;
 }
 
 static void apple2_mem_0200(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
-	meminfo->read_mem			= (a2 & VAR_RAMRD)	? 0x010200 : 0x000200;
-	meminfo->write_mem			= (a2 & VAR_RAMWRT)	? 0x010200 : 0x000200;
+	meminfo->read_mem			= (apple2_flags & VAR_RAMRD)	? 0x010200 : 0x000200;
+	meminfo->write_mem			= (apple2_flags & VAR_RAMWRT)	? 0x010200 : 0x000200;
 }
 
 static void apple2_mem_0400(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
-	if (a2 & VAR_80STORE)
+	if (apple2_flags & VAR_80STORE)
 	{
-		meminfo->read_mem		= (a2 & VAR_PAGE2)	? 0x010400 : 0x000400;
-		meminfo->write_mem		= (a2 & VAR_PAGE2)	? 0x010400 : 0x000400;
-		meminfo->write_handler	= (a2 & VAR_PAGE2)	? apple2_auxram0400_w : apple2_mainram0400_w;
+		meminfo->read_mem		= (apple2_flags & VAR_PAGE2)	? 0x010400 : 0x000400;
+		meminfo->write_mem		= (apple2_flags & VAR_PAGE2)	? 0x010400 : 0x000400;
+		meminfo->write_handler	= (apple2_flags & VAR_PAGE2)	? apple2_auxram0400_w : apple2_mainram0400_w;
 	}
 	else
 	{
-		meminfo->read_mem		= (a2 & VAR_RAMRD)	? 0x010400 : 0x000400;
-		meminfo->write_mem		= (a2 & VAR_RAMWRT)	? 0x010400 : 0x000400;
-		meminfo->write_handler	= (a2 & VAR_RAMWRT)	? apple2_auxram0400_w : apple2_mainram0400_w;
+		meminfo->read_mem		= (apple2_flags & VAR_RAMRD)	? 0x010400 : 0x000400;
+		meminfo->write_mem		= (apple2_flags & VAR_RAMWRT)	? 0x010400 : 0x000400;
+		meminfo->write_handler	= (apple2_flags & VAR_RAMWRT)	? apple2_auxram0400_w : apple2_mainram0400_w;
 	}
 }
 
 static void apple2_mem_0800(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
-	meminfo->read_mem			= (a2 & VAR_RAMRD)	? 0x010800 : 0x000800;
-	meminfo->write_mem			= (a2 & VAR_RAMWRT)	? 0x010800 : 0x000800;
+	meminfo->read_mem			= (apple2_flags & VAR_RAMRD)	? 0x010800 : 0x000800;
+	meminfo->write_mem			= (apple2_flags & VAR_RAMWRT)	? 0x010800 : 0x000800;
 }
 
 static void apple2_mem_2000(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
-	if ((a2 & (VAR_80STORE|VAR_HIRES)) == (VAR_80STORE|VAR_HIRES))
+	if ((apple2_flags & (VAR_80STORE|VAR_HIRES)) == (VAR_80STORE|VAR_HIRES))
 	{
-		meminfo->read_mem		= (a2 & VAR_PAGE2)	? 0x012000 : 0x002000;
-		meminfo->write_mem		= (a2 & VAR_PAGE2)	? 0x012000 : 0x002000;
-		meminfo->write_handler	= (a2 & VAR_PAGE2)	? apple2_auxram2000_w : apple2_mainram2000_w;
+		meminfo->read_mem		= (apple2_flags & VAR_PAGE2)	? 0x012000 : 0x002000;
+		meminfo->write_mem		= (apple2_flags & VAR_PAGE2)	? 0x012000 : 0x002000;
+		meminfo->write_handler	= (apple2_flags & VAR_PAGE2)	? apple2_auxram2000_w : apple2_mainram2000_w;
 	}
 	else
 	{
-		meminfo->read_mem		= (a2 & VAR_RAMRD)	? 0x012000 : 0x002000;
-		meminfo->write_mem		= (a2 & VAR_RAMWRT)	? 0x012000 : 0x002000;
-		meminfo->write_handler	= (a2 & VAR_RAMWRT)	? apple2_auxram2000_w : apple2_mainram2000_w;
+		meminfo->read_mem		= (apple2_flags & VAR_RAMRD)	? 0x012000 : 0x002000;
+		meminfo->write_mem		= (apple2_flags & VAR_RAMWRT)	? 0x012000 : 0x002000;
+		meminfo->write_handler	= (apple2_flags & VAR_RAMWRT)	? apple2_auxram2000_w : apple2_mainram2000_w;
 	}
 }
 
 static void apple2_mem_4000(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
-	meminfo->read_mem			= (a2 & VAR_RAMRD)	? 0x014000 : 0x004000;
-	meminfo->write_mem			= (a2 & VAR_RAMWRT)	? 0x014000 : 0x004000;
+	meminfo->read_mem			= (apple2_flags & VAR_RAMRD)	? 0x014000 : 0x004000;
+	meminfo->write_mem			= (apple2_flags & VAR_RAMWRT)	? 0x014000 : 0x004000;
 }
 
 static void apple2_mem_C000(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
@@ -454,9 +454,9 @@ static void apple2_mem_C000(running_machine *machine, offs_t begin, offs_t end, 
 
 static void apple2_mem_Cx00(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
-	if (a2 & VAR_INTCXROM)
+	if (apple2_flags & VAR_INTCXROM)
 	{
-		meminfo->read_mem		= (begin & 0x0FFF) | (a2 & VAR_ROMSWITCH ? 0x4000 : 0x0000) | APPLE2_MEM_ROM;
+		meminfo->read_mem		= (begin & 0x0FFF) | (apple2_flags & VAR_ROMSWITCH ? 0x4000 : 0x0000) | APPLE2_MEM_ROM;
 		meminfo->write_mem		= APPLE2_MEM_FLOATING;
 	}
 	else
@@ -468,9 +468,9 @@ static void apple2_mem_Cx00(running_machine *machine, offs_t begin, offs_t end, 
 
 static void apple2_mem_C300(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
-	if ((a2 & (VAR_INTCXROM|VAR_SLOTC3ROM)) != VAR_SLOTC3ROM)
+	if ((apple2_flags & (VAR_INTCXROM|VAR_SLOTC3ROM)) != VAR_SLOTC3ROM)
 	{
-		meminfo->read_mem		= (begin & 0x0FFF) | (a2 & VAR_ROMSWITCH ? 0x4000 : 0x0000) | APPLE2_MEM_ROM;
+		meminfo->read_mem		= (begin & 0x0FFF) | (apple2_flags & VAR_ROMSWITCH ? 0x4000 : 0x0000) | APPLE2_MEM_ROM;
 		meminfo->write_mem		= APPLE2_MEM_FLOATING;
 	}
 	else
@@ -482,45 +482,45 @@ static void apple2_mem_C300(running_machine *machine, offs_t begin, offs_t end, 
 
 static void apple2_mem_C800(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
-	meminfo->read_mem			= (begin & 0x0FFF) | (a2 & VAR_ROMSWITCH ? 0x4000 : 0x0000) | APPLE2_MEM_ROM;
+	meminfo->read_mem			= (begin & 0x0FFF) | (apple2_flags & VAR_ROMSWITCH ? 0x4000 : 0x0000) | APPLE2_MEM_ROM;
 	meminfo->write_mem			= APPLE2_MEM_FLOATING;
 }
 
 static void apple2_mem_CE00(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
-	if ((a2 & VAR_ROMSWITCH) && !strcmp(machine->gamedrv->name, "apple2cp"))
+	if ((apple2_flags & VAR_ROMSWITCH) && !strcmp(machine->gamedrv->name, "apple2cp"))
 	{
 		meminfo->read_mem		= APPLE2_MEM_AUX;
 		meminfo->write_mem		= APPLE2_MEM_AUX;
 	}
 	else
 	{
-		meminfo->read_mem		= (begin & 0x0FFF) | (a2 & VAR_ROMSWITCH ? 0x4000 : 0x0000) | APPLE2_MEM_ROM;
+		meminfo->read_mem		= (begin & 0x0FFF) | (apple2_flags & VAR_ROMSWITCH ? 0x4000 : 0x0000) | APPLE2_MEM_ROM;
 		meminfo->write_mem		= APPLE2_MEM_FLOATING;
 	}
 }
 
 static void apple2_mem_D000(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
-	if (a2 & VAR_LCRAM)
+	if (apple2_flags & VAR_LCRAM)
 	{
-		if (a2 & VAR_LCRAM2)
-			meminfo->read_mem	= (a2 & VAR_ALTZP)	? 0x01C000 : 0x00C000;
+		if (apple2_flags & VAR_LCRAM2)
+			meminfo->read_mem	= (apple2_flags & VAR_ALTZP)	? 0x01C000 : 0x00C000;
 		else
-			meminfo->read_mem	= (a2 & VAR_ALTZP)	? 0x01D000 : 0x00D000;
+			meminfo->read_mem	= (apple2_flags & VAR_ALTZP)	? 0x01D000 : 0x00D000;
 	}
 	else
 	{
-		meminfo->read_mem		= (a2 & VAR_ROMSWITCH) ? 0x005000 : 0x001000;
+		meminfo->read_mem		= (apple2_flags & VAR_ROMSWITCH) ? 0x005000 : 0x001000;
 		meminfo->read_mem		|= APPLE2_MEM_ROM;
 	}
 
-	if (a2 & VAR_LCWRITE)
+	if (apple2_flags & VAR_LCWRITE)
 	{
-		if (a2 & VAR_LCRAM2)
-			meminfo->write_mem	= (a2 & VAR_ALTZP)	? 0x01C000 : 0x00C000;
+		if (apple2_flags & VAR_LCRAM2)
+			meminfo->write_mem	= (apple2_flags & VAR_ALTZP)	? 0x01C000 : 0x00C000;
 		else
-			meminfo->write_mem	= (a2 & VAR_ALTZP)	? 0x01D000 : 0x00D000;
+			meminfo->write_mem	= (apple2_flags & VAR_ALTZP)	? 0x01D000 : 0x00D000;
 	}
 	else
 	{
@@ -530,19 +530,19 @@ static void apple2_mem_D000(running_machine *machine, offs_t begin, offs_t end, 
 
 static void apple2_mem_E000(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
-	if (a2 & VAR_LCRAM)
+	if (apple2_flags & VAR_LCRAM)
 	{
-		meminfo->read_mem		= (a2 & VAR_ALTZP)	? 0x01E000 : 0x00E000;
+		meminfo->read_mem		= (apple2_flags & VAR_ALTZP)	? 0x01E000 : 0x00E000;
 	}
 	else
 	{
-		meminfo->read_mem		= (a2 & VAR_ROMSWITCH) ? 0x006000 : 0x002000;
+		meminfo->read_mem		= (apple2_flags & VAR_ROMSWITCH) ? 0x006000 : 0x002000;
 		meminfo->read_mem		|= APPLE2_MEM_ROM;
 	}
 
-	if (a2 & VAR_LCWRITE)
+	if (apple2_flags & VAR_LCWRITE)
 	{
-		meminfo->write_mem		= (a2 & VAR_ALTZP)	? 0x01E000 : 0x00E000;
+		meminfo->write_mem		= (apple2_flags & VAR_ALTZP)	? 0x01E000 : 0x00E000;
 	}
 	else
 	{
@@ -585,8 +585,8 @@ void apple2_setvar(running_machine *machine, UINT32 val, UINT32 mask)
 	val |= a2_set;
 
 	/* change the softswitch */
-	a2 &= ~mask;
-	a2 |= val;
+	apple2_flags &= ~mask;
+	apple2_flags |= val;
 
 	apple2_update_memory(machine);
 }
@@ -639,10 +639,10 @@ UINT8 apple2_getfloatingbusvalue(running_machine *machine)
 
 	// machine state switches
 	//
-	Hires    = (a2 & VAR_HIRES) ? 1 : 0;
-	Mixed    = (a2 & VAR_MIXED) ? 1 : 0;
-	Page2    = (a2 & VAR_PAGE2) ? 1 : 0;
-	_80Store = (a2 & VAR_80STORE) ? 1 : 0;
+	Hires    = (apple2_flags & VAR_HIRES) ? 1 : 0;
+	Mixed    = (apple2_flags & VAR_MIXED) ? 1 : 0;
+	Page2    = (apple2_flags & VAR_PAGE2) ? 1 : 0;
+	_80Store = (apple2_flags & VAR_80STORE) ? 1 : 0;
 
 	// calculate video parameters according to display standard
 	//
@@ -901,21 +901,21 @@ READ8_HANDLER ( apple2_c01x_r )
 		switch (offset)
 		{
 			case 0x00:			result |= AY3600_anykey_clearstrobe_r();		break;
-			case 0x01:			result |= (a2 & VAR_LCRAM2)		? 0x80 : 0x00;	break;
-			case 0x02:			result |= (a2 & VAR_LCRAM)		? 0x80 : 0x00;	break;
-			case 0x03:			result |= (a2 & VAR_RAMRD)		? 0x80 : 0x00;	break;
-			case 0x04:			result |= (a2 & VAR_RAMWRT)		? 0x80 : 0x00;	break;
-			case 0x05:			result |= (a2 & VAR_INTCXROM)	? 0x80 : 0x00;	break;
-			case 0x06:			result |= (a2 & VAR_ALTZP)		? 0x80 : 0x00;	break;
-			case 0x07:			result |= (a2 & VAR_SLOTC3ROM)	? 0x80 : 0x00;	break;
-			case 0x08:			result |= (a2 & VAR_80STORE)	? 0x80 : 0x00;	break;
+			case 0x01:			result |= (apple2_flags & VAR_LCRAM2)		? 0x80 : 0x00;	break;
+			case 0x02:			result |= (apple2_flags & VAR_LCRAM)		? 0x80 : 0x00;	break;
+			case 0x03:			result |= (apple2_flags & VAR_RAMRD)		? 0x80 : 0x00;	break;
+			case 0x04:			result |= (apple2_flags & VAR_RAMWRT)		? 0x80 : 0x00;	break;
+			case 0x05:			result |= (apple2_flags & VAR_INTCXROM)	? 0x80 : 0x00;	break;
+			case 0x06:			result |= (apple2_flags & VAR_ALTZP)		? 0x80 : 0x00;	break;
+			case 0x07:			result |= (apple2_flags & VAR_SLOTC3ROM)	? 0x80 : 0x00;	break;
+			case 0x08:			result |= (apple2_flags & VAR_80STORE)	? 0x80 : 0x00;	break;
 			case 0x09:			result |= !video_screen_get_vblank(space->machine->primary_screen)		? 0x80 : 0x00;	break;
-			case 0x0A:			result |= (a2 & VAR_TEXT)		? 0x80 : 0x00;	break;
-			case 0x0B:			result |= (a2 & VAR_MIXED)		? 0x80 : 0x00;	break;
-			case 0x0C:			result |= (a2 & VAR_PAGE2)		? 0x80 : 0x00;	break;
-			case 0x0D:			result |= (a2 & VAR_HIRES)		? 0x80 : 0x00;	break;
-			case 0x0E:			result |= (a2 & VAR_ALTCHARSET)	? 0x80 : 0x00;	break;
-			case 0x0F:			result |= (a2 & VAR_80COL)		? 0x80 : 0x00;	break;
+			case 0x0A:			result |= (apple2_flags & VAR_TEXT)		? 0x80 : 0x00;	break;
+			case 0x0B:			result |= (apple2_flags & VAR_MIXED)		? 0x80 : 0x00;	break;
+			case 0x0C:			result |= (apple2_flags & VAR_PAGE2)		? 0x80 : 0x00;	break;
+			case 0x0D:			result |= (apple2_flags & VAR_HIRES)		? 0x80 : 0x00;	break;
+			case 0x0E:			result |= (apple2_flags & VAR_ALTCHARSET)	? 0x80 : 0x00;	break;
+			case 0x0F:			result |= (apple2_flags & VAR_80COL)		? 0x80 : 0x00;	break;
 		}
 
 		profiler_mark_end();
@@ -964,7 +964,7 @@ WRITE8_HANDLER( apple2_c02x_w )
 	switch(offset)
 	{
 		case 0x08:
-			apple2_setvar(space->machine, (a2 & VAR_ROMSWITCH) ^ VAR_ROMSWITCH, VAR_ROMSWITCH);
+			apple2_setvar(space->machine, (apple2_flags & VAR_ROMSWITCH) ^ VAR_ROMSWITCH, VAR_ROMSWITCH);
 			break;
 	}
 }
@@ -1301,14 +1301,14 @@ const applefdc_interface apple2_fdc_interface =
 
 void apple2_init_common(running_machine *machine)
 {
-	a2 = 0;
+	apple2_flags = 0;
 	apple2_fdc_diskreg = 0;
 
 	AY3600_init(machine);
 	add_reset_callback(machine, apple2_reset);
 
 	/* state save registers */
-	state_save_register_global(machine, a2);
+	state_save_register_global(machine, apple2_flags);
 	state_save_register_postload(machine, apple2_update_memory_postload, NULL);
 
 	/* apple2 behaves much better when the default memory is zero */

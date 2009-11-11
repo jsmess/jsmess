@@ -26,6 +26,9 @@ static UINT8 pmd85_ppi_port_outputs[4][3];
 static UINT8 pmd85_startup_mem_map = 0;
 static UINT8 pmd853_memory_mapping = 0x01;
 static void (*pmd85_update_memory)(running_machine *);
+static int previous_level;
+static int clk_level;
+static int clk_level_tape;
 
 enum {PMD85_LED_1, PMD85_LED_2, PMD85_LED_3};
 enum {PMD85_1, PMD85_2, PMD85_2A, PMD85_2B, PMD85_3, ALFA, MATO, C2717};
@@ -772,9 +775,6 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 {
 	int data;
 	int current_level;
-	static int previous_level = 0;
-	static int clk_level = 1;
-	static int clk_level_tape = 1;
 
 	if (!(input_port_read(machine, "DSW0") & 0x02))	/* V.24 / Tape Switch */
 	{
@@ -852,6 +852,8 @@ static DIRECT_UPDATE_HANDLER(pmd85_opbaseoverride)
 
 static void pmd85_common_driver_init (running_machine *machine)
 {
+	previous_level = 0;
+	clk_level = clk_level_tape = 1;
 	pmd85_cassette_timer = timer_alloc(machine, pmd85_cassette_timer_callback, NULL);
 	timer_adjust_periodic(pmd85_cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2400));
 

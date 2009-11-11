@@ -30,12 +30,6 @@ static struct fm7_alu_flags
 	UINT8 busy;
 } fm7_alu;
 
-extern UINT8* fm7_video_ram;
-extern UINT8* shared_ram;
-extern emu_timer* fm7_subtimer;
-extern emu_timer* fm77av_vsync_timer;
-extern UINT8 fm7_type;
-
 /*
  * Main CPU: Sub-CPU interface (port 0xfd05)
  *
@@ -1404,7 +1398,7 @@ READ8_HANDLER( fm7_sub_ram_ports_banked_r )
 	if(offset < 0x380)  // work RAM
 		return RAM[0x1d000+offset];
 	if(offset >= 0x380 && offset < 0x400) // shared RAM
-		return shared_ram[offset-0x380];
+		return fm7_shared_ram[offset-0x380];
 	if(offset >= 0x500 && offset < 0x800) // work RAM
 		return RAM[0x1d000+offset];
 	if(offset > 0x800) // CGROM
@@ -1459,7 +1453,7 @@ WRITE8_HANDLER( fm7_sub_ram_ports_banked_w )
 	}
 	if(offset >= 0x380 && offset < 0x400) // shared RAM
 	{
-		shared_ram[offset-0x380] = data;
+		fm7_shared_ram[offset-0x380] = data;
 		return;
 	}
 	if(offset >= 0x500 && offset < 0x800) // work RAM

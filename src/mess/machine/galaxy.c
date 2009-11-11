@@ -32,12 +32,12 @@ READ8_HANDLER( galaxy_keyboard_r )
 	}
 }
 
-UINT8 gal_latch_value = 0;
+UINT8 galaxy_latch_value = 0;
 
 WRITE8_HANDLER( galaxy_latch_w )
 {
 	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;
-	gal_latch_value = data;
+	galaxy_latch_value = data;
 	cassette_output(devtag_get_device(space->machine, "cassette"), val);
 }
 

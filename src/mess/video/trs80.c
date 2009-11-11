@@ -346,7 +346,7 @@ VIDEO_UPDATE( lnw80 )
 
 					for (x = 0; x < 0x40; x++)
 					{
-						gfx = gfxram[ y | x | ra];
+						gfx = trs80_gfxram[ y | x | ra];
 						/* Display 6 pixels in normal region */
 						*p++ = ( gfx & 0x01 ) ? fg : bg;
 						*p++ = ( gfx & 0x02 ) ? fg : bg;
@@ -358,7 +358,7 @@ VIDEO_UPDATE( lnw80 )
 
 					for (x = 0; x < 0x10; x++)
 					{
-						gfx = gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];
+						gfx = trs80_gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];
 						/* Display 6 pixels in extended region */
 						*p++ = ( gfx & 0x01 ) ? fg : bg;
 						*p++ = ( gfx & 0x02 ) ? fg : bg;
@@ -382,7 +382,7 @@ VIDEO_UPDATE( lnw80 )
 
 					for (x = 0; x < 0x40; x++)
 					{
-						gfx = gfxram[ y | x | ra];
+						gfx = trs80_gfxram[ y | x | ra];
 						/* Display 6 pixels in normal region */
 						fg = (gfx & 0x38) >> 3;
 						*p++ = fg;
@@ -409,7 +409,7 @@ VIDEO_UPDATE( lnw80 )
 
 					for (x = 0; x < 0x40; x++)
 					{
-						gfx = gfxram[ y | x | ra];
+						gfx = trs80_gfxram[ y | x | ra];
 						fg = (videoram[ 0x3c00 | x | y ] & 0x38) >> 3;
 						/* Display 6 pixels in normal region */
 						*p++ = ( gfx & 0x01 ) ? fg : bg;
@@ -423,13 +423,13 @@ VIDEO_UPDATE( lnw80 )
 
 					for (x = 0; x < 0x10; x++)
 					{
-						gfx = gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];
-						fg = (gfxram[ 0x3c00 | x | y ] & 0x38) >> 3;
+						gfx = trs80_gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];
+						fg = (trs80_gfxram[ 0x3c00 | x | y ] & 0x38) >> 3;
 						/* Display 6 pixels in extended region */
 						*p++ = ( gfx & 0x01 ) ? fg : bg;
 						*p++ = ( gfx & 0x02 ) ? fg : bg;
 						*p++ = ( gfx & 0x04 ) ? fg : bg;
-						fg = gfxram[ 0x3c00 | x | y ] & 0x07;
+						fg = trs80_gfxram[ 0x3c00 | x | y ] & 0x07;
 						*p++ = ( gfx & 0x08 ) ? fg : bg;
 						*p++ = ( gfx & 0x10 ) ? fg : bg;
 						*p++ = ( gfx & 0x20 ) ? fg : bg;
@@ -509,12 +509,12 @@ WRITE8_HANDLER( trs80_videoram_w )
 
 READ8_HANDLER( trs80_gfxram_r )
 {
-	return gfxram[offset];
+	return trs80_gfxram[offset];
 }
 
 WRITE8_HANDLER( trs80_gfxram_w )
 {
-	gfxram[offset] = data;
+	trs80_gfxram[offset] = data;
 }
 
 

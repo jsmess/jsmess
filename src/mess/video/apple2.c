@@ -50,7 +50,7 @@ static UINT16 *dhires_artifact_map;
 
 INLINE UINT32 effective_a2(void)
 {
-	return a2 & a2_videomask;
+	return apple2_flags & a2_videomask;
 }
 
 

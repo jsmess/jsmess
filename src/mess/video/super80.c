@@ -324,9 +324,9 @@ READ8_HANDLER( super80v_high_r )
 		return colorram[0x800+offset];
 
 	if (super80_shared & 0x10)
-		return pcgram[0x800+offset];
+		return super80_pcgram[0x800+offset];
 	else
-		return pcgram[offset];
+		return super80_pcgram[offset];
 }
 
 WRITE8_HANDLER( super80v_high_w )
@@ -338,7 +338,7 @@ WRITE8_HANDLER( super80v_high_w )
 		videoram[offset+0x800] = data;
 
 		if (super80_shared & 0x10)
-			pcgram[0x800+offset] = data;
+			super80_pcgram[0x800+offset] = data;
 	}
 }
 
@@ -449,7 +449,7 @@ MC6845_UPDATE_ROW( super80v_update_row )
 				inv ^= mc6845_cursor[ra];
 
 		/* get pattern of pixels for that character scanline */
-		gfx = pcgram[(chr<<4) | ra] ^ inv;
+		gfx = super80_pcgram[(chr<<4) | ra] ^ inv;
 
 		/* Display a scanline of a character (7 pixels) */
 		*p = ( gfx & 0x80 ) ? fg : bg; p++;

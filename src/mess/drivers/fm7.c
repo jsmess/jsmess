@@ -51,7 +51,7 @@
 #include "includes/fm7.h"
 
 UINT8* fm7_video_ram;
-UINT8* shared_ram;
+UINT8* fm7_shared_ram;
 static UINT8* fm7_boot_ram;  // Boot RAM (AV only)
 UINT8 fm7_type;
 static UINT8 irq_flags;  // active IRQ flags
@@ -100,8 +100,6 @@ static struct mmr
 	UINT8 enabled;
 	UINT8 mode;
 } fm7_mmr;
-
-extern struct fm7_video_flags fm7_video;
 
 /* key scancode conversion table
  * The FM-7 expects different scancodes when shift,ctrl or graph is held, or
@@ -958,7 +956,7 @@ static WRITE8_HANDLER( fm77av_bootram_w )
 static READ8_HANDLER( fm7_main_shared_r )
 {
 	if(fm7_video.sub_halt != 0)
-		return shared_ram[offset];
+		return fm7_shared_ram[offset];
 	else
 		return 0xff;
 }
@@ -966,7 +964,7 @@ static READ8_HANDLER( fm7_main_shared_r )
 static WRITE8_HANDLER( fm7_main_shared_w )
 {
 	if(fm7_video.sub_halt != 0)
-		shared_ram[offset] = data;
+		fm7_shared_ram[offset] = data;
 }
 
 static READ8_HANDLER( fm7_fmirq_r )
@@ -1440,7 +1438,7 @@ static ADDRESS_MAP_START( fm7_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM // Work RAM
-	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE(&shared_ram)
+	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE(&fm7_shared_ram)
 	// I/O space (D400-D4FF)
 	AM_RANGE(0xd400,0xd401) AM_READ(fm7_sub_keyboard_r)
 	AM_RANGE(0xd402,0xd402) AM_READ(fm7_cancel_ack)
@@ -1512,7 +1510,7 @@ static ADDRESS_MAP_START( fm77av_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM AM_REGION("maincpu",0x1c000) // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM AM_REGION("maincpu",0x1d000) // Work RAM
-	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE(&shared_ram)
+	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE(&fm7_shared_ram)
 	// I/O space (D400-D4FF)
 	AM_RANGE(0xd400,0xd401) AM_READ(fm7_sub_keyboard_r)
 	AM_RANGE(0xd402,0xd402) AM_READ(fm7_cancel_ack)
@@ -1691,7 +1689,7 @@ INPUT_PORTS_END
 
 static DRIVER_INIT(fm7)
 {
-//  shared_ram = auto_alloc_array(machine,UINT8,0x80);
+//  fm7_shared_ram = auto_alloc_array(machine,UINT8,0x80);
 	fm7_video_ram = auto_alloc_array(machine,UINT8,0x18000);  // 2 pages on some systems
 	fm7_timer = timer_alloc(machine,fm7_timer_irq,NULL);
 	fm7_subtimer = timer_alloc(machine,fm7_subtimer_irq,NULL);
@@ -1711,7 +1709,7 @@ static MACHINE_START(fm7)
 	RAM[0xfffe] = 0xfe;
 	RAM[0xffff] = 0x00;
 
-	memset(shared_ram,0xff,0x80);
+	memset(fm7_shared_ram,0xff,0x80);
 	fm7_type = SYS_FM7;
 
 	beep_set_frequency(devtag_get_device(machine,"beeper"),1200);
@@ -1723,7 +1721,7 @@ static MACHINE_START(fm77av)
 	UINT8* RAM = memory_region(machine,"maincpu");
 	UINT8* ROM = memory_region(machine,"init");
 
-	memset(shared_ram,0xff,0x80);
+	memset(fm7_shared_ram,0xff,0x80);
 
 	// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)
 	memcpy(RAM+0x3fff0,ROM+0x1ff0,16);

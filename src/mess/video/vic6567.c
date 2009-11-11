@@ -123,7 +123,7 @@ static UINT8 spr_disp_on = 0;
 static UINT16 spr_ptr[8];
 static UINT8 spr_data[8][4];
 static UINT16 mc_base[8];						// Sprite data counter bases
-static UINT16 mc[8] = {63, 63, 63, 63, 63, 63, 63, 63};	// Sprite data counters
+static UINT16 mc[8];							// Sprite data counters
 
 // Border
 static UINT8 border_on = 0;
@@ -797,6 +797,9 @@ VIDEO_START( vic2 )
 	const device_config *screen = video_screen_first(machine->config);
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
+
+	for (i = 0; i < ARRAY_LENGTH(mc); i++)
+		mc[i] = 63;
 
 	vic2.bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 

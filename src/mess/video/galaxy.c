@@ -25,11 +25,11 @@ TIMER_CALLBACK( gal_video )
 	if (galaxy_interrupts_enabled == TRUE)
 	{
 		UINT8 *gfx = memory_region(machine, "gfx1");
-		UINT8 dat = (gal_latch_value & 0x3c) >> 2;
+		UINT8 dat = (galaxy_latch_value & 0x3c) >> 2;
 		if ((gal_cnt >= 48 * 2) && (gal_cnt < 48 * 210))  // display on screen just first 208 lines
 		{
-			UINT8 mode = (gal_latch_value >> 1) & 1; // bit 2 latch represents mode
-			UINT16 addr = (cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_I) << 8) | cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R) | ((gal_latch_value & 0x80) ^ 0x80);
+			UINT8 mode = (galaxy_latch_value >> 1) & 1; // bit 2 latch represents mode
+			UINT16 addr = (cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_I) << 8) | cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R) | ((galaxy_latch_value & 0x80) ^ 0x80);
   			if (mode == 0)
 			{
   				// Text mode

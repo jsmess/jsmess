@@ -56,15 +56,23 @@ struct fm7_video_flags
 
 /*----------- defined in drivers/fm7.c -----------*/
 
+extern UINT8* fm7_video_ram;
+extern UINT8* fm7_shared_ram;
+extern emu_timer* fm77av_vsync_timer;
+extern UINT8 fm7_type;
+
+
 READ8_HANDLER( fm7_sub_keyboard_r );
 READ8_HANDLER( fm77av_key_encoder_r );
 WRITE8_HANDLER( fm77av_key_encoder_w );
 READ8_HANDLER( fm7_sub_beeper_r );
 
+void fm7_mmr_refresh(const address_space*);
+
 
 /*----------- defined in video/fm7.c -----------*/
 
-void fm7_mmr_refresh(const address_space*);
+extern struct fm7_video_flags fm7_video;
 
 TIMER_CALLBACK( fm77av_vsync );
 

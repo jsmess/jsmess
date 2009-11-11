@@ -271,7 +271,7 @@ DRIVER_INIT( super80 )
 
 DRIVER_INIT( super80v )
 {
-	pcgram = memory_region(machine, "maincpu")+0xf000;
+	super80_pcgram = memory_region(machine, "maincpu")+0xf000;
 	videoram = memory_region(machine, "maincpu")+0x18000;
 	colorram = memory_region(machine, "maincpu")+0x1C000;
 	driver_init_common(machine);

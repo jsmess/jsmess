@@ -422,7 +422,7 @@ static msm8251_interface pc8001_8251_intf =
 
 /* 8255 Interface */
 
-I8255A_INTERFACE( pc8001_8255_intf )
+static I8255A_INTERFACE( pc8001_8255_intf )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,

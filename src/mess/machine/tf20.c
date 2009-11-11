@@ -157,6 +157,7 @@ WRITE_LINE_DEVICE_HANDLER( tf20_pouts_w )
 	upd7201_ctsa_w(tf20->upd7201, state);
 }
 
+#ifdef UNUSED_FUNCTION
 /* serial output signal (to another terminal) */
 WRITE_LINE_DEVICE_HANDLER( tf20_txc_w )
 {
@@ -190,6 +191,7 @@ READ_LINE_DEVICE_HANDLER( tf20_pinc_r )
 
 	return upd7201_dtra_r(tf20->upd7201);
 }
+#endif
 
 
 /*****************************************************************************
