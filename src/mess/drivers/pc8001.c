@@ -9,9 +9,14 @@
 
 	TODO:
 
-	- printer ACK callback
 	- uPD3301
 	- PCG1000
+	- Intel 8251
+	- cassette
+	- floppy
+	- PC-8011
+	- PC-8021
+	- PC-8031
 
 */
 
@@ -76,6 +81,11 @@ static WRITE8_HANDLER( port30_w )
 		7		unused
 
 	*/
+
+	pc8001_state *state = space->machine->driver_data;
+
+	/* cassette motor */
+	cassette_change_state(state->cassette, BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 static WRITE8_HANDLER( pc8001mk2_port31_w )
@@ -144,11 +154,12 @@ static READ8_HANDLER( port40_r )
 	*/
 
 	pc8001_state *state = space->machine->driver_data;
-	UINT8 data = 0xc0;
+	UINT8 data = 0xc8;
 
 	data = centronics_busy_r(state->centronics);
-	data |= state->rtc_data ? 0x10 : 0x00;
-	if (video_screen_get_vblank(space->machine->primary_screen)) data |= 0x20;
+	data |= state->ack << 1;
+	data |= state->rtc_data << 4;
+	data |= state->vrtc << 5;
 
 	return data;
 }
@@ -350,6 +361,10 @@ static PALETTE_INIT( pc8001 )
 
 static VIDEO_START( pc8001 )
 {
+	pc8001_state *state = machine->driver_data;
+
+	/* find memory regions */
+	state->char_rom = memory_region(machine, "chargen");
 }
 
 static VIDEO_UPDATE( pc8001 )
@@ -365,6 +380,24 @@ static VIDEO_UPDATE( pc8001 )
 
 static UPD3301_DISPLAY_PIXELS( pc8001_display_pixels )
 {
+	pc8001_state *state = device->machine->driver_data;
+
+	UINT8 data = state->char_rom[(cc << 4) | lc];
+	int i;
+
+	for (i = 0; i < 8; i++)
+	{
+		int color = BIT(data, i);
+
+		*BITMAP_ADDR16(tmpbitmap, y, x + i) = color;
+	}
+}
+
+static WRITE_LINE_DEVICE_HANDLER( pc8001_vrtc_w )
+{
+	pc8001_state *driver_state = device->machine->driver_data;
+
+	driver_state->vrtc = state;
 }
 
 static UPD3301_INTERFACE( pc8001_upd3301_intf )
@@ -375,7 +408,7 @@ static UPD3301_INTERFACE( pc8001_upd3301_intf )
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE(I8257_TAG, i8257_drq2_w),
 	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_LINE(pc8001_vrtc_w)
 };
 
 /* 8251 Interface */
@@ -407,7 +440,7 @@ static I8257_INTERFACE( pc8001_8257_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_read_byte),
-	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER(UPD3301_TAG, upd3301_dack_w), DEVCB_NULL }
 };
@@ -424,6 +457,23 @@ static WRITE_LINE_DEVICE_HANDLER( rtc_data_w )
 static UPD1990A_INTERFACE( pc8001_upd1990a_intf )
 {
 	DEVCB_LINE(rtc_data_w),
+	DEVCB_NULL
+};
+
+/* Centronics Interface */
+
+static WRITE_LINE_DEVICE_HANDLER( ack_w )
+{
+	pc8001_state *driver_state = device->machine->driver_data;
+
+	driver_state->ack = state;
+}
+
+static centronics_interface pc8001_centronics_intf =
+{
+	0,
+	DEVCB_LINE(ack_w),
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -486,6 +536,11 @@ static MACHINE_START( pc8001 )
 //	state_save_register_global(machine, state->);
 }
 
+static MACHINE_START( pc8001mk2 )
+{
+	MACHINE_START_CALL(pc8001);
+}
+
 /* Cassette Configuration */
 
 static const cassette_config pc8001_cassette_config =
@@ -532,7 +587,7 @@ static MACHINE_DRIVER_START( pc8001 )
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8001_upd1990a_intf)
 	MDRV_UPD3301_ADD(UPD3301_TAG, 14318180, pc8001_upd3301_intf)
 
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, pc8001_centronics_intf)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, pc8001_cassette_config)
 
 	MDRV_RAM_ADD("messram")
@@ -546,6 +601,7 @@ static MACHINE_DRIVER_START( pc8001mk2 )
 	MDRV_CPU_MODIFY(Z80_TAG)
 	MDRV_CPU_PROGRAM_MAP(pc8001mk2_mem)
 	MDRV_CPU_IO_MAP(pc8001mk2_io)
+	MDRV_MACHINE_START(pc8001mk2)
 
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
@@ -574,10 +630,11 @@ ROM_START( pc8001mk2 )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
 
 	ROM_REGION( 0x20000, "kanji", 0)
+	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME			PARENT	COMPAT  MACHINE   INPUT    INIT  CONFIG  COMPANY FULLNAME */
-COMP( 1979, pc8001,			0,		0,     pc8001,  pc8001,  0,    0,   "NEC",  "PC-8001", GAME_NOT_WORKING )
-COMP( 1983, pc8001mk2,		pc8001,	0,     pc8001,  pc8001,  0,    0,   "NEC",  "PC-8001mkII", GAME_NOT_WORKING )
+/*    YEAR	NAME			PARENT		COMPAT		MACHINE		INPUT		INIT		CONFIG	COMPANY	FULLNAME		FLAGS */
+COMP( 1979, pc8001,			0,			0,			pc8001,		pc8001,		0,			0,		"NEC",	"PC-8001",		GAME_NOT_WORKING )
+COMP( 1983, pc8001mk2,		pc8001,		0,			pc8001mk2,	pc8001,		0,			0,		"NEC",	"PC-8001mkII",	GAME_NOT_WORKING )

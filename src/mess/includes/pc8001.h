@@ -20,6 +20,10 @@ struct _pc8001_state
 
 	/* video state */
 	UINT8 *char_rom;
+	int vrtc;
+
+	/* printer state */
+	int ack;
 
 	/* devices */
 	const device_config *i8257;
