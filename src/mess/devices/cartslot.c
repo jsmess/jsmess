@@ -80,6 +80,10 @@ static int load_cartridge(const device_config *device, const rom_entry *romrgn, 
 		/* read the ROM */
 		pos = read_length = image_fread(device, ptr, length);
 
+		/* reset the ROM to the initial point. */
+		/* eventually, we could add a flag to allow the ROM to continue instead of restarting whenever a new cart region is present */
+		image_fseek(device, 0, SEEK_SET);
+
 		/* do we need to mirror the ROM? */
 		if (flags & ROM_MIRROR)
 		{
@@ -140,7 +144,7 @@ static int process_cartridge(const device_config *image, process_mode mode)
 {
 	const rom_source *source;
 	const rom_entry *romrgn, *roment;
-	int result;
+	int result = 0;
 
 	for (source = rom_first_source(image->machine->gamedrv, image->machine->config); source != NULL; source = rom_next_source(image->machine->gamedrv, image->machine->config, source))
 	{
@@ -153,8 +157,10 @@ static int process_cartridge(const device_config *image, process_mode mode)
 				{
 					if (strcmp(roment->_hashdata,image->tag)==0)
 					{
-						result = load_cartridge(image, romrgn, roment, mode);
-						if (!result)
+						result |= load_cartridge(image, romrgn, roment, mode);
+
+						/* if loading failed in any cart region, stop loading */
+						if (result)
 							return result;
 					}
 				}
@@ -162,6 +168,7 @@ static int process_cartridge(const device_config *image, process_mode mode)
 			}
 		}
 	}
+
 	return INIT_PASS;
 }
 
