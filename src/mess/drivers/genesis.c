@@ -394,7 +394,7 @@ ROM_END
 
 static DRIVER_INIT( mess_md_common )
 {
-	megadrive_io_read_data_port_ptr	= mess_md_io_read_data_port;
+	megadrive_io_read_data_port_ptr = mess_md_io_read_data_port;
 	megadrive_io_write_data_port_ptr = mess_md_io_write_data_port;
 }
 
@@ -433,18 +433,26 @@ static DRIVER_INIT( mess_32x )
 	DRIVER_INIT_CALL(mess_md_common);
 }
 
+static MACHINE_DRIVER_START( ms_32x )
+	MDRV_IMPORT_FROM( genesis_32x )
+
+	MDRV_IMPORT_FROM( _32x_cartslot )
+MACHINE_DRIVER_END
+
+
 ROM_START( 32x )
 	ROM_REGION16_BE( 0x400000, "gamecart", ROMREGION_ERASE00 ) /* 68000 Code */
+	ROM_CART_LOAD("cart", 0x000000, 0x400000, ROM_NOMIRROR)
 
-	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
-	ROM_COPY( "gamecart", 0x000000, 0x000000, 0x400000)
+	ROM_REGION32_BE( 0x400000, "gamecart_sh2", ROMREGION_ERASE00 ) /* Copy for the SH2 */
+	ROM_CART_LOAD("cart", 0x000000, 0x400000, ROM_NOMIRROR)
 
 	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */
 	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
 
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	// temp, rom should only be visible here when one of the regs is set, tempo needs it
-	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
+	ROM_CART_LOAD("cart", 0x000000, 0x400000, ROM_NOMIRROR)
 	ROM_COPY( "32x_68k_bios", 0x0, 0x0, 0x100)
 
 	ROM_REGION( 0x400000, "32x_master_sh2", 0 ) /* SH2 Code */
@@ -821,7 +829,7 @@ CONS( 1994, picou,      pico,      0,      pico,            pico,   genesis,   0
 CONS( 1993, picoj,      pico,      0,      pico,            pico,   md_jpn,    0,   "Sega",   "Pico (Japan, NTSC)", 0)
 
 /* Not Working */
-CONS( 1994, 32x,        0,         0,      genesis_32x,     md_sel, mess_32x,  0,   "Sega",   "32X", GAME_NOT_WORKING )
+CONS( 1994, 32x,        0,         0,      ms_32x,          md_sel, mess_32x,  0,   "Sega",   "32X", GAME_NOT_WORKING )
 CONS( 1992, segacd,     0,         0,      genesis_scd,     md,     genesis,   0,   "Sega",   "Sega CD (USA, NTSC)", GAME_NOT_WORKING )
 CONS( 1993, megacd,     segacd,    0,      genesis_scd,     md,     md_eur,    0,   "Sega",   "Mega-CD (Europe, PAL)", GAME_NOT_WORKING )
 CONS( 1991, megacdj,    segacd,    0,      genesis_scd,     md,     md_jpn,    0,   "Sega",   "Mega-CD (Japan, NTSC)", GAME_NOT_WORKING )

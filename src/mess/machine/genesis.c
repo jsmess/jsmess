@@ -1274,7 +1274,6 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	return INIT_PASS;
 }
 
-
 /******* Image unloading (with SRAM saving) *******/
 
 static DEVICE_IMAGE_UNLOAD( genesis_cart )
@@ -1287,7 +1286,7 @@ static DEVICE_IMAGE_UNLOAD( genesis_cart )
 	}
 }
 
-
+	
 /******* Cart getinfo *******/
 
 MACHINE_DRIVER_START( genesis_cartslot )
@@ -1296,6 +1295,12 @@ MACHINE_DRIVER_START( genesis_cartslot )
 	MDRV_CARTSLOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(genesis_cart)
 	MDRV_CARTSLOT_UNLOAD(genesis_cart)
+MACHINE_DRIVER_END
+
+MACHINE_DRIVER_START( _32x_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("32x,bin")
+	MDRV_CARTSLOT_MANDATORY
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( pico_cartslot )
