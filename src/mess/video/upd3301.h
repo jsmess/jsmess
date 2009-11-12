@@ -52,8 +52,8 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*upd3301_display_pixels_func)(const device_config *device, bitmap_t *bitmap, int y, int x, UINT8 cc, UINT8 lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa);
-#define UPD3301_DISPLAY_PIXELS(name) void name(const device_config *device, bitmap_t *bitmap, int y, int x, UINT8 cc, UINT8 lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)
+typedef void (*upd3301_display_pixels_func)(const device_config *device, bitmap_t *bitmap, int y, int sx, UINT8 cc, UINT8 lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa);
+#define UPD3301_DISPLAY_PIXELS(name) void name(const device_config *device, bitmap_t *bitmap, int y, int sx, UINT8 cc, UINT8 lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)
 
 typedef struct _upd3301_interface upd3301_interface;
 struct _upd3301_interface

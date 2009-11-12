@@ -11,13 +11,12 @@
 
 	TODO:
 
-	- FIFO
-	- screen display
-	- set_drq
-	- dack_w
-	- interrupts
+	- attributes
+	- N interrupt
 	- light pen
 	- reset counters
+	- proper DMA timing (now the whole screen is transferred at the end of the frame, 
+		accurate timing requires CCLK timer which kills performance)
 
 */
 
@@ -34,10 +33,10 @@
 #define UPD3301_COMMAND_RESET					0x00
 #define UPD3301_COMMAND_START_DISPLAY			0x20
 #define UPD3301_COMMAND_SET_INTERRUPT_MASK		0x40
-#define UPD3301_COMMAND_READ_LIGHT_PEN			0x60
+#define UPD3301_COMMAND_READ_LIGHT_PEN			0x60	/* not supported */
 #define UPD3301_COMMAND_LOAD_CURSOR_POSITION	0x80
 #define UPD3301_COMMAND_RESET_INTERRUPT			0xa0
-#define UPD3301_COMMAND_RESET_COUNTERS			0xc0
+#define UPD3301_COMMAND_RESET_COUNTERS			0xc0	/* not supported */
 
 #define UPD3301_STATUS_VE						0x10
 #define UPD3301_STATUS_U						0x08	/* not supported */
@@ -61,22 +60,37 @@ enum
 typedef struct _upd3301_t upd3301_t;
 struct _upd3301_t
 {
-	devcb_resolved_write_line	out_int_func;
-	devcb_resolved_write_line	out_drq_func;
-	devcb_resolved_write_line	out_hrtc_func;
-	devcb_resolved_write_line	out_vrtc_func;
+	/* callbacks */
+	devcb_resolved_write_line		out_int_func;
+	devcb_resolved_write_line		out_drq_func;
+	devcb_resolved_write_line		out_hrtc_func;
+	devcb_resolved_write_line		out_vrtc_func;
+	upd3301_display_pixels_func		display_func;
 
+	/* screen drawing */
 	const device_config *screen;	/* screen */
-	int width;						/* character width */
+	bitmap_t *bitmap;				/* bitmap */
+	int y;							/* current scanline */
 
-	int mode;
-	UINT8 status;
-	int param_count;
+	/* live state */
+	int mode;						/* command mode */
+	UINT8 status;					/* status register */
+	int param_count;				/* parameter count */
 
-	UINT8 row_buffer[80][2];		/* row buffer */
-	UINT8 fifo[20][2];				/* FIFO */
+	/* FIFOs */
+	UINT8 data_fifo[80][2];			/* row data FIFO */
+	UINT8 attr_fifo[40][2];			/* attribute FIFO */
+	int data_fifo_pos;				/* row data FIFO position */
+	int attr_fifo_pos;				/* attribute FIFO position */
+	int input_fifo;					/* which FIFO is in input mode */
 
+	/* interrupts */
+	int mn;							/* disable special character interrupt */
+	int me;							/* disable end of screen interrupt */
 	int dma_mode;					/* DMA mode */
+
+	/* screen geometry */
+	int width;						/* character width */
 	int h;							/* characters per line */
 	int b;							/* cursor blink time */
 	int l;							/* lines per screen */
@@ -85,15 +99,21 @@ struct _upd3301_t
 	int r;							/* lines per character */
 	int v;							/* vertical blanking height */
 	int z;							/* horizontal blanking width */
+
+	/* attributes */
 	int at1;						/*  */
 	int at0;						/*  */
 	int sc;							/*  */
 	int a;							/* attributes per row */
-	int mn;							/* disable special character interrupt */
-	int me;							/* disable end of screen interrupt */
+	int attr_blink;					/* attribute blink */
+	int attr_frame;					/* attribute blink frame counter */
+
+	/* cursor */
 	int cm;							/* cursor visible */
 	int cx;							/* cursor column */
 	int cy;							/* cursor row */
+	int cursor_blink;				/* cursor blink */
+	int cursor_frame;				/* cursor blink frame counter */
 
 	/* timers */
 	emu_timer *vrtc_timer;			/* vertical sync timer */
@@ -142,6 +162,19 @@ static void set_interrupt(const device_config *device, int state)
 }
 
 /*-------------------------------------------------
+    set_drq - set data request line state
+-------------------------------------------------*/
+
+static void set_drq(const device_config *device, int state)
+{
+	upd3301_t *upd3301 = get_safe_token(device);
+
+	if (LOG) logerror("UPD3301 '%s' DRQ: %u\n", device->tag, state);
+
+	devcb_call_write_line(&upd3301->out_drq_func, state);
+}
+
+/*-------------------------------------------------
     set_display - set display state
 -------------------------------------------------*/
 
@@ -166,10 +199,12 @@ static void set_display(const device_config *device, int state)
 static void reset_counters(const device_config *device)
 {
 	set_interrupt(device, 0);
+	set_drq(device, 0);
 }
 
 /*-------------------------------------------------
-    update_hrtc_timer -
+    update_hrtc_timer - update horizontal retrace
+	timer
 -------------------------------------------------*/
 
 static void update_hrtc_timer(upd3301_t *upd3301, int state)
@@ -185,7 +220,8 @@ static void update_hrtc_timer(upd3301_t *upd3301, int state)
 }
 
 /*-------------------------------------------------
-    update_vrtc_timer -
+    update_vrtc_timer - update vertical retrace
+	timer
 -------------------------------------------------*/
 
 static void update_vrtc_timer(upd3301_t *upd3301, int state)
@@ -198,7 +234,8 @@ static void update_vrtc_timer(upd3301_t *upd3301, int state)
 }
 
 /*-------------------------------------------------
-    recompute_parameters -
+    recompute_parameters - recompute screen
+	geometry parameters
 -------------------------------------------------*/
 
 static void recompute_parameters(const device_config *device)
@@ -283,6 +320,7 @@ READ8_DEVICE_HANDLER( upd3301_r )
 
 	case 1: /* status */
 		data = upd3301->status;
+		upd3301->status &= ~(UPD3301_STATUS_LP | UPD3301_STATUS_E |UPD3301_STATUS_N | UPD3301_STATUS_U);
 		break;
 	}
 
@@ -423,6 +461,7 @@ WRITE8_DEVICE_HANDLER( upd3301_w )
 
 		case UPD3301_COMMAND_RESET_COUNTERS:
 			if (LOG) logerror("UPD3301 '%s' Reset Counters\n", device->tag);
+			upd3301->mode = MODE_RESET_COUNTERS;
 			reset_counters(device);
 			break;
 		}
@@ -439,12 +478,67 @@ WRITE_LINE_DEVICE_HANDLER( upd3301_lpen_w )
 }
 
 /*-------------------------------------------------
+    draw_row - draw character row
+-------------------------------------------------*/
+
+static void draw_row(const device_config *device, bitmap_t *bitmap)
+{
+	upd3301_t *upd3301 = get_safe_token(device);
+	int sx, lc;
+
+	for (lc = 0; lc < upd3301->r; lc++)
+	{
+		for (sx = 0; sx < upd3301->h; sx++)
+		{
+			int y = upd3301->y + lc;
+			UINT8 cc = upd3301->data_fifo[sx][!upd3301->input_fifo];
+			int hlgt = 0;
+			int rvv = 0;
+			int vsp = 0;
+			int sl0 = 0;
+			int sl12 = 0;
+			int csr = upd3301->cm && upd3301->cursor_blink && ((y / upd3301->r) == upd3301->cy) && (sx == upd3301->cx);
+			int gpa = 0;
+
+			upd3301->display_func(device, bitmap, y, sx, cc, lc, hlgt, rvv, vsp, sl0, sl12, csr, gpa);
+		}
+	}
+
+	upd3301->y += upd3301->r;
+}
+
+/*-------------------------------------------------
     upd3301_dack_w - DMA acknowledge write
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( upd3301_dack_w )
 {
-	logerror("DMA WRITE %02x\n", data);
+	upd3301_t *upd3301 = get_safe_token(device);
+
+	if (upd3301->data_fifo_pos < upd3301->h)
+	{
+		upd3301->data_fifo[upd3301->data_fifo_pos][upd3301->input_fifo] = data;
+		upd3301->data_fifo_pos++;
+	}
+	else
+	{
+		upd3301->attr_fifo[upd3301->attr_fifo_pos][upd3301->input_fifo] = data;
+		upd3301->attr_fifo_pos++;
+	}
+
+	if ((upd3301->data_fifo_pos == upd3301->h) && (upd3301->attr_fifo_pos == (upd3301->a << 1)))
+	{
+		upd3301->input_fifo = !upd3301->input_fifo;
+		upd3301->data_fifo_pos = 0;
+		upd3301->attr_fifo_pos = 0;
+		draw_row(device, upd3301->bitmap);
+	}
+
+	if (upd3301->y == (upd3301->l * upd3301->r))
+	{
+		/* end DMA transfer */
+		set_drq(device, 0);
+	}
 }
 
 /*-------------------------------------------------
@@ -457,8 +551,29 @@ void upd3301_update(const device_config *device, bitmap_t *bitmap, const rectang
 
 	if (upd3301->status & UPD3301_STATUS_VE)
 	{
+		upd3301->y = 0;
+		upd3301->bitmap = bitmap;
+		upd3301->data_fifo_pos = 0;
+		upd3301->attr_fifo_pos = 0;
+
+		upd3301->cursor_frame++;
+
+		if (upd3301->cursor_frame == upd3301->b)
+		{
+			upd3301->cursor_frame = 0;
+			upd3301->cursor_blink = !upd3301->cursor_blink;
+		}
+
+		upd3301->attr_frame++;
+
+		if (upd3301->attr_frame == (upd3301->b << 1))
+		{
+			upd3301->attr_frame = 0;
+			upd3301->attr_blink = !upd3301->attr_blink;
+		}
+
 		/* start DMA transfer */
-		//devcb_call_write_line(&upd3301->out_drq_func, 1);
+		set_drq(device, 1);
 	}
 	else
 	{
@@ -486,6 +601,7 @@ static DEVICE_START( upd3301 )
 	assert(upd3301->screen != NULL);
 
 	/* get character width */
+	upd3301->display_func = intf->display_func;
 	upd3301->width = intf->width;
 
 	/* create the timers */
@@ -510,6 +626,10 @@ static DEVICE_RESET( upd3301 )
 	upd3301->r = 10;
 	upd3301->v = 6;
 	upd3301->z = 32;
+	upd3301->status = 0;
+
+	set_interrupt(device, 0);
+	set_drq(device, 0);
 
 	recompute_parameters(device);
 }

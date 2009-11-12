@@ -2,6 +2,7 @@
 
 	http://www2.odn.ne.jp/~haf09260/Pc80/EnrPc.htm
 	http://home1.catvmics.ne.jp/~kanemoto/n80/inside.html
+	http://www.geocities.jp/retro_zzz/machines/nec/8001/index.html
 
 */
 
@@ -9,6 +10,7 @@
 
 	TODO:
 
+	- 8257dma has write modes flipped (should be 1=r, 2=w)
 	- uPD3301
 	- PCG1000
 	- Intel 8251
@@ -83,6 +85,12 @@ static WRITE8_HANDLER( port30_w )
 	*/
 
 	pc8001_state *state = space->machine->driver_data;
+
+	/* characters per line */
+	state->width80 = BIT(data, 0);
+
+	/* color mode */
+	state->color = BIT(data, 1);
 
 	/* cassette motor */
 	cassette_change_state(state->cassette, BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -382,14 +390,36 @@ static UPD3301_DISPLAY_PIXELS( pc8001_display_pixels )
 {
 	pc8001_state *state = device->machine->driver_data;
 
-	UINT8 data = state->char_rom[(cc << 4) | lc];
+	UINT8 data = state->char_rom[(cc << 3) | lc];
 	int i;
 
-	for (i = 0; i < 8; i++)
-	{
-		int color = BIT(data, i);
+	if (lc >= 8) return;
+	if (csr) data = 0xff;
 
-		*BITMAP_ADDR16(tmpbitmap, y, x + i) = color;
+	if (state->width80)
+	{
+		for (i = 0; i < 8; i++)
+		{
+			int color = BIT(data, 7) ^ rvv;
+
+			*BITMAP_ADDR16(bitmap, y, (sx * 8) + i) = color;
+
+			data <<= 1;
+		}
+	}
+	else
+	{
+		if (sx % 2) return;
+
+		for (i = 0; i < 8; i++)
+		{
+			int color = BIT(data, 7) ^ rvv;
+
+			*BITMAP_ADDR16(bitmap, y, (sx/2 * 16) + (i * 2)) = color;
+			*BITMAP_ADDR16(bitmap, y, (sx/2 * 16) + (i * 2) + 1) = color;
+
+			data <<= 1;
+		}
 	}
 }
 
@@ -612,11 +642,11 @@ MACHINE_DRIVER_END
 
 ROM_START( pc8001 )
 	ROM_REGION( 0x6000, "n80", 0 )
-	ROM_SYSTEM_BIOS( 0, "v101", "N80-BASIC v1.01" )
+	ROM_SYSTEM_BIOS( 0, "v101", "N-BASIC v1.01" )
 	ROMX_LOAD( "n80v101.rom", 0x00000, 0x6000, CRC(a2cc9f22) SHA1(6d2d838de7fea20ddf6601660d0525d5b17bf8a3), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "v102", "N80-BASIC v1.02" )
+	ROM_SYSTEM_BIOS( 1, "v102", "N-BASIC v1.02" )
 	ROMX_LOAD( "n80v102.rom", 0x00000, 0x6000, CRC(ed01ca3f) SHA1(b34a98941499d5baf79e7c0e5578b81dbede4a58), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "v110", "N80-BASIC v1.10" )
+	ROM_SYSTEM_BIOS( 2, "v110", "N-BASIC v1.10" )
 	ROMX_LOAD( "n80v110.rom", 0x00000, 0x6000, CRC(1e02d93f) SHA1(4603cdb7a3833e7feb257b29d8052c872369e713), ROM_BIOS(3) )
 
 	ROM_REGION( 0x800, "chargen", 0)

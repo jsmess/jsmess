@@ -21,6 +21,8 @@ struct _pc8001_state
 	/* video state */
 	UINT8 *char_rom;
 	int vrtc;
+	int width80;
+	int color;
 
 	/* printer state */
 	int ack;
