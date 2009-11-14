@@ -357,8 +357,8 @@ DRIVER_INIT( ti99_4p )
 
 	/* set up memory pointers */
 	xRAM_ptr = (UINT16 *) (memory_region(machine, "maincpu") + offset_xram_4p);
-	/*console_GROMs.data_ptr = memory_region(machine, region_grom);*/
-	create_grom_high2k(0x0000, 0x5fff);
+	/* console_GROMs.data_ptr = memory_region(machine, region_grom);
+	create_grom_high2k(0x0000, 0x5fff); */
 }
 
 static const TMS9928a_interface tms9918_interface =
@@ -538,8 +538,9 @@ MACHINE_RESET( ti99 )
 		memory_install_read16_handler(space, 0x9000, 0x93ff, 0, 0, ti99_nop_8_r);
 		memory_install_write16_handler(space, 0x9400, 0x97ff, 0, 0, ti99_nop_8_w);
 	}
-	/* Check whether we have locked the cartslot. */
-	lock_cartridge_slot(cartslots, (input_port_read(machine, "CFG") >> config_cartslot_bit) & config_cartslot_mask);
+	/* Check whether we have locked the cartslot. This uses GROM, which the 4p doesn't have. */
+	if (ti99_model != model_99_4p)
+		lock_cartridge_slot(cartslots, (input_port_read(machine, "CFG") >> config_cartslot_bit) & config_cartslot_mask);
 
 	switch (xRAM_kind)
 	{

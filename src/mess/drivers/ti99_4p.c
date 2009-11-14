@@ -24,6 +24,16 @@
     TODO:
     * Test the system? Call Debug, Call XB16.
     * Implement MEM8 timings.
+
+	2009-11-15
+	This driver found to be hopelessly broken.
+	1. Fixed crash in DRIVER_INIT - was trying to set up GROM when this model doesn't have any.
+	2. Fixed crash in MACHINE_RESET - new cart system depends on GROM.
+	3. Fixed crash when drawing the lower border - screen size changed to the same as ti99_4ev.
+	Now, it produces a black screen.
+	If you use memory view in the debugger, it crashes at 6000 and some higher addresses. This is
+	because the memory map has references to GROM handlers.
+
 */
 
 #include "driver.h"
@@ -260,8 +270,8 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	MDRV_SCREEN_REFRESH_RATE(60)	/* or 50Hz */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512+32, (212+16)*2)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512+32 - 1, 0, (212+16)*2 - 1)
+	MDRV_SCREEN_SIZE(512+32, (212+28)*2)
+	MDRV_SCREEN_VISIBLE_AREA(0, 512+32 - 1, 0, (212+28)*2 - 1)
 
 	MDRV_PALETTE_LENGTH(512)
 
