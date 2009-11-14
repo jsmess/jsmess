@@ -607,6 +607,18 @@ static WRITE8_HANDLER(towns_video_fd90_w)
 /*
  *  Port 0x600-0x607 - Keyboard controller (8042 MCU)
  * 
+ *  Sends two-byte code on each key press and release.
+ *  First byte has the MSB set, and contains shift/ctrl/alt/kana flags
+ *    Known bits:
+ *      bit 7 = always 1
+ *      bit 4 = key release
+ *      bit 3 = ctrl (yet to be confirmed)
+ *      bit 2 = shift (yet to be confirmed)
+ * 
+ *  Second byte has the MSB reset, and contains the scancode of the key 
+ *  pressed or released.
+ *      bit 7 = always 0
+ *      bits 6-0 = key scancode
  */
 static void towns_kb_sendcode(running_machine* machine, UINT8 scancode, int release)
 {
@@ -1631,6 +1643,7 @@ static VIDEO_UPDATE( towns )
 {
 	int x,y;
 	UINT8 colour;
+	UINT32 colourcode;
 	UINT8 row;  // JIS row number
 	UINT16 code;
 	int off = 0;
@@ -1657,6 +1670,21 @@ static VIDEO_UPDATE( towns )
 	}	
 	
 	// draw text layer
+/*
+ *  Text layer format
+ *  2 bytes per character at both 0xc8000 and 0xca000
+ *  0xc8xxx: Byte 1: ASCII character
+ *           Byte 2: Attributes
+ *             bits 2-0: GRB (or is it BRG?)
+ *             bit 3: Inverse
+ *             bit 4: Blink
+ *             bit 5: high brightness
+ *             bits 7-6: Kanji high/low 
+ * 
+ *  If either bits 6 or 7 are high, then a fullwidth Kanji character is displayed
+ *  at this location.  The character displayed is represented by a 2-byte 
+ *  JIS code at the same offset at 0xca000.
+ */
 	if(towns_tvram_enable != 0)
 	{
 		for(y=0;y<40;y++)
@@ -1664,13 +1692,22 @@ static VIDEO_UPDATE( towns )
 			off = 160 * y;
 			for(x=0;x<80;x++)
 			{
-				colour = towns_txtvram[off+1] & 0x0f;
+				colour = towns_txtvram[off+1] & 0x07;
+				if(towns_txtvram[off+1] & 0x20)
+				{  // Bright
+					colourcode = (((colour & 0x02) ? 0xfe : 0x00) << 16)
+						| (((colour & 0x04) ? 0xfe : 0x00) << 8)
+						| ((colour & 0x01) ? 0xfe : 0x00);
+				}
+				else
+				{
+					colourcode = (((colour & 0x02) ? 0x7f : 0x00) << 16)
+						| (((colour & 0x04) ? 0x7f : 0x00) << 8)
+						| ((colour & 0x01) ? 0x7f : 0x00);
+				}
+				
 				if((towns_txtvram[off+1] & 0xc0) != 0)
 				{	// double width
-					// TODO: work out exactly how these map to the font ROM
-					// Numbers are tiles 0x70-0x79
-					// lowercase characters are from tile 0x160
-					// uppercase characters are from tile 0x260
 					if(towns_txtvram[off+1] & 0x40)
 					{
 						row = (towns_txtvram[off+0x2000] - 32);
@@ -1691,19 +1728,13 @@ static VIDEO_UPDATE( towns )
 									+ (((row-16) & 0x70) * 0x60);
 						}
 						drawgfx_transpen_raw(bitmap,cliprect,screen->machine->gfx[1],code,
-							(towns_palette_r[colour] << 16)
-							| (towns_palette_g[colour] << 8)
-							| (towns_palette_b[colour]),
-							0,0,x*8,y*16,0);
+							colourcode,	0,0,x*8,y*16,0);
 					}
 				}
 				else
 				{
 					drawgfx_transpen_raw(bitmap,cliprect,screen->machine->gfx[0],towns_txtvram[off],
-						(towns_palette_r[colour] << 16)
-						| (towns_palette_g[colour] << 8)
-						| (towns_palette_b[colour]),
-						0,0,x*8,y*16,0);
+						colourcode,	0,0,x*8,y*16,0);
 				}
 				off += 2;
 			}
