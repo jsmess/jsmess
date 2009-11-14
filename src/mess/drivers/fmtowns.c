@@ -1215,14 +1215,14 @@ static READ32_HANDLER(towns_rtc_r)
 static WRITE32_HANDLER(towns_rtc_w)
 {
 	if(ACCESSING_BITS_0_7)
-		towns_rtc_data = data;;
+		towns_rtc_data = data;
 }
 
 static WRITE32_HANDLER(towns_rtc_select_w)
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		if(!(data & 0x80))
+		if(data & 0x80)
 		{
 			if(data & 0x01)
 				towns_rtc_select = towns_rtc_data & 0x0f;
