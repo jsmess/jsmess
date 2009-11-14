@@ -99,6 +99,7 @@ INLINE sn76496_state *get_safe_token(const device_config *device)
 		   sound_get_type(device) == SOUND_SN76489 ||
 		   sound_get_type(device) == SOUND_SN76489A ||
 		   sound_get_type(device) == SOUND_SN76494 ||
+		   sound_get_type(device) == SOUND_SN94624 ||
 		   sound_get_type(device) == SOUND_GAMEGEAR ||
 		   sound_get_type(device) == SOUND_SMSIII);
 	return (sn76496_state *)device->token;
