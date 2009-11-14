@@ -612,8 +612,8 @@ static WRITE8_HANDLER(towns_video_fd90_w)
  *    Known bits:
  *      bit 7 = always 1
  *      bit 4 = key release
- *      bit 3 = ctrl (yet to be confirmed)
- *      bit 2 = shift (yet to be confirmed)
+ *      bit 3 = ctrl
+ *      bit 2 = shift
  * 
  *  Second byte has the MSB reset, and contains the scancode of the key 
  *  pressed or released.
@@ -629,10 +629,18 @@ static void towns_kb_sendcode(running_machine* machine, UINT8 scancode, int rele
 		case 0:  // key press
 			towns_kb_output = 0x80;
 			towns_kb_extend = scancode & 0x7f;
+			if(input_port_read(machine,"key3") & 0x00080000)
+				towns_kb_output |= 0x04;
+			if(input_port_read(machine,"key3") & 0x00040000)
+				towns_kb_output |= 0x08;
 			break;
 		case 1:  // key release
 			towns_kb_output = 0x90;
 			towns_kb_extend = scancode & 0x7f;
+			if(input_port_read(machine,"key3") & 0x00080000)
+				towns_kb_output |= 0x04;
+			if(input_port_read(machine,"key3") & 0x00040000)
+				towns_kb_output |= 0x08;
 			break;
 		case 2:  // extended byte
 			towns_kb_output = scancode;
@@ -1809,7 +1817,6 @@ static const upd71071_intf towns_dma_config =
 	{ towns_fdc_dma_w, 0, 0, 0 }
 };
 
-// for debugging
 static const gfx_layout fnt_chars_16x16 =
 {
 	16,16,
@@ -1832,7 +1839,6 @@ static const gfx_layout text_chars =
 	8*16
 };
 
-/* decoded for debugging purpose, this will be nuked in the end... */
 static GFXDECODE_START( towns )
 	GFXDECODE_ENTRY( "user",   0x180000 + 0x3d800, text_chars,  0, 16 )
 	GFXDECODE_ENTRY( "user",   0x180000, fnt_chars_16x16,  0, 16 )
