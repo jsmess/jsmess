@@ -47,7 +47,7 @@ static bitmap_t* lcdbitmap;
 
 #define VERBOSE_LEVEL	(5)
 
-#define ENABLE_VERBOSE_LOG (0)
+#define ENABLE_VERBOSE_LOG (1)
 
 #if ENABLE_VERBOSE_LOG
 INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)
@@ -1047,6 +1047,10 @@ typedef struct
 	INT32 audio_sample_freq;
 	INT32 audio_sample_size;
 
+	UINT16 decode_addr;
+	UINT8 decode_delay;
+	attotime decode_period;
+
 } cdic_regs_t;
 
 #define CDIC_SECTOR_SYNC		0
@@ -1475,43 +1479,55 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 // After an appropriate delay for decoding to take place...
 static TIMER_CALLBACK( audio_sample_trigger )
 {
-	// Indicate that data has been decoded
-	verboselog(machine, 0, "Flagging that audio data has been decoded\n" );
-	cdic_regs.audio_buffer |= 0x8000;
-
-	// Set the CDIC interrupt line
-	verboselog(machine, 0, "Setting CDIC interrupt line for soundmap decode\n" );
-	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
-	cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
-
-	if(CDIC_IS_VALID_SAMPLE_BUF(cdic_regs.z_buffer & 0x3ffe))
+	if(cdic_regs.decode_addr == 0xffff)
 	{
-		attotime period;
+		verboselog(machine, 0, "Decode stop requested, stopping playback\n" );
+		timer_adjust_oneshot(cdic_regs.audio_sample_timer, attotime_never, 0);
+		return;
+	}
 
-		verboselog(machine, 0, "Hit audio_sample_trigger, with cdic_regs.z_buffer == %04x, calling cdic_decode_audio_sector\n", cdic_regs.z_buffer );
+	if(!cdic_regs.decode_delay)
+	{
+		// Indicate that data has been decoded
+		verboselog(machine, 0, "Flagging that audio data has been decoded\n" );
+		cdic_regs.audio_buffer |= 0x8000;
+
+		// Set the CDIC interrupt line
+		verboselog(machine, 0, "Setting CDIC interrupt line for soundmap decode\n" );
+		cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
+		cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
+	}
+	else
+	{
+		cdic_regs.decode_delay = 0;
+	}
+
+	if(CDIC_IS_VALID_SAMPLE_BUF(cdic_regs.decode_addr & 0x3ffe))
+	{
+		verboselog(machine, 0, "Hit audio_sample_trigger, with cdic_regs.decode_addr == %04x, calling cdic_decode_audio_sector\n", cdic_regs.decode_addr );
 
 		// Decode the data at Z+4, the same offset as a normal CD sector.
-		cdic_decode_audio_sector(machine, ((UINT8*)cdram) + (cdic_regs.z_buffer & 0x3ffe) + 4, 1);
+		cdic_decode_audio_sector(machine, ((UINT8*)cdram) + (cdic_regs.decode_addr & 0x3ffe) + 4, 1);
 
 		// Swap buffer positions to indicate our new buffer position at the next read
-		cdic_regs.z_buffer ^= 0x1a00;
-		cdic_regs.data_buffer ^= 0x0001;
+		cdic_regs.decode_addr ^= 0x1a00;
 
-		verboselog(machine, 0, "Updated cdic_regs.z_buffer, new value is %04x\n", cdic_regs.z_buffer );
+		verboselog(machine, 0, "Updated cdic_regs.decode_addr, new value is %04x\n", cdic_regs.decode_addr );
 
 		//// Delay for Frequency * (18*28*2*size in bytes) before requesting more data
 		verboselog(machine, 0, "Data is valid, setting up a new callback\n" );
-		period = attotime_mul(ATTOTIME_IN_HZ(CDIC_SAMPLE_BUF_FREQ(cdic_regs.z_buffer & 0x3ffe)), 18*28*2*CDIC_SAMPLE_BUF_SIZE(cdic_regs.z_buffer & 0x3ffe));
-		timer_adjust_oneshot(cdic_regs.audio_sample_timer, period, 0);
+		cdic_regs.decode_period = attotime_mul(ATTOTIME_IN_HZ(CDIC_SAMPLE_BUF_FREQ(cdic_regs.decode_addr & 0x3ffe)), 18*28*2*CDIC_SAMPLE_BUF_SIZE(cdic_regs.decode_addr & 0x3ffe));
+		timer_adjust_oneshot(cdic_regs.audio_sample_timer, cdic_regs.decode_period, 0);
 		//dmadac_enable(&dmadac[0], 2, 0);
 	}
 	else
 	{
 		// Swap buffer positions to indicate our new buffer position at the next read
-		cdic_regs.z_buffer ^= 0x1a00;
-		cdic_regs.z_buffer &= 0xfffe;
-		verboselog(machine, 0, "Data is not valid, stopping playback\n" );
-		timer_adjust_oneshot(cdic_regs.audio_sample_timer, attotime_never, 0);
+		cdic_regs.decode_addr ^= 0x1a00;
+
+		verboselog(machine, 0, "Data is not valid, indicating to shut down on the next audio sample\n" );
+		cdic_regs.decode_addr = 0xffff;
+		timer_adjust_oneshot(cdic_regs.audio_sample_timer, cdic_regs.decode_period, 0);
 	}
 }
 
@@ -1590,6 +1606,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 	switch(cdic_regs.command)
 	{
 		case 0x23: // Reset Mode 1
+		case 0x24: // Reset Mode 2
 		case 0x29: // Read Mode 1
 		case 0x2a: // Read Mode 2
 		//case 0x2c: // Seek
@@ -1673,6 +1690,9 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				}
 			}
 
+			cdic_regs.data_buffer &= ~0x0004;
+			cdic_regs.data_buffer ^= 0x0001;
+
 			//printf( "%02x\n", buffer[CDIC_SECTOR_SUBMODE2] );
 			if((buffer[CDIC_SECTOR_FILE2] << 8) == cdic_regs.file)
 			{
@@ -1684,10 +1704,8 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 						{
 					 		verboselog(machine, 0, "Audio sector\n" );
 
-							cdic_regs.data_buffer ^= 0x0001;
-
 							cdic_regs.x_buffer |= 0x8000;
-							cdic_regs.data_buffer |= 0x4000;
+							//cdic_regs.data_buffer |= 0x4000;
 							cdic_regs.data_buffer |= 0x0004;
 
 							for(index = 6; index < 2352/2; index++)
@@ -1705,11 +1723,8 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 					}
 					else if((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == 0x00)
 					{
-						cdic_regs.data_buffer ^= 0x0001;
-
-						cdic_regs.data_buffer &= ~0x0004;
 						cdic_regs.x_buffer |= 0x8000;
-						cdic_regs.data_buffer |= 0x4000;
+						//cdic_regs.data_buffer |= 0x4000;
 
 						for(index = 6; index < 2352/2; index++)
 						{
@@ -1732,11 +1747,8 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 					}
 					else /*if(buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_DATA | CDIC_SUBMODE_VIDEO))*/
 					{
-						cdic_regs.data_buffer ^= 0x0001;
-
-						cdic_regs.data_buffer &= ~0x0004;
 						cdic_regs.x_buffer |= 0x8000;
-						cdic_regs.data_buffer |= 0x4000;
+						//cdic_regs.data_buffer |= 0x4000;
 
 						for(index = 6; index < 2352/2; index++)
 						{
@@ -1765,10 +1777,10 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 
 			break;
 		}
-		case 0x24: // Mode 2 Reset
+		//case 0x24: // Mode 2 Reset
 		case 0x2e: // Abort
 			timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
-			cdic_regs.data_buffer &= ~4;
+			//cdic_regs.data_buffer &= ~4;
 			break;
 		case 0x28: // Play CDDA audio
 		{
@@ -1830,7 +1842,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0);
 
 			cdic_regs.x_buffer |= 0x8000;
-			cdic_regs.data_buffer |= 0x4000;
+			//cdic_regs.data_buffer |= 0x4000;
 
 			for(index = 6; index < 2352/2; index++)
 			{
@@ -2071,17 +2083,16 @@ static WRITE16_HANDLER( cdic_w )
 			if(cdic_regs.z_buffer & 0x2000)
 			{
 				attotime period = timer_timeleft(cdic_regs.audio_sample_timer);
-				if(!attotime_is_never(period))
+				if(attotime_is_never(period))
 				{
-					timer_adjust_oneshot(cdic_regs.audio_sample_timer, period, 0);
-				}
-				else
-				{
+					cdic_regs.decode_addr = cdic_regs.z_buffer & 0x3a00;
+					cdic_regs.decode_delay = 1;
 					timer_adjust_oneshot(cdic_regs.audio_sample_timer, ATTOTIME_IN_HZ(75), 0);
 				}
 			}
 			else
 			{
+				cdic_regs.decode_addr = 0xffff;
 				timer_adjust_oneshot(cdic_regs.audio_sample_timer, attotime_never, 0);
 			}
 			break;
@@ -2098,12 +2109,12 @@ static WRITE16_HANDLER( cdic_w )
 			{
 				switch(cdic_regs.command)
 				{
-					case 0x24: // Reset Mode 2
+					//case 0x24: // Reset Mode 2
 					case 0x2e: // Abort
 					{
 						timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
 						dmadac_enable(&dmadac[0], 2, 0);
-						cdic_regs.data_buffer &= 0xbfff;
+						//cdic_regs.data_buffer &= 0xbfff;
 						break;
 					}
 					case 0x2b: // Stop CDDA
@@ -2117,17 +2128,16 @@ static WRITE16_HANDLER( cdic_w )
 					case 0x2c: // Seek
 					{
 						attotime period = timer_timeleft(cdic_regs.interrupt_timer);
-						//if(cdic_regs.command == 0x2c)
-						//{
-						//	cdic_regs.time &= 0xffff0000;
-						//}
 						if(!attotime_is_never(period))
 						{
 							timer_adjust_oneshot(cdic_regs.interrupt_timer, period, 0);
 						}
 						else
 						{
-							timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0);
+							if(cdic_regs.command != 0x23 && cdic_regs.command != 0x24)
+							{
+								timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0);
+							}
 						}
 						break;
 					}
@@ -2161,6 +2171,9 @@ static void cdic_init(running_machine *machine, cdic_regs_t *cdic)
 
 	cdic->audio_sample_freq = 0;
 	cdic->audio_sample_size = 0;
+
+	cdic->decode_addr = 0;
+	cdic->decode_delay = 0;
 }
 
 static void cdic_register_globals(running_machine *machine)
