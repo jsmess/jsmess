@@ -1,5 +1,9 @@
 /*
     Nintendo 64 Video Hardware
+
+    Initial version by Ville Linde
+    Many improvements by Harmony
+    Many improvements by angrylion, Gonetz, Orkin
 */
 
 #include <math.h>
