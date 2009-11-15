@@ -595,7 +595,6 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	fprintf(state.chm_toc, "</BODY></HTML>");
 	fclose(state.chm_toc);
 
-
 	/* create the help project file */
 	s = pool_malloc(state.pool, strlen(dest_dir) + 1 + strlen(help_project_filename) + 1);
 	if (!s)
@@ -621,12 +620,15 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 
 	/* finish up */
 	XML_ParserFree(state.parser);
+	fclose(in);
 	pool_free(state.pool);
 	return state.error ? -1 : 0;
 
 outofmemory:
 	fprintf(stderr, "Out of memory");
 error:
+	if (state.chm_toc) fclose(state.chm_toc);
+	if (in)	fclose(in);
 	return -1;
 }
 

@@ -74,6 +74,7 @@ int main(int argc, char *argv[])
 	buffer = malloc(bytes + 1);
 	if (buffer == NULL)
 	{
+		fclose(src);
 		fprintf(stderr, "Out of memory allocating %d byte buffer\n", bytes);
 		return 1;
 	}
