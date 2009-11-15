@@ -70,7 +70,7 @@ static ADDRESS_MAP_START(interact_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000,0x3fff) AM_ROM  //BANK(2) 
  //   AM_RANGE(0x1000,0x3fff) AM_RAM
 
-	// Vidéo br mapping
+	// VidÃ©o br mapping
 	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE(&videoram)
 	// continous RAM
     AM_RANGE(0x4A00,0xffff) AM_RAM

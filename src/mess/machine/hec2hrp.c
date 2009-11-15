@@ -158,7 +158,7 @@ int i, j, n;
 
 WRITE8_HANDLER( hector_switch_bank_w )
 {
-	if (offset==0x00)	{	// 0x800 et 0x000=> vidéo page, HR
+	if (offset==0x00)	{	// 0x800 et 0x000=> vidÃ©o page, HR
                         	memory_set_bank(space->machine, 1, HECTOR_BANK_VIDEO);
 							if (flag_clk ==1)
 							{
@@ -166,7 +166,7 @@ WRITE8_HANDLER( hector_switch_bank_w )
 								cputag_set_clock(space->machine, "maincpu", XTAL_5MHz);  // Augmentation CPU
 							}
 						}	
-	if (offset==0x04)	{	// 0x804 => vidéo page, BR
+	if (offset==0x04)	{	// 0x804 => vidÃ©o page, BR
 							flag_hr=0;		
                         	memory_set_bank(space->machine, 1, HECTOR_BANK_VIDEO);
 							if (flag_clk ==0)
@@ -235,7 +235,7 @@ else
 {
 	if (write_cassette == 0)
     {
-		// Accée à la cassette
+		// AccÃ©e Ã  la cassette
 		level = cassette_input(cassette_device_image(space->machine));
 
 		// Travail du 741 en trigger
@@ -244,7 +244,7 @@ else
 		if (level > +0.08) 
 			cassette_bit = 0x01;
 	}
-    // Programme du sn7474 (bascule) : Changement état bit Data K7 à chaque front montant de cassette_bit
+    // Programme du sn7474 (bascule) : Changement Ã©tat bit Data K7 Ã  chaque front montant de cassette_bit
     if ((cassette_bit != cassette_bit_mem) && (cassette_bit !=0)) 
     {
 	    if (Data_K7 == 0x00)
@@ -253,7 +253,7 @@ else
 		    Data_K7 =  0x00;
     }
 	value = ( CK_signal & 0x7F ) + Data_K7;
-    cassette_bit_mem = cassette_bit;  // Mémorisation état bit cassette
+    cassette_bit_mem = cassette_bit;  // MÃ©morisation Ã©tat bit cassette
 }
 return value;
 } 
@@ -498,11 +498,11 @@ void Init_Value_SN76477_Hector(void)
      Pin_Value[10][1]= RES_K(180.0);   // 180
      Pin_Value[10][0]= RES_K(32.054); // 32.054 (180 // 39 KOhm)
      
-     // Version 3 : Ajusté pour les frequences mesurées :
-                // 4  0 SOUND 255 Hz => ajusté à l'oreille
-                // 4  4 SOUND  65 Hz => ajusté à l'oreille 
-                // 4  8 SOUND  17 Hz =>  ajusté à l'oreille
-                // 4 12 SOUND 4,3 Hz =>  ajusté à l'oreille
+     // Version 3 : AjustÃ© pour les frequences mesurÃ©es :
+                // 4  0 SOUND 255 Hz => ajustÃ© Ã  l'oreille
+                // 4  4 SOUND  65 Hz => ajustÃ© Ã  l'oreille 
+                // 4  8 SOUND  17 Hz =>  ajustÃ© Ã  l'oreille
+                // 4 12 SOUND 4,3 Hz =>  ajustÃ© Ã  l'oreille
      // SLF C       Version 3
      Pin_Value[21][0]= CAP_U(0.1);  //CAPU(0.1) vu
      Pin_Value[21][1]= CAP_U(1.1);  //1.1
@@ -512,7 +512,7 @@ void Init_Value_SN76477_Hector(void)
      Pin_Value[20][0]= RES_K(37.268); //37.268 (47//180 KOhms)
 
      // Capa VCO    
-     // Version 3 : Ajusté pour les frequences mesurées :
+     // Version 3 : AjustÃ© pour les frequences mesurÃ©es :
              // 0 0  SOUND 5,5KHz => 5,1KHz
              // 0 16 SOUND 1,3KHz => 1,2KHz
              // 0 32 SOUND 580Hz  => 570Hz
@@ -539,7 +539,7 @@ void Init_Value_SN76477_Hector(void)
      //setOneShot(R24, C23)
      // R OneShot
      Pin_Value[24][1] = RES_K(100);  //0
-     Pin_Value[24][0] = RES_K(1000);  //RES_M(1) infini sur Hector car non connectée
+     Pin_Value[24][0] = RES_K(1000);  //RES_M(1) infini sur Hector car non connectÃ©e
 
      // Capa OneShot
      Pin_Value[23][0] = 1.0;  //0     0.1 (0) et 0.0 (1)
@@ -557,12 +557,12 @@ void Init_Value_SN76477_Hector(void)
      Pin_Value[6][0] = CAP_U(0.390);    // 0.390
      Pin_Value[6][1] = CAP_U(08.60);    // 0.48
 
-     // Valeur corrigé par rapport au schéma : 
+     // Valeur corrigÃ© par rapport au schÃ©ma : 
      Pin_Value[5][1] = RES_K(3.30 ) ;     // 330Kohm
      Pin_Value[5][0] = RES_K(1.76 ) ;     // 76 Kohm
      
-     // Noise pas commandé par le bus audio ! 
-	 // Seule la valeur [0] est documentée !
+     // Noise pas commandÃ© par le bus audio ! 
+	 // Seule la valeur [0] est documentÃ©e !
      Pin_Value[4][0] = RES_K(47) ;      // 47 K ohm
      Pin_Value[12][0] = RES_K(100);     // 100K ohm
      Pin_Value[3][0] = 0 ;              // NC
@@ -574,7 +574,7 @@ void Init_Value_SN76477_Hector(void)
      Pin_Value[28][0] = 0; 
      Pin_Value[28][1] = 1; 
      
-     // Initialisation à 0 des pin du SN
+     // Initialisation Ã  0 des pin du SN
      AU[0]=0;
      AU[1]=0;     
      AU[2]=0;
@@ -602,7 +602,7 @@ void Update_Sound(const address_space *space, UINT8 data)
 	// MIXER
 	sn76477_mixer_a_w(sn76477, ((ValMixer & 0x04)==4) ? 1 : 0);
 	sn76477_mixer_b_w(sn76477, ((ValMixer & 0x01)==1) ? 1 : 0);
-	sn76477_mixer_c_w(sn76477, ((ValMixer & 0x02)==2) ? 1 : 0);// Revu selon mesure électronique
+	sn76477_mixer_c_w(sn76477, ((ValMixer & 0x02)==2) ? 1 : 0);// Revu selon mesure Ã©lectronique
 
     // VCO oscillateur
     if (AU[12]==1)

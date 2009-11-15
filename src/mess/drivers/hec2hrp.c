@@ -43,7 +43,7 @@
 //  (left)7                     (right)9
 //               (down)8
 //
-// Fire <-> or <≤>
+// Fire <-> or <¬≤>
 // Pot => INS /SUPPR
 // Cassete : wav file (1 way, 16 bits, 44100hz)
 
@@ -87,11 +87,11 @@ static ADDRESS_MAP_START(hec2hrp_mem, ADDRESS_SPACE_PROGRAM, 8)
     // Main ROM page 
 	AM_RANGE(0x0000,0x3fff) AM_ROMBANK(2) 
 
-	// VidÈo br mapping
+	// Vid√©o br mapping
 	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE(&videoram)
 	// continous RAM
     AM_RANGE(0x4A00,0xbfff) AM_RAM
-	// from 0xC000 to 0xFFFF => Bank Ram for vidÈo and data !
+	// from 0xC000 to 0xFFFF => Bank Ram for vid√©o and data !
 	AM_RANGE(0xc000,0xffff) AM_RAMBANK(1)
 ADDRESS_MAP_END
 

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////
-///// Hector vidéo
+///// Hector vidÃ©o
 /////////////////////////////////////////////////////////////////////////////////
 /*      Hector 2HR+
         Victor
@@ -49,7 +49,7 @@ void Init_Hector_Palette( running_machine  *machine)
     Col2 = 7; // Point interrogation (Blanc)
     Col3 = 3; // Ecriture de choix (jaune)
 
-	// Color initialisation : full luminosité
+	// Color initialisation : full luminositÃ©
 	palette_set_color( machine, 0,MAKE_RGB(000,000,000));//Noir
 	palette_set_color( machine, 1,MAKE_RGB(255,000,000));//Rouge
 	palette_set_color( machine, 2,MAKE_RGB(000,255,000));//Vert
@@ -58,7 +58,7 @@ void Init_Hector_Palette( running_machine  *machine)
 	palette_set_color( machine, 5,MAKE_RGB(255,000,255));//Magneta
 	palette_set_color( machine, 6,MAKE_RGB(000,255,255));//Cyan
 	palette_set_color( machine, 7,MAKE_RGB(255,255,255));//Blanc
-	// 1/2 luminosité
+	// 1/2 luminositÃ©
 	palette_set_color( machine, 8,MAKE_RGB(000,000,000));//Noir
 	palette_set_color( machine, 9,MAKE_RGB(128,000,000));//Rouge
 	palette_set_color( machine,10,MAKE_RGB(000,128,000));//Vert
