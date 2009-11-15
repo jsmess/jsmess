@@ -37,6 +37,9 @@ System Driver Changes:
 
 - [TI85/TI86] Converted the serial interface to a device. [Wilbert Pol]
 
+- [TI99] Fixed a crash when the user mounts cartridge dump files in legacy
+  mode.  [Michael Zapf]
+
 
 
 Imgtool Changes:

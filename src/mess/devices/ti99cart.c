@@ -2685,6 +2685,10 @@ READ8_DEVICE_HANDLER( ti99_multicart_cru_r )
 
 	int slot = cartslots->active_slot;
 
+	/* We don't support this cartridge type in the legacy mode. */
+	if (in_legacy_mode(device))
+		return 0;
+	
 	/* Sanity check. Higher slots are always empty. */
 	if (slot >= NUMBER_OF_CARTRIDGE_SLOTS)
 		return 0;
@@ -2713,6 +2717,10 @@ WRITE8_DEVICE_HANDLER( ti99_multicart_cru_w )
 	cartridge_t *cart;
 
 	int slot = cartslots->active_slot;
+
+	/* We don't support this cartridge type in the legacy mode. */
+	if (in_legacy_mode(device))
+		return;
 
 	/* Sanity check. Higher slots are always empty. */
 	if (slot >= NUMBER_OF_CARTRIDGE_SLOTS)
