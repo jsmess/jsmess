@@ -2443,16 +2443,15 @@ INLINE void divot_filter16_buffer(int* r, int* g, int* b, COLOR* vibuffer)
 	filtered.b = *b;
 }
 
-// Fix me for endianness.
+// Fix me.
 INLINE void restore_filter16(int* r, int* g, int* b, UINT16* fbuff, UINT32 fbuff_index, UINT32 hres)
 {
-	UINT32 hresdiff = hres << 1;
-	UINT32 addr = (UINT32)fbuff;
-	UINT32 Lsw = fbuff_index & 1;
+	INT32 hresdiff = (INT32)hres << 1;
+	INT32 Lsw = fbuff_index & 1;
 	INT32 pixdiff = Lsw ? 6 : -2;
-	UINT32 leftuppix = (addr - hresdiff - pixdiff);
-	UINT32 leftdownpix = (addr + hresdiff - pixdiff);
-	UINT32 toleftpix = (addr - pixdiff);
+	INT32 leftuppix = -hresdiff - pixdiff;
+	INT32 leftdownpix = hresdiff - pixdiff;
+	INT32 toleftpix = -pixdiff;
 	UINT8 tempr, tempg, tempb;
 	UINT16 pix;
 	int i;
@@ -2466,7 +2465,7 @@ INLINE void restore_filter16(int* r, int* g, int* b, UINT16* fbuff, UINT32 fbuff
 
 	for (i = 0; i < 3; i++)
 	{
-		pix = *(UINT16*)leftuppix;
+		pix = fbuff[leftuppix ^ 1];
 		tempr = (((pix >> 11) & 0x1f) << 3);
 		tempg = (((pix >> 6) & 0x1f) << 3);
 		tempb = (((pix >> 1) & 0x1f) << 3);
@@ -2502,7 +2501,7 @@ INLINE void restore_filter16(int* r, int* g, int* b, UINT16* fbuff, UINT32 fbuff
 
 	for (i = 0; i < 3; i++)
 	{
-		pix = *(UINT16*)leftdownpix;
+		pix = fbuff[leftdownpix ^ 1];
 		tempr = (((pix >> 11) & 0x1f) << 3);
 		tempg = (((pix >> 6) & 0x1f) << 3);
 		tempb = (((pix >> 1) & 0x1f) << 3);
@@ -2539,7 +2538,7 @@ INLINE void restore_filter16(int* r, int* g, int* b, UINT16* fbuff, UINT32 fbuff
 	{
 		if (!(i & 1))
 		{
-			pix = *(UINT16*)toleftpix;
+			pix = fbuff[toleftpix ^ 1];
 			tempr = (((pix >> 11) & 0x1f) << 3);
 			tempg = (((pix >> 6) & 0x1f) << 3);
 			tempb = (((pix >> 1) & 0x1f) << 3);
