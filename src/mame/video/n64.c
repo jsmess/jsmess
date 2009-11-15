@@ -289,8 +289,8 @@ INLINE UINT32 z_compare(void* fb, UINT8* hb, UINT16* zb, UINT8* zhb, UINT32 sz, 
 INLINE INT32 normalize_dzpix(INT32 sum);
 INLINE INT32 CLIP(INT32 value,INT32 min,INT32 max);
 INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres);
-INLINE void divot_filter16(INT32* r, INT32* g, INT32* b, UINT16* fbuff);
-INLINE void restore_filter16(INT32* r, INT32* g, INT32* b, UINT16* fbuff, UINT32 hres);
+INLINE void divot_filter16(INT32* r, INT32* g, INT32* b, UINT16* fbuff, UINT32 fbuff_index);
+INLINE void restore_filter16(INT32* r, INT32* g, INT32* b, UINT16* fbuff, UINT32 fbuff_index, UINT32 hres);
 INLINE UINT32 getlog2(UINT32 lod_clamp);
 INLINE void set_shade_for_rects(void);
 INLINE void set_shade_for_tris(UINT32 shade);
@@ -663,7 +663,7 @@ VIDEO_UPDATE(n64)
 							}
 							else
 							{
-								restore_filter16(&r, &g, &b, &frame_buffer[pixels ^ WORD_ADDR_XOR], n64_vi_width);
+								restore_filter16(&r, &g, &b, &frame_buffer[pixels ^ WORD_ADDR_XOR], pixels ^ WORD_ADDR_XOR, n64_vi_width);
 							}
 						}
 						if (i > 0 && i < (hres - 1) && divot && (curpixel_cvg != 7 || prev_cvg != 7 || next_cvg != 7))
@@ -674,7 +674,7 @@ VIDEO_UPDATE(n64)
 							}
 							else
 							{
-								divot_filter16(&r, &g, &b, &frame_buffer[pixels ^ WORD_ADDR_XOR]);
+								divot_filter16(&r, &g, &b, &frame_buffer[pixels ^ WORD_ADDR_XOR], pixels ^ WORD_ADDR_XOR);
 							}
 						}
 
@@ -2342,15 +2342,14 @@ INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres)
 }
 
 // This needs to be fixed for endianness.
-INLINE void divot_filter16(INT32* r, INT32* g, INT32* b, UINT16* fbuff)
+INLINE void divot_filter16(INT32* r, INT32* g, INT32* b, UINT16* fbuff, UINT32 fbuff_index)
 {
 	UINT32 leftr, leftg, leftb, rightr, rightg, rightb;
 	UINT16 leftpix, rightpix;
 	UINT16* next, *prev;
-	UINT32 addr = (UINT32)fbuff;
-	UINT32 Lsw = (addr >> 1) & 1;
-	next = (Lsw) ? (UINT16*)(addr - 2) : (UINT16*)(addr + 6);
-	prev = (Lsw) ? (UINT16*)(addr - 6) : (UINT16*)(addr + 2);
+	UINT32 Lsw = fbuff_index & 1;
+	next = (Lsw) ? (UINT16*)(fbuff - 1) : (UINT16*)(fbuff + 3);
+	prev = (Lsw) ? (UINT16*)(fbuff - 3) : (UINT16*)(fbuff + 1);
 	leftpix = *prev;
 	rightpix = *next;
 
@@ -2437,11 +2436,11 @@ INLINE void divot_filter16_buffer(int* r, int* g, int* b, COLOR* vibuffer)
 }
 
 // Fix me for endianness.
-INLINE void restore_filter16(int* r, int* g, int* b, UINT16* fbuff, UINT32 hres)
+INLINE void restore_filter16(int* r, int* g, int* b, UINT16* fbuff, UINT32 fbuff_index, UINT32 hres)
 {
 	UINT32 hresdiff = hres << 1;
 	UINT32 addr = (UINT32)fbuff;
-	UINT32 Lsw = (addr >> 1) & 1;
+	UINT32 Lsw = fbuff_index & 1;
 	INT32 pixdiff = Lsw ? 6 : -2;
 	UINT32 leftuppix = (addr - hresdiff - pixdiff);
 	UINT32 leftdownpix = (addr + hresdiff - pixdiff);
