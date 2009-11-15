@@ -26,7 +26,7 @@ static ADDRESS_MAP_START( n64_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x04600000, 0x046fffff) AM_READWRITE(n64_pi_reg_r, n64_pi_reg_w)	// Peripheral Interface
 	AM_RANGE(0x04700000, 0x047fffff) AM_READWRITE(n64_ri_reg_r, n64_ri_reg_w)	// RDRAM Interface
 	AM_RANGE(0x04800000, 0x048fffff) AM_READWRITE(n64_si_reg_r, n64_si_reg_w)	// Serial Interface
-	AM_RANGE(0x08000000, 0x08007fff) AM_RAM										// Cartridge SRAM
+	//AM_RANGE(0x08000000, 0x08007fff) AM_RAM										// Cartridge SRAM
 	AM_RANGE(0x10000000, 0x13ffffff) AM_ROM AM_REGION("user2", 0)	// Cartridge
 	AM_RANGE(0x1fc00000, 0x1fc007bf) AM_ROM AM_REGION("user1", 0)	// PIF ROM
 	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_READWRITE(n64_pif_ram_r, n64_pif_ram_w)
@@ -155,11 +155,19 @@ static MACHINE_DRIVER_START( n64 )
 	MDRV_CARTSLOT_LOAD(n64_cart)
 MACHINE_DRIVER_END
 
-ROM_START( n64)
+ROM_START( n64 )
     ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for R4300 */
+
     ROM_REGION32_BE( 0x800, "user1", 0 )
     ROM_LOAD( "pifdata.bin", 0x0000, 0x0800, CRC(5ec82be9) SHA1(9174eadc0f0ea2654c95fd941406ab46b9dc9bdd) )
+
     ROM_REGION32_BE( 0x4000000, "user2", ROMREGION_ERASEFF)
+
+	ROM_REGION16_BE( 0x80, "normpoint", 0 )
+    ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
+
+	ROM_REGION16_BE( 0x80, "normslope", 0 )
+    ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 ROM_END
 
 CONS(1996, n64, 	0,		0,		n64, 	n64, 	0,	0,	"Nintendo", "Nintendo 64", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
