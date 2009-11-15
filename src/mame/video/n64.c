@@ -2142,12 +2142,9 @@ INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres)
 	UINT32 backr[7], backg[7], backb[7];
 	UINT32 invr[7], invg[7], invb[7];
 	INT32 coeff;
-	UINT16 *leftuppix = vbuff + ((-hres - 4) ^ 2);
-	UINT16 *leftdownpix = vbuff + ((hres - 4) ^ 2);
-	UINT16 *toleftpix = vbuff + ((-4) ^ 2);
-	UINT8 *leftupcvg = hbuff + ((hres - 2) ^ BYTE_ADDR_XOR);
-	UINT8 *leftdowncvg = hbuff + ((hres - 2) ^ BYTE_ADDR_XOR);
-	UINT8 *toleftcvg = hbuff + ((-2) ^ BYTE_ADDR_XOR);
+	UINT32 leftup = -hres - 2;
+	UINT32 leftdown = hres - 2;
+	UINT32 toleft = -2;
 	UINT32 colr, colg, colb;
 	UINT32 enb;
 	int i = 0;
@@ -2169,9 +2166,9 @@ INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres)
 
 	for(i = 0; i < 5; i++)
 	{
-		pix = *leftuppix;//*(UINT16*)(leftuppix ^ 2);
-		cvg = *leftupcvg & 3;//(*(UINT8*)(leftupcvg ^ BYTE_ADDR_XOR)) & 3;
-		if  (i& 1)
+		pix = vbuff[leftup ^ WORD_ADDR_XOR];
+		cvg = hbuff[leftup ^ BYTE_ADDR_XOR] & 3;
+		if(i & 1)
 		{
 			if (cvg == 3 && (pix & 1))
 			{
@@ -2190,14 +2187,13 @@ INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres)
 			}
 			numoffull++;
 		}
-		leftuppix += 2;
-		leftupcvg++;
+		leftup++;
 	}
 
 	for(i = 0; i < 5; i++)
 	{
-		pix = *leftdownpix;
-		cvg = *leftdowncvg & 3;
+		pix = vbuff[leftdown ^ WORD_ADDR_XOR];
+		cvg = hbuff[leftdown ^ BYTE_ADDR_XOR] & 3;
 		if (i&1)
 		{
 			if (cvg == 3 && (pix & 1))
@@ -2217,14 +2213,13 @@ INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres)
 			}
 			numoffull++;
 		}
-		leftdownpix += 2;
-		leftdowncvg++;
+		leftdown++;
 	}
 
 	for(i = 0; i < 5; i++)
 	{
-		pix = *toleftpix;
-		cvg = *toleftcvg & 3;
+		pix = vbuff[toleft ^ WORD_ADDR_XOR];
+		cvg = hbuff[toleft ^ BYTE_ADDR_XOR] & 3;
 		if (!(i&3))
 		{
 			if (cvg == 3 && (pix & 1))
@@ -2244,8 +2239,7 @@ INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres)
 			}
 			numoffull++;
 		}
-		toleftpix += 2;
-		toleftcvg++;
+		toleft++;
 	}
 
 	if (numoffull != 7)
@@ -5781,7 +5775,8 @@ INLINE void BLENDER_EQUATION(INT32* r, INT32* g, INT32* b, int cycle, int bsel_s
 
 INLINE UINT32 addrightcvg(UINT32 x, UINT32 k)
 {
-#undef FULL_SUBPIXELS
+//#undef FULL_SUBPIXELS
+#define FULL_SUBPIXELS
 	UINT32 coveredsubpixels=((x >> 14) & 3);
 	if (!(x & 0xffff))
 	{
