@@ -5614,7 +5614,7 @@ void rdp_process_list(running_machine *machine)
 	// load command data
 	for (i=0; i < length; i += 4)
 	{
-		rdp_cmd_data[rdp_cmd_ptr++] = READ_RDP_DATA(dp_current + i);
+		rdp_cmd_data[rdp_cmd_ptr++] = READ_RDP_DATA((dp_current & 0x1fffffff) + i);
 		if (rdp_cmd_ptr >= 0x1000)
 		{
 			fatalerror("rdp_process_list: rdp_cmd_ptr overflow\n");
