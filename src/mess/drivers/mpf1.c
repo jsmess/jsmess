@@ -370,6 +370,7 @@ static MACHINE_DRIVER_START( mpf1p )
 	MDRV_CPU_PROGRAM_MAP(mpf1p_map)
 	MDRV_CPU_IO_MAP(mpf1_io_map)
 
+	MDRV_MACHINE_START( mpf1 )
 	MDRV_MACHINE_RESET( mpf1 )
 
 	/* video hardware */
