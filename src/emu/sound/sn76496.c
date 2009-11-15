@@ -44,6 +44,10 @@
   for the taps), and added R->OldNoise to simulate the extra 0 that is always
   output before the noise LFSR contents are after an LFSR reset.
   This fixes SN76489/A to match chips. Added SN94624.
+  
+  14/11/2009 : Lord Nightmare
+  Removed STEP mess, vastly simplifying the code. Made output bipolar rather
+  than always above the 0 line.
 
   TODO: * Implement a function for setting stereo regs for the game gear.
           Requires making the core support both mono and stereo, and have
@@ -65,8 +69,7 @@
 #include "sn76496.h"
 
 
-#define MAX_OUTPUT 0x7fff
-#define STEP 0x10000
+#define MAX_OUTPUT 0x3fff
 #define NOISEMODE (R->Register[6]&4)?1:0
 
 
@@ -149,8 +152,7 @@ WRITE8_DEVICE_HANDLER( sn76496_w )
 		case 2:	/* tone 1 : frequency */
 		case 4:	/* tone 2 : frequency */
 		    if ((data & 0x80) == 0) R->Register[r] = (R->Register[r] & 0x0f) | ((data & 0x3f) << 4);
-			R->Period[c] = STEP * R->Register[r];
-			if (R->Period[c] == 0) R->Period[c] = STEP;
+			R->Period[c] = R->Register[r];
 			if (r == 4)
 			{
 				/* update noise shift frequency */
@@ -170,7 +172,7 @@ WRITE8_DEVICE_HANDLER( sn76496_w )
 			        if ((data & 0x80) == 0) R->Register[r] = (R->Register[r] & 0x3f0) | (data & 0x0f);
 				n = R->Register[6];
 				/* N/512,N/1024,N/2048,Tone #3 output */
-				R->Period[3] = ((n&3) == 3) ? 2 * R->Period[2] : (STEP << (5+(n&3)));
+				R->Period[3] = ((n&3) == 3) ? 2 * R->Period[2] : (1 << (5+(n&3)));
 			        /* Reset noise shifter */
 				R->RNG = R->FeedbackMask;
 				R->OldNoise = 0;
@@ -181,8 +183,6 @@ WRITE8_DEVICE_HANDLER( sn76496_w )
 	}
 }
 
-
-
 static STREAM_UPDATE( SN76496Update )
 {
 	int i;
@@ -190,113 +190,64 @@ static STREAM_UPDATE( SN76496Update )
 	stream_sample_t *buffer = outputs[0];
 
 
-	/* If the volume is 0, increase the counter; this is more or less
-    a speedup hack for when silence is to be output */
-	for (i = 0;i < 4;i++)
-	{
-		if (R->Volume[i] == 0)
-		{
-			/* note that I do count += samples, NOT count = samples + 1.
-            You might think it's the same since the volume is 0, but doing
-            the latter could cause interferencies when the program is
-            rapidly modulating the volume. */
-			if (R->Count[i] <= samples*STEP) R->Count[i] += samples*STEP;
-		}
-	}
-
 	while (samples > 0)
 	{
-		int vol[4];
-		unsigned int out;
-		int left;
+	// clock chip once
+		INT16 out;
 
 		/* decrement Cycles to READY by one */
 		if (R->CyclestoREADY >0) R->CyclestoREADY--;
 
-		/* vol[] keeps track of how long each square wave stays */
-		/* in the 1 position during the sample period. */
-		vol[0] = vol[1] = vol[2] = vol[3] = 0;
-
+		// handle channels 0,1,2
 		for (i = 0;i < 3;i++)
 		{
-			if (R->Output[i]) vol[i] += R->Count[i];
-			R->Count[i] -= STEP;
-			/* Period[i] is the half period of the square wave. Here, in each
-            loop I add Period[i] twice, so that at the end of the loop the
-            square wave is in the same status (0 or 1) it was at the start.
-            vol[i] is also incremented by Period[i], since the wave has been 1
-            exactly half of the time, regardless of the initial position.
-            If we exit the loop in the middle, Output[i] has to be inverted
-            and vol[i] incremented only if the exit status of the square
-            wave is 1. */
-			while (R->Count[i] <= 0)
+			R->Count[i]--;
+			if (R->Count[i] < 0)
 			{
-				R->Count[i] += R->Period[i];
-				if (R->Count[i] > 0)
-				{
-					R->Output[i] ^= 1;
-					if (R->Output[i]) vol[i] += R->Period[i];
-					break;
-				}
-				R->Count[i] += R->Period[i];
-				vol[i] += R->Period[i];
+				R->Output[i] ^= 1;
+				R->Count[i] = R->Period[i];
 			}
-			if (R->Output[i]) vol[i] -= R->Count[i];
 		}
 
-		left = STEP;
-		do
+		// handle channel 3
+		R->Count[3]--;
+		if (R->Count[3] <= 0)
 		{
-			int nextevent;
-
-
-			if (R->Count[3] < left) nextevent = R->Count[3];
-			else nextevent = left;
-
-			if (R->Output[3]) vol[3] += R->Count[3];
-			R->Count[3] -= nextevent;
-			if (R->Count[3] <= 0)
+			if (NOISEMODE == 1) /* White Noise Mode */
 			{
-		        if (NOISEMODE == 1) /* White Noise Mode */
-		        {
-			        if ((((R->RNG & R->WhitenoiseTaps) != R->WhitenoiseTaps) && ((R->RNG & R->WhitenoiseTaps) != 0)) ^ R->FeedbackInvert ) /* XOR or XNOR */
-					{
-				        R->RNG >>= 1;
-				        R->RNG |= R->FeedbackMask;
-					}
-					else
-					{
-				        R->RNG >>= 1;
-					}
-				}
-				else /* Periodic noise mode */
+				if ((((R->RNG & R->WhitenoiseTaps) != R->WhitenoiseTaps) && ((R->RNG & R->WhitenoiseTaps) != 0)) ^ R->FeedbackInvert ) /* XOR or XNOR */
 				{
-			        if (R->RNG & 1)
-					{
-				        R->RNG >>= 1;
-				        R->RNG |= R->FeedbackMask;
-					}
-					else
-					{
-				        R->RNG >>= 1;
-					}
+					R->RNG >>= 1;
+					R->RNG |= R->FeedbackMask;
 				}
-				R->Output[3] = R->OldNoise;
-				R->OldNoise = R->RNG & 1;
-				R->Count[3] += R->Period[3];
-				if (R->Output[3]) vol[3] += R->Period[3];
+				else
+				{
+					R->RNG >>= 1;
+				}
 			}
-			if (R->Output[3]) vol[3] -= R->Count[3];
+			else /* Periodic noise mode */
+			{
+				if (R->RNG & 1)
+				{
+					R->RNG >>= 1;
+					R->RNG |= R->FeedbackMask;
+				}
+				else
+				{
+					R->RNG >>= 1;
+				}
+			}
+			R->Output[3] = R->OldNoise;
+			R->OldNoise = R->RNG & 1;
+			R->Count[3] = R->Period[3];
+		}
 
-			left -= nextevent;
-		} while (left > 0);
+		out = (R->Output[0]?R->Volume[0]:(0-R->Volume[0]))
+			+(R->Output[1]?R->Volume[1]:(0-R->Volume[1]))
+			+(R->Output[2]?R->Volume[2]:(0-R->Volume[2]))
+			+(R->Output[3]?R->Volume[3]:(0-R->Volume[3]));
 
-		out = vol[0] * R->Volume[0] + vol[1] * R->Volume[1] +
-				vol[2] * R->Volume[2] + vol[3] * R->Volume[3];
-
-		if (out > MAX_OUTPUT * STEP) out = MAX_OUTPUT * STEP;
-
-		*(buffer++) = out / STEP;
+		*(buffer++) = out;
 
 		samples--;
 	}
@@ -349,8 +300,7 @@ static int SN76496_init(const device_config *device, sn76496_state *R)
 
 	for (i = 0;i < 4;i++)
 	{
-		R->Output[i] = 0;
-		R->Period[i] = R->Count[i] = STEP;
+		R->Output[i] = R->Period[i] = R->Count[i] = 0;
 	}
 
 	/* Default is SN76489 non-A */
