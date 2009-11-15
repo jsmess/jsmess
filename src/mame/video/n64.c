@@ -1767,9 +1767,9 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 						UINT16 k = tlut[ c << 2];
 						if (!other_modes.tlut_type)
 						{
-							color->r = (((c >> 11) & 0x1f) << 3) | (((c >> 11) & 0x1f) >> 2);
-							color->g = (((c >>  6) & 0x1f) << 3) | (((c >>  6) & 0x1f) >> 2);
-							color->b = (((c >>  1) & 0x1f) << 3) | (((c >>  1) & 0x1f) >> 2);
+							color->r = (((k >> 11) & 0x1f) << 3) | (((k >> 11) & 0x1f) >> 2);
+							color->g = (((k >>  6) & 0x1f) << 3) | (((k >>  6) & 0x1f) >> 2);
+							color->b = (((k >>  1) & 0x1f) << 3) | (((k >>  1) & 0x1f) >> 2);
 							color->a = (k & 1) ? 0xff : 0;
 						}
 						else
