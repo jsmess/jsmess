@@ -562,7 +562,7 @@ VIDEO_UPDATE(n64)
 	}
 
 	frame_buffer = (UINT16*)&rdram[(n64_vi_origin & 0xffffff) >> 2];
-	hb = ((UINT32)frame_buffer - (UINT32)rdram) >> 1;
+	hb = ((n64_vi_origin & 0xffffff) >> 2) >> 1;
 	hidden_buffer = &hidden_bits[hb];
 
 	vibuffering = 0; // Disabled for now
@@ -2136,13 +2136,12 @@ INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres)
 	INT32 coeff;
 	UINT32 hresdiff = hres << 1;
 	UINT32 hresdiffcvg = hres;
-	UINT32 addr = (UINT32)vbuff;
-	UINT32 leftuppix = (addr - hresdiff - 4) ^ 2;
-	UINT32 leftdownpix = (addr + hresdiff - 4) ^ 2;
-	UINT32 toleftpix = (addr - 4) ^ 2;
-	UINT32 leftupcvg = 0;
-	UINT32 leftdowncvg = 0;
-	UINT32 toleftcvg = 0;
+	UINT16 *leftuppix = vbuff + ((-hresdiff - 4) ^ 2);//UINT32 leftuppix = (addr - hresdiff - 4) ^ 2;
+	UINT16 *leftdownpix = vbuff + ((hresdiff - 4) ^ 2);//UINT32 leftdownpix = (addr + hresdiff - 4) ^ 2;
+	UINT16 *toleftpix = vbuff + ((-4) ^ 2);//UINT32 toleftpix = (addr - 4) ^ 2;
+	UINT8 *leftupcvg = hbuff + ((hresdiffcvg - 2) ^ BYTE_ADDR_XOR);
+	UINT8 *leftdowncvg = hbuff + ((hresdiffcvg - 2) ^ BYTE_ADDR_XOR);
+	UINT8 *toleftcvg = hbuff + ((-2) ^ BYTE_ADDR_XOR);
 	UINT32 colr, colg, colb;
 	UINT32 enb;
 	int i = 0;
@@ -2162,15 +2161,10 @@ INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres)
 		return filtered;
 	}
 
-	addr = (UINT32)hbuff;
-	leftupcvg = (addr - hresdiffcvg - 2) ^ BYTE_ADDR_XOR;
-	leftdowncvg = (addr + hresdiffcvg - 2) ^ BYTE_ADDR_XOR;
-	toleftcvg = (addr - 2) ^ BYTE_ADDR_XOR;
-
 	for(i = 0; i < 5; i++)
 	{
-		pix = *(UINT16*)(leftuppix ^ 2);
-		cvg = (*(UINT8*)(leftupcvg ^ BYTE_ADDR_XOR)) & 3;
+		pix = *leftuppix;//*(UINT16*)(leftuppix ^ 2);
+		cvg = *leftupcvg & 3;//(*(UINT8*)(leftupcvg ^ BYTE_ADDR_XOR)) & 3;
 		if  (i& 1)
 		{
 			if (cvg == 3 && (pix & 1))
@@ -2196,8 +2190,8 @@ INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres)
 
 	for(i = 0; i < 5; i++)
 	{
-		pix = *(UINT16*)(leftdownpix ^ 2);
-		cvg = (*(UINT8*)(leftdowncvg ^ BYTE_ADDR_XOR)) & 3;
+		pix = *leftdownpix;
+		cvg = *leftdowncvg & 3;
 		if (i&1)
 		{
 			if (cvg == 3 && (pix & 1))
@@ -2223,8 +2217,8 @@ INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres)
 
 	for(i = 0; i < 5; i++)
 	{
-		pix = *(UINT16*)(toleftpix ^ 2);
-		cvg = (*(UINT8*)(toleftcvg ^ BYTE_ADDR_XOR)) & 3;
+		pix = *toleftpix;
+		cvg = *toleftcvg & 3;
 		if (!(i&3))
 		{
 			if (cvg == 3 && (pix & 1))
