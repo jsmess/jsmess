@@ -5208,7 +5208,7 @@ static RDP_COMMAND( rdp_load_block )
 
 	if ((ti_address & 3) && (ti_address & 0xffffff00) != 0xf8a00)
 	{
-		fatalerror( "load block: unaligned ti_address 0x%x",ti_address ); // Rat Attack
+		stricterror( "load block: unaligned ti_address 0x%x",ti_address ); // Rat Attack, Frogger 2 prototype
 	}
 
 	src = (UINT32*)&ram16[ti_address2 >> 1];
