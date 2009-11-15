@@ -3,7 +3,7 @@
 
     Initial version by Ville Linde
     Many improvements by Harmony
-    Many improvements by angrylion, Gonetz, Orkin
+    Many improvements by angrylion, Ziggy, Gonetz, Orkin
 */
 
 #include <math.h>
@@ -11,6 +11,14 @@
 #include "includes/n64.h"
 
 #define LOG_RDP_EXECUTION 		0
+
+#define STRICT_ERROR (0)
+
+#if STRICT_ERROR
+#define stricterror fatalerror
+#else
+#define stricterror(...)
+#endif
 
 static FILE *rdp_exec;
 
@@ -3232,7 +3240,7 @@ static void fill_rectangle_32bit(running_machine *machine, RECTANGLE *rect)
 
 	if (x2 < x1)
 	{
-		fatalerror(" SCARS (E) case: fill_rectangle_32bit");
+		stricterror ("SCARS (E) case: fill_rectangle_32bit");
 	}
 
 	// TODO: clip
@@ -3330,7 +3338,7 @@ INLINE void texture_rectangle_32bit(running_machine *machine, TEX_RECTANGLE *rec
 
 	if (x2 < x1)
 	{
-		fatalerror( "x2 < x1: texture_rectangle_32bit" );
+		stricterror( "x2 < x1: texture_rectangle_32bit" );
 	}
 
 	if (other_modes.cycle_type == CYCLE_TYPE_FILL || other_modes.cycle_type == CYCLE_TYPE_COPY)
@@ -3501,7 +3509,7 @@ static void render_spans_32(running_machine *machine, int start, int end, int ti
 
 	if (other_modes.key_en)
 	{
-		fatalerror( "render_spans_32: key_en" );
+		stricterror( "render_spans_32: key_en" );
 	}
 
 	if (other_modes.cycle_type == CYCLE_TYPE_2 && texture)
@@ -3587,7 +3595,7 @@ static void render_spans_32(running_machine *machine, int start, int end, int ti
 				curpixel_cvg = span[i].cvg[x];
 				if (curpixel_cvg > 8)
 				{
-					fatalerror("render_spans_32: curpixel_cvg = %d", curpixel_cvg);
+					stricterror("render_spans_32: curpixel_cvg = %d", curpixel_cvg);
 				}
 				if (curpixel_cvg)
 				{
@@ -3840,7 +3848,7 @@ static void render_spans_16(running_machine *machine, int start, int end, int ti
 
 				if (curpixel_cvg > 8)
 				{
-					fatalerror("render_spans_16: cvg of current pixel is %d", curpixel_cvg);
+					stricterror("render_spans_16: cvg of current pixel is %d", curpixel_cvg);
 				}
 
 				if (curpixel_cvg)
@@ -5124,10 +5132,13 @@ static RDP_COMMAND( rdp_set_other_modes )
 static RDP_COMMAND( rdp_load_tlut )
 {
 	int i;
-	UINT16 sl, sh;
+	int tl, th, sl, sh;
+	int tilenum = (w2 >> 24) & 7;
 
-	sl	= ((w1 >> 12) & 0xfff) / 4;
-	sh	= ((w2 >> 12) & 0xfff) / 4;
+	sl = tile[tilenum].sl = ((w1 >> 12) & 0xfff);
+	tl = tile[tilenum].tl =  w1 & 0xfff;
+	sh = tile[tilenum].sh = ((w2 >> 12) & 0xfff);
+	th = tile[tilenum].th = w2 & 0xfff;
 
 	switch (ti_format)
 	{
@@ -5137,9 +5148,9 @@ static RDP_COMMAND( rdp_load_tlut )
 			{
 				case PIXEL_SIZE_16BIT:
 				{
-					UINT16 *src = (UINT16*)&rdram[ti_address / 4];
+					UINT16 *src = (UINT16*)&rdram[(ti_address + (tl >> 2) * (ti_width << 1) + (sl >> 1)) >> 2];
 
-					for (i=sl; i <= sh; i++)
+					for (i = (sl >> 2); i <= (sh >> 2); i++)
 					{
 						tlut[i] = src[i];
 					}
@@ -5152,7 +5163,6 @@ static RDP_COMMAND( rdp_load_tlut )
 
 		default:	fatalerror("RDP: load_tlut: format = %d\n", ti_format);
 	}
-
 }
 
 static RDP_COMMAND( rdp_set_tile_size )
