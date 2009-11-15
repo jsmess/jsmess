@@ -600,9 +600,9 @@ VIDEO_UPDATE(n64)
 					}
 					else
 					{
-						newc.r = (((pix >> 11) & 0x1f) << 3);
-						newc.g = (((pix >> 6) & 0x1f) << 3);
-						newc.b = (((pix >> 1) & 0x1f) << 3);
+						newc.r = (((pix >> 11) & 0x1f) << 3) | (((pix >> 11) & 0x1f) >> 2);
+						newc.g = (((pix >> 6) & 0x1f) << 3) | (((pix >> 6) & 0x1f) >> 2);
+						newc.b = (((pix >> 1) & 0x1f) << 3) | (((pix >> 1) & 0x1f) >> 2);
 						ViBuffer[i][j] = newc;
 					}
 					pixels++;
@@ -654,9 +654,9 @@ VIDEO_UPDATE(n64)
 							prev_cvg = ((frame_buffer[(pixels - 1)^WORD_ADDR_XOR] & 1) << 2) | (hidden_buffer[(pixels - 1)^BYTE_ADDR_XOR] & 3);
 							next_cvg = ((frame_buffer[(pixels + 1)^WORD_ADDR_XOR] & 1) << 2) | (hidden_buffer[(pixels + 1)^BYTE_ADDR_XOR] & 3);
 						}
-						r = (((pix >> 11) & 0x1f) << 3);
-						g = (((pix >> 6) & 0x1f) << 3);
-						b = (((pix >> 1) & 0x1f) << 3);
+						r = (((pix >> 11) & 0x1f) << 3) | (((pix >> 11) & 0x1f) >> 2);
+						g = (((pix >> 6) & 0x1f) << 3) | (((pix >> 6) & 0x1f) >> 2);
+						b = (((pix >> 1) & 0x1f) << 3) | (((pix >> 1) & 0x1f) >> 2);
 
 						if (!vibuffering && curpixel_cvg < 7 && i > 1 && j > 1 && i < (hres - 2) && j < (vres - 2) && fsaa)
 						{
@@ -1058,9 +1058,9 @@ INLINE int BLENDER1_16(running_machine *machine, UINT16 *fb, UINT8* hb, COLOR c,
 		curpixel_overlap = 0;
 	}
 
-	memory_color.r = ((mem >> 11) & 0x1f) << 3;
-	memory_color.g = ((mem >>  6) & 0x1f) << 3;
-	memory_color.b = ((mem >>  1) & 0x1f) << 3;
+	memory_color.r = (((mem >> 11) & 0x1f) << 3) | (((mem >> 11) & 0x1f) >> 2);
+	memory_color.g = (((mem >>  6) & 0x1f) << 3) | (((mem >>  6) & 0x1f) >> 2);
+	memory_color.b = (((mem >>  1) & 0x1f) << 3) | (((mem >>  1) & 0x1f) >> 2);
 
 	if (other_modes.image_read_en)
 	{
@@ -1125,9 +1125,9 @@ INLINE int BLENDER2_16(running_machine *machine, UINT16 *fb, UINT8* hb, COLOR c1
 		curpixel_overlap = 0;
 	}
 
-	memory_color.r = ((mem >> 11) & 0x1f) << 3;
-	memory_color.g = ((mem >>  6) & 0x1f) << 3;
-	memory_color.b = ((mem >>  1) & 0x1f) << 3;
+	memory_color.r = (((mem >> 11) & 0x1f) << 3) | (((mem >> 11) & 0x1f) >> 2);
+	memory_color.g = (((mem >>  6) & 0x1f) << 3) | (((mem >> 11) & 0x1f) >> 2);
+	memory_color.b = (((mem >>  1) & 0x1f) << 3) | (((mem >> 11) & 0x1f) >> 2);
 
 	if (other_modes.image_read_en)
 	{
@@ -1342,9 +1342,9 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 					{
 						if (other_modes.tlut_type == 0)
 						{
-							color->r = ((c >> 11) & 0x1f) << 3;
-							color->g = ((c >>  6) & 0x1f) << 3;
-							color->b = ((c >>  1) & 0x1f) << 3;
+							color->r = (((c >> 11) & 0x1f) << 3) | (((c >> 11) & 0x1f) >> 2);
+							color->g = (((c >>  6) & 0x1f) << 3) | (((c >>  6) & 0x1f) >> 2);
+							color->b = (((c >>  1) & 0x1f) << 3) | (((c >>  1) & 0x1f) >> 2);
 							color->a = (c & 1) ? 0xff : 0;
 						}
 						else
@@ -1370,9 +1370,9 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 					{
 						if (other_modes.tlut_type == 0)
 						{
-							color->r = ((c >> 11) & 0x1f) << 3;
-							color->g = ((c >>  6) & 0x1f) << 3;
-							color->b = ((c >>  1) & 0x1f) << 3;
+							color->r = (((c >> 11) & 0x1f) << 3) | (((c >> 11) & 0x1f) >> 2);
+							color->g = (((c >>  6) & 0x1f) << 3) | (((c >>  6) & 0x1f) >> 2);
+							color->b = (((c >>  1) & 0x1f) << 3) | (((c >>  1) & 0x1f) >> 2);
 							color->a = (c & 1) ? 0xff : 0;
 						}
 						else
@@ -1395,9 +1395,9 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 
 					if (!other_modes.en_tlut)
 					{
-						color->r = ((c >> 11) & 0x1f) << 3;
-						color->g = ((c >>  6) & 0x1f) << 3;
-						color->b = ((c >>  1) & 0x1f) << 3;
+						color->r = (((c >> 11) & 0x1f) << 3) | (((c >> 11) & 0x1f) >> 2);
+						color->g = (((c >>  6) & 0x1f) << 3) | (((c >>  6) & 0x1f) >> 2);
+						color->b = (((c >>  1) & 0x1f) << 3) | (((c >>  1) & 0x1f) >> 2);
 						color->a = (c & 1) ? 0xff : 0;
 					}
 					else
@@ -1405,9 +1405,9 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 						c = tlut[(c >> 8) << 2];
 						if (other_modes.tlut_type == 0) //Golden Eye 007, sea, "frigate" level
 						{
-							color->r = ((c >> 11) & 0x1f) << 3;
-							color->g = ((c >>  6) & 0x1f) << 3;
-							color->b = ((c >>  1) & 0x1f) << 3;
+							color->r = (((c >> 11) & 0x1f) << 3) | (((c >> 11) & 0x1f) >> 2);
+							color->g = (((c >>  6) & 0x1f) << 3) | (((c >>  6) & 0x1f) >> 2);
+							color->b = (((c >>  1) & 0x1f) << 3) | (((c >>  1) & 0x1f) >> 2);
 							color->a = (c & 1) ? 0xff : 0;
 						}
 						else // Beetle Adventure Racing, Mount Mayhem
@@ -1437,9 +1437,9 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 						c = tlut[(c >> 24) << 2];
 						if (!other_modes.tlut_type)
 						{
-							color->r = ((c >> 11) & 0x1f) << 3;
-							color->g = ((c >>  6) & 0x1f) << 3;
-							color->b = ((c >>  1) & 0x1f) << 3;
+							color->r = (((c >> 11) & 0x1f) << 3) | (((c >> 11) & 0x1f) >> 2);
+							color->g = (((c >>  6) & 0x1f) << 3) | (((c >>  6) & 0x1f) >> 2);
+							color->b = (((c >>  1) & 0x1f) << 3) | (((c >>  1) & 0x1f) >> 2);
 							color->a = (c & 1) ? 0xff : 0;
 						}
 						else
@@ -1519,9 +1519,9 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 					{
 						if (other_modes.tlut_type == 0)
 						{
-							color->r = ((c >> 11) & 0x1f) << 3;
-							color->g = ((c >>  6) & 0x1f) << 3;
-							color->b = ((c >>  1) & 0x1f) << 3;
+							color->r = (((c >> 11) & 0x1f) << 3) | (((c >> 11) & 0x1f) >> 2);
+							color->g = (((c >>  6) & 0x1f) << 3) | (((c >>  6) & 0x1f) >> 2);
+							color->b = (((c >>  1) & 0x1f) << 3) | (((c >>  1) & 0x1f) >> 2);
 							color->a = (c & 1) ? 0xff : 0;
 						}
 						else
@@ -1547,9 +1547,9 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 					{
 						if (other_modes.tlut_type == 0)
 						{
-							color->r = ((c >> 11) & 0x1f) << 3;
-							color->g = ((c >>  6) & 0x1f) << 3;
-							color->b = ((c >>  1) & 0x1f) << 3;
+							color->r = (((c >> 11) & 0x1f) << 3) | (((c >> 11) & 0x1f) >> 2);
+							color->g = (((c >>  6) & 0x1f) << 3) | (((c >>  6) & 0x1f) >> 2);
+							color->b = (((c >>  1) & 0x1f) << 3) | (((c >>  1) & 0x1f) >> 2);
 							color->a = (c & 1) ? 0xff : 0;
 						}
 						else
@@ -1573,19 +1573,19 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 
 					if (!other_modes.en_tlut)
 					{
-						color->r = ((c >> 11) & 0x1f) << 3;
-						color->g = ((c >>  6) & 0x1f) << 3;
-						color->b = ((c >>  1) & 0x1f) << 3;
+						color->r = (((c >> 11) & 0x1f) << 3) | (((c >> 11) & 0x1f) >> 2);
+						color->g = (((c >>  6) & 0x1f) << 3) | (((c >>  6) & 0x1f) >> 2);
+						color->b = (((c >>  1) & 0x1f) << 3) | (((c >>  1) & 0x1f) >> 2);
 						color->a = (c & 1) ? 0xff : 0;
 					}
 					else
 					{
 						c = tlut[(c >> 8) << 2];
-						if (other_modes.tlut_type == 0) //Golden Eye 007, sea, "frigate" level
+						if (!other_modes.tlut_type) // GoldenEye 007, sea, "frigate" level
 						{
-							color->r = ((c >> 11) & 0x1f) << 3;
-							color->g = ((c >>  6) & 0x1f) << 3;
-							color->b = ((c >>  1) & 0x1f) << 3;
+							color->r = (((c >> 11) & 0x1f) << 3) | (((c >> 11) & 0x1f) >> 2);
+							color->g = (((c >>  6) & 0x1f) << 3) | (((c >>  6) & 0x1f) >> 2);
+							color->b = (((c >>  1) & 0x1f) << 3) | (((c >>  1) & 0x1f) >> 2);
 							color->a = (c & 1) ? 0xff : 0;
 						}
 						else // Beetle Adventure Racing, Mount Mayhem
@@ -1626,9 +1626,9 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 						UINT16 c = tlut[((tpal << 4) | p) << 2];
 						if (!other_modes.tlut_type)
 						{
-                    		color->r = ((c >> 11) & 0x1f) << 3;
-                    		color->g = ((c >>  6) & 0x1f) << 3;
-                    		color->b = ((c >>  1) & 0x1f) << 3;
+                    		color->r = (((c >> 11) & 0x1f) << 3) | (((c >> 11) & 0x1f) << 3);
+                    		color->g = (((c >>  6) & 0x1f) << 3) | (((c >>  6) & 0x1f) << 3);
+                    		color->b = (((c >>  1) & 0x1f) << 3) | (((c >>  1) & 0x1f) << 3);
                     		color->a = (c & 1) ? 0xff : 0;
 						}
 						else
@@ -1659,9 +1659,9 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 						UINT16 c = tlut[p << 2];
 						if (!other_modes.tlut_type)
 						{
-                    		color->r = ((c >> 11) & 0x1f) << 3;
-                    		color->g = ((c >>  6) & 0x1f) << 3;
-                    		color->b = ((c >>  1) & 0x1f) << 3;
+							color->r = (((c >> 11) & 0x1f) << 3) | (((c >> 11) & 0x1f) >> 2);
+							color->g = (((c >>  6) & 0x1f) << 3) | (((c >>  6) & 0x1f) >> 2);
+							color->b = (((c >>  1) & 0x1f) << 3) | (((c >>  1) & 0x1f) >> 2);
                     		color->a = (c & 1) ? 0xff : 0;
 						}
 						else
@@ -1691,9 +1691,9 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 						c = tlut[(c >> 8) << 2];
 						if (!other_modes.tlut_type)
 						{
-                    		color->r = ((c >> 11) & 0x1f) << 3;
-                    		color->g = ((c >>  6) & 0x1f) << 3;
-                    		color->b = ((c >>  1) & 0x1f) << 3;
+							color->r = (((c >> 11) & 0x1f) << 3) | (((c >> 11) & 0x1f) >> 2);
+							color->g = (((c >>  6) & 0x1f) << 3) | (((c >>  6) & 0x1f) >> 2);
+							color->b = (((c >>  1) & 0x1f) << 3) | (((c >>  1) & 0x1f) >> 2);
                     		color->a = (c & 1) ? 0xff : 0;
 						}
 						else
@@ -1736,9 +1736,9 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 						UINT16 k = tlut[((tpal << 4) | c) << 2];
 						if (!other_modes.tlut_type)
 						{
-							color->r = ((k >> 11) & 0x1f) << 3;
-							color->g = ((k >>  6) & 0x1f) << 3;
-							color->b = ((k >>  1) & 0x1f) << 3;
+							color->r = (((k >> 11) & 0x1f) << 3) | (((k >> 11) & 0x1f) >> 2);
+							color->g = (((k >>  6) & 0x1f) << 3) | (((k >>  6) & 0x1f) >> 2);
+							color->b = (((k >>  1) & 0x1f) << 3) | (((k >>  1) & 0x1f) >> 2);
 							color->a = (k & 1) ? 0xff : 0;
 						}
 						else
@@ -1767,9 +1767,9 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 						UINT16 k = tlut[ c << 2];
 						if (!other_modes.tlut_type)
 						{
-							color->r = ((k >> 11) & 0x1f) << 3;
-							color->g = ((k >>  6) & 0x1f) << 3;
-							color->b = ((k >>  1) & 0x1f) << 3;
+							color->r = (((c >> 11) & 0x1f) << 3) | (((c >> 11) & 0x1f) >> 2);
+							color->g = (((c >>  6) & 0x1f) << 3) | (((c >>  6) & 0x1f) >> 2);
+							color->b = (((c >>  1) & 0x1f) << 3) | (((c >>  1) & 0x1f) >> 2);
 							color->a = (k & 1) ? 0xff : 0;
 						}
 						else
@@ -1814,6 +1814,11 @@ INLINE void TEXTURE_PIPELINE(COLOR* TEX, INT32 SSS, INT32 SST, UINT32 NOBILINEAR
 		INT32 maxs2, maxt2;
 		int upper = 0;
 
+		t0.r = t0.g = t0.b = t0.a = 0;
+		t1.r = t1.g = t1.b = t1.a = 0;
+		t2.r = t2.g = t2.b = t2.a = 0;
+		t3.r = t3.g = t3.b = t3.a = 0;
+
 		sss1 = SSS;
 		sst1 = SST;
 
@@ -1856,7 +1861,7 @@ INLINE void TEXTURE_PIPELINE(COLOR* TEX, INT32 SSS, INT32 SST, UINT32 NOBILINEAR
 		}
 		if (other_modes.mid_texel || !upper)
 		{
-			rt0 = t0.r; gt0 = t0.g; bt0=t0.b; at0 = t0.a;
+			rt0 = t0.r; gt0 = t0.g; bt0 = t0.b; at0 = t0.a;
 		}
 		rt1 = t1.r; rt2 = t2.r; gt1 = t1.g; gt2 = t2.g; bt1 = t1.b; bt2 = t2.b; at1 = t1.a; at2 = t2.a;
 		if (other_modes.mid_texel || upper)
@@ -2136,9 +2141,9 @@ INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres)
 	UINT32 centercvg = (*hbuff & 3) + ((pix & 1) << 2) + 1;
 	UINT32 numoffull = 1;
 	UINT32 cvg;
-	UINT32 r = ((pix >> 11) & 0x1f) << 3;
-	UINT32 g = ((pix >> 6) & 0x1f) << 3;
-	UINT32 b = ((pix >> 1) & 0x1f) << 3;
+	UINT32 r = (((pix >> 11) & 0x1f) << 3) | (((pix >> 11) & 0x1f) >> 2);
+	UINT32 g = (((pix >> 6) & 0x1f) << 3) | (((pix >> 6) & 0x1f) >> 2);
+	UINT32 b = (((pix >> 1) & 0x1f) << 3) | (((pix >> 1) & 0x1f) >> 2);
 	UINT32 backr[7], backg[7], backb[7];
 	UINT32 invr[7], invg[7], invb[7];
 	INT32 coeff;
@@ -2172,9 +2177,9 @@ INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres)
 		{
 			if (cvg == 3 && (pix & 1))
 			{
-				backr[numoffull] = (((pix >> 11) & 0x1f) << 3);
-				backg[numoffull] = (((pix >> 6) & 0x1f) << 3);
-				backb[numoffull] = (((pix >> 1) & 0x1f) << 3);
+				backr[numoffull] = (((pix >> 11) & 0x1f) << 3) | (((pix >> 11) & 0x1f) >> 2);
+				backg[numoffull] = (((pix >> 6) & 0x1f) << 3) | (((pix >> 6) & 0x1f) >> 2);
+				backb[numoffull] = (((pix >> 1) & 0x1f) << 3) | (((pix >> 1) & 0x1f) >> 2);
 				invr[numoffull] = 255 - backr[numoffull];
 				invg[numoffull] = 255 - backg[numoffull];
 				invb[numoffull] = 255 - backb[numoffull];
@@ -2198,9 +2203,9 @@ INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres)
 		{
 			if (cvg == 3 && (pix & 1))
 			{
-				backr[numoffull] = (((pix >> 11) & 0x1f) << 3);
-				backg[numoffull] = (((pix >> 6) & 0x1f) << 3);
-				backb[numoffull] = (((pix >> 1) & 0x1f) << 3);
+				backr[numoffull] = (((pix >> 11) & 0x1f) << 3) | (((pix >> 11) & 0x1f) >> 2);
+				backg[numoffull] = (((pix >> 6) & 0x1f) << 3) | (((pix >> 6) & 0x1f) >> 2);
+				backb[numoffull] = (((pix >> 1) & 0x1f) << 3) | (((pix >> 1) & 0x1f) >> 2);
 				invr[numoffull] = 255 - backr[numoffull];
 				invg[numoffull] = 255 - backg[numoffull];
 				invb[numoffull] = 255 - backb[numoffull];
@@ -2224,9 +2229,9 @@ INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres)
 		{
 			if (cvg == 3 && (pix & 1))
 			{
-				backr[numoffull] = (((pix >> 11) & 0x1f) << 3);
-				backg[numoffull] = (((pix >> 6) & 0x1f) << 3);
-				backb[numoffull] = (((pix >> 1) & 0x1f) << 3);
+				backr[numoffull] = (((pix >> 11) & 0x1f) << 3) | (((pix >> 11) & 0x1f) >> 2);
+				backg[numoffull] = (((pix >> 6) & 0x1f) << 3) | (((pix >> 6) & 0x1f) >> 2);
+				backb[numoffull] = (((pix >> 1) & 0x1f) << 3) | (((pix >> 1) & 0x1f) >> 2);
 				invr[numoffull] = 255 - backr[numoffull];
 				invg[numoffull] = 255 - backg[numoffull];
 				invb[numoffull] = 255 - backb[numoffull];
@@ -2356,12 +2361,12 @@ INLINE void divot_filter16(INT32* r, INT32* g, INT32* b, UINT16* fbuff, UINT32 f
 	//leftpix = *(fbuff - 1); //for BE targets
 	//rightpix = *(fbuff + 1);
 
-	leftr = (((leftpix >> 11) & 0x1f) << 3);
-	leftg = (((leftpix >> 6) & 0x1f) << 3);
-	leftb = (((leftpix >> 1) & 0x1f) << 3);
-	rightr = (((rightpix >> 11) & 0x1f) << 3);
-	rightg = (((rightpix >> 6) & 0x1f) << 3);
-	rightb = (((rightpix >> 1) & 0x1f) << 3);
+	leftr = (((leftpix >> 11) & 0x1f) << 3) | (((leftpix >> 11) & 0x1f) >> 2);
+	leftg = (((leftpix >> 6) & 0x1f) << 3) | (((leftpix >> 6) & 0x1f) >> 2);
+	leftb = (((leftpix >> 1) & 0x1f) << 3) | (((leftpix >> 1) & 0x1f) >> 2);
+	rightr = (((rightpix >> 11) & 0x1f) << 3) | (((rightpix >> 11) & 0x1f) >> 2);
+	rightg = (((rightpix >> 6) & 0x1f) << 3) | (((rightpix >> 6) & 0x1f) >> 2);
+	rightb = (((rightpix >> 1) & 0x1f) << 3) |(((rightpix >> 1) & 0x1f) >> 2);
 	if ((leftr >= *r && rightr >= leftr) || (leftr >= rightr && *r >= leftr))
 	{
 		*r = leftr; //left = median value
@@ -2455,9 +2460,9 @@ INLINE void restore_filter16(int* r, int* g, int* b, UINT16* fbuff, UINT32 fbuff
 	for (i = 0; i < 3; i++)
 	{
 		pix = fbuff[leftuppix ^ 1];
-		tempr = (((pix >> 11) & 0x1f) << 3);
-		tempg = (((pix >> 6) & 0x1f) << 3);
-		tempb = (((pix >> 1) & 0x1f) << 3);
+		tempr = (((pix >> 11) & 0x1f) << 3) | (((pix >> 11) & 0x1f) >> 2);
+		tempg = (((pix >> 6) & 0x1f) << 3) | (((pix >> 6) & 0x1f) >> 2);
+		tempb = (((pix >> 1) & 0x1f) << 3) | (((pix >> 1) & 0x1f) >> 2);
 		tempr &= ~7;
 		tempg &= ~7;
 		tempb &= ~7;
@@ -2491,9 +2496,9 @@ INLINE void restore_filter16(int* r, int* g, int* b, UINT16* fbuff, UINT32 fbuff
 	for (i = 0; i < 3; i++)
 	{
 		pix = fbuff[leftdownpix ^ 1];
-		tempr = (((pix >> 11) & 0x1f) << 3);
-		tempg = (((pix >> 6) & 0x1f) << 3);
-		tempb = (((pix >> 1) & 0x1f) << 3);
+		tempr = (((pix >> 11) & 0x1f) << 3) | (((pix >> 11) & 0x1f) >> 2);
+		tempg = (((pix >> 6) & 0x1f) << 3) | (((pix >> 6) & 0x1f) >> 2);
+		tempb = (((pix >> 1) & 0x1f) << 3) | (((pix >> 1) & 0x1f) >> 2);
 		tempr &= ~7;
 		tempg &= ~7;
 		tempb &= ~7;
@@ -2528,9 +2533,9 @@ INLINE void restore_filter16(int* r, int* g, int* b, UINT16* fbuff, UINT32 fbuff
 		if (!(i & 1))
 		{
 			pix = fbuff[toleftpix ^ 1];
-			tempr = (((pix >> 11) & 0x1f) << 3);
-			tempg = (((pix >> 6) & 0x1f) << 3);
-			tempb = (((pix >> 1) & 0x1f) << 3);
+			tempr = (((pix >> 11) & 0x1f) << 3) | (((pix >> 11) & 0x1f) >> 2);
+			tempg = (((pix >> 6) & 0x1f) << 3) | (((pix >> 6) & 0x1f) >> 2);
+			tempb = (((pix >> 1) & 0x1f) << 3) | (((pix >> 1) & 0x1f) >> 2);
 			tempr &= ~7;
 			tempg &= ~7;
 			tempb &= ~7;
@@ -2815,9 +2820,9 @@ INLINE void tcdiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 
 void col_decode16(UINT16* addr, COLOR* col)
 {
-	col->r = ((*addr >> 11) & 0x1f) << 3;
-	col->g = ((*addr >> 6) & 0x1f) << 3;
-	col->b = ((*addr >> 1) & 0x1f) << 3;
+	col->r = (((*addr >> 11) & 0x1f) << 3) | (((*addr >> 11) & 0x1f) >> 2);
+	col->g = (((*addr >> 6) & 0x1f) << 3) | (((*addr >> 6) & 0x1f) >> 2);
+	col->b = (((*addr >> 1) & 0x1f) << 3) | (((*addr >> 6) & 0x1f) >> 2);
 	col->a = (*addr & 1) ? 0xff : 0;
 }
 
@@ -4005,7 +4010,7 @@ static void render_spans_16(running_machine *machine, int start, int end, int ti
 
 					if(z_compare_result)
 					{
-						int rendered=0;//ìî¸
+						int rendered = 0;
 						int dith = 0;
 						if (!other_modes.rgb_dither_sel)
 						{
@@ -4070,25 +4075,25 @@ static void triangle(running_machine *machine, UINT32 w1, UINT32 w2, int shade, 
 	int dsdylod, dtdylod;
 	UINT32 w3, w4, w5, w6, w7, w8;
 
-	int k=0;
+	int k = 0;
 
-	INT32 limcvg;
-	INT32 startcvg;
+	INT32 limcvg = 0;
+	INT32 startcvg = 0;
 
-	int sign_dxldy;
-	int sign_dxmdy;
-	int samesign;
+	int sign_dxldy = 0;
+	int sign_dxmdy = 0;
+	int samesign = 0;
 
-	int dsdiff, dtdiff, dwdiff, drdiff, dgdiff, dbdiff, dadiff, dzdiff;
-	int sign_dxhdy;
+	int dsdiff = 0, dtdiff = 0, dwdiff = 0, drdiff = 0, dgdiff = 0, dbdiff = 0, dadiff = 0, dzdiff = 0;
+	int sign_dxhdy = 0;
 
-	int dsdeh, dtdeh, dwdeh, drdeh, dgdeh, dbdeh, dadeh, dzdeh, dsdyh, dtdyh, dwdyh, drdyh, dgdyh, dbdyh, dadyh, dzdyh;
-	int do_offset;
+	int dsdeh = 0, dtdeh = 0, dwdeh = 0, drdeh = 0, dgdeh = 0, dbdeh = 0, dadeh = 0, dzdeh = 0, dsdyh = 0, dtdyh = 0, dwdyh = 0, drdyh = 0, dgdyh = 0, dbdyh = 0, dadyh = 0, dzdyh = 0;
+	int do_offset = 0;
 
-	int xfrac;
-	int dseoff, dteoff, dweoff, dreoff, dgeoff, dbeoff, daeoff, dzeoff;
+	int xfrac = 0;
+	int dseoff = 0, dteoff = 0, dweoff = 0, dreoff = 0, dgeoff = 0, dbeoff = 0, daeoff = 0, dzeoff = 0;
 
-	int dsdxh, dtdxh, dwdxh, drdxh, dgdxh, dbdxh, dadxh, dzdxh;
+	int dsdxh = 0, dtdxh = 0, dwdxh = 0, drdxh = 0, dgdxh = 0, dbdxh = 0, dadxh = 0, dzdxh = 0;
 
 	int m_inc;
 	UINT32 min=0, max=3;
