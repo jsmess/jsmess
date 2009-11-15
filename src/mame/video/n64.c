@@ -1421,7 +1421,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 				case PIXEL_SIZE_32BIT:
 				{
 					UINT32 *tc = (UINT32*)texture_cache;
-					int xorval = (fb_size == PIXEL_SIZE_16BIT) ? XOR_SWAP_DWORD : XOR_SWAP_WORD; // Conker's Bad Fur Day, Jet Force Gemini, Super Smash Bros., Mickey's Speedway USA, Ogre Battle, Wave Race, Gex 3, South Park Rally
+					int xorval = (fb_size == PIXEL_SIZE_16BIT) ? XOR_SWAP_WORD : XOR_SWAP_DWORD; // Conker's Bad Fur Day, Jet Force Gemini, Super Smash Bros., Mickey's Speedway USA, Ogre Battle, Wave Race, Gex 3, South Park Rally
                     int taddr = (((tbase >> 2) + ((t) * (twidth >> 1)) + (s)) ^ ((t & 1) ? xorval : 0)) & 0x3ff;
 					UINT32 c = tc[taddr];
 
