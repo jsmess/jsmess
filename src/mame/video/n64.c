@@ -2142,13 +2142,11 @@ INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres)
 	UINT32 backr[7], backg[7], backb[7];
 	UINT32 invr[7], invg[7], invb[7];
 	INT32 coeff;
-	UINT32 hresdiff = hres << 1;
-	UINT32 hresdiffcvg = hres;
-	UINT16 *leftuppix = vbuff + ((-hresdiff - 4) ^ 2);//UINT32 leftuppix = (addr - hresdiff - 4) ^ 2;
-	UINT16 *leftdownpix = vbuff + ((hresdiff - 4) ^ 2);//UINT32 leftdownpix = (addr + hresdiff - 4) ^ 2;
-	UINT16 *toleftpix = vbuff + ((-4) ^ 2);//UINT32 toleftpix = (addr - 4) ^ 2;
-	UINT8 *leftupcvg = hbuff + ((hresdiffcvg - 2) ^ BYTE_ADDR_XOR);
-	UINT8 *leftdowncvg = hbuff + ((hresdiffcvg - 2) ^ BYTE_ADDR_XOR);
+	UINT16 *leftuppix = vbuff + ((-hres - 4) ^ 2);
+	UINT16 *leftdownpix = vbuff + ((hres - 4) ^ 2);
+	UINT16 *toleftpix = vbuff + ((-4) ^ 2);
+	UINT8 *leftupcvg = hbuff + ((hres - 2) ^ BYTE_ADDR_XOR);
+	UINT8 *leftdowncvg = hbuff + ((hres - 2) ^ BYTE_ADDR_XOR);
 	UINT8 *toleftcvg = hbuff + ((-2) ^ BYTE_ADDR_XOR);
 	UINT32 colr, colg, colb;
 	UINT32 enb;
@@ -2446,12 +2444,9 @@ INLINE void divot_filter16_buffer(int* r, int* g, int* b, COLOR* vibuffer)
 // Fix me.
 INLINE void restore_filter16(int* r, int* g, int* b, UINT16* fbuff, UINT32 fbuff_index, UINT32 hres)
 {
-	INT32 hresdiff = (INT32)hres << 1;
-	INT32 Lsw = fbuff_index & 1;
-	INT32 pixdiff = Lsw ? 6 : -2;
-	INT32 leftuppix = -hresdiff - pixdiff;
-	INT32 leftdownpix = hresdiff - pixdiff;
-	INT32 toleftpix = -pixdiff;
+	INT32 leftuppix = -hres - 1;
+	INT32 leftdownpix = hres - 1;
+	INT32 toleftpix = -1;
 	UINT8 tempr, tempg, tempb;
 	UINT16 pix;
 	int i;
@@ -2496,7 +2491,7 @@ INLINE void restore_filter16(int* r, int* g, int* b, UINT16* fbuff, UINT32 fbuff
 		{
 			*b -= 1;
 		}
-		leftuppix = ((leftuppix ^ 2) + 2) ^ 2;
+		leftuppix++;
 	}
 
 	for (i = 0; i < 3; i++)
@@ -2532,7 +2527,7 @@ INLINE void restore_filter16(int* r, int* g, int* b, UINT16* fbuff, UINT32 fbuff
 		{
 			*b -= 1;
 		}
-		leftdownpix = ((leftdownpix ^ 2) + 2) ^ 2;
+		leftdownpix++;
 	}
 	for(i = 0; i < 3; i++)
 	{
@@ -2570,7 +2565,7 @@ INLINE void restore_filter16(int* r, int* g, int* b, UINT16* fbuff, UINT32 fbuff
 				*b -= 1;
 			}
 		}
-		toleftpix = ((toleftpix ^ 2) + 2) ^ 2;
+		toleftpix++;
 	}
 }
 
