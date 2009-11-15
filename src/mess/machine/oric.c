@@ -465,6 +465,9 @@ static void oric_install_apple2_interface(running_machine *machine)
 	const device_config *fdc = devtag_get_device(machine, "fdc");
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
+	if (oric_is_telestrat)
+		return;
+
 	memory_install_read8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_r);
 	memory_install_read8_device_handler(space, fdc, 0x0310, 0x031f, 0, 0, applefdc_r);
 	memory_install_read8_handler(space, 0x0320, 0x03ff, 0, 0, SMH_BANK(4));
@@ -479,6 +482,9 @@ static void oric_enable_memory(running_machine *machine, int low, int high, int 
 {
 	int i;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	if (oric_is_telestrat)
+		return;
 	for (i = low; i <= high; i++)
 	{
 		switch(i) {
@@ -514,6 +520,8 @@ CALL &320 to start, or use BOBY rom.
 static WRITE8_HANDLER(apple2_v2_interface_w)
 {
 	/* data is ignored, address is used to decode operation */
+	if (oric_is_telestrat)
+		return;
 
 /*  logerror("apple 2 interface v2 rom page: %01x\n",(offset & 0x02)>>1); */
 
@@ -588,6 +596,8 @@ static void oric_jasmin_set_mem_0x0c000(running_machine *machine)
     2. If os is enabled, and overlay ram is enabled, all 16k can be accessed.
     3. if os is disabled, and overlay ram is enabled, jasmin rom takes priority.
     */
+	if (oric_is_telestrat)
+		return;
 
 	/* the ram is disabled in the jasmin rom which indicates that jasmin takes
     priority over the ram */
@@ -1065,6 +1075,8 @@ MACHINE_RESET( oric )
 {
 	int disc_interface_id = input_port_read(machine, "FLOPPY") & 0x07;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	if (oric_is_telestrat)
+		return;
 
 	switch (disc_interface_id)
 	{
