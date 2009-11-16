@@ -633,6 +633,8 @@ static void towns_kb_sendcode(running_machine* machine, UINT8 scancode, int rele
 				towns_kb_output |= 0x04;
 			if(input_port_read(machine,"key3") & 0x00040000)
 				towns_kb_output |= 0x08;
+			if(input_port_read(machine,"key3") & 0x06400000)
+				towns_kb_output |= 0x20;
 			break;
 		case 1:  // key release
 			towns_kb_output = 0x90;
@@ -641,6 +643,8 @@ static void towns_kb_sendcode(running_machine* machine, UINT8 scancode, int rele
 				towns_kb_output |= 0x04;
 			if(input_port_read(machine,"key3") & 0x00040000)
 				towns_kb_output |= 0x08;
+			if(input_port_read(machine,"key3") & 0x06400000)
+				towns_kb_output |= 0x20;
 			break;
 		case 2:  // extended byte
 			towns_kb_output = scancode;
