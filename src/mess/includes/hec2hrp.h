@@ -36,6 +36,7 @@
 extern WRITE8_HANDLER( hector_switch_bank_w );
 extern void Key(int pccode, int state, running_machine *machine);
 extern READ8_HANDLER( hector_keyboard_r );
+extern WRITE8_HANDLER( hector_keyboard_w );
 extern WRITE8_HANDLER( hector_sn_2000_w );
 extern WRITE8_HANDLER( hector_sn_2800_w );
 extern WRITE8_HANDLER( hector_sn_3000_w );

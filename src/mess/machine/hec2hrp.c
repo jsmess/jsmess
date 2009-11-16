@@ -32,6 +32,7 @@
 
 #include "driver.h"
 #include "devices/cassette.h"
+#include "devices/printer.h"
 #include "sound/sn76477.h"   // for sn sound
 #include "sound/wave.h"      // for K7 sound
 #include "sound/discrete.h"  // for 1 Bit sound
@@ -195,6 +196,11 @@ WRITE8_HANDLER( hector_switch_bank_w )
 						}  
 }
 
+WRITE8_HANDLER( hector_keyboard_w )
+{
+                //nothing to do => Key() function manage the value
+}
+
 READ8_HANDLER( hector_keyboard_r )
 {
    return touches[offset]; //send the pre calculated value
@@ -258,9 +264,8 @@ else
 return value;
 } 
 WRITE8_HANDLER( hector_sn_3000_w )
-{ // int i;
+{
     state3000 = data & 0xf8; // except bit 0 to 2
-//printf( "\n Etat registre 3000 =\"%x\"",data);
 	if ((data & 7) != oldstate3000 )
     	{
            // Update sn76477 only when necessary!
@@ -268,17 +273,8 @@ WRITE8_HANDLER( hector_sn_3000_w )
 	       Update_Sound(space, data & 7);
         }
         oldstate3000 = data & 7;
-// affichage des valeurs saisies
-/*	for(i=0; i<24 ;i++ )
-	{
-	   printf( "\n Etat 0 de la PIN %d DU SN76477 =\"%E\"",i,Pin_Value[i][0]);
-	   printf( "\n Etat 1 de la PIN %d DU SN76477 =\"%E\"",i,Pin_Value[i][1]);
-	} 
-	for(i=0; i<16 ;i++ ) 
-	{
-	   printf( "\n Etat Au%d du SN76477 =\"%d\"",i,AU[i]);
-	}*/
 }
+
 /* Color Interface */
 WRITE8_HANDLER( hector_color_a_w )
 {
@@ -345,7 +341,6 @@ const device_config *cassette_device_image(running_machine *machine)
 }
 
 
-
 /********************************************************************************
  Port Handling 
 ********************************************************************************/
@@ -357,11 +352,7 @@ READ8_HANDLER( hector_mx_io_port_r)
 WRITE8_HANDLER( hector_mx40_io_port_w)
 {
    if ((offset &0x0ff) == 0xf0) // Port A => to printer
-   {
-         printf("%c",data);
-         if (data==0x0d)
-                 printf("%c",0x0A);   // Add a CR to the LF (against printer).
-   }
+   		printer_output(devtag_get_device(space->machine, "printer"), data);
    if ((offset &0x0ff) == 0x40) // Port page 0
       memory_set_bank(space->machine, 2, HECTORMX_BANK_PAGE0);
    if ((offset &0x0ff) == 0x41) // Port page 1
@@ -378,11 +369,7 @@ WRITE8_HANDLER( hector_mx40_io_port_w)
 WRITE8_HANDLER( hector_mx80_io_port_w)
 {
    if ((offset &0x0ff) == 0xf0) // Port A => to printer
-   {
-         printf("%c",data);
-         if (data==0x0d)
-               printf("%c",0x0A);   // Add a CR to the LF (against printer).
-   }
+   		printer_output(devtag_get_device(space->machine, "printer"), data);
    if ((offset &0x0ff) == 0x40) // Port page 0
       memory_set_bank(space->machine, 2, HECTORMX_BANK_PAGE0);
    if ((offset &0x0ff) == 0x41) // Port page 1
@@ -488,7 +475,7 @@ void Init_Value_SN76477_Hector(void)
      // SetEnvelopControl( R10 , R7, C8 ) : Attack/Decay
      // Decay R
      Pin_Value[7][1] = RES_K(680.0); //680  vu
-     Pin_Value[7][0] = RES_K(222.325); // 142.325 (680 // 180KOhm)
+     Pin_Value[7][0] = RES_K(252.325); // 142.325 (680 // 180KOhm)
      
      // Capa A/D
      Pin_Value[8][0] = CAP_U(0.47); // 0.47uf

@@ -43,13 +43,14 @@
 //  (left)7                     (right)9
 //               (down)8
 //
-// Fire <-> or <Â²>
+// Fire <-> or <²>
 // Pot => INS /SUPPR
 // Cassete : wav file (1 way, 16 bits, 44100hz)
 
 #include "driver.h"
 #include "machine/pckeybrd.h"
 #include "devices/cassette.h"
+#include "devices/printer.h"
 #include "sound/wave.h"      // for K7 sound
 #include "sound/sn76477.h"   // for sn sound
 #include "sound/discrete.h"  // for 1 Bit sound
@@ -82,7 +83,7 @@ static ADDRESS_MAP_START(hec2hrp_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x2000,0x2003) AM_WRITE( hector_sn_2000_w)  // Sound
 	AM_RANGE(0x2800,0x2803) AM_WRITE( hector_sn_2800_w)  // Sound
 	AM_RANGE(0x3000,0x3000) AM_READWRITE( hector_cassette_r, hector_sn_3000_w)// Write necessary
-	AM_RANGE(0x3800,0x3807) AM_READ( hector_keyboard_r)  // Keyboard
+	AM_RANGE(0x3800,0x3807) AM_READWRITE( hector_keyboard_r, hector_keyboard_w)  // Keyboard
 
     // Main ROM page 
 	AM_RANGE(0x0000,0x3fff) AM_ROMBANK(2) 
@@ -237,7 +238,7 @@ static MACHINE_DRIVER_START( hec2hr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 230)  
 	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)  
-    MDRV_PALETTE_LENGTH(256)
+    MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_START(hec2hrp)
 	MDRV_VIDEO_UPDATE(hec2hrp)
@@ -257,6 +258,9 @@ static MACHINE_DRIVER_START( hec2hr )
 
     // Gestion cassette
     MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
+
+	/* printer */
+	MDRV_PRINTER_ADD("printer")
 
 MACHINE_DRIVER_END
 
@@ -278,7 +282,7 @@ MACHINE_DRIVER_END
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 230)  
 	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)  
-    MDRV_PALETTE_LENGTH(256)
+    MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_START(hec2hrp)
 	MDRV_VIDEO_UPDATE(hec2hrp)
@@ -298,6 +302,9 @@ MACHINE_DRIVER_END
 
     // Gestion cassette
     MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
+
+	/* printer */
+	MDRV_PRINTER_ADD("printer")
 
 MACHINE_DRIVER_END
 
@@ -319,7 +326,7 @@ static MACHINE_DRIVER_START( hec2mx40 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 230)  
 	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)  
-    MDRV_PALETTE_LENGTH(256)
+    MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_START(hec2hrp)
 	MDRV_VIDEO_UPDATE(hec2hrp)
@@ -339,6 +346,9 @@ static MACHINE_DRIVER_START( hec2mx40 )
 
     // Gestion cassette
     MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
+
+	/* printer */
+	MDRV_PRINTER_ADD("printer")
 
 MACHINE_DRIVER_END
 
@@ -360,7 +370,7 @@ static MACHINE_DRIVER_START( hec2mx80 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 230)  
 	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)  
-    MDRV_PALETTE_LENGTH(256)
+    MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_START(hec2hrp)
 	MDRV_VIDEO_UPDATE(hec2hrp)
@@ -380,6 +390,9 @@ static MACHINE_DRIVER_START( hec2mx80 )
 
     // Gestion cassette
     MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
+
+	/* printer */
+	MDRV_PRINTER_ADD("printer")
 
 MACHINE_DRIVER_END
 
