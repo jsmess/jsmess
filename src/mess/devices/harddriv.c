@@ -384,7 +384,7 @@ static DEVICE_IMAGE_UNLOAD(mess_ide)
 }
 
 
-#ifdef UNSUED_FUNCTION
+#ifdef UNUSED_FUNCTION
 /*-------------------------------------------------
     ide_hd_validity_check - check this device's validity
 -------------------------------------------------*/
