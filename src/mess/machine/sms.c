@@ -953,29 +953,6 @@ READ8_HANDLER( gg_sio_r )
 	return sms_state.gg_sio[offset];
 }
 
-
-READ8_HANDLER( gg_psg_r )
-{
-	return 0xff;
-}
-
-
-WRITE8_HANDLER( gg_psg_w )
-{
-	logerror("write %02X to psg at offset #%d.\n",data , offset);
-
-	/* D7 = Noise Left */
-	/* D6 = Tone3 Left */
-	/* D5 = Tone2 Left */
-	/* D4 = Tone1 Left */
-
-	/* D3 = Noise Right */
-	/* D2 = Tone3 Right */
-	/* D1 = Tone2 Right */
-	/* D0 = Tone1 Right */
-}
-
-
 static void sms_machine_stop( running_machine *machine )
 {
 	/* Does the cartridge have SRAM that should be saved? */

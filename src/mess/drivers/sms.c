@@ -134,7 +134,7 @@ static ADDRESS_MAP_START( gg_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00)                 AM_READ(gg_input_port_2_r)
 	AM_RANGE(0x01, 0x05)                 AM_READWRITE(gg_sio_r, gg_sio_w)
-	AM_RANGE(0x06, 0x06)                 AM_READWRITE(gg_psg_r, gg_psg_w)
+	AM_RANGE(0x06, 0x06)                 AM_DEVWRITE("gamegear", sn76496_stereo_w)
 	AM_RANGE(0x07, 0x07)                 AM_WRITE(sms_io_control_w)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0x06) AM_WRITE(sms_bios_w)
 	AM_RANGE(0x09, 0x09) AM_MIRROR(0x06) AM_WRITE(sms_io_control_w)
@@ -659,9 +659,10 @@ static MACHINE_DRIVER_START( gamegear )
 	MDRV_SMSVDP_ADD("sms_vdp", _315_5378_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 	MDRV_SOUND_ADD("gamegear", GAMEGEAR, XTAL_53_693175MHz/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart1")

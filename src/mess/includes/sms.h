@@ -34,8 +34,6 @@ READ8_HANDLER( sms_mapper_r );
 WRITE8_HANDLER( sms_bios_w );
 WRITE8_HANDLER( gg_sio_w );
 READ8_HANDLER( gg_sio_r );
-READ8_HANDLER( gg_psg_r );
-WRITE8_HANDLER( gg_psg_w );
 READ8_HANDLER( gg_input_port_2_r );
 
 void sms_pause_callback( running_machine *machine );
