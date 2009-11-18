@@ -115,12 +115,14 @@ static const floppy_error_map errmap[] =
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
+extern DEVICE_GET_INFO(apple525);
+extern DEVICE_GET_INFO(sonydriv);
 
 INLINE floppy_drive *get_safe_token(const device_config *device)
 {
 	assert( device != NULL );
 	assert( device->token != NULL );
-	assert( device->type == DEVICE_GET_INFO_NAME(floppy) );
+	assert( device->type == DEVICE_GET_INFO_NAME(floppy) || device->type == DEVICE_GET_INFO_NAME(apple525) || device->type == DEVICE_GET_INFO_NAME(sonydriv));
 	return (floppy_drive *) device->token;
 }
 
