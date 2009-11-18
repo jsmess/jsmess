@@ -1934,7 +1934,7 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(x68030_map, ADDRESS_SPACE_PROGRAM, 32)
-	AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
+//	AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)
 //  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE(&x68k_gvram)
 //  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w) AM_BASE(&x68k_tvram)
@@ -2508,9 +2508,10 @@ static MACHINE_START( x68030 )
 	memory_install_read32_handler(space,0x000000,messram_get_size(devtag_get_device(machine, "messram"))-1,0xffffffff,0,(read32_space_func)1);
 	memory_install_write32_handler(space,0x000000,messram_get_size(devtag_get_device(machine, "messram"))-1,0xffffffff,0,(write32_space_func)1);
 	// mirror? Human68k 3.02 explicitly adds 0x3000000 to some pointers
-	memory_install_read32_handler(space,0x3000000,0x3000000+messram_get_size(devtag_get_device(machine, "messram"))-1,0xffffffff,0,(read32_space_func)1);
-	memory_install_write32_handler(space,0x3000000,0x3000000+messram_get_size(devtag_get_device(machine, "messram"))-1,0xffffffff,0,(write32_space_func)1);
+	memory_install_read32_handler(space,0x3000000,0x3000000+messram_get_size(devtag_get_device(machine, "messram"))-1,0xffffffff,0,(read32_space_func)5);
+	memory_install_write32_handler(space,0x3000000,0x3000000+messram_get_size(devtag_get_device(machine, "messram"))-1,0xffffffff,0,(write32_space_func)5);
 	memory_set_bankptr(machine, 1,messram_get_ptr(devtag_get_device(machine, "messram")));
+	memory_set_bankptr(machine, 5,messram_get_ptr(devtag_get_device(machine, "messram")));
 	memory_install_read32_handler(space,0xc00000,0xdfffff,0xffffffff,0,x68k_gvram32_r);
 	memory_install_write32_handler(space,0xc00000,0xdfffff,0xffffffff,0,x68k_gvram32_w);
 	memory_set_bankptr(machine, 2,x68k_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
