@@ -8,7 +8,7 @@
 
 ******************************************************************************/
 
-#include "ctype.h"
+#include <ctype.h>
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/sn76496.h"
