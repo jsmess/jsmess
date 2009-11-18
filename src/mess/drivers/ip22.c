@@ -1027,6 +1027,8 @@ static UINT32 nPBUS_DMA_WordsLeft;
 
 static TIMER_CALLBACK(ip22_dma)
 {
+	timer_set(machine, attotime_never, NULL, 0, ip22_dma);
+	/*
 	if( nPBUS_DMA_Active )
 	{
 		UINT16 temp16 = ( ip22_mainram[(nPBUS_DMA_CurPtr - 0x08000000)/4] & 0xffff0000 ) >> 16;
@@ -1054,6 +1056,7 @@ static TIMER_CALLBACK(ip22_dma)
 		}
 		timer_set(machine, ATTOTIME_IN_HZ(44100), NULL, 0, ip22_dma);
 	}
+	*/
 }
 
 static READ32_HANDLER( hpc3_pbusdma_r )
