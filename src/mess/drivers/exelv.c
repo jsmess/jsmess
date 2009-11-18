@@ -56,6 +56,19 @@ TODO:
 /*#include "devices/cartslot.h"
 #include "devices/cassette.h"*/
 
+
+typedef struct _exelv_state
+{
+	UINT8	tms7040_porta;
+	UINT8	tms7040_portb;
+	UINT8	tms7040_portc;
+	UINT8	tms7040_portd;
+} exelv_state;
+
+
+static exelv_state exelv_driver_state;
+
+
 static void io_reset(void);
 
 /*
@@ -491,6 +504,114 @@ static WRITE8_HANDLER(exelv_portb_w)
 	set_io_ack((data & 0x2) != 0);
 }
 
+
+/*
+    TMS7041 PORT A
+    A0 - X1 NDSR A8
+    A1 - X1 MDTR A9
+    A2 - REV2 WX302-3
+    A3 - TMS5220 IRQ
+    A4 - REV4 WX302-4
+    A5 - X1 RXD A4 (version b) / WX301-14 (version a)
+    A6 - X1 SCLK A9
+    A7 - TMS5220 RDY
+*/
+static READ8_HANDLER(tms7040_porta_r)
+{
+	UINT8 data = 0xFF;
+
+	logerror("tms7040_porta_r\n");
+
+	return data;
+}
+
+
+static WRITE8_HANDLER(tms7040_porta_w)
+{
+	logerror("tms7040_porta_w: data = 0x%02x\n", data);
+
+	exelv_driver_state.tms7040_porta = data;
+}
+
+
+/*
+    TMS7041 PORT B
+    B0 - TMS5220 W
+    B1 - TMS5220 R
+    B2 - REV1 WX302-13
+    B3 - X1 TXD A5 (version b) / WX301-8 (version a)
+    B4 - TP3
+    B5 - REV5 WX318-1
+    B6 - REV6 WX319-11
+    B7 - REV3 WX302-6
+*/
+static READ8_HANDLER(tms7040_portb_r)
+{
+	UINT8 data = 0xFF;
+
+	logerror("tms7040_portb_r\n");
+
+	return data;
+}
+
+
+static WRITE8_HANDLER(tms7040_portb_w)
+{
+	logerror("tms7040_portb_w: data = 0x%02x\n", data);
+
+	exelv_driver_state.tms7040_portb = data;
+}
+
+
+/*
+    TMS7041 PORT C - connected to mailbox WX318 and WX319 data bits
+*/
+static READ8_HANDLER(tms7040_portc_r)
+{
+	UINT8 data = 0xFF;
+
+	logerror("tms7040_portc_r\n");
+
+	return data;
+}
+
+
+static WRITE8_HANDLER(tms7040_portc_w)
+{
+	logerror("tms7040_portc_w: data = 0x%02x\n", data);
+
+	exelv_driver_state.tms7040_portc = data;
+}
+
+
+/*
+    TMS7041 PORT D
+    D0 - TMS5220 D7
+    D1 - TMS5220 D6
+    D2 - TMS5220 D5
+    D3 - TMS5220 D4
+    D4 - TMS5220 D3
+    D5 - TMS5220 D2
+    D6 - TMS5220 D1
+    D7 - TMS5220 D0
+*/
+static READ8_HANDLER(tms7040_portd_r)
+{
+	UINT8 data = 0xFF;
+
+	logerror("tms7040_portd_r\n");
+
+	return data;
+}
+
+
+static WRITE8_HANDLER(tms7040_portd_w)
+{
+	logerror("tms7040_portd_w: data = 0x%02x\n", data);
+
+	exelv_driver_state.tms7040_portd = data;
+}
+
 /*
     Main CPU memory map summary:
 
@@ -547,6 +668,10 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(exelv_tms7040_port, ADDRESS_SPACE_IO, 8)
+	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA)	AM_READWRITE(tms7040_porta_r, tms7040_porta_w)	/* interfacing to modem port, tms5200, and main cpu */
+	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB)	AM_READWRITE(tms7040_portb_r, tms7040_portb_w)	/* Various */
+	AM_RANGE(TMS7000_PORTC, TMS7000_PORTC)	AM_READWRITE(tms7040_portc_r, tms7040_portc_w)	/* Connected to mailbox */
+	AM_RANGE(TMS7000_PORTD, TMS7000_PORTD)	AM_READWRITE(tms7040_portd_r, tms7040_portd_w)	/*(Reverse) connected to tms5220 data pins */
 ADDRESS_MAP_END
 
 
