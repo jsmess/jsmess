@@ -59,6 +59,11 @@ TODO:
 
 typedef struct _exelv_state
 {
+	/* tms7020 i/o ports */
+	UINT8	tms7020_porta;
+	UINT8	tms7020_portb;
+
+	/* tms7041 i/o ports */
 	UINT8	tms7040_porta;
 	UINT8	tms7040_portb;
 	UINT8	tms7040_portc;
@@ -493,13 +498,50 @@ static WRITE8_HANDLER(mailbox_w)
 	}
 }
 
-static READ8_HANDLER(exelv_porta_r)
+/*
+    TMS7020 PORT A
+    A0 - R - TMS7041 port B bit 7 (REV3)
+    A1 - 
+    A2 - 
+    A3 - 
+    A4 - 
+    A5 - 
+    A6 - 
+    A7 - 
+*/
+static READ8_HANDLER(tms7020_porta_r)
 {
-	return (io_command_ack || io_ack) ? 1 : 0;
+	return ( exelv_driver_state.tms7040_portb & 0x80 ) ? 0x01 : 0x00;
 }
 
-static WRITE8_HANDLER(exelv_portb_w)
+
+static WRITE8_HANDLER(tms7020_porta_w)
 {
+	exelv_driver_state.tms7020_porta = data;
+}
+
+
+/*
+    TMS7020 PORT B
+    B0 - W - TMS7041 port A bit 2 (REV2)
+    B1 - W - TMS7041 port A bit 4 (REV4)
+    B2 - 
+    B3 - 
+    B4 - 
+    B5 - 
+    B6 - 
+    B7 - 
+*/
+static READ8_HANDLER(tms7020_portb_r)
+{
+	return 0x00;
+}
+
+
+static WRITE8_HANDLER(tms7020_portb_w)
+{
+	exelv_driver_state.tms7020_portb = data;
+
 	set_io_hsk(space->machine, (data & 0x1) != 0);
 	set_io_ack((data & 0x2) != 0);
 }
@@ -509,18 +551,21 @@ static WRITE8_HANDLER(exelv_portb_w)
     TMS7041 PORT A
     A0 - X1 NDSR A8
     A1 - X1 MDTR A9
-    A2 - REV2 WX302-3
+    A2 - R - TMS7020 port B bit 0 (REV2)
     A3 - TMS5220 IRQ
-    A4 - REV4 WX302-4
+    A4 - R - TMS7020 port B bit 1 (REV4)
     A5 - X1 RXD A4 (version b) / WX301-14 (version a)
     A6 - X1 SCLK A9
     A7 - TMS5220 RDY
 */
 static READ8_HANDLER(tms7040_porta_r)
 {
-	UINT8 data = 0xFF;
+	UINT8 data = 0xED;
 
 	logerror("tms7040_porta_r\n");
+
+	data |= ( exelv_driver_state.tms7020_portb & 0x01 ) ? 0x04 : 0x00;
+	data |= ( exelv_driver_state.tms7020_portb & 0x02 ) ? 0x10 : 0x00;
 
 	return data;
 }
@@ -656,8 +701,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(exelv_portmap, ADDRESS_SPACE_IO, 8)
 
-	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READ(exelv_porta_r)
-	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_WRITE(exelv_portb_w)
+	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READWRITE(tms7020_porta_r, tms7020_porta_w)
+	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_READWRITE(tms7020_portb_r, tms7020_portb_w)
 
 ADDRESS_MAP_END
 
@@ -668,10 +713,10 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(exelv_tms7040_port, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA)	AM_READWRITE(tms7040_porta_r, tms7040_porta_w)	/* interfacing to modem port, tms5200, and main cpu */
-	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB)	AM_READWRITE(tms7040_portb_r, tms7040_portb_w)	/* Various */
-	AM_RANGE(TMS7000_PORTC, TMS7000_PORTC)	AM_READWRITE(tms7040_portc_r, tms7040_portc_w)	/* Connected to mailbox */
-	AM_RANGE(TMS7000_PORTD, TMS7000_PORTD)	AM_READWRITE(tms7040_portd_r, tms7040_portd_w)	/*(Reverse) connected to tms5220 data pins */
+	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA)	AM_READWRITE(tms7040_porta_r, tms7040_porta_w)
+	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB)	AM_READWRITE(tms7040_portb_r, tms7040_portb_w)
+	AM_RANGE(TMS7000_PORTC, TMS7000_PORTC)	AM_READWRITE(tms7040_portc_r, tms7040_portc_w)
+	AM_RANGE(TMS7000_PORTD, TMS7000_PORTD)	AM_READWRITE(tms7040_portd_r, tms7040_portd_w)
 ADDRESS_MAP_END
 
 
