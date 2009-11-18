@@ -24,6 +24,8 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
+- [EXL100] Added 7041 rom dump.  [Wilbert Pol]
+
 - [SMS] Added SegaScope (3D-Glasses) support to Sega Master System I
   drivers (i.e. sms1, sms1pal, smsj & sg1000m3). To enable this, enter
   Driver Configuration menu and turn on SegaScope, then go in the Video
