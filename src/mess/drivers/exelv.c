@@ -511,12 +511,16 @@ static WRITE8_HANDLER(mailbox_w)
 */
 static READ8_HANDLER(tms7020_porta_r)
 {
+	logerror("tms7020_porta_r\n");
+
 	return ( exelv_driver_state.tms7040_portb & 0x80 ) ? 0x01 : 0x00;
 }
 
 
 static WRITE8_HANDLER(tms7020_porta_w)
 {
+	logerror("tms7020_porta_w: data = 0x%02x\n", data);
+
 	exelv_driver_state.tms7020_porta = data;
 }
 
@@ -534,12 +538,16 @@ static WRITE8_HANDLER(tms7020_porta_w)
 */
 static READ8_HANDLER(tms7020_portb_r)
 {
+	logerror("tms7020_portb_r\n");
+
 	return 0x00;
 }
 
 
 static WRITE8_HANDLER(tms7020_portb_w)
 {
+	logerror("tms7020_portb_w: data = 0x%02x\n", data);
+
 	exelv_driver_state.tms7020_portb = data;
 
 	set_io_hsk(space->machine, (data & 0x1) != 0);
@@ -560,7 +568,7 @@ static WRITE8_HANDLER(tms7020_portb_w)
 */
 static READ8_HANDLER(tms7040_porta_r)
 {
-	UINT8 data = 0xED;
+	UINT8 data = 0x6D;
 
 	logerror("tms7040_porta_r\n");
 
