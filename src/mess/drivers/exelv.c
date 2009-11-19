@@ -64,10 +64,10 @@ typedef struct _exelv_state
 	UINT8	tms7020_portb;
 
 	/* tms7041 i/o ports */
-	UINT8	tms7040_porta;
-	UINT8	tms7040_portb;
-	UINT8	tms7040_portc;
-	UINT8	tms7040_portd;
+	UINT8	tms7041_porta;
+	UINT8	tms7041_portb;
+	UINT8	tms7041_portc;
+	UINT8	tms7041_portd;
 } exelv_state;
 
 
@@ -513,7 +513,7 @@ static READ8_HANDLER(tms7020_porta_r)
 {
 	logerror("tms7020_porta_r\n");
 
-	return ( exelv_driver_state.tms7040_portb & 0x80 ) ? 0x01 : 0x00;
+	return ( exelv_driver_state.tms7041_portb & 0x80 ) ? 0x01 : 0x00;
 }
 
 
@@ -566,11 +566,11 @@ static WRITE8_HANDLER(tms7020_portb_w)
     A6 - X1 SCLK A9
     A7 - TMS5220 RDY
 */
-static READ8_HANDLER(tms7040_porta_r)
+static READ8_HANDLER(tms7041_porta_r)
 {
 	UINT8 data = 0x6D;
 
-	logerror("tms7040_porta_r\n");
+	logerror("tms7041_porta_r\n");
 
 	data |= ( exelv_driver_state.tms7020_portb & 0x01 ) ? 0x04 : 0x00;
 	data |= ( exelv_driver_state.tms7020_portb & 0x02 ) ? 0x10 : 0x00;
@@ -579,11 +579,11 @@ static READ8_HANDLER(tms7040_porta_r)
 }
 
 
-static WRITE8_HANDLER(tms7040_porta_w)
+static WRITE8_HANDLER(tms7041_porta_w)
 {
-	logerror("tms7040_porta_w: data = 0x%02x\n", data);
+	logerror("tms7041_porta_w: data = 0x%02x\n", data);
 
-	exelv_driver_state.tms7040_porta = data;
+	exelv_driver_state.tms7041_porta = data;
 }
 
 
@@ -598,42 +598,42 @@ static WRITE8_HANDLER(tms7040_porta_w)
     B6 - REV6 WX319-11
     B7 - REV3 WX302-6
 */
-static READ8_HANDLER(tms7040_portb_r)
+static READ8_HANDLER(tms7041_portb_r)
 {
 	UINT8 data = 0xFF;
 
-	logerror("tms7040_portb_r\n");
+	logerror("tms7041_portb_r\n");
 
 	return data;
 }
 
 
-static WRITE8_HANDLER(tms7040_portb_w)
+static WRITE8_HANDLER(tms7041_portb_w)
 {
-	logerror("tms7040_portb_w: data = 0x%02x\n", data);
+	logerror("tms7041_portb_w: data = 0x%02x\n", data);
 
-	exelv_driver_state.tms7040_portb = data;
+	exelv_driver_state.tms7041_portb = data;
 }
 
 
 /*
     TMS7041 PORT C - connected to mailbox WX318 and WX319 data bits
 */
-static READ8_HANDLER(tms7040_portc_r)
+static READ8_HANDLER(tms7041_portc_r)
 {
 	UINT8 data = 0xFF;
 
-	logerror("tms7040_portc_r\n");
+	logerror("tms7041_portc_r\n");
 
 	return data;
 }
 
 
-static WRITE8_HANDLER(tms7040_portc_w)
+static WRITE8_HANDLER(tms7041_portc_w)
 {
-	logerror("tms7040_portc_w: data = 0x%02x\n", data);
+	logerror("tms7041_portc_w: data = 0x%02x\n", data);
 
-	exelv_driver_state.tms7040_portc = data;
+	exelv_driver_state.tms7041_portc = data;
 }
 
 
@@ -648,21 +648,21 @@ static WRITE8_HANDLER(tms7040_portc_w)
     D6 - TMS5220 D1
     D7 - TMS5220 D0
 */
-static READ8_HANDLER(tms7040_portd_r)
+static READ8_HANDLER(tms7041_portd_r)
 {
 	UINT8 data = 0xFF;
 
-	logerror("tms7040_portd_r\n");
+	logerror("tms7041_portd_r\n");
 
 	return data;
 }
 
 
-static WRITE8_HANDLER(tms7040_portd_w)
+static WRITE8_HANDLER(tms7041_portd_w)
 {
-	logerror("tms7040_portd_w: data = 0x%02x\n", data);
+	logerror("tms7041_portd_w: data = 0x%02x\n", data);
 
-	exelv_driver_state.tms7040_portd = data;
+	exelv_driver_state.tms7041_portd = data;
 }
 
 /*
@@ -690,8 +690,7 @@ static WRITE8_HANDLER(tms7040_portd_w)
     @>f800-@>ffff: tms7020/tms7040 internal ROM
 */
 
-static ADDRESS_MAP_START(exelv_memmap, ADDRESS_SPACE_PROGRAM, 8)
-
+static ADDRESS_MAP_START(tms7020_mem, ADDRESS_SPACE_PROGRAM, 8)
 	//AM_RANGE(0x0000, 0x007f) AM_READWRITE(tms7000_internal_r, tms7000_internal_w)/* tms7020 internal RAM */
 	AM_RANGE(0x0080, 0x00ff) AM_NOP
 	//AM_RANGE(0x0100, 0x010b) AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)/* tms7020 internal I/O ports */
@@ -704,27 +703,47 @@ static ADDRESS_MAP_START(exelv_memmap, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM										/* CPU RAM */
 	AM_RANGE(0xc800, 0xf7ff) AM_NOP
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION("maincpu",0x0000)		/* tms7020 internal ROM */
-
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(exelv_portmap, ADDRESS_SPACE_IO, 8)
 
+static ADDRESS_MAP_START(tms7020_port, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READWRITE(tms7020_porta_r, tms7020_porta_w)
 	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_READWRITE(tms7020_portb_r, tms7020_portb_w)
-
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(exelv_tms7040_map, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("tms7040",0x0000)
+static ADDRESS_MAP_START(tms7041_map, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("tms7041",0x0000)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(exelv_tms7040_port, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA)	AM_READWRITE(tms7040_porta_r, tms7040_porta_w)
-	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB)	AM_READWRITE(tms7040_portb_r, tms7040_portb_w)
-	AM_RANGE(TMS7000_PORTC, TMS7000_PORTC)	AM_READWRITE(tms7040_portc_r, tms7040_portc_w)
-	AM_RANGE(TMS7000_PORTD, TMS7000_PORTD)	AM_READWRITE(tms7040_portd_r, tms7040_portd_w)
+static ADDRESS_MAP_START(tms7041_port, ADDRESS_SPACE_IO, 8)
+	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA)	AM_READWRITE(tms7041_porta_r, tms7041_porta_w)
+	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB)	AM_READWRITE(tms7041_portb_r, tms7041_portb_w)
+	AM_RANGE(TMS7000_PORTC, TMS7000_PORTC)	AM_READWRITE(tms7041_portc_r, tms7041_portc_w)
+	AM_RANGE(TMS7000_PORTD, TMS7000_PORTD)	AM_READWRITE(tms7041_portd_r, tms7041_portd_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START(tms7040_mem, ADDRESS_SPACE_PROGRAM, 8)
+	//AM_RANGE(0x0000, 0x007f) AM_READWRITE(tms7000_internal_r, tms7000_internal_w)/* tms7040 internal RAM */
+	AM_RANGE(0x0080, 0x00ff) AM_NOP
+	//AM_RANGE(0x0100, 0x010b) AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)/* tms7020 internal I/O ports */
+	//AM_RANGE(0x010c, 0x01ff) AM_READWRITE(SMH_NOP, SMH_NOP)     /* external I/O ports */
+	AM_RANGE(0x012d, 0x0012d) AM_READWRITE(tms3556_reg_r/*right???*/, tms3556_reg_w)
+	AM_RANGE(0x012e, 0x0012e) AM_READWRITE(tms3556_vram_r/*right???*/, tms3556_vram_w)
+	AM_RANGE(0x0130, 0x00130) AM_READWRITE(mailbox_r, mailbox_w)
+	AM_RANGE(0x0200, 0x7fff) AM_ROMBANK(1)								/* system ROM */
+	AM_RANGE(0x8000, 0xbfff) AM_NOP
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM										/* CPU RAM */
+	AM_RANGE(0xc800, 0xefff) AM_NOP
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu",0x0000)		/* tms7040 internal ROM */
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START(tms7042_map, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0xe000, 0xefff) AM_ROM AM_REGION("tms7042",0x0000)
+    AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("tms7042",0x0000)		/* Duplicated until a proper dump surfaces */
 ADDRESS_MAP_END
 
 
@@ -736,17 +755,45 @@ static INPUT_PORTS_START(exelv)
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START(exelv)
+static MACHINE_DRIVER_START(exl100)
 	/* basic machine hardware */
-	/* TMS7020 CPU @ 4.91(?) MHz */
-	MDRV_CPU_ADD("maincpu", TMS7000_EXL, XTAL_4_9152MHz)
-	MDRV_CPU_PROGRAM_MAP(exelv_memmap)
-	MDRV_CPU_IO_MAP(exelv_portmap)
+	MDRV_CPU_ADD("maincpu", TMS7000_EXL, XTAL_4_9152MHz)	/* TMS7020 */
+	MDRV_CPU_PROGRAM_MAP(tms7020_mem)
+	MDRV_CPU_IO_MAP(tms7020_port)
 	MDRV_CPU_VBLANK_INT_HACK(exelv_hblank_interrupt, 363)
 
-	MDRV_CPU_ADD("tms7040", TMS7000, XTAL_4_9152MHz)
-	MDRV_CPU_PROGRAM_MAP(exelv_tms7040_map)
-	MDRV_CPU_IO_MAP(exelv_tms7040_port)
+	MDRV_CPU_ADD("tms7041", TMS7000, XTAL_4_9152MHz)
+	MDRV_CPU_PROGRAM_MAP(tms7041_map)
+	MDRV_CPU_IO_MAP(tms7041_port)
+
+	MDRV_QUANTUM_TIME(HZ(60))
+
+	MDRV_MACHINE_RESET( exelv )
+
+	/* video hardware */
+	MDRV_IMPORT_FROM(tms3556)
+
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+
+	MDRV_VIDEO_START(exelv)
+
+	/* sound */
+	/*MDRV_SOUND_ADD("tms5220", TMS5220, tms5220interface)*/
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START(exeltel)
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", TMS7000_EXL, XTAL_4_9152MHz)	/* TMS7040 */
+	MDRV_CPU_PROGRAM_MAP(tms7040_mem)
+	MDRV_CPU_IO_MAP(tms7020_port)
+	MDRV_CPU_VBLANK_INT_HACK(exelv_hblank_interrupt, 363)
+
+	MDRV_CPU_ADD("tms7042", TMS7000, XTAL_4_9152MHz)
+	MDRV_CPU_PROGRAM_MAP(tms7042_map)
+	MDRV_CPU_IO_MAP(tms7041_port)
 
 	MDRV_QUANTUM_TIME(HZ(60))
 
@@ -771,10 +818,10 @@ MACHINE_DRIVER_END
 */
 ROM_START(exl100)
 	ROM_REGION(0x800, "maincpu", 0)
-	ROM_LOAD("exl100in.bin", 0x0000, 0x0800, BAD_DUMP CRC(049109a3) SHA1(98a07297dcdacef41c793c197b6496dac1e8e744))		/* TMS7020 ROM, needs verification */
+	ROM_LOAD("exl100in.bin", 0x0000, 0x0800, CRC(049109a3) SHA1(98a07297dcdacef41c793c197b6496dac1e8e744))		/* TMS7020 ROM, verification would be welcome */
 
-	ROM_REGION(0x1000, "tms7040", 0)
-	ROM_LOAD("exl100_7041.bin", 0x0000, 0x1000, BAD_DUMP CRC(a0163507) SHA1(8452849df7eac8a89cf03ee98e2306047c1c4c38))			/* TMS7041 internal ROM, needs verification  */
+	ROM_REGION(0x1000, "tms7041", 0)
+	ROM_LOAD("exl100_7041.bin", 0x0000, 0x1000, CRC(a0163507) SHA1(8452849df7eac8a89cf03ee98e2306047c1c4c38))			/* TMS7041 internal ROM, verification would be welcome  */
 
 	ROM_REGION(0x10000, "user1", ROMREGION_ERASEFF)			/* cartridge area */
 ROM_END
@@ -783,15 +830,16 @@ ROM_END
 ROM_START(exeltel)
 	/*CPU memory space*/
 	ROM_REGION(0x1000, "maincpu", 0)
-	ROM_LOAD("exeltelin.bin", 0x0006, 0x0ffa, BAD_DUMP CRC(c12f24b5))		/* TMS7020 internal ROM */
+	ROM_LOAD("exeltel_7040.bin", 0x0000, 0x1000, CRC(2792f02f) SHA1(442a852eb68ef78974733d169084752a131de23d))		/* TMS7040 internal ROM */
 
-	ROM_REGION(0x1000, "tms7040", 0)
+	ROM_REGION(0x1000, "tms7042", 0)
 	ROM_LOAD("exeltel_7042.bin", 0x0000, 0x1000, BAD_DUMP CRC(a0163507) SHA1(8452849df7eac8a89cf03ee98e2306047c1c4c38))			/* TMS7042 internal ROM, needs redump */
 
 	ROM_REGION(0x10000,"user1",0)
 	ROM_LOAD("exeltel14.bin", 0x0000, 0x10000, CRC(52a80dd4) SHA1(2cb4c784fba3aec52770999bb99a9a303269bf89))	/* system ROM */
 ROM_END
 
+
 /*      YEAR    NAME    PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG      COMPANY         FULLNAME */
-COMP(	1984,	exl100, 0,          0,      exelv,      exelv,  0,		0,      "Exelvision",   "EXL 100" , GAME_NOT_WORKING)
-COMP(	1986,	exeltel,exl100,     0,		exelv,		exelv,	0,		0,		"Exelvision",	"Exeltel" , GAME_NOT_WORKING)
+COMP(	1984,	exl100, 0,          0,      exl100,     exelv,  0,		0,      "Exelvision",   "EXL 100" , GAME_NOT_WORKING)
+COMP(	1986,	exeltel,exl100,     0,		exeltel,	exelv,	0,		0,		"Exelvision",	"Exeltel" , GAME_NOT_WORKING)
