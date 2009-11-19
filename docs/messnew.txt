@@ -18,6 +18,7 @@ Systems Promoted from GAME_NOT_WORKING:
 
 Skeleton drivers: 
 -----------------
+- Exelvision Exeltel
 - Sharp PC-E220
 
 
