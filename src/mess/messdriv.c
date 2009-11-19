@@ -1310,7 +1310,7 @@ const game_driver * const drivers[] =
 
     /* Exeltel */
     DRIVER( exl100 )
-//  DRIVER( exeltel )
+	DRIVER( exeltel )
 
     /* Comx World Operations Ltd */
     DRIVER( comx35p )
