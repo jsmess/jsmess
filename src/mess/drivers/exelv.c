@@ -54,6 +54,7 @@ TODO:
 #include "cpu/tms7000/tms7000.h"
 #include "video/tms3556.h"
 #include "sound/tms5220.h"
+#include "audio/spchroms.h"
 /*#include "devices/cartslot.h"
 #include "devices/cassette.h"*/
 
@@ -88,9 +89,13 @@ static VIDEO_START( exelv )
 	tms3556_init(machine, /*0x8000*/0x10000);	/* tms3556 with 32 kb of video RAM */
 }
 
+
 static MACHINE_RESET( exelv )
 {
+	static const spchroms_interface exelv_speech_intf = { "tms5220c" };
+
 	tms3556_reset();
+	spchroms_config( machine, &exelv_speech_intf );
 	memory_set_bankptr( machine, 1, memory_region(machine, "user1") + 0x0200 );
 }
 
@@ -195,6 +200,7 @@ static WRITE8_HANDLER(mailbox_wx318_w)
 
 	exelv_driver_state.wx318 = data;
 }
+
 
 /*
     TMS7020 PORT A
@@ -480,9 +486,9 @@ INPUT_PORTS_END
 static const tms5220_interface exl100_tms5220_interface =
 {
 	DEVCB_NULL,						/* no IRQ callback */
-	NULL,							/* speech ROM read handler */
-	NULL,							/* speech ROM load address handler */
-	NULL							/* speech ROM read and branch handler */
+	spchroms_read,					/* speech ROM read handler */
+	spchroms_load_address,			/* speech ROM load address handler */
+	spchroms_read_and_branch		/* speech ROM read and branch handler */
 };
 
 
@@ -563,6 +569,10 @@ ROM_START(exl100)
 	ROM_LOAD("exl100_7041.bin", 0x0000, 0x1000, CRC(a0163507) SHA1(8452849df7eac8a89cf03ee98e2306047c1c4c38))			/* TMS7041 internal ROM, verification would be welcome  */
 
 	ROM_REGION(0x10000, "user1", ROMREGION_ERASEFF)			/* cartridge area */
+
+	/* TMS5220 ROM space, no idea if this is correct for exl100 */
+	ROM_REGION(0x8000, "tms5220c", 0)
+	ROM_LOAD_OPTIONAL("spchrom.bin", 0x0000, 0x8000, CRC(58b155f7) SHA1(382292295c00dff348d7e17c5ce4da12a1d87763)) /* system speech ROM */
 ROM_END
 
 
@@ -574,7 +584,14 @@ ROM_START(exeltel)
 	ROM_LOAD("exeltel_7042.bin", 0x0000, 0x1000, BAD_DUMP CRC(a0163507) SHA1(8452849df7eac8a89cf03ee98e2306047c1c4c38))			/* TMS7042 internal ROM, needs redump */
 
 	ROM_REGION(0x10000,"user1",0)
-	ROM_LOAD("exeltel14.bin", 0x0000, 0x10000, CRC(52a80dd4) SHA1(2cb4c784fba3aec52770999bb99a9a303269bf89))	/* system ROM */
+	ROM_SYSTEM_BIOS( 0, "french", "French v1.4" )
+	ROMX_LOAD("exeltel14.bin", 0x0000, 0x10000, CRC(52a80dd4) SHA1(2cb4c784fba3aec52770999bb99a9a303269bf89), ROM_BIOS(1))	/* French system ROM v1.4 */
+	ROM_SYSTEM_BIOS( 1, "spanish", "Spanish" )
+	ROMX_LOAD("amper.bin", 0x0000, 0x10000, CRC(45af256c) SHA1(3bff16542f8ac55b9841084ea38034132459facb), ROM_BIOS(2)) /* Spanish system rom */
+
+	/* TMS5220 ROM space,; no idea if this is correct for exeltel */
+	ROM_REGION(0x8000, "tms5220c", 0)
+	ROM_LOAD_OPTIONAL("spchrom.bin", 0x0000, 0x8000, CRC(58b155f7) SHA1(382292295c00dff348d7e17c5ce4da12a1d87763)) /* system speech ROM */
 ROM_END
 
 
