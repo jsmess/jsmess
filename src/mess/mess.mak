@@ -295,14 +295,14 @@ DRVLIBS = \
 	$(MESSOBJ)/grundy.a \
 	$(MESSOBJ)/hartung.a \
 	$(MESSOBJ)/heathkit.a \
+	$(MESSOBJ)/hec2hrp.a \
 	$(MESSOBJ)/hegener.a \
 	$(MESSOBJ)/homebrew.a \
 	$(MESSOBJ)/homelab.a \
 	$(MESSOBJ)/hp.a \
-	$(MESSOBJ)/hec2hrp.a \
-	$(MESSOBJ)/interact.a \
 	$(MESSOBJ)/intel.a \
 	$(MESSOBJ)/intelgnt.a \
+	$(MESSOBJ)/interact.a \
 	$(MESSOBJ)/interton.a \
 	$(MESSOBJ)/intv.a \
 	$(MESSOBJ)/jupiter.a \

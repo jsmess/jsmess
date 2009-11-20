@@ -452,7 +452,13 @@ or Fatal Fury for example).
 #include "deprecat.h"
 #include "cpu/mips/mips3.h"
 
-static int hng64_boothack = 0;
+static int hng64_mcu_type = 0;
+static UINT32 fake_mcu_time;
+#define FIGHT_MCU  1
+#define SHOOT_MCU  2
+#define RACING_MCU 3
+#define SAMSHO_MCU 4
+
 static UINT32 *rombase;
 static UINT32 *hng_mainram;
 static UINT32 *hng_cart;
@@ -619,7 +625,7 @@ static WRITE32_HANDLER( hng64_pal_w )
 	//  popmessage("Alpha is not zero!") ;
 
 	// sams64 / sams64_2 never write a palette, why not?
-	if (hng64_boothack!=1)
+	if (hng64_mcu_type!=SAMSHO_MCU)
 		palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
@@ -727,51 +733,123 @@ static WRITE32_HANDLER( hng64_sram_w )
 	COMBINE_DATA (&hng64_sram[offset]);
 }
 
-static WRITE32_HANDLER( hng64_dualport_w )
+/**************************************
+* MCU simulations
+**************************************/
+
+/* Fatal Fury Wild Ambition / Buriki One */
+static READ32_HANDLER( fight_io_r )
 {
-	logerror("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
-	COMBINE_DATA (&hng64_dualport[offset]);
-}
-
-
-static READ32_HANDLER( hng64_dualport_r )
-{
-	static int toggle = 0;
-
-	logerror("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
-
-	// These hacks create some red marks for the boot-up sequence
 	switch (offset*4)
 	{
-		//SamSho64
-        case 0x00:
-		{
-
-			if (hng64_boothack == 1) // ss64
-			{
-				toggle^=1; if (toggle==1) {return 0x00000400;} else {return 0x00000300;};
-			}
-			else if (hng64_boothack == 2) // ffwa
-			{
-				return 0x00000400;
-			}
-
-			return mame_rand(space->machine);
-		}
-
-		//RoadsEdge
-//      case 0x00:  return input_port_read(space->machine, "IPT_TEST");
-
-
-		case 0x04:  return input_port_read(space->machine, "SYSTEM");
-		case 0x08:  return input_port_read(space->machine, "P1_P2");
-
-		// This takes care of the 'machine' error code
+		case 0x000: return 0x00000400;
+		case 0x004: return input_port_read(space->machine, "SYSTEM");
+		case 0x008: return input_port_read(space->machine, "P1_P2");
 		case 0x600: return no_machine_error_code;
 	}
 
+	return hng64_dualport[offset];
+}
+
+/* Samurai Shodown 64 / Samurai Shodown 64 2 */
+static READ32_HANDLER( samsho_io_r )
+{
+	switch (offset*4)
+	{
+        case 0x000:
+		{
+			/* this is used on post by the io mcu to signal that a init task is complete, zeroed otherwise. */
+			//popmessage("%04x",fake_mcu_time);
+
+			if(fake_mcu_time < 0x100)
+				fake_mcu_time++;
+
+			if(fake_mcu_time < 0x80) //i/o init 1
+				return 0x300;
+			else if(fake_mcu_time < 0x100)//i/o init 2
+				return 0x400;
+			else
+				return 0x000;
+		}
+		case 0x004: return input_port_read(space->machine, "SYSTEM");
+		case 0x008: return input_port_read(space->machine, "P1_P2");
+		case 0x600: return no_machine_error_code;
+	}
+
+	return hng64_dualport[offset];
+}
+
+/* Beast Busters 2 */
+/* FIXME: trigger input doesn't work? */
+static READ32_HANDLER( shoot_io_r )
+{
+	switch (offset*4)
+	{
+        case 0x000:
+        {
+        	if(cpu_get_pc(space->cpu) == 0x8000e040 || cpu_get_pc(space->cpu) == 0x80012fc0) //i/o init 1
+				return 0x400;
+
+        	return 0;
+		}
+		case 0x010: return input_port_read(space->machine, "D_IN");
+		case 0x018:
+		{
+			UINT8 p1_x, p1_y, p2_x, p2_y;
+			p1_x = input_port_read(space->machine, "LIGHT_P1_X") & 0xff;
+			p1_y = input_port_read(space->machine, "LIGHT_P1_Y") & 0xff;
+			p2_x = input_port_read(space->machine, "LIGHT_P2_X") & 0xff;
+			p2_y = input_port_read(space->machine, "LIGHT_P2_Y") & 0xff;
+
+			return p1_x<<24 | p1_y<<16 | p2_x<<8 | p2_y;
+		}
+		case 0x01c:
+		{
+			UINT8 p3_x, p3_y;
+			p3_x = input_port_read(space->machine, "LIGHT_P3_X") & 0xff;
+			p3_y = input_port_read(space->machine, "LIGHT_P3_Y") & 0xff;
+
+			return p3_x<<24 | p3_y<<16 | p3_x<<8 | p3_y; //FIXME: see what's the right bank here when the trigger works
+		}
+		case 0x600: return no_machine_error_code;
+	}
+
+	return hng64_dualport[offset];
+}
+
+/* Roads Edge / Xtreme Rally */
+static READ32_HANDLER( racing_io_r )
+{
+	switch (offset*4)
+	{
+        case 0x000: return mame_rand(space->machine);
+		case 0x004: return input_port_read(space->machine, "SYSTEM");
+		case 0x008: return input_port_read(space->machine, "P1_P2");
+		case 0x600: return no_machine_error_code;
+	}
+
+	return hng64_dualport[offset];
+}
+
+static READ32_HANDLER( hng64_dualport_r )
+{
+	printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+
+	switch(hng64_mcu_type)
+	{
+		case FIGHT_MCU:  return fight_io_r(space, offset,0xffffffff);
+		case SHOOT_MCU:  return shoot_io_r(space, offset,0xffffffff);
+		case RACING_MCU: return racing_io_r(space, offset,0xffffffff);
+		case SAMSHO_MCU: return samsho_io_r(space, offset,0xffffffff);
+	}
+
 	return mame_rand(space->machine)&0xffffffff;
-	//return hng64_dualport[offset];
+}
+
+static WRITE32_HANDLER( hng64_dualport_w )
+{
+	printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+	COMBINE_DATA (&hng64_dualport[offset]);
 }
 
 // Hardware calls these '3d buffers'
@@ -879,6 +957,16 @@ static READ32_HANDLER( tcram_r )
 	return hng64_tcram[offset] ;
 }
 
+/* Some games (namely sams64 after the title screen) tests bit 15 of this to be high, unknown purpose (vblank? related to the display list?). */
+static READ32_HANDLER( unk_vreg_r )
+{
+	static UINT32 toggle;
+
+	toggle^=0x8000;
+	return toggle;
+}
+
+
 /*
 <ElSemi> 0xE0000000 sound
 <ElSemi> 0xD0100000 3D bank A
@@ -944,6 +1032,7 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE(&hng64_tcram)				// Transition Control
 	AM_RANGE(0x20300000, 0x203001ff) AM_WRITE(dl_w) AM_BASE(&hng64_dl)						// 3d Display List
 	AM_RANGE(0x20300214, 0x20300217) AM_WRITE(dl_control_w)
+	AM_RANGE(0x20300218, 0x2030021b) AM_READ(unk_vreg_r)
 
 	// 3d?
 //  AM_RANGE(0x30000000, 0x3000002f) AM_READWRITE(q2_r, q2_w) AM_BASE(&hng64_q2)
@@ -1332,6 +1421,52 @@ static INPUT_PORTS_START( hng64 )
 	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( bbust2 )
+	PORT_START("D_IN")
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_SERVICE2 )
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_SERVICE3 )
+	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_SERVICE )
+	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3) //trigger
+	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3) //pump
+	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(3) //bomb
+	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x00200000, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_START3 )
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) //trigger
+	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) //pump
+	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) //bomb
+	PORT_BIT( 0x08000000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) //trigger
+	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) //pump
+	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) //bomb
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("LIGHT_P1_X")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_START("LIGHT_P1_Y")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_START("LIGHT_P2_X")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_START("LIGHT_P2_Y")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_START("LIGHT_P3_X")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(3)
+
+	PORT_START("LIGHT_P3_Y")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(3)
+INPUT_PORTS_END
 
 
 static const gfx_layout hng64_8x8x4_tilelayout =
@@ -1498,25 +1633,26 @@ static DRIVER_INIT(hng64_fght)
 static DRIVER_INIT( fatfurwa )
 {
 	DRIVER_INIT_CALL(hng64_fght);
-	hng64_boothack = 2;
+	hng64_mcu_type = FIGHT_MCU;
 }
 
 static DRIVER_INIT( ss64 )
 {
 	DRIVER_INIT_CALL(hng64_fght);
-	hng64_boothack = 1;
+	hng64_mcu_type = SAMSHO_MCU;
 }
 
 
 static DRIVER_INIT(hng64_race)
 {
 	no_machine_error_code=0x02000000;
+	hng64_mcu_type = RACING_MCU;
 	DRIVER_INIT_CALL(hng64);
 }
 
 static DRIVER_INIT(hng64_shoot)
 {
-	hng64_boothack = 2;
+	hng64_mcu_type = SHOOT_MCU;
 	no_machine_error_code=0x03000000;
 	DRIVER_INIT_CALL(hng64);
 }
@@ -1601,8 +1737,27 @@ static MACHINE_RESET(hyperneo)
 
 	// "Display List" init - ugly
 	activeBuffer = 0 ;
+
+	/* For simulate MCU stepping */
+	fake_mcu_time = 0;
 }
 
+static PALETTE_INIT( hng64 )
+{
+	#if 0
+
+	int x,r,g,b,i;
+
+	for(i=0;i<0x10;i++)
+	for(x=0;x<0x100;x++)
+	{
+		r = (x & 0xf)*0x10;
+		g = ((x & 0x3c)>>2)*0x10;
+		b = ((x & 0xf0)>>4)*0x10;
+		palette_set_color(machine,x+i*0x100,MAKE_RGB(r,g,b));
+	}
+	#endif
+}
 
 static MACHINE_DRIVER_START( hng64 )
 	/* basic machine hardware */
@@ -1617,6 +1772,8 @@ static MACHINE_DRIVER_START( hng64 )
 	MDRV_CPU_ADD("comm", Z80,MASTER_CLOCK/4)		/* KL5C80A12CFP - binary compatible with Z80. */
 	MDRV_CPU_PROGRAM_MAP(hng_comm_map)
 	MDRV_CPU_IO_MAP(hng_comm_io_map)
+
+	MDRV_PALETTE_INIT(hng64)
 
 	MDRV_GFXDECODE(hng64)
 	MDRV_MACHINE_START(hyperneo)
@@ -2107,7 +2264,7 @@ GAME( 1997, hng64,  0,        hng64, hng64, hng64,      ROT0, "SNK", "Hyper NeoG
 GAME( 1997, roadedge, hng64,  hng64, hng64, hng64_race, ROT0, "SNK", "Roads Edge / Round Trip (rev.B)",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 001 */
 GAME( 1998, sams64,   hng64,  hng64, hng64, ss64,       ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 002 */
 GAME( 1998, xrally,   hng64,  hng64, hng64, hng64_race, ROT0, "SNK", "Xtreme Rally / Off Beat Racer!",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 003 */
-GAME( 1998, bbust2,   hng64,  hng64, hng64, hng64_shoot,ROT0, "SNK", "Beast Busters 2nd Nightmare",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 004 */
+GAME( 1998, bbust2,   hng64,  hng64, bbust2,hng64_shoot,ROT0, "SNK", "Beast Busters 2nd Nightmare",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 004 */
 GAME( 1998, sams64_2, hng64,  hng64, hng64, ss64,       ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 005 */
 GAME( 1998, fatfurwa, hng64,  hng64, hng64, fatfurwa,   ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", GAME_NOT_WORKING|GAME_NO_SOUND )	/* 006 */
 GAME( 1999, buriki,   hng64,  hng64, hng64, fatfurwa,   ROT0, "SNK", "Buriki One (rev.B)",				  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 007 */

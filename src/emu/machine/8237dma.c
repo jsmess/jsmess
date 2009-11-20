@@ -214,7 +214,7 @@ INLINE void dma8237_advance( const device_config *device )
 static void set_dack(i8237_t *i8237, int channel)
 {
 	int i;
-	
+
 	for (i = 0; i < 4; i++)
 	{
 		int state = (i == channel) ^ !BIT(i8237->command, 7);
@@ -602,6 +602,10 @@ WRITE_LINE_DEVICE_HANDLER( i8237_dreq0_w ) { dma8237_drq_write(device, 0, state)
 WRITE_LINE_DEVICE_HANDLER( i8237_dreq1_w ) { dma8237_drq_write(device, 1, state); }
 WRITE_LINE_DEVICE_HANDLER( i8237_dreq2_w ) { dma8237_drq_write(device, 2, state); }
 WRITE_LINE_DEVICE_HANDLER( i8237_dreq3_w ) { dma8237_drq_write(device, 3, state); }
+
+WRITE_LINE_DEVICE_HANDLER( i8237_eop_w )
+{
+}
 
 
 /******************* Unfortunate hacks *******************/

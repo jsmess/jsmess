@@ -1125,6 +1125,7 @@ static void static_generate_exception(mips3_state *mips3, UINT8 exception, int r
 	drcuml_state *drcuml = mips3->impstate->drcuml;
 	UINT32 offset = 0x180;
 	drcuml_codelabel next = 1;
+	drcuml_codelabel skip = 2;
 	drcuml_block *block;
 	jmp_buf errorbuf;
 
@@ -1147,7 +1148,7 @@ static void static_generate_exception(mips3_state *mips3, UINT8 exception, int r
 	UML_HANDLE(block, *exception_handle);											// handle  name
 
 	/* exception parameter is expected to be the fault address in this case */
-	if (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE || exception == EXCEPTION_ADDRLOAD || exception == EXCEPTION_ADDRSTORE)
+	if (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE || exception == EXCEPTION_TLBMOD || exception == EXCEPTION_ADDRLOAD || exception == EXCEPTION_ADDRSTORE)
 	{
 		/* set BadVAddr to the fault address */
 		UML_GETEXP(block, IREG(0));													// getexp  i0
@@ -1203,7 +1204,9 @@ static void static_generate_exception(mips3_state *mips3, UINT8 exception, int r
 	/* choose our target PC */
 	UML_ADD(block, IREG(0), IREG(3), IMM(0xbfc00200));								// add     i0,i3,0xbfc00200
 	UML_TEST(block, IREG(1), IMM(SR_BEV));											// test    i1,SR_BEV
-	UML_ADDc(block, IF_Z, IREG(0), IREG(3), IMM(0x80000000));						// add     i0,i3,0x80000000,z
+	UML_JMPc(block, IF_NZ, skip);													// jnz     <skip>
+	UML_ADD(block, IREG(0), IREG(3), IMM(0x80000000));								// add     i0,i3,0x80000000,z
+	UML_LABEL(block, skip);														// <skip>:
 
 	/* adjust cycles */
 	UML_SUB(block, MEM(&mips3->icount), MEM(&mips3->icount), IREG(1));			 	// sub icount,icount,cycles,S

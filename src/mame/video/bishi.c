@@ -9,7 +9,7 @@
 
 #include "driver.h"
 #include "video/konamiic.h"
-#include "machine/konamigx.h"
+#include "konamigx.h"
 
 static int layer_colorbase[4], layerpri[4];
 
@@ -72,7 +72,7 @@ VIDEO_UPDATE(bishi)
 	static const int pris[4] = { K55_PRIINP_0, K55_PRIINP_3, K55_PRIINP_6, K55_PRIINP_7 };
 	static const int enables[4] = { K55_INP_VRAM_A, K55_INP_VRAM_B, K55_INP_VRAM_C, K55_INP_VRAM_D };
 
-	K054338_update_all_shadows(screen->machine);
+	K054338_update_all_shadows(screen->machine,0 );
 	K054338_fill_backcolor(screen->machine, bitmap, 0);
 
 	for (i = 0; i < 4; i++)

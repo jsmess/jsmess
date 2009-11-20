@@ -5439,11 +5439,17 @@ static void K056832_UpdatePageLayout(void)
 		}
 	}
 
+	// winning spike doesn't like layer association..
+	if (K056832_djmain_hack==2)
+		K056832_LayerAssociation = 0;
+
+
 	// disable all tilemaps
 	for (pageIndex=0; pageIndex<K056832_PAGE_COUNT; pageIndex++)
 	{
 		K056832_LayerAssociatedWithPage[pageIndex] = -1;
 	}
+
 
 	// enable associated tilemaps
 	for (layer=0; layer<4; layer++)
@@ -5460,7 +5466,7 @@ static void K056832_UpdatePageLayout(void)
 			for (c=0; c<colspan; c++)
 			{
 				pageIndex = (((rowstart + r) & 3) << 2) + ((colstart + c) & 3);
-if (!K056832_djmain_hack || K056832_LayerAssociatedWithPage[pageIndex] == -1) //*
+if (!(K056832_djmain_hack==1) || K056832_LayerAssociatedWithPage[pageIndex] == -1) //*
 					K056832_LayerAssociatedWithPage[pageIndex] = setlayer;
 			}
 		}
@@ -6816,6 +6822,12 @@ void K056832_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rect
 			drawrect.min_x = (dminx < cminx ) ? cminx : dminx;
 			drawrect.max_x = (dmaxx > cmaxx ) ? cmaxx : dmaxx;
 
+			// soccer superstars visible area is >512 pixels, this causes problems with the logic because
+			// the tilemaps are 512 pixels across.  Assume that if the limits were set as below that we
+			// want the tilemap to be drawn on the right hand side..  this is probably not the correct
+			// logic, but it works.
+			if ((drawrect.min_x>0) && (drawrect.max_x==511)) drawrect.max_x=cliprect->max_x;
+
 			tilemap_set_scrollx(tmap, 0, dx);
 
 			LINE_SHORTCIRCUIT:
@@ -7267,7 +7279,7 @@ int K054338_read_register(int reg)
 	return k54338_regs[reg];
 }
 
-void K054338_update_all_shadows(running_machine *machine)
+void K054338_update_all_shadows(running_machine *machine, int rushingheroes_hack)
 {
 	int i, d;
 	int noclip = k54338_regs[K338_REG_CONTROL] & K338_CTL_CLIPSL;
@@ -7279,9 +7291,18 @@ void K054338_update_all_shadows(running_machine *machine)
 		K054338_shdRGB[i] = d;
 	}
 
-	palette_set_shadow_dRGB32(machine, 0, K054338_shdRGB[0], K054338_shdRGB[1], K054338_shdRGB[2], noclip);
-	palette_set_shadow_dRGB32(machine, 1, K054338_shdRGB[3], K054338_shdRGB[4], K054338_shdRGB[5], noclip);
-	palette_set_shadow_dRGB32(machine, 2, K054338_shdRGB[6], K054338_shdRGB[7], K054338_shdRGB[8], noclip);
+	if (!rushingheroes_hack)
+	{
+		palette_set_shadow_dRGB32(machine, 0, K054338_shdRGB[0], K054338_shdRGB[1], K054338_shdRGB[2], noclip);
+		palette_set_shadow_dRGB32(machine, 1, K054338_shdRGB[3], K054338_shdRGB[4], K054338_shdRGB[5], noclip);
+		palette_set_shadow_dRGB32(machine, 2, K054338_shdRGB[6], K054338_shdRGB[7], K054338_shdRGB[8], noclip);
+	}
+	else // rushing heroes seems to specify shadows in another format, or it's not being interpreted properly.
+	{
+		palette_set_shadow_dRGB32(machine, 0, -80, -80, -80, 0);
+		palette_set_shadow_dRGB32(machine, 1, -80, -80, -80, 0);
+		palette_set_shadow_dRGB32(machine, 2, -80, -80, -80, 0);
+	}
 }
 
 // K054338 BG color fill

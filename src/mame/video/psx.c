@@ -3916,7 +3916,7 @@ INTERRUPT_GEN( psx_vblank )
 			return;
 	}
 
-	psx_irq_set( device->machine, PSX_IRQ_ROOTCOUNTER3 ); // Is this right?
+	psx_irq_set( device->machine, 0x0001 );
 }
 
 void psx_gpu_reset( running_machine *machine )

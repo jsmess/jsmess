@@ -138,10 +138,9 @@ static const device_config *dmadac[2];
 
 void signal_rcp_interrupt(running_machine *machine, int interrupt)
 {
-	mi_interrupt |= interrupt;
-
 	if (mi_intr_mask & interrupt)
 	{
+		mi_interrupt |= interrupt;
 
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
@@ -151,7 +150,7 @@ void clear_rcp_interrupt(running_machine *machine, int interrupt)
 {
 	mi_interrupt &= ~interrupt;
 
-	if (!(mi_interrupt & mi_intr_mask))
+	//if (!mi_interrupt)
 	{
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
@@ -1279,7 +1278,7 @@ WRITE32_HANDLER( n64_pi_reg_w )
                 dma_length = (dma_length + 3) & ~3;
             }*/
 
-			//printf("PI DMA: %08X to %08X, length %08X\n", pi_dram_addr, pi_cart_addr, dma_length);
+			//mame_printf_debug("PI DMA: %08X to %08X, length %08X\n", pi_dram_addr, pi_cart_addr, dma_length);
 
 			if (pi_dram_addr != 0xffffffff)
 			{
@@ -1307,7 +1306,7 @@ WRITE32_HANDLER( n64_pi_reg_w )
                 dma_length = (dma_length + 3) & ~3;
             }
 
-			//printf("PI DMA: %08X to %08X, length %08X\n", pi_cart_addr, pi_dram_addr, dma_length);
+			//mame_printf_debug("PI DMA: %08X to %08X, length %08X\n", pi_cart_addr, pi_dram_addr, dma_length);
 
 			if (pi_dram_addr != 0xffffffff)
 			{
@@ -1318,7 +1317,7 @@ WRITE32_HANDLER( n64_pi_reg_w )
                     pi_cart_addr += 4;
                     pi_dram_addr += 4;*/
 
-					UINT8 b = memory_read_byte(space, pi_cart_addr & 0x1fffffff);
+					UINT8 b = memory_read_byte(space, pi_cart_addr);
 					memory_write_byte(space, pi_dram_addr & 0x1fffffff, b);
 					pi_cart_addr += 1;
 					pi_dram_addr += 1;
@@ -1331,7 +1330,7 @@ WRITE32_HANDLER( n64_pi_reg_w )
 				// TODO: CIC-6105 has different address...
 				memory_write_dword(space, 0x00000318, 0x400000);
 				memory_write_dword(space, 0x000003f0, 0x800000);
-				//pi_first_dma = 0;
+				pi_first_dma = 0;
 			}
 
 			break;
@@ -1860,7 +1859,7 @@ static void pif_dma(running_machine *machine, int direction)
 
 	if (direction)		// RDRAM -> PIF RAM
 	{
-		src = (UINT32*)&rdram[(si_dram_addr & 0x1ffffff) / 4];
+		src = (UINT32*)&rdram[(si_dram_addr & 0x1fffffff) / 4];
 
 		for (i=0; i < 64; i+=4)
 		{
@@ -1921,7 +1920,6 @@ WRITE32_HANDLER( n64_si_reg_w )
 			// PIF RAM -> RDRAM
 			si_pif_addr = data;
             si_pif_addr_rd64b = data;
-            //printf( "si_pif_addr = %08x, si_pif_addr_rd64b = %08x\n", si_pif_addr, si_pif_addr_rd64b );
             pif_dma(space->machine, 0);
 			break;
 
@@ -1929,7 +1927,6 @@ WRITE32_HANDLER( n64_si_reg_w )
 			// RDRAM -> PIF RAM
 			si_pif_addr = data;
             si_pif_addr_wr64b = data;
-            //printf( "si_pif_addr = %08x, si_pif_addr_wr64b = %08x\n", si_pif_addr, si_pif_addr_wr64b );
             pif_dma(space->machine, 1);
 			break;
 

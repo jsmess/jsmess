@@ -159,10 +159,10 @@ INLINE void sm8500_process_interrupts(sm8500_state *cpustate) {
 			if ( cpustate->IFLAGS & ( 1 << irqline ) ) {
 				cpustate->halted = 0;
 				switch( irqline ) {
-				case WDT_INT:
+				case ILL_INT:
 					sm8500_do_interrupt( cpustate, 0x101C );
 					break;
-				case ILL_INT:
+				case WDT_INT:
 					sm8500_do_interrupt( cpustate, 0x101E );
 					break;
 				case NMI_INT:

@@ -10,7 +10,7 @@
 
     Name:    Draw 80 Poker
     Company: IGT - International Gaming Technology
-    Year:    1983
+    Year:    1982
 
     Hardware:
 
@@ -22,8 +22,7 @@
 
     This is one of the first video machines produced by IGT.  Originally, the
     company was called SIRCOMA and was founded in 1979.  It became a public
-    company in 1981 and changed its name to IGT.  The motherboard has a date
-    of 1982 (c) IGT, but the game rom labels and backglass are dated 1983.
+    company in 1981 and changed its name to IGT.
 
 ***********************************************************************************/
 #include "driver.h"
@@ -34,11 +33,11 @@
 
 static tilemap *bg_tilemap;
 
-static UINT8 p1, p2, prog, bus;
+static UINT8 t0, t1, p0, p1, p2, prog, bus;
 
-static UINT8 *pkr_io_ram;
 static UINT8 active_bank = 0;
 
+static UINT8 pkr_io_ram[0x100];
 static UINT16 video_ram[0x0400];
 static UINT8 color_ram[0x0400];
 
@@ -46,6 +45,21 @@ static UINT8 color_ram[0x0400];
 /*****************
 * Write Handlers *
 ******************/
+
+static WRITE8_HANDLER( t0_w )
+{
+	t0 = data;
+}
+
+static WRITE8_HANDLER( t1_w )
+{
+	t1 = data;
+}
+
+static WRITE8_HANDLER( p0_w )
+{
+	p0 = data;
+}
 
 static WRITE8_HANDLER( p1_w )
 {
@@ -64,9 +78,7 @@ static WRITE8_HANDLER( prog_w )
 	// Bankswitch Program Memory
 	if (prog == 0x01)
 	{
-		active_bank++;
-		if (active_bank == 2)
-			active_bank = 0;
+		active_bank = active_bank ^ 0x01;
 
 		memory_set_bank(space->machine, 1, active_bank);
 	}
@@ -79,53 +91,30 @@ static WRITE8_HANDLER( bus_w )
 
 static WRITE8_HANDLER( drw80pkr_io_w )
 {
-	static UINT16 n_offs;
-	static UINT16 n_data;
-	static UINT16 add;
+	UINT16 n_offs;
 
-
-	if (p2 == 0x3f) // write cg address
+	if (p2 == 0x3f || p2 == 0x7f)
 	{
-		if (p1 == 0xbf || p1 == 0x3f)
+		n_offs = ((p1 & 0xc0) << 2 ) + offset;
+
+		if (p2 == 0x3f)
 		{
-			n_data = data;
+			video_ram[n_offs] = data; // low address
+		} else {
+			color_ram[n_offs] = data & 0x0f; // color palette
+			video_ram[n_offs] += ((data & 0xf0) << 4 ); // high address
 		}
-		if (p1 == 0x7f && data != 0x0f)
-		{
-			n_data = data + 0x100;
-		}
-
-		add = ((p1 & 0xc0) << 2);
-		if (p1 == 0x3f && offset >= 0xf0)
-		{
-			add = 0x200;
-		}
-		n_offs = (add) + (0xff-offset);
-
-		video_ram[n_offs] = n_data;
-
-		tilemap_mark_tile_dirty(bg_tilemap, n_offs);
-	}
-
-	if (p2 == 0x7f) // write palette
-	{
-		n_offs = ((p1 & 0xc0) << 2 ) + (0xff-offset);
-
-		color_ram[n_offs] = 0;//data & 0x0f;
-
-		if (data < 0x10)
-			video_ram[n_offs] = video_ram[n_offs] + 0x100;
 
 		tilemap_mark_tile_dirty(bg_tilemap, n_offs);
 	}
 
 	// ay8910 control port
 	if (p1 == 0xfc && p2 == 0xff && offset == 0x00)
-		ay8910_address_w(devtag_get_device(space->machine, "ay"), 0, data);
+		ay8910_address_w(devtag_get_device(space->machine, "aysnd"), 0, data);
 
 	// ay8910_write_port_0_w
 	if (p1 == 0xfe && p2 == 0xff && offset == 0x00)
-		ay8910_data_w(devtag_get_device(space->machine, "ay"), 0, data);
+		ay8910_data_w(devtag_get_device(space->machine, "aysnd"), 0, data);
 
 	// CRTC Register
 	// R0 = 0x1f(31)    Horizontal Total
@@ -152,12 +141,29 @@ static WRITE8_HANDLER( drw80pkr_io_w )
 	// CRTC Address
     //if (p1 == 0xff && p2 == 0xd7)
 
-	pkr_io_ram[offset] = data;
+	if (p2 == 0xfb) {
+		pkr_io_ram[offset] = data;
+	}
 }
 
 /****************
 * Read Handlers *
 ****************/
+
+static READ8_HANDLER( t0_r )
+{
+    return t0;
+}
+
+static READ8_HANDLER( t1_r )
+{
+    return t1;
+}
+
+static READ8_HANDLER( p0_r )
+{
+    return p0;
+}
 
 static READ8_HANDLER( p1_r )
 {
@@ -176,7 +182,64 @@ static READ8_HANDLER( bus_r )
 
 static READ8_HANDLER( drw80pkr_io_r )
 {
-    return pkr_io_ram[offset];
+	UINT8 ret;
+	UINT16 kbdin;
+
+	ret = 0x00;
+
+	if (p2 == 0x3b)
+	{
+		// unknown
+	}
+
+	if (p2 == 0x7b)
+	{
+		ret = pkr_io_ram[offset];
+	}
+
+	if (p2 == 0xf7)
+	{
+		// unknown
+	}
+
+	if (p2 == 0xfb)
+	{
+		ret = pkr_io_ram[offset];
+	}
+
+	if (p2 == 0xff)
+	{
+		// TODO: Get Input Port Values
+		kbdin = ((input_port_read(space->machine, "IN1") & 0xaf ) << 8) + input_port_read(space->machine, "IN0");
+
+		switch (kbdin)
+		{
+			// The following is very incorrect, but does allow you to
+			// play slightly with very messed up hold buttons etc.
+			//
+			// Open/Close the door with 'O'
+			// Press '5' (twice) with door open to play credit
+			// Press '1' to draw/deal
+			//
+			case 0x0000: ret = 0x00; break;
+			case 0x0001: ret = 0x01; break;	/* Door */
+			case 0x4000: ret = 0x00; break;
+			case 0x8000: ret = 0x00; break;	/* Hand Pay */
+			case 0x0002: ret = 0x00; break;	/* Books */
+			case 0x0004: ret = 0x0e; break;	/* Coin In */
+			case 0x0008: ret = 0x0d; break;	/* Start */
+			case 0x0010: ret = 0x00; break;	/* Discard */
+			case 0x0020: ret = 0x00; break;	/* Cancel */
+			case 0x0040: ret = 0x01; break;	/* Hold 1 */
+			case 0x0080: ret = 0x02; break;	/* Hold 2 */
+			case 0x0100: ret = 0x03; break;	/* Hold 3 */
+			case 0x0200: ret = 0x04; break;	/* Hold 4 */
+			case 0x0400: ret = 0x05; break;	/* Hold 5 */
+			case 0x0800: ret = 0x00; break;	/* Bet */
+		}
+	}
+
+    return ret;
 }
 
 
@@ -206,37 +269,28 @@ static VIDEO_UPDATE( drw80pkr )
 
 static PALETTE_INIT( drw80pkr )
 {
-/*  prom bits
-    7654 3210
-    ---- -xxx   red component.
-    --xx x---   green component.
-    xx-- ----   blue component.
-*/
-	int i;
+	int j;
 
-	for (i = 0;i < machine->config->total_colors;i++)
+	for (j = 0; j < machine->config->total_colors; j++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int r, g, b, tr, tg, tb, i;
+
+		i = (color_prom[j] >> 3) & 0x01;
+		//i = color_prom[j];
 
 		/* red component */
-		bit0 = (~color_prom[i] >> 0) & 0x01;
-		bit1 = (~color_prom[i] >> 1) & 0x01;
-		bit2 = (~color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
+		tr = 0xf0 - (0xf0 * ((color_prom[j] >> 0) & 0x01));
+		r = tr - (i * (tr / 5));
 
 		/* green component */
-		bit0 = (~color_prom[i] >> 3) & 0x01;
-		bit1 = (~color_prom[i] >> 4) & 0x01;
-		bit2 = (~color_prom[i] >> 5) & 0x01;
-		g = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
+		tg = 0xf0 - (0xf0 * ((color_prom[j] >> 1) & 0x01));
+		g = tg - (i * (tg / 5));
 
 		/* blue component */
-		bit0 = (~color_prom[i] >> 6) & 0x01;
-		bit1 = (~color_prom[i] >> 7) & 0x01;
-		bit2 = 0;
-		b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
+		tb = 0xf0 - (0xf0 * ((color_prom[j] >> 2) & 0x01));
+		b = tb - (i * (tb / 5));
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine, j, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -250,7 +304,7 @@ static const gfx_layout charlayout =
 	8,8,    /* 8x8 characters */
 	RGN_FRAC(1,2), /* 512 characters */
 	2,  /* 2 bitplanes */
-	{ RGN_FRAC(1,2), 0 },
+	{ 0, RGN_FRAC(1,2) },
 	{ STEP8(0,1) },
 	{ STEP8(0,8) },
 	8*8
@@ -285,11 +339,13 @@ static ADDRESS_MAP_START( drw80pkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drw80pkr_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff) AM_READWRITE(drw80pkr_io_r, drw80pkr_io_w) AM_BASE(&pkr_io_ram)
-	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_RAM
+	AM_RANGE(0x00, 0xff) AM_READWRITE(drw80pkr_io_r, drw80pkr_io_w)
+	AM_RANGE(MCS48_PORT_T0,   MCS48_PORT_T0) AM_READWRITE(t0_r, t0_w)
+	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READWRITE(t1_r, t1_w)
+	AM_RANGE(MCS48_PORT_P0,   MCS48_PORT_P0) AM_READWRITE(p0_r, p0_w)
 	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READWRITE(p2_r, p2_w)
-    AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_RAM_WRITE(prog_w)
+	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_RAM_WRITE(prog_w)
     AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READWRITE(bus_r, bus_w)
 ADDRESS_MAP_END
 
@@ -299,6 +355,26 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( drw80pkr )
 	// Unknown at this time
+	// These are temporary buttons for testing only
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR ) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK ) PORT_NAME("Books")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Discard") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_POKER_CANCEL )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Hopper") PORT_TOGGLE PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 /*************************
@@ -331,7 +407,7 @@ static MACHINE_DRIVER_START( drw80pkr )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8912, 20000000/12)
+	MDRV_SOUND_ADD("aysnd", AY8912, 20000000/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 
@@ -341,22 +417,34 @@ MACHINE_DRIVER_END
 
 ROM_START( drw80pkr )
 	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "pm0.u81",   0x0000, 0x1000, CRC(73223555) SHA1(229999ec00a1353f0d4928c65c8975079060c5af) )
+	ROM_LOAD( "pm1.u82",   0x1000, 0x1000, CRC(f8158f2b) SHA1(da3b30cfd49cd0e8a48d78fd3f82b2b4ab33670c) )
+
+	ROM_REGION( 0x002000, "gfx1", 0 )
+	ROM_LOAD( "cg0-a.u74",	 0x0000, 0x1000, CRC(0eefe598) SHA1(ed10aac345b10e35fb15babdd3ac30ebe2b8fc0f) )
+	ROM_LOAD( "cg1-a.u76",	 0x1000, 0x1000, CRC(522a96d0) SHA1(48f855a132413493353fbf6a44a1feb34ae6726d) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap13.u92", 0x0000, 0x0100, CRC(be67a8d9) SHA1(24b8cd19a5ec09779a737f6fc8c07b44f1226c8f) )
+ROM_END
+
+ROM_START( drw80pk2 )
+	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "pm0.u81",   0x0000, 0x1000, CRC(0f3e97d2) SHA1(aa9e4015246284f32435d7320de667e075412e5b) )
 	ROM_LOAD( "pm1.u82",   0x1000, 0x1000, CRC(5a6ad467) SHA1(0128bd70b65244a0f68031d5f451bf115eeb7609) )
-
 
 	ROM_REGION( 0x002000, "gfx1", 0 )
 	ROM_LOAD( "cg0-a.u74",	 0x0000, 0x1000, CRC(97f5eb92) SHA1(f6c7bb42ccef8a78e8d56104ad942ae5b8e5b0df) )
 	ROM_LOAD( "cg1-a.u76",	 0x1000, 0x1000, CRC(2a3a750d) SHA1(db6183d11b2865b011c3748dc472cf5858dde78f) )
 
-	ROM_REGION( 0x100, "proms", 0 ) // WRONG CAP
-	ROM_LOAD( "cap13.u92", 0x0000, 0x0100, CRC(42d6e973) SHA1(5c2983d5c80333ca45033070a2296fe58c339ee1) )
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap13.u92", 0x0000, 0x0100, CRC(be67a8d9) SHA1(24b8cd19a5ec09779a737f6fc8c07b44f1226c8f) )
 ROM_END
-
 
 /*************************
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY                                  FULLNAME              FLAGS   */
-GAME( 1983, drw80pkr, 0,      drw80pkr, drw80pkr, drw80pkr, ROT0,  "IGT - International Gaming Technology", "Draw 80 Poker",      GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY                                  FULLNAME                FLAGS   */
+GAME( 1982, drw80pkr, 0,      drw80pkr, drw80pkr, drw80pkr, ROT0,  "IGT - International Gaming Technology", "Draw 80 Poker",        GAME_NOT_WORKING )
+GAME( 1983, drw80pk2, 0,      drw80pkr, drw80pkr, drw80pkr, ROT0,  "IGT - International Gaming Technology", "Draw 80 Poker - Minn", GAME_NOT_WORKING )

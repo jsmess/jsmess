@@ -43,22 +43,41 @@ write
 
 static MACHINE_RESET( marineb )
 {
-	marineb_active_low_flipscreen = 0;
+	espial_state *state = (espial_state *)machine->driver_data;
+
+	state->palette_bank = 0;
+	state->column_scroll = 0;
+	state->flipscreen_x = 0;
+	state->flipscreen_y = 0;
+	state->marineb_active_low_flipscreen = 0;
 	MACHINE_RESET_CALL(espial);
 }
 
 static MACHINE_RESET( springer )
 {
-	marineb_active_low_flipscreen = 1;
+	espial_state *state = (espial_state *)machine->driver_data;
+
+	state->palette_bank = 0;
+	state->column_scroll = 0;
+	state->flipscreen_x = 0;
+	state->flipscreen_y = 0;
+	state->marineb_active_low_flipscreen = 1;
 	MACHINE_RESET_CALL(espial);
+}
+
+static MACHINE_START( marineb )
+{
+	espial_state *state = (espial_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->marineb_active_low_flipscreen);
 }
 
 static ADDRESS_MAP_START( marineb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(marineb_videoram_w) AM_BASE(&marineb_videoram)
-	AM_RANGE(0x8c00, 0x8c3f) AM_RAM AM_BASE(&spriteram)  /* Hoccer only */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(marineb_colorram_w) AM_BASE(&marineb_colorram)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(marineb_videoram_w) AM_BASE_MEMBER(espial_state, videoram)
+	AM_RANGE(0x8c00, 0x8c3f) AM_RAM AM_BASE_MEMBER(espial_state, spriteram)  /* Hoccer only */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(marineb_colorram_w) AM_BASE_MEMBER(espial_state, colorram)
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(marineb_column_scroll_w)
 	AM_RANGE(0x9a00, 0x9a00) AM_WRITE(marineb_palette_bank_0_w)
 	AM_RANGE(0x9c00, 0x9c00) AM_WRITE(marineb_palette_bank_1_w)
@@ -505,12 +524,16 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( marineb )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(espial_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(marineb_map)
 	MDRV_CPU_IO_MAP(marineb_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
+	MDRV_MACHINE_START(marineb)
 	MDRV_MACHINE_RESET(marineb)
 
 	/* video hardware */
@@ -841,13 +864,13 @@ ROM_END
 
 
 /*    year  name      parent   machine   inputs */
-GAME( 1982, marineb,  0,       marineb,  marineb, 0, ROT0,   "Orca", "Marine Boy", 0 )
-GAME( 1982, changes,  0,       changes,  changes, 0, ROT0,   "Orca", "Changes", 0 )
-GAME( 1982, changesa, changes, changes,  changes, 0, ROT0,   "Orca (Eastern Micro Electronics, Inc. license)", "Changes (EME license)", 0)
-GAME( 1982, looper,   changes, changes,  changes, 0, ROT0,   "Orca", "Looper", 0 )
-GAME( 1982, springer, 0,       springer, marineb, 0, ROT270, "Orca", "Springer", 0 )
-GAME( 1983, hoccer,   0,       hoccer,   hoccer,  0, ROT90,  "Eastern Micro Electronics, Inc.", "Hoccer (set 1)", 0 )
-GAME( 1983, hoccer2,  hoccer,  hoccer,   hoccer,  0, ROT90,  "Eastern Micro Electronics, Inc.", "Hoccer (set 2)" , 0)	/* earlier */
-GAME( 1983, bcruzm12, 0,       bcruzm12, bcruzm12,0, ROT90,  "Sigma Enterprises Inc.", "Battle Cruiser M-12", 0 )
-GAME( 1983, hopprobo, 0,       hopprobo, marineb, 0, ROT90,  "Sega", "Hopper Robo", 0 )
-GAME( 1984, wanted,   0,       wanted,   wanted,  0, ROT90,  "Sigma Enterprises Inc.", "Wanted", 0 )
+GAME( 1982, marineb,  0,       marineb,  marineb, 0, ROT0,   "Orca", "Marine Boy", GAME_SUPPORTS_SAVE )
+GAME( 1982, changes,  0,       changes,  changes, 0, ROT0,   "Orca", "Changes", GAME_SUPPORTS_SAVE )
+GAME( 1982, changesa, changes, changes,  changes, 0, ROT0,   "Orca (Eastern Micro Electronics, Inc. license)", "Changes (EME license)", GAME_SUPPORTS_SAVE )
+GAME( 1982, looper,   changes, changes,  changes, 0, ROT0,   "Orca", "Looper", GAME_SUPPORTS_SAVE )
+GAME( 1982, springer, 0,       springer, marineb, 0, ROT270, "Orca", "Springer", GAME_SUPPORTS_SAVE )
+GAME( 1983, hoccer,   0,       hoccer,   hoccer,  0, ROT90,  "Eastern Micro Electronics, Inc.", "Hoccer (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1983, hoccer2,  hoccer,  hoccer,   hoccer,  0, ROT90,  "Eastern Micro Electronics, Inc.", "Hoccer (set 2)" , GAME_SUPPORTS_SAVE )	/* earlier */
+GAME( 1983, bcruzm12, 0,       bcruzm12, bcruzm12,0, ROT90,  "Sigma Enterprises Inc.", "Battle Cruiser M-12", GAME_SUPPORTS_SAVE )
+GAME( 1983, hopprobo, 0,       hopprobo, marineb, 0, ROT90,  "Sega", "Hopper Robo", GAME_SUPPORTS_SAVE )
+GAME( 1984, wanted,   0,       wanted,   wanted,  0, ROT90,  "Sigma Enterprises Inc.", "Wanted", GAME_SUPPORTS_SAVE )

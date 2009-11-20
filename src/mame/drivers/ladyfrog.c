@@ -1,6 +1,9 @@
 /*
 Lady Frog (c) 1990 Mondial Games
 (there's  "(c) Alfa Tecnology" in the ROM)
+
+Touche Me - Unknown Manfacturer (likely the same as Lady Frog)
+
 driver by Tomasz Slanina
 
 'N.Y. Captor' (TAITO) hardware , without sub cpu.
@@ -43,9 +46,6 @@ Notes:
 
 */
 
-/* set to 1 for real screen size - two more tile columns on right side = black(title)/garbage(game) */
-#define ladyfrog_scr_size 0
-
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
@@ -53,6 +53,7 @@ Notes:
 #include "sound/msm5232.h"
 
 VIDEO_START( ladyfrog );
+VIDEO_START( toucheme );
 VIDEO_UPDATE( ladyfrog );
 
 extern UINT8 *ladyfrog_scrlram;
@@ -167,7 +168,7 @@ static ADDRESS_MAP_START( ladyfrog_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_WRITENOP
-	AM_RANGE(0xc802, 0xc803) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0xc802, 0xc803) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xc900, 0xc90d) AM_DEVWRITE("msm", msm5232_w)
 	AM_RANGE(0xca00, 0xca00) AM_WRITENOP
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITENOP
@@ -181,36 +182,44 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( ladyfrog )
+
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )  PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x03, "1" )
-	PORT_DIPNAME( 0x04, 0x00, "Clear 'doors' after life lost" )
+	PORT_DIPNAME( 0x04, 0x00, "Clear 'doors' after life lost" )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Free_Play ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Free_Play ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_A ) )  PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_3C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
 
 	PORT_START("INPUTS")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -223,6 +232,31 @@ static INPUT_PORTS_START( ladyfrog )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( toucheme )
+	PORT_INCLUDE( ladyfrog )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_A ) )  PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
 INPUT_PORTS_END
 
 
@@ -275,11 +309,8 @@ static MACHINE_DRIVER_START( ladyfrog )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
-#if ladyfrog_scr_size
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 29*8-1)
-#else
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 27*8-1)
-#endif
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 29*8-1) // black borders in ladyfrog gameplay are correct
+
 
 	MDRV_GFXDECODE(ladyfrog)
 	MDRV_PALETTE_LENGTH(512)
@@ -290,7 +321,7 @@ static MACHINE_DRIVER_START( ladyfrog )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 8000000/4)
+	MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
@@ -307,6 +338,11 @@ static MACHINE_DRIVER_START( ladyfrog )
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( toucheme )
+	MDRV_IMPORT_FROM(ladyfrog)
+	MDRV_VIDEO_START(toucheme)
 MACHINE_DRIVER_END
 
 
@@ -326,4 +362,21 @@ ROM_START( ladyfrog )
 	ROM_LOAD( "8.10",   0x20000, 0x10000, CRC(8c73baa1) SHA1(50fb408be181ef3c125dee23b04daeb010c9f276) )
 ROM_END
 
-GAME( 1990, ladyfrog, 0,       ladyfrog,  ladyfrog, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", 0)
+ROM_START( toucheme )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2.ic107",   0x0000, 0x10000, CRC(26f4580b) SHA1(59dc5799436cdaf68dfcb620cd9e2f6929ac7817) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "1.ic115",   0x0000, 0x8000, CRC(902589aa) SHA1(d60088fc31a67fec91f908f671af77bb87a5e59c) )
+
+	ROM_REGION( 0x60000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "3.ic32",   0x30000, 0x10000, CRC(223b4435) SHA1(fb5a4096012093bae5fda213a5de317e63a88ec3) )
+	ROM_LOAD( "4.ic33",   0x40000, 0x10000, CRC(96dcc2f3) SHA1(9c61f8161771e40ca41b6e102bc04583dc97cd0d) )
+	ROM_LOAD( "5.ic34",   0x50000, 0x10000, CRC(b8667a6b) SHA1(288a5cbd8fc01b24822e89fbc1e6d7f45c181483) )
+	ROM_LOAD( "6.ic8",    0x00000, 0x10000, CRC(d257382f) SHA1(9c459b90c9ddfe90de4a252f29a7bee809412b46) )
+	ROM_LOAD( "7.ic9",    0x10000, 0x10000, CRC(feb1b974) SHA1(ffd4527472cdf655fbebebf4d3abb61962e54457) )
+	ROM_LOAD( "8.ic10",   0x20000, 0x10000, CRC(fc6808bf) SHA1(f1f1b75a79dfdb500012f9b52c6364f0a13dce2d) )
+ROM_END
+
+GAME( 1990, ladyfrog, 0, ladyfrog, ladyfrog, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", 0)
+GAME( 19??, toucheme, 0, toucheme, toucheme, 0, ORIENTATION_SWAP_XY, "Unknown", "Touche Me", 0) // art style is similar, so it's probably the same manufacturer

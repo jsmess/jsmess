@@ -252,7 +252,6 @@ DRVLIBS = \
 	$(MAMEOBJ)/gameplan.a \
 	$(MAMEOBJ)/gametron.a \
 	$(MAMEOBJ)/gottlieb.a \
-	$(MAMEOBJ)/greyhnd.a \
 	$(MAMEOBJ)/igs.a \
 	$(MAMEOBJ)/irem.a \
 	$(MAMEOBJ)/itech.a \
@@ -387,7 +386,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/batman.o $(VIDEO)/batman.o \
 	$(DRIVERS)/beathead.o $(VIDEO)/beathead.o \
 	$(DRIVERS)/blstroid.o $(VIDEO)/blstroid.o \
-	$(DRIVERS)/boxer.o $(VIDEO)/boxer.o \
+	$(DRIVERS)/boxer.o \
 	$(DRIVERS)/bsktball.o $(MACHINE)/bsktball.o $(AUDIO)/bsktball.o $(VIDEO)/bsktball.o \
 	$(DRIVERS)/bwidow.o \
 	$(DRIVERS)/bzone.o $(AUDIO)/bzone.o \
@@ -620,6 +619,7 @@ $(MAMEOBJ)/eolith.a: \
 
 $(MAMEOBJ)/excelent.a: \
 	$(DRIVERS)/aquarium.o $(VIDEO)/aquarium.o \
+	$(DRIVERS)/d9final.o \
 	$(DRIVERS)/gcpinbal.o $(VIDEO)/gcpinbal.o \
 	$(DRIVERS)/vmetal.o \
 
@@ -669,10 +669,6 @@ $(MAMEOBJ)/gottlieb.a: \
 	$(DRIVERS)/exterm.o $(VIDEO)/exterm.o \
 	$(DRIVERS)/gottlieb.o $(AUDIO)/gottlieb.o $(VIDEO)/gottlieb.o \
 
-$(MAMEOBJ)/greyhnd.a: \
-	$(DRIVERS)/findout.o \
-	$(DRIVERS)/getrivia.o \
-
 $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/cabaret.o \
 	$(DRIVERS)/ddz.o \
@@ -681,15 +677,13 @@ $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/jackie.o \
 	$(DRIVERS)/igspoker.o \
 	$(DRIVERS)/igs009.o \
-	$(DRIVERS)/igs_blit.o \
+	$(DRIVERS)/igs011.o \
 	$(DRIVERS)/igs017.o \
 	$(DRIVERS)/igs_m027.o \
-	$(DRIVERS)/igs_m68.o \
 	$(DRIVERS)/spoker.o \
 	$(DRIVERS)/iqblock.o $(VIDEO)/iqblock.o \
 	$(DRIVERS)/lordgun.o $(VIDEO)/lordgun.o \
 	$(DRIVERS)/pgm.o $(VIDEO)/pgm.o \
-	$(DRIVERS)/tarzan.o \
 	$(MACHINE)/pgmcrypt.o \
 	$(MACHINE)/pgmprot.o \
 
@@ -711,7 +705,6 @@ $(MAMEOBJ)/irem.a: \
 	$(DRIVERS)/travrusa.o $(VIDEO)/travrusa.o \
 	$(DRIVERS)/vigilant.o $(VIDEO)/vigilant.o \
 	$(MACHINE)/irem_cpu.o \
-	$(AUDIO)/fghtbskt.o \
 	$(AUDIO)/irem.o \
 
 $(MAMEOBJ)/itech.a: \
@@ -982,6 +975,7 @@ $(MAMEOBJ)/nichibut.a: \
 	$(DRIVERS)/magmax.o $(VIDEO)/magmax.o \
 	$(DRIVERS)/nbmj8688.o $(VIDEO)/nbmj8688.o \
 	$(DRIVERS)/nbmj8891.o $(VIDEO)/nbmj8891.o \
+	$(DRIVERS)/nbmj8900.o $(VIDEO)/nbmj8900.o \
 	$(DRIVERS)/nbmj8991.o $(VIDEO)/nbmj8991.o \
 	$(DRIVERS)/nbmj9195.o $(VIDEO)/nbmj9195.o \
 	$(DRIVERS)/nightgal.o \
@@ -1521,6 +1515,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/funworld.o $(VIDEO)/funworld.o \
 	$(DRIVERS)/galaxi.o \
 	$(DRIVERS)/gamecstl.o \
+	$(DRIVERS)/gei.o \
 	$(DRIVERS)/good.o \
 	$(DRIVERS)/goldnpkr.o \
 	$(DRIVERS)/gotcha.o $(VIDEO)/gotcha.o \

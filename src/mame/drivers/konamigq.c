@@ -49,7 +49,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
-#include "machine/konamigx.h"
+#include "konamigx.h"
 #include "machine/eeprom.h"
 #include "machine/am53cf96.h"
 #include "harddisk.h"
@@ -330,7 +330,7 @@ static void scsi_dma_write( running_machine *machine, UINT32 n_address, INT32 n_
 
 static void scsi_irq(running_machine *machine)
 {
-	psx_irq_set(machine, PSX_IRQ_EXTCD);
+	psx_irq_set(machine, 0x400);
 }
 
 static const SCSIConfigTable dev_table =

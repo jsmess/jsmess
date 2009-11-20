@@ -11,12 +11,12 @@
                  _I/OW   2 |             | 39  A6
                  _MEMR   3 |             | 38  A5
                  _MEMW   4 |             | 37  A4
-					     5 |             | 36  _EOP
+                         5 |             | 36  _EOP
                  READY   6 |             | 35  A3
                   HLDA   7 |             | 34  A2
                  ADSTB   8 |             | 33  A1
                    AEN   9 |             | 32  A0
-				   HRQ  10 |     8237	 | 31  Vcc
+                   HRQ  10 |     8237    | 31  Vcc
                    _CS  11 |             | 30  DB0
                    CLK  12 |             | 29  DB1
                  RESET  13 |             | 28  DB2
@@ -87,6 +87,9 @@ WRITE_LINE_DEVICE_HANDLER( i8237_dreq0_w );
 WRITE_LINE_DEVICE_HANDLER( i8237_dreq1_w );
 WRITE_LINE_DEVICE_HANDLER( i8237_dreq2_w );
 WRITE_LINE_DEVICE_HANDLER( i8237_dreq3_w );
+
+/* end of process */
+WRITE_LINE_DEVICE_HANDLER( i8237_eop_w );
 
 DEVICE_GET_INFO( i8237 );
 
