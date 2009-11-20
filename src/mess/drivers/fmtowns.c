@@ -164,6 +164,15 @@ static UINT8 towns_crtc_sel;  // selected CRTC register
 static UINT16 towns_crtc_reg[32];
 static UINT8 towns_tvram_enable;
 
+struct towns_cdrom_controller
+{
+	UINT8 command;
+	UINT8 status;
+	UINT8 cmd_status[4];
+	UINT8 cmd_status_ptr;
+	UINT8 parameter[8];
+} towns_cd;
+
 static void towns_update_video_banks(const address_space* space);
 static PIC8259_SET_INT_LINE( towns_pic_irq );
 
@@ -1122,26 +1131,98 @@ static WRITE8_HANDLER(towns_video_ff81_w)
 
 /*
  *  I/O ports 0x4c0-0x4cf
- *  CD-ROM driver (SCSI?)
+ *  CD-ROM driver (custom?)
+ * 
+ *  0x4c0 - Status port (R/W)
+ *    bit 7 - IRQ from sub MPU (reset when read)
+ *    bit 6 - IRQ from DMA end (reset when read)
+ *    bit 5 - Software transfer
+ *    bit 4 - DMA transfer
+ *    bit 1 - status read request
+ *    bit 0 - ready
+ * 
+ *  0x4c2 - Command port (R/W)
+ *    On read, returns status byte (4 in total?)
+ *    On write, performs specified command:
+ *      bit 7 - command type
+ *      bit 6 - IRQ
+ *      bit 5 - status
+ *      bits 4-0 - command
+ *        Type=1:
+ *          0 = set state
+ *          1 = set state (CDDASET)
+ *        Type=0:
+ *          0 = Seek
+ *          2 = Read (MODE1)
+ *          5 = TOC Read
+ * 
+ *  0x4c4 - Parameter port (R/W)
+ *    Inserts a byte into an array of 8 bytes used for command parameters
+ *    Writing to this port puts the byte at the front of the array, and
+ *    pushes the other parameters back.  Parameters are in BCD?
+ * 
+ *  0x4c6 (W/O)
+ *    bit 3 - software transfer mode
+ *    bit 4 - DMA transfer mode
+ * 
  */
+static void towns_cdrom_execute_command(void)
+{
+	// For now, we'll return status codes that hopefully tell the system
+	// that there is no CD-ROM in the drive.
+	
+	towns_cd.status |= 0x02;  // status read request
+	towns_cd.cmd_status_ptr = 0;
+	towns_cd.cmd_status[0] = 0x10;
+	towns_cd.cmd_status[1] = 0x00;
+	towns_cd.cmd_status[2] = 0x00;
+	towns_cd.cmd_status[3] = 0x00;
+}
+
 static READ8_HANDLER(towns_cdrom_r)
 {
+	logerror("CD: read port %02x\n",offset*2);
 	switch(offset)
 	{
-		case 0x00:
-			return 0x01;
+		case 0x00:  // status
+			return towns_cd.status;
+		case 0x01:  // command status
+			if(towns_cd.cmd_status_ptr > 3)
+			{
+				towns_cd.cmd_status_ptr = 0;
+				towns_cd.status &= ~0x02;
+			}
+			return towns_cd.cmd_status[towns_cd.cmd_status_ptr++];
 		default:
-			logerror("CD: read port %02x\n",offset*2);
 			return 0x00;
 	}
 }
 
 static WRITE8_HANDLER(towns_cdrom_w)
 {
+	int x;
 	switch(offset)
 	{
+		case 0x00: // status
+			logerror("CD: status write %02x\n",data);
+			break;
+		case 0x01: // command
+			towns_cd.command = data;
+			towns_cdrom_execute_command();
+			logerror("CD: command %02x sent\n",data);
+			logerror("CD: parameters: %02x %02x %02x %02x %02x %02x %02x %02x\n",
+				towns_cd.parameter[0],towns_cd.parameter[1],towns_cd.parameter[2],
+				towns_cd.parameter[3],towns_cd.parameter[4],towns_cd.parameter[5],
+				towns_cd.parameter[6],towns_cd.parameter[7]);
+			break;
+		case 0x02: // parameter
+			for(x=0;x<7;x++)
+				towns_cd.parameter[x+1] = towns_cd.parameter[x];
+			towns_cd.parameter[0] = data;
+			logerror("CD: parameter %02x added\n",data);
+			break;
 		default:
-			logerror("CD: read port %02x\n",offset*2);
+			logerror("CD: write port %02x\n",offset*2);
 	}
 }
 
@@ -1643,6 +1724,7 @@ static MACHINE_RESET( towns )
 	towns_vram_wplane = 0x00;
 	towns_kb_status = 0x18;
 	towns_kb_irq1_enable = 0;
+	towns_cd.status = 0x01;  // CDROM controller ready
 	timer_adjust_periodic(towns_rtc_timer,attotime_zero,0,ATTOTIME_IN_HZ(1));
 	timer_adjust_periodic(towns_kb_timer,attotime_zero,0,ATTOTIME_IN_MSEC(10));
 }
