@@ -23,6 +23,7 @@ struct _pc8001_state
 	int vrtc;
 	int width80;
 	int color;
+	int dack2;
 
 	/* printer state */
 	int ack;

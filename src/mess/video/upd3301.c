@@ -27,7 +27,7 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG 1
+#define LOG 0
 
 #define UPD3301_COMMAND_MASK					0xe0
 #define UPD3301_COMMAND_RESET					0x00
@@ -515,6 +515,11 @@ WRITE8_DEVICE_HANDLER( upd3301_dack_w )
 {
 	upd3301_t *upd3301 = get_safe_token(device);
 
+	if (upd3301->y >= (upd3301->l * upd3301->r))
+	{
+		return;
+	}
+
 	if (upd3301->data_fifo_pos < upd3301->h)
 	{
 		upd3301->data_fifo[upd3301->data_fifo_pos][upd3301->input_fifo] = data;
@@ -532,12 +537,12 @@ WRITE8_DEVICE_HANDLER( upd3301_dack_w )
 		upd3301->data_fifo_pos = 0;
 		upd3301->attr_fifo_pos = 0;
 		draw_row(device, upd3301->bitmap);
-	}
 
-	if (upd3301->y == (upd3301->l * upd3301->r))
-	{
-		/* end DMA transfer */
-		set_drq(device, 0);
+		if (upd3301->y == (upd3301->l * upd3301->r))
+		{
+			/* end DMA transfer */
+			set_drq(device, 0);
+		}
 	}
 }
 

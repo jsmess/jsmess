@@ -27,7 +27,7 @@
 #include "cpu/z80/z80.h"
 #include "devices/cassette.h"
 #include "devices/messram.h"
-#include "machine/8257dma.h"
+#include "machine/i8257.h"
 #include "machine/ctronics.h"
 #include "machine/i8214.h"
 #include "machine/i8255a.h"
@@ -464,15 +464,42 @@ static I8255A_INTERFACE( pc8001_8255_intf )
 
 /* 8257 Interface */
 
+static WRITE_LINE_DEVICE_HANDLER( hrq_w )
+{
+	/* HACK - this should be connected to the BUSREQ line of Z80 */
+	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_HALT, state);
+	
+	/* HACK - this should be connected to the BUSACK line of Z80 */
+	i8257_hlda_w(device, state);
+}
+
+static WRITE8_DEVICE_HANDLER( mem_w )
+{
+	pc8001_state *driver_state = device->machine->driver_data;
+
+	if (!driver_state->dack2)
+	{
+		upd3301_dack_w(driver_state->upd3301, 0, data);
+	}
+}
+
+static WRITE_LINE_DEVICE_HANDLER( dack2_w )
+{
+	pc8001_state *driver_state = device->machine->driver_data;
+
+	driver_state->dack2 = state;
+}
+
 static I8257_INTERFACE( pc8001_8257_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT),
+	DEVCB_LINE(hrq_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(mem_w),
 	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_read_byte),
 	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER(UPD3301_TAG, upd3301_dack_w), DEVCB_NULL }
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_LINE(dack2_w), DEVCB_NULL }
 };
 
 /* uPD1990A Interface */
@@ -529,6 +556,9 @@ static MACHINE_START( pc8001 )
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);
 	upd1990a_oe_w(state->upd1990a, 1);
+
+	/* initialize DMA */
+	i8257_ready_w(state->i8257, 1);
 
 	/* setup memory banking */
 	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "n80"), 0);
