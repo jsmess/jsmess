@@ -11,7 +11,7 @@
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
 #include "machine/i8255a.h"
-#include "machine/8257dma.h"
+#include "machine/i8257.h"
 #include "machine/wd17xx.h"
 #include "video/i8275.h"
 #include "includes/radio86.h"
@@ -345,15 +345,25 @@ WRITE8_HANDLER (partner_mem_page_w )
 	partner_bank_switch(space->machine);
 }
 
+static WRITE_LINE_DEVICE_HANDLER( hrq_w )
+{
+	/* HACK - this should be connected to the BUSREQ line of Z80 */
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state);
+	
+	/* HACK - this should be connected to the BUSACK line of Z80 */
+	i8257_hlda_w(device, state);
+}
+
 I8257_INTERFACE( partner_dma )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
+	DEVCB_LINE(hrq_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
+	I8257_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
+	I8257_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
 	{ DEVCB_DEVICE_HANDLER("wd1793", wd17xx_data_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_DEVICE_HANDLER("wd1793", wd17xx_data_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("i8275", i8275_dack_w), DEVCB_NULL }
+	{ DEVCB_DEVICE_HANDLER("wd1793", wd17xx_data_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("i8275", i8275_dack_w), DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
 

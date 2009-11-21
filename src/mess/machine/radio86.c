@@ -11,7 +11,7 @@
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
 #include "machine/i8255a.h"
-#include "machine/8257dma.h"
+#include "machine/i8257.h"
 #include "video/i8275.h"
 #include "includes/radio86.h"
 
@@ -129,15 +129,25 @@ I8255A_INTERFACE( rk7007_ppi8255_interface )
 	DEVCB_HANDLER(radio86_8255_portc_w2),
 };
 
+static WRITE_LINE_DEVICE_HANDLER( hrq_w )
+{
+	/* HACK - this should be connected to the BUSREQ line of Z80 */
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state);
+	
+	/* HACK - this should be connected to the BUSACK line of Z80 */
+	i8257_hlda_w(device, state);
+}
+
 I8257_INTERFACE( radio86_dma )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
+	DEVCB_LINE(hrq_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
+	I8257_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
+	I8257_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER("i8275", i8275_dack_w), DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
 static TIMER_CALLBACK( radio86_reset )

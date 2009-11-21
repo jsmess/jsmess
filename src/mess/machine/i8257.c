@@ -2,10 +2,18 @@
 
     Intel 8257 Programmable DMA Controller emulation
 
-    Copyright Nicola Salmoria and the MAME Team.
+    Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
+
+/*
+
+	TODO:
+
+	- use cr/ar directly
+
+*/
 
 #include "driver.h"
 #include "i8257.h"
@@ -61,21 +69,21 @@ struct _dma8257_t
 	devcb_resolved_write_line	out_hrq_func;
 	devcb_resolved_write_line	out_tc_func;
 	devcb_resolved_write_line	out_mark_func;
-	devcb_resolved_read8		in_memr_func;
-	devcb_resolved_write8		out_memw_func;
-	devcb_resolved_read8		in_ior_func;
-	devcb_resolved_write8		out_iow_func;
-	devcb_resolved_write_line	out_dack_func[4];
+	devcb_resolved_read8		in_memr_func[I8257_CHANNELS];
+	devcb_resolved_write8		out_memw_func[I8257_CHANNELS];
+	devcb_resolved_read8		in_ior_func[I8257_CHANNELS];
+	devcb_resolved_write8		out_iow_func[I8257_CHANNELS];
+	devcb_resolved_write_line	out_dack_func[I8257_CHANNELS];
 
 	/* registers */
 	UINT8 mr;					/* mode register */
 	UINT8 sr;					/* status register */
-	UINT16 ar[4];				/* address register */
-	UINT16 cr[4];				/* count register */
+	UINT16 ar[I8257_CHANNELS];	/* address register */
+	UINT16 cr[I8257_CHANNELS];	/* count register */
 	int fl;						/* first/last flip-flop */
 
 	/* inputs */
-	int drq[4];					/* data request */
+	int drq[I8257_CHANNELS];	/* data request */
 	int hlda;					/* hold acknowledge */
 	int ready;					/* ready */
 
@@ -157,7 +165,7 @@ static void set_dack(const device_config *device, int active_channel)
 	i8257_t *i8257 = get_safe_token(device);
 	int ch;
 
-	for (ch = 0; ch < 4; ch++)
+	for (ch = 0; ch < I8257_CHANNELS; ch++)
 	{
 		int state = (ch != active_channel);
 		
@@ -172,7 +180,7 @@ static int sample_drq(const device_config *device)
 	i8257_t *i8257 = get_safe_token(device);
 	int ch;
 
-	for (ch = 0; ch < 4; ch++)
+	for (ch = 0; ch < I8257_CHANNELS; ch++)
 	{
 		if (i8257->drq[ch] && BIT(i8257->mr, ch))
 		{
@@ -188,9 +196,9 @@ static void resolve_priorities(const device_config *device)
 	i8257_t *i8257 = get_safe_token(device);
 	int i;
 
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < I8257_CHANNELS; i++)
 	{
-		int ch = (i + i8257->priority) % 4;
+		int ch = (i + i8257->priority) % I8257_CHANNELS;
 
 		if (i8257->drq[ch] && BIT(i8257->mr, ch))
 		{
@@ -213,12 +221,12 @@ static void dma_read(const device_config *device)
 		break;
 
 	case MODE_WRITE:
-		i8257->data = devcb_call_read8(&i8257->in_memr_func, i8257->address);
+		i8257->data = devcb_call_read8(&i8257->in_memr_func[i8257->channel], i8257->address);
 		if (LOG) logerror("I8257 '%s' DMA Memory Read %04x: %02x\n", device->tag, i8257->address, i8257->data);
 		break;
 
 	case MODE_READ:
-		i8257->data = devcb_call_read8(&i8257->in_ior_func, i8257->address);
+		i8257->data = devcb_call_read8(&i8257->in_ior_func[i8257->channel], i8257->address);
 		if (LOG) logerror("I8257 '%s' DMA I/O Read %04x: %02x\n", device->tag, i8257->address, i8257->data);
 		break;
 
@@ -237,12 +245,12 @@ static void dma_write(const device_config *device)
 		break;
 
 	case MODE_WRITE:
-		devcb_call_write8(&i8257->out_iow_func, i8257->address, i8257->data);
+		devcb_call_write8(&i8257->out_iow_func[i8257->channel], i8257->address, i8257->data);
 		if (LOG) logerror("I8257 '%s' DMA I/O Write %04x: %02x\n", device->tag, i8257->address, i8257->data);
 		break;
 
 	case MODE_READ:
-		devcb_call_write8(&i8257->out_memw_func, i8257->address, i8257->data);
+		devcb_call_write8(&i8257->out_memw_func[i8257->channel], i8257->address, i8257->data);
 		if (LOG) logerror("I8257 '%s' DMA Memory Write %04x: %02x\n", device->tag, i8257->address, i8257->data);
 		break;
 
@@ -310,7 +318,10 @@ static TIMER_CALLBACK( dma_tick )
 
 	case STATE_S3:
 		/* activate write command */
-		dma_write(device);
+		if (!(i8257->mr & I8257_MODE_EW))
+		{
+			dma_write(device);
+		}
 
 		i8257->address++;
 		i8257->count--;
@@ -365,6 +376,13 @@ static TIMER_CALLBACK( dma_tick )
 		i8257->ar[2] = i8257->ar[3];
 		i8257->cr[2] = i8257->cr[3];
 
+		if (LOG)
+		{
+			logerror("I8257 '%s' DMA Channel 2 Address Register: %04x\n", device->tag, i8257->ar[2]);
+			logerror("I8257 '%s' DMA Channel 2 Count Register: %04x\n", device->tag, i8257->cr[2] & 0x3fff);
+			logerror("I8257 '%s' DMA Channel 2 Mode: %u\n", device->tag, i8257->cr[2] >> 14);
+		}
+
 		i8257->state = STATE_S4;
 		break;
 
@@ -377,12 +395,13 @@ static TIMER_CALLBACK( dma_tick )
 			if ((i8257->mr & I8257_MODE_TCS) && 
 				!((i8257->channel == 2) && (i8257->mr & I8257_MODE_AL)))
 			{
-				i8257->mr &= (1 << i8257->channel);
+				i8257->mr &= ~(1 << i8257->channel);
+				if (LOG) logerror("I8257 '%s' DMA Channel %u: disabled\n", device->tag, i8257->channel);
 			}
 
 			if (i8257->mr & I8257_MODE_RP)
 			{
-				i8257->priority = (i8257->channel + 1) % 4;
+				i8257->priority = (i8257->channel + 1) % I8257_CHANNELS;
 			}
 
 			/* resolve DRQ priorities */
@@ -481,7 +500,7 @@ WRITE8_DEVICE_HANDLER( i8257_w )
 		if (i8257->fl)
 		{
 			i8257->ar[ch] = (data << 8) | (i8257->ar[ch] & 0xff);
-			if (LOG) logerror("I8257 '%s' Address Register %u: %04x\n", device->tag, ch, i8257->ar[ch]);
+			if (LOG) logerror("I8257 '%s' DMA Channel %u Address Register: %04x\n", device->tag, ch, i8257->ar[ch]);
 		}
 		else
 		{
@@ -505,8 +524,8 @@ WRITE8_DEVICE_HANDLER( i8257_w )
 		if (i8257->fl)
 		{
 			i8257->cr[ch] = (data << 8) | (i8257->cr[ch] & 0xff);
-			if (LOG) logerror("I8257 '%s' Count Register %u: %04x\n", device->tag, ch, i8257->cr[ch] & 0x3fff);
-			if (LOG) logerror("I8257 '%s' Mode: %u\n", device->tag, i8257->cr[ch] >> 14);
+			if (LOG) logerror("I8257 '%s' DMA Channel %u Count Register: %04x\n", device->tag, ch, i8257->cr[ch] & 0x3fff);
+			if (LOG) logerror("I8257 '%s' DMA Channel %u Mode: %u\n", device->tag, ch, i8257->cr[ch] >> 14);
 		}
 		else
 		{
@@ -524,6 +543,11 @@ WRITE8_DEVICE_HANDLER( i8257_w )
 	case 8:
 		i8257->mr = data;
 		i8257->fl = 0;
+
+		if ((i8257->state == STATE_SI) && sample_drq(device))
+		{
+			timer_enable(i8257->dma_timer, 1);
+		}
 
 		if (LOG)
 		{
@@ -566,7 +590,7 @@ static void drq_w(const device_config *device, int ch, int state)
 
 	if (LOG) logerror("I8257 '%s' Data Request %u: %u\n", device->tag, ch, state);
 
-	if (state)
+	if (state && (i8257->state == STATE_SI))
 	{
 		timer_enable(i8257->dma_timer, 1);
 	}
@@ -585,19 +609,21 @@ static DEVICE_START( i8257 )
 {
 	i8257_t *i8257 = get_safe_token(device);
 	i8257_interface *intf = (i8257_interface *)device->static_config;
+	int ch;
 
 	/* resolve callbacks */
 	devcb_resolve_write_line(&i8257->out_hrq_func, &intf->out_hrq_func, device);
 	devcb_resolve_write_line(&i8257->out_tc_func, &intf->out_tc_func, device);
 	devcb_resolve_write_line(&i8257->out_mark_func, &intf->out_mark_func, device);
-	devcb_resolve_read8(&i8257->in_memr_func, &intf->in_memr_func, device);
-	devcb_resolve_write8(&i8257->out_memw_func, &intf->out_memw_func, device);
-	devcb_resolve_read8(&i8257->in_ior_func, &intf->in_ior_func, device);
-	devcb_resolve_write8(&i8257->out_iow_func, &intf->out_iow_func, device);
-	devcb_resolve_write_line(&i8257->out_dack_func[0], &intf->out_dack_func[0], device);
-	devcb_resolve_write_line(&i8257->out_dack_func[1], &intf->out_dack_func[1], device);
-	devcb_resolve_write_line(&i8257->out_dack_func[2], &intf->out_dack_func[2], device);
-	devcb_resolve_write_line(&i8257->out_dack_func[3], &intf->out_dack_func[3], device);
+	
+	for (ch = 0; ch < I8257_CHANNELS; ch++)
+	{
+		devcb_resolve_read8(&i8257->in_memr_func[ch], &intf->in_memr_func[ch], device);
+		devcb_resolve_write8(&i8257->out_memw_func[ch], &intf->out_memw_func[ch], device);
+		devcb_resolve_read8(&i8257->in_ior_func[ch], &intf->in_ior_func[ch], device);
+		devcb_resolve_write8(&i8257->out_iow_func[ch], &intf->out_iow_func[ch], device);
+		devcb_resolve_write_line(&i8257->out_dack_func[ch], &intf->out_dack_func[ch], device);
+	}
 
 	/* create the DMA timer */
 	i8257->dma_timer = timer_alloc(device->machine, dma_tick, (void *)device);
@@ -636,6 +662,7 @@ static DEVICE_RESET( i8257 )
 	i8257->sr = 0;
 	i8257->state = STATE_SI;
 	i8257->priority = 0;
+	i8257->ready = 1;
 
 	set_hrq(device, 0);
 	set_mark(device, 0);

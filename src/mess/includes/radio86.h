@@ -8,7 +8,7 @@
 #define radio86_H_
 
 #include "machine/i8255a.h"
-#include "machine/8257dma.h"
+#include "machine/i8257.h"
 #include "video/i8275.h"
 
 /*----------- defined in drivers/radio86.c -----------*/

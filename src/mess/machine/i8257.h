@@ -2,7 +2,7 @@
 
     Intel 8257 Programmable DMA Controller emulation
 
-    Copyright Nicola Salmoria and the MAME Team.
+    Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ****************************************************************************
@@ -48,6 +48,14 @@
 #define I8257_INTERFACE(_name) \
 	const i8257_interface (_name) =
 
+#define I8257_MEMORY_HANDLER(_tag, _space, _func) \
+	{ DEVCB_MEMORY_HANDLER(_tag, _space, _func), \
+	  DEVCB_MEMORY_HANDLER(_tag, _space, _func), \
+	  DEVCB_MEMORY_HANDLER(_tag, _space, _func), \
+	  DEVCB_MEMORY_HANDLER(_tag, _space, _func) }
+
+#define I8257_CHANNELS	4
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -60,15 +68,15 @@ struct _i8257_interface
 	devcb_write_line	out_mark_func;
 
 	/* memory */
-	devcb_read8			in_memr_func;
-	devcb_write8		out_memw_func;
+	devcb_read8			in_memr_func[I8257_CHANNELS];
+	devcb_write8		out_memw_func[I8257_CHANNELS];
 
 	/* I/O */
-	devcb_read8			in_ior_func;
-	devcb_write8		out_iow_func;
+	devcb_read8			in_ior_func[I8257_CHANNELS];
+	devcb_write8		out_iow_func[I8257_CHANNELS];
 
 	/* DMA acknowledge */
-	devcb_write_line	out_dack_func[4];
+	devcb_write_line	out_dack_func[I8257_CHANNELS];
 };
 
 /***************************************************************************

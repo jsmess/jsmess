@@ -473,33 +473,16 @@ static WRITE_LINE_DEVICE_HANDLER( hrq_w )
 	i8257_hlda_w(device, state);
 }
 
-static WRITE8_DEVICE_HANDLER( mem_w )
-{
-	pc8001_state *driver_state = device->machine->driver_data;
-
-	if (!driver_state->dack2)
-	{
-		upd3301_dack_w(driver_state->upd3301, 0, data);
-	}
-}
-
-static WRITE_LINE_DEVICE_HANDLER( dack2_w )
-{
-	pc8001_state *driver_state = device->machine->driver_data;
-
-	driver_state->dack2 = state;
-}
-
 static I8257_INTERFACE( pc8001_8257_intf )
 {
 	DEVCB_LINE(hrq_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_HANDLER(mem_w),
-	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_read_byte),
-	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_LINE(dack2_w), DEVCB_NULL }
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER(UPD3301_TAG, upd3301_dack_w), DEVCB_NULL },
+	I8257_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_read_byte),
+	I8257_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_write_byte),
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
 /* uPD1990A Interface */
