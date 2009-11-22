@@ -36,7 +36,9 @@ typedef enum
 	MODEL_MAC_LC_II,
 	MODEL_MAC_LC_III,
 	MODEL_MAC_CLASSIC_II,
-	MODEL_MAC_COLOR_CLASSIC
+	MODEL_MAC_COLOR_CLASSIC,
+
+	MODEL_MAC_POWERMAC_6100	// original PowerMac
 } mac_model_t;
 
 // video parameters for classic Macs
@@ -73,6 +75,8 @@ DRIVER_INIT(maciisi);
 DRIVER_INIT(macse30);
 DRIVER_INIT(macclassic2);
 DRIVER_INIT(maclc2);
+DRIVER_INIT(maclc3);
+DRIVER_INIT(macpm6100);
 
 READ16_HANDLER ( mac_via_r );
 WRITE16_HANDLER ( mac_via_w );

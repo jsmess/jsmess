@@ -205,6 +205,8 @@ static void mac_install_memory(running_machine *machine, offs_t memory_begin, of
 	write16_space_func wh;
 	read32_space_func rh32;
 	write32_space_func wh32;
+	read64_space_func rh64;
+	write64_space_func wh64;
 
 	memory_size = MIN(memory_size, (memory_end + 1 - memory_begin));
 	memory_mask = memory_size - 1;
@@ -219,7 +221,7 @@ static void mac_install_memory(running_machine *machine, offs_t memory_begin, of
 		memory_install_write16_handler(space, memory_begin,
 			memory_end, memory_mask, 0, wh);
 	}
-	else
+	else if (mac_model < MODEL_MAC_POWERMAC_6100)
 	{
 		rh32 = (read32_space_func) (FPTR)bank;
 		wh32 = is_rom ? SMH_UNMAP : (write32_space_func) (FPTR)bank;
@@ -228,6 +230,17 @@ static void mac_install_memory(running_machine *machine, offs_t memory_begin, of
 			memory_end, memory_mask, 0, rh32);
 		memory_install_write32_handler(space, memory_begin,
 			memory_end, memory_mask, 0, wh32);
+
+	}
+	else
+	{
+		rh64 = (read64_space_func) (FPTR)bank;
+		wh64 = is_rom ? SMH_UNMAP : (write64_space_func) (FPTR)bank;
+
+		memory_install_read64_handler(space, memory_begin,
+			memory_end, memory_mask, 0, rh64);
+		memory_install_write64_handler(space, memory_begin,
+			memory_end, memory_mask, 0, wh64);
 
 	}
 
@@ -263,7 +276,7 @@ static void mac_field_interrupts(running_machine *machine)
 			take_interrupt = 1;
 		}
 	}
-	else
+	else if (mac_model < MODEL_MAC_POWERMAC_6100)
 	{
 		if (scc_interrupt)
 		{
@@ -277,6 +290,10 @@ static void mac_field_interrupts(running_machine *machine)
 		{
 			take_interrupt = 1;
 		}
+	}
+	else
+	{
+		return;	// no interrupts for PowerPC yet
 	}
 
 	if (last_taken_interrupt != -1)
@@ -371,7 +388,7 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 		}
 
 		/* install the memory */
-		if (((mac_model >= MODEL_MAC_LC) && (mac_model <= MODEL_MAC_COLOR_CLASSIC))|| (mac_model == MODEL_MAC_LC_II))
+		if (((mac_model >= MODEL_MAC_LC) && (mac_model <= MODEL_MAC_COLOR_CLASSIC))|| (mac_model == MODEL_MAC_LC_II) || (mac_model == MODEL_MAC_POWERMAC_6100) || (mac_model == MODEL_MAC_CLASSIC_II))
 		{
 			mac_install_memory(machine, 0x00000000, memory_size-1, memory_size, memory_data, is_rom, 1);
 		}
@@ -387,9 +404,13 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 				mac_install_memory(machine, 0x00000000, 0x03ffffff, memory_size, memory_data, is_rom, 1);
 			}
 		}
-		else if ((mac_model == MODEL_MAC_CLASSIC_II) || ((mac_model == MODEL_MAC_II) && (mac_model <= MODEL_MAC_SE30))) 
+		else if ((mac_model == MODEL_MAC_CLASSIC_II) || ((mac_model >= MODEL_MAC_II) && (mac_model <= MODEL_MAC_SE30))) 
 		{
 			mac_install_memory(machine, 0x00000000, 0x3fffffff, memory_size, memory_data, is_rom, 1);
+		}
+		else if (mac_model == MODEL_MAC_LC_III)	// up to 36 MB
+		{
+			mac_install_memory(machine, 0x00000000, 0x023fffff, memory_size, memory_data, is_rom, 1);
 		}
 		else
 		{
@@ -1422,7 +1443,7 @@ WRITE16_HANDLER ( mac_iwm_w )
  * *************************************************************************/
 
 // Mac ADB state
-static int adb_irq_pending, adb_waiting_cmd, adb_datasize, adb_buffer[16];
+static int adb_irq_pending, adb_waiting_cmd, adb_datasize, adb_buffer[257];
 static int adb_state, adb_command, adb_send, adb_timer_ticks, adb_extclock, adb_direction;
 static int adb_listenreg, adb_listenaddr, adb_last_talk;
 
@@ -1822,9 +1843,34 @@ static TIMER_CALLBACK(mac_adb_tick)
 		}
 		else if (ADB_IS_EGRET)
 		{
-			#if LOG_ADB
-			printf("Egret ADB: got command byte %02x\n", adb_command);
-			#endif
+			// Egret sending a response to the 680x0?
+			if (adb_state & 1)
+			{
+				adb_send = adb_buffer[adb_datasize];
+				#if LOG_ADB
+				printf("Egret ADB: done sending byte %02x, %d left\n", adb_send, adb_datasize);
+				#endif
+
+				adb_datasize--;
+				adb_timer_ticks = 8;
+				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+
+				if (adb_datasize == 0)
+				{
+					#if LOG_ADB
+					printf("Egret ADB: this is the last byte, dropping XS\n");
+					#endif
+					adb_state &= ~1;
+				}
+			}
+			else
+			{
+				#if LOG_ADB
+				printf("Egret ADB: got command byte %02x\n", adb_command);
+				#endif
+				adb_buffer[adb_datasize++] = adb_command;
+				adb_command = 0;
+			}
 		}
 	}
 	else
@@ -1910,23 +1956,168 @@ static void mac_adb_newaction(int state)
 	}
 }
 
+static void mac_egret_response_std(int type, int flag, int cmd)
+{
+	adb_send = 0xaa;
+	adb_buffer[3] = type;
+	adb_buffer[2] = flag;
+	adb_buffer[1] = cmd;
+	adb_state |= 1;
+	adb_timer_ticks = 8;
+	adb_datasize = 3;
+	timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+}
+
+static void mac_egret_response_read_pram(int addr)
+{
+	int count = 0x100 - addr;	
+
+	adb_datasize = count+3;
+
+	adb_buffer[count+3] = 1;
+	adb_buffer[count+2] = 0;
+	adb_buffer[count+1] = 7;
+	while (count)
+	{
+		adb_buffer[count] = rtc_ram[addr];
+		addr++;
+		count--;
+	}
+
+	adb_send = 0xaa;
+	adb_state |= 1;
+	adb_timer_ticks = 8;
+	timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+}
+
+static void mac_egret_mcu_exec(void)
+{
+	switch (adb_buffer[1])
+	{
+		case 0x01:	// enable/disable ADB auto-polling
+			#if LOG_ADB
+			if (adb_buffer[2])
+			{
+				printf("ADB: Egret enable ADB auto-poll\n");
+			}
+			else
+			{
+				printf("ADB: Egret disable ADB auto-poll\n");
+			}
+			#endif
+
+			mac_egret_response_std(1, 0, 1);
+			break;
+
+		case 0x07: // read PRAM
+			#if LOG_ADB
+			printf("ADB: Egret read PRAM from %x\n", adb_buffer[2]<<8 | adb_buffer[3]);
+	 		#endif
+
+			mac_egret_response_read_pram(adb_buffer[2]<<8 | adb_buffer[3]);
+			break;
+
+		case 0x0e: // send to DFAC
+			#if LOG_ADB
+			printf("ADB: Egret send %02x to DFAC\n", adb_buffer[2]);
+			#endif
+
+			mac_egret_response_std(1, 0, 0x0e);
+			break;
+
+		case 0x1b: // set one-second interrupt
+			#if LOG_ADB
+			if (adb_buffer[2])
+			{
+				printf("ADB: Egret enable one-second IRQ\n");
+			}
+			else
+			{
+				printf("ADB: Egret disable one-second IRQ\n");
+			}
+			#endif
+
+			mac_egret_response_std(1, 0, 0x1b);
+			break;
+
+		case 0x1c:	// enable/disable keyboard NMI
+			#if LOG_ADB
+			if (adb_buffer[2])
+			{
+				printf("ADB: Egret enable keyboard NMI\n");
+			}
+			else
+			{
+				printf("ADB: Egret disable keyboard NMI\n");
+			}
+			#endif
+
+			mac_egret_response_std(1, 0, 0x1c);
+			break;
+
+		default:
+			#if LOG_ADB
+			printf("ADB: Unknown Egret MCU command %02x\n", adb_buffer[1]);
+			#endif
+			break;
+	}
+}
+
 static void mac_egret_newaction(int state)
 {
 	if (state != adb_state)
 	{
 		#if LOG_ADB
-		printf("ADB: New Egret state: SS %d VF %d XS %d\n", (state>>2)&1, (state>>1)&1, state&1);
+		printf("ADB: New Egret state: SS %d VF %d XS %d\n", (state>>2)&1, (state>>1)&1, adb_state&1);
 		#endif
 		
-		// rising edge of VIA bit 5 (bit 2 here) seems to mean the 68k wants to send something
-		if ((state & 0x04) && !(adb_state & 0x4))
+		// if bit 2 is high and stays high, the rising edge of bit 1 indicates the start of sending a command
+		if ((state & 0x04) && (adb_state & 0x04) && (state & 0x02) && !(adb_state & 0x02))
 		{
 			adb_command = adb_send = 0;
 			adb_timer_ticks = 8;
 			timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 		}
 
-		adb_state = state;
+		// if bit 2 drops and bit 1 is zero, execute the command
+		if (!(state & 0x02) && !(state & 0x04) && (adb_state & 0x04) && (adb_datasize))
+		{
+			#if LOG_ADB
+			int i;
+
+			printf("ADB: Egret exec command with %d bytes: ", adb_datasize);
+
+			for (i = 0; i < adb_datasize; i++)
+			{
+				printf("%02x ", adb_buffer[i]);
+			}
+
+			printf("\n");
+			#endif
+
+			// exec command here
+			switch (adb_buffer[0])
+			{
+				case 0:	// ADB command
+					adb_datasize = 0;
+					break;
+
+				case 1: // general Egret MCU command
+					mac_egret_mcu_exec();
+					break;
+
+				case 2: // error
+					adb_datasize = 0;
+					break;
+
+				case 3: // one-second interrupt
+					adb_datasize = 0;
+					break;
+			}
+		}
+
+		adb_state &= ~0x6;
+		adb_state |= state & 0x6;
 	}
 }
 
@@ -1987,7 +2178,14 @@ static void adb_reset(void)
 	adb_extclock = 0;
 	adb_send = 0;
 	adb_waiting_cmd = 0;
-	adb_state = ADB_STATE_NOTINIT;
+	if (ADB_IS_BITBANG)
+	{
+		adb_state = ADB_STATE_NOTINIT;
+	}
+	else if (ADB_IS_EGRET)
+	{
+		adb_state = 0;
+	}
 	adb_direction = 0;
 	adb_datasize = 0;
 	adb_last_talk = -1;
@@ -2050,7 +2248,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 
 	if ((mac_model == MODEL_MAC_CLASSIC) ||
 	    (mac_model == MODEL_MAC_II) || (mac_model == MODEL_MAC_II_FDHD) || 
-	    (mac_model == MODEL_MAC_IIX))
+	    (mac_model == MODEL_MAC_IIX) || (mac_model == MODEL_MAC_POWERMAC_6100))
 	{
 		return 0x81;		// bit 0 must be set to avoid attempting to boot from AppleTalk
 	}
@@ -2067,7 +2265,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 
 	if (mac_model == MODEL_MAC_IICI)
 	{
-		return 0xc7;	// 0x40 = IIcx/IIci/IIfx/SE30 | 0x06 = IIci
+		return 0x81 | PA6 | PA2 | PA1;
 	}
 
 	if (mac_model == MODEL_MAC_IISI)
@@ -2077,12 +2275,12 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 
 	if (mac_model == MODEL_MAC_IIFX)
 	{
-		return 0xc3;	// 0x40 = IIcx/IIci/IIfx/SE30 | 0x02 = IIfx
+		return 0x81 | PA6 | PA1;
 	}
 
 	if (mac_model == MODEL_MAC_IICX)
 	{
-		return 0xc1;	// 0x40 = IIcx/IIci/IIfx ID bit
+		return 0x81 | PA6;
 	}
 
 	return 0x80;
@@ -2096,7 +2294,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 	if (video_screen_get_vpos(device->machine->primary_screen) >= MAC_V_VIS)
 		val |= 0x40;
 
-	if ((ADB_IS_BITBANG) || (ADB_IS_EGRET))
+	if (ADB_IS_BITBANG)
 	{
 		val |= adb_state<<4;
 
@@ -2104,6 +2302,11 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 		{
 			val |= 0x08;
 		}
+	}
+	else if (ADB_IS_EGRET)
+	{
+		val |= adb_state<<3;
+		val ^= 0x08;	// maybe it's reversed?
 	}
 	else
 	{
@@ -2197,7 +2400,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 	}
 	else if (ADB_IS_EGRET)
 	{
-		mac_egret_newaction((data & 0x38) >> 3);
+		mac_egret_newaction((data & 0x30) >> 3);
 	}
 }
 
@@ -2333,6 +2536,7 @@ MACHINE_RESET(mac)
 	rtc_init();
 
 	/* setup the memory overlay */
+	if (mac_model < MODEL_MAC_POWERMAC_6100)	// no overlay for PowerPC
 	set_memory_overlay(machine, 1);
 
 	/* setup videoram */
@@ -2400,7 +2604,7 @@ static DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
 				mac_overlay = -1;
 			}
 		}
-		else if ( ((mac_model >= MODEL_MAC_II) && (mac_model <= MODEL_MAC_SE30)) || (mac_model == MODEL_MAC_CLASSIC_II))
+		else if ( (mac_model == MODEL_MAC_LC_III) || ((mac_model >= MODEL_MAC_II) && (mac_model <= MODEL_MAC_SE30)) || (mac_model == MODEL_MAC_CLASSIC_II))
 		{
 			if ((address >= 0x40000000) && (address <= 0x4fffffff))
 			{
@@ -2428,7 +2632,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 		mac_install_memory(machine, 0x400000, (model >= MODEL_MAC_PLUS) ? 0x43ffff : 0x5fffff,
 			memory_region_length(machine, "user1"), memory_region(machine, "user1"), TRUE, 3);
 	}
-	else if ((model == MODEL_MAC_LC) || (model == MODEL_MAC_LC_II))
+	else if ((model == MODEL_MAC_LC) || (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III))
 	{
 		mac_install_memory(machine, 0x000000, messram_get_size(devtag_get_device(machine, "messram"))-1, messram_get_size(devtag_get_device(machine, "messram")), messram_get_ptr(devtag_get_device(machine, "messram")), FALSE, 2);
 	}
@@ -2438,15 +2642,14 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 	}
 
 	set_memory_overlay(machine, 1);
+	mac_overlay = 1;
+
+	memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, messram_get_size(devtag_get_device(machine, "messram")));
 
 	if ((model == MODEL_MAC_SE) || (model == MODEL_MAC_CLASSIC) || (model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) || 
-	    (model == MODEL_MAC_LC_II) || ((mac_model >= MODEL_MAC_II) && (mac_model <= MODEL_MAC_SE30)))
+	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || ((mac_model >= MODEL_MAC_II) && (mac_model <= MODEL_MAC_SE30)))
 	{
-		// classic will fail RAM test and try to boot appletalk if RAM is not all zero
-		memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, messram_get_size(devtag_get_device(machine, "messram")));
-
 		memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), overlay_opbaseoverride);
-		mac_overlay = 1;
 	}
 
 	/* setup keyboard */
@@ -2525,6 +2728,11 @@ DRIVER_INIT(maclc2)
 	mac_driver_init(machine, MODEL_MAC_LC_II);
 }
 
+DRIVER_INIT(maclc3)
+{
+	mac_driver_init(machine, MODEL_MAC_LC_III);
+}
+
 // make the appletalk init fail instead of hanging on the II FDHD/IIx/IIcx/SE30 ROM
 static void patch_appletalk_iix(running_machine *machine)
 {
@@ -2585,12 +2793,17 @@ DRIVER_INIT(macclassic2)
 	mac_driver_init(machine, MODEL_MAC_CLASSIC_II);
 }
 
+DRIVER_INIT(macpm6100)
+{
+	mac_driver_init(machine, MODEL_MAC_POWERMAC_6100);
+}
+
 void mac_nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state)
 {
 	UINT8 masks[6] = { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20 };
 
 	// NuBus slot must be 9 through E
-	assert((slot < 9) || (slot > 0xe));
+	assert((slot >= 9) && (slot <= 0xe));
 
 	slot -= 9;
 
