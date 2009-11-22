@@ -344,6 +344,8 @@ const game_driver * const drivers[] =
     DRIVER( maciisi )	/* 1990 Apple Macintosh IIsi */
     DRIVER( macclas2 )	/* 1991 Apple Macintosh Classic II */
     DRIVER( maclc2 )	/* 1991 Apple Macintosh LC II */
+    DRIVER( maclc3 )	/* 1993 Apple Macintosh LC III */
+    DRIVER( pmac6100 )  /* 1994 Apple Power Macintosh 6100 */
 
     /* Atari */
     DRIVER( a400 )      /* 1979 Atari 400                                   */
