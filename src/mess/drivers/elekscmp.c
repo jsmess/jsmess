@@ -40,7 +40,7 @@ static MACHINE_RESET(elekscmp)
 
 static MACHINE_DRIVER_START( elekscmp )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",SCMP, XTAL_4_433619MHz)
+    MDRV_CPU_ADD("maincpu",INS8060, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(elekscmp_mem)
 
     MDRV_MACHINE_RESET(elekscmp)
@@ -62,5 +62,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, elekscmp,  0,       0, 	elekscmp, 	elekscmp, 	 0,  0,  	 "Elektor Electronics",   "Elektor SC/MP",		GAME_NOT_WORKING)
+COMP( 1977, elekscmp,  0,       0, 	elekscmp, 	elekscmp, 	 0,  0,  	 "Elektor Electronics",   "Elektor SC/MP",		GAME_NOT_WORKING)
 
