@@ -124,7 +124,8 @@ CPUS += TMS0980
 CPUS += I4004
 CPUS += SUPERFX
 CPUS += Z8
-
+CPUS += I8008
+CPUS += SCMP
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
@@ -1518,6 +1519,10 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/next.o		\
 	$(MESS_DRIVERS)/pda600.o	\
 	$(MESS_DRIVERS)/pce220.o	\
+	$(MESS_DRIVERS)/mod8.o		\
+	$(MESS_DRIVERS)/k1003.o		\
+	$(MESS_DRIVERS)/mk14.o		\
+	$(MESS_DRIVERS)/elekscmp.o	\
 
 
 
@@ -1567,14 +1572,17 @@ $(MESS_DRIVERS)/cosmicos.o:	$(MESS_LAYOUT)/cosmicos.lh
 $(MESS_DRIVERS)/c80.o:		$(MESS_LAYOUT)/c80.lh
 $(MESS_DRIVERS)/dectalk.o:	$(MESS_LAYOUT)/dectalk.lh
 $(MESS_DRIVERS)/elf.o:		$(MESS_LAYOUT)/elf2.lh
+$(MESS_DRIVERS)/elekscmp.o:	$(MESS_LAYOUT)/elekscmp.lh
 $(MESS_DRIVERS)/ex800.o:	$(MESS_LAYOUT)/ex800.lh
 $(MESS_DRIVERS)/glasgow.o:	$(MESS_LAYOUT)/glasgow.lh
+$(MESS_DRIVERS)/k1003.o:	$(MESS_LAYOUT)/k1003.lh
 $(MESS_DRIVERS)/kim1.o:		$(MESS_LAYOUT)/kim1.lh
 $(MESS_DRIVERS)/junior.o:	$(MESS_LAYOUT)/junior.lh
 $(MESS_DRIVERS)/lc80.o:		$(MESS_LAYOUT)/lc80.lh
 $(MESS_DRIVERS)/lx800.o:	$(MESS_LAYOUT)/lx800.lh
 $(MESS_DRIVERS)/mephisto.o:	$(MESS_LAYOUT)/mephisto.lh
 $(MESS_DRIVERS)/mk1.o:		$(MESS_LAYOUT)/mk1.lh
+$(MESS_DRIVERS)/mk14.o:		$(MESS_LAYOUT)/mk14.lh
 $(MESS_DRIVERS)/mk2.o:		$(MESS_LAYOUT)/mk2.lh
 $(MESS_DRIVERS)/mpf1.o:		$(MESS_LAYOUT)/mpf1.lh
 $(MESS_DRIVERS)/mmd1.o:		$(MESS_LAYOUT)/mmd1.lh \

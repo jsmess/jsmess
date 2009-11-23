@@ -1516,5 +1516,9 @@ const game_driver * const drivers[] =
 	DRIVER( nexttrb )
 	DRIVER( pda600 )
 	DRIVER( pce220 )
+	DRIVER( mod8 )
+	DRIVER( k1003 )	
+	DRIVER( mk14 )
+	DRIVER( elekscmp )
 
 #endif /* DRIVER_RECURSIVE */

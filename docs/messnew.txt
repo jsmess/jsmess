@@ -4,7 +4,10 @@ New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Hector MX40c [JJ Stacino]
 - Hector MX80c [JJ Stacino]
-
+- Microsystems International Limited MOD-8 [Miodrag Milanovic]
+- Science of Cambridge MK-14 [Miodrag Milanovic]
+- Robotron K1003 [Miodrag Milanovic]
+- Elektor SC/MP [Miodrag Milanovic]
 
 
 Systems Promoted from GAME_NOT_WORKING:
