@@ -41,6 +41,8 @@ System Driver Changes:
   Once enabled, remappable controls will also appear in the Input (this 
   System) menu. [Fabio Priuli]
 
+- [TI81] Added v1.6K BIOS dump. [critor]
+
 - [TI85/TI86] Converted the serial interface to a device. [Wilbert Pol]
 
 - [TI99] Fixed a crash when the user mounts cartridge dump files in legacy

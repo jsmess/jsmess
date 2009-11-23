@@ -604,9 +604,11 @@ ROM_END
 ROM_START (ti81)
 	ROM_REGION (0x18000, "maincpu",0)
 	ROM_DEFAULT_BIOS("v18")
-	ROM_SYSTEM_BIOS( 0, "v18", "V 1.8K" )
-	ROMX_LOAD( "ti81v18k.bin", 0x10000, 0x8000, CRC(94ac58e2) SHA1(ba915cfe2fe50a452ef8287db8f2244e29056d54), ROM_BIOS(1) )
-	//No dumps 1.0, 1.6K (?) and 2.0 from ticalc.org, less sure about 1.6K
+	ROM_SYSTEM_BIOS( 0, "v16", "V 1.6K" )
+	ROMX_LOAD( "ti81v16k.bin", 0x10000, 0x8000, CRC(452ca838) SHA1(92649f0f3bce7d8829d950cecd6532d7f7db1297), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v18", "V 1.8K" )
+	ROMX_LOAD( "ti81v18k.bin", 0x10000, 0x8000, CRC(94ac58e2) SHA1(ba915cfe2fe50a452ef8287db8f2244e29056d54), ROM_BIOS(2) )
+	//No dumps 1.0, and 2.0 from ticalc.org, less sure about 1.6K
 ROM_END
 
 ROM_START (ti81v2)
