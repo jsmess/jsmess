@@ -225,10 +225,8 @@ static void scsihd_write_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 		case 0x2a: // WRITE(10)
 			if ((our_this->disk) && (our_this->blocks))
 			{
-				printf("We have a disc and we have %d blocks, with a data length of %d, time to write\n", our_this->blocks, dataLength);
 				while (dataLength > 0)
 				{
-					printf("Attempting to write some data at LBA %08x\n", our_this->lba);
 					if (!hard_disk_write(our_this->disk, our_this->lba, data))
 					{
 						logerror("SCSIHD: HD write error!\n");
@@ -309,7 +307,6 @@ static int scsihd_dispatch(int operation, void *file, INT64 intparm, void *ptrpa
 			return 0;
 
 		case SCSIOP_WRITE_DATA:
-			printf("intparm = %08x%08x\n", (UINT32)(intparm >> 32), (UINT32)(intparm & 0x00000000ffffffff));
 			scsihd_write_data( (SCSIInstance *)file, (UINT8 *)ptrparm, intparm );
 			return 0;
 
