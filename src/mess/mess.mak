@@ -1197,6 +1197,7 @@ $(MESSOBJ)/rockwell.a:			\
 	$(MESS_VIDEO)/aim65.o		\
 	$(MESS_MACHINE)/aim65.o		\
 	$(MESS_DRIVERS)/aim65.o		\
+	$(MESS_DRIVERS)/aim65_40.o	\
 
 $(MESSOBJ)/samcoupe.a:			\
 	$(MESS_FORMATS)/coupedsk.o	\
@@ -1563,6 +1564,7 @@ $(MESSOBJ)/mess.o:	$(MESS_LAYOUT)/lcd.lh
 $(MESS_DRIVERS)/4004clk.o:	$(MESS_LAYOUT)/4004clk.lh
 $(MESS_DRIVERS)/acrnsys1.o:	$(MESS_LAYOUT)/acrnsys1.lh
 $(MESS_DRIVERS)/aim65.o:	$(MESS_LAYOUT)/aim65.lh
+$(MESS_DRIVERS)/aim65_40.o:	$(MESS_LAYOUT)/aim65_40.lh
 $(MESS_DRIVERS)/amico2k.o:	$(MESS_LAYOUT)/amico2k.lh
 $(MESS_DRIVERS)/beta.o:		$(MESS_LAYOUT)/beta.lh
 $(MESS_DRIVERS)/bob85.o:	$(MESS_LAYOUT)/bob85.lh
