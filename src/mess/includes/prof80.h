@@ -11,6 +11,7 @@
 #define Z80STI_TAG				"z9"
 
 #define GRIP_Z80_TAG			"grip_z1"
+#define SPEAKER_TAG				"speaker"
 
 #define UNIO_Z80STI_TAG			"z5"
 #define UNIO_Z80SIO_TAG			"z15"

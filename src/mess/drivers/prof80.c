@@ -33,20 +33,16 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "video/mc6845.h"
+#include "formats/basicdsk.h"
+#include "devices/flopdrv.h"
+#include "devices/messram.h"
 #include "machine/i8255a.h"
 #include "machine/upd765.h"
 #include "machine/upd1990a.h"
 #include "machine/z80sti.h"
 #include "machine/ctronics.h"
 #include "machine/rescap.h"
-#include "devices/flopdrv.h"
-#include "formats/basicdsk.h"
-#include "devices/messram.h"
-
-INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
-{
-	return floppy_get_device(machine, drive);
-}
+#include "sound/speaker.h"
 
 /* Keyboard HACK */
 
@@ -193,10 +189,10 @@ static TIMER_CALLBACK( floppy_motor_off_tick )
 {
 	prof80_state *state = machine->driver_data;
 
-	floppy_drive_set_motor_state(get_floppy_image(machine, 0), 0);
-	floppy_drive_set_motor_state(get_floppy_image(machine, 1), 0);
-	floppy_drive_set_ready_state(get_floppy_image(machine, 0), 0, 1);
-	floppy_drive_set_ready_state(get_floppy_image(machine, 1), 0, 1);
+	floppy_drive_set_motor_state(floppy_get_device(machine, 0), 0);
+	floppy_drive_set_motor_state(floppy_get_device(machine, 1), 0);
+	floppy_drive_set_ready_state(floppy_get_device(machine, 0), 0, 1);
+	floppy_drive_set_ready_state(floppy_get_device(machine, 1), 0, 1);
 
 	state->motor = 0;
 }
@@ -242,10 +238,10 @@ static void ls259_w(running_machine *machine, int fa, int sa, int fb, int sb)
 		else
 		{
 			/* turn on floppy motor */
-			floppy_drive_set_motor_state(get_floppy_image(machine, 0), 1);
-			floppy_drive_set_motor_state(get_floppy_image(machine, 1), 1);
-			floppy_drive_set_ready_state(get_floppy_image(machine, 0), 1, 1);
-			floppy_drive_set_ready_state(get_floppy_image(machine, 1), 1, 1);
+			floppy_drive_set_motor_state(floppy_get_device(machine, 0), 1);
+			floppy_drive_set_motor_state(floppy_get_device(machine, 1), 1);
+			floppy_drive_set_ready_state(floppy_get_device(machine, 0), 1, 1);
+			floppy_drive_set_ready_state(floppy_get_device(machine, 1), 1, 1);
 
 			state->motor = 1;
 
@@ -867,20 +863,6 @@ static MC6845_UPDATE_ROW( grip_update_row )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( grip_de_w )
-{
-	prof80_state *driver_state = device->machine->driver_data;
-
-	z80sti_i1_w(driver_state->z80sti, state);
-}
-
-static WRITE_LINE_DEVICE_HANDLER( grip_cur_w )
-{
-	prof80_state *driver_state = device->machine->driver_data;
-
-	z80sti_i2_w(driver_state->z80sti, state);
-}
-
 static const mc6845_interface grip_mc6845_interface =
 {
 	SCREEN_TAG,
@@ -888,8 +870,8 @@ static const mc6845_interface grip_mc6845_interface =
 	NULL,
 	grip_update_row,
 	NULL,
-	DEVCB_LINE(grip_de_w),
-	DEVCB_LINE(grip_cur_w),
+	DEVCB_DEVICE_LINE(Z80STI_TAG, z80sti_i1_w),
+	DEVCB_DEVICE_LINE(Z80STI_TAG, z80sti_i2_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	NULL
@@ -931,7 +913,7 @@ static const struct upd765_interface prof80_upd765_interface =
 	NULL,
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0,FLOPPY_1, FLOPPY_2, FLOPPY_3}
+	{ FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3 }
 };
 
 /* PPI8255 Interface */
@@ -1068,16 +1050,6 @@ static READ8_DEVICE_HANDLER( grip_z80sti_gpio_r )
 	return centronics_busy_r(state->centronics) << 3;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( grip_z80sti_tbo_w )
-{
-	// connected to speaker
-}
-
-static WRITE_LINE_DEVICE_HANDLER( grip_z80sti_irq_w )
-{
-	cputag_set_input_line(device->machine, GRIP_Z80_TAG, INPUT_LINE_IRQ0, state);
-}
-
 static Z80STI_INTERFACE( grip_z80sti_interface )
 {
 	0,									/* serial receive clock */
@@ -1087,10 +1059,10 @@ static Z80STI_INTERFACE( grip_z80sti_interface )
 	DEVCB_NULL,							/* serial input */
 	DEVCB_NULL,							/* serial output */
 	DEVCB_NULL,							/* timer A output */
-	DEVCB_LINE(grip_z80sti_tbo_w),		/* timer B output */
+	DEVCB_DEVICE_LINE(SPEAKER_TAG, speaker_level_w),		/* timer B output */
 	DEVCB_LINE(z80sti_tc_w),			/* timer C output */
 	DEVCB_LINE(z80sti_rc_w),			/* timer D output */
-	DEVCB_LINE(grip_z80sti_irq_w)		/* interrupt */
+	DEVCB_CPU_INPUT_LINE(GRIP_Z80_TAG, INPUT_LINE_IRQ0)		/* interrupt */
 };
 
 /* Z80 Daisy Chain */
@@ -1221,6 +1193,11 @@ static MACHINE_DRIVER_START( prof80 )
     MDRV_VIDEO_UPDATE(prof80)
 
 	MDRV_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz/4, grip_mc6845_interface)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, prof80_upd1990a_intf)
