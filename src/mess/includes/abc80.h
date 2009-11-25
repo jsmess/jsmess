@@ -47,6 +47,7 @@
 #define SCREEN_TAG		"screen"
 #define Z80_TAG			"ab67"
 #define Z80PIO_TAG		"cd67"
+#define SN76477_TAG		"g8"
 #define CASSETTE_TAG	"cassette"
 
 typedef struct _abc80_state abc80_state;
@@ -58,6 +59,8 @@ struct _abc80_state
 	int z80pio_astb;
 
 	/* video state */
+	UINT8 *video_ram;
+	UINT8 *video_80_ram;
 	tilemap *tx_tilemap;
 	int blink;
 	int char_bank;

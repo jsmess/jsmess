@@ -35,11 +35,11 @@ static PALETTE_INIT( abc80 )
 	palette_set_color(machine, 3, RGB_BLACK);
 }
 
-static TILE_GET_INFO(abc80_get_tile_info)
+static TILE_GET_INFO( abc80_get_tile_info )
 {
 	abc80_state *state = machine->driver_data;
 
-	int attr = videoram[tile_index];
+	int attr = state->video_ram[tile_index];
 	int code = attr & 0x7f;
 	int color = (state->blink && (attr & 0x80)) ? 1 : 0;
 	int r = (tile_index & 0x78) >> 3;
@@ -126,7 +126,7 @@ static void abc80_update(running_machine *machine, bitmap_t *bitmap, const recta
             */
 
 			videoram_addr = ((r & 0x07) << 7) | ((((c >> 3) & 0x07) + ((r >> 3) | (r >> 1))) & 0x0f) | (c & 0x07);
-			videoram_data = videoram[videoram_addr];
+			videoram_data = state->video_ram[videoram_addr];
 			attr_addr = ((dh & dv) << 7) & (data & 0x7f);
 			attr_data = state->attr_prom[attr_addr];
 
