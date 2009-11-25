@@ -38,11 +38,6 @@
 #include "formats/basicdsk.h"
 #include "devices/messram.h"
 
-INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
-{
-	return floppy_get_device(machine, drive);
-}
-
 /* Keyboard HACK */
 
 static const UINT8 xerox820_keycodes[3][9][8] =
@@ -370,10 +365,10 @@ static WRITE8_DEVICE_HANDLER( xerox820_pio_port_a_w )
 	if (dvsel1) wd17xx_set_drive(state->wd1771, 0);
 	if (dvsel2) wd17xx_set_drive(state->wd1771, 1);
 
-	floppy_drive_set_motor_state(get_floppy_image(device->machine, 0), dvsel1);
-	floppy_drive_set_motor_state(get_floppy_image(device->machine, 1), dvsel2);
-	floppy_drive_set_ready_state(get_floppy_image(device->machine, 0), dvsel1, 1);
-	floppy_drive_set_ready_state(get_floppy_image(device->machine, 1), dvsel2, 1);
+	floppy_drive_set_motor_state(floppy_get_device(device->machine, 0), dvsel1);
+	floppy_drive_set_motor_state(floppy_get_device(device->machine, 1), dvsel2);
+	floppy_drive_set_ready_state(floppy_get_device(device->machine, 0), dvsel1, 1);
+	floppy_drive_set_ready_state(floppy_get_device(device->machine, 1), dvsel2, 1);
 
 	/* side select */
 	wd17xx_set_side(state->wd1771, BIT(data, 2));
