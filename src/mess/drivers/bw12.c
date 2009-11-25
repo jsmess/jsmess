@@ -448,19 +448,14 @@ static UPD765_GET_IMAGE( bw12_upd765_get_image )
 
 static const struct upd765_interface bw12_upd765_interface =
 {
-	DEVCB_LINE(bw12_upd765_interrupt),		/* interrupt */
-	NULL,						/* DMA request */
-	bw12_upd765_get_image,		/* image lookup */
-	UPD765_RDY_PIN_CONNECTED,	/* ready pin */
-	{FLOPPY_0,FLOPPY_1, NULL, NULL}
+	DEVCB_LINE(bw12_upd765_interrupt),	/* interrupt */
+	NULL,								/* DMA request */
+	bw12_upd765_get_image,				/* image lookup */
+	UPD765_RDY_PIN_CONNECTED,			/* ready pin */
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
 /* PIA6821 Interface */
-
-static WRITE_LINE_DEVICE_HANDLER( bw12_interrupt )
-{
-	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, state);
-}
 
 static READ8_DEVICE_HANDLER( bw12_pia6821_pa_r )
 {
@@ -495,20 +490,6 @@ static READ8_DEVICE_HANDLER( bw12_pia6821_pa_r )
 	return data;
 }
 
-static READ_LINE_DEVICE_HANDLER( bw12_pia6821_ca1_r )
-{
-	bw12_state *state = device->machine->driver_data;
-
-	return centronics_ack_r(state->centronics);
-}
-
-static WRITE_LINE_DEVICE_HANDLER( bw12_pia6821_ca2_w )
-{
-	bw12_state *driver_state = device->machine->driver_data;
-
-	centronics_strobe_w(driver_state->centronics, state);
-}
-
 static READ_LINE_DEVICE_HANDLER( bw12_pia6821_cb1_r )
 {
 	bw12_state *state = device->machine->driver_data;
@@ -534,18 +515,18 @@ static WRITE_LINE_DEVICE_HANDLER( bw12_pia6821_cb2_w )
 
 static const pia6821_interface bw12_pia_config =
 {
-	DEVCB_HANDLER(bw12_pia6821_pa_r),	/* port A input */
-	DEVCB_NULL,							/* port B input */
-	DEVCB_LINE(bw12_pia6821_ca1_r),		/* CA1 input */
-	DEVCB_LINE(bw12_pia6821_cb1_r),		/* CB1 input */
-	DEVCB_NULL,							/* CA2 input */
-	DEVCB_NULL,							/* CB2 input */
-	DEVCB_NULL, 						/* port A output */
+	DEVCB_HANDLER(bw12_pia6821_pa_r),							/* port A input */
+	DEVCB_NULL,													/* port B input */
+	DEVCB_DEVICE_LINE(CENTRONICS_TAG, centronics_ack_r),		/* CA1 input */
+	DEVCB_LINE(bw12_pia6821_cb1_r),								/* CB1 input */
+	DEVCB_NULL,													/* CA2 input */
+	DEVCB_NULL,													/* CB2 input */
+	DEVCB_NULL, 												/* port A output */
 	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),	/* port B output */
-	DEVCB_LINE(bw12_pia6821_ca2_w),		/* CA2 output */
-	DEVCB_LINE(bw12_pia6821_cb2_w),		/* CB2 output */
-	DEVCB_LINE(bw12_interrupt),			/* IRQA output */
-	DEVCB_LINE(bw12_interrupt)			/* IRQB output */
+	DEVCB_DEVICE_LINE(CENTRONICS_TAG, centronics_strobe_w),		/* CA2 output */
+	DEVCB_LINE(bw12_pia6821_cb2_w),								/* CB2 output */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),				/* IRQA output */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)				/* IRQB output */
 };
 
 /* Centronics Interface */
@@ -559,6 +540,11 @@ static const centronics_interface bw12_centronics_intf =
 };
 
 /* Z80-SIO/0 Interface */
+
+static WRITE_LINE_DEVICE_HANDLER( bw12_interrupt )
+{
+	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, state);
+}
 
 static const z80sio_interface bw12_z80sio_intf =
 {
@@ -879,5 +865,5 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                             FULLNAME        FLAGS */
-COMP( 1984,	bw12,	0,		0,		bw12, 	bw12,	0,		0,	"Bondwell International Limited",   "Bondwell 12",	GAME_SUPPORTS_SAVE )
-COMP( 1984,	bw14,	bw12,	0,		bw14,	bw12,	0,		0,	"Bondwell International Limited",   "Bondwell 14",	GAME_SUPPORTS_SAVE )
+COMP( 1984,	bw12,	0,		0,		bw12, 	bw12,	0,		0,		"Bondwell International Limited",   "Bondwell 12",	GAME_SUPPORTS_SAVE )
+COMP( 1984,	bw14,	bw12,	0,		bw14,	bw12,	0,		0,		"Bondwell International Limited",   "Bondwell 14",	GAME_SUPPORTS_SAVE )
