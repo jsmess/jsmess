@@ -9,6 +9,7 @@
 #define MC14412_TAG		"m31"
 #define CASSETTE_TAG	"cassette"
 #define CENTRONICS_TAG	"centronics"
+#define SPEAKER_TAG		"speaker"
 
 //#define I8085_TAG     "m19"
 //#define I8155_TAG		"m12"
@@ -23,9 +24,6 @@ struct _kc85_state
 {
 	/* memory state */
 	UINT8 bank;				/* memory bank selection */
-
-	/* clock state */
-	int upd1990a_data;		/* RTC data output */
 
 	/* keyboard state */
 	UINT16 keylatch;		/* keyboard latch */

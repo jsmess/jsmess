@@ -26,9 +26,6 @@ struct _pc88_state
 	UINT8 i8255_0_pc;
 	UINT8 i8255_1_pc;
 
-	/* RTC state */
-	int rtc_data;
-
 	/* memory state */
 	UINT16 kanji;
 	UINT16 kanji2;

@@ -52,7 +52,7 @@ WRITE8_HANDLER( pc88_rtc_w )
 	upd1990a_c0_w(state->upd1990a, BIT(data, 0));
 	upd1990a_c1_w(state->upd1990a, BIT(data, 1));
 	upd1990a_c2_w(state->upd1990a, BIT(data, 2));
-	upd1990a_data_w(state->upd1990a, BIT(data, 3));
+	upd1990a_data_in_w(state->upd1990a, BIT(data, 3));
 
 	/* printer */
 	centronics_data_w(state->centronics, 0, data);
@@ -181,7 +181,7 @@ READ8_HANDLER( pc88sr_inport_40 )
 	r = centronics_busy_r(state->centronics);
 	r |= pc8801_is_24KHz ? 0x00 : 0x02;
 	r |= use_5FD ? 0x00 : 0x08;
-	r |= state->rtc_data ? 0x10 : 0x00;
+	r |= upd1990a_data_out_r(state->upd1990a) ? 0x10 : 0x00;
 	if(video_screen_get_vblank(space->machine->primary_screen)) r|=0x20;
 
 	return r|0xc0;

@@ -345,16 +345,38 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_c2_w )
 }
 
 /*-------------------------------------------------
-    upd1990a_data_w - data input write
+    upd1990a_data_in_w - data input write
 -------------------------------------------------*/
 
-WRITE_LINE_DEVICE_HANDLER( upd1990a_data_w )
+WRITE_LINE_DEVICE_HANDLER( upd1990a_data_in_w )
 {
 	upd1990a_t *upd1990a = get_safe_token(device);
 
 	if (LOG) logerror("UPD1990A DATA IN %u\n", state);
 
 	upd1990a->data_in = state;
+}
+
+/*-------------------------------------------------
+    upd1990a_data_out_r - data output read
+-------------------------------------------------*/
+
+READ_LINE_DEVICE_HANDLER( upd1990a_data_out_r )
+{
+	upd1990a_t *upd1990a = get_safe_token(device);
+
+	return upd1990a->data_out;
+}
+
+/*-------------------------------------------------
+    upd1990a_tp_r - timing pulse read
+-------------------------------------------------*/
+
+READ_LINE_DEVICE_HANDLER( upd1990a_tp_r )
+{
+	upd1990a_t *upd1990a = get_safe_token(device);
+
+	return upd1990a->tp;
 }
 
 /*-------------------------------------------------
@@ -437,11 +459,11 @@ static TIMER_CALLBACK( tp_tick )
 	const device_config *device = ptr;
 	upd1990a_t *upd1990a = get_safe_token(device);
 
+	upd1990a->tp = !upd1990a->tp;
+
 	if (LOG) logerror("UPD1990A TP %u\n", upd1990a->tp);
 
 	devcb_call_write_line(&upd1990a->out_tp_func, upd1990a->tp);
-
-	upd1990a->tp = !upd1990a->tp;
 }
 
 /*-------------------------------------------------
@@ -453,11 +475,11 @@ static TIMER_CALLBACK( data_out_tick )
 	const device_config *device = ptr;
 	upd1990a_t *upd1990a = get_safe_token(device);
 
+	upd1990a->data_out = !upd1990a->data_out;
+
 	if (LOG) logerror("UPD1990A DATA OUT TICK %u\n", upd1990a->data_out);
 
 	devcb_call_write_line(&upd1990a->out_data_func, upd1990a->data_out);
-
-	upd1990a->data_out = !upd1990a->data_out;
 }
 
 /*-------------------------------------------------

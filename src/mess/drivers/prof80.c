@@ -208,7 +208,7 @@ static void ls259_w(running_machine *machine, int fa, int sa, int fb, int sb)
 	switch (sa)
 	{
 	case 0: /* C0/TDI */
-		upd1990a_data_w(state->upd1990a, fa);
+		upd1990a_data_in_w(state->upd1990a, fa);
 		upd1990a_c0_w(state->upd1990a, fa);
 		break;
 
@@ -361,7 +361,7 @@ static READ8_HANDLER( status2_r )
 
 	prof80_state *state = space->machine->driver_data;
 
-	return (!state->rtc_data << 7) | !state->motor;
+	return (!upd1990a_data_out_r(state->upd1990a) << 7) | !state->motor;
 }
 
 static WRITE8_HANDLER( mmu_w )
@@ -910,16 +910,9 @@ static VIDEO_UPDATE( prof80 )
 
 /* uPD1990A Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( prof80_upd1990a_data_w )
-{
-	prof80_state *driver_state = device->machine->driver_data;
-
-	driver_state->rtc_data = state;
-}
-
 static UPD1990A_INTERFACE( prof80_upd1990a_intf )
 {
-	DEVCB_LINE(prof80_upd1990a_data_w),
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -1159,7 +1152,6 @@ static MACHINE_START( prof80 )
 	state_save_register_global(machine, state->lps);
 	state_save_register_global(machine, state->page);
 	state_save_register_global(machine, state->flash);
-	state_save_register_global(machine, state->rtc_data);
 	state_save_register_global(machine, state->fdc_index);
 	state_save_register_global(machine, state->gripd);
 	state_save_register_global(machine, state->gripc);

@@ -77,6 +77,12 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_c1_w );
 WRITE_LINE_DEVICE_HANDLER( upd1990a_c2_w );
 
 /* data in */
-WRITE_LINE_DEVICE_HANDLER( upd1990a_data_w );
+WRITE_LINE_DEVICE_HANDLER( upd1990a_data_in_w );
+
+/* data out */
+READ_LINE_DEVICE_HANDLER( upd1990a_data_out_r );
+
+/* timing pulse */
+READ_LINE_DEVICE_HANDLER( upd1990a_tp_r );
 
 #endif /* __UPD1990A_H__ */

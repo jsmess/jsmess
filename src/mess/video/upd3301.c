@@ -71,6 +71,8 @@ struct _upd3301_t
 	const device_config *screen;	/* screen */
 	bitmap_t *bitmap;				/* bitmap */
 	int y;							/* current scanline */
+	int hrtc;						/* horizontal retrace */
+	int vrtc;						/* vertical retrace */
 
 	/* live state */
 	int mode;						/* command mode */
@@ -278,6 +280,7 @@ static TIMER_CALLBACK( vrtc_tick )
 	//if (LOG) logerror("UPD3301 '%s' VRTC: %u\n", device->tag, param);
 
 	devcb_call_write_line(&upd3301->out_vrtc_func, param);
+	upd3301->vrtc = param;
 
 	if (param && !upd3301->me)
 	{
@@ -300,6 +303,7 @@ static TIMER_CALLBACK( hrtc_tick )
 	//if (LOG) logerror("UPD3301 '%s' HRTC: %u\n", device->tag, param);
 
 	devcb_call_write_line(&upd3301->out_hrtc_func, param);
+	upd3301->hrtc = param;
 
 	update_hrtc_timer(upd3301, param);
 }
@@ -475,6 +479,28 @@ WRITE8_DEVICE_HANDLER( upd3301_w )
 
 WRITE_LINE_DEVICE_HANDLER( upd3301_lpen_w )
 {
+}
+
+/*-------------------------------------------------
+    upd3301_hrtc_r - horizontal retrace read
+-------------------------------------------------*/
+
+READ_LINE_DEVICE_HANDLER( upd3301_hrtc_r )
+{
+	upd3301_t *upd3301 = get_safe_token(device);
+
+	return upd3301->hrtc;
+}
+
+/*-------------------------------------------------
+    upd3301_vrtc_r - vertical retrace read
+-------------------------------------------------*/
+
+READ_LINE_DEVICE_HANDLER( upd3301_vrtc_r )
+{
+	upd3301_t *upd3301 = get_safe_token(device);
+
+	return upd3301->vrtc;
 }
 
 /*-------------------------------------------------

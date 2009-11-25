@@ -15,17 +15,10 @@
 typedef struct _pc8001_state pc8001_state;
 struct _pc8001_state
 {
-	/* RTC state*/
-	int rtc_data;
-
 	/* video state */
 	UINT8 *char_rom;
-	int vrtc;
 	int width80;
 	int color;
-
-	/* printer state */
-	int ack;
 
 	/* devices */
 	const device_config *i8257;

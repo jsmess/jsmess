@@ -38,9 +38,6 @@ struct _prof80_state
 	int page;				/* video page */
 	int flash;				/* flash */
 
-	/* clock state */
-	int rtc_data;			/* RTC data output */
-
 	/* floppy state */
 	int	fdc_index;			/* floppy index hole sensor */
 	int motor;				/* floppy motor */

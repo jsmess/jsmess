@@ -811,16 +811,9 @@ INPUT_PORTS_END
 
 /* uPD1990A Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( kc85_upd1990a_data_w )
-{
-	kc85_state *driver_state = device->machine->driver_data;
-
-	driver_state->upd1990a_data = state;
-}
-
 static UPD1990A_INTERFACE( kc85_upd1990a_intf )
 {
-	DEVCB_LINE(kc85_upd1990a_data_w),
+	DEVCB_NULL,
 	DEVCB_CPU_INPUT_LINE(I8085_TAG, I8085_RST75_LINE)
 };
 
@@ -852,7 +845,7 @@ static READ8_DEVICE_HANDLER( kc85_8155_port_c_r )
 
 	UINT8 data = 0;
 
-	data |= state->upd1990a_data;
+	data |= upd1990a_data_out_r(state->upd1990a);
 	data |= centronics_not_busy_r(state->centronics) << 1;
 	data |= centronics_busy_r(state->centronics) << 2;
 
@@ -896,7 +889,7 @@ static WRITE8_DEVICE_HANDLER( kc85_8155_port_a_w )
 	upd1990a_c1_w(state->upd1990a, BIT(data, 1));
 	upd1990a_c2_w(state->upd1990a, BIT(data, 2));
 	upd1990a_clk_w(state->upd1990a, BIT(data, 3));
-	upd1990a_data_w(state->upd1990a, BIT(data, 4));
+	upd1990a_data_in_w(state->upd1990a, BIT(data, 4));
 }
 
 static WRITE8_DEVICE_HANDLER( kc85_8155_port_b_w )
@@ -972,7 +965,7 @@ static READ8_DEVICE_HANDLER( pc8201_8155_port_c_r )
 
 	UINT8 data = 0;
 
-	data |= state->upd1990a_data;
+	data |= upd1990a_data_out_r(state->upd1990a);
 	data |= centronics_not_busy_r(state->centronics) << 1;
 	data |= centronics_busy_r(state->centronics) << 2;
 
@@ -1141,7 +1134,7 @@ static MACHINE_START( kc85 )
 	/* find devices */
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
-	state->speaker = devtag_get_device(machine, "speaker");
+	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* initialize RTC */
@@ -1172,7 +1165,6 @@ static MACHINE_START( kc85 )
 
 	/* register for state saving */
 	state_save_register_global(machine, state->bank);
-	state_save_register_global(machine, state->upd1990a_data);
 	state_save_register_global(machine, state->keylatch);
 	state_save_register_global(machine, state->buzzer);
 	state_save_register_global(machine, state->bell);
@@ -1185,7 +1177,7 @@ static MACHINE_START( pc8201 )
 	/* find devices */
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
-	state->speaker = devtag_get_device(machine, "speaker");
+	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* initialize RTC */
@@ -1207,7 +1199,6 @@ static MACHINE_START( pc8201 )
 
 	/* register for state saving */
 	state_save_register_global(machine, state->bank);
-	state_save_register_global(machine, state->upd1990a_data);
 	state_save_register_global(machine, state->keylatch);
 	state_save_register_global(machine, state->buzzer);
 	state_save_register_global(machine, state->bell);
@@ -1223,7 +1214,7 @@ static MACHINE_START( trsm100 )
 	/* find devices */
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
-	state->speaker = devtag_get_device(machine, "speaker");
+	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* initialize RTC */
@@ -1264,7 +1255,6 @@ static MACHINE_START( trsm100 )
 
 	/* register for state saving */
 	state_save_register_global(machine, state->bank);
-	state_save_register_global(machine, state->upd1990a_data);
 	state_save_register_global(machine, state->keylatch);
 	state_save_register_global(machine, state->buzzer);
 	state_save_register_global(machine, state->bell);
@@ -1276,7 +1266,7 @@ static MACHINE_START( tandy200 )
 
 	/* find devices */
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
-	state->speaker = devtag_get_device(machine, "speaker");
+	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* configure ROM banking */
@@ -1347,7 +1337,7 @@ static MACHINE_DRIVER_START( kc85 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
@@ -1387,7 +1377,7 @@ static MACHINE_DRIVER_START( pc8201 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
@@ -1457,7 +1447,7 @@ static MACHINE_DRIVER_START( tandy200 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 //  MDRV_TCM5089_ADD(TCM5089_TAG, XTAL_3_579545MHz)
 
@@ -1494,7 +1484,7 @@ ROM_START( kc85 )
 	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-ROM_START( npc8201a )
+ROM_START( pc8201a )
 	ROM_REGION( 0x10000, I8085_TAG, 0 )
 	ROM_LOAD( "pc8201rom.rom0", 0x0000, 0x8000, CRC(30555035) SHA1(96f33ff235db3028bf5296052acedbc94437c596) )
 
@@ -1554,6 +1544,6 @@ COMP( 1983, m10,		kc85,	0,		kc85,		olivm10,	0,		0,			"Olivetti",				"M-10", 0 )
 COMP( 1983, trsm100,	0,		0,		trsm100,	kc85,		0,		0,			"Tandy Radio Shack",	"TRS-80 Model 100", 0 )
 COMP( 1986, tandy102,	trsm100,0,		tandy102,	kc85,		0,		0,			"Tandy Radio Shack",	"Tandy 102", 0 )
 //COMP( 1983, npc8201,  0,      0,      pc8201,     pc8201a,    0,      0,			"NEC",                  "PC-8201 (Japan)", 0 )
-COMP( 1983, npc8201a,	0,		0,		pc8201,		pc8201a,	0,		0,			"NEC",					"PC-8201A", 0 )
+COMP( 1983, pc8201a,	0,		0,		pc8201,		pc8201a,	0,		0,			"NEC",					"PC-8201A", 0 )
 //COMP( 1987, npc8300,  npc8201,0,      pc8300,     pc8300,     0,      0,			"NEC",                  "PC-8300", 0 )
 COMP( 1984, tandy200,	0,		0,		tandy200,	kc85,		0,		0,			"Tandy Radio Shack",	"Tandy 200", 0 )

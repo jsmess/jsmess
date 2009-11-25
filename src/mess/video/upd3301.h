@@ -86,6 +86,12 @@ WRITE_LINE_DEVICE_HANDLER( upd3301_lpen_w );
 /* dma acknowledge */
 WRITE8_DEVICE_HANDLER( upd3301_dack_w );
 
+/* horizontal retrace */
+READ_LINE_DEVICE_HANDLER( upd3301_hrtc_r );
+
+/* vertical retrace */
+READ_LINE_DEVICE_HANDLER( upd3301_vrtc_r );
+
 /* screen update */
 void upd3301_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
 

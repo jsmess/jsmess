@@ -250,7 +250,7 @@ static WRITE8_HANDLER( rtc_cmd_w )
 	upd1990a_c0_w(state->upd1990a, BIT(data, 0));
 	upd1990a_c1_w(state->upd1990a, BIT(data, 1));
 	upd1990a_c2_w(state->upd1990a, BIT(data, 2));
-	upd1990a_data_w(state->upd1990a, BIT(data, 3));
+	upd1990a_data_in_w(state->upd1990a, BIT(data, 3));
 }
 
 static WRITE8_HANDLER( rtc_ctrl_w )

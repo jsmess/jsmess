@@ -530,16 +530,9 @@ GFXDECODE_END
 
 /* uPD1990A Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( rtc_data_w )
-{
-	pc88_state *driver_state = device->machine->driver_data;
-
-	driver_state->rtc_data = state;
-}
-
 static UPD1990A_INTERFACE( pc88_upd1990a_intf )
 {
-	DEVCB_LINE(rtc_data_w),
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
