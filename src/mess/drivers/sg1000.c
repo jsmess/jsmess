@@ -165,14 +165,14 @@ static ADDRESS_MAP_START( sc3000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE(SN76489A_TAG, sn76496_w)
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
-	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
+	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE(UPD9255_TAG, i8255a_r, i8255a_w)
 ADDRESS_MAP_END
 
 /* This is how the I/O ports are really mapped, but MAME does not support overlapping ranges
 static ADDRESS_MAP_START( sc3000_io_map, ADDRESS_SPACE_IO, 8 )
     ADDRESS_MAP_GLOBAL_MASK(0xff)
-    AM_RANGE(0x00, 0x00) AM_MIRROR(0xdf) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
-    AM_RANGE(0x00, 0x00) AM_MIRROR(0x7f) AM_WRITE(sn76496_0_w)
+    AM_RANGE(0x00, 0x00) AM_MIRROR(0xdf) AM_DEVREADWRITE(UPD9255_TAG, i8255a_r, i8255a_w)
+    AM_RANGE(0x00, 0x00) AM_MIRROR(0x7f) AM_DEVWRITE(SN76489A_TAG, sn76496_w)
     AM_RANGE(0x00, 0x00) AM_MIRROR(0xae) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
     AM_RANGE(0x01, 0x01) AM_MIRROR(0xae) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
     AM_RANGE(0x60, 0x60) AM_MIRROR(0x9f) AM_READ(sc3000_r_r)
@@ -191,12 +191,12 @@ static ADDRESS_MAP_START( sf7000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE(SN76489A_TAG, sn76496_w)
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
-	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
+	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE(UPD9255_0_TAG, i8255a_r, i8255a_w)
 	AM_RANGE(0xe0, 0xe0) AM_DEVREAD(UPD765_TAG, upd765_status_r)
 	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE(UPD765_TAG, upd765_data_r, upd765_data_w)
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
-	AM_RANGE(0xe8, 0xe8) AM_DEVREADWRITE("uart", msm8251_data_r, msm8251_data_w)
-	AM_RANGE(0xe9, 0xe9) AM_DEVREADWRITE("uart", msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE(UPD9255_1_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0xe8, 0xe8) AM_DEVREADWRITE(UPD8251_TAG, msm8251_data_r, msm8251_data_w)
+	AM_RANGE(0xe9, 0xe9) AM_DEVREADWRITE(UPD8251_TAG, msm8251_status_r, msm8251_control_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -449,7 +449,7 @@ static const TMS9928a_interface tms9928a_interface =
 	0, 0,
 	sg1000_vdp_interrupt
 };
-
+ 
 static TIMER_CALLBACK( lightgun_tick )
 {
 	UINT8 *rom = memory_region(machine, Z80_TAG);
@@ -609,12 +609,11 @@ static READ8_DEVICE_HANDLER( sf7000_ppi8255_a_r )
         PA7
     */
 
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS_TAG);
 	sg1000_state *state = device->machine->driver_data;
 	UINT8 result = 0;
 
 	result |= state->fdc_irq;
-	result |= centronics_busy_r(printer) << 1;
+	result |= centronics_busy_r(state->centronics) << 1;
 	result |= state->fdc_index << 2;
 
 	return result;
@@ -622,8 +621,6 @@ static READ8_DEVICE_HANDLER( sf7000_ppi8255_a_r )
 
 static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
 {
-	const device_config *fdc = devtag_get_device(device->machine, UPD765_TAG);
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS_TAG);
 	/*
         Signal  Description
 
@@ -637,44 +634,46 @@ static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
         PC7     /STROBE to Centronics printer
     */
 
+	sg1000_state *state = device->machine->driver_data;
+
 	/* floppy motor */
-	floppy_drive_set_motor_state(floppy_get_device(device->machine, 0), (data & 0x02) ? 0 : 1);
-	floppy_drive_set_ready_state(floppy_get_device(device->machine, 0), 1, 0);
+	floppy_drive_set_motor_state(floppy_get_device(device->machine, 0), BIT(data, 1) ? 0 : 1);
+	floppy_drive_set_ready_state(floppy_get_device(device->machine, 0), 1, 1);
 
 	/* FDC terminal count */
-	upd765_tc_w(fdc, data & 0x04);
+	upd765_tc_w(state->upd765, BIT(data, 2));
 
 	/* FDC reset */
-	if (data & 0x08)
+	if (BIT(data, 3))
 	{
-		upd765_reset(fdc, 0);
+		upd765_reset(state->upd765, 0);
 	}
 
 	/* ROM selection */
 	memory_set_bank(device->machine, 1, BIT(data, 6));
 
 	/* printer strobe */
-	centronics_strobe_w(printer, BIT(data, 7));
+	centronics_strobe_w(state->centronics, BIT(data, 7));
 }
 
-static const i8255a_interface sf7000_ppi8255_intf[2] =
+static I8255A_INTERFACE( sf7000_8255_0_intf )
 {
-	{
-		DEVCB_HANDLER(sc3000_ppi8255_a_r),		// Port A read
-		DEVCB_HANDLER(sc3000_ppi8255_b_r),		// Port B read
-		DEVCB_NULL,								// Port C read
-		DEVCB_NULL,								// Port A write
-		DEVCB_NULL,								// Port B write
-		DEVCB_HANDLER(sc3000_ppi8255_c_w)		// Port C write
-	},
-	{
-		DEVCB_HANDLER(sf7000_ppi8255_a_r),		// Port A read
-		DEVCB_NULL,								// Port B read
-		DEVCB_NULL,								// Port C read
-		DEVCB_NULL,								// Port A write
-		DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),	// Port B write
-		DEVCB_HANDLER(sf7000_ppi8255_c_w)		// Port C write
-	}
+	DEVCB_HANDLER(sc3000_ppi8255_a_r),		// Port A read
+	DEVCB_HANDLER(sc3000_ppi8255_b_r),		// Port B read
+	DEVCB_NULL,								// Port C read
+	DEVCB_NULL,								// Port A write
+	DEVCB_NULL,								// Port B write
+	DEVCB_HANDLER(sc3000_ppi8255_c_w)		// Port C write
+};
+
+static I8255A_INTERFACE( sf7000_8255_1_intf )
+{
+	DEVCB_HANDLER(sf7000_ppi8255_a_r),		// Port A read
+	DEVCB_NULL,								// Port B read
+	DEVCB_NULL,								// Port C read
+	DEVCB_NULL,								// Port A write
+	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),	// Port B write
+	DEVCB_HANDLER(sf7000_ppi8255_c_w)		// Port C write
 };
 
 static WRITE_LINE_DEVICE_HANDLER( sf7000_fdc_interrupt )
@@ -697,7 +696,7 @@ static const struct upd765_interface sf7000_upd765_interface =
 	NULL,
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0, NULL, NULL, NULL }
+	{ FLOPPY_0, NULL, NULL, NULL }
 };
 
 
@@ -706,7 +705,9 @@ static MACHINE_START( sf7000 )
 	sg1000_state *state = machine->driver_data;
 
 	/* find devices */
+	state->upd765 = devtag_get_device(machine, UPD765_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
 	/* configure VDP */
 	TMS9928A_configure(&tms9928a_interface);
@@ -810,11 +811,10 @@ static void sc3000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, in
 
 static DEVICE_IMAGE_LOAD( sc3000_cart )
 {
-//  const address_space *program = cputag_get_address_space(image->machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	int size = image_length(image);
 	UINT8 *ptr = memory_region(image->machine, Z80_TAG);
 
-	if (image_fread(image, ptr, size ) != size)
+	if (image_fread(image, ptr, size) != size)
 	{
 		return INIT_FAIL;
 	}
@@ -836,7 +836,7 @@ static MACHINE_DRIVER_START( sg1000 )
 	MDRV_CPU_IO_MAP(sg1000_io_map)
 	MDRV_CPU_VBLANK_INT(SCREEN_TAG, sg1000_int)
 
-	MDRV_MACHINE_START( sg1000 )
+	MDRV_MACHINE_START(sg1000)
 
     /* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
@@ -885,9 +885,7 @@ static MACHINE_DRIVER_START( sc3000 )
 	MDRV_CPU_IO_MAP(sc3000_io_map)
 	MDRV_CPU_VBLANK_INT(SCREEN_TAG, sg1000_int)
 
-	MDRV_MACHINE_START( sc3000 )
-
-	MDRV_I8255A_ADD( "ppi8255", sc3000_ppi8255_intf ) // uPD9255AC-2
+	MDRV_MACHINE_START(sc3000)
 
     /* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
@@ -900,10 +898,9 @@ static MACHINE_DRIVER_START( sc3000 )
 	MDRV_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL_10_738635MHz/3)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	/* printer */
-	MDRV_PRINTER_ADD("sp400") /* serial printer */
-
-	/* cassette */
+	/* devices */
+	MDRV_I8255A_ADD(UPD9255_TAG, sc3000_ppi8255_intf)
+//	MDRV_PRINTER_ADD("sp400") /* serial printer */
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_config)
 
 	/* cartridge */
@@ -917,7 +914,7 @@ static MACHINE_DRIVER_START( sc3000 )
 	MDRV_RAM_DEFAULT_SIZE("2K")
 MACHINE_DRIVER_END
 
-static FLOPPY_OPTIONS_START(sf7000)
+static FLOPPY_OPTIONS_START( sf7000 )
 	FLOPPY_OPTION(sf7000, "sf7", "SF7 disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
 		TRACKS([40])
@@ -947,11 +944,8 @@ static MACHINE_DRIVER_START( sf7000 )
 	MDRV_CPU_IO_MAP(sf7000_io_map)
 	MDRV_CPU_VBLANK_INT(SCREEN_TAG, sg1000_int)
 
-	MDRV_MACHINE_START( sf7000 )
-	MDRV_MACHINE_RESET( sf7000 )
-
-	MDRV_I8255A_ADD("ppi8255_0", sf7000_ppi8255_intf[0])
-	MDRV_I8255A_ADD("ppi8255_1", sf7000_ppi8255_intf[1])
+	MDRV_MACHINE_START(sf7000)
+	MDRV_MACHINE_RESET(sf7000)
 
     /* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
@@ -964,19 +958,15 @@ static MACHINE_DRIVER_START( sf7000 )
 	MDRV_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL_10_738635MHz/3)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	/* printer */
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MDRV_PRINTER_ADD("sp400") /* serial printer */
-
-	/* cassette */
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_config)
-
-	/* uart */
-	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
-
+	/* devices */
+	MDRV_I8255A_ADD(UPD9255_0_TAG, sf7000_8255_0_intf)
+	MDRV_I8255A_ADD(UPD9255_1_TAG, sf7000_8255_1_intf)
+	MDRV_MSM8251_ADD(UPD8251_TAG, default_msm8251_interface)
 	MDRV_UPD765A_ADD(UPD765_TAG, sf7000_upd765_interface)
-
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, sf7000_floppy_config)
+//	MDRV_PRINTER_ADD("sp400") /* serial printer */
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_config)
 	
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -1016,37 +1006,13 @@ ROM_START( sf7000 )
     ROM_LOAD( "ipl.rom", 0x0000, 0x2000, CRC(d76810b8) SHA1(77339a6db2593aadc638bed77b8e9bed5d9d87e3) )
 ROM_END
 
-/* System Configuration */
-static void sf7000_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* serial */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:						info->i = IO_SERIAL; break;
-		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:					info->start = DEVICE_START_NAME(serial_device); break;
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(serial_device); break;
-		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = DEVICE_IMAGE_UNLOAD_NAME(serial_device); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "txt"); break;
-	}
-}
-static SYSTEM_CONFIG_START( sf7000 )
-	CONFIG_DEVICE(sf7000_serial_getinfo)
-SYSTEM_CONFIG_END
-
-
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY   FULLNAME */
-CONS( 1983,	sg1000,		0,		0,		sg1000,		sg1000,		0,		0,		"Sega",	"SG-1000", GAME_SUPPORTS_SAVE )
-CONS( 1984,	sg1000m2,	sg1000,	0,		sc3000,		sc3000,		0,		0,		"Sega",	"SG-1000 II", GAME_SUPPORTS_SAVE )
-COMP( 1983,	sc3000,		0,		0,		sc3000,		sc3000,		0,		0,		"Sega",	"SC-3000", GAME_SUPPORTS_SAVE )
-COMP( 1983,	sc3000h,	sc3000,	0,		sc3000,		sc3000,		0,		0,		"Sega",	"SC-3000H", GAME_SUPPORTS_SAVE )
-COMP( 1983,	sf7000,		sc3000, 0,		sf7000,		sf7000,		0,		sf7000,		"Sega",	"SC-3000/Super Control Station SF-7000", GAME_SUPPORTS_SAVE )
-CONS( 1984,	omv1000,    sg1000,	0,      omv,        omv,        0,      0,        "Tsukuda Original", "Othello Multivision FG-1000", GAME_NOT_WORKING )
-CONS( 1984,	omv2000,    sg1000,	0,      omv,        omv,        0,      0,        "Tsukuda Original", "Othello Multivision FG-2000", GAME_NOT_WORKING )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY				FULLNAME									FLAGS */
+CONS( 1983,	sg1000,		0,		0,		sg1000,		sg1000,		0,		0,			"Sega",				"SG-1000",									GAME_SUPPORTS_SAVE )
+CONS( 1984,	sg1000m2,	sg1000,	0,		sc3000,		sc3000,		0,		0,			"Sega",				"SG-1000 II",								GAME_SUPPORTS_SAVE )
+COMP( 1983,	sc3000,		0,		0,		sc3000,		sc3000,		0,		0,			"Sega",				"SC-3000",									GAME_SUPPORTS_SAVE )
+COMP( 1983,	sc3000h,	sc3000,	0,		sc3000,		sc3000,		0,		0,			"Sega",				"SC-3000H",									GAME_SUPPORTS_SAVE )
+COMP( 1983,	sf7000,		sc3000, 0,		sf7000,		sf7000,		0,		0,			"Sega",				"SC-3000/Super Control Station SF-7000",	GAME_SUPPORTS_SAVE )
+CONS( 1984,	omv1000,    sg1000,	0,      omv,        omv,        0,      0,			"Tsukuda Original", "Othello Multivision FG-1000",				GAME_NOT_WORKING )
+CONS( 1984,	omv2000,    sg1000,	0,      omv,        omv,        0,      0,			"Tsukuda Original", "Othello Multivision FG-2000",				GAME_NOT_WORKING )

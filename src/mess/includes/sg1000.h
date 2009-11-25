@@ -6,6 +6,10 @@
 #define SN76489A_TAG	"sn76489a"
 #define UPD765_TAG		"upd765"
 #define CASSETTE_TAG	"cassette"
+#define UPD8251_TAG		"upd8251"
+#define UPD9255_TAG		"upd9255"
+#define UPD9255_0_TAG	"upd9255_0"
+#define UPD9255_1_TAG	"upd9255_1"
 #define CENTRONICS_TAG	"centronics"
 
 #define IS_CARTRIDGE_TV_DRAW(ptr) \
@@ -34,6 +38,8 @@ struct _sg1000_state
 	int fdc_index;
 
 	/* devices */
+	const device_config *upd765;
+	const device_config *centronics;
 	const device_config *cassette;
 };
 
