@@ -12,20 +12,20 @@
 #include "cpu/cdp1802/cdp1802.h"
 #include "includes/pecom.h"
 
-static CDP1869_PAGE_RAM_READ( pecom_page_ram_r )
+static READ8_DEVICE_HANDLER( pecom_page_ram_r )
 {
 	pecom_state *state = device->machine->driver_data;
 
-	UINT16 addr = pma & PECOM_PAGE_RAM_MASK;
+	UINT16 addr = offset & PECOM_PAGE_RAM_MASK;
 
 	return state->page_ram[addr];
 }
 
-static CDP1869_PAGE_RAM_WRITE( pecom_page_ram_w )
+static WRITE8_DEVICE_HANDLER( pecom_page_ram_w )
 {
 	pecom_state *state = device->machine->driver_data;
 
-	UINT16 addr = pma & PECOM_PAGE_RAM_MASK;
+	UINT16 addr = offset & PECOM_PAGE_RAM_MASK;
 
 	state->page_ram[addr] = data;
 }
@@ -85,8 +85,8 @@ static CDP1869_INTERFACE( pecom_cdp1869_intf )
 	SCREEN_TAG,
 	CDP1869_COLOR_CLK_PAL,
 	CDP1869_PAL,
-	pecom_page_ram_r,
-	pecom_page_ram_w,
+	DEVCB_HANDLER(pecom_page_ram_r),
+	DEVCB_HANDLER(pecom_page_ram_w),
 	pecom_pcb_r,
 	pecom_char_ram_r,
 	pecom_char_ram_w,

@@ -66,20 +66,20 @@ static UINT8 tmc600_get_color(running_machine *machine, UINT16 pma)
 	return color;
 }
 
-static CDP1869_PAGE_RAM_READ( tmc600_page_ram_r )
+static READ8_DEVICE_HANDLER( tmc600_page_ram_r )
 {
 	tmc600_state *state = device->machine->driver_data;
 
-	UINT16 addr = pma & TMC600_PAGE_RAM_MASK;
+	UINT16 addr = offset & TMC600_PAGE_RAM_MASK;
 
 	return state->page_ram[addr];
 }
 
-static CDP1869_PAGE_RAM_WRITE( tmc600_page_ram_w )
+static WRITE8_DEVICE_HANDLER( tmc600_page_ram_w )
 {
 	tmc600_state *state = device->machine->driver_data;
 
-	UINT16 addr = pma & TMC600_PAGE_RAM_MASK;
+	UINT16 addr = offset & TMC600_PAGE_RAM_MASK;
 
 	state->page_ram[addr] = data;
 	state->color_ram[addr] = state->vismac_color_latch;
@@ -115,8 +115,8 @@ static CDP1869_INTERFACE( tmc600_cdp1869_intf )
 	SCREEN_TAG,
 	CDP1869_COLOR_CLK_PAL,
 	CDP1869_PAL,
-	tmc600_page_ram_r,
-	tmc600_page_ram_w,
+	DEVCB_HANDLER(tmc600_page_ram_r),
+	DEVCB_HANDLER(tmc600_page_ram_w),
 	tmc600_pcb_r,
 	tmc600_char_ram_r,
 	NULL,

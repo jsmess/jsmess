@@ -8,20 +8,20 @@
 
 /* CDP1869 */
 
-static CDP1869_PAGE_RAM_READ( comx35_pageram_r )
+static READ8_DEVICE_HANDLER( comx35_pageram_r )
 {
 	comx35_state *state = device->machine->driver_data;
 
-	UINT16 addr = pma & COMX35_PAGERAM_MASK;
+	UINT16 addr = offset & COMX35_PAGERAM_MASK;
 
 	return state->pageram[addr];
 }
 
-static CDP1869_PAGE_RAM_WRITE( comx35_pageram_w )
+static WRITE8_DEVICE_HANDLER( comx35_pageram_w )
 {
 	comx35_state *state = device->machine->driver_data;
 
-	UINT16 addr = pma & COMX35_PAGERAM_MASK;
+	UINT16 addr = offset & COMX35_PAGERAM_MASK;
 
 	state->pageram[addr] = data;
 }
@@ -75,8 +75,8 @@ static CDP1869_INTERFACE( pal_cdp1869_intf )
 	SCREEN_TAG,
 	CDP1869_COLOR_CLK_PAL,
 	CDP1869_PAL,
-	comx35_pageram_r,
-	comx35_pageram_w,
+	DEVCB_HANDLER(comx35_pageram_r),
+	DEVCB_HANDLER(comx35_pageram_w),
 	comx35_pcb_r,
 	comx35_charram_r,
 	comx35_charram_w,
@@ -89,8 +89,8 @@ static CDP1869_INTERFACE( ntsc_cdp1869_intf )
 	SCREEN_TAG,
 	CDP1869_COLOR_CLK_NTSC,
 	CDP1869_NTSC,
-	comx35_pageram_r,
-	comx35_pageram_w,
+	DEVCB_HANDLER(comx35_pageram_r),
+	DEVCB_HANDLER(comx35_pageram_w),
 	comx35_pcb_r,
 	comx35_charram_r,
 	comx35_charram_w,
