@@ -102,8 +102,6 @@ struct hd_state
 	int current_pos;
 };
 
-unsigned char SASIReadByte(const device_config* device);
-
 DEVICE_START( x68k_hdc );
 DEVICE_GET_INFO( x68k_hdc );
 

@@ -75,6 +75,26 @@
 
 static UINT8 *system_rom;
 
+// Ram banking handlers.
+static WRITE8_HANDLER( dgnbeta_ram_b0_w );
+static WRITE8_HANDLER( dgnbeta_ram_b1_w );
+static WRITE8_HANDLER( dgnbeta_ram_b2_w );
+static WRITE8_HANDLER( dgnbeta_ram_b3_w );
+static WRITE8_HANDLER( dgnbeta_ram_b4_w );
+static WRITE8_HANDLER( dgnbeta_ram_b5_w );
+static WRITE8_HANDLER( dgnbeta_ram_b6_w );
+static WRITE8_HANDLER( dgnbeta_ram_b7_w );
+static WRITE8_HANDLER( dgnbeta_ram_b8_w );
+static WRITE8_HANDLER( dgnbeta_ram_b9_w );
+static WRITE8_HANDLER( dgnbeta_ram_bA_w );
+static WRITE8_HANDLER( dgnbeta_ram_bB_w );
+static WRITE8_HANDLER( dgnbeta_ram_bC_w );
+static WRITE8_HANDLER( dgnbeta_ram_bD_w );
+static WRITE8_HANDLER( dgnbeta_ram_bE_w );
+static WRITE8_HANDLER( dgnbeta_ram_bF_w );
+static WRITE8_HANDLER( dgnbeta_ram_bG_w );
+
+
 #define VERBOSE 0
 
 
@@ -139,8 +159,6 @@ static int DMA_NMI_LAST;
 #define NO_KEY_PRESSED	0x7F			/* retrurned by hardware if no key pressed */
 
 static int SelectedKeyrow(int	Rows);
-
-int dgnbeta_font=0;
 
 const pia6821_interface dgnbeta_pia_intf[] =
 {
@@ -403,87 +421,87 @@ static void dgn_beta_bank_memory(int offset, int data, int bank)
 	PageRegs[TaskReg][bank].memory[offset]=data;
 }
 
-WRITE8_HANDLER( dgnbeta_ram_b0_w )
+static WRITE8_HANDLER( dgnbeta_ram_b0_w )
 {
 	dgn_beta_bank_memory(offset,data,0);
 }
 
-WRITE8_HANDLER( dgnbeta_ram_b1_w )
+static WRITE8_HANDLER( dgnbeta_ram_b1_w )
 {
 	dgn_beta_bank_memory(offset,data,1);
 }
 
-WRITE8_HANDLER( dgnbeta_ram_b2_w )
+static WRITE8_HANDLER( dgnbeta_ram_b2_w )
 {
 	dgn_beta_bank_memory(offset,data,2);
 }
 
-WRITE8_HANDLER( dgnbeta_ram_b3_w )
+static WRITE8_HANDLER( dgnbeta_ram_b3_w )
 {
 	dgn_beta_bank_memory(offset,data,3);
 }
 
-WRITE8_HANDLER( dgnbeta_ram_b4_w )
+static WRITE8_HANDLER( dgnbeta_ram_b4_w )
 {
 	dgn_beta_bank_memory(offset,data,4);
 }
 
-WRITE8_HANDLER( dgnbeta_ram_b5_w )
+static WRITE8_HANDLER( dgnbeta_ram_b5_w )
 {
 	dgn_beta_bank_memory(offset,data,5);
 }
 
-WRITE8_HANDLER( dgnbeta_ram_b6_w )
+static WRITE8_HANDLER( dgnbeta_ram_b6_w )
 {
 	dgn_beta_bank_memory(offset,data,6);
 }
 
-WRITE8_HANDLER( dgnbeta_ram_b7_w )
+static WRITE8_HANDLER( dgnbeta_ram_b7_w )
 {
 	dgn_beta_bank_memory(offset,data,7);
 }
 
-WRITE8_HANDLER( dgnbeta_ram_b8_w )
+static WRITE8_HANDLER( dgnbeta_ram_b8_w )
 {
 	dgn_beta_bank_memory(offset,data,8);
 }
 
-WRITE8_HANDLER( dgnbeta_ram_b9_w )
+static WRITE8_HANDLER( dgnbeta_ram_b9_w )
 {
 	dgn_beta_bank_memory(offset,data,9);
 }
 
-WRITE8_HANDLER( dgnbeta_ram_bA_w )
+static WRITE8_HANDLER( dgnbeta_ram_bA_w )
 {
 	dgn_beta_bank_memory(offset,data,10);
 }
 
-WRITE8_HANDLER( dgnbeta_ram_bB_w )
+static WRITE8_HANDLER( dgnbeta_ram_bB_w )
 {
 	dgn_beta_bank_memory(offset,data,11);
 }
 
-WRITE8_HANDLER( dgnbeta_ram_bC_w )
+static WRITE8_HANDLER( dgnbeta_ram_bC_w )
 {
 	dgn_beta_bank_memory(offset,data,12);
 }
 
-WRITE8_HANDLER( dgnbeta_ram_bD_w )
+static WRITE8_HANDLER( dgnbeta_ram_bD_w )
 {
 	dgn_beta_bank_memory(offset,data,13);
 }
 
-WRITE8_HANDLER( dgnbeta_ram_bE_w )
+static WRITE8_HANDLER( dgnbeta_ram_bE_w )
 {
 	dgn_beta_bank_memory(offset,data,14);
 }
 
-WRITE8_HANDLER( dgnbeta_ram_bF_w )
+static WRITE8_HANDLER( dgnbeta_ram_bF_w )
 {
 	dgn_beta_bank_memory(offset,data,15);
 }
 
-WRITE8_HANDLER( dgnbeta_ram_bG_w )
+static WRITE8_HANDLER( dgnbeta_ram_bG_w )
 {
 	dgn_beta_bank_memory(offset,data,16);
 }
@@ -1048,6 +1066,7 @@ void dgn_beta_frame_interrupt (running_machine *machine, int data)
 	ScanInKeyboard();
 }
 
+#ifdef UNUSED_FUNCTION
 void dgn_beta_line_interrupt (int data)
 {
 //  /* Set PIA line, so it recognises inturrupt */
@@ -1060,6 +1079,7 @@ void dgn_beta_line_interrupt (int data)
 //      pia_0_cb1_w(machine, 0,CLEAR_LINE);
 //  }
 }
+#endif
 
 
 /********************************* Machine/Driver Initialization ****************************************/

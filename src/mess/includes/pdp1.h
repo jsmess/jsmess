@@ -16,8 +16,6 @@
 #define MEMORY_WRITE_START18(name) MEMORY_WRITE32_START(name)
 
 
-/*----------- defined in drivers/pdp1.c -----------*/
-
 /* defines for each bit and mask in input port "CSW" */
 enum
 {
@@ -101,12 +99,10 @@ enum
 	pdp1_fontdata_size = 8 * pdp1_charnum
 };
 
-extern pdp1_reset_param_t pdp1_reset_param;
-
 
 /*----------- defined in machine/pdp1.c -----------*/
 
-extern int *pdp1_memory;
+extern pdp1_reset_param_t pdp1_reset_param;
 
 MACHINE_START( pdp1 );
 MACHINE_RESET( pdp1 );
@@ -118,31 +114,11 @@ DEVICE_START( pdp1_tape );
 DEVICE_IMAGE_LOAD( pdp1_tape );
 DEVICE_IMAGE_UNLOAD( pdp1_tape );
 
-void pdp1_tape_read_binary(const device_config *device);
-void iot_rpa(const device_config *device, int op2, int nac, int mb, int *io, int ac);
-void iot_rpb(const device_config *device, int op2, int nac, int mb, int *io, int ac);
-void iot_rrb(const device_config *device, int op2, int nac, int mb, int *io, int ac);
-void iot_ppa(const device_config *device, int op2, int nac, int mb, int *io, int ac);
-void iot_ppb(const device_config *device, int op2, int nac, int mb, int *io, int ac);
-
 DEVICE_IMAGE_LOAD(pdp1_typewriter);
 DEVICE_IMAGE_UNLOAD(pdp1_typewriter);
-void iot_tyo(const device_config *device, int op2, int nac, int mb, int *io, int ac);
-void iot_tyi(const device_config *device, int op2, int nac, int mb, int *io, int ac);
-
-void iot_dpy(const device_config *device, int op2, int nac, int mb, int *io, int ac);
 
 DEVICE_IMAGE_LOAD(pdp1_drum);
 DEVICE_IMAGE_UNLOAD(pdp1_drum);
-void iot_dia(const device_config *device, int op2, int nac, int mb, int *io, int ac);
-void iot_dba(const device_config *device, int op2, int nac, int mb, int *io, int ac);
-void iot_dcc(const device_config *device, int op2, int nac, int mb, int *io, int ac);
-void iot_dra(const device_config *device, int op2, int nac, int mb, int *io, int ac);
-
-void iot_011(const device_config *device, int op2, int nac, int mb, int *io, int ac);
-
-void iot_cks(const device_config *device, int op2, int nac, int mb, int *io, int ac);
-void pdp1_io_sc_callback(const device_config *device);
 
 INTERRUPT_GEN( pdp1_interrupt );
 

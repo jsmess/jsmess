@@ -15,13 +15,6 @@ struct rp5c15_interface
 
 DEVICE_GET_INFO(rp5c15);
 
-void rtc_add_second(const device_config*);
-void rtc_add_minute(const device_config*);
-void rtc_add_day(const device_config*);
-void rtc_add_month(const device_config*);
-
-TIMER_CALLBACK(rtc_alarm_pulse);
-
 #define RP5C15 DEVICE_GET_INFO_NAME(rp5c15)
 
 #define MDRV_RP5C15_ADD(_tag, _config) \

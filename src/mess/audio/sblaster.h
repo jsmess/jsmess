@@ -28,7 +28,6 @@ typedef struct {
 } SOUNDBLASTER_CONFIG;
 
 void soundblaster_config(const SOUNDBLASTER_CONFIG *config);
-void soundblaster_reset(void);
 
 
 #endif /* SBLASTER_H_ */

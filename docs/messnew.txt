@@ -61,8 +61,8 @@ Source Changes:
 - The core is based on MAME 0.135u1.  This incorporates all features of the
   update to this core.  [MAME team]
 
-- Cleanups (static qualifiers, headers, renames and more multisession
-  friendly init code).  [Atari Ace]
+- Cleanups (static qualifiers, headers, renames, reduced global symbols, and
+  more multisession friendly init code).  [Atari Ace]
 
 
 

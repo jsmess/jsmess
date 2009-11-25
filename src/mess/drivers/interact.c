@@ -80,7 +80,7 @@ static ADDRESS_MAP_START(interact_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 /* Cassette definition */
-const struct CassetteOptions interact_cassette_options = {
+static const struct CassetteOptions interact_cassette_options = {
 	1,		/* channels */
 	16,		/* bits per sample */
 	44100	/* sample frequency */
@@ -101,45 +101,24 @@ DISCRETE_SOUND_END
 
 static MACHINE_RESET(interact)
 {
-    flag_hr=0;
-    flag_clk =0;
-	write_cassette=0;
+	hector_reset(machine, 0);
 }
 
 static MACHINE_START(interact)
 {
-UINT8 i;
-       
 	// Start keyboard
     at_keyboard_init(machine, AT_KEYBOARD_TYPE_PC);
     at_keyboard_reset();
     at_keyboard_set_scan_code_set(2);
     at_keyboard_reset();
 
-	// For keyboard
-    keyboard_timer = timer_alloc(machine, Callback_keyboard, 0);
-    timer_adjust_periodic(keyboard_timer, ATTOTIME_IN_MSEC(100), 0, ATTOTIME_IN_MSEC(20));//keyboard scan 25ms
-
-    for(i = 0; i < 8; i++) touches[i] = 0xff;     //all key off
-
-	// For Cassette synchro
-    Cassette_timer = timer_alloc(machine, Callback_CK, 0);
-    timer_adjust_periodic(Cassette_timer, ATTOTIME_IN_MSEC(100), 0, ATTOTIME_IN_USEC(64));// 11 * 6; 16 *4; 32 *2; 64 => real synchro scan speed for 15,624Khz
- 
-	// Sound sn76477
-	Init_Value_SN76477_Hector();  //init R/C value
-}
-
-static VIDEO_START( interact )
-{
-    Init_Hector_Palette(machine);
-    flag_hr=0;
+	hector_init(machine);
 }
 
 static VIDEO_UPDATE( interact )
 {
    	video_screen_set_visarea(screen, 0, 113, 0, 75);
-    hector_hr( bitmap, videoram,  77, 32);
+	hector_hr( bitmap, videoram,  77, 32);
 	return 0;
 }
 
@@ -163,7 +142,7 @@ static MACHINE_DRIVER_START( interact )
 	MDRV_PALETTE_LENGTH(16)				// 8 colours, but only 4 at a time
 	MDRV_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(interact)
+	MDRV_VIDEO_START(hec2hrp)
 	MDRV_VIDEO_UPDATE(interact)
 		/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -206,7 +185,7 @@ static MACHINE_DRIVER_START( hector1 )
 	MDRV_PALETTE_LENGTH(16)				// 8 colours, but only 4 at a time
 	MDRV_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(interact)
+	MDRV_VIDEO_START(hec2hrp)
 	MDRV_VIDEO_UPDATE(interact)
 		/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

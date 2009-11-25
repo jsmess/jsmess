@@ -22,7 +22,7 @@ extern int adam_joy_stat[2];
 extern int adam_net_data; /* Data on AdamNet Bus */
 extern int adam_pcb;
 
-int adam_cart_verify(const UINT8 *buf, size_t size);
+//int adam_cart_verify(const UINT8 *buf, size_t size);
 
 void adam_clear_keyboard_buffer(void);
 void adam_explore_keyboard(running_machine *machine);

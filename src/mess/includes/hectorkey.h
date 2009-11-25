@@ -26,7 +26,7 @@
     TODO : Add the cartridge function,
            Adjust the one shot and A/D timing (sn76477)
 */
-int hectorkey[0x100] = {
+static const UINT8 hectorkey[0x100] = {
 
 ///////////////////////////////////////// 0x00-0x0f
 0xff, //0

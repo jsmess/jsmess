@@ -115,7 +115,12 @@ struct _rp5c15_t
 
 static emu_timer* rtc_timer;
 
-TIMER_CALLBACK(rtc_alarm_pulse)
+static void rtc_add_second(const device_config*);
+static void rtc_add_minute(const device_config*);
+static void rtc_add_day(const device_config*);
+static void rtc_add_month(const device_config*);
+
+static TIMER_CALLBACK(rtc_alarm_pulse)
 {
 	const device_config* device = ptr;
 	rp5c15_t* rtc = device->token;
@@ -354,7 +359,7 @@ static void rp5c15_write(const device_config* device, int offset, int data, UINT
 	}
 }
 
-void rtc_add_second(const device_config* device)  // add one second to current time
+static void rtc_add_second(const device_config* device)  // add one second to current time
 {
 	rp5c15_t* rtc = device->token;
 
@@ -371,7 +376,7 @@ void rtc_add_second(const device_config* device)  // add one second to current t
 	rtc_add_minute(device);
 }
 
-void rtc_add_minute(const device_config* device)
+static void rtc_add_minute(const device_config* device)
 {
 	rp5c15_t* rtc = device->token;
 
@@ -396,7 +401,7 @@ void rtc_add_minute(const device_config* device)
 	rtc_add_day(device);
 }
 
-void rtc_add_day(const device_config* device)
+static void rtc_add_day(const device_config* device)
 {
 	rp5c15_t* rtc = device->token;
 	int d,m;
@@ -464,7 +469,7 @@ void rtc_add_day(const device_config* device)
 	}
 }
 
-void rtc_add_month(const device_config* device)
+static void rtc_add_month(const device_config* device)
 {
 	rp5c15_t* rtc = device->token;
 

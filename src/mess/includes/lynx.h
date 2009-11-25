@@ -27,10 +27,6 @@ extern size_t lynx_mem_fe00_size;
 
 READ8_HANDLER( lynx_memory_config_r );
 WRITE8_HANDLER( lynx_memory_config_w );
-WRITE8_HANDLER(mikey_write);
-READ8_HANDLER(mikey_read);
-WRITE8_HANDLER(suzy_write);
-READ8_HANDLER(suzy_read);
 void lynx_timer_count_down(running_machine *machine, int nr);
 
 INTERRUPT_GEN( lynx_frame_int );

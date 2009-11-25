@@ -37,17 +37,22 @@
 #include "includes/hec2hrp.h"
 
 // Color status
-UINT8 Col0, Col1,Col2,Col3;  // For actual colors
+UINT8 hector_color[4];  // For actual colors
+// Ram video BR :
+UINT8 hector_videoram[0x04000];
+// Status for screen definition
+UINT8 hector_flag_hr;
+UINT8 hector_flag_80c;
 
 
 
-void Init_Hector_Palette( running_machine  *machine)
+static void Init_Hector_Palette( running_machine  *machine)
 {
 	// basic colors !
-    Col0 = 0;  // fond (noir)
-    Col1 = 1;  // HECTOR HRX (rouge)
-    Col2 = 7; // Point interrogation (Blanc)
-    Col3 = 3; // Ecriture de choix (jaune)
+	hector_color[0] = 0;  // fond (noir)
+	hector_color[1] = 1;  // HECTOR HRX (rouge)
+	hector_color[2] = 7; // Point interrogation (Blanc)
+	hector_color[3] = 3; // Ecriture de choix (jaune)
 
 	// Color initialisation : full luminosité
 	palette_set_color( machine, 0,MAKE_RGB(000,000,000));//Noir
@@ -79,31 +84,31 @@ void hector_hr(bitmap_t *bitmap, UINT8 *page, int ymax, int yram)
 			gfx = *(page+x);
 			/* Display a scanline of a character (4 pixels !) */
 			switch (gfx & 0x03) {
-			     case 0x00 : *p=Col0; break;
-			     case 0x01 : *p=Col1; break;
- 			     case 0x02 : *p=Col2; break;
-			     default   : *p=Col3; break;}
+			     case 0x00 : *p=hector_color[0]; break;
+			     case 0x01 : *p=hector_color[1]; break;
+ 			     case 0x02 : *p=hector_color[2]; break;
+			     default   : *p=hector_color[3]; break;}
 			p++;	
 
 			switch (gfx & 0x0c)	{
-				 case 0x00 : *p=Col0; break;
-			     case 0x04 : *p=Col1; break;
- 			     case 0x08 : *p=Col2; break;
-			     default   : *p=Col3; break;}
+			     case 0x00 : *p=hector_color[0]; break;
+			     case 0x04 : *p=hector_color[1]; break;
+ 			     case 0x08 : *p=hector_color[2]; break;
+			     default   : *p=hector_color[3]; break;}
 			p++;	
 
 			switch (gfx & 0x30)	{
-			     case 0x00 : *p=Col0; break;
-			     case 0x10 : *p=Col1; break;
- 			     case 0x20 : *p=Col2; break;
-			     default   : *p=Col3; break;}
+			     case 0x00 : *p=hector_color[0]; break;
+			     case 0x10 : *p=hector_color[1]; break;
+ 			     case 0x20 : *p=hector_color[2]; break;
+			     default   : *p=hector_color[3]; break;}
 			p++;	
 
 			switch (gfx & 0xc0) {
-			     case 0x00 : *p=Col0; break;
-			     case 0x40 : *p=Col1; break;
- 			     case 0x80 : *p=Col2; break;
-			     default   : *p=Col3; break;}
+			     case 0x00 : *p=hector_color[0]; break;
+			     case 0x40 : *p=hector_color[1]; break;
+ 			     case 0x80 : *p=hector_color[2]; break;
+			     default   : *p=hector_color[3]; break;}
 			p++;
 		}
 		ma+=yram;
@@ -139,3 +144,33 @@ void hector_80c(bitmap_t *bitmap, UINT8 *page, int ymax, int yram)
 		ma+=yram;
 	}
 }
+
+VIDEO_START( hec2hrp )
+{
+    Init_Hector_Palette(machine);
+}
+
+VIDEO_UPDATE( hec2hrp )
+{
+    if (hector_flag_hr==1)
+        {    
+           if (hector_flag_80c==0)
+           {
+              video_screen_set_visarea(screen, 0, 243, 0, 227);
+              hector_hr( bitmap , &hector_videoram[0], 227, 64);
+           }
+           else
+           {
+               video_screen_set_visarea(screen, 0, 243*2, 0, 227);
+               hector_80c( bitmap , &hector_videoram[0], 227, 64);
+           }
+        }
+	else
+        {
+            video_screen_set_visarea(screen, 0, 113, 0, 75);
+            hector_hr( bitmap, videoram,  77, 32);
+        }
+
+    return 0;
+}
+

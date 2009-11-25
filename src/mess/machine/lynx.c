@@ -993,7 +993,7 @@ static void lynx_multiply( void )
 	}
 }
 
-READ8_HANDLER( suzy_read )
+static READ8_HANDLER( suzy_read )
 {
 	UINT8 value = 0, input;
 
@@ -1064,7 +1064,7 @@ READ8_HANDLER( suzy_read )
 	return value;
 }
 
-WRITE8_HANDLER(suzy_write)
+static WRITE8_HANDLER( suzy_write )
 {
 	suzy.data[offset] = data;
 
@@ -1611,7 +1611,7 @@ static WRITE8_HANDLER(lynx_uart_w)
 ****************************************/
 
 
-READ8_HANDLER(mikey_read)
+static READ8_HANDLER( mikey_read )
 {
 	UINT8 direction, value = 0x00;
 
@@ -1681,7 +1681,7 @@ READ8_HANDLER(mikey_read)
 	return value;
 }
 
-WRITE8_HANDLER(mikey_write)
+static WRITE8_HANDLER( mikey_write )
 {
 	switch (offset)
 	{

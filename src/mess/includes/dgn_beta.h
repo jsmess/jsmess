@@ -74,32 +74,11 @@ MACHINE_START( dgnbeta );
 READ8_HANDLER( dgn_beta_page_r );
 WRITE8_HANDLER( dgn_beta_page_w );
 
-// Ram banking handlers.
-WRITE8_HANDLER( dgnbeta_ram_b0_w );
-WRITE8_HANDLER( dgnbeta_ram_b1_w );
-WRITE8_HANDLER( dgnbeta_ram_b2_w );
-WRITE8_HANDLER( dgnbeta_ram_b3_w );
-WRITE8_HANDLER( dgnbeta_ram_b4_w );
-WRITE8_HANDLER( dgnbeta_ram_b5_w );
-WRITE8_HANDLER( dgnbeta_ram_b6_w );
-WRITE8_HANDLER( dgnbeta_ram_b7_w );
-WRITE8_HANDLER( dgnbeta_ram_b8_w );
-WRITE8_HANDLER( dgnbeta_ram_b9_w );
-WRITE8_HANDLER( dgnbeta_ram_bA_w );
-WRITE8_HANDLER( dgnbeta_ram_bB_w );
-WRITE8_HANDLER( dgnbeta_ram_bC_w );
-WRITE8_HANDLER( dgnbeta_ram_bD_w );
-WRITE8_HANDLER( dgnbeta_ram_bE_w );
-WRITE8_HANDLER( dgnbeta_ram_bF_w );
-WRITE8_HANDLER( dgnbeta_ram_bG_w );
-
 /*  WD2797 FDC */
 READ8_HANDLER(dgnbeta_wd2797_r);
 WRITE8_HANDLER(dgnbeta_wd2797_w);
 
-extern int dgnbeta_font;
 void dgn_beta_frame_interrupt (running_machine *machine, int data);
-void dgn_beta_line_interrupt (int data);
 
 
 /*----------- defined in video/dgn_beta.c -----------*/

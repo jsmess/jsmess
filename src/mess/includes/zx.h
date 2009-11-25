@@ -33,7 +33,7 @@ void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT
 
 extern emu_timer *ula_nmi;
 extern int ula_irq_active;
-extern int ula_nmi_active;
+//extern int ula_nmi_active;
 extern int ula_frame_vsync;
 extern int ula_scanline_count;
 //extern int ula_scancode_count;

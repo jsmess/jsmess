@@ -150,9 +150,6 @@ int vic2e_k2_r (void);
 
 /* to be called each vertical retrace */
 extern INTERRUPT_GEN( vic2_frame_interrupt );
-TIMER_CALLBACK( line_timer_callback );
-TIMER_CALLBACK( PAL_timer_callback );
-TIMER_CALLBACK( NTSC_timer_callback );
 
 /* private area */
 

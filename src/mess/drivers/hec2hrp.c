@@ -59,18 +59,6 @@
 #include "includes/hec2hrp.h"
 
 
-// Rom page (MX machine)
-UINT8 rom_p1[0x04000]; // Basic 3x page
-UINT8 rom_p2[0x04000]; // Assemblex / Monitrix page
-
-// Ram video BR :
-UINT8 videoramhector[0x04000];
-// Status for screen definition
-UINT8 flag_hr=1;
-UINT8 flag_80c=0;
-// Status for CPU clock
-UINT8 flag_clk=0;  // 0 5MHz (HR machine) - 1  1.75MHz (BR machine)
-
 ///////////////////////////////////////////////////////////////////////////////
 static ADDRESS_MAP_START(hec2hrp_mem, ADDRESS_SPACE_PROGRAM, 8)
 ///////////////////////////////////////////////////////////////////////////////
@@ -122,15 +110,13 @@ INPUT_PORTS_END
 static MACHINE_START( hec2hrp )
 ///////////////////////////////////////////////////////////////////////////////
 {    
-UINT8 i;
-
 UINT8 *RAM = memory_region(machine, "maincpu"); // pointer to mess ram
 UINT8 *ROM1 = memory_region(machine, "page1"); // pointer to rom page 1
 UINT8 *ROM2 = memory_region(machine, "page2"); // pointer to rom page 2
 
     // Memory install for bank switching
 	memory_configure_bank(machine, 1, HECTOR_BANK_PROG , 1, &RAM[0xc000]  , 0); // Mess ram
-	memory_configure_bank(machine, 1, HECTOR_BANK_VIDEO, 1, videoramhector, 0); // Video ram
+	memory_configure_bank(machine, 1, HECTOR_BANK_VIDEO, 1, hector_videoram, 0); // Video ram
 
     // Set bank HECTOR_BANK_PROG as basic bank
 	memory_set_bank(machine, 1, HECTOR_BANK_PROG);
@@ -141,9 +127,6 @@ UINT8 *ROM2 = memory_region(machine, "page2"); // pointer to rom page 2
 	memory_configure_bank(machine, 2, HECTORMX_BANK_PAGE2 , 1, &ROM2[0x0000] , 0); // Rom page 2
 	memory_set_bank(machine, 2, HECTORMX_BANK_PAGE0);
 //////////////////////////////////////////////////////////SPECIFIQUE MX /////////////////
-	// For keyboard
-    keyboard_timer = timer_alloc(machine, Callback_keyboard, 0);
-    timer_adjust_periodic(keyboard_timer, ATTOTIME_IN_MSEC(100), 0, ATTOTIME_IN_MSEC(20));//keyboard scan 25ms
 
     // Start keyboard
     at_keyboard_init(machine, AT_KEYBOARD_TYPE_PC);
@@ -151,27 +134,19 @@ UINT8 *ROM2 = memory_region(machine, "page2"); // pointer to rom page 2
     at_keyboard_set_scan_code_set(2);
     at_keyboard_reset();
 
-    for(i = 0; i < 8; i++) touches[i] = 0xff;     //all key off
 
-	// For Cassette synchro
-    Cassette_timer = timer_alloc(machine, Callback_CK, 0);
-    timer_adjust_periodic(Cassette_timer, ATTOTIME_IN_MSEC(100), 0, ATTOTIME_IN_USEC(64));// 11 * 6; 16 *4; 32 *2; 64 => real synchro scan speed for 15,624Khz
- 
-	// Sound sn76477
-	Init_Value_SN76477_Hector();  //init R/C value
+    hector_init(machine);
 }
 
 static MACHINE_RESET(hec2hrp)
 {
 	memory_set_bank(machine, 1, HECTOR_BANK_PROG);
-    memory_set_bank(machine, 2, HECTORMX_BANK_PAGE0);
-    flag_hr=1;
-    flag_clk =0;
-	write_cassette=0;
+	memory_set_bank(machine, 2, HECTORMX_BANK_PAGE0);
+	hector_reset(machine, 1);
 }
 
 /* Cassette definition */
-const struct CassetteOptions hector_cassette_options = {
+static const struct CassetteOptions hector_cassette_options = {
 	1,		/* channels */
 	16,		/* bits per sample */
 	44100	/* sample frequency */
@@ -189,36 +164,6 @@ static DISCRETE_SOUND_START( hec2hrp )
 	DISCRETE_INPUT_LOGIC(NODE_01)
 	DISCRETE_OUTPUT(NODE_01, 5000)
 DISCRETE_SOUND_END
-
-///////////////////////////////////////////////////////////////////////////////
-static VIDEO_START( hec2hrp )
-///////////////////////////////////////////////////////////////////////////////
-{
-    Init_Hector_Palette(machine);
-}
-
-static VIDEO_UPDATE( hec2hrp )
-{
-    if (flag_hr==1)
-        {    
-           if (flag_80c==0)
-           {
-              video_screen_set_visarea(screen, 0, 243, 0, 227);
-              hector_hr( bitmap , &videoramhector[0], 227, 64);
-           }
-           else
-           {
-               video_screen_set_visarea(screen, 0, 243*2, 0, 227);
-               hector_80c( bitmap , &videoramhector[0], 227, 64);
-           }
-        }
-	else
-        {
-           	video_screen_set_visarea(screen, 0, 113, 0, 75);
-            hector_hr( bitmap, videoram,  77, 32);
-        }
-    return 0;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 static MACHINE_DRIVER_START( hec2hr )
@@ -265,7 +210,7 @@ static MACHINE_DRIVER_START( hec2hr )
 MACHINE_DRIVER_END
 
 ///////////////////////////////////////////////////////////////////////////////
- MACHINE_DRIVER_START( hec2hrp )
+static MACHINE_DRIVER_START( hec2hrp )
 ///////////////////////////////////////////////////////////////////////////////
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_5MHz)

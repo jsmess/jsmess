@@ -367,41 +367,6 @@ static PALETTE_INIT( pdp1 )
 }
 
 
-pdp1_reset_param_t pdp1_reset_param =
-{
-	{	/* external iot handlers.  NULL means that the iot is unimplemented, unless there are
-        parentheses around the iot name, in which case the iot is internal to the cpu core. */
-		/* I put a ? when the source is the handbook, since a) I have used the maintainance manual
-        as the primary source (as it goes more into details) b) the handbook and the maintainance
-        manual occasionnally contradict each other. */
-		/* dia, dba, dcc, dra are documented in MIT PDP-1 COMPUTER MODIFICATION
-        BULLETIN no. 2 (drumInstrWriteup.bin/drumInstrWriteup.txt), and are
-        similar to IOT documented in Parallel Drum Type 23 Instruction Manual. */
-	/*  (iot)       rpa         rpb         tyo         tyi         ppa         ppb         dpy */
-		NULL,		iot_rpa,	iot_rpb,	iot_tyo,	iot_tyi,	iot_ppa,	iot_ppb,	iot_dpy,
-	/*              spacewar                                                                 */
-		NULL,		iot_011,	NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-	/*                          lag                                             glf?/jsp?   gpl?/gpr?/gcf? */
-		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-	/*  rrb         rcb?        rcc?        cks         mcs         mes         mel          */
-		iot_rrb,	NULL,		NULL,		iot_cks,	NULL,		NULL,		NULL,		NULL,
-	/*  cad?        rac?        rbc?        pac                     lpr/lfb/lsp swc/sci/sdf?/shr?   scv? */
-		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-	/*  (dsc)       (asc)       (isb)       (cac)       (lsm)       (esm)       (cbs)        */
-		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-	/*  icv?        dia         dba         dcc         dra                     mri|rlc?    mrf/inr?/ccr? */
-		NULL,		iot_dia,	iot_dba,	iot_dcc,	iot_dra,	NULL,		NULL,		NULL,
-	/*  mcb|dur?    mwc|mtf?    mrc|sfc?... msm|cgo?    (eem/lem)   mic         muf          */
-		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-	},
-	pdp1_tape_read_binary,
-	pdp1_io_sc_callback,
-	0,	/* extend mode support defined in input ports and pdp1_init_machine */
-	0,	/* hardware multiply/divide support defined in input ports and pdp1_init_machine */
-	0	/* type 20 sequence break system support defined in input ports and pdp1_init_machine */
-};
-
-
 static MACHINE_DRIVER_START(pdp1)
 
 	/* basic machine hardware */

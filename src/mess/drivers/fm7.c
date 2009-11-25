@@ -79,6 +79,8 @@ static UINT8 fm77av_ym_irq;
 static UINT8 speaker_active;
 static UINT16 fm7_kanji_address;
 
+static void fm7_mmr_refresh(const address_space*);
+
 
 static struct key_encoder
 {
@@ -1107,7 +1109,7 @@ static void fm7_update_bank(const address_space* space, int bank, UINT8 physical
 	memory_set_bankptr(space->machine,bank+1,RAM+(physical<<12));
 }
 
-void fm7_mmr_refresh(const address_space* space)
+static void fm7_mmr_refresh(const address_space* space)
 {
 	int x;
 	UINT16 window_addr;

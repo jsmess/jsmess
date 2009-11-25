@@ -28,7 +28,7 @@ static TIMER_CALLBACK( req_delay )
 	sasi->status_port |= 0x01;
 }
 
-unsigned char SASIReadByte(const device_config* device)
+static unsigned char SASIReadByte(const device_config* device)
 {
 	//int ret;
 	unsigned char val;

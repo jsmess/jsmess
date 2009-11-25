@@ -74,6 +74,7 @@ void soundblaster_config(const SOUNDBLASTER_CONFIG *config)
 	blaster.config = *config;
 }
 
+#ifdef UNUSED_FUNCTION
 void soundblaster_reset(void)
 {
 	if (blaster.timer)
@@ -85,7 +86,6 @@ void soundblaster_reset(void)
 	blaster.frequency=0;
 }
 
-#if 0
 int soundblaster_start(void)
 {
 	channel = stream_init("PC speaker", 50, Machine->sample_rate, 0, pc_sh_update);

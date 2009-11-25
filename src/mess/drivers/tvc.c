@@ -342,7 +342,7 @@ static const mc6845_interface tvc_crtc6845_interface =
 	NULL
 };
 
-INTERRUPT_GEN( tvc_interrupt )
+static INTERRUPT_GEN( tvc_interrupt )
 {
 	tvc_flipflop  &= ~0x10;
 	cpu_set_input_line(device, 0, HOLD_LINE);

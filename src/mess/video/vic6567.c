@@ -71,6 +71,11 @@
 #include "vic4567.h"
 #include "utils.h"
 
+static TIMER_CALLBACK( line_timer_callback );
+static TIMER_CALLBACK( PAL_timer_callback );
+static TIMER_CALLBACK( NTSC_timer_callback );
+
+
 /* lightpen values */
 #include "includes/c64.h"
 
@@ -1502,7 +1507,7 @@ static void vic2_drawlines (running_machine *machine, int first, int last, int s
 
 #include "vic4567.c"
 
-TIMER_CALLBACK( line_timer_callback )
+static TIMER_CALLBACK( line_timer_callback )
 {
 	int i,j;
 
@@ -2175,7 +2180,7 @@ TIMER_CALLBACK( line_timer_callback )
 		} \
 	}
 
-TIMER_CALLBACK( PAL_timer_callback )
+static TIMER_CALLBACK( PAL_timer_callback )
 {
 	int i;
 	UINT8 mask;
@@ -2733,7 +2738,7 @@ TIMER_CALLBACK( PAL_timer_callback )
 	timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, PAL_timer_callback);
 }
 
-TIMER_CALLBACK( NTSC_timer_callback )
+static TIMER_CALLBACK( NTSC_timer_callback )
 {
 	int i;
 	UINT8 mask;

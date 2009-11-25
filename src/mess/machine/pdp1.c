@@ -41,9 +41,31 @@ static TIMER_CALLBACK(tyo_callback);
 static TIMER_CALLBACK(dpy_callback);
 static void pdp1_machine_stop(running_machine *machine);
 
+static void pdp1_tape_read_binary(const device_config *device);
+static void pdp1_io_sc_callback(const device_config *device);
+
+static void iot_rpa(const device_config *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_rpb(const device_config *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_rrb(const device_config *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_ppa(const device_config *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_ppb(const device_config *device, int op2, int nac, int mb, int *io, int ac);
+
+static void iot_tyo(const device_config *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_tyi(const device_config *device, int op2, int nac, int mb, int *io, int ac);
+
+static void iot_dpy(const device_config *device, int op2, int nac, int mb, int *io, int ac);
+
+static void iot_dia(const device_config *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_dba(const device_config *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_dcc(const device_config *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_dra(const device_config *device, int op2, int nac, int mb, int *io, int ac);
+
+static void iot_011(const device_config *device, int op2, int nac, int mb, int *io, int ac);
+
+static void iot_cks(const device_config *device, int op2, int nac, int mb, int *io, int ac);
 
 /* pointer to pdp-1 RAM */
-int *pdp1_memory;
+static int *pdp1_memory;
 
 
 /*
@@ -153,6 +175,40 @@ static DIRECT_UPDATE_HANDLER(setOPbasefunc)
 	return -1;
 }
 
+
+pdp1_reset_param_t pdp1_reset_param =
+{
+	{	/* external iot handlers.  NULL means that the iot is unimplemented, unless there are
+        parentheses around the iot name, in which case the iot is internal to the cpu core. */
+		/* I put a ? when the source is the handbook, since a) I have used the maintainance manual
+        as the primary source (as it goes more into details) b) the handbook and the maintainance
+        manual occasionnally contradict each other. */
+		/* dia, dba, dcc, dra are documented in MIT PDP-1 COMPUTER MODIFICATION
+        BULLETIN no. 2 (drumInstrWriteup.bin/drumInstrWriteup.txt), and are
+        similar to IOT documented in Parallel Drum Type 23 Instruction Manual. */
+	/*  (iot)       rpa         rpb         tyo         tyi         ppa         ppb         dpy */
+		NULL,		iot_rpa,	iot_rpb,	iot_tyo,	iot_tyi,	iot_ppa,	iot_ppb,	iot_dpy,
+	/*              spacewar                                                                 */
+		NULL,		iot_011,	NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
+	/*                          lag                                             glf?/jsp?   gpl?/gpr?/gcf? */
+		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
+	/*  rrb         rcb?        rcc?        cks         mcs         mes         mel          */
+		iot_rrb,	NULL,		NULL,		iot_cks,	NULL,		NULL,		NULL,		NULL,
+	/*  cad?        rac?        rbc?        pac                     lpr/lfb/lsp swc/sci/sdf?/shr?   scv? */
+		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
+	/*  (dsc)       (asc)       (isb)       (cac)       (lsm)       (esm)       (cbs)        */
+		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
+	/*  icv?        dia         dba         dcc         dra                     mri|rlc?    mrf/inr?/ccr? */
+		NULL,		iot_dia,	iot_dba,	iot_dcc,	iot_dra,	NULL,		NULL,		NULL,
+	/*  mcb|dur?    mwc|mtf?    mrc|sfc?... msm|cgo?    (eem/lem)   mic         muf          */
+		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
+	},
+	pdp1_tape_read_binary,
+	pdp1_io_sc_callback,
+	0,	/* extend mode support defined in input ports and pdp1_init_machine */
+	0,	/* hardware multiply/divide support defined in input ports and pdp1_init_machine */
+	0	/* type 20 sequence break system support defined in input ports and pdp1_init_machine */
+};
 
 MACHINE_RESET( pdp1 )
 {
@@ -591,7 +647,7 @@ void pdp1_tape_read_binary(const device_config *device)
  * IO Bits        10 11 12 13 14 15 16 17
  * TAPE CHANNELS  8  7  6  5  4  3  2  1
  */
-void iot_rpa(const device_config *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_rpa(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	if (LOG_IOT_EXTRA)
 		logerror("Warning, RPA instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
@@ -628,7 +684,7 @@ void iot_rpa(const device_config *device, int op2, int nac, int mb, int *io, int
  * different (730002 or 724002) the 18-bit word read from tape is automatically
  * transferred to the IO Register via the Reader Buffer.
  */
-void iot_rpb(const device_config *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_rpb(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	if (LOG_IOT_EXTRA)
 		logerror("Warning, RPB instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
@@ -639,7 +695,7 @@ void iot_rpb(const device_config *device, int op2, int nac, int mb, int *io, int
 /*
     rrb iot callback
 */
-void iot_rrb(const device_config *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_rrb(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	if (LOG_IOT_EXTRA)
 		logerror("RRB instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
@@ -662,7 +718,7 @@ void iot_rrb(const device_config *device, int op2, int nac, int mb, int *io, int
  * For each In-Out Transfer instruction one line of tape is punched. In-Out Register
  * Bit 17 conditions Hole 1. Bit 16 conditions Hole 2, etc. Bit 10 conditions Hole 8
  */
-void iot_ppa(const device_config *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_ppa(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	if (LOG_IOT_EXTRA)
 		logerror("PPA instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
@@ -690,7 +746,7 @@ void iot_ppa(const device_config *device, int op2, int nac, int mb, int *io, int
  * Bit 5 conditions Hole 1. Bit 4 conditions Hole 2, etc. Bit 0 conditions Hole 6.
  * Hole 7 is left blank. Hole 8 is always punched in this mode.
  */
-void iot_ppb(const device_config *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_ppb(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	if (LOG_IOT_EXTRA)
 		logerror("PPB instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
@@ -856,7 +912,7 @@ static TIMER_CALLBACK(tyo_callback)
 /*
     tyo iot callback
 */
-void iot_tyo(const device_config *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_tyo(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	int ch, delay;
 
@@ -909,7 +965,7 @@ void iot_tyo(const device_config *device, int op2, int nac, int mb, int *io, int
  * clears the In-Out Register before transferring the information and also clears
  * the type-in status bit.
  */
-void iot_tyi(const device_config *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_tyi(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	if (LOG_IOT_EXTRA)
 		logerror("Warning, TYI instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
@@ -974,7 +1030,7 @@ static TIMER_CALLBACK(dpy_callback)
 
     Light on one pixel on CRT
 */
-void iot_dpy(const device_config *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_dpy(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	int x;
 	int y;
@@ -1062,7 +1118,7 @@ DEVICE_IMAGE_UNLOAD(pdp1_drum)
 	parallel_drum.fd = NULL;
 }
 
-void iot_dia(const device_config *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_dia(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	parallel_drum.wfb = ((*io) & 0370000) >> 12;
 	parallel_drum_set_il((*io) & 0007777);
@@ -1070,7 +1126,7 @@ void iot_dia(const device_config *device, int op2, int nac, int mb, int *io, int
 	parallel_drum.dba = 0;	/* right? */
 }
 
-void iot_dba(const device_config *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_dba(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	parallel_drum.wfb = ((*io) & 0370000) >> 12;
 	parallel_drum_set_il((*io) & 0007777);
@@ -1111,7 +1167,7 @@ static void drum_write(int field, int position, UINT32 data)
 	}
 }
 
-void iot_dcc(const device_config *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_dcc(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	attotime delay;
 	int dc;
@@ -1150,7 +1206,7 @@ void iot_dcc(const device_config *device, int op2, int nac, int mb, int *io, int
 	cpu_set_reg(cputag_get_cpu(device->machine, "maincpu"), PDP1_PC, cpu_get_reg(cputag_get_cpu(device->machine, "maincpu"), PDP1_PC)+1);
 }
 
-void iot_dra(const device_config *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_dra(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	(*io) = attotime_mul(
 		timer_timeelapsed(parallel_drum.rotation_timer),
@@ -1172,7 +1228,7 @@ void iot_dra(const device_config *device, int op2, int nac, int mb, int *io, int
         fire rocket, and fire torpedo. low order 4 bits, same for
         other ship. routine is entered by jsp cwg.
 */
-void iot_011(const device_config *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_011(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	int key_state = input_port_read(device->machine, "SPACEWAR");
 	int reply;
@@ -1211,7 +1267,7 @@ void iot_011(const device_config *device, int op2, int nac, int mb, int *io, int
 
     check IO status
 */
-void iot_cks(const device_config *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_cks(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	if (LOG_IOT_EXTRA)
 		logerror("CKS instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));

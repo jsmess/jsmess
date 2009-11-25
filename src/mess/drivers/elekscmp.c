@@ -30,7 +30,7 @@ static ADDRESS_MAP_START(elekscmp_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( elekscmp )
+static INPUT_PORTS_START( elekscmp )
 INPUT_PORTS_END
 
 

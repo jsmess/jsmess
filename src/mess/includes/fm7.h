@@ -67,8 +67,6 @@ READ8_HANDLER( fm77av_key_encoder_r );
 WRITE8_HANDLER( fm77av_key_encoder_w );
 READ8_HANDLER( fm7_sub_beeper_r );
 
-void fm7_mmr_refresh(const address_space*);
-
 
 /*----------- defined in video/fm7.c -----------*/
 

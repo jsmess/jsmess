@@ -42,45 +42,54 @@
 #include "includes/hectorkey.h"      // Keyboard mapping
 #include "includes/hec2hrp.h"
 
-const device_config *cassette_device_image(running_machine *machine);
 
+static void Mise_A_Jour_Etat(int Adresse, int Value );
+static void Update_Sound(const address_space *space, UINT8 data);
+
+static const device_config *cassette_device_image(running_machine *machine);
+
+static void Key(int pccode, int state, running_machine *machine);
 
 // Stat for the register in 0x3000
-UINT8 state3000=0;
-UINT8 write_cassette=0; 
+static UINT8 state3000=0;
+static UINT8 write_cassette=0; 
 
 // Keyboard timer
-TIMER_CALLBACK( Callback_keyboard );
-emu_timer *keyboard_timer;
+static TIMER_CALLBACK( Callback_keyboard );
+static emu_timer *keyboard_timer;
 
 // Cassette timer
-TIMER_CALLBACK( Callback_CK );
-emu_timer *Cassette_timer;
-UINT8 CK_signal ;  // Synchro signal for K7
+static TIMER_CALLBACK( Callback_CK );
+static emu_timer *Cassette_timer;
+static UINT8 CK_signal ;  // Synchro signal for K7
+
+// Status for CPU clock
+static UINT8 flag_clk=0;  // 0 5MHz (HR machine) - 1  1.75MHz (BR machine)
 
 
-UINT8 actions=0xff;               //  keyboard key off
 
-double Pin_Value[29][2]; // SN76477
-int AU[17];              // Pour les fils de bus audio du SN76477
-int ValMixer;            // for mixer
-int oldstate3000;        // Edge state mixer
-int oldstate1000;        // Edge state cassette
+static UINT8 actions=0xff;               //  keyboard key off
+
+static double Pin_Value[29][2]; // SN76477
+static int AU[17];              // Pour les fils de bus audio du SN76477
+static int ValMixer;            // for mixer
+static int oldstate3000;        // Edge state mixer
+static int oldstate1000;        // Edge state cassette
 
 
 //#include "drivers/hec2son.c" // need to create a header file...
 
 // Keyboard map
-UINT8 touches[8];
-UINT8 pot0 = 0x40, pot1 = 0x40;  // State for joy resistor
+static UINT8 touches[8];
+static UINT8 pot0 = 0x40, pot1 = 0x40;  // State for joy resistor
 
 // To generate the CK signal (K7)
-TIMER_CALLBACK( Callback_CK )
+static TIMER_CALLBACK( Callback_CK )
 {
 	CK_signal++;
 }
 
-TIMER_CALLBACK( Callback_keyboard )
+static TIMER_CALLBACK( Callback_keyboard )
 { 
 int touche ;
 int Code0 ;
@@ -109,7 +118,7 @@ if ( (touche & 0x80) != 0 )
 }
 }
 
-void Key(int pccode, int state, running_machine *machine)
+static void Key(int pccode, int state, running_machine *machine)
 { 
  // Mise a jour de l'image du clavier /////////////////////////////////////////
 int i, j, n;
@@ -138,13 +147,13 @@ int i, j, n;
           { 
                memory_set_bank(machine, 1, HECTOR_BANK_PROG);
                memory_set_bank(machine, 2, HECTORMX_BANK_PAGE0);
-               flag_hr=1;
+               hector_flag_hr=1;
           }
           else
-               flag_hr=0;
+               hector_flag_hr=0;
           //Common flag
-          flag_80c=0;
-          flag_clk =0;
+          hector_flag_80c = 0;
+          flag_clk = 0;
           return ;
  } 
  for(i = 0; i < (n & 7); i++) 
@@ -168,7 +177,7 @@ WRITE8_HANDLER( hector_switch_bank_w )
 							}
 						}	
 	if (offset==0x04)	{	// 0x804 => vidéo page, BR
-							flag_hr=0;		
+							hector_flag_hr=0;		
                         	memory_set_bank(space->machine, 1, HECTOR_BANK_VIDEO);
 							if (flag_clk ==0)
 							{
@@ -186,7 +195,7 @@ WRITE8_HANDLER( hector_switch_bank_w )
 
 						}  
 	if (offset==0x0c)	{	// 0x80c => base page, BR
-							flag_hr=0;
+							hector_flag_hr=0;
                         	memory_set_bank(space->machine, 1, HECTOR_BANK_PROG);
 							if (flag_clk ==0)
 							{
@@ -314,20 +323,22 @@ static int counter_write=0; // Attente de quelque cycles avant demettre en route
 	   }
 
         // Other bit : color definition    
-       	Col0 =  data        & 0x07 ;
-		Col2 =((data >> 3)  & 0x07) | (Col2 & 0x40) ;
+	hector_color[0] =  data        & 0x07 ;
+	hector_color[2] = ((data >> 3)  & 0x07) | (hector_color[2] & 0x40);
 
-		oldstate1000=data; // For next step
+	oldstate1000=data; // For next step
 }
 WRITE8_HANDLER( hector_color_b_w )
 {
-const device_config *discrete = devtag_get_device(space->machine, "discrete");
-       	Col1 =  data        & 0x07 ;
-		Col3 = (data >> 3)  & 0x07;
-		// Half light on color 2 only on HR machines: 
-		if (data & 0x40) Col2 |= 8; else Col2 &= 7;
-         // Play bit 
-		discrete_sound_w(discrete, NODE_01,  (data & 0x80) ? 0:1 );
+	const device_config *discrete = devtag_get_device(space->machine, "discrete");
+       	hector_color[1] =  data        & 0x07;
+	hector_color[3] = (data >> 3)  & 0x07;
+
+	// Half light on color 2 only on HR machines: 
+	if (data & 0x40) hector_color[2] |= 8; else hector_color[2] &= 7;
+
+	// Play bit
+	discrete_sound_w(discrete, NODE_01,  (data & 0x80) ? 0:1 );
 }
 
 
@@ -335,7 +346,7 @@ const device_config *discrete = devtag_get_device(space->machine, "discrete");
  Cassette Handling
 ******************************************************************************/
 
-const device_config *cassette_device_image(running_machine *machine)
+static const device_config *cassette_device_image(running_machine *machine)
 {
 	return devtag_get_device(machine, "cassette");
 }
@@ -356,14 +367,14 @@ WRITE8_HANDLER( hector_mx40_io_port_w)
    if ((offset &0x0ff) == 0x40) // Port page 0
       memory_set_bank(space->machine, 2, HECTORMX_BANK_PAGE0);
    if ((offset &0x0ff) == 0x41) // Port page 1
-      { 
-            memory_set_bank(space->machine, 2, HECTORMX_BANK_PAGE1);
-            flag_80c=0;
-      }
+   { 
+      memory_set_bank(space->machine, 2, HECTORMX_BANK_PAGE1);
+      hector_flag_80c=0;
+   }
    if ((offset &0x0ff) == 0x44) // Port page 2   // 42 pour MX80
       memory_set_bank(space->machine, 2, HECTORMX_BANK_PAGE2);
    if ((offset &0x0ff) == 0x49) // Port screen resolution
-      flag_80c=0;// No 80c in 40c !
+      hector_flag_80c=0;// No 80c in 40c !
 }
 
 WRITE8_HANDLER( hector_mx80_io_port_w)
@@ -373,14 +384,14 @@ WRITE8_HANDLER( hector_mx80_io_port_w)
    if ((offset &0x0ff) == 0x40) // Port page 0
       memory_set_bank(space->machine, 2, HECTORMX_BANK_PAGE0);
    if ((offset &0x0ff) == 0x41) // Port page 1
-      { 
-            memory_set_bank(space->machine, 2, HECTORMX_BANK_PAGE1);
-            flag_80c=0;
-      }
+   { 
+      memory_set_bank(space->machine, 2, HECTORMX_BANK_PAGE1);
+      hector_flag_80c=0;
+   }
    if ((offset &0x0ff) == 0x42) // Port page 2  => port different du MX40
       memory_set_bank(space->machine, 2, HECTORMX_BANK_PAGE2);
    if ((offset &0x0ff) == 0x49) // Port screen resolution
-      flag_80c=1; 
+      hector_flag_80c=1; 
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -468,7 +479,7 @@ void Mise_A_Jour_Etat(int Adresse, int Value )
 }
 
 
-void Init_Value_SN76477_Hector(void)
+static void Init_Value_SN76477_Hector(void)
 { 
      // Remplissage des valeurs de resistance et capacite d'Hector
 
@@ -653,3 +664,28 @@ sn76477_interface hector_sn76477_interface =
 	CAP_U(1.00001),	// 23  oneshot_cap
     RES_K(10000)	// 24  oneshot_res
 };
+
+void hector_reset(running_machine *machine, int hr)
+{
+	hector_flag_hr = hr;
+	flag_clk = 0;
+	write_cassette = 0;
+}
+
+void hector_init(running_machine *machine)
+{
+	int i;
+
+	// For keyboard
+	keyboard_timer = timer_alloc(machine, Callback_keyboard, 0);
+	timer_adjust_periodic(keyboard_timer, ATTOTIME_IN_MSEC(100), 0, ATTOTIME_IN_MSEC(20));//keyboard scan 25ms
+
+	for(i = 0; i < 8; i++) touches[i] = 0xff;     //all key off
+
+	// For Cassette synchro
+	Cassette_timer = timer_alloc(machine, Callback_CK, 0);
+	timer_adjust_periodic(Cassette_timer, ATTOTIME_IN_MSEC(100), 0, ATTOTIME_IN_USEC(64));// 11 * 6; 16 *4; 32 *2; 64 => real synchro scan speed for 15,624Khz
+ 
+	// Sound sn76477
+	Init_Value_SN76477_Hector();  //init R/C value
+}

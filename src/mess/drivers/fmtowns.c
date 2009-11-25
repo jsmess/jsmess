@@ -166,7 +166,7 @@ static UINT8 towns_crtc_sel;  // selected CRTC register
 static UINT16 towns_crtc_reg[32];
 static UINT8 towns_tvram_enable;
 
-struct towns_cdrom_controller
+static struct towns_cdrom_controller
 {
 	UINT8 command;
 	UINT8 status;

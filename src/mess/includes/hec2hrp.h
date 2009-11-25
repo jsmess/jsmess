@@ -34,7 +34,6 @@
 
 // Protoype of memory Handler
 extern WRITE8_HANDLER( hector_switch_bank_w );
-extern void Key(int pccode, int state, running_machine *machine);
 extern READ8_HANDLER( hector_keyboard_r );
 extern WRITE8_HANDLER( hector_keyboard_w );
 extern WRITE8_HANDLER( hector_sn_2000_w );
@@ -44,6 +43,8 @@ extern READ8_HANDLER( hector_cassette_r );
 extern WRITE8_HANDLER( hector_color_a_w );
 extern WRITE8_HANDLER( hector_color_b_w );
 
+extern void hector_init(running_machine *machine);
+extern void hector_reset(running_machine *machine, int hr);
 
 extern READ8_HANDLER( hector_mx_io_port_r);
 extern WRITE8_HANDLER( hector_mx80_io_port_w);
@@ -51,42 +52,25 @@ extern WRITE8_HANDLER( hector_mx40_io_port_w);
 
 
 // Prototype of video function
-extern void Init_Hector_Palette( running_machine  *machine);
 extern void hector_80c(bitmap_t *bitmap, UINT8 *page, int ymax, int yram) ;
 extern void hector_hr(bitmap_t *bitmap, UINT8 *page, int ymax, int yram) ;
+VIDEO_START( hec2hrp );
+VIDEO_UPDATE( hec2hrp );
 
 // Global variables used in extern modules
 
 // Status for screen definition
-extern UINT8 flag_hr;
-extern UINT8 flag_80c;
-// Status for CPU clock
-extern UINT8 flag_clk;  // 0 5MHz (HR machine) - 1  1.75MHz (BR machine)
+extern UINT8 hector_flag_hr;
+extern UINT8 hector_flag_80c;
 
 // Ram video BR :
-extern UINT8 videoramhector[0x04000];
+extern UINT8 hector_videoram[0x04000];
 
 // Color status
-extern UINT8 Col0, Col1,Col2,Col3;  // For actual colors
+extern UINT8 hector_color[4];
 
 // Sound function
-extern void Mise_A_Jour_Etat(int Adresse, int Value );
-extern void Init_Value_SN76477_Hector(void);
-extern void Update_Sound(const address_space *space, UINT8 data);
-extern  sn76477_interface hector_sn76477_interface;
-
-
-//Keyboard / joystick / cassette
-extern UINT8 actions;
-extern UINT8 touches[8];
-extern UINT8 pot0, pot1;  // State for resistor
-extern UINT8 write_cassette; 
-
-//TIMER definition
-extern TIMER_CALLBACK( Callback_CK );
-extern TIMER_CALLBACK( Callback_keyboard );
-extern  emu_timer *keyboard_timer;
-extern emu_timer *Cassette_timer;
+extern sn76477_interface hector_sn76477_interface;
 
 
 // Enum status for high memory bank (c000 - ffff)

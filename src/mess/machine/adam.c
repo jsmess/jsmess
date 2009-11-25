@@ -27,6 +27,7 @@ static int KbRepeatDelay = 20;
 
 static UINT8 KbRepeatTable[256];
 
+#ifdef UNUSED_FUNCTION
 int adam_cart_verify(const UINT8 *cartdata, size_t size)
 {
 	int retval = IMAGE_VERIFY_FAIL;
@@ -39,6 +40,7 @@ int adam_cart_verify(const UINT8 *cartdata, size_t size)
 
 	return retval;
 }
+#endif
 
 void adam_clear_keyboard_buffer(void)
 {
