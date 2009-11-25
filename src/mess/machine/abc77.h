@@ -62,9 +62,12 @@ DEVICE_GET_INFO( abc77 );
 INPUT_PORTS_EXTERN( abc77 );
 
 /* receive data */
-void abc77_rxd_w(const device_config *device, int state);
+WRITE_LINE_DEVICE_HANDLER( abc77_rxd_w );
+
+/* transmit data */
+READ_LINE_DEVICE_HANDLER( abc77_txd_r );
 
 /* reset */
-void abc77_reset_w(const device_config *device, int state);
+WRITE_LINE_DEVICE_HANDLER( abc77_reset_w );
 
 #endif

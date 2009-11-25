@@ -715,44 +715,9 @@ INPUT_PORTS_END
 
 /* ABC 77 */
 
-static WRITE_LINE_DEVICE_HANDLER( abc800_abc77_txd_w )
-{
-	abc800_state *driver_state = device->machine->driver_data;
-
-	driver_state->abc77_txd = state;
-}
-
 static ABC77_INTERFACE( abc800_abc77_intf )
 {
-	DEVCB_LINE(abc800_abc77_txd_w),
-	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rxtxcb_w),
-	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_dcdb_w)
-};
-
-static WRITE_LINE_DEVICE_HANDLER( abc802_abc77_txd_w )
-{
-	abc802_state *driver_state = device->machine->driver_data;
-
-	driver_state->abc77_txd = state;
-}
-
-static ABC77_INTERFACE( abc802_abc77_intf )
-{
-	DEVCB_LINE(abc802_abc77_txd_w),
-	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rxtxcb_w),
-	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_dcdb_w)
-};
-
-static WRITE_LINE_DEVICE_HANDLER( abc806_abc77_txd_w )
-{
-	abc806_state *driver_state = device->machine->driver_data;
-
-	driver_state->abc77_txd = state;
-}
-
-static ABC77_INTERFACE( abc806_abc77_intf )
-{
-	DEVCB_LINE(abc806_abc77_txd_w),
+	DEVCB_NULL,
 	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rxtxcb_w),
 	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_dcdb_w)
 };
@@ -879,14 +844,6 @@ static const z80sio_interface sio_intf =
 
 /* Z80 DART */
 
-static READ_LINE_DEVICE_HANDLER( abc800_dart_rxdb_r )
-{
-	abc800_state *state = device->machine->driver_data;
-
-	/* receive bit from keyboard */
-	return state->abc77_txd;
-}
-
 static Z80DART_INTERFACE( abc800_dart_intf )
 {
 	0,
@@ -899,7 +856,7 @@ static Z80DART_INTERFACE( abc800_dart_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_LINE(abc800_dart_rxdb_r),
+	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77_TAG, abc77_txd_r), */
 	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77_TAG, abc77_rxd_w), */
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -907,14 +864,6 @@ static Z80DART_INTERFACE( abc800_dart_intf )
 
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
 };
-
-static READ_LINE_DEVICE_HANDLER( abc802_dart_rxdb_r )
-{
-	abc802_state *state = device->machine->driver_data;
-
-	/* receive bit from keyboard */
-	return state->abc77_txd;
-}
 
 static WRITE_LINE_DEVICE_HANDLER( abc802_dart_dtrb_r )
 {
@@ -946,7 +895,7 @@ static Z80DART_INTERFACE( abc802_dart_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_LINE(abc802_dart_rxdb_r),
+	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77_TAG, abc77_txd_r), */
 	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77_TAG, abc77_rxd_w), */
 	DEVCB_LINE(abc802_dart_dtrb_r),
 	DEVCB_LINE(abc802_dart_rtsb_r),
@@ -954,14 +903,6 @@ static Z80DART_INTERFACE( abc802_dart_intf )
 
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
 };
-
-static READ_LINE_DEVICE_HANDLER( abc806_dart_rxdb_r )
-{
-	abc806_state *state = device->machine->driver_data;
-
-	/* receive bit from keyboard */
-	return state->abc77_txd;
-}
 
 static WRITE_LINE_DEVICE_HANDLER( abc806_dart_dtrb_w )
 {
@@ -984,7 +925,7 @@ static Z80DART_INTERFACE( abc806_dart_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_LINE(abc806_dart_rxdb_r),
+	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77_TAG, abc77_txd_r), */
 	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77_TAG, abc77_rxd_w), */
 	DEVCB_LINE(abc806_dart_dtrb_w),
 	DEVCB_NULL,
@@ -1007,13 +948,13 @@ static const z80_daisy_chain abc800_daisy_chain[] =
 
 static ABCBUS_CONFIG( abcbus_config )
 {
-	{ LUXOR_55_21046, CONKORT_TAG },
+	{ CONKORT_TAG },
 	{ NULL }
 };
 
 static ABCBUS_CONFIG( abc802_abcbus_config )
 {
-//  { LUXOR_55_21046, CONKORT_TAG }, won't boot with this enabled
+//  { CONKORT_TAG }, won't boot with this enabled
 	{ NULL }
 };
 
@@ -1041,7 +982,6 @@ static MACHINE_START( abc800 )
 
 	/* register for state saving */
 	state_save_register_global(machine, state->fetch_charram);
-	state_save_register_global(machine, state->abc77_txd);
 	state_save_register_global(machine, state->pling);
 }
 
@@ -1071,7 +1011,6 @@ static MACHINE_START( abc802 )
 
 	/* register for state saving */
 	state_save_register_global(machine, state->lrs);
-	state_save_register_global(machine, state->abc77_txd);
 	state_save_register_global(machine, state->pling);
 }
 
@@ -1127,7 +1066,6 @@ static MACHINE_START( abc806 )
 	}
 
 	/* register for state saving */
-	state_save_register_global(machine, state->abc77_txd);
 	state_save_register_global(machine, state->keydtr);
 	state_save_register_global(machine, state->eme);
 	state_save_register_global(machine, state->fetch_charram);
@@ -1288,7 +1226,7 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc802_dart_intf)
-//  MDRV_ABC77_ADD(abc802_abc77_intf)
+//  MDRV_ABC77_ADD(abc800_abc77_intf)
 	MDRV_LUXOR_55_21046_ADD
 	MDRV_PRINTER_ADD("printer")
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
@@ -1327,7 +1265,7 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc806_dart_intf)
-//  MDRV_ABC77_ADD(abc806_abc77_intf)
+//  MDRV_ABC77_ADD(abc800_abc77_intf)
 	MDRV_LUXOR_55_21046_ADD
 	MDRV_PRINTER_ADD("printer")
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )

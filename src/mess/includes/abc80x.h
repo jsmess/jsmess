@@ -42,9 +42,6 @@ struct _abc800_state
 	/* cpu state */
 	int fetch_charram;			/* opcode fetched from character RAM region (0x7800-0x7fff) */
 
-	/* keyboard state */
-	int abc77_txd;				/* ABC-77 transmit data */
-
 	/* video state */
 	UINT8 *charram;				/* character RAM */
 	UINT8 *videoram;			/* HR video RAM */
@@ -71,9 +68,6 @@ struct _abc802_state
 	/* cpu state */
 	int lrs;				/* low RAM select */
 
-	/* keyboard state */
-	int abc77_txd;			/* ABC-77 transmit data */
-
 	/* video state */
 	UINT8 *charram;			/* character RAM */
 	const UINT8 *char_rom;	/* character generator ROM */
@@ -97,9 +91,6 @@ struct _abc802_state
 typedef struct _abc806_state abc806_state;
 struct _abc806_state
 {
-	/* keyboard state */
-	int abc77_txd;			/* ABC-77 transmit data */
-
 	/* memory state */
 	int keydtr;				/* keyboard DTR */
 	int eme;				/* extended memory enable */

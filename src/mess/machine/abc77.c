@@ -22,6 +22,7 @@ struct _abc77_t
 
 	const device_config *cpu;		/* CPU of the 8035 */
 
+	int txd;						/* transmit data */
 	int keylatch;					/* keyboard row latch */
 	int clock;						/* transmit clock */
 	int hys;						/* hysteresis */
@@ -144,6 +145,7 @@ static WRITE8_HANDLER( abc77_data_w )
 
 	/* transmit data */
 	devcb_call_write_line(&abc77->out_txd_func, BIT(data, 5));
+	abc77->txd = BIT(data, 5);
 
 	/* key down */
 	devcb_call_write_line(&abc77->out_keydown_func, BIT(data, 6));
@@ -352,22 +354,33 @@ ROM_END
     abc77_rxd_w - keyboard serial data in
 -------------------------------------------------*/
 
-void abc77_rxd_w(const device_config *device, int level)
+WRITE_LINE_DEVICE_HANDLER( abc77_rxd_w )
 {
 	abc77_t *abc77 = get_safe_token(device);
 
-	cpu_set_input_line(abc77->cpu, MCS48_INPUT_IRQ, level ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(abc77->cpu, MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
+}
+
+/*-------------------------------------------------
+    abc77_txd_r - keyboard serial data out
+-------------------------------------------------*/
+
+READ_LINE_DEVICE_HANDLER( abc77_txd_r )
+{
+	abc77_t *abc77 = get_safe_token(device);
+
+	return abc77->txd;
 }
 
 /*-------------------------------------------------
     abc77_reset_w - keyboard reset
 -------------------------------------------------*/
 
-void abc77_reset_w(const device_config *device, int level)
+WRITE_LINE_DEVICE_HANDLER( abc77_reset_w )
 {
 	abc77_t *abc77 = get_safe_token(device);
 
-	if (abc77->reset && !level)
+	if (abc77->reset && !state)
 	{
 		int t = 1.1 * RES_K(100) * CAP_N(100) * 1000; // t = 1.1 * R1 * C1
 		int ea = BIT(input_port_read(device->machine, "ABC77_DSW"), 7);
@@ -379,7 +392,7 @@ void abc77_reset_w(const device_config *device, int level)
 		cpu_set_input_line(abc77->cpu, MCS48_INPUT_EA, ea ? CLEAR_LINE : ASSERT_LINE);
 	}
 
-	abc77->reset = level;
+	abc77->reset = state;
 }
 
 /*-------------------------------------------------
@@ -410,6 +423,7 @@ static DEVICE_START( abc77 )
 	state_save_register_device_item(device, 0, abc77->keylatch);
 	state_save_register_device_item(device, 0, abc77->clock);
 	state_save_register_device_item(device, 0, abc77->hys);
+	state_save_register_device_item(device, 0, abc77->txd);
 	state_save_register_device_item(device, 0, abc77->reset);
 }
 
@@ -428,7 +442,7 @@ DEVICE_GET_INFO( abc77 )
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = rom_abc77;				break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME( abc77 ); break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(abc77); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(abc77);		break;

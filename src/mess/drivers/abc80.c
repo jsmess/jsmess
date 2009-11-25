@@ -466,7 +466,7 @@ static const z80_daisy_chain abc80_daisy_chain[] =
 
 static ABCBUS_CONFIG( abcbus_config )
 {
-	{ LUXOR_55_10828, CONKORT_TAG },
+	{ CONKORT_TAG },
 	{ NULL }
 };
 

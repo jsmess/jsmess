@@ -108,8 +108,7 @@ typedef void (*abcbus_card_select)(const device_config *device, UINT8 data);
 typedef struct _abcbus_daisy_chain abcbus_daisy_chain;
 struct _abcbus_daisy_chain
 {
-	device_type		devtype;	/* type of device */
-	const char		*devname;	/* name of the device */
+	const char		*tag;	/* device tag */
 };
 #define ABCBUS_CONFIG(name) const abcbus_daisy_chain (name)[] =
 
