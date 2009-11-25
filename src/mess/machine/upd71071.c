@@ -125,40 +125,63 @@ static TIMER_CALLBACK(dma_transfer_timer)
 			if(dmac->intf->dma_read[channel])
 				data = dmac->intf->dma_read[channel](device->machine);
 			memory_write_byte(space,dmac->reg.address_current[channel],data & 0xff);
-			dmac->reg.count_current[channel]--;
 			if(dmac->reg.mode_control[channel] & 0x20)  // Address direction
 				dmac->reg.address_current[channel]--;
 			else
 				dmac->reg.address_current[channel]++;
+			if(dmac->reg.count_current[channel] == 0)
+			{
+				if(dmac->reg.mode_control[channel] & 0x10)
+				{
+					dmac->reg.address_current[channel] = dmac->reg.address_base[channel];
+					dmac->reg.count_current[channel] = dmac->reg.count_base[channel];
+				}
+				// TODO: send terminal count
+			}
+			else
+				dmac->reg.count_current[channel]--;
 			break;
 		case 0x08:  // memory -> I/O
 			data = memory_read_byte(space,dmac->reg.address_current[channel]);
 			if(dmac->intf->dma_read[channel])
 				dmac->intf->dma_write[channel](device->machine,data);
-			dmac->reg.count_current[channel]--;
 			if(dmac->reg.mode_control[channel] & 0x20)  // Address direction
 				dmac->reg.address_current[channel]--;
 			else
 				dmac->reg.address_current[channel]++;
+			if(dmac->reg.count_current[channel] == 0)
+			{
+				if(dmac->reg.mode_control[channel] & 0x10)
+				{
+					dmac->reg.address_current[channel] = dmac->reg.address_base[channel];
+					dmac->reg.count_current[channel] = dmac->reg.count_base[channel];
+				}
+				// TODO: send terminal count
+			}
+			else
+				dmac->reg.count_current[channel]--;
 			break;
 		case 0x0c:  // Invalid
 			break;
 	}
 }
 
-void upd71071_dmarq(const device_config* device, int state,int channel)
+int upd71071_dmarq(const device_config* device, int state,int channel)
 {
 	upd71071_t* dmac = device->token;
 
 	if(state != 0)
 	{
+		if(dmac->reg.device_control & 0x0004)
+			return 2;
+		
+		if(dmac->reg.mask & (1 << channel))  // is channel masked?
+			return 1;
+
 		dmac->dmarq[channel] = 1;  // DMARQ line is set
 		dmac->reg.status |= (0x10 << channel);
 
 		// start transfer
-		if(dmac->reg.mask & (1 << channel))  // is channel masked?
-			return;
-		
 		switch(dmac->reg.mode_control[channel] & 0xc0)
 		{
 			case 0x00:  // Demand
@@ -182,6 +205,7 @@ void upd71071_dmarq(const device_config* device, int state,int channel)
 		dmac->reg.status &= ~(0x10 << channel);
 		dmac->reg.status |= (0x01 << channel);  // END or TC
 	}
+	return 0;
 }
 
 static DEVICE_START(upd71071)

@@ -12,7 +12,7 @@ struct _upd71071_interface
 	void (*dma_write[4])(running_machine* machine, UINT16 data);
 };
 
-void upd71071_dmarq(const device_config* device,int state,int channel);
+int upd71071_dmarq(const device_config* device,int state,int channel);
 
 DEVICE_GET_INFO(upd71071);
 

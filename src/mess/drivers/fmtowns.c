@@ -112,6 +112,8 @@
 #include "cpu/i386/i386.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
+#include "sound/cdda.h"
+#include "devices/chd_cd.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "formats/basicdsk.h"
@@ -170,11 +172,29 @@ struct towns_cdrom_controller
 	UINT8 status;
 	UINT8 cmd_status[4];
 	UINT8 cmd_status_ptr;
+	UINT8 extra_status;
 	UINT8 parameter[8];
+	UINT8 mpu_irq_enable;
+	UINT8 dma_irq_enable;
+	UINT8 buffer[2048];
+	INT32 buffer_ptr;
+	UINT32 lba_current;
+	UINT32 lba_last;
+	emu_timer* read_timer;
 } towns_cd;
 
 static void towns_update_video_banks(const address_space* space);
 static PIC8259_SET_INT_LINE( towns_pic_irq );
+
+INLINE UINT32 bcd_to_dec(UINT32 val)
+{
+	return (val & 0x00000f) + 
+		(((val & 0x0000f0) >> 4) * 10) +
+		(((val & 0x000f00) >> 8) * 100) +
+		(((val & 0x00f000) >> 12) * 1000) +
+		(((val & 0x0f0000) >> 16) * 10000) +
+		(((val & 0xf00000) >> 24) * 100000);
+}
 
 static void towns_init_serial_rom(running_machine* machine)
 {
@@ -1166,32 +1186,249 @@ static WRITE8_HANDLER(towns_video_ff81_w)
  *    bit 4 - DMA transfer mode
  * 
  */
-static void towns_cdrom_execute_command(void)
+static TIMER_CALLBACK( towns_cdrom_read_byte )
 {
-	// For now, we'll return status codes that hopefully tell the system
-	// that there is no CD-ROM in the drive.
+	const device_config* device = ptr;
+	int masked;
+	// TODO: support software transfers, for now DMA is assumed.
 	
-	towns_cd.status |= 0x02;  // status read request
+	if(towns_cd.buffer_ptr < 0) // transfer has ended
+		return;
+	
+	masked = upd71071_dmarq(device,param,3);  // CD-ROM controller uses DMA1 channel 3
+	//logerror("DMARQ: param=%i ret=%i bufferptr=%i\n",param,masked,towns_cd.buffer_ptr);
+	if(param != 0)
+	{
+		timer_adjust_oneshot(towns_cd.read_timer,ATTOTIME_IN_HZ(300000),0);
+	}
+	else
+	{
+		if(masked != 0)  // check if the DMA channel is masked
+		{
+			timer_adjust_oneshot(towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
+			return;
+		}
+		if(towns_cd.buffer_ptr < 2048)
+			timer_adjust_oneshot(towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
+		else
+		{  // end of transfer
+			towns_cd.status &= ~0x10;  // no longer transferring by DMA
+			towns_cd.status &= ~0x20;  // no longer transferring by software
+			logerror("DMA1: end of transfer (LBA=%08x)\n",towns_cd.lba_current);
+			if(towns_cd.lba_current >= towns_cd.lba_last)
+			{  
+				towns_cd.status |= 0x02;  // status read request
+				towns_cd.cmd_status_ptr = 0;
+				towns_cd.extra_status = 0;
+				towns_cd.cmd_status[0] = 0x06;
+				towns_cd.cmd_status[1] = 0x00;
+				towns_cd.cmd_status[2] = 0x00;
+				towns_cd.cmd_status[3] = 0x00;
+				if(towns_cd.dma_irq_enable != 0)
+				{
+					towns_cd.status |= 0x40;  // IRQ from end of DMA
+					pic8259_set_irq_line(devtag_get_device(device->machine,"pic8259_slave"),1,0);
+				}
+				towns_cd.status |= 0x01;  // ready
+			}
+			else
+			{
+				towns_cd.status |= 0x02;  // status read request
+				towns_cd.cmd_status_ptr = 0;
+				towns_cd.extra_status = 0;
+				towns_cd.cmd_status[0] = 0x22;
+				towns_cd.cmd_status[1] = 0x00;
+				towns_cd.cmd_status[2] = 0x00;
+				towns_cd.cmd_status[3] = 0x00;
+				if(towns_cd.dma_irq_enable != 0)
+				{
+					towns_cd.status |= 0x40;  // IRQ from end of DMA
+					pic8259_set_irq_line(devtag_get_device(device->machine,"pic8259_slave"),1,0);
+				}
+				cdrom_read_data(mess_cd_get_cdrom_file(devtag_get_device(device->machine,"cdrom")),++towns_cd.lba_current,towns_cd.buffer,CD_TRACK_MODE1);
+				timer_adjust_oneshot(towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
+				towns_cd.buffer_ptr = -1;
+				towns_cd.status |= 0x01;  // ready
+			}
+		}
+	}
+}
+
+static void towns_cdrom_read(const device_config* device)
+{
+	// MODE 1 read
+	// load data into buffer to be sent via DMA1 channel 3
+	UINT32 lba1,lba2;
+	
+	lba1 = towns_cd.parameter[7] << 16;
+	lba1 += towns_cd.parameter[6] << 8;
+	lba1 += towns_cd.parameter[5];
+	lba2 = towns_cd.parameter[4] << 16;
+	lba2 += towns_cd.parameter[3] << 8;
+	lba2 += towns_cd.parameter[2];
+	towns_cd.lba_current = bcd_to_dec(lba1) - 200;
+	towns_cd.lba_last = bcd_to_dec(lba2) - 200;
+	
+	logerror("CD: Mode 1 read from LBA next:%i last:%i\n",towns_cd.lba_current,towns_cd.lba_last);
+	
+	cdrom_read_data(mess_cd_get_cdrom_file(device),towns_cd.lba_current,towns_cd.buffer,CD_TRACK_MODE1);
+	towns_cd.buffer_ptr = 0;
+	towns_cd.status |= 0x03; // immediate status return?
+	towns_cd.status |= 0x10;  // DMA transfer begin
+	towns_cd.status &= ~0x20;  // not a software transfer
 	towns_cd.cmd_status_ptr = 0;
-	towns_cd.cmd_status[0] = 0x10;
+	towns_cd.extra_status = 2;
+	towns_cd.cmd_status[0] = 0x00;
 	towns_cd.cmd_status[1] = 0x00;
 	towns_cd.cmd_status[2] = 0x00;
 	towns_cd.cmd_status[3] = 0x00;
+	if(towns_cd.dma_irq_enable != 0)
+	{
+		towns_cd.status |= 0x40;  // IRQ from end of DMA
+		pic8259_set_irq_line(devtag_get_device(device->machine,"pic8259_slave"),1,0);
+	}
+	
+	// start read timer - assume single-speed currently
+	//timer_adjust_oneshot(towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
+}
+
+static void towns_cdrom_execute_command(const device_config* device)
+{
+	// For now, we'll return status codes that hopefully tell the system
+	// that there is no CD-ROM in the drive.
+
+	if(mess_cd_get_cdrom_file(device) == NULL)
+	{  // No CD in drive
+		if(towns_cd.command & 0x20)
+		{
+			towns_cd.status |= 0x02;  // status read request
+			towns_cd.cmd_status_ptr = 0;
+			towns_cd.extra_status = 0;
+			towns_cd.cmd_status[0] = 0x10;
+			towns_cd.cmd_status[1] = 0x00;
+			towns_cd.cmd_status[2] = 0x00;
+			towns_cd.cmd_status[3] = 0x00;
+		}
+	}
+	else
+	{
+		switch(towns_cd.command & 0x9f)
+		{
+			case 0x00:  // Seek
+				if(towns_cd.command & 0x20)
+				{
+					towns_cd.status |= 0x02;  // status read request
+					towns_cd.cmd_status_ptr = 0;
+					towns_cd.extra_status = 1;
+					towns_cd.cmd_status[0] = 0x00;
+					towns_cd.cmd_status[1] = 0x00;
+					towns_cd.cmd_status[2] = 0x00;
+					towns_cd.cmd_status[3] = 0x00;
+					if(towns_cd.command & 0x40)
+						towns_cd.status |= 0x80;  // IRQ from MPU
+				}
+				logerror("CD: Command 0x00: SEEK\n");
+				break;
+			case 0x02:  // Read (MODE1)
+				logerror("CD: Command 0x02: READ MODE1\n");
+				towns_cdrom_read(device);
+				break;
+			case 0x05:  // Read TOC
+				logerror("CD: Command 0x05: READ TOC\n");
+				break;
+			case 0x80:  // set state
+				if(towns_cd.command & 0x20)
+				{
+					towns_cd.status |= 0x02;  // status read request
+					towns_cd.cmd_status_ptr = 0;
+					towns_cd.extra_status = 0;
+					towns_cd.cmd_status[0] = 0x00;
+					towns_cd.cmd_status[1] = 0x00;
+					towns_cd.cmd_status[2] = 0x00;
+					towns_cd.cmd_status[3] = 0x00;
+					if(towns_cd.command & 0x40)
+						towns_cd.status |= 0x80;  // IRQ from MPU
+				}
+				logerror("CD: Command 0x80: set state\n");
+				break;
+			case 0x81:  // set state (CDDASET)
+				if(towns_cd.command & 0x20)
+				{
+					towns_cd.status |= 0x02;  // status read request
+					towns_cd.cmd_status_ptr = 0;
+					towns_cd.extra_status = 0;
+					towns_cd.cmd_status[0] = 0x00;
+					towns_cd.cmd_status[1] = 0x00;
+					towns_cd.cmd_status[2] = 0x00;
+					towns_cd.cmd_status[3] = 0x00;
+					if(towns_cd.command & 0x40)
+						towns_cd.status |= 0x80;  // IRQ from MPU
+				}
+				logerror("CD: Command 0x81: set state (CDDASET)\n");
+				break;
+			default:
+				towns_cd.status |= 0x02;  // status read request
+				towns_cd.cmd_status_ptr = 0;
+				towns_cd.extra_status = 0;
+				towns_cd.cmd_status[0] = 0x10;
+				towns_cd.cmd_status[1] = 0x00;
+				towns_cd.cmd_status[2] = 0x00;
+				towns_cd.cmd_status[3] = 0x00;
+				logerror("CD: Unknown or unimplemented command %02x\n",towns_cd.command);
+		}
+	}
+}
+
+static UINT16 towns_cdrom_dma_r(running_machine* machine)
+{
+	if(towns_cd.buffer_ptr >= 2048)
+		return 0x00;
+	return towns_cd.buffer[towns_cd.buffer_ptr++];
 }
 
 static READ8_HANDLER(towns_cdrom_r)
 {
-	logerror("CD: read port %02x\n",offset*2);
 	switch(offset)
 	{
 		case 0x00:  // status
+			//logerror("CD: status read, returning %02x\n",towns_cd.status);
 			return towns_cd.status;
 		case 0x01:  // command status
 			if(towns_cd.cmd_status_ptr > 3)
 			{
 				towns_cd.cmd_status_ptr = 0;
 				towns_cd.status &= ~0x02;
+				// check for more status bytes
+				if(towns_cd.extra_status != 0)
+				{
+					towns_cd.status |= 0x02;
+					switch(towns_cd.command & 0x9f)
+					{
+						case 0x00:  // seek
+							towns_cd.cmd_status[0] = 0x04;
+							towns_cd.cmd_status[1] = 0x00;
+							towns_cd.cmd_status[2] = 0x00;
+							towns_cd.cmd_status[3] = 0x00;
+							towns_cd.extra_status = 0;
+							break;
+						case 0x02:  // read
+							if(towns_cd.extra_status == 2)
+							{
+								towns_cd.cmd_status[0] = 0x22;
+							}
+							else
+								towns_cd.cmd_status[0] = 0x06;
+							towns_cd.cmd_status[1] = 0x00;
+							towns_cd.cmd_status[2] = 0x00;
+							towns_cd.cmd_status[3] = 0x00;
+							towns_cd.extra_status = 0;
+							break;
+						case 0x05:  // read toc
+							break;
+					}
+				}
 			}
+			logerror("CD: reading command status port, returning %02x\n",towns_cd.cmd_status[towns_cd.cmd_status_ptr]);
 			return towns_cd.cmd_status[towns_cd.cmd_status_ptr++];
 		default:
 			return 0x00;
@@ -1204,25 +1441,43 @@ static WRITE8_HANDLER(towns_cdrom_w)
 	switch(offset)
 	{
 		case 0x00: // status
+			if(data & 0x80)
+				towns_cd.status &= ~0x80;
+			if(data & 0x40)
+				towns_cd.status &= ~0x40;
+			if(data & 0x04)
+				logerror("CD: sub MPU reset\n");
+			towns_cd.mpu_irq_enable = data & 0x02;
+			towns_cd.dma_irq_enable = data & 0x01;
 			logerror("CD: status write %02x\n",data);
 			break;
 		case 0x01: // command
 			towns_cd.command = data;
-			towns_cdrom_execute_command();
+			towns_cdrom_execute_command(devtag_get_device(space->machine,"cdrom"));
 			logerror("CD: command %02x sent\n",data);
 			logerror("CD: parameters: %02x %02x %02x %02x %02x %02x %02x %02x\n",
-				towns_cd.parameter[0],towns_cd.parameter[1],towns_cd.parameter[2],
-				towns_cd.parameter[3],towns_cd.parameter[4],towns_cd.parameter[5],
-				towns_cd.parameter[6],towns_cd.parameter[7]);
+				towns_cd.parameter[7],towns_cd.parameter[6],towns_cd.parameter[5],
+				towns_cd.parameter[4],towns_cd.parameter[3],towns_cd.parameter[2],
+				towns_cd.parameter[1],towns_cd.parameter[0]);
 			break;
 		case 0x02: // parameter
-			for(x=0;x<7;x++)
-				towns_cd.parameter[x+1] = towns_cd.parameter[x];
+			for(x=7;x>0;x--)
+				towns_cd.parameter[x] = towns_cd.parameter[x-1];
 			towns_cd.parameter[0] = data;
 			logerror("CD: parameter %02x added\n",data);
 			break;
+		case 0x03:
+			// TODO: software transfer mode (bit 3)
+			if(data & 0x10)
+			{
+				towns_cd.status |= 0x10;  // DMA transfer begin
+				towns_cd.status &= ~0x20;  // not a software transfer
+				towns_cd.buffer_ptr = 0;
+				timer_adjust_oneshot(towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
+			}
+			break;
 		default:
-			logerror("CD: write port %02x\n",offset*2);
+			logerror("CD: write %02x to port %02x\n",data,offset*2);
 	}
 }
 
@@ -1703,6 +1958,9 @@ static DRIVER_INIT( towns )
 	towns_rtc_timer = timer_alloc(machine,rtc_second,NULL);
 	towns_kb_timer = timer_alloc(machine,poll_keyboard,NULL);
 	
+	// CD-ROM init
+	towns_cd.read_timer = timer_alloc(machine,towns_cdrom_read_byte,(void*)devtag_get_device(machine,"dma_1"));
+	
 	cpu_set_irq_callback(cputag_get_cpu(machine,"maincpu"), towns_irq_callback);
 }
 
@@ -1899,7 +2157,7 @@ static const upd71071_intf towns_dma_config =
 {
 	"maincpu",
 	1000000,
-	{ towns_fdc_dma_r, 0, 0, 0 },
+	{ towns_fdc_dma_r, 0, 0, towns_cdrom_dma_r },
 	{ towns_fdc_dma_w, 0, 0, 0 }
 };
 
@@ -1957,6 +2215,8 @@ static MACHINE_DRIVER_START( towns )
 	MDRV_SOUND_ADD("pcm", RF5C68, 2150000)  // actual clock speed unknown
 //  MDRV_SOUND_CONFIG(rf5c68_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ADD("cdda",CDDA,0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
     MDRV_PIT8253_ADD("pit",towns_pit8253_config)
 
@@ -1966,6 +2226,8 @@ static MACHINE_DRIVER_START( towns )
 
 	MDRV_MB8877_ADD("fdc",towns_mb8877a_interface)
 	MDRV_FLOPPY_4_DRIVES_ADD(towns_floppy_config)
+	
+	MDRV_CDROM_ADD("cdrom")
 
 	MDRV_UPD71071_ADD("dma_1",towns_dma_config)
 	MDRV_UPD71071_ADD("dma_2",towns_dma_config)
