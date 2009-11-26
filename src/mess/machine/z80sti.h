@@ -58,6 +58,9 @@ struct _z80sti_interface
 	int	rx_clock;			/* serial receive clock */
 	int	tx_clock;			/* serial transmit clock */
 
+	/* this gets called on each change of the _INT pin (pin 17) */
+	devcb_write_line		out_int_func;
+
 	/* this is called on each read of the GPIO pins */
 	devcb_read8				in_gpio_func;
 
@@ -81,9 +84,6 @@ struct _z80sti_interface
 
 	/* this gets called for each change of the TDO pin (pin 4) */
 	devcb_write_line		out_tdo_func;
-
-	/* this gets called on each change of the _INT pin (pin 17) */
-	devcb_write_line		out_int_func;
 };
 
 /***************************************************************************
