@@ -1377,6 +1377,11 @@ const game_driver * const drivers[] =
 
 	/* Conitec Datensysteme */
     DRIVER( prof80 )
+    DRIVER( prof80g21 )
+    DRIVER( prof80g25 )
+    DRIVER( prof80g26 )
+    DRIVER( prof80g31 )
+    DRIVER( prof80g562 )
     DRIVER( prof180x )
 
 /****************Games*******************************************************/
