@@ -4,6 +4,11 @@
 
         12/05/2009 Skeleton driver.
 
+    TODO:
+    Add 8251 for serial
+    Add 8226? for keypad reading and led display handling
+    Add optional 2x 8255A
+
 ****************************************************************************/
 
 #include "driver.h"
@@ -67,8 +72,8 @@ ROM_START( sdk86 )
 	ROM_LOAD16_BYTE( "0169_102042-001.a27", 0xff000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626)) /* Label: "iD2616 // T142094WS // (C)INTEL '77 // 0169 // 102042-001" */
 	ROM_LOAD16_BYTE( "0170_102043-001.a30", 0xff001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b)) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
 
-	ROM_REGION(0x1000, "proms", 0 ) // all are Intel D3625 1kx4 (82s137 equivalent)
-	ROM_LOAD( "0036_101993-001.a12", 0x0000, 0x0400, NO_DUMP ) /* Label: "iD3625A 0036 // 8142 // 101993-001" */
+	ROM_REGION(0x1000, "proms", 0 ) // all are Intel D3625A 1kx4 (82s137A equivalent)
+	ROM_LOAD( "0036_101993-001.a12", 0x0000, 0x0400, CRC(bb7edbfd) SHA1(8847f9815c7cb8695986743199673920a7d4390d)) /* Label: "iD3625A 0036 // 8142 // 101993-001" */
 	ROM_LOAD( "0035_101992-001.a22", 0x0400, 0x0400, NO_DUMP ) /* Label: "iD3625A 0035 // 8142 // 101992-001" */
 	ROM_LOAD( "0037_101994-001.a26", 0x0800, 0x0400, NO_DUMP ) /* Label: "iD3625A 0037 // 8142 // 101994-001" */
 	ROM_LOAD( "0038_101995-001.a29", 0x0C00, 0x0400, NO_DUMP ) /* Label: "iD3625A 0038 // 8142 // 101995-001" */
