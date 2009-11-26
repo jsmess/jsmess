@@ -30,6 +30,15 @@ System Driver Changes:
 ----------------------
 - [EXL100] Added 7041 rom dump.  [Wilbert Pol]
 
+- [EXIDY] Improved sound compatibility.  [Robbbert]
+
+- [GLASGOW] Upgraded artwork to be clickable. Fixed various driver
+  problems. Chess can be played by using the mouse.  [Robbbert]
+
+- [INTV] Fixed intvkbd. Fixed disassembler.  [Robbbert]
+
+- [ORIC] Telstrat regression has been fixed.  [Robbbert]
+
 - [SMS] Added SegaScope (3D-Glasses) support to Sega Master System I
   drivers (i.e. sms1, sms1pal, smsj & sg1000m3). To enable this, enter
   Driver Configuration menu and turn on SegaScope, then go in the Video
