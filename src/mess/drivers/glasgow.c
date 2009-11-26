@@ -20,6 +20,25 @@ sp_rinter@gmx.de
 1*74LS367 3 State Hex Buffers
 
 
+Made playable by Robbbert in Nov 2009.
+
+How to play (quick guide)
+1. You are the white player.
+2. Click on the piece to move (LED starts flashing), then click where it goes
+3. Computer plays black, it will work out its move and beep.
+4. Read the move in the display, or look for the flashing LEDs.
+5. Move the computer's piece in the same way you moved yours.
+6. If a piece is being taken, firstly click on the piece then click the blank
+	area at bottom right. This causes the piece to disappear. After that,
+	move the piece that took the other piece.
+7. You'll need to read the official user manual for advanced features, or if
+	you get messages such as "Err1".
+
+Note about clickable artwork: it seems the horizontal coordinates can vary
+	between computers. The supplied artwork at svn r6463 works with my
+	computer; it may be out of alignment on yours.
+
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -31,9 +50,7 @@ sp_rinter@gmx.de
 static UINT8 lcd_shift_counter;
 // static UINT8 led_status;
 static UINT8 led7;
-static UINT8 key_low,
-		key_hi,
-		key_select,
+static UINT8 	key_select,
 		irq_flag,
 		lcd_invert,
 		key_selector;
@@ -44,31 +61,45 @@ static UINT16 Line18_LED;
 static UINT16 Line18_REED;
 
 static UINT8 read_board_flag;
-
-static const char EMP[4] = "EMP";
+static UINT8 mouse_hold = 0;
 
 typedef struct {
-	unsigned int field;
-	unsigned int x;
-	unsigned int y;
-	unsigned char piece[4];
+	UINT8 field;
+	UINT8 piece;
 } BOARD_FIELD;
 
 static BOARD_FIELD m_board[8][8];
 
+/* starts at bottom left corner */
 static const BOARD_FIELD start_board[8][8] =
 {
-	{ { 7,44,434,"WR1"}, { 6,100,434,"WN1"}, { 5,156,434,"WB1"}, { 4,212,434,"WQ1"}, { 3,268,434,"WK"}, { 2,324,434,"WB2"}, { 1,380,434,"WN2"}, { 0,436,434,"WR2"} },
-	{ {15,44,378,"WP1"}, {14,100,378,"WP2"}, {13,156,378,"WP3"}, {12,212,378,"WP4"}, {11,268,378,"WP5"}, {10,324,378,"WP6"}, { 9,380,378,"WP7"}, { 8,436,378,"WP8"} },
+	{ {7,10}, {6,8}, {5,9}, {4,11}, {3,12}, {2,9}, {1,8}, {0,10} },
+	{ {15,7}, {14,7}, {13,7}, {12,7}, { 11,7}, {10,7}, {9,7}, {8,7} },
 
-	{ {23,44,322, "EMP"}, {22,100,322, "EMP"}, {21,156,322, "EMP"}, {20,212,322, "EMP"}, {19,268,322, "EMP"}, {18,324,322, "EMP"}, {17,380,322, "EMP"}, {16,436,322, "EMP"} },
-	{ {31,44,266, "EMP"}, {30,100,266, "EMP"}, {29,156,266, "EMP"}, {28,212,266, "EMP"}, {27,268,266, "EMP"}, {26,324,266, "EMP"}, {25,380,266, "EMP"}, {24,436,266, "EMP"} },
-	{ {39,44,210, "EMP"}, {38,100,210, "EMP"}, {37,156,210, "EMP"}, {36,212,210, "EMP"}, {35,268,210, "EMP"}, {34,324,210, "EMP"}, {33,380,210, "EMP"}, {32,436,210, "EMP"} },
-	{ {47,44,154, "EMP"}, {46,100,154, "EMP"}, {45,156,154, "EMP"}, {44,212,154, "EMP"}, {43,268,154, "EMP"}, {42,324,154, "EMP"}, {41,380,154, "EMP"}, {40,436,154, "EMP"} },
+	{ {23,0}, {22,0}, {21,0}, {20,0}, {19,0}, {18,0}, {17,0}, {16,0} },
+	{ {31,0}, {30,0}, {29,0}, {28,0}, {27,0}, {26,0}, {25,0}, {24,0} },
+	{ {39,0}, {38,0}, {37,0}, {36,0}, {35,0}, {34,0}, {33,0}, {32,0} },
+	{ {47,0}, {46,0}, {45,0}, {44,0}, {43,0}, {42,0}, {41,0}, {40,0} },
 
-	{ {55,44,100,"BP1"}, {54,100,100,"BP2"}, {53,156,100,"BP3"}, {52,212,100,"BP4"}, {51,268,100,"BP5"}, {50,324,100,"BP6"}, {49,380,100,"BP7"}, {48,436,100,"BP8"} },
-	{ {63,44,44 ,"BR1"}, {62,100,44 ,"BN1"}, {61,156,44 ,"BB1"}, {60,212,44 ,"BQ1"}, {59,268,44 ,"BK"}, {58,324,44 ,"BB2"}, {57,380,44 ,"BN2"}, {56,436,44 ,"BR2"} }
+	{ {55,1}, {54,1}, {53,1}, {52,1}, {51,1}, {50,1}, {49,1}, {48,1} },
+	{ {63,4}, {62,2}, {61,3}, {60,5}, {59,6}, {58,3}, {57,2}, {56,4} }
 };
+
+INLINE UINT8 pos_to_num(UINT8 val)
+{
+	switch (val)
+	{
+		case 0xfe: return 7;
+		case 0xfd: return 6;
+		case 0xfb: return 5;
+		case 0xf7: return 4;
+		case 0xef: return 3;
+		case 0xdf: return 2;
+		case 0xbf: return 1;
+		case 0x7f: return 0;
+		default: return 0xff;
+	}
+}
 
 static void set_board( void )
 {
@@ -84,12 +115,17 @@ static void set_board( void )
 	}
 }
 
+static void glasgow_pieces_w ( running_machine *machine )
+{
+	/* This causes the pieces to display on-screen */
+	UINT8 i_18, i_AH;
 
-static int irq_edge = 0x00;
+	for (i_18 = 0; i_18 < 8; i_18++)
+		for (i_AH = 0; i_AH < 8; i_AH++)
+			output_set_indexed_value("P", 63 - m_board[i_18][i_AH].field, m_board[i_18][i_AH].piece);
+}
 
-
-// Used by Glasgow and Dallas
-static WRITE16_HANDLER( write_lcd_gg )
+static WRITE16_HANDLER( glasgow_lcd_w )
 {
 	UINT8 lcd_data = data >> 8;
 
@@ -98,7 +134,184 @@ static WRITE16_HANDLER( write_lcd_gg )
 
 	lcd_shift_counter--;
 	lcd_shift_counter &= 3;
-//  logerror("LCD Offset = %d Data low = %x \n", offset, lcd_data);
+}
+
+static WRITE16_HANDLER( glasgow_lcd_flag_w )
+{
+	const device_config *speaker = devtag_get_device(space->machine, "beep");
+	UINT16 lcd_flag = data & 0x8100;
+
+	beep_set_state(speaker, (lcd_flag & 0x100) ? 1 : 0);
+
+	if (lcd_flag)
+		led7 = 255;
+	else
+	{
+		led7 = 0;
+		key_selector = 1;
+	}
+}
+
+static READ16_HANDLER( glasgow_keys_r )
+{
+	UINT8 data = 0xff;
+
+	static const char *const keynames[] = { "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
+	static UINT8 board_row = 0;
+	static UINT16 mouse_down = 0;
+	board_row++;
+	board_row &= 7;
+
+	/* See if any pieces moved on the board */
+	data = input_port_read(space->machine, keynames[board_row]);
+
+	if ((data != 0xff) && (!mouse_down))
+	{
+		/* Moving a white piece onto a blank, or taking a black piece */
+		if ((mouse_hold > 6) && (m_board[board_row][pos_to_num(data)].piece < 7))
+		{
+			m_board[board_row][pos_to_num(data)].piece = mouse_hold;
+			mouse_hold = 0;
+		}
+		else
+		/* Moving a black piece onto a blank, or taking a white piece */
+		if ((mouse_hold) && (mouse_hold < 7)
+			&& ((m_board[board_row][pos_to_num(data)].piece > 6) || (!(m_board[board_row][pos_to_num(data)].piece))))
+		{
+			m_board[board_row][pos_to_num(data)].piece = mouse_hold;
+			mouse_hold = 0;
+		}
+		else
+		/* Picking up a white piece */
+		if (m_board[board_row][pos_to_num(data)].piece > 6)
+		{
+			mouse_hold = m_board[board_row][pos_to_num(data)].piece;
+			m_board[board_row][pos_to_num(data)].piece = 0;
+		}
+		else
+		/* Picking up a black piece */
+		if ((m_board[board_row][pos_to_num(data)].piece) && (m_board[board_row][pos_to_num(data)].piece < 7))
+		{
+			mouse_hold = m_board[board_row][pos_to_num(data)].piece;
+			m_board[board_row][pos_to_num(data)].piece = 0;
+		}
+
+		mouse_down = board_row + 1;
+
+	}
+	else
+	if ((data == 0xff) && (mouse_down == (board_row + 1)))	/* Wait for mouse to be released */
+		mouse_down = 0;
+
+	/* See if we are taking a piece off the board */
+	if (!input_port_read(space->machine, "LINE10"))
+		mouse_hold = 0;
+
+	/* See if any keys pressed */
+	data = 3;
+
+	if (key_select == input_port_read(space->machine, "LINE0"))
+		data &= 1;
+
+	if (key_select == input_port_read(space->machine, "LINE1"))
+		data &= 2;
+
+	return data << 8;
+}
+
+static WRITE16_HANDLER( glasgow_keys_w )
+{
+	key_select = data >> 8;
+	glasgow_pieces_w(space->machine);
+}
+
+static READ16_HANDLER( glasgow_board_r )
+{
+	UINT8 i_AH, data = 0;
+
+	if (Line18_REED < 8)
+	{
+		// if there is a piece on the field -> set bit in data
+		for (i_AH = 0; i_AH < 8; i_AH++)
+		{
+			if (!m_board[Line18_REED][i_AH].piece)
+				data |= (1 << i_AH);
+		}
+	}
+
+	read_board_flag = TRUE;
+
+	return data << 8;
+}
+
+static WRITE16_HANDLER( glasgow_board_w )
+{
+	//UINT8 beep_flag;
+	Line18_REED = pos_to_num(data >> 8) ^ 7;
+
+	// LED's or REED's ?
+	if (read_board_flag)
+	{
+		Line18_LED = 0;
+		read_board_flag = 0;
+	}
+	else
+	{
+		Line18_LED = data >> 8;
+	}
+
+	lcd_invert = 1;
+	//beep_flag = data >> 8;
+	//if ((beep_flag & 02) == 0) key_selector = 0; else key_selector = 1;
+	//logerror("Write Beeper   = %x \n  ",data);
+	beeper = data;
+
+}
+
+static WRITE16_HANDLER( glasgow_beeper_w )
+{
+	UINT8 i_AH, i_18;
+	UINT16 LineAH = 0;
+	UINT8 LED;
+
+	LineAH = data >> 8;
+
+	if (LineAH && Line18_LED)
+	{
+		for (i_AH = 0; i_AH < 8; i_AH++)
+		{
+			if (LineAH & (1 << i_AH))
+			{
+				for (i_18 = 0; i_18 < 8; i_18++)
+				{
+					if (!(Line18_LED & (1 << i_18)))
+					{
+						LED = m_board[i_18][i_AH].field;
+						output_set_led_value(LED, 1);
+						//  LED on
+					}
+					else
+					{
+					//  LED off
+
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		//  No LED  -> all LED's off
+		for (i_AH = 0; i_AH < 8; i_AH++)
+		{
+			for (i_18 = 0; i_18 < 8; i_18++)
+			{
+				// LED off
+				LED = m_board[i_18][i_AH].field;
+				output_set_led_value(LED, 0);
+			}
+		}
+	}
 }
 
 static WRITE16_HANDLER( write_beeper )
@@ -141,30 +354,6 @@ static WRITE16_HANDLER( write_lcd_flag )
 	logerror("LCD Flag 16 = %x \n", data);
 }
 
-static WRITE16_HANDLER( write_lcd_flag_gg )
-{
-	const device_config *speaker = devtag_get_device(space->machine, "beep");
-	UINT8 lcd_flag = data >> 8;
-
-	beep_set_state(speaker, lcd_flag & 1 ? 1 : 0);
-
-	if (lcd_flag == 0)
-		key_selector = 1;
-
-	if (lcd_flag != 0)
-		led7 = 255;
-	else
-		led7 = 0;
-
-//  logerror("LCD Flag gg = %x \n", lcd_flag);
-}
-
-static WRITE16_HANDLER( write_keys )
-{
-	key_select = data >> 8;
-//  logerror("Write Key = %x \n", data);
-}
-
 static READ16_HANDLER( read_board )
 {
 	return 0xff00;	// Mephisto need it for working
@@ -183,32 +372,6 @@ static WRITE16_HANDLER( write_board )
 	logerror("Write Board = %x \n", data >> 8);
 }
 
-static WRITE16_HANDLER( write_board_gg )
-{
-	UINT8 beep_flag;
-
-	Line18_REED = data >> 8;
-
-	// LED's or REED's ?
-	if (read_board_flag)
-	{
-		Line18_LED = 0;
-		read_board_flag = 0;
-	}
-	else
-	{
-		Line18_LED = data >> 8;
-	}
-
-	//logerror("write_board Line18_LED   = %x \n  ", Line18_LED);
-	//logerror("write_board Line18_REED   = %x \n  ",Line18_REED);
-
-	lcd_invert = 1;
-	beep_flag = data >> 8;
-	//if ((beep_flag & 02) == 0) key_selector = 0; else key_selector = 1;
-	//logerror("Write Beeper   = %x \n  ",data);
-	beeper = data;
-}
 
 static WRITE16_HANDLER( write_irq_flag )
 {
@@ -218,23 +381,6 @@ static WRITE16_HANDLER( write_irq_flag )
 	logerror("Write 0x800004 = %x \n", data);
 	irq_flag = 1;
 	beeper = data;
-}
-
-static READ16_HANDLER( read_keys ) // Glasgow, Dallas
-{
-	UINT16 data = 0x0300;
-
-	key_low = input_port_read(space->machine, "LINE0");
-	key_hi = input_port_read(space->machine, "LINE1");
-
-	if (key_select == key_low)
-		data = data & 0x100;
-
-	if (key_select == key_hi)
-		data = data & 0x200;
-
-	//logerror("Keyboard Offset = %x Data = %x\n  ", offset, data);
-	return data;
 }
 
 static READ16_HANDLER( read_newkeys16 )  //Amsterdam, Roma
@@ -247,93 +393,10 @@ static READ16_HANDLER( read_newkeys16 )  //Amsterdam, Roma
 		data = input_port_read(space->machine, "LINE1");
 
 	logerror("read Keyboard Offset = %x Data = %x Select = %x \n", offset, data, key_selector);
-	data = data << 8;
+	data <<= 8;
 	return data ;
 }
 
-static READ16_HANDLER( read_board_gg )
-{
-	UINT8 i_18, i_AH;
-	UINT16 data = 0xff;
-
-	for (i_18 = 0; i_18 < 8; i_18++)
-	{
-		// Looking for cleared bit in Line18 -> current line
-		if (!(Line18_REED & (1 << i_18)))
-		{
-			// if there is a piece on the field -> set bit in data
-			for (i_AH = 0; i_AH < 8; i_AH++)
-			{
-				if (strcmp ((char *)m_board[i_18][i_AH].piece, EMP))
-					data &= ~(1 << i_AH);  // clear bit
-			}
-		}
-	}
-
-	data = data << 8;
-	read_board_flag = TRUE;
-	logerror("read_board_data = %x \n", data);
-
-//  return 0xff00;   // Mephisto need it for working
-
-	return data;
-}
-
-static WRITE16_HANDLER( write_beeper_gg )
-{
-//  logerror("Write Board   = %x \n  ",data>>8);
-	UINT8 i_AH, i_18;
-	UINT16 LineAH = 0;
-	UINT8 LED;
-
-//  logerror("Write Board   = %x \n  ",data);
-
-	LineAH = data >> 8;
-
-	if (LineAH && Line18_LED)
-	{
-//  logerror("Line18_LED   = %x \n  ",Line18_LED);
-//  logerror("LineAH   = %x \n  ",LineAH);
-
-		for (i_AH = 0; i_AH < 8; i_AH++)
-		{
-			if (LineAH & (1 << i_AH))
-			{
-				for (i_18 = 0; i_18 < 8; i_18++)
-				{
-					if (!(Line18_LED & (1 << i_18)))
-					{
-//                      logerror("i_18   = %d \n  ",i_18);
-//                      logerror("i_AH   = %d \n  ",i_AH);
-//                      logerror("LED an:   = %d \n  ",m_board[i_18][i_AH]);
-
-						LED = m_board[i_18][i_AH].field;
-						output_set_led_value(LED, 1);
-						//  LED on
-					}
-					else
-					{
-					//  LED off
-
-					}
-				}
-			}
-		}
-	}
-	else
-	{
-		//  No LED  -> all LED's off
-		for (i_AH = 0; i_AH < 8; i_AH++)
-		{
-			for (i_18 = 0; i_18 < 8; i_18++)
-			{
-				// LED off
-				LED = m_board[i_18][i_AH].field;
-				output_set_led_value(LED, 0);
-			}
-		}
-	}
-}
 
 /*
 static READ16_HANDLER(read_test)
@@ -396,14 +459,14 @@ static READ32_HANDLER( read_newkeys32 ) // Dallas 32, Roma 32
 		data = input_port_read(space->machine, "LINE1");
 	//if (key_selector == 1) data = input_port_read(machine, "LINE0"); else data = 0;
 	logerror("read Keyboard Offset = %x Data = %x\n", offset, data);
-	data = data << 24;
+	data <<= 24;
 	return data ;
 }
 
 static READ32_HANDLER( read_board32 )
 {
 	logerror("read board 32 Offset = %x \n", offset);
-	return 0x00000000;
+	return 0;
 }
 
 /*
@@ -433,12 +496,14 @@ static WRITE32_HANDLER ( write_beeper32 )
 	beeper = data;
 }
 
+//static int irq_edge = 0x00;
+
 static TIMER_CALLBACK( update_nmi )
 {
 	//cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, irq_edge & 0xff ? CLEAR_LINE : ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
-   	irq_edge = ~irq_edge;
+	// irq_edge = ~irq_edge;
 }
 
 static TIMER_CALLBACK( update_nmi32 )
@@ -446,7 +511,7 @@ static TIMER_CALLBACK( update_nmi32 )
 	// cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, irq_edge & 0xff ? CLEAR_LINE : ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
-    irq_edge = ~irq_edge;
+	// irq_edge = ~irq_edge;
 }
 
 static MACHINE_START( glasgow )
@@ -477,15 +542,15 @@ static MACHINE_RESET( glasgow )
 	set_board();
 }
 
-
 static ADDRESS_MAP_START(glasgow_mem, ADDRESS_SPACE_PROGRAM, 16)
+	ADDRESS_MAP_GLOBAL_MASK(0x1FFFF)
 	AM_RANGE(0x00000000, 0x0000ffff) AM_ROM
-	AM_RANGE(0x00ff0000, 0x00ff0001) AM_MIRROR(0xfe0000) AM_WRITE( write_lcd_gg )
-	AM_RANGE(0x00ff0002, 0x00ff0003) AM_MIRROR(0xfe0002) AM_READWRITE( read_keys,write_keys )
-	AM_RANGE(0x00ff0004, 0x00ff0005) AM_MIRROR(0xfe0004) AM_WRITE( write_lcd_flag_gg )
-	AM_RANGE(0x00ff0006, 0x00ff0007) AM_MIRROR(0xfe0006) AM_READWRITE( read_board_gg, write_beeper_gg )
-	AM_RANGE(0x00ff0008, 0x00ff0009) AM_MIRROR(0xfe0008) AM_WRITE( write_board_gg )
-	AM_RANGE(0x00ffc000, 0x00ffffff) AM_MIRROR(0xfec000) AM_RAM		// 16KB
+	AM_RANGE(0x00010000, 0x00010001) AM_WRITE( glasgow_lcd_w )
+	AM_RANGE(0x00010002, 0x00010003) AM_READWRITE( glasgow_keys_r, glasgow_keys_w )
+	AM_RANGE(0x00010004, 0x00010005) AM_WRITE( glasgow_lcd_flag_w )
+	AM_RANGE(0x00010006, 0x00010007) AM_READWRITE( glasgow_board_r, glasgow_beeper_w )
+	AM_RANGE(0x00010008, 0x00010009) AM_WRITE( glasgow_board_w )
+	AM_RANGE(0x0001c000, 0x0001ffff) AM_RAM		// 16KB
 ADDRESS_MAP_END
 
 
@@ -560,7 +625,83 @@ static INPUT_PORTS_START( old_keyboard )   //Glasgow,Dallas
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MEM") PORT_CODE(KEYCODE_F4)
 INPUT_PORTS_END
 
-
+static INPUT_PORTS_START( glasgow )
+	PORT_INCLUDE( old_keyboard )
+	PORT_START("LINE2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_START("LINE3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_START("LINE4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_START("LINE5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_START("LINE6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_START("LINE7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_START("LINE8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_START("LINE9")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_START("LINE10")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_KEYBOARD)
+INPUT_PORTS_END
 
 static MACHINE_DRIVER_START(glasgow )
 	/* basic machine hardware */
@@ -653,7 +794,7 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR, NAME,     PARENT,   COMPAT, MACHINE,     INPUT,          INIT,     CONFIG, COMPANY,                      FULLNAME,                 FLAGS */
-CONS(  1984, glasgow,  0,        0,    glasgow,       old_keyboard,   0,	0,   "Hegener & Glaser Muenchen",  "Mephisto III S Glasgow", 0)
+CONS(  1984, glasgow,  0,        0,    glasgow,       glasgow,        0,	0,   "Hegener & Glaser Muenchen",  "Mephisto III S Glasgow", 0)
 CONS(  1984, amsterd,  glasgow,  0,    amsterd,       new_keyboard,   0,	0,   "Hegener & Glaser Muenchen",  "Mephisto Amsterdam",     0)
 CONS(  1984, dallas,   glasgow,  0,    glasgow,       old_keyboard,   0,	0,   "Hegener & Glaser Muenchen",  "Mephisto Dallas",        0)
 CONS(  1984, roma,     glasgow,  0,    glasgow,       new_keyboard,   0,	0,   "Hegener & Glaser Muenchen",  "Mephisto Roma",          GAME_NOT_WORKING)
