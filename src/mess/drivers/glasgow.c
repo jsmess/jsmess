@@ -162,35 +162,20 @@ static READ16_HANDLER( glasgow_keys_r )
 	board_row++;
 	board_row &= 7;
 
-	/* See if any pieces moved on the board */
+	/* See if we are moving a piece */
 	data = input_port_read(space->machine, keynames[board_row]);
 
 	if ((data != 0xff) && (!mouse_down))
 	{
-		/* Moving a white piece onto a blank, or taking a black piece */
-		if ((mouse_hold > 6) && (m_board[board_row][pos_to_num(data)].piece < 7))
+		/* Moving a piece onto a blank */
+		if ((mouse_hold) && (!m_board[board_row][pos_to_num(data)].piece))
 		{
 			m_board[board_row][pos_to_num(data)].piece = mouse_hold;
 			mouse_hold = 0;
 		}
 		else
-		/* Moving a black piece onto a blank, or taking a white piece */
-		if ((mouse_hold) && (mouse_hold < 7)
-			&& ((m_board[board_row][pos_to_num(data)].piece > 6) || (!(m_board[board_row][pos_to_num(data)].piece))))
-		{
-			m_board[board_row][pos_to_num(data)].piece = mouse_hold;
-			mouse_hold = 0;
-		}
-		else
-		/* Picking up a white piece */
-		if (m_board[board_row][pos_to_num(data)].piece > 6)
-		{
-			mouse_hold = m_board[board_row][pos_to_num(data)].piece;
-			m_board[board_row][pos_to_num(data)].piece = 0;
-		}
-		else
-		/* Picking up a black piece */
-		if ((m_board[board_row][pos_to_num(data)].piece) && (m_board[board_row][pos_to_num(data)].piece < 7))
+		/* Picking up a piece */
+		if ((!mouse_hold) && (m_board[board_row][pos_to_num(data)].piece))
 		{
 			mouse_hold = m_board[board_row][pos_to_num(data)].piece;
 			m_board[board_row][pos_to_num(data)].piece = 0;
