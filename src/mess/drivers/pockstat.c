@@ -196,8 +196,8 @@ static READ32_HANDLER( ps_ftlb_r )
 			verboselog(space->machine, 0, "ps_ftlb_r: Unknown (F_WAIT1) = %08x & %08x\n", ftlb_regs.wait1, mem_mask );
 			return ftlb_regs.wait1;
 		case 0x0010/4:
-			verboselog(space->machine, 0, "ps_ftlb_r: Unknown (F_WAIT2) = %08x & %08x\n", ftlb_regs.wait2 | 0x08, mem_mask );
-			return ftlb_regs.wait2 | 0x08;
+			verboselog(space->machine, 0, "ps_ftlb_r: Unknown (F_WAIT2) = %08x & %08x\n", ftlb_regs.wait2 | 0x04, mem_mask );
+			return ftlb_regs.wait2 | 0x04;
 		case 0x0100/4:
 		case 0x0104/4:
 		case 0x0108/4:
@@ -430,7 +430,7 @@ static READ32_HANDLER( ps_timer_r )
  			verboselog(space->machine, 0, "ps_timer_r: Timer %d Count = %08x & %08x\n", offset / (0x10/4), timer_regs.timer[offset / (0x10/4)].count, mem_mask );
  			if(timer_regs.timer[offset / (0x10/4)].control & 4)
  			{
-				timer_regs.timer[offset / (0x10/4)].count -= 0x10;
+				timer_regs.timer[offset / (0x10/4)].count--;
 				if(timer_regs.timer[offset / (0x10/4)].count > timer_regs.timer[offset / (0x10/4)].period)
 				{
 					timer_regs.timer[offset / (0x10/4)].count = timer_regs.timer[offset / (0x10/4)].period;
@@ -793,12 +793,17 @@ static WRITE32_HANDLER(ps_flash_w)
 static READ32_HANDLER( ps_audio_r )
 {
 	verboselog(space->machine, 0, "ps_audio_r: Unknown Read: %08x = %08x & %08x\n", 0xd800000 + (offset << 2), 0x10, mem_mask);
-	return 0x10;
+	return 0;
 }
 
 static WRITE32_HANDLER( ps_audio_w )
 {
 	verboselog(space->machine, 0, "ps_audio_w: Unknown Write: %08x = %08x & %08x\n", 0xd800000 + (offset << 2), data, mem_mask);
+}
+
+static WRITE32_HANDLER( ps_dac_w )
+{
+	dac_data_16_w(devtag_get_device(space->machine, "dac"), (UINT16)((data + 0x8000) & 0x0000ffff));
 }
 
 static ADDRESS_MAP_START(pockstat_mem, ADDRESS_SPACE_PROGRAM, 32)
@@ -814,6 +819,7 @@ static ADDRESS_MAP_START(pockstat_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x0d000000, 0x0d000003) AM_READWRITE(ps_lcd_r, ps_lcd_w)
 	AM_RANGE(0x0d000100, 0x0d00017f) AM_RAM AM_BASE(&lcd_buffer)
 	AM_RANGE(0x0d80000c, 0x0d80000f) AM_READWRITE(ps_audio_r, ps_audio_w)
+	AM_RANGE(0x0d800014, 0x0d800017) AM_WRITE(ps_dac_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -962,7 +968,7 @@ static MACHINE_DRIVER_START( pockstat )
 
     MDRV_SPEAKER_STANDARD_MONO("mono")
     MDRV_SOUND_ADD("dac", DAC, 0)
-    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
@@ -982,4 +988,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT     INIT  CONFIG     COMPANY                             FULLNAME       FLAGS */
-CONS( 1999, pockstat, 0,      0,      pockstat,  pockstat, 0,    0,  "Sony Computer Entertainment Inc.", "Sony PocketStation", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+CONS( 1999, pockstat, 0,      0,      pockstat,  pockstat, 0,    0,  "Sony Computer Entertainment Inc.", "Sony PocketStation", GAME_SUPPORTS_SAVE )
