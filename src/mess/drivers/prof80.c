@@ -116,7 +116,7 @@ static void prof80_keyboard_scan(running_machine *machine)
 			if (!BIT(data, col))
 			{
 				/* latch key data */
-				keydata = ~prof80_keycodes[table][row][col];
+				keydata = prof80_keycodes[table][row][col];
 
 				if (state->keydata != keydata)
 				{
