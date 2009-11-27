@@ -209,14 +209,17 @@ static void ls259_w(running_machine *machine, int fa, int sa, int fb, int sb)
 	case 0: /* C0/TDI */
 		upd1990a_data_in_w(state->upd1990a, fa);
 		upd1990a_c0_w(state->upd1990a, fa);
+		state->c0 = fa;
 		break;
 
 	case 1: /* C1 */
 		upd1990a_c1_w(state->upd1990a, fa);
+		state->c1 = fa;
 		break;
 
 	case 2: /* C2 */
 		upd1990a_c2_w(state->upd1990a, fa);
+		state->c2 = fa;
 		break;
 
 	case 3:	/* READY */
@@ -361,8 +364,40 @@ static READ8_HANDLER( status2_r )
     */
 
 	prof80_state *state = space->machine->driver_data;
+	UINT8 data = 0;
+	int js4 = 0, js5 = 0;
 
-	return (!upd1990a_data_out_r(state->upd1990a) << 7) | !state->motor;
+	/* floppy motor */
+	data |= !state->motor;
+
+	/* JS4 */
+	switch (input_port_read(space->machine, "J4"))
+	{
+	case 0: js4 = 0; break;
+	case 1: js4 = 1; break;
+	case 2: js4 = !state->c0; break;
+	case 3: js4 = !state->c1; break;
+	case 4: js4 = !state->c2; break;
+	}
+
+	data |= js4 << 4;
+
+	/* JS5 */
+	switch (input_port_read(space->machine, "J5"))
+	{
+	case 0: js5 = 0; break;
+	case 1: js5 = 1; break;
+	case 2: js5 = !state->c0; break;
+	case 3: js5 = !state->c1; break;
+	case 4: js5 = !state->c2; break;
+	}
+
+	data |= js5 << 4;
+
+	/* RTC data */
+	data |= !upd1990a_data_out_r(state->upd1990a) << 7;
+
+	return data;
 }
 
 static WRITE8_HANDLER( par_w )
@@ -414,6 +449,20 @@ static WRITE8_HANDLER( gripd_w )
 
 /* GRIP */
 
+static WRITE8_HANDLER( vol0_w )
+{
+	prof80_state *state = space->machine->driver_data;
+
+	state->vol0 = BIT(data, 7);
+}
+
+static WRITE8_HANDLER( vol1_w )
+{
+	prof80_state *state = space->machine->driver_data;
+
+	state->vol1 = BIT(data, 7);
+}
+
 static WRITE8_HANDLER( flash_w )
 {
 	prof80_state *state = space->machine->driver_data;
@@ -448,8 +497,40 @@ static READ8_HANDLER( stat_r )
     */
 
 	prof80_state *state = space->machine->driver_data;
+	UINT8 data = 0;
+	int js0 = 0, js1 = 0;
 
-	return (state->lps << 7) | (centronics_fault_r(state->centronics) << 6);
+	/* JS0 */
+	switch (input_port_read(space->machine, "GRIP-J3A"))
+	{
+	case 0: js0 = 0; break;
+	case 1: js0 = 1; break;
+	case 2: js0 = state->vol0; break;
+	case 3: js0 = state->vol1; break;
+	case 4: js0 = state->page; break;
+	}
+
+	data |= js0 << 4;
+
+	/* JS1 */
+	switch (input_port_read(space->machine, "GRIP-J3B"))
+	{
+	case 0: js1 = 0; break;
+	case 1: js1 = 1; break;
+	case 2: js1 = state->vol0; break;
+	case 3: js1 = state->vol1; break;
+	case 4: js1 = state->page; break;
+	}
+
+	data |= js1 << 5;
+
+	/* centronics fault */
+	data |= centronics_fault_r(state->centronics) << 6;
+
+	/* light pen strobe */
+	data |= state->lps << 7;
+
+	return data;
 }
 
 static READ8_HANDLER( lrs_r )
@@ -557,13 +638,13 @@ static ADDRESS_MAP_START( grip_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(cxstb_r, cxstb_w)
 //  AM_RANGE(0x10, 0x10) AM_WRITE(ccon_w)
-//  AM_RANGE(0x11, 0x11) AM_WRITE(vol0_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE(vol0_w)
 //  AM_RANGE(0x12, 0x12) AM_WRITE(rts_w)
 	AM_RANGE(0x13, 0x13) AM_WRITE(page_w)
 //  AM_RANGE(0x14, 0x14) AM_WRITE(cc1_w)
 //  AM_RANGE(0x15, 0x15) AM_WRITE(cc2_w)
 	AM_RANGE(0x16, 0x16) AM_WRITE(flash_w)
-//  AM_RANGE(0x17, 0x17) AM_WRITE(vol1_w)
+	AM_RANGE(0x17, 0x17) AM_WRITE(vol1_w)
 	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE(Z80STI_TAG, z80sti_r, z80sti_w)
 	AM_RANGE(0x30, 0x30) AM_READWRITE(lrs_r, lrs_w)
 	AM_RANGE(0x40, 0x40) AM_READ(stat_r)
@@ -1061,6 +1142,14 @@ static READ8_DEVICE_HANDLER( grip_z80sti_gpio_r )
 	return centronics_busy_r(state->centronics) << 3;
 }
 
+static WRITE_LINE_DEVICE_HANDLER( grip_speaker_w )
+{
+	prof80_state *driver_state = device->machine->driver_data;
+	int level = state && ((driver_state->vol1 << 1) | driver_state->vol0);
+
+	speaker_level_w(device, level);
+}
+
 static Z80STI_INTERFACE( grip_z80sti_interface )
 {
 	0,														/* serial receive clock */
@@ -1071,7 +1160,7 @@ static Z80STI_INTERFACE( grip_z80sti_interface )
 	DEVCB_NULL,												/* serial input */
 	DEVCB_NULL,												/* serial output */
 	DEVCB_NULL,												/* timer A output */
-	DEVCB_DEVICE_LINE(SPEAKER_TAG, speaker_level_w),		/* timer B output */
+	DEVCB_DEVICE_LINE(SPEAKER_TAG, grip_speaker_w),			/* timer B output */
 	DEVCB_LINE(z80sti_tc_w),								/* timer C output */
 	DEVCB_LINE(z80sti_rc_w)									/* timer D output */
 };
@@ -1108,6 +1197,9 @@ static MACHINE_START( prof80 )
 	prof80_bankswitch(machine);
 
 	/* register for state saving */
+	state_save_register_global(machine, state->c0);
+	state_save_register_global(machine, state->c1);
+	state_save_register_global(machine, state->c2);
 	state_save_register_global_array(machine, state->mmu);
 	state_save_register_global(machine, state->init);
 	state_save_register_global(machine, state->fdc_index);
@@ -1152,6 +1244,8 @@ static MACHINE_START( grip )
 	memory_set_bank(machine, 18, 0);
 
 	/* register for state saving */
+	state_save_register_global(machine, state->vol0);
+	state_save_register_global(machine, state->vol1);
 	state_save_register_global(machine, state->keydata);
 	state_save_register_global(machine, state->kbf);
 	state_save_register_global_pointer(machine, state->video_ram, GRIP_VIDEORAM_SIZE);
@@ -1172,7 +1266,16 @@ static const floppy_config prof80_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+static const INT16 speaker_levels[] = {-32768, 0, 32767, 0};
+
+static const speaker_interface grip_speaker_interface =
+{
+	4,
+	speaker_levels
+};
+
 /* Machine Drivers */
+
 static MACHINE_DRIVER_START( prof80 )
 	MDRV_DRIVER_DATA(prof80_state)
 
@@ -1226,6 +1329,7 @@ static MACHINE_DRIVER_START( grip )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER, 0)
+	MDRV_SOUND_CONFIG(grip_speaker_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
