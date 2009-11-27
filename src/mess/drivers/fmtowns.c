@@ -122,6 +122,10 @@
 #include "machine/upd71071.h"
 #include "devices/messram.h"
 
+// CD controller IRQ types
+#define TOWNS_CD_IRQ_MPU 1
+#define TOWNS_CD_IRQ_DMA 2
+
 static UINT8 ftimer;
 static UINT8 nmi_mask;
 static UINT8 compat_mode;
@@ -1201,6 +1205,45 @@ static WRITE8_HANDLER(towns_video_ff81_w)
  *    bit 4 - DMA transfer mode
  * 
  */
+static void towns_cdrom_set_irq(running_machine* machine,int line,int state)
+{
+	switch(line)
+	{
+		case TOWNS_CD_IRQ_MPU:
+			if(state != 0)
+			{
+				if(towns_cd.command & 0x40)
+				{
+					towns_cd.status |= 0x80;
+					if(towns_cd.mpu_irq_enable)
+						pic8259_set_irq_line(devtag_get_device(machine,"pic8259_slave"),1,1);						
+				}
+			}
+			else
+			{
+				towns_cd.status &= ~0x80;
+				pic8259_set_irq_line(devtag_get_device(machine,"pic8259_slave"),1,0);
+			}
+			break;
+		case TOWNS_CD_IRQ_DMA:
+			if(state != 0)
+			{
+				if(towns_cd.command & 0x40)
+				{
+					towns_cd.status |= 0x40;
+					if(towns_cd.dma_irq_enable)
+						pic8259_set_irq_line(devtag_get_device(machine,"pic8259_slave"),1,1);						
+				}
+			}
+			else
+			{
+				towns_cd.status &= ~0x40;
+				pic8259_set_irq_line(devtag_get_device(machine,"pic8259_slave"),1,0);
+			}
+			break;
+	}
+} 
+
 static TIMER_CALLBACK( towns_cdrom_read_byte )
 {
 	const device_config* device = ptr;
@@ -1239,11 +1282,7 @@ static TIMER_CALLBACK( towns_cdrom_read_byte )
 				towns_cd.cmd_status[1] = 0x00;
 				towns_cd.cmd_status[2] = 0x00;
 				towns_cd.cmd_status[3] = 0x00;
-				if(towns_cd.dma_irq_enable != 0)
-				{
-					towns_cd.status |= 0x40;  // IRQ from end of DMA
-					pic8259_set_irq_line(devtag_get_device(device->machine,"pic8259_slave"),1,0);
-				}
+				towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_DMA,1);
 				towns_cd.status |= 0x01;  // ready
 			}
 			else
@@ -1255,11 +1294,7 @@ static TIMER_CALLBACK( towns_cdrom_read_byte )
 				towns_cd.cmd_status[1] = 0x00;
 				towns_cd.cmd_status[2] = 0x00;
 				towns_cd.cmd_status[3] = 0x00;
-				if(towns_cd.dma_irq_enable != 0)
-				{
-					towns_cd.status |= 0x40;  // IRQ from end of DMA
-					pic8259_set_irq_line(devtag_get_device(device->machine,"pic8259_slave"),1,0);
-				}
+				towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_DMA,1);
 				cdrom_read_data(mess_cd_get_cdrom_file(devtag_get_device(device->machine,"cdrom")),++towns_cd.lba_current,towns_cd.buffer,CD_TRACK_MODE1);
 				timer_adjust_oneshot(towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
 				towns_cd.buffer_ptr = -1;
@@ -1294,11 +1329,7 @@ static void towns_cdrom_read(const device_config* device)
 		towns_cd.cmd_status[1] = 0x00;
 		towns_cd.cmd_status[2] = 0x00;
 		towns_cd.cmd_status[3] = 0x00;
-		if(towns_cd.mpu_irq_enable != 0)
-		{
-			towns_cd.status |= 0x80;  // IRQ from MPU
-			pic8259_set_irq_line(devtag_get_device(device->machine,"pic8259_slave"),1,1);
-		}
+		towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_MPU,1);
 	}
 	else
 	{
@@ -1313,11 +1344,7 @@ static void towns_cdrom_read(const device_config* device)
 		towns_cd.cmd_status[1] = 0x00;
 		towns_cd.cmd_status[2] = 0x00;
 		towns_cd.cmd_status[3] = 0x00;
-		if(towns_cd.mpu_irq_enable != 0)
-		{
-			towns_cd.status |= 0x80;  // IRQ from MPU
-			pic8259_set_irq_line(devtag_get_device(device->machine,"pic8259_slave"),1,1);
-		}
+		towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_MPU,1);
 	}
 	
 	// start read timer - assume single-speed currently
@@ -1340,6 +1367,7 @@ static void towns_cdrom_execute_command(const device_config* device)
 			towns_cd.cmd_status[1] = 0x00;
 			towns_cd.cmd_status[2] = 0x00;
 			towns_cd.cmd_status[3] = 0x00;
+			towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_MPU,1);
 		}
 	}
 	else
@@ -1356,8 +1384,7 @@ static void towns_cdrom_execute_command(const device_config* device)
 					towns_cd.cmd_status[1] = 0x00;
 					towns_cd.cmd_status[2] = 0x00;
 					towns_cd.cmd_status[3] = 0x00;
-					if(towns_cd.command & 0x40)
-						towns_cd.status |= 0x80;  // IRQ from MPU
+					towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_MPU,1);
 				}
 				logerror("CD: Command 0x00: SEEK\n");
 				break;
@@ -1374,8 +1401,7 @@ static void towns_cdrom_execute_command(const device_config* device)
 					towns_cd.cmd_status[1] = 0x00;
 					towns_cd.cmd_status[2] = 0x00;
 					towns_cd.cmd_status[3] = 0x00;
-					if(towns_cd.command & 0x40)
-						towns_cd.status |= 0x80;  // IRQ from MPU
+					towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_MPU,1);
 				break;
 			case 0x80:  // set state
 				if(towns_cd.command & 0x20)
@@ -1387,8 +1413,7 @@ static void towns_cdrom_execute_command(const device_config* device)
 					towns_cd.cmd_status[1] = 0x00;
 					towns_cd.cmd_status[2] = 0x00;
 					towns_cd.cmd_status[3] = 0x00;
-					if(towns_cd.command & 0x40)
-						towns_cd.status |= 0x80;  // IRQ from MPU
+					towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_MPU,1);
 				}
 				logerror("CD: Command 0x80: set state\n");
 				break;
@@ -1402,8 +1427,7 @@ static void towns_cdrom_execute_command(const device_config* device)
 					towns_cd.cmd_status[1] = 0x00;
 					towns_cd.cmd_status[2] = 0x00;
 					towns_cd.cmd_status[3] = 0x00;
-					if(towns_cd.command & 0x40)
-						towns_cd.status |= 0x80;  // IRQ from MPU
+					towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_MPU,1);
 				}
 				logerror("CD: Command 0x81: set state (CDDASET)\n");
 				break;
@@ -1415,6 +1439,7 @@ static void towns_cdrom_execute_command(const device_config* device)
 				towns_cd.cmd_status[1] = 0x00;
 				towns_cd.cmd_status[2] = 0x00;
 				towns_cd.cmd_status[3] = 0x00;
+				towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_MPU,1);
 				logerror("CD: Unknown or unimplemented command %02x\n",towns_cd.command);
 		}
 	}
@@ -1552,9 +1577,9 @@ static WRITE8_HANDLER(towns_cdrom_w)
 	{
 		case 0x00: // status
 			if(data & 0x80)
-				towns_cd.status &= ~0x80;
+				towns_cdrom_set_irq(space->machine,TOWNS_CD_IRQ_MPU,0);
 			if(data & 0x40)
-				towns_cd.status &= ~0x40;
+				towns_cdrom_set_irq(space->machine,TOWNS_CD_IRQ_DMA,0);
 			if(data & 0x04)
 				logerror("CD: sub MPU reset\n");
 			towns_cd.mpu_irq_enable = data & 0x02;
