@@ -540,7 +540,7 @@ static int x68k_read_mouse(running_machine *machine)
 	char val = 0;
 	char ipt = 0;
 
-	if(!(scc_get_reg_b(scc,5) & 0x02))
+	if(!(scc8530_get_reg_b(scc,5) & 0x02))
 		return 0xff;
 
 	switch(x68k_sys.mouse.inputtype)
@@ -562,11 +562,11 @@ static int x68k_read_mouse(running_machine *machine)
 	x68k_sys.mouse.inputtype++;
 	if(x68k_sys.mouse.inputtype > 2)
 	{
-		int val = scc_get_reg_b(scc, 0);
+		int val = scc8530_get_reg_b(scc, 0);
 		x68k_sys.mouse.inputtype = 0;
 		x68k_sys.mouse.bufferempty = 1;
 		val &= ~0x01;
-		scc_set_reg_b(scc, 0, val);
+		scc8530_set_reg_b(scc, 0, val);
 		logerror("SCC: mouse buffer empty\n");
 	}
 
@@ -586,13 +586,13 @@ static READ16_HANDLER( x68k_scc_r )
 	switch(offset)
 	{
 	case 0:
-		return scc_r(scc, 0);
+		return scc8530_r(scc, 0);
 	case 1:
 		return x68k_read_mouse(space->machine);
 	case 2:
-		return scc_r(scc, 1);
+		return scc8530_r(scc, 1);
 	case 3:
-		return scc_r(scc, 3);
+		return scc8530_r(scc, 3);
 	default:
 		return 0xff;
 	}
@@ -607,29 +607,29 @@ static WRITE16_HANDLER( x68k_scc_w )
 	switch(offset)
 	{
 	case 0:
-		scc_w(scc, 0,(UINT8)data);
-		if((scc_get_reg_b(scc, 5) & 0x02) != prev)
+		scc8530_w(scc, 0,(UINT8)data);
+		if((scc8530_get_reg_b(scc, 5) & 0x02) != prev)
 		{
-			if(scc_get_reg_b(scc, 5) & 0x02)  // Request to Send
+			if(scc8530_get_reg_b(scc, 5) & 0x02)  // Request to Send
 			{
-				int val = scc_get_reg_b(scc, 0);
+				int val = scc8530_get_reg_b(scc, 0);
 				x68k_sys.mouse.bufferempty = 0;
 				val |= 0x01;
-				scc_set_reg_b(scc, 0,val);
+				scc8530_set_reg_b(scc, 0,val);
 			}
 		}
 		break;
 	case 1:
-		scc_w(scc, 2,(UINT8)data);
+		scc8530_w(scc, 2,(UINT8)data);
 		break;
 	case 2:
-		scc_w(scc, 1,(UINT8)data);
+		scc8530_w(scc, 1,(UINT8)data);
 		break;
 	case 3:
-		scc_w(scc, 3,(UINT8)data);
+		scc8530_w(scc, 3,(UINT8)data);
 		break;
 	}
-	prev = scc_get_reg_b(scc, 5) & 0x02;
+	prev = scc8530_get_reg_b(scc, 5) & 0x02;
 }
 
 static TIMER_CALLBACK(x68k_scc_ack)
@@ -642,11 +642,11 @@ static TIMER_CALLBACK(x68k_scc_ack)
 //      return;
 
 	// hard-code the IRQ vector for now, until the SCC code is more complete
-	if((scc_get_reg_a(scc, 9) & 0x08) || (scc_get_reg_b(scc, 9) & 0x08))  // SCC reg WR9 is the same for both channels
+	if((scc8530_get_reg_a(scc, 9) & 0x08) || (scc8530_get_reg_b(scc, 9) & 0x08))  // SCC reg WR9 is the same for both channels
 	{
-		if((scc_get_reg_b(scc, 1) & 0x18) != 0)  // if bits 3 and 4 of WR1 are 0, then Rx IRQs are disabled on this channel
+		if((scc8530_get_reg_b(scc, 1) & 0x18) != 0)  // if bits 3 and 4 of WR1 are 0, then Rx IRQs are disabled on this channel
 		{
-			if(scc_get_reg_b(scc, 5) & 0x02)  // RTS signal
+			if(scc8530_get_reg_b(scc, 5) & 0x02)  // RTS signal
 			{
 				x68k_sys.mouse.irqactive = 1;
 				current_vector[5] = 0x54;

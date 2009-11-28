@@ -96,19 +96,19 @@ static void init_nes_core( running_machine *machine )
             memory for the bank 2 pointer */
 			if (nes_fds.data == NULL)
 				nes_fds.data = auto_alloc_array(machine, UINT8, 0x8000 );
-			memory_install_read8_handler(space, 0x4030, 0x403f, 0, 0, fds_r);
+			memory_install_read8_handler(space, 0x4030, 0x403f, 0, 0, nes_fds_r);
 			memory_install_read8_handler(space, 0x6000, 0xdfff, 0, 0, SMH_BANK(2));
 			memory_install_read8_handler(space, 0xe000, 0xffff, 0, 0, SMH_BANK(1));
 
-			memory_install_write8_handler(space, 0x4020, 0x402f, 0, 0, fds_w);
+			memory_install_write8_handler(space, 0x4020, 0x402f, 0, 0, nes_fds_w);
 			memory_install_write8_handler(space, 0x6000, 0xdfff, 0, 0, SMH_BANK(2));
 
 			memory_set_bankptr(machine, 1, &nes.rom[0xe000]);
 			memory_set_bankptr(machine, 2, nes_fds.data );
 			break;
 		case 50:
-			memory_install_write8_handler(space, 0x4020, 0x403f, 0, 0, mapper50_add_w);
-			memory_install_write8_handler(space, 0x40a0, 0x40bf, 0, 0, mapper50_add_w);
+			memory_install_write8_handler(space, 0x4020, 0x403f, 0, 0, nes_mapper50_add_w);
+			memory_install_write8_handler(space, 0x40a0, 0x40bf, 0, 0, nes_mapper50_add_w);
 		default:
 			nes.slow_banking = 0;
 			memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, SMH_BANK(5));
@@ -130,43 +130,44 @@ static void init_nes_core( running_machine *machine )
 	/* Set up the mapper callbacks */
 	if (nes.format == 1)
 	{
+		mmc_intf intf = { 0 };
 		const mmc *mapper;
 
 		mapper = nes_mapper_lookup(nes.mapper);
 		if (mapper)
 		{
-			mmc_write_low = mapper->mmc_write_low;
-			mmc_read_low = mapper->mmc_read_low;
-			mmc_write_mid = mapper->mmc_write_mid;
-			mmc_write = mapper->mmc_write;
+			intf.mmc_write_low = mapper->mmc_write_low;
+			intf.mmc_read_low = mapper->mmc_read_low;
+			intf.mmc_write_mid = mapper->mmc_write_mid;
+			intf.mmc_write = mapper->mmc_write;
+			nes_mapper_init(&intf);
 			ppu_latch = mapper->ppu_latch;
 		}
 		else
 		{
 			logerror("Mapper %d is not yet supported, defaulting to no mapper.\n",nes.mapper);
-			mmc_write_low = mmc_write_mid = mmc_write = NULL;
-			mmc_read_low = NULL;
-			ppu_latch = NULL;
+			nes_mapper_init(&intf);
 		}
 	}
 	else if (nes.format == 2)
 	{
+		mmc_intf intf = { 0 };
 		const unif *board;
 
 		board = nes_unif_lookup(nes.board);
 		if (board)
 		{
-			mmc_write_low = board->mmc_write_low;
-			mmc_read_low = board->mmc_read_low;
-			mmc_write_mid = board->mmc_write_mid;
-			mmc_write = board->mmc_write;
+			intf.mmc_write_low = board->mmc_write_low;
+			intf.mmc_read_low = board->mmc_read_low;
+			intf.mmc_write_mid = board->mmc_write_mid;
+			intf.mmc_write = board->mmc_write;
+			nes_mapper_init(&intf);
 			ppu_latch = board->ppu_latch;
 		}
 		else
 		{
 			logerror("Board %s is not yet supported, defaulting to no mapper.\n", nes.board);
-			mmc_write_low = mmc_write_mid = mmc_write = NULL;
-			mmc_read_low = NULL;
+			nes_mapper_init(&intf);
 			ppu_latch = NULL;
 		}
 	}
@@ -209,10 +210,10 @@ MACHINE_RESET( nes )
 
 	/* Reset the mapper variables. Will also mark the char-gen ram as dirty */
 	if (nes.format == 1)
-		mapper_reset(machine, nes.mapper);
+		nes_mapper_reset(machine, nes.mapper);
 
 	if (nes.format == 2)
-		unif_reset(machine, nes.board);
+		nes_unif_reset(machine, nes.board);
 
 	/* Reset the serial input ports */
 	in_0.shift = 0;

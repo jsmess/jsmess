@@ -345,7 +345,7 @@ static const cartslot_pcb_type *identify_pcb(const device_config *device)
 		else
 		{
 			if (me != MCERR_NOT_MULTICART)
-				fatalerror("multicart error: %s\n", mc_error_text(me));
+				fatalerror("multicart error: %s\n", multicart_error_text(me));
 			if (image_pcb(device) != NULL)
 			{
 				/* read from hash file */

@@ -287,7 +287,7 @@ static void create_grom_high2k(int first, int last)
         }
 }
 
-int is_99_8()
+int ti99_is_99_8()
 {
 	return ti99_model == model_99_8;
 }
@@ -540,7 +540,7 @@ MACHINE_RESET( ti99 )
 	}
 	/* Check whether we have locked the cartslot. This uses GROM, which the 4p doesn't have. */
 	if (ti99_model != model_99_4p)
-		lock_cartridge_slot(cartslots, (input_port_read(machine, "CFG") >> config_cartslot_bit) & config_cartslot_mask);
+		ti99_lock_cartridge_slot(cartslots, (input_port_read(machine, "CFG") >> config_cartslot_bit) & config_cartslot_mask);
 
 	switch (xRAM_kind)
 	{
@@ -675,7 +675,7 @@ INTERRUPT_GEN( ti99_4ev_hblank_interrupt )
     Backdoor function that is called by hsgpl, so that the machine code knows
     whether hsgpl or console GROMs are active
 */
-void set_hsgpl_crdena(int data)
+void ti99_set_hsgpl_crdena(int data)
 {
 	hsgpl_crdena = (data != 0);
 }
@@ -928,7 +928,7 @@ static UINT8 GROM_dataread(void)
 	{
 		/* Pass the (one and only) program counter for GROMs. The
            buffer is set and used in the cartridge chip. */
-		reply = cartridge_grom_read(cartslots, console_GROMs.addr-0x6000);
+		reply = ti99_cartridge_grom_read(cartslots, console_GROMs.addr-0x6000);
 	}
 	else
 	{
@@ -984,7 +984,7 @@ READ16_HANDLER ( ti99_grom_r )
     */
 
 	/* Activates a slot in the multi-cartridge extender. */
-	cartridge_slot_set(cartslots, (offset & 0x01fe)/2);
+	ti99_cartridge_slot_set(cartslots, (offset & 0x01fe)/2);
 
 	if (offset & 1)
 	{	/* Read GROM address
@@ -1035,7 +1035,7 @@ WRITE16_HANDLER ( ti99_grom_w )
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	/* Activates a slot in the multi-cartridge extender. */
-	cartridge_slot_set(cartslots, (offset & 0x01fe)/2);
+	ti99_cartridge_slot_set(cartslots, (offset & 0x01fe)/2);
 
 	// 1001 1wbb bbbb bbr0
 
@@ -1096,7 +1096,7 @@ static READ8_HANDLER ( ti99_grom_r8 )
 
 	/* Activates a slot in the multi-cartridge extender. */
 	// 1001 1wbb bbbb bbr0
-	cartridge_slot_set(cartslots, (offset & 0x03fc)/4);
+	ti99_cartridge_slot_set(cartslots, (offset & 0x03fc)/4);
 
 	if (offset & 2)
 	{
@@ -1128,7 +1128,7 @@ static WRITE8_HANDLER ( ti99_grom_w8 )
 	cpu_adjust_icount(space->machine->firstcpu,-4/*20+3*/);		/* from 4 to 23? */
 
 	/* Activates a slot in the multi-cartridge extender. */
-	cartridge_slot_set(cartslots, (offset & 0x03fc)/4);
+	ti99_cartridge_slot_set(cartslots, (offset & 0x03fc)/4);
 
 	if (offset & 2)
 	{

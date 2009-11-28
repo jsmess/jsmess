@@ -50,8 +50,6 @@
 #include "devices/messram.h"
 #include "sound/dmadac.h"
 
-UINT32 *se30_vram;
-
 /*
 	Apple Sound Chip
 
@@ -587,7 +585,7 @@ static ADDRESS_MAP_START(macse30_map, ADDRESS_SPACE_PROGRAM, 32)
 
 	AM_RANGE(0x50f40000, 0x50f41fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)	// mirror
 
-	AM_RANGE(0xfe000000, 0xfe00ffff) AM_RAM	AM_BASE(&se30_vram)
+	AM_RANGE(0xfe000000, 0xfe00ffff) AM_RAM	AM_BASE(&mac_se30_vram)
 	AM_RANGE(0xfeffe000, 0xfeffffff) AM_ROM AM_REGION("se30vrom", 0x0)
 ADDRESS_MAP_END
 

@@ -552,7 +552,7 @@ static const struct m6845_interface BBC6845 =
  * memory interface to BBC's 6845
  ************************************************************************/
 
-WRITE8_HANDLER ( BBC_6845_w )
+WRITE8_HANDLER ( bbc_6845_w )
 {
 	switch (offset&1)
 	{
@@ -568,7 +568,7 @@ WRITE8_HANDLER ( BBC_6845_w )
 	video_refresh=1;
 }
 
- READ8_HANDLER (BBC_6845_r)
+ READ8_HANDLER (bbc_6845_r)
 {
 	int retval=0;
 

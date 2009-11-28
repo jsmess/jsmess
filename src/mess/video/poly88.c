@@ -9,7 +9,7 @@
 #include "driver.h"
 #include "includes/poly88.h"
 
-UINT8* poly_video_ram;
+UINT8* poly88_video_ram;
 
 static UINT8 mcm6571a[] =
 {
@@ -192,7 +192,7 @@ VIDEO_UPDATE( poly88 )
 		xpos = 0;
 		for(x = 0; x < 64; x++ )
 		{
-			UINT8 code = poly_video_ram[addr + x];
+			UINT8 code = poly88_video_ram[addr + x];
 			if ((code & 0x80)==0) {
 				for(j = 0; j < 15; j++ )
 				{

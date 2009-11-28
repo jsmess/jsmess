@@ -108,10 +108,10 @@ static ADDRESS_MAP_START( bbca_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc00, 0xfdff) AM_NOP	/*    fc00-fdff                 FRED & JIM Pages                */
 
 																					/*    fe00-feff                 Shiela Address Page             */
-	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(BBC_6845_r    	, BBC_6845_w		)	/*    fe00-fe07  6845 CRTA      Video controller                */
+	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(bbc_6845_r    	, bbc_6845_w		)	/*    fe00-fe07  6845 CRTA      Video controller                */
 	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_stat_r, acia6850_ctrl_w)
 	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_data_r, acia6850_data_w)
-	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r		, BBC_SerialULA_w   )	/*    fe10-fe17  Serial ULA     Serial system chip              */
+	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r		, bbc_SerialULA_w   )	/*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe18, 0xfe1f) AM_NOP													/*    fe18-fe1f  INTOFF/STATID  1 ECONET Interrupt Off / ID No. */
 	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE	 (              	  bbc_videoULA_w    )	/* R: fe20-fe2f  INTON          1 ECONET Interrupt On           */
 																					/* W: fe20-fe2f  Video ULA      Video system chip               */
@@ -142,10 +142,10 @@ static ADDRESS_MAP_START( bbcb_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc00, 0xfdff) AM_READWRITE(bbc_opus_read     , bbc_opus_write	)	/*    fc00-fdff                 OPUS Disc Controller            */
 
 																					/*    fe00-feff                 Shiela Address Page             */
-	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(BBC_6845_r    	, BBC_6845_w     	)	/*    fe00-fe07  6845 CRTC      Video controller                */
+	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(bbc_6845_r    	, bbc_6845_w     	)	/*    fe00-fe07  6845 CRTC      Video controller                */
 	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_stat_r, acia6850_ctrl_w)
 	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_data_r, acia6850_data_w)
-	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r		, BBC_SerialULA_w   )	/*    fe10-fe17  Serial ULA     Serial system chip              */
+	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r		, bbc_SerialULA_w   )	/*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe18, 0xfe1f) AM_NOP													/*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
 	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE    (              	  bbc_videoULA_w    )	/* R: fe20-fe2f  INTON          ECONET Interrupt On             */
 																					/* W: fe20-fe2f  Video ULA      Video system chip               */
@@ -177,10 +177,10 @@ static ADDRESS_MAP_START( bbcbp_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc00, 0xfdff) AM_NOP	/*    fc00-fdff                 FRED & JIM Pages                */
 
 																					/*    fe00-feff                 Shiela Address Page             */
-	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(BBC_6845_r		, BBC_6845_w		)	/*    fe00-fe07  6845 CRTC      Video controller                */
+	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(bbc_6845_r		, bbc_6845_w		)	/*    fe00-fe07  6845 CRTC      Video controller                */
 	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_stat_r, acia6850_ctrl_w)
 	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_data_r, acia6850_data_w)
-	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r		, BBC_SerialULA_w   )	/*    fe10-fe17  Serial ULA     Serial system chip              */
+	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r		, bbc_SerialULA_w   )	/*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe18, 0xfe1f) AM_NOP													/*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
 	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE	 (bbc_videoULA_w						)	/* R: fe20-fe2f  INTON          ECONET Interrupt On             */
 																					/* W: fe20-fe2f  Video ULA      Video system chip               */
@@ -213,10 +213,10 @@ static ADDRESS_MAP_START( bbcbp128_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc00, 0xfdff) AM_NOP	/*    fc00-fdff                 FRED & JIM Pages                */
 
 																					/*    fe00-feff                 Shiela Address Page             */
-	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(BBC_6845_r		, BBC_6845_w		)	/*    fe00-fe07  6845 CRTC      Video controller                */
+	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(bbc_6845_r		, bbc_6845_w		)	/*    fe00-fe07  6845 CRTC      Video controller                */
 	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_stat_r, acia6850_ctrl_w)
 	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_data_r, acia6850_data_w)
-	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r		, BBC_SerialULA_w   )	/*    fe10-fe17  Serial ULA     Serial system chip              */
+	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r		, bbc_SerialULA_w   )	/*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe10, 0xfe17) AM_NOP													/*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe18, 0xfe1f) AM_NOP													/*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
 	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE	 (bbc_videoULA_w						)	/* R: fe20-fe2f  INTON          ECONET Interrupt On             */
@@ -278,7 +278,7 @@ static ADDRESS_MAP_START(bbcm_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE(0xfc00, 0xfdff) AM_READWRITE(SMH_BANK(2)        , SMH_ROM          )       fc00-fdff                   FRED & JIM Pages
 
                                                                                           fe00-feff                 Shiela Address Page
-    AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(BBC_6845_r        , BBC_6845_w        )         fe00-fe07  6845 CRTC      Video controller
+    AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(bbc_6845_r        , bbc_6845_w        )         fe00-fe07  6845 CRTC      Video controller
     AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_stat_r, acia6850_ctrl_w)
     AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_data_r, acia6850_data_w)
     AM_RANGE(0xfe10, 0xfe17) AM_NOP                                                       fe10-fe17  Serial ULA     Serial system chip
@@ -835,7 +835,7 @@ static MACHINE_DRIVER_START( bbca )
 	MDRV_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
 
 	/* devices */
-	MDRV_UPD7002_ADD("upd7002",BBC_uPD7002)
+	MDRV_UPD7002_ADD("upd7002", bbc_uPD7002)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
 
 	MDRV_I8271_ADD("i8271", bbc_i8271_interface)
@@ -933,7 +933,7 @@ static MACHINE_DRIVER_START( bbcm )
 	MDRV_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
 
 	/* devices */
-	MDRV_UPD7002_ADD("upd7002",BBC_uPD7002)
+	MDRV_UPD7002_ADD("upd7002", bbc_uPD7002)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
 

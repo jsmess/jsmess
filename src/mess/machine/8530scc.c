@@ -74,7 +74,7 @@ static DEVICE_START( scc8530 )
     scc_set_status
 -------------------------------------------------*/
 
-void scc_set_status(const device_config *device, int status)
+void scc8530_set_status(const device_config *device, int status)
 {
 	scc8530_t *scc = get_token(device);
 	scc->status = status;
@@ -172,10 +172,10 @@ static void scc_putbreg(const device_config *device, int data)
 
 
 /*-------------------------------------------------
-    scc_get_reg_a
+    scc8530_get_reg_a
 -------------------------------------------------*/
 
-UINT8 scc_get_reg_a(const device_config *device, int reg)
+UINT8 scc8530_get_reg_a(const device_config *device, int reg)
 {
 	scc8530_t *scc = get_token(device);
 	return scc->reg_val_a[reg];
@@ -184,10 +184,10 @@ UINT8 scc_get_reg_a(const device_config *device, int reg)
 
 
 /*-------------------------------------------------
-    scc_get_reg_b
+    scc8530_get_reg_b
 -------------------------------------------------*/
 
-UINT8 scc_get_reg_b(const device_config *device, int reg)
+UINT8 scc8530_get_reg_b(const device_config *device, int reg)
 {
 	scc8530_t *scc = get_token(device);
 	return scc->reg_val_b[reg];
@@ -196,10 +196,10 @@ UINT8 scc_get_reg_b(const device_config *device, int reg)
 
 
 /*-------------------------------------------------
-    scc_set_reg_a
+    scc8530_set_reg_a
 -------------------------------------------------*/
 
-void scc_set_reg_a(const device_config *device, int reg, UINT8 data)
+void scc8530_set_reg_a(const device_config *device, int reg, UINT8 data)
 {
 	scc8530_t *scc = get_token(device);
 	scc->reg_val_a[reg] = data;
@@ -208,10 +208,10 @@ void scc_set_reg_a(const device_config *device, int reg, UINT8 data)
 
 
 /*-------------------------------------------------
-    scc_set_reg_a
+    scc8530_set_reg_a
 -------------------------------------------------*/
 
-void scc_set_reg_b(const device_config *device, int reg, UINT8 data)
+void scc8530_set_reg_b(const device_config *device, int reg, UINT8 data)
 {
 	scc8530_t *scc = get_token(device);
 	scc->reg_val_b[reg] = data;
@@ -220,10 +220,10 @@ void scc_set_reg_b(const device_config *device, int reg, UINT8 data)
 
 
 /*-------------------------------------------------
-    scc_r
+    scc8530_r
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER(scc_r)
+READ8_DEVICE_HANDLER(scc8530_r)
 {
 	scc8530_t *scc = get_token(device);
 	UINT8 result = 0;
@@ -271,10 +271,10 @@ READ8_DEVICE_HANDLER(scc_r)
 
 
 /*-------------------------------------------------
-    scc_w
+    scc8530_w
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER(scc_w)
+WRITE8_DEVICE_HANDLER(scc8530_w)
 {
 	scc8530_t *scc = get_token(device);
 

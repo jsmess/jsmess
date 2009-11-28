@@ -20,16 +20,16 @@ static ADDRESS_MAP_START(poly88_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // System Expansion area
 	AM_RANGE(0x2000, 0x3fff) AM_RAM // Minimal user RAM area
 	AM_RANGE(0x4000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_BASE(&poly_video_ram) // Video RAM
+	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_BASE(&poly88_video_ram) // Video RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( poly88_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(poly_baud_rate_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(poly_intr_w)
-	AM_RANGE(0xf8, 0xf8) AM_READ(poly_keyboard_r)
+	AM_RANGE(0x04, 0x04) AM_WRITE(poly88_baud_rate_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(poly88_intr_w)
+	AM_RANGE(0xf8, 0xf8) AM_READ(poly88_keyboard_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(poly8813_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -37,7 +37,7 @@ static ADDRESS_MAP_START(poly8813_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM // Monitor ROM
 	AM_RANGE(0x0400, 0x0bff) AM_ROM // Disk System ROM
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM // System RAM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM AM_BASE(&poly_video_ram) // Video RAM
+	AM_RANGE(0x1800, 0x1bff) AM_RAM AM_BASE(&poly88_video_ram) // Video RAM
 	AM_RANGE(0x2000, 0xffff) AM_RAM // RAM
 ADDRESS_MAP_END
 

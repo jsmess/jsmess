@@ -435,7 +435,7 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 		if (me == MCERR_NONE)
 			result = pcb->assemble(pcbdev->machine, image);
 		else
-			fatalerror("Error loading multicart: %s\n", mc_error_text(me));
+			fatalerror("Error loading multicart: %s\n", multicart_error_text(me));
 	}
 	else
 	{

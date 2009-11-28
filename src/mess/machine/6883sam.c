@@ -148,7 +148,7 @@ static STATE_POSTLOAD( update_sam_postload )
 	update_sam(device);
 }
 
-void sam_set_state(const device_config *device, UINT16 state, UINT16 mask)
+void sam6883_set_state(const device_config *device, UINT16 state, UINT16 mask)
 {
 	sam6883_t *sam = get_safe_token(device);
 	sam->state &= ~mask;
@@ -184,7 +184,7 @@ WRITE8_DEVICE_HANDLER( sam6883_da_w )
 }
 #endif
 
-const UINT8 *sam_m6847_get_video_ram(const device_config *device,int scanline)
+const UINT8 *sam6883_videoram(const device_config *device,int scanline)
 {
 	sam6883_t *sam = get_safe_token(device);
 	const UINT8 *ram_base;
@@ -228,19 +228,19 @@ const UINT8 *sam_m6847_get_video_ram(const device_config *device,int scanline)
 	return &ram_base[video_position];
 }
 
-UINT8 get_sam_memorysize(const device_config *device)
+UINT8 sam6883_memorysize(const device_config *device)
 {
 	sam6883_t *sam = get_safe_token(device);
 	return (sam->state & 0x6000) / 0x2000;
 }
 
-UINT8 get_sam_pagemode(const device_config *device)
+UINT8 sam6883_pagemode(const device_config *device)
 {
 	sam6883_t *sam = get_safe_token(device);
 	return (sam->state & 0x0400) / 0x0400;
 }
 
-UINT8 get_sam_maptype(const device_config *device)
+UINT8 sam6883_maptype(const device_config *device)
 {
 	sam6883_t *sam = get_safe_token(device);
 	return (sam->state & 0x8000) / 0x8000;

@@ -1,6 +1,5 @@
 #include "driver.h"
 #include "includes/intv.h"
-#include "video/stic.h"
 
 #define FOREGROUND_BIT 0x0010
 
@@ -697,7 +696,7 @@ static void draw_borders(running_machine *machine, bitmap_t *bm)
 static int col_delay = 0;
 static int row_delay = 0;
 
-void stic_screenrefresh(running_machine *machine)
+void intv_stic_screenrefresh(running_machine *machine)
 {
 	int i;
 

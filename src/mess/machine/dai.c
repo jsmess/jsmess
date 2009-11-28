@@ -249,13 +249,13 @@ WRITE8_HANDLER( dai_io_discrete_devices_w )
 
 ***************************************************************************/
 
-READ8_HANDLER( amd9511_r )
+READ8_HANDLER( dai_amd9511_r )
 {
 	/* optional and no present at this moment */
 	return 0xff;
 }
 
-WRITE8_HANDLER( amd9511_w )
+WRITE8_HANDLER( dai_amd9511_w )
 {
 	logerror ("Writing to AMD9511 math chip, %04x, %02x\n", offset, data);
 }

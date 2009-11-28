@@ -22,19 +22,19 @@ static int CurrBorderColor = 0;
 static int LastDisplayedBorderColor = -1; /* Negative value indicates redraw */
 
 /* Force the border to be redrawn on the next frame */
-void force_border_redraw (void)
+void border_force_redraw (void)
 {
         LastDisplayedBorderColor = -1;
 }
 
 /* Set the last border colour to have been displayed. Used when loading snap
    shots and to record the last colour change in a frame that was skipped. */
-void set_last_border_color (int NewColor)
+void border_set_last_color (int NewColor)
 {
         CurrBorderColor = NewColor;
 }
 
-void draw_border(running_machine *machine, bitmap_t *bitmap,
+void border_draw(running_machine *machine, bitmap_t *bitmap,
 	int full_refresh,               /* Full refresh flag */
 	int TopBorderLines,             /* Border lines before actual screen */
 	int ScreenLines,                /* Screen height in pixels */

@@ -46,16 +46,16 @@ struct _scc8530_interface
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void scc_set_status(const device_config *device, int status);
+void scc8530_set_status(const device_config *device, int status);
 
-UINT8 scc_get_reg_a(const device_config *device, int reg);
-UINT8 scc_get_reg_b(const device_config *device, int reg);
-void scc_set_reg_a(const device_config *device, int reg, UINT8 data);
-void scc_set_reg_b(const device_config *device, int reg, UINT8 data);
+UINT8 scc8530_get_reg_a(const device_config *device, int reg);
+UINT8 scc8530_get_reg_b(const device_config *device, int reg);
+void scc8530_set_reg_a(const device_config *device, int reg, UINT8 data);
+void scc8530_set_reg_b(const device_config *device, int reg, UINT8 data);
 
 DEVICE_GET_INFO(scc8530);
 
-READ8_DEVICE_HANDLER(scc_r);
-WRITE8_DEVICE_HANDLER(scc_w);
+READ8_DEVICE_HANDLER(scc8530_r);
+WRITE8_DEVICE_HANDLER(scc8530_w);
 
 #endif /* __8530SCC_H__ */

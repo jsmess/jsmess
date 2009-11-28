@@ -24,8 +24,8 @@ MACHINE_RESET( dai );
 READ8_HANDLER( dai_io_discrete_devices_r );
 WRITE8_HANDLER( dai_io_discrete_devices_w );
 WRITE8_HANDLER( dai_stack_interrupt_circuit_w );
-READ8_HANDLER( amd9511_r );
-WRITE8_HANDLER( amd9511_w );
+READ8_HANDLER( dai_amd9511_r );
+WRITE8_HANDLER( dai_amd9511_w );
 extern UINT8 dai_noise_volume;
 extern UINT8 dai_osc_volume[3];
 

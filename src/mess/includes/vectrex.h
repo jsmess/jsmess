@@ -23,15 +23,15 @@ extern int vectrex_reset_refresh;
 
 TIMER_CALLBACK(vectrex_imager_eye);
 void vectrex_configuration(running_machine *machine);
-READ8_DEVICE_HANDLER (v_via_pa_r);
-READ8_DEVICE_HANDLER(v_via_pb_r );
-void v_via_irq (const device_config *device, int level);
+READ8_DEVICE_HANDLER (vectrex_via_pa_r);
+READ8_DEVICE_HANDLER(vectrex_via_pb_r );
+void vectrex_via_irq (const device_config *device, int level);
 WRITE8_HANDLER ( vectrex_psg_port_w );
 
 DRIVER_INIT( vectrex );
 
 /* for spectrum 1+ */
-READ8_DEVICE_HANDLER( s1_via_pb_r );
+READ8_DEVICE_HANDLER( vectrex_s1_via_pb_r );
 
 
 /*----------- defined in video/vectrex.c -----------*/

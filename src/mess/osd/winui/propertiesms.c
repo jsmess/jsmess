@@ -413,15 +413,15 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 		
 		// identify the current amount of RAM
 		this_ram_string = options_get_string(opts, OPTION_RAMSIZE);
-		current_ram = (this_ram_string != NULL) ? ram_parse_string(this_ram_string) : 0;
+		current_ram = (this_ram_string != NULL) ? messram_parse_string(this_ram_string) : 0;
 		if (current_ram == 0)
-			current_ram = ram_parse_string(config->default_size);
+			current_ram = messram_parse_string(config->default_size);
 
 		// by default, assume index 0
 		current_index = 0;
 
 		{
-			ram = ram_parse_string(config->default_size);
+			ram = messram_parse_string(config->default_size);
 			t_ramstring = tstring_from_utf8(config->default_size);
 			if( !t_ramstring )
 				return FALSE;
@@ -444,7 +444,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 			{				
 				i++;
 				// identify this option
-				ram = ram_parse_string(s);
+				ram = messram_parse_string(s);
 				this_ram_string = s;
 
 				t_ramstring = tstring_from_utf8(this_ram_string);

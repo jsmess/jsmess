@@ -108,14 +108,14 @@ static READ8_DEVICE_HANDLER( c64_cia0_port_a_r )
 {
 	UINT8 cia0portb = cia_get_output_b(devtag_get_device(device->machine, "cia_0"));
 
-	return common_cia0_port_a_r(device, cia0portb);
+	return cbm_common_cia0_port_a_r(device, cia0portb);
 }
 
 static READ8_DEVICE_HANDLER( c64_cia0_port_b_r )
 {
 	UINT8 cia0porta = cia_get_output_a(devtag_get_device(device->machine, "cia_0"));
 
-	return common_cia0_port_b_r(device, cia0porta);
+	return cbm_common_cia0_port_b_r(device, cia0porta);
 }
 
 static WRITE8_DEVICE_HANDLER( c64_cia0_port_b_w )

@@ -64,11 +64,11 @@ static WRITE8_DEVICE_HANDLER (v_via_cb2_w);
 
 const via6522_interface vectrex_via6522_interface =
 {
-	DEVCB_HANDLER(v_via_pa_r), DEVCB_HANDLER(v_via_pb_r),         /* read PA/B */
+	DEVCB_HANDLER(vectrex_via_pa_r), DEVCB_HANDLER(vectrex_via_pb_r),         /* read PA/B */
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,                     /* read ca1, cb1, ca2, cb2 */
 	DEVCB_HANDLER(v_via_pa_w), DEVCB_HANDLER(v_via_pb_w),         /* write PA/B */
 	DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(v_via_ca2_w), DEVCB_HANDLER(v_via_cb2_w), /* write ca1, cb1, ca2, cb2 */
-	DEVCB_LINE(v_via_irq),                      /* IRQ */
+	DEVCB_LINE(vectrex_via_irq),                      /* IRQ */
 };
 
 static int x_center, y_center, x_max, y_max;
@@ -474,9 +474,9 @@ static WRITE8_DEVICE_HANDLER(v_via_cb2_w)
 
 const via6522_interface spectrum1_via6522_interface =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(v_via_pa_r), DEVCB_HANDLER(s1_via_pb_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(vectrex_via_pa_r), DEVCB_HANDLER(vectrex_s1_via_pb_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(v_via_pa_w), DEVCB_HANDLER(v_via_pb_w), DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(v_via_ca2_w), DEVCB_HANDLER(v_via_cb2_w),
-	/*irq                      */ DEVCB_LINE(v_via_irq),
+	/*irq                      */ DEVCB_LINE(vectrex_via_irq),
 };
 
 

@@ -1,6 +1,14 @@
 #ifndef __MMC_H
 #define __MMC_H
 
+typedef struct __mmc_intf
+{
+	write8_space_func mmc_write_low; /* $4100-$5fff write routine */
+	read8_space_func mmc_read_low; /* $4100-$5fff read routine */
+	write8_space_func mmc_write_mid; /* $6000-$7fff write routine */
+	write8_space_func mmc_write; /* $8000-$ffff write routine */
+} mmc_intf;
+
 typedef struct __mmc
 {
 	int iNesMapper; /* iNES Mapper # */
@@ -40,21 +48,16 @@ typedef struct __unif
 
 const unif *nes_unif_lookup(const char *board);
 
-extern int MMC1_extended; /* 0 = normal MMC1 cart, 1 = 512k MMC1, 2 = 1024k MMC1 */
+//extern int MMC1_extended; /* 0 = normal MMC1 cart, 1 = 512k MMC1, 2 = 1024k MMC1 */
 
 #define MMC5_VRAM
 
-extern UINT8 MMC5_vram[0x400];
-extern int MMC5_vram_control;
+extern UINT8 nes_mmc5_vram[0x400];
+extern int nes_mmc5_vram_control;
 
-extern write8_space_func mmc_write_low;
-extern read8_space_func mmc_read_low;
-extern write8_space_func mmc_write_mid;
-extern read8_space_func mmc_read_mid;
-extern write8_space_func mmc_write;
-
-int mapper_reset( running_machine *machine, int mapperNum );
-int unif_reset( running_machine *machine, const char *board );
+void nes_mapper_init( const mmc_intf *intf );
+int nes_mapper_reset( running_machine *machine, int mapperNum );
+int nes_unif_reset( running_machine *machine, const char *board );
 
 WRITE8_HANDLER( nes_low_mapper_w );
 READ8_HANDLER( nes_low_mapper_r );
@@ -66,9 +69,9 @@ READ8_HANDLER( nes_chr_r );
 WRITE8_HANDLER( nes_nt_w );
 READ8_HANDLER( nes_nt_r );
 
-READ8_HANDLER( fds_r );
-WRITE8_HANDLER( fds_w );
-WRITE8_HANDLER( mapper50_add_w );
+READ8_HANDLER( nes_fds_r );
+WRITE8_HANDLER( nes_fds_w );
+WRITE8_HANDLER( nes_mapper50_add_w );
 
 //TEMPORARY PPU STUFF
 

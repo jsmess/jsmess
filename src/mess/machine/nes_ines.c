@@ -386,7 +386,7 @@ static READ8_HANDLER( mapper5_l_r )
 	/* $5c00 - $5fff: extended videoram attributes */
 	if ((offset >= 0x1b00) && (offset <= 0x1eff))
 	{
-		return MMC5_vram[offset - 0x1b00];
+		return nes_mmc5_vram[offset - 0x1b00];
 	}
 
 	switch (offset)
@@ -442,7 +442,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 	if ((offset >= 0x1b00) && (offset <= 0x1eff))
 	{
 		if (MMC5_vram_protect == 0x03)
-			MMC5_vram[offset - 0x1b00] = data;
+			nes_mmc5_vram[offset - 0x1b00] = data;
 		return;
 	}
 
@@ -474,7 +474,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 			break;
 
 		case 0x1004: /* $5104 - Extra VRAM (EXRAM) control */
-			MMC5_vram_control = data;
+			nes_mmc5_vram_control = data;
 			LOG_MMC(("MMC5 exram control: %02x\n", data));
 			break;
 
@@ -1862,7 +1862,7 @@ static void fds_irq( const device_config *device, int scanline, int vblank, int 
 	}
 }
 
-READ8_HANDLER( fds_r )
+READ8_HANDLER( nes_fds_r )
 {
 	UINT8 ret = 0x00;
 	LOG_MMC(("fds_r, offset: %04x\n", offset));
@@ -1914,7 +1914,7 @@ READ8_HANDLER( fds_r )
 	return ret;
 }
 
-WRITE8_HANDLER( fds_w )
+WRITE8_HANDLER( nes_fds_w )
 {
 	LOG_MMC(("fds_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -3207,10 +3207,10 @@ static WRITE8_HANDLER( mapper50_l_w )
 }
 
 /* This goes to 0x4020-0x403f */
-WRITE8_HANDLER( mapper50_add_w )
+WRITE8_HANDLER( nes_mapper50_add_w )
 {
 	UINT8 prg;
-	LOG_MMC(("mapper50_add_w, offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("nes_mapper50_add_w, offset: %04x, data: %02x\n", offset, data));
 
 	prg = (data & 0x08) | ((data & 0x06) >> 1) | ((data & 0x01) << 2);
 	prg8_cd(space->machine, prg);

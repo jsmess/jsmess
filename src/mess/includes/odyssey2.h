@@ -41,8 +41,8 @@ WRITE8_HANDLER ( odyssey2_lum_w );
 
 STREAM_UPDATE( odyssey2_sh_update );
 
-void ef9341_w( int command, int b, UINT8 data );
-UINT8 ef9341_r( int command, int b );
+void odyssey2_ef9341_w( int command, int b, UINT8 data );
+UINT8 odyssey2_ef9341_r( int command, int b );
 
 #define SOUND_ODYSSEY2		DEVICE_GET_INFO_NAME( odyssey2_sound )
 
@@ -67,7 +67,7 @@ READ8_HANDLER( odyssey2_getbus );
 WRITE8_HANDLER ( odyssey2_putbus );
 
 READ8_HANDLER( odyssey2_t0_r );
-void the_voice_lrq_callback( const device_config *device, int state );
+void odyssey2_the_voice_lrq_callback( const device_config *device, int state );
 
 READ8_HANDLER ( g7400_bus_r );
 WRITE8_HANDLER ( g7400_bus_w );

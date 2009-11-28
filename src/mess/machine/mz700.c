@@ -115,7 +115,7 @@ MACHINE_START( mz700 )
 	mz->ppi = devtag_get_device(machine, "ppi8255");
 
 	/* reset memory map to defaults */
-	mz_bank_4_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0);
+	mz700_bank_4_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0);
 }
 
 
@@ -221,7 +221,7 @@ READ8_HANDLER( mz800_bank_1_r )
 	return 0xff;
 }
 
-WRITE8_HANDLER( mz_bank_1_w )
+WRITE8_HANDLER( mz700_bank_1_w )
 {
 	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mz_state *mz = space->machine->driver_data;
@@ -248,7 +248,7 @@ WRITE8_HANDLER( mz_bank_1_w )
 	}
 }
 
-WRITE8_HANDLER( mz_bank_2_w )
+WRITE8_HANDLER( mz700_bank_2_w )
 {
 	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -256,7 +256,7 @@ WRITE8_HANDLER( mz_bank_2_w )
 	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "monitor"));
 }
 
-WRITE8_HANDLER( mz_bank_3_w )
+WRITE8_HANDLER( mz700_bank_3_w )
 {
 	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mz_state *mz = space->machine->driver_data;
@@ -304,7 +304,7 @@ WRITE8_HANDLER( mz_bank_3_w )
 	}
 }
 
-WRITE8_HANDLER( mz_bank_4_w )
+WRITE8_HANDLER( mz700_bank_4_w )
 {
 	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mz_state *mz = space->machine->driver_data;
@@ -312,8 +312,8 @@ WRITE8_HANDLER( mz_bank_4_w )
 	if (mz->mz700_mode)
 	{
 		mz->mz700_ram_lock = FALSE;		/* reset lock */
-		mz_bank_2_w(space, 0, 0);	/* switch in monitor rom */
-		mz_bank_3_w(space, 0, 0);	/* switch in videoram, colorram, and mmio */
+		mz700_bank_2_w(space, 0, 0);	/* switch in monitor rom */
+		mz700_bank_3_w(space, 0, 0);	/* switch in videoram, colorram, and mmio */
 
 		/* rest is ram is always ram in mz700 mode */
 		memory_install_readwrite8_handler(spc, 0x1000, 0xcfff, 0, 0, SMH_BANK(2), SMH_BANK(2));
@@ -359,7 +359,7 @@ WRITE8_HANDLER( mz_bank_4_w )
 	}
 }
 
-WRITE8_HANDLER( mz_bank_5_w )
+WRITE8_HANDLER( mz700_bank_5_w )
 {
 	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mz_state *mz = space->machine->driver_data;
@@ -378,7 +378,7 @@ WRITE8_HANDLER( mz_bank_5_w )
 	}
 }
 
-WRITE8_HANDLER( mz_bank_6_w )
+WRITE8_HANDLER( mz700_bank_6_w )
 {
 	mz_state *mz = space->machine->driver_data;
 
@@ -388,9 +388,9 @@ WRITE8_HANDLER( mz_bank_6_w )
 
 		/* restore access */
 		if (mz->mz700_ram_vram)
-			mz_bank_3_w(space, 0, 0);
+			mz700_bank_3_w(space, 0, 0);
 		else
-			mz_bank_1_w(space, 0, 0);
+			mz700_bank_1_w(space, 0, 0);
 	}
 	else
 	{
@@ -398,9 +398,9 @@ WRITE8_HANDLER( mz_bank_6_w )
 
 		/* restore access from 0xe000 to 0xffff */
 		if (mz->mz800_ram_monitor)
-			mz_bank_3_w(space, 0, 0);
+			mz700_bank_3_w(space, 0, 0);
 		else
-			mz_bank_1_w(space, 0, 0);
+			mz700_bank_1_w(space, 0, 0);
 	}
 }
 
@@ -654,7 +654,7 @@ WRITE8_HANDLER( mz800_display_mode_w )
 //  {
 //      logerror("mz800_display_mode_w: switching mode to %s\n", (BIT(data, 3) ? "mz700" : "mz800"));
 //      mz->mz700_mode = BIT(data, 3);
-//      mz_bank_4_w(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0);
+//      mz700_bank_4_w(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0);
 //  }
 }
 

@@ -52,11 +52,11 @@ INLINE messram_state *get_safe_token(const device_config *device)
 *****************************************************************************/
 
 /*-------------------------------------------------
-    parse_string - convert a ram string to an
+    messram_parse_string - convert a ram string to an
     integer value
 -------------------------------------------------*/
 
-UINT32 ram_parse_string(const char *s)
+UINT32 messram_parse_string(const char *s)
 {
 	UINT32 ram;
 	char suffix = '\0';
@@ -88,7 +88,8 @@ UINT32 ram_parse_string(const char *s)
 	return ram;
 }
 
-const char *ram_string(char *buffer, UINT32 ram)
+#ifdef UNUSED_FUNCTION
+const char *messram_string(char *buffer, UINT32 ram)
 {
 	const char *suffix;
 
@@ -109,6 +110,7 @@ const char *ram_string(char *buffer, UINT32 ram)
 	sprintf(buffer, "%u%s", ram, suffix);
 	return buffer;
 }
+#endif
 
 
 /*****************************************************************************
@@ -126,12 +128,12 @@ static DEVICE_START( messram )
 		const char *ramsize_string = options_get_string(mame_options(), OPTION_RAMSIZE);
 
 		if ((ramsize_string != NULL) && (ramsize_string[0] != '\0'))
-			messram->size = ram_parse_string(ramsize_string);
+			messram->size = messram_parse_string(ramsize_string);
 	}
 
 	/* if we didn't get a size yet, use the default */
 	if (messram->size == 0)
-		messram->size = ram_parse_string(config->default_size);
+		messram->size = messram_parse_string(config->default_size);
 
 	/* allocate space for the ram */
 	messram->ram = auto_alloc_array(device->machine, UINT8, messram->size);
@@ -154,7 +156,7 @@ static DEVICE_VALIDITY_CHECK( messram )
 	const char *gamename_option = NULL;
 
 	/* verify default ram value */
-	if (config!=NULL && ram_parse_string(config->default_size) == 0)
+	if (config!=NULL && messram_parse_string(config->default_size) == 0)
 	{
 		mame_printf_error("%s: '%s' has an invalid default RAM option: %s\n", driver->source_file, driver->name, config->default_size);
 		error = TRUE;
@@ -170,7 +172,7 @@ static DEVICE_VALIDITY_CHECK( messram )
 
 		if ((ramsize_string != NULL) && (ramsize_string[0] != '\0'))
 		{
-			specified_ram = ram_parse_string(ramsize_string);
+			specified_ram = messram_parse_string(ramsize_string);
 
 			if (specified_ram == 0)
 			{
@@ -180,7 +182,7 @@ static DEVICE_VALIDITY_CHECK( messram )
 			if (gamename_option!=NULL && strlen(gamename_option) > 0 && strcmp(gamename_option, driver->name) == 0)
 			{							
 				/* compare command line option to default value */
-				if (ram_parse_string(config->default_size) == specified_ram)
+				if (messram_parse_string(config->default_size) == specified_ram)
 					is_valid = TRUE;
 
 				/* verify extra ram options */
@@ -197,7 +199,7 @@ static DEVICE_VALIDITY_CHECK( messram )
 					/* try to parse each option */
 					while(*s != '\0')
 					{
-						UINT32 option_ram_size = ram_parse_string(s);
+						UINT32 option_ram_size = messram_parse_string(s);
 
 						if (option_ram_size == 0)
 						{
@@ -289,6 +291,7 @@ UINT8 *messram_get_ptr(const device_config *device)
 }
 
 
+#ifdef UNUSED_FUNCTION
 void messram_dump(const device_config *device, const char *filename)
 {
 	messram_state *messram = get_safe_token(device);
@@ -310,3 +313,4 @@ void messram_dump(const device_config *device, const char *filename)
 		mame_fclose(file);
 	}
 }
+#endif

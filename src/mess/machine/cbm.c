@@ -178,7 +178,7 @@ components (to select/read additional keyboard lines) */
  * irq to irq connected
  */
 
-UINT8 common_cia0_port_a_r( const device_config *device, UINT8 output_b )
+UINT8 cbm_common_cia0_port_a_r( const device_config *device, UINT8 output_b )
 {
 	UINT8 value = 0xff;
 
@@ -302,7 +302,7 @@ UINT8 common_cia0_port_a_r( const device_config *device, UINT8 output_b )
 	return value;
 }
 
-UINT8 common_cia0_port_b_r( const device_config *device, UINT8 output_a )
+UINT8 cbm_common_cia0_port_b_r( const device_config *device, UINT8 output_a )
 {
 	UINT8 value = 0xff;
 

@@ -1445,7 +1445,7 @@ MACHINE_RESET( sms )
 	}
 
 	if (sms_state.cartridge[sms_state.current_cartridge].features & CF_GG_SMS_MODE)
-		sms_set_ggsmsmode(smsvdp, 1);
+		sms_vdp_set_ggsmsmode(smsvdp, 1);
 
 	/* Initialize SIO stuff for GG */
 	sms_state.gg_sio[0] = 0x7f;
@@ -1633,7 +1633,7 @@ VIDEO_UPDATE( sms1 )
 
 	if (screen == main_scr)
 	{
-		smsvdp_update(smsvdp, bitmap, cliprect);
+		sms_vdp_update(smsvdp, bitmap, cliprect);
 	}
 	else if (screen == left_lcd)
 	{
@@ -1644,7 +1644,7 @@ VIDEO_UPDATE( sms1 )
 		if (segascope)
 		{
 			if (sms_state.sscope_state & 0x01)  /* 1 = left screen ON, right screen OFF */
-				smsvdp_update(smsvdp, bitmap, cliprect);
+				sms_vdp_update(smsvdp, bitmap, cliprect);
 			else                                /* 0 = left screen OFF, right screen ON */
 			{
 				for (y = 0; y < height; y++)
@@ -1674,7 +1674,7 @@ VIDEO_UPDATE( sms1 )
 						*BITMAP_ADDR32(bitmap, y, x) = MAKE_RGB(0,0,0);
 			}
 			else                                /* 0 = left screen OFF, right screen ON */
-				smsvdp_update(smsvdp, bitmap, cliprect);
+				sms_vdp_update(smsvdp, bitmap, cliprect);
 		}
 		else	/* We only use the third screen for SegaScope, if it not selected return a black screen */
 		{
@@ -1690,7 +1690,7 @@ VIDEO_UPDATE( sms1 )
 VIDEO_UPDATE( sms )
 {
 	const device_config *smsvdp = devtag_get_device(screen->machine, "sms_vdp");
-	smsvdp_update(smsvdp, bitmap, cliprect);
+	sms_vdp_update(smsvdp, bitmap, cliprect);
 
 	return 0;
 }

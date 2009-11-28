@@ -1045,7 +1045,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 		case 0x3A:	/* C03A - SCCBDATA */
 		case 0x3B:	/* C03B - SCCADATA */
 			scc = devtag_get_device(space->machine, "scc");
-			result = scc_r(scc, offset & 0x03);
+			result = scc8530_r(scc, offset & 0x03);
 			break;
 
 		case 0x3C:	/* C03C - SOUNDCTL */
@@ -1185,7 +1185,7 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 		case 0x3A:	/* C03A - SCCBDATA */
 		case 0x3B:	/* C03B - SCCADATA */
 			scc = devtag_get_device(space->machine, "scc");
-			scc_w(scc, offset & 0x03, data);
+			scc8530_w(scc, offset & 0x03, data);
 			break;
 
 		case 0x3C:	/* C03C - SOUNDCTL */

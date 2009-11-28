@@ -79,7 +79,7 @@ static void coco_field_sync_callback(running_machine *machine, int data)
 static const UINT8 *get_video_ram_coco(running_machine *machine,int scanline)
 {
 	coco_state *state = machine->driver_data;
-	return sam_m6847_get_video_ram(state->sam, scanline);
+	return sam6883_videoram(state->sam, scanline);
 }
 
 static void internal_video_start_coco(running_machine *machine, m6847_type type)

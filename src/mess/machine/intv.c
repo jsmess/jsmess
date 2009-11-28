@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "video/stic.h"
 #include "includes/intv.h"
 #include "cpu/cp1610/cp1610.h"
 #include "image.h"
@@ -501,7 +500,7 @@ INTERRUPT_GEN( intv_interrupt )
 	cputag_set_input_line(device->machine, "maincpu", CP1610_INT_INTRM, ASSERT_LINE);
 	sr1_int_pending = 1;
 	timer_set(device->machine, cputag_clocks_to_attotime(device->machine, "maincpu", 3791), NULL, 0, intv_interrupt_complete);
-	stic_screenrefresh(device->machine);
+	intv_stic_screenrefresh(device->machine);
 }
 
 static const UINT8 controller_table[] =

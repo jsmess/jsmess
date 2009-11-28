@@ -889,7 +889,7 @@ static MACHINE_DRIVER_START( amstrad )
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_PALETTE_INIT(amstrad_cpc)
 
-	MDRV_MC6845_ADD( "mc6845", MC6845, XTAL_16MHz / 16, mc6845_amstrad_intf )
+	MDRV_MC6845_ADD( "mc6845", MC6845, XTAL_16MHz / 16, amstrad_mc6845_intf )
 
 	MDRV_VIDEO_START(amstrad)
 	MDRV_VIDEO_UPDATE(amstrad)
@@ -951,7 +951,7 @@ static MACHINE_DRIVER_START( cpcplus )
 	MDRV_PALETTE_LENGTH(4096)
 	MDRV_PALETTE_INIT(amstrad_plus)
 
-	MDRV_MC6845_ADD( "mc6845", MC6845, XTAL_40MHz / 40, mc6845_amstrad_plus_intf )
+	MDRV_MC6845_ADD( "mc6845", MC6845, XTAL_40MHz / 40, amstrad_plus_mc6845_intf )
 
 	MDRV_VIDEO_START(amstrad)
 	MDRV_VIDEO_UPDATE(amstrad)
@@ -1007,7 +1007,7 @@ static MACHINE_DRIVER_START( gx4000 )
 	MDRV_PALETTE_LENGTH(4096)
 	MDRV_PALETTE_INIT(amstrad_plus)
 
-	MDRV_MC6845_ADD( "mc6845", MC6845, XTAL_40MHz / 40, mc6845_amstrad_plus_intf )
+	MDRV_MC6845_ADD( "mc6845", MC6845, XTAL_40MHz / 40, amstrad_plus_mc6845_intf )
 
 	MDRV_VIDEO_START(amstrad)
 	MDRV_VIDEO_UPDATE(amstrad)

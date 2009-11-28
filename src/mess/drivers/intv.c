@@ -34,7 +34,6 @@
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/cp1610/cp1610.h"
-#include "video/stic.h"
 #include "includes/intv.h"
 #include "devices/cartslot.h"
 #include "sound/ay8910.h"
@@ -342,7 +341,7 @@ static INPUT_PORTS_START( intvkbd )
 INPUT_PORTS_END
 
 static ADDRESS_MAP_START( intv_mem , ADDRESS_SPACE_PROGRAM, 16)
-	AM_RANGE(0x0000, 0x003f) AM_READWRITE( stic_r, stic_w )
+	AM_RANGE(0x0000, 0x003f) AM_READWRITE( intv_stic_r, intv_stic_w )
 	AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
 	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE("ay8910", AY8914_directread_port_0_lsb_r, AY8914_directwrite_port_0_lsb_w )
  	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )
@@ -353,7 +352,7 @@ static ADDRESS_MAP_START( intv_mem , ADDRESS_SPACE_PROGRAM, 16)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( intvkbd_mem , ADDRESS_SPACE_PROGRAM, 16)
-	AM_RANGE(0x0000, 0x003f) AM_READWRITE( stic_r, stic_w )
+	AM_RANGE(0x0000, 0x003f) AM_READWRITE( intv_stic_r, intv_stic_w )
 	AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
 	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE("ay8910", AY8914_directread_port_0_lsb_r, AY8914_directwrite_port_0_lsb_w )
  	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )

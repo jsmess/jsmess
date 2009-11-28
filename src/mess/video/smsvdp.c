@@ -250,7 +250,7 @@ WRITE8_DEVICE_HANDLER( sms_vdp_hcount_latch_w )
 }
 
 
-void sms_set_ggsmsmode( const device_config *device, int mode )
+void sms_vdp_set_ggsmsmode( const device_config *device, int mode )
 {
 	smsvdp_t *smsvdp = get_safe_token(device);
 
@@ -1336,7 +1336,7 @@ static void sms_update_palette( smsvdp_t *smsvdp )
 }
 
 
-UINT32 smsvdp_update( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect )
+UINT32 sms_vdp_update( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	smsvdp_t *smsvdp = get_safe_token(device);
 	const device_config *screen = video_screen_first(device->machine->config);

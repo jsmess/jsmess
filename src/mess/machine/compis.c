@@ -981,7 +981,7 @@ static void update_dma_control(running_machine *machine, int which, int new_cont
  *************************************/
 
 
-READ16_HANDLER( i186_internal_port_r )
+READ16_HANDLER( compis_i186_internal_port_r )
 {
 	int temp, which;
 
@@ -1163,7 +1163,7 @@ READ16_HANDLER( i186_internal_port_r )
  *
  *************************************/
 
-WRITE16_HANDLER( i186_internal_port_w )
+WRITE16_HANDLER( compis_i186_internal_port_w )
 {
 	int temp, which, data16 = data;
 
@@ -1385,14 +1385,14 @@ WRITE16_HANDLER( i186_internal_port_w )
 			temp = (data16 & 0x0fff) << 8;
 			if (data16 & 0x1000)
 			{
-				memory_install_read16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), temp, temp + 0xff, 0, 0, i186_internal_port_r);
-				memory_install_write16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), temp, temp + 0xff, 0, 0, i186_internal_port_w);
+				memory_install_read16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), temp, temp + 0xff, 0, 0, compis_i186_internal_port_r);
+				memory_install_write16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), temp, temp + 0xff, 0, 0, compis_i186_internal_port_w);
 			}
 			else
 			{
 				temp &= 0xffff;
-				memory_install_read16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, i186_internal_port_r);
-				memory_install_write16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, i186_internal_port_w);
+				memory_install_read16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, compis_i186_internal_port_r);
+				memory_install_write16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, compis_i186_internal_port_w);
 			}
 /*          popmessage("Sound CPU reset");*/
 			break;

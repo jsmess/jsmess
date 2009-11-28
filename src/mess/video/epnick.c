@@ -154,7 +154,7 @@ the NICK_GET_RED8, NICK_GET_GREEN8, NICK_GET_BLUE8 macros
 return a 8-bit colour value for the index specified.  */
 
 /* initial the palette */
-PALETTE_INIT( nick )
+PALETTE_INIT( epnick )
 {
 	int i;
 
@@ -961,8 +961,8 @@ static int	Nick_vh_start(void)
   return 0;
 }
 
-#if 0
-int	Nick_reg_r(int RegIndex)
+#ifdef UNUSED_FUNCTION
+READ8_HANDLER( nick_reg_r )
 {
   /* read from a nick register - return floating bus,
    because the registers are not readable! */
@@ -970,7 +970,7 @@ int	Nick_reg_r(int RegIndex)
 }
 #endif
 
-WRITE8_HANDLER( Nick_reg_w )
+WRITE8_HANDLER( epnick_reg_w )
 {
 	//mame_printf_info("Nick write %02x %02x\r\n",offset, data);
 
@@ -1026,14 +1026,14 @@ static void    Nick_DoScreen(running_machine *machine,bitmap_t *bm)
 }
 
 
-VIDEO_START( nick )
+VIDEO_START( epnick )
 {
 	Nick_vh_start();
 	VIDEO_START_CALL(generic_bitmapped);
 }
 
 
-VIDEO_UPDATE( nick )
+VIDEO_UPDATE( epnick )
 {
 	Nick_DoScreen(screen->machine,tmpbitmap);
 	return VIDEO_UPDATE_CALL(generic_bitmapped);

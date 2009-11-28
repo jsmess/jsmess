@@ -641,7 +641,7 @@ static void pak_load_trailer(running_machine *machine, const pak_decodedtrailer 
      * access that bit or or whether it is something else.  So that is why
      * I am specifying 0x7fff instead of 0xffff here
      */
-	sam_set_state(state->sam, trailer->sam, 0x7fff);
+	sam6883_set_state(state->sam, trailer->sam, 0x7fff);
 }
 
 static int generic_pak_load(const device_config *image, int rambase_index, int rombase_index, int pakbase_index)
@@ -1763,7 +1763,7 @@ static WRITE_LINE_DEVICE_HANDLER( dgnalpha_fdc_drq_w )
 }
 
 /* The Dragon Alpha hardware reverses the order of the WD2797 registers */
-READ8_HANDLER(wd2797_r)
+READ8_HANDLER(dgnalpha_wd2797_r)
 {
 	const device_config *fdc = devtag_get_device(space->machine, "wd2797");
 	int result = 0;
@@ -1789,7 +1789,7 @@ READ8_HANDLER(wd2797_r)
 	return result;
 }
 
-WRITE8_HANDLER(wd2797_w)
+WRITE8_HANDLER(dgnalpha_wd2797_w)
 {
 	const device_config *fdc = devtag_get_device(space->machine, "wd2797");
     switch(offset & 0x3)
@@ -1812,12 +1812,12 @@ WRITE8_HANDLER(wd2797_w)
 	};
 }
 
-READ8_HANDLER(alpha_modem_r)
+READ8_HANDLER(dgnalpha_modem_r)
 {
 	return 0xFF;
 }
 
-WRITE8_HANDLER(alpha_modem_w)
+WRITE8_HANDLER(dgnalpha_modem_w)
 {
 }
 
@@ -1906,7 +1906,7 @@ static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco2 )
 */
 
 /* The read handler will eventually return the 6845 status */
-READ8_HANDLER ( plus_reg_r )
+READ8_HANDLER ( dgnplus_reg_r )
 {
 	return 0;
 }
@@ -1924,7 +1924,7 @@ READ8_HANDLER ( plus_reg_r )
         1,1 Undefined. I will assume that it's the same as 00.
     3-7     Unused.
 */
-WRITE8_HANDLER ( plus_reg_w )
+WRITE8_HANDLER ( dgnplus_reg_w )
 {
 	int map;
 
@@ -1977,7 +1977,7 @@ static SAM6883_SET_MPU_RATE( d_sam_set_mpurate )
     cpu_set_clockscale(cputag_get_cpu(device->machine, "maincpu"), val ? 2 : 1);
 }
 
-READ8_HANDLER(dragon_alpha_mapped_irq_r)
+READ8_HANDLER(dgnalpha_mapped_irq_r)
 {
 	return bas_rom_bank[0x3ff0 + offset];
 }
@@ -2036,9 +2036,9 @@ static void setup_memory_map(running_machine *machine)
 	/* We need to init these vars from the sam, as this may be called from outside the sam callbacks */
 	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	coco_state *state = machine->driver_data;
-	UINT8 memsize	= get_sam_memorysize(state->sam);
-	UINT8 maptype	= get_sam_maptype(state->sam);
-//  UINT8 pagemode  = get_sam_pagemode(machine);
+	UINT8 memsize	= sam6883_memorysize(state->sam);
+	UINT8 maptype	= sam6883_maptype(state->sam);
+	//UINT8 pagemode  = sam6883_pagemode(machine);
 	int 		last_ram_block;		/* Last block that will be RAM, dependent on maptype */
 	int 		block_index;		/* Index of block being processed */
 	int	 	wbank;			/* bank no to go in this block */
@@ -2116,7 +2116,7 @@ static SAM6883_SET_PAGE_ONE_MODE( d_sam_set_pageonemode )
      * this (it probably ignored it)
      */
 
-	if (!get_sam_maptype(device))		// Ignored in maptype 1
+	if (!sam6883_maptype(device))		// Ignored in maptype 1
 	{
 		if((messram_get_size(devtag_get_device(device->machine, "messram"))>0x8000) && val)
 			bottom_32k=&messram_get_ptr(devtag_get_device(device->machine, "messram"))[0x8000];

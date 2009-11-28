@@ -20,17 +20,17 @@ extern MACHINE_RESET( vector06 );
 
 extern INTERRUPT_GEN( vector06_interrupt );
 
-extern READ8_HANDLER(vector_8255_1_r);
-extern WRITE8_HANDLER(vector_8255_1_w);
-extern READ8_HANDLER(vector_8255_2_r);
-extern WRITE8_HANDLER(vector_8255_2_w);
+extern READ8_HANDLER(vector06_8255_1_r);
+extern WRITE8_HANDLER(vector06_8255_1_w);
+extern READ8_HANDLER(vector06_8255_2_r);
+extern WRITE8_HANDLER(vector06_8255_2_w);
 
 extern WRITE8_HANDLER(vector06_color_set);
-extern WRITE8_HANDLER(vector_disc_w);
+extern WRITE8_HANDLER(vector06_disc_w);
 
 extern UINT8 vector06_keyboard_mask;
-extern UINT8 vector_color_index;
-extern UINT8 vector_video_mode;
+extern UINT8 vector06_color_index;
+extern UINT8 vector06_video_mode;
 
 /*----------- defined in video/vector06.c -----------*/
 

@@ -215,13 +215,13 @@ void vectrex_configuration(running_machine *machine)
 
 *********************************************************************/
 
-void v_via_irq(const device_config *device, int level)
+void vectrex_via_irq(const device_config *device, int level)
 {
 	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, level);
 }
 
 
-READ8_DEVICE_HANDLER(v_via_pb_r)
+READ8_DEVICE_HANDLER(vectrex_via_pb_r)
 {
 	int pot;
 	static const char *const ctrlnames[] = { "CONTR1X", "CONTR1Y", "CONTR2X", "CONTR2Y" };
@@ -237,7 +237,7 @@ READ8_DEVICE_HANDLER(v_via_pb_r)
 }
 
 
-READ8_DEVICE_HANDLER(v_via_pa_r)
+READ8_DEVICE_HANDLER(vectrex_via_pa_r)
 {
 	if ((!(vectrex_via_out[PORTB] & 0x10)) && (vectrex_via_out[PORTB] & 0x08))
 		/* BDIR inactive, we can read the PSG. BC1 has to be active. */
@@ -251,7 +251,7 @@ READ8_DEVICE_HANDLER(v_via_pa_r)
 }
 
 
-READ8_DEVICE_HANDLER(s1_via_pb_r)
+READ8_DEVICE_HANDLER(vectrex_s1_via_pb_r)
 {
 	return (vectrex_via_out[PORTB] & ~0x40) | (input_port_read(device->machine, "COIN") & 0x40);
 }

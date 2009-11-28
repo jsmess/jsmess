@@ -176,13 +176,12 @@ static UINT8 IRQ_reset;
 static UINT8 IRQ_status;
 static UINT8 IRQ_mode;
 
-int MMC1_extended;	/* 0 = normal MMC1 cart, 1 = 512k MMC1, 2 = 1024k MMC1 */
+//int MMC1_extended;	/* 0 = normal MMC1 cart, 1 = 512k MMC1, 2 = 1024k MMC1 */
 
-write8_space_func mmc_write_low;
-read8_space_func mmc_read_low;
-write8_space_func mmc_write_mid;
-read8_space_func mmc_read_mid;
-write8_space_func mmc_write;
+static write8_space_func mmc_write_low;
+static read8_space_func mmc_read_low;
+static write8_space_func mmc_write_mid;
+static write8_space_func mmc_write;
 
 static int mult1, mult2;
 
@@ -216,8 +215,8 @@ static int MMC5_vram_protect;
 static int MMC5_scanline;
 static int MMC5_floodtile;
 static int MMC5_floodattr;
-UINT8 MMC5_vram[0x400];
-int MMC5_vram_control;
+UINT8 nes_mmc5_vram[0x400];
+int nes_mmc5_vram_control;
 
 // these might be unified in single mmc_reg[] array, together with mmc_cmd1 & mmc_cmd2
 // but be careful that MMC3 clones often use mmc_cmd1/mmc_cmd2 (from base MMC3) AND additional regs below!
@@ -657,7 +656,7 @@ static void set_nt_page( int page, int source, int bank, int writable )
 			base_ptr = nes.vrom;
 			break;
 		case EXRAM:
-			base_ptr = MMC5_vram;
+			base_ptr = nes_mmc5_vram;
 			break;
 		case CIRAM:
 		default:
@@ -1551,7 +1550,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 
 /*************************************************************
 
-    mapper_reset
+    nes_mapper_reset
 
     Resets the mapper bankswitch areas to their defaults.
     It returns a value "err" that indicates if it was
@@ -1563,7 +1562,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 
 *************************************************************/
 
-int mapper_reset( running_machine *machine, int mmc_num )
+int nes_mapper_reset( running_machine *machine, int mmc_num )
 {
 	nes_state *state = machine->driver_data;
 	int err = 0, i;
@@ -1590,7 +1589,7 @@ int mapper_reset( running_machine *machine, int mmc_num )
 
 	mapper_warning = 0;
 
-	MMC5_vram_control = 0;
+	nes_mmc5_vram_control = 0;
 
 	/* Point the WRAM/battery area to the first RAM bank */
 	if (mmc_num != 20)
@@ -1614,6 +1613,14 @@ int mapper_reset( running_machine *machine, int mmc_num )
 	return err;
 }
 
+void nes_mapper_init(const mmc_intf *intf)
+{
+	mmc_write_low = intf->mmc_write_low;
+	mmc_read_low = intf->mmc_read_low;
+	mmc_write_mid = intf->mmc_write_mid;
+	mmc_write = intf->mmc_write;
+}
+
 /*************************************************************
 
     Support for .unf Files
@@ -1624,7 +1631,7 @@ int mapper_reset( running_machine *machine, int mmc_num )
 #include "machine/nes_unif.c"
 
 // WIP code
-int unif_reset( running_machine *machine, const char *board )
+int nes_unif_reset( running_machine *machine, const char *board )
 {
 	nes_state *state = machine->driver_data;
 	int err = 0;

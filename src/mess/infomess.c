@@ -123,7 +123,7 @@ void print_game_ramoptions(FILE *out, const game_driver *game, const machine_con
 	for (device = ram_first(config); device != NULL; device = ram_next(device))
 	{
 		ram_config *config = device->inline_config;	
-		fprintf(out, "\t\t<ramoption default=\"1\">%u</ramoption>\n",  ram_parse_string(config->default_size));
+		fprintf(out, "\t\t<ramoption default=\"1\">%u</ramoption>\n",  messram_parse_string(config->default_size));
 		if (config->extra_options != NULL)
 		{
 			const char *s;
@@ -137,7 +137,7 @@ void print_game_ramoptions(FILE *out, const game_driver *game, const machine_con
 			/* try to parse each option */
 			while(*s != '\0')
 			{
-				fprintf(out, "\t\t<ramoption>%u</ramoption>\n",  ram_parse_string(s));
+				fprintf(out, "\t\t<ramoption>%u</ramoption>\n",  messram_parse_string(s));
 				s += strlen(s) + 1;
 			}
 			astring_free(buffer);

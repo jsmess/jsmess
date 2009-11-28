@@ -614,7 +614,7 @@ long myo;
 		const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
 
 		myo=offset-0x200;
-		if ((myo>=0x00) && (myo<=0x07)) return BBC_6845_r(space, myo-0x00);		/* Video Controller */
+		if ((myo>=0x00) && (myo<=0x07)) return bbc_6845_r(space, myo-0x00);		/* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f))
 		{
 			const device_config *acia = devtag_get_device(space->machine, "acia6850");
@@ -653,7 +653,7 @@ long myo;
 		const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
 
 		myo=offset-0x200;
-		if ((myo>=0x00) && (myo<=0x07)) BBC_6845_w(space, myo-0x00,data);			/* Video Controller */
+		if ((myo>=0x00) && (myo<=0x07)) bbc_6845_w(space, myo-0x00,data);			/* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f))
 		{
 			const device_config *acia = devtag_get_device(space->machine, "acia6850");
@@ -663,7 +663,7 @@ long myo;
 			else
 				acia6850_data_w(acia, 0, data);
 		}
-		if ((myo>=0x10) && (myo<=0x17)) BBC_SerialULA_w(space, myo-0x10,data);		/* Serial System Chip */
+		if ((myo>=0x10) && (myo<=0x17)) bbc_SerialULA_w(space, myo-0x10,data);		/* Serial System Chip */
 		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w(devtag_get_device(space->machine, "upd7002"),myo-0x18,data);			/* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) bbc_videoULA_w(space, myo-0x20,data);			/* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) bbcm_wd1770l_write(space, myo-0x24,data); 	/* 1770 */
@@ -1340,7 +1340,7 @@ static UPD7002_EOC(BBC_uPD7002_EOC)
 	via_cb1_w(via_0, 0,data);
 }
 
-const uPD7002_interface BBC_uPD7002 =
+const uPD7002_interface bbc_uPD7002 =
 {
 	BBC_get_analogue_input,
 	BBC_uPD7002_EOC
@@ -1454,7 +1454,7 @@ static void BBC_Cassette_motor(running_machine *machine, unsigned char status)
 
 
 
-WRITE8_HANDLER ( BBC_SerialULA_w )
+WRITE8_HANDLER ( bbc_SerialULA_w )
 {
 	BBC_Cassette_motor(space->machine, (data & 0x80) >> 7);
 }

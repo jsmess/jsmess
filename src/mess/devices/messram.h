@@ -69,8 +69,10 @@ struct _ram_config
 DEVICE_GET_INFO( messram );
 UINT32 messram_get_size(const device_config *device);
 UINT8 *messram_get_ptr(const device_config *device);
+#ifdef UNUSED_FUNCTION
 void messram_dump(const device_config *device, const char *filename);
-UINT32 ram_parse_string(const char *s);
-const char *ram_string(char *buffer, UINT32 ram);
+const char *messram_string(char *buffer, UINT32 ram);
+#endif
+UINT32 messram_parse_string(const char *s);
 
 #endif /* __MESSRAM_H__ */

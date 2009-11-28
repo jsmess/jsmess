@@ -792,7 +792,7 @@ static STATE_POSTLOAD( coco3_video_postload )
 static const UINT8 *get_video_ram_coco3(running_machine *machine,int scanline)
 {
 	const device_config *sam = devtag_get_device(machine, "sam");
-	return sam_m6847_get_video_ram(sam,scanline);
+	return sam6883_videoram(sam,scanline);
 }
 
 static void internal_video_start_coco3(running_machine *machine, m6847_type type)

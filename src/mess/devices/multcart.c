@@ -38,7 +38,7 @@ struct _multicart_load_state
 	multicart_socket *		sockets;
 };
 
-static const char multicart_error_text[14][30] =
+static const char error_text[14][30] =
 {
 	"no error",
 	"not a multicart",
@@ -56,9 +56,9 @@ static const char multicart_error_text[14][30] =
 	"no pcb or resource found"
 };
 
-const char *mc_error_text(multicart_open_error error)
+const char *multicart_error_text(multicart_open_error error)
 {
-	return multicart_error_text[(int)error];
+	return error_text[(int)error];
 }
 
 /***************************************************************************
@@ -227,7 +227,7 @@ static multicart_open_error load_ram_resource(multicart_load_state *state, xml_d
 		return MCERR_MISSING_RAM_LENGTH;
 
 	/* ...and parse it */
-	resource->length = ram_parse_string(length_string);
+	resource->length = messram_parse_string(length_string);
 	if (resource->length <= 0)
 		return MCERR_INVALID_RAM_SPEC;
 

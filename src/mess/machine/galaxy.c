@@ -55,9 +55,8 @@ INTERRUPT_GEN( galaxy_interrupt )
 
 static IRQ_CALLBACK ( galaxy_irq_callback )
 {
-	gal_cnt = 0;
+	galaxy_set_timer();
 	galaxy_interrupts_enabled = TRUE;
-	timer_adjust_periodic(gal_video_timer, attotime_zero, 0, ATTOTIME_IN_HZ(6144000 / 8));
 	return 0xff;
 }
 
@@ -185,9 +184,6 @@ MACHINE_RESET( galaxy )
 
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), galaxy_irq_callback);
 	galaxy_interrupts_enabled = TRUE;
-
-	gal_video_timer = timer_alloc(machine, gal_video, NULL);
-	timer_adjust_periodic(gal_video_timer, attotime_zero, 0,attotime_never);
 }
 
 DRIVER_INIT( galaxyp )
@@ -211,8 +207,4 @@ MACHINE_RESET( galaxyp )
 	memory_install_write8_handler(space, 0xe000, 0xefff, 0, 0, SMH_NOP);
 	memory_set_bankptr(machine,11, memory_region(machine, "maincpu") + 0xe000);
 	galaxy_interrupts_enabled = TRUE;
-
-	gal_video_timer = timer_alloc(machine, gal_video, NULL);
-	timer_adjust_periodic(gal_video_timer, attotime_zero, 0, attotime_never);
-
 }

@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "video/stic.h"
 #include "includes/intv.h"
 
 
@@ -17,7 +16,7 @@ int intv_row_delay = 0;  // for now
 int intv_left_edge_inhibit = 0;  // for now
 int intv_top_edge_inhibit = 0;  // for now
 
-READ16_HANDLER( stic_r )
+READ16_HANDLER( intv_stic_r )
 {
 	//logerror("%x = stic_r(%x)\n",0,offset);
 	switch (offset)
@@ -39,7 +38,7 @@ READ16_HANDLER( stic_r )
 	return 0;
 }
 
-WRITE16_HANDLER( stic_w )
+WRITE16_HANDLER( intv_stic_w )
 {
 	struct intv_sprite_type *s;
 

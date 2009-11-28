@@ -92,10 +92,10 @@ WRITE8_HANDLER ( bbcm_wd1770_write );
 
 /* tape support */
 
-WRITE8_HANDLER ( BBC_SerialULA_w );
+WRITE8_HANDLER ( bbc_SerialULA_w );
 
 extern const i8271_interface bbc_i8271_interface;
-extern const uPD7002_interface BBC_uPD7002;
+extern const uPD7002_interface bbc_uPD7002;
 
 /*----------- defined in video/bbc.c -----------*/
 
@@ -114,8 +114,8 @@ void bbcbp_setvideoshadow(running_machine *machine, int vdusel);
 
 WRITE8_HANDLER ( bbc_videoULA_w );
 
-WRITE8_HANDLER ( BBC_6845_w );
-READ8_HANDLER ( BBC_6845_r );
+WRITE8_HANDLER ( bbc_6845_w );
+READ8_HANDLER ( bbc_6845_r );
 
 
 #endif /* BBC_H_ */

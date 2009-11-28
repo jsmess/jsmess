@@ -24,11 +24,11 @@
 
 /*----------- defined in video/epnick.c -----------*/
 
-PALETTE_INIT( nick );
-VIDEO_START( nick );
-VIDEO_UPDATE( nick );
+PALETTE_INIT( epnick );
+VIDEO_START( epnick );
+VIDEO_UPDATE( epnick );
 
-WRITE8_HANDLER( Nick_reg_w );
+WRITE8_HANDLER( epnick_reg_w );
 
 
 #endif /* __EPNICK_H__ */

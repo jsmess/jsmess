@@ -29,14 +29,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vector06_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00, 0x03) AM_READWRITE(vector_8255_1_r, vector_8255_1_w )
-	AM_RANGE( 0x04, 0x07) AM_READWRITE(vector_8255_2_r, vector_8255_2_w )
+	AM_RANGE( 0x00, 0x03) AM_READWRITE(vector06_8255_1_r, vector06_8255_1_w )
+	AM_RANGE( 0x04, 0x07) AM_READWRITE(vector06_8255_2_r, vector06_8255_2_w )
 	AM_RANGE( 0x0C, 0x0C) AM_WRITE ( vector06_color_set )
 	AM_RANGE( 0x18, 0x18) AM_DEVREADWRITE("wd1793", wd17xx_data_r,wd17xx_data_w)
 	AM_RANGE( 0x19, 0x19) AM_DEVREADWRITE("wd1793", wd17xx_sector_r,wd17xx_sector_w)
 	AM_RANGE( 0x1A, 0x1A) AM_DEVREADWRITE("wd1793", wd17xx_track_r,wd17xx_track_w)
   	AM_RANGE( 0x1B, 0x1B) AM_DEVREADWRITE("wd1793", wd17xx_status_r,wd17xx_command_w)
-  	AM_RANGE( 0x1C, 0x1C) AM_WRITE(vector_disc_w)
+  	AM_RANGE( 0x1C, 0x1C) AM_WRITE(vector06_disc_w)
 ADDRESS_MAP_END
 
 /* Input ports */

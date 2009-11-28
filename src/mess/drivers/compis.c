@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( compis_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE( 0x0330, 0x033f) AM_READWRITE( compis_gdc_16_r, compis_gdc_16_w )	/* GDC 82720 PCS6:6     */
 	AM_RANGE( 0x0340, 0x0343) AM_READWRITE( compis_fdc_r, compis_fdc_w )	/* iSBX0 (J8) FDC 8272      */
 	AM_RANGE( 0x0350, 0x0351) AM_READ( compis_fdc_dack_r)	/* iSBX0 (J8) DMA ACK       */
-	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( i186_internal_port_r, i186_internal_port_w)/* CPU 80186         */
+	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( compis_i186_internal_port_r, compis_i186_internal_port_w)/* CPU 80186         */
 //{ 0x0100, 0x017e, compis_null_r },    /* RTC              */
 //{ 0x0180, 0x01ff, compis_null_r },    /* PCS3?            */
 //{ 0x0200, 0x027f, compis_null_r },    /* Reserved         */

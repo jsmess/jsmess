@@ -47,9 +47,6 @@ typedef enum
 #define MAC_H_TOTAL	(704)		// (512+192)
 #define MAC_V_TOTAL	(370)		// (342+28)
 
-/*----------- defined in drivers/mac.c -----------*/
-extern UINT32 *se30_vram;
-
 /*----------- defined in machine/mac.c -----------*/
 
 extern mac_model_t mac_model;
@@ -102,6 +99,8 @@ void mac_fdc_set_enable_lines(const device_config *device, int enable_mask);
 void mac_nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state);
 
 /*----------- defined in video/mac.c -----------*/
+
+extern UINT32 *mac_se30_vram;
 
 VIDEO_START( mac );
 VIDEO_UPDATE( mac );

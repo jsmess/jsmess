@@ -255,8 +255,8 @@ void spectrum_setup_sp(running_machine *machine, unsigned char *pSnapshot, unsig
 	/* Set border colour */
 	spectrum_PreviousFE = (spectrum_PreviousFE & 0xf8) | (pSnapshot[34] & 0x07);
 	EventList_Reset();
-	set_last_border_color(pSnapshot[34] & 0x07);
-	force_border_redraw();
+	border_set_last_color(pSnapshot[34] & 0x07);
+	border_force_redraw();
 
 	if ((pSnapshot[35]&0x0ff)!=0)
 		logerror("Unknown meaning of byte on position 35: %02x.\n", pSnapshot[35]&0x0ff);
@@ -384,8 +384,8 @@ void spectrum_setup_sna(running_machine *machine, unsigned char *pSnapshot, unsi
 	/* Set border colour */
 	spectrum_PreviousFE = (spectrum_PreviousFE & 0xf8) | (pSnapshot[26] & 0x07);
 	EventList_Reset();
-	set_last_border_color(pSnapshot[26] & 0x07);
-	force_border_redraw();
+	border_set_last_color(pSnapshot[26] & 0x07);
+	border_force_redraw();
 
 	cputag_set_input_line(machine, "maincpu", 0, data);
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, data);
@@ -656,8 +656,8 @@ void spectrum_setup_z80(running_machine *machine, unsigned char *pSnapshot, unsi
 	/* Set border colour */
 	spectrum_PreviousFE = (spectrum_PreviousFE & 0xf8) | ((pSnapshot[12] & 0x0e) >> 1);
 	EventList_Reset();
-	set_last_border_color((pSnapshot[12] & 0x0e) >> 1);
-	force_border_redraw();
+	border_set_last_color((pSnapshot[12] & 0x0e) >> 1);
+	border_force_redraw();
 
 	lo = pSnapshot[13] & 0x0ff;
 	hi = pSnapshot[14] & 0x0ff;

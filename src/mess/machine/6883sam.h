@@ -71,15 +71,15 @@ DEVICE_GET_INFO( sam6883_gime );
 WRITE8_DEVICE_HANDLER(sam6883_w);
 
 /* set the state of the SAM */
-void sam_set_state(const device_config *device,UINT16 state, UINT16 mask);
+void sam6883_set_state(const device_config *device,UINT16 state, UINT16 mask);
 
 /* used by video/m6847.c to read the position of the SAM */
-const UINT8 *sam_m6847_get_video_ram(const device_config *device,int scanline);
+const UINT8 *sam6883_videoram(const device_config *device,int scanline);
 
 /* used to get memory size and pagemode independent of callbacks */
-UINT8 get_sam_memorysize(const device_config *device);
-UINT8 get_sam_pagemode(const device_config *device);
-UINT8 get_sam_maptype(const device_config *device);
+UINT8 sam6883_memorysize(const device_config *device);
+UINT8 sam6883_pagemode(const device_config *device);
+UINT8 sam6883_maptype(const device_config *device);
 
 #if 0
 WRITE_LINE_DEVICE_HANDLER( sam6883_hs_w );

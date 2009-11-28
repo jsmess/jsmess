@@ -41,8 +41,8 @@ SNAPSHOT_LOAD( amstrad );
 
 DEVICE_IMAGE_LOAD(amstrad_plus_cartridge);
 
-extern const mc6845_interface mc6845_amstrad_intf;
-extern const mc6845_interface mc6845_amstrad_plus_intf;
+extern const mc6845_interface amstrad_mc6845_intf;
+extern const mc6845_interface amstrad_plus_mc6845_intf;
 
 VIDEO_START( amstrad );
 VIDEO_UPDATE( amstrad );

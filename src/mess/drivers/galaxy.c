@@ -179,7 +179,7 @@ static MACHINE_DRIVER_START( galaxy )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT( black_and_white )
 
-	MDRV_VIDEO_START( generic_bitmapped )
+	MDRV_VIDEO_START( galaxy )
 	MDRV_VIDEO_UPDATE( galaxy )
 
 	/* snapshot */
@@ -215,7 +215,7 @@ static MACHINE_DRIVER_START( galaxyp )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT( black_and_white )
 
-	MDRV_VIDEO_START( generic_bitmapped )
+	MDRV_VIDEO_START( galaxy )
 	MDRV_VIDEO_UPDATE( galaxy )
 
 	/* snapshot */

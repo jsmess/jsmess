@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( d64_plus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE("sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffe1) AM_NOP
-	AM_RANGE(0xffe2, 0xffe2) AM_READWRITE(plus_reg_r,plus_reg_w)	/* Dragon plus control / status reg */
+	AM_RANGE(0xffe2, 0xffe2) AM_READWRITE(dgnplus_reg_r,dgnplus_reg_w)	/* Dragon plus control / status reg */
 	AM_RANGE(0xffe3, 0xffef) AM_NOP
 	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("maincpu", 0x3ff0)
 ADDRESS_MAP_END
@@ -271,13 +271,13 @@ static ADDRESS_MAP_START( dgnalpha_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff04, 0xff07) AM_DEVREADWRITE("acia", acia_6551_r, acia_6551_w)
 	AM_RANGE(0xff20, 0xff23) AM_DEVREADWRITE("pia_1", pia6821_r, coco_pia_1_w)
 	AM_RANGE(0xff24, 0xff27) AM_DEVREADWRITE("pia_2", pia6821_r, pia6821_w) 	/* Third PIA on Dragon Alpha */
-	AM_RANGE(0Xff28, 0xff2b) AM_READWRITE(alpha_modem_r, alpha_modem_w)		/* Modem, dummy to stop eror log ! */
-	AM_RANGE(0xff2c, 0xff2f) AM_READWRITE(wd2797_r,	wd2797_w)				/* Alpha onboard disk interface */
+	AM_RANGE(0Xff28, 0xff2b) AM_READWRITE(dgnalpha_modem_r, dgnalpha_modem_w)		/* Modem, dummy to stop eror log ! */
+	AM_RANGE(0xff2c, 0xff2f) AM_READWRITE(dgnalpha_wd2797_r, dgnalpha_wd2797_w)				/* Alpha onboard disk interface */
 	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE("coco_cartslot", coco_cartridge_r, coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE("sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffef) AM_NOP
-	AM_RANGE(0xfff0, 0xffff) AM_READ(dragon_alpha_mapped_irq_r)
+	AM_RANGE(0xfff0, 0xffff) AM_READ(dgnalpha_mapped_irq_r)
 ADDRESS_MAP_END
 
 

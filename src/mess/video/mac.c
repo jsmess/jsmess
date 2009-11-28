@@ -15,6 +15,7 @@
 #include "includes/mac.h"
 #include "devices/messram.h"
 
+UINT32 *mac_se30_vram;
 static int screen_buffer;
 
 PALETTE_INIT( mac )
@@ -78,7 +79,7 @@ VIDEO_UPDATE( macse30 )
 	int y, x, b;
 
 	video_base = screen_buffer ? 0x8000 : 0;
-	video_ram = (const UINT16 *) &se30_vram[video_base/4];
+	video_ram = (const UINT16 *) &mac_se30_vram[video_base/4];
 
 	for (y = 0; y < MAC_V_VIS; y++)
 	{

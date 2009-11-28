@@ -16,8 +16,8 @@
 #include "devices/messram.h"
 
 UINT8 vector06_keyboard_mask;
-UINT8 vector_color_index;
-UINT8 vector_video_mode;
+UINT8 vector06_color_index;
+UINT8 vector06_video_mode;
 
 /* Driver initialization */
 DRIVER_INIT(vector06)
@@ -54,7 +54,7 @@ static WRITE8_DEVICE_HANDLER (vector06_8255_porta_w )
 	vector06_keyboard_mask = data ^ 0xff;
 }
 
-static void vector_set_video_mode(running_machine *machine, int width) {
+static void vector06_set_video_mode(running_machine *machine, int width) {
 	rectangle visarea;
 
 	visarea.min_x = 0;
@@ -66,11 +66,11 @@ static void vector_set_video_mode(running_machine *machine, int width) {
 
 static WRITE8_DEVICE_HANDLER (vector06_8255_portb_w )
 {
-	vector_color_index = data & 0x0f;
-	if ((data & 0x10) != vector_video_mode)
+	vector06_color_index = data & 0x0f;
+	if ((data & 0x10) != vector06_video_mode)
 	{
-		vector_video_mode = data & 0x10;
-		vector_set_video_mode(device->machine,(vector_video_mode==0x10) ? 512 : 256);
+		vector06_video_mode = data & 0x10;
+		vector06_set_video_mode(device->machine,(vector06_video_mode==0x10) ? 512 : 256);
 	}
 }
 
@@ -79,7 +79,7 @@ WRITE8_HANDLER(vector06_color_set)
 	UINT8 r = (data & 7) << 5;
 	UINT8 g = ((data >> 3) & 7) << 5;
 	UINT8 b = ((data >>6) & 3) << 6;
-	palette_set_color( space->machine, vector_color_index, MAKE_RGB(r,g,b) );
+	palette_set_color( space->machine, vector06_color_index, MAKE_RGB(r,g,b) );
 }
 
 static UINT8 romdisk_msb;
@@ -123,20 +123,20 @@ I8255A_INTERFACE( vector06_ppi8255_interface )
 	DEVCB_NULL
 };
 
-READ8_HANDLER(vector_8255_1_r) {
+READ8_HANDLER(vector06_8255_1_r) {
 	return i8255a_r(devtag_get_device(space->machine, "ppi8255"), (offset ^ 0x03));
 }
 
-WRITE8_HANDLER(vector_8255_1_w) {
+WRITE8_HANDLER(vector06_8255_1_w) {
 	i8255a_w(devtag_get_device(space->machine, "ppi8255"), (offset ^0x03) , data );
 
 }
 
-READ8_HANDLER(vector_8255_2_r) {
+READ8_HANDLER(vector06_8255_2_r) {
 	return i8255a_r(devtag_get_device(space->machine, "ppi8255_2"), (offset ^ 0x03));
 }
 
-WRITE8_HANDLER(vector_8255_2_w) {
+WRITE8_HANDLER(vector06_8255_2_w) {
 	i8255a_w(devtag_get_device(space->machine, "ppi8255_2"), (offset ^0x03) , data );
 
 }
@@ -169,7 +169,7 @@ static TIMER_CALLBACK(reset_check_callback)
 	}
 }
 
-WRITE8_HANDLER(vector_disc_w)
+WRITE8_HANDLER(vector06_disc_w)
 {
 	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
 	wd17xx_set_side (fdc,((data & 4) >> 2) ^ 1);
@@ -198,7 +198,7 @@ MACHINE_RESET( vector06 )
 	memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
 
 	vector06_keyboard_mask = 0;
-	vector_color_index = 0;
-	vector_video_mode = 0;
+	vector06_color_index = 0;
+	vector06_video_mode = 0;
 	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, reset_check_callback);
 }

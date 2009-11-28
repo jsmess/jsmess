@@ -120,22 +120,22 @@ void coco_nmi_w(const device_config *device, int data);
 void coco_halt_w(const device_config *device, int data);
 
 /* Compusense Dragon Plus board */
-READ8_HANDLER ( plus_reg_r );
-WRITE8_HANDLER ( plus_reg_w );
+READ8_HANDLER ( dgnplus_reg_r );
+WRITE8_HANDLER ( dgnplus_reg_w );
 
-READ8_HANDLER( dragon_alpha_mapped_irq_r );
+READ8_HANDLER( dgnalpha_mapped_irq_r );
 
 /* Dragon Alpha AY-8912 */
 READ8_HANDLER ( dgnalpha_psg_porta_read );
 WRITE8_HANDLER ( dgnalpha_psg_porta_write );
 
 /* Dragon Alpha WD2797 FDC */
-READ8_HANDLER(wd2797_r);
-WRITE8_HANDLER(wd2797_w);
+READ8_HANDLER(dgnalpha_wd2797_r);
+WRITE8_HANDLER(dgnalpha_wd2797_w);
 
 /* Dragon Alpha Modem, just dummy funcs at the mo */
-READ8_HANDLER(alpha_modem_r);
-WRITE8_HANDLER(alpha_modem_w);
+READ8_HANDLER(dgnalpha_modem_r);
+WRITE8_HANDLER(dgnalpha_modem_w);
 
 #ifdef UNUSED_FUNCTION
 void coco_set_halt_line(running_machine *machine, int halt_line);

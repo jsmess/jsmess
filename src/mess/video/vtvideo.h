@@ -48,9 +48,9 @@ struct _vt_video_interface
 DEVICE_GET_INFO( vt100_video );
 
 /* register access */
-READ8_DEVICE_HANDLER  ( lba7_r );
-WRITE8_DEVICE_HANDLER ( dc012_w );
-WRITE8_DEVICE_HANDLER ( dc011_w );
+READ8_DEVICE_HANDLER  ( vt_video_lba7_r );
+WRITE8_DEVICE_HANDLER ( vt_video_dc012_w );
+WRITE8_DEVICE_HANDLER ( vt_video_dc011_w );
 WRITE8_DEVICE_HANDLER ( vt_video_brightness_w );
 
 

@@ -39,8 +39,8 @@ READ16_HANDLER (compis_usart_r);
 WRITE16_HANDLER (compis_usart_w);
 
 /* 80186 Internal */
-READ16_HANDLER (i186_internal_port_r);
-WRITE16_HANDLER (i186_internal_port_w);
+READ16_HANDLER (compis_i186_internal_port_r);
+WRITE16_HANDLER (compis_i186_internal_port_w);
 
 /* FDC 8272 */
 READ16_HANDLER (compis_fdc_dack_r);

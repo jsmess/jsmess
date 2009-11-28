@@ -1312,7 +1312,7 @@ VIDEO_UPDATE( amstrad )
 }
 
 
-const mc6845_interface mc6845_amstrad_intf =
+const mc6845_interface amstrad_mc6845_intf =
 {
 	"screen",					/* screen name */
 	16,							/* number of pixels per video memory address */
@@ -1327,7 +1327,7 @@ const mc6845_interface mc6845_amstrad_intf =
 };
 
 
-const mc6845_interface mc6845_amstrad_plus_intf =
+const mc6845_interface amstrad_plus_mc6845_intf =
 {
 	"screen",					/* screen name */
 	16,							/* number of pixels per video memory address */

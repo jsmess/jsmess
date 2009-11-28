@@ -27,9 +27,9 @@ static TIMER_CALLBACK(poly88_usart_timer_callback)
 	cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), 0, HOLD_LINE);
 }
 
-WRITE8_HANDLER(poly_baud_rate_w)
+WRITE8_HANDLER(poly88_baud_rate_w)
 {
-	logerror("poly_baud_rate_w %02x\n",data);
+	logerror("poly88_baud_rate_w %02x\n",data);
 	poly88_usart_timer = timer_alloc(space->machine, poly88_usart_timer_callback, NULL);
 	timer_adjust_periodic(poly88_usart_timer, attotime_zero, 0, ATTOTIME_IN_HZ(300));
 
@@ -245,7 +245,7 @@ const msm8251_interface poly88_usart_interface=
 	poly88_usart_rxready
 };
 
-READ8_HANDLER(poly_keyboard_r)
+READ8_HANDLER(poly88_keyboard_r)
 {
 	UINT8 retVal = last_code;
 	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
@@ -253,7 +253,7 @@ READ8_HANDLER(poly_keyboard_r)
 	return retVal;
 }
 
-WRITE8_HANDLER(poly_intr_w)
+WRITE8_HANDLER(poly88_intr_w)
 {
 	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }

@@ -71,14 +71,14 @@ INLINE const vt_video_interface *get_interface(const device_config *device)
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
-READ8_DEVICE_HANDLER( lba7_r )
+READ8_DEVICE_HANDLER( vt_video_lba7_r )
 {
 	vt_video_t *vt = get_safe_token(device);
 	return vt->lba7;
 }
 
 
-WRITE8_DEVICE_HANDLER( dc012_w )
+WRITE8_DEVICE_HANDLER( vt_video_dc012_w )
 {
 	vt_video_t *vt = get_safe_token(device);
 
@@ -128,7 +128,7 @@ WRITE8_DEVICE_HANDLER( dc012_w )
 }
 
 
-WRITE8_DEVICE_HANDLER( dc011_w )
+WRITE8_DEVICE_HANDLER( vt_video_dc011_w )
 {
 	vt_video_t *vt = get_safe_token(device);
 	if (BIT(data,5)==0) {
@@ -319,7 +319,7 @@ static DEVICE_RESET( vt_video )
 }
 
 /*-------------------------------------------------
-    DEVICE_GET_INFO( dc012 )
+    DEVICE_GET_INFO( vt100_video )
 -------------------------------------------------*/
 
 DEVICE_GET_INFO( vt100_video )

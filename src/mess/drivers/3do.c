@@ -116,11 +116,11 @@ static ADDRESS_MAP_START( 3do_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0x001FFFFF) AM_RAMBANK(1) AM_BASE(&dram)					/* DRAM */
 	AM_RANGE(0x00200000, 0x002FFFFF) AM_RAM	AM_BASE(&vram)							/* VRAM */
 	AM_RANGE(0x03000000, 0x030FFFFF) AM_ROMBANK(2)									/* BIOS */
-	AM_RANGE(0x03140000, 0x0315FFFF) AM_READWRITE(nvarea_r, nvarea_w)				/* NVRAM */
-	AM_RANGE(0x03180000, 0x031FFFFF) AM_READWRITE(unk_318_r, unk_318_w)				/* ???? */
-	AM_RANGE(0x03200000, 0x032FFFFF) AM_READWRITE(vram_sport_r, vram_sport_w)		/* special vram access1 */
-	AM_RANGE(0x03300000, 0x033FFFFF) AM_READWRITE(madam_r, madam_w)					/* address decoder */
-	AM_RANGE(0x03400000, 0x034FFFFF) AM_READWRITE(clio_r, clio_w)					/* io controller */
+	AM_RANGE(0x03140000, 0x0315FFFF) AM_READWRITE(_3do_nvarea_r, _3do_nvarea_w)				/* NVRAM */
+	AM_RANGE(0x03180000, 0x031FFFFF) AM_READWRITE(_3do_unk_318_r, _3do_unk_318_w)				/* ???? */
+	AM_RANGE(0x03200000, 0x032FFFFF) AM_READWRITE(_3do_vram_sport_r, _3do_vram_sport_w)		/* special vram access1 */
+	AM_RANGE(0x03300000, 0x033FFFFF) AM_READWRITE(_3do_madam_r, _3do_madam_w)					/* address decoder */
+	AM_RANGE(0x03400000, 0x034FFFFF) AM_READWRITE(_3do_clio_r, _3do_clio_w)					/* io controller */
 ADDRESS_MAP_END
 
 
@@ -135,8 +135,8 @@ static MACHINE_RESET( 3do )
 	/* start with overlay enabled */
 	memory_set_bank(machine, 1, 1);
 
-	madam_init();
-	clio_init();
+	_3do_madam_init();
+	_3do_clio_init();
 }
 
 

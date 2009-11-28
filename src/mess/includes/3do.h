@@ -10,22 +10,22 @@
 
 /*----------- defined in machine/3do.c -----------*/
 
-READ32_HANDLER( nvarea_r );
-WRITE32_HANDLER( nvarea_w );
+READ32_HANDLER( _3do_nvarea_r );
+WRITE32_HANDLER( _3do_nvarea_w );
 
-READ32_HANDLER( unk_318_r );
-WRITE32_HANDLER( unk_318_w );
+READ32_HANDLER( _3do_unk_318_r );
+WRITE32_HANDLER( _3do_unk_318_w );
 
-READ32_HANDLER( vram_sport_r );
-WRITE32_HANDLER( vram_sport_w );
+READ32_HANDLER( _3do_vram_sport_r );
+WRITE32_HANDLER( _3do_vram_sport_w );
 
-READ32_HANDLER( madam_r );
-WRITE32_HANDLER( madam_w );
-void madam_init( void );
+READ32_HANDLER( _3do_madam_r );
+WRITE32_HANDLER( _3do_madam_w );
+void _3do_madam_init( void );
 
-READ32_HANDLER( clio_r );
-WRITE32_HANDLER( clio_w );
-void clio_init( void );
+READ32_HANDLER( _3do_clio_r );
+WRITE32_HANDLER( _3do_clio_w );
+void _3do_clio_init( void );
 
 
 #endif /* _3DO_H_ */

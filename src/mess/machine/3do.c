@@ -18,12 +18,12 @@ static MADAM	madam;
 static CLIO		clio;
 
 
-READ32_HANDLER( nvarea_r ) {
+READ32_HANDLER( _3do_nvarea_r ) {
 	logerror( "%08X: NVRAM read offset = %08X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset );
 	return 0;
 }
 
-WRITE32_HANDLER( nvarea_w ) {
+WRITE32_HANDLER( _3do_nvarea_w ) {
 	logerror( "%08X: NVRAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset, data, mem_mask );
 }
 
@@ -70,7 +70,7 @@ WRITE32_HANDLER( nvarea_w ) {
     write 00002000 to 03180000
     several groups of 16 write actions or 16 read actions
 */
-READ32_HANDLER( unk_318_r ) {
+READ32_HANDLER( _3do_unk_318_r ) {
 	logerror( "%08X: UNK_318 read offset = %08X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset );
 #if 0
 	switch( offset ) {
@@ -82,7 +82,7 @@ READ32_HANDLER( unk_318_r ) {
 	return 0;
 }
 
-WRITE32_HANDLER( unk_318_w )
+WRITE32_HANDLER( _3do_unk_318_w )
 {
 	logerror( "%08X: UNK_318 write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset, data, mem_mask );
 
@@ -99,7 +99,7 @@ WRITE32_HANDLER( unk_318_w )
 
 
 
-READ32_HANDLER( vram_sport_r ) {
+READ32_HANDLER( _3do_vram_sport_r ) {
 	logerror( "%08X: VRAM SPORT read offset = %08X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset );
 	switch( offset ) {
 	case 0x1840:	/* 03206100 - ?? */
@@ -110,7 +110,7 @@ READ32_HANDLER( vram_sport_r ) {
 	return 0;
 }
 
-WRITE32_HANDLER( vram_sport_w ) {
+WRITE32_HANDLER( _3do_vram_sport_w ) {
 	logerror( "%08X: VRAM SPORT write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset, data, mem_mask );
 	switch( offset ) {
 	case 0x0800:	/* 03202000 - ?? during boot 00190019 gets written */
@@ -122,7 +122,7 @@ WRITE32_HANDLER( vram_sport_w ) {
 
 
 
-READ32_HANDLER( madam_r ) {
+READ32_HANDLER( _3do_madam_r ) {
 	logerror( "%08X: MADAM read offset = %08X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset );
 	switch( offset ) {
 	case 0:		/* 03300000 - Revision */
@@ -134,7 +134,7 @@ READ32_HANDLER( madam_r ) {
 }
 
 
-WRITE32_HANDLER( madam_w ) {
+WRITE32_HANDLER( _3do_madam_w ) {
 	logerror( "%08X: MADAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset, data, mem_mask );
 	switch( offset ) {
 	case 0x01:	/* 03300004 - Memory configuration 29 = 2MB DRAM, 1MB VRAM */
@@ -148,14 +148,14 @@ WRITE32_HANDLER( madam_w ) {
 }
 
 
-void madam_init( void )
+void _3do_madam_init( void )
 {
 	memset( &madam, 0, sizeof(MADAM) );
 	madam.revision = 0x00000001;
 }
 
 
-READ32_HANDLER( clio_r )
+READ32_HANDLER( _3do_clio_r )
 {
 	logerror( "%08X: CLIO read offset = %08X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset );
 
@@ -174,7 +174,7 @@ READ32_HANDLER( clio_r )
 	return 0;
 }
 
-WRITE32_HANDLER( clio_w )
+WRITE32_HANDLER( _3do_clio_w )
 {
 	logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset, data, mem_mask );
 
@@ -194,7 +194,7 @@ WRITE32_HANDLER( clio_w )
 	}
 }
 
-void clio_init( void )
+void _3do_clio_init( void )
 {
 	memset( &clio, 0, sizeof(CLIO) );
 }

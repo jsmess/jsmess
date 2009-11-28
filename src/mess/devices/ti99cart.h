@@ -84,9 +84,9 @@ struct _cartridge_t
 typedef struct _cartridge_t cartridge_t;
 
 /* Functions to be called from the console. */
-void   cartridge_slot_set(const device_config *cartsys, int slotnumber);
-void   lock_cartridge_slot(const device_config *cartsys, int slotnumber);
-UINT8  cartridge_grom_read(const device_config *cartsys, int offset);
+void   ti99_cartridge_slot_set(const device_config *cartsys, int slotnumber);
+void   ti99_lock_cartridge_slot(const device_config *cartsys, int slotnumber);
+UINT8  ti99_cartridge_grom_read(const device_config *cartsys, int offset);
 
 DEVICE_GET_INFO(ti99_multicart);
 

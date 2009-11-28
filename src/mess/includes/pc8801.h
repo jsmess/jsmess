@@ -79,7 +79,7 @@ WRITE8_HANDLER(pc88_extmem_w);
 /*----------- defined in video/pc8801.c -----------*/
 
 void pc8801_video_init (running_machine *machine, int hireso);
-int is_pc8801_vram_select(running_machine *machine);
+int pc8801_is_vram_select(running_machine *machine);
 WRITE8_HANDLER(pc88_vramsel_w);
  READ8_HANDLER(pc88_vramtest_r);
 extern unsigned char *pc88sr_textRAM;

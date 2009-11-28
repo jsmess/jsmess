@@ -383,7 +383,7 @@ void pc8801_update_bank(running_machine *machine)
 
 	memory_set_bankptr(machine, 4, pc8801_mainRAM + 0x8400);
 
-	if(is_pc8801_vram_select(machine))
+	if (pc8801_is_vram_select(machine))
 	{
 		/* VRAM */
 		/* already maped */

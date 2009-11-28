@@ -79,7 +79,7 @@ VIDEO_EOF( spectrum )
         if (NumItems)
         {
                 pItem = EventList_GetFirstItem();
-                set_last_border_color ( pItem[NumItems-1].Event_Data );
+                border_set_last_color ( pItem[NumItems-1].Event_Data );
                 EventList_Reset();
 				EventList_SetOffsetStartTime ( cpu_attotime_to_clocks(machine->firstcpu, attotime_mul(video_screen_get_scan_period(machine->primary_screen), video_screen_get_vpos(machine->primary_screen))) );
                 logerror ("Event log reset in callback fn.\n");
@@ -158,7 +158,7 @@ VIDEO_UPDATE( spectrum )
                 }
 	}
 
-	draw_border(screen->machine, bitmap, full_refresh,
+	border_draw(screen->machine, bitmap, full_refresh,
 		SPEC_TOP_BORDER, SPEC_DISPLAY_YSIZE, SPEC_BOTTOM_BORDER,
 		SPEC_LEFT_BORDER, SPEC_DISPLAY_XSIZE, SPEC_RIGHT_BORDER,
 		SPEC_LEFT_BORDER_CYCLES, SPEC_DISPLAY_XSIZE_CYCLES,

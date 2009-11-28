@@ -261,7 +261,7 @@ static WRITE8_HANDLER(write_gvram_alu3_bank5){write_gvram_alu3(space, offset,dat
 static WRITE8_HANDLER(write_gvram_alu3_bank6){write_gvram_alu3(space, offset + 0x3000,data);}
 
 
-int is_pc8801_vram_select( running_machine *machine )
+int pc8801_is_vram_select( running_machine *machine )
 {
 	read8_space_func rh5 = NULL, rh6 = NULL;
 	write8_space_func wh5 = NULL, wh6 = NULL;

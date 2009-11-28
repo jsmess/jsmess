@@ -769,7 +769,7 @@ INLINE void ef9341_inc_c( void )
 	}
 }
 
-void ef9341_w( int command, int b, UINT8 data )
+void odyssey2_ef9341_w( int command, int b, UINT8 data )
 {
 	logerror("ef9341 %s write, t%s, data %02X\n", command ? "command" : "data", b ? "B" : "A", data );
 
@@ -843,7 +843,7 @@ void ef9341_w( int command, int b, UINT8 data )
 	}
 }
 
-UINT8 ef9341_r( int command, int b )
+UINT8 odyssey2_ef9341_r( int command, int b )
 {
 	UINT8	data = 0xFF;
 

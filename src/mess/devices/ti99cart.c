@@ -164,7 +164,7 @@ static int in_legacy_mode(const device_config *device)
     Interestingly, cartridge subroutines are found nevertheless, even when
     the cartridge is plugged into a higher slot.
 */
-void cartridge_slot_set(const device_config *cartsys, int slotnumber)
+void ti99_cartridge_slot_set(const device_config *cartsys, int slotnumber)
 {
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
 	assert(slotnumber>=0 && slotnumber<=255);
@@ -180,7 +180,7 @@ void cartridge_slot_set(const device_config *cartsys, int slotnumber)
     Called from the machine driver, taking the dipswitch setting.
     We take slot numbers from 0 (automatic mode) to the maximum.
 */
-void lock_cartridge_slot(const device_config *cartsys, int slotnumber)
+void ti99_lock_cartridge_slot(const device_config *cartsys, int slotnumber)
 {
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
 	assert(slotnumber>=0 && slotnumber<=255);
@@ -227,7 +227,7 @@ static void clear_slot(const device_config *cartsys, int slotnumber)
     Note that the GROM access mechanism is identical for all cartridge
     types.
 */
-UINT8 cartridge_grom_read(const device_config *device, int cart_offset)
+UINT8 ti99_cartridge_grom_read(const device_config *device, int cart_offset)
 {
 	UINT8 value;
 	int slot;
@@ -340,7 +340,7 @@ static cartridge_t *assemble_common(const device_config *cartslot)
 	{
 		cartridge->rom_ptr = socketcont;
 		cartridge->rom_size = reslength;
-		if (!is_99_8())
+		if (!ti99_is_99_8())
 		{
 			/* Big-endianize it for 16 bit access. */
 			UINT16 *cont16b = (UINT16 *)socketcont;
@@ -355,7 +355,7 @@ static cartridge_t *assemble_common(const device_config *cartslot)
 	{
 		cartridge->rom2_ptr = (UINT16 *)socketcont;
 		assert(cartridge->rom2_ptr != NULL);
-		if (!is_99_8())
+		if (!ti99_is_99_8())
 		{
 			/* Big-endianize it for 16 bit access. */
 			UINT16 *cont16b = (UINT16 *)socketcont;
@@ -370,7 +370,7 @@ static cartridge_t *assemble_common(const device_config *cartslot)
 	{
 		cartridge->ram_ptr = socketcont;
 		cartridge->ram_size = reslength;
-		if (!is_99_8())
+		if (!ti99_is_99_8())
 		{
 			/* Big-endianize it for 16 bit access. */
 			UINT16 *cont16b = (UINT16 *)socketcont;
@@ -533,7 +533,7 @@ static int disassemble_std(const device_config *image)
 
 	/* Do we have RAM? If so, swap the bytes (undo the BIG_ENDIANIZE) */
 	cart = &cartslots->cartridge[slotnumber];
-	if (!is_99_8())
+	if (!ti99_is_99_8())
 	{
 		for (i = 0; i < cart->ram_size/2; i++)
 			((UINT16 *)cart->ram_ptr)[i] = BIG_ENDIANIZE_INT16(((UINT16 *)cart->ram_ptr)[i]);
@@ -1898,7 +1898,7 @@ static DEVICE_IMAGE_LOAD( ti99_cartridge )
 			if (me == MCERR_NONE)
 				result = pcb->assemble(image);
 			else
-				fatalerror("Error loading multicart: %s\n", mc_error_text(me));
+				fatalerror("Error loading multicart: %s\n", multicart_error_text(me));
 
 			/* This is for legacy support. If we have no multicart left
 			but there are still legacy dumps, we switch to legacy mode. */
@@ -2327,7 +2327,7 @@ static int load_legacy(const device_config *image)
 				savembx = TRUE;
 			}
 
-			if (is_99_8())
+			if (ti99_is_99_8())
 			{
 				// printf("** is 99/8\n");
 				if (savembx==TRUE)
@@ -2367,7 +2367,7 @@ static int load_legacy(const device_config *image)
 		case SLOTC_MINIMEM:
 			/* Load the NVRAM. Need to BIG_ENDIANIZE it.
 			MiniMemory has only one cartridge page. */
-			if (is_99_8())
+			if (ti99_is_99_8())
 			{
 				// printf("** is 99/8\n");
 				image_battery_load(image, cart8rom+0x1000,0x1000);
@@ -2386,7 +2386,7 @@ static int load_legacy(const device_config *image)
 
 		case SLOTC_MBX:
 			/* Load the NVRAM. Need to BIG_ENDIANIZE it. */
-			if (is_99_8())
+			if (ti99_is_99_8())
 			{
 				// printf("** is 99/8\n");
 				image_battery_load(image, cart8rom+0x0c00, 0x0400);
@@ -2405,7 +2405,7 @@ static int load_legacy(const device_config *image)
 
 		case SLOTC_DROM:
 			maxrom = 0x2000;
-			if (is_99_8())
+			if (ti99_is_99_8())
 			{
 				// printf("** is 99/8\n");
 				filesize = image_fread(image, cart8rom2, maxrom);
@@ -2456,7 +2456,7 @@ static void unload_legacy(const device_config *image)
 			break;
 
 		case SLOTC_MINIMEM:
-			if (is_99_8())
+			if (ti99_is_99_8())
 			{
 				// printf("** is 99/8\n");
 				image_battery_save(image, cartslots->cartridge[slot].ram_ptr, 0x1000);
@@ -2474,7 +2474,7 @@ static void unload_legacy(const device_config *image)
 			}
 			break;
 		case SLOTC_MBX:
-			if (is_99_8())
+			if (ti99_is_99_8())
 			{
 				// printf("** is 99/8\n");
 				image_battery_save(image, cartslots->cartridge[slot].ram_ptr, 0x0400);

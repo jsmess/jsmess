@@ -85,7 +85,7 @@ enum _multicart_open_error
 };
 typedef enum _multicart_open_error multicart_open_error;
 
-const char *mc_error_text(multicart_open_error error);
+const char *multicart_error_text(multicart_open_error error);
 
 /***************************************************************************
     PROTOTYPES

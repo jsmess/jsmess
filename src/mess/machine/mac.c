@@ -995,18 +995,18 @@ void mac_scc_mouse_irq(running_machine *machine, int x, int y)
 	if (x && y)
 	{
 		if (last_was_x)
-			scc_set_status(scc, 0x0a);
+			scc8530_set_status(scc, 0x0a);
 		else
-			scc_set_status(scc, 0x02);
+			scc8530_set_status(scc, 0x02);
 
 		last_was_x ^= 1;
 	}
 	else
 	{
 		if (x)
-			scc_set_status(scc, 0x0a);
+			scc8530_set_status(scc, 0x0a);
 		else
-			scc_set_status(scc, 0x02);
+			scc8530_set_status(scc, 0x02);
 	}
 
 	//cputag_set_input_line(machine, "maincpu", 2, ASSERT_LINE);
@@ -1020,7 +1020,7 @@ READ16_HANDLER ( mac_scc_r )
 	const device_config *scc = devtag_get_device(space->machine, "scc");
 	UINT16 result;
 
-	result = scc_r(scc, offset);
+	result = scc8530_r(scc, offset);
 	return (result << 8) | result;
 }
 
@@ -1029,7 +1029,7 @@ READ16_HANDLER ( mac_scc_r )
 WRITE16_HANDLER ( mac_scc_w )
 {
 	const device_config *scc = devtag_get_device(space->machine, "scc");
-	scc_w(scc, offset, (UINT8) data);
+	scc8530_w(scc, offset, (UINT8) data);
 }
 
 WRITE16_HANDLER ( mac_scc_2_w )
@@ -1037,7 +1037,7 @@ WRITE16_HANDLER ( mac_scc_2_w )
 	const device_config *scc = devtag_get_device(space->machine, "scc");
 	UINT8 wdata = data>>8;
 
-	scc_w(scc, offset, wdata);
+	scc8530_w(scc, offset, wdata);
 }
 
 

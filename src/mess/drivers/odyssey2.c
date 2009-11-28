@@ -162,7 +162,7 @@ GFXDECODE_END
 
 static const sp0256_interface the_voice_sp0256 =
 {
-	DEVCB_LINE(the_voice_lrq_callback),
+	DEVCB_LINE(odyssey2_the_voice_lrq_callback),
 	DEVCB_NULL
 };
 

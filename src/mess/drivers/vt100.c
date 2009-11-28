@@ -50,7 +50,7 @@ ADDRESS_MAP_END
 static READ8_HANDLER(vt100_flags_r)
 {
 	UINT8 retVal = 0;
- 	retVal |= lba7_r(devtag_get_device(space->machine, "vt100_video"),0) * 0x40;
+ 	retVal |= vt_video_lba7_r(devtag_get_device(space->machine, "vt100_video"),0) * 0x40;
 	retVal |= vt100_keyboard_int * 0x80;
 	return retVal;
 }
@@ -130,9 +130,9 @@ static ADDRESS_MAP_START( vt100_io , ADDRESS_SPACE_IO, 8)
 	// 0x82 Keyboard UART data input
 	AM_RANGE (0x82, 0x82) AM_WRITE(vt100_keyboard_w)
 	// 0xA2 Video processor DC012
-	AM_RANGE (0xa2, 0xa2) AM_DEVWRITE("vt100_video", dc012_w)
+	AM_RANGE (0xa2, 0xa2) AM_DEVWRITE("vt100_video", vt_video_dc012_w)
 	// 0xC2 Video processor DC011
-	AM_RANGE (0xc2, 0xc2) AM_DEVWRITE("vt100_video", dc011_w)
+	AM_RANGE (0xc2, 0xc2) AM_DEVWRITE("vt100_video", vt_video_dc011_w)
 	// 0xE2 Graphics port
 	// AM_RANGE (0xe2, 0xe2)
 ADDRESS_MAP_END
