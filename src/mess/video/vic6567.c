@@ -71,7 +71,9 @@
 #include "vic4567.h"
 #include "utils.h"
 
+#ifdef UNUSED_FUNCION
 static TIMER_CALLBACK( line_timer_callback );
+#endif
 static TIMER_CALLBACK( PAL_timer_callback );
 static TIMER_CALLBACK( NTSC_timer_callback );
 
@@ -1507,6 +1509,7 @@ static void vic2_drawlines (running_machine *machine, int first, int last, int s
 
 #include "vic4567.c"
 
+#ifdef UNUSED_FUNCTION
 static TIMER_CALLBACK( line_timer_callback )
 {
 	int i,j;
@@ -1568,6 +1571,7 @@ static TIMER_CALLBACK( line_timer_callback )
 
 	timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, line_timer_callback);
 }
+#endif
 
 // modified VIC II emulation by Christian Bauer starts here...
 
