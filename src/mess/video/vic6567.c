@@ -71,7 +71,7 @@
 #include "vic4567.h"
 #include "utils.h"
 
-#ifdef UNUSED_FUNCION
+#ifdef UNUSED_FUNCTION
 static TIMER_CALLBACK( line_timer_callback );
 #endif
 static TIMER_CALLBACK( PAL_timer_callback );
