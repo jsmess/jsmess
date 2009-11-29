@@ -560,10 +560,14 @@ static void wd17xx_command_restore(const device_config *device)
 }
 
 
-/* track writing, converted to format commands */
+/* 
+	Write an entire track. Formats which do not define a write_track 
+	function pointer will cause a silent return. 
+*/ 
 static void write_track(const device_config *device)
 {
 	wd1770_state *w = get_safe_token(device);
+#if 0
 	int i;
 	for (i=0;i+4<w->data_offset;)
 	{
@@ -583,6 +587,20 @@ static void write_track(const device_config *device)
 		else
 			i++;
 	}
+#endif
+
+	if (w->type == WD_TYPE_1771)
+		w->data_count = TRKSIZE_SD;
+	else
+		w->data_count = (w->density) ? TRKSIZE_DD : TRKSIZE_SD;
+
+	floppy_drive_write_track_data_info_buffer( w->drive, w->hd, (char *)w->buffer, &(w->data_count) );
+
+	w->data_offset = 0;
+
+	wd17xx_set_drq(device);
+	w->status |= STA_2_BUSY;
+	w->busy_count = 0;
 }
 
 

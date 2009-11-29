@@ -73,7 +73,8 @@ Source Changes:
 - Cleanups (static qualifiers, headers, renames, reduced global symbols, and
   more multisession friendly init code).  [Atari Ace]
 
-
+- WD17xx write track supported in proper way instead of using more 
+  sector writes [Michael Zapf]
 
 0.135
 
