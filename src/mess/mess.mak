@@ -1524,6 +1524,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/k1003.o		\
 	$(MESS_DRIVERS)/mk14.o		\
 	$(MESS_DRIVERS)/elekscmp.o	\
+	$(MESS_DRIVERS)/ht68k.o	\
 
 
 

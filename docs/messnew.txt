@@ -8,7 +8,7 @@ New System Drivers Supported (in no particular order):
 - Science of Cambridge MK-14 [Miodrag Milanovic]
 - Robotron K1003 [Miodrag Milanovic]
 - Elektor SC/MP [Miodrag Milanovic]
-
+- Hawthorne Technologies TinyGiant HT68k [Miodrag Milanovic]
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
