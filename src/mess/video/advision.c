@@ -5,7 +5,7 @@
   Routines to control the Adventurevision video hardware
 
   Video hardware is composed of a vertical array of 40 LEDs which is
-  reflected off a spinning mirror.
+  reflected off a spinning mirror, to give a resolution of 150 x 40 at 15 FPS.
 
 ***************************************************************************/
 
@@ -21,14 +21,14 @@ VIDEO_START( advision )
 {
 	advision_state *state = machine->driver_data;
 
-    state->video_hpos = 0;
+	state->video_hpos = 0;
 	state->display = auto_alloc_array(machine, UINT8, 8 * 8 * 256);
 	memset(state->display, 0, 8 * 8 * 256);
 }
 
 /***************************************************************************
 
-  Stop the video hardware emulation.
+  Initialise the palette.
 
 ***************************************************************************/
 
@@ -42,6 +42,12 @@ PALETTE_INIT( advision )
 		palette_set_color_rgb(machine, i, i * 0x22, 0x00, 0x00);
 	}
 }
+
+/***************************************************************************
+
+  Update the display data.
+
+***************************************************************************/
 
 void advision_vh_write(running_machine *machine, int data)
 {
@@ -57,7 +63,7 @@ void advision_vh_update(running_machine *machine, int x)
 {
 	advision_state *state = machine->driver_data;
 
-    UINT8 *dst = &state->display[x];
+	UINT8 *dst = &state->display[x];
 	int y;
 
 	for( y = 0; y < 8; y++ )
@@ -76,7 +82,7 @@ void advision_vh_update(running_machine *machine, int x)
 		state->led_latch[7-y] = 0xff;
 
 		dst += 8 * 256;
-    }
+	}
 }
 
 
@@ -90,29 +96,28 @@ VIDEO_UPDATE( advision )
 {
 	advision_state *state = screen->machine->driver_data;
 
-	int x, y, bit;
+	int x, y;
 
-    static int framecount = 0;
+	static int framecount = 0;
 
-    if( (framecount++ % 8) == 0 )
+	if( (framecount++ % 4) == 0 )
 	{
 		state->frame_start = 1;
 		state->video_hpos = 0;
-    }
+	}
 
-	for( x = (framecount % 2) * 128; x < (framecount % 2) * 128+128; x++ )
+	for (x = 0; x < 150; x++)
 	{
 		UINT8 *led = &state->display[x];
 
-		for( y = 0; y < 8; y++ )
+		for( y = 0; y < 128; y+=2 )
 		{
-			for( bit = 0; bit < 8; bit++ )
-			{
-				if( *led > 0 )
-					*BITMAP_ADDR16(bitmap, 30 + 2 *( y * 8 + bit), 85 + x) = --(*led);
+			if( *led > 0 )
+				*BITMAP_ADDR16(bitmap, 30 + y, 85 + x) = --(*led);
+			else
+				*BITMAP_ADDR16(bitmap, 30 + y, 85 + x) = 0;
 
-				led += 256;
-			}
+			led += 256;
 		}
 	}
 	return 0;
