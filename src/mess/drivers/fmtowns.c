@@ -1410,7 +1410,7 @@ static void towns_cdrom_execute_command(const device_config* device)
 					towns_cd.cmd_status_ptr = 0;
 					towns_cd.extra_status = 0;
 					towns_cd.cmd_status[0] = 0x00;
-					towns_cd.cmd_status[1] = 0x00;
+					towns_cd.cmd_status[1] = 0x01; // CD-ROM/CD-DA status?  bit 1 = error type(HE or CDR)
 					towns_cd.cmd_status[2] = 0x00;
 					towns_cd.cmd_status[3] = 0x00;
 					towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_MPU,1);
@@ -1430,6 +1430,20 @@ static void towns_cdrom_execute_command(const device_config* device)
 					towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_MPU,1);
 				}
 				logerror("CD: Command 0x81: set state (CDDASET)\n");
+				break;
+			case 0x84:   // Stop audio track (?)
+				if(towns_cd.command & 0x20)
+				{
+					towns_cd.status |= 0x02;  // status read request
+					towns_cd.cmd_status_ptr = 0;
+					towns_cd.extra_status = 0;
+					towns_cd.cmd_status[0] = 0x00;
+					towns_cd.cmd_status[1] = 0x00;
+					towns_cd.cmd_status[2] = 0x00;
+					towns_cd.cmd_status[3] = 0x00;
+					towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_MPU,1);
+				}
+				logerror("CD: Command 0x84: Stop audio track(?)\n");
 				break;
 			default:
 				towns_cd.status |= 0x02;  // status read request
@@ -1455,16 +1469,15 @@ static UINT16 towns_cdrom_dma_r(running_machine* machine)
 static READ8_HANDLER(towns_cdrom_r)
 {
 	UINT32 addr = 0;
-	
+	UINT8 ret = 0;
 	switch(offset)
 	{
 		case 0x00:  // status
 			//logerror("CD: status read, returning %02x\n",towns_cd.status);
 			return towns_cd.status;
 		case 0x01:  // command status
-			if(towns_cd.cmd_status_ptr > 3)
+			if(towns_cd.cmd_status_ptr >= 3)
 			{
-				towns_cd.cmd_status_ptr = 0;
 				towns_cd.status &= ~0x02;
 				// check for more status bytes
 				if(towns_cd.extra_status != 0)
@@ -1525,7 +1538,7 @@ static READ8_HANDLER(towns_cdrom_r)
 									break;
 								case 6:  // st1/2/3 = address of track 0xaa? (BCD)
 									addr = cdrom_get_track_start(mess_cd_get_cdrom_file(devtag_get_device(space->machine,"cdrom")),0xaa);
-									addr = dword_to_bcd(addr);
+									addr = lba_to_msf(addr);
 									towns_cd.cmd_status[0] = 0x17;
 									towns_cd.cmd_status[1] = (addr & 0xff0000) >> 16;
 									towns_cd.cmd_status[2] = (addr & 0x00ff00) >> 8;
@@ -1536,15 +1549,16 @@ static READ8_HANDLER(towns_cdrom_r)
 									if(towns_cd.extra_status & 0x01)
 									{
 										towns_cd.cmd_status[0] = 0x16;
-										towns_cd.cmd_status[1] = cdrom_get_adr_control(mess_cd_get_cdrom_file(devtag_get_device(space->machine,"cdrom")),(towns_cd.extra_status/2)-2);
-										towns_cd.cmd_status[2] = (towns_cd.extra_status/2)-2;
+										towns_cd.cmd_status[1] = (cdrom_get_adr_control(mess_cd_get_cdrom_file(devtag_get_device(space->machine,"cdrom")),(towns_cd.extra_status/2)-3) & 0x0f) << 4;
+										towns_cd.cmd_status[1] |= (cdrom_get_adr_control(mess_cd_get_cdrom_file(devtag_get_device(space->machine,"cdrom")),(towns_cd.extra_status/2)-3) & 0xf0) >> 4;
+										towns_cd.cmd_status[2] = (towns_cd.extra_status/2)-3;
 										towns_cd.cmd_status[3] = 0x00;
 										towns_cd.extra_status++;
 									}
 									else
 									{
-										addr = cdrom_get_track_start(mess_cd_get_cdrom_file(devtag_get_device(space->machine,"cdrom")),(towns_cd.extra_status/2)-3);
-										addr = dword_to_bcd(addr);
+										addr = cdrom_get_track_start(mess_cd_get_cdrom_file(devtag_get_device(space->machine,"cdrom")),(towns_cd.extra_status/2)-4);
+										addr = lba_to_msf(addr);
 										towns_cd.cmd_status[0] = 0x17;
 										towns_cd.cmd_status[1] = (addr & 0xff0000) >> 16;
 										towns_cd.cmd_status[2] = (addr & 0x00ff00) >> 8;
@@ -1552,7 +1566,6 @@ static READ8_HANDLER(towns_cdrom_r)
 										if(((towns_cd.extra_status/2)-3) >= cdrom_get_last_track(mess_cd_get_cdrom_file(devtag_get_device(space->machine,"cdrom"))))
 										{
 											towns_cd.extra_status = 0;
-											towns_cd.status &= ~0x02;
 										}
 										else
 											towns_cd.extra_status++;
@@ -1560,11 +1573,21 @@ static READ8_HANDLER(towns_cdrom_r)
 									break;
 							}
 							break;
+						case 0x84:
+							towns_cd.cmd_status[0] = 0x07;
+							towns_cd.cmd_status[1] = 0x00;
+							towns_cd.cmd_status[2] = 0x00;
+							towns_cd.cmd_status[3] = 0x00;
+							towns_cd.extra_status = 0;
+							break;
 					}
 				}
 			}
 			logerror("CD: reading command status port, returning %02x\n",towns_cd.cmd_status[towns_cd.cmd_status_ptr]);
-			return towns_cd.cmd_status[towns_cd.cmd_status_ptr++];
+			ret = towns_cd.cmd_status[towns_cd.cmd_status_ptr++];
+			if(towns_cd.cmd_status_ptr > 3)
+				towns_cd.cmd_status_ptr = 0;
+			return ret;
 		default:
 			return 0x00;
 	}
