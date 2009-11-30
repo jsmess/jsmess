@@ -372,7 +372,7 @@ static TIMER_CALLBACK(osborne1_video_callback)
 	{
 		/* Draw a line of the display */
 		UINT16 address = osborne1.start_y * 128 + osborne1.new_start_x + 11;
-		UINT16 *p = BITMAP_ADDR16( tmpbitmap, y, 0 );
+		UINT16 *p = BITMAP_ADDR16( machine->generic.tmpbitmap, y, 0 );
 		int x;
 
 		for ( x = 0; x < 52; x++ )

@@ -644,7 +644,7 @@ INTERRUPT_GEN( microtan_interrupt )
         lastrow = row;
         /* CapsLock LED */
 		if( row == 3 && chg == 0x80 )
-			set_led_status(1, (keyrows[3] & 0x80) ? 0 : 1);
+			set_led_status(device->machine, 1, (keyrows[3] & 0x80) ? 0 : 1);
 
         if (new & chg)  /* key(s) pressed ? */
         {
@@ -936,7 +936,7 @@ MACHINE_RESET( microtan )
 	{
         keyrows[i] = input_port_read(machine, keynames[i-1]);
 	}
-    set_led_status(1, (keyrows[3] & 0x80) ? 0 : 1);
+    set_led_status(machine, 1, (keyrows[3] & 0x80) ? 0 : 1);
 
 	microtan_timer = timer_alloc(machine, microtan_read_cassette, NULL);
 }

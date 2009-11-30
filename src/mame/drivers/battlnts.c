@@ -43,8 +43,8 @@ static WRITE8_HANDLER( battlnts_bankswitch_w )
 	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 
 	/* bits 4 & 5 = coin counters */
-	coin_counter_w(0,data & 0x10);
-	coin_counter_w(1,data & 0x20);
+	coin_counter_w(space->machine, 0,data & 0x10);
+	coin_counter_w(space->machine, 1,data & 0x20);
 
 	/* other bits unknown */
 }
@@ -53,7 +53,7 @@ static ADDRESS_MAP_START( battlnts_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(K007342_r, K007342_w)	/* Color RAM + Video RAM */
 	AM_RANGE(0x2000, 0x21ff) AM_READWRITE(K007420_r, K007420_w)	/* Sprite RAM */
 	AM_RANGE(0x2200, 0x23ff) AM_READWRITE(K007342_scroll_r, K007342_scroll_w)		/* Scroll RAM */
-	AM_RANGE(0x2400, 0x24ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram)/* palette */
+	AM_RANGE(0x2400, 0x24ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE_GENERIC(paletteram)/* palette */
 	AM_RANGE(0x2600, 0x2607) AM_WRITE(K007342_vreg_w) 			/* Video Registers */
 	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P2")

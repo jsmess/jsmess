@@ -4159,7 +4159,7 @@ static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *
 
 static void mcd212_draw_scanline(running_machine *machine, int y)
 {
-	bitmap_t *bitmap = tmpbitmap;
+	bitmap_t *bitmap = machine->generic.tmpbitmap;
 	UINT8 plane_a_r[768], plane_a_g[768], plane_a_b[768];
 	UINT8 plane_b_r[768], plane_b_g[768], plane_b_b[768];
 	UINT32 out[768];
@@ -4378,7 +4378,7 @@ static VIDEO_UPDATE(cdi)
 
 	if (screen == main_screen)
 	{
-		copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect);
+		copybitmap(bitmap, screen->machine->generic.tmpbitmap, 0, 0, 0, 0, cliprect);
 	}
 	else if (screen == lcd_screen)
 	{

@@ -51,7 +51,7 @@ VIDEO_UPDATE( kayproii )
 			{
 				if (ra < 8)
 				{
-					chr = videoram[x]^0x80;
+					chr = screen->machine->generic.videoram.u8[x]^0x80;
 
 					/* Take care of flashing characters */
 					if ((chr < 0x80) && (framecnt & 0x08))
@@ -96,7 +96,7 @@ VIDEO_UPDATE( omni2 )
 			{
 				if (ra < 8)
 				{
-					chr = videoram[x];
+					chr = screen->machine->generic.videoram.u8[x];
 
 					/* Take care of flashing characters */
 					if ((chr > 0x7f) && (framecnt & 0x08))
@@ -154,8 +154,8 @@ MC6845_UPDATE_ROW( kaypro2x_update_row )
 		UINT8 inv=0;
 		//      if (x == cursor_x) inv=0xff;    /* uncomment when mame fixed */
 		mem = (ma + x) & 0x7ff;
-		chr = videoram[mem];
-		attr = videoram[mem | 0x800];
+		chr = device->machine->generic.videoram.u8[mem];
+		attr = device->machine->generic.videoram.u8[mem | 0x800];
 
 		if ((attr & 3) == 3)
 		{
@@ -303,22 +303,22 @@ WRITE8_HANDLER( kaypro2x_register_w )
 
 READ8_HANDLER( kaypro_videoram_r )
 {
-	return videoram[offset];
+	return space->machine->generic.videoram.u8[offset];
 }
 
 WRITE8_HANDLER( kaypro_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 }
 
 READ8_HANDLER( kaypro2x_videoram_r )
 {
-	return videoram[mc6845_video_address];
+	return space->machine->generic.videoram.u8[mc6845_video_address];
 }
 
 WRITE8_HANDLER( kaypro2x_videoram_w )
 {
-	videoram[mc6845_video_address] = data;
+	space->machine->generic.videoram.u8[mc6845_video_address] = data;
 }
 
 VIDEO_START( kaypro )

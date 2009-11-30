@@ -1146,9 +1146,9 @@ static void hp48_machine_start( running_machine *machine, hp48_models model )
 
 	/* internal RAM */
 	ram_size = HP48_GX_MODEL ? (128 * 1024) : (32 * 1024);
-	generic_nvram_size = 2 * ram_size;
-	generic_nvram = auto_alloc_array(machine, UINT8, generic_nvram_size);
-	ram = (UINT8*) generic_nvram;
+	machine->generic.nvram_size = 2 * ram_size;
+	machine->generic.nvram.u8 = auto_alloc_array(machine, UINT8, machine->generic.nvram_size);
+	ram = machine->generic.nvram.u8;
 
 	/* ROM load */
 	rom_size = HP48_S_SERIES ? (256 * 1024) : (512 * 1024);
@@ -1156,7 +1156,7 @@ static void hp48_machine_start( running_machine *machine, hp48_models model )
 	hp48_decode_nibble( rom, memory_region( machine, "maincpu" ), rom_size );
 
 	/* init state */
-	memset( generic_nvram, 0, generic_nvram_size );
+	memset( machine->generic.nvram.u8, 0, machine->generic.nvram_size );
 	memset( hp48_io, 0, sizeof( hp48_io ) );
 	hp48_out = 0;
 	hp48_kdn = 0;
@@ -1214,7 +1214,7 @@ static void hp48_machine_start( running_machine *machine, hp48_models model )
 		state_save_register_item(machine, "globals", NULL, i, hp48_modules[i].mask );
 	}
 	state_save_register_global_array(machine,  hp48_io );
-	state_save_register_global_pointer(machine,  generic_nvram, generic_nvram_size );
+	state_save_register_global_pointer(machine,  machine->generic.nvram.u8, machine->generic.nvram_size );
 
 	state_save_register_postload( machine, hp48_update_annunciators, NULL );
 	state_save_register_postload( machine, hp48_apply_modules, NULL );

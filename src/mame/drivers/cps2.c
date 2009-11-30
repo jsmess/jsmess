@@ -586,7 +586,7 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/qsound.h"
 #include "sound/okim6295.h" // gigamn2 bootleg
@@ -708,85 +708,70 @@ static const eeprom_interface cps2_eeprom_interface =
 	"0111"	/* erase command */
 };
 
-static NVRAM_HANDLER( cps2 )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-        eeprom_init(machine, &cps2_eeprom_interface);
-
-		if (file)
-			eeprom_load(file);
-	}
-}
-
 static WRITE16_HANDLER( cps2_eeprom_port_w )
 {
-    if (ACCESSING_BITS_8_15)
-    {
-	/* bit 0 - Unused */
-	/* bit 1 - Unused */
-	/* bit 2 - Unused */
-	/* bit 3 - Unused? */
-	/* bit 4 - Eeprom data  */
-	/* bit 5 - Eeprom clock */
-	/* bit 6 - */
-	/* bit 7 - */
+	if (ACCESSING_BITS_8_15)
+	{
+		/* bit 0 - Unused */
+		/* bit 1 - Unused */
+		/* bit 2 - Unused */
+		/* bit 3 - Unused? */
+		/* bit 4 - Eeprom data  */
+		/* bit 5 - Eeprom clock */
+		/* bit 6 - */
+		/* bit 7 - */
 
-	/* EEPROM */
-	eeprom_write_bit(data & 0x1000);
-	eeprom_set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
-	eeprom_set_cs_line((data & 0x4000) ? CLEAR_LINE : ASSERT_LINE);
+		/* EEPROM */
+		input_port_write(space->machine, "EEPROMOUT", data, 0xffff);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-	/* bit 0 - coin counter 1 */
-	/* bit 0 - coin counter 2 */
-	/* bit 2 - Unused */
-	/* bit 3 - Allows access to Z80 address space (Z80 reset) */
-	/* bit 4 - lock 1  */
-	/* bit 5 - lock 2  */
-	/* bit 6 - */
-	/* bit 7 - */
+		/* bit 0 - coin counter 1 */
+		/* bit 0 - coin counter 2 */
+		/* bit 2 - Unused */
+		/* bit 3 - Allows access to Z80 address space (Z80 reset) */
+		/* bit 4 - lock 1  */
+		/* bit 5 - lock 2  */
+		/* bit 6 - */
+		/* bit 7 - */
 
-        /* Z80 Reset */
-	if (cputag_get_cpu(space->machine, "audiocpu"))
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
+	        /* Z80 Reset */
+		if (cputag_get_cpu(space->machine, "audiocpu"))
+			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
 
-	coin_counter_w(0, data & 0x0001);
-	if( (strncmp(space->machine->gamedrv->name,"pzloop2",8)==0) ||
- 	    (strncmp(space->machine->gamedrv->name,"pzloop2j",8)==0) )
-	{
-		// Puzz Loop 2 uses coin counter 2 input to switch between stick and paddle controls
-		readpaddle = data & 0x0002;
-	}
-	else
-	{
-		coin_counter_w(1, data & 0x0002);
-	}
+		coin_counter_w(space->machine, 0, data & 0x0001);
+		if( (strncmp(space->machine->gamedrv->name,"pzloop2",8)==0) ||
+	 	    (strncmp(space->machine->gamedrv->name,"pzloop2j",8)==0) )
+		{
+			// Puzz Loop 2 uses coin counter 2 input to switch between stick and paddle controls
+			readpaddle = data & 0x0002;
+		}
+		else
+		{
+			coin_counter_w(space->machine, 1, data & 0x0002);
+		}
 
-	if(strncmp(space->machine->gamedrv->name,"mmatrix",7)==0)		// Mars Matrix seems to require the coin lockout bit to be reversed
-	{
-		coin_lockout_w(0,data & 0x0010);
-		coin_lockout_w(1,data & 0x0020);
-		coin_lockout_w(2,data & 0x0040);
-		coin_lockout_w(3,data & 0x0080);
-	}
-	else
-	{
-		coin_lockout_w(0,~data & 0x0010);
-		coin_lockout_w(1,~data & 0x0020);
-		coin_lockout_w(2,~data & 0x0040);
-		coin_lockout_w(3,~data & 0x0080);
-	}
+		if(strncmp(space->machine->gamedrv->name,"mmatrix",7)==0)		// Mars Matrix seems to require the coin lockout bit to be reversed
+		{
+			coin_lockout_w(space->machine, 0,data & 0x0010);
+			coin_lockout_w(space->machine, 1,data & 0x0020);
+			coin_lockout_w(space->machine, 2,data & 0x0040);
+			coin_lockout_w(space->machine, 3,data & 0x0080);
+		}
+		else
+		{
+			coin_lockout_w(space->machine, 0,~data & 0x0010);
+			coin_lockout_w(space->machine, 1,~data & 0x0020);
+			coin_lockout_w(space->machine, 2,~data & 0x0040);
+			coin_lockout_w(space->machine, 3,~data & 0x0080);
+		}
 
-	/*
-    set_led_status(0,data & 0x01);
-    set_led_status(1,data & 0x10);
-    set_led_status(2,data & 0x20);
-    */
+		/*
+        set_led_status(space->machine, 0,data & 0x01);
+        set_led_status(space->machine, 1,data & 0x10);
+        set_led_status(space->machine, 2,data & 0x20);
+        */
     }
 }
 
@@ -907,55 +892,60 @@ ADDRESS_MAP_END
 
 /* 4 players and 4 buttons */
 static INPUT_PORTS_START( cps2_4p4b )
-    PORT_START("IN0")      /* IN0 (0x00) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_START("IN0")      /* IN0 (0x00) */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 
-    PORT_START("IN1")      /* IN1 (0x10) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
+	PORT_START("IN1")      /* IN1 (0x10) */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
 
-    PORT_START("IN2")      /* IN2 (0x20) */
-    PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_START("IN2")      /* IN2 (0x20) */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-    PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START4 )
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN2 )
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN3 )
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START4 )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN4 )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 INPUT_PORTS_END
 
 /* 4 players and 3 buttons */
@@ -963,12 +953,12 @@ static INPUT_PORTS_START( cps2_4p3b )
 	PORT_INCLUDE(cps2_4p4b)
 
 	PORT_MODIFY("IN0")
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(1) */
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(2) */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(1) */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(2) */
 
 	PORT_MODIFY("IN1")
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(3) */
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(4) */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(3) */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(4) */
 INPUT_PORTS_END
 
 /* 4 players and 2 buttons */
@@ -976,12 +966,12 @@ static INPUT_PORTS_START( cps2_4p2b )
 	PORT_INCLUDE(cps2_4p3b)
 
 	PORT_MODIFY("IN0")
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(1) */
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(2) */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(1) */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(2) */
 
 	PORT_MODIFY("IN1")
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(3) */
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(4) */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(3) */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(4) */
 INPUT_PORTS_END
 
 /* 3 players and 4 buttons */
@@ -989,11 +979,11 @@ static INPUT_PORTS_START( cps2_3p4b )
 	PORT_INCLUDE(cps2_4p4b)
 
 	PORT_MODIFY("IN1")
-    PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )           /* PORT_PLAYER(4) inputs */
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )           /* PORT_PLAYER(4) inputs */
 
 	PORT_MODIFY("IN2")
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )           /* START4 */
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )           /* COIN4 */
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )           /* START4 */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )           /* COIN4 */
 INPUT_PORTS_END
 
 /* 3 players and 3 buttons */
@@ -1001,11 +991,11 @@ static INPUT_PORTS_START( cps2_3p3b )
 	PORT_INCLUDE(cps2_3p4b)
 
 	PORT_MODIFY("IN0")
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(1) */
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(2) */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(1) */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(2) */
 
 	PORT_MODIFY("IN1")
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(3) */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(3) */
 INPUT_PORTS_END
 
 /* 3 players and 2 buttons */
@@ -1014,11 +1004,11 @@ static INPUT_PORTS_START( cps2_3p2b )
 	PORT_INCLUDE(cps2_3p3b)
 
 	PORT_MODIFY("IN0")
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(1) */
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(2) */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(1) */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(2) */
 
 	PORT_MODIFY("IN1")
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(3) */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(3) */
 INPUT_PORTS_END
 #endif
 
@@ -1027,11 +1017,11 @@ static INPUT_PORTS_START( cps2_2p4b )
 	PORT_INCLUDE(cps2_3p4b)
 
 	PORT_MODIFY("IN1")
-    PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )           /* PORT_PLAYER(3) inputs */
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )           /* PORT_PLAYER(3) inputs */
 
 	PORT_MODIFY("IN2")
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )           /* START3 */
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )           /* COIN3 */
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )           /* START3 */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )           /* COIN3 */
 INPUT_PORTS_END
 
 /* 2 players and 3 buttons */
@@ -1039,8 +1029,8 @@ static INPUT_PORTS_START( cps2_2p3b )
 	PORT_INCLUDE(cps2_2p4b)
 
 	PORT_MODIFY("IN0")
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(1) */
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(2) */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(1) */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(2) */
 INPUT_PORTS_END
 
 /* 2 players and 2 buttons */
@@ -1048,8 +1038,8 @@ static INPUT_PORTS_START( cps2_2p2b )
 	PORT_INCLUDE(cps2_2p3b)
 
 	PORT_MODIFY("IN0")
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(1) */
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(2) */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(1) */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(2) */
 INPUT_PORTS_END
 
 /* 2 players and 1 button */
@@ -1057,8 +1047,8 @@ static INPUT_PORTS_START( cps2_2p1b )
 	PORT_INCLUDE(cps2_2p2b)
 
 	PORT_MODIFY("IN0")
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON2 PORT_PLAYER(1) */
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON2 PORT_PLAYER(2) */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON2 PORT_PLAYER(1) */
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON2 PORT_PLAYER(2) */
 INPUT_PORTS_END
 
 /* 2 players and 6 buttons (2 rows of 3 buttons) */
@@ -1066,14 +1056,14 @@ static INPUT_PORTS_START( cps2_2p6b )
 	PORT_INCLUDE(cps2_2p3b)
 
 	PORT_MODIFY("IN1")
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
 
 	PORT_MODIFY("IN2")
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 /* 1 player and 4 buttons */
@@ -1081,11 +1071,11 @@ static INPUT_PORTS_START( cps2_1p4b )
 	PORT_INCLUDE(cps2_2p4b)
 
 	PORT_MODIFY("IN0")
-    PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )           /* PORT_PLAYER(2) inputs */
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )           /* PORT_PLAYER(2) inputs */
 
 	PORT_MODIFY("IN2")
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )           /* START2 */
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )           /* COIN2 */
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )           /* START2 */
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )           /* COIN2 */
 INPUT_PORTS_END
 
 /* 1 player and 3 buttons */
@@ -1093,7 +1083,7 @@ static INPUT_PORTS_START( cps2_1p3b )
 	PORT_INCLUDE(cps2_1p4b)
 
 	PORT_MODIFY("IN0")
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(1) */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(1) */
 INPUT_PORTS_END
 
 /* 1 player and 2 buttons */
@@ -1101,7 +1091,7 @@ static INPUT_PORTS_START( cps2_1p2b )
 	PORT_INCLUDE(cps2_1p3b)
 
 	PORT_MODIFY("IN0")
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(1) */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(1) */
 INPUT_PORTS_END
 
 
@@ -1116,14 +1106,14 @@ static INPUT_PORTS_START( cybots )
 	PORT_INCLUDE(cps2_2p6b)
 
 	PORT_MODIFY("IN1")
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )                     /* BUTTON5 PORT_PLAYER(1) */
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )                     /* BUTTON6 PORT_PLAYER(1) */
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )                     /* BUTTON5 PORT_PLAYER(2) */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )                     /* BUTTON5 PORT_PLAYER(1) */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )                     /* BUTTON6 PORT_PLAYER(1) */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )                     /* BUTTON5 PORT_PLAYER(2) */
 
 	PORT_MODIFY("IN2")
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )                     /* BUTTON6 PORT_PLAYER(2) */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )                     /* BUTTON6 PORT_PLAYER(2) */
 INPUT_PORTS_END
 
 /* 2 players, no joysticks which are replaced with 4 buttons, no other buttons */
@@ -1131,16 +1121,16 @@ static INPUT_PORTS_START( qndream )
 	PORT_INCLUDE(cps2_2p4b)
 
 	PORT_MODIFY("IN0")
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-    PORT_BIT( 0x00f0, IP_ACTIVE_LOW, IPT_UNUSED )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-    PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00f0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 /* 2 players and 1 button - either 2 8-way joysticks, 2 2-way joysticks, or 2 paddles */
@@ -1159,7 +1149,7 @@ static INPUT_PORTS_START( choko )
 	PORT_INCLUDE(cps2_1p3b)
 
 	PORT_MODIFY("IN2")
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
 
@@ -1219,7 +1209,7 @@ static MACHINE_DRIVER_START( cps2 )
 	MDRV_CPU_PROGRAM_MAP(qsound_sub_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 251)	/* 251 is good (see 'mercy mercy mercy'section of sgemf attract mode for accurate sound sync */
 
-	MDRV_NVRAM_HANDLER(cps2)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", cps2_eeprom_interface)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -6176,6 +6166,28 @@ ROM_START( spf2ta )
 	ROM_LOAD16_WORD_SWAP( "pzf.12m",   0x200000, 0x200000, CRC(399d2c7b) SHA1(e849dea97b8d16540415c0d9bbc4f9f4eb755ec4) )
 ROM_END
 
+ROM_START( spf2th )
+	ROM_REGION(CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "pzfh.03",  0x000000, 0x80000, CRC(20510f2d) SHA1(dcdfc0f6b849499732b76811edb682fea758f530) )
+	ROM_LOAD16_WORD_SWAP( "pzf.04",   0x080000, 0x80000, CRC(b80649e2) SHA1(5bfccd656aea7ff82e9a20bb5856f4ab99b5a007) )
+
+	ROM_REGION( 0xC00000, "gfx", 0 )
+	ROM_FILL(             0x000000, 0x800000, 0 )
+	ROMX_LOAD( "pzf.14m", 0x800000, 0x100000, CRC(2d4881cb) SHA1(fd3baa183c25bed153b19c251980e2fb761600e2) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "pzf.16m", 0x800002, 0x100000, CRC(4b0fd1be) SHA1(377aafdcdb7a866b1c8487670e3598d8197976e4) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "pzf.18m", 0x800004, 0x100000, CRC(e43aac33) SHA1(d041e0688c3807d3363861a7f216de43b34d846c) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "pzf.20m", 0x800006, 0x100000, CRC(7f536ff1) SHA1(905b9d62ef7bef47297c7f4a4dd697aed6df38a5) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION(QSOUND_SIZE, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "pzf.01",   0x00000, 0x08000, CRC(600fb2a3) SHA1(1fab1c2a23bf6ad8309d29ddbbc29435a8aeea13) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+	ROM_LOAD( "pzf.02",   0x28000, 0x20000, CRC(496076e0) SHA1(1ee4e135140afd0e8e03231e570cd77d140f6367) )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
+	ROM_LOAD16_WORD_SWAP( "pzf.11m",   0x000000, 0x200000, CRC(78442743) SHA1(b61190bb586871de6d54af580e3e1d9cc0de0acb) )
+	ROM_LOAD16_WORD_SWAP( "pzf.12m",   0x200000, 0x200000, CRC(399d2c7b) SHA1(e849dea97b8d16540415c0d9bbc4f9f4eb755ec4) )
+ROM_END
+
 ROM_START( ssf2 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "ssfe.03",  0x000000, 0x80000, CRC(a597745d) SHA1(5b12e09c14f0ea93b668b97ca2d27a686c85f641) )
@@ -7719,6 +7731,7 @@ GAME( 1996, sfz2alb,  sfz2al,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "St
 GAME( 1996, spf2t,    0,        cps2, cps2_2p2b, cps2,     ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (USA 960620)", 0 )
 GAME( 1996, spf2xj,   spf2t,    cps2, cps2_2p2b, cps2,     ROT0,   "Capcom", "Super Puzzle Fighter II X (Japan 960531)", 0 )
 GAME( 1996, spf2ta,   spf2t,    cps2, cps2_2p2b, cps2,     ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (Asia 960529)", 0 )
+GAME( 1996, spf2th,   spf2t,    cps2, cps2_2p2b, cps2,     ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (Hispanic 960531)", 0 )
 GAME( 1996, megaman2, 0,        cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Mega Man 2: The Power Fighters (USA 960708)", 0 )
 GAME( 1996, megaman2a,megaman2, cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Mega Man 2: The Power Fighters (Asia 960708)", 0 )
 GAME( 1996, rckman2j, megaman2, cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Rockman 2: The Power Fighters (Japan 960708)", 0 )

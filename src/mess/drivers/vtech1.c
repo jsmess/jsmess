@@ -591,7 +591,7 @@ static WRITE8_HANDLER( vtech1_latch_w )
 		logerror("vtech1_latch_w $%02X\n", data);
 
 	/* bit 1, SHRG mod (if installed) */
-	if (videoram_size == 0x2000)
+	if (space->machine->generic.videoram_size == 0x2000)
 	{
 		mc6847_gm0_w(vtech1->mc6847, BIT(data, 1));
 		mc6847_gm2_w(vtech1->mc6847, BIT(data, 1));
@@ -637,10 +637,10 @@ static WRITE8_HANDLER( vtech1_video_bank_w )
 
 static READ8_DEVICE_HANDLER( vtech1_mc6847_videoram_r )
 {
-	mc6847_inv_w(device, BIT(videoram[offset], 6));
-	mc6847_as_w(device, BIT(videoram[offset], 7));
+	mc6847_inv_w(device, BIT(device->machine->generic.videoram.u8[offset], 6));
+	mc6847_as_w(device, BIT(device->machine->generic.videoram.u8[offset], 7));
 
-	return videoram[offset];
+	return device->machine->generic.videoram.u8[offset];
 }
 
 static VIDEO_UPDATE( vtech1 )
@@ -715,11 +715,11 @@ static DRIVER_INIT( vtech1h )
 	DRIVER_INIT_CALL(vtech1);
 
 	/* the SHRG mod replaces the standard videoram chip with an 8k chip */
-	videoram_size = 0x2000;
-	videoram = auto_alloc_array(machine, UINT8, videoram_size);
+	machine->generic.videoram_size = 0x2000;
+	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, machine->generic.videoram_size);
 
 	memory_install_readwrite8_handler(prg, 0x7000, 0x77ff, 0, 0, SMH_BANK(4), SMH_BANK(4));
-	memory_configure_bank(machine, 4, 0, 4, videoram, 0x800);
+	memory_configure_bank(machine, 4, 0, 4, machine->generic.videoram.u8, 0x800);
 	memory_set_bank(machine, 4, 0);
 }
 
@@ -733,7 +733,7 @@ static ADDRESS_MAP_START( laser110_mem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
     AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
     AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
-    AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size) /* (6847) */
+    AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_SIZE_GENERIC(videoram) /* (6847) */
     AM_RANGE(0x7800, 0x7fff) AM_RAMBANK(1) /* 2k user ram */
     AM_RANGE(0x8000, 0xbfff) AM_NOP /* 16k ram expansion */
     AM_RANGE(0xc000, 0xffff) AM_NOP
@@ -744,7 +744,7 @@ static ADDRESS_MAP_START( laser210_mem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
     AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
     AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
-    AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size) /* U7 (6847) */
+    AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_SIZE_GENERIC(videoram) /* U7 (6847) */
     AM_RANGE(0x7800, 0x8fff) AM_RAMBANK(1) /* 6k user ram */
     AM_RANGE(0x9000, 0xcfff) AM_NOP /* 16k ram expansion */
     AM_RANGE(0xd000, 0xffff) AM_NOP
@@ -755,7 +755,7 @@ static ADDRESS_MAP_START( laser310_mem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
     AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
     AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
-    AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size) /* (6847) */
+    AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_SIZE_GENERIC(videoram) /* (6847) */
     AM_RANGE(0x7800, 0xb7ff) AM_RAMBANK(1) /* 16k user ram */
     AM_RANGE(0xb800, 0xf7ff) AM_NOP /* 16k ram expansion */
     AM_RANGE(0xf8ff, 0xffff) AM_NOP

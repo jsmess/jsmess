@@ -171,7 +171,7 @@ Check gticlub.c for details on the bottom board.
 #include "machine/konppc.h"
 #include "machine/konamiic.h"
 #include "machine/adc083x.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "video/konamiic.h"
 #include "video/gticlub.h"
 
@@ -229,8 +229,8 @@ static VIDEO_UPDATE( jetwave )
 
 static WRITE32_HANDLER( paletteram32_w )
 {
-	COMBINE_DATA(&paletteram32[offset]);
-	data = paletteram32[offset];
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
+	data = space->machine->generic.paletteram.u32[offset];
 	palette_set_color_rgb(space->machine, (offset * 2) + 0, pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16));
 	palette_set_color_rgb(space->machine, (offset * 2) + 1, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
@@ -280,17 +280,10 @@ static VIDEO_UPDATE( zr107 )
 
 /******************************************************************/
 
-static CUSTOM_INPUT( adcdo_r )
-{
-	const device_config *adc0838 = devtag_get_device(field->port->machine, "adc0838");
-	return adc083x_do_read(adc0838, 0);
-}
-
 static READ8_HANDLER( sysreg_r )
 {
 	UINT32 r = 0;
-	const device_config *adc0838 = devtag_get_device(space->machine, "adc0838");
-	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
+	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4" };
 
 	switch (offset)
 	{
@@ -298,17 +291,8 @@ static READ8_HANDLER( sysreg_r )
 		case 1:	/* I/O port 1 */
 		case 2:	/* I/O port 2 */
 		case 3:	/* System Port 0 */
-			r = input_port_read(space->machine, portnames[offset]);
-			break;
-
 		case 4:	/* System Port 1 */
-			/*
-                0x80 = PARAACK
-                0x40 = unused
-                0x20 = SARS (A/D busy flag)
-                0x10 = EEPDO (EEPROM DO)
-            */
-			r = (adc083x_sars_read(adc0838, 0) << 5) | (eeprom_read_bit() << 4);
+			r = input_port_read(space->machine, portnames[offset]);
 			break;
 
 		case 5:	/* Parallel data port */
@@ -319,8 +303,6 @@ static READ8_HANDLER( sysreg_r )
 
 static WRITE8_HANDLER( sysreg_w )
 {
-	const device_config *adc0838 = devtag_get_device(space->machine, "adc0838");
-
 	switch (offset)
 	{
 		case 0:	/* LED Register 0 */
@@ -346,9 +328,7 @@ static WRITE8_HANDLER( sysreg_w )
                 0x02 = EEPCLK
                 0x01 = EEPDI
             */
-			eeprom_write_bit((data & 0x01) ? 1 : 0);
-			eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
-			eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+			input_port_write(space->machine, "EEPROMOUT", data & 0x07, 0xff);
 			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 0 = %02X\n", data);
 			break;
@@ -369,9 +349,7 @@ static WRITE8_HANDLER( sysreg_w )
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
 				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
-			adc083x_cs_write(adc0838, 0, (data >> 2) & 1);
-			adc083x_di_write(adc0838, 0, (data >> 1) & 1);
-			adc083x_clk_write(adc0838, 0, (data >> 0) & 1);
+			input_port_write(space->machine, "OUT4", data, 0xff);
 			mame_printf_debug("System register 1 = %02X\n", data);
 			break;
 
@@ -435,7 +413,7 @@ static ADDRESS_MAP_START( zr107_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x74000000, 0x74003fff) AM_READWRITE(K056832_ram_long_r, K056832_ram_long_w)
 	AM_RANGE(0x74020000, 0x7402003f) AM_READWRITE(K056832_long_r, K056832_long_w)
 	AM_RANGE(0x74060000, 0x7406003f) AM_READWRITE(ccu_r, ccu_w)
-	AM_RANGE(0x74080000, 0x74081fff) AM_RAM_WRITE(paletteram32_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x74080000, 0x74081fff) AM_RAM_WRITE(paletteram32_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x740a0000, 0x740a3fff) AM_READ(K056832_rom_long_r)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)		/* 21N 21K 23N 23K */
 	AM_RANGE(0x78010000, 0x7801ffff) AM_WRITE(cgboard_dsp_shared_w_ppc)
@@ -453,15 +431,15 @@ ADDRESS_MAP_END
 
 static WRITE32_HANDLER( jetwave_palette_w )
 {
-	COMBINE_DATA(&paletteram32[offset]);
-	data = paletteram32[offset];
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
+	data = space->machine->generic.paletteram.u32[offset];
 	palette_set_color_rgb(space->machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 static ADDRESS_MAP_START( jetwave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0x80000000) AM_RAM		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_reg_r, K001604_reg_w)
-	AM_RANGE(0x74010000, 0x7401ffff) AM_MIRROR(0x80000000) AM_RAM_WRITE(jetwave_palette_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x74010000, 0x7401ffff) AM_MIRROR(0x80000000) AM_RAM_WRITE(jetwave_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x74020000, 0x7403ffff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_tile_r, K001604_tile_w)
 	AM_RANGE(0x74040000, 0x7407ffff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_char_r, K001604_char_w)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)		/* 21N 21K 23N 23K */
@@ -541,7 +519,7 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 
-static INPUT_PORTS_START( midnrun )
+static INPUT_PORTS_START( zr107 )
 	PORT_START("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )		// View switch
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )		// Shift up
@@ -555,7 +533,27 @@ static INPUT_PORTS_START( midnrun )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(adcdo_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("adc0838", adc083x_do_read)
+
+	PORT_START("IN4")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* PARAACK */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("adc0838",adc083x_sars_read)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom",eepromdev_read_bit)
+
+	PORT_START("EEPROMOUT")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+
+	PORT_START("OUT4")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("adc0838", adc083x_cs_write)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("adc0838", adc083x_di_write)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("adc0838", adc083x_clk_write)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( midnrun )
+	PORT_INCLUDE( zr107 )
 
 	PORT_START("IN3")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
@@ -586,20 +584,7 @@ static INPUT_PORTS_START( midnrun )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( windheat )
-	PORT_START("IN0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )		// View switch
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )		// Shift up
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )		// Shift down
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_TOGGLE		// AT/MT switch
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x0b, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(adcdo_r, NULL)
+	PORT_INCLUDE( zr107 )
 
 	PORT_START("IN3")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
@@ -619,7 +604,7 @@ static INPUT_PORTS_START( windheat )
 	PORT_DIPSETTING( 0x00, "Twin" )
 
 	PORT_START("ANALOG1")		// Steering wheel
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 	PORT_START("ANALOG2")		// Acceleration pedal
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
@@ -630,20 +615,7 @@ static INPUT_PORTS_START( windheat )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jetwave )
-	PORT_START("IN0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x0b, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(adcdo_r, NULL)
+	PORT_INCLUDE( zr107 )
 
 	PORT_START("IN3")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
@@ -705,7 +677,7 @@ static double adc0838_callback( const device_config *device, UINT8 input )
 }
 
 
-static const adc0831_interface zr107_adc_interface = {
+static const adc083x_interface zr107_adc_interface = {
 	adc0838_callback
 };
 
@@ -742,7 +714,7 @@ static MACHINE_DRIVER_START( zr107 )
 
 	MDRV_QUANTUM_TIME(HZ(30000))
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 	MDRV_MACHINE_START(zr107)
 	MDRV_MACHINE_RESET(zr107)
 
@@ -789,7 +761,7 @@ static MACHINE_DRIVER_START( jetwave )
 
 	MDRV_QUANTUM_TIME(HZ(30000))
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 	MDRV_MACHINE_START(zr107)
 	MDRV_MACHINE_RESET(zr107)
 

@@ -749,7 +749,7 @@ static WRITE8_HANDLER(pcw16_keyboard_control_w)
 				/* busy */
 				pcw16_keyboard_state |= PCW16_KEYBOARD_BUSY_STATUS;
 				/* keyboard takes data */
-				at_keyboard_write(pcw16_keyboard_data_shift);
+				at_keyboard_write(space->machine,pcw16_keyboard_data_shift);
 				/* set clock low - no furthur transmissions */
 				pcw16_keyboard_set_clock_state(0);
 				/* set int */

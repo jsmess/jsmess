@@ -1554,14 +1554,14 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 					for( x = 0; x < 96; x++ ) {
 						UINT8 data = pokemini_ram[ ( y * 12 ) + x ];
 
-						*BITMAP_ADDR16(tmpbitmap, y + 0, x) = ( data & 0x01 ) ? 3 : 0;
-						*BITMAP_ADDR16(tmpbitmap, y + 1, x) = ( data & 0x02 ) ? 3 : 0;
-						*BITMAP_ADDR16(tmpbitmap, y + 2, x) = ( data & 0x04 ) ? 3 : 0;
-						*BITMAP_ADDR16(tmpbitmap, y + 3, x) = ( data & 0x08 ) ? 3 : 0;
-						*BITMAP_ADDR16(tmpbitmap, y + 4, x) = ( data & 0x10 ) ? 3 : 0;
-						*BITMAP_ADDR16(tmpbitmap, y + 5, x) = ( data & 0x20 ) ? 3 : 0;
-						*BITMAP_ADDR16(tmpbitmap, y + 6, x) = ( data & 0x40 ) ? 3 : 0;
-						*BITMAP_ADDR16(tmpbitmap, y + 7, x) = ( data & 0x80 ) ? 3 : 0;
+						*BITMAP_ADDR16(machine->generic.tmpbitmap, y + 0, x) = ( data & 0x01 ) ? 3 : 0;
+						*BITMAP_ADDR16(machine->generic.tmpbitmap, y + 1, x) = ( data & 0x02 ) ? 3 : 0;
+						*BITMAP_ADDR16(machine->generic.tmpbitmap, y + 2, x) = ( data & 0x04 ) ? 3 : 0;
+						*BITMAP_ADDR16(machine->generic.tmpbitmap, y + 3, x) = ( data & 0x08 ) ? 3 : 0;
+						*BITMAP_ADDR16(machine->generic.tmpbitmap, y + 4, x) = ( data & 0x10 ) ? 3 : 0;
+						*BITMAP_ADDR16(machine->generic.tmpbitmap, y + 5, x) = ( data & 0x20 ) ? 3 : 0;
+						*BITMAP_ADDR16(machine->generic.tmpbitmap, y + 6, x) = ( data & 0x40 ) ? 3 : 0;
+						*BITMAP_ADDR16(machine->generic.tmpbitmap, y + 7, x) = ( data & 0x80 ) ? 3 : 0;
 					}
 				}
 

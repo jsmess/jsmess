@@ -241,8 +241,8 @@ GetLives( running_machine *machine )
 static WRITE8_HANDLER( coinplus_w )
 {
 	int dsw = input_port_read(space->machine, "DSW1");
-	coin_counter_w( 0, data&1 );
-	coin_counter_w( 1, data&2 );
+	coin_counter_w( space->machine, 0, data&1 );
+	coin_counter_w( space->machine, 1, data&2 );
 	if( data&1 )
 	{ /* TODO: coinage adjustments */
 		logerror( "COIN A+\n" );
@@ -760,8 +760,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu1_am, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(djboy_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(djboy_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(djboy_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(djboy_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd400, 0xd8ff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE(1)
 ADDRESS_MAP_END

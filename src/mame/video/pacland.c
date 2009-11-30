@@ -220,10 +220,6 @@ VIDEO_START( pacland )
 		tilemap_set_transmask(fg_tilemap, color, mask, 0);
 	}
 
-	spriteram = pacland_spriteram + 0x780;
-	spriteram_2 = spriteram + 0x800;
-	spriteram_3 = spriteram_2 + 0x800;
-
 	state_save_register_global(machine, palette_bank);
 	state_save_register_global(machine, scroll0);
 	state_save_register_global(machine, scroll1);
@@ -287,6 +283,9 @@ WRITE8_HANDLER( pacland_bankswitch_w )
 /* the sprite generator IC is the same as Mappy */
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int whichmask)
 {
+	UINT8 *spriteram = pacland_spriteram + 0x780;
+	UINT8 *spriteram_2 = spriteram + 0x800;
+	UINT8 *spriteram_3 = spriteram_2 + 0x800;
 	int offs;
 
 	for (offs = 0;offs < 0x80;offs += 2)

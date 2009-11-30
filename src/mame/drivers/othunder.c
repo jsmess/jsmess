@@ -360,8 +360,8 @@ static WRITE16_HANDLER( othunder_TC0220IOC_w )
                 0x000000    eeprom in data
                 x0000000    eeprom out data  */
 
-				set_led_status(0, data & 1);
-				set_led_status(1, data & 2);
+				set_led_status(space->machine, 0, data & 1);
+				set_led_status(space->machine, 1, data & 2);
 
 if (data & 4)
 	popmessage("OBPRI SET!");
@@ -506,7 +506,7 @@ static ADDRESS_MAP_START( othunder_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
 	AM_RANGE(0x220000, 0x22000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
 	AM_RANGE(0x300000, 0x300003) AM_READWRITE(othunder_sound_r, othunder_sound_w)
-	AM_RANGE(0x400000, 0x4005ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x400000, 0x4005ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x500000, 0x500007) AM_READWRITE(othunder_lightgun_r, othunder_lightgun_w)
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(irq_ack_w)
 ADDRESS_MAP_END
@@ -774,7 +774,7 @@ ROM_START( othunder )
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "b67-08", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "b67-07", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
@@ -810,7 +810,7 @@ ROM_START( othunderu )
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "b67-08", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "b67-07", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
@@ -846,7 +846,7 @@ ROM_START( othunderuo )
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "b67-08", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "b67-07", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
@@ -882,7 +882,7 @@ ROM_START( othunderj )
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "b67-08", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "b67-07", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
 
 	ROM_REGION( 0x0800, "plds", 0 )

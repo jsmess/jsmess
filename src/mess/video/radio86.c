@@ -14,7 +14,7 @@
 I8275_DISPLAY_PIXELS(radio86_display_pixels)
 {
 	int i;
-	bitmap_t *bitmap = tmpbitmap;
+	bitmap_t *bitmap = device->machine->generic.tmpbitmap;
 	UINT8 *charmap = memory_region(device->machine, "gfx1");
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp) {
@@ -36,7 +36,7 @@ UINT8 mikrosha_font_page;
 I8275_DISPLAY_PIXELS(mikrosha_display_pixels)
 {
 	int i;
-	bitmap_t *bitmap = tmpbitmap;
+	bitmap_t *bitmap = device->machine->generic.tmpbitmap;
 	UINT8 *charmap = memory_region(device->machine, "gfx1") + (mikrosha_font_page & 1) * 0x400;
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp) {
@@ -56,7 +56,7 @@ I8275_DISPLAY_PIXELS(mikrosha_display_pixels)
 I8275_DISPLAY_PIXELS(apogee_display_pixels)
 {
 	int i;
-	bitmap_t *bitmap = tmpbitmap;
+	bitmap_t *bitmap = device->machine->generic.tmpbitmap;
 	UINT8 *charmap = memory_region(device->machine, "gfx1") + (gpa & 1) * 0x400;
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp) {
@@ -76,7 +76,7 @@ I8275_DISPLAY_PIXELS(apogee_display_pixels)
 I8275_DISPLAY_PIXELS(partner_display_pixels)
 {
 	int i;
-	bitmap_t *bitmap = tmpbitmap;
+	bitmap_t *bitmap = device->machine->generic.tmpbitmap;
 	UINT8 *charmap = memory_region(device->machine, "gfx1") + 0x400 * (gpa * 2 + hlgt);
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp) {

@@ -65,7 +65,7 @@
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/es5506.h"
 #include "includes/taito_f3.h"
 #include "audio/taito_en.h"
@@ -88,10 +88,10 @@ Extract a standard version of this
 static WRITE32_HANDLER( color_ram_w )
 {
 	int a,r,g,b;
-	COMBINE_DATA(&paletteram32[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
 	{
-		a = paletteram32[offset];
+		a = space->machine->generic.paletteram.u32[offset];
 		r = (a &0xff0000) >> 16;
 		g = (a &0xff00) >> 8;
 		b = (a &0xff);
@@ -138,19 +138,6 @@ static const eeprom_interface groundfx_eeprom_interface =
 	"0100110000",	/* lock command */
 };
 
-static NVRAM_HANDLER( groundfx )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else {
-		eeprom_init(machine, &groundfx_eeprom_interface);
-		if (file)
-			eeprom_load(file);
-		else
-			eeprom_set_data(default_eeprom,128);  /* Default the gun setup values */
-	}
-}
-
 
 /**********************************************************
             GAME INPUTS
@@ -171,7 +158,6 @@ static WRITE32_HANDLER( groundfx_input_w )
 	switch (offset)
 	{
 		case 0x00:
-		{
 			if (ACCESSING_BITS_24_31)	/* $500000 is watchdog */
 			{
 				watchdog_reset(space->machine);
@@ -179,26 +165,21 @@ static WRITE32_HANDLER( groundfx_input_w )
 
 			if (ACCESSING_BITS_0_7)
 			{
-				eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				eeprom_write_bit(data & 0x40);
-				eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-				return;
+				input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 			}
 
-			return;
-		}
+			break;
 
 		case 0x01:
-		{
 			if (ACCESSING_BITS_24_31)
 			{
-				coin_lockout_w(0,~data & 0x01000000);
-				coin_lockout_w(1,~data & 0x02000000);
-				coin_counter_w(0, data & 0x04000000);
-				coin_counter_w(1, data & 0x08000000);
+				coin_lockout_w(space->machine, 0,~data & 0x01000000);
+				coin_lockout_w(space->machine, 1,~data & 0x02000000);
+				coin_counter_w(space->machine, 0, data & 0x04000000);
+				coin_counter_w(space->machine, 1, data & 0x08000000);
 				coin_word = (data >> 16) &0xffff;
 			}
-		}
+			break;
 	}
 }
 
@@ -252,7 +233,7 @@ static WRITE32_HANDLER( motor_control_w )
 static ADDRESS_MAP_START( groundfx_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM	AM_BASE(&groundfx_ram) /* main CPUA ram */
-	AM_RANGE(0x300000, 0x303fff) AM_RAM	AM_BASE(&spriteram32) AM_SIZE(&spriteram_size) /* sprite ram */
+	AM_RANGE(0x300000, 0x303fff) AM_RAM	AM_BASE_SIZE_GENERIC(spriteram) /* sprite ram */
 	AM_RANGE(0x400000, 0x400003) AM_WRITE(motor_control_w)	/* gun vibration */
 	AM_RANGE(0x500000, 0x500003) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0x500004, 0x500007) AM_READ_PORT("SYSTEM")
@@ -263,7 +244,7 @@ static ADDRESS_MAP_START( groundfx_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x830000, 0x83002f) AM_READWRITE(TC0480SCP_ctrl_long_r,TC0480SCP_ctrl_long_w)	// debugging
 	AM_RANGE(0x900000, 0x90ffff) AM_READWRITE(TC0100SCN_long_r,TC0100SCN_long_w)	/* piv tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_READWRITE(TC0100SCN_ctrl_long_r,TC0100SCN_ctrl_long_w)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE(color_ram_w) AM_BASE(&paletteram32) /* palette ram */
+	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE(color_ram_w) AM_BASE_GENERIC(paletteram) /* palette ram */
 	AM_RANGE(0xb00000, 0xb003ff) AM_RAM						// ?? single bytes, blending ??
 	AM_RANGE(0xc00000, 0xc00007) AM_READNOP /* Network? */
 	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w)	/* perhaps port based rotate control? */
@@ -283,7 +264,7 @@ static INPUT_PORTS_START( groundfx )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON3 )		/* shift hi */
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON1 )		/* brake */
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -293,6 +274,11 @@ static INPUT_PORTS_START( groundfx )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
 
 	PORT_START("SYSTEM")
 	PORT_SERVICE_NO_TOGGLE( 0x00000001, IP_ACTIVE_LOW )
@@ -389,7 +375,8 @@ static MACHINE_DRIVER_START( groundfx )
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 
 	MDRV_MACHINE_RESET(groundfx)
-	MDRV_NVRAM_HANDLER(groundfx)
+//  MDRV_NVRAM_HANDLER(groundfx)
+	MDRV_EEPROM_ADD("eeprom", groundfx_eeprom_interface, 128, default_eeprom)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

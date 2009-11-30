@@ -284,21 +284,21 @@ static READ8_HANDLER( random_num_r )
 
 static WRITE8_HANDLER( led_0_w )
 {
-	set_led_status(0, data & 1);
+	set_led_status(space->machine, 0, data & 1);
 	logerror("LED 0 %s\n", (data & 1) ? "on" : "off");
 }
 
 
 static WRITE8_HANDLER( led_1_w )
 {
-	set_led_status(1, data & 1);
+	set_led_status(space->machine, 1, data & 1);
 	logerror("LED 1 %s\n", (data & 1) ? "on" : "off");
 }
 
 
 static WRITE8_HANDLER( gridlee_coin_counter_w )
 {
-	coin_counter_w(0, data & 1);
+	coin_counter_w(space->machine, 0, data & 1);
 	logerror("coin counter %s\n", (data & 1) ? "on" : "off");
 }
 
@@ -312,8 +312,8 @@ static WRITE8_HANDLER( gridlee_coin_counter_w )
 
 /* CPU 1 read addresses */
 static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&spriteram)
-	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(gridlee_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(gridlee_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(led_0_w)
 	AM_RANGE(0x9010, 0x9010) AM_WRITE(led_1_w)
 	AM_RANGE(0x9020, 0x9020) AM_WRITE(gridlee_coin_counter_w)
@@ -328,7 +328,7 @@ static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9700, 0x9700) AM_READ_PORT("IN2") AM_WRITENOP
 	AM_RANGE(0x9820, 0x9820) AM_READ(random_num_r)
 	AM_RANGE(0x9828, 0x993f) AM_WRITE(gridlee_sound_w)
-	AM_RANGE(0x9c00, 0x9cff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x9c00, 0x9cff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -431,7 +431,7 @@ void ui_mess_main_menu_populate(running_machine *machine, ui_menu *menu)
 	int has_keyboard = FALSE;
 
 	/* scan the input port array to see what options we need to enable */
-	for (port = machine->portconfig; port != NULL; port = port->next)
+	for (port = machine->portlist.head; port != NULL; port = port->next)
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -448,7 +448,7 @@ void ui_mess_main_menu_populate(running_machine *machine, ui_menu *menu)
 
 #if HAS_WAVE
   	/* add tape control menu */
-	if (device_list_first(machine->config->devicelist, CASSETTE))
+	if (device_list_first(&machine->config->devicelist, CASSETTE))
 		ui_menu_item_append(menu, "Tape Control", NULL, 0, ui_mess_menu_tape_control);
 #endif /* HAS_WAVE */
 

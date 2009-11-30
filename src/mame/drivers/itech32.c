@@ -732,17 +732,17 @@ static WRITE8_DEVICE_HANDLER( drivedge_portb_out )
 	/* bit 4 controls the ticket dispenser */
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
-	set_led_status(1, data & 0x01);
-	set_led_status(2, data & 0x02);
-	set_led_status(3, data & 0x04);
+	set_led_status(space->machine, 1, data & 0x01);
+	set_led_status(space->machine, 2, data & 0x02);
+	set_led_status(space->machine, 3, data & 0x04);
 	ticket_dispenser_w(space, 0, (data & 0x10) << 3);
-	coin_counter_w(0, (data & 0x20) >> 5);
+	coin_counter_w(space->machine, 0, (data & 0x20) >> 5);
 }
 
 
 static WRITE8_DEVICE_HANDLER( drivedge_turbo_light )
 {
-	set_led_status(0, data);
+	set_led_status(device->machine, 0, data);
 }
 
 
@@ -755,7 +755,7 @@ static WRITE8_DEVICE_HANDLER( pia_portb_out )
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
 	ticket_dispenser_w(space, 0, (data & 0x10) << 3);
-	coin_counter_w(0, (data & 0x20) >> 5);
+	coin_counter_w(space->machine, 0, (data & 0x20) >> 5);
 }
 
 
@@ -961,7 +961,7 @@ static ADDRESS_MAP_START( timekill_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x078000, 0x078001) AM_WRITE(sound_data_w)
 	AM_RANGE(0x080000, 0x08007f) AM_READWRITE(itech32_video_r, itech32_video_w) AM_BASE(&itech32_video)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(int1_ack_w)
-	AM_RANGE(0x0c0000, 0x0c7fff) AM_RAM_WRITE(timekill_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x0c0000, 0x0c7fff) AM_RAM_WRITE(timekill_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1", 0) AM_BASE(&main_rom)
 ADDRESS_MAP_END
 
@@ -979,7 +979,7 @@ static ADDRESS_MAP_START( bloodstm_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x480000, 0x480001) AM_WRITE(sound_data_w)
 	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE(bloodstm_video_r, bloodstm_video_w) AM_BASE(&itech32_video)
-	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE(bloodstm_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE(bloodstm_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(bloodstm_plane_w)
 	AM_RANGE(0x780000, 0x780001) AM_READ_PORT("EXTRA")
 	AM_RANGE(0x800000, 0x87ffff) AM_MIRROR(0x780000) AM_ROM AM_REGION("user1", 0) AM_BASE(&main_rom)
@@ -1044,7 +1044,7 @@ AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE(test2_r, test2_w)
 	AM_RANGE(0x08e000, 0x08e003) AM_READ_PORT("8e000") AM_WRITENOP
 	AM_RANGE(0x100000, 0x10000f) AM_WRITE(drivedge_zbuf_control_w) AM_BASE(&drivedge_zbuf_control)
 	AM_RANGE(0x180000, 0x180003) AM_WRITE(drivedge_color0_w)
-	AM_RANGE(0x1a0000, 0x1bffff) AM_RAM_WRITE(drivedge_paletteram_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x1a0000, 0x1bffff) AM_RAM_WRITE(drivedge_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1c0000, 0x1c0003) AM_WRITENOP
 	AM_RANGE(0x1e0000, 0x1e0113) AM_READWRITE(itech020_video_r, itech020_video_w) AM_BASE((UINT32 **)&itech32_video)
 	AM_RANGE(0x1e4000, 0x1e4003) AM_WRITE(tms_reset_assert_w)
@@ -1082,7 +1082,7 @@ static ADDRESS_MAP_START( itech020_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x480000, 0x480003) AM_WRITE(sound_data32_w)
 	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE(itech020_video_r, itech020_video_w) AM_BASE((UINT32 **)&itech32_video)
 	AM_RANGE(0x578000, 0x57ffff) AM_READNOP				/* touched by protection */
-	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE(itech020_paletteram_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE(itech020_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x600000, 0x603fff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
 /* ? */	AM_RANGE(0x61ff00, 0x61ffff) AM_WRITENOP			/* Unknown Writes */
 	AM_RANGE(0x680000, 0x680003) AM_READWRITE(itech020_prot_result_r, SMH_NOP)

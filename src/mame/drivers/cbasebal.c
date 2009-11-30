@@ -53,7 +53,7 @@ static READ8_HANDLER( bankedram_r )
 	else if (rambank == 1)
 	{
 		if (offset < 0x800)
-			return paletteram[offset];
+			return space->machine->generic.paletteram.u8[offset];
 		else return 0;
 	}
 	else
@@ -77,10 +77,10 @@ static WRITE8_HANDLER( bankedram_w )
 
 static WRITE8_HANDLER( cbasebal_coinctrl_w )
 {
-	coin_lockout_w(0,~data & 0x04);
-	coin_lockout_w(1,~data & 0x08);
-	coin_counter_w(0,data & 0x01);
-	coin_counter_w(1,data & 0x02);
+	coin_lockout_w(space->machine, 0,~data & 0x04);
+	coin_lockout_w(space->machine, 1,~data & 0x08);
+	coin_counter_w(space->machine, 0,data & 0x01);
+	coin_counter_w(space->machine, 1,data & 0x02);
 }
 
 
@@ -134,9 +134,9 @@ static WRITE8_HANDLER( eeprom_serial_w )
 static ADDRESS_MAP_START( cbasebal_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(&paletteram)	/* palette + vram + scrollram */
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_GENERIC(paletteram)	/* palette + vram + scrollram */
 	AM_RANGE(0xe000, 0xfdff) AM_RAM		/* work RAM */
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cbasebal_portmap, ADDRESS_SPACE_IO, 8 )

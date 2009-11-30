@@ -87,9 +87,9 @@ DRIVER_INIT( mz700 )
 	mz->mz700 = TRUE;
 	mz->mz700_mode = TRUE;
 
-	videoram_size = 0x800;
-	videoram = auto_alloc_array(machine, UINT8, videoram_size);
-	colorram = auto_alloc_array(machine, UINT8, 0x800);
+	machine->generic.videoram_size = 0x800;
+	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, machine->generic.videoram_size);
+	machine->generic.colorram.u8 = auto_alloc_array(machine, UINT8, 0x800);
 }
 
 DRIVER_INIT( mz800 )
@@ -99,9 +99,9 @@ DRIVER_INIT( mz800 )
 	mz->mz700_mode = FALSE;
 
 	/* video ram */
-	videoram_size = 0x4000;
-	videoram = auto_alloc_array(machine, UINT8, videoram_size);
-	colorram = videoram + 0x800;
+	machine->generic.videoram_size = 0x4000;
+	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, machine->generic.videoram_size);
+	machine->generic.colorram.u8 = machine->generic.videoram.u8 + 0x800;
 
 	/* character generator ram */
 	mz->cgram = auto_alloc_array(machine, UINT8, 0x1000);
@@ -163,13 +163,13 @@ READ8_HANDLER( mz800_bank_0_r )
 		{
 			/* vram from 0x8000 to 0xbfff */
 			memory_install_readwrite8_handler(spc, 0x8000, 0xbfff, 0, 0, SMH_BANK(4), SMH_BANK(4));
-			memory_set_bankptr(space->machine, 4, videoram);
+			memory_set_bankptr(space->machine, 4, space->machine->generic.videoram.u8);
 		}
 		else
 		{
 			/* vram from 0x8000 to 0x9fff */
 			memory_install_readwrite8_handler(spc, 0x8000, 0x9fff, 0, 0, SMH_BANK(4), SMH_BANK(4));
-			memory_set_bankptr(space->machine, 4, videoram);
+			memory_set_bankptr(space->machine, 4, space->machine->generic.videoram.u8);
 
 			/* ram from 0xa000 to 0xbfff */
 			memory_install_readwrite8_handler(spc, 0xa000, 0xbfff, 0, 0, SMH_BANK(5), SMH_BANK(5));
@@ -267,11 +267,11 @@ WRITE8_HANDLER( mz700_bank_3_w )
 		{
 			/* switch in videoram */
 			memory_install_readwrite8_handler(spc, 0xd000, 0xd7ff, 0, 0, SMH_BANK(7), SMH_BANK(7));
-			memory_set_bankptr(space->machine, 7, videoram);
+			memory_set_bankptr(space->machine, 7, space->machine->generic.videoram.u8);
 
 			/* switch in colorram */
 			memory_install_readwrite8_handler(spc, 0xd800, 0xdfff, 0, 0, SMH_BANK(9), SMH_BANK(9));
-			memory_set_bankptr(space->machine, 9, colorram);
+			memory_set_bankptr(space->machine, 9, space->machine->generic.colorram.u8);
 
 			mz->mz700_ram_vram = TRUE;
 
@@ -333,13 +333,13 @@ WRITE8_HANDLER( mz700_bank_4_w )
 		{
 			/* vram from 0x8000 to 0xbfff */
 			memory_install_readwrite8_handler(spc, 0x8000, 0xbfff, 0, 0, SMH_BANK(4), SMH_BANK(4));
-			memory_set_bankptr(space->machine, 4, videoram);
+			memory_set_bankptr(space->machine, 4, space->machine->generic.videoram.u8);
 		}
 		else
 		{
 			/* vram from 0x8000 to 0x9fff */
 			memory_install_readwrite8_handler(spc, 0x8000, 0x9fff, 0, 0, SMH_BANK(4), SMH_BANK(4));
-			memory_set_bankptr(space->machine, 4, videoram);
+			memory_set_bankptr(space->machine, 4, space->machine->generic.videoram.u8);
 
 			/* ram from 0xa000 to 0xbfff */
 			memory_install_readwrite8_handler(spc, 0xa000, 0xbfff, 0, 0, SMH_BANK(5), SMH_BANK(5));

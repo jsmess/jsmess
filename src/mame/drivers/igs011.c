@@ -219,9 +219,9 @@ static WRITE16_HANDLER( igs011_palette )
 {
 	int rgb;
 
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 
-	rgb = (paletteram16[offset & 0x7ff] & 0xff) | ((paletteram16[offset | 0x800] & 0xff) << 8);
+	rgb = (space->machine->generic.paletteram.u16[offset & 0x7ff] & 0xff) | ((space->machine->generic.paletteram.u16[offset | 0x800] & 0xff) << 8);
 	palette_set_color_rgb(space->machine,offset & 0x7ff,pal5bit(rgb >> 0),pal5bit(rgb >> 5),pal5bit(rgb >> 10));
 }
 
@@ -783,7 +783,7 @@ static WRITE16_HANDLER( lhb2_magic_w )
 
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(0,	data & 0x20);
+				coin_counter_w(space->machine, 0,	data & 0x20);
 				//  coin out        data & 0x40
 				igs_hopper		=	data & 0x80;
 			}
@@ -874,7 +874,7 @@ static WRITE16_HANDLER( drgnwrld_magic_w )
 
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
-				coin_counter_w(0,data & 2);
+				coin_counter_w(space->machine, 0,data & 2);
 
 			if (data & ~0x2)
 				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(space->cpu), data);
@@ -938,7 +938,7 @@ static WRITE16_HANDLER( wlcc_magic_w )
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(0,	data & 0x01);
+				coin_counter_w(space->machine, 0,	data & 0x01);
 				//  coin out        data & 0x02
 
 				okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), (data & 0x10) ? 0x40000 : 0);
@@ -1012,7 +1012,7 @@ static WRITE16_HANDLER( lhb_inputs_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0,	data & 0x20	);
+		coin_counter_w(space->machine, 0,	data & 0x20	);
 		//  coin out        data & 0x40
 		igs_hopper		=	data & 0x80;
 	}
@@ -1056,8 +1056,8 @@ static WRITE16_HANDLER( vbowl_magic_w )
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(0,data & 1);
-				coin_counter_w(1,data & 2);
+				coin_counter_w(space->machine, 0,data & 1);
+				coin_counter_w(space->machine, 1,data & 2);
 			}
 
 			if (data & ~0x3)
@@ -1123,7 +1123,7 @@ static WRITE16_HANDLER( xymg_magic_w )
 
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(0,	data & 0x20);
+				coin_counter_w(space->machine, 0,	data & 0x20);
 				//  coin out        data & 0x40
 			}
 
@@ -1192,9 +1192,9 @@ static READ16_HANDLER( xymg_magic_r )
 
 static ADDRESS_MAP_START( drgnwrld, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
-	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
+	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
-	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE( &paletteram16 )
+	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
 	AM_RANGE( 0x700000, 0x700003 ) AM_DEVWRITE8( "ymsnd", ym3812_w, 0x00ff )
@@ -1217,13 +1217,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lhb2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
-	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
+	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE( 0x200000, 0x200001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
 	AM_RANGE( 0x204000, 0x204003 ) AM_DEVWRITE8( "ymsnd", ym2413_w, 0x00ff )
 	AM_RANGE( 0x208000, 0x208003 ) AM_WRITE( lhb2_magic_w )
 	AM_RANGE( 0x208002, 0x208003 ) AM_READ ( lhb2_magic_r )
 	AM_RANGE( 0x20c000, 0x20cfff ) AM_RAM AM_BASE(&igs011_priority_ram)
-	AM_RANGE( 0x210000, 0x211fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE( &paletteram16 )
+	AM_RANGE( 0x210000, 0x211fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x214000, 0x214001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
 	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE( igs011_priority_w )
@@ -1243,10 +1243,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wlcc, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
-	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
+	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
-	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE( &paletteram16 )
+	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x520000, 0x520001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
 	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE( wlcc_magic_w )
@@ -1276,10 +1276,10 @@ static WRITE16_HANDLER( lhb_irq_enable_w )
 static ADDRESS_MAP_START( lhb, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x010000, 0x010001 ) AM_DEVWRITE( "oki", lhb_okibank_w )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
-	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
+	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
-	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE( &paletteram16 )
+	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
 	AM_RANGE( 0x700000, 0x700001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x700002, 0x700005 ) AM_READ ( lhb_inputs_r )
@@ -1357,10 +1357,10 @@ static WRITE16_HANDLER( vbowl_link_3_w )	{ }
 
 static ADDRESS_MAP_START( vbowl, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
-	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
+	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
-	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE( &paletteram16 )
+	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x520000, 0x520001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x600000, 0x600007 ) AM_DEVREADWRITE( "ics", ics2115_word_r, ics2115_word_w )
 	AM_RANGE( 0x700000, 0x700003 ) AM_RAM AM_BASE( &vbowl_trackball )
@@ -1399,7 +1399,7 @@ static ADDRESS_MAP_START( xymg, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
-	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE( &paletteram16 )
+	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
 	AM_RANGE( 0x700000, 0x700003 ) AM_WRITE( xymg_magic_w )
 	AM_RANGE( 0x700002, 0x700003 ) AM_READ ( xymg_magic_r )
@@ -1415,7 +1415,7 @@ static ADDRESS_MAP_START( xymg, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x85b800, 0x85b801 ) AM_WRITE( igs011_blit_pen_w )
 	AM_RANGE( 0x85c000, 0x85c001 ) AM_WRITE( igs011_blit_depth_w )
 	AM_RANGE( 0x888000, 0x888001 ) AM_READ( igs_3_dips_r )
-	AM_RANGE( 0x1f0000, 0x1f3fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size ) // extra ram
+	AM_RANGE( 0x1f0000, 0x1f3fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram ) // extra ram
 ADDRESS_MAP_END
 
 
@@ -3621,7 +3621,7 @@ GAME( 1996, xymg,         0,        xymg,     xymg,      xymg,         ROT0, "IG
 GAME( 1996, wlcc,         xymg,     wlcc,     wlcc,      wlcc,         ROT0, "IGS",        "Wan Li Chang Cheng (China, V638C)",    0 )
 GAME( 1996, vbowl,        0,        vbowl,    vbowl,     vbowl,        ROT0, "IGS",        "Virtua Bowling (World, V101XCM)",      GAME_IMPERFECT_SOUND )
 GAME( 1996, vbowlj,       vbowl,    vbowl,    vbowlj,    vbowlj,       ROT0, "IGS / Alta", "Virtua Bowling (Japan, V100JCM)",      GAME_IMPERFECT_SOUND )
-GAME( 1998, nkishusp,     0,        lhb2,     lhb2,      nkishusp,     ROT0, "IGS / Alta", "Mahjong Nenrikishu SP",                0 )
+GAME( 1998, nkishusp,     lhb2,     lhb2,     lhb2,      nkishusp,     ROT0, "IGS / Alta", "Mahjong Nenrikishu SP",                GAME_NOT_WORKING )
 
 GAME( 1997, drgnwrld,     0,        drgnwrld, drgnwrld,  drgnwrld,     ROT0, "IGS",        "Dragon World (World, V040O)",          0 )
 GAME( 1995, drgnwrldv30,  drgnwrld, drgnwrld, drgnwrld,  drgnwrldv30,  ROT0, "IGS",        "Dragon World (World, V030O)",          0 )

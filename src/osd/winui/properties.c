@@ -624,7 +624,7 @@ static char *GameInfoCPU(UINT nIndex)
 
 	ZeroMemory(buf, sizeof(buf));
 
-	cpu = device_list_class_first(config->devicelist, DEVICE_CLASS_CPU_CHIP);
+	cpu = device_list_class_first(&config->devicelist, DEVICE_CLASS_CPU_CHIP);
 	while (cpu != NULL)
 	{
 		if (cpu->clock >= 1000000)
@@ -663,7 +663,7 @@ static char *GameInfoSound(UINT nIndex)
 	buf[0] = 0;
 
 	/* iterate over sound chips */
-	sound = device_list_class_first(config->devicelist, DEVICE_CLASS_SOUND_CHIP);
+	sound = device_list_class_first(&config->devicelist, DEVICE_CLASS_SOUND_CHIP);
 	while(sound != NULL)
 	{
 		int clock,count;
@@ -2607,7 +2607,7 @@ static void SetYM3812Enabled(HWND hWnd, int nIndex)
 	{
 		enabled = FALSE;
 
-		for (sound = device_list_class_first(config->devicelist, DEVICE_CLASS_SOUND_CHIP); sound != NULL;
+		for (sound = device_list_class_first(&config->devicelist, DEVICE_CLASS_SOUND_CHIP); sound != NULL;
 			sound = device_list_class_next(sound, DEVICE_CLASS_SOUND_CHIP))
 		{
 			if (nIndex <= -1

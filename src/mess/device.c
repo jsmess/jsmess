@@ -369,7 +369,7 @@ static char *string_buffer_putstr(char *buffer, size_t buffer_length, size_t *bu
 	MESS device
 -------------------------------------------------*/
 
-static void create_mess_device(running_machine *machine, device_config **listheadptr, device_getinfo_handler handler, const game_driver *gamedrv,
+static void create_mess_device(running_machine *machine, device_list *devlist, device_getinfo_handler handler, const game_driver *gamedrv,
 	int count_override, int *position)
 {
 	mess_device_class mess_devclass;
@@ -411,7 +411,7 @@ static void create_mess_device(running_machine *machine, device_config **listhea
 		}
 
 		/* create a bonafide MAME device */
-		device = device_list_add(listheadptr, NULL, MESS_DEVICE, mame_tag, 0);
+		device = device_list_add(devlist, NULL, MESS_DEVICE, mame_tag, 0);
 		device->machine = machine;
 		mess_device = (mess_device_config *) device->inline_config;
 
@@ -540,7 +540,7 @@ const device_config *image_from_devtype_and_index(running_machine *machine, iode
 	const device_config *dev;
 	const legacy_mess_device *iodev;
 
-	for (dev = device_list_first(machine->config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
+	for (dev = device_list_first(&machine->config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
 	{
 		iodev = mess_device_from_core_device(dev);
 		if ((type == iodev->type) && (iodev->index_in_device == id))

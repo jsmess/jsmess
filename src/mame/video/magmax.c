@@ -78,7 +78,7 @@ VIDEO_START( magmax )
 	prom_tab = auto_alloc_array(machine, UINT32, 256);
 
 	/* Allocate temporary bitmap */
- 	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+ 	machine->generic.tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	for (i=0; i<256; i++)
 	{
@@ -91,6 +91,7 @@ VIDEO_START( magmax )
 
 VIDEO_UPDATE( magmax )
 {
+	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
 	int offs;
 
 	/* bit 2 flip screen */
@@ -107,7 +108,7 @@ VIDEO_UPDATE( magmax )
 		UINT32 scroll_v = (*magmax_scroll_y) & 0xff;
 
 		/*clear background-over-sprites bitmap*/
-		bitmap_fill(tmpbitmap, NULL, 0);
+		bitmap_fill(screen->machine->generic.tmpbitmap, NULL, 0);
 
 		for (v = 2*8; v < 30*8; v++) /*only for visible area*/
 		{
@@ -158,7 +159,7 @@ VIDEO_UPDATE( magmax )
 
 				/*priority: background over sprites*/
 				if (map_v_scr_100 && ((graph_data & 0x0c)==0x0c))
-					*BITMAP_ADDR16(tmpbitmap, v, h) = line_data[h];
+					*BITMAP_ADDR16(screen->machine->generic.tmpbitmap, v, h) = line_data[h];
 			}
 
 			if (flipscreen)
@@ -175,7 +176,7 @@ VIDEO_UPDATE( magmax )
 	}
 
 	/* draw the sprites */
-	for (offs = 0; offs < spriteram_size/2; offs += 4)
+	for (offs = 0; offs < screen->machine->generic.spriteram_size/2; offs += 4)
 	{
 		int sx, sy;
 
@@ -213,7 +214,7 @@ VIDEO_UPDATE( magmax )
 	}
 
 	if (!(*magmax_vreg & 0x40))		/* background disable */
-		copybitmap_trans(bitmap, tmpbitmap, flipscreen,flipscreen,0,0, cliprect, 0);
+		copybitmap_trans(bitmap, screen->machine->generic.tmpbitmap, flipscreen,flipscreen,0,0, cliprect, 0);
 
 	/* draw the foreground characters */
 	for (offs = 32*32-1; offs >= 0; offs -= 1)
@@ -221,7 +222,7 @@ VIDEO_UPDATE( magmax )
 		//int page = (*magmax_vreg>>3) & 0x1;
 		int code;
 
-		code = videoram16[offs /*+ page*/] & 0xff;
+		code = screen->machine->generic.videoram.u16[offs /*+ page*/] & 0xff;
 		if (code)
 		{
 			int sx = (offs % 32);

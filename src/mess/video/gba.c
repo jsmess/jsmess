@@ -1763,7 +1763,7 @@ INLINE UINT32 decrease_brightness(UINT32 color, int coeff)
 
 void gba_draw_scanline(running_machine *machine, int y)
 {
-	bitmap_t *bitmap = tmpbitmap;
+	bitmap_t *bitmap = machine->generic.tmpbitmap;
 	UINT16 *scanline = BITMAP_ADDR16(bitmap, y, 0);
 	int i, x;
 	static UINT32 xferscan[7][240+2048];	// up to 1024 pixels of slop on either side to allow easier clip handling

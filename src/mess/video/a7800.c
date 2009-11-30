@@ -115,7 +115,7 @@ static void maria_draw_scanline(running_machine *machine)
 	UINT16 *scanline;
 
 	/* set up scanline */
-	scanline = BITMAP_ADDR16(tmpbitmap, maria_scanline, 0);
+	scanline = BITMAP_ADDR16(machine->generic.tmpbitmap, maria_scanline, 0);
 	for (i = 0; i < 320; i++)
 		scanline[i] = maria_backcolor;
 

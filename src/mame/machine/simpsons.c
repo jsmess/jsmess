@@ -86,8 +86,8 @@ WRITE8_HANDLER( simpsons_eeprom_w )
 WRITE8_HANDLER( simpsons_coin_counter_w )
 {
 	/* bit 0,1 coin counters */
-	coin_counter_w(0,data & 0x01);
-	coin_counter_w(1,data & 0x02);
+	coin_counter_w(space->machine, 0,data & 0x01);
+	coin_counter_w(space->machine, 1,data & 0x02);
 	/* bit 2 selects mono or stereo sound */
 	/* bit 3 = enable char ROM reading through the video RAM */
 	K052109_set_RMRD_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
@@ -125,9 +125,9 @@ MACHINE_RESET( simpsons )
 
 	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), simpsons_banking);
 
-	paletteram = &RAM[0x88000];
+	machine->generic.paletteram.u8 = &RAM[0x88000];
 	simpsons_xtraram = &RAM[0x89000];
-	spriteram16 = (UINT16 *)&RAM[0x8a000];
+	machine->generic.spriteram.u16 = (UINT16 *)&RAM[0x8a000];
 
 	simpsons_firq_enabled = 0;
 

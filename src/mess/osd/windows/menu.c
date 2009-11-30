@@ -118,7 +118,7 @@ static int input_item_from_serial_number(running_machine *machine, int serial_nu
 	const input_setting_config *this_setting = NULL;
 
 	i = 0;
-	for (this_port = machine->portconfig; (i != serial_number) && (this_port != NULL); this_port = this_port->next)
+	for (this_port = machine->portlist.head; (i != serial_number) && (this_port != NULL); this_port = this_port->next)
 	{
 		i++;
 		for (this_field = this_port->fieldlist; (i != serial_number) && (this_field != NULL); this_field = this_field->next)
@@ -160,7 +160,7 @@ static int serial_number_from_input_item(running_machine *machine, const input_p
 	const input_setting_config *this_setting;
 
 	i = 0;
-	for (this_port = machine->portconfig; this_port != NULL; this_port = this_port->next)
+	for (this_port = machine->portlist.head; this_port != NULL; this_port = this_port->next)
 	{
 		if ((port == this_port) && (field == NULL) && (setting == NULL))
 			return i;
@@ -225,7 +225,7 @@ static void customize_input(running_machine *machine, HWND wnd, const char *titl
 		win_dialog_add_separator(dlg);
 	}
 
-	for (port = machine->portconfig; port != NULL; port = port->next)
+	for (port = machine->portlist.head; port != NULL; port = port->next)
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -379,7 +379,7 @@ static void customize_switches(running_machine *machine, HWND wnd, int title_str
 	if (!dlg)
 		goto done;
 
-	for (port = machine->portconfig; port != NULL; port = port->next)
+	for (port = machine->portlist.head; port != NULL; port = port->next)
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -519,7 +519,7 @@ static void customize_analogcontrols(running_machine *machine, HWND wnd)
 	if (!dlg)
 		goto done;
 
-	for (port = machine->portconfig; port != NULL; port = port->next)
+	for (port = machine->portlist.head; port != NULL; port = port->next)
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -1195,7 +1195,7 @@ static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
 	int child_count = 0;
 
 	use_input_categories = 0;
-	for (port = machine->portconfig; port != NULL; port = port->next)
+	for (port = machine->portlist.head; port != NULL; port = port->next)
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -1214,7 +1214,7 @@ static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
 	if (use_input_categories)
 	{
 		// using input categories
-		for (port = machine->portconfig; port != NULL; port = port->next)
+		for (port = machine->portlist.head; port != NULL; port = port->next)
 		{
 			for (field = port->fieldlist; field != NULL; field = field->next)
 			{
@@ -1350,7 +1350,7 @@ static void prepare_menus(HWND wnd)
 	has_misc		= input_has_input_class(window->machine, INPUT_CLASS_MISC);
 
 	has_analog = 0;
-	for (port = window->machine->portconfig; port != NULL; port = port->next)
+	for (port = window->machine->portlist.head; port != NULL; port = port->next)
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -1405,7 +1405,7 @@ static void prepare_menus(HWND wnd)
 	// if we are using categorized input, we need to properly checkmark the categories
 	if (use_input_categories)
 	{
-		for (port = window->machine->portconfig; port != NULL; port = port->next)
+		for (port = window->machine->portlist.head; port != NULL; port = port->next)
 		{
 			for (field = port->fieldlist; field != NULL; field = field->next)
 			{

@@ -57,7 +57,7 @@ static WRITE8_HANDLER( chqflag_bankswitch_w )
 	if (data & 0x20)
 	{
 		memory_install_readwrite8_handler(space, 0x1800, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(5), paletteram_xBBBBBGGGGGRRRRR_be_w);
-		memory_set_bankptr(space->machine, 5, paletteram);
+		memory_set_bankptr(space->machine, 5, space->machine->generic.paletteram.v);
 
 		if (K051316_readroms)
 			memory_install_readwrite8_handler(space, 0x1000, 0x17ff, 0, 0, K051316_rom_0_r, K051316_0_w);	/* 051316 #1 (ROM test) */
@@ -78,8 +78,8 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 	static int last;
 
 	/* bits 0 & 1 = coin counters */
-	coin_counter_w(1,data & 0x01);
-	coin_counter_w(0,data & 0x02);
+	coin_counter_w(space->machine, 1,data & 0x01);
+	coin_counter_w(space->machine, 0,data & 0x02);
 
 	/* bit 4 = enable rom reading thru K051316 #1 & #2 */
 	K051316_readroms = (data & 0x10);
@@ -440,7 +440,7 @@ static DRIVER_INIT( chqflag )
 	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	konami_rom_deinterleave_2(machine, "gfx1");
-	paletteram = &RAM[0x58000];
+	machine->generic.paletteram.u8 = &RAM[0x58000];
 }
 
 GAMEL( 1988, chqflag,        0, chqflag, chqflag, chqflag, ROT90, "Konami", "Chequered Flag", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND, layout_chqflag )

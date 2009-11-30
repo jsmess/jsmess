@@ -255,7 +255,7 @@ To Do / Unknowns:
 #include "cpu/nec/nec.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "machine/nmk112.h"
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
@@ -596,14 +596,14 @@ static WRITE8_HANDLER( toaplan2_coin_w )
 
 	if (data & 0x0f)
 	{
-		coin_lockout_w( 0, ((data & 4) ? 0 : 1) );
-		coin_lockout_w( 1, ((data & 8) ? 0 : 1) );
-		coin_counter_w( 0, (data & 1) );
-		coin_counter_w( 1, (data & 2) );
+		coin_lockout_w( space->machine, 0, ((data & 4) ? 0 : 1) );
+		coin_lockout_w( space->machine, 1, ((data & 8) ? 0 : 1) );
+		coin_counter_w( space->machine, 0, (data & 1) );
+		coin_counter_w( space->machine, 1, (data & 2) );
 	}
 	else
 	{
-		coin_lockout_global_w(1); /* Lock all coin slots */
+		coin_lockout_global_w(space->machine, 1); /* Lock all coin slots */
 	}
 	if (data & 0xe0)
 	{
@@ -1213,7 +1213,7 @@ static WRITE8_HANDLER( raizing_clear_nmi_w )
 /*###################### Battle Bakraid ##############################*/
 
 /* EEPROM contents with Battle Bakraid Unlimited version features unlocked */
-static const UINT8 bbakraid_unlimited_nvram[512] = {
+static const UINT8 bbakraid_unlim_default[512] = {
 	0xc2,0x49,0x00,0x07,0xa1,0x20,0x2a,0x2a,0x2a,0x90,0x90,0x90,0x00,0x00,0x00,0x00,
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x06,0x1a,0x80,0x2a,0x2a,0x2a,0x94,
 	0x94,0x94,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x04,
@@ -1250,7 +1250,7 @@ static const UINT8 bbakraid_unlimited_nvram[512] = {
 
 
 
-static const eeprom_interface eeprom_interface_93C66 =
+static const eeprom_interface bbakraid_93C66_intf =
 {
 	/* Pin 6 of the 93C66 is connected to Gnd!
        So it's configured for 512 bytes */
@@ -1266,29 +1266,10 @@ static const eeprom_interface eeprom_interface_93C66 =
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
-
-static NVRAM_HANDLER( bbakraid )
-{
-	/* Pin 6 of 93C66 is connected to Gnd! */
-
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C66);
-
-		if (file) eeprom_load(file);
-		else
-		{
-			if (bbakraid_unlimited_ver == 1)
-				eeprom_set_data(bbakraid_unlimited_nvram, sizeof(bbakraid_unlimited_nvram));
-		}
-	}
-}
-
-
 static READ16_HANDLER( bbakraid_nvram_r )
 {
+	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+
 	/* Bit 1 returns the status of BUSAK from the Z80.
        BUSRQ is activated via bit 0x10 on the NVRAM write port.
        These accesses are made when the 68K wants to read the Z80
@@ -1296,7 +1277,7 @@ static READ16_HANDLER( bbakraid_nvram_r )
     */
 
 	int data;
-	data  = ((eeprom_read_bit() & 0x01) << 4);
+	data  = ((eepromdev_read_bit(eeprom) & 0x01) << 4);
 	data |= ((raizing_Z80_busreq >> 4) & 0x01);	/* Loop BUSRQ to BUSAK */
 
 	return data;
@@ -1309,16 +1290,8 @@ static WRITE16_HANDLER( bbakraid_nvram_w )
 		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",cpu_get_pc(space->cpu),data);
 
 	if ( ACCESSING_BITS_0_7 )
-	{
-		// chip select
-		eeprom_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 
-		// latch the bit
-		eeprom_write_bit( (data & 0x04) >> 2 );
-
-		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE );
-	}
 	raizing_Z80_busreq = data & 0x10;	/* see bbakraid_nvram_r above */
 }
 
@@ -1341,7 +1314,7 @@ static ADDRESS_MAP_START( tekipaki_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x020000, 0x03ffff) AM_ROM							/* extra for Whoopee */
 	AM_RANGE(0x080000, 0x082fff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(toaplan2_0_voffs_w)
 	AM_RANGE(0x140004, 0x140007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
 	AM_RANGE(0x140008, 0x140009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
@@ -1361,7 +1334,7 @@ static ADDRESS_MAP_START( ghox_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040001) AM_READ(ghox_p2_h_analog_r)	/* Paddle 2 */
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x100000, 0x100001) AM_READ(ghox_p1_h_analog_r)	/* Paddle 1 */
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(toaplan2_0_voffs_w)
 	AM_RANGE(0x140004, 0x140007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
@@ -1404,7 +1377,7 @@ static ADDRESS_MAP_START( dogyuun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x30000c, 0x30000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	/***** The following loctions in 0x50000x are for video controller 2 ******/
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(toaplan2_1_voffs_w)	/* VideoRAM selector/offset */
 	AM_RANGE(0x500004, 0x500007) AM_READWRITE(toaplan2_1_videoram16_r, toaplan2_1_videoram16_w)	/* Tile/Sprite VideoRAM */
@@ -1430,7 +1403,7 @@ static ADDRESS_MAP_START( kbash_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x30000c, 0x30000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)	/* VBlank */
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)			/* test bit 8 */
 ADDRESS_MAP_END
 
@@ -1455,7 +1428,7 @@ static ADDRESS_MAP_START( kbash2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x30000c, 0x30000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
 
@@ -1466,7 +1439,7 @@ static ADDRESS_MAP_START( truxton2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200004, 0x200007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)
 	AM_RANGE(0x200008, 0x200009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x20000c, 0x20000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)
-	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(toaplan2_txvideoram16_r, toaplan2_txvideoram16_w) AM_BASE(&toaplan2_txvideoram16) AM_SIZE(&toaplan2_tx_vram_size)
 	AM_RANGE(0x402000, 0x4021ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE(&toaplan2_txvideoram16_offs) AM_SIZE(&toaplan2_tx_offs_vram_size)
 	AM_RANGE(0x402200, 0x402fff) AM_RAM
@@ -1489,7 +1462,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pipibibs_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x082fff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(toaplan2_0_voffs_w)
 	AM_RANGE(0x140004, 0x140007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)
 	AM_RANGE(0x140008, 0x140009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
@@ -1510,7 +1483,7 @@ static ADDRESS_MAP_START( pipibibi_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x082fff) AM_RAM
 	AM_RANGE(0x083000, 0x0837ff) AM_READWRITE(pipibibi_spriteram16_r, pipibibi_spriteram16_w)	/* SpriteRAM */
 	AM_RANGE(0x083800, 0x087fff) AM_RAM				/* SpriteRAM (unused) */
-	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x120000, 0x120fff) AM_RAM				/* Copy of SpriteRAM ? */
 //  AM_RANGE(0x13f000, 0x13f001) AM_WRITENOP        /* ??? */
 	AM_RANGE(0x180000, 0x182fff) AM_READWRITE(pipibibi_videoram16_r, pipibibi_videoram16_w)		/* TileRAM */
@@ -1565,7 +1538,7 @@ static ADDRESS_MAP_START( fixeight_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x30000c, 0x30000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x501fff) AM_READWRITE(toaplan2_txvideoram16_r, toaplan2_txvideoram16_w) AM_BASE(&toaplan2_txvideoram16) AM_SIZE(&toaplan2_tx_vram_size)
 	AM_RANGE(0x502000, 0x5021ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE(&toaplan2_txvideoram16_offs) AM_SIZE(&toaplan2_tx_offs_vram_size)
 	AM_RANGE(0x503000, 0x5031ff) AM_READWRITE(toaplan2_txscrollram16_r, toaplan2_txscrollram16_w) AM_BASE(&toaplan2_txscrollram16) AM_SIZE(&toaplan2_tx_scroll_vram_size)
@@ -1589,7 +1562,7 @@ static ADDRESS_MAP_START( fixeighb_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x30000c, 0x30000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x501fff) AM_READWRITE(toaplan2_txvideoram16_r, toaplan2_txvideoram16_w) AM_BASE(&toaplan2_txvideoram16) AM_SIZE(&toaplan2_tx_vram_size)
 	AM_RANGE(0x502000, 0x5021ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE(&toaplan2_txvideoram16_offs) AM_SIZE(&toaplan2_tx_offs_vram_size)
 	AM_RANGE(0x503000, 0x5031ff) AM_READWRITE(toaplan2_txscrollram16_r, toaplan2_txscrollram16_w) AM_BASE(&toaplan2_txscrollram16) AM_SIZE(&toaplan2_tx_scroll_vram_size)
@@ -1623,7 +1596,7 @@ static ADDRESS_MAP_START( vfive_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x30000c, 0x30000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
 ADDRESS_MAP_END
 
@@ -1699,7 +1672,7 @@ static ADDRESS_MAP_START( batsugun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x30000c, 0x30000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)	/* VBlank */
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	/***** The following in 0x50000x are for video controller 2 ******/
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(toaplan2_1_voffs_w)	/* VideoRAM selector/offset */
 	AM_RANGE(0x500004, 0x500007) AM_READWRITE(toaplan2_1_videoram16_r, toaplan2_1_videoram16_w)	/* Tile/Sprite VideoRAM */
@@ -1716,7 +1689,7 @@ static ADDRESS_MAP_START( snowbro2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x30000c, 0x30000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)	/* VBlank */
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x500003) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff)
 	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("JMPR")
@@ -1748,7 +1721,7 @@ static ADDRESS_MAP_START( mahoudai_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x30000c, 0x30000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)	/* VBlank */
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x401000, 0x4017ff) AM_RAM							/* Unused PaletteRAM */
 	AM_RANGE(0x500000, 0x501fff) AM_READWRITE(toaplan2_txvideoram16_r, toaplan2_txvideoram16_w) AM_BASE(&toaplan2_txvideoram16) AM_SIZE(&toaplan2_tx_vram_size)
 	AM_RANGE(0x502000, 0x5021ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE(&toaplan2_txvideoram16_offs) AM_SIZE(&toaplan2_tx_offs_vram_size)
@@ -1775,7 +1748,7 @@ static ADDRESS_MAP_START( shippumd_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x30000c, 0x30000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)	/* VBlank */
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x401000, 0x4017ff) AM_RAM							/* Unused PaletteRAM */
 	AM_RANGE(0x500000, 0x501fff) AM_READWRITE(toaplan2_txvideoram16_r, toaplan2_txvideoram16_w) AM_BASE(&toaplan2_txvideoram16) AM_SIZE(&toaplan2_tx_vram_size)
 	AM_RANGE(0x502000, 0x5021ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE(&toaplan2_txvideoram16_offs) AM_SIZE(&toaplan2_tx_offs_vram_size)
@@ -1801,7 +1774,7 @@ static ADDRESS_MAP_START( bgaregga_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x30000c, 0x30000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)	/* VBlank */
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x501fff) AM_READWRITE(toaplan2_txvideoram16_r, toaplan2_txvideoram16_w) AM_BASE(&toaplan2_txvideoram16) AM_SIZE(&toaplan2_tx_vram_size)
 	AM_RANGE(0x502000, 0x5021ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE(&toaplan2_txvideoram16_offs) AM_SIZE(&toaplan2_tx_offs_vram_size)
 	AM_RANGE(0x502200, 0x502fff) AM_RAM
@@ -1814,7 +1787,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( batrider_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x201fff) AM_READWRITE(toaplan2_txvideoram16_r, toaplan2_txvideoram16_w) AM_BASE(&toaplan2_txvideoram16) AM_SIZE(&toaplan2_tx_vram_size)	/* Text VideoRAM */
-	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16) AM_SIZE(&batrider_paletteram16_size)
+	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram) AM_SIZE(&batrider_paletteram16_size)
 	AM_RANGE(0x203000, 0x2031ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE(&toaplan2_txvideoram16_offs) AM_SIZE(&toaplan2_tx_offs_vram_size)
 	AM_RANGE(0x203200, 0x2033ff) AM_READWRITE(toaplan2_txscrollram16_r, toaplan2_txscrollram16_w) AM_BASE(&toaplan2_txscrollram16) AM_SIZE(&toaplan2_tx_scroll_vram_size)
 	AM_RANGE(0x203400, 0x207fff) AM_READWRITE(raizing_tx_gfxram16_r, raizing_tx_gfxram16_w)	/* Main RAM actually */
@@ -1845,7 +1818,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bbakraid_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x201fff) AM_READWRITE(toaplan2_txvideoram16_r, toaplan2_txvideoram16_w) AM_BASE(&toaplan2_txvideoram16) AM_SIZE(&toaplan2_tx_vram_size)	/* Text VideoRAM */
-	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16) AM_SIZE(&batrider_paletteram16_size)
+	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram) AM_SIZE(&batrider_paletteram16_size)
 	AM_RANGE(0x203000, 0x2031ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE(&toaplan2_txvideoram16_offs) AM_SIZE(&toaplan2_tx_offs_vram_size)
 	AM_RANGE(0x203200, 0x2033ff) AM_READWRITE(toaplan2_txscrollram16_r, toaplan2_txscrollram16_w) AM_BASE(&toaplan2_txscrollram16) AM_SIZE(&toaplan2_tx_scroll_vram_size)
 	AM_RANGE(0x203400, 0x207fff) AM_READWRITE(raizing_tx_gfxram16_r, raizing_tx_gfxram16_w)	/* Main RAM actually */
@@ -3297,6 +3270,11 @@ static INPUT_PORTS_START( bbakraid )
 	PORT_DIPNAME( 0x8000,	0x0000, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x8000, DEF_STR( On ) )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 INPUT_PORTS_END
 
 
@@ -4334,7 +4312,7 @@ static MACHINE_DRIVER_START( bbakraid )
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(toaplan2)
-	MDRV_NVRAM_HANDLER(bbakraid)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", bbakraid_93C66_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -4360,6 +4338,12 @@ static MACHINE_DRIVER_START( bbakraid )
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( bbakradu )
+	MDRV_IMPORT_FROM(bbakraid)
+
+	MDRV_DEVICE_REMOVE("eeprom")
+	MDRV_EEPROM_ADD("eeprom", bbakraid_93C66_intf, 512, bbakraid_unlim_default)
+MACHINE_DRIVER_END
 
 
 /***************************************************************************
@@ -5455,7 +5439,7 @@ GAME( 1998, batridja, batrid,   batrider, batridrj, batrider, ROT270, "Raizing /
 
 // Battle Bakraid
 // the 'unlimited' version is a newer revision of the code.
-GAME( 1999, bkraidu,  0,       bbakraid, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (U.S.A.) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
-GAME( 1999, bkraiduj, bkraidu, bbakraid, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
+GAME( 1999, bkraidu,  0,        bbakradu, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (U.S.A.) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
+GAME( 1999, bkraiduj, bkraidu,  bbakradu, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
 // older revision of the code
-GAME( 1999, bkraidj,  bkraidu, bbakraid, bbakraid, bbakraid, ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", GAME_SUPPORTS_SAVE )
+GAME( 1999, bkraidj,  bkraidu,  bbakraid, bbakraid, bbakraid, ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", GAME_SUPPORTS_SAVE )

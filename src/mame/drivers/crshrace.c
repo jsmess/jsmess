@@ -192,13 +192,13 @@ static ADDRESS_MAP_START( crshrace_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x3fffff) AM_READ(extrarom1_r)
 	AM_RANGE(0x400000, 0x4fffff) AM_READ(extrarom2_r)
 	AM_RANGE(0x500000, 0x5fffff) AM_READ(extrarom2_r)	/* mirror */
-	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM AM_BASE(&spriteram16_2) AM_SIZE(&spriteram_2_size)
+	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
 	AM_RANGE(0xd00000, 0xd01fff) AM_RAM_WRITE(crshrace_videoram1_w) AM_BASE(&crshrace_videoram1)
-	AM_RANGE(0xe00000, 0xe01fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe00000, 0xe01fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM
 	AM_RANGE(0xffc000, 0xffc001) AM_WRITE(crshrace_roz_bank_w)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(crshrace_videoram2_w) AM_BASE(&crshrace_videoram2)
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1") AM_WRITE(crshrace_gfxctrl_w)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW0")
@@ -504,7 +504,7 @@ ROM_START( crshrace )
 	ROM_LOAD( "h897",         0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )
 	ROM_LOAD( "h896",         0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )
 
-	ROM_REGION( 0x100000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "h894",         0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
@@ -538,7 +538,7 @@ ROM_START( crshrace2 )
 	ROM_LOAD( "h897",         0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )	// IC29.BIN
 	ROM_LOAD( "h896",         0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )	// IC75.BIN
 
-	ROM_REGION( 0x100000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "h894",         0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )	// IC73.BIN
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */

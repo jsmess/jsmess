@@ -30,7 +30,7 @@ VIDEO_START( cgenie )
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 
-	videoram_size = 0x4000;
+	machine->generic.videoram_size = 0x4000;
 
 	VIDEO_START_CALL(generic_bitmapped);
 
@@ -272,18 +272,18 @@ static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, 
 			if( graphics )
 			{
 				/* get graphics code */
-				code = videoram[i];
+				code = machine->generic.videoram.u8[i];
 				drawgfx_opaque(bitmap, &r, machine->gfx[1], code, 0,
 					0, 0, r.min_x, r.min_y);
 			}
 			else
 			{
 				/* get character code */
-				code = videoram[i];
+				code = machine->generic.videoram.u8[i];
 
 				/* translate defined character sets */
 				code += cgenie_font_offset[(code >> 6) & 3];
-				drawgfx_opaque(bitmap, &r, machine->gfx[0], code, colorram[i&0x3ff],
+				drawgfx_opaque(bitmap, &r, machine->gfx[0], code, machine->generic.colorram.u8[i&0x3ff],
 					0, 0, r.min_x, r.min_y);
 			}
 
@@ -312,7 +312,7 @@ static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, 
 				rc.max_x = r.max_x;
 				rc.min_y = r.min_y + (crt.cursor_top & 15);
 				rc.max_y = r.min_y + (crt.cursor_bottom & 15);
-				drawgfx_opaque(bitmap, &rc, machine->gfx[0], 0x7f, colorram[i&0x3ff],
+				drawgfx_opaque(bitmap, &rc, machine->gfx[0], 0x7f, machine->generic.colorram.u8[i&0x3ff],
 					0, 0, rc.min_x, rc.min_y);
 			}
 		}
@@ -324,7 +324,7 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 	int i, address, offset, cursor, size, code, x, y;
     rectangle r;
 
-	bitmap_fill(tmpbitmap, cliprect, get_black_pen(machine));
+	bitmap_fill(machine->generic.tmpbitmap, cliprect, get_black_pen(machine));
 	bitmap_fill(dlybitmap, cliprect, get_black_pen(machine));
 
     if(crt.vertical_displayed || crt.horizontal_displayed)
@@ -351,8 +351,8 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 			if( graphics )
 			{
 				/* get graphics code */
-				code = videoram[i];
-				drawgfx_opaque(tmpbitmap, &r, machine->gfx[1], code, 1,
+				code = machine->generic.videoram.u8[i];
+				drawgfx_opaque(machine->generic.tmpbitmap, &r, machine->gfx[1], code, 1,
 					0, 0, r.min_x, r.min_y);
 				drawgfx_opaque(dlybitmap, &r, machine->gfx[1], code, 2,
 					0, 0, r.min_x, r.min_y);
@@ -360,13 +360,13 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 			else
 			{
 				/* get character code */
-				code = videoram[i];
+				code = machine->generic.videoram.u8[i];
 
 				/* translate defined character sets */
 				code += cgenie_font_offset[(code >> 6) & 3];
-				drawgfx_opaque(tmpbitmap, &r, machine->gfx[0], code, colorram[i&0x3ff] + 16,
+				drawgfx_opaque(machine->generic.tmpbitmap, &r, machine->gfx[0], code, machine->generic.colorram.u8[i&0x3ff] + 16,
 					0, 0, r.min_x, r.min_y);
-				drawgfx_opaque(dlybitmap, &r, machine->gfx[0], code, colorram[i&0x3ff] + 32,
+				drawgfx_opaque(dlybitmap, &r, machine->gfx[0], code, machine->generic.colorram.u8[i&0x3ff] + 32,
 					0, 0, r.min_x, r.min_y);
 			}
 
@@ -396,15 +396,15 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 				rc.min_y = r.min_y + (crt.cursor_top & 15);
 				rc.max_y = r.min_y + (crt.cursor_bottom & 15);
 
-				drawgfx_opaque(tmpbitmap, &rc, machine->gfx[0], 0x7f, colorram[i&0x3ff] + 16,
+				drawgfx_opaque(machine->generic.tmpbitmap, &rc, machine->gfx[0], 0x7f, machine->generic.colorram.u8[i&0x3ff] + 16,
 					0, 0, rc.min_x, rc.min_y);
-				drawgfx_opaque(dlybitmap, &rc, machine->gfx[0], 0x7f, colorram[i&0x3ff] + 32,
+				drawgfx_opaque(dlybitmap, &rc, machine->gfx[0], 0x7f, machine->generic.colorram.u8[i&0x3ff] + 32,
 					0, 0, rc.min_x, rc.min_y);
 			}
 		}
 	}
 
-	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, machine->generic.tmpbitmap, 0, 0, 0, 0, cliprect);
 	copybitmap_trans(bitmap, dlybitmap, 0, 0, 1, 0, cliprect, 0);
 }
 

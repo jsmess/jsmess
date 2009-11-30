@@ -145,7 +145,7 @@ static ADDRESS_MAP_START( suprslam_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0xff2000, 0xff203f) AM_RAM /* ?? */
 	AM_RANGE(0xff8000, 0xff8fff) AM_RAM AM_BASE(&K053936_0_linectrl)
 	AM_RANGE(0xff9000, 0xff9001) AM_WRITE(sound_command_w)
-	AM_RANGE(0xffa000, 0xffafff) AM_RAM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xffa000, 0xffafff) AM_RAM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xffd000, 0xffd01f) AM_WRITE(SMH_RAM) AM_BASE(&K053936_0_ctrl)
 	AM_RANGE(0xffe000, 0xffe001) AM_WRITE(suprslam_bank_w)
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1")
@@ -346,7 +346,7 @@ ROM_START( suprslam )
 	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
 	ROM_LOAD( "eb26ic66.bin", 0x000000, 0x200000, CRC(8cb33682) SHA1(0e6189ef0673227d35b9a154e333cc6cf9b65df6) )
 
-	ROM_REGION( 0x100000, "ym.deltat", 0 ) /* Samples */
+	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* Samples */
 	ROM_LOAD( "eb26ic59.bin", 0x000000, 0x100000, CRC(4ae4095b) SHA1(62b0600b18febb6cecb6370b03a2d6b7756840a2) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* 8x8x4 'Screen' Layer GFX */

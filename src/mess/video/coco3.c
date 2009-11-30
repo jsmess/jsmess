@@ -629,9 +629,9 @@ WRITE8_HANDLER(coco3_palette_w)
 {
 	data &= 0x3f;
 
-	if (paletteram[offset] != data)
+	if (space->machine->generic.paletteram.u8[offset] != data)
 	{
-		paletteram[offset] = data;
+		space->machine->generic.paletteram.u8[offset] = data;
 		if (LOG_PALETTE)
 			logerror("CoCo3 Palette: %i <== $%02x\n", offset, data);
 	}
@@ -813,8 +813,8 @@ static void internal_video_start_coco3(running_machine *machine, m6847_type type
 	}
 
 	/* incidentals */
-	paletteram = video->palette_ram;
-	memory_set_bankptr(machine, 10, paletteram);
+	machine->generic.paletteram.u8 = video->palette_ram;
+	memory_set_bankptr(machine, 10, machine->generic.paletteram.u8);
 
 	/* font */
 	rom = memory_region(machine, "maincpu");

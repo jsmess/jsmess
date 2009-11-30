@@ -645,17 +645,17 @@ static void stop_rev_timer( int drive ) {
 	timer_reset( fdc_status[drive].sync_timer, attotime_never );
 }
 
-static void fdc_setup_leds( int drive ) {
+static void fdc_setup_leds(running_machine *machine, int drive ) {
 
 	char portname[12];
 	sprintf(portname, "drive_%d_led", drive);
 	output_set_value(portname, fdc_status[drive].motor_on == 0 ? 0 : 1);
 
 	if ( drive == 0 )
-		set_led_status( 1, fdc_status[drive].motor_on ); /* update internal drive led */
+		set_led_status(machine, 1, fdc_status[drive].motor_on ); /* update internal drive led */
 
 	if ( drive == 1 )
-		set_led_status( 2, fdc_status[drive].motor_on ); /* update external drive led */
+		set_led_status(machine, 2, fdc_status[drive].motor_on ); /* update external drive led */
 }
 
 static void fdc_stepdrive( int drive ) {
@@ -719,7 +719,7 @@ WRITE8_DEVICE_HANDLER( amiga_fdc_control_w )
 	for ( drive = 0; drive < NUM_DRIVES; drive++ ) {
 		if ( !( fdc_sel & ( 1 << drive ) ) ) {
 			fdc_motor( drive, ( data >> 7 ) & 1 );
-			fdc_setup_leds( drive );
+			fdc_setup_leds( device->machine,drive );
 		}
     }
 }

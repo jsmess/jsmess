@@ -115,10 +115,6 @@ VIDEO_START( retofinv )
 	fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan,8,8,36,28);
 
 	colortable_configure_tilemap_groups(machine->colortable, fg_tilemap, machine->gfx[0], 0);
-
-	spriteram = retofinv_sharedram + 0x0780;
-	spriteram_2 = retofinv_sharedram + 0x0f80;
-	spriteram_3 = retofinv_sharedram + 0x1780;
 }
 
 
@@ -177,6 +173,9 @@ WRITE8_HANDLER( retofinv_gfx_ctrl_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 {
+	UINT8 *spriteram = retofinv_sharedram + 0x0780;
+	UINT8 *spriteram_2 = retofinv_sharedram + 0x0f80;
+	UINT8 *spriteram_3 = retofinv_sharedram + 0x1780;
 	int offs;
 	static const rectangle spritevisiblearea =
 	{

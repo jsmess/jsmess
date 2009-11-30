@@ -548,30 +548,12 @@ TODO:
 
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/namcoio.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
+#include "machine/namcoio.h"
+#include "includes/mappy.h"
 
 
-/* video functions */
-VIDEO_START( phozon );
-PALETTE_INIT( phozon );
-VIDEO_UPDATE( phozon );
-
-/* video driver data & functions */
-extern UINT8 *mappy_videoram;
-extern UINT8 *mappy_spriteram;
-PALETTE_INIT( superpac );
-PALETTE_INIT( mappy );
-VIDEO_START( superpac );
-VIDEO_START( mappy );
-VIDEO_UPDATE( superpac );
-VIDEO_UPDATE( mappy );
-WRITE8_HANDLER( superpac_videoram_w );
-WRITE8_HANDLER( mappy_videoram_w );
-WRITE8_HANDLER( mappy_scroll_w );
-READ8_HANDLER( superpac_flipscreen_r );
-WRITE8_HANDLER( superpac_flipscreen_w );
 
 
 
@@ -619,10 +601,10 @@ static READ8_HANDLER( dipB_muxi )	// dips B
 static WRITE8_HANDLER( out_mux )	{ mux = data & 1; }
 static WRITE8_HANDLER( out_lamps )
 {
-	set_led_status(0,data & 1);
-	set_led_status(1,data & 2);
-	coin_lockout_global_w(data & 4);
-	coin_counter_w(0,~data & 8);
+	set_led_status(space->machine, 0,data & 1);
+	set_led_status(space->machine, 1,data & 2);
+	coin_lockout_global_w(space->machine, data & 4);
+	coin_counter_w(space->machine, 0,~data & 8);
 }
 
 /* chip #0: player inputs, buttons, coins */

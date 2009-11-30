@@ -83,12 +83,12 @@ int twin16_spriteram_process_enable( void )
 
 static READ16_HANDLER( videoram16_r )
 {
-	return videoram16[offset];
+	return space->machine->generic.videoram.u16[offset];
 }
 
 static WRITE16_HANDLER( videoram16_w )
 {
-	COMBINE_DATA(videoram16 + offset);
+	COMBINE_DATA(space->machine->generic.videoram.u16 + offset);
 }
 
 static READ16_HANDLER( extra_rom_r )
@@ -135,9 +135,9 @@ static WRITE16_HANDLER( twin16_CPUA_register_w )
 		if ((old & 0x10) == 0 && (twin16_CPUA_register & 0x10))
 			cputag_set_input_line(space->machine, "sub", M68K_IRQ_6, HOLD_LINE);
 
-		coin_counter_w(0, twin16_CPUA_register & 0x01);
-		coin_counter_w(1, twin16_CPUA_register & 0x02);
-		coin_counter_w(2, twin16_CPUA_register & 0x04);
+		coin_counter_w(space->machine, 0, twin16_CPUA_register & 0x01);
+		coin_counter_w(space->machine, 1, twin16_CPUA_register & 0x02);
+		coin_counter_w(space->machine, 2, twin16_CPUA_register & 0x04);
 	}
 }
 
@@ -172,8 +172,8 @@ static WRITE16_HANDLER( fround_CPU_register_w )
 		if ((old & 0x08) == 0 && (twin16_CPUA_register & 0x08))
 			cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 
-		coin_counter_w(0, twin16_CPUA_register & 0x01);
-		coin_counter_w(1, twin16_CPUA_register & 0x02);
+		coin_counter_w(space->machine, 0, twin16_CPUA_register & 0x01);
+		coin_counter_w(space->machine, 1, twin16_CPUA_register & 0x02);
 	}
 }
 
@@ -242,7 +242,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x040000, 0x043fff) AM_READWRITE(COMRAM_r, COMRAM_w)
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(twin16_paletteram_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(twin16_paletteram_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x081000, 0x081fff) AM_WRITENOP
 	AM_RANGE(0x0a0000, 0x0a001b) AM_READ(twin16_input_r)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(twin16_CPUA_register_w)
@@ -254,8 +254,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c000e, 0x0c000f) AM_READ(twin16_sprite_status_r)
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(twin16_text_ram_w) AM_BASE(&twin16_text_ram)
 //  AM_RANGE(0x104000, 0x105fff) AM_NOP             // miaj
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(&videoram16)
-	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE(1) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE(1) AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -277,7 +277,7 @@ static ADDRESS_MAP_START( fround_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_READWRITE(COMRAM_r, COMRAM_w)
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(twin16_paletteram_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(twin16_paletteram_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0a0000, 0x0a001b) AM_READ(twin16_input_r)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(fround_CPU_register_w)
 	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(sound_command_w)
@@ -286,8 +286,8 @@ static ADDRESS_MAP_START( fround_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c000e, 0x0c000f) AM_READ(twin16_sprite_status_r)
 	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(fround_gfx_bank_w)
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(twin16_text_ram_w) AM_BASE(&twin16_text_ram)
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(&videoram16)
-	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x500000, 0x6fffff) AM_READ(twin16_gfx_rom1_r)
 ADDRESS_MAP_END
 
@@ -1332,8 +1332,8 @@ static DRIVER_INIT( cuebrickj )
 {
 	gfx_untangle(machine);
 
-	generic_nvram = (UINT8 *)cuebrickj_nvram;
-	generic_nvram_size = 0x400*0x20;
+	machine->generic.nvram.u8 = (UINT8 *)cuebrickj_nvram;
+	machine->generic.nvram_size = 0x400*0x20;
 }
 
 /* Game Drivers */

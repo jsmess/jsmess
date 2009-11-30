@@ -205,8 +205,8 @@ WRITE8_HANDLER( yard_flipscreen_w )
 	/* screen flip is handled both by software and hardware */
 	flip_screen_set(space->machine, (data & 0x01) ^ (~input_port_read(space->machine, "DSW2") & 0x01));
 
-	coin_counter_w(0, data & 0x02);
-	coin_counter_w(1, data & 0x20);
+	coin_counter_w(space->machine, 0, data & 0x02);
+	coin_counter_w(space->machine, 1, data & 0x20);
 }
 
 
@@ -225,7 +225,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	int offs;
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int attr = state->spriteram[offs + 1];
 		int bank = (attr & 0x20) >> 5;

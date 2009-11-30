@@ -100,7 +100,7 @@ static void get_sprite_info(running_machine *machine)
 	UINT8 *base_gfx = memory_region(machine, "gfx1");
 	int gfx_max     = memory_region_length(machine, "gfx1");
 
-	UINT16 *source = spriteram16;
+	UINT16 *source = machine->generic.spriteram.u16;
 
 	struct sprite *sprite = sprite_list;
 	struct sprite *finish = sprite_list + NUM_SPRITES;
@@ -869,7 +869,7 @@ WRITE16_HANDLER( hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w )
 {
 	int newword, r, g, b;
 
-	newword = COMBINE_DATA(&paletteram16[offset]);
+	newword = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 
 	r = ((newword << 1) & 0x1E ) | ((newword >> 12) & 0x01);
 	g = ((newword >> 3) & 0x1E ) | ((newword >> 13) & 0x01);
@@ -882,7 +882,7 @@ WRITE16_HANDLER( hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w )
 
 WRITE16_HANDLER( wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w )
 {
-	int newword = COMBINE_DATA(&paletteram16[offset]);
+	int newword = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 
 	// the highest nibble has some unknown functions
 //  if (newword & 0xf000) logerror("MSN set on color %03x: %1x\n", offset, newword>>12);
@@ -1052,7 +1052,7 @@ VIDEO_UPDATE ( wecleman )
 
 	video_on = wecleman_irqctrl & 0x40;
 
-	set_led_status(0, wecleman_selected_ip & 0x04);	// Start lamp
+	set_led_status(screen->machine, 0, wecleman_selected_ip & 0x04);	// Start lamp
 
 	fg_y = (wecleman_txtram[0x0f24>>1] & (TILEMAP_DIMY - 1));
 	bg_y = (wecleman_txtram[0x0f26>>1] & (TILEMAP_DIMY - 1));
@@ -1139,7 +1139,7 @@ VIDEO_UPDATE( hotchase )
 
 	video_on = wecleman_irqctrl & 0x40;
 
-	set_led_status(0, wecleman_selected_ip & 0x04);	// Start lamp
+	set_led_status(screen->machine, 0, wecleman_selected_ip & 0x04);	// Start lamp
 
 	get_sprite_info(screen->machine);
 

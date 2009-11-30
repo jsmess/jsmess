@@ -1444,7 +1444,7 @@ static TIMER_CALLBACK(wswan_scanline_interrupt)
 {
 	if( wswan_vdp.current_line < 144 )
 	{
-		wswan_refresh_scanline();
+		wswan_refresh_scanline(machine);
 	}
 
 	/* Decrement 12kHz (HBlank) counter */

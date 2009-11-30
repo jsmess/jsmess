@@ -69,12 +69,12 @@ static WRITE8_HANDLER( bladestl_bankswitch_w )
 	int bankaddress;
 
 	/* bits 0 & 1 = coin counters */
-	coin_counter_w(0,data & 0x01);
-	coin_counter_w(1,data & 0x02);
+	coin_counter_w(space->machine, 0,data & 0x01);
+	coin_counter_w(space->machine, 1,data & 0x02);
 
 	/* bits 2 & 3 = lamps */
-	set_led_status(0,data & 0x04);
-	set_led_status(1,data & 0x08);
+	set_led_status(space->machine, 0,data & 0x04);
+	set_led_status(space->machine, 1,data & 0x08);
 
 	/* bit 4 = relay (???) */
 
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(K007342_r, K007342_w)	/* Color RAM + Video RAM */
 	AM_RANGE(0x2000, 0x21ff) AM_READWRITE(K007420_r, K007420_w)	/* Sprite RAM */
 	AM_RANGE(0x2200, 0x23ff) AM_READWRITE(K007342_scroll_r, K007342_scroll_w)	/* Scroll RAM */
-	AM_RANGE(0x2400, 0x245f) AM_RAM AM_BASE(&paletteram)		/* palette */
+	AM_RANGE(0x2400, 0x245f) AM_RAM AM_BASE_GENERIC(paletteram)		/* palette */
 	AM_RANGE(0x2600, 0x2607) AM_WRITE(K007342_vreg_w)			/* Video Registers */
 	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("COINSW")				/* DIPSW #3, coinsw, startsw */
 	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P1")					/* 1P controls */

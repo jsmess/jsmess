@@ -457,7 +457,7 @@ static int internal_pc_cga_video_start(running_machine *machine, int personality
 	state_save_register_item(machine, "pccga", NULL, 0, cga.status);
 	state_save_register_item(machine, "pccga", NULL, 0, cga.plantronics);
 
-	cga.config_input_port = input_port_by_tag(machine->portconfig, "pcvideo_cga_config" );
+	cga.config_input_port = input_port_by_tag(&machine->portlist, "pcvideo_cga_config" );
 
 	return 0;
 }
@@ -503,11 +503,11 @@ static VIDEO_START( pc_cga )
 			break;
 	}
 
-	videoram_size = 0x4000;
+	machine->generic.videoram_size = 0x4000;
 
-	videoram = auto_alloc_array(machine, UINT8, videoram_size);
+	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, machine->generic.videoram_size);
 
-	memory_set_bankptr(machine,11, videoram);
+	memory_set_bankptr(machine,11, machine->generic.videoram.u8);
 
 	internal_pc_cga_video_start(machine, M6845_PERSONALITY_GENUINE);
 
@@ -551,8 +551,8 @@ static MC6845_UPDATE_ROW( cga_text_inten_update_row )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		UINT8 chr = videoram[ offset ];
-		UINT8 attr = videoram[ offset +1 ];
+		UINT8 chr = device->machine->generic.videoram.u8[ offset ];
+		UINT8 attr = device->machine->generic.videoram.u8[ offset +1 ];
 		UINT8 data = cga.chr_gen[ chr * 8 + ra ];
 		UINT16 fg = attr & 0x0F;
 		UINT16 bg = attr >> 4;
@@ -589,8 +589,8 @@ static MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		UINT8 chr = videoram[ offset ];
-		UINT8 attr = videoram[ offset +1 ];
+		UINT8 chr = device->machine->generic.videoram.u8[ offset ];
+		UINT8 attr = device->machine->generic.videoram.u8[ offset +1 ];
 		UINT8 data = cga.chr_gen[ chr * 8 + ra ];
 		UINT16 fg = 0x10 + ( attr & 0x0F );
 		UINT16 bg = 0x10 + ( ( attr >> 4 ) & 0x07 );
@@ -626,8 +626,8 @@ static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		UINT8 chr = videoram[ offset ];
-		UINT8 attr = videoram[ offset +1 ];
+		UINT8 chr = device->machine->generic.videoram.u8[ offset ];
+		UINT8 attr = device->machine->generic.videoram.u8[ offset +1 ];
 		UINT8 data = cga.chr_gen[ chr * 8 + ra ];
 		UINT16 fg = attr & 0x0F;
 
@@ -663,8 +663,8 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		UINT8 chr = videoram[ offset ];
-		UINT8 attr = videoram[ offset +1 ];
+		UINT8 chr = device->machine->generic.videoram.u8[ offset ];
+		UINT8 attr = device->machine->generic.videoram.u8[ offset +1 ];
 		UINT8 data = cga.chr_gen[ chr * 8 + ra ];
 		UINT16 fg = attr & 0x0F;
 		UINT16 bg = attr >> 4;
@@ -711,8 +711,8 @@ static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		UINT8 chr = videoram[ offset ];
-		UINT8 attr = videoram[ offset +1 ];
+		UINT8 chr = device->machine->generic.videoram.u8[ offset ];
+		UINT8 attr = device->machine->generic.videoram.u8[ offset +1 ];
 		UINT8 data = cga.chr_gen[ chr * 8 + ra ];
 		UINT16 fg = attr & 0x07;
 		UINT16 bg = 0;
@@ -757,14 +757,14 @@ static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
-		UINT8 data = videoram[ offset ];
+		UINT8 data = device->machine->generic.videoram.u8[ offset ];
 
 		*p = data >> 4; p++;
 		*p = data >> 4; p++;
 		*p = data & 0x0F; p++;
 		*p = data & 0x0F; p++;
 
-		data = videoram[ offset + 1 ];
+		data = device->machine->generic.videoram.u8[ offset + 1 ];
 
 		*p = data >> 4; p++;
 		*p = data >> 4; p++;
@@ -821,7 +821,7 @@ if ( NTSC_FILTER )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
-		UINT8 data = videoram[ offset ];
+		UINT8 data = device->machine->generic.videoram.u8[ offset ];
 
 if ( NTSC_FILTER )
 {
@@ -853,7 +853,7 @@ if ( NTSC_FILTER )
 		*p = data & 0x0F; p++;
 		*p = data & 0x0F; p++;
 
-		data = videoram[ offset + 1 ];
+		data = device->machine->generic.videoram.u8[ offset + 1 ];
 
 if ( NTSC_FILTER )
 {
@@ -919,14 +919,14 @@ static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
-		UINT8 data = videoram[ offset ];
+		UINT8 data = device->machine->generic.videoram.u8[ offset ];
 
 		*p = cga.palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]; p++;
 		*p = cga.palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]; p++;
 		*p = cga.palette_lut_2bpp[ ( data >> 2 ) & 0x03 ]; p++;
 		*p = cga.palette_lut_2bpp[   data        & 0x03 ]; p++;
 
-		data = videoram[ offset+1 ];
+		data = device->machine->generic.videoram.u8[ offset+1 ];
 
 		*p = cga.palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]; p++;
 		*p = cga.palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]; p++;
@@ -954,7 +954,7 @@ static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( ra & 1 ) << 13 );
-		UINT8 data = videoram[ offset ];
+		UINT8 data = device->machine->generic.videoram.u8[ offset ];
 
 		*p = ( data & 0x80 ) ? fg : 0; p++;
 		*p = ( data & 0x40 ) ? fg : 0; p++;
@@ -965,7 +965,7 @@ static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row )
 		*p = ( data & 0x02 ) ? fg : 0; p++;
 		*p = ( data & 0x01 ) ? fg : 0; p++;
 
-		data = videoram[ offset + 1 ];
+		data = device->machine->generic.videoram.u8[ offset + 1 ];
 
 		*p = ( data & 0x80 ) ? fg : 0; p++;
 		*p = ( data & 0x40 ) ? fg : 0; p++;
@@ -1471,10 +1471,10 @@ static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16 offset = offset_base | ( ( ma + i ) & 0x1FFF );
-		UINT16 i = ( cga.color_select & 8 ) ? videoram[ videoram_offset[3] | offset ] << 3 : 0;
-		UINT16 r = ( cga.color_select & 4 ) ? videoram[ videoram_offset[2] | offset ] << 2 : 0;
-		UINT16 g = ( cga.color_select & 2 ) ? videoram[ videoram_offset[1] | offset ] << 1 : 0;
-		UINT16 b = ( cga.color_select & 1 ) ? videoram[ videoram_offset[0] | offset ]      : 0;
+		UINT16 i = ( cga.color_select & 8 ) ? device->machine->generic.videoram.u8[ videoram_offset[3] | offset ] << 3 : 0;
+		UINT16 r = ( cga.color_select & 4 ) ? device->machine->generic.videoram.u8[ videoram_offset[2] | offset ] << 2 : 0;
+		UINT16 g = ( cga.color_select & 2 ) ? device->machine->generic.videoram.u8[ videoram_offset[1] | offset ] << 1 : 0;
+		UINT16 b = ( cga.color_select & 1 ) ? device->machine->generic.videoram.u8[ videoram_offset[0] | offset ]      : 0;
 
 		*p = ( ( i & 0x400 ) | ( r & 0x200 ) | ( g & 0x100 ) | ( b & 0x80 ) ) >> 7; p++;
 		*p = ( ( i & 0x200 ) | ( r & 0x100 ) | ( g & 0x080 ) | ( b & 0x40 ) ) >> 6; p++;
@@ -1519,7 +1519,7 @@ static WRITE8_HANDLER ( pc1512_w )
 		}
 		else
 		{
-			memory_set_bankptr(space->machine,1, videoram + videoram_offset[0]);
+			memory_set_bankptr(space->machine,1, space->machine->generic.videoram.u8 + videoram_offset[0]);
 		}
 		cga.mode_control = data;
 		switch( cga.mode_control & 0x3F )
@@ -1577,7 +1577,7 @@ static WRITE8_HANDLER ( pc1512_w )
 		pc1512.read = data;
 		if ( ( cga.mode_control & 0x12 ) == 0x12 )
 		{
-			memory_set_bankptr(space->machine,1, videoram + videoram_offset[data & 3]);
+			memory_set_bankptr(space->machine,1, space->machine->generic.videoram.u8 + videoram_offset[data & 3]);
 		}
 		break;
 
@@ -1614,17 +1614,17 @@ static WRITE8_HANDLER ( pc1512_videoram_w )
 	if ( ( cga.mode_control & 0x12 ) == 0x12 )
 	{
 		if (pc1512.write & 1)
-			videoram[offset+videoram_offset[0]] = data; /* blue plane */
+			space->machine->generic.videoram.u8[offset+videoram_offset[0]] = data; /* blue plane */
 		if (pc1512.write & 2)
-			videoram[offset+videoram_offset[1]] = data; /* green */
+			space->machine->generic.videoram.u8[offset+videoram_offset[1]] = data; /* green */
 		if (pc1512.write & 4)
-			videoram[offset+videoram_offset[2]] = data; /* red */
+			space->machine->generic.videoram.u8[offset+videoram_offset[2]] = data; /* red */
 		if (pc1512.write & 8)
-			videoram[offset+videoram_offset[3]] = data; /* intensity (text, 4color) */
+			space->machine->generic.videoram.u8[offset+videoram_offset[3]] = data; /* intensity (text, 4color) */
 	}
 	else
 	{
-		videoram[offset + videoram_offset[0]] = data;
+		space->machine->generic.videoram.u8[offset + videoram_offset[0]] = data;
 	}
 }
 
@@ -1638,9 +1638,9 @@ WRITE16_HANDLER ( pc1512_videoram16le_w ) { write16le_with_write8_handler(pc1512
 
 static VIDEO_START( pc1512 )
 {
-	videoram_size = 0x10000;
-	videoram = auto_alloc_array(machine, UINT8, videoram_size );
-	memory_set_bankptr(machine,1,videoram + videoram_offset[0]);
+	machine->generic.videoram_size = 0x10000;
+	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, machine->generic.videoram_size );
+	memory_set_bankptr(machine,1,machine->generic.videoram.u8 + videoram_offset[0]);
 
 	memset( &pc1512, 0, sizeof ( pc1512 ) );
 	pc1512.write = 0xf;

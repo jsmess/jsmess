@@ -402,12 +402,12 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/cojag.o $(AUDIO)/jaguar.o $(VIDEO)/jaguar.o \
 	$(DRIVERS)/copsnrob.o $(MACHINE)/copsnrob.o $(VIDEO)/copsnrob.o \
 	$(DRIVERS)/cyberbal.o $(AUDIO)/cyberbal.o $(VIDEO)/cyberbal.o \
-	$(DRIVERS)/destroyr.o $(VIDEO)/destroyr.o \
+	$(DRIVERS)/destroyr.o \
 	$(DRIVERS)/dragrace.o $(AUDIO)/dragrace.o $(VIDEO)/dragrace.o \
 	$(DRIVERS)/eprom.o $(VIDEO)/eprom.o \
 	$(DRIVERS)/firefox.o \
 	$(DRIVERS)/firetrk.o $(AUDIO)/firetrk.o $(VIDEO)/firetrk.o \
-	$(DRIVERS)/flyball.o $(VIDEO)/flyball.o \
+	$(DRIVERS)/flyball.o \
 	$(DRIVERS)/foodf.o $(VIDEO)/foodf.o \
 	$(DRIVERS)/gauntlet.o $(VIDEO)/gauntlet.o \
 	$(DRIVERS)/harddriv.o $(MACHINE)/harddriv.o $(AUDIO)/harddriv.o $(VIDEO)/harddriv.o \
@@ -603,7 +603,7 @@ $(MAMEOBJ)/dynax.a: \
 	$(DRIVERS)/royalmah.o \
 
 $(MAMEOBJ)/edevices.a: \
-	$(DRIVERS)/diverboy.o $(VIDEO)/diverboy.o \
+	$(DRIVERS)/diverboy.o \
 	$(DRIVERS)/fantland.o $(VIDEO)/fantland.o \
 	$(DRIVERS)/mwarr.o \
 	$(DRIVERS)/mugsmash.o $(VIDEO)/mugsmash.o \
@@ -952,6 +952,7 @@ $(MAMEOBJ)/namco.a: \
 	$(VIDEO)/digdug.o \
 	$(MACHINE)/psx.o $(VIDEO)/psx.o \
 	$(MACHINE)/xevious.o $(VIDEO)/xevious.o \
+	$(DRIVERS)/namcops2.o \
 
 $(MAMEOBJ)/nasco.a: \
 	$(DRIVERS)/crgolf.o $(VIDEO)/crgolf.o \
@@ -1099,7 +1100,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/calorie.o \
 	$(DRIVERS)/coolridr.o \
 	$(DRIVERS)/deniam.o $(VIDEO)/deniam.o \
-	$(DRIVERS)/dotrikun.o $(VIDEO)/dotrikun.o \
+	$(DRIVERS)/dotrikun.o \
 	$(VIDEO)/genesis.o \
 	$(DRIVERS)/gpworld.o \
 	$(DRIVERS)/hikaru.o \
@@ -1203,6 +1204,7 @@ $(MAMEOBJ)/sigma.a: \
 	$(DRIVERS)/nyny.o \
 	$(DRIVERS)/r2dtank.o \
 	$(DRIVERS)/spiders.o $(AUDIO)/spiders.o \
+	$(DRIVERS)/sub.o \
 
 $(MAMEOBJ)/snk.a: \
 	$(DRIVERS)/bbusters.o $(VIDEO)/bbusters.o \

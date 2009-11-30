@@ -273,8 +273,8 @@ static const char keyboard[8][10][8] = {
 MACHINE_RESET( kay_kbd )
 {
 	/* disable CapsLock LED initially */
-	set_led_status(1, 1);
-	set_led_status(1, 0);
+	set_led_status(machine, 1, 1);
+	set_led_status(machine, 1, 0);
 	kay_kbd_beeper = devtag_get_device(machine, "beep");
 	beep_on = 1;
 	control_status = 0x14;
@@ -329,7 +329,7 @@ INTERRUPT_GEN( kay_kbd_interrupt )
 		lastrow = row;
 		/* CapsLock LED */
 		if( row == 3 && chg == 0x80 )
-			set_led_status(1, (keyrows[3] & 0x80) ? 0 : 1);
+			set_led_status(device->machine, 1, (keyrows[3] & 0x80) ? 0 : 1);
 
 		if (new & chg)	/* key(s) pressed ? */
 		{

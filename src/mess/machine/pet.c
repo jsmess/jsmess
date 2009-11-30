@@ -658,8 +658,8 @@ DRIVER_INIT( pet80 )
 
 	pet_common_driver_init(machine);
 	state->cbm8096 = 1;
-	videoram = &pet_memory[0x8000];
-	videoram_size = 0x800;
+	machine->generic.videoram.u8 = &pet_memory[0x8000];
+	machine->generic.videoram_size = 0x800;
 	pet80_vh_init(machine);
 
 }
@@ -738,7 +738,7 @@ INTERRUPT_GEN( pet_frame_interrupt )
 		}
 	}
 
-	set_led_status (1, input_port_read(device->machine, "SPECIAL") & 0x80 ? 1 : 0);		/* Shift Lock */
+	set_led_status (device->machine,1, input_port_read(device->machine, "SPECIAL") & 0x80 ? 1 : 0);		/* Shift Lock */
 }
 
 

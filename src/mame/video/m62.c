@@ -290,8 +290,8 @@ WRITE8_HANDLER( m62_flipscreen_w )
 	else
 		tilemap_set_flip_all(space->machine, 0);
 
-	coin_counter_w(0, data & 2);
-	coin_counter_w(1, data & 4);
+	coin_counter_w(space->machine, 0, data & 2);
+	coin_counter_w(space->machine, 1, data & 4);
 }
 
 WRITE8_HANDLER( m62_hscroll_low_w )
@@ -338,7 +338,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0; offs < spriteram_size; offs += 8)
+	for (offs = 0; offs < state->spriteram_size; offs += 8)
 	{
 		int i, incr, code, col, flipx, flipy, sx, sy;
 

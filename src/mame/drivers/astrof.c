@@ -71,7 +71,8 @@
 
 static READ8_HANDLER( irq_clear_r )
 {
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	astrof_state *state = (astrof_state *)space->machine->driver_data;
+	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 
 	return 0;
 }
@@ -79,7 +80,8 @@ static READ8_HANDLER( irq_clear_r )
 
 static TIMER_DEVICE_CALLBACK( irq_callback )
 {
-	cputag_set_input_line(timer->machine, "maincpu", 0, ASSERT_LINE);
+	astrof_state *state = (astrof_state *)timer->machine->driver_data;
+	cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
 }
 
 
@@ -92,16 +94,20 @@ static TIMER_DEVICE_CALLBACK( irq_callback )
 
 static INPUT_CHANGED( coin_inserted )
 {
+	astrof_state *state = (astrof_state *)field->port->machine->driver_data;
+
 	/* coin insertion causes an NMI */
-	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
-	coin_counter_w(0, newval);
+	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	coin_counter_w(field->port->machine, 0, newval);
 }
 
 
 static INPUT_CHANGED( service_coin_inserted )
 {
+	astrof_state *state = (astrof_state *)field->port->machine->driver_data;
+
 	/* service coin insertion causes an NMI */
-	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -436,6 +442,7 @@ static MACHINE_START( astrof )
 	/* the 74175 outputs all HI's if not otherwise set */
 	astrof_set_video_control_2(machine, 0xff);
 
+	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->samples = devtag_get_device(machine, "samples");
 
 	/* register for state saving */
@@ -469,6 +476,8 @@ static MACHINE_START( spfghmk2 )
 	/* the 74175 outputs all HI's if not otherwise set */
 	spfghmk2_set_video_control_2(machine, 0xff);
 
+	state->maincpu = devtag_get_device(machine, "maincpu");
+
 	/* the red background circuit is disabled */
 	state->red_on = FALSE;
 
@@ -486,6 +495,7 @@ static MACHINE_START( tomahawk )
 	/* the 74175 outputs all HI's if not otherwise set */
 	tomahawk_set_video_control_2(machine, 0xff);
 
+	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->sn = devtag_get_device(machine, "snsnd");
 
 	/* register for state saving */
@@ -519,7 +529,7 @@ static MACHINE_RESET( abattle )
 static ADDRESS_MAP_START( astrof_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_NOP
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(astrof_videoram_w) AM_BASE_MEMBER(astrof_state, videoram) AM_SIZE_MEMBER(astrof_state, videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(astrof_videoram_w) AM_BASE_SIZE_MEMBER(astrof_state, videoram, videoram_size)
 	AM_RANGE(0x6000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x8002) AM_MIRROR(0x1ff8) AM_NOP
 	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITEONLY AM_BASE_MEMBER(astrof_state, astrof_color)
@@ -538,7 +548,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spfghmk2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_NOP
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(astrof_videoram_w) AM_BASE_MEMBER(astrof_state, videoram) AM_SIZE_MEMBER(astrof_state, videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(astrof_videoram_w) AM_BASE_SIZE_MEMBER(astrof_state, videoram, videoram_size)
 	AM_RANGE(0x6000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x8002) AM_MIRROR(0x1ff8) AM_NOP
 	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITEONLY AM_BASE_MEMBER(astrof_state, astrof_color)
@@ -557,7 +567,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tomahawk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_NOP
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(tomahawk_videoram_w) AM_BASE_MEMBER(astrof_state, videoram) AM_SIZE_MEMBER(astrof_state, videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(tomahawk_videoram_w) AM_BASE_SIZE_MEMBER(astrof_state, videoram, videoram_size)
 	AM_RANGE(0x6000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x8002) AM_MIRROR(0x1ff8) AM_NOP
 	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITEONLY AM_BASE_MEMBER(astrof_state, astrof_color)

@@ -570,8 +570,8 @@ static WRITE16_HANDLER( grdians_lockout_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		// initially 0, then either $25 (coin 1) or $2a (coin 2)
-		coin_counter_w(0,data & 0x01);	// or 0x04
-		coin_counter_w(1,data & 0x02);	// or 0x08
+		coin_counter_w(space->machine, 0,data & 0x01);	// or 0x04
+		coin_counter_w(space->machine, 1,data & 0x02);	// or 0x08
 	}
 //  popmessage("%04X", data & 0xffff);
 }
@@ -588,8 +588,8 @@ static ADDRESS_MAP_START( grdians_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x70000c, 0x70000d) AM_READ(watchdog_reset16_r)		// Watchdog
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(grdians_lockout_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)		// Sprites
-	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)		// Sprites
+	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM								// cleared
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs)	// Video Registers
 	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
@@ -650,8 +650,8 @@ static ADDRESS_MAP_START( gundamex_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(grdians_lockout_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
-	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM								// cleared
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs)	// Video Registers
 	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
@@ -711,8 +711,8 @@ static ADDRESS_MAP_START( mj4simai_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW2")				// DSW 2
 	AM_RANGE(0x600300, 0x60030f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
-	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs)	// Video Registers
 	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)	// TMP68301 Registers
 ADDRESS_MAP_END
@@ -734,8 +734,8 @@ static ADDRESS_MAP_START( myangel_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700302, 0x700303) AM_READ_PORT("DSW2")				// DSW 2
 	AM_RANGE(0x700310, 0x70031f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)		// Sprites
-	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)		// Sprites
+	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs)				// Video Registers
 	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)		// TMP68301 Registers
 ADDRESS_MAP_END
@@ -757,8 +757,8 @@ static ADDRESS_MAP_START( myangel2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW2")				// DSW 2
 	AM_RANGE(0x600300, 0x60030f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xd00000, 0xd3ffff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)		// Sprites
-	AM_RANGE(0xd40000, 0xd4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0xd00000, 0xd3ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)		// Sprites
+	AM_RANGE(0xd40000, 0xd4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0xd60000, 0xd6003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs	)			// Video Registers
 	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)		// TMP68301 Registers
 ADDRESS_MAP_END
@@ -785,8 +785,8 @@ static WRITE16_HANDLER( pzlbowl_coin_counter_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0,data & 0x10);
-		coin_counter_w(1,data & 0x20);
+		coin_counter_w(space->machine, 0,data & 0x10);
+		coin_counter_w(space->machine, 1,data & 0x20);
 	}
 }
 
@@ -801,8 +801,8 @@ static ADDRESS_MAP_START( pzlbowl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500004, 0x500005) AM_READWRITE(pzlbowl_coins_r,pzlbowl_coin_counter_w)	// Coins + Protection?
 	AM_RANGE(0x500006, 0x500007) AM_READ(watchdog_reset16_r)			// Watchdog
 	AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r)			// Protection
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)		// Sprites
-	AM_RANGE(0x840000, 0x84ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)		// Sprites
+	AM_RANGE(0x840000, 0x84ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0x860000, 0x86003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs)				// Video Registers
 	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)		// TMP68301 Registers
@@ -827,8 +827,8 @@ static ADDRESS_MAP_START( penbros_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600004, 0x600005) AM_WRITE(pzlbowl_coin_counter_w)	// Coins Counter
 	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r)		// Watchdog
 //  AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r)      // Protection
-	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)		// Sprites
-	AM_RANGE(0xb40000, 0xb4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)		// Sprites
+	AM_RANGE(0xb40000, 0xb4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0xb60000, 0xb6003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs	)
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)		// TMP68301 Registers
@@ -843,11 +843,11 @@ static WRITE16_HANDLER( samshoot_coin_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0, data & 0x10);
-		coin_counter_w(1, data & 0x20);
+		coin_counter_w(space->machine, 0, data & 0x10);
+		coin_counter_w(space->machine, 1, data & 0x20);
 		// Are these connected? They are set in I/O test
-		coin_lockout_w(0,~data & 0x40);
-		coin_lockout_w(1,~data & 0x80);
+		coin_lockout_w(space->machine, 0,~data & 0x40);
+		coin_lockout_w(space->machine, 1,~data & 0x80);
 	}
 //  popmessage("%04x",data);
 }
@@ -855,7 +855,7 @@ static WRITE16_HANDLER( samshoot_coin_w )
 static ADDRESS_MAP_START( samshoot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x1fffff ) AM_ROM
 	AM_RANGE( 0x200000, 0x20ffff ) AM_RAM
-	AM_RANGE( 0x300000, 0x30ffff ) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x300000, 0x30ffff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 
 	AM_RANGE( 0x400000, 0x400001 ) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE( 0x400002, 0x400003 ) AM_READ_PORT("BUTTONS")			// Buttons
@@ -870,8 +870,8 @@ static ADDRESS_MAP_START( samshoot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x700004, 0x700005 ) AM_READ_PORT("COIN")	AM_WRITE( samshoot_coin_w )	// Coins
 	AM_RANGE( 0x700006, 0x700007 ) AM_READ( watchdog_reset16_r )	// Watchdog?
 
-	AM_RANGE( 0x800000, 0x83ffff ) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
-	AM_RANGE( 0x840000, 0x84ffff ) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE( 0x800000, 0x83ffff ) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
+	AM_RANGE( 0x840000, 0x84ffff ) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE( 0x860000, 0x86003f ) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs)	// Video Registers
 
 	AM_RANGE( 0x900000, 0x903fff ) AM_DEVREADWRITE( "x1snd", seta_sound_word_r, seta_sound_word_w	)	// Sound
@@ -900,7 +900,7 @@ static UINT8 funcube_serial_count;
 // RAM shared with the sub CPU
 static READ32_HANDLER( funcube_nvram_dword_r )
 {
-	UINT16 val = generic_nvram16[offset];
+	UINT16 val = space->machine->generic.nvram.u16[offset];
 	return ((val & 0xff00) << 8) | (val & 0x00ff);
 }
 
@@ -908,27 +908,27 @@ static WRITE32_HANDLER( funcube_nvram_dword_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		generic_nvram16[offset] = (generic_nvram16[offset] & 0xff00) | (data & 0x000000ff);
+		space->machine->generic.nvram.u16[offset] = (space->machine->generic.nvram.u16[offset] & 0xff00) | (data & 0x000000ff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		generic_nvram16[offset] = (generic_nvram16[offset] & 0x00ff) | ((data & 0x00ff0000) >> 8);
+		space->machine->generic.nvram.u16[offset] = (space->machine->generic.nvram.u16[offset] & 0x00ff) | ((data & 0x00ff0000) >> 8);
 	}
 }
 
 static WRITE16_HANDLER( spriteram16_word_w )
 {
-	COMBINE_DATA( &spriteram16[offset] );
+	COMBINE_DATA( &space->machine->generic.spriteram.u16[offset] );
 }
 
 static READ16_HANDLER( spriteram16_word_r )
 {
-	return spriteram16[offset];
+	return space->machine->generic.spriteram.u16[offset];
 }
 
 static READ16_HANDLER( paletteram16_word_r )
 {
-	return paletteram16[offset];
+	return space->machine->generic.paletteram.u16[offset];
 }
 
 static READ16BETO32BE( spriteram32_dword, spriteram16_word_r );
@@ -990,8 +990,8 @@ static ADDRESS_MAP_START( funcube_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE( 0x00600000, 0x00600003 ) AM_WRITE( SMH_NOP )	// sound chip
 
-	AM_RANGE( 0x00800000, 0x0083ffff ) AM_READWRITE( spriteram32_dword_r,  spriteram32_dword_w  ) AM_BASE((UINT32**)&spriteram16 ) AM_SIZE(&spriteram_size)
-	AM_RANGE( 0x00840000, 0x0084ffff ) AM_READWRITE( paletteram32_dword_r, paletteram32_dword_w ) AM_BASE((UINT32**)&paletteram16)
+	AM_RANGE( 0x00800000, 0x0083ffff ) AM_READWRITE( spriteram32_dword_r,  spriteram32_dword_w  ) AM_BASE_GENERIC(spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE( 0x00840000, 0x0084ffff ) AM_READWRITE( paletteram32_dword_r, paletteram32_dword_w ) AM_BASE_GENERIC(paletteram)
 	AM_RANGE( 0x00860000, 0x0086003f ) AM_WRITE( seta2_vregs_dword_w )                            AM_BASE((UINT32**)&seta2_vregs)
 
 	AM_RANGE( 0x00c00000, 0x00c002ff ) AM_READWRITE( funcube_nvram_dword_r, funcube_nvram_dword_w )
@@ -1004,7 +1004,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( funcube_sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
-	AM_RANGE( 0x200000, 0x20017f ) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x200000, 0x20017f ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 ADDRESS_MAP_END
 
 
@@ -1073,14 +1073,14 @@ static WRITE8_HANDLER( funcube_leds_w )
 {
 	*funcube_leds = data;
 
-	set_led_status( 0, (~data) & 0x01 );	// win lamp (red)
-	set_led_status( 1, (~data) & 0x02 );	// win lamp (green)
+	set_led_status( space->machine, 0, (~data) & 0x01 );	// win lamp (red)
+	set_led_status( space->machine, 1, (~data) & 0x02 );	// win lamp (green)
 
 	// Set in a moving pattern: 0111 -> 1011 -> 1101 -> 1110
-	set_led_status( 2, (~data) & 0x10 );
-	set_led_status( 3, (~data) & 0x20 );
-	set_led_status( 4, (~data) & 0x40 );
-	set_led_status( 5, (~data) & 0x80 );
+	set_led_status( space->machine, 2, (~data) & 0x10 );
+	set_led_status( space->machine, 3, (~data) & 0x20 );
+	set_led_status( space->machine, 4, (~data) & 0x40 );
+	set_led_status( space->machine, 5, (~data) & 0x80 );
 
 	funcube_debug_outputs();
 }
@@ -1103,7 +1103,7 @@ static WRITE8_HANDLER( funcube_outputs_w )
 	// Bit 1: high on pay out
 
 	// Bit 3: low after coining up, blinks on pay out
-	set_led_status( 6, (~data) & 0x08 );
+	set_led_status( space->machine, 6, (~data) & 0x08 );
 
 	funcube_debug_outputs();
 }

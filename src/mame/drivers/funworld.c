@@ -1074,12 +1074,12 @@ VIDEO_UPDATE( funworld );
 
 static WRITE8_DEVICE_HANDLER(funworld_lamp_a_w)
 {
-	coin_counter_w(0, data & 0x01);					/* credit in counter */
+	coin_counter_w(device->machine, 0, data & 0x01);					/* credit in counter */
 
 	output_set_lamp_value(0, 1-((data >> 1) & 1));	/* button hold1 and */
 	output_set_lamp_value(2, 1-((data >> 1) & 1));	/* hold3 (see pinouts) */
 
-	coin_counter_w(7, data & 0x04);					/* credit out counter, mapped as coin 8 */
+	coin_counter_w(device->machine, 7, data & 0x04);					/* credit out counter, mapped as coin 8 */
 
 	output_set_lamp_value(1, 1-((data >> 3) & 1));	/* button hold2/low */
 	output_set_lamp_value(5, 1-((data >> 5) & 1));	/* button 6 (collect/cancel) */
@@ -1106,22 +1106,22 @@ static WRITE8_DEVICE_HANDLER(pia1_ca2_w)
 *************************/
 
 static ADDRESS_MAP_START( funworld_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_r)
 	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_address_data_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE_GENERIC(colorram)
 	AM_RANGE(0x4000, 0x4000) AM_READNOP
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magicrd2_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_r)
@@ -1131,13 +1131,13 @@ static ADDRESS_MAP_START( magicrd2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2c00, 0x2cff) AM_RAM	/* range for protection */
 	AM_RANGE(0x3600, 0x36ff) AM_RAM	/* some games use $3603-05 range for protection */
 	AM_RANGE(0x3c00, 0x3cff) AM_RAM	/* range for protection */
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE_GENERIC(colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cuoreuno_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_r)
@@ -1146,26 +1146,26 @@ static ADDRESS_MAP_START( cuoreuno_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x2000, 0x2000) AM_READNOP	/* some unknown reads */
 	AM_RANGE(0x3e00, 0x3fff) AM_RAM	/* some games use $3e03-05 range for protection */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE_GENERIC(colorram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( royalmcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x2a00, 0x2a03) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 	AM_RANGE(0x2c00, 0x2c00) AM_DEVREAD("ay8910", ay8910_r)
 	AM_RANGE(0x2c00, 0x2c01) AM_DEVWRITE("ay8910", ay8910_address_data_w)
 	AM_RANGE(0x2e00, 0x2e00) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x2e01, 0x2e01) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE_GENERIC(colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( saloon_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
 	AM_RANGE(0x0a01, 0x0a01) AM_READ_PORT("IN1")
 	AM_RANGE(0x081c, 0x081c) AM_DEVWRITE("crtc", mc6845_address_w)
@@ -1174,8 +1174,8 @@ static ADDRESS_MAP_START( saloon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("ay8910", ay8910_r)
 	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("ay8910", ay8910_address_data_w)
 //  AM_RANGE(0x2000, 0x2000) AM_READNOP /* some unknown reads... maybe a DSW */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE_GENERIC(colorram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -2283,14 +2283,14 @@ This code should be inserted into a PC-DOS program, that program is nowhere to b
 static NVRAM_HANDLER( jolyc980 )
 {
 	if (read_or_write)
-		mame_fwrite(file, generic_nvram, generic_nvram_size);
+		mame_fwrite(file, machine->generic.nvram.v, machine->generic.nvram_size);
 	else if (file)
-		mame_fread(file, generic_nvram, generic_nvram_size);
+		mame_fread(file, machine->generic.nvram.v, machine->generic.nvram_size);
 	else
 	{
 		int i;
-		for(i=0;i<generic_nvram_size;i++)
-			generic_nvram[i] = jolyc980_default_eeprom[i];
+		for(i=0;i<machine->generic.nvram_size;i++)
+			machine->generic.nvram.u8[i] = jolyc980_default_eeprom[i];
 	}
 }
 

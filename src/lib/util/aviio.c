@@ -2306,7 +2306,9 @@ static avi_error soundbuf_flush(avi_file *file, int only_flush_full)
 			return avierr;
 
 		/* add up the samples */
-		if (channelsamples > 0)
+		if (channelsamples > chunksamples)
+			file->info.audio_numsamples = stream->samples += chunksamples;
+		else if (channelsamples > 0)
 			file->info.audio_numsamples = stream->samples += channelsamples;
 
 		/* advance past those */

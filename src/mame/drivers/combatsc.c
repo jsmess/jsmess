@@ -155,8 +155,8 @@ static WRITE8_HANDLER( combasc_coin_counter_w )
 	/* b1: coin counter 2 */
 	/* b0: coin counter 1 */
 
-	coin_counter_w(0,data & 0x01);
-	coin_counter_w(1,data & 0x02);
+	coin_counter_w(space->machine, 0,data & 0x01);
+	coin_counter_w(space->machine, 1,data & 0x02);
 }
 
 static READ8_HANDLER( trackball_r )
@@ -286,7 +286,7 @@ static ADDRESS_MAP_START( combasc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0418, 0x0418) AM_WRITE(combasc_sh_irqtrigger_w)
 	AM_RANGE(0x041c, 0x041c) AM_WRITE(watchdog_reset_w)			/* watchdog reset? */
 
-	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE(&paletteram)		/* palette */
+	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE_GENERIC(paletteram)		/* palette */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM								/* RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(combasc_video_r, combasc_video_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)						/* banked ROM area */
@@ -296,7 +296,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( combascb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x04ff) AM_RAM
 	AM_RANGE(0x0500, 0x0500) AM_WRITE(combascb_bankselect_w)
-	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE(&paletteram)		/* palette */
+	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE_GENERIC(paletteram)		/* palette */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(combasc_video_r, combasc_video_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)						/* banked ROM/RAM area */

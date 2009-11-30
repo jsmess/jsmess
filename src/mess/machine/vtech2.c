@@ -121,7 +121,7 @@ static void laser_machine_init(running_machine *machine, int bank_mask, int vide
 
 	laser_bank_mask = bank_mask;
     laser_video_bank = video_mask;
-	videoram = mem + laser_video_bank * 0x04000;
+	machine->generic.videoram.u8 = mem + laser_video_bank * 0x04000;
 	logerror("laser_machine_init(): bank mask $%04X, video %d [$%05X]\n", laser_bank_mask, laser_video_bank, laser_video_bank * 0x04000);
 
 	for (i = 0; i < ARRAY_LENGTH(laser_bank); i++)

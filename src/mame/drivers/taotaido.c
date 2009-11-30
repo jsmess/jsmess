@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM AM_BASE(&taotaido_spriteram)		// sprite ram
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_BASE(&taotaido_spriteram2)		// sprite tile lookup ram
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM										// main ram
-	AM_RANGE(0xffc000, 0xffcfff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// palette ram
+	AM_RANGE(0xffc000, 0xffcfff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// palette ram
 	AM_RANGE(0xffe000, 0xffe3ff) AM_RAM AM_BASE(&taotaido_scrollram)		// rowscroll / rowselect / scroll ram
 	AM_RANGE(0xffff80, 0xffff81) AM_READ_PORT("P1")
 	AM_RANGE(0xffff82, 0xffff83) AM_READ_PORT("P2")
@@ -376,7 +376,7 @@ ROM_START( taotaido )
 	ROM_LOAD( "3-u113.bin", 0x000000, 0x20000, CRC(a167c4e4) SHA1(d32184e7040935cd440d4d82c66491b710ec87a8) )
 	ROM_RELOAD ( 0x10000, 0x20000 )
 
-	ROM_REGION( 0x100000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "u104.bin",     0x000000, 0x100000, CRC(e89387a9) SHA1(1deeee056af367d1a5aa0722dd3d6c68a82d0489) )
 
 	ROM_REGION( 0x200000, "ymsnd", 0 ) /* sound samples */
@@ -400,7 +400,7 @@ ROM_START( taotaidoa )
 	ROM_LOAD( "3-u113.bin", 0x000000, 0x20000, CRC(a167c4e4) SHA1(d32184e7040935cd440d4d82c66491b710ec87a8) )
 	ROM_RELOAD ( 0x10000, 0x20000 )
 
-	ROM_REGION( 0x100000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "u104.bin",     0x000000, 0x100000, CRC(e89387a9) SHA1(1deeee056af367d1a5aa0722dd3d6c68a82d0489) )
 
 	ROM_REGION( 0x200000, "ymsnd", 0 ) /* sound samples */

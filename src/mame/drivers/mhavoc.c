@@ -271,7 +271,7 @@ static ADDRESS_MAP_START( gamma_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW2") AM_WRITE(mhavoc_gamma_irq_ack_w)	/* DSW at 8S, IRQ Acknowledge*/
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(mhavoc_out_1_w)			/* Coin Counters    */
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(mhavoc_alpha_w)			/* Alpha Comm. Write Port */
-	AM_RANGE(0x6000, 0x61ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* EEROM */
+	AM_RANGE(0x6000, 0x61ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* EEROM */
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)					/* Program ROM (16K)    */
 ADDRESS_MAP_END
 
@@ -301,7 +301,7 @@ static ADDRESS_MAP_START( alphaone_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x10b4, 0x10b4) AM_WRITE(mhavoc_rom_banksel_w)
 	AM_RANGE(0x10b8, 0x10b8) AM_WRITE(mhavoc_ram_banksel_w)
 	AM_RANGE(0x10e0, 0x10ff) AM_WRITE(SMH_RAM) AM_BASE(&mhavoc_colorram)	/* ColorRAM */
-	AM_RANGE(0x1800, 0x18ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* EEROM */
+	AM_RANGE(0x1800, 0x18ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* EEROM */
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(2)						/* Paged Program ROM (32K) */
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("alpha", 0x4000) /* Vector Generator RAM */
 	AM_RANGE(0x5000, 0x7fff) AM_ROM								/* Vector ROM */
@@ -388,12 +388,12 @@ static INPUT_PORTS_START( mhavoc )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x0c, 0x0c, "Right Coin Mechanism" )	PORT_DIPLOCATION("SW2:5,6")
-	PORT_DIPSETTING(    0x0c, "x1snd" )
+	PORT_DIPSETTING(    0x0c, "x1" )
 	PORT_DIPSETTING(    0x08, "x4" )
 	PORT_DIPSETTING(    0x04, "x5" )
 	PORT_DIPSETTING(    0x00, "x6" )
 	PORT_DIPNAME( 0x10, 0x10, "Left Coin Mechanism" )	PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x10, "x1snd" )
+	PORT_DIPSETTING(    0x10, "x1" )
 	PORT_DIPSETTING(    0x00, "x2" )
 	PORT_DIPNAME( 0xe0, 0xe0, "Bonus Credits" )			PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x80, "2 each 4" )

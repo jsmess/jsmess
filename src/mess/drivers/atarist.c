@@ -321,7 +321,7 @@ static WRITE8_HANDLER( ikbd_port3_w )
 
 	atarist_state *state = space->machine->driver_data;
 
-	set_led_status(1, data & 0x01);
+	set_led_status(space->machine, 1, data & 0x01);
 
 	if (~data & 0x02) state->ikbd_keylatch = input_port_read(space->machine, "P31");
 	if (~data & 0x04) state->ikbd_keylatch = input_port_read(space->machine, "P32");

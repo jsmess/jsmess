@@ -167,16 +167,16 @@ static CUSTOM_INPUT( gstream_mirror_r )
 
 static WRITE32_HANDLER( gstream_palette_w )
 {
-	COMBINE_DATA(&paletteram32[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
-	palette_set_color_rgb(space->machine,offset*2,pal5bit(paletteram32[offset] >> (0+16)),
-		                             pal5bit(paletteram32[offset] >> (6+16)),
-									 pal5bit(paletteram32[offset] >> (11+16)));
+	palette_set_color_rgb(space->machine,offset*2,pal5bit(space->machine->generic.paletteram.u32[offset] >> (0+16)),
+		                             pal5bit(space->machine->generic.paletteram.u32[offset] >> (6+16)),
+									 pal5bit(space->machine->generic.paletteram.u32[offset] >> (11+16)));
 
 
-	palette_set_color_rgb(space->machine,offset*2+1,pal5bit(paletteram32[offset] >> (0)),
-		                             pal5bit(paletteram32[offset] >> (6)),
-									 pal5bit(paletteram32[offset] >> (11)));
+	palette_set_color_rgb(space->machine,offset*2+1,pal5bit(space->machine->generic.paletteram.u32[offset] >> (0)),
+		                             pal5bit(space->machine->generic.paletteram.u32[offset] >> (6)),
+									 pal5bit(space->machine->generic.paletteram.u32[offset] >> (11)));
 }
 
 static WRITE32_HANDLER( gstream_vram_w )
@@ -214,12 +214,12 @@ static ADDRESS_MAP_START( gstream_32bit_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x4E000000, 0x4E1FFFFF) AM_ROM AM_REGION("user2",0) // main game rom
 	AM_RANGE(0x4F000000, 0x4F000003) AM_WRITE(gstream_tilemap3_scrollx_w)
 	AM_RANGE(0x4F200000, 0x4F200003) AM_WRITE(gstream_tilemap3_scrolly_w)
-	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_WRITE(gstream_palette_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_WRITE(gstream_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x4F800000, 0x4F800003) AM_WRITE(gstream_tilemap1_scrollx_w)
 	AM_RANGE(0x4FA00000, 0x4FA00003) AM_WRITE(gstream_tilemap1_scrolly_w)
 	AM_RANGE(0x4FC00000, 0x4FC00003) AM_WRITE(gstream_tilemap2_scrollx_w)
 	AM_RANGE(0x4FE00000, 0x4FE00003) AM_WRITE(gstream_tilemap2_scrolly_w)
-	AM_RANGE(0xFFC00000, 0xFFC01FFF) AM_RAM AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size) // Backup RAM
+	AM_RANGE(0xFFC00000, 0xFFC01FFF) AM_RAM AM_BASE_SIZE_GENERIC(nvram) // Backup RAM
 	AM_RANGE(0xFFF80000, 0xFFFFFFFF) AM_ROM AM_REGION("user1",0) // boot rom
 ADDRESS_MAP_END
 

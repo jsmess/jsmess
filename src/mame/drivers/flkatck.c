@@ -47,8 +47,8 @@ static WRITE8_HANDLER( flkatck_bankswitch_w )
 	int bankaddress = 0;
 
 	/* bits 3-4: coin counters */
-	coin_counter_w(0,data & 0x08);
-	coin_counter_w(1,data & 0x10);
+	coin_counter_w(space->machine, 0,data & 0x08);
+	coin_counter_w(space->machine, 1,data & 0x10);
 
 	/* bits 0-1: bank # */
 	bankaddress += 0x10000 + (data & 0x03)*0x2000;
@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( flkatck_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0007) AM_RAM_WRITE(flkatck_k007121_regs_w) 									/* 007121 registers */
 	AM_RANGE(0x0008, 0x03ff) AM_RAM																	/* RAM */
 	AM_RANGE(0x0400, 0x041f) AM_READWRITE(flkatck_ls138_r, flkatck_ls138_w)							/* inputs, DIPS, bankswitch, counters, sound command */
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE(&paletteram)	/* palette */
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE_GENERIC(paletteram)	/* palette */
 	AM_RANGE(0x1000, 0x1fff) AM_RAM																	/* RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(flkatck_k007121_w) AM_BASE(&k007121_ram)					/* Video RAM (007121) */
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)															/* banked ROM */

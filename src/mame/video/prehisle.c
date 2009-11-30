@@ -24,7 +24,7 @@ WRITE16_HANDLER( prehisle_bg_videoram16_w )
 
 WRITE16_HANDLER( prehisle_fg_videoram16_w )
 {
-	COMBINE_DATA(&videoram16[offset]);
+	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
@@ -54,8 +54,8 @@ WRITE16_HANDLER( prehisle_control16_w )
 	case 0x10: tilemap_set_scrolly(bg2_tilemap, 0, scroll); break;
 	case 0x18: tilemap_set_scrollx(bg2_tilemap, 0, scroll); break;
 	case 0x23: invert_controls = data ? 0x00ff : 0x0000; break;
-	case 0x28: coin_counter_w(0, data & 1); break;
-	case 0x29: coin_counter_w(1, data & 1); break;
+	case 0x28: coin_counter_w(space->machine, 0, data & 1); break;
+	case 0x29: coin_counter_w(space->machine, 1, data & 1); break;
 	case 0x30: flip_screen_set(space->machine, data & 0x01); break;
 	}
 }
@@ -85,7 +85,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int attr = videoram16[tile_index];
+	int attr = machine->generic.videoram.u16[tile_index];
 	int code = attr & 0xfff;
 	int color = attr >> 12;
 
@@ -112,6 +112,7 @@ VIDEO_START( prehisle )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int foreground )
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 
 	for (offs = 0; offs < 1024; offs += 4)

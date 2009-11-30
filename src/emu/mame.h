@@ -140,6 +140,44 @@ typedef struct _ui_input_private ui_input_private;
 typedef struct _cheat_private cheat_private;
 typedef struct _debugcpu_private debugcpu_private;
 typedef struct _debugvw_private debugvw_private;
+typedef struct _generic_machine_private generic_machine_private;
+typedef struct _generic_video_private generic_video_private;
+typedef struct _generic_audio_private generic_audio_private;
+
+
+/* structure to hold a pointer/size pair for generic pointers */
+typedef union _generic_ptr generic_ptr;
+union _generic_ptr
+{
+	void *		v;
+	UINT8 *		u8;
+	UINT16 *	u16;
+	UINT32 *	u32;
+	UINT64 *	u64;
+};
+
+
+/* this structure holds generic pointers that are commonly used */
+typedef struct _generic_pointers generic_pointers;
+struct _generic_pointers
+{
+	generic_ptr				nvram;				/* generic NVRAM */
+	UINT32					nvram_size;
+	generic_ptr				videoram;			/* videoram */
+	UINT32					videoram_size;
+	generic_ptr				colorram;			/* color ram */
+	UINT32					colorram_size;
+	generic_ptr				spriteram;			/* spriteram */
+	UINT32					spriteram_size;
+	generic_ptr				spriteram2;			/* secondary spriteram */
+	UINT32					spriteram2_size;
+	generic_ptr				buffered_spriteram;	/* buffered spriteram */
+	generic_ptr				buffered_spriteram2;/* secondary buffered spriteram */
+	generic_ptr				buffered_spriteram3;/* tertiary buffered spriteram */
+	generic_ptr				paletteram;			/* palette RAM */
+	generic_ptr				paletteram2;		/* secondary palette RAM */
+	bitmap_t *				tmpbitmap;			/* temporary bitmap */
+};
 
 
 /* description of the currently-running machine */
@@ -148,7 +186,7 @@ struct _running_machine
 {
 	/* configuration data */
 	const machine_config *	config;				/* points to the constructed machine_config */
-	const input_port_config *portconfig;		/* points to a list of input port configurations */
+	input_port_list			portlist;			/* points to a list of input port configurations */
 
 	/* CPU information */
 	const device_config *	firstcpu;			/* first CPU (allows for quick iteration via typenext) */
@@ -174,6 +212,9 @@ struct _running_machine
 	/* debugger-related information */
 	UINT32					debug_flags;		/* the current debug flags */
 
+	/* generic pointers */
+	generic_pointers		generic;			/* generic pointers */
+
 	/* internal core information */
 	mame_private *			mame_data;			/* internal data from mame.c */
 	cpuexec_private *		cpuexec_data;		/* internal data from cpuexec.c */
@@ -192,6 +233,9 @@ struct _running_machine
 	cheat_private *			cheat_data;			/* internal data from cheat.c */
 	debugcpu_private *		debugcpu_data;		/* internal data from debugcpu.c */
 	debugvw_private *		debugvw_data;		/* internal data from debugvw.c */
+	generic_machine_private *generic_machine_data; /* internal data from machine/generic.c */
+	generic_video_private *	generic_video_data;	/* internal data from video/generic.c */
+	generic_audio_private *	generic_audio_data;	/* internal data from audio/generic.c */
 #ifdef MESS
 	images_private *		images_data;		/* internal data from image.c */
 	ui_mess_private *		ui_mess_data;		/* internal data from uimess.c */

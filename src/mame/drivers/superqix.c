@@ -233,13 +233,13 @@ static WRITE8_HANDLER( bootleg_mcu_p1_w )
 			// ???
 			break;
 		case 1:
-			coin_counter_w(0,data & 1);
+			coin_counter_w(space->machine, 0,data & 1);
 			break;
 		case 2:
-			coin_counter_w(1,data & 1);
+			coin_counter_w(space->machine, 1,data & 1);
 			break;
 		case 3:
-			coin_lockout_global_w((data & 1) ^ invert_coin_lockout);
+			coin_lockout_global_w(space->machine, (data & 1) ^ invert_coin_lockout);
 			break;
 		case 4:
 			flip_screen_set(space->machine, data & 1);
@@ -300,13 +300,13 @@ static WRITE8_HANDLER( sqixu_mcu_p2_w )
 	// bit 0 = unknown (clocked often)
 
 	// bit 1 = coin cointer 1
-	coin_counter_w(0,data & 2);
+	coin_counter_w(space->machine, 0,data & 2);
 
 	// bit 2 = coin counter 2
-	coin_counter_w(1,data & 4);
+	coin_counter_w(space->machine, 1,data & 4);
 
 	// bit 3 = coin lockout
-	coin_lockout_global_w(~data & 8);
+	coin_lockout_global_w(space->machine, ~data & 8);
 
 	// bit 4 = flip screen
 	flip_screen_set(space->machine, data & 0x10);
@@ -576,14 +576,14 @@ static MACHINE_START( pbillian )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe100, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(superqix_videoram_w) AM_BASE(&superqix_videoram)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pbillian_port_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE(&paletteram)
+	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x0408, 0x0408) AM_READ(pbillian_from_mcu_r)
@@ -596,7 +596,7 @@ static ADDRESS_MAP_START( pbillian_port_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotsmash_port_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE(&paletteram)
+	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x0408, 0x0408) AM_READ(hotsmash_from_mcu_r)
@@ -609,7 +609,7 @@ static ADDRESS_MAP_START( hotsmash_port_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sqix_port_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE(&paletteram)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("ay1", ay8910_r)
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("ay1", ay8910_data_address_w)
 	AM_RANGE(0x0405, 0x0405) AM_DEVREAD("ay2", ay8910_r)
@@ -622,7 +622,7 @@ static ADDRESS_MAP_START( sqix_port_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bootleg_port_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE(&paletteram)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("ay1", ay8910_r)
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("ay1", ay8910_data_address_w)
 	AM_RANGE(0x0405, 0x0405) AM_DEVREAD("ay2", ay8910_r)

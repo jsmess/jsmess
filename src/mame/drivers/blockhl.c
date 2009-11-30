@@ -47,7 +47,7 @@ static INTERRUPT_GEN( blockhl_interrupt )
 static READ8_HANDLER( bankedram_r )
 {
 	if (palette_selected)
-		return paletteram[offset];
+		return space->machine->generic.paletteram.u8[offset];
 	else
 		return ram[offset];
 }
@@ -254,8 +254,8 @@ static KONAMI_SETLINES_CALLBACK( blockhl_banking )
 	memory_set_bankptr(device->machine, 1,&RAM[offs]);
 
 	/* bits 3/4 = coin counters */
-	coin_counter_w(0,lines & 0x08);
-	coin_counter_w(1,lines & 0x10);
+	coin_counter_w(device->machine, 0,lines & 0x08);
+	coin_counter_w(device->machine, 1,lines & 0x10);
 
 	/* bit 5 = select palette RAM or work RAM at 5800-5fff */
 	palette_selected = ~lines & 0x20;
@@ -276,7 +276,7 @@ static MACHINE_RESET( blockhl )
 
 	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), blockhl_banking);
 
-	paletteram = &RAM[0x18000];
+	machine->generic.paletteram.u8 = &RAM[0x18000];
 }
 
 

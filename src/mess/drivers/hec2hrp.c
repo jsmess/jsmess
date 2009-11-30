@@ -77,7 +77,7 @@ static ADDRESS_MAP_START(hec2hrp_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000,0x3fff) AM_ROMBANK(2) 
 
 	// Vidéo br mapping
-	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_GENERIC(videoram)
 	// continous RAM
     AM_RANGE(0x4A00,0xbfff) AM_RAM
 	// from 0xC000 to 0xFFFF => Bank Ram for vidéo and data !
@@ -130,9 +130,9 @@ UINT8 *ROM2 = memory_region(machine, "page2"); // pointer to rom page 2
 
     // Start keyboard
     at_keyboard_init(machine, AT_KEYBOARD_TYPE_PC);
-    at_keyboard_reset();
+    at_keyboard_reset(machine);
     at_keyboard_set_scan_code_set(2);
-    at_keyboard_reset();
+    at_keyboard_reset(machine);
 
 
     hector_init(machine);

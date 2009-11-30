@@ -344,7 +344,7 @@ static void device_display_cassette(const device_config *image)
 	x = 0.0f;
 	y = 0.5f;
 
-	device = device_list_first( image->machine->config->devicelist, CASSETTE );
+	device = device_list_first( &image->machine->config->devicelist, CASSETTE );
 
 	while ( device && strcmp( device->tag, image->tag ) )
 	{

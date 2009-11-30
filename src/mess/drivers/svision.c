@@ -247,7 +247,7 @@ static WRITE8_HANDLER(tvlink_w)
 static ADDRESS_MAP_START( svision_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM
 	AM_RANGE( 0x2000, 0x3fff) AM_READWRITE(svision_r, svision_w) AM_BASE(&svision_reg)
-	AM_RANGE( 0x4000, 0x5fff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE( 0x4000, 0x5fff) AM_RAM AM_BASE_GENERIC(videoram)
 	AM_RANGE( 0x6000, 0x7fff) AM_NOP
 	AM_RANGE( 0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE( 0xc000, 0xffff) AM_ROMBANK(2)
@@ -256,7 +256,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tvlink_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM
 	AM_RANGE( 0x2000, 0x3fff) AM_READWRITE(tvlink_r, tvlink_w) AM_BASE(&svision_reg)
-	AM_RANGE( 0x4000, 0x5fff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE( 0x4000, 0x5fff) AM_RAM AM_BASE_GENERIC(videoram)
 	AM_RANGE( 0x6000, 0x7fff) AM_NOP
 	AM_RANGE( 0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE( 0xc000, 0xffff) AM_ROMBANK(2)
@@ -367,7 +367,7 @@ static PALETTE_INIT( svisionp )
 static VIDEO_UPDATE( svision )
 {
 	int x, y, i, j=XPOS/4+YPOS*0x30;
-	UINT8 *vram= videoram;
+	UINT8 *vram= screen->machine->generic.videoram.u8;
 
 	if (BANK&8)
 	{
@@ -398,7 +398,7 @@ static VIDEO_UPDATE( svision )
 static VIDEO_UPDATE( tvlink )
 {
 	int x, y, i, j = XPOS/4+YPOS*0x30;
-	UINT8 *vram = videoram;
+	UINT8 *vram = screen->machine->generic.videoram.u8;
 
 	if (BANK & 8)
 	{

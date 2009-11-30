@@ -51,14 +51,14 @@ static TIMER_CALLBACK( gal_video )
 				y = gal_cnt / 48 - 2;
 				x = (gal_cnt % 48) * 8;
 
-				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 0) & 1; x++;
-				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 1) & 1; x++;
-				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 2) & 1; x++;
-				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 3) & 1; x++;
-				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 4) & 1; x++;
-				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 5) & 1; x++;
-				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 6) & 1; x++;
-				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 7) & 1;
+				*BITMAP_ADDR16(machine->generic.tmpbitmap, y, x ) = (code >> 0) & 1; x++;
+				*BITMAP_ADDR16(machine->generic.tmpbitmap, y, x ) = (code >> 1) & 1; x++;
+				*BITMAP_ADDR16(machine->generic.tmpbitmap, y, x ) = (code >> 2) & 1; x++;
+				*BITMAP_ADDR16(machine->generic.tmpbitmap, y, x ) = (code >> 3) & 1; x++;
+				*BITMAP_ADDR16(machine->generic.tmpbitmap, y, x ) = (code >> 4) & 1; x++;
+				*BITMAP_ADDR16(machine->generic.tmpbitmap, y, x ) = (code >> 5) & 1; x++;
+				*BITMAP_ADDR16(machine->generic.tmpbitmap, y, x ) = (code >> 6) & 1; x++;
+				*BITMAP_ADDR16(machine->generic.tmpbitmap, y, x ) = (code >> 7) & 1;
 			}
 			else
 			{ // Graphics mode
@@ -93,14 +93,14 @@ static TIMER_CALLBACK( gal_video )
 				}
 				/* end of hack */
 
-				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 0) & 1; x++;
-				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 1) & 1; x++;
-				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 2) & 1; x++;
-				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 3) & 1; x++;
-				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 4) & 1; x++;
-				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 5) & 1; x++;
-				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 6) & 1; x++;
-				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 7) & 1;
+				*BITMAP_ADDR16(machine->generic.tmpbitmap, y, x ) = (code >> 0) & 1; x++;
+				*BITMAP_ADDR16(machine->generic.tmpbitmap, y, x ) = (code >> 1) & 1; x++;
+				*BITMAP_ADDR16(machine->generic.tmpbitmap, y, x ) = (code >> 2) & 1; x++;
+				*BITMAP_ADDR16(machine->generic.tmpbitmap, y, x ) = (code >> 3) & 1; x++;
+				*BITMAP_ADDR16(machine->generic.tmpbitmap, y, x ) = (code >> 4) & 1; x++;
+				*BITMAP_ADDR16(machine->generic.tmpbitmap, y, x ) = (code >> 5) & 1; x++;
+				*BITMAP_ADDR16(machine->generic.tmpbitmap, y, x ) = (code >> 6) & 1; x++;
+				*BITMAP_ADDR16(machine->generic.tmpbitmap, y, x ) = (code >> 7) & 1;
 			}
 		}
 		gal_cnt++;
@@ -129,7 +129,7 @@ VIDEO_UPDATE( galaxy )
 	if (galaxy_interrupts_enabled == FALSE)
 	{
 		rectangle black_area = {0, 384 - 1, 0, 208 - 1};
-		bitmap_fill(tmpbitmap, &black_area, 0);
+		bitmap_fill(screen->machine->generic.tmpbitmap, &black_area, 0);
 	}
 	galaxy_interrupts_enabled = FALSE;
 	return VIDEO_UPDATE_CALL ( generic_bitmapped );

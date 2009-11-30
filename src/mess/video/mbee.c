@@ -66,7 +66,7 @@ READ8_HANDLER ( mbee_pcg_color_latch_r )
 
 WRITE8_HANDLER ( mbee_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 }
 
 WRITE8_HANDLER ( mbee_pcg_w )
@@ -79,7 +79,7 @@ WRITE8_HANDLER ( mbee_pcg_color_w )
 	if( (m6545_video_bank & 0x01) || (mbee_pcg_color_latch & 0x40) == 0 )
 		mbee_pcgram[0x0800 | offset] = data;
 	else
-		colorram[offset] = data;
+		space->machine->generic.colorram.u8[offset] = data;
 }
 
 static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
@@ -459,15 +459,15 @@ static void mc6845_screen_configure(running_machine *machine)
 VIDEO_START( mbee )
 {
 	UINT8 *ram = memory_region(machine, "maincpu");
-	videoram = ram+0x15000;
+	machine->generic.videoram.u8 = ram+0x15000;
 	mbee_pcgram = ram+0x11000;
 }
 
 VIDEO_START( mbeeic )
 {
 	UINT8 *ram = memory_region(machine, "maincpu");
-	videoram = ram+0x15000;
-	colorram = ram+0x15800;
+	machine->generic.videoram.u8 = ram+0x15000;
+	machine->generic.colorram.u8 = ram+0x15800;
 	mbee_pcgram = ram+0x11000;
 }
 
@@ -491,7 +491,7 @@ VIDEO_UPDATE( mbee )
 			{
 				UINT8 inv=0;
 				mem = (x + screen_home) & 0x7ff;
-				chr = videoram[mem];
+				chr = screen->machine->generic.videoram.u8[mem];
 				if ((x & 15) == 0) keyboard_matrix_r(screen->machine, x);	// actually happens for every scanline of every character, but imposes too much unnecessary overhead */
 				/* process cursor */
 				if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
@@ -540,8 +540,8 @@ VIDEO_UPDATE( mbeeic )
 			{
 				UINT8 inv=0;
 				mem = (x + screen_home) & 0x7ff;
-				chr = videoram[mem];
-				col = colorram[mem] | colourm;					// read a byte of colour
+				chr = screen->machine->generic.videoram.u8[mem];
+				col = screen->machine->generic.colorram.u8[mem] | colourm;					// read a byte of colour
 				if ((x & 15) == 0) keyboard_matrix_r(screen->machine, x);	// actually happens for every scanline of every character, but imposes too much unnecessary overhead */
 
 				/* process cursor */

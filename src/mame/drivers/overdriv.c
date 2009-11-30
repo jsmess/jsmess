@@ -167,9 +167,9 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 
 		/* bit 1 is clear during service mode - function unknown */
 
-		set_led_status(0, data & 0x08);
-		coin_counter_w(0, data & 0x10);
-		coin_counter_w(1, data & 0x20);
+		set_led_status(space->machine, 0, data & 0x08);
+		coin_counter_w(space->machine, 0, data & 0x10);
+		coin_counter_w(space->machine, 1, data & 0x20);
 
 //logerror("%06x: write %04x to cpuA_ctrl_w\n",cpu_get_pc(space->cpu),data);
 	}
@@ -225,7 +225,7 @@ static WRITE16_HANDLER( overdriv_cpuB_irq6_w )
 static ADDRESS_MAP_START( overdriv_master_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM					/* work RAM */
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITENOP			/* unknown (always 0x30) */

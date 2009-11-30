@@ -128,12 +128,12 @@ static WRITE16_HANDLER( bg_lsb_w )
 
 static READ16_HANDLER( spriteram_lsb_r )
 {
-	return spriteram[offset];
+	return space->machine->generic.spriteram.u8[offset];
 }
 static WRITE16_HANDLER( spriteram_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		spriteram[offset] = data;
+		space->machine->generic.spriteram.u8[offset] = data;
 }
 
 
@@ -228,8 +228,8 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectang
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT8 *s	=	spriteram;
-	UINT8 *end	=	spriteram + 0x800;
+	UINT8 *s	=	machine->generic.spriteram.u8;
+	UINT8 *end	=	machine->generic.spriteram.u8 + 0x800;
 
 	for ( ; s < end; s += 8 )
 	{
@@ -249,6 +249,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		x		>>=	3;
 		sx		=	(x & 0x1ff) - (x & 0x200);
 		sy		=	(y & 0x1ff) - (y & 0x200);
+
+		// sprites list stop (used by mgdh & sdmg2 during don den)
+		if (sy == -0x200)
+			break;
 
 		color = (s[7] & 0xe0) >> 5;
 
@@ -1089,8 +1093,8 @@ static READ8_HANDLER( input_r )
 static ADDRESS_MAP_START( iqblocka_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
-	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_BASE( &spriteram )
-	AM_RANGE( 0x1800, 0x1bff ) AM_READWRITE( SMH_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE(&paletteram)
+	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_BASE_GENERIC( spriteram )
+	AM_RANGE( 0x1800, 0x1bff ) AM_READWRITE( SMH_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE_GENERIC(paletteram)
 	AM_RANGE( 0x1c00, 0x1fff ) AM_RAM
 
 //  AM_RANGE(0x200a, 0x200a) AM_WRITENOP
@@ -1205,9 +1209,9 @@ static WRITE16_HANDLER( mgcs_paletteram_xRRRRRGGGGGBBBBB_w )
 {
 	int rgb;
 
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 
-	rgb = ((paletteram16[offset/2*2+0] & 0xff) << 8) | (paletteram16[offset/2*2+1] & 0xff);
+	rgb = ((space->machine->generic.paletteram.u16[offset/2*2+0] & 0xff) << 8) | (space->machine->generic.paletteram.u16[offset/2*2+1] & 0xff);
 
 	// bitswap
 	rgb = BITSWAP16(rgb,7,8,9,2,14,3,13,15,12,11,10,0,1,4,5,6);
@@ -1220,8 +1224,8 @@ static ADDRESS_MAP_START( mgcs, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x300000, 0x303fff ) AM_RAM
 	AM_RANGE( 0x49c000, 0x49c003 ) AM_WRITE( mgcs_magic_w )
 	AM_RANGE( 0x49c002, 0x49c003 ) AM_READ ( mgcs_magic_r )
-	AM_RANGE( 0xa02000, 0xa02fff ) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_BASE( (UINT16**)&spriteram )
-	AM_RANGE( 0xa03000, 0xa037ff ) AM_RAM_WRITE( mgcs_paletteram_xRRRRRGGGGGBBBBB_w ) AM_BASE( &paletteram16 )
+	AM_RANGE( 0xa02000, 0xa02fff ) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_BASE_GENERIC( spriteram )
+	AM_RANGE( 0xa03000, 0xa037ff ) AM_RAM_WRITE( mgcs_paletteram_xRRRRRGGGGGBBBBB_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0xa04020, 0xa04027 ) AM_DEVREAD8( "ppi8255", ppi8255_r, 0x00ff )
 	AM_RANGE( 0xa04024, 0xa04025 ) AM_WRITE( video_disable_lsb_w )
 	AM_RANGE( 0xa04028, 0xa04029 ) AM_WRITE( irq2_enable_w )
@@ -1239,9 +1243,9 @@ static WRITE16_HANDLER( sdmg2_paletteram_xRRRRRGGGGGBBBBB_w )
 {
 	int rgb;
 
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 
-	rgb = ((paletteram16[offset/2*2+1] & 0xff) << 8) | (paletteram16[offset/2*2+0] & 0xff);
+	rgb = ((space->machine->generic.paletteram.u16[offset/2*2+1] & 0xff) << 8) | (space->machine->generic.paletteram.u16[offset/2*2+0] & 0xff);
 
 	palette_set_color_rgb(space->machine, offset/2, pal5bit(rgb >> 0), pal5bit(rgb >> 5), pal5bit(rgb >> 10));
 }
@@ -1253,6 +1257,8 @@ static READ8_HANDLER( sdmg2_keys_r )
 	if (~input_select & 0x04)	return input_port_read(space->machine, "KEY2");
 	if (~input_select & 0x08)	return input_port_read(space->machine, "KEY3");
 	if (~input_select & 0x10)	return input_port_read(space->machine, "KEY4");
+
+	if (input_select == 0x1f)	return input_port_read(space->machine, "KEY0");	// in joystick mode
 
 	logerror("%s: warning, reading key with input_select = %02x\n", cpuexec_describe_context(space->machine), input_select);
 	return 0xff;
@@ -1273,7 +1279,7 @@ static WRITE16_HANDLER( sdmg2_magic_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				input_select	=	data & 0x1f;
-				coin_counter_w(0,	data & 0x20);
+				coin_counter_w(space->machine, 0,	data & 0x20);
 				//  coin out        data & 0x40
 				hopper			=	data & 0x80;
 			}
@@ -1315,8 +1321,8 @@ static READ16_HANDLER( sdmg2_magic_r )
 static ADDRESS_MAP_START( sdmg2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
-	AM_RANGE(0x202000, 0x202fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_BASE( (UINT16**)&spriteram )
-	AM_RANGE(0x203000, 0x2037ff) AM_RAM_WRITE( sdmg2_paletteram_xRRRRRGGGGGBBBBB_w ) AM_BASE( &paletteram16 )
+	AM_RANGE(0x202000, 0x202fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_BASE_GENERIC( spriteram )
+	AM_RANGE(0x203000, 0x2037ff) AM_RAM_WRITE( sdmg2_paletteram_xRRRRRGGGGGBBBBB_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE(0x204020, 0x204027) AM_DEVREAD8( "ppi8255", ppi8255_r, 0x00ff )
 	AM_RANGE(0x204024, 0x204025) AM_WRITE( video_disable_lsb_w )
 	AM_RANGE(0x204028, 0x204029) AM_WRITE( irq2_enable_w )
@@ -1358,7 +1364,7 @@ static WRITE16_HANDLER( mgdh_magic_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				//  coin out     data & 0x40
-				coin_counter_w(0, data & 0x80);
+				coin_counter_w(space->machine, 0, data & 0x80);
 			}
 
 			if ( data & ~0xc0 )
@@ -1398,6 +1404,9 @@ static READ16_HANDLER( mgdh_magic_r )
 		case 0x00:
 			return mgdh_keys_r(space, 0);
 
+		case 0x01:
+			return input_port_read(space->machine, "BUTTONS");
+
 		case 0x02:
 			return BITSWAP8(input_port_read(space->machine, "DSW2"), 0,1,2,3,4,5,6,7);
 
@@ -1420,8 +1429,8 @@ static ADDRESS_MAP_START( mgdh_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 	AM_RANGE(0x876000, 0x876003) AM_WRITE( mgdh_magic_w )
 	AM_RANGE(0x876002, 0x876003) AM_READ ( mgdh_magic_r )
-	AM_RANGE(0xa02000, 0xa02fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_BASE( (UINT16**)&spriteram )
-	AM_RANGE(0xa03000, 0xa037ff) AM_RAM_WRITE( sdmg2_paletteram_xRRRRRGGGGGBBBBB_w ) AM_BASE( &paletteram16 )
+	AM_RANGE(0xa02000, 0xa02fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_BASE_GENERIC( spriteram )
+	AM_RANGE(0xa03000, 0xa037ff) AM_RAM_WRITE( sdmg2_paletteram_xRRRRRGGGGGBBBBB_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE(0xa04020, 0xa04027) AM_DEVREAD8( "ppi8255", ppi8255_r, 0x00ff )
 	AM_RANGE(0xa04024, 0xa04025) AM_WRITE( video_disable_lsb_w )
 	AM_RANGE(0xa04028, 0xa04029) AM_WRITE( irq2_enable_w )
@@ -1725,18 +1734,33 @@ static INPUT_PORTS_START( sdmg2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE1  ) PORT_NAME("Statistics")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN1     )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_OTHER     ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SERVICE3  )	// shown in test mode
+
+	// Keyboard mode:
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SERVICE3  )	PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)	// shown in test mode
+	// Joystick mode:
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON3   )	PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
+
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 
 	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	// Keyboard mode:
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A         ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E         ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I         ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M         ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN       ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1            ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
+	// Joystick mode:
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1            ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP       ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN     ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT     ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT    ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1           ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2           ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
 
 	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
@@ -1842,14 +1866,24 @@ static INPUT_PORTS_START( mgdh )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 
 	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	// Keyboard mode:
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A         ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x02)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E         ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x02)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I         ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x02)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M         ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x02)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN       ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x02)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1            ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x02)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x02)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x02)
+	// Joystick mode:
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1            ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP       ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN     ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT     ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT    ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1           ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x00)
 
 	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
@@ -1890,6 +1924,16 @@ static INPUT_PORTS_START( mgdh )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("BUTTONS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
 INPUT_PORTS_END
 

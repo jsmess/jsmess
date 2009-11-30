@@ -140,8 +140,8 @@ WRITE8_HANDLER( c1943_c804_w )
 	int bank, i;
 
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(0, data & 0x01);
-	coin_counter_w(1, data & 0x02);
+	coin_counter_w(space->machine, 0, data & 0x01);
+	coin_counter_w(space->machine, 1, data & 0x02);
 
 	/* bits 2, 3 and 4 select the ROM bank */
 	bank = data & 0x1c;
@@ -229,7 +229,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	_1943_state *state = (_1943_state *)machine->driver_data;
 	int offs;
 
-	for (offs = spriteram_size - 32; offs >= 0; offs -= 32)
+	for (offs = state->spriteram_size - 32; offs >= 0; offs -= 32)
 	{
 		int attr = state->spriteram[offs + 1];
 		int code = state->spriteram[offs] + ((attr & 0xe0) << 3);

@@ -1117,9 +1117,9 @@ static WRITE32_HANDLER( system11gun_w )
 	if( ACCESSING_BITS_0_15 )
 	{
 		/* start 1 */
-		set_led_status(0, !(data & 0x08));
+		set_led_status(space->machine, 0, !(data & 0x08));
 		/* start 2 */
-		set_led_status(1, !(data & 0x04));
+		set_led_status(space->machine, 1, !(data & 0x04));
 		/* blowback 1 */
 		/* !(data & 0x02) */
 		/* blowback 2 */
@@ -1407,7 +1407,7 @@ static WRITE8_HANDLER( s12_mcu_settings_w )
 
 static READ8_HANDLER( s12_mcu_gun_h_r )
 {
-	const input_port_config *port = input_port_by_tag(space->machine->portconfig, "LIGHT0_X");
+	const input_port_config *port = input_port_by_tag(&space->machine->portlist, "LIGHT0_X");
 	if( port != NULL )
 	{
 		int rv = input_port_read_direct( port ) << 6;
@@ -1426,7 +1426,7 @@ static READ8_HANDLER( s12_mcu_gun_h_r )
 
 static READ8_HANDLER( s12_mcu_gun_v_r )
 {
-	const input_port_config *port = input_port_by_tag(space->machine->portconfig, "LIGHT0_Y");
+	const input_port_config *port = input_port_by_tag(&space->machine->portlist, "LIGHT0_Y");
 	if( port != NULL )
 	{
 		int rv = input_port_read_direct( port ) << 6;

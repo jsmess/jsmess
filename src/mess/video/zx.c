@@ -54,7 +54,7 @@ void zx_ula_bkgnd(running_machine *machine, int color)
 	{
 		int y, new_x, new_y;
 		rectangle r;
-		bitmap_t *bitmap = tmpbitmap;
+		bitmap_t *bitmap = machine->generic.tmpbitmap;
 
 		new_y = video_screen_get_vpos(machine->primary_screen);
 		new_x = video_screen_get_hpos(machine->primary_screen);
@@ -107,7 +107,7 @@ static TIMER_CALLBACK(zx_ula_nmi)
 	const device_config *screen = video_screen_first(machine->config);
 	int height = video_screen_get_height(screen);
 	rectangle r = *video_screen_get_visible_area(screen);
-	bitmap_t *bitmap = tmpbitmap;
+	bitmap_t *bitmap = machine->generic.tmpbitmap;
 
 	r.min_y = r.max_y = ula_scanline_count;
 	bitmap_fill(bitmap, &r, 1);
@@ -143,7 +143,7 @@ void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT
 
 	if ((!ula_irq_active) && (chr == 0x76))
 	{
-		bitmap_t *bitmap = tmpbitmap;
+		bitmap_t *bitmap = machine->generic.tmpbitmap;
 		UINT16 y, *scanline;
 		UINT16 ireg = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_I) << 8;
 		UINT8 data, *chrgen, creg;

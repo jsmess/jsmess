@@ -208,12 +208,12 @@ static WRITE8_HANDLER( jackie_unk_reg3_hi_w ) { jackie_unk_reg_hi_w( 2, offset, 
 
 static WRITE8_HANDLER( jackie_nmi_and_coins_w )
 {
-	coin_counter_w(0,		data & 0x01);	// coin_a
-	coin_counter_w(1,		data & 0x04);	// coin_c
-	coin_counter_w(2,		data & 0x08);	// key in
-	coin_counter_w(3,		data & 0x10);	// coin out mech
+	coin_counter_w(space->machine, 0,		data & 0x01);	// coin_a
+	coin_counter_w(space->machine, 1,		data & 0x04);	// coin_c
+	coin_counter_w(space->machine, 2,		data & 0x08);	// key in
+	coin_counter_w(space->machine, 3,		data & 0x10);	// coin out mech
 
-	set_led_status(6,		data & 0x20);	// led for coin out / hopper active
+	set_led_status(space->machine, 6,		data & 0x20);	// led for coin out / hopper active
 
 	exp_bank   = (data & 0x02) ? 1 : 0;		// expram bank number
 	nmi_enable = data & 0x80;     // nmi enable?
@@ -284,8 +284,8 @@ static ADDRESS_MAP_START( jackie_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x05a0, 0x05a4) AM_WRITE(jackie_unk_reg3_lo_w)
 	AM_RANGE(0x0da0, 0x0da4) AM_WRITE(jackie_unk_reg3_hi_w)
 	AM_RANGE(0x1000, 0x1107) AM_RAM AM_BASE( &bg_scroll2 )
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE( &paletteram )
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE( &paletteram_2 )
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")			/* DSW1 */
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")			/* DSW2 */
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")			/* DSW3 */

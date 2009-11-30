@@ -43,7 +43,6 @@
 #include "20pacgal.h"
 
 
-
 /*************************************
  *
  *  Clocks
@@ -64,12 +63,13 @@
 
 static WRITE8_HANDLER( irqack_w )
 {
+	_20pacgal_state *state = (_20pacgal_state *)space->machine->driver_data;
 	int bit = data & 1;
 
-	cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), bit);
+	cpu_interrupt_enable(state->maincpu, bit);
 
 	if (!bit)
-		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -106,29 +106,6 @@ static const eeprom_interface _20pacgal_eeprom_intf =
 };
 
 
-static READ8_DEVICE_HANDLER( eeprom_r )
-{
-	_20pacgal_state *state = (_20pacgal_state *)device->machine->driver_data;
-
-	/* bit 7 is EEPROM data */
-	return eepromdev_read_bit(state->eeprom) << 7;
-}
-
-
-static WRITE8_DEVICE_HANDLER( eeprom_w )
-{
-	_20pacgal_state *state = (_20pacgal_state *)device->machine->driver_data;
-
-	/* bit 7 is data */
-	/* bit 6 is clock (active high) */
-	/* bit 5 is cs (active low) */
-	eepromdev_write_bit(state->eeprom, data & 0x80);
-	eepromdev_set_cs_line(state->eeprom, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-	eepromdev_set_clock_line(state->eeprom, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-
 /*************************************
  *
  *  Coin counter
@@ -137,7 +114,7 @@ static WRITE8_DEVICE_HANDLER( eeprom_w )
 
 static WRITE8_HANDLER( _20pacgal_coin_counter_w )
 {
-	coin_counter_w(0, data & 1);
+	coin_counter_w(space->machine, 0, data & 1);
 }
 
 
@@ -219,7 +196,7 @@ static ADDRESS_MAP_START( 20pacgal_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x81, 0x81) AM_WRITENOP				/* ??? pulsed by the timer irq */
 	AM_RANGE(0x82, 0x82) AM_WRITE(irqack_w)
 	AM_RANGE(0x85, 0x86) AM_WRITENOP				/* stars: rng seed (lo/hi) */
-	AM_RANGE(0x87, 0x87) AM_DEVREADWRITE("eeprom", eeprom_r, eeprom_w)
+	AM_RANGE(0x87, 0x87) AM_READ_PORT("EEPROMIN") AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x88, 0x88) AM_WRITE(rom_bank_select_w)
 	AM_RANGE(0x89, 0x89) AM_DEVWRITE("dac", dac_signed_w)
 	AM_RANGE(0x8a, 0x8a) AM_WRITENOP				/* stars: bits 3-4 = active set; bit 5 = enable */
@@ -265,6 +242,14 @@ static INPUT_PORTS_START( 20pacgal )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START( "EEPROMIN" )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	/* bit 7 is EEPROM data */
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)		/* bit 5 is cs (active low) */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)	/* bit 6 is clock (active high) */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)		/* bit 7 is data */
 INPUT_PORTS_END
 
 
@@ -279,6 +264,7 @@ static MACHINE_START( 20pacgal )
 {
 	_20pacgal_state *state = (_20pacgal_state *)machine->driver_data;
 
+	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->eeprom = devtag_get_device(machine, "eeprom");
 
 	state_save_register_global(machine, state->game_selected);
@@ -287,7 +273,6 @@ static MACHINE_START( 20pacgal )
 static MACHINE_RESET( 20pacgal )
 {
 	_20pacgal_state *state = (_20pacgal_state *)machine->driver_data;
-
 	state->game_selected = 0;
 }
 

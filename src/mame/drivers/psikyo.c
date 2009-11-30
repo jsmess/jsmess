@@ -337,7 +337,6 @@ static READ32_HANDLER( s1945_input_r )
 
 static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 {
-	paletteram16 = (UINT16 *)paletteram32;
 	if (ACCESSING_BITS_16_31)
 		paletteram16_xRRRRRGGGGGBBBBB_word_w(space, offset*2, data >> 16, mem_mask >> 16);
 	if (ACCESSING_BITS_0_15)
@@ -346,8 +345,8 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 
 static ADDRESS_MAP_START( psikyo_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM														// ROM (not all used)
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)		// Sprites, buffered by two frames (list buffered + fb buffered)
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE(&paletteram32)	// Palette
+	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)		// Sprites, buffered by two frames (list buffered + fb buffered)
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(psikyo_vram_0_w) AM_BASE(&psikyo_vram_0)		// Layer 0
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(psikyo_vram_1_w) AM_BASE(&psikyo_vram_1)		// Layer 1
 	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_BASE(&psikyo_vregs)								// RAM + Vregs
@@ -1488,7 +1487,7 @@ ROM_START( gunbird )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(9e07104d) SHA1(3bc54cb755bb3194197706965b532d62b48c4d12) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
 	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
@@ -1518,7 +1517,7 @@ ROM_START( gunbirdk )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(9e07104d) SHA1(3bc54cb755bb3194197706965b532d62b48c4d12) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
 	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
@@ -1548,7 +1547,7 @@ ROM_START( gunbirdj )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(9e07104d) SHA1(3bc54cb755bb3194197706965b532d62b48c4d12) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
 	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
@@ -1579,7 +1578,7 @@ ROM_START( btlkroad )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(51d73682) SHA1(562038d08e9a4389ffa39f3a659b2a29b94dc156) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(0f33049f) SHA1(ca4fd5f3906685ace1af40b75f5678231d7324e8) )
 
 	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
@@ -1643,7 +1642,7 @@ ROM_START( s1945jn )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(fe1312c2) SHA1(8339a96a0885518d6e22cb3bdb9c2f82d011d86d) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(a44a4a9b) SHA1(5378256752d709daed0b5f4199deebbcffe84e10) )
 
 	ROM_REGION( 0x040000, "user1", 0 )	/* */

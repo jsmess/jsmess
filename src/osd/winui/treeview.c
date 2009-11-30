@@ -944,7 +944,7 @@ static void CreateDeviceFolders(int parent_index, device_class class, UINT icon_
 		}
 
 		// enumerate through all devices
-		for (device = device_list_class_first(config->devicelist, class); device != NULL;
+		for (device = device_list_class_first(&config->devicelist, class); device != NULL;
 			device = device_list_class_next(device, class))
 		{
 			// get the name

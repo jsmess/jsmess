@@ -330,8 +330,8 @@ static messtest_result_t run_test(int flags, messtest_results *results)
 	screenshot_num = 0;
 	runtime_hash = 0;
 	had_failure = FALSE;
-	videoram = NULL;
-	videoram_size = 0;
+	//videoram = NULL;
+	//videoram_size = 0;
 
 	/* set up options */
 	opts = mame_options_init(win_mess_opts);
@@ -494,7 +494,7 @@ static const input_setting_config *find_switch(running_machine *machine, const c
 
 	/* find switch with the name */
 	found = FALSE;
-	for (port = machine->portconfig; !found && (port != NULL); port = port->next)
+	for (port = machine->portlist.head; !found && (port != NULL); port = port->next)
 	{
 		for (field = port->fieldlist; !found && (field != NULL); field = field->next)
 		{

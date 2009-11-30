@@ -128,9 +128,9 @@ void samcoupe_update_memory(const address_space *space)
 
 	/* video memory location */
 	if (asic->vmpr & 0x40)	/* if bit set in 2 bank screen mode */
-		videoram = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[((asic->vmpr & 0x1e) & PAGE_MASK) * 0x4000];
+		space->machine->generic.videoram.u8 = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[((asic->vmpr & 0x1e) & PAGE_MASK) * 0x4000];
 	else
-		videoram = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[((asic->vmpr & 0x1f) & PAGE_MASK) * 0x4000];
+		space->machine->generic.videoram.u8 = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[((asic->vmpr & 0x1f) & PAGE_MASK) * 0x4000];
 }
 
 

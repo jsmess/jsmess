@@ -269,8 +269,8 @@ static WRITE8_DEVICE_HANDLER ( pmd85_ppi_0_portb_w )
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_0_portc_w )
 {
 	pmd85_ppi_port_outputs[0][2] = data;
-	set_led_status(PMD85_LED_2, (data & 0x08) ? 1 : 0);
-	set_led_status(PMD85_LED_3, (data & 0x04) ? 1 : 0);
+	set_led_status(device->machine, PMD85_LED_2, (data & 0x08) ? 1 : 0);
+	set_led_status(device->machine, PMD85_LED_3, (data & 0x04) ? 1 : 0);
 }
 
 /*******************************************************************************
@@ -303,8 +303,8 @@ static  READ8_DEVICE_HANDLER ( mato_ppi_0_portc_r )
 static WRITE8_DEVICE_HANDLER ( mato_ppi_0_portc_w )
 {
 	pmd85_ppi_port_outputs[0][2] = data;
-	set_led_status(PMD85_LED_2, (data & 0x08) ? 1 : 0);
-	set_led_status(PMD85_LED_3, (data & 0x04) ? 1 : 0);
+	set_led_status(device->machine, PMD85_LED_2, (data & 0x08) ? 1 : 0);
+	set_led_status(device->machine, PMD85_LED_3, (data & 0x04) ? 1 : 0);
 }
 
 /*******************************************************************************

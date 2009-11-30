@@ -51,11 +51,11 @@ WRITE8_HANDLER( tgtball_flipscreen_w )
 /* 800 bytes for red, followed by 800 bytes for green & 800 bytes for blue */
 WRITE8_HANDLER( paradise_palette_w )
 {
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 	offset %= 0x800;
-	palette_set_color_rgb(space->machine,offset,	paletteram[offset + 0x800 * 0],
-											paletteram[offset + 0x800 * 1],
-											paletteram[offset + 0x800 * 2]	);
+	palette_set_color_rgb(space->machine,offset,	space->machine->generic.paletteram.u8[offset + 0x800 * 0],
+											space->machine->generic.paletteram.u8[offset + 0x800 * 1],
+											space->machine->generic.paletteram.u8[offset + 0x800 * 2]	);
 }
 
 /***************************************************************************
@@ -86,9 +86,9 @@ WRITE8_HANDLER( paradise_palbank_w )
 	int bank2 = (data & 0xf0);
 
 	for (i = 0; i < 15; i++)
-		palette_set_color_rgb(space->machine,0x800+i,	paletteram[0x200 + bank2 + i + 0x800 * 0],
-												paletteram[0x200 + bank2 + i + 0x800 * 1],
-												paletteram[0x200 + bank2 + i + 0x800 * 2]	);
+		palette_set_color_rgb(space->machine,0x800+i,	space->machine->generic.paletteram.u8[0x200 + bank2 + i + 0x800 * 0],
+												space->machine->generic.paletteram.u8[0x200 + bank2 + i + 0x800 * 1],
+												space->machine->generic.paletteram.u8[0x200 + bank2 + i + 0x800 * 2]	);
 	if (paradise_palbank != bank1)
 	{
 		paradise_palbank = bank1;
@@ -136,13 +136,13 @@ WRITE8_HANDLER( paradise_pixmap_w )
 {
 	int x,y;
 
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 
 	x = (offset & 0x7f) << 1;
 	y = (offset >> 7);
 
-	*BITMAP_ADDR16(tmpbitmap, y, x+0) = 0x80f - (data >> 4);
-	*BITMAP_ADDR16(tmpbitmap, y, x+1) = 0x80f - (data & 0x0f);
+	*BITMAP_ADDR16(space->machine->generic.tmpbitmap, y, x+0) = 0x80f - (data >> 4);
+	*BITMAP_ADDR16(space->machine->generic.tmpbitmap, y, x+1) = 0x80f - (data & 0x0f);
 }
 
 
@@ -159,7 +159,7 @@ VIDEO_START( paradise )
 	tilemap_2 = tilemap_create(	machine, get_tile_info_2, tilemap_scan_rows, 8,8, 0x20,0x20 );
 
 	/* pixmap */
-	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	machine->generic.tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	tilemap_set_transparent_pen(tilemap_0,0x0f);
 	tilemap_set_transparent_pen(tilemap_1,0xff);
@@ -181,8 +181,9 @@ WRITE8_HANDLER( paradise_priority_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int i;
-	for (i = 0; i < spriteram_size ; i += paradise_sprite_inc)
+	for (i = 0; i < machine->generic.spriteram_size ; i += paradise_sprite_inc)
 	{
 		int code	=	spriteram[i+0];
 		int x		=	spriteram[i+1];
@@ -250,7 +251,7 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 
 	if (layers_ctrl&1)	tilemap_draw(bitmap,cliprect, tilemap_0, 0,0);
 	if (layers_ctrl&2)	tilemap_draw(bitmap,cliprect, tilemap_1, 0,0);
-	if (layers_ctrl&4)	copybitmap_trans(bitmap,tmpbitmap,flip_screen_get(screen->machine),flip_screen_get(screen->machine),0,0,cliprect, 0x80f);
+	if (layers_ctrl&4)	copybitmap_trans(bitmap,screen->machine->generic.tmpbitmap,flip_screen_get(screen->machine),flip_screen_get(screen->machine),0,0,cliprect, 0x80f);
 
 	if (paradise_priority & 2)
 	{

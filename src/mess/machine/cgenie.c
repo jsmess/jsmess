@@ -159,7 +159,7 @@ MACHINE_START( cgenie )
 	/* set up RAM */
 	memory_install_read8_handler(space, 0x4000, 0x4000 + messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, SMH_BANK(1));
 	memory_install_write8_handler(space, 0x4000, 0x4000 + messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, cgenie_videoram_w);
-	videoram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	machine->generic.videoram.u8 = messram_get_ptr(devtag_get_device(machine, "messram"));
 	memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
 }
 
@@ -520,22 +520,22 @@ WRITE8_HANDLER( cgenie_motor_w )
  *      Video RAM                    *
  *************************************/
 
-int cgenie_videoram_r( int offset )
+int cgenie_videoram_r( running_machine *machine, int offset )
 {
-	return videoram[offset];
+	return machine->generic.videoram.u8[offset];
 }
 
 WRITE8_HANDLER( cgenie_videoram_w )
 {
 	/* write to video RAM */
-	if( data == videoram[offset] )
+	if( data == space->machine->generic.videoram.u8[offset] )
 		return; 			   /* no change */
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 }
 
  READ8_HANDLER( cgenie_colorram_r )
 {
-	return colorram[offset] | 0xf0;
+	return space->machine->generic.colorram.u8[offset] | 0xf0;
 }
 
 WRITE8_HANDLER( cgenie_colorram_w )
@@ -543,11 +543,11 @@ WRITE8_HANDLER( cgenie_colorram_w )
 	/* only bits 0 to 3 */
 	data &= 15;
 	/* nothing changed ? */
-	if( data == colorram[offset] )
+	if( data == space->machine->generic.colorram.u8[offset] )
 		return;
 
 	/* set new value */
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	/* make offset relative to video frame buffer offset */
 	offset = (offset + (cgenie_get_register(12) << 8) + cgenie_get_register(13)) & 0x3ff;
 }

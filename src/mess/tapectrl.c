@@ -53,7 +53,7 @@ struct _tape_control_menu_state
 INLINE int cassette_count( running_machine *machine )
 {
 	int count = 0;
-	const device_config *device = device_list_first( machine->config->devicelist, CASSETTE );
+	const device_config *device = device_list_first( &machine->config->devicelist, CASSETTE );
 
 	while ( device )
 	{
@@ -175,7 +175,7 @@ void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *pa
 	if (menustate->device == NULL)
 	{
 		int index = menustate->index;
-		const device_config *device = device_list_first( machine->config->devicelist, CASSETTE );
+		const device_config *device = device_list_first( &machine->config->devicelist, CASSETTE );
 
 		while ( index > 0 && device )
 		{

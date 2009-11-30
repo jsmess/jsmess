@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( f1gp_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM																		// WORK RAM-1
 	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(&sharedram)					// DUAL RAM
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_BASE(&f1gp_fgvideoram)					// CHARACTER
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// PALETTE
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// PALETTE
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(f1gp_gfxctrl_w)
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( f1gp2_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM																				// WORK RAM-1
 	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(&sharedram)							// DUAL RAM
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_BASE(&f1gp_fgvideoram)							// CHARACTER
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)			// PALETTE
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)			// PALETTE
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE(f1gp2_gfxctrl_w)
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( f1gpb_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x2fffff) AM_READ(extrarom_r)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READ(extrarom2_r)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(f1gp_zoomdata_r, f1gp_zoomdata_w)
 	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_BASE(&f1gp_rozvideoram)
 	AM_RANGE(0xd02000, 0xd03fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)	/* mirror */
@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( f1gpb_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
 	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(&sharedram)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_BASE(&f1gp_fgvideoram)
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
@@ -560,7 +560,7 @@ ROM_START( f1gp )
 	ROM_REGION( 0x40000, "gfx4", ROMREGION_ERASE00 )	/* gfx data for the 053936 */
 	/* RAM, not ROM - handled at run time */
 
-	ROM_REGION( 0x100000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "rom14-a.09",   0x000000, 0x100000, CRC(b4c1ac31) SHA1(acab2e1b5ce4ca3a5c4734562481b54db4b46995) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
@@ -656,7 +656,7 @@ ROM_START( f1gp2 )
 	ROM_LOAD( "rom9",         0x200000, 0x100000, CRC(1bede8a1) SHA1(325ecc3afb30d281c2c8a56719e83e4dc20545bb) )
 	ROM_LOAD( "rom8",         0x300000, 0x100000, CRC(98baf2a1) SHA1(df7bd1a743ad0a6e067641e2b7a352c466875ef6) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "rom4",         0x000000, 0x080000, CRC(c2d3d7ad) SHA1(3178096741583cfef1ca8f53e6efa0a59e1d5cb6) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */

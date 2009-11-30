@@ -125,7 +125,7 @@ VIDEO_UPDATE(concept)
 	UINT16 *line;
 	/* resolution is 720*560 */
 
-	v = /*videoram_ptr*/ (UINT16 *) videoram16;
+	v = screen->machine->generic.videoram.u16;
 
 	for (y = 0; y < 560; y++)
 	{

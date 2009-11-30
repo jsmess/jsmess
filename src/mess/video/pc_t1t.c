@@ -158,7 +158,7 @@ static VIDEO_START( pc_t1t )
 	pcjr.bank = 0;
 	pcjr.chr_size = 16;
 
-	videoram_size = 0x8000;
+	machine->generic.videoram_size = 0x8000;
 }
 
 
@@ -170,7 +170,7 @@ static VIDEO_START( pc_pcjr )
 	pcjr.mode_control = 0x08;
 	pcjr.chr_size = 8;
 
-	videoram_size = 0x8000;
+	machine->generic.videoram_size = 0x8000;
 }
 
 static VIDEO_UPDATE( mc6845_t1000 )
@@ -405,8 +405,8 @@ static MC6845_UPDATE_ROW( t1000_update_row )
  READ8_HANDLER ( pc_t1t_videoram_r )
 {
 	int data = 0xff;
-	if( videoram )
-		data = videoram[offset];
+	if( space->machine->generic.videoram.u8 )
+		data = space->machine->generic.videoram.u8[offset];
 	return data;
 }
 
@@ -737,7 +737,7 @@ static void pc_t1t_bank_w(running_machine *machine, int data)
 		dram = (data & 0x07) << 14;
 		vram = (data & 0x38) << (14-3);
 #endif
-		videoram = &ram[vram];
+		machine->generic.videoram.u8 = &ram[vram];
 		pcjr.displayram = &ram[dram];
 		pc_t1t_mode_switch();
 	}

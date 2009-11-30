@@ -102,7 +102,7 @@ extern DEVICE_IMAGE_LOAD(wswan_cart);
 
 /*----------- defined in video/wswan.c -----------*/
 
-extern void wswan_refresh_scanline( void );
+extern void wswan_refresh_scanline( running_machine *machine );
 
 
 /*----------- defined in audio/wswan.c -----------*/

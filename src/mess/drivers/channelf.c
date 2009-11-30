@@ -131,8 +131,8 @@ static WRITE8_HANDLER( channelf_port_0_w )
     if (data & 0x20)
 	{
 		offs = channelf_row_reg*128+channelf_col_reg;
-		if (videoram[offs] != channelf_val_reg)
-			videoram[offs] = channelf_val_reg;
+		if (space->machine->generic.videoram.u8[offs] != channelf_val_reg)
+			space->machine->generic.videoram.u8[offs] = channelf_val_reg;
 	}
 }
 

@@ -86,8 +86,8 @@ PALETTE_INIT( kncljoe )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = videoram[2*tile_index+1];
-	int code = videoram[2*tile_index] + ((attr & 0xc0) << 2) + (tile_bank << 10);
+	int attr = machine->generic.videoram.u8[2*tile_index+1];
+	int code = machine->generic.videoram.u8[2*tile_index] + ((attr & 0xc0) << 2) + (tile_bank << 10);
 
 	SET_TILE_INFO(
 			0,
@@ -123,7 +123,7 @@ VIDEO_START( kncljoe )
 
 WRITE8_HANDLER( kncljoe_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
 }
 
@@ -143,8 +143,8 @@ WRITE8_HANDLER( kncljoe_control_w )
 	flipscreen = data & 0x01;
 	tilemap_set_flip_all(space->machine,flipscreen ? TILEMAP_FLIPX : TILEMAP_FLIPY);
 
-	coin_counter_w(0,data & 0x02);
-	coin_counter_w(1,data & 0x20);
+	coin_counter_w(space->machine, 0,data & 0x02);
+	coin_counter_w(space->machine, 1,data & 0x20);
 
 	i = (data & 0x10) >> 4;
 	if (tile_bank != i)
@@ -183,6 +183,7 @@ WRITE8_HANDLER( kncljoe_scroll_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	rectangle clip = *cliprect;
 	const gfx_element *gfx = machine->gfx[1 + sprite_bank];
 	int i, j;

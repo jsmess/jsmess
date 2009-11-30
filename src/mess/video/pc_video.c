@@ -48,9 +48,9 @@ struct mscrtc6845 *pc_video_start(running_machine *machine, const struct mscrtc6
 	pc_anythingdirty = 1;
 	pc_current_height = -1;
 	pc_current_width = -1;
-	tmpbitmap = NULL;
+	machine->generic.tmpbitmap = NULL;
 
-	videoram_size = vramsize;
+	machine->generic.videoram_size = vramsize;
 
 	if (config)
 	{
@@ -59,7 +59,7 @@ struct mscrtc6845 *pc_video_start(running_machine *machine, const struct mscrtc6
 			return NULL;
 	}
 
-	if (videoram_size)
+	if (machine->generic.videoram_size)
 	{
 		video_start_generic_bitmapped(machine);
 	}
@@ -106,11 +106,11 @@ VIDEO_UPDATE( pc_video )
 			bitmap_fill(bitmap, cliprect, 0);
 		}
 
-		video_update(tmpbitmap ? tmpbitmap : bitmap, pc_crtc);
+		video_update(screen->machine->generic.tmpbitmap ? screen->machine->generic.tmpbitmap : bitmap, pc_crtc);
 
-		if (tmpbitmap)
+		if (screen->machine->generic.tmpbitmap)
 		{
-			copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect);
+			copybitmap(bitmap, screen->machine->generic.tmpbitmap, 0, 0, 0, 0, cliprect);
 			if (!pc_anythingdirty)
 				rc = UPDATE_HAS_NOT_CHANGED;
 			pc_anythingdirty = 0;
@@ -123,9 +123,9 @@ VIDEO_UPDATE( pc_video )
 
 WRITE8_HANDLER ( pc_video_videoram_w )
 {
-	if (videoram && videoram[offset] != data)
+	if (space->machine->generic.videoram.u8 && space->machine->generic.videoram.u8[offset] != data)
 	{
-		videoram[offset] = data;
+		space->machine->generic.videoram.u8[offset] = data;
 		pc_anythingdirty = 1;
 	}
 }
@@ -135,6 +135,6 @@ WRITE16_HANDLER( pc_video_videoram16le_w ) { write16le_with_write8_handler(pc_vi
 
 WRITE32_HANDLER( pc_video_videoram32_w )
 {
-	COMBINE_DATA(((UINT32 *) videoram) + offset);
+	COMBINE_DATA(space->machine->generic.videoram.u32 + offset);
 	pc_anythingdirty = 1;
 }

@@ -99,8 +99,8 @@ static WRITE16_HANDLER( latch_w )
 	{
 		if (data & 0x1000)
 			logerror("Color bank set to 1!\n");
-		coin_counter_w(0, (data >> 9) & 1);
-		coin_counter_w(1, (data >> 8) & 1);
+		coin_counter_w(space->machine, 0, (data >> 9) & 1);
+		coin_counter_w(space->machine, 1, (data >> 8) & 1);
 	}
 
 	/* lower byte being modified? */
@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x147fff) AM_MIRROR(0x438000) AM_ROM /* slapstic goes here */
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(&rampart_bitmap)
 	AM_RANGE(0x220000, 0x3bffff) AM_WRITENOP	/* the code blasts right through this when initializing */
-	AM_RANGE(0x3c0000, 0x3c07ff) AM_MIRROR(0x019800) AM_RAM_WRITE(atarigen_expanded_666_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x3c0000, 0x3c07ff) AM_MIRROR(0x019800) AM_RAM_WRITE(atarigen_expanded_666_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3e0000, 0x3e07ff) AM_MIRROR(0x010000) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0x3e0800, 0x3e3f3f) AM_MIRROR(0x010000) AM_RAM
 	AM_RANGE(0x3e3f40, 0x3e3f7f) AM_MIRROR(0x010000) AM_RAM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)

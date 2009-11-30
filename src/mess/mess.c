@@ -42,6 +42,7 @@ void mess_predevice_init(running_machine *machine)
 	device_config *dev;
 	image_device_info info;
 	device_get_image_devices_func get_image_devices;
+	device_list *devlist;
 
 	/* initialize natural keyboard support */
 	inputx_init(machine);
@@ -51,7 +52,9 @@ void mess_predevice_init(running_machine *machine)
 
 	/* init all devices */
 	image_init(machine);
-
+	
+	devlist = &((machine_config *)machine->config)->devicelist;
+	
 	/* make sure that any required devices have been allocated */
 	for (image = image_device_first(machine->config); image != NULL; image = image_device_next(image))
 	{
@@ -97,11 +100,11 @@ void mess_predevice_init(running_machine *machine)
 		/* get image-specific hardware */
 		get_image_devices = (device_get_image_devices_func) device_get_info_fct(image, DEVINFO_FCT_GET_IMAGE_DEVICES);
 		if (get_image_devices != NULL)
-			(*get_image_devices)(image, (device_config **) &machine->config->devicelist);
+			(*get_image_devices)(image, devlist);
 	}
 
 	/* ensure that any added devices have a machine */
-	for (dev = (device_config *) machine->config->devicelist; dev != NULL; dev = dev->next)
+	for (dev = machine->config->devicelist.head; dev != NULL; dev = dev->next)
 	{
 		if (dev->machine == NULL)
 		{
@@ -117,10 +120,10 @@ void mess_predevice_init(running_machine *machine)
 			if (tokens != NULL)
 			{
 				config = machine_config_alloc(tokens);
-				for (config_dev = config->devicelist; config_dev != NULL; config_dev = config_dev->next)
+				for (config_dev = config->devicelist.head; config_dev != NULL; config_dev = config_dev->next)
 				{
 					new_dev = device_list_add(
-						(device_config **) &machine->config->devicelist,
+						devlist,
 						dev,
 						config_dev->type,
 						device_build_tag(tempstring, dev, config_dev->tag),

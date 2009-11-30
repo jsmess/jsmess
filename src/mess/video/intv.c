@@ -704,21 +704,21 @@ void intv_stic_screenrefresh(running_machine *machine)
 	{
 		intv_stic_handshake = 0;
 		// Render the background
-		render_background(machine, tmpbitmap);
+		render_background(machine, machine->generic.tmpbitmap);
 		// Render the sprites into their buffers
 		render_sprites(machine);
 		for (i = 0; i < 8; i++) intv_sprite[i].collision = 0;
 		// Copy the sprites to the background
-		copy_sprites_to_background(machine, tmpbitmap);
+		copy_sprites_to_background(machine, machine->generic.tmpbitmap);
 		determine_sprite_collisions();
 		for (i = 0; i < 8; i++) intv_collision_registers[i] |= intv_sprite[i].collision;
 		/* draw the screen borders if enabled */
-		draw_borders(machine, tmpbitmap);
+		draw_borders(machine, machine->generic.tmpbitmap);
 	}
 	else
 	{
 		/* STIC disabled, just fill with border color */
-		bitmap_fill(tmpbitmap, NULL, (intv_border_color<<1)+1);
+		bitmap_fill(machine->generic.tmpbitmap, NULL, (intv_border_color<<1)+1);
 	}
 	col_delay = intv_col_delay;
 	row_delay = intv_row_delay;
@@ -798,7 +798,7 @@ VIDEO_UPDATE( intvkbd )
 				offs = current_row*64+x;
 				drawgfx_transpen(bitmap, NULL,
 					screen->machine->gfx[2],
-					videoram[offs],
+					screen->machine->generic.videoram.u8[offs],
 					7, /* white */
 					0,0,
 					x*8,y*8, 0);

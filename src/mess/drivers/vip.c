@@ -518,7 +518,7 @@ static CDP1802_EF_READ( vip_ef_r )
 
 	/* tape input */
 	if (cassette_input(state->cassette) < 0) flags -= EF2;
-	set_led_status(VIP_LED_TAPE, (cassette_input(state->cassette) > 0));
+	set_led_status(device->machine, VIP_LED_TAPE, (cassette_input(state->cassette) > 0));
 
 	/* keyboard */
 	if (input_port_read(device->machine, "KEYPAD") & (1 << state->keylatch)) flags -= EF3;
@@ -576,7 +576,7 @@ static WRITE_LINE_DEVICE_HANDLER( vip_q_w )
 	}
 
 	/* Q led */
-	set_led_status(VIP_LED_Q, state);
+	set_led_status(device->machine, VIP_LED_Q, state);
 
 	/* tape output */
 	cassette_output(driver_state->cassette, state ? 1.0 : -1.0);
@@ -647,7 +647,7 @@ static MACHINE_START( vip )
 	state->colorram = auto_alloc_array(machine, UINT8, VP590_COLOR_RAM_SIZE);
 
 	/* enable power LED */
-	set_led_status(VIP_LED_POWER, 1);
+	set_led_status(machine, VIP_LED_POWER, 1);
 
 	/* look up devices */
 	state->cdp1861 = devtag_get_device(machine, CDP1861_TAG);

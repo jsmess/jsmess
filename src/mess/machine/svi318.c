@@ -295,7 +295,7 @@ READ8_HANDLER( svi318_psg_port_a_r )
 WRITE8_HANDLER( svi318_psg_port_b_w )
 {
 	if ( (svi.bank_switch ^ data) & 0x20)
-		set_led_status (0, !(data & 0x20) );
+		set_led_status (space->machine, 0, !(data & 0x20) );
 
 	svi.bank_switch = data;
 	svi318_set_banks(space->machine);

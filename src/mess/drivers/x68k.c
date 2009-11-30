@@ -1501,7 +1501,7 @@ static WRITE16_HANDLER( x68k_sram_w )
 {
 	if(x68k_sys.sysport.sram_writeprotect == 0x31)
 	{
-		COMBINE_DATA(generic_nvram16+offset);
+		COMBINE_DATA(space->machine->generic.nvram.u16+offset);
 	}
 }
 
@@ -1518,7 +1518,7 @@ static READ16_HANDLER( x68k_sram_r )
         return 0xff00;
     if(offset == 0x70/2)
         return 0x0700;*/
-	return generic_nvram16[offset];
+	return space->machine->generic.nvram.u16[offset];
 }
 
 static READ32_HANDLER( x68k_sram32_r )
@@ -1531,14 +1531,14 @@ static READ32_HANDLER( x68k_sram32_r )
         return 0xff00;
     if(offset == 0x70/2)
         return 0x0700;*/
-	return generic_nvram32[offset];
+	return space->machine->generic.nvram.u32[offset];
 }
 
 static WRITE32_HANDLER( x68k_sram32_w )
 {
 	if(x68k_sys.sysport.sram_writeprotect == 0x31)
 	{
-		COMBINE_DATA(generic_nvram32+offset);
+		COMBINE_DATA(space->machine->generic.nvram.u32+offset);
 	}
 }
 
@@ -1926,7 +1926,7 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE(x68k_spriteram_r, x68k_spriteram_w)
 	AM_RANGE(0xec0000, 0xecffff) AM_NOP  // User I/O
 //  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(sram_r, sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK(4) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK(4) AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
 //	AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
@@ -1961,7 +1961,7 @@ static ADDRESS_MAP_START(x68030_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE16(x68k_spriteram_r, x68k_spriteram_w,0xffffffff)
 	AM_RANGE(0xec0000, 0xecffff) AM_NOP  // User I/O
 //  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(sram_r, sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK(4) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK(4) AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
 //	AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)
@@ -2485,7 +2485,7 @@ static MACHINE_START( x68000 )
 	memory_set_bankptr(machine, 3,x68k_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
 	memory_install_read16_handler(space,0xed0000,0xed3fff,0xffffffff,0,x68k_sram_r);
 	memory_install_write16_handler(space,0xed0000,0xed3fff,0xffffffff,0,x68k_sram_w);
-	memory_set_bankptr(machine, 4,generic_nvram16);  // so that code in SRAM is executable, there is an option for booting from SRAM
+	memory_set_bankptr(machine, 4,space->machine->generic.nvram.u16);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
 	timer_adjust_periodic(kb_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(5));  // every 5ms
@@ -2520,7 +2520,7 @@ static MACHINE_START( x68030 )
 	memory_set_bankptr(machine, 3,x68k_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
 	memory_install_read32_handler(space,0xed0000,0xed3fff,0xffffffff,0,x68k_sram32_r);
 	memory_install_write32_handler(space,0xed0000,0xed3fff,0xffffffff,0,x68k_sram32_w);
-	memory_set_bankptr(machine, 4,generic_nvram32);  // so that code in SRAM is executable, there is an option for booting from SRAM
+	memory_set_bankptr(machine, 4,machine->generic.nvram.u32);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
 	timer_adjust_periodic(kb_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(5));  // every 5ms

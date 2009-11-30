@@ -364,7 +364,6 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 			struct DriversInfo *gameinfo = &drivers_info[ndriver];
 			const rom_entry *region, *rom;
 			machine_config *config;
-			const input_port_config *input_ports;
 			const rom_source *source;
 			int num_speakers;
 
@@ -446,9 +445,11 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 			if (gamedrv->ipt != NULL)
 			{
 				const input_port_config *port;
-				input_ports = input_port_config_alloc(gamedrv->ipt,NULL,0);
+				input_port_list portlist;
 				
-				for (port = input_ports; port != NULL; port = port->next)
+				input_port_list_init(&portlist, gamedrv->ipt, NULL, 0, FALSE);
+
+				for (port = portlist.head; port != NULL; port = port->next)
 				{
 					const input_field_config *field;
 					for (field = port->fieldlist; field != NULL; field = field->next)
@@ -467,7 +468,7 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 							gameinfo->usesMouse = TRUE;
 					}
 				}
-				input_port_config_free(input_ports);
+				input_port_list_deinit(&portlist);
 			}
 		}
 	}

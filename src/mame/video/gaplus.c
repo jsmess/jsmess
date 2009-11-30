@@ -199,10 +199,6 @@ VIDEO_START( gaplus )
 
 	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[0], 0xff);
 
-	spriteram = gaplus_spriteram + 0x780;
-	spriteram_2 = spriteram + 0x800;
-	spriteram_3 = spriteram_2 + 0x800;
-
 	starfield_init(machine);
 }
 
@@ -267,6 +263,9 @@ static void starfield_render(running_machine *machine, bitmap_t *bitmap)
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	UINT8 *spriteram = gaplus_spriteram + 0x780;
+	UINT8 *spriteram_2 = spriteram + 0x800;
+	UINT8 *spriteram_3 = spriteram_2 + 0x800;
 	int offs;
 
 	for (offs = 0;offs < 0x80;offs += 2)

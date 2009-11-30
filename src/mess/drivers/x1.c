@@ -236,8 +236,8 @@ static DEVICE_START(x1_daisy){}
 
 static VIDEO_START( x1 )
 {
-	colorram = auto_alloc_array(machine, UINT8, 0x1000);
-	videoram = auto_alloc_array(machine, UINT8, 0x1000);
+	machine->generic.colorram.u8 = auto_alloc_array(machine, UINT8, 0x1000);
+	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 0x1000);
 	gfx_bitmap_ram = auto_alloc_array(machine, UINT8, 0xc000*2);
 }
 
@@ -252,11 +252,11 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 	{
 		for (x=0;x<40*w;x++)
 		{
-			int tile = videoram[(x+(y*40*w)+crtc_start_addr) & screen_mask];
-			int color = colorram[(x+(y*40*w)+crtc_start_addr) & screen_mask] & 0x1f;
-			int width = (colorram[(x+(y*40*w)+crtc_start_addr) & screen_mask] & 0x80)>>7;
-			int height = (colorram[(x+(y*40*w)+crtc_start_addr) & screen_mask] & 0x40)>>6;
-			int pcg_bank = (colorram[(x+(y*40*w)+crtc_start_addr) & screen_mask] & 0x20)>>5;
+			int tile = machine->generic.videoram.u8[(x+(y*40*w)+crtc_start_addr) & screen_mask];
+			int color = machine->generic.colorram.u8[(x+(y*40*w)+crtc_start_addr) & screen_mask] & 0x1f;
+			int width = (machine->generic.colorram.u8[(x+(y*40*w)+crtc_start_addr) & screen_mask] & 0x80)>>7;
+			int height = (machine->generic.colorram.u8[(x+(y*40*w)+crtc_start_addr) & screen_mask] & 0x40)>>6;
+			int pcg_bank = (machine->generic.colorram.u8[(x+(y*40*w)+crtc_start_addr) & screen_mask] & 0x20)>>5;
 			UINT8 *gfx_data = pcg_bank ? memory_region(machine, "pcg") : memory_region(machine, "cgrom");
 
 			/* skip draw if the x/y values are odd and the width/height is active, */
@@ -982,20 +982,20 @@ static const wd17xx_interface x1_mb8877a_interface =
 
 static UINT16 check_pcg_addr(running_machine *machine)
 {
-	if(colorram[0x7ff] & 0x20) return 0x7ff;
-	if(colorram[0x3ff] & 0x20) return 0x3ff;
-	if(colorram[0x5ff] & 0x20) return 0x5ff;
-	if(colorram[0x1ff] & 0x20) return 0x1ff;
+	if(machine->generic.colorram.u8[0x7ff] & 0x20) return 0x7ff;
+	if(machine->generic.colorram.u8[0x3ff] & 0x20) return 0x3ff;
+	if(machine->generic.colorram.u8[0x5ff] & 0x20) return 0x5ff;
+	if(machine->generic.colorram.u8[0x1ff] & 0x20) return 0x1ff;
 
 	return 0x3ff;
 }
 
 static UINT16 check_chr_addr(running_machine *machine)
 {
-	if(!(colorram[0x7ff] & 0x20)) return 0x7ff;
-	if(!(colorram[0x3ff] & 0x20)) return 0x3ff;
-	if(!(colorram[0x5ff] & 0x20)) return 0x5ff;
-	if(!(colorram[0x1ff] & 0x20)) return 0x1ff;
+	if(!(machine->generic.colorram.u8[0x7ff] & 0x20)) return 0x7ff;
+	if(!(machine->generic.colorram.u8[0x3ff] & 0x20)) return 0x3ff;
+	if(!(machine->generic.colorram.u8[0x5ff] & 0x20)) return 0x5ff;
+	if(!(machine->generic.colorram.u8[0x1ff] & 0x20)) return 0x1ff;
 
 	return 0x3ff;
 }
@@ -1015,7 +1015,7 @@ static READ8_HANDLER( x1_pcg_r )
 		if(scrn_reg.pcg_mode)
 		{
 			gfx_data = memory_region(space->machine, "kanji");
-			calc_pcg_offset = (videoram[check_chr_addr(space->machine)]+(videoram[check_chr_addr(space->machine)+0x800]<<8)) & 0xfff;
+			calc_pcg_offset = (space->machine->generic.videoram.u8[check_chr_addr(space->machine)]+(space->machine->generic.videoram.u8[check_chr_addr(space->machine)+0x800]<<8)) & 0xfff;
 
 			kanji_offset = calc_pcg_offset*0x20;
 
@@ -1075,7 +1075,7 @@ static WRITE8_HANDLER( x1_pcg_w )
 	{
 		if(scrn_reg.pcg_mode)
 		{
-			used_pcg_addr = videoram[check_pcg_addr(space->machine)]*8;
+			used_pcg_addr = space->machine->generic.videoram.u8[check_pcg_addr(space->machine)]*8;
 			pcg_index[addr-1] = (offset & 0xe) >> 1;
 			pcg_offset = (pcg_index[addr-1]+used_pcg_addr) & 0x7ff;
 			pcg_offset+=((addr-1)*0x800);
@@ -1317,8 +1317,8 @@ static READ8_HANDLER( x1_io_r )
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa8); }
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); }
 //	else if(offset == 0x1fe0)						{ return x1_blackclip_r(space,0); }
-	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return colorram[offset-0x2000]; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
+	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return space->machine->generic.colorram.u8[offset-0x2000]; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return space->machine->generic.videoram.u8[offset-0x3000]; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)]; }
 	else
 	{
@@ -1358,8 +1358,8 @@ static WRITE8_HANDLER( x1_io_w )
 //  else if(offset == 0x1fc5)                       { x1turbo_gfxpal_w(space,0,data); }
 	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
 //	else if(offset == 0x1fe0)						{ x1_blackclip_w(space,0,data); }
-	else if(offset >= 0x2000 && offset <= 0x2fff)	{ colorram[offset-0x2000] = data; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ videoram[offset-0x3000] = pcg_write_addr = data; }
+	else if(offset >= 0x2000 && offset <= 0x2fff)	{ space->machine->generic.colorram.u8[offset-0x2000] = data; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ space->machine->generic.videoram.u8[offset-0x3000] = pcg_write_addr = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
@@ -1391,8 +1391,8 @@ static READ8_HANDLER( x1turbo_io_r )
 	else if(offset == 0x1fc5)						{ return x1turbo_gfxpal_r(space,0); }
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); }
 	else if(offset == 0x1fe0)						{ return x1_blackclip_r(space,0); }
-	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return colorram[offset-0x2000]; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
+	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return space->machine->generic.colorram.u8[offset-0x2000]; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return space->machine->generic.videoram.u8[offset-0x3000]; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)]; }
 	else
 	{
@@ -1435,8 +1435,8 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	else if(offset == 0x1fc5)						{ x1turbo_gfxpal_w(space,0,data); }
 	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
 	else if(offset == 0x1fe0)						{ x1_blackclip_w(space,0,data); }
-	else if(offset >= 0x2000 && offset <= 0x2fff)	{ colorram[offset-0x2000] = data; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ videoram[offset-0x3000] = pcg_write_addr = data; }
+	else if(offset >= 0x2000 && offset <= 0x2fff)	{ space->machine->generic.colorram.u8[offset-0x2000] = data; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ space->machine->generic.videoram.u8[offset-0x3000] = pcg_write_addr = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{

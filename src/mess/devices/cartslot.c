@@ -391,7 +391,7 @@ static DEVICE_GET_IMAGE_DEVICES(cartslot)
 	if (pcb_type != NULL)
 	{
 		device_list_add(
-			listheadptr,
+			devlist,
 			device,
 			pcb_type->devtype,
 			device_build_tag(tempstring, device, TAG_PCB),

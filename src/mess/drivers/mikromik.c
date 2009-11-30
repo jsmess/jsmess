@@ -295,7 +295,7 @@ static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 
 		int color = hlt_in ? 2 : (video_in ^ compl_in);
 
-		*BITMAP_ADDR16(tmpbitmap, y, x + i) = color;
+		*BITMAP_ADDR16(device->machine->generic.tmpbitmap, y, x + i) = color;
 	}
 }
 
@@ -345,7 +345,7 @@ static VIDEO_UPDATE( mm1 )
 
 	/* text */
 	i8275_update(state->i8275, bitmap, cliprect);
-	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, screen->machine->generic.tmpbitmap, 0, 0, 0, 0, cliprect);
 
 	/* graphics */
 	upd7220_update(state->upd7220, bitmap, cliprect);

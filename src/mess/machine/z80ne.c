@@ -649,14 +649,14 @@ WRITE8_HANDLER(lx385_ctrl_w)
 
 READ8_DEVICE_HANDLER( lx388_mc6847_videoram_r )
 {
-	int d6 = BIT(videoram[offset], 6);
-	int d7 = BIT(videoram[offset], 7);
+	int d6 = BIT(device->machine->generic.videoram.u8[offset], 6);
+	int d7 = BIT(device->machine->generic.videoram.u8[offset], 7);
 
 	mc6847_inv_w(device, d6 && d7);
 	mc6847_as_w(device, !d6 && d7);
 	mc6847_intext_w(device, !d6 && d7);
 
-	return videoram[offset];
+	return device->machine->generic.videoram.u8[offset];
 }
 
 VIDEO_UPDATE( lx388 )

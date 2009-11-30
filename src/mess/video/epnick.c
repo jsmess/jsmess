@@ -1035,6 +1035,6 @@ VIDEO_START( epnick )
 
 VIDEO_UPDATE( epnick )
 {
-	Nick_DoScreen(screen->machine,tmpbitmap);
+	Nick_DoScreen(screen->machine,screen->machine->generic.tmpbitmap);
 	return VIDEO_UPDATE_CALL(generic_bitmapped);
 }

@@ -80,12 +80,12 @@ static WRITE8_HANDLER( mainevt_bankswitch_w )
 
 static WRITE8_HANDLER( mainevt_coin_w )
 {
-	coin_counter_w(0,data & 0x10);
-	coin_counter_w(1,data & 0x20);
-	set_led_status(0,data & 0x01);
-	set_led_status(1,data & 0x02);
-	set_led_status(2,data & 0x04);
-	set_led_status(3,data & 0x08);
+	coin_counter_w(space->machine, 0,data & 0x10);
+	coin_counter_w(space->machine, 1,data & 0x20);
+	set_led_status(space->machine, 0,data & 0x01);
+	set_led_status(space->machine, 1,data & 0x02);
+	set_led_status(space->machine, 2,data & 0x04);
+	set_led_status(space->machine, 3,data & 0x08);
 }
 
 static WRITE8_HANDLER( mainevt_sh_irqtrigger_w )
@@ -159,7 +159,7 @@ static ADDRESS_MAP_START( mainevt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(K052109_051960_r,K052109_051960_w)
 
 	AM_RANGE(0x4000, 0x5dff) AM_RAM
-	AM_RANGE(0x5e00, 0x5fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram)
+	AM_RANGE(0x5e00, 0x5fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( devstors_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(K052109_051960_r,K052109_051960_w)
 
 	AM_RANGE(0x4000, 0x5dff) AM_RAM
-	AM_RANGE(0x5e00, 0x5fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram)
+	AM_RANGE(0x5e00, 0x5fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

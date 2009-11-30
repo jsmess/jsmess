@@ -80,7 +80,7 @@ static VIDEO_START( lastfght )
 	for (i = 0; i < 2; i++)
 		lastfght_bitmap[i] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	colorram = auto_alloc_array(machine, UINT8, 256*3);
+	machine->generic.colorram.u8 = auto_alloc_array(machine, UINT8, 256*3);
 }
 
 
@@ -131,11 +131,11 @@ static WRITE16_HANDLER(colordac_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		colorram[clr_offset] = data;
+		space->machine->generic.colorram.u8[clr_offset] = data;
 		palette_set_color_rgb(space->machine, clr_offset/3,
-			pal6bit(colorram[(clr_offset/3)*3+0]),
-			pal6bit(colorram[(clr_offset/3)*3+1]),
-			pal6bit(colorram[(clr_offset/3)*3+2])
+			pal6bit(space->machine->generic.colorram.u8[(clr_offset/3)*3+0]),
+			pal6bit(space->machine->generic.colorram.u8[(clr_offset/3)*3+1]),
+			pal6bit(space->machine->generic.colorram.u8[(clr_offset/3)*3+2])
 		);
 		clr_offset = (clr_offset+1) % (256*3);
 	}
@@ -352,7 +352,7 @@ static ADDRESS_MAP_START( lastfght_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE( 0x080000, 0x0fffff ) AM_ROM AM_REGION("maincpu", 0)
 
-	AM_RANGE( 0x200000, 0x20ffff ) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	// battery
+	AM_RANGE( 0x200000, 0x20ffff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	// battery
 
 	AM_RANGE( 0x600000, 0x600001 ) AM_WRITE( lastfght_hi_w )
 	AM_RANGE( 0x600002, 0x600003 ) AM_READWRITE( lastfght_sound_r, lastfght_sound_w )

@@ -151,9 +151,9 @@ static WRITE8_HANDLER( altair_out1_w )
         7   CONT. M1
     */
 
-	set_led_status(0, data & 0x08); // 1P
-	set_led_status(1, data & 0x10); // 2P
-	set_led_status(2, data & 0x20); // FIRE
+	set_led_status(space->machine, 0, data & 0x08); // 1P
+	set_led_status(space->machine, 1, data & 0x10); // 2P
+	set_led_status(space->machine, 2, data & 0x20); // FIRE
 }
 
 static WRITE8_HANDLER( draco_out1_w )
@@ -231,14 +231,14 @@ static COP400_INTERFACE( draco_cop_intf )
 
 static ADDRESS_MAP_START( destryer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
 	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( destryea_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
 	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
 ADDRESS_MAP_END
@@ -276,7 +276,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( draco_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
 	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
 ADDRESS_MAP_END
@@ -313,7 +313,7 @@ static CUSTOM_INPUT( cdp1869_pcb_r )
 	return state->cdp1869_pcb;
 }
 
-static CUSTOM_INPUT( cdp1869_predisplay_r )
+static CUSTOM_INPUT( cidelsa_prd_r )
 {
 	cidelsa_state *state = (cidelsa_state *)field->port->machine->driver_data;
 
@@ -354,7 +354,7 @@ static INPUT_PORTS_START( destryer )
 	PORT_DIPSETTING(    0x00, "Slot A: 2.5  Slot B: 5" )
 
 	PORT_START("EF")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_predisplay_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cidelsa_prd_r, NULL)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) // ST
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) // M2
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) // M1
@@ -404,7 +404,7 @@ static INPUT_PORTS_START( altair )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("EF")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_predisplay_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cidelsa_prd_r, NULL)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) // ST
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) // M2
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) // M1
@@ -456,7 +456,7 @@ static INPUT_PORTS_START( draco )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT )
 
 	PORT_START("EF")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_predisplay_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(CDP1869_TAG, cdp1869_predisplay_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) // ST
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) // M2
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) // M1
@@ -474,6 +474,8 @@ static TIMER_CALLBACK( set_cpu_mode )
 static MACHINE_START( cidelsa )
 {
 	cidelsa_state *state = (cidelsa_state *)machine->driver_data;
+
+	state->cdp1802 = devtag_get_device(machine, CDP1802_TAG);
 
 	/* reset the CPU */
 	state->cdp1802_mode = CDP1802_MODE_RESET;
@@ -555,7 +557,7 @@ static MACHINE_DRIVER_START( altair )
 	MDRV_MACHINE_RESET(cidelsa)
 
 	/* input/output hardware */
-	MDRV_CDP1852_ADD("ic23", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in0_intf)	/* clock is really tied to CDP1876 CMSEL (pin 32) */
+	MDRV_CDP1852_ADD("ic23", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in0_intf)	/* clock is really tied to CDP1869 CMSEL (pin 37) */
 	MDRV_CDP1852_ADD("ic24", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in1_intf)
 	MDRV_CDP1852_ADD("ic25", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in2_intf)
 	MDRV_CDP1852_ADD("ic26", ALTAIR_CHR1 / 8, altair_cdp1852_out1_intf)		/* clock is CDP1802 TPB */

@@ -53,7 +53,7 @@ static WRITE8_HANDLER( jupiter_vh_charram_w );
 /* memory w/r functions */
 static ADDRESS_MAP_START( jupiter_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2400, 0x27ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x2400, 0x27ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x2c00, 0x2fff) AM_MIRROR(0x0400) AM_WRITE(jupiter_vh_charram_w) AM_BASE(&jupiter_charram)
 	AM_RANGE(0x3c00, 0x3fff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x4800, 0xffff) AM_RAM AM_RAM_WRITE( jupiter_expram_w ) AM_BASE(&jupiter_expram)			/* Expansion RAM */
@@ -281,7 +281,7 @@ static VIDEO_UPDATE( jupiter )
 
 	for(offs = 0; offs < 768; offs++)
 	{
-		int code = videoram[offs];
+		int code = screen->machine->generic.videoram.u8[offs];
 		int sx, sy;
 
 		sy = (offs / 32) << 3;

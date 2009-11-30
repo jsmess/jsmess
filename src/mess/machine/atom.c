@@ -402,11 +402,11 @@ MACHINE_RESET( atomeb )
 
 READ8_DEVICE_HANDLER( atom_mc6847_videoram_r )
 {
-	mc6847_as_w(device, BIT(videoram[offset], 6));
-	mc6847_intext_w(device, BIT(videoram[offset], 6));
-	mc6847_inv_w(device, BIT(videoram[offset], 7));
+	mc6847_as_w(device, BIT(device->machine->generic.videoram.u8[offset], 6));
+	mc6847_intext_w(device, BIT(device->machine->generic.videoram.u8[offset], 6));
+	mc6847_inv_w(device, BIT(device->machine->generic.videoram.u8[offset], 7));
 
-	return videoram[offset];
+	return device->machine->generic.videoram.u8[offset];
 }
 
 VIDEO_UPDATE( atom )

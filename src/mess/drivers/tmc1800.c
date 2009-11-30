@@ -574,7 +574,7 @@ static WRITE_LINE_DEVICE_HANDLER( tmc2000_q_w )
 	cdp1864_aoe_w(driver_state->cdp1864, state);
 
 	/* set Q led status */
-	set_led_status(1, state);
+	set_led_status(device->machine, 1, state);
 
 	/* tape output */
 	cassette_output(driver_state->cassette, state ? 1.0 : -1.0);
@@ -687,7 +687,7 @@ static WRITE_LINE_DEVICE_HANDLER( oscnano_q_w )
 	cdp1864_aoe_w(driver_state->cdp1864, state);
 
 	/* set Q led status */
-	set_led_status(1, state);
+	set_led_status(device->machine, 1, state);
 
 	/* tape output */
 	cassette_output(driver_state->cassette, state ? 1.0 : -1.0);

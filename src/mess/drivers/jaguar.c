@@ -208,7 +208,7 @@ static void jaguar_nvram_load(running_machine *machine)
 		if (nvram_file) eeprom_load(nvram_file);
 	}
 
-	for (device = machine->config->devicelist; device != NULL; device = device->next)
+	for (device = (device_config *)machine->config->devicelist.head; device != NULL; device = device->next)		
 	{
 		device_nvram_func nvram = (device_nvram_func)device_get_info_fct(device, DEVINFO_FCT_NVRAM);
 		if (nvram != NULL)
@@ -235,7 +235,7 @@ static void jaguar_nvram_save(running_machine *machine)
 		if (nvram_file) eeprom_save(nvram_file);
 	}
 
-	for (device = machine->config->devicelist; device != NULL; device = device->next)
+	for (device = (device_config *)machine->config->devicelist.head; device != NULL; device = device->next)
 	{
 		device_nvram_func nvram = (device_nvram_func)device_get_info_fct(device, DEVINFO_FCT_NVRAM);
 		if (nvram != NULL)

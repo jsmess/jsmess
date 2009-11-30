@@ -67,8 +67,8 @@ static VIDEO_UPDATE(jongkyo)
 
 
 
-			data1 = videoram[0x4000 + x/4 + y*64];
-			data2 = videoram[x/4 + y*64];
+			data1 = screen->machine->generic.videoram.u8[0x4000 + x/4 + y*64];
+			data2 = screen->machine->generic.videoram.u8[x/4 + y*64];
 
 			for (b = 0; b < 4; ++b)
 			{
@@ -113,7 +113,7 @@ static WRITE8_HANDLER( mux_w )
 static WRITE8_HANDLER( jongkyo_coin_counter_w )
 {
 	/* bit 1 = coin counter */
-	coin_counter_w(0,data & 2);
+	coin_counter_w(space->machine, 0,data & 2);
 
 	/* bit 2 always set? */
 }
@@ -197,7 +197,7 @@ static ADDRESS_MAP_START( jongkyo_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x6bff) AM_READ(SMH_ROM) // fixed rom
 	AM_RANGE(0x6c00, 0x6fff) AM_READ(SMH_BANK(1))	// banked (8 banks)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_GENERIC(videoram)
 ADDRESS_MAP_END
 
 

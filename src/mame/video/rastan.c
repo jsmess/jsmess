@@ -57,12 +57,12 @@ WRITE16_HANDLER( rastan_spritectrl_w )
 	/* bit 4 unused */
 
 	/* bits 0 and 1 are coin lockout */
-	coin_lockout_w(1,~data & 0x01);
-	coin_lockout_w(0,~data & 0x02);
+	coin_lockout_w(space->machine, 1,~data & 0x01);
+	coin_lockout_w(space->machine, 0,~data & 0x02);
 
 	/* bits 2 and 3 are the coin counters */
-	coin_counter_w(1,data & 0x04);
-	coin_counter_w(0,data & 0x08);
+	coin_counter_w(space->machine, 1,data & 0x04);
+	coin_counter_w(space->machine, 0,data & 0x08);
 }
 
 WRITE16_HANDLER( rainbow_spritectrl_w )
@@ -167,6 +167,7 @@ the Y settings are active low.
 
 VIDEO_UPDATE( jumping )
 {
+	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
 	int offs,layer[2];
 	int sprite_colbank = (sprite_ctrl & 0xe0) >> 1;
 
@@ -183,7 +184,7 @@ VIDEO_UPDATE( jumping )
  	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,0);
 
 	/* Draw the sprites. 128 sprites in total */
-	for (offs = spriteram_size/2-8; offs >= 0; offs -= 8)
+	for (offs = screen->machine->generic.spriteram_size/2-8; offs >= 0; offs -= 8)
 	{
 		int tile = spriteram16[offs];
 		if (tile < screen->machine->gfx[1]->total_elements)

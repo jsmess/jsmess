@@ -712,7 +712,7 @@ static WRITE16_HANDLER( led_0_w )
 	/* this has $00 written during an IRQ 6, then reset to $ff afterwards */
 	/* LED??? */
 	if (ACCESSING_BITS_0_7)
-		set_led_status(0, data != 0);
+		set_led_status(space->machine, 0, data != 0);
 }
 
 
@@ -720,7 +720,7 @@ static WRITE16_HANDLER( led_1_w )
 {
 	/* LED??? -- only written $00 or $ff */
 	if (ACCESSING_BITS_0_7)
-		set_led_status(1, data != 0);
+		set_led_status(space->machine, 1, data != 0);
 }
 
 
@@ -734,7 +734,7 @@ static WRITE16_HANDLER( led_1_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(gaelco3d_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(gaelco3d_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x51000c, 0x51000d) AM_READ_PORT("IN0")
 	AM_RANGE(0x51001c, 0x51001d) AM_READ_PORT("IN1")
 	AM_RANGE(0x51002c, 0x51002d) AM_READ_PORT("IN2")
@@ -761,7 +761,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main020_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(gaelco3d_paletteram_020_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(gaelco3d_paletteram_020_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x51000c, 0x51000f) AM_READ_PORT("IN0")
 	AM_RANGE(0x51001c, 0x51001f) AM_READ_PORT("IN1")
 	AM_RANGE(0x51002c, 0x51002f) AM_READ_PORT("IN2")

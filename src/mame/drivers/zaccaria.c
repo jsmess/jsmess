@@ -183,7 +183,7 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 	acs = ~data & 0x08;
 
 	// bit 4 = led (for testing?)
-	set_led_status(0,~data & 0x10);
+	set_led_status(device->machine, 0,~data & 0x10);
 }
 
 static READ_LINE_DEVICE_HANDLER( zaccaria_ca2_r )
@@ -302,7 +302,7 @@ static READ8_HANDLER( zaccaria_prot2_r )
 
 static WRITE8_HANDLER( coin_w )
 {
-	coin_counter_w(0,data & 1);
+	coin_counter_w(space->machine, 0,data & 1);
 }
 
 static WRITE8_HANDLER( nmienable_w )
@@ -318,8 +318,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6400, 0x6407) AM_READ(zaccaria_prot1_r)
 	AM_RANGE(0x6000, 0x67ff) AM_WRITE(zaccaria_videoram_w) AM_BASE(&zaccaria_videoram)	/* 6400-67ff is 4 bits wide */
 	AM_RANGE(0x6800, 0x683f) AM_WRITE(zaccaria_attributes_w) AM_BASE(&zaccaria_attributesram)
-	AM_RANGE(0x6840, 0x685f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x6881, 0x68bc) AM_RAM AM_BASE(&spriteram_2) AM_SIZE(&spriteram_2_size)
+	AM_RANGE(0x6840, 0x685f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x6881, 0x68bc) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
 	AM_RANGE(0x6c00, 0x6c00) AM_WRITE(zaccaria_flip_screen_x_w)
 	AM_RANGE(0x6c01, 0x6c01) AM_WRITE(zaccaria_flip_screen_y_w)
 	AM_RANGE(0x6c02, 0x6c02) AM_WRITENOP    /* sound reset */

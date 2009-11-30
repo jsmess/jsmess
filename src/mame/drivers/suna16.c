@@ -65,11 +65,11 @@ static WRITE16_HANDLER( bssoccer_leds_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		set_led_status(0, data & 0x01);
-		set_led_status(1, data & 0x02);
-		set_led_status(2, data & 0x04);
-		set_led_status(3, data & 0x08);
-		coin_counter_w(0, data & 0x10);
+		set_led_status(space->machine, 0, data & 0x01);
+		set_led_status(space->machine, 1, data & 0x02);
+		set_led_status(space->machine, 2, data & 0x04);
+		set_led_status(space->machine, 3, data & 0x08);
+		coin_counter_w(space->machine, 0, data & 0x10);
 	}
 	if (data & ~0x1f)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(space->cpu), data);
 }
@@ -79,9 +79,9 @@ static WRITE16_HANDLER( uballoon_leds_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0, data & 0x01);
-		set_led_status(0, data & 0x02);
-		set_led_status(1, data & 0x04);
+		coin_counter_w(space->machine, 0, data & 0x01);
+		set_led_status(space->machine, 0, data & 0x02);
+		set_led_status(space->machine, 1, data & 0x04);
 	}
 	if (data & ~0x07)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(space->cpu), data);
 }
@@ -91,7 +91,7 @@ static WRITE16_HANDLER( bestbest_coin_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0, data & 0x04);
+		coin_counter_w(space->machine, 0, data & 0x04);
 	}
 	if (data & ~0x04)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(space->cpu), data);
 }
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( bssoccer_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x203fff) AM_RAM	// RAM
 	AM_RANGE(0x400000, 0x4001ff) AM_READWRITE(suna16_paletteram16_r, suna16_paletteram16_w)  // Banked Palette
 	AM_RANGE(0x400200, 0x400fff) AM_RAM	//
-	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_BASE(&spriteram16)	// Sprites
+	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_BASE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("P1") AM_WRITE(suna16_soundlatch_w)	// To Sound CPU
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("P2") AM_WRITE(suna16_flipscreen_w)	// Flip Screen
 	AM_RANGE(0xa00004, 0xa00005) AM_READ_PORT("P3") AM_WRITE(bssoccer_leds_w)	// Leds
@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( uballoon_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x803fff) AM_RAM	// RAM
 	AM_RANGE(0x200000, 0x2001ff) AM_READWRITE(suna16_paletteram16_r, suna16_paletteram16_w)	// Banked Palette
 	AM_RANGE(0x200200, 0x200fff) AM_RAM	//
-	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x1e0000) AM_RAM AM_BASE(&spriteram16)	// Sprites
+	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x1e0000) AM_RAM AM_BASE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1") AM_WRITE(suna16_soundlatch_w)	// To Sound CPU
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("DSW1") AM_WRITE(suna16_flipscreen_w)	// Flip Screen
@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( sunaq_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x540000, 0x5401ff) AM_READWRITE(suna16_paletteram16_r, suna16_paletteram16_w)
 	AM_RANGE(0x540200, 0x540fff) AM_RAM   // RAM
 	AM_RANGE(0x580000, 0x583fff) AM_RAM	// RAM
-	AM_RANGE(0x5c0000, 0x5dffff) AM_RAM AM_BASE(&spriteram16)	// Sprites
+	AM_RANGE(0x5c0000, 0x5dffff) AM_RAM AM_BASE_GENERIC(spriteram)	// Sprites
 ADDRESS_MAP_END
 
 
@@ -191,8 +191,8 @@ static ADDRESS_MAP_START( bestbest_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x540000, 0x540fff ) AM_READWRITE( suna16_paletteram16_r, suna16_paletteram16_w )	// Banked(?) Palette
 	AM_RANGE( 0x541000, 0x54ffff ) AM_RAM														//
 	AM_RANGE( 0x580000, 0x58ffff ) AM_RAM							// RAM
-	AM_RANGE( 0x5c0000, 0x5dffff ) AM_RAM AM_BASE( &spriteram16   )	// Sprites (Chip 1)
-	AM_RANGE( 0x5e0000, 0x5fffff ) AM_RAM AM_BASE( &spriteram16_2 )	// Sprites (Chip 2)
+	AM_RANGE( 0x5c0000, 0x5dffff ) AM_RAM AM_BASE_GENERIC( spriteram  )	// Sprites (Chip 1)
+	AM_RANGE( 0x5e0000, 0x5fffff ) AM_RAM AM_BASE_GENERIC( spriteram2 )	// Sprites (Chip 2)
 ADDRESS_MAP_END
 
 

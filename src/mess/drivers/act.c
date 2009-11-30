@@ -199,20 +199,20 @@ static const wd17xx_interface act_wd2797_interface =
 
 static READ16_HANDLER( act_pal_r )
 {
-	return paletteram16[offset];
+	return space->machine->generic.paletteram.u16[offset];
 }
 
 static WRITE16_HANDLER( act_pal_w )
 {
 	UINT8 i,r,g,b;
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 
 	if(ACCESSING_BITS_0_7 && offset) //TODO: offset 0 looks bogus
 	{
-		i = paletteram16[offset] & 1;
-		r = ((paletteram16[offset] & 2)>>0) | i;
-		g = ((paletteram16[offset] & 4)>>1) | i;
-		b = ((paletteram16[offset] & 8)>>2) | i;
+		i = space->machine->generic.paletteram.u16[offset] & 1;
+		r = ((space->machine->generic.paletteram.u16[offset] & 2)>>0) | i;
+		g = ((space->machine->generic.paletteram.u16[offset] & 4)>>1) | i;
+		b = ((space->machine->generic.paletteram.u16[offset] & 8)>>2) | i;
 
 		palette_set_color_rgb(space->machine, offset, pal2bit(r), pal2bit(g), pal2bit(b));
 	}
@@ -221,7 +221,7 @@ static WRITE16_HANDLER( act_pal_w )
 static ADDRESS_MAP_START(act_f1_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x01e00,0x01fff) AM_RAM AM_BASE(&act_scrollram)
-	AM_RANGE(0xe0000,0xe001f) AM_READWRITE(act_pal_r,act_pal_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xe0000,0xe001f) AM_READWRITE(act_pal_r,act_pal_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x00000,0xeffff) AM_RAM AM_BASE(&act_vram)
 	AM_RANGE(0xf0000,0xf7fff) AM_RAM
 	AM_RANGE(0xf8000,0xfffff) AM_ROM

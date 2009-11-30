@@ -69,11 +69,11 @@ static WRITE8_DEVICE_HANDLER( joust2_pia_3_cb1_w );
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( input_port_0_device_r ) { return input_port_read_direct(input_port_by_index(device->machine->portconfig, 0)); }
-static READ8_DEVICE_HANDLER( input_port_1_device_r ) { return input_port_read_direct(input_port_by_index(device->machine->portconfig, 1)); }
-static READ8_DEVICE_HANDLER( input_port_2_device_r ) { return input_port_read_direct(input_port_by_index(device->machine->portconfig, 2)); }
-static READ8_DEVICE_HANDLER( input_port_3_device_r ) { return input_port_read_direct(input_port_by_index(device->machine->portconfig, 3)); }
-static READ8_DEVICE_HANDLER( input_port_4_device_r ) { return input_port_read_direct(input_port_by_index(device->machine->portconfig, 4)); }
+static READ8_DEVICE_HANDLER( input_port_0_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 0)); }
+static READ8_DEVICE_HANDLER( input_port_1_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 1)); }
+static READ8_DEVICE_HANDLER( input_port_2_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 2)); }
+static READ8_DEVICE_HANDLER( input_port_3_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 3)); }
+static READ8_DEVICE_HANDLER( input_port_4_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 4)); }
 
 /*************************************
  *
@@ -528,7 +528,7 @@ WRITE8_HANDLER( williams2_bank_select_w )
 		case 3:
 			memory_install_readwrite8_handler(space, 0x8000, 0x87ff, 0, 0, (read8_space_func)SMH_BANK(4), williams2_paletteram_w);
 			memory_set_bank(space->machine, 1, 1 + ((vram_bank & 4) >> 1));
-			memory_set_bankptr(space->machine, 4, paletteram);
+			memory_set_bankptr(space->machine, 4, space->machine->generic.paletteram.v);
 			break;
 	}
 }
@@ -647,14 +647,14 @@ READ8_DEVICE_HANDLER( williams_input_port_49way_0_5_r )
 WRITE8_HANDLER( williams_cmos_w )
 {
 	/* only 4 bits are valid */
-	generic_nvram[offset] = data | 0xf0;
+	space->machine->generic.nvram.u8[offset] = data | 0xf0;
 }
 
 
 WRITE8_HANDLER( bubbles_cmos_w )
 {
 	/* bubbles has additional CMOS for a full 8 bits */
-	generic_nvram[offset] = data;
+	space->machine->generic.nvram.u8[offset] = data;
 }
 
 
@@ -892,7 +892,7 @@ static READ8_DEVICE_HANDLER( lottofun_input_port_0_r )
 
 static WRITE8_DEVICE_HANDLER( lottofun_coin_lock_w )
 {
-	coin_lockout_global_w(data & 1); /* bit 5 of PIC control port A */
+	coin_lockout_global_w(device->machine, data & 1); /* bit 5 of PIC control port A */
 }
 
 /*************************************
@@ -923,10 +923,10 @@ static WRITE8_DEVICE_HANDLER( tshoot_maxvol_w )
 static WRITE8_DEVICE_HANDLER( tshoot_lamp_w )
 {
 	/* set the grenade lamp */
-	set_led_status(0,data & 0x04);
+	set_led_status(device->machine, 0,data & 0x04);
 
 	/* set the gun lamp */
-	set_led_status(1,data & 0x08);
+	set_led_status(device->machine, 1,data & 0x08);
 
 #if 0
 	/* gun coil */

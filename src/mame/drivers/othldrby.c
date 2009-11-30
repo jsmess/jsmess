@@ -53,10 +53,10 @@ static WRITE16_HANDLER( coinctrl_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0,data & 1);
-		coin_counter_w(1,data & 2);
-		coin_lockout_w(0,~data & 4);
-		coin_lockout_w(1,~data & 8);
+		coin_counter_w(space->machine, 0,data & 1);
+		coin_counter_w(space->machine, 1,data & 2);
+		coin_lockout_w(space->machine, 0,~data & 4);
+		coin_lockout_w(space->machine, 1,~data & 8);
 	}
 }
 
@@ -103,7 +103,7 @@ static ADDRESS_MAP_START( othldrby_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(othldrby_vreg_addr_w)
 	AM_RANGE(0x30000c, 0x30000d) AM_READ(pip)	// vblank?
 	AM_RANGE(0x30000c, 0x30000f) AM_WRITE(othldrby_vreg_w)
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_READ(pap)	// scanline???
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("DSW1")

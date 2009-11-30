@@ -146,8 +146,8 @@ WRITE8_HANDLER( vulgus_bgvideoram_w )
 WRITE8_HANDLER( vulgus_c804_w )
 {
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(0, data & 0x01);
-	coin_counter_w(1, data & 0x02);
+	coin_counter_w(space->machine, 0, data & 0x01);
+	coin_counter_w(space->machine, 1, data & 0x02);
 
 	/* bit 7 flips screen */
 	flip_screen_set(space->machine, data & 0x80);
@@ -172,10 +172,11 @@ WRITE8_HANDLER( vulgus_palette_bank_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
 
-	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int code,i,col,sx,sy,dir;
 

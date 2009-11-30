@@ -142,8 +142,8 @@ WRITE8_HANDLER( suprloco_control_w )
 		/*logerror("Bit 4 = %d\n", (data >> 4) & 1); */
 	}
 
-	coin_counter_w(0, data & 0x01);
-	coin_counter_w(1, data & 0x02);
+	coin_counter_w(space->machine, 0, data & 0x01);
+	coin_counter_w(space->machine, 1, data & 0x02);
 
 	flip_screen_set(space->machine, data & 0x80);
 
@@ -186,7 +186,7 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectang
 	short skip;	/* bytes to skip before drawing each row (can be negative) */
 
 
-	spr_reg	= spriteram + 0x10 * spr_number;
+	spr_reg	= machine->generic.spriteram.u8 + 0x10 * spr_number;
 
 	src = spr_reg[SPR_GFXOFS_LO] + (spr_reg[SPR_GFXOFS_HI] << 8);
 	skip = spr_reg[SPR_SKIP_LO] + (spr_reg[SPR_SKIP_HI] << 8);
@@ -256,9 +256,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	UINT8 *spr_reg;
 
 
-	for (spr_number = 0;spr_number < (spriteram_size >> 4);spr_number++)
+	for (spr_number = 0;spr_number < (machine->generic.spriteram_size >> 4);spr_number++)
 	{
-		spr_reg = spriteram + 0x10 * spr_number;
+		spr_reg = machine->generic.spriteram.u8 + 0x10 * spr_number;
 		if (spr_reg[SPR_X] != 0xff)
 			draw_sprite(machine, bitmap, cliprect, spr_number);
 	}

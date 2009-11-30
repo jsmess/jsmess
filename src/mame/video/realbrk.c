@@ -33,8 +33,8 @@ WRITE16_HANDLER( realbrk_flipscreen_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0,	data & 0x0001);
-		coin_counter_w(1,	data & 0x0004);
+		coin_counter_w(space->machine, 0,	data & 0x0001);
+		coin_counter_w(space->machine, 1,	data & 0x0004);
 
 		flip_screen_set(space->machine, 	data & 0x0080);
 	}
@@ -214,6 +214,7 @@ VIDEO_START(realbrk)
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 
 	int max_x = video_screen_get_width(machine->primary_screen);
@@ -379,6 +380,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 /* layer : 0== bghigh<spr    1== bglow<spr<bghigh     2==spr<bglow    3==boarder */
 static void dai2kaku_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, int layer)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 
 	int max_x = video_screen_get_width(machine->primary_screen);

@@ -109,7 +109,7 @@ WRITE8_HANDLER( megazone_flipscreen_w )
 
 VIDEO_START( megazone )
 {
-	tmpbitmap = auto_bitmap_alloc(machine,256,256,video_screen_get_format(machine->primary_screen));
+	machine->generic.tmpbitmap = auto_bitmap_alloc(machine,256,256,video_screen_get_format(machine->primary_screen));
 }
 
 
@@ -119,14 +119,14 @@ VIDEO_UPDATE( megazone )
 	int x,y;
 
 	/* for every character in the Video RAM */
-	for (offs = videoram_size - 1;offs >= 0;offs--)
+	for (offs = screen->machine->generic.videoram_size - 1;offs >= 0;offs--)
 	{
 		int sx,sy,flipx,flipy;
 
 		sx = offs % 32;
 		sy = offs / 32;
-		flipx = colorram[offs] & (1<<6);
-		flipy = colorram[offs] & (1<<5);
+		flipx = screen->machine->generic.colorram.u8[offs] & (1<<6);
+		flipy = screen->machine->generic.colorram.u8[offs] & (1<<5);
 		if (flipscreen)
 		{
 			sx = 31 - sx;
@@ -135,9 +135,9 @@ VIDEO_UPDATE( megazone )
 			flipy = !flipy;
 		}
 
-		drawgfx_opaque(tmpbitmap,0,screen->machine->gfx[1],
-				((int)videoram[offs]) + ((colorram[offs] & (1<<7) ? 256 : 0) ),
-				(colorram[offs] & 0x0f) + 0x10,
+		drawgfx_opaque(screen->machine->generic.tmpbitmap,0,screen->machine->gfx[1],
+				((int)screen->machine->generic.videoram.u8[offs]) + ((screen->machine->generic.colorram.u8[offs] & (1<<7) ? 256 : 0) ),
+				(screen->machine->generic.colorram.u8[offs] & 0x0f) + 0x10,
 				flipx,flipy,
 				8*sx,8*sy);
 	}
@@ -159,13 +159,14 @@ VIDEO_UPDATE( megazone )
 		}
 
 
-		copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,cliprect);
+		copyscrollbitmap(bitmap,screen->machine->generic.tmpbitmap,1,&scrollx,1,&scrolly,cliprect);
 	}
 
 
 	/* Draw the sprites. */
 	{
-		for (offs = spriteram_size-4; offs >= 0;offs -= 4)
+		UINT8 *spriteram = screen->machine->generic.spriteram.u8;
+		for (offs = screen->machine->generic.spriteram_size-4; offs >= 0;offs -= 4)
 		{
 			int sx = spriteram[offs + 3];
 			int sy = 255-((spriteram[offs + 1]+16)&0xff);

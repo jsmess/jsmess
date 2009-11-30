@@ -74,7 +74,7 @@ extern VIDEO_UPDATE( tankbatt );
 
 static WRITE8_HANDLER( tankbatt_led_w )
 {
-	set_led_status(offset,data & 1);
+	set_led_status(space->machine, offset,data & 1);
 }
 
 static READ8_HANDLER( tankbatt_in0_r )
@@ -156,21 +156,21 @@ static WRITE8_HANDLER( tankbatt_irq_ack_w )
 
 static WRITE8_HANDLER( tankbatt_coin_counter_w )
 {
-	coin_counter_w(0,data & 1);
-	coin_counter_w(1,data & 1);
+	coin_counter_w(space->machine, 0,data & 1);
+	coin_counter_w(space->machine, 1,data & 1);
 }
 
 static WRITE8_HANDLER( tankbatt_coin_lockout_w )
 {
-	coin_lockout_w(0,data & 1);
-	coin_lockout_w(1,data & 1);
+	coin_lockout_w(space->machine, 0,data & 1);
+	coin_lockout_w(space->machine, 1,data & 1);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x000f) AM_RAM AM_BASE(&tankbatt_bulletsram) AM_SIZE(&tankbatt_bulletsram_size)
 	AM_RANGE(0x0010, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(tankbatt_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(tankbatt_videoram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x0c00, 0x0c07) AM_READ(tankbatt_in0_r)
 	AM_RANGE(0x0c00, 0x0c01) AM_WRITE(tankbatt_led_w)
 	AM_RANGE(0x0c02, 0x0c02) AM_WRITE(tankbatt_coin_counter_w)

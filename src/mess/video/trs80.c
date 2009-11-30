@@ -75,7 +75,7 @@ VIDEO_UPDATE( trs80 )
 
 			for (x = ma; x < ma + 64; x+=skip)
 			{
-				chr = videoram[x];
+				chr = screen->machine->generic.videoram.u8[x];
 
 				if (chr & 0x80)
 				{
@@ -147,7 +147,7 @@ VIDEO_UPDATE( trs80m4 )
 
 			for (x = ma; x < ma + cols; x+=skip)
 			{
-				chr = videoram[x+start_address];
+				chr = screen->machine->generic.videoram.u8[x+start_address];
 
 				if (((chr & 0xc0) == 0xc0) && (~trs80_mode & 8))
 				{
@@ -232,7 +232,7 @@ VIDEO_UPDATE( ht1080z )
 
 			for (x = ma; x < ma + 64; x+=skip)
 			{
-				chr = videoram[x];
+				chr = screen->machine->generic.videoram.u8[x];
 
 				if (chr & 0x80)
 				{
@@ -301,7 +301,7 @@ VIDEO_UPDATE( lnw80 )
 
 					for (x = ma; x < ma + 64; x++)
 					{
-						chr = videoram[x];
+						chr = screen->machine->generic.videoram.u8[x];
 
 						if (chr & 0x80)
 						{
@@ -410,12 +410,12 @@ VIDEO_UPDATE( lnw80 )
 					for (x = 0; x < 0x40; x++)
 					{
 						gfx = trs80_gfxram[ y | x | ra];
-						fg = (videoram[ 0x3c00 | x | y ] & 0x38) >> 3;
+						fg = (screen->machine->generic.videoram.u8[ 0x3c00 | x | y ] & 0x38) >> 3;
 						/* Display 6 pixels in normal region */
 						*p++ = ( gfx & 0x01 ) ? fg : bg;
 						*p++ = ( gfx & 0x02 ) ? fg : bg;
 						*p++ = ( gfx & 0x04 ) ? fg : bg;
-						fg = videoram[ 0x3c00 | x | y ] & 0x07;
+						fg = screen->machine->generic.videoram.u8[ 0x3c00 | x | y ] & 0x07;
 						*p++ = ( gfx & 0x08 ) ? fg : bg;
 						*p++ = ( gfx & 0x10 ) ? fg : bg;
 						*p++ = ( gfx & 0x20 ) ? fg : bg;
@@ -464,7 +464,7 @@ VIDEO_UPDATE( radionic )
 
 			for (x = ma; x < ma + 64; x+=skip)
 			{
-				chr = videoram[x];
+				chr = screen->machine->generic.videoram.u8[x];
 
 				/* get pattern of pixels for that character scanline */
 				gfx = FNT[(chr<<3) | (ra & 7) | (ra & 8) << 8];
@@ -493,13 +493,13 @@ VIDEO_UPDATE( radionic )
 READ8_HANDLER( trs80_videoram_r )
 {
 	if ((trs80_mode & 0x80) && (~trs80_model4 & 1)) offset |= 0x400;
-	return videoram[offset];
+	return space->machine->generic.videoram.u8[offset];
 }
 
 WRITE8_HANDLER( trs80_videoram_w )
 {
 	if ((trs80_mode & 0x80) && (~trs80_model4 & 1)) offset |= 0x400;
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 }
 
 

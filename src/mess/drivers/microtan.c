@@ -53,7 +53,7 @@
 
 static ADDRESS_MAP_START( microtan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x03ff) AM_RAM_WRITE(microtan_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x0200, 0x03ff) AM_RAM_WRITE(microtan_videoram_w) AM_BASE_SIZE_GENERIC(videoram)
 	AM_RANGE(0xbc00, 0xbc00) AM_DEVWRITE("ay8910.1", ay8910_address_w)
 	AM_RANGE(0xbc01, 0xbc01) AM_DEVREADWRITE("ay8910.1", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xbc02, 0xbc02) AM_DEVWRITE("ay8910.2", ay8910_address_w)

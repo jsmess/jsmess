@@ -73,7 +73,7 @@ static ADDRESS_MAP_START(interact_mem, ADDRESS_SPACE_PROGRAM, 8)
  //   AM_RANGE(0x1000,0x3fff) AM_RAM
 
 	// Vidéo br mapping
-	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_GENERIC(videoram)
 	// continous RAM
     AM_RANGE(0x4A00,0xffff) AM_RAM
 
@@ -108,9 +108,9 @@ static MACHINE_START(interact)
 {
 	// Start keyboard
     at_keyboard_init(machine, AT_KEYBOARD_TYPE_PC);
-    at_keyboard_reset();
+    at_keyboard_reset(machine);
     at_keyboard_set_scan_code_set(2);
-    at_keyboard_reset();
+    at_keyboard_reset(machine);
 
 	hector_init(machine);
 }
@@ -118,7 +118,7 @@ static MACHINE_START(interact)
 static VIDEO_UPDATE( interact )
 {
    	video_screen_set_visarea(screen, 0, 113, 0, 75);
-	hector_hr( bitmap, videoram,  77, 32);
+	hector_hr( bitmap, screen->machine->generic.videoram.u8,  77, 32);
 	return 0;
 }
 

@@ -145,7 +145,7 @@ static VIDEO_UPDATE(ti99_2)
 	for (i = 0; i < 768; i++)
 	{
 		/* Is the char code masked or not ??? */
-		drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], videoram[i] & 0x7F, 0,
+		drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], screen->machine->generic.videoram.u8[i] & 0x7F, 0,
 			0, 0, sx, sy);
 
 		sx += 8;
@@ -186,7 +186,7 @@ static ADDRESS_MAP_START( ti99_2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)	/* system ROM, banked on 32kb ROMs protos */
 	AM_RANGE(0x6000, 0xdfff) AM_NOP		    /* free for expansion */
 	AM_RANGE(0xe000, 0xebff) AM_RAM		    /* system RAM */
-	AM_RANGE(0xec00, 0xeeff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xec00, 0xeeff) AM_RAM AM_BASE_SIZE_GENERIC(videoram)
 	AM_RANGE(0xef00, 0xefff) AM_RAM		    /* system RAM */
 	AM_RANGE(0xf000, 0xffff) AM_NOP		    /* free for expansion (and internal processor RAM) */
 ADDRESS_MAP_END

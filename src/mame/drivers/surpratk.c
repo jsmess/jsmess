@@ -34,9 +34,9 @@ static READ8_HANDLER( bankedram_r )
 	if (videobank & 0x02)
 	{
 		if (videobank & 0x04)
-			return paletteram[offset + 0x0800];
+			return space->machine->generic.paletteram.u8[offset + 0x0800];
 		else
-			return paletteram[offset];
+			return space->machine->generic.paletteram.u8[offset];
 	}
 	else if (videobank & 0x01)
 		return K053245_r(space,offset);
@@ -73,8 +73,8 @@ static WRITE8_HANDLER( surpratk_5fc0_w )
 	if ((data & 0xf4) != 0x10) logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bit 0/1 = coin counters */
-	coin_counter_w(0,data & 0x01);
-	coin_counter_w(1,data & 0x02);
+	coin_counter_w(space->machine, 0,data & 0x01);
+	coin_counter_w(space->machine, 1,data & 0x02);
 
 	/* bit 3 = enable char ROM reading through the video RAM */
 	K052109_set_RMRD_line( ( data & 0x08 ) ? ASSERT_LINE : CLEAR_LINE );
@@ -282,7 +282,7 @@ static MACHINE_RESET( surpratk )
 {
 	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), surpratk_banking);
 
-	paletteram = &memory_region(machine, "maincpu")[0x48000];
+	machine->generic.paletteram.u8 = &memory_region(machine, "maincpu")[0x48000];
 }
 
 static DRIVER_INIT( surpratk )

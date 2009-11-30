@@ -261,7 +261,7 @@ static WRITE8_DEVICE_HANDLER( mpf1_portc_w )
 	/* bit 6, monitor break control */
 
 	/* bit 7, tape output, tone and led */
-	set_led_status(0, !BIT(data, 7));
+	set_led_status(device->machine, 0, !BIT(data, 7));
 	speaker_level_w(speaker, BIT(data, 7));
 	cassette_output(cassette, BIT(data, 7));
 }
@@ -276,7 +276,7 @@ static TIMER_CALLBACK( check_halt_callback )
 	// halt-LED; the red one, is turned on when the processor is halted
 	// TODO: processor seems to halt, but restarts(?) at 0x0000 after a while -> fix
 	INT64 led_halt = devtag_get_info_int(machine, "maincpu", CPUINFO_INT_REGISTER + Z80_HALT);
-	set_led_status(1, led_halt);
+	set_led_status(machine, 1, led_halt);
 }
 
 static TIMER_CALLBACK( irq0_callback )

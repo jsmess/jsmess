@@ -154,10 +154,6 @@ VIDEO_START( digdug )
 
 	tilemap_set_transparent_pen(tx_tilemap, 0);
 
-	spriteram   = digdug_objram + 0x380;
-	spriteram_2 = digdug_posram + 0x380;
-	spriteram_3 = digdug_flpram + 0x380;
-
 	state_save_register_global(machine, bg_select);
 	state_save_register_global(machine, tx_color_mode);
 	state_save_register_global(machine, bg_disable);
@@ -256,6 +252,9 @@ static const rectangle spritevisiblearea =
 
 static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	UINT8 *spriteram = digdug_objram + 0x380;
+	UINT8 *spriteram_2 = digdug_posram + 0x380;
+	UINT8 *spriteram_3 = digdug_flpram + 0x380;
 	int offs;
 
 	for (offs = 0;offs < 0x80;offs += 2)

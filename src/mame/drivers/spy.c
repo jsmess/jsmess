@@ -45,7 +45,7 @@ static READ8_HANDLER( spy_bankedram1_r )
 {
 	if (rambank & 1)
 	{
-		return paletteram[offset];
+		return space->machine->generic.paletteram.u8[offset];
 	}
 	else if (rambank & 2)
 	{
@@ -290,8 +290,8 @@ static WRITE8_HANDLER( spy_3f90_w )
     ********************************************************************/
 
 	/* bits 0/1 = coin counters */
-	coin_counter_w(0,data & 0x01);
-	coin_counter_w(1,data & 0x02);
+	coin_counter_w(space->machine, 0,data & 0x01);
+	coin_counter_w(space->machine, 1,data & 0x02);
 
 	/* bit 2 = enable char ROM reading through the video RAM */
 	K052109_set_RMRD_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
@@ -583,7 +583,7 @@ static void gfx_untangle(running_machine *machine)
 
 static DRIVER_INIT( spy )
 {
-	paletteram = &memory_region(machine, "maincpu")[0x28000];
+	machine->generic.paletteram.u8 = &memory_region(machine, "maincpu")[0x28000];
 	pmcram =     &memory_region(machine, "maincpu")[0x28800];
 	gfx_untangle(machine);
 }

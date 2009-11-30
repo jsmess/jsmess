@@ -341,7 +341,7 @@ static int is_image_device(const device_config *device)
 
 const device_config *image_device_first(const machine_config *config)
 {
-    const device_config *device = device_list_first(config->devicelist, DEVICE_TYPE_WILDCARD);
+    const device_config *device = device_list_first(&config->devicelist, DEVICE_TYPE_WILDCARD);
     while((device != NULL) && !is_image_device(device))
     {
         device = device_list_next(device, DEVICE_TYPE_WILDCARD);

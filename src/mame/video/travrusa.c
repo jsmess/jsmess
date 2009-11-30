@@ -281,8 +281,8 @@ WRITE8_HANDLER( travrusa_flipscreen_w )
 
 	flip_screen_set(space->machine, data & 1);
 
-	coin_counter_w(0, data & 0x02);
-	coin_counter_w(1, data & 0x20);
+	coin_counter_w(space->machine, 0, data & 0x02);
+	coin_counter_w(space->machine, 1, data & 0x20);
 }
 
 
@@ -314,7 +314,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		sect_rect(&clip, &spritevisiblearea);
 
 
-	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int sx = ((state->spriteram[offs + 3] + 8) & 0xff) - 8;
 		int sy = 240 - state->spriteram[offs];

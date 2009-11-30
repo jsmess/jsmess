@@ -798,9 +798,9 @@ static WRITE16_HANDLER(md0_w)
 
 static WRITE16_HANDLER(p_w)
 {
-	UINT16 old = paletteram16[offset];
+	UINT16 old = space->machine->generic.paletteram.u16[offset];
 	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
-	if(0 && paletteram16[offset] != old)
+	if(0 && space->machine->generic.paletteram.u16[offset] != old)
 		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
@@ -881,14 +881,14 @@ static ADDRESS_MAP_START( model1_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x770000, 0x770001) AM_WRITENOP		// Video synchronization switch
 	AM_RANGE(0x780000, 0x7fffff) AM_READWRITE(sys24_char_r, sys24_char_w)
 
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_BASE(&model1_color_xlat)
 
 	AM_RANGE(0xc00000, 0xc0003f) AM_READ(io_r) AM_WRITENOP
 
 	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE(network_ctl_r, network_ctl_w)
 
-	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(snd_latch_to_68k_w)
 	AM_RANGE(0xc40002, 0xc40003) AM_READ(snd_68k_ready_r)
@@ -929,14 +929,14 @@ static ADDRESS_MAP_START( model1_vr_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x770000, 0x770001) AM_WRITENOP		// Video synchronization switch
 	AM_RANGE(0x780000, 0x7fffff) AM_READWRITE(sys24_char_r, sys24_char_w)
 
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_BASE(&model1_color_xlat)
 
 	AM_RANGE(0xc00000, 0xc0003f) AM_READ(io_r) AM_WRITENOP
 
 	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE(network_ctl_r, network_ctl_w)
 
-	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(snd_latch_to_68k_w)
 	AM_RANGE(0xc40002, 0xc40003) AM_READ(snd_68k_ready_r)

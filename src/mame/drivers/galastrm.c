@@ -144,10 +144,10 @@ popmessage(t);
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				coin_lockout_w(0, ~data & 0x01000000);
-				coin_lockout_w(1, ~data & 0x02000000);
-				coin_counter_w(0, data & 0x04000000);
-				coin_counter_w(1, data & 0x04000000);
+				coin_lockout_w(space->machine, 0, ~data & 0x01000000);
+				coin_lockout_w(space->machine, 1, ~data & 0x02000000);
+				coin_counter_w(space->machine, 0, data & 0x04000000);
+				coin_counter_w(space->machine, 1, data & 0x04000000);
 				coin_word = (data >> 16) &0xffff;
 			}
 //logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(space->cpu),offset);
@@ -179,7 +179,7 @@ static WRITE32_HANDLER( galastrm_adstick_ctrl_w )
 static ADDRESS_MAP_START( galastrm_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(&galastrm_ram) 								/* main CPUA ram */
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x400000, 0x400003) AM_READ_PORT("IN0")
 	AM_RANGE(0x400004, 0x400007) AM_READ_PORT("IN1")
 	AM_RANGE(0x400000, 0x400007) AM_WRITE(galastrm_input_w)									/* eerom etc. */

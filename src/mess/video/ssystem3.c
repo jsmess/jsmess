@@ -53,8 +53,8 @@ PALETTE_INIT( ssystem3 )
 VIDEO_START( ssystem3 )
 {
 	// artwork seams to need this
-    videoram_size = 6 * 2 + 24;
-    videoram = auto_alloc_array(machine, UINT8, videoram_size);
+    machine->generic.videoram_size = 6 * 2 + 24;
+    machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, machine->generic.videoram_size);
 }
 
 

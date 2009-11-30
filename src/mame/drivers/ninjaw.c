@@ -412,7 +412,7 @@ static ADDRESS_MAP_START( ninjaw_master_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x220000, 0x220003) AM_READWRITE(ninjaw_sound_r,ninjaw_sound_w)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE(2) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE(2) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x280000, 0x293fff) AM_READWRITE(TC0100SCN_word_0_r,TC0100SCN_triple_screen_w)	/* tilemaps (1st screen/all screens) */
 	AM_RANGE(0x2a0000, 0x2a000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r,TC0100SCN_ctrl_word_0_w)
 	AM_RANGE(0x2c0000, 0x2d3fff) AM_READWRITE(TC0100SCN_word_1_r,TC0100SCN_word_1_w)		/* tilemaps (2nd screen) */
@@ -448,7 +448,7 @@ static ADDRESS_MAP_START( darius2_master_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x220000, 0x220003) AM_READWRITE(ninjaw_sound_r,ninjaw_sound_w)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE(2) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE(2) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x280000, 0x293fff) AM_READWRITE(TC0100SCN_word_0_r,TC0100SCN_triple_screen_w)	/* tilemaps (1st screen/all screens) */
 	AM_RANGE(0x2a0000, 0x2a000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r,TC0100SCN_ctrl_word_0_w)
 	AM_RANGE(0x2c0000, 0x2d3fff) AM_READWRITE(TC0100SCN_word_1_r,TC0100SCN_word_1_w)		/* tilemaps (2nd screen) */
@@ -879,7 +879,7 @@ ROM_START( ninjaw )
 	ROM_LOAD( "b31-10.17", 0x080000, 0x80000, CRC(c6434aef) SHA1(3348ce87882e3f668aa85bbb517975ec1fc9b6fd) )
 	ROM_LOAD( "b31-11.16", 0x100000, 0x80000, CRC(8da531d4) SHA1(525dfab0a0729e9fb6f0e4c8187bf4ce16321b20) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "b31-08.19", 0x000000, 0x80000, CRC(a0a1f87d) SHA1(6b0f8094f3a3ef1ced76984e333e22a17c51af29) )
 
 	ROM_REGION( 0x01000, "user1", 0 )	/* unknown roms */
@@ -935,7 +935,7 @@ ROM_START( ninjawj )
 	ROM_LOAD( "b31-10.17", 0x080000, 0x80000, CRC(c6434aef) SHA1(3348ce87882e3f668aa85bbb517975ec1fc9b6fd) )
 	ROM_LOAD( "b31-11.16", 0x100000, 0x80000, CRC(8da531d4) SHA1(525dfab0a0729e9fb6f0e4c8187bf4ce16321b20) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "b31-08.19", 0x000000, 0x80000, CRC(a0a1f87d) SHA1(6b0f8094f3a3ef1ced76984e333e22a17c51af29) )
 
 	ROM_REGION( 0x01000, "user1", 0 )	/* unknown roms */
@@ -982,7 +982,7 @@ ROM_START( darius2 )
 	ROM_LOAD( "c07-10.95", 0x00000, 0x80000, CRC(4bbe0ed9) SHA1(081b73c4e4d4fa548445e5548573099bcb1e9213) )
 	ROM_LOAD( "c07-11.96", 0x80000, 0x80000, CRC(3c815699) SHA1(0471ff5b0c0da905267f2cee52fd68c8661cccc9) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c07-12.107", 0x00000, 0x80000, CRC(e0b71258) SHA1(0258e308b643d723475824752ebffc4ea29d1ac4) )
 ROM_END
 

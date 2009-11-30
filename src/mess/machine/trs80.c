@@ -951,7 +951,7 @@ MACHINE_RESET( trs80 )
 	trs80_cass = devtag_get_device(machine, "cassette");
 	trs80_speaker = devtag_get_device(machine, "speaker");
 	trs80_fdc = devtag_get_device(machine, "wd179x");
-	videoram_size = 0x800;
+	machine->generic.videoram_size = 0x800;
 }
 
 MACHINE_RESET( trs80m4 )

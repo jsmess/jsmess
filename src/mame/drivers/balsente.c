@@ -242,9 +242,9 @@ DIP locations verified for:
  *************************************/
 
 static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&spriteram)
-	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(balsente_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(balsente_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(balsente_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(balsente_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x9000, 0x9007) AM_WRITE(balsente_adc_select_w)
 	AM_RANGE(0x9400, 0x9401) AM_READ(balsente_adc_data_r)
 	AM_RANGE(0x9800, 0x987f) AM_WRITE(balsente_misc_output_w)
@@ -258,7 +258,7 @@ static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9903, 0x9903) AM_READ_PORT("IN1") AM_WRITENOP
 	AM_RANGE(0x9a00, 0x9a03) AM_READ(balsente_random_num_r)
 	AM_RANGE(0x9a04, 0x9a05) AM_READWRITE(balsente_m6850_r, balsente_m6850_w)
-	AM_RANGE(0x9b00, 0x9cff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* system+cart NOVRAM */
+	AM_RANGE(0x9b00, 0x9cff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* system+cart NOVRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(2)
 ADDRESS_MAP_END
@@ -589,10 +589,10 @@ static INPUT_PORTS_START( stocker )
 	PORT_DIPSETTING(    0x18, "5 Coins = 2 Bonus" )
 	PORT_DIPSETTING(    0x1c, "5 Coins = 3 Bonus" )
 	PORT_DIPNAME( 0x20, 0x00, "Left Coin Mech" )	PORT_DIPLOCATION("H1:6")
-	PORT_DIPSETTING(    0x00, "x1snd" )
+	PORT_DIPSETTING(    0x00, "x1" )
 	PORT_DIPSETTING(    0x20, "x2" )
 	PORT_DIPNAME( 0xc0, 0x00, "Right Coin Mech" )	PORT_DIPLOCATION("H1:7,8")
-	PORT_DIPSETTING(    0x00, "x1snd" )
+	PORT_DIPSETTING(    0x00, "x1" )
 	PORT_DIPSETTING(    0x40, "x4" )
 	PORT_DIPSETTING(    0x80, "x5" )
 	PORT_DIPSETTING(    0xc0, "x6" )

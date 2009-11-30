@@ -59,8 +59,8 @@ VIDEO_UPDATE( mz700 )
 		sy = (offs / 40) * 8;
 		sx = (offs % 40) * 8;
 
-		color = colorram[offs];
-		code = videoram[offs] | (color & 0x80) << 1;
+		color = screen->machine->generic.colorram.u8[offs];
+		code = screen->machine->generic.videoram.u8[offs] | (color & 0x80) << 1;
 
 		drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], code, color, 0, 0, sx, sy);
 	}
@@ -96,7 +96,7 @@ VIDEO_UPDATE( mz800 )
 		else
 		{
 			int x, y;
-			UINT8 *start_addr = videoram;
+			UINT8 *start_addr = screen->machine->generic.videoram.u8;
 
 			for (x = 0; x < 40; x++)
 			{

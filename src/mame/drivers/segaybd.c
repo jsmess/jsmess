@@ -1,4 +1,4 @@
-	/***************************************************************************
+/***************************************************************************
 
     Sega Y-board hardware
 
@@ -437,7 +437,7 @@ static ADDRESS_MAP_START( suby_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x180000, 0x1807ff) AM_MIRROR(0x007800) AM_RAM AM_BASE(&segaic16_rotateram_0)
 	AM_RANGE(0x188000, 0x188fff) AM_MIRROR(0x007000) AM_RAM AM_BASE(&segaic16_spriteram_0)
-	AM_RANGE(0x190000, 0x193fff) AM_MIRROR(0x004000) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x190000, 0x193fff) AM_MIRROR(0x004000) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0x198000, 0x19ffff) AM_READ(segaic16_rotate_control_0_r)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
@@ -858,10 +858,10 @@ static INPUT_PORTS_START( rchase )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x04, 0x04, "Coin #1 multiplier" ) PORT_DIPLOCATION("SWA:3")
-	PORT_DIPSETTING(    0x04, "x1snd" )
+	PORT_DIPSETTING(    0x04, "x1" )
 	PORT_DIPSETTING(    0x00, "x2" )
 	PORT_DIPNAME( 0x18, 0x18, "Coin #2 multiplier" ) PORT_DIPLOCATION("SWA:4,5")
-	PORT_DIPSETTING(    0x18, "x1snd" )
+	PORT_DIPSETTING(    0x18, "x1" )
 	PORT_DIPSETTING(    0x10, "x4" )
 	PORT_DIPSETTING(    0x08, "x5" )
 	PORT_DIPSETTING(    0x00, "x6" )

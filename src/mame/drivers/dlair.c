@@ -167,7 +167,7 @@ static VIDEO_UPDATE( dleuro )
 	for (y = 0; y < 32; y++)
 		for (x = 0; x < 32; x++)
 		{
-			UINT8 *base = &videoram[y * 64 + x * 2 + 1];
+			UINT8 *base = &screen->machine->generic.videoram.u8[y * 64 + x * 2 + 1];
 			drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], base[0], base[1], 0, 0, 10 * x, 16 * y);
 		}
 
@@ -238,7 +238,7 @@ static WRITE8_HANDLER( misc_w )
 	UINT8 diff = data ^ last_misc;
 	last_misc = data;
 
-	coin_counter_w(0, (~data >> 4) & 1);
+	coin_counter_w(space->machine, 0, (~data >> 4) & 1);
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
@@ -264,8 +264,8 @@ static WRITE8_HANDLER( dleuro_misc_w )
 	UINT8 diff = data ^ last_misc;
 	last_misc = data;
 
-	coin_counter_w(1, (~data >> 3) & 1);
-	coin_counter_w(0, (~data >> 4) & 1);
+	coin_counter_w(space->machine, 1, (~data >> 3) & 1);
+	coin_counter_w(space->machine, 0, (~data >> 4) & 1);
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
@@ -400,7 +400,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dleuro_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_BASE_GENERIC(videoram)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1f47) // WT LED 1
 	AM_RANGE(0xe008, 0xe008) AM_MIRROR(0x1f47) // WT LED 2
 	AM_RANGE(0xe010, 0xe010) AM_MIRROR(0x1f47) AM_WRITE(led_den1_w)			// WT EXT LED 1

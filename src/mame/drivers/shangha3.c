@@ -79,10 +79,10 @@ static WRITE16_HANDLER( shangha3_coinctrl_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_lockout_w(0,~data & 0x0400);
-		coin_lockout_w(1,~data & 0x0400);
-		coin_counter_w(0,data & 0x0100);
-		coin_counter_w(1,data & 0x0200);
+		coin_lockout_w(space->machine, 0,~data & 0x0400);
+		coin_lockout_w(space->machine, 1,~data & 0x0400);
+		coin_counter_w(space->machine, 0,data & 0x0100);
+		coin_counter_w(space->machine, 1,data & 0x0200);
 	}
 }
 
@@ -93,10 +93,10 @@ static WRITE16_HANDLER( heberpop_coinctrl_w )
 		/* the sound ROM bank is selected by the main CPU! */
 		okim6295_set_bank_base(devtag_get_device(space->machine, "oki"),(data & 0x08) ? 0x40000 : 0x00000);
 
-		coin_lockout_w(0,~data & 0x04);
-		coin_lockout_w(1,~data & 0x04);
-		coin_counter_w(0,data & 0x01);
-		coin_counter_w(1,data & 0x02);
+		coin_lockout_w(space->machine, 0,~data & 0x04);
+		coin_lockout_w(space->machine, 1,~data & 0x04);
+		coin_counter_w(space->machine, 0,data & 0x01);
+		coin_counter_w(space->machine, 1,data & 0x02);
 	}
 }
 
@@ -107,10 +107,10 @@ static WRITE16_HANDLER( blocken_coinctrl_w )
 		/* the sound ROM bank is selected by the main CPU! */
 		okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), ((data >> 4) & 3) * 0x40000);
 
-		coin_lockout_w(0,~data & 0x04);
-		coin_lockout_w(1,~data & 0x04);
-		coin_counter_w(0,data & 0x01);
-		coin_counter_w(1,data & 0x02);
+		coin_lockout_w(space->machine, 0,~data & 0x04);
+		coin_lockout_w(space->machine, 1,~data & 0x04);
+		coin_counter_w(space->machine, 0,data & 0x01);
+		coin_counter_w(space->machine, 1,data & 0x02);
 	}
 }
 
@@ -128,7 +128,7 @@ static WRITE16_HANDLER( heberpop_sound_command_w )
 
 static ADDRESS_MAP_START( shangha3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x200008, 0x200009) AM_WRITE(shangha3_blitter_go_w)
@@ -146,7 +146,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( heberpop_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("DSW")
@@ -169,7 +169,7 @@ static ADDRESS_MAP_START( blocken_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x10000a, 0x10000b) AM_WRITENOP	/* irq ack? */
 	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(blocken_coinctrl_w)
 	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(heberpop_sound_command_w)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE(&shangha3_ram) AM_SIZE(&shangha3_ram_size)	/* gfx & work ram */
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(shangha3_flipscreen_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(shangha3_gfxlist_addr_w)

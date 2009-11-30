@@ -23,9 +23,9 @@ static tilemap *bg_tilemap;
 
 WRITE8_HANDLER( microtan_videoram_w )
 {
-	if ((videoram[offset] != data) || (microtan_chunky_buffer[offset] != microtan_chunky_graphics))
+	if ((space->machine->generic.videoram.u8[offset] != data) || (microtan_chunky_buffer[offset] != microtan_chunky_graphics))
 	{
-		videoram[offset] = data;
+		space->machine->generic.videoram.u8[offset] = data;
 		tilemap_mark_tile_dirty(bg_tilemap, offset);
 		microtan_chunky_buffer[offset] = microtan_chunky_graphics;
 	}
@@ -34,7 +34,7 @@ WRITE8_HANDLER( microtan_videoram_w )
 static TILE_GET_INFO(get_bg_tile_info)
 {
 	int gfxn = microtan_chunky_buffer[tile_index];
-	int code = videoram[tile_index];
+	int code = machine->generic.videoram.u8[tile_index];
 
 	SET_TILE_INFO(gfxn, code, 0, 0);
 }
@@ -44,8 +44,8 @@ VIDEO_START( microtan )
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		8, 16, 32, 16);
 
-	microtan_chunky_buffer = auto_alloc_array(machine, UINT8, videoram_size);
-	memset(microtan_chunky_buffer, 0, videoram_size);
+	microtan_chunky_buffer = auto_alloc_array(machine, UINT8, machine->generic.videoram_size);
+	memset(microtan_chunky_buffer, 0, machine->generic.videoram_size);
 	microtan_chunky_graphics = 0;
 }
 

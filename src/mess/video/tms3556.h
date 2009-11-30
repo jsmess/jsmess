@@ -9,6 +9,6 @@ WRITE8_HANDLER(tms3556_reg_w);
 
 extern void tms3556_init(running_machine *machine, int vram_size);
 extern void tms3556_reset(void);
-extern void tms3556_interrupt(void);
+extern void tms3556_interrupt(running_machine *machine);
 
 MACHINE_DRIVER_EXTERN( tms3556 );

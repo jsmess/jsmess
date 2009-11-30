@@ -61,7 +61,7 @@ void inputx_setup_natural_keyboard(
 	int (*charqueue_empty)(void));
 
 /* validity checks */
-int mess_validate_input_ports(int drivnum, const machine_config *config, const input_port_config *portlist);
+int mess_validate_input_ports(int drivnum, const machine_config *config, const input_port_list *portlist);
 int mess_validate_natural_keyboard_statics(void);
 
 /* these can be called from FEs */

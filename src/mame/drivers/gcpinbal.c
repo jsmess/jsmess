@@ -112,8 +112,8 @@ static WRITE16_HANDLER( ioc_w )
 //          return;
 //
 //      case 0x88/2:    /* coin control (+ others) ??? */
-//          coin_lockout_w(0, ~data & 0x01);
-//          coin_lockout_w(1, ~data & 0x02);
+//          coin_lockout_w(space->machine, 0, ~data & 0x01);
+//          coin_lockout_w(space->machine, 1, ~data & 0x02);
 //popmessage(" address %04x value %04x",offset,data);
 //  }
 
@@ -231,8 +231,8 @@ static void gcp_adpcm_int(const device_config *device)
 static ADDRESS_MAP_START( gcpinbal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(gcpinbal_tilemaps_word_r, gcpinbal_tilemaps_word_w) AM_BASE(&gcpinbal_tilemapram)
-	AM_RANGE(0xc80000, 0xc80fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	/* sprite ram */
-	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xc80000, 0xc80fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	/* sprite ram */
+	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd80000, 0xd800ff) AM_READWRITE(ioc_r, ioc_w) AM_BASE(&gcpinbal_ioc_ram)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM	/* RAM */
 ADDRESS_MAP_END

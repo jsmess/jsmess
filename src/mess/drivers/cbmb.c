@@ -132,7 +132,7 @@ static ADDRESS_MAP_START(cbmb_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf4000, 0xf5fff) AM_ROM
 	AM_RANGE(0xf6000, 0xf7fff) AM_ROM
 	AM_RANGE(0xf8000, 0xfbfff) AM_ROM AM_BASE(&cbmb_basic)
-	AM_RANGE(0xfd000, 0xfd7ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size) /* VIDEORAM */
+	AM_RANGE(0xfd000, 0xfd7ff) AM_RAM AM_BASE_SIZE_GENERIC(videoram) /* VIDEORAM */
 	AM_RANGE(0xfd800, 0xfd800) AM_MIRROR(0xfe) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR(0xfe) AM_DEVREADWRITE("crtc", mc6845_register_r , mc6845_register_w)
 	/* disk units */

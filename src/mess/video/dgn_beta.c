@@ -314,7 +314,7 @@ void dgnbeta_init_video(running_machine *machine)
 
 	GCtrl=0;
 
-	videoram=messram_get_ptr(devtag_get_device(machine, "messram"));
+	machine->generic.videoram.u8=messram_get_ptr(devtag_get_device(machine, "messram"));
 
 	ClkMax=65000;
 	FlashCount=0;
@@ -411,13 +411,13 @@ static void beta_plot_char_line(running_machine *machine, int x,int y, bitmap_t 
 			Offset=0;
 
 		/* Get the character to display */
-		char_code 	= videoram[Offset];
+		char_code 	= machine->generic.videoram.u8[Offset];
 
 		/* Extract non-colour attributes, in character set 1, undeline is used */
 		/* We will extract the colours below, when we have decoded inverse */
 		/* to indicate a double height character */
-		UnderLine=(videoram[Offset+1] & 0x40) >> 6;
-		FlashChar=(videoram[Offset+1] & 0x80) >> 7;
+		UnderLine=(machine->generic.videoram.u8[Offset+1] & 0x40) >> 6;
+		FlashChar=(machine->generic.videoram.u8[Offset+1] & 0x80) >> 7;
 
 		// underline is active for character set 0, on character row 9
 		ULActive=(UnderLine && (beta_6845_RA==9) && ~SWChar);
@@ -441,13 +441,13 @@ static void beta_plot_char_line(running_machine *machine, int x,int y, bitmap_t 
 		/* Invert colours if invert is true */
 		if(!Invert)
 		{
-			FgColour	= (videoram[Offset+1] & 0x38) >> 3;
-			BgColour	= (videoram[Offset+1] & 0x07);
+			FgColour	= (machine->generic.videoram.u8[Offset+1] & 0x38) >> 3;
+			BgColour	= (machine->generic.videoram.u8[Offset+1] & 0x07);
 		}
 		else
 		{
-			BgColour	= (videoram[Offset+1] & 0x38) >> 3;
-			FgColour	= (videoram[Offset+1] & 0x07);
+			BgColour	= (machine->generic.videoram.u8[Offset+1] & 0x38) >> 3;
+			FgColour	= (machine->generic.videoram.u8[Offset+1] & 0x07);
 		}
 
 		/* The beta Character ROM has characters of 8x10, each aligned to a 16 byte boundry */
@@ -529,7 +529,7 @@ static void plot_gfx_pixel(int x, int y, int Dot, int Colour, bitmap_t *bitmap)
 
 /* Get and plot a graphics bixel block */
 
-static void beta_plot_gfx_line(int x,int y, bitmap_t *bitmap)
+static void beta_plot_gfx_line(running_machine *machine,int x,int y, bitmap_t *bitmap)
 {
 	int crtcAddr;
 	int Addr;
@@ -569,8 +569,8 @@ static void beta_plot_gfx_line(int x,int y, bitmap_t *bitmap)
 		if(y>MaxY) MaxY=y;
 		if(y<MinY) MinY=y;
 
-		Lo	= videoram[Addr];
-		Hi	= videoram[Addr+1];
+		Lo	= machine->generic.videoram.u8[Addr];
+		Hi	= machine->generic.videoram.u8[Addr+1];
 		Word	= (Hi<<8) | Lo;
 
 		/* If contol is low then we are plotting 4 bit per pixel, 16 colour mode */
@@ -666,7 +666,7 @@ VIDEO_UPDATE( dgnbeta )
 				if(IsTextMode)
 					beta_plot_char_line(screen->machine, beta_scr_x, beta_scr_y, bitmap);
 				else
-					beta_plot_gfx_line(beta_scr_x, beta_scr_y, bitmap);
+					beta_plot_gfx_line(screen->machine, beta_scr_x, beta_scr_y, bitmap);
 			}
 
 			/* In direct drive mode we have 4bpp, so 4 pixels per word, so increment x by 4 */

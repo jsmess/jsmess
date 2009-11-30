@@ -163,7 +163,7 @@ UINT8 trs80_model4;
 static ADDRESS_MAP_START( trs80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x3800, 0x38ff) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -184,7 +184,7 @@ static ADDRESS_MAP_START( model1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x37ee, 0x37ee) AM_DEVREADWRITE("wd179x", wd17xx_sector_r, wd17xx_sector_w)
 	AM_RANGE(0x37ef, 0x37ef) AM_DEVREADWRITE("wd179x", wd17xx_data_r, wd17xx_data_w)
 	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x300) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -748,14 +748,14 @@ static DRIVER_INIT( trs80m4 )
 {
 	trs80_mode = 0;
 	trs80_model4 = 2;
-	videoram = memory_region(machine, "maincpu")+0x4000;
+	machine->generic.videoram.u8 = memory_region(machine, "maincpu")+0x4000;
 }
 
 static DRIVER_INIT( trs80m4p )
 {
 	trs80_mode = 0;
 	trs80_model4 = 4;
-	videoram = memory_region(machine, "maincpu")+0x4000;
+	machine->generic.videoram.u8 = memory_region(machine, "maincpu")+0x4000;
 }
 
 static DRIVER_INIT( lnw80 )
@@ -763,7 +763,7 @@ static DRIVER_INIT( lnw80 )
 	trs80_mode = 0;
 	trs80_model4 = 0;
 	trs80_gfxram = memory_region(machine, "gfx2");
-	videoram = memory_region(machine, "gfx2")+0x4000;
+	machine->generic.videoram.u8 = memory_region(machine, "gfx2")+0x4000;
 }
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT      CONFIG       COMPANY  FULLNAME */

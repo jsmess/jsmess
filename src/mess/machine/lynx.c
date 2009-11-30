@@ -1233,7 +1233,7 @@ static void lynx_draw_lines(running_machine *machine, int newline)
 		{
 			for ( ; lynx_line_y < yend; lynx_line_y++)
 			{
-				line = BITMAP_ADDR16(tmpbitmap, lynx_line_y, 0);
+				line = BITMAP_ADDR16(machine->generic.tmpbitmap, lynx_line_y, 0);
 				for (x = 160 - 2; x >= 0; j++, x -= 2)
 				{
 					byte = lynx_read_vram(j);
@@ -1246,7 +1246,7 @@ static void lynx_draw_lines(running_machine *machine, int newline)
 		{
 			for ( ; lynx_line_y < yend; lynx_line_y++)
 			{
-				line = BITMAP_ADDR16(tmpbitmap, 102 - 1 - lynx_line_y, 0);
+				line = BITMAP_ADDR16(machine->generic.tmpbitmap, 102 - 1 - lynx_line_y, 0);
 				for (x = 0; x < 160; j++, x += 2)
 				{
 					byte = lynx_read_vram(j);
@@ -1263,7 +1263,7 @@ static void lynx_draw_lines(running_machine *machine, int newline)
 		{
 			for ( ; lynx_line_y < yend; lynx_line_y++)
 			{
-				line = BITMAP_ADDR16(tmpbitmap, 102 - 1 - lynx_line_y, 0);
+				line = BITMAP_ADDR16(machine->generic.tmpbitmap, 102 - 1 - lynx_line_y, 0);
 				for (x = 160 - 2; x >= 0; j++, x -= 2)
 				{
 					byte = lynx_read_vram(j);
@@ -1276,7 +1276,7 @@ static void lynx_draw_lines(running_machine *machine, int newline)
 		{
 			for ( ; lynx_line_y < yend; lynx_line_y++)
 			{
-				line = BITMAP_ADDR16(tmpbitmap, lynx_line_y, 0);
+				line = BITMAP_ADDR16(machine->generic.tmpbitmap, lynx_line_y, 0);
 				for (x = 0; x < 160; j++, x += 2)
 				{
 					byte = lynx_read_vram(j);

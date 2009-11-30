@@ -61,7 +61,7 @@ static TILE_GET_INFO( get_sb_tile_info )
 	SET_TILE_INFO(0, tileno, 0, 0);
 }
 
-static void plot_pixel_sbw(int x, int y, int col, int flip)
+static void plot_pixel_sbw(bitmap_t *tmpbitmap, int x, int y, int col, int flip)
 {
 	if (flip)
 	{
@@ -76,19 +76,19 @@ static WRITE8_HANDLER( sbw_videoram_w )
 	int flip = flip_screen_get(space->machine);
 	int x,y,i,v1,v2;
 
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 
 	offset &= 0x1fff;
 
 	y = offset / 32;
 	x = (offset % 32) * 8;
 
-	v1 = videoram[offset];
-	v2 = videoram[offset+0x2000];
+	v1 = space->machine->generic.videoram.u8[offset];
+	v2 = space->machine->generic.videoram.u8[offset+0x2000];
 
 	for(i = 0; i < 8; i++)
 	{
-		plot_pixel_sbw(x++, y, color_prom_address | ( ((v1&1)*0x20) | ((v2&1)*0x40) ), flip);
+		plot_pixel_sbw(space->machine->generic.tmpbitmap, x++, y, color_prom_address | ( ((v1&1)*0x20) | ((v2&1)*0x40) ), flip);
 		v1 >>= 1;
 		v2 >>= 1;
 	}
@@ -98,13 +98,13 @@ static VIDEO_UPDATE(sbowling)
 {
 	bitmap_fill(bitmap,cliprect,0x18);
 	tilemap_draw(bitmap,cliprect,sb_tilemap,0,0);
-	copybitmap_trans(bitmap,tmpbitmap,0,0,0,0,cliprect, color_prom_address);
+	copybitmap_trans(bitmap,screen->machine->generic.tmpbitmap,0,0,0,0,cliprect, color_prom_address);
 	return 0;
 }
 
 static VIDEO_START(sbowling)
 {
-	tmpbitmap = auto_bitmap_alloc(machine,32*8,32*8,video_screen_get_format(machine->primary_screen));
+	machine->generic.tmpbitmap = auto_bitmap_alloc(machine,32*8,32*8,video_screen_get_format(machine->primary_screen));
 	sb_tilemap = tilemap_create(machine, get_sb_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
@@ -154,8 +154,8 @@ static WRITE8_HANDLER (system_w)
 	if((sbw_system^data)&1)
 	{
 		int offs;
-		for (offs = 0;offs < videoram_size; offs++)
-			sbw_videoram_w(space, offs, videoram[offs]);
+		for (offs = 0;offs < space->machine->generic.videoram_size; offs++)
+			sbw_videoram_w(space, offs, space->machine->generic.videoram.u8[offs]);
 	}
 	sbw_system = data;
 }
@@ -186,7 +186,7 @@ static READ8_HANDLER (controls_r)
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(sbw_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(sbw_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xf801, 0xf801) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM

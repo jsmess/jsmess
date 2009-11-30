@@ -95,11 +95,11 @@ static WRITE16_HANDLER( splash_coin_w )
 		{
 			case 0x00:	/* Coin Lockouts */
 			case 0x01:
-				coin_lockout_w( (offset >> 3) & 0x01, (data & 0x0400) >> 8);
+				coin_lockout_w( space->machine, (offset >> 3) & 0x01, (data & 0x0400) >> 8);
 				break;
 			case 0x02:	/* Coin Counters */
 			case 0x03:
-				coin_counter_w( (offset >> 3) & 0x01, (data & 0x0100) >> 8);
+				coin_counter_w( space->machine, (offset >> 3) & 0x01, (data & 0x0100) >> 8);
 				break;
 		}
 	}
@@ -117,7 +117,7 @@ static ADDRESS_MAP_START( splash_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE(&splash_videoram)	/* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE(&splash_vregs)							/* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM													/* Work RAM */
-	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)/* Palette is xRRRRxGGGGxBBBBx */
+	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette is xRRRRxGGGGxBBBBx */
 	AM_RANGE(0x900000, 0x900fff) AM_RAM AM_BASE(&splash_spriteram)						/* Sprite RAM */
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM													/* Work RAM */
 ADDRESS_MAP_END
@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( roldfrog_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE(&splash_videoram)	/* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE(&splash_vregs)							/* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM													/* Work RAM */
-	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)/* Palette is xRRRRxGGGGxBBBBx */
+	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette is xRRRRxGGGGxBBBBx */
 	AM_RANGE(0xa00000, 0xa00001) AM_READ(roldfrog_bombs_r)
 	AM_RANGE(0xd00000, 0xd00fff) AM_RAM AM_BASE(&splash_spriteram)						/* Sprite RAM */
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITEONLY AM_BASE(&roldfrog_bitmap_mode)			/* Bitmap Mode? */
@@ -200,7 +200,7 @@ static ADDRESS_MAP_START( funystrp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE(&splash_videoram)	/* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE(&splash_vregs)							/* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM													/* Work RAM */
-	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)/* Palette is xRRRRxGGGGxBBBBx */
+	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette is xRRRRxGGGGxBBBBx */
 	AM_RANGE(0xd00000, 0xd01fff) AM_RAM AM_BASE(&splash_spriteram)						/* Sprite RAM */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM													/* Work RAM */
 ADDRESS_MAP_END

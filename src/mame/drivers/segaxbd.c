@@ -650,7 +650,7 @@ static WRITE16_HANDLER( aburner2_iochip_0_D_w )
 
 	output_set_lamp_value(2, (data >> 1) & 0x01);	/* altitude warning lamp */
 	output_set_led_value(0, (data >> 2) & 0x01);	/* start lamp */
-	coin_counter_w(0, (data >> 4) & 0x01);
+	coin_counter_w(space->machine, 0, (data >> 4) & 0x01);
 	output_set_lamp_value(0, (data >> 5) & 0x01);	/* lock on lamp */
 	output_set_lamp_value(1, (data >> 6) & 0x01);	/* danger lamp */
 	sound_global_enable(space->machine, (data >> 7) & 0x01);
@@ -735,7 +735,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0e8000, 0x0e801f) AM_MIRROR(0x003fe0) AM_READWRITE(segaic16_compare_timer_0_r, segaic16_compare_timer_0_w)
 	AM_RANGE(0x100000, 0x100fff) AM_MIRROR(0x00f000) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0x110000, 0x11ffff) AM_WRITE(segaic16_sprites_draw_0_w)
-	AM_RANGE(0x120000, 0x123fff) AM_MIRROR(0x00c000) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x120000, 0x123fff) AM_MIRROR(0x00c000) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0x130000, 0x13ffff) AM_READWRITE(adc_r, adc_w)
 	AM_RANGE(0x140000, 0x14000f) AM_MIRROR(0x00fff0) AM_READWRITE(iochip_0_r, iochip_0_w)
 	AM_RANGE(0x150000, 0x15000f) AM_MIRROR(0x00fff0) AM_READWRITE(iochip_1_r, iochip_1_w)

@@ -20,7 +20,7 @@ static void draw_mode4_line(const device_config *screen, bitmap_t *bitmap, int y
 
 	for (x = 0; x < 256;)
 	{
-		UINT8 tmp = *(videoram + (x/2) + (y*128));
+		UINT8 tmp = screen->machine->generic.videoram.u8[(x/2) + (y*128)];
 
 #ifdef MONO
 		if (tmp>>4)
@@ -63,7 +63,7 @@ static void draw_mode3_line(const device_config *screen, bitmap_t *bitmap, int y
 
 	for (x = 0; x < 512;)
 	{
-		UINT8 tmp = *(videoram + (x/4) + (y*128));
+		UINT8 tmp = screen->machine->generic.videoram.u8[(x/4) + (y*128)];
 
 #ifdef MONO
 		if (tmp >> 6)
@@ -104,12 +104,12 @@ static void draw_mode2_line(const device_config *screen, bitmap_t *bitmap, int y
 	coupe_asic *asic = screen->machine->driver_data;
 	int b, scrx = 0;
 	UINT16 ink = 127, pap = 0;
-	UINT8 *attr = videoram + 32*192 + y*32;
+	UINT8 *attr = screen->machine->generic.videoram.u8 + 32*192 + y*32;
 	int x;
 
 	for (x = 0; x < 256/8; x++)
 	{
-		UINT8 tmp = *(videoram + x + (y*32));
+		UINT8 tmp = screen->machine->generic.videoram.u8[x + (y*32)];
 
 #ifndef MONO
 		ink = asic->clut[(*attr) & 0x07];
@@ -132,8 +132,8 @@ static void draw_mode1_line(const device_config *screen, bitmap_t *bitmap, int y
 	int block, x = 0;
 
 	/* get base address of attribute and data values */
-	UINT8 *attr = videoram + 32*192 + ((y & 0xf8) << 2);
-	UINT8 *data = videoram + (((y & 0xc0) << 5) | ((y & 0x07) << 8) | ((y & 0x38) << 2));
+	UINT8 *attr = screen->machine->generic.videoram.u8 + 32*192 + ((y & 0xf8) << 2);
+	UINT8 *data = screen->machine->generic.videoram.u8 + (((y & 0xc0) << 5) | ((y & 0x07) << 8) | ((y & 0x38) << 2));
 
 	/* loop over all 32 blocks */
 	for (block = 0; block < 32; block++)

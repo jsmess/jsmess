@@ -86,24 +86,11 @@ Stephh's notes (based on the games M68000 code and some tests) :
 ***************************************************************************/
 
 #include "driver.h"
+#include "yunsun16.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
-
-/* Variables defined in video: */
-
-extern UINT16 *yunsun16_vram_0,   *yunsun16_vram_1;
-extern UINT16 *yunsun16_scroll_0, *yunsun16_scroll_1;
-extern UINT16 *yunsun16_priority;
-
-/* Functions defined in video: */
-
-WRITE16_HANDLER( yunsun16_vram_0_w );
-WRITE16_HANDLER( yunsun16_vram_1_w );
-
-VIDEO_START( yunsun16 );
-VIDEO_UPDATE( yunsun16 );
 
 
 /***************************************************************************
@@ -131,27 +118,28 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800018, 0x800019) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x80001a, 0x80001b) AM_READ_PORT("DSW1")
 	AM_RANGE(0x80001c, 0x80001d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800030, 0x800031) AM_WRITE(SMH_NOP						)	// ? (value: don't care)
-	AM_RANGE(0x800100, 0x800101) AM_WRITE(SMH_NOP						)	// ? $9100
-	AM_RANGE(0x800102, 0x800103) AM_WRITE(SMH_NOP						)	// ? $9080
-	AM_RANGE(0x800104, 0x800105) AM_WRITE(SMH_NOP						)	// ? $90c0
-	AM_RANGE(0x80010a, 0x80010b) AM_WRITE(SMH_NOP						)	// ? $9000
-	AM_RANGE(0x80010c, 0x80010f) AM_RAM AM_BASE(&yunsun16_scroll_1				)	// Scrolling
-	AM_RANGE(0x800114, 0x800117) AM_RAM AM_BASE(&yunsun16_scroll_0				)	// Scrolling
-	AM_RANGE(0x800154, 0x800155) AM_RAM AM_BASE(&yunsun16_priority				)	// Priority
-	AM_RANGE(0x800180, 0x800181) AM_WRITE(yunsun16_sound_bank_w					)	// Sound
-	AM_RANGE(0x800188, 0x800189) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff	)	// Sound
-	AM_RANGE(0x8001fe, 0x8001ff) AM_WRITE(SMH_NOP							)	// ? 0 (during int)
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(yunsun16_vram_1_w) AM_BASE(&yunsun16_vram_1	)	// Layer 1
-	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(yunsun16_vram_0_w) AM_BASE(&yunsun16_vram_0	)	// Layer 0
-	AM_RANGE(0x910000, 0x910fff) AM_RAM	AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
+	AM_RANGE(0x800030, 0x800031) AM_WRITE(SMH_NOP)	// ? (value: don't care)
+	AM_RANGE(0x800100, 0x800101) AM_WRITE(SMH_NOP)	// ? $9100
+	AM_RANGE(0x800102, 0x800103) AM_WRITE(SMH_NOP)	// ? $9080
+	AM_RANGE(0x800104, 0x800105) AM_WRITE(SMH_NOP)	// ? $90c0
+	AM_RANGE(0x80010a, 0x80010b) AM_WRITE(SMH_NOP)	// ? $9000
+	AM_RANGE(0x80010c, 0x80010f) AM_RAM AM_BASE_MEMBER(yunsun16_state, scrollram_1)	// Scrolling
+	AM_RANGE(0x800114, 0x800117) AM_RAM AM_BASE_MEMBER(yunsun16_state, scrollram_0)	// Scrolling
+	AM_RANGE(0x800154, 0x800155) AM_RAM AM_BASE_MEMBER(yunsun16_state, priorityram)	// Priority
+	AM_RANGE(0x800180, 0x800181) AM_WRITE(yunsun16_sound_bank_w)	// Sound
+	AM_RANGE(0x800188, 0x800189) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)	// Sound
+	AM_RANGE(0x8001fe, 0x8001ff) AM_WRITE(SMH_NOP)	// ? 0 (during int)
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(yunsun16_vram_1_w) AM_BASE_MEMBER(yunsun16_state, vram_1)	// Layer 1
+	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(yunsun16_vram_0_w) AM_BASE_MEMBER(yunsun16_state, vram_0)	// Layer 0
+	AM_RANGE(0x910000, 0x910fff) AM_RAM	AM_BASE_SIZE_MEMBER(yunsun16_state, spriteram, spriteram_size)	// Sprites
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 
 static WRITE16_HANDLER( magicbub_sound_command_w )
 {
+	yunsun16_state *state = (yunsun16_state *)space->machine->driver_data;
 	if (ACCESSING_BITS_0_7)
 	{
 /*
@@ -160,8 +148,8 @@ number 0 on each voice. That sample is 00000-00000.
 */
 		if ((data & 0xff) != 0x3a)
 		{
-		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+			soundlatch_w(space, 0, data & 0xff);
+			cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 }
@@ -567,13 +555,32 @@ GFXDECODE_END
 
 ***************************************************************************/
 
+static MACHINE_START( yunsun16 )
+{
+	yunsun16_state *state = (yunsun16_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->sprites_scrolldx);
+	state_save_register_global(machine, state->sprites_scrolldy);
+}
+
+static MACHINE_RESET( yunsun16 )
+{
+	yunsun16_state *state = (yunsun16_state *)machine->driver_data;
+
+	state->sprites_scrolldx = -0x40;
+	state->sprites_scrolldy = -0x0f;
+}
+
 /***************************************************************************
                                 Magic Bubble
 ***************************************************************************/
 
 static void soundirq(const device_config *device, int state)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, state);
+	yunsun16_state *yunsun16 = (yunsun16_state *)device->machine->driver_data;
+	cpu_set_input_line(yunsun16->audiocpu, 0, state);
 }
 
 static const ym3812_interface magicbub_ym3812_intf =
@@ -583,6 +590,9 @@ static const ym3812_interface magicbub_ym3812_intf =
 
 static MACHINE_DRIVER_START( magicbub )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(yunsun16_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -591,6 +601,9 @@ static MACHINE_DRIVER_START( magicbub )
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(sound_port_map)
+
+	MDRV_MACHINE_START(yunsun16)
+	MDRV_MACHINE_RESET(yunsun16)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -627,10 +640,16 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( shocking )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(yunsun16_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
+
+	MDRV_MACHINE_START(yunsun16)
+	MDRV_MACHINE_RESET(yunsun16)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -920,9 +939,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 199?, magicbub, 0,        magicbub, magicbub, magicbub, ROT0,   "Yun Sung", "Magic Bubble", GAME_NO_COCKTAIL )
-GAME( 199?, magicbuba,magicbub, magicbub, magicbua, magicbub, ROT0,   "Yun Sung", "Magic Bubble (Adult version)", GAME_NO_COCKTAIL )
-GAME( 1996, paprazzi, 0,        shocking, paprazzi, 0,        ROT270, "Yun Sung", "Paparazzi",    GAME_NO_COCKTAIL )
-GAME( 1997, shocking, 0,        shocking, shocking, 0,        ROT0,   "Yun Sung", "Shocking",     GAME_NO_COCKTAIL )
-GAME( 1998, bombkick, 0,        shocking, bombkick, 0,        ROT0,   "Yun Sung", "Bomb Kick",    GAME_NO_COCKTAIL )
-
+GAME( 199?, magicbub, 0,        magicbub, magicbub, magicbub, ROT0,   "Yun Sung", "Magic Bubble", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 199?, magicbuba,magicbub, magicbub, magicbua, magicbub, ROT0,   "Yun Sung", "Magic Bubble (Adult version)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1996, paprazzi, 0,        shocking, paprazzi, 0,        ROT270, "Yun Sung", "Paparazzi",    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1997, shocking, 0,        shocking, shocking, 0,        ROT0,   "Yun Sung", "Shocking",     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1998, bombkick, 0,        shocking, bombkick, 0,        ROT0,   "Yun Sung", "Bomb Kick",    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

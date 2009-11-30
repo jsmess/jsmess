@@ -211,7 +211,7 @@ static void vendetta_video_banking( running_machine *machine, int select )
 	{
 		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, (read8_space_func)SMH_BANK(4), paletteram_xBBBBBGGGGGRRRRR_be_w );
 		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), video_banking_base + 0x0000, video_banking_base + 0x0fff, 0, 0, K053247_r, K053247_w );
-		memory_set_bankptr(machine, 4, paletteram);
+		memory_set_bankptr(machine, 4, machine->generic.paletteram.v);
 	}
 	else
 	{
@@ -223,8 +223,8 @@ static void vendetta_video_banking( running_machine *machine, int select )
 static WRITE8_HANDLER( vendetta_5fe0_w )
 {
 	/* bit 0,1 coin counters */
-	coin_counter_w(0,data & 0x01);
-	coin_counter_w(1,data & 0x02);
+	coin_counter_w(space->machine, 0,data & 0x01);
+	coin_counter_w(space->machine, 1,data & 0x02);
 
 	/* bit 2 = BRAMBK ?? */
 
@@ -703,7 +703,7 @@ static MACHINE_RESET( vendetta )
 {
 	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), vendetta_banking);
 
-	paletteram = &memory_region(machine, "maincpu")[0x48000];
+	machine->generic.paletteram.u8 = &memory_region(machine, "maincpu")[0x48000];
 	irq_enabled = 0;
 
 	/* init banks */

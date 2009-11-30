@@ -634,13 +634,13 @@ static tilemap *bg_tilemap;
 
 static WRITE8_HANDLER( goldnpkr_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( goldnpkr_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -654,8 +654,8 @@ static TILE_GET_INFO( get_bg_tile_info )
     xx-- ----   unused.
 */
 
-	int attr = colorram[tile_index];
-	int code = ((attr & 1) << 8) | videoram[tile_index];
+	int attr = machine->generic.colorram.u8[tile_index];
+	int code = ((attr & 1) << 8) | machine->generic.videoram.u8[tile_index];
 	int bank = (attr & 0x02) >> 1;	/* bit 1 switch the gfx banks */
  	int color = (attr & 0x3c) >> 2;	/* bits 2-3-4-5 for color */
 
@@ -859,9 +859,9 @@ static WRITE8_DEVICE_HANDLER( lamps_a_w )
 	output_set_lamp_value(4, 1 - ((data >> 4) & 1));	/* Lamp 4 */
 
 //  popmessage("written : %02X", data);
-	coin_counter_w(0, data & 0x40);	/* counter1 */
-	coin_counter_w(1, data & 0x80);	/* counter2 */
-	coin_counter_w(2, data & 0x20);	/* counter3 */
+	coin_counter_w(device->machine, 0, data & 0x40);	/* counter1 */
+	coin_counter_w(device->machine, 1, data & 0x80);	/* counter2 */
+	coin_counter_w(device->machine, 2, data & 0x20);	/* counter3 */
 
 /*  Counters:
 
@@ -893,37 +893,37 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 
 static ADDRESS_MAP_START( goldnpkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* battery backed RAM */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_BASE_GENERIC(colorram)
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pottnpkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* battery backed RAM */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_BASE_GENERIC(colorram)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( witchcrd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* battery backed RAM */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_BASE_GENERIC(colorram)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SW2")
 //  AM_RANGE(0x2108, 0x210b) AM_NOP /* unknown 40-pin device */
 	AM_RANGE(0x4000, 0x7fff) AM_ROM

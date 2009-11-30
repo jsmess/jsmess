@@ -8,7 +8,7 @@ static bitmap_t *sprites_bitmap;
 
 VIDEO_START( galpanic )
 {
-	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	machine->generic.tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	sprites_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	pandora_start(machine,0,0, -16);
@@ -37,12 +37,12 @@ WRITE16_HANDLER( galpanic_bgvideoram_w )
 	sy = offset / 256;
 	sx = offset % 256;
 
-	*BITMAP_ADDR16(tmpbitmap, sy, sx) = 1024 + (data >> 1);
+	*BITMAP_ADDR16(space->machine->generic.tmpbitmap, sy, sx) = 1024 + (data >> 1);
 }
 
 WRITE16_HANDLER( galpanic_paletteram_w )
 {
-	data = COMBINE_DATA(&paletteram16[offset]);
+	data = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 	/* bit 0 seems to be a transparency flag for the front bitmap */
 	palette_set_color_rgb(space->machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
@@ -50,10 +50,11 @@ WRITE16_HANDLER( galpanic_paletteram_w )
 
 static void comad_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 	int sx=0, sy=0;
 
-	for (offs = 0;offs < spriteram_size/2;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size/2;offs += 4)
 	{
 		int code,color,flipx,flipy;
 
@@ -103,7 +104,7 @@ static void draw_fgbitmap(bitmap_t *bitmap, const rectangle *cliprect)
 VIDEO_UPDATE( galpanic )
 {
 	/* copy the temporary bitmap to the screen */
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect);
+	copybitmap(bitmap,screen->machine->generic.tmpbitmap,0,0,0,0,cliprect);
 
 	draw_fgbitmap(bitmap, cliprect);
 
@@ -115,7 +116,7 @@ VIDEO_UPDATE( galpanic )
 VIDEO_UPDATE( comad )
 {
 	/* copy the temporary bitmap to the screen */
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect);
+	copybitmap(bitmap,screen->machine->generic.tmpbitmap,0,0,0,0,cliprect);
 
 	draw_fgbitmap(bitmap,cliprect);
 

@@ -37,7 +37,7 @@ static INTERRUPT_GEN( gbusters_interrupt )
 static READ8_HANDLER( bankedram_r )
 {
 	if (palette_selected)
-		return paletteram[offset];
+		return space->machine->generic.paletteram.u8[offset];
 	else
 		return ram[offset];
 }
@@ -71,8 +71,8 @@ static WRITE8_HANDLER( gbusters_coin_counter_w )
 	palette_selected = ~data & 0x01;
 
 	/* bits 1 & 2 = coin counters */
-	coin_counter_w(0,data & 0x02);
-	coin_counter_w(1,data & 0x04);
+	coin_counter_w(space->machine, 0,data & 0x02);
+	coin_counter_w(space->machine, 1,data & 0x04);
 
 	/* bits 3 selects tilemap priority */
 	gbusters_priority = data & 0x08;
@@ -369,7 +369,7 @@ static MACHINE_RESET( gbusters )
 	/* mirror address for banked ROM */
 	memcpy(&RAM[0x18000], &RAM[0x10000], 0x08000 );
 
-	paletteram = &RAM[0x30000];
+	machine->generic.paletteram.u8 = &RAM[0x30000];
 }
 
 

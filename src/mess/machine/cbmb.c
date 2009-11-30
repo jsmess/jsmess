@@ -451,7 +451,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 // 128u4 FIXME
 //  vic2_frame_interrupt (device);
 
-	set_led_status(1, input_port_read(machine, "SPECIAL") & 0x04 ? 1 : 0);		/* Shift Lock */
+	set_led_status(machine, 1, input_port_read(machine, "SPECIAL") & 0x04 ? 1 : 0);		/* Shift Lock */
 }
 
 

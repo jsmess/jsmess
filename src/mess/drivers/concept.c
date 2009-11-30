@@ -44,7 +44,7 @@ static ADDRESS_MAP_START(concept_memmap, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x020000, 0x021fff) AM_ROM										/* macsbugs ROM (optional) */
 	AM_RANGE(0x030000, 0x03ffff) AM_READWRITE(concept_io_r,concept_io_w)	/* I/O space */
 
-	AM_RANGE(0x080000, 0x0fffff) AM_RAM AM_BASE(&videoram16)/* AM_RAMBANK(2) */	/* DRAM */
+	AM_RANGE(0x080000, 0x0fffff) AM_RAM AM_BASE_GENERIC(videoram)/* AM_RAMBANK(2) */	/* DRAM */
 ADDRESS_MAP_END
 
 /* init with simple, fixed, B/W palette */

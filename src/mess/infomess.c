@@ -27,13 +27,13 @@
     settings for a system
 -------------------------------------------------*/
 
-void print_game_categories(FILE *out, const game_driver *game, const input_port_config *portlist)
+void print_game_categories(FILE *out, const game_driver *game, const input_port_list *portlist)
 {
 	const input_port_config *port;
 	const input_field_config *field;
 
 	/* iterate looking for Categories */
-	for (port = portlist; port != NULL; port = port->next)
+	for (port = portlist->head; port != NULL; port = port->next)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (field->type == IPT_CATEGORY)
 			{
@@ -109,7 +109,7 @@ void print_game_device(FILE *out, const game_driver *game, const machine_config 
 }
 
 /* device iteration helpers */
-#define ram_first(config)				device_list_first((config)->devicelist, MESSRAM)
+#define ram_first(config)				device_list_first(&(config)->devicelist, MESSRAM)
 #define ram_next(previous)				((previous)->typenext)
 
 /*-------------------------------------------------

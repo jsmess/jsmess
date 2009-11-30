@@ -1470,7 +1470,7 @@ static void compis_gdc_start(running_machine *machine, const compis_gdc_interfac
 
 	gdc_mess.tmpbmp = auto_bitmap_alloc (machine, 640, 400, BITMAP_FORMAT_INDEXED16);
 	gdc_fifo_reset(&gdc);
-	videoram_size = gdc_mess.vramsize;
+	machine->generic.videoram_size = gdc_mess.vramsize;
 
 	VIDEO_START_CALL(generic_bitmapped);
 }

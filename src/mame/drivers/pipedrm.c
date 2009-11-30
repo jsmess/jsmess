@@ -284,8 +284,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram)
-	AM_RANGE(0xd000, 0xffff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xd000, 0xffff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
 ADDRESS_MAP_END
 
 
@@ -712,7 +712,7 @@ ROM_START( pipedrm )
 	ROM_REGION( 0x80000, "ymsnd", 0 )
 	ROM_LOAD( "g71.u118", 0x00000, 0x80000, CRC(488e2fd1) SHA1(8ef8ceb2bd36a245138802f51babf62f17c30942) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
 	ROM_LOAD( "g72.u83", 0x00000, 0x80000, CRC(dc3d14be) SHA1(4220f3fd13487dd861ac84b1b0d3e92125b3cc19) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
@@ -746,7 +746,7 @@ ROM_START( pipedrmu )
 	ROM_REGION( 0x80000, "ymsnd", 0 )
 	ROM_LOAD( "g71.u118", 0x00000, 0x80000, CRC(488e2fd1) SHA1(8ef8ceb2bd36a245138802f51babf62f17c30942) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
 	ROM_LOAD( "g72.u83", 0x00000, 0x80000, CRC(dc3d14be) SHA1(4220f3fd13487dd861ac84b1b0d3e92125b3cc19) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
@@ -781,7 +781,7 @@ ROM_START( pipedrmj )
 	ROM_REGION( 0x80000, "ymsnd", 0 )
 	ROM_LOAD( "g71.u118", 0x00000, 0x80000, CRC(488e2fd1) SHA1(8ef8ceb2bd36a245138802f51babf62f17c30942) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
 	ROM_LOAD( "g72.u83", 0x00000, 0x80000, CRC(dc3d14be) SHA1(4220f3fd13487dd861ac84b1b0d3e92125b3cc19) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
@@ -846,10 +846,10 @@ ROM_END
 static DRIVER_INIT( pipedrm )
 {
 	/* sprite RAM lives at the end of palette RAM */
-	spriteram = &paletteram[0xc00];
-	spriteram_size = 0x400;
+	machine->generic.spriteram.u8 = &machine->generic.paletteram.u8[0xc00];
+	machine->generic.spriteram_size = 0x400;
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xcc00, 0xcfff, 0, 0, (read8_space_func)SMH_BANK(3), (write8_space_func)SMH_BANK(3));
-	memory_set_bankptr(machine, 3, spriteram);
+	memory_set_bankptr(machine, 3, machine->generic.spriteram.v);
 }
 
 

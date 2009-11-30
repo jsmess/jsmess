@@ -94,8 +94,8 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 		data >>= 8;
 
 		/* bits 0-1 are coin counters */
-		coin_counter_w(0,data & 0x01);
-		coin_counter_w(1,data & 0x02);
+		coin_counter_w(space->machine, 0,data & 0x01);
+		coin_counter_w(space->machine, 1,data & 0x02);
 
 		/* bit 2 selects layer priority */
 		gradius3_priority = data & 0x04;
@@ -174,7 +174,7 @@ static WRITE8_DEVICE_HANDLER( sound_bank_w )
 static ADDRESS_MAP_START( gradius3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(cpuA_ctrl_w)	/* halt cpu B, irq enable, priority, coin counters, other? */
 	AM_RANGE(0x0c8000, 0x0c8001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c8002, 0x0c8003) AM_READ_PORT("P1")

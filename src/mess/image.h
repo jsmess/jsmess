@@ -17,7 +17,6 @@
 #include "osdmess.h"
 
 
-
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -37,7 +36,7 @@ typedef int (*device_image_verify_func)(const UINT8 *buf, size_t size);
 typedef void (*device_display_func)(const device_config *image);
 typedef void (*device_image_partialhash_func)(char *, const unsigned char *, unsigned long, unsigned int);
 typedef const char *(*device_get_name_func)(const device_config *device, char *buffer, size_t buffer_length);
-typedef void (*device_get_image_devices_func)(const device_config *device, device_config **listheadptr);
+typedef void (*device_get_image_devices_func)(const device_config *device, device_list *devlist);
 
 typedef enum
 {
@@ -338,6 +337,6 @@ const device_config *image_from_absolute_index(running_machine *machine, int abs
 #define DEVICE_GET_NAME(name)               const char *DEVICE_GET_NAME_NAME(name)(const device_config *device, char *buffer, size_t buffer_length)
 
 #define DEVICE_GET_IMAGE_DEVICES_NAME(name) device_get_image_devices_##name
-#define DEVICE_GET_IMAGE_DEVICES(name)      void DEVICE_GET_IMAGE_DEVICES_NAME(name)(const device_config *device, device_config **listheadptr)
+#define DEVICE_GET_IMAGE_DEVICES(name)      void DEVICE_GET_IMAGE_DEVICES_NAME(name)(const device_config *device, device_list *devlist)
 
 #endif /* __IMAGE_H__ */

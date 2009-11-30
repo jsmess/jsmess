@@ -5,7 +5,7 @@ static tilemap *bg_tilemap, *fg_tilemap;
 
 WRITE16_HANDLER( tigeroad_videoram_w )
 {
-	COMBINE_DATA(&videoram16[offset]);
+	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
@@ -37,13 +37,13 @@ WRITE16_HANDLER( tigeroad_videoctrl_w )
 
 		/* bits 4-5 are coin lockouts */
 
-		coin_lockout_w(0, !(data & 0x10));
-		coin_lockout_w(1, !(data & 0x20));
+		coin_lockout_w(space->machine, 0, !(data & 0x10));
+		coin_lockout_w(space->machine, 1, !(data & 0x20));
 
 		/* bits 6-7 are coin counters */
 
-		coin_counter_w(0, data & 0x40);
-		coin_counter_w(1, data & 0x80);
+		coin_counter_w(space->machine, 0, data & 0x40);
+		coin_counter_w(space->machine, 1, data & 0x80);
 	}
 }
 
@@ -66,8 +66,8 @@ WRITE16_HANDLER( tigeroad_scroll_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
-	UINT16 *source = &buffered_spriteram16[spriteram_size/2] - 4;
-	UINT16 *finish = buffered_spriteram16;
+	UINT16 *source = &machine->generic.buffered_spriteram.u16[machine->generic.spriteram_size/2] - 4;
+	UINT16 *finish = machine->generic.buffered_spriteram.u16;
 
 	// TODO: The Track Map should probably be drawn on top of the background tilemap...
 	//       Also convert the below into a for loop!
@@ -124,7 +124,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int data = videoram16[tile_index];
+	int data = machine->generic.videoram.u16[tile_index];
 	int attr = data >> 8;
 	int code = (data & 0xff) + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5);
 	int color = attr & 0x0f;

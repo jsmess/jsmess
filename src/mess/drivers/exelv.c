@@ -101,7 +101,7 @@ static MACHINE_RESET( exelv )
 
 static INTERRUPT_GEN( exelv_hblank_interrupt )
 {
-	tms3556_interrupt();
+	tms3556_interrupt(device->machine);
 }
 
 /*static DEVICE_IMAGE_LOAD(exelv_cart)

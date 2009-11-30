@@ -589,7 +589,7 @@ WRITE8_HANDLER ( msx_psg_port_b_w )
 {
 	/* Arabic or kana mode led */
 	if ( (data ^ msx1.psg_b) & 0x80)
-		set_led_status (2, !(data & 0x80) );
+		set_led_status (space->machine, 2, !(data & 0x80) );
 
 	if ( (msx1.psg_b ^ data) & 0x10)
 	{
@@ -767,7 +767,7 @@ static WRITE8_DEVICE_HANDLER ( msx_ppi_port_c_w )
 
 	/* caps lock */
 	if ( (old_val ^ data) & 0x40)
-		set_led_status (1, !(data & 0x40) );
+		set_led_status (device->machine,1, !(data & 0x40) );
 
 	/* key click */
 	if ( (old_val ^ data) & 0x80)

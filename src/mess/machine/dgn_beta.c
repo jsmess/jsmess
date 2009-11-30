@@ -387,7 +387,7 @@ static void SetDefaultTask(running_machine *machine)
 
 	/* Map video ram to base of area it can use, that way we can take the literal RA */
 	/* from the 6845 without having to mask it ! */
-	videoram=&messram_get_ptr(devtag_get_device(machine, "messram"))[TextVidBasePage*RamPageSize];
+	machine->generic.videoram.u8=&messram_get_ptr(devtag_get_device(machine, "messram"))[TextVidBasePage*RamPageSize];
 }
 
 // Return the value of a page register
@@ -1126,7 +1126,7 @@ static void dgnbeta_reset(running_machine *machine)
 	wd17xx_set_density(fdc, DEN_MFM_LO);
 	wd17xx_set_drive(fdc, 0);
 
-	videoram = messram_get_ptr(devtag_get_device(machine, "messram"));		/* Point video ram at the start of physical ram */
+	machine->generic.videoram.u8 = messram_get_ptr(devtag_get_device(machine, "messram"));		/* Point video ram at the start of physical ram */
 }
 
 

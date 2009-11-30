@@ -368,6 +368,7 @@ const game_driver * const drivers[] =
 	DRIVER( guzzler )	/* (c) 1983 Tehkan */
 	DRIVER( cannonb )	/* (c) 1985 Soft */
 	DRIVER( cannonb2 )	/* (c) 1985 TV Game Gruenberg */
+	DRIVER( cannonb3 )	/* (c) 1985 Soft */
 	DRIVER( ckongb )	/* bootleg */
 
 	/* Nichibutsu games */
@@ -919,6 +920,7 @@ const game_driver * const drivers[] =
 
 	/* Namco System 23 */
 	DRIVER( rapidrvr )	/* (c) 1997 */
+	DRIVER( finlflng )	/* (c) 1997 */
 	DRIVER( motoxgo )	/* (c) 1997 */
 	DRIVER( timecrs2 )	/* (c) 1997 */
 	DRIVER( timecrs2b )	/* (c) 1997 */
@@ -926,6 +928,27 @@ const game_driver * const drivers[] =
 	DRIVER( 500gp )		/* (c) 1999 */
 	DRIVER( finfurl2 )	/* (c) 1999 */
 	DRIVER( finfurl2j )	/* (c) 1999 */
+
+	/* Namco System 246 */
+	DRIVER( sys246 )
+	DRIVER( dragchrn )
+	DRIVER( netchu02 )
+	DRIVER( soulclb2 )
+	DRIVER( soulcl2a )
+	DRIVER( tekken4 )
+	DRIVER( tekken4a )
+	DRIVER( tekken4b )
+	DRIVER( zgundm )
+	DRIVER( fghtjam )
+	DRIVER( sukuinuf )
+	DRIVER( zgundmdx )
+	DRIVER( soulclb3 )
+	DRIVER( kinniku )
+	DRIVER( taiko9 )
+
+	/* Namco System 256 */
+	DRIVER( sys256 )
+	DRIVER( tekken51 )
 
 	/* Misc Namco games */
 	DRIVER( 20pacgal )	/* (c) 2000 Ver 1.04 */
@@ -1178,6 +1201,7 @@ const game_driver * const drivers[] =
 	DRIVER( kinstb )	/* bootleg */
 	DRIVER( ffight2b )	/* bootleg */
 	DRIVER( sblast2b )	/* bootleg */
+	DRIVER( iron )	    /* bootleg */
 
 	/* Midway 8080 b/w games */
 	DRIVER( seawolf )	/* 596 [1976] */
@@ -1318,8 +1342,10 @@ const game_driver * const drivers[] =
 	DRIVER( spacezap )	/* (c) 1980 */
 	DRIVER( ebases )	/* (c) 1980 */
 	DRIVER( wow )		/* (c) 1980 */
+	DRIVER( wowg )		/* (c) 1980 */
 	DRIVER( gorf )		/* (c) 1981 */
 	DRIVER( gorfpgm1 )	/* (c) 1981 */
+	DRIVER( gorfpgm1g )	/* (c) 1981 */
 	DRIVER( robby )		/* (c) 1981 Bally Midway */
 	DRIVER( demndrgn )	/* (c) 1982 Bally Midway */
 	DRIVER( profpac )	/* (c) 1983 Bally Midway */
@@ -2782,6 +2808,7 @@ V-V                           TP-027
 	DRIVER( spf2t )		/* 20/06/1996 (c) 1996 (US) */
 	DRIVER( spf2xj )	/* 31/05/1996 (c) 1996 (Japan) */
 	DRIVER( spf2ta )	/* 29/05/1996 (c) 1996 (Asia) */
+	DRIVER( spf2th )	/* 31/05/1996 (c) 1996 (Hispanic) */
 	DRIVER( qndream )	/* 26/06/1996 (c) 1996 (Japan) */
 	DRIVER( megaman2 )	/* 08/07/1996 (c) 1996 (US) */
 	DRIVER( megaman2a )	/* 08/07/1996 (c) 1996 (Asia) */
@@ -4391,6 +4418,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( zombrvn )	/* 1999.02 Zombie Revenge */
 	DRIVER( airlbios )	/* 1999.03 Airline Pilots */
 	DRIVER( alpiltdx )
+	DRIVER( alpilota )
 	DRIVER( ggram2 )	/* 1999.04 Giant Gram Zen Nippon Pro-wres 2 */
 						/* 1999.05 Taisen Puzzle Kurutto Stone */
 						/* 1999.06 Ringout 4x4 */
@@ -4404,7 +4432,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( toyfight )	/* 1999.09 Toy Fighter */
 	DRIVER( jambo )		/* 1999.09 Jambo! Safari */
 						/* 1999.09 Super Major League 99 */
-						/* 1999.10 Sega Tetris */
+	DRIVER( sgtetris )	/* 1999.10 Sega Tetris */
 	DRIVER( derbyoc )	/* 1999.10 Derby Owners Club */
 	DRIVER( doa2 )		/* 1999.11 Dead or Alive 2 */
 	DRIVER( otrigger )	/* 1999.11 Out Trigger */
@@ -4608,6 +4636,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( rangrmsn )	/* 2004.03 Ranger Mission */
 	DRIVER( salmankt )	/* 2004.06 Salary Man Kintarou Net Select */
 	DRIVER( kofnw )		/* 2004.07 The King of Fighters Neo Wave */
+	DRIVER( kofnwj )       	/* 2004.07 The King of Fighters Neo Wave (Japan) */
 	DRIVER( xtrmhunt )	/* 2004.09 Extreme Hunting */
 						/* 2004.09 Dirty Pig Skin Football */
 						/* 2004.09 Faster than Speed */
@@ -5424,6 +5453,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ssridersb )	/* bootleg */
 	DRIVER( xmen )		/* GX065 (c) 1992 (US) */
 	DRIVER( xmenj )		/* GX065 (c) 1992 (Japan) */
+	DRIVER( xmene )		/* GX065 (c) 1992 (Europe) */
 	DRIVER( xmen2pe )	/* GX065 (c) 1992 (World) */
 	DRIVER( xmen2pa )	/* GX065 (c) 1992 (Asia) */
 	DRIVER( xmen2pj )	/* GX065 (c) 1992 (Japan) */
@@ -8107,6 +8137,7 @@ Other Sun games
 	DRIVER( spiders )	/* (c) 1981 Sigma Ent. Inc. */
 	DRIVER( spiders2 )	/* (c) 1981 Sigma Ent. Inc. */
 	DRIVER( spinner )	/* bootleg */
+	DRIVER( sub )		/* (c) 1985 Sigma Ent. Inc. */
 
 	/* IGS games ( www.igs.com.tw ) */
 	DRIVER( goldstar )	/* (c) 198? IGS */
@@ -8901,10 +8932,12 @@ Other Sun games
 	DRIVER( cubeqst )	/* (c) 1983 Simutrek Inc. */
 	DRIVER( pkscram )	/* (c) 1993 Cosmo Electronics Corporation */
 
-	/* Impera */
-	DRIVER( magicard )	/* (c) 199? */
-	DRIVER( magicarda )	/* (c) 199? */
-	DRIVER( magicardb )	/* (c) 199? */
+	/* Impera CD-I based */
+	DRIVER( magicard )	/* (c) 199? Impera */
+	DRIVER( magicarda )	/* (c) 199? Impera */
+	DRIVER( magicardb )	/* (c) 199? Impera */
+	DRIVER( magicardj )	/* (c) 1998 Impera */
+	DRIVER( magicle )	/* (c) 1998 Impera */
 
 	/* Funworld */
 	DRIVER( jollycrd )	/* (c) 1985 TAB-Austria */
@@ -9621,19 +9654,34 @@ Other Sun games
 	/* Hi-Soft */
 	DRIVER( himesiki )	/* (c) 1989 Hi-Soft */
 
-	/* Draw Poker Hi-Lo based */
-	DRIVER( norautp )	/* (c) 1988? Noraut Ltd */
-	DRIVER( norautjp )	/* (c) 1988? Noraut Ltd */
-	DRIVER( norautrh )	/* (c) 1988? Noraut Ltd */
-	DRIVER( norautu )	/* (c) 1988? Noraut Ltd */
-	DRIVER( norautv3 )	/* (c) 1988? Noraut Ltd */
-	DRIVER( norautpn )	/* (c) 1990? unknown */
-	DRIVER( pma )		/* PMA */
-	DRIVER( dphl )		/* (c) M. Kramer Inc. 1983 */
+	/* Draw Poker Hi-Lo based (z80) */
+	DRIVER( norautp )	/* (c) 1988 Noraut Ltd. */
+	DRIVER( norautdx )	/* (c) 198? Noraut Ltd. */
+	DRIVER( norautpn )	/* (c) 199? unknown */
+	DRIVER( norautjo )	/* (c) 198? Noraut Ltd. */
+	DRIVER( norautjp )	/* (c) 198? Noraut Ltd. */
+	DRIVER( norautrh )	/* (c) 198? Noraut Ltd. */
+	DRIVER( norautra )	/* (c) 198? Noraut Ltd. */
+	DRIVER( norautu )	/* (c) 198? Noraut Ltd. */
+	DRIVER( noraut3a )	/* (c) 2002 Noraut Ltd. */
+	DRIVER( noraut3b )	/* (c) 2003 Noraut Ltd. */
+	DRIVER( norautua )	/* (c) 198? Noraut Ltd. */
+	DRIVER( norautub )	/* (c) 198? Noraut Ltd. */
+	DRIVER( mainline )	/* (c) Mainline London */
+	DRIVER( df_djpkr )	/* (c) DellFern Ltd. */
+	DRIVER( ndxron10 )	/* 2005, unknown */
+	DRIVER( cgip30cs )	/* (c) 1999, CGI */
+	DRIVER( pma )		/* 1983, PMA */
+	DRIVER( bjpoker )	/* (c) M. Kramer Inc. */
+
+	/* Draw Poker Hi-Lo based (i8080) */
+	DRIVER( dphl )		/* (c) 1983 M. Kramer Inc. */
 	DRIVER( dphla )		/* unknown */
-	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
 	DRIVER( dphljp )	/* unknown */
+	DRIVER( kimbldhl )	/* (c) 198?, Kimble Ireland */
+	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
 	DRIVER( smshilo )	/* (c) 1983 SMS Manufacturing Corp. */
+	DRIVER( drhl )		/* (c) Drew, Inc. */
 	DRIVER( tpoker2 )	/* (c) 1993 Micro Manufacturing, Inc. */
 
 	/* Sanki Denshi Kogyo */

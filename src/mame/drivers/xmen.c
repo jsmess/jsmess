@@ -95,7 +95,7 @@ logerror("%06x: write %04x to 108000\n",cpu_get_pc(space->cpu),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = coin counter */
-		coin_counter_w(0, data & 0x01);
+		coin_counter_w(space->machine, 0, data & 0x01);
 
 		/* bit 2 is data */
 		/* bit 3 is clock (active high) */
@@ -163,7 +163,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(K053247_word_r, K053247_word_w)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
 	AM_RANGE(0x108020, 0x108027) AM_WRITE(K053246_word_w)
 	AM_RANGE(0x10804c, 0x10804d) AM_WRITE(sound_cmd_w)
@@ -199,7 +199,7 @@ static ADDRESS_MAP_START( 6p_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x101000, 0x101fff) AM_RAM
 	AM_RANGE(0x102000, 0x102fff) AM_RAM AM_BASE(&xmen6p_spriteramright)	/* sprites (screen 2) */
 	AM_RANGE(0x103000, 0x103fff) AM_RAM		/* 6p - a buffer? */
-	AM_RANGE(0x104000, 0x104fff) AM_READWRITE(SMH_RAM,paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x104000, 0x104fff) AM_READWRITE(SMH_RAM,paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
 	AM_RANGE(0x108020, 0x108027) AM_WRITE(K053246_word_w) /* sprites */
 	AM_RANGE(0x10804c, 0x10804d) AM_WRITE(sound_cmd_w)
@@ -570,6 +570,31 @@ ROM_START( xmenj )
 	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
 ROM_END
 
+ROM_START( xmene )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "065-eba04.10d",  0x00000, 0x20000, CRC(3588c5ec) SHA1(7966e7259038468845dafd19e5f7fc576c2901fa) ) /* Europe 4 Player version */
+	ROM_LOAD16_BYTE( "065-eba05.10f",  0x00001, 0x20000, CRC(79ce32f8) SHA1(1a21b38d4a82103d78e246aca68ed3e4afaf60f3) )
+	ROM_LOAD16_BYTE( "065-a02.9d",     0x80000, 0x40000, CRC(b31dc44c) SHA1(4bdac05826b4d6d4fe46686ede5190e2f73eefc5) )
+	ROM_LOAD16_BYTE( "065-a03.9f",     0x80001, 0x40000, CRC(13842fe6) SHA1(b61f094eb94336edb8708d3437ead9b853b2d6e6) )
+
+	ROM_REGION( 0x30000, "audiocpu", 0 )		/* 64k+128k for sound cpu */
+	ROM_LOAD( "065-a01.6f",   0x00000, 0x20000, CRC(147d3a4d) SHA1(a14409fe991e803b9e7812303e3a9ebd857d8b01) )
+	ROM_RELOAD(               0x10000, 0x20000 )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_LOAD( "065-a08.15l",   0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )	/* tiles */
+	ROM_LOAD( "065-a07.16l",   0x100000, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_LOAD( "065-a09.2h",  0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) )	/* sprites */
+	ROM_LOAD( "065-a10.2l",  0x100000, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
+	ROM_LOAD( "065-a12.1h",  0x200000, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
+	ROM_LOAD( "065-a11.1l",  0x300000, 0x100000, CRC(46da948e) SHA1(168ac9178ee5bad5931557fb549e1237971d7839) )
+
+	ROM_REGION( 0x200000, "konami", 0 )	/* samples for the 054539 */
+	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
+ROM_END
+
 ROM_START( xmen2pe )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "065-eaa04.10d",  0x00000, 0x20000, CRC(502861e7) SHA1(f96aab2d2006703065de5bd7e341f929d04f5f60) ) /* Europe 2 Player version */
@@ -761,6 +786,7 @@ static DRIVER_INIT( xmen )
 
 GAME( 1992, xmen,    0,    xmen, xmen,   xmen,   ROT0, "Konami", "X-Men (4 Players ver UBB)", 0 ) /* Second "version" letter denotes players, A=2 players, B=4 players, C=6 players ??? */
 GAME( 1992, xmenj,   xmen, xmen, xmen,   xmen,   ROT0, "Konami", "X-Men (4 Players ver JBA)", 0 )
+GAME( 1992, xmene,   xmen, xmen, xmen,   xmen,   ROT0, "Konami", "X-Men (4 Players ver EBA)", 0 )
 GAME( 1992, xmen2pe, xmen, xmen, xmen2p, xmen,   ROT0, "Konami", "X-Men (2 Players ver EAA)", 0 )
 GAME( 1992, xmen2pa, xmen, xmen, xmen2p, xmen,   ROT0, "Konami", "X-Men (2 Players ver AAA)", 0 )
 GAME( 1992, xmen2pj, xmen, xmen, xmen2p, xmen,   ROT0, "Konami", "X-Men (2 Players ver JAA)", 0 )

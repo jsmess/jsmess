@@ -262,9 +262,9 @@ static void gb_select_sprites( void )
 	}
 }
 
-INLINE void gb_update_sprites ( void )
+INLINE void gb_update_sprites ( running_machine *machine )
 {
-	bitmap_t *bitmap = tmpbitmap;
+	bitmap_t *bitmap = machine->generic.tmpbitmap;
 	UINT8 height, tilemask, line, *oam, *vram;
 	int i, yindex;
 
@@ -351,7 +351,7 @@ INLINE void gb_update_sprites ( void )
 
 static void gb_update_scanline( running_machine *machine )
 {
-	bitmap_t *bitmap = tmpbitmap;
+	bitmap_t *bitmap = machine->generic.tmpbitmap;
 
 	profiler_mark_start(PROFILER_VIDEO);
 
@@ -472,7 +472,7 @@ static void gb_update_scanline( running_machine *machine )
 			}
 			if ( gb_lcd.end_x == 160 && LCDCONT & 0x02 )
 			{
-				gb_update_sprites();
+				gb_update_sprites(machine);
 			}
 			gb_lcd.start_x = gb_lcd.end_x;
 		}
@@ -501,9 +501,9 @@ static void gb_update_scanline( running_machine *machine )
 
 /* --- Super Game Boy Specific --- */
 
-INLINE void sgb_update_sprites (void)
+INLINE void sgb_update_sprites (running_machine *machine)
 {
-	bitmap_t *bitmap = tmpbitmap;
+	bitmap_t *bitmap = machine->generic.tmpbitmap;
 	UINT8 height, tilemask, line, *oam, *vram, pal;
 	INT16 i, yindex;
 
@@ -596,13 +596,13 @@ INLINE void sgb_update_sprites (void)
 	}
 }
 
-static void sgb_refresh_border(void)
+static void sgb_refresh_border(running_machine *machine)
 {
 	UINT16 data, data2;
 	UINT16 yidx, xidx, xindex;
 	UINT8 *map, *tiles, *tiles2;
 	UINT8 pal, i;
-	bitmap_t *bitmap = tmpbitmap;
+	bitmap_t *bitmap = machine->generic.tmpbitmap;
 
 	map = sgb_tile_map - 64;
 
@@ -671,7 +671,7 @@ static void sgb_refresh_border(void)
 
 static void sgb_update_scanline( running_machine *machine )
 {
-	bitmap_t *bitmap = tmpbitmap;
+	bitmap_t *bitmap = machine->generic.tmpbitmap;
 
 	profiler_mark_start(PROFILER_VIDEO);
 
@@ -757,7 +757,7 @@ static void sgb_update_scanline( running_machine *machine )
 			/* Draw the "border" if we're on the first line */
 			if ( gb_lcd.current_line == 0 )
 			{
-				sgb_refresh_border();
+				sgb_refresh_border(machine);
 			}
 		}
 		if ( cycles_to_go < 160 )
@@ -835,7 +835,7 @@ static void sgb_update_scanline( running_machine *machine )
 			}
 			if ( ( gb_lcd.end_x == 160 ) && ( LCDCONT & 0x02 ) )
 			{
-				sgb_update_sprites();
+				sgb_update_sprites(machine);
 			}
 			gb_lcd.start_x = gb_lcd.end_x;
 		}
@@ -869,7 +869,7 @@ static void sgb_update_scanline( running_machine *machine )
 
 INLINE void cgb_update_sprites ( running_machine *machine )
 {
-	bitmap_t *bitmap = tmpbitmap;
+	bitmap_t *bitmap = machine->generic.tmpbitmap;
 	UINT8 height, tilemask, line, *oam;
 	int i, xindex, yindex;
 
@@ -981,7 +981,7 @@ INLINE void cgb_update_sprites ( running_machine *machine )
 
 static void cgb_update_scanline ( running_machine *machine )
 {
-	bitmap_t *bitmap = tmpbitmap;
+	bitmap_t *bitmap = machine->generic.tmpbitmap;
 
 	profiler_mark_start(PROFILER_VIDEO);
 

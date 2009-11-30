@@ -131,7 +131,7 @@ static MACHINE_START( segac2 )
 
 static MACHINE_RESET( segac2 )
 {
-	megadrive_ram = generic_nvram16;
+	megadrive_ram = machine->generic.nvram.u16;
 
 	/* set up interrupts and such */
 	MACHINE_RESET_CALL(megadriv);
@@ -212,7 +212,7 @@ static READ16_HANDLER( palette_r )
 	offset &= 0x1ff;
 	if (segac2_alt_palette_mode)
 		offset = ((offset << 1) & 0x100) | ((offset << 2) & 0x80) | ((~offset >> 2) & 0x40) | ((offset >> 1) & 0x20) | (offset & 0x1f);
-	return paletteram16[offset + palbank * 0x200];
+	return space->machine->generic.paletteram.u16[offset + palbank * 0x200];
 }
 
 /* handle writes to the paletteram */
@@ -228,8 +228,8 @@ static WRITE16_HANDLER( palette_w )
 	offset += palbank * 0x200;
 
 	/* combine data */
-	COMBINE_DATA(&paletteram16[offset]);
-	newword = paletteram16[offset];
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	newword = space->machine->generic.paletteram.u16[offset];
 
 	/* up to 8 bits */
 	r = ((newword << 1) & 0x1e) | ((newword >> 12) & 0x01);
@@ -401,10 +401,10 @@ static WRITE16_HANDLER( io_chip_w )
              D1 : To CN1 pin J. (Coin meter 2)
              D0 : To CN1 pin 8. (Coin meter 1)
             */
-/*          coin_lockout_w(1, data & 0x08);
-            coin_lockout_w(0, data & 0x04); */
-			coin_counter_w(1, data & 0x02);
-			coin_counter_w(0, data & 0x01);
+/*          coin_lockout_w(space->machine, 1, data & 0x08);
+            coin_lockout_w(space->machine, 0, data & 0x04); */
+			coin_counter_w(space->machine, 1, data & 0x02);
+			coin_counter_w(space->machine, 0, data & 0x01);
 			break;
 
 		/* banking */
@@ -565,8 +565,8 @@ static WRITE16_HANDLER( counter_timer_w )
 				break;
 
 			case 0x10:	/* coin counter */
-//              coin_counter_w(0,1);
-//              coin_counter_w(0,0);
+//              coin_counter_w(space->machine, 0,1);
+//              coin_counter_w(space->machine, 0,0);
 				break;
 
 			case 0x12:	/* set coinage info -- followed by two 4-bit values */
@@ -627,9 +627,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x840000, 0x84001f) AM_MIRROR(0x13fee0) AM_READWRITE(io_chip_r, io_chip_w)
 	AM_RANGE(0x840100, 0x840107) AM_MIRROR(0x13fef8) AM_DEVREADWRITE8("ymsnd", ym3438_r, ym3438_w, 0x00ff)
 	AM_RANGE(0x880100, 0x880101) AM_MIRROR(0x13fefe) AM_WRITE(counter_timer_w)
-	AM_RANGE(0x8c0000, 0x8c0fff) AM_MIRROR(0x13f000) AM_READWRITE(palette_r, palette_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x8c0000, 0x8c0fff) AM_MIRROR(0x13f000) AM_READWRITE(palette_r, palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x18ff00) AM_READWRITE(megadriv_vdp_r, megadriv_vdp_w)
-	AM_RANGE(0xe00000, 0xe0ffff) AM_MIRROR(0x1f0000) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_MIRROR(0x1f0000) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 ADDRESS_MAP_END
 
 

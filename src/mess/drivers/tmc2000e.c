@@ -233,7 +233,7 @@ static WRITE_LINE_DEVICE_HANDLER( tmc2000e_q_w )
 
 	// set Q led status
 
-	set_led_status(1, state);
+	set_led_status(device->machine, 1, state);
 
 	// tape out
 

@@ -1345,7 +1345,7 @@ MSX_SLOT_WRITE(diskrom)
 		wd17xx_set_drive (fdc,val & 1);
 		if ((state->mem[0x3ffd] ^ val) & 0x40)
 		{
-			set_led_status (0, !(val & 0x40));
+			set_led_status (machine, 0, !(val & 0x40));
 		}
 		state->mem[0x3ffd] = (val | 0x7c) & ~0x04;
 		break;
@@ -1467,7 +1467,7 @@ MSX_SLOT_WRITE(diskrom2)
 		wd17xx_set_drive (fdc,val & 1);
 		if ((state->mem[0x3fbc] ^ val) & 0x40)
 		{
-			set_led_status (0, !(val & 0x40));
+			set_led_status (machine, 0, !(val & 0x40));
 		}
 		state->mem[0x3fbc] = (val | 0x7c) & ~0x04;
 		break;

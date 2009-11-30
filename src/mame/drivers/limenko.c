@@ -25,7 +25,7 @@
 
 #include "driver.h"
 #include "cpu/e132xs/e132xs.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/okim6295.h"
 #include "cpu/mcs51/mcs51.h"
 
@@ -46,34 +46,25 @@ static void draw_sprites(running_machine *machine, UINT32 *sprites, const rectan
   MISC FUNCTIONS
 *****************************************************************************************************/
 
-static WRITE32_HANDLER( eeprom_w )
-{
-	// data & 0x80000 -> video disabled?
-
-	eeprom_write_bit(data & 0x40000);
-	eeprom_set_cs_line((data & 0x10000) ? CLEAR_LINE : ASSERT_LINE );
-	eeprom_set_clock_line((data & 0x20000) ? ASSERT_LINE : CLEAR_LINE );
-}
-
 static WRITE32_HANDLER( limenko_coincounter_w )
 {
-	coin_counter_w(0,data & 0x10000);
+	coin_counter_w(space->machine,0,data & 0x10000);
 }
 
 static WRITE32_HANDLER( limenko_paletteram_w )
 {
 	UINT16 paldata;
-	COMBINE_DATA(&paletteram32[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
 	if(ACCESSING_BITS_0_15)
 	{
-		paldata = paletteram32[offset] & 0x7fff;
+		paldata = space->machine->generic.paletteram.u32[offset] & 0x7fff;
 		palette_set_color_rgb(space->machine, offset * 2 + 1, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
 	}
 
 	if(ACCESSING_BITS_16_31)
 	{
-		paldata = (paletteram32[offset] >> 16) & 0x7fff;
+		paldata = (space->machine->generic.paletteram.u32[offset] >> 16) & 0x7fff;
 		palette_set_color_rgb(space->machine, offset * 2 + 0, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
 	}
 }
@@ -123,12 +114,12 @@ static WRITE32_HANDLER( spriteram_buffer_w )
 	if(spriteram_bit)
 	{
 		// draw the sprites to the frame buffer
-		draw_sprites(space->machine,spriteram32_2,&clip,prev_sprites_count);
+		draw_sprites(space->machine,space->machine->generic.spriteram2.u32,&clip,prev_sprites_count);
 	}
 	else
 	{
 		// draw the sprites to the frame buffer
-		draw_sprites(space->machine,spriteram32,&clip,prev_sprites_count);
+		draw_sprites(space->machine,space->machine->generic.spriteram.u32,&clip,prev_sprites_count);
 	}
 
 	// buffer the next number of sprites to draw
@@ -145,9 +136,9 @@ static ADDRESS_MAP_START( limenko_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
 	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_BASE(&md_videoram)
 	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
-	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE(&spriteram32_2)
-	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE(limenko_paletteram_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE_GENERIC(spriteram2)
+	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE(limenko_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
 	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE(&limenko_videoreg)
 	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE(spriteram_buffer_w)
@@ -159,7 +150,7 @@ static ADDRESS_MAP_START( limenko_io_map, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x0800, 0x0803) AM_READ_PORT("IN1")
 	AM_RANGE(0x1000, 0x1003) AM_READ_PORT("IN2")
 	AM_RANGE(0x4000, 0x4003) AM_WRITE(limenko_coincounter_w)
-	AM_RANGE(0x4800, 0x4803) AM_WRITE(eeprom_w)
+	AM_RANGE(0x4800, 0x4803) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x5000, 0x5003) AM_WRITENOP // sound latch
 ADDRESS_MAP_END
 
@@ -172,9 +163,9 @@ static ADDRESS_MAP_START( spotty_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
 	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_BASE(&md_videoram)
 	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
-	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE(&spriteram32_2)
-	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE(limenko_paletteram_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE_GENERIC(spriteram2)
+	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE(limenko_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
 	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE(&limenko_videoreg)
 	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE(spriteram_buffer_w)
@@ -186,7 +177,7 @@ static ADDRESS_MAP_START( spotty_io_map, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x0800, 0x0803) AM_READ_PORT("IN1")
 	AM_RANGE(0x0800, 0x0803) AM_WRITENOP // hopper related
 	AM_RANGE(0x1000, 0x1003) AM_READ_PORT("IN2")
-	AM_RANGE(0x4800, 0x4803) AM_WRITE(eeprom_w)
+	AM_RANGE(0x4800, 0x4803) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x5000, 0x5003) AM_WRITE(spotty_soundlatch_w)
 ADDRESS_MAP_END
 
@@ -515,7 +506,7 @@ static INPUT_PORTS_START( legendoh )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_SPECIAL ) //security bit
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL) //eeprom
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -526,6 +517,12 @@ static INPUT_PORTS_START( legendoh )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(spriteram_bit_r, NULL) //changes spriteram location
 	PORT_BIT( 0x4000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+//  PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // 0x80000 -> video disabled?
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sb2003 )
@@ -558,13 +555,19 @@ static INPUT_PORTS_START( sb2003 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SPECIAL ) //security bit
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL) //eeprom
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_DIPNAME( 0x20000000, 0x00000000, "Sound Enable" )
 	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(spriteram_bit_r, NULL) //changes spriteram location
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1 ) // checked in dynabomb I/O test, but doesn't work in game
 	PORT_BIT( 0x5f00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+//  PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // 0x80000 -> video disabled?
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spotty )
@@ -597,12 +600,18 @@ static INPUT_PORTS_START( spotty )
 	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(spriteram_bit_r, NULL) //changes spriteram location
 	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SPECIAL ) //security bit
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL) //eeprom
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x20000000, DEF_STR( On ) )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x5f10ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+//  PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // 0x80000 -> video disabled?
 INPUT_PORTS_END
 
 /*****************************************************************************************************
@@ -637,7 +646,7 @@ static MACHINE_DRIVER_START( limenko )
 	MDRV_CPU_IO_MAP(limenko_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -665,7 +674,7 @@ static MACHINE_DRIVER_START( spotty )
 	MDRV_CPU_ADD("audiocpu", AT89C4051, 4000000)	/* 4 MHz */
 	MDRV_CPU_IO_MAP(spotty_sound_io_map)
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -144,7 +144,7 @@ static VIDEO_UPDATE( saa5050 )
 
 		for (sx = 0; sx < 40; sx++)
 		{
-			code = videoram[sy * 80 + sx];
+			code = screen->machine->generic.videoram.u8[sy * 80 + sx];
 			if (code < 32)
 			{
 				switch (code) {

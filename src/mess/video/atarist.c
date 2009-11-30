@@ -112,7 +112,7 @@ static TIMER_CALLBACK( atarist_shifter_tick )
 		break;
 	}
 
-	*BITMAP_ADDR32(tmpbitmap, y, x) = pen;
+	*BITMAP_ADDR32(machine->generic.tmpbitmap, y, x) = pen;
 }
 
 INLINE void atarist_shifter_load(running_machine *machine)

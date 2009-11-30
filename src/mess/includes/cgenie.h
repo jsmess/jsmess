@@ -55,7 +55,7 @@ WRITE8_HANDLER ( cgenie_data_w );
 WRITE8_HANDLER ( cgenie_motor_w );
 
  READ8_HANDLER ( cgenie_keyboard_r );
-int cgenie_videoram_r(int offset);
+int cgenie_videoram_r(running_machine *machine,int offset);
 WRITE8_HANDLER ( cgenie_videoram_w );
 
 // CRTC 6845

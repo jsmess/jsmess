@@ -168,7 +168,7 @@ VIDEO_UPDATE( hec2hrp )
 	else
         {
             video_screen_set_visarea(screen, 0, 113, 0, 75);
-            hector_hr( bitmap, videoram,  77, 32);
+            hector_hr( bitmap, screen->machine->generic.videoram.u8,  77, 32);
         }
 
     return 0;

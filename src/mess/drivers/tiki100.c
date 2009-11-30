@@ -219,10 +219,10 @@ static WRITE8_HANDLER( system_w )
 	floppy_drive_set_ready_state(get_floppy_image(space->machine, 1), BIT(data, 6), 1);
 
 	/* GRAFIKK key led */
-	set_led_status(1, BIT(data, 5));
+	set_led_status(space->machine, 1, BIT(data, 5));
 
 	/* LOCK key led */
-	set_led_status(2, BIT(data, 7));
+	set_led_status(space->machine, 2, BIT(data, 7));
 
 	/* bankswitch */
 	state->rome = BIT(data, 2);

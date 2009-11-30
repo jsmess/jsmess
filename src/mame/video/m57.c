@@ -166,8 +166,8 @@ WRITE8_HANDLER( m57_flipscreen_w )
 	state->flipscreen = (data & 0x01) ^ (~input_port_read(space->machine, "DSW2") & 0x01);
 	tilemap_set_flip(state->bg_tilemap, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	coin_counter_w(0,data & 0x02);
-	coin_counter_w(1,data & 0x20);
+	coin_counter_w(space->machine, 0,data & 0x02);
+	coin_counter_w(space->machine, 1,data & 0x20);
 }
 
 
@@ -226,7 +226,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
 	int offs;
 
-	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		UINT8 attributes = state->spriteram[offs + 1];
 		int sx = state->spriteram[offs + 3];

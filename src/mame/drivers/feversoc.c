@@ -72,6 +72,7 @@ static VIDEO_START( feversoc )
 
 static VIDEO_UPDATE( feversoc )
 {
+	UINT32 *spriteram32 = screen->machine->generic.spriteram.u32;
 	int offs,spr_offs,colour,sx,sy,h,w,dx,dy;
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]); //black pen
@@ -101,17 +102,17 @@ static VIDEO_UPDATE( feversoc )
 static WRITE32_HANDLER( fs_paletteram_w )
 {
 	int r,g,b;
-	COMBINE_DATA(&paletteram32[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
-	r = ((paletteram32[offset] & 0x001f0000)>>16) << 3;
-	g = ((paletteram32[offset] & 0x03e00000)>>16) >> 2;
-	b = ((paletteram32[offset] & 0x7c000000)>>16) >> 7;
+	r = ((space->machine->generic.paletteram.u32[offset] & 0x001f0000)>>16) << 3;
+	g = ((space->machine->generic.paletteram.u32[offset] & 0x03e00000)>>16) >> 2;
+	b = ((space->machine->generic.paletteram.u32[offset] & 0x7c000000)>>16) >> 7;
 
 	palette_set_color(space->machine,offset*2+0,MAKE_RGB(r,g,b));
 
-	r = (paletteram32[offset] & 0x001f) << 3;
-	g = (paletteram32[offset] & 0x03e0) >> 2;
-	b = (paletteram32[offset] & 0x7c00) >> 7;
+	r = (space->machine->generic.paletteram.u32[offset] & 0x001f) << 3;
+	g = (space->machine->generic.paletteram.u32[offset] & 0x03e0) >> 2;
+	b = (space->machine->generic.paletteram.u32[offset] & 0x7c00) >> 7;
 
 	palette_set_color(space->machine,offset*2+1,MAKE_RGB(r,g,b));
 }
@@ -129,18 +130,18 @@ static WRITE32_HANDLER( output_w )
 	if(ACCESSING_BITS_16_31)
 	{
 		/* probably eeprom stuff too */
-		coin_lockout_w(0,~data>>16 & 0x40);
-		coin_lockout_w(1,~data>>16 & 0x40);
-		coin_counter_w(0,data>>16 & 1);
+		coin_lockout_w(space->machine, 0,~data>>16 & 0x40);
+		coin_lockout_w(space->machine, 1,~data>>16 & 0x40);
+		coin_counter_w(space->machine, 0,data>>16 & 1);
 		//data>>16 & 2 coin out
-		coin_counter_w(1,data>>16 & 4);
+		coin_counter_w(space->machine, 1,data>>16 & 4);
 		//data>>16 & 8 coin hopper
 		okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), 0x40000 * (((data>>16) & 0x20)>>5));
 	}
 	if(ACCESSING_BITS_0_15)
 	{
 		/* -xxx xxxx lamps*/
-		coin_counter_w(2,data & 0x2000); //key in
+		coin_counter_w(space->machine, 2,data & 0x2000); //key in
 		//data & 0x4000 key out
 	}
 }
@@ -148,13 +149,13 @@ static WRITE32_HANDLER( output_w )
 static ADDRESS_MAP_START( feversoc_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
 	AM_RANGE(0x02000000, 0x0203dfff) AM_RAM //work ram
-	AM_RANGE(0x0203e000, 0x0203ffff) AM_RAM AM_BASE(&spriteram32)
+	AM_RANGE(0x0203e000, 0x0203ffff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x06000000, 0x06000003) AM_WRITE(output_w)
 	AM_RANGE(0x06000004, 0x06000007) AM_WRITENOP //???
 	AM_RANGE(0x06000008, 0x0600000b) AM_READ(in0_r)
 	AM_RANGE(0x0600000c, 0x0600000f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff0000)
 //  AM_RANGE(0x06010000, 0x06017fff) AM_RAM //contains RISE11 keys and other related stuff.
-	AM_RANGE(0x06018000, 0x06019fff) AM_RAM_WRITE(fs_paletteram_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x06018000, 0x06019fff) AM_RAM_WRITE(fs_paletteram_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
 static const gfx_layout spi_spritelayout =
