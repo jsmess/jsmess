@@ -44,11 +44,12 @@ static PALETTE_INIT( pokemini )
 	palette_set_color(machine, 3, MAKE_RGB(0x4e, 0x4e, 0x4e));
 }
 
+static const INT16 speaker_levels[] = {-32768, 0, 32767};
 
 static const speaker_interface pokemini_speaker_interface =
 {
 	3,				/* optional: number of different levels */
-	NULL			/* optional: level lookup table */
+	speaker_levels	/* optional: level lookup table */
 };
 
 static MACHINE_DRIVER_START( pokemini )
