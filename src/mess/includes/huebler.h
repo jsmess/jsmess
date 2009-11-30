@@ -12,6 +12,12 @@
 typedef struct _huebler_state huebler_state;
 struct _huebler_state
 {
+	/* keyboard state */
+	int keylatch;
+	UINT8 keydata;
+	int keystatus;
+	const UINT8 *keyboard_rom;
+
 	/* video state */
 	UINT8 *video_ram;
 	const UINT8 *char_rom;
