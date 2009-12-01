@@ -1231,9 +1231,10 @@ $(MESSOBJ)/sega.a:				\
 
 $(MESSOBJ)/sgi.a:				\
 	$(MESS_MACHINE)/sgi.o		\
+	$(MESS_DRIVERS)/sgi_ip2.o	\
+	$(MESS_DRIVERS)/sgi_ip6.o	\
 	$(MESS_DRIVERS)/ip20.o		\
 	$(MESS_DRIVERS)/ip22.o		\
-	$(MESS_DRIVERS)/ip6.o		\
 	$(MESS_VIDEO)/newport.o		\
 
 $(MESSOBJ)/sharp.a:				\

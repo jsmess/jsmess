@@ -1,22 +1,26 @@
-/*********************************************************************\
-*
-*   SGI IP6 4D/PI workstation
-*
-*   Skeleton driver by Harmony
-*
-*   Todo: Everything
-*
-*   Preliminary Memory map:
-*
-* 	1fc00000 - 1fc3ffff      BIOS
-*
-\*********************************************************************/
+/****************************************************************************
+
+	drivers/sgi_ip6.c
+	SGI 4D/PI IP6 family skeleton driver
+
+	by Harmony
+
+		0x1fc00000 - 0x1fc3ffff		ROM
+
+	Interrupts:
+		R2000:
+			NYI
+
+****************************************************************************/
 
 #include "driver.h"
 #include "cpu/mips/r3000.h"
 
-#define VERBOSE_LEVEL ( 99 )
+#define VERBOSE_LEVEL ( 0 )
 
+#define ENABLE_VERBOSE_LOG (1)
+
+#if ENABLE_VERBOSE_LOG
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
@@ -29,6 +33,26 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		logerror("%08x: %s", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), buf);
 	}
 }
+#else
+#define verboselog(x,y,z,...)
+#endif
+
+/***************************************************************************
+    VIDEO HARDWARE
+***************************************************************************/
+
+static VIDEO_START( sgi_ip6 )
+{
+}
+
+static VIDEO_UPDATE( sgi_ip6 )
+{
+	return 0;
+}
+
+/***************************************************************************
+    MACHINE FUNCTIONS
+***************************************************************************/
 
 typedef struct
 {
@@ -147,12 +171,9 @@ static WRITE32_HANDLER(ip6_unk3_w)
 	verboselog(space->machine, 0, "ip6_unk3_w: Unknown address: %08x = %08x & %08x\n", 0x1fb00000 + (offset << 2), data, mem_mask );
 }
 
-static ADDRESS_MAP_START( sgi_ip6_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE( 0x1f880000, 0x1f880003 ) AM_READWRITE(ip6_unk1_r, ip6_unk1_w)
-	AM_RANGE( 0x1fb00000, 0x1fb00003 ) AM_READWRITE(ip6_unk3_r, ip6_unk3_w)
-	AM_RANGE( 0x1fbc004c, 0x1fbc004f ) AM_READWRITE(ip6_unk2_r, ip6_unk2_w)
-	AM_RANGE( 0x1fc00000, 0x1fc3ffff ) AM_ROM AM_REGION( "user1", 0 )
-ADDRESS_MAP_END
+static INTERRUPT_GEN( sgi_ip6_vbl )
+{
+}
 
 static MACHINE_START( sgi_ip6 )
 {
@@ -165,18 +186,20 @@ static MACHINE_RESET( sgi_ip6 )
 	ip6_regs.unknown_half_0 = 0;
 }
 
-static DRIVER_INIT( sgi_ip6 )
-{
-}
+/***************************************************************************
+    ADDRESS MAPS
+***************************************************************************/
 
-static INPUT_PORTS_START( sgi_ip6 )
-	PORT_START("UNUSED") // unused IN0
-	PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_UNUSED)
-INPUT_PORTS_END
+static ADDRESS_MAP_START( sgi_ip6_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE( 0x1f880000, 0x1f880003 ) AM_READWRITE(ip6_unk1_r, ip6_unk1_w)
+	AM_RANGE( 0x1fb00000, 0x1fb00003 ) AM_READWRITE(ip6_unk3_r, ip6_unk3_w)
+	AM_RANGE( 0x1fbc004c, 0x1fbc004f ) AM_READWRITE(ip6_unk2_r, ip6_unk2_w)
+	AM_RANGE( 0x1fc00000, 0x1fc3ffff ) AM_ROM AM_REGION( "user1", 0 )
+ADDRESS_MAP_END
 
-static INTERRUPT_GEN( sgi_ip6_vbl )
-{
-}
+/***************************************************************************
+    MACHINE DRIVERS
+***************************************************************************/
 
 static const r3000_cpu_core config =
 {
@@ -203,9 +226,24 @@ static MACHINE_DRIVER_START( sgi_ip6 )
 
 	MDRV_MACHINE_START( sgi_ip6 )
 
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(generic_bitmapped)
+	MDRV_VIDEO_START(sgi_ip6)
+	MDRV_VIDEO_UPDATE(sgi_ip6)
 MACHINE_DRIVER_END
+
+static INPUT_PORTS_START( sgi_ip6 )
+	PORT_START("UNUSED") // unused IN0
+	PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
+static DRIVER_INIT( sgi_ip6 )
+{
+}
+
+/***************************************************************************
+
+  ROM definition(s)
+
+***************************************************************************/
 
 ROM_START( sgi_ip6 )
 	ROM_REGION32_BE( 0x40000, "user1", 0 )

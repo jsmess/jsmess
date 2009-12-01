@@ -1197,7 +1197,7 @@ static MACHINE_RESET( ip225015 )
 
 	nPBUS_DMA_Active = 0;
 
-	mips3drc_set_options(cputag_get_cpu(machine, "maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS);
+	mips3drc_set_options(cputag_get_cpu(machine, "maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
 }
 
 static void dump_chain(const address_space *space, UINT32 ch_base)
