@@ -12,6 +12,7 @@ New System Drivers Supported (in no particular order):
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
+- Ausbaufähiger Mikrocomputer mit dem U 880 (Huebler/Everts) [Curt Coder]
 - Hector 2HR+ [JJ Stacino]
 - Hector 2HR [JJ Stacino]
 - Hector HRX [JJ Stacino]
@@ -34,6 +35,8 @@ System Driver Changes:
 
 - [GLASGOW] Upgraded artwork to be clickable. Fixed various driver
   problems. Chess can be played by using the mouse.  [Robbbert]
+
+- [HUEBLER] Added keyboard. [Curt Coder]
 
 - [INTV] Fixed intvkbd. Fixed disassembler.  [Robbbert]
 

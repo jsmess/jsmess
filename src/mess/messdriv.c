@@ -1431,7 +1431,7 @@ const game_driver * const drivers[] =
     DRIVER( elwro800 )
     DRIVER( fk1 )
     DRIVER( et3400 )
-    DRIVER( huebler )
+    DRIVER( amu880 )
     DRIVER( interact )
     DRIVER( jr200 )
     DRIVER( h8 )
