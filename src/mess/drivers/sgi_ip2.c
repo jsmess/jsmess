@@ -345,9 +345,11 @@ static MACHINE_RESET( sgi_ip2 )
 ***************************************************************************/
 
 static UINT32 *mainram;
+static UINT32 *bss;
 
 static ADDRESS_MAP_START(sgi_ip2_map, ADDRESS_SPACE_PROGRAM, 32)
-	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_BASE(&mainram)
+	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_BASE(&mainram)
+	AM_RANGE(0x02100000, 0x0210ffff) AM_RAM AM_BASE(&bss) // ??? I don't understand the need for this...
 	AM_RANGE(0x30000000, 0x30017fff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x30800000, 0x30800003) AM_READWRITE8(sgi_ip2_m_but_r, 		sgi_ip2_m_but_w, 		0xffffffff)
 	AM_RANGE(0x31000000, 0x31000003) AM_READWRITE16(sgi_ip2_m_quad_r,		sgi_ip2_m_quad_w, 		0xffffffff)
