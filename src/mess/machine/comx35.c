@@ -643,7 +643,7 @@ MACHINE_START( comx35p )
 
 	/* screen format */
 
-	state->pal_ntsc = CDP1869_PAL;
+	state->pal_ntsc = 1;
 
 	/* register for state saving */
 
@@ -674,7 +674,7 @@ MACHINE_START( comx35n )
 
 	// screen format
 
-	state->pal_ntsc = CDP1869_NTSC;
+	state->pal_ntsc = 0;
 }
 
 MACHINE_RESET( comx35 )
