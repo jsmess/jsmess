@@ -795,6 +795,6 @@ COMP( 1988, mistrum,  spectrum, 0,		spectrum,		spectrum,	0,		0,	"Amaterske RADIO
 COMP( 1990, blitz,    spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Blic" , 0)		// no keyboard images found
 COMP( 1990, byte,     spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Byte" , 0)		// no keyboard images found
 COMP( 199?, orizon,   spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Orizon-Micro" , 0)		// no keyboard images found
-COMP( 1993, quorum48, spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Kvorum 48K" , 0)
-COMP( 1993, magic6,   spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Magic 6" , 0)	// keyboard should be spectrum, but image was not clear
+COMP( 1993, quorum48, spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Kvorum 48K" , GAME_NOT_WORKING)
+COMP( 1993, magic6,   spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Magic 6" , GAME_NOT_WORKING)	// keyboard should be spectrum, but image was not clear
 COMP( 1990, compani1, spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Kompanion 1" , 0)		// no keyboard images found
