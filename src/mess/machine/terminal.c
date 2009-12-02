@@ -12,7 +12,8 @@ struct _terminal_state
 	UINT8 buffer[TERMINAL_WIDTH*TERMINAL_HEIGHT];
 	UINT8 x_pos;
 	UINT8 y_pos;
-	
+	UINT8 shift_state;
+	UINT8 ctrl_state;
 	devcb_resolved_write8 terminal_keyboard_func;
 };
 
@@ -249,18 +250,39 @@ void generic_terminal_update(const device_config *device, bitmap_t *bitmap, cons
 	}
 }
 
+static INPUT_CHANGED( terminal_shift )
+{
+	const device_config	*devconf = devtag_get_device(field->port->machine, TERMINAL_TAG);
+	terminal_state *term = get_safe_token(devconf);
+	term->shift_state = BIT(input_port_read(field->port->machine, "KEYSSPEC"),1);
+}
+
+static INPUT_CHANGED( terminal_ctrl )
+{
+	const device_config	*devconf = devtag_get_device(field->port->machine, TERMINAL_TAG);
+	terminal_state *term = get_safe_token(devconf);
+	term->ctrl_state = BIT(input_port_read(field->port->machine, "KEYSSPEC"),0);
+}
 // Ugh, god, this is a horrible, HORRIBLE hack!
 static INPUT_CHANGED( terminal_kbd_put )
 {
 	const device_config	*devconf = devtag_get_device(field->port->machine, TERMINAL_TAG);
 	terminal_state *term = get_safe_token(devconf);
+	UINT8 data = (UINT8)(FPTR)param;
 	if(input_port_read(field->port->machine, "KEYS0") ||
 	   input_port_read(field->port->machine, "KEYS1") ||
 	   input_port_read(field->port->machine, "KEYS2") ||
 	   input_port_read(field->port->machine, "KEYS3") ||
 	   input_port_read(field->port->machine, "KEYS4"))
 	{		
-		devcb_call_write8(&term->terminal_keyboard_func, 0, (UINT8)(FPTR)param);
+		if (term->ctrl_state==1) {
+			data -= 0x60;
+		}
+		if (term->shift_state==1) {
+			data -= 0x20;
+		} 
+		
+		devcb_call_write8(&term->terminal_keyboard_func, 0, data);
 	}
 }
 
@@ -300,10 +322,10 @@ MACHINE_DRIVER_END
 
 static DEVICE_START( terminal )
 {
-	terminal_state *terminal = get_safe_token(device);
+	terminal_state *term = get_safe_token(device);
 	const terminal_interface *intf = get_interface(device);
 	
-	devcb_resolve_write8(&terminal->terminal_keyboard_func, &intf->terminal_keyboard_func, device);
+	devcb_resolve_write8(&term->terminal_keyboard_func, &intf->terminal_keyboard_func, device);	
 }
 
 /*-------------------------------------------------
@@ -312,7 +334,11 @@ static DEVICE_START( terminal )
 
 static DEVICE_RESET( terminal )
 {
+	terminal_state *term = get_safe_token(device);
+	
 	terminal_clear(device);
+	term->shift_state = 0;
+	term->ctrl_state = 0;
 }
 
 /*-------------------------------------------------
@@ -392,4 +418,9 @@ INPUT_PORTS_START( generic_terminal )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>') PORT_CHANGED(terminal_kbd_put, (void*)'.')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')			PORT_CHANGED(terminal_kbd_put, (void*)' ')
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(0x0d)			PORT_CHANGED(terminal_kbd_put, (void*)0x0d)
+	PORT_START("KEYSSPEC")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL)) 	PORT_CHANGED(terminal_ctrl, NULL)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1) 				PORT_CHANGED(terminal_shift, NULL)
+	PORT_BIT(0xFC, IP_ACTIVE_HIGH, IPT_UNUSED) 
+	
 INPUT_PORTS_END
