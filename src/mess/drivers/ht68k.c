@@ -11,6 +11,7 @@
 #include "machine/68681.h"
 #include "devices/flopdrv.h"
 #include "machine/wd17xx.h"
+#include "machine/terminal.h"
 
 static UINT16* ht68k_ram;
 
@@ -26,6 +27,7 @@ ADDRESS_MAP_END
 
 /* Input ports */
 INPUT_PORTS_START( ht68k )
+	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
 
@@ -38,40 +40,31 @@ static MACHINE_RESET(ht68k)
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 }
 
-static VIDEO_START( ht68k )
-{
-}
-
-static VIDEO_UPDATE( ht68k )
-{
-    return 0;
-}
-
-
 static void duart_irq_handler(const device_config *device, UINT8 vector)
 {
-	logerror("duart_irq_handler\n");
+	cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_3, HOLD_LINE, M68K_INT_ACK_AUTOVECTOR);
 }
 
 static void duart_tx(const device_config *device, int channel, UINT8 data)
 {
+	const device_config	*devconf = devtag_get_device(device->machine, "terminal");
+	terminal_write(devconf,0,data);
 }
-
-static UINT8 duart_inp = 0x0e;
 
 static UINT8 duart_input(const device_config *device)
 {
-	if (duart_inp != 0)
-	{
-		duart_inp = 0;
-		return 0x0e;
-	}
-	else
-	{
-		duart_inp = 0x0e;
-		return 0x00;
-	}
+	return 0;
 }
+
+static WRITE8_DEVICE_HANDLER( ht68k_kbd_put )
+{
+	duart68681_rx_data(devtag_get_device(device->machine, "duart68681"), 1, data);
+}
+
+static GENERIC_TERMINAL_INTERFACE( ht68k_terminal_intf )
+{
+	DEVCB_HANDLER(ht68k_kbd_put)
+};
 
 static const duart68681_config ht68k_duart68681_config =
 {
@@ -101,19 +94,10 @@ static MACHINE_DRIVER_START( ht68k )
     MDRV_MACHINE_RESET(ht68k)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+    MDRV_IMPORT_FROM( generic_terminal )	
+	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,ht68k_terminal_intf)	
 
-    MDRV_VIDEO_START(ht68k)
-    MDRV_VIDEO_UPDATE(ht68k)
-
-	MDRV_DUART68681_ADD( "duart68681", XTAL_8MHz, ht68k_duart68681_config )
+	MDRV_DUART68681_ADD( "duart68681", XTAL_8MHz / 2, ht68k_duart68681_config )
 	MDRV_WD1770_ADD("wd1770", default_wd17xx_interface_2_drives )
 	MDRV_FLOPPY_2_DRIVES_ADD(ht68k_floppy_config)
 MACHINE_DRIVER_END
