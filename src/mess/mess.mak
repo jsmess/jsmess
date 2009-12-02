@@ -465,6 +465,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/smc92x4.o	\
 	$(MESS_MACHINE)/sst39vfx.o	\
 	$(MESS_MACHINE)/tc8521.o	\
+	$(MESS_MACHINE)/terminal.o	\
 	$(MESS_MACHINE)/upd1990a.o	\
 	$(MESS_MACHINE)/upd7002.o	\
 	$(MESS_MACHINE)/upd7201.o	\

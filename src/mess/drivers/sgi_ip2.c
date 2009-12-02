@@ -46,7 +46,8 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/mc146818.h" /* TOD clock */
 #include "machine/68681.h" /* DUART0, DUART1 */
-
+#include "machine/terminal.h"
+	
 #define VERBOSE_LEVEL ( 0 )
 
 #define ENABLE_VERBOSE_LOG (0)
@@ -67,19 +68,6 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 #else
 #define verboselog(x,y,z,...)
 #endif
-
-/***************************************************************************
-    VIDEO HARDWARE
-***************************************************************************/
-
-static VIDEO_START( sgi_ip2 )
-{
-}
-
-static VIDEO_UPDATE( sgi_ip2 )
-{
-	return 0;
-}
 
 /***************************************************************************
     MACHINE FUNCTIONS
@@ -315,18 +303,16 @@ static WRITE16_HANDLER(sgi_ip2_stklmt_w)
 	COMBINE_DATA(&sgi_ip2_stklmt);
 }
 
-// Ugh, god, this is a horrible, HORRIBLE hack!
-static INPUT_CHANGED( sgi_ip2_serial_kbd_put )
+static WRITE8_DEVICE_HANDLER( sgi_kbd_put )
 {
-	if(input_port_read(field->port->machine, "KEYS0") ||
-	   input_port_read(field->port->machine, "KEYS1") ||
-	   input_port_read(field->port->machine, "KEYS2") ||
-	   input_port_read(field->port->machine, "KEYS3") ||
-	   input_port_read(field->port->machine, "KEYS4"))
-	{
-		duart68681_rx_data(devtag_get_device(field->port->machine, "duart68681a"), 1, (UINT8)(FPTR)param);
-	}
+	duart68681_rx_data(devtag_get_device(device->machine, "duart68681a"), 1, data);
 }
+
+static GENERIC_TERMINAL_INTERFACE( sgi_terminal_intf )
+{
+	DEVCB_HANDLER(sgi_kbd_put)
+};
+
 
 static INTERRUPT_GEN( sgi_ip2_vbl )
 {
@@ -393,8 +379,9 @@ static void duarta_output(const device_config *device, UINT8 data)
 
 static void duarta_tx(const device_config *device, int channel, UINT8 data)
 {
+	const device_config	*devconf = devtag_get_device(device->machine, "terminal");
 	verboselog(device->machine, 0, "duarta_tx: %02x\n", data);
-	printf( "%c", data );
+	terminal_write(devconf,0,data);
 }
 
 static const duart68681_config sgi_ip2_duart68681a_config =
@@ -439,22 +426,15 @@ static MACHINE_DRIVER_START( sgi_ip2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(sgi_ip2_map)
-	MDRV_CPU_VBLANK_INT("screen", sgi_ip2_vbl)
+	MDRV_CPU_VBLANK_INT(TERMINAL_SCREEN_TAG, sgi_ip2_vbl)
 
 	MDRV_MACHINE_START(sgi_ip2)
 	MDRV_MACHINE_RESET(sgi_ip2)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(256, 256) // No this is not true, it is all a lie.  Unfortunately, 1024x1024-pixel displays are SLOOOOW.
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MDRV_PALETTE_LENGTH(256)
-
-	MDRV_VIDEO_START(sgi_ip2)
-	MDRV_VIDEO_UPDATE(sgi_ip2)
-
+	/* video hardware */	
+	MDRV_IMPORT_FROM( generic_terminal )	
+	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sgi_terminal_intf)	
+	
     MDRV_DUART68681_ADD( "duart68681a", XTAL_3_6864MHz, sgi_ip2_duart68681a_config ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
     MDRV_DUART68681_ADD( "duart68681b", XTAL_3_6864MHz, sgi_ip2_duart68681b_config ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
 	MDRV_NVRAM_HANDLER(mc146818)
@@ -511,55 +491,7 @@ static INPUT_PORTS_START( sgi_ip2 )
 	PORT_DIPSETTING(	0x000e, "DSD Tape Boot (2)" )
 	PORT_DIPSETTING(	0x000f, "DSD Hard Disk Boot" )
 
-	PORT_START("KEYS0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'a')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'b')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'c')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'d')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'e')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'f')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'g')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'h')
-
-	PORT_START("KEYS1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'i')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'j')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'k')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'l')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'m')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'n')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'o')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'p')
-
-	PORT_START("KEYS2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'q')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'r')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'s')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'t')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'u')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'v')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'w')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'x')
-
-	PORT_START("KEYS3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'y')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')	PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'z')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0')				PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'0')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1')				PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'1')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2')				PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'2')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3')				PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'3')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4')				PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'4')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5')				PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'5')
-
-	PORT_START("KEYS4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6')				PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'6')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7')				PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'7')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8')				PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'8')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9')				PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'9')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<') PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)',')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>') PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)'.')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')			PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)' ')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(0x0d)			PORT_CHANGED(sgi_ip2_serial_kbd_put, (void*)0x0d)
+	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
 static DRIVER_INIT( sgi_ip2 )
