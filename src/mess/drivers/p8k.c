@@ -11,7 +11,6 @@
     TODO:
       * add Z8001 core so that we can handle the 16bit IO Map (Z8000 uses a
         8bit IO Map, and hence I commented out the whole map)
-      * add floppy emulation to 8 bit board
       * properly implement Z80 daisy chain in 16 bit board
 
 ****************************************************************************/
@@ -20,6 +19,9 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z8000/z8000.h"
 #include "cpu/z80/z80daisy.h"
+#include "formats/basicdsk.h"
+#include "devices/flopdrv.h"
+#include "machine/upd765.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
@@ -73,12 +75,13 @@ static ADDRESS_MAP_START(p8k_iomap, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80ctc_0", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("z80pio_0", z80pio_alt_r, z80pio_alt_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("z80pio_1", z80pio_alt_r, z80pio_alt_w)
-	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80pio_2", z80pio_alt_r, z80pio_alt_w)	// we still need to add the FDC related part of this one
-//  AM_RANGE(0x20, 0x23) // FDC
+	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80pio_2", z80pio_alt_r, z80pio_alt_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("i8272", upd765_data_r, upd765_data_w)
+	AM_RANGE(0x21, 0x21) AM_DEVREAD("i8272", upd765_status_r)
 	AM_RANGE(0x24, 0x27) AM_DEVREADWRITE("z80sio_0", sio2_r, sio2_w)
 	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("z80sio_1", sio2_r, sio2_w)
 	AM_RANGE(0x2c, 0x2f) AM_DEVREADWRITE("z80ctc_1", z80ctc_r, z80ctc_w)
-	AM_RANGE(0x3c, 0x3c) AM_DEVREADWRITE("z80dma", z80dma_r, z80dma_w)	// FDC related
+	AM_RANGE(0x3c, 0x3c) AM_DEVREADWRITE("z80dma", z80dma_r, z80dma_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(p8k_16_memmap, ADDRESS_SPACE_PROGRAM, 16)
@@ -206,11 +209,20 @@ static void p8k_daisy_interrupt(const device_config *device, int state)
 
 /* Z80 DMA */
 
-// still to implement: dma io read/write which handle FDC. also, the interrupt should deal with FDC as well, with p8k_daisy_interrupt as a fallback
+static WRITE_LINE_DEVICE_HANDLER( p8k_dma_irq_w )
+{
+	if (state)
+	{
+		const device_config *i8272 = devtag_get_device(device->machine, "i8272");
+		upd765_tc_w(i8272, state);
+	}
+
+	p8k_daisy_interrupt(device, state);
+}
 
 static Z80DMA_INTERFACE( p8k_dma_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
+	DEVCB_LINE(p8k_dma_irq_w),
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
 	DEVCB_NULL,
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
@@ -320,7 +332,6 @@ static const z80sio_interface p8k_sio_1_intf =
 	NULL					/* receive handler */
 };
 
-
 /* Z80 Daisy Chain */
 
 static const z80_daisy_chain p8k_daisy_chain[] =
@@ -336,6 +347,42 @@ static const z80_daisy_chain p8k_daisy_chain[] =
 	{ NULL }
 };
 
+/* Intel 8272 Interface */
+
+static WRITE_LINE_DEVICE_HANDLER( p8k_i8272_irq_w )
+{
+	const device_config *z80pio = devtag_get_device(device->machine, "z80pio_2");
+	
+	z80pio_p_w(z80pio, 1, (state) ? 0x10 : 0x00);
+}
+
+static UPD765_DMA_REQUEST( p8k_i8272_drq_w )
+{
+	const device_config *z80dma = devtag_get_device(device->machine, "z80dma");
+
+	z80dma_rdy_w(z80dma, state);
+}
+
+static const struct upd765_interface p8k_i8272_intf =
+{
+	DEVCB_LINE(p8k_i8272_irq_w),
+	p8k_i8272_drq_w,
+	NULL,
+	UPD765_RDY_PIN_CONNECTED,
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
+};
+
+static const floppy_config p8k_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(default),
+	DO_NOT_KEEP_GEOMETRY
+};
 
 /***************************************************************************
 
@@ -443,7 +490,6 @@ static const z80sio_interface p8k_16_sio_1_intf =
 	NULL					/* receive handler */
 };
 
-
 /* Z80 Daisy Chain */
 
 static const z80_daisy_chain p8k_16_daisy_chain[] =
@@ -483,6 +529,8 @@ static MACHINE_DRIVER_START( p8k )
 	MDRV_Z80PIO_ADD("z80pio_0", p8k_pio_0_intf)
 	MDRV_Z80PIO_ADD("z80pio_1", p8k_pio_1_intf)
 	MDRV_Z80PIO_ADD("z80pio_2", p8k_pio_2_intf)
+	MDRV_UPD765A_ADD("i8272", p8k_i8272_intf)
+	MDRV_FLOPPY_2_DRIVES_ADD(p8k_floppy_config)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
