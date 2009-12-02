@@ -35,11 +35,11 @@ Type 4: 6K Rom + 1K Ram
     Rom is mapped from $0000 - $15FF (only 5,5K ROM visible to the CPU)
     Ram is mapped from $1800 - $1BFF
 
-One other type is known for Radofin (compatible to VC4000, but not the Cartridge Pins)
-which consisted of 2K ROM and 2K RAM which are properly mapped as follows:
+One other type is known for Radofin (rom compatible to VC4000, but not the Cartridge connector).
+It consisted of a 2K ROM and 2K RAM which are most likely mapped as follows (needs to be confirmed):
 2K Rom mapped from $0000 - $07FF
 2K Ram mapped from $0800 - $0FFF
-The Cartridge is called Hobby Module and properly the Rom is the same as used in
+The Cartridge is called Hobby Module and the Rom is probably the same as used in
 elektor TV Game Computer which is a kind of developer machine for the VC4000.
 
 Go to the bottom to see the game list and emulation status of each.
@@ -90,8 +90,9 @@ static WRITE8_HANDLER(vc4000_sound_ctl)
 
 
 static ADDRESS_MAP_START( vc4000_mem , ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1680, 0x16ff) AM_READWRITE( vc4000_key_r, vc4000_sound_ctl ) AM_MIRROR(0x0800)
 	AM_RANGE(0x1700, 0x17ff) AM_READWRITE( vc4000_video_r, vc4000_video_w ) AM_MIRROR(0x0800)
 ADDRESS_MAP_END
@@ -187,25 +188,33 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 {
 	running_machine *machine = image->machine;
 	int size = image_length(image);
+	const address_space *memspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (size > 0x1600)
 		size = 0x1600;
 
 	if (size > 0x1000)	/* 6k rom + 1k ram - Chess2 only */
 	{
-		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1000, 0x15ff, 0, 0, SMH_BANK(1));	/* extra rom */
+		memory_install_read8_handler(memspace, 0x0800, 0x15ff, 0, 0, SMH_BANK(1));	/* extra rom */
 		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x1000);
 
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, SMH_BANK(3), SMH_BANK(4));	/* ram */
-		memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0x1800);
-		memory_set_bankptr(machine, 4, memory_region(machine, "maincpu") + 0x1800);
+		memory_install_readwrite8_handler(memspace, 0x1800, 0x1bff, 0, 0, SMH_BANK(2), SMH_BANK(2));	/* ram */
+		memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x1800);
 	}
 	else
 	if (size > 0x0800)	/* some 4k roms have 1k of mirrored ram */
 	{
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1000, 0x15ff, 0, 0x800, SMH_BANK(1), SMH_BANK(2)); /* ram */
-		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x1000);
+		memory_install_read8_handler(memspace, 0x0800, 0x0fff, 0, 0, SMH_BANK(1));	/* extra rom */
+		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x0800);
+		
+		memory_install_readwrite8_handler(memspace, 0x1000, 0x15ff, 0, 0x800, SMH_BANK(2), SMH_BANK(2)); /* ram */
 		memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x1000);
+	}
+	else
+	if (size == 0x0800)	/* 2k roms + 2k ram - Hobby Module(Radofin) and elektor TVGC*/
+	{
+		memory_install_readwrite8_handler(memspace, 0x0800, 0x0fff, 0, 0, SMH_BANK(1), SMH_BANK(1)); /* ram */
+		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x0800);
 	}
 
 	if (size > 0)
