@@ -1,5 +1,6 @@
 #include "driver.h"
 #include "machine/teleprinter.h"
+#include "machine/terminal.h"
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -11,8 +12,7 @@ struct _teleprinter_state
 {
 	UINT8 buffer[TELEPRINTER_WIDTH*TELEPRINTER_HEIGHT];
 	UINT8 x_pos;
-	UINT8 shift_state;
-	UINT8 ctrl_state;
+	UINT8 last_code;
 	devcb_resolved_write8 teleprinter_keyboard_func;
 };
 
@@ -181,7 +181,7 @@ static void teleprinter_scroll_line(const device_config *device)
 static void teleprinter_write_char(const device_config *device,UINT8 data) {
 	teleprinter_state *term = get_safe_token(device);
 	
-	term->buffer[24*TELEPRINTER_WIDTH+term->x_pos] = data;
+	term->buffer[(TELEPRINTER_HEIGHT-1)*TELEPRINTER_WIDTH+term->x_pos] = data;
 	term->x_pos++;
 	if (term->x_pos > TELEPRINTER_WIDTH) {
 		term->x_pos = 0;
@@ -239,40 +239,10 @@ void generic_teleprinter_update(const device_config *device, bitmap_t *bitmap, c
 	}
 }
 
-static INPUT_CHANGED( teleprinter_shift )
+static TIMER_CALLBACK(keyboard_callback)
 {
-	const device_config	*devconf = devtag_get_device(field->port->machine, TELEPRINTER_TAG);
-	teleprinter_state *term = get_safe_token(devconf);
-	term->shift_state = BIT(input_port_read(field->port->machine, "KEYSSPEC"),1);
-}
-
-static INPUT_CHANGED( teleprinter_ctrl )
-{
-	const device_config	*devconf = devtag_get_device(field->port->machine, TELEPRINTER_TAG);
-	teleprinter_state *term = get_safe_token(devconf);
-	term->ctrl_state = BIT(input_port_read(field->port->machine, "KEYSSPEC"),0);
-}
-// Ugh, god, this is a horrible, HORRIBLE hack!
-static INPUT_CHANGED( teleprinter_kbd_put )
-{
-	const device_config	*devconf = devtag_get_device(field->port->machine, TELEPRINTER_TAG);
-	teleprinter_state *term = get_safe_token(devconf);
-	UINT8 data = (UINT8)(FPTR)param;
-	if(input_port_read(field->port->machine, "KEYS0") ||
-	   input_port_read(field->port->machine, "KEYS1") ||
-	   input_port_read(field->port->machine, "KEYS2") ||
-	   input_port_read(field->port->machine, "KEYS3") ||
-	   input_port_read(field->port->machine, "KEYS4"))
-	{		
-		if (term->ctrl_state==1) {
-			data -= 0x60;
-		}
-		if (term->shift_state==1) {
-			data -= 0x20;
-		} 
-		
-		devcb_call_write8(&term->teleprinter_keyboard_func, 0, data);
-	}
+	teleprinter_state *term = get_safe_token(ptr);
+	term->last_code = terminal_keyboard_handler(machine, &term->teleprinter_keyboard_func, term->last_code);
 }
 
 /***************************************************************************
@@ -315,6 +285,8 @@ static DEVICE_START( teleprinter )
 	const teleprinter_interface *intf = get_interface(device);
 	
 	devcb_resolve_write8(&term->teleprinter_keyboard_func, &intf->teleprinter_keyboard_func, device);	
+	
+	timer_pulse(device->machine, ATTOTIME_IN_HZ(240), (void*)device, 0, keyboard_callback);
 }
 
 /*-------------------------------------------------
@@ -326,8 +298,7 @@ static DEVICE_RESET( teleprinter )
 	teleprinter_state *term = get_safe_token(device);
 	
 	teleprinter_clear(device);
-	term->shift_state = 0;
-	term->ctrl_state = 0;
+	term->last_code = 0;
 }
 
 /*-------------------------------------------------
@@ -358,58 +329,5 @@ DEVICE_GET_INFO( teleprinter )
 }
 
 INPUT_PORTS_START( generic_teleprinter )
-	PORT_START("KEYS0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')	PORT_CHANGED(teleprinter_kbd_put, (void*)'a')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')	PORT_CHANGED(teleprinter_kbd_put, (void*)'b')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')	PORT_CHANGED(teleprinter_kbd_put, (void*)'c')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')	PORT_CHANGED(teleprinter_kbd_put, (void*)'d')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')	PORT_CHANGED(teleprinter_kbd_put, (void*)'e')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')	PORT_CHANGED(teleprinter_kbd_put, (void*)'f')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')	PORT_CHANGED(teleprinter_kbd_put, (void*)'g')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')	PORT_CHANGED(teleprinter_kbd_put, (void*)'h')
-
-	PORT_START("KEYS1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')	PORT_CHANGED(teleprinter_kbd_put, (void*)'i')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')	PORT_CHANGED(teleprinter_kbd_put, (void*)'j')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')	PORT_CHANGED(teleprinter_kbd_put, (void*)'k')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')	PORT_CHANGED(teleprinter_kbd_put, (void*)'l')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')	PORT_CHANGED(teleprinter_kbd_put, (void*)'m')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')	PORT_CHANGED(teleprinter_kbd_put, (void*)'n')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')	PORT_CHANGED(teleprinter_kbd_put, (void*)'o')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')	PORT_CHANGED(teleprinter_kbd_put, (void*)'p')
-
-	PORT_START("KEYS2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')	PORT_CHANGED(teleprinter_kbd_put, (void*)'q')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')	PORT_CHANGED(teleprinter_kbd_put, (void*)'r')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')	PORT_CHANGED(teleprinter_kbd_put, (void*)'s')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')	PORT_CHANGED(teleprinter_kbd_put, (void*)'t')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')	PORT_CHANGED(teleprinter_kbd_put, (void*)'u')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')	PORT_CHANGED(teleprinter_kbd_put, (void*)'v')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')	PORT_CHANGED(teleprinter_kbd_put, (void*)'w')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')	PORT_CHANGED(teleprinter_kbd_put, (void*)'x')
-
-	PORT_START("KEYS3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')	PORT_CHANGED(teleprinter_kbd_put, (void*)'y')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')	PORT_CHANGED(teleprinter_kbd_put, (void*)'z')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0')				PORT_CHANGED(teleprinter_kbd_put, (void*)'0')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1')				PORT_CHANGED(teleprinter_kbd_put, (void*)'1')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2')				PORT_CHANGED(teleprinter_kbd_put, (void*)'2')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3')				PORT_CHANGED(teleprinter_kbd_put, (void*)'3')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4')				PORT_CHANGED(teleprinter_kbd_put, (void*)'4')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5')				PORT_CHANGED(teleprinter_kbd_put, (void*)'5')
-
-	PORT_START("KEYS4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6')				PORT_CHANGED(teleprinter_kbd_put, (void*)'6')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7')				PORT_CHANGED(teleprinter_kbd_put, (void*)'7')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8')				PORT_CHANGED(teleprinter_kbd_put, (void*)'8')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9')				PORT_CHANGED(teleprinter_kbd_put, (void*)'9')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<') PORT_CHANGED(teleprinter_kbd_put, (void*)',')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>') PORT_CHANGED(teleprinter_kbd_put, (void*)'.')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')			PORT_CHANGED(teleprinter_kbd_put, (void*)' ')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(0x0d)			PORT_CHANGED(teleprinter_kbd_put, (void*)0x0d)
-	PORT_START("KEYSSPEC")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL)) 	PORT_CHANGED(teleprinter_ctrl, NULL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1) 				PORT_CHANGED(teleprinter_shift, NULL)
-	PORT_BIT(0xFC, IP_ACTIVE_HIGH, IPT_UNUSED) 
-	
+	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
