@@ -2,39 +2,18 @@
 
         XOR S-100-12
 
-        12/05/2009 Skeleton driver.
-
-    Execution of this monitor rom starts at F800.
-
-    I/O sequence:   read 0A, discard result
-            read 0B, output result to 0B
-            send the sequence AA 40 4E 37 to 01, then to 03 (programming a device?)
-            L1:read 03 to see if display device is ready
-            write ascii character to 02 goto L1 until signon message is displayed
-            in same fashion display top of memory (F800)
-            display prompt character (*) wait for input
-            read 03 to see if a key is being input, if so read 02 and display it
-            if illegal input, display ? then display prompt on a new line
-
-    To summarise:   out 01 and out 03 - program a device
-            out 02 - display a character
-            in 02 - read character from keyboard
-            in 03 - get busy status of display (bit 0) and keyboard (bit 1) High=ready
-
 *****************************************************************************************************/
 
 /*
 
     TODO:
 
-    - terminal
-    - keyboard
     - ROM should be mirrored every 2K at boot
     - 2/4 MHz jumper J2
     - floppy
     - memory expansion
     - COM5016
-    - CTC
+    - CTC signals
 
 */
 
@@ -47,6 +26,7 @@
 #include "machine/com8116.h"
 #include "machine/i8255a.h"
 #include "machine/msm8251.h"
+#include "machine/terminal.h"
 #include "machine/wd17xx.h"
 #include "machine/z80ctc.h"
 #include "devices/messram.h"
@@ -72,7 +52,9 @@ static WRITE8_HANDLER( prom_toggle_w )
 
 static READ8_HANDLER( prom_disable_r )
 {
-	memory_install_readwrite8_handler(space, 0x0000, 0xf7ff, 0, 0, SMH_BANK(1), SMH_BANK(2));
+	const address_space *program = cputag_get_address_space(space->machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+
+	memory_install_readwrite8_handler(program, 0x0000, 0xf7ff, 0, 0, SMH_BANK(1), SMH_BANK(2));
 	memory_set_bank(space->machine, 1, 1);
 
 	return 0xff;
@@ -82,6 +64,14 @@ static WRITE8_DEVICE_HANDLER( baud_w )
 {
 	com8116_str_w(device, 0, data & 0x0f);
 	com8116_stt_w(device, 0, data >> 4);
+}
+
+static WRITE8_DEVICE_HANDLER( i8251_b_data_w )
+{
+	const device_config	*terminal = devtag_get_device(device->machine, "terminal");
+	
+	msm8251_data_w(device, 0, data);
+	terminal_write(terminal, 0, data);
 }
 
 /* Memory Maps */
@@ -97,7 +87,7 @@ static ADDRESS_MAP_START( xor100_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(I8251_A_TAG, msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(I8251_A_TAG, msm8251_status_r, msm8251_control_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE(I8251_B_TAG, msm8251_data_r, msm8251_data_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE(I8251_B_TAG, msm8251_data_r, i8251_b_data_w)
 	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE(I8251_B_TAG, msm8251_status_r, msm8251_control_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(I8255A_TAG, i8255a_r, i8255a_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(mmu_w)
@@ -110,6 +100,8 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( xor100 )
+	PORT_INCLUDE(generic_terminal)
+
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x0f, 0x05, "Serial Port A" )
 	PORT_DIPSETTING(    0x00, "50 baud" )
@@ -146,17 +138,6 @@ static INPUT_PORTS_START( xor100 )
 	PORT_DIPSETTING(    0xe0, "9600 baud" )
 	PORT_DIPSETTING(    0xf0, "19200 baud" )
 INPUT_PORTS_END
-
-/* Video */
-
-static VIDEO_START( xor100 )
-{
-}
-
-static VIDEO_UPDATE( xor100 )
-{
-    return 0;
-}
 
 /* COM5016 Interface */
 
@@ -244,7 +225,21 @@ static const wd17xx_interface wd1795_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
+};
+
+/* Terminal Interface */
+
+static WRITE8_DEVICE_HANDLER( xor100_kbd_put )
+{
+	xor100_state *state = device->machine->driver_data;
+
+	msm8251_receive_character(state->i8251_b, data);
+}
+
+static GENERIC_TERMINAL_INTERFACE( xor100_terminal_intf )
+{
+	DEVCB_HANDLER(xor100_kbd_put)
 };
 
 /* Machine Initialization */
@@ -328,17 +323,7 @@ static MACHINE_DRIVER_START( xor100 )
     MDRV_MACHINE_RESET(xor100)
 
     /* video hardware */
-    MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
-
-    MDRV_VIDEO_START(xor100)
-    MDRV_VIDEO_UPDATE(xor100)
+	MDRV_IMPORT_FROM( generic_terminal )	
 
 	/* devices */
 	MDRV_MSM8251_ADD(I8251_A_TAG, /*XTAL_8MHz/2,*/ printer_8251_intf)
@@ -346,10 +331,10 @@ static MACHINE_DRIVER_START( xor100 )
 	MDRV_I8255A_ADD(I8255A_TAG, printer_8255_intf)
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
 	MDRV_COM8116_ADD(COM5016_TAG, 5000000, com5016_intf) // COM5016
-	MDRV_WD179X_ADD(WD1795_TAG, /*XTAL_8MHz/8,*/ wd1795_intf ) // WD1795-02
+	MDRV_WD179X_ADD(WD1795_TAG, /*XTAL_8MHz/8,*/ wd1795_intf) // WD1795-02
 	MDRV_FLOPPY_2_DRIVES_ADD(xor100_floppy_config)
-
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, xor100_cassette_config)
+	MDRV_GENERIC_TERMINAL_ADD("terminal", xor100_terminal_intf)  
 	
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -363,8 +348,7 @@ ROM_START( xor100 )
 	ROM_LOAD( "xp 185.8b", 0xf800, 0x0800, CRC(0d0bda8d) SHA1(11c83f7cd7e6a570641b44a2f2cc5737a7dd8ae3) )
 ROM_END
 
-
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY                 FULLNAME        FLAGS */
-COMP( 1982, xor100,		0,		0,		xor100,		xor100,		0,		0,		"Xor Data Science",		"XOR S-100-12",	GAME_NOT_WORKING )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY                 FULLNAME        FLAGS */
+COMP( 1982, xor100,		0,		0,		xor100,		xor100,		0,		0,		"Xor Data Science",		"XOR S-100-12",	0 )

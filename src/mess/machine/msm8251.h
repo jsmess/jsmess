@@ -83,4 +83,6 @@ void msm8251_receive_clock(const device_config *device);
 void msm8251_connect_to_serial_device(const device_config *device, const device_config *image);
 void msm8251_connect(const device_config *device, struct serial_connection *other_connection);
 
+void msm8251_receive_character(const device_config *device, UINT8 ch);
+
 #endif /* __MSM8251_H__ */

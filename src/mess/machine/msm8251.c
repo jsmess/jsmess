@@ -62,7 +62,6 @@ struct _msm8251_t
     PROTOTYPES
 ***************************************************************************/
 
-static void msm8251_receive_character(const device_config *device, UINT8 ch);
 static void msm8251_in_callback(running_machine *machine, int id, unsigned long state);
 static void msm8251_update_tx_empty(const device_config *device);
 static void msm8251_update_tx_ready(const device_config *device);
@@ -721,7 +720,7 @@ WRITE8_DEVICE_HANDLER(msm8251_data_w)
     bit of data has been received
 -------------------------------------------------*/
 
-static void msm8251_receive_character(const device_config *device, UINT8 ch)
+void msm8251_receive_character(const device_config *device, UINT8 ch)
 {
 	msm8251_t *uart = get_token(device);
 
