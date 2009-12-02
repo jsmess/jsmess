@@ -13,6 +13,7 @@ struct _teleprinter_state
 	UINT8 buffer[TELEPRINTER_WIDTH*TELEPRINTER_HEIGHT];
 	UINT8 x_pos;
 	UINT8 last_code;
+	UINT8 scan_line;
 	devcb_resolved_write8 teleprinter_keyboard_func;
 };
 
@@ -242,7 +243,7 @@ void generic_teleprinter_update(const device_config *device, bitmap_t *bitmap, c
 static TIMER_CALLBACK(keyboard_callback)
 {
 	teleprinter_state *term = get_safe_token(ptr);
-	term->last_code = terminal_keyboard_handler(machine, &term->teleprinter_keyboard_func, term->last_code);
+	term->last_code = terminal_keyboard_handler(machine, &term->teleprinter_keyboard_func, term->last_code, &term->scan_line);
 }
 
 /***************************************************************************
@@ -299,6 +300,7 @@ static DEVICE_RESET( teleprinter )
 	
 	teleprinter_clear(device);
 	term->last_code = 0;
+	term->scan_line = 0;
 }
 
 /*-------------------------------------------------

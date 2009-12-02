@@ -13,6 +13,7 @@ struct _terminal_state
 	UINT8 x_pos;
 	UINT8 y_pos;
 	UINT8 last_code;
+	UINT8 scan_line;
 	devcb_resolved_write8 terminal_keyboard_func;
 };
 
@@ -261,7 +262,7 @@ static UINT8 row_number(UINT8 code) {
 	return 0;
 }
 
-UINT8 terminal_keyboard_handler(running_machine *machine, devcb_resolved_write8 *callback, UINT8 last_code)
+UINT8 terminal_keyboard_handler(running_machine *machine, devcb_resolved_write8 *callback, UINT8 last_code, UINT8 *scan_line)
 {
 	static const char *const keynames[] = { "TERM_LINE0", "TERM_LINE1", "TERM_LINE2", "TERM_LINE3", "TERM_LINE4", "TERM_LINE5", "TERM_LINE6" };
 	int i;
@@ -271,9 +272,8 @@ UINT8 terminal_keyboard_handler(running_machine *machine, devcb_resolved_write8 
 	UINT8 shift = BIT(input_port_read(machine, "TERM_LINEC"),1);
 	UINT8 caps  = BIT(input_port_read(machine, "TERM_LINEC"),2);
 	UINT8 ctrl  = BIT(input_port_read(machine, "TERM_LINEC"),0);
-	for(i = 0; i < 7; i++)
+	i = *scan_line;
 	{
-
 		code = 	input_port_read(machine, keynames[i]);
 		if (code != 0)
 		{
@@ -347,7 +347,12 @@ UINT8 terminal_keyboard_handler(running_machine *machine, devcb_resolved_write8 
 			if (last_code != key_code ) {
 				devcb_call_write8(callback, 0, key_code);
 			}
-			retVal = key_code;			
+			retVal = key_code;
+		} else {
+			*scan_line += 1;
+			if (*scan_line==7) {
+				*scan_line = 0;
+			}
 		}
 	}
 	return retVal;
@@ -356,7 +361,7 @@ UINT8 terminal_keyboard_handler(running_machine *machine, devcb_resolved_write8 
 static TIMER_CALLBACK(keyboard_callback)
 {
 	terminal_state *term = get_safe_token(ptr);
-	term->last_code = terminal_keyboard_handler(machine, &term->terminal_keyboard_func, term->last_code);
+	term->last_code = terminal_keyboard_handler(machine, &term->terminal_keyboard_func, term->last_code, &term->scan_line);
 }
 
 /***************************************************************************
@@ -399,7 +404,7 @@ static DEVICE_START( terminal )
 	const terminal_interface *intf = get_interface(device);
 	
 	devcb_resolve_write8(&term->terminal_keyboard_func, &intf->terminal_keyboard_func, device);	
-	timer_pulse(device->machine, ATTOTIME_IN_HZ(240), (void*)device, 0, keyboard_callback);
+	timer_pulse(device->machine, ATTOTIME_IN_HZ(2400), (void*)device, 0, keyboard_callback);
 }
 
 /*-------------------------------------------------
@@ -411,6 +416,7 @@ static DEVICE_RESET( terminal )
 	terminal_state *term = get_safe_token(device);
 	terminal_clear(device);
 	term->last_code = 0;
+	term->scan_line = 0;
 }
 
 /*-------------------------------------------------
