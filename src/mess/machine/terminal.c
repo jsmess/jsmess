@@ -206,6 +206,7 @@ WRITE8_DEVICE_HANDLER ( terminal_write )
 	terminal_state *term = get_safe_token(device);
 	switch(data) {
 		case 10: term->y_pos++;
+				term->x_pos = 0;
 				if (term->y_pos==TERMINAL_HEIGHT) {
 					terminal_scroll_line(device);
 					term->y_pos = (TERMINAL_HEIGHT-1);

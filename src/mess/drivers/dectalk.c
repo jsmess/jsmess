@@ -146,6 +146,7 @@ DUART is INT level 6
 #include "dectalk.lh" //  hack to avoid screenless system crash
 #include "machine/68681.h"
 #include "sound/dac.h"
+#include "machine/terminal.h"
 
 
 /* Components */
@@ -205,6 +206,8 @@ static void duart_output(const device_config *device, UINT8 data)
 
 static void duart_tx(const device_config *device, int channel, UINT8 data)
 {
+	const device_config	*devconf = devtag_get_device(device->machine, "terminal");
+	terminal_write(devconf,0,data);
 #ifdef SERIAL_TO_STDERR
 	fprintf(stderr, "%02X ",data);
 #endif
@@ -660,6 +663,8 @@ PORT_START("hacks")
 	PORT_CONFNAME( 0x01, 0x01, "Hack to prevent hang when skip self test is shorted" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	
+	PORT_INCLUDE(generic_terminal)	
 INPUT_PORTS_END
 
 /******************************************************************************
@@ -695,6 +700,15 @@ static DRIVER_INIT( dectalk )
 	timer_set(machine, ATTOTIME_IN_HZ(120), NULL, 0, simulate_input_cb);
 }
 
+static WRITE8_DEVICE_HANDLER( dectalk_kbd_put )
+{
+	duart68681_rx_data(devtag_get_device(device->machine, "duart68681"), 1, data);
+}
+
+static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
+{
+	DEVCB_HANDLER(dectalk_kbd_put)
+};
 
 static MACHINE_DRIVER_START(dectalk)
     /* basic machine hardware */
@@ -717,7 +731,7 @@ static MACHINE_DRIVER_START(dectalk)
     //MDRV_NVRAM_HANDLER(generic_0fill)
 
     /* video hardware */
-    MDRV_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
+    //MDRV_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
 
     /* sound hardware */
     MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -726,7 +740,8 @@ static MACHINE_DRIVER_START(dectalk)
 
     /* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
-
+	MDRV_IMPORT_FROM( generic_terminal )	
+	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)	
 MACHINE_DRIVER_END
 
 
