@@ -15,6 +15,10 @@
 typedef struct _xor100_state xor100_state;
 struct _xor100_state
 {
+	/* memory state */
+	int mode;
+	int bank;
+
 	/* floppy state */
 	int fdc_irq;
 	int fdc_drq;
@@ -23,6 +27,7 @@ struct _xor100_state
 	const device_config *i8251_a;
 	const device_config *i8251_b;
 	const device_config *wd1795;
+	const device_config *z80ctc;
 	const device_config *cassette;
 	const device_config *centronics;
 };

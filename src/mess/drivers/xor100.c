@@ -9,9 +9,7 @@
     TODO:
 
     - floppy
-    - ROM should be mirrored every 2K at boot
     - honor jumpers
-    - memory expansion
     - CTC signals
 	- serial printer
 
@@ -33,6 +31,45 @@
 
 /* Read/Write Handlers */
 
+enum
+{
+	EPROM_0000 = 0,
+	EPROM_F800,
+	EPROM_OFF
+};
+
+static void xor100_bankswitch(running_machine *machine)
+{
+	xor100_state *state = machine->driver_data;
+	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+
+	switch (state->mode)
+	{
+	case EPROM_OFF:
+		memory_install_read8_handler(program, 0x0000, 0xf7ff, 0, 0, SMH_BANK(2));
+		memory_install_read8_handler(program, 0xf800, 0xffff, 0, 0, SMH_BANK(3));
+		memory_set_bank(machine, 2, 1 + state->bank);
+		memory_set_bank(machine, 3, 1 + state->bank);
+		break;
+
+	case EPROM_0000:
+		memory_install_read8_handler(program, 0x0000, 0xf7ff, 0x07ff, 0, SMH_BANK(2));
+		memory_install_read8_handler(program, 0xf800, 0xffff, 0, 0, SMH_BANK(3));
+		memory_set_bank(machine, 2, 0);
+		memory_set_bank(machine, 3, 0);
+		break;
+
+	case EPROM_F800:
+		memory_install_read8_handler(program, 0x0000, 0xf7ff, 0, 0, SMH_BANK(2));
+		memory_install_read8_handler(program, 0xf800, 0xffff, 0, 0, SMH_BANK(3));
+		memory_set_bank(machine, 2, 1 + state->bank);
+		memory_set_bank(machine, 3, 0);
+		break;
+	}
+
+	memory_set_bank(machine, 1, 1 + state->bank);
+}
+
 static WRITE8_HANDLER( mmu_w )
 {
 	/*
@@ -49,19 +86,34 @@ static WRITE8_HANDLER( mmu_w )
 		7
 
     */
+
+	xor100_state *state = space->machine->driver_data;
+
+	state->bank = data & 0x03;
+
+	xor100_bankswitch(space->machine);
 }
 
 static WRITE8_HANDLER( prom_toggle_w )
 {
-	memory_set_bank(space->machine, 3, BIT(data, 0));
+	xor100_state *state = space->machine->driver_data;
+
+	switch (state->mode)
+	{
+	case EPROM_OFF: state->mode = EPROM_F800; break;
+	case EPROM_F800: state->mode = EPROM_OFF; break;
+	}
+
+	xor100_bankswitch(space->machine);
 }
 
 static READ8_HANDLER( prom_disable_r )
 {
-	const address_space *program = cputag_get_address_space(space->machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	xor100_state *state = space->machine->driver_data;
 
-	memory_install_readwrite8_handler(program, 0x0000, 0xf7ff, 0, 0, SMH_BANK(1), SMH_BANK(2));
-	memory_set_bank(space->machine, 1, 1);
+	state->mode = EPROM_F800;
+
+	xor100_bankswitch(space->machine);
 
 	return 0xff;
 }
@@ -134,8 +186,9 @@ static WRITE8_HANDLER( floppy_select_w )
 
 static ADDRESS_MAP_START( xor100_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xf7ff) AM_READWRITE(SMH_BANK(1), SMH_BANK(2))
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(SMH_BANK(3), SMH_BANK(4))
+	AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_BANK(1))
+	AM_RANGE(0x0000, 0xf7ff) AM_READ(SMH_BANK(2))
+	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_BANK(3))
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xor100_io, ADDRESS_SPACE_IO, 8 )
@@ -362,6 +415,7 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_irq_w )
 	xor100_state *driver_state = device->machine->driver_data;
 
 	driver_state->fdc_irq = state;
+	z80ctc_trg0_w(driver_state->z80ctc, state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
@@ -397,39 +451,38 @@ static GENERIC_TERMINAL_INTERFACE( xor100_terminal_intf )
 static MACHINE_START( xor100 )
 {
 	xor100_state *state = machine->driver_data;
-
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
 	state->i8251_a = devtag_get_device(machine, I8251_A_TAG);
 	state->i8251_b = devtag_get_device(machine, I8251_B_TAG);
 	state->wd1795 = devtag_get_device(machine, WD1795_TAG);
+	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* setup memory banking */
-	memory_install_readwrite8_handler(program, 0xf800, 0xffff, 0, 0, SMH_BANK(3), SMH_BANK(4));
-
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, Z80_TAG) + 0xf800, 0);
-	memory_configure_bank(machine, 1, 1, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
-
-	memory_configure_bank(machine, 2, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_configure_bank(machine, 1, 1, 4, messram_get_ptr(devtag_get_device(machine, "messram")), 0x10000);
+	memory_install_write8_handler(program, 0x0000, 0xffff, 0, 0, SMH_BANK(1));
+	memory_set_bank(machine, 1, 1);
+	
+	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(machine, 2, 1, 4, messram_get_ptr(devtag_get_device(machine, "messram")), 0x10000);
+	memory_install_read8_handler(program, 0x0000, 0xf7ff, 0, 0x7ff, SMH_BANK(2));
 	memory_set_bank(machine, 2, 0);
-
-	memory_configure_bank(machine, 3, 0, 1, memory_region(machine, Z80_TAG) + 0xf800, 0);
-	memory_configure_bank(machine, 3, 1, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf800, 0);
-
-	memory_configure_bank(machine, 4, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf800, 0);
-	memory_set_bank(machine, 4, 0);
+	
+	memory_configure_bank(machine, 3, 0, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(machine, 3, 1, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf800, 0x10000);
+	memory_install_read8_handler(program, 0xf800, 0xffff, 0, 0, SMH_BANK(3));
+	memory_set_bank(machine, 3, 0);
 }
 
 static MACHINE_RESET( xor100 )
 {
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	xor100_state *state = machine->driver_data;
 
-	memory_install_read8_handler(program, 0x0000, 0x07ff, 0, 0, SMH_BANK(1)); // TODO: should be mirrored every 2K
-	memory_install_write8_handler(program, 0x0000, 0xf7ff, 0, 0, SMH_BANK(2));
-	memory_set_bank(machine, 1, 0);
-	memory_set_bank(machine, 3, 0);
+	state->mode = EPROM_0000;
+
+	xor100_bankswitch(machine);
 }
 
 /* Machine Driver */
@@ -474,16 +527,18 @@ static MACHINE_DRIVER_START( xor100 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")	
+	MDRV_RAM_EXTRA_OPTIONS("128K,192K,256K")
 MACHINE_DRIVER_END
 
 /* ROMs */
 
 ROM_START( xor100 )
-	ROM_REGION( 0x10000, Z80_TAG, 0 )
-	ROM_LOAD( "xp 185.8b", 0xf800, 0x0800, CRC(0d0bda8d) SHA1(11c83f7cd7e6a570641b44a2f2cc5737a7dd8ae3) )
+	ROM_REGION( 0x800, Z80_TAG, 0 )
+	ROM_SYSTEM_BIOS( 0, "v185", "v1.85" )
+	ROMX_LOAD( "xp 185.8b", 0x000, 0x800, CRC(0d0bda8d) SHA1(11c83f7cd7e6a570641b44a2f2cc5737a7dd8ae3), ROM_BIOS(1) )
 ROM_END
 
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY                 FULLNAME        FLAGS */
-COMP( 1982, xor100,		0,		0,		xor100,		xor100,		0,		0,		"Xor Data Science",		"XOR S-100-12",	0 )
+COMP( 1980, xor100,		0,		0,		xor100,		xor100,		0,		0,		"Xor Data Science",		"XOR S-100-12",	0 )
