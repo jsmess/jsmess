@@ -6,7 +6,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 #define TELEPRINTER_WIDTH 80
-#define TELEPRINTER_HEIGHT 25
+#define TELEPRINTER_HEIGHT 50
 typedef struct _teleprinter_state teleprinter_state;
 struct _teleprinter_state
 {

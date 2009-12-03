@@ -5,7 +5,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 #define TERMINAL_WIDTH 80
-#define TERMINAL_HEIGHT 25
+#define TERMINAL_HEIGHT 24
 typedef struct _terminal_state terminal_state;
 struct _terminal_state
 {
@@ -205,20 +205,38 @@ static void terminal_clear(const device_config *device) {
 WRITE8_DEVICE_HANDLER ( terminal_write ) 
 {
 	terminal_state *term = get_safe_token(device);
-	switch(data) {
-		case 10: term->y_pos++;
-				term->x_pos = 0;
-				if (term->y_pos==TERMINAL_HEIGHT) {
-					terminal_scroll_line(device);
-					term->y_pos = (TERMINAL_HEIGHT-1);
-				}; break;
-		case 13: term->x_pos = 0; break;
-		case  9: do {
-					term->x_pos ++;
-				 } while ((term->x_pos % 8)!=0);
-				 break;
-		case 16: break;
-		default: terminal_write_char(device,data); break;
+	if (data > 0x1f) {
+		// printable char
+		if (data!=0x7f) terminal_write_char(device,data);
+	} else {
+		switch(data) {
+			case 0x07 : // bell
+						break;
+			case 0x08: 	if (term->x_pos!=0) { 
+							term->x_pos--; 
+						} 
+						break;			
+			case 0x09:  do {
+							term->x_pos ++;
+						} while ((term->x_pos % 8)!=0);
+						break;
+			case 0x0a: 	term->y_pos++;
+						term->x_pos = 0;
+						if (term->y_pos==TERMINAL_HEIGHT) {
+							terminal_scroll_line(device);
+							term->y_pos = (TERMINAL_HEIGHT-1);
+						}; 
+						break;
+			case 0x0b:  if (term->y_pos!=0) {
+							term->y_pos--;
+						}
+						break;
+			case 0x0d: 	term->x_pos = 0; 
+						break;
+			case 0x1e:  term->x_pos = 0;
+						term->y_pos = 0;
+						break;			
+		}
 	}
 }
 	
