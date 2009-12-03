@@ -1529,5 +1529,7 @@ const game_driver * const drivers[] =
 	DRIVER( elekscmp )
 	DRIVER( ht68k )
 	DRIVER( mits680b )
+	DRIVER( basic52 )
+	DRIVER( basic31 )	
 
 #endif /* DRIVER_RECURSIVE */

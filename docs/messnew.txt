@@ -27,8 +27,9 @@ Skeleton drivers:
 - Exelvision Exeltel
 - Sharp PC-E220
 - Hewlett-Packard HP16500b [R. Belmont]
-- MITS Altair 680b  [Miodrag Milanovic]
-
+- MITS Altair 680b [Miodrag Milanovic]
+- MCS Basic 52 [Miodrag Milanovic]
+- MCS Basic 31 [Miodrag Milanovic]
 
 System Driver Changes:
 ----------------------

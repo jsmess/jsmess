@@ -1530,6 +1530,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/elekscmp.o	\
 	$(MESS_DRIVERS)/ht68k.o		\
 	$(MESS_DRIVERS)/mits680b.o	\
+	$(MESS_DRIVERS)/basic52.o	\
 
 
 
