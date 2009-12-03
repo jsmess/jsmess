@@ -27,7 +27,7 @@ Skeleton drivers:
 -----------------
 - Exelvision Exeltel
 - Sharp PC-E220
-
+- Hewlett-Packard HP16500b [R. Belmont]
 
 
 System Driver Changes:

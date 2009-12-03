@@ -1072,10 +1072,11 @@ const game_driver * const drivers[] =
     DRIVER( hp48gx )    /* HP 48GX */
     DRIVER( hp48gp )        /* HP 48G+ */
     DRIVER( hp49g )
+    DRIVER( hp16500b )
 
     /* SpectraVideo */
     DRIVER( svi318 )    /* SVI-318 (PAL)                                    */
-    DRIVER( svi318n )   /* SVI-318 (NTSC)                                   */
+    DRIVER( svi318n )   /* SVI-318 (NTSC)                                  */
     DRIVER( svi328 )    /* SVI-328 (PAL)                                    */
     DRIVER( svi328n )   /* SVI-328 (NTSC)                                   */
     DRIVER( sv328p80 )  /* SVI-328 (PAL) + SVI-806 80 column card           */

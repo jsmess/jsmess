@@ -910,6 +910,7 @@ $(MESSOBJ)/hp.a:				\
 	$(MESS_DRIVERS)/hp48.o		\
 	$(MESS_DEVICES)/xmodem.o	\
 	$(MESS_DEVICES)/kermit.o	\
+	$(MESS_DRIVERS)/hp16500.o	\
 
 $(MESSOBJ)/hec2hrp.a:			\
 	$(MESS_DRIVERS)/hec2hrp.o	\
