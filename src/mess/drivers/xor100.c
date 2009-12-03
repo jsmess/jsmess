@@ -8,12 +8,12 @@
 
     TODO:
 
-    - ROM should be mirrored every 2K at boot
-    - 2/4 MHz jumper J2
     - floppy
+    - ROM should be mirrored every 2K at boot
+    - honor jumpers
     - memory expansion
-    - COM5016
     - CTC signals
+	- serial printer
 
 */
 
@@ -22,8 +22,8 @@
 #include "cpu/z80/z80.h"
 #include "formats/basicdsk.h"
 #include "devices/flopdrv.h"
-#include "devices/cassette.h"
 #include "machine/com8116.h"
+#include "machine/ctronics.h"
 #include "machine/i8255a.h"
 #include "machine/msm8251.h"
 #include "machine/terminal.h"
@@ -41,6 +41,12 @@ static WRITE8_HANDLER( mmu_w )
 
         0       A16
         1       A17
+		2		A18
+		3		A19
+		4
+		5
+		6
+		7
 
     */
 }
@@ -74,6 +80,56 @@ static WRITE8_DEVICE_HANDLER( i8251_b_data_w )
 	terminal_write(terminal, 0, data);
 }
 
+static READ8_HANDLER( fdc_irq_r )
+{
+	/*
+
+		bit		description
+
+		0		
+		1		
+		2		
+		3		
+		4
+		5
+		6
+		7		FDC IRQ
+
+	*/
+
+	xor100_state *state = space->machine->driver_data;
+
+	return state->fdc_irq << 7;
+}
+
+static WRITE8_HANDLER( floppy_select_w )
+{
+	/*
+
+		bit		description
+
+		0		DS0
+		1		DS1
+		2		DS2
+		3		DS3
+		4
+		5
+		6
+		7		_HLSTB
+
+	*/
+
+	xor100_state *state = space->machine->driver_data;
+
+	if (!BIT(data, 0)) wd17xx_set_drive(state->wd1795, 0);
+	if (!BIT(data, 1)) wd17xx_set_drive(state->wd1795, 1);
+
+	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), 1);
+	floppy_drive_set_motor_state(floppy_get_device(space->machine, 1), 1);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1, 1);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1, 1);
+}
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( xor100_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -95,6 +151,9 @@ static ADDRESS_MAP_START( xor100_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0a, 0x0a) AM_READ(prom_disable_r)
 	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("DSW0") AM_DEVWRITE(COM5016_TAG, baud_w)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE(WD1795_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0xfc, 0xfc) AM_READ(fdc_irq_r)
+	AM_RANGE(0xfd, 0xfd) AM_WRITE(floppy_select_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -137,6 +196,46 @@ static INPUT_PORTS_START( xor100 )
 	PORT_DIPSETTING(    0xd0, "7200 baud" )
 	PORT_DIPSETTING(    0xe0, "9600 baud" )
 	PORT_DIPSETTING(    0xf0, "19200 baud" )
+
+	PORT_START("J1")
+	PORT_CONFNAME( 0x01, 0x01, "J1 Wait State")
+	PORT_CONFSETTING( 0x00, "No Wait States" )
+	PORT_CONFSETTING( 0x01, "1 M1 Wait State" )
+
+	PORT_START("J2")
+	PORT_CONFNAME( 0x01, 0x01, "J2 CPU Speed")
+	PORT_CONFSETTING( 0x00, "2 MHz" )
+	PORT_CONFSETTING( 0x01, "4 MHz" )
+
+	PORT_START("J3")
+	PORT_CONFNAME( 0x01, 0x00, "J3")
+	PORT_CONFSETTING( 0x00, "" )
+	PORT_CONFSETTING( 0x01, "" )
+
+	PORT_START("J4-J5")
+	PORT_CONFNAME( 0x01, 0x01, "J4/J5 EPROM Type")
+	PORT_CONFSETTING( 0x00, "2708" )
+	PORT_CONFSETTING( 0x01, "2716" )
+
+	PORT_START("J6")
+	PORT_CONFNAME( 0x01, 0x01, "J6 EPROM")
+	PORT_CONFSETTING( 0x00, "Disabled" )
+	PORT_CONFSETTING( 0x01, "Enabled" )
+
+	PORT_START("J7")
+	PORT_CONFNAME( 0x01, 0x00, "J7 I/O Port Addresses")
+	PORT_CONFSETTING( 0x00, "00-0F" )
+	PORT_CONFSETTING( 0x01, "10-1F" )
+
+	PORT_START("J8")
+	PORT_CONFNAME( 0x01, 0x00, "J8")
+	PORT_CONFSETTING( 0x00, "" )
+	PORT_CONFSETTING( 0x01, "" )
+
+	PORT_START("J9")
+	PORT_CONFNAME( 0x01, 0x01, "J9 Power On RAM")
+	PORT_CONFSETTING( 0x00, "Enabled" )
+	PORT_CONFSETTING( 0x01, "Disabled" )
 INPUT_PORTS_END
 
 /* COM5016 Interface */
@@ -162,8 +261,8 @@ static COM8116_INTERFACE( com5016_intf )
 	DEVCB_NULL,					/* fX/4 output */
 	DEVCB_LINE(com5016_fr_w),	/* fR output */
 	DEVCB_LINE(com5016_ft_w),	/* fT output */
-	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },	// WRONG
-	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },	// WRONG
+	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },	// WRONG?
+	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },	// WRONG?
 };
 
 /* Printer 8251A Interface */
@@ -186,14 +285,51 @@ static msm8251_interface terminal_8251_intf =
 
 /* Printer 8255A Interface */
 
+static READ8_DEVICE_HANDLER( i8255_pc_r )
+{
+	/*
+
+		bit		description
+
+		PC0
+		PC1
+		PC2
+		PC3
+		PC4		ON LINE
+		PC5		BUSY
+		PC6		_ACK
+		PC7
+
+	*/
+
+	xor100_state *driver_state = device->machine->driver_data;
+	UINT8 data = 0;
+
+	/* on line */
+	data |= centronics_vcc_r(driver_state->centronics) << 4;
+
+	/* busy */
+	data |= centronics_busy_r(driver_state->centronics) << 5;
+
+	return data;
+}
+
 static I8255A_INTERFACE( printer_8255_intf )
 {
-	DEVCB_NULL,		// Port A read
-	DEVCB_NULL,		// Port B read
-	DEVCB_NULL,		// Port C read
-	DEVCB_NULL,		// Port A write
-	DEVCB_NULL,		// Port B write
-	DEVCB_NULL		// Port C write
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(i8255_pc_r),
+	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),
+	DEVCB_DEVICE_LINE(CENTRONICS_TAG, centronics_strobe_w),
+	DEVCB_NULL
+};
+
+static centronics_interface xor100_centronics_intf =
+{
+	0,
+	DEVCB_DEVICE_LINE(I8255A_TAG, i8255a_pc4_w),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* Z80-CTC Interface */
@@ -221,10 +357,24 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 /* WD1795-02 Interface */
 
+static WRITE_LINE_DEVICE_HANDLER( fdc_irq_w )
+{
+	xor100_state *driver_state = device->machine->driver_data;
+
+	driver_state->fdc_irq = state;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
+{
+	xor100_state *driver_state = device->machine->driver_data;
+
+	driver_state->fdc_drq = state;
+}
+
 static const wd17xx_interface wd1795_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_LINE(fdc_irq_w),
+	DEVCB_LINE(fdc_drq_w),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
@@ -253,6 +403,7 @@ static MACHINE_START( xor100 )
 	/* find devices */
 	state->i8251_a = devtag_get_device(machine, I8251_A_TAG);
 	state->i8251_b = devtag_get_device(machine, I8251_B_TAG);
+	state->wd1795 = devtag_get_device(machine, WD1795_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* setup memory banking */
@@ -283,22 +434,6 @@ static MACHINE_RESET( xor100 )
 
 /* Machine Driver */
 
-static const cassette_config xor100_cassette_config =
-{
-	cassette_default_formats,
-	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
-};
-
-static FLOPPY_OPTIONS_START( xor100 )
-	FLOPPY_OPTION( xor100, "dsk", "XOR-100-12 disk image", basicdsk_identify_default, basicdsk_construct_default, // WRONG
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
 static const floppy_config xor100_floppy_config =
 {
 	DEVCB_NULL,
@@ -307,7 +442,7 @@ static const floppy_config xor100_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(xor100),
+	FLOPPY_OPTIONS_NAME(default),
 	DO_NOT_KEEP_GEOMETRY
 };
 
@@ -333,8 +468,8 @@ static MACHINE_DRIVER_START( xor100 )
 	MDRV_COM8116_ADD(COM5016_TAG, 5000000, com5016_intf) // COM5016
 	MDRV_WD179X_ADD(WD1795_TAG, /*XTAL_8MHz/8,*/ wd1795_intf) // WD1795-02
 	MDRV_FLOPPY_2_DRIVES_ADD(xor100_floppy_config)
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, xor100_cassette_config)
 	MDRV_GENERIC_TERMINAL_ADD("terminal", xor100_terminal_intf)  
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, xor100_centronics_intf)
 	
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
