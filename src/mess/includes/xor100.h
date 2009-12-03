@@ -11,6 +11,7 @@
 #define WD1795_TAG		"wd1795"
 #define CASSETTE_TAG	"cassette"
 #define CENTRONICS_TAG	"centronics"
+#define TERMINAL_TAG	"terminal"
 
 typedef struct _xor100_state xor100_state;
 struct _xor100_state
@@ -22,6 +23,7 @@ struct _xor100_state
 	/* floppy state */
 	int fdc_irq;
 	int fdc_drq;
+	int fdc_dden;
 
 	/* devices */
 	const device_config *i8251_a;

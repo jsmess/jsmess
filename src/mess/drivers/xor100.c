@@ -8,10 +8,11 @@
 
     TODO:
 
-    - floppy
-    - honor jumpers
-    - CTC signals
+    - floppy images are bad
+    - honor jumper settings
+    - CTC signal header
 	- serial printer
+	- cassette?
 
 */
 
@@ -42,17 +43,22 @@ static void xor100_bankswitch(running_machine *machine)
 {
 	xor100_state *state = machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	const device_config *messram = devtag_get_device(machine, "messram");
+	int banks = messram_get_size(messram) / 0x10000;
 
 	switch (state->mode)
 	{
-	case EPROM_OFF:
-		memory_install_read8_handler(program, 0x0000, 0xf7ff, 0, 0, SMH_BANK(2));
-		memory_install_read8_handler(program, 0xf800, 0xffff, 0, 0, SMH_BANK(3));
-		memory_set_bank(machine, 2, 1 + state->bank);
-		memory_set_bank(machine, 3, 1 + state->bank);
-		break;
-
 	case EPROM_0000:
+		if (state->bank < banks)
+		{
+			memory_install_write8_handler(program, 0x0000, 0xffff, 0, 0, SMH_BANK(1));
+			memory_set_bank(machine, 1, 1 + state->bank);
+		}
+		else
+		{
+			memory_install_write8_handler(program, 0x0000, 0xffff, 0, 0, SMH_UNMAP);
+		}
+
 		memory_install_read8_handler(program, 0x0000, 0xf7ff, 0x07ff, 0, SMH_BANK(2));
 		memory_install_read8_handler(program, 0xf800, 0xffff, 0, 0, SMH_BANK(3));
 		memory_set_bank(machine, 2, 0);
@@ -60,14 +66,41 @@ static void xor100_bankswitch(running_machine *machine)
 		break;
 
 	case EPROM_F800:
-		memory_install_read8_handler(program, 0x0000, 0xf7ff, 0, 0, SMH_BANK(2));
+		if (state->bank < banks)
+		{
+			memory_install_write8_handler(program, 0x0000, 0xffff, 0, 0, SMH_BANK(1));
+			memory_install_read8_handler(program, 0x0000, 0xf7ff, 0, 0, SMH_BANK(2));
+			memory_set_bank(machine, 1, 1 + state->bank);
+			memory_set_bank(machine, 2, 1 + state->bank);
+		}
+		else
+		{
+			memory_install_write8_handler(program, 0x0000, 0xffff, 0, 0, SMH_UNMAP);
+			memory_install_read8_handler(program, 0x0000, 0xf7ff, 0, 0, SMH_UNMAP);
+		}
+
 		memory_install_read8_handler(program, 0xf800, 0xffff, 0, 0, SMH_BANK(3));
-		memory_set_bank(machine, 2, 1 + state->bank);
 		memory_set_bank(machine, 3, 0);
 		break;
-	}
 
-	memory_set_bank(machine, 1, 1 + state->bank);
+	case EPROM_OFF:
+		if (state->bank < banks)
+		{
+			memory_install_write8_handler(program, 0x0000, 0xffff, 0, 0, SMH_BANK(1));
+			memory_install_read8_handler(program, 0x0000, 0xf7ff, 0, 0, SMH_BANK(2));
+			memory_install_read8_handler(program, 0xf800, 0xffff, 0, 0, SMH_BANK(3));
+			memory_set_bank(machine, 1, 1 + state->bank);
+			memory_set_bank(machine, 2, 1 + state->bank);
+			memory_set_bank(machine, 3, 1 + state->bank);
+		}
+		else
+		{
+			memory_install_write8_handler(program, 0x0000, 0xffff, 0, 0, SMH_UNMAP);
+			memory_install_read8_handler(program, 0x0000, 0xf7ff, 0, 0, SMH_UNMAP);
+			memory_install_read8_handler(program, 0xf800, 0xffff, 0, 0, SMH_UNMAP);
+		}
+		break;
+	}
 }
 
 static WRITE8_HANDLER( mmu_w )
@@ -89,7 +122,7 @@ static WRITE8_HANDLER( mmu_w )
 
 	xor100_state *state = space->machine->driver_data;
 
-	state->bank = data & 0x03;
+	state->bank = data & 0x07;
 
 	xor100_bankswitch(space->machine);
 }
@@ -126,13 +159,13 @@ static WRITE8_DEVICE_HANDLER( baud_w )
 
 static WRITE8_DEVICE_HANDLER( i8251_b_data_w )
 {
-	const device_config	*terminal = devtag_get_device(device->machine, "terminal");
+	const device_config	*terminal = devtag_get_device(device->machine, TERMINAL_TAG);
 	
 	msm8251_data_w(device, 0, data);
 	terminal_write(terminal, 0, data);
 }
 
-static READ8_HANDLER( fdc_irq_r )
+static READ8_HANDLER( fdc_wait_r )
 {
 	/*
 
@@ -151,10 +184,16 @@ static READ8_HANDLER( fdc_irq_r )
 
 	xor100_state *state = space->machine->driver_data;
 
-	return state->fdc_irq << 7;
+	if (!state->fdc_irq && !state->fdc_drq)
+	{
+		/* TODO: this is really connected to the Z80 _RDY line */
+		cputag_set_input_line(space->machine, Z80_TAG, INPUT_LINE_HALT, ASSERT_LINE);
+	}
+
+	return !state->fdc_irq << 7;
 }
 
-static WRITE8_HANDLER( floppy_select_w )
+static WRITE8_HANDLER( fdc_dcont_w )
 {
 	/*
 
@@ -173,8 +212,9 @@ static WRITE8_HANDLER( floppy_select_w )
 
 	xor100_state *state = space->machine->driver_data;
 
-	if (!BIT(data, 0)) wd17xx_set_drive(state->wd1795, 0);
-	if (!BIT(data, 1)) wd17xx_set_drive(state->wd1795, 1);
+	/* drive select */
+	if (BIT(data, 0)) wd17xx_set_drive(state->wd1795, 0);
+	if (BIT(data, 1)) wd17xx_set_drive(state->wd1795, 1);
 
 	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), 1);
 	floppy_drive_set_motor_state(floppy_get_device(space->machine, 1), 1);
@@ -182,17 +222,45 @@ static WRITE8_HANDLER( floppy_select_w )
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1, 1);
 }
 
+static WRITE8_HANDLER( fdc_dsel_w )
+{
+	/*
+
+		bit		description
+
+		0		J
+		1		K
+		2		
+		3		
+		4
+		5
+		6
+		7		
+
+	*/
+
+	xor100_state *state = space->machine->driver_data;
+
+	switch (data & 0x03)
+	{
+	case 0: break;
+	case 1: state->fdc_dden = 1; break;
+	case 2: state->fdc_dden = 0; break;
+	case 3: state->fdc_dden = state->fdc_dden; break;
+	}
+
+	wd17xx_set_density(state->wd1795, state->fdc_dden ? DEN_FM_HI : DEN_FM_LO);
+}
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( xor100_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_BANK(1))
 	AM_RANGE(0x0000, 0xf7ff) AM_READ(SMH_BANK(2))
 	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_BANK(3))
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xor100_io, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(I8251_A_TAG, msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(I8251_A_TAG, msm8251_status_r, msm8251_control_w)
@@ -205,8 +273,8 @@ static ADDRESS_MAP_START( xor100_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("DSW0") AM_DEVWRITE(COM5016_TAG, baud_w)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE(WD1795_TAG, wd17xx_r, wd17xx_w)
-	AM_RANGE(0xfc, 0xfc) AM_READ(fdc_irq_r)
-	AM_RANGE(0xfd, 0xfd) AM_WRITE(floppy_select_w)
+	AM_RANGE(0xfc, 0xfc) AM_READWRITE(fdc_wait_r, fdc_dcont_w)
+	AM_RANGE(0xfd, 0xfd) AM_WRITE(fdc_dsel_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -416,6 +484,12 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_irq_w )
 
 	driver_state->fdc_irq = state;
 	z80ctc_trg0_w(driver_state->z80ctc, state);
+
+	if (state)
+	{
+		/* TODO: this is really connected to the Z80 _RDY line */
+		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_HALT, CLEAR_LINE);
+	}
 }
 
 static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
@@ -423,6 +497,12 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
 	xor100_state *driver_state = device->machine->driver_data;
 
 	driver_state->fdc_drq = state;
+
+	if (state)
+	{
+		/* TODO: this is really connected to the Z80 _RDY line */
+		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_HALT, CLEAR_LINE);
+	}
 }
 
 static const wd17xx_interface wd1795_intf =
@@ -451,7 +531,8 @@ static GENERIC_TERMINAL_INTERFACE( xor100_terminal_intf )
 static MACHINE_START( xor100 )
 {
 	xor100_state *state = machine->driver_data;
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	const device_config *messram = devtag_get_device(machine, "messram");
+	int banks = messram_get_size(messram) / 0x10000;
 
 	/* find devices */
 	state->i8251_a = devtag_get_device(machine, I8251_A_TAG);
@@ -461,19 +542,18 @@ static MACHINE_START( xor100 )
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* setup memory banking */
-	memory_configure_bank(machine, 1, 1, 4, messram_get_ptr(devtag_get_device(machine, "messram")), 0x10000);
-	memory_install_write8_handler(program, 0x0000, 0xffff, 0, 0, SMH_BANK(1));
-	memory_set_bank(machine, 1, 1);
-	
+	memory_configure_bank(machine, 1, 1, banks, messram_get_ptr(messram), 0x10000);
 	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(machine, 2, 1, 4, messram_get_ptr(devtag_get_device(machine, "messram")), 0x10000);
-	memory_install_read8_handler(program, 0x0000, 0xf7ff, 0, 0x7ff, SMH_BANK(2));
-	memory_set_bank(machine, 2, 0);
-	
+	memory_configure_bank(machine, 2, 1, banks, messram_get_ptr(messram), 0x10000);
 	memory_configure_bank(machine, 3, 0, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(machine, 3, 1, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf800, 0x10000);
-	memory_install_read8_handler(program, 0xf800, 0xffff, 0, 0, SMH_BANK(3));
-	memory_set_bank(machine, 3, 0);
+	memory_configure_bank(machine, 3, 1, banks, messram_get_ptr(messram) + 0xf800, 0x10000);
+
+	/* register for state saving */
+	state_save_register_global(machine, state->mode);
+	state_save_register_global(machine, state->bank);
+	state_save_register_global(machine, state->fdc_irq);
+	state_save_register_global(machine, state->fdc_drq);
+	state_save_register_global(machine, state->fdc_dden);
 }
 
 static MACHINE_RESET( xor100 )
@@ -518,16 +598,16 @@ static MACHINE_DRIVER_START( xor100 )
 	MDRV_MSM8251_ADD(I8251_B_TAG, /*XTAL_8MHz/2,*/ terminal_8251_intf)
 	MDRV_I8255A_ADD(I8255A_TAG, printer_8255_intf)
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
-	MDRV_COM8116_ADD(COM5016_TAG, 5000000, com5016_intf) // COM5016
-	MDRV_WD179X_ADD(WD1795_TAG, /*XTAL_8MHz/8,*/ wd1795_intf) // WD1795-02
+	MDRV_COM8116_ADD(COM5016_TAG, 5000000, com5016_intf)
+	MDRV_WD179X_ADD(WD1795_TAG, /*XTAL_8MHz/8,*/ wd1795_intf)
 	MDRV_FLOPPY_2_DRIVES_ADD(xor100_floppy_config)
-	MDRV_GENERIC_TERMINAL_ADD("terminal", xor100_terminal_intf)  
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, xor100_centronics_intf)
+	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG, xor100_terminal_intf)  
 	
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")	
-	MDRV_RAM_EXTRA_OPTIONS("128K,192K,256K")
+	MDRV_RAM_EXTRA_OPTIONS("128K,192K,256K,320K,384K,448K,512K")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -541,4 +621,4 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY                 FULLNAME        FLAGS */
-COMP( 1980, xor100,		0,		0,		xor100,		xor100,		0,		0,		"Xor Data Science",		"XOR S-100-12",	0 )
+COMP( 1980, xor100,		0,		0,		xor100,		xor100,		0,		0,		"Xor Data Science",		"XOR S-100-12",	GAME_SUPPORTS_SAVE )
