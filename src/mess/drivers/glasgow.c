@@ -383,14 +383,13 @@ static READ16_HANDLER( read_newkeys16 )  //Amsterdam, Roma
 }
 
 
-/*
+#ifdef UNUSED_FUNCTION
 static READ16_HANDLER(read_test)
 {
-  logerror("read test Offset = %x Data = %x\n  ",offset,data);
-  return 0xffff;    // Mephisto need it for working
+	logerror("read test Offset = %x Data = %x\n  ",offset,data);
+	return 0xffff;    // Mephisto need it for working
 }
-
-*/
+#endif
 
 /*
 
@@ -454,13 +453,13 @@ static READ32_HANDLER( read_board32 )
 	return 0;
 }
 
-/*
+#ifdef UNUSED_FUNCTION
 static READ16_HANDLER(read_board_amsterd)
 {
-  logerror("read board amsterdam Offset = %x \n  ", offset);
-  return 0xffff;
+	logerror("read board amsterdam Offset = %x \n  ", offset);
+	return 0xffff;
 }
-*/
+#endif
 
 static WRITE32_HANDLER( write_board32 )
 {

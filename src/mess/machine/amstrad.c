@@ -1997,7 +1997,8 @@ READ8_HANDLER( amstrad_plus_asic_6000_r )
 	{
 		return 0x00;
 	}
-/*      if(offset == 0x0c0f)  // DMA status and control
+#if 0
+	if(offset == 0x0c0f)  // DMA status and control
         {
             int result = 0;
             if(amstrad_plus_irq_cause == 0x00)
@@ -2010,7 +2011,7 @@ READ8_HANDLER( amstrad_plus_asic_6000_r )
                 result |= 0x80;
             return result;
         }
-*/
+#endif
 	return amstrad_plus_asic_ram[offset+0x2000];
 }
 
@@ -3579,7 +3580,8 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 }
 
 
-/*static DEVICE_IMAGE_LOAD( aleste )
+#if 0
+static DEVICE_IMAGE_LOAD( aleste )
 {
     if (device_load_basicdsk_floppy(image)==INIT_PASS)
     {
@@ -3587,4 +3589,5 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
         return INIT_PASS;
     }
     return INIT_FAIL;
-}*/
+}
+#endif

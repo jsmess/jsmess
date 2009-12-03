@@ -776,12 +776,13 @@ static WRITE8_HANDLER( cop_w )
 
 			break;
 
-/*      case NEWBRAIN_COPCMD_TIMCOM:
-            copregint = 0;
-            copbytes = 6;
-            copstate = NEWBRAIN_COP_STATE_DATA;
-            break;
-*/
+#if 0
+		case NEWBRAIN_COPCMD_TIMCOM:
+			copregint = 0;
+			copbytes = 6;
+			copstate = NEWBRAIN_COP_STATE_DATA;
+			break;
+#endif
 		case NEWBRAIN_COPCMD_PDNCOM:
 			/* power down */
 			copregint = 0;

@@ -423,7 +423,7 @@ static int image_tracksector2offset( int track, int sector )
 	return image_offset[track - 1] + sector * 256;
 }
 
-/*
+#ifdef UNUSED_FUNCTION
 // WARNING: this would work with a d64 image... it has to be adapted to work with GCR image we store at loading time
 static void image_offset2tracksector( int offset )
 {
@@ -433,7 +433,7 @@ static void image_offset2tracksector( int offset )
 
     do
     {
-    helper -= (d64_sectors_per_track[++i] * 256);
+        helper -= (d64_sectors_per_track[++i] * 256);
     } while (helper > 0);
 
     track = i;
@@ -442,7 +442,7 @@ static void image_offset2tracksector( int offset )
 
     logerror("We are reading at offset %d, which is in track %d and sector %d \n", offset, track, sector);
 }
-*/
+#endif
 
 
 /* These functions return the Disk ID stored in the disk BAM */
@@ -562,7 +562,7 @@ static const int bin_2_gcr[] =
 
 
 /* This could be of use if we ever implement saving in .d64 format, to convert back GCR -> d64 */
-/*
+#if 0
 static const int gcr_2_bin[] =
 {
     -1, -1,   -1,   -1,
@@ -574,7 +574,7 @@ static const int gcr_2_bin[] =
     -1, 0x09, 0x0a, 0x0b,
     -1, 0x0d, 0x0e, -1
 };
-*/
+#endif
 
 
 /* gcr_double_2_gcr takes 4 bytes (a, b, c, d) and shuffles their nibbles to obtain 5 bytes in dest */

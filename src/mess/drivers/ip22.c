@@ -1032,7 +1032,7 @@ static UINT32 nPBUS_DMA_WordsLeft;
 static TIMER_CALLBACK(ip22_dma)
 {
 	timer_set(machine, attotime_never, NULL, 0, ip22_dma);
-	/*
+#if 0
 	if( nPBUS_DMA_Active )
 	{
 		UINT16 temp16 = ( ip22_mainram[(nPBUS_DMA_CurPtr - 0x08000000)/4] & 0xffff0000 ) >> 16;
@@ -1060,7 +1060,7 @@ static TIMER_CALLBACK(ip22_dma)
 		}
 		timer_set(machine, ATTOTIME_IN_HZ(44100), NULL, 0, ip22_dma);
 	}
-	*/
+#endif
 }
 
 static READ32_HANDLER( hpc3_pbusdma_r )
@@ -1323,7 +1323,7 @@ static void scsi_irq(running_machine *machine, int state)
 
 				// clear DMA on the controller too
 				wd33c93_clear_dma();
-				/*
+#if 0
 				UINT32 dptr, tmpword;
 				UINT32 bc = memory_read_dword(space, nHPC_SCSI0Descriptor + 4);
 				UINT32 rptr = memory_read_dword(space, nHPC_SCSI0Descriptor);
@@ -1372,7 +1372,7 @@ static void scsi_irq(running_machine *machine, int state)
 				{
 					logerror("IP22: overly large host to device transfer, can't handle!\n");
 				}
-				*/
+#endif
 			}
 
 			// HPC3 DMA: device to host

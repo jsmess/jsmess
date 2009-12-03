@@ -46,9 +46,11 @@ static const rectangle asr_scroll_clear_window =
 
 static struct
 {
-	/*UINT8 OutQueue[ASROutQueueSize];
-    int OutQueueHead;
-    int OutQueueLen;*/
+#if 0
+	UINT8 OutQueue[ASROutQueueSize];
+	int OutQueueHead;
+	int OutQueueLen;
+#endif
 
 	UINT8 recv_buf;
 	UINT8 xmit_buf;

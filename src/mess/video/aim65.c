@@ -109,41 +109,45 @@ WRITE8_DEVICE_HANDLER( aim65_printer_on )
 
 WRITE8_DEVICE_HANDLER( aim65_printer_data_a )
 {
-/*  if (flag_a == 0) {
-        printerRAM[(printer_y * 20) + printer_x] |= data;
-        flag_a = 1;
-    }*/
+#if 0
+	if (flag_a == 0) {
+		printerRAM[(printer_y * 20) + printer_x] |= data;
+		flag_a = 1;
+	}
+#endif
 }
 
 WRITE8_DEVICE_HANDLER( aim65_printer_data_b )
 {
-/*  data &= 0x03;
+#if 0
+	data &= 0x03;
 
-    if (flag_b == 0) {
-        printerRAM[(printer_y * 20) + printer_x ] |= (data << 8);
-        flag_b = 1;
-    }*/
+	if (flag_b == 0) {
+		printerRAM[(printer_y * 20) + printer_x ] |= (data << 8);
+		flag_b = 1;
+	}
+#endif
 }
 
 VIDEO_START( aim65 )
 {
 	print_timer = timer_alloc(machine, aim65_printer_timer, NULL);
 
-	/*
-    videoram_size = 600 * 10 * 2;
-    printerRAM = auto_alloc_array(machine, UINT16, videoram_size / 2);
-    memset(printerRAM, 0, videoram_size);
-    printer_x = 0;
-    printer_y = 0;
-    printer_dir = 0;
-    flag_a=0;
-    flag_b=0;
+#if 0
+	videoram_size = 600 * 10 * 2;
+	printerRAM = auto_alloc_array(machine, UINT16, videoram_size / 2);
+	memset(printerRAM, 0, videoram_size);
+	printer_x = 0;
+	printer_y = 0;
+	printer_dir = 0;
+	flag_a=0;
+	flag_b=0;
 
 
-    printer_level = 0;
+	printer_level = 0;
 
-    VIDEO_START_CALL(generic);
-    */
+	VIDEO_START_CALL(generic);
+#endif
 }
 
 
@@ -151,32 +155,34 @@ VIDEO_START( aim65 )
 VIDEO_UPDATE( aim65 )
 {
 	/* Display printer output */
-/*  dir = 1;
-    for(y = 0; y<500;y++)
-    {
-        for(x = 0; x< 10; x++)
-        {
-            if (dir == 1) {
-                data = printerRAM[y * 10  + x];
-            }
-            else {
-                data = printerRAM[(y * 10) + (9 - x)];
-            }
+#if 0
+	dir = 1;
+	for(y = 0; y<500;y++)
+	{
+		for(x = 0; x< 10; x++)
+		{
+			if (dir == 1) {
+				data = printerRAM[y * 10  + x];
+			}
+			else {
+				data = printerRAM[(y * 10) + (9 - x)];
+			}
 
 
-            for (b = 0; b<10; b++)
-            {
-                color=machine->pens[(data & 0x1)?2:0];
-                plot_pixel(bitmap,700 - ((b * 10) + x), y,color);
-                data = data >> 1;
-            }
-        }
+			for (b = 0; b<10; b++)
+			{
+				color=machine->pens[(data & 0x1)?2:0];
+				plot_pixel(bitmap,700 - ((b * 10) + x), y,color);
+				data = data >> 1;
+			}
+		}
 
-        if (dir == 0)
-            dir = 1;
-        else
-            dir = 0;
-    } */
+		if (dir == 0)
+			dir = 1;
+		else
+			dir = 0;
+	}
+#endif
 
 	return 0;
 }

@@ -1295,7 +1295,7 @@ DRIVER_INIT( pcjr )
 }
 
 
-/*
+#ifdef UNUSED_FUNCTION
 static void pc_map_vga_memory(running_machine *machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
 {
 	const address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
@@ -1316,7 +1316,7 @@ static void pc_map_vga_memory(running_machine *machine, offs_t begin, offs_t end
 			break;
 	}
 }
-*/
+#endif
 
 static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine, "IN0"); }
 

@@ -1765,12 +1765,12 @@ static WRITE32_HANDLER( gba_io_w )
 			{
 //              printf("IE (%08x) = %04x raw %x (%08x) (scan %d PC %x)\n", 0x04000000 + ( offset << 2 ), data & mem_mask, data, ~mem_mask, video_screen_get_vpos(machine->primary_screen), cpu_get_pc(space->cpu));
 				gba_state->IE = ( gba_state->IE & ~mem_mask ) | ( data & mem_mask );
-				 /*
-                if (gba_state->IE & gba_state->IF)
-                {
-                    gba_request_irq(machine, gba_state->IF);
-                }
-                */
+#if 0
+				if (gba_state->IE & gba_state->IF)
+				{
+					gba_request_irq(machine, gba_state->IF);
+				}
+#endif
 			}
 			if( (mem_mask) & 0xffff0000 )
 			{

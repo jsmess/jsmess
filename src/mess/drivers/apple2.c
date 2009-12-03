@@ -556,7 +556,8 @@ static const ay8910_interface apple2_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL
 };
-/*
+
+#ifdef UNUSED_FUNCTION
 static void apple2_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
     switch(state)
@@ -574,7 +575,8 @@ static void apple2_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
         default:                                        apple525_device_getinfo(devclass, state, info); break;
     }
 }
-*/
+#endif
+
 static const floppy_config apple2_floppy_config =
 {
 	DEVCB_NULL,

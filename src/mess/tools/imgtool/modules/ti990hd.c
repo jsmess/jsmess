@@ -1389,8 +1389,10 @@ static imgtoolerr_t ti990_image_nextenum(imgtool_directory *enumeration, imgtool
 			iter->level++;
 			iter->nrc[iter->level] = get_UINT16BE(dor.nrc)/*get_UINT32BE(iter->fdr[iter->level-1].eom)-1*/;
 			iter->index[iter->level] = 0;
-			/*if (get_UINT16BE(dor.nrc) != (get_UINT32BE(iter->xdr[iter->level-1].fdr.eom)-1))
-                printf("hiha");*/
+#if 0
+			if (get_UINT16BE(dor.nrc) != (get_UINT32BE(iter->xdr[iter->level-1].fdr.eom)-1))
+				printf("hiha");
+#endif
 		}
 
 		/* go to upper level if applicable */

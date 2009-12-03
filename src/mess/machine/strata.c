@@ -293,12 +293,13 @@ static int strataflash_r(int id, offs_t offset, bus_width_t bus_width)
 				return READ_BLOCKLOCK(id, offset >> BLOCK_ADDRESS_SHIFT);
 			}
 			return 0;	// default case
-		/*case 0x03: // master lock config
-            if (strata[id].flash_master_lock)
-                return 1;
-            else
-                return 0;
-        */
+#if 0
+		case 0x03: // master lock config
+			if (strata[id].flash_master_lock)
+				return 1;
+			else
+				return 0;
+#endif
 
 		/* CFI query identification string */
 		case 0x10:

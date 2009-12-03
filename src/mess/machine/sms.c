@@ -1045,40 +1045,47 @@ static int sms_verify_cart( UINT8 *magic, int size )
 	{
 		if (!strncmp((char*)&magic[0x7ff0], "TMR SEGA", 8))
 		{
-			/* Technically, it should be this, but remove for now until verified:
-            if (!strcmp(sysname, "gamegear"))
-            {
-                if ((unsigned char)magic[0x7ffd] < 0x50)
-                    retval = IMAGE_VERIFY_PASS;
-            }
-            if (!strcmp(sysname, "sms"))
-            {
-                if ((unsigned char)magic[0x7ffd] >= 0x50)
-                    retval = IMAGE_VERIFY_PASS;
-            }
-            */
+#if 0
+			/* Technically, it should be this, but remove for now until verified: */
+			if (!strcmp(sysname, "gamegear"))
+			{
+				if ((unsigned char)magic[0x7ffd] < 0x50)
+					retval = IMAGE_VERIFY_PASS;
+			}
+			if (!strcmp(sysname, "sms"))
+			{
+				if ((unsigned char)magic[0x7ffd] >= 0x50)
+					retval = IMAGE_VERIFY_PASS;
+			}
+#endif
 			retval = IMAGE_VERIFY_PASS;
 		}
-	}
 
+#if 0
 		/* Check at $81f0 also */
-		//if (!retval) {
-	 //  if (!strncmp(&magic[0x81f0], "TMR SEGA", 8)) {
-				/* Technically, it should be this, but remove for now until verified:
-                if (!strcmp(sysname, "gamegear")) 
+		if (!retval)
+		{
+			if (!strncmp(&magic[0x81f0], "TMR SEGA", 8))
 			{
-                    if ((unsigned char)magic[0x81fd] < 0x50)
-                        retval = IMAGE_VERIFY_PASS;
-                }
-                if (!strcmp(sysname, "sms")) 
-			{
-                    if ((unsigned char)magic[0x81fd] >= 0x50)
-                        retval = IMAGE_VERIFY_PASS;
-                }
-                */
-		 //  retval = IMAGE_VERIFY_PASS;
-		//  }
-		//}
+#if 0
+				/* Technically, it should be this, but remove for now until verified: */
+				if (!strcmp(sysname, "gamegear")) 
+				{
+					if ((unsigned char)magic[0x81fd] < 0x50)
+						retval = IMAGE_VERIFY_PASS;
+				}
+				if (!strcmp(sysname, "sms")) 
+				{
+					if ((unsigned char)magic[0x81fd] >= 0x50)
+						retval = IMAGE_VERIFY_PASS;
+				}
+#endif
+		 		retval = IMAGE_VERIFY_PASS;
+			}
+		}
+#endif
+
+	}
 
 	return retval;
 }

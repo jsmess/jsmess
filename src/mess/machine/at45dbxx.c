@@ -389,7 +389,7 @@ void at45dbxx_save(const device_config *device, mame_file *file)
 	mame_fwrite( file, flash->data, flash->size);
 }
 
-/*
+#ifdef UNUSED_FUNCTION
 NVRAM_HANDLER( at45dbxx )
 {
     _logerror( 0, ("nvram_handler_at45dbxx (%p/%d)\n", file, read_or_write));
@@ -409,7 +409,7 @@ NVRAM_HANDLER( at45dbxx )
         }
     }
 }
-*/
+#endif
 
 
 /*-------------------------------------------------

@@ -166,8 +166,10 @@ static UINT32 nREX3_ClipMode;
 static UINT32 nREX3_Config;
 static UINT32 nREX3_Status;
 static UINT8 nREX3_XFerWidth;
-/*static UINT32 nREX3_CurrentX;
-static UINT32 nREX3_CurrentY;*/
+#if 0
+static UINT32 nREX3_CurrentX;
+static UINT32 nREX3_CurrentY;
+#endif
 static UINT32 nREX3_Kludge_SkipLine;
 
 static UINT32 *video_base;

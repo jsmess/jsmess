@@ -280,14 +280,16 @@ struct kc85_module
 	/* enable module */
 	void (*enable)(int state);
 };
-/*
+
+#if 0
 static const struct kc85_module kc85_v24_module=
 {
     0x0ee,
     "M003",
     "V24"
 };
-*/
+#endif
+
 static const struct kc85_module kc85_disk_interface_device=
 {
 	0x0a7,

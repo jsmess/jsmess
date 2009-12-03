@@ -490,12 +490,15 @@ WRITE16_HANDLER( x68k_crtc_w )
 
 READ16_HANDLER( x68k_crtc_r )
 {
-/*  switch(offset)
-    {
-    default:
-        logerror("CRTC: [%08x] Read from CRTC register %i\n",activecpu_get_pc(),offset);
-        return 0xff;
-    }*/
+#if 0
+	switch(offset)
+	{
+	default:
+		logerror("CRTC: [%08x] Read from CRTC register %i\n",activecpu_get_pc(),offset);
+		return 0xff;
+	}
+#endif
+
 	if(offset < 24)
 	{
 //      logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")),x68k_sys.crtc.reg[offset],offset);

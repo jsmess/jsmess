@@ -122,10 +122,12 @@ DEVICE_START( ti990_tape )
 	t->eot = 0;
 }
 
-/*DEVICE_STOP( ti990_tape )
+#ifdef UNUSED_FUNCTION
+DEVICE_STOP( ti990_tape )
 {
-    d->img = NULL;
-}*/
+	d->img = NULL;
+}
+#endif
 
 /*
     Open a tape image

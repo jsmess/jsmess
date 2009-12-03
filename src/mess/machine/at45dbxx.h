@@ -55,8 +55,6 @@ void at45dbxx_load(const device_config *device, mame_file *file);
 void at45dbxx_save(const device_config *device, mame_file *file);
 
 // non-volatile ram handler
-/*
-NVRAM_HANDLER( at45dbxx );
-*/
+//NVRAM_HANDLER( at45dbxx );
 
 #endif

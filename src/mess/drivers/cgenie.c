@@ -492,7 +492,7 @@ ROM_START (cgenie)
 ROM_END
 
 // Code below is previous non-working implementation , just for reference
-/*
+#if 0
 
 #define CGENIE_DRIVE_INFO
 
@@ -628,7 +628,7 @@ DEVICE_IMAGE_LOAD( cgenie_floppy )
     }
     return INIT_PASS;
 }
-*/
+#endif
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG     COMPANY    FULLNAME */
 COMP( 1982, cgenie,   0,		0,		cgenie,   cgenie,	0,        0,    "EACA Computers Ltd.",  "Colour Genie EG2000" , 0)

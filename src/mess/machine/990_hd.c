@@ -50,13 +50,15 @@ INLINE UINT32 get_UINT32BE(UINT32BE word)
 	return (word.bytes[0] << 24) | (word.bytes[1] << 16) | (word.bytes[2] << 8) | word.bytes[3];
 }
 
-/*INLINE void set_UINT32BE(UINT32BE *word, UINT32 data)
+#ifdef UNUSED_FUNCTION
+INLINE void set_UINT32BE(UINT32BE *word, UINT32 data)
 {
     word->bytes[0] = (data >> 24) & 0xff;
     word->bytes[1] = (data >> 16) & 0xff;
     word->bytes[2] = (data >> 8) & 0xff;
     word->bytes[3] = data & 0xff;
-}*/
+}
+#endif
 
 /* disk image header */
 typedef struct disk_image_header
@@ -185,10 +187,12 @@ static int get_id_from_device( const device_config *device )
 }
 
 
-/*DEVICE_STOP( ti990_hd )
+#ifdef UNUSED_FUNCTION
+DEVICE_STOP( ti990_hd )
 {
-    d->img = NULL;
-}*/
+	d->img = NULL;
+}
+#endif
 
 /*
     Initialize hard disk unit and open a hard disk image

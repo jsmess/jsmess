@@ -1,5 +1,7 @@
-/*DEVICE_IMAGE_LOAD(ti99_hsgpl);
-DEVICE_IMAGE_UNLOAD(ti99_hsgpl);*/
+#if 0
+DEVICE_IMAGE_LOAD(ti99_hsgpl);
+DEVICE_IMAGE_UNLOAD(ti99_hsgpl);
+#endif
 int ti99_hsgpl_load_memcard(running_machine *machine);
 int ti99_hsgpl_save_memcard(running_machine *machine);
 

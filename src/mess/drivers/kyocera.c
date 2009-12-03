@@ -237,7 +237,7 @@ static WRITE8_HANDLER( uart_ctrl_w )
         7
 
     */
-/*
+#if 0
     kc85_state *state = space->machine->driver_data;
 
     im6402_sbs_w(state->im6402, BIT(data, 0));
@@ -245,7 +245,7 @@ static WRITE8_HANDLER( uart_ctrl_w )
     im6402_pi_w(state->im6402, BIT(data, 2));
     im6402_cls1_w(state->im6402, BIT(data, 3));
     im6402_cls2_w(state->im6402, BIT(data, 4));
-*/
+#endif
 }
 
 static READ8_HANDLER( uart_status_r )
@@ -264,7 +264,7 @@ static READ8_HANDLER( uart_status_r )
         7       _LPS        low power sensor
 
     */
-/*
+#if 0
     kc85_state *state = space->machine->driver_data;
 
     UINT8 data = 0;
@@ -278,7 +278,7 @@ static READ8_HANDLER( uart_status_r )
     data = (tbre << 4) | (pe << 3) | (fe << 2) | (oe << 1) | cd;
 
     return data;
-*/
+#endif
 
 	return 0xf0;
 }
@@ -299,7 +299,7 @@ static READ8_HANDLER( pc8201_uart_status_r )
         7       _LPS        low power signal
 
     */
-/*
+#if 0
     kc85_state *state = space->machine->driver_data;
 
     UINT8 data = 0;
@@ -313,7 +313,7 @@ static READ8_HANDLER( pc8201_uart_status_r )
     data = (tbre << 4) | (pe << 3) | (fe << 2) | (oe << 1) | cd;
 
     return data;
-*/
+#endif
 
 	return 0xf0;
 }
@@ -334,11 +334,11 @@ static WRITE8_HANDLER( modem_w )
         7
 
     */
-/*
+#if 0
     kc85_state *state = space->machine->driver_data;
 
     mc14412_en_w(state->mc14412, BIT(data, 1));
-*/
+#endif
 }
 
 static WRITE8_HANDLER( kc85_ctrl_w )

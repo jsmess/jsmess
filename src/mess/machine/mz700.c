@@ -526,14 +526,14 @@ static WRITE8_DEVICE_HANDLER( pio_port_c_w )
         Bit 3 outputs a string of pulses to the Clock pin, and therefore cannot be used to control
         the motor directly.
         For the moment, the user can use the UI to select play, stop, etc.
-        If you load from the command-line or the software-picker, type in L <enter> immediately.
+        If you load from the command-line or the software-picker, type in L <enter> immediately. */
+#if 0
+	cassette_change_state(
+		devtag_get_device(device->machine, "cassette"),
+		((data & 0x08) && mz700_motor_on) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
+		CASSETTE_MOTOR_DISABLED);
 
-    cassette_change_state(
-        devtag_get_device(device->machine, "cassette"),
-        ((data & 0x08) && mz700_motor_on) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
-        CASSETTE_MOTOR_DISABLED);
-
-    */
+#endif
 
 	LOG(2,"mz700_pio_port_c_w",("%02X\n", data),device->machine);
 

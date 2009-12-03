@@ -2020,11 +2020,13 @@ static UINT8 cartridge_grom_read_legacy(const device_config *cartsys, int cart_o
 
 static READ16_DEVICE_HANDLER( ti99_cart_r_legacy )
 {
-/*  if (hsgpl_crdena)
-        return ti99_hsgpl_rom6_r(space, offset, mem_mask);
-*/
 	int slotmbx, slotmini, slotebr2, slotrom;
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)device->token;
+
+#if 0
+	if (hsgpl_crdena)
+		return ti99_hsgpl_rom6_r(space, offset, mem_mask);
+#endif
 
 	slotmbx = cartslots->legacy_slotnumber[SLOTC_MBX];
 
@@ -2063,14 +2065,16 @@ static READ16_DEVICE_HANDLER( ti99_cart_r_legacy )
 
 static WRITE16_DEVICE_HANDLER( ti99_cart_w_legacy )
 {
-
-/*  if (hsgpl_crdena)
-        ti99_hsgpl_rom6_w(space, offset, data, mem_mask);
-        return;
-        */
 	int slotmbx, slotmini, slotebr2, slotrom;
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)device->token;
 
+#if 0
+	if (hsgpl_crdena)
+	{
+		ti99_hsgpl_rom6_w(space, offset, data, mem_mask);
+		return;
+	}
+#endif
 	slotmbx = cartslots->legacy_slotnumber[SLOTC_MBX];
 	slotrom = cartslots->legacy_slotnumber[SLOTC_CROM];
 	slotebr2 = cartslots->legacy_slotnumber[SLOTC_DROM];
@@ -2115,11 +2119,13 @@ static WRITE16_DEVICE_HANDLER( ti99_cart_w_legacy )
 */
 static READ8_DEVICE_HANDLER( ti99_cart_r_legacy8 )
 {
-/*  if (hsgpl_crdena)
-        return ti99_hsgpl_rom6_r(space, offset, mem_mask);
-*/
 	int slotmbx, slotmini, slotebr2, slotrom;
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)device->token;
+
+#if 0
+	if (hsgpl_crdena)
+		return ti99_hsgpl_rom6_r(space, offset, mem_mask);
+#endif
 
 	slotmbx = cartslots->legacy_slotnumber[SLOTC_MBX];
 
@@ -2161,14 +2167,16 @@ static READ8_DEVICE_HANDLER( ti99_cart_r_legacy8 )
 */
 static WRITE8_DEVICE_HANDLER( ti99_cart_w_legacy8 )
 {
-
-/*  if (hsgpl_crdena)
-        ti99_hsgpl_rom6_w(space, offset, data, mem_mask);
-        return;
-        */
 	int slotmbx, slotmini, slotebr2, slotrom;
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)device->token;
 
+#if 0
+	if (hsgpl_crdena)
+	{
+		ti99_hsgpl_rom6_w(space, offset, data, mem_mask);
+		return;
+	}
+#endif
 	slotmbx = cartslots->legacy_slotnumber[SLOTC_MBX];
 	slotrom = cartslots->legacy_slotnumber[SLOTC_CROM];
 	slotebr2 = cartslots->legacy_slotnumber[SLOTC_DROM];
@@ -2243,12 +2251,14 @@ static int load_legacy(const device_config *image)
 	/* There is a circuitry in TI99/4(a) that resets the console when a
 	cartridge is inserted or removed.  We emulate this instead of resetting 
 	the emulator (which is the default in MESS). */
-	/*cpu_set_input_line(machine->firstcpu, INPUT_LINE_RESET, PULSE_LINE);
+#if 0
+	cpu_set_input_line(machine->firstcpu, INPUT_LINE_RESET, PULSE_LINE);
 	tms9901_reset(0);
 	if (! has_evpc)
 		TMS9928A_reset();
 	if (has_evpc)
-		v9938_reset(0);*/
+		v9938_reset(0);
+#endif
 
 	ch = strrchr(name, '.');
 	ch2 = (ch-1 >= name) ? ch-1 : "";

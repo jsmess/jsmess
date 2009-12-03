@@ -309,7 +309,8 @@ static READ8_HANDLER( avr8_read )
         case 0x84:
         {
             //INT64 divisor = 1;
-            /*INT64 update = (INT64)(cpu_get_total_cycles(space->cpu)) - last_tcnt1_cycle;
+#if 0
+            INT64 update = (INT64)(cpu_get_total_cycles(space->cpu)) - last_tcnt1_cycle;
             switch(device->tccr1b & 0x07)
             {
                 case 0: // No clock source (Timer/Counter stopped).
@@ -345,7 +346,8 @@ static READ8_HANDLER( avr8_read )
             diff /= divisor;
             diff %= regs.ocr1a;
             printf( "AVR8: R: regs.tcnt1l read: %04x\n",  );
-            */break;
+#endif
+            break;
         }
 
         case 0x85:

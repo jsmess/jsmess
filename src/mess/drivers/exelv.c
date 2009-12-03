@@ -104,14 +104,16 @@ static INTERRUPT_GEN( exelv_hblank_interrupt )
 	tms3556_interrupt(device->machine);
 }
 
-/*static DEVICE_IMAGE_LOAD(exelv_cart)
+#ifdef UNUSED_FUNCTION
+static DEVICE_IMAGE_LOAD(exelv_cart)
 {
-    return INIT_PASS;
+	return INIT_PASS;
 }
 
 static DEVICE_IMAGE_UNLOAD( exelv_cart )
 {
-}*/
+}
+#endif
 
 /*
     I/O CPU protocol (WIP):

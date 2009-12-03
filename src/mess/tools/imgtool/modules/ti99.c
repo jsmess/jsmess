@@ -761,9 +761,11 @@ static int parse_pc99_image(imgtool_stream *file_handle, int fm_format, int pass
 			crc2 = c;
 			calc_crc(& crc, c);
 
+#if 0
 			/* CRC seems to be completely hosed */
-			/*if (crc)
-                printf("aargh!");*/
+			if (crc)
+				printf("aargh!");
+#endif
 			if ((seclen != 256) || (crc1 != 0xf7) || (crc2 != 0xf7)
 					|| (cylinder != expected_cylinder) || (head != expected_head)
 					|| ((pass == 1) && ((cylinder >= geometry->cylinders)
@@ -859,9 +861,11 @@ static int parse_pc99_image(imgtool_stream *file_handle, int fm_format, int pass
 			crc2 = c;
 			calc_crc(& crc, c);
 
+#if 0
 			/* CRC seems to be completely hosed */
-			/*if (crc)
-                printf("aargh!");*/
+			if (crc)
+				printf("aargh!");
+#endif
 			if ((crc1 != 0xf7) || (crc2 != 0xf7))
 				continue;
 
@@ -990,10 +994,12 @@ static imgtoolerr_t open_image_lvl1(imgtool_stream *file_handle, ti99_img_format
 			return IMGTOOLERR_CORRUPTIMAGE;	/* TODO: support 512-byte sectors */
 		}
 
+#if 0
 		/* read vib */
-		/*reply = read_absolute_physrec(l1_img, 0, vib);
-        if (reply)
-            return reply;*/
+		reply = read_absolute_physrec(l1_img, 0, vib);
+		if (reply)
+			return reply;
+#endif
 	}
 	else
 	{
@@ -1294,13 +1300,15 @@ static void dsk_aphysrec_to_sector_address(int aphysrec, const ti99_geometry *ge
     geometry (I): disk image geometry
     address (O): physical sector address
 */
-/*static void win_aphysrec_to_sector_address(int aphysrec, const ti99_geometry *geometry, ti99_sector_address *address)
+#ifdef UNUSED_FUNCTION
+static void win_aphysrec_to_sector_address(int aphysrec, const ti99_geometry *geometry, ti99_sector_address *address)
 {
     address.sector = aphysrec % l1_img->geometry.secspertrack;
     aphysrec /= l1_img->geometry.secspertrack;
     address.side = aphysrec % l1_img->geometry.heads;
     address.cylinder = aphysrec / l1_img->geometry.heads;
-}*/
+}
+#endif
 
 /*
     Read one 256-byte physical record from a disk image
@@ -1318,9 +1326,10 @@ static int read_absolute_physrec(ti99_lvl1_imgref *l1_img, unsigned aphysrec, vo
 
 	if (l1_img->img_format == if_harddisk)
 	{
-		/*win_aphysrec_to_sector_address(aphysrec, & l1_img->geometry, & address);
-
-        return read_sector(l1_img, & address, dest);*/
+#if 0
+		win_aphysrec_to_sector_address(aphysrec, & l1_img->geometry, & address);
+		return read_sector(l1_img, & address, dest);
+#endif
 
 		return imghd_read(&l1_img->harddisk_handle, aphysrec, dest) != IMGTOOLERR_SUCCESS;
 	}
@@ -1348,9 +1357,10 @@ static int write_absolute_physrec(ti99_lvl1_imgref *l1_img, unsigned aphysrec, c
 
 	if (l1_img->img_format == if_harddisk)
 	{
-		/*win_aphysrec_to_sector_address(aphysrec, & l1_img->geometry, & address);
-
-        return write_sector(l1_img, & address, dest);*/
+#if 0
+		win_aphysrec_to_sector_address(aphysrec, & l1_img->geometry, & address);
+		return write_sector(l1_img, & address, dest);
+#endif
 
 		return imghd_write(&l1_img->harddisk_handle, aphysrec, src) != IMGTOOLERR_SUCCESS;
 	}
@@ -3013,8 +3023,10 @@ static int open_file_lvl2_win(ti99_lvl2_imgref *l2_img, const char *fpath, ti99_
 			/* clear remainder of cluster table */
 			for (; i<54; i++)
 			{
-				/*set_UINT16BE(&cur_fdr->clusters[i][0], 0);
-                set_UINT16BE(&cur_fdr->clusters[i][1], 0);*/
+#if 0
+				set_UINT16BE(&cur_fdr->clusters[i][0], 0);
+				set_UINT16BE(&cur_fdr->clusters[i][1], 0);
+#endif
 				if ((get_UINT16BE(cur_fdr->clusters[i][0]) != 0) || (get_UINT16BE(cur_fdr->clusters[i][1]) != 0))
 					return IMGTOOLERR_CORRUPTIMAGE;
 			}
@@ -3284,7 +3296,8 @@ static int write_file_physrec(ti99_lvl2_fileref *l2_file, unsigned fphysrec, con
 /*
     Write a field in every fdr record associated to a file
 */
-/*static int set_win_fdr_field(ti99_lvl2_fileref *l2_file, size_t offset, size_t size, void *data)
+#ifdef UNUSED_FUNCTION
+static int set_win_fdr_field(ti99_lvl2_fileref *l2_file, size_t offset, size_t size, void *data)
 {
     win_fdr fdr_buf;
     unsigned fdr_aphysrec;
@@ -3303,7 +3316,8 @@ static int write_file_physrec(ti99_lvl2_fileref *l2_file, unsigned fphysrec, con
     }
 
     return errorcode;
-}*/
+}
+#endif
 
 static UINT8 get_file_flags(ti99_lvl2_fileref *l2_file)
 {
@@ -4542,15 +4556,19 @@ static imgtoolerr_t ti99_image_readfile(imgtool_partition *partition, const char
 		return errorcode;
 
 	get_file_creation_date(&src_file, &date_time);
-	/*if ((date_time.time_MSB == 0) || (date_time.time_LSB == 0)
+#if 0
+	if ((date_time.time_MSB == 0) || (date_time.time_LSB == 0)
             || (date_time.date_MSB == 0) || (date_time.date_LSB == 0))
-        current_date_time(&date_time);*/
+		current_date_time(&date_time);
+#endif
 	set_file_creation_date(&dst_file, date_time);
 
 	get_file_update_date(&src_file, &date_time);
-	/*if ((date_time.time_MSB == 0) || (date_time.time_LSB == 0)
+#if 0
+	if ((date_time.time_MSB == 0) || (date_time.time_LSB == 0)
             || (date_time.date_MSB == 0) || (date_time.date_LSB == 0))
-        current_date_time(&date_time);*/
+		current_date_time(&date_time);
+#endif
 	set_file_update_date(&dst_file, date_time);
 
 	if (stream_write(destf, & dst_file.u.tifiles.hdr, 128) != 128)
@@ -4707,15 +4725,19 @@ static imgtoolerr_t ti99_image_writefile(imgtool_partition *partition, const cha
 		return errorcode;
 
 	get_file_creation_date(&src_file, &date_time);
-	/*if ((date_time.time_MSB == 0) || (date_time.time_LSB == 0)
+#if 0
+	if ((date_time.time_MSB == 0) || (date_time.time_LSB == 0)
             || (date_time.date_MSB == 0) || (date_time.date_LSB == 0))
-        current_date_time(&date_time);*/
+		current_date_time(&date_time);
+#endif
 	set_file_creation_date(&dst_file, date_time);
 
 	get_file_update_date(&src_file, &date_time);
-	/*if ((date_time.time_MSB == 0) || (date_time.time_LSB == 0)
+#if 0
+	if ((date_time.time_MSB == 0) || (date_time.time_LSB == 0)
             || (date_time.date_MSB == 0) || (date_time.date_LSB == 0))
-        current_date_time(&date_time);*/
+		current_date_time(&date_time);
+#endif
 	set_file_update_date(&dst_file, date_time);
 
 	/* alloc data physrecs */
@@ -4947,8 +4969,10 @@ static imgtoolerr_t dsk_image_deletefile(imgtool_partition *partition, const cha
 		}
 		/* the condition below is an error, but it should not prevent us from
         deleting the file */
-		/*if (i<fphysrecs)
-            return IMGTOOLERR_CORRUPTIMAGE;*/
+#if 0
+		if (i<fphysrecs)
+			return IMGTOOLERR_CORRUPTIMAGE;
+#endif
 
 		/* free fdr AU */
 		cur_AU = catalog->files[catalog_index].fdr_ptr / image->AUformat.physrecsperAU;

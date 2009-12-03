@@ -573,14 +573,16 @@ static void pdp1_erase_lightpen(bitmap_t *bitmap)
 {
 	if (previous_lightpen_state.active)
 	{
-		/*if (previous_lightpen_state.x>0)
-            pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2-1, previous_lightpen_state.y/2, pen_black);
-        if (previous_lightpen_state.x<1023)
-            pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2+1, previous_lightpen_state.y/2, pen_black);
-        if (previous_lightpen_state.y>0)
-            pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2, previous_lightpen_state.y/2-1, pen_black);
-        if (previous_lightpen_state.y<1023)
-            pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2, previous_lightpen_state.y/2+1, pen_black);*/
+#if 0
+		if (previous_lightpen_state.x>0)
+			pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2-1, previous_lightpen_state.y/2, pen_black);
+		if (previous_lightpen_state.x<1023)
+			pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2+1, previous_lightpen_state.y/2, pen_black);
+		if (previous_lightpen_state.y>0)
+			pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2, previous_lightpen_state.y/2-1, pen_black);
+		if (previous_lightpen_state.y<1023)
+			pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2, previous_lightpen_state.y/2+1, pen_black);
+#endif
 		pdp1_draw_circle(bitmap, previous_lightpen_state.x, previous_lightpen_state.y, previous_lightpen_state.radius, pen_black);
 	}
 }
@@ -590,14 +592,16 @@ static void pdp1_draw_lightpen(bitmap_t *bitmap)
 	if (lightpen_state.active)
 	{
 		int color_ = lightpen_state.down ? pen_lightpen_pressed : pen_lightpen_nonpressed;
-		/*if (lightpen_state.x>0)
-            pdp1_plot_pixel(bitmap, lightpen_state.x/2-1, lightpen_state.y/2, color);
-        if (lightpen_state.x<1023)
-            pdp1_plot_pixel(bitmap, lightpen_state.x/2+1, lightpen_state.y/2, color);
-        if (lightpen_state.y>0)
-            pdp1_plot_pixel(bitmap, lightpen_state.x/2, lightpen_state.y/2-1, color);
-        if (lightpen_state.y<1023)
-            pdp1_plot_pixel(bitmap, lightpen_state.x/2, lightpen_state.y/2+1, color);*/
+#if 0
+		if (lightpen_state.x>0)
+			pdp1_plot_pixel(bitmap, lightpen_state.x/2-1, lightpen_state.y/2, color);
+		if (lightpen_state.x<1023)
+			pdp1_plot_pixel(bitmap, lightpen_state.x/2+1, lightpen_state.y/2, color);
+		if (lightpen_state.y>0)
+			pdp1_plot_pixel(bitmap, lightpen_state.x/2, lightpen_state.y/2-1, color);
+		if (lightpen_state.y<1023)
+			pdp1_plot_pixel(bitmap, lightpen_state.x/2, lightpen_state.y/2+1, color);
+#endif
 		pdp1_draw_circle(bitmap, lightpen_state.x, lightpen_state.y, lightpen_state.radius, color_);
 	}
 	previous_lightpen_state = lightpen_state;

@@ -942,11 +942,13 @@ WRITE8_HANDLER ( sgb_io_w )
 				{
 					/* We should test for this case , but the code below won't
                        work with the current setup */
-					/* if (sgb_bytecount == 16)
-                    {
-                        logerror("SGB: end of block is not zero!");
-                        sgb_start = 0;
-                    }*/
+#if 0
+					if (sgb_bytecount == 16)
+					{
+						logerror("SGB: end of block is not zero!");
+						sgb_start = 0;
+					}
+#endif
 					sgb_data[sgb_bytecount] >>= 1;
 					sgb_data[sgb_bytecount] |= 0x80;
 					sgb_bitcount++;

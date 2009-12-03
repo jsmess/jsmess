@@ -726,7 +726,7 @@ DRIVER_INIT( at586 )
 }
 
 
-/*
+#ifdef UNUSED_FUNCTION
 static void at_map_vga_memory(running_machine *machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
 {
 	int buswidth;
@@ -743,8 +743,8 @@ static void at_map_vga_memory(running_machine *machine, offs_t begin, offs_t end
 			break;
 	}
 }
+#endif
 
-*/
 
 
 

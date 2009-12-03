@@ -3187,7 +3187,7 @@ static void mcd212_process_ica(running_machine *machine, int channel)
 						cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 					}
 				}
-				/*
+#if 0
 				if(mcd212_regs.channel[1].csrr & MCD212_CSR2R_IT2)
 				{
 					UINT8 interrupt = scc68070_regs.lir & 7;
@@ -3197,7 +3197,7 @@ static void mcd212_process_ica(running_machine *machine, int channel)
 						cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 					}
 				}
-				*/
+#endif
 				break;
 			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f: // RELOAD DISPLAY PARAMETERS
 				verboselog(machine, 6, "%08x: %08x: ICA %d: RELOAD DISPLAY PARAMETERS\n", addr * 2 + channel * 0x200000, cmd, channel );
@@ -3276,7 +3276,7 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 						cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 					}
 				}
-				/*
+#if 0
 				if(mcd212_regs.channel[1].csrr & MCD212_CSR2R_IT2)
 				{
 					UINT8 interrupt = scc68070_regs.lir & 7;
@@ -3286,7 +3286,7 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 						cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 					}
 				}
-				*/
+#endif
 				break;
 			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f: // RELOAD DISPLAY PARAMETERS
 				verboselog(machine, 6, "%08x: %08x: DCA %d: RELOAD DISPLAY PARAMETERS\n", addr * 2 + channel * 0x200000, cmd, channel );

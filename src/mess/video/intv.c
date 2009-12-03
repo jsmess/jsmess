@@ -14,7 +14,7 @@ VIDEO_START( intv )
 
 	VIDEO_START_CALL(generic_bitmapped);
 
-/*
+#if 0
     for (i = 0; i < 8; i++) {
         struct intv_sprite_type* s = &intv_sprite[i];
         s->visible = 0;
@@ -57,7 +57,7 @@ VIDEO_START( intv )
         intv_gram[i] = 0;
         intv_gramdirtybytes[i] = 1;
     }
-*/
+#endif
 }
 
 
@@ -588,7 +588,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, int tran
 #endif
 
 /* TBD: need to handle sprites behind foreground? */
-/*
+#ifdef UNUSED_FUNCTION
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int behind_foreground)
 {
     int i;
@@ -682,7 +682,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int behind_
         }
     }
 }
-*/
+#endif
 
 static void draw_borders(running_machine *machine, bitmap_t *bm)
 {

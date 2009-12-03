@@ -194,10 +194,10 @@ WRITE8_DEVICE_HANDLER( sed1330_command_w )
 
 	switch (sed1330->ir)
 	{
-/*
-    case SED1330_INSTRUCTION_SLEEP_IN:
-        break;
-*/
+#if 0
+	case SED1330_INSTRUCTION_SLEEP_IN:
+		break;
+#endif
 	case SED1330_INSTRUCTION_CSRDIR_RIGHT:
 	case SED1330_INSTRUCTION_CSRDIR_LEFT:
 	case SED1330_INSTRUCTION_CSRDIR_UP:
@@ -489,10 +489,10 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 			logerror("SED1330 '%s' Invalid parameter byte %02x\n", device->tag, data);
 		}
 		break;
-/*
-    case SED1330_INSTRUCTION_CSRR:
-        break;
-*/
+#if 0
+	case SED1330_INSTRUCTION_CSRR:
+		break;
+#endif
 	case SED1330_INSTRUCTION_MWRITE:
 		if (LOG) logerror("SED1330 '%s' Memory Write %02x to %04x (row %u col %u line %u)\n", device->tag, data, sed1330->csr, sed1330->csr/80/8, sed1330->csr%80, sed1330->csr/80);
 
@@ -500,10 +500,10 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 
 		increment_csr(sed1330);
 		break;
-/*
-    case SED1330_INSTRUCTION_MREAD:
-        break;
-*/
+#if 0
+	case SED1330_INSTRUCTION_MREAD:
+		break;
+#endif
 	default:
 		logerror("SED1330 '%s' Unsupported instruction %02x\n", device->tag, sed1330->ir);
 	}

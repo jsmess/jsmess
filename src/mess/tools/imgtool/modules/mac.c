@@ -432,14 +432,16 @@ exit:
     Return a zero if s1 and s2 are equal, a negative value if s1 is less than
     s2, and a positive value if s1 is greater than s2.
 */
-/*static int mac_strcmp(const UINT8 *s1, const UINT8 *s2)
+#ifdef UNUSED_FUNCTION
+static int mac_strcmp(const UINT8 *s1, const UINT8 *s2)
 {
     size_t common_len;
 
     common_len = (s1[0] <= s2[0]) ? s1[0] : s2[0];
 
     return memcmp(s1+1, s2+1, common_len) || ((int)s1[0] - s2[0]);
-}*/
+}
+#endif
 
 /*
     mac_stricmp()
@@ -1395,8 +1397,10 @@ static imgtoolerr_t mac_file_seteof(mac_fileref *fileref, UINT32 newEof)
 
 	newABEof = (newEof + fileref->l2_img->blocksperAB * 512 - 1) / (fileref->l2_img->blocksperAB * 512);
 
-	/*if (fileref->pLen % (fileref->l2_img->blocksperAB * 512))
-        return IMGTOOLERR_CORRUPTIMAGE;*/
+#if 0
+	if (fileref->pLen % (fileref->l2_img->blocksperAB * 512))
+		return IMGTOOLERR_CORRUPTIMAGE;
+#endif
 
 	if (newEof < fileref->eof)
 		fileref->eof = newEof;
@@ -1421,13 +1425,15 @@ static imgtoolerr_t mac_file_seteof(mac_fileref *fileref, UINT32 newEof)
 		return err;
 
 	/* update current pos if beyond new EOF */
-	/*if (fileref->crPs > newEof)
-    {
-        if ((fileref->crPs / 512) != (newEof / 512))
-            fileref->reload_buf = TRUE;
+#if 0
+	if (fileref->crPs > newEof)
+	{
+		if ((fileref->crPs / 512) != (newEof / 512))
+			fileref->reload_buf = TRUE;
 
-        fileref->crPs = newEof;
-    }*/
+		fileref->crPs = newEof;
+	}
+#endif
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -4088,11 +4094,13 @@ static imgtoolerr_t BT_check(mac_BTref *BTref, int is_extent)
 			/* this check is unecessary because the current consistency checks
             that forward and back linking match and that node height is correct
             are enough to detect such errors */
-			/*if (bitmap[cur_node >> 3] & (0x80 >> (cur_node & 7)))
+#if 0
+			if (bitmap[cur_node >> 3] & (0x80 >> (cur_node & 7)))
             {
                 err = IMGTOOLERR_CORRUPTIMAGE;
                 goto bail;
-            }*/
+            }
+#endif
 			/* add node in bitmap */
 			bitmap[cur_node >> 3] |= (0x80 >> (cur_node & 7));
 			/* read node */
@@ -4202,15 +4210,19 @@ static imgtoolerr_t BT_check(mac_BTref *BTref, int is_extent)
 					}
 					/* next test is not necessary because we have checked that
                     the root node has no successor */
-					/*if (i < BTref->treeDepth-1)
-                    {*/
+#if 0
+					if (i < BTref->treeDepth-1)
+					{
+#endif
 						data_nodes[i+1].cur_rec++;
-					/*}
-                    else
-                    {
-                        err = IMGTOOLERR_CORRUPTIMAGE;
-                        goto bail;
-                    }*/
+#if 0
+					}
+					else
+					{
+						err = IMGTOOLERR_CORRUPTIMAGE;
+						goto bail;
+					}
+#endif
 				}
 				i++;
 			}
@@ -4383,11 +4395,13 @@ end_of_list:
 		/* this check is unecessary because the current consistency checks that
         forward and back linking match and that node height is correct are
         enough to detect such errors */
-		/*if (bitmap[cur_node >> 3] & (0x80 >> (cur_node & 7)))
+#if 0
+		if (bitmap[cur_node >> 3] & (0x80 >> (cur_node & 7)))
         {
             err = IMGTOOLERR_CORRUPTIMAGE;
             goto bail;
-        }*/
+        }
+#endif
 		/* add node in bitmap */
 		bitmap[cur_node >> 3] |= (0x80 >> (cur_node & 7));
 		/* read map node */
@@ -5650,8 +5664,8 @@ static imgtoolerr_t mac_image_writefile(imgtool_partition *partition, const char
 	mac_dirent cat_info;
 	mac_fileref fileref;
 	UINT32 fork_len;
-	/*UINT16 commentID;
-    mac_str255 comment;*/
+	/*UINT16 commentID;*/
+	/*mac_str255 comment;*/
 	UINT8 buf[512];
 	UINT32 i, run_len;
 	imgtoolerr_t err;
@@ -5666,8 +5680,10 @@ static imgtoolerr_t mac_image_writefile(imgtool_partition *partition, const char
 	if (err)
 		return err;
 
-	/*if (header.version_old != 0)
-        return IMGTOOLERR_UNIMPLEMENTED;*/
+#if 0
+	if (header.version_old != 0)
+		return IMGTOOLERR_UNIMPLEMENTED;
+#endif
 	/*mac_strcpy(filename, header.filename);*/
 	memset(&cat_info, 0, sizeof(cat_info));
 	set_UINT32BE(&cat_info.flFinderInfo.type, 0x3F3F3F3F);

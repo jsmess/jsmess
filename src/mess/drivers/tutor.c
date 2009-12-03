@@ -479,7 +479,8 @@ static WRITE8_DEVICE_HANDLER(tutor_printer_w)
     @>f000-@>f0fb: tms9995 internal RAM 2
 */
 
-/*static WRITE8_HANDLER(test_w)
+#ifdef UNUSED_FUNCTION
+static WRITE8_HANDLER(test_w)
 {
     switch (offset)
     {
@@ -487,7 +488,8 @@ static WRITE8_DEVICE_HANDLER(tutor_printer_w)
         logerror("unmapped write %d %d\n", offset, data);
         break;
     }
-}*/
+}
+#endif
 
 static ADDRESS_MAP_START(tutor_memmap, ADDRESS_SPACE_PROGRAM, 8)
 

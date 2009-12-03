@@ -509,7 +509,7 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
 		LOG(("Z80STI '%s' Timer A Data Register: %x\n", device->tag, data));
 		z80sti->tdr[TIMER_A] = data;
 		break;
-/*
+#if 0
     case Z80STI_REGISTER_UCR:
         z80sti->ucr = data;
         break;
@@ -525,7 +525,7 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
     case Z80STI_REGISTER_UDR:
         z80sti->udr = data;
         break;
-*/
+#endif
 	default:
 		LOG(("Z80STI '%s' Unsupported Register %x\n", device->tag, offset & 0x0f));
 	}

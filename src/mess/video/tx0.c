@@ -418,9 +418,11 @@ void tx0_typewriter_drawchar(running_machine *machine, int character)
 	switch (character)
 	{
 	case 020:
+#if 0
 		/* color shift */
-		/*color = color_typewriter_black;
-        color = color_typewriter_red;*/
+		color = color_typewriter_black;
+		color = color_typewriter_red;
+#endif
 		break;
 
 	case 043:

@@ -314,11 +314,13 @@ static WRITE8_HANDLER(ide_mem_w)
 				rtc65271_w(0, 0, data);
 			break;
 		case 2:		/* IDE registers set 1 (CS1Fx) */
+#if 0
 			/* latch write */
-			/*if (offset & 1)
-                output_latch = (output_latch & 0xff00) | data;
-            else
-                output_latch = (output_latch & 0x00ff) | (data << 8);*/
+			if (offset & 1)
+				output_latch = (output_latch & 0xff00) | data;
+			else
+				output_latch = (output_latch & 0x00ff) | (data << 8);
+#endif
 			/* latch write - bytes are swapped in 2004 IDE card */
 			if (offset & 1)
 				output_latch = (output_latch & 0x00ff) | (data << 8);
@@ -332,11 +334,13 @@ static WRITE8_HANDLER(ide_mem_w)
 			}
 			break;
 		case 3:		/* IDE registers set 2 (CS3Fx) */
+#if 0
 			/* latch write */
-			/*if (offset & 1)
-                output_latch = (output_latch & 0xff00) | data;
-            else
-                output_latch = (output_latch & 0x00ff) | (data << 8);*/
+			if (offset & 1)
+				output_latch = (output_latch & 0xff00) | data;
+			else
+				output_latch = (output_latch & 0x00ff) | (data << 8);
+#endif
 			/* latch write - bytes are swapped in 2004 IDE card */
 			if (offset & 1)
 				output_latch = (output_latch & 0x00ff) | (data << 8);

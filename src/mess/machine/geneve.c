@@ -325,9 +325,11 @@ static void speech_kludge_callback(int dummy)
 	{
 		/* Weirdly enough, we are always seeing some problems even though
         everything is working fine. */
-		/*attotime time_to_ready = double_to_attotime(tms5220_time_to_ready());
-        logerror("ti99/4a speech says aaargh!\n");
-        logerror("(time to ready: %f -> %d)\n", time_to_ready, (int) ceil(3000000*time_to_ready));*/
+#if 0
+		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready());
+		logerror("ti99/4a speech says aaargh!\n");
+		logerror("(time to ready: %f -> %d)\n", time_to_ready, (int) ceil(3000000*time_to_ready));
+#endif
 	}
 }
 
@@ -653,9 +655,11 @@ WRITE8_HANDLER ( geneve_w )
 				page_lookup[offset-0xf110] = data;
 				return;
 
-			/*case 0xf118:  // read-only register???
-                key_buf = data;
-                return*/
+#if 0
+			case 0xf118:  // read-only register???
+				key_buf = data;
+				return;
+#endif
 
 			case 0xf120:
 				sn76496_w(devtag_get_device(space->machine, "sn76496"), 0, data);
@@ -706,9 +710,11 @@ WRITE8_HANDLER ( geneve_w )
 				page_lookup[offset-0x8000] = data;
 				return;
 
-			/*case 0x8008:  // read-only register???
-                key_buf = data;
-                return*/
+#if 0
+			case 0x8008:  // read-only register???
+				key_buf = data;
+				return
+#endif
 
 			case 0x8010:
 			case 0x8011:
@@ -1274,10 +1280,12 @@ static void poll_mouse(running_machine *machine)
 /*
     set the state of int2 (called by tms9928 core)
 */
-/*void tms9901_set_int2(int state)
+#ifdef UNUSED_FUNCTION
+void tms9901_set_int2(int state)
 {
-    tms9901_set_single_int(devtag_get_device(machine, "tms9901"), 2, state);
-}*/
+	tms9901_set_single_int(devtag_get_device(machine, "tms9901"), 2, state);
+}
+#endif
 
 /*
     Called by the 9901 core whenever the state of INTREQ and IC0-3 changes

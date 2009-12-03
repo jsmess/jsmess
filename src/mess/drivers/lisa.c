@@ -83,7 +83,7 @@ static const applefdc_interface lisa210_fdc_interface =
 	sony_read_status
 };
 
-/*
+#ifdef UNUSED_FUNCTION
 static void lisa_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
     switch(state)
@@ -93,7 +93,7 @@ static void lisa_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
         default:                                        sonydriv_device_getinfo(devclass, state, info); break;
     }
 }
-*/
+#endif
 
 static const floppy_config lisa_floppy_config =
 {

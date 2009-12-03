@@ -538,11 +538,13 @@ static void tms3556_draw_line(bitmap_t *bmp, int line)
 
 	double_lines = 0;
 
-	/*if (vdp.controlRegs[4] & 0x??)
-    {   // interlaced mode
-        ln = BITMAP_ADDR16(bmp, line, vdp.field);
-    }
-    else*/
+#if 0
+	if (vdp.controlRegs[4] & 0x??
+	{   // interlaced mode
+		ln = BITMAP_ADDR16(bmp, line, vdp.field);
+	}
+	else
+#endif
 	{	/* non-interlaced mode */
 		ln = BITMAP_ADDR16(bmp, line, 0);
 		ln2 = BITMAP_ADDR16(bmp, line, 1);

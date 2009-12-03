@@ -139,10 +139,10 @@ static int fd800_read_id(int unit, int head, int *cylinder_id, int *sector_id)
 	/*UINT8 revolution_count;*/
 	chrn_id id;
 
-	/*revolution_count = 0;
+	/*revolution_count = 0;*/
 
-    while (revolution_count < 2)
-    {*/
+	/*while (revolution_count < 2)*/
+	/*{*/
 		if (floppy_drive_get_next_id(fd800.drv[unit].img, head, &id))
 		{
 			if (cylinder_id)

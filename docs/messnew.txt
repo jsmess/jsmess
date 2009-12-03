@@ -78,11 +78,13 @@ Source Changes:
 - The core is based on MAME 0.135u2.  This incorporates all features of the
   update to this core.  [MAME team]
 
-- Cleanups (static qualifiers, headers, renames, reduced global symbols, and
-  more multisession friendly init code).  [Atari Ace]
+- Cleanups (static qualifiers, headers, renames, reduced global symbols, dead
+  code cleanups and more multisession friendly init code).  [Atari Ace]
 
 - WD17xx write track supported in proper way instead of using more 
   sector writes [Michael Zapf]
+
+
 
 0.135
 

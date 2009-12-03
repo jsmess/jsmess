@@ -637,8 +637,10 @@ WRITE16_HANDLER ( ti99_hsgpl_rom6_w )
 		case 15:
 			/* feeprom is normally written to using GPL ports, and I don't know
             writing through >6000 page is enabled */
-			/*at29c040a_w(feeprom_rom6, 1 + 2*offset + 0x2000*hsgpl.cur_bank + 0x8000*port, data);
-            at29c040a_w(feeprom_rom6, 2*offset + 0x2000*hsgpl.cur_bank + 0x8000*port, data >> 8);*/
+#if 0
+			at29c040a_w(feeprom_rom6, 1 + 2*offset + 0x2000*hsgpl.cur_bank + 0x8000*port, data);
+			at29c040a_w(feeprom_rom6, 2*offset + 0x2000*hsgpl.cur_bank + 0x8000*port, data >> 8);
+#endif
 			break;
 
 		case 32:

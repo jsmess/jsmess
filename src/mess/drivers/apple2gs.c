@@ -151,7 +151,7 @@ static const es5503_interface apple2gs_es5503_interface =
 	apple2gs_docram
 };
 
-/*
+#ifdef UNUSED_FUNCTION
 static void apple2gs_floppy35_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
     // 3.5" floppy
@@ -189,7 +189,8 @@ static void apple2gs_floppy525_getinfo(const mess_device_class *devclass, UINT32
 
         default:                                        apple525_device_getinfo(devclass, state, info); break;
     }
-}*/
+}
+#endif
 
 static const floppy_config apple2gs_floppy35_floppy_config =
 {

@@ -357,8 +357,10 @@ DRIVER_INIT( ti99_4p )
 
 	/* set up memory pointers */
 	xRAM_ptr = (UINT16 *) (memory_region(machine, "maincpu") + offset_xram_4p);
-	/* console_GROMs.data_ptr = memory_region(machine, region_grom);
-	create_grom_high2k(0x0000, 0x5fff); */
+#if 0
+	console_GROMs.data_ptr = memory_region(machine, region_grom);
+	create_grom_high2k(0x0000, 0x5fff);
+#endif
 }
 
 static const TMS9928a_interface tms9918_interface =
@@ -470,13 +472,15 @@ MACHINE_RESET( ti99 )
 		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + offset_sram);
 	}
 
-/*  if (ti99_model != model_99_4p)
-    {
-        if (ti99_model == model_99_8)
-            current_page_ptr_8 = cartridge_pages_8[0];
-        else
-            current_page_ptr = cartridge_pages[0];
-    } */
+#if 0
+	if (ti99_model != model_99_4p)
+	{
+		if (ti99_model == model_99_8)
+			current_page_ptr_8 = cartridge_pages_8[0];
+		else
+			current_page_ptr = cartridge_pages[0];
+	}
+#endif
 
 	if (!has_evpc) TMS9928A_reset();
         else v9938_reset(0);
@@ -1267,13 +1271,15 @@ READ8_HANDLER( ti99_8_r )
 	mapper_reg = ti99_8_mapper_regs[page];
 	offset = (mapper_reg + (offset & 0x0fff)) & 0x00ffffff;
 
+#if 0
 	/* test read protect */
-	/*if (mapper_reg & 0x20000000)
-        ;*/
+	if (mapper_reg & 0x20000000)
+		;
 
 	/* test execute protect */
-	/*if (mapper_reg & 0x40000000)
-        ;*/
+	if (mapper_reg & 0x40000000)
+		;
+#endif
 
 	if (offset < 0x010000)
 		/* Read RAM */
@@ -1446,9 +1452,11 @@ WRITE8_HANDLER ( ti99_8_w )
 	/* 4 KiB page size */
 	offset = (mapper_reg + (offset & 0x0fff)) & 0x00ffffff;
 
+#if 0
 	/* test write protect */
-	/*if (mapper_reg & 0x80000000)
-        ;*/
+	if (mapper_reg & 0x80000000)
+		;
+#endif
 
 	if (offset < 0x010000)
 	{	/* Write RAM */
@@ -2066,8 +2074,10 @@ static READ8_DEVICE_HANDLER( ti99_R9901_1 )
 	}
 
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
-	/*if (cassette_input(devtag_get_device(device->machine, "cassette1")) > 0)
-        answer |= 8;*/
+#if 0
+	if (cassette_input(devtag_get_device(device->machine, "cassette1")) > 0)
+		answer |= 8;
+#endif
 
 	return answer;
 }
@@ -2202,8 +2212,10 @@ static READ8_DEVICE_HANDLER( ti99_8_R9901_1 )
 	}
 
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
-	/*if (cassette_input(devtag_get_device(machine, "cassette")) > 0)
-        answer |= 8;*/
+#if 0
+	if (cassette_input(devtag_get_device(machine, "cassette")) > 0)
+		answer |= 8;
+#endif
 
 	return answer;
 }
@@ -2634,7 +2646,8 @@ static void ti99_4p_mapper_init(running_machine *machine)
 	int i;
 
 	/* Not required at run-time */
-	/*memory_install_read16_handler(space, 0x2000, 0x2fff, SMH_BANK(3));
+#if 0
+	memory_install_read16_handler(space, 0x2000, 0x2fff, SMH_BANK(3));
     memory_install_write16_handler(space, 0x2000, 0x2fff, SMH_BANK(3));
     memory_install_read16_handler(space, 0x3000, 0x3fff, SMH_BANK(4));
     memory_install_write16_handler(space, 0x3000, 0x3fff, SMH_BANK(4));
@@ -2649,7 +2662,8 @@ static void ti99_4p_mapper_init(running_machine *machine)
     memory_install_read16_handler(space, 0xe000, 0xefff, SMH_BANK(9));
     memory_install_write16_handler(space, 0xe000, 0xefff, SMH_BANK(9));
     memory_install_read16_handler(space, 0xf000, 0xffff, SMH_BANK(10));
-    memory_install_write16_handler(space, 0xf000, 0xffff, SMH_BANK(10));*/
+    memory_install_write16_handler(space, 0xf000, 0xffff, SMH_BANK(10));
+#endif
 
 	ti99_peb_set_16bit_card_handlers(0x1e00, & ti99_4p_mapper_handlers);
 

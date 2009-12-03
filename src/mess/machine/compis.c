@@ -478,10 +478,10 @@ WRITE16_DEVICE_HANDLER ( compis_osp_pit_w )
 /*-------------------------------------------------------------------------*/
 static void compis_usart_rxready(const device_config *device, int state)
 {
-/*
-    if (state)
-        compis_pic_irq(COMPIS_IRQ_8251_RXRDY);
-*/
+#if 0
+	if (state)
+		compis_pic_irq(COMPIS_IRQ_8251_RXRDY);
+#endif
 }
 
 const msm8251_interface compis_usart_interface=

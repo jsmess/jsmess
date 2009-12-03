@@ -103,23 +103,21 @@ UINT32 sst39vfx_get_size( const device_config *device)
 #define OFFSET_SWAP(offset,width) (offset & (~(width - 1))) | (width - 1 - (offset & (width - 1)))
 */
 
-/*
+#ifdef UNUSED_FUNCTION
 READ8_HANDLER( sst39vfx_r )
 {
-    _logerror( 1, ("sst39vfx_r (%08X)\n", offset));
-    if (flash->swap) offset = OFFSET_SWAP( offset, flash->swap);
-    return flash->data[offset];
+	_logerror( 1, ("sst39vfx_r (%08X)\n", offset));
+	if (flash->swap) offset = OFFSET_SWAP( offset, flash->swap);
+	return flash->data[offset];
 }
-*/
 
-/*
 WRITE8_HANDLER( sst39vfx_w )
 {
-    _logerror( 1, ("sst39vfx_w (%08X/%02X)\n", offset, data));
-    if (flash->swap) offset = OFFSET_SWAP( offset, flash->swap);
-    flash->data[offset] = data;
+	_logerror( 1, ("sst39vfx_w (%08X/%02X)\n", offset, data));
+	if (flash->swap) offset = OFFSET_SWAP( offset, flash->swap);
+	flash->data[offset] = data;
 }
-*/
+#endif
 
 static void sst39vfx_swap( const device_config *device)
 {
@@ -154,7 +152,7 @@ void sst39vfx_save(const device_config *device, mame_file *file)
 	if (flash->swap) sst39vfx_swap(device);
 }
 
-/*
+#if 0
 NVRAM_HANDLER( sst39vfx )
 {
     _logerror( 0, ("nvram_handler_sst39vfx (%p/%d)\n", file, read_or_write));
@@ -174,7 +172,7 @@ NVRAM_HANDLER( sst39vfx )
         }
     }
 }
-*/
+#endif
 
 
 /*-------------------------------------------------

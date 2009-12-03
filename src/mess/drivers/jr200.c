@@ -79,12 +79,12 @@ static const UINT8 jr200_keycodes[4][9][8] =
 	}
 };
 
-/*
+#if 0
 static READ8_HANDLER( test_r )
 {
-    return 0x00;
+	return 0x00;
 }
-*/
+#endif
 
 static WRITE8_HANDLER( io_reg_w )
 {

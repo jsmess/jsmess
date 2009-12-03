@@ -186,13 +186,14 @@ static void mfp_init()
 	x68k_sys.mfp.irqline = 6;  // MFP is connected to 68000 IRQ line 6
 	x68k_sys.mfp.current_irq = -1;  // No current interrupt
 
-/*  mfp_timer[0] = timer_alloc(machine, mfp_timer_a_callback, NULL);
+#if 0
+    mfp_timer[0] = timer_alloc(machine, mfp_timer_a_callback, NULL);
     mfp_timer[1] = timer_alloc(machine, mfp_timer_b_callback, NULL);
     mfp_timer[2] = timer_alloc(machine, mfp_timer_c_callback, NULL);
     mfp_timer[3] = timer_alloc(machine, mfp_timer_d_callback, NULL);
     mfp_irq = timer_alloc(machine, mfp_update_irq, NULL);
     timer_adjust_periodic(mfp_irq, attotime_zero, 0, ATTOTIME_IN_USEC(32));
-*/
+#endif
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1261,12 +1262,14 @@ static READ16_HANDLER( x68k_sysport_r )
 	}
 }
 
-/*static READ16_HANDLER( x68k_mfp_r )
+#ifdef UNUSED_FUNCTION
+static READ16_HANDLER( x68k_mfp_r )
 {
-    const device_config *x68k_mfp = devtag_get_device(space->machine, MC68901_TAG);
+	const device_config *x68k_mfp = devtag_get_device(space->machine, MC68901_TAG);
 
-    return mc68901_register_r(x68k_mfp, offset);
-}*/
+	return mc68901_register_r(x68k_mfp, offset);
+}
+#endif
 
 static READ16_HANDLER( x68k_mfp_r )
 {
@@ -1276,7 +1279,8 @@ static READ16_HANDLER( x68k_mfp_r )
 //  logerror("MFP: [%08x] Reading offset %i\n",cpu_get_pc(space->cpu),offset);
     switch(offset)
     {
-/*    case 0x00:  // GPIP - General purpose I/O register (read-only)
+#if 0
+    case 0x00:  // GPIP - General purpose I/O register (read-only)
         ret = 0x23;
         if(video_screen_get_vpos(machine->primary_screen) == x68k_sys.crtc.reg[9])
             ret |= 0x40;
@@ -1317,7 +1321,8 @@ static READ16_HANDLER( x68k_mfp_r )
     case 17:  // TCDR
         return x68k_sys.mfp.timer[2].counter;
     case 18:  // TDDR
-        return x68k_sys.mfp.timer[3].counter;*/
+        return x68k_sys.mfp.timer[3].counter;
+#endif
     case 21:  // RSR
         return x68k_sys.mfp.rsr;
     case 22:  // TSR
@@ -1354,7 +1359,8 @@ static WRITE16_HANDLER( x68k_mfp_w )
     */
 	switch(offset)
 	{
-/*  case 0:  // GPDR
+#if 0
+  case 0:  // GPDR
         // All bits are inputs generally, so no action taken.
         break;
     case 1:  // AER
@@ -1431,7 +1437,8 @@ static WRITE16_HANDLER( x68k_mfp_w )
         break;
     case 20:
         x68k_sys.mfp.ucr = data;
-        break;*/
+        break;
+#endif
     case 21:
         if(data & 0x01)
             x68k_sys.mfp.usart.recv_enable = 1;
@@ -1512,12 +1519,14 @@ static READ16_HANDLER( x68k_sram_r )
 //      return 0x0000;
 	if(offset == 0x08/2)
 		return messram_get_size(devtag_get_device(space->machine, "messram")) >> 16;  // RAM size
-	/*if(offset == 0x46/2)
+#if 0
+	if(offset == 0x46/2)
         return 0x0024;
     if(offset == 0x6e/2)
         return 0xff00;
     if(offset == 0x70/2)
-        return 0x0700;*/
+        return 0x0700;
+#endif
 	return space->machine->generic.nvram.u16[offset];
 }
 
@@ -1525,12 +1534,14 @@ static READ32_HANDLER( x68k_sram32_r )
 {
 	if(offset == 0x08/4)
 		return (messram_get_size(devtag_get_device(space->machine, "messram")) & 0xffff0000);  // RAM size
-	/*if(offset == 0x46/2)
+#if 0
+	if(offset == 0x46/2)
         return 0x0024;
     if(offset == 0x6e/2)
         return 0xff00;
     if(offset == 0x70/2)
-        return 0x0700;*/
+        return 0x0700;
+#endif
 	return space->machine->generic.nvram.u32[offset];
 }
 

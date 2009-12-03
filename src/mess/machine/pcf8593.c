@@ -420,7 +420,7 @@ void pcf8593_save(const device_config *device, mame_file *file)
 	mame_fwrite( file, rtc->data, sizeof(rtc->data));
 }
 
-/*
+#ifdef UNUSED_FUNCTION
 NVRAM_HANDLER( pcf8593 )
 {
     _logerror( 0, ("nvram_handler_pcf8593 (%p/%d)\n", file, read_or_write));
@@ -440,7 +440,7 @@ NVRAM_HANDLER( pcf8593 )
         }
     }
 }
-*/
+#endif
 
 
 /*-------------------------------------------------

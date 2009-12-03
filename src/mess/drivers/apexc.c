@@ -232,14 +232,16 @@ static WRITE8_HANDLER(tape_write)
 */
 
 
+#if 0
 /* defines for input port numbers */
-/* enum
+enum
 {
-    panel_control = 0,
-    panel_edit1,
-    panel_edit2
+	panel_control = 0,
+	panel_edit1,
+	panel_edit2
 };
-*/
+#endif
+
 
 /* defines for each bit and mask in input port panel_control */
 enum

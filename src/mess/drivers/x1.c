@@ -635,11 +635,13 @@ static READ8_HANDLER( sub_io_r )
 		return bus_res;
 	}
 
-	/*if(key_flag == 1)
-    {
-        key_flag = 0;
-        return 0x82; //TODO: this is for shift/ctrl/kana lock etc.
-    }*/
+#if 0
+	if(key_flag == 1)
+	{
+		key_flag = 0;
+		return 0x82; //TODO: this is for shift/ctrl/kana lock etc.
+	}
+#endif
 
 	sub_cmd_length--;
 	sub_obf = (sub_cmd_length) ? 0x00 : 0x20;
@@ -1987,7 +1989,8 @@ static INTERRUPT_GEN( x1_vbl )
 	//...
 }
 
-/*static IRQ_CALLBACK(x1_irq_callback)
+#ifdef UNUSED_FUNCTION
+static IRQ_CALLBACK(x1_irq_callback)
 {
     if(ctc_irq_flag != 0)
     {
@@ -2005,7 +2008,8 @@ static INTERRUPT_GEN( x1_vbl )
     }
     return x1_irq_vector;
 }
-*/
+#endif
+
 static TIMER_CALLBACK(keyboard_callback)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);

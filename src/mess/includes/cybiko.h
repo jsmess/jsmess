@@ -24,11 +24,11 @@ DRIVER_INIT( cybikov2 );
 DRIVER_INIT( cybikoxt );
 
 // non-volatile ram handler
-/*
+#if 0
 NVRAM_HANDLER( cybikov1 );
 NVRAM_HANDLER( cybikov2 );
 NVRAM_HANDLER( cybikoxt );
-*/
+#endif
 
 // machine start
 MACHINE_START( cybikov1 );

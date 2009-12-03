@@ -41,7 +41,7 @@ static const m6502_interface apple3_m6502_interface =
 	NULL,					/* port_write_func */
 };
 
-/*
+#ifdef UNUSED_FUNCTION
 static void apple3_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
     switch(state)
@@ -61,8 +61,7 @@ static void apple3_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
         default:                                        apple525_device_getinfo(devclass, state, info); break;
     }
 }
-
-*/
+#endif
 
 static const floppy_config apple3_floppy_config =
 {

@@ -404,7 +404,8 @@ ROM_START( primoc64 )
 ROM_END
 
 
-/*static void primo_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+#ifdef UNUSED_FUNCTION
+static void primo_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
     switch(state)
     {
@@ -416,8 +417,7 @@ ROM_END
         default:                                        cartslot_device_getinfo(devclass, state, info); break;
     }
 }
-
-*/
+#endif
 
 /*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  INIT     CONFIG COMPANY  FULLNAME */
 COMP ( 1984, primoa32, 0,        0,     primoa32, primo, primo32, 0, "Microkey", "Primo A-32" , 0)

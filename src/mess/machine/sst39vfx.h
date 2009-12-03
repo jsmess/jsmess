@@ -61,18 +61,16 @@ UINT8* sst39vfx_get_base( const device_config *device );
 UINT32 sst39vfx_get_size( const device_config *device );
 
 // read/write handler
-/*
+#if 0
 READ8_HANDLER( sst39vfx_r );
 WRITE8_HANDLER( sst39vfx_w );
-*/
+#endif
 
 // load/save
 void sst39vfx_load(const device_config *device, mame_file *file);
 void sst39vfx_save(const device_config *device, mame_file *file);
 
 // non-volatile ram handler
-/*
-NVRAM_HANDLER( sst39vfx );
-*/
+//NVRAM_HANDLER( sst39vfx );
 
 #endif

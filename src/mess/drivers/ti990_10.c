@@ -99,9 +99,11 @@ static INTERRUPT_GEN( ti990_10_line_interrupt )
 	ti990_line_interrupt(device->machine);
 }
 
-/*static void idle_callback(int state)
+#ifdef UNUSED_FUNCTION
+static void idle_callback(int state)
 {
-}*/
+}
+#endif
 
 static void rset_callback(const device_config *device)
 {

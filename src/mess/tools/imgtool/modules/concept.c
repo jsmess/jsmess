@@ -132,9 +132,11 @@ static imgtoolerr_t concept_image_nextenum(imgtool_directory *enumeration, imgto
 static void concept_image_closeenum(imgtool_directory *enumeration);
 static imgtoolerr_t concept_image_freespace(imgtool_partition *partition, UINT64 *size);
 static imgtoolerr_t concept_image_readfile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf);
-/*static imgtoolerr_t concept_image_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, option_resolution *writeoptions);
+#if 0
+static imgtoolerr_t concept_image_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, option_resolution *writeoptions);
 static imgtoolerr_t concept_image_deletefile(imgtool_partition *partition, const char *filename);
-static imgtoolerr_t concept_image_create(const imgtool_module *mod, imgtool_stream *f, option_resolution *createoptions);*/
+static imgtoolerr_t concept_image_create(const imgtool_module *mod, imgtool_stream *f, option_resolution *createoptions);
+#endif
 
 void concept_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
 {
