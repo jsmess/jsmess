@@ -11,7 +11,6 @@ New System Drivers Supported:
 - Robotron K1003 [Miodrag Milanovic]
 
 
-
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
 - Ausbaufähiger Mikrocomputer mit dem U 880 (Huebler/Everts) [Curt Coder]
@@ -28,6 +27,7 @@ Skeleton drivers:
 - Exelvision Exeltel
 - Sharp PC-E220
 - Hewlett-Packard HP16500b [R. Belmont]
+- MITS Altair 680b  [Miodrag Milanovic]
 
 
 System Driver Changes:
