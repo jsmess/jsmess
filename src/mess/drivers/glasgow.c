@@ -163,7 +163,7 @@ static READ16_HANDLER( glasgow_keys_r )
 	board_row &= 7;
 
 	/* See if we are moving a piece */
-	data = input_port_read(space->machine, keynames[board_row]);
+	data = input_port_read_safe(space->machine, keynames[board_row], 0xff);
 
 	if ((data != 0xff) && (!mouse_down))
 	{
@@ -189,7 +189,7 @@ static READ16_HANDLER( glasgow_keys_r )
 		mouse_down = 0;
 
 	/* See if we are taking a piece off the board */
-	if (!input_port_read(space->machine, "LINE10"))
+	if (!input_port_read_safe(space->machine, "LINE10", 0xff))
 		mouse_hold = 0;
 
 	/* See if any keys pressed */
