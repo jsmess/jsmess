@@ -184,35 +184,31 @@ static struct towns_cdrom_controller
 	INT32 buffer_ptr;
 	UINT32 lba_current;
 	UINT32 lba_last;
+	UINT32 cdda_current;
+	UINT32 cdda_length;
 	emu_timer* read_timer;
 } towns_cd;
 
 static void towns_update_video_banks(const address_space* space);
 static PIC8259_SET_INT_LINE( towns_pic_irq );
 
-INLINE UINT32 bcd_to_dec(UINT32 val)
-{
-	return (val & 0x00000f) + 
-		(((val & 0x0000f0) >> 4) * 10) +
-		(((val & 0x000f00) >> 8) * 100) +
-		(((val & 0x00f000) >> 12) * 1000) +
-		(((val & 0x0f0000) >> 16) * 10000) +
-		(((val & 0xf00000) >> 24) * 100000);
-}
-
 INLINE UINT8 byte_to_bcd(UINT8 val)
 {
 	return ((val / 10) << 4) | (val % 10);
 }
 
-INLINE UINT32 dword_to_bcd(UINT32 val)
+INLINE UINT8 bcd_to_byte(UINT8 val)
 {
-	return (((val / 100000) % 10) << 20) |
-		(((val / 10000) % 10) << 16) | 
-		(((val / 1000) % 10) << 12) | 
-		(((val / 100) % 10) << 8) | 
-		(((val / 10) % 10) << 4) | 
-		(val % 10);
+	return (((val & 0xf0) >> 4) * 10) + (val & 0x0f);
+}
+
+INLINE UINT32 msf_to_lba(UINT32 val)  // because the CDROM core doesn't provide this
+{
+	UINT8 m,s,f;
+	f = bcd_to_byte(val & 0x0000ff);
+	s = (bcd_to_byte((val & 0x00ff00) >> 8));
+	m = (bcd_to_byte((val & 0xff0000) >> 16));
+	return (m * (60 * 75)) + (s * 75) + f;   
 }
 
 static void towns_init_serial_rom(running_machine* machine)
@@ -357,7 +353,7 @@ static READ8_HANDLER(towns_sys6c_r)
 
 static WRITE8_HANDLER(towns_sys6c_w)
 {
-	logerror("SYS: (0x6c) write to timer (0x%02x)\n",data);
+//	logerror("SYS: (0x6c) write to timer (0x%02x)\n",data);
 	ftimer -= 0x54;
 }
 
@@ -1244,6 +1240,21 @@ static void towns_cdrom_set_irq(running_machine* machine,int line,int state)
 	}
 } 
 
+static UINT8 towns_cd_get_track(running_machine* machine)
+{
+	const device_config* cdrom = devtag_get_device(machine,"cdrom");
+	const device_config* cdda = devtag_get_device(machine,"cdda");
+	UINT32 lba = cdda_get_audio_lba(cdda);
+	UINT8 track;
+	
+	for(track=1;track<99;track++)
+	{
+		if(cdrom_get_track_start(mess_cd_get_cdrom_file(cdrom),track) > lba)
+			break;
+	}
+	return track;
+}
+
 static TIMER_CALLBACK( towns_cdrom_read_byte )
 {
 	const device_config* device = ptr;
@@ -1308,6 +1319,11 @@ static void towns_cdrom_read(const device_config* device)
 {
 	// MODE 1 read
 	// load data into buffer to be sent via DMA1 channel 3
+	// A set of status bytes is sent after each sector, and DMA is paused
+	// so that the DMA controller than be set up again.
+	// parameters:
+	// 			3 bytes: MSF of first sector to read
+	//          3 bytes: MSF of last sector to read
 	UINT32 lba1,lba2;
 	
 	lba1 = towns_cd.parameter[7] << 16;
@@ -1316,8 +1332,8 @@ static void towns_cdrom_read(const device_config* device)
 	lba2 = towns_cd.parameter[4] << 16;
 	lba2 += towns_cd.parameter[3] << 8;
 	lba2 += towns_cd.parameter[2];
-	towns_cd.lba_current = bcd_to_dec(lba1) - 200;
-	towns_cd.lba_last = bcd_to_dec(lba2) - 200;
+	towns_cd.lba_current = msf_to_lba(lba1-0x200);
+	towns_cd.lba_last = msf_to_lba(lba2-0x200);
 	
 	logerror("CD: Mode 1 read from LBA next:%i last:%i\n",towns_cd.lba_current,towns_cd.lba_last);
 
@@ -1351,11 +1367,41 @@ static void towns_cdrom_read(const device_config* device)
 	//timer_adjust_oneshot(towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
 }
 
+static void towns_cdrom_play_cdda(const device_config* device)
+{
+	// PLAY AUDIO
+	// Plays CD-DA audio from the specified MSF
+	// Parameters:
+	// 			3 bytes: starting MSF of audio to play
+	// 			3 bytes: ending MSF of audio to play (can span multiple tracks)
+	UINT32 lba1,lba2;
+	const device_config* cdda = devtag_get_device(device->machine,"cdda");
+	
+	lba1 = towns_cd.parameter[7] << 16;
+	lba1 += towns_cd.parameter[6] << 8;
+	lba1 += towns_cd.parameter[5];
+	lba2 = towns_cd.parameter[4] << 16;
+	lba2 += towns_cd.parameter[3] << 8;
+	lba2 += towns_cd.parameter[2];
+	towns_cd.cdda_current = msf_to_lba(lba1);
+	towns_cd.cdda_length = msf_to_lba(lba2) - towns_cd.cdda_current;
+	
+	cdda_set_cdrom(cdda,mess_cd_get_cdrom_file(device));
+	cdda_start_audio(cdda,towns_cd.cdda_current,towns_cd.cdda_length);
+	logerror("CD: CD-DA start from LBA:%i length:%i\n",towns_cd.cdda_current,towns_cd.cdda_length);
+	
+	towns_cd.status |= 0x03; 
+	towns_cd.extra_status = 1;
+	towns_cd.cmd_status[0] = 0x00;
+	towns_cd.cmd_status[1] = 0x00;
+	towns_cd.cmd_status[2] = 0x00;
+	towns_cd.cmd_status[3] = 0x00;
+	towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_MPU,1);
+	
+}
+
 static void towns_cdrom_execute_command(const device_config* device)
 {
-	// For now, we'll return status codes that hopefully tell the system
-	// that there is no CD-ROM in the drive.
-
 	if(mess_cd_get_cdrom_file(device) == NULL)
 	{  // No CD in drive
 		if(towns_cd.command & 0x20)
@@ -1392,16 +1438,31 @@ static void towns_cdrom_execute_command(const device_config* device)
 				logerror("CD: Command 0x02: READ MODE1\n");
 				towns_cdrom_read(device);
 				break;
+			case 0x04:  // Play Audio Track
+				logerror("CD: Command 0x04: PLAY CD-DA\n");
+				towns_cdrom_play_cdda(device);
+				break;
 			case 0x05:  // Read TOC
 				logerror("CD: Command 0x05: READ TOC\n");
-					towns_cd.status |= 0x02;  // status read request
-					towns_cd.cmd_status_ptr = 0;
-					towns_cd.extra_status = 1;
-					towns_cd.cmd_status[0] = 0x00;
-					towns_cd.cmd_status[1] = 0x00;
-					towns_cd.cmd_status[2] = 0x00;
-					towns_cd.cmd_status[3] = 0x00;
-					towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_MPU,1);
+				towns_cd.status |= 0x02;  // status read request
+				towns_cd.cmd_status_ptr = 0;
+				towns_cd.extra_status = 1;
+				towns_cd.cmd_status[0] = 0x00;
+				towns_cd.cmd_status[1] = 0x00;
+				towns_cd.cmd_status[2] = 0x00;
+				towns_cd.cmd_status[3] = 0x00;
+				towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_MPU,1);
+				break;
+			case 0x06:  // Read CD-DA state?
+				logerror("CD: Command 0x06: READ CD-DA STATE\n");
+				towns_cd.status |= 0x02;  // status read request
+				towns_cd.cmd_status_ptr = 0;
+				towns_cd.extra_status = 1;
+				towns_cd.cmd_status[0] = 0x00;
+				towns_cd.cmd_status[1] = 0x00;
+				towns_cd.cmd_status[2] = 0x00;
+				towns_cd.cmd_status[3] = 0x00;
+				towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_MPU,1);
 				break;
 			case 0x80:  // set state
 				if(towns_cd.command & 0x20)
@@ -1410,9 +1471,14 @@ static void towns_cdrom_execute_command(const device_config* device)
 					towns_cd.cmd_status_ptr = 0;
 					towns_cd.extra_status = 0;
 					towns_cd.cmd_status[0] = 0x00;
-					towns_cd.cmd_status[1] = 0x01; // CD-ROM/CD-DA status?  bit 1 = error type(HE or CDR)
+					towns_cd.cmd_status[1] = 0x01;
 					towns_cd.cmd_status[2] = 0x00;
 					towns_cd.cmd_status[3] = 0x00;
+					if(cdda_audio_active(devtag_get_device(device->machine,"cdda")))
+					{
+						towns_cd.cmd_status[0] = 0x00;
+						towns_cd.cmd_status[1] |= 0x02;
+					}
 					towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_MPU,1);
 				}
 				logerror("CD: Command 0x80: set state\n");
@@ -1431,19 +1497,20 @@ static void towns_cdrom_execute_command(const device_config* device)
 				}
 				logerror("CD: Command 0x81: set state (CDDASET)\n");
 				break;
-			case 0x84:   // Stop audio track (?)
+			case 0x84:   // Unknown (status?)
 				if(towns_cd.command & 0x20)
 				{
 					towns_cd.status |= 0x02;  // status read request
 					towns_cd.cmd_status_ptr = 0;
-					towns_cd.extra_status = 0;
+					towns_cd.extra_status = 1;
 					towns_cd.cmd_status[0] = 0x00;
 					towns_cd.cmd_status[1] = 0x00;
 					towns_cd.cmd_status[2] = 0x00;
 					towns_cd.cmd_status[3] = 0x00;
+					cdda_stop_audio(devtag_get_device(device->machine,"cdda"));
 					towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_MPU,1);
 				}
-				logerror("CD: Command 0x84: Stop audio track(?)\n");
+				logerror("CD: Command 0x84: STOP CD-DA\n");
 				break;
 			default:
 				towns_cd.status |= 0x02;  // status read request
@@ -1470,6 +1537,9 @@ static READ8_HANDLER(towns_cdrom_r)
 {
 	UINT32 addr = 0;
 	UINT8 ret = 0;
+
+	ret = towns_cd.cmd_status[towns_cd.cmd_status_ptr];
+
 	switch(offset)
 	{
 		case 0x00:  // status
@@ -1499,6 +1569,13 @@ static READ8_HANDLER(towns_cdrom_r)
 							}
 							else
 								towns_cd.cmd_status[0] = 0x06;
+							towns_cd.cmd_status[1] = 0x00;
+							towns_cd.cmd_status[2] = 0x00;
+							towns_cd.cmd_status[3] = 0x00;
+							towns_cd.extra_status = 0;
+							break;
+						case 0x04:  // play cdda
+							towns_cd.cmd_status[0] = 0x07;
 							towns_cd.cmd_status[1] = 0x00;
 							towns_cd.cmd_status[2] = 0x00;
 							towns_cd.cmd_status[3] = 0x00;
@@ -1573,8 +1650,47 @@ static READ8_HANDLER(towns_cdrom_r)
 									break;
 							}
 							break;
+						case 0x06:  // read CD-DA state
+							switch(towns_cd.extra_status)
+							{
+								case 1:  // st2 = track number
+									towns_cd.cmd_status[0] = 0x18;
+									towns_cd.cmd_status[1] = 0x00;
+									towns_cd.cmd_status[2] = towns_cd_get_track(space->machine);  // track number
+									towns_cd.cmd_status[3] = 0x00;
+									towns_cd.extra_status++;
+									break;
+								case 2:  // st0/1/2 = MSF from beginning of current track
+									addr = cdda_get_audio_lba(devtag_get_device(space->machine,"cdda"));
+									addr = lba_to_msf(addr - towns_cd.cdda_current);  
+									towns_cd.cmd_status[0] = 0x19;
+									towns_cd.cmd_status[1] = (addr & 0xff0000) >> 16;
+									towns_cd.cmd_status[2] = (addr & 0x00ff00) >> 8;
+									towns_cd.cmd_status[3] = addr & 0x0000ff;
+									towns_cd.extra_status++;
+									break;
+								case 3:  // st1/2 = current MSF
+									addr = cdda_get_audio_lba(devtag_get_device(space->machine,"cdda"));
+									addr = lba_to_msf(addr);  // this data is incorrect, but will do until exact meaning is found
+									towns_cd.cmd_status[0] = 0x19;
+									towns_cd.cmd_status[1] = 0;
+									towns_cd.cmd_status[2] = (addr & 0xff0000) >> 16;
+									towns_cd.cmd_status[3] = (addr & 0x00ff00) >> 8;
+									towns_cd.extra_status++;
+									break;
+								case 4:
+									addr = cdda_get_audio_lba(devtag_get_device(space->machine,"cdda"));
+									addr = lba_to_msf(addr);  // this data is incorrect, but will do until exact meaning is found
+									towns_cd.cmd_status[0] = 0x20;
+									towns_cd.cmd_status[1] = addr & 0x0000ff;
+									towns_cd.cmd_status[2] = 0x00;
+									towns_cd.cmd_status[3] = 0x00;
+									towns_cd.extra_status = 0;
+									break;
+							}
+							break;
 						case 0x84:
-							towns_cd.cmd_status[0] = 0x07;
+							towns_cd.cmd_status[0] = 0x11;
 							towns_cd.cmd_status[1] = 0x00;
 							towns_cd.cmd_status[2] = 0x00;
 							towns_cd.cmd_status[3] = 0x00;
@@ -1583,8 +1699,8 @@ static READ8_HANDLER(towns_cdrom_r)
 					}
 				}
 			}
-			logerror("CD: reading command status port, returning %02x\n",towns_cd.cmd_status[towns_cd.cmd_status_ptr]);
-			ret = towns_cd.cmd_status[towns_cd.cmd_status_ptr++];
+			logerror("CD: reading command status port, returning %02x\n",ret);
+			towns_cd.cmd_status_ptr++;
 			if(towns_cd.cmd_status_ptr > 3)
 				towns_cd.cmd_status_ptr = 0;
 			return ret;
