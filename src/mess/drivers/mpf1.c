@@ -14,7 +14,6 @@
 
 	TODO:
 
-	- mpf1b doesn't use artwork for some reason
 	- remove halt callback
 	- crt board
 	- speech board
@@ -36,6 +35,7 @@
 #include "sound/tms5220.h"
 #include "devices/cassette.h"
 #include "mpf1.lh"
+#include "mpf1b.lh"
 
 /* Address Maps */
 
