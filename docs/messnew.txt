@@ -9,6 +9,7 @@ New System Drivers Supported:
 - Microsystems International Limited MOD-8 [Miodrag Milanovic]
 - Science of Cambridge MK-14 [Miodrag Milanovic]
 - Robotron K1003 [Miodrag Milanovic]
+- MITS Altair 8800bt [Miodrag Milanovic]
 
 
 Systems Promoted from GAME_NOT_WORKING:
