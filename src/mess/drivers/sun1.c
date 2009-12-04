@@ -12,17 +12,34 @@
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/upd7201.h"
+#include "machine/terminal.h"
 
 static UINT16* sun1_ram;
+
+// Just hack to show output since upd7201 is not implemented yet
+
+static READ16_HANDLER(sun1_upd7201_r)
+{
+	return 0xffff;
+}
+
+static WRITE16_HANDLER(sun1_upd7201_w)
+{
+	const device_config	*devconf = devtag_get_device(space->machine, "terminal");	
+	if (offset==0) terminal_write(devconf,0,data >> 8);
+}
 
 static ADDRESS_MAP_START(sun1_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(&sun1_ram) // 512 KB RAM / ROM at boot
 	AM_RANGE(0x00200000, 0x00203fff) AM_ROM AM_REGION("user1",0)
+	AM_RANGE(0x00600000, 0x00600007) AM_READWRITE( sun1_upd7201_r, sun1_upd7201_w )
 ADDRESS_MAP_END
 
 /* Input ports */
 INPUT_PORTS_START( sun1 )
+	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
 
@@ -35,14 +52,16 @@ static MACHINE_RESET(sun1)
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 }
 
-static VIDEO_START( sun1 )
+
+static WRITE8_DEVICE_HANDLER( sun1_kbd_put )
 {
 }
 
-static VIDEO_UPDATE( sun1 )
+static GENERIC_TERMINAL_INTERFACE( sun1_terminal_intf )
 {
-    return 0;
-}
+	DEVCB_HANDLER(sun1_kbd_put)
+};
+
 
 static MACHINE_DRIVER_START( sun1 )
     /* basic machine hardware */
@@ -52,17 +71,8 @@ static MACHINE_DRIVER_START( sun1 )
     MDRV_MACHINE_RESET(sun1)
 	
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
-
-    MDRV_VIDEO_START(sun1)
-    MDRV_VIDEO_UPDATE(sun1)
+    MDRV_IMPORT_FROM( generic_terminal )	
+	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sun1_terminal_intf)	
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(sun1)
