@@ -12,6 +12,9 @@
 typedef struct _mpf1_state mpf1_state;
 struct _mpf1_state
 {
+	int _break;
+	int m1;
+
 	UINT8 lednum;
 
 	emu_timer *led_refresh_timer;

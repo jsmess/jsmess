@@ -1534,6 +1534,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/basic52.o	\
 	$(MESS_DRIVERS)/altair.o	\
 	$(MESS_DRIVERS)/sun1.o		\
+	$(MESS_DRIVERS)/micronic.o	\
 
 
 
