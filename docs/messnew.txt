@@ -31,6 +31,7 @@ Skeleton drivers:
 - MITS Altair 680b [Miodrag Milanovic]
 - MCS Basic 52 [Miodrag Milanovic]
 - MCS Basic 31 [Miodrag Milanovic]
+- Sun-1
 
 System Driver Changes:
 ----------------------

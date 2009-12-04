@@ -1533,6 +1533,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/mits680b.o	\
 	$(MESS_DRIVERS)/basic52.o	\
 	$(MESS_DRIVERS)/altair.o	\
+	$(MESS_DRIVERS)/sun1.o		\
 
 
 

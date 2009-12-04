@@ -1533,4 +1533,5 @@ const game_driver * const drivers[] =
 	DRIVER( basic52 )
 	DRIVER( basic31 )	
 	DRIVER( al8800bt )
+	DRIVER( sun1 )
 #endif /* DRIVER_RECURSIVE */
