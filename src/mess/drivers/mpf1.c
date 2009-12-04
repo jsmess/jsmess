@@ -12,22 +12,14 @@
 
 /*
 
-    Artwork picture downloaded from:
-
-    http://members.lycos.co.uk/leeedavison/z80/mpf1/
-
-*/
-
-/*
-
 	TODO:
 
+	- mpf1b doesn't use artwork for some reason
+	- remove halt callback
 	- crt board
 	- speech board
 	- printers
-	- intr key
-	- moni key
-	- 
+	- clickable artwork
 
 */
 
@@ -86,6 +78,16 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
+static INPUT_CHANGED( trigger_nmi )
+{
+	cputag_set_input_line(field->port->machine, Z80_TAG, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
+static INPUT_CHANGED( trigger_irq )
+{
+	cputag_set_input_line(field->port->machine, Z80_TAG, INPUT_LINE_IRQ0, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
 static INPUT_PORTS_START( mpf1 )
 	PORT_START("PC0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 HL") PORT_CODE(KEYCODE_3)
@@ -137,14 +139,10 @@ static INPUT_PORTS_START( mpf1 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MOVE") PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("user")
-	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("USER KEY") PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("extra")	// interrupt keys
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MONI") PORT_CODE(KEYCODE_M)	// causes NMI ?
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INTR") PORT_CODE(KEYCODE_I)	// causes INT
+	PORT_START("SPECIAL")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("USER KEY") PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MONI") PORT_CODE(KEYCODE_M) PORT_CHANGED(trigger_nmi, 0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INTR") PORT_CODE(KEYCODE_I) PORT_CHANGED(trigger_irq, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mpf1b )
@@ -198,14 +196,10 @@ static INPUT_PORTS_START( mpf1b )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL/left") PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("user")
-	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("extra")	// interrupt keys
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MONI") PORT_CODE(KEYCODE_M)	// causes NMI ?
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INTR") PORT_CODE(KEYCODE_I)	// causes INT
+	PORT_START("SPECIAL")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("USER KEY") PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MONI") PORT_CODE(KEYCODE_M) PORT_CHANGED(trigger_nmi, 0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INTR") PORT_CODE(KEYCODE_I) PORT_CHANGED(trigger_irq, 0)
 INPUT_PORTS_END
 
 /* Intel 8255A Interface */
@@ -236,7 +230,7 @@ static READ8_DEVICE_HANDLER( mpf1_porta_r )
 	if (!BIT(state->lednum, 5)) data &= input_port_read(device->machine, "PC5");
 
 	/* bit 6, user key */
-	data &= input_port_read(device->machine, "user");
+	data &= BIT(input_port_read(device->machine, "SPECIAL"), 0) << 6;
 
 	/* bit 7, tape input */
 	data |= (cassette_input(state->cassette) > 0 ? 1 : 0) << 7;
@@ -264,6 +258,13 @@ static WRITE8_DEVICE_HANDLER( mpf1_portc_w )
 	timer_adjust_oneshot(state->led_refresh_timer, attotime_never, 0);
 
 	/* bit 6, monitor break control */
+	state->_break = BIT(data, 6);
+
+	if (state->_break)
+	{
+		state->m1 = 0;
+		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, CLEAR_LINE);
+	}
 
 	/* bit 7, tape output, tone and led */
 	set_led_status(device->machine, 0, !BIT(data, 7));
@@ -345,11 +346,6 @@ static TIMER_CALLBACK( check_halt_callback )
 	set_led_status(machine, 1, led_halt);
 }
 
-static TIMER_CALLBACK( irq0_callback )
-{
-	irq0_line_hold( cputag_get_cpu(machine, Z80_TAG) );
-}
-
 static MACHINE_START( mpf1 )
 {
 	mpf1_state *state = machine->driver_data;
@@ -361,6 +357,8 @@ static MACHINE_START( mpf1 )
 	state->led_refresh_timer = timer_alloc(machine, led_refresh, 0);
 
 	/* register for state saving */
+	state_save_register_global(machine, state->_break);
+	state_save_register_global(machine, state->m1);
 	state_save_register_global(machine, state->lednum);
 }
 
@@ -370,8 +368,7 @@ static MACHINE_RESET( mpf1 )
 
 	state->lednum = 0;
 
-	timer_pulse(machine,  ATTOTIME_IN_HZ(1), NULL, 0, check_halt_callback );
-	timer_pulse(machine,  ATTOTIME_IN_HZ(60), NULL, 0, irq0_callback );
+	timer_pulse(machine,  ATTOTIME_IN_HZ(1), NULL, 0, check_halt_callback);
 }
 
 /* Machine Drivers */
@@ -484,6 +481,28 @@ ROM_END
 
 /* System Drivers */
 
-COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  0, 0, "Multitech", "Micro Professor 1", 0)
-COMP( 1979, mpf1b, mpf1, 0, mpf1b,mpf1b, 0, 0, "Multitech", "Micro Professor 1B", 0)
-COMP( 1982, mpf1p, mpf1, 0, mpf1p,mpf1b, 0, 0, "Multitech", "Micro Professor 1 Plus", GAME_NOT_WORKING)
+static DIRECT_UPDATE_HANDLER( mpf1_direct_update_handler )
+{
+	mpf1_state *state = space->machine->driver_data;
+
+	if (!state->_break)
+	{
+		state->m1++;
+
+		if (state->m1 == 5)
+		{
+			cputag_set_input_line(space->machine, Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
+		}
+	}
+
+	return 0;
+}
+
+static DRIVER_INIT( mpf1 )
+{
+	memory_set_direct_update_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), mpf1_direct_update_handler);
+}
+
+COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  mpf1, 0, "Multitech", "Micro Professor 1", 0)
+COMP( 1979, mpf1b, mpf1, 0, mpf1b,mpf1b, mpf1, 0, "Multitech", "Micro Professor 1B", 0)
+COMP( 1982, mpf1p, mpf1, 0, mpf1p,mpf1b, mpf1, 0, "Multitech", "Micro Professor 1 Plus", GAME_NOT_WORKING)
