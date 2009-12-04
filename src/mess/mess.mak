@@ -1518,6 +1518,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/unior.o		\
 	$(MESS_DRIVERS)/tvc.o		\
 	$(MESS_DRIVERS)/mmd1.o		\
+	$(MESS_DRIVERS)/pc2000.o	\
 	$(MESS_DRIVERS)/ptcsol.o	\
 	$(MESS_DRIVERS)/p8k.o		\
 	$(MESS_DRIVERS)/cosmicos.o	\

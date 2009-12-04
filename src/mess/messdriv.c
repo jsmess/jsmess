@@ -1418,6 +1418,7 @@ const game_driver * const drivers[] =
 
 /*********** To sort (mostly skeleton drivers) ******************************/
 
+    DRIVER( pc2000 ) /* VTech PreComputer 2000 */
     DRIVER( a5105 )
     DRIVER( bcs3 )
     DRIVER( bcs3a )
