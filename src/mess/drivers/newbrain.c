@@ -14,6 +14,8 @@
 #include "devices/cassette.h"
 #include "machine/rescap.h"
 #include "devices/messram.h"
+#include "newbrain.lh"
+
 /*
 
     NewBrain
@@ -47,7 +49,6 @@
     - bitmapped graphics mode
     - COP420 microbus access
     - escape key is missing
-    - layout for the 16-segment displays
     - CP/M 2.2 ROMs
     - floppy disc controller
     - convert FDC into a device
@@ -1504,6 +1505,7 @@ static MACHINE_DRIVER_START( newbrain_a )
 	MDRV_MACHINE_RESET(newbrain)
 
 	/* video hardware */
+	MDRV_DEFAULT_LAYOUT(layout_newbrain)
 	MDRV_IMPORT_FROM(newbrain_video)
 
 	/* cassette */
