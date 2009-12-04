@@ -5,6 +5,7 @@
 #define Z80CTC_TAG		"u11"
 #define Z80PIO_TAG		"u10"
 #define I8255A_TAG		"u14"
+#define TMS5220_TAG		"tms5220"
 #define CASSETTE_TAG	"cassette"
 #define SPEAKER_TAG		"speaker"
 
