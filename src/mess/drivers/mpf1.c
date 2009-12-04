@@ -36,6 +36,7 @@
 #include "devices/cassette.h"
 #include "mpf1.lh"
 #include "mpf1b.lh"
+#include "mpf1p.lh"
 
 /* Address Maps */
 
@@ -419,7 +420,7 @@ static MACHINE_DRIVER_START( mpf1b )
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, mpf1_cassette_config)
 
 	/* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_mpf1)
+	MDRV_DEFAULT_LAYOUT(layout_mpf1b)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -444,7 +445,7 @@ static MACHINE_DRIVER_START( mpf1p )
 	MDRV_MACHINE_RESET(mpf1)
 
 	/* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_mpf1)
+	MDRV_DEFAULT_LAYOUT(layout_mpf1p)
 
 	/* devices */
 	MDRV_Z80PIO_ADD(Z80PIO_TAG, mpf1_pio_intf)
