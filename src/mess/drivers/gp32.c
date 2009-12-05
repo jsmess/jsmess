@@ -107,36 +107,38 @@ static WRITE32_HANDLER( s3c240x_palette_w )
 
 static UINT32 s3c240x_clkpow_regs[0x18/4];
 
-UINT32 cpu_get_fclk( int reg)
+static UINT32 s3c240x_get_fclk( int reg)
 {
 	UINT32 data, mdiv, pdiv, sdiv;
 	data = s3c240x_clkpow_regs[reg]; // MPLLCON or UPLLCON
 	mdiv = (data >> 12) & 0xFF;
 	pdiv = (data >>  4) & 0x3F;
 	sdiv = (data >>  0) & 0x03;
-	return (UINT32)((float)((mdiv + 8) * 12000000) / (float)((pdiv + 2) * (1 << sdiv)));
+	return (UINT32)((double)((mdiv + 8) * 12000000) / (double)((pdiv + 2) * (1 << sdiv)));
 }
 
-UINT32 cpu_get_hclk( int reg)
+/*
+static UINT32 s3c240x_get_hclk( int reg)
 {
 	switch (s3c240x_clkpow_regs[5] & 0x3) // CLKDIVN
 	{
-		case 0 : return cpu_get_fclk( reg) / 1;
-		case 1 : return cpu_get_fclk( reg) / 1;
-		case 2 : return cpu_get_fclk( reg) / 2;
-		case 3 : return cpu_get_fclk( reg) / 2;
+		case 0 : return s3c240x_get_fclk( reg) / 1;
+		case 1 : return s3c240x_get_fclk( reg) / 1;
+		case 2 : return s3c240x_get_fclk( reg) / 2;
+		case 3 : return s3c240x_get_fclk( reg) / 2;
 	}
 	return 0;
 }
+*/
 
-UINT32 cpu_get_pclk( int reg)
+static UINT32 s3c240x_get_pclk( int reg)
 {
 	switch (s3c240x_clkpow_regs[5] & 0x3) // CLKDIVN
 	{
-		case 0 : return cpu_get_fclk( reg) / 1;
-		case 1 : return cpu_get_fclk( reg) / 2;
-		case 2 : return cpu_get_fclk( reg) / 2;
-		case 3 : return cpu_get_fclk( reg) / 4;
+		case 0 : return s3c240x_get_fclk( reg) / 1;
+		case 1 : return s3c240x_get_fclk( reg) / 2;
+		case 2 : return s3c240x_get_fclk( reg) / 2;
+		case 3 : return s3c240x_get_fclk( reg) / 4;
 	}
 	return 0;
 }
@@ -220,25 +222,26 @@ static void s3c240x_timer_recalc( running_machine *machine, int timer, UINT32 ct
 	const int mux_shift[] = { 0, 4, 8, 12, 16};
 	if (ctrl_bits & 1)	// timer start?
 	{
-		UINT32 prescaler, mux, freq, cnt, cmp, tps;
+		UINT32 prescaler, mux, freq, cnt, cmp;
+		double hz;
 		logerror( "starting timer %d\n", timer);
 		prescaler = (s3c240x_timer_regs[0] >> prescaler_shift[timer]) & 0xFF;
 		mux = (s3c240x_timer_regs[1] >> mux_shift[timer]) & 0x0F;
-		freq = cpu_get_pclk( 1) / (prescaler + 1) / mux_table[mux];
+		freq = s3c240x_get_pclk( 1) / (prescaler + 1) / mux_table[mux];
 		cnt = s3c240x_timer_regs[count_reg+0] & 0xFFFF;
 		if (timer != 4)
 			cmp = s3c240x_timer_regs[count_reg+1] & 0xFFFF;
 		else
 			cmp = 0;
-		tps = freq * (cnt - cmp + 1);
-//		logerror( "TIMER %d - FCLK=%d HCLK=%d PCLK=%d prescaler=%d div=%d freq=%d cnt=%d cmp=%d tps=%d\n", timer, cpu_get_fclk( 1), cpu_get_hclk( 1), cpu_get_pclk( 1), prescaler, mux_table[mux], freq, cnt, cmp, tps);
+		hz = (double)((prescaler + 1) * mux_table[mux]) / (cnt - cmp + 1);
+//		logerror( "TIMER %d - FCLK=%d HCLK=%d PCLK=%d prescaler=%d div=%d freq=%d cnt=%d cmp=%d hz=%f\n", timer, s3c240x_get_fclk( 1), s3c240x_get_hclk( 1), s3c240x_get_pclk( 1), prescaler, mux_table[mux], freq, cnt, cmp, hz);
 		if (ctrl_bits & 8) // auto reload
 		{
-			timer_adjust_periodic( s3c240x_timers[timer], ATTOTIME_IN_HZ( tps), timer, ATTOTIME_IN_HZ( tps));
+			timer_adjust_periodic( s3c240x_timers[timer], ATTOTIME_IN_HZ( hz), timer, ATTOTIME_IN_HZ( hz));
 		}
 		else
 		{
-			timer_adjust_oneshot( s3c240x_timers[timer], ATTOTIME_IN_HZ( tps), timer);
+			timer_adjust_oneshot( s3c240x_timers[timer], ATTOTIME_IN_HZ( hz), timer);
 		}
 	}
 	else	// stopping is easy
@@ -371,7 +374,7 @@ void smc_reset(void)
 	smc.busy = 0;
 }
 
-UINT8 smc_read( running_machine *machine)
+static UINT8 smc_read( running_machine *machine)
 {
 	const device_config *smartmedia = devtag_get_device( machine, "smartmedia");
 	UINT8 data;
@@ -380,7 +383,7 @@ UINT8 smc_read( running_machine *machine)
 	return data;
 }
 
-void smc_write( running_machine *machine, UINT8 data)
+static void smc_write( running_machine *machine, UINT8 data)
 {
 //	logerror( "smc_write %08X\n", data);
 	if ((smc.chip) && (!smc.read))
@@ -404,7 +407,7 @@ void smc_write( running_machine *machine, UINT8 data)
 	}
 }
 
-void smc_update( running_machine *machine)
+static void smc_update( running_machine *machine)
 {
 	if (!smc.chip)
 	{
