@@ -21,6 +21,8 @@ struct _beta_state
 	UINT8 ls145_p;
 	UINT8 segment;
 
+	emu_timer *led_refresh_timer;
+
 	/* devices */
 	const device_config *speaker;
 };

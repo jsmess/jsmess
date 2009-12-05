@@ -11,7 +11,6 @@
     TODO:
 
     - write EPROM back to file
-    - fix display flickering
 
 */
 
@@ -78,8 +77,10 @@ INPUT_PORTS_END
 
 /* M6532 Interface */
 
-static void update_display(beta_state *state)
+static TIMER_CALLBACK( led_refresh )
 {
+	beta_state *state = machine->driver_data;
+
 	if (state->ls145_p < 6)
 	{
 		output_set_digit_value(state->ls145_p, state->segment);
@@ -148,7 +149,7 @@ static WRITE8_DEVICE_HANDLER( beta_riot_a_w )
 
 	/* display */
 	state->segment = BITSWAP8(data, 7, 3, 4, 1, 0, 2, 5, 6) & 0x7f;
-	update_display(state);
+	timer_adjust_oneshot(state->led_refresh_timer, ATTOTIME_IN_USEC(70), 0);
 
 	/* EPROM data */
 	state->eprom_data = data;
@@ -241,6 +242,8 @@ static MACHINE_START( beta )
 	/* find devices */
 	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
 
+	state->led_refresh_timer = timer_alloc(machine, led_refresh, 0);
+
 	/* register for state saving */
 	state_save_register_global(machine, state->eprom_oe);
 	state_save_register_global(machine, state->eprom_ce);
@@ -298,4 +301,4 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY         FULLNAME    FLAGS */
-COMP( 1984, beta,	0,		0,		beta,	beta,	0,		0,	"Pitronics",	"Beta",		GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1984, beta,	0,		0,		beta,	beta,	0,		0,		"Pitronics",	"Beta",		GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

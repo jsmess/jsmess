@@ -36,6 +36,8 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
+- [BETA] Fixed display flickering. [Curt Coder]
+
 - [EXL100] Added 7041 rom dump.  [Wilbert Pol]
 
 - [EXIDY] Improved sound compatibility.  [Robbbert]
@@ -46,6 +48,10 @@ System Driver Changes:
 - [HUEBLER] Added keyboard. [Curt Coder]
 
 - [INTV] Fixed intvkbd. Fixed disassembler.  [Robbbert]
+
+- [MPF1] Converted to use driver state, added speech and printer
+  ROMs, implemented MONI/INTR keys, monitor BREAK logic, added
+  artwork for mpf1b, added layout for mpf1p. [Curt Coder]
 
 - [ORIC] Telstrat regression has been fixed.  [Robbbert]
 
