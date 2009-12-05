@@ -16,6 +16,7 @@
 #include "messopts.h"
 
 #include "lcd.lh"
+#include "lcd_rot.lh"
 
 /* Globals */
 const char mess_disclaimer[] =

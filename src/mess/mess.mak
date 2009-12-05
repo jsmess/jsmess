@@ -1571,6 +1571,7 @@ $(MESS_MACHINE)/nes_mmc.o: 	$(MESSSRC)/machine/nes_ines.c \
 #-------------------------------------------------
 
 $(MESSOBJ)/mess.o:	$(MESS_LAYOUT)/lcd.lh
+$(MESSOBJ)/mess.o:	$(MESS_LAYOUT)/lcd_rot.lh
 
 $(MESS_DRIVERS)/4004clk.o:	$(MESS_LAYOUT)/4004clk.lh
 $(MESS_DRIVERS)/acrnsys1.o:	$(MESS_LAYOUT)/acrnsys1.lh
