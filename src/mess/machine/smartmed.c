@@ -56,6 +56,15 @@ typedef struct disk_image_header
 	UINT32BE log2_pages_per_block;
 } disk_image_header;
 
+typedef struct disk_image_format_2_header
+{
+	UINT8 data1[3];
+	UINT8 padding1[256-3];
+	UINT8 data2[16];
+	UINT8 data3[16];
+	UINT8 padding2[768-32];
+} disk_image_format_2_header;
+
 enum
 {
 	header_len = sizeof(disk_image_header)
@@ -144,7 +153,7 @@ static DEVICE_START( smartmedia )
 /*
     Load a SmartMedia image
 */
-static DEVICE_IMAGE_LOAD( smartmedia )
+static DEVICE_IMAGE_LOAD( smartmedia_format_1 )
 {
 	smartmedia_t *sm = get_safe_token(image);
 	disk_image_header custom_header;
@@ -193,6 +202,97 @@ static DEVICE_IMAGE_LOAD( smartmedia )
 	image_fread(image, sm->data_ptr, sm->page_total_size*sm->num_pages);
 
 	return INIT_PASS;
+}
+
+static int detect_geometry( smartmedia_t *sm, UINT8 id1, UINT8 id2)
+{
+	int result = 0;
+
+	switch (id1)
+	{
+		case 0xEC :
+		{
+			switch (id2)
+			{
+				case 0xA4 : sm->page_data_size = 0x0100; sm->num_pages = 0x00800; sm->page_total_size = 0x0108; sm->log2_pages_per_block = 0; result = 1; break;
+				case 0x6E : sm->page_data_size = 0x0100; sm->num_pages = 0x01000; sm->page_total_size = 0x0108; sm->log2_pages_per_block = 0; result = 1; break;
+				case 0xEA : sm->page_data_size = 0x0100; sm->num_pages = 0x02000; sm->page_total_size = 0x0108; sm->log2_pages_per_block = 0; result = 1; break;
+				case 0xE3 : sm->page_data_size = 0x0200; sm->num_pages = 0x02000; sm->page_total_size = 0x0210; sm->log2_pages_per_block = 0; result = 1; break;
+				case 0xE6 : sm->page_data_size = 0x0200; sm->num_pages = 0x04000; sm->page_total_size = 0x0210; sm->log2_pages_per_block = 0; result = 1; break;
+				case 0x73 : sm->page_data_size = 0x0200; sm->num_pages = 0x08000; sm->page_total_size = 0x0210; sm->log2_pages_per_block = 0; result = 1; break;
+				case 0x75 : sm->page_data_size = 0x0200; sm->num_pages = 0x10000; sm->page_total_size = 0x0210; sm->log2_pages_per_block = 0; result = 1; break;
+				case 0x76 : sm->page_data_size = 0x0200; sm->num_pages = 0x20000; sm->page_total_size = 0x0210; sm->log2_pages_per_block = 0; result = 1; break;
+				case 0x79 : sm->page_data_size = 0x0200; sm->num_pages = 0x40000; sm->page_total_size = 0x0210; sm->log2_pages_per_block = 0; result = 1; break;
+			}
+		}
+		break;
+	}
+
+	return result;
+}
+
+static DEVICE_IMAGE_LOAD( smartmedia_format_2 )
+{
+	smartmedia_t *sm = get_safe_token(image);
+	disk_image_format_2_header custom_header;
+	int bytes_read, i, j;
+
+	bytes_read = image_fread(image, &custom_header, sizeof(custom_header));
+	if (bytes_read != sizeof(custom_header))
+	{
+		return INIT_FAIL;
+	}
+
+	if (custom_header.data1[0] != 0xEC)
+	{
+		return INIT_FAIL;
+	}
+
+	if (!detect_geometry( sm, custom_header.data1[0], custom_header.data1[1]))
+	{
+		return INIT_FAIL;
+	}
+
+	sm->data_ptr = auto_alloc_array(image->machine, UINT8, sm->page_total_size*sm->num_pages);
+	sm->data_uid_ptr = auto_alloc_array(image->machine, UINT8, 256 + 16);
+	sm->mode = SM_M_INIT;
+	sm->pointer_mode = SM_PM_A;
+	sm->page_addr = 0;
+	sm->byte_addr = 0;
+	sm->status = 0x40;
+	if (!image_is_writable(image))
+		sm->status |= 0x80;
+	sm->accumulated_status = 0;
+	sm->pagereg = auto_alloc_array(image->machine, UINT8, sm->page_total_size);
+	memcpy( sm->id, custom_header.data1, 3);
+	sm->mp_opcode = 0;
+
+	for (i=0;i<8;i++)
+	{
+		memcpy( sm->data_uid_ptr + i * 32, custom_header.data2, 16);
+		for (j=0;j<16;j++) sm->data_uid_ptr[i*32+16+j] = custom_header.data2[j] ^ 0xFF;
+	}
+	memcpy( sm->data_uid_ptr + 256, custom_header.data3, 16);
+
+	image_fread(image, sm->data_ptr, sm->page_total_size*sm->num_pages);
+
+	return INIT_PASS;
+}
+
+static DEVICE_IMAGE_LOAD( smartmedia )
+{
+	int result;
+	UINT64 position;
+	// try format 1
+	position = image_ftell( image);
+	result = DEVICE_IMAGE_LOAD_NAME(smartmedia_format_1)(image);
+	if (result != INIT_PASS)
+	{
+			// try format 2
+			image_fseek( image, position, SEEK_SET);
+			result = DEVICE_IMAGE_LOAD_NAME(smartmedia_format_2)(image);
+	}
+	return result;
 }
 
 /*
