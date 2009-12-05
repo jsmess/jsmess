@@ -107,6 +107,9 @@ static WRITE32_HANDLER( s3c240x_palette_w )
 
 static UINT32 s3c240x_clkpow_regs[0x18/4];
 
+#define MPLLCON  1
+#define UPLLCON  2
+
 static UINT32 s3c240x_get_fclk( int reg)
 {
 	UINT32 data, mdiv, pdiv, sdiv;
@@ -152,6 +155,15 @@ static WRITE32_HANDLER( s3c240x_clkpow_w )
 {
 //	logerror( "(CLKPOW) %08X <- %08X\n", 0x14800000 + (offset << 2), data);
 	COMBINE_DATA(&s3c240x_clkpow_regs[offset]);
+	switch (offset)
+	{
+		// MPLLCON
+		case 0x04 / 4 :
+		{
+			cputag_set_clock( space->machine, "maincpu", s3c240x_get_fclk( MPLLCON));
+		}
+		break;
+	}
 }
 
 // INTERRUPT CONTROLLER
@@ -227,14 +239,14 @@ static void s3c240x_timer_recalc( running_machine *machine, int timer, UINT32 ct
 		logerror( "starting timer %d\n", timer);
 		prescaler = (s3c240x_timer_regs[0] >> prescaler_shift[timer]) & 0xFF;
 		mux = (s3c240x_timer_regs[1] >> mux_shift[timer]) & 0x0F;
-		freq = s3c240x_get_pclk( 1) / (prescaler + 1) / mux_table[mux];
+		freq = s3c240x_get_pclk( MPLLCON) / (prescaler + 1) / mux_table[mux];
 		cnt = s3c240x_timer_regs[count_reg+0] & 0xFFFF;
 		if (timer != 4)
 			cmp = s3c240x_timer_regs[count_reg+1] & 0xFFFF;
 		else
 			cmp = 0;
 		hz = (double)((prescaler + 1) * mux_table[mux]) / (cnt - cmp + 1);
-//		logerror( "TIMER %d - FCLK=%d HCLK=%d PCLK=%d prescaler=%d div=%d freq=%d cnt=%d cmp=%d hz=%f\n", timer, s3c240x_get_fclk( 1), s3c240x_get_hclk( 1), s3c240x_get_pclk( 1), prescaler, mux_table[mux], freq, cnt, cmp, hz);
+//		logerror( "TIMER %d - FCLK=%d HCLK=%d PCLK=%d prescaler=%d div=%d freq=%d cnt=%d cmp=%d hz=%f\n", timer, s3c240x_get_fclk( MPLLCON), s3c240x_get_hclk( MPLLCON), s3c240x_get_pclk( MPLLCON), prescaler, mux_table[mux], freq, cnt, cmp, hz);
 		if (ctrl_bits & 8) // auto reload
 		{
 			timer_adjust_periodic( s3c240x_timers[timer], ATTOTIME_IN_HZ( hz), timer, ATTOTIME_IN_HZ( hz));
