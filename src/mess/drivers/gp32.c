@@ -234,8 +234,8 @@ static void s3c240x_timer_recalc( running_machine *machine, int timer, UINT32 ct
 	const int mux_shift[] = { 0, 4, 8, 12, 16};
 	if (ctrl_bits & 1)	// timer start?
 	{
-		UINT32 prescaler, mux, freq, cnt, cmp;
-		double hz;
+		UINT32 prescaler, mux, cnt, cmp;
+		double freq, hz;
 		logerror( "starting timer %d\n", timer);
 		prescaler = (s3c240x_timer_regs[0] >> prescaler_shift[timer]) & 0xFF;
 		mux = (s3c240x_timer_regs[1] >> mux_shift[timer]) & 0x0F;
@@ -245,8 +245,9 @@ static void s3c240x_timer_recalc( running_machine *machine, int timer, UINT32 ct
 			cmp = s3c240x_timer_regs[count_reg+1] & 0xFFFF;
 		else
 			cmp = 0;
-		hz = (double)((prescaler + 1) * mux_table[mux]) / (cnt - cmp + 1);
-//		logerror( "TIMER %d - FCLK=%d HCLK=%d PCLK=%d prescaler=%d div=%d freq=%d cnt=%d cmp=%d hz=%f\n", timer, s3c240x_get_fclk( MPLLCON), s3c240x_get_hclk( MPLLCON), s3c240x_get_pclk( MPLLCON), prescaler, mux_table[mux], freq, cnt, cmp, hz);
+		//hz = (double)((prescaler + 1) * mux_table[mux]) / (cnt - cmp + 1);
+		hz = freq / (cnt - cmp + 1);
+//		logerror( "TIMER %d - FCLK=%d HCLK=%d PCLK=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d hz=%f\n", timer, s3c240x_get_fclk( MPLLCON), s3c240x_get_hclk( MPLLCON), s3c240x_get_pclk( MPLLCON), prescaler, mux_table[mux], freq, cnt, cmp, hz);
 		if (ctrl_bits & 8) // auto reload
 		{
 			timer_adjust_periodic( s3c240x_timers[timer], ATTOTIME_IN_HZ( hz), timer, ATTOTIME_IN_HZ( hz));
@@ -272,23 +273,23 @@ static WRITE32_HANDLER( s3c240x_timer_w )
 	{
 		if ((data & 1) != (old_value & 1))	// timer 0 status change
 		{
-			s3c240x_timer_recalc(space->machine, 0, data&0xf, 0xc);
+			s3c240x_timer_recalc(space->machine, 0, data&0xf, 0xc / 4);
 		}
 		if ((data & 0x100) != (old_value & 0x100))	// timer 1 status change
 		{
-			s3c240x_timer_recalc(space->machine, 1, (data>>8)&0xf, 0x18);
+			s3c240x_timer_recalc(space->machine, 1, (data>>8)&0xf, 0x18 / 4);
 		}
 		if ((data & 0x1000) != (old_value & 0x1000))	// timer 2 status change
 		{
-			s3c240x_timer_recalc(space->machine, 2, (data>>12)&0xf, 0x24);
+			s3c240x_timer_recalc(space->machine, 2, (data>>12)&0xf, 0x24 / 4);
 		}
 		if ((data & 0x10000) != (old_value & 0x10000))	// timer 3 status change
 		{
-			s3c240x_timer_recalc(space->machine, 3, (data>>16)&0xf, 0x30);
+			s3c240x_timer_recalc(space->machine, 3, (data>>16)&0xf, 0x30 / 4);
 		}
 		if ((data & 0x100000) != (old_value & 0x100000))	// timer 4 status change
 		{
-			s3c240x_timer_recalc(space->machine, 4, (data>>20)&0xf, 0x3c);
+			s3c240x_timer_recalc(space->machine, 4, (data>>20)&0xf, 0x3c / 4);
 		}
 	}
 }
@@ -832,7 +833,7 @@ static MACHINE_DRIVER_START( gp32 )
 	MDRV_SMARTMEDIA_ADD("smartmedia")
 MACHINE_DRIVER_END
 
-ROM_START(gp32)
+ROM_START( gp32 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "157e", "GP32 Firmware 1.57 (English)" )
 	ROMX_LOAD( "gp32157e.bin", 0x000000, 0x080000, CRC(b1e35643) SHA1(1566bc2a27980602e9eb501cf8b2d62939bfd1e5), ROM_BIOS(1) )
