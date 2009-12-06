@@ -36,6 +36,7 @@ Skeleton drivers:
 - Plan-80 [Miodrag Milanovic]
 - SAPI-1 ZPS 2 [Miodrag Milanovic]
 - SAPI-1 ZPS 3 [Miodrag Milanovic]
+- Protec Pro-80 [Miodrag Milanovic]
 
 System Driver Changes:
 ----------------------
