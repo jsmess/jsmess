@@ -65,7 +65,7 @@ MACHINE_DRIVER_END
 ROM_START( pro80 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	// This rom dump is taken out of manual for this machine
-	ROM_LOAD( "pro80.bin", 0x0000, 0x0400, CRC(28117a7) SHA1(8c3a85492b5f3ae40779e4b888b085d9cebea526))
+	ROM_LOAD( "pro80.bin", 0x0000, 0x0400, CRC(1bf6e0a5) SHA1(eb45816337e08ed8c30b589fc24960dc98b94db2))
 ROM_END
 
 /* Driver */
