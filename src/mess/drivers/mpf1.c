@@ -231,7 +231,7 @@ static READ8_DEVICE_HANDLER( mpf1_porta_r )
 	if (!BIT(state->lednum, 5)) data &= input_port_read(device->machine, "PC5");
 
 	/* bit 6, user key */
-	data &= BIT(input_port_read(device->machine, "SPECIAL"), 0) << 6;
+	data &= input_port_read(device->machine, "SPECIAL") & 1 ? 0xff : 0xbf;
 
 	/* bit 7, tape input */
 	data |= (cassette_input(state->cassette) > 0 ? 1 : 0) << 7;
