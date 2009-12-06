@@ -31,20 +31,23 @@ static UINT32 s3c240x_vidregs[0x400/4];
 #define BPPMODE_TFT_08	0x0B
 #define BPPMODE_TFT_16	0x0C
 
+//             76543210 76543210 76543210 76543210
+// 5551 16-bit 00000000 00000000 RRRRRGGG GGBBBBB0
+// 5551 32-bit 00000000 RRRRRI00 GGGGGI00 BBBBBI00
+// 565  16-bit 00000000 00000000 RRRRRGGG GGBBBBB0
+// 565  32-bit 00000000 RRRRR000 GGGGG000 BBBBB000
+
 static VIDEO_UPDATE( gp32 )
 {
 	if (s3c240x_vidregs[0] & 1)	// display enabled?
 	{
 		int x, y, bppmode;
 //		int hwswp, tpal, offsize;
-		UINT8 *vram;
 		UINT32 vramaddr;
 
 //		logerror("vramaddr 1 = %08X\n", s3c240x_vidregs[5] << 1);
 //		logerror("vramaddr 2 = %08X\n", ((s3c240x_vidregs[5] & 0xFFE00000) | s3c240x_vidregs[6]) << 1);
 		vramaddr = s3c240x_vidregs[5] << 1;
-
-		vram = (UINT8 *)&s3c240x_ram[(vramaddr-0x0c000000)/4];
 
 		bppmode = (s3c240x_vidregs[0] >> 1) & 0xF;
 
@@ -57,14 +60,41 @@ static VIDEO_UPDATE( gp32 )
 		{
 			case BPPMODE_TFT_08 :
 			{
+				UINT8 *vram;
+				vram = (UINT8 *)&s3c240x_ram[(vramaddr-0x0c000000)/4];
 				for (y = 0; y < 320; y++)
 				{
-					UINT16 *scanline = BITMAP_ADDR16( bitmap, y, 0);
+					UINT32 *scanline = BITMAP_ADDR32( bitmap, y, 0);
 					for (x = 0; x < 240; x++)
 					{
-						*scanline++ = vram[(240*y)+x];
+						*scanline++ = palette_get_color( screen->machine, *vram++);
 					}
 				}
+			}
+			break;
+			case BPPMODE_TFT_16 :
+			{
+				UINT16 *vram;
+				vram = (UINT16 *)&s3c240x_ram[(vramaddr-0x0c000000)/4];
+				for (y = 0; y < 320; y++)
+				{
+					UINT32 *scanline = BITMAP_ADDR32( bitmap, y, 0);
+					for (x = 0; x < 240; x++)
+					{
+						UINT16 data;
+						UINT8 r, g, b;
+						data = *vram++;
+						r = ((data >> 11) & 0x1F) << 3;
+						g = ((data >>  6) & 0x1F) << 3;
+						b = ((data >>  1) & 0x1F) << 3;
+						*scanline++ = MAKE_RGB( r, g, b);
+					}
+				}
+			}
+			break;
+			default :
+			{
+				printf( "bppmode %d not supported\n", bppmode);
 			}
 			break;
 		}
@@ -96,11 +126,15 @@ static WRITE32_HANDLER( s3c240x_vidregs_w )
 
 static WRITE32_HANDLER( s3c240x_palette_w )
 {
+	UINT8 r, g, b;
 	if (mem_mask != 0xffffffff)
 	{
 		logerror("s3c240x_palette_w: unknown mask %08x\n", mem_mask);
 	}
-	palette_set_color_rgb(space->machine, offset, ((data>>11)&0x1f)<<3, ((data>>5)&0x3f)<<2, (data&0x1f)<<3);
+	r = ((data >> 11) & 0x1F) << 3;
+	g = ((data >>  6) & 0x1F) << 3;
+	b = ((data >>  1) & 0x1F) << 3;
+	palette_set_color_rgb(space->machine, offset, r, g, b);
 }
 
 // CLOCK & POWER MANAGEMENT
@@ -815,7 +849,7 @@ static MACHINE_DRIVER_START( gp32 )
 	MDRV_PALETTE_LENGTH(32768)
 
 	MDRV_SCREEN_ADD("screen", LCD)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_SIZE(240, 320)
@@ -835,12 +869,16 @@ MACHINE_DRIVER_END
 
 ROM_START( gp32 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_SYSTEM_BIOS( 0, "157e", "GP32 Firmware 1.57 (English)" )
+	ROM_SYSTEM_BIOS( 0, "157e", "GP32 Firmware 1.5.7 (English)" )
 	ROMX_LOAD( "gp32157e.bin", 0x000000, 0x080000, CRC(b1e35643) SHA1(1566bc2a27980602e9eb501cf8b2d62939bfd1e5), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "100k", "GP32 Firmware 1.00 (Korean)" )
+	ROM_SYSTEM_BIOS( 1, "100k", "GP32 Firmware 1.0.0 (Korean)" )
 	ROMX_LOAD( "gp32100k.bin", 0x000000, 0x080000, CRC(d9925ac9) SHA1(3604d0d7210ed72eddd3e3e0c108f1102508423c), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "156k", "GP32 Firmware 1.56 (Korean)" )
+	ROM_SYSTEM_BIOS( 2, "156k", "GP32 Firmware 1.5.6 (Korean)" )
 	ROMX_LOAD( "gp32156k.bin", 0x000000, 0x080000, CRC(667fb1c8) SHA1(d179ab8e96411272b6a1d683e59da752067f9da8), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 3, "166m", "GP32 Firmware 1.6.6 (European)" )
+	ROMX_LOAD( "gp32166m.bin", 0x000000, 0x080000, CRC(4548a840) SHA1(1ad0cab0af28fb45c182e5e8c87ead2aaa4fffe1), ROM_BIOS(4) )
+//	ROM_SYSTEM_BIOS( 4, "test", "test" )
+//	ROMX_LOAD( "test.bin", 0x000000, 0x080000, CRC(00000000) SHA1(0000000000000000000000000000000000000000), ROM_BIOS(5) )
 ROM_END
 
 CONS(2001, gp32, 0, 0, gp32, gp32, 0, 0, "Game Park", "GP32", ROT270|GAME_NOT_WORKING|GAME_NO_SOUND)
