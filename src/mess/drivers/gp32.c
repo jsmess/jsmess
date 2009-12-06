@@ -343,14 +343,26 @@ static UINT32 s3c240x_dma_regs[0x7c/4];
 
 static void s3c240x_dma_start( running_machine *machine, int dma)
 {
-	UINT32 size, addr_src, addr_dst, reg = dma << 3;
 	const address_space *space = cpu_get_address_space( cputag_get_cpu( machine, "maincpu"), ADDRESS_SPACE_PROGRAM);
-	int i;
+	UINT32 size, addr_src, addr_dst, dsz, tsz, tc, reg;
+	int i, inc_src, inc_dst;
+	reg = dma << 3;
+	inc_src = (s3c240x_dma_regs[reg+0] >> 29) & 1;
 	addr_src = s3c240x_dma_regs[reg+0] & 0x1FFFFFFF;
+	inc_dst = (s3c240x_dma_regs[reg+1] >> 29) & 1;
 	addr_dst = s3c240x_dma_regs[reg+1] & 0x1FFFFFFF;
-	size = (s3c240x_dma_regs[reg+2] & 0x000FFFFF) << ((s3c240x_dma_regs[reg+2] >> 20) & 3);
-//	logerror( "DMA %d -> copy 0x%08X bytes from 0x%08X to 0x%08X\n", dma, size, addr_src, addr_dst);
-	for (i=0;i<size;i++) memory_write_byte( space, addr_dst + i, memory_read_byte( space, addr_src + i));
+	tsz = (s3c240x_dma_regs[reg+2] >> 27) & 1;
+	dsz = (s3c240x_dma_regs[reg+2] >> 20) & 2;
+	tc = (s3c240x_dma_regs[reg+2] >> 0) & 0x000FFFFF;
+	size = tc << dsz;
+//	logerror( "DMA %d - addr_src %08X inc_src %d addr_dst %08X inc_dst %d tsz %d dsz %d tc %d size %d\n", dma, addr_src, inc_src, addr_dst, inc_dst, tsz, dsz, tc, size);
+//	logerror( "DMA %d - copy 0x%08X bytes from 0x%08X (%d) to 0x%08X (%d)\n", dma, size, addr_src, inc_src, addr_dst, inc_dst);
+	for (i=0;i<size;i++)
+	{
+		memory_write_byte( space, addr_dst, memory_read_byte( space, addr_src));
+		if (!inc_src) addr_src++;
+		if (!inc_dst) addr_dst++;
+	}
 }
 
 static READ32_HANDLER( s3c240x_dma_r )
