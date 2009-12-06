@@ -1541,5 +1541,6 @@ const game_driver * const drivers[] =
 	DRIVER( plan80 )
 	DRIVER( pro80 )
 	DRIVER( pimps )
+	DRIVER( sage2 )
 	
 #endif /* DRIVER_RECURSIVE */
