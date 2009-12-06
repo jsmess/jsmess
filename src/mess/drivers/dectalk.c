@@ -25,10 +25,9 @@
 *    * pins OP0 and OP2 are connected to the primary serial port:
 *      * OP0 is RTS
 *      * OP2 is DTR
-*  * Attach m68k interrupts properly; I suspect the DUART INT and SPC INTs are both hooked up wrong
 *  * Actually store the X2212 nvram's eeprom data to disk rather than throwing it out on exit
 *    * is there some way i can hook this up using &generic_nvram?
-*  * emulate/simulate the MT8060 dtmf decoder as a 16-key input device?
+*  * emulate/simulate the MT8060 dtmf decoder as a 16-key input device? or hook it to some simple fft code?
 *  * discuss and figure out how to have an external application send data to the two serial ports to be spoken
 *
 * LED error code list (found by experimentation and help from leeeeee):
@@ -682,22 +681,12 @@ static TIMER_CALLBACK( outfifo_read_cb )
 	dac_signed_data_16_w( speaker, data );
 }
 
-// the following function reads the keyboard and sends to the duart to allow for user input; it doesn't 'exist' on the real unit
-// it more or less simulates a half duplex input terminal
-static TIMER_CALLBACK( simulate_input_cb )
-{
-	// todo: check RTS line
-
-	timer_set(machine, ATTOTIME_IN_HZ(120), NULL, 0, simulate_input_cb);
-}
-
 /* Driver init: stuff that needs setting up which isn't directly affected by reset */
 static DRIVER_INIT( dectalk )
 {
 	dectalk_clear_all_fifos(machine);
 	dectalk.simulate_outfifo_error = 0;
 	timer_set(machine, ATTOTIME_IN_HZ(10000), NULL, 0,  outfifo_read_cb);
-	timer_set(machine, ATTOTIME_IN_HZ(120), NULL, 0, simulate_input_cb);
 }
 
 static WRITE8_DEVICE_HANDLER( dectalk_kbd_put )
