@@ -1048,7 +1048,8 @@ const game_driver * const drivers[] =
     DRIVER( mato )      /* Mato (PMD-85.2 clone)                            */
 
     /* Zbrojovka Brno */
-    DRIVER( c2717 )     /* Consul 2717 (PMD-85.2 clone)             */
+    DRIVER( c2717 )     /* Consul 2717 (PMD-85.2 clone)             		*/
+	DRIVER( c2717pmd )  /* Consul 2717 with PMD-32             				*/
 
     /* Microkey */
     DRIVER( primoa32 )  /* Primo A-32                                       */
@@ -1252,6 +1253,8 @@ const game_driver * const drivers[] =
 
     /* SAPI-1 */
     DRIVER (sapi1)
+	DRIVER (sapizps2)
+	DRIVER (sapizps3)
 
   /* Spectrum clones */
 
@@ -1535,4 +1538,5 @@ const game_driver * const drivers[] =
 	DRIVER( al8800bt )
 	DRIVER( sun1 )
 	DRIVER( micronic )
+	DRIVER( plan80 )
 #endif /* DRIVER_RECURSIVE */

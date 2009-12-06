@@ -140,3 +140,12 @@ VIDEO_UPDATE( sapi1 )
 	return 0;
 }
 
+
+VIDEO_START( sapizps3 )
+{
+}
+
+VIDEO_UPDATE( sapizps3 )
+{
+ 	return 0;
+}

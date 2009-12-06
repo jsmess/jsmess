@@ -21,5 +21,7 @@ extern UINT8* sapi_video_ram;
 
 extern VIDEO_START( sapi1 );
 extern VIDEO_UPDATE( sapi1 );
+extern VIDEO_START( sapizps3 );
+extern VIDEO_UPDATE( sapizps3 );
 
 #endif

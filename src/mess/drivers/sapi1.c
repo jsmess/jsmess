@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
+#include "cpu/z80/z80.h"
 #include "includes/sapi1.h"
 #include "devices/messram.h"
 
@@ -23,11 +24,20 @@ static ADDRESS_MAP_START(sapi1_mem, ADDRESS_SPACE_PROGRAM, 8)
 	//AM_RANGE(0x2c00, 0x2fff) AM_NOP // PORT 2
 	//AM_RANGE(0x3000, 0x33ff) AM_NOP // 3214
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE(&sapi_video_ram) // AND-1 (video RAM)
-	AM_RANGE(0x4000, 0x4000) AM_RAM // REM-1
+	AM_RANGE(0x4000, 0x7fff) AM_RAM // REM-1
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sapi1_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_UNMAP_HIGH
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(sapizps3_mem, ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sapizps3_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -85,27 +95,55 @@ INPUT_PORTS_END
 
 /* Machine driver */
 static MACHINE_DRIVER_START( sapi1 )
-	  /* basic machine hardware */
-	  MDRV_CPU_ADD("maincpu", 8080, 2000000)
-	  MDRV_CPU_PROGRAM_MAP(sapi1_mem)
-	  MDRV_CPU_IO_MAP(sapi1_io)
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", 8080, 2000000)
+	MDRV_CPU_PROGRAM_MAP(sapi1_mem)
+	MDRV_CPU_IO_MAP(sapi1_io)
 
-	  MDRV_MACHINE_START( sapi1 )
-	  MDRV_MACHINE_RESET( sapi1 )
+	MDRV_MACHINE_START( sapi1 )
+	MDRV_MACHINE_RESET( sapi1 )
 
-    /* video hardware */
-		MDRV_SCREEN_ADD("screen", RASTER)
-		MDRV_SCREEN_REFRESH_RATE(50)
-		MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-		MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-		MDRV_SCREEN_SIZE(40*6, 24*9)
-		MDRV_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 24*9-1)
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(40*6, 24*9)
+	MDRV_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 24*9-1)
 
-		MDRV_PALETTE_LENGTH(2)
-		MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)
 
-		MDRV_VIDEO_START(sapi1)
+	MDRV_VIDEO_START(sapi1)
     MDRV_VIDEO_UPDATE(sapi1)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")	
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( sapizps3 )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z80, 2000000)
+	MDRV_CPU_PROGRAM_MAP(sapizps3_mem)
+	MDRV_CPU_IO_MAP(sapizps3_io)
+
+	MDRV_MACHINE_START( sapi1 )
+	MDRV_MACHINE_RESET( sapi1 )
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(80*6, 24*9)
+	MDRV_SCREEN_VISIBLE_AREA(0, 80*6-1, 0, 24*9-1)
+
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)
+
+	MDRV_VIDEO_START(sapizps3)
+    MDRV_VIDEO_UPDATE(sapizps3)
 	
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -116,11 +154,40 @@ MACHINE_DRIVER_END
 
 ROM_START( sapi1 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "sapi1.rom", 0x0000, 0x1000, CRC(c6e85b01) SHA1(2a26668249c6161aef7215a1e2b92bfdf6fe3671) )
+	ROM_SYSTEM_BIOS( 0, "mb1", "MB1" )
+    ROMX_LOAD( "sapi1.rom", 0x0000, 0x1000, CRC(c6e85b01) SHA1(2a26668249c6161aef7215a1e2b92bfdf6fe3671), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "mb2", "MB2 (ANK-1)" )
+	ROMX_LOAD( "mb2_4.bin", 0x0000, 0x1000, CRC(a040b3e0) SHA1(586990a07a96323741679a11ff54ad0023da87bc), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 2, "mb3", "MB3 (Consul)" )
+	ROMX_LOAD( "mb3_1.bin", 0x0000, 0x1000, CRC(be895f88) SHA1(7fc2a92f41d978a9f0ccd0e235ea3c6146adfb6f), ROM_BIOS(3))
 ROM_END
 
+ROM_START( sapizps2 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS( 0, "v4", "MIKOS 4" )
+	ROMX_LOAD( "36.bin", 0x0000, 0x0800, CRC(a27f340a) SHA1(d07d208fcbe428897336c17197d3e8fb52181f38), ROM_BIOS(1))
+	ROMX_LOAD( "37.bin", 0x0800, 0x0800, CRC(30daa708) SHA1(66e990c40788ee25cf6cabd4842a78daf4fcdddd), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "v5", "MIKOS 5" )
+	ROMX_LOAD( "mikos5_1.bin", 0x0000, 0x0800, CRC(c2a83ca3) SHA1(a3678253d7690c89945e791ea0f8e15b081c9126), ROM_BIOS(2))
+	ROMX_LOAD( "mikos5_2.bin", 0x0800, 0x0800, CRC(c4458a04) SHA1(0cc909323f0e6507d95e57ea39e1deb8bd57bf89), ROM_BIOS(2))
+	ROMX_LOAD( "mikos5_3.bin", 0x1000, 0x0800, CRC(efb499f3) SHA1(78f0ca3ff10d7af4ae94ab820723296beb035f8f), ROM_BIOS(2))
+	ROMX_LOAD( "mikos5_4.bin", 0x1800, 0x0800, CRC(4d90e9be) SHA1(8ec554198697550a49432e8210d43700ef1d6a32), ROM_BIOS(2))	
+ROM_END
 
+ROM_START( sapizps3 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS( 0, "default", "JPR-1A" )
+	ROMX_LOAD( "jpr1a.bin", 	 0x0000, 0x0800, CRC(3ed89786) SHA1(dcc8657b4884bfe58d114c539b733b73d038ee30), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "per", "Perina" )
+	ROMX_LOAD( "perina_1988.bin",0x0000, 0x0800, CRC(d71e8d3a) SHA1(9b3a26ea7c2f2c8a1fb10b51c1c880acc9fd806d), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 2, "pkt1", "PKT 1" )
+	ROMX_LOAD( "pkt1.bin", 		 0x0000, 0x0800, CRC(ed5a2725) SHA1(3383c15f87f976400b8d0f31829e2a95236c4b6c), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS( 3, "1zmod", "JPR-1Zmod" )
+	ROMX_LOAD( "jpr1zmod.bin", 	 0x0000, 0x0800, CRC(69a29b07) SHA1(1cd31032954fcd7d10b1586be62db6f7597eb4f2), ROM_BIOS(4))
+ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY                  FULLNAME   FLAGS */
 COMP( 1985, sapi1, 	0, 	 	0,		sapi1, 		sapi1, 		sapi1, 	 0,  	"Tesla",					 "SAPI-1 ZPS 1",	 0)
+COMP( 1985, sapizps2,sapi1,	0,		sapi1, 		sapi1, 		sapi1, 	 0,  	"Tesla",					 "SAPI-1 ZPS 2",	 GAME_NOT_WORKING)
+COMP( 1985, sapizps3,sapi1,	0,		sapizps3, 	sapi1, 		sapi1, 	 0,  	"Tesla",					 "SAPI-1 ZPS 3",	 GAME_NOT_WORKING)

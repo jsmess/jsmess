@@ -10,7 +10,7 @@ New System Drivers Supported:
 - Science of Cambridge MK-14 [Miodrag Milanovic]
 - Robotron K1003 [Miodrag Milanovic]
 - MITS Altair 8800bt [Miodrag Milanovic]
-
+- Consul 2717 with PMD-32 [Miodrag Milanovic]
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
@@ -33,6 +33,9 @@ Skeleton drivers:
 - MCS Basic 52 [Miodrag Milanovic]
 - MCS Basic 31 [Miodrag Milanovic]
 - Sun-1
+- Plan-80 [Miodrag Milanovic]
+- SAPI-1 ZPS 2 [Miodrag Milanovic]
+- SAPI-1 ZPS 3 [Miodrag Milanovic]
 
 System Driver Changes:
 ----------------------

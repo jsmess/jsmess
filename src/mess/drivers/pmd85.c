@@ -699,8 +699,14 @@ ROM_END
 
 ROM_START(c2717)
 	ROM_REGION(0x14000,"maincpu",0)
-	ROM_LOAD("c2717.rom", 0x10000, 0x4000, CRC(da1703b1) SHA1(9fb93e6cae8b551064c7175bf3b4e3113429ce73))
+	ROM_LOAD("c2717.rom", 0x10000, 0x4000, CRC(da1703b1) SHA1(9fb93e6cae8b551064c7175bf3b4e3113429ce73))	
 ROM_END
+
+ROM_START(c2717pmd)
+	ROM_REGION(0x14000,"maincpu",0)
+	ROM_LOAD( "c2717-pmd32.rom", 0x10000, 0x4000, CRC(cbdd323c) SHA1(ee9fea11be8bd4f945c583b0ae5684269906d0ce))
+ROM_END
+
 
 /*    YEAR  NAME     PARENT  COMPAT MACHINE  INPUT  INIT      CONFIG COMPANY  FULLNAME */
 COMP( 1985, pmd851,  0,      0,		pmd851,  pmd85, pmd851,   0, "Tesla", "PMD-85.1" , 0)
@@ -711,3 +717,4 @@ COMP( 1988, pmd853,  pmd851, 0,		pmd853,  pmd85, pmd853,   0, "Tesla", "PMD-85.3
 COMP( 1986, alfa,    pmd851, 0,		alfa,    alfa,  alfa,     0, "Didaktik", "Alfa" , 0)
 COMP( 1985, mato,    pmd851, 0,		mato,    mato,  mato,     0, "Statny", "Mato" , 0)
 COMP( 1989, c2717,   pmd851, 0,		c2717,   pmd85, c2717,    0, "Zbrojovka Brno", "Consul 2717" , 0)
+COMP( 1989, c2717pmd,pmd851, 0,		c2717,   pmd85, c2717,    0, "Zbrojovka Brno", "Consul 2717 (with PMD-32)" , GAME_NOT_WORKING)
