@@ -344,7 +344,7 @@ static UINT32 s3c240x_dma_regs[0x7c/4];
 static void s3c240x_dma_start( running_machine *machine, int dma)
 {
 	const address_space *space = cpu_get_address_space( cputag_get_cpu( machine, "maincpu"), ADDRESS_SPACE_PROGRAM);
-	UINT32 size, addr_src, addr_dst, dsz, tsz, tc, reg;
+	UINT32 addr_src, addr_dst, dsz, tsz, tc, reg;
 	int i, inc_src, inc_dst;
 	reg = dma << 3;
 	inc_src = (s3c240x_dma_regs[reg+0] >> 29) & 1;
@@ -352,16 +352,20 @@ static void s3c240x_dma_start( running_machine *machine, int dma)
 	inc_dst = (s3c240x_dma_regs[reg+1] >> 29) & 1;
 	addr_dst = s3c240x_dma_regs[reg+1] & 0x1FFFFFFF;
 	tsz = (s3c240x_dma_regs[reg+2] >> 27) & 1;
-	dsz = (s3c240x_dma_regs[reg+2] >> 20) & 2;
+	dsz = (s3c240x_dma_regs[reg+2] >> 20) & 3;
 	tc = (s3c240x_dma_regs[reg+2] >> 0) & 0x000FFFFF;
-	size = tc << dsz;
-//	logerror( "DMA %d - addr_src %08X inc_src %d addr_dst %08X inc_dst %d tsz %d dsz %d tc %d size %d\n", dma, addr_src, inc_src, addr_dst, inc_dst, tsz, dsz, tc, size);
-//	logerror( "DMA %d - copy 0x%08X bytes from 0x%08X (%d) to 0x%08X (%d)\n", dma, size, addr_src, inc_src, addr_dst, inc_dst);
-	for (i=0;i<size;i++)
+//	logerror( "DMA %d - addr_src %08X inc_src %d addr_dst %08X inc_dst %d tsz %d dsz %d tc %d\n", dma, addr_src, inc_src, addr_dst, inc_dst, tsz, dsz, tc);
+//	logerror( "DMA %d - copy %08X bytes from %08X (%s) to %08X (%s)\n", dma, tc << dsz, addr_src, inc_src ? "fix" : "inc", addr_dst, inc_dst ? "fix" : "inc");
+	for (i=0;i<tc;i++)
 	{
-		memory_write_byte( space, addr_dst, memory_read_byte( space, addr_src));
-		if (!inc_src) addr_src++;
-		if (!inc_dst) addr_dst++;
+		switch (dsz)
+		{
+			case 0 : memory_write_byte( space, addr_dst, memory_read_byte( space, addr_src)); break;
+			case 1 : memory_write_word( space, addr_dst, memory_read_word( space, addr_src)); break;
+			case 2 : memory_write_dword( space, addr_dst, memory_read_dword( space, addr_src)); break;
+		}
+		if (!inc_src) addr_src += (1 << dsz);
+		if (!inc_dst) addr_dst += (1 << dsz);
 	}
 }
 
