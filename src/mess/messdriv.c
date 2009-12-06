@@ -1540,5 +1540,6 @@ const game_driver * const drivers[] =
 	DRIVER( micronic )
 	DRIVER( plan80 )
 	DRIVER( pro80 )
+	DRIVER( pimps )
 	
 #endif /* DRIVER_RECURSIVE */
