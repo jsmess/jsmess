@@ -24,8 +24,11 @@
 			
 	0x04:
 	0x05:
-	0x06:	Address Register (24-bit)
+	0x06:
+	0x07:	Address Register (32-bit)
 			Self-explanatory, I hope. :)
+			NOTE: Datasheet clearly shows this as 24-bit, with register 7 unused.
+			But the FM-Towns definitely uses reg 7 as bits 24-31.
 			
 	0x08:	
 	0x09:	Device Control register (16-bit)
@@ -264,6 +267,12 @@ static READ8_DEVICE_HANDLER(upd71071_read)
 			else
 				ret = (dmac->reg.address_current[dmac->selected_channel] >> 16) & 0xff;
 			break;
+		case 0x07:  // Address (highest)
+			if(dmac->base[dmac->selected_channel] != 0)
+				ret = (dmac->reg.address_base[dmac->selected_channel] >> 24) & 0xff;
+			else
+				ret = (dmac->reg.address_current[dmac->selected_channel] >> 24) & 0xff;
+			break;
 		case 0x08:  // Device control (low)
 			ret = dmac->reg.device_control & 0xff;
 			break;
@@ -325,24 +334,31 @@ static WRITE8_DEVICE_HANDLER(upd71071_write)
 			break;
 		case 0x04:  // Address (low)
 			dmac->reg.address_base[dmac->selected_channel] =
-				(dmac->reg.address_base[dmac->selected_channel] & 0x00ffff00) | data;
+				(dmac->reg.address_base[dmac->selected_channel] & 0xffffff00) | data;
 			dmac->reg.address_current[dmac->selected_channel] =
-				(dmac->reg.address_current[dmac->selected_channel] & 0x00ffff00) | data;
-			logerror("DMA: Channel %i Address set [%06x]\n",dmac->selected_channel,dmac->reg.address_base[dmac->selected_channel]);
+				(dmac->reg.address_current[dmac->selected_channel] & 0xffffff00) | data;
+			logerror("DMA: Channel %i Address set [%08x]\n",dmac->selected_channel,dmac->reg.address_base[dmac->selected_channel]);
 			break;
 		case 0x05:  // Address (mid)
 			dmac->reg.address_base[dmac->selected_channel] =
-				(dmac->reg.address_base[dmac->selected_channel] & 0x00ff00ff) | (data << 8);
+				(dmac->reg.address_base[dmac->selected_channel] & 0xffff00ff) | (data << 8);
 			dmac->reg.address_current[dmac->selected_channel] =
-				(dmac->reg.address_current[dmac->selected_channel] & 0x00ff00ff) | (data << 8);
-			logerror("DMA: Channel %i Address set [%06x]\n",dmac->selected_channel,dmac->reg.address_base[dmac->selected_channel]);
+				(dmac->reg.address_current[dmac->selected_channel] & 0xffff00ff) | (data << 8);
+			logerror("DMA: Channel %i Address set [%08x]\n",dmac->selected_channel,dmac->reg.address_base[dmac->selected_channel]);
 			break;
 		case 0x06:  // Address (high)
 			dmac->reg.address_base[dmac->selected_channel] =
-				(dmac->reg.address_base[dmac->selected_channel] & 0x0000ffff) | (data << 16);
+				(dmac->reg.address_base[dmac->selected_channel] & 0xff00ffff) | (data << 16);
 			dmac->reg.address_current[dmac->selected_channel] =
-				(dmac->reg.address_current[dmac->selected_channel] & 0x0000ffff) | (data << 16);
-			logerror("DMA: Channel %i Address set [%06x]\n",dmac->selected_channel,dmac->reg.address_base[dmac->selected_channel]);
+				(dmac->reg.address_current[dmac->selected_channel] & 0xff00ffff) | (data << 16);
+			logerror("DMA: Channel %i Address set [%08x]\n",dmac->selected_channel,dmac->reg.address_base[dmac->selected_channel]);
+			break;
+		case 0x07:  // Address (highest)
+			dmac->reg.address_base[dmac->selected_channel] =
+				(dmac->reg.address_base[dmac->selected_channel] & 0x00ffffff) | (data << 24);
+			dmac->reg.address_current[dmac->selected_channel] =
+				(dmac->reg.address_current[dmac->selected_channel] & 0x00ffffff) | (data << 24);
+			logerror("DMA: Channel %i Address set [%08x]\n",dmac->selected_channel,dmac->reg.address_base[dmac->selected_channel]);
 			break;
 		case 0x08:  // Device control (low)
 			dmac->reg.device_control = (dmac->reg.device_control & 0xff00) | data;
