@@ -20,7 +20,7 @@ static ADDRESS_MAP_START(ht68k_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(&ht68k_ram) // 512 KB RAM / ROM at boot
 	//AM_RANGE(0x00080000, 0x000fffff) // Expansion
 	//AM_RANGE(0x00d80000, 0x00d8ffff) // Printer
-	AM_RANGE(0x00e00000, 0x00e00003) AM_MIRROR(0x7fffc) AM_DEVREADWRITE8("wd1770", wd17xx_r, wd17xx_w, 0xff) // FDC WD1770
+	AM_RANGE(0x00e00000, 0x00e00007) AM_MIRROR(0xfff8) AM_DEVREADWRITE8("wd1770", wd17xx_r, wd17xx_w, 0x00ff) // FDC WD1770
 	AM_RANGE(0x00e80000, 0x00e800ff) AM_MIRROR(0xff00) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff )
 	AM_RANGE(0x00f00000, 0x00f07fff) AM_ROM AM_MIRROR(0xf8000) AM_REGION("user1",0)
 ADDRESS_MAP_END
@@ -56,6 +56,21 @@ static UINT8 duart_input(const device_config *device)
 	return 0;
 }
 
+static void duart_output(const device_config *device, UINT8 data)
+{
+	const device_config *fdc = devtag_get_device(device->machine, "wd1770");
+	wd17xx_set_side(fdc,BIT(data,3) ? 0 : 1);
+	if (BIT(data,4)) {
+ 		wd17xx_set_drive(fdc,0);
+	} else if (BIT(data,5)) {
+ 		wd17xx_set_drive(fdc,1);
+	} else if (BIT(data,6)) {
+ 		wd17xx_set_drive(fdc,2);
+	} else if (BIT(data,7)) {
+ 		wd17xx_set_drive(fdc,3);
+	}
+}
+
 static WRITE8_DEVICE_HANDLER( ht68k_kbd_put )
 {
 	duart68681_rx_data(devtag_get_device(device->machine, "duart68681"), 1, data);
@@ -71,7 +86,19 @@ static const duart68681_config ht68k_duart68681_config =
 	duart_irq_handler,
 	duart_tx,
 	duart_input,
-	NULL
+	duart_output
+};
+
+static WRITE_LINE_DEVICE_HANDLER( ht68k_fdc_intrq_w )
+{
+	//cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_4, HOLD_LINE, M68K_INT_ACK_AUTOVECTOR);
+}
+
+static const wd17xx_interface ht68k_wd17xx_interface =
+{
+	DEVCB_LINE(ht68k_fdc_intrq_w),
+	DEVCB_NULL,
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
 static const floppy_config ht68k_floppy_config =
@@ -98,8 +125,8 @@ static MACHINE_DRIVER_START( ht68k )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,ht68k_terminal_intf)	
 
 	MDRV_DUART68681_ADD( "duart68681", XTAL_8MHz / 2, ht68k_duart68681_config )
-	MDRV_WD1770_ADD("wd1770", default_wd17xx_interface_2_drives )
-	MDRV_FLOPPY_2_DRIVES_ADD(ht68k_floppy_config)
+	MDRV_WD1770_ADD("wd1770", ht68k_wd17xx_interface )
+	MDRV_FLOPPY_4_DRIVES_ADD(ht68k_floppy_config)
 MACHINE_DRIVER_END
 
 /* ROM definition */
