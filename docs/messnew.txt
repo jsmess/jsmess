@@ -29,16 +29,18 @@ Skeleton drivers:
 - Sharp PC-E220
 - Hewlett-Packard HP16500b [R. Belmont]
 - Micronic 1000 [Curt Coder]
-- MITS Altair 680b [Miodrag Milanovic]
-- MCS Basic 52 [Miodrag Milanovic]
-- MCS Basic 31 [Miodrag Milanovic]
+- MITS Altair 680b
+- MCS Basic 52
+- MCS Basic 31
 - Sun-1
-- Plan-80 [Miodrag Milanovic]
-- SAPI-1 ZPS 2 [Miodrag Milanovic]
-- SAPI-1 ZPS 3 [Miodrag Milanovic]
-- Protec Pro-80 [Miodrag Milanovic]
-- PIMPS [Miodrag Milanovic]
-- Sage II [Miodrag Milanovic]
+- Plan-80
+- SAPI-1 ZPS 2
+- SAPI-1 ZPS 3
+- Protec Pro-80
+- PIMPS
+- Sage II
+- NorthStar Horizon
+- Vector Graphic Vector 1+
 
 System Driver Changes:
 ----------------------

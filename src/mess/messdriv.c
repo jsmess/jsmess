@@ -1543,5 +1543,8 @@ const game_driver * const drivers[] =
 	DRIVER( pimps )
 	DRIVER( sage2 )
 	DRIVER( zexall ) /* zexall z80 test suite with kevtris' preloader/serial interface at 0000-00ff */
+	DRIVER( horizon )
+	DRIVER( horizsd )
+	DRIVER( vector1 )
 	
 #endif /* DRIVER_RECURSIVE */
