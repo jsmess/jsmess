@@ -169,6 +169,24 @@ static TIMER_CALLBACK(dma_transfer_timer)
 	}
 }
 
+void upd71071_soft_reset(const device_config* device)
+{
+	upd71071_t* dmac = device->token;
+	int x;
+	
+	// Does not change base/current address, count, or buswidth
+	dmac->selected_channel = 0;
+	dmac->base[0] = 0;
+	for(x=0;x<4;x++)
+		dmac->reg.mode_control[x] = 0;
+	dmac->reg.device_control = 0;
+	dmac->reg.temp_h = 0;
+	dmac->reg.temp_l = 0;
+	dmac->reg.mask = 0x0f;  // mask all channels
+	dmac->reg.status &= ~0x0f;  // clears bits 0-3 only
+	dmac->reg.request = 0;
+}
+
 int upd71071_dmarq(const device_config* device, int state,int channel)
 {
 	upd71071_t* dmac = device->token;
@@ -311,6 +329,8 @@ static WRITE8_DEVICE_HANDLER(upd71071_write)
 		case 0x00:  // Initialise
 			// TODO: reset (bit 0)
 			dmac->buswidth = data & 0x02;
+			if(data & 0x01)
+				upd71071_soft_reset(device);
 			logerror("DMA: Initialise [%02x]\n",data);
 			break;
 		case 0x01:  // Channel
