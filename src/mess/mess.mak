@@ -1539,6 +1539,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/pro80.o		\
 	$(MESS_DRIVERS)/pimps.o		\
 	$(MESS_DRIVERS)/sage2.o		\
+	$(MESS_DRIVERS)/zexall.o	\
 
 
 

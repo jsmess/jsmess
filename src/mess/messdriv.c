@@ -1542,5 +1542,6 @@ const game_driver * const drivers[] =
 	DRIVER( pro80 )
 	DRIVER( pimps )
 	DRIVER( sage2 )
+	DRIVER( zexall ) /* zexall z80 test suite with kevtris' preloader/serial interface at 0000-00ff */
 	
 #endif /* DRIVER_RECURSIVE */
