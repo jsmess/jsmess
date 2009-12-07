@@ -68,8 +68,8 @@ rsdos CoCo Disks
 Fully implemented.  This format supports two format-specific options on the put
 command:
 
-  --ftype=(0|1|2|3) Specifies the file type
-  --ascii=(A|B)     Specifies the ASCII flag
+  --ftype=(basic|data|binary|assembler) Specifies the file type
+  --ascii=(ascii|binary)                Specifies the ASCII flag
 
 cococas CoCo Cassettes
 ----------------------
