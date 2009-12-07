@@ -73,7 +73,7 @@ static void duart_output(const device_config *device, UINT8 data)
 
 static WRITE8_DEVICE_HANDLER( ht68k_kbd_put )
 {
-	duart68681_rx_data(devtag_get_device(device->machine, "duart68681"), 1, data);
+	duart68681_rx_data(devtag_get_device(device->machine, "duart68681"), 0, data);
 }
 
 static GENERIC_TERMINAL_INTERFACE( ht68k_terminal_intf )
@@ -139,5 +139,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY                     FULLNAME                    FLAGS */
-COMP( 1987, ht68k,  0,       0, 	 ht68k, 	ht68k, 	 0,  	  0,  	"Hawthorne Technologies",   "TinyGiant HT68k",		GAME_NOT_WORKING)
+COMP( 1987, ht68k,  0,       0, 	 ht68k, 	ht68k, 	 0,  	  0,  	"Hawthorne Technologies",   "TinyGiant HT68k",		0)
 
