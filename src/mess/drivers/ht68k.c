@@ -60,13 +60,13 @@ static void duart_output(const device_config *device, UINT8 data)
 {
 	const device_config *fdc = devtag_get_device(device->machine, "wd1770");
 	wd17xx_set_side(fdc,BIT(data,3) ? 0 : 1);
-	if (BIT(data,4)) {
+	if (BIT(data,7)==0) {
  		wd17xx_set_drive(fdc,0);
-	} else if (BIT(data,5)) {
+	} else if (BIT(data,6)==0) {
  		wd17xx_set_drive(fdc,1);
-	} else if (BIT(data,6)) {
+	} else if (BIT(data,5)==0) {
  		wd17xx_set_drive(fdc,2);
-	} else if (BIT(data,7)) {
+	} else if (BIT(data,4)==0) {
  		wd17xx_set_drive(fdc,3);
 	}
 }
