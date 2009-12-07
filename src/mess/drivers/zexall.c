@@ -112,6 +112,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(z80_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0001, 0x0001) AM_NOP // really a disable/enable for some sort of interrupt timer on kev's hardware, which is completely irrelevant for the test
 ADDRESS_MAP_END
 
 
@@ -125,9 +126,13 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
+static WRITE8_DEVICE_HANDLER( null_kbd_put )
+{
+}
+
 static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
 {
-	NULL
+	DEVCB_HANDLER(null_kbd_put)
 };
 
 static MACHINE_DRIVER_START(zexall)
