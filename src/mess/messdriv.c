@@ -1546,5 +1546,6 @@ const game_driver * const drivers[] =
 	DRIVER( horizon )
 	DRIVER( horizsd )
 	DRIVER( vector1 )
+	DRIVER( tricep )
 	
 #endif /* DRIVER_RECURSIVE */
