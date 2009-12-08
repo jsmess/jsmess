@@ -20,6 +20,7 @@
 #include "cpu/arm7/arm7core.h"
 #include "machine/smartmed.h"
 #include "includes/gp32.h"
+#include "sound/dmadac.h"
 
 #define BIT(x,n) (((x)>>(n))&1)
 #define BITS(x,m,n) (((x)>>(n))&((1<<((m)-(n)+1))-1))
@@ -52,7 +53,7 @@ static VIDEO_UPDATE( gp32 )
 //		logerror("vramaddr 2 = %08X\n", ((s3c240x_vidregs[5] & 0xFFE00000) | s3c240x_vidregs[6]) << 1);
 		vramaddr = s3c240x_vidregs[5] << 1;
 
-		bppmode = (s3c240x_vidregs[0] >> 1) & 0xF;
+		bppmode = BITS( s3c240x_vidregs[0], 4, 1);
 
 //		hwswp = (s3c240x_vidregs[4] >> 0) & 0x1;
 //		tpal = s3c240x_vidregs[20] & 0x0001FFFF;
@@ -152,9 +153,9 @@ static UINT32 s3c240x_get_fclk( int reg)
 {
 	UINT32 data, mdiv, pdiv, sdiv;
 	data = s3c240x_clkpow_regs[reg]; // MPLLCON or UPLLCON
-	mdiv = (data >> 12) & 0xFF;
-	pdiv = (data >>  4) & 0x3F;
-	sdiv = (data >>  0) & 0x03;
+	mdiv = BITS( data, 19, 12);
+	pdiv = BITS( data, 9, 4);
+	sdiv = BITS( data, 1, 0);
 	return (UINT32)((double)((mdiv + 8) * 12000000) / (double)((pdiv + 2) * (1 << sdiv)));
 }
 
@@ -500,7 +501,7 @@ static struct {
 	UINT8 datatx;
 } smc;
 
-static void smc_reset(void)
+static void smc_reset( running_machine *machine)
 {
 //	logerror( "smc_reset\n");
 	smc.add_latch = 0;
@@ -511,6 +512,12 @@ static void smc_reset(void)
 	smc.read = 0;
 	smc.wp = 0;
 	smc.busy = 0;
+}
+
+static void smc_init( running_machine *machine)
+{
+//	logerror( "smc_init\n");
+	smc_reset( machine);
 }
 
 static UINT8 smc_read( running_machine *machine)
@@ -550,7 +557,7 @@ static void smc_update( running_machine *machine)
 {
 	if (!smc.chip)
 	{
-		smc_reset();
+		smc_reset( machine);
 	}
 	else
 	{
@@ -562,6 +569,66 @@ static void smc_update( running_machine *machine)
 		{
 			smc.datarx = smc_read( machine);
 		}
+	}
+}
+
+// I2S
+
+#define I2S_L3C ( 1 )
+#define I2S_L3M ( 2 )
+#define I2S_L3D ( 3 )
+
+static struct {
+	int l3d;
+	int l3m;
+	int l3c;
+} i2s;
+
+static void i2s_reset( running_machine *machine)
+{
+//	logerror( "i2s_reset\n");
+	i2s.l3d = 0;
+	i2s.l3m = 0;
+	i2s.l3c = 0;
+}
+
+static void i2s_init( running_machine *machine)
+{
+//	logerror( "i2s_init\n");
+	i2s_reset( machine);
+}
+
+static void i2s_write( running_machine *machine, int line, int data)
+{
+	switch (line)
+	{
+		case I2S_L3C :
+		{
+			if (data != i2s.l3c)
+			{
+//				logerror( "I2S L3C %d\n", data);
+				i2s.l3c = data;
+			}
+		}
+		break;
+		case I2S_L3M :
+		{
+			if (data != i2s.l3m)
+			{
+//				logerror( "I2S L3M %d\n", data);
+				i2s.l3m = data;
+			}
+		}
+		break;
+		case I2S_L3D :
+		{
+			if (data != i2s.l3d)
+			{
+//				logerror( "I2S L3D %d\n", data);
+				i2s.l3d = data;
+			}
+		}
+		break;
 	}
 }
 
@@ -662,6 +729,10 @@ static WRITE32_HANDLER( s3c240x_gpio_w )
 			smc.add_latch = ((data & 0x00000010) != 0);
 			smc.do_write  = ((data & 0x00000008) == 0);
 			smc_update( space->machine);
+			// sound
+			i2s_write( space->machine, I2S_L3D, (data & 0x00000800) ? 1 : 0);
+			i2s_write( space->machine, I2S_L3M, (data & 0x00000400) ? 1 : 0);
+			i2s_write( space->machine, I2S_L3C, (data & 0x00000200) ? 1 : 0);
 		}
 		break;
 	}
@@ -945,7 +1016,52 @@ static TIMER_CALLBACK( s3c240x_iic_timer_exp )
 
 // IIS
 
+static emu_timer *s3c240x_iis_timer;
 static UINT32 s3c240x_iis_regs[0x14/4];
+static INT16 s3c240x_iis_fifo[16/2];
+static INT16 s3c240x_iis_fifo_index = 0;
+
+static void s3c240x_iis_start( running_machine *machine)
+{
+	const UINT32 codeclk_table[] = { 256, 384};
+	const device_config *dmadac[2];
+	double freq;
+	int prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk;
+//	logerror( "IIS start\n");
+	prescaler_enable = BIT( s3c240x_iis_regs[0], 1);
+	prescaler_control_a = BITS( s3c240x_iis_regs[2], 9, 5);
+	prescaler_control_b = BITS( s3c240x_iis_regs[2], 4, 0);
+	codeclk = BIT( s3c240x_iis_regs[1], 2);
+	freq = (double)(s3c240x_get_pclk( MPLLCON) / (prescaler_control_a + 1) / codeclk_table[codeclk]) * 2; // why do I have to multiply by two?
+//	logerror( "IIS - pclk %d psc_enable %d psc_a %d psc_b %d codeclk %d freq %f\n", s3c240x_get_pclk( MPLLCON), prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk_table[codeclk], freq);
+	dmadac[0] = devtag_get_device( machine, "dac1");
+	dmadac[1] = devtag_get_device( machine, "dac2");
+	dmadac_set_frequency( &dmadac[0], 2, freq);
+	dmadac_enable( &dmadac[0], 2, 1);
+	timer_adjust_periodic( s3c240x_iis_timer, ATTOTIME_IN_HZ( freq), 0, ATTOTIME_IN_HZ( freq));
+}
+
+static void s3c240x_iis_stop( running_machine *machine)
+{
+	const device_config *dmadac[2];
+//	logerror( "IIS stop\n");
+	timer_adjust_oneshot( s3c240x_iis_timer, attotime_never, 0);
+	dmadac[0] = devtag_get_device( machine, "dac1");
+	dmadac[1] = devtag_get_device( machine, "dac2");
+	dmadac_enable( &dmadac[0], 2, 0);
+}
+
+static void s3c240x_iis_recalc( running_machine *machine)
+{
+	if (s3c240x_iis_regs[0] & 1)
+	{
+		s3c240x_iis_start( machine);
+	}
+	else
+	{
+		s3c240x_iis_stop( machine);
+	}
+}
 
 static READ32_HANDLER( s3c240x_iis_r )
 {
@@ -956,8 +1072,44 @@ static READ32_HANDLER( s3c240x_iis_r )
 
 static WRITE32_HANDLER( s3c240x_iis_w )
 {
+	UINT32 old_value = s3c240x_iis_regs[offset];
 //	logerror( "(IIS) %08X <- %08X (PC %08X)\n", 0x15508000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_iis_regs[offset]);
+	switch (offset)
+	{
+		// IISCON
+		case 0x00 / 4 :
+		{
+			if ((old_value & 1) != (data & 1)) s3c240x_iis_recalc( space->machine);
+		}
+		break;
+		// IISFIF
+		case 0x10 / 4 :
+		{
+			if (ACCESSING_BITS_16_31)
+			{
+				s3c240x_iis_fifo[s3c240x_iis_fifo_index++] = (data >> 16) & 0xFFFF;
+			}
+			if (ACCESSING_BITS_0_15)
+			{
+				s3c240x_iis_fifo[s3c240x_iis_fifo_index++] = data & 0xFFFF;
+			}
+			if (s3c240x_iis_fifo_index == 2)
+			{
+				const device_config *dmadac[2];
+				dmadac[0] = devtag_get_device( space->machine, "dac1");
+				dmadac[1] = devtag_get_device( space->machine, "dac2");
+				s3c240x_iis_fifo_index = 0;
+    		dmadac_transfer( &dmadac[0], 2, 1, 1, 1, s3c240x_iis_fifo);
+			}
+		}
+		break;
+	}
+}
+
+static TIMER_CALLBACK( s3c240x_iis_timer_exp )
+{
+//	logerror( "IIS timer callback\n");
 }
 
 // RTC
@@ -1029,12 +1181,15 @@ static void s3c240x_machine_start(running_machine *machine)
 	s3c240x_pwm_timer[3] = timer_alloc(machine, s3c240x_pwm_timer_exp, (void *)(FPTR)3);
 	s3c240x_pwm_timer[4] = timer_alloc(machine, s3c240x_pwm_timer_exp, (void *)(FPTR)4);
 	s3c240x_iic_timer = timer_alloc(machine, s3c240x_iic_timer_exp, (void *)(FPTR)0);
-	smc_reset();
+	s3c240x_iis_timer = timer_alloc(machine, s3c240x_iis_timer_exp, (void *)(FPTR)0);
+	smc_init( machine);
+	i2s_init( machine);
 }
 
 static void s3c240x_machine_reset(running_machine *machine)
 {
-	smc_reset();
+	smc_reset( machine);
+	i2s_reset( machine);
 }
 
 static ADDRESS_MAP_START( gp32_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -1107,6 +1262,10 @@ static MACHINE_DRIVER_START( gp32 )
 	MDRV_MACHINE_RESET(gp32)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MDRV_SOUND_ADD("dac1", DMADAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ADD("dac2", DMADAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MDRV_SMARTMEDIA_ADD("smartmedia")
 MACHINE_DRIVER_END
