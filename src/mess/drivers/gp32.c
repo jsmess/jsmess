@@ -21,6 +21,9 @@
 #include "machine/smartmed.h"
 #include "includes/gp32.h"
 
+#define BIT(x,n) (((x)>>(n))&1)
+#define BITS(x,m,n) (((x)>>(n))&((1<<((m)-(n)+1))-1))
+
 static UINT32 *s3c240x_ram;
 
 // LCD CONTROLLER
@@ -303,89 +306,110 @@ static const char *timer_reg_names[] =
 };
 #endif
 
-static emu_timer *s3c240x_timers[5];
-static UINT32 s3c240x_timer_regs[0x44/4];
+static emu_timer *s3c240x_pwm_timer[5];
+static UINT32 s3c240x_pwm_regs[0x44/4];
 
-static READ32_HANDLER( s3c240x_timer_r )
+static READ32_HANDLER( s3c240x_pwm_r )
 {
-	UINT32 data = s3c240x_timer_regs[offset];
-//	logerror( "(TIMER) %08X -> %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	UINT32 data = s3c240x_pwm_regs[offset];
+//	logerror( "(PWM) %08X -> %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
-static void s3c240x_timer_recalc( running_machine *machine, int timer, UINT32 ctrl_bits, UINT32 count_reg)
+static void s3c240x_pwm_start( running_machine *machine, int timer)
 {
 	const int mux_table[] = { 2, 4, 8, 16};
 	const int prescaler_shift[] = { 0, 0, 8, 8, 8};
 	const int mux_shift[] = { 0, 4, 8, 12, 16};
-	if (ctrl_bits & 1)	// timer start?
+	const int tcon_shift[] = { 0, 8, 12, 16, 20};
+	const UINT32 *regs = &s3c240x_pwm_regs[3+timer*3];
+	UINT32 prescaler, mux, cnt, cmp, auto_reload;
+	double freq, hz;
+//		logerror( "PWM %d start\n", timer);
+	prescaler = (s3c240x_pwm_regs[0] >> prescaler_shift[timer]) & 0xFF;
+	mux = (s3c240x_pwm_regs[1] >> mux_shift[timer]) & 0x0F;
+	freq = s3c240x_get_pclk( MPLLCON) / (prescaler + 1) / mux_table[mux];
+	cnt = BITS( regs[0], 15, 0);
+	if (timer != 4)
 	{
-		UINT32 prescaler, mux, cnt, cmp;
-		double freq, hz;
-//		logerror( "starting timer %d\n", timer);
-		prescaler = (s3c240x_timer_regs[0] >> prescaler_shift[timer]) & 0xFF;
-		mux = (s3c240x_timer_regs[1] >> mux_shift[timer]) & 0x0F;
-		freq = s3c240x_get_pclk( MPLLCON) / (prescaler + 1) / mux_table[mux];
-		cnt = s3c240x_timer_regs[count_reg+0] & 0xFFFF;
-		if (timer != 4)
-			cmp = s3c240x_timer_regs[count_reg+1] & 0xFFFF;
-		else
-			cmp = 0;
-		//hz = (double)((prescaler + 1) * mux_table[mux]) / (cnt - cmp + 1);
-		hz = freq / (cnt - cmp + 1);
-//		logerror( "TIMER %d - FCLK=%d HCLK=%d PCLK=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d hz=%f\n", timer, s3c240x_get_fclk( MPLLCON), s3c240x_get_hclk( MPLLCON), s3c240x_get_pclk( MPLLCON), prescaler, mux_table[mux], freq, cnt, cmp, hz);
-		if (ctrl_bits & 8) // auto reload
-		{
-			timer_adjust_periodic( s3c240x_timers[timer], ATTOTIME_IN_HZ( hz), timer, ATTOTIME_IN_HZ( hz));
-		}
-		else
-		{
-			timer_adjust_oneshot( s3c240x_timers[timer], ATTOTIME_IN_HZ( hz), timer);
-		}
+		cmp = BITS( regs[1], 15, 0);
+		auto_reload = BIT( s3c240x_pwm_regs[2], tcon_shift[timer] + 3);
 	}
-	else	// stopping is easy
+	else
 	{
-//		logerror( "stopping timer %d\n", timer);
-		timer_adjust_oneshot( s3c240x_timers[timer], attotime_never, 0);
+		cmp = 0;
+		auto_reload = BIT( s3c240x_pwm_regs[2], tcon_shift[timer] + 2);
+	}
+	hz = freq / (cnt - cmp + 1);
+//	logerror( "PWM %d - FCLK=%d HCLK=%d PCLK=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", timer, s3c240x_get_fclk( MPLLCON), s3c240x_get_hclk( MPLLCON), s3c240x_get_pclk( MPLLCON), prescaler, mux_table[mux], freq, cnt, cmp, auto_reload, hz);
+	if (auto_reload)
+	{
+		timer_adjust_periodic( s3c240x_pwm_timer[timer], ATTOTIME_IN_HZ( hz), timer, ATTOTIME_IN_HZ( hz));
+	}
+	else
+	{
+		timer_adjust_oneshot( s3c240x_pwm_timer[timer], ATTOTIME_IN_HZ( hz), timer);
 	}
 }
 
-static WRITE32_HANDLER( s3c240x_timer_w )
+static void s3c240x_pwm_stop( running_machine *machine, int timer)
 {
-	UINT32 old_value = s3c240x_timer_regs[offset];
-//	logerror( "(TIMER) %08X <- %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, cpu_get_pc( space->cpu));
-	COMBINE_DATA(&s3c240x_timer_regs[offset]);
-	if (offset == 2)	// TCON
+//	logerror( "PWM %d stop\n", timer);
+	timer_adjust_oneshot( s3c240x_pwm_timer[timer], attotime_never, 0);
+}
+
+static void s3c240x_pwm_recalc( running_machine *machine, int timer)
+{
+	const int tcon_shift[] = { 0, 8, 12, 16, 20};
+	if (s3c240x_pwm_regs[2] & (1 << tcon_shift[timer]))
 	{
-		if ((data & 1) != (old_value & 1))	// timer 0 status change
+		s3c240x_pwm_start( machine, timer);
+	}
+	else
+	{
+		s3c240x_pwm_stop( machine, timer);
+	}
+}
+
+static WRITE32_HANDLER( s3c240x_pwm_w )
+{
+	UINT32 old_value = s3c240x_pwm_regs[offset];
+//	logerror( "(PWM) %08X <- %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	COMBINE_DATA(&s3c240x_pwm_regs[offset]);
+	switch (offset)
+	{
+		// TCON
+		case 0x08 / 4 :
 		{
-			s3c240x_timer_recalc(space->machine, 0, data&0xf, 0xc / 4);
-		}
-		if ((data & 0x100) != (old_value & 0x100))	// timer 1 status change
-		{
-			s3c240x_timer_recalc(space->machine, 1, (data>>8)&0xf, 0x18 / 4);
-		}
-		if ((data & 0x1000) != (old_value & 0x1000))	// timer 2 status change
-		{
-			s3c240x_timer_recalc(space->machine, 2, (data>>12)&0xf, 0x24 / 4);
-		}
-		if ((data & 0x10000) != (old_value & 0x10000))	// timer 3 status change
-		{
-			s3c240x_timer_recalc(space->machine, 3, (data>>16)&0xf, 0x30 / 4);
-		}
-		if ((data & 0x100000) != (old_value & 0x100000))	// timer 4 status change
-		{
-			s3c240x_timer_recalc(space->machine, 4, (data>>20)&0xf, 0x3c / 4);
+			if ((data & 1) != (old_value & 1))
+			{
+				s3c240x_pwm_recalc( space->machine, 0);
+			}
+			if ((data & 0x100) != (old_value & 0x100))
+			{
+				s3c240x_pwm_recalc( space->machine, 1);
+			}
+			if ((data & 0x1000) != (old_value & 0x1000))
+			{
+				s3c240x_pwm_recalc( space->machine, 2);
+			}
+			if ((data & 0x10000) != (old_value & 0x10000))
+			{
+				s3c240x_pwm_recalc( space->machine, 3);
+			}
+			if ((data & 0x100000) != (old_value & 0x100000))
+			{
+				s3c240x_pwm_recalc( space->machine, 4);
+			}
 		}
 	}
 }
 
-static TIMER_CALLBACK( s3c240x_timer_exp )
+static TIMER_CALLBACK( s3c240x_pwm_timer_exp )
 {
 	int ch = param;
-	static UINT32 ch_int[5] = { INT_TIMER0, INT_TIMER1, INT_TIMER2, INT_TIMER3, INT_TIMER4 };
-//	logerror( "timer %d callback\n", ch);
-//	timer_adjust_oneshot(s3c240x_timers[ch], attotime_never, 0);
+	const int ch_int[] = { INT_TIMER0, INT_TIMER1, INT_TIMER2, INT_TIMER3, INT_TIMER4 };
+//	logerror( "PWM %d timer callback\n", ch);
 	s3c240x_request_irq( machine, ch_int[ch]);
 }
 
@@ -600,7 +624,7 @@ static READ32_HANDLER( s3c240x_gpio_r )
 
 static WRITE32_HANDLER( s3c240x_gpio_w )
 {
-//	UINT32 old_value = s3c240x_timer_regs[offset];
+//	UINT32 old_value = s3c240x_gpio_regs[offset];
 	COMBINE_DATA(&s3c240x_gpio[offset]);
 //	logerror( "(GPIO) %08X <- %08X (PC %08X)\n", 0x15600000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	switch (offset)
@@ -999,11 +1023,11 @@ static WRITE32_HANDLER( s3c240x_mmc_w )
 
 static void s3c240x_machine_start(running_machine *machine)
 {
-	s3c240x_timers[0] = timer_alloc(machine, s3c240x_timer_exp, (void *)(FPTR)0);
-	s3c240x_timers[1] = timer_alloc(machine, s3c240x_timer_exp, (void *)(FPTR)1);
-	s3c240x_timers[2] = timer_alloc(machine, s3c240x_timer_exp, (void *)(FPTR)2);
-	s3c240x_timers[3] = timer_alloc(machine, s3c240x_timer_exp, (void *)(FPTR)3);
-	s3c240x_timers[4] = timer_alloc(machine, s3c240x_timer_exp, (void *)(FPTR)4);
+	s3c240x_pwm_timer[0] = timer_alloc(machine, s3c240x_pwm_timer_exp, (void *)(FPTR)0);
+	s3c240x_pwm_timer[1] = timer_alloc(machine, s3c240x_pwm_timer_exp, (void *)(FPTR)1);
+	s3c240x_pwm_timer[2] = timer_alloc(machine, s3c240x_pwm_timer_exp, (void *)(FPTR)2);
+	s3c240x_pwm_timer[3] = timer_alloc(machine, s3c240x_pwm_timer_exp, (void *)(FPTR)3);
+	s3c240x_pwm_timer[4] = timer_alloc(machine, s3c240x_pwm_timer_exp, (void *)(FPTR)4);
 	s3c240x_iic_timer = timer_alloc(machine, s3c240x_iic_timer_exp, (void *)(FPTR)0);
 	smc_reset();
 }
@@ -1025,7 +1049,7 @@ static ADDRESS_MAP_START( gp32_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x14a00400, 0x14a007ff) AM_RAM AM_BASE_GENERIC(paletteram) AM_WRITE(s3c240x_palette_w)
 	AM_RANGE(0x15000000, 0x1500002b) AM_READWRITE(s3c240x_uart_0_r, s3c240x_uart_0_w)
 	AM_RANGE(0x15004000, 0x1500402b) AM_READWRITE(s3c240x_uart_1_r, s3c240x_uart_1_w)
-	AM_RANGE(0x15100000, 0x15100043) AM_READWRITE(s3c240x_timer_r, s3c240x_timer_w)
+	AM_RANGE(0x15100000, 0x15100043) AM_READWRITE(s3c240x_pwm_r, s3c240x_pwm_w)
 	AM_RANGE(0x15200140, 0x152001fb) AM_READWRITE(s3c240x_usb_device_r, s3c240x_usb_device_w)
 	AM_RANGE(0x15300000, 0x1530000b) AM_READWRITE(s3c240x_watchdog_r, s3c240x_watchdog_w)
 	AM_RANGE(0x15400000, 0x1540000f) AM_READWRITE(s3c240x_iic_r, s3c240x_iic_w)
