@@ -115,12 +115,13 @@ static READ32_HANDLER( s3c240x_vidregs_r )
 		}
 		break;
 	}
+//	logerror( "(LCD) %08X -> %08X (PC %08X)\n", 0x14A00000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_vidregs_w )
 {
-//	logerror( "(LCD) %08X <- %08X\n", 0x14A00000 + (offset << 2), data);
+//	logerror( "(LCD) %08X <- %08X (PC %08X)\n", 0x14A00000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_vidregs[offset]);
 }
 
@@ -187,7 +188,7 @@ static READ32_HANDLER( s3c240x_clkpow_r )
 
 static WRITE32_HANDLER( s3c240x_clkpow_w )
 {
-//	logerror( "(CLKPOW) %08X <- %08X\n", 0x14800000 + (offset << 2), data);
+//	logerror( "(CLKPOW) %08X <- %08X (PC %08X)\n", 0x14800000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_clkpow_regs[offset]);
 	switch (offset)
 	{
@@ -204,35 +205,76 @@ static WRITE32_HANDLER( s3c240x_clkpow_w )
 
 static UINT32 s3c240x_irq_regs[0x18/4];
 
-static READ32_HANDLER( s3c240x_irq_r )
+static void s3c240x_check_pending_irq( running_machine *machine)
 {
-	UINT32 data = s3c240x_irq_regs[offset];
-//	logerror( "(IRQ) %08X -> %08X\n", 0x14400000 + (offset << 2), data);
-	return data;
-}
-
-static WRITE32_HANDLER( s3c240x_irq_w )
-{
-//	logerror( "(IRQ) %08X <- %08X\n", 0x14400000 + (offset << 2), data);
-	switch (offset)
+	if (s3c240x_irq_regs[0] != 0)
 	{
-		// SRCPND
-		case 0x00 / 4 :
+		UINT32 int_type = 0, temp;
+		temp = s3c240x_irq_regs[0];
+		while (!(temp & 1))
 		{
-			cpu_set_input_line( cputag_get_cpu( space->machine, "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
+			int_type++;
+			temp = temp >> 1;
 		}
-		break;
+		s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
+		s3c240x_irq_regs[5] = int_type; // INTOFFSET
+		cpu_set_input_line( cputag_get_cpu( machine, "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
 	}
-	COMBINE_DATA(&s3c240x_irq_regs[offset]);
+	else
+	{
+		cpu_set_input_line( cputag_get_cpu( machine, "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
+	}
 }
 
 static void s3c240x_request_irq( running_machine *machine, UINT32 int_type)
 {
 //	logerror( "request irq %d\n", int_type);
-//	logerror( "%08X %08X %08X %08X %08X %08X\n", s3c240x_irq_regs[0], s3c240x_irq_regs[1], s3c240x_irq_regs[2], s3c240x_irq_regs[3], s3c240x_irq_regs[4], s3c240x_irq_regs[5]);
-	s3c240x_irq_regs[5] = int_type; // INTOFFSET
-	cpu_set_input_line( cputag_get_cpu( machine, "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
-//	cpu_set_input_line( cputag_get_cpu( machine, "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
+//	logerror( "(1) %08X %08X %08X %08X %08X %08X\n", s3c240x_irq_regs[0], s3c240x_irq_regs[1], s3c240x_irq_regs[2], s3c240x_irq_regs[3], s3c240x_irq_regs[4], s3c240x_irq_regs[5]);
+	if (s3c240x_irq_regs[0] == 0)
+	{
+		s3c240x_irq_regs[0] |= (1 << int_type); // SRCPND
+		s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
+		s3c240x_irq_regs[5] = int_type; // INTOFFSET
+		cpu_set_input_line( cputag_get_cpu( machine, "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+	}
+	else
+	{
+		s3c240x_irq_regs[0] |= (1 << int_type); // SRCPND
+		s3c240x_check_pending_irq( machine);
+	}
+}
+
+
+static READ32_HANDLER( s3c240x_irq_r )
+{
+	UINT32 data = s3c240x_irq_regs[offset];
+//	logerror( "(IRQ) %08X -> %08X (PC %08X)\n", 0x14400000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	return data;
+}
+
+static WRITE32_HANDLER( s3c240x_irq_w )
+{
+	UINT32 old_value = s3c240x_irq_regs[offset];
+//	logerror( "(IRQ) %08X <- %08X (PC %08X)\n", 0x14400000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	COMBINE_DATA(&s3c240x_irq_regs[offset]);
+	switch (offset)
+	{
+		// SRCPND
+		case 0x00 / 4 :
+		{
+			s3c240x_irq_regs[0] = (old_value & ~data); // clear only the bit positions of SRCPND corresponding to those set to one in the data
+//			logerror( "(2) %08X %08X %08X %08X %08X %08X\n", s3c240x_irq_regs[0], s3c240x_irq_regs[1], s3c240x_irq_regs[2], s3c240x_irq_regs[3], s3c240x_irq_regs[4], s3c240x_irq_regs[5]);
+			s3c240x_check_pending_irq( space->machine);
+		}
+		break;
+		// INTPND
+		case 0x10 / 4 :
+		{
+			s3c240x_irq_regs[4] = (old_value & ~data); // clear only the bit positions of INTPND corresponding to those set to one in the data
+//			logerror( "(3) %08X %08X %08X %08X %08X %08X\n", s3c240x_irq_regs[0], s3c240x_irq_regs[1], s3c240x_irq_regs[2], s3c240x_irq_regs[3], s3c240x_irq_regs[4], s3c240x_irq_regs[5]);
+		}
+		break;
+	}
 }
 
 // PWM TIMER
@@ -267,7 +309,7 @@ static UINT32 s3c240x_timer_regs[0x44/4];
 static READ32_HANDLER( s3c240x_timer_r )
 {
 	UINT32 data = s3c240x_timer_regs[offset];
-//	logerror( "(TIMER) %08X -> %08X\n", 0x15100000 + (offset << 2), data);
+//	logerror( "(TIMER) %08X -> %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
@@ -311,7 +353,7 @@ static void s3c240x_timer_recalc( running_machine *machine, int timer, UINT32 ct
 static WRITE32_HANDLER( s3c240x_timer_w )
 {
 	UINT32 old_value = s3c240x_timer_regs[offset];
-//	logerror( "(TIMER) %08X <- %08X\n", 0x15100000 + (offset << 2), data);
+//	logerror( "(TIMER) %08X <- %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_timer_regs[offset]);
 	if (offset == 2)	// TCON
 	{
@@ -382,13 +424,13 @@ static void s3c240x_dma_start( running_machine *machine, int dma)
 static READ32_HANDLER( s3c240x_dma_r )
 {
 	UINT32 data = s3c240x_dma_regs[offset];
-//	logerror( "(DMA) %08X -> %08X\n", 0x14600000 + (offset << 2), data);
+//	logerror( "(DMA) %08X -> %08X (PC %08X)\n", 0x14600000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_dma_w )
 {
-//	logerror( "(DMA) %08X <- %08X\n", 0x14600000 + (offset << 2), data);
+//	logerror( "(DMA) %08X <- %08X (PC %08X)\n", 0x14600000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_dma_regs[offset]);
 	switch (offset)
 	{
@@ -434,7 +476,7 @@ static struct {
 	UINT8 datatx;
 } smc;
 
-void smc_reset(void)
+static void smc_reset(void)
 {
 //	logerror( "smc_reset\n");
 	smc.add_latch = 0;
@@ -506,7 +548,6 @@ static UINT32 s3c240x_gpio[0x60/4];
 static READ32_HANDLER( s3c240x_gpio_r )
 {
 	UINT32 data = s3c240x_gpio[offset];
-//	logerror("read GPIO @ 0x156000%02x (PC %x)\n", offset*4, cpu_get_pc(space->cpu));
 	switch (offset)
 	{
 		// PBCON
@@ -553,6 +594,7 @@ static READ32_HANDLER( s3c240x_gpio_r )
 		}
 		break;
 	}
+//	logerror( "(GPIO) %08X -> %08X (PC %08X)\n", 0x15600000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
@@ -560,19 +602,15 @@ static WRITE32_HANDLER( s3c240x_gpio_w )
 {
 //	UINT32 old_value = s3c240x_timer_regs[offset];
 	COMBINE_DATA(&s3c240x_gpio[offset]);
-//	logerror("%08x to GPIO @ 0x156000%02x (PC %x)\n", data, offset*4, cpu_get_pc(space->cpu));
-//	if (offset == 0x30/4) logerror("[%08x] %s %s\n", data, (data & 0x200) ? "SCL" : "scl", (data & 0x400) ? "SDL" : "sdl");
+//	logerror( "(GPIO) %08X <- %08X (PC %08X)\n", 0x15600000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	switch (offset)
 	{
 		// PBCON
 		case 0x08 / 4 :
 		{
 			// smartmedia
-			//if ((old_value & 0x00000001) != (data & 0x00000001))
-			{
-				smc.read = ((data & 0x00000001) == 0);
-				smc_update( space->machine);
-			}
+			smc.read = ((data & 0x00000001) == 0);
+			smc_update( space->machine);
 		}
 		break;
 		// PBDAT
@@ -586,26 +624,20 @@ static WRITE32_HANDLER( s3c240x_gpio_w )
 		case 0x24 / 4 :
 		{
 			// smartmedia
-			//if ((old_value & 0x000001C0) != (data & 0x000001C0))
-			{
-				smc.do_read = ((data & 0x00000100) == 0);
-				smc.chip = ((data & 0x00000080) == 0);
-				smc.wp = ((data & 0x00000040) == 0);
-				smc_update( space->machine);
-			}
+			smc.do_read = ((data & 0x00000100) == 0);
+			smc.chip = ((data & 0x00000080) == 0);
+			smc.wp = ((data & 0x00000040) == 0);
+			smc_update( space->machine);
 		}
 		break;
 		// PEDAT
 		case 0x30 / 4 :
 		{
 			// smartmedia
-			//if ((old_value & 0x00000038) != (data & 0x00000038))
-			{
-				smc.cmd_latch = ((data & 0x00000020) != 0);
-				smc.add_latch = ((data & 0x00000010) != 0);
-				smc.do_write  = ((data & 0x00000008) == 0);
-				smc_update( space->machine);
-			}
+			smc.cmd_latch = ((data & 0x00000020) != 0);
+			smc.add_latch = ((data & 0x00000010) != 0);
+			smc.do_write  = ((data & 0x00000008) == 0);
+			smc_update( space->machine);
 		}
 		break;
 	}
@@ -622,7 +654,7 @@ static READ32_HANDLER( s3c240x_memcon_r )
 
 static WRITE32_HANDLER( s3c240x_memcon_w )
 {
-//	logerror( "(MEMCON) %08X <- %08X\n", 0x14000000 + (offset << 2), data);
+//	logerror( "(MEMCON) %08X <- %08X (PC %08X)\n", 0x14000000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_memcon_regs[offset]);
 }
 
@@ -637,7 +669,7 @@ static READ32_HANDLER( s3c240x_usb_host_r )
 
 static WRITE32_HANDLER( s3c240x_usb_host_w )
 {
-//	logerror( "(USB H) %08X <- %08X\n", 0x14200000 + (offset << 2), data);
+//	logerror( "(USB H) %08X <- %08X (PC %08X)\n", 0x14200000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_usb_host_regs[offset]);
 }
 
@@ -653,16 +685,17 @@ static READ32_HANDLER( s3c240x_uart_0_r )
 		// UTRSTAT0
 		case 0x10 / 4 :
 		{
-			data = (data & ~0x00000006) | 0x00000004 | 0x00000002;
+			data = (data & ~0x00000006) | 0x00000004 | 0x00000002; // [bit 2] Transmitter empty / [bit 1] Transmit buffer empty
 		}
 		break;
 	}
+//	logerror( "(UART 0) %08X -> %08X (PC %08X)\n", 0x15000000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_uart_0_w )
 {
-//	logerror( "(UART 0) %08X <- %08X\n", 0x15000000 + (offset << 2), data);
+//	logerror( "(UART 0) %08X <- %08X (PC %08X)\n", 0x15000000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_uart_0_regs[offset]);
 }
 
@@ -672,12 +705,23 @@ static UINT32 s3c240x_uart_1_regs[0x2C/4];
 
 static READ32_HANDLER( s3c240x_uart_1_r )
 {
-	return s3c240x_uart_1_regs[offset];
+	UINT32 data = s3c240x_uart_1_regs[offset];
+	switch (offset)
+	{
+		// UTRSTAT1
+		case 0x10 / 4 :
+		{
+			data = (data & ~0x00000006) | 0x00000004 | 0x00000002; // [bit 2] Transmitter empty / [bit 1] Transmit buffer empty
+		}
+		break;
+	}
+//	logerror( "(UART 1) %08X -> %08X (PC %08X)\n", 0x15004000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_uart_1_w )
 {
-//	logerror( "(UART 1) %08X <- %08X\n", 0x15004000 + (offset << 2), data);
+//	logerror( "(UART 1) %08X <- %08X (PC %08X)\n", 0x15004000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_uart_1_regs[offset]);
 }
 
@@ -687,12 +731,14 @@ static UINT32 s3c240x_usb_device_regs[0xBC/4];
 
 static READ32_HANDLER( s3c240x_usb_device_r )
 {
-	return s3c240x_usb_device_regs[offset];
+	UINT32 data = s3c240x_usb_device_regs[offset];
+//	logerror( "(USB D) %08X -> %08X (PC %08X)\n", 0x15200140 + (offset << 2), data, cpu_get_pc( space->cpu));
+	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_usb_device_w )
 {
-//	logerror( "(USB D) %08X <- %08X\n", 0x15200140 + (offset << 2), data);
+//	logerror( "(USB D) %08X <- %08X (PC %08X)\n", 0x15200140 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_usb_device_regs[offset]);
 }
 
@@ -707,7 +753,7 @@ static READ32_HANDLER( s3c240x_watchdog_r )
 
 static WRITE32_HANDLER( s3c240x_watchdog_w )
 {
-//	logerror( "(WDOG) %08X <- %08X\n", 0x15300000 + (offset << 2), data);
+//	logerror( "(WDOG) %08X <- %08X (PC %08X)\n", 0x15300000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_watchdog_regs[offset]);
 }
 
@@ -784,13 +830,13 @@ static READ32_HANDLER( s3c240x_iic_r )
 		}
 		break;
 	}
-//	logerror( "(IIC) %08X -> %08X\n", 0x15400000 + (offset << 2), data);
+//	logerror( "(IIC) %08X -> %08X (PC %08X)\n", 0x15400000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_iic_w )
 {
-//	logerror( "(IIC) %08X <- %08X\n", 0x15400000 + (offset << 2), data);
+//	logerror( "(IIC) %08X <- %08X (PC %08X)\n", 0x15400000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_iic_regs[offset]);
 	switch (offset)
 	{
@@ -880,13 +926,13 @@ static UINT32 s3c240x_iis_regs[0x14/4];
 static READ32_HANDLER( s3c240x_iis_r )
 {
 	UINT32 data = s3c240x_iis_regs[offset];
-	//if (offset == 0) data = data & (~0x01); // mp3
+//	logerror( "(IIS) %08X -> %08X (PC %08X)\n", 0x15508000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_iis_w )
 {
-//	logerror( "(IIS) %08X <- %08X\n", 0x15508000 + (offset << 2), data);
+//	logerror( "(IIS) %08X <- %08X (PC %08X)\n", 0x15508000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_iis_regs[offset]);
 }
 
@@ -901,7 +947,7 @@ static READ32_HANDLER( s3c240x_rtc_r )
 
 static WRITE32_HANDLER( s3c240x_rtc_w )
 {
-//	logerror( "(RTC) %08X <- %08X\n", 0x15700040 + (offset << 2), data);
+//	logerror( "(RTC) %08X <- %08X (PC %08X)\n", 0x15700040 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_rtc_regs[offset]);
 }
 
@@ -916,7 +962,7 @@ static READ32_HANDLER( s3c240x_adc_r )
 
 static WRITE32_HANDLER( s3c240x_adc_w )
 {
-//	logerror( "(ADC) %08X <- %08X\n", 0x15800000 + (offset << 2), data);
+//	logerror( "(ADC) %08X <- %08X (PC %08X)\n", 0x15800000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_adc_regs[offset]);
 }
 
@@ -931,7 +977,7 @@ static READ32_HANDLER( s3c240x_spi_r )
 
 static WRITE32_HANDLER( s3c240x_spi_w )
 {
-//	logerror( "(SPI) %08X <- %08X\n", 0x15900000 + (offset << 2), data);
+//	logerror( "(SPI) %08X <- %08X (PC %08X)\n", 0x15900000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_spi_regs[offset]);
 }
 
