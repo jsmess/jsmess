@@ -78,20 +78,20 @@ Notes: (all chips shown above)
       TMM331  - Toshiba TMM331AP 2k x8 MASKROM (DIP24)
                 Pinout (preliminary):
                            TMM331
-                   ? ? ?|----\/----|
-                    ?A7?|1 ? ? ? 24| VCC
-?                    A8?|2 ? ? ? 23| D0
-?                    A9?|3 ? ? ? 22| D1
-?                   A10 |4 ? ? ? 21| D2
-                    ?A0?|5 ? ? ? 20| D3
-?                    A1?|6 ? ? ? 19| D4
-                    ?A2?|7 ? ? ? 18| D5
-                    ?A3?|8 ? ? ? 17| D6
-                    ?A4?|9 ? ? ? 16| D7
-?                    A5?|10 ? ? ?15| CE (LOW)
-?                    A6?|11 ? ? ?14| ? (unknown, leave NC?)
-                    GND?|12 ? ? ?13| OE (LOW)
-? ? ?                   |----------|
+                        |----\/----|
+                     A7 |1       24| VCC
+                     A8 |2       23| D0
+                     A9 |3       22| D1
+                    A10 |4       21| D2
+                     A0 |5       20| D3
+                     A1 |6       19| D4
+                     A2 |7       18| D5
+                     A3 |8       17| D6
+                     A4 |9       16| D7
+                     A5 |10      15| CE (LOW)
+                     A6 |11      14| ? (unknown, leave NC?)
+                    GND |12      13| OE (LOW)
+                        |----------|
 
 */
 
@@ -670,7 +670,7 @@ static DRIVER_INIT( studio2 )
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY   FULLNAME */
 CONS( 1977,	studio2,	0,		0,		studio2,	studio2,	studio2,	0,			"RCA",		"Studio II", GAME_SUPPORTS_SAVE )
-CONS( 1978, visicom,	studio2,0,		visicom,	studio2,	studio2,	0,			"Toshiba",	"Visicom (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+CONS( 1978, visicom,	studio2,0,		visicom,	studio2,	studio2,	0,			"Toshiba",	"Visicom (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 CONS( 1978,	mpt02s,		studio2,0,		mpt02,		studio2,	studio2,	0,			"Soundic",	"MPT-02 Victory Home TV Programmer (Austria)", GAME_NOT_WORKING )
 CONS( 1978,	mpt02h,		studio2,0,		mpt02,		studio2,	studio2,	0,			"Hanimex",	"MPT-02 Jeu TV Programmable (France)", GAME_NOT_WORKING )
 CONS( 1978,	mtc9016,	studio2,0,		mpt02,		studio2,	studio2,	0,			"Mustang",	"9016 Telespiel Computer (Germany)", GAME_NOT_WORKING )
