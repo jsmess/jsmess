@@ -42,6 +42,7 @@ Skeleton drivers:
 - NorthStar Horizon
 - Vector Graphic Vector 1+
 - Morrow Tricep
+- Indiana University 68030 board
 
 System Driver Changes:
 ----------------------
