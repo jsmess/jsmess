@@ -1543,6 +1543,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/horizon.o	\
 	$(MESS_DRIVERS)/tricep.o	\
 	$(MESS_DRIVERS)/indiana.o	\
+	$(MESS_DRIVERS)/vector4.o	\
 
 
 

@@ -43,6 +43,7 @@ Skeleton drivers:
 - Vector Graphic Vector 1+
 - Morrow Tricep
 - Indiana University 68030 board
+- Vector Graphics - Vector 4
 
 System Driver Changes:
 ----------------------

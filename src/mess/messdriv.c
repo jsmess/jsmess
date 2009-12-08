@@ -1548,5 +1548,6 @@ const game_driver * const drivers[] =
 	DRIVER( vector1 )
 	DRIVER( tricep )
 	DRIVER( indiana )
+	DRIVER( vector4 )
 	
 #endif /* DRIVER_RECURSIVE */
