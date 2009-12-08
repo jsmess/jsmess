@@ -26,6 +26,7 @@
 #define BITS(x,m,n) (((x)>>(n))&((1<<((m)-(n)+1))-1))
 
 static UINT32 *s3c240x_ram;
+static UINT8 *eeprom_data;
 
 // LCD CONTROLLER
 
@@ -856,11 +857,14 @@ static WRITE32_HANDLER( s3c240x_watchdog_w )
 
 static emu_timer *s3c240x_iic_timer;
 static UINT32 s3c240x_iic_regs[0x10/4];
+static UINT8 s3c240x_iic_data[3];
+static int s3c240x_iic_data_index = 0;
+static UINT16 s3c240x_iic_addr = 0;
 
-static UINT8 iic_read( running_machine *machine, int last)
+/*
+static UINT8 i2cmem_read_byte( running_machine *machine, int last)
 {
 	UINT8 data = 0;
-/*
 	int i;
 	i2cmem_write( machine, 0, I2CMEM_SDA, 1);
 	for (i=0;i<8;i++)
@@ -872,13 +876,13 @@ static UINT8 iic_read( running_machine *machine, int last)
 	i2cmem_write( machine, 0, I2CMEM_SDA, last);
 	i2cmem_write( machine, 0, I2CMEM_SCL, 1);
 	i2cmem_write( machine, 0, I2CMEM_SCL, 0);
-*/
 	return data;
 }
+*/
 
-static void iic_write( running_machine *machine, UINT8 data)
-{
 /*
+static void i2cmem_write_byte( running_machine *machine, UINT8 data)
+{
 	int i;
 	for (i=0;i<8;i++)
 	{
@@ -887,30 +891,49 @@ static void iic_write( running_machine *machine, UINT8 data)
 		i2cmem_write( machine, 0, I2CMEM_SCL, 1);
 		i2cmem_write( machine, 0, I2CMEM_SCL, 0);
 	}
-	i2cmem_write( machine, 0, I2CMEM_SDA, 1);
+	i2cmem_write( machine, 0, I2CMEM_SDA, 1); // ack bit
 	i2cmem_write( machine, 0, I2CMEM_SCL, 1);
 	i2cmem_write( machine, 0, I2CMEM_SCL, 0);
-*/
 }
+*/
 
-static void iic_start( running_machine *machine)
-{
 /*
+static void i2cmem_start( running_machine *machine)
+{
 	i2cmem_write( machine, 0, I2CMEM_SDA, 1);
 	i2cmem_write( machine, 0, I2CMEM_SCL, 1);
 	i2cmem_write( machine, 0, I2CMEM_SDA, 0);
 	i2cmem_write( machine, 0, I2CMEM_SCL, 0);
+}
 */
+
+/*
+static void i2cmem_stop( running_machine *machine)
+{
+	i2cmem_write( machine, 0, I2CMEM_SDA, 0);
+	i2cmem_write( machine, 0, I2CMEM_SCL, 1);
+	i2cmem_write( machine, 0, I2CMEM_SDA, 1);
+	i2cmem_write( machine, 0, I2CMEM_SCL, 0);
+}
+*/
+
+static void iic_start( running_machine *machine)
+{
+//	logerror( "IIC start\n");
+	s3c240x_iic_data_index = 0;
+	timer_adjust_oneshot( s3c240x_iic_timer, ATTOTIME_IN_MSEC( 1), 0);
 }
 
 static void iic_stop( running_machine *machine)
 {
-/*
-	i2cmem_write( machine, 0, I2CMEM_SDA, 0);
-	i2cmem_write( machine, 0, I2CMEM_SCL, 1);
-	i2cmem_write( machine, 0, I2CMEM_SDA, 1);
-	i2cmem_write( machine, 0, I2CMEM_SCL, 0);
-*/
+//	logerror( "IIC stop\n");
+	timer_adjust_oneshot( s3c240x_iic_timer, attotime_never, 0);
+}
+
+static void iic_resume( running_machine *machine)
+{
+//	logerror( "IIC resume\n");
+	timer_adjust_oneshot( s3c240x_iic_timer, ATTOTIME_IN_MSEC( 1), 0);
 }
 
 static READ32_HANDLER( s3c240x_iic_r )
@@ -946,15 +969,14 @@ static WRITE32_HANDLER( s3c240x_iic_w )
 //			tx_clock_source_selection = (data >> 6) & 1;
 //			enable_interrupt = (data >> 5) & 1;
 //			clock = (double)(s3c240x_get_pclk( MPLLCON) / div_table[tx_clock_source_selection] / (transmit_clock_value + 1));
-			interrupt_pending_flag = (data >> 4) & 1;
+			interrupt_pending_flag = BIT( data, 4);
 			if (interrupt_pending_flag == 0)
 			{
 				int start_stop_condition;
-				start_stop_condition = (s3c240x_iic_regs[1] >> 5) & 1;
+				start_stop_condition = BIT( s3c240x_iic_regs[1], 5);
 				if (start_stop_condition != 0)
 				{
-//					logerror( "IIC resume\n");
-					timer_adjust_oneshot( s3c240x_iic_timer, ATTOTIME_IN_MSEC( 10), 0);
+					iic_resume( space->machine);
 				}
 			}
 		}
@@ -962,20 +984,15 @@ static WRITE32_HANDLER( s3c240x_iic_w )
 		// IICSTAT
 		case 0x04 / 4 :
 		{
-			int start_stop_condition, mode_selection;
-			mode_selection = (data >> 6) & 3;
-			start_stop_condition = (data >> 5) & 1;
+			int start_stop_condition;
+			start_stop_condition = BIT( data, 5);
 			if (start_stop_condition != 0)
 			{
-//				logerror( "IIC start (mode %d)\n", mode_selection);
 				iic_start( space->machine);
-				timer_adjust_oneshot( s3c240x_iic_timer, ATTOTIME_IN_MSEC( 10), 0);
 			}
 			else
 			{
-//				logerror( "IIC stop\n");
 				iic_stop( space->machine);
-				timer_adjust_oneshot( s3c240x_iic_timer, attotime_never, 0);
 			}
 		}
 		break;
@@ -985,28 +1002,41 @@ static WRITE32_HANDLER( s3c240x_iic_w )
 static TIMER_CALLBACK( s3c240x_iic_timer_exp )
 {
 	int enable_interrupt, mode_selection;
-//	logerror( "s3c240x_iic_timer_exp\n");
-	mode_selection = (s3c240x_iic_regs[1] >> 6) & 3;
+//	logerror( "IIC timer callback\n");
+	mode_selection = BITS( s3c240x_iic_regs[1], 7, 6);
 	switch (mode_selection)
 	{
 		// master receive mode
 		case 2 :
 		{
-			UINT8 data_shift = iic_read( machine, 0);
-//			logerror( "IIC READ %02X\n", data_shift);
-			s3c240x_iic_regs[3] = (s3c240x_iic_regs[3] & ~0xFF) | data_shift;
+			if (s3c240x_iic_data_index == 0)
+			{
+//				UINT8 data_shift = s3c240x_iic_regs[3] & 0xFF;
+//				logerror( "IIC write %02X\n", data_shift);
+			}
+			else
+			{
+				UINT8 data_shift = eeprom_data[s3c240x_iic_addr];
+//				logerror( "IIC read %02X [%04X]\n", data_shift, s3c240x_iic_addr);
+				s3c240x_iic_regs[3] = (s3c240x_iic_regs[3] & ~0xFF) | data_shift;
+			}
+			s3c240x_iic_data_index++;
 		}
 		break;
 		// master transmit mode
 		case 3 :
 		{
 			UINT8 data_shift = s3c240x_iic_regs[3] & 0xFF;
-//			logerror( "IIC WRITE %02X\n", data_shift);
-			iic_write( machine, data_shift);
+//			logerror( "IIC write %02X\n", data_shift);
+			s3c240x_iic_data[s3c240x_iic_data_index++] = data_shift;
+			if (s3c240x_iic_data_index == 3)
+			{
+				s3c240x_iic_addr = (s3c240x_iic_data[1] << 8) | s3c240x_iic_data[2];
+			}
 		}
 		break;
 	}
-	enable_interrupt = (s3c240x_iic_regs[0] >> 5) & 1;
+	enable_interrupt = BIT( s3c240x_iic_regs[0], 5);
 	if (enable_interrupt)
 	{
 //		logerror( "IIC request irq\n");
@@ -1182,6 +1212,7 @@ static void s3c240x_machine_start(running_machine *machine)
 	s3c240x_pwm_timer[4] = timer_alloc(machine, s3c240x_pwm_timer_exp, (void *)(FPTR)4);
 	s3c240x_iic_timer = timer_alloc(machine, s3c240x_iic_timer_exp, (void *)(FPTR)0);
 	s3c240x_iis_timer = timer_alloc(machine, s3c240x_iis_timer_exp, (void *)(FPTR)0);
+	eeprom_data = auto_alloc_array( machine, UINT8, 0x2000);
 	smc_init( machine);
 	i2s_init( machine);
 }
@@ -1190,6 +1221,28 @@ static void s3c240x_machine_reset(running_machine *machine)
 {
 	smc_reset( machine);
 	i2s_reset( machine);
+}
+
+static NVRAM_HANDLER( gp32 )
+{
+	if (read_or_write)
+	{
+		if (file)
+		{
+			mame_fwrite( file, eeprom_data, 0x2000);
+		}
+	}
+	else
+	{
+		if (file)
+		{
+			mame_fread( file, eeprom_data, 0x2000);
+		}
+		else
+		{
+			memset( eeprom_data, 0, 0x2000);
+		}
+	}
 }
 
 static ADDRESS_MAP_START( gp32_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -1266,6 +1319,8 @@ static MACHINE_DRIVER_START( gp32 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ADD("dac2", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	MDRV_NVRAM_HANDLER(gp32)
 
 	MDRV_SMARTMEDIA_ADD("smartmedia")
 MACHINE_DRIVER_END
