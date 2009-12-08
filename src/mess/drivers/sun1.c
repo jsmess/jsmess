@@ -65,7 +65,7 @@ static GENERIC_TERMINAL_INTERFACE( sun1_terminal_intf )
 
 static MACHINE_DRIVER_START( sun1 )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", M68000, XTAL_8MHz)
+    MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
     MDRV_CPU_PROGRAM_MAP(sun1_mem)    
 
     MDRV_MACHINE_RESET(sun1)
