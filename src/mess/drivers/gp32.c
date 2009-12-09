@@ -20,7 +20,9 @@
 #include "cpu/arm7/arm7core.h"
 #include "machine/smartmed.h"
 #include "includes/gp32.h"
-#include "sound/dmadac.h"
+#include "sound/dac.h"
+
+#define CLOCK_MULTIPLIER 1
 
 #define BIT(x,n) (((x)>>(n))&1)
 #define BITS(x,m,n) (((x)>>(n))&((1<<((m)-(n)+1))-1))
@@ -200,7 +202,7 @@ static WRITE32_HANDLER( s3c240x_clkpow_w )
 		// MPLLCON
 		case 0x04 / 4 :
 		{
-			cputag_set_clock( space->machine, "maincpu", s3c240x_get_fclk( MPLLCON));
+			cputag_set_clock( space->machine, "maincpu", s3c240x_get_fclk( MPLLCON) * CLOCK_MULTIPLIER);
 		}
 		break;
 	}
@@ -417,33 +419,109 @@ static TIMER_CALLBACK( s3c240x_pwm_timer_exp )
 
 // DMA
 
+static emu_timer *s3c240x_dma_timer[4];
 static UINT32 s3c240x_dma_regs[0x7c/4];
+
+static void s3c240x_dma_trigger( running_machine *machine, int dma)
+{
+	UINT32 *regs = &s3c240x_dma_regs[dma<<3];
+	UINT32 curr_tc, curr_src, curr_dst;
+  const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	int dsz, inc;
+	static UINT32 ch_int[] = { INT_DMA0, INT_DMA1, INT_DMA2, INT_DMA3};
+//	logerror( "DMA %d trigger\n", dma);
+	curr_tc = BITS( regs[3], 19, 0);
+	curr_src = BITS( regs[4], 28, 0);
+	curr_dst = BITS( regs[5], 28, 0);
+	dsz = BITS( regs[2], 21, 20);
+//	logerror( "DMA %d - curr_src %08X curr_dst %08X curr_tc %04X dsz %d\n", dma, curr_src, curr_dst, curr_tc, dsz);
+	switch (dsz)
+	{
+		case 0 : memory_write_byte( space, curr_dst, memory_read_byte( space, curr_src)); break;
+		case 1 : memory_write_word( space, curr_dst, memory_read_word( space, curr_src)); break;
+		case 2 : memory_write_dword( space, curr_dst, memory_read_dword( space, curr_src)); break;
+	}
+	// update curr_src
+	inc = BIT( regs[0], 29);
+	if (!inc)
+	{
+		curr_src += (1 << dsz);
+		regs[4] = (regs[4] & ~0x1FFFFFFF) | curr_src;
+	}
+	// update curr_dst
+	inc = BIT( regs[1], 29);
+	if (!inc)
+	{
+		curr_dst += (1 << dsz);
+		regs[5] = (regs[5] & ~0x1FFFFFFF) | curr_dst;
+	}
+	// update curr_tc
+	curr_tc--;
+	regs[3] = (regs[3] & ~0x000FFFFF) | curr_tc;
+	// ...
+	if (curr_tc == 0)
+	{
+		int _int, reload;
+		reload = BIT( regs[2], 22);
+		if (!reload)
+		{
+			regs[3] = (regs[3] & ~0x000FFFFF) | BITS( regs[2], 19, 0);
+			regs[4] = (regs[4] & ~0x1FFFFFFF) | BITS( regs[0], 28, 0);
+			regs[5] = (regs[5] & ~0x1FFFFFFF) | BITS( regs[1], 28, 0);
+		}
+		else
+		{
+			regs[6] &= ~(1 << 1); // clear on/off
+		}
+		_int = BIT( regs[2], 28);
+		if (_int)
+		{
+//			logerror( "DMA %d request irq\n", dma);
+			s3c240x_request_irq( machine, ch_int[dma]);
+		}
+	}
+}
 
 static void s3c240x_dma_start( running_machine *machine, int dma)
 {
-	const address_space *space = cpu_get_address_space( cputag_get_cpu( machine, "maincpu"), ADDRESS_SPACE_PROGRAM);
-	UINT32 addr_src, addr_dst, dsz, tsz, tc, reg;
-	int i, inc_src, inc_dst;
-	reg = dma << 3;
-	inc_src = (s3c240x_dma_regs[reg+0] >> 29) & 1;
-	addr_src = s3c240x_dma_regs[reg+0] & 0x1FFFFFFF;
-	inc_dst = (s3c240x_dma_regs[reg+1] >> 29) & 1;
-	addr_dst = s3c240x_dma_regs[reg+1] & 0x1FFFFFFF;
-	tsz = (s3c240x_dma_regs[reg+2] >> 27) & 1;
-	dsz = (s3c240x_dma_regs[reg+2] >> 20) & 3;
-	tc = (s3c240x_dma_regs[reg+2] >> 0) & 0x000FFFFF;
-//	logerror( "DMA %d - addr_src %08X inc_src %d addr_dst %08X inc_dst %d tsz %d dsz %d tc %d\n", dma, addr_src, inc_src, addr_dst, inc_dst, tsz, dsz, tc);
+	UINT32 addr_src, addr_dst, tc;
+	UINT32 *regs = &s3c240x_dma_regs[dma<<3];
+//	UINT32 dsz, tsz, reload;
+//	int inc_src, inc_dst, _int, servmode, swhw_sel, hwsrcsel;
+//	logerror( "DMA %d start\n", dma);
+	addr_src = BITS( regs[0], 28, 0);
+	addr_dst = BITS( regs[1], 28, 0);
+	tc = BITS( regs[2], 19, 0);
+//	inc_src = BIT( regs[0], 29);
+//	inc_dst = BIT( regs[1], 29);
+//	tsz = BIT( regs[2], 27);
+//	_int = BIT( regs[2], 28);
+//	servmode = BIT( regs[2], 26);
+//	hwsrcsel = BITS( regs[2], 25, 24);
+//	swhw_sel = BIT( regs[2], 23);
+//	reload = BIT( regs[2], 22);
+//	dsz = BITS( regs[2], 21, 20);
+//	logerror( "DMA %d - addr_src %08X inc_src %d addr_dst %08X inc_dst %d int %d tsz %d servmode %d hwsrcsel %d swhw_sel %d reload %d dsz %d tc %d\n", dma, addr_src, inc_src, addr_dst, inc_dst, _int, tsz, servmode, hwsrcsel, swhw_sel, reload, dsz, tc);
 //	logerror( "DMA %d - copy %08X bytes from %08X (%s) to %08X (%s)\n", dma, tc << dsz, addr_src, inc_src ? "fix" : "inc", addr_dst, inc_dst ? "fix" : "inc");
-	for (i=0;i<tc;i++)
+	regs[3] = (regs[3] & ~0x000FFFFF) | tc;
+	regs[4] = (regs[4] & ~0x1FFFFFFF) | addr_src;
+	regs[5] = (regs[5] & ~0x1FFFFFFF) | addr_dst;
+}
+
+static void s3c240x_dma_stop( running_machine *machine, int dma)
+{
+//	logerror( "DMA %d stop\n", dma);
+}
+
+static void s3c240x_dma_recalc( running_machine *machine, int dma)
+{
+	if (s3c240x_dma_regs[(dma<<3)+6] & 2)
 	{
-		switch (dsz)
-		{
-			case 0 : memory_write_byte( space, addr_dst, memory_read_byte( space, addr_src)); break;
-			case 1 : memory_write_word( space, addr_dst, memory_read_word( space, addr_src)); break;
-			case 2 : memory_write_dword( space, addr_dst, memory_read_dword( space, addr_src)); break;
-		}
-		if (!inc_src) addr_src += (1 << dsz);
-		if (!inc_dst) addr_dst += (1 << dsz);
+		s3c240x_dma_start( machine, dma);
+	}
+	else
+	{
+		s3c240x_dma_stop( machine, dma);
 	}
 }
 
@@ -456,35 +534,78 @@ static READ32_HANDLER( s3c240x_dma_r )
 
 static WRITE32_HANDLER( s3c240x_dma_w )
 {
+	UINT32 old_value = s3c240x_dma_regs[offset];
 //	logerror( "(DMA) %08X <- %08X (PC %08X)\n", 0x14600000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_dma_regs[offset]);
 	switch (offset)
 	{
+		// DCON0
+		case 0x08 / 4 :
+		{
+			if (((data >> 22) & 1) != 0) // reload
+			{
+				s3c240x_dma_regs[0x18/4] &= ~(1 << 1); // clear on/off
+			}
+		}
+		break;
 		// DMASKTRIG0
 		case 0x18 / 4 :
 		{
-			if (data & 2) s3c240x_dma_start( space->machine, 0);
+			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc( space->machine, 0);
+		}
+		break;
+		// DCON1
+		case 0x28 / 4 :
+		{
+			if (((data >> 22) & 1) != 0) // reload
+			{
+				s3c240x_dma_regs[0x38/4] &= ~(1 << 1); // clear on/off
+			}
 		}
 		break;
 		// DMASKTRIG1
 		case 0x38 / 4 :
 		{
-			if (data & 2) s3c240x_dma_start( space->machine, 1);
+			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc( space->machine, 1);
+		}
+		break;
+		// DCON2
+		case 0x48 / 4 :
+		{
+			if (((data >> 22) & 1) != 0) // reload
+			{
+				s3c240x_dma_regs[0x58/4] &= ~(1 << 1); // clear on/off
+			}
 		}
 		break;
 		// DMASKTRIG2
 		case 0x58 / 4 :
 		{
-			if (data & 2) s3c240x_dma_start( space->machine, 2);
+			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc( space->machine, 2);
+		}
+		break;
+		// DCON3
+		case 0x68 / 4 :
+		{
+			if (((data >> 22) & 1) != 0) // reload
+			{
+				s3c240x_dma_regs[0x78/4] &= ~(1 << 1); // clear on/off
+			}
 		}
 		break;
 		// DMASKTRIG3
 		case 0x78 / 4 :
 		{
-			if (data & 2) s3c240x_dma_start( space->machine, 3);
+			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc( space->machine, 3);
 		}
 		break;
 	}
+}
+
+static TIMER_CALLBACK( s3c240x_dma_timer_exp )
+{
+//	int ch = param;
+//	logerror( "DMA %d timer callback\n", ch);
 }
 
 // SMARTMEDIA
@@ -736,6 +857,15 @@ static WRITE32_HANDLER( s3c240x_gpio_w )
 			i2s_write( space->machine, I2S_L3C, (data & 0x00000200) ? 1 : 0);
 		}
 		break;
+/*
+		// PGDAT
+		case 0x48 / 4 :
+		{
+			int i2ssdo;
+			i2ssdo = BIT( data, 3);
+		}
+		break;
+*/
 	}
 }
 
@@ -1048,13 +1178,12 @@ static TIMER_CALLBACK( s3c240x_iic_timer_exp )
 
 static emu_timer *s3c240x_iis_timer;
 static UINT32 s3c240x_iis_regs[0x14/4];
-static INT16 s3c240x_iis_fifo[16/2];
-static INT16 s3c240x_iis_fifo_index = 0;
+static UINT16 s3c240x_iis_fifo[16/2];
+static int s3c240x_iis_fifo_index = 0;
 
 static void s3c240x_iis_start( running_machine *machine)
 {
 	const UINT32 codeclk_table[] = { 256, 384};
-	const device_config *dmadac[2];
 	double freq;
 	int prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk;
 //	logerror( "IIS start\n");
@@ -1064,21 +1193,13 @@ static void s3c240x_iis_start( running_machine *machine)
 	codeclk = BIT( s3c240x_iis_regs[1], 2);
 	freq = (double)(s3c240x_get_pclk( MPLLCON) / (prescaler_control_a + 1) / codeclk_table[codeclk]) * 2; // why do I have to multiply by two?
 //	logerror( "IIS - pclk %d psc_enable %d psc_a %d psc_b %d codeclk %d freq %f\n", s3c240x_get_pclk( MPLLCON), prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk_table[codeclk], freq);
-	dmadac[0] = devtag_get_device( machine, "dac1");
-	dmadac[1] = devtag_get_device( machine, "dac2");
-	dmadac_set_frequency( &dmadac[0], 2, freq);
-	dmadac_enable( &dmadac[0], 2, 1);
 	timer_adjust_periodic( s3c240x_iis_timer, ATTOTIME_IN_HZ( freq), 0, ATTOTIME_IN_HZ( freq));
 }
 
 static void s3c240x_iis_stop( running_machine *machine)
 {
-	const device_config *dmadac[2];
 //	logerror( "IIS stop\n");
 	timer_adjust_oneshot( s3c240x_iis_timer, attotime_never, 0);
-	dmadac[0] = devtag_get_device( machine, "dac1");
-	dmadac[1] = devtag_get_device( machine, "dac2");
-	dmadac_enable( &dmadac[0], 2, 0);
 }
 
 static void s3c240x_iis_recalc( running_machine *machine)
@@ -1126,11 +1247,12 @@ static WRITE32_HANDLER( s3c240x_iis_w )
 			}
 			if (s3c240x_iis_fifo_index == 2)
 			{
-				const device_config *dmadac[2];
-				dmadac[0] = devtag_get_device( space->machine, "dac1");
-				dmadac[1] = devtag_get_device( space->machine, "dac2");
+				const device_config *dac[2];
+				dac[0] = devtag_get_device( space->machine, "dac1");
+				dac[1] = devtag_get_device( space->machine, "dac2");
 				s3c240x_iis_fifo_index = 0;
-    		dmadac_transfer( &dmadac[0], 2, 1, 1, 1, s3c240x_iis_fifo);
+    		dac_signed_data_16_w( dac[0], s3c240x_iis_fifo[0] + 0x8000);
+    		dac_signed_data_16_w( dac[1], s3c240x_iis_fifo[1] + 0x8000);
 			}
 		}
 		break;
@@ -1139,7 +1261,23 @@ static WRITE32_HANDLER( s3c240x_iis_w )
 
 static TIMER_CALLBACK( s3c240x_iis_timer_exp )
 {
+	UINT32 dcon;
+	int hwsrcsel, swhwsel;
 //	logerror( "IIS timer callback\n");
+	dcon = s3c240x_dma_regs[0x48/4];
+	hwsrcsel = BITS( dcon, 25, 24);
+	swhwsel = BIT( dcon, 23);
+	if ((swhwsel == 1) && (hwsrcsel == 0))
+	{
+		UINT32 dmasktrig;
+		int on_off;
+		dmasktrig = s3c240x_dma_regs[0x58/4];
+		on_off = BIT( dmasktrig, 1);
+		if (on_off)
+		{
+			s3c240x_dma_trigger( machine, 2);
+		}
+	}
 }
 
 // RTC
@@ -1210,6 +1348,10 @@ static void s3c240x_machine_start(running_machine *machine)
 	s3c240x_pwm_timer[2] = timer_alloc(machine, s3c240x_pwm_timer_exp, (void *)(FPTR)2);
 	s3c240x_pwm_timer[3] = timer_alloc(machine, s3c240x_pwm_timer_exp, (void *)(FPTR)3);
 	s3c240x_pwm_timer[4] = timer_alloc(machine, s3c240x_pwm_timer_exp, (void *)(FPTR)4);
+	s3c240x_dma_timer[0] = timer_alloc( machine, s3c240x_dma_timer_exp, (void *)(FPTR)0);
+	s3c240x_dma_timer[1] = timer_alloc( machine, s3c240x_dma_timer_exp, (void *)(FPTR)1);
+	s3c240x_dma_timer[2] = timer_alloc( machine, s3c240x_dma_timer_exp, (void *)(FPTR)2);
+	s3c240x_dma_timer[3] = timer_alloc( machine, s3c240x_dma_timer_exp, (void *)(FPTR)3);
 	s3c240x_iic_timer = timer_alloc(machine, s3c240x_iic_timer_exp, (void *)(FPTR)0);
 	s3c240x_iis_timer = timer_alloc(machine, s3c240x_iis_timer_exp, (void *)(FPTR)0);
 	eeprom_data = auto_alloc_array( machine, UINT8, 0x2000);
@@ -1315,9 +1457,9 @@ static MACHINE_DRIVER_START( gp32 )
 	MDRV_MACHINE_RESET(gp32)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("dac1", DMADAC, 0)
+	MDRV_SOUND_ADD("dac1", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ADD("dac2", DMADAC, 0)
+	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MDRV_NVRAM_HANDLER(gp32)
