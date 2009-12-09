@@ -27,8 +27,13 @@
 #define BIT(x,n) (((x)>>(n))&1)
 #define BITS(x,m,n) (((x)>>(n))&((1<<((m)-(n)+1))-1))
 
+#define MPLLCON  1
+#define UPLLCON  2
+
 static UINT32 *s3c240x_ram;
 static UINT8 *eeprom_data;
+
+static UINT32 s3c240x_get_hclk( int reg);
 
 // LCD CONTROLLER
 
@@ -92,9 +97,9 @@ static VIDEO_UPDATE( gp32 )
 						UINT16 data;
 						UINT8 r, g, b;
 						data = *vram++;
-						r = ((data >> 11) & 0x1F) << 3;
-						g = ((data >>  6) & 0x1F) << 3;
-						b = ((data >>  1) & 0x1F) << 3;
+						r = BITS( data, 15, 11) << 3;
+						g = BITS( data, 10,  6) << 3;
+						b = BITS( data,  5,  1) << 3;
 						*scanline++ = MAKE_RGB( r, g, b);
 					}
 				}
@@ -127,37 +132,93 @@ static READ32_HANDLER( s3c240x_vidregs_r )
 	return data;
 }
 
+static void s3c240x_lcd_start( running_machine *machine)
+{
+	UINT32 vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk;
+	double framerate;
+	rectangle visarea;
+//	logerror( "LCD start\n");
+	vspw = BITS( s3c240x_vidregs[1], 5, 0);
+	vbpd = BITS( s3c240x_vidregs[1], 31, 24);
+	lineval = BITS( s3c240x_vidregs[1], 23, 14);
+	vfpd = BITS( s3c240x_vidregs[1], 13, 6);
+	hspw = BITS( s3c240x_vidregs[3], 7, 0);
+	hbpd = BITS( s3c240x_vidregs[2], 25, 19);
+	hfpd = BITS( s3c240x_vidregs[2], 7, 0);
+	hozval = BITS( s3c240x_vidregs[2], 18, 8);
+	clkval = BITS( s3c240x_vidregs[0], 17, 8);
+	hclk = s3c240x_get_hclk( MPLLCON);
+//	logerror( "LCD - vspw %d vbpd %d lineval %d vfpd %d hspw %d hbpd %d hfpd %d hozval %d clkval %d hclk %d\n", vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk);
+	framerate = 1 / (((vspw + 1) + (vbpd + 1) + (lineval + 1) + (vfpd + 1)) * ((hspw + 1) + (hbpd + 1) + (hfpd + 1) + (hozval + 1)) * (2 * (clkval + 1) / (double)hclk));
+//	logerror( "LCD - framerate %f\n", framerate);
+	visarea.min_x = 0;
+	visarea.min_y = 0;
+	visarea.max_x = hozval;
+	visarea.max_y = lineval;
+	video_screen_configure( machine->primary_screen, hozval + 1, lineval + 1, &visarea, HZ_TO_ATTOSECONDS( framerate));
+}
+
+static void s3c240x_lcd_stop( running_machine *machine)
+{
+//	logerror( "LCD stop\n");
+}
+
+static void s3c240x_lcd_recalc( running_machine *machine)
+{
+	if (s3c240x_vidregs[0] & 1)
+	{
+		s3c240x_lcd_start( machine);
+	}
+	else
+	{
+		s3c240x_lcd_stop( machine);
+	}
+}
+
 static WRITE32_HANDLER( s3c240x_vidregs_w )
 {
+	UINT32 old_value = s3c240x_vidregs[offset];
 //	logerror( "(LCD) %08X <- %08X (PC %08X)\n", 0x14A00000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_vidregs[offset]);
+	switch (offset)
+	{
+		// LCDCON1
+		case 0x00 / 4 :
+		{
+			if ((old_value & 1) != (data & 1))
+			{
+				s3c240x_lcd_recalc( space->machine);
+			}
+		}
+		break;
+	}
 }
 
 static READ32_HANDLER( s3c240x_palette_r )
 {
-	return s3c240x_palette[offset];
+	UINT32 data = s3c240x_palette[offset];
+//	logerror( "(LCD) %08X -> %08X (PC %08X)\n", 0x14A00400 + (offset << 2), data, cpu_get_pc( space->cpu));
+	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_palette_w )
 {
 	UINT8 r, g, b;
+//	logerror( "(LCD) %08X <- %08X (PC %08X)\n", 0x14A00400 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_palette[offset]);
 	if (mem_mask != 0xffffffff)
 	{
 		logerror( "s3c240x_palette_w: unknown mask %08x\n", mem_mask);
 	}
-	r = ((data >> 11) & 0x1F) << 3;
-	g = ((data >>  6) & 0x1F) << 3;
-	b = ((data >>  1) & 0x1F) << 3;
+	r = BITS( data, 15, 11) << 3;
+	g = BITS( data, 10,  6) << 3;
+	b = BITS( data,  5,  1) << 3;
 	palette_set_color_rgb( space->machine, offset, r, g, b);
 }
 
 // CLOCK & POWER MANAGEMENT
 
 static UINT32 s3c240x_clkpow_regs[0x18/4];
-
-#define MPLLCON  1
-#define UPLLCON  2
 
 static UINT32 s3c240x_get_fclk( int reg)
 {
@@ -169,7 +230,6 @@ static UINT32 s3c240x_get_fclk( int reg)
 	return (UINT32)((double)((mdiv + 8) * 12000000) / (double)((pdiv + 2) * (1 << sdiv)));
 }
 
-/*
 static UINT32 s3c240x_get_hclk( int reg)
 {
 	switch (s3c240x_clkpow_regs[5] & 0x3) // CLKDIVN
@@ -181,7 +241,6 @@ static UINT32 s3c240x_get_hclk( int reg)
 	}
 	return 0;
 }
-*/
 
 static UINT32 s3c240x_get_pclk( int reg)
 {
@@ -1246,11 +1305,11 @@ static WRITE32_HANDLER( s3c240x_iis_w )
 		{
 			if (ACCESSING_BITS_16_31)
 			{
-				s3c240x_iis_fifo[s3c240x_iis_fifo_index++] = (data >> 16) & 0xFFFF;
+				s3c240x_iis_fifo[s3c240x_iis_fifo_index++] = BITS( data, 31, 16);
 			}
 			if (ACCESSING_BITS_0_15)
 			{
-				s3c240x_iis_fifo[s3c240x_iis_fifo_index++] = data & 0xFFFF;
+				s3c240x_iis_fifo[s3c240x_iis_fifo_index++] = BITS( data, 15, 0);
 			}
 			if (s3c240x_iis_fifo_index == 2)
 			{
