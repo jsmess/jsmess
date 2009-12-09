@@ -1550,5 +1550,6 @@ const game_driver * const drivers[] =
 	DRIVER( indiana )
 	DRIVER( vector4 )
 	DRIVER( unistar )
+	DRIVER( dual68 )
 	
 #endif /* DRIVER_RECURSIVE */

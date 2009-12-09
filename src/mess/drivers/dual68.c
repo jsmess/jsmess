@@ -1,0 +1,93 @@
+/***************************************************************************
+
+        Dual Systems 68000
+
+        09/12/2009 Skeleton driver.
+
+****************************************************************************/
+
+#include "driver.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/i8085/i8085.h"
+#include "machine/terminal.h"
+
+static UINT16* dual68_ram;
+
+static WRITE16_HANDLER(dual68_terminal_w)
+{
+	const device_config	*devconf = devtag_get_device(space->machine, "terminal");
+	terminal_write(devconf,0,data >> 8);
+}
+
+static ADDRESS_MAP_START(dual68_mem, ADDRESS_SPACE_PROGRAM, 16)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM AM_BASE(&dual68_ram)
+	AM_RANGE(0x00080000, 0x00081fff) AM_ROM AM_REGION("user1",0)
+	AM_RANGE(0x007f0000, 0x007f0001) AM_WRITE(dual68_terminal_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(sio4_mem, ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x07ff) AM_ROM
+	AM_RANGE(0x0800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sio4_io , ADDRESS_SPACE_IO, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+ADDRESS_MAP_END
+
+/* Input ports */
+INPUT_PORTS_START( dual68 )
+	PORT_INCLUDE(generic_terminal)
+INPUT_PORTS_END
+
+
+static MACHINE_RESET(dual68)
+{
+	UINT8* user1 = memory_region(machine, "user1");
+
+	memcpy((UINT8*)dual68_ram,user1,0x2000);
+
+	device_reset(cputag_get_cpu(machine, "maincpu"));
+}
+
+static WRITE8_DEVICE_HANDLER( dual68_kbd_put )
+{
+
+}
+
+static GENERIC_TERMINAL_INTERFACE( dual68_terminal_intf )
+{
+	DEVCB_HANDLER(dual68_kbd_put)
+};
+
+static MACHINE_DRIVER_START( dual68 )
+    /* basic machine hardware */
+    MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz / 2)
+    MDRV_CPU_PROGRAM_MAP(dual68_mem)
+
+	MDRV_CPU_ADD("siocpu", 8085A, XTAL_16MHz / 8)
+    MDRV_CPU_PROGRAM_MAP(sio4_mem)
+    MDRV_CPU_IO_MAP(sio4_io)
+
+    MDRV_MACHINE_RESET(dual68)
+
+    /* video hardware */
+    MDRV_IMPORT_FROM( generic_terminal )
+	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dual68_terminal_intf)
+MACHINE_DRIVER_END
+
+/* ROM definition */
+ROM_START( dual68 )
+    ROM_REGION( 0x2000, "user1", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "dual_cpu68000_1.bin", 0x0001, 0x1000, CRC(d1785c08) SHA1(73c1f68875f1d8eb5e92f4347f509c61103da90f))
+	ROM_LOAD16_BYTE( "dual_cpu68000_2.bin", 0x0000, 0x1000, CRC(b9f1ba3c) SHA1(8fd02936ad06d5a22d435d96f06e2442fc7d00ec))
+	ROM_REGION( 0x10000, "siocpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "dual_sio4.bin", 0x0000, 0x0800, CRC(6b0a1965) SHA1(5d2dc6c6a315293ded4b9fc95c8ac1599bf31dd3))
+ROM_END
+
+/* Driver */
+
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY                        FULLNAME       FLAGS */
+COMP( 1981, dual68,  0,       0, 	dual68, 	dual68, 	 0,  0,  	 "Dual Systems Corporation",   "Dual Systems 68000",		GAME_NOT_WORKING)
+
