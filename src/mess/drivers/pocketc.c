@@ -82,9 +82,14 @@
 
 static ADDRESS_MAP_START( pc1401_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x2000, 0x47ff) AM_READ( SMH_RAM )
-/*  { 0x2000, 0x3fff, SMH_RAM }, // done in pc1401_machine_init */
-/*  { 0x5000, 0x57ff, ? }, */
+	AM_RANGE( 0x3800, 0x47ff) AM_RAM
+	AM_RANGE( 0x6000, 0x67ff) AM_READWRITE( pc1401_lcd_read, pc1401_lcd_write ) AM_MIRROR(0x1000)
+	AM_RANGE( 0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pc1402_mem , ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE( 0x0000, 0x1fff) AM_ROM
+	AM_RANGE( 0x2000, 0x47ff) AM_RAM
 	AM_RANGE( 0x6000, 0x67ff) AM_READWRITE( pc1401_lcd_read, pc1401_lcd_write ) AM_MIRROR(0x1000)
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -141,6 +146,14 @@ static ADDRESS_MAP_START( pc1403_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( pc1403h_mem , ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE( 0x0000, 0x1fff) AM_ROM
+	AM_RANGE( 0x3000, 0x30bf) AM_READWRITE( pc1403_lcd_read, pc1403_lcd_write )
+	AM_RANGE( 0x3800, 0x3fff) AM_READWRITE( pc1403_asic_read, pc1403_asic_write )
+	AM_RANGE( 0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE( 0x8000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
 
 #if 0
 static ADDRESS_MAP_START( pc1421_readmem , ADDRESS_SPACE_PROGRAM, 8)
@@ -160,6 +173,7 @@ ADDRESS_MAP_END
 
 /* 2008-05 FP: the following input ports are based on the way ports are read, but I would like
    to have confirmation from technical docs before considering these correct.
+	If they need to be changed, you must also update the clickable artwork.
 */
 
 static INPUT_PORTS_START( pc1401 )
@@ -280,11 +294,7 @@ static INPUT_PORTS_START( pc1401 )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
 	PORT_START("DSW0")
-    PORT_DIPNAME( 0xc0, 0x40, "RAM")
-	PORT_DIPSETTING(	0x00, "2KB" )
-	PORT_DIPSETTING(	0x40, "PC1401 (4KB)" )
-	PORT_DIPSETTING(	0x80, "PC1402 (10KB)" )
-    PORT_DIPNAME( 0x07, 0x02, "Contrast")
+	PORT_DIPNAME( 0x07, 0x01, "Contrast")
 	PORT_DIPSETTING(	0x00, "0/Low" )
 	PORT_DIPSETTING(	0x01, "1" )
 	PORT_DIPSETTING(	0x02, "2" )
@@ -293,16 +303,6 @@ static INPUT_PORTS_START( pc1401 )
 	PORT_DIPSETTING(	0x05, "5" )
 	PORT_DIPSETTING(	0x06, "6" )
 	PORT_DIPSETTING(	0x07, "7/High" )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( pc1402 )
-	PORT_INCLUDE( pc1401 )
-
-	PORT_MODIFY("DSW0")
-    PORT_DIPNAME( 0xc0, 0x80, "RAM")
-	PORT_DIPSETTING(	0x00, "2KB" )
-	PORT_DIPSETTING(	0x40, "PC1401 (4KB)" )
-	PORT_DIPSETTING(	0x80, "PC1402 (10KB)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc1403 )
@@ -430,11 +430,8 @@ static INPUT_PORTS_START( pc1403 )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F3)
 
 	PORT_START("DSW0")
-    PORT_DIPNAME( 0x80, 0x00, "RAM")
-	PORT_DIPSETTING(	0x00, "PC1403 (8KB)" )
-	PORT_DIPSETTING(	0x80, "PC1403H (32KB)" )
     // normally no contrast control!
-    PORT_DIPNAME( 0x07, 0x02, "Contrast")
+	PORT_DIPNAME( 0x07, 0x01, "Contrast")
 	PORT_DIPSETTING(	0x00, "0/Low" )
 	PORT_DIPSETTING(	0x01, "1" )
 	PORT_DIPSETTING(	0x02, "2" )
@@ -449,7 +446,7 @@ static INPUT_PORTS_START( pc1403h )
 	PORT_INCLUDE( pc1403 )
 
 	PORT_MODIFY("DSW0")
-    PORT_DIPNAME( 0x80, 0x80, "RAM")
+	PORT_DIPNAME( 0x80, 0x80, "RAM")
 	PORT_DIPSETTING(	0x00, "PC1403 (8KB)" )
 	PORT_DIPSETTING(	0x80, "PC1403H (32KB)" )
 INPUT_PORTS_END
@@ -539,14 +536,14 @@ static INPUT_PORTS_START( pc1251 )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F3)
 
 	PORT_START("MODE")
-    PORT_DIPNAME( 0x07, 0x00, "Mode")
+	PORT_DIPNAME( 0x07, 0x00, "Mode")
 	PORT_DIPSETTING(	0x04, DEF_STR(Off) )
 	PORT_DIPSETTING(	0x00, "On/RUN" )
 	PORT_DIPSETTING(	0x02, "On/PRO" )
 	PORT_DIPSETTING(	0x01, "On/RSV" )
 
 	PORT_START("DSW0")
-    PORT_DIPNAME( 0x07, 0x02, "Contrast")
+	PORT_DIPNAME( 0x07, 0x01, "Contrast")
 	PORT_DIPSETTING(	0x00, "0/Low" )
 	PORT_DIPSETTING(	0x01, "1" )
 	PORT_DIPSETTING(	0x02, "2" )
@@ -648,7 +645,7 @@ static INPUT_PORTS_START( pc1350 )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P     Alpha") PORT_CODE(KEYCODE_P)
 
 	PORT_START("KEY11")
-    PORT_DIPNAME( 0xc0, 0x00, "Power")
+	PORT_DIPNAME( 0xc0, 0x00, "Power")
 	PORT_DIPSETTING(	0xc0, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
@@ -657,7 +654,7 @@ static INPUT_PORTS_START( pc1350 )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) // temporarily here, but not read...
 
 	PORT_START("DSW0")
-    PORT_DIPNAME( 0x07, 0x02, "Contrast")
+	PORT_DIPNAME( 0x07, 0x07, "Contrast")
 	PORT_DIPSETTING(	0x00, "0/Low" )
 	PORT_DIPSETTING(	0x01, "1" )
 	PORT_DIPSETTING(	0x02, "2" )
@@ -721,10 +718,10 @@ GFXDECODE_END
 
 static const sc61860_cpu_core config =
 {
-    pc1401_reset, pc1401_brk, NULL,
-    pc1401_ina, pc1401_outa,
-    pc1401_inb, pc1401_outb,
-    pc1401_outc
+	pc1401_reset, pc1401_brk, NULL,
+	pc1401_ina, pc1401_outa,
+	pc1401_inb, pc1401_outb,
+	pc1401_outc
 };
 
 static MACHINE_DRIVER_START( pc1401 )
@@ -741,8 +738,8 @@ static MACHINE_DRIVER_START( pc1401 )
        aim: show sharp with keyboard
        resolution depends on the dots of the lcd
        (lcd dot displayed as 2x3 pixel)
-       it seams to have 3/4 ratio in the real pc1401 */
-    /* video hardware */
+       it seems to have 3/4 ratio in the real pc1401 */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", LCD)
 	MDRV_SCREEN_REFRESH_RATE(20)	/* very early and slow lcd */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -762,6 +759,11 @@ static MACHINE_DRIVER_START( pc1401 )
 	/*MDRV_SOUND_ADD("dac", DAC, pocketc_sound_interface)*/
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( pc1402 )
+	MDRV_IMPORT_FROM( pc1401)
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_PROGRAM_MAP( pc1402_mem)
+MACHINE_DRIVER_END
 
 static const sc61860_cpu_core pc1251_config =
 {
@@ -902,6 +904,12 @@ static MACHINE_DRIVER_START( pc1403 )
 	MDRV_VIDEO_UPDATE( pc1403 )
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( pc1403h )
+	MDRV_IMPORT_FROM( pc1403)
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_PROGRAM_MAP( pc1403h_mem)
+MACHINE_DRIVER_END
+
 
 ROM_START(pc1401)
 	ROM_REGION(0x10000,"maincpu",0)
@@ -954,12 +962,12 @@ ROM_END
 
 ROM_START(pc1403)
 	ROM_REGION(0x10000,"maincpu",0)
-    ROM_LOAD("introm.bin", 0x0000, 0x2000, CRC(588c500b) SHA1(2fed9ebede27e20a8ee4b4b03b9f8cd7808ada5c))
+	ROM_LOAD("introm.bin", 0x0000, 0x2000, CRC(588c500b) SHA1(2fed9ebede27e20a8ee4b4b03b9f8cd7808ada5c))
 	ROM_REGION(0x10000,"user1",0)
-    ROM_LOAD("extrom08.bin", 0x0000, 0x4000, CRC(1fa65140) SHA1(f22a9f114486f69733fc43dfec26fb210643aeff))
-    ROM_LOAD("extrom09.bin", 0x4000, 0x4000, CRC(4a7da6ab) SHA1(b50fe8a4ca821244c119147b3ff04cee0fd6ad5c))
-    ROM_LOAD("extrom0a.bin", 0x8000, 0x4000, CRC(9925174f) SHA1(793a79142cd170ed7ac3f7ecb1b6e6f92c8fa4e0))
-    ROM_LOAD("extrom0b.bin", 0xc000, 0x4000, CRC(fa5df9ec) SHA1(6ff62c215f510a3a652d61823f54cd4018d6a771))
+	ROM_LOAD("extrom08.bin", 0x0000, 0x4000, CRC(1fa65140) SHA1(f22a9f114486f69733fc43dfec26fb210643aeff))
+	ROM_LOAD("extrom09.bin", 0x4000, 0x4000, CRC(4a7da6ab) SHA1(b50fe8a4ca821244c119147b3ff04cee0fd6ad5c))
+	ROM_LOAD("extrom0a.bin", 0x8000, 0x4000, CRC(9925174f) SHA1(793a79142cd170ed7ac3f7ecb1b6e6f92c8fa4e0))
+	ROM_LOAD("extrom0b.bin", 0xc000, 0x4000, CRC(fa5df9ec) SHA1(6ff62c215f510a3a652d61823f54cd4018d6a771))
 	ROM_REGION(0x100,"gfx1",ROMREGION_ERASEFF)
 ROM_END
 
@@ -984,23 +992,23 @@ ROM_END
    pc1600
 */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG      COMPANY     FULLNAME */
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE INPUT   INIT    CONFIG      COMPANY     FULLNAME */
 /* cpu sc61860 */
-COMP( 1982, pc1245,	0,		0,	pc1250,	pc1251,	pc1251,	0, "Sharp", "Pocket Computer 1245", GAME_NOT_WORKING )
-COMP( 1982, pc1250,	0,		0,	pc1250,	pc1251,	pc1251,	0, "Sharp", "Pocket Computer 1250", 0 )
+COMP( 1982, pc1245,	0,	0,	pc1250,	pc1251,	pc1251,	0, "Sharp", "Pocket Computer 1245", GAME_NOT_WORKING )
+COMP( 1982, pc1250,	0,	0,	pc1250,	pc1251,	pc1251,	0, "Sharp", "Pocket Computer 1250", 0 )
 COMP( 1982, pc1251,	pc1250,	0,	pc1251,	pc1251,	pc1251,	0, "Sharp", "Pocket Computer 1251", 0 )
 COMP( 1982, pc1255,	pc1250,	0,	pc1255,	pc1251,	pc1251,	0, "Sharp", "Pocket Computer 1255", 0 )
-COMP( 198?, trs80pc3,pc1250,0,	pc1251,	pc1251,	pc1251,	0, "Tandy", "TRS80 PC-3", 0 )
+COMP( 198?, trs80pc3,   pc1250, 0,	pc1251,	pc1251,	pc1251,	0, "Tandy", "TRS80 PC-3", 0 )
 
-COMP( 1982, pc1260,	0,		0,	pc1260,	pc1251,	pc1251,	0, "Sharp", "Pocket Computer 1260", GAME_NOT_WORKING )
+COMP( 1982, pc1260,	0,	0,	pc1260,	pc1251,	pc1251,	0, "Sharp", "Pocket Computer 1260", GAME_NOT_WORKING )
 COMP( 1982, pc1261,	pc1260,	0,	pc1261,	pc1251,	pc1251,	0, "Sharp", "Pocket Computer 1261/1262", GAME_NOT_WORKING )
 
 /* pc1261/pc1262 */
-COMP( 1984, pc1350,	0,		0,	pc1350,	pc1350,	0,	0,	 "Sharp", "Pocket Computer 1350", 0 )
+COMP( 1984, pc1350,	0,	0,	pc1350,	pc1350,	0,	0, "Sharp", "Pocket Computer 1350", 0 )
 
-COMP( 1983, pc1401,	0,		0,	pc1401,	pc1401,	pc1401,	0, "Sharp", "Pocket Computer 1401", 0 )
-COMP( 1984, pc1402,	pc1401,	0,	pc1401,	pc1402,	pc1401,	0, "Sharp", "Pocket Computer 1402", 0 )
+COMP( 1983, pc1401,	0,	0,	pc1401,	pc1401,	pc1401,	0, "Sharp", "Pocket Computer 1401", 0 )
+COMP( 1984, pc1402,	pc1401,	0,	pc1402,	pc1401,	pc1401,	0, "Sharp", "Pocket Computer 1402", 0 )
 
 /* 72kb rom, 32kb ram, cpu? pc1360 */
-COMP( 198?, pc1403,	0,	0,	pc1403,	pc1403,	pc1403,	0, "Sharp", "Pocket Computer 1403", GAME_NOT_WORKING)
-COMP( 198?, pc1403h,	pc1403,	0,	pc1403,	pc1403h,pc1403,	0, "Sharp", "Pocket Computer 1403H", GAME_NOT_WORKING)
+COMP( 198?, pc1403,	0,	0,	pc1403,	pc1403,	pc1403,	0, "Sharp", "Pocket Computer 1403", GAME_NOT_WORKING )
+COMP( 198?, pc1403h,	pc1403,	0,	pc1403h,pc1403, pc1403,	0, "Sharp", "Pocket Computer 1403H", GAME_NOT_WORKING )

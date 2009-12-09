@@ -8,7 +8,7 @@
   203d: 0 BUSY, 1 PRINT, 3 JAPAN, 4 SMALL, 5 SHIFT, 6 DEF
   207c: 1 DEF 1 RAD 2 GRAD 5 ERROR 6 FLAG */
 
-static const unsigned char pocketc_palette[] =
+static const UINT8 pocketc_palette[] =
 {
 	99,107,99,
 	94,111,103,
@@ -19,14 +19,14 @@ static const unsigned char pocketc_palette[] =
 };
 
 const unsigned short pocketc_colortable[8][2] = {
-	{ 0, 4 },
-	{ 0, 4 },
-	{ 0, 4 },
-	{ 0, 4 },
+	{ 5, 4 },
+	{ 5, 0 },
+	{ 5, 2 },
+	{ 4, 5 },
+	{ 1, 4 },
+	{ 0, 5 },
 	{ 1, 5 },
-	{ 1, 5 },
-	{ 1, 5 },
-	{ 1, 5 }
+	{ 3, 5 }
 };
 
 PALETTE_INIT( pocketc )
@@ -51,14 +51,13 @@ PALETTE_INIT( pocketc )
 
 VIDEO_START( pocketc )
 {
-    machine->generic.videoram_size = 6 * 2 + 24;
-    machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, machine->generic.videoram_size);
+	machine->generic.videoram_size = 6 * 2 + 24;
+	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, machine->generic.videoram_size);
 }
 
-
+/* Draw an indicator (DEG, SHIFT, etc) */
 void pocketc_draw_special(bitmap_t *bitmap, int x, int y, const POCKETC_FIGURE fig, int color)
 {
-	UINT8 color_pen[] = { 8,8,8,8,7,7,7,7 };
 	int i,j;
 	for (i=0; fig[i]; i++, y++)
 	{
@@ -67,7 +66,7 @@ void pocketc_draw_special(bitmap_t *bitmap, int x, int y, const POCKETC_FIGURE f
 			switch(fig[i][j])
 			{
 			case '1':
-				*BITMAP_ADDR16(bitmap, y, x+j) = color_pen[color];
+				*BITMAP_ADDR16(bitmap, y, x+j) = color;
 				break;
 			case 'e':
 				return;

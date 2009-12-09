@@ -125,8 +125,8 @@ VIDEO_UPDATE( pc1251 )
 	bitmap_fill(bitmap, cliprect, 11);
 
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
-	color[0] = pocketc_colortable[PC1251_CONTRAST][0];
-	color[1] = pocketc_colortable[PC1251_CONTRAST][1];
+	color[0] = 7; //pocketc_colortable[PC1251_CONTRAST][0];
+	color[1] = 8; //pocketc_colortable[PC1251_CONTRAST][1];
 
 	for (x=RIGHT,y=DOWN, i=0; i<60; x+=3)
 	{

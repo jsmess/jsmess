@@ -141,22 +141,28 @@ VIDEO_UPDATE( pc1401 )
 
 	bitmap_fill(bitmap, cliprect, 11);
 
+#if 0
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
 	color[0] = pocketc_colortable[CONTRAST][0];
 	color[1] = pocketc_colortable[CONTRAST][1];
+#endif
+	/* Above can be unreadable or misleading at certain contrast settings, this is better */
+	color[0] = 7;
+	color[1] = 8;
 
-    if (pc1401_portc&1) {
-		for (x=RIGHT,y=DOWN,i=0; i<0x28;x+=2) {
+	if (pc1401_portc&1)
+	{
+		for (x=RIGHT,y=DOWN,i=0; i<0x28;x+=2)
+		{
 			for (j=0; j<5;j++,i++,x+=2)
-			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1401_lcd.reg[i],CONTRAST,0,0,
-				x,y);
+			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1401_lcd.reg[i],CONTRAST,0,0,x,y);
 		}
-		for (i=0x67; i>=0x40;x+=2) {
+		for (i=0x67; i>=0x40;x+=2)
+		{
 			for (j=0; j<5;j++,i--,x+=2)
-			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1401_lcd.reg[i],CONTRAST,0,0,
-				x,y);
+			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1401_lcd.reg[i],CONTRAST,0,0,x,y);
 		}
-    }
+	}
 
 	pocketc_draw_special(bitmap, RIGHT+149, DOWN+24, line,
 			pc1401_lcd.reg[0x3c] & 0x08 ? color[1] : color[0]);

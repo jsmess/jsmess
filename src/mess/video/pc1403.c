@@ -161,8 +161,8 @@ VIDEO_UPDATE( pc1403 )
 	bitmap_fill(bitmap, cliprect, 11);
 
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
-	color[0] = pocketc_colortable[CONTRAST][0];
-	color[2] = pocketc_colortable[CONTRAST][1];
+	color[0] = 7; // pocketc_colortable[CONTRAST][0];
+	color[2] = 8; // pocketc_colortable[CONTRAST][1];
 	color[1] = (pc1403_portc & 1) ? color[2] : color[0];
 
 	if (pc1403_portc & 1)
