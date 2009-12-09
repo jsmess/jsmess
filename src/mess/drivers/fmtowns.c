@@ -852,6 +852,7 @@ static WRITE32_HANDLER(towns_sys5e8_w)
 
 static READ32_HANDLER(towns_padport_r)
 {
+	logerror("PADPORT: read mask %08x\n",mem_mask);
 	if(ACCESSING_BITS_0_7)
 		return 0x7f;
 
@@ -1255,7 +1256,7 @@ static void towns_cd_set_status(running_machine* machine, UINT8 st0, UINT8 st1, 
 	towns_cd.cmd_status[2] = st2;
 	towns_cd.cmd_status[3] = st3;
 	// wait a bit
-	timer_set(machine,ATTOTIME_IN_MSEC(20),machine,0,towns_cd_status_ready);
+	timer_set(machine,ATTOTIME_IN_MSEC(1),machine,0,towns_cd_status_ready);
 }
 
 static UINT8 towns_cd_get_track(running_machine* machine)
@@ -1283,7 +1284,7 @@ static TIMER_CALLBACK( towns_cdrom_read_byte )
 		return;
 	
 	masked = upd71071_dmarq(device,param,3);  // CD-ROM controller uses DMA1 channel 3
-	logerror("DMARQ: param=%i ret=%i bufferptr=%i\n",param,masked,towns_cd.buffer_ptr);
+//	logerror("DMARQ: param=%i ret=%i bufferptr=%i\n",param,masked,towns_cd.buffer_ptr);
 	if(param != 0)
 	{
 		timer_adjust_oneshot(towns_cd.read_timer,ATTOTIME_IN_HZ(300000),0);
@@ -1332,7 +1333,7 @@ static void towns_cdrom_read(const device_config* device)
 	// parameters:
 	// 			3 bytes: MSF of first sector to read
 	//          3 bytes: MSF of last sector to read
-	UINT32 lba1,lba2;
+	UINT32 lba1,lba2,track;
 
 	lba1 = towns_cd.parameter[7] << 16;
 	lba1 += towns_cd.parameter[6] << 8;
@@ -1344,35 +1345,58 @@ static void towns_cdrom_read(const device_config* device)
 	towns_cd.lba_last = msf_to_lba(lba2);
 	
 	// first track starts at 00:02:00 - this is hardcoded in the boot procedure
-	if(cdrom_get_track(mess_cd_get_cdrom_file(device),lba1) == 0)
+	track = cdrom_get_track(mess_cd_get_cdrom_file(device),lba1);
+	if(track < 2)
 	{  // recalculate LBA
-		if(towns_cd.parameter[6] < 2)
+		if((towns_cd.parameter[6] & 0x0f) < 2)
 		{
-			lba1 = (towns_cd.parameter[7] - 1) << 16;
-			lba1 += (towns_cd.parameter[6] + 58) << 8;
+			lba1 = 0;
+			if((towns_cd.parameter[6] & 0xf0) == 0x00)
+			{
+				lba1 |= (((towns_cd.parameter[6] + 8) & 0x0f) << 8);
+				lba1 |= (((towns_cd.parameter[6] + 0x80) & 0xf0) << 8);
+				lba1 |= ((towns_cd.parameter[7] - 1) << 16);
+			}
+			else
+			{
+				lba1 |= (((towns_cd.parameter[6] + 8) & 0x0f) << 8);
+				lba1 |= (((towns_cd.parameter[6] - 0x10) & 0xf0) << 8);
+				lba1 |= ((towns_cd.parameter[7]) << 16);
+			}
 		}
 		else
 		{
-			lba1 = towns_cd.parameter[7] << 16;
-			lba1 += (towns_cd.parameter[6] - 2) << 8;
+			lba1 = (towns_cd.parameter[7] << 16);
+			lba1 |= ((towns_cd.parameter[6] - 2) << 8);
 		}
-		lba1 += towns_cd.parameter[5];
-		if(towns_cd.parameter[3] < 2)
+		lba1 |= towns_cd.parameter[5];
+		if((towns_cd.parameter[3] & 0x0f) < 2)
 		{
-			lba2 = (towns_cd.parameter[4] - 1) << 16;
-			lba2 += (towns_cd.parameter[3] + 58) << 8;
+			lba2 = 0;
+			if((towns_cd.parameter[3] & 0xf0) == 0x00)
+			{
+				lba2 |= (((towns_cd.parameter[3] + 8) & 0x0f) << 8);
+				lba2 |= (((towns_cd.parameter[3] + 0x80) & 0xf0) << 8);
+				lba2 |= ((towns_cd.parameter[4] - 1) << 16);
+			}
+			else
+			{
+				lba2 |= (((towns_cd.parameter[3] + 8) & 0x0f) << 8);
+				lba2 |= (((towns_cd.parameter[3] - 0x10) & 0xf0) << 8);
+				lba2 |= ((towns_cd.parameter[4]) << 16);
+			}
 		}
 		else
 		{
-			lba2 = towns_cd.parameter[4] << 16;
-			lba2 += (towns_cd.parameter[3] - 2) << 8;
+			lba2 = (towns_cd.parameter[4] << 16);
+			lba2 |= ((towns_cd.parameter[3] - 2) << 8);
 		}
-		lba2 += towns_cd.parameter[2];
+		lba2 |= towns_cd.parameter[2];
 		towns_cd.lba_current = msf_to_lba(lba1);
 		towns_cd.lba_last = msf_to_lba(lba2);
 	}
 	
-	logerror("CD: Mode 1 read from LBA next:%i last:%i\n",towns_cd.lba_current,towns_cd.lba_last);
+	logerror("CD: Mode 1 read from LBA next:%i last:%i track:%i\n",towns_cd.lba_current,towns_cd.lba_last,track);
 
 	if(towns_cd.lba_current > towns_cd.lba_last)
 	{
@@ -1462,6 +1486,11 @@ static void towns_cdrom_execute_command(const device_config* device)
 				if(towns_cd.command & 0x20)
 				{
 					towns_cd.extra_status = 0;
+					if(towns_cd.parameter[7] != 0)
+					{
+						towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
+						break;
+					}
 					if(cdda_audio_active(devtag_get_device(device->machine,"cdda")))
 						towns_cd_set_status(device->machine,0x00,0x03,0x00,0x00);
 					else
@@ -2166,7 +2195,7 @@ static DRIVER_INIT( towns )
 {
 	towns_vram = auto_alloc_array(machine,UINT32,0x20000);
 	towns_cmos = auto_alloc_array(machine,UINT8,0x2000);
-	towns_gfxvram = auto_alloc_array(machine,UINT8,0x40000);
+	towns_gfxvram = auto_alloc_array(machine,UINT8,0x80000);
 	towns_txtvram = auto_alloc_array(machine,UINT8,0x20000);
 	towns_serial_rom = auto_alloc_array(machine,UINT8,256/8);
 	towns_init_serial_rom(machine);
