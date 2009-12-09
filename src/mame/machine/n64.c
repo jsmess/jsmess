@@ -156,7 +156,7 @@ void clear_rcp_interrupt(running_machine *machine, int interrupt)
 	}
 }
 
-UINT8 is64_buffer[0x10000];
+static UINT8 is64_buffer[0x10000];
 
 READ32_HANDLER( n64_is64_r )
 {
@@ -1384,14 +1384,14 @@ WRITE32_HANDLER( n64_pi_reg_w )
 }
 
 // RDRAM Interface
-UINT32 ri_mode = 0;
-UINT32 ri_config = 0;
-UINT32 ri_current_load = 0;
-UINT32 ri_select = 0;
-UINT32 ri_count = 0;
-UINT32 ri_latency = 0;
-UINT32 ri_rerror = 0;
-UINT32 ri_werror = 0;
+static UINT32 ri_mode = 0;
+static UINT32 ri_config = 0;
+static UINT32 ri_current_load = 0;
+static UINT32 ri_select = 0;
+static UINT32 ri_count = 0;
+static UINT32 ri_latency = 0;
+static UINT32 ri_rerror = 0;
+static UINT32 ri_werror = 0;
 
 READ32_HANDLER( n64_ri_reg_r )
 {
@@ -1542,13 +1542,13 @@ static int pif_channel_handle_command(running_machine *machine, int channel, int
 			switch (channel)
 			{
 				case 0:
+				case 1:
 				{
 					rdata[0] = 0x05;
 					rdata[1] = 0x00;
 					rdata[2] = 0x02;
 					return 0;
 				}
-				case 1:
 				case 2:
 				case 3:
 				{
@@ -1580,8 +1580,8 @@ static int pif_channel_handle_command(running_machine *machine, int channel, int
 		{
 			UINT16 buttons = 0;
 			INT8 x = 0, y = 0;
-			/* add here tags for P2, P3 and P4 when implemented */
-			static const char *const portnames[] = { "P1", "P1_ANALOG_X", "P1_ANALOG_Y" };
+			/* add here tags for P3 and P4 when implemented */
+			static const char *const portnames[] = { "P1", "P1_ANALOG_X", "P1_ANALOG_Y", "P2", "P2_ANALOG_X", "P2_ANALOG_Y" };
 
 			if (slength != 1 || rlength != 4)
 			{
@@ -1590,7 +1590,8 @@ static int pif_channel_handle_command(running_machine *machine, int channel, int
 
 			switch (channel)
 			{
-				case 0:
+				case 0: //p1 inputs
+				case 1: //p2 inputs
 				{
                     buttons = input_port_read(machine, portnames[(channel*3) + 0]);
                     x = input_port_read(machine, portnames[(channel*3) + 1]) - 128;
@@ -1602,7 +1603,6 @@ static int pif_channel_handle_command(running_machine *machine, int channel, int
 					rdata[3] = (UINT8)(y);
 					return 0;
 				}
-				case 1:
 				case 2:
 				case 3:
 				{
