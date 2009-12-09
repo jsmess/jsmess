@@ -1544,6 +1544,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/tricep.o	\
 	$(MESS_DRIVERS)/indiana.o	\
 	$(MESS_DRIVERS)/vector4.o	\
+	$(MESS_DRIVERS)/unistar.o	\
 
 
 

@@ -44,6 +44,7 @@ Skeleton drivers:
 - Morrow Tricep
 - Indiana University 68030 board
 - Vector Graphics - Vector 4
+- Callan Unistar Terminal
 
 System Driver Changes:
 ----------------------
