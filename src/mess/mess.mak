@@ -924,6 +924,7 @@ $(MESSOBJ)/interact.a:			\
 	
 $(MESSOBJ)/intel.a:				\
 	$(MESS_DRIVERS)/sdk86.o		\
+	$(MESS_DRIVERS)/sdk85.o		\
 
 $(MESSOBJ)/intelgnt.a:			\
 	$(MESS_AUDIO)/dave.o		\

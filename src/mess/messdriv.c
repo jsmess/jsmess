@@ -1551,5 +1551,6 @@ const game_driver * const drivers[] =
 	DRIVER( vector4 )
 	DRIVER( unistar )
 	DRIVER( dual68 )
+	DRIVER( sdk85 )
 	
 #endif /* DRIVER_RECURSIVE */

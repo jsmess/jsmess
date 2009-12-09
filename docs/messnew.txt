@@ -46,6 +46,7 @@ Skeleton drivers:
 - Vector Graphics - Vector 4
 - Callan Unistar Terminal
 - Dual Systems 68000
+- Intel SDK-85
 
 System Driver Changes:
 ----------------------
