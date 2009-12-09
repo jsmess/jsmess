@@ -33,6 +33,7 @@ static UINT8 *eeprom_data;
 // LCD CONTROLLER
 
 static UINT32 s3c240x_vidregs[0x400/4];
+static UINT32 s3c240x_palette[0x400/4];
 
 #define BPPMODE_TFT_01	0x08
 #define BPPMODE_TFT_08	0x0B
@@ -132,17 +133,23 @@ static WRITE32_HANDLER( s3c240x_vidregs_w )
 	COMBINE_DATA(&s3c240x_vidregs[offset]);
 }
 
+static READ32_HANDLER( s3c240x_palette_r )
+{
+	return s3c240x_palette[offset];
+}
+
 static WRITE32_HANDLER( s3c240x_palette_w )
 {
 	UINT8 r, g, b;
+	COMBINE_DATA(&s3c240x_palette[offset]);
 	if (mem_mask != 0xffffffff)
 	{
-		logerror("s3c240x_palette_w: unknown mask %08x\n", mem_mask);
+		logerror( "s3c240x_palette_w: unknown mask %08x\n", mem_mask);
 	}
 	r = ((data >> 11) & 0x1F) << 3;
 	g = ((data >>  6) & 0x1F) << 3;
 	b = ((data >>  1) & 0x1F) << 3;
-	palette_set_color_rgb(space->machine, offset, r, g, b);
+	palette_set_color_rgb( space->machine, offset, r, g, b);
 }
 
 // CLOCK & POWER MANAGEMENT
@@ -1396,7 +1403,7 @@ static ADDRESS_MAP_START( gp32_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x14600000, 0x1460007b) AM_READWRITE(s3c240x_dma_r, s3c240x_dma_w)
 	AM_RANGE(0x14800000, 0x14800017) AM_READWRITE(s3c240x_clkpow_r, s3c240x_clkpow_w)
 	AM_RANGE(0x14a00000, 0x14a003ff) AM_READWRITE(s3c240x_vidregs_r, s3c240x_vidregs_w)
-	AM_RANGE(0x14a00400, 0x14a007ff) AM_RAM AM_BASE_GENERIC(paletteram) AM_WRITE(s3c240x_palette_w)
+	AM_RANGE(0x14a00400, 0x14a007ff) AM_READWRITE(s3c240x_palette_r, s3c240x_palette_w)
 	AM_RANGE(0x15000000, 0x1500002b) AM_READWRITE(s3c240x_uart_0_r, s3c240x_uart_0_w)
 	AM_RANGE(0x15004000, 0x1500402b) AM_READWRITE(s3c240x_uart_1_r, s3c240x_uart_1_w)
 	AM_RANGE(0x15100000, 0x15100043) AM_READWRITE(s3c240x_pwm_r, s3c240x_pwm_w)
