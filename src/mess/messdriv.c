@@ -1552,5 +1552,9 @@ const game_driver * const drivers[] =
 	DRIVER( unistar )
 	DRIVER( dual68 )
 	DRIVER( sdk85 )
+	DRIVER( rpc86 )
+	DRIVER( isbc86 )
+	DRIVER( isbc286 )
+	DRIVER( isbc2861 )
 	
 #endif /* DRIVER_RECURSIVE */

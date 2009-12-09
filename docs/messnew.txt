@@ -47,6 +47,10 @@ Skeleton drivers:
 - Callan Unistar Terminal
 - Dual Systems 68000
 - Intel SDK-85
+- Intel RPC 86
+- Intel iSBC 86/12A
+- Intel iSBC 286
+- Intel iSBC 286-10
 
 System Driver Changes:
 ----------------------
