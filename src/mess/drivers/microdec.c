@@ -8,23 +8,25 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "machine/upd765.h"
+#include "devices/flopdrv.h"
 #include "machine/terminal.h"
 
 static UINT8 received_char = 0;
 
-static WRITE8_HANDLER(vector_terminal_w)
+static WRITE8_HANDLER(microdec_terminal_w)
 {
 	const device_config	*devconf = devtag_get_device(space->machine, "terminal");
 	terminal_write(devconf,0,data);
 }
 
-static READ8_HANDLER(vector_terminal_status_r)
+static READ8_HANDLER(microdec_terminal_status_r)
 {
 	if (received_char!=0) return 3; // char received
 	return 1; // ready
 }
 
-static READ8_HANDLER(vector_terminal_r)
+static READ8_HANDLER(microdec_terminal_r)
 {
 	UINT8 retVal = received_char;
 	received_char = 0;
@@ -40,8 +42,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( microdec_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xfc, 0xfc) AM_READWRITE(vector_terminal_r,vector_terminal_w)
-	AM_RANGE(0xfd, 0xfd) AM_READ(vector_terminal_status_r)
+	AM_RANGE(0xfc, 0xfc) AM_READWRITE(microdec_terminal_r,microdec_terminal_w)
+	AM_RANGE(0xfd, 0xfd) AM_READ(microdec_terminal_status_r)
+	AM_RANGE(0xfa, 0xfa) AM_DEVREAD("upd765", upd765_status_r)
+	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -55,14 +59,39 @@ static MACHINE_RESET(microdec)
 	received_char = 0;
 }
 
-static WRITE8_DEVICE_HANDLER( vector4_kbd_put )
+static WRITE8_DEVICE_HANDLER( microdec_kbd_put )
 {
 	received_char = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( vector4_terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( microdec_terminal_intf )
 {
-	DEVCB_HANDLER(vector4_kbd_put)
+	DEVCB_HANDLER(microdec_kbd_put)
+};
+
+static WRITE_LINE_DEVICE_HANDLER( microdec_irq_w )
+{
+}
+
+static const struct upd765_interface microdec_upd765_interface =
+{
+	DEVCB_LINE(microdec_irq_w), /* interrupt */
+	NULL,						/* DMA request */
+	NULL,	/* image lookup */
+	UPD765_RDY_PIN_CONNECTED,	/* ready pin */
+	{FLOPPY_0,FLOPPY_1, NULL, NULL}
+};
+
+static const floppy_config microdec_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(default),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( microdec )
@@ -75,7 +104,10 @@ static MACHINE_DRIVER_START( microdec )
 
     /* video hardware */
     MDRV_IMPORT_FROM( generic_terminal )
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,vector4_terminal_intf)
+	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,microdec_terminal_intf)	
+	
+	MDRV_UPD765A_ADD("upd765", microdec_upd765_interface)
+	MDRV_FLOPPY_2_DRIVES_ADD(microdec_floppy_config)
 MACHINE_DRIVER_END
 
 /* ROM definition */
