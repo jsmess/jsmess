@@ -1895,6 +1895,16 @@ static IRQ_CALLBACK( towns_irq_callback )
 	return r; 
 }
 
+// YM3438 interrupt
+void towns_fm_irq(const device_config* device, int irq)
+{
+	const device_config* pic = devtag_get_device(device->machine,"pic8259_slave");
+	if(irq)
+		pic8259_set_irq_line(pic,5,1);
+	else
+		pic8259_set_irq_line(pic,5,0);
+}
+
 static PIC8259_SET_INT_LINE( towns_pic_irq )
 {
 	cputag_set_input_line(device->machine,"maincpu",0,interrupt ? HOLD_LINE : CLEAR_LINE);
@@ -1962,10 +1972,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(marty_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x00000000, 0x000bffff) AM_RAM
   AM_RANGE(0x000c0000, 0x000c7fff) AM_READWRITE8(towns_gfx_r,towns_gfx_w,0xffffffff)
-  AM_RANGE(0x000c8000, 0x000c8fff) AM_READWRITE(SMH_BANK(2),SMH_BANK(2))
-  AM_RANGE(0x000c9000, 0x000c9fff) AM_READWRITE(SMH_BANK(3),SMH_BANK(3))
-  AM_RANGE(0x000ca000, 0x000ca7ff) AM_READWRITE(SMH_BANK(4),SMH_BANK(5))
-  AM_RANGE(0x000ca800, 0x000cafff) AM_READWRITE(SMH_BANK(10),SMH_BANK(10))
+  AM_RANGE(0x000c8000, 0x000cafff) AM_READWRITE8(towns_spriteram_low_r,towns_spriteram_low_w,0xffffffff)
   AM_RANGE(0x000cb000, 0x000cbfff) AM_READWRITE(SMH_BANK(6),SMH_BANK(7))
   AM_RANGE(0x000cc000, 0x000cff7f) AM_READWRITE(SMH_BANK(8),SMH_BANK(8))
   AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_r,towns_video_cff80_w,0xffffffff)
@@ -2407,6 +2414,11 @@ static const upd71071_intf towns_dma_config =
 	{ towns_fdc_dma_w, 0, 0, 0 }
 };
 
+static const ym3438_interface ym3438_intf =
+{
+	towns_fm_irq
+};
+
 static const gfx_layout fnt_chars_16x16 =
 {
 	16,16,
@@ -2456,7 +2468,7 @@ static MACHINE_DRIVER_START( towns )
     /* sound hardware */
     MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("fm", YM3438, 53693100 / 7) // actual clock speed unknown
-//  MDRV_SOUND_CONFIG(ym3438_interface)
+	MDRV_SOUND_CONFIG(ym3438_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("pcm", RF5C68, 2150000)  // actual clock speed unknown
 //  MDRV_SOUND_CONFIG(rf5c68_interface)
