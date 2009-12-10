@@ -51,6 +51,8 @@ Skeleton drivers:
 - Intel iSBC 86/12A
 - Intel iSBC 286
 - Intel iSBC 286-10
+- Morrow Designs Micro Decision MD-2 and MD-3
+- SWTPC 68000
 
 System Driver Changes:
 ----------------------

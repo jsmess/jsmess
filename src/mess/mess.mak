@@ -1549,6 +1549,8 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/vector4.o	\
 	$(MESS_DRIVERS)/unistar.o	\
 	$(MESS_DRIVERS)/dual68.o	\
+	$(MESS_DRIVERS)/swtpc.o		\
+	$(MESS_DRIVERS)/microdec.o	\
 
 
 

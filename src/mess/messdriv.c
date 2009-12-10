@@ -1556,5 +1556,8 @@ const game_driver * const drivers[] =
 	DRIVER( isbc86 )
 	DRIVER( isbc286 )
 	DRIVER( isbc2861 )
+	DRIVER( swtpc )
+	DRIVER( md2 )
+	DRIVER( md3 )
 	
 #endif /* DRIVER_RECURSIVE */
