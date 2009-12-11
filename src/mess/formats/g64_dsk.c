@@ -44,14 +44,58 @@ struct g64dsk_tag
 	UINT32 track_offset[HALF_TRACKS];		/* offset within data for each half track */
 	UINT32 speed_zone_offset[HALF_TRACKS]; /* offset within data for each half track */
 };
-/*
+
 static struct g64dsk_tag *get_tag(floppy_image *floppy)
 {
 	struct g64dsk_tag *tag;
 	tag = floppy_tag(floppy, G64_DSK_TAG);
 	return tag;
 }
-*/
+
+static floperr_t get_track_offset(floppy_image *floppy, int track, UINT64 *offset)
+{
+	struct g64dsk_tag *tag = get_tag(floppy);
+	UINT64 offs = 0;
+
+	if ((track < 0) || (track >= tag->tracks))
+		return FLOPPY_ERROR_SEEKERROR;
+
+	offs = tag->track_offset[track];
+
+	if (offset)
+		*offset = offs;
+
+	return FLOPPY_ERROR_SUCCESS;
+}
+
+static floperr_t g64_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
+{
+	floperr_t err;
+	UINT64 track_offset;
+	UINT8 header[2];
+	UINT64 track_length;
+
+	/* get track offset */
+	err = get_track_offset(floppy, track, &track_offset);
+	
+	if (err) 
+		return err;
+
+	/* get track length */
+	floppy_image_read(floppy, header, track_offset, 2);
+	track_length = (header[1] << 8) | header[0];
+
+	/* read track */
+	floppy_image_read(floppy, buffer, track_offset, buflen);
+	
+	return FLOPPY_ERROR_SUCCESS;
+}
+
+static floperr_t g64_write_track(floppy_image *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
+{
+	return FLOPPY_ERROR_UNSUPPORTED;
+}
+
 FLOPPY_IDENTIFY( g64_dsk_identify )
 {
 	UINT8 header[8];
@@ -72,6 +116,7 @@ FLOPPY_IDENTIFY( g64_dsk_identify )
 
 FLOPPY_CONSTRUCT( g64_dsk_construct )
 {
+	struct FloppyCallbacks *callbacks;
 	struct g64dsk_tag *tag;
 	UINT8 header[HEADER_LENGTH];
 	UINT64 pos = 0;
@@ -115,6 +160,12 @@ FLOPPY_CONSTRUCT( g64_dsk_construct )
 		tag->speed_zone_offset[i] = (header[3] << 24) | (header[2] << 16) | (header[1] << 8) | header[0];
 		logerror("G64 track %f speed zone offset: %04x\n", ((i * 0.5) + 1), tag->speed_zone_offset[i]);
 	}
+
+	/* set callbacks */
+	callbacks = floppy_callbacks(floppy);
+
+	callbacks->read_track = g64_read_track;
+	callbacks->write_track = g64_write_track;
 
 	return FLOPPY_ERROR_SUCCESS;
 }

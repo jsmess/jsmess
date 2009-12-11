@@ -208,19 +208,6 @@ INLINE c1541_config *get_safe_config(const device_config *device)
 	return (c1541_config *)device->inline_config;
 }
 
-INLINE void set_byte_ready(c1541_t *c1541, int byte)
-{
-	if (c1541->byte != byte)
-	{
-		int byte_ready = !(c1541->soe && byte_ready);
-
-		cpu_set_input_line(c1541->cpu, M6502_SET_OVERFLOW, byte_ready);
-		via_ca1_w(c1541->via1, 0, byte_ready);
-		
-		c1541->byte = byte;
-	}
-}
-
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
@@ -233,7 +220,7 @@ static TIMER_CALLBACK( bit_tick )
 {
 	const device_config *device = (device_config *) param;
 	c1541_t *c1541 = get_safe_token(device);
-	int byte_ready = 0;
+	int byte = 0;
 
 	if (c1541->bit_pos == 0x07)
 	{
@@ -241,14 +228,22 @@ static TIMER_CALLBACK( bit_tick )
 		c1541->buffer_pos++;
 		c1541->bit_pos = 0;
 
-		byte_ready = 1;
+		byte = 1;
 	}
 	else
 	{
 		c1541->bit_pos++;
 	}
 
-	set_byte_ready(c1541, byte_ready);
+	if (c1541->byte != byte)
+	{
+		int byte_ready = !(c1541->soe && byte_ready);
+
+		cpu_set_input_line(c1541->cpu, M6502_SET_OVERFLOW, byte_ready);
+		via_ca1_w(c1541->via1, 0, byte_ready);
+		
+		c1541->byte = byte;
+	}
 }
 
 /*-------------------------------------------------
@@ -690,6 +685,7 @@ static DEVICE_START( c1541 )
 	c1541->via0 = device_find_child_by_tag(device, M6522_0_TAG);
 	c1541->via1 = device_find_child_by_tag(device, M6522_1_TAG);
 	c1541->serial_bus = devtag_get_device(device->machine, config->serial_bus_tag);
+	c1541->image = device_find_child_by_tag(device, "c1541_drive");
 
 	/* allocate data timer */
 	c1541->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
