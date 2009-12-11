@@ -686,6 +686,9 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_AUDIO)/vic6560.o		\
 	$(MESS_VIDEO)/ted7360.o		\
 	$(MESS_VIDEO)/vic6560.o		\
+	$(MESS_MACHINE)/cbmserial.o	\
+	$(MESS_MACHINE)/c1541.o		\
+	$(MESS_FORMATS)/g64_dsk.o	\
 
 $(MESSOBJ)/cbmshare.a:			\
 	$(MESS_FORMATS)/cbm_tap.o 	\
