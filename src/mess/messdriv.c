@@ -1559,5 +1559,9 @@ const game_driver * const drivers[] =
 	DRIVER( swtpc )
 	DRIVER( md2 )
 	DRIVER( md3 )
+	DRIVER( ccs2422 )
+	DRIVER( ccs2810 )
+	DRIVER( qtsbc )
+	DRIVER( msbc1 )
 	
 #endif /* DRIVER_RECURSIVE */

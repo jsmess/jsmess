@@ -1554,6 +1554,10 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/dual68.o	\
 	$(MESS_DRIVERS)/swtpc.o		\
 	$(MESS_DRIVERS)/microdec.o	\
+	$(MESS_DRIVERS)/ccs2422.o	\
+	$(MESS_DRIVERS)/ccs2810.o	\
+	$(MESS_DRIVERS)/qtsbc.o		\
+	$(MESS_DRIVERS)/msbc1.o		\
 
 
 

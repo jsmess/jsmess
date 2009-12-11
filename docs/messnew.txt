@@ -28,6 +28,8 @@ Systems Promoted from GAME_NOT_WORKING:
 Skeleton drivers: 
 -----------------
 - Callan Unistar Terminal
+- CCS Model 2422B
+- CCS Model 2810
 - Dual Systems 68000
 - Exelvision Exeltel
 - Hewlett-Packard HP16500b [R. Belmont]
@@ -44,9 +46,11 @@ Skeleton drivers:
 - Morrow Designs Micro Decision MD-2 and MD-3
 - Morrow Tricep
 - NorthStar Horizon
+- Onmibyte MSBC-1
 - Plan-80
 - Protec Pro-80
 - PIMPS
+- QT Computer Systems SBC +2/4
 - Sage II
 - SAPI-1 ZPS 2
 - SAPI-1 ZPS 3
@@ -55,7 +59,6 @@ Skeleton drivers:
 - SWTPC 6800
 - Vector Graphic Vector 1+
 - Vector Graphics - Vector 4
-
 
 
 System Driver Changes:
