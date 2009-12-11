@@ -1289,6 +1289,57 @@ static void sms_refresh_line( running_machine *machine, smsvdp_t *smsvdp, bitmap
 }
 
 
+static UINT8 color_brightness(rgb_t color)
+{
+	/* reference: http://www.w3.org/TR/AERT#color-contrast */
+	UINT8 brightness = (RGB_RED(color) * 0.299) + (RGB_GREEN(color) * 0.587) + (RGB_BLUE(color) * 0.114);
+	//printf ("color brightness: %2X\n", brightness);
+	return brightness;
+}
+
+
+UINT8 sms_vdp_area_brightness(const device_config *device, int x, int y, int x_range, int y_range)
+{
+	int beam_x, beam_y;
+	int dx, dy;
+	int vint_line;
+	smsvdp_t *smsvdp;
+
+	if (x < LBORDER_START + LBORDER_X_PIXELS || x >= LBORDER_START + LBORDER_X_PIXELS + 256)
+	{
+		return 0x00;
+	}
+
+	smsvdp = get_safe_token(device);
+
+	beam_x = video_screen_get_hpos(device->machine->primary_screen);
+	beam_y = video_screen_get_vpos(device->machine->primary_screen);
+	dx = x - beam_x;
+	dy = y - beam_y;
+
+	if (abs(dy) <= y_range && abs(dx) <= x_range)
+	{
+		rgb_t color = *BITMAP_ADDR32(smsvdp->tmpbitmap, beam_y, beam_x);
+		return color_brightness(color);
+	}
+
+	/* Color & Switch Test ROM check TH after the line where VINT    */
+	/* occurs (237 for NTSC/192 mode). Until details are not figured */
+	/* out, calculate VINT line and use it for this special case.    */
+	vint_line = smsvdp->sms_frame_timing[VERTICAL_BLANKING] + smsvdp->sms_frame_timing[TOP_BLANKING]
+	          + smsvdp->sms_frame_timing[TOP_BORDER] + smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V]
+	          + 1;
+
+	if (beam_y == vint_line + 1 && abs(dx) <= x_range)
+	{
+		rgb_t color = *BITMAP_ADDR32(smsvdp->tmpbitmap, y, x);
+		return color_brightness(color);
+	}
+
+	return 0x00;
+}
+
+
 static void sms_update_palette( smsvdp_t *smsvdp )
 {
 	int i;
@@ -1405,9 +1456,7 @@ static DEVICE_START( smsvdp )
 
 	/* Make temp bitmap for rendering */
 	smsvdp->tmpbitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED32);
-
 	smsvdp->prev_bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED32);
-
 
 	smsvdp->smsvdp_display_timer = timer_alloc(device->machine, smsvdp_display_callback, smsvdp);
 	timer_adjust_periodic(smsvdp->smsvdp_display_timer, video_screen_get_time_until_pos(screen, 0, 0), 0, video_screen_get_scan_period(screen));
@@ -1429,6 +1478,10 @@ static DEVICE_START( smsvdp )
 	state_save_register_device_item(device, 0, smsvdp->prev_bitmap_saved);
 	state_save_register_device_item_array(device, 0, smsvdp->reg);
 	state_save_register_device_item_array(device, 0, smsvdp->current_palette);
+	state_save_register_device_item_pointer(device, 0, smsvdp->line_buffer, 256 * 5);
+	state_save_register_device_item_pointer(device, 0, smsvdp->collision_buffer, SMS_X_PIXELS);
+	state_save_register_device_item_bitmap(device, 0, smsvdp->tmpbitmap);
+	state_save_register_device_item_bitmap(device, 0, smsvdp->prev_bitmap);
 }
 
 static DEVICE_RESET( smsvdp )

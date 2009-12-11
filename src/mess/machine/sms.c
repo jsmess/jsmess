@@ -67,10 +67,6 @@ struct _sms_driver_data {
 	
 	/* Data needed for Light Phaser */
 	UINT16 lphaser_latch;
-	UINT16 lphaser_1_x;
-	UINT16 lphaser_1_y;
-	UINT16 lphaser_2_x;
-	UINT16 lphaser_2_y;
 	int lphaser_x_offs;	/* Needed to 'calibrate' lphaser; set at cart loading */
 
 	/* Data needed for SegaScope (3D glasses) */
@@ -188,23 +184,28 @@ static void sms_vdp_hcount_lphaser( running_machine *machine, int hpos)
 static UINT8 sms_vdp_hcount( running_machine *machine )
 {
 	UINT8 tmp;
+	const device_config *screen = video_screen_first(machine->config);
+	int hpos = video_screen_get_hpos(screen);
+
+	/* alternative method: pass HCounter test, but some others fail */
+	//int hpos_tmp = hpos;
+	//if ((hpos + 2) % 6 == 0) hpos_tmp--;
+	//tmp = ((hpos_tmp - 46) >> 1) & 0xff;
+
 	UINT64 calc_cycles;
 	attotime time_end;
-	const device_config *screen = video_screen_first(machine->config);
-
-	//int hpos = video_screen_get_hpos(screen);
 	int vpos = video_screen_get_vpos(screen);
-	int width = video_screen_get_width(screen);
-	
-	/* this is simpler and independent of other clocks */
-	//tmp = ((hpos - 46) >> 1) & 0xff;
-	
-	/* ... but this is closer to the behavior described by Flubba */
-	/* and makes use of his equation posted at SMSPower forum.    */
-	time_end = video_screen_get_time_until_pos(screen, vpos, width - 1);
+	int max_hpos = video_screen_get_width(screen) - 1;
+
+	if (hpos == max_hpos)
+		time_end = attotime_zero;
+	else
+		time_end = video_screen_get_time_until_pos(screen, vpos, max_hpos);
 	calc_cycles = cpu_attotime_to_clocks(cputag_get_cpu(machine, "maincpu"), time_end);
+
+	/* equation got from SMSPower forum, posted by Flubba. */
 	tmp = ((590 - (calc_cycles * 3)) / 4) & 0xff;
-	
+
 	//printf ("sms_vdp_hcount: hpos %3d => hcount %2X\n", hpos, tmp);
 	return tmp;
 }
@@ -216,53 +217,6 @@ static void sms_vdp_hcount_latch( running_machine *machine )
 	const device_config *smsvdp = devtag_get_device(machine, "sms_vdp");
 	
 	sms_vdp_hcount_latch_w(smsvdp, 0, value);
-}
-
-static int lphaser_sensor_is_on( running_machine *machine, int x, int y )
-{
-	const device_config *screen = video_screen_first(machine->config);
-	int dx, dy;
-	//const int r_x_r = 20 * 20; /* radius^2 */
-	int hpos, vpos;
-	
-	if (x < LBORDER_START + LBORDER_X_PIXELS || x >= LBORDER_START + LBORDER_X_PIXELS + 256)
-	{
-		sms_state.lphaser_latch = 0;
-		return 0;
-	}
-	
-	hpos = video_screen_get_hpos(screen);
-	vpos = video_screen_get_vpos(screen);
-	
-	/* some offset seems needed for sms_vdp_hcount_latch() */
-	//hpos -= 44;
-	
-	dx = x - hpos;
-	dy = y - vpos;
-	
-	//printf ("Light Phaser polling at %3d x %3d for shot %3d x %3d\n", hpos, vpos, x, y);
-	
-	/* SMSPower Wiki: the Light Phaser sensor "sees" a circular portion of the screen */
-	//if ( (dx * dx) + (dy * dy) - (r_x_r) <= 0 )
-	if (abs(dy) <= 5 && abs(dx) <= 60) /* simpler method used by SMSPlus-GX */
-	{
-		/* avoid latching hcount more than once in a line */
-		if (sms_state.lphaser_latch == 0)
-		{
-			sms_state.lphaser_latch = 1;
-			//sms_vdp_hcount_latch(screen);
-			/* FIXME: sms_vdp_hcount_lphaser() is a hack necessary while normal latch gives too inconstant shot positions */
-			x += sms_state.lphaser_x_offs;
-			sms_vdp_hcount_lphaser(machine, x);
-		}
-
-		return 1;
-	}
-	else
-	{
-		sms_state.lphaser_latch = 0;
-		return 0;
-	}
 }
 
 
@@ -282,11 +236,33 @@ static UINT16 screen_vpos_nonscaled( const device_config *screen, int scaled_vpo
 }
 
 
+static int lphaser_sensor_is_on( running_machine *machine, const char *tag_x, const char *tag_y )
+{
+	int x = screen_hpos_nonscaled(machine->primary_screen, input_port_read(machine, tag_x));
+	int y = screen_vpos_nonscaled(machine->primary_screen, input_port_read(machine, tag_y));
+
+	if (sms_vdp_area_brightness(devtag_get_device(machine, "sms_vdp"), x, y, 60, 5) >= 0x7f)
+	{
+		/* avoid latching hcount more than once in a line */
+		if (sms_state.lphaser_latch == 0)
+		{
+			sms_state.lphaser_latch = 1;
+			//sms_vdp_hcount_latch(machine);
+			/* FIXME: sms_vdp_hcount_lphaser() is a hack necessary while normal latch gives too inconstant shot positions */
+			x += sms_state.lphaser_x_offs;
+			sms_vdp_hcount_lphaser(machine, x);
+		}
+		return 1;
+	}
+
+	sms_state.lphaser_latch = 0;
+	return 0;
+}
+
+
 static void sms_get_inputs( const address_space *space )
 {
 	UINT8 data = 0x00;
-	UINT8 data_x = 0x00;
-	UINT8 data_y = 0x00;
 	UINT32 cpu_cycles = cpu_get_total_cycles(space->cpu);
 	running_machine *machine = space->machine;
 
@@ -324,12 +300,6 @@ static void sms_get_inputs( const address_space *space )
 		{
 			if (input_port_read(machine, "RFU") & 0x01)
 				data |= sms_state.rapid_fire_state_1 & 0x10;
-
-			data_x = input_port_read(machine, "LPHASER0");
-			data_y = input_port_read(machine, "LPHASER1");
-
-			sms_state.lphaser_1_x = screen_hpos_nonscaled(machine->primary_screen, data_x);
-			sms_state.lphaser_1_y = screen_vpos_nonscaled(machine->primary_screen, data_y);
 		}
 		/* just consider the button (trigger) bit */
 		data |= ~0x10;
@@ -392,12 +362,6 @@ static void sms_get_inputs( const address_space *space )
 		{
 			if (input_port_read(machine, "RFU") & 0x04)
 				data |= sms_state.rapid_fire_state_2 & 0x04;
-
-			data_x = input_port_read(machine, "LPHASER2");
-			data_y = input_port_read(machine, "LPHASER3");
-
-			sms_state.lphaser_2_x = screen_hpos_nonscaled (machine->primary_screen, data_x);
-			sms_state.lphaser_2_y = screen_vpos_nonscaled (machine->primary_screen, data_y);
 		}
 		/* just consider the button (trigger) bit */
 		data |= ~0x04;
@@ -544,6 +508,9 @@ READ8_HANDLER( sms_input_port_1_r )
 		return 0xff;
 	
 	sms_get_inputs(space);
+
+	/* Reset Button */
+	sms_state.input_port1 = (sms_state.input_port1 & 0xef) | (input_port_read_safe(space->machine, "RESET", 0x01) & 0x01) << 4;
 	
 	/* Do region detection if TH of ports A and B are set to output (0) */
 	if (!(sms_state.ctrl_reg & 0x0a))
@@ -555,15 +522,22 @@ READ8_HANDLER( sms_input_port_1_r )
 		if (sms_state.is_region_japan)
 			sms_state.input_port1 ^= 0xc0;
 	}
-	else if (sms_state.ctrl_reg & 0x02 && lphaser_sensor_is_on(space->machine, sms_state.lphaser_1_x, sms_state.lphaser_1_y))
+	else
 	{
-		sms_state.input_port1 &= ~0x40;
+		if (sms_state.ctrl_reg & 0x02
+		    && (input_port_read_safe(space->machine, "CTRLSEL", 0x00) & 0x0f) == 0x01
+		    && lphaser_sensor_is_on(space->machine, "LPHASER0", "LPHASER1"))
+		{
+			sms_state.input_port1 &= ~0x40;
+		}
+		if (sms_state.ctrl_reg & 0x08
+		    && (input_port_read_safe(space->machine, "CTRLSEL", 0x00) & 0xf0) == 0x10
+		    && lphaser_sensor_is_on(space->machine, "LPHASER2", "LPHASER3"))
+		{	
+			sms_state.input_port1 &= ~0x80;
+		}	
 	}
-	else if (sms_state.ctrl_reg & 0x08 && lphaser_sensor_is_on(space->machine, sms_state.lphaser_2_x, sms_state.lphaser_2_y))
-	{	
-		sms_state.input_port1 &= ~0x80;
-	}	
-		
+
 	return sms_state.input_port1;
 }
 	
@@ -1487,10 +1461,6 @@ MACHINE_RESET( sms )
 	sms_state.sports_pad_2_y = 0;
 
 	sms_state.lphaser_latch = 0;
-	sms_state.lphaser_1_x = 0;
-	sms_state.lphaser_1_y = 0;
-	sms_state.lphaser_2_x = 0;
-	sms_state.lphaser_2_x = 0;
 
 	sms_state.sscope_state = 0;
 

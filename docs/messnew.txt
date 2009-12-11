@@ -2,15 +2,17 @@
 
 New System Drivers Supported:
 -----------------------------
+- Consul 2717 with PMD-32 [Miodrag Milanovic]
 - Elektor SC/MP [Miodrag Milanovic]
 - Hawthorne Technologies TinyGiant HT68k [Miodrag Milanovic]
 - Hector MX40c [JJ Stacino]
 - Hector MX80c [JJ Stacino]
 - Microsystems International Limited MOD-8 [Miodrag Milanovic]
-- Science of Cambridge MK-14 [Miodrag Milanovic]
-- Robotron K1003 [Miodrag Milanovic]
 - MITS Altair 8800bt [Miodrag Milanovic]
-- Consul 2717 with PMD-32 [Miodrag Milanovic]
+- Robotron K1003 [Miodrag Milanovic]
+- Science of Cambridge MK-14 [Miodrag Milanovic]
+
+
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
@@ -25,34 +27,36 @@ Systems Promoted from GAME_NOT_WORKING:
 
 Skeleton drivers: 
 -----------------
-- Exelvision Exeltel
-- Sharp PC-E220
-- Hewlett-Packard HP16500b [R. Belmont]
-- Micronic 1000 [Curt Coder]
-- MITS Altair 680b
-- MCS Basic 52
-- MCS Basic 31
-- Sun-1
-- Plan-80
-- SAPI-1 ZPS 2
-- SAPI-1 ZPS 3
-- Protec Pro-80
-- PIMPS
-- Sage II
-- NorthStar Horizon
-- Vector Graphic Vector 1+
-- Morrow Tricep
-- Indiana University 68030 board
-- Vector Graphics - Vector 4
 - Callan Unistar Terminal
 - Dual Systems 68000
+- Exelvision Exeltel
+- Hewlett-Packard HP16500b [R. Belmont]
+- Indiana University 68030 board
 - Intel SDK-85
 - Intel RPC 86
 - Intel iSBC 86/12A
 - Intel iSBC 286
 - Intel iSBC 286-10
+- MCS Basic 52
+- MCS Basic 31
+- Micronic 1000 [Curt Coder]
+- MITS Altair 680b
 - Morrow Designs Micro Decision MD-2 and MD-3
+- Morrow Tricep
+- NorthStar Horizon
+- Plan-80
+- Protec Pro-80
+- PIMPS
+- Sage II
+- SAPI-1 ZPS 2
+- SAPI-1 ZPS 3
+- Sharp PC-E220
+- Sun-1
 - SWTPC 68000
+- Vector Graphic Vector 1+
+- Vector Graphics - Vector 4
+
+
 
 System Driver Changes:
 ----------------------
@@ -85,6 +89,9 @@ System Driver Changes:
   Oekaki", then enter Driver Configuration menu and turn on the Tablet.
   Once enabled, remappable controls will also appear in the Input (this 
   System) menu. [Fabio Priuli]
+
+- [SMS] Added Reset button to SMS1 and improved Lightgun behavior based 
+  on "Color & Switch Test". [Enik Land]
 
 - [TI81] Added v1.6K BIOS dump. [critor]
 
