@@ -118,13 +118,13 @@
 
 	TODO:
 
-	- serial bus
+	- mechanical track 0 sensing
+	- get floppy image to driver state
+	- allocate track buffer
 	- activity led
-	- bus reset
-	- spindle motor
-	- stepper motor
 	- read G64
 	- write G64
+	- D64 to G64 conversion
 	- accurate timing
 
 */
@@ -141,9 +141,19 @@
     PARAMETERS
 ***************************************************************************/
 
+#define LOG 1
+
 #define M6502_TAG		"ucd5"
 #define M6522_0_TAG		"uab1"
 #define M6522_1_TAG		"ucd4"
+#define TIMER_BIT_TAG	"ue7"
+
+static const double C1541_BITRATE[4] =
+{
+	XTAL_16MHz/13.0, XTAL_16MHz/14.0, XTAL_16MHz/15.0, XTAL_16MHz/16.0
+};
+
+#define C1541_TRACK_BUFFER_SIZE		0x2000
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -152,14 +162,31 @@
 typedef struct _c1541_t c1541_t;
 struct _c1541_t
 {
-	UINT8 yb;
-	int atna;
+	/* abstractions */
+	int address;						/* serial bus address - 8 */
+	UINT8 *track_buffer;				/* track data buffer */
+	int track;							/* current position of the actuator (half track) */
+	int buffer_pos;						/* current byte position within track buffer */
+	int bit_pos;						/* current bit position within track buffer byte */
+
+	/* signals */
+	UINT8 yb;							/* GCR data byte */
+	int byte;							/* byte ready */
+	int atna;							/* attention acknowledge */
+	int ds;								/* data speed */
+	int stp;							/* stepper motor phase */
+	int soe;							/* s? output enable */
+	int mode;							/* mode (0 = write, 1 = read) */
 
 	/* devices */
 	const device_config *cpu;
 	const device_config *via0;
 	const device_config *via1;
 	const device_config *serial_bus;
+	const device_config *image;
+	
+	/* timers */
+	emu_timer *bit_timer;
 };
 
 /***************************************************************************
@@ -181,9 +208,48 @@ INLINE c1541_config *get_safe_config(const device_config *device)
 	return (c1541_config *)device->inline_config;
 }
 
+INLINE void set_byte_ready(c1541_t *c1541, int byte)
+{
+	if (c1541->byte != byte)
+	{
+		int byte_ready = !(c1541->soe && byte_ready);
+
+		cpu_set_input_line(c1541->cpu, M6502_SET_OVERFLOW, byte_ready);
+		via_ca1_w(c1541->via1, 0, byte_ready);
+		
+		c1541->byte = byte;
+	}
+}
+
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( bit_tick )
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( bit_tick )
+{
+	const device_config *device = (device_config *) param;
+	c1541_t *c1541 = get_safe_token(device);
+	int byte_ready = 0;
+
+	if (c1541->bit_pos == 0x07)
+	{
+		c1541->yb = c1541->track_buffer[c1541->buffer_pos];
+		c1541->buffer_pos++;
+		c1541->bit_pos = 0;
+
+		byte_ready = 1;
+	}
+	else
+	{
+		c1541->bit_pos++;
+	}
+
+	set_byte_ready(c1541, byte_ready);
+}
 
 /*-------------------------------------------------
     c1541_atn_w - serial bus attention
@@ -193,7 +259,7 @@ static WRITE_LINE_DEVICE_HANDLER( c1541_atn_w )
 {
 	c1541_t *c1541 = get_safe_token(device);
 
-	via_ca1_w(c1541->via1, 0, state);
+	via_ca1_w(c1541->via0, 0, state);
 }
 
 /*-------------------------------------------------
@@ -202,7 +268,14 @@ static WRITE_LINE_DEVICE_HANDLER( c1541_atn_w )
 
 static WRITE_LINE_DEVICE_HANDLER( c1541_reset_w )
 {
-	// reset cpu and vias
+	c1541_t *c1541 = get_safe_token(device);
+
+	if (state)
+	{
+		device_reset(c1541->cpu);
+		device_reset(c1541->via0);
+		device_reset(c1541->via1);
+	}
 }
 
 /*-------------------------------------------------
@@ -274,14 +347,23 @@ static READ8_DEVICE_HANDLER( via0_pb_r )
 		PB1		STP0
 		PB2		MTR
 		PB3		ACT
-		PB4		WPS
-		PB5		
-		PB6		
-		PB7		SYNC
+		PB4		WPS input	write protect sensor
+		PB5		DS0
+		PB6		DS1
+		PB7		SYNC input
 
 	*/
 
-	return 0;
+	c1541_t *c1541 = get_safe_token(device);
+	UINT8 data = 0;
+
+	/* write protect sensor */
+	data |= (floppy_drive_get_flag_state(c1541->image, FLOPPY_DRIVE_DISK_WRITE_PROTECTED)) << 4;
+
+	/* SYNC detected */
+	data |= !(c1541->mode && (c1541->yb == 0xff)) << 7;
+
+	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( via0_pb_w )
@@ -294,20 +376,75 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 		PB1		STP0
 		PB2		MTR
 		PB3		ACT
-		PB4		WPS
-		PB5		
-		PB6		
-		PB7		SYNC
+		PB4		WPS input
+		PB5		DS0
+		PB6		DS1
+		PB7		SYNC input
 
 	*/
+
+	c1541_t *c1541 = get_safe_token(device);
+	int stp = data & 0x03;
+	int ds = (data >> 5) & 0x03;
+
+	/* stepper motor */
+	if (c1541->stp != stp)
+	{
+		int tracks = 0;
+		int length;
+
+		switch (c1541->stp)
+		{
+		case 0:	if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
+		case 1:	if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
+		case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
+		case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
+		}
+
+		floppy_drive_seek(c1541->image, tracks);
+
+//		if (c1541->track < 0) c1541->track = 0; // BUMP!
+//		if (c1541->track > 83) c1541->track = 83;
+
+//		if (LOG) logerror("C1541 Track: %f\n", (float)c1541->track / 2);
+
+		floppy_drive_read_track_data_info_buffer(c1541->image, 0, c1541->track_buffer, &length);
+
+		if (LOG) logerror("C1541 Track length %u\n", length);
+
+		c1541->stp = stp;
+	}
+
+	/* spindle motor */
+	floppy_drive_set_motor_state(c1541->image, BIT(data, 2) ? FLOPPY_DRIVE_MOTOR_ON : 0);
+	timer_enable(c1541->bit_timer, BIT(data, 2));
+
+	/* activity LED */
+
+	/* data speed */
+	if (c1541->ds != ds)
+	{
+		timer_adjust_periodic(c1541->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C1541_BITRATE[ds]));
+		c1541->ds = ds;
+	}
 }
 
 static WRITE_LINE_DEVICE_HANDLER( soe_w )
 {
+	c1541_t *c1541 = get_safe_token(device);
+	int byte_ready = !(state && c1541->byte);
+
+	c1541->soe = state;
+
+	cpu_set_input_line(c1541->cpu, M6502_SET_OVERFLOW, byte_ready);
+	via_ca1_w(c1541->via0, 0, byte_ready);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( mode_w )
 {
+	c1541_t *c1541 = get_safe_token(device);
+
+	c1541->mode = state;
 }
 
 static const via6522_interface c1541_via0_intf =
@@ -344,8 +481,8 @@ static READ8_DEVICE_HANDLER( via1_pb_r )
 		PB2		CLK IN
 		PB3		CLK OUT
 		PB4		ATNA
-		PB5		
-		PB6		
+		PB5		J1
+		PB6		J2
 		PB7		ATN IN
 
 	*/
@@ -358,6 +495,9 @@ static READ8_DEVICE_HANDLER( via1_pb_r )
 
 	/* clock in */
 	data |= cbmserial_clk_r(c1541->serial_bus) << 2;
+
+	/* serial bus address */
+	data |= c1541->address << 5;
 
 	/* attention in */
 	data |= cbmserial_atn_r(c1541->serial_bus) << 7;
@@ -376,8 +516,8 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 		PB2		CLK IN
 		PB3		CLK OUT
 		PB4		ATNA
-		PB5		
-		PB6		
+		PB5		J1
+		PB6		J2
 		PB7		ATN IN
 
 	*/
@@ -539,6 +679,10 @@ static DEVICE_START( c1541 )
 	c1541_t *c1541 = get_safe_token(device);
 	const c1541_config *config = get_safe_config(device);
 
+	/* set serial address */
+	assert((config->address > 7) && (config->address < 12));
+	c1541->address = config->address - 8;
+
 	/* find our CPU */
 	c1541->cpu = device_find_child_by_tag(device, M6502_TAG);
 
@@ -546,6 +690,10 @@ static DEVICE_START( c1541 )
 	c1541->via0 = device_find_child_by_tag(device, M6522_0_TAG);
 	c1541->via1 = device_find_child_by_tag(device, M6522_1_TAG);
 	c1541->serial_bus = devtag_get_device(device->machine, config->serial_bus_tag);
+
+	/* allocate data timer */
+	c1541->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
+	timer_adjust_periodic(c1541->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C1541_BITRATE[0]));
 
 	/* register for state saving */
 //	state_save_register_device_item(device, 0, c1541->);
