@@ -77,7 +77,7 @@ MACHINE_DRIVER_END
 /* ROM definition */
 ROM_START( ccs2810 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "ccs2810_u8.bin", 0xf000, 0x0800, CRC(c3054ea) SHA1(c554b7c44a61af13decb2785f3c9b33c6fc2bfce))
+	ROM_LOAD( "ccs2810_u8.bin", 0xf000, 0x0800, CRC(0c3054ea) SHA1(c554b7c44a61af13decb2785f3c9b33c6fc2bfce))
 ROM_END
 
 /* Driver */
