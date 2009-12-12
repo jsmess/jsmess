@@ -155,6 +155,7 @@ static UINT8 towns_kb_irq1_enable;
 static UINT8 towns_kb_output;  // key output
 static UINT8 towns_kb_extend;  // extended key output
 static emu_timer* towns_kb_timer;
+static UINT8 towns_fm_irq_flag;
 
 static struct towns_cdrom_controller
 {
@@ -696,6 +697,32 @@ static WRITE32_HANDLER(towns_sys5e8_w)
 			}
 			break;
 	}
+}
+
+// Sound/LED control (I/O port 0x4e8-0x4ef)
+// R/O  -- (0x4e9) FM IRQ flag (bit 0), PCM IRQ flag (bit 3)
+// (0x4ea) PCM IRQ mask
+// R/W  -- (0x4eb) PCM IRQ flag
+// W/O  -- (0x4ec) LED control
+static READ8_HANDLER(towns_sound_ctrl_r)
+{
+	UINT8 ret = 0;
+	
+	switch(offset)
+	{
+		case 0x01:
+			if(towns_fm_irq_flag)
+				ret |= 0x01;
+			break;
+		default:
+			logerror("FM: unimplemented port 0x%04x read\n",offset + 0x4e8); 
+	}
+	return ret;
+}
+
+static WRITE8_HANDLER(towns_sound_ctrl_w)
+{
+	// TODO:
 }
 
 static READ32_HANDLER(towns_padport_r)
@@ -1498,9 +1525,15 @@ void towns_fm_irq(const device_config* device, int irq)
 {
 	const device_config* pic = devtag_get_device(device->machine,"pic8259_slave");
 	if(irq)
+	{
+		towns_fm_irq_flag = 1;
 		pic8259_set_irq_line(pic,5,1);
+	}
 	else
+	{
+		towns_fm_irq_flag = 0;
 		pic8259_set_irq_line(pic,5,0);
+	}
 }
 
 static PIC8259_SET_INT_LINE( towns_pic_irq )
@@ -1628,10 +1661,7 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   AM_RANGE(0x04d4,0x04d7) AM_NOP  // R/W  -- (0x4d5) mute?
   AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8("fm",ym3438_r,ym3438_w,0x00ff00ff)
   AM_RANGE(0x04e0,0x04e3) AM_NOP  // R/W  -- volume ports
-  AM_RANGE(0x04e8,0x04ef) AM_NOP  // R/O  -- (0x4e9) FM IRQ flag (bit 0), PCM IRQ flag (bit 3)
-                                  // (0x4ea) PCM IRQ mask
-                                  // R/W  -- (0x4eb) PCM IRQ flag
-                                  // W/O  -- (0x4ec) LED control
+  AM_RANGE(0x04e8,0x04ef) AM_READWRITE8(towns_sound_ctrl_r,towns_sound_ctrl_w,0xffffffff)  
   AM_RANGE(0x04f0,0x04fb) AM_DEVWRITE8("pcm",rf5c68_w,0xffffffff)
   // CRTC / Video
   AM_RANGE(0x05c8,0x05cb) AM_READWRITE8(towns_video_5c8_r, towns_video_5c8_w, 0xffffffff)
@@ -1949,8 +1979,8 @@ static MACHINE_DRIVER_START( towns )
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MDRV_SCREEN_SIZE(640, 400)
+    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
     MDRV_GFXDECODE(towns)
 
     /* sound hardware */

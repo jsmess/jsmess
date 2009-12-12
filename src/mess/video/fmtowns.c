@@ -2,14 +2,69 @@
 /* 
  * FM Towns video hardware
  * 
- * Resolution: from 320x200 to 640x400
+ * Resolution: from 320x200 to 768x512
  * 
  * Up to two graphics layers
  * 
  * Sprites
  * 
- * CRTC registers:
- *   
+ * CRTC registers (16-bit):
+ * 
+ *  0:  HSync width 1
+ * 	1:	HSync width 2
+ *  4:	HSync total
+ *  5:	VSync width 1
+ * 	6:	VSync width 2
+ * 	7:	Equalising pulse accountable time (what?)
+ *  8:  VSync total
+ *  
+ * 	9:
+ *  10:	Graphic layer 0 horizontal start/end
+ * 	11:
+ * 	12:	Graphic layer 1 horizontal start/end
+ * 
+ * 	13:
+ * 	14:	Graphic layer 0 vertical start/end
+ * 	15:
+ * 	16: Graphic layer 1 vertical start/end
+ * 
+ * 	17:	Graphic layer 0 initial address?
+ * 	18: Graphic layer 0 horizontal adjust
+ * 	19: Graphic layer 0 field indirect address offset
+ * 	20: Graphic layer 0 line indirect address offset
+ * 
+ * 	21-24: As above, but for Graphic layer 1
+ * 
+ * 	28:	Control register 0
+ * 		VSync enable (bit 15) (blank display?)
+ * 		Scroll type (layer 0 = bit 4, layer 1 = bit 5)
+ * 			0 = spherical scroll, 1 = cylindrical scroll
+ * 
+ *  29: Control register 1
+ * 		Dot clock (bits 1 and 0)
+ * 		0x00 = 28.6363MHz
+ * 		0x01 = 24.5454MHz
+ * 		0x02 = 25.175MHz
+ * 		0x03 = 21.0525MHz (default?)
+ * 
+ * 	30: Dummy register
+ * 
+ * 	31:	Control register 2
+ *	
+ * 	Video registers:
+ * 
+ * 	0:	Graphic layer(s) type: (others likely exist)
+ * 		bit 4 = 2 layers
+ * 		0x0a: 1 layer, 256 colours
+ * 		0x0f: 1 layer, highcolour
+ * 		0x15: 2 layers, both 16 colours
+ * 		0x17: 2 layers, highcolour, 16 colours
+ * 		0x1d: 2 layers, 16 colours, highcolour
+ * 		0x1f: 2 layers, both highcolour
+ * 
+ * 	1:  Layer reverse (priority?) (bit 0)
+ * 		YM (bit 2) - unknown
+ * 		peltype (bits 4 and 5)
  * 
  */
 
@@ -17,6 +72,8 @@
 #include "machine/pic8259.h"
 #include "devices/messram.h"
 #include "includes/fmtowns.h"
+
+//#define CRTC_REG_DISP 1
 
 static UINT8 towns_vram_wplane;
 static UINT8 towns_vram_rplane;
@@ -26,9 +83,12 @@ static UINT8 towns_palette_r[256];
 static UINT8 towns_palette_g[256];
 static UINT8 towns_palette_b[256];
 static UINT8 towns_degipal[8];
+static UINT8 towns_dpmd_flag;
 static UINT8 towns_crtc_mix;
 static UINT8 towns_crtc_sel;  // selected CRTC register
 static UINT16 towns_crtc_reg[32];
+static UINT8 towns_video_sel;  // selected shifter register
+static UINT8 towns_video_reg[2];
 static UINT8 towns_tvram_enable;
 static UINT16 towns_kanji_offset;
 static UINT8 towns_kanji_code_h;
@@ -40,6 +100,11 @@ extern UINT8* towns_txtvram;
 
 extern UINT32 towns_mainmem_enable;
 extern UINT32 towns_ankcg_enable;
+
+void towns_update_video(running_machine* machine)
+{
+	
+}
 
 READ8_HANDLER( towns_gfx_high_r )
 {
@@ -216,6 +281,8 @@ WRITE8_HANDLER( towns_video_cff80_w )
  *  port 0x440-0x443 - CRTC
  * 		0x440 = register select
  * 		0x442/3 = register data (16-bit)
+ * 		0x448 = shifter register select
+ * 		0x44a = shifter register data (8-bit)
  * 
  */
 READ8_HANDLER(towns_video_440_r)
@@ -230,6 +297,19 @@ READ8_HANDLER(towns_video_440_r)
 		case 0x03:
 			logerror("CRTC: reading register %i (0x443) [%04x]\n",towns_crtc_sel,towns_crtc_reg[towns_crtc_sel]);
 			return (towns_crtc_reg[towns_crtc_sel] & 0xff00) >> 8;
+		case 0x08:
+			return towns_video_sel;
+		case 0x0a:
+			logerror("Video: reading register %i (0x44a) [%02x]\n",towns_video_sel,towns_video_reg[towns_video_sel]);
+			return towns_video_reg[towns_video_sel];
+		case 0x0c:
+			if(towns_dpmd_flag != 0)
+			{
+				towns_dpmd_flag = 0;
+				return 0x80;
+			}
+			else
+				return 0x00;
 		default:
 			logerror("VID: read port %04x\n",offset+0x440);
 	}
@@ -253,6 +333,13 @@ WRITE8_HANDLER(towns_video_440_w)
 			towns_crtc_reg[towns_crtc_sel] = 
 				(towns_crtc_reg[towns_crtc_sel] & 0x00ff) | (data << 8); 
 			break;
+		case 0x08:
+			towns_video_sel = data & 0x01;
+			break;
+		case 0x0a:
+			logerror("Video: writing register %i (0x44a) [%02x]\n",towns_video_sel,data);
+			towns_video_reg[towns_video_sel] = data;
+			break;
 		default:
 			logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0x440);
 	}
@@ -266,7 +353,7 @@ READ8_HANDLER(towns_video_5c8_r)
 		case 0x00:  // 0x5c8 - disable TVRAM?
 		if(towns_tvram_enable != 0)
 		{
-			towns_tvram_enable = 0;
+			//towns_tvram_enable = 0;
 			return 0x80;
 		}
 		else
@@ -344,6 +431,7 @@ WRITE8_HANDLER(towns_video_fd90_w)
 		case 0x0e:
 		case 0x0f:
 			towns_degipal[offset-0x08] = data;
+			towns_dpmd_flag = 1;
 			break;
 	}
 	logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
@@ -366,7 +454,7 @@ WRITE8_HANDLER(towns_video_ff81_w)
  *  Sprite RAM, low memory
  *  Writing to 0xc8xxx or 0xcaxxx activates TVRAM mode
  *  Writing to I/O port 0x5c8 disables TVRAM mode 
- *     (bit 7 returns high is TVRAM mode was previously active)
+ *     (bit 7 returns high if TVRAM mode was previously active)
  * 
  *  In TVRAM mode:
  *    0xc8000-0xc8fff: ASCII text (2 bytes each: ISO646 code, then attribute)
@@ -443,7 +531,7 @@ VIDEO_UPDATE( towns )
 	
 	if(towns_vram_page_sel != 0)
 		off = 0x20000;
-	for(y=0;y<480;y++)
+	for(y=0;y<400;y++)
 	{
 //		off = 0x50 * y;
 		for(x=0;x<640;x+=2)
@@ -533,7 +621,17 @@ VIDEO_UPDATE( towns )
 			}
 		}
 	}
-		
+	
+#ifdef CRTC_REG_DISP
+	popmessage("CRTC: %i %i %i %i %i %i %i %i %i\n%i %i %i %i | %i %i %i %i\nZOOM: %04x\nShifter: %02x %02x\nText=%i",
+		towns_crtc_reg[0],towns_crtc_reg[1],towns_crtc_reg[2],towns_crtc_reg[3],
+		towns_crtc_reg[4],towns_crtc_reg[5],towns_crtc_reg[6],towns_crtc_reg[7],
+		towns_crtc_reg[8],
+		towns_crtc_reg[9],towns_crtc_reg[10],towns_crtc_reg[11],towns_crtc_reg[12],
+		towns_crtc_reg[13],towns_crtc_reg[14],towns_crtc_reg[15],towns_crtc_reg[16],
+		towns_crtc_reg[27],towns_video_reg[0],towns_video_reg[1],towns_tvram_enable);
+#endif
+
     return 0;
 }
 
