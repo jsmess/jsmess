@@ -6,7 +6,7 @@
 
 
 #include "driver.h"
-#include "amiga.h"
+#include "includes/amiga.h"
 #include "amigakbd.h"
 #include "machine/6526cia.h"
 

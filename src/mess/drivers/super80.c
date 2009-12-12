@@ -11,7 +11,7 @@
 #include "sound/speaker.h"
 #include "machine/ctronics.h"
 #include "super80.lh"
-#include "super80.h"
+#include "includes/super80.h"
 
 UINT8 *super80_pcgram;
 

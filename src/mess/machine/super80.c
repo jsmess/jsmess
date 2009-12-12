@@ -6,7 +6,7 @@
 #include "devices/cassette.h"
 #include "sound/speaker.h"
 #include "machine/ctronics.h"
-#include "super80.h"
+#include "includes/super80.h"
 
 /* Bits in shared variable:
     d5 cassette LED

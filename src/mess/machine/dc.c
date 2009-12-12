@@ -16,10 +16,10 @@
 #include "driver.h"
 #include "cdrom.h"
 #include "debugger.h"
-#include "dc.h"
+#include "includes/dc.h"
 #include "cpu/sh4/sh4.h"
 #include "sound/aica.h"
-#include "naomi.h"
+#include "includes/naomi.h"
 #include "machine/gdrom.h"
 #include "devices/chd_cd.h"
 

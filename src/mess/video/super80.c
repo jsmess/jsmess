@@ -7,7 +7,7 @@
 
 
 #include "driver.h"
-#include "super80.h"
+#include "includes/super80.h"
 
 
 static UINT16 vidpg=0xfe00;	/* Home position of video page being displayed */
