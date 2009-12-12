@@ -218,7 +218,7 @@ INLINE c1541_config *get_safe_config(const device_config *device)
 
 static TIMER_CALLBACK( bit_tick )
 {
-	const device_config *device = (device_config *) param;
+	const device_config *device = (device_config *)(FPTR) param;
 	c1541_t *c1541 = get_safe_token(device);
 	int byte = 0;
 
