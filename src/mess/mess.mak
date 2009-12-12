@@ -486,7 +486,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_VIDEO)/m6845.o		\
 	$(MESS_VIDEO)/m6847.o		\
 	$(MESS_VIDEO)/msm6255.o		\
-	$(MESS_VIDEO)/saa5050.o		\
 	$(MESS_VIDEO)/saa505x.o		\
 	$(MESS_VIDEO)/sed1330.o		\
 	$(MESS_VIDEO)/tms3556.o		\
