@@ -1,9 +1,5 @@
-/* This must be called cps1.h, because kabuki.c includes it */
-
-
-
-#ifndef _CPS1_H_
-#define _CPS1_H_
+#ifndef _CPSCHNGHR_H_
+#define _CPSCHNGHR_H_
 
 
 /*----------- defined in machine/kabuki.c -----------*/

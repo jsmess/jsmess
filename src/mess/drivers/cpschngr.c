@@ -18,7 +18,7 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "sound/qsound.h"
-#include "cps1.h"
+#include "includes/cpschngr.h"
 
 static READ16_HANDLER( cps1_dsw_r )
 {
