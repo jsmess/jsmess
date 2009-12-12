@@ -237,7 +237,7 @@ static TIMER_CALLBACK( bit_tick )
 
 	if (c1541->byte != byte)
 	{
-		int byte_ready = !(c1541->soe && byte_ready);
+		int byte_ready = !(c1541->soe && byte);
 
 		cpu_set_input_line(c1541->cpu, M6502_SET_OVERFLOW, byte_ready);
 		via_ca1_w(c1541->via1, 0, byte_ready);
