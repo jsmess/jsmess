@@ -707,8 +707,6 @@ void crtc_ega_update(const device_config *device, bitmap_t *bitmap, const rectan
 		/* call the tear down function if any */
 		if (crtc_ega->intf->end_update != NULL)
 			crtc_ega->intf->end_update(device, bitmap, cliprect, param);
-
-		popmessage(NULL);
 	}
 	else
 		popmessage("Invalid crtc_ega screen parameters - display disabled!!!");
