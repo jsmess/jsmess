@@ -61,7 +61,6 @@ struct _cbmserial_daisy_chain
 
 typedef void (*cbmserial_line)(const device_config *device, int state);
 
-
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/

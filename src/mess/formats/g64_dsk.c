@@ -96,7 +96,7 @@ floperr_t g64_get_track_length(floppy_image *floppy, int track, UINT64 *length)
 {
 	floperr_t err;
 	UINT64 track_offset;
-	UINT64 track_length;
+	UINT64 track_length = 0;
 	UINT8 header[2];
 
 	/* get track offset */
@@ -105,9 +105,12 @@ floperr_t g64_get_track_length(floppy_image *floppy, int track, UINT64 *length)
 	if (err) 
 		return err;
 
-	/* get track length */
-	floppy_image_read(floppy, header, track_offset, 2);
-	track_length = (header[1] << 8) | header[0];
+	if (track_offset)
+	{
+		/* get track length */
+		floppy_image_read(floppy, header, track_offset, 2);
+		track_length = (header[1] << 8) | header[0];
+	}
 
 	if (length)
 		*length = track_length;
@@ -120,7 +123,7 @@ static floperr_t g64_read_track(floppy_image *floppy, int head, int track, UINT6
 	floperr_t err;
 	UINT64 track_offset;
 	UINT8 header[2];
-	UINT64 track_length;
+	UINT64 track_length = 0;
 
 	/* get track offset */
 	err = get_track_offset(floppy, track, &track_offset);
@@ -128,13 +131,17 @@ static floperr_t g64_read_track(floppy_image *floppy, int head, int track, UINT6
 	if (err) 
 		return err;
 
-	/* get track length */
-	floppy_image_read(floppy, header, track_offset, 2);
-	track_length = (header[1] << 8) | header[0];
-	logerror("G64 track %.1f length %u\n", get_track_index(track), track_length);
+	if (track_offset)
+	{
+		/* get track length */
+		floppy_image_read(floppy, header, track_offset, 2);
+		track_length = (header[1] << 8) | header[0];
 
-	/* read track */
-	floppy_image_read(floppy, buffer, track_offset, buflen);
+		/* read track */
+		floppy_image_read(floppy, buffer, track_offset, buflen);
+	}
+
+	logerror("G64 track %.1f length %u\n", get_track_index(track), track_length);
 	
 	return FLOPPY_ERROR_SUCCESS;
 }

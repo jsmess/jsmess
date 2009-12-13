@@ -118,9 +118,9 @@
 
 	TODO:
 
+	- read data fails
+	- detect sync from 10 consecutive 1-bits
 	- get track length from image
-	- attention acknowledge
-	- mechanical track 0 sensing?
 	- activity led
 	- write G64
 	- D64 to G64 conversion
@@ -154,8 +154,6 @@ static const double C1541_BITRATE[4] =
 	XTAL_16MHz/13.0, XTAL_16MHz/14.0, XTAL_16MHz/15.0, XTAL_16MHz/16.0
 };
 
-#define C1541_TRACK_BUFFER_SIZE		0x2000
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -167,7 +165,7 @@ struct _c1541_t
 	int address;						/* serial bus address - 8 */
 	UINT8 track_buffer[8192];			/* track data buffer */
 	int track_len;						/* track length */
-	int track;							/* current position of the actuator (half track) */
+	int track : 1;						/* current position of the actuator (half track) */
 	int buffer_pos;						/* current byte position within track buffer */
 	int bit_pos;						/* current bit position within track buffer byte */
 
@@ -177,11 +175,11 @@ struct _c1541_t
 	int atna;							/* attention acknowledge */
 	int ds;								/* data speed */
 	int stp;							/* stepper motor phase */
-	int soe : 1;						/* s? output enable */
+	int soe;							/* s? output enable */
 	int mode;							/* mode (0 = write, 1 = read) */
 
 	/* serial bus */
-	int data_out;
+	int data_out;						/* serial bus data output */
 
 	/* devices */
 	const device_config *cpu;
@@ -261,8 +259,7 @@ static TIMER_CALLBACK( bit_tick )
     c1541_atn_w - serial bus attention
 -------------------------------------------------*/
 
-static void cbmserial_atn_c1541(const device_config *device, int state)
-//static CBM_SERIAL_ATN( c1541 )
+static CBMSERIAL_ATN( c1541 )
 {
 	c1541_t *c1541 = get_safe_token(device);
 	int serial_data = !c1541->data_out && !(c1541->atna ^ !state);
@@ -276,16 +273,13 @@ static void cbmserial_atn_c1541(const device_config *device, int state)
     c1541_reset_w - serial bus reset
 -------------------------------------------------*/
 
-static void cbmserial_reset_c1541(const device_config *device, int state)
-//static CBM_SERIAL_RESET( c1541 )
+static CBMSERIAL_RESET( c1541 )
 {
 	c1541_t *c1541 = get_safe_token(device);
 
 	if (!state)
 	{
-		device_reset(c1541->cpu);
-		device_reset(c1541->via0);
-		device_reset(c1541->via1);
+		device_reset(device);
 	}
 }
 
@@ -357,6 +351,7 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 	*/
 
 	c1541_t *c1541 = get_safe_token(device->owner);
+	
 	int data_out = BIT(data, 1);
 	int clk_out = BIT(data, 3);
 	int atna = BIT(data, 4);
@@ -487,6 +482,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 	*/
 
 	c1541_t *c1541 = get_safe_token(device->owner);
+
 	int stp = data & 0x03;
 	int ds = (data >> 5) & 0x03;
 	int mtr = BIT(data, 2);
@@ -504,21 +500,15 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 		case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
 		}
 
-		floppy_drive_seek(c1541->image, tracks);
+		if (tracks != 0)
+		{
+			c1541->track_len = 8192; // TODO get track length from image
+			c1541->buffer_pos = 0;
+			c1541->bit_pos = 0;
 
-		c1541->track += tracks;
-
-		if (c1541->track < 0) c1541->track = 0; // BUMP!
-		if (c1541->track > 83) c1541->track = 83;
-
-		if (LOG) logerror("C1541 Track: %0.1f\n", (float)(c1541->track / 2) + 1);
-		
-		c1541->track_len = 8192;
-		floppy_drive_read_track_data_info_buffer(c1541->image, 0, c1541->track_buffer, &c1541->track_len);
-		c1541->buffer_pos = 0;
-		c1541->bit_pos = 0;
-
-		if (LOG) logerror("C1541 Track length %u\n", c1541->track_len);
+			floppy_drive_seek(c1541->image, tracks);
+			floppy_drive_read_track_data_info_buffer(c1541->image, 0, c1541->track_buffer, &c1541->track_len);
+		}
 
 		c1541->stp = stp;
 	}
@@ -728,7 +718,11 @@ static DEVICE_START( c1541 )
 
 static DEVICE_RESET( c1541 )
 {
+	c1541_t *c1541 = get_safe_token(device);
 
+	device_reset(c1541->cpu);
+	device_reset(c1541->via0);
+	device_reset(c1541->via1);
 }
 
 /*-------------------------------------------------
@@ -752,8 +746,8 @@ DEVICE_GET_INFO( c1541 )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1541);						break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1541);						break;
-		case DEVINFO_FCT_CBM_SERIAL_ATN:				info->f = (genf *)cbmserial_atn_c1541;				break;
-		case DEVINFO_FCT_CBM_SERIAL_RESET:				info->f = (genf *)cbmserial_reset_c1541;				break;
+		case DEVINFO_FCT_CBM_SERIAL_ATN:				info->f = (genf *)CBMSERIAL_ATN_NAME(c1541);				break;
+		case DEVINFO_FCT_CBM_SERIAL_RESET:				info->f = (genf *)CBMSERIAL_RESET_NAME(c1541);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1541");							break;
