@@ -333,9 +333,10 @@ the Edu64-1 used the full C64 BIOS. Confirmations are needed, anyway.
 
 /* devices config */
 #include "includes/cbm.h"
-#include "includes/cbmserb.h"	// needed for MDRV_DEVICE_REMOVE
 #include "includes/cbmdrive.h"
 #include "includes/vc1541.h"
+#include "machine/cbmserial.h"
+#include "machine/c1541.h"
 
 #include "includes/c64.h"
 
@@ -478,6 +479,12 @@ static const m6502_interface c64_m6510_interface =
 	c64_m6510_port_write
 };
 
+static CBMSERIAL_DAISY( cbmserial_daisy )
+{
+	{ "cia_1" },
+	{ "c1541" },
+	{ NULL}
+};
 
 /*************************************
  *
@@ -522,7 +529,8 @@ static MACHINE_DRIVER_START( c64 )
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, VIC6567_CLOCK, c64_ntsc_cia1)
 
 	/* floppy from serial bus */
-	MDRV_IMPORT_FROM(simulated_drive)
+	MDRV_CBMSERIAL_ADD("serial_bus", cbmserial_daisy)
+	MDRV_C1541_ADD("c1541", "serial_bus", 8)
 
 	MDRV_IMPORT_FROM(c64_cartslot)
 MACHINE_DRIVER_END
@@ -563,7 +571,8 @@ static MACHINE_DRIVER_START( c64pal )
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, VIC6569_CLOCK, c64_pal_cia1)
 
 	/* floppy from serial bus */
-	MDRV_IMPORT_FROM(simulated_drive)
+	MDRV_CBMSERIAL_ADD("serial_bus", cbmserial_daisy)
+	MDRV_C1541_ADD("c1541", "serial_bus", 8)
 
 	MDRV_IMPORT_FROM(c64_cartslot)
 MACHINE_DRIVER_END

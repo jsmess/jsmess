@@ -19,11 +19,11 @@
 #include "cpu/z80/z80.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
+#include "machine/cbmserial.h"
 #include "video/vic6567.h"
 #include "video/vdc8563.h"
 
 #include "includes/cbm.h"
-#include "includes/cbmserb.h"
 #include "includes/cbmdrive.h"
 #include "includes/vc1541.h"
 
@@ -205,10 +205,10 @@ static READ8_DEVICE_HANDLER( c64_cia1_port_a_r )
 	UINT8 value = 0xff;
 	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
 
-	if (!serial_clock || !cbm_serial_clock_read(serbus, 0))
+	if (!cbmserial_clk_r(serbus))
 		value &= ~0x40;
 
-	if (!serial_data || !cbm_serial_data_read(serbus, 0))
+	if (!cbmserial_data_r(serbus))
 		value &= ~0x80;
 
 	return value;
@@ -219,9 +219,9 @@ static WRITE8_DEVICE_HANDLER( c64_cia1_port_a_w )
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
 	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
 
-	cbm_serial_clock_write(serbus, 0, serial_clock = !(data & 0x10));
-	cbm_serial_data_write(serbus, 0, serial_data = !(data & 0x20));
-	cbm_serial_atn_write(serbus, 0, serial_atn = !(data & 0x08));
+	cbmserial_clk_w(serbus, device, !(data & 0x10));
+	cbmserial_data_w(serbus, device, !(data & 0x20));
+	cbmserial_atn_w(serbus, device, !(data & 0x08));
 	c64_vicaddr = c64_memory + helper[data & 0x03];
 }
 

@@ -118,11 +118,10 @@
 
 	TODO:
 
-	- mechanical track 0 sensing
-	- get floppy image to driver state
-	- allocate track buffer
+	- get track length from image
+	- attention acknowledge
+	- mechanical track 0 sensing?
 	- activity led
-	- read G64
 	- write G64
 	- D64 to G64 conversion
 	- accurate timing
@@ -148,6 +147,8 @@
 #define M6522_1_TAG		"ucd4"
 #define TIMER_BIT_TAG	"ue7"
 
+#define FLOPPY_TAG		"c1541_floppy"
+
 static const double C1541_BITRATE[4] =
 {
 	XTAL_16MHz/13.0, XTAL_16MHz/14.0, XTAL_16MHz/15.0, XTAL_16MHz/16.0
@@ -164,7 +165,8 @@ struct _c1541_t
 {
 	/* abstractions */
 	int address;						/* serial bus address - 8 */
-	UINT8 *track_buffer;				/* track data buffer */
+	UINT8 track_buffer[8192];			/* track data buffer */
+	int track_len;						/* track length */
 	int track;							/* current position of the actuator (half track) */
 	int buffer_pos;						/* current byte position within track buffer */
 	int bit_pos;						/* current bit position within track buffer byte */
@@ -175,8 +177,11 @@ struct _c1541_t
 	int atna;							/* attention acknowledge */
 	int ds;								/* data speed */
 	int stp;							/* stepper motor phase */
-	int soe;							/* s? output enable */
+	int soe : 1;						/* s? output enable */
 	int mode;							/* mode (0 = write, 1 = read) */
+
+	/* serial bus */
+	int data_out;
 
 	/* devices */
 	const device_config *cpu;
@@ -218,7 +223,7 @@ INLINE c1541_config *get_safe_config(const device_config *device)
 
 static TIMER_CALLBACK( bit_tick )
 {
-	const device_config *device = (device_config *)(FPTR) param;
+	const device_config *device = (device_config *)ptr;
 	c1541_t *c1541 = get_safe_token(device);
 	int byte = 0;
 
@@ -226,6 +231,12 @@ static TIMER_CALLBACK( bit_tick )
 	{
 		c1541->yb = c1541->track_buffer[c1541->buffer_pos];
 		c1541->buffer_pos++;
+
+		if (c1541->buffer_pos > c1541->track_len)
+		{
+			c1541->buffer_pos = 0;
+		}
+
 		c1541->bit_pos = 0;
 
 		byte = 1;
@@ -237,7 +248,7 @@ static TIMER_CALLBACK( bit_tick )
 
 	if (c1541->byte != byte)
 	{
-		int byte_ready = !(c1541->soe && byte);
+		int byte_ready = !(byte && c1541->soe);
 
 		cpu_set_input_line(c1541->cpu, M6502_SET_OVERFLOW, byte_ready);
 		via_ca1_w(c1541->via1, 0, byte_ready);
@@ -250,22 +261,27 @@ static TIMER_CALLBACK( bit_tick )
     c1541_atn_w - serial bus attention
 -------------------------------------------------*/
 
-static WRITE_LINE_DEVICE_HANDLER( c1541_atn_w )
+static void cbmserial_atn_c1541(const device_config *device, int state)
+//static CBM_SERIAL_ATN( c1541 )
 {
 	c1541_t *c1541 = get_safe_token(device);
+	int serial_data = !c1541->data_out && !(c1541->atna ^ !state);
 
-	via_ca1_w(c1541->via0, 0, state);
+	via_ca1_w(c1541->via0, 0, !state);
+
+	cbmserial_data_w(c1541->serial_bus, device, serial_data);
 }
 
 /*-------------------------------------------------
     c1541_reset_w - serial bus reset
 -------------------------------------------------*/
 
-static WRITE_LINE_DEVICE_HANDLER( c1541_reset_w )
+static void cbmserial_reset_c1541(const device_config *device, int state)
+//static CBM_SERIAL_RESET( c1541 )
 {
 	c1541_t *c1541 = get_safe_token(device);
 
-	if (state)
+	if (!state)
 	{
 		device_reset(c1541->cpu);
 		device_reset(c1541->via0);
@@ -281,14 +297,106 @@ static ADDRESS_MAP_START( c1541_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
 	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1541", 0)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1541", 0xc000)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
     via6522_interface c1541_via0_intf
 -------------------------------------------------*/
 
-static READ8_DEVICE_HANDLER( via0_pa_r )
+static READ8_DEVICE_HANDLER( via0_pb_r )
+{
+	/*
+
+		bit		description
+
+		PB0		DATA IN
+		PB1		DATA OUT
+		PB2		CLK IN
+		PB3		CLK OUT
+		PB4		ATNA
+		PB5		J1
+		PB6		J2
+		PB7		ATN IN
+
+	*/
+
+	c1541_t *c1541 = get_safe_token(device->owner);
+	UINT8 data = 0;
+
+	/* data in */
+	data = !cbmserial_data_r(c1541->serial_bus);
+
+	/* clock in */
+	data |= !cbmserial_clk_r(c1541->serial_bus) << 2;
+
+	/* serial bus address */
+	data |= c1541->address << 5;
+
+	/* attention in */
+	data |= !cbmserial_atn_r(c1541->serial_bus) << 7;
+
+	return data;
+}
+
+static WRITE8_DEVICE_HANDLER( via0_pb_w )
+{
+	/*
+
+		bit		description
+
+		PB0		DATA IN
+		PB1		DATA OUT
+		PB2		CLK IN
+		PB3		CLK OUT
+		PB4		ATNA
+		PB5		J1
+		PB6		J2
+		PB7		ATN IN
+
+	*/
+
+	c1541_t *c1541 = get_safe_token(device->owner);
+	int data_out = BIT(data, 1);
+	int clk_out = BIT(data, 3);
+	int atna = BIT(data, 4);
+
+	/* data out */
+	int serial_data = !data_out && !(atna ^ !cbmserial_atn_r(c1541->serial_bus));
+	cbmserial_data_w(c1541->serial_bus, device->owner, serial_data);
+	c1541->data_out = data_out;
+
+	/* clock out */
+	cbmserial_clk_w(c1541->serial_bus, device->owner, !clk_out);
+
+	/* attention acknowledge */
+	c1541->atna = atna;
+}
+
+static const via6522_interface c1541_via0_intf =
+{
+	DEVCB_NULL,
+	DEVCB_HANDLER(via0_pb_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_HANDLER(via0_pb_w),
+	DEVCB_NULL, // ATN IN
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0)
+};
+
+/*-------------------------------------------------
+    via6522_interface c1541_via1_intf
+-------------------------------------------------*/
+
+static READ8_DEVICE_HANDLER( yb_r )
 {
 	/*
 
@@ -305,12 +413,12 @@ static READ8_DEVICE_HANDLER( via0_pa_r )
 
 	*/
 
-	c1541_t *c1541 = get_safe_token(device);
+	c1541_t *c1541 = get_safe_token(device->owner);
 
 	return c1541->yb;
 }
 
-static WRITE8_DEVICE_HANDLER( via0_pa_w )
+static WRITE8_DEVICE_HANDLER( yb_w )
 {
 	/*
 
@@ -327,12 +435,12 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
 
 	*/
 
-	c1541_t *c1541 = get_safe_token(device);
+	c1541_t *c1541 = get_safe_token(device->owner);
 
 	c1541->yb = data;
 }
 
-static READ8_DEVICE_HANDLER( via0_pb_r )
+static READ8_DEVICE_HANDLER( via1_pb_r )
 {
 	/*
 
@@ -349,11 +457,11 @@ static READ8_DEVICE_HANDLER( via0_pb_r )
 
 	*/
 
-	c1541_t *c1541 = get_safe_token(device);
+	c1541_t *c1541 = get_safe_token(device->owner);
 	UINT8 data = 0;
 
 	/* write protect sensor */
-	data |= (floppy_drive_get_flag_state(c1541->image, FLOPPY_DRIVE_DISK_WRITE_PROTECTED)) << 4;
+	data |= (floppy_drive_get_flag_state(c1541->image, FLOPPY_DRIVE_DISK_WRITE_PROTECTED) == FLOPPY_DRIVE_DISK_WRITE_PROTECTED) << 4;
 
 	/* SYNC detected */
 	data |= !(c1541->mode && (c1541->yb == 0xff)) << 7;
@@ -361,7 +469,7 @@ static READ8_DEVICE_HANDLER( via0_pb_r )
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( via0_pb_w )
+static WRITE8_DEVICE_HANDLER( via1_pb_w )
 {
 	/*
 
@@ -378,15 +486,15 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 
 	*/
 
-	c1541_t *c1541 = get_safe_token(device);
+	c1541_t *c1541 = get_safe_token(device->owner);
 	int stp = data & 0x03;
 	int ds = (data >> 5) & 0x03;
+	int mtr = BIT(data, 2);
 
 	/* stepper motor */
 	if (c1541->stp != stp)
 	{
 		int tracks = 0;
-		int length;
 
 		switch (c1541->stp)
 		{
@@ -398,21 +506,26 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 
 		floppy_drive_seek(c1541->image, tracks);
 
-//		if (c1541->track < 0) c1541->track = 0; // BUMP!
-//		if (c1541->track > 83) c1541->track = 83;
+		c1541->track += tracks;
 
-//		if (LOG) logerror("C1541 Track: %f\n", (float)c1541->track / 2);
+		if (c1541->track < 0) c1541->track = 0; // BUMP!
+		if (c1541->track > 83) c1541->track = 83;
 
-		floppy_drive_read_track_data_info_buffer(c1541->image, 0, c1541->track_buffer, &length);
+		if (LOG) logerror("C1541 Track: %0.1f\n", (float)(c1541->track / 2) + 1);
+		
+		c1541->track_len = 8192;
+		floppy_drive_read_track_data_info_buffer(c1541->image, 0, c1541->track_buffer, &c1541->track_len);
+		c1541->buffer_pos = 0;
+		c1541->bit_pos = 0;
 
-		if (LOG) logerror("C1541 Track length %u\n", length);
+		if (LOG) logerror("C1541 Track length %u\n", c1541->track_len);
 
 		c1541->stp = stp;
 	}
 
 	/* spindle motor */
-	floppy_drive_set_motor_state(c1541->image, BIT(data, 2) ? FLOPPY_DRIVE_MOTOR_ON : 0);
-	timer_enable(c1541->bit_timer, BIT(data, 2));
+	floppy_drive_set_motor_state(c1541->image, mtr ? FLOPPY_DRIVE_MOTOR_ON : 0);
+	timer_enable(c1541->bit_timer, mtr);
 
 	/* activity LED */
 
@@ -426,124 +539,37 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( soe_w )
 {
-	c1541_t *c1541 = get_safe_token(device);
+	c1541_t *c1541 = get_safe_token(device->owner);
 	int byte_ready = !(state && c1541->byte);
 
 	c1541->soe = state;
 
 	cpu_set_input_line(c1541->cpu, M6502_SET_OVERFLOW, byte_ready);
-	via_ca1_w(c1541->via0, 0, byte_ready);
+	via_ca1_w(device, 0, byte_ready);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( mode_w )
 {
-	c1541_t *c1541 = get_safe_token(device);
+	c1541_t *c1541 = get_safe_token(device->owner);
 
 	c1541->mode = state;
 }
 
-static const via6522_interface c1541_via0_intf =
+static const via6522_interface c1541_via1_intf =
 {
-	DEVCB_HANDLER(via0_pa_r),
-	DEVCB_HANDLER(via0_pb_r),
+	DEVCB_HANDLER(yb_r),
+	DEVCB_HANDLER(via1_pb_r),
 	DEVCB_NULL, // BYTE REDY
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_HANDLER(via0_pa_w),
-	DEVCB_HANDLER(via0_pb_w),
+	DEVCB_HANDLER(yb_w),
+	DEVCB_HANDLER(via1_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_LINE(soe_w),
 	DEVCB_LINE(mode_w),
-
-	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0)
-};
-
-/*-------------------------------------------------
-    via6522_interface c1541_via1_intf
--------------------------------------------------*/
-
-static READ8_DEVICE_HANDLER( via1_pb_r )
-{
-	/*
-
-		bit		description
-
-		PB0		DATA IN
-		PB1		DATA OUT
-		PB2		CLK IN
-		PB3		CLK OUT
-		PB4		ATNA
-		PB5		J1
-		PB6		J2
-		PB7		ATN IN
-
-	*/
-
-	c1541_t *c1541 = get_safe_token(device);
-	UINT8 data = 0;
-
-	/* data in */
-	data = cbmserial_data_r(c1541->serial_bus);
-
-	/* clock in */
-	data |= cbmserial_clk_r(c1541->serial_bus) << 2;
-
-	/* serial bus address */
-	data |= c1541->address << 5;
-
-	/* attention in */
-	data |= cbmserial_atn_r(c1541->serial_bus) << 7;
-
-	return data;
-}
-
-static WRITE8_DEVICE_HANDLER( via1_pb_w )
-{
-	/*
-
-		bit		description
-
-		PB0		DATA IN
-		PB1		DATA OUT
-		PB2		CLK IN
-		PB3		CLK OUT
-		PB4		ATNA
-		PB5		J1
-		PB6		J2
-		PB7		ATN IN
-
-	*/
-
-	c1541_t *c1541 = get_safe_token(device);
-
-	/* data out */
-	cbmserial_data_w(c1541->serial_bus, BIT(data, 1));
-
-	/* clock out */
-	cbmserial_clk_w(c1541->serial_bus, BIT(data, 3));
-
-	/* attention acknowledge */
-	c1541->atna = BIT(data, 4);
-}
-
-static const via6522_interface c1541_via1_intf =
-{
-	DEVCB_NULL,
-	DEVCB_HANDLER(via1_pb_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_HANDLER(via1_pb_w),
-	DEVCB_NULL, // ATN IN
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 
 	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0)
 };
@@ -568,7 +594,7 @@ static const floppy_config c1541_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_SS_40,
+	FLOPPY_DRIVE_SS_80,
 	FLOPPY_OPTIONS_NAME(c1541),
 	DO_NOT_KEEP_GEOMETRY
 };
@@ -584,7 +610,7 @@ static MACHINE_DRIVER_START( c1541 )
 	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c1541_via0_intf)
 	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
 
-	MDRV_FLOPPY_DRIVE_ADD("c1541_drive", c1541_floppy_config)
+	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_TAG, c1541_floppy_config)
 MACHINE_DRIVER_END
 
 /*-------------------------------------------------
@@ -602,14 +628,14 @@ ROM_END
 -------------------------------------------------*/
 
 ROM_START( c1541 ) // schematic 1540008
-	ROM_REGION( 0x1000, "c1541", ROMREGION_LOADBYNAME )
+	ROM_REGION( 0x10000, "c1541", ROMREGION_LOADBYNAME )
 	ROM_LOAD( "325302-01.uab4", 0xc000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
 	ROM_LOAD( "901229-01.uab5", 0xe000, 0x2000, CRC(9a48d3f0) SHA1(7a1054c6156b51c25410caec0f609efb079d3a77) )
 	ROM_LOAD( "901229-02.uab5", 0xe000, 0x2000, CRC(b29bab75) SHA1(91321142e226168b1139c30c83896933f317d000) )
 	ROM_LOAD( "901229-03.uab5", 0xe000, 0x2000, CRC(9126e74a) SHA1(03d17bd745066f1ead801c5183ac1d3af7809744) )
 	ROM_LOAD( "901229-04.uab5", 0xe000, 0x2000, NO_DUMP )
-	ROM_LOAD( "901229-05.uab5", 0xe000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b) )
-	ROM_LOAD( "901229-06aa.uab5", 0xe000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0) )
+	ROM_LOAD( "901229-05 ae.uab5", 0xe000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b) )
+//	ROM_LOAD( "901229-06 aa.uab5", 0xe000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0) )
 ROM_END
 
 /*-------------------------------------------------
@@ -617,14 +643,14 @@ ROM_END
 -------------------------------------------------*/
 
 ROM_START( c1541cr ) // schematic 1540049
-	ROM_REGION( 0x1000, "c1541cr", ROMREGION_LOADBYNAME )
+	ROM_REGION( 0x10000, "c1541cr", ROMREGION_LOADBYNAME )
 	ROM_LOAD( "325302-01.ub3", 0xc000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
 	ROM_LOAD( "901229-01.ub4", 0xe000, 0x2000, CRC(9a48d3f0) SHA1(7a1054c6156b51c25410caec0f609efb079d3a77) )
 	ROM_LOAD( "901229-02.ub4", 0xe000, 0x2000, CRC(b29bab75) SHA1(91321142e226168b1139c30c83896933f317d000) )
 	ROM_LOAD( "901229-03.ub4", 0xe000, 0x2000, CRC(9126e74a) SHA1(03d17bd745066f1ead801c5183ac1d3af7809744) )
 	ROM_LOAD( "901229-04.ub4", 0xe000, 0x2000, NO_DUMP )
-	ROM_LOAD( "901229-05.ub4", 0xe000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b) )
-	ROM_LOAD( "901229-06aa.ub4", 0xe000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0) )
+	ROM_LOAD( "901229-05 ae.ub4", 0xe000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b) )
+	ROM_LOAD( "901229-06 aa.ub4", 0xe000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0) )
 ROM_END
 
 /*-------------------------------------------------
@@ -644,7 +670,7 @@ ROM_END
 -------------------------------------------------*/
 
 ROM_START( c1541b ) // schematic ?
-	ROM_REGION( 0x1000, "c1541b", ROMREGION_LOADBYNAME )
+	ROM_REGION( 0x10000, "c1541b", ROMREGION_LOADBYNAME )
 	ROM_LOAD( "251968-01.ua2", 0xc000, 0x4000, CRC(1b3ca08d) SHA1(8e893932de8cce244117fcea4c46b7c39c6a7765) )
 	ROM_LOAD( "251968-02.ua2", 0xc000, 0x4000, CRC(2d862d20) SHA1(38a7a489c7bbc8661cf63476bf1eb07b38b1c704) )
 ROM_END
@@ -660,7 +686,7 @@ ROM_END
 -------------------------------------------------*/
 
 ROM_START( c1541ii ) // schematic 340503
-	ROM_REGION( 0x1000, "c1541ii", ROMREGION_LOADBYNAME )
+	ROM_REGION( 0x10000, "c1541ii", ROMREGION_LOADBYNAME )
 	ROM_LOAD( "251968-03.u4", 0xc000, 0x4000, CRC(899fa3c5) SHA1(d3b78c3dbac55f5199f33f3fe0036439811f7fb3) )
 	ROM_LOAD( "355640-01.u4", 0xc000, 0x4000, CRC(57224cde) SHA1(ab16f56989b27d89babe5f89c5a8cb3da71a82f0) )
 ROM_END
@@ -685,11 +711,12 @@ static DEVICE_START( c1541 )
 	c1541->via0 = device_find_child_by_tag(device, M6522_0_TAG);
 	c1541->via1 = device_find_child_by_tag(device, M6522_1_TAG);
 	c1541->serial_bus = devtag_get_device(device->machine, config->serial_bus_tag);
-	c1541->image = device_find_child_by_tag(device, "c1541_drive");
+	c1541->image = device_find_child_by_tag(device, FLOPPY_TAG);
 
 	/* allocate data timer */
 	c1541->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
-	timer_adjust_periodic(c1541->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C1541_BITRATE[0]));
+//	timer_adjust_periodic(c1541->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C1541_BITRATE[0]));
+//	timer_enable(c1541->bit_timer, 0);
 
 	/* register for state saving */
 //	state_save_register_device_item(device, 0, c1541->);
@@ -725,8 +752,8 @@ DEVICE_GET_INFO( c1541 )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1541);						break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1541);						break;
-		case DEVINFO_FCT_CBM_SERIAL_ATN:				info->f = (genf *)c1541_atn_w;								break;
-		case DEVINFO_FCT_CBM_SERIAL_RESET:				info->f = (genf *)c1541_reset_w;							break;
+		case DEVINFO_FCT_CBM_SERIAL_ATN:				info->f = (genf *)cbmserial_atn_c1541;				break;
+		case DEVINFO_FCT_CBM_SERIAL_RESET:				info->f = (genf *)cbmserial_reset_c1541;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1541");							break;

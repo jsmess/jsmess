@@ -199,6 +199,18 @@ C64 SERIAL BUS
 
 #define LOG 0
 
+enum
+{
+	SRQ = 0,
+	ATN,
+	CLK,
+	DATA,
+	RESET,
+	SIGNAL_COUNT
+};
+
+static const char *const SIGNAL_NAME[] = { "SRQ", "ATN", "CLK", "DATA", "RESET" };
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -209,23 +221,15 @@ struct _cbmserial_daisy_state
 	cbmserial_daisy_state		*next;			/* next device */
 	const device_config			*device;		/* associated device */
 
-	devcb_resolved_write_line	out_srq_func;
-	devcb_resolved_write_line	out_atn_func;
-	devcb_resolved_write_line	out_clk_func;
-	devcb_resolved_write_line	out_data_func;
-	devcb_resolved_write_line	out_reset_func;
+	int line[SIGNAL_COUNT];				/* serial signal states */
+
+	cbmserial_line				out_line_func[SIGNAL_COUNT];
 };
 
 typedef struct _cbmserial_t cbmserial_t;
 struct _cbmserial_t
 {
 	cbmserial_daisy_state *daisy_state;
-
-	int srq;			/* serial service request */
-	int atn;			/* attention */
-	int clk;			/* clock */
-	int data;			/* data */
-	int reset;			/* reset */
 };
 
 /***************************************************************************
@@ -247,108 +251,106 @@ INLINE const cbmserial_daisy_chain *get_interface(const device_config *device)
 	return (const cbmserial_daisy_chain *) device->static_config;
 }
 
+INLINE int get_signal(const device_config *device, int line)
+{
+	cbmserial_t *cbmserial = get_safe_token(device);
+	cbmserial_daisy_state *daisy = cbmserial->daisy_state;
+	int state = 1;
+
+	for ( ; daisy != NULL; daisy = daisy->next)
+	{
+		if (!daisy->line[line])
+		{
+			state = 0;
+			break;
+		}
+	}
+
+	return state;
+}
+
+INLINE void set_signal(const device_config *serial_bus_device, const device_config *calling_device, int line, int state)
+{
+	cbmserial_t *cbmserial = get_safe_token(serial_bus_device);
+	cbmserial_daisy_state *daisy = cbmserial->daisy_state;
+	int data = 1;
+
+	for ( ; daisy != NULL; daisy = daisy->next)
+	{
+		if (!strcmp(daisy->device->tag, calling_device->tag))
+		{
+			if (daisy->line[line] != state)
+			{
+				logerror("CBM serial bus device '%s' %s %u\n", calling_device->tag, SIGNAL_NAME[line], state);
+				daisy->line[line] = state;
+			}
+			break;
+		}
+	}
+
+	data = get_signal(serial_bus_device, line);
+	daisy = cbmserial->daisy_state;
+
+	for ( ; daisy != NULL; daisy = daisy->next)
+	{
+		if (daisy->out_line_func[line]) (daisy->out_line_func[line])(daisy->device, data);
+	}
+
+	logerror("SRQ %u ATN %u CLK %u DATA %u RESET %u\n", get_signal(serial_bus_device, SRQ),get_signal(serial_bus_device, ATN),get_signal(serial_bus_device, CLK),get_signal(serial_bus_device, DATA),get_signal(serial_bus_device, RESET));
+}
+
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
 
-WRITE_LINE_DEVICE_HANDLER( cbmserial_srq_w )
+void cbmserial_srq_w(const device_config *serial_bus_device, const device_config *calling_device, int state)
 {
-	cbmserial_t *cbmserial = get_safe_token(device);
-	cbmserial_daisy_state *daisy = cbmserial->daisy_state;
-
-	cbmserial->srq = state;
-
-	for ( ; daisy != NULL; daisy = daisy->next)
-	{
-		devcb_call_write_line(&daisy->out_srq_func, state);
-	}
+	set_signal(serial_bus_device, calling_device, SRQ, state);
 }
 
 READ_LINE_DEVICE_HANDLER( cbmserial_srq_r )
 {
-	cbmserial_t *cbmserial = get_safe_token(device);
-
-	return cbmserial->srq;
+	return get_signal(device, SRQ);
 }
 
-WRITE_LINE_DEVICE_HANDLER( cbmserial_atn_w )
+void cbmserial_atn_w(const device_config *serial_bus_device, const device_config *calling_device, int state)
 {
-	cbmserial_t *cbmserial = get_safe_token(device);
-	cbmserial_daisy_state *daisy = cbmserial->daisy_state;
-
-	cbmserial->atn = state;
-
-	for ( ; daisy != NULL; daisy = daisy->next)
-	{
-		devcb_call_write_line(&daisy->out_atn_func, state);
-	}
+	set_signal(serial_bus_device, calling_device, ATN, state);
 }
 
 READ_LINE_DEVICE_HANDLER( cbmserial_atn_r )
 {
-	cbmserial_t *cbmserial = get_safe_token(device);
-
-	return cbmserial->atn;
+	return get_signal(device, ATN);
 }
 
-WRITE_LINE_DEVICE_HANDLER( cbmserial_clk_w )
+void cbmserial_clk_w(const device_config *serial_bus_device, const device_config *calling_device, int state)
 {
-	cbmserial_t *cbmserial = get_safe_token(device);
-	cbmserial_daisy_state *daisy = cbmserial->daisy_state;
-
-	cbmserial->clk = state;
-
-	for ( ; daisy != NULL; daisy = daisy->next)
-	{
-		devcb_call_write_line(&daisy->out_clk_func, state);
-	}
+	set_signal(serial_bus_device, calling_device, CLK, state);
 }
 
 READ_LINE_DEVICE_HANDLER( cbmserial_clk_r )
 {
-	cbmserial_t *cbmserial = get_safe_token(device);
-
-	return cbmserial->clk;
+	return get_signal(device, CLK);
 }
 
-WRITE_LINE_DEVICE_HANDLER( cbmserial_data_w )
+void cbmserial_data_w(const device_config *serial_bus_device, const device_config *calling_device, int state)
 {
-	cbmserial_t *cbmserial = get_safe_token(device);
-	cbmserial_daisy_state *daisy = cbmserial->daisy_state;
-
-	cbmserial->data = state;
-
-	for ( ; daisy != NULL; daisy = daisy->next)
-	{
-		devcb_call_write_line(&daisy->out_data_func, state);
-	}
+	set_signal(serial_bus_device, calling_device, DATA, state);
 }
 
 READ_LINE_DEVICE_HANDLER( cbmserial_data_r )
 {
-	cbmserial_t *cbmserial = get_safe_token(device);
-
-	return cbmserial->data;
+	return get_signal(device, DATA);
 }
 
-WRITE_LINE_DEVICE_HANDLER( cbmserial_reset_w )
+void cbmserial_reset_w(const device_config *serial_bus_device, const device_config *calling_device, int state)
 {
-	cbmserial_t *cbmserial = get_safe_token(device);
-	cbmserial_daisy_state *daisy = cbmserial->daisy_state;
-
-	cbmserial->reset = state;
-
-	for ( ; daisy != NULL; daisy = daisy->next)
-	{
-		devcb_call_write_line(&daisy->out_reset_func, state);
-	}
+	set_signal(serial_bus_device, calling_device, RESET, state);
 }
 
 READ_LINE_DEVICE_HANDLER( cbmserial_reset_r )
 {
-	cbmserial_t *cbmserial = get_safe_token(device);
-
-	return cbmserial->reset;
+	return get_signal(device, RESET);
 }
 
 /*-------------------------------------------------
@@ -357,8 +359,9 @@ READ_LINE_DEVICE_HANDLER( cbmserial_reset_r )
 
 static DEVICE_START( cbmserial )
 {
-	//cbmserial_t *cbmserial = get_safe_token(device);
+	cbmserial_t *cbmserial = get_safe_token(device);
 	const cbmserial_daisy_chain *daisy = get_interface(device);
+	int i;
 
 	astring *tempstring = astring_alloc();
 	cbmserial_daisy_state *head = NULL;
@@ -378,14 +381,21 @@ static DEVICE_START( cbmserial )
 			fatalerror("Unable to locate device '%s'", daisy->tag);
 		}
 
-		devcb_resolve_write_line(&((*tailptr)->out_srq_func), (const devcb_write_line *)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_CBM_SERIAL_SRQ), (*tailptr)->device);
-		devcb_resolve_write_line(&((*tailptr)->out_atn_func), (const devcb_write_line *)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_CBM_SERIAL_ATN), (*tailptr)->device);
-		devcb_resolve_write_line(&((*tailptr)->out_clk_func), (const devcb_write_line *)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_CBM_SERIAL_CLK), (*tailptr)->device);
-		devcb_resolve_write_line(&((*tailptr)->out_data_func), (const devcb_write_line *)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_CBM_SERIAL_DATA), (*tailptr)->device);
-		devcb_resolve_write_line(&((*tailptr)->out_reset_func), (const devcb_write_line *)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_CBM_SERIAL_RESET), (*tailptr)->device);
+		for (i = SRQ; i < SIGNAL_COUNT; i++)
+		{
+			(*tailptr)->line[i] = 1;
+		}
+
+		(*tailptr)->out_line_func[SRQ] = (cbmserial_line)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_CBM_SERIAL_SRQ);
+		(*tailptr)->out_line_func[ATN] = (cbmserial_line)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_CBM_SERIAL_ATN);
+		(*tailptr)->out_line_func[CLK] = (cbmserial_line)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_CBM_SERIAL_CLK);
+		(*tailptr)->out_line_func[DATA] = (cbmserial_line)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_CBM_SERIAL_DATA);
+		(*tailptr)->out_line_func[RESET] = (cbmserial_line)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_CBM_SERIAL_RESET);
 
 		tailptr = &(*tailptr)->next;
 	}
+
+	cbmserial->daisy_state = head;
 
 	astring_free(tempstring);
 
