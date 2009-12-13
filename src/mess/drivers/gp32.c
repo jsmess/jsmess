@@ -21,6 +21,22 @@
 #include "machine/smartmed.h"
 #include "includes/gp32.h"
 #include "sound/dac.h"
+#include "video/generic.h"
+
+#define VERBOSE_LEVEL ( 0 )
+
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ...)
+{
+	if (VERBOSE_LEVEL >= n_level)
+	{
+		va_list v;
+		char buf[32768];
+		va_start( v, s_fmt);
+		vsprintf( buf, s_fmt, v);
+		va_end( v);
+		logerror( "%s: %s", cpuexec_describe_context( machine), buf);
+	}
+}
 
 #define CLOCK_MULTIPLIER 1
 
@@ -37,10 +53,21 @@ static UINT32 s3c240x_get_hclk( int reg);
 
 // LCD CONTROLLER
 
-static UINT32 s3c240x_vidregs[0x400/4];
-static UINT32 s3c240x_palette[0x400/4];
+static UINT32 s3c240x_lcd_regs[0x400/4];
+static emu_timer *s3c240x_lcd_timer;
+
+static struct
+{
+	UINT32 vramaddr[2];
+	UINT32 offsize;
+	UINT32 bppmode;
+	UINT32 hozval;
+	UINT32 lineval;
+} s3c240x_lcd;
 
 #define BPPMODE_TFT_01	0x08
+#define BPPMODE_TFT_02	0x09
+#define BPPMODE_TFT_04	0x0A
 #define BPPMODE_TFT_08	0x0B
 #define BPPMODE_TFT_16	0x0C
 
@@ -50,122 +77,154 @@ static UINT32 s3c240x_palette[0x400/4];
 // 565  16-bit 00000000 00000000 RRRRRGGG GGBBBBB0
 // 565  32-bit 00000000 RRRRR000 GGGGG000 BBBBB000
 
-static VIDEO_UPDATE( gp32 )
+static void s3c240x_lcd_dma_reload( running_machine *machine)
 {
-	if (s3c240x_vidregs[0] & 1)	// display enabled?
+	s3c240x_lcd.vramaddr[0] = s3c240x_lcd_regs[5] << 1;
+	s3c240x_lcd.vramaddr[1] = ((s3c240x_lcd_regs[5] & 0xFFE00000) | s3c240x_lcd_regs[6]) << 1;
+	s3c240x_lcd.offsize = BITS( s3c240x_lcd_regs[7], 21, 11);
+	verboselog( machine, 3, "LCD - vramaddr_start %08X vramaddr_stop %08X offsize %08X\n", s3c240x_lcd.vramaddr[0], s3c240x_lcd.vramaddr[1], s3c240x_lcd.offsize);
+}
+
+static TIMER_CALLBACK( s3c240x_lcd_timer_exp )
+{
+	const device_config *screen = machine->primary_screen;
+	bitmap_t *bitmap = machine->generic.tmpbitmap;
+	int vpos, hpos, x;
+	verboselog( machine, 2, "LCD timer callback\n");
+	vpos = video_screen_get_vpos( screen);
+	hpos = video_screen_get_hpos( screen);
+	verboselog( machine, 3, "LCD - vpos %d hpos %d\n", vpos, hpos);
+	if (s3c240x_lcd.vramaddr[0] >= s3c240x_lcd.vramaddr[1])
 	{
-		int x, y, bppmode;
-//		int hwswp, tpal, offsize;
-		UINT32 vramaddr;
-
-//		logerror("vramaddr 1 = %08X\n", s3c240x_vidregs[5] << 1);
-//		logerror("vramaddr 2 = %08X\n", ((s3c240x_vidregs[5] & 0xFFE00000) | s3c240x_vidregs[6]) << 1);
-		vramaddr = s3c240x_vidregs[5] << 1;
-
-		bppmode = BITS( s3c240x_vidregs[0], 4, 1);
-
-//		hwswp = (s3c240x_vidregs[4] >> 0) & 0x1;
-//		tpal = s3c240x_vidregs[20] & 0x0001FFFF;
-//		offsize = (s3c240x_vidregs[7] >> 11) & 0x7FF;
-//		logerror("bppmode %d hwswp %d tpal %05X offsize %03X\n", bppmode, hwswp, tpal, offsize);
-
-		switch (bppmode)
+		s3c240x_lcd_dma_reload( machine);
+	}
+	verboselog( machine, 3, "LCD - vramaddr %08X\n", s3c240x_lcd.vramaddr[0]);
+	while (s3c240x_lcd.vramaddr[0] < s3c240x_lcd.vramaddr[1])
+	{
+		switch (s3c240x_lcd.bppmode)
 		{
+			// 8-bit
 			case BPPMODE_TFT_08 :
 			{
-				UINT8 *vram;
-				vram = (UINT8 *)&s3c240x_ram[(vramaddr-0x0c000000)/4];
-				for (y = 0; y < 320; y++)
+				UINT8 *vram = (UINT8 *)&s3c240x_ram[(s3c240x_lcd.vramaddr[0]-0x0c000000)/4];
+				UINT32 *scanline = BITMAP_ADDR32( bitmap, vpos, hpos);
+				for (x = 0; x < 16; x++)
 				{
-					UINT32 *scanline = BITMAP_ADDR32( bitmap, y, 0);
-					for (x = 0; x < 240; x++)
-					{
-						*scanline++ = palette_get_color( screen->machine, *vram++);
-					}
+					*scanline++ = palette_get_color( machine, *vram++);
 				}
+				hpos += 16;
 			}
 			break;
+			// 16-bit
 			case BPPMODE_TFT_16 :
 			{
-				UINT16 *vram;
-				vram = (UINT16 *)&s3c240x_ram[(vramaddr-0x0c000000)/4];
-				for (y = 0; y < 320; y++)
+				UINT16 *vram = (UINT16 *)&s3c240x_ram[(s3c240x_lcd.vramaddr[0]-0x0c000000)/4];
+				UINT32 *scanline = BITMAP_ADDR32( bitmap, vpos, hpos);
+				for (x = 0; x < 8; x++)
 				{
-					UINT32 *scanline = BITMAP_ADDR32( bitmap, y, 0);
-					for (x = 0; x < 240; x++)
-					{
-						UINT16 data;
-						UINT8 r, g, b;
-						data = *vram++;
-						r = BITS( data, 15, 11) << 3;
-						g = BITS( data, 10,  6) << 3;
-						b = BITS( data,  5,  1) << 3;
-						*scanline++ = MAKE_RGB( r, g, b);
-					}
+					UINT16 data;
+					UINT8 r, g, b;
+					data = *vram++;
+					r = BITS( data, 15, 11) << 3;
+					g = BITS( data, 10,  6) << 3;
+					b = BITS( data,  5,  1) << 3;
+					*scanline++ = MAKE_RGB( r, g, b);
 				}
+				hpos += 8;
 			}
 			break;
+			// not supported
 			default :
 			{
-				logerror( "bppmode %d not supported\n", bppmode);
+				verboselog( machine, 0, "bppmode %d not supported\n", s3c240x_lcd.bppmode);
 			}
 			break;
 		}
+		s3c240x_lcd.vramaddr[0] += 16;
+		if (hpos >= s3c240x_lcd.hozval)
+		{
+			switch (s3c240x_lcd.bppmode)
+			{
+				case BPPMODE_TFT_08 : s3c240x_lcd.vramaddr[0] += s3c240x_lcd.offsize << 0; break;
+				case BPPMODE_TFT_16 : s3c240x_lcd.vramaddr[0] += s3c240x_lcd.offsize << 1; break;
+			}
+			vpos = (vpos + 1) % (s3c240x_lcd.lineval + 1);
+			hpos = 0;
+			if (vpos == 0) break; // end of frame
+		}
 	}
-	return 0;
+	timer_adjust_oneshot( s3c240x_lcd_timer, video_screen_get_time_until_pos( screen, vpos, hpos), 0);
 }
 
-static READ32_HANDLER( s3c240x_vidregs_r )
+static READ32_HANDLER( s3c240x_lcd_r )
 {
-	UINT32 data = s3c240x_vidregs[offset];
+	running_machine *machine = space->machine;
+	UINT32 data = s3c240x_lcd_regs[offset];
 	switch (offset)
 	{
 		// LCDCON1
 		case 0x00 / 4 :
 		{
 			// make sure line counter is going
-			data = (data & ~0xFFFC0000) | ((240 - video_screen_get_vpos( space->machine->primary_screen)) << 18);
+			UINT32 lineval = BITS( s3c240x_lcd_regs[1], 23, 14);
+			data = (data & ~0xFFFC0000) | ((lineval - video_screen_get_vpos( machine->primary_screen)) << 18);
 		}
 		break;
 	}
-//	logerror( "(LCD) %08X -> %08X (PC %08X)\n", 0x14A00000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(LCD) %08X -> %08X (PC %08X)\n", 0x14A00000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
-static void s3c240x_lcd_start( running_machine *machine)
+static void s3c240x_lcd_configure( running_machine *machine)
 {
+	const device_config *screen = machine->primary_screen;
 	UINT32 vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk;
-	double framerate;
+	double framerate, vclk;
 	rectangle visarea;
-//	logerror( "LCD start\n");
-	vspw = BITS( s3c240x_vidregs[1], 5, 0);
-	vbpd = BITS( s3c240x_vidregs[1], 31, 24);
-	lineval = BITS( s3c240x_vidregs[1], 23, 14);
-	vfpd = BITS( s3c240x_vidregs[1], 13, 6);
-	hspw = BITS( s3c240x_vidregs[3], 7, 0);
-	hbpd = BITS( s3c240x_vidregs[2], 25, 19);
-	hfpd = BITS( s3c240x_vidregs[2], 7, 0);
-	hozval = BITS( s3c240x_vidregs[2], 18, 8);
-	clkval = BITS( s3c240x_vidregs[0], 17, 8);
+	vspw = BITS( s3c240x_lcd_regs[1], 5, 0);
+	vbpd = BITS( s3c240x_lcd_regs[1], 31, 24);
+	lineval = BITS( s3c240x_lcd_regs[1], 23, 14);
+	vfpd = BITS( s3c240x_lcd_regs[1], 13, 6);
+	hspw = BITS( s3c240x_lcd_regs[3], 7, 0);
+	hbpd = BITS( s3c240x_lcd_regs[2], 25, 19);
+	hfpd = BITS( s3c240x_lcd_regs[2], 7, 0);
+	hozval = BITS( s3c240x_lcd_regs[2], 18, 8);
+	clkval = BITS( s3c240x_lcd_regs[0], 17, 8);
 	hclk = s3c240x_get_hclk( MPLLCON);
-//	logerror( "LCD - vspw %d vbpd %d lineval %d vfpd %d hspw %d hbpd %d hfpd %d hozval %d clkval %d hclk %d\n", vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk);
-	framerate = 1 / (((vspw + 1) + (vbpd + 1) + (lineval + 1) + (vfpd + 1)) * ((hspw + 1) + (hbpd + 1) + (hfpd + 1) + (hozval + 1)) * (2 * (clkval + 1) / (double)hclk));
-//	logerror( "LCD - framerate %f\n", framerate);
+	verboselog( machine, 3, "LCD - vspw %d vbpd %d lineval %d vfpd %d hspw %d hbpd %d hfpd %d hozval %d clkval %d hclk %d\n", vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk);
+	vclk = (double)(hclk / ((clkval + 1) * 2));
+	verboselog( machine, 3, "LCD - vclk %f\n", vclk);
+	framerate = vclk / (((vspw + 1) + (vbpd + 1) + (lineval + 1) + (vfpd + 1)) * ((hspw + 1) + (hbpd + 1) + (hfpd + 1) + (hozval + 1)));
+	verboselog( machine, 3, "LCD - framerate %f\n", framerate);
 	visarea.min_x = 0;
 	visarea.min_y = 0;
 	visarea.max_x = hozval;
 	visarea.max_y = lineval;
-	video_screen_configure( machine->primary_screen, hozval + 1, lineval + 1, &visarea, HZ_TO_ATTOSECONDS( framerate));
+	verboselog( machine, 3, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+	video_screen_configure( screen, hozval + 1, lineval + 1, &visarea, HZ_TO_ATTOSECONDS( framerate));
+}
+
+static void s3c240x_lcd_start( running_machine *machine)
+{
+	const device_config *screen = machine->primary_screen;
+	verboselog( machine, 1, "LCD start\n");
+	s3c240x_lcd_configure( machine);
+	s3c240x_lcd.bppmode = BITS( s3c240x_lcd_regs[0], 4, 1);
+	s3c240x_lcd.hozval = BITS( s3c240x_lcd_regs[2], 18, 8);
+	s3c240x_lcd.lineval = BITS( s3c240x_lcd_regs[1], 23, 14);
+	s3c240x_lcd_dma_reload( machine);
+	timer_adjust_oneshot( s3c240x_lcd_timer, video_screen_get_time_until_pos( screen, 0, 0), 0);
 }
 
 static void s3c240x_lcd_stop( running_machine *machine)
 {
-//	logerror( "LCD stop\n");
+	verboselog( machine, 1, "LCD stop\n");
+	timer_adjust_oneshot( s3c240x_lcd_timer, attotime_never, 0);
 }
 
 static void s3c240x_lcd_recalc( running_machine *machine)
 {
-	if (s3c240x_vidregs[0] & 1)
+	if (s3c240x_lcd_regs[0] & 1)
 	{
 		s3c240x_lcd_start( machine);
 	}
@@ -175,11 +234,12 @@ static void s3c240x_lcd_recalc( running_machine *machine)
 	}
 }
 
-static WRITE32_HANDLER( s3c240x_vidregs_w )
+static WRITE32_HANDLER( s3c240x_lcd_w )
 {
-	UINT32 old_value = s3c240x_vidregs[offset];
-//	logerror( "(LCD) %08X <- %08X (PC %08X)\n", 0x14A00000 + (offset << 2), data, cpu_get_pc( space->cpu));
-	COMBINE_DATA(&s3c240x_vidregs[offset]);
+	running_machine *machine = space->machine;
+	UINT32 old_value = s3c240x_lcd_regs[offset];
+	verboselog( machine, 9, "(LCD) %08X <- %08X (PC %08X)\n", 0x14A00000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	COMBINE_DATA(&s3c240x_lcd_regs[offset]);
 	switch (offset)
 	{
 		// LCDCON1
@@ -187,33 +247,39 @@ static WRITE32_HANDLER( s3c240x_vidregs_w )
 		{
 			if ((old_value & 1) != (data & 1))
 			{
-				s3c240x_lcd_recalc( space->machine);
+				s3c240x_lcd_recalc( machine);
 			}
 		}
 		break;
 	}
 }
 
-static READ32_HANDLER( s3c240x_palette_r )
+// LCD PALETTE
+
+static UINT32 s3c240x_lcd_palette[0x400/4];
+
+static READ32_HANDLER( s3c240x_lcd_palette_r )
 {
-	UINT32 data = s3c240x_palette[offset];
-//	logerror( "(LCD) %08X -> %08X (PC %08X)\n", 0x14A00400 + (offset << 2), data, cpu_get_pc( space->cpu));
+	running_machine *machine = space->machine;
+	UINT32 data = s3c240x_lcd_palette[offset];
+	verboselog( machine, 9, "(LCD) %08X -> %08X (PC %08X)\n", 0x14A00400 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
-static WRITE32_HANDLER( s3c240x_palette_w )
+static WRITE32_HANDLER( s3c240x_lcd_palette_w )
 {
+	running_machine *machine = space->machine;
 	UINT8 r, g, b;
-//	logerror( "(LCD) %08X <- %08X (PC %08X)\n", 0x14A00400 + (offset << 2), data, cpu_get_pc( space->cpu));
-	COMBINE_DATA(&s3c240x_palette[offset]);
+	verboselog( machine, 9, "(LCD) %08X <- %08X (PC %08X)\n", 0x14A00400 + (offset << 2), data, cpu_get_pc( space->cpu));
+	COMBINE_DATA(&s3c240x_lcd_palette[offset]);
 	if (mem_mask != 0xffffffff)
 	{
-		logerror( "s3c240x_palette_w: unknown mask %08x\n", mem_mask);
+		verboselog( machine, 0, "s3c240x_lcd_palette_w: unknown mask %08x\n", mem_mask);
 	}
 	r = BITS( data, 15, 11) << 3;
 	g = BITS( data, 10,  6) << 3;
 	b = BITS( data,  5,  1) << 3;
-	palette_set_color_rgb( space->machine, offset, r, g, b);
+	palette_set_color_rgb( machine, offset, r, g, b);
 }
 
 // CLOCK & POWER MANAGEMENT
@@ -256,19 +322,23 @@ static UINT32 s3c240x_get_pclk( int reg)
 
 static READ32_HANDLER( s3c240x_clkpow_r )
 {
-	return s3c240x_clkpow_regs[offset];
+	running_machine *machine = space->machine;
+	UINT32 data = s3c240x_clkpow_regs[offset];
+	verboselog( machine, 9, "(CLKPOW) %08X -> %08X (PC %08X)\n", 0x14800000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_clkpow_w )
 {
-//	logerror( "(CLKPOW) %08X <- %08X (PC %08X)\n", 0x14800000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	running_machine *machine = space->machine;
+	verboselog( machine, 9, "(CLKPOW) %08X <- %08X (PC %08X)\n", 0x14800000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_clkpow_regs[offset]);
 	switch (offset)
 	{
 		// MPLLCON
 		case 0x04 / 4 :
 		{
-			cputag_set_clock( space->machine, "maincpu", s3c240x_get_fclk( MPLLCON) * CLOCK_MULTIPLIER);
+			cputag_set_clock( machine, "maincpu", s3c240x_get_fclk( MPLLCON) * CLOCK_MULTIPLIER);
 		}
 		break;
 	}
@@ -301,8 +371,8 @@ static void s3c240x_check_pending_irq( running_machine *machine)
 
 static void s3c240x_request_irq( running_machine *machine, UINT32 int_type)
 {
-//	logerror( "request irq %d\n", int_type);
-//	logerror( "(1) %08X %08X %08X %08X %08X %08X\n", s3c240x_irq_regs[0], s3c240x_irq_regs[1], s3c240x_irq_regs[2], s3c240x_irq_regs[3], s3c240x_irq_regs[4], s3c240x_irq_regs[5]);
+	verboselog( machine, 5, "request irq %d\n", int_type);
+	verboselog( machine, 5, "(1) %08X %08X %08X %08X %08X %08X\n", s3c240x_irq_regs[0], s3c240x_irq_regs[1], s3c240x_irq_regs[2], s3c240x_irq_regs[3], s3c240x_irq_regs[4], s3c240x_irq_regs[5]);
 	if (s3c240x_irq_regs[0] == 0)
 	{
 		s3c240x_irq_regs[0] |= (1 << int_type); // SRCPND
@@ -320,15 +390,17 @@ static void s3c240x_request_irq( running_machine *machine, UINT32 int_type)
 
 static READ32_HANDLER( s3c240x_irq_r )
 {
+	running_machine *machine = space->machine;
 	UINT32 data = s3c240x_irq_regs[offset];
-//	logerror( "(IRQ) %08X -> %08X (PC %08X)\n", 0x14400000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(IRQ) %08X -> %08X (PC %08X)\n", 0x14400000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_irq_w )
 {
+	running_machine *machine = space->machine;
 	UINT32 old_value = s3c240x_irq_regs[offset];
-//	logerror( "(IRQ) %08X <- %08X (PC %08X)\n", 0x14400000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(IRQ) %08X <- %08X (PC %08X)\n", 0x14400000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_irq_regs[offset]);
 	switch (offset)
 	{
@@ -336,15 +408,15 @@ static WRITE32_HANDLER( s3c240x_irq_w )
 		case 0x00 / 4 :
 		{
 			s3c240x_irq_regs[0] = (old_value & ~data); // clear only the bit positions of SRCPND corresponding to those set to one in the data
-//			logerror( "(2) %08X %08X %08X %08X %08X %08X\n", s3c240x_irq_regs[0], s3c240x_irq_regs[1], s3c240x_irq_regs[2], s3c240x_irq_regs[3], s3c240x_irq_regs[4], s3c240x_irq_regs[5]);
-			s3c240x_check_pending_irq( space->machine);
+			verboselog( machine, 5, "(2) %08X %08X %08X %08X %08X %08X\n", s3c240x_irq_regs[0], s3c240x_irq_regs[1], s3c240x_irq_regs[2], s3c240x_irq_regs[3], s3c240x_irq_regs[4], s3c240x_irq_regs[5]);
+			s3c240x_check_pending_irq( machine);
 		}
 		break;
 		// INTPND
 		case 0x10 / 4 :
 		{
 			s3c240x_irq_regs[4] = (old_value & ~data); // clear only the bit positions of INTPND corresponding to those set to one in the data
-//			logerror( "(3) %08X %08X %08X %08X %08X %08X\n", s3c240x_irq_regs[0], s3c240x_irq_regs[1], s3c240x_irq_regs[2], s3c240x_irq_regs[3], s3c240x_irq_regs[4], s3c240x_irq_regs[5]);
+			verboselog( machine, 5, "(3) %08X %08X %08X %08X %08X %08X\n", s3c240x_irq_regs[0], s3c240x_irq_regs[1], s3c240x_irq_regs[2], s3c240x_irq_regs[3], s3c240x_irq_regs[4], s3c240x_irq_regs[5]);
 		}
 		break;
 	}
@@ -381,8 +453,9 @@ static UINT32 s3c240x_pwm_regs[0x44/4];
 
 static READ32_HANDLER( s3c240x_pwm_r )
 {
+	running_machine *machine = space->machine;
 	UINT32 data = s3c240x_pwm_regs[offset];
-//	logerror( "(PWM) %08X -> %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(PWM) %08X -> %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
@@ -395,7 +468,7 @@ static void s3c240x_pwm_start( running_machine *machine, int timer)
 	const UINT32 *regs = &s3c240x_pwm_regs[3+timer*3];
 	UINT32 prescaler, mux, cnt, cmp, auto_reload;
 	double freq, hz;
-//		logerror( "PWM %d start\n", timer);
+	verboselog( machine, 1, "PWM %d start\n", timer);
 	prescaler = (s3c240x_pwm_regs[0] >> prescaler_shift[timer]) & 0xFF;
 	mux = (s3c240x_pwm_regs[1] >> mux_shift[timer]) & 0x0F;
 	freq = s3c240x_get_pclk( MPLLCON) / (prescaler + 1) / mux_table[mux];
@@ -411,7 +484,7 @@ static void s3c240x_pwm_start( running_machine *machine, int timer)
 		auto_reload = BIT( s3c240x_pwm_regs[2], tcon_shift[timer] + 2);
 	}
 	hz = freq / (cnt - cmp + 1);
-//	logerror( "PWM %d - FCLK=%d HCLK=%d PCLK=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", timer, s3c240x_get_fclk( MPLLCON), s3c240x_get_hclk( MPLLCON), s3c240x_get_pclk( MPLLCON), prescaler, mux_table[mux], freq, cnt, cmp, auto_reload, hz);
+	verboselog( machine, 5, "PWM %d - FCLK=%d HCLK=%d PCLK=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", timer, s3c240x_get_fclk( MPLLCON), s3c240x_get_hclk( MPLLCON), s3c240x_get_pclk( MPLLCON), prescaler, mux_table[mux], freq, cnt, cmp, auto_reload, hz);
 	if (auto_reload)
 	{
 		timer_adjust_periodic( s3c240x_pwm_timer[timer], ATTOTIME_IN_HZ( hz), timer, ATTOTIME_IN_HZ( hz));
@@ -424,7 +497,7 @@ static void s3c240x_pwm_start( running_machine *machine, int timer)
 
 static void s3c240x_pwm_stop( running_machine *machine, int timer)
 {
-//	logerror( "PWM %d stop\n", timer);
+	verboselog( machine, 1, "PWM %d stop\n", timer);
 	timer_adjust_oneshot( s3c240x_pwm_timer[timer], attotime_never, 0);
 }
 
@@ -443,8 +516,9 @@ static void s3c240x_pwm_recalc( running_machine *machine, int timer)
 
 static WRITE32_HANDLER( s3c240x_pwm_w )
 {
+	running_machine *machine = space->machine;
 	UINT32 old_value = s3c240x_pwm_regs[offset];
-//	logerror( "(PWM) %08X <- %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(PWM) %08X <- %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_pwm_regs[offset]);
 	switch (offset)
 	{
@@ -453,23 +527,23 @@ static WRITE32_HANDLER( s3c240x_pwm_w )
 		{
 			if ((data & 1) != (old_value & 1))
 			{
-				s3c240x_pwm_recalc( space->machine, 0);
+				s3c240x_pwm_recalc( machine, 0);
 			}
 			if ((data & 0x100) != (old_value & 0x100))
 			{
-				s3c240x_pwm_recalc( space->machine, 1);
+				s3c240x_pwm_recalc( machine, 1);
 			}
 			if ((data & 0x1000) != (old_value & 0x1000))
 			{
-				s3c240x_pwm_recalc( space->machine, 2);
+				s3c240x_pwm_recalc( machine, 2);
 			}
 			if ((data & 0x10000) != (old_value & 0x10000))
 			{
-				s3c240x_pwm_recalc( space->machine, 3);
+				s3c240x_pwm_recalc( machine, 3);
 			}
 			if ((data & 0x100000) != (old_value & 0x100000))
 			{
-				s3c240x_pwm_recalc( space->machine, 4);
+				s3c240x_pwm_recalc( machine, 4);
 			}
 		}
 	}
@@ -479,7 +553,7 @@ static TIMER_CALLBACK( s3c240x_pwm_timer_exp )
 {
 	int ch = param;
 	const int ch_int[] = { INT_TIMER0, INT_TIMER1, INT_TIMER2, INT_TIMER3, INT_TIMER4 };
-//	logerror( "PWM %d timer callback\n", ch);
+	verboselog( machine, 2, "PWM %d timer callback\n", ch);
 	s3c240x_request_irq( machine, ch_int[ch]);
 }
 
@@ -493,36 +567,35 @@ static void s3c240x_dma_trigger( running_machine *machine, int dma)
 	UINT32 *regs = &s3c240x_dma_regs[dma<<3];
 	UINT32 curr_tc, curr_src, curr_dst;
   const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	int dsz, inc;
-	static UINT32 ch_int[] = { INT_DMA0, INT_DMA1, INT_DMA2, INT_DMA3};
-//	logerror( "DMA %d trigger\n", dma);
+	int dsz, inc_src, inc_dst, servmode;
+	const UINT32 ch_int[] = { INT_DMA0, INT_DMA1, INT_DMA2, INT_DMA3};
+	verboselog( machine, 5, "DMA %d trigger\n", dma);
 	curr_tc = BITS( regs[3], 19, 0);
 	curr_src = BITS( regs[4], 28, 0);
 	curr_dst = BITS( regs[5], 28, 0);
 	dsz = BITS( regs[2], 21, 20);
-//	logerror( "DMA %d - curr_src %08X curr_dst %08X curr_tc %04X dsz %d\n", dma, curr_src, curr_dst, curr_tc, dsz);
-	switch (dsz)
+	servmode = BIT( regs[2], 26);
+	inc_src = BIT( regs[0], 29);
+	inc_dst = BIT( regs[1], 29);
+	verboselog( machine, 5, "DMA %d - curr_src %08X curr_dst %08X curr_tc %d dsz %d\n", dma, curr_src, curr_dst, curr_tc, dsz);
+	while (curr_tc > 0)
 	{
-		case 0 : memory_write_byte( space, curr_dst, memory_read_byte( space, curr_src)); break;
-		case 1 : memory_write_word( space, curr_dst, memory_read_word( space, curr_src)); break;
-		case 2 : memory_write_dword( space, curr_dst, memory_read_dword( space, curr_src)); break;
+		curr_tc--;
+		switch (dsz)
+		{
+			case 0 : memory_write_byte( space, curr_dst, memory_read_byte( space, curr_src)); break;
+			case 1 : memory_write_word( space, curr_dst, memory_read_word( space, curr_src)); break;
+			case 2 : memory_write_dword( space, curr_dst, memory_read_dword( space, curr_src)); break;
+		}
+		if (inc_src == 0) curr_src += (1 << dsz);
+		if (inc_dst == 0) curr_dst += (1 << dsz);
+		if (servmode == 0) break;
 	}
 	// update curr_src
-	inc = BIT( regs[0], 29);
-	if (!inc)
-	{
-		curr_src += (1 << dsz);
-		regs[4] = (regs[4] & ~0x1FFFFFFF) | curr_src;
-	}
+	regs[4] = (regs[4] & ~0x1FFFFFFF) | curr_src;
 	// update curr_dst
-	inc = BIT( regs[1], 29);
-	if (!inc)
-	{
-		curr_dst += (1 << dsz);
-		regs[5] = (regs[5] & ~0x1FFFFFFF) | curr_dst;
-	}
+	regs[5] = (regs[5] & ~0x1FFFFFFF) | curr_dst;
 	// update curr_tc
-	curr_tc--;
 	regs[3] = (regs[3] & ~0x000FFFFF) | curr_tc;
 	// ...
 	if (curr_tc == 0)
@@ -542,7 +615,6 @@ static void s3c240x_dma_trigger( running_machine *machine, int dma)
 		_int = BIT( regs[2], 28);
 		if (_int)
 		{
-//			logerror( "DMA %d request irq\n", dma);
 			s3c240x_request_irq( machine, ch_int[dma]);
 		}
 	}
@@ -552,31 +624,35 @@ static void s3c240x_dma_start( running_machine *machine, int dma)
 {
 	UINT32 addr_src, addr_dst, tc;
 	UINT32 *regs = &s3c240x_dma_regs[dma<<3];
-//	UINT32 dsz, tsz, reload;
-//	int inc_src, inc_dst, _int, servmode, swhw_sel, hwsrcsel;
-//	logerror( "DMA %d start\n", dma);
+	UINT32 dsz, tsz, reload;
+	int inc_src, inc_dst, _int, servmode, swhwsel, hwsrcsel;
+	verboselog( machine, 1, "DMA %d start\n", dma);
 	addr_src = BITS( regs[0], 28, 0);
 	addr_dst = BITS( regs[1], 28, 0);
 	tc = BITS( regs[2], 19, 0);
-//	inc_src = BIT( regs[0], 29);
-//	inc_dst = BIT( regs[1], 29);
-//	tsz = BIT( regs[2], 27);
-//	_int = BIT( regs[2], 28);
-//	servmode = BIT( regs[2], 26);
-//	hwsrcsel = BITS( regs[2], 25, 24);
-//	swhw_sel = BIT( regs[2], 23);
-//	reload = BIT( regs[2], 22);
-//	dsz = BITS( regs[2], 21, 20);
-//	logerror( "DMA %d - addr_src %08X inc_src %d addr_dst %08X inc_dst %d int %d tsz %d servmode %d hwsrcsel %d swhw_sel %d reload %d dsz %d tc %d\n", dma, addr_src, inc_src, addr_dst, inc_dst, _int, tsz, servmode, hwsrcsel, swhw_sel, reload, dsz, tc);
-//	logerror( "DMA %d - copy %08X bytes from %08X (%s) to %08X (%s)\n", dma, tc << dsz, addr_src, inc_src ? "fix" : "inc", addr_dst, inc_dst ? "fix" : "inc");
+	inc_src = BIT( regs[0], 29);
+	inc_dst = BIT( regs[1], 29);
+	tsz = BIT( regs[2], 27);
+	_int = BIT( regs[2], 28);
+	servmode = BIT( regs[2], 26);
+	hwsrcsel = BITS( regs[2], 25, 24);
+	swhwsel = BIT( regs[2], 23);
+	reload = BIT( regs[2], 22);
+	dsz = BITS( regs[2], 21, 20);
+	verboselog( machine, 5, "DMA %d - addr_src %08X inc_src %d addr_dst %08X inc_dst %d int %d tsz %d servmode %d hwsrcsel %d swhwsel %d reload %d dsz %d tc %d\n", dma, addr_src, inc_src, addr_dst, inc_dst, _int, tsz, servmode, hwsrcsel, swhwsel, reload, dsz, tc);
+	verboselog( machine, 5, "DMA %d - copy %08X bytes from %08X (%s) to %08X (%s)\n", dma, tc << dsz, addr_src, inc_src ? "fix" : "inc", addr_dst, inc_dst ? "fix" : "inc");
 	regs[3] = (regs[3] & ~0x000FFFFF) | tc;
 	regs[4] = (regs[4] & ~0x1FFFFFFF) | addr_src;
 	regs[5] = (regs[5] & ~0x1FFFFFFF) | addr_dst;
+	if (!((dma == 2) && (swhwsel == 1) && (hwsrcsel == 0)))
+	{
+		s3c240x_dma_trigger( machine, dma);
+	}
 }
 
 static void s3c240x_dma_stop( running_machine *machine, int dma)
 {
-//	logerror( "DMA %d stop\n", dma);
+	verboselog( machine, 1, "DMA %d stop\n", dma);
 }
 
 static void s3c240x_dma_recalc( running_machine *machine, int dma)
@@ -593,15 +669,17 @@ static void s3c240x_dma_recalc( running_machine *machine, int dma)
 
 static READ32_HANDLER( s3c240x_dma_r )
 {
+	running_machine *machine = space->machine;
 	UINT32 data = s3c240x_dma_regs[offset];
-//	logerror( "(DMA) %08X -> %08X (PC %08X)\n", 0x14600000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(DMA) %08X -> %08X (PC %08X)\n", 0x14600000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_dma_w )
 {
+	running_machine *machine = space->machine;
 	UINT32 old_value = s3c240x_dma_regs[offset];
-//	logerror( "(DMA) %08X <- %08X (PC %08X)\n", 0x14600000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(DMA) %08X <- %08X (PC %08X)\n", 0x14600000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_dma_regs[offset]);
 	switch (offset)
 	{
@@ -617,7 +695,7 @@ static WRITE32_HANDLER( s3c240x_dma_w )
 		// DMASKTRIG0
 		case 0x18 / 4 :
 		{
-			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc( space->machine, 0);
+			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc( machine, 0);
 		}
 		break;
 		// DCON1
@@ -632,7 +710,7 @@ static WRITE32_HANDLER( s3c240x_dma_w )
 		// DMASKTRIG1
 		case 0x38 / 4 :
 		{
-			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc( space->machine, 1);
+			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc( machine, 1);
 		}
 		break;
 		// DCON2
@@ -647,7 +725,7 @@ static WRITE32_HANDLER( s3c240x_dma_w )
 		// DMASKTRIG2
 		case 0x58 / 4 :
 		{
-			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc( space->machine, 2);
+			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc( machine, 2);
 		}
 		break;
 		// DCON3
@@ -662,7 +740,7 @@ static WRITE32_HANDLER( s3c240x_dma_w )
 		// DMASKTRIG3
 		case 0x78 / 4 :
 		{
-			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc( space->machine, 3);
+			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc( machine, 3);
 		}
 		break;
 	}
@@ -670,8 +748,8 @@ static WRITE32_HANDLER( s3c240x_dma_w )
 
 static TIMER_CALLBACK( s3c240x_dma_timer_exp )
 {
-//	int ch = param;
-//	logerror( "DMA %d timer callback\n", ch);
+	int ch = param;
+	verboselog( machine, 2, "DMA %d timer callback\n", ch);
 }
 
 // SMARTMEDIA
@@ -691,7 +769,7 @@ static struct {
 
 static void smc_reset( running_machine *machine)
 {
-//	logerror( "smc_reset\n");
+	verboselog( machine, 5, "smc_reset\n");
 	smc.add_latch = 0;
 	smc.chip = 0;
 	smc.cmd_latch = 0;
@@ -704,7 +782,7 @@ static void smc_reset( running_machine *machine)
 
 static void smc_init( running_machine *machine)
 {
-//	logerror( "smc_init\n");
+	verboselog( machine, 5, "smc_init\n");
 	smc_reset( machine);
 }
 
@@ -713,29 +791,29 @@ static UINT8 smc_read( running_machine *machine)
 	const device_config *smartmedia = devtag_get_device( machine, "smartmedia");
 	UINT8 data;
 	data = smartmedia_data_r( smartmedia);
-//	logerror( "smc_read %08X\n", data);
+	verboselog( machine, 5, "smc_read %08X\n", data);
 	return data;
 }
 
 static void smc_write( running_machine *machine, UINT8 data)
 {
-//	logerror( "smc_write %08X\n", data);
+	verboselog( machine, 5, "smc_write %08X\n", data);
 	if ((smc.chip) && (!smc.read))
 	{
 		const device_config *smartmedia = devtag_get_device( machine, "smartmedia");
 		if (smc.cmd_latch)
 		{
-//			logerror( "smartmedia_command_w %08X\n", data);
+			verboselog( machine, 5, "smartmedia_command_w %08X\n", data);
 			smartmedia_command_w( smartmedia, data);
 		}
 		else if (smc.add_latch)
 		{
-//			logerror( "smartmedia_address_w %08X\n", data);
+			verboselog( machine, 5, "smartmedia_address_w %08X\n", data);
 			smartmedia_address_w( smartmedia, data);
 		}
 		else
 		{
-//			logerror( "smartmedia_data_w %08X\n", data);
+			verboselog( machine, 5, "smartmedia_data_w %08X\n", data);
  			smartmedia_data_w( smartmedia, data);
 		}
 	}
@@ -774,7 +852,7 @@ static struct {
 
 static void i2s_reset( running_machine *machine)
 {
-//	logerror( "i2s_reset\n");
+	verboselog( machine, 5, "i2s_reset\n");
 	i2s.l3d = 0;
 	i2s.l3m = 0;
 	i2s.l3c = 0;
@@ -782,7 +860,7 @@ static void i2s_reset( running_machine *machine)
 
 static void i2s_init( running_machine *machine)
 {
-//	logerror( "i2s_init\n");
+	verboselog( machine, 5, "i2s_init\n");
 	i2s_reset( machine);
 }
 
@@ -794,7 +872,7 @@ static void i2s_write( running_machine *machine, int line, int data)
 		{
 			if (data != i2s.l3c)
 			{
-//				logerror( "I2S L3C %d\n", data);
+				verboselog( machine, 5, "I2S L3C %d\n", data);
 				i2s.l3c = data;
 			}
 		}
@@ -803,7 +881,7 @@ static void i2s_write( running_machine *machine, int line, int data)
 		{
 			if (data != i2s.l3m)
 			{
-//				logerror( "I2S L3M %d\n", data);
+				verboselog( machine, 5, "I2S L3M %d\n", data);
 				i2s.l3m = data;
 			}
 		}
@@ -812,7 +890,7 @@ static void i2s_write( running_machine *machine, int line, int data)
 		{
 			if (data != i2s.l3d)
 			{
-//				logerror( "I2S L3D %d\n", data);
+				verboselog( machine, 5, "I2S L3D %d\n", data);
 				i2s.l3d = data;
 			}
 		}
@@ -826,6 +904,7 @@ static UINT32 s3c240x_gpio[0x60/4];
 
 static READ32_HANDLER( s3c240x_gpio_r )
 {
+	running_machine *machine = space->machine;
 	UINT32 data = s3c240x_gpio[offset];
 	switch (offset)
 	{
@@ -843,13 +922,13 @@ static READ32_HANDLER( s3c240x_gpio_r )
 			// smartmedia
 			data = (data & ~0x000000FF) | (smc.datarx & 0xFF);
 			// buttons
-			data = (data & ~0x0000FF00) | (input_port_read( space->machine, "IN0") & 0x0000FF00);
+			data = (data & ~0x0000FF00) | (input_port_read( machine, "IN0") & 0x0000FF00);
 		}
 		break;
 		// PDDAT
 		case 0x24 / 4 :
 		{
-			const device_config *smartmedia = devtag_get_device( space->machine, "smartmedia");
+			const device_config *smartmedia = devtag_get_device( machine, "smartmedia");
 			// smartmedia
 			data = (data & ~0x000003C0);
 			if (!smc.busy) data = data | 0x00000200;
@@ -861,7 +940,7 @@ static READ32_HANDLER( s3c240x_gpio_r )
 		// PEDAT
 		case 0x30 / 4 :
 		{
-			const device_config *smartmedia = devtag_get_device( space->machine, "smartmedia");
+			const device_config *smartmedia = devtag_get_device( machine, "smartmedia");
 			// smartmedia
 			data = (data & ~0x0000003C);
 			if (smc.cmd_latch) data = data | 0x00000020;
@@ -869,19 +948,20 @@ static READ32_HANDLER( s3c240x_gpio_r )
 			if (!smc.do_write) data = data | 0x00000008;
 			if (!smartmedia_present( smartmedia)) data = data | 0x00000004;
 			// buttons
-			data = (data & ~0x000000C0) | (input_port_read( space->machine, "IN1") & 0x000000C0);
+			data = (data & ~0x000000C0) | (input_port_read( machine, "IN1") & 0x000000C0);
 		}
 		break;
 	}
-//	logerror( "(GPIO) %08X -> %08X (PC %08X)\n", 0x15600000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(GPIO) %08X -> %08X (PC %08X)\n", 0x15600000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_gpio_w )
 {
+	running_machine *machine = space->machine;
 //	UINT32 old_value = s3c240x_gpio_regs[offset];
 	COMBINE_DATA(&s3c240x_gpio[offset]);
-//	logerror( "(GPIO) %08X <- %08X (PC %08X)\n", 0x15600000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(GPIO) %08X <- %08X (PC %08X)\n", 0x15600000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	switch (offset)
 	{
 		// PBCON
@@ -889,7 +969,7 @@ static WRITE32_HANDLER( s3c240x_gpio_w )
 		{
 			// smartmedia
 			smc.read = ((data & 0x00000001) == 0);
-			smc_update( space->machine);
+			smc_update( machine);
 		}
 		break;
 		// PBDAT
@@ -906,7 +986,7 @@ static WRITE32_HANDLER( s3c240x_gpio_w )
 			smc.do_read = ((data & 0x00000100) == 0);
 			smc.chip = ((data & 0x00000080) == 0);
 			smc.wp = ((data & 0x00000040) == 0);
-			smc_update( space->machine);
+			smc_update( machine);
 		}
 		break;
 		// PEDAT
@@ -916,11 +996,11 @@ static WRITE32_HANDLER( s3c240x_gpio_w )
 			smc.cmd_latch = ((data & 0x00000020) != 0);
 			smc.add_latch = ((data & 0x00000010) != 0);
 			smc.do_write  = ((data & 0x00000008) == 0);
-			smc_update( space->machine);
+			smc_update( machine);
 			// sound
-			i2s_write( space->machine, I2S_L3D, (data & 0x00000800) ? 1 : 0);
-			i2s_write( space->machine, I2S_L3M, (data & 0x00000400) ? 1 : 0);
-			i2s_write( space->machine, I2S_L3C, (data & 0x00000200) ? 1 : 0);
+			i2s_write( machine, I2S_L3D, (data & 0x00000800) ? 1 : 0);
+			i2s_write( machine, I2S_L3M, (data & 0x00000400) ? 1 : 0);
+			i2s_write( machine, I2S_L3C, (data & 0x00000200) ? 1 : 0);
 		}
 		break;
 /*
@@ -941,12 +1021,16 @@ static UINT32 s3c240x_memcon_regs[0x34/4];
 
 static READ32_HANDLER( s3c240x_memcon_r )
 {
-	return s3c240x_memcon_regs[offset];
+	running_machine *machine = space->machine;
+	UINT32 data = s3c240x_memcon_regs[offset];
+	verboselog( machine, 9, "(MEMCON) %08X -> %08X (PC %08X)\n", 0x14000000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_memcon_w )
 {
-//	logerror( "(MEMCON) %08X <- %08X (PC %08X)\n", 0x14000000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	running_machine *machine = space->machine;
+	verboselog( machine, 9, "(MEMCON) %08X <- %08X (PC %08X)\n", 0x14000000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_memcon_regs[offset]);
 }
 
@@ -956,12 +1040,16 @@ static UINT32 s3c240x_usb_host_regs[0x5C/4];
 
 static READ32_HANDLER( s3c240x_usb_host_r )
 {
-	return s3c240x_usb_host_regs[offset];
+	running_machine *machine = space->machine;
+	UINT32 data = s3c240x_usb_host_regs[offset];
+	verboselog( machine, 9, "(USB H) %08X -> %08X (PC %08X)\n", 0x14200000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_usb_host_w )
 {
-//	logerror( "(USB H) %08X <- %08X (PC %08X)\n", 0x14200000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	running_machine *machine = space->machine;
+	verboselog( machine, 9, "(USB H) %08X <- %08X (PC %08X)\n", 0x14200000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_usb_host_regs[offset]);
 }
 
@@ -971,6 +1059,7 @@ static UINT32 s3c240x_uart_0_regs[0x2C/4];
 
 static READ32_HANDLER( s3c240x_uart_0_r )
 {
+	running_machine *machine = space->machine;
 	UINT32 data = s3c240x_uart_0_regs[offset];
 	switch (offset)
 	{
@@ -981,13 +1070,14 @@ static READ32_HANDLER( s3c240x_uart_0_r )
 		}
 		break;
 	}
-//	logerror( "(UART 0) %08X -> %08X (PC %08X)\n", 0x15000000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(UART 0) %08X -> %08X (PC %08X)\n", 0x15000000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_uart_0_w )
 {
-//	logerror( "(UART 0) %08X <- %08X (PC %08X)\n", 0x15000000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	running_machine *machine = space->machine;
+	verboselog( machine, 9, "(UART 0) %08X <- %08X (PC %08X)\n", 0x15000000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_uart_0_regs[offset]);
 }
 
@@ -997,6 +1087,7 @@ static UINT32 s3c240x_uart_1_regs[0x2C/4];
 
 static READ32_HANDLER( s3c240x_uart_1_r )
 {
+	running_machine *machine = space->machine;
 	UINT32 data = s3c240x_uart_1_regs[offset];
 	switch (offset)
 	{
@@ -1007,13 +1098,14 @@ static READ32_HANDLER( s3c240x_uart_1_r )
 		}
 		break;
 	}
-//	logerror( "(UART 1) %08X -> %08X (PC %08X)\n", 0x15004000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(UART 1) %08X -> %08X (PC %08X)\n", 0x15004000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_uart_1_w )
 {
-//	logerror( "(UART 1) %08X <- %08X (PC %08X)\n", 0x15004000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	running_machine *machine = space->machine;
+	verboselog( machine, 9, "(UART 1) %08X <- %08X (PC %08X)\n", 0x15004000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_uart_1_regs[offset]);
 }
 
@@ -1023,14 +1115,16 @@ static UINT32 s3c240x_usb_device_regs[0xBC/4];
 
 static READ32_HANDLER( s3c240x_usb_device_r )
 {
+	running_machine *machine = space->machine;
 	UINT32 data = s3c240x_usb_device_regs[offset];
-//	logerror( "(USB D) %08X -> %08X (PC %08X)\n", 0x15200140 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(USB D) %08X -> %08X (PC %08X)\n", 0x15200140 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_usb_device_w )
 {
-//	logerror( "(USB D) %08X <- %08X (PC %08X)\n", 0x15200140 + (offset << 2), data, cpu_get_pc( space->cpu));
+	running_machine *machine = space->machine;
+	verboselog( machine, 9, "(USB D) %08X <- %08X (PC %08X)\n", 0x15200140 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_usb_device_regs[offset]);
 }
 
@@ -1040,12 +1134,16 @@ static UINT32 s3c240x_watchdog_regs[0x0C/4];
 
 static READ32_HANDLER( s3c240x_watchdog_r )
 {
-	return s3c240x_watchdog_regs[offset];
+	running_machine *machine = space->machine;
+	UINT32 data = s3c240x_watchdog_regs[offset];
+	verboselog( machine, 9, "(WDOG) %08X -> %08X (PC %08X)\n", 0x15300000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_watchdog_w )
 {
-//	logerror( "(WDOG) %08X <- %08X (PC %08X)\n", 0x15300000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	running_machine *machine = space->machine;
+	verboselog( machine, 9, "(WDOG) %08X <- %08X (PC %08X)\n", 0x15300000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_watchdog_regs[offset]);
 }
 
@@ -1054,8 +1152,8 @@ static WRITE32_HANDLER( s3c240x_watchdog_w )
 static emu_timer *s3c240x_iic_timer;
 static UINT32 s3c240x_iic_regs[0x10/4];
 static UINT8 s3c240x_iic_data[3];
-static int s3c240x_iic_data_index = 0;
-static UINT16 s3c240x_iic_addr = 0;
+static int s3c240x_iic_data_index;
+static UINT16 s3c240x_iic_addr;
 
 /*
 static UINT8 i2cmem_read_byte( running_machine *machine, int last)
@@ -1115,25 +1213,26 @@ static void i2cmem_stop( running_machine *machine)
 
 static void iic_start( running_machine *machine)
 {
-//	logerror( "IIC start\n");
+	verboselog( machine, 1, "IIC start\n");
 	s3c240x_iic_data_index = 0;
 	timer_adjust_oneshot( s3c240x_iic_timer, ATTOTIME_IN_MSEC( 1), 0);
 }
 
 static void iic_stop( running_machine *machine)
 {
-//	logerror( "IIC stop\n");
+	verboselog( machine, 1, "IIC stop\n");
 	timer_adjust_oneshot( s3c240x_iic_timer, attotime_never, 0);
 }
 
 static void iic_resume( running_machine *machine)
 {
-//	logerror( "IIC resume\n");
+	verboselog( machine, 1, "IIC resume\n");
 	timer_adjust_oneshot( s3c240x_iic_timer, ATTOTIME_IN_MSEC( 1), 0);
 }
 
 static READ32_HANDLER( s3c240x_iic_r )
 {
+	running_machine *machine = space->machine;
 	UINT32 data = s3c240x_iic_regs[offset];
 	switch (offset)
 	{
@@ -1144,13 +1243,14 @@ static READ32_HANDLER( s3c240x_iic_r )
 		}
 		break;
 	}
-//	logerror( "(IIC) %08X -> %08X (PC %08X)\n", 0x15400000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(IIC) %08X -> %08X (PC %08X)\n", 0x15400000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_iic_w )
 {
-//	logerror( "(IIC) %08X <- %08X (PC %08X)\n", 0x15400000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	running_machine *machine = space->machine;
+	verboselog( machine, 9, "(IIC) %08X <- %08X (PC %08X)\n", 0x15400000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_iic_regs[offset]);
 	switch (offset)
 	{
@@ -1172,7 +1272,7 @@ static WRITE32_HANDLER( s3c240x_iic_w )
 				start_stop_condition = BIT( s3c240x_iic_regs[1], 5);
 				if (start_stop_condition != 0)
 				{
-					iic_resume( space->machine);
+					iic_resume( machine);
 				}
 			}
 		}
@@ -1184,11 +1284,11 @@ static WRITE32_HANDLER( s3c240x_iic_w )
 			start_stop_condition = BIT( data, 5);
 			if (start_stop_condition != 0)
 			{
-				iic_start( space->machine);
+				iic_start( machine);
 			}
 			else
 			{
-				iic_stop( space->machine);
+				iic_stop( machine);
 			}
 		}
 		break;
@@ -1198,7 +1298,7 @@ static WRITE32_HANDLER( s3c240x_iic_w )
 static TIMER_CALLBACK( s3c240x_iic_timer_exp )
 {
 	int enable_interrupt, mode_selection;
-//	logerror( "IIC timer callback\n");
+	verboselog( machine, 2, "IIC timer callback\n");
 	mode_selection = BITS( s3c240x_iic_regs[1], 7, 6);
 	switch (mode_selection)
 	{
@@ -1207,13 +1307,13 @@ static TIMER_CALLBACK( s3c240x_iic_timer_exp )
 		{
 			if (s3c240x_iic_data_index == 0)
 			{
-//				UINT8 data_shift = s3c240x_iic_regs[3] & 0xFF;
-//				logerror( "IIC write %02X\n", data_shift);
+				UINT8 data_shift = s3c240x_iic_regs[3] & 0xFF;
+				verboselog( machine, 5, "IIC write %02X\n", data_shift);
 			}
 			else
 			{
 				UINT8 data_shift = eeprom_data[s3c240x_iic_addr];
-//				logerror( "IIC read %02X [%04X]\n", data_shift, s3c240x_iic_addr);
+				verboselog( machine, 5, "IIC read %02X [%04X]\n", data_shift, s3c240x_iic_addr);
 				s3c240x_iic_regs[3] = (s3c240x_iic_regs[3] & ~0xFF) | data_shift;
 			}
 			s3c240x_iic_data_index++;
@@ -1223,7 +1323,7 @@ static TIMER_CALLBACK( s3c240x_iic_timer_exp )
 		case 3 :
 		{
 			UINT8 data_shift = s3c240x_iic_regs[3] & 0xFF;
-//			logerror( "IIC write %02X\n", data_shift);
+			verboselog( machine, 5, "IIC write %02X\n", data_shift);
 			s3c240x_iic_data[s3c240x_iic_data_index++] = data_shift;
 			if (s3c240x_iic_data_index == 3)
 			{
@@ -1235,7 +1335,7 @@ static TIMER_CALLBACK( s3c240x_iic_timer_exp )
 	enable_interrupt = BIT( s3c240x_iic_regs[0], 5);
 	if (enable_interrupt)
 	{
-//		logerror( "IIC request irq\n");
+		verboselog( machine, 5, "IIC request irq\n");
 		s3c240x_request_irq( machine, INT_IIC);
 	}
 }
@@ -1245,26 +1345,26 @@ static TIMER_CALLBACK( s3c240x_iic_timer_exp )
 static emu_timer *s3c240x_iis_timer;
 static UINT32 s3c240x_iis_regs[0x14/4];
 static UINT16 s3c240x_iis_fifo[16/2];
-static int s3c240x_iis_fifo_index = 0;
+static int s3c240x_iis_fifo_index;
 
 static void s3c240x_iis_start( running_machine *machine)
 {
 	const UINT32 codeclk_table[] = { 256, 384};
 	double freq;
 	int prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk;
-//	logerror( "IIS start\n");
+	verboselog( machine, 1, "IIS start\n");
 	prescaler_enable = BIT( s3c240x_iis_regs[0], 1);
 	prescaler_control_a = BITS( s3c240x_iis_regs[2], 9, 5);
 	prescaler_control_b = BITS( s3c240x_iis_regs[2], 4, 0);
 	codeclk = BIT( s3c240x_iis_regs[1], 2);
 	freq = (double)(s3c240x_get_pclk( MPLLCON) / (prescaler_control_a + 1) / codeclk_table[codeclk]) * 2; // why do I have to multiply by two?
-//	logerror( "IIS - pclk %d psc_enable %d psc_a %d psc_b %d codeclk %d freq %f\n", s3c240x_get_pclk( MPLLCON), prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk_table[codeclk], freq);
+	verboselog( machine, 5, "IIS - pclk %d psc_enable %d psc_a %d psc_b %d codeclk %d freq %f\n", s3c240x_get_pclk( MPLLCON), prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk_table[codeclk], freq);
 	timer_adjust_periodic( s3c240x_iis_timer, ATTOTIME_IN_HZ( freq), 0, ATTOTIME_IN_HZ( freq));
 }
 
 static void s3c240x_iis_stop( running_machine *machine)
 {
-//	logerror( "IIS stop\n");
+	verboselog( machine, 1, "IIS stop\n");
 	timer_adjust_oneshot( s3c240x_iis_timer, attotime_never, 0);
 }
 
@@ -1282,22 +1382,24 @@ static void s3c240x_iis_recalc( running_machine *machine)
 
 static READ32_HANDLER( s3c240x_iis_r )
 {
+	running_machine *machine = space->machine;
 	UINT32 data = s3c240x_iis_regs[offset];
-//	logerror( "(IIS) %08X -> %08X (PC %08X)\n", 0x15508000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(IIS) %08X -> %08X (PC %08X)\n", 0x15508000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_iis_w )
 {
+	running_machine *machine = space->machine;
 	UINT32 old_value = s3c240x_iis_regs[offset];
-//	logerror( "(IIS) %08X <- %08X (PC %08X)\n", 0x15508000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	verboselog( machine, 9, "(IIS) %08X <- %08X (PC %08X)\n", 0x15508000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_iis_regs[offset]);
 	switch (offset)
 	{
 		// IISCON
 		case 0x00 / 4 :
 		{
-			if ((old_value & 1) != (data & 1)) s3c240x_iis_recalc( space->machine);
+			if ((old_value & 1) != (data & 1)) s3c240x_iis_recalc( machine);
 		}
 		break;
 		// IISFIF
@@ -1314,8 +1416,8 @@ static WRITE32_HANDLER( s3c240x_iis_w )
 			if (s3c240x_iis_fifo_index == 2)
 			{
 				const device_config *dac[2];
-				dac[0] = devtag_get_device( space->machine, "dac1");
-				dac[1] = devtag_get_device( space->machine, "dac2");
+				dac[0] = devtag_get_device( machine, "dac1");
+				dac[1] = devtag_get_device( machine, "dac2");
 				s3c240x_iis_fifo_index = 0;
     		dac_signed_data_16_w( dac[0], s3c240x_iis_fifo[0] + 0x8000);
     		dac_signed_data_16_w( dac[1], s3c240x_iis_fifo[1] + 0x8000);
@@ -1329,7 +1431,7 @@ static TIMER_CALLBACK( s3c240x_iis_timer_exp )
 {
 	UINT32 dcon;
 	int hwsrcsel, swhwsel;
-//	logerror( "IIS timer callback\n");
+	verboselog( machine, 2, "IIS timer callback\n");
 	dcon = s3c240x_dma_regs[0x48/4];
 	hwsrcsel = BITS( dcon, 25, 24);
 	swhwsel = BIT( dcon, 23);
@@ -1352,12 +1454,16 @@ static UINT32 s3c240x_rtc_regs[0x4C/4];
 
 static READ32_HANDLER( s3c240x_rtc_r )
 {
-	return s3c240x_rtc_regs[offset];
+	running_machine *machine = space->machine;
+	UINT32 data = s3c240x_rtc_regs[offset];
+	verboselog( machine, 9, "(RTC) %08X -> %08X (PC %08X)\n", 0x15700040 + (offset << 2), data, cpu_get_pc( space->cpu));
+	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_rtc_w )
 {
-//	logerror( "(RTC) %08X <- %08X (PC %08X)\n", 0x15700040 + (offset << 2), data, cpu_get_pc( space->cpu));
+	running_machine *machine = space->machine;
+	verboselog( machine, 9, "(RTC) %08X <- %08X (PC %08X)\n", 0x15700040 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_rtc_regs[offset]);
 }
 
@@ -1367,12 +1473,16 @@ static UINT32 s3c240x_adc_regs[0x08/4];
 
 static READ32_HANDLER( s3c240x_adc_r )
 {
-	return s3c240x_adc_regs[offset];
+	running_machine *machine = space->machine;
+	UINT32 data = s3c240x_adc_regs[offset];
+	verboselog( machine, 9, "(ADC) %08X -> %08X (PC %08X)\n", 0x15800000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_adc_w )
 {
-//	logerror( "(ADC) %08X <- %08X (PC %08X)\n", 0x15800000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	running_machine *machine = space->machine;
+	verboselog( machine, 9, "(ADC) %08X <- %08X (PC %08X)\n", 0x15800000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_adc_regs[offset]);
 }
 
@@ -1382,12 +1492,16 @@ static UINT32 s3c240x_spi_regs[0x18/4];
 
 static READ32_HANDLER( s3c240x_spi_r )
 {
-	return s3c240x_spi_regs[offset];
+	running_machine *machine = space->machine;
+	UINT32 data = s3c240x_spi_regs[offset];
+	verboselog( machine, 9, "(SPI) %08X -> %08X (PC %08X)\n", 0x15900000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_spi_w )
 {
-//	logerror( "(SPI) %08X <- %08X (PC %08X)\n", 0x15900000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	running_machine *machine = space->machine;
+	verboselog( machine, 9, "(SPI) %08X <- %08X (PC %08X)\n", 0x15900000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_spi_regs[offset]);
 }
 
@@ -1397,38 +1511,46 @@ static UINT32 s3c240x_mmc_regs[0x40/4];
 
 static READ32_HANDLER( s3c240x_mmc_r )
 {
-	return s3c240x_mmc_regs[offset];
+	running_machine *machine = space->machine;
+	UINT32 data = s3c240x_mmc_regs[offset];
+	verboselog( machine, 9, "(MMC) %08X -> %08X (PC %08X)\n", 0x15A00000 + (offset << 2), data, cpu_get_pc( space->cpu));
+	return data;
 }
 
 static WRITE32_HANDLER( s3c240x_mmc_w )
 {
+	running_machine *machine = space->machine;
+	verboselog( machine, 9, "(MMC) %08X <- %08X (PC %08X)\n", 0x15A00000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_mmc_regs[offset]);
 }
 
 // ...
 
-static void s3c240x_machine_start(running_machine *machine)
+static void s3c240x_machine_start( running_machine *machine)
 {
-	s3c240x_pwm_timer[0] = timer_alloc(machine, s3c240x_pwm_timer_exp, (void *)(FPTR)0);
-	s3c240x_pwm_timer[1] = timer_alloc(machine, s3c240x_pwm_timer_exp, (void *)(FPTR)1);
-	s3c240x_pwm_timer[2] = timer_alloc(machine, s3c240x_pwm_timer_exp, (void *)(FPTR)2);
-	s3c240x_pwm_timer[3] = timer_alloc(machine, s3c240x_pwm_timer_exp, (void *)(FPTR)3);
-	s3c240x_pwm_timer[4] = timer_alloc(machine, s3c240x_pwm_timer_exp, (void *)(FPTR)4);
+	s3c240x_pwm_timer[0] = timer_alloc( machine, s3c240x_pwm_timer_exp, (void *)(FPTR)0);
+	s3c240x_pwm_timer[1] = timer_alloc( machine, s3c240x_pwm_timer_exp, (void *)(FPTR)1);
+	s3c240x_pwm_timer[2] = timer_alloc( machine, s3c240x_pwm_timer_exp, (void *)(FPTR)2);
+	s3c240x_pwm_timer[3] = timer_alloc( machine, s3c240x_pwm_timer_exp, (void *)(FPTR)3);
+	s3c240x_pwm_timer[4] = timer_alloc( machine, s3c240x_pwm_timer_exp, (void *)(FPTR)4);
 	s3c240x_dma_timer[0] = timer_alloc( machine, s3c240x_dma_timer_exp, (void *)(FPTR)0);
 	s3c240x_dma_timer[1] = timer_alloc( machine, s3c240x_dma_timer_exp, (void *)(FPTR)1);
 	s3c240x_dma_timer[2] = timer_alloc( machine, s3c240x_dma_timer_exp, (void *)(FPTR)2);
 	s3c240x_dma_timer[3] = timer_alloc( machine, s3c240x_dma_timer_exp, (void *)(FPTR)3);
-	s3c240x_iic_timer = timer_alloc(machine, s3c240x_iic_timer_exp, (void *)(FPTR)0);
-	s3c240x_iis_timer = timer_alloc(machine, s3c240x_iis_timer_exp, (void *)(FPTR)0);
+	s3c240x_iic_timer = timer_alloc( machine, s3c240x_iic_timer_exp, (void *)(FPTR)0);
+	s3c240x_iis_timer = timer_alloc( machine, s3c240x_iis_timer_exp, (void *)(FPTR)0);
+	s3c240x_lcd_timer = timer_alloc( machine, s3c240x_lcd_timer_exp, (void *)(FPTR)0);
 	eeprom_data = auto_alloc_array( machine, UINT8, 0x2000);
 	smc_init( machine);
 	i2s_init( machine);
 }
 
-static void s3c240x_machine_reset(running_machine *machine)
+static void s3c240x_machine_reset( running_machine *machine)
 {
 	smc_reset( machine);
 	i2s_reset( machine);
+	s3c240x_iis_fifo_index = 0;
+	s3c240x_iic_data_index = 0;
 }
 
 static NVRAM_HANDLER( gp32 )
@@ -1461,8 +1583,8 @@ static ADDRESS_MAP_START( gp32_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x14400000, 0x14400017) AM_READWRITE(s3c240x_irq_r, s3c240x_irq_w)
 	AM_RANGE(0x14600000, 0x1460007b) AM_READWRITE(s3c240x_dma_r, s3c240x_dma_w)
 	AM_RANGE(0x14800000, 0x14800017) AM_READWRITE(s3c240x_clkpow_r, s3c240x_clkpow_w)
-	AM_RANGE(0x14a00000, 0x14a003ff) AM_READWRITE(s3c240x_vidregs_r, s3c240x_vidregs_w)
-	AM_RANGE(0x14a00400, 0x14a007ff) AM_READWRITE(s3c240x_palette_r, s3c240x_palette_w)
+	AM_RANGE(0x14a00000, 0x14a003ff) AM_READWRITE(s3c240x_lcd_r, s3c240x_lcd_w)
+	AM_RANGE(0x14a00400, 0x14a007ff) AM_READWRITE(s3c240x_lcd_palette_r, s3c240x_lcd_palette_w)
 	AM_RANGE(0x15000000, 0x1500002b) AM_READWRITE(s3c240x_uart_0_r, s3c240x_uart_0_w)
 	AM_RANGE(0x15004000, 0x1500402b) AM_READWRITE(s3c240x_uart_1_r, s3c240x_uart_1_w)
 	AM_RANGE(0x15100000, 0x15100043) AM_READWRITE(s3c240x_pwm_r, s3c240x_pwm_w)
@@ -1517,7 +1639,8 @@ static MACHINE_DRIVER_START( gp32 )
 	/* 320x240 is 4:3 but ROT270 causes an aspect ratio of 3:4 by default */
 	MDRV_DEFAULT_LAYOUT(layout_lcd_rot)
 
-	MDRV_VIDEO_UPDATE(gp32)
+	MDRV_VIDEO_START(generic_bitmapped)
+	MDRV_VIDEO_UPDATE(generic_bitmapped)
 
 	MDRV_MACHINE_START(gp32)
 	MDRV_MACHINE_RESET(gp32)
