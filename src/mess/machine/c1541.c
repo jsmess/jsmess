@@ -275,8 +275,6 @@ static CBMSERIAL_ATN( c1541 )
 
 static CBMSERIAL_RESET( c1541 )
 {
-	c1541_t *c1541 = get_safe_token(device);
-
 	if (!state)
 	{
 		device_reset(device);
