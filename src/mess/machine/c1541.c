@@ -119,7 +119,6 @@
 	TODO:
 
 	- allocate track buffer runtime
-	- weak bits (for Cyan loader)
 	- accurate timing
 	- D64 to G64 conversion
 	- activity led
@@ -264,6 +263,12 @@ static TIMER_CALLBACK( bit_tick )
 		/* byte ready */
 		c1541->bit_count = 0;
 		byte = 1;
+
+		if (!(c1541->data & 0xff))
+		{
+			/* simulate weak bits with randomness */
+			c1541->data = (c1541->data & 0xff00) | (mame_rand(machine) & 0xff);
+		}
 	}
 
 	if (c1541->byte != byte)
@@ -302,6 +307,17 @@ static CBMSERIAL_RESET( c1541 )
 		device_reset(device);
 	}
 }
+
+/*-------------------------------------------------
+    ADDRESS_MAP( c1540_map )
+-------------------------------------------------*/
+
+static ADDRESS_MAP_START( c1540_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1540", 0xc000)
+ADDRESS_MAP_END
 
 /*-------------------------------------------------
     ADDRESS_MAP( c1541_map )
@@ -641,12 +657,12 @@ static const floppy_config c1541_floppy_config =
 };
 
 /*-------------------------------------------------
-    MACHINE_DRIVER( c1541 )
+    MACHINE_DRIVER( c1540 )
 -------------------------------------------------*/
 
-static MACHINE_DRIVER_START( c1541 )
+static MACHINE_DRIVER_START( c1540 )
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
-	MDRV_CPU_PROGRAM_MAP(c1541_map)
+	MDRV_CPU_PROGRAM_MAP(c1540_map)
 
 	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c1541_via0_intf)
 	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
@@ -655,11 +671,22 @@ static MACHINE_DRIVER_START( c1541 )
 MACHINE_DRIVER_END
 
 /*-------------------------------------------------
+    MACHINE_DRIVER( c1541 )
+-------------------------------------------------*/
+
+static MACHINE_DRIVER_START( c1541 )
+	MDRV_IMPORT_FROM(c1540)
+
+	MDRV_CPU_MODIFY(M6502_TAG)
+	MDRV_CPU_PROGRAM_MAP(c1541_map)
+MACHINE_DRIVER_END
+
+/*-------------------------------------------------
     ROM( c1540 )
 -------------------------------------------------*/
 
 ROM_START( c1540 ) // schematic 1540008
-	ROM_REGION( 0x1000, "c1540", ROMREGION_LOADBYNAME )
+	ROM_REGION( 0x10000, "c1540", ROMREGION_LOADBYNAME )
 	ROM_LOAD( "325302-01.uab4", 0xc000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
 	ROM_LOAD( "325303-01.uab5", 0xe000, 0x2000, CRC(10b39158) SHA1(56dfe79b26f50af4e83fd9604857756d196516b9) )
 ROM_END
@@ -791,6 +818,39 @@ static DEVICE_RESET( c1541 )
 	device_reset(c1541->cpu);
 	device_reset(c1541->via0);
 	device_reset(c1541->via1);
+}
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( c1540 )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( c1540 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c1541_t);									break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(c1541_config);								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
+
+		/* --- the following bits of info are returned as pointers --- */
+		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c1540);							break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c1540);			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1541);						break;
+		case DEVINFO_FCT_STOP:							/* Nothing */												break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1541);						break;
+		case DEVINFO_FCT_CBM_SERIAL_ATN:				info->f = (genf *)CBMSERIAL_ATN_NAME(c1541);				break;
+		case DEVINFO_FCT_CBM_SERIAL_RESET:				info->f = (genf *)CBMSERIAL_RESET_NAME(c1541);				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore VIC-1540");						break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Commodore VIC-1540");						break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
+	}
 }
 
 /*-------------------------------------------------
