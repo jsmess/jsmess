@@ -1,3 +1,12 @@
+/**********************************************************************
+
+    Commodore 1540/1541 Single Disk Drive emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
 /*
 
 	1540/1541/1541A/SX-64 Parts
@@ -209,14 +218,14 @@ INLINE c1541_t *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-	assert(device->type == C1541);
+	assert((device->type == C1540) || (device->type == C1541));
 	return (c1541_t *)device->token;
 }
 
 INLINE c1541_config *get_safe_config(const device_config *device)
 {
 	assert(device != NULL);
-	assert(device->type == C1541);
+	assert((device->type == C1540) || (device->type == C1541));
 	return (c1541_config *)device->inline_config;
 }
 
@@ -703,7 +712,7 @@ ROM_START( c1541 ) // schematic 1540008
 	ROM_LOAD( "901229-03.uab5", 0xe000, 0x2000, CRC(9126e74a) SHA1(03d17bd745066f1ead801c5183ac1d3af7809744) )
 	ROM_LOAD( "901229-04.uab5", 0xe000, 0x2000, NO_DUMP )
 	ROM_LOAD( "901229-05 ae.uab5", 0xe000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b) )
-//	ROM_LOAD( "901229-06 aa.uab5", 0xe000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0) )
+	ROM_LOAD( "901229-06 aa.uab5", 0xe000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0) )
 ROM_END
 
 /*-------------------------------------------------

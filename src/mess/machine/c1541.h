@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Commodore 1541 Single Disk Drive emulation
+    Commodore 1540/1541 Single Disk Drive emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
