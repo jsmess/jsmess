@@ -113,7 +113,7 @@ static floperr_t g64_read_track(floppy_image *floppy, int head, int track, UINT6
 		floppy_image_read(floppy, header, track_offset, 2);
 		track_length = (header[1] << 8) | header[0];
 
-		if (buflen < track_length) fatalerror("G64 track buffer too small: %u!\n", buflen);
+		if (buflen < track_length) fatalerror("G64 track buffer too small: %u!\n", (UINT32)buflen);
 
 		if (track_length)
 		{
