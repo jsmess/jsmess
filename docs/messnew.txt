@@ -65,6 +65,9 @@ System Driver Changes:
 ----------------------
 - [BETA] Fixed display flickering. [Curt Coder]
 
+- [C64] Emulated the Commodore 1541 disk drive at hardware level. 
+  G64 images are now supported (D64 support coming) [Curt Coder]
+
 - [EXL100] Added 7041 rom dump.  [Wilbert Pol]
 
 - [EXIDY] Improved sound compatibility.  [Robbbert]
