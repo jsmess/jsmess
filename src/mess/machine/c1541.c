@@ -140,7 +140,7 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG 1
+#define LOG 0
 
 #define M6502_TAG		"ucd5"
 #define M6522_0_TAG		"uab1"
@@ -173,10 +173,11 @@ struct _c1541_t
 	UINT8 yb;							/* GCR data byte */
 	int byte;							/* byte ready */
 	int atna;							/* attention acknowledge */
-	int ds;								/* data speed */
-	int stp;							/* stepper motor phase */
+	int ds;								/* density select */
+	int stp;							/* stepping motor */
 	int soe;							/* s? output enable */
 	int mode;							/* mode (0 = write, 1 = read) */
+	int sync;
 
 	/* serial bus */
 	int data_out;						/* serial bus data output */
@@ -227,7 +228,16 @@ static TIMER_CALLBACK( bit_tick )
 
 	if (c1541->bit_pos == 0x07)
 	{
-		c1541->yb = c1541->track_buffer[c1541->buffer_pos];
+		UINT8 data = c1541->track_buffer[c1541->buffer_pos];
+
+		if (data != 0xff)
+		{
+			c1541->yb = data;
+			byte = 1;
+		}
+
+		c1541->sync = !(c1541->mode && (data == 0xff));
+
 		c1541->buffer_pos++;
 
 		if (c1541->buffer_pos > c1541->track_len)
@@ -235,9 +245,9 @@ static TIMER_CALLBACK( bit_tick )
 			c1541->buffer_pos = 0;
 		}
 
-		c1541->bit_pos = 0;
+//		logerror("YB %02x pos %u\n", c1541->yb, c1541->buffer_pos-1);
 
-		byte = 1;
+		c1541->bit_pos = 0;
 	}
 	else
 	{
@@ -437,27 +447,28 @@ static READ8_DEVICE_HANDLER( via1_pb_r )
 {
 	/*
 
-		bit		description
+		bit		signal		description
 
-		PB0		STP1
-		PB1		STP0
-		PB2		MTR
-		PB3		ACT
-		PB4		WPS input	write protect sensor
-		PB5		DS0
-		PB6		DS1
-		PB7		SYNC input
+		PB0		STP0		stepping motor bit 0
+		PB1		STP1		stepping motor bit 1
+		PB2		MTR			motor ON/OFF
+		PB3		ACT			drive 0 LED
+		PB4		WPS			write protect sense
+		PB5		DS0			density select 0
+		PB6		DS1			density select 1
+		PB7		SYNC		SYNC detect line
 
 	*/
 
 	c1541_t *c1541 = get_safe_token(device->owner);
 	UINT8 data = 0;
 
-	/* write protect sensor */
+	/* write protect sense */
 	data |= (floppy_drive_get_flag_state(c1541->image, FLOPPY_DRIVE_DISK_WRITE_PROTECTED) == FLOPPY_DRIVE_DISK_WRITE_PROTECTED) << 4;
 
-	/* SYNC detected */
-	data |= !(c1541->mode && (c1541->yb == 0xff)) << 7;
+	/* SYNC detect */
+	//logerror("SYNC %u\n", !(c1541->mode && (c1541->yb == 0xff)));
+	data |= c1541->sync << 7;
 
 	return data;
 }
@@ -466,16 +477,16 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 {
 	/*
 
-		bit		description
+		bit		signal		description
 
-		PB0		STP1
-		PB1		STP0
-		PB2		MTR
-		PB3		ACT
-		PB4		WPS input
-		PB5		DS0
-		PB6		DS1
-		PB7		SYNC input
+		PB0		STP0		stepping motor bit 0
+		PB1		STP1		stepping motor bit 1
+		PB2		MTR			motor ON/OFF
+		PB3		ACT			drive 0 LED
+		PB4		WPS			write protect sense
+		PB5		DS0			density select 0
+		PB6		DS1			density select 1
+		PB7		SYNC		SYNC detect line
 
 	*/
 
@@ -517,10 +528,11 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 
 	/* activity LED */
 
-	/* data speed */
+	/* density select */
 	if (c1541->ds != ds)
 	{
-		timer_adjust_periodic(c1541->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C1541_BITRATE[ds]));
+		//logerror("DS %u\n", ds);
+		timer_adjust_periodic(c1541->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C1541_BITRATE[ds]/4));
 		c1541->ds = ds;
 	}
 }

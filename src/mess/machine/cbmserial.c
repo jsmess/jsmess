@@ -281,7 +281,7 @@ INLINE void set_signal(const device_config *serial_bus_device, const device_conf
 		{
 			if (daisy->line[line] != state)
 			{
-				logerror("CBM serial bus device '%s' %s %u\n", calling_device->tag, SIGNAL_NAME[line], state);
+				if (LOG) logerror("CBM Serial Bus: '%s' %s %u\n", calling_device->tag, SIGNAL_NAME[line], state);
 				daisy->line[line] = state;
 			}
 			break;
@@ -296,7 +296,7 @@ INLINE void set_signal(const device_config *serial_bus_device, const device_conf
 		if (daisy->out_line_func[line]) (daisy->out_line_func[line])(daisy->device, data);
 	}
 
-	logerror("SRQ %u ATN %u CLK %u DATA %u RESET %u\n", get_signal(serial_bus_device, SRQ),get_signal(serial_bus_device, ATN),get_signal(serial_bus_device, CLK),get_signal(serial_bus_device, DATA),get_signal(serial_bus_device, RESET));
+	if (LOG) logerror("CBM Serial Bus: SRQ %u ATN %u CLK %u DATA %u RESET %u\n", get_signal(serial_bus_device, SRQ),get_signal(serial_bus_device, ATN),get_signal(serial_bus_device, CLK),get_signal(serial_bus_device, DATA),get_signal(serial_bus_device, RESET));
 }
 
 /***************************************************************************
