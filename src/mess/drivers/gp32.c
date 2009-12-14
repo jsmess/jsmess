@@ -58,11 +58,13 @@ static emu_timer *s3c240x_lcd_timer;
 
 static struct
 {
-	UINT32 vramaddr[2];
+	UINT32 vramaddr_cur;
+	UINT32 vramaddr_max;
 	UINT32 offsize;
+	UINT32 pagewidth_cur;
+	UINT32 pagewidth_max;
 	UINT32 bppmode;
-	UINT32 hozval;
-	UINT32 lineval;
+	int vpos, hpos;
 } s3c240x_lcd;
 
 #define BPPMODE_TFT_01	0x08
@@ -79,81 +81,132 @@ static struct
 
 static void s3c240x_lcd_dma_reload( running_machine *machine)
 {
-	s3c240x_lcd.vramaddr[0] = s3c240x_lcd_regs[5] << 1;
-	s3c240x_lcd.vramaddr[1] = ((s3c240x_lcd_regs[5] & 0xFFE00000) | s3c240x_lcd_regs[6]) << 1;
+	s3c240x_lcd.vramaddr_cur = s3c240x_lcd_regs[5] << 1;
+	s3c240x_lcd.vramaddr_max = ((s3c240x_lcd_regs[5] & 0xFFE00000) | s3c240x_lcd_regs[6]) << 1;
 	s3c240x_lcd.offsize = BITS( s3c240x_lcd_regs[7], 21, 11);
-	verboselog( machine, 3, "LCD - vramaddr_start %08X vramaddr_stop %08X offsize %08X\n", s3c240x_lcd.vramaddr[0], s3c240x_lcd.vramaddr[1], s3c240x_lcd.offsize);
+	s3c240x_lcd.pagewidth_cur = 0;
+	s3c240x_lcd.pagewidth_max = BITS( s3c240x_lcd_regs[7], 10, 0);
+	verboselog( machine, 3, "LCD - vramaddr %08X %08X offsize %08X pagewidth %08X\n", s3c240x_lcd.vramaddr_cur, s3c240x_lcd.vramaddr_max, s3c240x_lcd.offsize, s3c240x_lcd.pagewidth_max);
+}
+
+INLINE void s3c240x_lcd_pagewidth_inc( void)
+{
+	s3c240x_lcd.pagewidth_cur++;
+	if (s3c240x_lcd.pagewidth_cur >= s3c240x_lcd.pagewidth_max)
+	{
+		UINT32 lineval;
+		s3c240x_lcd.vramaddr_cur += s3c240x_lcd.offsize << 1;
+		s3c240x_lcd.pagewidth_cur = 0;
+		lineval = BITS( s3c240x_lcd_regs[1], 23, 14);
+		s3c240x_lcd.vpos = (s3c240x_lcd.vpos + 1) % (lineval + 1);
+		s3c240x_lcd.hpos = 0;
+	}
+}
+
+static void s3c240x_lcd_render_01( running_machine *machine, bitmap_t *bitmap)
+{
+	int i, j, k;
+	for (k=0;k<8;k++)
+	{
+		for (j=0;j<2;j++)
+		{
+			UINT8 *vram = (UINT8 *)s3c240x_ram + (s3c240x_lcd.vramaddr_cur - 0x0C000000);
+			UINT32 *scanline = BITMAP_ADDR32( bitmap, s3c240x_lcd.vpos, s3c240x_lcd.hpos);
+			UINT8 data = *vram;
+			for (i=0;i<8;i++)
+			{
+				if (data & 0x80)
+				{
+					*scanline++ = RGB_BLACK;
+				}
+				else
+				{
+					*scanline++ = RGB_WHITE;
+				}
+				data = data << 1;
+				s3c240x_lcd.hpos++;
+			}
+			s3c240x_lcd.vramaddr_cur++;
+		}
+		s3c240x_lcd_pagewidth_inc();
+	}
+}
+
+static void s3c240x_lcd_render_08( running_machine *machine, bitmap_t *bitmap)
+{
+	int i, j;
+	for (j=0;j<8;j++)
+	{
+		UINT8 *vram = (UINT8 *)s3c240x_ram + (s3c240x_lcd.vramaddr_cur - 0x0C000000);
+		UINT32 *scanline = BITMAP_ADDR32( bitmap, s3c240x_lcd.vpos, s3c240x_lcd.hpos);
+		for (i=0;i<2;i++)
+		{
+			*scanline++ = palette_get_color( machine, *vram++);
+			s3c240x_lcd.vramaddr_cur++;
+			s3c240x_lcd.hpos++;
+		}
+		s3c240x_lcd_pagewidth_inc();
+	}
+}
+
+static void s3c240x_lcd_render_16( running_machine *machine, bitmap_t *bitmap)
+{
+	int i;
+	for (i = 0; i < 8; i++)
+	{
+		UINT8 *vram = (UINT8 *)s3c240x_ram + (s3c240x_lcd.vramaddr_cur - 0x0C000000);
+		UINT32 *scanline = BITMAP_ADDR32( bitmap, s3c240x_lcd.vpos, s3c240x_lcd.hpos);
+		UINT16 data;
+		UINT8 r, g, b;
+		data = (vram[0] << 0) | (vram[1] << 8);
+		r = BITS( data, 15, 11) << 3;
+		g = BITS( data, 10,  6) << 3;
+		b = BITS( data,  5,  1) << 3;
+		*scanline++ = MAKE_RGB( r, g, b);
+		s3c240x_lcd.vramaddr_cur += 2;
+		s3c240x_lcd.hpos++;
+		s3c240x_lcd_pagewidth_inc();
+	}
 }
 
 static TIMER_CALLBACK( s3c240x_lcd_timer_exp )
 {
 	const device_config *screen = machine->primary_screen;
-	bitmap_t *bitmap = machine->generic.tmpbitmap;
-	int vpos, hpos, x;
 	verboselog( machine, 2, "LCD timer callback\n");
-	vpos = video_screen_get_vpos( screen);
-	hpos = video_screen_get_hpos( screen);
-	verboselog( machine, 3, "LCD - vpos %d hpos %d\n", vpos, hpos);
-	if (s3c240x_lcd.vramaddr[0] >= s3c240x_lcd.vramaddr[1])
+	s3c240x_lcd.vpos = video_screen_get_vpos( screen);
+	s3c240x_lcd.hpos = video_screen_get_hpos( screen);
+	verboselog( machine, 3, "LCD - vpos %d hpos %d\n", s3c240x_lcd.vpos, s3c240x_lcd.hpos);
+	if (s3c240x_lcd.vramaddr_cur >= s3c240x_lcd.vramaddr_max)
 	{
 		s3c240x_lcd_dma_reload( machine);
 	}
-	verboselog( machine, 3, "LCD - vramaddr %08X\n", s3c240x_lcd.vramaddr[0]);
-	while (s3c240x_lcd.vramaddr[0] < s3c240x_lcd.vramaddr[1])
+	verboselog( machine, 3, "LCD - vramaddr %08X\n", s3c240x_lcd.vramaddr_cur);
+	while (s3c240x_lcd.vramaddr_cur < s3c240x_lcd.vramaddr_max)
 	{
 		switch (s3c240x_lcd.bppmode)
 		{
-			// 8-bit
-			case BPPMODE_TFT_08 :
-			{
-				UINT8 *vram = (UINT8 *)&s3c240x_ram[(s3c240x_lcd.vramaddr[0]-0x0c000000)/4];
-				UINT32 *scanline = BITMAP_ADDR32( bitmap, vpos, hpos);
-				for (x = 0; x < 16; x++)
-				{
-					*scanline++ = palette_get_color( machine, *vram++);
-				}
-				hpos += 16;
-			}
-			break;
-			// 16-bit
-			case BPPMODE_TFT_16 :
-			{
-				UINT16 *vram = (UINT16 *)&s3c240x_ram[(s3c240x_lcd.vramaddr[0]-0x0c000000)/4];
-				UINT32 *scanline = BITMAP_ADDR32( bitmap, vpos, hpos);
-				for (x = 0; x < 8; x++)
-				{
-					UINT16 data;
-					UINT8 r, g, b;
-					data = *vram++;
-					r = BITS( data, 15, 11) << 3;
-					g = BITS( data, 10,  6) << 3;
-					b = BITS( data,  5,  1) << 3;
-					*scanline++ = MAKE_RGB( r, g, b);
-				}
-				hpos += 8;
-			}
-			break;
-			// not supported
-			default :
-			{
-				verboselog( machine, 0, "bppmode %d not supported\n", s3c240x_lcd.bppmode);
-			}
-			break;
+			case BPPMODE_TFT_01 : s3c240x_lcd_render_01( machine, machine->generic.tmpbitmap); break;
+			case BPPMODE_TFT_08 : s3c240x_lcd_render_08( machine, machine->generic.tmpbitmap); break;
+			case BPPMODE_TFT_16 : s3c240x_lcd_render_16( machine, machine->generic.tmpbitmap); break;
+			default : verboselog( machine, 0, "bppmode %d not supported\n", s3c240x_lcd.bppmode); break;
 		}
-		s3c240x_lcd.vramaddr[0] += 16;
-		if (hpos >= s3c240x_lcd.hozval)
-		{
-			switch (s3c240x_lcd.bppmode)
-			{
-				case BPPMODE_TFT_08 : s3c240x_lcd.vramaddr[0] += s3c240x_lcd.offsize << 0; break;
-				case BPPMODE_TFT_16 : s3c240x_lcd.vramaddr[0] += s3c240x_lcd.offsize << 1; break;
-			}
-			vpos = (vpos + 1) % (s3c240x_lcd.lineval + 1);
-			hpos = 0;
-			if (vpos == 0) break; // end of frame
-		}
+		if ((s3c240x_lcd.vpos == 0) && (s3c240x_lcd.hpos == 0)) break;
 	}
-	timer_adjust_oneshot( s3c240x_lcd_timer, video_screen_get_time_until_pos( screen, vpos, hpos), 0);
+	timer_adjust_oneshot( s3c240x_lcd_timer, video_screen_get_time_until_pos( screen, s3c240x_lcd.vpos, s3c240x_lcd.hpos), 0);
+}
+
+static VIDEO_START( gp32 )
+{
+	VIDEO_START_CALL(generic_bitmapped);
+}
+
+static VIDEO_UPDATE( gp32 )
+{
+	running_machine *machine = screen->machine;
+	VIDEO_UPDATE_CALL(generic_bitmapped);
+	s3c240x_lcd_dma_reload( machine);
+	s3c240x_lcd.bppmode = BITS( s3c240x_lcd_regs[0], 4, 1);
+	return 0;
 }
 
 static READ32_HANDLER( s3c240x_lcd_r )
@@ -209,10 +262,8 @@ static void s3c240x_lcd_start( running_machine *machine)
 	const device_config *screen = machine->primary_screen;
 	verboselog( machine, 1, "LCD start\n");
 	s3c240x_lcd_configure( machine);
-	s3c240x_lcd.bppmode = BITS( s3c240x_lcd_regs[0], 4, 1);
-	s3c240x_lcd.hozval = BITS( s3c240x_lcd_regs[2], 18, 8);
-	s3c240x_lcd.lineval = BITS( s3c240x_lcd_regs[1], 23, 14);
 	s3c240x_lcd_dma_reload( machine);
+	s3c240x_lcd.bppmode = BITS( s3c240x_lcd_regs[0], 4, 1);
 	timer_adjust_oneshot( s3c240x_lcd_timer, video_screen_get_time_until_pos( screen, 0, 0), 0);
 }
 
@@ -562,6 +613,14 @@ static TIMER_CALLBACK( s3c240x_pwm_timer_exp )
 static emu_timer *s3c240x_dma_timer[4];
 static UINT32 s3c240x_dma_regs[0x7c/4];
 
+static void s3c240x_dma_reload( running_machine *machine, int dma)
+{
+	UINT32 *regs = &s3c240x_dma_regs[dma<<3];
+	regs[3] = (regs[3] & ~0x000FFFFF) | BITS( regs[2], 19, 0);
+	regs[4] = (regs[4] & ~0x1FFFFFFF) | BITS( regs[0], 28, 0);
+	regs[5] = (regs[5] & ~0x1FFFFFFF) | BITS( regs[1], 28, 0);
+}
+
 static void s3c240x_dma_trigger( running_machine *machine, int dma)
 {
 	UINT32 *regs = &s3c240x_dma_regs[dma<<3];
@@ -604,9 +663,7 @@ static void s3c240x_dma_trigger( running_machine *machine, int dma)
 		reload = BIT( regs[2], 22);
 		if (!reload)
 		{
-			regs[3] = (regs[3] & ~0x000FFFFF) | BITS( regs[2], 19, 0);
-			regs[4] = (regs[4] & ~0x1FFFFFFF) | BITS( regs[0], 28, 0);
-			regs[5] = (regs[5] & ~0x1FFFFFFF) | BITS( regs[1], 28, 0);
+			s3c240x_dma_reload( machine, dma);
 		}
 		else
 		{
@@ -641,10 +698,8 @@ static void s3c240x_dma_start( running_machine *machine, int dma)
 	dsz = BITS( regs[2], 21, 20);
 	verboselog( machine, 5, "DMA %d - addr_src %08X inc_src %d addr_dst %08X inc_dst %d int %d tsz %d servmode %d hwsrcsel %d swhwsel %d reload %d dsz %d tc %d\n", dma, addr_src, inc_src, addr_dst, inc_dst, _int, tsz, servmode, hwsrcsel, swhwsel, reload, dsz, tc);
 	verboselog( machine, 5, "DMA %d - copy %08X bytes from %08X (%s) to %08X (%s)\n", dma, tc << dsz, addr_src, inc_src ? "fix" : "inc", addr_dst, inc_dst ? "fix" : "inc");
-	regs[3] = (regs[3] & ~0x000FFFFF) | tc;
-	regs[4] = (regs[4] & ~0x1FFFFFFF) | addr_src;
-	regs[5] = (regs[5] & ~0x1FFFFFFF) | addr_dst;
-	if (!((dma == 2) && (swhwsel == 1) && (hwsrcsel == 0)))
+	s3c240x_dma_reload( machine, dma);
+	if (swhwsel == 0)
 	{
 		s3c240x_dma_trigger( machine, dma);
 	}
@@ -1149,11 +1204,15 @@ static WRITE32_HANDLER( s3c240x_watchdog_w )
 
 // IIC
 
+static struct
+{
+	UINT8 data[3];
+	int data_index;
+	UINT16 address;
+} s3c240x_iic;
+
 static emu_timer *s3c240x_iic_timer;
 static UINT32 s3c240x_iic_regs[0x10/4];
-static UINT8 s3c240x_iic_data[3];
-static int s3c240x_iic_data_index;
-static UINT16 s3c240x_iic_addr;
 
 /*
 static UINT8 i2cmem_read_byte( running_machine *machine, int last)
@@ -1214,7 +1273,7 @@ static void i2cmem_stop( running_machine *machine)
 static void iic_start( running_machine *machine)
 {
 	verboselog( machine, 1, "IIC start\n");
-	s3c240x_iic_data_index = 0;
+	s3c240x_iic.data_index = 0;
 	timer_adjust_oneshot( s3c240x_iic_timer, ATTOTIME_IN_MSEC( 1), 0);
 }
 
@@ -1305,18 +1364,18 @@ static TIMER_CALLBACK( s3c240x_iic_timer_exp )
 		// master receive mode
 		case 2 :
 		{
-			if (s3c240x_iic_data_index == 0)
+			if (s3c240x_iic.data_index == 0)
 			{
 				UINT8 data_shift = s3c240x_iic_regs[3] & 0xFF;
 				verboselog( machine, 5, "IIC write %02X\n", data_shift);
 			}
 			else
 			{
-				UINT8 data_shift = eeprom_data[s3c240x_iic_addr];
-				verboselog( machine, 5, "IIC read %02X [%04X]\n", data_shift, s3c240x_iic_addr);
+				UINT8 data_shift = eeprom_data[s3c240x_iic.address];
+				verboselog( machine, 5, "IIC read %02X [%04X]\n", data_shift, s3c240x_iic.address);
 				s3c240x_iic_regs[3] = (s3c240x_iic_regs[3] & ~0xFF) | data_shift;
 			}
-			s3c240x_iic_data_index++;
+			s3c240x_iic.data_index++;
 		}
 		break;
 		// master transmit mode
@@ -1324,10 +1383,10 @@ static TIMER_CALLBACK( s3c240x_iic_timer_exp )
 		{
 			UINT8 data_shift = s3c240x_iic_regs[3] & 0xFF;
 			verboselog( machine, 5, "IIC write %02X\n", data_shift);
-			s3c240x_iic_data[s3c240x_iic_data_index++] = data_shift;
-			if (s3c240x_iic_data_index == 3)
+			s3c240x_iic.data[s3c240x_iic.data_index++] = data_shift;
+			if (s3c240x_iic.data_index == 3)
 			{
-				s3c240x_iic_addr = (s3c240x_iic_data[1] << 8) | s3c240x_iic_data[2];
+				s3c240x_iic.address = (s3c240x_iic.data[1] << 8) | s3c240x_iic.data[2];
 			}
 		}
 		break;
@@ -1335,17 +1394,20 @@ static TIMER_CALLBACK( s3c240x_iic_timer_exp )
 	enable_interrupt = BIT( s3c240x_iic_regs[0], 5);
 	if (enable_interrupt)
 	{
-		verboselog( machine, 5, "IIC request irq\n");
 		s3c240x_request_irq( machine, INT_IIC);
 	}
 }
 
 // IIS
 
+static struct 
+{
+	UINT16 fifo[16/2];
+	int fifo_index;
+} s3c240x_iis;
+
 static emu_timer *s3c240x_iis_timer;
 static UINT32 s3c240x_iis_regs[0x14/4];
-static UINT16 s3c240x_iis_fifo[16/2];
-static int s3c240x_iis_fifo_index;
 
 static void s3c240x_iis_start( running_machine *machine)
 {
@@ -1407,20 +1469,20 @@ static WRITE32_HANDLER( s3c240x_iis_w )
 		{
 			if (ACCESSING_BITS_16_31)
 			{
-				s3c240x_iis_fifo[s3c240x_iis_fifo_index++] = BITS( data, 31, 16);
+				s3c240x_iis.fifo[s3c240x_iis.fifo_index++] = BITS( data, 31, 16);
 			}
 			if (ACCESSING_BITS_0_15)
 			{
-				s3c240x_iis_fifo[s3c240x_iis_fifo_index++] = BITS( data, 15, 0);
+				s3c240x_iis.fifo[s3c240x_iis.fifo_index++] = BITS( data, 15, 0);
 			}
-			if (s3c240x_iis_fifo_index == 2)
+			if (s3c240x_iis.fifo_index == 2)
 			{
 				const device_config *dac[2];
 				dac[0] = devtag_get_device( machine, "dac1");
 				dac[1] = devtag_get_device( machine, "dac2");
-				s3c240x_iis_fifo_index = 0;
-    		dac_signed_data_16_w( dac[0], s3c240x_iis_fifo[0] + 0x8000);
-    		dac_signed_data_16_w( dac[1], s3c240x_iis_fifo[1] + 0x8000);
+				s3c240x_iis.fifo_index = 0;
+    		dac_signed_data_16_w( dac[0], s3c240x_iis.fifo[0] + 0x8000);
+    		dac_signed_data_16_w( dac[1], s3c240x_iis.fifo[1] + 0x8000);
 			}
 		}
 		break;
@@ -1549,8 +1611,8 @@ static void s3c240x_machine_reset( running_machine *machine)
 {
 	smc_reset( machine);
 	i2s_reset( machine);
-	s3c240x_iis_fifo_index = 0;
-	s3c240x_iic_data_index = 0;
+	s3c240x_iis.fifo_index = 0;
+	s3c240x_iic.data_index = 0;
 }
 
 static NVRAM_HANDLER( gp32 )
@@ -1639,8 +1701,8 @@ static MACHINE_DRIVER_START( gp32 )
 	/* 320x240 is 4:3 but ROT270 causes an aspect ratio of 3:4 by default */
 	MDRV_DEFAULT_LAYOUT(layout_lcd_rot)
 
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(generic_bitmapped)
+	MDRV_VIDEO_START(gp32)
+	MDRV_VIDEO_UPDATE(gp32)
 
 	MDRV_MACHINE_START(gp32)
 	MDRV_MACHINE_RESET(gp32)
@@ -1658,16 +1720,18 @@ MACHINE_DRIVER_END
 
 ROM_START( gp32 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_SYSTEM_BIOS( 0, "157e", "GP32 Firmware 1.5.7 (English)" )
+	ROM_SYSTEM_BIOS( 0, "157e", "Firmware 1.5.7 (English)" )
 	ROMX_LOAD( "gp32157e.bin", 0x000000, 0x080000, CRC(b1e35643) SHA1(1566bc2a27980602e9eb501cf8b2d62939bfd1e5), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "100k", "GP32 Firmware 1.0.0 (Korean)" )
+	ROM_SYSTEM_BIOS( 1, "100k", "Firmware 1.0.0 (Korean)" )
 	ROMX_LOAD( "gp32100k.bin", 0x000000, 0x080000, CRC(d9925ac9) SHA1(3604d0d7210ed72eddd3e3e0c108f1102508423c), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "156k", "GP32 Firmware 1.5.6 (Korean)" )
+	ROM_SYSTEM_BIOS( 2, "156k", "Firmware 1.5.6 (Korean)" )
 	ROMX_LOAD( "gp32156k.bin", 0x000000, 0x080000, CRC(667fb1c8) SHA1(d179ab8e96411272b6a1d683e59da752067f9da8), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS( 3, "166m", "GP32 Firmware 1.6.6 (European)" )
+	ROM_SYSTEM_BIOS( 3, "166m", "Firmware 1.6.6 (European)" )
 	ROMX_LOAD( "gp32166m.bin", 0x000000, 0x080000, CRC(4548a840) SHA1(1ad0cab0af28fb45c182e5e8c87ead2aaa4fffe1), ROM_BIOS(4) )
-//	ROM_SYSTEM_BIOS( 4, "test", "test" )
-//	ROMX_LOAD( "test.bin", 0x000000, 0x080000, CRC(00000000) SHA1(0000000000000000000000000000000000000000), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS( 4, "mfv2", "Mr. Spiv Multi Firmware V2" )
+	ROMX_LOAD( "gp32mfv2.bin", 0x000000, 0x080000, CRC(7ddaaaeb) SHA1(5a85278f721beb3b00125db5c912d1dc552c5897), ROM_BIOS(5) )
+//	ROM_SYSTEM_BIOS( 5, "test", "test" )
+//	ROMX_LOAD( "test.bin", 0x000000, 0x080000, CRC(00000000) SHA1(0000000000000000000000000000000000000000), ROM_BIOS(6) )
 ROM_END
 
 CONS(2001, gp32, 0, 0, gp32, gp32, 0, 0, "Game Park", "GP32", ROT270|GAME_NOT_WORKING|GAME_NO_SOUND)
