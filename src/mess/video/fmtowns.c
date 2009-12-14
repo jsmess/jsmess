@@ -35,6 +35,11 @@
  * 
  * 	21-24: As above, but for Graphic layer 1
  * 
+ * 	27: Layer zoom.  	bit 0 = x2 horizontal zoom layer 0
+ * 	to be confirmed		bit 5 = x2 vertical zoom layer 0
+ * 						bit 9 = x2 horizontal zoom layer 1
+ * 						bit 13 = x2 vertical zoom layer 1
+ * 
  * 	28:	Control register 0
  * 		VSync enable (bit 15) (blank display?)
  * 		Scroll type (layer 0 = bit 4, layer 1 = bit 5)
@@ -55,12 +60,10 @@
  * 
  * 	0:	Graphic layer(s) type: (others likely exist)
  * 		bit 4 = 2 layers
- * 		0x0a: 1 layer, 256 colours
- * 		0x0f: 1 layer, highcolour
- * 		0x15: 2 layers, both 16 colours
- * 		0x17: 2 layers, highcolour, 16 colours
- * 		0x1d: 2 layers, 16 colours, highcolour
- * 		0x1f: 2 layers, both highcolour
+ * 		bits 2-3 = layer 1 mode
+ * 		bits 0-1 = layer 0 mode
+ * 			mode: 1 = 16 colours, 2 = 256 colours, 3 = highcolour (16-bit)
+ * 			      0 = disabled?
  * 
  * 	1:  Layer reverse (priority?) (bit 0)
  * 		YM (bit 2) - unknown
@@ -87,12 +90,13 @@ static UINT8 towns_dpmd_flag;
 static UINT8 towns_crtc_mix;
 static UINT8 towns_crtc_sel;  // selected CRTC register
 static UINT16 towns_crtc_reg[32];
-static UINT8 towns_video_sel;  // selected shifter register
+static UINT8 towns_video_sel;  // selected video register
 static UINT8 towns_video_reg[2];
 static UINT8 towns_tvram_enable;
 static UINT16 towns_kanji_offset;
 static UINT8 towns_kanji_code_h;
 static UINT8 towns_kanji_code_l;
+static rectangle towns_crtc_layerscr[2];  // each layer has independent sizes
 
 extern UINT32* towns_vram;
 extern UINT8* towns_gfxvram;
@@ -101,9 +105,38 @@ extern UINT8* towns_txtvram;
 extern UINT32 towns_mainmem_enable;
 extern UINT32 towns_ankcg_enable;
 
-void towns_update_video(running_machine* machine)
+void towns_crtc_refresh_mode(running_machine* machine)
 {
+	rectangle scr;
+	unsigned int width,height;
 	
+	scr.min_x = scr.min_y = 0;
+	scr.max_x = towns_crtc_reg[4];
+	scr.max_y = towns_crtc_reg[8] / 2;
+	
+	// layer 0
+	width = towns_crtc_reg[10] - towns_crtc_reg[9];
+	height = (towns_crtc_reg[14] - towns_crtc_reg[13]) / 2;
+	towns_crtc_layerscr[0].min_x = (scr.max_x / 2) - (width / 2);
+	towns_crtc_layerscr[0].min_y = (scr.max_y / 2) - (height / 2);
+	towns_crtc_layerscr[0].max_x = (scr.max_x / 2) + (width / 2);
+	towns_crtc_layerscr[0].max_y = (scr.max_y / 2) + (height / 2);
+	
+	// layer 1
+	width = towns_crtc_reg[12] - towns_crtc_reg[11];
+	height = (towns_crtc_reg[16] - towns_crtc_reg[15]) / 2;
+	towns_crtc_layerscr[1].min_x = (scr.max_x / 2) - (width / 2);
+	towns_crtc_layerscr[1].min_y = (scr.max_y / 2) - (height / 2);
+	towns_crtc_layerscr[1].max_x = (scr.max_x / 2) + (width / 2);
+	towns_crtc_layerscr[1].max_y = (scr.max_y / 2) + (height / 2);
+
+	// sanity checks
+	if(scr.max_x == 0 || scr.max_y == 0)
+		return;
+	if(scr.max_x <= scr.min_x || scr.max_y <= scr.min_y)
+		return;
+	
+	video_screen_configure(machine->primary_screen,scr.max_x+1,scr.max_y+1,&scr,HZ_TO_ATTOSECONDS(60));
 }
 
 READ8_HANDLER( towns_gfx_high_r )
@@ -326,12 +359,14 @@ WRITE8_HANDLER(towns_video_440_w)
 		case 0x02:
 			logerror("CRTC: writing register %i (0x442) [%02x]\n",towns_crtc_sel,data);
 			towns_crtc_reg[towns_crtc_sel] = 
-				(towns_crtc_reg[towns_crtc_sel] & 0xff00) | data; 
+				(towns_crtc_reg[towns_crtc_sel] & 0xff00) | data;
+			towns_crtc_refresh_mode(space->machine); 
 			break;
 		case 0x03:
 			logerror("CRTC: writing register %i (0x443) [%02x]\n",towns_crtc_sel,data);
 			towns_crtc_reg[towns_crtc_sel] = 
 				(towns_crtc_reg[towns_crtc_sel] & 0x00ff) | (data << 8); 
+			towns_crtc_refresh_mode(space->machine); 
 			break;
 		case 0x08:
 			towns_video_sel = data & 0x01;
@@ -515,6 +550,290 @@ WRITE8_HANDLER(towns_spriteram_low_w)
 	}
 }
 
+void towns_crtc_draw_scan_layer_hicolour(bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
+{
+	int off = 0;
+	int x;
+	UINT16 colour;
+	int hzoom = 1;
+	
+	if(towns_vram_page_sel != 0)
+		off = 0x20000;
+	if(layer != 0)
+	{
+		if(!(towns_video_reg[0] & 0x10))
+			return;
+		off += 0x40000;
+		off += towns_crtc_reg[21];  // initial offset
+		if(towns_crtc_reg[27] & 0x0100)
+			hzoom = 2;
+	}
+	else
+	{
+		off += towns_crtc_reg[17];  // initial offset
+		if(towns_crtc_reg[27] & 0x0001)
+			hzoom = 2;
+	}	
+
+	off += (line * (512 / hzoom) * 2);
+
+	if(hzoom == 1)
+	{	
+		for(x=rect->min_x;x<rect->max_x;x++)
+		{
+			colour = (towns_gfxvram[off] << 8) | towns_gfxvram[off+1];
+			if(colour != 0)
+			{ 
+				*BITMAP_ADDR32(bitmap,scanline,x) = 
+					((colour & 0xf800))
+					| ((colour & 0x07c0) << 13)
+					| ((colour & 0x003e) << 2);
+			}
+			off+=2;
+		}
+	}
+	else
+	{  // x2 horizontal zoom
+		for(x=rect->min_x;x<rect->max_x;x+=2)
+		{
+			colour = (towns_gfxvram[off+1] << 8) | towns_gfxvram[off];
+			if(colour != 0)
+			{ 
+				*BITMAP_ADDR32(bitmap,scanline,x) = 
+					((colour & 0x001f) << 3)
+					| ((colour & 0x7c00) << 1)
+					| ((colour & 0x03e0) << 14);
+				*BITMAP_ADDR32(bitmap,scanline,x+1) = 
+					((colour & 0x001f) << 3)
+					| ((colour & 0x7c00) << 1)
+					| ((colour & 0x03e0) << 14);
+			}
+			off+=2;
+		}
+	}
+}
+
+void towns_crtc_draw_scan_layer_256(bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
+{
+	int off = 0;
+	int x;
+	UINT8 colour;
+	int hzoom = 1;
+	
+	if(towns_vram_page_sel != 0)
+		off = 0x20000;
+	if(layer != 0)
+	{
+		if(!(towns_video_reg[0] & 0x10))
+			return;
+		off += 0x40000;
+		off += towns_crtc_reg[21];  // initial offset
+		if(towns_crtc_reg[27] & 0x0100)
+			hzoom = 2;
+	}
+	else
+	{
+		off += towns_crtc_reg[17];  // initial offset
+		if(towns_crtc_reg[27] & 0x0001)
+			hzoom = 2;
+	}	
+
+	off += (line * (512 / hzoom));
+
+	if(hzoom == 1)
+	{	
+		for(x=rect->min_x;x<rect->max_x;x++)
+		{
+			colour = towns_gfxvram[off];
+			if(colour != 0)
+			{ 
+				*BITMAP_ADDR32(bitmap,scanline,x) =
+					(towns_palette_r[colour] << 16)
+					| (towns_palette_g[colour] << 8)
+					| (towns_palette_b[colour]);
+			}
+			off++;
+		}
+	}
+	else
+	{  // x2 horizontal zoom
+		for(x=rect->min_x;x<rect->max_x;x+=2)
+		{
+			colour = towns_gfxvram[off];
+			if(colour != 0)
+			{ 
+				*BITMAP_ADDR32(bitmap,scanline,x) =
+					(towns_palette_r[colour] << 16)
+					| (towns_palette_g[colour] << 8)
+					| (towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+1) =
+					(towns_palette_r[colour] << 16)
+					| (towns_palette_g[colour] << 8)
+					| (towns_palette_b[colour]);
+			}
+			off++;
+		}
+	}
+}
+
+void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
+{
+	int off = 0;
+	int x;
+	UINT8 colour;
+	int hzoom = 1;
+	
+	if(towns_vram_page_sel != 0)
+		off = 0x20000;
+	if(layer != 0)
+	{
+		if(!(towns_video_reg[0] & 0x10))
+			return;
+		off += 0x40000;
+		off += towns_crtc_reg[21];  // initial offset
+		if(towns_crtc_reg[27] & 0x0100)
+			hzoom = 2;
+	}
+	else
+	{
+		off += towns_crtc_reg[17];  // initial offset
+		if(towns_crtc_reg[27] & 0x0001)
+			hzoom = 2;
+	}	
+
+	off += (line * ((rect->max_x - rect->min_x) / 2));
+
+	if(hzoom == 1)
+	{	
+		for(x=rect->min_x;x<rect->max_x;x+=2)
+		{
+			colour = towns_gfxvram[off] >> 4;
+			if(colour != 0)
+			{ 
+				*BITMAP_ADDR32(bitmap,scanline,x+1) =
+					(towns_palette_r[colour] << 16)
+					| (towns_palette_g[colour] << 8)
+					| (towns_palette_b[colour]);
+			}
+			colour = towns_gfxvram[off] & 0x0f; 
+			if(colour != 0)
+			{ 
+				*BITMAP_ADDR32(bitmap,scanline,x) =
+					(towns_palette_r[colour] << 16)
+					| (towns_palette_g[colour] << 8)
+					| (towns_palette_b[colour]);
+			}
+			off++;
+		}
+	}
+	else
+	{  // x2 horizontal zoom
+		for(x=rect->min_x;x<rect->max_x;x+=4)
+		{
+			colour = towns_gfxvram[off] >> 4;
+			if(colour != 0)
+			{ 
+				*BITMAP_ADDR32(bitmap,scanline,x+2) =
+					(towns_palette_r[colour] << 16)
+					| (towns_palette_g[colour] << 8)
+					| (towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+3) =
+					(towns_palette_r[colour] << 16)
+					| (towns_palette_g[colour] << 8)
+					| (towns_palette_b[colour]);
+			}
+			colour = towns_gfxvram[off] & 0x0f; 
+			if(colour != 0)
+			{ 
+				*BITMAP_ADDR32(bitmap,scanline,x) =
+					(towns_palette_r[colour] << 16)
+					| (towns_palette_g[colour] << 8)
+					| (towns_palette_b[colour]);
+				*BITMAP_ADDR32(bitmap,scanline,x+1) =
+					(towns_palette_r[colour] << 16)
+					| (towns_palette_g[colour] << 8)
+					| (towns_palette_b[colour]);
+			}
+			off++;
+		}
+	}
+}
+
+void towns_crtc_draw_layer(bitmap_t* bitmap,const rectangle* rect,int layer)
+{
+	int line;
+	int scanline;
+	
+	if(layer == 0)
+	{
+		scanline = rect->min_y;
+		switch(towns_video_reg[0] & 0x03)
+		{
+			case 0x01:
+				for(line=0;line<(rect->max_y - rect->min_y);line++)
+				{
+					towns_crtc_draw_scan_layer_16(bitmap,rect,layer,line,scanline);
+					scanline++;
+					if(towns_crtc_reg[27] & 0x0010)  // vertical zoom
+					{
+						towns_crtc_draw_scan_layer_16(bitmap,rect,layer,line,scanline);
+						scanline++;
+					}
+				}
+				break;
+			case 0x02:
+				for(line=0;line<(rect->max_y - rect->min_y);line++)
+				{
+					towns_crtc_draw_scan_layer_256(bitmap,rect,layer,line,scanline);
+					scanline++;
+					if(towns_crtc_reg[27] & 0x0010)  // vertical zoom
+					{
+						towns_crtc_draw_scan_layer_256(bitmap,rect,layer,line,scanline);
+						scanline++;
+					}
+				}
+				break;
+			case 0x03:
+				for(line=0;line<(rect->max_y - rect->min_y);line++)
+				{
+					towns_crtc_draw_scan_layer_hicolour(bitmap,rect,layer,line,scanline);
+					scanline++;
+					if(towns_crtc_reg[27] & 0x0010)  // vertical zoom
+					{
+						towns_crtc_draw_scan_layer_hicolour(bitmap,rect,layer,line,scanline);
+						scanline++;
+					}
+				}
+				break;
+		}
+	}
+	else
+	{
+		scanline = rect->min_y;
+		switch(towns_video_reg[0] & 0x0c)
+		{
+			case 0x04:
+				for(line=rect->min_y;line<rect->max_y;line++)
+				{
+					towns_crtc_draw_scan_layer_16(bitmap,rect,layer,line,scanline);
+					scanline++;
+					if(towns_crtc_reg[27] & 0x1000)  // vertical zoom
+					{
+						towns_crtc_draw_scan_layer_16(bitmap,rect,layer,line,scanline);
+						scanline++;
+					}
+				}
+				break;
+			case 0x08:
+				// 256 colour - TODO
+				break;
+			case 0x0c:
+				// Highcolour - TODO
+				break;
+		}
+	}
+}
+
 VIDEO_START( towns )
 {
 	towns_vram_wplane = 0x00;
@@ -528,28 +847,21 @@ VIDEO_UPDATE( towns )
 	UINT8 row;  // JIS row number
 	UINT16 code;
 	int off = 0;
-	
-	if(towns_vram_page_sel != 0)
-		off = 0x20000;
-	for(y=0;y<400;y++)
+
+	bitmap_fill(bitmap,cliprect,0x00000000);
+
+	if(towns_video_reg[1] & 0x01)
 	{
-//		off = 0x50 * y;
-		for(x=0;x<640;x+=2)
-		{
-			colour = towns_gfxvram[off] >> 4; 
-			*BITMAP_ADDR32(bitmap,y,x+1) =
-				(towns_palette_r[colour] << 16)
-				| (towns_palette_g[colour] << 8)
-				| (towns_palette_b[colour]);
-			colour = towns_gfxvram[off] & 0x0f; 
-			*BITMAP_ADDR32(bitmap,y,x) =
-				(towns_palette_r[colour] << 16)
-				| (towns_palette_g[colour] << 8)
-				| (towns_palette_b[colour]);
-			off++;
-		}
-	}	
+		towns_crtc_draw_layer(bitmap,&towns_crtc_layerscr[1],1);
+		towns_crtc_draw_layer(bitmap,&towns_crtc_layerscr[0],0);
+	}
+	else
+	{
+		towns_crtc_draw_layer(bitmap,&towns_crtc_layerscr[0],0);
+		towns_crtc_draw_layer(bitmap,&towns_crtc_layerscr[1],1);
+	}
 	
+		
 	// draw text layer
 /*
  *  Text layer format
@@ -609,13 +921,13 @@ VIDEO_UPDATE( towns )
 									+ (((row-16) & 0x70) * 0x60);
 						}
 						drawgfx_transpen_raw(bitmap,cliprect,screen->machine->gfx[1],code,
-							colourcode,	0,0,x*8,y*16,0);
+							colourcode,	0,0,towns_crtc_layerscr[0].min_x+(x*8),towns_crtc_layerscr[0].min_y+(y*16),0);
 					}
 				}
 				else
 				{
 					drawgfx_transpen_raw(bitmap,cliprect,screen->machine->gfx[0],towns_txtvram[off],
-						colourcode,	0,0,x*8,y*16,0);
+						colourcode,	0,0,towns_crtc_layerscr[0].min_x+(x*8),towns_crtc_layerscr[0].min_y+(y*16),0);
 				}
 				off += 2;
 			}
