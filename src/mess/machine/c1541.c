@@ -118,9 +118,7 @@
 
 	TODO:
 
-	- read data fails
-	- detect sync from 10 consecutive 1-bits
-	- get track length from image
+	- job flag never gets cleared
 	- activity led
 	- write G64
 	- D64 to G64 conversion
@@ -154,6 +152,8 @@ static const double C1541_BITRATE[4] =
 	XTAL_16MHz/13.0, XTAL_16MHz/14.0, XTAL_16MHz/15.0, XTAL_16MHz/16.0
 };
 
+#define SYNC_MARK		0x3ff
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -165,9 +165,10 @@ struct _c1541_t
 	int address;						/* serial bus address - 8 */
 	UINT8 track_buffer[8192];			/* track data buffer */
 	int track_len;						/* track length */
-	int track : 1;						/* current position of the actuator (half track) */
 	int buffer_pos;						/* current byte position within track buffer */
 	int bit_pos;						/* current bit position within track buffer byte */
+	int bit_count;						/*  */
+	UINT16 data;
 
 	/* signals */
 	UINT8 yb;							/* GCR data byte */
@@ -177,7 +178,6 @@ struct _c1541_t
 	int stp;							/* stepping motor */
 	int soe;							/* s? output enable */
 	int mode;							/* mode (0 = write, 1 = read) */
-	int sync;
 
 	/* serial bus */
 	int data_out;						/* serial bus data output */
@@ -226,32 +226,35 @@ static TIMER_CALLBACK( bit_tick )
 	c1541_t *c1541 = get_safe_token(device);
 	int byte = 0;
 
-	if (c1541->bit_pos == 0x07)
+	/* shift in data from the read head */
+	c1541->data <<= 1;
+	c1541->data |= BIT(c1541->track_buffer[c1541->buffer_pos], c1541->bit_pos);
+	c1541->bit_pos--;
+	c1541->bit_count++;
+
+	if (c1541->bit_pos < 0)
 	{
-		UINT8 data = c1541->track_buffer[c1541->buffer_pos];
-
-		if (data != 0xff)
-		{
-			c1541->yb = data;
-			byte = 1;
-		}
-
-		c1541->sync = !(c1541->mode && (data == 0xff));
-
+		c1541->bit_pos = 7;
 		c1541->buffer_pos++;
 
-		if (c1541->buffer_pos > c1541->track_len)
+		if (c1541->buffer_pos > c1541->track_len + 1)
 		{
-			c1541->buffer_pos = 0;
+			/* loop to the start of the track */
+			c1541->buffer_pos = 2;
 		}
-
-//		logerror("YB %02x pos %u\n", c1541->yb, c1541->buffer_pos-1);
-
-		c1541->bit_pos = 0;
 	}
-	else
+
+	if ((c1541->data & SYNC_MARK) == SYNC_MARK)
 	{
-		c1541->bit_pos++;
+		/* SYNC detected */
+		c1541->bit_count = 0;
+	}
+
+	if (c1541->bit_count > 7)
+	{
+		/* byte ready */
+		c1541->bit_count = 0;
+		byte = 1;
 	}
 
 	if (c1541->byte != byte)
@@ -418,7 +421,7 @@ static READ8_DEVICE_HANDLER( yb_r )
 
 	c1541_t *c1541 = get_safe_token(device->owner);
 
-	return c1541->yb;
+	return c1541->data & 0xff;
 }
 
 static WRITE8_DEVICE_HANDLER( yb_w )
@@ -467,8 +470,7 @@ static READ8_DEVICE_HANDLER( via1_pb_r )
 	data |= (floppy_drive_get_flag_state(c1541->image, FLOPPY_DRIVE_DISK_WRITE_PROTECTED) == FLOPPY_DRIVE_DISK_WRITE_PROTECTED) << 4;
 
 	/* SYNC detect */
-	//logerror("SYNC %u\n", !(c1541->mode && (c1541->yb == 0xff)));
-	data |= c1541->sync << 7;
+	data |= !(c1541->mode && ((c1541->data & SYNC_MARK) == SYNC_MARK)) << 7;
 
 	return data;
 }
@@ -511,12 +513,15 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 
 		if (tracks != 0)
 		{
-			c1541->track_len = 8192; // TODO get track length from image
-			c1541->buffer_pos = 0;
-			c1541->bit_pos = 0;
+			c1541->track_len = 8192;
+			c1541->buffer_pos = 2;
+			c1541->bit_pos = 7;
+			c1541->bit_count = 0;
 
 			floppy_drive_seek(c1541->image, tracks);
 			floppy_drive_read_track_data_info_buffer(c1541->image, 0, c1541->track_buffer, &c1541->track_len);
+
+			c1541->track_len = (c1541->track_buffer[1] << 8) | c1541->track_buffer[0];
 		}
 
 		c1541->stp = stp;
@@ -531,7 +536,6 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 	/* density select */
 	if (c1541->ds != ds)
 	{
-		//logerror("DS %u\n", ds);
 		timer_adjust_periodic(c1541->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C1541_BITRATE[ds]/4));
 		c1541->ds = ds;
 	}

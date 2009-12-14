@@ -92,32 +92,6 @@ static floperr_t get_track_offset(floppy_image *floppy, int track, UINT64 *offse
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-floperr_t g64_get_track_length(floppy_image *floppy, int track, UINT64 *length)
-{
-	floperr_t err;
-	UINT64 track_offset;
-	UINT16 track_length = 0;
-	UINT8 header[2];
-
-	/* get track offset */
-	err = get_track_offset(floppy, track, &track_offset);
-	
-	if (err) 
-		return err;
-
-	if (track_offset)
-	{
-		/* get track length */
-		floppy_image_read(floppy, header, track_offset, 2);
-		track_length = (header[1] << 8) | header[0];
-	}
-
-	if (length)
-		*length = track_length;
-
-	return FLOPPY_ERROR_SUCCESS;
-}
-
 static floperr_t g64_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
 {
 	floperr_t err;

@@ -11,8 +11,6 @@
 
 #include "formats/flopimg.h"
 
-floperr_t g64_get_track_length(floppy_image *floppy, int track, UINT64 *length);
-
 FLOPPY_IDENTIFY( g64_dsk_identify );
 FLOPPY_CONSTRUCT( g64_dsk_construct );
 
