@@ -118,11 +118,12 @@
 
 	TODO:
 
-	- job flag never gets cleared
-	- activity led
-	- write G64
-	- D64 to G64 conversion
+	- allocate track buffer runtime
+	- weak bits (for Cyan loader)
 	- accurate timing
+	- D64 to G64 conversion
+	- activity led
+	- write to G64
 
 */
 
@@ -149,10 +150,16 @@
 
 static const double C1541_BITRATE[4] =
 {
-	XTAL_16MHz/13.0, XTAL_16MHz/14.0, XTAL_16MHz/15.0, XTAL_16MHz/16.0
+	XTAL_16MHz/13.0,	/* tracks 1-17 */
+	XTAL_16MHz/14.0,	/* tracks 18-24 */
+	XTAL_16MHz/15.0, 	/* tracks 25-30 */
+	XTAL_16MHz/16.0		/* tracks 31-42 */
 };
 
-#define SYNC_MARK		0x3ff
+#define SYNC_MARK			0x3ff		/* 10 consecutive 1-bits */
+
+#define TRACK_BUFFER_SIZE	8194		/* 2 bytes track length + maximum of 8192 bytes of GCR encoded data */
+#define TRACK_DATA_START	2
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -163,21 +170,23 @@ struct _c1541_t
 {
 	/* abstractions */
 	int address;						/* serial bus address - 8 */
-	UINT8 track_buffer[8192];			/* track data buffer */
+	UINT8 track_buffer[TRACK_BUFFER_SIZE];				/* track data buffer */
 	int track_len;						/* track length */
 	int buffer_pos;						/* current byte position within track buffer */
 	int bit_pos;						/* current bit position within track buffer byte */
-	int bit_count;						/*  */
-	UINT16 data;
+	int bit_count;						/* current data byte bit counter */
+	UINT16 data;						/* data shift register */
 
 	/* signals */
-	UINT8 yb;							/* GCR data byte */
+	UINT8 yb;							/* GCR data byte to write */
 	int byte;							/* byte ready */
 	int atna;							/* attention acknowledge */
 	int ds;								/* density select */
 	int stp;							/* stepping motor */
 	int soe;							/* s? output enable */
 	int mode;							/* mode (0 = write, 1 = read) */
+	int via0_irq;						/* VIA #0 interrupt request */
+	int via1_irq;						/* VIA #1 interrupt request */
 
 	/* serial bus */
 	int data_out;						/* serial bus data output */
@@ -240,7 +249,7 @@ static TIMER_CALLBACK( bit_tick )
 		if (c1541->buffer_pos > c1541->track_len + 1)
 		{
 			/* loop to the start of the track */
-			c1541->buffer_pos = 2;
+			c1541->buffer_pos = TRACK_DATA_START;
 		}
 	}
 
@@ -308,6 +317,21 @@ ADDRESS_MAP_END
 /*-------------------------------------------------
     via6522_interface c1541_via0_intf
 -------------------------------------------------*/
+
+static WRITE_LINE_DEVICE_HANDLER( via0_irq_w )
+{
+	c1541_t *c1541 = get_safe_token(device->owner);
+
+	c1541->via0_irq = state;
+
+	cpu_set_input_line(c1541->cpu, INPUT_LINE_IRQ0, (c1541->via0_irq | c1541->via1_irq) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static READ8_DEVICE_HANDLER( via0_pa_r )
+{
+	/* dummy read to acknowledge ATN IN interrupt */
+	return 0;
+}
 
 static READ8_DEVICE_HANDLER( via0_pb_r )
 {
@@ -381,7 +405,7 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 
 static const via6522_interface c1541_via0_intf =
 {
-	DEVCB_NULL,
+	DEVCB_HANDLER(via0_pa_r),
 	DEVCB_HANDLER(via0_pb_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -390,17 +414,26 @@ static const via6522_interface c1541_via0_intf =
 
 	DEVCB_NULL,
 	DEVCB_HANDLER(via0_pb_w),
-	DEVCB_NULL, // ATN IN
+	DEVCB_NULL, /* ATN IN */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0)
+	DEVCB_LINE(via0_irq_w)
 };
 
 /*-------------------------------------------------
     via6522_interface c1541_via1_intf
 -------------------------------------------------*/
+
+static WRITE_LINE_DEVICE_HANDLER( via1_irq_w )
+{
+	c1541_t *c1541 = get_safe_token(device->owner);
+
+	c1541->via1_irq = state;
+
+	cpu_set_input_line(c1541->cpu, INPUT_LINE_IRQ0, (c1541->via0_irq | c1541->via1_irq) ? ASSERT_LINE : CLEAR_LINE);
+}
 
 static READ8_DEVICE_HANDLER( yb_r )
 {
@@ -469,7 +502,7 @@ static READ8_DEVICE_HANDLER( via1_pb_r )
 	/* write protect sense */
 	data |= (floppy_drive_get_flag_state(c1541->image, FLOPPY_DRIVE_DISK_WRITE_PROTECTED) == FLOPPY_DRIVE_DISK_WRITE_PROTECTED) << 4;
 
-	/* SYNC detect */
+	/* SYNC detect line */
 	data |= !(c1541->mode && ((c1541->data & SYNC_MARK) == SYNC_MARK)) << 7;
 
 	return data;
@@ -513,14 +546,18 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 
 		if (tracks != 0)
 		{
-			c1541->track_len = 8192;
-			c1541->buffer_pos = 2;
+			c1541->track_len = TRACK_BUFFER_SIZE;
+			c1541->buffer_pos = TRACK_DATA_START;
 			c1541->bit_pos = 7;
 			c1541->bit_count = 0;
 
+			/* step read/write head */
 			floppy_drive_seek(c1541->image, tracks);
+
+			/* read track data */
 			floppy_drive_read_track_data_info_buffer(c1541->image, 0, c1541->track_buffer, &c1541->track_len);
 
+			/* extract track length */
 			c1541->track_len = (c1541->track_buffer[1] << 8) | c1541->track_buffer[0];
 		}
 
@@ -563,7 +600,7 @@ static const via6522_interface c1541_via1_intf =
 {
 	DEVCB_HANDLER(yb_r),
 	DEVCB_HANDLER(via1_pb_r),
-	DEVCB_NULL, // BYTE REDY
+	DEVCB_NULL, /* BYTE READY */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -575,7 +612,7 @@ static const via6522_interface c1541_via1_intf =
 	DEVCB_LINE(soe_w),
 	DEVCB_LINE(mode_w),
 
-	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0)
+	DEVCB_LINE(via1_irq_w)
 };
 
 /*-------------------------------------------------
@@ -717,13 +754,30 @@ static DEVICE_START( c1541 )
 	c1541->serial_bus = devtag_get_device(device->machine, config->serial_bus_tag);
 	c1541->image = device_find_child_by_tag(device, FLOPPY_TAG);
 
+	/* allocate track buffer */
+//	c1541->track_buffer = auto_alloc_array(device->machine, UINT8, TRACK_BUFFER_SIZE);
+
 	/* allocate data timer */
 	c1541->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
-//	timer_adjust_periodic(c1541->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C1541_BITRATE[0]));
-//	timer_enable(c1541->bit_timer, 0);
 
 	/* register for state saving */
-//	state_save_register_device_item(device, 0, c1541->);
+//	state_save_register_device_item_pointer(device, 0, c1541->track_buffer, TRACK_BUFFER_SIZE);
+	state_save_register_device_item(device, 0, c1541->address);
+	state_save_register_device_item(device, 0, c1541->track_len);
+	state_save_register_device_item(device, 0, c1541->buffer_pos);
+	state_save_register_device_item(device, 0, c1541->bit_pos);
+	state_save_register_device_item(device, 0, c1541->bit_count);
+	state_save_register_device_item(device, 0, c1541->data);
+	state_save_register_device_item(device, 0, c1541->yb);
+	state_save_register_device_item(device, 0, c1541->byte);
+	state_save_register_device_item(device, 0, c1541->atna);
+	state_save_register_device_item(device, 0, c1541->ds);
+	state_save_register_device_item(device, 0, c1541->stp);
+	state_save_register_device_item(device, 0, c1541->soe);
+	state_save_register_device_item(device, 0, c1541->mode);
+	state_save_register_device_item(device, 0, c1541->via0_irq);
+	state_save_register_device_item(device, 0, c1541->via1_irq);
+	state_save_register_device_item(device, 0, c1541->data_out);
 }
 
 /*-------------------------------------------------

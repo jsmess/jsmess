@@ -40,6 +40,8 @@
 #include "formats/flopimg.h"
 #include "devices/flopdrv.h"
 
+#define LOG 0
+
 #define G64_DSK_TAG		"g64tag"
 
 #define HEADER_LENGTH	0x2ac		 /* standard length for 84 half tracks */
@@ -111,11 +113,21 @@ static floperr_t g64_read_track(floppy_image *floppy, int head, int track, UINT6
 		floppy_image_read(floppy, header, track_offset, 2);
 		track_length = (header[1] << 8) | header[0];
 
-		/* read track */
-		floppy_image_read(floppy, buffer, track_offset, buflen);
+		if (buflen < track_length) fatalerror("G64 track buffer too small: %u!\n", buflen);
+
+		if (track_length)
+		{
+			/* read track */
+			floppy_image_read(floppy, buffer, track_offset, track_length);
+		}
+		else
+		{
+			/* set track length to 0 */
+			memset(buffer, 0, 2);
+		}
 	}
 
-	logerror("G64 track %.1f length %u\n", get_track_index(track), track_length);
+	if (LOG) logerror("G64 track %.1f length %u\n", get_track_index(track), track_length);
 	
 	return FLOPPY_ERROR_SUCCESS;
 }
@@ -164,22 +176,23 @@ FLOPPY_CONSTRUCT( g64_dsk_construct )
 	/* version */
 	floppy_image_read(floppy, header, pos, 0x0c); pos += 0xc;
 	tag->version = header[8];
-	logerror("G64 version: %u\n", tag->version);
+	if (LOG) logerror("G64 version: %u\n", tag->version);
 
 	/* number of half tracks */
 	tag->tracks = header[9];
-	logerror("G64 tracks: %u\n", tag->tracks);
+	if (LOG) logerror("G64 tracks: %u\n", tag->tracks);
 
 	/* size of each stored half track */
 	tag->track_size = (header[11] << 8) | header[10];
-	logerror("G64 track size: %04x\n", tag->track_size);
+	if (LOG) logerror("G64 track size: %04x\n", tag->track_size);
 
 	/* data offsets */
 	for (i = 0; i < tag->tracks; i++)
 	{
 		floppy_image_read(floppy, header, pos, 4); pos += 4;
 		tag->track_offset[i] = (header[3] << 24) | (header[2] << 16) | (header[1] << 8) | header[0];
-		logerror("G64 track %.1f data offset: %04x\n", get_track_index(i), tag->track_offset[i]);
+		
+		if (LOG) logerror("G64 track %.1f data offset: %04x\n", get_track_index(i), tag->track_offset[i]);
 	}
 
 	/* speed zone offsets */
@@ -187,10 +200,14 @@ FLOPPY_CONSTRUCT( g64_dsk_construct )
 	{
 		floppy_image_read(floppy, header, pos, 4); pos += 4;
 		tag->speed_zone_offset[i] = (header[3] << 24) | (header[2] << 16) | (header[1] << 8) | header[0];
-		if (tag->speed_zone_offset[i] < 4) 
-			logerror("G64 track %.1f speed zone: %u\n", get_track_index(i), tag->speed_zone_offset[i]);
-		else
-			logerror("G64 track %.1f speed zone offset: %04x\n", get_track_index(i), tag->speed_zone_offset[i]);
+
+		if (LOG)
+		{
+			if (tag->speed_zone_offset[i] < 4)
+				logerror("G64 track %.1f speed zone: %u\n", get_track_index(i), tag->speed_zone_offset[i]);
+			else
+				logerror("G64 track %.1f speed zone offset: %04x\n", get_track_index(i), tag->speed_zone_offset[i]);
+		}
 	}
 
 	/* set callbacks */
