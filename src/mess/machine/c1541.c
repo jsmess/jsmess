@@ -501,7 +501,7 @@ static READ8_DEVICE_HANDLER( c1541c_via0_pa_r )
 
 	c1541_t *c1541 = get_safe_token(device->owner);
 
-	return (floppy_drive_get_flag_state(c1541->image, FLOPPY_DRIVE_HEAD_AT_TRACK_0) == FLOPPY_DRIVE_HEAD_AT_TRACK_0);
+	return !floppy_tk00_r(c1541->image);
 }
 
 static const via6522_interface c1541c_via0_intf =

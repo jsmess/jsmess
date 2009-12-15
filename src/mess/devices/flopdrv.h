@@ -62,8 +62,6 @@ typedef struct chrn_id
 	unsigned long flags;
 } chrn_id;
 
-/* set if drive is connected and head is positioned over track 0 */
-#define FLOPPY_DRIVE_HEAD_AT_TRACK_0			0x0004
 /* set if drive is ready */
 #define FLOPPY_DRIVE_READY						0x0010
 /* set if index has just occured */
@@ -144,7 +142,13 @@ WRITE_LINE_DEVICE_HANDLER( floppy_drtn_w );
 WRITE_LINE_DEVICE_HANDLER( floppy_stp_w );
 WRITE_LINE_DEVICE_HANDLER( floppy_wtd_w );
 WRITE_LINE_DEVICE_HANDLER( floppy_wtg_w );
+
+/* write-protect */
 READ_LINE_DEVICE_HANDLER( floppy_wpt_r );
+
+/* track 0 detect */
+READ_LINE_DEVICE_HANDLER( floppy_tk00_r );
+
 
 #define FLOPPY	DEVICE_GET_INFO_NAME(floppy)
 DEVICE_GET_INFO(floppy);

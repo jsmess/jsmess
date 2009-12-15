@@ -309,7 +309,7 @@ int sony_read_status(const device_config *device)
 		case 0x0a:	/* At track 0: 0=track zero 1=not track zero */
 			logerror("sony_status(): reading Track 0 pc=0x%08x\n", (int) cpu_get_pc(device->machine->firstcpu));
 			if (cur_image)
-				result = floppy_drive_get_flag_state(cur_image, FLOPPY_DRIVE_HEAD_AT_TRACK_0) ? 0 : 1;
+				result = floppy_tk00_r(cur_image);
 			else
 				result = 0;
 			break;

@@ -211,7 +211,7 @@ static void mc6843_finish_STZ( const device_config *device )
 	/* seek to track zero */
 	for ( i=0; i<83; i++ )
 	{
-		if ( floppy_drive_get_flag_state( img, FLOPPY_DRIVE_HEAD_AT_TRACK_0) )
+		if (floppy_tk00_r(img) == CLEAR_LINE)
 			break;
 		floppy_drive_seek( img, -1 );
 	}
@@ -222,10 +222,8 @@ static void mc6843_finish_STZ( const device_config *device )
 	mc6843->CTAR = 0;
 	mc6843->GCR = 0;
 	mc6843->SAR = 0;
-	if ( ! floppy_drive_get_flag_state( img, FLOPPY_DRIVE_HEAD_AT_TRACK_0) )
-	{
-		mc6843->STRB |= 0x10;
-	}
+	mc6843->STRB |= floppy_tk00_r(img) << 4;
+
 	mc6843_cmd_end( device );
 }
 
@@ -514,13 +512,12 @@ READ8_DEVICE_HANDLER ( mc6843_r )
 	{
 		/* update */
 		const device_config* img = mc6843_floppy_image( device );
-		int flag = floppy_drive_get_flag_state( img, FLOPPY_DRIVE_READY | FLOPPY_DRIVE_HEAD_AT_TRACK_0);
+		int flag = floppy_drive_get_flag_state( img, FLOPPY_DRIVE_READY);
 		mc6843->STRA &= 0xa3;
 		if ( flag & FLOPPY_DRIVE_READY )
 			mc6843->STRA |= 0x04;
-		if ( flag & FLOPPY_DRIVE_HEAD_AT_TRACK_0 )
-			mc6843->STRA |= 0x08;
 
+		mc6843->STRA |= !floppy_tk00_r(img) << 3;
 		mc6843->STRA |= !floppy_wpt_r(img) << 4;
 
 		if ( mc6843->index_pulse )

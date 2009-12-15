@@ -297,40 +297,24 @@ static void upd765_seek_complete(const device_config *device)
 
 	fdc->pcn[fdc->drive] = fdc->ncn;
 
+	fdc->upd765_status[0] = 0x20;
+
 	/* drive ready? */
 	if (img != NULL && floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
 	{
-		/* yes */
-
 		/* recalibrate? */
 		if (fdc->upd765_flags & UPD765_SEEK_OPERATION_IS_RECALIBRATE)
 		{
-			/* yes */
-
-			/* at track 0? */
-			if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_HEAD_AT_TRACK_0))
-			{
-				/* yes. Seek complete */
-				fdc->upd765_status[0] = 0x020;
-			}
-			else
-			{
+			/* not at track 0? */
+			if (floppy_tk00_r(img))
 				/* no, track 0 failed after 77 steps */
-				fdc->upd765_status[0] = 0x040 | 0x020 | 0x010;
-			}
-		}
-		else
-		{
-			/* no, seek */
-
-			/* seek complete */
-			fdc->upd765_status[0] = 0x020;
+				fdc->upd765_status[0] |= 0x40 | 0x10;
 		}
 	}
 	else
 	{
 		/* abnormal termination, not ready */
-		fdc->upd765_status[0] = 0x040 | 0x020 | 0x08;
+		fdc->upd765_status[0] |= 0x40 | 0x08;
 	}
 
 	/* set drive and side */
@@ -513,7 +497,7 @@ static void upd765_seek_setup(const device_config *device, int is_recalibrate)
 		fdc->ncn = 0;
 
 		/* if drive is already at track 0, or drive is not ready */
-		if (img == NULL || floppy_drive_get_flag_state(img, FLOPPY_DRIVE_HEAD_AT_TRACK_0) ||
+		if (img == NULL || floppy_tk00_r(img) == CLEAR_LINE ||
 			(!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
 			)
 		{
@@ -1892,16 +1876,12 @@ static void upd765_setup_command(const device_config *device)
 
 			if (img)
 			{
+				fdc->upd765_status[3] |= !floppy_tk00_r(img) << 4;
 				fdc->upd765_status[3] |= !floppy_wpt_r(img) << 6;
 
 				if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
 				{
 					fdc->upd765_status[3] |= 0x20;
-				}
-
-				if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_HEAD_AT_TRACK_0))
-				{
-					fdc->upd765_status[3] |= 0x10;
 				}
 			}
 

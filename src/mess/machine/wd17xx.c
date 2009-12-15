@@ -538,7 +538,7 @@ static void wd17xx_command_restore(const device_config *device)
 	if (image_slotexists(w->drive))
 	{
 		/* keep stepping until track 0 is received or 255 steps have been done */
-		while (!(floppy_drive_get_flag_state(w->drive, FLOPPY_DRIVE_HEAD_AT_TRACK_0)) && (step_counter!=0))
+		while (floppy_tk00_r(w->drive) && (step_counter != 0))
 		{
 			/* update time to simulate seek time busy signal */
 			w->busy_count++;
@@ -1295,7 +1295,7 @@ READ8_DEVICE_HANDLER( wd17xx_status_r )
 
 		/* set track 0 state */
 		result &=~STA_1_TRACK0;
-		if (floppy_drive_get_flag_state(w->drive, FLOPPY_DRIVE_HEAD_AT_TRACK_0))
+		if (floppy_tk00_r(w->drive) == CLEAR_LINE)
 			result |= STA_1_TRACK0;
 
 	//  floppy_drive_set_ready_state(w->drive, 1,1);

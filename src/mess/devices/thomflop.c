@@ -1281,8 +1281,9 @@ READ8_HANDLER ( thmfc_floppy_r )
 				data |= 0x40;
 			if ( image_exists(img) )
 				data |= 0x20; /* disk change (?) */
-			if ( flags & FLOPPY_DRIVE_HEAD_AT_TRACK_0 )
-				data |= 0x08;
+
+			data |= !floppy_tk00_r(img) << 3;
+
 			if ( flags & FLOPPY_DRIVE_READY )
 				data |= 0x02;
 		}

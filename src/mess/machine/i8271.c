@@ -209,12 +209,8 @@ static void i8271_seek_to_track(const device_config *device,int track)
 
         /*logerror("step\n"); */
 
-		while (
-			/* track 0 not set */
-			(!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_HEAD_AT_TRACK_0)) &&
-			/* not seeked more than 255 tracks */
-			(StepCount!=0)
-			)
+		/* track 0 not set, not seeked more than 255 tracks */
+		while (floppy_tk00_r(img) && (StepCount != 0))
 		{
 /*            logerror("step\n"); */
 			StepCount--;
@@ -875,18 +871,10 @@ static void i8271_command_execute(const device_config *device)
 					i8271->drive_control_input |= floppy_wpt_r(img) << 3;
 
 					/* bit 1 = 0 if head at track 0 */
-					if (!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_HEAD_AT_TRACK_0))
-					{
-						i8271->drive_control_input |= (1<<1);
-					}
-
+					i8271->drive_control_input |= floppy_tk00_r(img) << 1;
 
 					/* need to setup this register based on drive selected */
 					data = i8271->drive_control_input;
-
-
-
-
 				}
 				break;
 
@@ -1094,10 +1082,7 @@ static void i8271_command_execute(const device_config *device)
 			status |= !floppy_wpt_r(img) << 3;
 
 			/* bit 1 = 1 if head at track 0 */
-			if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_HEAD_AT_TRACK_0))
-			{
-				status |= (1<<1);
-			}
+			status |= !floppy_tk00_r(img) << 1;
 
 			i8271->ResultRegister = status;
 			i8271_command_complete(device,1,0);

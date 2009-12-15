@@ -274,8 +274,7 @@ static int fd800_do_restore(int unit)
 	}
 
 	/* limit iterations to 76 to prevent an endless loop if the disc is locked */
-	while (! (seek_complete = floppy_drive_get_flag_state(fd800.drv[unit].img, FLOPPY_DRIVE_HEAD_AT_TRACK_0))
-			&& (seek_count < 76))
+	while (!(seek_complete = !floppy_tk00_r(fd800.drv[unit].img)) && (seek_count < 76))
 	{
 		floppy_drive_seek(fd800.drv[unit].img, -1);
 		seek_count++;
