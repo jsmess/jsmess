@@ -1820,10 +1820,17 @@ static INPUT_PORTS_START( towns )
 
 INPUT_PORTS_END
 
+static TIMER_CALLBACK( towns_vblank_end )
+{
+	// here we'll clear the vsync signal, I presume it goes low on it's own eventually
+	pic8259_set_irq_line(ptr,3,0);  // IRQ11 = VSync
+}
+
 static INTERRUPT_GEN( towns_vsync_irq )
 {
 	const device_config* dev = devtag_get_device(device->machine,"pic8259_slave");
 	pic8259_set_irq_line(dev,3,1);  // IRQ11 = VSync
+	timer_set(device->machine,video_screen_get_time_until_vblank_end(device->machine->primary_screen),(void*)dev,0,towns_vblank_end);
 }
 
 static DRIVER_INIT( towns )
@@ -1989,7 +1996,6 @@ static MACHINE_DRIVER_START( towns )
 	MDRV_SOUND_CONFIG(ym3438_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("pcm", RF5C68, 2150000)  // actual clock speed unknown
-//  MDRV_SOUND_CONFIG(rf5c68_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("cdda",CDDA,0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
