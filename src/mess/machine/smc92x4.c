@@ -255,19 +255,18 @@ static void floppy_step(running_machine *machine,int which, int disk_unit, int d
 static UINT8 floppy_get_disk_status(running_machine *machine,int which, int disk_unit)
 {
 	const device_config *disk_img = floppy_get_device(machine, disk_unit);
-	int status = floppy_status(disk_img, -1);
-	int reply;
+	int reply = 0;
 
-	reply = 0;
-	if (status & FLOPPY_DRIVE_INDEX)
+	if (floppy_drive_get_flag_state(disk_img, FLOPPY_DRIVE_INDEX) == FLOPPY_DRIVE_INDEX)
 		reply |= DS_INDEX;
-	reply |= DS_SKCOM;
-	if (status & FLOPPY_DRIVE_HEAD_AT_TRACK_0)
+	if (floppy_drive_get_flag_state(disk_img, FLOPPY_DRIVE_HEAD_AT_TRACK_0) == FLOPPY_DRIVE_HEAD_AT_TRACK_0)
 		reply |= DS_TRK00;
-	if (status & FLOPPY_DRIVE_DISK_WRITE_PROTECTED)
+	if (floppy_drive_get_flag_state(disk_img, FLOPPY_DRIVE_DISK_WRITE_PROTECTED) == FLOPPY_DRIVE_DISK_WRITE_PROTECTED)
 		reply |= DS_WRPROT;
-	if /*(status & FLOPPY_DRIVE_READY)*/(image_exists(disk_img))
+	if (image_exists(disk_img))
 		reply |= DS_READY;
+
+	reply |= DS_SKCOM;
 
 	return reply;
 }

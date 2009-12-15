@@ -52,8 +52,6 @@ struct floppy_config_t
 /* CRC error in data field */
 #define ID_FLAG_CRC_ERROR_IN_DATA_FIELD 0x0004
 
-int	floppy_status(const device_config *img, int new_status);
-
 typedef struct chrn_id
 {
 	unsigned char C;

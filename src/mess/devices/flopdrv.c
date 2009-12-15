@@ -339,29 +339,6 @@ static TIMER_CALLBACK(floppy_drive_index_callback)
 /*************************************************************************/
 /* IO_FLOPPY device functions */
 
-/* return and set current status
-  use for setting:-
-  1) write protect/enable
-  2) drive present/missing
-*/
-
-int	floppy_status(const device_config *img, int new_status)
-{
-	/* return current status only? */
-	if (new_status!=-1)
-	{
-		/* we don't set the flags directly.
-        The flags are "cooked" when we do a floppy_drive_get_flag_state depending on
-        if drive is connected etc. So if we wrote the flags back it would
-        corrupt this information. Therefore we update the flags depending on new_status */
-
-		floppy_drive_set_flag_state(img, FLOPPY_DRIVE_DISK_WRITE_PROTECTED, (new_status & FLOPPY_DRIVE_DISK_WRITE_PROTECTED));
-	}
-
-	/* return current status */
-	return floppy_drive_get_flag_state(img,0x0ff);
-}
-
 /* set flag state */
 void floppy_drive_set_flag_state(const device_config *img, int flag, int state)
 {
