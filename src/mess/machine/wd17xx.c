@@ -1167,7 +1167,12 @@ void wd17xx_set_drive(const device_config *device, UINT8 drive)
 		logerror("wd17xx_set_drive: $%02x\n", drive);
 
 	if (w->intf->floppy_drive_tags[drive] != NULL)
-		w->drive = devtag_get_device(device->machine, w->intf->floppy_drive_tags[drive]);
+	{
+		if (device->owner != NULL)
+			w->drive = device_find_child_by_tag(device->owner, w->intf->floppy_drive_tags[drive]);
+		else
+			w->drive = devtag_get_device(device->machine, w->intf->floppy_drive_tags[drive]);
+	}
 }
 
 void wd17xx_set_side(const device_config *device, UINT8 head)
@@ -1957,7 +1962,13 @@ static DEVICE_RESET( wd1770 )
 	for (i = 0; i < 4; i++)
 	{
 		if(w->intf->floppy_drive_tags[i]!=NULL) {
-			const device_config *img = devtag_get_device(device->machine,w->intf->floppy_drive_tags[i]);
+			const device_config *img;
+
+			if (device->owner != NULL)
+				img = device_find_child_by_tag(device->owner, w->intf->floppy_drive_tags[i]);
+			else
+				img = devtag_get_device(device->machine, w->intf->floppy_drive_tags[i]);
+
 			if (img!=NULL) {
 				floppy_drive_set_controller(img,device);
 				floppy_drive_set_index_pulse_callback(img, wd17xx_index_pulse_callback);
