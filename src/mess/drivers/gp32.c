@@ -64,6 +64,8 @@ static struct
 	UINT32 pagewidth_cur;
 	UINT32 pagewidth_max;
 	UINT32 bppmode;
+	UINT32 bswp, hwswp;
+	UINT32 hozval, lineval;
 	int vpos, hpos;
 } s3c240x_lcd;
 
@@ -89,83 +91,157 @@ static void s3c240x_lcd_dma_reload( running_machine *machine)
 	verboselog( machine, 3, "LCD - vramaddr %08X %08X offsize %08X pagewidth %08X\n", s3c240x_lcd.vramaddr_cur, s3c240x_lcd.vramaddr_max, s3c240x_lcd.offsize, s3c240x_lcd.pagewidth_max);
 }
 
-INLINE void s3c240x_lcd_pagewidth_inc( void)
+static void s3c240x_lcd_dma_init( running_machine *machine)
 {
-	s3c240x_lcd.pagewidth_cur++;
-	if (s3c240x_lcd.pagewidth_cur >= s3c240x_lcd.pagewidth_max)
-	{
-		UINT32 lineval;
-		s3c240x_lcd.vramaddr_cur += s3c240x_lcd.offsize << 1;
-		s3c240x_lcd.pagewidth_cur = 0;
-		lineval = BITS( s3c240x_lcd_regs[1], 23, 14);
-		s3c240x_lcd.vpos = (s3c240x_lcd.vpos + 1) % (lineval + 1);
-		s3c240x_lcd.hpos = 0;
-	}
+	s3c240x_lcd_dma_reload( machine);
+	s3c240x_lcd.bppmode = BITS( s3c240x_lcd_regs[0], 4, 1);
+	s3c240x_lcd.bswp = BIT( s3c240x_lcd_regs[4], 1);
+	s3c240x_lcd.hwswp = BIT( s3c240x_lcd_regs[4], 0);
+	s3c240x_lcd.lineval = BITS( s3c240x_lcd_regs[1], 23, 14);
+	s3c240x_lcd.hozval = BITS( s3c240x_lcd_regs[2], 18, 8);
 }
 
-static void s3c240x_lcd_render_01( running_machine *machine, bitmap_t *bitmap)
+static UINT32 s3c240x_lcd_dma_read( running_machine *machine)
 {
-	int i, j, k;
-	for (k=0;k<8;k++)
-	{
-		for (j=0;j<2;j++)
-		{
-			UINT8 *vram = (UINT8 *)s3c240x_ram + (s3c240x_lcd.vramaddr_cur - 0x0C000000);
-			UINT32 *scanline = BITMAP_ADDR32( bitmap, s3c240x_lcd.vpos, s3c240x_lcd.hpos);
-			UINT8 data = *vram;
-			for (i=0;i<8;i++)
-			{
-				if (data & 0x80)
-				{
-					*scanline++ = RGB_BLACK;
-				}
-				else
-				{
-					*scanline++ = RGB_WHITE;
-				}
-				data = data << 1;
-				s3c240x_lcd.hpos++;
-			}
-			s3c240x_lcd.vramaddr_cur++;
-		}
-		s3c240x_lcd_pagewidth_inc();
-	}
-}
-
-static void s3c240x_lcd_render_08( running_machine *machine, bitmap_t *bitmap)
-{
-	int i, j;
-	for (j=0;j<8;j++)
-	{
-		UINT8 *vram = (UINT8 *)s3c240x_ram + (s3c240x_lcd.vramaddr_cur - 0x0C000000);
-		UINT32 *scanline = BITMAP_ADDR32( bitmap, s3c240x_lcd.vpos, s3c240x_lcd.hpos);
-		for (i=0;i<2;i++)
-		{
-			*scanline++ = palette_get_color( machine, *vram++);
-			s3c240x_lcd.vramaddr_cur++;
-			s3c240x_lcd.hpos++;
-		}
-		s3c240x_lcd_pagewidth_inc();
-	}
-}
-
-static void s3c240x_lcd_render_16( running_machine *machine, bitmap_t *bitmap)
-{
+	UINT8 *vram, data[4];
 	int i;
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < 2; i++)
 	{
-		UINT8 *vram = (UINT8 *)s3c240x_ram + (s3c240x_lcd.vramaddr_cur - 0x0C000000);
-		UINT32 *scanline = BITMAP_ADDR32( bitmap, s3c240x_lcd.vpos, s3c240x_lcd.hpos);
-		UINT16 data;
-		UINT8 r, g, b;
-		data = (vram[0] << 0) | (vram[1] << 8);
-		r = BITS( data, 15, 11) << 3;
-		g = BITS( data, 10,  6) << 3;
-		b = BITS( data,  5,  1) << 3;
-		*scanline++ = MAKE_RGB( r, g, b);
+		vram = (UINT8 *)s3c240x_ram + s3c240x_lcd.vramaddr_cur - 0x0C000000;
+		data[i*2+0] = vram[0];
+		data[i*2+1] = vram[1];
 		s3c240x_lcd.vramaddr_cur += 2;
-		s3c240x_lcd.hpos++;
-		s3c240x_lcd_pagewidth_inc();
+		s3c240x_lcd.pagewidth_cur++;
+		if (s3c240x_lcd.pagewidth_cur >= s3c240x_lcd.pagewidth_max)
+		{
+			s3c240x_lcd.vramaddr_cur += s3c240x_lcd.offsize << 1;
+			s3c240x_lcd.pagewidth_cur = 0;
+		}
+	}
+	if (s3c240x_lcd.hwswp == 0)
+	{
+		if (s3c240x_lcd.bswp == 0)
+		{
+			return (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | (data[0] << 0);
+		}
+		else
+		{
+			return (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | (data[3] << 0);
+		}
+	}
+	else
+	{
+		if (s3c240x_lcd.bswp == 0)
+		{
+			return (data[1] << 24) | (data[0] << 16) | (data[3] << 8) | (data[2] << 0);
+		}
+		else
+		{
+			return (data[2] << 24) | (data[3] << 16) | (data[0] << 8) | (data[1] << 0);
+		}
+	}
+}
+
+static void s3c240x_lcd_render_01( running_machine *machine)
+{
+	bitmap_t *bitmap = machine->generic.tmpbitmap;
+	UINT32 *scanline = BITMAP_ADDR32( bitmap, s3c240x_lcd.vpos, s3c240x_lcd.hpos);
+	int i, j;
+	for (i = 0; i < 4; i++)
+	{
+		UINT32 data = s3c240x_lcd_dma_read( machine);
+		for (j = 0; j < 32; j++)
+		{
+			if (data & 0x80000000)
+			{
+				*scanline++ = RGB_BLACK;
+			}
+			else
+			{
+				*scanline++ = RGB_WHITE;
+			}
+			data = data << 1;
+			s3c240x_lcd.hpos++;
+			if (s3c240x_lcd.hpos >= (s3c240x_lcd.pagewidth_max << 4))
+			{
+				s3c240x_lcd.vpos = (s3c240x_lcd.vpos + 1) % (s3c240x_lcd.lineval + 1);
+				s3c240x_lcd.hpos = 0;
+				scanline = BITMAP_ADDR32( bitmap, s3c240x_lcd.vpos, s3c240x_lcd.hpos);
+			}
+		}
+	}
+}
+
+static void s3c240x_lcd_render_04( running_machine *machine)
+{
+	bitmap_t *bitmap = machine->generic.tmpbitmap;
+	UINT32 *scanline = BITMAP_ADDR32( bitmap, s3c240x_lcd.vpos, s3c240x_lcd.hpos);
+	int i, j;
+	for (i = 0; i < 4; i++)
+	{
+		UINT32 data = s3c240x_lcd_dma_read( machine);
+		for (j = 0; j < 8; j++)
+		{
+			*scanline++ = palette_get_color( machine, (data >> 28) & 0xFF);
+			data = data << 4;
+			s3c240x_lcd.hpos++;
+			if (s3c240x_lcd.hpos >= (s3c240x_lcd.pagewidth_max << 2))
+			{
+				s3c240x_lcd.vpos = (s3c240x_lcd.vpos + 1) % (s3c240x_lcd.lineval + 1);
+				s3c240x_lcd.hpos = 0;
+				scanline = BITMAP_ADDR32( bitmap, s3c240x_lcd.vpos, s3c240x_lcd.hpos);
+			}
+		}
+	}
+}
+
+static void s3c240x_lcd_render_08( running_machine *machine)
+{
+	bitmap_t *bitmap = machine->generic.tmpbitmap;
+	UINT32 *scanline = BITMAP_ADDR32( bitmap, s3c240x_lcd.vpos, s3c240x_lcd.hpos);
+	int i, j;
+	for (i = 0; i < 4; i++)
+	{
+		UINT32 data = s3c240x_lcd_dma_read( machine);
+		for (j = 0; j < 4; j++)
+		{
+			*scanline++ = palette_get_color( machine, (data >> 24) & 0xFF);
+			data = data << 8;
+			s3c240x_lcd.hpos++;
+			if (s3c240x_lcd.hpos >= (s3c240x_lcd.pagewidth_max << 1))
+			{
+				s3c240x_lcd.vpos = (s3c240x_lcd.vpos + 1) % (s3c240x_lcd.lineval + 1);
+				s3c240x_lcd.hpos = 0;
+				scanline = BITMAP_ADDR32( bitmap, s3c240x_lcd.vpos, s3c240x_lcd.hpos);
+			}
+		}
+	}
+}
+
+static void s3c240x_lcd_render_16( running_machine *machine)
+{
+	bitmap_t *bitmap = machine->generic.tmpbitmap;
+	UINT32 *scanline = BITMAP_ADDR32( bitmap, s3c240x_lcd.vpos, s3c240x_lcd.hpos);
+	int i, j;
+	for (i = 0; i < 4; i++)
+	{
+		UINT32 data = s3c240x_lcd_dma_read( machine);
+		for (j = 0; j < 2; j++)
+		{
+			UINT8 r, g, b;
+			r = BITS( data, 31, 27) << 3;
+			g = BITS( data, 26, 22) << 3;
+			b = BITS( data, 21, 17) << 3;
+			*scanline++ = MAKE_RGB( r, g, b);
+			data = data << 16;
+			s3c240x_lcd.hpos++;
+			if (s3c240x_lcd.hpos >= (s3c240x_lcd.pagewidth_max << 0))
+			{
+				s3c240x_lcd.vpos = (s3c240x_lcd.vpos + 1) % (s3c240x_lcd.lineval + 1);
+				s3c240x_lcd.hpos = 0;
+				scanline = BITMAP_ADDR32( bitmap, s3c240x_lcd.vpos, s3c240x_lcd.hpos);
+			}
+		}
 	}
 }
 
@@ -185,10 +261,11 @@ static TIMER_CALLBACK( s3c240x_lcd_timer_exp )
 	{
 		switch (s3c240x_lcd.bppmode)
 		{
-			case BPPMODE_TFT_01 : s3c240x_lcd_render_01( machine, machine->generic.tmpbitmap); break;
-			case BPPMODE_TFT_08 : s3c240x_lcd_render_08( machine, machine->generic.tmpbitmap); break;
-			case BPPMODE_TFT_16 : s3c240x_lcd_render_16( machine, machine->generic.tmpbitmap); break;
-			default : verboselog( machine, 0, "bppmode %d not supported\n", s3c240x_lcd.bppmode); break;
+			case BPPMODE_TFT_01 : s3c240x_lcd_render_01( machine); break;
+			case BPPMODE_TFT_04 : s3c240x_lcd_render_04( machine); break;
+			case BPPMODE_TFT_08 : s3c240x_lcd_render_08( machine); break;
+			case BPPMODE_TFT_16 : s3c240x_lcd_render_16( machine); break;
+			default : verboselog( machine, 0, "s3c240x_lcd_timer_exp: bppmode %d not supported\n", s3c240x_lcd.bppmode); break;
 		}
 		if ((s3c240x_lcd.vpos == 0) && (s3c240x_lcd.hpos == 0)) break;
 	}
@@ -204,8 +281,7 @@ static VIDEO_UPDATE( gp32 )
 {
 	running_machine *machine = screen->machine;
 	VIDEO_UPDATE_CALL(generic_bitmapped);
-	s3c240x_lcd_dma_reload( machine);
-	s3c240x_lcd.bppmode = BITS( s3c240x_lcd_regs[0], 4, 1);
+	s3c240x_lcd_dma_init( machine);
 	return 0;
 }
 
@@ -262,8 +338,7 @@ static void s3c240x_lcd_start( running_machine *machine)
 	const device_config *screen = machine->primary_screen;
 	verboselog( machine, 1, "LCD start\n");
 	s3c240x_lcd_configure( machine);
-	s3c240x_lcd_dma_reload( machine);
-	s3c240x_lcd.bppmode = BITS( s3c240x_lcd_regs[0], 4, 1);
+	s3c240x_lcd_dma_init( machine);
 	timer_adjust_oneshot( s3c240x_lcd_timer, video_screen_get_time_until_pos( screen, 0, 0), 0);
 }
 
@@ -1220,7 +1295,7 @@ static UINT8 i2cmem_read_byte( running_machine *machine, int last)
 	UINT8 data = 0;
 	int i;
 	i2cmem_write( machine, 0, I2CMEM_SDA, 1);
-	for (i=0;i<8;i++)
+	for (i = 0; i < 8; i++)
 	{
 		i2cmem_write( machine, 0, I2CMEM_SCL, 1);
     data = (data << 1) + (i2cmem_read( machine, 0, I2CMEM_SDA) ? 1 : 0);
@@ -1237,7 +1312,7 @@ static UINT8 i2cmem_read_byte( running_machine *machine, int last)
 static void i2cmem_write_byte( running_machine *machine, UINT8 data)
 {
 	int i;
-	for (i=0;i<8;i++)
+	for (i = 0; i < 8; i++)
 	{
 		i2cmem_write( machine, 0, I2CMEM_SDA, (data & 0x80) ? 1 : 0);
 		data = data << 1;
@@ -1446,6 +1521,17 @@ static READ32_HANDLER( s3c240x_iis_r )
 {
 	running_machine *machine = space->machine;
 	UINT32 data = s3c240x_iis_regs[offset];
+/*
+	switch (offset)
+	{
+		// IISCON
+		case 0x00 / 4 :
+		{
+			//data = data & ~1; // for mp3 player
+		}
+		break;
+	}
+*/
 	verboselog( machine, 9, "(IIS) %08X -> %08X (PC %08X)\n", 0x15508000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
 }
