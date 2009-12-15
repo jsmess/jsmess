@@ -36,6 +36,20 @@
 typedef struct _c1571_t c1571_t;
 struct _c1571_t
 {
+	/* abstractions */
+	int address;
+
+	/* signals */
+	int data_out;
+	int atn_ack;
+	int soe;							/* s? output enable */
+	int mode;							/* mode (0 = write, 1 = read) */
+
+	/* interrupts */
+	int via0_irq;						/* VIA #0 interrupt request */
+	int via1_irq;						/* VIA #1 interrupt request */
+	int cia_irq;						/* CIA interrupt request */
+
 	/* devices */
 	const device_config *cpu;
 	const device_config *via0;
@@ -68,6 +82,32 @@ INLINE c1571_config *get_safe_config(const device_config *device)
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
+
+/*-------------------------------------------------
+    c1571_atn_w - serial bus attention
+-------------------------------------------------*/
+
+static CBMSERIAL_ATN( c1571 )
+{
+	c1571_t *c1571 = get_safe_token(device);
+	int data_out = !c1571->data_out && !(c1571->atn_ack ^ !state);
+
+	via_ca1_w(c1571->via0, 0, !state);
+
+	cbmserial_data_w(c1571->serial_bus, device, data_out);
+}
+
+/*-------------------------------------------------
+    c1571_reset_w - serial bus reset
+-------------------------------------------------*/
+
+static CBMSERIAL_RESET( c1571 )
+{
+	if (!state)
+	{
+		device_reset(device);
+	}
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( c1570_map )
@@ -114,55 +154,295 @@ ADDRESS_MAP_END
     via6522_interface c1571_via0_intf
 -------------------------------------------------*/
 
+static WRITE_LINE_DEVICE_HANDLER( via0_irq_w )
+{
+	c1571_t *c1571 = get_safe_token(device->owner);
+
+	c1571->via0_irq = state;
+
+	cpu_set_input_line(c1571->cpu, INPUT_LINE_IRQ0, (c1571->via0_irq | c1571->via1_irq | c1571->cia_irq) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static READ8_DEVICE_HANDLER( via0_pa_r )
+{
+	/*
+
+		bit		description
+
+		PA0		TRK0 SNS
+		PA1		SER DIR
+		PA2		SIDE
+		PA3		
+		PA4		
+		PA5		_1/2 MHZ
+		PA6		ATN OUT
+		PA7		BYTE RDY
+
+	*/
+
+	c1571_t *c1571 = get_safe_token(device->owner);
+
+	return floppy_tk00_r(c1571->image);
+}
+
+static WRITE8_DEVICE_HANDLER( via0_pa_w )
+{
+	/*
+
+		bit		description
+
+		PA0		TRK0 SNS
+		PA1		SER DIR
+		PA2		SIDE
+		PA3		
+		PA4		
+		PA5		_1/2 MHZ
+		PA6		ATN OUT
+		PA7		BYTE RDY
+
+	*/
+
+	c1571_t *c1571 = get_safe_token(device->owner);
+
+	/* side */
+	wd17xx_set_side(c1571->wd1770, BIT(data, 2));
+}
+
+static READ8_DEVICE_HANDLER( via0_pb_r )
+{
+	/*
+
+		bit		description
+
+		PB0		DATA IN
+		PB1		DATA OUT
+		PB2		CLK IN
+		PB3		CLK OUT
+		PB4		ATN ACK
+		PB5		DEV# SEL
+		PB6		DEV# SEL
+		PB7		ATN IN
+
+	*/
+
+	c1571_t *c1571 = get_safe_token(device->owner);
+	UINT8 data = 0;
+
+	/* data in */
+	data = !cbmserial_data_r(c1571->serial_bus);
+
+	/* clock in */
+	data |= !cbmserial_clk_r(c1571->serial_bus) << 2;
+
+	/* serial bus address */
+	data |= c1571->address << 5;
+
+	/* attention in */
+	data |= !cbmserial_atn_r(c1571->serial_bus) << 7;
+
+	return data;
+}
+
+static WRITE8_DEVICE_HANDLER( via0_pb_w )
+{
+	/*
+
+		bit		description
+
+		PB0		DATA IN
+		PB1		DATA OUT
+		PB2		CLK IN
+		PB3		CLK OUT
+		PB4		ATN ACK
+		PB5		DEV# SEL
+		PB6		DEV# SEL
+		PB7		ATN IN
+
+	*/
+
+	c1571_t *c1571 = get_safe_token(device->owner);
+
+	int data_out = BIT(data, 1);
+	int clk_out = BIT(data, 3);
+	int atn_ack = BIT(data, 4);
+
+	/* data out */
+	int serial_data = !data_out && !(atn_ack ^ !cbmserial_atn_r(c1571->serial_bus));
+	cbmserial_data_w(c1571->serial_bus, device->owner, serial_data);
+	c1571->data_out = data_out;
+
+	/* clock out */
+	cbmserial_clk_w(c1571->serial_bus, device->owner, !clk_out);
+
+	/* attention acknowledge */
+	c1571->atn_ack = atn_ack;
+}
+
 static const via6522_interface c1571_via0_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_HANDLER(via0_pa_r),
+	DEVCB_HANDLER(via0_pb_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_NULL
+	DEVCB_HANDLER(via0_pa_w),
+	DEVCB_HANDLER(via0_pb_w),
+	DEVCB_NULL, /* ATN IN */
+	DEVCB_NULL,
+	DEVCB_NULL, /* _WPRT */
+	DEVCB_NULL,
+
+	DEVCB_LINE(via0_irq_w)
 };
 
 /*-------------------------------------------------
     via6522_interface c1571_via1_intf
 -------------------------------------------------*/
 
+static WRITE_LINE_DEVICE_HANDLER( via1_irq_w )
+{
+	c1571_t *c1571 = get_safe_token(device->owner);
+
+	c1571->via1_irq = state;
+
+	cpu_set_input_line(c1571->cpu, INPUT_LINE_IRQ0, (c1571->via0_irq | c1571->via1_irq | c1571->cia_irq) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static READ8_DEVICE_HANDLER( yb_r )
+{
+	/*
+
+		bit		description
+
+		PA0		YB0
+		PA1		YB1
+		PA2		YB2
+		PA3		YB3
+		PA4		YB4
+		PA5		YB5
+		PA6		YB6
+		PA7		YB7
+
+	*/
+
+	return 0;
+}
+
+static WRITE8_DEVICE_HANDLER( yb_w )
+{
+	/*
+
+		bit		description
+
+		PA0		YB0
+		PA1		YB1
+		PA2		YB2
+		PA3		YB3
+		PA4		YB4
+		PA5		YB5
+		PA6		YB6
+		PA7		YB7
+
+	*/
+}
+
+static READ8_DEVICE_HANDLER( via1_pb_r )
+{
+	/*
+
+		bit		signal		description
+
+		PB0		STP0		stepping motor bit 0
+		PB1		STP1		stepping motor bit 1
+		PB2		MTR			motor ON/OFF
+		PB3		ACT			drive 0 LED
+		PB4		_WPRT		write protect sense
+		PB5		DS0			density select 0
+		PB6		DS1			density select 1
+		PB7		_SYNC		SYNC detect line
+
+	*/
+
+	c1571_t *c1571 = get_safe_token(device->owner);
+	UINT8 data = 0;
+
+	/* write protect sense */
+	data |= !floppy_wpt_r(c1571->image) << 4;
+
+	/* SYNC detect line */
+
+	return data;
+}
+
+static WRITE8_DEVICE_HANDLER( via1_pb_w )
+{
+	/*
+
+		bit		signal		description
+
+		PB0		STP0		stepping motor bit 0
+		PB1		STP1		stepping motor bit 1
+		PB2		MTR			motor ON/OFF
+		PB3		ACT			drive 0 LED
+		PB4		_WPRT		write protect sense
+		PB5		DS0			density select 0
+		PB6		DS1			density select 1
+		PB7		_SYNC		SYNC detect line
+
+	*/
+}
+
+static WRITE_LINE_DEVICE_HANDLER( soe_w )
+{
+	c1571_t *c1571 = get_safe_token(device->owner);
+
+	c1571->soe = state;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( mode_w )
+{
+	c1571_t *c1571 = get_safe_token(device->owner);
+
+	c1571->mode = state;
+}
+
 static const via6522_interface c1571_via1_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_HANDLER(yb_r),
+	DEVCB_HANDLER(via1_pb_r),
+	DEVCB_NULL, /* BYTE READY */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_NULL
+	DEVCB_HANDLER(yb_w),
+	DEVCB_HANDLER(via1_pb_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(soe_w),
+	DEVCB_LINE(mode_w),
+
+	DEVCB_LINE(via1_irq_w)
 };
 
 /*-------------------------------------------------
     cia6526_interface c1571_cia_intf
 -------------------------------------------------*/
 
+static WRITE_LINE_DEVICE_HANDLER( cia_irq_w )
+{
+	c1571_t *c1571 = get_safe_token(device->owner);
+
+	c1571->cia_irq = state;
+
+	cpu_set_input_line(c1571->cpu, INPUT_LINE_IRQ0, (c1571->via0_irq | c1571->via1_irq | c1571->cia_irq) ? ASSERT_LINE : CLEAR_LINE);
+}
+
 static const cia6526_interface c1571_cia_intf =
 {
-	DEVCB_NULL,
+	DEVCB_LINE(cia_irq_w),
 	DEVCB_NULL,
 	10, /* 1/10 second */
 	{
@@ -187,9 +467,9 @@ static const wd17xx_interface c1571_wd1770_intf =
 -------------------------------------------------*/
 
 static FLOPPY_OPTIONS_START( c1571 )
+	FLOPPY_OPTION( c1571, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
 //	FLOPPY_OPTION( c1571, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
 //	FLOPPY_OPTION( c1571, "d71", "Commodore 1571 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
-	FLOPPY_OPTION( c1571, "g64", "Commodore 1571 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
 FLOPPY_OPTIONS_END
 
 /*-------------------------------------------------
@@ -306,6 +586,25 @@ ROM_END
 
 static DEVICE_START( c1571 )
 {
+	c1571_t *c1571 = get_safe_token(device);
+	const c1571_config *config = get_safe_config(device);
+
+	/* set serial address */
+	assert((config->address > 7) && (config->address < 12));
+	c1571->address = config->address - 8;
+
+	/* find our CPU */
+	c1571->cpu = device_find_child_by_tag(device, M6502_TAG);
+
+	/* find devices */
+	c1571->via0 = device_find_child_by_tag(device, M6522_0_TAG);
+	c1571->via1 = device_find_child_by_tag(device, M6522_1_TAG);
+	c1571->cia = device_find_child_by_tag(device, M6526_TAG);
+	c1571->wd1770 = device_find_child_by_tag(device, WD1770_TAG);
+	c1571->serial_bus = devtag_get_device(device->machine, config->serial_bus_tag);
+	c1571->image = device_find_child_by_tag(device, FLOPPY_0);
+
+	/* register for state saving */
 }
 
 /*-------------------------------------------------
@@ -314,6 +613,13 @@ static DEVICE_START( c1571 )
 
 static DEVICE_RESET( c1571 )
 {
+	c1571_t *c1571 = get_safe_token(device);
+
+	device_reset(c1571->cpu);
+	device_reset(c1571->via0);
+	device_reset(c1571->via1);
+	device_reset(c1571->cia);
+	device_reset(c1571->wd1770);
 }
 
 /*-------------------------------------------------
@@ -337,6 +643,8 @@ DEVICE_GET_INFO( c1570 )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1571);						break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1571);						break;
+		case DEVINFO_FCT_CBM_SERIAL_ATN:				info->f = (genf *)CBMSERIAL_ATN_NAME(c1571);				break;
+		case DEVINFO_FCT_CBM_SERIAL_RESET:				info->f = (genf *)CBMSERIAL_RESET_NAME(c1571);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1570");							break;
@@ -368,6 +676,8 @@ DEVICE_GET_INFO( c1571 )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1571);						break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1571);						break;
+		case DEVINFO_FCT_CBM_SERIAL_ATN:				info->f = (genf *)CBMSERIAL_ATN_NAME(c1571);				break;
+		case DEVINFO_FCT_CBM_SERIAL_RESET:				info->f = (genf *)CBMSERIAL_RESET_NAME(c1571);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1571");							break;
@@ -399,6 +709,8 @@ DEVICE_GET_INFO( c1571cr )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1571);						break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1571);						break;
+		case DEVINFO_FCT_CBM_SERIAL_ATN:				info->f = (genf *)CBMSERIAL_ATN_NAME(c1571);				break;
+		case DEVINFO_FCT_CBM_SERIAL_RESET:				info->f = (genf *)CBMSERIAL_RESET_NAME(c1571);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1571CR");						break;
