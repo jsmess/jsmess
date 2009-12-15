@@ -292,7 +292,7 @@ int sony_read_status(const device_config *device)
 			break;
 		case 0x06:	/* Disk is locked 0=locked 1=unlocked */
 			if (cur_image)
-				result = floppy_drive_get_flag_state(cur_image, FLOPPY_DRIVE_DISK_WRITE_PROTECTED) ? 0 : 1;
+				result = floppy_wpt_r(cur_image);
 			else
 				result = 0;
 			break;

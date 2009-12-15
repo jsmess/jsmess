@@ -475,23 +475,11 @@ int	floppy_drive_get_flag_state(const device_config *img, int flag)
 
 	flags |= drive_flags & FLOPPY_DRIVE_HEAD_AT_TRACK_0;
 
-	/* if disk image is read-only return write protected all the time */
-	if (!image_is_writable(img))
-	{
-		flags |= FLOPPY_DRIVE_DISK_WRITE_PROTECTED;
-	}
-	else
-	{
-		/* return real state of write protected flag */
-		flags |= drive_flags & FLOPPY_DRIVE_DISK_WRITE_PROTECTED;
-	}
-
 	/* drive present not */
 	if (!image_slotexists(img))
 	{
 		/* adjust some flags if drive is not present */
 		flags &= ~FLOPPY_DRIVE_HEAD_AT_TRACK_0;
-		flags |= FLOPPY_DRIVE_DISK_WRITE_PROTECTED;
 	}
 
     flags &= flag;
@@ -704,6 +692,9 @@ DEVICE_START( floppy )
 
 	floppy->drive_id = floppy_get_drive(device);
 	floppy->active = FALSE;
+
+	/* by default we are write-protected */
+	floppy->wpt = CLEAR_LINE;
 
 	/* resolve callbacks */
 	devcb_resolve_write_line(&floppy->out_idx_func, &floppy->config->out_idx_func, device);
@@ -978,6 +969,15 @@ WRITE_LINE_DEVICE_HANDLER( floppy_wtg_w )
 READ_LINE_DEVICE_HANDLER( floppy_wpt_r )
 {
 	floppy_drive *drive = get_safe_token(device);
+
+	if (image_slotexists(device))
+	{
+		if (image_is_writable(device))
+			drive->wpt = ASSERT_LINE;
+		else
+			drive->wpt = CLEAR_LINE;
+	}
+
 	return drive->wpt;
 }
 

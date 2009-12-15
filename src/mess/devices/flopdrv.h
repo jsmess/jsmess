@@ -62,8 +62,6 @@ typedef struct chrn_id
 	unsigned long flags;
 } chrn_id;
 
-/* set if disc is write protected - also set if drive is present but no disc in drive */
-#define FLOPPY_DRIVE_DISK_WRITE_PROTECTED		0x0002
 /* set if drive is connected and head is positioned over track 0 */
 #define FLOPPY_DRIVE_HEAD_AT_TRACK_0			0x0004
 /* set if drive is ready */

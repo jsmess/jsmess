@@ -872,10 +872,7 @@ static void i8271_command_execute(const device_config *device)
 					i8271->drive_control_input = (1<<6) | (1<<2);
 
 					/* bit 3 = 0 if write protected */
-					if (!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
-					{
-						i8271->drive_control_input |= (1<<3);
-					}
+					i8271->drive_control_input |= floppy_wpt_r(img) << 3;
 
 					/* bit 1 = 0 if head at track 0 */
 					if (!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_HEAD_AT_TRACK_0))
@@ -1094,10 +1091,7 @@ static void i8271_command_execute(const device_config *device)
 			}
 
 			/* bit 3 = 1 if write protected */
-			if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
-			{
-				status |= (1<<3);
-			}
+			status |= !floppy_wpt_r(img) << 3;
 
 			/* bit 1 = 1 if head at track 0 */
 			if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_HEAD_AT_TRACK_0))
@@ -1226,7 +1220,7 @@ static void i8271_command_execute(const device_config *device)
 			}
 			else
 			{
-				if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
+				if (floppy_wpt_r(img) == CLEAR_LINE)
 				{
 					/* Completion type: operation intervention probably required for recovery */
 					/* Completion code: Drive write protected */
@@ -1271,7 +1265,7 @@ static void i8271_command_execute(const device_config *device)
 			}
 			else
 			{
-				if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
+				if (floppy_wpt_r(img) == CLEAR_LINE)
 				{
 					/* Completion type: operation intervention probably required for recovery */
 					/* Completion code: Drive write protected */

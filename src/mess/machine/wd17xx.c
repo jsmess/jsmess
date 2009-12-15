@@ -560,10 +560,10 @@ static void wd17xx_command_restore(const device_config *device)
 }
 
 
-/* 
-	Write an entire track. Formats which do not define a write_track 
-	function pointer will cause a silent return. 
-*/ 
+/*
+	Write an entire track. Formats which do not define a write_track
+	function pointer will cause a silent return.
+*/
 static void write_track(const device_config *device)
 {
 	wd1770_state *w = get_safe_token(device);
@@ -1078,7 +1078,7 @@ static TIMER_CALLBACK(wd17xx_write_sector_callback)
 	{
 
 		/* drive write protected? */
-		if (floppy_drive_get_flag_state(w->drive,FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
+		if (floppy_wpt_r(w->drive) == CLEAR_LINE)
 		{
 			w->status |= STA_2_WRITE_PRO;
 
@@ -1548,7 +1548,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 			{
 
 				/* drive write protected? */
-				if (floppy_drive_get_flag_state(w->drive,FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
+				if (floppy_wpt_r(w->drive) == CLEAR_LINE)
 				{
 				/* yes */
 					w->status |= STA_2_WRITE_PRO;

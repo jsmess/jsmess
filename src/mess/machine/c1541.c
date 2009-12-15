@@ -56,13 +56,13 @@
 
 	...
 
-	PCB Assy # 1540008-01	
+	PCB Assy # 1540008-01
 	Schematic # 1540001
 	Original "Long" Board
 	Has 4 discreet 2114 RAMs
 	ALPS Drive only
 
-	PCB Assy # 1540048	
+	PCB Assy # 1540048
 	Schematic # 1540049
 	Referred to as the CR board
 	Changed to 2048 x 8 bit RAM pkg.
@@ -70,12 +70,12 @@
 	Alps Drive (-01)
 	Newtronics Drive (-03)
 
-	PCB Assy # 250442-01	
+	PCB Assy # 250442-01
 	Schematic # 251748
 	Termed the 1541 A
 	Just one jumper change to accommodate both types of drive
 
-	PCB Assy # 250446-01	
+	PCB Assy # 250446-01
 	Schematic # 251748 (See Notes)
 	Termed the 1541 A-2
 	Just one jumper change to accommodate both types of drive
@@ -84,7 +84,7 @@
 
 	VIC1541 1540001-01   Very early version, long board.
 			1540001-03   As above, only the ROMs are different.
-			1540008-01   
+			1540008-01
 
 	1541    1540048-01   Shorter board with a 40 pin gate array, Alps mech.
 			1540048-03   As above, but Newtronics mech.
@@ -99,12 +99,12 @@
 	1541A   250442-01    Alps or Newtronics drive selected by a jumper.
 	1541A2  250446-01    A 74LS123 replaces the 9602 at UD4.
 	1541B   250448-01    Same as the 1541C, but in a case like the 1541.
-	1541C   250448-01    Short board, new 40/42 pin gate array, 20 pin gate 
+	1541C   250448-01    Short board, new 40/42 pin gate array, 20 pin gate
 						 array and a R/W hybrid chip replace many components.
 						 Uses a Newtronics drive with optical trk 0 sensor.
-	1541C   251854       As above, single DOS ROM IC, trk 0 sensor, 30 pin 
+	1541C   251854       As above, single DOS ROM IC, trk 0 sensor, 30 pin
 						 IC for R/W ampl & stepper motor control (like 1571).
-	                     
+
 	1541-II              A complete redesign using the 40 pin gate array
 						 from the 1451C and a Sony R/W hybrid, but not the
 						 20 pin gate array, single DOS ROM IC.
@@ -203,7 +203,7 @@ struct _c1541_t
 	const device_config *via1;
 	const device_config *serial_bus;
 	const device_config *image;
-	
+
 	/* timers */
 	emu_timer *bit_timer;
 };
@@ -284,7 +284,7 @@ static TIMER_CALLBACK( bit_tick )
 
 		cpu_set_input_line(c1541->cpu, M6502_SET_OVERFLOW, byte_ready);
 		via_ca1_w(c1541->via1, 0, byte_ready);
-		
+
 		c1541->byte = byte;
 	}
 }
@@ -442,7 +442,7 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 	*/
 
 	c1541_t *c1541 = get_safe_token(device->owner);
-	
+
 	int data_out = BIT(data, 1);
 	int clk_out = BIT(data, 3);
 	int atna = BIT(data, 4);
@@ -489,16 +489,16 @@ static READ8_DEVICE_HANDLER( c1541c_via0_pa_r )
 		bit		description
 
 		PA0		TR00 SENCE
-		PA1		
-		PA2		
-		PA3		
-		PA4		
-		PA5		
-		PA6		
-		PA7		
+		PA1
+		PA2
+		PA3
+		PA4
+		PA5
+		PA6
+		PA7
 
 	*/
-	
+
 	c1541_t *c1541 = get_safe_token(device->owner);
 
 	return !(floppy_drive_get_flag_state(c1541->image, FLOPPY_DRIVE_HEAD_AT_TRACK_0) == FLOPPY_DRIVE_HEAD_AT_TRACK_0);
@@ -534,7 +534,7 @@ static READ8_DEVICE_HANDLER( c2031_via0_pa_r )
 		bit		description
 
 		PA0		DI0
-		PA1		DI1	
+		PA1		DI1
 		PA2		DI2
 		PA3		DI3
 		PA4		DI4
@@ -554,7 +554,7 @@ static WRITE8_DEVICE_HANDLER( c2031_via0_pa_w )
 		bit		description
 
 		PA0		DI0
-		PA1		DI1	
+		PA1		DI1
 		PA2		DI2
 		PA3		DI3
 		PA4		DI4
@@ -700,7 +700,7 @@ static READ8_DEVICE_HANDLER( via1_pb_r )
 	UINT8 data = 0;
 
 	/* write protect sense */
-	data |= (floppy_drive_get_flag_state(c1541->image, FLOPPY_DRIVE_DISK_WRITE_PROTECTED) == FLOPPY_DRIVE_DISK_WRITE_PROTECTED) << 4;
+	data |= !floppy_wpt_r(c1541->image) << 4;
 
 	/* SYNC detect line */
 	data |= !(c1541->mode && ((c1541->data & SYNC_MARK) == SYNC_MARK)) << 7;

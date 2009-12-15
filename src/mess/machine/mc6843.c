@@ -514,14 +514,15 @@ READ8_DEVICE_HANDLER ( mc6843_r )
 	{
 		/* update */
 		const device_config* img = mc6843_floppy_image( device );
-		int flag = floppy_drive_get_flag_state( img, FLOPPY_DRIVE_READY | FLOPPY_DRIVE_HEAD_AT_TRACK_0 | FLOPPY_DRIVE_DISK_WRITE_PROTECTED );
+		int flag = floppy_drive_get_flag_state( img, FLOPPY_DRIVE_READY | FLOPPY_DRIVE_HEAD_AT_TRACK_0);
 		mc6843->STRA &= 0xa3;
 		if ( flag & FLOPPY_DRIVE_READY )
 			mc6843->STRA |= 0x04;
 		if ( flag & FLOPPY_DRIVE_HEAD_AT_TRACK_0 )
 			mc6843->STRA |= 0x08;
-		if ( flag & FLOPPY_DRIVE_DISK_WRITE_PROTECTED )
-			mc6843->STRA |= 0x10;
+
+		mc6843->STRA |= !floppy_wpt_r(img) << 4;
+
 		if ( mc6843->index_pulse )
 			mc6843->STRA |= 0x40;
 

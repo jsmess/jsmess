@@ -1060,7 +1060,7 @@ static void upd765_format_track(const device_config *device)
 	const device_config *img = current_image(device);
 
 	/* write protected? */
-	if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
+	if (floppy_wpt_r(img) == CLEAR_LINE)
 	{
 		fdc->upd765_status[1] |= UPD765_ST1_NOT_WRITEABLE;
 
@@ -1186,7 +1186,7 @@ static void upd765_write_data(const device_config *device)
 	}
 
 	/* write protected? */
-	if (floppy_drive_get_flag_state(current_image(device), FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
+	if (floppy_wpt_r(current_image(device)) == CLEAR_LINE)
 	{
 		fdc->upd765_status[1] |= UPD765_ST1_NOT_WRITEABLE;
 
@@ -1892,10 +1892,7 @@ static void upd765_setup_command(const device_config *device)
 
 			if (img)
 			{
-				if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
-				{
-					fdc->upd765_status[3] |= 0x40;
-				}
+				fdc->upd765_status[3] |= !floppy_wpt_r(img) << 6;
 
 				if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
 				{

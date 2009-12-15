@@ -435,7 +435,7 @@ static READ8_DEVICE_HANDLER( bw2_8255_c_r )
 	data |= centronics_busy_r(state->centronics) << 4;
 	data |= state->mfdbk << 5;
 
-	data |= floppy_drive_get_flag_state(get_floppy_image(device->machine, state->selected_drive), FLOPPY_DRIVE_DISK_WRITE_PROTECTED) ? 0x00 : 0x80;
+	data |= floppy_wpt_r(get_floppy_image(device->machine, state->selected_drive)) << 7;
 
 	return data;
 }
@@ -840,7 +840,7 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_WD179X_ADD("wd179x", bw2_wd17xx_interface )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(bw2_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")

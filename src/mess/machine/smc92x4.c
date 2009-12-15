@@ -261,7 +261,8 @@ static UINT8 floppy_get_disk_status(running_machine *machine,int which, int disk
 		reply |= DS_INDEX;
 	if (floppy_drive_get_flag_state(disk_img, FLOPPY_DRIVE_HEAD_AT_TRACK_0) == FLOPPY_DRIVE_HEAD_AT_TRACK_0)
 		reply |= DS_TRK00;
-	if (floppy_drive_get_flag_state(disk_img, FLOPPY_DRIVE_DISK_WRITE_PROTECTED) == FLOPPY_DRIVE_DISK_WRITE_PROTECTED)
+
+	if (floppy_wpt_r(disk_img) == CLEAR_LINE)
 		reply |= DS_WRPROT;
 	if (image_exists(disk_img))
 		reply |= DS_READY;
