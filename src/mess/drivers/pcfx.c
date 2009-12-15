@@ -16,7 +16,7 @@ static ADDRESS_MAP_START( pcfx_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE( 0xE0000000, 0xE7FFFFFF ) AM_NOP
 	AM_RANGE( 0xE8000000, 0xE9FFFFFF ) AM_NOP
 	AM_RANGE( 0xF8000000, 0xF8000007 ) AM_NOP	/* PIO */
-	AM_RANGE( 0xFFF00000, 0xFFFFFFFF ) AM_ROMBANK(1)	/* ROM */
+	AM_RANGE( 0xFFF00000, 0xFFFFFFFF ) AM_ROMBANK("bank1")	/* ROM */
 ADDRESS_MAP_END
 
 
@@ -37,7 +37,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( pcfx )
 {
-	memory_set_bankptr( machine, 1, memory_region(machine, "user1") );
+	memory_set_bankptr( machine, "bank1", memory_region(machine, "user1") );
 }
 
 

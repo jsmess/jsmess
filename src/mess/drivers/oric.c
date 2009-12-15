@@ -59,9 +59,9 @@
 
 static ADDRESS_MAP_START(oric_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0x0000, 0xbfff) AM_RAM AM_BASE( &oric_ram )
-    AM_RANGE( 0xc000, 0xdfff) AM_READWRITE( SMH_BANK(1), SMH_BANK(5) )
-	AM_RANGE( 0xe000, 0xf7ff) AM_READWRITE( SMH_BANK(2), SMH_BANK(6) )
-	AM_RANGE( 0xf800, 0xffff) AM_READWRITE( SMH_BANK(3), SMH_BANK(7) )
+    AM_RANGE( 0xc000, 0xdfff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
+	AM_RANGE( 0xe000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
+	AM_RANGE( 0xf800, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
 ADDRESS_MAP_END
 
 /*
@@ -74,7 +74,7 @@ static ADDRESS_MAP_START(telestrat_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x031c, 0x031f) AM_DEVREADWRITE("acia",  acia_6551_r, acia_6551_w )
 	AM_RANGE( 0x0320, 0x032f) AM_DEVREADWRITE("via6522_1", via_r, via_w)
 	AM_RANGE( 0x0400, 0xbfff) AM_RAM
-	AM_RANGE( 0xc000, 0xffff) AM_READWRITE( SMH_BANK(1), SMH_BANK(2) )
+	AM_RANGE( 0xc000, 0xffff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 ADDRESS_MAP_END
 
 
@@ -380,7 +380,8 @@ static const floppy_config prav8d_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(apple2),
+//mess0135u3	FLOPPY_OPTIONS_NAME(apple2),
+	FLOPPY_OPTIONS_NAME(oric),
 	DO_NOT_KEEP_GEOMETRY
 };
 

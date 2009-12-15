@@ -424,13 +424,13 @@ static ADDRESS_MAP_START( pet40_mem , ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pet80_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x8000, 0x8fff) AM_RAMBANK(1)
-	AM_RANGE(0x9000, 0x9fff) AM_RAMBANK(2)
-	AM_RANGE(0xa000, 0xafff) AM_RAMBANK(3)
-	AM_RANGE(0xb000, 0xbfff) AM_RAMBANK(4)
-	AM_RANGE(0xc000, 0xe7ff) AM_RAMBANK(6)
+	AM_RANGE(0x8000, 0x8fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x9000, 0x9fff) AM_RAMBANK("bank2")
+	AM_RANGE(0xa000, 0xafff) AM_RAMBANK("bank3")
+	AM_RANGE(0xb000, 0xbfff) AM_RAMBANK("bank4")
+	AM_RANGE(0xc000, 0xe7ff) AM_RAMBANK("bank6")
 #if 1
-	AM_RANGE(0xe800, 0xefff) AM_RAMBANK(7)
+	AM_RANGE(0xe800, 0xefff) AM_RAMBANK("bank7")
 #else
 	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
 	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
@@ -438,9 +438,9 @@ static ADDRESS_MAP_START( pet80_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 #endif
-	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_BANK(8))
-	AM_RANGE(0xf000, 0xffef) AM_WRITE(SMH_BANK(8))
-	AM_RANGE(0xfff1, 0xffff) AM_WRITE(SMH_BANK(9))
+	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("bank8")
+	AM_RANGE(0xf000, 0xffef) AM_WRITE_BANK("bank8")
+	AM_RANGE(0xfff1, 0xffff) AM_WRITE_BANK("bank9")
 ADDRESS_MAP_END
 
 
@@ -460,8 +460,8 @@ ADDRESS_MAP_END
 
 */
 static ADDRESS_MAP_START( superpet_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE(1) AM_BASE(&pet_memory)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE(2) AM_BASE_SIZE_GENERIC(videoram)
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("share1") AM_BASE(&pet_memory)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share2") AM_BASE_SIZE_GENERIC(videoram)
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
 	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
 	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
@@ -475,9 +475,9 @@ static ADDRESS_MAP_START( superpet_mem , ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superpet_m6809_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE(1)	/* same memory as m6502 */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE(2)	/* same memory as m6502 */
-    AM_RANGE(0x9000, 0x9fff) AM_RAMBANK(1)	/* 64 kbyte ram turned in */
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("share1")	/* same memory as m6502 */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share2")	/* same memory as m6502 */
+    AM_RANGE(0x9000, 0x9fff) AM_RAMBANK("bank1")	/* 64 kbyte ram turned in */
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
 	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
 	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)

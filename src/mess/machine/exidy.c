@@ -162,7 +162,7 @@ static TIMER_CALLBACK(exidy_cassette_tc)
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( exidy_reset )
 {
-	memory_set_bank(machine, 1, 0);
+	memory_set_bank(machine, "bank1", 0);
 }
 
 WRITE8_HANDLER(exidy_fc_w)
@@ -458,5 +458,5 @@ MACHINE_RESET( exidy )
 	exidy_fe_w(space, 0, 0);
 
 	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, exidy_reset);
-	memory_set_bank(machine, 1, 1);
+	memory_set_bank(machine, "bank1", 1);
 }

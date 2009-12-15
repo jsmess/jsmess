@@ -77,12 +77,13 @@ static WRITE8_HANDLER( ls259_w )
 	{
 	case 0: /* IC24 A8 */
 		//logerror("IC24 A8 %u\n", d);
-		memory_set_bank(space->machine, 1, d);
+		memory_set_bank(space->machine, "bank1", d);
 
 		if (d)
-			memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+			memory_install_readwrite_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
 		else
-			memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
+			memory_install_read_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
+			memory_unmap_write(program, 0x0000, 0x0fff, 0, 0);
 		break;
 
 	case 1: /* RECALL */
@@ -127,7 +128,7 @@ static WRITE8_HANDLER( ls259_w )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( mm1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
+	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x1000, 0xfeff) AM_RAM
 	AM_RANGE(0xff00, 0xff0f) AM_MIRROR(0x80) AM_DEVREADWRITE(I8237_TAG, i8237_r, i8237_w)
 //	AM_RANGE(0xff10, 0xff13) AM_MIRROR(0x8c) AM_DEVREADWRITE(UPD7201_TAG, upd7201_cd_ba_r, upd7201_cd_ba_w)
@@ -692,10 +693,11 @@ static MACHINE_START( mm1 )
 	state->key_rom = memory_region(machine, "keyboard");
 
 	/* setup memory banking */
-	memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "bios"), 0);
-	memory_configure_bank(machine, 1, 1, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
-	memory_set_bank(machine, 1, 0);
+	memory_install_read_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
+	memory_unmap_write(program, 0x0000, 0x0fff, 0, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "bios"), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_set_bank(machine, "bank1", 0);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->sense);

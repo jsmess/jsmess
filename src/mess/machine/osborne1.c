@@ -203,18 +203,18 @@ WRITE8_HANDLER( osborne1_bankswitch_w )
 	}
 	if ( osborne1.bank2_enabled )
 	{
-		memory_set_bankptr(space->machine,1, memory_region(space->machine, "maincpu") );
-		memory_set_bankptr(space->machine,2, osborne1.empty_4K );
-		memory_set_bankptr(space->machine,3, osborne1.empty_4K );
+		memory_set_bankptr(space->machine,"bank1", memory_region(space->machine, "maincpu") );
+		memory_set_bankptr(space->machine,"bank2", osborne1.empty_4K );
+		memory_set_bankptr(space->machine,"bank3", osborne1.empty_4K );
 	}
 	else
 	{
-		memory_set_bankptr(space->machine,1, messram_get_ptr(devtag_get_device(space->machine, "messram")) );
-		memory_set_bankptr(space->machine,2, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x1000 );
-		memory_set_bankptr(space->machine,3, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x3000 );
+		memory_set_bankptr(space->machine,"bank1", messram_get_ptr(devtag_get_device(space->machine, "messram")) );
+		memory_set_bankptr(space->machine,"bank2", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x1000 );
+		memory_set_bankptr(space->machine,"bank3", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x3000 );
 	}
 	osborne1.bank4_ptr = messram_get_ptr(devtag_get_device(space->machine, "messram")) + ( ( osborne1.bank3_enabled ) ? 0x10000 : 0xF000 );
-	memory_set_bankptr(space->machine,4, osborne1.bank4_ptr );
+	memory_set_bankptr(space->machine,"bank4", osborne1.bank4_ptr );
 	osborne1.bankswitch = offset;
 	osborne1.in_irq_handler = 0;
 }

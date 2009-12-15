@@ -172,7 +172,7 @@ static READ32_HANDLER( mb89371_r )
 }
 
 static ADDRESS_MAP_START( konamigv_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_SHARE(1) AM_BASE(&g_p_n_psxram) AM_SIZE(&g_n_psxramsize) /* ram */
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_SHARE("share1") AM_BASE(&g_p_n_psxram) AM_SIZE(&g_n_psxramsize) /* ram */
 	AM_RANGE(0x1f000000, 0x1f00001f) AM_READWRITE(am53cf96_r, am53cf96_w)
 	AM_RANGE(0x1f100000, 0x1f100003) AM_READ_PORT("P1")
 	AM_RANGE(0x1f100004, 0x1f100007) AM_READ_PORT("P2")
@@ -196,11 +196,11 @@ static ADDRESS_MAP_START( konamigv_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801c00, 0x1f801dff) AM_DEVREADWRITE("spu", psx_spu_r, psx_spu_w)
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE(2) AM_REGION("user1", 0) /* bios */
-	AM_RANGE(0x80000000, 0x801fffff) AM_RAM AM_SHARE(1) /* ram mirror */
-	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE(2) /* bios mirror */
-	AM_RANGE(0xa0000000, 0xa01fffff) AM_RAM AM_SHARE(1) /* ram mirror */
-	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_ROM AM_SHARE(2) /* bios mirror */
+	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
+	AM_RANGE(0x80000000, 0x801fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
+	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
+	AM_RANGE(0xa0000000, 0xa01fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
+	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -636,7 +636,7 @@ static DRIVER_INIT( btchamp )
 	intelflash_init( machine, 0, FLASH_SHARP_LH28F400, NULL );
 
 	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f68008f, 0, 0, btc_trackball_r, btc_trackball_w );
-	memory_install_write32_handler    ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800e0, 0x1f6800e3, 0, 0, (write32_space_func)SMH_NOP );
+	memory_nop_write                  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800e0, 0x1f6800e3, 0, 0 );
 	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f380000, 0x1f3fffff, 0, 0, btcflash_r, btcflash_w );
 
 	DRIVER_INIT_CALL(konamigv);
@@ -722,11 +722,11 @@ static DRIVER_INIT( kdeadeye )
 {
 	intelflash_init( machine, 0, FLASH_SHARP_LH28F400, NULL );
 
-	memory_install_read_port_handler  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f680083, 0, 0, "GUNX1" );
-	memory_install_read_port_handler  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680090, 0x1f680093, 0, 0, "GUNY1" );
-	memory_install_read_port_handler  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800a0, 0x1f6800a3, 0, 0, "GUNX2" );
-	memory_install_read_port_handler  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800b0, 0x1f6800b3, 0, 0, "GUNY2" );
-	memory_install_read_port_handler  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800c0, 0x1f6800c3, 0, 0, "BUTTONS" );
+	memory_install_read_port  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f680083, 0, 0, "GUNX1" );
+	memory_install_read_port  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680090, 0x1f680093, 0, 0, "GUNY1" );
+	memory_install_read_port  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800a0, 0x1f6800a3, 0, 0, "GUNX2" );
+	memory_install_read_port  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800b0, 0x1f6800b3, 0, 0, "GUNY2" );
+	memory_install_read_port  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800c0, 0x1f6800c3, 0, 0, "BUTTONS" );
 	memory_install_write32_handler    ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800e0, 0x1f6800e3, 0, 0, kdeadeye_0_w );
 	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f380000, 0x1f3fffff, 0, 0, btcflash_r, btcflash_w );
 

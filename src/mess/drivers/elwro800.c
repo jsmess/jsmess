@@ -114,35 +114,35 @@ static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 	if (!BIT(cs,0))
 	{
 		// rom BAS0
-		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x0000); /* BAS0 ROM */
-		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_NOP);
+		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x0000); /* BAS0 ROM */
+		memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0);
 		state->ram_at_0000 = 0;
 	}
 	else if (!BIT(cs,4))
 	{
 		// rom BOOT
-		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x4000); /* BOOT ROM */
-		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_NOP);
+		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x4000); /* BOOT ROM */
+		memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0);
 		state->ram_at_0000 = 0;
 	}
 	else
 	{
 		// RAM
-		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
-		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK(1));
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
+		memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
 		state->ram_at_0000 = 1;
 	}
 
 	cs = prom[((0x2000 >> 10) | (ls175 << 6)) & 0x1ff];
 	if (!BIT(cs,1))
 	{
-		memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x2000);	/* BAS1 ROM */
-		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, SMH_NOP);
+		memory_set_bankptr(machine, "bank2", memory_region(machine, "maincpu") + 0x2000);	/* BAS1 ROM */
+		memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0);
 	}
 	else
 	{
-		memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000); /* RAM */
-		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, SMH_BANK(2));
+		memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000); /* RAM */
+		memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, "bank2");
 	}
 
 	if (BIT(ls175,2))
@@ -378,9 +378,9 @@ static WRITE8_HANDLER(elwro800jr_io_w)
  *************************************/
 
 static ADDRESS_MAP_START(elwro800_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK(1)
-	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK(2)
-	AM_RANGE(0x4000, 0xffff) AM_RAMBANK(3)
+	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x4000, 0xffff) AM_RAMBANK("bank3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(elwro800_io, ADDRESS_SPACE_IO, 8)
@@ -509,7 +509,7 @@ static MACHINE_RESET(elwro800)
 {
 	memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, 64*1024);
 
-	memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 
 	// this is a reset of ls175 in mmu
 	elwro800jr_mmu_w(machine, 0);

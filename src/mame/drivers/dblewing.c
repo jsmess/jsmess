@@ -169,53 +169,6 @@ static VIDEO_UPDATE(dblewing)
 }
 
 
-/*
-
-cheats.. to make testing a bit easier
-
-; [ Double Wings ]
-:dblewing:00000000:FF3C1F:00000009:FFFFFFFF:Infinite Credits
-:dblewing:00000000:FF381C:000000F8:FFFFFFFF:1P Rapid Fire
-:dblewing:00000000:FF3821:00000002:FFFFFFFF:1P Invincibility
-:dblewing:00000000:FF389D:00000008:FFFFFFFF:1P Infinite Lives
-:dblewing:00000000:FF389F:00000006:FFFFFFFF:1P Infinite Bombs
-:dblewing:00000000:FF38A5:0000001C:0000001C:1P Always Maximum Shot Power
-:dblewing:62000000:FF38A5:00000000:00000000:1P Select Weapon
-:dblewing:00010000:FF38A5:00000000:00000060:Vulcan
-:dblewing:00010000:FF38A5:00000020:00000060:Laser
-:dblewing:00010000:FF38A5:00000040:00000060:Break Vulcan
-:dblewing:00000000:FF38A7:0000000C:0000000C:1P Always Max Sub Wepon Power
-:dblewing:62000000:FF38A7:00000000:00000000:1P Select Sub Weapon
-:dblewing:00010000:FF38A7:00000000:000000F0:None
-:dblewing:00010000:FF38A7:00000060:000000F0:Missile
-:dblewing:00010000:FF38A7:00000070:000000F0:Homing
-:dblewing:00000000:FF38B5:00000001:FFFFFFFF:1P Always Have Restart Item
-:dblewing:62000000:FF38A1:00000000:FFFFFFFF:1P Select Character
-:dblewing:00010000:FF38A1:00000000:FFFFFFFF:Nick (Red)
-:dblewing:00010000:FF38A1:00000001:FFFFFFFF:Sophie (Blue)
-:dblewing:00010000:FF38A1:00000002:FFFFFFFF:Elan (Yellow)
-:dblewing:00000000:FF38DC:000000F8:FFFFFFFF:2P Rapid Fire
-:dblewing:00000000:FF38E1:00000002:FFFFFFFF:2P Invincibility
-:dblewing:00000000:FF395D:00000008:FFFFFFFF:2P Infinite Lives
-:dblewing:00000000:FF395F:00000006:FFFFFFFF:2P Infinite Bombs
-:dblewing:00000000:FF3965:0000001C:0000001C:2P Always Maximum Shot Power
-:dblewing:62000000:FF3965:00000000:00000000:2P Select Weapon
-:dblewing:00010000:FF3965:00000000:00000060:Vulcan
-:dblewing:00010000:FF3965:00000020:00000060:Laser
-:dblewing:00010000:FF3965:00000040:00000060:Break Vulcan
-:dblewing:00000000:FF3967:0000000C:0000000C:2P Always Max Sub Wepon Power
-:dblewing:62000000:FF3967:00000000:00000000:2P Select Sub Weapon
-:dblewing:00010000:FF3967:00000000:000000F0:None
-:dblewing:00010000:FF3967:00000060:000000F0:Missile
-:dblewing:00010000:FF3967:00000070:000000F0:Homing
-:dblewing:00000000:FF3975:00000001:FFFFFFFF:2P Always Have Restart Item
-:dblewing:62000000:FF3961:00000000:FFFFFFFF:2P Select Character
-:dblewing:00010000:FF3961:00000000:FFFFFFFF:Nick (Red)
-:dblewing:00010000:FF3961:00000001:FFFFFFFF:Sophie (Blue)
-:dblewing:00010000:FF3961:00000002:FFFFFFFF:Elan (Yellow)
-
-*/
-
 /* protection.. involves more addresses than this .. */
 /* this is going to be typical deco '104' protection...
  writes one place, reads back data shifted in another
@@ -433,10 +386,10 @@ static WRITE16_HANDLER( dblewing_prot_w )
 static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100fff) AM_READ(SMH_RAM) AM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
-	AM_RANGE(0x102000, 0x102fff) AM_READ(SMH_RAM) AM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
-	AM_RANGE(0x104000, 0x104fff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf1_rowscroll)
-	AM_RANGE(0x106000, 0x106fff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf2_rowscroll)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
+	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
+	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
+	AM_RANGE(0x106000, 0x106fff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
 
 	/* protection */
 //  AM_RANGE(0x280104, 0x280105) AM_WRITENOP              // ??
@@ -452,9 +405,9 @@ static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x284000, 0x284001) AM_RAM
 	AM_RANGE(0x288000, 0x288001) AM_RAM
-	AM_RANGE(0x28C000, 0x28C00f) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x28C000, 0x28C00f) AM_RAM AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x320000, 0x3207ff) AM_READWRITE(SMH_RAM,paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x320000, 0x3207ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff0000, 0xff3fff) AM_MIRROR(0xc000) AM_RAM
 ADDRESS_MAP_END
 

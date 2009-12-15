@@ -419,10 +419,10 @@ static void prg32( running_machine *machine, int bank )
 		memcpy(&nes.rom[0x8000], &nes.rom[bank * 0x8000 + 0x10000], 0x8000);
 	else
 	{
-		memory_set_bankptr(machine, 1, &nes.rom[bank * 0x8000 + 0x10000]);
-		memory_set_bankptr(machine, 2, &nes.rom[bank * 0x8000 + 0x12000]);
-		memory_set_bankptr(machine, 3, &nes.rom[bank * 0x8000 + 0x14000]);
-		memory_set_bankptr(machine, 4, &nes.rom[bank * 0x8000 + 0x16000]);
+		memory_set_bankptr(machine, "bank1", &nes.rom[bank * 0x8000 + 0x10000]);
+		memory_set_bankptr(machine, "bank2", &nes.rom[bank * 0x8000 + 0x12000]);
+		memory_set_bankptr(machine, "bank3", &nes.rom[bank * 0x8000 + 0x14000]);
+		memory_set_bankptr(machine, "bank4", &nes.rom[bank * 0x8000 + 0x16000]);
 	}
 }
 
@@ -434,8 +434,8 @@ static void prg16_89ab( running_machine *machine, int bank )
 		memcpy(&nes.rom[0x8000], &nes.rom[bank * 0x4000 + 0x10000], 0x4000);
 	else
 	{
-		memory_set_bankptr(machine, 1, &nes.rom[bank * 0x4000 + 0x10000]);
-		memory_set_bankptr(machine, 2, &nes.rom[bank * 0x4000 + 0x12000]);
+		memory_set_bankptr(machine, "bank1", &nes.rom[bank * 0x4000 + 0x10000]);
+		memory_set_bankptr(machine, "bank2", &nes.rom[bank * 0x4000 + 0x12000]);
 	}
 }
 
@@ -447,8 +447,8 @@ static void prg16_cdef( running_machine *machine, int bank )
 		memcpy(&nes.rom[0xc000], &nes.rom[bank * 0x4000 + 0x10000], 0x4000);
 	else
 	{
-		memory_set_bankptr(machine, 3, &nes.rom[bank * 0x4000 + 0x10000]);
-		memory_set_bankptr(machine, 4, &nes.rom[bank * 0x4000 + 0x12000]);
+		memory_set_bankptr(machine, "bank3", &nes.rom[bank * 0x4000 + 0x10000]);
+		memory_set_bankptr(machine, "bank4", &nes.rom[bank * 0x4000 + 0x12000]);
 	}
 }
 
@@ -459,7 +459,7 @@ static void prg8_89( running_machine *machine, int bank )
 	if (nes.slow_banking)
 		memcpy(&nes.rom[0x8000], &nes.rom[bank * 0x2000 + 0x10000], 0x2000);
 	else
-		memory_set_bankptr(machine, 1, &nes.rom[bank * 0x2000 + 0x10000]);
+		memory_set_bankptr(machine, "bank1", &nes.rom[bank * 0x2000 + 0x10000]);
 }
 
 static void prg8_ab( running_machine *machine, int bank )
@@ -469,7 +469,7 @@ static void prg8_ab( running_machine *machine, int bank )
 	if (nes.slow_banking)
 		memcpy(&nes.rom[0xa000], &nes.rom[bank * 0x2000 + 0x10000], 0x2000);
 	else
-		memory_set_bankptr(machine, 2, &nes.rom[bank * 0x2000 + 0x10000]);
+		memory_set_bankptr(machine, "bank2", &nes.rom[bank * 0x2000 + 0x10000]);
 }
 
 static void prg8_cd( running_machine *machine, int bank )
@@ -479,7 +479,7 @@ static void prg8_cd( running_machine *machine, int bank )
 	if (nes.slow_banking)
 		memcpy(&nes.rom[0xc000], &nes.rom[bank * 0x2000 + 0x10000], 0x2000);
 	else
-		memory_set_bankptr(machine, 3, &nes.rom[bank * 0x2000 + 0x10000]);
+		memory_set_bankptr(machine, "bank3", &nes.rom[bank * 0x2000 + 0x10000]);
 }
 
 static void prg8_ef( running_machine *machine, int bank )
@@ -489,7 +489,7 @@ static void prg8_ef( running_machine *machine, int bank )
 	if (nes.slow_banking)
 		memcpy(&nes.rom[0xe000], &nes.rom[bank * 0x2000 + 0x10000], 0x2000);
 	else
-		memory_set_bankptr(machine, 4, &nes.rom[bank * 0x2000 + 0x10000]);
+		memory_set_bankptr(machine, "bank4", &nes.rom[bank * 0x2000 + 0x10000]);
 }
 
 /* We define an additional helper to map PRG-ROM to 0x6000-0x7000 */
@@ -499,7 +499,7 @@ static void prg8_67( running_machine *machine, int bank )
 {
 	/* assumes that bank references an 8k chunk */
 	bank &= ((nes.prg_chunks << 1) - 1);
-	memory_set_bankptr(machine, 5, &nes.rom[bank * 0x2000 + 0x10000]);
+	memory_set_bankptr(machine, "bank5", &nes.rom[bank * 0x2000 + 0x10000]);
 }
 
 /* CHR ROM in 1K, 2K, 4K or 8K blocks */
@@ -1003,7 +1003,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_chr_mask = 0x7f;
 			mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper4_set_chr(machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
-			memory_set_bankptr(machine, 5, nes.wram);
+			memory_set_bankptr(machine, "bank5", nes.wram);
 			break;
 		case 46:
 			prg32(machine, 0);
@@ -1041,7 +1041,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_chr_mask = 0xff;
 			mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper4_set_chr(machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
-			memory_set_bankptr(machine, 5, nes.wram);
+			memory_set_bankptr(machine, "bank5", nes.wram);
 			break;
 		case 57:
 			mmc_cmd1 = 0x00;
@@ -1593,7 +1593,7 @@ int nes_mapper_reset( running_machine *machine, int mmc_num )
 
 	/* Point the WRAM/battery area to the first RAM bank */
 	if (mmc_num != 20)
-		memory_set_bankptr(machine, 5, &nes.wram[0x0000]);
+		memory_set_bankptr(machine, "bank5", &nes.wram[0x0000]);
 
 	/* Here, we init a few helpers: 4 prg banks and 16 chr banks - some mappers use them */
 	for (i = 0; i < 4; i++)
@@ -1655,7 +1655,7 @@ int nes_unif_reset( running_machine *machine, const char *board )
 		nes_irq_timer = timer_alloc(machine, nes_irq_callback, NULL);
 
 	/* Point the WRAM/battery area to the first RAM bank */
-	memory_set_bankptr(machine, 5, &nes.wram[0x0000]);
+	memory_set_bankptr(machine, "bank5", &nes.wram[0x0000]);
 
 	switch (unif_board->board_idx)
 	{

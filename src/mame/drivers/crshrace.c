@@ -159,7 +159,7 @@ static WRITE8_HANDLER( crshrace_sh_bankswitch_w )
 {
 	UINT8 *rom = memory_region(space->machine, "audiocpu") + 0x10000;
 
-	memory_set_bankptr(space->machine, 1,rom + (data & 0x03) * 0x8000);
+	memory_set_bankptr(space->machine, "bank1",rom + (data & 0x03) * 0x8000);
 }
 
 
@@ -206,14 +206,14 @@ static ADDRESS_MAP_START( crshrace_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("P3")
-	AM_RANGE(0xfff020, 0xfff03f) AM_WRITE(SMH_RAM) AM_BASE(&K053936_0_ctrl)
-	AM_RANGE(0xfff044, 0xfff047) AM_WRITE(SMH_RAM)	// ??? moves during race
+	AM_RANGE(0xfff020, 0xfff03f) AM_WRITEONLY AM_BASE(&K053936_0_ctrl)
+	AM_RANGE(0xfff044, 0xfff047) AM_WRITEONLY	// ??? moves during race
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )

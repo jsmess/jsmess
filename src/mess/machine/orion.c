@@ -168,7 +168,7 @@ WRITE8_HANDLER ( orion128_memory_page_w )
 {
 	if (data!=orion128_memory_page )
 	{
-		memory_set_bankptr(space->machine, 1, messram_get_ptr(devtag_get_device(space->machine, "messram")) + (data & 3) * 0x10000);
+		memory_set_bankptr(space->machine, "bank1", messram_get_ptr(devtag_get_device(space->machine, "messram")) + (data & 3) * 0x10000);
 		orion128_memory_page = (data & 3);
 	}
 }
@@ -178,8 +178,8 @@ MACHINE_RESET ( orion128 )
 	orion128_video_page = 0;
 	orion128_video_mode = 0;
 	orion128_memory_page = -1;
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0xf800);
-	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf000);
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0xf800);
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf000);
 	orion128_video_width = SCREEN_WIDTH_384;
 	orion_set_video_mode(machine,384);
 	radio86_init_keyboard();
@@ -302,17 +302,17 @@ static void orionz80_switch_bank(running_machine *machine)
 	bank_select = (orionz80_dispatcher & 0x0c) >> 2;
 	segment_select = orionz80_dispatcher & 0x03;
 
-	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
+	memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
 	if ((orionz80_dispatcher & 0x80)==0)
 	{ // dispatcher on
-		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * bank_select + segment_select * 0x4000 );
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * bank_select + segment_select * 0x4000 );
 	}
 	else
 	{ // dispatcher off
-		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * orionz80_memory_page);
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * orionz80_memory_page);
 	}
 
-	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000 + 0x10000 * orionz80_memory_page);
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000 + 0x10000 * orionz80_memory_page);
 
 	if ((orionz80_dispatcher & 0x20) == 0)
 	{
@@ -327,19 +327,19 @@ static void orionz80_switch_bank(running_machine *machine)
 		memory_install_write8_handler(space, 0xf900, 0xf9ff, 0, 0, orionz80_memory_page_w);
 		memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, orion128_video_page_w);
 		memory_install_write8_handler(space, 0xfb00, 0xfbff, 0, 0, orionz80_dispatcher_w);
-		memory_install_write8_handler(space, 0xfc00, 0xfeff, 0, 0, SMH_UNMAP);
+		memory_unmap_write(space, 0xfc00, 0xfeff, 0, 0);
 		memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
 
-		memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf000);
-		memory_set_bankptr(machine, 5, memory_region(machine, "maincpu") + 0xf800);
+		memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf000);
+		memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") + 0xf800);
 
 	}
 	else
 	{
 		/* if it is full memory access */
-		memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf000 + 0x10000 * orionz80_memory_page);
-		memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf400 + 0x10000 * orionz80_memory_page);
-		memory_set_bankptr(machine, 5, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf800 + 0x10000 * orionz80_memory_page);
+		memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf000 + 0x10000 * orionz80_memory_page);
+		memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf400 + 0x10000 * orionz80_memory_page);
+		memory_set_bankptr(machine, "bank5", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf800 + 0x10000 * orionz80_memory_page);
 	}
 }
 
@@ -359,9 +359,9 @@ MACHINE_RESET ( orionz80 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-	memory_install_write8_handler(space, 0x4000, 0xefff, 0, 0, SMH_BANK(2));
-	memory_install_write8_handler(space, 0xf000, 0xf3ff, 0, 0, SMH_BANK(3));
+	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+	memory_install_write_bank(space, 0x4000, 0xefff, 0, 0, "bank2");
+	memory_install_write_bank(space, 0xf000, 0xf3ff, 0, 0, "bank3");
 
 	memory_install_write8_handler(space, 0xf400, 0xf4ff, 0, 0, orion128_system_w);
 	memory_install_write8_handler(space, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_w);
@@ -374,14 +374,14 @@ MACHINE_RESET ( orionz80 )
 	memory_install_write8_handler(space, 0xf900, 0xf9ff, 0, 0, orionz80_memory_page_w);
 	memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, orion128_video_page_w);
 	memory_install_write8_handler(space, 0xfb00, 0xfbff, 0, 0, orionz80_dispatcher_w);
-	memory_install_write8_handler(space, 0xfc00, 0xfeff, 0, 0, SMH_UNMAP);
+	memory_unmap_write(space, 0xfc00, 0xfeff, 0, 0);
 	memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
 
 
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0xf800);
-	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
-	memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf000);
-	memory_set_bankptr(machine, 5, memory_region(machine, "maincpu") + 0xf800);
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0xf800);
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf000);
+	memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") + 0xf800);
 
 
 	orion128_video_page = 0;
@@ -466,92 +466,92 @@ static void orionpro_bank_switch(running_machine *machine)
 	{
 		page = orionpro_128_page & 7;
 	}
-	memory_install_write8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK(1));
-	memory_install_write8_handler(space, 0x2000, 0x3fff, 0, 0, SMH_BANK(2));
-	memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_BANK(3));
-	memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, SMH_BANK(4));
-	memory_install_write8_handler(space, 0xc000, 0xefff, 0, 0, SMH_BANK(5));
-	memory_install_write8_handler(space, 0xf000, 0xf3ff, 0, 0, SMH_BANK(6));
-	memory_install_write8_handler(space, 0xf400, 0xf7ff, 0, 0, SMH_BANK(7));
-	memory_install_write8_handler(space, 0xf800, 0xffff, 0, 0, SMH_BANK(8));
+	memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank1");
+	memory_install_write_bank(space, 0x2000, 0x3fff, 0, 0, "bank2");
+	memory_install_write_bank(space, 0x4000, 0x7fff, 0, 0, "bank3");
+	memory_install_write_bank(space, 0x8000, 0xbfff, 0, 0, "bank4");
+	memory_install_write_bank(space, 0xc000, 0xefff, 0, 0, "bank5");
+	memory_install_write_bank(space, 0xf000, 0xf3ff, 0, 0, "bank6");
+	memory_install_write_bank(space, 0xf400, 0xf7ff, 0, 0, "bank7");
+	memory_install_write_bank(space, 0xf800, 0xffff, 0, 0, "bank8");
 
 
 	if ((orionpro_dispatcher & 0x01)==0x00)
 	{	// RAM0 segment disabled
-		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page);
-		memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0x2000);
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page);
+		memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0x2000);
 	}
 	else
 	{
-		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + (orionpro_ram0_segment & 31) * 0x4000);
-		memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + (orionpro_ram0_segment & 31) * 0x4000 + 0x2000);
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + (orionpro_ram0_segment & 31) * 0x4000);
+		memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + (orionpro_ram0_segment & 31) * 0x4000 + 0x2000);
 	}
 	if ((orionpro_dispatcher & 0x10)==0x10)
 	{	// ROM1 enabled
-		memory_install_write8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_UNMAP);
-		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x20000);
+		memory_unmap_write(space, 0x0000, 0x1fff, 0, 0);
+		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x20000);
 	}
 	if ((orionpro_dispatcher & 0x08)==0x08)
 	{	// ROM2 enabled
-		memory_install_write8_handler(space, 0x2000, 0x3fff, 0, 0, SMH_UNMAP);
-		memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x22000 + (orionpro_rom2_segment & 7) * 0x2000);
+		memory_unmap_write(space, 0x2000, 0x3fff, 0, 0);
+		memory_set_bankptr(machine, "bank2", memory_region(machine, "maincpu") + 0x22000 + (orionpro_rom2_segment & 7) * 0x2000);
 	}
 
 	if ((orionpro_dispatcher & 0x02)==0x00)
 	{	// RAM1 segment disabled
-		memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0x4000);
+		memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0x4000);
 	}
 	else
 	{
-		memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + (orionpro_ram1_segment & 31) * 0x4000);
+		memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + (orionpro_ram1_segment & 31) * 0x4000);
 	}
 
 	if ((orionpro_dispatcher & 0x04)==0x00)
 	{	// RAM2 segment disabled
-		memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0x8000);
+		memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0x8000);
 	}
 	else
 	{
-		memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + (orionpro_ram2_segment & 31) * 0x4000);
+		memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + (orionpro_ram2_segment & 31) * 0x4000);
 	}
 
-	memory_set_bankptr(machine, 5, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0xc000);
+	memory_set_bankptr(machine, "bank5", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0xc000);
 
 	if (is128)
 	{
-		memory_set_bankptr(machine, 6, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * 0 + 0xf000);
+		memory_set_bankptr(machine, "bank6", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * 0 + 0xf000);
 
 		memory_install_write8_handler(space, 0xf400, 0xf4ff, 0, 0, orion128_system_w);
 		memory_install_write8_handler(space, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_w);
-		memory_install_write8_handler(space, 0xf600, 0xf6ff, 0, 0, SMH_UNMAP);
+		memory_unmap_write(space, 0xf600, 0xf6ff, 0, 0);
 		memory_install_write8_handler(space, 0xf700, 0xf7ff, 0, 0, orion128_floppy_w);
 		memory_install_read8_handler(space, 0xf400, 0xf4ff, 0, 0, orion128_system_r);
 		memory_install_read8_handler(space, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_r);
-		memory_install_read8_handler(space, 0xf600, 0xf6ff, 0, 0, SMH_UNMAP);
+		memory_unmap_read(space, 0xf600, 0xf6ff, 0, 0);
 		memory_install_read8_handler(space, 0xf700, 0xf7ff, 0, 0, orion128_floppy_r);
 
 		memory_install_write8_handler(space, 0xf800, 0xf8ff, 0, 0, orion128_video_mode_w);
 		memory_install_write8_handler(space, 0xf900, 0xf9ff, 0, 0, orionpro_memory_page_w);
 		memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, orion128_video_page_w);
-		memory_install_write8_handler(space, 0xfb00, 0xfeff, 0, 0, SMH_UNMAP);
+		memory_unmap_write(space, 0xfb00, 0xfeff, 0, 0);
 		memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
 
 
-		memory_set_bankptr(machine, 8, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * 0 + 0xf800);
+		memory_set_bankptr(machine, "bank8", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * 0 + 0xf800);
 	}
 	else
 	{
 		if ((orionpro_dispatcher & 0x40)==0x40)
 		{	// FIX F000 enabled
-			memory_set_bankptr(machine, 6, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * 0 + 0xf000);
-			memory_set_bankptr(machine, 7, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * 0 + 0xf400);
-			memory_set_bankptr(machine, 8, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * 0 + 0xf800);
+			memory_set_bankptr(machine, "bank6", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * 0 + 0xf000);
+			memory_set_bankptr(machine, "bank7", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * 0 + 0xf400);
+			memory_set_bankptr(machine, "bank8", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * 0 + 0xf800);
 		}
 		else
 		{
-			memory_set_bankptr(machine, 6, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0xf000);
-			memory_set_bankptr(machine, 7, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0xf400);
-			memory_set_bankptr(machine, 8, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0xf800);
+			memory_set_bankptr(machine, "bank6", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0xf000);
+			memory_set_bankptr(machine, "bank7", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0xf400);
+			memory_set_bankptr(machine, "bank8", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0xf800);
 		}
 	}
 }

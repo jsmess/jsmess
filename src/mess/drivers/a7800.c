@@ -33,18 +33,18 @@
 static ADDRESS_MAP_START( a7800_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0x300) AM_READWRITE(a7800_TIA_r, a7800_TIA_w)
 	AM_RANGE(0x0020, 0x003f) AM_MIRROR(0x300) AM_READWRITE(a7800_MARIA_r, a7800_MARIA_w)
-	AM_RANGE(0x0040, 0x00ff) AM_READWRITE(SMH_BANK(5), a7800_RAM0_w)	/* RAM (6116 block 0) */
-	AM_RANGE(0x0140, 0x01ff) AM_RAMBANK(6)	/* RAM (6116 block 1) */
+	AM_RANGE(0x0040, 0x00ff) AM_READ_BANK("bank5") AM_WRITE(a7800_RAM0_w)	/* RAM (6116 block 0) */
+	AM_RANGE(0x0140, 0x01ff) AM_RAMBANK("bank6")	/* RAM (6116 block 1) */
 	AM_RANGE(0x0280, 0x02ff) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
 	AM_RANGE(0x0480, 0x04ff) AM_MIRROR(0x100) AM_RAM	/* RIOT RAM */
 	AM_RANGE(0x1800, 0x27ff) AM_RAM
-	AM_RANGE(0x2800, 0x2fff) AM_RAMBANK(7)	/* MAINRAM */
-	AM_RANGE(0x3000, 0x37ff) AM_RAMBANK(7)	/* MAINRAM */
-	AM_RANGE(0x3800, 0x3fff) AM_RAMBANK(7)	/* MAINRAM */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)						/* f18 hornet */
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(2)						/* sc */
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(3)						/* sc + ac */
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(4)						/* ac */
+	AM_RANGE(0x2800, 0x2fff) AM_RAMBANK("bank7")	/* MAINRAM */
+	AM_RANGE(0x3000, 0x37ff) AM_RAMBANK("bank7")	/* MAINRAM */
+	AM_RANGE(0x3800, 0x3fff) AM_RAMBANK("bank7")	/* MAINRAM */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")						/* f18 hornet */
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")						/* sc */
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank3")						/* sc + ac */
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank4")						/* ac */
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(a7800_cart_w)
 ADDRESS_MAP_END

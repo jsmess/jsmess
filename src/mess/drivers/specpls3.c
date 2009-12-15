@@ -237,16 +237,16 @@ void spectrum_plus3_update_memory(running_machine *machine)
 			ram_page = spectrum_128_port_7ffd_data & 0x07;
 			ram_data = messram_get_ptr(devtag_get_device(machine, "messram")) + (ram_page<<14);
 
-			memory_set_bankptr(machine, 4, ram_data);
+			memory_set_bankptr(machine, "bank4", ram_data);
 
 			logerror("RAM at 0xc000: %02x\n", ram_page);
 
 			/* Reset memory between 0x4000 - 0xbfff in case extended paging was being used */
 			/* Bank 5 in 0x4000 - 0x7fff */
-			memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + (5 << 14));
+			memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + (5 << 14));
 
 			/* Bank 2 in 0x8000 - 0xbfff */
-			memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + (2 << 14));
+			memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + (2 << 14));
 
 
 			ROMSelection = ((spectrum_128_port_7ffd_data >> 4) & 0x01) |
@@ -256,8 +256,8 @@ void spectrum_plus3_update_memory(running_machine *machine)
 
 			ChosenROM = memory_region(machine, "maincpu") + 0x010000 + (ROMSelection << 14);
 
-			memory_set_bankptr(machine, 1, ChosenROM);
-			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+			memory_set_bankptr(machine, "bank1", ChosenROM);
+			memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 
 			logerror("rom switch: %02x\n", ROMSelection);
 	}
@@ -274,18 +274,18 @@ void spectrum_plus3_update_memory(running_machine *machine)
 			memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
 
 			ram_data = messram_get_ptr(devtag_get_device(machine, "messram")) + (memory_selection[0] << 14);
-			memory_set_bankptr(machine, 1, ram_data);
+			memory_set_bankptr(machine, "bank1", ram_data);
 			/* allow writes to 0x0000-0x03fff */
-			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
+			memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
 
 			ram_data = messram_get_ptr(devtag_get_device(machine, "messram")) + (memory_selection[1] << 14);
-			memory_set_bankptr(machine, 2, ram_data);
+			memory_set_bankptr(machine, "bank2", ram_data);
 
 			ram_data = messram_get_ptr(devtag_get_device(machine, "messram")) + (memory_selection[2] << 14);
-			memory_set_bankptr(machine, 3, ram_data);
+			memory_set_bankptr(machine, "bank3", ram_data);
 
 			ram_data = messram_get_ptr(devtag_get_device(machine, "messram")) + (memory_selection[3] << 14);
-			memory_set_bankptr(machine, 4, ram_data);
+			memory_set_bankptr(machine, "bank4", ram_data);
 
 			logerror("extended memory paging: %02x\n", MemorySelection);
 		}

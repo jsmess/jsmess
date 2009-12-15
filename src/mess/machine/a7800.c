@@ -82,17 +82,15 @@ static void a7800_driver_init(running_machine *machine, int ispal, int lines)
 	a7800_lines = lines;
 
 	/* standard banks */
-	memory_set_bankptr(machine, 5, &ROM[0x2040]);		/* RAM0 */
-	memory_set_bankptr(machine, 6, &ROM[0x2140]);		/* RAM1 */
-	memory_set_bankptr(machine, 7, &ROM[0x2000]);		/* MAINRAM */
+	memory_set_bankptr(machine, "bank5", &ROM[0x2040]);		/* RAM0 */
+	memory_set_bankptr(machine, "bank6", &ROM[0x2140]);		/* RAM1 */
+	memory_set_bankptr(machine, "bank7", &ROM[0x2000]);		/* MAINRAM */
 
 	/* Brutal hack put in as a consequence of new memory system; fix this */
-	memory_install_read8_handler(space, 0x0480, 0x04FF, 0, 0, SMH_BANK(10));
-	memory_install_write8_handler(space, 0x0480, 0x04FF, 0, 0, SMH_BANK(10));
-	memory_set_bankptr(machine, 10, ROM + 0x0480);
-	memory_install_read8_handler(space, 0x1800, 0x27FF, 0, 0, SMH_BANK(11));
-	memory_install_write8_handler(space, 0x1800, 0x27FF, 0, 0, SMH_BANK(11));
-	memory_set_bankptr(machine, 11, ROM + 0x1800);
+	memory_install_readwrite_bank(space, 0x0480, 0x04FF, 0, 0,"bank10");
+	memory_set_bankptr(machine, "bank10", ROM + 0x0480);
+	memory_install_readwrite_bank(space, 0x1800, 0x27FF, 0, 0, "bank11");
+	memory_set_bankptr(machine, "bank11", ROM + 0x1800);
 }
 
 
@@ -119,10 +117,10 @@ MACHINE_RESET( a7800 )
 
 	/* set banks to default states */
 	memory = memory_region(machine, "maincpu");
-	memory_set_bankptr(machine,  1, memory + 0x4000 );
-	memory_set_bankptr(machine,  2, memory + 0x8000 );
-	memory_set_bankptr(machine,  3, memory + 0xA000 );
-	memory_set_bankptr(machine,  4, memory + 0xC000 );
+	memory_set_bankptr(machine,  "bank1", memory + 0x4000 );
+	memory_set_bankptr(machine,  "bank2", memory + 0x8000 );
+	memory_set_bankptr(machine,  "bank3", memory + 0xA000 );
+	memory_set_bankptr(machine,  "bank4", memory + 0xC000 );
 
 	/* pokey cartridge */
 	if (a7800_cart_type & 0x01)
@@ -370,8 +368,8 @@ WRITE8_HANDLER( a7800_cart_w )
 		{
 			data &= 0x07;
 		}
-		memory_set_bankptr(space->machine, 2,memory + 0x10000 + (data << 14));
-		memory_set_bankptr(space->machine, 3,memory + 0x12000 + (data << 14));
+		memory_set_bankptr(space->machine, "bank2",memory + 0x10000 + (data << 14));
+		memory_set_bankptr(space->machine, "bank3",memory + 0x12000 + (data << 14));
 	/*  logerror("BANK SEL: %d\n",data); */
 	}
 	else if(( a7800_cart_type == MBANK_TYPE_ABSOLUTE ) &&( offset == 0x4000 ) )
@@ -380,11 +378,11 @@ WRITE8_HANDLER( a7800_cart_w )
 		/*logerror( "F18 BANK SEL: %d\n", data );*/
 		if( data & 1 )
 		{
-			memory_set_bankptr(space->machine, 1,memory + 0x10000 );
+			memory_set_bankptr(space->machine, "bank1",memory + 0x10000 );
 		}
 		else if( data & 2 )
 		{
-			memory_set_bankptr(space->machine, 1,memory + 0x14000 );
+			memory_set_bankptr(space->machine, "bank1",memory + 0x14000 );
 		}
 	}
 	else if(( a7800_cart_type == MBANK_TYPE_ACTIVISION ) &&( offset >= 0xBF80 ) )
@@ -394,8 +392,8 @@ WRITE8_HANDLER( a7800_cart_w )
 
 		/*logerror( "Activision BANK SEL: %d\n", data );*/
 
-		memory_set_bankptr(space->machine,  3, memory + 0x10000 + ( data << 14 ) );
-		memory_set_bankptr(space->machine,  4, memory + 0x12000 + ( data << 14 ) );
+		memory_set_bankptr(space->machine,  "bank3", memory + 0x10000 + ( data << 14 ) );
+		memory_set_bankptr(space->machine,  "bank4", memory + 0x12000 + ( data << 14 ) );
 	}
 }
 

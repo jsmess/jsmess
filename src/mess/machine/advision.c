@@ -29,10 +29,10 @@
 MACHINE_START( advision )
 {
 	/* configure EA banking */
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "bios"), 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, I8048_TAG), 0);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8048_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "bios"), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, I8048_TAG), 0);
+	memory_install_readwrite_bank(cputag_get_address_space(machine, I8048_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank1");
+	memory_set_bank(machine, "bank1", 0);
 }
 
 MACHINE_RESET( advision )
@@ -44,7 +44,7 @@ MACHINE_RESET( advision )
 
 	/* enable internal ROM */
 	cputag_set_input_line(machine, I8048_TAG, MCS48_INPUT_EA, CLEAR_LINE);
-	memory_set_bank(machine, 1, 0);
+	memory_set_bank(machine, "bank1", 0);
 
 	/* reset sound CPU */
 	cputag_set_input_line(machine, COP411_TAG, INPUT_LINE_RESET, ASSERT_LINE);
@@ -65,7 +65,7 @@ WRITE8_HANDLER( advision_bankswitch_w )
 
 	cputag_set_input_line(space->machine, I8048_TAG, MCS48_INPUT_EA, ea ? ASSERT_LINE : CLEAR_LINE);
 
-	memory_set_bank(space->machine, 1, ea);
+	memory_set_bank(space->machine, "bank1", ea);
 
 	state->rambank = (data & 0x03) << 8;
 }

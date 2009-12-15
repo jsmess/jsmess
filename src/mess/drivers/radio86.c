@@ -19,7 +19,7 @@
 
 /* Address maps */
 static ADDRESS_MAP_START(radio86_mem, ADDRESS_SPACE_PROGRAM, 8)
-    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK(1) // First bank
+    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
     AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w) AM_MIRROR(0x1ffc)
     //AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w) AM_MIRROR(0x1ffc)
@@ -39,7 +39,7 @@ static ADDRESS_MAP_START( rk7007_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(radio86rom_mem, ADDRESS_SPACE_PROGRAM, 8)
-    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK(1) // First bank
+    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
     AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w) AM_MIRROR(0x1ffc)
     AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w) AM_MIRROR(0x1ffc)
@@ -49,7 +49,7 @@ static ADDRESS_MAP_START(radio86rom_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(radio86ram_mem, ADDRESS_SPACE_PROGRAM, 8)
-    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK(1) // First bank
+    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0xdfff ) AM_RAM  // RAM
     AM_RANGE( 0xe000, 0xe7ff ) AM_ROM  // System ROM page 2
     AM_RANGE( 0xe800, 0xf5ff ) AM_RAM  // RAM
@@ -63,7 +63,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(radio86_16_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK(1) // First bank
+    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0x3fff ) AM_RAM  // RAM
     AM_RANGE( 0x4000, 0x7fff ) AM_READ(radio_cpu_state_r)
     AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w) AM_MIRROR(0x1ffc)
@@ -75,7 +75,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(mikron2_mem, ADDRESS_SPACE_PROGRAM, 8)
-    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK(1) // First bank
+    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
     AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w) AM_MIRROR(0x00fc)
     //AM_RANGE( 0xc100, 0xc103 ) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w) AM_MIRROR(0x00fc)

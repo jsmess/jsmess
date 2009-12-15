@@ -21,8 +21,8 @@ DRIVER_INIT(mikro80)
 	/* set initialy ROM to be visible on first bank */
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memset(RAM,0x0000,0x0800); // make frist page empty by default
-  	memory_configure_bank(machine, 1, 1, 2, RAM, 0x0000);
-	memory_configure_bank(machine, 1, 0, 2, RAM, 0xf800);
+  	memory_configure_bank(machine, "bank1", 1, 2, RAM, 0x0000);
+	memory_configure_bank(machine, "bank1", 0, 2, RAM, 0xf800);
 	mikro80_key_mask = 0x7f;
 }
 
@@ -77,13 +77,13 @@ I8255A_INTERFACE( mikro80_ppi8255_interface )
 
 static TIMER_CALLBACK( mikro80_reset )
 {
-	memory_set_bank(machine,1, 0);
+	memory_set_bank(machine,"bank1", 0);
 }
 
 MACHINE_RESET( mikro80 )
 {
 	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, mikro80_reset);
-	memory_set_bank(machine, 1, 1);
+	memory_set_bank(machine, "bank1", 1);
 	mikro80_keyboard_mask = 0;
 }
 

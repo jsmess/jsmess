@@ -23,7 +23,8 @@
     DEBUGGING
 ***************************************************************************/
 
-#define REPORT_TIMES		(0)
+#define REPORT_TIMES				(0)
+#define DETECT_OVERLAPPING_MEMORY 	(0)
 
 
 
@@ -320,7 +321,7 @@ static int validate_driver(int drivnum, const machine_config *config, tagmap *na
 	enum { NAME_LEN_PARENT = 8, NAME_LEN_CLONE = 16 };
 
 	/* check for duplicate names */
-	if (tagmap_add(names, driver->name, (void *)driver) == TMERR_DUPLICATE)
+	if (tagmap_add(names, driver->name, (void *)driver, FALSE) == TMERR_DUPLICATE)
 	{
 		const game_driver *match = tagmap_find(names, driver->name);
 		mame_printf_error("%s: %s is a duplicate name (%s, %s)\n", driver->source_file, driver->name, match->source_file, match->name);
@@ -328,7 +329,7 @@ static int validate_driver(int drivnum, const machine_config *config, tagmap *na
 	}
 
 	/* check for duplicate descriptions */
-	if (tagmap_add(descriptions, driver->description, (void *)driver) == TMERR_DUPLICATE)
+	if (tagmap_add(descriptions, driver->description, (void *)driver, FALSE) == TMERR_DUPLICATE)
 	{
 		const game_driver *match = tagmap_find(descriptions, driver->description);
 		mame_printf_error("%s: %s is a duplicate description (%s, %s)\n", driver->source_file, driver->description, match->source_file, match->description);
@@ -414,7 +415,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 	{
 		char romaddr[20];
 		sprintf(romaddr, "%p", driver->rom);
-		if (tagmap_add(roms, romaddr, (void *)driver) == TMERR_DUPLICATE)
+		if (tagmap_add(roms, romaddr, (void *)driver, FALSE) == TMERR_DUPLICATE)
 		{
 			const game_driver *match = tagmap_find(roms, romaddr);
 			mame_printf_error("%s: %s uses the same ROM set as (%s, %s)\n", driver->source_file, driver->description, match->source_file, match->name);
@@ -1253,6 +1254,7 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 	for (device = device_list_first(&config->devicelist, DEVICE_TYPE_WILDCARD); device != NULL; device = device_list_next(device, DEVICE_TYPE_WILDCARD))
 	{
 		device_validity_check_func validity_check = (device_validity_check_func) device_get_info_fct(device, DEVINFO_FCT_VALIDITY_CHECK);
+		int detected_overlap = DETECT_OVERLAPPING_MEMORY ? FALSE : TRUE;
 		const device_config *scandevice;
 		int spacenum;
 
@@ -1283,7 +1285,7 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 			address_map *map;
 
 			/* construct the maps */
-			map = address_map_alloc(device, driver, spacenum);
+			map = address_map_alloc(device, driver, spacenum, NULL);
 
 			/* if this is an empty map, just skip it */
 			if (map->entrylist == NULL)
@@ -1310,6 +1312,21 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 				UINT32 bytestart = SPACE_SHIFT(entry->addrstart);
 				UINT32 byteend = SPACE_SHIFT_END(entry->addrend);
 
+				/* look for overlapping entries */
+				if (!detected_overlap)
+				{
+					address_map_entry *scan;
+					for (scan = map->entrylist; scan != entry; scan = scan->next)
+						if (entry->addrstart <= scan->addrend && entry->addrend >= scan->addrstart &&
+							((entry->read.type != AMH_NONE && scan->read.type != AMH_NONE) ||
+							 (entry->write.type != AMH_NONE && scan->write.type != AMH_NONE)))
+						{
+							mame_printf_warning("%s: %s '%s' %s space has overlapping memory (%X-%X,%d,%d) vs (%X-%X,%d,%d)\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->addrstart, entry->addrend, entry->read.type, entry->write.type, scan->addrstart, scan->addrend, scan->read.type, scan->write.type);
+							detected_overlap = TRUE;
+							break;
+						}
+				}
+
 				/* look for inverted start/end pairs */
 				if (byteend < bytestart)
 				{
@@ -1325,7 +1342,7 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 				}
 
 				/* if this is a program space, auto-assign implicit ROM entries */
-				if ((FPTR)entry->read.generic == STATIC_ROM && entry->region == NULL)
+				if (entry->read.type == AMH_ROM && entry->region == NULL)
 				{
 					entry->region = device->tag;
 					entry->rgnoffs = entry->addrstart;
@@ -1362,28 +1379,38 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 				}
 
 				/* make sure all devices exist */
-				if (entry->read_devtag != NULL && device_list_find_by_tag(&config->devicelist, entry->read_devtag) == NULL)
+				if ((entry->read.type == AMH_DEVICE_HANDLER && entry->read.tag != NULL && device_list_find_by_tag(&config->devicelist, entry->read.tag) == NULL) ||
+					(entry->write.type == AMH_DEVICE_HANDLER && entry->write.tag != NULL && device_list_find_by_tag(&config->devicelist, entry->write.tag) == NULL))
 				{
-					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant device '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->read_devtag);
-					error = TRUE;
-				}
-				if (entry->write_devtag != NULL && device_list_find_by_tag(&config->devicelist, entry->write_devtag) == NULL)
-				{
-					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant device '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->write_devtag);
+					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant device '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->write.tag);
 					error = TRUE;
 				}
 
 				/* make sure ports exist */
-				if (entry->read_porttag != NULL && input_port_by_tag(portlist, entry->read_porttag) == NULL)
+				if ((entry->read.type == AMH_PORT && entry->read.tag != NULL && input_port_by_tag(portlist, entry->read.tag) == NULL) ||
+					(entry->write.type == AMH_PORT && entry->write.tag != NULL && input_port_by_tag(portlist, entry->write.tag) == NULL))
 				{
-					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->read_porttag);
+					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->read.tag);
 					error = TRUE;
 				}
 
-				/* make sure ports exist */
-				if (entry->write_porttag != NULL && input_port_by_tag(portlist, entry->write_porttag) == NULL)
+				/* validate bank and share tags */
+				if (entry->read.type == AMH_BANK)
+					error |= validate_tag(driver, "bank", entry->read.tag);
+				if (entry->write.type == AMH_BANK)
+					error |= validate_tag(driver, "bank", entry->write.tag);
+				if (entry->share != NULL)
+					error |= validate_tag(driver, "share", entry->share);
+
+				/* if there are base or size members, check that they are within bounds */
+				if (entry->baseptroffs_plus1 != 0 && (entry->baseptroffs_plus1 - 1) >= config->driver_data_size)
 				{
-					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->write_porttag);
+					mame_printf_error("%s: %s device '%s' %s space memory map has an out of bounds AM_BASE_MEMBER entry\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum]);
+					error = TRUE;
+				}
+				if (entry->sizeptroffs_plus1 != 0 && (entry->sizeptroffs_plus1 - 1) >= config->driver_data_size)
+				{
+					mame_printf_error("%s: %s device '%s' %s space memory map has an out of bounds AM_SIZE_MEMBER entry\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum]);
 					error = TRUE;
 				}
 			}
@@ -1469,7 +1496,7 @@ int mame_validitychecks(const game_driver *curdriver)
 	{
 		const char *string = input_port_string_from_index(strnum);
 		if (string != NULL)
-			tagmap_add(defstr, string, (void *)(FPTR)strnum);
+			tagmap_add(defstr, string, (void *)(FPTR)strnum, FALSE);
 	}
 	prep += get_profile_ticks();
 

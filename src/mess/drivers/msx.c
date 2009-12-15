@@ -297,17 +297,17 @@ PCB Layouts missing
 #include "sound/2413intf.h"
 
 static ADDRESS_MAP_START (msx_memory_map, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x1fff) AM_READWRITE( SMH_BANK(1), msx_page0_w )
-	AM_RANGE( 0x2000, 0x3fff) AM_READWRITE( SMH_BANK(2), msx_page0_1_w )
-	AM_RANGE( 0x4000, 0x5fff) AM_READWRITE( SMH_BANK(3), msx_page1_w )
-	AM_RANGE( 0x6000, 0x7ff7) AM_READWRITE( SMH_BANK(4), msx_page1_1_w )
-	AM_RANGE( 0x7ff8, 0x7fff) AM_READWRITE( SMH_BANK(5), msx_page1_2_w )
-	AM_RANGE( 0x8000, 0x97ff) AM_READWRITE( SMH_BANK(6), msx_page2_w )
-	AM_RANGE( 0x9800, 0x9fff) AM_READWRITE( SMH_BANK(7), msx_page2_1_w )
-	AM_RANGE( 0xa000, 0xb7ff) AM_READWRITE( SMH_BANK(8), msx_page2_2_w )
-	AM_RANGE( 0xb800, 0xbfff) AM_READWRITE( SMH_BANK(9), msx_page2_3_w )
-	AM_RANGE( 0xc000, 0xdfff) AM_READWRITE( SMH_BANK(10), msx_page3_w )
-	AM_RANGE( 0xe000, 0xfffe) AM_READWRITE( SMH_BANK(11), msx_page3_1_w )
+	AM_RANGE( 0x0000, 0x1fff) AM_READ_BANK("bank1") AM_WRITE( msx_page0_w )
+	AM_RANGE( 0x2000, 0x3fff) AM_READ_BANK("bank2") AM_WRITE( msx_page0_1_w )
+	AM_RANGE( 0x4000, 0x5fff) AM_READ_BANK("bank3") AM_WRITE( msx_page1_w )
+	AM_RANGE( 0x6000, 0x7ff7) AM_READ_BANK("bank4") AM_WRITE( msx_page1_1_w )
+	AM_RANGE( 0x7ff8, 0x7fff) AM_READ_BANK("bank5") AM_WRITE( msx_page1_2_w )
+	AM_RANGE( 0x8000, 0x97ff) AM_READ_BANK("bank6") AM_WRITE( msx_page2_w )
+	AM_RANGE( 0x9800, 0x9fff) AM_READ_BANK("bank7") AM_WRITE(msx_page2_1_w )
+	AM_RANGE( 0xa000, 0xb7ff) AM_READ_BANK("bank8") AM_WRITE( msx_page2_2_w )
+	AM_RANGE( 0xb800, 0xbfff) AM_READ_BANK("bank9") AM_WRITE( msx_page2_3_w )
+	AM_RANGE( 0xc000, 0xdfff) AM_READ_BANK("bank10") AM_WRITE( msx_page3_w )
+	AM_RANGE( 0xe000, 0xfffe) AM_READ_BANK("bank11") AM_WRITE( msx_page3_1_w )
 	AM_RANGE( 0xffff, 0xffff) AM_READWRITE( msx_sec_slot_r, msx_sec_slot_w )
 ADDRESS_MAP_END
 

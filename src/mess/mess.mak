@@ -248,15 +248,12 @@ DRVLIBS = \
 	$(MESSOBJ)/amiga.a \
 	$(MESSOBJ)/amstrad.a \
 	$(MESSOBJ)/apf.a \
-	$(MESSOBJ)/apple.a \
 	$(MESSOBJ)/applied.a \
 	$(MESSOBJ)/arcadia.a \
 	$(MESSOBJ)/ascii.a \
 	$(MESSOBJ)/at.a \
-	$(MESSOBJ)/atari.a \
 	$(MESSOBJ)/bally.a \
 	$(MESSOBJ)/bandai.a \
-	$(MESSOBJ)/be.a \
 	$(MESSOBJ)/bnpo.a \
 	$(MESSOBJ)/bondwell.a \
 	$(MESSOBJ)/booth.a \
@@ -270,7 +267,6 @@ DRVLIBS = \
 	$(MESSOBJ)/coleco.a \
 	$(MESSOBJ)/comx.a \
 	$(MESSOBJ)/concept.a \
-	$(MESSOBJ)/conitec.a \
 	$(MESSOBJ)/cybiko.a \
 	$(MESSOBJ)/dai.a \
 	$(MESSOBJ)/ddr.a \
@@ -300,7 +296,6 @@ DRVLIBS = \
 	$(MESSOBJ)/hegener.a \
 	$(MESSOBJ)/homebrew.a \
 	$(MESSOBJ)/homelab.a \
-	$(MESSOBJ)/hp.a \
 	$(MESSOBJ)/intel.a \
 	$(MESSOBJ)/intelgnt.a \
 	$(MESSOBJ)/interact.a \
@@ -310,7 +305,6 @@ DRVLIBS = \
 	$(MESSOBJ)/kaypro.a \
 	$(MESSOBJ)/koei.a \
 	$(MESSOBJ)/kyocera.a \
-	$(MESSOBJ)/luxor.a \
 	$(MESSOBJ)/magnavox.a \
 	$(MESSOBJ)/matsushi.a \
 	$(MESSOBJ)/mattel.a \
@@ -370,21 +364,25 @@ DRVLIBS = \
 	$(MESSOBJ)/tem.a \
 	$(MESSOBJ)/tesla.a \
 	$(MESSOBJ)/thomson.a \
-	$(MESSOBJ)/ti.a \
 	$(MESSOBJ)/tiger.a \
 	$(MESSOBJ)/tiki.a \
 	$(MESSOBJ)/tomy.a \
-	$(MESSOBJ)/trs.a \
 	$(MESSOBJ)/unisys.a \
 	$(MESSOBJ)/veb.a \
-	$(MESSOBJ)/visual.a \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/xerox.a \
 	$(MESSOBJ)/zvt.a \
 	$(MESSOBJ)/shared.a \
-
-
+#	$(MESSOBJ)/atari.a \
+#	$(MESSOBJ)/apple.a \
+#	$(MESSOBJ)/be.a \
+#	$(MESSOBJ)/conitec.a \
+#	$(MESSOBJ)/hp.a \
+#	$(MESSOBJ)/luxor.a \
+#	$(MESSOBJ)/ti.a \
+#	$(MESSOBJ)/trs.a \
+#	$(MESSOBJ)/visual.a \
 
 #-------------------------------------------------
 # the following files are general components and
@@ -395,6 +393,7 @@ $(MESSOBJ)/shared.a: \
 	$(MAME_MACHINE)/pckeybrd.o	\
 	$(MESS_AUDIO)/lmc1992.o		\
 	$(MESS_AUDIO)/mea8000.o		\
+	$(MESS_AUDIO)/spchroms.o	\
 	$(MESS_DEVICES)/bitbngr.o	\
 	$(MESS_DEVICES)/cartslot.o	\
 	$(MESS_DEVICES)/cassette.o	\
@@ -490,7 +489,9 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_VIDEO)/sed1330.o		\
 	$(MESS_VIDEO)/tms3556.o		\
 	$(MESS_VIDEO)/upd7220.o		\
-
+	$(MESS_MACHINE)/applefdc.o	\
+	$(MESS_DEVICES)/sonydriv.o	\
+	$(MESS_DEVICES)/appldriv.o	\
 
 
 
@@ -566,9 +567,6 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_MACHINE)/mockngbd.o	\
 	$(MESS_MACHINE)/lisa.o		\
 	$(MESS_DRIVERS)/lisa.o		\
-	$(MESS_MACHINE)/applefdc.o	\
-	$(MESS_DEVICES)/sonydriv.o	\
-	$(MESS_DEVICES)/appldriv.o	\
 	$(MESS_AUDIO)/mac.o			\
 	$(MESS_VIDEO)/mac.o			\
 	$(MESS_MACHINE)/mac.o		\
@@ -1418,8 +1416,7 @@ $(MESSOBJ)/ti.a:				\
 	$(MESS_MACHINE)/ti99pcod.o	\
 	$(MESS_MACHINE)/strata.o	\
 	$(MESS_MACHINE)/geneve.o	\
-	$(MESS_MACHINE)/990_dk.o	\
-	$(MESS_AUDIO)/spchroms.o	\
+	$(MESS_MACHINE)/990_dk.o	\	
 	$(MESS_DRIVERS)/ti990_4.o	\
 	$(MESS_DRIVERS)/ti99_4x.o	\
 	$(MESS_DRIVERS)/ti99_4p.o	\

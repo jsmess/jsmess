@@ -109,31 +109,10 @@
 
 #define GX_DEBUG     0
 
-VIDEO_START(konamigx_5bpp);
-VIDEO_START(konamigx_6bpp);
-VIDEO_START(konamigx_6bpp_2);
-VIDEO_START(konamigx_type3);
-VIDEO_START(konamigx_type4);
-VIDEO_START(konamigx_type4_sd2);
-VIDEO_START(le2);
-VIDEO_START(dragoonj);
-VIDEO_START(winspike);
-VIDEO_START(opengolf);
-VIDEO_START(racinfrc);
-VIDEO_UPDATE(konamigx);
-
 static MACHINE_START(konamigx);
 static MACHINE_RESET(konamigx);
 
-WRITE32_HANDLER( konamigx_palette_w );
-WRITE32_HANDLER( konamigx_palette2_w );
-WRITE32_HANDLER( konamigx_555_palette_w );
-WRITE32_HANDLER( konamigx_555_palette2_w );
-WRITE32_HANDLER( konamigx_tilebank_w );
-
 UINT32 *gx_psacram, *gx_subpaletteram32;
-WRITE32_HANDLER( konamigx_t1_psacmap_w );
-WRITE32_HANDLER( konamigx_t4_psacmap_w );
 
 static int konamigx_cfgport;
 
@@ -702,8 +681,6 @@ static INTERRUPT_GEN(konamigx_vbinterrupt)
 	dmastart_callback(0);
 }
 
-extern int konamigx_current_frame;
-
 static INTERRUPT_GEN(konamigx_vbinterrupt_type4)
 {
 	// lift idle suspension
@@ -1242,9 +1219,6 @@ static ADDRESS_MAP_START( gx_type2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
-extern WRITE32_HANDLER( konamigx_type3_psac2_bank_w );
-extern UINT32* konamigx_type3_psac2_bank;
-
 static ADDRESS_MAP_START( gx_type3_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM
 	//AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
@@ -1342,7 +1316,7 @@ static WRITE16_HANDLER(tms57002_control_word_w)
 
 /* 68000 memory handling */
 static ADDRESS_MAP_START( gxsndmap, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(&gx_sndram)
 	AM_RANGE(0x200000, 0x2004ff) AM_READWRITE(dual539_r, dual539_w)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(tms57002_data_word_r, tms57002_data_word_w)

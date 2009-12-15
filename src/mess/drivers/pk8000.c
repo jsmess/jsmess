@@ -34,51 +34,51 @@ static void pk8000_set_bank(running_machine *machine,UINT8 data)
 
 	switch(block1) {
 		case 0:
-				memory_set_bankptr(machine, 1, rom + 0x10000);
-				memory_set_bankptr(machine, 5, messram_get_ptr(devtag_get_device(machine, "messram")));
+				memory_set_bankptr(machine, "bank1", rom + 0x10000);
+				memory_set_bankptr(machine, "bank5", messram_get_ptr(devtag_get_device(machine, "messram")));
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
-				memory_set_bankptr(machine, 5, messram_get_ptr(devtag_get_device(machine, "messram")));
+				memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
+				memory_set_bankptr(machine, "bank5", messram_get_ptr(devtag_get_device(machine, "messram")));
 				break;
 	}
 
 	switch(block2) {
 		case 0:
-				memory_set_bankptr(machine, 2, rom + 0x14000);
-				memory_set_bankptr(machine, 6, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+				memory_set_bankptr(machine, "bank2", rom + 0x14000);
+				memory_set_bankptr(machine, "bank6", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
-				memory_set_bankptr(machine, 6, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+				memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+				memory_set_bankptr(machine, "bank6", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 				break;
 	}
 	switch(block3) {
 		case 0:
-				memory_set_bankptr(machine, 3, rom + 0x18000);
-				memory_set_bankptr(machine, 7, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+				memory_set_bankptr(machine, "bank3", rom + 0x18000);
+				memory_set_bankptr(machine, "bank7", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
-				memory_set_bankptr(machine, 7, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+				memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+				memory_set_bankptr(machine, "bank7", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
 				break;
 	}
 	switch(block4) {
 		case 0:
-				memory_set_bankptr(machine, 4, rom + 0x1c000);
-				memory_set_bankptr(machine, 8, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+				memory_set_bankptr(machine, "bank4", rom + 0x1c000);
+				memory_set_bankptr(machine, "bank8", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
-				memory_set_bankptr(machine, 8, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+				memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+				memory_set_bankptr(machine, "bank8", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
 				break;
 	}
 }
@@ -157,10 +157,10 @@ static READ8_HANDLER(pk8000_joy_2_r)
 
 static ADDRESS_MAP_START(pk8000_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x3fff ) AM_READWRITE(SMH_BANK(1), SMH_BANK(5))
-	AM_RANGE( 0x4000, 0x7fff ) AM_READWRITE(SMH_BANK(2), SMH_BANK(6))
-	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(SMH_BANK(3), SMH_BANK(7))
-	AM_RANGE( 0xc000, 0xffff ) AM_READWRITE(SMH_BANK(4), SMH_BANK(8))
+	AM_RANGE( 0x0000, 0x3fff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
+	AM_RANGE( 0x4000, 0x7fff ) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
+	AM_RANGE( 0x8000, 0xbfff ) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
+	AM_RANGE( 0xc000, 0xffff ) AM_READ_BANK("bank4") AM_WRITE_BANK("bank8")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pk8000_io , ADDRESS_SPACE_IO, 8)

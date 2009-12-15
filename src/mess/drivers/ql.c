@@ -216,7 +216,7 @@ static READ8_HANDLER( ipc_bus_r )
 
 static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM	// 48K System ROM
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROMBANK(1) // 16K Cartridge ROM
+	AM_RANGE(0x00c000, 0x00ffff) AM_ROMBANK("bank1") // 16K Cartridge ROM
 	AM_RANGE(0x010000, 0x017fff) AM_UNMAP // 32K Expansion I/O
 	AM_RANGE(0x018000, 0x018003) AM_DEVREAD(ZX8302_TAG, zx8302_rtc_r)
 	AM_RANGE(0x018000, 0x018001) AM_DEVWRITE(ZX8302_TAG, zx8302_rtc_w)
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x018063, 0x018063) AM_DEVWRITE(ZX8301_TAG, zx8301_control_w)
 	AM_RANGE(0x01c000, 0x01ffff) AM_UNMAP // 16K Expansion I/O
 	AM_RANGE(0x020000, 0x03ffff) AM_DEVREADWRITE(ZX8301_TAG, zx8301_ram_r, zx8301_ram_w)
-	AM_RANGE(0x040000, 0x0fffff) AM_RAMBANK(2)
+	AM_RANGE(0x040000, 0x0fffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ipc_io_map, ADDRESS_SPACE_IO, 8 )
@@ -535,45 +535,45 @@ static MACHINE_START( ql )
 
 	/* configure ROM cartridge */
 
-	memory_install_readwrite8_handler(program, 0x00c000, 0x00ffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, M68008_TAG) + 0x00c000, 0);
-	memory_set_bank(machine, 1, 0);
+	memory_unmap_readwrite(program, 0x00c000, 0x00ffff, 0, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, M68008_TAG) + 0x00c000, 0);
+	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM */
 
 	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 128*1024:
-		memory_install_readwrite8_handler(program, 0x040000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_unmap_readwrite(program, 0x040000, 0x0fffff, 0, 0);
 		break;
 
 	case 192*1024:
-		memory_install_readwrite8_handler(program, 0x040000, 0x04ffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
-		memory_install_readwrite8_handler(program, 0x050000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite_bank(program, 0x040000, 0x04ffff, 0, 0, "bank2");
+		memory_unmap_readwrite(program, 0x050000, 0x0fffff, 0, 0);
 		break;
 
 	case 256*1024:
-		memory_install_readwrite8_handler(program, 0x040000, 0x05ffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
-		memory_install_readwrite8_handler(program, 0x060000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite_bank(program, 0x040000, 0x05ffff, 0, 0, "bank2");
+		memory_unmap_readwrite(program, 0x060000, 0x0fffff, 0, 0);
 		break;
 
 	case 384*1024:
-		memory_install_readwrite8_handler(program, 0x040000, 0x07ffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
-		memory_install_readwrite8_handler(program, 0x080000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite_bank(program, 0x040000, 0x07ffff, 0, 0, "bank2");
+		memory_unmap_readwrite(program, 0x080000, 0x0fffff, 0, 0);
 		break;
 
 	case 640*1024:
-		memory_install_readwrite8_handler(program, 0x040000, 0x0bffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
-		memory_install_readwrite8_handler(program, 0x0c0000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite_bank(program, 0x040000, 0x0bffff, 0, 0, "bank2");
+		memory_unmap_readwrite(program, 0x0c0000, 0x0fffff, 0, 0);
 		break;
 
 	case 896*1024:
-		memory_install_readwrite8_handler(program, 0x040000, 0x0fffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		memory_install_readwrite_bank(program, 0x040000, 0x0fffff, 0, 0, "bank2");
 		break;
 	}
 
-	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, M68008_TAG) + 0x050000, 0);
-	memory_set_bank(machine, 2, 0);
+	memory_configure_bank(machine, "bank2", 0, 1, memory_region(machine, M68008_TAG) + 0x050000, 0);
+	memory_set_bank(machine, "bank2", 0);
 
 	// find devices
 
@@ -602,7 +602,8 @@ static DEVICE_IMAGE_LOAD( ql_cart )
 	{
 		if (image_fread(image, ptr, filesize) == filesize)
 		{
-			memory_install_readwrite8_handler(cputag_get_address_space(image->machine, M68008_TAG, ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0, SMH_BANK(1), SMH_UNMAP);
+			memory_install_read_bank(cputag_get_address_space(image->machine, M68008_TAG, ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0, "bank1");
+			memory_unmap_write(cputag_get_address_space(image->machine, M68008_TAG, ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0);
 
 			return INIT_PASS;
 		}

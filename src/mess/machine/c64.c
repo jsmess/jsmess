@@ -482,35 +482,35 @@ static void c64_bankswitch( running_machine *machine, int reset )
 	{
 			c64_io_enabled = 1;		// charen has no effect in ultimax_mode
 
-			memory_set_bankptr(machine, 1, roml);
-			memory_set_bankptr(machine, 2, c64_memory + 0x8000);
-			memory_set_bankptr(machine, 3, c64_memory + 0xa000);
-			memory_set_bankptr(machine, 4, romh);
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, SMH_NOP);
+			memory_set_bankptr(machine, "bank1", roml);
+			memory_set_bankptr(machine, "bank2", c64_memory + 0x8000);
+			memory_set_bankptr(machine, "bank3", c64_memory + 0xa000);
+			memory_set_bankptr(machine, "bank4", romh);
+			memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0);
 	}
 	else
 	{
 		/* 0x8000-0x9000 */
 		if (loram && hiram && !c64_exrom)
 		{
-			memory_set_bankptr(machine, 1, roml);
-			memory_set_bankptr(machine, 2, c64_memory + 0x8000);
+			memory_set_bankptr(machine, "bank1", roml);
+			memory_set_bankptr(machine, "bank2", c64_memory + 0x8000);
 		}
 		else
 		{
-			memory_set_bankptr(machine, 1, c64_memory + 0x8000);
-			memory_set_bankptr(machine, 2, c64_memory + 0x8000);
+			memory_set_bankptr(machine, "bank1", c64_memory + 0x8000);
+			memory_set_bankptr(machine, "bank2", c64_memory + 0x8000);
 		}
 
 		/* 0xa000 */
 		if (hiram && !c64_game && !c64_exrom)
-			memory_set_bankptr(machine, 3, romh);
+			memory_set_bankptr(machine, "bank3", romh);
 
 		else if (loram && hiram && c64_game)
-			memory_set_bankptr(machine, 3, c64_basic);
+			memory_set_bankptr(machine, "bank3", c64_basic);
 
 		else
-			memory_set_bankptr(machine, 3, c64_memory + 0xa000);
+			memory_set_bankptr(machine, "bank3", c64_memory + 0xa000);
 
 		/* 0xd000 */
 		// RAM
@@ -540,8 +540,8 @@ static void c64_bankswitch( running_machine *machine, int reset )
 		}
 
 		/* 0xe000-0xf000 */
-		memory_set_bankptr(machine, 4, hiram ? c64_kernal : c64_memory + 0xe000);
-		memory_set_bankptr(machine, 5, c64_memory + 0xe000);
+		memory_set_bankptr(machine, "bank4", hiram ? c64_kernal : c64_memory + 0xe000);
+		memory_set_bankptr(machine, "bank5", c64_memory + 0xe000);
 	}
 
 	/* make sure the opbase function gets called each time */

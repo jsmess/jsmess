@@ -280,7 +280,7 @@ static WRITE8_HANDLER( master_nmi_trigger_w )
 	cputag_set_input_line(space->machine, "slave", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void airbustr_bankswitch(running_machine *machine, const char *cpu, int bank, int data)
+static void airbustr_bankswitch(running_machine *machine, const char *cpu, const char *bank, int data)
 {
 	UINT8 *ROM = memory_region(machine, cpu);
 
@@ -294,22 +294,23 @@ static void airbustr_bankswitch(running_machine *machine, const char *cpu, int b
 
 static WRITE8_HANDLER( master_bankswitch_w )
 {
-	airbustr_bankswitch(space->machine, "master", 1, data);
+	airbustr_bankswitch(space->machine, "master", "bank1", data);
 }
 
 static WRITE8_HANDLER( slave_bankswitch_w )
 {
-	airbustr_bankswitch(space->machine, "slave", 2, data);
+	const device_config *pandora = devtag_get_device(space->machine, "pandora");
+	airbustr_bankswitch(space->machine, "slave", "bank2", data);
 
 	flip_screen_set(space->machine, data & 0x10);
 
 	// used at the end of levels, after defeating the boss, to leave trails
-	pandora_set_clear_bitmap(data&0x20);
+	pandora_set_clear_bitmap(pandora, data&0x20);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	airbustr_bankswitch(space->machine, "audiocpu", 3, data);
+	airbustr_bankswitch(space->machine, "audiocpu", "bank3", data);
 }
 
 static READ8_HANDLER( soundcommand_status_r )
@@ -369,11 +370,11 @@ static WRITE8_HANDLER( airbustr_coin_counter_w )
 
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(pandora_spriteram_r, pandora_spriteram_w)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", pandora_spriteram_r, pandora_spriteram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE(&devram) // shared with protection device
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_io_map, ADDRESS_SPACE_IO, 8 )
@@ -385,7 +386,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(airbustr_videoram2_w) AM_BASE(&airbustr_videoram2)
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(airbustr_colorram2_w) AM_BASE(&airbustr_colorram2)
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(airbustr_videoram_w) AM_BASE_GENERIC(videoram)
@@ -393,7 +394,7 @@ static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd5ff) AM_RAM_WRITE(airbustr_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd600, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_io_map, ADDRESS_SPACE_IO, 8 )
@@ -411,7 +412,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(3)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
@@ -609,6 +610,13 @@ static MACHINE_RESET( airbustr )
 
 /* Machine Driver */
 
+static const kaneko_pandora_interface airbustr_pandora_config =
+{
+	"screen",	/* screen tag */
+	1, 	/* gfx_region */
+	0, 0	/* x_offs, y_offs */
+};
+
 static MACHINE_DRIVER_START( airbustr )
 	// basic machine hardware
 	MDRV_CPU_ADD("master", Z80, 6000000)	// ???
@@ -628,12 +636,11 @@ static MACHINE_DRIVER_START( airbustr )
 
 	MDRV_QUANTUM_TIME(HZ(6000))	// Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches
-    MDRV_MACHINE_START(airbustr)
+	MDRV_MACHINE_START(airbustr)
 	MDRV_MACHINE_RESET(airbustr)
 	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
 	// video hardware
-
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -642,6 +649,8 @@ static MACHINE_DRIVER_START( airbustr )
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(airbustr)
 	MDRV_PALETTE_LENGTH(768)
+
+	MDRV_KANEKO_PANDORA_ADD("pandora", airbustr_pandora_config)
 
 	MDRV_VIDEO_START(airbustr)
 	MDRV_VIDEO_UPDATE(airbustr)

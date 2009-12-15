@@ -96,7 +96,7 @@ static MACHINE_RESET( exelv )
 
 	tms3556_reset();
 	spchroms_config( machine, &exelv_speech_intf );
-	memory_set_bankptr( machine, 1, memory_region(machine, "user1") + 0x0200 );
+	memory_set_bankptr( machine, "bank1", memory_region(machine, "user1") + 0x0200 );
 }
 
 static INTERRUPT_GEN( exelv_hblank_interrupt )
@@ -428,7 +428,7 @@ static ADDRESS_MAP_START(tms7020_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x012d, 0x0012d) AM_READWRITE(tms3556_reg_r/*right???*/, tms3556_reg_w)
 	AM_RANGE(0x012e, 0x0012e) AM_READWRITE(tms3556_vram_r/*right???*/, tms3556_vram_w)
 	AM_RANGE(0x0130, 0x00130) AM_READWRITE(mailbox_wx319_r, mailbox_wx318_w)
-	AM_RANGE(0x0200, 0x7fff) AM_ROMBANK(1)								/* system ROM */
+	AM_RANGE(0x0200, 0x7fff) AM_ROMBANK("bank1")								/* system ROM */
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM										/* CPU RAM */
 	AM_RANGE(0xc800, 0xf7ff) AM_NOP
@@ -463,7 +463,7 @@ static ADDRESS_MAP_START(tms7040_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x012d, 0x0012d) AM_READWRITE(tms3556_reg_r/*right???*/, tms3556_reg_w)
 	AM_RANGE(0x012e, 0x0012e) AM_READWRITE(tms3556_vram_r/*right???*/, tms3556_vram_w)
 	AM_RANGE(0x0130, 0x00130) AM_READWRITE(mailbox_wx319_r, mailbox_wx318_w)
-	AM_RANGE(0x0200, 0x7fff) AM_ROMBANK(1)								/* system ROM */
+	AM_RANGE(0x0200, 0x7fff) AM_ROMBANK("bank1")								/* system ROM */
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM										/* CPU RAM */
 	AM_RANGE(0xc800, 0xefff) AM_NOP

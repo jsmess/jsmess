@@ -24,24 +24,24 @@
 
 /* Address maps */
 static ADDRESS_MAP_START(partner_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK(1)
-	AM_RANGE( 0x0800, 0x3fff ) AM_RAMBANK(2)
-	AM_RANGE( 0x4000, 0x5fff ) AM_RAMBANK(3)
-	AM_RANGE( 0x6000, 0x7fff ) AM_RAMBANK(4)
-	AM_RANGE( 0x8000, 0x9fff ) AM_RAMBANK(5)
-	AM_RANGE( 0xa000, 0xb7ff ) AM_RAMBANK(6)
-	AM_RANGE( 0xb800, 0xbfff ) AM_RAMBANK(7)
-	AM_RANGE( 0xc000, 0xc7ff ) AM_RAMBANK(8)
-	AM_RANGE( 0xc800, 0xcfff ) AM_RAMBANK(9)
-	AM_RANGE( 0xd000, 0xd7ff ) AM_RAMBANK(10)
+	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("bank1")
+	AM_RANGE( 0x0800, 0x3fff ) AM_RAMBANK("bank2")
+	AM_RANGE( 0x4000, 0x5fff ) AM_RAMBANK("bank3")
+	AM_RANGE( 0x6000, 0x7fff ) AM_RAMBANK("bank4")
+	AM_RANGE( 0x8000, 0x9fff ) AM_RAMBANK("bank5")
+	AM_RANGE( 0xa000, 0xb7ff ) AM_RAMBANK("bank6")
+	AM_RANGE( 0xb800, 0xbfff ) AM_RAMBANK("bank7")
+	AM_RANGE( 0xc000, 0xc7ff ) AM_RAMBANK("bank8")
+	AM_RANGE( 0xc800, 0xcfff ) AM_RAMBANK("bank9")
+	AM_RANGE( 0xd000, 0xd7ff ) AM_RAMBANK("bank10")
 	AM_RANGE( 0xd800, 0xd8ff ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w)  // video
 	AM_RANGE( 0xd900, 0xd9ff ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
 	AM_RANGE( 0xda00, 0xdaff ) AM_WRITE(partner_mem_page_w)
 	AM_RANGE( 0xdb00, 0xdbff ) AM_DEVWRITE("dma8257", i8257_w)	 // DMA
-	AM_RANGE( 0xdc00, 0xddff ) AM_RAMBANK(11)
+	AM_RANGE( 0xdc00, 0xddff ) AM_RAMBANK("bank11")
 	AM_RANGE( 0xde00, 0xdeff ) AM_WRITE(partner_win_memory_page_w)
-	AM_RANGE( 0xe000, 0xe7ff ) AM_RAMBANK(12)
-	AM_RANGE( 0xe800, 0xffff ) AM_RAMBANK(13)
+	AM_RANGE( 0xe000, 0xe7ff ) AM_RAMBANK("bank12")
+	AM_RANGE( 0xe800, 0xffff ) AM_RAMBANK("bank13")
 ADDRESS_MAP_END
 
 /* Input ports */

@@ -123,31 +123,26 @@ MACHINE_START( pc1350 )
 
 	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1350_power_up);
 
-	memory_install_read8_handler(space, 0x6000, 0x6fff, 0, 0, SMH_BANK(1));
-	memory_install_write8_handler(space, 0x6000, 0x6fff, 0, 0, SMH_BANK(1));
-	memory_set_bankptr(machine, 1, &messram_get_ptr(devtag_get_device(machine, "messram"))[0x0000]);
+	memory_install_readwrite_bank(space, 0x6000, 0x6fff, 0, 0, "bank1");	
+	memory_set_bankptr(machine, "bank1", &messram_get_ptr(devtag_get_device(machine, "messram"))[0x0000]);
 
 	if (messram_get_size(devtag_get_device(machine, "messram")) >= 0x3000)
 	{
-		memory_install_read8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK(2));
-		memory_install_write8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK(2));
-		memory_set_bankptr(machine, 2, &messram_get_ptr(devtag_get_device(machine, "messram"))[0x1000]);
+		memory_install_readwrite_bank(space, 0x4000, 0x5fff, 0, 0, "bank2");
+		memory_set_bankptr(machine, "bank2", &messram_get_ptr(devtag_get_device(machine, "messram"))[0x1000]);
 	}
 	else
 	{
-		memory_install_read8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_NOP);
+		memory_nop_readwrite(space, 0x4000, 0x5fff, 0, 0);		
 	}
 
 	if (messram_get_size(devtag_get_device(machine, "messram")) >= 0x5000)
 	{
-		memory_install_read8_handler(space, 0x2000, 0x3fff, 0, 0, SMH_BANK(3));
-		memory_install_write8_handler(space, 0x2000, 0x3fff, 0, 0, SMH_BANK(3));
-		memory_set_bankptr(machine, 3, &messram_get_ptr(devtag_get_device(machine, "messram"))[0x3000]);
+		memory_install_readwrite_bank(space, 0x2000, 0x3fff, 0, 0, "bank3");
+		memory_set_bankptr(machine, "bank3", &messram_get_ptr(devtag_get_device(machine, "messram"))[0x3000]);
 	}
 	else
 	{
-		memory_install_read8_handler(space, 0x2000, 0x3fff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(space, 0x2000, 0x3fff, 0, 0, SMH_NOP);
+		memory_nop_readwrite(space, 0x2000, 0x3fff, 0, 0);
 	}
 }

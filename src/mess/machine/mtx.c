@@ -216,26 +216,26 @@ WRITE8_HANDLER( mtx_bankswitch_w )
 	UINT8 ram_page = data >> 0 & 0x0f;
 
 	/* set rom bank (switches between basic and assembler rom or cartridges) */
-	memory_set_bank(space->machine, 2, rom_page);
+	memory_set_bank(space->machine, "bank2", rom_page);
 
 	/* set ram bank, for invalid pages a nop-handler will be installed */
 	if (ram_page >= messram_get_size(devtag_get_device(space->machine, "messram"))/0x8000)
 	{
-		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_NOP, SMH_NOP);
-		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_NOP, SMH_NOP);
+		memory_nop_readwrite(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0);
+		memory_nop_readwrite(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
 	}
 	else if (ram_page + 1 == messram_get_size(devtag_get_device(space->machine, "messram"))/0x8000)
 	{
-		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_NOP, SMH_NOP);
-		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK(4), SMH_BANK(4));
-		memory_set_bank(space->machine, 4, ram_page);
+		memory_nop_readwrite(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0);
+		memory_install_readwrite_bank(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank4");
+		memory_set_bank(space->machine, "bank4", ram_page);
 	}
 	else
 	{
-		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_BANK(3), SMH_BANK(3));
-		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK(4), SMH_BANK(4));
-		memory_set_bank(space->machine, 3, ram_page);
-		memory_set_bank(space->machine, 4, ram_page);
+		memory_install_readwrite_bank(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, "bank3");
+		memory_install_readwrite_bank(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank4");
+		memory_set_bank(space->machine, "bank3", ram_page);
+		memory_set_bank(space->machine, "bank4", ram_page);
 	}
 }
 
@@ -250,10 +250,10 @@ WRITE8_HANDLER( mtx_bankswitch_w )
 DRIVER_INIT( mtx512 )
 {
 	/* configure memory */
-	memory_set_bankptr(machine, 1, memory_region(machine, "user1"));
-	memory_configure_bank(machine, 2, 0, 8, memory_region(machine, "user2"), 0x2000);
-	memory_configure_bank(machine, 3, 0, messram_get_size(devtag_get_device(machine, "messram"))/0x4000/2, messram_get_ptr(devtag_get_device(machine, "messram")), 0x4000);
-	memory_configure_bank(machine, 4, 0, messram_get_size(devtag_get_device(machine, "messram"))/0x4000/2, messram_get_ptr(devtag_get_device(machine, "messram")) + messram_get_size(devtag_get_device(machine, "messram"))/2, 0x4000);
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));
+	memory_configure_bank(machine, "bank2", 0, 8, memory_region(machine, "user2"), 0x2000);
+	memory_configure_bank(machine, "bank3", 0, messram_get_size(devtag_get_device(machine, "messram"))/0x4000/2, messram_get_ptr(devtag_get_device(machine, "messram")), 0x4000);
+	memory_configure_bank(machine, "bank4", 0, messram_get_size(devtag_get_device(machine, "messram"))/0x4000/2, messram_get_ptr(devtag_get_device(machine, "messram")) + messram_get_size(devtag_get_device(machine, "messram"))/2, 0x4000);
 
 	/* setup tms9928a */
 	TMS9928A_configure(&tms9928a_interface);

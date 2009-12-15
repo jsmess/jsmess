@@ -258,9 +258,9 @@ static ADDRESS_MAP_START( darius_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd40000, 0xd40003) AM_WRITE(PC080SN_xscroll_word_0_w)
 	AM_RANGE(0xd50000, 0xd50003) AM_WRITE(PC080SN_ctrl_word_0_w)
 	AM_RANGE(0xd80000, 0xd80fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)/* palette */
-	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE(1) AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE(3) AM_BASE(&darius_fg_ram)
+	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("share1") AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE("share3") AM_BASE(&darius_fg_ram)
 	AM_RANGE(0xe10000, 0xe10fff) AM_RAM												/* ??? */
 ADDRESS_MAP_END
 
@@ -269,9 +269,9 @@ static ADDRESS_MAP_START( darius_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM				/* local RAM */
 	AM_RANGE(0xc00000, 0xc0007f) AM_WRITE(darius_ioc_w)	/* only writes $c00050 (?) */
 	AM_RANGE(0xd80000, 0xd80fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w)
-	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE(3)
+	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE("share3")
 ADDRESS_MAP_END
 
 
@@ -285,8 +285,7 @@ static UINT8 nmi_enable = 0;
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(machine,  STATIC_BANK1, memory_region(machine, "audiocpu") + (banknum * 0x8000) + 0x10000 );
-//  memory_set_bankptr(machine,  1, memory_region(machine, "audiocpu") + (banknum * 0x8000) + 0x10000 );
+	memory_set_bankptr(machine,  "bank1", memory_region(machine, "audiocpu") + (banknum * 0x8000) + 0x10000 );
 
 }
 
@@ -473,11 +472,11 @@ static WRITE8_DEVICE_HANDLER( darius_write_portB1 )
 *****************************************************/
 
 static ADDRESS_MAP_START( darius_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
-	AM_RANGE(0xb000, 0xb000) AM_READWRITE(SMH_NOP, taitosound_slave_port_w)
+	AM_RANGE(0xb000, 0xb000) AM_READNOP AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xb001, 0xb001) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(darius_fm0_pan)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(darius_fm1_pan)
@@ -490,7 +489,7 @@ static ADDRESS_MAP_START( darius_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( darius_sound2_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(SMH_ROM, SMH_NOP)
+	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
 	/* yes, no RAM */
 ADDRESS_MAP_END
 
@@ -1201,7 +1200,7 @@ static MACHINE_RESET( darius )
 		memcpy( RAM + 0x8000*i + 0x10000, RAM,            0x4000 );
 		memcpy( RAM + 0x8000*i + 0x14000, RAM + 0x4000*i, 0x4000 );
 	}
-	memory_set_bankptr(machine, 1, RAM);
+	memory_set_bankptr(machine, "bank1", RAM);
 
 	sound_global_enable( machine, 1 );	/* mixer enabled */
 

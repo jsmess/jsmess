@@ -146,7 +146,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 
 		if (data)
 		{
-			memory_install_read8_handler(mainspace, 0x8000, 0xffff, 0, 0, (read8_space_func)SMH_BANK(1));
+			memory_install_read_bank(mainspace, 0x8000, 0xffff, 0, 0, "bank1");
 			switch (data)
 			{
 				case 2:  bankaddress = 0x10000; break;
@@ -158,18 +158,18 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 				case 6:  bankaddress = 0x30000; break; /* not used */
 				default: bankaddress = 0x00000; break; /* not used */
 			}
-			memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+			memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
 		}
 		else
 		{
 			memory_install_read8_handler(mainspace, 0x8000, 0x8fff, 0, 0, wardner_sprite_r);
-			memory_install_read8_handler(mainspace, 0xa000, 0xadff, 0, 0, (read8_space_func)SMH_BANK(4));
-			memory_install_read8_handler(mainspace, 0xae00, 0xafff, 0, 0, (read8_space_func)SMH_BANK(2));
-			memory_install_read8_handler(mainspace, 0xc000, 0xc7ff, 0, 0, (read8_space_func)SMH_BANK(3));
-			memory_set_bankptr(space->machine, 1, &RAM[0x0000]);
-			memory_set_bankptr(space->machine, 2, rambase_ae00);
-			memory_set_bankptr(space->machine, 3, rambase_c000);
-			memory_set_bankptr(space->machine, 4, space->machine->generic.paletteram.v);
+			memory_install_read_bank(mainspace, 0xa000, 0xadff, 0, 0, "bank4");
+			memory_install_read_bank(mainspace, 0xae00, 0xafff, 0, 0, "bank2");
+			memory_install_read_bank(mainspace, 0xc000, 0xc7ff, 0, 0, "bank3");
+			memory_set_bankptr(space->machine, "bank1", &RAM[0x0000]);
+			memory_set_bankptr(space->machine, "bank2", rambase_ae00);
+			memory_set_bankptr(space->machine, "bank3", rambase_c000);
+			memory_set_bankptr(space->machine, "bank4", space->machine->generic.paletteram.v);
 		}
 	}
 }
@@ -189,14 +189,14 @@ static ADDRESS_MAP_START( main_program_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
 
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK(1)) /* Overlapped RAM/Banked ROM - See below */
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") /* Overlapped RAM/Banked ROM - See below */
 
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(wardner_sprite_w) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x9000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xadff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xae00, 0xafff) AM_RAM AM_BASE(&rambase_ae00)
 	AM_RANGE(0xb000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(&rambase_c000) AM_SHARE(1)	/* Shared RAM with Sound Z80 */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(&rambase_c000) AM_SHARE("share1")	/* Shared RAM with Sound Z80 */
 	AM_RANGE(0xc800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -228,7 +228,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_program_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x807f) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE(1)	/* Shared RAM with Main Z80 */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")	/* Shared RAM with Main Z80 */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM
 
 ADDRESS_MAP_END

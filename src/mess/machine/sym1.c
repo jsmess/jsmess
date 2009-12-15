@@ -193,17 +193,26 @@ static WRITE8_DEVICE_HANDLER( sym1_via2_a_w )
 
 	logerror("SYM1 VIA2 W 0x%02x\n", data);
 
-	memory_install_write8_handler(cpu0space, 0xa600, 0xa67f, 0, 0,
-		((input_port_read(device->machine, "WP") & 0x01) && !(data & 0x01)) ? SMH_NOP : SMH_BANK(5));
-
-	memory_install_write8_handler(cpu0space, 0x0400, 0x07ff, 0, 0,
-		((input_port_read(device->machine, "WP") & 0x02) && !(data & 0x02)) ? SMH_NOP : SMH_BANK(2));
-
-	memory_install_write8_handler(cpu0space, 0x0800, 0x0bff, 0, 0,
-		((input_port_read(device->machine, "WP") & 0x04) && !(data & 0x04)) ? SMH_NOP : SMH_BANK(3));
-
-	memory_install_write8_handler(cpu0space, 0x0c00, 0x0fff, 0, 0,
-		((input_port_read(device->machine, "WP") & 0x08) && !(data & 0x08)) ? SMH_NOP : SMH_BANK(4));
+	if ((input_port_read(device->machine, "WP") & 0x01) && !(data & 0x01)) {	
+		memory_nop_write(cpu0space, 0xa600, 0xa67f, 0, 0);
+	} else {
+		memory_install_write_bank(cpu0space, 0xa600, 0xa67f, 0, 0, "bank5");
+	}
+	if ((input_port_read(device->machine, "WP") & 0x02) && !(data & 0x02)) {
+		memory_nop_write(cpu0space, 0x0400, 0x07ff, 0, 0);
+	} else {
+		memory_install_write_bank(cpu0space, 0x0400, 0x07ff, 0, 0, "bank2");
+	}
+	if ((input_port_read(device->machine, "WP") & 0x04) && !(data & 0x04)) {
+		memory_nop_write(cpu0space, 0x0800, 0x0bff, 0, 0);
+	} else {
+		memory_install_write_bank(cpu0space, 0x0800, 0x0bff, 0, 0, "bank3");
+	}
+	if ((input_port_read(device->machine, "WP") & 0x08) && !(data & 0x08)) {
+		memory_nop_write(cpu0space, 0x0c00, 0x0fff, 0, 0);
+	} else {
+		memory_install_write_bank(cpu0space, 0x0c00, 0x0fff, 0, 0, "bank4");
+	}
 }
 
 
@@ -272,8 +281,8 @@ DRIVER_INIT( sym1 )
 	/* wipe expansion memory banks that are not installed */
 	if (messram_get_size(devtag_get_device(machine, "messram")) < 4*1024)
 	{
-		memory_install_readwrite8_handler(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),
-			messram_get_size(devtag_get_device(machine, "messram")), 0x0fff, 0, 0, SMH_NOP, SMH_NOP);
+		memory_nop_readwrite(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),
+			messram_get_size(devtag_get_device(machine, "messram")), 0x0fff, 0, 0);
 	}
 
 	/* allocate a timer to refresh the led display */
@@ -285,8 +294,8 @@ MACHINE_RESET( sym1 )
 {
 	/* make 0xf800 to 0xffff point to the last half of the monitor ROM
        so that the CPU can find its reset vectors */
-	memory_install_readwrite8_handler(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),
-			0xf800, 0xffff, 0, 0, SMH_BANK(1), SMH_NOP);
-	memory_set_bankptr(machine, 1, sym1_monitor + 0x800);
+	memory_install_read_bank(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),0xf800, 0xffff, 0, 0, "bank1");
+	memory_nop_write(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),0xf800, 0xffff, 0, 0);
+	memory_set_bankptr(machine, "bank1", sym1_monitor + 0x800);
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 }

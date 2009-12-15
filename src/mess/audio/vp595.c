@@ -83,7 +83,7 @@ void vp595_install_write_handlers(const device_config *device, const address_spa
 	}
 	else
 	{
-		memory_install_write8_handler(io, 0x03, 0x03, 0, 0, SMH_UNMAP);
+		memory_unmap_write(io, 0x03, 0x03, 0, 0);
 	}
 }
 

@@ -130,7 +130,7 @@ static WRITE8_HANDLER( suprslam_sh_bankswitch_w )
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x8000;
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
 }
 
 /*** MEMORY MAPS *************************************************************/
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( suprslam_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8000, 0xff8fff) AM_RAM AM_BASE(&K053936_0_linectrl)
 	AM_RANGE(0xff9000, 0xff9001) AM_WRITE(sound_command_w)
 	AM_RANGE(0xffa000, 0xffafff) AM_RAM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xffd000, 0xffd01f) AM_WRITE(SMH_RAM) AM_BASE(&K053936_0_ctrl)
+	AM_RANGE(0xffd000, 0xffd01f) AM_WRITEONLY AM_BASE(&K053936_0_ctrl)
 	AM_RANGE(0xffe000, 0xffe001) AM_WRITE(suprslam_bank_w)
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1")
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
@@ -158,7 +158,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )

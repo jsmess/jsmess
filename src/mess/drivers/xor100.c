@@ -51,53 +51,53 @@ static void xor100_bankswitch(running_machine *machine)
 	case EPROM_0000:
 		if (state->bank < banks)
 		{
-			memory_install_write8_handler(program, 0x0000, 0xffff, 0, 0, SMH_BANK(1));
-			memory_set_bank(machine, 1, 1 + state->bank);
+			memory_install_write_bank(program, 0x0000, 0xffff, 0, 0, "bank1");
+			memory_set_bank(machine, "bank1", 1 + state->bank);
 		}
 		else
 		{
-			memory_install_write8_handler(program, 0x0000, 0xffff, 0, 0, SMH_UNMAP);
+			memory_unmap_write(program, 0x0000, 0xffff, 0, 0);
 		}
 
-		memory_install_read8_handler(program, 0x0000, 0xf7ff, 0x07ff, 0, SMH_BANK(2));
-		memory_install_read8_handler(program, 0xf800, 0xffff, 0, 0, SMH_BANK(3));
-		memory_set_bank(machine, 2, 0);
-		memory_set_bank(machine, 3, 0);
+		memory_install_read_bank(program, 0x0000, 0xf7ff, 0x07ff, 0, "bank2");
+		memory_install_read_bank(program, 0xf800, 0xffff, 0, 0, "bank2");
+		memory_set_bank(machine, "bank2", 0);
+		memory_set_bank(machine, "bank3", 0);
 		break;
 
 	case EPROM_F800:
 		if (state->bank < banks)
 		{
-			memory_install_write8_handler(program, 0x0000, 0xffff, 0, 0, SMH_BANK(1));
-			memory_install_read8_handler(program, 0x0000, 0xf7ff, 0, 0, SMH_BANK(2));
-			memory_set_bank(machine, 1, 1 + state->bank);
-			memory_set_bank(machine, 2, 1 + state->bank);
+			memory_install_write_bank(program, 0x0000, 0xffff, 0, 0, "bank1");
+			memory_install_read_bank(program, 0x0000, 0xf7ff, 0, 0, "bank2");
+			memory_set_bank(machine, "bank1", 1 + state->bank);
+			memory_set_bank(machine, "bank2", 1 + state->bank);
 		}
 		else
 		{
-			memory_install_write8_handler(program, 0x0000, 0xffff, 0, 0, SMH_UNMAP);
-			memory_install_read8_handler(program, 0x0000, 0xf7ff, 0, 0, SMH_UNMAP);
+			memory_unmap_write(program, 0x0000, 0xffff, 0, 0);
+			memory_unmap_read(program, 0x0000, 0xf7ff, 0, 0);
 		}
 
-		memory_install_read8_handler(program, 0xf800, 0xffff, 0, 0, SMH_BANK(3));
-		memory_set_bank(machine, 3, 0);
+		memory_install_read_bank(program, 0xf800, 0xffff, 0, 0, "bank3");
+		memory_set_bank(machine, "bank3", 0);
 		break;
 
 	case EPROM_OFF:
 		if (state->bank < banks)
 		{
-			memory_install_write8_handler(program, 0x0000, 0xffff, 0, 0, SMH_BANK(1));
-			memory_install_read8_handler(program, 0x0000, 0xf7ff, 0, 0, SMH_BANK(2));
-			memory_install_read8_handler(program, 0xf800, 0xffff, 0, 0, SMH_BANK(3));
-			memory_set_bank(machine, 1, 1 + state->bank);
-			memory_set_bank(machine, 2, 1 + state->bank);
-			memory_set_bank(machine, 3, 1 + state->bank);
+			memory_install_write_bank(program, 0x0000, 0xffff, 0, 0, "bank1");
+			memory_install_read_bank(program, 0x0000, 0xf7ff, 0, 0, "bank2");
+			memory_install_read_bank(program, 0xf800, 0xffff, 0, 0, "bank3");
+			memory_set_bank(machine, "bank1", 1 + state->bank);
+			memory_set_bank(machine, "bank2", 1 + state->bank);
+			memory_set_bank(machine, "bank3", 1 + state->bank);
 		}
 		else
 		{
-			memory_install_write8_handler(program, 0x0000, 0xffff, 0, 0, SMH_UNMAP);
-			memory_install_read8_handler(program, 0x0000, 0xf7ff, 0, 0, SMH_UNMAP);
-			memory_install_read8_handler(program, 0xf800, 0xffff, 0, 0, SMH_UNMAP);
+			memory_unmap_write(program, 0x0000, 0xffff, 0, 0);
+			memory_unmap_read(program, 0x0000, 0xf7ff, 0, 0);
+			memory_unmap_read(program, 0xf800, 0xffff, 0, 0);
 		}
 		break;
 	}
@@ -255,9 +255,9 @@ static WRITE8_HANDLER( fdc_dsel_w )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( xor100_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_BANK(1))
-	AM_RANGE(0x0000, 0xf7ff) AM_READ(SMH_BANK(2))
-	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_BANK(3))
+	AM_RANGE(0x0000, 0xffff) AM_WRITE_BANK("bank1")
+	AM_RANGE(0x0000, 0xf7ff) AM_READ_BANK("bank2")
+	AM_RANGE(0xf800, 0xffff) AM_READ_BANK("bank3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xor100_io, ADDRESS_SPACE_IO, 8 )
@@ -542,11 +542,11 @@ static MACHINE_START( xor100 )
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* setup memory banking */
-	memory_configure_bank(machine, 1, 1, banks, messram_get_ptr(messram), 0x10000);
-	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(machine, 2, 1, banks, messram_get_ptr(messram), 0x10000);
-	memory_configure_bank(machine, 3, 0, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(machine, 3, 1, banks, messram_get_ptr(messram) + 0xf800, 0x10000);
+	memory_configure_bank(machine, "bank1", 1, banks, messram_get_ptr(messram), 0x10000);
+	memory_configure_bank(machine, "bank2", 0, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(machine, "bank2", 1, banks, messram_get_ptr(messram), 0x10000);
+	memory_configure_bank(machine, "bank3", 0, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(machine, "bank3", 1, banks, messram_get_ptr(messram) + 0xf800, 0x10000);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->mode);

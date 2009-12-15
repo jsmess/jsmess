@@ -478,21 +478,21 @@ static VIDEO_START( pc_cga )
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read8_handler(space, 0xb8000, 0xbbfff, 0, 0x04000, SMH_BANK(11) );
+			memory_install_read_bank(space, 0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
 			memory_install_write8_handler(space, 0xb8000, 0xbbfff, 0, 0x04000, pc_video_videoram_w );
 			memory_install_read8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga8_r );
 			memory_install_write8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga8_w );
 			break;
 
 		case 16:
-			memory_install_read16_handler(space, 0xb8000, 0xbbfff, 0, 0x04000, SMH_BANK(11) );
+			memory_install_read_bank(space, 0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
 			memory_install_write16_handler(space, 0xb8000, 0xbbfff, 0, 0x04000, pc_video_videoram16le_w );
 			memory_install_read16_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga16le_r );
 			memory_install_write16_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga16le_w );
 			break;
 
 		case 32:
-			memory_install_read32_handler(space, 0xb8000, 0xbbfff, 0, 0x04000, SMH_BANK(11) );
+			memory_install_read_bank(space, 0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
 			memory_install_write32_handler(space, 0xb8000, 0xbbfff, 0, 0x04000, pc_video_videoram32_w );
 			memory_install_read32_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga32le_r );
 			memory_install_write32_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga32le_w );
@@ -507,7 +507,7 @@ static VIDEO_START( pc_cga )
 
 	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, machine->generic.videoram_size);
 
-	memory_set_bankptr(machine,11, machine->generic.videoram.u8);
+	memory_set_bankptr(machine,"bank11", machine->generic.videoram.u8);
 
 	internal_pc_cga_video_start(machine, M6845_PERSONALITY_GENUINE);
 
@@ -1519,7 +1519,7 @@ static WRITE8_HANDLER ( pc1512_w )
 		}
 		else
 		{
-			memory_set_bankptr(space->machine,1, space->machine->generic.videoram.u8 + videoram_offset[0]);
+			memory_set_bankptr(space->machine,"bank1", space->machine->generic.videoram.u8 + videoram_offset[0]);
 		}
 		cga.mode_control = data;
 		switch( cga.mode_control & 0x3F )
@@ -1577,7 +1577,7 @@ static WRITE8_HANDLER ( pc1512_w )
 		pc1512.read = data;
 		if ( ( cga.mode_control & 0x12 ) == 0x12 )
 		{
-			memory_set_bankptr(space->machine,1, space->machine->generic.videoram.u8 + videoram_offset[data & 3]);
+			memory_set_bankptr(space->machine,"bank1", space->machine->generic.videoram.u8 + videoram_offset[data & 3]);
 		}
 		break;
 
@@ -1640,7 +1640,7 @@ static VIDEO_START( pc1512 )
 {
 	machine->generic.videoram_size = 0x10000;
 	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, machine->generic.videoram_size );
-	memory_set_bankptr(machine,1,machine->generic.videoram.u8 + videoram_offset[0]);
+	memory_set_bankptr(machine,"bank1",machine->generic.videoram.u8 + videoram_offset[0]);
 
 	memset( &pc1512, 0, sizeof ( pc1512 ) );
 	pc1512.write = 0xf;

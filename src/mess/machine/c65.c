@@ -681,13 +681,12 @@ static WRITE8_HANDLER( c65_ram_expansion_w )
 		expansion_ram_begin = 0x80000;
 		expansion_ram_end = 0x80000 + (messram_get_size(devtag_get_device(space->machine, "messram")) - 128*1024) - 1;
 
-		memory_install_read8_handler(space, expansion_ram_begin, expansion_ram_end,
-			0, 0, (data == 0x00) ? SMH_BANK(16) : SMH_NOP);
-		memory_install_write8_handler(space, expansion_ram_begin, expansion_ram_end,
-			0, 0, (data == 0x00) ? SMH_BANK(16) : SMH_NOP);
-
-		if (data == 0x00)
-			memory_set_bankptr(space->machine, 16, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 128*1024);
+		if (data == 0x00) {
+			memory_install_readwrite_bank(space, expansion_ram_begin, expansion_ram_end,0,0,"bank16");
+			memory_set_bankptr(space->machine, "bank16", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 128*1024);
+		} else {
+			memory_nop_readwrite(space, expansion_ram_begin, expansion_ram_end,0,0);
+		}
 	}
 }
 
@@ -829,8 +828,6 @@ static int c65_io_on=0, c65_io_dc00_on=0;
 static void c65_bankswitch_interface( running_machine *machine, int value )
 {
 	static int old = 0;
-	read8_space_func rh;
-	write8_space_func wh;
 
 	DBG_LOG(machine, 2, "c65 bankswitch", ("%.2x\n",value));
 
@@ -838,48 +835,46 @@ static void c65_bankswitch_interface( running_machine *machine, int value )
 	{
 		if (value & 1)
 		{
-			memory_set_bankptr(machine, 8, c64_colorram + 0x400);
-			memory_set_bankptr(machine, 9, c64_colorram + 0x400);
-			rh = SMH_BANK(8);
-			wh = SMH_BANK(9);
+			memory_set_bankptr(machine, "bank8", c64_colorram + 0x400);
+			memory_set_bankptr(machine, "bank9", c64_colorram + 0x400);
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, "bank8");
+			memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, "bank9");
 		}
 		else
 		{
-			rh = c65_read_io_dc00;
-			wh = c65_write_io_dc00;
+			memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, c65_read_io_dc00);
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0,c65_write_io_dc00);
 		}
-		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, rh);
-		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, wh);
 	}
 
 	c65_io_dc00_on = !(value & 1);
 #if 0
 	/* cartridge roms !?*/
 	if (value & 0x08)
-		memory_set_bankptr(machine, 1, c64_roml);
+		memory_set_bankptr(machine, "bank1", c64_roml);
 	else
-		memory_set_bankptr(machine, 1, c64_memory + 0x8000);
+		memory_set_bankptr(machine, "bank1", c64_memory + 0x8000);
 
 	if (value & 0x10)
-		memory_set_bankptr(machine, 2, c64_basic);
+		memory_set_bankptr(machine, "bank2", c64_basic);
 	else
-		memory_set_bankptr(machine, 2, c64_memory + 0xa000);
+		memory_set_bankptr(machine, "bank2", c64_memory + 0xa000);
 #endif
 	if ((old^value) & 0x20)
 	{
 	/* bankswitching faulty when doing actual page */
 		if (value & 0x20)
-			memory_set_bankptr(machine, 3, c65_interface);
+			memory_set_bankptr(machine, "bank3", c65_interface);
 		else
-			memory_set_bankptr(machine, 3, c64_memory + 0xc000);
+			memory_set_bankptr(machine, "bank3", c64_memory + 0xc000);
 	}
 	c65_charset_select = value & 0x40;
 #if 0
 	/* cartridge roms !?*/
 	if (value & 0x80)
-		memory_set_bankptr(machine, 8, c64_kernal);
+		memory_set_bankptr(machine, "bank8", c64_kernal);
 	else
-		memory_set_bankptr(machine, 6, c64_memory + 0xe000);
+		memory_set_bankptr(machine, "bank6", c64_memory + 0xe000);
 #endif
 	old = value;
 }
@@ -888,8 +883,6 @@ void c65_bankswitch( running_machine *machine )
 {
 	static int old = -1;
 	int data, loram, hiram, charen;
-	read8_space_func rh4, rh8;
-	write8_space_func wh5, wh9;
 
 	data = (UINT8) devtag_get_info_int(machine, "maincpu", CPUINFO_INT_M6510_PORT);
 	if (data == old)
@@ -901,77 +894,73 @@ void c65_bankswitch( running_machine *machine )
 	charen = (data & 4) ? 1 : 0;
 
 	if ((!c64_game && c64_exrom) || (loram && hiram && !c64_exrom))
-		memory_set_bankptr(machine, 1, c64_roml);
+		memory_set_bankptr(machine, "bank1", c64_roml);
 	else
-		memory_set_bankptr(machine, 1, c64_memory + 0x8000);
+		memory_set_bankptr(machine, "bank1", c64_memory + 0x8000);
 
 	if ((!c64_game && c64_exrom && hiram) || (!c64_exrom))
-		memory_set_bankptr(machine, 2, c64_romh);
+		memory_set_bankptr(machine, "bank2", c64_romh);
 	else if (loram && hiram)
-		memory_set_bankptr(machine, 2, c64_basic);
+		memory_set_bankptr(machine, "bank2", c64_basic);
 	else
-		memory_set_bankptr(machine, 2, c64_memory + 0xa000);
+		memory_set_bankptr(machine, "bank2", c64_memory + 0xa000);
 
 	if ((!c64_game && c64_exrom) || (charen && (loram || hiram)))
 	{
 		c65_io_on = 1;
-		rh4 = c65_read_io;
-		wh5 = c65_write_io;
-		memory_set_bankptr(machine, 6, c64_colorram);
-		memory_set_bankptr(machine, 7, c64_colorram);
+		memory_set_bankptr(machine, "bank6", c64_colorram);
+		memory_set_bankptr(machine, "bank7", c64_colorram);
 
 		if (c65_io_dc00_on)
 		{
-			rh8 = c65_read_io_dc00;
-			wh9 = c65_write_io_dc00;
+			memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, c65_read_io_dc00);
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, c65_write_io_dc00);
 		}
 		else
 		{
-			rh8 = SMH_BANK(8);
-			wh9 = SMH_BANK(9);
-			memory_set_bankptr(machine, 8, c64_colorram + 0x400);
-			memory_set_bankptr(machine, 9, c64_colorram + 0x400);
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, "bank8");
+			memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, "bank9");
+			memory_set_bankptr(machine, "bank8", c64_colorram + 0x400);
+			memory_set_bankptr(machine, "bank9", c64_colorram + 0x400);
 		}
-		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, rh8);
-		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, wh9);
+		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, c65_read_io);
+		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, c65_write_io);
 	}
 	else
 	{
 		c65_io_on = 0;
-		rh4 = SMH_BANK(4);
-		wh5 = SMH_BANK(5);
-		memory_set_bankptr(machine, 5, c64_memory + 0xd000);
-		memory_set_bankptr(machine, 7, c64_memory + 0xd800);
-		memory_set_bankptr(machine, 9, c64_memory + 0xdc00);
+		memory_set_bankptr(machine, "bank5", c64_memory + 0xd000);
+		memory_set_bankptr(machine, "bank7", c64_memory + 0xd800);
+		memory_set_bankptr(machine, "bank9", c64_memory + 0xdc00);
 		if (!charen && (loram || hiram))
 		{
-			memory_set_bankptr(machine, 4, c64_chargen);
-			memory_set_bankptr(machine, 6, c64_chargen + 0x800);
-			memory_set_bankptr(machine, 8, c64_chargen + 0xc00);
+			memory_set_bankptr(machine, "bank4", c64_chargen);
+			memory_set_bankptr(machine, "bank6", c64_chargen + 0x800);
+			memory_set_bankptr(machine, "bank8", c64_chargen + 0xc00);
 		}
 		else
 		{
-			memory_set_bankptr(machine, 4, c64_memory + 0xd000);
-			memory_set_bankptr(machine, 6, c64_memory + 0xd800);
-			memory_set_bankptr(machine, 8, c64_memory + 0xdc00);
+			memory_set_bankptr(machine, "bank4", c64_memory + 0xd000);
+			memory_set_bankptr(machine, "bank6", c64_memory + 0xd800);
+			memory_set_bankptr(machine, "bank8", c64_memory + 0xdc00);
 		}
+		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, "bank4");
+		memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, "bank5");
 	}
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, rh4);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, wh5);
 
 	if (!c64_game && c64_exrom)
 	{
-		memory_set_bankptr(machine, 10, c64_romh);
+		memory_set_bankptr(machine, "bank10", c64_romh);
 	}
 	else
 	{
 		if (hiram)
 		{
-			memory_set_bankptr(machine, 10, c64_kernal);
+			memory_set_bankptr(machine, "bank10", c64_kernal);
 		}
 		else
 		{
-			memory_set_bankptr(machine, 10, c64_memory + 0xe000);
+			memory_set_bankptr(machine, "bank10", c64_memory + 0xe000);
 		}
 	}
 	old = data;
@@ -1020,11 +1009,11 @@ static int c65_dma_read_color( running_machine *machine, int offset )
 static void c65_common_driver_init( running_machine *machine )
 {
 	c64_memory = auto_alloc_array_clear(machine, UINT8, 0x10000);
-	memory_set_bankptr(machine, 11, c64_memory + 0x00000);
-	memory_set_bankptr(machine, 12, c64_memory + 0x08000);
-	memory_set_bankptr(machine, 13, c64_memory + 0x0a000);
-	memory_set_bankptr(machine, 14, c64_memory + 0x0c000);
-	memory_set_bankptr(machine, 15, c64_memory + 0x0e000);
+	memory_set_bankptr(machine, "bank11", c64_memory + 0x00000);
+	memory_set_bankptr(machine, "bank12", c64_memory + 0x08000);
+	memory_set_bankptr(machine, "bank13", c64_memory + 0x0a000);
+	memory_set_bankptr(machine, "bank14", c64_memory + 0x0c000);
+	memory_set_bankptr(machine, "bank15", c64_memory + 0x0e000);
 
 	c65_charset_select = 0;
 	c65_6511_port = 0xff;

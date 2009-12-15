@@ -88,9 +88,9 @@ static WRITE8_HANDLER( pc8001mk2_port31_w )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( pc8001_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_RAMBANK(1)
-	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK(2)
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK(3)
+	AM_RANGE(0x0000, 0x5fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc8001_io, ADDRESS_SPACE_IO, 8 )
@@ -141,10 +141,10 @@ static ADDRESS_MAP_START( pc8001_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc8001mk2_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_RAMBANK(1)
-	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK(2)
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(3)
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK(4)
+	AM_RANGE(0x0000, 0x5fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc8001mk2_io, ADDRESS_SPACE_IO, 8 )
@@ -450,37 +450,38 @@ static MACHINE_START( pc8001 )
 	i8257_ready_w(state->i8257, 1);
 
 	/* setup memory banking */
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "n80"), 0);
-	memory_install_readwrite8_handler(program, 0x0000, 0x5fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "n80"), 0);
+	memory_install_read_bank(program, 0x0000, 0x5fff, 0, 0, "bank1");
+	memory_unmap_write(program, 0x0000, 0x5fff, 0, 0);
 
 	switch (messram_get_size(messram))
 	{
 	case 16*1024:
-		memory_configure_bank(machine, 3, 0, 1, messram_get_ptr(messram), 0);
-		memory_install_readwrite8_handler(program, 0x6000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-		memory_install_readwrite8_handler(program, 0xc000, 0xffff, 0, 0, SMH_BANK(3), SMH_BANK(3));
+		memory_configure_bank(machine, "bank3", 0, 1, messram_get_ptr(messram), 0);
+		memory_unmap_readwrite(program, 0x6000, 0xbfff, 0, 0);
+		memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
+		memory_install_readwrite_bank(program, 0xc000, 0xffff, 0, 0, "bank3");
 		break;
 
 	case 32*1024:
-		memory_configure_bank(machine, 3, 0, 1, messram_get_ptr(messram), 0);
-		memory_install_readwrite8_handler(program, 0x6000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-		memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(3), SMH_BANK(3));
+		memory_configure_bank(machine, "bank3", 0, 1, messram_get_ptr(messram), 0);
+		memory_unmap_readwrite(program, 0x6000, 0xbfff, 0, 0);
+		memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank3");
 		break;
 
 	case 64*1024:
-		memory_configure_bank(machine, 1, 0, 1, messram_get_ptr(messram), 0);
-		memory_configure_bank(machine, 2, 0, 1, messram_get_ptr(messram) + 0x6000, 0);
-		memory_configure_bank(machine, 3, 0, 1, messram_get_ptr(messram) + 0x8000, 0);
-		memory_install_readwrite8_handler(program, 0x0000, 0x5fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_install_readwrite8_handler(program, 0x6000, 0xbfff, 0, 0, SMH_BANK(2), SMH_BANK(2));
-		memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(3), SMH_BANK(3));
-		memory_set_bank(machine, 2, 0);
+		memory_configure_bank(machine, "bank1", 0, 1, messram_get_ptr(messram), 0);
+		memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(messram) + 0x6000, 0);
+		memory_configure_bank(machine, "bank3", 0, 1, messram_get_ptr(messram) + 0x8000, 0);
+		memory_install_readwrite_bank(program, 0x0000, 0x5fff, 0, 0, "bank1");
+		memory_install_readwrite_bank(program, 0x6000, 0xbfff, 0, 0, "bank2");
+		memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank3");
+		memory_set_bank(machine, "bank2", 0);
 		break;
 	}
 
-	memory_set_bank(machine, 1, 1);
-	memory_set_bank(machine, 3, 0);
+	memory_set_bank(machine, "bank1", 1);
+	memory_set_bank(machine, "bank3", 0);
 
 	/* register for state saving */
 //	state_save_register_global(machine, state->);

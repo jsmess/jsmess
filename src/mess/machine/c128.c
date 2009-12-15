@@ -294,14 +294,6 @@ const cia6526_interface c128_pal_cia1 =
     Memory Handlers
 
 ***********************************************/
-
-static void c128_set_m8502_read_handler( running_machine *machine, UINT16 start, UINT16 end, read8_space_func rh )
-{
-	const device_config *cpu;
-	cpu = cputag_get_cpu(machine, "m8502");
-	memory_install_read8_handler(cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM), start, end, 0, 0, rh);
-}
-
 static WRITE8_HANDLER( c128_dma8726_port_w )
 {
 	DBG_LOG(space->machine, 1, "dma write", ("%.3x %.2x\n",offset,data));
@@ -408,7 +400,6 @@ void c128_bankswitch_64( running_machine *machine, int reset )
 {
 	static int old, exrom, game;
 	int data, loram, hiram, charen;
-	read8_space_func rh;
 
 	if (!c64mode)
 		return;
@@ -423,53 +414,51 @@ void c128_bankswitch_64( running_machine *machine, int reset )
 	charen = (data & 4) ? 1 : 0;
 
 	if ((!c64_game && c64_exrom) || (loram && hiram && !c64_exrom))
-		memory_set_bankptr(machine, 8, c64_roml);
+		memory_set_bankptr(machine, "bank8", c64_roml);
 	else
-		memory_set_bankptr(machine, 8, c64_memory + 0x8000);
+		memory_set_bankptr(machine, "bank8", c64_memory + 0x8000);
 
 	if ((!c64_game && c64_exrom && hiram) || (!c64_exrom))
-		memory_set_bankptr(machine, 9, c64_romh);
+		memory_set_bankptr(machine, "bank9", c64_romh);
 	else if (loram && hiram)
-		memory_set_bankptr(machine, 9, c64_basic);
+		memory_set_bankptr(machine, "bank9", c64_basic);
 	else
-		memory_set_bankptr(machine, 9, c64_memory + 0xa000);
+		memory_set_bankptr(machine, "bank9", c64_memory + 0xa000);
 
 	if ((!c64_game && c64_exrom) || (charen && (loram || hiram)))
 	{
-		rh = c128_read_io;
+		memory_install_read8_handler(cpu_get_address_space(cputag_get_cpu(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, c128_read_io);
 		c128_write_io = 1;
 	}
 	else
 	{
-		rh = SMH_BANK(5);
+		memory_install_read_bank(cpu_get_address_space(cputag_get_cpu(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, "bank5");
 		c128_write_io = 0;
 		if ((!charen && (loram || hiram)))
-			memory_set_bankptr(machine, 13, c64_chargen);
+			memory_set_bankptr(machine, "bank13", c64_chargen);
 		else
-			memory_set_bankptr(machine, 13, c64_memory + 0xd000);
+			memory_set_bankptr(machine, "bank13", c64_memory + 0xd000);
 	}
-
-	c128_set_m8502_read_handler(machine, 0xd000, 0xdfff, rh);
 
 	if (!c64_game && c64_exrom)
 	{
-		memory_set_bankptr(machine, 14, c64_romh);
-		memory_set_bankptr(machine, 15, c64_romh+0x1f00);
-		memory_set_bankptr(machine, 16, c64_romh+0x1f05);
+		memory_set_bankptr(machine, "bank14", c64_romh);
+		memory_set_bankptr(machine, "bank15", c64_romh+0x1f00);
+		memory_set_bankptr(machine, "bank16", c64_romh+0x1f05);
 	}
 	else
 	{
 		if (hiram)
 		{
-			memory_set_bankptr(machine, 14, c64_kernal);
-			memory_set_bankptr(machine, 15, c64_kernal+0x1f00);
-			memory_set_bankptr(machine, 16, c64_kernal+0x1f05);
+			memory_set_bankptr(machine, "bank14", c64_kernal);
+			memory_set_bankptr(machine, "bank15", c64_kernal+0x1f00);
+			memory_set_bankptr(machine, "bank16", c64_kernal+0x1f05);
 		}
 		else
 		{
-			memory_set_bankptr(machine, 14, c64_memory + 0xe000);
-			memory_set_bankptr(machine, 15, c64_memory + 0xff00);
-			memory_set_bankptr(machine, 16, c64_memory + 0xff05);
+			memory_set_bankptr(machine, "bank14", c64_memory + 0xe000);
+			memory_set_bankptr(machine, "bank15", c64_memory + 0xff00);
+			memory_set_bankptr(machine, "bank16", c64_memory + 0xff05);
 		}
 	}
 	old = data;
@@ -519,8 +508,8 @@ static void c128_bankswitch_z80( running_machine *machine )
 	 c128_ram = c64_memory + MMU_RAM_ADDR;
 	 c128_va1617 = MMU_VIC_ADDR;
 #if 1
-	 memory_set_bankptr(machine, 10, c128_z80);
-	 memory_set_bankptr(machine, 11, c128_ram + 0x1000);
+	 memory_set_bankptr(machine, "bank10", c128_z80);
+	 memory_set_bankptr(machine, "bank11", c128_ram + 0x1000);
 	 if ( (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
 		  || (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
 		 c128_ram = NULL;
@@ -531,21 +520,21 @@ static void c128_bankswitch_z80( running_machine *machine )
 		 c128_ram_bottom = 0;
 
 	 if (MMU_RAM_ADDR==0) { /* this is used in z80 mode for rom on/off switching !*/
-		 memory_set_bankptr(machine, 10, c128_z80);
-		 memory_set_bankptr(machine, 11, c128_z80 + 0x400);
+		 memory_set_bankptr(machine, "bank10", c128_z80);
+		 memory_set_bankptr(machine, "bank11", c128_z80 + 0x400);
 	 }
 	 else
 	 {
-		 memory_set_bankptr(machine, 10, (c128_ram_bottom > 0 ? c64_memory : c128_ram));
-		 memory_set_bankptr(machine, 11, (c128_ram_bottom > 0x400 ? c64_memory : c128_ram) + 0x400);
+		 memory_set_bankptr(machine, "bank10", (c128_ram_bottom > 0 ? c64_memory : c128_ram));
+		 memory_set_bankptr(machine, "bank11", (c128_ram_bottom > 0x400 ? c64_memory : c128_ram) + 0x400);
 	 }
 
-	 memory_set_bankptr(machine, 1, (c128_ram_bottom > 0 ? c64_memory : c128_ram));
-	 memory_set_bankptr(machine, 2, (c128_ram_bottom > 0x400 ? c64_memory : c128_ram) + 0x400);
+	 memory_set_bankptr(machine, "bank1", (c128_ram_bottom > 0 ? c64_memory : c128_ram));
+	 memory_set_bankptr(machine, "bank2", (c128_ram_bottom > 0x400 ? c64_memory : c128_ram) + 0x400);
 
-	 memory_set_bankptr(machine, 3, (c128_ram_bottom > 0x1000 ? c64_memory : c128_ram) + 0x1000);
-	 memory_set_bankptr(machine, 4, (c128_ram_bottom > 0x2000 ? c64_memory : c128_ram) + 0x2000);
-	 memory_set_bankptr(machine, 5, c128_ram + 0x4000);
+	 memory_set_bankptr(machine, "bank3", (c128_ram_bottom > 0x1000 ? c64_memory : c128_ram) + 0x1000);
+	 memory_set_bankptr(machine, "bank4", (c128_ram_bottom > 0x2000 ? c64_memory : c128_ram) + 0x2000);
+	 memory_set_bankptr(machine, "bank5", c128_ram + 0x4000);
 
 	 if (MMU_TOP)
 		 c128_ram_top = 0x10000 - MMU_SIZE;
@@ -553,24 +542,24 @@ static void c128_bankswitch_z80( running_machine *machine )
 		 c128_ram_top = 0x10000;
 
 	 if (c128_ram_top > 0xc000)
-		memory_set_bankptr(machine, 6, c128_ram + 0xc000);
+		memory_set_bankptr(machine, "bank6", c128_ram + 0xc000);
 	 else
-		memory_set_bankptr(machine, 6, c64_memory + 0xc000);
+		memory_set_bankptr(machine, "bank6", c64_memory + 0xc000);
 
 	 if (c128_ram_top > 0xe000)
-		memory_set_bankptr(machine, 7, c128_ram + 0xe000);
+		memory_set_bankptr(machine, "bank7", c128_ram + 0xe000);
 	 else
-		memory_set_bankptr(machine, 7, c64_memory + 0xd000);
+		memory_set_bankptr(machine, "bank7", c64_memory + 0xd000);
 
 	 if (c128_ram_top > 0xf000)
-		memory_set_bankptr(machine, 8, c128_ram + 0xf000);
+		memory_set_bankptr(machine, "bank8", c128_ram + 0xf000);
 	 else
-		memory_set_bankptr(machine, 8, c64_memory + 0xe000);
+		memory_set_bankptr(machine, "bank8", c64_memory + 0xe000);
 
 	 if (c128_ram_top > 0xff05)
-		memory_set_bankptr(machine, 9, c128_ram + 0xff05);
+		memory_set_bankptr(machine, "bank9", c128_ram + 0xff05);
 	 else
-		memory_set_bankptr(machine, 9, c64_memory + 0xff05);
+		memory_set_bankptr(machine, "bank9", c64_memory + 0xff05);
 
 	 if ( (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
 		  || (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
@@ -580,8 +569,6 @@ static void c128_bankswitch_z80( running_machine *machine )
 
 static void c128_bankswitch_128( running_machine *machine, int reset )
 {
-	read8_space_func rh;
-
 	c64mode = MMU_64MODE;
 	if (c64mode)
 	{
@@ -591,17 +578,17 @@ static void c128_bankswitch_128( running_machine *machine, int reset )
 		c128_ram_bottom = 0;
 		c128_ram_top = 0x10000;
 
-		memory_set_bankptr(machine, 1, c64_memory);
-		memory_set_bankptr(machine, 2, c64_memory + 0x100);
+		memory_set_bankptr(machine, "bank1", c64_memory);
+		memory_set_bankptr(machine, "bank2", c64_memory + 0x100);
 
-		memory_set_bankptr(machine, 3, c64_memory + 0x200);
-		memory_set_bankptr(machine, 4, c64_memory + 0x400);
-		memory_set_bankptr(machine, 5, c64_memory + 0x1000);
-		memory_set_bankptr(machine, 6, c64_memory + 0x2000);
+		memory_set_bankptr(machine, "bank3", c64_memory + 0x200);
+		memory_set_bankptr(machine, "bank4", c64_memory + 0x400);
+		memory_set_bankptr(machine, "bank5", c64_memory + 0x1000);
+		memory_set_bankptr(machine, "bank6", c64_memory + 0x2000);
 
-		memory_set_bankptr(machine, 7, c64_memory + 0x4000);
+		memory_set_bankptr(machine, "bank7", c64_memory + 0x4000);
 
-		memory_set_bankptr(machine, 12, c64_memory + 0xc000);
+		memory_set_bankptr(machine, "bank12", c64_memory + 0xc000);
 
 		c128_bankswitch_64(machine, reset);
 	}
@@ -609,47 +596,47 @@ static void c128_bankswitch_128( running_machine *machine, int reset )
 	{
 		c128_ram = c64_memory + MMU_RAM_ADDR;
 		c128_va1617 = MMU_VIC_ADDR;
-		memory_set_bankptr(machine, 1, c64_memory + mmu_page0);
-		memory_set_bankptr(machine, 2, c64_memory + mmu_page1);
+		memory_set_bankptr(machine, "bank1", c64_memory + mmu_page0);
+		memory_set_bankptr(machine, "bank2", c64_memory + mmu_page1);
 		if (MMU_BOTTOM)
 			{
 				c128_ram_bottom = MMU_SIZE;
 			}
 		else
 			c128_ram_bottom = 0;
-		memory_set_bankptr(machine, 3, (c128_ram_bottom > 0x200 ? c64_memory : c128_ram) + 0x200);
-		memory_set_bankptr(machine, 4, (c128_ram_bottom > 0x400 ? c64_memory : c128_ram) + 0x400);
-		memory_set_bankptr(machine, 5, (c128_ram_bottom > 0x1000 ? c64_memory : c128_ram) + 0x1000);
-		memory_set_bankptr(machine, 6, (c128_ram_bottom > 0x2000 ? c64_memory : c128_ram) + 0x2000);
+		memory_set_bankptr(machine, "bank3", (c128_ram_bottom > 0x200 ? c64_memory : c128_ram) + 0x200);
+		memory_set_bankptr(machine, "bank4", (c128_ram_bottom > 0x400 ? c64_memory : c128_ram) + 0x400);
+		memory_set_bankptr(machine, "bank5", (c128_ram_bottom > 0x1000 ? c64_memory : c128_ram) + 0x1000);
+		memory_set_bankptr(machine, "bank6", (c128_ram_bottom > 0x2000 ? c64_memory : c128_ram) + 0x2000);
 
 		if (MMU_RAM_LO)
 		{
-			memory_set_bankptr(machine, 7, c128_ram + 0x4000);
+			memory_set_bankptr(machine, "bank7", c128_ram + 0x4000);
 		}
 		else
 		{
-			memory_set_bankptr(machine, 7, c128_basic);
+			memory_set_bankptr(machine, "bank7", c128_basic);
 		}
 
 		if (MMU_RAM_MID)
 		{
-			memory_set_bankptr(machine, 8, c128_ram + 0x8000);
-			memory_set_bankptr(machine, 9, c128_ram + 0xa000);
+			memory_set_bankptr(machine, "bank8", c128_ram + 0x8000);
+			memory_set_bankptr(machine, "bank9", c128_ram + 0xa000);
 		}
 		else if (MMU_ROM_MID)
 		{
-			memory_set_bankptr(machine, 8, c128_basic + 0x4000);
-			memory_set_bankptr(machine, 9, c128_basic + 0x6000);
+			memory_set_bankptr(machine, "bank8", c128_basic + 0x4000);
+			memory_set_bankptr(machine, "bank9", c128_basic + 0x6000);
 		}
 		else if (MMU_INTERNAL_ROM_MID)
 		{
-			memory_set_bankptr(machine, 8, c128_internal_function);
-			memory_set_bankptr(machine, 9, c128_internal_function + 0x2000);
+			memory_set_bankptr(machine, "bank8", c128_internal_function);
+			memory_set_bankptr(machine, "bank9", c128_internal_function + 0x2000);
 		}
 		else
 		{
-			memory_set_bankptr(machine, 8, c128_external_function);
-			memory_set_bankptr(machine, 9, c128_external_function + 0x2000);
+			memory_set_bankptr(machine, "bank8", c128_external_function);
+			memory_set_bankptr(machine, "bank9", c128_external_function + 0x2000);
 		}
 
 		if (MMU_TOP)
@@ -659,84 +646,84 @@ static void c128_bankswitch_128( running_machine *machine, int reset )
 		else
 			c128_ram_top = 0x10000;
 
-		c128_set_m8502_read_handler(machine, 0xff00, 0xff04, c128_mmu8722_ff00_r);
+		memory_install_read8_handler(cpu_get_address_space(cputag_get_cpu(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xff00, 0xff04, 0, 0, c128_mmu8722_ff00_r);
 
 		if (MMU_IO_ON)
 		{
-			rh = c128_read_io;
 			c128_write_io = 1;
+			memory_install_read8_handler(cpu_get_address_space(cputag_get_cpu(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, c128_read_io);
 		}
 		else
 		{
 			c128_write_io = 0;
-			rh = SMH_BANK(13);
+			memory_install_read_bank(cpu_get_address_space(cputag_get_cpu(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, "bank13");
 		}
-		c128_set_m8502_read_handler(machine, 0xd000, 0xdfff, rh);
+		
 
 		if (MMU_RAM_HI)
 		{
 			if (c128_ram_top > 0xc000)
 			{
-				memory_set_bankptr(machine, 12, c128_ram + 0xc000);
+				memory_set_bankptr(machine, "bank12", c128_ram + 0xc000);
 			}
 			else
 			{
-				memory_set_bankptr(machine, 12, c64_memory + 0xc000);
+				memory_set_bankptr(machine, "bank12", c64_memory + 0xc000);
 			}
 			if (!MMU_IO_ON)
 			{
 				if (c128_ram_top > 0xd000)
 				{
-					memory_set_bankptr(machine, 13, c128_ram + 0xd000);
+					memory_set_bankptr(machine, "bank13", c128_ram + 0xd000);
 				}
 				else
 				{
-					memory_set_bankptr(machine, 13, c64_memory + 0xd000);
+					memory_set_bankptr(machine, "bank13", c64_memory + 0xd000);
 				}
 			}
 			if (c128_ram_top > 0xe000)
 			{
-				memory_set_bankptr(machine, 14, c128_ram + 0xe000);
+				memory_set_bankptr(machine, "bank14", c128_ram + 0xe000);
 			}
 			else
 			{
-				memory_set_bankptr(machine, 14, c64_memory + 0xe000);
+				memory_set_bankptr(machine, "bank14", c64_memory + 0xe000);
 			}
 			if (c128_ram_top > 0xff05)
 			{
-				memory_set_bankptr(machine, 16, c128_ram + 0xff05);
+				memory_set_bankptr(machine, "bank16", c128_ram + 0xff05);
 			}
 			else
 			{
-				memory_set_bankptr(machine, 16, c64_memory + 0xff05);
+				memory_set_bankptr(machine, "bank16", c64_memory + 0xff05);
 			}
 		}
 		else if (MMU_ROM_HI)
 		{
-			memory_set_bankptr(machine, 12, c128_editor);
+			memory_set_bankptr(machine, "bank12", c128_editor);
 			if (!MMU_IO_ON) {
-				memory_set_bankptr(machine, 13, c128_chargen);
+				memory_set_bankptr(machine, "bank13", c128_chargen);
 			}
-			memory_set_bankptr(machine, 14, c128_kernal);
-			memory_set_bankptr(machine, 16, c128_kernal + 0x1f05);
+			memory_set_bankptr(machine, "bank14", c128_kernal);
+			memory_set_bankptr(machine, "bank16", c128_kernal + 0x1f05);
 		}
 		else if (MMU_INTERNAL_ROM_HI)
 		{
-			memory_set_bankptr(machine, 12, c128_internal_function);
+			memory_set_bankptr(machine, "bank12", c128_internal_function);
 			if (!MMU_IO_ON) {
-				memory_set_bankptr(machine, 13, c128_internal_function + 0x1000);
+				memory_set_bankptr(machine, "bank13", c128_internal_function + 0x1000);
 			}
-			memory_set_bankptr(machine, 14, c128_internal_function + 0x2000);
-			memory_set_bankptr(machine, 16, c128_internal_function + 0x3f05);
+			memory_set_bankptr(machine, "bank14", c128_internal_function + 0x2000);
+			memory_set_bankptr(machine, "bank16", c128_internal_function + 0x3f05);
 		}
 		else					   /*if (MMU_EXTERNAL_ROM_HI) */
 		{
-			memory_set_bankptr(machine, 12, c128_external_function);
+			memory_set_bankptr(machine, "bank12", c128_external_function);
 			if (!MMU_IO_ON) {
-				memory_set_bankptr(machine, 13, c128_external_function + 0x1000);
+				memory_set_bankptr(machine, "bank13", c128_external_function + 0x1000);
 			}
-			memory_set_bankptr(machine, 14, c128_external_function + 0x2000);
-			memory_set_bankptr(machine, 16, c128_external_function + 0x3f05);
+			memory_set_bankptr(machine, "bank14", c128_external_function + 0x2000);
+			memory_set_bankptr(machine, "bank16", c128_external_function + 0x3f05);
 		}
 
 		if ( (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))

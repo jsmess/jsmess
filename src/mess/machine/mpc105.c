@@ -29,7 +29,8 @@ static void mpc105_update_memory(running_machine *machine)
 	const device_config *cpu;
 	int bank;
 	offs_t begin, end;
-
+	char bank_str[10];
+	
 	if (LOG_MPC105)
 		logerror("mpc105_update_memory(machine): Updating memory (bank enable=0x%02X)\n", mpc105->bank_enable);
 
@@ -41,8 +42,8 @@ static void mpc105_update_memory(running_machine *machine)
 			const address_space *space = cpu_get_address_space( cpu, ADDRESS_SPACE_PROGRAM );
 
 			/* first clear everything out */
-			memory_install_read64_handler(space, 0x00000000, 0x3FFFFFFF, 0, 0, SMH_NOP);
-			memory_install_write64_handler(space, 0x00000000, 0x3FFFFFFF, 0, 0, SMH_NOP);
+			memory_nop_read(space, 0x00000000, 0x3FFFFFFF, 0, 0);
+			memory_nop_read(space, 0x00000000, 0x3FFFFFFF, 0, 0);
 		}
 	}
 
@@ -76,7 +77,8 @@ static void mpc105_update_memory(running_machine *machine)
 						memory_install_write64_handler(space, begin, end,
 							0, 0, (write64_space_func) (FPTR)(bank + mpc105->bank_base));
 					}
-					memory_set_bankptr(machine, bank + mpc105->bank_base, messram_get_ptr(devtag_get_device(machine, "messram")));
+					sprintf(bank_str,"bank%d",bank + mpc105->bank_base);
+					memory_set_bankptr(machine, bank_str, messram_get_ptr(devtag_get_device(machine, "messram")));
 				}
 			}
 		}

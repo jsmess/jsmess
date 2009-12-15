@@ -541,7 +541,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( _4in1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(1)	/* banked game code */
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")	/* banked game code */
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
 	AM_RANGE(0x5400, 0x57ff) AM_READ(galaxold_videoram_r)
@@ -596,8 +596,8 @@ static ADDRESS_MAP_START( dkongjrm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
 	AM_RANGE(0x9800, 0x983f) AM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
-	AM_RANGE(0x9840, 0x987f) AM_WRITE(SMH_RAM) AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
-	AM_RANGE(0x98c0, 0x98ff) AM_WRITE(SMH_RAM) AM_BASE(&galaxold_spriteram2) AM_SIZE(&galaxold_spriteram2_size)
+	AM_RANGE(0x9840, 0x987f) AM_WRITEONLY AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
+	AM_RANGE(0x98c0, 0x98ff) AM_WRITEONLY AM_BASE(&galaxold_spriteram2) AM_SIZE(&galaxold_spriteram2_size)
 	AM_RANGE(0xa000, 0xa0ff) AM_READ_PORT("IN0")
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(galaxold_coin_counter_w)
   //AM_RANGE(0xa004, 0xa007) AM_WRITE(galaxian_lfo_freq_w)
@@ -622,7 +622,7 @@ static ADDRESS_MAP_START( ozon1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_BASE(&galaxold_videoram)
 	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(galaxold_videoram_w)
 	AM_RANGE(0x5000, 0x503f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
-	AM_RANGE(0x5040, 0x505f) AM_RAM_WRITE(SMH_RAM) AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
+	AM_RANGE(0x5040, 0x505f) AM_RAM AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
 	AM_RANGE(0x6801, 0x6801) AM_WRITENOP //continuosly 0 and 1
 	AM_RANGE(0x6802, 0x6802) AM_WRITE(galaxold_coin_counter_w)
 	AM_RANGE(0x6806, 0x6806) AM_WRITENOP //only one 0 at reset
@@ -641,7 +641,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( drivfrcg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1480, 0x14bf) AM_MIRROR(0x6000) AM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
-	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0x6000) AM_WRITE(SMH_RAM) AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
+	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0x6000) AM_WRITEONLY AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
 	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x6000) AM_READ_PORT("IN0")
 	AM_RANGE(0x1503, 0x1503) AM_MIRROR(0x6000) AM_WRITE(galaxold_coin_counter_w)
 	AM_RANGE(0x1580, 0x1580) AM_MIRROR(0x6000) AM_READ_PORT("IN1")
@@ -681,7 +681,7 @@ static ADDRESS_MAP_START( bongo, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb004, 0xb004) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_READWRITE(watchdog_reset_r, SMH_NOP)
+	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bongo_io, ADDRESS_SPACE_IO, 8 )
@@ -694,7 +694,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hunchbkg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1480, 0x14bf) AM_MIRROR(0x6000) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
-	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0x6000) AM_WRITE(SMH_RAM) AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
+	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0x6000) AM_WRITEONLY AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
 	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x6000) AM_READ_PORT("IN0")
 	AM_RANGE(0x1503, 0x1503) AM_MIRROR(0x6000) AM_WRITE(galaxold_coin_counter_w)
 	AM_RANGE(0x1580, 0x1580) AM_MIRROR(0x6000) AM_READ_PORT("IN1")
@@ -706,7 +706,7 @@ static ADDRESS_MAP_START( hunchbkg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1604, 0x1604) AM_MIRROR(0x6000) AM_WRITENOP
 	AM_RANGE(0x1606, 0x1606) AM_MIRROR(0x6000) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x1607, 0x1607) AM_MIRROR(0x6000) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0x1680, 0x1680) AM_MIRROR(0x6000) AM_READ(SMH_NOP) AM_DEVWRITE(GAL_AUDIO, galaxian_pitch_w)
+	AM_RANGE(0x1680, 0x1680) AM_MIRROR(0x6000) AM_READNOP AM_DEVWRITE(GAL_AUDIO, galaxian_pitch_w)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
@@ -726,7 +726,7 @@ static ADDRESS_MAP_START( harem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4fff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_BASE(&galaxold_videoram)
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP
-	AM_RANGE(0x5800, 0x5800) AM_READWRITE(SMH_NOP, interrupt_enable_w)
+	AM_RANGE(0x5800, 0x5800) AM_READNOP AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x5801, 0x5807) AM_WRITENOP
 	AM_RANGE(0x6101, 0x6101) AM_READ_PORT("IN0")
 	AM_RANGE(0x6102, 0x6102) AM_READ_PORT("IN1")
@@ -2999,6 +2999,78 @@ ROM_START( porter )
 	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
 ROM_END
 
+
+/*
+
+on a cocktail galaxian pcb (eagle style)
+
+this had a CPU daughtercard with 3 unknown prom/pal/gal type things on it:
+
+Harris M3-7643-5 x2
+TI SN746471 ? (number has been partially obliterated on purpose.
+and a 74ls126
+
+The CPU has 'VIDEO STARS - V.S PRO - TEL: 03045 61541' on a sticky label on it.
+
+the cpu daughterboard is etched 'competitive video'.
+
+The rom daughtercard may not have come from this precise pcb,
+i think it was on a fullsize pcb according to the spacing of the riser pins.
+This daughterboard is also etched competitive video, and uses 4 2716's and 3 2732's.
+
+there are 8 rom sockets on this daughterboard, 7 are roms, and the final socket is actually a 6116 ram.
+
+there is a small prom in the midle of the pcb inbetween the risers,
+with a circular red labelled saying 'k'. This might be a decryption prom or somethign? i dunno.
+
+there is a TBP18s03 PROM installed at 6L which i guess is the colour prom :)
+
+I think thats about it.
+
+Dumped 26.05.04
+Andy Welburn
+www.andys-arcade.com
+
+*/
+
+/* this rom mapping probably isn't quite right */
+ROM_START( vstars )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "c-k2.bin",       0x0000, 0x0400, CRC(b0fcf6c1) SHA1(7dc8a7b99977ea9582c1ed36fa9f1fa502a70c6e) )
+	ROM_CONTINUE(               0x0800, 0x0400)
+	ROM_LOAD( "c-k1.bin",       0x0c00, 0x0400, CRC(ea9603b2) SHA1(f72202f17f862c7ea81e556690f8fcb9ee926e7f) )
+	ROM_CONTINUE(               0x0400, 0x0400)
+	ROM_LOAD( "c-k4.bin",       0x1c00, 0x0400, CRC(f5743990) SHA1(defd1577b935e3597eba74344dca5626ec2993dd) )
+	ROM_CONTINUE(               0x1000, 0x0400)
+	ROM_LOAD( "c-k3.bin",       0x1400, 0x0400, CRC(c4338a77) SHA1(b1ca2d43340b671ef33f3a96ce8e1c286a3e6d80) )
+	ROM_CONTINUE(               0x1800, 0x0400)
+	ROM_LOAD( "c-k6.bin",       0x2c00, 0x0400, CRC(184b9d7e) SHA1(80159ab19233ce95e9c74d039b6777d01b32e959) )
+	ROM_CONTINUE(               0x2000, 0x0400)
+	ROM_CONTINUE(               0x2400, 0x0400)
+	ROM_CONTINUE(               0x2800, 0x0400)
+	ROM_LOAD( "c-k7.bin",       0x4c00, 0x0400, CRC(9ddcc06f) SHA1(63bc77d8b3273681ca4e681105a117d19a0f23a5) )
+	ROM_CONTINUE(               0x4000, 0x0400)
+	ROM_CONTINUE(               0x4400, 0x0400)
+	ROM_CONTINUE(               0x4800, 0x0400)
+
+	/* seems to be data, can't rearrange based on the jumps */
+	ROM_LOAD( "c-k5.bin",       0x3c00, 0x0400, CRC(d8df2ec4) SHA1(bef1d4b404cddb8a5f9d4e3f30ee09915c602f56) )
+	ROM_CONTINUE(               0x3000, 0x0400)
+	ROM_CONTINUE(               0x3400, 0x0400)
+	ROM_CONTINUE(               0x3800, 0x0400)
+
+	/* Crazy Kong gfx?! */
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "1h.bin",   0x0000, 0x1000, CRC(7866d2cb) SHA1(62dd8b80bc0459c7337d8a8cb83e53b999e7f4a9) )
+	ROM_LOAD( "1k.bin",   0x1000, 0x1000, CRC(7311a101) SHA1(49d54c8b94cae4ba81d7a7684eaa4e87815bb4da) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6l.bin",     0x0000, 0x0020, CRC(fd81e715) SHA1(eadafe88f26405e6540d4b248b940974e8c31145) )
+
+	ROM_REGION( 0x0020, "proms2", 0 )
+	ROM_LOAD( "k.bin",     0x0000, 0x0020, CRC(d46ed869) SHA1(9c0a11df11b1a24ee933d1aa435337b78c3ca643) )
+ROM_END
+
 GAME( 1981, scramblb, scramble, scramblb, scramblb, 0,        ROT90,  "bootleg", "Scramble (Galaxian hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1981, scramb2,  scramble, scramb2,  scramb2,  0,        ROT90,  "bootleg", "Scramble (bootleg)", GAME_SUPPORTS_SAVE )
 
@@ -3022,3 +3094,4 @@ GAME( 1985, trvchlng, 0,        racknrol, trvchlng, 0,	      ROT90,  "Joyland (S
 GAME( 1981, ckongg,   0,        ckongg,   ckongg,   0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, kkgalax,  ckongg,   kkgalax,  kkgalax,  0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // set was marked as 'King Kong on Galaxian'
 GAME( 1982, porter,   0,        mooncrst, porter,   0,        ROT90,  "[Nova Games Ltd.] (bootleg)", "Port Man (bootleg on Moon Cresta hardware)", GAME_IMPERFECT_GRAPHICS ) // missing GFX bank switch!
+GAME( 1982, vstars,   0,        mooncrst, porter,   0,        ROT90,  "Competitive Video?", "Video Stars", GAME_NOT_WORKING )

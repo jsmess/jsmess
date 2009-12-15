@@ -9,6 +9,7 @@
   - American Horseshoes
   - Play Girls
   - Play Girls 2
+  - LA Girl
   - Cuby Bop
 
   Dual processor games (1 main TC0090LVC (z80 core), 1 sound z80)
@@ -59,6 +60,8 @@ puzznici note
 #include "sound/msm5205.h"
 #include "includes/taito_l.h"
 
+
+static const char * const bankname[] = { "bank2", "bank3", "bank4", "bank5" };
 
 static const struct
 {
@@ -151,10 +154,10 @@ static void machine_init(running_machine *machine)
 		cur_rambank[i] = 0x80;
 		current_base[i] = palette_ram;
 		current_notifier[i] = palette_notifier;
-		memory_set_bankptr(machine, 2+i, current_base[i]);
+		memory_set_bankptr(machine, bankname[i], current_base[i]);
 	}
 	cur_rombank = cur_rombank2 = 0;
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x10000);
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x10000);
 
 	gfx_element_set_source(machine->gfx[2], taitol_rambanks);
 
@@ -335,7 +338,7 @@ static WRITE8_HANDLER( rombankswitch_w )
 
 //      logerror("robs %d, %02x (%04x)\n", offset, data, cpu_get_pc(space->cpu));
 		cur_rombank = data;
-		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu")+0x10000+0x2000*cur_rombank);
+		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu")+0x10000+0x2000*cur_rombank);
 	}
 }
 
@@ -354,7 +357,7 @@ static WRITE8_HANDLER( rombank2switch_w )
 //      logerror("robs2 %02x (%04x)\n", data, cpu_get_pc(space->cpu));
 
 		cur_rombank2 = data;
-		memory_set_bankptr(space->machine, 6, memory_region(space->machine, "slave")+0x10000+0x4000*cur_rombank2);
+		memory_set_bankptr(space->machine, "bank6", memory_region(space->machine, "slave")+0x10000+0x4000*cur_rombank2);
 	}
 }
 
@@ -391,7 +394,7 @@ logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, cpu_get_pc(spa
 			current_notifier[offset] = 0;
 			current_base[offset] = empty_ram;
 		}
-		memory_set_bankptr(space->machine, 2+offset, current_base[offset]);
+		memory_set_bankptr(space->machine, bankname[offset], current_base[offset]);
 	}
 }
 
@@ -639,11 +642,11 @@ static READ8_HANDLER( horshoes_trackx_hi_r )
 
 #define COMMON_BANKS_MAP \
 	AM_RANGE(0x0000, 0x5fff) AM_ROM			\
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1) 			\
-	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK(2) AM_WRITE(bank0_w) \
-	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK(3) AM_WRITE(bank1_w) \
-	AM_RANGE(0xe000, 0xefff) AM_ROMBANK(4) AM_WRITE(bank2_w) \
-	AM_RANGE(0xf000, 0xfdff) AM_ROMBANK(5) AM_WRITE(bank3_w) \
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1") 			\
+	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank2") AM_WRITE(bank0_w) \
+	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK("bank3") AM_WRITE(bank1_w) \
+	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank4") AM_WRITE(bank2_w) \
+	AM_RANGE(0xf000, 0xfdff) AM_ROMBANK("bank5") AM_WRITE(bank3_w) \
 	AM_RANGE(0xfe00, 0xfe03) AM_READWRITE(taitol_bankc_r, taitol_bankc_w)		\
 	AM_RANGE(0xfe04, 0xfe04) AM_READWRITE(taitol_control_r, taitol_control_w)	\
 	AM_RANGE(0xff00, 0xff02) AM_READWRITE(irq_adr_r, irq_adr_w)			\
@@ -665,7 +668,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fhawk_2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(6)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank6")
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
 	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_WRITE(taitosound_port_w)
 	AM_RANGE(0xc801, 0xc801) AM_READWRITE(taitosound_comm_r, taitosound_comm_w)
@@ -681,7 +684,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fhawk_3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(7)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READNOP AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe001, 0xe001) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
@@ -711,12 +714,12 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 	UINT8 *RAM = memory_region(space->machine, "audiocpu");
 	int banknum = (data - 1) & 3;
 
-	memory_set_bankptr (space->machine, 7, &RAM [0x10000 + (banknum * 0x4000)]);
+	memory_set_bankptr (space->machine, "bank7", &RAM [0x10000 + (banknum * 0x4000)]);
 }
 
 static ADDRESS_MAP_START( raimais_3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(7)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_WRITE(taitosound_slave_port_w)
@@ -737,7 +740,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( champwr_2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(6)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank6")
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(shared_r, shared_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSWA") AM_WRITENOP	// Watchdog
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSWB")
@@ -753,7 +756,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( champwr_3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(7)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_WRITE(taitosound_slave_port_w)
@@ -887,7 +890,7 @@ static ADDRESS_MAP_START( evilston_2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(shared_r, shared_w)
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK(7)
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank7")
 ADDRESS_MAP_END
 
 
@@ -1889,7 +1892,7 @@ static WRITE8_DEVICE_HANDLER( portA_w )
 
 		cur_bank = data & 0x03;
 		bankaddress = 0x10000 + (cur_bank-1) * 0x4000;
-		memory_set_bankptr(device->machine, 7, &RAM[bankaddress]);
+		memory_set_bankptr(device->machine, "bank7", &RAM[bankaddress]);
 		//logerror ("YM2203 bank change val=%02x  pc=%04x\n", cur_bank, cpu_get_pc(space->cpu) );
 	}
 }
@@ -2731,6 +2734,54 @@ ROM_START( evilston )
 	ROM_LOAD( "c67-02.ic5",  0x80000, 0x80000, CRC(eb4f895c) SHA1(2c902572fe5a5d4442e4dd29e8a85cb40c384140) )
 ROM_END
 
+/*
+
+LA Girl
+(no manufacturer/year?)
+
+PCB Layout
+----------
+
+|------------------------------------------|
+|VOL 4558 YM3014                 ROM4      |
+|UPC1241              2018            ROM5 |
+|     YM2203             TPC1020           |
+|            DSW1(8)                       |
+|            DSW2(8)                       |
+|                         6264    ROM3     |
+|J                                ROM2     |
+|A  27.2109MHz                             |
+|M                                         |
+|M                                PAL      |
+|A                                PAL      |
+|        6264            TPC1020  PAL      |
+|            ROM1                          |
+|                                  6264    |
+|                                  6264    |
+|              PAL       TPC1020           |
+|        Z80B                              |
+|                 44256           44256    |
+|PAL              44256           44256    |
+|------------------------------------------|
+Notes:
+      Z80 - clock 6.802725MHz [27.2109/4]
+   YM2203 - clocks 3.4013625 [27/2109/8] & 1.1337875 [27.2109/24]
+    VSync - 55.8268Hz  \ possibly sync/PCB fault, had to adjust
+    HSync - 14.7739kHz / h/v syncs on monitor to get a stable picture
+
+*/
+
+ROM_START( lagirl )
+	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_LOAD( "rom1",  0x00000, 0x40000, CRC(ba1acfdb) SHA1(ff1093c2d0887287ce451417bd373e00f2881ce7) )
+	ROM_RELOAD(           0x10000, 0x40000 )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "rom2",   0x40001, 0x20000, CRC(4c739a30) SHA1(4426f51aac9bb39f5d1a7616d183ff6c76749dc2) )
+	ROM_LOAD16_BYTE( "rom3",   0x40000, 0x20000, CRC(4cf22a4b) SHA1(1c933ccbb6a5b8a6795385d7970db5f7138e572e) )
+	ROM_LOAD16_BYTE( "rom4",   0x00001, 0x20000, CRC(7dcd6696) SHA1(8f3b1fe669520142668af6dc2d04f13767048989) )
+	ROM_LOAD16_BYTE( "rom5",   0x00000, 0x20000, CRC(b1782816) SHA1(352663974886e1e4358e55b87c8bf0cdb979f177) )
+ROM_END
 
 
 
@@ -2793,5 +2844,7 @@ GAME( 199?, cubybop,   0,        cachat,   cubybop,  0,        ROT0,   "Taito Co
 
 GAME( 1992, plgirls,   0,        cachat,   plgirls,  0,        ROT270, "Hot-B.", "Play Girls", 0 )
 GAME( 1993, plgirls2,  0,        cachat,   plgirls2, 0,        ROT270, "Hot-B.", "Play Girls 2", 0 )
+
+GAME( 199?, lagirl,   0,         cachat,   plgirls,  0,        ROT270, "<unknown>", "LA Girl", 0 )
 
 GAME( 1990, evilston,  0,        evilston, evilston, evilston, ROT270, "Spacy Industrial, Ltd.", "Evil Stone", 0 )

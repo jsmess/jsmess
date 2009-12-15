@@ -350,8 +350,8 @@ static MACHINE_RESET( bgaregga )
 
 	// Set Z80 bank switch - default bank is 2
 	current_bank = 4;
-	memory_configure_bank(machine, 1, 0, 16, Z80, 0x4000);
-	memory_set_bank(machine, 1, 4);
+	memory_configure_bank(machine, "bank1", 0, 16, Z80, 0x4000);
+	memory_set_bank(machine, "bank1", 4);
 
 	if (memory_region(machine, "oki1") != NULL)
 		NMK112_init(0, "oki1", "oki2");
@@ -406,8 +406,7 @@ static DRIVER_INIT( fixeight )
 
 	if (fixeight_sec_cpu_mem)
 	{
-		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x28f002, 0x28fbff, 0, 0, (read16_space_func)SMH_BANK(2), (write16_space_func)SMH_BANK(2) );
-		memory_set_bankptr(machine, 2, fixeight_sec_cpu_mem);
+		memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x28f002, 0x28fbff, 0, 0, fixeight_sec_cpu_mem );
 	}
 
 	toaplan2_sub_cpu = CPU_2_V25;
@@ -417,7 +416,7 @@ static DRIVER_INIT( fixeight )
 static DRIVER_INIT( fixeighb )
 {
 	UINT16 *bgdata = (UINT16 *)memory_region(machine, "maincpu");
-	memory_set_bankptr(machine, 1, &bgdata[0x40000]); /* $80000 - $fffff */
+	memory_set_bankptr(machine, "bank1", &bgdata[0x40000]); /* $80000 - $fffff */
 
 	toaplan2_sub_cpu = CPU_2_NONE;
 	register_state_save(machine);
@@ -936,11 +935,10 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 			/* game keeping service mode. It writes/reads the settings to/from */
 			/* these shared RAM locations. The secondary CPU reads/writes them */
 			/* from/to nvram to store the settings (a 93C45 EEPROM) */
-			//memory_install_readwrite16_handler(space, 0x28f002, 0x28fbff, 0, 0, (read16_space_func)SMH_BANK(2), (write16_space_func)SMH_BANK(2));
-			//memory_set_bankptr(space->machine, 2, fixeight_sec_cpu_mem);
-			memory_install_read_port_handler(space, 0x28f004, 0x28f005, 0, 0, "DSWA");	/* Dip Switch A - Wrong !!! */
-			memory_install_read_port_handler(space, 0x28f006, 0x28f007, 0, 0, "DSWB");	/* Dip Switch B - Wrong !!! */
-			memory_install_read_port_handler(space, 0x28f008, 0x28f009, 0, 0, "JMPR");	/* Territory Jumper block - Wrong !!! */
+			//memory_install_ram(space, 0x28f002, 0x28fbff, 0, 0, fixeight_sec_cpu_mem);
+			memory_install_read_port(space, 0x28f004, 0x28f005, 0, 0, "DSWA");	/* Dip Switch A - Wrong !!! */
+			memory_install_read_port(space, 0x28f006, 0x28f007, 0, 0, "DSWB");	/* Dip Switch B - Wrong !!! */
+			memory_install_read_port(space, 0x28f008, 0x28f009, 0, 0, "JMPR");	/* Territory Jumper block - Wrong !!! */
 
 			mcu_data = data;
 		}
@@ -1081,7 +1079,7 @@ static WRITE8_HANDLER( bgaregga_bankswitch_w )
 	if (bank != current_bank)
 	{
 		current_bank = bank;
-		memory_set_bank(space->machine, 1, bank);
+		memory_set_bank(space->machine, "bank1", bank);
 	}
 }
 
@@ -1124,7 +1122,7 @@ static WRITE8_HANDLER( batrider_bankswitch_w )
 	if (bank != current_bank)
 	{
 		current_bank = bank;
-		memory_set_bank(space->machine, 1, bank);
+		memory_set_bank(space->machine, "bank1", bank);
 	}
 }
 
@@ -1527,11 +1525,11 @@ static ADDRESS_MAP_START( fixeight_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x280000, 0x28dfff) AM_RAM							/* part of shared ram ? */
 	AM_RANGE(0x28e000, 0x28efff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)
 	AM_RANGE(0x28f000, 0x28f001) AM_READWRITE(fixeight_sec_cpu_r, fixeight_sec_cpu_w) AM_BASE(&fixeight_sec_cpu_mem)	/* V25+ Command/Status port */
-//  AM_RANGE(0x28f002, 0x28f003) AM_READ(SMH_RAM)             /* part of shared ram */
+//  AM_RANGE(0x28f002, 0x28f003) AM_READONLY             /* part of shared ram */
 //  AM_RANGE(0x28f004, 0x28f005) AM_READ_PORT("DSWA") /* Dip Switch A - Wrong !!! */
 //  AM_RANGE(0x28f006, 0x28f007) AM_READ_PORT("DSWB") /* Dip Switch B - Wrong !!! */
 //  AM_RANGE(0x28f008, 0x28f009) AM_READ_PORT("JMPR") /* Territory Jumper block - Wrong !!! */
-//  AM_RANGE(0x28f00a, 0x28fbff) AM_READ(SMH_RAM)             /* part of shared ram */
+//  AM_RANGE(0x28f00a, 0x28fbff) AM_READONLY             /* part of shared ram */
 	AM_RANGE(0x28fc00, 0x28ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
 #endif
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(toaplan2_0_voffs_w)	/* VideoRAM selector/offset */
@@ -1567,7 +1565,7 @@ static ADDRESS_MAP_START( fixeighb_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x502000, 0x5021ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE(&toaplan2_txvideoram16_offs) AM_SIZE(&toaplan2_tx_offs_vram_size)
 	AM_RANGE(0x503000, 0x5031ff) AM_READWRITE(toaplan2_txscrollram16_r, toaplan2_txscrollram16_w) AM_BASE(&toaplan2_txscrollram16) AM_SIZE(&toaplan2_tx_scroll_vram_size)
 	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
-	AM_RANGE(0x800000, 0x87ffff) AM_READ(SMH_BANK(1))
+	AM_RANGE(0x800000, 0x87ffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 
@@ -1865,7 +1863,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bgaregga_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&raizing_shared_ram)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
@@ -1880,7 +1878,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( batrider_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1906,7 +1904,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bbakraid_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM			/* Only 2FFFh valid code */
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1947,8 +1945,8 @@ static ADDRESS_MAP_START( V25_kbash_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM							/* Internal 512 bytes of RAM */
 //  AM_RANGE(0x80000, 0x87fff) AM_RAM AM_BASE(&V25_sharedram)   /* External shared RAM (ROM for KBASH) */
 
-    AM_RANGE(0xa0000, 0xa7fff) AM_ROM AM_SHARE(10)
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_SHARE(10) AM_REGION("mcu", 0)
+    AM_RANGE(0xa0000, 0xa7fff) AM_ROM AM_SHARE("share10")
+	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_SHARE("share10") AM_REGION("mcu", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( V25_kbash_port, ADDRESS_SPACE_IO, 8 )
@@ -2002,19 +2000,19 @@ static READ8_HANDLER( kludge_r )
 
 static ADDRESS_MAP_START( V25_rambased_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE(6) AM_BASE(&batsugun_share)
+	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE("share6") AM_BASE(&batsugun_share)
 
-//  AM_RANGE(0x40000, 0x477ff) AM_RAM AM_SHARE(7)
+//  AM_RANGE(0x40000, 0x477ff) AM_RAM AM_SHARE("share7")
 	AM_RANGE(0x40e00, 0x40eff) AM_RAM //internal V25 RAM
 	#ifdef USE_ENCRYPTED_V25S
 	AM_RANGE(0x40f00, 0x40fff) AM_READWRITE(v25s_internal_io_r,v25s_internal_io_w)
 	AM_RANGE(0x87ff9, 0x87ff9) AM_READ(kludge_r)
 	#endif
 
-	AM_RANGE(0x80000, 0x87fff) AM_RAM AM_SHARE(6)
-	AM_RANGE(0xa0000, 0xa7fff) AM_RAM AM_SHARE(6)
+	AM_RANGE(0x80000, 0x87fff) AM_RAM AM_SHARE("share6")
+	AM_RANGE(0xa0000, 0xa7fff) AM_RAM AM_SHARE("share6")
 
-	AM_RANGE(0xf8000, 0xfffff) AM_RAM AM_SHARE(6)
+	AM_RANGE(0xf8000, 0xfffff) AM_RAM AM_SHARE("share6")
 ADDRESS_MAP_END
 
 /*****************************************************************************
@@ -3486,7 +3484,7 @@ MACHINE_DRIVER_END
 
 /* x = modified to match batsugun 'unencrypted' code */
 
-const UINT8 ts002mach_decryption_table[256] = {
+static const UINT8 ts002mach_decryption_table[256] = {
 	0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07, 0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f, /* 00 */
 	0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17, 0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f, /* 10 */
 	0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27, 0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f, /* 20 */
@@ -3554,7 +3552,7 @@ MACHINE_DRIVER_END
   '!' = code stops being the same as batsugun at this point, might be wrong
   - they seem to have mostly mapped extra opcodes for common ones, eg. mov
 */
-const UINT8 ts004dash_decryption_table[256] = {
+static const UINT8 ts004dash_decryption_table[256] = {
 	0x00,0x01,0x02,0x03,0x8c,0x05,0x06,0x07, 0x08,0x09,0x36,0x0b,0x0c,0x0d,0x8c,0x0f, /* 00 */
 	                    /*?*/                          /*?*/               /*?*/
 	0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17, 0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x8e,0x1f, /* 10 */
@@ -3834,7 +3832,7 @@ MACHINE_DRIVER_END
 
 /* x = modified to match batsugun 'unencrypted' code - '?' likewise, but not so sure about them */
 /* this one seems more different to the other tables */
-const UINT8 ts001turbo_decryption_table[256] = {
+static const UINT8 ts001turbo_decryption_table[256] = {
 	0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07, 0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f, /* 00 */
 	0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17, 0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f, /* 10 */
 	0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27, 0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f, /* 20 */
@@ -3943,7 +3941,7 @@ MACHINE_DRIVER_END
     - note, the basic startup code remapping seems identical between all games, so they
       probably use a common remap with some per-game changes which supports the above theory
    */
-const UINT8 ts007spy_vfive_decryption_table[256] = {
+static const UINT8 ts007spy_vfive_decryption_table[256] = {
 	0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07, 0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f, /* 00 */
 	0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17, 0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f, /* 10 */
 	0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27, 0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f, /* 20 */
@@ -4024,7 +4022,7 @@ static const ym2151_interface batsugun_ym2151_interface =
 
 /* the batsugun cpu is mostly non-encrypted, from a glance over the code it seems they
    only encrypted a few opcodes used in the interrupt routine, the rest is a 1:1 mapping */
-const UINT8 ts007spy_decryption_table[256] = {
+static const UINT8 ts007spy_decryption_table[256] = {
 	0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07, 0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f, /* 00 */
 	0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17, 0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f, /* 10 */
 	0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27, 0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f, /* 20 */

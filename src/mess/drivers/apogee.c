@@ -19,7 +19,7 @@
 
 /* Address maps */
 static ADDRESS_MAP_START(apogee_mem, ADDRESS_SPACE_PROGRAM, 8)
-    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK(1) // First bank
+    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0xebff ) AM_RAM  // RAM
     //AM_RANGE( 0xec00, 0xecff ) AM_RAM  // Timer
     AM_RANGE( 0xed00, 0xed03 ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w) AM_MIRROR(0x00fc)

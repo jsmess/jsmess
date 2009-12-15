@@ -1448,7 +1448,7 @@ static MACHINE_START( mmonkey )
 	state_save_register_global(machine, state->protection_ret);
 }
 
-MACHINE_RESET( btime )
+static MACHINE_RESET( btime )
 {
 	btime_state *state = (btime_state *)machine->driver_data;
 
@@ -1465,7 +1465,7 @@ MACHINE_RESET( btime )
 	state->audio_nmi_state = 0;
 }
 
-MACHINE_RESET( lnc )
+static MACHINE_RESET( lnc )
 {
 	btime_state *state = (btime_state *)machine->driver_data;
 	*state->lnc_charbank = 1;
@@ -1473,7 +1473,7 @@ MACHINE_RESET( lnc )
 	MACHINE_RESET_CALL(btime);
 }
 
-MACHINE_RESET( mmonkey )
+static MACHINE_RESET( mmonkey )
 {
 	btime_state *state = (btime_state *)machine->driver_data;
 
@@ -2165,8 +2165,8 @@ static DRIVER_INIT( cookrace )
 	btime_state *state = (btime_state *)machine->driver_data;
 	decrypt_C10707_cpu(machine, "maincpu");
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, (read8_space_func)SMH_BANK(10));
-	memory_set_bankptr(machine, 10, memory_region(machine, "audiocpu") + 0xe200);
+	memory_install_read_bank(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, "bank10");
+	memory_set_bankptr(machine, "bank10", memory_region(machine, "audiocpu") + 0xe200);
 	state->audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
@@ -2184,8 +2184,8 @@ static DRIVER_INIT( wtennis )
 
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, (read8_space_func)SMH_BANK(10));
-	memory_set_bankptr(machine, 10, memory_region(machine, "audiocpu") + 0xe200);
+	memory_install_read_bank(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, "bank10");
+	memory_set_bankptr(machine, "bank10", memory_region(machine, "audiocpu") + 0xe200);
 	state->audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 

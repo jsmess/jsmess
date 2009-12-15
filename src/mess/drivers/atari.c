@@ -239,7 +239,7 @@
 
 static ADDRESS_MAP_START(a400_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x9fff) AM_NOP	/* RAM installed at runtime */
-	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(1)
+	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
@@ -253,7 +253,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(a800_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x9fff) AM_NOP	/* RAM installed at runtime */
-	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(1)
+	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
@@ -282,17 +282,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(a800xl_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x4fff) AM_RAM
-	AM_RANGE(0x5000, 0x57ff) AM_RAMBANK(2)
+	AM_RANGE(0x5000, 0x57ff) AM_RAMBANK("bank2")
 	AM_RANGE(0x5800, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(1)
-	AM_RANGE(0xc000, 0xcfff) AM_RAMBANK(3)
+	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank1")
+	AM_RANGE(0xc000, 0xcfff) AM_RAMBANK("bank3")
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_alt_r, pia6821_alt_w)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
-	AM_RANGE(0xd800, 0xffff) AM_RAMBANK(4)
+	AM_RANGE(0xd800, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
 
@@ -728,123 +728,106 @@ static PALETTE_INIT( atari )
 
 static void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 {
-	read8_space_func rbank1, rbank2, rbank3, rbank4;
-	write8_space_func wbank1, wbank2, wbank3, wbank4;
 	UINT8 *base1, *base2, *base3, *base4;
 
 	/* check if memory C000-FFFF changed */
 	if( new_mmu & 0x01 )
 	{
 		logerror("%s MMU BIOS ROM\n", machine->gamedrv->name);
-		rbank3 = SMH_BANK(3);
-		wbank3 = SMH_UNMAP;
 		base3 = memory_region(machine, "maincpu") + 0x14000;  /* 8K lo BIOS */
-		rbank4 = SMH_BANK(4);
-		wbank4 = SMH_UNMAP;
 		base4 = memory_region(machine, "maincpu") + 0x15800;  /* 4K FP ROM + 8K hi BIOS */
+		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, "bank3");
+		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0);
+		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0, "bank4");
+		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0);
 	}
 	else
 	{
 		logerror("%s MMU BIOS RAM\n", machine->gamedrv->name);
-		rbank3 = SMH_BANK(3);
-		wbank3 = SMH_BANK(3);
 		base3 = memory_region(machine, "maincpu") + 0x0c000;  /* 8K RAM */
-		rbank4 = SMH_BANK(4);
-		wbank4 = SMH_BANK(4);
 		base4 = memory_region(machine, "maincpu") + 0x0d800;  /* 4K RAM + 8K RAM */
+		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, "bank3");
+		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0, "bank4");
 	}
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, rbank3, wbank3);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0, rbank4, wbank4);
-	memory_set_bankptr(machine, 3, base3);
-	memory_set_bankptr(machine, 4, base4);
+	memory_set_bankptr(machine, "bank3", base3);
+	memory_set_bankptr(machine, "bank4", base4);
 
 	/* check if BASIC changed */
 	if( new_mmu & 0x02 )
 	{
 		logerror("%s MMU BASIC RAM\n", machine->gamedrv->name);
-		rbank1 = SMH_BANK(1);
-		wbank1 = SMH_BANK(1);
+		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0, "bank1");
 		base1 = memory_region(machine, "maincpu") + 0x0a000;  /* 8K RAM */
 	}
 	else
 	{
 		logerror("%s MMU BASIC ROM\n", machine->gamedrv->name);
-		rbank1 = SMH_BANK(1);
-		wbank1 = SMH_UNMAP;
+		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0, "bank1");
+		memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0);
 		base1 = memory_region(machine, "maincpu") + 0x10000;  /* 8K BASIC */
 	}
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0, rbank1, wbank1);
-	memory_set_bankptr(machine, 1, base1);
+	
+	memory_set_bankptr(machine, "bank1", base1);
 
 	/* check if self-test ROM changed */
 	if( new_mmu & 0x80 )
 	{
 		logerror("%s MMU SELFTEST RAM\n", machine->gamedrv->name);
-		rbank2 = SMH_BANK(2);
-		wbank2 = SMH_BANK(2);
+		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
 		base2 = memory_region(machine, "maincpu") + 0x05000;  /* 0x0800 bytes */
 	}
 	else
 	{
 		logerror("%s MMU SELFTEST ROM\n", machine->gamedrv->name);
-		rbank2 = SMH_BANK(2);
-		wbank2 = SMH_UNMAP;
+		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
+		memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0);
 		base2 = memory_region(machine, "maincpu") + 0x15000;  /* 0x0800 bytes */
-	}
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
-	memory_set_bankptr(machine, 2, base2);
+	}	
+	memory_set_bankptr(machine, "bank2", base2);
 }
 
 /* BASIC was available in a separate cart, so we don't test it */
 static void a1200xl_mmu(running_machine *machine, UINT8 new_mmu)
 {
-	read8_space_func rbank2, rbank3, rbank4;
-	write8_space_func wbank2, wbank3, wbank4;
 	UINT8 *base2, *base3, *base4;
 
 	/* check if memory C000-FFFF changed */
 	if( new_mmu & 0x01 )
 	{
 		logerror("%s MMU BIOS ROM\n", machine->gamedrv->name);
-		rbank3 = SMH_BANK(3);
-		wbank3 = SMH_UNMAP;
 		base3 = memory_region(machine, "maincpu") + 0x14000;  /* 8K lo BIOS */
-		rbank4 = SMH_BANK(4);
-		wbank4 = SMH_UNMAP;
 		base4 = memory_region(machine, "maincpu") + 0x15800;  /* 4K FP ROM + 8K hi BIOS */
+		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, "bank3");
+		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0);
+		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0, "bank4");
+		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0);
 	}
 	else
 	{
 		logerror("%s MMU BIOS RAM\n", machine->gamedrv->name);
-		rbank3 = SMH_BANK(3);
-		wbank3 = SMH_BANK(3);
 		base3 = memory_region(machine, "maincpu") + 0x0c000;  /* 8K RAM */
-		rbank4 = SMH_BANK(4);
-		wbank4 = SMH_BANK(4);
 		base4 = memory_region(machine, "maincpu") + 0x0d800;  /* 4K RAM + 8K RAM */
+		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, "bank3");
+		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0, "bank4");
 	}
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, rbank3, wbank3);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0, rbank4, wbank4);
-	memory_set_bankptr(machine, 3, base3);
-	memory_set_bankptr(machine, 4, base4);
+	memory_set_bankptr(machine, "bank3", base3);
+	memory_set_bankptr(machine, "bank4", base4);
 
 	/* check if self-test ROM changed */
 	if( new_mmu & 0x80 )
 	{
 		logerror("%s MMU SELFTEST RAM\n", machine->gamedrv->name);
-		rbank2 = SMH_BANK(2);
-		wbank2 = SMH_BANK(2);
 		base2 = memory_region(machine, "maincpu") + 0x05000;  /* 0x0800 bytes */
+		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
 	}
 	else
 	{
 		logerror("%s MMU SELFTEST ROM\n", machine->gamedrv->name);
-		rbank2 = SMH_BANK(2);
-		wbank2 = SMH_UNMAP;
 		base2 = memory_region(machine, "maincpu") + 0x15000;  /* 0x0800 bytes */
-	}
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
-	memory_set_bankptr(machine, 2, base2);
+		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
+		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0);
+	}	
+	memory_set_bankptr(machine, "bank2", base2);
 }
 
 /**************************************************************

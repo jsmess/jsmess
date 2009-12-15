@@ -66,7 +66,7 @@ struct _diverboy_state
 };
 
 
-VIDEO_START(diverboy)
+static VIDEO_START(diverboy)
 {
 }
 
@@ -106,7 +106,7 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE(diverboy)
+static VIDEO_UPDATE(diverboy)
 {
 //  bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	draw_sprites(screen->machine, bitmap, cliprect);
@@ -146,8 +146,8 @@ static ADDRESS_MAP_START( diverboy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("COINS")
 //  AM_RANGE(0x18000a, 0x18000b) AM_READNOP
 //  AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
-	AM_RANGE(0x320000, 0x3207ff) AM_WRITE(SMH_RAM) /* ?? */
-	AM_RANGE(0x322000, 0x3227ff) AM_WRITE(SMH_RAM) /* ?? */
+	AM_RANGE(0x320000, 0x3207ff) AM_WRITEONLY /* ?? */
+	AM_RANGE(0x322000, 0x3227ff) AM_WRITEONLY /* ?? */
 //  AM_RANGE(0x340000, 0x340001) AM_WRITENOP
 //  AM_RANGE(0x340002, 0x340003) AM_WRITENOP
 ADDRESS_MAP_END

@@ -234,26 +234,26 @@ static WRITE16_HANDLER(es5510_dsp_w)
 static UINT16 *sound_ram;
 
 ADDRESS_MAP_START( f3_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_MIRROR(0x30000) AM_SHARE(1) AM_BASE(&sound_ram)
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_MIRROR(0x30000) AM_SHARE("share1") AM_BASE(&sound_ram)
 	AM_RANGE(0x140000, 0x140fff) AM_READWRITE(f3_68000_share_r, f3_68000_share_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("ensoniq", es5505_r, es5505_w)
 	AM_RANGE(0x260000, 0x2601ff) AM_READWRITE(es5510_dsp_r, es5510_dsp_w)
 	AM_RANGE(0x280000, 0x28001f) AM_READWRITE(f3_68681_r, f3_68681_w)
 	AM_RANGE(0x300000, 0x30003f) AM_WRITE(f3_es5505_bank_w)
 	AM_RANGE(0x340000, 0x340003) AM_WRITE(f3_volume_w) /* 8 channel volume control */
-	AM_RANGE(0xc00000, 0xc1ffff) AM_ROMBANK(1)
-	AM_RANGE(0xc20000, 0xc3ffff) AM_ROMBANK(2)
-	AM_RANGE(0xc40000, 0xc7ffff) AM_ROMBANK(3)
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE(1)	// mirror
+	AM_RANGE(0xc00000, 0xc1ffff) AM_ROMBANK("bank1")
+	AM_RANGE(0xc20000, 0xc3ffff) AM_ROMBANK("bank2")
+	AM_RANGE(0xc40000, 0xc7ffff) AM_ROMBANK("bank3")
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("share1")	// mirror
 ADDRESS_MAP_END
 
 void taito_f3_soundsystem_reset(running_machine *machine)
 {
 	/* Sound cpu program loads to 0xc00000 so we use a bank */
 	UINT16 *ROM = (UINT16 *)memory_region(machine, "audiocpu");
-	memory_set_bankptr(machine, 1,&ROM[0x80000]);
-	memory_set_bankptr(machine, 2,&ROM[0x90000]);
-	memory_set_bankptr(machine, 3,&ROM[0xa0000]);
+	memory_set_bankptr(machine, "bank1",&ROM[0x80000]);
+	memory_set_bankptr(machine, "bank2",&ROM[0x90000]);
+	memory_set_bankptr(machine, "bank3",&ROM[0xa0000]);
 
 	sound_ram[0]=ROM[0x80000]; /* Stack and Reset vectors */
 	sound_ram[1]=ROM[0x80001];

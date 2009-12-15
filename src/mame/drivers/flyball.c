@@ -66,14 +66,14 @@ static TILE_GET_INFO( flyball_get_tile_info )
 }
 
 
-VIDEO_START( flyball )
+static VIDEO_START( flyball )
 {
 	flyball_state *state = (flyball_state *)machine->driver_data;
 	state->tmap = tilemap_create(machine, flyball_get_tile_info, flyball_get_memory_offset, 8, 16, 32, 16);
 }
 
 
-VIDEO_UPDATE( flyball )
+static VIDEO_UPDATE( flyball )
 {
 	flyball_state *state = (flyball_state *)screen->machine->driver_data;
 	int pitcherx = state->pitcher_horz;
@@ -252,7 +252,7 @@ static ADDRESS_MAP_START( flyball_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0900, 0x0900) AM_WRITE(flyball_potmask_w)
 	AM_RANGE(0x0a00, 0x0a07) AM_WRITE(flyball_misc_w)
 	AM_RANGE(0x0b00, 0x0b00) AM_READ(flyball_input_r)
-	AM_RANGE(0x0d00, 0x0eff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(flyball_state, playfield_ram)
+	AM_RANGE(0x0d00, 0x0eff) AM_WRITEONLY AM_BASE_MEMBER(flyball_state, playfield_ram)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_BASE_MEMBER(flyball_state, rombase) /* program */
 ADDRESS_MAP_END
 

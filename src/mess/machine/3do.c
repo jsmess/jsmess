@@ -91,7 +91,7 @@ WRITE32_HANDLER( _3do_unk_318_w )
 		case 0:		/* Boot ROM writes 03180000 here and then starts reading some things */
 		{
 			/* disable ROM overlay */
-			memory_set_bank(space->machine, 1, 0);
+			memory_set_bank(space->machine, "bank1", 0);
 		}
 		break;
 	}

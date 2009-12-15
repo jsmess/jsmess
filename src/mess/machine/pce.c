@@ -99,9 +99,9 @@ static TIMER_CALLBACK( pce_cd_adpcm_dma_timer_callback );
 
 static WRITE8_HANDLER( pce_sf2_banking_w )
 {
-	memory_set_bankptr( space->machine, 2, memory_region(space->machine, "user1") + offset * 0x080000 + 0x080000 );
-	memory_set_bankptr( space->machine, 3, memory_region(space->machine, "user1") + offset * 0x080000 + 0x088000 );
-	memory_set_bankptr( space->machine, 4, memory_region(space->machine, "user1") + offset * 0x080000 + 0x0D0000 );
+	memory_set_bankptr( space->machine, "bank2", memory_region(space->machine, "user1") + offset * 0x080000 + 0x080000 );
+	memory_set_bankptr( space->machine, "bank3", memory_region(space->machine, "user1") + offset * 0x080000 + 0x088000 );
+	memory_set_bankptr( space->machine, "bank4", memory_region(space->machine, "user1") + offset * 0x080000 + 0x0D0000 );
 }
 
 static WRITE8_HANDLER( pce_cartridge_ram_w )
@@ -190,10 +190,10 @@ DEVICE_IMAGE_LOAD(pce_cart)
 			memcpy( ROM + 0x080000, ROM, 0x080000 );
 	}
 
-	memory_set_bankptr( image->machine, 1, ROM );
-	memory_set_bankptr( image->machine, 2, ROM + 0x080000 );
-	memory_set_bankptr( image->machine, 3, ROM + 0x088000 );
-	memory_set_bankptr( image->machine, 4, ROM + 0x0D0000 );
+	memory_set_bankptr( image->machine, "bank1", ROM );
+	memory_set_bankptr( image->machine, "bank2", ROM + 0x080000 );
+	memory_set_bankptr( image->machine, "bank3", ROM + 0x088000 );
+	memory_set_bankptr( image->machine, "bank4", ROM + 0x0D0000 );
 
 	/* Check for Street fighter 2 */
 	if ( size == PCE_ROM_MAXSIZE )
@@ -205,7 +205,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 	if ( ! memcmp( ROM + 0x1F26, "POPULOUS", 8 ) )
 	{
 		cartridge_ram = auto_alloc_array(image->machine, UINT8, 0x8000 );
-		memory_set_bankptr( image->machine, 2, cartridge_ram );
+		memory_set_bankptr( image->machine, "bank2", cartridge_ram );
 		memory_install_write8_handler(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x080000, 0x087FFF, 0, 0, pce_cartridge_ram_w );
 	}
 
@@ -218,7 +218,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 		{
 			pce_sys3_card = 1;
 			cartridge_ram = auto_alloc_array(image->machine, UINT8, 0x30000 );
-			memory_set_bankptr( image->machine, 4, cartridge_ram );
+			memory_set_bankptr( image->machine, "bank4", cartridge_ram );
 			memory_install_write8_handler(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0D0000, 0x0FFFFF, 0, 0, pce_cartridge_ram_w );
 		}
 	}
@@ -293,7 +293,7 @@ NVRAM_HANDLER( pce )
 
 static void pce_set_cd_bram( running_machine *machine )
 {
-	memory_set_bankptr( machine, 10, pce_cd.bram + ( pce_cd.bram_locked ? PCE_BRAM_SIZE : 0 ) );
+	memory_set_bankptr( machine, "bank10", pce_cd.bram + ( pce_cd.bram_locked ? PCE_BRAM_SIZE : 0 ) );
 }
 
 /* Callback for new data from the MSM5205.

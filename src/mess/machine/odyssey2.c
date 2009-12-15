@@ -22,17 +22,17 @@ static void odyssey2_switch_banks(running_machine *machine)
 	switch ( cart_size ) {
 	case 12288:
 		/* 12KB cart support (for instance, KTAA as released) */
-		memory_set_bankptr( machine, 1, memory_region(machine, "user1") + (p1 & 0x03) * 0xC00 );
-		memory_set_bankptr( machine, 2, memory_region(machine, "user1") + (p1 & 0x03) * 0xC00 + 0x800 );
+		memory_set_bankptr( machine, "bank1", memory_region(machine, "user1") + (p1 & 0x03) * 0xC00 );
+		memory_set_bankptr( machine, "bank2", memory_region(machine, "user1") + (p1 & 0x03) * 0xC00 + 0x800 );
 		break;
 	case 16384:
 		/* 16KB cart support (for instance, full sized version KTAA) */
-		memory_set_bankptr( machine, 1, memory_region(machine, "user1") + (p1 & 0x03) * 0x1000 + 0x400 );
-		memory_set_bankptr( machine, 2, memory_region(machine, "user1") + (p1 & 0x03) * 0x1000 + 0xC00 );
+		memory_set_bankptr( machine, "bank1", memory_region(machine, "user1") + (p1 & 0x03) * 0x1000 + 0x400 );
+		memory_set_bankptr( machine, "bank2", memory_region(machine, "user1") + (p1 & 0x03) * 0x1000 + 0xC00 );
 		break;
 	default:
-		memory_set_bankptr(machine, 1, memory_region(machine, "user1") + (p1 & 0x03) * 0x800);
-		memory_set_bankptr(machine, 2, memory_region(machine, "user1") + (p1 & 0x03) * 0x800 );
+		memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + (p1 & 0x03) * 0x800);
+		memory_set_bankptr(machine, "bank2", memory_region(machine, "user1") + (p1 & 0x03) * 0x800 );
 		break;
 	}
 }

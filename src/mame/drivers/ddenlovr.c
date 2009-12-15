@@ -1595,7 +1595,7 @@ static ADDRESS_MAP_START( quiz365_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x200c02, 0x200c03) AM_READ(quiz365_protection_r)							// Protection
 	AM_RANGE(0x200e0a, 0x200e0d) AM_WRITE(quiz365_protection_w)							// Protection
-//  AM_RANGE(0x201000, 0x2017ff) AM_WRITE(SMH_RAM)                                      // ?
+//  AM_RANGE(0x201000, 0x2017ff) AM_WRITEONLY                                      // ?
 
 	AM_RANGE(0x300200, 0x300201) AM_WRITE(ddenlovr_select2_16_w)
 	AM_RANGE(0x300202, 0x300203) AM_WRITE(quiz365_coincounter_w)						// Coin Counters + more stuff written on startup
@@ -1655,7 +1655,7 @@ static ADDRESS_MAP_START( ddenlvrj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM // ROM
 
 	AM_RANGE(0x200000, 0x2003ff) AM_WRITE(ddenlovr_palette_w)							// Palette
-//  AM_RANGE(0x201000, 0x2017ff) AM_WRITE(SMH_RAM)                                      // ? B0 on startup, then 00
+//  AM_RANGE(0x201000, 0x2017ff) AM_WRITEONLY                                      // ? B0 on startup, then 00
 
 	AM_RANGE(0x300040, 0x300047) AM_WRITE(ddenlovr16_palette_base_w)
 	AM_RANGE(0x300048, 0x30004f) AM_WRITE(ddenlovr16_palette_mask_w)
@@ -1675,7 +1675,7 @@ static ADDRESS_MAP_START( ddenlvrj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300184, 0x300185) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300186, 0x300187) AM_READ(ddenlvrj_dsw_r)								// DSW
 	AM_RANGE(0x300188, 0x300189) AM_WRITE(ddenlvrj_coincounter_w)						// Coin Counters
-	AM_RANGE(0x30018a, 0x30018b) AM_WRITE(SMH_RAM) AM_BASE( &ddenlvrj_dsw_sel )			// DSW select
+	AM_RANGE(0x30018a, 0x30018b) AM_WRITEONLY AM_BASE(&ddenlvrj_dsw_sel)			// DSW select
 	AM_RANGE(0x30018c, 0x30018d) AM_DEVWRITE("oki", ddenlovr_oki_bank_w)
 	AM_RANGE(0x3001ca, 0x3001cb) AM_WRITE(ddenlovr_blitter_irq_ack_w)					// Blitter irq acknowledge
 	AM_RANGE(0x300240, 0x300241) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)// Sound
@@ -1710,11 +1710,11 @@ static WRITE16_HANDLER( ddenlvrk_protection2_w )
 static ADDRESS_MAP_START( ddenlvrk_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM														// ROM
 
-	AM_RANGE(0x100000, 0x100001) AM_READWRITE(ddenlvrk_protection1_r, SMH_RAM)					AM_BASE(&ddenlvrk_protection1)
+	AM_RANGE(0x100000, 0x100001) AM_RAM_READ(ddenlvrk_protection1_r)							AM_BASE(&ddenlvrk_protection1)
 	AM_RANGE(0x200000, 0x200001) AM_READWRITE(ddenlvrk_protection2_r, ddenlvrk_protection2_w)	AM_BASE(&ddenlvrk_protection2)
 
 	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w)								// Palette
-//  AM_RANGE(0xd01000, 0xd017ff) SMH_RAM)                                                   // ? B0 on startup, then 00
+//  AM_RANGE(0xd01000, 0xd017ff) AM_RAM                                                    // ? B0 on startup, then 00
 
 	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr16_palette_base_w)
 	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr16_palette_mask_w)
@@ -1752,7 +1752,7 @@ static ADDRESS_MAP_START( ddenlovr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE("oki", ddenlovr_oki_bank_w)
 
 	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w)								// Palette
-//  AM_RANGE(0xd01000, 0xd017ff) SMH_RAM)                                                   // ? B0 on startup, then 00
+//  AM_RANGE(0xd01000, 0xd017ff) AM_RAM                                                   // ? B0 on startup, then 00
 
 	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr16_palette_base_w)
 	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr16_palette_mask_w)
@@ -1834,8 +1834,8 @@ static ADDRESS_MAP_START( nettoqc_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x200000, 0x2003ff) AM_WRITE(ddenlovr_palette_w)								// Palette
 	AM_RANGE(0x200c02, 0x200c03) AM_READ(nettoqc_protection_r)								//
-	AM_RANGE(0x200e0a, 0x200e0d) AM_WRITE(SMH_RAM) AM_BASE(&nettoqc_protection_val)			//
-	AM_RANGE(0x201000, 0x2017ff) AM_WRITE(SMH_RAM)											// ?
+	AM_RANGE(0x200e0a, 0x200e0d) AM_WRITEONLY AM_BASE(&nettoqc_protection_val)			//
+	AM_RANGE(0x201000, 0x2017ff) AM_WRITEONLY											// ?
 
 	AM_RANGE(0x300040, 0x300047) AM_WRITE(ddenlovr16_palette_base_w)
 	AM_RANGE(0x300048, 0x30004f) AM_WRITE(ddenlovr16_palette_mask_w)
@@ -1883,19 +1883,19 @@ static WRITE8_HANDLER( rongrong_select_w )
 
 //logerror("%04x: rongrong_select_w %02x\n",cpu_get_pc(space->cpu),data);
 	/* bits 0-4 = **both** ROM bank **AND** input select */
-	memory_set_bankptr(space->machine, 1, &rom[0x10000 + 0x8000 * (data & 0x1f)]);
+	memory_set_bankptr(space->machine, "bank1", &rom[0x10000 + 0x8000 * (data & 0x1f)]);
 	ddenlovr_select = data;
 
 	/* bits 5-7 = RAM bank */
-	memory_set_bankptr(space->machine, 2, &rom[0x110000 + 0x1000 * ((data & 0xe0) >> 5)]);
+	memory_set_bankptr(space->machine, "bank2", &rom[0x110000 + 0x1000 * ((data & 0xe0) >> 5)]);
 }
 
 
 static ADDRESS_MAP_START( quizchq_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM											// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM											// RAM
-	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK(2)									// RAM (Banked)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1) AM_WRITE(rongrong_palette_w)		// ROM (Banked)
+	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")									// RAM (Banked)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(rongrong_palette_w)		// ROM (Banked)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizchq_portmap, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -1930,8 +1930,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rongrong_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM											// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM											// RAM
-	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK(2)									// RAM (Banked)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1) AM_WRITE(rongrong_palette_w)		// ROM (Banked)
+	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")									// RAM (Banked)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(rongrong_palette_w)		// ROM (Banked)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rongrong_portmap, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -1980,7 +1980,7 @@ static READ8_HANDLER( magic_r )
 static WRITE8_HANDLER( mmpanic_rombank_w )
 {
 	UINT8 *rom = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine, 1, &rom[0x10000 + 0x8000 * (data & 0x7)]);
+	memory_set_bankptr(space->machine, "bank1", &rom[0x10000 + 0x8000 * (data & 0x7)]);
 	/* Bit 4? */
 }
 
@@ -2039,8 +2039,8 @@ static ADDRESS_MAP_START( mmpanic_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0051, 0x0051) AM_READ(magic_r)								// ?
 	AM_RANGE(0x0000, 0x5fff) AM_ROM											// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM											// RAM
-	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK(2)									// RAM (Banked)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1) AM_WRITE(rongrong_palette_w)		// ROM (Banked)
+	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")									// RAM (Banked)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(rongrong_palette_w)		// ROM (Banked)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mmpanic_portmap, ADDRESS_SPACE_IO, 8 )
@@ -2097,7 +2097,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mmpanic_sound_portmap, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
-	AM_RANGE(0x02, 0x02) AM_READ(SMH_NOP )		// read just before port 00
+	AM_RANGE(0x02, 0x02) AM_READNOP		// read just before port 00
 	AM_RANGE(0x04, 0x04) AM_NOP					// read only once at the start
 	AM_RANGE(0x06, 0x06) AM_WRITENOP	// almost always 1, sometimes 0
 	AM_RANGE(0x08, 0x09) AM_DEVWRITE("ymsnd", ym2413_w)
@@ -2116,9 +2116,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( funkyfig_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK(2)			// RAM (Banked)
+	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")			// RAM (Banked)
 
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x81ff) AM_WRITE(rongrong_palette_w)
 	AM_RANGE(0x8400, 0x87ff) AM_WRITENOP
 ADDRESS_MAP_END
@@ -2141,9 +2141,9 @@ static WRITE8_HANDLER( funkyfig_rombank_w )
 
 	ddenlovr_select = data;
 
-	memory_set_bankptr(space->machine, 1, &rom[0x10000 + 0x8000 * (data & 0x0f)]);
+	memory_set_bankptr(space->machine, "bank1", &rom[0x10000 + 0x8000 * (data & 0x0f)]);
 	// bit 4 selects palette ram at 8000?
-	memory_set_bankptr(space->machine, 2, &rom[0x90000 + 0x1000 * ((data & 0xe0) >> 5)]);
+	memory_set_bankptr(space->machine, "bank2", &rom[0x90000 + 0x1000 * ((data & 0xe0) >> 5)]);
 }
 
 static READ8_HANDLER( funkyfig_dsw_r )
@@ -2247,16 +2247,16 @@ static WRITE8_HANDLER( hanakanz_rombank_w )
 {
 	UINT8 *rom = memory_region(space->machine, "maincpu");
 
-	memory_set_bankptr(space->machine, 1, &rom[0x10000 + 0x8000 * (data & 0x0f)]);
+	memory_set_bankptr(space->machine, "bank1", &rom[0x10000 + 0x8000 * (data & 0x0f)]);
 
-	memory_set_bankptr(space->machine, 2, &rom[0x90000 + 0x1000 * ((data & 0xf0) >> 4)]);
+	memory_set_bankptr(space->machine, "bank2", &rom[0x90000 + 0x1000 * ((data & 0xf0) >> 4)]);
 }
 
 static ADDRESS_MAP_START( hanakanz_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM								// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM								// RAM
-	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK(2)						// RAM (Banked)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)						// ROM (Banked)
+	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")						// RAM (Banked)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")						// ROM (Banked)
 ADDRESS_MAP_END
 
 
@@ -2583,8 +2583,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mjmyster_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM				// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM				// RAM
-	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK(2)		// RAM (Banked)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)		// ROM/RAM (Banked)
+	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")		// RAM (Banked)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")		// ROM/RAM (Banked)
 	AM_RANGE(0xf000, 0xf1ff) AM_WRITE(rongrong_palette_w)	// RAM enabled by bit 4 of rombank
 	AM_RANGE(0xf200, 0xffff) AM_WRITENOP		// ""
 ADDRESS_MAP_END
@@ -2592,7 +2592,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( mjmyster_rambank_w )
 {
 	UINT8 *rom = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine, 2, &rom[0x90000 + 0x1000 * (data & 0x07)]);
+	memory_set_bankptr(space->machine, "bank2", &rom[0x90000 + 0x1000 * (data & 0x07)]);
 //  logerror("%04x: rambank = %02x\n", cpu_get_pc(space->cpu), data);
 }
 
@@ -2703,7 +2703,7 @@ static UINT8 hginga_rombank;
 static WRITE8_HANDLER( hginga_rombank_w )
 {
 	UINT8 *rom = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine, 1, &rom[0x10000 + 0x8000 * (data & 0x7)]);
+	memory_set_bankptr(space->machine, "bank1", &rom[0x10000 + 0x8000 * (data & 0x7)]);
 	hginga_rombank = data;
 }
 
@@ -2719,9 +2719,9 @@ static READ8_HANDLER( hginga_protection_r )
 static ADDRESS_MAP_START( hginga_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM								// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM								// RAM
-	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK(2)						// RAM (Banked)
+	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")						// RAM (Banked)
 	AM_RANGE(0xf601, 0xf601) AM_READ(hginga_protection_r)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)						// ROM/RAM (Banked)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")						// ROM/RAM (Banked)
 	AM_RANGE(0xf000, 0xf1ff) AM_WRITE(rongrong_palette_w)	// RAM enabled by bit 4 of rombank
 	AM_RANGE(0xf700, 0xf706) AM_WRITENOP
 ADDRESS_MAP_END
@@ -2933,9 +2933,9 @@ static READ8_HANDLER( hgokou_protection_r )
 static ADDRESS_MAP_START( hgokou_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM								// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM								// RAM
-	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK(2)						// RAM (Banked)
+	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")						// RAM (Banked)
 	AM_RANGE(0xe601, 0xe601) AM_READ(hgokou_protection_r)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)						// ROM (Banked)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")						// ROM (Banked)
 	AM_RANGE(0xe000, 0xe1ff) AM_WRITE(rongrong_palette_w)
 	AM_RANGE(0xe700, 0xe706) AM_WRITENOP
 ADDRESS_MAP_END
@@ -2978,8 +2978,8 @@ static WRITE8_HANDLER( hparadis_select_w )
 	ddenlovr_select = data;
 	hginga_ip = 0;
 
-	memory_set_bankptr(space->machine, 1, &rom[0x10000 + 0x8000 * (data & 0x07)]);
-	memory_set_bankptr(space->machine, 2, &rom[0x50000 + 0x1000 * ((data & 0xe0) >> 5)]);
+	memory_set_bankptr(space->machine, "bank1", &rom[0x10000 + 0x8000 * (data & 0x07)]);
+	memory_set_bankptr(space->machine, "bank2", &rom[0x50000 + 0x1000 * ((data & 0xe0) >> 5)]);
 }
 
 
@@ -3025,8 +3025,8 @@ static WRITE8_HANDLER( hparadis_coin_w )
 static ADDRESS_MAP_START( hparadis_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM								// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM								// RAM
-	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK(2)						// RAM (Banked)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)						// ROM (Banked)
+	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")						// RAM (Banked)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")						// ROM (Banked)
 	AM_RANGE(0xc000, 0xc1ff) AM_WRITE(rongrong_palette_w)
 ADDRESS_MAP_END
 
@@ -3154,7 +3154,7 @@ static ADDRESS_MAP_START( akamaru_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x624680, 0x624681) AM_READ(akamaru_protection1_r)
 
 	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w)								// Palette
-//  AM_RANGE(0xd01000, 0xd017ff) AM_WRITE(SMH_RAM)                                          // 0
+//  AM_RANGE(0xd01000, 0xd017ff) AM_WRITEONLY                                          // 0
 
 	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr16_palette_base_w)
 	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr16_palette_mask_w)
@@ -3172,7 +3172,7 @@ static ADDRESS_MAP_START( akamaru_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe00104, 0xe00105) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0xe00106, 0xe00107) AM_READ(akamaru_protection2_r)
-	AM_RANGE(0xe00108, 0xe0010b) AM_WRITE(SMH_RAM) AM_BASE( &akamaru_protection2)
+	AM_RANGE(0xe00108, 0xe0010b) AM_WRITEONLY AM_BASE(&akamaru_protection2)
 
 	AM_RANGE(0xe0010c, 0xe0010d) AM_READ(akamaru_e0010d_r)
 	AM_RANGE(0xe00200, 0xe00201) AM_READ(akamaru_dsw_r)										// DSW
@@ -3180,7 +3180,7 @@ static ADDRESS_MAP_START( akamaru_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe00204, 0xe00205) AM_READ(akamaru_blitter_r)									// Blitter Busy & IRQ
 	AM_RANGE(0xe00302, 0xe00303) AM_WRITE(ddenlovr_blitter_irq_ack_w)						// Blitter irq acknowledge
 
-	AM_RANGE(0xe00304, 0xe00307) AM_WRITE(SMH_RAM) AM_BASE( &akamaru_dsw_sel)				// DSW select
+	AM_RANGE(0xe00304, 0xe00307) AM_WRITEONLY AM_BASE( &akamaru_dsw_sel)				// DSW select
 	AM_RANGE(0xe00308, 0xe00309) AM_WRITE(ddenlovr_coincounter_0_w)							// Coin Counters
 	AM_RANGE(0xe0030c, 0xe0030d) AM_WRITE(ddenlovr_coincounter_1_w)							//
 
@@ -3200,7 +3200,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( mjflove_rombank_w )
 {
 	UINT8 *rom = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine, 1, &rom[0x10000 + 0x8000 * (data & 0xf)]);
+	memory_set_bankptr(space->machine, "bank1", &rom[0x10000 + 0x8000 * (data & 0xf)]);
 }
 
 static WRITE8_DEVICE_HANDLER( mjflove_okibank_w )
@@ -3330,8 +3330,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sryudens_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM								// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM								// RAM
-	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK(2)						// RAM (Banked)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)						// ROM (Banked)
+	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")						// RAM (Banked)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")						// ROM (Banked)
 	AM_RANGE(0xe000, 0xe1ff) AM_WRITE(rongrong_palette_w)
 ADDRESS_MAP_END
 
@@ -3371,7 +3371,7 @@ static WRITE8_HANDLER( sryudens_coincounter_w )
 static WRITE8_HANDLER( sryudens_rambank_w )
 {
 	UINT8 *rom = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine, 2, &rom[0x90000 + 0x1000 * (data & 0x0f)]);
+	memory_set_bankptr(space->machine, "bank2", &rom[0x90000 + 0x1000 * (data & 0x0f)]);
 //  logerror("%04x: rambank = %02x\n", cpu_get_pc(space->cpu), data);
 }
 
@@ -8649,7 +8649,7 @@ static DRIVER_INIT( rongrong )
        version of the game might be a bootleg with the protection
        patched. (both sets need this)
      */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60d4, 0x60d4, 0, 0, (read8_space_func)SMH_NOP);
+	memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60d4, 0x60d4, 0, 0);
 }
 
 /***************************************************************************

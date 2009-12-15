@@ -430,13 +430,13 @@ static WRITE8_HANDLER( ems_sel_w )
 		if(data == 0x00 || data == 0x10)
 		{
 			rom_bank = 1;
-			memory_set_bankptr(space->machine, 1, &ROM[0x20000]);
+			memory_set_bankptr(space->machine, "bank1", &ROM[0x20000]);
 		}
 
 		if(data == 0x02 || data == 0x12)
 		{
 			rom_bank = 0;
-			memory_set_bankptr(space->machine, 1, &ROM[0x00000]);
+			memory_set_bankptr(space->machine, "bank1", &ROM[0x00000]);
 		}
 	}
 
@@ -586,8 +586,8 @@ static ADDRESS_MAP_START( pc9801_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x000a5000, 0x000a7fff) AM_RAM //??? (presumably another work ram bank)
 	AM_RANGE(0x000a8000, 0x000bffff) AM_READWRITE(gfx_bitmap_ram_r,gfx_bitmap_ram_w)
 	AM_RANGE(0x000c0000, 0x000dffff) AM_READWRITE(wram_ide_r,wram_ide_w)
-	AM_RANGE(0x000e0000, 0x000fffff) AM_ROMBANK(1) AM_WRITE8(rom_bank_w,0xffffffff)
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROMBANK(1) AM_WRITE8(rom_bank_w,0xffffffff)
+	AM_RANGE(0x000e0000, 0x000fffff) AM_ROMBANK("bank1") AM_WRITE8(rom_bank_w,0xffffffff)
+	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROMBANK("bank1") AM_WRITE8(rom_bank_w,0xffffffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 32)
@@ -656,7 +656,7 @@ static MACHINE_RESET(pc9801)
 	gate_a20 = 0;
 	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), I386_EIP, 0xffff0+0x10000);
 
-	memory_set_bankptr(machine, 1, &ROM[0x20000]);
+	memory_set_bankptr(machine, "bank1", &ROM[0x20000]);
 
 	wram_bank = 0;
 	rom_bank = 1;
@@ -672,7 +672,7 @@ static MACHINE_RESET(pc9821)
 	gate_a20 = 0;
 	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), I386_EIP, 0xffff0+0x10000);
 
-	memory_set_bankptr(machine, 1, &ROM[0x20000]);
+	memory_set_bankptr(machine, "bank1", &ROM[0x20000]);
 
 	wram_bank = 0;
 	rom_bank = 1;

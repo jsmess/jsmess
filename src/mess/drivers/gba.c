@@ -1889,7 +1889,7 @@ static WRITE32_HANDLER(gba_oam_w)
 }
 
 static ADDRESS_MAP_START( gbadvance_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x00003fff) AM_ROMBANK(1)
+	AM_RANGE(0x00000000, 0x00003fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x02000000, 0x0203ffff) AM_RAM AM_MIRROR(0xfc0000)
 	AM_RANGE(0x03000000, 0x03007fff) AM_RAM AM_MIRROR(0xff8000)
 	AM_RANGE(0x04000000, 0x040003ff) AM_READWRITE( gba_io_r, gba_io_w )
@@ -2525,11 +2525,11 @@ static DIRECT_UPDATE_HANDLER( gba_direct )
 {
 	if (address > 0x4000)
 	{
-		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "bios")+0x4000);
+		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "bios")+0x4000);
 	}
 	else
 	{
-		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "bios"));
+		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "bios"));
 	}
 
 	return address;

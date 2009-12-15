@@ -92,9 +92,9 @@ static void palm_spim_exchange( const device_config *device )
 static MACHINE_START( palm )
 {
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-    memory_install_read16_handler (space, 0x000000, messram_get_size(devtag_get_device(machine, "messram")) - 1, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, (read16_space_func)1);
-    memory_install_write16_handler(space, 0x000000, messram_get_size(devtag_get_device(machine, "messram")) - 1, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, (write16_space_func)1);
-    memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
+    memory_install_read_bank (space, 0x000000, messram_get_size(devtag_get_device(machine, "messram")) - 1, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, "bank1");
+    memory_install_write_bank(space, 0x000000, messram_get_size(devtag_get_device(machine, "messram")) - 1, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, "bank1");
+    memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
 
     state_save_register_global(machine, port_f_latch);
     state_save_register_global(machine, spim_data);

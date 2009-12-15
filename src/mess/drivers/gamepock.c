@@ -9,7 +9,7 @@ static ADDRESS_MAP_START(gamepock_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x0fff) AM_ROM
 	AM_RANGE(0x1000,0x3fff) AM_NOP
-	AM_RANGE(0x4000,0xBfff) AM_ROMBANK(1)
+	AM_RANGE(0x4000,0xBfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xC000,0xC7ff) AM_MIRROR(0x0800) AM_RAM
 	AM_RANGE(0xff80,0xffff) AM_RAM				/* 128 bytes microcontroller RAM */
 ADDRESS_MAP_END
@@ -40,7 +40,7 @@ static const UPD7810_CONFIG gamepock_cpu_config = { TYPE_78C06, gamepock_io_call
 
 static DEVICE_START(gamepock_cart)
 {
-	memory_set_bankptr( device->machine, 1, memory_region(device->machine,  "user1" ) );
+	memory_set_bankptr( device->machine, "bank1", memory_region(device->machine,  "user1" ) );
 }
 
 static DEVICE_IMAGE_LOAD(gamepock_cart) {
@@ -52,7 +52,7 @@ static DEVICE_IMAGE_LOAD(gamepock_cart) {
 		return INIT_FAIL;
 	}
 
-	memory_set_bankptr( image->machine, 1, memory_region(image->machine,  "user1" ) );
+	memory_set_bankptr( image->machine, "bank1", memory_region(image->machine,  "user1" ) );
 
 	return INIT_PASS;
 }

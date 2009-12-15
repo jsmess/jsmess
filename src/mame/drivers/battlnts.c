@@ -36,11 +36,11 @@ static WRITE8_HANDLER( battlnts_sh_irqtrigger_w )
 static WRITE8_HANDLER( battlnts_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
-	int bankaddress;
+	UINT32 bankaddress;
 
 	/* bits 6 & 7 = bank number */
 	bankaddress = 0x10000 + ((data & 0xc0) >> 6) * 0x4000;
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
 
 	/* bits 4 & 5 = coin counters */
 	coin_counter_w(space->machine, 0,data & 0x10);
@@ -65,7 +65,7 @@ static ADDRESS_MAP_START( battlnts_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2e10, 0x2e10) AM_WRITE(watchdog_reset_w)			/* watchdog reset */
 	AM_RANGE(0x2e14, 0x2e14) AM_WRITE(soundlatch_w)				/* sound code # */
 	AM_RANGE(0x2e18, 0x2e18) AM_WRITE(battlnts_sh_irqtrigger_w)	/* cause interrupt on audio CPU */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)						/* banked ROM */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")						/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM 777e02.bin */
 ADDRESS_MAP_END
 
@@ -195,11 +195,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( battlnts )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)		/* ? */
+	MDRV_CPU_ADD("maincpu", HD6309, XTAL_24MHz / 2 /* 3000000*4? */)
 	MDRV_CPU_PROGRAM_MAP(battlnts_map)
 	MDRV_CPU_VBLANK_INT("screen", battlnts_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_24MHz / 6 /* 3579545? */)
 	MDRV_CPU_PROGRAM_MAP(battlnts_sound_map)
 
 	/* video hardware */
@@ -218,10 +218,10 @@ static MACHINE_DRIVER_START( battlnts )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM3812, 3000000)
+	MDRV_SOUND_ADD("ym1", YM3812, XTAL_24MHz / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
+	MDRV_SOUND_ADD("ym2", YM3812, XTAL_24MHz / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

@@ -212,10 +212,10 @@ static WRITE_LINE_DEVICE_HANDLER( pcw_fdc_interrupt )
     setup of the memory below.
 */
 static ADDRESS_MAP_START(pcw_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_BANK(1), SMH_BANK(5))
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK(2), SMH_BANK(6))
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(3), SMH_BANK(7))
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_BANK(4), SMH_BANK(8))
+	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
+	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
+	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
+	AM_RANGE(0xc000, 0xffff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank8")
 ADDRESS_MAP_END
 
 
@@ -236,7 +236,9 @@ static  READ8_HANDLER(pcw_keyboard_r)
 static void pcw_update_read_memory_block(running_machine *machine, int block, int bank)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-
+	char block_name[10];
+	
+	sprintf(block_name,"bank%d",block+1);
 	/* bank 3? */
 	if (bank == 3)
 	{
@@ -250,19 +252,20 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
 	else
 	{
 		/* restore bank handler across entire block */
-		memory_install_read8_handler(space,
-			block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff, 0, 0,
-			(read8_space_func) (STATIC_BANK1 + (FPTR)block));
+		memory_install_read_bank(space,block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff, 0, 0,block_name);
 //      LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
-	memory_set_bankptr(machine, block + 1, messram_get_ptr(devtag_get_device(machine, "messram")) + ((bank * 0x4000) % messram_get_size(devtag_get_device(machine, "messram"))));
+	memory_set_bankptr(machine, block_name, messram_get_ptr(devtag_get_device(machine, "messram")) + ((bank * 0x4000) % messram_get_size(devtag_get_device(machine, "messram"))));
 }
 
 
 
 static void pcw_update_write_memory_block(running_machine *machine, int block, int bank)
 {
-	memory_set_bankptr(machine, block + 5, messram_get_ptr(devtag_get_device(machine, "messram")) + ((bank * 0x4000) % messram_get_size(devtag_get_device(machine, "messram"))));
+	char block_name[10];
+	
+	sprintf(block_name,"bank%d",block+5);
+	memory_set_bankptr(machine, block_name, messram_get_ptr(devtag_get_device(machine, "messram")) + ((bank * 0x4000) % messram_get_size(devtag_get_device(machine, "messram"))));
 //  LOG(("MEM: write block %i -> bank %i\n",block,bank));
 }
 
@@ -343,7 +346,7 @@ static void pcw_update_mem(running_machine *machine, int block, int data)
 
 		FakeROM = &memory_region(machine, "maincpu")[0x010000];
 
-		memory_set_bankptr(machine, 1, FakeROM);
+		memory_set_bankptr(machine, "bank1", FakeROM);
 	}
 }
 

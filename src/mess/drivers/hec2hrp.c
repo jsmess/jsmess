@@ -74,14 +74,14 @@ static ADDRESS_MAP_START(hec2hrp_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x3800,0x3807) AM_READWRITE( hector_keyboard_r, hector_keyboard_w)  // Keyboard
 
     // Main ROM page 
-	AM_RANGE(0x0000,0x3fff) AM_ROMBANK(2) 
+	AM_RANGE(0x0000,0x3fff) AM_ROMBANK("bank2") 
 
 	// Vidéo br mapping
 	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_GENERIC(videoram)
 	// continous RAM
     AM_RANGE(0x4A00,0xbfff) AM_RAM
 	// from 0xC000 to 0xFFFF => Bank Ram for vidéo and data !
-	AM_RANGE(0xc000,0xffff) AM_RAMBANK(1)
+	AM_RANGE(0xc000,0xffff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hec2hrp_io , ADDRESS_SPACE_IO, 8)
@@ -115,17 +115,17 @@ UINT8 *ROM1 = memory_region(machine, "page1"); // pointer to rom page 1
 UINT8 *ROM2 = memory_region(machine, "page2"); // pointer to rom page 2
 
     // Memory install for bank switching
-	memory_configure_bank(machine, 1, HECTOR_BANK_PROG , 1, &RAM[0xc000]  , 0); // Mess ram
-	memory_configure_bank(machine, 1, HECTOR_BANK_VIDEO, 1, hector_videoram, 0); // Video ram
+	memory_configure_bank(machine, "bank1", HECTOR_BANK_PROG , 1, &RAM[0xc000]  , 0); // Mess ram
+	memory_configure_bank(machine, "bank1", HECTOR_BANK_VIDEO, 1, hector_videoram, 0); // Video ram
 
     // Set bank HECTOR_BANK_PROG as basic bank
-	memory_set_bank(machine, 1, HECTOR_BANK_PROG);
+	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
 
 //////////////////////////////////////////////////////////SPECIFIQUE MX /////////////////
-	memory_configure_bank(machine, 2, HECTORMX_BANK_PAGE0 , 1, &RAM[0x0000]  , 0); // Mess ram
-	memory_configure_bank(machine, 2, HECTORMX_BANK_PAGE1 , 1, &ROM1[0x0000] , 0); // Rom page 1
-	memory_configure_bank(machine, 2, HECTORMX_BANK_PAGE2 , 1, &ROM2[0x0000] , 0); // Rom page 2
-	memory_set_bank(machine, 2, HECTORMX_BANK_PAGE0);
+	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE0 , 1, &RAM[0x0000]  , 0); // Mess ram
+	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE1 , 1, &ROM1[0x0000] , 0); // Rom page 1
+	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE2 , 1, &ROM2[0x0000] , 0); // Rom page 2
+	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
 //////////////////////////////////////////////////////////SPECIFIQUE MX /////////////////
 
     // Start keyboard
@@ -140,8 +140,8 @@ UINT8 *ROM2 = memory_region(machine, "page2"); // pointer to rom page 2
 
 static MACHINE_RESET(hec2hrp)
 {
-	memory_set_bank(machine, 1, HECTOR_BANK_PROG);
-	memory_set_bank(machine, 2, HECTORMX_BANK_PAGE0);
+	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
+	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
 	hector_reset(machine, 1);
 }
 

@@ -83,19 +83,19 @@ static void update_memory_mapping(running_machine *machine)
 
 	if (!state->memprom)
 	{
-		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));
+		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
 	}
 	else
 	{
-		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + drambank*64*1024);
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + drambank*64*1024);
 	}
 	if (state->memcmos)
 	{
-		memory_set_bankptr(machine, 2, state->cmosram);
+		memory_set_bankptr(machine, "bank2", state->cmosram);
 	}
 	else
 	{
-		memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + drambank*64*1024 + 32*1024);
+		memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + drambank*64*1024 + 32*1024);
 	}
 }
 
@@ -408,8 +408,8 @@ static IRQ_CALLBACK(irq_callback)
 
 static ADDRESS_MAP_START(qx10_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_RAMBANK(1)
-	AM_RANGE( 0x8000, 0xefff ) AM_RAMBANK(2)
+	AM_RANGE( 0x0000, 0x7fff ) AM_RAMBANK("bank1")
+	AM_RANGE( 0x8000, 0xefff ) AM_RAMBANK("bank2")
 	AM_RANGE( 0xf000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 

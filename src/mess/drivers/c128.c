@@ -213,38 +213,38 @@ to use an EEPROM reader, in order to obtain a dump of the whole content.
  */
 static ADDRESS_MAP_START(c128_z80_mem , ADDRESS_SPACE_PROGRAM, 8)
 #if 1
-	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(SMH_BANK(10), c128_write_0000)
-	AM_RANGE(0x1000, 0xbfff) AM_READWRITE(SMH_BANK(11), c128_write_1000)
+	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bank10") AM_WRITE(c128_write_0000)
+	AM_RANGE(0x1000, 0xbfff) AM_READ_BANK("bank11") AM_WRITE(c128_write_1000)
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 #else
 	/* best to do reuse bankswitching numbers */
-	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(SMH_BANK(10), SMH_BANK(1))
-	AM_RANGE(0x0400, 0x0fff) AM_READWRITE(SMH_BANK(11), SMH_BANK(2))
-	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK(3)
-	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK(4)
-	AM_RANGE(0x4000, 0xbfff) AM_RAMBANK(5)
-	AM_RANGE(0xc000, 0xdfff) AM_RAMBANK(6)
-	AM_RANGE(0xe000, 0xefff) AM_RAMBANK(7)
-	AM_RANGE(0xf000, 0xfeff) AM_RAMBANK(8)
+	AM_RANGE(0x0000, 0x03ff) AM_READ_BANK("bank10") AM_WRITE_BANK(1))
+	AM_RANGE(0x0400, 0x0fff) AM_READ_BANK("bank11") AM_WRITE_BANK(2))
+	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK("bank3")
+	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank4")
+	AM_RANGE(0x4000, 0xbfff) AM_RAMBANK("bank5")
+	AM_RANGE(0xc000, 0xdfff) AM_RAMBANK("bank6")
+	AM_RANGE(0xe000, 0xefff) AM_RAMBANK("bank7")
+	AM_RANGE(0xf000, 0xfeff) AM_RAMBANK("bank8")
 	AM_RANGE(0xff00, 0xff04) AM_READWRITE(c128_mmu8722_ff00_r, c128_mmu8722_ff00_w)
-	AM_RANGE(0xff05, 0xffff) AM_RAMBANK(9)
+	AM_RANGE(0xff05, 0xffff) AM_RAMBANK("bank9")
 #endif
 
 #if 0
-	AM_RANGE(0x10000, 0x1ffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x20000, 0xfffff) AM_WRITE(SMH_RAM)	   /* or nothing */
-	AM_RANGE(0x100000, 0x107fff) AM_WRITE(SMH_ROM) AM_BASE(&c128_basic)	/* maps to 0x4000 */
-	AM_RANGE(0x108000, 0x109fff) AM_WRITE(SMH_ROM) AM_BASE(&c64_basic)	/* maps to 0xa000 */
-	AM_RANGE(0x10a000, 0x10bfff) AM_WRITE(SMH_ROM) AM_BASE(&c64_kernal)	/* maps to 0xe000 */
-	AM_RANGE(0x10c000, 0x10cfff) AM_WRITE(SMH_ROM) AM_BASE(&c128_editor)
-	AM_RANGE(0x10d000, 0x10dfff) AM_WRITE(SMH_ROM) AM_BASE(&c128_z80)		/* maps to z80 0 */
-	AM_RANGE(0x10e000, 0x10ffff) AM_WRITE(SMH_ROM) AM_BASE(&c128_kernal)
-	AM_RANGE(0x110000, 0x117fff) AM_WRITE(SMH_ROM) AM_BASE(&c128_internal_function)
-	AM_RANGE(0x118000, 0x11ffff) AM_WRITE(SMH_ROM) AM_BASE(&c128_external_function)
-	AM_RANGE(0x120000, 0x120fff) AM_WRITE(SMH_ROM) AM_BASE(&c64_chargen)
-	AM_RANGE(0x121000, 0x121fff) AM_WRITE(SMH_ROM) AM_BASE(&c128_chargen)
-	AM_RANGE(0x122000, 0x1227ff) AM_WRITE(SMH_ROM) AM_BASE(&c64_colorram)
-	AM_RANGE(0x122800, 0x1327ff) AM_WRITE(SMH_ROM) AM_BASE(&c128_vdcram)
+	AM_RANGE(0x10000, 0x1ffff) AM_WRITEONLY
+	AM_RANGE(0x20000, 0xfffff) AM_WRITEONLY	   /* or nothing */
+	AM_RANGE(0x100000, 0x107fff) AM_BASE(&c128_basic)	/* maps to 0x4000 */
+	AM_RANGE(0x108000, 0x109fff) AM_BASE(&c64_basic)	/* maps to 0xa000 */
+	AM_RANGE(0x10a000, 0x10bfff) AM_BASE(&c64_kernal)	/* maps to 0xe000 */
+	AM_RANGE(0x10c000, 0x10cfff) AM_BASE(&c128_editor)
+	AM_RANGE(0x10d000, 0x10dfff) AM_BASE(&c128_z80)		/* maps to z80 0 */
+	AM_RANGE(0x10e000, 0x10ffff) AM_BASE(&c128_kernal)
+	AM_RANGE(0x110000, 0x117fff) AM_BASE(&c128_internal_function)
+	AM_RANGE(0x118000, 0x11ffff) AM_BASE(&c128_external_function)
+	AM_RANGE(0x120000, 0x120fff) AM_BASE(&c64_chargen)
+	AM_RANGE(0x121000, 0x121fff) AM_BASE(&c128_chargen)
+	AM_RANGE(0x122000, 0x1227ff) AM_BASE(&c64_colorram)
+	AM_RANGE(0x122800, 0x1327ff) AM_BASE(&c128_vdcram)
 	/* 2 kbyte by 8 bits, only 1 kbyte by 4 bits used) */
 #endif
 ADDRESS_MAP_END
@@ -261,22 +261,22 @@ static ADDRESS_MAP_START( c128_z80_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c128_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x00ff) AM_RAMBANK(1)
-	AM_RANGE(0x0100, 0x01ff) AM_RAMBANK(2)
-	AM_RANGE(0x0200, 0x03ff) AM_RAMBANK(3)
-	AM_RANGE(0x0400, 0x0fff) AM_RAMBANK(4)
-	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK(5)
-	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK(6)
+	AM_RANGE(0x0000, 0x00ff) AM_RAMBANK("bank1")
+	AM_RANGE(0x0100, 0x01ff) AM_RAMBANK("bank2")
+	AM_RANGE(0x0200, 0x03ff) AM_RAMBANK("bank3")
+	AM_RANGE(0x0400, 0x0fff) AM_RAMBANK("bank4")
+	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK("bank5")
+	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank6")
 
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE( SMH_BANK(7), c128_write_4000 )
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE( SMH_BANK(8), c128_write_8000 )
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE( SMH_BANK(9), c128_write_a000 )
-
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE( SMH_BANK(12), c128_write_c000 )
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE( SMH_BANK(13), c128_write_d000 )
-	AM_RANGE(0xe000, 0xfeff) AM_READWRITE( SMH_BANK(14), c128_write_e000 )
-	AM_RANGE(0xff00, 0xff04) AM_READWRITE( SMH_BANK(15), c128_write_ff00 )	   /* mmu c128 modus */
-	AM_RANGE(0xff05, 0xffff) AM_READWRITE( SMH_BANK(16), c128_write_ff05 )
+	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK( "bank7") AM_WRITE( c128_write_4000 )
+	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK( "bank8") AM_WRITE( c128_write_8000 )
+	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK( "bank9") AM_WRITE( c128_write_a000 )
+	
+	AM_RANGE(0xc000, 0xcfff) AM_READ_BANK( "bank12") AM_WRITE( c128_write_c000 )
+	AM_RANGE(0xd000, 0xdfff) AM_READ_BANK( "bank13") AM_WRITE( c128_write_d000 )
+	AM_RANGE(0xe000, 0xfeff) AM_READ_BANK( "bank14") AM_WRITE( c128_write_e000 )
+	AM_RANGE(0xff00, 0xff04) AM_READ_BANK( "bank15") AM_WRITE( c128_write_ff00 )	   /* mmu c128 modus */
+	AM_RANGE(0xff05, 0xffff) AM_READ_BANK( "bank16") AM_WRITE( c128_write_ff05 )
 ADDRESS_MAP_END
 
 

@@ -31,13 +31,13 @@ static void lviv_update_memory (running_machine *machine)
 {
 	if (lviv_ppi_port_outputs[0][2] & 0x02)
 	{
-		memory_set_bankptr(machine,1, messram_get_ptr(devtag_get_device(machine, "messram")));
-		memory_set_bankptr(machine,2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+		memory_set_bankptr(machine,"bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
+		memory_set_bankptr(machine,"bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 	}
 	else
 	{
-		memory_set_bankptr(machine,1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
-		memory_set_bankptr(machine,2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+		memory_set_bankptr(machine,"bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+		memory_set_bankptr(machine,"bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
 	}
 }
 
@@ -168,15 +168,15 @@ WRITE8_HANDLER ( lviv_io_w )
 	{
 		startup_mem_map = 0;
 
-		memory_install_write8_handler(cpuspace, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
-		memory_install_write8_handler(cpuspace, 0x4000, 0x7fff, 0, 0, SMH_BANK(2));
-		memory_install_write8_handler(cpuspace, 0x8000, 0xbfff, 0, 0, SMH_BANK(3));
-		memory_install_write8_handler(cpuspace, 0xC000, 0xffff, 0, 0, SMH_UNMAP);
+		memory_install_write_bank(cpuspace, 0x0000, 0x3fff, 0, 0, "bank1");
+		memory_install_write_bank(cpuspace, 0x4000, 0x7fff, 0, 0, "bank2");
+		memory_install_write_bank(cpuspace, 0x8000, 0xbfff, 0, 0, "bank3");
+		memory_unmap_write(cpuspace, 0xC000, 0xffff, 0, 0);
 
-		memory_set_bankptr(space->machine,1, messram_get_ptr(devtag_get_device(space->machine, "messram")));
-		memory_set_bankptr(space->machine,2, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x4000);
-		memory_set_bankptr(space->machine,3, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x8000);
-		memory_set_bankptr(space->machine,4, memory_region(space->machine, "maincpu") + 0x010000);
+		memory_set_bankptr(space->machine,"bank1", messram_get_ptr(devtag_get_device(space->machine, "messram")));
+		memory_set_bankptr(space->machine,"bank2", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x4000);
+		memory_set_bankptr(space->machine,"bank3", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x8000);
+		memory_set_bankptr(space->machine,"bank4", memory_region(space->machine, "maincpu") + 0x010000);
 	}
 	else
 	{
@@ -228,15 +228,15 @@ MACHINE_RESET( lviv )
 
 	startup_mem_map = 1;
 
-	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-	memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
-	memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, SMH_UNMAP);
-	memory_install_write8_handler(space, 0xC000, 0xffff, 0, 0, SMH_UNMAP);
+	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+	memory_unmap_write(space, 0x4000, 0x7fff, 0, 0);
+	memory_unmap_write(space, 0x8000, 0xbfff, 0, 0);
+	memory_unmap_write(space, 0xC000, 0xffff, 0, 0);
 
-	memory_set_bankptr(machine,1, memory_region(machine, "maincpu") + 0x010000);
-	memory_set_bankptr(machine,2, memory_region(machine, "maincpu") + 0x010000);
-	memory_set_bankptr(machine,3, memory_region(machine, "maincpu") + 0x010000);
-	memory_set_bankptr(machine,4, memory_region(machine, "maincpu") + 0x010000);
+	memory_set_bankptr(machine,"bank1", memory_region(machine, "maincpu") + 0x010000);
+	memory_set_bankptr(machine,"bank2", memory_region(machine, "maincpu") + 0x010000);
+	memory_set_bankptr(machine,"bank3", memory_region(machine, "maincpu") + 0x010000);
+	memory_set_bankptr(machine,"bank4", memory_region(machine, "maincpu") + 0x010000);
 
 	/*timer_pulse(machine, TIME_IN_NSEC(200), NULL, 0, lviv_draw_pixel);*/
 

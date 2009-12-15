@@ -33,11 +33,11 @@ static WRITE8_HANDLER (rom_page_w)
 	{
 		int chip = (data >> 4) % 5;
 		int page = data & 7;
-		memory_set_bankptr(space->machine, 2, memory_region(space->machine, "romdisk") + chip*0x10000 + page * 0x2000);
+		memory_set_bankptr(space->machine, "bank2", memory_region(space->machine, "romdisk") + chip*0x10000 + page * 0x2000);
 	}
 	else
 	{
-		memory_set_bankptr(space->machine, 2, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0xc000);
+		memory_set_bankptr(space->machine, "bank2", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0xc000);
 	}
 }
 
@@ -191,9 +191,9 @@ static const struct upd765_interface pyldin_upd765_interface =
 
 static ADDRESS_MAP_START(pyl601_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xbfff ) AM_RAMBANK(1)
-	AM_RANGE( 0xc000, 0xdfff ) AM_RAMBANK(2)
-	AM_RANGE( 0xe000, 0xe5ff ) AM_RAMBANK(3)
+	AM_RANGE( 0x0000, 0xbfff ) AM_RAMBANK("bank1")
+	AM_RANGE( 0xc000, 0xdfff ) AM_RAMBANK("bank2")
+	AM_RANGE( 0xe000, 0xe5ff ) AM_RAMBANK("bank3")
 	AM_RANGE( 0xe600, 0xe600 ) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE( 0xe601, 0xe601 ) AM_DEVREADWRITE("crtc", mc6845_register_r , mc6845_register_w)
 	AM_RANGE( 0xe604, 0xe604 ) AM_DEVWRITE("crtc", mc6845_address_w)
@@ -212,8 +212,8 @@ static ADDRESS_MAP_START(pyl601_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0xe6d0, 0xe6d0 ) AM_DEVREAD("upd765", upd765_status_r)
 	AM_RANGE( 0xe6d1, 0xe6d1 ) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w)
 	AM_RANGE( 0xe6f0, 0xe6f0 ) AM_READWRITE(rom_page_r, rom_page_w)
-	AM_RANGE( 0xe700, 0xefff ) AM_RAMBANK(4)
-	AM_RANGE( 0xf000, 0xffff ) AM_READWRITE(SMH_BANK(5), SMH_BANK(6))
+	AM_RANGE( 0xe700, 0xefff ) AM_RAMBANK("bank4")
+	AM_RANGE( 0xf000, 0xffff ) AM_READ_BANK("bank5") AM_WRITE_BANK("bank6")
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -318,12 +318,12 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(pyl601)
 {
-	memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
-	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
-	memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xe000);
-	memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xe700);
-	memory_set_bankptr(machine, 5, memory_region(machine, "maincpu") + 0xf000);
-	memory_set_bankptr(machine, 6, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf000);
+	memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xe000);
+	memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xe700);
+	memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") + 0xf000);
+	memory_set_bankptr(machine, "bank6", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf000);
 
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 }

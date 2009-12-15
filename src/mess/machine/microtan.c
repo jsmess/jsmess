@@ -910,18 +910,14 @@ DRIVER_INIT( microtan )
     switch (read_dsw(machine) & 3)
     {
         case 0:  // 1K only :)
-            memory_install_read8_handler(space, 0x0400, 0xbbff, 0, 0, SMH_NOP);
-            memory_install_write8_handler(space, 0x0400, 0xbbff, 0, 0, SMH_NOP);
+            memory_nop_readwrite(space, 0x0400, 0xbbff, 0, 0);
             break;
         case 1:  // +7K TANEX
-            memory_install_read8_handler(space, 0x0400, 0x1fff, 0, 0, SMH_RAM);
-            memory_install_write8_handler(space, 0x0400, 0x1fff, 0, 0, SMH_RAM);
-            memory_install_read8_handler(space, 0x2000, 0xbbff, 0, 0, SMH_NOP);
-            memory_install_write8_handler(space, 0x2000, 0xbbff, 0, 0, SMH_NOP);
+            memory_install_ram(space, 0x0400, 0x1fff, 0, 0 ,NULL);
+            memory_nop_readwrite(space, 0x2000, 0xbbff, 0, 0);
             break;
         default: // +7K TANEX + 40K TANRAM
-            memory_install_read8_handler(space, 0x0400, 0xbbff, 0, 0, SMH_RAM);
-            memory_install_write8_handler(space, 0x0400, 0xbbff, 0, 0, SMH_RAM);
+            memory_install_ram(space, 0x0400, 0xbbff, 0, 0, NULL);
             break;
     }
 

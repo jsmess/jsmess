@@ -324,11 +324,11 @@ static void mxtc_config_w(const device_config *busdevice, const device_config *d
 		{
 			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
 			{
-				memory_set_bankptr(busdevice->machine, 1, bios_ram);
+				memory_set_bankptr(busdevice->machine, "bank1", bios_ram);
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				memory_set_bankptr(busdevice->machine, 1, memory_region(busdevice->machine, "bios") + 0x10000);
+				memory_set_bankptr(busdevice->machine, "bank1", memory_region(busdevice->machine, "bios") + 0x10000);
 			}
 			break;
 		}
@@ -459,7 +459,7 @@ static ADDRESS_MAP_START( calchase_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM AM_BASE(&vga_vram)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000e0000, 0x000effff) AM_RAM
-	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK(1)
+	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
 	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
 	AM_RANGE(0x04000000, 0x040001ff) AM_RAM
@@ -490,8 +490,8 @@ static ADDRESS_MAP_START( calchase_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE("ide", fdc_r, fdc_w)
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITENOP//AM_WRITE(pnp_data_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_32le_r,	pci_32le_w)
-	AM_RANGE(0x43c0, 0x43cf) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x83c0, 0x83cf) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x43c0, 0x43cf) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x83c0, 0x83cf) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 
@@ -622,7 +622,7 @@ static const struct pit8253_config calchase_pit8254_config =
 
 static MACHINE_RESET(calchase)
 {
-	memory_set_bankptr(machine, 1, memory_region(machine, "bios") + 0x10000);
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "bios") + 0x10000);
 }
 
 static void set_gate_a20(running_machine *machine, int a20)

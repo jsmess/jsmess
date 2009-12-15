@@ -43,7 +43,7 @@ WRITE8_HANDLER( dai_stack_interrupt_circuit_w )
 
 static void dai_update_memory(running_machine *machine, int dai_rom_bank)
 {
-	memory_set_bank(machine, 2, dai_rom_bank);
+	memory_set_bank(machine, "bank2", dai_rom_bank);
 }
 
 static TIMER_CALLBACK(dai_bootstrap_callback)
@@ -143,12 +143,12 @@ MACHINE_START( dai )
 {
 	dai_tms5501 = devtag_get_device(machine, "tms5501");
 
-	memory_configure_bank(machine, 2, 0, 4, memory_region(machine, "maincpu") + 0x010000, 0x1000);
+	memory_configure_bank(machine, "bank2", 0, 4, memory_region(machine, "maincpu") + 0x010000, 0x1000);
 }
 
 MACHINE_RESET( dai )
 {
-	memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
+	memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
 	timer_set(machine, attotime_zero, NULL, 0, dai_bootstrap_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(100),NULL,0,dai_timer);	/* timer for tms5501 */
 }

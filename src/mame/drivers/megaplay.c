@@ -599,7 +599,7 @@ static ADDRESS_MAP_START( megaplay_bios_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6403, 0x6403) AM_READWRITE(megaplay_bios_gamesel_r, megaplay_bios_gamesel_w)
 	AM_RANGE(0x6404, 0x6404) AM_READWRITE(megaplay_bios_6404_r, megaplay_bios_6404_w)
 	AM_RANGE(0x6600, 0x6600) AM_READWRITE(megaplay_bios_6600_r, megaplay_bios_6600_w)
-	AM_RANGE(0x6001, 0x67ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x6001, 0x67ff) AM_WRITEONLY
 	AM_RANGE(0x6800, 0x77ff) AM_RAM AM_BASE(&ic3_ram)
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(bank_r, bank_w)
 ADDRESS_MAP_END
@@ -892,8 +892,7 @@ static DRIVER_INIT (megaplay)
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa10000, 0xa1001f, 0, 0, megaplay_io_read, megaplay_io_write);
 
 	/* megaplay has ram shared with the bios cpu here */
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(7), (write8_space_func)SMH_BANK(7));
-	memory_set_bankptr(machine, 7, &ic36_ram[0]);
+	memory_install_ram(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, &ic36_ram[0]);
 
 	/* instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too */
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa02000, 0xa03fff, 0, 0, megadriv_68k_read_z80_extra_ram, megadriv_68k_write_z80_extra_ram);

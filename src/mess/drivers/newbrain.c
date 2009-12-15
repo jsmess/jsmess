@@ -73,13 +73,14 @@ static void check_interrupt(running_machine *machine)
 /* Bank Switching */
 
 #define memory_install_unmapped(program, bank, bank_start, bank_end) \
-	memory_install_readwrite8_handler(program, bank_start, bank_end, 0, 0, SMH_UNMAP, SMH_UNMAP);
+	memory_unmap_readwrite(program, bank_start, bank_end, 0, 0);
 
-#define memory_install_rom(program, bank, bank_start, bank_end) \
-	memory_install_readwrite8_handler(program, bank_start, bank_end, 0, 0, SMH_BANK((FPTR)bank), SMH_UNMAP);
+#define memory_install_rom_helper(program, bank, bank_start, bank_end) \
+	memory_install_read_bank(program, bank_start, bank_end, 0, 0, bank); \
+	memory_unmap_write(program, bank_start, bank_end, 0, 0);
 
-#define memory_install_ram(program, bank, bank_start, bank_end) \
-	memory_install_readwrite8_handler(program, bank_start, bank_end, 0, 0, SMH_BANK((FPTR)bank), SMH_BANK((FPTR)bank));
+#define memory_install_ram_helper(program, bank, bank_start, bank_end) \
+	memory_install_readwrite_bank(program, bank_start, bank_end, 0, 0, bank);
 
 static void newbrain_eim_bankswitch(running_machine *machine)
 {
@@ -98,19 +99,20 @@ static void newbrain_eim_bankswitch(running_machine *machine)
 		UINT16 eim_bank_start = eim_bank * 0x2000;
 		UINT16 bank_start = (bank - 1) * 0x2000;
 		UINT16 bank_end = bank_start + 0x1fff;
-
+		char bank_name[10];
+		sprintf(bank_name,"bank%d",bank);
 		switch (ch)
 		{
 		case 0:
 			/* ROM */
-			memory_install_rom(program, bank, bank_start, bank_end);
-			memory_configure_bank(machine, bank, 0, 1, memory_region(machine, "eim") + eim_bank_start, 0);
+			memory_install_rom_helper(program, bank_name, bank_start, bank_end);
+			memory_configure_bank(machine, bank_name, 0, 1, memory_region(machine, "eim") + eim_bank_start, 0);
 			break;
 
 		case 2:
 			/* RAM */
-			memory_install_ram(program, bank, bank_start, bank_end);
-			memory_configure_bank(machine, bank, 0, 1, state->eim_ram + eim_bank_start, 0);
+			memory_install_ram_helper(program, bank_name, bank_start, bank_end);
+			memory_configure_bank(machine, bank_name, 0, 1, state->eim_ram + eim_bank_start, 0);
 			break;
 
 		default:
@@ -138,21 +140,23 @@ static void newbrain_a_bankswitch(running_machine *machine)
 	{
 		UINT16 bank_start = (bank - 1) * 0x2000;
 		UINT16 bank_end = bank_start + 0x1fff;
-
+		char bank_name[10];
+		sprintf(bank_name,"bank%d",bank);
+		
 		if (state->pwrup)
 		{
 			/* all banks point to ROM at 0xe000 */
-			memory_install_rom(program, bank, bank_start, bank_end);
-			memory_configure_bank(machine, bank, 0, 1, memory_region(machine, Z80_TAG) + 0xe000, 0);
+			memory_install_rom_helper(program, bank_name, bank_start, bank_end);
+			memory_configure_bank(machine, bank_name, 0, 1, memory_region(machine, Z80_TAG) + 0xe000, 0);
 		}
 		else
 		{
-			memory_configure_bank(machine, bank, 0, 1, memory_region(machine, Z80_TAG) + bank_start, 0);
+			memory_configure_bank(machine, bank_name, 0, 1, memory_region(machine, Z80_TAG) + bank_start, 0);
 
 			if (bank < 5)
 			{
 				/* bank is RAM */
-				memory_install_ram(program, bank, bank_start, bank_end);
+				memory_install_ram_helper(program, bank_name, bank_start, bank_end);
 			}
 			else if (bank == 5)
 			{
@@ -160,8 +164,8 @@ static void newbrain_a_bankswitch(running_machine *machine)
 				if (memory_region(machine, "eim"))
 				{
 					/* expansion interface ROM */
-					memory_install_rom(program, bank, bank_start, bank_end);
-					memory_configure_bank(machine, bank, 0, 1, memory_region(machine, "eim") + 0x4000, 0);
+					memory_install_rom_helper(program, bank_name, bank_start, bank_end);
+					memory_configure_bank(machine, bank_name, 0, 1, memory_region(machine, "eim") + 0x4000, 0);
 				}
 				else
 				{
@@ -169,15 +173,15 @@ static void newbrain_a_bankswitch(running_machine *machine)
 					if (memory_region(machine, Z80_TAG)[0xa001] == 0)
 					{
 						/* unmapped on the M model */
-						memory_install_unmapped(program, bank, bank_start, bank_end);
+						memory_install_unmapped(program, bank_name, bank_start, bank_end);
 					}
 					else
 					{
 						/* bank is ROM on the A model */
-						memory_install_rom(program, bank, bank_start, bank_end);
+						memory_install_rom_helper(program, bank_name, bank_start, bank_end);
 					}
 
-					memory_configure_bank(machine, bank, 0, 1, memory_region(machine, Z80_TAG) + 0xa000, 0);
+					memory_configure_bank(machine, bank_name, 0, 1, memory_region(machine, Z80_TAG) + 0xa000, 0);
 				}
 			}
 			else if (bank == 6)
@@ -186,22 +190,22 @@ static void newbrain_a_bankswitch(running_machine *machine)
 				if (memory_region(machine, Z80_TAG)[0xa001] == 0)
 				{
 					/* unmapped on the M model */
-					memory_install_unmapped(program, bank, bank_start, bank_end);
+					memory_install_unmapped(program, bank_name, bank_start, bank_end);
 				}
 				else
 				{
 					/* bank is ROM on the A model */
-					memory_install_rom(program, bank, bank_start, bank_end);
+					memory_install_rom_helper(program, bank_name, bank_start, bank_end);
 				}
 			}
 			else
 			{
 				/* bank is ROM */
-				memory_install_rom(program, bank, bank_start, bank_end);
+				memory_install_rom_helper(program, bank_name, bank_start, bank_end);
 			}
 		}
 
-		memory_set_bank(machine, bank, 0);
+		memory_set_bank(machine, bank_name, 0);
 	}
 }
 
@@ -1086,14 +1090,14 @@ static ADC080X_INTERFACE( newbrain_adc0809_intf )
 
 static ADDRESS_MAP_START( newbrain_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK(1)
-	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK(2)
-	AM_RANGE(0x4000, 0x5fff) AM_RAMBANK(3)
-	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK(4)
-	AM_RANGE(0x8000, 0x9fff) AM_RAMBANK(5)
-	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(6)
-	AM_RANGE(0xc000, 0xdfff) AM_RAMBANK(7)
-	AM_RANGE(0xe000, 0xffff) AM_RAMBANK(8)
+	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x4000, 0x5fff) AM_RAMBANK("bank3")
+	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("bank4")
+	AM_RANGE(0x8000, 0x9fff) AM_RAMBANK("bank5")
+	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank6")
+	AM_RANGE(0xc000, 0xdfff) AM_RAMBANK("bank7")
+	AM_RANGE(0xe000, 0xffff) AM_RAMBANK("bank8")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( newbrain_ei_io_map, ADDRESS_SPACE_IO, 8 )

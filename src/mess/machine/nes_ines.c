@@ -504,7 +504,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 
 		case 0x1013: /* $5113 */
 			LOG_MMC(("MMC5 mid RAM bank select: %02x\n", data & 0x07));
-			memory_set_bankptr(space->machine, 5, &nes.wram[data * 0x2000]);
+			memory_set_bankptr(space->machine, "bank5", &nes.wram[data * 0x2000]);
 			/* The & 4 is a hack that'll tide us over for now */
 			nes_battery_ram = &nes.wram[(data & 4) * 0x2000];
 			break;
@@ -520,14 +520,14 @@ static WRITE8_HANDLER( mapper5_l_w )
 						/* ROM */
 						LOG_MMC(("\tROM bank select (8k, $8000): %02x\n", data));
 						data &= ((nes.prg_chunks << 1) - 1);
-						memory_set_bankptr(space->machine, 1, &nes.rom[data * 0x2000 + 0x10000]);
+						memory_set_bankptr(space->machine, "bank1", &nes.rom[data * 0x2000 + 0x10000]);
 					}
 					else
 					{
 						/* RAM */
 						LOG_MMC(("\tRAM bank select (8k, $8000): %02x\n", data & 0x07));
 						/* The & 4 is a hack that'll tide us over for now */
-						memory_set_bankptr(space->machine, 1, &nes.wram[(data & 4) * 0x2000]);
+						memory_set_bankptr(space->machine, "bank1", &nes.wram[(data & 4) * 0x2000]);
 					}
 					break;
 			}
@@ -548,8 +548,8 @@ static WRITE8_HANDLER( mapper5_l_w )
 						/* RAM */
 						LOG_MMC(("\tRAM bank select (16k, $8000): %02x\n", data & 0x07));
 						/* The & 4 is a hack that'll tide us over for now */
-						memory_set_bankptr(space->machine, 1, &nes.wram[((data & 4) >> 1) * 0x4000]);
-						memory_set_bankptr(space->machine, 2, &nes.wram[((data & 4) >> 1) * 0x4000 + 0x2000]);
+						memory_set_bankptr(space->machine, "bank1", &nes.wram[((data & 4) >> 1) * 0x4000]);
+						memory_set_bankptr(space->machine, "bank2", &nes.wram[((data & 4) >> 1) * 0x4000 + 0x2000]);
 					}
 					break;
 				case 0x03:
@@ -558,14 +558,14 @@ static WRITE8_HANDLER( mapper5_l_w )
 					{
 						/* ROM */
 						data &= ((nes.prg_chunks << 1) - 1);
-						memory_set_bankptr(space->machine, 2, &nes.rom[data * 0x2000 + 0x10000]);
+						memory_set_bankptr(space->machine, "bank2", &nes.rom[data * 0x2000 + 0x10000]);
 					}
 					else
 					{
 						/* RAM */
 						LOG_MMC(("\tRAM bank select (8k, $a000): %02x\n", data & 0x07));
 						/* The & 4 is a hack that'll tide us over for now */
-						memory_set_bankptr(space->machine, 2, &nes.wram[(data & 4) * 0x2000]);
+						memory_set_bankptr(space->machine, "bank2", &nes.wram[(data & 4) * 0x2000]);
 					}
 					break;
 			}
@@ -581,14 +581,14 @@ static WRITE8_HANDLER( mapper5_l_w )
 					{
 						/* ROM */
 						data &= ((nes.prg_chunks << 1) - 1);
-						memory_set_bankptr(space->machine, 3, &nes.rom[data * 0x2000 + 0x10000]);
+						memory_set_bankptr(space->machine, "bank3", &nes.rom[data * 0x2000 + 0x10000]);
 					}
 					else
 					{
 						/* RAM */
 						LOG_MMC(("\tRAM bank select (8k, $c000): %02x\n", data & 0x07));
 						/* The & 4 is a hack that'll tide us over for now */
-						memory_set_bankptr(space->machine, 3, &nes.wram[(data & 4)* 0x2000]);
+						memory_set_bankptr(space->machine, "bank3", &nes.wram[(data & 4)* 0x2000]);
 					}
 					break;
 			}
@@ -609,7 +609,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 				case 0x03:
 					/* 8k switch */
 					data &= ((nes.prg_chunks << 1) - 1);
-					memory_set_bankptr(space->machine, 4, &nes.rom[data * 0x2000 + 0x10000]);
+					memory_set_bankptr(space->machine, "bank4", &nes.rom[data * 0x2000 + 0x10000]);
 					break;
 			}
 			break;
@@ -2886,8 +2886,8 @@ static WRITE8_HANDLER( mapper43_w )
 		{
 			if (bank * 2 >= nes.prg_chunks)
 			{
-				memory_set_bankptr(space->machine, 3, nes.wram);
-				memory_set_bankptr(space->machine, 4, nes.wram);
+				memory_set_bankptr(space->machine, "bank3", nes.wram);
+				memory_set_bankptr(space->machine, "bank4", nes.wram);
 			}
 			else
 			{
@@ -2899,8 +2899,8 @@ static WRITE8_HANDLER( mapper43_w )
 		{
 			if (bank * 2 >= nes.prg_chunks)
 			{
-				memory_set_bankptr(space->machine, 1, nes.wram);
-				memory_set_bankptr(space->machine, 2, nes.wram);
+				memory_set_bankptr(space->machine, "bank1", nes.wram);
+				memory_set_bankptr(space->machine, "bank2", nes.wram);
 			}
 			else
 			{
@@ -2913,10 +2913,10 @@ static WRITE8_HANDLER( mapper43_w )
 	{
 		if (bank * 2 >= nes.prg_chunks)
 		{
-			memory_set_bankptr(space->machine, 1, nes.wram);
-			memory_set_bankptr(space->machine, 2, nes.wram);
-			memory_set_bankptr(space->machine, 3, nes.wram);
-			memory_set_bankptr(space->machine, 4, nes.wram);
+			memory_set_bankptr(space->machine, "bank1", nes.wram);
+			memory_set_bankptr(space->machine, "bank2", nes.wram);
+			memory_set_bankptr(space->machine, "bank3", nes.wram);
+			memory_set_bankptr(space->machine, "bank4", nes.wram);
 		}
 		else
 		{
@@ -4028,7 +4028,7 @@ static WRITE8_HANDLER( mapper69_w )
 					if (!(data & 0x40))
 						prg8_67(space->machine, data & 0x3f);
 					else if (data & 0x80)
-						memory_set_bankptr(space->machine, 5, &nes.wram[(data & 0x3f) * 0x2000]);
+						memory_set_bankptr(space->machine, "bank5", &nes.wram[(data & 0x3f) * 0x2000]);
 					break;
 
 				case 9:

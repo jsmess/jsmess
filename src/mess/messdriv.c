@@ -41,15 +41,15 @@ const game_driver * const drivers[] =
     DRIVER( 3do_pal )
 
     /* Atari */
-    DRIVER( a2600 )     /* Atari 2600                                       */
-    DRIVER( a2600p )    /* Atari 2600 PAL                                   */
-    DRIVER( a5200 )     /* Atari 5200                                       */
-    DRIVER( a7800 )     /* Atari 7800 NTSC                                  */
-    DRIVER( a7800p )    /* Atari 7800 PAL                                   */
-    DRIVER( lynx )      /* Atari Lynx Handheld                              */
-    DRIVER( lynx2 )     /* Atari Lynx II Handheld redesigned, no additions  */
-    DRIVER( jaguar )    /* Atari Jaguar                                     */
-    DRIVER( jaguarcd )  /* Atari Jaguar CD                                  */
+//mess0135u3    DRIVER( a2600 )     /* Atari 2600                                       */
+//mess0135u3    DRIVER( a2600p )    /* Atari 2600 PAL                                   */
+//mess0135u3    DRIVER( a5200 )     /* Atari 5200                                       */
+//mess0135u3    DRIVER( a7800 )     /* Atari 7800 NTSC                                  */
+//mess0135u3    DRIVER( a7800p )    /* Atari 7800 PAL                                   */
+//mess0135u3    DRIVER( lynx )      /* Atari Lynx Handheld                              */
+//mess0135u3    DRIVER( lynx2 )     /* Atari Lynx II Handheld redesigned, no additions  */
+//mess0135u3    DRIVER( jaguar )    /* Atari Jaguar                                     */
+//mess0135u3    DRIVER( jaguarcd )  /* Atari Jaguar CD                                  */
 
     /* Nintendo */
     DRIVER( nes )       /* Nintendo Entertainment System                    */
@@ -279,46 +279,46 @@ const game_driver * const drivers[] =
     DRIVER( nc200 )     /* 1993 NC200                                       */
 
     /* Apple */
-    DRIVER( apple1 )    /* Jul 1976 Apple 1                                 */
-    DRIVER( apple2 )    /* Apr 1977 Apple ][                                */
-    DRIVER( apple2p )   /* Jun 1979 Apple ][+                               */
-    DRIVER( prav82 )    /* Pravetz 82                                       */
-    DRIVER( prav8m )    /* Pravetz 8M                                       */
-    DRIVER( apple2jp )  /* ??? ???? Apple ][j+                              */
-    DRIVER( apple2e )   /* Jan 1983 Apple //e                               */
-    DRIVER( mprof3 )    /* Microprofessor III                               */
-    DRIVER( apple2ee )  /* Mar 1985 Apple //e Enhanced                      */
-    DRIVER( apple2ep )  /* Jan 1987 Apple //e Platinum                      */
-    DRIVER( apple2c )   /* Apr 1984 Apple //c                               */
-    DRIVER( prav8c )    /* Pravetz 8C                               */
-    DRIVER( apple2c0 )  /* ??? 1985 Apple //c (3.5 ROM)                     */
-    DRIVER( apple2c3 )  /* Sep 1986 Apple //c (Original Mem. Exp.)          */
-    DRIVER( apple2c4 )  /* ??? 198? Apple //c (rev 4)                       */
-    DRIVER( apple2cp )  /* Sep 1988 Apple //c+                              */
-    DRIVER( apple2gsr0 )    /* Sep 1986 Apple IIgs ROM00                    */
-    DRIVER( apple2gsr1 )    /* Sep 1987 Apple IIgs ROM01                    */
-    DRIVER( apple2gs )  /* Aug 1989 Apple IIgs ROM03                        */
-    DRIVER( apple2gsr3p )   /* ??? 198? Apple IIgs ROM03 prototype          */
-    DRIVER( apple2gsr3lp )  /* ??? 1989 Apple IIgs ROM03 late? prototype    */
-    DRIVER( apple3 )    /* May 1980 Apple ///                               */
-                    /* Dec 1983 Apple ///+                              */
-    DRIVER( ace100 )    /* ??? 1982 Franklin Ace 100                        */
-    DRIVER( laser128 )  /* ??? 1987 Laser 128                               */
-    DRIVER( las128ex )  /* ??? 1987 Laser 128 EX                            */
-    DRIVER( las3000 )   /* ??? 1983 Laser 3000                              */
-    DRIVER( ivelultr )  /* Ivasim Ivel Ultra                                */
-    DRIVER( agat7 )     /* Agat-7                                           */
-    DRIVER( agat9 )     /* Agat-9                                           */
+//mess0135u3    DRIVER( apple1 )    /* Jul 1976 Apple 1                                 */
+//mess0135u3    DRIVER( apple2 )    /* Apr 1977 Apple ][                                */
+//mess0135u3    DRIVER( apple2p )   /* Jun 1979 Apple ][+                               */
+//mess0135u3    DRIVER( prav82 )    /* Pravetz 82                                       */
+//mess0135u3    DRIVER( prav8m )    /* Pravetz 8M                                       */
+//mess0135u3    DRIVER( apple2jp )  /* ??? ???? Apple ][j+                              */
+//mess0135u3    DRIVER( apple2e )   /* Jan 1983 Apple //e                               */
+//mess0135u3    DRIVER( mprof3 )    /* Microprofessor III                               */
+//mess0135u3    DRIVER( apple2ee )  /* Mar 1985 Apple //e Enhanced                      */
+//mess0135u3    DRIVER( apple2ep )  /* Jan 1987 Apple //e Platinum                      */
+//mess0135u3    DRIVER( apple2c )   /* Apr 1984 Apple //c                               */
+//mess0135u3    DRIVER( prav8c )    /* Pravetz 8C                               */
+//mess0135u3    DRIVER( apple2c0 )  /* ??? 1985 Apple //c (3.5 ROM)                     */
+//mess0135u3    DRIVER( apple2c3 )  /* Sep 1986 Apple //c (Original Mem. Exp.)          */
+//mess0135u3    DRIVER( apple2c4 )  /* ??? 198? Apple //c (rev 4)                       */
+//mess0135u3    DRIVER( apple2cp )  /* Sep 1988 Apple //c+                              */
+//mess0135u3    DRIVER( apple2gsr0 )    /* Sep 1986 Apple IIgs ROM00                    */
+//mess0135u3    DRIVER( apple2gsr1 )    /* Sep 1987 Apple IIgs ROM01                    */
+//mess0135u3    DRIVER( apple2gs )  /* Aug 1989 Apple IIgs ROM03                        */
+//mess0135u3    DRIVER( apple2gsr3p )   /* ??? 198? Apple IIgs ROM03 prototype          */
+//mess0135u3    DRIVER( apple2gsr3lp )  /* ??? 1989 Apple IIgs ROM03 late? prototype    */
+//mess0135u3    DRIVER( apple3 )    /* May 1980 Apple ///                               */
+//mess0135u3                    /* Dec 1983 Apple ///+                              */
+//mess0135u3    DRIVER( ace100 )    /* ??? 1982 Franklin Ace 100                        */
+//mess0135u3    DRIVER( laser128 )  /* ??? 1987 Laser 128                               */
+//mess0135u3    DRIVER( las128ex )  /* ??? 1987 Laser 128 EX                            */
+//mess0135u3    DRIVER( las3000 )   /* ??? 1983 Laser 3000                              */
+//mess0135u3    DRIVER( ivelultr )  /* Ivasim Ivel Ultra                                */
+//mess0135u3    DRIVER( agat7 )     /* Agat-7                                           */
+//mess0135u3    DRIVER( agat9 )     /* Agat-9                                           */
 
 /*
  * Lisa                  January             1983
  * Lisa 2                January             1984
  * Macintosh XL          January             1985
  */
-    DRIVER( lisa )      /* 1983 Apple Lisa                                  */
-    DRIVER( lisa2 )     /* 1984 Apple Lisa 2                                */
-    DRIVER( lisa210 )   /* 1984 Apple Lisa 2/10                             */
-    DRIVER( macxl )     /* 1985 Apple Macintosh XL                          */
+//mess0135u3    DRIVER( lisa )      /* 1983 Apple Lisa                                  */
+//mess0135u3    DRIVER( lisa2 )     /* 1984 Apple Lisa 2                                */
+//mess0135u3    DRIVER( lisa210 )   /* 1984 Apple Lisa 2/10                             */
+//mess0135u3    DRIVER( macxl )     /* 1985 Apple Macintosh XL                          */
 /*
  * Macintosh            January             1984
  * Macintosh 512k       July?               1984
@@ -327,46 +327,46 @@ const game_driver * const drivers[] =
  * Macintosh SE         March               1987
  * Macintosh II         March               1987
  */
-    DRIVER( mac128k )   /* 1984 Apple Macintosh                             */
-    DRIVER( mac512k )   /* 1985 Apple Macintosh 512k                        */
-    DRIVER( mac512ke )  /* 1986 Apple Macintosh 512ke                       */
-    DRIVER( macplus )   /* 1986 Apple Macintosh Plus                        */
-    DRIVER( macse )     /* 1987 Apple Macintosh SE                          */
-    DRIVER( macii )     /* 1987 Apple Macintosh II */
-    DRIVER( macsefd )   /* 1988 Apple Macintosh SE (FDHD) */
-    DRIVER( mac2fdhd )	/* 1988 Apple Macintosh II (FDHD) */
-    DRIVER( maciix )	/* 1988 Apple Macintosh IIx */
-    DRIVER( macse30 )	/* 1989 Apple Macintosh SE/30 */
-    DRIVER( maciicx )	/* 1989 Apple Macintosh IIcx */
-    DRIVER( maciici )	/* 1989 Apple Macintosh IIci */
-    DRIVER( macclasc )  /* 1990 Apple Macintosh Classic                     */
-    DRIVER( maclc )	/* 1990 Apple Macintosh LC */
-    DRIVER( maciisi )	/* 1990 Apple Macintosh IIsi */
-    DRIVER( macclas2 )	/* 1991 Apple Macintosh Classic II */
-    DRIVER( maclc2 )	/* 1991 Apple Macintosh LC II */
-    DRIVER( maclc3 )	/* 1993 Apple Macintosh LC III */
-    DRIVER( pmac6100 )  /* 1994 Apple Power Macintosh 6100 */
+//mess0135u3    DRIVER( mac128k )   /* 1984 Apple Macintosh                             */
+//mess0135u3    DRIVER( mac512k )   /* 1985 Apple Macintosh 512k                        */
+//mess0135u3    DRIVER( mac512ke )  /* 1986 Apple Macintosh 512ke                       */
+//mess0135u3    DRIVER( macplus )   /* 1986 Apple Macintosh Plus                        */
+//mess0135u3    DRIVER( macse )     /* 1987 Apple Macintosh SE                          */
+//mess0135u3    DRIVER( macii )     /* 1987 Apple Macintosh II */
+//mess0135u3    DRIVER( macsefd )   /* 1988 Apple Macintosh SE (FDHD) */
+//mess0135u3    DRIVER( mac2fdhd )	/* 1988 Apple Macintosh II (FDHD) */
+//mess0135u3    DRIVER( maciix )	/* 1988 Apple Macintosh IIx */
+//mess0135u3    DRIVER( macse30 )	/* 1989 Apple Macintosh SE/30 */
+//mess0135u3    DRIVER( maciicx )	/* 1989 Apple Macintosh IIcx */
+//mess0135u3    DRIVER( maciici )	/* 1989 Apple Macintosh IIci */
+//mess0135u3    DRIVER( macclasc )  /* 1990 Apple Macintosh Classic                     */
+//mess0135u3    DRIVER( maclc )	/* 1990 Apple Macintosh LC */
+//mess0135u3    DRIVER( maciisi )	/* 1990 Apple Macintosh IIsi */
+//mess0135u3    DRIVER( macclas2 )	/* 1991 Apple Macintosh Classic II */
+//mess0135u3    DRIVER( maclc2 )	/* 1991 Apple Macintosh LC II */
+//mess0135u3    DRIVER( maclc3 )	/* 1993 Apple Macintosh LC III */
+//mess0135u3    DRIVER( pmac6100 )  /* 1994 Apple Power Macintosh 6100 */
 
     /* Atari */
-    DRIVER( a400 )      /* 1979 Atari 400                                   */
-    DRIVER( a400pal )   /* 1979 Atari 400 PAL                               */
-    DRIVER( a800 )      /* 1979 Atari 800                                   */
-    DRIVER( a800pal )   /* 1979 Atari 800 PAL                               */
-    DRIVER( a1200xl )   /* 1982 Atari 1200 XL                               */
-    DRIVER( a600xl )    /* 1983 Atari 600 XL                                */
-    DRIVER( a800xl )    /* 1983 Atari 800 XL                                */
-    DRIVER( a800xlp )   /* 1983 Atari 800 XL (PAL)                          */
-    DRIVER( a65xe )     /* 1986 Atari 65 XE (XL Extended)                   */
-    DRIVER( a65xea )    /* 1986? Atari 65 XE Arabic                         */
-    DRIVER( a130xe )    /* 1986 Atari 130 XE                                */
-    DRIVER( a800xe )    /* 1986 Atari 800 XE                                */
-    DRIVER( xegs )      /* 1987 Atari XE Game System                        */
-    DRIVER( atarist )   /* Atari ST                                         */
-    DRIVER( megast )    /* Atari Mega ST                                    */
+//mess0135u3    DRIVER( a400 )      /* 1979 Atari 400                                   */
+//mess0135u3    DRIVER( a400pal )   /* 1979 Atari 400 PAL                               */
+//mess0135u3    DRIVER( a800 )      /* 1979 Atari 800                                   */
+//mess0135u3    DRIVER( a800pal )   /* 1979 Atari 800 PAL                               */
+//mess0135u3    DRIVER( a1200xl )   /* 1982 Atari 1200 XL                               */
+//mess0135u3    DRIVER( a600xl )    /* 1983 Atari 600 XL                                */
+//mess0135u3    DRIVER( a800xl )    /* 1983 Atari 800 XL                                */
+//mess0135u3    DRIVER( a800xlp )   /* 1983 Atari 800 XL (PAL)                          */
+//mess0135u3    DRIVER( a65xe )     /* 1986 Atari 65 XE (XL Extended)                   */
+//mess0135u3    DRIVER( a65xea )    /* 1986? Atari 65 XE Arabic                         */
+//mess0135u3    DRIVER( a130xe )    /* 1986 Atari 130 XE                                */
+//mess0135u3    DRIVER( a800xe )    /* 1986 Atari 800 XE                                */
+//mess0135u3    DRIVER( xegs )      /* 1987 Atari XE Game System                        */
+//mess0135u3    DRIVER( atarist )   /* Atari ST                                         */
+//mess0135u3    DRIVER( megast )    /* Atari Mega ST                                    */
 //  DRIVER( stacy )     /* Atari STacy                                      */
-    DRIVER( atariste )  /* Atari STe                                        */
-    DRIVER( stbook )    /* Atari STBook                                     */
-    DRIVER( megaste )   /* Atari Mega STe                                   */
+//mess0135u3    DRIVER( atariste )  /* Atari STe                                        */
+//mess0135u3    DRIVER( stbook )    /* Atari STBook                                     */
+//mess0135u3    DRIVER( megaste )   /* Atari Mega STe                                   */
 //  DRIVER( stpad )     /* Atari STPad (prototype)                          */
 //  DRIVER( tt030 )     /* Atari TT030                                      */
 //  DRIVER( fx1 )       /* Atari FX-1 (prototype)                           */
@@ -651,44 +651,44 @@ const game_driver * const drivers[] =
     DRIVER( ip244415 )	/* IP24: Indigo 2, R4400, 150MHz					*/
 
     /* Texas Instruments */
-    DRIVER( ti990_10 )  /* 1975 TI 990/10                                   */
-    DRIVER( ti990_4 )   /* 1976 TI 990/4                                    */
-    DRIVER( 990189 )    /* 1978 TM 990/189                                  */
-    DRIVER( 990189v )   /* 1980 TM 990/189 with Color Video Board           */
-
-    DRIVER( ti99_224 )  /* 1983 TI 99/2 (24kb ROMs)                         */
-    DRIVER( ti99_232 )  /* 1983 TI 99/2 (32kb ROMs)                         */
-    DRIVER( ti99_4 )    /* 1979 TI-99/4                                     */
-    DRIVER( ti99_4e )   /* 1980 TI-99/4 with 50Hz video                     */
-    DRIVER( ti99_4a )   /* 1981 TI-99/4A                                    */
-    DRIVER( ti99_4ae )  /* 1981 TI-99/4A with 50Hz video                    */
-    DRIVER( ti99_4ev)   /* 1994 TI-99/4A with EVPC video card               */
-    DRIVER( ti99_8 )    /* 1983 TI-99/8                                     */
-    DRIVER( ti99_8e )   /* 1983 TI-99/8 with 50Hz video                     */
-
-    /* TI 99 clones */
-    DRIVER( tutor)      /* 1983? Tomy Tutor                                 */
-    DRIVER( geneve )    /* 1987? Myarc Geneve 9640                          */
-    DRIVER( genmod )    /* 199?? Myarc Geneve 9640                          */
-    DRIVER( ti99_4p )   /* 1996 SNUG 99/4P (a.k.a. SGCPU)                   */
-
-    DRIVER( avigo )     /*                                                  */
-
-    /* Texas Instruments Calculators */
-    DRIVER( ti73 )      /* 1990 TI-73                                       */
-    DRIVER( ti81 )      /* 1990 TI-81 (Z80 2 MHz)                           */
-    DRIVER( ti81v2 )    /* 1990 TI-81 (Z80 2 MHz)                           */
-    DRIVER( ti85 )      /* 1992 TI-85 (Z80 6 MHz)                           */
-    DRIVER( ti82 )      /* 1993 TI-82 (Z80 6 MHz)                           */
-    DRIVER( ti83 )      /* 1996 TI-83 (Z80 6 MHz)                           */
-    DRIVER( ti86 )      /* 1997 TI-86 (Z80 6 MHz)                           */
-    DRIVER( ti83p )     /* 1999 TI-83 Plus (Z80 6 MHz)                      */
-    DRIVER( ti83pse )   /* 2001 TI-83 Plus Silver Edition                   */
-//  DRIVER( ti84p )     /* 2004 TI-84 Plus                                  */
-    DRIVER( ti84pse )   /* 2004 TI-84 Plus Silver Edition                   */
-    DRIVER( ti89 )      /* 1998 TI-89                                       */
-    DRIVER( ti92 )      /* 1995 TI-92                                       */
-    DRIVER( ti92p )     /* 1999 TI-92 Plus                                  */
+//mess0135u3    DRIVER( ti990_10 )  /* 1975 TI 990/10                                   */
+//mess0135u3    DRIVER( ti990_4 )   /* 1976 TI 990/4                                    */
+//mess0135u3    DRIVER( 990189 )    /* 1978 TM 990/189                                  */
+//mess0135u3    DRIVER( 990189v )   /* 1980 TM 990/189 with Color Video Board           */
+//mess0135u3
+//mess0135u3    DRIVER( ti99_224 )  /* 1983 TI 99/2 (24kb ROMs)                         */
+//mess0135u3    DRIVER( ti99_232 )  /* 1983 TI 99/2 (32kb ROMs)                         */
+//mess0135u3    DRIVER( ti99_4 )    /* 1979 TI-99/4                                     */
+//mess0135u3    DRIVER( ti99_4e )   /* 1980 TI-99/4 with 50Hz video                     */
+//mess0135u3    DRIVER( ti99_4a )   /* 1981 TI-99/4A                                    */
+//mess0135u3    DRIVER( ti99_4ae )  /* 1981 TI-99/4A with 50Hz video                    */
+//mess0135u3    DRIVER( ti99_4ev)   /* 1994 TI-99/4A with EVPC video card               */
+//mess0135u3    DRIVER( ti99_8 )    /* 1983 TI-99/8                                     */
+//mess0135u3    DRIVER( ti99_8e )   /* 1983 TI-99/8 with 50Hz video                     */
+//mess0135u3
+//mess0135u3    /* TI 99 clones */
+//mess0135u3    DRIVER( tutor)      /* 1983? Tomy Tutor                                 */
+//mess0135u3    DRIVER( geneve )    /* 1987? Myarc Geneve 9640                          */
+//mess0135u3    DRIVER( genmod )    /* 199?? Myarc Geneve 9640                          */
+//mess0135u3    DRIVER( ti99_4p )   /* 1996 SNUG 99/4P (a.k.a. SGCPU)                   */
+//mess0135u3
+//mess0135u3    DRIVER( avigo )     /*                                                  */
+//mess0135u3
+//mess0135u3    /* Texas Instruments Calculators */
+//mess0135u3    DRIVER( ti73 )      /* 1990 TI-73                                       */
+//mess0135u3    DRIVER( ti81 )      /* 1990 TI-81 (Z80 2 MHz)                           */
+//mess0135u3    DRIVER( ti81v2 )    /* 1990 TI-81 (Z80 2 MHz)                           */
+//mess0135u3    DRIVER( ti85 )      /* 1992 TI-85 (Z80 6 MHz)                           */
+//mess0135u3    DRIVER( ti82 )      /* 1993 TI-82 (Z80 6 MHz)                           */
+//mess0135u3    DRIVER( ti83 )      /* 1996 TI-83 (Z80 6 MHz)                           */
+//mess0135u3    DRIVER( ti86 )      /* 1997 TI-86 (Z80 6 MHz)                           */
+//mess0135u3    DRIVER( ti83p )     /* 1999 TI-83 Plus (Z80 6 MHz)                      */
+//mess0135u3    DRIVER( ti83pse )   /* 2001 TI-83 Plus Silver Edition                   */
+//mess0135u3//  DRIVER( ti84p )     /* 2004 TI-84 Plus                                  */
+//mess0135u3    DRIVER( ti84pse )   /* 2004 TI-84 Plus Silver Edition                   */
+//mess0135u3    DRIVER( ti89 )      /* 1998 TI-89                                       */
+//mess0135u3    DRIVER( ti92 )      /* 1995 TI-92                                       */
+//mess0135u3    DRIVER( ti92p )     /* 1999 TI-92 Plus                                  */
 
     /* NEC */
     DRIVER( pc6001 )
@@ -766,34 +766,34 @@ const game_driver * const drivers[] =
     DRIVER( mbee64 )    /* Microbee 64K (CP/M)                              */
 
     /* Tandy / Radio Shack */
-    DRIVER( trs80 )     /* TRS-80 Model I - Level I BASIC                   */
-    DRIVER( trs80l2 )   /* TRS-80 Model I - Level II BASIC                  */
-    DRIVER( sys80 )     /* EACA System 80                                   */
-    DRIVER( lnw80 )     /* LNW Research LNW-80                              */
-    DRIVER( trs80m3 )   /* TRS-80 Model III - Radio Shack/Tandy             */
-    DRIVER( trs80m4 )
-    DRIVER( trs80m4p )
-    DRIVER( ht1080z ) /* Hradstechnika Szvetkezet HT-1080Z */
-    DRIVER( ht1080z2 ) /* Hradstechnika Szvetkezet HT-1080Z Series II */
-    DRIVER( ht108064 ) /* Hradstechnika Szvetkezet HT-1080Z/64 */
-    DRIVER( radionic )  /* Radionic */
-
-    DRIVER( coco )      /* Color Computer                                   */
-    DRIVER( cocoe )     /* Color Computer (Extended BASIC 1.0)              */
-    DRIVER( coco2 )     /* Color Computer 2                                 */
-    DRIVER( coco2b )    /* Color Computer 2B (uses M6847T1 video chip)      */
-    DRIVER( coco3 )     /* Color Computer 3 (NTSC)                          */
-    DRIVER( coco3p )    /* Color Computer 3 (PAL)                           */
-    DRIVER( coco3h )    /* Hacked Color Computer 3 (6309)                   */
-    DRIVER( dragon32 )  /* Dragon 32                                        */
-    DRIVER( dragon64 )  /* Dragon 64                                        */
-    DRIVER( d64plus )   /* Dragon 64 + Compusense Plus addon                */
-    DRIVER( dgnalpha )  /* Dragon Alpha                                     */
-    DRIVER( dgnbeta )   /* Dragon Beta                                      */
-    DRIVER( tanodr64 )  /* Tano Dragon 64 (NTSC)                            */
-    DRIVER( cp400 )     /* Prologica CP400                                  */
-    DRIVER( mc10 )      /* MC-10                                            */
-    DRIVER( alice )     /* Matra & Hachette Ordinateur Alice                */
+//mess0135u3    DRIVER( trs80 )     /* TRS-80 Model I - Level I BASIC                   */
+//mess0135u3    DRIVER( trs80l2 )   /* TRS-80 Model I - Level II BASIC                  */
+//mess0135u3    DRIVER( sys80 )     /* EACA System 80                                   */
+//mess0135u3    DRIVER( lnw80 )     /* LNW Research LNW-80                              */
+//mess0135u3    DRIVER( trs80m3 )   /* TRS-80 Model III - Radio Shack/Tandy             */
+//mess0135u3    DRIVER( trs80m4 )
+//mess0135u3    DRIVER( trs80m4p )
+//mess0135u3    DRIVER( ht1080z ) /* Hradstechnika Szvetkezet HT-1080Z */
+//mess0135u3    DRIVER( ht1080z2 ) /* Hradstechnika Szvetkezet HT-1080Z Series II */
+//mess0135u3    DRIVER( ht108064 ) /* Hradstechnika Szvetkezet HT-1080Z/64 */
+//mess0135u3    DRIVER( radionic )  /* Radionic */
+//mess0135u3
+//mess0135u3    DRIVER( coco )      /* Color Computer                                   */
+//mess0135u3    DRIVER( cocoe )     /* Color Computer (Extended BASIC 1.0)              */
+//mess0135u3    DRIVER( coco2 )     /* Color Computer 2                                 */
+//mess0135u3    DRIVER( coco2b )    /* Color Computer 2B (uses M6847T1 video chip)      */
+//mess0135u3    DRIVER( coco3 )     /* Color Computer 3 (NTSC)                          */
+//mess0135u3    DRIVER( coco3p )    /* Color Computer 3 (PAL)                           */
+//mess0135u3    DRIVER( coco3h )    /* Hacked Color Computer 3 (6309)                   */
+//mess0135u3    DRIVER( dragon32 )  /* Dragon 32                                        */
+//mess0135u3    DRIVER( dragon64 )  /* Dragon 64                                        */
+//mess0135u3    DRIVER( d64plus )   /* Dragon 64 + Compusense Plus addon                */
+//mess0135u3    DRIVER( dgnalpha )  /* Dragon Alpha                                     */
+//mess0135u3    DRIVER( dgnbeta )   /* Dragon Beta                                      */
+//mess0135u3    DRIVER( tanodr64 )  /* Tano Dragon 64 (NTSC)                            */
+//mess0135u3    DRIVER( cp400 )     /* Prologica CP400                                  */
+//mess0135u3    DRIVER( mc10 )      /* MC-10                                            */
+//mess0135u3    DRIVER( alice )     /* Matra & Hachette Ordinateur Alice                */
 
     /* EACA */
     DRIVER( cgenie )    /* Colour Genie EG2000                              */
@@ -1065,15 +1065,15 @@ const game_driver * const drivers[] =
     DRIVER( comquest )  /* Comquest Plus German                             */
 
     /* Hewlett Packard */
-    DRIVER( hp38g )
-    DRIVER( hp39g )
-    DRIVER( hp48s )     /* HP 48S */
-    DRIVER( hp48sx )    /* HP 48SX */
-    DRIVER( hp48g )     /* HP 48G */
-    DRIVER( hp48gx )    /* HP 48GX */
-    DRIVER( hp48gp )        /* HP 48G+ */
-    DRIVER( hp49g )
-    DRIVER( hp16500b )
+//mess0135u3    DRIVER( hp38g )
+//mess0135u3    DRIVER( hp39g )
+//mess0135u3    DRIVER( hp48s )     /* HP 48S */
+//mess0135u3    DRIVER( hp48sx )    /* HP 48SX */
+//mess0135u3    DRIVER( hp48g )     /* HP 48G */
+//mess0135u3    DRIVER( hp48gx )    /* HP 48GX */
+//mess0135u3    DRIVER( hp48gp )        /* HP 48G+ */
+//mess0135u3    DRIVER( hp49g )
+//mess0135u3    DRIVER( hp16500b )
 
     /* SpectraVideo */
     DRIVER( svi318 )    /* SVI-318 (PAL)                                    */
@@ -1117,16 +1117,16 @@ const game_driver * const drivers[] =
     DRIVER( tx0_8kw )   /* 1962 MIT TX-0 (8kw RAM)                          */
 
     /* Luxor Datorer AB */
-    DRIVER( abc80 )
-//  DRIVER( abc80h )
-    DRIVER( abc802 )
-    DRIVER( abc800m )
-    DRIVER( abc800c )
-    DRIVER( abc806 )
+//mess0135u3    DRIVER( abc80 )
+//mess0135u3//  DRIVER( abc80h )
+//mess0135u3    DRIVER( abc802 )
+//mess0135u3    DRIVER( abc800m )
+//mess0135u3    DRIVER( abc800c )
+//mess0135u3    DRIVER( abc806 )
 
     /* Be Incorporated */
-    DRIVER( bebox )     /* BeBox Dual603-66                                 */
-    DRIVER( bebox2 )    /* BeBox Dual603-133                                */
+//mess0135u3    DRIVER( bebox )     /* BeBox Dual603-66                                 */
+//mess0135u3    DRIVER( bebox2 )    /* BeBox Dual603-133                                */
 
     /* Tiger Electronics */
     DRIVER( gamecom )   /* Tiger Game.com                                   */
@@ -1381,13 +1381,13 @@ const game_driver * const drivers[] =
     DRIVER( votrpss ) /* 1982 Votrax Personal Speech System */
 
 	/* Conitec Datensysteme */
-    DRIVER( prof80 )
-    DRIVER( prof80g21 )
-    DRIVER( prof80g25 )
-    DRIVER( prof80g26 )
-    DRIVER( prof80g31 )
-    DRIVER( prof80g562 )
-    DRIVER( prof180x )
+//mess0135u3    DRIVER( prof80 )
+//mess0135u3    DRIVER( prof80g21 )
+//mess0135u3    DRIVER( prof80g25 )
+//mess0135u3    DRIVER( prof80g26 )
+//mess0135u3    DRIVER( prof80g31 )
+//mess0135u3    DRIVER( prof80g562 )
+//mess0135u3    DRIVER( prof180x )
 
 /****************Games*******************************************************/
     /* Computer Electronic */
@@ -1458,7 +1458,7 @@ const game_driver * const drivers[] =
     DRIVER( kontiki )
     DRIVER( tiki100 )
     DRIVER( vcs80 )
-    DRIVER( v1050 )
+//mess0135u3    DRIVER( v1050 )
     DRIVER( xerox820 )
     DRIVER( xor100 )
     DRIVER( iq151 )

@@ -93,26 +93,27 @@ static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 		if (rombank < 3)
 		{
 			/* internal ROM */
-			memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
-			memory_set_bank(machine, 1, rombank);
+			memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+			memory_unmap_write(program, 0x0000, 0x7fff, 0, 0);
+			memory_set_bank(machine, "bank1", rombank);
 		}
 		else
 		{
 			/* ROM cartridge */
-			memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+			memory_unmap_readwrite(program, 0x0000, 0x7fff, 0, 0);
 		}
 		//logerror("0x0000-0x7fff = ROM %u\n", rombank);
 		break;
 
 	case 1: /* RAM 0000H to 7FFFH */
-		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_set_bank(machine, 1, 4);
+		memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+		memory_set_bank(machine, "bank1", 4);
 		//logerror("0x0000-0x7fff = RAM 0-7fff\n");
 		break;
 
 	case 2:	/* RAM 8000H to FFFFH */
-		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_set_bank(machine, 1, 5);
+		memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+		memory_set_bank(machine, "bank1", 5);
 		//logerror("0x0000-0x7fff = RAM 8000-ffff\n");
 		break;
 
@@ -124,32 +125,32 @@ static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 	switch (ram8000)
 	{
 	case 0: /* cell addresses 0000H to 3FFFH */
-		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(3), SMH_BANK(3));
-		memory_set_bank(machine, 3, 0);
+		memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank3");
+		memory_set_bank(machine, "bank3", 0);
 		//logerror("0x8000-0xbfff = RAM 0-3fff\n");
 		break;
 
 	case 1: /* cell addresses 4000H to 7FFFH */
-		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(3), SMH_BANK(3));
-		memory_set_bank(machine, 3, 1);
+		memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank3");
+		memory_set_bank(machine, "bank3", 1);
 		//logerror("0x8000-0xbfff = RAM 4000-7fff\n");
 		break;
 
 	case 2: /* cell addresses 8000H to BFFFH */
-		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(3), SMH_BANK(3));
-		memory_set_bank(machine, 3, 2);
+		memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank3");
+		memory_set_bank(machine, "bank3", 2);
 		//logerror("0x8000-0xbfff = RAM 8000-bfff\n");
 		break;
 
 	case 3: /* RAM cartridge */
 		if (messram_get_size(devtag_get_device(machine, "messram")) > 64)
 		{
-			memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(3), SMH_BANK(3));
-			memory_set_bank(machine, 3, 3); // TODO or 4
+			memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank3");
+			memory_set_bank(machine, "bank3", 3); // TODO or 4
 		}
 		else
 		{
-			memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+			memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
 		}
 		//logerror("0x8000-0xbfff = RAM cartridge\n");
 		break;
@@ -158,16 +159,16 @@ static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 	if (BIT(data, 6))
 	{
 		/* CRT video RAM */
-		memory_install_readwrite8_handler(program, 0xc000, 0xdfff, 0, 0, SMH_BANK(4), SMH_BANK(4));
-		memory_install_readwrite8_handler(program, 0xe000, 0xe7ff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-		memory_set_bank(machine, 4, 1);
+		memory_install_readwrite_bank(program, 0xc000, 0xdfff, 0, 0, "bank4");
+		memory_unmap_readwrite(program, 0xe000, 0xe7ff, 0, 0);
+		memory_set_bank(machine, "bank4", 1);
 		//logerror("0xc000-0xdfff = video RAM\n");
 	}
 	else
 	{
 		/* RAM */
-		memory_install_readwrite8_handler(program, 0xc000, 0xe7ff, 0, 0, SMH_BANK(4), SMH_BANK(4));
-		memory_set_bank(machine, 4, 0);
+		memory_install_readwrite_bank(program, 0xc000, 0xe7ff, 0, 0, "bank4");
+		memory_set_bank(machine, "bank4", 0);
 		//logerror("0xc000-0e7fff = RAM c000-e7fff\n");
 	}
 }
@@ -356,10 +357,10 @@ static WRITE8_HANDLER( port71_w )
 
 static ADDRESS_MAP_START( pc8401a_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK(1)
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(3)
-	AM_RANGE(0xc000, 0xe7ff) AM_RAMBANK(4)
-	AM_RANGE(0xe800, 0xffff) AM_RAMBANK(5)
+	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
+	AM_RANGE(0xc000, 0xe7ff) AM_RAMBANK("bank4")
+	AM_RANGE(0xe800, 0xffff) AM_RAMBANK("bank5")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc8401a_io, ADDRESS_SPACE_IO, 8 )
@@ -524,22 +525,22 @@ static MACHINE_START( pc8401a )
 	state->crt_ram = auto_alloc_array(machine, UINT8, PC8401A_CRT_VIDEORAM_SIZE);
 
 	/* set up A0/A1 memory banking */
-	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, Z80_TAG), 0x8000);
-	memory_configure_bank(machine, 1, 4, 2, messram_get_ptr(devtag_get_device(machine, "messram")), 0x8000);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, Z80_TAG), 0x8000);
+	memory_configure_bank(machine, "bank1", 4, 2, messram_get_ptr(devtag_get_device(machine, "messram")), 0x8000);
+	memory_set_bank(machine, "bank1", 0);
 
 	/* set up A2 memory banking */
-	memory_configure_bank(machine, 3, 0, 5, messram_get_ptr(devtag_get_device(machine, "messram")), 0x4000);
-	memory_set_bank(machine, 3, 0);
+	memory_configure_bank(machine, "bank3", 0, 5, messram_get_ptr(devtag_get_device(machine, "messram")), 0x4000);
+	memory_set_bank(machine, "bank3", 0);
 
 	/* set up A3 memory banking */
-	memory_configure_bank(machine, 4, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000, 0);
-	memory_configure_bank(machine, 4, 1, 1, state->crt_ram, 0);
-	memory_set_bank(machine, 4, 0);
+	memory_configure_bank(machine, "bank4", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000, 0);
+	memory_configure_bank(machine, "bank4", 1, 1, state->crt_ram, 0);
+	memory_set_bank(machine, "bank4", 0);
 
 	/* set up A4 memory banking */
-	memory_configure_bank(machine, 5, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xe800, 0);
-	memory_set_bank(machine, 5, 0);
+	memory_configure_bank(machine, "bank5", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xe800, 0);
+	memory_set_bank(machine, "bank5", 0);
 
 	/* bank switch */
 	pc8401a_bankswitch(machine, 0);

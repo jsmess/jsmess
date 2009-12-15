@@ -195,26 +195,26 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 
 	if (size > 0x1000)	/* 6k rom + 1k ram - Chess2 only */
 	{
-		memory_install_read8_handler(memspace, 0x0800, 0x15ff, 0, 0, SMH_BANK(1));	/* extra rom */
-		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x1000);
+		memory_install_read_bank(memspace, 0x0800, 0x15ff, 0, 0, "bank1");	/* extra rom */
+		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x1000);
 
-		memory_install_readwrite8_handler(memspace, 0x1800, 0x1bff, 0, 0, SMH_BANK(2), SMH_BANK(2));	/* ram */
-		memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x1800);
+		memory_install_readwrite_bank(memspace, 0x1800, 0x1bff, 0, 0, "bank2");	/* ram */
+		memory_set_bankptr(machine, "bank2", memory_region(machine, "maincpu") + 0x1800);
 	}
 	else
 	if (size > 0x0800)	/* some 4k roms have 1k of mirrored ram */
 	{
-		memory_install_read8_handler(memspace, 0x0800, 0x0fff, 0, 0, SMH_BANK(1));	/* extra rom */
-		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x0800);
+		memory_install_read_bank(memspace, 0x0800, 0x0fff, 0, 0, "bank1");	/* extra rom */
+		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x0800);
 		
-		memory_install_readwrite8_handler(memspace, 0x1000, 0x15ff, 0, 0x800, SMH_BANK(2), SMH_BANK(2)); /* ram */
-		memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x1000);
+		memory_install_readwrite_bank(memspace, 0x1000, 0x15ff, 0, 0x800, "bank2"); /* ram */
+		memory_set_bankptr(machine, "bank2", memory_region(machine, "maincpu") + 0x1000);
 	}
 	else
 	if (size == 0x0800)	/* 2k roms + 2k ram - Hobby Module(Radofin) and elektor TVGC*/
 	{
-		memory_install_readwrite8_handler(memspace, 0x0800, 0x0fff, 0, 0, SMH_BANK(1), SMH_BANK(1)); /* ram */
-		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x0800);
+		memory_install_readwrite_bank(memspace, 0x0800, 0x0fff, 0, 0, "bank1"); /* ram */
+		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x0800);
 	}
 
 	if (size > 0)

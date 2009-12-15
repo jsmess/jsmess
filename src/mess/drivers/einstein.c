@@ -440,7 +440,7 @@ static WRITE_LINE_DEVICE_HANDLER( einstein_serial_receive_clock )
 static void einstein_page_rom(running_machine *machine)
 {
 	einstein_state *einstein = machine->driver_data;
-	memory_set_bankptr(machine, 1, einstein->rom_enabled ? memory_region(machine, "bios") : messram_get_ptr(devtag_get_device(machine, "messram")));
+	memory_set_bankptr(machine, "bank1", einstein->rom_enabled ? memory_region(machine, "bios") : messram_get_ptr(devtag_get_device(machine, "messram")));
 }
 
 /* writing to this port is a simple trigger, and switches between RAM and ROM */
@@ -569,8 +569,8 @@ static MACHINE_RESET( einstein )
 	einstein->ctc = devtag_get_device(machine, IC_I058);
 
 	/* initialize memory mapping */
-	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")));
-	memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")));
+	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
 	einstein->rom_enabled = 1;
 	einstein_page_rom(machine);
 
@@ -637,8 +637,8 @@ static VIDEO_UPDATE( einstein2 )
 ***************************************************************************/
 
 static ADDRESS_MAP_START( einstein_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07fff) AM_READWRITE(SMH_BANK(1), SMH_BANK(2))
-	AM_RANGE(0x8000, 0x0ffff) AM_RAMBANK(3)
+	AM_RANGE(0x0000, 0x07fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
+	AM_RANGE(0x8000, 0x0ffff) AM_RAMBANK("bank3")
 ADDRESS_MAP_END
 
 /* The I/O ports are decoded into 8 blocks using address lines A3 to A7 */

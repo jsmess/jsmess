@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffff86, 0xffff87) AM_READ_PORT("DSW1")
 	AM_RANGE(0xffff88, 0xffff89) AM_READ_PORT("DSW2")
 	AM_RANGE(0xffff8a, 0xffff8b) AM_READ_PORT("DSW3")
-	AM_RANGE(0xffff8c, 0xffff8d) AM_READ(SMH_RAM)						// unknown
+	AM_RANGE(0xffff8c, 0xffff8d) AM_READONLY						// unknown
 	AM_RANGE(0xffff8e, 0xffff8f) AM_READ_PORT("JP")
 	AM_RANGE(0xffffa0, 0xffffa1) AM_READ_PORT("P3")						// used only by taotaida
 	AM_RANGE(0xffffa2, 0xffffa3) AM_READ_PORT("P4")						// used only by taotaida
@@ -126,13 +126,13 @@ static WRITE8_HANDLER( taotaido_sh_bankswitch_w )
 {
 	UINT8 *rom = memory_region(space->machine, "audiocpu") + 0x10000;
 
-	memory_set_bankptr(space->machine, 1,rom + (data & 0x03) * 0x8000);
+	memory_set_bankptr(space->machine, "bank1",rom + (data & 0x03) * 0x8000);
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port_map, ADDRESS_SPACE_IO, 8 )

@@ -9,8 +9,8 @@
 #define CASSETTE_TAG	"cassette"
 #define CENTRONICS_TAG	"centronics"
 
-#define BANK_ROM1	1
-#define BANK_ROM2	2
+#define BANK_ROM1	"bank1"
+#define BANK_ROM2	"bank2"
 
 typedef struct _crvision_state crvision_state;
 struct _crvision_state

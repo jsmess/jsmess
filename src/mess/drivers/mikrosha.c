@@ -20,7 +20,7 @@
 
 /* Address maps */
 static ADDRESS_MAP_START(mikrosha_mem, ADDRESS_SPACE_PROGRAM, 8)
-    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK(1) // First bank
+    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM // RAM
     AM_RANGE( 0x8000, 0xbfff ) AM_READ(radio_cpu_state_r) // Not connected
     AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w) AM_MIRROR(0x07fc)

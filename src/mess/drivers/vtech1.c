@@ -621,13 +621,13 @@ static WRITE8_HANDLER( vtech1_memory_bank_w )
 
 	if (data >= 1)
 		if ((data <= 3 && vtech1->ram_size == 66*1024) || (vtech1->ram_size == 4098*1024))
-			memory_set_bank(space->machine, 3, data - 1);
+			memory_set_bank(space->machine, "bank3", data - 1);
 }
 
 static WRITE8_HANDLER( vtech1_video_bank_w )
 {
 	logerror("vtech1_video_bank_w $%02X\n", data);
-	memory_set_bank(space->machine, 4, data & 0x03);
+	memory_set_bank(space->machine, "bank4", data & 0x03);
 }
 
 
@@ -670,27 +670,27 @@ static DRIVER_INIT( vtech1 )
 	vtech1->ram_size = messram_get_size(devtag_get_device(machine, "messram"));
 
 	/* setup memory banking */
-	memory_set_bankptr(machine, 1, vtech1->ram);
+	memory_set_bankptr(machine, "bank1", vtech1->ram);
 
 	/* 16k memory expansion? */
 	if (vtech1->ram_size == 18*1024 || vtech1->ram_size == 22*1024 || vtech1->ram_size == 32*1024)
 	{
 		offs_t base = 0x7800 + (vtech1->ram_size - 0x4000);
-		memory_install_readwrite8_handler(prg, base, base + 0x3fff, 0, 0, SMH_BANK(2), SMH_BANK(2));
-		memory_set_bankptr(machine, 2, vtech1->ram + base - 0x7800);
+		memory_install_readwrite_bank(prg, base, base + 0x3fff, 0, 0, "bank2");
+		memory_set_bankptr(machine, "bank2", vtech1->ram + base - 0x7800);
 	}
 
 	/* 64k expansion? */
 	if (vtech1->ram_size >= 66*1024)
 	{
 		/* install fixed first bank */
-		memory_install_readwrite8_handler(prg, 0x8000, 0xbfff, 0, 0, SMH_BANK(2), SMH_BANK(2));
-		memory_set_bankptr(machine, 2, vtech1->ram + 0x800);
+		memory_install_readwrite_bank(prg, 0x8000, 0xbfff, 0, 0, "bank2");
+		memory_set_bankptr(machine, "bank2", vtech1->ram + 0x800);
 
 		/* install the others, dynamically banked in */
-		memory_install_readwrite8_handler(prg, 0xc000, 0xffff, 0, 0, SMH_BANK(3), SMH_BANK(3));
-		memory_configure_bank(machine, 3, 0, (vtech1->ram_size - 0x4800) / 0x4000, vtech1->ram + 0x4800, 0x4000);
-		memory_set_bank(machine, 3, 0);
+		memory_install_readwrite_bank(prg, 0xc000, 0xffff, 0, 0, "bank3");
+		memory_configure_bank(machine, "bank3", 0, (vtech1->ram_size - 0x4800) / 0x4000, vtech1->ram + 0x4800, 0x4000);
+		memory_set_bank(machine, "bank3", 0);
 	}
 
 	/* initialize floppy */
@@ -718,9 +718,9 @@ static DRIVER_INIT( vtech1h )
 	machine->generic.videoram_size = 0x2000;
 	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, machine->generic.videoram_size);
 
-	memory_install_readwrite8_handler(prg, 0x7000, 0x77ff, 0, 0, SMH_BANK(4), SMH_BANK(4));
-	memory_configure_bank(machine, 4, 0, 4, machine->generic.videoram.u8, 0x800);
-	memory_set_bank(machine, 4, 0);
+	memory_install_readwrite_bank(prg, 0x7000, 0x77ff, 0, 0, "bank4");
+	memory_configure_bank(machine, "bank4", 0, 4, machine->generic.videoram.u8, 0x800);
+	memory_set_bank(machine, "bank4", 0);
 }
 
 
@@ -734,7 +734,7 @@ static ADDRESS_MAP_START( laser110_mem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
     AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
     AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_SIZE_GENERIC(videoram) /* (6847) */
-    AM_RANGE(0x7800, 0x7fff) AM_RAMBANK(1) /* 2k user ram */
+    AM_RANGE(0x7800, 0x7fff) AM_RAMBANK("bank1") /* 2k user ram */
     AM_RANGE(0x8000, 0xbfff) AM_NOP /* 16k ram expansion */
     AM_RANGE(0xc000, 0xffff) AM_NOP
 ADDRESS_MAP_END
@@ -745,7 +745,7 @@ static ADDRESS_MAP_START( laser210_mem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
     AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
     AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_SIZE_GENERIC(videoram) /* U7 (6847) */
-    AM_RANGE(0x7800, 0x8fff) AM_RAMBANK(1) /* 6k user ram */
+    AM_RANGE(0x7800, 0x8fff) AM_RAMBANK("bank1") /* 6k user ram */
     AM_RANGE(0x9000, 0xcfff) AM_NOP /* 16k ram expansion */
     AM_RANGE(0xd000, 0xffff) AM_NOP
 ADDRESS_MAP_END
@@ -756,7 +756,7 @@ static ADDRESS_MAP_START( laser310_mem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
     AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
     AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_SIZE_GENERIC(videoram) /* (6847) */
-    AM_RANGE(0x7800, 0xb7ff) AM_RAMBANK(1) /* 16k user ram */
+    AM_RANGE(0x7800, 0xb7ff) AM_RAMBANK("bank1") /* 16k user ram */
     AM_RANGE(0xb800, 0xf7ff) AM_NOP /* 16k ram expansion */
     AM_RANGE(0xf8ff, 0xffff) AM_NOP
 ADDRESS_MAP_END

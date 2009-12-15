@@ -330,25 +330,27 @@ static TIMER_CALLBACK(nc_keyboard_timer_callback)
 }
 
 
-static const read8_space_func nc_bankhandler_r[]={
-SMH_BANK(1), SMH_BANK(2), SMH_BANK(3), SMH_BANK(4)};
+static const char *nc_bankhandler_r[]={
+"bank1", "bank2", "bank3", "bank4"};
 
-static const write8_space_func nc_bankhandler_w[]={
-SMH_BANK(5), SMH_BANK(6), SMH_BANK(7), SMH_BANK(8)};
+static const char *nc_bankhandler_w[]={
+"bank5", "bank6", "bank7", "bank8"};
 
 static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int mem_type;
 	int mem_bank;
-	read8_space_func read_handler;
-	write8_space_func write_handler = NULL;
-
+	char bank1[10];
+	char bank5[10];
+	sprintf(bank1,"bank%d",bank+1);
+	sprintf(bank5,"bank%d",bank+5);
+	
 	mem_type = (nc_memory_config[bank]>>6) & 0x03;
 	mem_bank = nc_memory_config[bank] & 0x03f;
-
-	read_handler = nc_bankhandler_r[bank];
-
+	
+	memory_install_read_bank(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, nc_bankhandler_r[bank]);
+	
 	switch (mem_type)
 	{
 		/* ROM */
@@ -361,9 +363,9 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 
 			addr = (memory_region(machine, "maincpu")+0x010000) + (mem_bank<<14);
 
-			memory_set_bankptr(machine, bank+1, addr);
-
-			write_handler = SMH_NOP;
+			memory_set_bankptr(machine, bank1, addr);
+			
+			memory_nop_write(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0);
 			LOG(("BANK %d: ROM %d\n",bank,mem_bank));
 		}
 		break;
@@ -377,10 +379,10 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 
 			addr = messram_get_ptr(devtag_get_device(machine, "messram")) + (mem_bank<<14);
 
-			memory_set_bankptr(machine, bank+1, addr);
-			memory_set_bankptr(machine, bank+5, addr);
+			memory_set_bankptr(machine, bank1, addr);
+			memory_set_bankptr(machine, bank5, addr);
 
-			write_handler = nc_bankhandler_w[bank];
+			memory_install_write_bank(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, nc_bankhandler_w[bank]);
 			LOG(("BANK %d: RAM\n",bank));
 		}
 		break;
@@ -396,20 +398,20 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 				mem_bank = mem_bank & nc_membank_card_ram_mask;
 				addr = nc_card_ram + (mem_bank<<14);
 
-				memory_set_bankptr(machine, bank+1, addr);
+				memory_set_bankptr(machine, bank1, addr);
 
 				/* write enabled? */
 				if (input_port_read(machine, "EXTRA") & 0x02)
 				{
 					/* yes */
-					memory_set_bankptr(machine, bank+5, addr);
-
-					write_handler = nc_bankhandler_w[bank];
+					memory_set_bankptr(machine, bank5, addr);
+					
+					memory_install_write_bank(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, nc_bankhandler_w[bank]);
 				}
 				else
 				{
 					/* no */
-					write_handler = SMH_NOP;
+					memory_nop_write(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0);
 				}
 
 				LOG(("BANK %d: CARD-RAM\n",bank));
@@ -417,20 +419,10 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 			else
 			{
 				/* if no card connected, then writes fail */
-				read_handler = SMH_NOP;
-				write_handler = SMH_NOP;
+				memory_nop_readwrite(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0);
 			}
 		}
 		break;
-	}
-
-	memory_install_read8_handler(space,
-		(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, read_handler);
-
-	if (write_handler)
-	{
-		memory_install_write8_handler(space,
-			(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, write_handler);
 	}
 }
 
@@ -606,10 +598,10 @@ static void nc_common_init_machine(running_machine *machine)
 }
 
 static ADDRESS_MAP_START(nc_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_BANK(1), SMH_BANK(5))
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK(2), SMH_BANK(6))
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(3), SMH_BANK(7))
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_BANK(4), SMH_BANK(8))
+	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
+	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
+	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
+	AM_RANGE(0xc000, 0xffff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank8")
 ADDRESS_MAP_END
 
 

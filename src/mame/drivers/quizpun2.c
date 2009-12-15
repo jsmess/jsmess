@@ -276,7 +276,7 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 static WRITE8_HANDLER( quizpun2_rombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine,  1, &ROM[ 0x10000 + 0x2000 * (data & 0x1f) ] );
+	memory_set_bankptr(space->machine,  "bank1", &ROM[ 0x10000 + 0x2000 * (data & 0x1f) ] );
 }
 
 static WRITE8_HANDLER( quizpun2_irq_ack )
@@ -292,7 +292,7 @@ static WRITE8_HANDLER( quizpun2_soundlatch_w )
 
 static ADDRESS_MAP_START( quizpun2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
-	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK(1)
+	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("bank1")
 
 	AM_RANGE( 0xa000, 0xbfff ) AM_RAM_WRITE( fg_ram_w ) AM_BASE( &fg_ram )	// 4 * 800
 	AM_RANGE( 0xc000, 0xc7ff ) AM_RAM_WRITE( bg_ram_w ) AM_BASE( &bg_ram )	// 4 * 400
@@ -325,8 +325,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizpun2_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE( SMH_NOP )	// IRQ end
-	AM_RANGE( 0x20, 0x20 ) AM_WRITE( SMH_NOP )	// NMI end
+	AM_RANGE( 0x00, 0x00 ) AM_WRITENOP	// IRQ end
+	AM_RANGE( 0x20, 0x20 ) AM_WRITENOP	// NMI end
 	AM_RANGE( 0x40, 0x40 ) AM_READ( soundlatch_r )
 	AM_RANGE( 0x60, 0x61 ) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w )
 ADDRESS_MAP_END

@@ -42,13 +42,13 @@ VIDEO_START( contra );
 
 static WRITE8_HANDLER( contra_bankswitch_w )
 {
-	int bankaddress;
+	UINT32 bankaddress;
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 
 	bankaddress = 0x10000 + (data & 0x0f) * 0x2000;
 	if (bankaddress < 0x28000)	/* for safety */
-		memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+		memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
 }
 
 static WRITE8_HANDLER( contra_sh_irqtrigger_w )
@@ -89,18 +89,18 @@ static ADDRESS_MAP_START( contra_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x1000, 0x1fff) AM_RAM
 
-	AM_RANGE(0x2000, 0x5fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x2000, 0x5fff) AM_READONLY
 	AM_RANGE(0x2000, 0x23ff) AM_WRITE(contra_fg_cram_w) AM_BASE(&contra_fg_cram)
 	AM_RANGE(0x2400, 0x27ff) AM_WRITE(contra_fg_vram_w) AM_BASE(&contra_fg_vram)
 	AM_RANGE(0x2800, 0x2bff) AM_WRITE(contra_text_cram_w) AM_BASE(&contra_text_cram)
 	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(contra_text_vram_w) AM_BASE(&contra_text_vram)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(SMH_RAM) AM_BASE_GENERIC(spriteram)/* 2nd bank is at 0x5000 */
-	AM_RANGE(0x3800, 0x3fff) AM_WRITE(SMH_RAM) // second sprite buffer
+	AM_RANGE(0x3000, 0x37ff) AM_WRITEONLY AM_BASE_GENERIC(spriteram)/* 2nd bank is at 0x5000 */
+	AM_RANGE(0x3800, 0x3fff) AM_WRITEONLY // second sprite buffer
 	AM_RANGE(0x4000, 0x43ff) AM_WRITE(contra_bg_cram_w) AM_BASE(&contra_bg_cram)
 	AM_RANGE(0x4400, 0x47ff) AM_WRITE(contra_bg_vram_w) AM_BASE(&contra_bg_vram)
-	AM_RANGE(0x4800, 0x5fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x4800, 0x5fff) AM_WRITEONLY
 
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
  	AM_RANGE(0x7000, 0x7000) AM_WRITE(contra_bankswitch_w)
 
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -189,11 +189,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( contra )
 
 	/* basic machine hardware */
- 	MDRV_CPU_ADD("maincpu", M6809, 1500000)
+ 	MDRV_CPU_ADD("maincpu", M6809, XTAL_24MHz/16) /* 1500000? */
 	MDRV_CPU_PROGRAM_MAP(contra_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
- 	MDRV_CPU_ADD("audiocpu", M6809, 2000000)
+ 	MDRV_CPU_ADD("audiocpu", M6809, XTAL_24MHz/12) /* 2000000? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
@@ -216,7 +216,7 @@ static MACHINE_DRIVER_START( contra )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 3582071)
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_DRIVER_END
@@ -244,6 +244,9 @@ ROM_START( contra )
 	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #0 char lookup table */
 	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )	/* 007121 #1 sprite lookup table */
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
+
+	ROM_REGION( 0x0001, "pals", 0 )
+    ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 ROM_START( contra1 )
@@ -268,6 +271,9 @@ ROM_START( contra1 )
 	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #0 char lookup table */
 	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )	/* 007121 #1 sprite lookup table */
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
+
+	ROM_REGION( 0x0001, "pals", 0 )
+    ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 ROM_START( contrab )
@@ -331,6 +337,9 @@ ROM_START( contraj )
 	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #0 char lookup table */
 	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )	/* 007121 #1 sprite lookup table */
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
+
+	ROM_REGION( 0x0001, "pals", 0 )
+    ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 ROM_START( contrajb )
@@ -394,6 +403,9 @@ ROM_START( gryzor )
 	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #0 char lookup table */
 	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )	/* 007121 #1 sprite lookup table */
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
+
+	ROM_REGION( 0x0001, "pals", 0 )
+    ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 ROM_START( gryzora )
@@ -418,6 +430,9 @@ ROM_START( gryzora )
 	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #0 char lookup table */
 	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )	/* 007121 #1 sprite lookup table */
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
+
+	ROM_REGION( 0x0001, "pals", 0 )
+    ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 

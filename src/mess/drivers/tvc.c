@@ -20,43 +20,48 @@ static void tvc_set_mem_page(running_machine *machine, UINT8 data)
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	switch(data & 0x18) {
 		case 0x00 : // system ROM selected
-				memory_install_readwrite8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1), SMH_NOP);
-				memory_set_bankptr(space->machine, 1, memory_region(machine, "sys"));
+				memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
+				memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+				memory_set_bankptr(space->machine, "bank1", memory_region(machine, "sys"));
 				break;
 		case 0x08 : // Cart ROM selected
-				memory_install_readwrite8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1), SMH_NOP);
-				memory_set_bankptr(space->machine, 1, memory_region(machine, "cart"));
+				memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
+				memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+				memory_set_bankptr(space->machine, "bank1", memory_region(machine, "cart"));
 				break;
 		case 0x10 : // RAM selected
-				memory_install_readwrite8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-				memory_set_bankptr(space->machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
+				memory_install_readwrite_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
+				memory_set_bankptr(space->machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
 				break;
 	}
 	// Bank 2 is always RAM
-	memory_set_bankptr(space->machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 	if ((data & 0x20)==0) {
 		// Video RAM
-		memory_set_bankptr(space->machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000);
+		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000);
 	} else {
 		// System RAM page 3
-		memory_set_bankptr(space->machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
 	}
 	switch(data & 0xc0) {
 		case 0x00 : // Cart ROM selected
-				memory_install_readwrite8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(4), SMH_NOP);
-				memory_set_bankptr(space->machine, 4, memory_region(machine, "cart"));
+				memory_install_read_bank(space, 0xc000, 0xffff, 0, 0, "bank4");
+				memory_unmap_write(space, 0xc000, 0xffff, 0, 0);
+				memory_set_bankptr(space->machine, "bank4", memory_region(machine, "cart"));
 				break;
 		case 0x40 : // System ROM selected
-				memory_install_readwrite8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(4), SMH_NOP);
-				memory_set_bankptr(space->machine, 4, memory_region(machine, "sys"));
+				memory_install_read_bank(space, 0xc000, 0xffff, 0, 0, "bank4");
+				memory_unmap_write(space, 0xc000, 0xffff, 0, 0);
+				memory_set_bankptr(space->machine, "bank4", memory_region(machine, "sys"));
 				break;
 		case 0x80 : // RAM selected
-				memory_install_readwrite8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(4), SMH_BANK(4));
-				memory_set_bankptr(space->machine, 4, messram_get_ptr(devtag_get_device(machine, "messram"))+0xc000);
+				memory_install_readwrite_bank(space, 0xc000, 0xffff, 0, 0, "bank4");
+				memory_set_bankptr(space->machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram"))+0xc000);
 				break;
 		case 0xc0 : // External ROM selected
-				memory_install_readwrite8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(4), SMH_NOP);
-				memory_set_bankptr(space->machine, 4, memory_region(machine, "ext"));
+				memory_install_read_bank(space, 0xc000, 0xffff, 0, 0, "bank4");
+				memory_unmap_write(space, 0xc000, 0xffff, 0, 0);
+				memory_set_bankptr(space->machine, "bank4", memory_region(machine, "ext"));
 				break;
 
 	}
@@ -113,10 +118,10 @@ static WRITE8_HANDLER( tvc_port0_w )
 {	
 }
 static ADDRESS_MAP_START(tvc_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1)
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(2)
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(3)
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK(4)
+	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tvc_io , ADDRESS_SPACE_IO, 8)

@@ -799,6 +799,7 @@ static void hp48_apply_modules( running_machine *machine, void* param )
 		UINT32 off_mask = hp48_modules[i].off_mask;
 		UINT32 mirror = nselect_mask & ~off_mask;
 		UINT32 end = base + (off_mask & nselect_mask);
+		char bank[10];
 
 		if ( hp48_modules[i].state != HP48_MODULE_CONFIGURED ) continue;
 
@@ -819,7 +820,8 @@ static void hp48_apply_modules( running_machine *machine, void* param )
 
 		if ( hp48_modules[i].data )
 		{
-			memory_set_bankptr( space->machine, i, hp48_modules[i].data );
+			sprintf(bank,"bank%d",i);
+			memory_set_bankptr( space->machine, bank, hp48_modules[i].data );
 		}
 
 		if ( i == 0 )

@@ -195,11 +195,11 @@ TO DO:
 #include "formats/adam_dsk.h"
 
 static ADDRESS_MAP_START( adam_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x00000, 0x01fff) AM_READWRITE( SMH_BANK(1), SMH_BANK(6) )
-	AM_RANGE(0x02000, 0x03fff) AM_READWRITE( SMH_BANK(2), SMH_BANK(7) )
-	AM_RANGE(0x04000, 0x05fff) AM_READWRITE( SMH_BANK(3), SMH_BANK(8) )
-	AM_RANGE(0x06000, 0x07fff) AM_READWRITE( SMH_BANK(4), SMH_BANK(9) )
-	AM_RANGE(0x08000, 0x0ffff) AM_READWRITE( SMH_BANK(5), adam_common_writes_w )
+	AM_RANGE(0x00000, 0x01fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank6")
+	AM_RANGE(0x02000, 0x03fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank7")
+	AM_RANGE(0x04000, 0x05fff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank8")
+	AM_RANGE(0x06000, 0x07fff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank9")
+	AM_RANGE(0x08000, 0x0ffff) AM_READ_BANK("bank5") AM_WRITE( adam_common_writes_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START ( adam_io, ADDRESS_SPACE_IO, 8)
@@ -487,89 +487,89 @@ Lineal virtual memory map:
 			if (adam_net_data & 0x02)
 			{
 				/* Read */
-				memory_set_bankptr(machine, 1, BankBase+0x32000); /* No data here */
-				memory_set_bankptr(machine, 2, BankBase+0x34000); /* No data here */
-				memory_set_bankptr(machine, 3, BankBase+0x36000); /* No data here */
-				memory_set_bankptr(machine, 4, BankBase+0x38000); /* EOS ROM */
+				memory_set_bankptr(machine, "bank1", BankBase+0x32000); /* No data here */
+				memory_set_bankptr(machine, "bank2", BankBase+0x34000); /* No data here */
+				memory_set_bankptr(machine, "bank3", BankBase+0x36000); /* No data here */
+				memory_set_bankptr(machine, "bank4", BankBase+0x38000); /* EOS ROM */
 
 				/* Write */
-				memory_set_bankptr(machine, 6, BankBase+0x3A000); /* Write protecting ROM */
-				memory_set_bankptr(machine, 7, BankBase+0x3A000); /* Write protecting ROM */
-				memory_set_bankptr(machine, 8, BankBase+0x3A000); /* Write protecting ROM */
-				memory_set_bankptr(machine, 9, BankBase+0x3A000); /* Write protecting ROM */
+				memory_set_bankptr(machine, "bank6", BankBase+0x3A000); /* Write protecting ROM */
+				memory_set_bankptr(machine, "bank7", BankBase+0x3A000); /* Write protecting ROM */
+				memory_set_bankptr(machine, "bank8", BankBase+0x3A000); /* Write protecting ROM */
+				memory_set_bankptr(machine, "bank9", BankBase+0x3A000); /* Write protecting ROM */
 			}
 			else
 			{
 				/* Read */
-				memory_set_bankptr(machine, 1, BankBase+0x20000); /* SmartWriter ROM */
-				memory_set_bankptr(machine, 2, BankBase+0x22000);
-				memory_set_bankptr(machine, 3, BankBase+0x24000);
-				memory_set_bankptr(machine, 4, BankBase+0x26000);
+				memory_set_bankptr(machine, "bank1", BankBase+0x20000); /* SmartWriter ROM */
+				memory_set_bankptr(machine, "bank2", BankBase+0x22000);
+				memory_set_bankptr(machine, "bank3", BankBase+0x24000);
+				memory_set_bankptr(machine, "bank4", BankBase+0x26000);
 
 				/* Write */
-				memory_set_bankptr(machine, 6, BankBase+0x3A000); /* Write protecting ROM */
-				memory_set_bankptr(machine, 7, BankBase+0x3A000); /* Write protecting ROM */
-				memory_set_bankptr(machine, 8, BankBase+0x3A000); /* Write protecting ROM */
-				memory_set_bankptr(machine, 9, BankBase+0x3A000); /* Write protecting ROM */
+				memory_set_bankptr(machine, "bank6", BankBase+0x3A000); /* Write protecting ROM */
+				memory_set_bankptr(machine, "bank7", BankBase+0x3A000); /* Write protecting ROM */
+				memory_set_bankptr(machine, "bank8", BankBase+0x3A000); /* Write protecting ROM */
+				memory_set_bankptr(machine, "bank9", BankBase+0x3A000); /* Write protecting ROM */
 			}
 			break;
 		case 1: /* Internal RAM */
 			/* Read */
-			memory_set_bankptr(machine, 1, BankBase);
-			memory_set_bankptr(machine, 2, BankBase+0x02000);
-			memory_set_bankptr(machine, 3, BankBase+0x04000);
-			memory_set_bankptr(machine, 4, BankBase+0x06000);
+			memory_set_bankptr(machine, "bank1", BankBase);
+			memory_set_bankptr(machine, "bank2", BankBase+0x02000);
+			memory_set_bankptr(machine, "bank3", BankBase+0x04000);
+			memory_set_bankptr(machine, "bank4", BankBase+0x06000);
 
 			/* Write */
-			memory_set_bankptr(machine, 6, BankBase);
-			memory_set_bankptr(machine, 7, BankBase+0x02000);
-			memory_set_bankptr(machine, 8, BankBase+0x04000);
-			memory_set_bankptr(machine, 9, BankBase+0x06000);
+			memory_set_bankptr(machine, "bank6", BankBase);
+			memory_set_bankptr(machine, "bank7", BankBase+0x02000);
+			memory_set_bankptr(machine, "bank8", BankBase+0x04000);
+			memory_set_bankptr(machine, "bank9", BankBase+0x06000);
 			break;
 		case 2: /* RAM Expansion */
 			/* Read */
-			memory_set_bankptr(machine, 1, BankBase+0x10000);
-			memory_set_bankptr(machine, 2, BankBase+0x12000);
-			memory_set_bankptr(machine, 3, BankBase+0x14000);
-			memory_set_bankptr(machine, 4, BankBase+0x16000);
+			memory_set_bankptr(machine, "bank1", BankBase+0x10000);
+			memory_set_bankptr(machine, "bank2", BankBase+0x12000);
+			memory_set_bankptr(machine, "bank3", BankBase+0x14000);
+			memory_set_bankptr(machine, "bank4", BankBase+0x16000);
 
 			/* Write */
-			memory_set_bankptr(machine, 6, BankBase+0x10000);
-			memory_set_bankptr(machine, 7, BankBase+0x12000);
-			memory_set_bankptr(machine, 8, BankBase+0x14000);
-			memory_set_bankptr(machine, 9, BankBase+0x16000);
+			memory_set_bankptr(machine, "bank6", BankBase+0x10000);
+			memory_set_bankptr(machine, "bank7", BankBase+0x12000);
+			memory_set_bankptr(machine, "bank8", BankBase+0x14000);
+			memory_set_bankptr(machine, "bank9", BankBase+0x16000);
 			break;
 		case 3: /* OS7 ROM (8k) + Internal RAM (24k) */
 			/* Read */
-			memory_set_bankptr(machine, 1, BankBase+0x30000);
-			memory_set_bankptr(machine, 2, BankBase+0x02000);
-			memory_set_bankptr(machine, 3, BankBase+0x04000);
-			memory_set_bankptr(machine, 4, BankBase+0x06000);
+			memory_set_bankptr(machine, "bank1", BankBase+0x30000);
+			memory_set_bankptr(machine, "bank2", BankBase+0x02000);
+			memory_set_bankptr(machine, "bank3", BankBase+0x04000);
+			memory_set_bankptr(machine, "bank4", BankBase+0x06000);
 
 			/* Write */
-			memory_set_bankptr(machine, 6, BankBase+0x3A000); /* Write protecting ROM */
-			memory_set_bankptr(machine, 7, BankBase+0x02000);
-			memory_set_bankptr(machine, 8, BankBase+0x04000);
-			memory_set_bankptr(machine, 9, BankBase+0x06000);
+			memory_set_bankptr(machine, "bank6", BankBase+0x3A000); /* Write protecting ROM */
+			memory_set_bankptr(machine, "bank7", BankBase+0x02000);
+			memory_set_bankptr(machine, "bank8", BankBase+0x04000);
+			memory_set_bankptr(machine, "bank9", BankBase+0x06000);
 	}
 
 	switch (adam_upper_memory)
 	{
 		case 0: /* Internal RAM */
 			/* Read */
-			memory_set_bankptr(machine, 5, BankBase+0x08000);
+			memory_set_bankptr(machine, "bank5", BankBase+0x08000);
 			/*memory_set_bankptr(machine, 10, BankBase+0x08000);*/
 			break;
 		case 1: /* ROM Expansion */
 			break;
 		case 2: /* RAM Expansion */
 			/* Read */
-			memory_set_bankptr(machine, 5, BankBase+0x18000);
+			memory_set_bankptr(machine, "bank5", BankBase+0x18000);
 			/*memory_set_bankptr(machine, 10, BankBase+0x18000);*/
 			break;
 		case 3: /* Cartridge ROM */
 			/* Read */
-			memory_set_bankptr(machine, 5, BankBase+0x28000);
+			memory_set_bankptr(machine, "bank5", BankBase+0x28000);
 			/*memory_set_bankptr(machine, 10, BankBase+0x3A000); *//* Write protecting ROM */
 			break;
 	}

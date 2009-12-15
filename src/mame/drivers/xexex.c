@@ -283,7 +283,7 @@ static READ16_HANDLER( sound_status_r )
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(machine, 2, memory_region(machine, "audiocpu") + 0x10000 + cur_sound_region*0x4000);
+	memory_set_bankptr(machine, "bank2", memory_region(machine, "audiocpu") + 0x10000 + cur_sound_region*0x4000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -376,7 +376,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
 	AM_RANGE(0x180000, 0x181fff) AM_READWRITE(K056832_ram_word_r, K056832_ram_word_w)
 	AM_RANGE(0x182000, 0x183fff) AM_READWRITE(K056832_ram_word_r, K056832_ram_word_w)
-	AM_RANGE(0x190000, 0x191fff) AM_READWRITE(K056832_rom_word_r, SMH_ROM)		// Passthrough to tile roms
+	AM_RANGE(0x190000, 0x191fff) AM_READ(K056832_rom_word_r)		// Passthrough to tile roms
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_READ(K053250_0_rom_r)
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)
 
@@ -393,7 +393,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(2))
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("konami", k054539_r, k054539_w)

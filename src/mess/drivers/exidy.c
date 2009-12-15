@@ -155,12 +155,12 @@ static READ8_HANDLER( exidy_read_ff ) { return 0xff; }
 
 static ADDRESS_MAP_START( exidy_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK(1)
+	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("bank1")
 	AM_RANGE(0x0800, 0xbbff) AM_RAM AM_REGION("maincpu", 0x0800)
 	AM_RANGE(0xbc00, 0xbcff) AM_ROM						/* disk bios */
-	AM_RANGE(0xbd00, 0xbdff) AM_READWRITE(exidy_read_ff, SMH_NOP)
+	AM_RANGE(0xbd00, 0xbdff) AM_READ(exidy_read_ff) AM_WRITENOP
 	AM_RANGE(0xbe00, 0xbe03) AM_DEVREADWRITE("wd179x", wd17xx_r, wd17xx_w)
-	AM_RANGE(0xbe04, 0xbfff) AM_READWRITE(exidy_read_ff, SMH_NOP)
+	AM_RANGE(0xbe04, 0xbfff) AM_READ(exidy_read_ff) AM_WRITENOP
 	AM_RANGE(0xc000, 0xefff) AM_ROM						/* rom pac and bios */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_REGION("maincpu", 0xf000)		/* screen ram */
 	AM_RANGE(0xf800, 0xfbff) AM_ROM						/* char rom */
@@ -169,7 +169,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( exidyd_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK(1)
+	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("bank1")
 	AM_RANGE(0x0800, 0xbfff) AM_RAM AM_REGION("maincpu", 0x0800)
 	AM_RANGE(0xc000, 0xefff) AM_ROM						/* rom pac and bios */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_REGION("maincpu", 0xf000)		/* screen ram */
@@ -418,7 +418,7 @@ MACHINE_DRIVER_END
 static DRIVER_INIT( exidy )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 2, &RAM[0x0000], 0xe000);
+	memory_configure_bank(machine, "bank1", 0, 2, &RAM[0x0000], 0xe000);
 }
 
 /***************************************************************************

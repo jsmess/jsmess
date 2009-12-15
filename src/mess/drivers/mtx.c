@@ -46,10 +46,10 @@ UINT8 *mtx_ram;
  *************************************/
 
 static ADDRESS_MAP_START( mtx_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK(1)
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(2)
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(3)
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(4)
+	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2")
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank3")
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank4")
 	AM_RANGE(0xc000, 0xffff) AM_RAM AM_BASE(&mtx_ram)
 ADDRESS_MAP_END
 

@@ -296,10 +296,13 @@ static void UpdateBanks(running_machine *machine, int first, int last)
 	int		bank_start;
 	int		bank_end;
 	int		MapPage;
-
+	char page_num[10];
+	
 	LOG_BANK_UPDATE(("\n\nUpdating banks %d to %d at PC=$%X\n",first,last,cpu_get_pc(space_0->cpu)));
 	for(Page=first;Page<=last;Page++)
 	{
+		sprintf(page_num,"bank%d",Page+1);
+
 		bank_start	= bank_info[Page].start;
 		bank_end	= bank_info[Page].end;
 
@@ -325,6 +328,8 @@ static void UpdateBanks(running_machine *machine, int first, int last)
 				logerror("Error RAM in IO PAGE !\n");
 			}
 			writebank=bank_info[Page].handler;
+			memory_install_write8_handler(space_0, bank_start, bank_end,0,0,writebank);
+			memory_install_write8_handler(space_1, bank_start, bank_end,0,0,writebank);
 		}
 		else					// Block is rom, or undefined
 		{
@@ -338,13 +343,12 @@ static void UpdateBanks(running_machine *machine, int first, int last)
 			else
 				readbank=system_rom;
 
-			writebank = SMH_UNMAP;
+			memory_unmap_write(space_0, bank_start, bank_end,0,0);
+			memory_unmap_write(space_1, bank_start, bank_end,0,0);
 		}
 
 		PageRegs[TaskReg][Page].memory=readbank;
-		memory_set_bankptr(machine, Page+1,readbank);
-		memory_install_write8_handler(space_0, bank_start, bank_end,0,0,writebank);
-		memory_install_write8_handler(space_1, bank_start, bank_end,0,0,writebank);
+		memory_set_bankptr(machine, page_num,readbank);
 
 		LOG_BANK_UPDATE(("UpdateBanks:MapPage=$%02X readbank=$%X\n",MapPage,(int)(FPTR)readbank));
 		LOG_BANK_UPDATE(("PageRegsSet Task=%X Page=%x\n",TaskReg,Page));

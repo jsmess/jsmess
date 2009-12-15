@@ -1153,7 +1153,7 @@ void mess_init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb
 
 	/* MESS managed RAM */
 	if ( messram_get_ptr(devtag_get_device(machine, "messram")) )
-		memory_set_bankptr( machine, 10, messram_get_ptr(devtag_get_device(machine, "messram")) );
+		memory_set_bankptr( machine, "bank10", messram_get_ptr(devtag_get_device(machine, "messram")) );
 
 	/* FDC/HDC hardware */
 	pc_hdc_setup(machine, set_hdc_int_func);
@@ -1278,7 +1278,7 @@ DRIVER_INIT( pc1512 )
     for (i = 0; i < 256; i++)
 		gfx[i] = i;
 
-	memory_install_read16_handler( space, 0xb8000, 0xbbfff, 0, 0x0C000, SMH_BANK(1) );
+	memory_install_read_bank( space, 0xb8000, 0xbbfff, 0, 0x0C000, "bank1" );
 	memory_install_write16_handler( space, 0xb8000, 0xbbfff, 0, 0x0C000, pc1512_videoram16le_w );
 
 	memory_install_read16_handler( io_space, 0x3d0, 0x3df, 0, 0, pc1512_16le_r );

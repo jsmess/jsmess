@@ -69,7 +69,7 @@ static WRITE8_HANDLER( metlclsh_ack_nmi )
 
 static ADDRESS_MAP_START( metlclsh_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
@@ -116,14 +116,14 @@ static WRITE8_HANDLER( metlclsh_flipscreen_w )
 
 static ADDRESS_MAP_START( metlclsh_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0") AM_WRITE(metlclsh_gfxbank_w)	// bg tiles bank
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW")
 	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(metlclsh_cause_nmi2)			// cause nmi on cpu #1
 	AM_RANGE(0xc0c1, 0xc0c1) AM_WRITE(metlclsh_ack_irq2)			// irq ack
-	AM_RANGE(0xd000, 0xd7ff) AM_ROMBANK(1) AM_WRITE(metlclsh_bgram_w) AM_BASE(&metlclsh_bgram) // this is banked
+	AM_RANGE(0xd000, 0xd7ff) AM_ROMBANK("bank1") AM_WRITE(metlclsh_bgram_w) AM_BASE(&metlclsh_bgram) // this is banked
 	AM_RANGE(0xe301, 0xe301) AM_WRITE(metlclsh_flipscreen_w)		// 0/1
 	AM_RANGE(0xe401, 0xe401) AM_WRITE(metlclsh_rambank_w)
 	AM_RANGE(0xe402, 0xe403) AM_WRITEONLY AM_BASE(&metlclsh_scrollx)

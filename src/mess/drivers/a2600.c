@@ -613,32 +613,32 @@ static int next_bank(void)
 static void modeF8_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
-	memory_set_bankptr(machine,1, bank_base[1]);
+	memory_set_bankptr(machine,"bank1", bank_base[1]);
 }
 static void modeFA_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
-	memory_set_bankptr(machine,1, bank_base[1]);
+	memory_set_bankptr(machine,"bank1", bank_base[1]);
 }
 static void modeF6_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
-	memory_set_bankptr(machine,1, bank_base[1]);
+	memory_set_bankptr(machine,"bank1", bank_base[1]);
 }
 static void modeF4_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
-	memory_set_bankptr(machine,1, bank_base[1]);
+	memory_set_bankptr(machine,"bank1", bank_base[1]);
 }
 static void mode3F_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x800 * (data & (number_banks - 1));
-	memory_set_bankptr(machine,1, bank_base[1]);
+	memory_set_bankptr(machine,"bank1", bank_base[1]);
 }
 static void modeUA_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + (offset >> 6) * 0x1000;
-	memory_set_bankptr(machine,1, bank_base[1]);
+	memory_set_bankptr(machine,"bank1", bank_base[1]);
 }
 static void modeE0_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
@@ -649,27 +649,27 @@ static void modeE0_switch(running_machine *machine, UINT16 offset, UINT8 data)
 static void modeE7_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x800 * offset;
-	memory_set_bankptr(machine,1, bank_base[1]);
+	memory_set_bankptr(machine,"bank1", bank_base[1]);
 }
 static void modeE7_RAM_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
-	memory_set_bankptr(machine,9, extra_RAM + (4 + offset) * 256 );
+	memory_set_bankptr(machine,"bank9", extra_RAM + (4 + offset) * 256 );
 }
 static void modeDC_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * next_bank();
-	memory_set_bankptr(machine,1, bank_base[1]);
+	memory_set_bankptr(machine,"bank1", bank_base[1]);
 }
 static void mode3E_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x800 * (data & (number_banks - 1));
-	memory_set_bankptr(machine,1, bank_base[1]);
+	memory_set_bankptr(machine,"bank1", bank_base[1]);
 	mode3E_ram_enabled = 0;
 }
 static void mode3E_RAM_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	ram_base = extra_RAM + 0x200 * ( data & 0x3F );
-	memory_set_bankptr(machine,1, ram_base );
+	memory_set_bankptr(machine,"bank1", ram_base );
 	mode3E_ram_enabled = 1;
 }
 static void modeFV_switch(running_machine *machine, UINT16 offset, UINT8 data)
@@ -680,7 +680,7 @@ static void modeFV_switch(running_machine *machine, UINT16 offset, UINT8 data)
 		FVlocked = 1;
 		current_bank = current_bank ^ 0x01;
 		bank_base[1] = CART + 0x1000 * current_bank;
-		memory_set_bankptr(machine,1, bank_base[1]);
+		memory_set_bankptr(machine,"bank1", bank_base[1]);
 	}
 }
 static void modeJVP_switch(running_machine *machine, UINT16 offset, UINT8 data)
@@ -696,7 +696,7 @@ static void modeJVP_switch(running_machine *machine, UINT16 offset, UINT8 data)
 		break;
 	}
 	bank_base[1] = CART + 0x1000 * current_bank;
-	memory_set_bankptr(machine, 1, bank_base[1] );
+	memory_set_bankptr(machine, "bank1", bank_base[1] );
 }
 
 
@@ -822,8 +822,8 @@ static READ8_HANDLER(modeSS_r)
 			modeSS_high_ram_enabled = 1;
 			break;
 		}
-		memory_set_bankptr(space->machine, 1, bank_base[1] );
-		memory_set_bankptr(space->machine, 2, bank_base[2] );
+		memory_set_bankptr(space->machine, "bank1", bank_base[1] );
+		memory_set_bankptr(space->machine, "bank2", bank_base[2] );
 
 		/* Check if we should stop the tape */
 		if ( cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")) == 0x00FD )
@@ -1101,7 +1101,7 @@ static DIRECT_UPDATE_HANDLER(modeFE_opbase_handler)
            cpu should be the last byte that was on the data bus and so should determine the bank
            we should switch in. */
 		bank_base[1] = memory_region(space->machine, "user1") + 0x1000 * ( ( address & 0x2000 ) ? 0 : 1 );
-		memory_set_bankptr(space->machine, 1, bank_base[1] );
+		memory_set_bankptr(space->machine, "bank1", bank_base[1] );
 		/* and restore old opbase handler */
 		memory_set_direct_update_handler(space, FE_old_opbase_handler);
 	}
@@ -1253,15 +1253,15 @@ static void install_banks(running_machine *machine, int count, unsigned init)
 
 	for (i = 0; i < count; i++)
 	{
-		static const read8_space_func handler[] =
+		static const char *handler[] =
 		{
-			SMH_BANK(1),
-			SMH_BANK(2),
-			SMH_BANK(3),
-			SMH_BANK(4),
+			"bank1",
+			"bank2",
+			"bank3",
+			"bank4",
 		};
 
-		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
+		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
 			0x1000 + (i + 0) * 0x1000 / count - 0,
 			0x1000 + (i + 1) * 0x1000 / count - 1, 0, 0, handler[i]);
 

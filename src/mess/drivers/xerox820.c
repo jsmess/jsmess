@@ -142,20 +142,21 @@ static void xerox820_bankswitch(running_machine *machine, int bank)
 	if (bank)
 	{
 		/* ROM */
-		memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
-		memory_install_readwrite8_handler(program, 0x1000, 0x2fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_read_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
+		memory_unmap_write(program, 0x0000, 0x0fff, 0, 0);
+		memory_unmap_readwrite(program, 0x1000, 0x2fff, 0, 0);
 	}
 	else
 	{
 		/* RAM */
-		memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_install_readwrite8_handler(program, 0x1000, 0x2fff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		memory_install_readwrite_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
+		memory_install_readwrite_bank(program, 0x1000, 0x2fff, 0, 0, "bank2");
 	}
 
-	memory_install_readwrite8_handler(program, 0x3000, 0x3fff, 0, 0, SMH_BANK(3), SMH_BANK(3));
+	memory_install_readwrite_bank(program, 0x3000, 0x3fff, 0, 0, "bank3");
 
-	memory_set_bank(machine, 1, bank);
-	memory_set_bank(machine, 3, bank);
+	memory_set_bank(machine, "bank1", bank);
+	memory_set_bank(machine, "bank3", bank);
 }
 
 static WRITE8_HANDLER( scroll_w )
@@ -189,9 +190,9 @@ static WRITE8_HANDLER( x120_system_w )
 
 static ADDRESS_MAP_START( xerox820_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
-	AM_RANGE(0x1000, 0x2fff) AM_RAMBANK(2)
-	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK(3)
+	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x1000, 0x2fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK("bank3")
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -630,14 +631,14 @@ static MACHINE_START( xerox820 )
 	state->video_ram = auto_alloc_array(machine, UINT8, XEROX820_LCD_VIDEORAM_SIZE);
 
 	/* setup memory banking */
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "monitor"), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "monitor"), 0);
 
-	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, Z80_TAG) + 0x1000, 0);
-	memory_set_bank(machine, 2, 0);
+	memory_configure_bank(machine, "bank2", 0, 1, memory_region(machine, Z80_TAG) + 0x1000, 0);
+	memory_set_bank(machine, "bank2", 0);
 
-	memory_configure_bank(machine, 3, 0, 1, memory_region(machine, Z80_TAG) + 0x3000, 0);
-	memory_configure_bank(machine, 3, 1, 1, state->video_ram, 0);
+	memory_configure_bank(machine, "bank3", 0, 1, memory_region(machine, Z80_TAG) + 0x3000, 0);
+	memory_configure_bank(machine, "bank3", 1, 1, state->video_ram, 0);
 
 	/* bank switch */
 	xerox820_bankswitch(machine, 1);

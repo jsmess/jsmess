@@ -74,11 +74,11 @@ DC00      - Selection buttons #2, 9-16 (R)
 
 
 static ADDRESS_MAP_START( sms1_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK(1)					/* First 0x0400 part always points to first page */
-	AM_RANGE(0x0400, 0x3fff) AM_ROMBANK(2)					/* switchable rom bank */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(3)					/* switchable rom bank */
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(SMH_BANK(4), sms_cartram_w)	/* ROM bank / on-cart RAM */
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(SMH_BANK(5), sms_cartram2_w)	/* ROM bank / on-cart RAM */
+	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("bank1")					/* First 0x0400 part always points to first page */
+	AM_RANGE(0x0400, 0x3fff) AM_ROMBANK("bank2")					/* switchable rom bank */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank3")					/* switchable rom bank */
+	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank4") AM_WRITE(sms_cartram_w)	/* ROM bank / on-cart RAM */
+	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK("bank5") AM_WRITE(sms_cartram2_w)	/* ROM bank / on-cart RAM */
 	AM_RANGE(0xc000, 0xdff7) AM_MIRROR(0x2000) AM_RAM			/* RAM (mirror at 0xE000) */
 	AM_RANGE(0xdff8, 0xdfff) AM_RAM						/* RAM "underneath" frame registers */
 	AM_RANGE(0xfff8, 0xfffb) AM_READWRITE(sms_sscope_r, sms_sscope_w)	/* 3-D glasses */
@@ -86,11 +86,11 @@ static ADDRESS_MAP_START( sms1_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sms_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK(1)					/* First 0x0400 part always points to first page */
-	AM_RANGE(0x0400, 0x3fff) AM_ROMBANK(2)					/* switchable rom bank */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(3)					/* switchable rom bank */
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(SMH_BANK(4), sms_cartram_w)	/* ROM bank / on-cart RAM */
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(SMH_BANK(5), sms_cartram2_w)	/* ROM bank / on-cart RAM */
+	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("bank1")					/* First 0x0400 part always points to first page */
+	AM_RANGE(0x0400, 0x3fff) AM_ROMBANK("bank2")					/* switchable rom bank */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank3")					/* switchable rom bank */
+	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank4") AM_WRITE(sms_cartram_w)	/* ROM bank / on-cart RAM */
+	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK("bank5") AM_WRITE(sms_cartram2_w)	/* ROM bank / on-cart RAM */
 	AM_RANGE(0xc000, 0xdffb) AM_MIRROR(0x2000) AM_RAM			/* RAM (mirror at 0xE000) */
 	AM_RANGE(0xdffc, 0xdfff) AM_RAM						/* RAM "underneath" frame registers */
 	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)	/* Bankswitch control */
@@ -99,7 +99,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sms_store_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM						/* BIOS */
 	AM_RANGE(0x4000, 0x47ff) AM_RAM						/* RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(10)					/* Cartridge/card peek area */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank10")					/* Cartridge/card peek area */
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(sms_store_control_r, sms_store_control_w)	/* Control */
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(sms_store_cart_select_r, sms_store_cart_select_w) 	/* cartridge/card slot selector */
 	AM_RANGE(0xd800, 0xd800) AM_READ(sms_store_select1)			/* Game selector port #1 */

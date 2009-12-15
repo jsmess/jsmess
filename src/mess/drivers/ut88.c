@@ -30,7 +30,7 @@ static ADDRESS_MAP_START(ut88mini_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ut88_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK(1) // First bank
+	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x0800, 0xdfff ) AM_RAM  // RAM
     AM_RANGE( 0xe000, 0xe7ff ) AM_RAM  // Video RAM (not used)
     AM_RANGE( 0xe800, 0xefff ) AM_RAM  AM_BASE(&ut88_video_ram) // Video RAM

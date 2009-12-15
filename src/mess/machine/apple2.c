@@ -199,7 +199,7 @@ void apple2_update_memory(running_machine *machine)
 
 			/* did we 'go past the end?' */
 			if (end_r < apple2_mem_config.memmap[i].end)
-				memory_install_read8_handler(space, end_r + 1, apple2_mem_config.memmap[i].end, 0, 0, SMH_NOP);
+				memory_nop_read(space, end_r + 1, apple2_mem_config.memmap[i].end, 0, 0);
 
 			/* set the memory bank */
 			if (rbase)
@@ -274,7 +274,7 @@ void apple2_update_memory(running_machine *machine)
 
 			/* did we 'go past the end?' */
 			if (end_w < apple2_mem_config.memmap[i].end)
-				memory_install_write8_handler(space, end_w + 1, apple2_mem_config.memmap[i].end, 0, 0, SMH_NOP);
+				memory_nop_write(space, end_w + 1, apple2_mem_config.memmap[i].end, 0, 0);
 
 			/* set the memory bank */
 			if (wbase)

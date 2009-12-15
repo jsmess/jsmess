@@ -544,7 +544,7 @@ static ADDRESS_MAP_START( wecleman_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(wecleman_pageram_w) AM_BASE(&wecleman_pageram)	// Background Layers
 	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(wecleman_txtram_w) AM_BASE(&wecleman_txtram)	// Text Layer
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x124000, 0x127fff) AM_RAM AM_SHARE(1)	// Shared with main CPU
+	AM_RANGE(0x124000, 0x127fff) AM_RAM AM_SHARE("share1")	// Shared with main CPU
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(wecleman_soundlatch_w)	// To sound CPU
 	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)	// Selects accelerator / wheel / ..
@@ -554,7 +554,7 @@ static ADDRESS_MAP_START( wecleman_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140012, 0x140013) AM_READ_PORT("IN1")	// ??
 	AM_RANGE(0x140014, 0x140015) AM_READ_PORT("DSWA")	// DSW 2
 	AM_RANGE(0x140016, 0x140017) AM_READ_PORT("DSWB")	// DSW 1
-	AM_RANGE(0x140020, 0x140021) AM_WRITE(SMH_RAM)	// Paired with writes to $140003
+	AM_RANGE(0x140020, 0x140021) AM_WRITEONLY	// Paired with writes to $140003
 	AM_RANGE(0x140020, 0x140021) AM_READ(selected_ip_r)	// Accelerator or Wheel or ..
 	AM_RANGE(0x140030, 0x140031) AM_WRITENOP	// toggles between 0 & 1 on hitting bumps and crashes (vibration?)
 ADDRESS_MAP_END
@@ -605,7 +605,7 @@ static ADDRESS_MAP_START( hotchase_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x102000, 0x102fff) AM_READWRITE(hotchase_K051316_1_r, hotchase_K051316_1_w)	// Foreground
 	AM_RANGE(0x103000, 0x10301f) AM_WRITE(hotchase_K051316_ctrl_1_w)	// Foreground Ctrl
 	AM_RANGE(0x110000, 0x111fff) AM_RAM_WRITE(hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE(1)					// Shared with sub CPU
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("share1")					// Shared with sub CPU
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE_GENERIC(spriteram)	// Sprites
 	// Input Ports:
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(hotchase_soundlatch_w)	// To sound CPU
@@ -616,7 +616,7 @@ static ADDRESS_MAP_START( hotchase_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140012, 0x140013) AM_READ_PORT("IN1")	// ?? bit 4 from sound cpu
 	AM_RANGE(0x140014, 0x140015) AM_READ_PORT("DSW2")	// DSW 2
 	AM_RANGE(0x140016, 0x140017) AM_READ_PORT("DSW1")	// DSW 1
-	AM_RANGE(0x140020, 0x140021) AM_READWRITE(selected_ip_r, SMH_NOP)	// Paired with writes to $140003
+	AM_RANGE(0x140020, 0x140021) AM_READ(selected_ip_r) AM_WRITENOP	// Paired with writes to $140003
 	AM_RANGE(0x140022, 0x140023) AM_READNOP	// ??
 	AM_RANGE(0x140030, 0x140031) AM_WRITENOP	// signal to cabinet vibration motors?
 ADDRESS_MAP_END
@@ -629,7 +629,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( wecleman_sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM	// ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE(&wecleman_roadram) AM_SIZE(&wecleman_roadram_size)	// Road
-	AM_RANGE(0x070000, 0x073fff) AM_RAM AM_SHARE(1)	// RAM (Shared with main CPU)
+	AM_RANGE(0x070000, 0x073fff) AM_RAM AM_SHARE("share1")	// RAM (Shared with main CPU)
 ADDRESS_MAP_END
 
 
@@ -640,7 +640,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hotchase_sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM	// ROM
 	AM_RANGE(0x020000, 0x020fff) AM_RAM AM_BASE(&wecleman_roadram) AM_SIZE(&wecleman_roadram_size)	// Road
-	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE(1)	// Shared with main CPU
+	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("share1")	// Shared with main CPU
 	AM_RANGE(0x060000, 0x060fff) AM_RAM				// RAM
 ADDRESS_MAP_END
 

@@ -154,9 +154,9 @@ static WRITE8_HANDLER( display_w )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( cosmicos_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_RAMBANK(1)
+	AM_RANGE(0x0000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
-	AM_RANGE(0xff00, 0xffff) AM_RAMBANK(2)
+	AM_RANGE(0xff00, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicos_io, ADDRESS_SPACE_IO, 8 )
@@ -268,18 +268,21 @@ static void set_ram_mode(running_machine *machine)
 	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	if (state->ram_disable)
-	{
-		memory_install_readwrite8_handler(program, 0xff00, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+	{		
+		memory_unmap_read(program, 0xff00, 0xffff, 0, 0);
+		memory_unmap_write(program, 0xff00, 0xffff, 0, 0);
 	}
 	else
 	{
 		if (state->ram_protect)
 		{
-			memory_install_readwrite8_handler(program, 0xff00, 0xffff, 0, 0, SMH_BANK(2), SMH_UNMAP);
+			memory_install_read_bank(program, 0xff00, 0xffff, 0, 0, "bank2");
+			memory_unmap_write(program, 0xff00, 0xffff, 0, 0);
 		}
 		else
 		{
-			memory_install_readwrite8_handler(program, 0xff00, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+			memory_install_read_bank(program, 0xff00, 0xffff, 0, 0, "bank2");
+			memory_install_write_bank(program, 0xff00, 0xffff, 0, 0, "bank2");
 		}
 	}
 }
@@ -524,29 +527,29 @@ static MACHINE_START( cosmicos )
 	dm9368_rbi_w(state->dm9368, 1);
 
 	/* setup memory banking */
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, CDP1802_TAG), 0);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, CDP1802_TAG), 0);
+	memory_set_bank(machine, "bank1", 0);
 
-	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, CDP1802_TAG) + 0xff00, 0);
-	memory_set_bank(machine, 2, 0);
+	memory_configure_bank(machine, "bank2", 0, 1, memory_region(machine, CDP1802_TAG) + 0xff00, 0);
+	memory_set_bank(machine, "bank2", 0);
 
 	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 256:
-		memory_install_readwrite8_handler(program, 0x0000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_unmap_readwrite(program, 0x0000, 0xbfff, 0, 0);
 		break;
 
 	case 4*1024:
-		memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_install_readwrite8_handler(program, 0x1000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
+		memory_unmap_readwrite(program, 0x1000, 0xbfff, 0, 0);
 		break;
 
 	case 48*1024:
-		memory_install_readwrite8_handler(program, 0x0000, 0xbfff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+		memory_install_readwrite_bank(program, 0x0000, 0xbfff, 0, 0, "bank1");
 		break;
 	}
 
-	memory_install_readwrite8_handler(program, 0xff00, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+	memory_install_readwrite_bank(program, 0xff00, 0xffff, 0, 0, "bank2");
 
 	/* register for state saving */
 	state_save_register_global(machine, state->cdp1802_mode);

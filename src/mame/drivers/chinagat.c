@@ -180,12 +180,12 @@ static WRITE8_HANDLER( chinagat_video_ctrl_w )
 
 static WRITE8_HANDLER( chinagat_bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
+	memory_set_bank(space->machine, "bank1", data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
 }
 
 static WRITE8_HANDLER( chinagat_sub_bankswitch_w )
 {
-	memory_set_bank(space->machine, 4, data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
+	memory_set_bank(space->machine, "bank4", data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
 }
 
 static READ8_HANDLER( saiyugb1_mcu_command_r )
@@ -306,15 +306,15 @@ static void saiyugb1_m5205_irq_w( const device_config *device )
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(ddragon_fgvideoram_w) AM_BASE_MEMBER(ddragon_state, fgvideoram)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(ddragon_bgvideoram_w) AM_BASE_MEMBER(ddragon_state, bgvideoram)
 	AM_RANGE(0x3000, 0x317f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3400, 0x357f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0x3800, 0x397f) AM_WRITE(SMH_BANK(3)) AM_BASE_SIZE_MEMBER(ddragon_state, spriteram, spriteram_size)
+	AM_RANGE(0x3800, 0x397f) AM_WRITE_BANK("bank3") AM_BASE_SIZE_MEMBER(ddragon_state, spriteram, spriteram_size)
 	AM_RANGE(0x3e00, 0x3e04) AM_WRITE(chinagat_interrupt_w)
-	AM_RANGE(0x3e06, 0x3e06) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(ddragon_state, scrolly_lo)
-	AM_RANGE(0x3e07, 0x3e07) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(ddragon_state, scrollx_lo)
+	AM_RANGE(0x3e06, 0x3e06) AM_WRITEONLY AM_BASE_MEMBER(ddragon_state, scrolly_lo)
+	AM_RANGE(0x3e07, 0x3e07) AM_WRITEONLY AM_BASE_MEMBER(ddragon_state, scrollx_lo)
 	AM_RANGE(0x3f00, 0x3f00) AM_WRITE(chinagat_video_ctrl_w)
 	AM_RANGE(0x3f01, 0x3f01) AM_WRITE(chinagat_bankswitch_w)
 	AM_RANGE(0x3f00, 0x3f00) AM_READ_PORT("SYSTEM")
@@ -322,17 +322,17 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3f02, 0x3f02) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3f03, 0x3f03) AM_READ_PORT("P1")
 	AM_RANGE(0x3f04, 0x3f04) AM_READ_PORT("P2")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(chinagat_sub_bankswitch_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(SMH_RAM) /* Called on CPU start and after return from jump table */
+	AM_RANGE(0x2800, 0x2800) AM_WRITEONLY /* Called on CPU start and after return from jump table */
 //  AM_RANGE(0x2a2b, 0x2a2b) AM_READNOP /* What lives here? */
 //  AM_RANGE(0x2a30, 0x2a30) AM_READNOP /* What lives here? */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(4)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank4")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -354,8 +354,8 @@ static ADDRESS_MAP_START( ym2203c_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x8802, 0x8802) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 //  AM_RANGE(0x8803, 0x8803) AM_DEVWRITE("oki", okim6295_w)
 	AM_RANGE(0x8804, 0x8805) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
-//  AM_RANGE(0x8804, 0x8804) AM_WRITE(SMH_RAM)
-//  AM_RANGE(0x8805, 0x8805) AM_WRITE(SMH_RAM)
+//  AM_RANGE(0x8804, 0x8804) AM_WRITEONLY
+//  AM_RANGE(0x8805, 0x8805) AM_WRITEONLY
 
 //  AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 //  AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
@@ -531,7 +531,7 @@ static MACHINE_START( chinagat )
 	state->snd_cpu = devtag_get_device(machine, "audiocpu");
 
 	/* configure banks */
-	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	/* register for save states */
 	state_save_register_global(machine, state->scrollx_hi);
@@ -635,6 +635,9 @@ static MACHINE_DRIVER_START( saiyugb1 )
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* heavy interleaving to sync up sprite<->main cpu's */
 
+	MDRV_MACHINE_START(chinagat)
+	MDRV_MACHINE_RESET(chinagat)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -676,6 +679,9 @@ static MACHINE_DRIVER_START( saiyugb2 )
 	MDRV_CPU_PROGRAM_MAP(ym2203c_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
+
+	MDRV_MACHINE_START(chinagat)
+	MDRV_MACHINE_RESET(chinagat)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -926,8 +932,8 @@ static DRIVER_INIT( chinagat )
 	state->sprite_irq = M6809_IRQ_LINE;
 	state->sound_irq = INPUT_LINE_NMI;
 
-	memory_configure_bank(machine, 1, 0, 6, &MAIN[0x10000], 0x4000);
-	memory_configure_bank(machine, 4, 0, 6, &SUB[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 6, &MAIN[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank4", 0, 6, &SUB[0x10000], 0x4000);
 }
 
 

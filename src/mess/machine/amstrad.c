@@ -1454,10 +1454,10 @@ static void multiface_rethink_memory(running_machine *machine)
 	{
 
 		/* set bank addressess */
-		memory_set_bankptr(machine,1, multiface_rom);
-		memory_set_bankptr(machine,2, multiface_ram);
-		memory_set_bankptr(machine,9, multiface_rom);
-		memory_set_bankptr(machine,10, multiface_ram);
+		memory_set_bankptr(machine,"bank1", multiface_rom);
+		memory_set_bankptr(machine,"bank2", multiface_ram);
+		memory_set_bankptr(machine,"bank9", multiface_rom);
+		memory_set_bankptr(machine,"bank10", multiface_ram);
 	}
 }
 
@@ -1649,8 +1649,8 @@ static void amstrad_setLowerRom(running_machine *machine)
 			else
 				bank_base = AmstradCPC_RamBanks[0];
 		}
-		memory_set_bankptr(machine,1, bank_base);
-		memory_set_bankptr(machine,2, bank_base+0x02000);
+		memory_set_bankptr(machine,"bank1", bank_base);
+		memory_set_bankptr(machine,"bank2", bank_base+0x02000);
 	}
 	else  // CPC+/GX4000
 	{
@@ -1665,20 +1665,20 @@ static void amstrad_setLowerRom(running_machine *machine)
 		}
 		else
 		{
-			memory_install_read8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK(3));
-			memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, SMH_BANK(4));
-			memory_install_write8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK(11));
-			memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, SMH_BANK(12));
+			memory_install_read_bank(space, 0x4000, 0x5fff, 0, 0, "bank3");
+			memory_install_read_bank(space, 0x6000, 0x7fff, 0, 0, "bank4");
+			memory_install_write_bank(space, 0x4000, 0x5fff, 0, 0, "bank11");
+			memory_install_write_bank(space, 0x6000, 0x7fff, 0, 0, "bank12");
 		}
 
 		if(AmstradCPC_RamBanks[0] != NULL)
 		{
-			memory_set_bankptr(machine,1, AmstradCPC_RamBanks[0]);
-			memory_set_bankptr(machine,2, AmstradCPC_RamBanks[0]+0x2000);
-			memory_set_bankptr(machine,3, AmstradCPC_RamBanks[1]);
-			memory_set_bankptr(machine,4, AmstradCPC_RamBanks[1]+0x2000);
-			memory_set_bankptr(machine,5, AmstradCPC_RamBanks[2]);
-			memory_set_bankptr(machine,6, AmstradCPC_RamBanks[2]+0x2000);
+			memory_set_bankptr(machine,"bank1", AmstradCPC_RamBanks[0]);
+			memory_set_bankptr(machine,"bank2", AmstradCPC_RamBanks[0]+0x2000);
+			memory_set_bankptr(machine,"bank3", AmstradCPC_RamBanks[1]);
+			memory_set_bankptr(machine,"bank4", AmstradCPC_RamBanks[1]+0x2000);
+			memory_set_bankptr(machine,"bank5", AmstradCPC_RamBanks[2]);
+			memory_set_bankptr(machine,"bank6", AmstradCPC_RamBanks[2]+0x2000);
 		}
 
 		if ( (gate_array.mrer & (1<<2)) == 0)
@@ -1691,30 +1691,30 @@ static void amstrad_setLowerRom(running_machine *machine)
 				{
 				case 0x00:
 //                  logerror("L-ROM: located at &0000\n");
-					memory_set_bankptr(machine,1, bank_base);
-					memory_set_bankptr(machine,2, bank_base+0x02000);
+					memory_set_bankptr(machine,"bank1", bank_base);
+					memory_set_bankptr(machine,"bank2", bank_base+0x02000);
 					break;
 				case 0x08:
 //                  logerror("L-ROM: located at &4000\n");
-					memory_set_bankptr(machine,3, bank_base);
-					memory_set_bankptr(machine,4, bank_base+0x02000);
+					memory_set_bankptr(machine,"bank3", bank_base);
+					memory_set_bankptr(machine,"bank4", bank_base+0x02000);
 					break;
 				case 0x10:
 //                  logerror("L-ROM: located at &8000\n");
-					memory_set_bankptr(machine,5, bank_base);
-					memory_set_bankptr(machine,6, bank_base+0x02000);
+					memory_set_bankptr(machine,"bank5", bank_base);
+					memory_set_bankptr(machine,"bank6", bank_base+0x02000);
 					break;
 				case 0x18:
 //                  logerror("L-ROM: located at &0000, ASIC registers enabled\n");
-					memory_set_bankptr(machine,1, bank_base);
-					memory_set_bankptr(machine,2, bank_base+0x02000);
+					memory_set_bankptr(machine,"bank1", bank_base);
+					memory_set_bankptr(machine,"bank2", bank_base+0x02000);
 					break;
 				}
 			}
 			else
 			{
-				memory_set_bankptr( machine, 1, memory_region( machine,"maincpu" ) );
-				memory_set_bankptr( machine, 2, memory_region( machine,"maincpu" ) + 0x2000 );
+				memory_set_bankptr( machine, "bank1", memory_region( machine,"maincpu" ) );
+				memory_set_bankptr( machine, "bank2", memory_region( machine,"maincpu" ) + 0x2000 );
 			}
 		}
 	}
@@ -1743,8 +1743,8 @@ static void amstrad_setUpperRom(running_machine *machine)
 
 	if (bank_base)
 	{
-		memory_set_bankptr(machine,7, bank_base);
-		memory_set_bankptr(machine,8, bank_base+0x2000);
+		memory_set_bankptr(machine,"bank7", bank_base);
+		memory_set_bankptr(machine,"bank8", bank_base+0x2000);
 	}
 }
 
@@ -2190,37 +2190,37 @@ static WRITE8_HANDLER( aleste_msx_mapper )
 		switch(page)
 		{
 		case 0:  /* 0x0000 - 0x3fff */
-			memory_set_bankptr(space->machine,1,messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
-			memory_set_bankptr(space->machine,2,messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
-			memory_set_bankptr(space->machine,9,messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
-			memory_set_bankptr(space->machine,10,messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank1",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
+			memory_set_bankptr(space->machine,"bank2",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank9",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
+			memory_set_bankptr(space->machine,"bank10",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
 			Aleste_RamBanks[0] = messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr;
 			aleste_active_page[0] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x0000\n",ramptr,rampage);
 			break;
 		case 1:  /* 0x4000 - 0x7fff */
-			memory_set_bankptr(space->machine,3,messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
-			memory_set_bankptr(space->machine,4,messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
-			memory_set_bankptr(space->machine,11,messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
-			memory_set_bankptr(space->machine,12,messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank3",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
+			memory_set_bankptr(space->machine,"bank4",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank11",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
+			memory_set_bankptr(space->machine,"bank12",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
 			Aleste_RamBanks[1] = messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr;
 			aleste_active_page[1] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x4000\n",ramptr,rampage);
 			break;
 		case 2:  /* 0x8000 - 0xbfff */
-			memory_set_bankptr(space->machine,5,messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
-			memory_set_bankptr(space->machine,6,messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
-			memory_set_bankptr(space->machine,13,messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
-			memory_set_bankptr(space->machine,14,messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank5",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
+			memory_set_bankptr(space->machine,"bank6",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank13",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
+			memory_set_bankptr(space->machine,"bank14",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
 			Aleste_RamBanks[2] = messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr;
 			aleste_active_page[2] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x8000\n",ramptr,rampage);
 			break;
 		case 3:  /* 0xc000 - 0xffff */
-			memory_set_bankptr(space->machine,7,messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
-			memory_set_bankptr(space->machine,8,messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
-			memory_set_bankptr(space->machine,15,messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
-			memory_set_bankptr(space->machine,16,messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank7",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
+			memory_set_bankptr(space->machine,"bank8",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank15",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
+			memory_set_bankptr(space->machine,"bank16",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
 			Aleste_RamBanks[3] = messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr;
 			aleste_active_page[3] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0xc000\n",ramptr,rampage);
@@ -2766,19 +2766,19 @@ static void amstrad_rethinkMemory(running_machine *machine)
 	{
 		if(aleste_mode & 0x04)
 		{
-			memory_set_bankptr(machine,3, Aleste_RamBanks[1]);
-			memory_set_bankptr(machine,4, Aleste_RamBanks[1]+0x2000);
+			memory_set_bankptr(machine,"bank3", Aleste_RamBanks[1]);
+			memory_set_bankptr(machine,"bank4", Aleste_RamBanks[1]+0x2000);
 			/* bank 2 - 0x08000..0x0bfff */
-			memory_set_bankptr(machine,5, Aleste_RamBanks[2]);
-			memory_set_bankptr(machine,6, Aleste_RamBanks[2]+0x2000);
+			memory_set_bankptr(machine,"bank5", Aleste_RamBanks[2]);
+			memory_set_bankptr(machine,"bank6", Aleste_RamBanks[2]+0x2000);
 		}
 		else
 		{
-			memory_set_bankptr(machine,3, AmstradCPC_RamBanks[1]);
-			memory_set_bankptr(machine,4, AmstradCPC_RamBanks[1]+0x2000);
+			memory_set_bankptr(machine,"bank3", AmstradCPC_RamBanks[1]);
+			memory_set_bankptr(machine,"bank4", AmstradCPC_RamBanks[1]+0x2000);
 			/* bank 2 - 0x08000..0x0bfff */
-			memory_set_bankptr(machine,5, AmstradCPC_RamBanks[2]);
-			memory_set_bankptr(machine,6, AmstradCPC_RamBanks[2]+0x2000);
+			memory_set_bankptr(machine,"bank5", AmstradCPC_RamBanks[2]);
+			memory_set_bankptr(machine,"bank6", AmstradCPC_RamBanks[2]+0x2000);
 		}
 	}
 	else
@@ -2790,25 +2790,25 @@ static void amstrad_rethinkMemory(running_machine *machine)
 	/* other banks */
 	if(aleste_mode & 0x04)
 	{
-		memory_set_bankptr(machine,9, Aleste_RamBanks[0]);
-		memory_set_bankptr(machine,10, Aleste_RamBanks[0]+0x2000);
-		memory_set_bankptr(machine,11, Aleste_RamBanks[1]);
-		memory_set_bankptr(machine,12, Aleste_RamBanks[1]+0x2000);
-		memory_set_bankptr(machine,13, Aleste_RamBanks[2]);
-		memory_set_bankptr(machine,14, Aleste_RamBanks[2]+0x2000);
-		memory_set_bankptr(machine,15, Aleste_RamBanks[3]);
-		memory_set_bankptr(machine,16, Aleste_RamBanks[3]+0x2000);
+		memory_set_bankptr(machine,"bank9", Aleste_RamBanks[0]);
+		memory_set_bankptr(machine,"bank10", Aleste_RamBanks[0]+0x2000);
+		memory_set_bankptr(machine,"bank11", Aleste_RamBanks[1]);
+		memory_set_bankptr(machine,"bank12", Aleste_RamBanks[1]+0x2000);
+		memory_set_bankptr(machine,"bank13", Aleste_RamBanks[2]);
+		memory_set_bankptr(machine,"bank14", Aleste_RamBanks[2]+0x2000);
+		memory_set_bankptr(machine,"bank15", Aleste_RamBanks[3]);
+		memory_set_bankptr(machine,"bank16", Aleste_RamBanks[3]+0x2000);
 	}
 	else
 	{
-		memory_set_bankptr(machine,9, AmstradCPC_RamBanks[0]);
-		memory_set_bankptr(machine,10, AmstradCPC_RamBanks[0]+0x2000);
-		memory_set_bankptr(machine,11, AmstradCPC_RamBanks[1]);
-		memory_set_bankptr(machine,12, AmstradCPC_RamBanks[1]+0x2000);
-		memory_set_bankptr(machine,13, AmstradCPC_RamBanks[2]);
-		memory_set_bankptr(machine,14, AmstradCPC_RamBanks[2]+0x2000);
-		memory_set_bankptr(machine,15, AmstradCPC_RamBanks[3]);
-		memory_set_bankptr(machine,16, AmstradCPC_RamBanks[3]+0x2000);
+		memory_set_bankptr(machine,"bank9", AmstradCPC_RamBanks[0]);
+		memory_set_bankptr(machine,"bank10", AmstradCPC_RamBanks[0]+0x2000);
+		memory_set_bankptr(machine,"bank11", AmstradCPC_RamBanks[1]);
+		memory_set_bankptr(machine,"bank12", AmstradCPC_RamBanks[1]+0x2000);
+		memory_set_bankptr(machine,"bank13", AmstradCPC_RamBanks[2]);
+		memory_set_bankptr(machine,"bank14", AmstradCPC_RamBanks[2]+0x2000);
+		memory_set_bankptr(machine,"bank15", AmstradCPC_RamBanks[3]);
+		memory_set_bankptr(machine,"bank16", AmstradCPC_RamBanks[3]+0x2000);
 	}
 
 	/* multiface hardware enabled? */
@@ -3232,29 +3232,29 @@ static void amstrad_common_init(running_machine *machine)
 	amstrad_GateArray_RamConfiguration = 0;
 	amstrad_CRTC_HS_Counter = 2;
 
-	memory_install_read8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK(1));
-	memory_install_read8_handler(space, 0x2000, 0x3fff, 0, 0, SMH_BANK(2));
+	memory_install_read_bank(space, 0x0000, 0x1fff, 0, 0, "bank1");
+	memory_install_read_bank(space, 0x2000, 0x3fff, 0, 0, "bank2");
 
-	memory_install_read8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK(3));
-	memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, SMH_BANK(4));
+	memory_install_read_bank(space, 0x4000, 0x5fff, 0, 0, "bank3");
+	memory_install_read_bank(space, 0x6000, 0x7fff, 0, 0, "bank4");
 
-	memory_install_read8_handler(space, 0x8000, 0x9fff, 0, 0, SMH_BANK(5));
-	memory_install_read8_handler(space, 0xa000, 0xbfff, 0, 0, SMH_BANK(6));
+	memory_install_read_bank(space, 0x8000, 0x9fff, 0, 0, "bank5");
+	memory_install_read_bank(space, 0xa000, 0xbfff, 0, 0, "bank6");
 
-	memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_BANK(7));
-	memory_install_read8_handler(space, 0xe000, 0xffff, 0, 0, SMH_BANK(8));
+	memory_install_read_bank(space, 0xc000, 0xdfff, 0, 0, "bank7");
+	memory_install_read_bank(space, 0xe000, 0xffff, 0, 0, "bank8");
 
-	memory_install_write8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK(9));
-	memory_install_write8_handler(space, 0x2000, 0x3fff, 0, 0, SMH_BANK(10));
+	memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank9");
+	memory_install_write_bank(space, 0x2000, 0x3fff, 0, 0, "bank10");
 
-	memory_install_write8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK(11));
-	memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, SMH_BANK(12));
+	memory_install_write_bank(space, 0x4000, 0x5fff, 0, 0, "bank11");
+	memory_install_write_bank(space, 0x6000, 0x7fff, 0, 0, "bank12");
 
-	memory_install_write8_handler(space, 0x8000, 0x9fff, 0, 0, SMH_BANK(13));
-	memory_install_write8_handler(space, 0xa000, 0xbfff, 0, 0, SMH_BANK(14));
+	memory_install_write_bank(space, 0x8000, 0x9fff, 0, 0, "bank13");
+	memory_install_write_bank(space, 0xa000, 0xbfff, 0, 0, "bank14");
 
-	memory_install_write8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_BANK(15));
-	memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_BANK(16));
+	memory_install_write_bank(space, 0xc000, 0xdfff, 0, 0, "bank15");
+	memory_install_write_bank(space, 0xe000, 0xffff, 0, 0, "bank16");
 
 	device_reset(cputag_get_cpu(space->machine, "maincpu"));
 	if ( amstrad_system_type == SYSTEM_CPC || amstrad_system_type == SYSTEM_ALESTE )

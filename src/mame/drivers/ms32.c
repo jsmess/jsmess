@@ -244,16 +244,6 @@ static WRITE32_HANDLER( reset_sub_w )
 /********** MEMORY MAP **********/
 
 
-extern tilemap *ms32_tx_tilemap, *ms32_roz_tilemap, *ms32_bg_tilemap, *ms32_bg_tilemap_alt;
-extern UINT8* ms32_priram_8;
-extern UINT16* ms32_palram_16;
-extern UINT16* ms32_rozram_16;
-extern UINT16* ms32_lineram_16;
-extern UINT16* ms32_sprram_16;
-extern UINT16* ms32_txram_16;
-extern UINT16* ms32_bgram_16;
-extern UINT32 ms32_tilemaplayoutcontrol;
-
 static READ8_HANDLER(   ms32_nvram_r8 )    { return ms32_nvram_8[offset]; }
 static WRITE8_HANDLER(  ms32_nvram_w8 )    { ms32_nvram_8[offset] = data; }
 static READ8_HANDLER(   ms32_priram_r8 )   { return ms32_priram_8[offset]; }
@@ -298,7 +288,7 @@ static ADDRESS_MAP_START( ms32_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xc2c08000, 0xc2c0ffff) AM_READWRITE16(ms32_bgram_r16,  ms32_bgram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) /* bgram is 16-bit wide, 0x4000 in size */
 /*  AM_RANGE(0xc2c10000, 0xc2dfffff) // mirrors of txram / bg, handled above */
 	AM_RANGE(0xc2e00000, 0xc2e1ffff) AM_RAM AM_BASE(&ms32_mainram)                                AM_MIRROR(0x3c0e0000) /* mainram is 32-bit wide, 0x20000 in size */
-	AM_RANGE(0xc3e00000, 0xc3ffffff) AM_ROMBANK(1)                                                AM_MIRROR(0x3c000000) // ROM is 32-bit wide, 0x200000 in size */
+	AM_RANGE(0xc3e00000, 0xc3ffffff) AM_ROMBANK("bank1")                                                AM_MIRROR(0x3c000000) // ROM is 32-bit wide, 0x200000 in size */
 
 	/* todo: clean up the mapping of these */
 	AM_RANGE(0xfc800000, 0xfc800003) AM_READNOP	/* sound? */
@@ -323,9 +313,6 @@ ADDRESS_MAP_END
 
 /* F1 Super Battle has an extra linemap for the road, and am unknown maths chip (mcu?) handling perspective calculations for the road / corners etc. */
 /* it should use it's own memory map */
-
-extern UINT16* f1superb_extraram_16;
-extern tilemap* ms32_extra_tilemap;
 
 static WRITE16_HANDLER( ms32_extra_w16 )  { COMBINE_DATA(&f1superb_extraram_16[offset]); tilemap_mark_tile_dirty(ms32_extra_tilemap,offset/2); }
 static READ16_HANDLER(  ms32_extra_r16 )  { return f1superb_extraram_16[offset]; }
@@ -360,7 +347,7 @@ static ADDRESS_MAP_START( f1superb_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfd140000, 0xfd143fff) AM_RAM // used when you start enabling fpu ints
 	AM_RANGE(0xfd144000, 0xfd145fff) AM_RAM // same data here
 
- 	AM_RANGE(0xfdc00000, 0xfdc007ff) AM_RAM AM_READWRITE16(ms32_extra_r16, ms32_extra_w16, 0x0000ffff) // definitely line ram
+ 	AM_RANGE(0xfdc00000, 0xfdc007ff) AM_READWRITE16(ms32_extra_r16, ms32_extra_w16, 0x0000ffff) // definitely line ram
 	AM_RANGE(0xfde00000, 0xfde01fff) AM_RAM // scroll info for lineram?
 
 	AM_IMPORT_FROM(ms32_map)
@@ -1288,8 +1275,8 @@ static READ8_HANDLER( latch_r )
 
 static WRITE8_HANDLER( ms32_snd_bank_w )
 {
-	memory_set_bank(space->machine, 4, (data >> 0) & 0x0F);
-	memory_set_bank(space->machine, 5, (data >> 4) & 0x0F);
+	memory_set_bank(space->machine, "bank4", (data >> 0) & 0x0F);
+	memory_set_bank(space->machine, "bank5", (data >> 4) & 0x0F);
 }
 
 static WRITE8_HANDLER( to_main_w )
@@ -1308,8 +1295,8 @@ static ADDRESS_MAP_START( ms32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3f70, 0x3f70) AM_WRITENOP   // watchdog? banking? very noisy
 	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(ms32_snd_bank_w)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(4)
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(5)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank4")
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank5")
 ADDRESS_MAP_END
 
 
@@ -1317,9 +1304,9 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( ms32 )
 {
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));
-	memory_set_bank(machine, 4, 0);
-	memory_set_bank(machine, 5, 1);
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
+	memory_set_bank(machine, "bank4", 0);
+	memory_set_bank(machine, "bank5", 1);
 	irq_init(machine);
 }
 
@@ -2288,8 +2275,8 @@ void decrypt_ms32_bg(running_machine *machine, int addr_xor,int data_xor, const 
 static void configure_banks(running_machine *machine)
 {
 	state_save_register_global(machine, to_main);
-	memory_configure_bank(machine, 4, 0, 16, memory_region(machine, "audiocpu") + 0x14000, 0x4000);
-	memory_configure_bank(machine, 5, 0, 16, memory_region(machine, "audiocpu") + 0x14000, 0x4000);
+	memory_configure_bank(machine, "bank4", 0, 16, memory_region(machine, "audiocpu") + 0x14000, 0x4000);
+	memory_configure_bank(machine, "bank5", 0, 16, memory_region(machine, "audiocpu") + 0x14000, 0x4000);
 }
 
 static DRIVER_INIT( ms32_common )

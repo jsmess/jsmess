@@ -673,11 +673,11 @@ MACHINE_RESET( vic20 )
 	via_ca1_w(via_0, 0, vc20_via0_read_ca1(via_0, 0));
 
 	/* Set up memory banks */
-	memory_set_bankptr(machine,  1, ( ( messram_get_size(devtag_get_device(machine, "messram")) >=  8 * 1024 ) ? messram_get_ptr(devtag_get_device(machine, "messram")) : memory_region(machine, "maincpu") ) + 0x0400 );
-	memory_set_bankptr(machine,  2, vc20_rom_2000 ? vc20_rom_2000 : ( ( ( messram_get_size(devtag_get_device(machine, "messram")) >= 16 * 1024 ) ? messram_get_ptr(devtag_get_device(machine, "messram")) : memory_region(machine, "maincpu") ) + 0x2000 ) );
-	memory_set_bankptr(machine,  3, vc20_rom_4000 ? vc20_rom_4000 : ( ( ( messram_get_size(devtag_get_device(machine, "messram")) >= 24 * 1024 ) ? messram_get_ptr(devtag_get_device(machine, "messram")) : memory_region(machine, "maincpu") ) + 0x4000 ) );
-	memory_set_bankptr(machine,  4, vc20_rom_6000 ? vc20_rom_6000 : ( ( ( messram_get_size(devtag_get_device(machine, "messram")) >= 32 * 1024 ) ? messram_get_ptr(devtag_get_device(machine, "messram")) : memory_region(machine, "maincpu") ) + 0x6000 ) );
-	memory_set_bankptr(machine,  5, vc20_rom_a000 ? vc20_rom_a000 : ( memory_region(machine, "maincpu") + 0xa000 ) );
+	memory_set_bankptr(machine,  "bank1", ( ( messram_get_size(devtag_get_device(machine, "messram")) >=  8 * 1024 ) ? messram_get_ptr(devtag_get_device(machine, "messram")) : memory_region(machine, "maincpu") ) + 0x0400 );
+	memory_set_bankptr(machine,  "bank2", vc20_rom_2000 ? vc20_rom_2000 : ( ( ( messram_get_size(devtag_get_device(machine, "messram")) >= 16 * 1024 ) ? messram_get_ptr(devtag_get_device(machine, "messram")) : memory_region(machine, "maincpu") ) + 0x2000 ) );
+	memory_set_bankptr(machine,  "bank3", vc20_rom_4000 ? vc20_rom_4000 : ( ( ( messram_get_size(devtag_get_device(machine, "messram")) >= 24 * 1024 ) ? messram_get_ptr(devtag_get_device(machine, "messram")) : memory_region(machine, "maincpu") ) + 0x4000 ) );
+	memory_set_bankptr(machine,  "bank4", vc20_rom_6000 ? vc20_rom_6000 : ( ( ( messram_get_size(devtag_get_device(machine, "messram")) >= 32 * 1024 ) ? messram_get_ptr(devtag_get_device(machine, "messram")) : memory_region(machine, "maincpu") ) + 0x6000 ) );
+	memory_set_bankptr(machine,  "bank5", vc20_rom_a000 ? vc20_rom_a000 : ( memory_region(machine, "maincpu") + 0xa000 ) );
 }
 
 

@@ -121,9 +121,9 @@ DRIVER_INIT( z80ne )
 {
 	/* first two entries point to rom on reset */
 	UINT8 *RAM = memory_region(machine, "z80ne");
-	memory_configure_bank(machine, 1, 0, 1, &RAM[0x00000], 0x0400); /* RAM   at 0x0000 */
-	memory_configure_bank(machine, 1, 1, 1, &RAM[0x14000], 0x0400); /* ep382 at 0x0000 */
-	memory_configure_bank(machine, 2, 0, 1, &RAM[0x14000], 0x0400); /* ep382 at 0x8000 */
+	memory_configure_bank(machine, "bank1", 0, 1, &RAM[0x00000], 0x0400); /* RAM   at 0x0000 */
+	memory_configure_bank(machine, "bank1", 1, 1, &RAM[0x14000], 0x0400); /* ep382 at 0x0000 */
+	memory_configure_bank(machine, "bank2", 0, 1, &RAM[0x14000], 0x0400); /* ep382 at 0x8000 */
 }
 
 DRIVER_INIT( z80net )
@@ -139,19 +139,19 @@ DRIVER_INIT( z80netf )
 {
 	/* first two entries point to rom on reset */
 	UINT8 *RAM = memory_region(machine, "z80ne");
-	memory_configure_bank(machine, 1, 0, 1, &RAM[0x00000], 0x0400); /* RAM   at 0x0000-0x03FF */
-	memory_configure_bank(machine, 1, 1, 3, &RAM[0x14400], 0x0400); /* ep390, ep1390, ep2390 at 0x0000-0x03FF */
-	memory_configure_bank(machine, 1, 4, 1, &RAM[0x14000], 0x0400); /* ep382 at 0x0000-0x03FF */
-	memory_configure_bank(machine, 1, 5, 1, &RAM[0x10000], 0x0400); /* ep548 at 0x0000-0x03FF */
+	memory_configure_bank(machine, "bank1", 0, 1, &RAM[0x00000], 0x0400); /* RAM   at 0x0000-0x03FF */
+	memory_configure_bank(machine, "bank1", 1, 3, &RAM[0x14400], 0x0400); /* ep390, ep1390, ep2390 at 0x0000-0x03FF */
+	memory_configure_bank(machine, "bank1", 4, 1, &RAM[0x14000], 0x0400); /* ep382 at 0x0000-0x03FF */
+	memory_configure_bank(machine, "bank1", 5, 1, &RAM[0x10000], 0x0400); /* ep548 at 0x0000-0x03FF */
 
-	memory_configure_bank(machine, 2, 0, 1, &RAM[0x00400], 0x3C00); /* RAM   at 0x0400 */
-	memory_configure_bank(machine, 2, 1, 1, &RAM[0x10400], 0x3C00); /* ep548 at 0x0400-0x3FFF */
+	memory_configure_bank(machine, "bank2", 0, 1, &RAM[0x00400], 0x3C00); /* RAM   at 0x0400 */
+	memory_configure_bank(machine, "bank2", 1, 1, &RAM[0x10400], 0x3C00); /* ep548 at 0x0400-0x3FFF */
 
-	memory_configure_bank(machine, 3, 0, 1, &RAM[0x08000], 0x0400); /* RAM   at 0x8000 */
-	memory_configure_bank(machine, 3, 1, 1, &RAM[0x14000], 0x0400); /* ep382 at 0x8000 */
+	memory_configure_bank(machine, "bank3", 0, 1, &RAM[0x08000], 0x0400); /* RAM   at 0x8000 */
+	memory_configure_bank(machine, "bank3", 1, 1, &RAM[0x14000], 0x0400); /* ep382 at 0x8000 */
 
-	memory_configure_bank(machine, 4, 0, 1, &RAM[0x0F000], 0x0400); /* RAM   at 0xF000 */
-	memory_configure_bank(machine, 4, 1, 3, &RAM[0x14400], 0x0400); /* ep390, ep1390, ep2390 at 0xF000 */
+	memory_configure_bank(machine, "bank4", 0, 1, &RAM[0x0F000], 0x0400); /* RAM   at 0xF000 */
+	memory_configure_bank(machine, "bank4", 1, 3, &RAM[0x14400], 0x0400); /* ep390, ep1390, ep2390 at 0xF000 */
 
 }
 
@@ -232,7 +232,7 @@ static DIRECT_UPDATE_HANDLER( reset_delay_count )
 		/* remove this callback */
 		memory_set_direct_update_handler( space, NULL );
 		/* and switch to RAM bank at address 0x0000 */
-		memory_set_bank( space->machine, 1, 0 ); /* RAM at 0x0000 (bank 1) */
+		memory_set_bank( space->machine, "bank1", 0 ); /* RAM at 0x0000 (bank 1) */
 	}
 	return address;
 }
@@ -249,8 +249,8 @@ static void reset_lx382_banking(running_machine *machine)
 	const address_space *space = cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM);
 
 	/* switch to ROM bank at address 0x0000 */
-    memory_set_bank(machine, 1, 1);
-    memory_set_bank(machine, 2, 0);  /* ep382 at 0x8000 */
+    memory_set_bank(machine, "bank1", 1);
+    memory_set_bank(machine, "bank2", 0);  /* ep382 at 0x8000 */
 
 	/* after the first 3 bytes have been read from ROM, switch the RAM back in */
 	reset_delay_counter = 2;
@@ -266,10 +266,10 @@ static void reset_lx390_banking(running_machine *machine)
 	case 0x01: /* EP382 Hex Monitor */
 		if (VERBOSE)
 			logerror("reset_lx390_banking: banking ep382\n");
-	    memory_set_bank(machine, 1, 4);  /* ep382 at 0x0000 for 3 cycles, then RAM */
-	    memory_set_bank(machine, 2, 0);  /* RAM   at 0x0400 */
-	    memory_set_bank(machine, 3, 1);  /* ep382 at 0x8000 */
-	    memory_set_bank(machine, 4, 0);  /* RAM   at 0xF000 */
+	    memory_set_bank(machine, "bank1", 4);  /* ep382 at 0x0000 for 3 cycles, then RAM */
+	    memory_set_bank(machine, "bank2", 0);  /* RAM   at 0x0400 */
+	    memory_set_bank(machine, "bank3", 1);  /* ep382 at 0x8000 */
+	    memory_set_bank(machine, "bank4", 0);  /* RAM   at 0xF000 */
 		/* after the first 3 bytes have been read from ROM, switch the RAM back in */
 		reset_delay_counter = 2;
 		memory_set_direct_update_handler(space, reset_delay_count);
@@ -277,37 +277,37 @@ static void reset_lx390_banking(running_machine *machine)
 	case 0x02: /* EP548  16k BASIC */
 		if (VERBOSE)
 			logerror("reset_lx390_banking: banking ep548\n");
-	    memory_set_bank(machine, 1, 5);  /* ep548 at 0x0000-0x03FF */
-	    memory_set_bank(machine, 2, 1);  /* ep548 at 0x0400-0x3FFF */
-	    memory_set_bank(machine, 3, 0);  /* RAM   at 0x8000 */
-	    memory_set_bank(machine, 4, 0);  /* RAM   at 0xF000 */
+	    memory_set_bank(machine, "bank1", 5);  /* ep548 at 0x0000-0x03FF */
+	    memory_set_bank(machine, "bank2", 1);  /* ep548 at 0x0400-0x3FFF */
+	    memory_set_bank(machine, "bank3", 0);  /* RAM   at 0x8000 */
+	    memory_set_bank(machine, "bank4", 0);  /* RAM   at 0xF000 */
 		memory_set_direct_update_handler( space, NULL );
 	    break;
 	case 0x03: /* EP390  Boot Loader for 5.5k floppy BASIC */
 		if (VERBOSE)
 			logerror("reset_lx390_banking: banking ep390\n");
-	    memory_set_bank(machine, 1, 1);  /* ep390 at 0x0000-0 x03FF for 3 cycles, then RAM */
-	    memory_set_bank(machine, 2, 0);  /* RAM   at 0x0400-0x3FFF */
-	    memory_set_bank(machine, 3, 0);  /* RAM   at 0x8000 */
-	    memory_set_bank(machine, 4, 1);  /* ep390 at 0xF000 */
+	    memory_set_bank(machine, "bank1", 1);  /* ep390 at 0x0000-0 x03FF for 3 cycles, then RAM */
+	    memory_set_bank(machine, "bank2", 0);  /* RAM   at 0x0400-0x3FFF */
+	    memory_set_bank(machine, "bank3", 0);  /* RAM   at 0x8000 */
+	    memory_set_bank(machine, "bank4", 1);  /* ep390 at 0xF000 */
 		memory_set_direct_update_handler( space, NULL );
 	    break;
 	case 0x04: /* EP1390 Boot Loader for NE DOS 1.0/1.5 */
 		if (VERBOSE)
 			logerror("reset_lx390_banking: banking ep1390\n");
-	    memory_set_bank(machine, 1, 2);  /* ep1390 at 0x0000-0x03FF for 3 cycles, then RAM */
-	    memory_set_bank(machine, 2, 0);  /* RAM   at 0x0400-0x3FFF */
-	    memory_set_bank(machine, 3, 0);  /* RAM   at 0x8000 */
-	    memory_set_bank(machine, 4, 2);  /* ep1390 at 0xF000 */
+	    memory_set_bank(machine, "bank1", 2);  /* ep1390 at 0x0000-0x03FF for 3 cycles, then RAM */
+	    memory_set_bank(machine, "bank2", 0);  /* RAM   at 0x0400-0x3FFF */
+	    memory_set_bank(machine, "bank3", 0);  /* RAM   at 0x8000 */
+	    memory_set_bank(machine, "bank4", 2);  /* ep1390 at 0xF000 */
 		memory_set_direct_update_handler( space, NULL );
 	    break;
 	case 0x05: /* EP2390 Boot Loader for NE DOS G.1 */
 		if (VERBOSE)
 			logerror("reset_lx390_banking: banking ep2390\n");
-	    memory_set_bank(machine, 1, 3);  /* ep2390 at 0x0000-0x03FF for 3 cycles, then RAM */
-	    memory_set_bank(machine, 2, 0);  /* RAM   at 0x0400-0x3FFF */
-	    memory_set_bank(machine, 3, 0);  /* RAM   at 0x8000 */
-	    memory_set_bank(machine, 4, 3);  /* ep2390 at 0xF000 */
+	    memory_set_bank(machine, "bank1", 3);  /* ep2390 at 0x0000-0x03FF for 3 cycles, then RAM */
+	    memory_set_bank(machine, "bank2", 0);  /* RAM   at 0x0400-0x3FFF */
+	    memory_set_bank(machine, "bank3", 0);  /* RAM   at 0x8000 */
+	    memory_set_bank(machine, "bank4", 3);  /* ep2390 at 0xF000 */
 		memory_set_direct_update_handler( space, NULL );
 	    break;
 	}
@@ -745,7 +745,7 @@ READ8_DEVICE_HANDLER(lx390_reset_bank)
 	if((pc >= 0xf000) && (pc <=0xffff))
 	{
 		LOG(("lx390_reset_bank, reset memory bank 1\n"));
-		memory_set_bank(device->machine, 1, 0); /* RAM at 0x0000 (bank 1) */
+		memory_set_bank(device->machine, "bank1", 0); /* RAM at 0x0000 (bank 1) */
 	}
 	else
 	{

@@ -91,23 +91,21 @@ MACHINE_RESET( cgenie )
 	{
 		if ( input_port_read(machine, "DSW0") & 0x80 )
 		{
-			memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_BANK(10));
-			memory_install_write8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_NOP);
-			memory_set_bankptr(machine, 10, &ROM[0x0c000]);
+			memory_install_read_bank(space, 0xc000, 0xdfff, 0, 0, "bank10");
+			memory_nop_write(space, 0xc000, 0xdfff, 0, 0);
+			memory_set_bankptr(machine, "bank10", &ROM[0x0c000]);
 			logerror("cgenie DOS enabled\n");
 			memcpy(&ROM[0x0c000],&ROM[0x10000], 0x2000);
 		}
 		else
 		{
-			memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_NOP);
-			memory_install_write8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_NOP);
+			memory_nop_readwrite(space, 0xc000, 0xdfff, 0, 0);
 			logerror("cgenie DOS disabled (no floppy image given)\n");
 		}
 	}
 	else
 	{
-		memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_NOP);
+		memory_nop_readwrite(space, 0xc000, 0xdfff, 0, 0);
 		logerror("cgenie DOS disabled\n");
 		memset(&memory_region(machine, "maincpu")[0x0c000], 0x00, 0x2000);
 	}
@@ -115,16 +113,14 @@ MACHINE_RESET( cgenie )
 	/* copy EXT ROM, if enabled or wipe out that memory area */
 	if( input_port_read(machine, "DSW0") & 0x20 )
 	{
-		memory_install_read8_handler(space, 0xe000, 0xefff, 0, 0, SMH_ROM);
-		memory_install_write8_handler(space, 0xe000, 0xefff, 0, 0, SMH_ROM);
+		memory_install_rom(space, 0xe000, 0xefff, 0, 0, 0); // mess 0135u3 need to check
 		logerror("cgenie EXT enabled\n");
 		memcpy(&memory_region(machine, "maincpu")[0x0e000],
 			   &memory_region(machine, "maincpu")[0x12000], 0x1000);
 	}
 	else
 	{
-		memory_install_read8_handler(space, 0xe000, 0xefff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(space, 0xe000, 0xefff, 0, 0, SMH_NOP);
+		memory_nop_readwrite(space, 0xe000, 0xefff, 0, 0);
 		logerror("cgenie EXT disabled\n");
 		memset(&memory_region(machine, "maincpu")[0x0e000], 0x00, 0x1000);
 	}
@@ -157,10 +153,10 @@ MACHINE_START( cgenie )
 		memset(gfx + i * 8, i, 8);
 
 	/* set up RAM */
-	memory_install_read8_handler(space, 0x4000, 0x4000 + messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, SMH_BANK(1));
+	memory_install_read_bank(space, 0x4000, 0x4000 + messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, "bank1");
 	memory_install_write8_handler(space, 0x4000, 0x4000 + messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, cgenie_videoram_w);
 	machine->generic.videoram.u8 = messram_get_ptr(devtag_get_device(machine, "messram"));
-	memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
+	memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
 }
 
 /*************************************

@@ -61,6 +61,7 @@ Skeleton drivers:
 - Vector Graphics - Vector 4
 
 
+
 System Driver Changes:
 ----------------------
 - [BETA] Fixed display flickering. [Curt Coder]
@@ -118,7 +119,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.135u2.  This incorporates all features of the
+- The core is based on MAME 0.135u3.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Cleanups (static qualifiers, headers, renames, reduced global symbols, dead

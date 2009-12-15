@@ -1152,8 +1152,8 @@ static WRITE32_HANDLER( hpc3_unkpbus0_w )
 }
 
 static ADDRESS_MAP_START( ip225015_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE( 0x00000000, 0x0007ffff ) AM_READWRITE( SMH_BANK(1), SMH_BANK(1) )	/* mirror of first 512k of main RAM */
-	AM_RANGE( 0x08000000, 0x0fffffff ) AM_SHARE(1) AM_BASE( &ip22_mainram ) AM_RAM_WRITE(ip22_write_ram)		/* 128 MB of main RAM */
+	AM_RANGE( 0x00000000, 0x0007ffff ) AM_RAMBANK( "bank1" )	/* mirror of first 512k of main RAM */
+	AM_RANGE( 0x08000000, 0x0fffffff ) AM_SHARE("share1") AM_BASE( &ip22_mainram ) AM_RAM_WRITE(ip22_write_ram)		/* 128 MB of main RAM */
 	AM_RANGE( 0x1f0f0000, 0x1f0f1fff ) AM_READWRITE( newport_rex3_r, newport_rex3_w )
 	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_READWRITE( sgi_mc_r, sgi_mc_w )
 	AM_RANGE( 0x1fb90000, 0x1fb9ffff ) AM_READWRITE( hpc3_hd_enet_r, hpc3_hd_enet_w )
@@ -1169,7 +1169,7 @@ static ADDRESS_MAP_START( ip225015_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE( 0x1fbdd000, 0x1fbdd3ff ) AM_RAM
 	AM_RANGE( 0x1fbe0000, 0x1fbe04ff ) AM_READWRITE( rtc_r, rtc_w )
 	AM_RANGE( 0x1fc00000, 0x1fc7ffff ) AM_ROM AM_REGION( "user1", 0 )
-	AM_RANGE( 0x20000000, 0x27ffffff ) AM_SHARE(1) AM_RAM_WRITE(ip22_write_ram)
+	AM_RANGE( 0x20000000, 0x27ffffff ) AM_SHARE("share1") AM_RAM_WRITE(ip22_write_ram)
 ADDRESS_MAP_END
 
 static UINT32 nIntCounter;
@@ -1193,7 +1193,7 @@ static MACHINE_RESET( ip225015 )
 	timer_set(machine, ATTOTIME_IN_MSEC(1), NULL, 0, ip22_timer);
 
 	// set up low RAM mirror
-	memory_set_bankptr(machine, 1, ip22_mainram);
+	memory_set_bankptr(machine, "bank1", ip22_mainram);
 
 	nPBUS_DMA_Active = 0;
 

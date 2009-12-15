@@ -145,8 +145,8 @@ int i, j, n;
           if (!strncmp(machine->gamedrv->name , "hec2xxxx" , 4) |
               !strncmp(machine->gamedrv->name , "victor" , 6)     ) // aviable for all HR machines
           { 
-               memory_set_bank(machine, 1, HECTOR_BANK_PROG);
-               memory_set_bank(machine, 2, HECTORMX_BANK_PAGE0);
+               memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
+               memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
                hector_flag_hr=1;
           }
           else
@@ -169,7 +169,7 @@ int i, j, n;
 WRITE8_HANDLER( hector_switch_bank_w )
 {
 	if (offset==0x00)	{	// 0x800 et 0x000=> vidéo page, HR
-                        	memory_set_bank(space->machine, 1, HECTOR_BANK_VIDEO);
+                        	memory_set_bank(space->machine, "bank1", HECTOR_BANK_VIDEO);
 							if (flag_clk ==1)
 							{
            	    				flag_clk=0;
@@ -178,7 +178,7 @@ WRITE8_HANDLER( hector_switch_bank_w )
 						}	
 	if (offset==0x04)	{	// 0x804 => vidéo page, BR
 							hector_flag_hr=0;		
-                        	memory_set_bank(space->machine, 1, HECTOR_BANK_VIDEO);
+                        	memory_set_bank(space->machine, "bank1", HECTOR_BANK_VIDEO);
 							if (flag_clk ==0)
 							{
 								flag_clk=1;
@@ -186,7 +186,7 @@ WRITE8_HANDLER( hector_switch_bank_w )
 							}
 						}  
 	if (offset==0x08)	{	// 0x808 => base page, HR
-							memory_set_bank(space->machine, 1, HECTOR_BANK_PROG);
+							memory_set_bank(space->machine, "bank1", HECTOR_BANK_PROG);
 							if (flag_clk ==1)
 							{
 								flag_clk=0;
@@ -196,7 +196,7 @@ WRITE8_HANDLER( hector_switch_bank_w )
 						}  
 	if (offset==0x0c)	{	// 0x80c => base page, BR
 							hector_flag_hr=0;
-                        	memory_set_bank(space->machine, 1, HECTOR_BANK_PROG);
+                        	memory_set_bank(space->machine, "bank1", HECTOR_BANK_PROG);
 							if (flag_clk ==0)
 							{
 								flag_clk=1;
@@ -365,14 +365,14 @@ WRITE8_HANDLER( hector_mx40_io_port_w)
    if ((offset &0x0ff) == 0xf0) // Port A => to printer
    		printer_output(devtag_get_device(space->machine, "printer"), data);
    if ((offset &0x0ff) == 0x40) // Port page 0
-      memory_set_bank(space->machine, 2, HECTORMX_BANK_PAGE0);
+      memory_set_bank(space->machine, "bank2", HECTORMX_BANK_PAGE0);
    if ((offset &0x0ff) == 0x41) // Port page 1
    { 
-      memory_set_bank(space->machine, 2, HECTORMX_BANK_PAGE1);
+      memory_set_bank(space->machine, "bank2", HECTORMX_BANK_PAGE1);
       hector_flag_80c=0;
    }
    if ((offset &0x0ff) == 0x44) // Port page 2   // 42 pour MX80
-      memory_set_bank(space->machine, 2, HECTORMX_BANK_PAGE2);
+      memory_set_bank(space->machine, "bank2", HECTORMX_BANK_PAGE2);
    if ((offset &0x0ff) == 0x49) // Port screen resolution
       hector_flag_80c=0;// No 80c in 40c !
 }
@@ -382,14 +382,14 @@ WRITE8_HANDLER( hector_mx80_io_port_w)
    if ((offset &0x0ff) == 0xf0) // Port A => to printer
    		printer_output(devtag_get_device(space->machine, "printer"), data);
    if ((offset &0x0ff) == 0x40) // Port page 0
-      memory_set_bank(space->machine, 2, HECTORMX_BANK_PAGE0);
+      memory_set_bank(space->machine, "bank2", HECTORMX_BANK_PAGE0);
    if ((offset &0x0ff) == 0x41) // Port page 1
    { 
-      memory_set_bank(space->machine, 2, HECTORMX_BANK_PAGE1);
+      memory_set_bank(space->machine, "bank2", HECTORMX_BANK_PAGE1);
       hector_flag_80c=0;
    }
    if ((offset &0x0ff) == 0x42) // Port page 2  => port different du MX40
-      memory_set_bank(space->machine, 2, HECTORMX_BANK_PAGE2);
+      memory_set_bank(space->machine, "bank2", HECTORMX_BANK_PAGE2);
    if ((offset &0x0ff) == 0x49) // Port screen resolution
       hector_flag_80c=1; 
 }

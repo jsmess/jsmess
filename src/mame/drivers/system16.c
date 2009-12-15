@@ -246,7 +246,7 @@ ADDRESS_MAP_END
 // 7759
 static ADDRESS_MAP_START( sound_7759_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_r)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -258,7 +258,7 @@ static WRITE8_DEVICE_HANDLER( upd7759_bank_w ) //*
 
 	upd7759_reset_w(device, data & 0x40);
 	offs = 0x10000 + (data * 0x4000) % size;
-	memory_set_bankptr(device->machine, 1, memory_region(device->machine, "soundcpu") + offs);
+	memory_set_bankptr(device->machine, "bank1", memory_region(device->machine, "soundcpu") + offs);
 }
 
 
@@ -828,10 +828,10 @@ static ADDRESS_MAP_START( goldnaxe_b1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(SMH_NOP) // sound related?
-	AM_RANGE(0xc43000, 0xc43001) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xc43034, 0xc43035) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xc80000, 0xc80001) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xc42006, 0xc42007) AM_WRITENOP // sound related?
+	AM_RANGE(0xc43000, 0xc43001) AM_WRITENOP
+	AM_RANGE(0xc43034, 0xc43035) AM_WRITENOP
+	AM_RANGE(0xc80000, 0xc80001) AM_WRITENOP
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
 
@@ -1023,21 +1023,21 @@ static ADDRESS_MAP_START( goldnaxe_b2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE( sys16_textram_w ) AM_BASE(&sys16_textram)
 	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE( segaic16_paletteram_w ) AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
-	AM_RANGE(0xc40000, 0xc40001) AM_READ_PORT("DSW2") AM_WRITE(SMH_NOP)
+	AM_RANGE(0xc40000, 0xc40001) AM_READ_PORT("DSW2") AM_WRITENOP
 	AM_RANGE(0xc40002, 0xc40003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
 	AM_RANGE(0xc41004, 0xc41005) AM_READ_PORT("P2")
-	AM_RANGE(0xc43000, 0xc43001) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xc43000, 0xc43001) AM_WRITENOP
 	AM_RANGE(0xc44000, 0xc44001) AM_WRITE(goldnax_b2_fgscrolly_w)
 	AM_RANGE(0xc44008, 0xc44009) AM_WRITE(goldnax_b2_fgscrollx_w) // and tile bank
 	AM_RANGE(0xc44010, 0xc44011) AM_WRITE(goldnax_b2_bgscrolly_w)
 	AM_RANGE(0xc44018, 0xc44019) AM_WRITE(goldnax_b2_bgscrollx_w)
 	AM_RANGE(0xc44020, 0xc44027) AM_WRITE(goldnax_b2_bgpage_w) AM_BASE(&goldnax_b2_bgpage)
 	AM_RANGE(0xc44060, 0xc44067) AM_WRITE(goldnax_b2_fgpage_w) AM_BASE(&goldnax_b2_fgpage)
-	AM_RANGE(0xc46000, 0xc46001) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xc43034, 0xc43035) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xfe0006, 0xfe0007) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xc46000, 0xc46001) AM_WRITENOP
+	AM_RANGE(0xc43034, 0xc43035) AM_WRITENOP
+	AM_RANGE(0xfe0006, 0xfe0007) AM_WRITENOP
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
 

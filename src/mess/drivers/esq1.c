@@ -90,7 +90,7 @@ static MACHINE_RESET( esq1 )
 	es5503_set_base(devtag_get_device(machine, "es5503"), memory_region(machine, "ensoniq"));
 
 	// set default OSROM banking
-	memory_set_bankptr(machine, 1, memory_region(machine, "osrom") );
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "osrom") );
 }
 
 static void recalc_osrom_bank(running_machine *machine)
@@ -98,7 +98,7 @@ static void recalc_osrom_bank(running_machine *machine)
 	int bank = ((uart_outputport >> 1) & 0x7) ^ 7;
 
 //  printf("bank %d => offset %x (PC=%x)\n", bank, bank * 0x1000, cpu_get_pc(machine->cpu[0]));
-	memory_set_bankptr(machine, 1, memory_region(machine, "osrom") + (bank * 0x1000) );
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "osrom") + (bank * 0x1000) );
 }
 
 static READ8_HANDLER( uart_r )
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( esq1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x5fff) AM_RAM					// SEQRAM
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_r, es5503_w)
 	AM_RANGE(0x6400, 0x640f) AM_READWRITE( uart_r, uart_w )
-	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("osrom", 0x8000)	// OS "high" ROM is always mapped here
 ADDRESS_MAP_END
 

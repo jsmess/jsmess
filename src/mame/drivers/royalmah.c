@@ -301,7 +301,7 @@ logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
 	/* bits 6, 4 and 3 used for something input related? */
 
 	address = 0x10000 + (data & 0x07) * 0x8000;
-	memory_set_bankptr(space->machine, 1,&rom[address]);
+	memory_set_bankptr(space->machine, "bank1",&rom[address]);
 }
 
 
@@ -309,7 +309,7 @@ static WRITE8_HANDLER ( mjapinky_bank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	rombank = data;
-	memory_set_bankptr(space->machine, 1,ROM + 0x10000 + 0x8000 * data);
+	memory_set_bankptr(space->machine, "bank1",ROM + 0x10000 + 0x8000 * data);
 }
 
 static WRITE8_HANDLER( mjapinky_palbank_w )
@@ -339,7 +339,7 @@ logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
 
 	address = 0x10000 + data * 0x8000;
 
-	memory_set_bankptr(space->machine, 1,&rom[address]);
+	memory_set_bankptr(space->machine, "bank1",&rom[address]);
 }
 
 
@@ -357,7 +357,7 @@ static WRITE8_HANDLER ( dynax_bank_w )
 
 	address = 0x10000 + data * 0x8000;
 
-	memory_set_bankptr(space->machine, 1,&rom[address]);
+	memory_set_bankptr(space->machine, "bank1",&rom[address]);
 }
 
 static READ8_HANDLER ( daisyari_dsw_r )
@@ -383,7 +383,7 @@ static WRITE8_HANDLER ( daisyari_bank_w )
 	address = 0x10000 + ((data & 0x30)>>4) * 0x10000 + (data & 0x1) * 0x8000;
 //  printf("%08x %02x\n",address,data);
 
-	memory_set_bankptr(space->machine, 1,&rom[address]);
+	memory_set_bankptr(space->machine, "bank1",&rom[address]);
 
 	/* bit 1 used too but unknown purpose. */
 }
@@ -413,27 +413,27 @@ static WRITE8_HANDLER ( mjclub_bank_w )
 	address = 0x10000 + data * 0x8000;
 //  printf("%08x\n",address);
 
-	memory_set_bankptr(space->machine, 1,&rom[address]);
+	memory_set_bankptr(space->machine, "bank1",&rom[address]);
 
 	/* bit 5 used too but unknown purpose. */
 }
 
 
 static ADDRESS_MAP_START( royalmah_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE( 0x0000, 0x6fff ) AM_READWRITE( SMH_ROM, royalmah_rom_w )
+	AM_RANGE( 0x0000, 0x6fff ) AM_ROM AM_WRITE( royalmah_rom_w )
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK(1) )	// banked ROMs not present in royalmah
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE_GENERIC(videoram)
+	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "bank1" )	// banked ROMs not present in royalmah
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_GENERIC(videoram)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mjapinky_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE( 0x0000, 0x6fff ) AM_READWRITE( SMH_ROM, royalmah_rom_w )
+	AM_RANGE( 0x0000, 0x6fff ) AM_ROM AM_WRITE( royalmah_rom_w )
 	AM_RANGE( 0x7000, 0x77ff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x7800, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0x8000 ) AM_READ( mjapinky_dsw_r )
-	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK(1) )
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE_GENERIC(videoram)
+	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "bank1" )
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_GENERIC(videoram)
 ADDRESS_MAP_END
 
 
@@ -563,9 +563,9 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( janho_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE( 0x0000, 0x6fff ) AM_READWRITE( SMH_ROM, royalmah_rom_w )
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE(1) AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE_GENERIC(videoram)
+	AM_RANGE( 0x0000, 0x6fff ) AM_ROM AM_WRITE( royalmah_rom_w )
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("share1") AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_GENERIC(videoram)
 ADDRESS_MAP_END
 
 
@@ -578,7 +578,7 @@ static ADDRESS_MAP_START( janoh_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x6000, 0x607f ) AM_RAM
 	AM_RANGE( 0x7000, 0x7000 ) AM_READNOP
 	AM_RANGE( 0x7200, 0x7200 ) AM_WRITENOP
-	AM_RANGE( 0xf000, 0xffff ) AM_RAM AM_SHARE(1)
+	AM_RANGE( 0xf000, 0xffff ) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( janoh_sub_iomap, ADDRESS_SPACE_IO, 8 )
@@ -687,7 +687,7 @@ static ADDRESS_MAP_START( jansou_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x6800, 0x6800 ) AM_WRITE(jansou_sound_w)
 
 	AM_RANGE( 0x7000, 0x77ff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE_GENERIC(videoram)
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_GENERIC(videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jansou_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -707,10 +707,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( janptr96_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff) AM_ROM
-	AM_RANGE( 0x6000, 0x6fff ) AM_RAMBANK(3)	// nvram
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAMBANK(2)	// banked nvram
-	AM_RANGE( 0x8000, 0xffff ) AM_READ(SMH_BANK(1))
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITE(SMH_RAM) AM_BASE_GENERIC(videoram)
+	AM_RANGE( 0x6000, 0x6fff ) AM_RAMBANK("bank3")	// nvram
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAMBANK("bank2")	// banked nvram
+	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_GENERIC(videoram)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( janptr96_dswsel_w )
@@ -738,12 +738,12 @@ static READ8_HANDLER( janptr96_dsw_r )
 static WRITE8_HANDLER( janptr96_rombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine, 1,ROM + 0x10000 + 0x8000 * data);
+	memory_set_bankptr(space->machine, "bank1",ROM + 0x10000 + 0x8000 * data);
 }
 
 static WRITE8_HANDLER( janptr96_rambank_w )
 {
-	memory_set_bankptr(space->machine, 2,space->machine->generic.nvram.u8 + 0x1000 + 0x1000 * data);
+	memory_set_bankptr(space->machine, "bank2",space->machine->generic.nvram.u8 + 0x1000 + 0x1000 * data);
 }
 
 static READ8_HANDLER( janptr96_unknown_r )
@@ -842,8 +842,8 @@ static ADDRESS_MAP_START( mjifb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(mjifb_rom_io_r, mjifb_rom_io_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE( 0xc000, 0xffff ) AM_READWRITE(SMH_ROM, mjifb_videoram_w)
-//  AM_RANGE( 0xc000, 0xffff ) AM_READWRITE(SMH_ROM, SMH_RAM)  This should, but doesn't work
+	AM_RANGE( 0xc000, 0xffff ) AM_ROM AM_WRITE(mjifb_videoram_w)
+//  AM_RANGE( 0xc000, 0xffff ) AM_ROM AM_WRITEONLY  This should, but doesn't work
 ADDRESS_MAP_END
 
 static READ8_HANDLER( mjifb_p3_r )
@@ -941,7 +941,7 @@ static ADDRESS_MAP_START( mjdejavu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(mjdejavu_rom_io_r, mjdejavu_rom_io_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE( 0xc000, 0xffff ) AM_READWRITE(SMH_ROM, mjifb_videoram_w)
+	AM_RANGE( 0xc000, 0xffff ) AM_ROM AM_WRITE(mjifb_videoram_w)
 ADDRESS_MAP_END
 
 
@@ -956,7 +956,7 @@ static READ8_HANDLER( mjtensin_p3_r )
 
 static void mjtensin_update_rombank(running_machine *machine)
 {
-	memory_set_bankptr(machine,  1, memory_region(machine, "maincpu") + 0x10000 + rombank * 0x8000 );
+	memory_set_bankptr(machine,  "bank1", memory_region(machine, "maincpu") + 0x10000 + rombank * 0x8000 );
 }
 static WRITE8_HANDLER( mjtensin_p4_w )
 {
@@ -981,8 +981,8 @@ static ADDRESS_MAP_START( mjtensin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x6ff1, 0x6ff1 ) AM_WRITE( mjderngr_palbank_w )
 	AM_RANGE( 0x6ff3, 0x6ff3 ) AM_WRITE( mjtensin_6ff3_w )
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK(1) )
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE_GENERIC(videoram)
+	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "bank1" )
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_GENERIC(videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjtensin_iomap, ADDRESS_SPACE_IO, 8 )
@@ -997,7 +997,7 @@ ADDRESS_MAP_END
 
 static void cafetime_update_rombank(running_machine *machine)
 {
-	memory_set_bankptr(machine,  1, memory_region(machine, "maincpu") + 0x10000 + rombank * 0x8000 );
+	memory_set_bankptr(machine,  "bank1", memory_region(machine, "maincpu") + 0x10000 + rombank * 0x8000 );
 }
 static WRITE8_HANDLER( cafetime_p4_w )
 {
@@ -1051,8 +1051,8 @@ static ADDRESS_MAP_START( cafetime_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x7fe3, 0x7fe3 ) AM_WRITE( cafetime_7fe3_w )
 	AM_RANGE( 0x7fe4, 0x7fe4 ) AM_READ( cafetime_7fe4_r )
 	AM_RANGE( 0x7ff0, 0x7fff ) AM_DEVREADWRITE("rtc", msm6242_r, msm6242_w)
-	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK(1) )
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE_GENERIC(videoram)
+	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "bank1" )
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_GENERIC(videoram)
 ADDRESS_MAP_END
 
 
@@ -4609,14 +4609,14 @@ ROM_START( jansoua )
 ROM_END
 
 
-static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x8000 );	}
+static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x8000 );	}
 
 static DRIVER_INIT( janptr96 )
 {
 	machine->generic.nvram_size = 0x1000 * 9;
 	machine->generic.nvram.u8 = auto_alloc_array(machine, UINT8,  machine->generic.nvram_size );
 
-	memory_set_bankptr(machine, 3,machine->generic.nvram.u8);
+	memory_set_bankptr(machine, "bank3",machine->generic.nvram.u8);
 }
 
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, 0,        ROT0,   "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )

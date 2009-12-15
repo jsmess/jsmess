@@ -72,15 +72,19 @@ static void a800_setbank(running_machine *machine, int n)
 			}
 			break;
 	}
-
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0,
-		read_addr ? SMH_BANK(1) : SMH_NOP);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0,
-		write_addr ? SMH_BANK(1) : SMH_NOP);
-	if (read_addr)
-		memory_set_bankptr(machine, 1, read_addr);
-	if (write_addr)
-		memory_set_bankptr(machine, 1, write_addr);
+	
+	if (read_addr) {
+		memory_set_bankptr(machine, "bank1", read_addr);
+		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0,"bank1");
+	} else {
+		memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
+	}
+	if (write_addr) {
+		memory_set_bankptr(machine, "bank1", write_addr);
+		memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0,"bank1");
+	} else {
+		memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
+	}
 }
 
 
@@ -115,11 +119,8 @@ static void ms_atari_machine_start(running_machine *machine, int type, int has_c
 
 	/* install RAM */
 	ram_top = MIN(messram_get_size(devtag_get_device(machine, "messram")), ram_size) - 1;
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
-		0x0000, ram_top, 0, 0, SMH_BANK(2));
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
-		0x0000, ram_top, 0, 0, SMH_BANK(2));
-	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")));
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),0x0000, ram_top, 0, 0, "bank2");
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")));
 
 	/* cartridge */
 	if (has_cart)

@@ -784,14 +784,14 @@ void towns_update_video_banks(const address_space* space)
 //		memory_set_bankptr(space->machine,4,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca000);
 //		memory_set_bankptr(space->machine,5,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca000);
 //		memory_set_bankptr(space->machine,10,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca800);
-		memory_set_bankptr(space->machine,6,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
-		memory_set_bankptr(space->machine,7,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
-		memory_set_bankptr(space->machine,8,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcc000);
+		memory_set_bankptr(space->machine,"bank6",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
+		memory_set_bankptr(space->machine,"bank7",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
+		memory_set_bankptr(space->machine,"bank8",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcc000);
 		if(towns_system_port & 0x02)
-			memory_set_bankptr(space->machine,11,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xf8000);
+			memory_set_bankptr(space->machine,"bank11",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xf8000);
 		else
-			memory_set_bankptr(space->machine,11,ROM+0x238000);
-		memory_set_bankptr(space->machine,12,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xf8000);
+			memory_set_bankptr(space->machine,"bank11",ROM+0x238000);
+		memory_set_bankptr(space->machine,"bank12",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xf8000);
 		return;
 	}
 	else  // enable I/O ports and VRAM
@@ -808,16 +808,16 @@ void towns_update_video_banks(const address_space* space)
 //		memory_set_bankptr(space->machine,5,towns_txtvram+0x2000);
 //		memory_set_bankptr(space->machine,10,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca800);
 		if(towns_ankcg_enable != 0)
-			memory_set_bankptr(space->machine,6,ROM+0x180000+0x3d800);  // ANK CG 8x16
+			memory_set_bankptr(space->machine,"bank6",ROM+0x180000+0x3d800);  // ANK CG 8x16
 		else
-			memory_set_bankptr(space->machine,6,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
-		memory_set_bankptr(space->machine,7,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
-		memory_set_bankptr(space->machine,8,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcc000);
+			memory_set_bankptr(space->machine,"bank6",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
+		memory_set_bankptr(space->machine,"bank7",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
+		memory_set_bankptr(space->machine,"bank8",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcc000);
 		if(towns_system_port & 0x02)
-			memory_set_bankptr(space->machine,11,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xf8000);
+			memory_set_bankptr(space->machine,"bank11",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xf8000);
 		else
-			memory_set_bankptr(space->machine,11,ROM+0x238000);
-		memory_set_bankptr(space->machine,12,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xf8000);
+			memory_set_bankptr(space->machine,"bank11",ROM+0x238000);
+		memory_set_bankptr(space->machine,"bank12",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xf8000);
 		return;
 	}
 }
@@ -1593,14 +1593,14 @@ static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
 //  AM_RANGE(0x000ca000, 0x000ca7ff) AM_READWRITE(SMH_BANK(4),SMH_BANK(5))
 //  AM_RANGE(0x000ca800, 0x000cafff) AM_READWRITE(SMH_BANK(10),SMH_BANK(10))
   AM_RANGE(0x000c8000, 0x000cafff) AM_READWRITE8(towns_spriteram_low_r,towns_spriteram_low_w,0xffffffff)
-  AM_RANGE(0x000cb000, 0x000cbfff) AM_READWRITE(SMH_BANK(6),SMH_BANK(7))
-  AM_RANGE(0x000cc000, 0x000cff7f) AM_READWRITE(SMH_BANK(8),SMH_BANK(8))
+  AM_RANGE(0x000cb000, 0x000cbfff) AM_READ_BANK("bank6") AM_WRITE_BANK("bank7")
+  AM_RANGE(0x000cc000, 0x000cff7f) AM_RAMBANK("bank8")
   AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_r,towns_video_cff80_w,0xffffffff)
   AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
   AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) // CMOS? RAM
   AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
   AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
-  AM_RANGE(0x000f8000, 0x000fffff) AM_READWRITE(SMH_BANK(11),SMH_BANK(12))
+  AM_RANGE(0x000f8000, 0x000fffff) AM_READ_BANK("bank11") AM_WRITE_BANK("bank12")
   AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM - seems to be needed to boot
   AM_RANGE(0x80000000, 0x8003ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x1c0000) // VRAM
   AM_RANGE(0x81000000, 0x8101ffff) AM_RAM  // Sprite RAM
@@ -1617,14 +1617,14 @@ static ADDRESS_MAP_START(marty_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x00000000, 0x000bffff) AM_RAM
   AM_RANGE(0x000c0000, 0x000c7fff) AM_READWRITE8(towns_gfx_r,towns_gfx_w,0xffffffff)
   AM_RANGE(0x000c8000, 0x000cafff) AM_READWRITE8(towns_spriteram_low_r,towns_spriteram_low_w,0xffffffff)
-  AM_RANGE(0x000cb000, 0x000cbfff) AM_READWRITE(SMH_BANK(6),SMH_BANK(7))
-  AM_RANGE(0x000cc000, 0x000cff7f) AM_READWRITE(SMH_BANK(8),SMH_BANK(8))
+  AM_RANGE(0x000cb000, 0x000cbfff) AM_READ_BANK("bank6") AM_WRITE_BANK("bank7")
+  AM_RANGE(0x000cc000, 0x000cff7f) AM_RAMBANK("bank8")
   AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_r,towns_video_cff80_w,0xffffffff)
   AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
   AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) // CMOS? RAM
   AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
   AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
-  AM_RANGE(0x000f8000, 0x000fffff) AM_READWRITE(SMH_BANK(11),SMH_BANK(12))
+  AM_RANGE(0x000f8000, 0x000fffff) AM_READ_BANK("bank11") AM_WRITE_BANK("bank12")
   AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM - seems to be needed to boot
   AM_RANGE(0x00600000, 0x0067ffff) AM_ROM AM_REGION("user",0x000000)  // OS
   AM_RANGE(0x00680000, 0x0087ffff) AM_ROM AM_REGION("user",0x280000)  // EX ROM

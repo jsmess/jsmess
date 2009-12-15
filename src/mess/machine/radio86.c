@@ -32,8 +32,8 @@ DRIVER_INIT(radio86)
 	/* set initialy ROM to be visible on first bank */
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memset(RAM,0x0000,0x1000); // make frist page empty by default
-  	memory_configure_bank(machine, 1, 1, 2, RAM, 0x0000);
-	memory_configure_bank(machine, 1, 0, 2, RAM, 0xf800);
+  	memory_configure_bank(machine, "bank1", 1, 2, RAM, 0x0000);
+	memory_configure_bank(machine, "bank1", 0, 2, RAM, 0xf800);
 	radio86_init_keyboard();
 }
 
@@ -152,7 +152,7 @@ I8257_INTERFACE( radio86_dma )
 
 static TIMER_CALLBACK( radio86_reset )
 {
-	memory_set_bank(machine, 1, 0);
+	memory_set_bank(machine, "bank1", 0);
 }
 
 static UINT8 romdisk_lsb,romdisk_msb, disk_sel;
@@ -175,7 +175,7 @@ WRITE8_HANDLER(radio_io_w )
 MACHINE_RESET( radio86 )
 {
 	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, radio86_reset);
-	memory_set_bank(machine, 1, 1);
+	memory_set_bank(machine, "bank1", 1);
 
 	radio86_keyboard_mask = 0;
 	disk_sel = 0;

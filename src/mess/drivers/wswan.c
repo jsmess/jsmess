@@ -45,39 +45,39 @@ static ADDRESS_MAP_START (wswan_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00000, 0x03fff) AM_RAM		/* 16kb RAM / 4 colour tiles */
 	AM_RANGE(0x04000, 0x0ffff) AM_NOP		/* nothing */
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE( wswan_sram_r, wswan_sram_w )	/* SRAM bank */
-	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK(2)	/* ROM bank 1 */
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK(3)	/* ROM bank 2 */
-	AM_RANGE(0x40000, 0x4ffff) AM_ROMBANK(4)	/* ROM bank 3 */
-	AM_RANGE(0x50000, 0x5ffff) AM_ROMBANK(5)	/* ROM bank 4 */
-	AM_RANGE(0x60000, 0x6ffff) AM_ROMBANK(6)	/* ROM bank 5 */
-	AM_RANGE(0x70000, 0x7ffff) AM_ROMBANK(7)	/* ROM bank 6 */
-	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK(8)	/* ROM bank 7 */
-	AM_RANGE(0x90000, 0x9ffff) AM_ROMBANK(9)	/* ROM bank 8 */
-	AM_RANGE(0xA0000, 0xAffff) AM_ROMBANK(10)	/* ROM bank 9 */
-	AM_RANGE(0xB0000, 0xBffff) AM_ROMBANK(11)	/* ROM bank 10 */
-	AM_RANGE(0xC0000, 0xCffff) AM_ROMBANK(12)	/* ROM bank 11 */
-	AM_RANGE(0xD0000, 0xDffff) AM_ROMBANK(13)	/* ROM bank 12 */
-	AM_RANGE(0xE0000, 0xEffff) AM_ROMBANK(14)	/* ROM bank 13 */
-	AM_RANGE(0xF0000, 0xFffff) AM_ROMBANK(15)	/* ROM bank 14 */
+	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("bank2")	/* ROM bank 1 */
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("bank3")	/* ROM bank 2 */
+	AM_RANGE(0x40000, 0x4ffff) AM_ROMBANK("bank4")	/* ROM bank 3 */
+	AM_RANGE(0x50000, 0x5ffff) AM_ROMBANK("bank5")	/* ROM bank 4 */
+	AM_RANGE(0x60000, 0x6ffff) AM_ROMBANK("bank6")	/* ROM bank 5 */
+	AM_RANGE(0x70000, 0x7ffff) AM_ROMBANK("bank7")	/* ROM bank 6 */
+	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK("bank8")	/* ROM bank 7 */
+	AM_RANGE(0x90000, 0x9ffff) AM_ROMBANK("bank9")	/* ROM bank 8 */
+	AM_RANGE(0xA0000, 0xAffff) AM_ROMBANK("bank10")	/* ROM bank 9 */
+	AM_RANGE(0xB0000, 0xBffff) AM_ROMBANK("bank11")	/* ROM bank 10 */
+	AM_RANGE(0xC0000, 0xCffff) AM_ROMBANK("bank12")	/* ROM bank 11 */
+	AM_RANGE(0xD0000, 0xDffff) AM_ROMBANK("bank13")	/* ROM bank 12 */
+	AM_RANGE(0xE0000, 0xEffff) AM_ROMBANK("bank14")	/* ROM bank 13 */
+	AM_RANGE(0xF0000, 0xFffff) AM_ROMBANK("bank15")	/* ROM bank 14 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (wscolor_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM		/* 16kb RAM / 4 colour tiles, 16 colour tiles + palettes */
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE( wswan_sram_r, wswan_sram_w )	/* SRAM bank */
-	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK(2)	/* ROM bank 1 */
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK(3)	/* ROM bank 2 */
-	AM_RANGE(0x40000, 0x4ffff) AM_ROMBANK(4)	/* ROM bank 3 */
-	AM_RANGE(0x50000, 0x5ffff) AM_ROMBANK(5)	/* ROM bank 4 */
-	AM_RANGE(0x60000, 0x6ffff) AM_ROMBANK(6)	/* ROM bank 5 */
-	AM_RANGE(0x70000, 0x7ffff) AM_ROMBANK(7)	/* ROM bank 6 */
-	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK(8)	/* ROM bank 7 */
-	AM_RANGE(0x90000, 0x9ffff) AM_ROMBANK(9)	/* ROM bank 8 */
-	AM_RANGE(0xA0000, 0xAffff) AM_ROMBANK(10)	/* ROM bank 9 */
-	AM_RANGE(0xB0000, 0xBffff) AM_ROMBANK(11)	/* ROM bank 10 */
-	AM_RANGE(0xC0000, 0xCffff) AM_ROMBANK(12)	/* ROM bank 11 */
-	AM_RANGE(0xD0000, 0xDffff) AM_ROMBANK(13)	/* ROM bank 12 */
-	AM_RANGE(0xE0000, 0xEffff) AM_ROMBANK(14)	/* ROM bank 13 */
-	AM_RANGE(0xF0000, 0xFffff) AM_ROMBANK(15)	/* ROM bank 14 */
+	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("2")	/* ROM bank 1 */
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("3")	/* ROM bank 2 */
+	AM_RANGE(0x40000, 0x4ffff) AM_ROMBANK("4")	/* ROM bank 3 */
+	AM_RANGE(0x50000, 0x5ffff) AM_ROMBANK("5")	/* ROM bank 4 */
+	AM_RANGE(0x60000, 0x6ffff) AM_ROMBANK("6")	/* ROM bank 5 */
+	AM_RANGE(0x70000, 0x7ffff) AM_ROMBANK("7")	/* ROM bank 6 */
+	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK("8")	/* ROM bank 7 */
+	AM_RANGE(0x90000, 0x9ffff) AM_ROMBANK("9")	/* ROM bank 8 */
+	AM_RANGE(0xA0000, 0xAffff) AM_ROMBANK("10")	/* ROM bank 9 */
+	AM_RANGE(0xB0000, 0xBffff) AM_ROMBANK("11")	/* ROM bank 10 */
+	AM_RANGE(0xC0000, 0xCffff) AM_ROMBANK("12")	/* ROM bank 11 */
+	AM_RANGE(0xD0000, 0xDffff) AM_ROMBANK("13")	/* ROM bank 12 */
+	AM_RANGE(0xE0000, 0xEffff) AM_ROMBANK("14")	/* ROM bank 13 */
+	AM_RANGE(0xF0000, 0xFffff) AM_ROMBANK("15")	/* ROM bank 14 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (wswan_io, ADDRESS_SPACE_IO, 8)

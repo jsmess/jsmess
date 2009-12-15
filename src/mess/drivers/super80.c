@@ -36,21 +36,21 @@ UINT8 *super80_pcgram;
 static READ8_HANDLER( super80_read_ff ) { return 0xff; }
 
 static ADDRESS_MAP_START( super80_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1) AM_REGION("maincpu", 0x0000)
+	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1") AM_REGION("maincpu", 0x0000)
 	AM_RANGE(0x4000, 0xbfff) AM_RAM AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0xc000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(super80_read_ff, SMH_NOP)
+	AM_RANGE(0xf000, 0xffff) AM_READ(super80_read_ff) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( super80m_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1) AM_REGION("maincpu", 0x0000)
+	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1") AM_REGION("maincpu", 0x0000)
 	AM_RANGE(0x4000, 0xbfff) AM_RAM AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0xc000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION("maincpu", 0xf000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( super80v_map, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1)
+	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(super80v_low_r, super80v_low_w) AM_BASE(&super80_pcgram)

@@ -99,7 +99,7 @@ static const centronics_interface amiga_centronics_config =
 
 static ADDRESS_MAP_START(amiga_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x80000) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram) AM_SIZE(&amiga_chip_ram_size)
+	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x80000) AM_RAMBANK("bank1") AM_BASE(&amiga_chip_ram) AM_SIZE(&amiga_chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM /* slow-mem */
 	AM_RANGE(0xc80000, 0xcfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w)	/* see Note 1 above */
@@ -153,7 +153,7 @@ ADDRESS_MAP_END
  */
 
 static ADDRESS_MAP_START(cdtv_mem, ADDRESS_SPACE_PROGRAM, 16)
-	AM_RANGE(0x000000, 0x0fffff) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram) AM_SIZE(&amiga_chip_ram_size)
+	AM_RANGE(0x000000, 0x0fffff) AM_RAMBANK("bank1") AM_BASE(&amiga_chip_ram) AM_SIZE(&amiga_chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xdc0000, 0xdc003f) AM_READWRITE(amiga_clock_r, amiga_clock_w)
 	AM_RANGE(0xdc8000, 0xdc87ff) AM_RAM AM_BASE_GENERIC(nvram)
@@ -181,13 +181,13 @@ static ADDRESS_MAP_START(cdtv_rcmcu_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(a1000_mem, ADDRESS_SPACE_PROGRAM, 16)
-	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0xc0000) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram) AM_SIZE(&amiga_chip_ram_size)
+	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0xc0000) AM_RAMBANK("bank1") AM_BASE(&amiga_chip_ram) AM_SIZE(&amiga_chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) /* See Note 1 above */
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)	/* Custom Chips */
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xf80000, 0xfbffff) AM_ROM AM_REGION("user1", 0)	/* Bootstrap ROM */
-	AM_RANGE(0xfc0000, 0xffffff) AM_RAMBANK(2)	/* Writable Control Store RAM */
+	AM_RANGE(0xfc0000, 0xffffff) AM_RAMBANK("bank2")	/* Writable Control Store RAM */
 ADDRESS_MAP_END
 
 
@@ -501,7 +501,7 @@ static READ8_DEVICE_HANDLER( amiga_cia_0_cdtv_portA_r )
 static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 {
 	/* switch banks as appropriate */
-	memory_set_bank(device->machine, 1, data & 1);
+	memory_set_bank(device->machine, "bank1", data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0) {
@@ -512,7 +512,7 @@ static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 		}
 
 		/* overlay disabled, map RAM on 0x000000 */
-		memory_install_write16_handler(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, amiga_chip_ram_size - 1, 0, mirror_mask, SMH_BANK(1));
+		memory_install_write_bank(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, amiga_chip_ram_size - 1, 0, mirror_mask, "bank1");
 
 		/* if there is a cart region, check for cart overlay */
 		if (memory_region(device->machine, "user2") != NULL)
@@ -520,7 +520,7 @@ static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 	}
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_install_write16_handler(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, amiga_chip_ram_size - 1, 0, 0, SMH_UNMAP);
+		memory_unmap_write(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, amiga_chip_ram_size - 1, 0, 0);
 
 	set_led_status( device->machine, 0, ( data & 2 ) ? 0 : 1 ); /* bit 2 = Power Led on Amiga */
 	output_set_value("power_led", ( data & 2 ) ? 0 : 1);
@@ -578,7 +578,7 @@ static void amiga_reset(running_machine *machine)
 	else
 	{
 		/* No RTC support */
-		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xdc0000, 0xdc003f, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_unmap_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xdc0000, 0xdc003f, 0, 0);
 	}
 }
 
@@ -600,8 +600,8 @@ static DRIVER_INIT( amiga )
 	amiga_machine_config(machine, &amiga_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, 1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, amiga_chip_ram, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user1"), 0);
 
 	/* initialize cartridge (if present) */
 	amiga_cart_init(machine);
@@ -662,8 +662,8 @@ static DRIVER_INIT( cdtv )
 	amiga_machine_config(machine, &amiga_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, 1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, amiga_chip_ram, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user1"), 0);
 
 	/* initialize keyboard - in cdtv we can use a standard Amiga keyboard*/
 	amigakbd_init(machine);

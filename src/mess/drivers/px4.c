@@ -441,23 +441,25 @@ static void install_rom_capsule(const address_space *space, int size, const char
 	px4_state *px4 = space->machine->driver_data;
 
 	/* ram, part 1 */
-	memory_install_readwrite8_handler(space, 0x0000, 0xdfff - size, 0, 0, SMH_BANK(1), SMH_BANK(1));
-	memory_set_bankptr(space->machine, 1, messram_get_ptr(px4->ram));
+	memory_install_readwrite_bank(space, 0x0000, 0xdfff - size, 0, 0, "bank1");
+	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(px4->ram));
 
 	/* actual rom data, part 1 */
-	memory_install_readwrite8_handler(space, 0xe000 - size, 0xffff - size, 0, 0, SMH_BANK(2), SMH_NOP);
-	memory_set_bankptr(space->machine, 2, memory_region(space->machine, region) + (size - 0x2000));
+	memory_install_read_bank(space, 0xe000 - size, 0xffff - size, 0, 0, "bank2");
+	memory_nop_write(space, 0xe000 - size, 0xffff - size, 0, 0);
+	memory_set_bankptr(space->machine, "bank2", memory_region(space->machine, region) + (size - 0x2000));
 
 	/* rom data, part 2 */
 	if (size != 0x2000)
 	{
-		memory_install_readwrite8_handler(space, 0x10000 - size, 0xdfff, 0, 0, SMH_BANK(3), SMH_NOP);
-		memory_set_bankptr(space->machine, 3, memory_region(space->machine, region));
+		memory_install_read_bank(space, 0x10000 - size, 0xdfff, 0, 0, "bank3");
+		memory_nop_write(space, 0x10000 - size, 0xdfff, 0, 0);
+		memory_set_bankptr(space->machine, "bank3", memory_region(space->machine, region));
 	}
 
 	/* ram, continued */
-	memory_install_readwrite8_handler(space, 0xe000, 0xffff, 0, 0, SMH_BANK(4), SMH_BANK(4));
-	memory_set_bankptr(space->machine, 4, messram_get_ptr(px4->ram) + 0xe000);
+	memory_install_readwrite_bank(space, 0xe000, 0xffff, 0, 0, "bank4");
+	memory_set_bankptr(space->machine, "bank4", messram_get_ptr(px4->ram) + 0xe000);
 }
 
 /* bank register */
@@ -475,16 +477,17 @@ static WRITE8_HANDLER( px4_bankr_w )
 	{
 	case 0x00:
 		/* system bank */
-		memory_install_readwrite8_handler(space_program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_NOP);
-		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "os"));
-		memory_install_readwrite8_handler(space_program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
-		memory_set_bankptr(space->machine, 2, messram_get_ptr(px4->ram) + 0x8000);
+		memory_install_read_bank(space_program, 0x0000, 0x7fff, 0, 0, "bank1");
+		memory_nop_write(space_program, 0x0000, 0x7fff, 0, 0);
+		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "os"));
+		memory_install_readwrite_bank(space_program, 0x8000, 0xffff, 0, 0, "bank2");
+		memory_set_bankptr(space->machine, "bank2", messram_get_ptr(px4->ram) + 0x8000);
 		break;
 
 	case 0x04:
 		/* memory */
-		memory_install_readwrite8_handler(space_program, 0x0000, 0xffff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_set_bankptr(space->machine, 1, messram_get_ptr(px4->ram));
+		memory_install_readwrite_bank(space_program, 0x0000, 0xffff, 0, 0, "bank1");
+		memory_set_bankptr(space->machine, "bank2", messram_get_ptr(px4->ram));
 		break;
 
 	case 0x08: install_rom_capsule(space_program, 0x2000, "capsule1"); break;
@@ -1011,8 +1014,8 @@ static DRIVER_INIT( px4 )
 	px4->rs232c_device = NULL;
 
 	/* map os rom and last half of memory */
-	memory_set_bankptr(machine, 1, memory_region(machine, "os"));
-	memory_set_bankptr(machine, 2, messram_get_ptr(px4->ram) + 0x8000);
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "os"));
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(px4->ram) + 0x8000);
 }
 
 static DRIVER_INIT( px4p )
@@ -1038,8 +1041,8 @@ static MACHINE_RESET( px4 )
 ***************************************************************************/
 
 static ADDRESS_MAP_START( px4_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK(1)
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK(2)
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( px4_io, ADDRESS_SPACE_IO, 8 )

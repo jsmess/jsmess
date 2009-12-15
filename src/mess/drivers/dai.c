@@ -74,9 +74,9 @@ ADDRESS_MAP_END
 
 /* memory w/r functions */
 static ADDRESS_MAP_START( dai_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0xbfff) AM_RAMBANK(1)
+	AM_RANGE( 0x0000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE( 0xc000, 0xdfff) AM_ROM
-	AM_RANGE( 0xe000, 0xefff) AM_ROMBANK(2)
+	AM_RANGE( 0xe000, 0xefff) AM_ROMBANK("bank2")
 	AM_RANGE( 0xf000, 0xf7ff) AM_WRITE( dai_stack_interrupt_circuit_w )
 	AM_RANGE( 0xf800, 0xf8ff) AM_RAM
 	AM_RANGE( 0xfb00, 0xfbff) AM_READWRITE( dai_amd9511_r, dai_amd9511_w )

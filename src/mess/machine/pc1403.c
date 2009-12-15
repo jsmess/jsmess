@@ -34,7 +34,7 @@ WRITE8_HANDLER(pc1403_asic_write)
 	logerror ("asic write %.4x %.2x\n",offset, data);
 	break;
     case 2/*0x3c00*/:
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "user1")+((data&7)<<14));
+	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "user1")+((data&7)<<14));
 	logerror ("asic write %.4x %.2x\n",offset, data);
 	break;
     case 3/*0x3e00*/: break;
@@ -179,5 +179,5 @@ DRIVER_INIT( pc1403 )
 
 	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1403_power_up);
 
-	memory_set_bankptr(machine, 1, memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));
 }

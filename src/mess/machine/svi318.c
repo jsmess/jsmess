@@ -789,20 +789,20 @@ static void svi318_set_banks(running_machine *machine)
 		}
 	}
 
-	memory_set_bankptr(machine, 1, svi.bankLow_ptr );
-	memory_set_bankptr(machine, 2, svi.bankHigh1_ptr );
-	memory_set_bankptr(machine, 3, svi.bankHigh2_ptr );
+	memory_set_bankptr(machine, "bank1", svi.bankLow_ptr );
+	memory_set_bankptr(machine, "bank2", svi.bankHigh1_ptr );
+	memory_set_bankptr(machine, "bank3", svi.bankHigh2_ptr );
 
 	/* SVI-806 80 column card specific banking */
 	if ( svi.svi806_present )
 	{
 		if ( svi.svi806_ram_enabled )
 		{
-			memory_set_bankptr(machine, 4, svi.svi806_ram );
+			memory_set_bankptr(machine, "bank4", svi.svi806_ram );
 		}
 		else
 		{
-			memory_set_bankptr(machine, 4, svi.bankHigh2_ptr + 0x3000 );
+			memory_set_bankptr(machine, "bank4", svi.bankHigh2_ptr + 0x3000 );
 		}
 	}
 }

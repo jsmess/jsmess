@@ -240,9 +240,9 @@ static ADDRESS_MAP_START( roundup5_v30_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x08000, 0x0bfff) AM_RAM_WRITE(roundup5_text_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x0c000, 0x0c003) AM_WRITE(roundup5_crt_w)
 	AM_RANGE(0x0d000, 0x0d001) AM_READ_PORT("DSW")
-	AM_RANGE(0x0d400, 0x0d40f) AM_WRITE(SMH_RAM) AM_BASE(&roundup5_unknown0)
-	AM_RANGE(0x0d800, 0x0d801) AM_WRITE(SMH_RAM) AM_BASE(&roundup5_unknown1) // VRAM2 X scroll (todo)
-	AM_RANGE(0x0dc00, 0x0dc01) AM_WRITE(SMH_RAM) AM_BASE(&roundup5_unknown2) // VRAM2 Y scroll (todo)
+	AM_RANGE(0x0d400, 0x0d40f) AM_WRITEONLY AM_BASE(&roundup5_unknown0)
+	AM_RANGE(0x0d800, 0x0d801) AM_WRITEONLY AM_BASE(&roundup5_unknown1) // VRAM2 X scroll (todo)
+	AM_RANGE(0x0dc00, 0x0dc01) AM_WRITEONLY AM_BASE(&roundup5_unknown2) // VRAM2 Y scroll (todo)
 	AM_RANGE(0x0e000, 0x0e001) AM_WRITE(roundup5_control_w)
 	AM_RANGE(0x0f000, 0x0ffff) AM_RAM_WRITE(roundup5_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(roundup_v30_z80_r, roundup_v30_z80_w)
@@ -295,8 +295,8 @@ static ADDRESS_MAP_START( cyclwarr_68000a_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w) AM_BASE(&tatsumi_sprite_control_ram)
 	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x140000, 0x1bffff) AM_ROMBANK(2) /* CPU B ROM */
-	AM_RANGE(0x2c0000, 0x33ffff) AM_ROMBANK(1) /* CPU A ROM */
+	AM_RANGE(0x140000, 0x1bffff) AM_ROMBANK("bank2") /* CPU B ROM */
+	AM_RANGE(0x2c0000, 0x33ffff) AM_ROMBANK("bank1") /* CPU A ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cyclwarr_68000b_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -316,8 +316,8 @@ static ADDRESS_MAP_START( cyclwarr_68000b_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w)
 	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w)
-	AM_RANGE(0x140000, 0x1bffff) AM_ROMBANK(2) /* CPU B ROM */
-	AM_RANGE(0x2c0000, 0x33ffff) AM_ROMBANK(1) /* CPU A ROM */
+	AM_RANGE(0x140000, 0x1bffff) AM_ROMBANK("bank2") /* CPU B ROM */
+	AM_RANGE(0x2c0000, 0x33ffff) AM_ROMBANK("bank1") /* CPU A ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cyclwarr_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -351,8 +351,8 @@ static ADDRESS_MAP_START( bigfight_68000a_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w) AM_BASE(&tatsumi_sprite_control_ram)
 	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x100000, 0x17ffff) AM_ROMBANK(2) /* CPU A ROM */
-	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK(1) /* CPU B ROM */
+	AM_RANGE(0x100000, 0x17ffff) AM_ROMBANK("bank2") /* CPU A ROM */
+	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK("bank1") /* CPU B ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigfight_68000b_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -370,8 +370,8 @@ static ADDRESS_MAP_START( bigfight_68000b_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w)
 	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w)
-	AM_RANGE(0x100000, 0x17ffff) AM_ROMBANK(2) /* CPU A ROM */
-	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK(1) /* CPU B ROM */
+	AM_RANGE(0x100000, 0x17ffff) AM_ROMBANK("bank2") /* CPU A ROM */
+	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK("bank1") /* CPU B ROM */
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -1347,11 +1347,11 @@ static DRIVER_INIT( cyclwarr )
 
 	dst = memory_region(machine, "maincpu");
 	memcpy(cyclwarr_cpua_ram,dst,8);
-	memory_set_bankptr(machine, 1, dst);
+	memory_set_bankptr(machine, "bank1", dst);
 
 	dst = memory_region(machine, "sub");
 	memcpy(cyclwarr_cpub_ram,dst,8);
-	memory_set_bankptr(machine, 2, dst);
+	memory_set_bankptr(machine, "bank2", dst);
 
 	// Copy sprite & palette data out of GFX rom area
 	tatsumi_rom_sprite_lookup1 = memory_region(machine, "gfx2");

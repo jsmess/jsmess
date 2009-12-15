@@ -689,8 +689,8 @@ WRITE8_HANDLER( sms_mapper_w )
 				LOG(("ram 0 paged.\n"));
 				SOURCE = sms_state.cartridge[sms_state.current_cartridge].cartSRAM;
 			}
-			memory_set_bankptr(space->machine,  4, SOURCE);
-			memory_set_bankptr(space->machine,  5, SOURCE + 0x2000);
+			memory_set_bankptr(space->machine,  "bank4", SOURCE);
+			memory_set_bankptr(space->machine,  "bank5", SOURCE + 0x2000);
 		}
 		else /* it's rom */
 		{
@@ -705,8 +705,8 @@ WRITE8_HANDLER( sms_mapper_w )
 				SOURCE = sms_state.banking_bios[4];
 			}
 			LOG(("rom 2 paged in %x.\n", page));
-			memory_set_bankptr(space->machine,  4, SOURCE);
-			memory_set_bankptr(space->machine,  5, SOURCE + 0x2000);
+			memory_set_bankptr(space->machine,  "bank4", SOURCE);
+			memory_set_bankptr(space->machine,  "bank5", SOURCE + 0x2000);
 		}
 		break;
 
@@ -717,7 +717,7 @@ WRITE8_HANDLER( sms_mapper_w )
 		if (sms_state.is_gamegear)
 			SOURCE = SOURCE_CART;
 
-		memory_set_bankptr(space->machine,  2, SOURCE + 0x0400);
+		memory_set_bankptr(space->machine,  "bank2", SOURCE + 0x0400);
 		break;
 
 	case 2: /* Select 16k ROM bank for 4000-7FFF */
@@ -727,7 +727,7 @@ WRITE8_HANDLER( sms_mapper_w )
 		if (sms_state.is_gamegear)
 			SOURCE = SOURCE_CART;
 
-		memory_set_bankptr(space->machine,  3, SOURCE);
+		memory_set_bankptr(space->machine,  "bank3", SOURCE);
 		break;
 
 	case 3: /* Select 16k ROM bank for 8000-BFFF */
@@ -750,8 +750,8 @@ WRITE8_HANDLER( sms_mapper_w )
 		if (!(sms_state.mapper[0] & 0x08)) /* is RAM disabled? */
 		{
 			LOG(("rom 2 paged in %x.\n", page));
-			memory_set_bankptr(space->machine,  4, SOURCE);
-			memory_set_bankptr(space->machine,  5, SOURCE + 0x2000);
+			memory_set_bankptr(space->machine,  "bank4", SOURCE);
+			memory_set_bankptr(space->machine,  "bank5", SOURCE + 0x2000);
 		}
 		break;
 	}
@@ -765,8 +765,8 @@ static WRITE8_HANDLER( sms_codemasters_page0_w )
 		UINT8 rom_page_count = sms_state.cartridge[sms_state.current_cartridge].size / 0x4000;
 		sms_state.banking_cart[1] = sms_state.cartridge[sms_state.current_cartridge].ROM + ((rom_page_count > 0) ? data % rom_page_count : 0) * 0x4000;
 		sms_state.banking_cart[2] = sms_state.banking_cart[1] + 0x0400;
-		memory_set_bankptr(space->machine, 1, sms_state.banking_cart[1]);
-		memory_set_bankptr(space->machine, 2, sms_state.banking_cart[2]);
+		memory_set_bankptr(space->machine, "bank1", sms_state.banking_cart[1]);
+		memory_set_bankptr(space->machine, "bank2", sms_state.banking_cart[2]);
 	}
 }
 
@@ -779,14 +779,14 @@ static WRITE8_HANDLER( sms_codemasters_page1_w )
 		if (data & 0x80)
 		{
 			sms_state.cartridge[sms_state.current_cartridge].ram_page = data & 0x07;
-			memory_set_bankptr(space->machine, 5, sms_state.cartridge[sms_state.current_cartridge].cartRAM + sms_state.cartridge[sms_state.current_cartridge].ram_page * 0x2000);
+			memory_set_bankptr(space->machine, "bank5", sms_state.cartridge[sms_state.current_cartridge].cartRAM + sms_state.cartridge[sms_state.current_cartridge].ram_page * 0x2000);
 		}
 		else
 		{
 			UINT8 rom_page_count = sms_state.cartridge[sms_state.current_cartridge].size / 0x4000;
 			sms_state.banking_cart[3] = sms_state.cartridge[sms_state.current_cartridge].ROM + ((rom_page_count > 0) ? data % rom_page_count : 0) * 0x4000;
-			memory_set_bankptr(space->machine, 3, sms_state.banking_cart[3]);
-			memory_set_bankptr(space->machine, 5, sms_state.banking_cart[4] + 0x2000);
+			memory_set_bankptr(space->machine, "bank3", sms_state.banking_cart[3]);
+			memory_set_bankptr(space->machine, "bank5", sms_state.banking_cart[4] + 0x2000);
 		}
 	}
 }
@@ -829,8 +829,8 @@ WRITE8_HANDLER( sms_cartram2_w )
 			return;
 
 		sms_state.banking_cart[4] = sms_state.cartridge[sms_state.current_cartridge].ROM + page * 0x4000;
-		memory_set_bankptr(space->machine, 4, sms_state.banking_cart[4]);
-		memory_set_bankptr(space->machine, 5, sms_state.banking_cart[4] + 0x2000);
+		memory_set_bankptr(space->machine, "bank4", sms_state.banking_cart[4]);
+		memory_set_bankptr(space->machine, "bank5", sms_state.banking_cart[4] + 0x2000);
 		LOG(("rom 2 paged in %x dodgeball king.\n", page));
 	}
 }
@@ -861,8 +861,8 @@ WRITE8_HANDLER( sms_cartram_w )
 			if (!sms_state.cartridge[sms_state.current_cartridge].ROM)
 				return;
 			sms_state.banking_cart[4] = sms_state.cartridge[sms_state.current_cartridge].ROM + page * 0x4000;
-			memory_set_bankptr(space->machine, 4, sms_state.banking_cart[4]);
-			memory_set_bankptr(space->machine, 5, sms_state.banking_cart[4] + 0x2000);
+			memory_set_bankptr(space->machine, "bank4", sms_state.banking_cart[4]);
+			memory_set_bankptr(space->machine, "bank5", sms_state.banking_cart[4] + 0x2000);
 			LOG(("rom 2 paged in %x codemasters.\n", page));
 		}
 		else if (sms_state.cartridge[sms_state.current_cartridge].features & CF_ONCART_RAM)
@@ -940,11 +940,11 @@ static void setup_rom( const address_space *space )
 	running_machine *machine = space->machine;
 
 	/* 1. set up bank pointers to point to nothing */
-	memory_set_bankptr(machine, 1, sms_state.banking_none[1]);
-	memory_set_bankptr(machine, 2, sms_state.banking_none[2]);
-	memory_set_bankptr(machine, 3, sms_state.banking_none[3]);
-	memory_set_bankptr(machine, 4, sms_state.banking_none[4]);
-	memory_set_bankptr(machine, 5, sms_state.banking_none[4] + 0x2000);
+	memory_set_bankptr(machine, "bank1", sms_state.banking_none[1]);
+	memory_set_bankptr(machine, "bank2", sms_state.banking_none[2]);
+	memory_set_bankptr(machine, "bank3", sms_state.banking_none[3]);
+	memory_set_bankptr(machine, "bank4", sms_state.banking_none[4]);
+	memory_set_bankptr(machine, "bank5", sms_state.banking_none[4] + 0x2000);
 
 	/* 2. check and set up expansion port */
 	if (!(sms_state.bios_port & IO_EXPANSION) && (sms_state.bios_port & IO_CARTRIDGE) && (sms_state.bios_port & IO_CARD))
@@ -965,11 +965,11 @@ static void setup_rom( const address_space *space )
 	/* Out Run Europa initially writes a value to port 3E where IO_CARTRIDGE, IO_EXPANSION and IO_CARD are reset */
 	if ((!(sms_state.bios_port & IO_CARTRIDGE)) || sms_state.is_gamegear)
 	{
-		memory_set_bankptr(machine, 1, sms_state.banking_cart[1]);
-		memory_set_bankptr(machine, 2, sms_state.banking_cart[2]);
-		memory_set_bankptr(machine, 3, sms_state.banking_cart[3]);
-		memory_set_bankptr(machine, 4, sms_state.banking_cart[4]);
-		memory_set_bankptr(machine, 5, sms_state.banking_cart[4] + 0x2000);
+		memory_set_bankptr(machine, "bank1", sms_state.banking_cart[1]);
+		memory_set_bankptr(machine, "bank2", sms_state.banking_cart[2]);
+		memory_set_bankptr(machine, "bank3", sms_state.banking_cart[3]);
+		memory_set_bankptr(machine, "bank4", sms_state.banking_cart[4]);
+		memory_set_bankptr(machine, "bank5", sms_state.banking_cart[4] + 0x2000);
 		logerror("Switched in cartridge rom.\n");
 	}
 
@@ -979,31 +979,31 @@ static void setup_rom( const address_space *space )
 		/* 0x0400 bioses */
 		if (sms_state.has_bios_0400)
 		{
-			memory_set_bankptr(machine, 1, sms_state.banking_bios[1]);
+			memory_set_bankptr(machine, "bank1", sms_state.banking_bios[1]);
 			logerror("Switched in 0x0400 bios.\n");
 		}
 		/* 0x2000 bioses */
 		if (sms_state.has_bios_2000)
 		{
-			memory_set_bankptr(machine, 1, sms_state.banking_bios[1]);
-			memory_set_bankptr(machine, 2, sms_state.banking_bios[2]);
+			memory_set_bankptr(machine, "bank1", sms_state.banking_bios[1]);
+			memory_set_bankptr(machine, "bank2", sms_state.banking_bios[2]);
 			logerror("Switched in 0x2000 bios.\n");
 		}
 		if (sms_state.has_bios_full)
 		{
-			memory_set_bankptr(machine, 1, sms_state.banking_bios[1]);
-			memory_set_bankptr(machine, 2, sms_state.banking_bios[2]);
-			memory_set_bankptr(machine, 3, sms_state.banking_bios[3]);
-			memory_set_bankptr(machine, 4, sms_state.banking_bios[4]);
-			memory_set_bankptr(machine, 5, sms_state.banking_bios[4] + 0x2000);
+			memory_set_bankptr(machine, "bank1", sms_state.banking_bios[1]);
+			memory_set_bankptr(machine, "bank2", sms_state.banking_bios[2]);
+			memory_set_bankptr(machine, "bank3", sms_state.banking_bios[3]);
+			memory_set_bankptr(machine, "bank4", sms_state.banking_bios[4]);
+			memory_set_bankptr(machine, "bank5", sms_state.banking_bios[4] + 0x2000);
 			logerror("Switched in full bios.\n");
 		}
 	}
 
 	if (sms_state.cartridge[sms_state.current_cartridge].features & CF_ONCART_RAM)
 	{
-		memory_set_bankptr(machine, 4, sms_state.cartridge[sms_state.current_cartridge].cartRAM);
-		memory_set_bankptr(machine, 5, sms_state.cartridge[sms_state.current_cartridge].cartRAM);
+		memory_set_bankptr(machine, "bank4", sms_state.cartridge[sms_state.current_cartridge].cartRAM);
+		memory_set_bankptr(machine, "bank5", sms_state.cartridge[sms_state.current_cartridge].cartRAM);
 	}
 }
 
@@ -1334,7 +1334,8 @@ DEVICE_IMAGE_LOAD( sms_cart )
 		const address_space *program = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		memory_install_write8_handler(program, 0x6000, 0x6000, 0, 0, &sms_tvdraw_axis_w);
 		memory_install_read8_handler(program, 0x8000, 0x8000, 0, 0, &sms_tvdraw_status_r);
-		memory_install_readwrite8_handler(program, 0xa000, 0xa000, 0, 0, &sms_tvdraw_data_r, SMH_NOP);
+		memory_install_read8_handler(program, 0xa000, 0xa000, 0, 0, &sms_tvdraw_data_r);
+		memory_nop_write(program, 0xa000, 0xa000, 0, 0);
 	}
 
 	/* Load battery backed RAM, if available */
@@ -1488,7 +1489,7 @@ WRITE8_HANDLER( sms_store_cart_select_w )
 		sms_state.current_cartridge = slot;
 
 	setup_cart_banks();
-	memory_set_bankptr(space->machine, 10, sms_state.banking_cart[3] + 0x2000);
+	memory_set_bankptr(space->machine, "bank10", sms_state.banking_cart[3] + 0x2000);
 	setup_rom(space);
 }
 

@@ -56,16 +56,16 @@ static UINT16 *fg_buffer;	// i.e. text
  *
  *************************************/
 
-UINT32 *skimaxx_bg_buffer_front;
-UINT32 *skimaxx_bg_buffer_back;
+static UINT32 *skimaxx_bg_buffer_front;
+static UINT32 *skimaxx_bg_buffer_back;
 
-UINT32 *skimaxx_blitter_regs;
-UINT16 *skimaxx_blitter_gfx;
+static UINT32 *skimaxx_blitter_regs;
+static UINT16 *skimaxx_blitter_gfx;
 
-UINT32 skimaxx_blitter_gfx_len;
+static UINT32 skimaxx_blitter_gfx_len;
 
-UINT32 skimaxx_blitter_src_x, skimaxx_blitter_src_dx;
-UINT32 skimaxx_blitter_src_y, skimaxx_blitter_src_dy;
+static UINT32 skimaxx_blitter_src_x, skimaxx_blitter_src_dx;
+static UINT32 skimaxx_blitter_src_y, skimaxx_blitter_src_dy;
 
 // Set up blit parameters
 static WRITE32_HANDLER( skimaxx_blitter_w )
@@ -130,8 +130,8 @@ static VIDEO_START( skimaxx )
 	bg_buffer = auto_alloc_array(machine, UINT32, 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 2);	// 2 buffers
 	skimaxx_bg_buffer_back  = bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 0;
 	skimaxx_bg_buffer_front = bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 1;
-	memory_configure_bank(machine, 1, 0, 1, skimaxx_bg_buffer_back,  0);
-	memory_configure_bank(machine, 1, 1, 1, skimaxx_bg_buffer_front, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, skimaxx_bg_buffer_back,  0);
+	memory_configure_bank(machine, "bank1", 1, 1, skimaxx_bg_buffer_front, 0);
 }
 
 static VIDEO_UPDATE( skimaxx )
@@ -236,7 +236,7 @@ static READ32_HANDLER( m68k_tms_r )
   bit 0: bit banging data
 */
 
-UINT32 *skimaxx_fpga_ctrl;
+static UINT32 *skimaxx_fpga_ctrl;
 static WRITE32_HANDLER( skimaxx_fpga_ctrl_w )
 {
 	UINT32 newdata = COMBINE_DATA( skimaxx_fpga_ctrl );
@@ -249,7 +249,7 @@ static WRITE32_HANDLER( skimaxx_fpga_ctrl_w )
 		skimaxx_bg_buffer_back  = bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * bank_bg_buffer;
 		skimaxx_bg_buffer_front = bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * (1 - bank_bg_buffer);
 
-		memory_set_bank(space->machine, 1, bank_bg_buffer);
+		memory_set_bank(space->machine, "bank1", bank_bg_buffer);
 	}
 }
 
@@ -305,8 +305,8 @@ static ADDRESS_MAP_START( 68030_1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 	AM_RANGE(0x10000000, 0x10000003) AM_WRITE( skimaxx_sub_ctrl_w )
 	AM_RANGE(0x10100000, 0x1010000f) AM_READWRITE(m68k_tms_r, m68k_tms_w)//AM_NOP
-//  AM_RANGE(0x10180000, 0x10187fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x10180000, 0x1018ffff) AM_RAM AM_SHARE(1)	// above 10188000 accessed at level end (game bug?)
+//  AM_RANGE(0x10180000, 0x10187fff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x10180000, 0x1018ffff) AM_RAM AM_SHARE("share1")	// above 10188000 accessed at level end (game bug?)
 	AM_RANGE(0x20000000, 0x20000003) AM_READNOP	// watchdog_r?
 
 	AM_RANGE(0x20000010, 0x20000013) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)	// left
@@ -342,12 +342,12 @@ static ADDRESS_MAP_START( 68030_2_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x40000000, 0x40000003) AM_WRITE( skimaxx_fpga_ctrl_w ) AM_BASE( &skimaxx_fpga_ctrl )
 
-	AM_RANGE(0x50000000, 0x5007ffff) AM_RAMBANK(1)	// background ram allocated here at video_start (skimaxx_bg_buffer_back/front)
-//  AM_RANGE(0xfffc0000, 0xfffc7fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0xfffc0000, 0xfffcffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x50000000, 0x5007ffff) AM_RAMBANK("bank1")	// background ram allocated here at video_start (skimaxx_bg_buffer_back/front)
+//  AM_RANGE(0xfffc0000, 0xfffc7fff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xfffc0000, 0xfffcffff) AM_RAM AM_SHARE("share1")
 //  AM_RANGE(0xfffe0000, 0xffffffff) AM_RAM // I think this is banked with the shared RAM? (see CPU sync routines)
 	AM_RANGE(0xfffe0010, 0xfffeffff) AM_RAM				// HACK
-	AM_RANGE(0xfffe0000, 0xfffeffff) AM_RAM AM_SHARE(1)	// HACK
+	AM_RANGE(0xfffe0000, 0xfffeffff) AM_RAM AM_SHARE("share1")	// HACK
 	AM_RANGE(0xffff0000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
 

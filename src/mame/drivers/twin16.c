@@ -76,8 +76,8 @@ int twin16_spriteram_process_enable( void )
 
 /******************************************************************************************/
 
-#define COMRAM_r					SMH_BANK(1)
-#define COMRAM_w					SMH_BANK(1)
+#define COMRAM_r					"comram"
+#define COMRAM_w					"comram"
 
 /* Read/Write Handlers */
 
@@ -239,7 +239,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x043fff) AM_READWRITE(COMRAM_r, COMRAM_w)
+	AM_RANGE(0x040000, 0x043fff) AM_READ_BANK(COMRAM_r) AM_WRITE_BANK(COMRAM_w)
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(twin16_paletteram_word_w) AM_BASE_GENERIC(paletteram)
@@ -255,17 +255,17 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(twin16_text_ram_w) AM_BASE(&twin16_text_ram)
 //  AM_RANGE(0x104000, 0x105fff) AM_NOP             // miaj
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE(1) AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE("share1") AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x043fff) AM_READWRITE(COMRAM_r, COMRAM_w)
+	AM_RANGE(0x040000, 0x043fff) AM_READ_BANK(COMRAM_r) AM_WRITE_BANK(COMRAM_w)
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
 	AM_RANGE(0x080000, 0x09ffff) AM_READ(extra_rom_r)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(twin16_CPUB_register_w)
-	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x480000, 0x483fff) AM_READWRITE(videoram16_r, videoram16_w)
 	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_BASE(&twin16_tile_gfx_ram)
 	AM_RANGE(0x600000, 0x6fffff) AM_READ(twin16_gfx_rom1_r)
@@ -275,7 +275,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fround_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x043fff) AM_READWRITE(COMRAM_r, COMRAM_w)
+	AM_RANGE(0x040000, 0x043fff) AM_READ_BANK(COMRAM_r) AM_WRITE_BANK(COMRAM_w)
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(twin16_paletteram_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0a0000, 0x0a001b) AM_READ(twin16_input_r)

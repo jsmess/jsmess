@@ -761,7 +761,7 @@ static void pc_pcjr_bank_w(running_machine *machine, int data)
 			dram = ((data & 0x07) << 14);
 			vram = ((data & 0x38) << (14-3));
 		}
-		memory_set_bankptr( machine, 14, messram_get_ptr(devtag_get_device(machine, "messram")) + vram );
+		memory_set_bankptr( machine, "bank14", messram_get_ptr(devtag_get_device(machine, "messram")) + vram );
 		pcjr.displayram = messram_get_ptr(devtag_get_device(machine, "messram")) + dram;
 		pc_pcjr_mode_switch(machine);
 	}

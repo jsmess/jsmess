@@ -11,7 +11,7 @@
 #include "cpu/mcs51/mcs51.h"
 
 static ADDRESS_MAP_START(vt520_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0xffff) AM_RAMBANK(1)
+	AM_RANGE(0x0000, 0xffff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
 /*
@@ -41,8 +41,8 @@ static MACHINE_RESET(vt520)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
-	memory_install_write8_handler(space, 0x0000, 0xffff, 0, 0, SMH_UNMAP);
-	memory_set_bankptr(machine, 1, rom + 0x70000);
+	memory_unmap_write(space, 0x0000, 0xffff, 0, 0);
+	memory_set_bankptr(machine, "bank1", rom + 0x70000);
 }
 
 static VIDEO_START( vt520 )

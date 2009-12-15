@@ -70,10 +70,10 @@ static TIMER_CALLBACK(gamecom_clock_timer_callback)
 MACHINE_RESET( gamecom )
 {
 	UINT8 *rom = memory_region(machine, "user1");
-	memory_set_bankptr( machine, 1, rom );
-	memory_set_bankptr( machine, 2, rom );
-	memory_set_bankptr( machine, 3, rom );
-	memory_set_bankptr( machine, 4, rom );
+	memory_set_bankptr( machine, "bank1", rom );
+	memory_set_bankptr( machine, "bank2", rom );
+	memory_set_bankptr( machine, "bank3", rom );
+	memory_set_bankptr( machine, "bank4", rom );
 
 	/* should possibly go in a DRIVER_INIT piece? */
 	gamecom_clock_timer = timer_alloc(machine,  gamecom_clock_timer_callback , NULL);
@@ -90,16 +90,18 @@ MACHINE_RESET( gamecom )
 
 static void gamecom_set_mmu( running_machine *machine, int mmu, UINT8 data )
 {
+	char bank[10];
+	sprintf(bank,"bank%d",mmu);
 	if ( data < 0x20 )
 	{
 		/* select internal ROM bank */
-		memory_set_bankptr( machine, mmu, memory_region(machine, "user1") + (data << 13) );
+		memory_set_bankptr( machine, bank, memory_region(machine, "user1") + (data << 13) );
 	}
 	else
 	{
 		/* select cartridge bank */
 		if ( cartridge )
-			memory_set_bankptr( machine, mmu, cartridge + ( data << 13 ) );
+			memory_set_bankptr( machine, bank, cartridge + ( data << 13 ) );
 	}
 }
 

@@ -208,7 +208,7 @@ void spectrum_128_update_memory(running_machine *machine)
 			ram_page = spectrum_128_port_7ffd_data & 0x07;
 			ram_data = messram_get_ptr(devtag_get_device(machine, "messram")) + (ram_page<<14);
 
-			memory_set_bankptr(machine, 4, ram_data);
+			memory_set_bankptr(machine, "bank4", ram_data);
 	}
 
 	/* ROM switching */
@@ -218,7 +218,7 @@ void spectrum_128_update_memory(running_machine *machine)
 
 	ChosenROM = memory_region(machine, "maincpu") + 0x010000 + (ROMSelection<<14);
 
-	memory_set_bankptr(machine, 1, ChosenROM);
+	memory_set_bankptr(machine, "bank1", ChosenROM);
 }
 
 static  READ8_HANDLER ( spectrum_128_ula_r )
@@ -238,10 +238,10 @@ static ADDRESS_MAP_START (spectrum_128_io, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (spectrum_128_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x3fff) AM_RAMBANK(1)
-	AM_RANGE( 0x4000, 0x7fff) AM_RAMBANK(2)
-	AM_RANGE( 0x8000, 0xbfff) AM_RAMBANK(3)
-	AM_RANGE( 0xc000, 0xffff) AM_RAMBANK(4)
+	AM_RANGE( 0x0000, 0x3fff) AM_RAMBANK("bank1")
+	AM_RANGE( 0x4000, 0x7fff) AM_RAMBANK("bank2")
+	AM_RANGE( 0x8000, 0xbfff) AM_RAMBANK("bank3")
+	AM_RANGE( 0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
 static MACHINE_RESET( spectrum_128 )
@@ -250,10 +250,10 @@ static MACHINE_RESET( spectrum_128 )
 	/* 0x0000-0x3fff always holds ROM */
 
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + (5<<14));
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + (5<<14));
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + (2<<14));
+	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + (2<<14));
 
 	/* set initial ram config */
 	spectrum_128_port_7ffd_data = 0;

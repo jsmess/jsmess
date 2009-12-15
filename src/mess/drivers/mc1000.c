@@ -38,16 +38,16 @@ static void mc1000_bankswitch(running_machine *machine)
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* MC6845 video RAM */
-	memory_set_bank(machine, 2, state->mc6845_bank);
+	memory_set_bank(machine, "bank2", state->mc6845_bank);
 
 	/* extended RAM */
 	if (messram_get_size(devtag_get_device(machine, "messram")) > 16*1024)
 	{
-		memory_install_readwrite8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_BANK(3), SMH_BANK(3));
+		memory_install_readwrite_bank(program, 0x4000, 0x7fff, 0, 0, "bank3");
 	}
 	else
 	{
-		memory_install_readwrite8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_unmap_readwrite(program, 0x4000, 0x7fff, 0, 0);
 	}
 
 	/* MC6847 video RAM */
@@ -55,28 +55,28 @@ static void mc1000_bankswitch(running_machine *machine)
 	{
 		if (messram_get_size(devtag_get_device(machine, "messram")) > 16*1024)
 		{
-			memory_install_readwrite8_handler(program, 0x8000, 0x97ff, 0, 0, SMH_BANK(4), SMH_BANK(4));
+			memory_install_readwrite_bank(program, 0x8000, 0x97ff, 0, 0, "bank4");
 		}
 		else
 		{
-			memory_install_readwrite8_handler(program, 0x8000, 0x97ff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+			memory_unmap_readwrite(program, 0x8000, 0x97ff, 0, 0);
 		}
 	}
 	else
 	{
-		memory_install_readwrite8_handler(program, 0x8000, 0x97ff, 0, 0, SMH_BANK(4), SMH_BANK(4));
+		memory_install_readwrite_bank(program, 0x8000, 0x97ff, 0, 0, "bank4");
 	}
 
-	memory_set_bank(machine, 4, state->mc6847_bank);
+	memory_set_bank(machine, "bank4", state->mc6847_bank);
 
 	/* extended RAM */
 	if (messram_get_size(devtag_get_device(machine, "messram")) > 16*1024)
 	{
-		memory_install_readwrite8_handler(program, 0x9800, 0xbfff, 0, 0, SMH_BANK(5), SMH_BANK(5));
+		memory_install_readwrite_bank(program, 0x9800, 0xbfff, 0, 0, "bank5");
 	}
 	else
 	{
-		memory_install_readwrite8_handler(program, 0x9800, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_unmap_readwrite(program, 0x9800, 0xbfff, 0, 0);
 	}
 }
 
@@ -139,12 +139,12 @@ static WRITE8_HANDLER( mc6847_attr_w )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( mc1000_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK(1)
-	AM_RANGE(0x2000, 0x27ff) AM_RAMBANK(2) AM_BASE_MEMBER(mc1000_state, mc6845_video_ram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x2000, 0x27ff) AM_RAMBANK("bank2") AM_BASE_MEMBER(mc1000_state, mc6845_video_ram)
 	AM_RANGE(0x2800, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(3)
-	AM_RANGE(0x8000, 0x97ff) AM_RAMBANK(4) AM_BASE_MEMBER(mc1000_state, mc6847_video_ram)
-	AM_RANGE(0x9800, 0xbfff) AM_RAMBANK(5)
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank3")
+	AM_RANGE(0x8000, 0x97ff) AM_RAMBANK("bank4") AM_BASE_MEMBER(mc1000_state, mc6847_video_ram)
+	AM_RANGE(0x9800, 0xbfff) AM_RAMBANK("bank5")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -329,27 +329,27 @@ static MACHINE_START( mc1000 )
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* setup memory banking */
-	memory_install_readwrite8_handler(program, 0x0000, 0x1fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, Z80_TAG) + 0xc000, 0);
-	memory_set_bank(machine, 1, 1);
+	memory_install_readwrite_bank(program, 0x0000, 0x1fff, 0, 0, "bank1");
+	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, Z80_TAG) + 0xc000, 0);
+	memory_set_bank(machine, "bank1", 1);
 
 	state->rom0000 = 1;
 
-	memory_install_readwrite8_handler(program, 0x2000, 0x27ff, 0, 0, SMH_BANK(2), SMH_BANK(2));
-	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, Z80_TAG) + 0x2000, 0);
-	memory_configure_bank(machine, 2, 1, 1, state->mc6845_video_ram, 0);
-	memory_set_bank(machine, 2, 0);
+	memory_install_readwrite_bank(program, 0x2000, 0x27ff, 0, 0, "bank2");
+	memory_configure_bank(machine, "bank2", 0, 1, memory_region(machine, Z80_TAG) + 0x2000, 0);
+	memory_configure_bank(machine, "bank2", 1, 1, state->mc6845_video_ram, 0);
+	memory_set_bank(machine, "bank2", 0);
 
-	memory_configure_bank(machine, 3, 0, 1, memory_region(machine, Z80_TAG) + 0x4000, 0);
-	memory_set_bank(machine, 3, 0);
+	memory_configure_bank(machine, "bank3", 0, 1, memory_region(machine, Z80_TAG) + 0x4000, 0);
+	memory_set_bank(machine, "bank3", 0);
 
-	memory_configure_bank(machine, 4, 0, 1, state->mc6847_video_ram, 0);
-	memory_configure_bank(machine, 4, 1, 1, memory_region(machine, Z80_TAG) + 0x8000, 0);
-	memory_set_bank(machine, 4, 0);
+	memory_configure_bank(machine, "bank4", 0, 1, state->mc6847_video_ram, 0);
+	memory_configure_bank(machine, "bank4", 1, 1, memory_region(machine, Z80_TAG) + 0x8000, 0);
+	memory_set_bank(machine, "bank4", 0);
 
-	memory_configure_bank(machine, 5, 0, 1, memory_region(machine, Z80_TAG) + 0x9800, 0);
-	memory_set_bank(machine, 5, 0);
+	memory_configure_bank(machine, "bank5", 0, 1, memory_region(machine, Z80_TAG) + 0x9800, 0);
+	memory_set_bank(machine, "bank5", 0);
 
 	mc1000_bankswitch(machine);
 
@@ -366,7 +366,7 @@ static MACHINE_RESET( mc1000 )
 {
 	mc1000_state *state = machine->driver_data;
 
-	memory_set_bank(machine, 1, 1);
+	memory_set_bank(machine, "bank1", 1);
 
 	state->rom0000 = 1;
 }
@@ -474,7 +474,7 @@ static DIRECT_UPDATE_HANDLER( mc1000_direct_update_handler )
 	{
 		if (address >= 0xc000)
 		{
-			memory_set_bank(space->machine, 1, 0);
+			memory_set_bank(space->machine, "bank1", 0);
 			state->rom0000 = 0;
 		}
 	}

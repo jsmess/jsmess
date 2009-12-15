@@ -881,14 +881,14 @@ static WRITE8_HANDLER( rom_bank_0_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
-	memory_set_bankptr(space->machine, 1, &ROM[0x10000]);
+	memory_set_bankptr(space->machine, "bank1", &ROM[0x10000]);
 }
 
 static WRITE8_HANDLER( rom_bank_1_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
-	memory_set_bankptr(space->machine, 1, &ROM[0x00000]);
+	memory_set_bankptr(space->machine, "bank1", &ROM[0x00000]);
 }
 
 static WRITE8_HANDLER( rom_data_w )
@@ -1449,7 +1449,7 @@ static WRITE8_HANDLER( x1turbo_io_w )
 
 static ADDRESS_MAP_START( x1_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK(1) AM_WRITE(rom_data_w)
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1") AM_WRITE(rom_data_w)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1603,7 +1603,7 @@ static INPUT_CHANGED( ipl_reset )
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
 	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
-	memory_set_bankptr(space->machine, 1, &ROM[0x00000]);
+	memory_set_bankptr(space->machine, "bank1", &ROM[0x00000]);
 
 	//anything else?
 }
@@ -2042,7 +2042,7 @@ static MACHINE_RESET( x1 )
 	UINT8 *PCG_RAM = memory_region(machine, "pcg");
 	int i;
 
-	memory_set_bankptr(machine, 1, &ROM[0x00000]);
+	memory_set_bankptr(machine, "bank1", &ROM[0x00000]);
 
 	memset(gfx_bitmap_ram,0x00,0xc000*2);
 

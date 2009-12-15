@@ -232,7 +232,7 @@ static WRITE16_HANDLER(ml_output_w)
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
 	data=0;
-	memory_set_bankptr(device->machine,  1, memory_region(device->machine, "audiocpu") + ((data) & 0x03) * 0x4000 + 0x10000 );
+	memory_set_bankptr(device->machine,  "bank1", memory_region(device->machine, "audiocpu") + ((data) & 0x03) * 0x4000 + 0x10000 );
 }
 
 static void ml_msm5205_vck(const device_config *device)
@@ -434,8 +434,8 @@ static ADDRESS_MAP_START( mlanding_mem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_BASE(&g_ram)// 512kB G RAM - enough here for double buffered 512x400x8 frame
 	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE(ml_tileram_r, ml_tileram_w) AM_BASE(&ml_tileram)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE(2) AM_BASE(&dma_ram)
-	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("share2") AM_BASE(&dma_ram)
+	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("share1")
 
 	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(ml_sub_reset_w)
 	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITE(ml_nmi_to_sound_w) //sound reset ??
@@ -469,9 +469,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mlanding_sub_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
-	AM_RANGE(0x050000, 0x0503ff) AM_RAM AM_SHARE(3)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x050000, 0x0503ff) AM_RAM AM_SHARE("share3")
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&ml_dotram)
 ADDRESS_MAP_END
 
@@ -490,7 +490,7 @@ static WRITE8_HANDLER( ml_msm_start_msb_w )
 
 static ADDRESS_MAP_START( mlanding_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_MIRROR(0x00fe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xa000, 0xa001) AM_WRITE(ml_sound_to_main_w)
@@ -536,7 +536,7 @@ static ADDRESS_MAP_START( mlanding_z80_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( DSP_map_program, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE(3)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( DSP_map_data, ADDRESS_SPACE_DATA, 16 )

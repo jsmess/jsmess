@@ -96,9 +96,11 @@ static void pp01_set_memory(running_machine *machine,UINT8 block, UINT8 data)
 	UINT16 startaddr = block*0x1000;
 	UINT16 endaddr   = ((block+1)*0x1000)-1;
 	UINT8  blocknum  = block + 1;
+	char bank[10];
+	sprintf(bank,"bank%d",blocknum);
 	if (data>=0xE0 && data<=0xEF) {
 		// This is RAM
-		memory_install_read8_handler (space, startaddr, endaddr, 0, 0, SMH_BANK(blocknum));
+		memory_install_read_bank (space, startaddr, endaddr, 0, 0, bank);
 		switch(data) {
 			case 0xe6 :
 					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_r_1_w);
@@ -120,19 +122,18 @@ static void pp01_set_memory(running_machine *machine,UINT8 block, UINT8 data)
 					break;
 
 			default :
-					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, SMH_BANK(blocknum));
+					memory_install_write_bank(space, startaddr, endaddr, 0, 0, bank);
 					break;
 		}
 
-		memory_set_bankptr(machine, blocknum, messram_get_ptr(devtag_get_device(machine, "messram")) + (data & 0x0F)* 0x1000);
+		memory_set_bankptr(machine, bank, messram_get_ptr(devtag_get_device(machine, "messram")) + (data & 0x0F)* 0x1000);
 	} else if (data>=0xF8) {
-		memory_install_read8_handler (space, startaddr, endaddr, 0, 0, SMH_BANK(blocknum));
-		memory_install_write8_handler(space, startaddr, endaddr, 0, 0, SMH_UNMAP);
-		memory_set_bankptr(machine, blocknum, mem + ((data & 0x0F)-8)* 0x1000+0x10000);
+		memory_install_read_bank (space, startaddr, endaddr, 0, 0, bank);
+		memory_unmap_write(space, startaddr, endaddr, 0, 0);
+		memory_set_bankptr(machine, bank, mem + ((data & 0x0F)-8)* 0x1000+0x10000);
 	} else {
 		logerror("%02x %02x\n",block,data);
-		memory_install_read8_handler (space, startaddr, endaddr, 0, 0, SMH_UNMAP);
-		memory_install_write8_handler(space, startaddr, endaddr, 0, 0, SMH_UNMAP);
+		memory_unmap_readwrite (space, startaddr, endaddr, 0, 0);
 	}
 }
 

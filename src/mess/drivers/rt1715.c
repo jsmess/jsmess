@@ -20,14 +20,14 @@
 
 static WRITE8_HANDLER (rt1717_set_bank )
 {
-	memory_set_bankptr(space->machine, 1, messram_get_ptr(devtag_get_device(space->machine, "messram")));
-	memory_set_bankptr(space->machine, 3, messram_get_ptr(devtag_get_device(space->machine, "messram")));
+	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(devtag_get_device(space->machine, "messram")));
+	memory_set_bankptr(space->machine, "bank3", messram_get_ptr(devtag_get_device(space->machine, "messram")));
 }
 
 /* Address maps */
 static ADDRESS_MAP_START(rt1715_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x07ff ) AM_READWRITE(SMH_BANK(1), SMH_BANK(3))
-  AM_RANGE( 0x0800, 0xffff ) AM_READWRITE(SMH_BANK(2), SMH_BANK(2))
+	AM_RANGE( 0x0000, 0x07ff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank3")
+	AM_RANGE( 0x0800, 0xffff ) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rt1715_io , ADDRESS_SPACE_IO, 8)

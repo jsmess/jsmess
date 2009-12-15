@@ -61,15 +61,15 @@ static WRITE32_HANDLER( aga_overlay_w )
 		data = (data >> 16) & 1;
 
 		/* switch banks as appropriate */
-		memory_set_bank(space->machine, 1, data & 1);
+		memory_set_bank(space->machine, "bank1", data & 1);
 
 		/* swap the write handlers between ROM and bank 1 based on the bit */
 		if ((data & 1) == 0)
 			/* overlay disabled, map RAM on 0x000000 */
-			memory_install_write32_handler(space, 0x000000, 0x1fffff, 0, 0, SMH_BANK(1));
+			memory_install_write_bank(space, 0x000000, 0x1fffff, 0, 0, "bank1");
 		else
 			/* overlay enabled, map Amiga system ROM on 0x000000 */
-			memory_install_write32_handler(space, 0x000000, 0x1fffff, 0, 0, SMH_UNMAP);
+			memory_unmap_write(space, 0x000000, 0x1fffff, 0, 0);
 	}
 }
 
@@ -132,7 +132,7 @@ static WRITE8_DEVICE_HANDLER( cd32_cia_0_portb_w )
 
 static ADDRESS_MAP_START( a1200_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram32) AM_SIZE(&amiga_chip_ram_size)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE(&amiga_chip_ram32) AM_SIZE(&amiga_chip_ram_size)
 	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16(amiga_cia_r, amiga_cia_w, 0xffffffff)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE((UINT32**)&amiga_custom_regs)
@@ -142,7 +142,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cd32_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram32) AM_SIZE(&amiga_chip_ram_size)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE(&amiga_chip_ram32) AM_SIZE(&amiga_chip_ram_size)
 	AM_RANGE(0xb80000, 0xb8003f) AM_READWRITE(amiga_akiko32_r, amiga_akiko32_w)
 	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16(amiga_cia_r, amiga_cia_w, 0xffffffff)
@@ -587,8 +587,8 @@ static DRIVER_INIT( a1200 )
 	amiga_machine_config(machine, &cubocd32_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, 1, 0, 1, amiga_chip_ram32, 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, amiga_chip_ram32, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user1"), 0);
 
 	/* initialize keyboard */
 	amigakbd_init(machine);
@@ -613,8 +613,8 @@ static DRIVER_INIT( cd32 )
 	amiga_machine_config(machine, &cubocd32_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, 1, 0, 1, amiga_chip_ram32, 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, amiga_chip_ram32, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user1"), 0);
 
 	/* intialize akiko */
 	amiga_akiko_init(machine);

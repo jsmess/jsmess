@@ -174,12 +174,12 @@ void vp550_install_write_handlers(const device_config *device, const address_spa
 	}
 	else
 	{
-		memory_install_write8_handler(program, 0x8001, 0x8001, 0, 0, SMH_UNMAP);
-		memory_install_write8_handler(program, 0x8002, 0x8002, 0, 0, SMH_UNMAP);
-		memory_install_write8_handler(program, 0x8003, 0x8003, 0, 0, SMH_UNMAP);
-		memory_install_write8_handler(program, 0x8010, 0x8010, 0, 0, SMH_UNMAP);
-		memory_install_write8_handler(program, 0x8020, 0x8020, 0, 0, SMH_UNMAP);
-		memory_install_write8_handler(program, 0x8030, 0x8030, 0, 0, SMH_UNMAP);
+		memory_unmap_write(program, 0x8001, 0x8001, 0, 0);
+		memory_unmap_write(program, 0x8002, 0x8002, 0, 0);
+		memory_unmap_write(program, 0x8003, 0x8003, 0, 0);
+		memory_unmap_write(program, 0x8010, 0x8010, 0, 0);
+		memory_unmap_write(program, 0x8020, 0x8020, 0, 0);
+		memory_unmap_write(program, 0x8030, 0x8030, 0, 0);
 	}
 }
 

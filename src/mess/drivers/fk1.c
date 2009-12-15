@@ -237,18 +237,18 @@ static WRITE8_HANDLER( fk1_intr_w )
 static READ8_HANDLER( fk1_bank_ram_r )
 {
 	const address_space *space_mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_install_write8_handler(space_mem, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
-	memory_set_bankptr(space->machine, 1, messram_get_ptr(devtag_get_device(space->machine, "messram")));
-	memory_set_bankptr(space->machine, 2, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x4000);
+	memory_install_write_bank(space_mem, 0x0000, 0x3fff, 0, 0, "bank1");
+	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(devtag_get_device(space->machine, "messram")));
+	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x4000);
 	return 0;
 }
 
 static READ8_HANDLER( fk1_bank_rom_r )
 {
 	const address_space *space_mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_install_write8_handler(space_mem, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu"));
-	memory_set_bankptr(space->machine, 2, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x10000);
+	memory_unmap_write(space_mem, 0x0000, 0x3fff, 0, 0);
+	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu"));
+	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x10000);
 	return 0;
 }
 
@@ -288,10 +288,10 @@ static WRITE8_HANDLER( fk1_reset_int_w )
 }
 
 static ADDRESS_MAP_START(fk1_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1)
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(2)
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(3)
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK(4)
+	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fk1_io , ADDRESS_SPACE_IO, 8)
@@ -358,11 +358,11 @@ static TIMER_CALLBACK( vsync_callback )
 static MACHINE_RESET(fk1)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu")); // ROM
-	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000); // VRAM
-	memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
-	memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu")); // ROM
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000); // VRAM
+	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+	memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
 
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), fk1_irq_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(24000), NULL, 0, keyboard_callback);

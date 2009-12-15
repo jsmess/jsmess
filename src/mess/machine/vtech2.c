@@ -81,21 +81,21 @@ static const write8_space_func mwa_bank_soft[4] =
 };
 
 /* read banked memory (plain ROM/RAM) */
-static const read8_space_func mra_bank_hard[4] =
+static const char* mra_bank_hard[4] =
 {
-    SMH_BANK(1),  /* mapped in 0000-3fff */
-    SMH_BANK(2),  /* mapped in 4000-7fff */
-    SMH_BANK(3),  /* mapped in 8000-bfff */
-    SMH_BANK(4)   /* mapped in c000-ffff */
+    "bank1",  /* mapped in 0000-3fff */
+    "bank2",  /* mapped in 4000-7fff */
+    "bank3",  /* mapped in 8000-bfff */
+    "bank4"   /* mapped in c000-ffff */
 };
 
 /* write banked memory (plain ROM/RAM) */
-static const write8_space_func mwa_bank_hard[4] =
+static const char* mwa_bank_hard[4] =
 {
-    SMH_BANK(1),  /* mapped in 0000-3fff */
-    SMH_BANK(2),  /* mapped in 4000-7fff */
-    SMH_BANK(3),  /* mapped in 8000-bfff */
-    SMH_BANK(4)   /* mapped in c000-ffff */
+    "bank1",  /* mapped in 0000-3fff */
+    "bank2",  /* mapped in 4000-7fff */
+    "bank3",  /* mapped in 8000-bfff */
+    "bank4"   /* mapped in c000-ffff */
 };
 
 DRIVER_INIT(laser)
@@ -154,11 +154,9 @@ WRITE8_HANDLER( laser_bank_select_w )
         "RAM #0","RAM #1","RAM #2","RAM #3",
         "RAM #4","RAM #5","RAM #6","RAM #7/Video RAM hi",
         "ext ROM #0","ext ROM #1","ext ROM #2","ext ROM #3"};
-	read8_space_func read_handler;
-	write8_space_func write_handler;
-
+	char bank[10];
 	offset %= 4;
-    data &= 15;
+    data &= 15;	
 
 	if( data != laser_bank[offset] )
     {
@@ -168,32 +166,31 @@ WRITE8_HANDLER( laser_bank_select_w )
         /* memory mapped I/O bank selected? */
 		if (data == 2)
 		{
-			read_handler = mra_bank_soft[offset];
-			write_handler = mwa_bank_soft[offset];
+			memory_install_read8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, mra_bank_soft[offset]);
+			memory_install_write8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, mwa_bank_soft[offset]);
 		}
 		else
 		{
-			memory_set_bankptr(space->machine, offset+1, &mem[0x4000*laser_bank[offset]]);
+			sprintf(bank,"bank%d",offset+1);
+			memory_set_bankptr(space->machine, bank, &mem[0x4000*laser_bank[offset]]);
 			if( laser_bank_mask & (1 << data) )
 			{
-				read_handler = mra_bank_hard[offset];
-				write_handler = mwa_bank_hard[offset];
-
 				/* video RAM bank selected? */
 				if( data == laser_video_bank )
 				{
 					logerror("select bank #%d VIDEO!\n", offset+1);
 				}
+				memory_install_read_bank(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, mra_bank_hard[offset]);
+				memory_install_write_bank(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, mwa_bank_hard[offset]);
+				
 			}
 			else
 			{
 				logerror("select bank #%d MASKED!\n", offset+1);
-				read_handler = SMH_NOP;
-				write_handler = SMH_NOP;
+				memory_nop_readwrite(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0);
+				
 			}
 		}
-		memory_install_read8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, read_handler);
-		memory_install_write8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, write_handler);
     }
 }
 

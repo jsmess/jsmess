@@ -90,13 +90,13 @@ static const device_config *mc6845;
 static WRITE8_HANDLER( lynx48k_bank_w )
 {
 	if (!data)
-		memory_set_bank(space->machine, 1, 0);
+		memory_set_bank(space->machine, "bank1", 0);
 	else
 	if (data & 2)
-		memory_set_bank(space->machine, 1, 1);
+		memory_set_bank(space->machine, "bank1", 1);
 	else
 	if (data & 4)
-		memory_set_bank(space->machine, 1, 2);
+		memory_set_bank(space->machine, "bank1", 2);
 	else
 		logerror("%04X: Cannot understand bankswitch command %X\n",cpu_get_pc(space->cpu), data);
 }
@@ -111,26 +111,26 @@ static WRITE8_HANDLER( lynx128k_bank_w )
 
 	if (!bank)
 	{
-		memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu") + 0x00000);
-		memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x02000);
-		memory_set_bankptr(mem->machine, 3, memory_region(mem->machine, "maincpu") + 0x04000);
-		memory_set_bankptr(mem->machine, 4, memory_region(mem->machine, "maincpu") + 0x16000);
-		memory_set_bankptr(mem->machine, 5, memory_region(mem->machine, "maincpu") + 0x18000);
-		memory_set_bankptr(mem->machine, 6, memory_region(mem->machine, "maincpu") + 0x1a000);
-		memory_set_bankptr(mem->machine, 7, memory_region(mem->machine, "maincpu") + 0x0c000);
-		memory_set_bankptr(mem->machine, 8, memory_region(mem->machine, "maincpu") + 0x0e000);
+		memory_set_bankptr(mem->machine, "bank1", memory_region(mem->machine, "maincpu") + 0x00000);
+		memory_set_bankptr(mem->machine, "bank2", memory_region(mem->machine, "maincpu") + 0x02000);
+		memory_set_bankptr(mem->machine, "bank3", memory_region(mem->machine, "maincpu") + 0x04000);
+		memory_set_bankptr(mem->machine, "bank4", memory_region(mem->machine, "maincpu") + 0x16000);
+		memory_set_bankptr(mem->machine, "bank5", memory_region(mem->machine, "maincpu") + 0x18000);
+		memory_set_bankptr(mem->machine, "bank6", memory_region(mem->machine, "maincpu") + 0x1a000);
+		memory_set_bankptr(mem->machine, "bank7", memory_region(mem->machine, "maincpu") + 0x0c000);
+		memory_set_bankptr(mem->machine, "bank8", memory_region(mem->machine, "maincpu") + 0x0e000);
 	}
 	else
 	if (bank == 0x0e)
 	{
-		memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu") + 0x20000);
-		memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x22000);
-		memory_set_bankptr(mem->machine, 3, memory_region(mem->machine, "maincpu") + 0x24000);
-		memory_set_bankptr(mem->machine, 4, memory_region(mem->machine, "maincpu") + 0x26000);
-		memory_set_bankptr(mem->machine, 5, memory_region(mem->machine, "maincpu") + 0x28000);
-		memory_set_bankptr(mem->machine, 6, memory_region(mem->machine, "maincpu") + 0x2a000);
-		memory_set_bankptr(mem->machine, 7, memory_region(mem->machine, "maincpu") + 0x2c000);
-		memory_set_bankptr(mem->machine, 8, memory_region(mem->machine, "maincpu") + 0x2e000);
+		memory_set_bankptr(mem->machine, "bank1", memory_region(mem->machine, "maincpu") + 0x20000);
+		memory_set_bankptr(mem->machine, "bank2", memory_region(mem->machine, "maincpu") + 0x22000);
+		memory_set_bankptr(mem->machine, "bank3", memory_region(mem->machine, "maincpu") + 0x24000);
+		memory_set_bankptr(mem->machine, "bank4", memory_region(mem->machine, "maincpu") + 0x26000);
+		memory_set_bankptr(mem->machine, "bank5", memory_region(mem->machine, "maincpu") + 0x28000);
+		memory_set_bankptr(mem->machine, "bank6", memory_region(mem->machine, "maincpu") + 0x2a000);
+		memory_set_bankptr(mem->machine, "bank7", memory_region(mem->machine, "maincpu") + 0x2c000);
+		memory_set_bankptr(mem->machine, "bank8", memory_region(mem->machine, "maincpu") + 0x2e000);
 	}
 	else
 		logerror("%04X: Cannot understand bankswitch command %X\n",cpu_get_pc(space->cpu), data);
@@ -140,26 +140,26 @@ static WRITE8_HANDLER( lynx128k_bank_w )
 
 	if (!bank)
 	{
-		memory_set_bankptr(mem->machine, 11, memory_region(mem->machine, "maincpu") + 0x10000);
-		memory_set_bankptr(mem->machine, 12, memory_region(mem->machine, "maincpu") + 0x12000);
-		memory_set_bankptr(mem->machine, 13, memory_region(mem->machine, "maincpu") + 0x14000);
-		memory_set_bankptr(mem->machine, 14, memory_region(mem->machine, "maincpu") + 0x16000);
-		memory_set_bankptr(mem->machine, 15, memory_region(mem->machine, "maincpu") + 0x18000);
-		memory_set_bankptr(mem->machine, 16, memory_region(mem->machine, "maincpu") + 0x1a000);
-		memory_set_bankptr(mem->machine, 17, memory_region(mem->machine, "maincpu") + 0x1c000);
-		memory_set_bankptr(mem->machine, 18, memory_region(mem->machine, "maincpu") + 0x1e000);
+		memory_set_bankptr(mem->machine, "bank11", memory_region(mem->machine, "maincpu") + 0x10000);
+		memory_set_bankptr(mem->machine, "bank12", memory_region(mem->machine, "maincpu") + 0x12000);
+		memory_set_bankptr(mem->machine, "bank13", memory_region(mem->machine, "maincpu") + 0x14000);
+		memory_set_bankptr(mem->machine, "bank14", memory_region(mem->machine, "maincpu") + 0x16000);
+		memory_set_bankptr(mem->machine, "bank15", memory_region(mem->machine, "maincpu") + 0x18000);
+		memory_set_bankptr(mem->machine, "bank16", memory_region(mem->machine, "maincpu") + 0x1a000);
+		memory_set_bankptr(mem->machine, "bank17", memory_region(mem->machine, "maincpu") + 0x1c000);
+		memory_set_bankptr(mem->machine, "bank18", memory_region(mem->machine, "maincpu") + 0x1e000);
 	}
 	else
 	if (bank == 0xc0)
 	{
-		memory_set_bankptr(mem->machine, 11, memory_region(mem->machine, "maincpu") + 0x20000);
-		memory_set_bankptr(mem->machine, 12, memory_region(mem->machine, "maincpu") + 0x22000);
-		memory_set_bankptr(mem->machine, 13, memory_region(mem->machine, "maincpu") + 0x24000);
-		memory_set_bankptr(mem->machine, 14, memory_region(mem->machine, "maincpu") + 0x26000);
-		memory_set_bankptr(mem->machine, 15, memory_region(mem->machine, "maincpu") + 0x28000);
-		memory_set_bankptr(mem->machine, 16, memory_region(mem->machine, "maincpu") + 0x2a000);
-		memory_set_bankptr(mem->machine, 17, memory_region(mem->machine, "maincpu") + 0x2c000);
-		memory_set_bankptr(mem->machine, 18, memory_region(mem->machine, "maincpu") + 0x2e000);
+		memory_set_bankptr(mem->machine, "bank11", memory_region(mem->machine, "maincpu") + 0x20000);
+		memory_set_bankptr(mem->machine, "bank12", memory_region(mem->machine, "maincpu") + 0x22000);
+		memory_set_bankptr(mem->machine, "bank13", memory_region(mem->machine, "maincpu") + 0x24000);
+		memory_set_bankptr(mem->machine, "bank14", memory_region(mem->machine, "maincpu") + 0x26000);
+		memory_set_bankptr(mem->machine, "bank15", memory_region(mem->machine, "maincpu") + 0x28000);
+		memory_set_bankptr(mem->machine, "bank16", memory_region(mem->machine, "maincpu") + 0x2a000);
+		memory_set_bankptr(mem->machine, "bank17", memory_region(mem->machine, "maincpu") + 0x2c000);
+		memory_set_bankptr(mem->machine, "bank18", memory_region(mem->machine, "maincpu") + 0x2e000);
 	}
 	else
 		logerror("%04X: Cannot understand bankswitch command %X\n",cpu_get_pc(space->cpu), data);
@@ -169,7 +169,7 @@ static ADDRESS_MAP_START( lynx48k_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x5fff) AM_ROM
 	AM_RANGE(0x6000,0x7fff) AM_RAM
-	AM_RANGE(0x8000,0xffff) AM_RAMBANK(1)
+	AM_RANGE(0x8000,0xffff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lynx128k_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -178,7 +178,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( lynx48k_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x007f,0x007f) AM_MIRROR(0xff00) AM_WRITE(lynx48k_bank_w)
-	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xff00) AM_WRITE(SMH_NOP)		/* to be emulated */
+	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xff00) AM_WRITENOP		/* to be emulated */
 	AM_RANGE(0x0080,0x0080) AM_READ_PORT("LINE0")
 	AM_RANGE(0x0180,0x0180) AM_READ_PORT("LINE1")
 	AM_RANGE(0x0280,0x0280) AM_READ_PORT("LINE2")
@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( lynx128k_io , ADDRESS_SPACE_IO, 8)
 //  AM_RANGE(0x007c,0x007c) AM_MIRROR(0xff80) AM_READ(lynx128k_printer_r)
 //  AM_RANGE(0x007d,0x007d) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_init_w) // this is rw
 //  AM_RANGE(0x007e,0x007e) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_w)
-	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xff00) AM_WRITE(SMH_NOP)		/* to be emulated */
+	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xff00) AM_WRITENOP		/* to be emulated */
 	AM_RANGE(0x0080,0x0080) AM_READ_PORT("LINE0")
 	AM_RANGE(0x0180,0x0180) AM_READ_PORT("LINE1")
 	AM_RANGE(0x0280,0x0280) AM_READ_PORT("LINE2")
@@ -304,14 +304,23 @@ INPUT_PORTS_END
 static MACHINE_RESET( lynx128k )
 {
 	const address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_install_readwrite8_handler (mem, 0x0000, 0x1fff, 0, 0, SMH_BANK(1), SMH_BANK(11));
-	memory_install_readwrite8_handler (mem, 0x2000, 0x3fff, 0, 0, SMH_BANK(2), SMH_BANK(12));
-	memory_install_readwrite8_handler (mem, 0x4000, 0x5fff, 0, 0, SMH_BANK(3), SMH_BANK(13));
-	memory_install_readwrite8_handler (mem, 0x6000, 0x7fff, 0, 0, SMH_BANK(4), SMH_BANK(14));
-	memory_install_readwrite8_handler (mem, 0x8000, 0x9fff, 0, 0, SMH_BANK(5), SMH_BANK(15));
-	memory_install_readwrite8_handler (mem, 0xa000, 0xbfff, 0, 0, SMH_BANK(6), SMH_BANK(16));
-	memory_install_readwrite8_handler (mem, 0xc000, 0xdfff, 0, 0, SMH_BANK(7), SMH_BANK(17));
-	memory_install_readwrite8_handler (mem, 0xe000, 0xffff, 0, 0, SMH_BANK(8), SMH_BANK(18));
+	memory_install_read_bank (mem, 0x0000, 0x1fff, 0, 0, "bank1");
+	memory_install_read_bank (mem, 0x2000, 0x3fff, 0, 0, "bank2");
+	memory_install_read_bank (mem, 0x4000, 0x5fff, 0, 0, "bank3");
+	memory_install_read_bank (mem, 0x6000, 0x7fff, 0, 0, "bank4");
+	memory_install_read_bank (mem, 0x8000, 0x9fff, 0, 0, "bank5");
+	memory_install_read_bank (mem, 0xa000, 0xbfff, 0, 0, "bank6");
+	memory_install_read_bank (mem, 0xc000, 0xdfff, 0, 0, "bank7");
+	memory_install_read_bank (mem, 0xe000, 0xffff, 0, 0, "bank8");
+	memory_install_write_bank (mem, 0x0000, 0x1fff, 0, 0, "bank11");
+	memory_install_write_bank (mem, 0x2000, 0x3fff, 0, 0, "bank12");
+	memory_install_write_bank (mem, 0x4000, 0x5fff, 0, 0, "bank13");
+	memory_install_write_bank (mem, 0x6000, 0x7fff, 0, 0, "bank14");
+	memory_install_write_bank (mem, 0x8000, 0x9fff, 0, 0, "bank15");
+	memory_install_write_bank (mem, 0xa000, 0xbfff, 0, 0, "bank16");
+	memory_install_write_bank (mem, 0xc000, 0xdfff, 0, 0, "bank17");
+	memory_install_write_bank (mem, 0xe000, 0xffff, 0, 0, "bank18");
+	
 	lynx128k_bank_w(mem, 0, 0);
 }
 
@@ -490,7 +499,7 @@ MACHINE_DRIVER_END
 static DRIVER_INIT( lynx48k )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 3, &RAM[0x8000],  0x8000);
+	memory_configure_bank(machine, "bank1", 0, 3, &RAM[0x8000],  0x8000);
 }
 
 

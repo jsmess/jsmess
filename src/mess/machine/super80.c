@@ -122,7 +122,7 @@ static TIMER_CALLBACK( super80_timer )
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( super80_reset )
 {
-	memory_set_bank(machine, 1, 0);
+	memory_set_bank(machine, "bank1", 0);
 }
 
 static TIMER_CALLBACK( super80_halfspeed )
@@ -249,7 +249,7 @@ MACHINE_RESET( super80 )
 {
 	super80_shared=0xff;
 	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, super80_reset);
-	memory_set_bank(machine, 1, 1);
+	memory_set_bank(machine, "bank1", 1);
 	super80_z80pio = devtag_get_device(machine, "z80pio");
 	super80_speaker = devtag_get_device(machine, "speaker");
 	super80_cassette = devtag_get_device(machine, "cassette");
@@ -259,7 +259,7 @@ MACHINE_RESET( super80 )
 static void driver_init_common( running_machine *machine )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 2, &RAM[0x0000], 0xc000);
+	memory_configure_bank(machine, "bank1", 0, 2, &RAM[0x0000], 0xc000);
 	timer_pulse(machine, ATTOTIME_IN_HZ(200000),NULL,0,super80_timer);	/* timer for keyboard and cassette */
 }
 

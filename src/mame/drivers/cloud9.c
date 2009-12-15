@@ -304,7 +304,7 @@ static READ8_HANDLER( nvram_r )
 static ADDRESS_MAP_START( cloud9_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(cloud9_bitmode_addr_w)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(cloud9_bitmode_r, cloud9_bitmode_w)
-	AM_RANGE(0x0000, 0x4fff) AM_READWRITE(SMH_BANK(1), cloud9_videoram_w)
+	AM_RANGE(0x0000, 0x4fff) AM_ROMBANK("bank1") AM_WRITE(cloud9_videoram_w)
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(cloud9_state, spriteram)
 	AM_RANGE(0x5400, 0x547f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5480, 0x54ff) AM_WRITE(irq_ack_w)
@@ -319,7 +319,7 @@ static ADDRESS_MAP_START( cloud9_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5900, 0x5903) AM_MIRROR(0x007c) AM_READ(leta_r)
 	AM_RANGE(0x5a00, 0x5a0f) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x5b00, 0x5b0f) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x5c00, 0x5cff) AM_MIRROR(0x0300) AM_READWRITE(nvram_r, SMH_RAM) AM_BASE(&nvram_stage) AM_SIZE_GENERIC(nvram)
+	AM_RANGE(0x5c00, 0x5cff) AM_MIRROR(0x0300) AM_RAM_READ(nvram_r) AM_BASE(&nvram_stage) AM_SIZE_GENERIC(nvram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

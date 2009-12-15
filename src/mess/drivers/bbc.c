@@ -98,12 +98,12 @@ static READ8_HANDLER( bbc_fe_r )
 static ADDRESS_MAP_START( bbca_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH											/*  Hardware marked with a 1 is not present in a Model A        */
 
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_BANK(1)		, bbc_memorya1_w      	)	/*    0000-3fff                 Regular Ram                     */
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK(3)		, bbc_memorya1_w      	)	/*    4000-7fff                 Repeat of the Regular Ram       */
+	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE( bbc_memorya1_w      	)	/*    0000-3fff                 Regular Ram                     */
+	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank3") AM_WRITE( bbc_memorya1_w      	)	/*    4000-7fff                 Repeat of the Regular Ram       */
 
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(4)		, SMH_ROM      	)	/*    8000-bfff                 Paged ROM                       */
+	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank4")	/*    8000-bfff                 Paged ROM                       */
 
-	AM_RANGE(0xc000, 0xfbff) AM_READWRITE(SMH_BANK(7)    	, SMH_ROM      	)	/*    c000-fbff                 OS ROM                          */
+	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank7")  /*    c000-fbff                 OS ROM                          */
 
 	AM_RANGE(0xfc00, 0xfdff) AM_NOP	/*    fc00-fdff                 FRED & JIM Pages                */
 
@@ -131,13 +131,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bbcb_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_BANK(1)		, bbc_memorya1_w      	)	/*    0000-3fff                 Regular Ram                     */
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK(3)		, bbc_memoryb3_w      	)	/*    4000-7fff                 Repeat of the Regular Ram       */
+	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE( bbc_memorya1_w      	)	/*    0000-3fff                 Regular Ram                     */
+	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank3") AM_WRITE( bbc_memoryb3_w      	)	/*    4000-7fff                 Repeat of the Regular Ram       */
 
 
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(4)    	, bbc_memoryb4_w      	)	/*    8000-bfff                 Paged ROM                       */
+	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank4") AM_WRITE( bbc_memoryb4_w      	)	/*    8000-bfff                 Paged ROM                       */
 
-	AM_RANGE(0xc000, 0xfbff) AM_READWRITE(SMH_BANK(7)    	, SMH_ROM       	)	/*    c000-fbff                 OS ROM                          */
+	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank7") /*    c000-fbff                 OS ROM                          */
 
 	AM_RANGE(0xfc00, 0xfdff) AM_READWRITE(bbc_opus_read     , bbc_opus_write	)	/*    fc00-fdff                 OPUS Disc Controller            */
 
@@ -165,14 +165,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bbcbp_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 
-	AM_RANGE(0x0000, 0x2fff) AM_READWRITE(SMH_BANK(1)		, bbc_memorybp1_w		)	/*    0000-2fff                 Regular Ram                     */
+	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(  bbc_memorybp1_w		)	/*    0000-2fff                 Regular Ram                     */
 
-	AM_RANGE(0x3000, 0x7fff) AM_READWRITE(SMH_BANK(2)		, bbc_memorybp2_w		)	/*    3000-7fff                 Video/Shadow Ram                */
+	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE( bbc_memorybp2_w		)	/*    3000-7fff                 Video/Shadow Ram                */
 
-	AM_RANGE(0x8000, 0xafff) AM_READWRITE(SMH_BANK(4)		, bbc_memorybp4_w		)	/*    8000-afff                 Paged ROM or 12K of RAM         */
-	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(SMH_BANK(6)		, SMH_ROM			)	/*    b000-bfff                 Rest of paged ROM area          */
+	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank4") AM_WRITE( bbc_memorybp4_w		)	/*    8000-afff                 Paged ROM or 12K of RAM         */
+	AM_RANGE(0xb000, 0xbfff) AM_READ_BANK("bank6") 	/*    b000-bfff                 Rest of paged ROM area          */
 
-	AM_RANGE(0xc000, 0xfbff) AM_READWRITE(SMH_BANK(7)		, SMH_ROM			)	/*    c000-fbff                 OS ROM                          */
+	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank7")  /*    c000-fbff                 OS ROM                          */
 
 	AM_RANGE(0xfc00, 0xfdff) AM_NOP	/*    fc00-fdff                 FRED & JIM Pages                */
 
@@ -201,14 +201,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bbcbp128_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 
-	AM_RANGE(0x0000, 0x2fff) AM_READWRITE(SMH_BANK(1)		, bbc_memorybp1_w		)	/*    0000-2fff                 Regular Ram                     */
+	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE( bbc_memorybp1_w		)	/*    0000-2fff                 Regular Ram                     */
 
-	AM_RANGE(0x3000, 0x7fff) AM_READWRITE(SMH_BANK(2)		, bbc_memorybp2_w		)	/*    3000-7fff                 Video/Shadow Ram                */
+	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE( bbc_memorybp2_w		)	/*    3000-7fff                 Video/Shadow Ram                */
 
-	AM_RANGE(0x8000, 0xafff) AM_READWRITE(SMH_BANK(4)		, bbc_memorybp4_128_w	)	/*    8000-afff                 Paged ROM or 12K of RAM         */
-	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(SMH_BANK(6)		, bbc_memorybp6_128_w	)	/*    b000-bfff                 Rest of paged ROM area          */
+	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank4") AM_WRITE( bbc_memorybp4_128_w	)	/*    8000-afff                 Paged ROM or 12K of RAM         */
+	AM_RANGE(0xb000, 0xbfff) AM_READ_BANK("bank6") AM_WRITE( bbc_memorybp6_128_w	)	/*    b000-bfff                 Rest of paged ROM area          */
 
-	AM_RANGE(0xc000, 0xfbff) AM_READWRITE(SMH_BANK(7)		, SMH_ROM			)	/*    c000-fbff                 OS ROM                          */
+	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank7") 	/*    c000-fbff                 OS ROM                          */
 
 	AM_RANGE(0xfc00, 0xfdff) AM_NOP	/*    fc00-fdff                 FRED & JIM Pages                */
 
@@ -261,17 +261,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(bbcm_mem, ADDRESS_SPACE_PROGRAM, 8)
 
-	AM_RANGE(0x0000, 0x2fff) AM_READWRITE(SMH_BANK(1)		, bbc_memorybm1_w		)	/*    0000-2fff                 Regular Ram                     */
+	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE( bbc_memorybm1_w		)	/*    0000-2fff                 Regular Ram                     */
 
-	AM_RANGE(0x3000, 0x7fff) AM_READWRITE(SMH_BANK(2)		, bbc_memorybm2_w		)	/*    3000-7fff                 Video/Shadow Ram                */
+	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE( bbc_memorybm2_w		)	/*    3000-7fff                 Video/Shadow Ram                */
 
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(SMH_BANK(4)		, bbc_memorybm4_w		)	/*    8000-8fff                 Paged ROM/RAM or 4K of RAM ANDY */
-	AM_RANGE(0x9000, 0xbfff) AM_READWRITE(SMH_BANK(5)		, bbc_memorybm5_w		)	/*    9000-bfff                 Rest of paged ROM/RAM area      */
+	AM_RANGE(0x8000, 0x8fff) AM_READ_BANK("bank4") AM_WRITE( bbc_memorybm4_w		)	/*    8000-8fff                 Paged ROM/RAM or 4K of RAM ANDY */
+	AM_RANGE(0x9000, 0xbfff) AM_READ_BANK("bank5") AM_WRITE( bbc_memorybm5_w		)	/*    9000-bfff                 Rest of paged ROM/RAM area      */
 
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(SMH_BANK(7)		, bbc_memorybm7_w		)	/*    c000-dfff                 OS ROM or 8K of RAM       HAZEL */
+	AM_RANGE(0xc000, 0xdfff) AM_READ_BANK("bank7") AM_WRITE( bbc_memorybm7_w		)	/*    c000-dfff                 OS ROM or 8K of RAM       HAZEL */
 	AM_RANGE(0xe000, 0xfbff) AM_ROM AM_REGION("user1", 0x42000)				/*    e000-fbff                 OS ROM                          */
 
-	AM_RANGE(0xfc00, 0xfeff) AM_READWRITE(SMH_BANK(8)			, bbcm_w			)   /*    this is now processed directly because it can be ROM or hardware */
+	AM_RANGE(0xfc00, 0xfeff) AM_READ_BANK("bank8") AM_WRITE(  bbcm_w			)   /*    this is now processed directly because it can be ROM or hardware */
 
 	//AM_RANGE(0xfc00, 0xfeff) AM_READWRITE(bbcm_r          , bbcm_w            )   /*    this is now processed directly because it can be ROM or hardware */
 	/*

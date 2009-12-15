@@ -84,7 +84,7 @@ static WRITE8_HANDLER( memory_w )
 static ADDRESS_MAP_START( elf2_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x00ff) AM_RAMBANK(1)
+	AM_RANGE(0x0000, 0x00ff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( elf2_io, ADDRESS_SPACE_IO, 8 )
@@ -289,9 +289,10 @@ static MACHINE_START( elf2 )
 	dm9368_rbi_w(state->dm9368_h, 1);
 
 	/* setup memory banking */
-	memory_install_readwrite8_handler(program, 0x0000, 0x00ff, 0, 0, SMH_BANK(1), memory_w);
-	memory_configure_bank(machine, 1, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
-	memory_set_bank(machine, 1, 0);
+	memory_install_read_bank(program, 0x0000, 0x00ff, 0, 0, "bank1");
+	memory_install_write8_handler(program, 0x0000, 0x00ff, 0, 0, memory_w);
+	memory_configure_bank(machine, "bank1", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_set_bank(machine, "bank1", 0);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->cdp1861_efx);

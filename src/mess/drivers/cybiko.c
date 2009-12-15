@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( cybikov2_mem, ADDRESS_SPACE_PROGRAM, 16 )
 #if 0
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
 #endif
-	AM_RANGE( 0x100000, 0x13ffff ) AM_READ( SMH_BANK(2) ) AM_MIRROR( 0x0c0000 )
+	AM_RANGE( 0x100000, 0x13ffff ) AM_READ_BANK("bank2") AM_MIRROR( 0x0c0000 )
 //  AM_RANGE( 0x200000, 0x23ffff ) AM_RAM AM_MIRROR( 0x1c0000 )
 	AM_RANGE( 0x600000, 0x600001 ) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w )
 	AM_RANGE( 0xe00000, 0xffdbff ) AM_READ( cybiko_key_r )
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( cybikoxt_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x100000, 0x100001 ) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w )
 	AM_RANGE( 0x200000, 0x200003 ) AM_WRITE( cybiko_unk1_w )
 //  AM_RANGE( 0x400000, 0x5fffff ) AM_RAM
-	AM_RANGE( 0x600000, 0x67ffff ) AM_READ( SMH_BANK(2) )
+	AM_RANGE( 0x600000, 0x67ffff ) AM_READ_BANK("bank2")
 	AM_RANGE( 0x7ff800, 0x7fffff ) AM_READ( cybiko_unk2_r )
 	AM_RANGE( 0xe00000, 0xffdbff ) AM_READ( cybiko_key_r )
 ADDRESS_MAP_END

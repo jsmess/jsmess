@@ -363,7 +363,7 @@ static void atom_eprom_box_refresh(running_machine *machine)
 	/* get address of eprom data */
 	eprom_data = memory_region(machine, "maincpu") + 0x010000 + (selected_eprom<<12);
 	/* set bank address */
-	memory_set_bankptr(machine, 1, eprom_data);
+	memory_set_bankptr(machine, "bank1", eprom_data);
 }
 
 void atom_eprom_box_init(running_machine *machine)

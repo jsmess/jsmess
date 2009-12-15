@@ -51,10 +51,10 @@
 
 
 /* bank-switching */
-#define THOM_CART_BANK  2 /* cartridge ROM */
-#define THOM_RAM_BANK   3 /* data RAM */
-#define THOM_FLOP_BANK  4 /* external floppy controller ROM */
-#define THOM_BASE_BANK  5 /* system RAM */
+#define THOM_CART_BANK  "bank2" /* cartridge ROM */
+#define THOM_RAM_BANK   "bank3" /* data RAM */
+#define THOM_FLOP_BANK  "bank4" /* external floppy controller ROM */
+#define THOM_BASE_BANK  "bank5" /* system RAM */
 
 /* serial */
 extern DEVICE_START( thom_serial );
@@ -165,11 +165,11 @@ extern const mc6846_interface to9_timer;
 /***************************** TO8 ******************************/
 
 /* bank-switching */
-#define TO8_SYS_LO      5 /* system RAM low 2 Kb */
-#define TO8_SYS_HI      6 /* system RAM hi 2 Kb */
-#define TO8_DATA_LO     7 /* data RAM low 2 Kb */
-#define TO8_DATA_HI     8 /* data RAM hi 2 Kb */
-#define TO8_BIOS_BANK   9 /* BIOS ROM */
+#define TO8_SYS_LO      "bank5" /* system RAM low 2 Kb */
+#define TO8_SYS_HI      "bank6" /* system RAM hi 2 Kb */
+#define TO8_DATA_LO     "bank7" /* data RAM low 2 Kb */
+#define TO8_DATA_HI     "bank8" /* data RAM hi 2 Kb */
+#define TO8_BIOS_BANK   "bank9" /* BIOS ROM */
 
 extern UINT8 to8_data_vpage;
 extern UINT8 to8_cart_vpage;
@@ -277,7 +277,7 @@ extern MACHINE_RESET ( mo5nr );
 #define THOM_NB_PAGES 4
 
 /* page 0 is banked */
-#define THOM_VRAM_BANK 1
+#define THOM_VRAM_BANK "bank1"
 
 extern UINT8* thom_vram;
 

@@ -113,9 +113,9 @@ static UINT32	*vram;
 
 
 static ADDRESS_MAP_START( 3do_mem, ADDRESS_SPACE_PROGRAM, 32)
-	AM_RANGE(0x00000000, 0x001FFFFF) AM_RAMBANK(1) AM_BASE(&dram)					/* DRAM */
+	AM_RANGE(0x00000000, 0x001FFFFF) AM_RAMBANK("bank1") AM_BASE(&dram)					/* DRAM */
 	AM_RANGE(0x00200000, 0x002FFFFF) AM_RAM	AM_BASE(&vram)							/* VRAM */
-	AM_RANGE(0x03000000, 0x030FFFFF) AM_ROMBANK(2)									/* BIOS */
+	AM_RANGE(0x03000000, 0x030FFFFF) AM_ROMBANK("bank2")									/* BIOS */
 	AM_RANGE(0x03140000, 0x0315FFFF) AM_READWRITE(_3do_nvarea_r, _3do_nvarea_w)				/* NVRAM */
 	AM_RANGE(0x03180000, 0x031FFFFF) AM_READWRITE(_3do_unk_318_r, _3do_unk_318_w)				/* ???? */
 	AM_RANGE(0x03200000, 0x032FFFFF) AM_READWRITE(_3do_vram_sport_r, _3do_vram_sport_w)		/* special vram access1 */
@@ -126,14 +126,14 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( 3do )
 {
-	memory_set_bankptr(machine, 2,memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank2",memory_region(machine, "user1"));
 
 	/* configure overlay */
-	memory_configure_bank(machine, 1, 0, 1, dram, 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, dram, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user1"), 0);
 
 	/* start with overlay enabled */
-	memory_set_bank(machine, 1, 1);
+	memory_set_bank(machine, "bank1", 1);
 
 	_3do_madam_init();
 	_3do_clio_init();

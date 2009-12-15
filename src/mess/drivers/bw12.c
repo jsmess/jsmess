@@ -61,27 +61,28 @@ static void bw12_bankswitch(running_machine *machine)
 	switch (state->bank)
 	{
 	case 0: /* ROM */
-		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
+		memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+		memory_unmap_write(program, 0x0000, 0x7fff, 0, 0);
 		break;
 
 	case 1: /* BK0 */
-		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+		memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
 		break;
 
 	case 2: /* BK1 */
 	case 3: /* BK2 */
 		if (messram_get_size(devtag_get_device(machine, "messram")) > 64*1024)
 		{
-			memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+			memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
 		}
 		else
 		{
-			memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+			memory_unmap_readwrite(program, 0x0000, 0x7fff, 0, 0);
 		}
 		break;
 	}
 
-	memory_set_bank(machine, 1, state->bank);
+	memory_set_bank(machine, "bank1", state->bank);
 }
 
 static TIMER_CALLBACK( floppy_motor_off_tick )
@@ -192,7 +193,7 @@ static READ8_HANDLER( bw12_ls259_r )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( bw12_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK(1)
+	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE_MEMBER(bw12_state, video_ram)
 ADDRESS_MAP_END
@@ -677,9 +678,9 @@ static MACHINE_START( bw12 )
 	state->floppy_motor_off_timer = timer_alloc(machine, floppy_motor_off_tick, NULL);
 
 	/* setup memory banking */
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(machine, 1, 1, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
-	memory_configure_bank(machine, 1, 2, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000, 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_configure_bank(machine, "bank1", 2, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000, 0x8000);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->bank);

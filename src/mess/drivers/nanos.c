@@ -20,8 +20,8 @@
 static const UINT8 *FNT;
 
 static ADDRESS_MAP_START(nanos_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x0fff ) AM_READWRITE(SMH_BANK(1), SMH_BANK(3))
-	AM_RANGE( 0x1000, 0xffff ) AM_RAMBANK(2)
+	AM_RANGE( 0x0000, 0x0fff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank3")
+	AM_RANGE( 0x1000, 0xffff ) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER(nanos_tc_w)
@@ -297,9 +297,9 @@ static WRITE8_DEVICE_HANDLER (nanos_port_b_w)
 {
 	key_command = BIT(data,1);
 	if (BIT(data,7)) {
-		memory_set_bankptr(device->machine, 1, memory_region(device->machine, "maincpu"));
+		memory_set_bankptr(device->machine, "bank1", memory_region(device->machine, "maincpu"));
 	} else {
-		memory_set_bankptr(device->machine, 1, messram_get_ptr(devtag_get_device(device->machine, "messram")));
+		memory_set_bankptr(device->machine, "bank1", messram_get_ptr(devtag_get_device(device->machine, "messram")));
 	}
 }
 static UINT8 row_number(UINT8 code) {
@@ -401,12 +401,12 @@ static MACHINE_RESET(nanos)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	memory_install_write8_handler(space, 0x0000, 0x0fff, 0, 0, SMH_BANK(3));
-	memory_install_write8_handler(space, 0x1000, 0xffff, 0, 0, SMH_BANK(2));
+	memory_install_write_bank(space, 0x0000, 0x0fff, 0, 0, "bank3");
+	memory_install_write_bank(space, 0x1000, 0xffff, 0, 0, "bank2");
 
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));
-	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1000);
-	memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")));
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1000);
+	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")));
 
 	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), 1);
 

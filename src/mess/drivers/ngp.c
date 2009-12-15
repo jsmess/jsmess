@@ -484,7 +484,7 @@ static WRITE8_HANDLER( flash1_w )
 static ADDRESS_MAP_START( ngp_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x000080, 0x0000bf )	AM_READWRITE( ngp_io_r, ngp_io_w )								/* ngp/c specific i/o */
 	AM_RANGE( 0x004000, 0x006fff )	AM_RAM															/* work ram */
-	AM_RANGE( 0x007000, 0x007fff )	AM_RAM AM_SHARE(1)												/* shared with sound cpu */
+	AM_RANGE( 0x007000, 0x007fff )	AM_RAM AM_SHARE("share1")										/* shared with sound cpu */
 	AM_RANGE( 0x008000, 0x0087ff )	AM_DEVREADWRITE( "k1ge", k1ge_r, k1ge_w )						/* video registers */
 	AM_RANGE( 0x008800, 0x00bfff )	AM_RAM AM_REGION("vram", 0x800 )								/* Video RAM area */
 	AM_RANGE( 0x200000, 0x3fffff )	AM_ROM AM_WRITE( flash0_w ) AM_REGION( "cart", 0 )				/* cart area #1 */
@@ -518,7 +518,7 @@ static WRITE8_HANDLER( ngp_z80_signal_main_w )
 
 
 static ADDRESS_MAP_START( z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE( 0x0000, 0x0FFF )	AM_RAM AM_SHARE(1)								/* shared with tlcs900 */
+	AM_RANGE( 0x0000, 0x0FFF )	AM_RAM AM_SHARE("share1")								/* shared with tlcs900 */
 	AM_RANGE( 0x4000, 0x4001 )	AM_DEVWRITE( "t6w28", t6w28_w )					/* sound chip (right, left) */
 	AM_RANGE( 0x8000, 0x8000 )	AM_READWRITE( ngp_z80_comm_r, ngp_z80_comm_w )	/* main-sound communication */
 	AM_RANGE( 0xc000, 0xc000 )	AM_WRITE( ngp_z80_signal_main_w )				/* signal irq to main cpu */

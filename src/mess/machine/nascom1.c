@@ -286,30 +286,30 @@ DRIVER_INIT( nascom1 )
 	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 1 * 1024:
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
-			0x1400, 0x9000, 0, 0, SMH_NOP, SMH_NOP);
+		memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
+			0x1400, 0x9000, 0, 0);
 		break;
 
 	case 16 * 1024:
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
-			0x1400, 0x4fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
-			0x5000, 0xafff, 0, 0, SMH_NOP, SMH_NOP);
-		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
+		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
+			0x1400, 0x4fff, 0, 0, "bank1");
+		memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
+			0x5000, 0xafff, 0, 0);
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
 		break;
 
 	case 32 * 1024:
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
-			0x1400, 0x8fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
-			0x9000, 0xafff, 0, 0, SMH_NOP, SMH_NOP);
-		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
+		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
+			0x1400, 0x8fff, 0, 0, "bank1");
+		memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
+			0x9000, 0xafff, 0, 0);
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
 		break;
 
 	case 40 * 1024:
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
-			0x1400, 0xafff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
+		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
+			0x1400, 0xafff, 0, 0, "bank1");
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
 		break;
 	}
 }

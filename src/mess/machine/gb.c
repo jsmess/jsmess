@@ -182,26 +182,26 @@ static void gb_init_regs(running_machine *machine)
 
 static void gb_rom16_0000( running_machine *machine, UINT8 *addr )
 {
-	memory_set_bankptr( machine, 5, addr );
-	memory_set_bankptr( machine, 10, addr + 0x0100 );
-	memory_set_bankptr( machine, 6, addr + 0x0200 );
-	memory_set_bankptr( machine, 11, addr + 0x0900 );
+	memory_set_bankptr( machine, "bank5", addr );
+	memory_set_bankptr( machine, "bank10", addr + 0x0100 );
+	memory_set_bankptr( machine, "bank6", addr + 0x0200 );
+	memory_set_bankptr( machine, "bank11", addr + 0x0900 );
 }
 
 static void gb_rom16_4000( running_machine *machine, UINT8 *addr )
 {
-	memory_set_bankptr( machine, 1, addr );
-	memory_set_bankptr( machine, 4, addr + 0x2000 );
+	memory_set_bankptr( machine, "bank1", addr );
+	memory_set_bankptr( machine, "bank4", addr + 0x2000 );
 }
 
 static void gb_rom8_4000( running_machine *machine, UINT8 *addr )
 {
-	memory_set_bankptr( machine, 1, addr );
+	memory_set_bankptr( machine, "bank1", addr );
 }
 
 static void gb_rom8_6000( running_machine *machine, UINT8 *addr )
 {
-	memory_set_bankptr( machine, 4, addr );
+	memory_set_bankptr( machine, "bank4", addr );
 }
 
 static void gb_init(running_machine *machine)
@@ -219,12 +219,12 @@ static void gb_init(running_machine *machine)
 		if ( gb_driver_data.MBCType != MBC_MEGADUCK )
 		{
 			gb_rom16_4000( machine, gb_driver_data.ROMMap[gb_driver_data.ROMBank] );
-			memory_set_bankptr (machine, 2, gb_driver_data.RAMMap[gb_driver_data.RAMBank] ? gb_driver_data.RAMMap[gb_driver_data.RAMBank] : gb_driver_data.gb_dummy_ram_bank);
+			memory_set_bankptr (machine, "bank2", gb_driver_data.RAMMap[gb_driver_data.RAMBank] ? gb_driver_data.RAMMap[gb_driver_data.RAMBank] : gb_driver_data.gb_dummy_ram_bank);
 		}
 		else
 		{
-			memory_set_bankptr( machine, 1, gb_driver_data.ROMMap[gb_driver_data.ROMBank] );
-			memory_set_bankptr( machine, 10, gb_driver_data.ROMMap[0] );
+			memory_set_bankptr( machine, "bank1", gb_driver_data.ROMMap[gb_driver_data.ROMBank] );
+			memory_set_bankptr( machine, "bank10", gb_driver_data.ROMMap[0] );
 		}
 	}
 
@@ -315,7 +315,7 @@ MACHINE_RESET( gb )
 	gb_rom16_0000( machine, gb_driver_data.ROMMap[gb_driver_data.ROMBank00] );
 
 	/* Enable BIOS rom */
-	memory_set_bankptr(machine, 5, memory_region(machine, "maincpu") );
+	memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") );
 
 	gb_driver_data.divcount = 0x0004;
 }
@@ -331,7 +331,7 @@ MACHINE_RESET( sgb )
 	gb_rom16_0000( machine, gb_driver_data.ROMMap[gb_driver_data.ROMBank00] ? gb_driver_data.ROMMap[gb_driver_data.ROMBank00] : gb_driver_data.gb_dummy_rom_bank );
 
 	/* Enable BIOS rom */
-	memory_set_bankptr(machine, 5, memory_region(machine, "maincpu") );
+	memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") );
 
 	sgb_tile_data = auto_alloc_array_clear(machine, UINT8, 0x2000 );
 	memset( sgb_tile_data, 0, 0x2000 );
@@ -387,8 +387,8 @@ MACHINE_RESET( gbc )
 	gb_rom16_0000( machine, gb_driver_data.ROMMap[gb_driver_data.ROMBank00] ? gb_driver_data.ROMMap[gb_driver_data.ROMBank00] : gb_driver_data.gb_dummy_rom_bank );
 
 	/* Enable BIOS rom */
-	memory_set_bankptr(machine, 5, memory_region(machine, "maincpu") );
-	memory_set_bankptr(machine, 6, memory_region(machine, "maincpu") + 0x100 );
+	memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") );
+	memory_set_bankptr(machine, "bank6", memory_region(machine, "maincpu") + 0x100 );
 
 	/* Allocate memory for internal ram */
 	for( ii = 0; ii < 8; ii++ )
@@ -413,7 +413,7 @@ static void gb_machine_stop(running_machine *machine)
 static void gb_set_mbc1_banks( running_machine *machine )
 {
 	gb_rom16_4000( machine, gb_driver_data.ROMMap[ gb_driver_data.ROMBank ] );
-	memory_set_bankptr( machine, 2, gb_driver_data.RAMMap[ gb_driver_data.MBC1Mode ? ( gb_driver_data.ROMBank >> 5 ) : 0 ] );
+	memory_set_bankptr( machine, "bank2", gb_driver_data.RAMMap[ gb_driver_data.MBC1Mode ? ( gb_driver_data.ROMBank >> 5 ) : 0 ] );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc1 )
@@ -545,8 +545,8 @@ static WRITE8_HANDLER( gb_rom_bank_select_wisdom )
 	logerror( "0x%04X: wisdom tree mapper write to address 0x%04X\n", cpu_get_pc( space->cpu ), offset );
 	/* The address determines the bank to select */
 	gb_driver_data.ROMBank = ( offset << 1 ) & 0x1FF;
-	memory_set_bankptr( space->machine, 5, gb_driver_data.ROMMap[ gb_driver_data.ROMBank ] );
-	memory_set_bankptr( space->machine, 10, gb_driver_data.ROMMap[ gb_driver_data.ROMBank ] + 0x0100 );
+	memory_set_bankptr( space->machine, "bank5", gb_driver_data.ROMMap[ gb_driver_data.ROMBank ] );
+	memory_set_bankptr( space->machine, "bank10", gb_driver_data.ROMMap[ gb_driver_data.ROMBank ] + 0x0100 );
 	gb_rom16_4000( space->machine, gb_driver_data.ROMMap[ gb_driver_data.ROMBank + 1 ] );
 }
 
@@ -572,7 +572,7 @@ static WRITE8_HANDLER( gb_ram_bank_select_mbc3 )
 			if ( data < 5 )
 			{
 				memset( gb_driver_data.MBC3RTCData, gb_driver_data.MBC3RTCMap[gb_driver_data.MBC3RTCBank], 0x2000 );
-				memory_set_bankptr( space->machine, 2, gb_driver_data.MBC3RTCData );
+				memory_set_bankptr( space->machine, "bank2", gb_driver_data.MBC3RTCData );
 			}
 		}
 	}
@@ -581,7 +581,7 @@ static WRITE8_HANDLER( gb_ram_bank_select_mbc3 )
 		gb_driver_data.RAMBank = data & 0x3;
 		gb_driver_data.MBC3RTCBank = 0xFF;
 		/* Switch banks */
-		memory_set_bankptr( space->machine, 2, gb_driver_data.RAMMap[gb_driver_data.RAMBank] );
+		memory_set_bankptr( space->machine, "bank2", gb_driver_data.RAMMap[gb_driver_data.RAMBank] );
 	}
 }
 
@@ -595,7 +595,7 @@ static WRITE8_HANDLER( gb_ram_bank_select_mbc5 )
 	}
 	gb_driver_data.RAMBank = data;
 	/* Switch banks */
-	memory_set_bankptr (space->machine, 2, gb_driver_data.RAMMap[gb_driver_data.RAMBank] );
+	memory_set_bankptr (space->machine, "bank2", gb_driver_data.RAMMap[gb_driver_data.RAMBank] );
 }
 
 WRITE8_HANDLER ( gb_ram_enable )
@@ -689,7 +689,7 @@ static WRITE8_HANDLER( gb_ram_tama5 )
 			break;
 		case 0x0A:      /* Are we ready for the next command? */
 			gb_driver_data.MBC3RTCData[0] = 0x01;
-			memory_set_bankptr( space->machine, 2, gb_driver_data.MBC3RTCData );
+			memory_set_bankptr( space->machine, "bank2", gb_driver_data.MBC3RTCData );
 			break;
 		case 0x0C:      /* Data read register lo */
 			gb_driver_data.MBC3RTCData[0] = gb_driver_data.gbTama5Byte & 0x0F;
@@ -719,8 +719,8 @@ static WRITE8_HANDLER( gb_rom_bank_mmm01_0000_w )
 	if ( data & 0x40 )
 	{
 		mmm01_bank_offset = mmm01_reg1;
-		memory_set_bankptr( space->machine, 5, gb_driver_data.ROMMap[ mmm01_bank_offset ] );
-		memory_set_bankptr( space->machine, 10, gb_driver_data.ROMMap[ mmm01_bank_offset ] + 0x0100 );
+		memory_set_bankptr( space->machine, "bank5", gb_driver_data.ROMMap[ mmm01_bank_offset ] );
+		memory_set_bankptr( space->machine, "bank10", gb_driver_data.ROMMap[ mmm01_bank_offset ] + 0x0100 );
 		gb_rom16_4000( space->machine, gb_driver_data.ROMMap[ mmm01_bank_offset + mmm01_bank ] );
 	}
 }
@@ -765,7 +765,7 @@ static void gb_set_mbc1_kor_banks( running_machine *machine )
 		gb_rom16_0000( machine, gb_driver_data.ROMMap[ gb_driver_data.ROMBank & 0x30 ] );
 	}
 	gb_rom16_4000( machine, gb_driver_data.ROMMap[ gb_driver_data.ROMBank ] );
-	memory_set_bankptr( machine, 2, gb_driver_data.RAMMap[ gb_driver_data.MBC1Mode ? ( gb_driver_data.ROMBank >> 5 ) : 0 ] );
+	memory_set_bankptr( machine, "bank2", gb_driver_data.RAMMap[ gb_driver_data.MBC1Mode ? ( gb_driver_data.ROMBank >> 5 ) : 0 ] );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc1_kor )
@@ -1996,7 +1996,7 @@ WRITE8_HANDLER ( gbc_io2_w )
 			gb_driver_data.GBC_RAMBank = data & 0x7;
 			if ( ! gb_driver_data.GBC_RAMBank )
 				gb_driver_data.GBC_RAMBank = 1;
-			memory_set_bankptr (space->machine, 3, gb_driver_data.GBC_RAMMap[gb_driver_data.GBC_RAMBank]);
+			memory_set_bankptr (space->machine, "bank3", gb_driver_data.GBC_RAMMap[gb_driver_data.GBC_RAMBank]);
 			break;
 		default:
 			break;
@@ -2147,7 +2147,7 @@ WRITE8_HANDLER( megaduck_rom_bank_select_type1 )
 		gb_driver_data.ROMBank = data & gb_driver_data.ROMMask;
 
 		/* Switch banks */
-		memory_set_bankptr (space->machine, 1, gb_driver_data.ROMMap[gb_driver_data.ROMBank]);
+		memory_set_bankptr (space->machine, "bank1", gb_driver_data.ROMMap[gb_driver_data.ROMBank]);
 	}
 }
 
@@ -2158,8 +2158,8 @@ WRITE8_HANDLER( megaduck_rom_bank_select_type2 )
 		gb_driver_data.ROMBank = (data << 1) & gb_driver_data.ROMMask;
 
 		/* Switch banks */
-		memory_set_bankptr( space->machine, 10, gb_driver_data.ROMMap[gb_driver_data.ROMBank]);
-		memory_set_bankptr( space->machine, 1, gb_driver_data.ROMMap[gb_driver_data.ROMBank + 1]);
+		memory_set_bankptr( space->machine, "bank10", gb_driver_data.ROMMap[gb_driver_data.ROMBank]);
+		memory_set_bankptr( space->machine, "bank1", gb_driver_data.ROMMap[gb_driver_data.ROMBank + 1]);
 	}
 }
 

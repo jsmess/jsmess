@@ -29,16 +29,16 @@
 #include "rendlay.h"
 
 static ADDRESS_MAP_START( svi318_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE( 0x0000, 0x7fff) AM_READWRITE( SMH_BANK(1), svi318_writemem1 )
-	AM_RANGE( 0x8000, 0xbfff) AM_READWRITE( SMH_BANK(2), svi318_writemem2 )
-	AM_RANGE( 0xc000, 0xffff) AM_READWRITE( SMH_BANK(3), svi318_writemem3 )
+	AM_RANGE( 0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE( svi318_writemem1 )
+	AM_RANGE( 0x8000, 0xbfff) AM_READ_BANK("bank2") AM_WRITE( svi318_writemem2 )
+	AM_RANGE( 0xc000, 0xffff) AM_READ_BANK("bank3") AM_WRITE( svi318_writemem3 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( svi328_806_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE( 0x0000, 0x7fff) AM_READWRITE( SMH_BANK(1), svi318_writemem1 )
-	AM_RANGE( 0x8000, 0xbfff) AM_READWRITE( SMH_BANK(2), svi318_writemem2 )
-	AM_RANGE( 0xc000, 0xefff) AM_READWRITE( SMH_BANK(3), svi318_writemem3 )
-	AM_RANGE( 0xf000, 0xffff) AM_READWRITE( SMH_BANK(4), svi318_writemem4 )
+	AM_RANGE( 0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE( svi318_writemem1 )
+	AM_RANGE( 0x8000, 0xbfff) AM_READ_BANK("bank2") AM_WRITE( svi318_writemem2 )
+	AM_RANGE( 0xc000, 0xefff) AM_READ_BANK("bank3") AM_WRITE( svi318_writemem3 )
+	AM_RANGE( 0xf000, 0xffff) AM_READ_BANK("bank4") AM_WRITE( svi318_writemem4 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( svi318_io, ADDRESS_SPACE_IO, 8 )

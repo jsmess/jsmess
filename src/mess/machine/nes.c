@@ -76,13 +76,12 @@ static void init_nes_core( running_machine *machine )
 
 	/* Brutal hack put in as a consequence of the new memory system; we really
        need to fix the NES code */
-	memory_install_read8_handler(space, 0x0000, 0x07ff, 0, 0x1800, SMH_BANK(10));
-	memory_install_write8_handler(space, 0x0000, 0x07ff, 0, 0x1800, SMH_BANK(10));
+	memory_install_readwrite_bank(space, 0x0000, 0x07ff, 0, 0x1800, "bank10");
 
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0, 0x1fff, 0, 0, nes_chr_r, nes_chr_w);
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, nes_nt_r, nes_nt_w);
 
-	memory_set_bankptr(machine, 10, nes.rom);
+	memory_set_bankptr(machine, "bank10", nes.rom);
 
 	nes_battery_ram = nes.wram;
 
@@ -97,30 +96,30 @@ static void init_nes_core( running_machine *machine )
 			if (nes_fds.data == NULL)
 				nes_fds.data = auto_alloc_array(machine, UINT8, 0x8000 );
 			memory_install_read8_handler(space, 0x4030, 0x403f, 0, 0, nes_fds_r);
-			memory_install_read8_handler(space, 0x6000, 0xdfff, 0, 0, SMH_BANK(2));
-			memory_install_read8_handler(space, 0xe000, 0xffff, 0, 0, SMH_BANK(1));
+			memory_install_read_bank(space, 0x6000, 0xdfff, 0, 0, "bank2");
+			memory_install_read_bank(space, 0xe000, 0xffff, 0, 0, "bank1");
 
 			memory_install_write8_handler(space, 0x4020, 0x402f, 0, 0, nes_fds_w);
-			memory_install_write8_handler(space, 0x6000, 0xdfff, 0, 0, SMH_BANK(2));
+			memory_install_write_bank(space, 0x6000, 0xdfff, 0, 0, "bank2");
 
-			memory_set_bankptr(machine, 1, &nes.rom[0xe000]);
-			memory_set_bankptr(machine, 2, nes_fds.data );
+			memory_set_bankptr(machine, "bank1", &nes.rom[0xe000]);
+			memory_set_bankptr(machine, "bank2", nes_fds.data );
 			break;
 		case 50:
 			memory_install_write8_handler(space, 0x4020, 0x403f, 0, 0, nes_mapper50_add_w);
 			memory_install_write8_handler(space, 0x40a0, 0x40bf, 0, 0, nes_mapper50_add_w);
 		default:
 			nes.slow_banking = 0;
-			memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, SMH_BANK(5));
-			memory_install_read8_handler(space, 0x8000, 0x9fff, 0, 0, SMH_BANK(1));
-			memory_install_read8_handler(space, 0xa000, 0xbfff, 0, 0, SMH_BANK(2));
-			memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_BANK(3));
-			memory_install_read8_handler(space, 0xe000, 0xffff, 0, 0, SMH_BANK(4));
-			memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x6000);
-			memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x8000);
-			memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0xa000);
-			memory_set_bankptr(machine, 4, memory_region(machine, "maincpu") + 0xc000);
-			memory_set_bankptr(machine, 5, memory_region(machine, "maincpu") + 0xe000);
+			memory_install_read_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
+			memory_install_read_bank(space, 0x8000, 0x9fff, 0, 0, "bank1");
+			memory_install_read_bank(space, 0xa000, 0xbfff, 0, 0, "bank2");
+			memory_install_read_bank(space, 0xc000, 0xdfff, 0, 0, "bank3");
+			memory_install_read_bank(space, 0xe000, 0xffff, 0, 0, "bank4");
+			memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x6000);
+			memory_set_bankptr(machine, "bank2", memory_region(machine, "maincpu") + 0x8000);
+			memory_set_bankptr(machine, "bank3", memory_region(machine, "maincpu") + 0xa000);
+			memory_set_bankptr(machine, "bank4", memory_region(machine, "maincpu") + 0xc000);
+			memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") + 0xe000);
 
 			memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_w);
 			memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, nes_mapper_w);

@@ -34,7 +34,7 @@ WRITE8_HANDLER( xxmissio_paletteram_w );
 
 static WRITE8_HANDLER( xxmissio_bank_sel_w )
 {
-	memory_set_bank(space->machine, 1, data & 7);
+	memory_set_bank(space->machine, "bank1", data & 7);
 }
 
 static CUSTOM_INPUT( xxmissio_status_r )
@@ -95,8 +95,8 @@ static INTERRUPT_GEN( xxmissio_interrupt_s )
 
 static MACHINE_START( xxmissio )
 {
-	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "user1"), 0x4000);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "user1"), 0x4000);
+	memory_set_bank(machine, "bank1", 0);
 }
 
 /****************************************************************************/
@@ -113,20 +113,20 @@ static ADDRESS_MAP_START( map1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(xxmissio_status_m_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(xxmissio_flipscreen_w)
 
-	AM_RANGE(0xc000, 0xc7ff) AM_SHARE(1) AM_RAM AM_BASE(&xxmissio_fgram)
-	AM_RANGE(0xc800, 0xcfff) AM_SHARE(2) AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w) AM_BASE(&xxmissio_bgram)
-	AM_RANGE(0xd000, 0xd7ff) AM_SHARE(3) AM_RAM AM_BASE(&xxmissio_spriteram)
+	AM_RANGE(0xc000, 0xc7ff) AM_SHARE("share1") AM_RAM AM_BASE(&xxmissio_fgram)
+	AM_RANGE(0xc800, 0xcfff) AM_SHARE("share2") AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w) AM_BASE(&xxmissio_bgram)
+	AM_RANGE(0xd000, 0xd7ff) AM_SHARE("share3") AM_RAM AM_BASE(&xxmissio_spriteram)
 
-	AM_RANGE(0xd800, 0xdaff) AM_SHARE(4) AM_RAM_WRITE(xxmissio_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xd800, 0xdaff) AM_SHARE("share4") AM_RAM_WRITE(xxmissio_paletteram_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0xe000, 0xefff) AM_SHARE(5) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_SHARE(6) AM_RAM
+	AM_RANGE(0xe000, 0xefff) AM_SHARE("share5") AM_RAM
+	AM_RANGE(0xf000, 0xffff) AM_SHARE("share6") AM_RAM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( map2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x8002, 0x8003) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
@@ -138,14 +138,14 @@ static ADDRESS_MAP_START( map2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(xxmissio_status_s_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(xxmissio_flipscreen_w)
 
-	AM_RANGE(0xc000, 0xc7ff) AM_SHARE(1) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_SHARE(2) AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_SHARE(3) AM_RAM
+	AM_RANGE(0xc000, 0xc7ff) AM_SHARE("share1") AM_RAM
+	AM_RANGE(0xc800, 0xcfff) AM_SHARE("share2") AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_SHARE("share3") AM_RAM
 
-	AM_RANGE(0xd800, 0xdaff) AM_SHARE(4) AM_RAM_WRITE(xxmissio_paletteram_w)
+	AM_RANGE(0xd800, 0xdaff) AM_SHARE("share4") AM_RAM_WRITE(xxmissio_paletteram_w)
 
-	AM_RANGE(0xe000, 0xefff) AM_SHARE(6) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_SHARE(5) AM_RAM
+	AM_RANGE(0xe000, 0xefff) AM_SHARE("share6") AM_RAM
+	AM_RANGE(0xf000, 0xffff) AM_SHARE("share5") AM_RAM
 ADDRESS_MAP_END
 
 

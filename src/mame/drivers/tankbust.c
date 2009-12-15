@@ -114,8 +114,8 @@ static WRITE8_HANDLER( tankbust_e0xx_w )
 	case 7: /* 0xe007 bankswitch */
 		/* bank 1 at 0x6000-9fff = from 0x10000 when bit0=0 else from 0x14000 */
 		/* bank 2 at 0xa000-bfff = from 0x18000 when bit0=0 else from 0x1a000 */
-		memory_set_bankptr(space->machine,  1, memory_region(space->machine, "maincpu") + 0x10000 + ((data&1) * 0x4000) );
-		memory_set_bankptr(space->machine,  2, memory_region(space->machine, "maincpu") + 0x18000 + ((data&1) * 0x2000) ); /* verified (the game will reset after the "game over" otherwise) */
+		memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "maincpu") + 0x10000 + ((data&1) * 0x4000) );
+		memory_set_bankptr(space->machine,  "bank2", memory_region(space->machine, "maincpu") + 0x18000 + ((data&1) * 0x2000) ); /* verified (the game will reset after the "game over" otherwise) */
 	break;
 	}
 }
@@ -194,8 +194,8 @@ static READ8_HANDLER( some_changing_input )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x9fff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(SMH_BANK(2), SMH_ROM)
+	AM_RANGE(0x6000, 0x9fff) AM_ROMBANK("bank1")
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(tankbust_background_videoram_r, tankbust_background_videoram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(tankbust_background_colorram_r, tankbust_background_colorram_w) AM_BASE_GENERIC(colorram)
 	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(tankbust_txtram_r, tankbust_txtram_w) AM_BASE(&tankbust_txtram)
@@ -221,13 +221,12 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( map_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_WRITENOP	/* garbage, written in initialization loop */
 	//0x4000 and 0x4040-0x4045 seem to be used (referenced in the code)
 	AM_RANGE(0x4000, 0x7fff) AM_WRITENOP	/* garbage, written in initialization loop */
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x8000, 0x87ff) AM_READONLY
+	AM_RANGE(0x8000, 0x87ff) AM_WRITEONLY
 ADDRESS_MAP_END
 
 

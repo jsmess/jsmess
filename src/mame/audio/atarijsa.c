@@ -82,13 +82,13 @@ static WRITE8_HANDLER( jsa3_io_w );
  *************************************/
 
 static ADDRESS_MAP_START( jsa3_oki_map, 0, 8 )
-	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK(12)
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK(13)
+	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("bank12")
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank13")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jsa3_oki2_map, 0, 8 )
-	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK(14)
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK(15)
+	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("bank14")
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank15")
 ADDRESS_MAP_END
 
 
@@ -161,10 +161,11 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 			UINT8 *base = memory_region(machine, regions[rgn]);
 			if (base != NULL && memory_region_length(machine, regions[rgn]) >= 0x80000)
 			{
-				int banknum = (rgn != 2) ? 12 : 14;
-				memory_configure_bank(machine, banknum, 0, 2, base + 0x00000, 0x00000);
-				memory_configure_bank(machine, banknum, 2, 2, base + 0x20000, 0x20000);
-				memory_set_bankptr(machine, banknum + 1, base + 0x60000);
+				const char *bank = (rgn != 2) ? "bank12" : "bank14";
+				const char *bank_plus_1 = (rgn != 2) ? "bank13" : "bank15";
+				memory_configure_bank(machine, bank, 0, 2, base + 0x00000, 0x00000);
+				memory_configure_bank(machine, bank, 2, 2, base + 0x20000, 0x20000);
+				memory_set_bankptr(machine, bank_plus_1, base + 0x60000);
 			}
 		}
 	}
@@ -199,6 +200,7 @@ void atarijsa_reset(void)
 
 static READ8_HANDLER( jsa1_io_r )
 {
+	atarigen_state *atarigen = (atarigen_state *)space->machine->driver_data;
 	int result = 0xff;
 
 	switch (offset & 0x206)
@@ -224,8 +226,8 @@ static READ8_HANDLER( jsa1_io_r )
             */
 			result = input_port_read(space->machine, "JSAI");
 			if (!(input_port_read(space->machine, test_port) & test_mask)) result ^= 0x80;
-			if (atarigen_cpu_to_sound_ready) result ^= 0x40;
-			if (atarigen_sound_to_cpu_ready) result ^= 0x20;
+			if (atarigen->cpu_to_sound_ready) result ^= 0x40;
+			if (atarigen->sound_to_cpu_ready) result ^= 0x20;
 			if (tms5220 == NULL || !tms5220_readyq_r(tms5220)) result ^= 0x10;
 			break;
 
@@ -323,6 +325,7 @@ static WRITE8_HANDLER( jsa1_io_w )
 
 static READ8_HANDLER( jsa2_io_r )
 {
+	atarigen_state *atarigen = (atarigen_state *)space->machine->driver_data;
 	int result = 0xff;
 
 	switch (offset & 0x206)
@@ -351,8 +354,8 @@ static READ8_HANDLER( jsa2_io_r )
             */
 			result = input_port_read(space->machine, "JSAII");
 			if (!(input_port_read(space->machine, test_port) & test_mask)) result ^= 0x80;
-			if (atarigen_cpu_to_sound_ready) result ^= 0x40;
-			if (atarigen_sound_to_cpu_ready) result ^= 0x20;
+			if (atarigen->cpu_to_sound_ready) result ^= 0x40;
+			if (atarigen->sound_to_cpu_ready) result ^= 0x20;
 			break;
 
 		case 0x006:		/* /IRQACK */
@@ -445,6 +448,7 @@ static WRITE8_HANDLER( jsa2_io_w )
 
 static READ8_HANDLER( jsa3_io_r )
 {
+	atarigen_state *atarigen = (atarigen_state *)space->machine->driver_data;
 	int result = 0xff;
 
 	switch (offset & 0x206)
@@ -471,8 +475,8 @@ static READ8_HANDLER( jsa3_io_r )
             */
 			result = input_port_read(space->machine, "JSAIII");
 			if (!(input_port_read(space->machine, test_port) & test_mask)) result ^= 0x90;
-			if (atarigen_cpu_to_sound_ready) result ^= 0x40;
-			if (atarigen_sound_to_cpu_ready) result ^= 0x20;
+			if (atarigen->cpu_to_sound_ready) result ^= 0x40;
+			if (atarigen->sound_to_cpu_ready) result ^= 0x20;
 			break;
 
 		case 0x006:		/* /IRQACK */
@@ -531,7 +535,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 
 			/* update the OKI bank */
 			if (oki6295 != NULL)
-				memory_set_bank(space->machine, 12, (memory_get_bank(space->machine, 12) & 2) | ((data >> 1) & 1));
+				memory_set_bank(space->machine, "bank12", (memory_get_bank(space->machine, "bank12") & 2) | ((data >> 1) & 1));
 
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
@@ -556,7 +560,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 
 			/* update the OKI bank */
 			if (oki6295 != NULL)
-				memory_set_bank(space->machine, 12, (memory_get_bank(space->machine, 12) & 1) | ((data >> 3) & 2));
+				memory_set_bank(space->machine, "bank12", (memory_get_bank(space->machine, "bank12") & 1) | ((data >> 3) & 2));
 
 			/* update the volumes */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
@@ -576,6 +580,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 
 static READ8_HANDLER( jsa3s_io_r )
 {
+	atarigen_state *atarigen = (atarigen_state *)space->machine->driver_data;
 	int result = 0xff;
 
 	switch (offset & 0x206)
@@ -602,8 +607,8 @@ static READ8_HANDLER( jsa3s_io_r )
             */
 			result = input_port_read(space->machine, "JSAIII");
 			if (!(input_port_read(space->machine, test_port) & test_mask)) result ^= 0x90;
-			if (atarigen_cpu_to_sound_ready) result ^= 0x40;
-			if (atarigen_sound_to_cpu_ready) result ^= 0x20;
+			if (atarigen->cpu_to_sound_ready) result ^= 0x40;
+			if (atarigen->sound_to_cpu_ready) result ^= 0x20;
 			break;
 
 		case 0x006:		/* /IRQACK */
@@ -661,7 +666,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
             */
 
 			/* update the OKI bank */
-			memory_set_bank(space->machine, 12, (memory_get_bank(space->machine, 12) & 2) | ((data >> 1) & 1));
+			memory_set_bank(space->machine, "bank12", (memory_get_bank(space->machine, "bank12") & 2) | ((data >> 1) & 1));
 
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
@@ -686,8 +691,8 @@ static WRITE8_HANDLER( jsa3s_io_w )
             */
 
 			/* update the OKI bank */
-			memory_set_bank(space->machine, 12, (memory_get_bank(space->machine, 12) & 1) | ((data >> 3) & 2));
-			memory_set_bank(space->machine, 14, data >> 6);
+			memory_set_bank(space->machine, "bank12", (memory_get_bank(space->machine, "bank12") & 1) | ((data >> 3) & 2));
+			memory_set_bank(space->machine, "bank14", data >> 6);
 
 			/* update the volumes */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;

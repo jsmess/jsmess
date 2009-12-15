@@ -104,16 +104,18 @@ UINT32 intel82439tx_pci_read(const device_config *busdevice, const device_config
 static void intel82439tx_configure_memory(running_machine *machine, UINT8 val, offs_t begin, offs_t end, int read_bank, write32_space_func wh)
 {
 	const address_space* space = cpu_get_address_space(machine->firstcpu,ADDRESS_SPACE_PROGRAM);
-	memory_install_read_handler(space, begin, end, 0, 0, read_bank);
+	char bank[10];
+	sprintf(bank,"bank%d",read_bank);
+	memory_install_read_bank(space, begin, end, 0, 0, bank);
 	if (val & 0x01)
-		memory_set_bankptr(machine, read_bank, i82439tx->bios_ram + (begin - 0xC0000) / 4);
+		memory_set_bankptr(machine, bank, i82439tx->bios_ram + (begin - 0xC0000) / 4);
 	else
-		memory_set_bankptr(machine, read_bank, memory_region(machine, "user1") + (begin - 0xC0000));
+		memory_set_bankptr(machine, bank, memory_region(machine, "user1") + (begin - 0xC0000));
 
 	if (val & 0x02)
 		memory_install_write32_handler(space, begin, end, 0, 0, wh);
 	else
-		memory_install_write32_handler(space, begin, end, 0, 0, SMH_NOP);
+		memory_nop_read(space, begin, end, 0, 0);
 }
 
 

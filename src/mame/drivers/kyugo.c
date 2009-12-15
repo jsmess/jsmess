@@ -24,32 +24,20 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
-#include "kyugo.h"
 #include "sound/ay8910.h"
-
-
-static UINT8 *shared_ram;
-static WRITE8_HANDLER( kyugo_sub_cpu_control_w );
+#include "includes/kyugo.h"
 
 
 /*************************************
  *
- *  Machine initialization
+ *  Memory handlers
  *
  *************************************/
 
-static MACHINE_RESET( kyugo )
-{
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	// must start with interrupts and sub CPU disabled
-	cpu_interrupt_enable(cputag_get_cpu(machine, "maincpu"), 0);
-	kyugo_sub_cpu_control_w(space, 0, 0);
-}
-
-
 static WRITE8_HANDLER( kyugo_sub_cpu_control_w )
 {
-	cputag_set_input_line(space->machine, "sub", INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
+	kyugo_state *state = (kyugo_state *)space->machine->driver_data;
+	cpu_set_input_line(state->subcpu, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -61,15 +49,15 @@ static WRITE8_HANDLER( kyugo_sub_cpu_control_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(kyugo_bgvideoram_w) AM_BASE(&kyugo_bgvideoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(kyugo_bgattribram_w) AM_BASE(&kyugo_bgattribram)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(kyugo_fgvideoram_w) AM_BASE(&kyugo_fgvideoram)
-	AM_RANGE(0x9800, 0x9fff) AM_READWRITE(kyugo_spriteram_2_r, SMH_RAM) AM_BASE(&kyugo_spriteram_2)
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE(&kyugo_spriteram_1)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(kyugo_bgvideoram_w) AM_BASE_MEMBER(kyugo_state, bgvideoram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(kyugo_bgattribram_w) AM_BASE_MEMBER(kyugo_state, bgattribram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(kyugo_fgvideoram_w) AM_BASE_MEMBER(kyugo_state, fgvideoram)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM_READ(kyugo_spriteram_2_r) AM_BASE_MEMBER(kyugo_state, spriteram_2)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(kyugo_state, spriteram_1)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(kyugo_scroll_x_lo_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(kyugo_gfxctrl_w)
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(kyugo_scroll_y_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE(1) AM_BASE(&shared_ram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(kyugo_state, shared_ram)
 ADDRESS_MAP_END
 
 
@@ -104,7 +92,7 @@ Main_PortMap( srdmissn, 0x08 )
 #define Sub_MemMap( name, rom_end, shared, in0, in1, in2 )					\
 static ADDRESS_MAP_START( name##_sub_map, ADDRESS_SPACE_PROGRAM, 8 )		\
 	AM_RANGE(0x0000, rom_end) AM_ROM										\
-	AM_RANGE(shared, shared+0x7ff) AM_RAM AM_SHARE(1)						\
+	AM_RANGE(shared, shared+0x7ff) AM_RAM AM_SHARE("share1")						\
 	AM_RANGE(in0, in0) AM_READ_PORT("SYSTEM")								\
 	AM_RANGE(in1, in1) AM_READ_PORT("P1")									\
 	AM_RANGE(in2, in2) AM_READ_PORT("P2")									\
@@ -459,7 +447,42 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
+static MACHINE_START( kyugo )
+{
+	kyugo_state *state = (kyugo_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->subcpu = devtag_get_device(machine, "sub");
+
+	state_save_register_global(machine, state->scroll_x_lo);
+	state_save_register_global(machine, state->scroll_x_hi);
+	state_save_register_global(machine, state->scroll_y);
+	state_save_register_global(machine, state->bgpalbank);
+	state_save_register_global(machine, state->fgcolor);
+	state_save_register_global(machine, state->flipscreen);
+}
+
+static MACHINE_RESET( kyugo )
+{
+	kyugo_state *state = (kyugo_state *)machine->driver_data;
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	// must start with interrupts and sub CPU disabled
+	cpu_interrupt_enable(cputag_get_cpu(machine, "maincpu"), 0);
+	kyugo_sub_cpu_control_w(space, 0, 0);
+
+	state->scroll_x_lo = 0;
+	state->scroll_x_hi = 0;
+	state->scroll_y = 0;
+	state->bgpalbank = 0;
+	state->fgcolor = 0;
+	state->flipscreen = 0;
+}
+
+
 static MACHINE_DRIVER_START( gyrodine )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(kyugo_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
@@ -474,6 +497,7 @@ static MACHINE_DRIVER_START( gyrodine )
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
+	MDRV_MACHINE_START(kyugo)
 	MDRV_MACHINE_RESET(kyugo)
 
 	/* video hardware */
@@ -1123,6 +1147,7 @@ ROM_START( skywolf )
 	ROM_LOAD( "m1.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? not used */
 ROM_END
 
+
 ROM_START( skywolf2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "z80_2.bin",   0x0000, 0x8000, CRC(34db7bda) SHA1(1a98d5cf97063453a0351f7dbe339c32d59a3d20) )
@@ -1154,6 +1179,78 @@ ROM_START( skywolf2 )
 	/* 0x0300-0x031f empty - looks like there isn't a lookup table PROM */
 	ROM_LOAD( "m1.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? not used */
 ROM_END
+
+/*
+Sky Wolf bootleg
+ - this has all the data in 0x8000 sized roms.
+
+on main PCB (CR208):
+1x TMS27256JL (1)
+3x M27256 (2,3,4)
+3x PAL16L8NC (read protected)
+
+on roms PCB (CR207):
+7x M27256 (5,6,7,8,9,10,11)
+3x PROM N82S129N
+2x PROM DM74S288N (one is blank!)
+
+the only real difference seems to be that you get less lives.
+
+*/
+
+ROM_START( skywolf3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",   0x0000, 0x4000, CRC(74a86ec8) SHA1(f9e5622c855053f7aac81c4775654ee8bc802180) )
+	ROM_CONTINUE(0x0000,0x4000) // 1.BIN        [2/2]      z80_2.bin    [1/2]      99.981689%
+	ROM_LOAD( "2.bin",   0x4000, 0x4000, CRC(f02143de) SHA1(7695432c87bb4850f09b9d00c17f4b9216fb2b90) )
+	ROM_CONTINUE(0x4000,0x4000)
+
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "3.bin",  0x0000, 0x4000, CRC(787cdd0a) SHA1(6f53008ee96b690ef467b3436d4bebba82c71d6b) )
+	ROM_CONTINUE(0x0000,0x4000)
+	ROM_LOAD( "4.bin",  0x4000, 0x4000, CRC(07a2c814) SHA1(242bbce2b1b6e1668235d327e8c3a61906175af5) )
+	ROM_CONTINUE(0x4000,0x4000)
+
+	ROM_REGION( 0x01000, "gfx1", 0 )
+	ROM_LOAD( "8.bin",  0x00000, 0x1000, CRC(b86d3dac) SHA1(d92e494d46f641fbfb107da218f5aab5bdf1e68c) ) /* chars */
+	ROM_CONTINUE(0x0000,0x1000)
+	ROM_CONTINUE(0x0000,0x1000)
+	ROM_CONTINUE(0x0000,0x1000)
+	ROM_CONTINUE(0x0000,0x1000)
+	ROM_CONTINUE(0x0000,0x1000)
+	ROM_CONTINUE(0x0000,0x1000)
+	ROM_CONTINUE(0x0000,0x1000)
+
+	ROM_REGION( 0x06000, "gfx2", 0 )
+	ROM_LOAD( "11.bin",  0x00000, 0x2000, CRC(fc7bbf7a) SHA1(a10245d32efa9998a63008e3989b1a4958c85b0a) ) /* tiles - plane 1 */
+	ROM_CONTINUE(0x0000,0x2000)
+	ROM_CONTINUE(0x0000,0x2000)
+	ROM_CONTINUE(0x0000,0x2000)
+	ROM_LOAD( "10.bin",  0x02000, 0x2000, CRC(1a3710ab) SHA1(6e61e94bb7f22beeb43af35c3299569c40c38ed9) ) /* tiles - plane 0 */
+	ROM_CONTINUE(0x2000,0x2000)
+	ROM_CONTINUE(0x2000,0x2000)
+	ROM_CONTINUE(0x2000,0x2000)
+	ROM_LOAD( "9.bin",  0x04000, 0x2000, CRC(a184349a) SHA1(e67f3727e6b57dc5ab503f2aa00ec860ba722633) ) /* tiles - plane 2 */
+	ROM_CONTINUE(0x4000,0x2000)
+	ROM_CONTINUE(0x4000,0x2000)
+	ROM_CONTINUE(0x4000,0x2000)
+
+	ROM_REGION( 0x18000, "gfx3", 0 )
+	ROM_LOAD( "7.bin",  0x00000, 0x8000, CRC(086612e8) SHA1(c59296d720a65a69d8c558fda73702ec345c5a2d) ) /* sprites - plane 0 */
+	ROM_LOAD( "6.bin",  0x08000, 0x8000, CRC(3a9beabd) SHA1(a20ee42af04ef2e77dcc2040d9ebd6084005e009) ) /* sprites - plane 1 */
+	ROM_LOAD( "5.bin",  0x10000, 0x8000, CRC(bd83658e) SHA1(4b2a98c24c20e4deb819613e5fbcd63ae8c81700) ) /* sprites - plane 2 */
+
+	ROM_REGION( 0x0340, "proms", 0 )
+	ROM_LOAD( "82s129-1.bin",     0x0000, 0x0100, CRC(6a94b2a3) SHA1(b1f9bd97aa26c9fb6377ef32d5dd125583361f48) ) /* red */
+	//ROM_LOAD( "82s129-2.bin",     0x0100, 0x0100, CRC(ff7a7446) SHA1(ceeb375dc90142142a284969c104e581deb76f16) ) /* green (bad?) - causes green outline on title */
+	//ROM_LOAD( "82s129-3.bin",     0x0200, 0x0100, CRC(6b0980bf) SHA1(6314f9e593f2d2a2f014f6eb82295cb3aa70cbd1)) ) /* blue (bad) - high bit of colour fixed to 0 */
+	ROM_LOAD( "82s129-2.bin",     0x0100, 0x0100, CRC(ec0923d3) SHA1(26f9eda4260a8b767893b8dea42819f192ef0b20) ) /* green */
+	ROM_LOAD( "82s129-3.bin",     0x0200, 0x0100, CRC(ade97052) SHA1(cc1b4cd57d7bc55ce44de6b89a322ff08eabb1a0) ) /* blue */
+	ROM_LOAD( "74s288-2.bin",     0x0300, 0x0020, CRC(190a55ad) SHA1(de8a847bff8c343d69b853a215e6ee775ef2ef96) ) /* blank lookup prom */
+	ROM_LOAD( "74s288-1.bin",     0x0320, 0x0020, CRC(5ddb2d15) SHA1(422663566ebc7ea8cbc3089d806b0868e006fe0c) ) /* timing? not used */
+ROM_END
+
 
 ROM_START( legend )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1211,13 +1308,13 @@ static DRIVER_INIT( gyrodine )
 
 static DRIVER_INIT( srdmissn )
 {
+	kyugo_state *state = (kyugo_state *)machine->driver_data;
+
 	/* shared RAM is mapped at 0xe000 as well  */
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xe7ff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));
-	memory_set_bankptr(machine, 1, shared_ram);
+	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xe7ff, 0, 0, state->shared_ram);
 
 	/* extra RAM on sub CPU  */
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x8800, 0x8fff, 0, 0, (read8_space_func)SMH_BANK(2), (write8_space_func)SMH_BANK(2));
-	memory_set_bankptr(machine, 2, auto_alloc_array(machine, UINT8, 0x800));
+	memory_install_ram(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x8800, 0x8fff, 0, 0, NULL);
 }
 
 
@@ -1228,20 +1325,21 @@ static DRIVER_INIT( srdmissn )
  *
  *************************************/
 
-GAME( 1984, gyrodine, 0,        gyrodine, gyrodine, gyrodine, ROT90, "Crux (Taito Corporation license)", "Gyrodine (Taito Corporation license)", 0 )
-GAME( 1984, gyrodinec,gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Crux", "Gyrodine", 0 )
-GAME( 1984, buzzard,  gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Crux", "Buzzard", 0 )
-GAME( 1985, sonofphx, 0,        sonofphx, sonofphx, 0,        ROT90, "Associated Overseas MFR, Inc", "Son of Phoenix", 0 )
-GAME( 1985, repulse,  sonofphx, sonofphx, sonofphx, 0,        ROT90, "Sega", "Repulse", 0 )
-GAME( 1985, 99lstwar, sonofphx, sonofphx, sonofphx, 0,        ROT90, "Proma", "'99: The Last War", 0 )
-GAME( 1985, 99lstwara,sonofphx, sonofphx, sonofphx, 0,        ROT90, "Proma", "'99: The Last War (alternate)", 0 )
-GAME( 1985, 99lstwark,sonofphx, sonofphx, sonofphx, 0,        ROT90, "Kyugo", "'99: The Last War (Kyugo)", 0 )
-GAME( 1985, flashgal, 0,        flashgal, flashgal, 0,        ROT0,  "Sega", "Flashgal (set 1)", 0 )
-GAME( 1985, flashgala,flashgal, flashgla, flashgal, 0,        ROT0,  "Sega", "Flashgal (set 2)", 0 )
-GAME( 1986, srdmissn, 0,        srdmissn, srdmissn, srdmissn, ROT90, "Taito Corporation", "S.R.D. Mission", 0 )
-GAME( 1986, fx,       srdmissn, srdmissn, srdmissn, srdmissn, ROT90, "bootleg", "F-X", 0 )
-GAME( 1986, legend,   0,        legend,   legend,   srdmissn, ROT0,  "Sega / Coreland", "Legend", 0 )
-GAME( 1987, airwolf,  0,        srdmissn, airwolf,  srdmissn, ROT0,  "Kyugo", "Airwolf", 0 )
-GAME( 1987, airwolfa, airwolf,  srdmissn, airwolf,  srdmissn, ROT0,  "Kyugo (UA Theatre license)", "Airwolf (US)", 0 )
-GAME( 1987, skywolf,  airwolf,  srdmissn, skywolf,  srdmissn, ROT0,  "bootleg", "Sky Wolf (set 1)", 0 )
-GAME( 1987, skywolf2, airwolf,  srdmissn, airwolf,  srdmissn, ROT0,  "bootleg", "Sky Wolf (set 2)", 0 )
+GAME( 1984, gyrodine,  0,        gyrodine, gyrodine, gyrodine, ROT90, "Crux (Taito Corporation license)", "Gyrodine (Taito Corporation license)", GAME_SUPPORTS_SAVE )
+GAME( 1984, gyrodinec, gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Crux", "Gyrodine", GAME_SUPPORTS_SAVE )
+GAME( 1984, buzzard,   gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Crux", "Buzzard", GAME_SUPPORTS_SAVE )
+GAME( 1985, sonofphx,  0,        sonofphx, sonofphx, 0,        ROT90, "Associated Overseas MFR, Inc", "Son of Phoenix", GAME_SUPPORTS_SAVE )
+GAME( 1985, repulse,   sonofphx, sonofphx, sonofphx, 0,        ROT90, "Sega", "Repulse", GAME_SUPPORTS_SAVE )
+GAME( 1985, 99lstwar,  sonofphx, sonofphx, sonofphx, 0,        ROT90, "Proma", "'99: The Last War", GAME_SUPPORTS_SAVE )
+GAME( 1985, 99lstwara, sonofphx, sonofphx, sonofphx, 0,        ROT90, "Proma", "'99: The Last War (alternate)", GAME_SUPPORTS_SAVE )
+GAME( 1985, 99lstwark, sonofphx, sonofphx, sonofphx, 0,        ROT90, "Kyugo", "'99: The Last War (Kyugo)", GAME_SUPPORTS_SAVE )
+GAME( 1985, flashgal,  0,        flashgal, flashgal, 0,        ROT0,  "Sega", "Flashgal (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, flashgala, flashgal, flashgla, flashgal, 0,        ROT0,  "Sega", "Flashgal (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, srdmissn,  0,        srdmissn, srdmissn, srdmissn, ROT90, "Taito Corporation", "S.R.D. Mission", GAME_SUPPORTS_SAVE )
+GAME( 1986, fx,        srdmissn, srdmissn, srdmissn, srdmissn, ROT90, "bootleg", "F-X", GAME_SUPPORTS_SAVE )
+GAME( 1986, legend,    0,        legend,   legend,   srdmissn, ROT0,  "Sega / Coreland", "Legend", GAME_SUPPORTS_SAVE )
+GAME( 1987, airwolf,   0,        srdmissn, airwolf,  srdmissn, ROT0,  "Kyugo", "Airwolf", GAME_SUPPORTS_SAVE )
+GAME( 1987, airwolfa,  airwolf,  srdmissn, airwolf,  srdmissn, ROT0,  "Kyugo (UA Theatre license)", "Airwolf (US)", GAME_SUPPORTS_SAVE )
+GAME( 1987, skywolf,   airwolf,  srdmissn, skywolf,  srdmissn, ROT0,  "bootleg", "Sky Wolf (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, skywolf2,  airwolf,  srdmissn, airwolf,  srdmissn, ROT0,  "bootleg", "Sky Wolf (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, skywolf3,  airwolf,  srdmissn, airwolf,  srdmissn, ROT0,  "bootleg", "Sky Wolf (set 3)", GAME_SUPPORTS_SAVE )

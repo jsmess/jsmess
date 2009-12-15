@@ -146,16 +146,15 @@ static void amiga_ar1_init( running_machine *machine )
 	memset(ar_ram, 0, 0x4000);
 
 	/* Install ROM */
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf00000, 0xf7ffff, 0, 0, SMH_BANK(2));
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf00000, 0xf7ffff, 0, 0, SMH_ROM);
+	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf00000, 0xf7ffff, 0, 0, "bank2");
+	memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf00000, 0xf7ffff, 0, 0);
 
 	/* Install RAM */
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9fc000, 0x9fffff, 0, 0, SMH_BANK(3));
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9fc000, 0x9fffff, 0, 0, SMH_BANK(3));
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9fc000, 0x9fffff, 0, 0, "bank3");
 
 	/* Configure Banks */
-	memory_set_bankptr(machine, 2, memory_region(machine, "user2"));
-	memory_set_bankptr(machine, 3, ar_ram);
+	memory_set_bankptr(machine, "bank2", memory_region(machine, "user2"));
+	memory_set_bankptr(machine, "bank3", ar_ram);
 
 	amiga_ar1_spurious = 0;
 
@@ -228,7 +227,7 @@ static READ16_HANDLER( amiga_ar23_mode_r )
 		{
 			UINT32 mirror_mask = amiga_chip_ram_size;
 
-			memory_set_bank(space->machine, 1, 0);
+			memory_set_bank(space->machine, "bank1", 0);
 
 			while( (mirror_mask<<1) < 0x100000 )
 			{
@@ -236,7 +235,7 @@ static READ16_HANDLER( amiga_ar23_mode_r )
 			}
 
 			/* overlay disabled, map RAM on 0x000000 */
-			memory_install_write16_handler(space, 0x000000, amiga_chip_ram_size - 1, 0, mirror_mask, SMH_BANK(1));
+			memory_install_write_bank(space, 0x000000, amiga_chip_ram_size - 1, 0, mirror_mask, "bank1");
 		}
 	}
 
@@ -273,7 +272,7 @@ static void amiga_ar23_freeze( running_machine *machine )
 		}
 
 		/* overlay the cart rom's in chipram */
-		memory_set_bank(machine, 1, 2);
+		memory_set_bank(machine, "bank1", 2);
 
 		/* writes go to chipram */
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, amiga_chip_ram_size - 1, 0, 0, amiga_ar23_chipmem_w);
@@ -359,12 +358,12 @@ static void amiga_ar23_init( running_machine *machine, int ar3 )
 	}
 
 	/* Install ROM */
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400000+size, 0, mirror, SMH_BANK(2));
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400000+size, 0, mirror, SMH_ROM);
+	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400000+size, 0, mirror, "bank2");
+	memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400000+size, 0, mirror);
 
 	/* Install RAM */
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x440000, 0x44ffff, 0, 0, SMH_BANK(3));
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x440000, 0x44ffff, 0, 0, SMH_BANK(3));
+	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x440000, 0x44ffff, 0, 0, "bank3");
+	memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x440000, 0x44ffff, 0, 0, "bank3");
 
 	/* Install Custom chip monitor */
 //  memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xdff000, 0xdff1ff, 0, 0, amiga_ar23_custom_r);
@@ -375,12 +374,12 @@ static void amiga_ar23_init( running_machine *machine, int ar3 )
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400003, 0, mirror, amiga_ar23_mode_w);
 
 	/* Configure Banks */
-	memory_set_bankptr(machine, 2, memory_region(machine, "user2"));
-	memory_set_bankptr(machine, 3, ar_ram);
+	memory_set_bankptr(machine, "bank2", memory_region(machine, "user2"));
+	memory_set_bankptr(machine, "bank3", ar_ram);
 
-	memory_configure_bank(machine, 1, 0, 2, amiga_chip_ram, 0);
-	memory_configure_bank(machine, 1, 1, 2, memory_region(machine, "user1"), 0);
-	memory_configure_bank(machine, 1, 2, 2, memory_region(machine, "user2"), 0);
+	memory_configure_bank(machine, "bank1", 0, 2, amiga_chip_ram, 0);
+	memory_configure_bank(machine, "bank1", 1, 2, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, "bank1", 2, 2, memory_region(machine, "user2"), 0);
 
 	amiga_ar23_mode = 3;
 }

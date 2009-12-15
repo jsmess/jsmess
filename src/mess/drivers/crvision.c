@@ -461,7 +461,7 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 	case 0x1000: // 4K
 		image_fread(image, mem + 0x9000, 0x1000);			// load 4KB at 0x9000
 		memcpy(mem + 0xb000, mem + 0x9000, 0x1000);			// mirror 4KB at 0xb000
-		memory_install_read8_handler(program, 0x8000, 0xbfff, 0, 0x2000, SMH_BANK(BANK_ROM1));
+		memory_install_read_bank(program, 0x8000, 0xbfff, 0, 0x2000, BANK_ROM1);
 		break;
 
 	case 0x1800: // 6K
@@ -471,13 +471,13 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 		memcpy(mem + 0x8800, mem + 0x8000, 0x0800);			// mirror higher 2KB at 0x8800
 		memcpy(mem + 0xa000, mem + 0x8000, 0x0800);			// mirror higher 2KB at 0xa000
 		memcpy(mem + 0xa800, mem + 0x8000, 0x0800);			// mirror higher 2KB at 0xa800
-		memory_install_read8_handler(program, 0x8000, 0xbfff, 0, 0x2000, SMH_BANK(BANK_ROM1));
+		memory_install_read_bank(program, 0x8000, 0xbfff, 0, 0x2000, BANK_ROM1);
 		break;
 
 	case 0x2000: // 8K
 		image_fread(image, mem + 0x8000, 0x2000);			// load 8KB at 0x8000
 		memcpy(mem + 0xa000, mem + 0x8000, 0x2000);			// mirror 8KB at 0xa000
-		memory_install_read8_handler(program, 0x8000, 0xbfff, 0, 0x2000, SMH_BANK(BANK_ROM1));
+		memory_install_read_bank(program, 0x8000, 0xbfff, 0, 0x2000, BANK_ROM1);
 		break;
 
 	case 0x2800: // 10K
@@ -491,8 +491,8 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 		memcpy(mem + 0x6800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x6800
 		memcpy(mem + 0x7000, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x7000
 		memcpy(mem + 0x7800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x7800
-		memory_install_read8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(BANK_ROM1));
-		memory_install_read8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_BANK(BANK_ROM2));
+		memory_install_read_bank(program, 0x8000, 0xbfff, 0, 0, BANK_ROM1);
+		memory_install_read_bank(program, 0x4000, 0x7fff, 0, 0, BANK_ROM2);
 		break;
 
 	case 0x3000: // 12K
@@ -502,15 +502,15 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 		memcpy(mem + 0x5000, mem + 0x4000, 0x1000);			// mirror higher 4KB at 0x5000
 		memcpy(mem + 0x6000, mem + 0x4000, 0x1000);			// mirror higher 4KB at 0x6000
 		memcpy(mem + 0x7000, mem + 0x4000, 0x1000);			// mirror higher 4KB at 0x7000
-		memory_install_read8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(BANK_ROM1));
-		memory_install_read8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_BANK(BANK_ROM2));
+		memory_install_read_bank(program, 0x8000, 0xbfff, 0, 0, BANK_ROM1);
+		memory_install_read_bank(program, 0x4000, 0x7fff, 0, 0, BANK_ROM2);
 		break;
 
 	case 0x4000: // 16K
 		image_fread(image, mem + 0xa000, 0x2000);			// load lower 8KB at 0xa000
 		image_fread(image, mem + 0x8000, 0x2000);			// load higher 8KB at 0x8000
-		memory_install_read8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(BANK_ROM1));
-		memory_install_read8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_BANK(BANK_ROM2));
+		memory_install_read_bank(program, 0x8000, 0xbfff, 0, 0, BANK_ROM1);
+		memory_install_read_bank(program, 0x4000, 0x7fff, 0, 0, BANK_ROM2);
 		break;
 
 	case 0x4800: // 18K
@@ -524,19 +524,19 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 		memcpy(mem + 0x6800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x6800
 		memcpy(mem + 0x7000, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x7000
 		memcpy(mem + 0x7800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x7800
-		memory_install_read8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(BANK_ROM1));
-		memory_install_read8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_BANK(BANK_ROM2));
+		memory_install_read_bank(program, 0x8000, 0xbfff, 0, 0, BANK_ROM1);
+		memory_install_read_bank(program, 0x4000, 0x7fff, 0, 0, BANK_ROM2);
 		break;
 
 	default:
 		return INIT_FAIL;
 	}
 
-	memory_configure_bank(machine, 1, 0, 1, mem + 0x8000, 0);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, mem + 0x8000, 0);
+	memory_set_bank(machine, "bank1", 0);
 
-	memory_configure_bank(machine, 2, 0, 1, mem + 0x4000, 0);
-	memory_set_bank(machine, 2, 0);
+	memory_configure_bank(machine, "bank2", 0, 1, mem + 0x4000, 0);
+	memory_set_bank(machine, "bank2", 0);
 
 	return INIT_PASS;
 }

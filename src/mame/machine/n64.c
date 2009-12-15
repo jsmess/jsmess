@@ -816,17 +816,22 @@ static void n64_vi_recalculate_resolution(running_machine *machine)
     if (width == 0 || height == 0)
     {
         n64_vi_blank = 1;
+        /*
+        FIXME: MAME doesn't handle well a h/w res of zero (otherwise it hardlocks the emu, seen especially in Aleck 64 games
+        that sets the res after a longer delay than n64), guess that this just disables drawing?
+        */
+        return;
     }
     else
     {
         n64_vi_blank = 0;
     }
 
-    if (width == 0)
-        width = 1;
+//  if (width == 0)
+//      width = 1;
 
-    if (height == 0)
-        height = 1;
+//  if (height == 0)
+//      height = 1;
 
     if (width > 640)
         width = 640;

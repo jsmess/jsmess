@@ -71,17 +71,17 @@ static void tiki100_bankswitch(running_machine *machine)
 		if (!state->rome)
 		{
 			/* reserved */
-			memory_install_readwrite8_handler(program, 0x0000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+			memory_unmap_readwrite(program, 0x0000, 0xffff, 0, 0);
 		}
 		else
 		{
 			/* GFXRAM, GFXRAM, RAM */
 			memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, gfxram_r, gfxram_w);
-			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(3), SMH_BANK(3));
+			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank3");
 
-			memory_set_bank(machine, 1, BANK_VIDEO_RAM);
-			memory_set_bank(machine, 2, BANK_VIDEO_RAM);
-			memory_set_bank(machine, 3, BANK_RAM);
+			memory_set_bank(machine, "bank1", BANK_VIDEO_RAM);
+			memory_set_bank(machine, "bank2", BANK_VIDEO_RAM);
+			memory_set_bank(machine, "bank3", BANK_RAM);
 		}
 	}
 	else
@@ -89,24 +89,25 @@ static void tiki100_bankswitch(running_machine *machine)
 		if (!state->rome)
 		{
 			/* ROM, RAM, RAM */
-			memory_install_readwrite8_handler(program, 0x0000, 0x3fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
-			memory_install_readwrite8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_BANK(2), SMH_BANK(2));
-			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(3), SMH_BANK(3));
+			memory_install_read_bank(program, 0x0000, 0x3fff, 0, 0, "bank1");
+			memory_unmap_write( program, 0x0000, 0x3fff, 0, 0 );
+			memory_install_readwrite_bank(program, 0x4000, 0x7fff, 0, 0, "bank2");
+			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank3");
 
-			memory_set_bank(machine, 1, BANK_ROM);
-			memory_set_bank(machine, 2, BANK_RAM);
-			memory_set_bank(machine, 3, BANK_RAM);
+			memory_set_bank(machine, "bank1", BANK_ROM);
+			memory_set_bank(machine, "bank2", BANK_RAM);
+			memory_set_bank(machine, "bank3", BANK_RAM);
 		}
 		else
 		{
 			/* RAM, RAM, RAM */
-			memory_install_readwrite8_handler(program, 0x0000, 0x3fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-			memory_install_readwrite8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_BANK(2), SMH_BANK(2));
-			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(3), SMH_BANK(3));
+			memory_install_readwrite_bank(program, 0x0000, 0x3fff, 0, 0, "bank1");
+			memory_install_readwrite_bank(program, 0x4000, 0x7fff, 0, 0, "bank2");
+			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank3");
 
-			memory_set_bank(machine, 1, BANK_RAM);
-			memory_set_bank(machine, 2, BANK_RAM);
-			memory_set_bank(machine, 3, BANK_RAM);
+			memory_set_bank(machine, "bank1", BANK_RAM);
+			memory_set_bank(machine, "bank2", BANK_RAM);
+			memory_set_bank(machine, "bank3", BANK_RAM);
 		}
 	}
 }
@@ -235,9 +236,9 @@ static WRITE8_HANDLER( system_w )
 
 static ADDRESS_MAP_START( tiki100_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1)
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(2)
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK(3)
+	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tiki100_io, ADDRESS_SPACE_IO, 8 )
@@ -587,14 +588,14 @@ static MACHINE_START( tiki100 )
 	state->video_ram = auto_alloc_array(machine, UINT8, TIKI100_VIDEORAM_SIZE);
 
 	/* setup memory banking */
-	memory_configure_bank(machine, 1, BANK_ROM, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(machine, 1, BANK_RAM, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
-	memory_configure_bank(machine, 1, BANK_VIDEO_RAM, 1, state->video_ram, 0);
+	memory_configure_bank(machine, "bank1", BANK_ROM, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(machine, "bank1", BANK_RAM, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_configure_bank(machine, "bank1", BANK_VIDEO_RAM, 1, state->video_ram, 0);
 
-	memory_configure_bank(machine, 2, BANK_RAM, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000, 0);
-	memory_configure_bank(machine, 2, BANK_VIDEO_RAM, 1, state->video_ram + 0x4000, 0);
+	memory_configure_bank(machine, "bank2", BANK_RAM, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000, 0);
+	memory_configure_bank(machine, "bank2", BANK_VIDEO_RAM, 1, state->video_ram + 0x4000, 0);
 
-	memory_configure_bank(machine, 3, BANK_RAM, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000, 0);
+	memory_configure_bank(machine, "bank3", BANK_RAM, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000, 0);
 
 	tiki100_bankswitch(machine);
 

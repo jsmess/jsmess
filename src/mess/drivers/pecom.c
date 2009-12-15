@@ -16,12 +16,12 @@
 
 /* Address maps */
 static ADDRESS_MAP_START(pecom64_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK(1)
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAMBANK(2)
+	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
+	AM_RANGE( 0x4000, 0x7fff ) AM_RAMBANK("bank2")
     AM_RANGE( 0x8000, 0xbfff ) AM_ROM  // ROM 1
     AM_RANGE( 0xc000, 0xf3ff ) AM_ROM  // ROM 2
-    AM_RANGE( 0xf000, 0xf7ff ) AM_RAMBANK(3) // CDP1869 / ROM
-    AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK(4) // CDP1869 / ROM
+    AM_RANGE( 0xf000, 0xf7ff ) AM_RAMBANK("bank3") // CDP1869 / ROM
+    AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank4") // CDP1869 / ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pecom64_io, ADDRESS_SPACE_IO, 8 )

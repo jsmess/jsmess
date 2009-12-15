@@ -172,73 +172,20 @@
     The Video boards are exactly the same between the two boardset versions (bottom
     board) nothing changed with the video boards.
 
-    The biggest difference to me seems to be the ROM at U87 on Control Board II,
-    The part number for this ROM is different on the control board 1 three-stack
-    set at U68.
+    Both the 2-stack control board and 3-stack control board use a PROM that's contents
+    are identical between the two.  Apparently the 3-Stack Control Board prom was
+    dumped as a TBP28L22, because that is how the 2-Stack Control board prom was dumped.
 
-    Schematic part number for U68 (3-stack) is TBP28S42 PR-5308, and the chip has a
-    decal with "MR020" on it.
+    Board                  Location  Label            PROM Type
+    ---------------------  --------  ---------------  ---------
+    3-Stack Control Board  U68       MR020 (PR-5308)  TBP28S42?
+    2-Stack Control Board  U87       MR019 (PR-5315)  TBP28L22?
 
-    The 2-stack U87 ROM numbers are TBP28L22 PR-5315. Unknown what the decal or the
-    top of that chip reads. Schematic shows only U87 and the part number.
+    For the 3-stack control board PROM sheet 2 of 6 for the 834-5212 board lists the pinouts
+    and they match the physical board.  The PROM also has the TI logo and a date code? of J810A.
 
     ROM locations are different with ROMs 1-5 on control board II and a different
     numbered ROM in U87.
-
-    Possibly an undumped ROM or just a larger capacity bipolar PROM... (?)
-
-    3-stack control board U68 MR020 =   TBP28S42 PR-5308
-
-    2-stack control board U87 unknown = TBP28L22 PR-5315 *BIPOLAR PROM* Xref=National 74LS471
-
-
-    some pinout differences between the two:
-
-    512*8
-       +------+
-    A0 |1   20| Vcc
-    A1 |2   19| A8
-    A2 |3   18| A7
-    A3 |4   17| A6
-    A4 |5   16| A5
-    O1 |6   15| CE/
-    O2 |7   14| O8
-    O3 |8   13| O7
-    O4 |9   12| O6
-    GND|10  11| O5
-       +------+
-
-    cross ref:
-       Signetics     MMI     TI       Harris  Raytheon  AMD      National  Intel   Fujitsu
-       ---------     ---     --       ------  --------  ---      --------  -----   -------
-    TS 82S147 (60ns) 6349-1  28S42    7649-5  29621     -        74S472    -       TS MB7124
-       82S147A(45ns) 6349-2  -        7649A-5 29621A    27S29    74S472A   -
-                     63S481
-    OC -             -       -        -       -         -        74S473
-
-
-    ----------------------------------------------------------------------
-
-    256*8
-       +------+
-    A0 |1   20| Vcc
-    A1 |2   19| A7
-    A2 |3   18| A6
-    A3 |4   17| A5
-    A4 |5   16| CE1/
-    O1 |6   15| CE2/
-    O2 |7   14| O8
-    O3 |8   13| O7
-    O4 |9   12| O6
-    GND|10  11| O5
-       +------+
-
-    cross ref:
-       Signetics     MMI     TI       Harris  Raytheon  AMD      National  Intel
-       ---------     ---     --       ------  --------  ---      --------  -----
-    TS 82S135 (45ns) 6309-1  18S22    -       -         -        -         -
-       82LS135(100ns)-       28L22    -       -         -        74LS471   -
-
 
     ----ROM--NAMES-------------------------------------
 
@@ -283,7 +230,7 @@
        Names       Names     Location (2-stack)
     ------------      ---------     -------------------
 
-    not dumped (?)          U87  control board
+    congo.u68    =    MR019     U87  control board
     congo1.bin   =    ROM 1     U21  control board
     congo2.bin   =    ROM 2     U22  control board
     congo3.bin   =    ROM 3     U23  control board
@@ -306,12 +253,12 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "sound/sn76496.h"
+#include "sound/samples.h"
 #include "machine/segacrpt.h"
 #include "machine/8255ppi.h"
 #include "audio/segasnd.h"
-#include "sound/sn76496.h"
-#include "sound/samples.h"
-#include "zaxxon.h"
+#include "includes/zaxxon.h"
 
 
 
@@ -338,21 +285,6 @@
 
 /*************************************
  *
- *  Global variables
- *
- *************************************/
-
-static UINT8 int_enabled;
-static UINT8 coin_status[3];
-static UINT8 coin_enable[3];
-
-static UINT8 razmataz_dial_pos[2];
-static UINT16 razmataz_counter;
-
-
-
-/*************************************
- *
  *  Interrupt generation
  *
  *************************************/
@@ -367,15 +299,19 @@ static INPUT_CHANGED( service_switch )
 
 static INTERRUPT_GEN( vblank_int )
 {
-	if (int_enabled)
+	zaxxon_state *state = (zaxxon_state *)device->machine->driver_data;
+
+	if (state->int_enabled)
 		cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( int_enable_w )
 {
-	int_enabled = data & 1;
-	if (!int_enabled)
+	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+
+	state->int_enabled = data & 1;
+	if (!state->int_enabled)
 		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
@@ -389,10 +325,12 @@ static WRITE8_HANDLER( int_enable_w )
 
 static MACHINE_START( zaxxon )
 {
+	zaxxon_state *state = (zaxxon_state *)machine->driver_data;
+
 	/* register for save states */
-	state_save_register_global(machine, int_enabled);
-	state_save_register_global_array(machine, coin_status);
-	state_save_register_global_array(machine, coin_enable);
+	state_save_register_global(machine, state->int_enabled);
+	state_save_register_global_array(machine, state->coin_status);
+	state_save_register_global_array(machine, state->coin_enable);
 }
 
 
@@ -412,16 +350,19 @@ static MACHINE_RESET( razmataz )
 
 static READ8_HANDLER( razmataz_counter_r )
 {
+	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+
 	/* this behavior is really unknown; however, the code is using this */
 	/* counter as a sort of timeout when talking to the sound board */
 	/* it needs to be increasing at a reasonable rate but not too fast */
 	/* or else the sound will mess up */
-	return razmataz_counter++ >> 8;
+	return state->razmataz_counter++ >> 8;
 }
 
 
 static CUSTOM_INPUT( razmataz_dial_r )
 {
+	zaxxon_state *state = (zaxxon_state *)field->port->machine->driver_data;
 	static const char *const dialname[2] = { "DIAL0", "DIAL1" };
 	int num = (FPTR)param;
 	int delta, res;
@@ -431,14 +372,14 @@ static CUSTOM_INPUT( razmataz_dial_r )
 	if (delta < 0x80)
 	{
 		// right
-		razmataz_dial_pos[num] -= delta;
-		res = (razmataz_dial_pos[num] << 1) | 1;
+		state->razmataz_dial_pos[num] -= delta;
+		res = (state->razmataz_dial_pos[num] << 1) | 1;
 	}
 	else
 	{
 		// left
-		razmataz_dial_pos[num] += delta;
-		res = (razmataz_dial_pos[num] << 1);
+		state->razmataz_dial_pos[num] += delta;
+		res = (state->razmataz_dial_pos[num] << 1);
 	}
 
 	return res;
@@ -462,22 +403,30 @@ static WRITE8_HANDLER( zaxxon_coin_counter_w )
 // the coin input, which then needs to be explicitly cleared by the game.
 static WRITE8_HANDLER( zaxxon_coin_enable_w )
 {
-	coin_enable[offset] = data & 1;
-	if (!coin_enable[offset])
-		coin_status[offset] = 0;
+	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+
+	state->coin_enable[offset] = data & 1;
+	if (!state->coin_enable[offset])
+		state->coin_status[offset] = 0;
 }
 
 
 static INPUT_CHANGED( zaxxon_coin_inserted )
 {
 	if (newval)
-		coin_status[(int)(FPTR)param] = coin_enable[(int)(FPTR)param];
+	{
+		zaxxon_state *state = (zaxxon_state *)field->port->machine->driver_data;
+
+		state->coin_status[(int)(FPTR)param] = state->coin_enable[(int)(FPTR)param];
+	}
 }
 
 
 static CUSTOM_INPUT( zaxxon_coin_r )
 {
-	return coin_status[(int)(FPTR)param];
+	zaxxon_state *state = (zaxxon_state *)field->port->machine->driver_data;
+
+	return state->coin_status[(int)(FPTR)param];
 }
 
 
@@ -492,8 +441,8 @@ static CUSTOM_INPUT( zaxxon_coin_r )
 static ADDRESS_MAP_START( zaxxon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM_WRITE(zaxxon_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x1f00) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM_WRITE(zaxxon_videoram_w) AM_BASE_MEMBER(zaxxon_state,videoram)
+	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x1f00) AM_RAM AM_BASE_MEMBER(zaxxon_state,spriteram)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x18fc) AM_READ_PORT("SW00")
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x18fc) AM_READ_PORT("SW01")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x18fc) AM_READ_PORT("DSW02")
@@ -515,8 +464,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( congo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x1800) AM_RAM_WRITE(zaxxon_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xa400, 0xa7ff) AM_MIRROR(0x1800) AM_RAM_WRITE(congo_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x1800) AM_RAM_WRITE(zaxxon_videoram_w) AM_BASE_MEMBER(zaxxon_state,videoram)
+	AM_RANGE(0xa400, 0xa7ff) AM_MIRROR(0x1800) AM_RAM_WRITE(congo_colorram_w) AM_BASE_MEMBER(zaxxon_state,colorram)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fc4) AM_READ_PORT("SW00")
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x1fc4) AM_READ_PORT("SW01")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x1fc4) AM_READ_PORT("DSW02")
@@ -983,6 +932,8 @@ GFXDECODE_END
  *************************************/
 
 static MACHINE_DRIVER_START( root )
+
+	MDRV_DRIVER_DATA(zaxxon_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/16)
@@ -1556,12 +1507,14 @@ static DRIVER_INIT( futspy )
 
 static DRIVER_INIT( razmataz )
 {
+	zaxxon_state *state = (zaxxon_state *)machine->driver_data;
+
 	nprinces_decode(machine, "maincpu");
 
 	/* additional input ports are wired */
-	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc004, 0xc004, 0, 0x18f3, "SW04");
-	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc008, 0xc008, 0, 0x18f3, "SW08");
-	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc00c, 0xc00c, 0, 0x18f3, "SW0C");
+	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc004, 0xc004, 0, 0x18f3, "SW04");
+	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc008, 0xc008, 0, 0x18f3, "SW08");
+	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc00c, 0xc00c, 0, 0x18f3, "SW0C");
 
 	/* unknown behavior expected here */
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc80a, 0xc80a, 0, 0, razmataz_counter_r);
@@ -1570,8 +1523,8 @@ static DRIVER_INIT( razmataz )
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r, sega_usb_data_w);
 
 	/* additional state saving */
-	state_save_register_global_array(machine, razmataz_dial_pos);
-	state_save_register_global(machine, razmataz_counter);
+	state_save_register_global_array(machine, state->razmataz_dial_pos);
+	state_save_register_global(machine, state->razmataz_counter);
 }
 
 

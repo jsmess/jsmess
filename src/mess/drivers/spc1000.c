@@ -21,19 +21,19 @@ static UINT8 GMODE;
 
 static ADDRESS_MAP_START(spc1000_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_READWRITE(SMH_BANK(1), SMH_BANK(2))
-	AM_RANGE( 0x8000, 0xffff ) AM_READWRITE(SMH_BANK(3), SMH_BANK(4))
+	AM_RANGE( 0x0000, 0x7fff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
+	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER(spc1000_iplk_w)
 {
 	IPLK = IPLK ? 0 : 1;
 	if (IPLK == 1) {
-		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu"));
-		memory_set_bankptr(space->machine, 3, memory_region(space->machine, "maincpu"));
+		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu"));
+		memory_set_bankptr(space->machine, "bank3", memory_region(space->machine, "maincpu"));
 	} else {
-		memory_set_bankptr(space->machine, 1, messram_get_ptr(devtag_get_device(space->machine, "messram")));
-		memory_set_bankptr(space->machine, 3, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x8000);
+		memory_set_bankptr(space->machine, "bank1", messram_get_ptr(devtag_get_device(space->machine, "messram")));
+		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x8000);
 	}
 }
 
@@ -41,11 +41,11 @@ static READ8_HANDLER(spc1000_iplk_r)
 {
 	IPLK = IPLK ? 0 : 1;
 	if (IPLK == 1) {
-		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu"));
-		memory_set_bankptr(space->machine, 3, memory_region(space->machine, "maincpu"));
+		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu"));
+		memory_set_bankptr(space->machine, "bank3", memory_region(space->machine, "maincpu"));
 	} else {
-		memory_set_bankptr(space->machine, 1, messram_get_ptr(devtag_get_device(space->machine, "messram")));
-		memory_set_bankptr(space->machine, 3, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x8000);
+		memory_set_bankptr(space->machine, "bank1", messram_get_ptr(devtag_get_device(space->machine, "messram")));
+		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x8000);
 	}
 	return 0;
 }
@@ -193,16 +193,16 @@ static MACHINE_RESET(spc1000)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	memory_install_read8_handler(space, 0x0000, 0x7fff, 0, 0, SMH_BANK(1));
-	memory_install_read8_handler(space, 0x8000, 0xffff, 0, 0, SMH_BANK(3));
+	memory_install_read_bank(space, 0x0000, 0x7fff, 0, 0, "bank1");
+	memory_install_read_bank(space, 0x8000, 0xffff, 0, 0, "bank3");
 
-	memory_install_write8_handler(space, 0x0000, 0x7fff, 0, 0, SMH_BANK(2));
-	memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, SMH_BANK(4));
+	memory_install_write_bank(space, 0x0000, 0x7fff, 0, 0, "bank2");
+	memory_install_write_bank(space, 0x8000, 0xffff, 0, 0, "bank4");
 
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));
-	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")));
-	memory_set_bankptr(machine, 3, memory_region(machine, "maincpu"));
-	memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")));
+	memory_set_bankptr(machine, "bank3", memory_region(machine, "maincpu"));
+	memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
 
 	IPLK = 1;
 }

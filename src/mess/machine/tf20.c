@@ -75,8 +75,8 @@ static READ8_HANDLER( tf20_rom_disable )
 	tf20_state *tf20 = get_safe_token(space->cpu->owner);
 	const address_space *prg = cpu_get_address_space(space->cpu, ADDRESS_SPACE_PROGRAM);
 
-	memory_install_readwrite8_handler(prg, 0x0000, 0x7fff, 0, 0, SMH_BANK(21), SMH_BANK(21));
-	memory_set_bankptr(space->machine, 21, messram_get_ptr(tf20->ram));
+	memory_install_readwrite_bank(prg, 0x0000, 0x7fff, 0, 0,"bank21");
+	memory_set_bankptr(space->machine, "bank21", messram_get_ptr(tf20->ram));
 
 	return 0xff;
 }
@@ -199,8 +199,8 @@ READ_LINE_DEVICE_HANDLER( tf20_pinc_r )
 *****************************************************************************/
 
 static ADDRESS_MAP_START( tf20_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK(21)
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK(22)
+	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank21")
+	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank22")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tf20_io, ADDRESS_SPACE_IO, 8 )
@@ -333,7 +333,7 @@ static DEVICE_START( tf20 )
 	tf20->floppy_1 = device_find_child_by_tag(device, FLOPPY_1);
 
 	/* enable second half of ram */
-	memory_set_bankptr(device->machine, 22, messram_get_ptr(tf20->ram) + 0x8000);
+	memory_set_bankptr(device->machine, "bank22", messram_get_ptr(tf20->ram) + 0x8000);
 }
 
 static DEVICE_RESET( tf20 )
@@ -342,8 +342,9 @@ static DEVICE_RESET( tf20 )
 	const address_space *prg = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 
 	/* enable rom */
-	memory_install_readwrite8_handler(prg, 0x0000, 0x07ff, 0, 0x7800, SMH_BANK(21), SMH_NOP);
-	memory_set_bankptr(device->machine, 21, cpu->region);
+	memory_install_read_bank(prg, 0x0000, 0x07ff, 0, 0x7800, "bank21");
+	memory_nop_write(prg, 0x0000, 0x07ff, 0, 0x7800);
+	memory_set_bankptr(device->machine, "bank21", cpu->region);
 }
 
 DEVICE_GET_INFO( tf20 )

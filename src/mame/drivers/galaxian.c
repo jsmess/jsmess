@@ -254,7 +254,6 @@ static UINT8 zigzag_ay8910_latch;
 static UINT8 kingball_speech_dip;
 static UINT8 kingball_sound;
 static UINT8 mshuttle_ay8910_cs;
-static UINT8 *frogg_ram;
 
 static UINT16 protection_state;
 static UINT8 protection_result;
@@ -841,7 +840,7 @@ static INPUT_CHANGED( gmgalax_game_changed )
 	gmgalax_selected_game = newval;
 
 	/* select the bank and graphics bank based on it */
-	memory_set_bank(field->port->machine, 1, gmgalax_selected_game);
+	memory_set_bank(field->port->machine, "bank1", gmgalax_selected_game);
 	galaxian_gfxbank_w(space, 0, gmgalax_selected_game);
 
 	/* reset the stars */
@@ -870,8 +869,8 @@ static CUSTOM_INPUT( gmgalax_port_r )
 
 static WRITE8_HANDLER( zigzag_bankswap_w )
 {
-	memory_set_bank(space->machine, 1, data & 1);
-	memory_set_bank(space->machine, 2, ~data & 1);
+	memory_set_bank(space->machine, "bank1", data & 1);
+	memory_set_bank(space->machine, "bank2", ~data & 1);
 }
 
 
@@ -2430,9 +2429,9 @@ static void unmap_galaxian_sound(running_machine *machine, offs_t base)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	memory_install_write8_handler(space, base + 0x0004, base + 0x0007, 0, 0x07f8, (write8_space_func)SMH_UNMAP);
-	memory_install_write8_handler(space, base + 0x0800, base + 0x0807, 0, 0x07f8, (write8_space_func)SMH_UNMAP);
-	memory_install_write8_handler(space, base + 0x1800, base + 0x1800, 0, 0x07ff, (write8_space_func)SMH_UNMAP);
+	memory_unmap_write(space, base + 0x0004, base + 0x0007, 0, 0x07f8);
+	memory_unmap_write(space, base + 0x0800, base + 0x0807, 0, 0x07f8);
+	memory_unmap_write(space, base + 0x1800, base + 0x1800, 0, 0x07ff);
 }
 
 
@@ -2457,7 +2456,7 @@ static DRIVER_INIT( nolock )
 	DRIVER_INIT_CALL(galaxian);
 
 	/* ...but coin lockout disabled/disconnected */
-	memory_install_write8_handler(space, 0x6002, 0x6002, 0, 0x7f8, (write8_space_func)SMH_UNMAP);
+	memory_unmap_write(space, 0x6002, 0x6002, 0, 0x7f8);
 }
 
 
@@ -2469,7 +2468,7 @@ static DRIVER_INIT( azurian )
 	common_init(machine, scramble_draw_bullet, galaxian_draw_background, NULL, NULL);
 
 	/* coin lockout disabled */
-	memory_install_write8_handler(space, 0x6002, 0x6002, 0, 0x7f8, (write8_space_func)SMH_UNMAP);
+	memory_unmap_write(space, 0x6002, 0x6002, 0, 0x7f8);
 }
 
 
@@ -2481,8 +2480,8 @@ static DRIVER_INIT( gmgalax )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, gmgalax_extend_tile_info, gmgalax_extend_sprite_info);
 
 	/* ROM is banked */
-	memory_install_read8_handler(space, 0x0000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(1));
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
 	gmgalax_game_changed(machine->portlist.head->fieldlist, NULL, 0, 0);
@@ -2522,11 +2521,7 @@ static DRIVER_INIT( frogg )
 	common_init(machine, galaxian_draw_bullet, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
 
 	/* ...but needs a full 2k of RAM */
-	memory_install_readwrite8_handler(space, 0x4000, 0x47ff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));
-	frogg_ram = auto_alloc_array(machine, UINT8, 0x800);
-	memory_set_bankptr(machine, 1, frogg_ram);
-
-	state_save_register_global_pointer(machine, frogg_ram, 0x800);
+	memory_install_ram(space, 0x4000, 0x47ff, 0, 0, NULL);
 }
 
 
@@ -2695,22 +2690,22 @@ static DRIVER_INIT( zigzag )
 	common_init(machine, NULL, galaxian_draw_background, NULL, NULL);
 
 	/* make ROMs 2 & 3 swappable */
-	memory_install_read8_handler(space, 0x2000, 0x2fff, 0, 0, (read8_space_func)SMH_BANK(1));
-	memory_install_read8_handler(space, 0x3000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(2));
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x2000, 0x1000);
-	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "maincpu") + 0x2000, 0x1000);
+	memory_install_read_bank(space, 0x2000, 0x2fff, 0, 0, "bank1");
+	memory_install_read_bank(space, 0x3000, 0x3fff, 0, 0, "bank2");
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x2000, 0x1000);
+	memory_configure_bank(machine, "bank2", 0, 2, memory_region(machine, "maincpu") + 0x2000, 0x1000);
 
 	/* also re-install the fixed ROM area as a bank in order to inform the memory system that
        the fixed area only extends to 0x1fff */
-	memory_install_read8_handler(space, 0x0000, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(3));
-	memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0x0000);
+	memory_install_read_bank(space, 0x0000, 0x1fff, 0, 0, "bank3");
+	memory_set_bankptr(machine, "bank3", memory_region(machine, "maincpu") + 0x0000);
 
 	/* handler for doing the swaps */
 	memory_install_write8_handler(space, 0x7002, 0x7002, 0, 0x07f8, zigzag_bankswap_w);
 	zigzag_bankswap_w(space, 0, 0);
 
 	/* coin lockout disabled */
-	memory_install_write8_handler(space, 0x6002, 0x6002, 0, 0x7f8, (write8_space_func)SMH_UNMAP);
+	memory_unmap_write(space, 0x6002, 0x6002, 0, 0x7f8);
 
 	/* remove the galaxian sound hardware */
 	unmap_galaxian_sound(machine, 0x6000);
@@ -2736,7 +2731,7 @@ static DRIVER_INIT( checkman )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
 
 	/* move the interrupt enable from $b000 to $b001 */
-	memory_install_write8_handler(space, 0xb000, 0xb000, 0, 0x7f8, (write8_space_func)SMH_UNMAP);
+	memory_unmap_write(space, 0xb000, 0xb000, 0, 0x7f8);
 	memory_install_write8_handler(space, 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
 
 	/* attach the sound command handler */
@@ -2786,7 +2781,7 @@ static DRIVER_INIT( dingoe )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
 
 	/* move the interrupt enable from $b000 to $b001 */
-	memory_install_write8_handler(space, 0xb000, 0xb000, 0, 0x7f8, (write8_space_func)SMH_UNMAP);
+	memory_unmap_write(space, 0xb000, 0xb000, 0, 0x7f8);
 	memory_install_write8_handler(space, 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
 
 	/* attach the sound command handler */
@@ -2810,12 +2805,10 @@ static DRIVER_INIT( skybase )
 	memory_install_write8_handler(space, 0xa002, 0xa002, 0, 0x7f8, galaxian_gfxbank_w);
 
 	/* needs a full 2k of RAM */
-	memory_install_readwrite8_handler(space, 0x8000, 0x87ff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));
-	memory_set_bankptr(machine, 1, auto_alloc_array(machine, UINT8, 0x800));
+	memory_install_ram(space, 0x8000, 0x87ff, 0, 0, NULL);
 
 	/* extend ROM */
-	memory_install_read8_handler(space, 0x0000, 0x5fff, 0, 0, (read8_space_func)SMH_BANK(2));
-	memory_set_bankptr(machine, 2, memory_region(machine, "maincpu"));
+	memory_install_rom(space, 0x0000, 0x5fff, 0, 0, memory_region(machine, "maincpu"));
 }
 
 
@@ -2870,19 +2863,17 @@ static DRIVER_INIT( scorpnmc )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
 
 	/* move the interrupt enable from $b000 to $b001 */
-	memory_install_write8_handler(space, 0xb000, 0xb000, 0, 0x7f8, (write8_space_func)SMH_UNMAP);
+	memory_unmap_write(space, 0xb000, 0xb000, 0, 0x7f8);
 	memory_install_write8_handler(space, 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
 
 	/* extra ROM */
-	memory_install_read8_handler(space, 0x5000, 0x67ff, 0, 0, (read8_space_func)SMH_BANK(1));
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x5000);
+	memory_install_rom(space, 0x5000, 0x67ff, 0, 0, memory_region(machine, "maincpu") + 0x5000);
 
 	/* install RAM at $4000-$4800 */
-	memory_install_readwrite8_handler(space, 0x4000, 0x47ff, 0, 0, (read8_space_func)SMH_BANK(2), (write8_space_func)SMH_BANK(2));
-	memory_set_bankptr(machine, 2, auto_alloc_array(machine, UINT8, 0x800));
+	memory_install_ram(space, 0x4000, 0x47ff, 0, 0, NULL);
 
 	/* doesn't appear to use original RAM */
-	memory_install_readwrite8_handler(space, 0x8000, 0x87ff, 0, 0, (read8_space_func)SMH_UNMAP, (write8_space_func)SMH_UNMAP);
+	memory_unmap_readwrite(space, 0x8000, 0x87ff, 0, 0);
 }
 
 
@@ -2901,7 +2892,7 @@ static DRIVER_INIT( theend )
 	common_init(machine, theend_draw_bullet, galaxian_draw_background, NULL, NULL);
 
 	/* coin counter on the upper bit of port C */
-	memory_install_write8_handler(space, 0x6802, 0x6802, 0, 0x7f8, (write8_space_func)SMH_UNMAP);
+	memory_unmap_write(space, 0x6802, 0x6802, 0, 0x7f8);
 }
 
 
@@ -2923,11 +2914,11 @@ static DRIVER_INIT( explorer )
 	memory_install_write8_handler(space, 0x7000, 0x7000, 0, 0x7ff, watchdog_reset_w);
 
 	/* I/O appears to be direct, not via PPIs */
-	memory_install_readwrite8_handler(space, 0x8000, 0xffff, 0, 0, (read8_space_func)SMH_UNMAP, (write8_space_func)SMH_UNMAP);
-	memory_install_read_port_handler(space, 0x8000, 0x8000, 0, 0xffc, "IN0");
-	memory_install_read_port_handler(space, 0x8001, 0x8001, 0, 0xffc, "IN1");
-	memory_install_read_port_handler(space, 0x8002, 0x8002, 0, 0xffc, "IN2");
-	memory_install_read_port_handler(space, 0x8003, 0x8003, 0, 0xffc, "IN3");
+	memory_unmap_readwrite(space, 0x8000, 0xffff, 0, 0);
+	memory_install_read_port(space, 0x8000, 0x8000, 0, 0xffc, "IN0");
+	memory_install_read_port(space, 0x8001, 0x8001, 0, 0xffc, "IN1");
+	memory_install_read_port(space, 0x8002, 0x8002, 0, 0xffc, "IN2");
+	memory_install_read_port(space, 0x8003, 0x8003, 0, 0xffc, "IN3");
 	memory_install_write8_handler(space, 0x8000, 0x8000, 0, 0xfff, soundlatch_w);
 	memory_install_write8_handler(space, 0x9000, 0x9000, 0, 0xfff, explorer_sound_control_w);
 }
@@ -2940,8 +2931,8 @@ static DRIVER_INIT( sfx )
 	galaxian_sfx_tilemap = TRUE;
 
 	/* sound board has space for extra ROM */
-	memory_install_read8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(1));
-	memory_set_bankptr(machine, 1, memory_region(machine, "audiocpu"));
+	memory_install_read_bank(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "audiocpu"));
 }
 
 
@@ -2953,7 +2944,7 @@ static DRIVER_INIT( atlantis )
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
 	/* watchdog is at $7800? (or is it just disabled?) */
-	memory_install_read8_handler(space, 0x7000, 0x7000, 0, 0x7ff, (read8_space_func)SMH_UNMAP);
+	memory_unmap_read(space, 0x7000, 0x7000, 0, 0x7ff);
 	memory_install_read8_handler(space, 0x7800, 0x7800, 0, 0x7ff, watchdog_reset_r);
 }
 
@@ -2998,11 +2989,7 @@ static DRIVER_INIT( froggrmc )
 	memory_install_write8_handler(space, 0xb001, 0xb001, 0, 0x7f8, froggrmc_sound_control_w);
 
 	/* actually needs 2k of RAM */
-	memory_install_readwrite8_handler(space, 0x8000, 0x87ff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));
-	frogg_ram = auto_alloc_array(machine, UINT8, 0x800);
-	memory_set_bankptr(machine, 1, frogg_ram);
-
-	state_save_register_global_pointer(machine, frogg_ram, 0x800);
+	memory_install_ram(space, 0x8000, 0x87ff, 0, 0, NULL);
 
 	/* decrypt */
 	decode_frogger_sound(machine);
@@ -3046,11 +3033,11 @@ static DRIVER_INIT( scorpion )
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_IO), 0x00, 0xff, 0, 0, scorpion_ay8910_r, scorpion_ay8910_w);
 
 	/* extra ROM */
-	memory_install_read8_handler(space, 0x5800, 0x67ff, 0, 0, (read8_space_func)SMH_BANK(1));
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x5800);
+	memory_install_read_bank(space, 0x5800, 0x67ff, 0, 0, "bank1");
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x5800);
 
 	/* no background related */
-//  memory_install_write8_handler(space, 0x6803, 0x6803, 0, 0, (write8_space_func)SMH_NOP);
+//  memory_nop_write(space, 0x6803, 0x6803, 0, 0);
 
 	memory_install_read8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x3000, 0x3000, 0, 0, scorpion_digitalker_intr_r);
 /*

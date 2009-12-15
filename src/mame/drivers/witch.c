@@ -357,7 +357,7 @@ static WRITE8_HANDLER(write_a00x)
 				UINT8 *ROM = memory_region(space->machine, "maincpu");
 				bank = newbank;
 				ROM = &ROM[0x10000+0x8000 * newbank + UNBANKED_SIZE];
-				memory_set_bankptr(space->machine, 1,ROM);
+				memory_set_bankptr(space->machine, "bank1",ROM);
 			}
 		}
 		break;
@@ -439,7 +439,7 @@ static const ym2203_interface ym2203_interface_1 =
 
 static ADDRESS_MAP_START( map_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, UNBANKED_SIZE-1) AM_ROM
-	AM_RANGE(UNBANKED_SIZE, 0x7fff) AM_READ(SMH_BANK(1))
+	AM_RANGE(UNBANKED_SIZE, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(read_a00x, write_a00x)
@@ -450,9 +450,9 @@ static ADDRESS_MAP_START( map_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE(&sprite_ram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0xf180, 0xffff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xf180, 0xffff) AM_RAM AM_SHARE("share2")
 ADDRESS_MAP_END
 
 
@@ -462,8 +462,8 @@ static ADDRESS_MAP_START( map_sub, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
 	AM_RANGE(0x8010, 0x8016) AM_DEVREADWRITE("essnd", read_8010, es8712_w)
 	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(read_a00x, write_a00x)
-	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0xf180, 0xffff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xf180, 0xffff) AM_RAM AM_SHARE("share2")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( witch )
@@ -840,7 +840,7 @@ ROM_END
 static DRIVER_INIT(witch)
 {
  	UINT8 *ROM = (UINT8 *)memory_region(machine, "maincpu");
-	memory_set_bankptr(machine, 1, &ROM[0x10000+UNBANKED_SIZE]);
+	memory_set_bankptr(machine, "bank1", &ROM[0x10000+UNBANKED_SIZE]);
 
 	memory_install_read8_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x7000, 0x700f, 0, 0, prot_read_700x);
 	bank = -1;

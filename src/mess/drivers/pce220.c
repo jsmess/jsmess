@@ -15,25 +15,25 @@ static WRITE8_HANDLER( rom_bank_w)
 	UINT8 bank2 = data & 0x07; // bits 0,1,2
 	UINT8 bank1 = data & 0x70; // bits 4,5,6
 
-	memory_set_bankptr(space->machine, 3, memory_region(space->machine, "user1") + 0x4000 * bank1);
-	memory_set_bankptr(space->machine, 4, memory_region(space->machine, "user1") + 0x4000 * bank2);
+	memory_set_bankptr(space->machine, "bank3", memory_region(space->machine, "user1") + 0x4000 * bank1);
+	memory_set_bankptr(space->machine, "bank4", memory_region(space->machine, "user1") + 0x4000 * bank2);
 }
 
 static WRITE8_HANDLER( ram_bank_w)
 {
 	const address_space *space_prg = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 bank = BIT(data,2);
-	memory_install_write8_handler(space_prg, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
+	memory_install_write_bank(space_prg, 0x0000, 0x3fff, 0, 0, "bank1");
 
-	memory_set_bankptr(space->machine, 1, messram_get_ptr(devtag_get_device(space->machine, "messram"))+0x0000+bank*0x8000);
-	memory_set_bankptr(space->machine, 2, messram_get_ptr(devtag_get_device(space->machine, "messram"))+0x4000+bank*0x8000);
+	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(devtag_get_device(space->machine, "messram"))+0x0000+bank*0x8000);
+	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(devtag_get_device(space->machine, "messram"))+0x4000+bank*0x8000);
 }
 
 static ADDRESS_MAP_START(pce220_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1)
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(2)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(3)
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(4)
+	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank4")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pce220_io , ADDRESS_SPACE_IO, 8)
@@ -51,8 +51,8 @@ INPUT_PORTS_END
 static MACHINE_RESET(pce220)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-	memory_set_bankptr(machine, 1, memory_region(machine, "user1") + 0x0000);
+	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + 0x0000);
 }
 
 static VIDEO_START( pce220 )

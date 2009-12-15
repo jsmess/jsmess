@@ -123,50 +123,51 @@ static void pc8201_bankswitch(running_machine *machine, UINT8 data)
 	if (rom_bank > 1)
 	{
 		/* RAM */
-		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+		memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
 	}
 	else
 	{
 		/* ROM */
-		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
+		memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+		memory_unmap_write(program, 0x0000, 0x7fff, 0, 0 );
 	}
 
-	memory_set_bank(machine, 1, rom_bank);
+	memory_set_bank(machine, "bank1", rom_bank);
 
 	switch (ram_bank)
 	{
 	case 0:
 		if (messram_get_size(devtag_get_device(machine, "messram")) > 16 * 1024)
 		{
-			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
 		}
 		else
 		{
-			memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-			memory_install_readwrite8_handler(program, 0xc000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+			memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
+			memory_install_readwrite_bank(program, 0xc000, 0xffff, 0, 0, "bank2");
 		}
 		break;
 
 	case 1:
-		memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
 		break;
 
 	case 2:
 		if (messram_get_size(devtag_get_device(machine, "messram")) > 32 * 1024)
-			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
 		else
-			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+			memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
 		break;
 
 	case 3:
 		if (messram_get_size(devtag_get_device(machine, "messram")) > 64 * 1024)
-			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
 		else
-			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+			memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
 		break;
 	}
 
-	memory_set_bank(machine, 2, ram_bank);
+	memory_set_bank(machine, "bank2", ram_bank);
 }
 
 static WRITE8_HANDLER( pc8201_bank_w )
@@ -361,7 +362,7 @@ static WRITE8_HANDLER( kc85_ctrl_w )
 	kc85_state *state = space->machine->driver_data;
 
 	/* ROM bank selection */
-	memory_set_bank(space->machine, 1, BIT(data, 0));
+	memory_set_bank(space->machine, "bank1", BIT(data, 0));
 
 	/* printer strobe */
 	centronics_strobe_w(state->centronics, BIT(data, 1));
@@ -418,23 +419,24 @@ static WRITE8_HANDLER( tandy200_bank_w )
 	if (rom_bank == 3)
 	{
 		/* invalid ROM bank */
-		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_unmap_readwrite(program, 0x0000, 0x7fff, 0, 0);
 	}
 	else
 	{
-		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
-		memory_set_bank(space->machine, 1, rom_bank);
+		memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+		memory_unmap_write(program, 0x0000, 0x7fff, 0, 0);
+		memory_set_bank(space->machine, "bank1", rom_bank);
 	}
 
 	if (messram_get_size(devtag_get_device(space->machine, "messram")) < ((ram_bank + 1) * 24 * 1024))
 	{
 		/* invalid RAM bank */
-		memory_install_readwrite8_handler(program, 0xa000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_unmap_readwrite(program, 0xa000, 0xffff, 0, 0);
 	}
 	else
 	{
-		memory_install_readwrite8_handler(program, 0xa000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
-		memory_set_bank(space->machine, 2, ram_bank);
+		memory_install_readwrite_bank(program, 0xa000, 0xffff, 0, 0, "bank2");
+		memory_set_bank(space->machine, "bank2", ram_bank);
 	}
 }
 
@@ -501,21 +503,21 @@ static WRITE8_HANDLER( lcd_w )
 
 static ADDRESS_MAP_START( kc85_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK(1)
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK(2)
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc8201_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK(1)
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK(2)
+	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tandy200_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xffff) AM_RAMBANK(2)
+	AM_RANGE(0xa000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kc85_io, ADDRESS_SPACE_IO, 8 )
@@ -1142,26 +1144,27 @@ static MACHINE_START( kc85 )
 	upd1990a_oe_w(state->upd1990a, 1);
 
 	/* configure ROM banking */
-	memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, I8085_TAG), 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "option"), 0);
-	memory_set_bank(machine, 1, 0);
+	memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+	memory_unmap_write(program, 0x0000, 0x7fff, 0, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, I8085_TAG), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "option"), 0);
+	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM banking */
 	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 16 * 1024:
-		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-		memory_install_readwrite8_handler(program, 0xc000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
+		memory_install_readwrite_bank(program, 0xc000, 0xffff, 0, 0, "bank2");
 		break;
 
 	case 32 * 1024:
-		memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0,"bank2");
 		break;
 	}
 
-	memory_configure_bank(machine, 2, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
-	memory_set_bank(machine, 2, 0);
+	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_set_bank(machine, "bank2", 0);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->bank);
@@ -1185,15 +1188,15 @@ static MACHINE_START( pc8201 )
 	upd1990a_oe_w(state->upd1990a, 1);
 
 	/* configure ROM banking */
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, I8085_TAG), 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "option"), 0);
-	memory_configure_bank(machine, 1, 2, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000, 0x8000);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, I8085_TAG), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "option"), 0);
+	memory_configure_bank(machine, "bank1", 2, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000, 0x8000);
+	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine, 2, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
-	memory_configure_bank(machine, 2, 2, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000, 0x8000);
-	memory_set_bank(machine, 2, 0);
+	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_configure_bank(machine, "bank2", 2, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000, 0x8000);
+	memory_set_bank(machine, "bank2", 0);
 
 	pc8201_bankswitch(machine, 0);
 
@@ -1222,36 +1225,37 @@ static MACHINE_START( trsm100 )
 	upd1990a_oe_w(state->upd1990a, 1);
 
 	/* configure ROM banking */
-	memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, I8085_TAG), 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "option"), 0);
-	memory_set_bank(machine, 1, 0);
+	memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
+	memory_unmap_write(program, 0x0000, 0x7fff, 0, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, I8085_TAG), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "option"), 0);
+	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM banking */
 	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 8 * 1024:
-		memory_install_readwrite8_handler(program, 0x8000, 0xcfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-		memory_install_readwrite8_handler(program, 0xe000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		memory_unmap_readwrite(program, 0x8000, 0xcfff, 0, 0);
+		memory_install_readwrite_bank(program, 0xe000, 0xffff, 0, 0, "bank2");
 		break;
 
 	case 16 * 1024:
-		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-		memory_install_readwrite8_handler(program, 0xc000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
+		memory_install_readwrite_bank(program, 0xc000, 0xffff, 0, 0, "bank2");
 		break;
 
 	case 24 * 1024:
-		memory_install_readwrite8_handler(program, 0x8000, 0x9fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-		memory_install_readwrite8_handler(program, 0xa000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		memory_unmap_readwrite(program, 0x8000, 0x9fff, 0, 0);
+		memory_install_readwrite_bank(program, 0xa000, 0xffff, 0, 0, "bank2");
 		break;
 
 	case 32 * 1024:
-		memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
 		break;
 	}
 
-	memory_configure_bank(machine, 2, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
-	memory_set_bank(machine, 2, 0);
+	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_set_bank(machine, "bank2", 0);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->bank);
@@ -1270,14 +1274,14 @@ static MACHINE_START( tandy200 )
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* configure ROM banking */
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, I8085_TAG), 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, I8085_TAG) + 0x10000, 0);
-	memory_configure_bank(machine, 1, 2, 1, memory_region(machine, "option"), 0);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, I8085_TAG), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, I8085_TAG) + 0x10000, 0);
+	memory_configure_bank(machine, "bank1", 2, 1, memory_region(machine, "option"), 0);
+	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine, 2, 0, 3, messram_get_ptr(devtag_get_device(machine, "messram")), 0x6000);
-	memory_set_bank(machine, 2, 0);
+	memory_configure_bank(machine, "bank2", 0, 3, messram_get_ptr(devtag_get_device(machine, "messram")), 0x6000);
+	memory_set_bank(machine, "bank2", 0);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->bank);

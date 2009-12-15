@@ -340,9 +340,9 @@ static WRITE8_DEVICE_HANDLER(nec_ppi8255_w) {
 			//printf("%02x\n",data);
 
 			if((data & 0x0f) == 0x05)
-				memory_set_bankptr(device->machine, 1, &ext_rom[0x2000]);
+				memory_set_bankptr(device->machine, "bank1", &ext_rom[0x2000]);
 			if((data & 0x0f) == 0x04)
-				memory_set_bankptr(device->machine, 1, &gfx_data[0]);
+				memory_set_bankptr(device->machine, "bank1", &gfx_data[0]);
 		}
 	}
 	i8255a_w(device,offset,data);
@@ -352,7 +352,7 @@ static ADDRESS_MAP_START(pc6001_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_REGION("cart_img",0)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE(&pc6001_ram)
 ADDRESS_MAP_END
 
@@ -441,10 +441,10 @@ static WRITE8_HANDLER( pc6001m2_bank_r0_w )
 //	memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
 
 	printf("%02x BANK\n",data);
-	memory_set_bankptr(space->machine, 1, &ROM[banksw_table_r0[data & 0xf][0]]);
-	memory_set_bankptr(space->machine, 2, &ROM[banksw_table_r0[data & 0xf][1]]);
-	memory_set_bankptr(space->machine, 3, &ROM[banksw_table_r0[(data & 0xf0)>>4][2]]);
-	memory_set_bankptr(space->machine, 4, &ROM[banksw_table_r0[(data & 0xf0)>>4][3]]);
+	memory_set_bankptr(space->machine, "bank1", &ROM[banksw_table_r0[data & 0xf][0]]);
+	memory_set_bankptr(space->machine, "bank2", &ROM[banksw_table_r0[data & 0xf][1]]);
+	memory_set_bankptr(space->machine, "bank3", &ROM[banksw_table_r0[(data & 0xf0)>>4][2]]);
+	memory_set_bankptr(space->machine, "bank4", &ROM[banksw_table_r0[(data & 0xf0)>>4][3]]);
 }
 
 static WRITE8_HANDLER( pc6001m2_bank_r1_w )
@@ -455,10 +455,10 @@ static WRITE8_HANDLER( pc6001m2_bank_r1_w )
 //	memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
 
 	printf("%02x BANK\n",data);
-	memory_set_bankptr(space->machine, 5, &ROM[banksw_table_r1[data & 0xf][0]]);
-	memory_set_bankptr(space->machine, 6, &ROM[banksw_table_r1[data & 0xf][1]]);
-	memory_set_bankptr(space->machine, 7, &ROM[banksw_table_r1[(data & 0xf0)>>4][2]]);
-	memory_set_bankptr(space->machine, 8, &ROM[banksw_table_r1[(data & 0xf0)>>4][3]]);
+	memory_set_bankptr(space->machine, "bank5", &ROM[banksw_table_r1[data & 0xf][0]]);
+	memory_set_bankptr(space->machine, "bank6", &ROM[banksw_table_r1[data & 0xf][1]]);
+	memory_set_bankptr(space->machine, "bank7", &ROM[banksw_table_r1[(data & 0xf0)>>4][2]]);
+	memory_set_bankptr(space->machine, "bank8", &ROM[banksw_table_r1[(data & 0xf0)>>4][3]]);
 }
 
 static WRITE8_HANDLER( work_ram0_w ) { UINT8 *ROM = memory_region(space->machine, "maincpu"); ROM[offset+WRAM(0)] = data; }
@@ -473,14 +473,14 @@ static WRITE8_HANDLER( work_ram7_w ) { UINT8 *ROM = memory_region(space->machine
 
 static ADDRESS_MAP_START(pc6001m2_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK(1) AM_WRITE(work_ram0_w)
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(2) AM_WRITE(work_ram1_w)
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(3) AM_WRITE(work_ram2_w)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(4) AM_WRITE(work_ram3_w)
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(5) AM_WRITE(work_ram4_w)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(6) AM_WRITE(work_ram5_w)
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(7) AM_WRITE(work_ram6_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROMBANK(8) AM_WRITE(work_ram7_w)
+	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1") AM_WRITE(work_ram0_w)
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2") AM_WRITE(work_ram1_w)
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3") AM_WRITE(work_ram2_w)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4") AM_WRITE(work_ram3_w)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank5") AM_WRITE(work_ram4_w)
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank6") AM_WRITE(work_ram5_w)
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank7") AM_WRITE(work_ram6_w)
+	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank8") AM_WRITE(work_ram7_w)
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE(&pc6001_ram)
 ADDRESS_MAP_END
 
@@ -835,12 +835,12 @@ static MACHINE_RESET(pc6001m2)
 	/* set default bankswitch (basic 0 & 1) */
 	{
 		UINT8 *ROM = memory_region(machine, "maincpu");
-		memory_set_bankptr(machine, 1, &ROM[BASICROM(0)]);
-		memory_set_bankptr(machine, 2, &ROM[BASICROM(1)]);
-		memory_set_bankptr(machine, 5, &ROM[WRAM(4)]);
-		memory_set_bankptr(machine, 6, &ROM[WRAM(5)]);
-		memory_set_bankptr(machine, 7, &ROM[WRAM(6)]);
-		memory_set_bankptr(machine, 8, &ROM[WRAM(7)]);
+		memory_set_bankptr(machine, "bank1", &ROM[BASICROM(0)]);
+		memory_set_bankptr(machine, "bank2", &ROM[BASICROM(1)]);
+		memory_set_bankptr(machine, "bank5", &ROM[WRAM(4)]);
+		memory_set_bankptr(machine, "bank6", &ROM[WRAM(5)]);
+		memory_set_bankptr(machine, "bank7", &ROM[WRAM(6)]);
+		memory_set_bankptr(machine, "bank8", &ROM[WRAM(7)]);
 	}
 }
 

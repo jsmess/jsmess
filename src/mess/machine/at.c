@@ -169,9 +169,9 @@ static void init_at_common(running_machine *machine, const struct kbdc8042_inter
 	if (messram_get_size(devtag_get_device(machine, "messram")) > 0x0a0000)
 	{
 		offs_t ram_limit = 0x100000 + messram_get_size(devtag_get_device(machine, "messram")) - 0x0a0000;
-		memory_install_read_handler(space, 0x100000,  ram_limit - 1, 0, 0, 1);
-		memory_install_write_handler(space, 0x100000,  ram_limit - 1, 0, 0, 1);
-		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xa0000);
+		memory_install_read_bank(space, 0x100000,  ram_limit - 1, 0, 0, "bank1");
+		memory_install_write_bank(space, 0x100000,  ram_limit - 1, 0, 0, "bank1");
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xa0000);
 	}
 }
 

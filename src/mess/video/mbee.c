@@ -54,9 +54,9 @@ WRITE8_HANDLER ( mbee_pcg_color_latch_w )
 {
 	mbee_pcg_color_latch = data;
 	if (data & 0x40)
-		memory_set_bank(space->machine, 3, 1);
+		memory_set_bank(space->machine, "bank3", 1);
 	else
-		memory_set_bank(space->machine, 3, 0);
+		memory_set_bank(space->machine, "bank3", 0);
 }
 
 READ8_HANDLER ( mbee_pcg_color_latch_r )
@@ -133,26 +133,26 @@ static int keyboard_matrix_r(running_machine *machine, int offs)
 READ8_HANDLER ( mbee_color_bank_r )
 {
 /* Read of port 0A - set Telcom rom to first half */
-	memory_set_bank(space->machine, 5, 0);
+	memory_set_bank(space->machine, "bank5", 0);
 	return m6545_color_bank;
 }
 
 WRITE8_HANDLER ( mbee_color_bank_w )
 {
 	m6545_color_bank = data;
-	memory_set_bank(space->machine, 4, data & 7);
+	memory_set_bank(space->machine, "bank4", data & 7);
 }
 
 WRITE8_HANDLER ( mbee_0a_w )
 {
 	m6545_color_bank = data;
-	memory_set_bank(space->machine, 4, (data&15) >> 1);
+	memory_set_bank(space->machine, "bank4", (data&15) >> 1);
 }
 
 READ8_HANDLER ( mbee_bank_netrom_r )
 {
 /* Read of port 10A - set Telcom rom to 2nd half */
-	memory_set_bank(space->machine, 5, 1);
+	memory_set_bank(space->machine, "bank5", 1);
 	return m6545_color_bank;
 }
 
@@ -163,7 +163,7 @@ WRITE8_HANDLER( mbee_1c_w )
     d4 select attribute ram - not emulated
     d3..d0 select videoram bank - not emulated */
 
-	memory_set_bank(space->machine, 6, (data & 0x20) ? 1 : 0);
+	memory_set_bank(space->machine, "bank6", (data & 0x20) ? 1 : 0);
 }
 
 READ8_HANDLER ( mbee_video_bank_r )
@@ -175,9 +175,9 @@ WRITE8_HANDLER ( mbee_video_bank_w )
 {
 	m6545_video_bank = data;
 	if (data & 1)
-		memory_set_bank(space->machine, 2, 0);
+		memory_set_bank(space->machine, "bank2", 0);
 	else
-		memory_set_bank(space->machine, 2, 1);
+		memory_set_bank(space->machine, "bank2", 1);
 }
 
 static void m6545_update_strobe(running_machine *machine, int param)

@@ -193,7 +193,7 @@ Notes:
       R4543        : EPSON Real Time Clock Module (SOIC14)
       DSW(2)       : 2-Position DIP Switch (All OFF)
       N341256      : NKK N341256 32k x8 SRAM (x2, SOJ28)
-      H8/3002      : Sound CPU, Hitachi H8/3002 HD6413002F17 (QFP100), clocked at 14.7456MHz.
+      H8/3002      : Sound CPU, Hitachi H8/3002 HD6413002F17 (QFP100), clocked at 16.737MHz
       C416         : Namco custom C416 (QFP176)
       C352         : Namco custom C352 PCM sound chip (QFP100)
       MOT1         : PALCE 22V10H (PLCC28, labelled 'S12MOT1A')
@@ -992,7 +992,7 @@ static WRITE32_HANDLER( bankoffset_w )
 		m_n_bankoffset = data;
 	}
 
-	memory_set_bank(space->machine,  1, m_n_bankoffset );
+	memory_set_bank(space->machine,  "bank1", m_n_bankoffset );
 
 	verboselog( space->machine, 1, "bankoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_bankoffset );
 }
@@ -1080,8 +1080,8 @@ static WRITE32_HANDLER( s12_dma_bias_w )
 }
 
 static ADDRESS_MAP_START( namcos12_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE(1) AM_BASE(&g_p_n_psxram) AM_SIZE(&g_n_psxramsize) /* ram */
-	AM_RANGE(0x1f000000, 0x1f000003) AM_READWRITE(SMH_NOP, bankoffset_w)			/* banking */
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1") AM_BASE(&g_p_n_psxram) AM_SIZE(&g_n_psxramsize) /* ram */
+	AM_RANGE(0x1f000000, 0x1f000003) AM_READNOP AM_WRITE(bankoffset_w)			/* banking */
 	AM_RANGE(0x1f080000, 0x1f083fff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(&namcos12_sharedram) /* shared ram?? */
 	AM_RANGE(0x1f140000, 0x1f140fff) AM_DEVREADWRITE8("at28c16", at28c16_r, at28c16_w, 0x00ff00ff) /* eeprom */
 	AM_RANGE(0x1f1bff08, 0x1f1bff0f) AM_WRITENOP    /* ?? */
@@ -1103,12 +1103,12 @@ static ADDRESS_MAP_START( namcos12_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801c00, 0x1f801dff) AM_NOP
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
-	AM_RANGE(0x1fa00000, 0x1fbfffff) AM_ROMBANK(1) /* banked roms */
-	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_SHARE(2) AM_REGION("user1", 0) /* bios */
-	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE(1) /* ram mirror */
-	AM_RANGE(0x9fc00000, 0x9fffffff) AM_ROM AM_SHARE(2) /* bios mirror */
-	AM_RANGE(0xa0000000, 0xa03fffff) AM_RAM AM_SHARE(1) /* ram mirror */
-	AM_RANGE(0xbfc00000, 0xbfffffff) AM_ROM AM_SHARE(2) /* bios mirror */
+	AM_RANGE(0x1fa00000, 0x1fbfffff) AM_ROMBANK("bank1") /* banked roms */
+	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
+	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
+	AM_RANGE(0x9fc00000, 0x9fffffff) AM_ROM AM_SHARE("share2") /* bios mirror */
+	AM_RANGE(0xa0000000, 0xa03fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
+	AM_RANGE(0xbfc00000, 0xbfffffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -1164,12 +1164,12 @@ static UINT8 kcram[ 12 ];
 
 static WRITE32_HANDLER( kcoff_w )
 {
-	memory_set_bankptr(space->machine,  2, memory_region( space->machine, "user1" ) + 0x20280 );
+	memory_set_bankptr(space->machine,  "bank2", memory_region( space->machine, "user1" ) + 0x20280 );
 }
 
 static WRITE32_HANDLER( kcon_w )
 {
-	memory_set_bankptr(space->machine,  2, kcram );
+	memory_set_bankptr(space->machine,  "bank2", kcram );
 }
 
 static int ttt_cnt;
@@ -1260,18 +1260,18 @@ static MACHINE_RESET( namcos12 )
 		strcmp( machine->gamedrv->name, "ghlpanic" ) == 0 )
 	{
 		/* this is based on guesswork, it might not even be keycus. */
-		memory_install_read32_handler (space, 0x1fc20280, 0x1fc2028b, 0, 0, (read32_space_func)SMH_BANK(2) );
+		memory_install_read_bank (space, 0x1fc20280, 0x1fc2028b, 0, 0, "bank2" );
 		memory_install_write32_handler(space, 0x1f008000, 0x1f008003, 0, 0, kcon_w );
 		memory_install_write32_handler(space, 0x1f018000, 0x1f018003, 0, 0, kcoff_w );
 
 		memset( kcram, 0, sizeof( kcram ) );
-		memory_set_bankptr(space->machine,  2, kcram );
+		memory_set_bankptr(space->machine,  "bank2", kcram );
 	}
 }
 
 /* H8/3002 MCU stuff */
 static ADDRESS_MAP_START( s12h8rwmap, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE( sharedram_sub_r, sharedram_sub_w )
 	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE( "c352", c352_r, c352_w )
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")
@@ -1461,7 +1461,7 @@ static DRIVER_INIT( namcos12 )
 
 	psx_dma_install_read_handler( 5, namcos12_rom_read );
 
-	memory_configure_bank(machine,  1, 0, memory_region_length( machine, "user2" ) / 0x200000, memory_region( machine, "user2" ), 0x200000 );
+	memory_configure_bank(machine,  "bank1", 0, memory_region_length( machine, "user2" ) / 0x200000, memory_region( machine, "user2" ), 0x200000 );
 
 	s12_porta = 0;
 	s12_rtcstate = 0;
@@ -1474,7 +1474,7 @@ static DRIVER_INIT( namcos12 )
 	m_n_dmaoffset = 0;
 	m_n_dmabias = 0;
 	m_n_bankoffset = 0;
-	memory_set_bank(machine,  1, 0 );
+	memory_set_bank(machine,  "bank1", 0 );
 
 	state_save_register_global(machine,  m_n_dmaoffset );
 	state_save_register_global(machine,  m_n_dmabias );
@@ -1504,7 +1504,7 @@ static MACHINE_DRIVER_START( coh700 )
 	MDRV_CPU_PROGRAM_MAP( namcos12_map)
 	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
 
-	MDRV_CPU_ADD("sub", H83002, 14745600 )	/* verified 14.7456 MHz */
+	MDRV_CPU_ADD("sub", H83002, 16737350 )
 	MDRV_CPU_PROGRAM_MAP( s12h8rwmap)
 	MDRV_CPU_IO_MAP( s12h8iomap)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
@@ -1528,7 +1528,7 @@ static MACHINE_DRIVER_START( coh700 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c352", C352, 14745600)
+	MDRV_SOUND_ADD("c352", C352, 16737350)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)

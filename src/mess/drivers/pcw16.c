@@ -157,10 +157,10 @@ static TIMER_CALLBACK(pcw16_timer_callback)
 }
 
 static ADDRESS_MAP_START(pcw16_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_BANK(1), SMH_BANK(5))
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK(2), SMH_BANK(6))
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(3), SMH_BANK(7))
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_BANK(4), SMH_BANK(8))
+	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
+	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
+	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
+	AM_RANGE(0xc000, 0xffff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank8")
 ADDRESS_MAP_END
 
 
@@ -171,20 +171,20 @@ static WRITE8_HANDLER(pcw16_palette_w)
 
 static char *pcw16_mem_ptr[4];
 
-static const write8_space_func pcw16_write_handler_dram[4] =
+static const char *pcw16_write_handler_dram[4] =
 {
-	SMH_BANK(5),
-	SMH_BANK(6),
-	SMH_BANK(7),
-	SMH_BANK(8)
+	"bank5",
+	"bank6",
+	"bank7",
+	"bank8"
 };
 
-static const read8_space_func pcw16_read_handler_dram[4] =
+static const char *pcw16_read_handler_dram[4] =
 {
-	SMH_BANK(1),
-	SMH_BANK(2),
-	SMH_BANK(3),
-	SMH_BANK(4)
+	"bank1",
+	"bank2",
+	"bank3",
+	"bank4"
 };
 /*******************************************/
 
@@ -371,44 +371,38 @@ static  READ8_HANDLER(pcw16_no_mem_r)
 static void pcw16_set_bank_handlers(running_machine *machine, int bank, PCW16_RAM_TYPE type)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	read8_space_func read_handler;
-	write8_space_func write_handler;
 
 	switch (type) {
 	case PCW16_MEM_ROM:
 		/* rom */
-		read_handler = pcw16_read_handler_dram[bank];
-		write_handler = SMH_NOP;
+		memory_install_read_bank(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, pcw16_read_handler_dram[bank]);
+		memory_nop_write(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0);
 		break;
 
 	case PCW16_MEM_FLASH_1:
 		/* sram */
-		read_handler = pcw16_flash0_bank_handlers_r[bank];
-		write_handler = pcw16_flash0_bank_handlers_w[bank];
+		memory_install_read8_handler(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, pcw16_flash0_bank_handlers_r[bank]);
+		memory_install_write8_handler(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, pcw16_flash0_bank_handlers_w[bank]);
 		break;
 
 	case PCW16_MEM_FLASH_2:
-		read_handler = pcw16_flash1_bank_handlers_r[bank];
-		write_handler = pcw16_flash1_bank_handlers_w[bank];
+		memory_install_read8_handler(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, pcw16_flash1_bank_handlers_r[bank]);
+		memory_install_write8_handler(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, pcw16_flash1_bank_handlers_w[bank]);
 		break;
 
 	case PCW16_MEM_NONE:
-		read_handler = pcw16_no_mem_r;
-		write_handler = SMH_NOP;
+		memory_install_read8_handler(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, pcw16_no_mem_r);
+		memory_nop_write(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0);
 		break;
 
 	default:
 	case PCW16_MEM_DRAM:
 		/* dram */
-		read_handler = pcw16_read_handler_dram[bank];
-		write_handler = pcw16_write_handler_dram[bank];
+		memory_install_read_bank(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, pcw16_read_handler_dram[bank]);
+		memory_install_write_bank(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, pcw16_write_handler_dram[bank]);
 		break;
 	}
 
-	memory_install_read8_handler(space,
-		(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, read_handler);
-	memory_install_write8_handler(space,
-		(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, write_handler);
 }
 
 static void pcw16_update_bank(running_machine *machine, int bank)
@@ -416,7 +410,8 @@ static void pcw16_update_bank(running_machine *machine, int bank)
 	unsigned char *mem_ptr = messram_get_ptr(devtag_get_device(machine, "messram"));
 	int bank_id = 0;
 	int bank_offs = 0;
-
+	char bank1[10];
+	char bank2[10];
 
 	/* get memory bank */
 	bank_id = pcw16_banks[bank];
@@ -455,8 +450,10 @@ static void pcw16_update_bank(running_machine *machine, int bank)
 
 	mem_ptr = mem_ptr + ((bank_id - bank_offs)<<14);
 	pcw16_mem_ptr[bank] = (char*)mem_ptr;
-	memory_set_bankptr(machine, (bank+1), mem_ptr);
-	memory_set_bankptr(machine, (bank+5), mem_ptr);
+	sprintf(bank1,"bank%d",(bank+1));
+	sprintf(bank2,"bank%d",(bank+5));
+	memory_set_bankptr(machine, bank1, mem_ptr);
+	memory_set_bankptr(machine, bank2, mem_ptr);
 
 	if ((bank_id & 0x080)==0)
 	{

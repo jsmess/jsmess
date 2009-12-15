@@ -19,7 +19,7 @@
 
 /* Address maps */
 static ADDRESS_MAP_START(mikro80_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK(1) // First bank
+	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x0800, 0xdfff ) AM_RAM  // RAM
     AM_RANGE( 0xe000, 0xe7ff ) AM_RAM  AM_BASE(&mikro80_cursor_ram)// Video RAM
     AM_RANGE( 0xe800, 0xefff ) AM_RAM  AM_BASE(&mikro80_video_ram) // Video RAM

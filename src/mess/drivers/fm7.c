@@ -391,8 +391,9 @@ static READ8_HANDLER( fm7_rom_en_r )
 	basic_rom_en = 1;
 	if(fm7_type == SYS_FM7)
 	{
-		memory_install_readwrite8_handler(space,0x8000,0xfbff,0,0,SMH_BANK(1),SMH_NOP);
-		memory_set_bankptr(space->machine,1,RAM+0x38000);
+		memory_install_read_bank(space,0x8000,0xfbff,0,0,"bank1");
+		memory_nop_write(space,0x8000,0xfbff,0,0);
+		memory_set_bankptr(space->machine,"bank1",RAM+0x38000);
 	}
 	else
 		fm7_mmr_refresh(space);
@@ -407,8 +408,8 @@ static WRITE8_HANDLER( fm7_rom_en_w )
 	basic_rom_en = 0;
 	if(fm7_type == SYS_FM7)
 	{
-		memory_install_readwrite8_handler(space,0x8000,0xfbff,0,0,SMH_BANK(1),SMH_BANK(1));
-		memory_set_bankptr(space->machine,1,RAM+0x8000);
+		memory_install_readwrite_bank(space,0x8000,0xfbff,0,0,"bank1");
+		memory_set_bankptr(space->machine,"bank1",RAM+0x8000);
 	}
 	else
 		fm7_mmr_refresh(space);
@@ -1027,10 +1028,13 @@ static void fm7_update_bank(const address_space* space, int bank, UINT8 physical
 {
 	UINT8* RAM = memory_region(space->machine,"maincpu");
 	UINT16 size = 0xfff;
-
+	char bank_name[10];
+	
 	if(bank == 15)
 		size = 0xbff;
-
+	
+	sprintf(bank_name,"bank%d",bank+1);
+	
 	if(physical >= 0x10 && physical <= 0x1b)
 	{
 		switch(physical)
@@ -1089,9 +1093,10 @@ static void fm7_update_bank(const address_space* space, int bank, UINT8 physical
 	{
 		if(init_rom_en)
 		{
-			RAM = memory_region(space->machine,"init");
-			memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,SMH_BANK(bank+1),SMH_NOP);
-			memory_set_bankptr(space->machine,bank+1,RAM+(physical<<12)-0x36000);
+			RAM = memory_region(space->machine,"init");			
+			memory_install_read_bank(space,bank*0x1000,(bank*0x1000)+size,0,0,bank_name);
+			memory_nop_write(space,bank*0x1000,(bank*0x1000)+size,0,0);
+			memory_set_bankptr(space->machine,bank_name,RAM+(physical<<12)-0x36000);
 			return;
 		}
 	}
@@ -1100,13 +1105,14 @@ static void fm7_update_bank(const address_space* space, int bank, UINT8 physical
 		if(basic_rom_en)
 		{
 			RAM = memory_region(space->machine,"fbasic");
-			memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,SMH_BANK(bank+1),SMH_NOP);
-			memory_set_bankptr(space->machine,bank+1,RAM+(physical<<12)-0x38000);
+			memory_install_read_bank(space,bank*0x1000,(bank*0x1000)+size,0,0,bank_name);
+			memory_nop_write(space,bank*0x1000,(bank*0x1000)+size,0,0);
+			memory_set_bankptr(space->machine,bank_name,RAM+(physical<<12)-0x38000);
 			return;
 		}
 	}
-	memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,SMH_BANK(bank+1),SMH_BANK(bank+1));
-	memory_set_bankptr(space->machine,bank+1,RAM+(physical<<12));
+	memory_install_readwrite_bank(space,bank*0x1000,(bank*0x1000)+size,0,0,bank_name);
+	memory_set_bankptr(space->machine,bank_name,RAM+(physical<<12));
 }
 
 static void fm7_mmr_refresh(const address_space* space)
@@ -1135,8 +1141,8 @@ static void fm7_mmr_refresh(const address_space* space)
 		window_addr = ((fm7_mmr.window_offset << 8) + 0x7c00) & 0xffff;
 //      if(window_addr < 0xfc00)
 		{
-			memory_install_readwrite8_handler(space,0x7c00,0x7fff,0,0,SMH_BANK(24),SMH_BANK(24));
-			memory_set_bankptr(space->machine,24,RAM+window_addr);
+			memory_install_readwrite_bank(space,0x7c00,0x7fff,0,0,"bank24");
+			memory_set_bankptr(space->machine,"bank24",RAM+window_addr);
 		}
 	}
 }
@@ -1399,7 +1405,7 @@ static void fm77av_fmirq(const device_config* device,int irq)
 // The FM-7 has only 64kB RAM, so we'll worry about banking when we do the later models
 static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000,0x7fff) AM_RAM
-	AM_RANGE(0x8000,0xfbff) AM_ROMBANK(1) // also F-BASIC ROM, when enabled
+	AM_RANGE(0x8000,0xfbff) AM_ROMBANK("bank1") // also F-BASIC ROM, when enabled
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
 	AM_RANGE(0xfc80,0xfcff) AM_RAM AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
 	// I/O space (FD00-FDFF)
@@ -1420,7 +1426,7 @@ static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
 	AM_RANGE(0xfd40,0xfdff) AM_READ(fm7_unknown_r)
 	// Boot ROM
-	AM_RANGE(0xfe00,0xffdf) AM_ROMBANK(17)
+	AM_RANGE(0xfe00,0xffdf) AM_ROMBANK("bank17")
 	AM_RANGE(0xffe0,0xffef) AM_RAM
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w)
 ADDRESS_MAP_END
@@ -1454,22 +1460,22 @@ static ADDRESS_MAP_START( fm7_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000,0x0fff) AM_RAMBANK(1)
-	AM_RANGE(0x1000,0x1fff) AM_RAMBANK(2)
-	AM_RANGE(0x2000,0x2fff) AM_RAMBANK(3)
-	AM_RANGE(0x3000,0x3fff) AM_RAMBANK(4)
-	AM_RANGE(0x4000,0x4fff) AM_RAMBANK(5)
-	AM_RANGE(0x5000,0x5fff) AM_RAMBANK(6)
-	AM_RANGE(0x6000,0x6fff) AM_RAMBANK(7)
-	AM_RANGE(0x7000,0x7fff) AM_RAMBANK(8)
-	AM_RANGE(0x8000,0x8fff) AM_RAMBANK(9)
-	AM_RANGE(0x9000,0x9fff) AM_RAMBANK(10)
-	AM_RANGE(0xa000,0xafff) AM_RAMBANK(11)
-	AM_RANGE(0xb000,0xbfff) AM_RAMBANK(12)
-	AM_RANGE(0xc000,0xcfff) AM_RAMBANK(13)
-	AM_RANGE(0xd000,0xdfff) AM_RAMBANK(14)
-	AM_RANGE(0xe000,0xefff) AM_RAMBANK(15)
-	AM_RANGE(0xf000,0xfbff) AM_RAMBANK(16)
+	AM_RANGE(0x0000,0x0fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x1000,0x1fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x2000,0x2fff) AM_RAMBANK("bank3")
+	AM_RANGE(0x3000,0x3fff) AM_RAMBANK("bank4")
+	AM_RANGE(0x4000,0x4fff) AM_RAMBANK("bank5")
+	AM_RANGE(0x5000,0x5fff) AM_RAMBANK("bank6")
+	AM_RANGE(0x6000,0x6fff) AM_RAMBANK("bank7")
+	AM_RANGE(0x7000,0x7fff) AM_RAMBANK("bank8")
+	AM_RANGE(0x8000,0x8fff) AM_RAMBANK("bank9")
+	AM_RANGE(0x9000,0x9fff) AM_RAMBANK("bank10")
+	AM_RANGE(0xa000,0xafff) AM_RAMBANK("bank11")
+	AM_RANGE(0xb000,0xbfff) AM_RAMBANK("bank12")
+	AM_RANGE(0xc000,0xcfff) AM_RAMBANK("bank13")
+	AM_RANGE(0xd000,0xdfff) AM_RAMBANK("bank14")
+	AM_RANGE(0xe000,0xefff) AM_RAMBANK("bank15")
+	AM_RANGE(0xf000,0xfbff) AM_RAMBANK("bank16")
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
 	AM_RANGE(0xfc80,0xfcff) AM_RAM AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
 	// I/O space (FD00-FDFF)
@@ -1526,8 +1532,8 @@ static ADDRESS_MAP_START( fm77av_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd430,0xd430) AM_READWRITE(fm77av_video_flags_r,fm77av_video_flags_w)
 	AM_RANGE(0xd431,0xd432) AM_READWRITE(fm77av_key_encoder_r,fm77av_key_encoder_w)
 	AM_RANGE(0xd500,0xd7ff) AM_RAM AM_REGION("maincpu",0x1d500) // Work RAM
-	AM_RANGE(0xd800,0xdfff) AM_ROMBANK(20)
-	AM_RANGE(0xe000,0xffff) AM_ROMBANK(21)
+	AM_RANGE(0xd800,0xdfff) AM_ROMBANK("bank20")
+	AM_RANGE(0xe000,0xffff) AM_ROMBANK("bank21")
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -1730,9 +1736,9 @@ static MACHINE_START(fm77av)
 
 	fm7_video.subrom = 0;  // default sub CPU ROM is type C.
 	RAM = memory_region(machine,"subsyscg");
-	memory_set_bankptr(machine,20,RAM);
+	memory_set_bankptr(machine,"bank20",RAM);
 	RAM = memory_region(machine,"subsys_c");
-	memory_set_bankptr(machine,21,RAM+0x800);
+	memory_set_bankptr(machine,"bank21",RAM+0x800);
 
 	fm7_type = SYS_FM77AV;
 	beep_set_frequency(devtag_get_device(machine,"beeper"),1200);
@@ -1764,7 +1770,7 @@ static MACHINE_RESET(fm7)
 		memcpy(RAM+0x3fff0,ROM+0x1ff0,16);
 	}
 	if(fm7_type == SYS_FM7)
-		memory_set_bankptr(machine,1,RAM+0x38000);
+		memory_set_bankptr(machine,"bank1",RAM+0x38000);
 	key_delay = 700;  // 700ms on FM-7
 	key_repeat = 70;  // 70ms on FM-7
 	break_flag = 0;
@@ -1784,11 +1790,11 @@ static MACHINE_RESET(fm7)
 	{
 		if(!(input_port_read(machine,"DSW") & 0x02))
 		{  // DOS mode
-			memory_set_bankptr(machine,17,memory_region(machine,"dos"));
+			memory_set_bankptr(machine,"bank17",memory_region(machine,"dos"));
 		}
 		else
 		{  // BASIC mode
-			memory_set_bankptr(machine,17,memory_region(machine,"basic"));
+			memory_set_bankptr(machine,"bank17",memory_region(machine,"basic"));
 		}
 	}
 	if(fm7_type != SYS_FM7)  // set default RAM banks

@@ -238,7 +238,7 @@ Interrupts:
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_READNOP   /* 6850 ACIA */
 	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
@@ -252,7 +252,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( zoo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0bff) AM_READNOP   /* ACIA */
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
@@ -277,7 +277,7 @@ static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(qix_68705_portA_r, qix_68705_portA_w) AM_BASE_MEMBER(qix_state, _68705_port_out)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(qix_68705_portB_r, qix_68705_portB_w)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(qix_68705_portC_r, qix_68705_portC_w)
-	AM_RANGE(0x0004, 0x0007) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(qix_state, _68705_ddr)
+	AM_RANGE(0x0004, 0x0007) AM_WRITEONLY AM_BASE_MEMBER(qix_state, _68705_ddr)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
@@ -1314,9 +1314,9 @@ static DRIVER_INIT( kram3 )
 static DRIVER_INIT( zookeep )
 {
 	/* configure the banking */
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "videocpu") + 0xa000, 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "videocpu") + 0x10000, 0);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "videocpu") + 0xa000, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "videocpu") + 0x10000, 0);
+	memory_set_bank(machine, "bank1", 0);
 }
 
 

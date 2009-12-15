@@ -43,29 +43,34 @@ static void enterprise_update_memory_page(const address_space *space, offs_t pag
 {
 	int start = (page - 1) * 0x4000;
 	int end = (page - 1) * 0x4000 + 0x3fff;
-
+	char page_num[10];
+	sprintf(page_num,"bank%d",page);
+	
 	switch (index)
 	{
 	case 0x00:
 	case 0x01:
 	case 0x02:
 	case 0x03:
-		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK((FPTR)page), SMH_NOP);
-		memory_set_bankptr(space->machine, page, memory_region(space->machine, "exos") + (index * 0x4000));
+		memory_install_read_bank(space, start, end, 0, 0, page_num);
+		memory_nop_write(space, start, end, 0, 0 );
+		memory_set_bankptr(space->machine, page_num, memory_region(space->machine, "exos") + (index * 0x4000));
 		break;
 
 	case 0x04:
 	case 0x05:
 	case 0x06:
 	case 0x07:
-		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK((FPTR)page), SMH_NOP);
-		memory_set_bankptr(space->machine, page, memory_region(space->machine, "cartridges") + ((index - 0x04) * 0x4000));
+		memory_install_read_bank(space, start, end, 0, 0, page_num);
+		memory_nop_write(space, start, end, 0, 0);
+		memory_set_bankptr(space->machine, page_num, memory_region(space->machine, "cartridges") + ((index - 0x04) * 0x4000));
 		break;
 
 	case 0x20:
 	case 0x21:
-		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK((FPTR)page), SMH_NOP);
-		memory_set_bankptr(space->machine, page, memory_region(space->machine, "exdos") + ((index - 0x20) * 0x4000));
+		memory_install_read_bank(space, start, end, 0, 0, page_num);
+		memory_nop_write(space, start, end, 0, 0);
+		memory_set_bankptr(space->machine, page_num, memory_region(space->machine, "exdos") + ((index - 0x20) * 0x4000));
 		break;
 
 	case 0xf8:
@@ -75,12 +80,12 @@ static void enterprise_update_memory_page(const address_space *space, offs_t pag
 		/* additional 64k ram */
 		if (messram_get_size(devtag_get_device(space->machine, "messram")) == 128*1024)
 		{
-			memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK((FPTR)page), SMH_BANK((FPTR)page));
-			memory_set_bankptr(space->machine, page, messram_get_ptr(devtag_get_device(space->machine, "messram")) + (index - 0xf4) * 0x4000);
+			memory_install_readwrite_bank(space, start, end, 0, 0, page_num);
+			memory_set_bankptr(space->machine, page_num, messram_get_ptr(devtag_get_device(space->machine, "messram")) + (index - 0xf4) * 0x4000);
 		}
 		else
 		{
-			memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_UNMAP, SMH_UNMAP);
+			memory_unmap_readwrite(space, start, end, 0, 0);
 		}
 		break;
 
@@ -89,12 +94,12 @@ static void enterprise_update_memory_page(const address_space *space, offs_t pag
 	case 0xfe:
 	case 0xff:
 		/* basic 64k ram */
-		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK((FPTR)page), SMH_BANK((FPTR)page));
-		memory_set_bankptr(space->machine, page, messram_get_ptr(devtag_get_device(space->machine, "messram")) + (index - 0xfc) * 0x4000);
+		memory_install_readwrite_bank(space, start, end, 0, 0, page_num);
+		memory_set_bankptr(space->machine, page_num, messram_get_ptr(devtag_get_device(space->machine, "messram")) + (index - 0xfc) * 0x4000);
 		break;
 
 	default:
-		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_unmap_readwrite(space, start, end, 0, 0);
 	}
 }
 
@@ -250,10 +255,10 @@ static WRITE8_HANDLER( exdos_card_w )
 ***************************************************************************/
 
 static ADDRESS_MAP_START( enterprise_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1)
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(2)
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(3)
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK(4)
+	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
 

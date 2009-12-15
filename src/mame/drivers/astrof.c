@@ -40,8 +40,18 @@
           I have played one that stoped between waves to show the next enemy
 
     Known issues/to-do's:
-        * Is Astro Fighter supposed to have a blue background???
         * Analog sound in all games
+
+    About Colours:
+        * It was fairly common to have wiremods on these PCBs to change the
+          background colours, this is why you see Astro Fighter and Tomahawk
+          games with both Blue and Black backgrounds.  By default MAME
+          emulates an unmodified PCB, you can enable the hacks in the DRIVER
+          CONFIGURATION menu.
+
+          Versions of Tomahawk using the Astro Fighter PROM have been seen,
+          see notes in ROM loading.
+
 
 ****************************************************************************/
 
@@ -197,12 +207,34 @@ static void astrof_get_pens( running_machine *machine, pen_t *pens )
 {
 	astrof_state *state = (astrof_state *)machine->driver_data;
 	offs_t i;
+	UINT8 bank = (state->astrof_palette_bank ? 0x10 : 0x00);
+	UINT8 config = input_port_read_safe(machine, "FAKE", 0x00);
 	UINT8 *prom = memory_region(machine, "proms");
+
+	/* a common wire hack to the pcb causes the prom halves to be inverted */
+	/* this results in e.g. astrof background being black */
+	switch (config)
+	{
+	case 0:
+		/* normal PROM access */
+		break;
+	case 1:
+		/* invert PROM acess */
+		bank ^= 0x10;
+		break;
+	case 2:
+		/* force low */
+		bank = 0x00;
+		break;
+	default:
+		/* force high */
+		bank = 0x10;
+		break;
+	}
 
 	for (i = 0; i < ASTROF_NUM_PENS; i++)
 	{
-		UINT8 data = prom[(state->astrof_palette_bank ? 0x10 : 0x00) | i];
-
+		UINT8 data = prom[bank | i];
 		pens[i] = make_pen(machine, data);
 	}
 }
@@ -212,10 +244,36 @@ static void tomahawk_get_pens( running_machine *machine, pen_t *pens )
 {
 	offs_t i;
 	UINT8 *prom = memory_region(machine, "proms");
+	UINT8 config = input_port_read_safe(machine, "FAKE", 0x00);
 
 	for (i = 0; i < TOMAHAWK_NUM_PENS; i++)
 	{
-		UINT8 data = prom[i];
+		UINT8 data;
+		UINT8 pen;
+
+		/* a common wire hack to the pcb causes the prom halves to be inverted */
+		/* this results in e.g. astrof background being black */
+		switch (config)
+		{
+		case 0:
+			/* normal PROM access */
+			pen = i;
+			break;
+		case 1:
+			/* invert PROM acess */
+			pen = i ^ 0x10;
+			break;
+		case 2:
+			/* force low */
+			pen = i & 0x0f;
+			break;
+		default:
+			/* force high */
+			pen = i | 0x10;
+			break;
+		}
+
+		data = prom[pen];
 
 		pens[i] = make_pen(machine, data);
 	}
@@ -591,7 +649,20 @@ ADDRESS_MAP_END
  *
  *************************************/
 
+static INPUT_PORTS_START( astrof_common )
+	PORT_START("FAKE")
+	/* There are PCB wire-mods which limit / change PROM access */
+	PORT_CONFNAME( 0x03, 0x00, "Color PROM Wiremod" )
+	PORT_CONFSETTING(    0x00, "Normal (no mod)" )
+	PORT_CONFSETTING(    0x01, "Invert Access" )
+	PORT_CONFSETTING(    0x02, "Force Low" )
+	PORT_CONFSETTING(    0x03, "Force High" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( astrof )
+	PORT_INCLUDE( astrof_common )
+
 	PORT_START("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
@@ -645,6 +716,8 @@ INPUT_PORTS_END
 
 /* same as 'astrof', but inputs are ACTIVE_HIGH instead of ACTIVE_LOW */
 static INPUT_PORTS_START( abattle )
+	PORT_INCLUDE( astrof_common )
+
 	PORT_START("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -698,6 +771,8 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( spfghmk2 )
+	PORT_INCLUDE( astrof_common )
+
 	PORT_START("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
@@ -747,6 +822,8 @@ static INPUT_PORTS_START( spfghmk2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spfgmk22 )
+	PORT_INCLUDE( astrof_common )
+
 	PORT_START("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
@@ -801,6 +878,8 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( tomahawk )
+	PORT_INCLUDE( astrof_common )
+
 	PORT_START("IN")
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(tomahawk_controls_r, NULL)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
@@ -1190,6 +1269,11 @@ ROM_START( tomahawk )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "t777.clr",     0x0000, 0x0020, CRC(d6a528fd) SHA1(5fc08252a2d7c5405f601efbfb7d84bec328d733) )
+
+	// versions of this have also been seen using the standard Astro Fighter PROM, giving a blue submarine
+	// in blue water, with pink / yellow borders.  I think these are just unofficial conversions of Astro
+	// Fighter without the PROM properly replaced tho.
+	//ROM_LOAD( "astrf.clr",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
 ROM_END
 
 

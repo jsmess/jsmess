@@ -29,8 +29,8 @@
 
 /* Orion 128 */
 static ADDRESS_MAP_START(orion128_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0xefff ) AM_RAMBANK(1)
-	AM_RANGE( 0xf000, 0xf3ff ) AM_RAMBANK(2)
+	AM_RANGE( 0x0000, 0xefff ) AM_RAMBANK("bank1")
+	AM_RANGE( 0xf000, 0xf3ff ) AM_RAMBANK("bank2")
     AM_RANGE( 0xf400, 0xf4ff ) AM_READWRITE(orion128_system_r,orion128_system_w)  // Keyboard and cassette
     AM_RANGE( 0xf500, 0xf5ff ) AM_READWRITE(orion128_romdisk_r,orion128_romdisk_w)
     AM_RANGE( 0xf700, 0xf7ff ) AM_READWRITE(orion128_floppy_r,orion128_floppy_w)
@@ -51,11 +51,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(orionz80_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK(1)
-	AM_RANGE( 0x4000, 0xefff ) AM_RAMBANK(2)
-	AM_RANGE( 0xf000, 0xf3ff ) AM_RAMBANK(3)
-    AM_RANGE( 0xf400, 0xf7ff ) AM_RAMBANK(4)
-    AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK(5)
+	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
+	AM_RANGE( 0x4000, 0xefff ) AM_RAMBANK("bank2")
+	AM_RANGE( 0xf000, 0xf3ff ) AM_RAMBANK("bank3")
+    AM_RANGE( 0xf400, 0xf7ff ) AM_RAMBANK("bank4")
+    AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank5")
 ADDRESS_MAP_END
 
 /* Orion Pro */
@@ -65,14 +65,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(orionpro_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x1fff ) AM_RAMBANK(1)
-	AM_RANGE( 0x2000, 0x3fff ) AM_RAMBANK(2)
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAMBANK(3)
-	AM_RANGE( 0x8000, 0xbfff ) AM_RAMBANK(4)
-	AM_RANGE( 0xc000, 0xefff ) AM_RAMBANK(5)
-	AM_RANGE( 0xf000, 0xf3ff ) AM_RAMBANK(6)
-    AM_RANGE( 0xf400, 0xf7ff ) AM_RAMBANK(7)
-    AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK(8)
+	AM_RANGE( 0x0000, 0x1fff ) AM_RAMBANK("bank1")
+	AM_RANGE( 0x2000, 0x3fff ) AM_RAMBANK("bank2")
+	AM_RANGE( 0x4000, 0x7fff ) AM_RAMBANK("bank3")
+	AM_RANGE( 0x8000, 0xbfff ) AM_RAMBANK("bank4")
+	AM_RANGE( 0xc000, 0xefff ) AM_RAMBANK("bank5")
+	AM_RANGE( 0xf000, 0xf3ff ) AM_RAMBANK("bank6")
+    AM_RANGE( 0xf400, 0xf7ff ) AM_RAMBANK("bank7")
+    AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank8")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( orionpro_io , ADDRESS_SPACE_IO, 8)

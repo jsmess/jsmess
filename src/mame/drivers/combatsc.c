@@ -269,7 +269,7 @@ static READ8_DEVICE_HANDLER ( combasc_ym2203_r )
 static ADDRESS_MAP_START( combasc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(combasc_pf_control_w)
 	AM_RANGE(0x0020, 0x005f) AM_READWRITE(combasc_scrollram_r, combasc_scrollram_w)
-//  AM_RANGE(0x0060, 0x00ff) AM_WRITE(SMH_RAM)                 /* RAM */
+//  AM_RANGE(0x0060, 0x00ff) AM_WRITEONLY                 /* RAM */
 
 	AM_RANGE(0x0200, 0x0201) AM_READWRITE(protection_r, protection_w)
 	AM_RANGE(0x0206, 0x0206) AM_WRITE(protection_clock_w)
@@ -289,7 +289,7 @@ static ADDRESS_MAP_START( combasc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE_GENERIC(paletteram)		/* palette */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM								/* RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(combasc_video_r, combasc_video_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)						/* banked ROM area */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")						/* banked ROM area */
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM */
 ADDRESS_MAP_END
 
@@ -299,7 +299,7 @@ static ADDRESS_MAP_START( combascb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE_GENERIC(paletteram)		/* palette */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(combasc_video_r, combasc_video_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)						/* banked ROM/RAM area */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")						/* banked ROM/RAM area */
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM */
 ADDRESS_MAP_END
 
@@ -800,7 +800,7 @@ static DRIVER_INIT( combasct )
 static DRIVER_INIT( combasc )
 {
 	/* joystick instead of trackball */
-	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0404, 0x0404, 0, 0, "IN1");
+	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0404, 0x0404, 0, 0, "IN1");
 
 	combasc_init_common(machine);
 }

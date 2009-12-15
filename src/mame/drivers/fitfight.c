@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( bbprot_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb08000, 0xb0bfff) AM_RAM_WRITE(fof_mid_tileram_w) AM_BASE_MEMBER(fitfight_state, fof_mid_tileram)
 	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM_WRITE(fof_txt_tileram_w) AM_BASE_MEMBER(fitfight_state, fof_txt_tileram)
 
-	AM_RANGE(0xc00000, 0xc00fff) AM_READ(SMH_RAM)
+	AM_RANGE(0xc00000, 0xc00fff) AM_READONLY
 	AM_RANGE(0xc00000, 0xc03fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_MEMBER(fitfight_state, spriteram)
@@ -211,7 +211,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( snd_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)	/* ??? External ROM */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")	/* ??? External ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END

@@ -62,7 +62,7 @@ static WRITE8_HANDLER( f1gp_sh_bankswitch_w )
 {
 	UINT8 *rom = memory_region(space->machine, "audiocpu") + 0x10000;
 
-	memory_set_bankptr(space->machine, 1,rom + (data & 0x01) * 0x8000);
+	memory_set_bankptr(space->machine, "bank1",rom + (data & 0x01) * 0x8000);
 }
 
 
@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( f1gp_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfff008, 0xfff009) AM_READ(command_pending_r)
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
-	AM_RANGE(0xfff040, 0xfff05f) AM_WRITE(SMH_RAM) AM_BASE(&K053936_0_ctrl)
+	AM_RANGE(0xfff040, 0xfff05f) AM_WRITEONLY AM_BASE(&K053936_0_ctrl)
 	AM_RANGE(0xfff050, 0xfff051) AM_READ_PORT("DSW3")
 ADDRESS_MAP_END
 
@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( f1gp2_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfff008, 0xfff009) AM_READWRITE(command_pending_r, sound_command_w)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW3")
-	AM_RANGE(0xfff020, 0xfff02f) AM_WRITE(SMH_RAM) AM_BASE(&K053936_0_ctrl)
+	AM_RANGE(0xfff020, 0xfff02f) AM_WRITEONLY AM_BASE(&K053936_0_ctrl)
 	AM_RANGE(0xfff044, 0xfff047) AM_WRITE(f1gp_fgscroll_w)
 ADDRESS_MAP_END
 
@@ -148,7 +148,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )

@@ -21,7 +21,7 @@ DRIVER_INIT(rt1715)
 
 MACHINE_RESET( rt1715 )
 {
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x10000);
-	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0800);
-	memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")));
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x10000);
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0800);
+	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")));
 }

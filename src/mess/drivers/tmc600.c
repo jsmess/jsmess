@@ -103,7 +103,7 @@ static WRITE8_HANDLER( keyboard_latch_w )
 
 static ADDRESS_MAP_START( tmc600_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
-	AM_RANGE(0x6000, 0xbfff) AM_RAMBANK(1)
+	AM_RANGE(0x6000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
 	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
 ADDRESS_MAP_END
@@ -276,23 +276,23 @@ static MACHINE_START( tmc600 )
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* configure RAM */
-	memory_configure_bank(machine, 1, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_set_bank(machine, "bank1", 0);
 
 	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 8*1024:
-		memory_install_readwrite8_handler(program, 0x6000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite_bank(program, 0x6000, 0x7fff, 0, 0, "bank1");
+		memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
 		break;
 
 	case 16*1024:
-		memory_install_readwrite8_handler(program, 0x6000, 0x9fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_install_readwrite8_handler(program, 0xa000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite_bank(program, 0x6000, 0x9fff, 0, 0, "bank1");
+		memory_unmap_readwrite(program, 0xa000, 0xbfff, 0, 0);
 		break;
 
 	case 24*1024:
-		memory_install_readwrite8_handler(program, 0x6000, 0xbfff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+		memory_install_readwrite_bank(program, 0x6000, 0xbfff, 0, 0, "bank1");
 		break;
 	}
 

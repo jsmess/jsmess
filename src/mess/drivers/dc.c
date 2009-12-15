@@ -138,10 +138,10 @@ static ADDRESS_MAP_START( dc_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_BASE( &dc_framebuffer_ram ) // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
 
 	/* Area 3 */
-	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE(4) AM_BASE(&dc_ram)
-	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE(4)// extra ram on Naomi (mirror on DC)
-	AM_RANGE(0x0e000000, 0x0effffff) AM_RAM AM_SHARE(4)// mirror
-	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE(4)// mirror
+	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE("share4") AM_BASE(&dc_ram)
+	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE("share4")// extra ram on Naomi (mirror on DC)
+	AM_RANGE(0x0e000000, 0x0effffff) AM_RAM AM_SHARE("share4")// mirror
+	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE("share4")// mirror
 
 	/* Area 4 */
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( dc_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x12800000, 0x12ffffff) AM_WRITE( ta_fifo_yuv_w )
 	AM_RANGE(0x13000000, 0x137fffff) AM_WRITE( ta_texture_directpath1_w ) AM_MIRROR(0x00800000) // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
 
-	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE(4)	// another RAM mirror
+	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE("share4")	// another RAM mirror
 
 	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END

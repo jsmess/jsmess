@@ -263,9 +263,6 @@ static WRITE8_HANDLER(write_gvram_alu3_bank6){write_gvram_alu3(space, offset + 0
 
 int pc8801_is_vram_select( running_machine *machine )
 {
-	read8_space_func rh5 = NULL, rh6 = NULL;
-	write8_space_func wh5 = NULL, wh6 = NULL;
-
 	if (alu_on)
 	{
 		/* ALU mode */
@@ -275,56 +272,56 @@ int pc8801_is_vram_select( running_machine *machine )
 			switch (alu_2 & 0x07)
 			{
 			case 0:
-				rh5 = read_gvram_alu0_bank5;
-				rh6 = read_gvram_alu0_bank6;
+				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, read_gvram_alu0_bank5);
+				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, read_gvram_alu0_bank6);
 				break;
 			case 1:
-				rh5 = read_gvram_alu1_bank5;
-				rh6 = read_gvram_alu1_bank6;
+				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, read_gvram_alu1_bank5);
+				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, read_gvram_alu1_bank6);
 				break;
 			case 2:
-				rh5 = read_gvram_alu2_bank5;
-				rh6 = read_gvram_alu2_bank6;
+				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, read_gvram_alu2_bank5);
+				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, read_gvram_alu2_bank6);
 				break;
 			case 3:
-				rh5 = read_gvram_alu3_bank5;
-				rh6 = read_gvram_alu3_bank6;
+				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, read_gvram_alu3_bank5);
+				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, read_gvram_alu3_bank6);
 				break;
 			case 4:
-				rh5 = read_gvram_alu4_bank5;
-				rh6 = read_gvram_alu4_bank6;
+				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, read_gvram_alu4_bank5);
+				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, read_gvram_alu4_bank6);
 				break;
 			case 5:
-				rh5 = read_gvram_alu5_bank5;
-				rh6 = read_gvram_alu5_bank6;
+				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, read_gvram_alu5_bank5);
+				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, read_gvram_alu5_bank6);
 				break;
 			case 6:
-				rh5 = read_gvram_alu6_bank5;
-				rh6 = read_gvram_alu6_bank6;
+				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, read_gvram_alu6_bank5);
+				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, read_gvram_alu6_bank6);
 				break;
 			case 7:
-				rh5 = read_gvram_alu7_bank5;
-				rh6 = read_gvram_alu7_bank6;
+				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, read_gvram_alu7_bank5);
+				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, read_gvram_alu7_bank6);
 				break;
       		}
 
 			switch (alu_2 & 0x30)
 			{
 			case 0x00:
-				wh5 = write_gvram_alu0_bank5;
-				wh6 = write_gvram_alu0_bank6;
+				memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, write_gvram_alu0_bank5);
+				memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, write_gvram_alu0_bank6);
 				break;
 			case 0x10:
-				wh5 = write_gvram_alu1_bank5;
-				wh6 = write_gvram_alu1_bank6;
+				memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, write_gvram_alu1_bank5);
+				memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, write_gvram_alu1_bank6);
 				break;
 			case 0x20:
-				wh5 = write_gvram_alu2_bank5;
-				wh6 = write_gvram_alu2_bank6;
+				memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, write_gvram_alu2_bank5);
+				memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, write_gvram_alu2_bank6);
 				break;
 			case 0x30:
-				wh5 = write_gvram_alu3_bank5;
-				wh6 = write_gvram_alu3_bank6;
+				memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, write_gvram_alu3_bank5);
+				memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, write_gvram_alu3_bank6);
 				break;
      			}
       		return 1;
@@ -341,30 +338,30 @@ int pc8801_is_vram_select( running_machine *machine )
 		switch (selected_vram)
 		{
 		case 1:
-			rh5 = SMH_BANK(5);
-			rh6 = SMH_BANK(6);
-			wh5 = write_gvram0_bank5;
-			wh6 = write_gvram0_bank6;
-			memory_set_bankptr(machine, 5, gVRAM );
-			memory_set_bankptr(machine, 6, gVRAM + 0x3000 );
+			memory_set_bankptr(machine, "bank5", gVRAM );
+			memory_set_bankptr(machine, "bank6", gVRAM + 0x3000 );
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, "bank5");
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, write_gvram0_bank5);
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, "bank6");
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, write_gvram0_bank6);
 			return 1;
 
 		case 2:
-			rh5 = SMH_BANK(5);
-			rh6 = SMH_BANK(6);
-			wh5 = write_gvram1_bank5;
-			wh6 = write_gvram1_bank6;
-			memory_set_bankptr(machine, 5, gVRAM + 0x4000 );
-			memory_set_bankptr(machine, 6, gVRAM + 0x4000 + 0x3000 );
+			memory_set_bankptr(machine, "bank5", gVRAM + 0x4000 );
+			memory_set_bankptr(machine, "bank6", gVRAM + 0x4000 + 0x3000 );
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, "bank5");
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, write_gvram1_bank5);
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, "bank6");
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, write_gvram1_bank6);
 			return 1;
 
 		case 3:
-			rh5 = SMH_BANK(5);
-			rh6 = SMH_BANK(6);
-			wh5 = write_gvram2_bank5;
-			wh6 = write_gvram2_bank6;
-			memory_set_bankptr(machine, 5, gVRAM + 0x8000 );
-			memory_set_bankptr(machine, 6, gVRAM + 0x8000 + 0x3000 );
+			memory_set_bankptr(machine, "bank5", gVRAM + 0x8000 );
+			memory_set_bankptr(machine, "bank6", gVRAM + 0x8000 + 0x3000 );
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, "bank5");
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, write_gvram2_bank5);
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, "bank6");
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, write_gvram2_bank6);
 			return 1;
 
 		default:
@@ -372,10 +369,6 @@ int pc8801_is_vram_select( running_machine *machine )
 		}
 	}
 
-	if (rh5) memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, rh5);
-	if (wh5) memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, wh5);
-	if (rh6) memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, rh6);
-	if (wh6) memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, wh6);
 }
 
 WRITE8_HANDLER( pc88sr_disp_32 )
