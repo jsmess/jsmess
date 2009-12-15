@@ -594,12 +594,6 @@ void wininput_poll(running_machine *machine)
 
 //============================================================
 //  wininput_should_hide_mouse
-//
-//	Note: This routine only seems to be called when in
-//		windowed mode, and the mouse must always be
-//		on, otherwise clickable artwork cannot be
-//		used in the "old" gui.
-//
 //============================================================
 
 int wininput_should_hide_mouse(void)
@@ -617,7 +611,7 @@ int wininput_should_hide_mouse(void)
 		return FALSE;
 
 	// otherwise, yes
-	return FALSE;
+	return TRUE;
 }
 
 
