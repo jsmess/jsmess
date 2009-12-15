@@ -29,8 +29,6 @@
 #define M6526_TAG		"u20"
 #define WD1770_TAG		"u11"
 
-#define FLOPPY_TAG		"c1571_floppy"
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -231,15 +229,15 @@ static const floppy_config c1571_floppy_config =
 -------------------------------------------------*/
 
 static MACHINE_DRIVER_START( c1570 )
-	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+	MDRV_CPU_ADD(M6502_TAG, M6502, 2000000)
 	MDRV_CPU_PROGRAM_MAP(c1570_map)
 
-	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c1571_via0_intf)
-	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1571_via1_intf)
-	MDRV_CIA6526_ADD(M6526_TAG, CIA6526R1, XTAL_16MHz/16, c1571_cia_intf)
+	MDRV_VIA6522_ADD(M6522_0_TAG, 2000000, c1571_via0_intf)
+	MDRV_VIA6522_ADD(M6522_1_TAG, 2000000, c1571_via1_intf)
+	MDRV_CIA6526_ADD(M6526_TAG, CIA6526R1, 2000000, c1571_cia_intf)
 	MDRV_WD1770_ADD(WD1770_TAG, c1571_wd1770_intf)
 
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_TAG, c1570_floppy_config)
+	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1570_floppy_config)
 MACHINE_DRIVER_END
 
 /*-------------------------------------------------
@@ -247,15 +245,15 @@ MACHINE_DRIVER_END
 -------------------------------------------------*/
 
 static MACHINE_DRIVER_START( c1571 )
-	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+	MDRV_CPU_ADD(M6502_TAG, M6502, 2000000)
 	MDRV_CPU_PROGRAM_MAP(c1571_map)
 
-	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c1571_via0_intf)
-	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1571_via1_intf)
-	MDRV_CIA6526_ADD(M6526_TAG, CIA6526R1, XTAL_16MHz/16, c1571_cia_intf)
+	MDRV_VIA6522_ADD(M6522_0_TAG, 2000000, c1571_via0_intf)
+	MDRV_VIA6522_ADD(M6522_1_TAG, 2000000, c1571_via1_intf)
+	MDRV_CIA6526_ADD(M6526_TAG, CIA6526R1, 2000000, c1571_cia_intf)
 	MDRV_WD1770_ADD(WD1770_TAG, c1571_wd1770_intf)
 
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_TAG, c1571_floppy_config)
+	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_config)
 MACHINE_DRIVER_END
 
 /*-------------------------------------------------
@@ -263,15 +261,15 @@ MACHINE_DRIVER_END
 -------------------------------------------------*/
 
 static MACHINE_DRIVER_START( c1571cr )
-	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+	MDRV_CPU_ADD(M6502_TAG, M6502, 2000000)
 	MDRV_CPU_PROGRAM_MAP(c1571cr_map)
 
-	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c1571_via0_intf)
-	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1571_via1_intf)
-	MDRV_CIA6526_ADD(M6526_TAG, CIA6526R1, XTAL_16MHz/16, c1571_cia_intf)
+	MDRV_VIA6522_ADD(M6522_0_TAG, 2000000, c1571_via0_intf)
+	MDRV_VIA6522_ADD(M6522_1_TAG, 2000000, c1571_via1_intf)
+	MDRV_CIA6526_ADD(M6526_TAG, CIA6526R1, 2000000, c1571_cia_intf)
 	MDRV_WD1770_ADD(WD1770_TAG, c1571_wd1770_intf)
 
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_TAG, c1571_floppy_config)
+	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_config)
 MACHINE_DRIVER_END
 
 /*-------------------------------------------------
@@ -379,7 +377,6 @@ DEVICE_GET_INFO( c1571 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
 	}
 }
-
 
 /*-------------------------------------------------
     DEVICE_GET_INFO( c1571cr )

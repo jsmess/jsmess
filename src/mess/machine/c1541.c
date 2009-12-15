@@ -154,8 +154,6 @@
 #define M6522_1_TAG		"ucd4"
 #define TIMER_BIT_TAG	"ue7"
 
-#define FLOPPY_TAG		"c1541_floppy"
-
 static const double C1541_BITRATE[4] =
 {
 	XTAL_16MHz/13.0,	/* tracks 1-17 */
@@ -676,7 +674,7 @@ static MACHINE_DRIVER_START( c1540 )
 	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c1541_via0_intf)
 	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
 
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_TAG, c1541_floppy_config)
+	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_config)
 MACHINE_DRIVER_END
 
 /*-------------------------------------------------
@@ -788,7 +786,7 @@ static DEVICE_START( c1541 )
 	c1541->via0 = device_find_child_by_tag(device, M6522_0_TAG);
 	c1541->via1 = device_find_child_by_tag(device, M6522_1_TAG);
 	c1541->serial_bus = devtag_get_device(device->machine, config->serial_bus_tag);
-	c1541->image = device_find_child_by_tag(device, FLOPPY_TAG);
+	c1541->image = device_find_child_by_tag(device, FLOPPY_0);
 
 	/* allocate track buffer */
 //	c1541->track_buffer = auto_alloc_array(device->machine, UINT8, TRACK_BUFFER_SIZE);
