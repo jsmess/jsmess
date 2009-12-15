@@ -296,11 +296,11 @@ static TIMER_CALLBACK( bit_tick )
 static CBMSERIAL_ATN( c1541 )
 {
 	c1541_t *c1541 = get_safe_token(device);
-	int serial_data = !c1541->data_out && !(c1541->atna ^ !state);
+	int data_out = !c1541->data_out && !(c1541->atna ^ !state);
 
 	via_ca1_w(c1541->via0, 0, !state);
 
-	cbmserial_data_w(c1541->serial_bus, device, serial_data);
+	cbmserial_data_w(c1541->serial_bus, device, data_out);
 }
 
 /*-------------------------------------------------
@@ -501,7 +501,7 @@ static READ8_DEVICE_HANDLER( c1541c_via0_pa_r )
 
 	c1541_t *c1541 = get_safe_token(device->owner);
 
-	return !(floppy_drive_get_flag_state(c1541->image, FLOPPY_DRIVE_HEAD_AT_TRACK_0) == FLOPPY_DRIVE_HEAD_AT_TRACK_0);
+	return (floppy_drive_get_flag_state(c1541->image, FLOPPY_DRIVE_HEAD_AT_TRACK_0) == FLOPPY_DRIVE_HEAD_AT_TRACK_0);
 }
 
 static const via6522_interface c1541c_via0_intf =
