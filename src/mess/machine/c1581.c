@@ -112,9 +112,9 @@ static CBMSERIAL_RESET( c1581 )
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( c1581_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x4000, 0x4010) AM_DEVREADWRITE(M8520_TAG, cia_r, cia_w)
-	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE(WD1770_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
+	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE(M8520_TAG, cia_r, cia_w)
+	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE(WD1770_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("c1581", 0)
 ADDRESS_MAP_END
 
@@ -139,7 +139,7 @@ static READ8_DEVICE_HANDLER( c1581_cia_pa_r )
 
 	*/
 
-	c1581_t *c1581 = get_safe_token(device);
+	c1581_t *c1581 = get_safe_token(device->owner);
 	UINT8 data = 0;
 
 	/* ready */
@@ -168,7 +168,7 @@ static WRITE8_DEVICE_HANDLER( c1581_cia_pa_w )
 
 	*/
 
-	c1581_t *c1581 = get_safe_token(device);
+	c1581_t *c1581 = get_safe_token(device->owner);
 	int motor = BIT(data, 2);
 
 	/* side 0 */
@@ -176,7 +176,7 @@ static WRITE8_DEVICE_HANDLER( c1581_cia_pa_w )
 
 	/* motor */
 	floppy_drive_set_motor_state(c1581->image, motor ? 0 : FLOPPY_DRIVE_MOTOR_ON);
-	floppy_drive_set_ready_state(c1581->image, motor, 1);
+	floppy_drive_set_ready_state(c1581->image, !motor, 1);
 
 	/* power led */
 
@@ -200,7 +200,7 @@ static READ8_DEVICE_HANDLER( c1581_cia_pb_r )
 
 	*/
 
-	c1581_t *c1581 = get_safe_token(device);
+	c1581_t *c1581 = get_safe_token(device->owner);
 	UINT8 data = 0;
 
 	/* data in */
@@ -235,7 +235,7 @@ static WRITE8_DEVICE_HANDLER( c1581_cia_pb_w )
 
 	*/
 
-	c1581_t *c1581 = get_safe_token(device);
+	c1581_t *c1581 = get_safe_token(device->owner);
 
 	int data_out = BIT(data, 1);
 	int clk_out = BIT(data, 3);
@@ -283,9 +283,9 @@ static FLOPPY_OPTIONS_START( c1581 )
 	FLOPPY_OPTION( c1581, "d81", "Commodore 1581 Disk Image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
 		TRACKS([80])
-		SECTORS([20])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
 /*-------------------------------------------------
