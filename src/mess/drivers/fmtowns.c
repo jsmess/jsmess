@@ -1198,7 +1198,7 @@ static void towns_cdrom_execute_command(const device_config* device)
 				}
 				logerror("CD: Command 0x81: set state (CDDASET)\n");
 				break;
-			case 0x84:   // Unknown (status?)
+			case 0x84:   // Stop CD audio track
 				if(towns_cd.command & 0x20)
 				{
 					towns_cd.extra_status = 1;
@@ -1206,6 +1206,15 @@ static void towns_cdrom_execute_command(const device_config* device)
 					cdda_stop_audio(devtag_get_device(device->machine,"cdda"));
 				}
 				logerror("CD: Command 0x84: STOP CD-DA\n");
+				break;
+			case 0x85:   // Stop CD audio track (difference from 0x84?)
+				if(towns_cd.command & 0x20)
+				{
+					towns_cd.extra_status = 1;
+					towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
+					cdda_stop_audio(devtag_get_device(device->machine,"cdda"));
+				}
+				logerror("CD: Command 0x85: STOP CD-DA\n");
 				break;
 			default:
 				towns_cd.extra_status = 0;
@@ -1345,6 +1354,10 @@ static READ8_HANDLER(towns_cdrom_r)
 							break;
 						case 0x84:
 							towns_cd_set_status(space->machine,0x11,0x00,0x00,0x00);
+							towns_cd.extra_status = 0;
+							break;
+						case 0x85:
+							towns_cd_set_status(space->machine,0x12,0x00,0x00,0x00);
 							towns_cd.extra_status = 0;
 							break;
 					}
