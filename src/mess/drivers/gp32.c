@@ -1277,11 +1277,27 @@ static WRITE32_HANDLER( s3c240x_watchdog_w )
 	COMBINE_DATA(&s3c240x_watchdog_regs[offset]);
 }
 
+// EEPROM
+
+static UINT8 eeprom_read( running_machine *machine, UINT16 address)
+{
+	UINT8 data;
+	data = eeprom_data[address];
+	verboselog( machine, 5, "EEPROM %04X -> %02X\n", address, data);
+	return data;
+}
+
+static void eeprom_write( running_machine *machine, UINT16 address, UINT8 data)
+{
+	verboselog( machine, 5, "EEPROM %04X <- %02X\n", address, data);
+	eeprom_data[address] = data;
+}
+
 // IIC
 
 static struct
 {
-	UINT8 data[3];
+	UINT8 data[4];
 	int data_index;
 	UINT16 address;
 } s3c240x_iic;
@@ -1446,8 +1462,8 @@ static TIMER_CALLBACK( s3c240x_iic_timer_exp )
 			}
 			else
 			{
-				UINT8 data_shift = eeprom_data[s3c240x_iic.address];
-				verboselog( machine, 5, "IIC read %02X [%04X]\n", data_shift, s3c240x_iic.address);
+				UINT8 data_shift = eeprom_read( machine, s3c240x_iic.address);
+				verboselog( machine, 5, "IIC read %02X\n", data_shift);
 				s3c240x_iic_regs[3] = (s3c240x_iic_regs[3] & ~0xFF) | data_shift;
 			}
 			s3c240x_iic.data_index++;
@@ -1462,6 +1478,10 @@ static TIMER_CALLBACK( s3c240x_iic_timer_exp )
 			if (s3c240x_iic.data_index == 3)
 			{
 				s3c240x_iic.address = (s3c240x_iic.data[1] << 8) | s3c240x_iic.data[2];
+			}
+			if ((s3c240x_iic.data_index == 4) && (s3c240x_iic.data[0] == 0xA0))
+			{
+				eeprom_write( machine, s3c240x_iic.address, data_shift);
 			}
 		}
 		break;
@@ -1718,7 +1738,7 @@ static NVRAM_HANDLER( gp32 )
 		}
 		else
 		{
-			memset( eeprom_data, 0, 0x2000);
+			memset( eeprom_data, 0xFF, 0x2000);
 		}
 	}
 }
