@@ -216,14 +216,14 @@ INLINE c1541_t *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-	assert((device->type == C1540) || (device->type == C1541));
+	assert((device->type == C1540) || (device->type == C1541) || (device->type == C1541C) || (device->type == C1541II) || (device->type == C2031));
 	return (c1541_t *)device->token;
 }
 
 INLINE c1541_config *get_safe_config(const device_config *device)
 {
 	assert(device != NULL);
-	assert((device->type == C1540) || (device->type == C1541));
+	assert((device->type == C1540) || (device->type == C1541) || (device->type == C1541C) || (device->type == C1541II) || (device->type == C2031));
 	return (c1541_config *)device->inline_config;
 }
 
@@ -323,7 +323,7 @@ static ADDRESS_MAP_START( c1540_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
 	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1540", 0xc000)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1540", 0x0000)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -334,7 +334,40 @@ static ADDRESS_MAP_START( c1541_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
 	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1541", 0xc000)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1541", 0x0000)
+ADDRESS_MAP_END
+
+/*-------------------------------------------------
+    ADDRESS_MAP( c1541c_map )
+-------------------------------------------------*/
+
+static ADDRESS_MAP_START( c1541c_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1541c", 0x0000)
+ADDRESS_MAP_END
+
+/*-------------------------------------------------
+    ADDRESS_MAP( c1541ii_map )
+-------------------------------------------------*/
+
+static ADDRESS_MAP_START( c1541ii_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1541ii", 0x0000)
+ADDRESS_MAP_END
+
+/*-------------------------------------------------
+    ADDRESS_MAP( c2031_map )
+-------------------------------------------------*/
+
+static ADDRESS_MAP_START( c2031_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c2031", 0x0000)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -438,6 +471,150 @@ static const via6522_interface c1541_via0_intf =
 	DEVCB_NULL,
 	DEVCB_HANDLER(via0_pb_w),
 	DEVCB_NULL, /* ATN IN */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_LINE(via0_irq_w)
+};
+
+/*-------------------------------------------------
+    via6522_interface c1541c_via0_intf
+-------------------------------------------------*/
+
+static READ8_DEVICE_HANDLER( c1541c_via0_pa_r )
+{
+	/*
+
+		bit		description
+
+		PA0		TR00 SENCE
+		PA1		
+		PA2		
+		PA3		
+		PA4		
+		PA5		
+		PA6		
+		PA7		
+
+	*/
+	
+	c1541_t *c1541 = get_safe_token(device->owner);
+
+	return !(floppy_drive_get_flag_state(c1541->image, FLOPPY_DRIVE_HEAD_AT_TRACK_0) == FLOPPY_DRIVE_HEAD_AT_TRACK_0);
+}
+
+static const via6522_interface c1541c_via0_intf =
+{
+	DEVCB_HANDLER(c1541c_via0_pa_r),
+	DEVCB_HANDLER(via0_pb_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_HANDLER(via0_pb_w),
+	DEVCB_NULL, /* ATN IN */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_LINE(via0_irq_w)
+};
+
+/*-------------------------------------------------
+    via6522_interface c2031_via0_intf
+-------------------------------------------------*/
+
+static READ8_DEVICE_HANDLER( c2031_via0_pa_r )
+{
+	/*
+
+		bit		description
+
+		PA0		DI0
+		PA1		DI1	
+		PA2		DI2
+		PA3		DI3
+		PA4		DI4
+		PA5		DI5
+		PA6		DI6
+		PA7		DI7
+
+	*/
+
+	return 0;
+}
+
+static WRITE8_DEVICE_HANDLER( c2031_via0_pa_w )
+{
+	/*
+
+		bit		description
+
+		PA0		DI0
+		PA1		DI1	
+		PA2		DI2
+		PA3		DI3
+		PA4		DI4
+		PA5		DI5
+		PA6		DI6
+		PA7		DI7
+
+	*/
+}
+
+static READ8_DEVICE_HANDLER( c2031_via0_pb_r )
+{
+	/*
+
+		bit		description
+
+		PB0		ATNA
+		PB1		NRFD
+		PB2		NDAC
+		PB3		EOI
+		PB4		T/_R
+		PB5		HD SEL
+		PB6		DAV
+		PB7		_ATN
+
+	*/
+
+	return 0;
+}
+
+static WRITE8_DEVICE_HANDLER( c2031_via0_pb_w )
+{
+	/*
+
+		bit		description
+
+		PB0		ATNA
+		PB1		NRFD
+		PB2		NDAC
+		PB3		EOI
+		PB4		T/_R
+		PB5		HD SEL
+		PB6		DAV
+		PB7		_ATN
+
+	*/
+}
+
+static const via6522_interface c2031_via0_intf =
+{
+	DEVCB_HANDLER(c2031_via0_pa_r),
+	DEVCB_HANDLER(c2031_via0_pb_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_HANDLER(c2031_via0_pa_w),
+	DEVCB_HANDLER(c2031_via0_pb_w),
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -689,13 +866,52 @@ static MACHINE_DRIVER_START( c1541 )
 MACHINE_DRIVER_END
 
 /*-------------------------------------------------
+    MACHINE_DRIVER( c1541c )
+-------------------------------------------------*/
+
+static MACHINE_DRIVER_START( c1541c )
+	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+	MDRV_CPU_PROGRAM_MAP(c1541c_map)
+
+	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c1541c_via0_intf)
+	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
+
+	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_config)
+MACHINE_DRIVER_END
+
+/*-------------------------------------------------
+    MACHINE_DRIVER( c1541ii )
+-------------------------------------------------*/
+
+static MACHINE_DRIVER_START( c1541ii )
+	MDRV_IMPORT_FROM(c1540)
+
+	MDRV_CPU_MODIFY(M6502_TAG)
+	MDRV_CPU_PROGRAM_MAP(c1541ii_map)
+MACHINE_DRIVER_END
+
+/*-------------------------------------------------
+    MACHINE_DRIVER( c2031 )
+-------------------------------------------------*/
+
+static MACHINE_DRIVER_START( c2031 )
+	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+	MDRV_CPU_PROGRAM_MAP(c2031_map)
+
+	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c2031_via0_intf)
+	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
+
+	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_config)
+MACHINE_DRIVER_END
+
+/*-------------------------------------------------
     ROM( c1540 )
 -------------------------------------------------*/
 
 ROM_START( c1540 ) // schematic 1540008
-	ROM_REGION( 0x10000, "c1540", ROMREGION_LOADBYNAME )
-	ROM_LOAD( "325302-01.uab4", 0xc000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
-	ROM_LOAD( "325303-01.uab5", 0xe000, 0x2000, CRC(10b39158) SHA1(56dfe79b26f50af4e83fd9604857756d196516b9) )
+	ROM_REGION( 0x4000, "c1540", ROMREGION_LOADBYNAME )
+	ROM_LOAD( "325302-01.uab4", 0x0000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
+	ROM_LOAD( "325303-01.uab5", 0x2000, 0x2000, CRC(10b39158) SHA1(56dfe79b26f50af4e83fd9604857756d196516b9) )
 ROM_END
 
 /*-------------------------------------------------
@@ -703,14 +919,14 @@ ROM_END
 -------------------------------------------------*/
 
 ROM_START( c1541 ) // schematic 1540008
-	ROM_REGION( 0x10000, "c1541", ROMREGION_LOADBYNAME )
-	ROM_LOAD( "325302-01.uab4", 0xc000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
-	ROM_LOAD( "901229-01.uab5", 0xe000, 0x2000, CRC(9a48d3f0) SHA1(7a1054c6156b51c25410caec0f609efb079d3a77) )
-	ROM_LOAD( "901229-02.uab5", 0xe000, 0x2000, CRC(b29bab75) SHA1(91321142e226168b1139c30c83896933f317d000) )
-	ROM_LOAD( "901229-03.uab5", 0xe000, 0x2000, CRC(9126e74a) SHA1(03d17bd745066f1ead801c5183ac1d3af7809744) )
-	ROM_LOAD( "901229-04.uab5", 0xe000, 0x2000, NO_DUMP )
-	ROM_LOAD( "901229-05 ae.uab5", 0xe000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b) )
-	ROM_LOAD( "901229-06 aa.uab5", 0xe000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0) )
+	ROM_REGION( 0x4000, "c1541", ROMREGION_LOADBYNAME )
+	ROM_LOAD( "325302-01.uab4", 0x0000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
+	ROM_LOAD( "901229-01.uab5", 0x2000, 0x2000, CRC(9a48d3f0) SHA1(7a1054c6156b51c25410caec0f609efb079d3a77) )
+	ROM_LOAD( "901229-02.uab5", 0x2000, 0x2000, CRC(b29bab75) SHA1(91321142e226168b1139c30c83896933f317d000) )
+	ROM_LOAD( "901229-03.uab5", 0x2000, 0x2000, CRC(9126e74a) SHA1(03d17bd745066f1ead801c5183ac1d3af7809744) )
+	ROM_LOAD( "901229-04.uab5", 0x2000, 0x2000, NO_DUMP )
+	ROM_LOAD( "901229-05 ae.uab5", 0x2000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b) )
+	ROM_LOAD( "901229-06 aa.uab5", 0x2000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0) )
 ROM_END
 
 /*-------------------------------------------------
@@ -718,14 +934,14 @@ ROM_END
 -------------------------------------------------*/
 
 ROM_START( c1541cr ) // schematic 1540049
-	ROM_REGION( 0x10000, "c1541cr", ROMREGION_LOADBYNAME )
-	ROM_LOAD( "325302-01.ub3", 0xc000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
-	ROM_LOAD( "901229-01.ub4", 0xe000, 0x2000, CRC(9a48d3f0) SHA1(7a1054c6156b51c25410caec0f609efb079d3a77) )
-	ROM_LOAD( "901229-02.ub4", 0xe000, 0x2000, CRC(b29bab75) SHA1(91321142e226168b1139c30c83896933f317d000) )
-	ROM_LOAD( "901229-03.ub4", 0xe000, 0x2000, CRC(9126e74a) SHA1(03d17bd745066f1ead801c5183ac1d3af7809744) )
-	ROM_LOAD( "901229-04.ub4", 0xe000, 0x2000, NO_DUMP )
-	ROM_LOAD( "901229-05 ae.ub4", 0xe000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b) )
-	ROM_LOAD( "901229-06 aa.ub4", 0xe000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0) )
+	ROM_REGION( 0x4000, "c1541cr", ROMREGION_LOADBYNAME )
+	ROM_LOAD( "325302-01.ub3", 0x0000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
+	ROM_LOAD( "901229-01.ub4", 0x2000, 0x2000, CRC(9a48d3f0) SHA1(7a1054c6156b51c25410caec0f609efb079d3a77) )
+	ROM_LOAD( "901229-02.ub4", 0x2000, 0x2000, CRC(b29bab75) SHA1(91321142e226168b1139c30c83896933f317d000) )
+	ROM_LOAD( "901229-03.ub4", 0x2000, 0x2000, CRC(9126e74a) SHA1(03d17bd745066f1ead801c5183ac1d3af7809744) )
+	ROM_LOAD( "901229-04.ub4", 0x2000, 0x2000, NO_DUMP )
+	ROM_LOAD( "901229-05 ae.ub4", 0x2000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b) )
+	ROM_LOAD( "901229-06 aa.ub4", 0x2000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0) )
 ROM_END
 
 /*-------------------------------------------------
@@ -741,29 +957,39 @@ ROM_END
 #define rom_c1541a2 rom_c1541cr // schematic 251748
 
 /*-------------------------------------------------
-    ROM( c1541b )
--------------------------------------------------*/
-
-ROM_START( c1541b ) // schematic ?
-	ROM_REGION( 0x10000, "c1541b", ROMREGION_LOADBYNAME )
-	ROM_LOAD( "251968-01.ua2", 0xc000, 0x4000, CRC(1b3ca08d) SHA1(8e893932de8cce244117fcea4c46b7c39c6a7765) )
-	ROM_LOAD( "251968-02.ua2", 0xc000, 0x4000, CRC(2d862d20) SHA1(38a7a489c7bbc8661cf63476bf1eb07b38b1c704) )
-ROM_END
-
-/*-------------------------------------------------
     ROM( c1541c )
 -------------------------------------------------*/
 
-#define rom_c1541c rom_c1541b // schematic ?
+ROM_START( c1541c ) // schematic ?
+	ROM_REGION( 0x4000, "c1541c", ROMREGION_LOADBYNAME )
+	ROM_LOAD( "251968-01.ua2", 0x0000, 0x4000, CRC(1b3ca08d) SHA1(8e893932de8cce244117fcea4c46b7c39c6a7765) )
+	ROM_LOAD( "251968-02.ua2", 0x0000, 0x4000, CRC(2d862d20) SHA1(38a7a489c7bbc8661cf63476bf1eb07b38b1c704) )
+ROM_END
+
+/*-------------------------------------------------
+    ROM( c1541b )
+-------------------------------------------------*/
+
+#define rom_c1541b rom_c1541c // schematic ?
 
 /*-------------------------------------------------
     ROM( c1541ii )
 -------------------------------------------------*/
 
 ROM_START( c1541ii ) // schematic 340503
-	ROM_REGION( 0x10000, "c1541ii", ROMREGION_LOADBYNAME )
-	ROM_LOAD( "251968-03.u4", 0xc000, 0x4000, CRC(899fa3c5) SHA1(d3b78c3dbac55f5199f33f3fe0036439811f7fb3) )
-	ROM_LOAD( "355640-01.u4", 0xc000, 0x4000, CRC(57224cde) SHA1(ab16f56989b27d89babe5f89c5a8cb3da71a82f0) )
+	ROM_REGION( 0x4000, "c1541ii", ROMREGION_LOADBYNAME )
+	ROM_LOAD( "251968-03.u4", 0x0000, 0x4000, CRC(899fa3c5) SHA1(d3b78c3dbac55f5199f33f3fe0036439811f7fb3) )
+	ROM_LOAD( "355640-01.u4", 0x0000, 0x4000, CRC(57224cde) SHA1(ab16f56989b27d89babe5f89c5a8cb3da71a82f0) )
+ROM_END
+
+/*-------------------------------------------------
+    ROM( c2031 )
+-------------------------------------------------*/
+
+ROM_START( c2031 ) // schematic 1540039
+	ROM_REGION( 0x4000, "c2031", ROMREGION_LOADBYNAME )
+	ROM_LOAD( "901484-03.u5f", 0x0000, 0x2000, CRC(ee4b893b) SHA1(54d608f7f07860f24186749f21c96724dd48bc50) )
+	ROM_LOAD( "901484-05.u5h", 0x2000, 0x2000, CRC(6a629054) SHA1(ec6b75ecfdd4744e5d57979ef6af990444c11ae1) )
 ROM_END
 
 /*-------------------------------------------------
@@ -886,6 +1112,103 @@ DEVICE_GET_INFO( c1541 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1541");							break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Commodore VIC-1540");						break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
+	}
+}
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( c1541c )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( c1541c )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c1541_t);									break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(c1541_config);								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
+
+		/* --- the following bits of info are returned as pointers --- */
+		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c1541c);							break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c1541c);			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1541);						break;
+		case DEVINFO_FCT_STOP:							/* Nothing */												break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1541);						break;
+		case DEVINFO_FCT_CBM_SERIAL_ATN:				info->f = (genf *)CBMSERIAL_ATN_NAME(c1541);				break;
+		case DEVINFO_FCT_CBM_SERIAL_RESET:				info->f = (genf *)CBMSERIAL_RESET_NAME(c1541);				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1541C");							break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Commodore VIC-1540");						break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
+	}
+}
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( c1541ii )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( c1541ii )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c1541_t);									break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(c1541_config);								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
+
+		/* --- the following bits of info are returned as pointers --- */
+		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c1541ii);						break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c1541ii);		break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1541);						break;
+		case DEVINFO_FCT_STOP:							/* Nothing */												break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1541);						break;
+		case DEVINFO_FCT_CBM_SERIAL_ATN:				info->f = (genf *)CBMSERIAL_ATN_NAME(c1541);				break;
+		case DEVINFO_FCT_CBM_SERIAL_RESET:				info->f = (genf *)CBMSERIAL_RESET_NAME(c1541);				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1541-II");						break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Commodore VIC-1540");						break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
+	}
+}
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( c2031 )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( c2031 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c1541_t);									break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(c1541_config);								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
+
+		/* --- the following bits of info are returned as pointers --- */
+		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c2031);							break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c2031);			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1541);						break;
+		case DEVINFO_FCT_STOP:							/* Nothing */												break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1541);						break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 2031");							break;
 		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Commodore VIC-1540");						break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
