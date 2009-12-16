@@ -277,8 +277,8 @@ static WRITE8_HANDLER( slow_ctrl_w )
 //  if (BIT(data, 2)) wd17xx_set_drive(conkort->wd1791, 2);
 
 	/* motor enable */
-	floppy_drive_set_motor_state(get_floppy_image(space->machine, 0), BIT(data, 3));
-	floppy_drive_set_motor_state(get_floppy_image(space->machine, 1), BIT(data, 3));
+	floppy_mon_w(get_floppy_image(space->machine, 0), !BIT(data, 3));
+	floppy_mon_w(get_floppy_image(space->machine, 1), !BIT(data, 3));
 	floppy_drive_set_ready_state(get_floppy_image(space->machine, 0), 1, 1);
 	floppy_drive_set_ready_state(get_floppy_image(space->machine, 1), 1, 1);
 
@@ -914,8 +914,8 @@ static DEVICE_START( luxor_55_21046 )
 
 static DEVICE_RESET( luxor_55_21046 )
 {
-	floppy_drive_set_motor_state(get_floppy_image(device->machine, 0), 1);
-	floppy_drive_set_motor_state(get_floppy_image(device->machine, 1), 1);
+	floppy_mon_w(get_floppy_image(device->machine, 0), CLEAR_LINE);
+	floppy_mon_w(get_floppy_image(device->machine, 1), CLEAR_LINE);
 	floppy_drive_set_ready_state(get_floppy_image(device->machine, 0), 1, 1);
 	floppy_drive_set_ready_state(get_floppy_image(device->machine, 1), 1, 1);
 }

@@ -78,12 +78,19 @@ static READ8_HANDLER( tf20_rom_disable )
 	memory_install_readwrite_bank(prg, 0x0000, 0x7fff, 0, 0,"bank21");
 	memory_set_bankptr(space->machine, "bank21", messram_get_ptr(tf20->ram));
 
+	/* clear tc */
+	upd765_tc_w(tf20->upd765a, CLEAR_LINE);
+
 	return 0xff;
 }
 
 static READ8_HANDLER( tf20_dip_r )
 {
+	tf20_state *tf20 = get_safe_token(space->cpu->owner);
 	logerror("%s: tf20_dip_r\n", cpuexec_describe_context(space->machine));
+
+	/* clear tc */
+	upd765_tc_w(tf20->upd765a, CLEAR_LINE);
 
 	return 0xff;
 }
@@ -104,13 +111,13 @@ static WRITE8_HANDLER( tf20_fdc_control_w )
 	logerror("%s: tf20_fdc_control_w %02x\n", cpuexec_describe_context(space->machine), data);
 
 	/* bit 0, motor on signal */
-	floppy_drive_set_motor_state(tf20->floppy_0, BIT(data, 0));
+	floppy_mon_w(tf20->floppy_0, !BIT(data, 0));
+	floppy_mon_w(tf20->floppy_1, !BIT(data, 0));
 	floppy_drive_set_ready_state(tf20->floppy_0, BIT(data, 0), 1);
-	floppy_drive_set_motor_state(tf20->floppy_1, BIT(data, 0));
 	floppy_drive_set_ready_state(tf20->floppy_1, BIT(data, 0), 1);
 
-	/* clear tc on write */
-	upd765_tc_w(tf20->upd765a, CLEAR_LINE);
+	/* set tc on write */
+	upd765_tc_w(tf20->upd765a, ASSERT_LINE);
 }
 
 static IRQ_CALLBACK( tf20_irq_ack )

@@ -1004,7 +1004,7 @@ static void i8271_command_execute(const device_config *device)
 
 					/* load head - on mini-sized drives this turns on the disc motor,
                     on standard-sized drives this loads the head and turns the motor on */
-					floppy_drive_set_motor_state(img, i8271->CommandParameters[1] & 0x08);
+					floppy_mon_w(img, !BIT(i8271->CommandParameters[1], 3));
 					floppy_drive_set_ready_state(img, 1, 1);
 
 					/* step pin changed? if so perform a step in the direction indicated */

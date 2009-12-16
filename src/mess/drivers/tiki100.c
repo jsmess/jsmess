@@ -214,8 +214,8 @@ static WRITE8_HANDLER( system_w )
 	wd17xx_set_density(state->fd1797, BIT(data, 4) ? DEN_FM_LO : DEN_FM_HI);
 
 	/* floppy motor */
-	floppy_drive_set_motor_state(get_floppy_image(space->machine, 0), BIT(data, 6));
-	floppy_drive_set_motor_state(get_floppy_image(space->machine, 1), BIT(data, 6));
+	floppy_mon_w(get_floppy_image(space->machine, 0), !BIT(data, 6));
+	floppy_mon_w(get_floppy_image(space->machine, 1), !BIT(data, 6));
 	floppy_drive_set_ready_state(get_floppy_image(space->machine, 0), BIT(data, 6), 1);
 	floppy_drive_set_ready_state(get_floppy_image(space->machine, 1), BIT(data, 6), 1);
 

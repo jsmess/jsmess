@@ -637,7 +637,7 @@ static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
 	sg1000_state *state = device->machine->driver_data;
 
 	/* floppy motor */
-	floppy_drive_set_motor_state(floppy_get_device(device->machine, 0), BIT(data, 1) ? 0 : 1);
+	floppy_mon_w(floppy_get_device(device->machine, 0), BIT(data, 1));
 	floppy_drive_set_ready_state(floppy_get_device(device->machine, 0), 1, 1);
 
 	/* FDC terminal count */

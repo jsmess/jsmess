@@ -661,7 +661,7 @@ static WRITE8_HANDLER( fdc_auxiliary_w )
 
 	newbrain_state *state = space->machine->driver_data;
 
-	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), BIT(data, 0));
+	floppy_mon_w(floppy_get_device(space->machine, 0), !BIT(data, 0));
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1, 0);
 
 	upd765_reset_w(state->upd765, BIT(data, 1));

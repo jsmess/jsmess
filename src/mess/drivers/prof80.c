@@ -197,8 +197,8 @@ static TIMER_CALLBACK( floppy_motor_off_tick )
 {
 	prof80_state *state = machine->driver_data;
 
-	floppy_drive_set_motor_state(floppy_get_device(machine, 0), 0);
-	floppy_drive_set_motor_state(floppy_get_device(machine, 1), 0);
+	floppy_mon_w(floppy_get_device(machine, 0), ASSERT_LINE);
+	floppy_mon_w(floppy_get_device(machine, 1), ASSERT_LINE);
 	floppy_drive_set_ready_state(floppy_get_device(machine, 0), 0, 1);
 	floppy_drive_set_ready_state(floppy_get_device(machine, 1), 0, 1);
 
@@ -249,8 +249,8 @@ static void ls259_w(running_machine *machine, int fa, int sa, int fb, int sb)
 		else
 		{
 			/* turn on floppy motor */
-			floppy_drive_set_motor_state(floppy_get_device(machine, 0), 1);
-			floppy_drive_set_motor_state(floppy_get_device(machine, 1), 1);
+			floppy_mon_w(floppy_get_device(machine, 0), CLEAR_LINE);
+			floppy_mon_w(floppy_get_device(machine, 1), CLEAR_LINE);
 			floppy_drive_set_ready_state(floppy_get_device(machine, 0), 1, 1);
 			floppy_drive_set_ready_state(floppy_get_device(machine, 1), 1, 1);
 

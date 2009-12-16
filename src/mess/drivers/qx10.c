@@ -167,7 +167,7 @@ static WRITE8_HANDLER(fdd_motor_w)
 	qx10_state *driver_state = space->machine->driver_data;
 	driver_state->fdcmotor = 1;
 
-	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), 1);
+	floppy_mon_w(floppy_get_device(space->machine, 0), CLEAR_LINE);
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
 	// motor off controlled by clock
 };

@@ -177,7 +177,7 @@ static WRITE8_DEVICE_HANDLER( c1581_cia_pa_w )
 	wd17xx_set_side(c1581->wd1770, !BIT(data, 0));
 
 	/* motor */
-	floppy_drive_set_motor_state(c1581->image, !motor);
+	floppy_mon_w(c1581->image, motor);
 	floppy_drive_set_ready_state(c1581->image, !motor, 1);
 
 	/* power led */

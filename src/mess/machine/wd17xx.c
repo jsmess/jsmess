@@ -1444,7 +1444,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 {
 	wd1770_state *w = get_safe_token(device);
 
-	floppy_drive_set_motor_state(w->drive, 1);
+	floppy_mon_w(w->drive, CLEAR_LINE);
 	floppy_drive_set_ready_state(w->drive, 1,0);
 
 	/* also cleared by writing command */

@@ -2554,8 +2554,8 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 					/* FDC Motor Control - Bit 0 defines the state of the FDD motor:
                      * "1" the FDD motor will be active.
                      * "0" the FDD motor will be in-active.*/
-					floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), (data & 0x01));
-					floppy_drive_set_motor_state(floppy_get_device(space->machine, 1), (data & 0x01));
+					floppy_mon_w(floppy_get_device(space->machine, 0), !BIT(data, 0));
+					floppy_mon_w(floppy_get_device(space->machine, 1), !BIT(data, 0));
 					floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
 					floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1,1);
 				  break;

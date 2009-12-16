@@ -782,7 +782,7 @@ static DEVICE_RESET( mc6843 )
 	for ( i = 0; i < 4; i++ )
 	{
 		const device_config * img = floppy_get_device( device->machine, i );
-		floppy_drive_set_motor_state( img, 1 );
+		floppy_mon_w(img, CLEAR_LINE);
 		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
 		floppy_drive_set_rpm( img, 300. );
 	}

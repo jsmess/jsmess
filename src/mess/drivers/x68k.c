@@ -982,7 +982,7 @@ static WRITE16_HANDLER( x68k_fdc_w )
 					if(data & 0x20)  // ejects disk
 					{
 						image_unload(floppy_get_device(space->machine, drive));
-						floppy_drive_set_motor_state(floppy_get_device(space->machine, drive), 0);  // I'll presume ejecting the disk stops the drive motor :)
+						floppy_mon_w(floppy_get_device(space->machine, drive), ASSERT_LINE);
 					}
 				}
 			}
@@ -993,14 +993,14 @@ static WRITE16_HANDLER( x68k_fdc_w )
 	case 0x03:
 		x68k_sys.fdc.media_density[data & 0x03] = data & 0x10;
 		x68k_sys.fdc.motor[data & 0x03] = data & 0x80;
-		floppy_drive_set_motor_state(floppy_get_device(space->machine, data & 0x03), (data & 0x80));
+		floppy_mon_w(floppy_get_device(space->machine, data & 0x03), !BIT(data, 7));
 		if(data & 0x80)
 		{
 			for(drive=0;drive<4;drive++) // enable motor for this drive
 			{
 				if(drive == (data & 0x03))
 				{
-					floppy_drive_set_motor_state(floppy_get_device(space->machine, drive), 1);
+					floppy_mon_w(floppy_get_device(space->machine, drive), CLEAR_LINE);
 					output_set_indexed_value("access_drv",drive,0);
 				}
 				else
@@ -1011,7 +1011,7 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		{
 			for(drive=0;drive<4;drive++)
 			{
-				floppy_drive_set_motor_state(floppy_get_device(space->machine, drive), 0);
+				floppy_mon_w(floppy_get_device(space->machine, drive), ASSERT_LINE);
 				output_set_indexed_value("access_drv",drive,1);
 			}
 		}

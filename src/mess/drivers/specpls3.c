@@ -318,8 +318,8 @@ static WRITE8_HANDLER(spectrum_plus3_port_1ffd_w)
 	/* D3 - Disk motor on/off */
 	/* D4 - parallel port strobe */
 
-	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), data & (1<<3));
-	floppy_drive_set_motor_state(floppy_get_device(space->machine, 1), data & (1<<3));
+	floppy_mon_w(floppy_get_device(space->machine, 0), !BIT(data, 3));
+	floppy_mon_w(floppy_get_device(space->machine, 1), !BIT(data, 3));
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1, 1);
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1, 1);
 

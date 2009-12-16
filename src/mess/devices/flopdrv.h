@@ -66,8 +66,6 @@ typedef struct chrn_id
 #define FLOPPY_DRIVE_READY						0x0010
 /* set if index has just occured */
 #define FLOPPY_DRIVE_INDEX						0x0020
-/* motor state */
-#define FLOPPY_DRIVE_MOTOR_ON					0x0040
 
 /* a callback which will be executed if the ready state of the drive changes e.g. not ready->ready, ready->not ready */
 void floppy_drive_set_ready_state_change_callback(const device_config *img, void (*callback)(const device_config *controller,const device_config *img, int state));
@@ -86,8 +84,6 @@ int floppy_drive_get_next_id(const device_config *img, int side, chrn_id *);
 /* set ready state of drive. If flag == 1, set ready state only if drive present,
 disk is in drive, and motor is on. Otherwise set ready state to the state passed */
 void floppy_drive_set_ready_state(const device_config *img, int state, int flag);
-
-void floppy_drive_set_motor_state(const device_config *img, int state);
 
 /* seek up or down */
 void floppy_drive_seek(const device_config *img, signed int signed_tracks);
@@ -138,6 +134,7 @@ WRITE_LINE_DEVICE_HANDLER( floppy_ds2_w );
 WRITE_LINE_DEVICE_HANDLER( floppy_ds3_w );
 WRITE8_DEVICE_HANDLER( floppy_ds_w );
 
+WRITE_LINE_DEVICE_HANDLER( floppy_mon_w );
 WRITE_LINE_DEVICE_HANDLER( floppy_drtn_w );
 WRITE_LINE_DEVICE_HANDLER( floppy_stp_w );
 WRITE_LINE_DEVICE_HANDLER( floppy_wtd_w );

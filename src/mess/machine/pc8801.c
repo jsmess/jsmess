@@ -732,8 +732,8 @@ static void pc8801_init_5fd(running_machine *machine)
 
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "sub"), 0, 0);
 
-	floppy_drive_set_motor_state(floppy_get_device(machine, 0), 1);
-	floppy_drive_set_motor_state(floppy_get_device(machine, 1), 1);
+	floppy_mon_w(floppy_get_device(machine, 0), CLEAR_LINE);
+	floppy_mon_w(floppy_get_device(machine, 1), CLEAR_LINE);
 	floppy_drive_set_ready_state(floppy_get_device(machine, 0), 1, 1);
 	floppy_drive_set_ready_state(floppy_get_device(machine, 1), 1, 1);
 }

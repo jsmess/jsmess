@@ -119,7 +119,7 @@ static WRITE8_HANDLER(fd5_data_w)
 	cpu_yield(space->cpu);
 }
 
-static WRITE8_HANDLER(fd5_drive_control_w)
+static WRITE8_HANDLER( fd5_drive_control_w )
 {
 	int state;
 
@@ -130,13 +130,13 @@ static WRITE8_HANDLER(fd5_drive_control_w)
 
 	LOG(("fd5 drive state w: %02x\n",state));
 
-	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), state);
-	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), state);
-	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1,1);
+	floppy_mon_w(floppy_get_device(space->machine, 0), !state);
+	floppy_mon_w(floppy_get_device(space->machine, 1), !state);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1,1);
 }
 
-static WRITE8_HANDLER(fd5_tc_w)
+static WRITE8_HANDLER( fd5_tc_w )
 {
 	const device_config *fdc = devtag_get_device(space->machine, "upd765");
 	upd765_tc_w(fdc, 1);

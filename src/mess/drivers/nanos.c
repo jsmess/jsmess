@@ -408,8 +408,7 @@ static MACHINE_RESET(nanos)
 	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1000);
 	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")));
 
-	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), 1);
-
+	floppy_mon_w(floppy_get_device(space->machine, 0), CLEAR_LINE);
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
 	timer_pulse(machine, ATTOTIME_IN_HZ(24000), NULL, 0, keyboard_callback);
 }

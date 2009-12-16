@@ -85,8 +85,8 @@ static WRITE8_HANDLER(elwro800jr_fdc_control_w)
 {
 	const device_config *fdc = devtag_get_device(space->machine, "upd765");
 
-	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), (data & 0x01));
-	floppy_drive_set_motor_state(floppy_get_device(space->machine, 1), (data & 0x02));
+	floppy_mon_w(floppy_get_device(space->machine, 0), !BIT(data, 0));
+	floppy_mon_w(floppy_get_device(space->machine, 1), !BIT(data, 1));
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1,1);
 

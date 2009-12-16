@@ -765,7 +765,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 	}
 
 	/* spindle motor */
-	floppy_drive_set_motor_state(c1541->image, mtr ? FLOPPY_DRIVE_MOTOR_ON : 0);
+	floppy_mon_w(c1541->image, !mtr);
 	timer_enable(c1541->bit_timer, mtr);
 
 	/* activity LED */

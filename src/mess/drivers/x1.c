@@ -956,7 +956,7 @@ static WRITE8_HANDLER( x1_fdc_w )
 			break;
 		case 0x0ffc:
 			wd17xx_set_drive(dev,data & 3);
-			floppy_drive_set_motor_state(floppy_get_device(space->machine, data & 3), data & 0x80);
+			floppy_mon_w(floppy_get_device(space->machine, data & 3), !BIT(data, 7));
 			floppy_drive_set_ready_state(floppy_get_device(space->machine, data & 3), data & 0x80,0);
 			wd17xx_set_side(dev,(data & 0x10)>>4);
 			break;

@@ -265,13 +265,13 @@ static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
 
 	/* set floppy drive motor state */
 	if (floppy_count > 0)
-		floppy_drive_set_motor_state(floppy_get_device(machine, 0),	(data>>4) & 0x0f);
+		floppy_mon_w(floppy_get_device(machine, 0), !BIT(data, 4));
 	if (floppy_count > 1)
-		floppy_drive_set_motor_state(floppy_get_device(machine, 1),	(data>>5) & 0x01);
+		floppy_mon_w(floppy_get_device(machine, 1), !BIT(data, 5));
 	if (floppy_count > 2)
-		floppy_drive_set_motor_state(floppy_get_device(machine, 2),	(data>>6) & 0x01);
+		floppy_mon_w(floppy_get_device(machine, 2), !BIT(data, 6));
 	if (floppy_count > 3)
-		floppy_drive_set_motor_state(floppy_get_device(machine, 3),	(data>>7) & 0x01);
+		floppy_mon_w(floppy_get_device(machine, 3), !BIT(data, 7));
 
 	if ((data>>4) & (1<<selected_drive))
 	{
@@ -365,7 +365,7 @@ static void pcjr_fdc_dor_w(running_machine *machine, UINT8 data)
 
 	/* set floppy drive motor state */
 	if (floppy_count > 0)
-		floppy_drive_set_motor_state(floppy_get_device(machine, 0), data & 0x01);
+		floppy_mon_w(floppy_get_device(machine, 0), BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 
 	if ( data & 0x01 )
 	{

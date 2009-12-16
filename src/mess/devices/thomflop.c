@@ -76,6 +76,8 @@
 #define THOM_SIZE_DATA_HI    (256+80)
 #define THOM_SIZE_SYNCHRO     12
 
+static int motor_on;
+
 
 /* build an identifier, with header & space */
 static int thom_floppy_make_addr( chrn_id id, UINT8* dst, int sector_size )
@@ -839,7 +841,10 @@ static void to7_qdd_reset( running_machine *machine )
 		if (img) {
 			floppy_drive_set_index_pulse_callback( img, to7_qdd_index_pulse_cb );
 			floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
-			floppy_drive_set_motor_state( img, 1 );
+
+			motor_on = CLEAR_LINE;
+			floppy_mon_w(img, motor_on);
+
 			/* pulse each time the whole-disk spiraling track ends */
 			/* at 90us per byte read, the disk can be read in 6s */
 			floppy_drive_set_rpm( img, 60. / 6. );
@@ -1287,7 +1292,7 @@ READ8_HANDLER ( thmfc_floppy_r )
 			if ( flags & FLOPPY_DRIVE_READY )
 				data |= 0x02;
 		}
-		if ( ! (flags & FLOPPY_DRIVE_MOTOR_ON ) )
+		if (!motor_on)
 			data |= 0x10;
 		if (!floppy_wpt_r(img))
 			data |= 0x04;
@@ -1466,7 +1471,8 @@ WRITE8_HANDLER ( thmfc_floppy_w )
            set motor to 1 every few seconds.
            instead of counting, we assume the motor is always running...
         */
-		floppy_drive_set_motor_state( img, 1 /* motor */ );
+		motor_on = CLEAR_LINE /* motor */;
+		floppy_mon_w(img, motor_on);
 	}
 	break;
 

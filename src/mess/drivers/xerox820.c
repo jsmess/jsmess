@@ -366,8 +366,9 @@ static WRITE8_DEVICE_HANDLER( xerox820_pio_port_a_w )
 	if (dvsel1) wd17xx_set_drive(state->wd1771, 0);
 	if (dvsel2) wd17xx_set_drive(state->wd1771, 1);
 
-	floppy_drive_set_motor_state(floppy_get_device(device->machine, 0), dvsel1);
-	floppy_drive_set_motor_state(floppy_get_device(device->machine, 1), dvsel2);
+	floppy_mon_w(floppy_get_device(device->machine, 0), !dvsel1);
+	floppy_mon_w(floppy_get_device(device->machine, 1), !dvsel2);
+
 	floppy_drive_set_ready_state(floppy_get_device(device->machine, 0), dvsel1, 1);
 	floppy_drive_set_ready_state(floppy_get_device(device->machine, 1), dvsel2, 1);
 

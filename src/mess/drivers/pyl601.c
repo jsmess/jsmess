@@ -156,7 +156,7 @@ static UPD765_GET_IMAGE( pyldin_upd765_get_image )
 	return get_floppy_image(device->machine, (floppy_index & 1)^1);
 }
 static UINT8 floppy_ctrl = 0;
-static WRITE8_HANDLER (floppy_w)
+static WRITE8_HANDLER( floppy_w )
 {
 	// bit 0 is reset (if zero)
 	// bit 1 is TC state
@@ -167,7 +167,7 @@ static WRITE8_HANDLER (floppy_w)
 		//reset
 		upd765_reset(floppy,0);
 	}
-	floppy_drive_set_motor_state(get_floppy_image(space->machine, BIT(data,2)), BIT(data,3));
+	floppy_mon_w(get_floppy_image(space->machine, BIT(data,2)), !BIT(data, 3));
 
 	floppy_drive_set_ready_state(get_floppy_image(space->machine, 0), BIT(data,2), 0);
 

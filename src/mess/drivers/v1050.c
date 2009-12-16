@@ -811,8 +811,8 @@ static WRITE8_DEVICE_HANDLER( misc_8255_a_w )
 	wd17xx_set_side(state->mb8877, BIT(data, 4));
 
 	/* floppy motor */
-	floppy_drive_set_motor_state(get_floppy_image(device->machine, 0), f_motor_on);
-	floppy_drive_set_motor_state(get_floppy_image(device->machine, 1), f_motor_on);
+	floppy_mon_w(get_floppy_image(device->machine, 0), BIT(data, 6));
+	floppy_mon_w(get_floppy_image(device->machine, 1), BIT(data, 6));
 	floppy_drive_set_ready_state(get_floppy_image(device->machine, 0), f_motor_on, 1);
 	floppy_drive_set_ready_state(get_floppy_image(device->machine, 1), f_motor_on, 1);
 

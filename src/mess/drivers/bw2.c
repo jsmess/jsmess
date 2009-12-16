@@ -475,8 +475,8 @@ static PIT8253_OUTPUT_CHANGED( bw2_timer2_w )
 	driver_state->mtron = state;
 	driver_state->mfdbk = !state;
 
-	floppy_drive_set_motor_state(get_floppy_image(device->machine, 0), !driver_state->mtron);
-	floppy_drive_set_motor_state(get_floppy_image(device->machine, 1), !driver_state->mtron);
+	floppy_mon_w(get_floppy_image(device->machine, 0), driver_state->mtron);
+	floppy_mon_w(get_floppy_image(device->machine, 1), driver_state->mtron);
 
 	floppy_drive_set_ready_state(get_floppy_image(device->machine, 0), 1, 1);
 	floppy_drive_set_ready_state(get_floppy_image(device->machine, 1), 1, 1);

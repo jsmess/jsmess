@@ -43,6 +43,7 @@ struct _floppy_drive
 	int drtn; /* direction */
 	int stp;  /* step */
 	int wtg;  /* write gate */
+	int mon;  /* motor on */
 
 	/* state of output lines */
 	int idx;  /* index pulse */
@@ -371,66 +372,13 @@ void floppy_drive_set_flag_state(const device_config *img, int flag, int state)
 	}
 }
 
-void floppy_drive_set_motor_state(const device_config *img, int state)
-{
-	int new_motor_state = 0;
-	int previous_state = 0;
-
-	/* previous state */
-	if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_MOTOR_ON))
-		previous_state = 1;
-
-	/* calc new state */
-
-	/* drive present? */
-	if (image_slotexists(img))
-	{
-		/* disk inserted? */
-		if (image_exists(img))
-		{
-			/* drive present and disc inserted */
-
-			/* state of motor is same as the programmed state */
-			if (state)
-			{
-				new_motor_state = 1;
-			}
-		}
-	}
-
-	if ((new_motor_state^previous_state)!=0)
-	{
-		/* if timer already setup remove it */
-		if (image_slotexists(img))
-		{
-			floppy_drive *pDrive = get_safe_token( img );
-
-			pDrive->idx = 0;
-			if (new_motor_state)
-			{
-				/* off->on */
-				/* check it's in range */
-
-				/* setup timer to trigger at rpm */
-				floppy_drive_index_func(img);
-			}
-			else
-			{
-				/* on->off */
-				timer_adjust_oneshot(pDrive->index_timer, attotime_zero, 0);
-			}
-		}
-	}
-
-	floppy_drive_set_flag_state(img, FLOPPY_DRIVE_MOTOR_ON, new_motor_state);
-
-}
-
 /* for pc, drive is always ready, for amstrad,pcw,spectrum it is only ready under
 a fixed set of circumstances */
 /* use this to set ready state of drive */
 void floppy_drive_set_ready_state(const device_config *img, int state, int flag)
 {
+	floppy_drive *drive = get_safe_token(img);
+
 	if (flag)
 	{
 		/* set ready only if drive is present, disk is in the drive,
@@ -442,7 +390,7 @@ void floppy_drive_set_ready_state(const device_config *img, int state, int flag)
 			/* disk inserted? */
 			if (image_exists(img))
 			{
-				if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_MOTOR_ON))
+				if (drive->mon == CLEAR_LINE)
 				{
 					/* set state */
 					floppy_drive_set_flag_state(img, FLOPPY_DRIVE_READY, state);
@@ -471,7 +419,7 @@ int	floppy_drive_get_flag_state(const device_config *img, int flag)
 	drive_flags = drv->flags;
 
 	/* these flags are independant of a real drive/disk image */
-    flags |= drive_flags & (FLOPPY_DRIVE_READY | FLOPPY_DRIVE_MOTOR_ON | FLOPPY_DRIVE_INDEX);
+    flags |= drive_flags & (FLOPPY_DRIVE_READY | FLOPPY_DRIVE_INDEX);
 
     flags &= flag;
 
@@ -682,6 +630,9 @@ DEVICE_START( floppy )
 	/* not at track 0 */
 	floppy->tk00 = ASSERT_LINE;
 
+	/* motor off */
+	floppy->mon = ASSERT_LINE;
+
 	/* resolve callbacks */
 	devcb_resolve_write_line(&floppy->out_idx_func, &floppy->config->out_idx_func, device);
 	devcb_resolve_read_line(&floppy->in_mon_func, &floppy->config->in_mon_func, device);
@@ -888,6 +839,32 @@ WRITE8_DEVICE_HANDLER( floppy_ds_w )
 	floppy_ds3_w(device, BIT(data, 3));
 }
 
+/* motor on, active low */
+WRITE_LINE_DEVICE_HANDLER( floppy_mon_w )
+{
+	floppy_drive *drive = get_safe_token(device);
+
+	/* force off if there is no attached image */
+	if (!image_exists(device))
+		state = ASSERT_LINE;
+
+	if (image_slotexists(device))
+	{
+		/* off -> on */
+		if (drive->mon && state == CLEAR_LINE)
+		{
+			drive->idx = 0;
+			floppy_drive_index_func(device);
+		}
+
+		/* on -> off */
+		else if (drive->mon == CLEAR_LINE && state)
+			timer_adjust_oneshot(drive->index_timer, attotime_zero, 0);
+	}
+
+	drive->mon = state;
+}
+
 /* direction */
 WRITE_LINE_DEVICE_HANDLER( floppy_drtn_w )
 {
@@ -913,25 +890,17 @@ WRITE_LINE_DEVICE_HANDLER( floppy_stp_w )
 		if (drive->drtn)
 		{
 			/* move head outward */
-			drive->current_track--;
+			if (drive->current_track > 0)
+				drive->current_track--;
 
 			/* are we at track 0 now? */
-			if (drive->current_track <= 0)
-			{
-				drive->current_track = 0;
-				drive->tk00 = CLEAR_LINE;
-			}
-			else
-				drive->tk00 = ASSERT_LINE;
+			drive->tk00 = (drive->current_track == 0) ? CLEAR_LINE : ASSERT_LINE;
 		}
 		else
 		{
 			/* move head inward */
-			drive->current_track++;
-
-			/* are we over the maximum? */
-			if (drive->current_track >= drive->max_track)
-				drive->current_track = drive->max_track - 1;
+			if (drive->current_track < drive->max_track)
+				drive->current_track++;
 
 			/* we can't be at track 0 here, so reset the line */
 			drive->tk00 = ASSERT_LINE;

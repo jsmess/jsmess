@@ -447,7 +447,7 @@ static WRITE8_HANDLER(towns_floppy_w)
 			// bit 5 - CLKSEL
 			if(towns_selected_drive != 0 && towns_selected_drive < 2)
 			{
-				floppy_drive_set_motor_state(floppy_get_device(space->machine, towns_selected_drive-1), data & 0x10);
+				floppy_mon_w(floppy_get_device(space->machine, towns_selected_drive-1), !BIT(data, 4));
 				floppy_drive_set_ready_state(floppy_get_device(space->machine, towns_selected_drive-1), data & 0x10,0);
 			}
 			wd17xx_set_side(fdc,(data & 0x04)>>2);

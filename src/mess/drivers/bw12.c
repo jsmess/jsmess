@@ -89,8 +89,9 @@ static TIMER_CALLBACK( floppy_motor_off_tick )
 {
 	bw12_state *state = machine->driver_data;
 
-	floppy_drive_set_motor_state(get_floppy_image(machine, 0), 0);
-	floppy_drive_set_motor_state(get_floppy_image(machine, 1), 0);
+	floppy_mon_w(get_floppy_image(machine, 0), ASSERT_LINE);
+	floppy_mon_w(get_floppy_image(machine, 1), ASSERT_LINE);
+
 	floppy_drive_set_ready_state(get_floppy_image(machine, 0), 0, 0);
 	floppy_drive_set_ready_state(get_floppy_image(machine, 1), 0, 0);
 
@@ -150,7 +151,7 @@ static void ls259_w(running_machine *machine, int address, int data)
 
 		if (data)
 		{
-			floppy_drive_set_motor_state(get_floppy_image(machine, 0), 1);
+			floppy_mon_w(get_floppy_image(machine, 0), CLEAR_LINE);
 			floppy_drive_set_ready_state(get_floppy_image(machine, 0), 1, 0);
 		}
 
@@ -162,7 +163,7 @@ static void ls259_w(running_machine *machine, int address, int data)
 
 		if (data)
 		{
-			floppy_drive_set_motor_state(get_floppy_image(machine, 1), 1);
+			floppy_mon_w(get_floppy_image(machine, 1), CLEAR_LINE);
 			floppy_drive_set_ready_state(get_floppy_image(machine, 1), 1, 0);
 		}
 

@@ -84,6 +84,7 @@ typedef struct
 	unsigned int disk_switched : 1;	/* disk-in-place status bit */
 	unsigned int head : 1;			/* active head (-> floppy side) */
 	unsigned int step : 1;
+	int motor_on;
 
 	unsigned int loadedtrack_valid : 1;	/* is data in track buffer valid ? */
 	unsigned int loadedtrack_dirty : 1;	/* has data in track buffer been modified? */
@@ -297,10 +298,7 @@ int sony_read_status(const device_config *device)
 				result = 0;
 			break;
 		case 0x08:	/* Motor on 0=on 1=off */
-			if (cur_image)
-				result = floppy_drive_get_flag_state(cur_image, FLOPPY_DRIVE_MOTOR_ON) ? 1 : 0;
-			else
-				result = 0;
+				result = f->motor_on;
 			break;
 		case 0x09:	/* Number of sides: 0=single sided, 1=double sided */
 			if (cur_image)
@@ -394,12 +392,14 @@ static void sony_doaction(const device_config *device)
 			}
 			break;
 		case 0x08:	/* Turn motor on */
+			f->motor_on = CLEAR_LINE;
 			if (cur_image)
-				floppy_drive_set_flag_state(cur_image, FLOPPY_DRIVE_MOTOR_ON, 1);
+				floppy_mon_w(cur_image, f->motor_on);
 			break;
 		case 0x09:	/* Turn motor off */
+			f->motor_on = ASSERT_LINE;
 			if (cur_image)
-				floppy_drive_set_flag_state(cur_image, FLOPPY_DRIVE_MOTOR_ON, 0);
+				floppy_mon_w(cur_image, f->motor_on);
 			break;
 		case 0x0d:	/* Eject disk */
 			if (cur_image)

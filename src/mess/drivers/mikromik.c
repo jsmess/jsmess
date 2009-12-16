@@ -115,9 +115,9 @@ static WRITE8_HANDLER( ls259_w )
 
 	case 7: /* MOTOR ON */
 		//logerror("MOTOR %u\n", d);
-		floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), d);
+		floppy_mon_w(floppy_get_device(space->machine, 0), !d);
+		floppy_mon_w(floppy_get_device(space->machine, 1), !d);
 		floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), d, 1);
-		floppy_drive_set_motor_state(floppy_get_device(space->machine, 1), d);
 		floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), d, 1);
 
 		if (input_port_read(space->machine, "T5")) upd765_ready_w(state->upd765, d);

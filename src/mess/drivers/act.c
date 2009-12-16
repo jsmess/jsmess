@@ -140,7 +140,7 @@ static READ8_HANDLER( act_fdc_r )
 
 //  printf("%02x\n",offset);
 
-	floppy_drive_set_motor_state(floppy_get_device(space->machine, xi_sys_ctrl.fdrv_num), 1);
+	floppy_mon_w(floppy_get_device(space->machine, xi_sys_ctrl.fdrv_num), CLEAR_LINE);
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, xi_sys_ctrl.fdrv_num), 1,0);
 
 	switch(offset)
@@ -167,7 +167,7 @@ static WRITE8_HANDLER( act_fdc_w )
 
 //  printf("%02x %02x\n",offset,data);
 
-	floppy_drive_set_motor_state(floppy_get_device(space->machine, xi_sys_ctrl.fdrv_num), 1);
+	floppy_mon_w(floppy_get_device(space->machine, xi_sys_ctrl.fdrv_num), CLEAR_LINE);
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, xi_sys_ctrl.fdrv_num), 1,0);
 
 	switch(offset)
