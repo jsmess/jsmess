@@ -91,7 +91,7 @@ static const wd17xx_interface beta_wd17xx_interface =
 {
 	DEVCB_LINE(betadisk_wd179x_intrq_w),
 	DEVCB_LINE(betadisk_wd179x_drq_w),
-	{BETA_DISK_TAG ":" FLOPPY_0, BETA_DISK_TAG ":" FLOPPY_1, BETA_DISK_TAG ":" FLOPPY_2, BETA_DISK_TAG ":" FLOPPY_3}
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
 READ8_DEVICE_HANDLER(betadisk_status_r)
