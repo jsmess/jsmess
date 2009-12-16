@@ -11,8 +11,10 @@
 
     TODO:
 
-    - floppy access
-    - WD1770 DDEN = 0
+	- D81 sector translation
+	- WD1770 MO/RDY pin confusion
+	- ready signal polarity
+	- floppy access
     - fast serial
     - power LED
     - activity LED
@@ -131,11 +133,11 @@ static READ8_DEVICE_HANDLER( c1581_cia_pa_r )
         PA0     SIDE0
         PA1     /RDY
         PA2     /MOTOR
-        PA3     SW1
-        PA4     SW1
+        PA3     DEV# SEL
+        PA4     DEV# SEL
         PA5     POWER LED
         PA6     ACT LED
-        PA7     /DISK CHANGE
+        PA7     /DISK CHNG
 
     */
 
@@ -160,11 +162,11 @@ static WRITE8_DEVICE_HANDLER( c1581_cia_pa_w )
         PA0     SIDE0
         PA1     /RDY
         PA2     /MOTOR
-        PA3     SW1
-        PA4     SW1
+        PA3     DEV# SEL
+        PA4     DEV# SEL
         PA5     POWER LED
         PA6     ACT LED
-        PA7     /DISK CHANGE
+        PA7     /DISK CHNG
 
     */
 
@@ -175,12 +177,13 @@ static WRITE8_DEVICE_HANDLER( c1581_cia_pa_w )
 	wd17xx_set_side(c1581->wd1770, !BIT(data, 0));
 
 	/* motor */
-	floppy_drive_set_motor_state(c1581->image, motor ? 0 : FLOPPY_DRIVE_MOTOR_ON);
+	floppy_drive_set_motor_state(c1581->image, !motor);
 	floppy_drive_set_ready_state(c1581->image, !motor, 1);
 
 	/* power led */
 
 	/* active led */
+
 }
 
 static READ8_DEVICE_HANDLER( c1581_cia_pb_r )
@@ -257,7 +260,7 @@ static const cia6526_interface c1581_cia_intf =
 {
 	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0),
 	DEVCB_NULL,
-	10, /* 1/10 second */
+	XTAL_16MHz/8,
 	{
 		{ DEVCB_HANDLER(c1581_cia_pa_r), DEVCB_HANDLER(c1581_cia_pa_w) },
 		{ DEVCB_HANDLER(c1581_cia_pb_r), DEVCB_HANDLER(c1581_cia_pb_w) }
@@ -359,6 +362,9 @@ static DEVICE_START( c1581 )
 	c1581->wd1770 = device_find_child_by_tag(device, WD1770_TAG);
 	c1581->serial_bus = devtag_get_device(device->machine, config->serial_bus_tag);
 	c1581->image = device_find_child_by_tag(device, FLOPPY_0);
+
+	/* set floppy density */
+	wd17xx_set_density(c1581->wd1770, DEN_MFM_LO);
 
 	/* register for state saving */
 }
