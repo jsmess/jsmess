@@ -403,7 +403,7 @@ DEVICE_GET_INFO( c1581 )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1581);						break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1581);						break;
-		case DEVINFO_FCT_CBM_IEC_ATN:					info->f = (genf *)CBM_IEC_ATN_NAME(c1581);				break;
+		case DEVINFO_FCT_CBM_IEC_ATN:					info->f = (genf *)CBM_IEC_ATN_NAME(c1581);					break;
 		case DEVINFO_FCT_CBM_IEC_RESET:					info->f = (genf *)CBM_IEC_RESET_NAME(c1581);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

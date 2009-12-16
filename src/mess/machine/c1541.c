@@ -1074,7 +1074,7 @@ DEVICE_GET_INFO( c1540 )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1541);						break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1541);						break;
-		case DEVINFO_FCT_CBM_IEC_ATN:					info->f = (genf *)CBM_IEC_ATN_NAME(c1541);				break;
+		case DEVINFO_FCT_CBM_IEC_ATN:					info->f = (genf *)CBM_IEC_ATN_NAME(c1541);					break;
 		case DEVINFO_FCT_CBM_IEC_RESET:					info->f = (genf *)CBM_IEC_RESET_NAME(c1541);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1094,28 +1094,14 @@ DEVICE_GET_INFO( c1541 )
 {
 	switch (state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c1541_t);									break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(c1541_config);								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
-
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c1541);							break;
 		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c1541);			break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1541);						break;
-		case DEVINFO_FCT_STOP:							/* Nothing */												break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1541);						break;
-		case DEVINFO_FCT_CBM_IEC_ATN:					info->f = (genf *)CBM_IEC_ATN_NAME(c1541);				break;
-		case DEVINFO_FCT_CBM_IEC_RESET:					info->f = (genf *)CBM_IEC_RESET_NAME(c1541);				break;
-
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1541");							break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Commodore VIC-1540");						break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore VIC-1541");						break;
+
+		default:										DEVICE_GET_INFO_CALL(c1540);								break;
 	}
 }
 
@@ -1127,28 +1113,14 @@ DEVICE_GET_INFO( c1541c )
 {
 	switch (state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c1541_t);									break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(c1541_config);								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
-
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c1541c);							break;
 		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c1541c);			break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1541);						break;
-		case DEVINFO_FCT_STOP:							/* Nothing */												break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1541);						break;
-		case DEVINFO_FCT_CBM_IEC_ATN:					info->f = (genf *)CBM_IEC_ATN_NAME(c1541);				break;
-		case DEVINFO_FCT_CBM_IEC_RESET:					info->f = (genf *)CBM_IEC_RESET_NAME(c1541);				break;
-
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1541C");							break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Commodore VIC-1540");						break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
+
+		default:										DEVICE_GET_INFO_CALL(c1540);								break;
 	}
 }
 
@@ -1160,28 +1132,14 @@ DEVICE_GET_INFO( c1541ii )
 {
 	switch (state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c1541_t);									break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(c1541_config);								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
-
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c1541ii);						break;
 		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c1541ii);		break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1541);						break;
-		case DEVINFO_FCT_STOP:							/* Nothing */												break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1541);						break;
-		case DEVINFO_FCT_CBM_IEC_ATN:					info->f = (genf *)CBM_IEC_ATN_NAME(c1541);				break;
-		case DEVINFO_FCT_CBM_IEC_RESET:					info->f = (genf *)CBM_IEC_RESET_NAME(c1541);				break;
-
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1541-II");						break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Commodore VIC-1540");						break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
+
+		default:										DEVICE_GET_INFO_CALL(c1540);								break;
 	}
 }
 
@@ -1193,25 +1151,13 @@ DEVICE_GET_INFO( c2031 )
 {
 	switch (state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c1541_t);									break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(c1541_config);								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
-
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c2031);							break;
 		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c2031);			break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1541);						break;
-		case DEVINFO_FCT_STOP:							/* Nothing */												break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1541);						break;
-
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 2031");							break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Commodore VIC-1540");						break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
+
+		default:										DEVICE_GET_INFO_CALL(c1540);								break;
 	}
 }
