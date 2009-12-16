@@ -149,23 +149,12 @@ static TIMER_DEVICE_CALLBACK( keyboard_tick )
 #define BLK_RAM4	0x02
 #define BLK_EPROM	0x00
 
-#define MEMORY_INSTALL(_region, _offset, _banks) \
-	memory_configure_bank(machine, bank + 1, 0, 1, _region + _offset + ((bank % _banks) * 0x1000), 0); \
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), start_addr, end_addr, 0, 0, SMH_BANK(bank + 1), SMH_BANK(bank + 1)); \
-	memory_set_bank(machine, bank + 1, 0);
-
-#define MEMORY_INSTALL_RAM(_offset)	\
-	MEMORY_INSTALL(messram_get_ptr(devtag_get_device(machine, "messram")), _offset, 8)
-
-#define MEMORY_INSTALL_ROM \
-	MEMORY_INSTALL(memory_region(machine, Z80_TAG), 0, 2)
-
-#define MEMORY_INSTALL_UNMAP \
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), start_addr, end_addr, 0, 0, SMH_BANK(bank + 1), SMH_UNMAP);
-
 static void prof80_bankswitch(running_machine *machine)
 {
 	prof80_state *state = machine->driver_data;
+	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	UINT8 *rom = memory_region(machine, Z80_TAG);
 	int bank;
 
 	for (bank = 0; bank < 16; bank++)
@@ -176,12 +165,28 @@ static void prof80_bankswitch(running_machine *machine)
 
 		switch (block)
 		{
-		case BLK_RAM1:	MEMORY_INSTALL_RAM(0);			break;
-		case BLK_RAM2:	MEMORY_INSTALL_RAM(0x8000);		break;
-		case BLK_RAM3:	MEMORY_INSTALL_RAM(0x10000);	break;
-		case BLK_RAM4:	MEMORY_INSTALL_RAM(0x18000);	break;
-		case BLK_EPROM:	MEMORY_INSTALL_ROM;				break;
-		default:		MEMORY_INSTALL_UNMAP
+		case BLK_RAM1:
+			memory_install_ram(program, start_addr, end_addr, 0, 0, ram + ((bank % 8) * 0x1000));
+			break;
+
+		case BLK_RAM2:
+			memory_install_ram(program, start_addr, end_addr, 0, 0, ram + 0x8000 + ((bank % 8) * 0x1000));
+			break;
+
+		case BLK_RAM3:
+			memory_install_ram(program, start_addr, end_addr, 0, 0, ram + 0x10000 + ((bank % 8) * 0x1000));
+			break;
+
+		case BLK_RAM4:
+			memory_install_ram(program, start_addr, end_addr, 0, 0, ram + 0x18000 + ((bank % 8) * 0x1000));
+			break;
+		
+		case BLK_EPROM:	
+			memory_install_rom(program, start_addr, end_addr, 0, 0, rom + ((bank % 2) * 0x1000));
+			break;
+		
+		default:
+			memory_unmap_readwrite(program, start_addr, end_addr, 0, 0);
 		}
 
 		//logerror("Segment %u address %04x-%04x block %u\n", bank, start_addr, end_addr, block);
@@ -476,7 +481,7 @@ static WRITE8_HANDLER( page_w )
 
 	state->page = BIT(data, 7);
 
-	memory_set_bank(space->machine, 18, state->page);
+	memory_set_bank(space->machine, "videoram", state->page);
 }
 
 static READ8_HANDLER( stat_r )
@@ -593,22 +598,6 @@ static WRITE8_HANDLER( unio_ctrl_w )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( prof80_mem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
-    AM_RANGE(0x1000, 0x1fff) AM_RAMBANK(2)
-    AM_RANGE(0x2000, 0x2fff) AM_RAMBANK(3)
-    AM_RANGE(0x3000, 0x3fff) AM_RAMBANK(4)
-    AM_RANGE(0x4000, 0x4fff) AM_RAMBANK(5)
-    AM_RANGE(0x5000, 0x5fff) AM_RAMBANK(6)
-    AM_RANGE(0x6000, 0x6fff) AM_RAMBANK(7)
-    AM_RANGE(0x7000, 0x7fff) AM_RAMBANK(8)
-    AM_RANGE(0x8000, 0x8fff) AM_RAMBANK(9)
-    AM_RANGE(0x9000, 0x9fff) AM_RAMBANK(10)
-    AM_RANGE(0xa000, 0xafff) AM_RAMBANK(11)
-    AM_RANGE(0xb000, 0xbfff) AM_RAMBANK(12)
-    AM_RANGE(0xc000, 0xcfff) AM_RAMBANK(13)
-    AM_RANGE(0xd000, 0xdfff) AM_RAMBANK(14)
-    AM_RANGE(0xe000, 0xefff) AM_RAMBANK(15)
-    AM_RANGE(0xf000, 0xffff) AM_RAMBANK(16)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prof80_io, ADDRESS_SPACE_IO, 8 )
@@ -629,9 +618,9 @@ static ADDRESS_MAP_START( prof80_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( grip_mem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(17)
+    AM_RANGE(0x0000, 0x3fff) AM_ROM
     AM_RANGE(0x4000, 0x47ff) AM_RAM
-    AM_RANGE(0x8000, 0xffff) AM_RAMBANK(18)
+    AM_RANGE(0x8000, 0xffff) AM_RAMBANK("videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( grip_io, ADDRESS_SPACE_IO, 8 )
@@ -1237,11 +1226,8 @@ static MACHINE_START( grip )
 	state->video_ram = auto_alloc_array(machine, UINT8, GRIP_VIDEORAM_SIZE);
 
 	/* setup GRIP memory banking */
-	memory_configure_bank(machine, 17, 0, 1, memory_region(machine, GRIP_Z80_TAG), 0);
-	memory_set_bank(machine, 17, 0);
-
-	memory_configure_bank(machine, 18, 0, 2, state->video_ram, 0x8000);
-	memory_set_bank(machine, 18, 0);
+	memory_configure_bank(machine, "videoram", 0, 2, state->video_ram, 0x8000);
+	memory_set_bank(machine, "videoram", 0);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->vol0);
