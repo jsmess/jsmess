@@ -32,9 +32,9 @@ static void samcoupe_update_bank(const address_space *space, int bank_num, UINT8
 		memory_set_bankptr(space->machine, bank, memory);
 		memory_install_read_bank (space, ((bank_num-1) * 0x4000), ((bank_num-1) * 0x4000) + 0x3FFF, 0, 0, bank);
 		if (is_readonly) {
-			memory_install_write_bank(space, ((bank_num-1) * 0x4000), ((bank_num-1) * 0x4000) + 0x3FFF, 0, 0, bank);
-		} else {
 			memory_unmap_write(space, ((bank_num-1) * 0x4000), ((bank_num-1) * 0x4000) + 0x3FFF, 0, 0);
+		} else {
+			memory_install_write_bank(space, ((bank_num-1) * 0x4000), ((bank_num-1) * 0x4000) + 0x3FFF, 0, 0, bank);
 		}
 	} else {
 		memory_nop_readwrite(space, ((bank_num-1) * 0x4000), ((bank_num-1) * 0x4000) + 0x3FFF, 0, 0);
