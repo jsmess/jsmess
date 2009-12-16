@@ -80,7 +80,6 @@
 #include "sound/discrete.h"
 
 /* Devices */
-#include "devices/flopdrv.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
 #include "devices/messram.h"
@@ -216,16 +215,13 @@ static void abc800_bankswitch(running_machine *machine)
 	if (state->fetch_charram)
 	{
 		/* HR video RAM selected */
-		memory_install_readwrite_bank(program, 0x0000, 0x3fff, 0, 0, "bank1");
+		memory_install_ram(program, 0x0000, 0x3fff, 0, 0, state->videoram);
 	}
 	else
 	{
 		/* BASIC ROM selected */
-		memory_install_read_bank(program, 0x0000, 0x3fff, 0, 0, "bank1");
-		memory_unmap_write(program, 0x0000, 0x3fff, 0, 0);
+		memory_install_rom(program, 0x0000, 0x3fff, 0, 0, memory_region(machine, Z80_TAG));
 	}
-
-	memory_set_bank(machine, "bank1", state->fetch_charram);
 }
 
 static void abc802_bankswitch(running_machine *machine)
@@ -484,9 +480,9 @@ static READ8_HANDLER( abc802_pling_r )
 
 static ADDRESS_MAP_START( abc800m_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE_MEMBER(abc800_state, videoram)
 	AM_RANGE(0x4000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_READWRITE(abc800_charram_r, abc800_charram_w)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE_MEMBER(abc800_state, charram)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -509,9 +505,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc800c_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE_MEMBER(abc800_state, videoram)
 	AM_RANGE(0x4000, 0x7bff) AM_ROM
-	AM_RANGE(0x7c00, 0x7fff) AM_READWRITE(abc800_charram_r, abc800_charram_w)
+	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_BASE_MEMBER(abc800_state, charram)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -978,12 +974,6 @@ static MACHINE_START( abc800 )
 	/* initialize the ABC BUS */
 	abcbus_init(machine, Z80_TAG, abcbus_config);
 
-	/* configure memory */
-	state->videoram = auto_alloc_array(machine, UINT8, ABC800_VIDEO_RAM_SIZE);
-
-	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, state->videoram, 0);
-
 	/* register for state saving */
 	state_save_register_global(machine, state->fetch_charram);
 	state_save_register_global(machine, state->pling);
@@ -991,7 +981,9 @@ static MACHINE_START( abc800 )
 
 static MACHINE_RESET( abc800 )
 {
-	/* memory banking */
+	abc800_state *state = machine->driver_data;
+
+	state->fetch_charram = 0;
 	abc800_bankswitch(machine);
 }
 
@@ -1316,23 +1308,7 @@ ROM_START( abc800m )
 	ROM_LOAD( "fgctl.bin",  0x0000, 0x0200, BAD_DUMP CRC(7a19de8d) SHA1(e7cc49e749b37f7d7dd14f3feda53eae843a8fe0) )
 ROM_END
 
-ROM_START( abc800c )
-	ROM_REGION( 0x10000, Z80_TAG, 0 )
-	ROM_LOAD( "abc c-12.1m", 0x0000, 0x1000, NO_DUMP )
-	ROM_LOAD( "abc 1-12.1l", 0x1000, 0x1000, CRC(1e99fbdc) SHA1(ec6210686dd9d03a5ed8c4a4e30e25834aeef71d) )
-	ROM_LOAD( "abc 2-12.1k", 0x2000, 0x1000, CRC(ac196ba2) SHA1(64fcc0f03fbc78e4c8056e1fa22aee12b3084ef5) )
-	ROM_LOAD( "abc 3-12.1j", 0x3000, 0x1000, CRC(3ea2b5ee) SHA1(5a51ac4a34443e14112a6bae16c92b5eb636603f) )
-	ROM_LOAD( "abc 4-12.2m", 0x4000, 0x1000, CRC(695cb626) SHA1(9603ce2a7b2d7b1cbeb525f5493de7e5c1e5a803) )
-	ROM_LOAD( "abc 5-12.2l", 0x5000, 0x1000, CRC(b4b02358) SHA1(95338efa3b64b2a602a03bffc79f9df297e9534a) )
-	ROM_LOAD( "abc 6-13.2k", 0x6000, 0x1000, CRC(6fa71fb6) SHA1(b037dfb3de7b65d244c6357cd146376d4237dab6) )
-	ROM_LOAD( "abc 7-21.2j", 0x7000, 0x1000, CRC(fd137866) SHA1(3ac914d90db1503f61397c0ea26914eb38725044) )
-
-	ROM_REGION( 0x800, "chargen", 0 )
-	ROM_LOAD( "vu c-se.bin", 0x0000, 0x0800, NO_DUMP )
-
-	ROM_REGION( 0x200, "fgctl", 0 )
-	ROM_LOAD( "fgctl.bin",  0x0000, 0x0200, BAD_DUMP CRC(7a19de8d) SHA1(e7cc49e749b37f7d7dd14f3feda53eae843a8fe0) )
-ROM_END
+#define rom_abc800c rom_abc800m
 
 ROM_START( abc802 )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )

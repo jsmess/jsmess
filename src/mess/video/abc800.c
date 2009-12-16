@@ -17,22 +17,6 @@
 #include "machine/z80dart.h"
 #include "video/mc6845.h"
 
-/* Character Memory */
-
-READ8_HANDLER( abc800_charram_r )
-{
-	abc800_state *state = space->machine->driver_data;
-
-	return state->charram[offset];
-}
-
-WRITE8_HANDLER( abc800_charram_w )
-{
-	abc800_state *state = space->machine->driver_data;
-
-	state->charram[offset] = data;
-}
-
 /* Palette Initialization */
 
 static PALETTE_INIT( abc800m )
@@ -203,24 +187,14 @@ static VIDEO_START( abc800m )
 {
 	abc800_state *state = machine->driver_data;
 
-	/* allocate memory */
-
-	state->charram = auto_alloc_array(machine, UINT8, ABC800M_CHAR_RAM_SIZE);
-
 	/* find devices */
-
 	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
 
 	/* find memory regions */
-
 	state->char_rom = memory_region(machine, "chargen");
 	state->fgctl_prom = memory_region(machine, "fgctl");
 
 	/* register for state saving */
-
-	state_save_register_global_pointer(machine, state->charram, ABC800M_CHAR_RAM_SIZE);
-	state_save_register_global_pointer(machine, state->videoram, ABC800_VIDEO_RAM_SIZE);
-
 	state_save_register_global(machine, state->hrs);
 	state_save_register_global(machine, state->fgctl);
 }
@@ -229,20 +203,11 @@ static VIDEO_START( abc800c )
 {
 	abc800_state *state = machine->driver_data;
 
-	/* allocate memory */
-
-	state->charram = auto_alloc_array(machine, UINT8, ABC800C_CHAR_RAM_SIZE);
-
 	/* find memory regions */
-
 	state->char_rom = memory_region(machine, "chargen");
 	state->fgctl_prom = memory_region(machine, "fgctl");
 
 	/* register for state saving */
-
-	state_save_register_global_pointer(machine, state->charram, ABC800C_CHAR_RAM_SIZE);
-	state_save_register_global_pointer(machine, state->videoram, ABC800_VIDEO_RAM_SIZE);
-
 	state_save_register_global(machine, state->hrs);
 	state_save_register_global(machine, state->fgctl);
 }

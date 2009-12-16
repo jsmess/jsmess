@@ -131,9 +131,6 @@ struct _abc806_state
 
 /*----------- defined in video/abc800.c -----------*/
 
-READ8_HANDLER( abc800_charram_r );
-WRITE8_HANDLER( abc800_charram_w );
-
 WRITE8_HANDLER( abc800_hrs_w );
 WRITE8_HANDLER( abc800_hrc_w );
 
