@@ -766,34 +766,34 @@ const game_driver * const drivers[] =
     DRIVER( mbee64 )    /* Microbee 64K (CP/M)                              */
 
     /* Tandy / Radio Shack */
-//mess0135u3    DRIVER( trs80 )     /* TRS-80 Model I - Level I BASIC                   */
-//mess0135u3    DRIVER( trs80l2 )   /* TRS-80 Model I - Level II BASIC                  */
-//mess0135u3    DRIVER( sys80 )     /* EACA System 80                                   */
-//mess0135u3    DRIVER( lnw80 )     /* LNW Research LNW-80                              */
-//mess0135u3    DRIVER( trs80m3 )   /* TRS-80 Model III - Radio Shack/Tandy             */
-//mess0135u3    DRIVER( trs80m4 )
-//mess0135u3    DRIVER( trs80m4p )
-//mess0135u3    DRIVER( ht1080z ) /* Hradstechnika Szvetkezet HT-1080Z */
-//mess0135u3    DRIVER( ht1080z2 ) /* Hradstechnika Szvetkezet HT-1080Z Series II */
-//mess0135u3    DRIVER( ht108064 ) /* Hradstechnika Szvetkezet HT-1080Z/64 */
-//mess0135u3    DRIVER( radionic )  /* Radionic */
-//mess0135u3
-//mess0135u3    DRIVER( coco )      /* Color Computer                                   */
-//mess0135u3    DRIVER( cocoe )     /* Color Computer (Extended BASIC 1.0)              */
-//mess0135u3    DRIVER( coco2 )     /* Color Computer 2                                 */
-//mess0135u3    DRIVER( coco2b )    /* Color Computer 2B (uses M6847T1 video chip)      */
-//mess0135u3    DRIVER( coco3 )     /* Color Computer 3 (NTSC)                          */
-//mess0135u3    DRIVER( coco3p )    /* Color Computer 3 (PAL)                           */
-//mess0135u3    DRIVER( coco3h )    /* Hacked Color Computer 3 (6309)                   */
-//mess0135u3    DRIVER( dragon32 )  /* Dragon 32                                        */
-//mess0135u3    DRIVER( dragon64 )  /* Dragon 64                                        */
-//mess0135u3    DRIVER( d64plus )   /* Dragon 64 + Compusense Plus addon                */
-//mess0135u3    DRIVER( dgnalpha )  /* Dragon Alpha                                     */
-//mess0135u3    DRIVER( dgnbeta )   /* Dragon Beta                                      */
-//mess0135u3    DRIVER( tanodr64 )  /* Tano Dragon 64 (NTSC)                            */
-//mess0135u3    DRIVER( cp400 )     /* Prologica CP400                                  */
-//mess0135u3    DRIVER( mc10 )      /* MC-10                                            */
-//mess0135u3    DRIVER( alice )     /* Matra & Hachette Ordinateur Alice                */
+    DRIVER( trs80 )     /* TRS-80 Model I - Level I BASIC                   */
+    DRIVER( trs80l2 )   /* TRS-80 Model I - Level II BASIC                  */
+    DRIVER( sys80 )     /* EACA System 80                                   */
+    DRIVER( lnw80 )     /* LNW Research LNW-80                              */
+    DRIVER( trs80m3 )   /* TRS-80 Model III - Radio Shack/Tandy             */
+    DRIVER( trs80m4 )
+    DRIVER( trs80m4p )
+    DRIVER( ht1080z ) /* Hradstechnika Szvetkezet HT-1080Z */
+    DRIVER( ht1080z2 ) /* Hradstechnika Szvetkezet HT-1080Z Series II */
+    DRIVER( ht108064 ) /* Hradstechnika Szvetkezet HT-1080Z/64 */
+    DRIVER( radionic )  /* Radionic */
+
+    DRIVER( coco )      /* Color Computer                                   */
+    DRIVER( cocoe )     /* Color Computer (Extended BASIC 1.0)              */
+    DRIVER( coco2 )     /* Color Computer 2                                 */
+    DRIVER( coco2b )    /* Color Computer 2B (uses M6847T1 video chip)      */
+    DRIVER( coco3 )     /* Color Computer 3 (NTSC)                          */
+    DRIVER( coco3p )    /* Color Computer 3 (PAL)                           */
+    DRIVER( coco3h )    /* Hacked Color Computer 3 (6309)                   */
+    DRIVER( dragon32 )  /* Dragon 32                                        */
+    DRIVER( dragon64 )  /* Dragon 64                                        */
+    DRIVER( d64plus )   /* Dragon 64 + Compusense Plus addon                */
+    DRIVER( dgnalpha )  /* Dragon Alpha                                     */
+    DRIVER( dgnbeta )   /* Dragon Beta                                      */
+    DRIVER( tanodr64 )  /* Tano Dragon 64 (NTSC)                            */
+    DRIVER( cp400 )     /* Prologica CP400                                  */
+    DRIVER( mc10 )      /* MC-10                                            */
+    DRIVER( alice )     /* Matra & Hachette Ordinateur Alice                */
 
     /* EACA */
     DRIVER( cgenie )    /* Colour Genie EG2000                              */
@@ -1458,7 +1458,7 @@ const game_driver * const drivers[] =
     DRIVER( kontiki )
     DRIVER( tiki100 )
     DRIVER( vcs80 )
-//mess0135u3    DRIVER( v1050 )
+    DRIVER( v1050 )
     DRIVER( xerox820 )
     DRIVER( xor100 )
     DRIVER( iq151 )

@@ -162,13 +162,13 @@ static DRIVER_INIT( mc10 )
 	mc10->ram = messram_get_ptr(devtag_get_device(machine, "messram"));
 	mc10->ram_size = messram_get_size(devtag_get_device(machine, "messram"));
 
-	memory_set_bankptr(machine, 1, mc10->ram);
+	memory_set_bankptr(machine, "bank1", mc10->ram);
 
 	/* initialize memory expansion */
 	if (mc10->ram_size == 20*1024)
-		memory_set_bankptr(machine, 2, mc10->ram + 0x1000);
+		memory_set_bankptr(machine, "bank2", mc10->ram + 0x1000);
 	else
-		memory_install_readwrite8_handler(prg, 0x5000, 0x8fff, 0, 0, SMH_NOP, SMH_NOP);
+		memory_nop_readwrite(prg, 0x5000, 0x8fff, 0, 0);
 
 	/* register for state saving */
 	state_save_register_global(machine, mc10->keyboard_strobe);
@@ -181,8 +181,8 @@ static DRIVER_INIT( mc10 )
 
 static ADDRESS_MAP_START( mc10_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0100, 0x3fff) AM_NOP /* unused */
-	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK(1) /* 4k internal ram */
-	AM_RANGE(0x5000, 0x8fff) AM_RAMBANK(2) /* 16k memory expansion */
+	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank1") /* 4k internal ram */
+	AM_RANGE(0x5000, 0x8fff) AM_RAMBANK("bank2") /* 16k memory expansion */
 	AM_RANGE(0x9000, 0xbffe) AM_NOP /* unused */
 	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(mc10_bfff_r, mc10_bfff_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000) /* ROM */

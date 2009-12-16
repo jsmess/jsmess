@@ -154,30 +154,31 @@ static void v1050_bankswitch(running_machine *machine)
 
 	if (BIT(state->bank, 0))
 	{
-		memory_install_readwrite8_handler(program, 0x0000, 0x1fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_set_bank(machine, 1, bank);
+		memory_install_readwrite_bank(program, 0x0000, 0x1fff, 0, 0, "bank1");
+		memory_set_bank(machine, "bank1", bank);
 	}
 	else
 	{
-		memory_install_readwrite8_handler(program, 0x0000, 0x1fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
-		memory_set_bank(machine, 1, 3);
+		memory_install_read_bank(program, 0x0000, 0x1fff, 0, 0, "bank1");
+		memory_unmap_write(program, 0x0000, 0x1fff, 0, 0);
+		memory_set_bank(machine, "bank1", 3);
 	}
 
-	memory_set_bank(machine, 2, bank);
+	memory_set_bank(machine, "bank2", bank);
 
 	if (bank == 2)
 	{
-		memory_install_readwrite8_handler(program, 0x4000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_unmap_readwrite(program, 0x4000, 0xbfff, 0, 0);
 	}
 	else
 	{
-		memory_install_readwrite8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_BANK(3), SMH_BANK(3));
-		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(4), SMH_BANK(4));
-		memory_set_bank(machine, 3, bank);
-		memory_set_bank(machine, 4, bank);
+		memory_install_readwrite_bank(program, 0x4000, 0x7fff, 0, 0, "bank3");
+		memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank4");
+		memory_set_bank(machine, "bank3", bank);
+		memory_set_bank(machine, "bank4", bank);
 	}
 
-	memory_set_bank(machine, 5, bank);
+	memory_set_bank(machine, "bank5", bank);
 }
 
 /* Keyboard HACK */
@@ -420,11 +421,11 @@ static WRITE8_HANDLER( p2_w )
 
 static ADDRESS_MAP_START( v1050_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK(1)
-	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK(2)
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(3)
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(4)
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK(5)
+	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank3")
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank4")
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank5")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( v1050_io, ADDRESS_SPACE_IO, 8 )
@@ -1123,22 +1124,22 @@ static MACHINE_START( v1050 )
 	cpu_set_irq_callback(cputag_get_cpu(machine, Z80_TAG), v1050_int_ack);
 
 	/* setup memory banking */
-	memory_configure_bank(machine, 1, 0, 2, messram_get_ptr(devtag_get_device(machine, "messram")), 0x10000);
-	memory_configure_bank(machine, 1, 2, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1c000, 0);
-	memory_configure_bank(machine, 1, 3, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(machine, "bank1", 0, 2, messram_get_ptr(devtag_get_device(machine, "messram")), 0x10000);
+	memory_configure_bank(machine, "bank1", 2, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1c000, 0);
+	memory_configure_bank(machine, "bank1", 3, 1, memory_region(machine, Z80_TAG), 0);
 
-	memory_install_readwrite8_handler(program, 0x2000, 0x3fff, 0, 0, SMH_BANK(2), SMH_BANK(2));
-	memory_configure_bank(machine, 2, 0, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000, 0x10000);
-	memory_configure_bank(machine, 2, 2, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1e000, 0);
+	memory_install_readwrite_bank(program, 0x2000, 0x3fff, 0, 0, "bank2");
+	memory_configure_bank(machine, "bank2", 0, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000, 0x10000);
+	memory_configure_bank(machine, "bank2", 2, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1e000, 0);
 
-	memory_install_readwrite8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_BANK(3), SMH_BANK(3));
-	memory_configure_bank(machine, 3, 0, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000, 0x10000);
+	memory_install_readwrite_bank(program, 0x4000, 0x7fff, 0, 0, "bank3");
+	memory_configure_bank(machine, "bank3", 0, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000, 0x10000);
 
-	memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(4), SMH_BANK(4));
-	memory_configure_bank(machine, 4, 0, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000, 0x10000);
+	memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank4");
+	memory_configure_bank(machine, "bank4", 0, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000, 0x10000);
 
-	memory_install_readwrite8_handler(program, 0xc000, 0xffff, 0, 0, SMH_BANK(5), SMH_BANK(5));
-	memory_configure_bank(machine, 5, 0, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000, 0);
+	memory_install_readwrite_bank(program, 0xc000, 0xffff, 0, 0, "bank5");
+	memory_configure_bank(machine, "bank5", 0, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000, 0);
 
 	v1050_bankswitch(machine);
 

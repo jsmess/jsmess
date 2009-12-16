@@ -2043,7 +2043,8 @@ static void setup_memory_map(running_machine *machine)
 	int 		block_index;		/* Index of block being processed */
 	int	 	wbank;			/* bank no to go in this block */
 	UINT8 		*offset;		/* offset into coco rom for rom mapping */
-
+	char	bank[10];
+		
 	/* Set last RAM block dependent on map type */
 	if (maptype)
 		last_ram_block=15;
@@ -2053,6 +2054,7 @@ static void setup_memory_map(running_machine *machine)
 	/* Map RAM blocks */
 	for(block_index=0;block_index<=last_ram_block;block_index++)
 	{
+		sprintf(bank,"bank%d",block_index+1);
 		/* Lookup the apropreate wbank value dependent on ram size */
 		if (memsize==0)
 			wbank=memmap[block_index].wbank4;
@@ -2070,17 +2072,15 @@ static void setup_memory_map(running_machine *machine)
 		{
 			/* This deals with the bottom 32K page switch and the Dragon Plus paged ram */
 			if(block_index<8)
-				memory_set_bankptr(machine, block_index+1,&bottom_32k[memmap[wbank-1].start]);
+				memory_set_bankptr(machine, bank, &bottom_32k[memmap[wbank-1].start]);
 			else
-				memory_set_bankptr(machine, block_index+1,&messram_get_ptr(devtag_get_device(machine, "messram"))[memmap[wbank-1].start]);
+				memory_set_bankptr(machine, bank,&messram_get_ptr(devtag_get_device(machine, "messram"))[memmap[wbank-1].start]);
 
-			memory_install_read_handler(space, memmap[block_index].start, memmap[block_index].end, 0, 0, block_index+1);
-			memory_install_write_handler(space, memmap[block_index].start, memmap[block_index].end, 0, 0, block_index+1);
+			memory_install_readwrite_bank(space, memmap[block_index].start, memmap[block_index].end, 0, 0, bank);
 		}
 		else
 		{
-			memory_install_read_handler(space, memmap[block_index].start, memmap[block_index].end, 0, 0, STATIC_NOP);
-			memory_install_write_handler(space, memmap[block_index].start, memmap[block_index].end, 0, 0, STATIC_NOP);
+			memory_nop_readwrite(space, memmap[block_index].start, memmap[block_index].end, 0, 0);
 		}
 	}
 
@@ -2092,6 +2092,7 @@ static void setup_memory_map(running_machine *machine)
 
 		for(block_index=0;block_index<=7;block_index++)
 		{
+			sprintf(bank,"bank%d",block_index+9);
 			/* If we are in the BASIC rom area $8000-$BFFF, then we map to the bas_rom_bank */
 			/* as this may be in a different block of coco_rom, in the Dragon 64 and Alpha */
 			/* as these machines have mutiple bios roms that can ocupy this area */
@@ -2100,8 +2101,8 @@ static void setup_memory_map(running_machine *machine)
 			else
 				offset = &cart_rom[(0x1000*(block_index-4)) % cart_length];
 
-			memory_set_bankptr(machine, block_index + 9,offset);
-			memory_install_write_handler(space, memmap[block_index+8].start, memmap[block_index+8].end, 0, 0, STATIC_NOP);
+			memory_set_bankptr(machine, bank,offset);
+			memory_nop_write(space, memmap[block_index+8].start, memmap[block_index+8].end, 0, 0);
 		}
 	}
 }
@@ -2378,12 +2379,15 @@ static void coco3_mmu_update(running_machine *machine, int lowblock, int hiblock
 	};
 
 	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
-	int i, offset, writebank;
+	int i, offset;
 	UINT8 *readbank;
 	UINT8 *cart_rom = memory_region(machine, "cart");
-
+	char bank[10];
+	
 	for (i = lowblock; i <= hiblock; i++)
 	{
+		sprintf(bank,"bank%d",i+1);
+		
 		offset = coco3_mmu_translate(machine, i, 0);
 		if (offset & 0x80000000)
 		{
@@ -2392,18 +2396,17 @@ static void coco3_mmu_update(running_machine *machine, int lowblock, int hiblock
 				readbank = &cart_rom[offset & ~0x80008000];
 			else
 				readbank = &coco_rom[offset & ~0x80000000];
-			writebank = STATIC_UNMAP;
+			memory_unmap_write(space, bank_info[i].start, bank_info[i].end, 0, 0);
 		}
 		else
 		{
 			/* offset into normal RAM */
-			readbank = &messram_get_ptr(devtag_get_device(machine, "messram"))[offset];
-			writebank = i + 1;
+			readbank = &messram_get_ptr(devtag_get_device(machine, "messram"))[offset];			
+			memory_install_write_bank(space, bank_info[i].start, bank_info[i].end, 0, 0, bank);
 		}
 
 		/* set up the banks */
-		memory_set_bankptr(machine, i + 1, readbank);
-		memory_install_write_handler(space, bank_info[i].start, bank_info[i].end, 0, 0, writebank);
+		memory_set_bankptr(machine, bank, readbank);		
 
 		if (LOG_MMU)
 		{
@@ -2515,8 +2518,7 @@ WRITE8_HANDLER(coco3_gime_w)
 				}
 				else
 				{
-					memory_install_read8_handler(space, 0xFF40, 0xFF5F, 0, 0, SMH_NOP);
-					memory_install_write8_handler(space, 0xFF40, 0xFF5F, 0, 0, SMH_NOP);
+					memory_nop_readwrite(space, 0xFF40, 0xFF5F, 0, 0);
 				}
 			}
 			break;
@@ -2838,7 +2840,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 static void generic_coco12_dragon_init(running_machine *machine, const machine_init_interface *init)
 {
 	/* Set default RAM mapping */
-	memory_set_bankptr(machine, 1, &messram_get_ptr(devtag_get_device(machine, "messram"))[0]);
+	memory_set_bankptr(machine, "bank1", &messram_get_ptr(devtag_get_device(machine, "messram"))[0]);
 
 	/* Do generic Inits */
 	generic_init_machine(machine, init);

@@ -373,6 +373,8 @@ DRVLIBS = \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/xerox.a \
 	$(MESSOBJ)/zvt.a \
+	$(MESSOBJ)/visual.a \
+	$(MESSOBJ)/trs.a \
 	$(MESSOBJ)/shared.a \
 #	$(MESSOBJ)/atari.a \
 #	$(MESSOBJ)/apple.a \
@@ -381,8 +383,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/hp.a \
 #	$(MESSOBJ)/luxor.a \
 #	$(MESSOBJ)/ti.a \
-#	$(MESSOBJ)/trs.a \
-#	$(MESSOBJ)/visual.a \
 
 #-------------------------------------------------
 # the following files are general components and
