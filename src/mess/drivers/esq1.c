@@ -5,36 +5,36 @@
     Ensoniq ESQ-1 and SQ-80 Digital Wave Synthesizers
     Preliminary driver by R. Belmont
 
-    Map for ESQ-1:
-    0000-1fff: OS RAM
-    2000-3fff: Cartridge
-    4000-5fff: SEQRAM
-    6000-63ff: ES5503 DOC
-    6400-67ff: MC2681 DUART
-    6800-6fff: AD7524 (CV_MUX)
-    7000-7fff: OS ROM low (banked)
-    8000-ffff: OS ROM high (fixed)
+	Map for ESQ-1:
+	0000-1fff: OS RAM
+	2000-3fff: Cartridge
+	4000-5fff: SEQRAM
+	6000-63ff: ES5503 DOC
+	6400-67ff: MC2681 DUART
+	6800-6fff: AD7524 (CV_MUX)
+	7000-7fff: OS ROM low (banked)
+	8000-ffff: OS ROM high (fixed)
 
-    Map for SQ-80:
-    0000-1fff: OS RAM
-    2000-3fff: Cartridge
-    4000-5fff: DOSRAM or SEQRAM (banked)
-    6000-63ff: ES5503 DOC
-    6400-67ff: MC2681 DUART
-    6800-6bff: AD7524 (CV_MUX)
-    6c00-6dff: Mapper (bit 0 only - determines DOSRAM or SEQRAM at 4000)
-    6e00-6fff: WD1772 FDC (not present on ESQ1)
-    7000-7fff: OS ROM low (banked)
-    8000-ffff: OS ROM high (fixed)
+	Map for SQ-80:
+	0000-1fff: OS RAM
+	2000-3fff: Cartridge
+	4000-5fff: DOSRAM or SEQRAM (banked)
+	6000-63ff: ES5503 DOC
+	6400-67ff: MC2681 DUART
+	6800-6bff: AD7524 (CV_MUX)
+	6c00-6dff: Mapper (bit 0 only - determines DOSRAM or SEQRAM at 4000)
+	6e00-6fff: WD1772 FDC (not present on ESQ1)
+	7000-7fff: OS ROM low (banked)
+	8000-ffff: OS ROM high (fixed)
 
-    CV_MUX area:
-    write to        output goes to
-    $68f8   $00     D/A converter
-    $68f0   -$08    Filter Frequency (FF)
-    $68e8   -$10    Filter Resonance (Q)
-    $68d8   -$20    Final DCA (ENV4)
-    $68b8   -$40    Panning (PAN)
-    $6878   -$80    Floppy (Motor/LED on)
+	CV_MUX area:
+	write to        output goes to
+	$68f8 	$00 	D/A converter
+	$68f0 	-$08 	Filter Frequency (FF)
+	$68e8 	-$10 	Filter Resonance (Q)
+	$68d8 	-$20 	Final DCA (ENV4)
+	$68b8 	-$40 	Panning (PAN)
+	$6878 	-$80 	Floppy (Motor/LED on)
 
 If SEQRAM is mapped at 4000, DUART port 2 determines the 32KB "master bank" and ports 0 and 1
 determine which of the 4 8KB "sub banks" is visible.
@@ -45,20 +45,17 @@ IRQ sources are the DUART and the DRQ line from the FDC (SQ-80 only).
 NMI is from the IRQ line on the FDC (again, SQ-80 only).
 
 TODO:
-    - Actual 2681 DUART emulation
-    - VFD display
-    - Keyboard
-    - Analog filters and VCA on the back end of the 5503
-    - SQ-80 support (additional banking, FDC)
+	- VFD display
+	- Keyboard
+	- Analog filters and VCA on the back end of the 5503
+	- SQ-80 support (additional banking, FDC)
 
 ***************************************************************************/
 
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/es5503.h"
-
-static UINT8 uart_regs[0x10];
-static UINT8 uart_outputport;
+#include "machine/68681.h"
 
 static void esq1_doc_irq(const device_config *device, int state)
 {
@@ -90,75 +87,75 @@ static MACHINE_RESET( esq1 )
 	es5503_set_base(devtag_get_device(machine, "es5503"), memory_region(machine, "ensoniq"));
 
 	// set default OSROM banking
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "osrom") );
-}
-
-static void recalc_osrom_bank(running_machine *machine)
-{
-	int bank = ((uart_outputport >> 1) & 0x7) ^ 7;
-
-//  printf("bank %d => offset %x (PC=%x)\n", bank, bank * 0x1000, cpu_get_pc(machine->cpu[0]));
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "osrom") + (bank * 0x1000) );
-}
-
-static READ8_HANDLER( uart_r )
-{
-//  printf("Read UART @ %x\n", offset);
-
-	switch (offset)
-	{
-		case 5:	// interrupt status
-			return 0x08;	// timer/counter expire
-			break;
-	}
-
-	return 0;
-}
-
-static WRITE8_HANDLER( uart_w )
-{
-	uart_regs[offset] = data;
-
-//  printf("%x to UART %x\n", data, offset);
-
-	switch (offset)
-	{
-		case 0xb:
-//          printf("%02x to 6500\n", data);
-			break;
-
-		case 0xe:	// set output port bits
-			uart_outputport |= data;
-			recalc_osrom_bank(space->machine);
-			break;
-
-		case 0xf:	// reset output port bits
-			uart_outputport &= ~data;
-			recalc_osrom_bank(space->machine);
-			break;
-	}
+	memory_set_bankptr(machine, "osbank", memory_region(machine, "osrom") );
 }
 
 static ADDRESS_MAP_START( esq1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM					// OSRAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM					// SEQRAM
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_r, es5503_w)
-	AM_RANGE(0x6400, 0x640f) AM_READWRITE( uart_r, uart_w )
-	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE("duart", duart68681_r, duart68681_w)
+	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("osbank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("osrom", 0x8000)	// OS "high" ROM is always mapped here
 ADDRESS_MAP_END
 
-static INTERRUPT_GEN( esq1_interrupt )
+// from the schematics:
+//
+// DUART channel A is MIDI
+// channel B is to the keyboard/display
+// IP0 = tape in
+// IP1 = sequencer expansion cartridge inserted
+// IP2 = patch cartridge inserted
+// IP3 & 4 are 0.5 MHz, IP 5 & 6 are 1 MHz (note 0.5 MHz / 16 = MIDI baud rate)
+// 
+// OP0 = to display processor
+// OP1/2/3 = bank select 0, 1, and 2
+// OP4 = metronome low
+// OP5 = metronome hi
+// OP6/7 = tape out
+
+static void duart_irq_handler(const device_config *device, UINT8 vector)
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
+};
+
+static UINT8 duart_input(const device_config *device)
+{
+	return 0;
 }
+
+static void duart_output(const device_config *device, UINT8 data)
+{
+	int bank = ((data >> 1) & 0x7);
+
+//	printf("DP [%02x]: %d mlo %d mhi %d tape %d\n", data, data&1, (data>>4)&1, (data>>5)&1, (data>>6)&3);
+//	printf("[%02x] bank %d => offset %x (PC=%x)\n", data, bank, bank * 0x1000, cpu_get_pc(device->machine->firstcpu));
+	memory_set_bankptr(device->machine, "osbank", memory_region(device->machine, "osrom") + (bank * 0x1000) );
+}
+
+static void duart_tx(const device_config *device, int channel, UINT8 data)
+{
+	if ((data != 0) && (channel == 1)) printf("[%d]: %02x %c\n", channel, data, data);
+}
+
+static const duart68681_config duart_config =
+{
+	duart_irq_handler,
+	duart_tx,
+	duart_input,
+	duart_output,
+
+	500000, 500000,	// IP3, IP4
+	1000000, 1000000, // IP5, IP6
+};
 
 static MACHINE_DRIVER_START( esq1 )
 	MDRV_CPU_ADD("maincpu", M6809E, 4000000)	// how fast is it?
 	MDRV_CPU_PROGRAM_MAP(esq1_map)
-	MDRV_CPU_VBLANK_INT("screen", esq1_interrupt)
 
 	MDRV_MACHINE_RESET( esq1 )
+
+	MDRV_DUART68681_ADD("duart", 40000000, duart_config)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -189,22 +186,3 @@ ROM_START( esq1 )
 ROM_END
 
 CONS( 1987, esq1, 0, 0, esq1, esq1, 0, 0, "Ensoniq", "ESQ-1", GAME_NOT_WORKING )
-
-/*
-
-7 to UART 6                counter/timer upper
-d0 to UART 7               counter/timer lower
-60 to UART 4               aux control (C/T timer mode using external clock)
-20 to UART a               command register B
-30 to UART a               command register B
-10 to UART a               command register B
-13 to UART 8               mode register B => 8 bits no parity
-f to UART 8                mode register B => force odd parity, 8 bits (?)
-ee to UART 9               clock select register B
-5 to UART a                command register B (Enable Tx/Enable Rx)
-e7 to UART b               Tx holding register B (send E7 to display)
-0 to UART d                output port config (all bits are output ports)
-ab to UART 5               interrupt mask register (input port change, RxRdyB, counter ready, RxReadyA, TxReadyA)
-
-*/
-
