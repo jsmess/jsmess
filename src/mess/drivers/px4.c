@@ -487,7 +487,7 @@ static WRITE8_HANDLER( px4_bankr_w )
 	case 0x04:
 		/* memory */
 		memory_install_readwrite_bank(space_program, 0x0000, 0xffff, 0, 0, "bank1");
-		memory_set_bankptr(space->machine, "bank2", messram_get_ptr(px4->ram));
+		memory_set_bankptr(space->machine, "bank1", messram_get_ptr(px4->ram));
 		break;
 
 	case 0x08: install_rom_capsule(space_program, 0x2000, "capsule1"); break;
@@ -1306,7 +1306,7 @@ static MACHINE_DRIVER_START( px4 )
 	MDRV_CARTSLOT_NOT_MANDATORY
 
 	/* tf20 floppy drive */
-//  MDRV_TF20_ADD("floppy")
+//	MDRV_TF20_ADD("floppy")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( px4p )
