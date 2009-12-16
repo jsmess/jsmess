@@ -69,7 +69,7 @@ QUICKLOAD_LOAD(altair)
 	int quick_length;
 	int read_;
 	quick_length = image_length(image);
-	if (quick_length >= 0xfd00) 
+	if (quick_length >= 0xfd00)
 		return INIT_FAIL;
 	read_ = image_fread(image, altair_ram, quick_length);
 	if (read_ != quick_length)
@@ -83,7 +83,7 @@ static MACHINE_RESET(altair)
 {
 	// Set startup addess done by turn-key
 	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), I8085_PC, 0xFD00);
-	
+
 	term_data = 0;
 }
 
@@ -108,16 +108,16 @@ static MACHINE_DRIVER_START( altair )
 	/* video hardware */
 	MDRV_IMPORT_FROM( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,altair_terminal_intf)
-	
+
 	/* quickload */
-	MDRV_QUICKLOAD_ADD("quickload", altair, "bin", 0) 	
+	MDRV_QUICKLOAD_ADD("quickload", altair, "bin", 0)
 MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( al8800bt )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "turnmon.bin",  0xfd00, 0x0100, CRC(5c629294) SHA1(125c76216954b681721fff84a3aca05094b21a28))
-	ROM_LOAD( "88dskrom.bin", 0xff00, 0x0100, CRC(7c5232f3) SHA1(24f940ad70ad2829e1bc800c6790b6e993e6ebf6))	
+	ROM_LOAD( "88dskrom.bin", 0xff00, 0x0100, CRC(7c5232f3) SHA1(24f940ad70ad2829e1bc800c6790b6e993e6ebf6))
 ROM_END
 
 /* Driver */

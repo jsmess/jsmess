@@ -1,14 +1,14 @@
 /****************************************************************************
 
-	library.h
+    library.h
 
-	Code relevant to the Imgtool library; analgous to the MESS/MAME driver
-	list.
+    Code relevant to the Imgtool library; analgous to the MESS/MAME driver
+    list.
 
-	Unlike MESS and MAME which have static driver lists, Imgtool has a
-	concept of a library and this library is built at startup time.
-	dynamic for which modules are added to.  This makes "dynamic" modules
-	much easier
+    Unlike MESS and MAME which have static driver lists, Imgtool has a
+    concept of a library and this library is built at startup time.
+    dynamic for which modules are added to.  This makes "dynamic" modules
+    much easier
 
 ****************************************************************************/
 

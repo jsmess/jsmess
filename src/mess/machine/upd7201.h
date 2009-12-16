@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    NEC µPD7201 Multiprotocol Serial Communications Controller
+    NEC ??PD7201 Multiprotocol Serial Communications Controller
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.

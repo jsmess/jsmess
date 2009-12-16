@@ -11,7 +11,7 @@
 
     TODO:
 
-	- external ROM
+    - external ROM
     - text mode
 
 */
@@ -461,7 +461,7 @@ DEVICE_GET_INFO( hd61830 )
 
 		/* --- the following bits of info are returned as pointers to data --- */
 		case DEVINFO_PTR_DEFAULT_MEMORY_MAP_0:			info->default_map8 = ADDRESS_MAP_NAME(hd61380);		break;
-		
+
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(hd61830);			break;
 		case DEVINFO_FCT_STOP:							/* Nothing */										break;

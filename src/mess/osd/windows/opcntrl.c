@@ -1,10 +1,10 @@
 //============================================================
 //
-//	opcntrl.c - Code for handling option resolutions in
-//	Win32 controls
+//  opcntrl.c - Code for handling option resolutions in
+//  Win32 controls
 //
-//	This code was factored out of menu.c when Windows Imgtool
-//	started to have dynamic controls
+//  This code was factored out of menu.c when Windows Imgtool
+//  started to have dynamic controls
 //
 //============================================================
 

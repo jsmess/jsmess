@@ -104,8 +104,8 @@ static MACHINE_DRIVER_START( microdec )
 
     /* video hardware */
     MDRV_IMPORT_FROM( generic_terminal )
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,microdec_terminal_intf)	
-	
+	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,microdec_terminal_intf)
+
 	MDRV_UPD765A_ADD("upd765", microdec_upd765_interface)
 	MDRV_FLOPPY_2_DRIVES_ADD(microdec_floppy_config)
 MACHINE_DRIVER_END

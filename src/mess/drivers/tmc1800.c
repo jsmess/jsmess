@@ -872,11 +872,11 @@ static MACHINE_DRIVER_START( tmc1800 )
 	// devices
 	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
 	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("2K")
-	MDRV_RAM_EXTRA_OPTIONS("4K")	
+	MDRV_RAM_EXTRA_OPTIONS("4K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( osc1000b )
@@ -903,11 +903,11 @@ static MACHINE_DRIVER_START( osc1000b )
 	// devices
 	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
 	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("2K")
-	MDRV_RAM_EXTRA_OPTIONS("4K")	
+	MDRV_RAM_EXTRA_OPTIONS("4K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tmc2000 )
@@ -928,11 +928,11 @@ static MACHINE_DRIVER_START( tmc2000 )
 	// devices
 	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
 	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4K")
-	MDRV_RAM_EXTRA_OPTIONS("16K,32K")	
+	MDRV_RAM_EXTRA_OPTIONS("16K,32K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( oscnano )
@@ -953,7 +953,7 @@ static MACHINE_DRIVER_START( oscnano )
 	// devices
 	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
 	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4K")

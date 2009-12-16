@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	formats/svi_dsk.c
+    formats/svi_dsk.c
 
-	SVI318 disk images
+    SVI318 disk images
 
 *********************************************************************/
 
@@ -153,8 +153,8 @@ static FLOPPY_CONSTRUCT(svi_dsk_construct)
 	callbacks->get_heads_per_disk = svi_get_heads_per_disk;
 	callbacks->get_tracks_per_disk = svi_get_tracks_per_disk;
 	callbacks->get_indexed_sector_info = svi_get_indexed_sector_info;
-	
-	return FLOPPY_ERROR_SUCCESS;	
+
+	return FLOPPY_ERROR_SUCCESS;
 }
 
 
@@ -168,5 +168,5 @@ FLOPPY_OPTIONS_START( svi318 )
 		TRACKS([40])
 		SECTORS([17])
 		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))		
+		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END

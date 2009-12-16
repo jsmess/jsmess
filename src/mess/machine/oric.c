@@ -647,7 +647,7 @@ static void oric_jasmin_set_mem_0x0c000(running_machine *machine)
 			/*logerror("&c000-&ffff is ram\n"); */
 
 			oric_enable_memory(machine, 1, 3, TRUE, TRUE);
-                                        
+
 			memory_set_bankptr(machine, "bank1", oric_ram_0x0c000);
 			memory_set_bankptr(machine, "bank2", oric_ram_0x0c000+0x02000);
 			memory_set_bankptr(machine, "bank3", oric_ram_0x0c000+0x03800);
@@ -1333,7 +1333,7 @@ static void	telestrat_refresh_mem(running_machine *machine)
 			memory_nop_readwrite(space, 0xc000, 0xffff, 0, 0);
 		}
 		break;
-	}	
+	}
 }
 
 static READ8_DEVICE_HANDLER(telestrat_via2_in_a_func)

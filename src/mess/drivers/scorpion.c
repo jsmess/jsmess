@@ -333,7 +333,7 @@ static MACHINE_DRIVER_START( scorpion )
 	MDRV_MACHINE_RESET( scorpion )
 
 	MDRV_BETA_DISK_ADD(BETA_DISK_TAG)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("256K")

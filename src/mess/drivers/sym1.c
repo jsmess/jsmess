@@ -141,7 +141,7 @@ static MACHINE_DRIVER_START( sym1 )
 	MDRV_VIA6522_ADD("via6522_0", 0, sym1_via0)
 	MDRV_VIA6522_ADD("via6522_1", 0, sym1_via1)
 	MDRV_VIA6522_ADD("via6522_2", 0, sym1_via2)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4K")

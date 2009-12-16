@@ -782,7 +782,7 @@ static MACHINE_DRIVER_START( vip )
 	/* devices */
 	MDRV_QUICKLOAD_ADD("quickload", vip, "bin,c8,c8x", 0)
 	MDRV_CASSETTE_ADD("cassette", vip_cassette_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("2K")
@@ -791,7 +791,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vp111 )
 	MDRV_IMPORT_FROM(vip)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("1K")

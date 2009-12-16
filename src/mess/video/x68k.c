@@ -709,7 +709,7 @@ READ16_HANDLER( x68k_tvram_r )
 READ32_HANDLER( x68k_tvram32_r )
 {
 	UINT32 ret = 0;
-	
+
 	if(ACCESSING_BITS_0_15)
 		ret |= (x68k_tvram_r(space,(offset*2)+1,0xffff));
 	if(ACCESSING_BITS_16_31)
@@ -721,7 +721,7 @@ READ32_HANDLER( x68k_tvram32_r )
 READ32_HANDLER( x68k_gvram32_r )
 {
 	UINT32 ret = 0;
-	
+
 	if(ACCESSING_BITS_0_15)
 		ret |= x68k_gvram_r(space,offset*2+1,0xffff);
 	if(ACCESSING_BITS_16_31)

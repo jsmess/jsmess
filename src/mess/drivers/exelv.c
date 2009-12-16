@@ -207,13 +207,13 @@ static WRITE8_HANDLER(mailbox_wx318_w)
 /*
     TMS7020 PORT A
     A0 - R - TMS7041 port B bit 7 (REV3)
-    A1 - 
-    A2 - 
-    A3 - 
-    A4 - 
-    A5 - 
-    A6 - 
-    A7 - 
+    A1 -
+    A2 -
+    A3 -
+    A4 -
+    A5 -
+    A6 -
+    A7 -
 */
 static READ8_HANDLER(tms7020_porta_r)
 {
@@ -235,12 +235,12 @@ static WRITE8_HANDLER(tms7020_porta_w)
     TMS7020 PORT B
     B0 - W - TMS7041 port A bit 2 (REV2)
     B1 - W - TMS7041 port A bit 4 (REV4)
-    B2 - 
-    B3 - 
-    B4 - 
-    B5 - 
-    B6 - 
-    B7 - 
+    B2 -
+    B3 -
+    B4 -
+    B5 -
+    B6 -
+    B7 -
 */
 static READ8_HANDLER(tms7020_portb_r)
 {

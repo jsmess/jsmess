@@ -53,7 +53,7 @@ static file_error win_error_to_mame_file_error(DWORD error)
 
 
 //============================================================
-//	osd_get_temp_filename
+//  osd_get_temp_filename
 //============================================================
 
 file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *basename)
@@ -80,7 +80,7 @@ file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *ba
 
 
 //============================================================
-//	osd_copyfile
+//  osd_copyfile
 //============================================================
 
 file_error osd_copyfile(const char *destfile, const char *srcfile)
@@ -154,7 +154,7 @@ int osd_is_path_separator(char c)
 
 
 //============================================================
-//	osd_dirname
+//  osd_dirname
 //============================================================
 
 char *osd_dirname(const char *filename)
@@ -190,7 +190,7 @@ char *osd_dirname(const char *filename)
 
 
 //============================================================
-//	osd_basename
+//  osd_basename
 //============================================================
 
 char *osd_basename(char *filename)
@@ -212,7 +212,7 @@ char *osd_basename(char *filename)
 
 
 //============================================================
-//	osd_get_full_path
+//  osd_get_full_path
 //============================================================
 
 file_error osd_get_full_path(char **dst, const char *path)
@@ -254,7 +254,7 @@ done:
 
 
 //============================================================
-//	osd_mkdir
+//  osd_mkdir
 //============================================================
 
 file_error osd_mkdir(const char *dir)
@@ -282,7 +282,7 @@ done:
 
 
 //============================================================
-//	osd_rmdir
+//  osd_rmdir
 //============================================================
 
 file_error osd_rmdir(const char *dir)
@@ -310,7 +310,7 @@ done:
 
 
 //============================================================
-//	osd_getcurdir
+//  osd_getcurdir
 //============================================================
 
 file_error osd_getcurdir(char *buffer, size_t buffer_len)
@@ -341,7 +341,7 @@ done:
 
 
 //============================================================
-//	osd_setcurdir
+//  osd_setcurdir
 //============================================================
 
 file_error osd_setcurdir(const char *dir)
@@ -374,7 +374,7 @@ done:
 //============================================================
 
 //============================================================
-//	get_clipboard_text_by_format
+//  get_clipboard_text_by_format
 //============================================================
 
 static char *get_clipboard_text_by_format(UINT format, char *(*convert)(LPCVOID data))
@@ -415,7 +415,7 @@ static char *get_clipboard_text_by_format(UINT format, char *(*convert)(LPCVOID 
 
 
 //============================================================
-//	convert_wide
+//  convert_wide
 //============================================================
 
 static char *convert_wide(LPCVOID data)
@@ -426,7 +426,7 @@ static char *convert_wide(LPCVOID data)
 
 
 //============================================================
-//	convert_ansi
+//  convert_ansi
 //============================================================
 
 static char *convert_ansi(LPCVOID data)
@@ -437,7 +437,7 @@ static char *convert_ansi(LPCVOID data)
 
 
 //============================================================
-//	osd_get_clipboard_text
+//  osd_get_clipboard_text
 //============================================================
 
 char *osd_get_clipboard_text(void)

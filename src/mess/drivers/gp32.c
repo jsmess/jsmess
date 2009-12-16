@@ -1089,7 +1089,7 @@ static READ32_HANDLER( s3c240x_gpio_r )
 static WRITE32_HANDLER( s3c240x_gpio_w )
 {
 	running_machine *machine = space->machine;
-//	UINT32 old_value = s3c240x_gpio_regs[offset];
+//  UINT32 old_value = s3c240x_gpio_regs[offset];
 	COMBINE_DATA(&s3c240x_gpio[offset]);
 	verboselog( machine, 9, "(GPIO) %08X <- %08X (PC %08X)\n", 0x15600000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	switch (offset)
@@ -1134,13 +1134,13 @@ static WRITE32_HANDLER( s3c240x_gpio_w )
 		}
 		break;
 /*
-		// PGDAT
-		case 0x48 / 4 :
-		{
-			int i2ssdo;
-			i2ssdo = BIT( data, 3);
-		}
-		break;
+        // PGDAT
+        case 0x48 / 4 :
+        {
+            int i2ssdo;
+            i2ssdo = BIT( data, 3);
+        }
+        break;
 */
 	}
 }
@@ -1308,56 +1308,56 @@ static UINT32 s3c240x_iic_regs[0x10/4];
 /*
 static UINT8 i2cmem_read_byte( running_machine *machine, int last)
 {
-	UINT8 data = 0;
-	int i;
-	i2cmem_write( machine, 0, I2CMEM_SDA, 1);
-	for (i = 0; i < 8; i++)
-	{
-		i2cmem_write( machine, 0, I2CMEM_SCL, 1);
+    UINT8 data = 0;
+    int i;
+    i2cmem_write( machine, 0, I2CMEM_SDA, 1);
+    for (i = 0; i < 8; i++)
+    {
+        i2cmem_write( machine, 0, I2CMEM_SCL, 1);
     data = (data << 1) + (i2cmem_read( machine, 0, I2CMEM_SDA) ? 1 : 0);
-		i2cmem_write( machine, 0, I2CMEM_SCL, 0);
-	}
-	i2cmem_write( machine, 0, I2CMEM_SDA, last);
-	i2cmem_write( machine, 0, I2CMEM_SCL, 1);
-	i2cmem_write( machine, 0, I2CMEM_SCL, 0);
-	return data;
+        i2cmem_write( machine, 0, I2CMEM_SCL, 0);
+    }
+    i2cmem_write( machine, 0, I2CMEM_SDA, last);
+    i2cmem_write( machine, 0, I2CMEM_SCL, 1);
+    i2cmem_write( machine, 0, I2CMEM_SCL, 0);
+    return data;
 }
 */
 
 /*
 static void i2cmem_write_byte( running_machine *machine, UINT8 data)
 {
-	int i;
-	for (i = 0; i < 8; i++)
-	{
-		i2cmem_write( machine, 0, I2CMEM_SDA, (data & 0x80) ? 1 : 0);
-		data = data << 1;
-		i2cmem_write( machine, 0, I2CMEM_SCL, 1);
-		i2cmem_write( machine, 0, I2CMEM_SCL, 0);
-	}
-	i2cmem_write( machine, 0, I2CMEM_SDA, 1); // ack bit
-	i2cmem_write( machine, 0, I2CMEM_SCL, 1);
-	i2cmem_write( machine, 0, I2CMEM_SCL, 0);
+    int i;
+    for (i = 0; i < 8; i++)
+    {
+        i2cmem_write( machine, 0, I2CMEM_SDA, (data & 0x80) ? 1 : 0);
+        data = data << 1;
+        i2cmem_write( machine, 0, I2CMEM_SCL, 1);
+        i2cmem_write( machine, 0, I2CMEM_SCL, 0);
+    }
+    i2cmem_write( machine, 0, I2CMEM_SDA, 1); // ack bit
+    i2cmem_write( machine, 0, I2CMEM_SCL, 1);
+    i2cmem_write( machine, 0, I2CMEM_SCL, 0);
 }
 */
 
 /*
 static void i2cmem_start( running_machine *machine)
 {
-	i2cmem_write( machine, 0, I2CMEM_SDA, 1);
-	i2cmem_write( machine, 0, I2CMEM_SCL, 1);
-	i2cmem_write( machine, 0, I2CMEM_SDA, 0);
-	i2cmem_write( machine, 0, I2CMEM_SCL, 0);
+    i2cmem_write( machine, 0, I2CMEM_SDA, 1);
+    i2cmem_write( machine, 0, I2CMEM_SCL, 1);
+    i2cmem_write( machine, 0, I2CMEM_SDA, 0);
+    i2cmem_write( machine, 0, I2CMEM_SCL, 0);
 }
 */
 
 /*
 static void i2cmem_stop( running_machine *machine)
 {
-	i2cmem_write( machine, 0, I2CMEM_SDA, 0);
-	i2cmem_write( machine, 0, I2CMEM_SCL, 1);
-	i2cmem_write( machine, 0, I2CMEM_SDA, 1);
-	i2cmem_write( machine, 0, I2CMEM_SCL, 0);
+    i2cmem_write( machine, 0, I2CMEM_SDA, 0);
+    i2cmem_write( machine, 0, I2CMEM_SCL, 1);
+    i2cmem_write( machine, 0, I2CMEM_SDA, 1);
+    i2cmem_write( machine, 0, I2CMEM_SCL, 0);
 }
 */
 
@@ -1408,13 +1408,13 @@ static WRITE32_HANDLER( s3c240x_iic_w )
 		case 0x00 / 4 :
 		{
 			int interrupt_pending_flag;
-//			const int div_table[] = { 16, 512};
-//			int enable_interrupt, transmit_clock_value, tx_clock_source_selection
-//			double clock;
-//			transmit_clock_value = (data >> 0) & 0xF;
-//			tx_clock_source_selection = (data >> 6) & 1;
-//			enable_interrupt = (data >> 5) & 1;
-//			clock = (double)(s3c240x_get_pclk( MPLLCON) / div_table[tx_clock_source_selection] / (transmit_clock_value + 1));
+//          const int div_table[] = { 16, 512};
+//          int enable_interrupt, transmit_clock_value, tx_clock_source_selection
+//          double clock;
+//          transmit_clock_value = (data >> 0) & 0xF;
+//          tx_clock_source_selection = (data >> 6) & 1;
+//          enable_interrupt = (data >> 5) & 1;
+//          clock = (double)(s3c240x_get_pclk( MPLLCON) / div_table[tx_clock_source_selection] / (transmit_clock_value + 1));
 			interrupt_pending_flag = BIT( data, 4);
 			if (interrupt_pending_flag == 0)
 			{
@@ -1495,7 +1495,7 @@ static TIMER_CALLBACK( s3c240x_iic_timer_exp )
 
 // IIS
 
-static struct 
+static struct
 {
 	UINT16 fifo[16/2];
 	int fifo_index;
@@ -1542,15 +1542,15 @@ static READ32_HANDLER( s3c240x_iis_r )
 	running_machine *machine = space->machine;
 	UINT32 data = s3c240x_iis_regs[offset];
 /*
-	switch (offset)
-	{
-		// IISCON
-		case 0x00 / 4 :
-		{
-			//data = data & ~1; // for mp3 player
-		}
-		break;
-	}
+    switch (offset)
+    {
+        // IISCON
+        case 0x00 / 4 :
+        {
+            //data = data & ~1; // for mp3 player
+        }
+        break;
+    }
 */
 	verboselog( machine, 9, "(IIS) %08X -> %08X (PC %08X)\n", 0x15508000 + (offset << 2), data, cpu_get_pc( space->cpu));
 	return data;
@@ -1836,8 +1836,8 @@ ROM_START( gp32 )
 	ROMX_LOAD( "gp32166m.bin", 0x000000, 0x080000, CRC(4548a840) SHA1(1ad0cab0af28fb45c182e5e8c87ead2aaa4fffe1), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 4, "mfv2", "Mr. Spiv Multi Firmware V2" )
 	ROMX_LOAD( "gp32mfv2.bin", 0x000000, 0x080000, CRC(7ddaaaeb) SHA1(5a85278f721beb3b00125db5c912d1dc552c5897), ROM_BIOS(5) )
-//	ROM_SYSTEM_BIOS( 5, "test", "test" )
-//	ROMX_LOAD( "test.bin", 0x000000, 0x080000, CRC(00000000) SHA1(0000000000000000000000000000000000000000), ROM_BIOS(6) )
+//  ROM_SYSTEM_BIOS( 5, "test", "test" )
+//  ROMX_LOAD( "test.bin", 0x000000, 0x080000, CRC(00000000) SHA1(0000000000000000000000000000000000000000), ROM_BIOS(6) )
 ROM_END
 
 CONS(2001, gp32, 0, 0, gp32, gp32, 0, 0, "Game Park", "GP32", ROT270|GAME_NOT_WORKING|GAME_NO_SOUND)

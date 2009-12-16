@@ -585,7 +585,7 @@ static MACHINE_DRIVER_START( ibm5162 )
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1664K")
@@ -657,10 +657,10 @@ static MACHINE_DRIVER_START( ps2m30286 )
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("1664K")	
+	MDRV_RAM_DEFAULT_SIZE("1664K")
 MACHINE_DRIVER_END
 
 
@@ -731,10 +731,10 @@ static MACHINE_DRIVER_START( atvga )
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("1664K")	
+	MDRV_RAM_DEFAULT_SIZE("1664K")
 MACHINE_DRIVER_END
 
 
@@ -806,7 +806,7 @@ static MACHINE_DRIVER_START( at386 )
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1664K")
@@ -1122,7 +1122,7 @@ ROM_START( at586 )
 	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
 	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
-	
+
 /***************************************************************************
 
   Game driver(s)

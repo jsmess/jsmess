@@ -190,7 +190,7 @@ static MACHINE_DRIVER_START( galaxy )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_CASSETTE_ADD( "cassette", galaxy_cassette_config )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("6K")
@@ -229,7 +229,7 @@ static MACHINE_DRIVER_START( galaxyp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", galaxy_cassette_config )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("38K")

@@ -556,7 +556,7 @@ static MACHINE_DRIVER_START( abc80 )
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, default_cassette_config)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(abc80_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")

@@ -337,7 +337,7 @@ static MACHINE_DRIVER_START( elf2 )
 	/* devices */
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, elf_cassette_config)
 	MDRV_QUICKLOAD_ADD("quickload", elf, "bin", 0)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("256")

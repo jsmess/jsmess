@@ -173,7 +173,7 @@ ADDRESS_MAP_END
 
 /* 2008-05 FP: the following input ports are based on the way ports are read, but I would like
    to have confirmation from technical docs before considering these correct.
-	If they need to be changed, you must also update the clickable artwork.
+    If they need to be changed, you must also update the clickable artwork.
 */
 
 static INPUT_PORTS_START( pc1401 )
@@ -857,11 +857,11 @@ static MACHINE_DRIVER_START( pc1350 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 252-1)
 
 	MDRV_VIDEO_UPDATE( pc1350 )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4K")
-	MDRV_RAM_EXTRA_OPTIONS("12K,20K")	
+	MDRV_RAM_EXTRA_OPTIONS("12K,20K")
 MACHINE_DRIVER_END
 
 static const sc61860_cpu_core pc1403_config =

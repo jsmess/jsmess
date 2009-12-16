@@ -1235,10 +1235,10 @@ static MACHINE_DRIVER_START( v1050 )
 
 	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")		
+	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 
 /* ROMs */

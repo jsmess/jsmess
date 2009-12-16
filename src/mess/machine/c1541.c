@@ -9,129 +9,129 @@
 
 /*
 
-	1540/1541/1541A/SX-64 Parts
+    1540/1541/1541A/SX-64 Parts
 
-	Location       Part Number    Description
-								  2016 2K x 8 bit Static RAM (short board)
-	UA2-UB3                       2114 (4) 1K x 4 bit Static RAM (long board)
-				   325572-01      64H105 40 pin Gate Array (short board)
-				   325302-01      2364-130 ROM DOS 2.6 C000-DFFF
-				   325303-01      2364-131 ROM DOS 2.6 (1540) E000-FFFF
-				   901229-01      2364-173 ROM DOS 2.6 rev. 0 E000-FFFF
-				   901229-03      2364-197 ROM DOS 2.6 rev. 1 E000-FFFF
-				   901229-05      8K ROM DOS 2.6 rev. 2 E000-FFFF
-								  6502 CPU
-								  6522 (2) VIA
-	drive                         Alps DFB111M25A
-	drive                         Alps FDM2111-B2
-	drive                         Newtronics D500
+    Location       Part Number    Description
+                                  2016 2K x 8 bit Static RAM (short board)
+    UA2-UB3                       2114 (4) 1K x 4 bit Static RAM (long board)
+                   325572-01      64H105 40 pin Gate Array (short board)
+                   325302-01      2364-130 ROM DOS 2.6 C000-DFFF
+                   325303-01      2364-131 ROM DOS 2.6 (1540) E000-FFFF
+                   901229-01      2364-173 ROM DOS 2.6 rev. 0 E000-FFFF
+                   901229-03      2364-197 ROM DOS 2.6 rev. 1 E000-FFFF
+                   901229-05      8K ROM DOS 2.6 rev. 2 E000-FFFF
+                                  6502 CPU
+                                  6522 (2) VIA
+    drive                         Alps DFB111M25A
+    drive                         Alps FDM2111-B2
+    drive                         Newtronics D500
 
-	1541B/1541C Parts
+    1541B/1541C Parts
 
-	Location       Part Number    Description
-	UA3                           2016 2K x 8 bit Static RAM
-	UC2                           6502 CPU
-	UC1, UC3                      6522 (2) CIA
-	UC4            251828-02      64H156 42 pin Gate Array
-	UC5            251829-01      64H157 20 pin Gate Array
-	UD1          * 251853-01      R/W Hybrid
-	UD1          * 251853-02      R/W Hybrid
-	UA2            251968-01      27128 EPROM DOS 2.6 rev. 3 C000-FFFF
-	drive                         Newtronics D500
-	  * Not interchangeable.
+    Location       Part Number    Description
+    UA3                           2016 2K x 8 bit Static RAM
+    UC2                           6502 CPU
+    UC1, UC3                      6522 (2) CIA
+    UC4            251828-02      64H156 42 pin Gate Array
+    UC5            251829-01      64H157 20 pin Gate Array
+    UD1          * 251853-01      R/W Hybrid
+    UD1          * 251853-02      R/W Hybrid
+    UA2            251968-01      27128 EPROM DOS 2.6 rev. 3 C000-FFFF
+    drive                         Newtronics D500
+      * Not interchangeable.
 
-	1541-II Parts
+    1541-II Parts
 
-	Location       Part Number    Description
-	U5                            2016-15 2K x 8 bit Static RAM
-	U12                           SONY CX20185 R/W Amp.
-	U3                            6502A CPU
-	U6, U8                        6522 (2) CIA
-	U10            251828-01      64H156 40 pin Gate Array
-	U4             251968-03      16K ROM DOS 2.6 rev. 4 C000-FFFF
-	drive                         Chinon FZ-501M REV A
-	drive                         Digital System DS-50F
-	drive                         Newtronics D500
-	drive                         Safronic DS-50F
+    Location       Part Number    Description
+    U5                            2016-15 2K x 8 bit Static RAM
+    U12                           SONY CX20185 R/W Amp.
+    U3                            6502A CPU
+    U6, U8                        6522 (2) CIA
+    U10            251828-01      64H156 40 pin Gate Array
+    U4             251968-03      16K ROM DOS 2.6 rev. 4 C000-FFFF
+    drive                         Chinon FZ-501M REV A
+    drive                         Digital System DS-50F
+    drive                         Newtronics D500
+    drive                         Safronic DS-50F
 
-	...
+    ...
 
-	PCB Assy # 1540008-01
-	Schematic # 1540001
-	Original "Long" Board
-	Has 4 discreet 2114 RAMs
-	ALPS Drive only
+    PCB Assy # 1540008-01
+    Schematic # 1540001
+    Original "Long" Board
+    Has 4 discreet 2114 RAMs
+    ALPS Drive only
 
-	PCB Assy # 1540048
-	Schematic # 1540049
-	Referred to as the CR board
-	Changed to 2048 x 8 bit RAM pkg.
-	A 40 pin Gate Array is used
-	Alps Drive (-01)
-	Newtronics Drive (-03)
+    PCB Assy # 1540048
+    Schematic # 1540049
+    Referred to as the CR board
+    Changed to 2048 x 8 bit RAM pkg.
+    A 40 pin Gate Array is used
+    Alps Drive (-01)
+    Newtronics Drive (-03)
 
-	PCB Assy # 250442-01
-	Schematic # 251748
-	Termed the 1541 A
-	Just one jumper change to accommodate both types of drive
+    PCB Assy # 250442-01
+    Schematic # 251748
+    Termed the 1541 A
+    Just one jumper change to accommodate both types of drive
 
-	PCB Assy # 250446-01
-	Schematic # 251748 (See Notes)
-	Termed the 1541 A-2
-	Just one jumper change to accommodate both types of drive
+    PCB Assy # 250446-01
+    Schematic # 251748 (See Notes)
+    Termed the 1541 A-2
+    Just one jumper change to accommodate both types of drive
 
-	...
+    ...
 
-	VIC1541 1540001-01   Very early version, long board.
-			1540001-03   As above, only the ROMs are different.
-			1540008-01
+    VIC1541 1540001-01   Very early version, long board.
+            1540001-03   As above, only the ROMs are different.
+            1540008-01
 
-	1541    1540048-01   Shorter board with a 40 pin gate array, Alps mech.
-			1540048-03   As above, but Newtronics mech.
-			1540049      Similar to above
-			1540050      Similar to above, Alps mechanism.
+    1541    1540048-01   Shorter board with a 40 pin gate array, Alps mech.
+            1540048-03   As above, but Newtronics mech.
+            1540049      Similar to above
+            1540050      Similar to above, Alps mechanism.
 
-	SX64    250410-01    Design most similar to 1540048-01, Alps mechanism.
+    SX64    250410-01    Design most similar to 1540048-01, Alps mechanism.
 
-	1541    251777       Function of bridge rects. reversed, Newtronics mech.
-			251830       Same as above
+    1541    251777       Function of bridge rects. reversed, Newtronics mech.
+            251830       Same as above
 
-	1541A   250442-01    Alps or Newtronics drive selected by a jumper.
-	1541A2  250446-01    A 74LS123 replaces the 9602 at UD4.
-	1541B   250448-01    Same as the 1541C, but in a case like the 1541.
-	1541C   250448-01    Short board, new 40/42 pin gate array, 20 pin gate
-						 array and a R/W hybrid chip replace many components.
-						 Uses a Newtronics drive with optical trk 0 sensor.
-	1541C   251854       As above, single DOS ROM IC, trk 0 sensor, 30 pin
-						 IC for R/W ampl & stepper motor control (like 1571).
+    1541A   250442-01    Alps or Newtronics drive selected by a jumper.
+    1541A2  250446-01    A 74LS123 replaces the 9602 at UD4.
+    1541B   250448-01    Same as the 1541C, but in a case like the 1541.
+    1541C   250448-01    Short board, new 40/42 pin gate array, 20 pin gate
+                         array and a R/W hybrid chip replace many components.
+                         Uses a Newtronics drive with optical trk 0 sensor.
+    1541C   251854       As above, single DOS ROM IC, trk 0 sensor, 30 pin
+                         IC for R/W ampl & stepper motor control (like 1571).
 
-	1541-II              A complete redesign using the 40 pin gate array
-						 from the 1451C and a Sony R/W hybrid, but not the
-						 20 pin gate array, single DOS ROM IC.
+    1541-II              A complete redesign using the 40 pin gate array
+                         from the 1451C and a Sony R/W hybrid, but not the
+                         20 pin gate array, single DOS ROM IC.
 
-	NOTE: These system boards are the 60 Hz versions.
-		  The -02 and -04 boards are probably the 50 Hz versions.
+    NOTE: These system boards are the 60 Hz versions.
+          The -02 and -04 boards are probably the 50 Hz versions.
 
-	The ROMs appear to be completely interchangeable. For instance, the
-	first version of ROM for the 1541-II contained the same code as the
-	last version of the 1541. I copy the last version of the 1541-II ROM
-	into two 68764 EPROMs and use them in my original 1541 (long board).
-	Not only do they work, but they work better than the originals.
+    The ROMs appear to be completely interchangeable. For instance, the
+    first version of ROM for the 1541-II contained the same code as the
+    last version of the 1541. I copy the last version of the 1541-II ROM
+    into two 68764 EPROMs and use them in my original 1541 (long board).
+    Not only do they work, but they work better than the originals.
 
 
-	http://www.amiga-stuff.com/hardware/cbmboards.html
+    http://www.amiga-stuff.com/hardware/cbmboards.html
 
 */
 
 /*
 
-	TODO:
+    TODO:
 
-	- allocate track buffer runtime
-	- accurate timing
-	- D64 to G64 conversion
-	- activity led
-	- write to G64
+    - allocate track buffer runtime
+    - accurate timing
+    - D64 to G64 conversion
+    - activity led
+    - write to G64
 
 */
 
@@ -393,18 +393,18 @@ static READ8_DEVICE_HANDLER( via0_pb_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PB0		DATA IN
-		PB1		DATA OUT
-		PB2		CLK IN
-		PB3		CLK OUT
-		PB4		ATNA
-		PB5		J1
-		PB6		J2
-		PB7		ATN IN
+        PB0     DATA IN
+        PB1     DATA OUT
+        PB2     CLK IN
+        PB3     CLK OUT
+        PB4     ATNA
+        PB5     J1
+        PB6     J2
+        PB7     ATN IN
 
-	*/
+    */
 
 	c1541_t *c1541 = get_safe_token(device->owner);
 	UINT8 data = 0;
@@ -428,18 +428,18 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PB0		DATA IN
-		PB1		DATA OUT
-		PB2		CLK IN
-		PB3		CLK OUT
-		PB4		ATNA
-		PB5		J1
-		PB6		J2
-		PB7		ATN IN
+        PB0     DATA IN
+        PB1     DATA OUT
+        PB2     CLK IN
+        PB3     CLK OUT
+        PB4     ATNA
+        PB5     J1
+        PB6     J2
+        PB7     ATN IN
 
-	*/
+    */
 
 	c1541_t *c1541 = get_safe_token(device->owner);
 
@@ -486,18 +486,18 @@ static READ8_DEVICE_HANDLER( c1541c_via0_pa_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		TR00 SENCE
-		PA1
-		PA2
-		PA3
-		PA4
-		PA5
-		PA6
-		PA7
+        PA0     TR00 SENCE
+        PA1
+        PA2
+        PA3
+        PA4
+        PA5
+        PA6
+        PA7
 
-	*/
+    */
 
 	c1541_t *c1541 = get_safe_token(device->owner);
 
@@ -531,18 +531,18 @@ static READ8_DEVICE_HANDLER( c2031_via0_pa_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		DI0
-		PA1		DI1
-		PA2		DI2
-		PA3		DI3
-		PA4		DI4
-		PA5		DI5
-		PA6		DI6
-		PA7		DI7
+        PA0     DI0
+        PA1     DI1
+        PA2     DI2
+        PA3     DI3
+        PA4     DI4
+        PA5     DI5
+        PA6     DI6
+        PA7     DI7
 
-	*/
+    */
 
 	return 0;
 }
@@ -551,36 +551,36 @@ static WRITE8_DEVICE_HANDLER( c2031_via0_pa_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		DI0
-		PA1		DI1
-		PA2		DI2
-		PA3		DI3
-		PA4		DI4
-		PA5		DI5
-		PA6		DI6
-		PA7		DI7
+        PA0     DI0
+        PA1     DI1
+        PA2     DI2
+        PA3     DI3
+        PA4     DI4
+        PA5     DI5
+        PA6     DI6
+        PA7     DI7
 
-	*/
+    */
 }
 
 static READ8_DEVICE_HANDLER( c2031_via0_pb_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PB0		ATNA
-		PB1		NRFD
-		PB2		NDAC
-		PB3		EOI
-		PB4		T/_R
-		PB5		HD SEL
-		PB6		DAV
-		PB7		_ATN
+        PB0     ATNA
+        PB1     NRFD
+        PB2     NDAC
+        PB3     EOI
+        PB4     T/_R
+        PB5     HD SEL
+        PB6     DAV
+        PB7     _ATN
 
-	*/
+    */
 
 	return 0;
 }
@@ -589,18 +589,18 @@ static WRITE8_DEVICE_HANDLER( c2031_via0_pb_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PB0		ATNA
-		PB1		NRFD
-		PB2		NDAC
-		PB3		EOI
-		PB4		T/_R
-		PB5		HD SEL
-		PB6		DAV
-		PB7		_ATN
+        PB0     ATNA
+        PB1     NRFD
+        PB2     NDAC
+        PB3     EOI
+        PB4     T/_R
+        PB5     HD SEL
+        PB6     DAV
+        PB7     _ATN
 
-	*/
+    */
 }
 
 static const via6522_interface c2031_via0_intf =
@@ -639,18 +639,18 @@ static READ8_DEVICE_HANDLER( yb_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		YB0
-		PA1		YB1
-		PA2		YB2
-		PA3		YB3
-		PA4		YB4
-		PA5		YB5
-		PA6		YB6
-		PA7		YB7
+        PA0     YB0
+        PA1     YB1
+        PA2     YB2
+        PA3     YB3
+        PA4     YB4
+        PA5     YB5
+        PA6     YB6
+        PA7     YB7
 
-	*/
+    */
 
 	c1541_t *c1541 = get_safe_token(device->owner);
 
@@ -661,18 +661,18 @@ static WRITE8_DEVICE_HANDLER( yb_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		YB0
-		PA1		YB1
-		PA2		YB2
-		PA3		YB3
-		PA4		YB4
-		PA5		YB5
-		PA6		YB6
-		PA7		YB7
+        PA0     YB0
+        PA1     YB1
+        PA2     YB2
+        PA3     YB3
+        PA4     YB4
+        PA5     YB5
+        PA6     YB6
+        PA7     YB7
 
-	*/
+    */
 
 	c1541_t *c1541 = get_safe_token(device->owner);
 
@@ -683,18 +683,18 @@ static READ8_DEVICE_HANDLER( via1_pb_r )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		PB0		STP0		stepping motor bit 0
-		PB1		STP1		stepping motor bit 1
-		PB2		MTR			motor ON/OFF
-		PB3		ACT			drive 0 LED
-		PB4		WPS			write protect sense
-		PB5		DS0			density select 0
-		PB6		DS1			density select 1
-		PB7		SYNC		SYNC detect line
+        PB0     STP0        stepping motor bit 0
+        PB1     STP1        stepping motor bit 1
+        PB2     MTR         motor ON/OFF
+        PB3     ACT         drive 0 LED
+        PB4     WPS         write protect sense
+        PB5     DS0         density select 0
+        PB6     DS1         density select 1
+        PB7     SYNC        SYNC detect line
 
-	*/
+    */
 
 	c1541_t *c1541 = get_safe_token(device->owner);
 	UINT8 data = 0;
@@ -712,18 +712,18 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		PB0		STP0		stepping motor bit 0
-		PB1		STP1		stepping motor bit 1
-		PB2		MTR			motor ON/OFF
-		PB3		ACT			drive 0 LED
-		PB4		WPS			write protect sense
-		PB5		DS0			density select 0
-		PB6		DS1			density select 1
-		PB7		SYNC		SYNC detect line
+        PB0     STP0        stepping motor bit 0
+        PB1     STP1        stepping motor bit 1
+        PB2     MTR         motor ON/OFF
+        PB3     ACT         drive 0 LED
+        PB4     WPS         write protect sense
+        PB5     DS0         density select 0
+        PB6     DS1         density select 1
+        PB7     SYNC        SYNC detect line
 
-	*/
+    */
 
 	c1541_t *c1541 = get_safe_token(device->owner);
 
@@ -820,7 +820,7 @@ static const via6522_interface c1541_via1_intf =
 -------------------------------------------------*/
 
 static FLOPPY_OPTIONS_START( c1541 )
-//	FLOPPY_OPTION( c1541, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
+//  FLOPPY_OPTION( c1541, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
 	FLOPPY_OPTION( c1541, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
 FLOPPY_OPTIONS_END
 
@@ -1015,13 +1015,13 @@ static DEVICE_START( c1541 )
 	c1541->image = device_find_child_by_tag(device, FLOPPY_0);
 
 	/* allocate track buffer */
-//	c1541->track_buffer = auto_alloc_array(device->machine, UINT8, TRACK_BUFFER_SIZE);
+//  c1541->track_buffer = auto_alloc_array(device->machine, UINT8, TRACK_BUFFER_SIZE);
 
 	/* allocate data timer */
 	c1541->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
 
 	/* register for state saving */
-//	state_save_register_device_item_pointer(device, 0, c1541->track_buffer, TRACK_BUFFER_SIZE);
+//  state_save_register_device_item_pointer(device, 0, c1541->track_buffer, TRACK_BUFFER_SIZE);
 	state_save_register_device_item(device, 0, c1541->address);
 	state_save_register_device_item(device, 0, c1541->track_len);
 	state_save_register_device_item(device, 0, c1541->buffer_pos);

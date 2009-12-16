@@ -252,7 +252,7 @@ static MACHINE_DRIVER_START( apple2gs )
 	MDRV_FLOPPY_APPLE_2_DRIVES_REMOVE()
 	MDRV_FLOPPY_APPLE_2_DRIVES_ADD(apple2gs_floppy525_floppy_config,15,16)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2gs_floppy35_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("2M")

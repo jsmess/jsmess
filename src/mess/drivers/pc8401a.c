@@ -683,7 +683,7 @@ static MACHINE_DRIVER_START( pc8500 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(pc8500_video)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")

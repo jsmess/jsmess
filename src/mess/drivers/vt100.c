@@ -432,7 +432,7 @@ MACHINE_DRIVER_END
  * VT1xx-CB or CL: GPO "ReGIS" board vt100->vt125 upgrade kit (p/n 5414275 paddle board and 5414277 gpo board)
  * VT1xx-CE : DECWord Conversion kit
  * VT1xx-FB : Anti-glare kit
- 
+
  * Info about mask roms and other nasties:
  * A normal 2716 rom has pin 18: /CE; pin 20: /OE; pin 21: VPP (acts as CE2)
  * The vt100 23-031e2/23-061e2, 23-032e2, 23-033e2, and 23-034e2 mask roms

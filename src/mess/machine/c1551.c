@@ -60,18 +60,18 @@ static READ8_HANDLER( c1551_port_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		P0		STEP0
-		P1		STEP1
-		P2		MOTOR ON
-		P3		ACT
-		P4		WPRT
-		P5		DS0
-		P6		DS1
-		P7		ATN
+        P0      STEP0
+        P1      STEP1
+        P2      MOTOR ON
+        P3      ACT
+        P4      WPRT
+        P5      DS0
+        P6      DS1
+        P7      ATN
 
-	*/
+    */
 
 	return 0;
 }
@@ -80,18 +80,18 @@ static WRITE8_HANDLER( c1551_port_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		P0		STEP0
-		P1		STEP1
-		P2		MOTOR ON
-		P3		ACT
-		P4		WPRT
-		P5		DS0
-		P6		DS1
-		P7		ATN
+        P0      STEP0
+        P1      STEP1
+        P2      MOTOR ON
+        P3      ACT
+        P4      WPRT
+        P5      DS0
+        P6      DS1
+        P7      ATN
 
-	*/
+    */
 }
 
 
@@ -114,18 +114,18 @@ static READ8_DEVICE_HANDLER( c1551_tpi_pa_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		6523 P0
-		PA1		6523 P1
-		PA2		6523 P2
-		PA3		6523 P3
-		PA4		6523 P4
-		PA5		6523 P5
-		PA6		6523 P6
-		PA7		6523 P7
+        PA0     6523 P0
+        PA1     6523 P1
+        PA2     6523 P2
+        PA3     6523 P3
+        PA4     6523 P4
+        PA5     6523 P5
+        PA6     6523 P6
+        PA7     6523 P7
 
-	*/
+    */
 
 	return 0;
 }
@@ -134,36 +134,36 @@ static WRITE8_DEVICE_HANDLER( c1551_tpi_pa_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		6523 P0
-		PA1		6523 P1
-		PA2		6523 P2
-		PA3		6523 P3
-		PA4		6523 P4
-		PA5		6523 P5
-		PA6		6523 P6
-		PA7		6523 P7
+        PA0     6523 P0
+        PA1     6523 P1
+        PA2     6523 P2
+        PA3     6523 P3
+        PA4     6523 P4
+        PA5     6523 P5
+        PA6     6523 P6
+        PA7     6523 P7
 
-	*/
+    */
 }
 
 static READ8_DEVICE_HANDLER( c1551_tpi_pb_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PB0		YB0
-		PB1		YB1
-		PB2		YB2
-		PB3		YB3
-		PB4		YB4
-		PB5		YB5
-		PB6		YB6
-		PB7		YB7
+        PB0     YB0
+        PB1     YB1
+        PB2     YB2
+        PB3     YB3
+        PB4     YB4
+        PB5     YB5
+        PB6     YB6
+        PB7     YB7
 
-	*/
+    */
 
 	return 0;
 }
@@ -172,36 +172,36 @@ static WRITE8_DEVICE_HANDLER( c1551_tpi_pb_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PB0		YB0
-		PB1		YB1
-		PB2		YB2
-		PB3		YB3
-		PB4		YB4
-		PB5		YB5
-		PB6		YB6
-		PB7		YB7
+        PB0     YB0
+        PB1     YB1
+        PB2     YB2
+        PB3     YB3
+        PB4     YB4
+        PB5     YB5
+        PB6     YB6
+        PB7     YB7
 
-	*/
+    */
 }
 
 static READ8_DEVICE_HANDLER( c1551_tpi_pc_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PC0		6523 _IRQ
-		PC1		6523 _RES
-		PC2		interface J1
-		PC3		6523 pin 20
-		PC4		SOE
-		PC5		JP1
-		PC6		_SYNC
-		PC7		6523 phi2
+        PC0     6523 _IRQ
+        PC1     6523 _RES
+        PC2     interface J1
+        PC3     6523 pin 20
+        PC4     SOE
+        PC5     JP1
+        PC6     _SYNC
+        PC7     6523 phi2
 
-	*/
+    */
 
 	return 0;
 }
@@ -210,18 +210,18 @@ static WRITE8_DEVICE_HANDLER( c1551_tpi_pc_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PC0		6523 _IRQ
-		PC1		6523 _RES
-		PC2		interface J1
-		PC3		6523 pin 20
-		PC4		SOE
-		PC5		JP1
-		PC6		_SYNC
-		PC7		6523 phi2
+        PC0     6523 _IRQ
+        PC1     6523 _RES
+        PC2     interface J1
+        PC3     6523 pin 20
+        PC4     SOE
+        PC5     JP1
+        PC6     _SYNC
+        PC7     6523 phi2
 
-	*/
+    */
 }
 
 static const tpi6525_interface c1551_tpi_intf =
@@ -243,7 +243,7 @@ static const tpi6525_interface c1551_tpi_intf =
 
 static FLOPPY_OPTIONS_START( c1551 )
 	FLOPPY_OPTION( c1551, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
-//	FLOPPY_OPTION( c1551, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
+//  FLOPPY_OPTION( c1551, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
 FLOPPY_OPTIONS_END
 
 /*-------------------------------------------------
@@ -271,7 +271,7 @@ static MACHINE_DRIVER_START( c1551 )
 	MDRV_CPU_PROGRAM_MAP(c1551_map)
 
 	MDRV_TPI6525_ADD(M6525_TAG, c1551_tpi_intf)
-//	MDRV_MOS6523_ADD(M6523_TAG, 2000000, c1551_mos6523_intf)
+//  MDRV_MOS6523_ADD(M6523_TAG, 2000000, c1551_mos6523_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_TAG, c1551_floppy_config)
 MACHINE_DRIVER_END

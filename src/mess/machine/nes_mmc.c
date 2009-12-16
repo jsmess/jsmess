@@ -176,7 +176,7 @@ static UINT8 IRQ_reset;
 static UINT8 IRQ_status;
 static UINT8 IRQ_mode;
 
-//int MMC1_extended;	/* 0 = normal MMC1 cart, 1 = 512k MMC1, 2 = 1024k MMC1 */
+//int MMC1_extended;    /* 0 = normal MMC1 cart, 1 = 512k MMC1, 2 = 1024k MMC1 */
 
 static write8_space_func mmc_write_low;
 static read8_space_func mmc_read_low;

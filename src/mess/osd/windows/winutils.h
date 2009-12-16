@@ -1,6 +1,6 @@
 //============================================================
 //
-//	winutils.h - Generic Win32 utility code in MESS
+//  winutils.h - Generic Win32 utility code in MESS
 //
 //============================================================
 

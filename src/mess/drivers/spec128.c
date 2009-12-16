@@ -282,7 +282,7 @@ MACHINE_DRIVER_START( spectrum_128 )
 	MDRV_SOUND_ADD("ay8912", AY8912, 1773400)
 	MDRV_SOUND_CONFIG(spectrum_ay_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")

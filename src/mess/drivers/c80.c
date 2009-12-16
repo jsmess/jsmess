@@ -265,7 +265,7 @@ static MACHINE_DRIVER_START( c80 )
 	MDRV_Z80PIO_ADD(Z80PIO1_TAG, pio1_intf)
 	MDRV_Z80PIO_ADD(Z80PIO2_TAG, pio2_intf)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, c80_cassette_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1K")

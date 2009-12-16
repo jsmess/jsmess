@@ -10,7 +10,7 @@
 #include "machine/ins8250.h"
 #include "machine/i8255a.h"
 #include "machine/8237dma.h"
-	
+
 typedef struct _pc_state pc_state;
 struct _pc_state
 {
@@ -23,9 +23,9 @@ struct _pc_state
 	UINT8	u73_q2;
 	UINT8	out1;
 	int dma_channel;
-	UINT8 dma_offset[2][4];	
+	UINT8 dma_offset[2][4];
 	UINT8 pc_spkrdata;
-	UINT8 pc_input;		
+	UINT8 pc_input;
 
 	int						ppi_portc_switch_high;
 	int						ppi_speaker;
@@ -37,7 +37,7 @@ struct _pc_state
 	UINT8					ppi_shift_register;
 	UINT8					ppi_shift_enable;
 	write8_space_func		ppi_clock_callback;
-	write8_space_func		ppi_data_callback;	
+	write8_space_func		ppi_data_callback;
 };
 
 /*----------- defined in machine/pc.c -----------*/

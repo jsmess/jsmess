@@ -398,7 +398,7 @@ static MACHINE_DRIVER_START( comx35_pal )
 	MDRV_PRINTER_ADD("printer")
 
 	MDRV_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
@@ -427,10 +427,10 @@ static MACHINE_DRIVER_START( comx35_ntsc )
 	MDRV_PRINTER_ADD("printer")
 
 	MDRV_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("32K")	
+	MDRV_RAM_DEFAULT_SIZE("32K")
 MACHINE_DRIVER_END
 
 /* ROMs */

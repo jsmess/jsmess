@@ -727,7 +727,7 @@ static MACHINE_DRIVER_START ( to7 )
 /* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("40K")
-	MDRV_RAM_EXTRA_OPTIONS("24K,48K")	 
+	MDRV_RAM_EXTRA_OPTIONS("24K,48K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( t9000 )
@@ -906,11 +906,11 @@ static MACHINE_DRIVER_START ( to770 )
 	MDRV_PIA6821_MODIFY( THOM_PIA_SYS, to770_pia6821_sys )
 
     MDRV_MC6846_MODIFY( "mc6846", to770_timer )
-	 
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
-	MDRV_RAM_EXTRA_OPTIONS("64K")	 
+	MDRV_RAM_EXTRA_OPTIONS("64K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( to770a )
@@ -1094,7 +1094,7 @@ static MACHINE_DRIVER_START ( mo5 )
 	MDRV_CARTSLOT_MODIFY("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("m5,rom")
 	MDRV_CARTSLOT_LOAD(mo5_cartridge)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("112K")
@@ -1433,7 +1433,7 @@ static MACHINE_DRIVER_START ( to9 )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
      MDRV_MC6846_MODIFY( "mc6846", to9_timer )
-	 
+
 	 /* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("192K")
@@ -1652,7 +1652,7 @@ static MACHINE_DRIVER_START ( to8 )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
      MDRV_MC6846_MODIFY( "mc6846", to8_timer )
-	 
+
 	 /* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("512K")
@@ -1803,7 +1803,7 @@ static MACHINE_DRIVER_START ( to9p )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
      MDRV_MC6846_MODIFY( "mc6846", to9p_timer )
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("512K")
@@ -2140,10 +2140,10 @@ static MACHINE_DRIVER_START ( mo6 )
 	MDRV_CARTSLOT_MODIFY("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("m5,rom")
 	MDRV_CARTSLOT_LOAD(mo5_cartridge)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")	
+	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( pro128 )
@@ -2368,10 +2368,10 @@ static MACHINE_DRIVER_START ( mo5nr )
 	MDRV_CARTSLOT_MODIFY("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("m5,rom")
 	MDRV_CARTSLOT_LOAD(mo5_cartridge)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")	
+	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 
 COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, 0, to, "Thomson", "MO5 NR", 0 )

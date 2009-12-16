@@ -1,9 +1,9 @@
 /*********************************************************************
 
-	mslegacy.h
+    mslegacy.h
 
-	Defines since removed from MAME, but kept in MESS for legacy
-	reasons
+    Defines since removed from MAME, but kept in MESS for legacy
+    reasons
 
 *********************************************************************/
 

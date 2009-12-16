@@ -13,7 +13,7 @@
 
 /*-------------------------------------------------
     mess_display_help - display MESS help to
-	standard output
+    standard output
 -------------------------------------------------*/
 
 void mess_display_help(void)

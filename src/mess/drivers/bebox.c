@@ -169,7 +169,7 @@ static MACHINE_DRIVER_START( bebox )
 	MDRV_SMC37C78_ADD("smc37c78", pc_fdc_upd765_connected_1_drive_interface)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, bebox_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32M")

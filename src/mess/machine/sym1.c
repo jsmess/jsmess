@@ -193,7 +193,7 @@ static WRITE8_DEVICE_HANDLER( sym1_via2_a_w )
 
 	logerror("SYM1 VIA2 W 0x%02x\n", data);
 
-	if ((input_port_read(device->machine, "WP") & 0x01) && !(data & 0x01)) {	
+	if ((input_port_read(device->machine, "WP") & 0x01) && !(data & 0x01)) {
 		memory_nop_write(cpu0space, 0xa600, 0xa67f, 0, 0);
 	} else {
 		memory_install_write_bank(cpu0space, 0xa600, 0xa67f, 0, 0, "bank5");

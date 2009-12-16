@@ -4,19 +4,19 @@
 
         17/07/2009 Skeleton driver.
 
-	Apple ASICs identified:
-	-----------------------
-	343S1125	Grand Central (SWIM III, Sound, VIA)
-	341S0060	Cuda (ADB, PRAM)
-	343S1146	??? (likely SCSI due to position on board)
-	343S1191 (x2)   ??? (apparently clock generators)
+    Apple ASICs identified:
+    -----------------------
+    343S1125    Grand Central (SWIM III, Sound, VIA)
+    341S0060    Cuda (ADB, PRAM)
+    343S1146    ??? (likely SCSI due to position on board)
+    343S1191 (x2)   ??? (apparently clock generators)
 
 
-	Other chips
-	-----------
-	Z8530 SCC
-	CS4217 audio DAC
-	Bt856 video DAC
+    Other chips
+    -----------
+    Z8530 SCC
+    CS4217 audio DAC
+    Bt856 video DAC
 
 
 ****************************************************************************/

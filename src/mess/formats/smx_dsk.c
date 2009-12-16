@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	formats/smx_dsk.c
+    formats/smx_dsk.c
 
-	Specialist MX disk images
+    Specialist MX disk images
 
 *********************************************************************/
 
@@ -30,7 +30,7 @@ static int smx_get_tracks_per_disk(floppy_image *floppy)
 
 static UINT64 smx_translate_offset(floppy_image *floppy,
 	 int track, int head, int sector)
-{		
+{
 	return (track * 1024 * 5 * 2) + (head * 1024 * 5) + 1024 * sector;
 }
 
@@ -147,8 +147,8 @@ static FLOPPY_CONSTRUCT(smx_dsk_construct)
 	callbacks->get_heads_per_disk = smx_get_heads_per_disk;
 	callbacks->get_tracks_per_disk = smx_get_tracks_per_disk;
 	callbacks->get_indexed_sector_info = smx_get_indexed_sector_info;
-	
-	return FLOPPY_ERROR_SUCCESS;	
+
+	return FLOPPY_ERROR_SUCCESS;
 }
 
 

@@ -1,18 +1,18 @@
 /***************************************************************************
 
-	QX-10
+    QX-10
 
-	Preliminary driver by Mariusz Wojcieszek
+    Preliminary driver by Mariusz Wojcieszek
 
-	Status:
-	Driver boots and load CP/M from floppy image. Needs upd7220 for gfx
-	and keyboard hooked to upd7021.
+    Status:
+    Driver boots and load CP/M from floppy image. Needs upd7220 for gfx
+    and keyboard hooked to upd7021.
 
-	Done:
-	- preliminary memory map
-	- floppy (upd765)
-	- DMA
-	- Interrupts (pic8295)
+    Done:
+    - preliminary memory map
+    - floppy (upd765)
+    - DMA
+    - Interrupts (pic8295)
 ****************************************************************************/
 
 #include "driver.h"
@@ -30,7 +30,7 @@
 #define MAIN_CLK	15974400
 
 /*
-	Driver data
+    Driver data
 */
 
 typedef struct _qx10_state qx10_state;
@@ -57,7 +57,7 @@ struct _qx10_state
 };
 
 /*
-	Memory
+    Memory
 */
 static void update_memory_mapping(running_machine *machine)
 {
@@ -121,7 +121,7 @@ static WRITE8_HANDLER(cmos_sel_w)
 }
 
 /*
-	FDD
+    FDD
 */
 
 static const floppy_config qx10_floppy_config =
@@ -181,7 +181,7 @@ static READ8_HANDLER(qx10_30_r)
 };
 
 /*
-	DMA8237
+    DMA8237
 */
 static WRITE_LINE_DEVICE_HANDLER( dma_hrq_changed )
 {
@@ -209,10 +209,10 @@ static WRITE_LINE_DEVICE_HANDLER( tc_w )
 }
 
 /*
-	8237 DMA (Master)
-	Channel 1: Floppy disk
-	Channel 2: GDC
-	Channel 3: Option slots
+    8237 DMA (Master)
+    Channel 1: Floppy disk
+    Channel 2: GDC
+    Channel 3: Option slots
 */
 static I8237_INTERFACE( qx10_dma8237_1_interface )
 {
@@ -226,11 +226,11 @@ static I8237_INTERFACE( qx10_dma8237_1_interface )
 };
 
 /*
-	8237 DMA (Slave)
-	Channel 1: Option slots #1
-	Channel 2: Option slots #2
-	Channel 3: Option slots #3
-	Channel 4: Option slots #4
+    8237 DMA (Slave)
+    Channel 1: Option slots #1
+    Channel 2: Option slots #2
+    Channel 3: Option slots #3
+    Channel 4: Option slots #4
 */
 static I8237_INTERFACE( qx10_dma8237_2_interface )
 {
@@ -244,7 +244,7 @@ static I8237_INTERFACE( qx10_dma8237_2_interface )
 };
 
 /*
-	8255
+    8255
 */
 static I8255A_INTERFACE(qx10_i8255_interface)
 {
@@ -257,7 +257,7 @@ static I8255A_INTERFACE(qx10_i8255_interface)
 };
 
 /*
-	MC146818
+    MC146818
 */
 static READ8_HANDLER(mc146818_data_r)
 {
@@ -278,9 +278,9 @@ static WRITE8_HANDLER(mc146818_offset_w)
 };
 
 /*
-	UPD7201
-	Channel A: Keyboard
-	Channel B: RS232
+    UPD7201
+    Channel A: Keyboard
+    Channel B: RS232
 */
 static UPD7201_INTERFACE(qx10_upd7201_interface)
 {
@@ -317,11 +317,11 @@ static UPD7201_INTERFACE(qx10_upd7201_interface)
 };
 
 /*
-	Timer 0
-	Counter	CLK							Gate					OUT				Operation
-	0		Keyboard clock (1200bps)	Memory register D0		Speaker timer	Speaker timer (100ms)
-	1		Keyboard clock (1200bps)	+5V						8259A (10E) IR5	Software timer
-	2		Clock 1,9668MHz				Memory register D7		8259 (12E) IR1	Software timer
+    Timer 0
+    Counter CLK                         Gate                    OUT             Operation
+    0       Keyboard clock (1200bps)    Memory register D0      Speaker timer   Speaker timer (100ms)
+    1       Keyboard clock (1200bps)    +5V                     8259A (10E) IR5 Software timer
+    2       Clock 1,9668MHz             Memory register D7      8259 (12E) IR1  Software timer
 */
 
 static const struct pit8253_config qx10_pit8253_1_config =
@@ -334,11 +334,11 @@ static const struct pit8253_config qx10_pit8253_1_config =
 };
 
 /*
- 	Timer 1
-	Counter	CLK					Gate		OUT					Operation
-	0		Clock 1,9668MHz		+5V			Speaker frequency	1kHz
-	1		Clock 1,9668MHz		+5V			Keyboard clock		1200bps (Clock / 1664)
-	2		Clock 1,9668MHz		+5V			RS-232C baud rate	9600bps (Clock / 208)
+    Timer 1
+    Counter CLK                 Gate        OUT                 Operation
+    0       Clock 1,9668MHz     +5V         Speaker frequency   1kHz
+    1       Clock 1,9668MHz     +5V         Keyboard clock      1200bps (Clock / 1664)
+    2       Clock 1,9668MHz     +5V         RS-232C baud rate   9600bps (Clock / 208)
 */
 static const struct pit8253_config qx10_pit8253_2_config =
 {
@@ -351,14 +351,14 @@ static const struct pit8253_config qx10_pit8253_2_config =
 
 
 /*
-	Master PIC8259
-	IR0		Power down detection interrupt
-	IR1		Software timer #1 interrupt
-	IR2		External interrupt INTF1
-	IR3		External interrupt INTF2
-	IR4		Keyboard/RS232 interrupt
-	IR5		CRT/lightpen interrupt
-	IR6		Floppy controller interrupt
+    Master PIC8259
+    IR0     Power down detection interrupt
+    IR1     Software timer #1 interrupt
+    IR2     External interrupt INTF1
+    IR3     External interrupt INTF2
+    IR4     Keyboard/RS232 interrupt
+    IR5     CRT/lightpen interrupt
+    IR6     Floppy controller interrupt
 */
 
 static PIC8259_SET_INT_LINE( qx10_pic8259_master_set_int_line )
@@ -373,15 +373,15 @@ static const struct pic8259_interface qx10_pic8259_master_config =
 };
 
 /*
-	Slave PIC8259
-	IR0		Printer interrupt
-	IR1		External interrupt #1
-	IR2		Calendar clock interrupt
-	IR3		External interrupt #2
-	IR4		External interrupt #3
-	IR5		Software timer #2 interrupt
-	IR6		External interrupt #4
-	IR7		External interrupt #5
+    Slave PIC8259
+    IR0     Printer interrupt
+    IR1     External interrupt #1
+    IR2     Calendar clock interrupt
+    IR3     External interrupt #2
+    IR4     External interrupt #3
+    IR5     Software timer #2 interrupt
+    IR6     External interrupt #4
+    IR7     External interrupt #5
 
 */
 
@@ -445,7 +445,7 @@ static INPUT_PORTS_START( qx10 )
 INPUT_PORTS_END
 
 /*
-	Video
+    Video
 */
 static const compis_gdc_interface i82720_interface =
 {
@@ -516,7 +516,7 @@ static MACHINE_DRIVER_START( qx10 )
 
     MDRV_VIDEO_START(compis_gdc)
     MDRV_VIDEO_UPDATE(compis_gdc)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("256K")
@@ -526,13 +526,13 @@ MACHINE_DRIVER_END
 ROM_START( qx10 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "qx10boot.bin", 0x0000, 0x0800, CRC(f8dfcba5) SHA1(a7608f8aa7da355dcaf257ee28b66ded8974ce3a))
-	
+
 	/* This is probably the i8039 program ROM for the Q10MF Multifont card, and the actual font ROMs are missing (6 * HM43128) */
 	/* The first part of this rom looks like code for an embedded controller?
         From 8300 on, looks like a characters generator */
 	ROM_REGION( 0x800, "i8039", 0 )
 	ROM_LOAD( "m12020a.3e", 0x0000, 0x0800, CRC(fa27f333) SHA1(73d27084ca7b002d5f370220d8da6623a6e82132))
-	
+
 	/* This rom looks like a character generator */
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "qge.2e", 0x0000, 0x0800, CRC(ed93cb81) SHA1(579e68bde3f4184ded7d89b72c6936824f48d10b))

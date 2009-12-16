@@ -374,7 +374,7 @@ static ADDRESS_MAP_START( intv2_mem , ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 /* This is needed because MAME core does not allow PULSE_LINE.
-	The time interval is not critical, although it should be below 1000. */
+    The time interval is not critical, although it should be below 1000. */
 
 static TIMER_CALLBACK(intv_interrupt2_complete)
 {

@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Robotron A7150
 
         04/10/2009 Skeleton driver.
@@ -20,8 +20,8 @@ static INPUT_PORTS_START( a7150 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(a7150) 
-{	
+static MACHINE_RESET(a7150)
+{
 }
 
 static VIDEO_START( a7150 )
@@ -39,7 +39,7 @@ static MACHINE_DRIVER_START( a7150 )
     MDRV_CPU_PROGRAM_MAP(a7150_mem)
 
     MDRV_MACHINE_RESET(a7150)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)

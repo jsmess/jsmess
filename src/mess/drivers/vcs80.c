@@ -210,10 +210,10 @@ static MACHINE_DRIVER_START( vcs80 )
 
 	/* devices */
 	MDRV_Z80PIO_ADD(Z80PIO_TAG, pio_intf)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("1K")	
+	MDRV_RAM_DEFAULT_SIZE("1K")
 MACHINE_DRIVER_END
 
 /* ROMs */

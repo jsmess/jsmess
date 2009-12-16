@@ -159,7 +159,7 @@ void serial_device_setup(const device_config *image, int baud_rate, int num_data
 	serial_connection_out(image->machine,&serial_devices[id].connection);
 	transmit_register_reset(&serial_devices[id].transmit_reg);
 	receive_register_reset(&serial_devices[id].receive_reg);
-	receive_register_setup(&serial_devices[id].receive_reg, &serial_devices[id].data_form);	
+	receive_register_setup(&serial_devices[id].receive_reg, &serial_devices[id].data_form);
 }
 
 

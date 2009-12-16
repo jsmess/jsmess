@@ -303,7 +303,7 @@ static MACHINE_DRIVER_START( mtx512 )
 
 	/* snapshot */
 	MDRV_SNAPSHOT_ADD("snapshot", mtx, "mtb", 0.5)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
@@ -324,7 +324,7 @@ static MACHINE_DRIVER_START( rs128 )
 	MDRV_IMPORT_FROM(mtx512)
 
 	MDRV_Z80DART_ADD("z80dart", MTX_SYSTEM_CLOCK, mtx_dart_intf)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")

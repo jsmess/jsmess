@@ -51,13 +51,13 @@ static int validate_device(const mess_device_class *devclass)
 	}
 
 	/* File Extensions Checks
-	 *
-	 * Checks the following
-	 *
-	 * 1.  Tests the integrity of the string list
-	 * 2.  Checks for duplicate extensions
-	 * 3.  Makes sure that all extensions are either lower case chars or numbers
-	 */
+     *
+     * Checks the following
+     *
+     * 1.  Tests the integrity of the string list
+     * 2.  Checks for duplicate extensions
+     * 3.  Makes sure that all extensions are either lower case chars or numbers
+     */
 	s = mess_device_get_info_string(devclass, MESS_DEVINFO_STR_FILE_EXTENSIONS);
 	if (!s)
 	{

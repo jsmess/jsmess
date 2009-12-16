@@ -364,9 +364,9 @@ void matsucd_command_w( running_machine *machine, UINT8 data )
 
 	if ( cd.cdda_set == 0 )
 	{
-		// 2009-10, FP: for some reason, cdda_from_cdrom was not returning the correct 
-		// CDDA device. Hence, as a temp workaround, I added the cdda to the struct 
-		// and its tag is configured in matsucd_init 
+		// 2009-10, FP: for some reason, cdda_from_cdrom was not returning the correct
+		// CDDA device. Hence, as a temp workaround, I added the cdda to the struct
+		// and its tag is configured in matsucd_init
 		if ( cd.cdrom )
 			cdda_set_cdrom( cd.cdda, cd.cdrom);
 

@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////
 //////   HECTOR HEADER FILE /////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
-/*      
+/*
         Hector 2HR+
         Victor
         Hector 2HR
@@ -10,22 +10,22 @@
         Hector MX80c
         Hector1
         Interact
-        
+
         12/05/2009 Skeleton driver - Micko : mmicko@gmail.com
-	    31/06/2009 Video - Robbbert
+        31/06/2009 Video - Robbbert
 
         29/10/2009 Update skeleton to functional machine
                           by yo_fr       (jj.stac@aliceadsl.fr)
-               
+
                => add Keyboard,
-               => add color, 
+               => add color,
                => add cassette,
                => add sn76477 sound and 1bit sound,
                => add joysticks (stick, pot, fire)
-               => add BR/HR switching 
+               => add BR/HR switching
                => add bank switch for HRX
                => add device MX80c and bank switching for the ROM
-    Importante note : the keyboard function add been piked from 
+    Importante note : the keyboard function add been piked from
                       DChector project : http://dchector.free.fr/ made by DanielCoulom
                       (thank's Daniel)
     TODO : Add the cartridge function,

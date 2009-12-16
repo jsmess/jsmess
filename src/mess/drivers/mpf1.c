@@ -12,13 +12,13 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- remove halt callback
-	- crt board
-	- speech board
-	- printers
-	- clickable artwork
+    - remove halt callback
+    - crt board
+    - speech board
+    - printers
+    - clickable artwork
 
 */
 

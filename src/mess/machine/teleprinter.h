@@ -20,7 +20,7 @@ struct _teleprinter_interface
 ***************************************************************************/
 #define TELEPRINTER_TAG "teleprinter"
 #define TELEPRINTER_SCREEN_TAG "tty_screen"
- 
+
 #define GENERIC_TELEPRINTER DEVICE_GET_INFO_NAME( teleprinter )
 
 #define MDRV_GENERIC_TELEPRINTER_ADD(_tag, _intrf) \
@@ -30,7 +30,7 @@ struct _teleprinter_interface
 #define MDRV_GENERIC_TELEPRINTER_REMOVE(_tag)		\
     MDRV_DEVICE_REMOVE(_tag)
 
-	
+
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/

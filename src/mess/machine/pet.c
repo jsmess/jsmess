@@ -434,8 +434,8 @@ WRITE8_HANDLER( cbm8096_w )
 			else
 				memory_nop_write(space, 0xe800, 0xefff, 0, 0);
 		}
-		
-		
+
+
 		if ((data & 2) == 0) {
 			memory_install_write_bank(space, 0xc000, 0xe7ff, 0, 0, "bank6");
 			memory_install_write_bank(space, 0xf000, 0xffef, 0, 0, "bank8");
@@ -458,9 +458,9 @@ WRITE8_HANDLER( cbm8096_w )
 				memory_install_write_bank(space, 0x8000, 0x8fff, 0, 0, "bank1");
 			else
 				memory_nop_write(space, 0x8000, 0x8fff, 0, 0);
-		}		
+		}
 
-		if ((data & 1) == 0 ){ 
+		if ((data & 1) == 0 ){
 			memory_install_write_bank(space, 0x9000, 0x9fff, 0, 0, "bank2");
 			memory_install_write_bank(space, 0xa000, 0xafff, 0, 0, "bank3");
 			memory_install_write_bank(space, 0xb000, 0xbfff, 0, 0, "bank4");
@@ -468,7 +468,7 @@ WRITE8_HANDLER( cbm8096_w )
 			memory_nop_write(space, 0x9000, 0x9fff, 0, 0);
 			memory_nop_write(space, 0xa000, 0xafff, 0, 0);
 			memory_nop_write(space, 0xb000, 0xbfff, 0, 0);
-		}		
+		}
 
 		if (data & 4)
 		{

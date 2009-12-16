@@ -58,7 +58,7 @@ void print_game_categories(FILE *out, const game_driver *game, const input_port_
 
 /*-------------------------------------------------
     print_game_device - prints out all info on
-	MESS-specific devices
+    MESS-specific devices
 -------------------------------------------------*/
 
 void print_game_device(FILE *out, const game_driver *game, const machine_config *config)
@@ -114,15 +114,15 @@ void print_game_device(FILE *out, const game_driver *game, const machine_config 
 
 /*-------------------------------------------------
     print_game_ramoptions - prints out all RAM
-	options for this system
+    options for this system
 -------------------------------------------------*/
 void print_game_ramoptions(FILE *out, const game_driver *game, const machine_config *config)
 {
 	const device_config *device;
-	
+
 	for (device = ram_first(config); device != NULL; device = ram_next(device))
 	{
-		ram_config *config = device->inline_config;	
+		ram_config *config = device->inline_config;
 		fprintf(out, "\t\t<ramoption default=\"1\">%u</ramoption>\n",  messram_parse_string(config->default_size));
 		if (config->extra_options != NULL)
 		{
@@ -141,6 +141,6 @@ void print_game_ramoptions(FILE *out, const game_driver *game, const machine_con
 				s += strlen(s) + 1;
 			}
 			astring_free(buffer);
-		}	
+		}
 	}
 }

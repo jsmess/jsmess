@@ -121,8 +121,8 @@ static MACHINE_DRIVER_START( ht68k )
     MDRV_MACHINE_RESET(ht68k)
 
     /* video hardware */
-    MDRV_IMPORT_FROM( generic_terminal )	
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,ht68k_terminal_intf)	
+    MDRV_IMPORT_FROM( generic_terminal )
+	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,ht68k_terminal_intf)
 
 	MDRV_DUART68681_ADD( "duart68681", XTAL_8MHz / 2, ht68k_duart68681_config )
 	MDRV_WD1770_ADD("wd1770", ht68k_wd17xx_interface )

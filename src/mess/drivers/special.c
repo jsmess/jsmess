@@ -479,10 +479,10 @@ static MACHINE_DRIVER_START( specimx )
 	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(specimx_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")	
+	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( erik )
@@ -519,10 +519,10 @@ static MACHINE_DRIVER_START( erik )
 	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(specimx_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("192K")	
+	MDRV_RAM_DEFAULT_SIZE("192K")
 MACHINE_DRIVER_END
 
 /* ROM definition */

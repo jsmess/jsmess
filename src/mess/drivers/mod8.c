@@ -1,8 +1,8 @@
 /***************************************************************************
 
-		Microsystems International Limited MOD-8
+        Microsystems International Limited MOD-8
 
-		02/12/2009 Working driver [Miodrag Milanovic]
+        02/12/2009 Working driver [Miodrag Milanovic]
         18/11/2009 Skeleton driver.
 
 ****************************************************************************/
@@ -17,13 +17,13 @@ static int tty_cnt  = 0;
 
 static WRITE8_HANDLER(out_w)
 {
-	const device_config	*devconf = devtag_get_device(space->machine, TELEPRINTER_TAG);	
-	
+	const device_config	*devconf = devtag_get_device(space->machine, TELEPRINTER_TAG);
+
 	tty_data >>= 1;
 	tty_data |= (data & 0x01) ? 0x8000 : 0;
 	tty_cnt++;
 	if (tty_cnt==10) {
-		teleprinter_write(devconf,0,(tty_data >> 7) & 0x7f);		
+		teleprinter_write(devconf,0,(tty_data >> 7) & 0x7f);
 		tty_cnt = 0;
 	}
 }
@@ -31,7 +31,7 @@ static WRITE8_HANDLER(out_w)
 static WRITE8_HANDLER(tty_w)
 {
 	tty_data = 0;
-	tty_cnt = 0;		
+	tty_cnt = 0;
 }
 
 static READ8_HANDLER(tty_r)
@@ -87,11 +87,11 @@ static MACHINE_DRIVER_START( mod8 )
     MDRV_CPU_IO_MAP(mod8_io)
 
     MDRV_MACHINE_RESET(mod8)
-    
+
     /* video hardware */
-    MDRV_IMPORT_FROM( generic_teleprinter )	
-	MDRV_GENERIC_TELEPRINTER_ADD(TELEPRINTER_TAG,mod8_teleprinter_intf)	
-	
+    MDRV_IMPORT_FROM( generic_teleprinter )
+	MDRV_GENERIC_TELEPRINTER_ADD(TELEPRINTER_TAG,mod8_teleprinter_intf)
+
 MACHINE_DRIVER_END
 
 

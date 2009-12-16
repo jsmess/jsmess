@@ -1652,7 +1652,7 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 {
 	int val = param;
 	int v;
-	
+
 	if(strcmp(machine->gamedrv->name,"x68030") == 0)
 		v = 0x0b;
 	else
@@ -1721,8 +1721,8 @@ static WRITE16_HANDLER( x68k_rom0_w )
 
 static READ16_HANDLER( x68k_emptyram_r )
 {
-	/* this location is unused RAM, access here causes a bus error 
-	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
+	/* this location is unused RAM, access here causes a bus error
+       Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
 //  cputag_set_input_line_and_vector(space->machine, "maincpu",2,ASSERT_LINE,current_vector[2]);
@@ -1738,8 +1738,8 @@ static READ16_HANDLER( x68k_emptyram_r )
 
 static WRITE16_HANDLER( x68k_emptyram_w )
 {
-	/* this location is unused RAM, access here causes a bus error 
-	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
+	/* this location is unused RAM, access here causes a bus error
+       Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
 //  cputag_set_input_line_and_vector(space->machine, "maincpu",2,ASSERT_LINE,current_vector[2]);
@@ -1940,12 +1940,12 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
-//	AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
+//  AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(x68030_map, ADDRESS_SPACE_PROGRAM, 32)
-//	AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
+//  AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)
 //  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE(&x68k_gvram)
 //  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w) AM_BASE(&x68k_tvram)
@@ -1975,7 +1975,7 @@ static ADDRESS_MAP_START(x68030_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
-//	AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)
+//  AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -2641,7 +2641,7 @@ static MACHINE_DRIVER_START( x68000 )
 
 	MDRV_UPD72065_ADD("upd72065", fdc_interface)
 	MDRV_FLOPPY_4_DRIVES_ADD(x68k_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4M")
@@ -2650,13 +2650,13 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( x68kxvi )
 	MDRV_IMPORT_FROM( x68000 )
-	
+
 	MDRV_CPU_REPLACE("maincpu", M68000, 16000000)  /* 16 MHz */
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( x68030 )
 	MDRV_IMPORT_FROM( x68000 )
-	
+
 	MDRV_CPU_REPLACE("maincpu", M68030, 25000000)  /* 25 MHz 68EC030 */
 	MDRV_CPU_PROGRAM_MAP(x68030_map)
 

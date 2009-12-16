@@ -1,9 +1,9 @@
 /****************************************************************************
 
-	pile.h
+    pile.h
 
-	Utility code to implement "piles"; blocks of data that are built up
-	and then detached
+    Utility code to implement "piles"; blocks of data that are built up
+    and then detached
 
 ****************************************************************************/
 

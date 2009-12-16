@@ -1,24 +1,24 @@
 /*
 
-	http://www2.odn.ne.jp/~haf09260/Pc80/EnrPc.htm
-	http://home1.catvmics.ne.jp/~kanemoto/n80/inside.html
-	http://www.geocities.jp/retro_zzz/machines/nec/8001/index.html
+    http://www2.odn.ne.jp/~haf09260/Pc80/EnrPc.htm
+    http://home1.catvmics.ne.jp/~kanemoto/n80/inside.html
+    http://www.geocities.jp/retro_zzz/machines/nec/8001/index.html
 
 */
 
 /*
 
-	TODO:
+    TODO:
 
-	- print time$/date$ stalls
-	- uPD3301 attributes
-	- PCG1000
-	- Intel 8251
-	- cassette
-	- floppy
-	- PC-8011
-	- PC-8021
-	- PC-8031
+    - print time$/date$ stalls
+    - uPD3301 attributes
+    - PCG1000
+    - Intel 8251
+    - cassette
+    - floppy
+    - PC-8011
+    - PC-8021
+    - PC-8031
 
 */
 
@@ -42,18 +42,18 @@ static WRITE8_HANDLER( port30_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		characters per line (0=40, 1=80)
-		1		color mode (0=color, 1=B&W)
-		2		CMT CHIN
-		3		CMT MOTOR (1=on)
-		4		CMT BS1
-		5		CMT BS2
-		6		unused
-		7		unused
+        0       characters per line (0=40, 1=80)
+        1       color mode (0=color, 1=B&W)
+        2       CMT CHIN
+        3       CMT MOTOR (1=on)
+        4       CMT BS1
+        5       CMT BS2
+        6       unused
+        7       unused
 
-	*/
+    */
 
 	pc8001_state *state = space->machine->driver_data;
 
@@ -71,18 +71,18 @@ static WRITE8_HANDLER( pc8001mk2_port31_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		expansion ROM (0=expansion, 1=N80)
-		1		memory mode (0=ROM, 1=RAM)
-		2		color mode (0=attribute, 1=B&W)
-		3		graphics enable
-		4		resolution (0=640x200, 1=320x200)
-		5		background color
-		6		background color
-		7		background color
+        0       expansion ROM (0=expansion, 1=N80)
+        1       memory mode (0=ROM, 1=RAM)
+        2       color mode (0=attribute, 1=B&W)
+        3       graphics enable
+        4       resolution (0=640x200, 1=320x200)
+        5       background color
+        6       background color
+        7       background color
 
-	*/
+    */
 }
 
 /* Memory Maps */
@@ -113,30 +113,30 @@ static ADDRESS_MAP_START( pc8001_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_READ_PORT("R40") AM_WRITE_PORT("W40")
 	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE(UPD3301_TAG, upd3301_r, upd3301_w)
 	AM_RANGE(0x60, 0x68) AM_DEVREADWRITE(I8257_TAG, i8257_r, i8257_w)
-//	AM_RANGE(0x70, 0x7f) unused
-//	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) AM_WRITE(pc8011_ext0_w)
-//	AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) AM_WRITE(pc8011_ext1_w)
-//	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_WRITE(pc8011_ext2_w)
-//	AM_RANGE(0xb0, 0xb0) AM_READ(pc8011_gpio8_r)
-//	AM_RANGE(0xb1, 0xb1) AM_WRITE(pc8011_gpio8_w)
-//	AM_RANGE(0xb2, 0xb2) AM_READ(pc8011_gpio4_r)
-//	AM_RANGE(0xb3, 0xb3) AM_WRITE(pc8011_gpio4_w)
-//	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE(PC8011_CH1_I8251_TAG, msm8251_data_r, msm8251_data_w)
-//	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE(PC8011_CH1_I8251_TAG, msm8251_status_r, msm8251_control_w)
-//	AM_RANGE(0xc2, 0xc2) AM_DEVREADWRITE(PC8011_CH2_I8251_TAG, msm8251_data_r, msm8251_data_w)
-//	AM_RANGE(0xc3, 0xc3) AM_DEVREADWRITE(PC8011_CH2_I8251_TAG, msm8251_status_r, msm8251_control_w)
-//	AM_RANGE(0xc8, 0xc8) RS-232 output enable?
-//	AM_RANGE(0xca, 0xca) RS-232 output disable?
-//	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE(PC8011_IEEE488_I8255A_TAG, i8255a_r, i8255a_w)
-//	AM_RANGE(0xd8, 0xd8) AM_READ(pc8011_ieee488_control_signal_input_r)
-//	AM_RANGE(0xda, 0xda) AM_READ(pc8011_ieee488_bus_address_mode_r)
-//	AM_RANGE(0xdc, 0xdc) AM_WRITE(pc8011_ieee488_nrfd_w)
-//	AM_RANGE(0xde, 0xde) AM_WRITE(pc8011_ieee488_bus_mode_control_w)
-//	AM_RANGE(0xe0, 0xe3) AM_WRITE(expansion_storage_mode_w)
-//	AM_RANGE(0xe4, 0xe4) AM_MIRROR(0x01) AM_WRITE(irq_level_w)
-//	AM_RANGE(0xe6, 0xe6) AM_WRITE(irq_mask_w)
-//	AM_RANGE(0xe7, 0xe7) AM_WRITE(pc8012_memory_mode_w)
-//	AM_RANGE(0xe8, 0xfb) unused
+//  AM_RANGE(0x70, 0x7f) unused
+//  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) AM_WRITE(pc8011_ext0_w)
+//  AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) AM_WRITE(pc8011_ext1_w)
+//  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_WRITE(pc8011_ext2_w)
+//  AM_RANGE(0xb0, 0xb0) AM_READ(pc8011_gpio8_r)
+//  AM_RANGE(0xb1, 0xb1) AM_WRITE(pc8011_gpio8_w)
+//  AM_RANGE(0xb2, 0xb2) AM_READ(pc8011_gpio4_r)
+//  AM_RANGE(0xb3, 0xb3) AM_WRITE(pc8011_gpio4_w)
+//  AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE(PC8011_CH1_I8251_TAG, msm8251_data_r, msm8251_data_w)
+//  AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE(PC8011_CH1_I8251_TAG, msm8251_status_r, msm8251_control_w)
+//  AM_RANGE(0xc2, 0xc2) AM_DEVREADWRITE(PC8011_CH2_I8251_TAG, msm8251_data_r, msm8251_data_w)
+//  AM_RANGE(0xc3, 0xc3) AM_DEVREADWRITE(PC8011_CH2_I8251_TAG, msm8251_status_r, msm8251_control_w)
+//  AM_RANGE(0xc8, 0xc8) RS-232 output enable?
+//  AM_RANGE(0xca, 0xca) RS-232 output disable?
+//  AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE(PC8011_IEEE488_I8255A_TAG, i8255a_r, i8255a_w)
+//  AM_RANGE(0xd8, 0xd8) AM_READ(pc8011_ieee488_control_signal_input_r)
+//  AM_RANGE(0xda, 0xda) AM_READ(pc8011_ieee488_bus_address_mode_r)
+//  AM_RANGE(0xdc, 0xdc) AM_WRITE(pc8011_ieee488_nrfd_w)
+//  AM_RANGE(0xde, 0xde) AM_WRITE(pc8011_ieee488_bus_mode_control_w)
+//  AM_RANGE(0xe0, 0xe3) AM_WRITE(expansion_storage_mode_w)
+//  AM_RANGE(0xe4, 0xe4) AM_MIRROR(0x01) AM_WRITE(irq_level_w)
+//  AM_RANGE(0xe6, 0xe6) AM_WRITE(irq_mask_w)
+//  AM_RANGE(0xe7, 0xe7) AM_WRITE(pc8012_memory_mode_w)
+//  AM_RANGE(0xe8, 0xfb) unused
 	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(I8255A_TAG, i8255a_r, i8255a_w)
 ADDRESS_MAP_END
 
@@ -151,21 +151,21 @@ static ADDRESS_MAP_START( pc8001mk2_io, ADDRESS_SPACE_IO, 8 )
 	AM_IMPORT_FROM(pc8001_io)
 	AM_RANGE(0x30, 0x30) AM_WRITE(port30_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(pc8001mk2_port31_w)
-//	AM_RANGE(0x5c, 0x5c) AM_WRITE(pc8001mk2_gram_on_w)
-//	AM_RANGE(0x5f, 0x5f) AM_WRITE(pc8001mk2_gram_off_w)
-//	AM_RANGE(0xe8, 0xe8) kanji_address_lo_w, kanji_data_lo_r
-//	AM_RANGE(0xe9, 0xe9) kanji_address_hi_w, kanji_data_hi_r
-//	AM_RANGE(0xea, 0xea) kanji_readout_start_w
-//	AM_RANGE(0xeb, 0xeb) kanji_readout_end_w
-//	AM_RANGE(0xf3, 0xf3) DMA type disk unit interface selection port 
-//	AM_RANGE(0xf4, 0xf4) DMA type 8 inch control
-//	AM_RANGE(0xf5, 0xf5) DMA type 8 inch margin control
-//	AM_RANGE(0xf6, 0xf6) DMA type 8 inch FDC status
-//	AM_RANGE(0xf7, 0xf7) DMA type 8 inch FDC data register
-//	AM_RANGE(0xf8, 0xf8) DMA type 5 inch control
-//	AM_RANGE(0xf9, 0xf9) DMA type 5 inch margin control
-//	AM_RANGE(0xfa, 0xfa) DMA type 5 inch FDC status
-//	AM_RANGE(0xfb, 0xfb) DMA type 5 inch FDC data register
+//  AM_RANGE(0x5c, 0x5c) AM_WRITE(pc8001mk2_gram_on_w)
+//  AM_RANGE(0x5f, 0x5f) AM_WRITE(pc8001mk2_gram_off_w)
+//  AM_RANGE(0xe8, 0xe8) kanji_address_lo_w, kanji_data_lo_r
+//  AM_RANGE(0xe9, 0xe9) kanji_address_hi_w, kanji_data_hi_r
+//  AM_RANGE(0xea, 0xea) kanji_readout_start_w
+//  AM_RANGE(0xeb, 0xeb) kanji_readout_end_w
+//  AM_RANGE(0xf3, 0xf3) DMA type disk unit interface selection port
+//  AM_RANGE(0xf4, 0xf4) DMA type 8 inch control
+//  AM_RANGE(0xf5, 0xf5) DMA type 8 inch margin control
+//  AM_RANGE(0xf6, 0xf6) DMA type 8 inch FDC status
+//  AM_RANGE(0xf7, 0xf7) DMA type 8 inch FDC data register
+//  AM_RANGE(0xf8, 0xf8) DMA type 5 inch control
+//  AM_RANGE(0xf9, 0xf9) DMA type 5 inch margin control
+//  AM_RANGE(0xfa, 0xfa) DMA type 5 inch FDC status
+//  AM_RANGE(0xfb, 0xfb) DMA type 5 inch FDC data register
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -376,7 +376,7 @@ static UPD3301_INTERFACE( pc8001_upd3301_intf )
 
 /* 8251 Interface */
 
-static msm8251_interface pc8001_8251_intf = 
+static msm8251_interface pc8001_8251_intf =
 {
 	NULL,
 	NULL,
@@ -401,7 +401,7 @@ static WRITE_LINE_DEVICE_HANDLER( hrq_w )
 {
 	/* HACK - this should be connected to the BUSREQ line of Z80 */
 	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_HALT, state);
-	
+
 	/* HACK - this should be connected to the BUSACK line of Z80 */
 	i8257_hlda_w(device, state);
 }
@@ -484,7 +484,7 @@ static MACHINE_START( pc8001 )
 	memory_set_bank(machine, "bank3", 0);
 
 	/* register for state saving */
-//	state_save_register_global(machine, state->);
+//  state_save_register_global(machine, state->);
 }
 
 static MACHINE_START( pc8001mk2 )
@@ -586,6 +586,6 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR	NAME			PARENT		COMPAT		MACHINE		INPUT		INIT		CONFIG	COMPANY	FULLNAME		FLAGS */
+/*    YEAR  NAME            PARENT      COMPAT      MACHINE     INPUT       INIT        CONFIG  COMPANY FULLNAME        FLAGS */
 COMP( 1979, pc8001,			0,			0,			pc8001,		pc8001,		0,			0,		"NEC",	"PC-8001",		GAME_NOT_WORKING )
 COMP( 1983, pc8001mk2,		pc8001,		0,			pc8001mk2,	pc8001,		0,			0,		"NEC",	"PC-8001mkII",	GAME_NOT_WORKING )

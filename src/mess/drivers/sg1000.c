@@ -449,7 +449,7 @@ static const TMS9928a_interface tms9928a_interface =
 	0, 0,
 	sg1000_vdp_interrupt
 };
- 
+
 static TIMER_CALLBACK( lightgun_tick )
 {
 	UINT8 *rom = memory_region(machine, Z80_TAG);
@@ -857,7 +857,7 @@ static MACHINE_DRIVER_START( sg1000 )
 	MDRV_CARTSLOT_EXTENSION_LIST("sg,bin")
 	MDRV_CARTSLOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(sg1000_cart)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1K")
@@ -903,7 +903,7 @@ static MACHINE_DRIVER_START( sc3000 )
 
 	/* devices */
 	MDRV_I8255A_ADD(UPD9255_TAG, sc3000_ppi8255_intf)
-//	MDRV_PRINTER_ADD("sp400") /* serial printer */
+//  MDRV_PRINTER_ADD("sp400") /* serial printer */
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_config)
 
 	/* cartridge */
@@ -911,7 +911,7 @@ static MACHINE_DRIVER_START( sc3000 )
 	MDRV_CARTSLOT_EXTENSION_LIST("sg,sc,bin")
 	MDRV_CARTSLOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(sc3000_cart)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("2K")
@@ -967,10 +967,10 @@ static MACHINE_DRIVER_START( sf7000 )
 	MDRV_MSM8251_ADD(UPD8251_TAG, default_msm8251_interface)
 	MDRV_UPD765A_ADD(UPD765_TAG, sf7000_upd765_interface)
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, sf7000_floppy_config)
-//	MDRV_PRINTER_ADD("sp400") /* serial printer */
+//  MDRV_PRINTER_ADD("sp400") /* serial printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
@@ -1011,7 +1011,7 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY				FULLNAME									FLAGS */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY             FULLNAME                                    FLAGS */
 CONS( 1983,	sg1000,		0,		0,		sg1000,		sg1000,		0,		0,			"Sega",				"SG-1000",									GAME_SUPPORTS_SAVE )
 CONS( 1984,	sg1000m2,	sg1000,	0,		sc3000,		sc3000,		0,		0,			"Sega",				"SG-1000 II",								GAME_SUPPORTS_SAVE )
 COMP( 1983,	sc3000,		0,		0,		sc3000,		sc3000,		0,		0,			"Sega",				"SC-3000",									GAME_SUPPORTS_SAVE )

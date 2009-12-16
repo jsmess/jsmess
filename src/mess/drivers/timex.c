@@ -240,14 +240,14 @@ void ts2068_update_memory(running_machine *machine)
 		{
 			if (timex_cart_type == TIMEX_CART_DOCK)
 			{
-				memory_set_bankptr(machine, "bank1", DOCK);				
+				memory_set_bankptr(machine, "bank1", DOCK);
 				memory_install_read_bank(space, 0x0000, 0x1fff, 0, 0, "bank1");
 				if (timex_cart_chunks&0x01)
 					memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank9");
 				else
 					memory_unmap_write(space, 0x0000, 0x1fff, 0, 0);
-				
-				
+
+
 			}
 			else
 			{
@@ -285,7 +285,7 @@ void ts2068_update_memory(running_machine *machine)
 					memory_install_write_bank(space, 0x2000, 0x3fff, 0, 0, "bank10");
 				else
 					memory_unmap_write(space, 0x2000, 0x3fff, 0, 0);
-	
+
 			}
 			else
 			{
@@ -322,7 +322,7 @@ void ts2068_update_memory(running_machine *machine)
 				if (timex_cart_chunks&0x04)
 					memory_install_write_bank(space, 0x4000, 0x5fff, 0, 0, "bank11");
 				else
-					memory_unmap_write(space, 0x4000, 0x5fff, 0, 0);	
+					memory_unmap_write(space, 0x4000, 0x5fff, 0, 0);
 			}
 			else
 			{
@@ -433,8 +433,8 @@ void ts2068_update_memory(running_machine *machine)
 				if (timex_cart_chunks&0x20)
 					memory_install_write_bank(space, 0xa000, 0xbfff, 0, 0, "bank14");
 				else
-					memory_unmap_write(space, 0xa000, 0xbfff, 0, 0);	
-				
+					memory_unmap_write(space, 0xa000, 0xbfff, 0, 0);
+
 			}
 			else
 			{
@@ -508,7 +508,7 @@ void ts2068_update_memory(running_machine *machine)
 				if (timex_cart_chunks&0x80)
 					memory_install_write_bank(space, 0xe000, 0xffff, 0, 0, "bank16");
 				else
-					memory_unmap_write(space, 0xe000, 0xffff, 0, 0);								
+					memory_unmap_write(space, 0xe000, 0xffff, 0, 0);
 			}
 			else
 			{
@@ -622,10 +622,10 @@ static MACHINE_DRIVER_START( ts2068 )
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(timex_cart)
 	MDRV_CARTSLOT_UNLOAD(timex_cart)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("48K")		
+	MDRV_RAM_DEFAULT_SIZE("48K")
 MACHINE_DRIVER_END
 
 
@@ -654,7 +654,7 @@ static MACHINE_DRIVER_START( tc2048 )
 
 	MDRV_VIDEO_START( spectrum_128 )
 	MDRV_VIDEO_UPDATE( tc2048 )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("48K")

@@ -352,7 +352,7 @@ static const z80_daisy_chain p8k_daisy_chain[] =
 static WRITE_LINE_DEVICE_HANDLER( p8k_i8272_irq_w )
 {
 	const device_config *z80pio = devtag_get_device(device->machine, "z80pio_2");
-	
+
 	z80pio_p_w(z80pio, 1, (state) ? 0x10 : 0x00);
 }
 

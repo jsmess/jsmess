@@ -1,6 +1,6 @@
 //============================================================
 //
-//	softwarepicker.h - MESS's software picker
+//  softwarepicker.h - MESS's software picker
 //
 //============================================================
 

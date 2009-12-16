@@ -72,7 +72,7 @@ static void a800_setbank(running_machine *machine, int n)
 			}
 			break;
 	}
-	
+
 	if (read_addr) {
 		memory_set_bankptr(machine, "bank1", read_addr);
 		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0,"bank1");

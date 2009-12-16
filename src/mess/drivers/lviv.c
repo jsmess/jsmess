@@ -462,7 +462,7 @@ static MACHINE_DRIVER_START( lviv )
 	MDRV_SNAPSHOT_ADD("snapshot", lviv, "sav", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", lviv_cassette_config )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")

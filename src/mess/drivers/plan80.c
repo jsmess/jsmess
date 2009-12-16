@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Plan-80
 
         06/12/2009 Skeleton driver.
@@ -26,8 +26,8 @@ INPUT_PORTS_START( plan80 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(plan80) 
-{	
+static MACHINE_RESET(plan80)
+{
 }
 
 static VIDEO_START( plan80 )
@@ -38,22 +38,22 @@ static VIDEO_UPDATE( plan80 )
 {
 	UINT8 *gfx = memory_region(screen->machine, "gfx");
  	int x,y,j,b;
-	UINT16 addr;	
+	UINT16 addr;
 
 	for(y = 0; y < 32; y++ )
 	{
-		addr = y*64;		
+		addr = y*64;
 		for(x = 0; x < 48; x++ )
 		{
-			UINT8 code = plan80_video_ram[addr + x];			
+			UINT8 code = plan80_video_ram[addr + x];
 			for(j = 0; j < 8; j++ )
 			{
 				UINT8 val = gfx[code*8 + j];
 				if (BIT(code,7))  val ^= 0xff;
 				for(b = 0; b < 6; b++ )
 				{
-					*BITMAP_ADDR16(bitmap, y*8+j, x*6+b ) = (val >> (5-b)) & 1;									
-				}				
+					*BITMAP_ADDR16(bitmap, y*8+j, x*6+b ) = (val >> (5-b)) & 1;
+				}
 			}
 		}
 	}
@@ -64,10 +64,10 @@ static MACHINE_DRIVER_START( plan80 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",8080, 2048000)
     MDRV_CPU_PROGRAM_MAP(plan80_mem)
-    MDRV_CPU_IO_MAP(plan80_io)	
+    MDRV_CPU_IO_MAP(plan80_io)
 
     MDRV_MACHINE_RESET(plan80)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -84,7 +84,7 @@ MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( plan80 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )	
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "pl80mod.bin", 0x0000, 0x0800, CRC(6bdd7136) SHA1(721eab193c33c9330e0817616d3d2b601285fe50))
 	ROM_LOAD( "pl80mon.bin", 0xf800, 0x0800, CRC(433fb685) SHA1(43d53c35544d3a197ab71b6089328d104535cfa5))
 	ROM_REGION( 0x0800, "gfx", ROMREGION_ERASEFF )
@@ -93,6 +93,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   		 FULLNAME       FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY          FULLNAME       FLAGS */
 COMP( 1988, plan80,  0,       0, 	plan80, 	plan80, 	 0, 	0,  "Tesla Eltos",   "Plan-80",		GAME_NOT_WORKING)
 

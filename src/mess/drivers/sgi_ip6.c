@@ -1,15 +1,15 @@
 /****************************************************************************
 
-	drivers/sgi_ip6.c
-	SGI 4D/PI IP6 family skeleton driver
+    drivers/sgi_ip6.c
+    SGI 4D/PI IP6 family skeleton driver
 
-	by Harmony
+    by Harmony
 
-		0x1fc00000 - 0x1fc3ffff		ROM
+        0x1fc00000 - 0x1fc3ffff     ROM
 
-	Interrupts:
-		R2000:
-			NYI
+    Interrupts:
+        R2000:
+            NYI
 
 ****************************************************************************/
 

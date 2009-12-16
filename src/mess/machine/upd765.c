@@ -18,11 +18,11 @@
     - resolve "ready" state stuff (ready state when reset for PC, ready state change while processing command AND
     while idle)
 
-	Changes:
-	091006 (Mariusz Wojcieszek, changes needed by QX-10):
-	- allowed "Sense Interrupt Status" command when Seek is active
-	- DIO bit in status register (0x40) is cleared when "Read Data" command is executed,
-	  it is later set during result phase.
+    Changes:
+    091006 (Mariusz Wojcieszek, changes needed by QX-10):
+    - allowed "Sense Interrupt Status" command when Seek is active
+    - DIO bit in status register (0x40) is cleared when "Read Data" command is executed,
+      it is later set during result phase.
 
 ***************************************************************************/
 
@@ -1742,7 +1742,7 @@ READ8_DEVICE_HANDLER(upd765_data_r)
 {
 	upd765_t *fdc = get_safe_token(device);
 
-//	if ((fdc->FDC_main & 0x0c0) == 0x0c0)
+//  if ((fdc->FDC_main & 0x0c0) == 0x0c0)
 	if ((fdc->FDC_main & 0x080) == 0x080)
 	{
 		if (

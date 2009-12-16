@@ -120,7 +120,7 @@ ADDRESS_MAP_END
  Input Ports
 ******************************************************************************/
 INPUT_PORTS_START( zexall )
-	PORT_INCLUDE(generic_terminal)	
+	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
 /******************************************************************************
@@ -147,8 +147,8 @@ static MACHINE_DRIVER_START(zexall)
     //MDRV_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
 
     /* sound hardware */
-	MDRV_IMPORT_FROM( generic_terminal )	
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)	
+	MDRV_IMPORT_FROM( generic_terminal )
+	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
 
 MACHINE_DRIVER_END
 
@@ -160,7 +160,7 @@ MACHINE_DRIVER_END
 
 ROM_START(zexall)
 
-    ROM_REGION(0x10000, "romcode", 0) 
+    ROM_REGION(0x10000, "romcode", 0)
     ROM_LOAD("zex.bin", 0x00000, 0x2289, CRC(77E0A1DF) SHA1(CC8F84724E3837783816D92A6DFB8E5975232C66))
 ROM_END
 

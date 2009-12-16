@@ -60,7 +60,7 @@ static MACHINE_DRIVER_START( rt1715 )
 
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(rt1715)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")

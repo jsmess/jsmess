@@ -416,10 +416,10 @@ static MACHINE_DRIVER_START( kc85_3 )
 	MDRV_QUICKLOAD_ADD("quickload", kc, "kcc", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")	
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 

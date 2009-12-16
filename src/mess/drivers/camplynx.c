@@ -320,7 +320,7 @@ static MACHINE_RESET( lynx128k )
 	memory_install_write_bank (mem, 0xa000, 0xbfff, 0, 0, "bank16");
 	memory_install_write_bank (mem, 0xc000, 0xdfff, 0, 0, "bank17");
 	memory_install_write_bank (mem, 0xe000, 0xffff, 0, 0, "bank18");
-	
+
 	lynx128k_bank_w(mem, 0, 0);
 }
 

@@ -680,13 +680,13 @@ static MACHINE_DRIVER_START( tiki100 )
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(2000000))
 	MDRV_WD179X_ADD(FD1797_TAG, tiki100_wd17xx_interface) // FD1767PL-02 or FD1797-PL
 	MDRV_FLOPPY_2_DRIVES_ADD(tiki100_floppy_config)
-	
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(AY8912_TAG, AY8912, 2000000)
 	MDRV_SOUND_CONFIG(ay8910_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")

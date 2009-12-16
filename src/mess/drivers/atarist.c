@@ -1855,13 +1855,13 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_WD1772_ADD(WD1772_TAG, atarist_wd17xx_interface )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
-	
+
 	MDRV_IMPORT_FROM(atarist_cartslot)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1024K")  // 1040ST
-	MDRV_RAM_EXTRA_OPTIONS("512K,256K") //  520ST ,260ST	
+	MDRV_RAM_EXTRA_OPTIONS("512K,256K") //  520ST ,260ST
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megast )
@@ -1872,7 +1872,7 @@ static MACHINE_DRIVER_START( megast )
 	MDRV_RP5C15_ADD("rp5c15", rtc_intf)
 
 	MDRV_MACHINE_START(megast)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("4M")  //  Mega ST 4
@@ -1931,11 +1931,11 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
 
 	MDRV_IMPORT_FROM(atarist_cartslot)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1024K")  // 1040STe
-	MDRV_RAM_EXTRA_OPTIONS("512K") //  520STe	
+	MDRV_RAM_EXTRA_OPTIONS("512K") //  520STe
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megaste )

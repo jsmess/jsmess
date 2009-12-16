@@ -1230,8 +1230,8 @@ INLINE void prepare_scanline(running_machine *machine, mc6847_state *mc6847, int
 			attrs = update_attributes(mc6847);
 
 			/* commenting out cause it breaks the coco3 border,
-			 * the whole 'attr' handling needs to be rewritten anyway
-			if (attrs != mc6847->attrs[scanline]) */
+             * the whole 'attr' handling needs to be rewritten anyway
+            if (attrs != mc6847->attrs[scanline]) */
 			{
 				mc6847->dirty = TRUE;
 				mc6847->attrs[scanline] = attrs;

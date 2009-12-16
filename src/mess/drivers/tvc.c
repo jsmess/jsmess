@@ -115,7 +115,7 @@ static READ8_HANDLER( tvc_port59_r )
 }
 
 static WRITE8_HANDLER( tvc_port0_w )
-{	
+{
 }
 static ADDRESS_MAP_START(tvc_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
@@ -362,7 +362,7 @@ static MACHINE_DRIVER_START( tvc )
     MDRV_MACHINE_RESET(tvc)
 
 	MDRV_CPU_VBLANK_INT("screen", tvc_interrupt)
-	
+
  /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -377,10 +377,10 @@ static MACHINE_DRIVER_START( tvc )
 
     MDRV_VIDEO_START(tvc)
     MDRV_VIDEO_UPDATE(tvc)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("80K")		
+	MDRV_RAM_DEFAULT_SIZE("80K")
 MACHINE_DRIVER_END
 
 /* ROM definition */

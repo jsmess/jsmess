@@ -561,8 +561,8 @@ static void wd17xx_command_restore(const device_config *device)
 
 
 /*
-	Write an entire track. Formats which do not define a write_track
-	function pointer will cause a silent return.
+    Write an entire track. Formats which do not define a write_track
+    function pointer will cause a silent return.
 */
 static void write_track(const device_config *device)
 {

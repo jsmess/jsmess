@@ -140,34 +140,34 @@
 
 =================================================================================================
 
-	x1turbo specs (courtesy of Yasuhiro Ogawa):
+    x1turbo specs (courtesy of Yasuhiro Ogawa):
 
-	upper board: Z80A-CPU
-	             Z80A-DMA
-	             Z80A-SIO(O)
-	             Z80A-CTC
-	             uPD8255AC
-	             LH5357(28pin mask ROM. for IPL?)
-	             YM2149F
-	             16.000MHz(X1)
+    upper board: Z80A-CPU
+                 Z80A-DMA
+                 Z80A-SIO(O)
+                 Z80A-CTC
+                 uPD8255AC
+                 LH5357(28pin mask ROM. for IPL?)
+                 YM2149F
+                 16.000MHz(X1)
 
-	lower board: IX0526CE(HN61364) (28pin mask ROM. for ANK font?)
-	             MB83256x4 (Kanji ROMs)
-	             HD46505SP (VDP)
-	             M80C49-277 (MCU)
-	             uPD8255AC
-	             uPD1990 (RTC) + battery
-	             6.000MHz(X2)
-	             42.9545MHz(X3)
+    lower board: IX0526CE(HN61364) (28pin mask ROM. for ANK font?)
+                 MB83256x4 (Kanji ROMs)
+                 HD46505SP (VDP)
+                 M80C49-277 (MCU)
+                 uPD8255AC
+                 uPD1990 (RTC) + battery
+                 6.000MHz(X2)
+                 42.9545MHz(X3)
 
-	FDD I/O board: MB8877A (FDC)
-	               MB4107 (VFO)
+    FDD I/O board: MB8877A (FDC)
+                   MB4107 (VFO)
 
-	RAM banks:
-	upper board: MB8265A-15 x8 (main memory)
-	lower board: MB8416A-12 x3 (VRAM)
-				 MB8416A-15 x3 (PCG RAM)
-				 MB81416-10 x12 (GRAM)
+    RAM banks:
+    upper board: MB8265A-15 x8 (main memory)
+    lower board: MB8416A-12 x3 (VRAM)
+                 MB8416A-15 x3 (PCG RAM)
+                 MB81416-10 x12 (GRAM)
 
 ************************************************************************************************/
 
@@ -1028,7 +1028,7 @@ static READ8_HANDLER( x1_pcg_r )
 		}
 		else
 		{
-//			printf("%04x %04x %02x\n",pcg_write_addr*4*8,pcg_write_addr,bios_offset);
+//          printf("%04x %04x %02x\n",pcg_write_addr*4*8,pcg_write_addr,bios_offset);
 			gfx_data = memory_region(space->machine, "kanji");
 			if(bios_offset == 0)
 				kanji_offset = pcg_write_addr*4*8;//TODO: check me
@@ -1276,7 +1276,7 @@ static READ8_HANDLER( x1_kanji_r )
 
 static WRITE8_HANDLER( x1_kanji_w )
 {
-//	if(offset < 2)
+//  if(offset < 2)
 		printf("%04x %02x W\n",offset,data);
 
 	switch(offset)
@@ -1312,13 +1312,13 @@ static READ8_HANDLER( x1_io_r )
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return i8255a_r(devtag_get_device(space->machine, "ppi8255_0"), (offset-0x1a00) & 3); }
 	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(devtag_get_device(space->machine, "ay"), 0); }
-//	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ return z80dma_r(devtag_get_device(space->machine, "dma"), 0); }
-//	else if(offset >= 0x1f90 && offset <= 0x1f91)	{ return z80sio_c_r(devtag_get_device(space->machine, "sio"), (offset-0x1f90) & 1); }
-//	else if(offset >= 0x1f92 && offset <= 0x1f93)	{ return z80sio_d_r(devtag_get_device(space->machine, "sio"), (offset-0x1f92) & 1); }
+//  else if(offset >= 0x1f80 && offset <= 0x1f8f)   { return z80dma_r(devtag_get_device(space->machine, "dma"), 0); }
+//  else if(offset >= 0x1f90 && offset <= 0x1f91)   { return z80sio_c_r(devtag_get_device(space->machine, "sio"), (offset-0x1f90) & 1); }
+//  else if(offset >= 0x1f92 && offset <= 0x1f93)   { return z80sio_d_r(devtag_get_device(space->machine, "sio"), (offset-0x1f92) & 1); }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa0); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa8); }
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); }
-//	else if(offset == 0x1fe0)						{ return x1_blackclip_r(space,0); }
+//  else if(offset == 0x1fe0)                       { return x1_blackclip_r(space,0); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return space->machine->generic.colorram.u8[offset-0x2000]; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return space->machine->generic.videoram.u8[offset-0x3000]; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)]; }
@@ -1349,9 +1349,9 @@ static WRITE8_HANDLER( x1_io_w )
 	else if(offset >= 0x1c00 && offset <= 0x1cff)	{ ay8910_address_w(devtag_get_device(space->machine, "ay"), 0,data); }
 	else if(offset >= 0x1d00 && offset <= 0x1dff)	{ rom_bank_1_w(space,0,data); }
 	else if(offset >= 0x1e00 && offset <= 0x1eff)	{ rom_bank_0_w(space,0,data); }
-//	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ z80dma_w(devtag_get_device(space->machine, "dma"), 0,data); }
-//	else if(offset >= 0x1f90 && offset <= 0x1f91)	{ z80sio_c_w(devtag_get_device(space->machine, "sio"), (offset-0x1f90) & 1,data); }
-//	else if(offset >= 0x1f92 && offset <= 0x1f93)	{ z80sio_d_w(devtag_get_device(space->machine, "sio"), (offset-0x1f92) & 1,data); }
+//  else if(offset >= 0x1f80 && offset <= 0x1f8f)   { z80dma_w(devtag_get_device(space->machine, "dma"), 0,data); }
+//  else if(offset >= 0x1f90 && offset <= 0x1f91)   { z80sio_c_w(devtag_get_device(space->machine, "sio"), (offset-0x1f90) & 1,data); }
+//  else if(offset >= 0x1f92 && offset <= 0x1f93)   { z80sio_d_w(devtag_get_device(space->machine, "sio"), (offset-0x1f92) & 1,data); }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa0,data); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa8,data); }
 //  else if(offset == 0x1fb0)                       { x1turbo_pal_w(space,0,data); }
@@ -1359,7 +1359,7 @@ static WRITE8_HANDLER( x1_io_w )
 //  else if(offset == 0x1fc0)                       { x1turbo_txdisp_w(space,0,data); }
 //  else if(offset == 0x1fc5)                       { x1turbo_gfxpal_w(space,0,data); }
 	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
-//	else if(offset == 0x1fe0)						{ x1_blackclip_w(space,0,data); }
+//  else if(offset == 0x1fe0)                       { x1_blackclip_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ space->machine->generic.colorram.u8[offset-0x2000] = data; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ space->machine->generic.videoram.u8[offset-0x3000] = pcg_write_addr = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)] = data; }

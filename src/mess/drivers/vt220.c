@@ -56,10 +56,10 @@ static MACHINE_DRIVER_START( vt220 )
 
     MDRV_VIDEO_START(vt220)
     MDRV_VIDEO_UPDATE(vt220)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("16K")	
+	MDRV_RAM_DEFAULT_SIZE("16K")
 MACHINE_DRIVER_END
 
 /* ROM definition */

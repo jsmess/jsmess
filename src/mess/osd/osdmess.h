@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	osdmess.h
+    osdmess.h
 
-	OS dependent calls for MESS
+    OS dependent calls for MESS
 
 *********************************************************************/
 
@@ -57,9 +57,9 @@ file_error osd_copyfile(const char *destfile, const char *srcfile);
 
         buffer - pointer to buffer
 
-		buffer_len - length of buffer
+        buffer_len - length of buffer
 
-		basename - basename of file to create
+        basename - basename of file to create
 
     Return value:
 
@@ -160,8 +160,8 @@ file_error osd_setcurdir(const char *dir);
 
     Parameters:
 
-		dir - space to output directory
-		dir_size - size of path
+        dir - space to output directory
+        dir_size - size of path
 
 -----------------------------------------------------------------------------*/
 
@@ -172,7 +172,7 @@ void osd_get_emulator_directory(char *dir, size_t dir_size);
 
     Parameters:
 
-		c - the character in question
+        c - the character in question
 
     Return value:
 
@@ -187,7 +187,7 @@ int osd_is_path_separator(char c);
 
     Parameters:
 
-		filename - the path in question
+        filename - the path in question
 
     Return value:
 
@@ -202,7 +202,7 @@ char *osd_dirname(const char *filename);
 
     Parameters:
 
-		filename - the path in question
+        filename - the path in question
 
     Return value:
 
@@ -217,8 +217,8 @@ char *osd_basename(char *filename);
 
     Parameters:
 
-		path - the path in question
-		dst - pointer to receive new path; the returned string needs to be free()-ed!
+        path - the path in question
+        dst - pointer to receive new path; the returned string needs to be free()-ed!
 
     Return value:
 

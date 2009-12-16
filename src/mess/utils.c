@@ -86,7 +86,7 @@ char *stripspace(const char *src)
 }
 
 //============================================================
-//	strip_extension
+//  strip_extension
 //============================================================
 
 char *strip_extension(const char *filename)
@@ -223,7 +223,7 @@ static int is_delim(char c)
 
 /*-------------------------------------------------
     internal_find_extension - find an extension in
-	an extension list
+    an extension list
 -------------------------------------------------*/
 
 static int internal_find_extension(const char *extension_list, const char *target_extension)
@@ -263,7 +263,7 @@ static int internal_find_extension(const char *extension_list, const char *targe
 
 /*-------------------------------------------------
     find_extension - find an extension in an extension
-	list
+    list
 -------------------------------------------------*/
 
 int find_extension(const char *extension_list, const char *target_extension)
@@ -284,7 +284,7 @@ int find_extension(const char *extension_list, const char *target_extension)
 
 /*-------------------------------------------------
     specify_extension - merge a comma-delimited
-	list of file extensions onto an existing list
+    list of file extensions onto an existing list
 -------------------------------------------------*/
 
 void specify_extension(char *buffer, size_t buffer_len, const char *extension)

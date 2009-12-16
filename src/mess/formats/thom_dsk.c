@@ -139,13 +139,13 @@ static floperr_t internal_sap_write_sector(floppy_image *floppy, int head, int t
 	floppy_image_read(floppy, buf, offset, 4);
 	for (i=0;i<buflen;i++) {
 		buf[i+4] = ((UINT8*)buffer)[i];
-	}        
+	}
         crc = thom_sap_crc( buf, buflen+4 );
         buf[buflen+4] = crc >> 8;
         buf[buflen+5] = crc & 0xff;
 	for (i=0;i<buflen;i++) {
 		buf[i+4] ^= sap_magic_num;
-	}        
+	}
 	floppy_image_write(floppy, buf, offset, buflen+6);
 
 	return FLOPPY_ERROR_SUCCESS;
@@ -219,9 +219,9 @@ static floperr_t sap_post_format(floppy_image *floppy, option_resolution *params
         tag = (struct sap_dsk_tag *) floppy_create_tag(floppy, SAP_DSK_TAG, sizeof(struct sap_dsk_tag));
 
         /* default options */
-        if ( !tag->tracks ) 
+        if ( !tag->tracks )
         {
-                tag->tracks = 80;        
+                tag->tracks = 80;
                 tag->sector_size = 256;
         }
 
@@ -245,7 +245,7 @@ static floperr_t sap_post_format(floppy_image *floppy, option_resolution *params
                         floppy_image_write(floppy, header, pos, 4);
                         sap_write_indexed_sector( floppy, 0, track, sector, buf, tag->sector_size, 0 );
                 }
-        
+
         return FLOPPY_ERROR_SUCCESS;
 }
 
@@ -380,10 +380,10 @@ FLOPPY_OPTIONS_START(thomson)
 		SECTORS([16])
 		SECTOR_LENGTH([128])
 		FIRST_SECTOR_ID([1]))
- 
+
         FLOPPY_OPTION(sap,"sap", "Thomson SAP floppy disk image",	sap_dsk_identify, sap_dsk_construct, NULL)
 
-	FLOPPY_OPTION(qdd,"qd", "Thomson QDD floppy disk image (2\"8 SD)",	qdd_dsk_identify, qdd_dsk_construct, 
+	FLOPPY_OPTION(qdd,"qd", "Thomson QDD floppy disk image (2\"8 SD)",	qdd_dsk_identify, qdd_dsk_construct,
 		HEADS([1])
 		TRACKS([1])
 		SECTORS([400])

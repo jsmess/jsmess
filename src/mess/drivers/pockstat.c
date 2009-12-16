@@ -3,8 +3,8 @@
     Sony PocketStation
 
     05/2009 Skeleton driver written.
-	11/2009 Initial bring-up commenced by Harmony.
-	11/2009 Playable state achieved by Harmony.
+    11/2009 Initial bring-up commenced by Harmony.
+    11/2009 Playable state achieved by Harmony.
 
     PocketStation games were dowloaded from PS1 games into flash RAM after
     the unit had been inserted in the memory card slot, and so this should
@@ -23,8 +23,8 @@
       * http://exophase.devzero.co.uk/ps_info.txt
       * http://members.at.infoseek.co.jp/DrHell/pocket/index.html
 
-	Currently, a handful of games run, but some die due to odd hardware
-	issues.
+    Currently, a handful of games run, but some die due to odd hardware
+    issues.
 
 ****************************************************************************/
 

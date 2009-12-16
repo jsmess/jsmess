@@ -178,6 +178,6 @@ ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */
 COMP( 1991, atm, 	spec128,	0,		atm,	spec_plus,	0,		0,	"MicroART",		"ATM", GAME_NOT_WORKING)
-//COMP( 1991, atmtb1, 	spec128,	0,		atm,	spec_plus,	0,		0,	"MicroART",		"ATM-turbo1", GAME_NOT_WORKING)
+//COMP( 1991, atmtb1,   spec128,    0,      atm,    spec_plus,  0,      0,  "MicroART",     "ATM-turbo1", GAME_NOT_WORKING)
 COMP( 1993, atmtb2, spec128,	0,		atm,	spec_plus,	0,		0,	"MicroART",		"ATM-turbo2", GAME_NOT_WORKING)
-//COMP( 1994, turbo2, spec128,	0,		atm,	spec_plus,	0,		0,	"MicroART",		"TURBO 2+", GAME_NOT_WORKING)
+//COMP( 1994, turbo2, spec128,  0,      atm,    spec_plus,  0,      0,  "MicroART",     "TURBO 2+", GAME_NOT_WORKING)

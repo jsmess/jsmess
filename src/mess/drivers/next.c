@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         NeXT
 
         05/11/2009 Skeleton driver.
@@ -20,8 +20,8 @@ static INPUT_PORTS_START( next )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(next) 
-{	
+static MACHINE_RESET(next)
+{
 }
 
 static VIDEO_START( next )
@@ -39,7 +39,7 @@ static MACHINE_DRIVER_START( next )
     MDRV_CPU_PROGRAM_MAP(next_mem)
 
     MDRV_MACHINE_RESET(next)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -70,7 +70,7 @@ ROM_START( next )
 ROM_END
 
 ROM_START( nextnt )
-	ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF )	
+	ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v25", "v2.5 v66" )
 	ROMX_LOAD( "rev_2.5_v66.bin", 0x0000, 0x20000, CRC(f47e0bfe) SHA1(b3534796abae238a0111299fc406a9349f7fee24), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v24", "v2.4 v65" )
@@ -80,7 +80,7 @@ ROM_START( nextnt )
 ROM_END
 
 ROM_START( nexttrb )
-	ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF )  
+	ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v33", "v3.3 v74" )
 	ROMX_LOAD( "rev_3.3_v74.bin", 0x0000, 0x20000, CRC(fbc3a2cd) SHA1(a9bef655f26f97562de366e4a33bb462e764c929), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v32", "v3.2 v72" )
@@ -91,7 +91,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   				FULLNAME       			FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY                 FULLNAME                FLAGS */
 COMP( 1987, next,  	0,      	0, 	next, 		next, 	 0,  	  0,  	 "Next Software, Inc",   "NeXT",				GAME_NOT_WORKING)
 COMP( 1990, nextnt, next,       0, 	next040, 	next, 	 0,  	  0,  	 "Next Software, Inc",   "NeXT (Non Turbo)",	GAME_NOT_WORKING)
 COMP( 1992, nexttrb,next,       0, 	next040, 	next, 	 0,  	  0,  	 "Next Software, Inc",   "NeXT (Turbo)",		GAME_NOT_WORKING)

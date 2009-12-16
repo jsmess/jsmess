@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Berkeley Software Design, Inc.
@@ -15,8 +15,8 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
+ *  This product includes software developed by the University of
+ *  California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -33,7 +33,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)cdefs.h	8.8 (Berkeley) 1/9/95
+ *  @(#)cdefs.h 8.8 (Berkeley) 1/9/95
  * $FreeBSD: src/sys/sys/cdefs.h,v 1.28.2.1 2000/03/18 23:30:03 jasone Exp $
  */
 
@@ -215,7 +215,7 @@
 
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Guido van Rossum.
@@ -230,8 +230,8 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
+ *  This product includes software developed by the University of
+ *  California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -248,7 +248,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)glob.h	8.1 (Berkeley) 6/2/93
+ *  @(#)glob.h  8.1 (Berkeley) 6/2/93
  */
 
 #ifndef _GLOB_H_
@@ -267,10 +267,10 @@ typedef struct {
 	int (*gl_errfunc) __P((const char *, int));
 
 	/*
-	 * Alternate filesystem access methods for glob; replacement
-	 * versions of closedir(3), readdir(3), opendir(3), stat(2)
-	 * and lstat(2).
-	 */
+     * Alternate filesystem access methods for glob; replacement
+     * versions of closedir(3), readdir(3), opendir(3), stat(2)
+     * and lstat(2).
+     */
 	void (*gl_closedir) __P((void *));
 	struct dirent *(*gl_readdir) __P((void *));
 	void *(*gl_opendir) __P((const char *));

@@ -285,10 +285,10 @@ static MACHINE_DRIVER_START( spc1000 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", spc1000_cassette_config )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")		
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 /* ROM definition */

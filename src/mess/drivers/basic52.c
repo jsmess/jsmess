@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         MCS BASIC 52 and MCS BASIC 31 board
 
         03/12/2009 Skeleton driver.
@@ -22,7 +22,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( basic52_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAM 
+	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_ROM // EPROM
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)  // PPI-8255
 	//AM_RANGE(0xc000, 0xdfff) // Expansion block
@@ -35,13 +35,13 @@ INPUT_PORTS_START( basic52 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(basic52) 
-{	
+static MACHINE_RESET(basic52)
+{
 }
 
 static WRITE8_DEVICE_HANDLER( basic52_kbd_put )
 {
-	
+
 }
 
 static GENERIC_TERMINAL_INTERFACE( basic52_terminal_intf )
@@ -63,14 +63,14 @@ static MACHINE_DRIVER_START( basic31 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8031, XTAL_11_0592MHz)
     MDRV_CPU_PROGRAM_MAP(basic52_mem)
-    MDRV_CPU_IO_MAP(basic52_io)	
+    MDRV_CPU_IO_MAP(basic52_io)
 
     MDRV_MACHINE_RESET(basic52)
-	
+
     /* video hardware */
     MDRV_IMPORT_FROM( generic_terminal )
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,basic52_terminal_intf)	
-	
+	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,basic52_terminal_intf)
+
 	MDRV_I8255A_ADD("ppi8255", ppi8255_intf )
 MACHINE_DRIVER_END
 
@@ -78,14 +78,14 @@ static MACHINE_DRIVER_START( basic52 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8052, XTAL_11_0592MHz)
     MDRV_CPU_PROGRAM_MAP(basic52_mem)
-    MDRV_CPU_IO_MAP(basic52_io)	
+    MDRV_CPU_IO_MAP(basic52_io)
 
     MDRV_MACHINE_RESET(basic52)
-	
+
     /* video hardware */
     MDRV_IMPORT_FROM( generic_terminal )
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,basic52_terminal_intf)	
-	
+	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,basic52_terminal_intf)
+
 	MDRV_I8255A_ADD("ppi8255", ppi8255_intf )
 MACHINE_DRIVER_END
 

@@ -201,10 +201,10 @@ static MACHINE_DRIVER_START( partner )
 	MDRV_WD1793_ADD("wd1793", partner_wd17xx_interface )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(partner_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")	
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 /* ROM definition */

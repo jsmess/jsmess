@@ -243,7 +243,7 @@ static MACHINE_DRIVER_START( b2m )
 	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(b2m_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")

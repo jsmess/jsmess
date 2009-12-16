@@ -142,7 +142,7 @@ static void newbrain_a_bankswitch(running_machine *machine)
 		UINT16 bank_end = bank_start + 0x1fff;
 		char bank_name[10];
 		sprintf(bank_name,"bank%d",bank);
-		
+
 		if (state->pwrup)
 		{
 			/* all banks point to ROM at 0xe000 */
@@ -1515,7 +1515,7 @@ static MACHINE_DRIVER_START( newbrain_a )
 	/* cassette */
 	MDRV_CASSETTE_ADD("cassette1", newbrain_cassette_config)
 	MDRV_CASSETTE_ADD("cassette2", newbrain_cassette_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
@@ -1564,10 +1564,10 @@ static MACHINE_DRIVER_START( newbrain_eim )
 	MDRV_UPD765A_ADD(UPD765_TAG, newbrain_upd765_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(newbrain_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("96K")	
+	MDRV_RAM_DEFAULT_SIZE("96K")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -1704,7 +1704,7 @@ static void newbrain_serial_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-static SYSTEM_CONFIG_START( newbrain )	
+static SYSTEM_CONFIG_START( newbrain )
 	CONFIG_DEVICE(newbrain_serial_getinfo)
 SYSTEM_CONFIG_END
 

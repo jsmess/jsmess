@@ -441,7 +441,7 @@ static void set_active_bank(running_machine *machine)
 			memory_unmap_write(program, 0xc000, 0xc7ff, 0, 0); // ROM
 			memory_unmap_readwrite(program, 0xc800, 0xcfff, 0, 0);
 			memory_install_readwrite8_handler(program, 0xd000, 0xd7ff, 0, 0, comx35_videoram_r, comx35_videoram_w);
-			memory_unmap_read(program, 0xd800, 0xd800, 0, 0); 
+			memory_unmap_read(program, 0xd800, 0xd800, 0, 0);
 			memory_install_write8_device_handler(program, mc6845, 0xd800, 0xd800, 0, 0, mc6845_address_w);
 			memory_install_readwrite8_device_handler(program, mc6845, 0xd801, 0xd801, 0, 0, mc6845_register_r, mc6845_register_w);
 			memory_unmap_readwrite(program, 0xd802, 0xdfff, 0, 0);

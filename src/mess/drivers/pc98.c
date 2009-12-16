@@ -2,20 +2,20 @@
 
     NEC PC-98 computer series
 
-	preliminary driver by Angelo Salese
+    preliminary driver by Angelo Salese
 
-	Reminder: tests A20 line feature, afaik it's NOT supported by the i386 core (along with protected mode / MMU)
+    Reminder: tests A20 line feature, afaik it's NOT supported by the i386 core (along with protected mode / MMU)
 
-	TODO:
-	- remove the A20 line hack
+    TODO:
+    - remove the A20 line hack
 
-	Debug tricks list (aka list of things that should be fixed):
-	- run a first time without doing anything;
-	- call the debugger then soft reset (the debugger will be called after the reset because the CPU is into an halt state);
-	- wpiset 35,1,r -> do eip=90 -> bpset f926c -> do eip=128d -> run until HALT
-	- soft reset -> wpiset 35,1,r -> do eip=90 again -> run until HALT
-	- soft reset -> modify I/O $43d with a 0x02 (should bankswitch with the basic ROM) -> run
-	- modify memory 0x53c from 0xc4 to 0x84 two times
+    Debug tricks list (aka list of things that should be fixed):
+    - run a first time without doing anything;
+    - call the debugger then soft reset (the debugger will be called after the reset because the CPU is into an halt state);
+    - wpiset 35,1,r -> do eip=90 -> bpset f926c -> do eip=128d -> run until HALT
+    - soft reset -> wpiset 35,1,r -> do eip=90 again -> run until HALT
+    - soft reset -> modify I/O $43d with a 0x02 (should bankswitch with the basic ROM) -> run
+    - modify memory 0x53c from 0xc4 to 0x84 two times
 
 ========================================================================================
 
@@ -255,7 +255,7 @@ bit 5-7: BRG colors
 
 static VIDEO_UPDATE( pc9801 )
 {
-//	const gfx_element *gfx = screen->machine->gfx[0];
+//  const gfx_element *gfx = screen->machine->gfx[0];
 	int y,x;
 	int yi,xi;
 	UINT8 *gfx_data = memory_region(screen->machine, "gfx1");
@@ -351,14 +351,14 @@ static WRITE8_HANDLER( sio_port_w )
 }
 
 /*
-#define UPD7220_SR_DATA_READY			0x01
-#define UPD7220_SR_FIFO_FULL			0x02
-#define UPD7220_SR_FIFO_EMPTY			0x04
-#define UPD7220_SR_DRAWING_IN_PROGRESS	0x08
-#define UPD7220_SR_DMA_EXECUTE			0x10
-#define UPD7220_SR_VSYNC_ACTIVE			0x20
-#define UPD7220_SR_HBLANK_ACTIVE		0x40
-#define UPD7220_SR_LIGHT_PEN_DETECT		0x80
+#define UPD7220_SR_DATA_READY           0x01
+#define UPD7220_SR_FIFO_FULL            0x02
+#define UPD7220_SR_FIFO_EMPTY           0x04
+#define UPD7220_SR_DRAWING_IN_PROGRESS  0x08
+#define UPD7220_SR_DMA_EXECUTE          0x10
+#define UPD7220_SR_VSYNC_ACTIVE         0x20
+#define UPD7220_SR_HBLANK_ACTIVE        0x40
+#define UPD7220_SR_LIGHT_PEN_DETECT     0x80
 */
 static READ8_HANDLER( crtc_status_r )
 {
@@ -421,7 +421,7 @@ static UINT8 rom_bank;
 
 static WRITE8_HANDLER( ems_sel_w )
 {
-//	printf("%02x %02x\n",offset,data);
+//  printf("%02x %02x\n",offset,data);
 
 	if(offset == 1)
 	{
@@ -454,7 +454,7 @@ static WRITE8_HANDLER( rom_bank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "cpudata");
 
-//	printf("%08x %04x %08x\n",ROM[offset+(rom_bank*0x20000/4)],offset+(rom_bank*0x20000/4),data);
+//  printf("%08x %04x %08x\n",ROM[offset+(rom_bank*0x20000/4)],offset+(rom_bank*0x20000/4),data);
 
 	/* NOP any attempt to write on ROM (TODO: why it's overwriting here anyway? Doesn't make sense...) */
 	if((rom_bank == 0 && offset < 0x8000) || (rom_bank == 1 && offset < 0x18000))
@@ -592,32 +592,32 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(port_00_r,port_00_w,0xffffffff) // pic8259 (even ports) / dma (odd ports)
-//	AM_RANGE(0x0020, 0x0020) rtc
-//	AM_RANGE(0x0022, 0x0022)
+//  AM_RANGE(0x0020, 0x0020) rtc
+//  AM_RANGE(0x0022, 0x0022)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(sys_port_r,sys_port_w,0xffffffff) // rs232c (even ports) / system ppi8255 (odd ports)
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(sio_port_r,sio_port_w,0xffffffff) // printer ppi8255 (even ports) / keyboard (odd ports)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(port_60_r,port_60_w,0xffffffff) // uPD7220 status & fifo (R) / param & cmd (W) master (even ports)
-//	AM_RANGE(0x0064, 0x0064) V-SYNC related write
-//	AM_RANGE(0x0068, 0x0068) Flip-Flop 1 r/w
-//	AM_RANGE(0x006a, 0x006a) Flip-Flop 2 r/w
-//	AM_RANGE(0x006e, 0x006e) Flip-Flop 3 r/w
-//	AM_RANGE(0x0070, 0x0070) crtc registers
-//	AM_RANGE(0x0072, 0x0072)
-//	AM_RANGE(0x0074, 0x0074)
-//	AM_RANGE(0x0076, 0x0076)
-//	AM_RANGE(0x0078, 0x0078)
-//	AM_RANGE(0x007a, 0x007a)
-//	AM_RANGE(0x007c, 0x007c) GRCG mode write
-//	AM_RANGE(0x007e, 0x007e) GRCG tile write
+//  AM_RANGE(0x0064, 0x0064) V-SYNC related write
+//  AM_RANGE(0x0068, 0x0068) Flip-Flop 1 r/w
+//  AM_RANGE(0x006a, 0x006a) Flip-Flop 2 r/w
+//  AM_RANGE(0x006e, 0x006e) Flip-Flop 3 r/w
+//  AM_RANGE(0x0070, 0x0070) crtc registers
+//  AM_RANGE(0x0072, 0x0072)
+//  AM_RANGE(0x0074, 0x0074)
+//  AM_RANGE(0x0076, 0x0076)
+//  AM_RANGE(0x0078, 0x0078)
+//  AM_RANGE(0x007a, 0x007a)
+//  AM_RANGE(0x007c, 0x007c) GRCG mode write
+//  AM_RANGE(0x007e, 0x007e) GRCG tile write
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(port_70_r,port_70_w,0xffffffff) // crtc regs (even ports) / pit8253 (odd ports)
 	AM_RANGE(0x00a0, 0x00a3) AM_READWRITE8(port_a0_r,port_a0_w,0xffffffff) // uPD7220 status & fifo (R) / param & cmd (W) slave (even ports)
-// 	AM_RANGE(0x00e0, 0x00ef) DMA
+//  AM_RANGE(0x00e0, 0x00ef) DMA
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(port_f0_r,port_f0_w,0xffffffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(ems_sel_w,0xffffffff)
 	AM_RANGE(0x0460, 0x0463) AM_READWRITE8(wram_sel_r,wram_sel_w,0xffffffff)
 	AM_RANGE(0x7fd8, 0x7fdf) AM_READ8(pc98_mouse_r,0xffffffff)
 
-//	(and many more...)
+//  (and many more...)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9821_mem, ADDRESS_SPACE_PROGRAM, 32)
@@ -799,7 +799,7 @@ static READ8_DEVICE_HANDLER( printer_porta_r )
 
 static READ8_DEVICE_HANDLER( printer_portb_r )
 {
-//	printf("PPI2 Port B read\n");
+//  printf("PPI2 Port B read\n");
 	return 0xb4;
 }
 

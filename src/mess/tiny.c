@@ -36,8 +36,8 @@ const game_driver * const drivers[] =
 #else	/* DRIVER_RECURSIVE */
 
 	/* COLECO */
-	DRIVER( coleco )	/* ColecoVision (Original BIOS)						*/
-	DRIVER( colecoa )	/* ColecoVision (Thick Characters)					*/
-	DRIVER( colecob )	/* Spectravideo SVI-603 Coleco Game Adapter			*/
+	DRIVER( coleco )	/* ColecoVision (Original BIOS)                     */
+	DRIVER( colecoa )	/* ColecoVision (Thick Characters)                  */
+	DRIVER( colecob )	/* Spectravideo SVI-603 Coleco Game Adapter         */
 
 #endif	/* DRIVER_RECURSIVE */

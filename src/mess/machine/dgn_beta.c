@@ -297,7 +297,7 @@ static void UpdateBanks(running_machine *machine, int first, int last)
 	int		bank_end;
 	int		MapPage;
 	char page_num[10];
-	
+
 	LOG_BANK_UPDATE(("\n\nUpdating banks %d to %d at PC=$%X\n",first,last,cpu_get_pc(space_0->cpu)));
 	for(Page=first;Page<=last;Page++)
 	{

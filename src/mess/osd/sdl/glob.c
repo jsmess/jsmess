@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *  The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Guido van Rossum.
@@ -15,8 +15,8 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
+ *  This product includes software developed by the University of
+ *  California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -46,21 +46,21 @@ static char sccsid[] = "@(#)glob.c	8.3 (Berkeley) 10/13/93";
  * Optional extra services, controlled by flags not defined by POSIX:
  *
  * GLOB_QUOTE:
- *	Escaping convention: \ inhibits any special meaning the following
- *	character might have (except \ at end of string is retained).
+ *  Escaping convention: \ inhibits any special meaning the following
+ *  character might have (except \ at end of string is retained).
  * GLOB_MAGCHAR:
- *	Set in gl_flags if pattern contained a globbing character.
+ *  Set in gl_flags if pattern contained a globbing character.
  * GLOB_NOMAGIC:
- *	Same as GLOB_NOCHECK, but it will only append pattern if it did
- *	not contain any magic characters.  [Used in csh style globbing]
+ *  Same as GLOB_NOCHECK, but it will only append pattern if it did
+ *  not contain any magic characters.  [Used in csh style globbing]
  * GLOB_ALTDIRFUNC:
- *	Use alternately specified directory access functions.
+ *  Use alternately specified directory access functions.
  * GLOB_TILDE:
- *	expand ~user/foo to the /home/dir/of/user/foo
+ *  expand ~user/foo to the /home/dir/of/user/foo
  * GLOB_BRACE:
- *	expand {1,2}{a,b} to 1a 1b 2a 2b
+ *  expand {1,2}{a,b} to 1a 1b 2a 2b
  * gl_matchc:
- *	Number of matches in the current invocation of glob.
+ *  Number of matches in the current invocation of glob.
  */
 
 #ifdef WIN32
@@ -156,13 +156,13 @@ typedef char Char;
 
 static int	 compare __P((const void *, const void *));
 static void	 g_Ctoc __P((const Char *, char *));
-//static int	 g_lstat __P((Char *, struct stat *, glob_t *));
+//static int     g_lstat __P((Char *, struct stat *, glob_t *));
 static osd_directory	*g_opendir __P((Char *, glob_t *));
 static Char	*g_strchr __P((const Char *, int));
 #ifdef notdef
 static Char	*g_strcat __P((Char *, const Char *));
 #endif
-//static int	 g_stat __P((Char *, struct stat *, glob_t *));
+//static int     g_stat __P((Char *, struct stat *, glob_t *));
 static int	 glob0 __P((const Char *, glob_t *));
 static int	 glob1 __P((Char *, glob_t *));
 static int	 glob2 __P((Char *, Char *, Char *, glob_t *));
@@ -275,9 +275,9 @@ static int globexp2(ptr, pattern, pglob, rv)
 				continue;
 			if (*pe == EOS) {
 				/*
-				 * We could not find a matching RBRACKET.
-				 * Ignore and just look for RBRACE
-				 */
+                 * We could not find a matching RBRACKET.
+                 * Ignore and just look for RBRACE
+                 */
 				pe = pm;
 			}
 		}
@@ -303,9 +303,9 @@ static int globexp2(ptr, pattern, pglob, rv)
 				continue;
 			if (*pm == EOS) {
 				/*
-				 * We could not find a matching RBRACKET.
-				 * Ignore and just look for RBRACE
-				 */
+                 * We could not find a matching RBRACKET.
+                 * Ignore and just look for RBRACE
+                 */
 				pm = pl;
 			}
 			break;
@@ -328,9 +328,9 @@ static int globexp2(ptr, pattern, pglob, rv)
 				for (lm = ls; (pl < pm); *lm++ = *pl++)
 					continue;
 				/*
-				 * Append the rest of the pattern after the
-				 * closing brace
-				 */
+                 * Append the rest of the pattern after the
+                 * closing brace
+                 */
 				for (pl = pe + 1; (*lm++ = *pl++) != EOS;)
 					continue;
 
@@ -373,8 +373,8 @@ globtilde(pattern, patbuf, patbuf_len, pglob)
 		return pattern;
 
 	/*
-	 * Copy up to the end of the string or /
-	 */
+     * Copy up to the end of the string or /
+     */
 	eb = &patbuf[patbuf_len - 1];
 	for (p = pattern + 1, h = (char *) patbuf;
 	    h < (char *)eb && *p && *p != SLASH; *h++ = *p++)
@@ -384,10 +384,10 @@ globtilde(pattern, patbuf, patbuf_len, pglob)
 
 	if (((char *) patbuf)[0] == EOS) {
 		/*
-		 * handle a plain ~ or ~/ by expanding $HOME first (iff
-		 * we're not running setuid or setgid) and then trying
-		 * the password file
-		 */
+         * handle a plain ~ or ~/ by expanding $HOME first (iff
+         * we're not running setuid or setgid) and then trying
+         * the password file
+         */
 		if (
 		    (h = getenv("HOME")) == NULL) {
 			if (((h = getlogin()) != NULL &&
@@ -400,8 +400,8 @@ globtilde(pattern, patbuf, patbuf_len, pglob)
 	}
 	else {
 		/*
-		 * Expand a ~user
-		 */
+         * Expand a ~user
+         */
 		if ((pwd = getpwnam((char*) patbuf)) == NULL)
 			return pattern;
 		else
@@ -478,8 +478,8 @@ glob0(pattern, pglob)
 		case STAR:
 			pglob->gl_flags |= GLOB_MAGCHAR;
 			/* collapse adjacent stars to one,
-			 * to avoid exponential behavior
-			 */
+             * to avoid exponential behavior
+             */
 			if (bufnext == patbuf || bufnext[-1] != M_ALL)
 			    *bufnext++ = M_ALL;
 			break;
@@ -497,11 +497,11 @@ glob0(pattern, pglob)
 		return(err);
 
 	/*
-	 * If there was no match we are going to append the pattern
-	 * if GLOB_NOCHECK was specified or if GLOB_NOMAGIC was specified
-	 * and the pattern did not contain any magic characters
-	 * GLOB_NOMAGIC is there just for compatibility with csh.
-	 */
+     * If there was no match we are going to append the pattern
+     * if GLOB_NOCHECK was specified or if GLOB_NOMAGIC was specified
+     * and the pattern did not contain any magic characters
+     * GLOB_NOMAGIC is there just for compatibility with csh.
+     */
 	if (pglob->gl_pathc == oldpathc &&
 	    ((pglob->gl_flags & GLOB_NOCHECK) ||
 	      ((pglob->gl_flags & GLOB_NOMAGIC) &&
@@ -549,9 +549,9 @@ glob2(pathbuf, pathend, pattern, pglob)
 	char buf[_MAX_PATH];
 
 	/*
-	 * Loop over pattern segments until end of pattern or until
-	 * segment with meta character found.
-	 */
+     * Loop over pattern segments until end of pattern or until
+     * segment with meta character found.
+     */
 	for (anymeta = 0;;) {
 		if (*pattern == EOS) {		/* End of pattern? */
 			*pathend = EOS;
@@ -606,11 +606,11 @@ glob3(pathbuf, pathend, pattern, restpattern, pglob)
 	char buf[_MAX_PATH];
 
 	/*
-	 * The readdirfunc declaration can't be prototyped, because it is
-	 * assigned, below, to two functions which are prototyped in glob.h
-	 * and dirent.h as taking pointers to differently typed opaque
-	 * structures.
-	 */
+     * The readdirfunc declaration can't be prototyped, because it is
+     * assigned, below, to two functions which are prototyped in glob.h
+     * and dirent.h as taking pointers to differently typed opaque
+     * structures.
+     */
 	typedef const osd_directory_entry *(*readdirfunc_t)(osd_directory *);
 	readdirfunc_t readdirfunc;
 
@@ -673,8 +673,8 @@ glob3(pathbuf, pathend, pattern, restpattern, pglob)
  * Return 0 if new item added, error code if memory couldn't be allocated.
  *
  * Invariant of the glob_t structure:
- *	Either gl_pathc is zero and gl_pathv is NULL; or gl_pathc > 0 and
- *	gl_pathv points to (gl_offs + gl_pathc + 1) items.
+ *  Either gl_pathc is zero and gl_pathv is NULL; or gl_pathc > 0 and
+ *  gl_pathv points to (gl_offs + gl_pathc + 1) items.
  */
 static int
 globextend(path, pglob)

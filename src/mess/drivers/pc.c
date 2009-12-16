@@ -1526,7 +1526,7 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
@@ -1590,7 +1590,7 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
@@ -1665,7 +1665,7 @@ static MACHINE_DRIVER_START( ibm5150 )
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
@@ -1728,10 +1728,10 @@ static MACHINE_DRIVER_START( pccga )
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("640K")	
+	MDRV_RAM_DEFAULT_SIZE("640K")
 MACHINE_DRIVER_END
 
 
@@ -1782,10 +1782,10 @@ static MACHINE_DRIVER_START( europc )
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("640K")	
+	MDRV_RAM_DEFAULT_SIZE("640K")
 MACHINE_DRIVER_END
 
 
@@ -1843,10 +1843,10 @@ static MACHINE_DRIVER_START( ibm5160 )
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("640K")	
+	MDRV_RAM_DEFAULT_SIZE("640K")
 MACHINE_DRIVER_END
 
 
@@ -1890,10 +1890,10 @@ static MACHINE_DRIVER_START( pc200 )
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("640K")	
+	MDRV_RAM_DEFAULT_SIZE("640K")
 MACHINE_DRIVER_END
 
 
@@ -1943,17 +1943,17 @@ static MACHINE_DRIVER_START( ppc512 )
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("512K")	
+	MDRV_RAM_DEFAULT_SIZE("512K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ppc640 )
 	MDRV_IMPORT_FROM( ppc512 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ppc640_map)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
@@ -2001,7 +2001,7 @@ static MACHINE_DRIVER_START( pc1512 )
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
@@ -2050,7 +2050,7 @@ static MACHINE_DRIVER_START( pc1640 )
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
@@ -2111,7 +2111,7 @@ static MACHINE_DRIVER_START( xtvga )
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
@@ -2160,7 +2160,7 @@ static MACHINE_DRIVER_START( t1000hx )
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
@@ -2209,7 +2209,7 @@ static MACHINE_DRIVER_START( t1000_16 )
 	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")
@@ -2266,7 +2266,7 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_CARTSLOT_EXTENSION_LIST("jrc")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(pcjr_cartridge)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("640K")

@@ -374,10 +374,10 @@ static MACHINE_DRIVER_START( mz700 )
 	MDRV_TTL74145_ADD("ls145", default_ttl74145)
 
 	MDRV_CASSETTE_ADD( "cassette", mz700_cassette_config )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")	
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 

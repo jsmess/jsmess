@@ -15,53 +15,53 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- add HRTC/VRTC output to i8275
-	- NEC uPD7220 GDC
-	- accurate video timing
-	- floppy DRQ during RECALL = 0
-	- PCB layout
-	- NEC uPD7201 MPSC
+    - add HRTC/VRTC output to i8275
+    - NEC uPD7220 GDC
+    - accurate video timing
+    - floppy DRQ during RECALL = 0
+    - PCB layout
+    - NEC uPD7201 MPSC
 
 */
 
 /*
 
-	Nokia Elektroniikka pj
+    Nokia Elektroniikka pj
 
-	Controller ILC 9534
-	FDC-Interface ILC 9530
+    Controller ILC 9534
+    FDC-Interface ILC 9530
 
-	Parts:
+    Parts:
 
-	6,144 MHz xtal (CPU clock)
-	18,720 MHz xtal (pixel clock)
-	16 MHz xtal (FDC clock)
-	Intel 8085AP (CPU)
-	Intel 8253-5P (PIT)
-	Intel 8275P (CRTC)
-	Intel 8212P (I/OP)
-	Intel 8237A-5P (DMAC)
-	NEC uPD7220C (GDC)
-	NEC uPD7201P (MPSC=uart)
-	NEC uPD765 (FDC)
-	TMS4116-15 (16Kx4 DRAM)*4 = 32KB Video RAM for 7220
-	2164-6P (64Kx1 DRAM)*8 = 64KB Work RAM
+    6,144 MHz xtal (CPU clock)
+    18,720 MHz xtal (pixel clock)
+    16 MHz xtal (FDC clock)
+    Intel 8085AP (CPU)
+    Intel 8253-5P (PIT)
+    Intel 8275P (CRTC)
+    Intel 8212P (I/OP)
+    Intel 8237A-5P (DMAC)
+    NEC uPD7220C (GDC)
+    NEC uPD7201P (MPSC=uart)
+    NEC uPD765 (FDC)
+    TMS4116-15 (16Kx4 DRAM)*4 = 32KB Video RAM for 7220
+    2164-6P (64Kx1 DRAM)*8 = 64KB Work RAM
 
-	DMA channels:
+    DMA channels:
 
-	0	CRT
-	1	MPSC transmit
-	2	MPSC receive
-	3	FDC
+    0   CRT
+    1   MPSC transmit
+    2   MPSC receive
+    3   FDC
 
-	Interrupts:
+    Interrupts:
 
-	INTR	MPSC INT
-	RST5.5	FDC IRQ
-	RST6.5	8212 INT
-	RST7.5	DMA EOP
+    INTR    MPSC INT
+    RST5.5  FDC IRQ
+    RST6.5  8212 INT
+    RST7.5  DMA EOP
 
 */
 
@@ -131,7 +131,7 @@ static ADDRESS_MAP_START( mm1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x1000, 0xfeff) AM_RAM
 	AM_RANGE(0xff00, 0xff0f) AM_MIRROR(0x80) AM_DEVREADWRITE(I8237_TAG, i8237_r, i8237_w)
-//	AM_RANGE(0xff10, 0xff13) AM_MIRROR(0x8c) AM_DEVREADWRITE(UPD7201_TAG, upd7201_cd_ba_r, upd7201_cd_ba_w)
+//  AM_RANGE(0xff10, 0xff13) AM_MIRROR(0x8c) AM_DEVREADWRITE(UPD7201_TAG, upd7201_cd_ba_r, upd7201_cd_ba_w)
     AM_RANGE(0xff20, 0xff21) AM_MIRROR(0x8e) AM_DEVREADWRITE(I8275_TAG, i8275_r, i8275_w)
 	AM_RANGE(0xff30, 0xff33) AM_MIRROR(0x8c) AM_DEVREADWRITE(I8253_TAG, pit8253_r, pit8253_w)
 	AM_RANGE(0xff40, 0xff40) AM_MIRROR(0x8f) AM_DEVREADWRITE(I8212_TAG, i8212_r, i8212_w)

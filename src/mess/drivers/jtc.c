@@ -671,7 +671,7 @@ static MACHINE_DRIVER_START( jtc )
 
     MDRV_VIDEO_START(jtc)
     MDRV_VIDEO_UPDATE(jtc)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("2K")
@@ -683,7 +683,7 @@ static MACHINE_DRIVER_START( jtces88 )
     /* basic machine hardware */
     MDRV_CPU_MODIFY(UB8830D_TAG)
     MDRV_CPU_PROGRAM_MAP(jtc_es1988_mem)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("4K")
@@ -708,7 +708,7 @@ static MACHINE_DRIVER_START( jtces23 )
 
     MDRV_VIDEO_START(jtc_es23)
     MDRV_VIDEO_UPDATE(jtc_es23)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4K")
@@ -733,7 +733,7 @@ static MACHINE_DRIVER_START( jtces40 )
 
     MDRV_VIDEO_START(jtc_es40)
     MDRV_VIDEO_UPDATE(jtc_es40)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("8K")

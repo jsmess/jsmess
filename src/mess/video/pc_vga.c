@@ -582,7 +582,7 @@ static void vga_cpu_interface(running_machine *machine)
 	else if (vga.sequencer.data[4] & 4)
 	{
 		read_handler = vga_ega_r;
-		write_handler = vga_ega_w;		
+		write_handler = vga_ega_w;
 		read_handler16 = vga_ega16_r;
 		write_handler16 = vga_ega16_w;
 		read_handler32 = vga_ega32_r;
@@ -1244,7 +1244,7 @@ void pc_vga_init(running_machine *machine, const struct pc_vga_interface *vga_in
 			memory_install_write8_handler(spacevga, vga.vga_intf.port_offset + 0x3c0, vga.vga_intf.port_offset + 0x3cf, 0, 0, vga_port_03c0_w );
 			memory_install_write8_handler(spacevga, vga.vga_intf.port_offset + 0x3d0, vga.vga_intf.port_offset + 0x3df, 0, 0, vga_port_03d0_w );
 			break;
-			
+
 		case 16:
 			memory_install_read16_handler(spacevga, vga.vga_intf.port_offset + 0x3b0, vga.vga_intf.port_offset + 0x3bf, 0, 0, vga_port16le_03b0_r );
 			memory_install_read16_handler(spacevga, vga.vga_intf.port_offset + 0x3c0, vga.vga_intf.port_offset + 0x3cf, 0, 0, vga_port16le_03c0_r );

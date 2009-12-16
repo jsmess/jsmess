@@ -1306,7 +1306,7 @@ static MACHINE_DRIVER_START( px4 )
 	MDRV_CARTSLOT_NOT_MANDATORY
 
 	/* tf20 floppy drive */
-//	MDRV_TF20_ADD("floppy")
+//  MDRV_TF20_ADD("floppy")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( px4p )

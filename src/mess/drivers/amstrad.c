@@ -914,7 +914,7 @@ static MACHINE_DRIVER_START( amstrad )
 	MDRV_UPD765A_ADD("upd765", amstrad_upd765_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
@@ -978,10 +978,10 @@ static MACHINE_DRIVER_START( cpcplus )
 	MDRV_IMPORT_FROM(cpcplus_cartslot)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")	
+	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 
 
@@ -1020,10 +1020,10 @@ static MACHINE_DRIVER_START( gx4000 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_IMPORT_FROM(cpcplus_cartslot)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")	
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 
@@ -1040,7 +1040,7 @@ static MACHINE_DRIVER_START( aleste )
 	MDRV_UPD765A_MODIFY("upd765", aleste_8272_interface)
 
 	MDRV_FLOPPY_2_DRIVES_MODIFY(aleste_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("2M")

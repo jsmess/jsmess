@@ -780,7 +780,7 @@ static MACHINE_DRIVER_START( osi600 )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD("cassette", default_cassette_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4K")
@@ -808,7 +808,7 @@ static MACHINE_DRIVER_START( uk101 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4K")
-	MDRV_RAM_EXTRA_OPTIONS("8K")	
+	MDRV_RAM_EXTRA_OPTIONS("8K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c1p )
@@ -840,7 +840,7 @@ static MACHINE_DRIVER_START( c1p )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD("cassette", default_cassette_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("8K")
@@ -861,7 +861,7 @@ static MACHINE_DRIVER_START( c1pmf )
 	MDRV_ACIA6850_ADD("acia_1", osi470_acia_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, osi_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("20K")

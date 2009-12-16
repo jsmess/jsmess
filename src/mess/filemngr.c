@@ -1,15 +1,15 @@
 /*********************************************************************
 
-	filemngr.c
+    filemngr.c
 
-	MESS's clunky built-in file manager
+    MESS's clunky built-in file manager
 
-	TODO
-		- Support image creation arguments
-		- Restrict directory listing by file extension
-		- Support file manager invocation from the main menu for
-		  required images
-		- Restrict empty slot if image required
+    TODO
+        - Support image creation arguments
+        - Restrict directory listing by file extension
+        - Support file manager invocation from the main menu for
+          required images
+        - Restrict empty slot if image required
 
 *********************************************************************/
 
@@ -119,7 +119,7 @@ struct _confirm_save_as_menu_state
 
 /*-------------------------------------------------
     input_character - inputs a typed character
-	into a buffer
+    into a buffer
 -------------------------------------------------*/
 
 static void input_character(char *buffer, size_t buffer_length, unicode_char unichar, int (*filter)(unicode_char))
@@ -141,7 +141,7 @@ static void input_character(char *buffer, size_t buffer_length, unicode_char uni
 
 /*-------------------------------------------------
     extra_text_draw_box - generically adds header
-	or footer text
+    or footer text
 -------------------------------------------------*/
 
 static void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, const char *text, int direction)
@@ -187,7 +187,7 @@ static void extra_text_draw_box(float origx1, float origx2, float origy, float y
 
 /*-------------------------------------------------
     extra_text_render - generically adds header
-	and footer text
+    and footer text
 -------------------------------------------------*/
 
 static void extra_text_render(running_machine *machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom,
@@ -211,7 +211,7 @@ static void extra_text_render(running_machine *machine, ui_menu *menu, void *sta
 
 /*-------------------------------------------------
     menu_confirm_save_as_populate - populates the
-	confirm save as menu
+    confirm save as menu
 -------------------------------------------------*/
 
 static void menu_confirm_save_as_populate(running_machine *machine, ui_menu *menu, void *state)
@@ -259,7 +259,7 @@ static void menu_confirm_save_as(running_machine *machine, ui_menu *menu, void *
 
 /*-------------------------------------------------
     is_valid_filename_char - tests to see if a
-	character is valid in a filename 
+    character is valid in a filename
 -------------------------------------------------*/
 
 static int is_valid_filename_char(unicode_char unichar)
@@ -269,12 +269,12 @@ static int is_valid_filename_char(unicode_char unichar)
 	{
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 	/* 00-0f */
 		0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 	/* 10-1f */
-		1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 	/*	!"#$%&'()*+,-./ */
+		1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 	/*  !"#$%&'()*+,-./ */
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 	/* 0123456789:;<=>? */
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 	/* @ABCDEFGHIJKLMNO */
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 	/* PQRSTUVWXYZ[\]^_ */
 		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 	/* `abcdefghijklmno */
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 	/* pqrstuvwxyz{|}~	*/
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 	/* pqrstuvwxyz{|}~  */
 	};
 	return (unichar < ARRAY_LENGTH(valid_filename_char)) && valid_filename_char[unichar];
 }
@@ -299,7 +299,7 @@ static void file_create_render_extra(running_machine *machine, ui_menu *menu, vo
 
 /*-------------------------------------------------
     menu_file_create_populate - populates the file
-	creator menu
+    creator menu
 -------------------------------------------------*/
 
 static void menu_file_create_populate(running_machine *machine, ui_menu *menu, void *state, void *selection)
@@ -509,7 +509,7 @@ static void file_selector_render_extra(running_machine *machine, ui_menu *menu, 
 
 /*-------------------------------------------------
     compare_file_selector_entries - sorting proc
-	for file selector entries
+    for file selector entries
 -------------------------------------------------*/
 
 static int compare_file_selector_entries(const file_selector_entry *e1, const file_selector_entry *e2)
@@ -549,7 +549,7 @@ static int compare_file_selector_entries(const file_selector_entry *e1, const fi
 
 /*-------------------------------------------------
     append_file_selector_entry - appends a new
-	file selector entry to an entry list
+    file selector entry to an entry list
 -------------------------------------------------*/
 
 static file_selector_entry *append_file_selector_entry(ui_menu *menu, file_selector_menu_state *menustate,
@@ -580,7 +580,7 @@ static file_selector_entry *append_file_selector_entry(ui_menu *menu, file_selec
 
 /*-------------------------------------------------
     append_file_selector_entry_menu_item - appends
-	a menu item for a file selector entry
+    a menu item for a file selector entry
 -------------------------------------------------*/
 
 static file_selector_entry *append_dirent_file_selector_entry(ui_menu *menu, file_selector_menu_state *menustate,
@@ -627,7 +627,7 @@ static file_selector_entry *append_dirent_file_selector_entry(ui_menu *menu, fil
 
 /*-------------------------------------------------
     append_file_selector_entry_menu_item - appends
-	a menu item for a file selector entry
+    a menu item for a file selector entry
 -------------------------------------------------*/
 
 static void append_file_selector_entry_menu_item(ui_menu *menu, const file_selector_entry *entry)
@@ -667,7 +667,7 @@ static void append_file_selector_entry_menu_item(ui_menu *menu, const file_selec
 
 /*-------------------------------------------------
     menu_file_selector_populate - creates and
-	allocates all menu items for a directory
+    allocates all menu items for a directory
 -------------------------------------------------*/
 
 static file_error menu_file_selector_populate(running_machine *machine, ui_menu *menu, file_selector_menu_state *menustate)
@@ -747,7 +747,7 @@ done:
 
 /*-------------------------------------------------
     check_path - performs a quick check to see if
-	a path exists
+    a path exists
 -------------------------------------------------*/
 
 static file_error check_path(const char *path)
@@ -842,8 +842,8 @@ static void menu_file_selector(running_machine *machine, ui_menu *menu, void *pa
 
 /*-------------------------------------------------
     fix_working_directory - checks the working
-	directory for this device to ensure that it
-	"makes sense"
+    directory for this device to ensure that it
+    "makes sense"
 -------------------------------------------------*/
 
 static void fix_working_directory(const device_config *device)
@@ -873,7 +873,7 @@ static void file_manager_render_extra(running_machine *machine, ui_menu *menu, v
 {
 	file_manager_menu_state *menustate = (file_manager_menu_state *) state;
 	const char *path;
-	
+
 	/* access the path */
 	path = (menustate->selected_device != NULL) ? image_filename(menustate->selected_device) : NULL;
 	extra_text_render(machine, menu, state, selectedref, top, bottom,
@@ -884,7 +884,7 @@ static void file_manager_render_extra(running_machine *machine, ui_menu *menu, v
 
 /*-------------------------------------------------
     menu_file_manager_populate - populates the main
-	file manager menu
+    file manager menu
 -------------------------------------------------*/
 
 static void menu_file_manager_populate(running_machine *machine, ui_menu *menu, void *state)

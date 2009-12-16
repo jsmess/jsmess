@@ -1,6 +1,6 @@
 //============================================================
 //
-//	menu.c - Win32 MESS menus handling
+//  menu.c - Win32 MESS menus handling
 //
 //============================================================
 
@@ -40,7 +40,7 @@
 #endif
 
 //============================================================
-//	IMPORTS
+//  IMPORTS
 //============================================================
 
 // from timer.c
@@ -48,7 +48,7 @@ extern void win_timer_enable(int enabled);
 
 
 //============================================================
-//	PARAMETERS
+//  PARAMETERS
 //============================================================
 
 #define ID_FRAMESKIP_0				10000
@@ -94,7 +94,7 @@ enum
 #endif
 
 //============================================================
-//	LOCAL VARIABLES
+//  LOCAL VARIABLES
 //============================================================
 
 static HICON device_icons[IO_COUNT];
@@ -106,7 +106,7 @@ static int add_filter_entry(char *dest, size_t dest_len, const char *description
 
 
 //============================================================
-//	input_item_from_serial_number
+//  input_item_from_serial_number
 //============================================================
 
 static int input_item_from_serial_number(running_machine *machine, int serial_number,
@@ -148,7 +148,7 @@ static int input_item_from_serial_number(running_machine *machine, int serial_nu
 
 
 //============================================================
-//	serial_number_from_input_item
+//  serial_number_from_input_item
 //============================================================
 
 static int serial_number_from_input_item(running_machine *machine, const input_port_config *port,
@@ -187,7 +187,7 @@ static int serial_number_from_input_item(running_machine *machine, const input_p
 
 
 //============================================================
-//	customize_input
+//  customize_input
 //============================================================
 
 static void customize_input(running_machine *machine, HWND wnd, const char *title, artwork_cust_type cust_type, int player, int inputclass, const char *section)
@@ -207,7 +207,7 @@ static void customize_input(running_machine *machine, HWND wnd, const char *titl
 	} portslots[256];
 
 	/* check to see if there is any custom artwork for this configure dialog,
-	 * and if so, retrieve the info */
+     * and if so, retrieve the info */
 	portslot_count = artwork_get_inputscreen_customizations(&png, cust_type, section,
 		customizations, ARRAY_LENGTH(customizations));
 
@@ -233,8 +233,8 @@ static void customize_input(running_machine *machine, HWND wnd, const char *titl
 			if (input_field_name(field) && (this_inputclass == inputclass))
 			{
 				/* most of the time, the player parameter is the player number
-				 * but in the case of INPUT_CLASS_CATEGORIZED, it is the
-				 * category */
+                 * but in the case of INPUT_CLASS_CATEGORIZED, it is the
+                 * category */
 				if (inputclass == INPUT_CLASS_CATEGORIZED)
 					this_player = field->category;
 				else
@@ -243,7 +243,7 @@ static void customize_input(running_machine *machine, HWND wnd, const char *titl
 				if (this_player == player)
 				{
 					/* check to see if the custom artwork for this configure dialog
-					 * says anything about this input */
+                     * says anything about this input */
 					pr = NULL;
 					for (i = 0; customizations[i].ipt != IPT_END; i++)
 					{
@@ -259,8 +259,8 @@ static void customize_input(running_machine *machine, HWND wnd, const char *titl
 					}
 
 					/* store this InputPort/RECT combo in our list.  we do not
-					 * necessarily want to add it yet because we the INI might
-					 * want to reorder the tab order */
+                     * necessarily want to add it yet because we the INI might
+                     * want to reorder the tab order */
 					if (customizations[i].ipt == IPT_END)
 						i = portslot_count++;
 					if (i < ARRAY_LENGTH(portslots))
@@ -300,7 +300,7 @@ done:
 
 
 //============================================================
-//	customize_joystick
+//  customize_joystick
 //============================================================
 
 static void customize_joystick(running_machine *machine, HWND wnd, int joystick_num)
@@ -311,7 +311,7 @@ static void customize_joystick(running_machine *machine, HWND wnd, int joystick_
 
 
 //============================================================
-//	customize_keyboard
+//  customize_keyboard
 //============================================================
 
 static void customize_keyboard(running_machine *machine, HWND wnd)
@@ -322,7 +322,7 @@ static void customize_keyboard(running_machine *machine, HWND wnd)
 
 
 //============================================================
-//	customize_miscinput
+//  customize_miscinput
 //============================================================
 
 static void customize_miscinput(running_machine *machine, HWND wnd)
@@ -333,7 +333,7 @@ static void customize_miscinput(running_machine *machine, HWND wnd)
 
 
 //============================================================
-//	customize_categorizedinput
+//  customize_categorizedinput
 //============================================================
 
 static void customize_categorizedinput(running_machine *machine, HWND wnd, const char *section, int category)
@@ -345,7 +345,7 @@ static void customize_categorizedinput(running_machine *machine, HWND wnd, const
 
 
 //============================================================
-//	storeval_inputport
+//  storeval_inputport
 //============================================================
 
 static void storeval_inputport(void *param, int val)
@@ -361,7 +361,7 @@ static void storeval_inputport(void *param, int val)
 
 
 //============================================================
-//	customize_switches
+//  customize_switches
 //============================================================
 
 static void customize_switches(running_machine *machine, HWND wnd, int title_string_num, UINT32 ipt_name)
@@ -416,7 +416,7 @@ done:
 
 
 //============================================================
-//	customize_dipswitches
+//  customize_dipswitches
 //============================================================
 
 static void customize_dipswitches(running_machine *machine, HWND wnd)
@@ -427,7 +427,7 @@ static void customize_dipswitches(running_machine *machine, HWND wnd)
 
 
 //============================================================
-//	customize_configuration
+//  customize_configuration
 //============================================================
 
 static void customize_configuration(running_machine *machine, HWND wnd)
@@ -438,7 +438,7 @@ static void customize_configuration(running_machine *machine, HWND wnd)
 
 
 //============================================================
-//	customize_analogcontrols
+//  customize_analogcontrols
 //============================================================
 
 enum
@@ -568,7 +568,7 @@ done:
 
 
 //============================================================
-//	state_dialog
+//  state_dialog
 //============================================================
 
 static void state_dialog(HWND wnd, win_file_dialog_type dlgtype,
@@ -641,7 +641,7 @@ static void state_save(running_machine *machine)
 
 
 //============================================================
-//	format_combo_changed
+//  format_combo_changed
 //============================================================
 
 struct file_dialog_params
@@ -714,7 +714,7 @@ static void format_combo_changed(dialog_box *dialog, HWND dlgwnd, NMHDR *notific
 
 
 //============================================================
-//	storeval_option_resolution
+//  storeval_option_resolution
 //============================================================
 
 struct storeval_optres_params
@@ -753,7 +753,7 @@ static void storeval_option_resolution(void *storeval_param, int val)
 
 
 //============================================================
-//	build_option_dialog
+//  build_option_dialog
 //============================================================
 
 static dialog_box *build_option_dialog(const device_config *dev, char *filter, size_t filter_len, int *create_format, option_resolution **create_args)
@@ -839,7 +839,7 @@ error:
 
 
 //============================================================
-//	copy_extension_list
+//  copy_extension_list
 //============================================================
 
 static int copy_extension_list(char *dest, size_t dest_len, const char *extensions)
@@ -876,7 +876,7 @@ static int copy_extension_list(char *dest, size_t dest_len, const char *extensio
 
 
 //============================================================
-//	add_filter_entry
+//  add_filter_entry
 //============================================================
 
 static int add_filter_entry(char *dest, size_t dest_len, const char *description, const char *extensions)
@@ -904,7 +904,7 @@ static int add_filter_entry(char *dest, size_t dest_len, const char *description
 
 
 //============================================================
-//	build_generic_filter
+//  build_generic_filter
 //============================================================
 
 static void build_generic_filter(const device_config *device, int is_save, char *filter, size_t filter_len)
@@ -935,7 +935,7 @@ static void build_generic_filter(const device_config *device, int is_save, char 
 
 
 //============================================================
-//	change_device
+//  change_device
 //============================================================
 
 static void change_device(HWND wnd, const device_config *device, int is_save)
@@ -1020,7 +1020,7 @@ done:
 
 
 //============================================================
-//	pause
+//  pause
 //============================================================
 
 static void pause(running_machine *machine)
@@ -1031,7 +1031,7 @@ static void pause(running_machine *machine)
 
 
 //============================================================
-//	get_menu_item_string
+//  get_menu_item_string
 //============================================================
 
 static BOOL get_menu_item_string(HMENU menu, UINT item, BOOL by_position, HMENU *sub_menu, LPTSTR buffer, size_t buffer_len)
@@ -1065,7 +1065,7 @@ static BOOL get_menu_item_string(HMENU menu, UINT item, BOOL by_position, HMENU 
 
 
 //============================================================
-//	find_sub_menu
+//  find_sub_menu
 //============================================================
 
 static HMENU find_sub_menu(HMENU menu, const char *menutext, int create_sub_menu)
@@ -1116,7 +1116,7 @@ static HMENU find_sub_menu(HMENU menu, const char *menutext, int create_sub_menu
 
 
 //============================================================
-//	set_command_state
+//  set_command_state
 //============================================================
 
 static void set_command_state(HMENU menu_bar, UINT command, UINT state)
@@ -1141,7 +1141,7 @@ static void set_command_state(HMENU menu_bar, UINT command, UINT state)
 
 
 //============================================================
-//	append_menu_utf8
+//  append_menu_utf8
 //============================================================
 
 static void append_menu_utf8(HMENU menu, UINT flags, UINT_PTR id, const char *str)
@@ -1155,7 +1155,7 @@ static void append_menu_utf8(HMENU menu, UINT flags, UINT_PTR id, const char *st
 
 
 //============================================================
-//	append_menu_uistring
+//  append_menu_uistring
 //============================================================
 
 static void append_menu_uistring(HMENU menu, UINT flags, UINT_PTR id, int uistring)
@@ -1166,7 +1166,7 @@ static void append_menu_uistring(HMENU menu, UINT flags, UINT_PTR id, int uistri
 
 
 //============================================================
-//	remove_menu_items
+//  remove_menu_items
 //============================================================
 
 static void remove_menu_items(HMENU menu)
@@ -1178,7 +1178,7 @@ static void remove_menu_items(HMENU menu)
 
 
 //============================================================
-//	setup_joystick_menu
+//  setup_joystick_menu
 //============================================================
 
 static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
@@ -1265,7 +1265,7 @@ static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
 
 
 //============================================================
-//	is_windowed
+//  is_windowed
 //============================================================
 
 static int is_windowed(void)
@@ -1276,7 +1276,7 @@ static int is_windowed(void)
 
 
 //============================================================
-//	frameskip_level_count
+//  frameskip_level_count
 //============================================================
 
 static int frameskip_level_count(void)
@@ -1296,7 +1296,7 @@ static int frameskip_level_count(void)
 
 
 //============================================================
-//	prepare_menus
+//  prepare_menus
 //============================================================
 
 static void prepare_menus(HWND wnd)
@@ -1493,7 +1493,7 @@ static void prepare_menus(HWND wnd)
 
 
 //============================================================
-//	set_seped
+//  set_seped
 //============================================================
 
 static void set_speed(int speed)
@@ -1506,7 +1506,7 @@ static void set_speed(int speed)
 
 
 //============================================================
-//	win_toggle_menubar
+//  win_toggle_menubar
 //============================================================
 
 void win_toggle_menubar(void)
@@ -1567,7 +1567,7 @@ void win_toggle_menubar(void)
 
 
 //============================================================
-//	device_command
+//  device_command
 //============================================================
 
 static void device_command(HWND wnd, const device_config *img, int devoption)
@@ -1621,7 +1621,7 @@ static void device_command(HWND wnd, const device_config *img, int devoption)
 
 
 //============================================================
-//	help_display
+//  help_display
 //============================================================
 
 static void help_display(HWND wnd, const char *chapter)
@@ -1658,7 +1658,7 @@ static void help_display(HWND wnd, const char *chapter)
 
 
 //============================================================
-//	help_about_mess
+//  help_about_mess
 //============================================================
 
 static void help_about_mess(HWND wnd)
@@ -1669,7 +1669,7 @@ static void help_about_mess(HWND wnd)
 
 
 //============================================================
-//	help_about_thissystem
+//  help_about_thissystem
 //============================================================
 
 static void help_about_thissystem(running_machine *machine, HWND wnd)
@@ -1682,7 +1682,7 @@ static void help_about_thissystem(running_machine *machine, HWND wnd)
 
 
 //============================================================
-//	decode_deviceoption
+//  decode_deviceoption
 //============================================================
 
 static const device_config *decode_deviceoption(running_machine *machine, int command, int *devoption)
@@ -1701,7 +1701,7 @@ static const device_config *decode_deviceoption(running_machine *machine, int co
 
 
 //============================================================
-//	set_window_orientation
+//  set_window_orientation
 //============================================================
 
 static void set_window_orientation(win_window_info *window, int orientation)
@@ -1720,7 +1720,7 @@ static void set_window_orientation(win_window_info *window, int orientation)
 
 
 //============================================================
-//	pause_for_command
+//  pause_for_command
 //============================================================
 
 static int pause_for_command(UINT command)
@@ -1733,7 +1733,7 @@ static int pause_for_command(UINT command)
 
 
 //============================================================
-//	invoke_command
+//  invoke_command
 //============================================================
 
 static int invoke_command(HWND wnd, UINT command)
@@ -1858,8 +1858,8 @@ static int invoke_command(HWND wnd, UINT command)
 		case ID_OPTIONS_USEMOUSE:
 			{
 				// FIXME
-//				extern int win_use_mouse;
-//				win_use_mouse = !win_use_mouse;
+//              extern int win_use_mouse;
+//              win_use_mouse = !win_use_mouse;
 			}
 			break;
 
@@ -1978,7 +1978,7 @@ static int invoke_command(HWND wnd, UINT command)
 
 
 //============================================================
-//	set_menu_text
+//  set_menu_text
 //============================================================
 
 static void set_menu_text(HMENU menu_bar, int command, const char *text)
@@ -2003,7 +2003,7 @@ static void set_menu_text(HMENU menu_bar, int command, const char *text)
 
 
 //============================================================
-//	win_setup_menus
+//  win_setup_menus
 //============================================================
 
 int win_setup_menus(running_machine *machine, HMODULE module, HMENU menu_bar)
@@ -2071,7 +2071,7 @@ int win_setup_menus(running_machine *machine, HMODULE module, HMENU menu_bar)
 
 
 //============================================================
-//	win_resource_module
+//  win_resource_module
 //============================================================
 
 static HMODULE win_resource_module(void)
@@ -2089,7 +2089,7 @@ static HMODULE win_resource_module(void)
 
 
 //============================================================
-//	win_create_menu
+//  win_create_menu
 //============================================================
 
 #ifdef HAS_WINDOW_MENU
@@ -2122,7 +2122,7 @@ error:
 
 
 //============================================================
-//	win_mess_window_proc
+//  win_mess_window_proc
 //============================================================
 
 LRESULT CALLBACK win_mess_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)

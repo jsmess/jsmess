@@ -491,10 +491,10 @@ static MACHINE_DRIVER_START( nanos )
 	MDRV_UPD765A_ADD("upd765", nanos_upd765_interface)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(nanos_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")	
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 /* ROM definition */

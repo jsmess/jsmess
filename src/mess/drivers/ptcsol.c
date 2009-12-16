@@ -75,7 +75,7 @@ static MACHINE_DRIVER_START( sol20 )
 
 	MDRV_VIDEO_START(sol20)
 	MDRV_VIDEO_UPDATE(sol20)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("8K")

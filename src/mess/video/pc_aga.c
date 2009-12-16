@@ -817,11 +817,11 @@ WRITE8_HANDLER( pc200_cga_w )
 	pc_aga_cga_w(space, offset,data);
 	switch(offset) {
 	case 4:
-		pc200.portd |= 0x20;	
+		pc200.portd |= 0x20;
 		break;
 	case 8:
 		pc200.port8 = data;
-		pc200.portd |= 0x80;		
+		pc200.portd |= 0x80;
 		break;
 	case 0xe:
 		pc200.portd = 0x1f;

@@ -102,7 +102,7 @@ astring *zippath_parent(astring *dst, const char *path)
 
 /*-------------------------------------------------
     zippath_parent_basename - retrieves the parent
-	directory basename
+    directory basename
 -------------------------------------------------*/
 
 astring *zippath_parent_basename(astring *dst, const char *path)
@@ -137,11 +137,11 @@ astring *zippath_combine(astring *dst, const char *path1, const char *path2)
 	}
 	else if ((path1[0] != '\0') && !osd_is_path_separator(path1[strlen(path1) - 1]))
 	{
-		result = astring_assemble_3(dst, path1, PATH_SEPARATOR, path2);		
+		result = astring_assemble_3(dst, path1, PATH_SEPARATOR, path2);
 	}
 	else
 	{
-		result = astring_assemble_2(dst, path1, path2);		
+		result = astring_assemble_2(dst, path1, path2);
 	}
 	return result;
 }
@@ -154,7 +154,7 @@ astring *zippath_combine(astring *dst, const char *path1, const char *path2)
 
 /*-------------------------------------------------
     file_error_from_zip_error - translates a
-	file_error to a zip_error
+    file_error to a zip_error
 -------------------------------------------------*/
 
 static file_error file_error_from_zip_error(zip_error ziperr)
@@ -187,7 +187,7 @@ static file_error file_error_from_zip_error(zip_error ziperr)
 
 /*-------------------------------------------------
     create_core_file_from_zip - creates a core_file
-	from a zip file entry
+    from a zip file entry
 -------------------------------------------------*/
 
 static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header *header, core_file **file)
@@ -195,7 +195,7 @@ static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header
 	file_error filerr;
 	zip_error ziperr;
 	void *ptr;
-	
+
 	ptr = malloc(header->uncompressed_length);
 	if (ptr == NULL)
 	{
@@ -381,7 +381,7 @@ static int is_root(const char *path)
 
 /*-------------------------------------------------
     is_zip_file - tests to see if this file is a
-	ZIP file
+    ZIP file
 -------------------------------------------------*/
 
 static int is_zip_file(const char *path)
@@ -394,7 +394,7 @@ static int is_zip_file(const char *path)
 
 /*-------------------------------------------------
     is_zip_file_separator - returns whether this
-	character is a path separator within a ZIP file
+    character is a path separator within a ZIP file
 -------------------------------------------------*/
 
 static int is_zip_file_separator(char c)
@@ -406,7 +406,7 @@ static int is_zip_file_separator(char c)
 
 /*-------------------------------------------------
     is_zip_path_separator - returns whether this
-	character is a path separator within a ZIP path
+    character is a path separator within a ZIP path
 -------------------------------------------------*/
 
 static int is_zip_path_separator(char c)
@@ -418,7 +418,7 @@ static int is_zip_path_separator(char c)
 
 /*-------------------------------------------------
     next_path_char - lexes out the next path
-	character, normalizing separators as '/'
+    character, normalizing separators as '/'
 -------------------------------------------------*/
 
 static char next_path_char(const char *s, int *pos)
@@ -460,7 +460,7 @@ static char next_path_char(const char *s, int *pos)
 
 /*-------------------------------------------------
     zippath_find_sub_path - attempts to identify the
-	type of a sub path in a zip file
+    type of a sub path in a zip file
 -------------------------------------------------*/
 
 static const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const char *subpath, osd_dir_entry_type *type)
@@ -513,7 +513,7 @@ static const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const cha
 
 /*-------------------------------------------------
     zippath_resolve - separates a ZIP path out into
-	true path and ZIP entry components
+    true path and ZIP entry components
 -------------------------------------------------*/
 
 static file_error zippath_resolve(const char *path, osd_dir_entry_type *entry_type,
@@ -711,8 +711,8 @@ void zippath_closedir(zippath_directory *directory)
 
 /*-------------------------------------------------
     get_relative_path - checks to see if a specified
-	header is in the zippath_directory, and if so
-	returns the relative path
+    header is in the zippath_directory, and if so
+    returns the relative path
 -------------------------------------------------*/
 
 static const char *get_relative_path(zippath_directory *directory, const zip_file_header *header)
@@ -752,7 +752,7 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 		memset(&directory->returned_entry, 0, sizeof(directory->returned_entry));
 		directory->returned_entry.name = "..";
 		directory->returned_entry.type = ENTTYPE_DIR;
-		result = &directory->returned_entry;						
+		result = &directory->returned_entry;
 	}
 	else if (directory->directory != NULL)
 	{
@@ -794,7 +794,7 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 				for (s = relpath; *s && !is_zip_file_separator(*s); s++)
 					;
 				separator = *s ? s : NULL;
-				
+
 				if (separator != NULL)
 				{
 					/* a nested entry; loop through returned_dirlist to see if we've returned the parent directory */
@@ -811,13 +811,13 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 						rdent->next = directory->returned_dirlist;
 						memcpy(rdent->name, relpath, (separator - relpath) * sizeof(rdent->name[0]));
 						rdent->name[separator - relpath] = '\0';
-						directory->returned_dirlist = rdent;						
+						directory->returned_dirlist = rdent;
 
 						/* ...and return it */
 						memset(&directory->returned_entry, 0, sizeof(directory->returned_entry));
 						directory->returned_entry.name = rdent->name;
 						directory->returned_entry.type = ENTTYPE_DIR;
-						result = &directory->returned_entry;						
+						result = &directory->returned_entry;
 					}
 				}
 				else
@@ -827,7 +827,7 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 					directory->returned_entry.name = relpath;
 					directory->returned_entry.type = ENTTYPE_FILE;
 					directory->returned_entry.size = header->uncompressed_length;
-					result = &directory->returned_entry;						
+					result = &directory->returned_entry;
 				}
 			}
 		}
@@ -840,7 +840,7 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 
 /*-------------------------------------------------
     zippath_is_zip - returns TRUE if this path is
-	a ZIP path or FALSE if not
+    a ZIP path or FALSE if not
 -------------------------------------------------*/
 
 int zippath_is_zip(zippath_directory *directory)

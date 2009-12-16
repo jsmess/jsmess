@@ -1638,11 +1638,11 @@ static WRITE8_DEVICE_HANDLER( d_pia1_pb_w )
 	coco6847_video_changed();
 
 	/* PB1 will drive the sound output.  This is a rarely
-	 * used single bit sound mode. It is always connected thus
-	 * cannot be disabled.
-	 *
-	 * Source:  Page 31 of the Tandy Color Computer Serice Manual
-	 */
+     * used single bit sound mode. It is always connected thus
+     * cannot be disabled.
+     *
+     * Source:  Page 31 of the Tandy Color Computer Serice Manual
+     */
 	coco_sound_update(device->machine);
 }
 

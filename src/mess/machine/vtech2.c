@@ -156,7 +156,7 @@ WRITE8_HANDLER( laser_bank_select_w )
         "ext ROM #0","ext ROM #1","ext ROM #2","ext ROM #3"};
 	char bank[10];
 	offset %= 4;
-    data &= 15;	
+    data &= 15;
 
 	if( data != laser_bank[offset] )
     {
@@ -182,13 +182,13 @@ WRITE8_HANDLER( laser_bank_select_w )
 				}
 				memory_install_read_bank(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, mra_bank_hard[offset]);
 				memory_install_write_bank(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0, mwa_bank_hard[offset]);
-				
+
 			}
 			else
 			{
 				logerror("select bank #%d MASKED!\n", offset+1);
 				memory_nop_readwrite(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset * 0x4000, offset * 0x4000 + 0x3fff, 0, 0);
-				
+
 			}
 		}
     }

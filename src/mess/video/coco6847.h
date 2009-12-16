@@ -2,7 +2,7 @@
 
     coco6847.h
 
-	OBSOLETE Implementation of Motorola 6847 video hardware chip
+    OBSOLETE Implementation of Motorola 6847 video hardware chip
 
 **********************************************************************/
 

@@ -74,7 +74,7 @@ static MACHINE_DRIVER_START( vt520 )
 
     MDRV_VIDEO_START(vt520)
     MDRV_VIDEO_UPDATE(vt520)
-	
+
 	// On the board there are two M5M44256BJ-7 chips
 	// Which are DRAM 256K x 4bit
 	/* internal ram */

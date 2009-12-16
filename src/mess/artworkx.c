@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	artworkx.c
+    artworkx.c
 
-	MESS specific artwork code
+    MESS specific artwork code
 
 *********************************************************************/
 
@@ -17,7 +17,7 @@
 
 /***************************************************************************
 
-	Local variables
+    Local variables
 
 ***************************************************************************/
 
@@ -33,14 +33,14 @@ void artwork_use_device_art(const device_config *img, const char *defaultartfile
 	int len, pos, i;
 
 	/* This function builds the override_artfile string.  This string is a
-	 * list of NUL terminated strings.  These strings become the basename for
-	 * the .art file that we use.
-	 *
-	 * We use the following strings:
-	 * 1.  The basename
-	 * 2.  The goodname
-	 * 3.  The file specified by defaultartfile
-	 */
+     * list of NUL terminated strings.  These strings become the basename for
+     * the .art file that we use.
+     *
+     * We use the following strings:
+     * 1.  The basename
+     * 2.  The goodname
+     * 3.  The file specified by defaultartfile
+     */
 
 	strs[0] = image_basename_noext(img);
 	strs[1] = strs[0] ? image_longname(img) : NULL;

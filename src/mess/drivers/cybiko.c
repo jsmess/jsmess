@@ -263,7 +263,7 @@ static MACHINE_DRIVER_START( cybikov1 )
 	/* rtc */
 	MDRV_PCF8593_ADD("rtc")
 	MDRV_AT45DB041_ADD("flash1")
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("512K")
@@ -283,7 +283,7 @@ static MACHINE_DRIVER_START( cybikov2 )
 	// non-volatile ram
 //  MDRV_NVRAM_HANDLER(cybikov2)
 	MDRV_SST39VF020_ADD("flash2", 16, ENDIANNESS_BIG)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("256K")
@@ -307,7 +307,7 @@ static MACHINE_DRIVER_START( cybikoxt )
 //  MDRV_NVRAM_HANDLER(cybikoxt)
 	MDRV_DEVICE_REMOVE("flash1")
 	MDRV_SST39VF020_ADD("flash2", 16, ENDIANNESS_BIG)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("2M")

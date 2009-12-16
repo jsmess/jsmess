@@ -1,8 +1,8 @@
 /****************************************************************************
 
-	opresolv.h
+    opresolv.h
 
-	Extensible ranged option resolution handling
+    Extensible ranged option resolution handling
 
 ****************************************************************************/
 

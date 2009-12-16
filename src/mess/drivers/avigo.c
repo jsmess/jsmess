@@ -889,7 +889,7 @@ static MACHINE_DRIVER_START( avigo )
 
 	/* real time clock */
 	MDRV_TC8521_ADD("rtc", avigo_tc8521_interface)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")

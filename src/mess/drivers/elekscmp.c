@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Elektor SC/MP
 
         22/11/2009 Skeleton driver.
@@ -34,8 +34,8 @@ static INPUT_PORTS_START( elekscmp )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(elekscmp) 
-{	
+static MACHINE_RESET(elekscmp)
+{
 }
 
 static MACHINE_DRIVER_START( elekscmp )
@@ -44,10 +44,10 @@ static MACHINE_DRIVER_START( elekscmp )
     MDRV_CPU_PROGRAM_MAP(elekscmp_mem)
 
     MDRV_MACHINE_RESET(elekscmp)
-	
+
     /* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_elekscmp)
-    
+
 MACHINE_DRIVER_END
 
 /* ROM definition */

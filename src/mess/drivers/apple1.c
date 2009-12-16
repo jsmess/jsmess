@@ -253,7 +253,7 @@ static MACHINE_DRIVER_START( apple1 )
 	MDRV_SNAPSHOT_ADD("snapshot", apple1, "snp", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", apple1_cassette_config )
-	
+
 	/* Note that because we always include 4K of RAM at $E000-$EFFF,
        the RAM amounts listed here will be 4K below the actual RAM
        total. */
@@ -261,7 +261,7 @@ static MACHINE_DRIVER_START( apple1 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("48K")
 	MDRV_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,28K,32K,36K,40K,44K")
-	   
+
 MACHINE_DRIVER_END
 
 ROM_START(apple1)

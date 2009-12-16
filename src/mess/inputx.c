@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	inputx.c
+    inputx.c
 
-	Secondary input related functions for MESS specific functionality
+    Secondary input related functions for MESS specific functionality
 
 *********************************************************************/
 
@@ -370,7 +370,7 @@ static const char_info charinfo[] =
 
 /*-------------------------------------------------
     find_charinfo - looks up information about a
-	particular character
+    particular character
 -------------------------------------------------*/
 
 static const char_info *find_charinfo(unicode_char target_char)
@@ -403,7 +403,7 @@ static const char_info *find_charinfo(unicode_char target_char)
 
 /*-------------------------------------------------
     code_point_string - obtain a string representation of a
-	given code; used for logging and debugging
+    given code; used for logging and debugging
 -------------------------------------------------*/
 
 static const char *code_point_string(running_machine *machine, unicode_char ch)
@@ -452,7 +452,7 @@ static const char *code_point_string(running_machine *machine, unicode_char ch)
 
 /*-------------------------------------------------
     get_keyboard_code - accesses a particular
-	keyboard code
+    keyboard code
 -------------------------------------------------*/
 
 static unicode_char get_keyboard_code(const input_field_config *field, int i)
@@ -469,7 +469,7 @@ static unicode_char get_keyboard_code(const input_field_config *field, int i)
 
 /*-------------------------------------------------
     scan_keys - scans through input ports and
-	sets up natural keyboard input mapping
+    sets up natural keyboard input mapping
 -------------------------------------------------*/
 
 static int scan_keys(running_machine *machine, const input_port_config *portconfig, mess_input_code *codes, input_port_config_c *ports, input_field_config_c *shift_ports, int keys, int shift)
@@ -530,8 +530,8 @@ static int scan_keys(running_machine *machine, const input_port_config *portconf
 
 /*-------------------------------------------------
     build_codes - given an input port table, create
-	a input code table useful for mapping unicode
-	chars
+    a input code table useful for mapping unicode
+    chars
 -------------------------------------------------*/
 
 static mess_input_code *build_codes(running_machine *machine, const input_port_config *portconfig)
@@ -547,7 +547,7 @@ static mess_input_code *build_codes(running_machine *machine, const input_port_c
 	{
 		/* allocate the codes */
 		codes = auto_alloc_array_clear(machine, mess_input_code, code_count + 1);
-	
+
 		/* and populate them */
 		scan_keys(machine, portconfig, codes, ports, fields, 0, 0);
 	}
@@ -562,7 +562,7 @@ static mess_input_code *build_codes(running_machine *machine, const input_port_c
 
 /*-------------------------------------------------
     mess_validate_input_ports - validates the
-	natural keyboard setup of a set of input ports
+    natural keyboard setup of a set of input ports
 -------------------------------------------------*/
 
 int mess_validate_input_ports(int drivnum, const machine_config *config, const input_port_list *portlist)
@@ -580,8 +580,8 @@ int mess_validate_input_ports(int drivnum, const machine_config *config, const i
 
 
 /*-------------------------------------------------
-    mess_validate_natural_keyboard_statics - 
-	validates natural keyboard static data
+    mess_validate_natural_keyboard_statics -
+    validates natural keyboard static data
 -------------------------------------------------*/
 
 int mess_validate_natural_keyboard_statics(void)
@@ -934,7 +934,7 @@ static TIMER_CALLBACK(inputx_timerproc)
 
 /*-------------------------------------------------
     mess_input_port_update_hook - hook function
-	called from core to allow for natural keyboard	
+    called from core to allow for natural keyboard
 -------------------------------------------------*/
 
 void mess_input_port_update_hook(running_machine *machine, const input_port_config *port, input_port_value *digital)
@@ -976,7 +976,7 @@ void mess_input_port_update_hook(running_machine *machine, const input_port_conf
 
 /*-------------------------------------------------
     mess_get_keyboard_key_name - builds the name of
-	a key based on natural keyboard characters
+    a key based on natural keyboard characters
 -------------------------------------------------*/
 
 astring *mess_get_keyboard_key_name(const input_field_config *field)
@@ -1007,7 +1007,7 @@ astring *mess_get_keyboard_key_name(const input_field_config *field)
 
 /*-------------------------------------------------
     inputx_key_name - returns the name of a
-	specific key
+    specific key
 -------------------------------------------------*/
 
 const char *inputx_key_name(unicode_char ch)
@@ -1053,7 +1053,7 @@ int inputx_is_posting(running_machine *machine)
 
 /***************************************************************************
 
-	Coded input
+    Coded input
 
 ***************************************************************************/
 
@@ -1130,7 +1130,7 @@ void inputx_postn_coded_rate(running_machine *machine, const char *text, size_t 
 
 /***************************************************************************
 
-	Alternative calls
+    Alternative calls
 
 ***************************************************************************/
 
@@ -1325,9 +1325,9 @@ void inputx_postn_coded(running_machine *machine, const char *text, size_t text_
 
 /***************************************************************************
 
-	Other stuff
+    Other stuff
 
-	This stuff is here more out of convienience than anything else
+    This stuff is here more out of convienience than anything else
 ***************************************************************************/
 
 int input_classify_port(const input_field_config *field)
@@ -1411,8 +1411,8 @@ int input_player_number(const input_field_config *port)
 
 
 /*-------------------------------------------------
-    input_has_input_class - checks to see if a 
-	particular input class is present
+    input_has_input_class - checks to see if a
+    particular input class is present
 -------------------------------------------------*/
 
 int input_has_input_class(running_machine *machine, int inputclass)
@@ -1435,7 +1435,7 @@ int input_has_input_class(running_machine *machine, int inputclass)
 
 /*-------------------------------------------------
     input_count_players - counts the number of
-	active players
+    active players
 -------------------------------------------------*/
 
 int input_count_players(running_machine *machine)
@@ -1463,7 +1463,7 @@ int input_count_players(running_machine *machine)
 
 /*-------------------------------------------------
     input_category_active - checks to see if a
-	specific category is active
+    specific category is active
 -------------------------------------------------*/
 
 int input_category_active(running_machine *machine, int category)
@@ -1506,7 +1506,7 @@ int input_category_active(running_machine *machine, int category)
 
 /*-------------------------------------------------
     execute_input - debugger command to enter
-	natural keyboard input
+    natural keyboard input
 -------------------------------------------------*/
 
 static void execute_input(running_machine *machine, int ref, int params, const char *param[])
@@ -1518,7 +1518,7 @@ static void execute_input(running_machine *machine, int ref, int params, const c
 
 /*-------------------------------------------------
     execute_dumpkbd - debugger command to natural
-	keyboard codes
+    keyboard codes
 -------------------------------------------------*/
 
 static void execute_dumpkbd(running_machine *machine, int ref, int params, const char *param[])

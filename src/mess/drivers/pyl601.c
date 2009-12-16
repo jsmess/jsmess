@@ -510,7 +510,7 @@ static MACHINE_DRIVER_START( pyl601 )
 	MDRV_UPD765A_ADD("upd765", pyldin_upd765_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(pyldin_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("576K") // 64 + 512

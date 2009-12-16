@@ -48,11 +48,11 @@ struct _sms_driver_data {
 	emu_timer *rapid_fire_timer;
 	UINT8 rapid_fire_state_1;
 	UINT8 rapid_fire_state_2;
-	
+
 	/* Data needed for Paddle Control controller */
 	UINT32 last_paddle_read_time;
 	UINT8 paddle_read_state;
-	
+
 	/* Data needed for Sports Pad controller */
 	UINT32 last_sports_pad_time_1;
 	UINT32 last_sports_pad_time_2;
@@ -64,7 +64,7 @@ struct _sms_driver_data {
 	UINT8 sports_pad_1_y;
 	UINT8 sports_pad_2_x;
 	UINT8 sports_pad_2_y;
-	
+
 	/* Data needed for Light Phaser */
 	UINT16 lphaser_latch;
 	int lphaser_x_offs;	/* Needed to 'calibrate' lphaser; set at cart loading */
@@ -160,7 +160,7 @@ static TIMER_CALLBACK( lightgun_tick )
 		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);   /* enable crosshair */
 	else
 		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);  /* disable crosshair */
-	
+
 	/* is there a Light Phaser in P2 port? */
 	if ((input_port_read_safe(machine, "CTRLSEL", 0x00) & 0xf0) == 0x10)
 		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_ALL);   /* enable crosshair */
@@ -175,7 +175,7 @@ static void sms_vdp_hcount_lphaser( running_machine *machine, int hpos)
 {
 	UINT8 tmp = ((hpos - 46) >> 1) & 0xff;
 	const device_config *smsvdp = devtag_get_device(machine, "sms_vdp");
-	
+
 	//printf ("sms_vdp_hcount_lphaser: hpos %3d => hcount %2X\n", hpos, tmp);
 	sms_vdp_hcount_latch_w(smsvdp, 0, tmp);
 }
@@ -215,7 +215,7 @@ static void sms_vdp_hcount_latch( running_machine *machine )
 {
 	UINT8 value = sms_vdp_hcount(machine);
 	const device_config *smsvdp = devtag_get_device(machine, "sms_vdp");
-	
+
 	sms_vdp_hcount_latch_w(smsvdp, 0, value);
 }
 
@@ -269,7 +269,7 @@ static void sms_get_inputs( const address_space *space )
 	sms_state.input_port0 = 0xff;
 	sms_state.input_port1 = 0xff;
 
-	if (cpu_cycles - sms_state.last_paddle_read_time > 256) 
+	if (cpu_cycles - sms_state.last_paddle_read_time > 256)
 	{
 		sms_state.paddle_read_state ^= 0xff;
 		sms_state.last_paddle_read_time = cpu_cycles;
@@ -473,10 +473,10 @@ void sms_pause_callback( running_machine *machine )
 {
 	if (sms_state.is_gamegear && !(sms_state.cartridge[sms_state.current_cartridge].features & CF_GG_SMS_MODE))
 		return;
-	
-	if (!(input_port_read(machine, sms_state.is_gamegear ? "START" : "PAUSE") & 0x80)) 
+
+	if (!(input_port_read(machine, sms_state.is_gamegear ? "START" : "PAUSE") & 0x80))
 	{
-		if (!sms_state.paused) 
+		if (!sms_state.paused)
 		{
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 		}
@@ -506,18 +506,18 @@ READ8_HANDLER( sms_input_port_1_r )
 {
 	if (sms_state.bios_port & IO_CHIP)
 		return 0xff;
-	
+
 	sms_get_inputs(space);
 
 	/* Reset Button */
 	sms_state.input_port1 = (sms_state.input_port1 & 0xef) | (input_port_read_safe(space->machine, "RESET", 0x01) & 0x01) << 4;
-	
+
 	/* Do region detection if TH of ports A and B are set to output (0) */
 	if (!(sms_state.ctrl_reg & 0x0a))
  	{
 		/* Move bits 7,5 of IO control port into bits 7, 6 */
 		sms_state.input_port1 = (sms_state.input_port1 & 0x3f) | (sms_state.ctrl_reg & 0x80) | (sms_state.ctrl_reg & 0x20) << 1;
-		
+
 		/* Inverse region detect value for Japanese machines */
 		if (sms_state.is_region_japan)
 			sms_state.input_port1 ^= 0xc0;
@@ -533,16 +533,16 @@ READ8_HANDLER( sms_input_port_1_r )
 		if (sms_state.ctrl_reg & 0x08
 		    && (input_port_read_safe(space->machine, "CTRLSEL", 0x00) & 0xf0) == 0x10
 		    && lphaser_sensor_is_on(space->machine, "LPHASER2", "LPHASER3"))
-		{	
+		{
 			sms_state.input_port1 &= ~0x80;
-		}	
+		}
 	}
 
 	return sms_state.input_port1;
 }
-	
 
-	
+
+
 WRITE8_HANDLER( sms_ym2413_register_port_0_w )
 {
 	if (sms_state.has_fm)
@@ -1043,12 +1043,12 @@ static int sms_verify_cart( UINT8 *magic, int size )
 			{
 #if 0
 				/* Technically, it should be this, but remove for now until verified: */
-				if (!strcmp(sysname, "gamegear")) 
+				if (!strcmp(sysname, "gamegear"))
 				{
 					if ((unsigned char)magic[0x81fd] < 0x50)
 						retval = IMAGE_VERIFY_PASS;
 				}
-				if (!strcmp(sysname, "sms")) 
+				if (!strcmp(sysname, "sms"))
 				{
 					if ((unsigned char)magic[0x81fd] >= 0x50)
 						retval = IMAGE_VERIFY_PASS;
@@ -1142,26 +1142,26 @@ static int detect_lphaser_xoffset( UINT8 *rom )
 		/* Assault City */
 		{ 0x54, 0x4d, 0x52, 0x20, 0x53, 0x45, 0x47, 0x41, 0xff, 0xff, 0x9f, 0x74, 0x34, 0x70, 0x00, 0x40 },
 	};
-	
+
 	if (!(sms_state.bios_port & IO_CARTRIDGE) && sms_state.cartridge[sms_state.current_cartridge].size >= 0x8000)
 	{
 		if (!memcmp(&rom[0x7ff0], signatures[0], 16) || !memcmp(&rom[0x7ff0], signatures[1], 16))
 			return 40;
-		
+
 		if (!memcmp(&rom[0x7ff0], signatures[2], 16))
 			return 49;
-		
+
 		if (!memcmp(&rom[0x7ff0], signatures[3], 16))
 			return 47;
-		
+
 		if (!memcmp(&rom[0x7ff0], signatures[4], 16))
 			return 44;
-		
+
 		if (!memcmp(&rom[0x7ff0], signatures[5], 16))
 			return 53;
-		
+
 	}
-	return 50;	
+	return 50;
 }
 
 
@@ -1324,7 +1324,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 		sms_state.cartridge[index].cartRAM = auto_alloc_array(image->machine, UINT8, sms_state.cartridge[index].ram_size);
 		sms_state.cartridge[index].ram_page = 0;
 	}
-	
+
 	/* For Light Phaser games, we have to detect the x offset */
 	sms_state.lphaser_x_offs = detect_lphaser_xoffset(sms_state.cartridge[index].ROM);
 
@@ -1542,7 +1542,7 @@ static void sms_set_zero_flag( void )
 	sms_state.has_bios_2000 = 0;
 	sms_state.has_bios_full = 0;
 	sms_state.has_bios = 0;
-	sms_state.has_fm = 0;	
+	sms_state.has_fm = 0;
 }
 
 DRIVER_INIT( sg1000m3 )

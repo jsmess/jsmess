@@ -335,7 +335,7 @@ READ8_HANDLER(exidy_ff_r)
 	UINT8 data=0x7f;
 
 	/* bit 7 = printer busy
-	0 = printer is not busy */
+    0 = printer is not busy */
 
 	data |= centronics_busy_r(printer) << 7;
 

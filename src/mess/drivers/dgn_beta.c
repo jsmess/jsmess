@@ -330,7 +330,7 @@ static MACHINE_DRIVER_START( dgnbeta )
 	MDRV_WD179X_ADD("wd179x", dgnbeta_wd17xx_interface )
 
 	MDRV_FLOPPY_4_DRIVES_ADD(dgnbeta_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("256K")
@@ -339,7 +339,7 @@ static MACHINE_DRIVER_START( dgnbeta )
 	/* the Dragon 128, I have added a config for 128K, however, the only working machine known  */
 	/* to exist was fitted with 256K, so I have made this the default. Also available           */
 	/* documentation seems to sugest a maximum of 768K, so I have included configs increasing   */
-	/* in blocks of 128K up to this maximum.                                                    */	
+	/* in blocks of 128K up to this maximum.                                                    */
 MACHINE_DRIVER_END
 
 ROM_START(dgnbeta)

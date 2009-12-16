@@ -1824,16 +1824,16 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 
 			}
 
-			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x924/2] = 0x0001;								//	CTRL
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x924/2] = 0x0001;								//  CTRL
 			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x926/2] = 0x0001; 								//  TRACK
-			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x928/2] = 0x0000;								// 	INDEX
-			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x92a/2] = (cdic_regs.time >> 24) & 0x000000ff;	// 	MIN
-			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x92c/2] = (cdic_regs.time >> 16) & 0x000000ff;	// 	SEC
-			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x92e/2] = (cdic_regs.time >>  8) & 0x0000007f;	// 	FRAC
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x928/2] = 0x0000;								//  INDEX
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x92a/2] = (cdic_regs.time >> 24) & 0x000000ff;	//  MIN
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x92c/2] = (cdic_regs.time >> 16) & 0x000000ff;	//  SEC
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x92e/2] = (cdic_regs.time >>  8) & 0x0000007f;	//  FRAC
 			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x930/2] = 0x0000;								//  ZERO
-			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x932/2] = (cdic_regs.time >> 24) & 0x000000ff;	// 	AMIN
-			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x934/2] = (cdic_regs.time >> 16) & 0x000000ff;	// 	ASEC
-			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x936/2] = (cdic_regs.time >>  8) & 0x0000007f;	// 	AFRAC
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x932/2] = (cdic_regs.time >> 24) & 0x000000ff;	//  AMIN
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x934/2] = (cdic_regs.time >> 16) & 0x000000ff;	//  ASEC
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x936/2] = (cdic_regs.time >>  8) & 0x0000007f;	//  AFRAC
 			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x938/2] = 0x0000;								//  CRC1
 			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x93a/2] = 0x0000;								//  CRC2
 
@@ -1885,16 +1885,16 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
 			}
 
-			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x924/2] = 0x0041;								//	CTRL
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x924/2] = 0x0041;								//  CTRL
 			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x926/2] = 0x0001; 								//  TRACK
-			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x928/2] = 0x0000;								// 	INDEX
-			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x92a/2] = (cdic_regs.time >> 24) & 0x000000ff;	// 	MIN
-			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x92c/2] = (cdic_regs.time >> 16) & 0x000000ff;	// 	SEC
-			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x92e/2] = (cdic_regs.time >>  8) & 0x0000007f;	// 	FRAC
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x928/2] = 0x0000;								//  INDEX
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x92a/2] = (cdic_regs.time >> 24) & 0x000000ff;	//  MIN
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x92c/2] = (cdic_regs.time >> 16) & 0x000000ff;	//  SEC
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x92e/2] = (cdic_regs.time >>  8) & 0x0000007f;	//  FRAC
 			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x930/2] = 0x0000;								//  ZERO
-			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x932/2] = (cdic_regs.time >> 24) & 0x000000ff;	// 	AMIN
-			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x934/2] = (cdic_regs.time >> 16) & 0x000000ff;	// 	ASEC
-			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x936/2] = (cdic_regs.time >>  8) & 0x0000007f;	// 	AFRAC
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x932/2] = (cdic_regs.time >> 24) & 0x000000ff;	//  AMIN
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x934/2] = (cdic_regs.time >> 16) & 0x000000ff;	//  ASEC
+			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x936/2] = (cdic_regs.time >>  8) & 0x0000007f;	//  AFRAC
 			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x938/2] = 0x0000;								//  CRC1
 			cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + 0x93a/2] = 0x0000;								//  CRC2
 
@@ -2851,7 +2851,7 @@ static READ16_HANDLER(mcd212_r)
 					}
 					//if(interrupt2)
 					//{
-					//	cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_1 + (interrupt2 - 1), CLEAR_LINE);
+					//  cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_1 + (interrupt2 - 1), CLEAR_LINE);
 					//}
 					return old_csr;
 				}

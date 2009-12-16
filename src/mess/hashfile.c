@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	hashfile.c
+    hashfile.c
 
-	Code for parsing hash info (*.hsi) files
+    Code for parsing hash info (*.hsi) files
 
 *********************************************************************/
 

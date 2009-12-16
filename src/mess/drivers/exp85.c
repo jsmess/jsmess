@@ -235,7 +235,7 @@ static MACHINE_DRIVER_START( exp85 )
 	MDRV_I8355_ADD(I8355_TAG, XTAL_6_144MHz/2, i8355_intf)
 
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, exp85_cassette_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("256")

@@ -2,13 +2,13 @@
 
         Elwro 800 Junior
 
-		Driver by Mariusz Wojcieszek
+        Driver by Mariusz Wojcieszek
 
-		ToDo:
-		- 8251 DTR and DTS signals are connected (with some additional logic) to NMI of Z80, this
-		  is not emulated
-		- 8251 is used for JUNET network (a network of Elwro 800 Junior computers, allows sharing
-		  floppy disc drives and printers) - network is not emulated
+        ToDo:
+        - 8251 DTR and DTS signals are connected (with some additional logic) to NMI of Z80, this
+          is not emulated
+        - 8251 is used for JUNET network (a network of Elwro 800 Junior computers, allows sharing
+          floppy disc drives and printers) - network is not emulated
 
 ****************************************************************************/
 
@@ -513,7 +513,7 @@ static MACHINE_RESET(elwro800)
 
 	// this is a reset of ls175 in mmu
 	elwro800jr_mmu_w(machine, 0);
-	
+
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), elwro800_direct_handler);
 }
 
@@ -585,10 +585,10 @@ static MACHINE_DRIVER_START( elwro800 )
 	MDRV_CASSETTE_ADD( "cassette", elwro800jr_cassette_config )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(elwro800jr_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")	
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 /*************************************

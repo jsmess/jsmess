@@ -303,10 +303,10 @@ static MACHINE_DRIVER_START( poly880 )
 	MDRV_Z80PIO_ADD(Z80PIO2_TAG, pio2_intf)
 
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, poly880_cassette_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("1K")	
+	MDRV_RAM_DEFAULT_SIZE("1K")
 MACHINE_DRIVER_END
 
 /* ROMs */

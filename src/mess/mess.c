@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mess.c
+    mess.c
 
-	This file is a set of function calls and defs required for MESS
+    This file is a set of function calls and defs required for MESS
 
 ***************************************************************************/
 
@@ -32,7 +32,7 @@ const char mess_disclaimer[] =
 
 /*-------------------------------------------------
     mess_predevice_init - initialize devices for a specific
-	running_machine
+    running_machine
 -------------------------------------------------*/
 
 void mess_predevice_init(running_machine *machine)
@@ -53,9 +53,9 @@ void mess_predevice_init(running_machine *machine)
 
 	/* init all devices */
 	image_init(machine);
-	
+
 	devlist = &((machine_config *)machine->config)->devicelist;
-	
+
 	/* make sure that any required devices have been allocated */
 	for (image = image_device_first(machine->config); image != NULL; image = image_device_next(image))
 	{
@@ -147,7 +147,7 @@ void mess_predevice_init(running_machine *machine)
 
 /*-------------------------------------------------
     mess_postdevice_init - initialize devices for a specific
-	running_machine
+    running_machine
 -------------------------------------------------*/
 
 void mess_postdevice_init(running_machine *machine)

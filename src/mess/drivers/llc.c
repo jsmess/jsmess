@@ -329,10 +329,10 @@ static MACHINE_DRIVER_START( llc2 )
 
 	MDRV_Z80PIO_ADD( "z80pio", llc2_z80pio_intf )
 	MDRV_Z80CTC_ADD( "z80ctc", XTAL_3MHz, llc2_ctc_intf )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")	
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 /* ROM definition */
 

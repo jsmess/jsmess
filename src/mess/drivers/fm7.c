@@ -1029,12 +1029,12 @@ static void fm7_update_bank(const address_space* space, int bank, UINT8 physical
 	UINT8* RAM = memory_region(space->machine,"maincpu");
 	UINT16 size = 0xfff;
 	char bank_name[10];
-	
+
 	if(bank == 15)
 		size = 0xbff;
-	
+
 	sprintf(bank_name,"bank%d",bank+1);
-	
+
 	if(physical >= 0x10 && physical <= 0x1b)
 	{
 		switch(physical)
@@ -1093,7 +1093,7 @@ static void fm7_update_bank(const address_space* space, int bank, UINT8 physical
 	{
 		if(init_rom_en)
 		{
-			RAM = memory_region(space->machine,"init");			
+			RAM = memory_region(space->machine,"init");
 			memory_install_read_bank(space,bank*0x1000,(bank*0x1000)+size,0,0,bank_name);
 			memory_nop_write(space,bank*0x1000,(bank*0x1000)+size,0,0);
 			memory_set_bankptr(space->machine,bank_name,RAM+(physical<<12)-0x36000);

@@ -304,11 +304,11 @@ static MACHINE_DRIVER_START( nascom1 )
 	MDRV_SNAPSHOT_ADD("snapshot", nascom1, "nas", 0.5)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("40K")
-	MDRV_RAM_EXTRA_OPTIONS("1K,16K,32K")	
+	MDRV_RAM_EXTRA_OPTIONS("1K,16K,32K")
 MACHINE_DRIVER_END
 
 static FLOPPY_OPTIONS_START(nascom2)

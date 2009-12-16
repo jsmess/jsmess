@@ -478,7 +478,7 @@ static MACHINE_DRIVER_START( z80ne )
 	MDRV_CASSETTE_ADD( "cassetteb", z80ne_cassetteb_config )
 
 	MDRV_DEFAULT_LAYOUT(layout_z80ne)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
@@ -510,11 +510,11 @@ static MACHINE_DRIVER_START( z80net )
 	MDRV_MC6847_PALETTE(lx388palette)
 
 	MDRV_DEFAULT_LAYOUT(layout_z80net)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
-	MDRV_RAM_EXTRA_OPTIONS("1K")	
+	MDRV_RAM_EXTRA_OPTIONS("1K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( z80netb )
@@ -546,7 +546,7 @@ static MACHINE_DRIVER_START( z80netb )
 	MDRV_MC6847_ADD("mc6847", z80net_mc6847_intf)
 	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
 	MDRV_MC6847_PALETTE(lx388palette)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
@@ -586,7 +586,7 @@ static MACHINE_DRIVER_START( z80netf )
 	MDRV_FLOPPY_4_DRIVES_ADD(z80netf_floppy_config)
 
 	MDRV_DEFAULT_LAYOUT(layout_z80netf)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("56K")

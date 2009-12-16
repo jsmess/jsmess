@@ -184,7 +184,7 @@ static INPUT_PORTS_START( sms )
 	PORT_START("LPHASER1")	/* Light phaser Y - player 1 */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_CATEGORY(11) PORT_PLAYER(1)
 
-	PORT_START("LPHASER2")	/* Light phaser X - player 2 */	
+	PORT_START("LPHASER2")	/* Light phaser X - player 2 */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_CATEGORY(21) PORT_PLAYER(2)
 
 	PORT_START("LPHASER3")	/* Light phaser Y - player 2 */
@@ -264,11 +264,11 @@ static INPUT_PORTS_START( smsj )
 	PORT_CONFSETTING( 0x01, DEF_STR( On ) )
 
 	PORT_START("TVDRAW_X")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_NAME("Tablet - X Axis") PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1) 
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_NAME("Tablet - X Axis") PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 		PORT_CONDITION("TVDRAW", 0x01, PORTCOND_EQUALS, 0x01)
 
 	PORT_START("TVDRAW_Y")
-	PORT_BIT( 0xff, 0x60, IPT_LIGHTGUN_Y ) PORT_NAME("Tablet - Y Axis") PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 191) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1) 
+	PORT_BIT( 0xff, 0x60, IPT_LIGHTGUN_Y ) PORT_NAME("Tablet - Y Axis") PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 191) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 		PORT_CONDITION("TVDRAW", 0x01, PORTCOND_EQUALS, 0x01)
 
 	PORT_START("TVDRAW_PEN")
@@ -343,30 +343,30 @@ static void sms_int_callback( running_machine *machine, int state )
 
 static const smsvdp_interface _315_5124_intf =
 {
-	MODEL_315_5124, 
+	MODEL_315_5124,
 	sms_int_callback,
 	sms_pause_callback
 };
 
 static const smsvdp_interface _315_5246_intf =
 {
-	MODEL_315_5246, 
+	MODEL_315_5246,
 	sms_int_callback,
-	sms_pause_callback 
+	sms_pause_callback
 };
 
 static const smsvdp_interface _315_5378_intf =
 {
-	MODEL_315_5378, 
+	MODEL_315_5378,
 	sms_int_callback,
 	sms_pause_callback
 };
 
 static const smsvdp_interface sms_store_intf =
 {
-	MODEL_315_5124, 
+	MODEL_315_5124,
 	sms_store_int_callback,
-	sms_pause_callback 
+	sms_pause_callback
 };
 
 static MACHINE_DRIVER_START( sms_cartslot )

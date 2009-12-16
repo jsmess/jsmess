@@ -87,10 +87,10 @@ static MACHINE_DRIVER_START( vg5k )
 
 	MDRV_VIDEO_START(vg5k)
 	MDRV_VIDEO_UPDATE(vg5k)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("24K")	
+	MDRV_RAM_DEFAULT_SIZE("24K")
 MACHINE_DRIVER_END
 
 /* ROM definition */

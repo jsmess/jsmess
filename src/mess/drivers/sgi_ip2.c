@@ -1,43 +1,43 @@
 /****************************************************************************
 
-	drivers/sgi_ip2.c
-	SGI IRIS 3130 skeleton driver with some meat on its bones
+    drivers/sgi_ip2.c
+    SGI IRIS 3130 skeleton driver with some meat on its bones
 
-	by Harmony
+    by Harmony
 
-		0x00000000 - ?				RAM (?)
-	    0x30000000 - 0x30017fff     ROM (3x32k)
-		0x30800000 - 0x30800000		Mouse Buttons (1)
-		0x31000000 - 0x31000001		Mouse Quadrature (2)
-		0x32000000 - 0x3200000f		DUART0 (?)
-		0x32800000 - 0x3280000f		DUART1 (?)
-		0x33000000 - 0x330007ff		SRAM (2k)
-		0x34000000 - 0x34000000		Clock Control (1)
-		0x35000000 - 0x35000000		Clock Data (1)
-		0x36000000 - 0x36000000		OS Base (1)
-		0x38000000 - 0x38000001		Status Register (2)
-		0x39000000 - 0x39000000		Parity control (1)
-		0x3a000000 - 0x3a000000		Multibus Protection (1)
-		0x3b000000 - 0x3b000003		Page Table Map Base (4)
-		0x3c000000 - 0x3c000001		Text/Data Base (2)
-		0x3d000000 - 0x3d000001		Text/Data Limit (2)
-		0x3e000000 - 0x3e000001		Stack Base (2)
-		0x3f000000 - 0x3f000001		Stack Limit (2)
+        0x00000000 - ?              RAM (?)
+        0x30000000 - 0x30017fff     ROM (3x32k)
+        0x30800000 - 0x30800000     Mouse Buttons (1)
+        0x31000000 - 0x31000001     Mouse Quadrature (2)
+        0x32000000 - 0x3200000f     DUART0 (?)
+        0x32800000 - 0x3280000f     DUART1 (?)
+        0x33000000 - 0x330007ff     SRAM (2k)
+        0x34000000 - 0x34000000     Clock Control (1)
+        0x35000000 - 0x35000000     Clock Data (1)
+        0x36000000 - 0x36000000     OS Base (1)
+        0x38000000 - 0x38000001     Status Register (2)
+        0x39000000 - 0x39000000     Parity control (1)
+        0x3a000000 - 0x3a000000     Multibus Protection (1)
+        0x3b000000 - 0x3b000003     Page Table Map Base (4)
+        0x3c000000 - 0x3c000001     Text/Data Base (2)
+        0x3d000000 - 0x3d000001     Text/Data Limit (2)
+        0x3e000000 - 0x3e000001     Stack Base (2)
+        0x3f000000 - 0x3f000001     Stack Limit (2)
 
-	TODO:
-		Finish incomplete MC68681 DUART emulation
-		Hook up keyboard
-		Hook up mouse
-		Hook up graphics
-		Hook up mass storage
+    TODO:
+        Finish incomplete MC68681 DUART emulation
+        Hook up keyboard
+        Hook up mouse
+        Hook up graphics
+        Hook up mass storage
 
-	Interrupts:
-	    M68K:
-	    	6 - DUART
+    Interrupts:
+        M68K:
+            6 - DUART
 
-	It is unlikely that this driver will ever be fully brought to life, as
-	it will require the M68020 core to be updated to support having opcodes
-	paused and resumed mid-instruction in order to service exceptions.
+    It is unlikely that this driver will ever be fully brought to life, as
+    it will require the M68020 core to be updated to support having opcodes
+    paused and resumed mid-instruction in order to service exceptions.
 
 ****************************************************************************/
 
@@ -47,7 +47,7 @@
 #include "machine/mc146818.h" /* TOD clock */
 #include "machine/68681.h" /* DUART0, DUART1 */
 #include "machine/terminal.h"
-	
+
 #define VERBOSE_LEVEL ( 0 )
 
 #define ENABLE_VERBOSE_LOG (0)
@@ -431,10 +431,10 @@ static MACHINE_DRIVER_START( sgi_ip2 )
 	MDRV_MACHINE_START(sgi_ip2)
 	MDRV_MACHINE_RESET(sgi_ip2)
 
-	/* video hardware */	
-	MDRV_IMPORT_FROM( generic_terminal )	
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sgi_terminal_intf)	
-	
+	/* video hardware */
+	MDRV_IMPORT_FROM( generic_terminal )
+	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sgi_terminal_intf)
+
     MDRV_DUART68681_ADD( "duart68681a", XTAL_3_6864MHz, sgi_ip2_duart68681a_config ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
     MDRV_DUART68681_ADD( "duart68681b", XTAL_3_6864MHz, sgi_ip2_duart68681b_config ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
 	MDRV_NVRAM_HANDLER(mc146818)
@@ -518,5 +518,5 @@ ROM_START( sgi_ip2 )
 	ROM_LOAD( "sgi-ip2-u93.ip2.2-008.od",  0x10000, 0x8000, CRC(bf967590) SHA1(1aac48e4f5531a25c5482f64de5cd3c7a9931f11) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE  INPUT     INIT     CONFIG	COMPANY                   FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE  INPUT     INIT     CONFIG    COMPANY                   FULLNAME */
 COMP( 1985, sgi_ip2,  0,        0,        sgi_ip2, sgi_ip2,  sgi_ip2, 0,        "Silicon Graphics, Inc.", "IRIS 3130 (IP2)", GAME_NOT_WORKING )

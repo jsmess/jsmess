@@ -766,7 +766,7 @@ static void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 		memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0);
 		base1 = memory_region(machine, "maincpu") + 0x10000;  /* 8K BASIC */
 	}
-	
+
 	memory_set_bankptr(machine, "bank1", base1);
 
 	/* check if self-test ROM changed */
@@ -782,7 +782,7 @@ static void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
 		memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0);
 		base2 = memory_region(machine, "maincpu") + 0x15000;  /* 0x0800 bytes */
-	}	
+	}
 	memory_set_bankptr(machine, "bank2", base2);
 }
 
@@ -826,7 +826,7 @@ static void a1200xl_mmu(running_machine *machine, UINT8 new_mmu)
 		base2 = memory_region(machine, "maincpu") + 0x15000;  /* 0x0800 bytes */
 		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
 		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0);
-	}	
+	}
 	memory_set_bankptr(machine, "bank2", base2);
 }
 
@@ -837,10 +837,10 @@ static void a1200xl_mmu(running_machine *machine, UINT8 new_mmu)
  **************************************************************/
 
 static WRITE8_DEVICE_HANDLER(a1200xl_pia_pb_w) { a1200xl_mmu(device->machine, data); }
-static WRITE8_DEVICE_HANDLER(a800xl_pia_pb_w) 
+static WRITE8_DEVICE_HANDLER(a800xl_pia_pb_w)
 {
 	if ( pia6821_get_port_b_z_mask(device) != 0xff )
-		a800xl_mmu(device->machine, data); 
+		a800xl_mmu(device->machine, data);
 }
 
 static const pokey_interface atari_pokey_interface =
@@ -977,10 +977,10 @@ static MACHINE_DRIVER_START( atari_common_nodac )
 	MDRV_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)
 	MDRV_SOUND_CONFIG(atari_pokey_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("40K")		
+	MDRV_RAM_DEFAULT_SIZE("40K")
 MACHINE_DRIVER_END
 
 
@@ -1075,10 +1075,10 @@ static MACHINE_DRIVER_START( a600xl )
 	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
 
 	MDRV_IMPORT_FROM(a400_cartslot)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("16K")		
+	MDRV_RAM_DEFAULT_SIZE("16K")
 MACHINE_DRIVER_END
 
 
@@ -1103,14 +1103,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( a800xlpal )
 	MDRV_IMPORT_FROM( a800xl )
 
-	MDRV_CPU_MODIFY( "maincpu" )	
-	MDRV_CPU_CLOCK( 1773000 )	
-	MDRV_CPU_VBLANK_INT_HACK(a800xl_interrupt, TOTAL_LINES_50HZ)	
-	MDRV_SCREEN_MODIFY("screen")	
-	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_50HZ)	
-	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_50HZ)	
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_CLOCK( 1773000 )
+	MDRV_CPU_VBLANK_INT_HACK(a800xl_interrupt, TOTAL_LINES_50HZ)
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_50HZ)
+	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_50HZ)
 
-	MDRV_SOUND_MODIFY("pokey")	
+	MDRV_SOUND_MODIFY("pokey")
 	MDRV_SOUND_CLOCK(1773000)
 MACHINE_DRIVER_END
 
@@ -1139,10 +1139,10 @@ static MACHINE_DRIVER_START( a5200 )
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(a5200_cart)
 	MDRV_CARTSLOT_UNLOAD(a5200_cart)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("16K")	
+	MDRV_RAM_DEFAULT_SIZE("16K")
 MACHINE_DRIVER_END
 
 

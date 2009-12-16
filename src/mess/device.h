@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	device.h
+    device.h
 
-	Definitions and manipulations for device structures
+    Definitions and manipulations for device structures
 
 ***************************************************************************/
 

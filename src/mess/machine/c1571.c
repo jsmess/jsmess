@@ -143,10 +143,10 @@ static ADDRESS_MAP_START( c1571cr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
 	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
-//	AM_RANGE(0x2000, 0x2005) 5710 FDC
-//	AM_RANGE(0x400c, 0x400e) 5710 CIA
-//	AM_RANGE(0x4010, 0x4017) 5710 CIA
-//	AM_RANGE(0x6000, 0x7fff) RAM mirrors
+//  AM_RANGE(0x2000, 0x2005) 5710 FDC
+//  AM_RANGE(0x400c, 0x400e) 5710 CIA
+//  AM_RANGE(0x4010, 0x4017) 5710 CIA
+//  AM_RANGE(0x6000, 0x7fff) RAM mirrors
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("c1571cr", 0)
 ADDRESS_MAP_END
 
@@ -167,18 +167,18 @@ static READ8_DEVICE_HANDLER( via0_pa_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		TRK0 SNS
-		PA1		SER DIR
-		PA2		SIDE
-		PA3		
-		PA4		
-		PA5		_1/2 MHZ
-		PA6		ATN OUT
-		PA7		BYTE RDY
+        PA0     TRK0 SNS
+        PA1     SER DIR
+        PA2     SIDE
+        PA3
+        PA4
+        PA5     _1/2 MHZ
+        PA6     ATN OUT
+        PA7     BYTE RDY
 
-	*/
+    */
 
 	c1571_t *c1571 = get_safe_token(device->owner);
 
@@ -189,18 +189,18 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		TRK0 SNS
-		PA1		SER DIR
-		PA2		SIDE
-		PA3		
-		PA4		
-		PA5		_1/2 MHZ
-		PA6		ATN OUT
-		PA7		BYTE RDY
+        PA0     TRK0 SNS
+        PA1     SER DIR
+        PA2     SIDE
+        PA3
+        PA4
+        PA5     _1/2 MHZ
+        PA6     ATN OUT
+        PA7     BYTE RDY
 
-	*/
+    */
 
 	c1571_t *c1571 = get_safe_token(device->owner);
 
@@ -212,18 +212,18 @@ static READ8_DEVICE_HANDLER( via0_pb_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PB0		DATA IN
-		PB1		DATA OUT
-		PB2		CLK IN
-		PB3		CLK OUT
-		PB4		ATN ACK
-		PB5		DEV# SEL
-		PB6		DEV# SEL
-		PB7		ATN IN
+        PB0     DATA IN
+        PB1     DATA OUT
+        PB2     CLK IN
+        PB3     CLK OUT
+        PB4     ATN ACK
+        PB5     DEV# SEL
+        PB6     DEV# SEL
+        PB7     ATN IN
 
-	*/
+    */
 
 	c1571_t *c1571 = get_safe_token(device->owner);
 	UINT8 data = 0;
@@ -247,18 +247,18 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PB0		DATA IN
-		PB1		DATA OUT
-		PB2		CLK IN
-		PB3		CLK OUT
-		PB4		ATN ACK
-		PB5		DEV# SEL
-		PB6		DEV# SEL
-		PB7		ATN IN
+        PB0     DATA IN
+        PB1     DATA OUT
+        PB2     CLK IN
+        PB3     CLK OUT
+        PB4     ATN ACK
+        PB5     DEV# SEL
+        PB6     DEV# SEL
+        PB7     ATN IN
 
-	*/
+    */
 
 	c1571_t *c1571 = get_safe_token(device->owner);
 
@@ -314,18 +314,18 @@ static READ8_DEVICE_HANDLER( yb_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		YB0
-		PA1		YB1
-		PA2		YB2
-		PA3		YB3
-		PA4		YB4
-		PA5		YB5
-		PA6		YB6
-		PA7		YB7
+        PA0     YB0
+        PA1     YB1
+        PA2     YB2
+        PA3     YB3
+        PA4     YB4
+        PA5     YB5
+        PA6     YB6
+        PA7     YB7
 
-	*/
+    */
 
 	return 0;
 }
@@ -334,36 +334,36 @@ static WRITE8_DEVICE_HANDLER( yb_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		YB0
-		PA1		YB1
-		PA2		YB2
-		PA3		YB3
-		PA4		YB4
-		PA5		YB5
-		PA6		YB6
-		PA7		YB7
+        PA0     YB0
+        PA1     YB1
+        PA2     YB2
+        PA3     YB3
+        PA4     YB4
+        PA5     YB5
+        PA6     YB6
+        PA7     YB7
 
-	*/
+    */
 }
 
 static READ8_DEVICE_HANDLER( via1_pb_r )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		PB0		STP0		stepping motor bit 0
-		PB1		STP1		stepping motor bit 1
-		PB2		MTR			motor ON/OFF
-		PB3		ACT			drive 0 LED
-		PB4		_WPRT		write protect sense
-		PB5		DS0			density select 0
-		PB6		DS1			density select 1
-		PB7		_SYNC		SYNC detect line
+        PB0     STP0        stepping motor bit 0
+        PB1     STP1        stepping motor bit 1
+        PB2     MTR         motor ON/OFF
+        PB3     ACT         drive 0 LED
+        PB4     _WPRT       write protect sense
+        PB5     DS0         density select 0
+        PB6     DS1         density select 1
+        PB7     _SYNC       SYNC detect line
 
-	*/
+    */
 
 	c1571_t *c1571 = get_safe_token(device->owner);
 	UINT8 data = 0;
@@ -380,18 +380,18 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		PB0		STP0		stepping motor bit 0
-		PB1		STP1		stepping motor bit 1
-		PB2		MTR			motor ON/OFF
-		PB3		ACT			drive 0 LED
-		PB4		_WPRT		write protect sense
-		PB5		DS0			density select 0
-		PB6		DS1			density select 1
-		PB7		_SYNC		SYNC detect line
+        PB0     STP0        stepping motor bit 0
+        PB1     STP1        stepping motor bit 1
+        PB2     MTR         motor ON/OFF
+        PB3     ACT         drive 0 LED
+        PB4     _WPRT       write protect sense
+        PB5     DS0         density select 0
+        PB6     DS1         density select 1
+        PB7     _SYNC       SYNC detect line
 
-	*/
+    */
 }
 
 static WRITE_LINE_DEVICE_HANDLER( soe_w )
@@ -468,8 +468,8 @@ static const wd17xx_interface c1571_wd1770_intf =
 
 static FLOPPY_OPTIONS_START( c1571 )
 	FLOPPY_OPTION( c1571, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
-//	FLOPPY_OPTION( c1571, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
-//	FLOPPY_OPTION( c1571, "d71", "Commodore 1571 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
+//  FLOPPY_OPTION( c1571, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
+//  FLOPPY_OPTION( c1571, "d71", "Commodore 1571 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
 FLOPPY_OPTIONS_END
 
 /*-------------------------------------------------

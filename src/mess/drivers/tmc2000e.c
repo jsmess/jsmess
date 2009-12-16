@@ -344,11 +344,11 @@ static MACHINE_DRIVER_START( tmc2000e )
 	MDRV_CASSETTE_ADD("cassette", tmc2000_cassette_config)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(tmc2000e_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("8K")		
-	MDRV_RAM_EXTRA_OPTIONS("40K")	
+	MDRV_RAM_DEFAULT_SIZE("8K")
+	MDRV_RAM_EXTRA_OPTIONS("40K")
 MACHINE_DRIVER_END
 
 /* ROMs */

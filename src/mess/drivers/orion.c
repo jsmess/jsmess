@@ -152,10 +152,10 @@ static MACHINE_DRIVER_START( orion128 )
 	MDRV_FLOPPY_4_DRIVES_ADD(orion_floppy_config)
 
 	MDRV_CARTSLOT_ADD("cart")
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("256K")		
+	MDRV_RAM_DEFAULT_SIZE("256K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( orion128ms )
@@ -216,10 +216,10 @@ static MACHINE_DRIVER_START( orionz80 )
 	MDRV_FLOPPY_4_DRIVES_ADD(orion_floppy_config)
 
 	MDRV_CARTSLOT_ADD("cart")
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("512K")		
+	MDRV_RAM_DEFAULT_SIZE("512K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( orionz80ms )
@@ -271,10 +271,10 @@ static MACHINE_DRIVER_START( orionpro )
 	MDRV_FLOPPY_4_DRIVES_ADD(orion_floppy_config)
 
 	MDRV_CARTSLOT_ADD("cart")
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("512K")	
+	MDRV_RAM_DEFAULT_SIZE("512K")
 MACHINE_DRIVER_END
 
 /* ROM definition */

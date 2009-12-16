@@ -223,7 +223,7 @@ static MACHINE_DRIVER_START( dai )
 
 	/* tms5501 */
 	MDRV_TMS5501_ADD( "tms5501", dai_tms5501_interface )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("48K")

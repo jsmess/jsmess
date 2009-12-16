@@ -1151,7 +1151,7 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
 
 	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
@@ -1193,11 +1193,11 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
 
 	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
-	MDRV_RAM_EXTRA_OPTIONS("32K")	
+	MDRV_RAM_EXTRA_OPTIONS("32K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc802 )
@@ -1235,7 +1235,7 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
 
 	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
@@ -1274,7 +1274,7 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
 
 	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("160K") // 32KB + 128KB

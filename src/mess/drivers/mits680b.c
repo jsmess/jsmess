@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         MITS Altair 680b
 
         03/12/2009 Skeleton driver.
@@ -24,13 +24,13 @@ INPUT_PORTS_START( mits680b )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(mits680b) 
-{	
+static MACHINE_RESET(mits680b)
+{
 }
 
 static WRITE8_DEVICE_HANDLER( mits680b_kbd_put )
 {
-	
+
 }
 
 static GENERIC_TERMINAL_INTERFACE( mits680b_terminal_intf )
@@ -41,14 +41,14 @@ static GENERIC_TERMINAL_INTERFACE( mits680b_terminal_intf )
 static MACHINE_DRIVER_START( mits680b )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6800, XTAL_1MHz / 2)
-    MDRV_CPU_PROGRAM_MAP(mits680b_mem)    
+    MDRV_CPU_PROGRAM_MAP(mits680b_mem)
 
     MDRV_MACHINE_RESET(mits680b)
-	
+
     /* video hardware */
     MDRV_IMPORT_FROM( generic_terminal )
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,mits680b_terminal_intf)	
-	
+	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,mits680b_terminal_intf)
+
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
 MACHINE_DRIVER_END

@@ -87,7 +87,7 @@ VIDEO_UPDATE( macse30 )
 
 		for (x = 0; x < MAC_H_VIS; x += 16)
 		{
-//			word = *(video_ram++);
+//          word = *(video_ram++);
 			word = video_ram[((y * MAC_H_VIS)/16) + ((x/16)^1)];
 			for (b = 0; b < 16; b++)
 			{
@@ -99,12 +99,12 @@ VIDEO_UPDATE( macse30 )
 }
 
 /*
-	RasterOps ColorBoard 264: fixed resolution 640x480 NuBus video card, 1/4/8/16/24 bit color
-	1.5? MB of VRAM (tests up to 0x1fffff), Bt473 RAMDAC, and two custom gate arrays.
+    RasterOps ColorBoard 264: fixed resolution 640x480 NuBus video card, 1/4/8/16/24 bit color
+    1.5? MB of VRAM (tests up to 0x1fffff), Bt473 RAMDAC, and two custom gate arrays.
 
         - 0xfsff6004 is color depth: 0 for 1bpp, 1 for 2bpp, 2 for 4bpp, 3 for 8bpp, 4 for 24bpp (resolution is fixed 640x480)
         - 0xfsff6014 is VBL ack: write 1 to ack
-	- 0xfsff603c is VBL disable: write 1 to disable, 0 to enable
+    - 0xfsff603c is VBL disable: write 1 to disable, 0 to enable
 */
 
 UINT32 *mac_cb264_vram;
@@ -280,7 +280,7 @@ WRITE32_HANDLER( mac_cb264_w )
 			break;
 
 		default:
-//			printf("cb264_w: %x to reg %x (mask %x PC %x)\n", data, offset*4, mem_mask, cpu_get_pc(space->cpu));
+//          printf("cb264_w: %x to reg %x (mask %x PC %x)\n", data, offset*4, mem_mask, cpu_get_pc(space->cpu));
 			break;
 	}
 }
@@ -307,7 +307,7 @@ WRITE32_HANDLER( mac_cb264_ramdac_w )
 			break;
 
 		default:
-//			printf("%x to unknown RAMDAC register @ %x\n", data, offset);
+//          printf("%x to unknown RAMDAC register @ %x\n", data, offset);
 			break;
 	}
 }

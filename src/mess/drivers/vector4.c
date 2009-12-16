@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Vector 4
 
         08/12/2009 Skeleton driver.
@@ -53,8 +53,8 @@ INPUT_PORTS_START( vector4 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(vector4) 
-{	
+static MACHINE_RESET(vector4)
+{
 	received_char = 0;
 	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC, 0xe000);
 }
@@ -74,10 +74,10 @@ static MACHINE_DRIVER_START( vector4 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(vector4_mem)
-    MDRV_CPU_IO_MAP(vector4_io)	
+    MDRV_CPU_IO_MAP(vector4_io)
 
     MDRV_MACHINE_RESET(vector4)
-	
+
     /* video hardware */
     MDRV_IMPORT_FROM( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,vector4_terminal_intf)
@@ -87,7 +87,7 @@ MACHINE_DRIVER_END
 ROM_START( vector4 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v4c", "ver 4.0c" )
-    ROMX_LOAD( "vg40cl_ihl.bin", 0xe000, 0x0400, CRC(dcaf79e6) SHA1(63619ddb12ff51e5862902fb1b33a6630f555ad7), ROM_BIOS(1))	
+    ROMX_LOAD( "vg40cl_ihl.bin", 0xe000, 0x0400, CRC(dcaf79e6) SHA1(63619ddb12ff51e5862902fb1b33a6630f555ad7), ROM_BIOS(1))
 	ROMX_LOAD( "vg40ch_ihl.bin", 0xe400, 0x0400, CRC(3ff97d70) SHA1(b401e49aa97ac106c2fd5ee72d89e683ebe34e34), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v43", "ver 4.3" )
     ROMX_LOAD( "vg-em-43.bin",   0xe000, 0x1000, CRC(29a0fcee) SHA1(ca44de527f525b72f78b1c084c39aa6ce21731b5), ROM_BIOS(2))
@@ -98,6 +98,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG 	COMPANY   				FULLNAME       FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG     COMPANY                 FULLNAME       FLAGS */
 COMP( ????, vector4,  0,       0, 	vector4, 	vector4,	0,  	0,  	 "Vector Graphics",   "Vector 4",		GAME_NOT_WORKING)
 

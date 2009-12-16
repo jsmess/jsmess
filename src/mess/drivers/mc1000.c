@@ -448,11 +448,11 @@ static MACHINE_DRIVER_START( mc1000 )
 	/* devices */
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, mc1000_cassette_config)
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
-	MDRV_RAM_EXTRA_OPTIONS("48K")	
+	MDRV_RAM_EXTRA_OPTIONS("48K")
 MACHINE_DRIVER_END
 
 /* ROMs */

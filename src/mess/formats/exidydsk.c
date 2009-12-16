@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	formats/exi_dsk.c
+    formats/exi_dsk.c
 
-	Exidy Sorcerer floppy-disk images
+    Exidy Sorcerer floppy-disk images
 
 *********************************************************************/
 
@@ -145,8 +145,8 @@ static FLOPPY_CONSTRUCT(exi_dsk_construct)
 	callbacks->get_heads_per_disk = exi_get_heads_per_disk;
 	callbacks->get_tracks_per_disk = exi_get_tracks_per_disk;
 	callbacks->get_indexed_sector_info = exi_get_indexed_sector_info;
-	
-	return FLOPPY_ERROR_SUCCESS;	
+
+	return FLOPPY_ERROR_SUCCESS;
 }
 
 

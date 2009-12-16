@@ -9,14 +9,14 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- attributes
-	- N interrupt
-	- light pen
-	- reset counters
-	- proper DMA timing (now the whole screen is transferred at the end of the frame, 
-		accurate timing requires CCLK timer which kills performance)
+    - attributes
+    - N interrupt
+    - light pen
+    - reset counters
+    - proper DMA timing (now the whole screen is transferred at the end of the frame,
+        accurate timing requires CCLK timer which kills performance)
 
 */
 
@@ -206,7 +206,7 @@ static void reset_counters(const device_config *device)
 
 /*-------------------------------------------------
     update_hrtc_timer - update horizontal retrace
-	timer
+    timer
 -------------------------------------------------*/
 
 static void update_hrtc_timer(upd3301_t *upd3301, int state)
@@ -223,7 +223,7 @@ static void update_hrtc_timer(upd3301_t *upd3301, int state)
 
 /*-------------------------------------------------
     update_vrtc_timer - update vertical retrace
-	timer
+    timer
 -------------------------------------------------*/
 
 static void update_vrtc_timer(upd3301_t *upd3301, int state)
@@ -237,7 +237,7 @@ static void update_vrtc_timer(upd3301_t *upd3301, int state)
 
 /*-------------------------------------------------
     recompute_parameters - recompute screen
-	geometry parameters
+    geometry parameters
 -------------------------------------------------*/
 
 static void recompute_parameters(const device_config *device)
@@ -248,7 +248,7 @@ static void recompute_parameters(const device_config *device)
 	int vert_pix_total = (upd3301->l + upd3301->v) * upd3301->r;
 
 	attoseconds_t refresh = HZ_TO_ATTOSECONDS(device->clock) * horiz_pix_total * vert_pix_total;
-	
+
 	rectangle visarea;
 
 	visarea.min_x = 0;
@@ -263,7 +263,7 @@ static void recompute_parameters(const device_config *device)
 	}
 
 	video_screen_configure(upd3301->screen, horiz_pix_total, vert_pix_total, &visarea, refresh);
-	
+
 	update_hrtc_timer(upd3301, 0);
 	update_vrtc_timer(upd3301, 0);
 }
@@ -413,7 +413,7 @@ WRITE8_DEVICE_HANDLER( upd3301_w )
 
 			upd3301->param_count++;
 			break;
-		
+
 		default:
 			if (LOG) logerror("UPD3301 '%s' Invalid Parameter Byte %02x!\n", device->tag, data);
 		}
@@ -640,7 +640,7 @@ static DEVICE_START( upd3301 )
 	upd3301->hrtc_timer = timer_alloc(device->machine, hrtc_tick, (void *)device);
 
 	/* register for state saving */
-//	state_save_register_device_item(device, 0, upd3301->);
+//  state_save_register_device_item(device, 0, upd3301->);
 }
 
 /*-------------------------------------------------

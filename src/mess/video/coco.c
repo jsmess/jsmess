@@ -25,7 +25,7 @@
 
 /*************************************
  *
- *	Code
+ *  Code
  *
  *************************************/
 
@@ -90,7 +90,7 @@ static void internal_video_start_coco(running_machine *machine, m6847_type type)
 	cfg.type = type;
 
 	/* NPW 14-May-2006 - Ugly hack; using CPU timing factor seems to break some
-	 * Dragon games */
+     * Dragon games */
 	if (machine->gamedrv->name[0] == 'c')
 		cfg.cpu0_timing_factor = 4;
 

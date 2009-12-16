@@ -188,7 +188,7 @@ static MACHINE_DRIVER_START( pecom64 )
 	MDRV_IMPORT_FROM(pecom_video)
 
 	MDRV_CASSETTE_ADD( "cassette", pecom_cassette_config )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")

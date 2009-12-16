@@ -1,11 +1,11 @@
 /***************************************************************************
-   
+
         Sun-1
 
-		Documentation: 
-			http://www.bitsavers.org/pdf/sun/sun1/800-0345_Sun-1_System_Ref_Man_Jul82.pdf
-			(page 39,40 of pdf contain memory map)
-		
+        Documentation:
+            http://www.bitsavers.org/pdf/sun/sun1/800-0345_Sun-1_System_Ref_Man_Jul82.pdf
+            (page 39,40 of pdf contain memory map)
+
         04/12/2009 Skeleton driver.
 
 ****************************************************************************/
@@ -26,7 +26,7 @@ static READ16_HANDLER(sun1_upd7201_r)
 
 static WRITE16_HANDLER(sun1_upd7201_w)
 {
-	const device_config	*devconf = devtag_get_device(space->machine, "terminal");	
+	const device_config	*devconf = devtag_get_device(space->machine, "terminal");
 	if (offset==0) terminal_write(devconf,0,data >> 8);
 }
 
@@ -43,8 +43,8 @@ INPUT_PORTS_START( sun1 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(sun1) 
-{	
+static MACHINE_RESET(sun1)
+{
 	UINT8* user1 = memory_region(machine, "user1");
 
 	memcpy((UINT8*)sun1_ram,user1,0x4000);
@@ -66,13 +66,13 @@ static GENERIC_TERMINAL_INTERFACE( sun1_terminal_intf )
 static MACHINE_DRIVER_START( sun1 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
-    MDRV_CPU_PROGRAM_MAP(sun1_mem)    
+    MDRV_CPU_PROGRAM_MAP(sun1_mem)
 
     MDRV_MACHINE_RESET(sun1)
-	
+
     /* video hardware */
-    MDRV_IMPORT_FROM( generic_terminal )	
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sun1_terminal_intf)	
+    MDRV_IMPORT_FROM( generic_terminal )
+	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sun1_terminal_intf)
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(sun1)

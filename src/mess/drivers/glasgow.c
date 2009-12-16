@@ -29,14 +29,14 @@ How to play (quick guide)
 4. Read the move in the display, or look for the flashing LEDs.
 5. Move the computer's piece in the same way you moved yours.
 6. If a piece is being taken, firstly click on the piece then click the blank
-	area at bottom right. This causes the piece to disappear. After that,
-	move the piece that took the other piece.
+    area at bottom right. This causes the piece to disappear. After that,
+    move the piece that took the other piece.
 7. You'll need to read the official user manual for advanced features, or if
-	you get messages such as "Err1".
+    you get messages such as "Err1".
 
 Note about clickable artwork: it seems the horizontal coordinates can vary
-	between computers. The supplied artwork at svn r6463 works with my
-	computer; it may be out of alignment on yours.
+    between computers. The supplied artwork at svn r6463 works with my
+    computer; it may be out of alignment on yours.
 
 
 ***************************************************************************/

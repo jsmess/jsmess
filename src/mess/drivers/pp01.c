@@ -220,10 +220,10 @@ static MACHINE_DRIVER_START( pp01 )
 	MDRV_PIT8253_ADD( "pit8253", pp01_pit8253_intf )
 
 	MDRV_I8255A_ADD( "ppi8255", pp01_ppi8255_interface )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")		
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 /* ROM definition */

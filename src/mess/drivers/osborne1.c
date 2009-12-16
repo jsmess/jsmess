@@ -248,7 +248,7 @@ static MACHINE_DRIVER_START( osborne1 )
 	MDRV_MB8877_ADD("mb8877", default_wd17xx_interface_2_drives )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(osborne1_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("68K")	/* 64KB Main RAM and 4Kbit video attribute RAM */

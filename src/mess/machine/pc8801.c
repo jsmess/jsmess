@@ -708,7 +708,7 @@ READ8_HANDLER( pc8801fd_upd765_tc )
 	pc88_state *state = space->machine->driver_data;
 
 	upd765_tc_w(state->upd765, 1);
-	timer_set(space->machine,  attotime_zero, NULL, 0, pc8801fd_upd765_tc_to_zero );	
+	timer_set(space->machine,  attotime_zero, NULL, 0, pc8801fd_upd765_tc_to_zero );
 	return 0;
 }
 
@@ -724,14 +724,14 @@ const upd765_interface pc8801_fdc_interface =
 static void pc8801_init_5fd(running_machine *machine)
 {
 	use_5FD = (input_port_read(machine, "DSW2") & 0x80) != 0x00;
-	
+
 	if (!use_5FD)
 		cputag_suspend(machine, "sub", SUSPEND_REASON_DISABLE, 1);
 	else
 		cputag_resume(machine, "sub", SUSPEND_REASON_DISABLE);
 
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "sub"), 0, 0);
-	
+
 	floppy_drive_set_motor_state(floppy_get_device(machine, 0), 1);
 	floppy_drive_set_motor_state(floppy_get_device(machine, 1), 1);
 	floppy_drive_set_ready_state(floppy_get_device(machine, 0), 1, 1);

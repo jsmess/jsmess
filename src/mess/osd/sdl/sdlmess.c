@@ -46,7 +46,7 @@ file_error osd_getcurdir(char *buffer, size_t buffer_len)
 }
 
 //============================================================
-//	osd_get_full_path
+//  osd_get_full_path
 //============================================================
 
 file_error osd_get_full_path(char **dst, const char *path)
@@ -80,7 +80,7 @@ file_error osd_get_full_path(char **dst, const char *path)
 }
 
 //============================================================
-//	osd_setcurdir
+//  osd_setcurdir
 //============================================================
 
 file_error osd_setcurdir(const char *dir)
@@ -96,7 +96,7 @@ file_error osd_setcurdir(const char *dir)
 }
 
 //============================================================
-//	osd_basename
+//  osd_basename
 //============================================================
 
 char *osd_basename(char *filename)
@@ -117,7 +117,7 @@ char *osd_basename(char *filename)
 }
 
 //============================================================
-//	osd_dirname
+//  osd_dirname
 //============================================================
 
 char *osd_dirname(const char *filename)
@@ -163,7 +163,7 @@ const char *osd_get_device_name(int idx)
 }
 
 //============================================================
-//	osd_get_temp_filename
+//  osd_get_temp_filename
 //============================================================
 
 file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *basename)
@@ -182,7 +182,7 @@ file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *ba
 }
 
 //============================================================
-//	osd_mkdir
+//  osd_mkdir
 //============================================================
 
 file_error osd_mkdir(const char *dir)
@@ -212,7 +212,7 @@ int osd_is_path_separator(char c)
 
 
 //============================================================
-//	osd_rmdir
+//  osd_rmdir
 //============================================================
 
 file_error osd_rmdir(const char *dir)
@@ -229,7 +229,7 @@ file_error osd_rmdir(const char *dir)
 
 #ifdef SDLMAME_MACOSX
 //============================================================
-//	osd_get_clipboard_text
+//  osd_get_clipboard_text
 //============================================================
 
 char *osd_get_clipboard_text(void)
@@ -246,27 +246,27 @@ char *osd_get_clipboard_text(void)
 	ItemCount item_count;
 	UInt32 item_index;
 	Boolean	success = false;
-	
+
 	err = PasteboardCreate(kPasteboardClipboard, &pasteboard_ref);
 
 	if (!err)
 	{
 		sync_flags = PasteboardSynchronize( pasteboard_ref );
-		
+
 		err = PasteboardGetItemCount(pasteboard_ref, &item_count );
-		
+
 		for (item_index=1; item_index<=item_count; item_index++)
 		{
 			err = PasteboardGetItemIdentifier(pasteboard_ref, item_index, &item_id);
-			
+
 			if (!err)
 			{
 				err = PasteboardCopyItemFlavors(pasteboard_ref, item_id, &flavor_type_array);
-				
+
 				if (!err)
 				{
 					flavor_count = CFArrayGetCount(flavor_type_array);
-				
+
 					for (flavor_index = 0; flavor_index < flavor_count; flavor_index++)
 					{
 						CFStringRef flavor_type;
@@ -276,9 +276,9 @@ char *osd_get_clipboard_text(void)
 						CFDataRef data_ref;
 						CFIndex length;
 						CFRange range;
-						
+
 						flavor_type = (CFStringRef)CFArrayGetValueAtIndex(flavor_type_array, flavor_index);
-						
+
 						if (UTTypeConformsTo (flavor_type, kUTTypeUTF16PlainText))
 							encoding = kCFStringEncodingUTF16;
 						else if (UTTypeConformsTo (flavor_type, kUTTypeUTF8PlainText))
@@ -289,15 +289,15 @@ char *osd_get_clipboard_text(void)
 							continue;
 
 						err = PasteboardCopyItemFlavorData(pasteboard_ref, item_id, flavor_type, &flavor_data);
-						
+
 						if( !err )
 						{
 							string_ref = CFStringCreateFromExternalRepresentation (kCFAllocatorDefault, flavor_data, encoding);
 							data_ref = CFStringCreateExternalRepresentation (kCFAllocatorDefault, string_ref, kCFStringEncodingUTF8, '?');
-							
+
 							length = CFDataGetLength (data_ref);
 							range = CFRangeMake (0,length);
-							
+
 							result = malloc (length+1);
 							if (result != NULL)
 							{
@@ -312,25 +312,25 @@ char *osd_get_clipboard_text(void)
 							CFRelease(flavor_data);
 						}
 					}
-				
+
 					CFRelease(flavor_type_array);
 				}
 			}
-			
+
 			if (success)
 				break;
 		}
 
 		CFRelease(pasteboard_ref);
 	}
-	
+
 	return result;
 }
 #endif
 
 #ifdef SDLMAME_WIN32
 //============================================================
-//	get_clipboard_text_by_format
+//  get_clipboard_text_by_format
 //============================================================
 
 static char *get_clipboard_text_by_format(UINT format, char *(*convert)(LPCVOID data))
@@ -371,7 +371,7 @@ static char *get_clipboard_text_by_format(UINT format, char *(*convert)(LPCVOID 
 
 
 //============================================================
-//	convert_wide
+//  convert_wide
 //============================================================
 
 static char *convert_wide(LPCVOID data)
@@ -382,7 +382,7 @@ static char *convert_wide(LPCVOID data)
 
 
 //============================================================
-//	convert_ansi
+//  convert_ansi
 //============================================================
 
 static char *convert_ansi(LPCVOID data)
@@ -393,7 +393,7 @@ static char *convert_ansi(LPCVOID data)
 
 
 //============================================================
-//	osd_get_clipboard_text
+//  osd_get_clipboard_text
 //============================================================
 
 char *osd_get_clipboard_text(void)
@@ -414,7 +414,7 @@ char *osd_get_clipboard_text(void)
 
 #if defined(SDL_VIDEO_DRIVER_X11)
 //============================================================
-//	osd_get_clipboard_text
+//  osd_get_clipboard_text
 //============================================================
 
 char *osd_get_clipboard_text(void)
@@ -436,18 +436,18 @@ char *osd_get_clipboard_text(void)
 
 	/* get & validate SDL sys-wm info */
 	SDL_VERSION(&info.version);
-	if ( ! SDL_GetWMInfo( &info ) ) 
+	if ( ! SDL_GetWMInfo( &info ) )
 		return NULL;
-	if ( info.subsystem != SDL_SYSWM_X11 ) 
+	if ( info.subsystem != SDL_SYSWM_X11 )
 		return NULL;
-	if ( (display = info.info.x11.display) == NULL ) 
+	if ( (display = info.info.x11.display) == NULL )
 		return NULL;
-	if ( (our_win = info.info.x11.window) == None ) 
+	if ( (our_win = info.info.x11.window) == None )
 		return NULL;
 
 	/* request data to owner */
-	selection_win = XGetSelectionOwner( display, XA_PRIMARY ); 
-	if ( selection_win == None ) 
+	selection_win = XGetSelectionOwner( display, XA_PRIMARY );
+	if ( selection_win == None )
 		return NULL;
 
 	/* first, try UTF-8, then latin-1 */
@@ -474,17 +474,17 @@ char *osd_get_clipboard_text(void)
 
 		/* get property & check its type */
 		if ( XGetWindowProperty( display, our_win, types[i], 0, 65536, False, types[i],
-					 &data_type, &data_format, &nitems, &bytes_remaining, &prop ) 
+					 &data_type, &data_format, &nitems, &bytes_remaining, &prop )
 		     != Success )
 			continue;
-		if ( ! prop ) 
+		if ( ! prop )
 			continue;
 		if ( (data_format != 8) || (data_type != types[i]) )
 		{
 			XFree( prop );
 			continue;
 		}
-		
+
 		/* return a copy & free original */
 		result = core_strdup( (char*) prop );
 		XFree( prop );
@@ -498,7 +498,7 @@ char *osd_get_clipboard_text(void)
 
 #if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX) && !defined(SDL_VIDEO_DRIVER_X11)
 //============================================================
-//	osd_get_clipboard_text
+//  osd_get_clipboard_text
 //============================================================
 
 char *osd_get_clipboard_text(void)

@@ -385,7 +385,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 {
 	int i, current_index, driver_index;
 	const game_driver *gamedrv;
-	UINT32 ram, current_ram;	
+	UINT32 ram, current_ram;
 	const char *this_ram_string;
 	TCHAR* t_ramstring;
 	machine_config *cfg;
@@ -400,17 +400,17 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 
 	// allocate the machine config
 	cfg = machine_config_alloc_with_mess_devices(gamedrv);
-	
+
 	// identify how many options that we have
 	device = device_list_first(&cfg->devicelist, MESSRAM);
-	
-	EnableWindow(control, (device != NULL)); 
+
+	EnableWindow(control, (device != NULL));
 	i = 0;
 	// we can only do something meaningful if there is more than one option
 	if (device != NULL)
 	{
-		ram_config *config = device->inline_config;						
-		
+		ram_config *config = device->inline_config;
+
 		// identify the current amount of RAM
 		this_ram_string = options_get_string(opts, OPTION_RAMSIZE);
 		current_ram = (this_ram_string != NULL) ? messram_parse_string(this_ram_string) : 0;
@@ -427,7 +427,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 				return FALSE;
 
 			(void)ComboBox_InsertString(control, i, win_tstring_strdup(t_ramstring));
-			(void)ComboBox_SetItemData(control, i, ram);			
+			(void)ComboBox_SetItemData(control, i, ram);
 		}
 		if (config->extra_options != NULL)
 		{
@@ -441,7 +441,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 
 			/* try to parse each option */
 			while(*s != '\0')
-			{				
+			{
 				i++;
 				// identify this option
 				ram = messram_parse_string(s);
@@ -459,12 +459,12 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 
 				// is this the current option?  record the index if so
 				if (ram == current_ram)
-					current_index = i;								
-				
-				s += strlen(s) + 1;						
+					current_index = i;
+
+				s += strlen(s) + 1;
 			}
 			astring_free(buffer);
-		}	
+		}
 
 		// set the combo box
 		(void)ComboBox_SetCurSel(control, current_index);

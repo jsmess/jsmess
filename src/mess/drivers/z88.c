@@ -183,7 +183,7 @@ static void z88_install_memory_handler_pair(running_machine *machine, offs_t sta
 {
 	char bank_0[10];
 	char bank_1[10];
-	
+
 	sprintf(bank_0,"bank%d",bank_base + 0);
 	sprintf(bank_1,"bank%d",bank_base + 1);
 

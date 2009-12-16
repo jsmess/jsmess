@@ -13,11 +13,11 @@
 
     TODO:
 
-	- prof80 crashes because of no video
+    - prof80 crashes because of no video
     - GRIP does not ack display bytes sent by PROF
     - keyboard
     - NE555 timeout is 10x too high
-	- convert GRIP models to devices
+    - convert GRIP models to devices
     - grip31 does not work
     - UNIO card (Z80-STI, Z80-SIO, 2x centronics)
     - GRIP-COLOR (192kB color RAM)
@@ -1291,10 +1291,10 @@ static MACHINE_DRIVER_START( prof80 )
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, prof80_upd1990a_intf)
 	MDRV_UPD765A_ADD(UPD765_TAG, prof80_upd765_interface)
 	MDRV_FLOPPY_4_DRIVES_ADD(prof80_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")	
+	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( grip )
@@ -1407,7 +1407,7 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME		PARENT	COMPAT  MACHINE INPUT   INIT	CONFIG	COMPANY					FULLNAME				FLAGS */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                 FULLNAME                FLAGS */
 COMP( 1984, prof80,     0,		0,		prof80,	prof80,	0,		0,		"Conitec Datensysteme",	"PROF-80",				GAME_NOT_WORKING )
 COMP( 1984, prof80g21,	prof80,	0,		grip2,	grip,	0,		0,		"Conitec Datensysteme",	"PROF-80 (GRIP-2.1)",	GAME_NOT_WORKING )
 COMP( 1984, prof80g25,	prof80,	0,		grip2,	grip,	0,		0,		"Conitec Datensysteme",	"PROF-80 (GRIP-2.5)",	GAME_NOT_WORKING )

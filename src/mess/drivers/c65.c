@@ -248,7 +248,7 @@ static MACHINE_DRIVER_START( c65 )
 	MDRV_IMPORT_FROM(simulated_drive)
 
 	MDRV_IMPORT_FROM(c64_cartslot)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")

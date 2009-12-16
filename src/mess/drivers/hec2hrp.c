@@ -6,22 +6,22 @@
         Hector HRX
         Hector MX40c
         Hector MX80c
-        
+
         12/05/2009 Skeleton driver - Micko
-	    31/06/2009 Video - Robbbert
+        31/06/2009 Video - Robbbert
 
         29/10/2009 Update skeleton to functional machine
                           by yo_fr       (jj.stac@aliceadsl.fr)
-               
+
                => add Keyboard,
-               => add color, 
+               => add color,
                => add cassette,
                => add sn76477 sound and 1bit sound,
                => add joysticks (stick, pot, fire)
-               => add BR/HR switching 
+               => add BR/HR switching
                => add bank switch for HRX
                => add device MX80c and bank switching for the ROM
-    Importante note : the keyboard function add been piked from 
+    Importante note : the keyboard function add been piked from
                       DChector project : http://dchector.free.fr/ made by DanielCoulom
                       (thank's Daniel)
     TODO : Add the cartridge function,
@@ -43,7 +43,7 @@
 //  (left)7                     (right)9
 //               (down)8
 //
-// Fire <-> or <�>
+// Fire <-> or <?>
 // Pot => INS /SUPPR
 // Cassete : wav file (1 way, 16 bits, 44100hz)
 
@@ -73,14 +73,14 @@ static ADDRESS_MAP_START(hec2hrp_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x3000,0x3000) AM_READWRITE( hector_cassette_r, hector_sn_3000_w)// Write necessary
 	AM_RANGE(0x3800,0x3807) AM_READWRITE( hector_keyboard_r, hector_keyboard_w)  // Keyboard
 
-    // Main ROM page 
-	AM_RANGE(0x0000,0x3fff) AM_ROMBANK("bank2") 
+    // Main ROM page
+	AM_RANGE(0x0000,0x3fff) AM_ROMBANK("bank2")
 
-	// Vidéo br mapping
+	// Vid??o br mapping
 	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_GENERIC(videoram)
 	// continous RAM
     AM_RANGE(0x4A00,0xbfff) AM_RAM
-	// from 0xC000 to 0xFFFF => Bank Ram for vidéo and data !
+	// from 0xC000 to 0xFFFF => Bank Ram for vid??o and data !
 	AM_RANGE(0xc000,0xffff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -109,7 +109,7 @@ INPUT_PORTS_END
 ///////////////////////////////////////////////////////////////////////////////
 static MACHINE_START( hec2hrp )
 ///////////////////////////////////////////////////////////////////////////////
-{    
+{
 UINT8 *RAM = memory_region(machine, "maincpu"); // pointer to mess ram
 UINT8 *ROM1 = memory_region(machine, "page1"); // pointer to rom page 1
 UINT8 *ROM2 = memory_region(machine, "page2"); // pointer to rom page 2
@@ -181,8 +181,8 @@ static MACHINE_DRIVER_START( hec2hr )
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 230)  
-	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)  
+	MDRV_SCREEN_SIZE(512, 230)
+	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
     MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_START(hec2hrp)
@@ -196,7 +196,7 @@ static MACHINE_DRIVER_START( hec2hr )
 	MDRV_SOUND_ADD("sn76477", SN76477, 0)
 	MDRV_SOUND_CONFIG(hector_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
-	
+
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -225,8 +225,8 @@ static MACHINE_DRIVER_START( hec2hrp )
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 230)  
-	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)  
+	MDRV_SCREEN_SIZE(512, 230)
+	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
     MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_START(hec2hrp)
@@ -240,7 +240,7 @@ static MACHINE_DRIVER_START( hec2hrp )
 	MDRV_SOUND_ADD("sn76477", SN76477, 0)
 	MDRV_SOUND_CONFIG(hector_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
-	
+
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -269,8 +269,8 @@ static MACHINE_DRIVER_START( hec2mx40 )
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 230)  
-	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)  
+	MDRV_SCREEN_SIZE(512, 230)
+	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
     MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_START(hec2hrp)
@@ -284,7 +284,7 @@ static MACHINE_DRIVER_START( hec2mx40 )
 	MDRV_SOUND_ADD("sn76477", SN76477, 0)
 	MDRV_SOUND_CONFIG(hector_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
-	
+
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -313,8 +313,8 @@ static MACHINE_DRIVER_START( hec2mx80 )
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 230)  
-	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)  
+	MDRV_SCREEN_SIZE(512, 230)
+	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
     MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_START(hec2hrp)
@@ -328,7 +328,7 @@ static MACHINE_DRIVER_START( hec2mx80 )
 	MDRV_SOUND_ADD("sn76477", SN76477, 0)
 	MDRV_SOUND_CONFIG(hector_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
-	
+
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -368,7 +368,7 @@ ROM_START( hec2hrx )
 	ROM_LOAD( "hector2hrx.rom", 0x0000, 0x4000, CRC(f047c521) SHA1(744336b2acc76acd7c245b562bdc96dca155b066))
 	ROM_REGION( 0x4000, "page1", ROMREGION_ERASEFF )
 	ROM_REGION( 0x4000, "page2", ROMREGION_ERASEFF )
-ROM_END 
+ROM_END
 
 ROM_START( hec2mx80 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )

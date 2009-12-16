@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	formats/exi_dsk.h
+    formats/exi_dsk.h
 
-	Exidy Sorcerer disk images
+    Exidy Sorcerer disk images
 
 *********************************************************************/
 

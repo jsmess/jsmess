@@ -1510,7 +1510,7 @@ static DEVICE_RESET( smsvdp )
 	smsvdp->prev_bitmap_saved = 0;
 
 	/* for light gun input with "Hang-On & Safari Hunt", hcounter seems to
-	 need initialization to some value */
+     need initialization to some value */
 	smsvdp->hcounter = 0x40;
 
 	for (i = 0; i < 0x20; i++)

@@ -9,9 +9,9 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- use cr/ar directly
+    - use cr/ar directly
 
 */
 
@@ -139,7 +139,7 @@ static void set_hrq(const device_config *device, int state)
 static void set_tc(const device_config *device, int state)
 {
 	i8257_t *i8257 = get_safe_token(device);
-	
+
 	if (i8257->tc != state)
 	{
 		if (LOG) logerror("I8257 '%s' Terminal Count: %u\n", device->tag, state);
@@ -168,9 +168,9 @@ static void set_dack(const device_config *device, int active_channel)
 	for (ch = 0; ch < I8257_CHANNELS; ch++)
 	{
 		int state = (ch != active_channel);
-		
+
 		if (LOG) logerror("I8257 '%s' DMA Acknowledge %u: %u\n", device->tag, ch, state);
-		
+
 		devcb_call_write_line(&i8257->out_dack_func[ch], state);
 	}
 }
@@ -303,7 +303,7 @@ static TIMER_CALLBACK( dma_tick )
 	case STATE_S2:
 		/* activate DACKn */
 		set_dack(device, i8257->channel);
-		
+
 		/* activate read command */
 		dma_read(device);
 
@@ -343,7 +343,7 @@ static TIMER_CALLBACK( dma_tick )
 		if (!i8257->ready)
 		{
 			i8257->state = STATE_SW;
-		} 
+		}
 		else if (i8257->tc && (i8257->channel == 2) && (i8257->mr & I8257_MODE_AL))
 		{
 			i8257->state = STATE_SU;
@@ -392,7 +392,7 @@ static TIMER_CALLBACK( dma_tick )
 		if (i8257->tc)
 		{
 			/* reset enable for channel n if TC stop and TC are active */
-			if ((i8257->mr & I8257_MODE_TCS) && 
+			if ((i8257->mr & I8257_MODE_TCS) &&
 				!((i8257->channel == 2) && (i8257->mr & I8257_MODE_AL)))
 			{
 				i8257->mr &= ~(1 << i8257->channel);
@@ -488,7 +488,7 @@ WRITE8_DEVICE_HANDLER( i8257_w )
 {
 	i8257_t *i8257 = get_safe_token(device);
 	int ch;
-	
+
 	switch (offset & 0x0f)
 	{
 	case 0:
@@ -615,7 +615,7 @@ static DEVICE_START( i8257 )
 	devcb_resolve_write_line(&i8257->out_hrq_func, &intf->out_hrq_func, device);
 	devcb_resolve_write_line(&i8257->out_tc_func, &intf->out_tc_func, device);
 	devcb_resolve_write_line(&i8257->out_mark_func, &intf->out_mark_func, device);
-	
+
 	for (ch = 0; ch < I8257_CHANNELS; ch++)
 	{
 		devcb_resolve_read8(&i8257->in_memr_func[ch], &intf->in_memr_func[ch], device);

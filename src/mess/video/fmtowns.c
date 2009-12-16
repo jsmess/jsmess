@@ -1,74 +1,74 @@
 
-/* 
+/*
  * FM Towns video hardware
- * 
+ *
  * Resolution: from 320x200 to 768x512
- * 
+ *
  * Up to two graphics layers
- * 
+ *
  * Sprites
- * 
+ *
  * CRTC registers (16-bit):
- * 
+ *
  *  0:  HSync width 1
- * 	1:	HSync width 2
- *  4:	HSync total
- *  5:	VSync width 1
- * 	6:	VSync width 2
- * 	7:	Equalising pulse accountable time (what?)
+ *  1:  HSync width 2
+ *  4:  HSync total
+ *  5:  VSync width 1
+ *  6:  VSync width 2
+ *  7:  Equalising pulse accountable time (what?)
  *  8:  VSync total
- *  
- * 	9:
- *  10:	Graphic layer 0 horizontal start/end
- * 	11:
- * 	12:	Graphic layer 1 horizontal start/end
- * 
- * 	13:
- * 	14:	Graphic layer 0 vertical start/end
- * 	15:
- * 	16: Graphic layer 1 vertical start/end
- * 
- * 	17:	Graphic layer 0 initial address?
- * 	18: Graphic layer 0 horizontal adjust
- * 	19: Graphic layer 0 field indirect address offset
- * 	20: Graphic layer 0 line indirect address offset
- * 
- * 	21-24: As above, but for Graphic layer 1
- * 
- * 	27: Layer zoom.  	bit 0 = x2 horizontal zoom layer 0
- * 	to be confirmed		bit 5 = x2 vertical zoom layer 0
- * 						bit 9 = x2 horizontal zoom layer 1
- * 						bit 13 = x2 vertical zoom layer 1
- * 
- * 	28:	Control register 0
- * 		VSync enable (bit 15) (blank display?)
- * 		Scroll type (layer 0 = bit 4, layer 1 = bit 5)
- * 			0 = spherical scroll, 1 = cylindrical scroll
- * 
+ *
+ *  9:
+ *  10: Graphic layer 0 horizontal start/end
+ *  11:
+ *  12: Graphic layer 1 horizontal start/end
+ *
+ *  13:
+ *  14: Graphic layer 0 vertical start/end
+ *  15:
+ *  16: Graphic layer 1 vertical start/end
+ *
+ *  17: Graphic layer 0 initial address?
+ *  18: Graphic layer 0 horizontal adjust
+ *  19: Graphic layer 0 field indirect address offset
+ *  20: Graphic layer 0 line indirect address offset
+ *
+ *  21-24: As above, but for Graphic layer 1
+ *
+ *  27: Layer zoom.     bit 0 = x2 horizontal zoom layer 0
+ *  to be confirmed     bit 5 = x2 vertical zoom layer 0
+ *                      bit 9 = x2 horizontal zoom layer 1
+ *                      bit 13 = x2 vertical zoom layer 1
+ *
+ *  28: Control register 0
+ *      VSync enable (bit 15) (blank display?)
+ *      Scroll type (layer 0 = bit 4, layer 1 = bit 5)
+ *          0 = spherical scroll, 1 = cylindrical scroll
+ *
  *  29: Control register 1
- * 		Dot clock (bits 1 and 0)
- * 		0x00 = 28.6363MHz
- * 		0x01 = 24.5454MHz
- * 		0x02 = 25.175MHz
- * 		0x03 = 21.0525MHz (default?)
- * 
- * 	30: Dummy register
- * 
- * 	31:	Control register 2
- *	
- * 	Video registers:
- * 
- * 	0:	Graphic layer(s) type: (others likely exist)
- * 		bit 4 = 2 layers
- * 		bits 2-3 = layer 1 mode
- * 		bits 0-1 = layer 0 mode
- * 			mode: 1 = 16 colours, 2 = 256 colours, 3 = highcolour (16-bit)
- * 			      0 = disabled?
- * 
- * 	1:  Layer reverse (priority?) (bit 0)
- * 		YM (bit 2) - unknown
- * 		peltype (bits 4 and 5)
- * 
+ *      Dot clock (bits 1 and 0)
+ *      0x00 = 28.6363MHz
+ *      0x01 = 24.5454MHz
+ *      0x02 = 25.175MHz
+ *      0x03 = 21.0525MHz (default?)
+ *
+ *  30: Dummy register
+ *
+ *  31: Control register 2
+ *
+ *  Video registers:
+ *
+ *  0:  Graphic layer(s) type: (others likely exist)
+ *      bit 4 = 2 layers
+ *      bits 2-3 = layer 1 mode
+ *      bits 0-1 = layer 0 mode
+ *          mode: 1 = 16 colours, 2 = 256 colours, 3 = highcolour (16-bit)
+ *                0 = disabled?
+ *
+ *  1:  Layer reverse (priority?) (bit 0)
+ *      YM (bit 2) - unknown
+ *      peltype (bits 4 and 5)
+ *
  */
 
 #include "driver.h"
@@ -109,11 +109,11 @@ void towns_crtc_refresh_mode(running_machine* machine)
 {
 	rectangle scr;
 	unsigned int width,height;
-	
+
 	scr.min_x = scr.min_y = 0;
 	scr.max_x = towns_crtc_reg[4];
 	scr.max_y = towns_crtc_reg[8] / 2;
-	
+
 	// layer 0
 	width = towns_crtc_reg[10] - towns_crtc_reg[9];
 	height = (towns_crtc_reg[14] - towns_crtc_reg[13]) / 2;
@@ -121,7 +121,7 @@ void towns_crtc_refresh_mode(running_machine* machine)
 	towns_crtc_layerscr[0].min_y = (scr.max_y / 2) - (height / 2);
 	towns_crtc_layerscr[0].max_x = (scr.max_x / 2) + (width / 2);
 	towns_crtc_layerscr[0].max_y = (scr.max_y / 2) + (height / 2);
-	
+
 	// layer 1
 	width = towns_crtc_reg[12] - towns_crtc_reg[11];
 	height = (towns_crtc_reg[16] - towns_crtc_reg[15]) / 2;
@@ -135,7 +135,7 @@ void towns_crtc_refresh_mode(running_machine* machine)
 		return;
 	if(scr.max_x <= scr.min_x || scr.max_y <= scr.min_y)
 		return;
-	
+
 	video_screen_configure(machine->primary_screen,scr.max_x+1,scr.max_y+1,&scr,HZ_TO_ATTOSECONDS(60));
 }
 
@@ -312,11 +312,11 @@ WRITE8_HANDLER( towns_video_cff80_w )
 
 /*
  *  port 0x440-0x443 - CRTC
- * 		0x440 = register select
- * 		0x442/3 = register data (16-bit)
- * 		0x448 = shifter register select
- * 		0x44a = shifter register data (8-bit)
- * 
+ *      0x440 = register select
+ *      0x442/3 = register data (16-bit)
+ *      0x448 = shifter register select
+ *      0x44a = shifter register data (8-bit)
+ *
  */
 READ8_HANDLER(towns_video_440_r)
 {
@@ -358,15 +358,15 @@ WRITE8_HANDLER(towns_video_440_w)
 			break;
 		case 0x02:
 			logerror("CRTC: writing register %i (0x442) [%02x]\n",towns_crtc_sel,data);
-			towns_crtc_reg[towns_crtc_sel] = 
+			towns_crtc_reg[towns_crtc_sel] =
 				(towns_crtc_reg[towns_crtc_sel] & 0xff00) | data;
-			towns_crtc_refresh_mode(space->machine); 
+			towns_crtc_refresh_mode(space->machine);
 			break;
 		case 0x03:
 			logerror("CRTC: writing register %i (0x443) [%02x]\n",towns_crtc_sel,data);
-			towns_crtc_reg[towns_crtc_sel] = 
-				(towns_crtc_reg[towns_crtc_sel] & 0x00ff) | (data << 8); 
-			towns_crtc_refresh_mode(space->machine); 
+			towns_crtc_reg[towns_crtc_sel] =
+				(towns_crtc_reg[towns_crtc_sel] & 0x00ff) | (data << 8);
+			towns_crtc_refresh_mode(space->machine);
 			break;
 		case 0x08:
 			towns_video_sel = data & 0x01;
@@ -437,7 +437,7 @@ READ8_HANDLER(towns_video_fd90_r)
 		case 0x0f:
 			return towns_degipal[offset-0x08];
 	}
-//	logerror("VID: read port %04x\n",offset+0xfd90);
+//  logerror("VID: read port %04x\n",offset+0xfd90);
 	return 0x00;
 }
 
@@ -488,18 +488,18 @@ WRITE8_HANDLER(towns_video_ff81_w)
 /*
  *  Sprite RAM, low memory
  *  Writing to 0xc8xxx or 0xcaxxx activates TVRAM mode
- *  Writing to I/O port 0x5c8 disables TVRAM mode 
+ *  Writing to I/O port 0x5c8 disables TVRAM mode
  *     (bit 7 returns high if TVRAM mode was previously active)
- * 
+ *
  *  In TVRAM mode:
  *    0xc8000-0xc8fff: ASCII text (2 bytes each: ISO646 code, then attribute)
- *    0xca000-0xcafff: JIS code 
+ *    0xca000-0xcafff: JIS code
  */
 READ8_HANDLER(towns_spriteram_low_r)
 {
 	UINT8* RAM = messram_get_ptr(devtag_get_device(space->machine, "messram"));
 	UINT8* ROM = memory_region(space->machine,"user");
-	
+
 	if(offset < 0x1000)
 	{  // 0xc8000-0xc8fff
 		if(towns_mainmem_enable == 0)
@@ -556,7 +556,7 @@ void towns_crtc_draw_scan_layer_hicolour(bitmap_t* bitmap,const rectangle* rect,
 	int x;
 	UINT16 colour;
 	int hzoom = 1;
-	
+
 	if(towns_vram_page_sel != 0)
 		off = 0x20000;
 	if(layer != 0)
@@ -573,18 +573,18 @@ void towns_crtc_draw_scan_layer_hicolour(bitmap_t* bitmap,const rectangle* rect,
 		off += towns_crtc_reg[17];  // initial offset
 		if(towns_crtc_reg[27] & 0x0001)
 			hzoom = 2;
-	}	
+	}
 
 	off += (line * (512 / hzoom) * 2);
 
 	if(hzoom == 1)
-	{	
+	{
 		for(x=rect->min_x;x<rect->max_x;x++)
 		{
 			colour = (towns_gfxvram[off] << 8) | towns_gfxvram[off+1];
 			if(colour != 0)
-			{ 
-				*BITMAP_ADDR32(bitmap,scanline,x) = 
+			{
+				*BITMAP_ADDR32(bitmap,scanline,x) =
 					((colour & 0xf800))
 					| ((colour & 0x07c0) << 13)
 					| ((colour & 0x003e) << 2);
@@ -598,12 +598,12 @@ void towns_crtc_draw_scan_layer_hicolour(bitmap_t* bitmap,const rectangle* rect,
 		{
 			colour = (towns_gfxvram[off+1] << 8) | towns_gfxvram[off];
 			if(colour != 0)
-			{ 
-				*BITMAP_ADDR32(bitmap,scanline,x) = 
+			{
+				*BITMAP_ADDR32(bitmap,scanline,x) =
 					((colour & 0x001f) << 3)
 					| ((colour & 0x7c00) << 1)
 					| ((colour & 0x03e0) << 14);
-				*BITMAP_ADDR32(bitmap,scanline,x+1) = 
+				*BITMAP_ADDR32(bitmap,scanline,x+1) =
 					((colour & 0x001f) << 3)
 					| ((colour & 0x7c00) << 1)
 					| ((colour & 0x03e0) << 14);
@@ -619,7 +619,7 @@ void towns_crtc_draw_scan_layer_256(bitmap_t* bitmap,const rectangle* rect,int l
 	int x;
 	UINT8 colour;
 	int hzoom = 1;
-	
+
 	if(towns_vram_page_sel != 0)
 		off = 0x20000;
 	if(layer != 0)
@@ -636,17 +636,17 @@ void towns_crtc_draw_scan_layer_256(bitmap_t* bitmap,const rectangle* rect,int l
 		off += towns_crtc_reg[17];  // initial offset
 		if(towns_crtc_reg[27] & 0x0001)
 			hzoom = 2;
-	}	
+	}
 
 	off += (line * (512 / hzoom));
 
 	if(hzoom == 1)
-	{	
+	{
 		for(x=rect->min_x;x<rect->max_x;x++)
 		{
 			colour = towns_gfxvram[off];
 			if(colour != 0)
-			{ 
+			{
 				*BITMAP_ADDR32(bitmap,scanline,x) =
 					(towns_palette_r[colour] << 16)
 					| (towns_palette_g[colour] << 8)
@@ -661,7 +661,7 @@ void towns_crtc_draw_scan_layer_256(bitmap_t* bitmap,const rectangle* rect,int l
 		{
 			colour = towns_gfxvram[off];
 			if(colour != 0)
-			{ 
+			{
 				*BITMAP_ADDR32(bitmap,scanline,x) =
 					(towns_palette_r[colour] << 16)
 					| (towns_palette_g[colour] << 8)
@@ -682,7 +682,7 @@ void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int la
 	int x;
 	UINT8 colour;
 	int hzoom = 1;
-	
+
 	if(towns_vram_page_sel != 0)
 		off = 0x20000;
 	if(layer != 0)
@@ -699,25 +699,25 @@ void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int la
 		off += towns_crtc_reg[17];  // initial offset
 		if(towns_crtc_reg[27] & 0x0001)
 			hzoom = 2;
-	}	
+	}
 
 	off += (line * ((rect->max_x - rect->min_x) / 2));
 
 	if(hzoom == 1)
-	{	
+	{
 		for(x=rect->min_x;x<rect->max_x;x+=2)
 		{
 			colour = towns_gfxvram[off] >> 4;
 			if(colour != 0)
-			{ 
+			{
 				*BITMAP_ADDR32(bitmap,scanline,x+1) =
 					(towns_palette_r[colour] << 16)
 					| (towns_palette_g[colour] << 8)
 					| (towns_palette_b[colour]);
 			}
-			colour = towns_gfxvram[off] & 0x0f; 
+			colour = towns_gfxvram[off] & 0x0f;
 			if(colour != 0)
-			{ 
+			{
 				*BITMAP_ADDR32(bitmap,scanline,x) =
 					(towns_palette_r[colour] << 16)
 					| (towns_palette_g[colour] << 8)
@@ -732,7 +732,7 @@ void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int la
 		{
 			colour = towns_gfxvram[off] >> 4;
 			if(colour != 0)
-			{ 
+			{
 				*BITMAP_ADDR32(bitmap,scanline,x+2) =
 					(towns_palette_r[colour] << 16)
 					| (towns_palette_g[colour] << 8)
@@ -742,9 +742,9 @@ void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int la
 					| (towns_palette_g[colour] << 8)
 					| (towns_palette_b[colour]);
 			}
-			colour = towns_gfxvram[off] & 0x0f; 
+			colour = towns_gfxvram[off] & 0x0f;
 			if(colour != 0)
-			{ 
+			{
 				*BITMAP_ADDR32(bitmap,scanline,x) =
 					(towns_palette_r[colour] << 16)
 					| (towns_palette_g[colour] << 8)
@@ -763,7 +763,7 @@ void towns_crtc_draw_layer(bitmap_t* bitmap,const rectangle* rect,int layer)
 {
 	int line;
 	int scanline;
-	
+
 	if(layer == 0)
 	{
 		scanline = rect->min_y;
@@ -860,8 +860,8 @@ VIDEO_UPDATE( towns )
 		towns_crtc_draw_layer(bitmap,&towns_crtc_layerscr[0],0);
 		towns_crtc_draw_layer(bitmap,&towns_crtc_layerscr[1],1);
 	}
-	
-		
+
+
 	// draw text layer
 /*
  *  Text layer format
@@ -872,10 +872,10 @@ VIDEO_UPDATE( towns )
  *             bit 3: Inverse
  *             bit 4: Blink
  *             bit 5: high brightness
- *             bits 7-6: Kanji high/low 
- * 
+ *             bits 7-6: Kanji high/low
+ *
  *  If either bits 6 or 7 are high, then a fullwidth Kanji character is displayed
- *  at this location.  The character displayed is represented by a 2-byte 
+ *  at this location.  The character displayed is represented by a 2-byte
  *  JIS code at the same offset at 0xca000.
  */
 	if(towns_tvram_enable != 0)
@@ -898,7 +898,7 @@ VIDEO_UPDATE( towns )
 						| (((colour & 0x04) ? 0x7f : 0x00) << 8)
 						| ((colour & 0x01) ? 0x7f : 0x00);
 				}
-				
+
 				if((towns_txtvram[off+1] & 0xc0) != 0)
 				{	// double width
 					if(towns_txtvram[off+1] & 0x40)
@@ -908,14 +908,14 @@ VIDEO_UPDATE( towns )
 						if(row <= 8)
 						{
 							code = (row & 0x07) * 0x20;
-							code += ((towns_txtvram[off+0x2001]-32) & 0x1f) 
+							code += ((towns_txtvram[off+0x2001]-32) & 0x1f)
 									| (((towns_txtvram[off+0x2001]-32) & 0x40) << 2)
 									| (((towns_txtvram[off+0x2001]-32) & 0x20) << 4);
 						}
 						if(row >= 16)  // Kanji
 						{
 							code = 0x400;
-							code += ((towns_txtvram[off+0x2001]) & 0x1f) 
+							code += ((towns_txtvram[off+0x2001]) & 0x1f)
 									+ (((towns_txtvram[off+0x2001]-32) & 0x60) << 4)
 									+ ((row & 0x0f) << 5)
 									+ (((row-16) & 0x70) * 0x60);
@@ -933,7 +933,7 @@ VIDEO_UPDATE( towns )
 			}
 		}
 	}
-	
+
 #ifdef CRTC_REG_DISP
 	popmessage("CRTC: %i %i %i %i %i %i %i %i %i\n%i %i %i %i | %i %i %i %i\nZOOM: %04x\nShifter: %02x %02x\nText=%i",
 		towns_crtc_reg[0],towns_crtc_reg[1],towns_crtc_reg[2],towns_crtc_reg[3],

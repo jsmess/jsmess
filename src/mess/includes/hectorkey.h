@@ -8,19 +8,19 @@
         Hector MX80c
         Hector 1
         Interact
-             
+
         29/10/2009 Update skeleton to functional machine
                           by yo_fr       (jj.stac@aliceadsl.fr)
-               
+
                => add Keyboard,
-               => add color, 
+               => add color,
                => add cassette,
                => add sn76477 sound and 1bit sound,
                => add joysticks (stick, pot, fire)
-               => add BR/HR switching 
+               => add BR/HR switching
                => add bank switch for HRX
                => add device MX80c and bank switching for the ROM
-    Importante note : the keyboard function add been piked from 
+    Importante note : the keyboard function add been piked from
                       DChector project : http://dchector.free.fr/ made by DanielCoulom
                       (thank's Daniel)
     TODO : Add the cartridge function,
@@ -41,9 +41,9 @@ static const UINT8 hectorkey[0x100] = {
 0x22, //9=   8 --> 8
 0x21, //a=   9 --> 9
 0x12, //b=   0 --> 0
-0x15, //c=   ) --> - 
+0x15, //c=   ) --> -
 0x17, //d=   = --> +
-0x04, //e=BACK --> BACK 
+0x04, //e=BACK --> BACK
 0x03, //f= TAB --> TAB
 
 ///////////////////////////////////////// 0x10-0x1f
@@ -57,7 +57,7 @@ static const UINT8 hectorkey[0x100] = {
 0x41, //7=   I --> I
 0x53, //8=   O --> O
 0x52, //9=   P --> P
-0xff, //a=   ^ 
+0xff, //a=   ^
 0x35, //b=   $ --> =
 0x02, //c= ENT --> RETURN
 0x06, //d=CTRL --> CTRL
@@ -73,8 +73,8 @@ static const UINT8 hectorkey[0x100] = {
 0x57, //5=   K --> K
 0x56, //6=   L --> L
 0x55, //7=   M --> M
-0x13, //8=   % --> /  
-0x08, //9=   ² --> manette 0 ACTION
+0x13, //8=   % --> /
+0x08, //9=   ?? --> manette 0 ACTION
 0x07, //a= MAJ --> SHIFT
 0x00, //b=   * --> *
 0x63, //c=   W --> W
@@ -137,7 +137,7 @@ static const UINT8 hectorkey[0x100] = {
 0xff, //f
 
 ///////////////////////////////////////// 0x60-0x6f
-0xff, //0=  
+0xff, //0=
 0xff, //1
 0xff, //2
 0xff, //3
@@ -252,21 +252,21 @@ static const UINT8 hectorkey[0x100] = {
 0xff, //4
 0xff, //5
 0xff, //6
-0xff, //7=HOME 
-0x0d, //8=  UP  
-0x0f, //9= PUP 
+0xff, //7=HOME
+0x0d, //8=  UP
+0x0f, //9= PUP
 0xff, //a
 0xff, //b
 0xff, //c
-0xff, //d 
+0xff, //d
 0xff, //e
-0xff, //f= END 
+0xff, //f= END
 
 ///////////////////////////////////////// 0xd0-0xdf
-0x0c, //0=DOWN  
-0x0e, //1=PDWN 
-0xff, //2= INS  
-0xff, //3= SUP 
+0x0c, //0=DOWN
+0x0e, //1=PDWN
+0xff, //2= INS
+0xff, //3= SUP
 0xff, //4
 0xff, //5
 0xff, //6

@@ -9,28 +9,28 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- implement FIFO as ring buffer
-	- drawing modes
-		- character
-		- mixed
-	- commands
-		- WDAT
-		- FIGS
-		- FIGD
-		- GCHRD
-		- RDAT
-		- DMAR
-		- DMAW
-	- read-modify-write cycle
-		- read data
-		- modify data
-		- write data
+    - implement FIFO as ring buffer
+    - drawing modes
+        - character
+        - mixed
+    - commands
+        - WDAT
+        - FIGS
+        - FIGD
+        - GCHRD
+        - RDAT
+        - DMAR
+        - DMAW
+    - read-modify-write cycle
+        - read data
+        - modify data
+        - write data
 
-	- honor visible area
-	- wide mode (32-bit access)
-	- light pen
+    - honor visible area
+    - wide mode (32-bit access)
+    - light pen
 
 */
 
@@ -261,7 +261,7 @@ INLINE void queue(upd7220_t *upd7220, UINT8 data, int flag)
 		{
 			upd7220->sr |= UPD7220_SR_FIFO_FULL;
 		}
-	
+
 		upd7220->sr &= ~UPD7220_SR_FIFO_EMPTY;
 	}
 	else
@@ -419,7 +419,7 @@ static void recompute_parameters(const device_config *device)
 	int vert_pix_total = upd7220->vs + upd7220->vbp + upd7220->al + upd7220->vfp;
 
 	attoseconds_t refresh = HZ_TO_ATTOSECONDS(device->clock * 8) * horiz_pix_total * vert_pix_total;
-	
+
 	rectangle visarea;
 
 	visarea.min_x = (upd7220->hs + upd7220->hbp) * 16;
@@ -436,7 +436,7 @@ static void recompute_parameters(const device_config *device)
 	if (upd7220->m)
 	{
 		video_screen_configure(upd7220->screen, horiz_pix_total, vert_pix_total, &visarea, refresh);
-		
+
 		update_hsync_timer(upd7220, 0);
 		update_vsync_timer(upd7220, 0);
 	}
@@ -469,7 +469,7 @@ static void advance_ead(upd7220_t *upd7220)
 		EAD += P;
 		break;
 
-	case 1: 
+	case 1:
 		EAD += P;
 		if (MSB(DAD)) EAD++;
 		DAD = LR(DAD);
@@ -754,7 +754,7 @@ static void process_fifo(const device_config *device)
 			upd7220->pitch = data;
 
 			if (LOG) logerror("uPD7220 '%s' PITCH: %u\n", device->tag, upd7220->pitch);
-		}		
+		}
 		break;
 
 	case COMMAND_WDAT: /* write data into display memory */
@@ -867,7 +867,7 @@ WRITE8_DEVICE_HANDLER( upd7220_w )
 	else
 	{
 		/* parameter into FIFO */
-//		fifo_set_direction(upd7220, FIFO_WRITE);
+//      fifo_set_direction(upd7220, FIFO_WRITE);
 		queue(upd7220, data, 0);
 	}
 
@@ -917,17 +917,17 @@ WRITE_LINE_DEVICE_HANDLER( upd7220_ext_sync_w )
 
 WRITE_LINE_DEVICE_HANDLER( upd7220_lpen_w )
 {
-	/* only if 2 rising edges on the lpen input occur at the same 
-	   point during successive video fields are the pulses accepted */
+	/* only if 2 rising edges on the lpen input occur at the same
+       point during successive video fields are the pulses accepted */
 
-	/* 
-	
-		1. compute the address of the location on the CRT 
-		2. compare with LAD
-		3. if not equal move address to LAD
-		4. if equal set LPEN DETECT flag to 1
+	/*
 
-	*/
+        1. compute the address of the location on the CRT
+        2. compare with LAD
+        3. if not equal move address to LAD
+        4. if equal set LPEN DETECT flag to 1
+
+    */
 }
 
 /*-------------------------------------------------

@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	uimess.c
+    uimess.c
 
-	MESS supplement to ui.c.
+    MESS supplement to ui.c.
 
 *********************************************************************/
 
@@ -84,7 +84,7 @@ struct _ui_mess_private
 
 /*-------------------------------------------------
     ui_mess_init - initialize the MESS-specific
-	UI
+    UI
 -------------------------------------------------*/
 
 void ui_mess_init(running_machine *machine)
@@ -100,7 +100,7 @@ void ui_mess_init(running_machine *machine)
 
 /*-------------------------------------------------
     process_natural_keyboard - processes any
-	natural keyboard input
+    natural keyboard input
 -------------------------------------------------*/
 
 static void process_natural_keyboard(running_machine *machine)
@@ -154,7 +154,7 @@ static void process_natural_keyboard(running_machine *machine)
 
 /*-------------------------------------------------
     ui_mess_handler_ingame - function to determine
-	if the builtin UI should be disabled
+    if the builtin UI should be disabled
 -------------------------------------------------*/
 
 int ui_mess_handler_ingame(running_machine *machine)
@@ -300,7 +300,7 @@ static astring *image_info_astring(running_machine *machine, astring *string)
 
 /*-------------------------------------------------
     ui_mess_menu_image_info - menu that shows info
-	on all loaded images
+    on all loaded images
 -------------------------------------------------*/
 
 void ui_mess_menu_image_info(running_machine *machine, ui_menu *menu, void *parameter, void *state)
@@ -321,7 +321,7 @@ void ui_mess_menu_image_info(running_machine *machine, ui_menu *menu, void *para
 
 /*-------------------------------------------------
     ui_mess_use_new_ui - determines if the "new ui"
-	is in use
+    is in use
 -------------------------------------------------*/
 
 int ui_mess_use_new_ui(void)
@@ -359,7 +359,7 @@ void ui_mess_paste(running_machine *machine)
 
 /*-------------------------------------------------
     ui_mess_keyboard_disabled - returns whether
-	IPT_KEYBOARD input should be disabled
+    IPT_KEYBOARD input should be disabled
 -------------------------------------------------*/
 
 int ui_mess_keyboard_disabled(running_machine *machine)
@@ -371,7 +371,7 @@ int ui_mess_keyboard_disabled(running_machine *machine)
 
 /*-------------------------------------------------
     ui_mess_get_use_natural_keyboard - returns
-	whether the natural keyboard is active
+    whether the natural keyboard is active
 -------------------------------------------------*/
 
 int ui_mess_get_use_natural_keyboard(running_machine *machine)
@@ -383,7 +383,7 @@ int ui_mess_get_use_natural_keyboard(running_machine *machine)
 
 /*-------------------------------------------------
     ui_mess_set_use_natural_keyboard - specifies
-	whether the natural keyboard is active
+    whether the natural keyboard is active
 -------------------------------------------------*/
 
 void ui_mess_set_use_natural_keyboard(running_machine *machine, int use_natural_keyboard)
@@ -394,14 +394,14 @@ void ui_mess_set_use_natural_keyboard(running_machine *machine, int use_natural_
 
 
 /*-------------------------------------------------
-    ui_mess_menu_keyboard_mode - menu that 	
+    ui_mess_menu_keyboard_mode - menu that
 -------------------------------------------------*/
 
 void ui_mess_menu_keyboard_mode(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
 	const ui_menu_event *event;
 	int natural = ui_mess_get_use_natural_keyboard(machine);
-	
+
 	/* if the menu isn't built, populate now */
 	if (!ui_menu_populated(menu))
 	{
@@ -417,13 +417,13 @@ void ui_mess_menu_keyboard_mode(running_machine *machine, ui_menu *menu, void *p
 			ui_mess_set_use_natural_keyboard(machine, natural ^ TRUE);
 			ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_REF);
 		}
-	}		
+	}
 }
 
 
 
 /*-------------------------------------------------
-    ui_mess_menu_keyboard_mode - populate MESS-specific menus 	
+    ui_mess_menu_keyboard_mode - populate MESS-specific menus
 -------------------------------------------------*/
 
 void ui_mess_main_menu_populate(running_machine *machine, ui_menu *menu)
@@ -438,7 +438,7 @@ void ui_mess_main_menu_populate(running_machine *machine, ui_menu *menu)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
 			if (field->type == IPT_KEYBOARD)
-				has_keyboard = TRUE;			
+				has_keyboard = TRUE;
 		}
 	}
 

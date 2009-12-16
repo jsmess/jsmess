@@ -658,7 +658,7 @@ static void c128_bankswitch_128( running_machine *machine, int reset )
 			c128_write_io = 0;
 			memory_install_read_bank(cpu_get_address_space(cputag_get_cpu(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, "bank13");
 		}
-		
+
 
 		if (MMU_RAM_HI)
 		{

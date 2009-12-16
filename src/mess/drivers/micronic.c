@@ -1,9 +1,9 @@
 /***************************************************************************
-   
-	Micronics 1000
 
-	http://www.philpem.me.uk/elec/micronic/
-	http://members.lycos.co.uk/leeedavison/z80/micronic/index.html
+    Micronics 1000
+
+    http://www.philpem.me.uk/elec/micronic/
+    http://members.lycos.co.uk/leeedavison/z80/micronic/index.html
 
 ****************************************************************************/
 
@@ -19,8 +19,8 @@ INPUT_PORTS_START( micronic )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(micronic) 
-{	
+static MACHINE_RESET(micronic)
+{
 }
 
 static VIDEO_START( micronic )
@@ -35,10 +35,10 @@ static VIDEO_UPDATE( micronic )
 static MACHINE_DRIVER_START( micronic )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, 4000000)
-    MDRV_CPU_PROGRAM_MAP(micronic_mem)    
+    MDRV_CPU_PROGRAM_MAP(micronic_mem)
 
     MDRV_MACHINE_RESET(micronic)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)

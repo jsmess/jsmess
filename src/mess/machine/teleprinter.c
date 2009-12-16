@@ -25,7 +25,7 @@ INLINE teleprinter_state *get_safe_token(const device_config *device)
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type == GENERIC_TELEPRINTER);
-	
+
 	return (teleprinter_state *)device->token;
 }
 
@@ -40,7 +40,7 @@ INLINE const teleprinter_interface *get_interface(const device_config *device)
     IMPLEMENTATION
 ***************************************************************************/
 
-static const UINT8 teleprinter_font[128*8] = 
+static const UINT8 teleprinter_font[128*8] =
 {
   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
   0x07,0x07,0x07,0x07,0x00,0x00,0x00,0x00,
@@ -174,14 +174,14 @@ static const UINT8 teleprinter_font[128*8] =
 static void teleprinter_scroll_line(const device_config *device)
 {
 	teleprinter_state *term = get_safe_token(device);
-	
+
 	memcpy(term->buffer,term->buffer+TELEPRINTER_WIDTH,(TELEPRINTER_HEIGHT-1)*TELEPRINTER_WIDTH);
 	memset(term->buffer + TELEPRINTER_WIDTH*(TELEPRINTER_HEIGHT-1),0,TELEPRINTER_WIDTH);
 }
 
 static void teleprinter_write_char(const device_config *device,UINT8 data) {
 	teleprinter_state *term = get_safe_token(device);
-	
+
 	term->buffer[(TELEPRINTER_HEIGHT-1)*TELEPRINTER_WIDTH+term->x_pos] = data;
 	term->x_pos++;
 	if (term->x_pos > TELEPRINTER_WIDTH) {
@@ -192,12 +192,12 @@ static void teleprinter_write_char(const device_config *device,UINT8 data) {
 
 static void teleprinter_clear(const device_config *device) {
 	teleprinter_state *term = get_safe_token(device);
-	
+
 	memset(term->buffer,0,TELEPRINTER_WIDTH*TELEPRINTER_HEIGHT);
 	term->x_pos = 0;
 }
 
-WRITE8_DEVICE_HANDLER ( teleprinter_write ) 
+WRITE8_DEVICE_HANDLER ( teleprinter_write )
 {
 	teleprinter_state *term = get_safe_token(device);
 	switch(data) {
@@ -213,7 +213,7 @@ WRITE8_DEVICE_HANDLER ( teleprinter_write )
 		default: teleprinter_write_char(device,data); break;
 	}
 }
-	
+
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
@@ -225,11 +225,11 @@ void generic_teleprinter_update(const device_config *device, bitmap_t *bitmap, c
 
 	for (y = 0; y < TELEPRINTER_HEIGHT; y++)
 	{
-		for (c = 0; c < 8; c++) 
+		for (c = 0; c < 8; c++)
 		{
 			int horpos = 0;
 			for (x = 0; x < TELEPRINTER_WIDTH; x++)
-			{			
+			{
 				code = teleprinter_font[(term->buffer[y*TELEPRINTER_WIDTH + x]  & 0x7f) *8 + c];
 				for (b = 0; b < 8; b++)
 				{
@@ -251,7 +251,7 @@ static TIMER_CALLBACK(keyboard_callback)
 ***************************************************************************/
 static VIDEO_START( teleprinter )
 {
-	
+
 }
 
 static VIDEO_UPDATE(teleprinter )
@@ -270,9 +270,9 @@ MACHINE_DRIVER_START( generic_teleprinter )
 	MDRV_SCREEN_VISIBLE_AREA(0, TELEPRINTER_WIDTH*8-1, 0, TELEPRINTER_HEIGHT*8-1)
 	MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
-	
+
 	MDRV_VIDEO_START(teleprinter)
-	MDRV_VIDEO_UPDATE(teleprinter)	
+	MDRV_VIDEO_UPDATE(teleprinter)
 MACHINE_DRIVER_END
 
 
@@ -284,9 +284,9 @@ static DEVICE_START( teleprinter )
 {
 	teleprinter_state *term = get_safe_token(device);
 	const teleprinter_interface *intf = get_interface(device);
-	
-	devcb_resolve_write8(&term->teleprinter_keyboard_func, &intf->teleprinter_keyboard_func, device);	
-	
+
+	devcb_resolve_write8(&term->teleprinter_keyboard_func, &intf->teleprinter_keyboard_func, device);
+
 	timer_pulse(device->machine, ATTOTIME_IN_HZ(240), (void*)device, 0, keyboard_callback);
 }
 
@@ -297,7 +297,7 @@ static DEVICE_START( teleprinter )
 static DEVICE_RESET( teleprinter )
 {
 	teleprinter_state *term = get_safe_token(device);
-	
+
 	teleprinter_clear(device);
 	term->last_code = 0;
 	term->scan_line = 0;

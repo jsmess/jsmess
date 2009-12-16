@@ -161,7 +161,7 @@ static DEVICE_VALIDITY_CHECK( messram )
 		mame_printf_error("%s: '%s' has an invalid default RAM option: %s\n", driver->source_file, driver->name, config->default_size);
 		error = TRUE;
 	}
-	
+
 	/* command line options are only parsed for the device named "messram" */
 	if (device->tag!=NULL && strcmp(device->tag, "messram") == 0)
 	{
@@ -180,7 +180,7 @@ static DEVICE_VALIDITY_CHECK( messram )
 				error = TRUE;
 			}
 			if (gamename_option!=NULL && strlen(gamename_option) > 0 && strcmp(gamename_option, driver->name) == 0)
-			{							
+			{
 				/* compare command line option to default value */
 				if (messram_parse_string(config->default_size) == specified_ram)
 					is_valid = TRUE;
@@ -229,7 +229,7 @@ static DEVICE_VALIDITY_CHECK( messram )
 	}
 	else
 		is_valid = TRUE;
-				
+
 	if (!is_valid)
 	{
 		mame_printf_error("%s: '%s' cannot recognize the RAM option %s", driver->source_file, driver->name, ramsize_string);
@@ -244,7 +244,7 @@ static DEVICE_VALIDITY_CHECK( messram )
 	}
 
 	return error;
-	
+
 }
 
 

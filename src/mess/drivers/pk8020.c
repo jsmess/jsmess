@@ -213,7 +213,7 @@ static MACHINE_DRIVER_START( pk8020 )
 	MDRV_CASSETTE_ADD( "cassette", pk8020_cassette_config )
 
 	MDRV_FLOPPY_4_DRIVES_ADD(pk8020_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("258K")	//64 + 4*48 + 2

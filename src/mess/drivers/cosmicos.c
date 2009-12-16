@@ -1,33 +1,33 @@
 /*
 
-	COSMICOS
+    COSMICOS
 
-	http://retro.hansotten.nl/index.php?page=1802-cosmicos
+    http://retro.hansotten.nl/index.php?page=1802-cosmicos
 
 
-	HEX-monitor
+    HEX-monitor
 
-	0 - start user program
-	1 - inspect and/or change memory
-	2 - write memory block to cassette
-	3 - read memory block from cassette
-	4 - move memory block
-	5 - write memory block to EPROM
-	C - start user program from address 0000
+    0 - start user program
+    1 - inspect and/or change memory
+    2 - write memory block to cassette
+    3 - read memory block from cassette
+    4 - move memory block
+    5 - write memory block to EPROM
+    C - start user program from address 0000
 
 */
 
 /*
 
-	TODO:
+    TODO:
 
-	- display interface INH
-	- 2 segment display
-	- single step
-	- ascii monitor
-	- PPI 8255
-	- Floppy WD1793
-	- COM8017 UART to printer
+    - display interface INH
+    - 2 segment display
+    - single step
+    - ascii monitor
+    - PPI 8255
+    - Floppy WD1793
+    - COM8017 UART to printer
 
 */
 
@@ -160,11 +160,11 @@ static ADDRESS_MAP_START( cosmicos_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicos_io, ADDRESS_SPACE_IO, 8 )
-//	AM_RANGE(0x00, 0x00)
+//  AM_RANGE(0x00, 0x00)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD(CDP1864_TAG, video_on_r)
 	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE(CDP1864_TAG, video_off_r, audio_latch_w)
-//	AM_RANGE(0x03, 0x03)
-//	AM_RANGE(0x04, 0x04)
+//  AM_RANGE(0x03, 0x03)
+//  AM_RANGE(0x04, 0x04)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(hex_keyboard_r, hex_keylatch_w)
 	AM_RANGE(0x06, 0x06) AM_READWRITE(reset_counter_r, segment_w)
 	AM_RANGE(0x07, 0x07) AM_READWRITE(data_r, display_w)
@@ -208,7 +208,7 @@ static void set_cdp1802_mode(running_machine *machine, cdp1802_control_mode mode
 	cosmicos_state *state = machine->driver_data;
 
 	state->cdp1802_mode = mode;
-	
+
 	output_set_led_value(LED_RUN, 0);
 	output_set_led_value(LED_LOAD, 0);
 	output_set_led_value(LED_PAUSE, 0);
@@ -268,7 +268,7 @@ static void set_ram_mode(running_machine *machine)
 	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	if (state->ram_disable)
-	{		
+	{
 		memory_unmap_read(program, 0xff00, 0xffff, 0, 0);
 		memory_unmap_write(program, 0xff00, 0xffff, 0, 0);
 	}
@@ -426,8 +426,8 @@ static CDP1802_MODE_READ( cosmicos_mode_r )
 static CDP1802_EF_READ( cosmicos_ef_r )
 {
 	/*
-        EF1     
-        EF2		cassette input
+        EF1
+        EF2     cassette input
         EF3
         EF4     ENTER
     */
@@ -473,7 +473,7 @@ static CDP1802_SC_WRITE( cosmicos_sc_w )
 		cpu_set_input_line(device, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
 		cpu_set_input_line(device, CDP1802_INPUT_LINE_DMAIN, CLEAR_LINE);
 	}
-	
+
 	driver_state->sc1 = sc1;
 }
 
@@ -630,7 +630,7 @@ static MACHINE_DRIVER_START( cosmicos )
 	/* devices */
 	MDRV_QUICKLOAD_ADD("quickload", cosmicos, "bin", 0)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, cosmicos_cassette_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("256")
@@ -671,5 +671,5 @@ static DRIVER_INIT( cosmicos )
 	memory_set_direct_update_handler(program, cosmicos_direct_update_handler);
 }
 
-/*    YEAR  NAME		PARENT  COMPAT  MACHINE		INPUT		INIT		CONFIG		COMPANY				FULLNAME    FLAGS */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY             FULLNAME    FLAGS */
 COMP( 1979, cosmicos,	0,		0,		cosmicos,	cosmicos,	cosmicos,	0,			"Radio Bulletin",	"Cosmicos",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )

@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	inputx.h
+    inputx.h
 
-	Secondary input related functions for MESS specific functionality
+    Secondary input related functions for MESS specific functionality
 
 *********************************************************************/
 

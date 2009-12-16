@@ -65,9 +65,9 @@ const game_driver * const drivers[] =
     DRIVER( gblight )   /* Nintendo Game Boy Light Handheld             */
     DRIVER( gbcolor )   /* Nintendo Game Boy Color Handheld                 */
     DRIVER( snes )      /* Nintendo Super Nintendo NTSC                     */
-    DRIVER( snessfx )	/* Nintendo Super Nintendo NTSC, SuperFX			*/
+    DRIVER( snessfx )	/* Nintendo Super Nintendo NTSC, SuperFX            */
     DRIVER( snespal )   /* Nintendo Super Nintendo PAL                      */
-    DRIVER( snespsfx )	/* Nintendo Super Nintendo PAL, SuperFX			*/
+    DRIVER( snespsfx )	/* Nintendo Super Nintendo PAL, SuperFX         */
     DRIVER( sfcbox )    /* Nintendo Super Famicom Box                       */
     DRIVER( n64 )       /* Nintendo N64                                     */
     DRIVER( pokemini )  /* Nintendo Pokemon Mini                            */
@@ -236,7 +236,7 @@ const game_driver * const drivers[] =
     DRIVER( neocdz )    /* NeoGeo CDZ                                       */
 
     /* Philips */
-    DRIVER( cdimono1 )  /* Philips CD-i (Mono-I board)						*/
+    DRIVER( cdimono1 )  /* Philips CD-i (Mono-I board)                      */
 
 /****************COMPUTERS***************************************************/
 
@@ -334,17 +334,17 @@ const game_driver * const drivers[] =
 //mess0135u3    DRIVER( macse )     /* 1987 Apple Macintosh SE                          */
 //mess0135u3    DRIVER( macii )     /* 1987 Apple Macintosh II */
 //mess0135u3    DRIVER( macsefd )   /* 1988 Apple Macintosh SE (FDHD) */
-//mess0135u3    DRIVER( mac2fdhd )	/* 1988 Apple Macintosh II (FDHD) */
-//mess0135u3    DRIVER( maciix )	/* 1988 Apple Macintosh IIx */
-//mess0135u3    DRIVER( macse30 )	/* 1989 Apple Macintosh SE/30 */
-//mess0135u3    DRIVER( maciicx )	/* 1989 Apple Macintosh IIcx */
-//mess0135u3    DRIVER( maciici )	/* 1989 Apple Macintosh IIci */
+//mess0135u3    DRIVER( mac2fdhd )  /* 1988 Apple Macintosh II (FDHD) */
+//mess0135u3    DRIVER( maciix )    /* 1988 Apple Macintosh IIx */
+//mess0135u3    DRIVER( macse30 )   /* 1989 Apple Macintosh SE/30 */
+//mess0135u3    DRIVER( maciicx )   /* 1989 Apple Macintosh IIcx */
+//mess0135u3    DRIVER( maciici )   /* 1989 Apple Macintosh IIci */
 //mess0135u3    DRIVER( macclasc )  /* 1990 Apple Macintosh Classic                     */
-//mess0135u3    DRIVER( maclc )	/* 1990 Apple Macintosh LC */
-//mess0135u3    DRIVER( maciisi )	/* 1990 Apple Macintosh IIsi */
-//mess0135u3    DRIVER( macclas2 )	/* 1991 Apple Macintosh Classic II */
-//mess0135u3    DRIVER( maclc2 )	/* 1991 Apple Macintosh LC II */
-//mess0135u3    DRIVER( maclc3 )	/* 1993 Apple Macintosh LC III */
+//mess0135u3    DRIVER( maclc ) /* 1990 Apple Macintosh LC */
+//mess0135u3    DRIVER( maciisi )   /* 1990 Apple Macintosh IIsi */
+//mess0135u3    DRIVER( macclas2 )  /* 1991 Apple Macintosh Classic II */
+//mess0135u3    DRIVER( maclc2 )    /* 1991 Apple Macintosh LC II */
+//mess0135u3    DRIVER( maclc3 )    /* 1993 Apple Macintosh LC III */
 //mess0135u3    DRIVER( pmac6100 )  /* 1994 Apple Power Macintosh 6100 */
 
     /* Atari */
@@ -643,12 +643,12 @@ const game_driver * const drivers[] =
     DRIVER( x68030 )    /* Sharp X68030 (1993)                              */
 
     /* Silicon Graphics */
-    DRIVER( sgi_ip2 )	/* IP2: IRIS 2x00, 68020, 16MHz						*/
+    DRIVER( sgi_ip2 )	/* IP2: IRIS 2x00, 68020, 16MHz                     */
     DRIVER( sgi_ip6 )   /* IP6: 4D/PI, R2000, 20MHz                         */
     DRIVER( ip204415 )  /* IP20: Indigo 1, R4400, 150MHz                    */
-    DRIVER( ip225015 )  /* IP22: Indy, R5000, 150MHz						*/
-    DRIVER( ip224613 )	/* IP22: Indy, R4600, 133MHz						*/
-    DRIVER( ip244415 )	/* IP24: Indigo 2, R4400, 150MHz					*/
+    DRIVER( ip225015 )  /* IP22: Indy, R5000, 150MHz                        */
+    DRIVER( ip224613 )	/* IP22: Indy, R4600, 133MHz                        */
+    DRIVER( ip244415 )	/* IP24: Indigo 2, R4400, 150MHz                    */
 
     /* Texas Instruments */
 //mess0135u3    DRIVER( ti990_10 )  /* 1975 TI 990/10                                   */
@@ -1048,8 +1048,8 @@ const game_driver * const drivers[] =
     DRIVER( mato )      /* Mato (PMD-85.2 clone)                            */
 
     /* Zbrojovka Brno */
-    DRIVER( c2717 )     /* Consul 2717 (PMD-85.2 clone)             		*/
-	DRIVER( c2717pmd )  /* Consul 2717 with PMD-32             				*/
+    DRIVER( c2717 )     /* Consul 2717 (PMD-85.2 clone)                     */
+	DRIVER( c2717pmd )  /* Consul 2717 with PMD-32                          */
 
     /* Microkey */
     DRIVER( primoa32 )  /* Primo A-32                                       */
@@ -1534,7 +1534,7 @@ const game_driver * const drivers[] =
 	DRIVER( ht68k )
 	DRIVER( mits680b )
 	DRIVER( basic52 )
-	DRIVER( basic31 )	
+	DRIVER( basic31 )
 	DRIVER( al8800bt )
 	DRIVER( sun1 )
 	DRIVER( micronic )
@@ -1563,5 +1563,5 @@ const game_driver * const drivers[] =
 	DRIVER( ccs2810 )
 	DRIVER( qtsbc )
 	DRIVER( msbc1 )
-	
+
 #endif /* DRIVER_RECURSIVE */

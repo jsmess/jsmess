@@ -938,7 +938,7 @@ static MACHINE_DRIVER_START( einstein )
 	MDRV_WD1770_ADD(IC_I042, default_wd17xx_interface)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(einstein_floppy_config)
-	
+
 	/* RAM is provided by 8k DRAM ICs i009, i010, i011, i012, i013, i014, i015 and i016 */
 	/* internal ram */
 	MDRV_RAM_ADD("messram")

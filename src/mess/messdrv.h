@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	messdrv.h
+    messdrv.h
 
-	MESS specific driver stuff
+    MESS specific driver stuff
 
 ***************************************************************************/
 
@@ -32,7 +32,7 @@ struct SystemConfigurationParamBlock
 
 #define SYSTEM_CONFIG_EXTERN(name)															\
 	extern void construct_sysconfig_##name(struct SystemConfigurationParamBlock *cfg);		\
-																							
+
 #define SYSTEM_CONFIG_END																	\
 	}																						\
 

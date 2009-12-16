@@ -45,7 +45,7 @@ static void enterprise_update_memory_page(const address_space *space, offs_t pag
 	int end = (page - 1) * 0x4000 + 0x3fff;
 	char page_num[10];
 	sprintf(page_num,"bank%d",page);
-	
+
 	switch (index)
 	{
 	case 0x00:
@@ -485,17 +485,17 @@ static MACHINE_DRIVER_START( ep64 )
 	MDRV_WD1770_ADD("wd1770", enterp_wd1770_interface )
 
 	MDRV_FLOPPY_4_DRIVES_ADD(enterprise_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K") 	
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ep128 )
 	MDRV_IMPORT_FROM(ep64)
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K") 	
+	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 
 

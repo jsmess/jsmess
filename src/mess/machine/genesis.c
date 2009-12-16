@@ -1287,7 +1287,7 @@ static DEVICE_IMAGE_UNLOAD( genesis_cart )
 	}
 }
 
-	
+
 /******* Cart getinfo *******/
 
 MACHINE_DRIVER_START( genesis_cartslot )

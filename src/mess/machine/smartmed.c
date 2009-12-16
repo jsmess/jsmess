@@ -110,7 +110,7 @@ struct _smartmedia_t
 	UINT8 *pagereg;	// page register used by program command
 	UINT8 id[3];		// chip ID
 	UINT8 mp_opcode;	// multi-plane operation code
-	
+
 	int mode_3065;
 };
 

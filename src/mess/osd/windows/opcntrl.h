@@ -1,7 +1,7 @@
 //============================================================
 //
-//	opcntrl.h - Code for handling option resolutions in
-//	Win32 controls
+//  opcntrl.h - Code for handling option resolutions in
+//  Win32 controls
 //
 //============================================================
 

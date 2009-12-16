@@ -20,7 +20,7 @@ struct _terminal_interface
 ***************************************************************************/
 #define TERMINAL_TAG "terminal"
 #define TERMINAL_SCREEN_TAG "terminal_screen"
- 
+
 #define GENERIC_TERMINAL DEVICE_GET_INFO_NAME( terminal )
 
 #define MDRV_GENERIC_TERMINAL_ADD(_tag, _intrf) \
@@ -30,7 +30,7 @@ struct _terminal_interface
 #define MDRV_GENERIC_TERMINAL_REMOVE(_tag)		\
     MDRV_DEVICE_REMOVE(_tag)
 
-	
+
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/

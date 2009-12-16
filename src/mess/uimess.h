@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	uimess.h
+    uimess.h
 
-	MESS supplement to ui.c.
+    MESS supplement to ui.c.
 
 *********************************************************************/
 
@@ -26,7 +26,7 @@ typedef struct _ui_mess_private ui_mess_private;
     PROTOTYPES
 ***************************************************************************/
 
-/* initialize the MESS-specific	UI */
+/* initialize the MESS-specific UI */
 void ui_mess_init(running_machine *machine);
 
 /* MESS-specific in-"game" UI */

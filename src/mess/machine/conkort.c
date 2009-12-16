@@ -71,8 +71,8 @@ Notes:
 
     Slow Controller
     ---------------
-	- FD1791 HLD/HLT callbacks
-	- copy protection device
+    - FD1791 HLD/HLT callbacks
+    - copy protection device
     - DS/DD SS/DS jumpers
     - S1-S5 jumpers
 
@@ -435,13 +435,13 @@ static READ8_HANDLER( fast_ctrl_r )
 
         bit     description
 
-        0       
+        0
         1
         2
-        3		? (must be 1 to boot)
+        3       ? (must be 1 to boot)
         4
         5
-        6       
+        6
         7
 
     */

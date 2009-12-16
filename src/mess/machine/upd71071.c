@@ -1,80 +1,80 @@
 
 /*
 
-	NEC uPD71071 DMA Controller
-	Used on the Fujitsu FM-Towns
+    NEC uPD71071 DMA Controller
+    Used on the Fujitsu FM-Towns
 
-	Register description:
-	
-	0x00:	Initialise (Write-only)
-			- bit 0: Reset
-			- bit 1: 16-bit data bus
+    Register description:
 
-	0x01:	Channel Register
-			On read:
-			- bits 0-3: Selected channel
-			- bit 4: Only base registers may be read or written
-			On write:
-			- bits 0-1: Select channel for programming count, address, and mode registers
-			- bit 2: Only base registers can be read or written to
-			
-	0x02:	
-	0x03:	Count Register (16-bit)
-			DMA Transfer counter
-			
-	0x04:
-	0x05:
-	0x06:
-	0x07:	Address Register (32-bit)
-			Self-explanatory, I hope. :)
-			NOTE: Datasheet clearly shows this as 24-bit, with register 7 unused.
-			But the FM-Towns definitely uses reg 7 as bits 24-31.
-			
-	0x08:	
-	0x09:	Device Control register (16-bit)
-			bit 0: Enable memory-to-memory (MTM) transfers
-			bit 1: Enable fixed address for channel 0 only (MTM only)
-			bit 2: Disable DMA operation (stops HLDRQ signal to the CPU)
-			bit 3: Use compressed timing
-			bit 4: Rotational Priority
-			bit 5: Extended Writing
-			bit 6: DMARQ active level (1=active low)
-			bit 7: DMAAK active level (1=active high)
-			bit 8: Bus mode (0=bus release, 1=bus hold)
-			bit 9: Wait Enable during Verify
-			
-	0x0a:	Mode Control register
-			bit 0: Transfer size (1=16-bit, 0=8-bit,  16-bit data bus size only)
-			bit 2-3: Transfer direction (ignored for MTM transfers)
-						00 = Verify
-						01 = I/O to memory
-						10 = memory to I/O
-						11 = invalid
-			bit 4: Enable auto-initialise
-			bit 5: Address direction (0=increment, 1=decrement, affects only current Address reg)
-			bit 6-7: Transfer mode (ignored for MTM transfers)
-						00 = Demand
-						01 = Single
-						10 = Block
-						11 = Cascade
-			
-	0x0b:	Status register
-			bit 0-3: Terminal count (per channel)
-			bit 4-7: DMA request present (external hardware DMA only)
-			
-	0x0c:	
-	0x0d:	Temporary register (16-bit, read-only)
-			Stores the last data transferred in an MTM transfer
-			
-	0x0e:	Request register
-			bit 0-3: Software DMA request (1=set)
-			bit 0 only in MTM transfers
-	
-	0x0f:	Mask register
-			bit 0-3: DMARQ mask
-			bits 1 and 0 only in MTM transfers
-	
-			
+    0x00:   Initialise (Write-only)
+            - bit 0: Reset
+            - bit 1: 16-bit data bus
+
+    0x01:   Channel Register
+            On read:
+            - bits 0-3: Selected channel
+            - bit 4: Only base registers may be read or written
+            On write:
+            - bits 0-1: Select channel for programming count, address, and mode registers
+            - bit 2: Only base registers can be read or written to
+
+    0x02:
+    0x03:   Count Register (16-bit)
+            DMA Transfer counter
+
+    0x04:
+    0x05:
+    0x06:
+    0x07:   Address Register (32-bit)
+            Self-explanatory, I hope. :)
+            NOTE: Datasheet clearly shows this as 24-bit, with register 7 unused.
+            But the FM-Towns definitely uses reg 7 as bits 24-31.
+
+    0x08:
+    0x09:   Device Control register (16-bit)
+            bit 0: Enable memory-to-memory (MTM) transfers
+            bit 1: Enable fixed address for channel 0 only (MTM only)
+            bit 2: Disable DMA operation (stops HLDRQ signal to the CPU)
+            bit 3: Use compressed timing
+            bit 4: Rotational Priority
+            bit 5: Extended Writing
+            bit 6: DMARQ active level (1=active low)
+            bit 7: DMAAK active level (1=active high)
+            bit 8: Bus mode (0=bus release, 1=bus hold)
+            bit 9: Wait Enable during Verify
+
+    0x0a:   Mode Control register
+            bit 0: Transfer size (1=16-bit, 0=8-bit,  16-bit data bus size only)
+            bit 2-3: Transfer direction (ignored for MTM transfers)
+                        00 = Verify
+                        01 = I/O to memory
+                        10 = memory to I/O
+                        11 = invalid
+            bit 4: Enable auto-initialise
+            bit 5: Address direction (0=increment, 1=decrement, affects only current Address reg)
+            bit 6-7: Transfer mode (ignored for MTM transfers)
+                        00 = Demand
+                        01 = Single
+                        10 = Block
+                        11 = Cascade
+
+    0x0b:   Status register
+            bit 0-3: Terminal count (per channel)
+            bit 4-7: DMA request present (external hardware DMA only)
+
+    0x0c:
+    0x0d:   Temporary register (16-bit, read-only)
+            Stores the last data transferred in an MTM transfer
+
+    0x0e:   Request register
+            bit 0-3: Software DMA request (1=set)
+            bit 0 only in MTM transfers
+
+    0x0f:   Mask register
+            bit 0-3: DMARQ mask
+            bits 1 and 0 only in MTM transfers
+
+
 */
 
 #include "driver.h"
@@ -119,7 +119,7 @@ static TIMER_CALLBACK(dma_transfer_timer)
 	const address_space* space = cputag_get_address_space(device->machine,dmac->intf->cputag,ADDRESS_SPACE_PROGRAM);
 	int channel = param;
 	UINT16 data = 0;  // data to transfer
-	
+
 	switch(dmac->reg.mode_control[channel] & 0x0c)
 	{
 		case 0x00:  // Verify
@@ -173,7 +173,7 @@ void upd71071_soft_reset(const device_config* device)
 {
 	upd71071_t* dmac = device->token;
 	int x;
-	
+
 	// Does not change base/current address, count, or buswidth
 	dmac->selected_channel = 0;
 	dmac->base[0] = 0;
@@ -195,7 +195,7 @@ int upd71071_dmarq(const device_config* device, int state,int channel)
 	{
 		if(dmac->reg.device_control & 0x0004)
 			return 2;
-		
+
 		if(dmac->reg.mask & (1 << channel))  // is channel masked?
 			return 1;
 
@@ -217,7 +217,7 @@ int upd71071_dmarq(const device_config* device, int state,int channel)
 			case 0xc0:  // Cascade
 				// TODO
 				break;
-			
+
 		}
 	}
 	else
@@ -246,7 +246,7 @@ static READ8_DEVICE_HANDLER(upd71071_read)
 {
 	upd71071_t* dmac = device->token;
 	UINT8 ret = 0;
-	
+
 	logerror("DMA: read from register %02x\n",offset);
 	switch(offset)
 	{
@@ -317,7 +317,7 @@ static READ8_DEVICE_HANDLER(upd71071_read)
 			ret = dmac->reg.mask;
 			break;
 	}
-	return ret; 
+	return ret;
 }
 
 static WRITE8_DEVICE_HANDLER(upd71071_write)
@@ -339,16 +339,16 @@ static WRITE8_DEVICE_HANDLER(upd71071_write)
 			logerror("DMA: Channel selected [%02x]\n",data);
 			break;
 		case 0x02:  // Count (low)
-			dmac->reg.count_base[dmac->selected_channel] = 
+			dmac->reg.count_base[dmac->selected_channel] =
 				(dmac->reg.count_base[dmac->selected_channel] & 0xff00) | data;
-			dmac->reg.count_current[dmac->selected_channel] = 
+			dmac->reg.count_current[dmac->selected_channel] =
 				(dmac->reg.count_current[dmac->selected_channel] & 0xff00) | data;
 			logerror("DMA: Channel %i Counter set [%04x]\n",dmac->selected_channel,dmac->reg.count_base[dmac->selected_channel]);
 			break;
 		case 0x03:  // Count (high)
-			dmac->reg.count_base[dmac->selected_channel] = 
+			dmac->reg.count_base[dmac->selected_channel] =
 				(dmac->reg.count_base[dmac->selected_channel] & 0x00ff) | (data << 8);
-			dmac->reg.count_current[dmac->selected_channel] = 
+			dmac->reg.count_current[dmac->selected_channel] =
 				(dmac->reg.count_current[dmac->selected_channel] & 0x00ff) | (data << 8);
 			logerror("DMA: Channel %i Counter set [%04x]\n",dmac->selected_channel,dmac->reg.count_base[dmac->selected_channel]);
 			break;

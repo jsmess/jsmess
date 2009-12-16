@@ -25,14 +25,14 @@
     * Test the system? Call Debug, Call XB16.
     * Implement MEM8 timings.
 
-	2009-11-15
-	This driver found to be hopelessly broken.
-	1. Fixed crash in DRIVER_INIT - was trying to set up GROM when this model doesn't have any.
-	2. Fixed crash in MACHINE_RESET - new cart system depends on GROM.
-	3. Fixed crash when drawing the lower border - screen size changed to the same as ti99_4ev.
-	Now, it produces a black screen.
-	If you use memory view in the debugger, it crashes at 6000 and some higher addresses. This is
-	because the memory map has references to GROM handlers.
+    2009-11-15
+    This driver found to be hopelessly broken.
+    1. Fixed crash in DRIVER_INIT - was trying to set up GROM when this model doesn't have any.
+    2. Fixed crash in MACHINE_RESET - new cart system depends on GROM.
+    3. Fixed crash when drawing the lower border - screen size changed to the same as ti99_4ev.
+    Now, it produces a black screen.
+    If you use memory view in the debugger, it crashes at 6000 and some higher addresses. This is
+    because the memory map has references to GROM handlers.
 
 */
 

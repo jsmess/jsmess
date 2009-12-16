@@ -596,7 +596,7 @@ static MACHINE_DRIVER_START( samcoupe )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(samcoupe_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("512K")

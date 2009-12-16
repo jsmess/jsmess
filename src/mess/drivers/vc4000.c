@@ -206,7 +206,7 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 	{
 		memory_install_read_bank(memspace, 0x0800, 0x0fff, 0, 0, "bank1");	/* extra rom */
 		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x0800);
-		
+
 		memory_install_readwrite_bank(memspace, 0x1000, 0x15ff, 0, 0x800, "bank2"); /* ram */
 		memory_set_bankptr(machine, "bank2", memory_region(machine, "maincpu") + 0x1000);
 	}

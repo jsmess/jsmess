@@ -123,7 +123,7 @@ MACHINE_START( pc1350 )
 
 	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1350_power_up);
 
-	memory_install_readwrite_bank(space, 0x6000, 0x6fff, 0, 0, "bank1");	
+	memory_install_readwrite_bank(space, 0x6000, 0x6fff, 0, 0, "bank1");
 	memory_set_bankptr(machine, "bank1", &messram_get_ptr(devtag_get_device(machine, "messram"))[0x0000]);
 
 	if (messram_get_size(devtag_get_device(machine, "messram")) >= 0x3000)
@@ -133,7 +133,7 @@ MACHINE_START( pc1350 )
 	}
 	else
 	{
-		memory_nop_readwrite(space, 0x4000, 0x5fff, 0, 0);		
+		memory_nop_readwrite(space, 0x4000, 0x5fff, 0, 0);
 	}
 
 	if (messram_get_size(devtag_get_device(machine, "messram")) >= 0x5000)

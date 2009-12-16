@@ -1,20 +1,20 @@
 /*
-	Hewlett-Packard HP16500b Logic Analyzer
+    Hewlett-Packard HP16500b Logic Analyzer
 
-	MC68EC030 @ 25 MHz
+    MC68EC030 @ 25 MHz
 
-	WD37C65C floppy controller (NEC765 type)
-	Bt475 video RAMDAC
-	TMS9914A GPIB bus interface
-	Dallas DS1286 RTC/CMOS RAM
+    WD37C65C floppy controller (NEC765 type)
+    Bt475 video RAMDAC
+    TMS9914A GPIB bus interface
+    Dallas DS1286 RTC/CMOS RAM
 
-	IRQ 1 = 17732
-	IRQ 2 = 35b8
-	IRQ 3 = 35ce (jump 840120)
-	IRQ 4 = 17768
-	IRQ 5 = 814a
-	IRQ 6 = 35c8 (jump 840120)
-	IRQ 7 = 35d4 (jump 840120)
+    IRQ 1 = 17732
+    IRQ 2 = 35b8
+    IRQ 3 = 35ce (jump 840120)
+    IRQ 4 = 17768
+    IRQ 5 = 814a
+    IRQ 6 = 35c8 (jump 840120)
+    IRQ 7 = 35d4 (jump 840120)
 */
 
 #include "driver.h"

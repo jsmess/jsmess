@@ -271,7 +271,7 @@ static ADDRESS_MAP_START( c128_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK( "bank7") AM_WRITE( c128_write_4000 )
 	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK( "bank8") AM_WRITE( c128_write_8000 )
 	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK( "bank9") AM_WRITE( c128_write_a000 )
-	
+
 	AM_RANGE(0xc000, 0xcfff) AM_READ_BANK( "bank12") AM_WRITE( c128_write_c000 )
 	AM_RANGE(0xd000, 0xdfff) AM_READ_BANK( "bank13") AM_WRITE( c128_write_d000 )
 	AM_RANGE(0xe000, 0xfeff) AM_READ_BANK( "bank14") AM_WRITE( c128_write_e000 )

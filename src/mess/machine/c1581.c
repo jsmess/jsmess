@@ -9,13 +9,13 @@
 
 /*
 
-	TODO:
-	
-	- floppy access
-	- WD1770 DDEN = 0
-	- fast serial
-	- power LED
-	- activity LED
+    TODO:
+
+    - floppy access
+    - WD1770 DDEN = 0
+    - fast serial
+    - power LED
+    - activity LED
 
 */
 
@@ -126,18 +126,18 @@ static READ8_DEVICE_HANDLER( c1581_cia_pa_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		SIDE0
-		PA1		/RDY
-		PA2		/MOTOR
-		PA3		SW1
-		PA4		SW1
-		PA5		POWER LED
-		PA6		ACT LED
-		PA7		/DISK CHANGE
+        PA0     SIDE0
+        PA1     /RDY
+        PA2     /MOTOR
+        PA3     SW1
+        PA4     SW1
+        PA5     POWER LED
+        PA6     ACT LED
+        PA7     /DISK CHANGE
 
-	*/
+    */
 
 	c1581_t *c1581 = get_safe_token(device->owner);
 	UINT8 data = 0;
@@ -155,18 +155,18 @@ static WRITE8_DEVICE_HANDLER( c1581_cia_pa_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		SIDE0
-		PA1		/RDY
-		PA2		/MOTOR
-		PA3		SW1
-		PA4		SW1
-		PA5		POWER LED
-		PA6		ACT LED
-		PA7		/DISK CHANGE
+        PA0     SIDE0
+        PA1     /RDY
+        PA2     /MOTOR
+        PA3     SW1
+        PA4     SW1
+        PA5     POWER LED
+        PA6     ACT LED
+        PA7     /DISK CHANGE
 
-	*/
+    */
 
 	c1581_t *c1581 = get_safe_token(device->owner);
 	int motor = BIT(data, 2);
@@ -187,18 +187,18 @@ static READ8_DEVICE_HANDLER( c1581_cia_pb_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PB0		DATA IN
-		PB1		DATA OUT
-		PB2		CLK IN
-		PB3		CLK OUT
-		PB4		ATN ACK
-		PB5		FAST SER DIR
-		PB6		/WPRT
-		PB7		ATN IN
+        PB0     DATA IN
+        PB1     DATA OUT
+        PB2     CLK IN
+        PB3     CLK OUT
+        PB4     ATN ACK
+        PB5     FAST SER DIR
+        PB6     /WPRT
+        PB7     ATN IN
 
-	*/
+    */
 
 	c1581_t *c1581 = get_safe_token(device->owner);
 	UINT8 data = 0;
@@ -222,18 +222,18 @@ static WRITE8_DEVICE_HANDLER( c1581_cia_pb_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PB0		DATA IN
-		PB1		DATA OUT
-		PB2		CLK IN
-		PB3		CLK OUT
-		PB4		ATN ACK
-		PB5		FAST SER DIR
-		PB6		/WPRT
-		PB7		ATN IN
+        PB0     DATA IN
+        PB1     DATA OUT
+        PB2     CLK IN
+        PB3     CLK OUT
+        PB4     ATN ACK
+        PB5     FAST SER DIR
+        PB6     /WPRT
+        PB7     ATN IN
 
-	*/
+    */
 
 	c1581_t *c1581 = get_safe_token(device->owner);
 

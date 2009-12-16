@@ -65,7 +65,7 @@ INLINE int cassette_count( running_machine *machine )
 
 /*-------------------------------------------------
     tapecontrol_gettime - returns a textual
-	representation of the time
+    representation of the time
 -------------------------------------------------*/
 
 astring *tapecontrol_gettime(astring *dest, const device_config *device, int *curpos, int *endpos)
@@ -92,7 +92,7 @@ astring *tapecontrol_gettime(astring *dest, const device_config *device, int *cu
 
 /*-------------------------------------------------
     menu_tape_control_populate - populates the
-	main tape control menu
+    main tape control menu
 -------------------------------------------------*/
 
 static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, tape_control_menu_state *menustate)

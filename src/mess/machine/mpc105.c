@@ -30,7 +30,7 @@ static void mpc105_update_memory(running_machine *machine)
 	int bank;
 	offs_t begin, end;
 	char bank_str[10];
-	
+
 	if (LOG_MPC105)
 		logerror("mpc105_update_memory(machine): Updating memory (bank enable=0x%02X)\n", mpc105->bank_enable);
 

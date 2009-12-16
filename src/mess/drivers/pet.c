@@ -694,7 +694,7 @@ static MACHINE_DRIVER_START( pet )
 	MDRV_IMPORT_FROM( pet_general )
 	MDRV_QUICKLOAD_ADD("quickload", cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 	MDRV_IMPORT_FROM(pet_cartslot)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
@@ -711,11 +711,11 @@ static MACHINE_DRIVER_START( pet2001 )
 	MDRV_IMPORT_FROM( pet_general )
 	MDRV_QUICKLOAD_ADD("quickload", cbm_pet1, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 	MDRV_IMPORT_FROM(pet_cartslot)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("8K")
-	MDRV_RAM_EXTRA_OPTIONS("4K")	
+	MDRV_RAM_EXTRA_OPTIONS("4K")
 MACHINE_DRIVER_END
 
 
@@ -761,10 +761,10 @@ static MACHINE_DRIVER_START( pet80 )
 	MDRV_PIA6821_MODIFY( "pia_0", petb_pia0 )
 
 	MDRV_IMPORT_FROM(pet4_cartslot)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("32K")		
+	MDRV_RAM_DEFAULT_SIZE("32K")
 MACHINE_DRIVER_END
 
 

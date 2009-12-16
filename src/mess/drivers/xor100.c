@@ -11,8 +11,8 @@
     - floppy images are bad
     - honor jumper settings
     - CTC signal header
-	- serial printer
-	- cassette?
+    - serial printer
+    - cassette?
 
 */
 
@@ -111,12 +111,12 @@ static WRITE8_HANDLER( mmu_w )
 
         0       A16
         1       A17
-		2		A18
-		3		A19
-		4
-		5
-		6
-		7
+        2       A18
+        3       A19
+        4
+        5
+        6
+        7
 
     */
 
@@ -160,7 +160,7 @@ static WRITE8_DEVICE_HANDLER( baud_w )
 static WRITE8_DEVICE_HANDLER( i8251_b_data_w )
 {
 	const device_config	*terminal = devtag_get_device(device->machine, TERMINAL_TAG);
-	
+
 	msm8251_data_w(device, 0, data);
 	terminal_write(terminal, 0, data);
 }
@@ -169,18 +169,18 @@ static READ8_HANDLER( fdc_wait_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		
-		1		
-		2		
-		3		
-		4
-		5
-		6
-		7		FDC IRQ
+        0
+        1
+        2
+        3
+        4
+        5
+        6
+        7       FDC IRQ
 
-	*/
+    */
 
 	xor100_state *state = space->machine->driver_data;
 
@@ -197,18 +197,18 @@ static WRITE8_HANDLER( fdc_dcont_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		DS0
-		1		DS1
-		2		DS2
-		3		DS3
-		4
-		5
-		6
-		7		_HLSTB
+        0       DS0
+        1       DS1
+        2       DS2
+        3       DS3
+        4
+        5
+        6
+        7       _HLSTB
 
-	*/
+    */
 
 	xor100_state *state = space->machine->driver_data;
 
@@ -226,18 +226,18 @@ static WRITE8_HANDLER( fdc_dsel_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		J
-		1		K
-		2		
-		3		
-		4
-		5
-		6
-		7		
+        0       J
+        1       K
+        2
+        3
+        4
+        5
+        6
+        7
 
-	*/
+    */
 
 	xor100_state *state = space->machine->driver_data;
 
@@ -410,18 +410,18 @@ static READ8_DEVICE_HANDLER( i8255_pc_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PC0
-		PC1
-		PC2
-		PC3
-		PC4		ON LINE
-		PC5		BUSY
-		PC6		_ACK
-		PC7
+        PC0
+        PC1
+        PC2
+        PC3
+        PC4     ON LINE
+        PC5     BUSY
+        PC6     _ACK
+        PC7
 
-	*/
+    */
 
 	xor100_state *driver_state = device->machine->driver_data;
 	UINT8 data = 0;
@@ -591,7 +591,7 @@ static MACHINE_DRIVER_START( xor100 )
     MDRV_MACHINE_RESET(xor100)
 
     /* video hardware */
-	MDRV_IMPORT_FROM( generic_terminal )	
+	MDRV_IMPORT_FROM( generic_terminal )
 
 	/* devices */
 	MDRV_MSM8251_ADD(I8251_A_TAG, /*XTAL_8MHz/2,*/ printer_8251_intf)
@@ -602,11 +602,11 @@ static MACHINE_DRIVER_START( xor100 )
 	MDRV_WD179X_ADD(WD1795_TAG, /*XTAL_8MHz/8,*/ wd1795_intf)
 	MDRV_FLOPPY_2_DRIVES_ADD(xor100_floppy_config)
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, xor100_centronics_intf)
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG, xor100_terminal_intf)  
-	
+	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG, xor100_terminal_intf)
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")	
+	MDRV_RAM_DEFAULT_SIZE("64K")
 	MDRV_RAM_EXTRA_OPTIONS("128K,192K,256K,320K,384K,448K,512K")
 MACHINE_DRIVER_END
 

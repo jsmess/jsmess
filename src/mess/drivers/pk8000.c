@@ -356,10 +356,10 @@ static MACHINE_DRIVER_START( pk8000 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
     MDRV_CASSETTE_ADD( "cassette", pk8000_cassette_config )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")	
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 /* ROM definition */

@@ -1,6 +1,6 @@
 //============================================================
 //
-//	messui.c - MESS extensions to src/osd/winui/winui.c
+//  messui.c - MESS extensions to src/osd/winui/winui.c
 //
 //============================================================
 
@@ -207,9 +207,9 @@ static const struct TabViewCallbacks s_softwareTabViewCallbacks =
 //============================================================
 //  Image types
 //
-//	IO_ZIP is used for ZIP files
-//	IO_UNKNOWN is used for unknown types
-//	IO_BAD is used for bad files
+//  IO_ZIP is used for ZIP files
+//  IO_UNKNOWN is used for unknown types
+//  IO_BAD is used for bad files
 //============================================================
 
 #define IO_ZIP		(IO_COUNT + 0)
@@ -502,7 +502,7 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 	// same file extension
 	if (device == NULL)
 	{
-		const char *file_extension;		
+		const char *file_extension;
 
 		// identify the file extension
 		file_extension = strrchr(pszFilename, '.');
@@ -846,18 +846,18 @@ static void MessCreateDevice(const device_config *dev)
 
 
 /* This is used to Mount an image in the device view of MESSUI. The directory in the dialog box is not
-	set, and is thus random.
-	2009-10-18 Robbbert:
-	I've attempted to set the directory properly. Since the emulation is not running at this time,
-	we cannot do the same as the NEWUI does, that is, "initial_dir = image_working_directory(dev);"
-	because a crash occurs (the image system isn't set up yet).
+    set, and is thus random.
+    2009-10-18 Robbbert:
+    I've attempted to set the directory properly. Since the emulation is not running at this time,
+    we cannot do the same as the NEWUI does, that is, "initial_dir = image_working_directory(dev);"
+    because a crash occurs (the image system isn't set up yet).
 
-	Order of priority:
-	1. Directory where existing image is already loaded from
-	2. First directory specified in game-specific software tab
-	3. First directory specified in the system-wide software directories
-	4. mess-folder\software
-	5. mess-folder */
+    Order of priority:
+    1. Directory where existing image is already loaded from
+    2. First directory specified in game-specific software tab
+    3. First directory specified in the system-wide software directories
+    4. mess-folder\software
+    5. mess-folder */
 
 static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength)
 {
@@ -919,13 +919,13 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 
 
 /* This is used to Create an image in the device view of MESSUI. The directory in the dialog box is not
-	set, and is thus random.
+    set, and is thus random.
 
-	Order of priority:
-	1. First directory specified in game-specific software tab
-	2. First directory specified in the system-wide software directories
-	3. mess-folder\software
-	4. mess-folder */
+    Order of priority:
+    1. First directory specified in game-specific software tab
+    2. First directory specified in the system-wide software directories
+    3. mess-folder\software
+    4. mess-folder */
 
 static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength)
 {
@@ -1422,7 +1422,7 @@ static void CALLBACK MessTestsTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, 
 	}
 	else
 	{
-//		MessTestsFlex(GetDlgItem(GetMainWindow(), IDC_SWLIST), drivers[Picker_GetSelectedItem(hwndList)]);
+//      MessTestsFlex(GetDlgItem(GetMainWindow(), IDC_SWLIST), drivers[Picker_GetSelectedItem(hwndList)]);
 		Picker_SetSelectedPick(hwndList, nNewGame);
 	}
 	s_bInTimerProc = FALSE;

@@ -1086,8 +1086,8 @@ READ8_HANDLER ( apple2_c06x_r )
 				break;
 			default:
 				/* c060 Empty Cassette head read
-    	         * and any other non joystick c06 port returns this according to applewin
-    	         */
+                 * and any other non joystick c06 port returns this according to applewin
+                 */
 				return apple2_getfloatingbusvalue(space->machine);
 		}
 	}

@@ -138,7 +138,7 @@ static MACHINE_DRIVER_START( pent1024 )
 	MDRV_IMPORT_FROM( pentagon )
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("1024K")	
+	MDRV_RAM_DEFAULT_SIZE("1024K")
 MACHINE_DRIVER_END
 
 /***************************************************************************

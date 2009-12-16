@@ -1,38 +1,38 @@
 /****************************************************************************
 
-	opresolv.h
+    opresolv.h
 
-	Extensible ranged option resolution handling
+    Extensible ranged option resolution handling
 
-	An extensible mechanism for handling options is a major need in	MESS and
-	Imgtool.  Unfortunately, since we are using straight C for everything, it
-	can be hard and awkward to create non-arcane mechanisms for representing
-	these options.
+    An extensible mechanism for handling options is a major need in MESS and
+    Imgtool.  Unfortunately, since we are using straight C for everything, it
+    can be hard and awkward to create non-arcane mechanisms for representing
+    these options.
 
-	In this system, we have the following concepts:
-	1.  An "option specification"; a string that represents what options are
-		available, their defaults, and their allowed ranges.  Here is an
-		example:
+    In this system, we have the following concepts:
+    1.  An "option specification"; a string that represents what options are
+        available, their defaults, and their allowed ranges.  Here is an
+        example:
 
-		Examples:
-			"H[1]-2;T[35]/40/80;S[18]"
-				Allow 1-2 heads; 35, 40 or 80 tracks, and 18 sectors,
-				defaulting to 1 heads and 35 tracks.
+        Examples:
+            "H[1]-2;T[35]/40/80;S[18]"
+                Allow 1-2 heads; 35, 40 or 80 tracks, and 18 sectors,
+                defaulting to 1 heads and 35 tracks.
 
-			"N'Simon''s desk'"
-				Simon's desk (strings are not subject to range checking)
+            "N'Simon''s desk'"
+                Simon's desk (strings are not subject to range checking)
 
-	2.	An "option guide"; a struct that provides information about what the
-		various members of the option specification mean (i.e. - H=heads)
+    2.  An "option guide"; a struct that provides information about what the
+        various members of the option specification mean (i.e. - H=heads)
 
-	3.  An "option resolution"; an object that represents a set of interpreted
-		options.  At this stage, the option bid has been processed and it is
-		guaranteed that all options reside in their expected ranges.
+    3.  An "option resolution"; an object that represents a set of interpreted
+        options.  At this stage, the option bid has been processed and it is
+        guaranteed that all options reside in their expected ranges.
 
-	An option_resolution object is created based on an option guide and an
-	option specification.  It is then possible to specify individual parameters
-	to the option_resolution object.  Argument checks occur at this time.  When
-	one is all done, you can then query the object for any given value.
+    An option_resolution object is created based on an option guide and an
+    option specification.  It is then possible to specify individual parameters
+    to the option_resolution object.  Argument checks occur at this time.  When
+    one is all done, you can then query the object for any given value.
 
 ****************************************************************************/
 
@@ -44,7 +44,7 @@
 
 /***************************************************************************
 
-	Type definitions
+    Type definitions
 
 ***************************************************************************/
 
@@ -126,7 +126,7 @@ struct OptionRange
 
 /***************************************************************************
 
-	Prototypes
+    Prototypes
 
 ***************************************************************************/
 

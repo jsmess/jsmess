@@ -2059,7 +2059,7 @@ static void mo5_update_cart_bank(running_machine *machine)
 		if (write_enable) {
 			memory_install_write_bank( space, 0xb000, 0xefff, 0, 0, THOM_CART_BANK);
 		} else {
-			memory_nop_write( space, 0xb000, 0xefff, 0, 0);		
+			memory_nop_write( space, 0xb000, 0xefff, 0, 0);
 		}
 		if ( bank != old_cart_bank )
 			LOG_BANK(( "mo5_update_cart_bank: CART is nanonetwork RAM bank %i (write-enable=%i)\n", mo5_reg_cart & 3, write_enable ? 1 : 0 ));
@@ -3579,14 +3579,14 @@ static void to8_update_ram_bank (running_machine *machine)
 	{
 		memory_set_bank( machine, TO8_DATA_LO, to8_data_vpage );
 		memory_set_bank( machine, TO8_DATA_HI, to8_data_vpage );
-		
+
 		if (to8_data_vpage <= 4) {
 			memory_install_write8_handler( space, 0xa000, 0xbfff, 0, 0, to8_data_lo_w);
 			memory_install_write8_handler( space, 0xc000, 0xdfff, 0, 0, to8_data_hi_w);
 		} else {
 			memory_install_write_bank( space, 0xa000, 0xbfff, 0, 0, TO8_DATA_LO);
 			memory_install_write_bank( space, 0xc000, 0xdfff, 0, 0, TO8_DATA_HI);
-		}		
+		}
 	}
 	else
 	{

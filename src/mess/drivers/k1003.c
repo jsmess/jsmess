@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Robotron K1003
 
         20/11/2009 Skeleton driver.
@@ -13,18 +13,18 @@
 static ADDRESS_MAP_START(k1003_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000,0x07ff) AM_ROM
 	AM_RANGE(0x0800,0x17ff) AM_RAM
-	AM_RANGE(0x1800,0x1fff) AM_ROM	
-	AM_RANGE(0x2000,0x27ff) AM_ROM	
+	AM_RANGE(0x1800,0x1fff) AM_ROM
+	AM_RANGE(0x2000,0x27ff) AM_ROM
 	AM_RANGE(0x2800,0x2fff) AM_RAM
 	AM_RANGE(0x3000,0x3aff) AM_ROM
 ADDRESS_MAP_END
 
-static READ8_HANDLER (port2_r) 
+static READ8_HANDLER (port2_r)
 {
 	return 0x00;
 }
 
-static READ8_HANDLER (key_r) 
+static READ8_HANDLER (key_r)
 {
 	return 0x00;
 }
@@ -54,7 +54,7 @@ static UINT8 bit_to_dec(UINT8 val) {
 	return 0;
 }
 static WRITE8_HANDLER (disp_w)
-{	
+{
 	output_set_digit_value(bit_to_dec(data)*2,   disp_1);
 	output_set_digit_value(bit_to_dec(data)*2+1, disp_2);
 }
@@ -66,7 +66,7 @@ static ADDRESS_MAP_START( k1003_io , ADDRESS_SPACE_IO, 8)
 
 	AM_RANGE(0x08,0x08) AM_WRITE(disp_w)
 	AM_RANGE(0x09,0x09) AM_WRITE(disp_2_w)
-	AM_RANGE(0x10,0x10) AM_WRITE(disp_1_w)	
+	AM_RANGE(0x10,0x10) AM_WRITE(disp_1_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -74,18 +74,18 @@ static INPUT_PORTS_START( k1003 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(k1003) 
-{	
+static MACHINE_RESET(k1003)
+{
 }
 
 static MACHINE_DRIVER_START( k1003 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8008, 800000)
     MDRV_CPU_PROGRAM_MAP(k1003_mem)
-    MDRV_CPU_IO_MAP(k1003_io)	
+    MDRV_CPU_IO_MAP(k1003_io)
 
     MDRV_MACHINE_RESET(k1003)
-	
+
     /* video hardware */
     MDRV_DEFAULT_LAYOUT(layout_k1003)
 MACHINE_DRIVER_END
@@ -93,7 +93,7 @@ MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( k1003 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )	
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "k1003.01", 0x0000, 0x0100, CRC(9342f67d) SHA1(75d33cad89cf47e8e691a6ddbb86a8c11f454434))
 	ROM_LOAD( "k1003.02", 0x0100, 0x0100, CRC(a6846b2b) SHA1(a38b15ae0ac3f216e49aef4618363ea0d262fe52))
 	ROM_LOAD( "k1003.03", 0x0200, 0x0100, CRC(3fddd922) SHA1(9c9f28ad8a611d8a0911d2935ffa262976a0272d))
@@ -102,7 +102,7 @@ ROM_START( k1003 )
 	ROM_LOAD( "k1003.06", 0x0500, 0x0100, CRC(79e39c8f) SHA1(bffc24a47867834d749d32307dca1053231a1b62))
 	ROM_LOAD( "k1003.07", 0x0600, 0x0100, CRC(1f7279e0) SHA1(1e625adf606f87a55b6e8827fc9764d8a777903a))
 	ROM_LOAD( "k1003.08", 0x0700, 0x0100, CRC(4b950957) SHA1(268c7dbf52a85bdf4eb5ebbe6d01aae45e853a72))
-	
+
 	ROM_LOAD( "k1003.09", 0x1800, 0x0100, CRC(f3ec866f) SHA1(0b274be7290c9d469205136851c48595cd4f15e2))
 	ROM_LOAD( "k1003.10", 0x1900, 0x0100, CRC(c4af2cf7) SHA1(1815030d08072542fa56c4063b6de1d64b146887))
 	ROM_LOAD( "k1003.11", 0x1a00, 0x0100, CRC(473ef6db) SHA1(45372e09babf6fa08875e53d43e90d53f9cc0ec1))
@@ -121,7 +121,7 @@ ROM_START( k1003 )
 	ROM_LOAD( "031.bin", 0x2500, 0x0100, CRC(315d27d2) SHA1(26bb39d50781eed8d8be4ad6e1f13bc2b4672ce2))
 	ROM_LOAD( "032.bin", 0x2600, 0x0100, CRC(d03f7cc7) SHA1(5a1c0614eed6dfe21d0d1776f409c1c2209a74d1))
 	ROM_LOAD( "033.bin", 0x2700, 0x0100, CRC(efaeb541) SHA1(decdbbd3c4084dc18b34577f78ddf7044341764a))
-  
+
 	ROM_LOAD( "k1003.17", 0x3000, 0x0100, CRC(9031390b) SHA1(6f99a9f643b19770a373242edb0df8f342bbc230))
 	ROM_LOAD( "k1003.18", 0x3100, 0x0100, CRC(38435ffe) SHA1(7db78d304fe8a8f71c067babcdcf3c06da908ad3))
 	ROM_LOAD( "k1003.19", 0x3200, 0x0100, CRC(3cfddbda) SHA1(7e9d5c6126d0f08fcb7d88d0cc26eb24467f7321))

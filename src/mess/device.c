@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	device.c
+    device.c
 
-	Definitions and manipulations for device structures
+    Definitions and manipulations for device structures
 
 ***************************************************************************/
 
@@ -86,7 +86,7 @@ struct _mess_device_type_info
 ***************************************************************************/
 
 /* The List of Devices, with Associated Names - Be careful to ensure that   *
- * this list matches the ENUM from device.h, so searches can use IO_COUNT	*/
+ * this list matches the ENUM from device.h, so searches can use IO_COUNT   */
 static const mess_device_type_info device_info_array[] =
 {
 	{ IO_CARTSLOT,	"cartridge",	"cart" }, /*  0 */
@@ -163,7 +163,7 @@ iodevice_t device_typeid(const char *name)
 
 /*************************************
  *
- *	Device structure construction and destruction
+ *  Device structure construction and destruction
  *
  *************************************/
 
@@ -330,10 +330,10 @@ DEVICE_GET_INFO(mess_device)
 static void string_buffer_putc(char *buffer, size_t buffer_length, size_t *buffer_pos, char c)
 {
 	size_t pos;
-	
+
 	/* sanity check */
 	assert_always(*buffer_pos < buffer_length, "Buffer too small");
-	
+
 	pos = (*buffer_pos)++;
 	buffer[pos] = c;
 }
@@ -366,7 +366,7 @@ static char *string_buffer_putstr(char *buffer, size_t buffer_length, size_t *bu
 
 /*-------------------------------------------------
     create_mess_device - allocates a single legacy
-	MESS device
+    MESS device
 -------------------------------------------------*/
 
 static void create_mess_device(running_machine *machine, device_list *devlist, device_getinfo_handler handler, const game_driver *gamedrv,
@@ -451,7 +451,7 @@ static void create_mess_device(running_machine *machine, device_list *devlist, d
 
 		/* overriding the count? */
 		//if (count_override != 0)
-		//	mess_device->io_device.count = count_override;
+		//  mess_device->io_device.count = count_override;
 
 		/* any problems? */
 		assert((mess_device->io_device.type >= 0) && (mess_device->io_device.type < IO_COUNT));
@@ -496,7 +496,7 @@ void mess_devices_setup(running_machine *machine, machine_config *config, const 
 
 /*-------------------------------------------------
     machine_config_alloc_with_mess_devices -
-	allocate a machine_config with MESS devices
+    allocate a machine_config with MESS devices
 -------------------------------------------------*/
 
 machine_config *machine_config_alloc_with_mess_devices(const game_driver *gamedrv)
@@ -510,7 +510,7 @@ machine_config *machine_config_alloc_with_mess_devices(const game_driver *gamedr
 
 /*************************************
  *
- *	Device lookup
+ *  Device lookup
  *
  *************************************/
 
@@ -522,7 +522,7 @@ static const legacy_mess_device *mess_device_from_core_device(const device_confi
 
 /*************************************
  *
- *	Deprecated device access functions
+ *  Deprecated device access functions
  *
  *************************************/
 
@@ -562,7 +562,7 @@ const device_config *image_from_devtype_and_index(running_machine *machine, iode
 
 /*************************************
  *
- *	Diagnostics
+ *  Diagnostics
  *
  *************************************/
 

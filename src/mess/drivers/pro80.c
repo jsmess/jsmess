@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Protec Pro-80
 
         06/12/2009 Skeleton driver.
@@ -13,7 +13,7 @@ static ADDRESS_MAP_START(pro80_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
-	AM_RANGE(0x1400, 0x17ff) AM_RAM // 2nd RAM is optional 
+	AM_RANGE(0x1400, 0x17ff) AM_RAM // 2nd RAM is optional
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pro80_io , ADDRESS_SPACE_IO, 8)
@@ -26,8 +26,8 @@ INPUT_PORTS_START( pro80 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(pro80) 
-{	
+static MACHINE_RESET(pro80)
+{
 }
 
 static VIDEO_START( pro80 )
@@ -43,10 +43,10 @@ static MACHINE_DRIVER_START( pro80 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(pro80_mem)
-    MDRV_CPU_IO_MAP(pro80_io)	
+    MDRV_CPU_IO_MAP(pro80_io)
 
     MDRV_MACHINE_RESET(pro80)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -70,6 +70,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   	FULLNAME       FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY     FULLNAME       FLAGS */
 COMP( 1981, pro80,  0,       0, 	pro80, 		pro80, 	 0,  	  0,  	 "Protec",   "Pro-80",		GAME_NOT_WORKING)
 

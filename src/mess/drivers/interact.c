@@ -3,19 +3,19 @@
         Interact Family Computer
 
         12/05/2009 Skeleton driver - Micko
-	31/05/2009 Added notes and video - Robbbert
+    31/05/2009 Added notes and video - Robbbert
 
-	This was made by Interact Company of Ann Arbor, Michigan. However,
-	just after launch, the company collapsed. The liquidator, Protecto,
-	sold some and MicroVideo sold the rest. MicroVideo continued to
-	develop but went under 2 years later. Meanwhile, the French company
-	Lambda Systems sold a clone called the Victor Lambda. But, like the
-	Americans, Lambda Systems also collapsed. Another French company,
-	Micronique, purchased all remaining stock and intellectual rights
-	from Lambda Systems, Microvideo and Interact, and the computer becomes
-	wholly French. The computer has a name change, becoming the Hector.
-	This in turn gets upgraded (2HR, HRX, MX). The line is finally
-	retired in about 1985.
+    This was made by Interact Company of Ann Arbor, Michigan. However,
+    just after launch, the company collapsed. The liquidator, Protecto,
+    sold some and MicroVideo sold the rest. MicroVideo continued to
+    develop but went under 2 years later. Meanwhile, the French company
+    Lambda Systems sold a clone called the Victor Lambda. But, like the
+    Americans, Lambda Systems also collapsed. Another French company,
+    Micronique, purchased all remaining stock and intellectual rights
+    from Lambda Systems, Microvideo and Interact, and the computer becomes
+    wholly French. The computer has a name change, becoming the Hector.
+    This in turn gets upgraded (2HR, HRX, MX). The line is finally
+    retired in about 1985.
 
         Hector 2HR+
         Victor
@@ -25,19 +25,19 @@
         Hector MX80c
         Hector 1
         Interact
-             
+
         29/10/2009 Update skeleton to functional machine
                           by yo_fr       (jj.stac@aliceadsl.fr)
-               
+
                => add Keyboard,
-               => add color, 
+               => add color,
                => add cassette,
                => add sn76477 sound and 1bit sound,
                => add joysticks (stick, pot, fire)
-               => add BR/HR switching 
+               => add BR/HR switching
                => add bank switch for HRX
                => add device MX80c and bank switching for the ROM
-    Importante note : the keyboard function add been piked from 
+    Importante note : the keyboard function add been piked from
                       DChector project : http://dchector.free.fr/ made by DanielCoulom
                       (thank's Daniel)
     TODO : Add the cartridge function,
@@ -46,7 +46,7 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "cpu/z80/z80.h" 
+#include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/pckeybrd.h"
 #include "devices/cassette.h"
@@ -60,7 +60,7 @@
 static ADDRESS_MAP_START(interact_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
     // Hardward address mapping
-//	AM_RANGE(0x0800,0x0808) AM_WRITE( hector_switch_bank_w)// Bank management not udsed in BR machine
+//  AM_RANGE(0x0800,0x0808) AM_WRITE( hector_switch_bank_w)// Bank management not udsed in BR machine
 	AM_RANGE(0x1000,0x1000) AM_WRITE( hector_color_a_w)  // Color c0/c1
 	AM_RANGE(0x1800,0x1800) AM_WRITE( hector_color_b_w)  // Color c2/c3
 	AM_RANGE(0x2000,0x2003) AM_WRITE( hector_sn_2000_w)  // Sound
@@ -68,11 +68,11 @@ static ADDRESS_MAP_START(interact_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x3000,0x3000) AM_READWRITE( hector_cassette_r, hector_sn_3000_w)// Write necessary
 	AM_RANGE(0x3800,0x3807) AM_READWRITE( hector_keyboard_r, hector_keyboard_w)  // Keyboard
 
-    // Main ROM page 
-	AM_RANGE(0x0000,0x3fff) AM_ROM  //BANK(2) 
+    // Main ROM page
+	AM_RANGE(0x0000,0x3fff) AM_ROM  //BANK(2)
  //   AM_RANGE(0x1000,0x3fff) AM_RAM
 
-	// Vidéo br mapping
+	// Vid??o br mapping
 	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_GENERIC(videoram)
 	// continous RAM
     AM_RANGE(0x4A00,0xffff) AM_RAM
@@ -152,7 +152,7 @@ static MACHINE_DRIVER_START( interact )
 	MDRV_SOUND_ADD("sn76477", SN76477, 0)
 	MDRV_SOUND_CONFIG(hector_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
-	
+
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -195,7 +195,7 @@ static MACHINE_DRIVER_START( hector1 )
 	MDRV_SOUND_ADD("sn76477", SN76477, 0)
 	MDRV_SOUND_CONFIG(hector_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
-	
+
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -230,6 +230,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG		 COMPANY   FULLNAME       FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG      COMPANY   FULLNAME       FLAGS */
 COMP(1979, interact,        0, 0,   interact, interact,     0,	interact,  	 "Interact",   "Interact Family Computer", GAME_IMPERFECT_SOUND)
 COMP(????, hector1,  interact, 0, 	hector1, interact,     0,  interact,  	 "Micronique", "Hector 1",	GAME_IMPERFECT_SOUND)

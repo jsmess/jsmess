@@ -82,14 +82,14 @@
 *****************************************************************************************************/
 
 /*
-	
-	TODO:
 
-	- fix floppy
-	- rewrite memory banking
-	- rewrite extended memory handling
-	- remove MEM port
-	- remove CFG port
+    TODO:
+
+    - fix floppy
+    - rewrite memory banking
+    - rewrite extended memory handling
+    - remove MEM port
+    - remove CFG port
 
 */
 
@@ -137,43 +137,43 @@ static ADDRESS_MAP_START( pc88sr_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("KEY14")
 	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("KEY15")
 	AM_RANGE(0x10, 0x10) AM_WRITE(pc88_rtc_w)
-//	AM_RANGE(0x20, 0x21) AM_NOP										/* RS-232C and cassette (not yet) */
+//  AM_RANGE(0x20, 0x21) AM_NOP                                     /* RS-232C and cassette (not yet) */
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("DSW1") AM_WRITE(pc88sr_outport_30)
 	AM_RANGE(0x31, 0x31) AM_READWRITE(pc88sr_inport_31, pc88sr_outport_31)	/* DIP-SW2 */
 	AM_RANGE(0x32, 0x32) AM_READWRITE(pc88sr_inport_32, pc88sr_outport_32)
 	AM_RANGE(0x34, 0x35) AM_WRITE(pc88sr_alu)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(pc88sr_inport_40, pc88sr_outport_40)
 	AM_RANGE(0x44, 0x45) AM_DEVREAD(YM2203_TAG, ym2203_r)
-//	AM_RANGE(0x46, 0x47) AM_NOP										/* OPNA extra port (not yet) */
+//  AM_RANGE(0x46, 0x47) AM_NOP                                     /* OPNA extra port (not yet) */
 	AM_RANGE(0x50, 0x51) AM_READWRITE(pc88_crtc_r, pc88_crtc_w)
 	AM_RANGE(0x52, 0x5b) AM_WRITE(pc88_palette_w)
 	AM_RANGE(0x5c, 0x5c) AM_READ(pc88_vramtest_r)
 	AM_RANGE(0x5c, 0x5f) AM_WRITE(pc88_vramsel_w)
 	AM_RANGE(0x60, 0x68) AM_READWRITE(pc88_dmac_r, pc88_dmac_w)
-//	AM_RANGE(0x6e, 0x6e) AM_NOP										/* CPU clock info (not yet) */
-//	AM_RANGE(0x6f, 0x6f) AM_NOP										/* RS-232C speed ctrl (not yet) */
+//  AM_RANGE(0x6e, 0x6e) AM_NOP                                     /* CPU clock info (not yet) */
+//  AM_RANGE(0x6f, 0x6f) AM_NOP                                     /* RS-232C speed ctrl (not yet) */
 	AM_RANGE(0x70, 0x70) AM_READWRITE(pc8801_inport_70, pc8801_outport_70)
 	AM_RANGE(0x71, 0x71) AM_READWRITE(pc88sr_inport_71, pc88sr_outport_71)
 	AM_RANGE(0x78, 0x78) AM_WRITE(pc8801_outport_78)				/* text window increment */
-//	AM_RANGE(0x90, 0x9f) AM_NOP 									/* CD-ROM (unknown -- not yet) */
-//	AM_RANGE(0xa0, 0xa3) AM_NOP 									/* music & network (unknown -- not yet) */
-//	AM_RANGE(0xa8, 0xad) AM_NOP										/* second sound board (not yet) */
-//	AM_RANGE(0xb4, 0xb5) AM_NOP 									/* Video art board (unknown -- not yet) */
-//	AM_RANGE(0xc1, 0xc1) AM_NOP										/* (unknown -- not yet) */
-//	AM_RANGE(0xc2, 0xcf) AM_NOP 									/* music (unknown -- not yet) */
-//	AM_RANGE(0xd0, 0xd7) AM_NOP 									/* music & GP-IB (unknown -- not yet) */
-//	AM_RANGE(0xd8, 0xd8) AM_NOP 									/* GP-IB (unknown -- not yet) */
-//	AM_RANGE(0xdc, 0xdf) AM_NOP 									/* MODEM (unknown -- not yet) */
+//  AM_RANGE(0x90, 0x9f) AM_NOP                                     /* CD-ROM (unknown -- not yet) */
+//  AM_RANGE(0xa0, 0xa3) AM_NOP                                     /* music & network (unknown -- not yet) */
+//  AM_RANGE(0xa8, 0xad) AM_NOP                                     /* second sound board (not yet) */
+//  AM_RANGE(0xb4, 0xb5) AM_NOP                                     /* Video art board (unknown -- not yet) */
+//  AM_RANGE(0xc1, 0xc1) AM_NOP                                     /* (unknown -- not yet) */
+//  AM_RANGE(0xc2, 0xcf) AM_NOP                                     /* music (unknown -- not yet) */
+//  AM_RANGE(0xd0, 0xd7) AM_NOP                                     /* music & GP-IB (unknown -- not yet) */
+//  AM_RANGE(0xd8, 0xd8) AM_NOP                                     /* GP-IB (unknown -- not yet) */
+//  AM_RANGE(0xdc, 0xdf) AM_NOP                                     /* MODEM (unknown -- not yet) */
 	AM_RANGE(0xe2, 0xe3) AM_READWRITE(pc88_extmem_r, pc88_extmem_w) /* expand RAM select */
 	AM_RANGE(0xe4, 0xe4) AM_WRITE(pc8801_write_interrupt_level)
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(pc8801_write_interrupt_mask)
-//	AM_RANGE(0xe7, 0xe7) AM_NOP 									/* (unknown -- not yet) */
+//  AM_RANGE(0xe7, 0xe7) AM_NOP                                     /* (unknown -- not yet) */
 	AM_RANGE(0xe8, 0xeb) AM_READWRITE(pc88_kanji_r, pc88_kanji_w)
 	AM_RANGE(0xec, 0xed) AM_READWRITE(pc88_kanji2_r, pc88_kanji2_w) /* JIS level2 Kanji ROM */
-//	AM_RANGE(0xf0, 0xf1) AM_NOP 									/* Kana to Kanji dictionary ROM select (not yet) */
-//	AM_RANGE(0xf3, 0xf3) AM_NOP 									/* DMA floppy (unknown -- not yet) */
-//	AM_RANGE(0xf4, 0xf7) AM_NOP										/* DMA 5'floppy (may be not released) */
-//	AM_RANGE(0xf8, 0xfb) AM_NOP 									/* DMA 8'floppy (unknown -- not yet) */
+//  AM_RANGE(0xf0, 0xf1) AM_NOP                                     /* Kana to Kanji dictionary ROM select (not yet) */
+//  AM_RANGE(0xf3, 0xf3) AM_NOP                                     /* DMA floppy (unknown -- not yet) */
+//  AM_RANGE(0xf4, 0xf7) AM_NOP                                     /* DMA 5'floppy (may be not released) */
+//  AM_RANGE(0xf8, 0xfb) AM_NOP                                     /* DMA 8'floppy (unknown -- not yet) */
 	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(CPU_I8255A_TAG, i8255a_r, i8255a_w)
 ADDRESS_MAP_END
 
@@ -923,28 +923,28 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME			PARENT	COMPAT  MACHINE   INPUT    INIT  CONFIG  COMPANY FULLNAME */
+/*    YEAR  NAME            PARENT  COMPAT  MACHINE   INPUT    INIT  CONFIG  COMPANY FULLNAME */
 COMP( 1985, pc8001mk2sr,	0,		0,     pc88srl,  pc8001,  0,    0,   "NEC",  "PC-8001mkIISR", GAME_NOT_WORKING )
 
 COMP( 1981, pc8801,			0,		0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8801", GAME_NOT_WORKING )
 COMP( 1983, pc8801mk2,		pc8801,	0,     pc88srl,  pc88sr,  0,    0,   "NEC",  "PC-8801mkII", GAME_NOT_WORKING )	// not sure about this dump
 COMP( 1985, pc8801mk2sr,	pc8801,	0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801mkIISR", GAME_NOT_WORKING )
-//COMP( 1985, pc8801mk2tr,	pc8801,	0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801mkIITR", GAME_NOT_WORKING )
+//COMP( 1985, pc8801mk2tr,  pc8801, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801mkIITR", GAME_NOT_WORKING )
 COMP( 1985, pc8801mk2fr,	pc8801,	0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801mkIIFR", GAME_NOT_WORKING )
 COMP( 1985, pc8801mk2mr,	pc8801,	0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801mkIIMR", GAME_NOT_WORKING )
 
-//COMP( 1986, pc8801fh,		0,		0,     pc88srh,  pc88sr,  0,	0,   "NEC",  "PC-8801FH", GAME_NOT_WORKING )
+//COMP( 1986, pc8801fh,     0,      0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801FH", GAME_NOT_WORKING )
 COMP( 1986, pc8801mh,		pc8801,	0,     pc88srh,  pc88sr,  0,	0,   "NEC",  "PC-8801MH", GAME_NOT_WORKING )
 COMP( 1987, pc8801fa,		pc8801,	0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801FA", GAME_NOT_WORKING )
 COMP( 1987, pc8801ma,		pc8801,	0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801MA", GAME_NOT_WORKING )
-//COMP( 1988, pc8801fe,		pc8801,	0,     pc88srh,  pc88sr,  0,	0,   "NEC",  "PC-8801FE", GAME_NOT_WORKING )
+//COMP( 1988, pc8801fe,     pc8801, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801FE", GAME_NOT_WORKING )
 COMP( 1988, pc8801ma2,		pc8801,	0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801MA2", GAME_NOT_WORKING )
-//COMP( 1989, pc8801fe2,	pc8801,	0,     pc88srh,  pc88sr,  0,	0,   "NEC",  "PC-8801FE2", GAME_NOT_WORKING )
+//COMP( 1989, pc8801fe2,    pc8801, 0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801FE2", GAME_NOT_WORKING )
 COMP( 1989, pc8801mc,		pc8801,	0,     pc88srh,  pc88sr,  0,    0,   "NEC",  "PC-8801MC", GAME_NOT_WORKING )
 
 COMP( 1987, pc88va,			0,		0,     pc88va,   pc88sr,  0,    0,   "NEC",  "PC-88VA", GAME_NOT_WORKING )
-//COMP( 1988, pc88va2,		pc88va,	0,     pc88va,   pc88sr,  0,    0,   "NEC",  "PC-88VA2", GAME_NOT_WORKING )
-//COMP( 1988, pc88va3,		pc88va,	0,     pc88va,   pc88sr,  0,    0,   "NEC",  "PC-88VA3", GAME_NOT_WORKING )
+//COMP( 1988, pc88va2,      pc88va, 0,     pc88va,   pc88sr,  0,    0,   "NEC",  "PC-88VA2", GAME_NOT_WORKING )
+//COMP( 1988, pc88va3,      pc88va, 0,     pc88va,   pc88sr,  0,    0,   "NEC",  "PC-88VA3", GAME_NOT_WORKING )
 
-//COMP( 1989, pc98do,		0,		0,     pc88va,   pc88sr,  0,    0,   "NEC",  "PC-98DO", GAME_NOT_WORKING )
-//COMP( 1990, pc98dop,		0,		0,     pc88va,   pc88sr,  0,    0,   "NEC",  "PC-98DO+", GAME_NOT_WORKING )
+//COMP( 1989, pc98do,       0,      0,     pc88va,   pc88sr,  0,    0,   "NEC",  "PC-98DO", GAME_NOT_WORKING )
+//COMP( 1990, pc98dop,      0,      0,     pc88va,   pc88sr,  0,    0,   "NEC",  "PC-98DO+", GAME_NOT_WORKING )

@@ -662,8 +662,8 @@ PORT_START("hacks")
 	PORT_CONFNAME( 0x01, 0x01, "Hack to prevent hang when skip self test is shorted" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-	
-	PORT_INCLUDE(generic_terminal)	
+
+	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
 /******************************************************************************
@@ -729,8 +729,8 @@ static MACHINE_DRIVER_START(dectalk)
 
     /* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
-	MDRV_IMPORT_FROM( generic_terminal )	
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)	
+	MDRV_IMPORT_FROM( generic_terminal )
+	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
 MACHINE_DRIVER_END
 
 

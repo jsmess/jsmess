@@ -1,6 +1,6 @@
 //============================================================
 //
-//	winutils.c - Generic Win32 utility code
+//  winutils.c - Generic Win32 utility code
 //
 //============================================================
 
@@ -21,7 +21,7 @@
 #include "glob.h"
 
 //============================================================
-//	win_get_file_attributes_utf8
+//  win_get_file_attributes_utf8
 //============================================================
 
 DWORD win_get_file_attributes_utf8(const char *filename)

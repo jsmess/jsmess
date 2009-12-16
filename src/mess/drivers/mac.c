@@ -1,39 +1,39 @@
 /****************************************************************************
 
-	drivers/mac.c
-	Macintosh family emulation
- 
-	Nate Woods, Raphael Nabet, R. Belmont
- 
- 
-	    0x000000 - 0x3fffff     RAM/ROM (switches based on overlay)
-	    0x400000 - 0x4fffff     ROM
- 	    0x580000 - 0x5fffff     5380 NCR/Symbios SCSI peripherals chip (Mac Plus only)
- 	    0x600000 - 0x6fffff     RAM
-	    0x800000 - 0x9fffff     Zilog 8530 SCC (Serial Control Chip) Read
-	    0xa00000 - 0xbfffff     Zilog 8530 SCC (Serial Control Chip) Write
-	    0xc00000 - 0xdfffff     IWM (Integrated Woz Machine; floppy)
-	    0xe80000 - 0xefffff     Rockwell 6522 VIA
-	    0xf00000 - 0xffffef     ??? (the ROM appears to be accessing here)
-	    0xfffff0 - 0xffffff     Auto Vector
-	
-	
-	Interrupts:
-	    M68K:
-	        Level 1 from VIA
-	        Level 2 from SCC
-	        Level 4 : Interrupt switch (not implemented)
- 
-	    VIA:
-	        CA1 from VBLANK
-	        CA2 from 1 Hz clock (RTC)
-	        CB1 from Keyboard Clock
-	        CB2 from Keyboard Data
-	        SR  from Keyboard Data Ready
-	
-	    SCC:
-	        PB_EXT  from mouse Y circuitry
-	        PA_EXT  from mouse X circuitry
+    drivers/mac.c
+    Macintosh family emulation
+
+    Nate Woods, Raphael Nabet, R. Belmont
+
+
+        0x000000 - 0x3fffff     RAM/ROM (switches based on overlay)
+        0x400000 - 0x4fffff     ROM
+        0x580000 - 0x5fffff     5380 NCR/Symbios SCSI peripherals chip (Mac Plus only)
+        0x600000 - 0x6fffff     RAM
+        0x800000 - 0x9fffff     Zilog 8530 SCC (Serial Control Chip) Read
+        0xa00000 - 0xbfffff     Zilog 8530 SCC (Serial Control Chip) Write
+        0xc00000 - 0xdfffff     IWM (Integrated Woz Machine; floppy)
+        0xe80000 - 0xefffff     Rockwell 6522 VIA
+        0xf00000 - 0xffffef     ??? (the ROM appears to be accessing here)
+        0xfffff0 - 0xffffff     Auto Vector
+
+
+    Interrupts:
+        M68K:
+            Level 1 from VIA
+            Level 2 from SCC
+            Level 4 : Interrupt switch (not implemented)
+
+        VIA:
+            CA1 from VBLANK
+            CA2 from 1 Hz clock (RTC)
+            CB1 from Keyboard Clock
+            CB2 from Keyboard Data
+            SR  from Keyboard Data Ready
+
+        SCC:
+            PB_EXT  from mouse Y circuitry
+            PA_EXT  from mouse X circuitry
 
 ****************************************************************************/
 
@@ -51,30 +51,30 @@
 #include "sound/dmadac.h"
 
 /*
-	Apple Sound Chip
+    Apple Sound Chip
 
-	Base is normally IOBase + 0x14000
-	First 0x800 bytes is buffer RAM
+    Base is normally IOBase + 0x14000
+    First 0x800 bytes is buffer RAM
 
-	Verified to be only 8 bits wide by Apple documentation.
+    Verified to be only 8 bits wide by Apple documentation.
 
-	Registers:
-	0x800: VERSION
-	0x801: MODE
-	0x802: CONTROL
-	0x803: FIFO MODE (bit 0 = half, bit 1 = full?)
-	0x804: FIFO IRQ STATUS
-	0x805: WAVETABLE CONTROL
-	0x806: VOLUME
-	0x807: CLOCK RATE (0 = 22 kHz)
-	0x80a: PLAY REC A
+    Registers:
+    0x800: VERSION
+    0x801: MODE
+    0x802: CONTROL
+    0x803: FIFO MODE (bit 0 = half, bit 1 = full?)
+    0x804: FIFO IRQ STATUS
+    0x805: WAVETABLE CONTROL
+    0x806: VOLUME
+    0x807: CLOCK RATE (0 = 22 kHz)
+    0x80a: PLAY REC A
 */
 
 static UINT8 mac_asc_regs[0x2000];
 
 static READ8_HANDLER(mac_asc_r)
 {
-//	logerror("ASC: Read @ %x (PC %x)\n", offset, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")));
+//  logerror("ASC: Read @ %x (PC %x)\n", offset, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")));
 
 	switch (offset)
 	{
@@ -96,7 +96,7 @@ static WRITE8_HANDLER(mac_asc_w)
 	static const device_config *dacs[2];
 	INT32 i;
 
-//	logerror("ASC: %02x to %x (PC %x)\n", data, offset, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")));
+//  logerror("ASC: %02x to %x (PC %x)\n", data, offset, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")));
 
 	mac_asc_regs[offset] = data;
 
@@ -566,7 +566,7 @@ static ADDRESS_MAP_START(maciici_map, ADDRESS_SPACE_PROGRAM, 32)
 
 	// mirror video declaration ROM
 	AM_RANGE(0xfee00000, 0xfee7ffff) AM_RAM AM_BASE(&rbv_vram)
-//	AM_RANGE(0xfeff8000, 0xfeffffff) AM_ROM AM_REGION("user1", 0x78000)
+//  AM_RANGE(0xfeff8000, 0xfeffffff) AM_ROM AM_REGION("user1", 0x78000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(macse30_map, ADDRESS_SPACE_PROGRAM, 32)
@@ -632,9 +632,9 @@ static ADDRESS_MAP_START(pwrmac_map, ADDRESS_SPACE_PROGRAM, 64)
 
 	AM_RANGE(0x50f40000, 0x50f41fff) AM_READWRITE16(mac_via_r, mac_via_w, U64(0xffffffffffffffff))	// mirror
 
-//	AM_RANGE(0xff000000, 0xff3fffff) AM_ROM AM_REGION("user1", 0)
-//	AM_RANGE(0xff400000, 0xff7fffff) AM_ROM AM_REGION("user1", 0)
-//	AM_RANGE(0xff800000, 0xffbfffff) AM_ROM AM_REGION("user1", 0)
+//  AM_RANGE(0xff000000, 0xff3fffff) AM_ROM AM_REGION("user1", 0)
+//  AM_RANGE(0xff400000, 0xff7fffff) AM_ROM AM_REGION("user1", 0)
+//  AM_RANGE(0xff800000, 0xffbfffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -715,11 +715,11 @@ static MACHINE_DRIVER_START( mac512ke )
 	/* devices */
 	MDRV_IWM_ADD("fdc", mac_iwm_interface)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac128512_floppy_config)
-	
+
 	MDRV_SCC8530_ADD("scc")
 	MDRV_SCC8530_ACK(mac_scc_ack)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("512K")
@@ -727,7 +727,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mac128k )
 	MDRV_IMPORT_FROM( mac512ke )
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
@@ -742,9 +742,9 @@ static MACHINE_DRIVER_START( macplus )
 
 	MDRV_HARDDISK_ADD( "harddisk1" )
 	MDRV_HARDDISK_ADD( "harddisk2" )
-	
+
 	MDRV_FLOPPY_SONY_2_DRIVES_MODIFY(mac_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("4M")
@@ -757,7 +757,7 @@ static MACHINE_DRIVER_START( macse )
 
 	MDRV_DEVICE_REMOVE("via6522_0")
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_adb_intf)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("4M")
@@ -804,7 +804,7 @@ static MACHINE_DRIVER_START( macii )
 	/* devices */
 	MDRV_IWM_ADD("fdc", mac_iwm_interface)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_config)
-	
+
 	MDRV_SCC8530_ADD("scc")
 	MDRV_SCC8530_ACK(mac_scc_ack)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
@@ -815,7 +815,7 @@ static MACHINE_DRIVER_START( macii )
 
 	MDRV_HARDDISK_ADD( "harddisk1" )
 	MDRV_HARDDISK_ADD( "harddisk2" )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("2M")
@@ -835,7 +835,7 @@ static MACHINE_DRIVER_START( maclc )
 
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("2M")
-	MDRV_RAM_EXTRA_OPTIONS("4M,6M,8M,10M")	
+	MDRV_RAM_EXTRA_OPTIONS("4M,6M,8M,10M")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( maclc2 )
@@ -846,7 +846,7 @@ static MACHINE_DRIVER_START( maclc2 )
 
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("4M")
-	MDRV_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M,28M,32M,36M")	
+	MDRV_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M,28M,32M,36M")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( maclc3 )
@@ -860,7 +860,7 @@ static MACHINE_DRIVER_START( maclc3 )
 
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("4M")
-	MDRV_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M,28M,32M,36M")	
+	MDRV_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M,28M,32M,36M")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( maciix )
@@ -896,7 +896,7 @@ static MACHINE_DRIVER_START( macse30 )
 
 	MDRV_VIDEO_START(mac)
 	MDRV_VIDEO_UPDATE(macse30)
-				 
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MDRV_SOUND_ADD("ascal", DMADAC, 0)
@@ -914,7 +914,7 @@ static MACHINE_DRIVER_START( macse30 )
 	/* devices */
 	MDRV_IWM_ADD("fdc", mac_iwm_interface)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_config)
-	
+
 	MDRV_SCC8530_ADD("scc")
 	MDRV_SCC8530_ACK(mac_scc_ack)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
@@ -925,7 +925,7 @@ static MACHINE_DRIVER_START( macse30 )
 
 	MDRV_HARDDISK_ADD( "harddisk1" )
 	MDRV_HARDDISK_ADD( "harddisk2" )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("2M")
@@ -952,7 +952,7 @@ static MACHINE_DRIVER_START( maciici )
 
 	MDRV_VIDEO_START(maclc)
 	MDRV_VIDEO_UPDATE(macrbv)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("2M")
@@ -969,7 +969,7 @@ static MACHINE_DRIVER_START( maciisi )
 
 	MDRV_VIDEO_START(maclc)
 	MDRV_VIDEO_UPDATE(macrbv)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("2M")
@@ -1015,7 +1015,7 @@ static MACHINE_DRIVER_START( pwrmac )
 	/* devices */
 	MDRV_IWM_ADD("fdc", mac_iwm_interface)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_config)
-	
+
 	MDRV_SCC8530_ADD("scc")
 	MDRV_SCC8530_ACK(mac_scc_ack)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
@@ -1026,7 +1026,7 @@ static MACHINE_DRIVER_START( pwrmac )
 
 	MDRV_HARDDISK_ADD( "harddisk1" )
 	MDRV_HARDDISK_ADD( "harddisk2" )
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("8M")
@@ -1236,8 +1236,8 @@ static INPUT_PORTS_START( macadb )
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)			PORT_CHAR('`') PORT_CHAR('~')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)		PORT_CHAR(8)
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)	/* keyboard Enter : */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")		PORT_CODE(KEYCODE_ESC)		PORT_CHAR(27)                     
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control") PORT_CODE(KEYCODE_LCONTROL)   
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")		PORT_CODE(KEYCODE_ESC)		PORT_CHAR(27)
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Command / Open Apple") PORT_CODE(KEYCODE_LALT)
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
@@ -1252,7 +1252,7 @@ static INPUT_PORTS_START( macadb )
 	PORT_START("KEY4")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)	// 0x40
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)			PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))	// 0x41
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_UNUSED)	// 0x42 
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_UNUSED)	// 0x42
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)			PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))	// 0x43
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)	// 0x44
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)			PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD)) // 0x45
@@ -1411,7 +1411,7 @@ ROM_START( pmac6100 )
         ROM_LOAD( "9feb69b3.rom", 0x000000, 0x400000, CRC(a43fadbc) SHA1(6fac1c4e920a077c077b03902fef9199d5e8f2c3) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT	 CONFIG	COMPANY		  FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     CONFIG COMPANY       FULLNAME */
 COMP( 1984, mac128k,  0, 	0,	mac128k,  macplus,  mac128k512k, 0,     "Apple Computer", "Macintosh 128k",  GAME_NOT_WORKING )
 COMP( 1984, mac512k,  mac128k,  0,	mac512ke, macplus,  mac128k512k, 0,     "Apple Computer", "Macintosh 512k",  GAME_NOT_WORKING )
 COMP( 1986, mac512ke, macplus,  0,	mac512ke, macplus,  mac512ke,	 0,     "Apple Computer", "Macintosh 512ke", 0 )

@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	configms.c - MESS specific config handling
+    configms.c - MESS specific config handling
 
 ****************************************************************************/
 
@@ -16,7 +16,7 @@
 
 /*-------------------------------------------------
     device_dirs_load - loads MESS device directory
-	configuration items
+    configuration items
 -------------------------------------------------*/
 
 static void device_dirs_load(running_machine *machine, int config_type, xml_data_node *parentnode)
@@ -59,7 +59,7 @@ static void device_dirs_load(running_machine *machine, int config_type, xml_data
 
 /*-------------------------------------------------
     device_dirs_save - saves out MESS device
-	directories to the configuration file
+    directories to the configuration file
 -------------------------------------------------*/
 
 static void device_dirs_save(running_machine *machine, int config_type, xml_data_node *parentnode)
@@ -91,7 +91,7 @@ static void device_dirs_save(running_machine *machine, int config_type, xml_data
 
 /*-------------------------------------------------
     mess_config_init - sets up MESS specific
-	options on config files
+    options on config files
 -------------------------------------------------*/
 
 void mess_config_init(running_machine *machine)

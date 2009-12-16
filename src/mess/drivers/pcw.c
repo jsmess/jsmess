@@ -237,7 +237,7 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	char block_name[10];
-	
+
 	sprintf(block_name,"bank%d",block+1);
 	/* bank 3? */
 	if (bank == 3)
@@ -263,7 +263,7 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
 static void pcw_update_write_memory_block(running_machine *machine, int block, int bank)
 {
 	char block_name[10];
-	
+
 	sprintf(block_name,"bank%d",block+5);
 	memory_set_bankptr(machine, block_name, messram_get_ptr(devtag_get_device(machine, "messram")) + ((bank * 0x4000) % messram_get_size(devtag_get_device(machine, "messram"))));
 //  LOG(("MEM: write block %i -> bank %i\n",block,bank));
@@ -1022,10 +1022,10 @@ static MACHINE_DRIVER_START( pcw )
 	MDRV_UPD765A_ADD("upd765", pcw_upd765_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(pcw_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("256K")		
+	MDRV_RAM_DEFAULT_SIZE("256K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(  pcw_512 )
@@ -1041,7 +1041,7 @@ static MACHINE_DRIVER_START( pcw9512 )
 	MDRV_IMPORT_FROM( pcw )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_IO_MAP(pcw9512_io)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("512K")

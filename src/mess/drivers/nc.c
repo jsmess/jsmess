@@ -345,12 +345,12 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 	char bank5[10];
 	sprintf(bank1,"bank%d",bank+1);
 	sprintf(bank5,"bank%d",bank+5);
-	
+
 	mem_type = (nc_memory_config[bank]>>6) & 0x03;
 	mem_bank = nc_memory_config[bank] & 0x03f;
-	
+
 	memory_install_read_bank(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, nc_bankhandler_r[bank]);
-	
+
 	switch (mem_type)
 	{
 		/* ROM */
@@ -364,7 +364,7 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 			addr = (memory_region(machine, "maincpu")+0x010000) + (mem_bank<<14);
 
 			memory_set_bankptr(machine, bank1, addr);
-			
+
 			memory_nop_write(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0);
 			LOG(("BANK %d: ROM %d\n",bank,mem_bank));
 		}
@@ -405,7 +405,7 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 				{
 					/* yes */
 					memory_set_bankptr(machine, bank5, addr);
-					
+
 					memory_install_write_bank(space,(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, nc_bankhandler_w[bank]);
 				}
 				else
@@ -1662,7 +1662,7 @@ static MACHINE_DRIVER_START( nc100 )
 	MDRV_CARTSLOT_START(nc_pcmcia_card)
 	MDRV_CARTSLOT_LOAD(nc_pcmcia_card)
 	MDRV_CARTSLOT_UNLOAD(nc_pcmcia_card)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
@@ -1709,7 +1709,7 @@ static MACHINE_DRIVER_START( nc200 )
 	MDRV_UPD765A_ADD("upd765", nc200_upd765_interface)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, nc200_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")

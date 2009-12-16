@@ -1,6 +1,6 @@
 //============================================================
 //
-//	dialog.c - Win32 MESS dialog handling
+//  dialog.c - Win32 MESS dialog handling
 //
 //============================================================
 
@@ -106,7 +106,7 @@ struct _seqselect_info
 
 
 //============================================================
-//	PARAMETERS
+//  PARAMETERS
 //============================================================
 
 #define DIM_VERTICAL_SPACING	3
@@ -146,7 +146,7 @@ struct _seqselect_info
 
 
 //============================================================
-//	LOCAL VARIABLES
+//  LOCAL VARIABLES
 //============================================================
 
 static running_machine *Machine;	// HACK - please fix
@@ -164,7 +164,7 @@ static const WORD dlgitem_combobox[] =	{ 0xFFFF, 0x0085 };
 
 
 //============================================================
-//	PROTOTYPES
+//  PROTOTYPES
 //============================================================
 
 static void dialog_prime(dialog_box *di);
@@ -174,7 +174,7 @@ static int dialog_write_item(dialog_box *di, DWORD style, short x, short y,
 
 
 //============================================================
-//	call_windowproc
+//  call_windowproc
 //============================================================
 
 static LRESULT call_windowproc(WNDPROC wndproc, HWND hwnd, UINT msg,
@@ -191,7 +191,7 @@ static LRESULT call_windowproc(WNDPROC wndproc, HWND hwnd, UINT msg,
 
 
 //============================================================
-//	compute_dlgunits_multiple
+//  compute_dlgunits_multiple
 //============================================================
 
 static void calc_dlgunits_multiple(void)
@@ -235,7 +235,7 @@ done:
 
 
 //============================================================
-//	dialog_trigger
+//  dialog_trigger
 //============================================================
 
 static void dialog_trigger(HWND dlgwnd, WORD trigger_flags)
@@ -272,7 +272,7 @@ static void dialog_trigger(HWND dlgwnd, WORD trigger_flags)
 }
 
 //============================================================
-//	dialog_proc
+//  dialog_proc
 //============================================================
 
 static INT_PTR CALLBACK dialog_proc(HWND dlgwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -356,7 +356,7 @@ static INT_PTR CALLBACK dialog_proc(HWND dlgwnd, UINT msg, WPARAM wparam, LPARAM
 
 
 //============================================================
-//	dialog_write
+//  dialog_write
 //============================================================
 
 static int dialog_write(struct _dialog_box *di, const void *ptr, size_t sz, int align)
@@ -404,7 +404,7 @@ static int dialog_write(struct _dialog_box *di, const void *ptr, size_t sz, int 
 
 
 //============================================================
-//	dialog_write_string
+//  dialog_write_string
 //============================================================
 
 static int dialog_write_string(dialog_box *di, const WCHAR *str)
@@ -417,7 +417,7 @@ static int dialog_write_string(dialog_box *di, const WCHAR *str)
 
 
 //============================================================
-//	dialog_write_item
+//  dialog_write_item
 //============================================================
 
 static int dialog_write_item(dialog_box *di, DWORD style, short x, short y,
@@ -468,7 +468,7 @@ static int dialog_write_item(dialog_box *di, DWORD style, short x, short y,
 
 
 //============================================================
-//	dialog_add_trigger
+//  dialog_add_trigger
 //============================================================
 
 static int dialog_add_trigger(struct _dialog_box *di, WORD dialog_item,
@@ -504,7 +504,7 @@ static int dialog_add_trigger(struct _dialog_box *di, WORD dialog_item,
 }
 
 //============================================================
-//	dialog_add_object
+//  dialog_add_object
 //============================================================
 
 static int dialog_add_object(dialog_box *di, HGDIOBJ obj)
@@ -539,7 +539,7 @@ static int dialog_add_object(dialog_box *di, HGDIOBJ obj)
 
 
 //============================================================
-//	dialog_scrollbar_init
+//  dialog_scrollbar_init
 //============================================================
 
 static LRESULT dialog_scrollbar_init(dialog_box *dialog, HWND dlgwnd, UINT message, WPARAM wparam, LPARAM lparam)
@@ -562,7 +562,7 @@ static LRESULT dialog_scrollbar_init(dialog_box *dialog, HWND dlgwnd, UINT messa
 
 
 //============================================================
-//	dialog_add_scrollbar
+//  dialog_add_scrollbar
 //============================================================
 
 static int dialog_add_scrollbar(dialog_box *dialog)
@@ -577,7 +577,7 @@ static int dialog_add_scrollbar(dialog_box *dialog)
 
 
 //============================================================
-//	dialog_prime
+//  dialog_prime
 //============================================================
 
 static void dialog_prime(dialog_box *di)
@@ -601,7 +601,7 @@ static void dialog_prime(dialog_box *di)
 
 
 //============================================================
-//	dialog_get_combo_value
+//  dialog_get_combo_value
 //============================================================
 
 static LRESULT dialog_get_combo_value(dialog_box *dialog, HWND dialog_item, UINT message, WPARAM wparam, LPARAM lparam)
@@ -616,7 +616,7 @@ static LRESULT dialog_get_combo_value(dialog_box *dialog, HWND dialog_item, UINT
 
 
 //============================================================
-//	dialog_get_adjuster_value
+//  dialog_get_adjuster_value
 //============================================================
 
 static LRESULT dialog_get_adjuster_value(dialog_box *dialog, HWND dialog_item, UINT message, WPARAM wparam, LPARAM lparam)
@@ -629,7 +629,7 @@ static LRESULT dialog_get_adjuster_value(dialog_box *dialog, HWND dialog_item, U
 
 
 //============================================================
-//	dialog_get_slider_value
+//  dialog_get_slider_value
 //============================================================
 
 static LRESULT dialog_get_slider_value(dialog_box *dialog, HWND dialog_item, UINT message, WPARAM wparam, LPARAM lparam)
@@ -640,7 +640,7 @@ static LRESULT dialog_get_slider_value(dialog_box *dialog, HWND dialog_item, UIN
 
 
 //============================================================
-//	win_dialog_init
+//  win_dialog_init
 //============================================================
 
 dialog_box *win_dialog_init(const char *title, const struct dialog_layout *layout)
@@ -703,7 +703,7 @@ error:
 
 
 //============================================================
-//	dialog_new_control
+//  dialog_new_control
 //============================================================
 
 static void dialog_new_control(struct _dialog_box *di, short *x, short *y)
@@ -715,7 +715,7 @@ static void dialog_new_control(struct _dialog_box *di, short *x, short *y)
 
 
 //============================================================
-//	dialog_finish_control
+//  dialog_finish_control
 //============================================================
 
 static void dialog_finish_control(struct _dialog_box *di, short x, short y)
@@ -736,7 +736,7 @@ static void dialog_finish_control(struct _dialog_box *di, short x, short y)
 
 
 //============================================================
-//	dialog_combo_changed
+//  dialog_combo_changed
 //============================================================
 
 static LRESULT dialog_combo_changed(dialog_box *dialog, HWND dlgitem, UINT message, WPARAM wparam, LPARAM lparam)
@@ -749,7 +749,7 @@ static LRESULT dialog_combo_changed(dialog_box *dialog, HWND dlgitem, UINT messa
 
 
 //============================================================
-//	win_dialog_add_active_combobox
+//  win_dialog_add_active_combobox
 //============================================================
 
 int win_dialog_add_active_combobox(dialog_box *dialog, const char *item_label, int default_value,
@@ -799,7 +799,7 @@ done:
 
 
 //============================================================
-//	win_dialog_add_combobox
+//  win_dialog_add_combobox
 //============================================================
 
 int win_dialog_add_combobox(dialog_box *dialog, const char *item_label, int default_value,
@@ -812,7 +812,7 @@ int win_dialog_add_combobox(dialog_box *dialog, const char *item_label, int defa
 
 
 //============================================================
-//	win_dialog_add_combobox_item
+//  win_dialog_add_combobox_item
 //============================================================
 
 int win_dialog_add_combobox_item(dialog_box *dialog, const char *item_label, int item_data)
@@ -846,7 +846,7 @@ int win_dialog_add_combobox_item(dialog_box *dialog, const char *item_label, int
 
 
 //============================================================
-//	adjuster_sb_wndproc
+//  adjuster_sb_wndproc
 //============================================================
 
 struct adjuster_sb_stuff
@@ -907,7 +907,7 @@ static INT_PTR CALLBACK adjuster_sb_wndproc(HWND sbwnd, UINT msg, WPARAM wparam,
 
 
 //============================================================
-//	adjuster_sb_setup
+//  adjuster_sb_setup
 //============================================================
 
 static LRESULT adjuster_sb_setup(dialog_box *dialog, HWND sbwnd, UINT message, WPARAM wparam, LPARAM lparam)
@@ -932,7 +932,7 @@ static LRESULT adjuster_sb_setup(dialog_box *dialog, HWND sbwnd, UINT message, W
 
 
 //============================================================
-//	win_dialog_add_adjuster
+//  win_dialog_add_adjuster
 //============================================================
 
 int win_dialog_add_adjuster(dialog_box *dialog, const char *item_label, int default_value,
@@ -993,7 +993,7 @@ error:
 
 
 //============================================================
-//	win_dialog_add_slider
+//  win_dialog_add_slider
 //============================================================
 
 int win_dialog_add_slider(dialog_box *dialog, const char *item_label, int default_value,
@@ -1041,7 +1041,7 @@ error:
 
 
 //============================================================
-//	get_seqselect_info
+//  get_seqselect_info
 //============================================================
 
 static seqselect_info *get_seqselect_info(HWND editwnd)
@@ -1054,7 +1054,7 @@ static seqselect_info *get_seqselect_info(HWND editwnd)
 
 
 //============================================================
-//	seqselect_settext
+//  seqselect_settext
 //============================================================
 
 static void seqselect_settext(HWND editwnd)
@@ -1092,7 +1092,7 @@ static void seqselect_settext(HWND editwnd)
 
 
 //============================================================
-//	seqselect_start_read_from_main_thread
+//  seqselect_start_read_from_main_thread
 //============================================================
 
 static void seqselect_start_read_from_main_thread(void *param)
@@ -1154,7 +1154,7 @@ static void seqselect_start_read_from_main_thread(void *param)
 
 
 //============================================================
-//	seqselect_stop_read_from_main_thread
+//  seqselect_stop_read_from_main_thread
 //============================================================
 
 static void seqselect_stop_read_from_main_thread(void *param)
@@ -1174,7 +1174,7 @@ static void seqselect_stop_read_from_main_thread(void *param)
 
 
 //============================================================
-//	seqselect_wndproc
+//  seqselect_wndproc
 //============================================================
 
 static INT_PTR CALLBACK seqselect_wndproc(HWND editwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -1231,7 +1231,7 @@ static INT_PTR CALLBACK seqselect_wndproc(HWND editwnd, UINT msg, WPARAM wparam,
 
 
 //============================================================
-//	seqselect_setup
+//  seqselect_setup
 //============================================================
 
 static LRESULT seqselect_setup(dialog_box *dialog, HWND editwnd, UINT message, WPARAM wparam, LPARAM lparam)
@@ -1249,7 +1249,7 @@ static LRESULT seqselect_setup(dialog_box *dialog, HWND editwnd, UINT message, W
 
 
 //============================================================
-//	seqselect_apply
+//  seqselect_apply
 //============================================================
 
 static LRESULT seqselect_apply(dialog_box *dialog, HWND editwnd, UINT message, WPARAM wparam, LPARAM lparam)
@@ -1264,7 +1264,7 @@ static LRESULT seqselect_apply(dialog_box *dialog, HWND editwnd, UINT message, W
 }
 
 //============================================================
-//	dialog_add_single_seqselect
+//  dialog_add_single_seqselect
 //============================================================
 
 static int dialog_add_single_seqselect(struct _dialog_box *di, short x, short y,
@@ -1300,7 +1300,7 @@ static int dialog_add_single_seqselect(struct _dialog_box *di, short x, short y,
 
 
 //============================================================
-//	win_dialog_add_seqselect
+//  win_dialog_add_seqselect
 //============================================================
 
 int win_dialog_add_portselect(dialog_box *dialog, const input_field_config *field, const RECT *r)
@@ -1404,7 +1404,7 @@ int win_dialog_add_portselect(dialog_box *dialog, const input_field_config *fiel
 
 
 //============================================================
-//	win_dialog_add_notification
+//  win_dialog_add_notification
 //============================================================
 
 int win_dialog_add_notification(dialog_box *dialog, UINT notification,
@@ -1421,7 +1421,7 @@ int win_dialog_add_notification(dialog_box *dialog, UINT notification,
 
 
 //============================================================
-//	win_dialog_add_standard_buttons
+//  win_dialog_add_standard_buttons
 //============================================================
 
 int win_dialog_add_standard_buttons(dialog_box *dialog)
@@ -1448,7 +1448,7 @@ int win_dialog_add_standard_buttons(dialog_box *dialog)
 
 
 //============================================================
-//	create_png_bitmap
+//  create_png_bitmap
 //============================================================
 
 static HBITMAP create_png_bitmap(const png_info *png)
@@ -1518,7 +1518,7 @@ done:
 }
 
 //============================================================
-//	win_dialog_add_image
+//  win_dialog_add_image
 //============================================================
 
 int win_dialog_add_image(dialog_box *dialog, const png_info *png)
@@ -1551,7 +1551,7 @@ int win_dialog_add_image(dialog_box *dialog, const png_info *png)
 }
 
 //============================================================
-//	win_dialog_add_separator
+//  win_dialog_add_separator
 //============================================================
 
 int win_dialog_add_separator(dialog_box *dialog)
@@ -1562,7 +1562,7 @@ int win_dialog_add_separator(dialog_box *dialog)
 }
 
 //============================================================
-//	win_dialog_exit
+//  win_dialog_exit
 //============================================================
 
 void win_dialog_exit(dialog_box *dialog)
@@ -1588,7 +1588,7 @@ void win_dialog_exit(dialog_box *dialog)
 
 
 //============================================================
-//	win_dialog_malloc
+//  win_dialog_malloc
 //============================================================
 
 void *win_dialog_malloc(dialog_box *dialog, size_t size)
@@ -1599,7 +1599,7 @@ void *win_dialog_malloc(dialog_box *dialog, size_t size)
 
 
 //============================================================
-//	win_dialog_strdup
+//  win_dialog_strdup
 //============================================================
 
 char *win_dialog_strdup(dialog_box *dialog, const char *s)
@@ -1610,7 +1610,7 @@ char *win_dialog_strdup(dialog_box *dialog, const char *s)
 
 
 //============================================================
-//	win_dialog_wcsdup
+//  win_dialog_wcsdup
 //============================================================
 
 WCHAR *win_dialog_wcsdup(dialog_box *dialog, const WCHAR *s)
@@ -1624,7 +1624,7 @@ WCHAR *win_dialog_wcsdup(dialog_box *dialog, const WCHAR *s)
 
 
 //============================================================
-//	before_display_dialog
+//  before_display_dialog
 //============================================================
 
 static void before_display_dialog(running_machine *machine)
@@ -1642,7 +1642,7 @@ static void before_display_dialog(running_machine *machine)
 
 
 //============================================================
-//	after_display_dialog
+//  after_display_dialog
 //============================================================
 
 static void after_display_dialog(running_machine *machine)
@@ -1660,7 +1660,7 @@ static void after_display_dialog(running_machine *machine)
 
 
 //============================================================
-//	win_dialog_runmodal
+//  win_dialog_runmodal
 //============================================================
 
 void win_dialog_runmodal(running_machine *machine, HWND wnd, dialog_box *dialog)
@@ -1684,7 +1684,7 @@ void win_dialog_runmodal(running_machine *machine, HWND wnd, dialog_box *dialog)
 
 
 //============================================================
-//	file_dialog_hook
+//  file_dialog_hook
 //============================================================
 
 static UINT_PTR CALLBACK file_dialog_hook(HWND dlgwnd, UINT message, WPARAM wparam, LPARAM lparam)
@@ -1738,7 +1738,7 @@ static UINT_PTR CALLBACK file_dialog_hook(HWND dlgwnd, UINT message, WPARAM wpar
 
 
 //============================================================
-//	win_file_dialog
+//  win_file_dialog
 //============================================================
 
 BOOL win_file_dialog(running_machine *machine,

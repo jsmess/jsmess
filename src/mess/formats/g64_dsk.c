@@ -29,10 +29,10 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- speed zones
-	- writing
+    - speed zones
+    - writing
 
 */
 
@@ -103,8 +103,8 @@ static floperr_t g64_read_track(floppy_image *floppy, int head, int track, UINT6
 
 	/* get track offset */
 	err = get_track_offset(floppy, track, &track_offset);
-	
-	if (err) 
+
+	if (err)
 		return err;
 
 	if (track_offset)
@@ -128,7 +128,7 @@ static floperr_t g64_read_track(floppy_image *floppy, int head, int track, UINT6
 	}
 
 	if (LOG) logerror("G64 track %.1f length %u\n", get_track_index(track), track_length);
-	
+
 	return FLOPPY_ERROR_SUCCESS;
 }
 
@@ -191,7 +191,7 @@ FLOPPY_CONSTRUCT( g64_dsk_construct )
 	{
 		floppy_image_read(floppy, header, pos, 4); pos += 4;
 		tag->track_offset[i] = (header[3] << 24) | (header[2] << 16) | (header[1] << 8) | header[0];
-		
+
 		if (LOG) logerror("G64 track %.1f data offset: %04x\n", get_track_index(i), tag->track_offset[i]);
 	}
 

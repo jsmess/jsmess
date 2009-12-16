@@ -306,7 +306,7 @@ static ADDRESS_MAP_START( pasogo_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xac000, 0xaffff) AM_RAMBANK("bank12")
 	AM_RANGE(0xb0000, 0xb3fff) AM_RAMBANK("bank13")
 	AM_RANGE(0xb4000, 0xb7fff) AM_RAMBANK("bank14")
-//  AM_RANGE(0xb8000, 0xbffff) AM_RAM     
+//  AM_RANGE(0xb8000, 0xbffff) AM_RAM
 	AM_RANGE(0xb8000, 0xbffff) AM_RAMBANK("bank28")
 	AM_RANGE(0xc0000, 0xc3fff) AM_RAMBANK("bank15")
 	AM_RANGE(0xc4000, 0xc7fff) AM_RAMBANK("bank16")
@@ -320,7 +320,7 @@ static ADDRESS_MAP_START( pasogo_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe4000, 0xe7fff) AM_RAMBANK("bank24")
 	AM_RANGE(0xe8000, 0xebfff) AM_RAMBANK("bank25")
 	AM_RANGE(0xec000, 0xeffff) AM_RAMBANK("bank26")
-                                          
+
 	AM_RANGE(0xf0000, 0xfffff) AM_ROMBANK("bank27")
 ADDRESS_MAP_END
 
