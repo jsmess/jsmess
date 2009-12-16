@@ -1664,24 +1664,23 @@ static void apple2gs_setup_memory(running_machine *machine)
 	state_save_register_item_array(machine, "APPLE2GS_SLOWMEM", NULL, 0, apple2gs_slowmem);
 
 	/* install expanded memory */
-	memory_install_read8_handler(space, 0x010000, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, SMH_BANK(1));
-	memory_install_write8_handler(space, 0x010000, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, SMH_BANK(1));
-	memory_set_bankptr(machine,1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x010000);
+	memory_install_readwrite_bank(space, 0x010000, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, "bank1");
+	memory_set_bankptr(machine,"bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x010000);
 
 	/* install hi memory */
-	memory_install_read8_handler(space, 0xe00000, 0xe1ffff, 0, 0, SMH_BANK(2));
+	memory_install_read_bank(space, 0xe00000, 0xe1ffff, 0, 0, "bank2");
 	memory_install_write8_handler(space, 0xe00000, 0xe1ffff, 0, 0, apple2gs_slowmem_w);
 	memory_install_write8_handler(space, 0xe00400, 0xe007ff, 0, 0, apple2gs_E004xx_w);
 	memory_install_write8_handler(space, 0xe02000, 0xe03fff, 0, 0, apple2gs_E02xxx_w);
 	memory_install_write8_handler(space, 0xe10400, 0xe107ff, 0, 0, apple2gs_E104xx_w);
 	memory_install_write8_handler(space, 0xe12000, 0xe13fff, 0, 0, apple2gs_E12xxx_w);
-	memory_set_bankptr(machine,2, apple2gs_slowmem);
+	memory_set_bankptr(machine,"bank2", apple2gs_slowmem);
 
 	/* install alternate ROM bank */
 	begin = 0x1000000 - memory_region_length(machine, "maincpu");
 	end = 0xffffff;
-	memory_install_read8_handler(space, begin, end, 0, 0, SMH_BANK(3));
-	memory_set_bankptr(machine,3, memory_region(machine, "maincpu"));
+	memory_install_read_bank(space, begin, end, 0, 0, "bank3");
+	memory_set_bankptr(machine,"bank3", memory_region(machine, "maincpu"));
 
 	/* install new xxC000-xxCFFF handlers */
 	memory_install_read8_handler(space, 0x00c000, 0x00cfff, 0, 0, apple2gs_00Cxxx_r);

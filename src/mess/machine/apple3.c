@@ -287,7 +287,7 @@ static UINT8 *apple3_bankaddr(running_machine *machine,UINT16 bank, offs_t offse
 
 
 
-static void apple3_setbank(running_machine *machine,int mame_bank, UINT16 bank, offs_t offset)
+static void apple3_setbank(running_machine *machine,const char *mame_bank, UINT16 bank, offs_t offset)
 {
 	UINT8 *ptr;
 
@@ -297,9 +297,9 @@ static void apple3_setbank(running_machine *machine,int mame_bank, UINT16 bank, 
 	if (LOG_MEMORY)
 	{
 		#ifdef PTR64
-		logerror("\tbank #%d --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - messram_get_ptr(devtag_get_device(machine, "messram")));
+		logerror("\tbank %s --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - messram_get_ptr(devtag_get_device(machine, "messram")));
 		#else
-		logerror("\tbank #%d --> %02x/%04x [0x%08x]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - messram_get_ptr(devtag_get_device(machine, "messram")));
+		logerror("\tbank %s --> %02x/%04x [0x%08x]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - messram_get_ptr(devtag_get_device(machine, "messram")));
 		#endif
 	}
 }
@@ -371,16 +371,16 @@ static void apple3_update_memory(running_machine *machine)
 		bank = ~0;
 		page = 0x01;
 	}
-	apple3_setbank(machine,2, bank, ((offs_t) page) * 0x100);
+	apple3_setbank(machine,"bank2", bank, ((offs_t) page) * 0x100);
 
 	/* bank 3 (0200-1FFF) */
-	apple3_setbank(machine,3, ~0, 0x0200);
+	apple3_setbank(machine,"bank3", ~0, 0x0200);
 
 	/* bank 4 (2000-9FFF) */
-	apple3_setbank(machine,4, via_1_a, 0x0000);
+	apple3_setbank(machine,"bank4", via_1_a, 0x0000);
 
 	/* bank 5 (A000-BFFF) */
-	apple3_setbank(machine,5, ~0, 0x2000);
+	apple3_setbank(machine,"bank5", ~0, 0x2000);
 
 	/* install bank 8 (C000-CFFF) */
 	if (via_0_a & 0x40)
@@ -390,72 +390,70 @@ static void apple3_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_install_read8_handler(space, 0xC000, 0xC0FF, 0, 0, SMH_BANK(8));
+		memory_install_read_bank(space, 0xC000, 0xC0FF, 0, 0, "bank8");
 		if (via_0_a & 0x08)
-			memory_install_write8_handler(space, 0xC000, 0xC0FF, 0, 0, SMH_UNMAP);
+			memory_unmap_write(space, 0xC000, 0xC0FF, 0, 0);
 		else
-			memory_install_write8_handler(space, 0xC000, 0xC0FF, 0, 0, SMH_BANK(8));
-		apple3_setbank(machine,8, ~0, 0x4000);
+			memory_install_write_bank(space, 0xC000, 0xC0FF, 0, 0, "bank8");
+		apple3_setbank(machine,"bank8", ~0, 0x4000);
 	}
 
 	/* install bank 9 (C100-C4FF) */
 	if (via_0_a & 0x40)
 	{
-		memory_install_read8_handler(space, 0xC100, 0xC4FF, 0, 0, SMH_NOP);
-		memory_install_write8_handler(space, 0xC100, 0xC4FF, 0, 0, SMH_NOP);
+		memory_nop_readwrite(space, 0xC100, 0xC4FF, 0, 0);
 	}
 	else
 	{
-		memory_install_read8_handler(space, 0xC100, 0xC4FF, 0, 0, SMH_BANK(9));
+		memory_install_read_bank(space, 0xC100, 0xC4FF, 0, 0, "bank9");
 		if (via_0_a & 0x08)
-			memory_install_write8_handler(space, 0xC100, 0xC4FF, 0, 0, SMH_UNMAP);
+			memory_unmap_write(space, 0xC100, 0xC4FF, 0, 0);
 		else
-			memory_install_write8_handler(space, 0xC100, 0xC4FF, 0, 0, SMH_BANK(9));
-		apple3_setbank(machine,9, ~0, 0x4100);
+			memory_install_write_bank(space, 0xC100, 0xC4FF, 0, 0, "bank9");
+		apple3_setbank(machine,"bank9", ~0, 0x4100);
 	}
 
 	/* install bank 10 (C500-C7FF) */
-	memory_install_read8_handler(space, 0xC500, 0xC7FF, 0, 0, SMH_BANK(10));
+	memory_install_read_bank(space, 0xC500, 0xC7FF, 0, 0, "bank10");
 	if (via_0_a & 0x08)
-		memory_install_write8_handler(space, 0xC500, 0xC7FF, 0, 0, SMH_UNMAP);
+		memory_unmap_write(space, 0xC500, 0xC7FF, 0, 0);
 	else
-		memory_install_write8_handler(space, 0xC500, 0xC7FF, 0, 0, SMH_BANK(10));
-	apple3_setbank(machine,10, ~0, 0x4500);
+		memory_install_write_bank(space, 0xC500, 0xC7FF, 0, 0, "bank10");
+	apple3_setbank(machine,"bank10", ~0, 0x4500);
 
 	/* install bank 11 (C800-CFFF) */
 	if (via_0_a & 0x40)
 	{
-		memory_install_read8_handler(space, 0xC800, 0xCFFF, 0, 0, SMH_NOP);
-		memory_install_write8_handler(space, 0xC800, 0xCFFF, 0, 0, SMH_NOP);
+		memory_nop_readwrite(space, 0xC800, 0xCFFF, 0, 0);
 	}
 	else
 	{
-		memory_install_read8_handler(space, 0xC800, 0xCFFF, 0, 0, SMH_BANK(11));
+		memory_install_read_bank(space, 0xC800, 0xCFFF, 0, 0, "bank11");
 		if (via_0_a & 0x08)
-			memory_install_write8_handler(space, 0xC800, 0xCFFF, 0, 0, SMH_UNMAP);
+			memory_unmap_write(space, 0xC800, 0xCFFF, 0, 0);
 		else
-			memory_install_write8_handler(space, 0xC800, 0xCFFF, 0, 0, SMH_BANK(11));
-		apple3_setbank(machine,11, ~0, 0x4800);
+			memory_install_write_bank(space, 0xC800, 0xCFFF, 0, 0, "bank11");
+		apple3_setbank(machine,"bank11", ~0, 0x4800);
 	}
 
 	/* install bank 6 (D000-EFFF) */
-	memory_install_read8_handler(space, 0xD000, 0xEFFF, 0, 0, SMH_BANK(6));
+	memory_install_read_bank(space, 0xD000, 0xEFFF, 0, 0, "bank6");
 	if (via_0_a & 0x08)
-		memory_install_write8_handler(space, 0xD000, 0xEFFF, 0, 0, SMH_UNMAP);
+		memory_unmap_write(space, 0xD000, 0xEFFF, 0, 0);
 	else
-		memory_install_write8_handler(space, 0xD000, 0xEFFF, 0, 0, SMH_BANK(6));
-	apple3_setbank(machine,6, ~0, 0x5000);
+		memory_install_write_bank(space, 0xD000, 0xEFFF, 0, 0, "bank6");
+	apple3_setbank(machine,"bank6", ~0, 0x5000);
 
 	/* install bank 7 (F000-FFFF) */
-	memory_install_read8_handler(space, 0xF000, 0xFFFF, 0, 0, SMH_BANK(7));
+	memory_install_read_bank(space, 0xF000, 0xFFFF, 0, 0, "bank7");
 	if (via_0_a & 0x09)
-		memory_install_write8_handler(space, 0xF000, 0xFFFF, 0, 0, SMH_UNMAP);
+		memory_unmap_write(space, 0xF000, 0xFFFF, 0, 0);
 	else
-		memory_install_write8_handler(space, 0xF000, 0xFFFF, 0, 0, SMH_BANK(7));
+		memory_install_write_bank(space, 0xF000, 0xFFFF, 0, 0, "bank7");
 	if (via_0_a & 0x01)
-		memory_set_bankptr(machine,7, memory_region(machine, "maincpu"));
+		memory_set_bankptr(machine,"bank7", memory_region(machine, "maincpu"));
 	else
-		apple3_setbank(machine,7, ~0, 0x7000);
+		apple3_setbank(machine,"bank7", ~0, 0x7000);
 
 	/* reinstall VIA handlers */
 	{

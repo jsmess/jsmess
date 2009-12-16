@@ -201,50 +201,18 @@ static void mac_install_memory(running_machine *machine, offs_t memory_begin, of
 {
 	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	offs_t memory_mask;
-	read16_space_func rh;
-	write16_space_func wh;
-	read32_space_func rh32;
-	write32_space_func wh32;
-	read64_space_func rh64;
-	write64_space_func wh64;
-
+	char bank_name[10];
 	memory_size = MIN(memory_size, (memory_end + 1 - memory_begin));
 	memory_mask = memory_size - 1;
 
-	if (mac_model < MODEL_MAC_II)
-	{
-		rh = (read16_space_func) (FPTR)bank;
-		wh = is_rom ? SMH_UNMAP : (write16_space_func) (FPTR)bank;
-
-		memory_install_read16_handler(space, memory_begin,
-			memory_end, memory_mask, 0, rh);
-		memory_install_write16_handler(space, memory_begin,
-			memory_end, memory_mask, 0, wh);
+	sprintf(bank_name,"bank%d",bank);
+	if (is_rom) {
+		memory_install_read_bank(space, memory_begin,memory_end, memory_mask, 0, bank_name);
+		memory_unmap_write(space, memory_begin,memory_end, memory_mask, 0);
+	} else {
+		memory_install_readwrite_bank(space, memory_begin,memory_end, memory_mask, 0, bank_name);
 	}
-	else if (mac_model < MODEL_MAC_POWERMAC_6100)
-	{
-		rh32 = (read32_space_func) (FPTR)bank;
-		wh32 = is_rom ? SMH_UNMAP : (write32_space_func) (FPTR)bank;
-
-		memory_install_read32_handler(space, memory_begin,
-			memory_end, memory_mask, 0, rh32);
-		memory_install_write32_handler(space, memory_begin,
-			memory_end, memory_mask, 0, wh32);
-
-	}
-	else
-	{
-		rh64 = (read64_space_func) (FPTR)bank;
-		wh64 = is_rom ? SMH_UNMAP : (write64_space_func) (FPTR)bank;
-
-		memory_install_read64_handler(space, memory_begin,
-			memory_end, memory_mask, 0, rh64);
-		memory_install_write64_handler(space, memory_begin,
-			memory_end, memory_mask, 0, wh64);
-
-	}
-
-	memory_set_bankptr(machine,bank, memory_data);
+	memory_set_bankptr(machine,bank_name, memory_data);
 
 	if (1) //LOG_MEMORY)
 	{

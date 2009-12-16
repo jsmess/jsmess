@@ -102,7 +102,8 @@ void apple2_setup_memory(running_machine *machine, const apple2_memmap_config *c
 void apple2_update_memory(running_machine *machine)
 {
 	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	int i, bank, rbank, wbank;
+	int i, bank;
+	char rbank[10], wbank[10];
 	int full_update = 0;
 	apple2_meminfo meminfo;
 	read8_space_func rh;
@@ -111,7 +112,8 @@ void apple2_update_memory(running_machine *machine)
 	UINT8 *rbase, *wbase, *rom, *slot_ram;
 	UINT32 rom_length, slot_length, offset;
 	bank_disposition_t bank_disposition;
-
+	int wh_nop = 0;
+	
 	/* need to build list of current info? */
 	if (!apple2_current_meminfo)
 	{
@@ -143,13 +145,13 @@ void apple2_update_memory(running_machine *machine)
 			|| (meminfo.read_handler != apple2_current_meminfo[i].read_handler))
 		{
 			rbase = NULL;
-			rbank = (bank_disposition != A2MEM_IO) ? bank : 0;
+			sprintf(rbank,"bank%d",bank);
 			begin = apple2_mem_config.memmap[i].begin;
 			end_r = apple2_mem_config.memmap[i].end;
-			rh = (read8_space_func) (STATIC_BANK1 + (FPTR)(rbank - 1));
+			rh = NULL; 
 
 			LOG(("apple2_update_memory():  Updating RD {%06X..%06X} [#%02d] --> %08X\n",
-				begin, end_r, rbank, meminfo.read_mem));
+				begin, end_r, bank, meminfo.read_mem));
 
 			/* read handling */
 			if (meminfo.read_handler)
@@ -194,8 +196,13 @@ void apple2_update_memory(running_machine *machine)
 			}
 
 			/* install the actual handlers */
-			if (begin <= end_r)
-				memory_install_read8_handler(space, begin, end_r, 0, 0, rh);
+			if (begin <= end_r) {
+				if (rh) {
+					memory_install_read8_handler(space, begin, end_r, 0, 0, rh);
+				} else {				
+					memory_install_read_bank(space, begin, end_r, 0, 0, rbank);
+				}
+			}
 
 			/* did we 'go past the end?' */
 			if (end_r < apple2_mem_config.memmap[i].end)
@@ -219,17 +226,15 @@ void apple2_update_memory(running_machine *machine)
 		{
 			wbase = NULL;
 			if (bank_disposition == A2MEM_MONO)
-				wbank = bank + 0;
+				sprintf(wbank,"bank%d",bank);
 			else if (bank_disposition == A2MEM_DUAL)
-				wbank = bank + 1;
-			else
-				wbank = 0;
+				sprintf(wbank,"bank%d",bank+1);
 			begin = apple2_mem_config.memmap[i].begin;
 			end_w = apple2_mem_config.memmap[i].end;
-			wh = (write8_space_func) (STATIC_BANK1 + (FPTR)(wbank - 1));
+			wh = NULL;
 
 			LOG(("apple2_update_memory():  Updating WR {%06X..%06X} [#%02d] --> %08X\n",
-				begin, end_w, wbank, meminfo.write_mem));
+				begin, end_w, bank, meminfo.write_mem));
 
 			/* write handling */
 			if (meminfo.write_handler)
@@ -250,12 +255,12 @@ void apple2_update_memory(running_machine *machine)
 				if (slot_ram)
 					wbase = &slot_ram[meminfo.write_mem & APPLE2_MEM_MASK];
 				else
-					wh = SMH_NOP;
+					wh_nop = 1;
 			}
 			else if ((meminfo.write_mem & 0xC0000000) == APPLE2_MEM_ROM)
 			{
 				/* ROM */
-				wh = SMH_NOP;
+				wh_nop = 1;
 			}
 			else
 			{
@@ -269,8 +274,17 @@ void apple2_update_memory(running_machine *machine)
 
 
 			/* install the actual handlers */
-			if (begin <= end_w)
-				memory_install_write8_handler(space, begin, end_w, 0, 0, wh);
+			if (begin <= end_w) {
+				if (wh) {
+					memory_install_write8_handler(space, begin, end_w, 0, 0, wh);
+				} else {
+					if (wh_nop) {
+						memory_nop_write(space, begin, end_w, 0, 0);
+					} else {
+						memory_install_write_bank(space, begin, end_w, 0, 0, wbank);
+					}
+				}
+			}
 
 			/* did we 'go past the end?' */
 			if (end_w < apple2_mem_config.memmap[i].end)

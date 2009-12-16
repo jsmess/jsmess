@@ -380,8 +380,8 @@ DRVLIBS = \
 	$(MESSOBJ)/ti.a \
 	$(MESSOBJ)/luxor.a \
 	$(MESSOBJ)/be.a \
+	$(MESSOBJ)/apple.a \
 	$(MESSOBJ)/shared.a \
-#	$(MESSOBJ)/apple.a \
 #	$(MESSOBJ)/hp.a \
 
 #-------------------------------------------------
