@@ -103,9 +103,9 @@ static MACHINE_RESET( ti99_2 )
 {
 	state = ASSERT_LINE;
 	if (! ROM_paged)
-		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu")+0x4000);
+		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu")+0x4000);
 	else
-		memory_set_bankptr(machine, 1, (memory_region(machine, "maincpu")+0x4000));
+		memory_set_bankptr(machine, "bank1", (memory_region(machine, "maincpu")+0x4000));
 }
 
 static INTERRUPT_GEN( ti99_2_vblank_interrupt )
@@ -183,7 +183,7 @@ GFXDECODE_END
 
 static ADDRESS_MAP_START( ti99_2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM		    /* system ROM */
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)	/* system ROM, banked on 32kb ROMs protos */
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")	/* system ROM, banked on 32kb ROMs protos */
 	AM_RANGE(0x6000, 0xdfff) AM_NOP		    /* free for expansion */
 	AM_RANGE(0xe000, 0xebff) AM_RAM		    /* system RAM */
 	AM_RANGE(0xec00, 0xeeff) AM_RAM AM_BASE_SIZE_GENERIC(videoram)
@@ -215,7 +215,7 @@ static WRITE8_HANDLER ( ti99_2_write_kbd )
 	/* now, we handle ROM paging */
 	if (ROM_paged)
 	{	/* if we have paged ROMs, page according to S0 keyboard interface line */
-		memory_set_bankptr(space->machine, 1, (KeyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
+		memory_set_bankptr(space->machine, "bank1", (KeyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
 	}
 }
 

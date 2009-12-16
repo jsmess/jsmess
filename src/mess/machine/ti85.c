@@ -96,7 +96,7 @@ static TIMER_CALLBACK(ti85_timer_callback)
 
 static void update_ti85_memory (running_machine *machine)
 {
-	memory_set_bankptr(machine, 2,memory_region(machine, "maincpu") + 0x010000 + 0x004000*ti8x_memory_page_1);
+	memory_set_bankptr(machine, "bank2",memory_region(machine, "maincpu") + 0x010000 + 0x004000*ti8x_memory_page_1);
 }
 
 static void update_ti83p_memory (running_machine *machine)
@@ -108,26 +108,26 @@ static void update_ti83p_memory (running_machine *machine)
 		if (ti83p_port4 & 1)
 		{
 
-			memory_set_bankptr(machine, 3, ti8x_ram + 0x004000*(ti8x_memory_page_1&0x01));
-			memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, SMH_BANK(3));
+			memory_set_bankptr(machine, "bank3", ti8x_ram + 0x004000*(ti8x_memory_page_1&0x01));
+			memory_install_write_bank(space, 0x8000, 0xbfff, 0, 0, "bank3");
 		}
 		else
 		{
-			memory_set_bankptr(machine, 2, ti8x_ram + 0x004000*(ti8x_memory_page_1&0x01));
-			memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_BANK(2));
+			memory_set_bankptr(machine, "bank2", ti8x_ram + 0x004000*(ti8x_memory_page_1&0x01));
+			memory_install_write_bank(space, 0x4000, 0x7fff, 0, 0, "bank2");
 		}
 	}
 	else
 	{
 		if (ti83p_port4 & 1)
 		{
-			memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_1&0x1f));
-			memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, SMH_UNMAP);
+			memory_set_bankptr(machine, "bank3", memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_1&0x1f));
+			memory_unmap_write(space, 0x8000, 0xbfff, 0, 0);
 		}
 		else
 		{
-			memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_1&0x1f));
-			memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
+			memory_set_bankptr(machine, "bank2", memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_1&0x1f));
+			memory_unmap_write(space, 0x4000, 0x7fff, 0, 0);
 		}
 	}
 
@@ -135,13 +135,13 @@ static void update_ti83p_memory (running_machine *machine)
 	{
 		if (ti83p_port4 & 1)
 		{
-			memory_set_bankptr(machine, 4, ti8x_ram + 0x004000*(ti8x_memory_page_2&0x01));
-			memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(4));
+			memory_set_bankptr(machine, "bank4", ti8x_ram + 0x004000*(ti8x_memory_page_2&0x01));
+			memory_install_write_bank(space, 0xc000, 0xffff, 0, 0, "bank4");
 		}
 		else
 		{
-			memory_set_bankptr(machine, 3, ti8x_ram + 0x004000*(ti8x_memory_page_2&0x01));
-			memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, SMH_BANK(3));
+			memory_set_bankptr(machine, "bank3", ti8x_ram + 0x004000*(ti8x_memory_page_2&0x01));
+			memory_install_write_bank(space, 0x8000, 0xbfff, 0, 0, "bank3");
 		}
 
 	}
@@ -149,13 +149,13 @@ static void update_ti83p_memory (running_machine *machine)
 	{
 		if (ti83p_port4 & 1)
 		{
-			memory_set_bankptr(machine, 4, memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_2&0x1f));
-			memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_UNMAP);
+			memory_set_bankptr(machine, "bank4", memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_2&0x1f));
+			memory_unmap_write(space, 0xc000, 0xffff, 0, 0);
 		}
 		else
 		{
-			memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_2&0x1f));
-			memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, SMH_UNMAP);
+			memory_set_bankptr(machine, "bank3", memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_2&0x1f));
+			memory_unmap_write(space, 0x8000, 0xbfff, 0, 0);
 		}
 	}
 }
@@ -163,31 +163,29 @@ static void update_ti83p_memory (running_machine *machine)
 static void update_ti86_memory (running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	write8_space_func wh;
 
 	if (ti8x_memory_page_1 & 0x40)
 	{
-		memory_set_bankptr(machine, 2, ti8x_ram + 0x004000*(ti8x_memory_page_1&0x07));
-		wh = SMH_BANK(2);
+		memory_set_bankptr(machine, "bank2", ti8x_ram + 0x004000*(ti8x_memory_page_1&0x07));
+		memory_install_write_bank(space, 0x4000, 0x7fff, 0, 0, "bank2");
 	}
 	else
 	{
-		memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_1&0x0f));
-		wh = SMH_UNMAP;
+		memory_set_bankptr(machine, "bank2", memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_1&0x0f));
+		memory_unmap_write(space, 0x4000, 0x7fff, 0, 0);
 	}
-	memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, wh);
 
 	if (ti8x_memory_page_2 & 0x40)
 	{
-		memory_set_bankptr(machine, 3, ti8x_ram + 0x004000*(ti8x_memory_page_2&0x07));
-		wh = SMH_BANK(3);
+		memory_set_bankptr(machine, "bank3", ti8x_ram + 0x004000*(ti8x_memory_page_2&0x07));
+		memory_install_write_bank(space, 0x8000, 0xbfff, 0, 0, "bank3");
 	}
 	else
 	{
-		memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_2&0x0f));
-		wh = SMH_UNMAP;
+		memory_set_bankptr(machine, "bank3", memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_2&0x0f));
+		memory_unmap_write(space, 0x8000, 0xbfff, 0, 0);
 	}
-	memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, wh);
+	
 }
 
 /***************************************************************************
@@ -222,10 +220,10 @@ MACHINE_START( ti81 )
 
 	timer_pulse(machine, ATTOTIME_IN_HZ(200), NULL, 0, ti85_timer_callback);
 
-	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-	memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
-	memory_set_bankptr(machine, 1, mem + 0x010000);
-	memory_set_bankptr(machine, 2, mem + 0x014000);
+	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+	memory_unmap_write(space, 0x4000, 0x7fff, 0, 0);
+	memory_set_bankptr(machine, "bank1", mem + 0x010000);
+	memory_set_bankptr(machine, "bank2", mem + 0x014000);
 }
 
 MACHINE_START( ti82 )
@@ -262,10 +260,10 @@ MACHINE_START( ti82 )
 
 	timer_pulse(machine, ATTOTIME_IN_HZ(200), NULL, 0, ti85_timer_callback);
 
-	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-	memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
-	memory_set_bankptr(machine, 1, mem + 0x010000);
-	memory_set_bankptr(machine, 2, mem + 0x014000);
+	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+	memory_unmap_write(space, 0x4000, 0x7fff, 0, 0);
+	memory_set_bankptr(machine, "bank1", mem + 0x010000);
+	memory_set_bankptr(machine, "bank2", mem + 0x014000);
 }
 
 
@@ -296,10 +294,10 @@ MACHINE_START( ti85 )
 
 	timer_pulse(machine, ATTOTIME_IN_HZ(200), NULL, 0, ti85_timer_callback);
 
-	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-	memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
-	memory_set_bankptr(machine, 1, mem + 0x010000);
-	memory_set_bankptr(machine, 2, mem + 0x014000);
+	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+	memory_unmap_write(space, 0x4000, 0x7fff, 0, 0);
+	memory_set_bankptr(machine, "bank1", mem + 0x010000);
+	memory_set_bankptr(machine, "bank2", mem + 0x014000);
 }
 
 
@@ -342,14 +340,14 @@ MACHINE_START( ti83p )
 
 	ti8x_ram = auto_alloc_array(machine, UINT8, 32*1024);
 	{
-		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-		memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
-		memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, SMH_UNMAP);
+		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
+		memory_unmap_write(space, 0x4000, 0x7fff, 0, 0);
+		memory_unmap_write(space, 0x8000, 0xbfff, 0, 0);
 
-		memory_set_bankptr(machine, 1, mem + 0x010000);
-		memory_set_bankptr(machine, 2, mem + 0x010000);
-		memory_set_bankptr(machine, 3, mem + 0x010000);
-		memory_set_bankptr(machine, 4, ti8x_ram);
+		memory_set_bankptr(machine, "bank1", mem + 0x010000);
+		memory_set_bankptr(machine, "bank2", mem + 0x010000);
+		memory_set_bankptr(machine, "bank3", mem + 0x010000);
+		memory_set_bankptr(machine, "bank4", ti8x_ram);
 
 		if (ti_calculator_model == TI_83p)
 			memset(ti8x_ram, 0, sizeof(unsigned char)*32*1024);
@@ -386,12 +384,12 @@ MACHINE_START( ti86 )
 
 	ti8x_ram = auto_alloc_array(machine, UINT8, 128*1024);
 	{
-		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 
-		memory_set_bankptr(machine, 1, mem + 0x010000);
-		memory_set_bankptr(machine, 2, mem + 0x014000);
+		memory_set_bankptr(machine, "bank1", mem + 0x010000);
+		memory_set_bankptr(machine, "bank2", mem + 0x014000);
 
-		memory_set_bankptr(machine, 4, ti8x_ram);
+		memory_set_bankptr(machine, "bank4", ti8x_ram);
 
 		if (ti_calculator_model == TI_86)
 			memset(ti8x_ram, 0, sizeof(unsigned char)*128*1024);

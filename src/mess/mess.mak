@@ -377,12 +377,12 @@ DRVLIBS = \
 	$(MESSOBJ)/trs.a \
 	$(MESSOBJ)/conitec.a \
 	$(MESSOBJ)/atari.a \
+	$(MESSOBJ)/ti.a \
 	$(MESSOBJ)/shared.a \
 #	$(MESSOBJ)/apple.a \
 #	$(MESSOBJ)/be.a \
 #	$(MESSOBJ)/hp.a \
 #	$(MESSOBJ)/luxor.a \
-#	$(MESSOBJ)/ti.a \
 
 #-------------------------------------------------
 # the following files are general components and
@@ -1416,7 +1416,7 @@ $(MESSOBJ)/ti.a:				\
 	$(MESS_MACHINE)/ti99pcod.o	\
 	$(MESS_MACHINE)/strata.o	\
 	$(MESS_MACHINE)/geneve.o	\
-	$(MESS_MACHINE)/990_dk.o	\	
+	$(MESS_MACHINE)/990_dk.o	\
 	$(MESS_DRIVERS)/ti990_4.o	\
 	$(MESS_DRIVERS)/ti99_4x.o	\
 	$(MESS_DRIVERS)/ti99_4p.o	\

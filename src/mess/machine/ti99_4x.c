@@ -462,14 +462,14 @@ MACHINE_RESET( ti99 )
 		UINT8* mem = memory_region(machine, "maincpu");
 
 		/* set up system ROM and scratch pad pointers */
-		memory_set_bankptr(machine, 1, mem + offset_rom0_4p);	/* system ROM */
-		memory_set_bankptr(machine, 2, mem + offset_sram_4p);	/* scratch pad */
-		memory_set_bankptr(machine, 11, mem + offset_dram_4p);	/* extra RAM for debugger */
+		memory_set_bankptr(machine, "bank1", mem + offset_rom0_4p);	/* system ROM */
+		memory_set_bankptr(machine, "bank2", mem + offset_sram_4p);	/* scratch pad */
+		memory_set_bankptr(machine, "bank11", mem + offset_dram_4p);	/* extra RAM for debugger */
 	}
 	else
 	{
 		/* set up scratch pad pointer */
-		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + offset_sram);
+		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + offset_sram);
 	}
 
 #if 0
@@ -2644,7 +2644,7 @@ static int ti99_4p_mapper_lookup[16];
 static void ti99_4p_mapper_init(running_machine *machine)
 {
 	int i;
-
+	char bank_name[10];
 	/* Not required at run-time */
 #if 0
 	memory_install_read16_handler(space, 0x2000, 0x2fff, SMH_BANK(3));
@@ -2678,7 +2678,8 @@ static void ti99_4p_mapper_init(running_machine *machine)
 		{
 		case 2:
 		case 3:
-			memory_set_bankptr(machine,3+(i-2), xRAM_ptr + (i<<11));
+			sprintf(bank_name,"bank%d",3+(i-2));
+			memory_set_bankptr(machine,bank_name, xRAM_ptr + (i<<11));
 			break;
 
 		case 10:
@@ -2687,7 +2688,8 @@ static void ti99_4p_mapper_init(running_machine *machine)
 		case 13:
 		case 14:
 		case 15:
-			memory_set_bankptr(machine,5+(i-10), xRAM_ptr + (i<<11));
+			sprintf(bank_name,"bank%d",5+(i-10));
+			memory_set_bankptr(machine,bank_name, xRAM_ptr + (i<<11));
 			break;
 		}
 	}
@@ -2699,7 +2701,8 @@ static void ti99_4p_mapper_init(running_machine *machine)
 static void ti99_4p_mapper_cru_w(running_machine *machine, int offset, int data)
 {
 	int i;
-
+	char bank_name[10];
+	
 	if (offset == 1)
 	{
 		if (ti99_4p_mapper_on != data)
@@ -2713,7 +2716,8 @@ static void ti99_4p_mapper_cru_w(running_machine *machine, int offset, int data)
 				{
 				case 2:
 				case 3:
-					memory_set_bankptr(machine,3+(i-2), xRAM_ptr + (ti99_4p_mapper_on ? (ti99_4p_mapper_lookup[i]) : (i<<11)));
+					sprintf(bank_name,"bank%d",3+(i-2));
+					memory_set_bankptr(machine,bank_name, xRAM_ptr + (ti99_4p_mapper_on ? (ti99_4p_mapper_lookup[i]) : (i<<11)));
 					break;
 
 				case 10:
@@ -2722,7 +2726,8 @@ static void ti99_4p_mapper_cru_w(running_machine *machine, int offset, int data)
 				case 13:
 				case 14:
 				case 15:
-					memory_set_bankptr(machine,5+(i-10), xRAM_ptr + (ti99_4p_mapper_on ? (ti99_4p_mapper_lookup[i]) : (i<<11)));
+					sprintf(bank_name,"bank%d",5+(i-10));
+					memory_set_bankptr(machine,bank_name, xRAM_ptr + (ti99_4p_mapper_on ? (ti99_4p_mapper_lookup[i]) : (i<<11)));
 					break;
 				}
 			}
@@ -2741,7 +2746,7 @@ static READ16_HANDLER(ti99_4p_mapper_r)
 static WRITE16_HANDLER(ti99_4p_mapper_w)
 {
 	int page = offset & 0xf;
-
+	char bank_name[10];
 	ti99_4p_mapper_lookup[page] = (data & 0xff00) << 3;
 
 	if (ti99_4p_mapper_on)
@@ -2751,7 +2756,8 @@ static WRITE16_HANDLER(ti99_4p_mapper_w)
 		{
 		case 2:
 		case 3:
-			memory_set_bankptr(space->machine,3+(page-2), xRAM_ptr+ti99_4p_mapper_lookup[page]);
+			sprintf(bank_name,"bank%d",3+(page-2));
+			memory_set_bankptr(space->machine,bank_name, xRAM_ptr+ti99_4p_mapper_lookup[page]);
 			break;
 
 		case 10:
@@ -2760,7 +2766,8 @@ static WRITE16_HANDLER(ti99_4p_mapper_w)
 		case 13:
 		case 14:
 		case 15:
-			memory_set_bankptr(space->machine,5+(page-10), xRAM_ptr+ti99_4p_mapper_lookup[page]);
+			sprintf(bank_name,"bank%d",5+(page-10));
+			memory_set_bankptr(space->machine,bank_name, xRAM_ptr+ti99_4p_mapper_lookup[page]);
 			break;
 		}
 	}

@@ -60,26 +60,26 @@
 #include "machine/smc92x4.h"
 
 static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK(1)								/*system ROM*/
-	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK(3)								/*lower 8kb of RAM extension: AMS bank 2*/
-	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK(4)								/*lower 8kb of RAM extension: AMS bank 3*/
+	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")								/*system ROM*/
+	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK("bank3")								/*lower 8kb of RAM extension: AMS bank 2*/
+	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK("bank4")								/*lower 8kb of RAM extension: AMS bank 3*/
 	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(ti99_4p_peb_r, ti99_4p_peb_w)	/*DSR ROM space*/
 	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(ti99_4p_cart_r,ti99_4p_cart_w)/*cartridge space (internal or hsgpl)*/
-	AM_RANGE(0x8000, 0x83ff) AM_RAMBANK(2)								/*RAM PAD*/
+	AM_RANGE(0x8000, 0x83ff) AM_RAMBANK("bank2")								/*RAM PAD*/
 	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(ti99_nop_8_r, ti99_wsnd_w)	/*soundchip write*/
 	AM_RANGE(0x8800, 0x8bff) AM_READWRITE(ti99_rv38_r, ti99_nop_8_w)	/*vdp read*/
 	AM_RANGE(0x8C00, 0x8fff) AM_READWRITE(ti99_nop_8_r, ti99_wv38_w)	/*vdp write*/
 	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(ti99_nop_8_r, ti99_nop_8_w)	/*speech read - installed dynamically*/
 	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(ti99_nop_8_r, ti99_nop_8_w)	/*speech write - installed dynamically*/
 	AM_RANGE(0x9800, 0x98ff) AM_READWRITE(ti99_4p_grom_r, ti99_nop_8_w)	/*GPL read*/
-	AM_RANGE(0x9900, 0x9bff) AM_RAMBANK(11)								/*extra RAM for debugger*/
+	AM_RANGE(0x9900, 0x9bff) AM_RAMBANK("bank11")								/*extra RAM for debugger*/
 	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(ti99_nop_8_r, ti99_4p_grom_w)	/*GPL write*/
-	AM_RANGE(0xa000, 0xafff) AM_RAMBANK(5)								/*upper 24kb of RAM extension: AMS bank 10*/
-	AM_RANGE(0xb000, 0xbfff) AM_RAMBANK(6)								/*upper 24kb of RAM extension: AMS bank 11*/
-	AM_RANGE(0xc000, 0xcfff) AM_RAMBANK(7)								/*upper 24kb of RAM extension: AMS bank 12*/
-	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK(8)								/*upper 24kb of RAM extension: AMS bank 13*/
-	AM_RANGE(0xe000, 0xefff) AM_RAMBANK(9)								/*upper 24kb of RAM extension: AMS bank 14*/
-	AM_RANGE(0xf000, 0xffff) AM_RAMBANK(10)								/*upper 24kb of RAM extension: AMS bank 15*/
+	AM_RANGE(0xa000, 0xafff) AM_RAMBANK("bank5")								/*upper 24kb of RAM extension: AMS bank 10*/
+	AM_RANGE(0xb000, 0xbfff) AM_RAMBANK("bank6")								/*upper 24kb of RAM extension: AMS bank 11*/
+	AM_RANGE(0xc000, 0xcfff) AM_RAMBANK("bank7")								/*upper 24kb of RAM extension: AMS bank 12*/
+	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK("bank8")								/*upper 24kb of RAM extension: AMS bank 13*/
+	AM_RANGE(0xe000, 0xefff) AM_RAMBANK("bank9")								/*upper 24kb of RAM extension: AMS bank 14*/
+	AM_RANGE(0xf000, 0xffff) AM_RAMBANK("bank10")								/*upper 24kb of RAM extension: AMS bank 15*/
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(cru_map, ADDRESS_SPACE_IO, 8)

@@ -97,21 +97,28 @@ static NVRAM_HANDLER( avigo )
 static void avigo_setbank(running_machine *machine, int bank, void *address, read8_space_func rh, write8_space_func wh)
 {
 	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	char bank_1[10];
+	char bank_5[10];
+
+	sprintf(bank_1,"bank%d",bank + 1);
+	sprintf(bank_5,"bank%d",bank + 5);
 	if (address)
 	{
-		memory_set_bankptr(machine, 1+bank, address);
-		memory_set_bankptr(machine, 5+bank, address);
+		memory_set_bankptr(machine, bank_1, address);
+		memory_set_bankptr(machine, bank_5, address);
 		avigo_banked_opbase[bank] = ((UINT8 *) address) - (bank * 0x4000);
 	}
 	if (rh)
 	{
-		memory_install_read8_handler(space, (bank * 0x4000),
-			(bank * 0x4000) + 0x3FFF, 0, 0, rh);
+		memory_install_read8_handler(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0, rh);
+	} else {
+		memory_nop_read(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0);
 	}
 	if (wh)
 	{
-		memory_install_write8_handler(space, (bank * 0x4000),
-			(bank * 0x4000) + 0x3FFF, 0, 0, wh);
+		memory_install_write8_handler(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0, wh);
+	} else {
+		memory_nop_write(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0);
 	}
 }
 
@@ -295,7 +302,8 @@ static const tc8521_interface avigo_tc8521_interface =
 static void avigo_refresh_memory(running_machine *machine)
 {
 	unsigned char *addr;
-
+	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	
 	switch (avigo_rom_bank_h)
 	{
 		/* 011 */
@@ -332,8 +340,12 @@ static void avigo_refresh_memory(running_machine *machine)
 		/* %001 */
 		/* ram */
 		case 0x01:
-			addr = messram_get_ptr(devtag_get_device(machine, "messram")) + ((avigo_ram_bank_l & 0x07)<<14);
-			avigo_setbank(machine, 2, addr, SMH_BANK(3), SMH_BANK(7));
+			addr = messram_get_ptr(devtag_get_device(machine, "messram")) + ((avigo_ram_bank_l & 0x07)<<14);			
+			memory_set_bankptr(machine, "bank3", addr);
+			memory_set_bankptr(machine, "bank7", addr);
+			avigo_banked_opbase[2] = ((UINT8 *) addr) - (2 * 0x4000);
+			memory_install_read_bank (space, (2 * 0x4000),(2 * 0x4000) + 0x3FFF, 0, 0, "bank3");
+			memory_install_write_bank(space, (2 * 0x4000),(2 * 0x4000) + 0x3FFF, 0, 0, "bank7");			
 			break;
 
 		/* %111 */
@@ -343,8 +355,7 @@ static void avigo_refresh_memory(running_machine *machine)
 
 			addr = (unsigned char *)intelflash_getmemptr(avigo_flash_at_0x8000);
 			addr = addr + (avigo_ram_bank_l<<14);
-			avigo_setbank(machine, 2, addr, avigo_flash_0x8000_read_handler,
-				SMH_NOP /* avigo_flash_0x8000_write_handler */);
+			avigo_setbank(machine, 2, addr, avigo_flash_0x8000_read_handler, NULL /* avigo_flash_0x8000_write_handler */);
 			break;
 
 		case 0x07:
@@ -352,8 +363,7 @@ static void avigo_refresh_memory(running_machine *machine)
 
 			addr = (unsigned char *)intelflash_getmemptr(avigo_flash_at_0x8000);
 			addr = addr + (avigo_ram_bank_l<<14);
-			avigo_setbank(machine, 2, addr, avigo_flash_0x8000_read_handler,
-				SMH_NOP /* avigo_flash_0x8000_write_handler */);
+			avigo_setbank(machine, 2, addr, avigo_flash_0x8000_read_handler, NULL /* avigo_flash_0x8000_write_handler */);
 			break;
 	}
 }
@@ -455,10 +465,10 @@ static MACHINE_START( avigo )
 
 
 static ADDRESS_MAP_START( avigo_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE( SMH_BANK(1), SMH_BANK(5) )
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE( SMH_BANK(2), SMH_BANK(6) )
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE( SMH_BANK(3), SMH_BANK(7) )
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE( SMH_BANK(4), SMH_BANK(8) )
+	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
+	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
+	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
+	AM_RANGE(0xc000, 0xffff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank8")
 ADDRESS_MAP_END
 
 

@@ -651,44 +651,44 @@ const game_driver * const drivers[] =
     DRIVER( ip244415 )	/* IP24: Indigo 2, R4400, 150MHz                    */
 
     /* Texas Instruments */
-//mess0135u3    DRIVER( ti990_10 )  /* 1975 TI 990/10                                   */
-//mess0135u3    DRIVER( ti990_4 )   /* 1976 TI 990/4                                    */
-//mess0135u3    DRIVER( 990189 )    /* 1978 TM 990/189                                  */
-//mess0135u3    DRIVER( 990189v )   /* 1980 TM 990/189 with Color Video Board           */
-//mess0135u3
-//mess0135u3    DRIVER( ti99_224 )  /* 1983 TI 99/2 (24kb ROMs)                         */
-//mess0135u3    DRIVER( ti99_232 )  /* 1983 TI 99/2 (32kb ROMs)                         */
-//mess0135u3    DRIVER( ti99_4 )    /* 1979 TI-99/4                                     */
-//mess0135u3    DRIVER( ti99_4e )   /* 1980 TI-99/4 with 50Hz video                     */
-//mess0135u3    DRIVER( ti99_4a )   /* 1981 TI-99/4A                                    */
-//mess0135u3    DRIVER( ti99_4ae )  /* 1981 TI-99/4A with 50Hz video                    */
-//mess0135u3    DRIVER( ti99_4ev)   /* 1994 TI-99/4A with EVPC video card               */
-//mess0135u3    DRIVER( ti99_8 )    /* 1983 TI-99/8                                     */
-//mess0135u3    DRIVER( ti99_8e )   /* 1983 TI-99/8 with 50Hz video                     */
-//mess0135u3
-//mess0135u3    /* TI 99 clones */
-//mess0135u3    DRIVER( tutor)      /* 1983? Tomy Tutor                                 */
-//mess0135u3    DRIVER( geneve )    /* 1987? Myarc Geneve 9640                          */
-//mess0135u3    DRIVER( genmod )    /* 199?? Myarc Geneve 9640                          */
-//mess0135u3    DRIVER( ti99_4p )   /* 1996 SNUG 99/4P (a.k.a. SGCPU)                   */
-//mess0135u3
-//mess0135u3    DRIVER( avigo )     /*                                                  */
-//mess0135u3
-//mess0135u3    /* Texas Instruments Calculators */
-//mess0135u3    DRIVER( ti73 )      /* 1990 TI-73                                       */
-//mess0135u3    DRIVER( ti81 )      /* 1990 TI-81 (Z80 2 MHz)                           */
-//mess0135u3    DRIVER( ti81v2 )    /* 1990 TI-81 (Z80 2 MHz)                           */
-//mess0135u3    DRIVER( ti85 )      /* 1992 TI-85 (Z80 6 MHz)                           */
-//mess0135u3    DRIVER( ti82 )      /* 1993 TI-82 (Z80 6 MHz)                           */
-//mess0135u3    DRIVER( ti83 )      /* 1996 TI-83 (Z80 6 MHz)                           */
-//mess0135u3    DRIVER( ti86 )      /* 1997 TI-86 (Z80 6 MHz)                           */
-//mess0135u3    DRIVER( ti83p )     /* 1999 TI-83 Plus (Z80 6 MHz)                      */
-//mess0135u3    DRIVER( ti83pse )   /* 2001 TI-83 Plus Silver Edition                   */
-//mess0135u3//  DRIVER( ti84p )     /* 2004 TI-84 Plus                                  */
-//mess0135u3    DRIVER( ti84pse )   /* 2004 TI-84 Plus Silver Edition                   */
-//mess0135u3    DRIVER( ti89 )      /* 1998 TI-89                                       */
-//mess0135u3    DRIVER( ti92 )      /* 1995 TI-92                                       */
-//mess0135u3    DRIVER( ti92p )     /* 1999 TI-92 Plus                                  */
+    DRIVER( ti990_10 )  /* 1975 TI 990/10                                   */
+    DRIVER( ti990_4 )   /* 1976 TI 990/4                                    */
+    DRIVER( 990189 )    /* 1978 TM 990/189                                  */
+    DRIVER( 990189v )   /* 1980 TM 990/189 with Color Video Board           */
+
+    DRIVER( ti99_224 )  /* 1983 TI 99/2 (24kb ROMs)                         */
+    DRIVER( ti99_232 )  /* 1983 TI 99/2 (32kb ROMs)                         */
+    DRIVER( ti99_4 )    /* 1979 TI-99/4                                     */
+    DRIVER( ti99_4e )   /* 1980 TI-99/4 with 50Hz video                     */
+    DRIVER( ti99_4a )   /* 1981 TI-99/4A                                    */
+    DRIVER( ti99_4ae )  /* 1981 TI-99/4A with 50Hz video                    */
+    DRIVER( ti99_4ev)   /* 1994 TI-99/4A with EVPC video card               */
+    DRIVER( ti99_8 )    /* 1983 TI-99/8                                     */
+    DRIVER( ti99_8e )   /* 1983 TI-99/8 with 50Hz video                     */
+
+    /* TI 99 clones */
+    DRIVER( tutor)      /* 1983? Tomy Tutor                                 */
+    DRIVER( geneve )    /* 1987? Myarc Geneve 9640                          */
+    DRIVER( genmod )    /* 199?? Myarc Geneve 9640                          */
+    DRIVER( ti99_4p )   /* 1996 SNUG 99/4P (a.k.a. SGCPU)                   */
+
+    DRIVER( avigo )     /*                                                  */
+
+    /* Texas Instruments Calculators */
+    DRIVER( ti73 )      /* 1990 TI-73                                       */
+    DRIVER( ti81 )      /* 1990 TI-81 (Z80 2 MHz)                           */
+    DRIVER( ti81v2 )    /* 1990 TI-81 (Z80 2 MHz)                           */
+    DRIVER( ti85 )      /* 1992 TI-85 (Z80 6 MHz)                           */
+    DRIVER( ti82 )      /* 1993 TI-82 (Z80 6 MHz)                           */
+    DRIVER( ti83 )      /* 1996 TI-83 (Z80 6 MHz)                           */
+    DRIVER( ti86 )      /* 1997 TI-86 (Z80 6 MHz)                           */
+    DRIVER( ti83p )     /* 1999 TI-83 Plus (Z80 6 MHz)                      */
+    DRIVER( ti83pse )   /* 2001 TI-83 Plus Silver Edition                   */
+//  DRIVER( ti84p )     /* 2004 TI-84 Plus                                  */
+    DRIVER( ti84pse )   /* 2004 TI-84 Plus Silver Edition                   */
+    DRIVER( ti89 )      /* 1998 TI-89                                       */
+    DRIVER( ti92 )      /* 1995 TI-92                                       */
+    DRIVER( ti92p )     /* 1999 TI-92 Plus                                  */
 
     /* NEC */
     DRIVER( pc6001 )
