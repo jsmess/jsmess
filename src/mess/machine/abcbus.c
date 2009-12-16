@@ -57,12 +57,12 @@ READ8_HANDLER( abcbus_reset_r )
 		device_reset(daisy->device);
 
 	/* uninstall I/O handlers */
-	memory_install_readwrite8_handler(cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_IO), ABCBUS_INP, ABCBUS_OUT, 0x18, 0, SMH_NOP, SMH_NOP);
-	memory_install_read8_handler(cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_IO), ABCBUS_STAT, ABCBUS_STAT, 0x18, 0, SMH_NOP);
-	memory_install_write8_handler(cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_IO), ABCBUS_C1, ABCBUS_C1, 0x18, 0, SMH_NOP);
-	memory_install_write8_handler(cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_IO), ABCBUS_C2, ABCBUS_C2, 0x18, 0, SMH_NOP);
-	memory_install_write8_handler(cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_IO), ABCBUS_C3, ABCBUS_C3, 0x18, 0, SMH_NOP);
-	memory_install_write8_handler(cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_IO), ABCBUS_C4, ABCBUS_C4, 0x18, 0, SMH_NOP);
+	memory_nop_readwrite(cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_IO), ABCBUS_INP, ABCBUS_OUT, 0x18, 0);
+	memory_nop_read(cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_IO), ABCBUS_STAT, ABCBUS_STAT, 0x18, 0);
+	memory_nop_write(cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_IO), ABCBUS_C1, ABCBUS_C1, 0x18, 0);
+	memory_nop_write(cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_IO), ABCBUS_C2, ABCBUS_C2, 0x18, 0);
+	memory_nop_write(cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_IO), ABCBUS_C3, ABCBUS_C3, 0x18, 0);
+	memory_nop_write(cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_IO), ABCBUS_C4, ABCBUS_C4, 0x18, 0);
 
 	return 0xff;
 }

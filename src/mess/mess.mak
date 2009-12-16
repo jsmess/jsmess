@@ -378,11 +378,11 @@ DRVLIBS = \
 	$(MESSOBJ)/conitec.a \
 	$(MESSOBJ)/atari.a \
 	$(MESSOBJ)/ti.a \
+	$(MESSOBJ)/luxor.a \
 	$(MESSOBJ)/shared.a \
 #	$(MESSOBJ)/apple.a \
 #	$(MESSOBJ)/be.a \
 #	$(MESSOBJ)/hp.a \
-#	$(MESSOBJ)/luxor.a \
 
 #-------------------------------------------------
 # the following files are general components and
@@ -492,6 +492,8 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/applefdc.o	\
 	$(MESS_DEVICES)/sonydriv.o	\
 	$(MESS_DEVICES)/appldriv.o	\
+	$(MESS_FORMATS)/ap2_dsk.o	\
+	$(MESS_FORMATS)/ap_dsk35.o	\
 
 
 
@@ -559,8 +561,6 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_VIDEO)/apple2gs.o	\
 	$(MESS_MACHINE)/apple2gs.o	\
 	$(MESS_DRIVERS)/apple2gs.o	\
-	$(MESS_FORMATS)/ap2_dsk.o	\
-	$(MESS_FORMATS)/ap_dsk35.o	\
 	$(MESS_MACHINE)/ay3600.o	\
 	$(MESS_MACHINE)/ap2_slot.o	\
 	$(MESS_MACHINE)/ap2_lang.o	\

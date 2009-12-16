@@ -1117,12 +1117,12 @@ const game_driver * const drivers[] =
     DRIVER( tx0_8kw )   /* 1962 MIT TX-0 (8kw RAM)                          */
 
     /* Luxor Datorer AB */
-//mess0135u3    DRIVER( abc80 )
-//mess0135u3//  DRIVER( abc80h )
-//mess0135u3    DRIVER( abc802 )
-//mess0135u3    DRIVER( abc800m )
-//mess0135u3    DRIVER( abc800c )
-//mess0135u3    DRIVER( abc806 )
+    DRIVER( abc80 )
+//  DRIVER( abc80h )
+    DRIVER( abc802 )
+    DRIVER( abc800m )
+    DRIVER( abc800c )
+    DRIVER( abc806 )
 
     /* Be Incorporated */
 //mess0135u3    DRIVER( bebox )     /* BeBox Dual603-66                                 */

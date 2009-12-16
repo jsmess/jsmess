@@ -216,15 +216,16 @@ static void abc800_bankswitch(running_machine *machine)
 	if (state->fetch_charram)
 	{
 		/* HR video RAM selected */
-		memory_install_readwrite8_handler(program, 0x0000, 0x3fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+		memory_install_readwrite_bank(program, 0x0000, 0x3fff, 0, 0, "bank1");
 	}
 	else
 	{
 		/* BASIC ROM selected */
-		memory_install_readwrite8_handler(program, 0x0000, 0x3fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
+		memory_install_read_bank(program, 0x0000, 0x3fff, 0, 0, "bank1");
+		memory_unmap_write(program, 0x0000, 0x3fff, 0, 0);
 	}
 
-	memory_set_bank(machine, 1, state->fetch_charram);
+	memory_set_bank(machine, "bank1", state->fetch_charram);
 }
 
 static void abc802_bankswitch(running_machine *machine)
@@ -235,16 +236,16 @@ static void abc802_bankswitch(running_machine *machine)
 	if (state->lrs)
 	{
 		/* ROM and video RAM selected */
-		memory_install_readwrite8_handler(program, 0x0000, 0x77ff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+		memory_install_readwrite_bank(program, 0x0000, 0x77ff, 0, 0, "bank1");
 		memory_install_readwrite8_handler(program, 0x7800, 0x7fff, 0, 0, abc802_charram_r, abc802_charram_w);
 	}
 	else
 	{
 		/* low RAM selected */
-		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+		memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
 	}
 
-	memory_set_bank(machine, 1, state->lrs);
+	memory_set_bank(machine, "bank1", state->lrs);
 }
 
 static void abc806_bankswitch(running_machine *machine)
@@ -252,7 +253,8 @@ static void abc806_bankswitch(running_machine *machine)
 	abc806_state *state = machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT32 videoram_mask = messram_get_size(devtag_get_device(machine, "messram")) - (32 * 1024) - 1;
-	FPTR bank;
+	int bank;
+	char bank_name[10];
 
 	if (!state->keydtr)
 	{
@@ -267,12 +269,12 @@ static void abc806_bankswitch(running_machine *machine)
 			UINT16 start_addr = 0x1000 * (bank - 1);
 			UINT16 end_addr = start_addr + 0xfff;
 			UINT32 videoram_offset = (videoram_start + start_addr) & videoram_mask;
-
+			sprintf(bank_name,"bank%d",bank);
 			//logerror("%04x-%04x: Video RAM %04x (32K)\n", start_addr, end_addr, videoram_offset);
 
-			memory_install_readwrite8_handler(program, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
-			memory_configure_bank(machine, bank, 1, 1, state->videoram + videoram_offset, 0);
-			memory_set_bank(machine, bank, 1);
+			memory_install_readwrite_bank(program, start_addr, end_addr, 0, 0, bank_name);
+			memory_configure_bank(machine, bank_name, 1, 1, state->videoram + videoram_offset, 0);
+			memory_set_bank(machine, bank_name, 1);
 		}
 
 		for (bank = 9; bank <= 16; bank++)
@@ -281,11 +283,11 @@ static void abc806_bankswitch(running_machine *machine)
 
 			UINT16 start_addr = 0x1000 * (bank - 1);
 			UINT16 end_addr = start_addr + 0xfff;
-
+			sprintf(bank_name,"bank%d",bank);
 			//logerror("%04x-%04x: Work RAM (32K)\n", start_addr, end_addr);
 
-			memory_install_readwrite8_handler(program, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
-			memory_set_bank(machine, bank, 0);
+			memory_install_readwrite_bank(program, start_addr, end_addr, 0, 0, bank_name);
+			memory_set_bank(machine, bank_name, 0);
 		}
 	}
 	else
@@ -298,15 +300,15 @@ static void abc806_bankswitch(running_machine *machine)
 			UINT16 end_addr = start_addr + 0xfff;
 			UINT8 map = state->map[bank - 1];
 			UINT32 videoram_offset = ((map & 0x7f) << 12) & videoram_mask;
-
+			sprintf(bank_name,"bank%d",bank);
 			if (BIT(map, 7) && state->eme)
 			{
 				/* map to video RAM */
 				//logerror("%04x-%04x: Video RAM %04x (4K)\n", start_addr, end_addr, videoram_offset);
 
-				memory_install_readwrite8_handler(program, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
-				memory_configure_bank(machine, bank, 1, 1, state->videoram + videoram_offset, 0);
-				memory_set_bank(machine, bank, 1);
+				memory_install_readwrite_bank(program, start_addr, end_addr, 0, 0, bank_name);
+				memory_configure_bank(machine, bank_name, 1, 1, state->videoram + videoram_offset, 0);
+				memory_set_bank(machine, bank_name, 1);
 			}
 			else
 			{
@@ -318,25 +320,27 @@ static void abc806_bankswitch(running_machine *machine)
 					/* ROM */
 					//logerror("%04x-%04x: ROM (4K)\n", start_addr, end_addr);
 
-					memory_install_readwrite8_handler(program, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_UNMAP);
-					memory_set_bank(machine, bank, 0);
+					memory_install_read_bank(program, start_addr, end_addr, 0, 0, bank_name);
+					memory_unmap_write(program, start_addr, end_addr, 0, 0);
+					memory_set_bank(machine, bank_name, 0);
 					break;
 
 				case 8:
 					/* ROM/char RAM */
 					//logerror("%04x-%04x: ROM (4K)\n", start_addr, end_addr);
 
-					memory_install_readwrite8_handler(program, 0x7000, 0x77ff, 0, 0, SMH_BANK(bank), SMH_UNMAP);
+					memory_install_read_bank(program, 0x7000, 0x77ff, 0, 0, bank_name);
+					memory_unmap_write(program, 0x7000, 0x77ff, 0, 0);
 					memory_install_readwrite8_handler(program, 0x7800, 0x7fff, 0, 0, abc806_charram_r, abc806_charram_w);
-					memory_set_bank(machine, bank, 0);
+					memory_set_bank(machine, bank_name, 0);
 					break;
 
 				default:
 					/* work RAM */
 					//logerror("%04x-%04x: Work RAM (4K)\n", start_addr, end_addr);
 
-					memory_install_readwrite8_handler(program, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
-					memory_set_bank(machine, bank, 0);
+					memory_install_readwrite_bank(program, start_addr, end_addr, 0, 0, bank_name);
+					memory_set_bank(machine, bank_name, 0);
 					break;
 				}
 			}
@@ -356,21 +360,21 @@ static void abc806_bankswitch(running_machine *machine)
 			UINT16 start_addr = 0x1000 * (bank - 1);
 			UINT16 end_addr = start_addr + 0xfff;
 			UINT32 videoram_offset = (videoram_start + start_addr) & videoram_mask;
-
+			sprintf(bank_name,"bank%d",bank);
 			//logerror("%04x-%04x: Video RAM %04x (30K)\n", start_addr, end_addr, videoram_offset);
 
 			if (start_addr == 0x7000)
 			{
-				memory_install_readwrite8_handler(program, 0x7000, 0x77ff, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
+				memory_install_readwrite_bank(program, 0x7000, 0x77ff, 0, 0, bank_name);
 				memory_install_readwrite8_handler(program, 0x7800, 0x7fff, 0, 0, abc806_charram_r, abc806_charram_w);
 			}
 			else
 			{
-				memory_install_readwrite8_handler(program, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
+				memory_install_readwrite_bank(program, start_addr, end_addr, 0, 0, bank_name);
 			}
 
-			memory_configure_bank(machine, bank, 1, 1, state->videoram + videoram_offset, 0);
-			memory_set_bank(machine, bank, 1);
+			memory_configure_bank(machine, bank_name, 1, 1, state->videoram + videoram_offset, 0);
+			memory_set_bank(machine, bank_name, 1);
 		}
 	}
 }
@@ -480,7 +484,7 @@ static READ8_HANDLER( abc802_pling_r )
 
 static ADDRESS_MAP_START( abc800m_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1)
+	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_READWRITE(abc800_charram_r, abc800_charram_w)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
@@ -505,7 +509,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc800c_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1)
+	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7bff) AM_ROM
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_READWRITE(abc800_charram_r, abc800_charram_w)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
@@ -527,7 +531,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc802_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK(1)
+	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -549,22 +553,22 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc806_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
-	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK(2)
-	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK(3)
-	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK(4)
-	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK(5)
-	AM_RANGE(0x5000, 0x5fff) AM_RAMBANK(6)
-	AM_RANGE(0x6000, 0x6fff) AM_RAMBANK(7)
-	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK(8)
-	AM_RANGE(0x8000, 0x8fff) AM_RAMBANK(9)
-	AM_RANGE(0x9000, 0x9fff) AM_RAMBANK(10)
-	AM_RANGE(0xa000, 0xafff) AM_RAMBANK(11)
-	AM_RANGE(0xb000, 0xbfff) AM_RAMBANK(12)
-	AM_RANGE(0xc000, 0xcfff) AM_RAMBANK(13)
-	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK(14)
-	AM_RANGE(0xe000, 0xefff) AM_RAMBANK(15)
-	AM_RANGE(0xf000, 0xffff) AM_RAMBANK(16)
+	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK("bank3")
+	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK("bank4")
+	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank5")
+	AM_RANGE(0x5000, 0x5fff) AM_RAMBANK("bank6")
+	AM_RANGE(0x6000, 0x6fff) AM_RAMBANK("bank7")
+	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank8")
+	AM_RANGE(0x8000, 0x8fff) AM_RAMBANK("bank9")
+	AM_RANGE(0x9000, 0x9fff) AM_RAMBANK("bank10")
+	AM_RANGE(0xa000, 0xafff) AM_RAMBANK("bank11")
+	AM_RANGE(0xb000, 0xbfff) AM_RAMBANK("bank12")
+	AM_RANGE(0xc000, 0xcfff) AM_RAMBANK("bank13")
+	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK("bank14")
+	AM_RANGE(0xe000, 0xefff) AM_RAMBANK("bank15")
+	AM_RANGE(0xf000, 0xffff) AM_RAMBANK("bank16")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
@@ -977,8 +981,8 @@ static MACHINE_START( abc800 )
 	/* configure memory */
 	state->videoram = auto_alloc_array(machine, UINT8, ABC800_VIDEO_RAM_SIZE);
 
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(machine, 1, 1, 1, state->videoram, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, state->videoram, 0);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->fetch_charram);
@@ -1006,8 +1010,8 @@ static MACHINE_START( abc802 )
 	abcbus_init(machine, Z80_TAG, abc802_abcbus_config); // TODO: enable floppy
 
 	/* configure memory */
-	memory_configure_bank(machine, 1, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, Z80_TAG), 0);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->lrs);
@@ -1021,7 +1025,7 @@ static MACHINE_RESET( abc802 )
 	UINT8 config = input_port_read(machine, "CONFIG");
 
 	/* memory banking */
-	memory_set_bank(machine, 1, 1);
+	memory_set_bank(machine, "bank1", 1);
 
 	/* clear screen time out (S1) */
 	z80sio_set_dcd(state->z80sio, 1, BIT(config, 0));
@@ -1043,6 +1047,7 @@ static MACHINE_START( abc806 )
 	UINT8 *mem = memory_region(machine, Z80_TAG);
 	UINT32 videoram_size = messram_get_size(devtag_get_device(machine, "messram")) - (32 * 1024);
 	int bank;
+	char bank_name[10];
 
 	/* find devices */
 	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
@@ -1060,9 +1065,10 @@ static MACHINE_START( abc806 )
 
 	for (bank = 1; bank <= 16; bank++)
 	{
-		memory_configure_bank(machine, bank, 0, 1, mem + (0x1000 * (bank - 1)), 0);
-		memory_configure_bank(machine, bank, 1, 1, state->videoram, 0);
-		memory_set_bank(machine, bank, 0);
+		sprintf(bank_name,"bank%d",bank);
+		memory_configure_bank(machine, bank_name, 0, 1, mem + (0x1000 * (bank - 1)), 0);
+		memory_configure_bank(machine, bank_name, 1, 1, state->videoram, 0);
+		memory_set_bank(machine, bank_name, 0);
 	}
 
 	/* register for state saving */
@@ -1078,10 +1084,12 @@ static MACHINE_RESET( abc806 )
 
 	/* setup memory banking */
 	int bank;
+	char bank_name[10];
 
 	for (bank = 1; bank <= 16; bank++)
 	{
-		memory_set_bank(machine, bank, 0);
+		sprintf(bank_name,"bank%d",bank);
+		memory_set_bank(machine, bank_name, 0);
 	}
 
 	abc806_bankswitch(machine);

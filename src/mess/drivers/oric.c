@@ -380,8 +380,7 @@ static const floppy_config prav8d_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
-//mess0135u3    FLOPPY_OPTIONS_NAME(apple2),
-	FLOPPY_OPTIONS_NAME(oric),
+    FLOPPY_OPTIONS_NAME(apple2),
 	DO_NOT_KEEP_GEOMETRY
 };
 

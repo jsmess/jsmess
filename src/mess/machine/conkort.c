@@ -244,9 +244,9 @@ static ABCBUS_CARD_SELECT( luxor_55_10828 )
 		memory_install_readwrite8_handler(io, ABCBUS_INP, ABCBUS_OUT, 0x18, 0, slow_bus_data_r, slow_bus_data_w);
 		memory_install_read8_handler(io, ABCBUS_STAT, ABCBUS_STAT, 0x18, 0, slow_bus_stat_r);
 		memory_install_write8_handler(io, ABCBUS_C1, ABCBUS_C1, 0x18, 0, slow_bus_c1_w);
-		memory_install_write8_handler(io, ABCBUS_C2, ABCBUS_C2, 0x18, 0, SMH_NOP);
+		memory_nop_write(io, ABCBUS_C2, ABCBUS_C2, 0x18, 0);
 		memory_install_write8_handler(io, ABCBUS_C3, ABCBUS_C3, 0x18, 0, slow_bus_c3_w);
-		memory_install_write8_handler(io, ABCBUS_C4, ABCBUS_C4, 0x18, 0, SMH_NOP);
+		memory_nop_write(io, ABCBUS_C4, ABCBUS_C4, 0x18, 0);
 	}
 
 	cpu_set_input_line(conkort->cpu, INPUT_LINE_RESET, PULSE_LINE);
@@ -421,9 +421,9 @@ static ABCBUS_CARD_SELECT( luxor_55_21046 )
 		memory_install_readwrite8_handler(io, ABCBUS_INP, ABCBUS_OUT, 0x18, 0, fast_bus_data_r, fast_bus_data_w);
 		memory_install_read8_handler(io, ABCBUS_STAT, ABCBUS_STAT, 0x18, 0, fast_bus_stat_r);
 		memory_install_write8_handler(io, ABCBUS_C1, ABCBUS_C1, 0x18, 0, fast_bus_c1_w);
-		memory_install_write8_handler(io, ABCBUS_C2, ABCBUS_C2, 0x18, 0, SMH_NOP);
+		memory_nop_write(io, ABCBUS_C2, ABCBUS_C2, 0x18, 0);
 		memory_install_write8_handler(io, ABCBUS_C3, ABCBUS_C3, 0x18, 0, fast_bus_c3_w);
-		memory_install_write8_handler(io, ABCBUS_C4, ABCBUS_C4, 0x18, 0, SMH_NOP);
+		memory_nop_write(io, ABCBUS_C4, ABCBUS_C4, 0x18, 0);
 	}
 
 	cpu_set_input_line(conkort->cpu, INPUT_LINE_RESET, PULSE_LINE);
