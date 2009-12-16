@@ -213,10 +213,6 @@ static INPUT_PORTS_START( interact )
 	PORT_INCLUDE( at_keyboard )
 INPUT_PORTS_END
 
-
-static SYSTEM_CONFIG_START(interact)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( interact )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -231,5 +227,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG      COMPANY   FULLNAME       FLAGS */
-COMP(1979, interact,        0, 0,   interact, interact,     0,	interact,  	 "Interact",   "Interact Family Computer", GAME_IMPERFECT_SOUND)
-COMP(????, hector1,  interact, 0, 	hector1, interact,     0,  interact,  	 "Micronique", "Hector 1",	GAME_IMPERFECT_SOUND)
+COMP(1979, interact, 0, 		0,   interact, 	interact, 0,		0,  	 "Interact",   "Interact Family Computer", GAME_IMPERFECT_SOUND)
+COMP(????, hector1,  interact, 	0, 	 hector1, 	interact, 0,  		0,  	 "Micronique", "Hector 1",	GAME_IMPERFECT_SOUND)

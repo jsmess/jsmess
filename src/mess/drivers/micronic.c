@@ -53,9 +53,6 @@ static MACHINE_DRIVER_START( micronic )
     MDRV_VIDEO_UPDATE(micronic)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(micronic)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( micronic )
     ROM_REGION( 0x18000, "maincpu", 0 )
@@ -67,4 +64,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 198?, micronic,  0,       0, 	micronic, 	micronic, 	 0,  	  micronic,  	 "Victor Micronic",   "Micronic 1000",		GAME_NOT_WORKING)
+COMP( 198?, micronic,  0,       0, 	micronic, 	micronic, 	 0,  0,  	 "Victor Micronic",   "Micronic 1000",		GAME_NOT_WORKING)

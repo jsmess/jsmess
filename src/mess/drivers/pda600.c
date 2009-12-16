@@ -114,9 +114,6 @@ static MACHINE_DRIVER_START( pda600 )
     MDRV_VIDEO_UPDATE(pda600)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(pda600)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( pda600 )
     ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
@@ -125,6 +122,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1993, pda600,  0,       0, 	pda600, 	pda600, 	 0,  	  pda600,  	 "Amstrad",   "PenPad PDA 600",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   	FULLNAME       FLAGS */
+COMP( 1993, pda600,  0,       0, 	pda600, 	pda600,  0,  	 0,  	 "Amstrad",   "PenPad PDA 600",		GAME_NOT_WORKING)
 

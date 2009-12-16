@@ -75,9 +75,6 @@ static MACHINE_DRIVER_START( sun1 )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sun1_terminal_intf)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(sun1)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( sun1 )
     ROM_REGION( 0x4000, "user1", ROMREGION_ERASEFF )
@@ -104,5 +101,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1982, sun1,  0,       0, 	sun1, 	sun1, 	 0,  	  sun1,  	 "Sun Microsystems",   "Sun-1",		GAME_NOT_WORKING)
+COMP( 1982, sun1,  0,       0, 		 sun1, 		sun1, 	 0,  	  0,  	 "Sun Microsystems",   "Sun-1",		GAME_NOT_WORKING)
 
