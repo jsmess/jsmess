@@ -1407,7 +1407,7 @@ static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000,0x7fff) AM_RAM
 	AM_RANGE(0x8000,0xfbff) AM_ROMBANK("bank1") // also F-BASIC ROM, when enabled
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
-	AM_RANGE(0xfc80,0xfcff) AM_RAM AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
+	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
 	// I/O space (FD00-FDFF)
 	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
 	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
@@ -1477,7 +1477,7 @@ static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000,0xefff) AM_RAMBANK("bank15")
 	AM_RANGE(0xf000,0xfbff) AM_RAMBANK("bank16")
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
-	AM_RANGE(0xfc80,0xfcff) AM_RAM AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
+	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
 	// I/O space (FD00-FDFF)
 	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
 	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
