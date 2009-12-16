@@ -141,7 +141,7 @@
 #include "devices/flopdrv.h"
 #include "formats/g64_dsk.h"
 #include "machine/6522via.h"
-#include "machine/cbmserial.h"
+#include "machine/cbmiec.h"
 
 /***************************************************************************
     PARAMETERS
@@ -293,21 +293,21 @@ static TIMER_CALLBACK( bit_tick )
     c1541_atn_w - serial bus attention
 -------------------------------------------------*/
 
-static CBMSERIAL_ATN( c1541 )
+static CBM_IEC_ATN( c1541 )
 {
 	c1541_t *c1541 = get_safe_token(device);
 	int data_out = !c1541->data_out && !(c1541->atna ^ !state);
 
 	via_ca1_w(c1541->via0, 0, !state);
 
-	cbmserial_data_w(c1541->serial_bus, device, data_out);
+	cbm_iec_data_w(c1541->serial_bus, device, data_out);
 }
 
 /*-------------------------------------------------
     c1541_reset_w - serial bus reset
 -------------------------------------------------*/
 
-static CBMSERIAL_RESET( c1541 )
+static CBM_IEC_RESET( c1541 )
 {
 	if (!state)
 	{
@@ -410,16 +410,16 @@ static READ8_DEVICE_HANDLER( via0_pb_r )
 	UINT8 data = 0;
 
 	/* data in */
-	data = !cbmserial_data_r(c1541->serial_bus);
+	data = !cbm_iec_data_r(c1541->serial_bus);
 
 	/* clock in */
-	data |= !cbmserial_clk_r(c1541->serial_bus) << 2;
+	data |= !cbm_iec_clk_r(c1541->serial_bus) << 2;
 
 	/* serial bus address */
 	data |= c1541->address << 5;
 
 	/* attention in */
-	data |= !cbmserial_atn_r(c1541->serial_bus) << 7;
+	data |= !cbm_iec_atn_r(c1541->serial_bus) << 7;
 
 	return data;
 }
@@ -448,12 +448,12 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 	int atna = BIT(data, 4);
 
 	/* data out */
-	int serial_data = !data_out && !(atna ^ !cbmserial_atn_r(c1541->serial_bus));
-	cbmserial_data_w(c1541->serial_bus, device->owner, serial_data);
+	int serial_data = !data_out && !(atna ^ !cbm_iec_atn_r(c1541->serial_bus));
+	cbm_iec_data_w(c1541->serial_bus, device->owner, serial_data);
 	c1541->data_out = data_out;
 
 	/* clock out */
-	cbmserial_clk_w(c1541->serial_bus, device->owner, !clk_out);
+	cbm_iec_clk_w(c1541->serial_bus, device->owner, !clk_out);
 
 	/* attention acknowledge */
 	c1541->atna = atna;
@@ -1074,8 +1074,8 @@ DEVICE_GET_INFO( c1540 )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1541);						break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1541);						break;
-		case DEVINFO_FCT_CBM_SERIAL_ATN:				info->f = (genf *)CBMSERIAL_ATN_NAME(c1541);				break;
-		case DEVINFO_FCT_CBM_SERIAL_RESET:				info->f = (genf *)CBMSERIAL_RESET_NAME(c1541);				break;
+		case DEVINFO_FCT_CBM_IEC_ATN:					info->f = (genf *)CBM_IEC_ATN_NAME(c1541);				break;
+		case DEVINFO_FCT_CBM_IEC_RESET:					info->f = (genf *)CBM_IEC_RESET_NAME(c1541);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore VIC-1540");						break;
@@ -1107,8 +1107,8 @@ DEVICE_GET_INFO( c1541 )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1541);						break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1541);						break;
-		case DEVINFO_FCT_CBM_SERIAL_ATN:				info->f = (genf *)CBMSERIAL_ATN_NAME(c1541);				break;
-		case DEVINFO_FCT_CBM_SERIAL_RESET:				info->f = (genf *)CBMSERIAL_RESET_NAME(c1541);				break;
+		case DEVINFO_FCT_CBM_IEC_ATN:					info->f = (genf *)CBM_IEC_ATN_NAME(c1541);				break;
+		case DEVINFO_FCT_CBM_IEC_RESET:					info->f = (genf *)CBM_IEC_RESET_NAME(c1541);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1541");							break;
@@ -1140,8 +1140,8 @@ DEVICE_GET_INFO( c1541c )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1541);						break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1541);						break;
-		case DEVINFO_FCT_CBM_SERIAL_ATN:				info->f = (genf *)CBMSERIAL_ATN_NAME(c1541);				break;
-		case DEVINFO_FCT_CBM_SERIAL_RESET:				info->f = (genf *)CBMSERIAL_RESET_NAME(c1541);				break;
+		case DEVINFO_FCT_CBM_IEC_ATN:					info->f = (genf *)CBM_IEC_ATN_NAME(c1541);				break;
+		case DEVINFO_FCT_CBM_IEC_RESET:					info->f = (genf *)CBM_IEC_RESET_NAME(c1541);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1541C");							break;
@@ -1173,8 +1173,8 @@ DEVICE_GET_INFO( c1541ii )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1541);						break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1541);						break;
-		case DEVINFO_FCT_CBM_SERIAL_ATN:				info->f = (genf *)CBMSERIAL_ATN_NAME(c1541);				break;
-		case DEVINFO_FCT_CBM_SERIAL_RESET:				info->f = (genf *)CBMSERIAL_RESET_NAME(c1541);				break;
+		case DEVINFO_FCT_CBM_IEC_ATN:					info->f = (genf *)CBM_IEC_ATN_NAME(c1541);				break;
+		case DEVINFO_FCT_CBM_IEC_RESET:					info->f = (genf *)CBM_IEC_RESET_NAME(c1541);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1541-II");						break;

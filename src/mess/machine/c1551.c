@@ -13,7 +13,6 @@
 #include "devices/flopdrv.h"
 #include "formats/g64_dsk.h"
 #include "machine/6525tpi.h"
-#include "machine/cbmserial.h"
 
 /***************************************************************************
     PARAMETERS

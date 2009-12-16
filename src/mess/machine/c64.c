@@ -19,7 +19,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
-#include "machine/cbmserial.h"
+#include "machine/cbmiec.h"
 #include "video/vic6567.h"
 #include "video/vdc8563.h"
 
@@ -203,12 +203,12 @@ const cia6526_interface c64_pal_cia0 =
 static READ8_DEVICE_HANDLER( c64_cia1_port_a_r )
 {
 	UINT8 value = 0xff;
-	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
+	const device_config *serbus = devtag_get_device(device->machine, "iec");
 
-	if (!cbmserial_clk_r(serbus))
+	if (!cbm_iec_clk_r(serbus))
 		value &= ~0x40;
 
-	if (!cbmserial_data_r(serbus))
+	if (!cbm_iec_data_r(serbus))
 		value &= ~0x80;
 
 	return value;
@@ -217,11 +217,11 @@ static READ8_DEVICE_HANDLER( c64_cia1_port_a_r )
 static WRITE8_DEVICE_HANDLER( c64_cia1_port_a_w )
 {
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
-	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
+	const device_config *serbus = devtag_get_device(device->machine, "iec");
 
-	cbmserial_clk_w(serbus, device, !(data & 0x10));
-	cbmserial_data_w(serbus, device, !(data & 0x20));
-	cbmserial_atn_w(serbus, device, !(data & 0x08));
+	cbm_iec_clk_w(serbus, device, !(data & 0x10));
+	cbm_iec_data_w(serbus, device, !(data & 0x20));
+	cbm_iec_atn_w(serbus, device, !(data & 0x08));
 	c64_vicaddr = c64_memory + helper[data & 0x03];
 }
 

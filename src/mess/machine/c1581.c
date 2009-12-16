@@ -27,7 +27,7 @@
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "machine/6526cia.h"
-#include "machine/cbmserial.h"
+#include "machine/cbmiec.h"
 #include "machine/wd17xx.h"
 
 /***************************************************************************
@@ -87,21 +87,21 @@ INLINE c1581_config *get_safe_config(const device_config *device)
     c1581_atn_w - serial bus attention
 -------------------------------------------------*/
 
-static CBMSERIAL_ATN( c1581 )
+static CBM_IEC_ATN( c1581 )
 {
 	c1581_t *c1581 = get_safe_token(device);
 	int data_out = !c1581->data_out && !(c1581->atn_ack && !state);
 
 	mos6526_flag_w(c1581->cia, state);
 
-	cbmserial_data_w(c1581->serial_bus, device, data_out);
+	cbm_iec_data_w(c1581->serial_bus, device, data_out);
 }
 
 /*-------------------------------------------------
     c1581_reset_w - serial bus reset
 -------------------------------------------------*/
 
-static CBMSERIAL_RESET( c1581 )
+static CBM_IEC_RESET( c1581 )
 {
 	if (!state)
 	{
@@ -207,16 +207,16 @@ static READ8_DEVICE_HANDLER( c1581_cia_pb_r )
 	UINT8 data = 0;
 
 	/* data in */
-	data = !cbmserial_data_r(c1581->serial_bus);
+	data = !cbm_iec_data_r(c1581->serial_bus);
 
 	/* clock in */
-	data |= !cbmserial_clk_r(c1581->serial_bus) << 2;
+	data |= !cbm_iec_clk_r(c1581->serial_bus) << 2;
 
 	/* write protect */
 	data |= !floppy_wpt_r(c1581->image) << 6;
 
 	/* attention in */
-	data |= !cbmserial_atn_r(c1581->serial_bus) << 7;
+	data |= !cbm_iec_atn_r(c1581->serial_bus) << 7;
 
 	return data;
 }
@@ -245,12 +245,12 @@ static WRITE8_DEVICE_HANDLER( c1581_cia_pb_w )
 	int atn_ack = BIT(data, 4);
 
 	/* data out */
-	int serial_data = !data_out && !(atn_ack && !cbmserial_atn_r(c1581->serial_bus));
-	cbmserial_data_w(c1581->serial_bus, device->owner, serial_data);
+	int serial_data = !data_out && !(atn_ack && !cbm_iec_atn_r(c1581->serial_bus));
+	cbm_iec_data_w(c1581->serial_bus, device->owner, serial_data);
 	c1581->data_out = data_out;
 
 	/* clock out */
-	cbmserial_clk_w(c1581->serial_bus, device->owner, !clk_out);
+	cbm_iec_clk_w(c1581->serial_bus, device->owner, !clk_out);
 
 	/* attention acknowledge */
 	c1581->atn_ack = BIT(data, 4);
@@ -403,8 +403,8 @@ DEVICE_GET_INFO( c1581 )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1581);						break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1581);						break;
-		case DEVINFO_FCT_CBM_SERIAL_ATN:				info->f = (genf *)CBMSERIAL_ATN_NAME(c1581);				break;
-		case DEVINFO_FCT_CBM_SERIAL_RESET:				info->f = (genf *)CBMSERIAL_RESET_NAME(c1581);				break;
+		case DEVINFO_FCT_CBM_IEC_ATN:					info->f = (genf *)CBM_IEC_ATN_NAME(c1581);				break;
+		case DEVINFO_FCT_CBM_IEC_RESET:					info->f = (genf *)CBM_IEC_RESET_NAME(c1581);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1581");							break;

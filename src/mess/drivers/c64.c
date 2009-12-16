@@ -335,7 +335,7 @@ the Edu64-1 used the full C64 BIOS. Confirmations are needed, anyway.
 #include "includes/cbm.h"
 #include "includes/cbmdrive.h"
 #include "includes/vc1541.h"
-#include "machine/cbmserial.h"
+#include "machine/cbmiec.h"
 #include "machine/c1541.h"
 
 #include "includes/c64.h"
@@ -479,7 +479,7 @@ static const m6502_interface c64_m6510_interface =
 	c64_m6510_port_write
 };
 
-static CBMSERIAL_DAISY( cbmserial_daisy )
+static CBM_IEC_DAISY( cbm_iec_daisy )
 {
 	{ "cia_1" },
 	{ "c1541" },
@@ -529,8 +529,8 @@ static MACHINE_DRIVER_START( c64 )
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, VIC6567_CLOCK, c64_ntsc_cia1)
 
 	/* floppy from serial bus */
-	MDRV_CBMSERIAL_ADD("serial_bus", cbmserial_daisy)
-	MDRV_C1541_ADD("c1541", "serial_bus", 8)
+	MDRV_CBM_IEC_ADD("iec", cbm_iec_daisy)
+	MDRV_C1541_ADD("c1541", "iec", 8)
 
 	MDRV_IMPORT_FROM(c64_cartslot)
 MACHINE_DRIVER_END
@@ -571,8 +571,8 @@ static MACHINE_DRIVER_START( c64pal )
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, VIC6569_CLOCK, c64_pal_cia1)
 
 	/* floppy from serial bus */
-	MDRV_CBMSERIAL_ADD("serial_bus", cbmserial_daisy)
-	MDRV_C1541_ADD("c1541", "serial_bus", 8)
+	MDRV_CBM_IEC_ADD("iec", cbm_iec_daisy)
+	MDRV_C1541_ADD("c1541", "iec", 8)
 
 	MDRV_IMPORT_FROM(c64_cartslot)
 MACHINE_DRIVER_END
@@ -587,7 +587,7 @@ static MACHINE_DRIVER_START( ultimax )
 	MDRV_SOUND_CONFIG(c64_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_DEVICE_REMOVE("serial_bus")
+	MDRV_DEVICE_REMOVE("iec")
 	MDRV_DEVICE_REMOVE("c1541")
 	MDRV_DEVICE_REMOVE("cart1")
 	MDRV_DEVICE_REMOVE("cart2")
@@ -606,7 +606,7 @@ static MACHINE_DRIVER_START( c64gs )
 	MDRV_DEVICE_REMOVE( "dac" )
 	MDRV_DEVICE_REMOVE( "cassette" )
 	MDRV_DEVICE_REMOVE( "quickload" )
-	MDRV_DEVICE_REMOVE("serial_bus")
+	MDRV_DEVICE_REMOVE("iec")
 	MDRV_DEVICE_REMOVE("c1541")
 MACHINE_DRIVER_END
 

@@ -92,8 +92,8 @@ interface; no special expansion modules like ieee488 interface
 
 /* devices config */
 #include "includes/cbm.h"
-#include "includes/cbmserb.h"	// needed for MDRV_DEVICE_REMOVE
-#include "includes/cbmdrive.h"
+#include "machine/cbmiec.h"
+#include "machine/c1541.h"
 #include "includes/vc1541.h"
 #include "includes/cbmieeeb.h"
 #include "devices/messram.h"
@@ -246,6 +246,13 @@ static PALETTE_INIT( vc20 )
 	}
 }
 
+static CBM_IEC_DAISY( cbm_iec_daisy )
+{
+	{ "via6522_0" },
+	{ "via6522_1" },
+	{ "c1540" },
+	{ NULL}
+};
 
 
 /*************************************
@@ -290,7 +297,8 @@ static MACHINE_DRIVER_START( vic20 )
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
 
 	/* floppy from serial bus */
-	MDRV_IMPORT_FROM(simulated_drive)
+	MDRV_CBM_IEC_ADD("iec", cbm_iec_daisy)
+	MDRV_C1540_ADD("c1540", "iec", 8)
 
 	/* IEEE bus */
 	MDRV_CBM_IEEEBUS_ADD("ieee_bus")
@@ -313,8 +321,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vic20v )
 	MDRV_IMPORT_FROM( vic20 )
 
-	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
-	MDRV_IMPORT_FROM( cpu_vc1540 )
+	MDRV_DEVICE_REMOVE("iec")
+	MDRV_DEVICE_REMOVE("c1540")
 #ifdef CPU_SYNC
 	MDRV_QUANTUM_TIME(HZ(60))
 #else
@@ -353,8 +361,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vc20v )
 	MDRV_IMPORT_FROM( vc20 )
 
-	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
-	MDRV_IMPORT_FROM( cpu_vc1540 )
+	MDRV_DEVICE_REMOVE("iec")
+	MDRV_DEVICE_REMOVE("c1540")
 #ifdef CPU_SYNC
 	MDRV_QUANTUM_TIME(HZ(60))
 #else
@@ -434,8 +442,6 @@ ROM_START( vic20v )
 	ROM_FILL( 0x9000, 0x3000, 0xff )
 	ROM_LOAD( "901486.01", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
 	ROM_LOAD( "901486.06", 0xe000, 0x2000, CRC(e5e7c174) SHA1(06de7ec017a5e78bd6746d89c2ecebb646efeb19) )
-
-	VC1540_ROM("cpu_vc1540")
 ROM_END
 
 ROM_START( vic20plv )
@@ -445,28 +451,9 @@ ROM_START( vic20plv )
 	ROM_FILL( 0x9000, 0x3000, 0xff )
 	ROM_LOAD( "901486.01", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
 	ROM_LOAD( "901486.07", 0xe000, 0x2000, CRC(4be07cb4) SHA1(ce0137ed69f003a299f43538fa9eee27898e621e) )
-
-	VC1540_ROM("cpu_vc1540")
 ROM_END
 
 #define rom_vc20v		rom_vic20plv
-
-
-/*************************************
- *
- *  System configuration(s)
- *
- *************************************/
-
-
-static SYSTEM_CONFIG_START(vic20)
-	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(vic20v)
-	CONFIG_DEVICE(vc1541_device_getinfo)
-SYSTEM_CONFIG_END
 
 
 /***************************************************************************
@@ -477,17 +464,17 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT COMPAT MACHINE INPUT    INIT     CONFIG     COMPANY                             FULLNAME            FLAGS */
 
-COMP( 1981, vic1001,   vic20,  0,  vic20,   vic1001,  vic20,  vic20,     "Commodore Business Machines Co.",  "VIC-1001 (NTSC, Japan)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic1001,   vic20,  0,  vic20,   vic1001,  vic20,  0,     "Commodore Business Machines Co.",  "VIC-1001 (NTSC, Japan)", GAME_IMPERFECT_SOUND)
 
-COMP( 1981, vic20,     0,      0,   vic20,  vic20,    vic20,  vic20,     "Commodore Business Machines Co.",  "VIC 20 (NTSC)", GAME_IMPERFECT_SOUND)
-COMP( 1981, vic20cr,   vic20,  0,   vic20,  vic20,    vic20,  vic20,     "Commodore Business Machines Co.",  "VIC 20CR (NTSC)", GAME_IMPERFECT_SOUND)
-COMP( 1981, vic20i,    vic20,  0,   vic20i, vic20,    vic20i, vic20,     "Commodore Business Machines Co.",  "VIC 20 (NTSC, IEEE488 Interface - SYS45065)", GAME_IMPERFECT_SOUND)
-COMP( 1981, vic20v,    vic20,  0,   vic20v, vic20,    vic20v, vic20v,    "Commodore Business Machines Co.",  "VIC 20 (NTSC, VC1540)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+COMP( 1981, vic20,     0,      0,   vic20,  vic20,    vic20,  0,     "Commodore Business Machines Co.",  "VIC 20 (NTSC)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic20cr,   vic20,  0,   vic20,  vic20,    vic20,  0,     "Commodore Business Machines Co.",  "VIC 20CR (NTSC)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic20i,    vic20,  0,   vic20i, vic20,    vic20i, 0,     "Commodore Business Machines Co.",  "VIC 20 (NTSC, IEEE488 Interface - SYS45065)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic20v,    vic20,  0,   vic20v, vic20,    vic20v, 0,     "Commodore Business Machines Co.",  "VIC 20 (NTSC, VC1540)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
-COMP( 1981, vic20pal,  vic20,  0,   vc20,   vc20,     vc20,   vic20,     "Commodore Business Machines Co.",  "VC 20 (PAL)", GAME_IMPERFECT_SOUND)
-COMP( 1981, vic20crp,  vic20,  0,   vc20,   vc20,     vc20,   vic20,     "Commodore Business Machines Co.",  "VC 20CR (PAL)", GAME_IMPERFECT_SOUND)
-COMP( 1981, vic20plv,  vic20,  0,   vc20v,  vic20,    vc20v,  vic20v,    "Commodore Business Machines Co.",  "VC 20 (PAL, VC1540)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-COMP( 1981, vc20,      vic20,  0,   vc20,   vc20,     vc20,   vic20,     "Commodore Business Machines Co.",  "VIC 20 (PAL, Germany)", GAME_IMPERFECT_SOUND)
-COMP( 1981, vc20v,     vic20,  0,   vc20v,  vic20,    vc20v,  vic20v,    "Commodore Business Machines Co.",  "VIC 20 (PAL, Germany, VC1540)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+COMP( 1981, vic20pal,  vic20,  0,   vc20,   vc20,     vc20,   0,     "Commodore Business Machines Co.",  "VC 20 (PAL)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic20crp,  vic20,  0,   vc20,   vc20,     vc20,   0,     "Commodore Business Machines Co.",  "VC 20CR (PAL)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic20plv,  vic20,  0,   vc20v,  vic20,    vc20v,  0,     "Commodore Business Machines Co.",  "VC 20 (PAL, VC1540)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+COMP( 1981, vc20,      vic20,  0,   vc20,   vc20,     vc20,   0,     "Commodore Business Machines Co.",  "VIC 20 (PAL, Germany)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vc20v,     vic20,  0,   vc20v,  vic20,    vc20v,  0,     "Commodore Business Machines Co.",  "VIC 20 (PAL, Germany, VC1540)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
-COMP( 1981, vic20swe,  vic20,  0,   vc20,   vic20swe, vc20,   vic20,     "Commodore Business Machines Co.",  "VIC 20 (PAL, Swedish Expansion Kit)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic20swe,  vic20,  0,   vc20,   vic20swe, vc20,   0,     "Commodore Business Machines Co.",  "VIC 20 (PAL, Swedish Expansion Kit)", GAME_IMPERFECT_SOUND)

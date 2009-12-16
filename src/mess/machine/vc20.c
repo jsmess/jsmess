@@ -20,7 +20,7 @@
 #include "machine/6522via.h"
 #include "video/vic6560.h"
 #include "includes/vc1541.h"
-#include "includes/cbmserb.h"
+#include "machine/cbmiec.h"
 #include "includes/cbmieeeb.h"
 #include "includes/cbmdrive.h"
 
@@ -107,33 +107,32 @@ static WRITE8_DEVICE_HANDLER( vc20_via0_write_ca2 )
 
 static READ8_DEVICE_HANDLER( vc20_via0_read_porta )
 {
-	UINT8 value = 0xff;
-	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
+	const device_config *serbus = devtag_get_device(device->machine, "iec");
+	UINT8 data = 0xfc;
 
-	value &= ~(input_port_read(device->machine, "JOY") & 0x3c);
+	data &= ~(input_port_read(device->machine, "JOY") & 0x3c);
 
 	/* to short to be recognized normally */
 	/* should be reduced to about 1 or 2 microseconds */
 	/*  if ((input_port_read(space->machine, "CTRLSEL") & 0x20 ) && (input_port_read(space->machine, "JOY") & 0x40) )  // i.e. LIGHTPEN_BUTTON
-        value &= ~0x20; */
-	if (!serial_clock || !cbm_serial_clock_read(serbus, 0))
-		value &= ~0x01;
-	if (!serial_data || !cbm_serial_data_read(serbus, 0))
-		value &= ~0x02;
+        data &= ~0x20; */
+
+	data |= cbm_iec_clk_r(serbus);
+	data |= cbm_iec_data_r(serbus) << 1;
 
 	if ((cassette_get_state(devtag_get_device(device->machine, "cassette")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
-		value &= ~0x40;
+		data &= ~0x40;
 	else
-		value |=  0x40;
+		data |=  0x40;
 
-	return value;
+	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( vc20_via0_write_porta )
 {
-	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
+	const device_config *serbus = devtag_get_device(device->machine, "iec");
 
-	cbm_serial_atn_write(serbus, 0, serial_atn = !(data & 0x80));
+	cbm_iec_atn_w(serbus, device, !(data & 0x80));
 	DBG_LOG(device->machine, 1, "serial out", ("atn %s\n", serial_atn ? "high" : "low"));
 }
 
@@ -192,9 +191,9 @@ static READ8_DEVICE_HANDLER( vc20_via1_read_ca1 )
 
 static WRITE8_DEVICE_HANDLER( vc20_via1_write_ca2 )
 {
-	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
+	const device_config *serbus = devtag_get_device(device->machine, "iec");
 
-	cbm_serial_clock_write(serbus, 0, serial_clock = !data);
+	cbm_iec_clk_w(serbus, device, !data);
 }
 
 static READ8_DEVICE_HANDLER( vc20_via1_read_portb )
@@ -333,16 +332,16 @@ static WRITE8_DEVICE_HANDLER( vc20_via1_write_portb )
 
 static READ8_DEVICE_HANDLER( vc20_via1_read_cb1 )
 {
-	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
+	const device_config *serbus = devtag_get_device(device->machine, "iec");
 
 	DBG_LOG(device->machine, 1, "serial in", ("request read\n"));
-	return cbm_serial_request_read(serbus, 0);
+	return cbm_iec_srq_r(serbus);
 }
 
 static WRITE8_DEVICE_HANDLER( vc20_via1_write_cb2 )
 {
-	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
-	cbm_serial_data_write(serbus, 0, serial_data = !data);
+	const device_config *serbus = devtag_get_device(device->machine, "iec");
+	cbm_iec_data_w(serbus, device, !data);
 }
 
 /* ieee 6522 number 1 (via4)
