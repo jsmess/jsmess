@@ -375,11 +375,11 @@ DRVLIBS = \
 	$(MESSOBJ)/zvt.a \
 	$(MESSOBJ)/visual.a \
 	$(MESSOBJ)/trs.a \
+	$(MESSOBJ)/conitec.a \
+	$(MESSOBJ)/atari.a \
 	$(MESSOBJ)/shared.a \
-#	$(MESSOBJ)/atari.a \
 #	$(MESSOBJ)/apple.a \
 #	$(MESSOBJ)/be.a \
-#	$(MESSOBJ)/conitec.a \
 #	$(MESSOBJ)/hp.a \
 #	$(MESSOBJ)/luxor.a \
 #	$(MESSOBJ)/ti.a \

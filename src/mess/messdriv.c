@@ -41,15 +41,15 @@ const game_driver * const drivers[] =
     DRIVER( 3do_pal )
 
     /* Atari */
-//mess0135u3    DRIVER( a2600 )     /* Atari 2600                                       */
-//mess0135u3    DRIVER( a2600p )    /* Atari 2600 PAL                                   */
-//mess0135u3    DRIVER( a5200 )     /* Atari 5200                                       */
-//mess0135u3    DRIVER( a7800 )     /* Atari 7800 NTSC                                  */
-//mess0135u3    DRIVER( a7800p )    /* Atari 7800 PAL                                   */
-//mess0135u3    DRIVER( lynx )      /* Atari Lynx Handheld                              */
-//mess0135u3    DRIVER( lynx2 )     /* Atari Lynx II Handheld redesigned, no additions  */
-//mess0135u3    DRIVER( jaguar )    /* Atari Jaguar                                     */
-//mess0135u3    DRIVER( jaguarcd )  /* Atari Jaguar CD                                  */
+    DRIVER( a2600 )     /* Atari 2600                                       */
+    DRIVER( a2600p )    /* Atari 2600 PAL                                   */
+    DRIVER( a5200 )     /* Atari 5200                                       */
+    DRIVER( a7800 )     /* Atari 7800 NTSC                                  */
+    DRIVER( a7800p )    /* Atari 7800 PAL                                   */
+    DRIVER( lynx )      /* Atari Lynx Handheld                              */
+    DRIVER( lynx2 )     /* Atari Lynx II Handheld redesigned, no additions  */
+    DRIVER( jaguar )    /* Atari Jaguar                                     */
+    DRIVER( jaguarcd )  /* Atari Jaguar CD                                  */
 
     /* Nintendo */
     DRIVER( nes )       /* Nintendo Entertainment System                    */
@@ -1381,13 +1381,13 @@ const game_driver * const drivers[] =
     DRIVER( votrpss ) /* 1982 Votrax Personal Speech System */
 
 	/* Conitec Datensysteme */
-//mess0135u3    DRIVER( prof80 )
-//mess0135u3    DRIVER( prof80g21 )
-//mess0135u3    DRIVER( prof80g25 )
-//mess0135u3    DRIVER( prof80g26 )
-//mess0135u3    DRIVER( prof80g31 )
-//mess0135u3    DRIVER( prof80g562 )
-//mess0135u3    DRIVER( prof180x )
+    DRIVER( prof80 )
+    DRIVER( prof80g21 )
+    DRIVER( prof80g25 )
+    DRIVER( prof80g26 )
+    DRIVER( prof80g31 )
+    DRIVER( prof80g562 )
+    DRIVER( prof180x )
 
 /****************Games*******************************************************/
     /* Computer Electronic */

@@ -643,8 +643,10 @@ static void modeUA_switch(running_machine *machine, UINT16 offset, UINT8 data)
 static void modeE0_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	int bank = 1 + (offset >> 3);
+	char bank_name[10];
+	sprintf(bank_name,"bank%d",bank);
 	bank_base[bank] = CART + 0x400 * (offset & 7);
-	memory_set_bankptr(machine,bank, bank_base[bank]);
+	memory_set_bankptr(machine,bank_name, bank_base[bank]);
 }
 static void modeE7_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
@@ -1145,7 +1147,7 @@ static ADDRESS_MAP_START(a2600_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x007F) AM_MIRROR(0x0F00) AM_READWRITE(tia_r, tia_w)
 	AM_RANGE(0x0080, 0x00FF) AM_MIRROR(0x0D00) AM_RAM AM_BASE(&riot_ram)
 	AM_RANGE(0x0280, 0x029F) AM_MIRROR(0x0D00) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
-	AM_RANGE(0x1000, 0x1FFF)                   AM_ROMBANK(1)
+	AM_RANGE(0x1000, 0x1FFF)                   AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER(switch_A_w)
@@ -1266,7 +1268,7 @@ static void install_banks(running_machine *machine, int count, unsigned init)
 			0x1000 + (i + 1) * 0x1000 / count - 1, 0, 0, handler[i]);
 
 		bank_base[i + 1] = cart + init;
-		memory_set_bankptr(machine,i + 1, bank_base[i + 1]);
+		memory_set_bankptr(machine,handler[i], bank_base[i + 1]);
 	}
 }
 
@@ -1843,9 +1845,8 @@ static MACHINE_RESET( a2600 )
 		memory_install_read8_handler(space, 0x1fe0, 0x1fe7, 0, 0, modeE7_switch_r);
 		memory_install_write8_handler(space, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_w);
 		memory_install_read8_handler(space, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_r);
-		memory_install_write8_handler(space, 0x1800, 0x18ff, 0, 0, SMH_BANK(9));
-		memory_install_read8_handler(space, 0x1900, 0x19ff, 0, 0, SMH_BANK(9));
-		memory_set_bankptr(machine, 9, extra_RAM + 4 * 256 );
+		memory_install_readwrite_bank(space, 0x1800, 0x18ff, 0, 0, "bank9");
+		memory_set_bankptr(machine, "bank9", extra_RAM + 4 * 256 );
 		break;
 
 	case modeDC:
@@ -1868,8 +1869,8 @@ static MACHINE_RESET( a2600 )
 		memory_install_read8_handler(space, 0x1000, 0x1fff, 0, 0, modeSS_r);
 		bank_base[1] = extra_RAM + 2 * 0x800;
 		bank_base[2] = CART;
-		memory_set_bankptr(machine, 1, bank_base[1] );
-		memory_set_bankptr(machine, 2, bank_base[2] );
+		memory_set_bankptr(machine, "bank1", bank_base[1] );
+		memory_set_bankptr(machine, "bank2", bank_base[2] );
 		modeSS_write_enabled = 0;
 		modeSS_byte_started = 0;
 		memory_set_direct_update_handler(space, modeSS_opbase );
@@ -1902,8 +1903,8 @@ static MACHINE_RESET( a2600 )
 		break;
 
 	case mode32in1:
-		memory_set_bankptr(machine, 1, CART + current_reset_bank_counter * 0x800 );
-		memory_set_bankptr(machine, 2, CART + current_reset_bank_counter * 0x800 );
+		memory_set_bankptr(machine, "bank1", CART + current_reset_bank_counter * 0x800 );
+		memory_set_bankptr(machine, "bank2", CART + current_reset_bank_counter * 0x800 );
 		break;
 
 	case modeJVP:
@@ -1916,26 +1917,26 @@ static MACHINE_RESET( a2600 )
 
 	if (banking_mode == modeFA)
 	{
-		memory_install_write8_handler(space, 0x1000, 0x10ff, 0, 0, SMH_BANK(9));
-		memory_install_read8_handler(space, 0x1100, 0x11ff, 0, 0, SMH_BANK(9));
+		memory_install_write_bank(space, 0x1000, 0x10ff, 0, 0, "bank9");
+		memory_install_read_bank(space, 0x1100, 0x11ff, 0, 0, "bank9");
 
-		memory_set_bankptr(machine,9, extra_RAM);
+		memory_set_bankptr(machine,"bank9", extra_RAM);
 	}
 
 	if (banking_mode == modeCV)
 	{
-		memory_install_write8_handler(space, 0x1400, 0x17ff, 0, 0, SMH_BANK(9));
-		memory_install_read8_handler(space, 0x1000, 0x13ff, 0, 0, SMH_BANK(9));
+		memory_install_write_bank(space, 0x1400, 0x17ff, 0, 0, "bank9");
+		memory_install_read_bank(space, 0x1000, 0x13ff, 0, 0, "bank9");
 
-		memory_set_bankptr(machine,9, extra_RAM);
+		memory_set_bankptr(machine,"bank9", extra_RAM);
 	}
 
 	if (chip)
 	{
-		memory_install_write8_handler(space, 0x1000, 0x107f, 0, 0, SMH_BANK(9));
-		memory_install_read8_handler(space, 0x1080, 0x10ff, 0, 0, SMH_BANK(9));
+		memory_install_write_bank(space, 0x1000, 0x107f, 0, 0, "bank9");
+		memory_install_read_bank(space, 0x1080, 0x10ff, 0, 0, "bank9");
 
-		memory_set_bankptr(machine,9, extra_RAM);
+		memory_set_bankptr(machine,"bank9", extra_RAM);
 	}
 
 	/* Banks may have changed, reset the cpu so it uses the correct reset vector */

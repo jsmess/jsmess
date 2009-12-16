@@ -817,9 +817,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( st_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x000007) AM_ROM
-	AM_RANGE(0x000008, 0x1fffff) AM_RAMBANK(1)
-	AM_RANGE(0x200000, 0x3fffff) AM_RAMBANK(2)
-	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK(3)
+	AM_RANGE(0x000008, 0x1fffff) AM_RAMBANK("bank1")
+	AM_RANGE(0x200000, 0x3fffff) AM_RAMBANK("bank2")
+	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK("bank3")
 	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM
 	AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(atarist_mmu_r, atarist_mmu_w)
 	AM_RANGE(0xff8200, 0xff8203) AM_READWRITE(atarist_shifter_base_r, atarist_shifter_base_w)
@@ -841,9 +841,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x000007) AM_ROM
-	AM_RANGE(0x000008, 0x1fffff) AM_RAMBANK(1)
-	AM_RANGE(0x200000, 0x3fffff) AM_RAMBANK(2)
-	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK(3)
+	AM_RANGE(0x000008, 0x1fffff) AM_RAMBANK("bank1")
+	AM_RANGE(0x200000, 0x3fffff) AM_RAMBANK("bank2")
+	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK("bank3")
 	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM
 	AM_RANGE(0xff7f30, 0xff7f31) AM_READWRITE(atarist_blitter_dst_inc_y_r, atarist_blitter_dst_inc_y_w) // for TOS 1.02
 	AM_RANGE(0xff8000, 0xff8007) AM_READWRITE(atarist_mmu_r, atarist_mmu_w)
@@ -880,10 +880,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x000007) AM_ROM
-	AM_RANGE(0x000008, 0x1fffff) AM_RAMBANK(1)
-	AM_RANGE(0x200000, 0x3fffff) AM_RAMBANK(2)
+	AM_RANGE(0x000008, 0x1fffff) AM_RAMBANK("bank1")
+	AM_RANGE(0x200000, 0x3fffff) AM_RAMBANK("bank2")
 	AM_RANGE(0xe00000, 0xefffff) AM_ROM
-	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK(3)
+	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK("bank3")
 	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM
 	AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(atarist_mmu_r, atarist_mmu_w)
 	AM_RANGE(0xff8200, 0xff8203) AM_READWRITE(atarist_shifter_base_r, atarist_shifter_base_w)
@@ -935,10 +935,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x000007) AM_ROM
-	AM_RANGE(0x000008, 0x1fffff) AM_RAMBANK(1)
-	AM_RANGE(0x200000, 0x3fffff) AM_RAMBANK(2)
+	AM_RANGE(0x000008, 0x1fffff) AM_RAMBANK("bank1")
+	AM_RANGE(0x200000, 0x3fffff) AM_RAMBANK("bank2")
 	AM_RANGE(0xe00000, 0xefffff) AM_ROM
-	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK(3)
+	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK("bank3")
 	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM
 	AM_RANGE(0xff8000, 0xff8007) AM_READWRITE(atarist_mmu_r, atarist_mmu_w)
 	AM_RANGE(0xff8200, 0xff8203) AM_READWRITE(atarist_shifter_base_r, atarist_shifter_base_w)
@@ -986,13 +986,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stbook_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x000007) AM_ROM
-	AM_RANGE(0x000008, 0x1fffff) AM_RAMBANK(1)
-	AM_RANGE(0x200000, 0x3fffff) AM_RAMBANK(2)
+	AM_RANGE(0x000008, 0x1fffff) AM_RAMBANK("bank1")
+	AM_RANGE(0x200000, 0x3fffff) AM_RAMBANK("bank2")
 	AM_RANGE(0xd40000, 0xd7ffff) AM_ROM
 	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM
 	AM_RANGE(0xe80000, 0xebffff) AM_ROM
 //  AM_RANGE(0xf00000, 0xf1ffff) AM_READWRITE(stbook_ide_r, stbook_ide_w)
-	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK(3)
+	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK("bank3")
 	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM
 /*  AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(stbook_mmu_r, stbook_mmu_w)
     AM_RANGE(0xff8200, 0xff8203) AM_READWRITE(stbook_shifter_base_r, stbook_shifter_base_w)
@@ -1451,37 +1451,37 @@ static void atarist_configure_memory(running_machine *machine)
 	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 256 * 1024:
-		memory_install_readwrite16_handler(program, 0x000008, 0x03ffff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_install_readwrite16_handler(program, 0x040000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite_bank(program, 0x000008, 0x03ffff, 0, 0, "bank1");
+		memory_unmap_readwrite(program, 0x040000, 0x3fffff, 0, 0);
 		break;
 	case 512 * 1024:
-		memory_install_readwrite16_handler(program, 0x000008, 0x07ffff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_install_readwrite16_handler(program, 0x080000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite_bank(program, 0x000008, 0x07ffff, 0, 0, "bank1");
+		memory_unmap_readwrite(program, 0x080000, 0x3fffff, 0, 0);
 		break;
 	case 1024 * 1024:
-		memory_install_readwrite16_handler(program, 0x000008, 0x0fffff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_install_readwrite16_handler(program, 0x100000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite_bank(program, 0x000008, 0x0fffff, 0, 0, "bank1");
+		memory_unmap_readwrite(program, 0x100000, 0x3fffff, 0, 0);
 		break;
 	case 2048 * 1024:
-		memory_install_readwrite16_handler(program, 0x000008, 0x1fffff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_install_readwrite16_handler(program, 0x200000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite_bank(program, 0x000008, 0x1fffff, 0, 0, "bank1");
+		memory_unmap_readwrite(program, 0x200000, 0x3fffff, 0, 0);
 		break;
 	case 4096 * 1024:
-		memory_install_readwrite16_handler(program, 0x000008, 0x1fffff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_install_readwrite16_handler(program, 0x200000, 0x3fffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		memory_install_readwrite_bank(program, 0x000008, 0x1fffff, 0, 0, "bank1");
+		memory_install_readwrite_bank(program, 0x200000, 0x3fffff, 0, 0, "bank2");
 		break;
 	}
 
-	memory_configure_bank(machine, 1, 0, 1, RAM + 0x000008, 0);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, RAM + 0x000008, 0);
+	memory_set_bank(machine, "bank1", 0);
 
-	memory_configure_bank(machine, 2, 0, 1, RAM + 0x200000, 0);
-	memory_set_bank(machine, 2, 0);
+	memory_configure_bank(machine, "bank2", 0, 1, RAM + 0x200000, 0);
+	memory_set_bank(machine, "bank2", 0);
 
-	memory_install_readwrite16_handler(program, 0xfa0000, 0xfbffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+	memory_unmap_readwrite(program, 0xfa0000, 0xfbffff, 0, 0);
 
-	memory_configure_bank(machine, 3, 0, 1, RAM + 0xfa0000, 0);
-	memory_set_bank(machine, 3, 0);
+	memory_configure_bank(machine, "bank3", 0, 1, RAM + 0xfa0000, 0);
+	memory_set_bank(machine, "bank3", 0);
 }
 
 static void atarist_state_save(running_machine *machine)
@@ -1645,25 +1645,25 @@ static void stbook_configure_memory(running_machine *machine)
 	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 1024 * 1024:
-		memory_install_readwrite16_handler(program, 0x000008, 0x07ffff, 0, 0x080000, SMH_BANK(1), SMH_BANK(1));
-		memory_install_readwrite16_handler(program, 0x100000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite_bank(program, 0x000008, 0x07ffff, 0, 0x080000, "bank1");
+		memory_unmap_readwrite(program, 0x100000, 0x3fffff, 0, 0);
 		break;
 	case 4096 * 1024:
-		memory_install_readwrite16_handler(program, 0x000008, 0x1fffff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_install_readwrite16_handler(program, 0x200000, 0x3fffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		memory_install_readwrite_bank(program, 0x000008, 0x1fffff, 0, 0, "bank1");
+		memory_install_readwrite_bank(program, 0x200000, 0x3fffff, 0, 0, "bank2");
 		break;
 	}
 
-	memory_configure_bank(machine, 1, 0, 1, RAM + 0x000008, 0);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, RAM + 0x000008, 0);
+	memory_set_bank(machine, "bank1", 0);
 
-	memory_configure_bank(machine, 2, 0, 1, RAM + 0x200000, 0);
-	memory_set_bank(machine, 2, 0);
+	memory_configure_bank(machine, "bank2", 0, 1, RAM + 0x200000, 0);
+	memory_set_bank(machine, "bank2", 0);
 
-	memory_install_readwrite16_handler(program, 0xfa0000, 0xfbffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+	memory_unmap_readwrite(program, 0xfa0000, 0xfbffff, 0, 0);
 
-	memory_configure_bank(machine, 3, 0, 1, RAM + 0xfa0000, 0);
-	memory_set_bank(machine, 3, 0);
+	memory_configure_bank(machine, "bank3", 0, 1, RAM + 0xfa0000, 0);
+	memory_set_bank(machine, "bank3", 0);
 }
 
 static WRITE8_HANDLER( stbook_ym2149_port_a_w )
@@ -1785,7 +1785,7 @@ static DEVICE_IMAGE_LOAD( atarist_cart )
 	{
 		if (image_fread(image, ptr, filesize) == filesize)
 		{
-			memory_install_readwrite16_handler(cputag_get_address_space(image->machine, M68000_TAG, ADDRESS_SPACE_PROGRAM), 0xfa0000, 0xfbffff, 0, 0, SMH_BANK(3), SMH_BANK(3));
+			memory_install_readwrite_bank(cputag_get_address_space(image->machine, M68000_TAG, ADDRESS_SPACE_PROGRAM), 0xfa0000, 0xfbffff, 0, 0, "bank3");
 
 			return INIT_PASS;
 		}
