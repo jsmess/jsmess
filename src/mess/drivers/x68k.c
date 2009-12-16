@@ -2485,8 +2485,7 @@ static MACHINE_START( x68000 )
 	x68k_spriteram = (UINT16*)memory_region(machine, "user1");
 	memory_install_read16_handler(space,0x000000,0xbffffb,0xffffffff,0,(read16_space_func)x68k_emptyram_r);
 	memory_install_write16_handler(space,0x000000,0xbffffb,0xffffffff,0,(write16_space_func)x68k_emptyram_w);
-	memory_install_read16_handler(space,0x000000,messram_get_size(devtag_get_device(machine, "messram"))-1,0xffffffff,0,(read16_space_func)1);
-	memory_install_write16_handler(space,0x000000,messram_get_size(devtag_get_device(machine, "messram"))-1,0xffffffff,0,(write16_space_func)1);
+	memory_install_readwrite_bank(space,0x000000,messram_get_size(devtag_get_device(machine, "messram"))-1,0xffffffff,0,"bank1");
 	memory_set_bankptr(machine, "bank1",messram_get_ptr(devtag_get_device(machine, "messram")));
 	memory_install_read16_handler(space,0xc00000,0xdfffff,0xffffffff,0,x68k_gvram_r);
 	memory_install_write16_handler(space,0xc00000,0xdfffff,0xffffffff,0,x68k_gvram_w);
