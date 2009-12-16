@@ -606,26 +606,14 @@ static void vga_cpu_interface(running_machine *machine)
 
 	if (vga.vga_intf.map_vga_memory)
 	{
-		char vga_bank[10];
 		sel = vga.gc.data[6] & 0x0c;
 		switch(sel)
 		{
 			case 0x00:
-				if (vga.vga_intf.vga_memory_bank != 0)
-				{
-					read_handler = (read8_space_func) (FPTR)vga.vga_intf.vga_memory_bank;
-					write_handler = (write8_space_func) (FPTR)vga.vga_intf.vga_memory_bank;
-				}
-				else
-				{
-					read_handler = 0;
-					write_handler = 0;
-				}
-				vga.vga_intf.map_vga_memory(machine, 0xA0000, 0xBFFFF, read_handler, write_handler);
-
-				if (vga.vga_intf.vga_memory_bank != 0) {
-					sprintf(vga_bank,"bank%d",vga.vga_intf.vga_memory_bank);
-					memory_set_bankptr(machine,vga_bank, vga.memory);
+				if (vga.vga_intf.vga_memory_bank != NULL)
+				{					
+					vga.vga_intf.map_vga_memory(machine, 0xA0000, 0xBFFFF, read_handler, write_handler);
+					memory_set_bankptr(machine, vga.vga_intf.vga_memory_bank, vga.memory);
 				}
 				break;
 			case 0x04:

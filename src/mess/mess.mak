@@ -379,9 +379,9 @@ DRVLIBS = \
 	$(MESSOBJ)/atari.a \
 	$(MESSOBJ)/ti.a \
 	$(MESSOBJ)/luxor.a \
+	$(MESSOBJ)/be.a \
 	$(MESSOBJ)/shared.a \
 #	$(MESSOBJ)/apple.a \
-#	$(MESSOBJ)/be.a \
 #	$(MESSOBJ)/hp.a \
 
 #-------------------------------------------------

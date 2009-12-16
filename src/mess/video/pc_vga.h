@@ -18,7 +18,7 @@ MACHINE_DRIVER_EXTERN( pcvideo_pc1640 );
 struct pc_vga_interface
 {
 	/* VGA memory mapper */
-	int vga_memory_bank;
+	const char *vga_memory_bank;
 	void (*map_vga_memory)(running_machine *machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh);
 
 	/* VGA dipswitch (???) */

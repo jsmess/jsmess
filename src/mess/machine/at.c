@@ -654,8 +654,8 @@ static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine, 
 
 static const struct pc_vga_interface vga_interface =
 {
-	1,
-	NULL, //at_map_vga_memory,
+	NULL,
+	NULL,
 
 	input_port_0_r,
 
@@ -724,29 +724,6 @@ DRIVER_INIT( at586 )
 	DRIVER_INIT_CALL(at386);
 	intel82439tx_init(machine);
 }
-
-
-#ifdef UNUSED_FUNCTION
-static void at_map_vga_memory(running_machine *machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
-{
-	int buswidth;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	buswidth = cpu_get_databus_width(cputag_get_cpu(machine, "maincpu"), ADDRESS_SPACE_PROGRAM);
-	switch(buswidth)
-	{
-		case 8:
-			memory_install_read8_handler(space, 0xA0000, 0xBFFFF, 0, 0, SMH_NOP);
-			memory_install_write8_handler(space, 0xA0000, 0xBFFFF, 0, 0, SMH_NOP);
-
-			memory_install_read8_handler(space, begin, end, 0, 0, rh);
-			memory_install_write8_handler(space, begin, end, 0, 0, wh);
-			break;
-	}
-}
-#endif
-
-
-
 
 DRIVER_INIT( at_vga )
 {

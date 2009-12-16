@@ -1125,8 +1125,8 @@ const game_driver * const drivers[] =
     DRIVER( abc806 )
 
     /* Be Incorporated */
-//mess0135u3    DRIVER( bebox )     /* BeBox Dual603-66                                 */
-//mess0135u3    DRIVER( bebox2 )    /* BeBox Dual603-133                                */
+    DRIVER( bebox )     /* BeBox Dual603-66                                 */
+    DRIVER( bebox2 )    /* BeBox Dual603-133                                */
 
     /* Tiger Electronics */
     DRIVER( gamecom )   /* Tiger Game.com                                   */

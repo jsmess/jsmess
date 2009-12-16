@@ -1294,35 +1294,11 @@ DRIVER_INIT( pcjr )
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pcjr_set_keyb_int, pc_set_irq_line);
 }
 
-
-#ifdef UNUSED_FUNCTION
-static void pc_map_vga_memory(running_machine *machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
-{
-	const address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
-	int buswidth;
-	buswidth = cpu_get_databus_width(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
-	switch(buswidth)
-	{
-		case 8:
-			memory_install_read8_handler(space, 0xA0000, 0xBFFFF, 0, 0, SMH_NOP);
-			memory_install_write8_handler(space, 0xA0000, 0xBFFFF, 0, 0, SMH_NOP);
-
-			memory_install_read8_handler(space, begin, end, 0, 0, rh);
-			memory_install_write8_handler(space, begin, end, 0, 0, wh);
-			break;
-
-		default:
-			fatalerror("VGA:  Bus width %d not supported\n", buswidth);
-			break;
-	}
-}
-#endif
-
 static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine, "IN0"); }
 
 static const struct pc_vga_interface vga_interface =
 {
-	1,
+	NULL,
 	NULL,
 
 	input_port_0_r,
