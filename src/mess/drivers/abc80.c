@@ -504,18 +504,6 @@ static MACHINE_START( abc80 )
 	state_save_register_global(machine, state->z80pio_astb);
 }
 
-static const floppy_config abc80_floppy_config =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(abc80),
-	DO_NOT_KEEP_GEOMETRY
-};
-
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( abc80 )
@@ -554,8 +542,6 @@ static MACHINE_DRIVER_START( abc80 )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, default_cassette_config)
-
-	MDRV_FLOPPY_2_DRIVES_ADD(abc80_floppy_config)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")

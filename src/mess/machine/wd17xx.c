@@ -1168,8 +1168,9 @@ void wd17xx_set_drive(const device_config *device, UINT8 drive)
 
 	if (w->intf->floppy_drive_tags[drive] != NULL)
 	{
-		if (device->owner != NULL)
+		if (device->owner != NULL) {
 			w->drive = device_find_child_by_tag(device->owner, w->intf->floppy_drive_tags[drive]);
+		}
 		else
 			w->drive = devtag_get_device(device->machine, w->intf->floppy_drive_tags[drive]);
 	}

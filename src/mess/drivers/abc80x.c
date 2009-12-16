@@ -486,7 +486,7 @@ static ADDRESS_MAP_START( abc800m_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_READWRITE(abc800_charram_r, abc800_charram_w)
+	AM_RANGE(0x7800, 0x7fff) AM_READWRITE(abc800_charram_r, abc800_charram_w)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -511,7 +511,7 @@ static ADDRESS_MAP_START( abc800c_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7bff) AM_ROM
-	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_READWRITE(abc800_charram_r, abc800_charram_w)
+	AM_RANGE(0x7c00, 0x7fff) AM_READWRITE(abc800_charram_r, abc800_charram_w)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1112,18 +1112,6 @@ static MACHINE_RESET( abc806 )
 
 /* Machine Drivers */
 
-static const floppy_config abc800_floppy_config =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(abc80),
-	DO_NOT_KEEP_GEOMETRY
-};
-
 static MACHINE_DRIVER_START( abc800m )
 	MDRV_DRIVER_DATA(abc800_state)
 
@@ -1157,8 +1145,6 @@ static MACHINE_DRIVER_START( abc800m )
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
-
-	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -1200,8 +1186,6 @@ static MACHINE_DRIVER_START( abc800c )
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
 
-	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
-
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
@@ -1242,8 +1226,6 @@ static MACHINE_DRIVER_START( abc802 )
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
 
-	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
-
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
@@ -1280,8 +1262,6 @@ static MACHINE_DRIVER_START( abc806 )
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
-
-	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")

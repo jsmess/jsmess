@@ -730,6 +730,17 @@ const device_config *floppy_get_device(running_machine *machine,int drive)
 	return NULL;
 }
 
+const device_config *floppy_get_device_owner(const device_config *device,int drive)
+{
+	switch(drive) {
+		case 0 : return device_find_child_by_tag(device->owner,FLOPPY_0);
+		case 1 : return device_find_child_by_tag(device->owner,FLOPPY_1);
+		case 2 : return device_find_child_by_tag(device->owner,FLOPPY_2);
+		case 3 : return device_find_child_by_tag(device->owner,FLOPPY_3);
+	}
+	return NULL;
+}
+
 int floppy_get_drive_type(const device_config *image)
 {
 	floppy_drive *flopimg = get_safe_token( image );

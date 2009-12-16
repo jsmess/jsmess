@@ -169,9 +169,9 @@ INLINE fast_t *get_safe_token_machine_fast(running_machine *machine)
 	return get_safe_token_fast(device);
 }
 
-INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
+INLINE const device_config *get_floppy_image(const device_config *device, int drive)
 {
-	return floppy_get_device(machine, drive);
+	return floppy_get_device_owner(device, drive);
 }
 
 /***************************************************************************
@@ -277,10 +277,10 @@ static WRITE8_HANDLER( slow_ctrl_w )
 //  if (BIT(data, 2)) wd17xx_set_drive(conkort->wd1791, 2);
 
 	/* motor enable */
-	floppy_mon_w(get_floppy_image(space->machine, 0), !BIT(data, 3));
-	floppy_mon_w(get_floppy_image(space->machine, 1), !BIT(data, 3));
-	floppy_drive_set_ready_state(get_floppy_image(space->machine, 0), 1, 1);
-	floppy_drive_set_ready_state(get_floppy_image(space->machine, 1), 1, 1);
+	floppy_mon_w(get_floppy_image(conkort->wd1791, 0), !BIT(data, 3));
+	floppy_mon_w(get_floppy_image(conkort->wd1791, 1), !BIT(data, 3));
+	floppy_drive_set_ready_state(get_floppy_image(conkort->wd1791, 0), 1, 1);
+	floppy_drive_set_ready_state(get_floppy_image(conkort->wd1791, 1), 1, 1);
 
 	/* disk side selection */
 	wd17xx_set_side(conkort->wd1791, BIT(data, 4));
@@ -752,6 +752,30 @@ static const wd17xx_interface fast_wd17xx_interface =
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
+static const floppy_config abc80_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(abc80),
+	DO_NOT_KEEP_GEOMETRY
+};
+
+static const floppy_config abc800_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(abc80),
+	DO_NOT_KEEP_GEOMETRY
+};
+
 /* Machine Driver */
 
 static MACHINE_DRIVER_START( luxor_55_10828 )
@@ -762,6 +786,8 @@ static MACHINE_DRIVER_START( luxor_55_10828 )
 
 	MDRV_Z80PIO_ADD(Z80PIO_TAG, conkort_pio_intf)
 	MDRV_WD179X_ADD(WD1791_TAG, slow_wd17xx_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(abc80_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( luxor_55_21046 )
@@ -772,6 +798,8 @@ static MACHINE_DRIVER_START( luxor_55_21046 )
 
 	MDRV_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
 	MDRV_WD1793_ADD(SAB1793_TAG, fast_wd17xx_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)	
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -914,10 +942,12 @@ static DEVICE_START( luxor_55_21046 )
 
 static DEVICE_RESET( luxor_55_21046 )
 {
-	floppy_mon_w(get_floppy_image(device->machine, 0), CLEAR_LINE);
-	floppy_mon_w(get_floppy_image(device->machine, 1), CLEAR_LINE);
-	floppy_drive_set_ready_state(get_floppy_image(device->machine, 0), 1, 1);
-	floppy_drive_set_ready_state(get_floppy_image(device->machine, 1), 1, 1);
+	fast_t *conkort = device->token;
+	
+	floppy_mon_w(get_floppy_image(conkort->wd1793, 0), CLEAR_LINE);
+	floppy_mon_w(get_floppy_image(conkort->wd1793, 1), CLEAR_LINE);
+	floppy_drive_set_ready_state(get_floppy_image(conkort->wd1793, 0), 1, 1);
+	floppy_drive_set_ready_state(get_floppy_image(conkort->wd1793, 1), 1, 1);
 }
 
 /*-------------------------------------------------
