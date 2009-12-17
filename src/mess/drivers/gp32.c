@@ -80,6 +80,16 @@ static struct
 #define BPPMODE_TFT_08	0x0B
 #define BPPMODE_TFT_16	0x0C
 
+static rgb_t s3c240x_get_color_5551( UINT16 data)
+{
+	UINT8 r, g, b, i;
+	r = BITS( data, 15, 11) << 3;
+	g = BITS( data, 10, 6) << 3;
+	b = BITS( data, 5, 1) << 3;
+	i = BIT( data, 1) << 2;
+	return MAKE_RGB( r | i, g | i, b | i);
+}
+
 static void s3c240x_lcd_dma_reload( running_machine *machine)
 {
 	s3c240x_lcd.vramaddr_cur = s3c240x_lcd_regs[5] << 1;
@@ -151,17 +161,33 @@ static void s3c240x_lcd_render_01( running_machine *machine)
 		UINT32 data = s3c240x_lcd_dma_read( machine);
 		for (j = 0; j < 32; j++)
 		{
-			if (data & 0x80000000)
-			{
-				*scanline++ = RGB_BLACK;
-			}
-			else
-			{
-				*scanline++ = RGB_WHITE;
-			}
+			*scanline++ = palette_get_color( machine, (data >> 31) & 0x01);
 			data = data << 1;
 			s3c240x_lcd.hpos++;
 			if (s3c240x_lcd.hpos >= (s3c240x_lcd.pagewidth_max << 4))
+			{
+				s3c240x_lcd.vpos = (s3c240x_lcd.vpos + 1) % (s3c240x_lcd.lineval + 1);
+				s3c240x_lcd.hpos = 0;
+				scanline = BITMAP_ADDR32( bitmap, s3c240x_lcd.vpos, s3c240x_lcd.hpos);
+			}
+		}
+	}
+}
+
+static void s3c240x_lcd_render_02( running_machine *machine)
+{
+	bitmap_t *bitmap = machine->generic.tmpbitmap;
+	UINT32 *scanline = BITMAP_ADDR32( bitmap, s3c240x_lcd.vpos, s3c240x_lcd.hpos);
+	int i, j;
+	for (i = 0; i < 4; i++)
+	{
+		UINT32 data = s3c240x_lcd_dma_read( machine);
+		for (j = 0; j < 16; j++)
+		{
+			*scanline++ = palette_get_color( machine, (data >> 30) & 0x03);
+			data = data << 2;
+			s3c240x_lcd.hpos++;
+			if (s3c240x_lcd.hpos >= (s3c240x_lcd.pagewidth_max << 3))
 			{
 				s3c240x_lcd.vpos = (s3c240x_lcd.vpos + 1) % (s3c240x_lcd.lineval + 1);
 				s3c240x_lcd.hpos = 0;
@@ -181,7 +207,7 @@ static void s3c240x_lcd_render_04( running_machine *machine)
 		UINT32 data = s3c240x_lcd_dma_read( machine);
 		for (j = 0; j < 8; j++)
 		{
-			*scanline++ = palette_get_color( machine, (data >> 28) & 0xFF);
+			*scanline++ = palette_get_color( machine, (data >> 28) & 0x0F);
 			data = data << 4;
 			s3c240x_lcd.hpos++;
 			if (s3c240x_lcd.hpos >= (s3c240x_lcd.pagewidth_max << 2))
@@ -227,11 +253,7 @@ static void s3c240x_lcd_render_16( running_machine *machine)
 		UINT32 data = s3c240x_lcd_dma_read( machine);
 		for (j = 0; j < 2; j++)
 		{
-			UINT8 r, g, b;
-			r = BITS( data, 31, 27) << 3;
-			g = BITS( data, 26, 22) << 3;
-			b = BITS( data, 21, 17) << 3;
-			*scanline++ = MAKE_RGB( r, g, b);
+			*scanline++ = s3c240x_get_color_5551( (data >> 16) & 0xFFFF);
 			data = data << 16;
 			s3c240x_lcd.hpos++;
 			if (s3c240x_lcd.hpos >= (s3c240x_lcd.pagewidth_max << 0))
@@ -261,6 +283,7 @@ static TIMER_CALLBACK( s3c240x_lcd_timer_exp )
 		switch (s3c240x_lcd.bppmode)
 		{
 			case BPPMODE_TFT_01 : s3c240x_lcd_render_01( machine); break;
+			case BPPMODE_TFT_02 : s3c240x_lcd_render_02( machine); break;
 			case BPPMODE_TFT_04 : s3c240x_lcd_render_04( machine); break;
 			case BPPMODE_TFT_08 : s3c240x_lcd_render_08( machine); break;
 			case BPPMODE_TFT_16 : s3c240x_lcd_render_16( machine); break;
@@ -394,17 +417,13 @@ static READ32_HANDLER( s3c240x_lcd_palette_r )
 static WRITE32_HANDLER( s3c240x_lcd_palette_w )
 {
 	running_machine *machine = space->machine;
-	UINT8 r, g, b;
 	verboselog( machine, 9, "(LCD) %08X <- %08X (PC %08X)\n", 0x14A00400 + (offset << 2), data, cpu_get_pc( space->cpu));
 	COMBINE_DATA(&s3c240x_lcd_palette[offset]);
 	if (mem_mask != 0xffffffff)
 	{
 		verboselog( machine, 0, "s3c240x_lcd_palette_w: unknown mask %08x\n", mem_mask);
 	}
-	r = BITS( data, 15, 11) << 3;
-	g = BITS( data, 10,  6) << 3;
-	b = BITS( data,  5,  1) << 3;
-	palette_set_color_rgb( machine, offset, r, g, b);
+	palette_set_color( machine, offset, s3c240x_get_color_5551( data & 0xFFFF));
 }
 
 // CLOCK & POWER MANAGEMENT
