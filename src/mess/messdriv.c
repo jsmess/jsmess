@@ -336,12 +336,14 @@ const game_driver * const drivers[] =
     DRIVER( macsefd )   /* 1988 Apple Macintosh SE (FDHD) */
     DRIVER( mac2fdhd )  /* 1988 Apple Macintosh II (FDHD) */
     DRIVER( maciix )    /* 1988 Apple Macintosh IIx */
+    DRIVER( macprtb )   /* 1989 Apple Macintosh Portable */
     DRIVER( macse30 )   /* 1989 Apple Macintosh SE/30 */
     DRIVER( maciicx )   /* 1989 Apple Macintosh IIcx */
     DRIVER( maciici )   /* 1989 Apple Macintosh IIci */
     DRIVER( macclasc )  /* 1990 Apple Macintosh Classic                     */
     DRIVER( maclc ) /* 1990 Apple Macintosh LC */
     DRIVER( maciisi )   /* 1990 Apple Macintosh IIsi */
+    DRIVER( macpb100 )  /* 1991 Apple Macintosh PowerBook 100 */
     DRIVER( macclas2 )  /* 1991 Apple Macintosh Classic II */
     DRIVER( maclc2 )    /* 1991 Apple Macintosh LC II */
     DRIVER( maclc3 )    /* 1993 Apple Macintosh LC III */
