@@ -36,6 +36,9 @@ Skeleton drivers:
 - Indiana University 68030 board
 - Intel SDK-85
 - Intel RPC 86
+- Intel iPB
+- Intel iPC
+- Intel iPDS
 - Intel iSBC 86/12A
 - Intel iSBC 286
 - Intel iSBC 286-10

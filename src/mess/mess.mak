@@ -930,6 +930,9 @@ $(MESSOBJ)/intel.a:				\
 	$(MESS_DRIVERS)/sdk86.o		\
 	$(MESS_DRIVERS)/sdk85.o		\
 	$(MESS_DRIVERS)/isbc.o		\
+	$(MESS_DRIVERS)/ipb.o		\
+	$(MESS_DRIVERS)/ipc.o		\
+	$(MESS_DRIVERS)/ipds.o		\
 
 $(MESSOBJ)/intelgnt.a:			\
 	$(MESS_AUDIO)/dave.o		\

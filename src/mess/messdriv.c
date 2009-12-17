@@ -1565,5 +1565,8 @@ const game_driver * const drivers[] =
 	DRIVER( ccs2810 )
 	DRIVER( qtsbc )
 	DRIVER( msbc1 )
+	DRIVER( ipb )
+	DRIVER( ipc )
+	DRIVER( ipds )
 
 #endif /* DRIVER_RECURSIVE */
