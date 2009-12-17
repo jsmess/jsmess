@@ -7,6 +7,16 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+
+	- move M6510T port handling to cpu core
+	- TCBM bus
+	- connect to C16/Plus4
+
+*/
+
 #include "driver.h"
 #include "c1551.h"
 #include "cpu/m6502/m6502.h"

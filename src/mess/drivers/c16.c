@@ -126,11 +126,13 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 #include "machine/cbmipt.h"
 #include "video/ted7360.h"
 #include "devices/messram.h"
+#include "machine/c1541.h"
+#include "machine/c1551.h"
 
 /* devices config */
 #include "includes/cbm.h"
 #include "includes/cbmdrive.h"
-#include "includes/cbmserb.h"
+#include "machine/cbmiec.h"
 
 #include "includes/c16.h"
 
@@ -412,6 +414,19 @@ static const m6502_interface c16_m7501_interface =
 	c16_m7501_port_write	/* port_write_func */
 };
 
+static CBM_IEC_DAISY( c16_iec_no_drives )
+{
+	{ "maincpu" },
+	{ NULL}
+};
+
+static CBM_IEC_DAISY( c16_iec_1541 )
+{
+	{ "maincpu" },
+	{ C1541_IEC("c1541") },
+	{ NULL}
+};
+
 static MACHINE_DRIVER_START( c16 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M7501, 1400000)        /* 7.8336 MHz */
@@ -449,14 +464,14 @@ static MACHINE_DRIVER_START( c16 )
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
 
-	/* floppy from serial bus */
-	MDRV_IMPORT_FROM(simulated_drive)
-
 	/* tpi */
 	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_intf)
 	MDRV_TPI6525_ADD("tpi6535_tpi_3", c16_tpi6525_tpi_3_intf)
 
 	MDRV_IMPORT_FROM(c16_cartslot)
+
+	/* IEC serial bus */
+	MDRV_CBM_IEC_ADD("iec", c16_iec_no_drives)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -476,7 +491,6 @@ static MACHINE_DRIVER_START( c16c )
 	/* emulation code currently supports only one drive */
 	MDRV_DEVICE_REMOVE("tpi6535_tpi_3")
 
-	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_c1551 )
 #ifdef CPU_SYNC
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -489,8 +503,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( c16v )
 	MDRV_IMPORT_FROM( c16 )
 
-	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
-	MDRV_IMPORT_FROM( cpu_vc1541 )
+	/* floppy from serial bus */
+	MDRV_DEVICE_REMOVE("iec")
+	MDRV_CBM_IEC_ADD("iec", c16_iec_1541)
+	MDRV_C1541_ADD("c1541", "iec", 8)
 #ifdef CPU_SYNC
 	MDRV_QUANTUM_TIME(HZ(60))
 #else
@@ -528,7 +544,6 @@ static MACHINE_DRIVER_START( plus4c )
 	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_c1551_intf)
 
 	/* emulation code currently supports only one drive */
-	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_DEVICE_REMOVE("tpi6535_tpi_3")
 
 	MDRV_IMPORT_FROM( cpu_c1551 )
@@ -546,8 +561,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( plus4v )
 	MDRV_IMPORT_FROM( plus4 )
 
-	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
-	MDRV_IMPORT_FROM( cpu_vc1541 )
+	/* floppy from serial bus */
+	MDRV_DEVICE_REMOVE("iec")
+	MDRV_CBM_IEC_ADD("iec", c16_iec_1541)
+	MDRV_C1541_ADD("c1541", "iec", 8)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -636,9 +653,6 @@ ROM_START( c16v )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "318006-01.bin", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 	ROM_LOAD( "318004-05.bin", 0x14000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb) )
-
-	/* we temporarily use -bios to select among vc1541 firmwares, for this system */
-	VC1541_ROM("cpu_vc1540")
 ROM_END
 
 #define rom_c116		rom_c16
@@ -684,9 +698,6 @@ ROM_START( plus4v )
 
 	ROM_LOAD( "317053-01.bin", 0x18000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f) )
 	ROM_LOAD( "317054-01.bin", 0x1c000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693) )
-
-	/* we temporarily use -bios to select among vc1541 firmwares, for this system */
-	VC1541_ROM("cpu_vc1540")
 ROM_END
 
 
@@ -705,10 +716,6 @@ static SYSTEM_CONFIG_START(c16c)
 	CONFIG_DEVICE(c1551_device_getinfo)
 SYSTEM_CONFIG_END
 
-static SYSTEM_CONFIG_START(c16v)
-	CONFIG_DEVICE(vc1541_device_getinfo)
-SYSTEM_CONFIG_END
-
 static SYSTEM_CONFIG_START(plus)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 SYSTEM_CONFIG_END
@@ -717,9 +724,6 @@ static SYSTEM_CONFIG_START(plusc)
 	CONFIG_DEVICE(c1551_device_getinfo)
 SYSTEM_CONFIG_END
 
-static SYSTEM_CONFIG_START(plusv)
-	CONFIG_DEVICE(vc1541_device_getinfo)
-SYSTEM_CONFIG_END
 
 /***************************************************************************
 
@@ -731,16 +735,16 @@ SYSTEM_CONFIG_END
 
 COMP( 1984, c16,     0,     0,  c16,    c16,    c16,    c16,     "Commodore Business Machines Co.",  "Commodore 16 (PAL)", 0)
 COMP( 1984, c16c,    c16,   0,  c16c,   c16,    c16c,   c16c,    "Commodore Business Machines Co.",  "Commodore 16 (PAL, 1551)", 0 )
-COMP( 1984, c16v,    c16,   0,  c16v,   c16,    c16v,   c16v,    "Commodore Business Machines Co.",  "Commodore 16 (PAL, VC1541)", GAME_NOT_WORKING)
+COMP( 1984, c16v,    c16,   0,  c16v,   c16,    c16v,   0,    "Commodore Business Machines Co.",  "Commodore 16 (PAL, VC1541)", GAME_NOT_WORKING)
 COMP( 1984, c16hun,  c16,   0,  c16,    c16,    c16,    c16,     "Commodore Business Machines Co.",  "Commodore 16 Novotrade (PAL, Hungary)", 0)
 
 COMP( 1984, c116,    c16,   0,  c16,    c16,    c16,    c16,     "Commodore Business Machines Co.",  "Commodore 116 (PAL)", 0)
 COMP( 1984, c116c,	 c16,   0,  c16c,   c16,    c16c,   c16c,    "Commodore Business Machines Co.",  "Commodore 116 (PAL, 1551)", 0 )
-COMP( 1984, c116v,   c16,   0,  c16v,   c16,    c16v,   c16v,    "Commodore Business Machines Co.",  "Commodore 116 (PAL, VC1541)", GAME_NOT_WORKING)
+COMP( 1984, c116v,   c16,   0,  c16v,   c16,    c16v,   0,    "Commodore Business Machines Co.",  "Commodore 116 (PAL, VC1541)", GAME_NOT_WORKING)
 
 COMP( 1984, plus4,   c16,   0,  plus4,  plus4,  c16,    plus,    "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC)", 0)
 COMP( 1984, plus4c,  c16,   0,  plus4c, plus4,  c16c,   plusc,   "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, 1551)", 0 )
-COMP( 1984, plus4v,  c16,   0,  plus4v, plus4,  c16v,   plusv,   "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, VC1541)", GAME_NOT_WORKING)
+COMP( 1984, plus4v,  c16,   0,  plus4v, plus4,  c16v,   0,   "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, VC1541)", GAME_NOT_WORKING)
 
 COMP( 1984, c232,    c16,   0,  c16,    c16,    c16,    c16,     "Commodore Business Machines Co.",  "Commodore 232 (Prototype)", 0)
 COMP( 1984, c264,    c16,   0,  c264,   plus4,  c16,    plus,    "Commodore Business Machines Co.",  "Commodore 264 (Prototype)", 0)

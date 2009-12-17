@@ -15,7 +15,7 @@
 
 #include "machine/6525tpi.h"
 #include "video/ted7360.h"
-#include "includes/cbmserb.h"
+#include "machine/cbmiec.h"
 #include "includes/vc1541.h"
 #include "includes/cbmdrive.h"
 
@@ -113,13 +113,12 @@ static UINT8 read_cfg1( running_machine *machine )
 
 void c16_m7501_port_write( const device_config *device, UINT8 direction, UINT8 data )
 {
-	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
-	int dat, atn, clk;
+	const device_config *serbus = devtag_get_device(device->machine, "iec");
 
 	/* bit zero then output 0 */
-	cbm_serial_atn_write(serbus, 0, atn = !(data & 0x04));
-	cbm_serial_clock_write(serbus, 0, clk = !(data & 0x02));
-	cbm_serial_data_write(serbus, 0, dat = !(data & 0x01));
+	cbm_iec_atn_w(serbus, device, !(data & 0x04));
+	cbm_iec_clk_w(serbus, device, !(data & 0x02));
+	cbm_iec_data_w(serbus, device, !(data & 0x01));
 
 	cassette_output(devtag_get_device(device->machine, "cassette"), !(data & 0x02) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 
@@ -130,12 +129,12 @@ UINT8 c16_m7501_port_read( const device_config *device, UINT8 direction )
 {
 	UINT8 data = 0xff;
 	UINT8 c16_port7501 = (UINT8) devtag_get_info_int(device->machine, "maincpu", CPUINFO_INT_M6510_PORT);
-	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
+	const device_config *serbus = devtag_get_device(device->machine, "iec");
 
-	if ((c16_port7501 & 0x01) || !cbm_serial_data_read(serbus, 0))
+	if ((c16_port7501 & 0x01) || !cbm_iec_data_r(serbus))
 		data &= ~0x80;
 
-	if ((c16_port7501 & 0x02) || !cbm_serial_clock_read(serbus, 0))
+	if ((c16_port7501 & 0x02) || !cbm_iec_clk_r(serbus))
 		data &= ~0x40;
 
 //  data &= ~0x20; // port bit not in pinout
