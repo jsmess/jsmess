@@ -120,11 +120,11 @@ static floperr_t g64_read_track(floppy_image *floppy, int head, int track, UINT6
 			/* read track */
 			floppy_image_read(floppy, buffer, track_offset, track_length);
 		}
-		else
-		{
-			/* set track length to 0 */
-			memset(buffer, 0, 2);
-		}
+	}
+	else
+	{
+		/* set track length to 0 */
+		memset(buffer, 0, buflen);
 	}
 
 	if (LOG) logerror("G64 track %.1f length %u\n", get_track_index(track), track_length);
