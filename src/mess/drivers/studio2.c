@@ -658,6 +658,11 @@ ROM_START( mpt02h )
 	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
 ROM_END
 
+ROM_START( eti660 )
+	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
+	ROM_LOAD( "eti660.bin", 0x0000, 0x0400, CRC(811dfa62) SHA1(c0c4951e02f873f15560bdc3f35cdf3f99653922) )
+ROM_END
+
 /* Driver Initialization */
 
 static TIMER_CALLBACK( setup_beep )
@@ -681,3 +686,4 @@ CONS( 1978,	mpt02s,		studio2,0,		mpt02,		studio2,	studio2,	0,			"Soundic",	"MPT-
 CONS( 1978,	mpt02h,		studio2,0,		mpt02,		studio2,	studio2,	0,			"Hanimex",	"MPT-02 Jeu TV Programmable (France)", GAME_NOT_WORKING )
 CONS( 1978,	mtc9016,	studio2,0,		mpt02,		studio2,	studio2,	0,			"Mustang",	"9016 Telespiel Computer (Germany)", GAME_NOT_WORKING )
 CONS( 1978, shmc1200,	studio2,0,		mpt02,		studio2,	studio2,	0,			"Sheen",	"1200 Micro Computer (Australia)", GAME_NOT_WORKING )
+CONS( 1978, eti660,		studio2,0,		mpt02,		studio2,	studio2,	0,			"Electronics Today International",	"ETI-660 (Australia)", GAME_NOT_WORKING )

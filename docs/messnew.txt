@@ -32,6 +32,7 @@ Skeleton drivers:
 - CCS Model 2810
 - Commodore LCD [Curt Coder]
 - Dual Systems 68000
+- ETI-660 [Curt Coder]
 - Exelvision Exeltel
 - Hewlett-Packard HP16500b [R. Belmont]
 - Indiana University 68030 board

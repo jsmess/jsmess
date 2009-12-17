@@ -145,6 +145,7 @@ const game_driver * const drivers[] =
     DRIVER( studio2 )   /* 1977 Studio II                                   */
     DRIVER( visicom )
 	DRIVER( mpt02s )
+	DRIVER( eti660 )
 //  DRIVER( mpt02h )
 //  DRIVER( mtc9016 )   /* 1978 Mustang 9016 Telespiel Computer             */
 //  DRIVER( shmc1200 )
