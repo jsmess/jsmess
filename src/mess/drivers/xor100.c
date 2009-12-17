@@ -60,7 +60,7 @@ static void xor100_bankswitch(running_machine *machine)
 		}
 
 		memory_install_read_bank(program, 0x0000, 0xf7ff, 0x07ff, 0, "bank2");
-		memory_install_read_bank(program, 0xf800, 0xffff, 0, 0, "bank2");
+		memory_install_read_bank(program, 0xf800, 0xffff, 0, 0, "bank3");
 		memory_set_bank(machine, "bank2", 0);
 		memory_set_bank(machine, "bank3", 0);
 		break;
