@@ -250,7 +250,7 @@ static CBM_IEC_DAISY( cbm_iec_daisy )
 {
 	{ "via6522_0" },
 	{ "via6522_1" },
-	{ "c1540" },
+	{ C1541_IEC("c1540") },
 	{ NULL}
 };
 

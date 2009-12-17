@@ -19,7 +19,6 @@
 
 #include "machine/6522via.h"
 #include "video/vic6560.h"
-#include "includes/vc1541.h"
 #include "machine/cbmiec.h"
 #include "includes/cbmieeeb.h"
 #include "includes/cbmdrive.h"
@@ -45,9 +44,7 @@ static UINT8 keyboard[8] =
 {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 
 static int via1_portb, via1_porta, via0_ca2;
-static int serial_atn, serial_clock, serial_data;
 
-static int has_vc1541;
 static int ieee; /* ieee cartridge (interface and rom)*/
 static UINT8 *vc20_rom_2000;
 static UINT8 *vc20_rom_4000;
@@ -133,7 +130,6 @@ static WRITE8_DEVICE_HANDLER( vc20_via0_write_porta )
 	const device_config *serbus = devtag_get_device(device->machine, "iec");
 
 	cbm_iec_atn_w(serbus, device, !(data & 0x80));
-	DBG_LOG(device->machine, 1, "serial out", ("atn %s\n", serial_atn ? "high" : "low"));
 }
 
 /* via 1 addr 0x9120
@@ -592,20 +588,12 @@ static void vc20_common_driver_init( running_machine *machine )
 {
 	vc20_memory_init(machine);
 
-	serial_atn = 1;
-	serial_clock = 1;
-	serial_data = 1;
-
 	datasette_timer = timer_alloc(machine, vic20_tape_timer, NULL);
-
-	if (has_vc1541)
-		cbm_drive_config(machine, type_1541, 0, 0, "cpu_vc1540", 8);
 }
 
 DRIVER_INIT( vc20 )
 {
 	ieee = 0;
-	has_vc1541 = 0;
 	vc20_common_driver_init(machine);
 	vic6561_init(vic6560_dma_read, vic6560_dma_read_color);
 }
@@ -613,7 +601,6 @@ DRIVER_INIT( vc20 )
 DRIVER_INIT( vic20 )
 {
 	ieee = 0;
-	has_vc1541 = 0;
 	vc20_common_driver_init(machine);
 	vic6560_init(vic6560_dma_read, vic6560_dma_read_color);
 }
@@ -626,7 +613,6 @@ DRIVER_INIT( vic1001 )
 DRIVER_INIT( vc20v )
 {
 	ieee = 0;
-	has_vc1541 = 1;
 	vc20_common_driver_init(machine);
 	vic6561_init(vic6560_dma_read, vic6560_dma_read_color);
 }
@@ -634,7 +620,6 @@ DRIVER_INIT( vc20v )
 DRIVER_INIT( vic20v )
 {
 	ieee = 0;
-	has_vc1541 = 1;
 	vc20_common_driver_init(machine);
 	vic6560_init(vic6560_dma_read, vic6560_dma_read_color);
 }
@@ -642,7 +627,6 @@ DRIVER_INIT( vic20v )
 DRIVER_INIT( vic20i )
 {
 	ieee = 1;
-	has_vc1541 = 0;
 	vc20_common_driver_init(machine);
 	vic6560_init(vic6560_dma_read, vic6560_dma_read_color);
 }
@@ -651,22 +635,10 @@ MACHINE_RESET( vic20 )
 {
 	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
 
-	if (has_vc1541)
+	if (ieee)
 	{
-		cbm_drive_reset(machine);
-	}
-	else
-	{
-		if (ieee)
-		{
-			cbm_drive_0_config(IEEE, 8);
-			cbm_drive_1_config(IEEE, 9);
-		}
-		else
-		{
-			cbm_drive_0_config(SERIAL, 8);
-			cbm_drive_1_config(SERIAL, 9);
-		}
+		cbm_drive_0_config(IEEE, 8);
+		cbm_drive_1_config(IEEE, 9);
 	}
 
 	via_ca1_w(via_0, 0, vc20_via0_read_ca1(via_0, 0));

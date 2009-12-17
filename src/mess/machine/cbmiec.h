@@ -25,30 +25,6 @@
 #define CBM_IEC_DAISY(_name) \
 	const cbm_iec_daisy_chain (_name)[] =
 
-enum
-{
-	DEVINFO_FCT_CBM_IEC_SRQ = DEVINFO_FCT_DEVICE_SPECIFIC,
-	DEVINFO_FCT_CBM_IEC_ATN,
-	DEVINFO_FCT_CBM_IEC_CLK,
-	DEVINFO_FCT_CBM_IEC_DATA,
-	DEVINFO_FCT_CBM_IEC_RESET
-};
-
-#define CBM_IEC_SRQ_NAME(name)		cbm_iec_srq_##name
-#define CBM_IEC_SRQ(name)			void CBM_IEC_SRQ_NAME(name)(const device_config *device, int state)
-
-#define CBM_IEC_ATN_NAME(name)		cbm_iec_atn_##name
-#define CBM_IEC_ATN(name)			void CBM_IEC_ATN_NAME(name)(const device_config *device, int state)
-
-#define CBM_IEC_CLK_NAME(name)		cbm_iec_clk_##name
-#define CBM_IEC_CLK(name)			void CBM_IEC_CLK_NAME(name)(const device_config *device, int state)
-
-#define CBM_IEC_DATA_NAME(name)		cbm_iec_data_##name
-#define CBM_IEC_DATA(name)			void CBM_IEC_DATA_NAME(name)(const device_config *device, int state)
-
-#define CBM_IEC_RESET_NAME(name)	cbm_iec_reset_##name
-#define CBM_IEC_RESET(name)			void CBM_IEC_RESET_NAME(name)(const device_config *device, int state)
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -57,9 +33,13 @@ typedef struct _cbm_iec_daisy_chain cbm_iec_daisy_chain;
 struct _cbm_iec_daisy_chain
 {
 	const char *tag;	/* device tag */
-};
 
-typedef void (*cbm_iec_line)(const device_config *device, int state);
+	devcb_write_line	out_srq_func;
+	devcb_write_line	out_atn_func;
+	devcb_write_line	out_clk_func;
+	devcb_write_line	out_data_func;
+	devcb_write_line	out_reset_func;
+};
 
 /***************************************************************************
     PROTOTYPES

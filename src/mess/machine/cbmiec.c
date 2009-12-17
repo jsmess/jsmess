@@ -223,7 +223,7 @@ struct _cbm_iec_daisy_state
 
 	int line[SIGNAL_COUNT];						/* serial signal states */
 
-	cbm_iec_line				out_line_func[SIGNAL_COUNT];
+	devcb_resolved_write_line	out_line_func[SIGNAL_COUNT];
 };
 
 typedef struct _cbm_iec_t cbm_iec_t;
@@ -293,7 +293,7 @@ INLINE void set_signal(const device_config *iec, const device_config *device, in
 
 	for ( ; daisy != NULL; daisy = daisy->next)
 	{
-		if (daisy->out_line_func[line]) (daisy->out_line_func[line])(daisy->device, data);
+		devcb_call_write_line(&daisy->out_line_func[line], data);
 	}
 
 	if (LOG) logerror("CBM IEC: SRQ %u ATN %u CLK %u DATA %u RESET %u\n", get_signal(iec, SRQ),get_signal(iec, ATN),get_signal(iec, CLK),get_signal(iec, DATA),get_signal(iec, RESET));
@@ -386,11 +386,11 @@ static DEVICE_START( cbm_iec )
 			(*tailptr)->line[i] = 1;
 		}
 
-		(*tailptr)->out_line_func[SRQ] = (cbm_iec_line)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_CBM_IEC_SRQ);
-		(*tailptr)->out_line_func[ATN] = (cbm_iec_line)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_CBM_IEC_ATN);
-		(*tailptr)->out_line_func[CLK] = (cbm_iec_line)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_CBM_IEC_CLK);
-		(*tailptr)->out_line_func[DATA] = (cbm_iec_line)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_CBM_IEC_DATA);
-		(*tailptr)->out_line_func[RESET] = (cbm_iec_line)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_CBM_IEC_RESET);
+		devcb_resolve_write_line(&(*tailptr)->out_line_func[SRQ], &daisy->out_srq_func, device);
+		devcb_resolve_write_line(&(*tailptr)->out_line_func[ATN], &daisy->out_atn_func, device);
+		devcb_resolve_write_line(&(*tailptr)->out_line_func[CLK], &daisy->out_clk_func, device);
+		devcb_resolve_write_line(&(*tailptr)->out_line_func[DATA], &daisy->out_data_func, device);
+		devcb_resolve_write_line(&(*tailptr)->out_line_func[RESET], &daisy->out_reset_func, device);
 
 		tailptr = &(*tailptr)->next;
 	}

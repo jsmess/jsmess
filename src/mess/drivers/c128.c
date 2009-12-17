@@ -178,14 +178,15 @@ to use an EEPROM reader, in order to obtain a dump of the whole content.
 #include "machine/6526cia.h"
 
 #include "machine/cbmipt.h"
+#include "machine/c1571.h"
+#include "machine/c1581.h"
 #include "video/vic6567.h"
 #include "video/vdc8563.h"
 
+
 /* devices config */
 #include "includes/cbm.h"
-#include "includes/cbmserb.h"
-#include "includes/cbmdrive.h"
-#include "includes/vc1541.h"
+#include "machine/cbmiec.h"
 
 #include "includes/c128.h"
 #include "includes/c64.h"
@@ -578,6 +579,19 @@ static const m6502_interface c128_m8502_interface =
 	c128_m6510_port_write,	/* port_write_func */
 };
 
+static CBM_IEC_DAISY( c128_iec_bus )
+{
+	{ "cia_1", DEVCB_DEVICE_LINE("cia_0", mos6526_flag_w) },
+	{ C1571_IEC("c1571") },
+	{ NULL}
+};
+
+static CBM_IEC_DAISY( c128d81_iec_bus )
+{
+	{ "cia_1", DEVCB_DEVICE_LINE("cia_0", mos6526_flag_w) },
+	{ C1581_IEC("c1581") },
+	{ NULL}
+};
 
 /*************************************
  *
@@ -636,7 +650,8 @@ static MACHINE_DRIVER_START( c128 )
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, VIC6567_CLOCK, c128_ntsc_cia1)
 
 	/* floppy from serial bus */
-	MDRV_IMPORT_FROM(simulated_drive)
+	MDRV_CBM_IEC_ADD("iec", c128_iec_bus)
+	MDRV_C1571_ADD("c1571", "iec", 8)
 
 	MDRV_IMPORT_FROM(c64_cartslot)
 MACHINE_DRIVER_END
@@ -644,23 +659,23 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c128d )
 	MDRV_IMPORT_FROM( c128 )
-
-	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
-	MDRV_IMPORT_FROM( cpu_c1571 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c128dcr )
 	MDRV_IMPORT_FROM( c128 )
 
-	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
-	MDRV_IMPORT_FROM( cpu_c1571cr )
+	MDRV_DEVICE_REMOVE("c1571")
+	MDRV_C1571CR_ADD("c1571", "iec", 8)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c128d81 )
 	MDRV_IMPORT_FROM( c128 )
 
-	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
-	MDRV_IMPORT_FROM( cpu_c1581 )
+	MDRV_DEVICE_REMOVE("iec")
+	MDRV_DEVICE_REMOVE("c1571")
+
+	MDRV_CBM_IEC_ADD("iec", c128d81_iec_bus)
+	MDRV_C1563_ADD("c1563", "iec", 8)
 MACHINE_DRIVER_END
 
 
@@ -687,16 +702,11 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c128dpal )
 	MDRV_IMPORT_FROM( c128pal )
-
-	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
-	MDRV_IMPORT_FROM( cpu_c1571 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c128dcrp )
 	MDRV_IMPORT_FROM( c128pal )
 
-	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
-	MDRV_IMPORT_FROM( cpu_c1571cr )
 MACHINE_DRIVER_END
 
 
@@ -847,7 +857,6 @@ ROM_START( c128d )
 	ROM_LOAD( "390059-01.bin", 0x120000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )
 
 	ROM_REGION( 0x10000, "m8502", ROMREGION_ERASEFF )
-	C1571_ROM("cpu_vc1571")
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASEFF )
 	ROM_REGION( 0x100, "gfx2", ROMREGION_ERASEFF )
 ROM_END
@@ -862,7 +871,6 @@ ROM_START( c128dcr )
 	ROM_LOAD( "390059-01.bin", 0x120000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )			// Character
 
 	ROM_REGION( 0x10000, "m8502", ROMREGION_ERASEFF )
-	C1571CR_ROM("cpu_vc1571")
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASEFF )
 	ROM_REGION( 0x100, "gfx2", ROMREGION_ERASEFF )
 ROM_END
@@ -877,7 +885,6 @@ ROM_START( c128drde )
 	ROM_LOAD( "315079-01.bin", 0x120000, 0x2000, CRC(fe5a2db1) SHA1(638f8aff51c2ac4f99a55b12c4f8c985ef4bebd3) )
 
 	ROM_REGION( 0x10000, "m8502", ROMREGION_ERASEFF )
-	C1571CR_ROM("cpu_vc1571")
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASEFF )
 	ROM_REGION( 0x100, "gfx2", ROMREGION_ERASEFF )
 ROM_END
@@ -890,7 +897,6 @@ ROM_START( c128drsw )
 	ROM_LOAD( "325181-01.bin", 0x120000, 0x2000, CRC(7a70d9b8) SHA1(aca3f7321ee7e6152f1f0afad646ae41964de4fb) )
 
 	ROM_REGION( 0x10000, "m8502", ROMREGION_ERASEFF )
-	C1571CR_ROM("cpu_vc1571")
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASEFF )
 	ROM_REGION( 0x100, "gfx2", ROMREGION_ERASEFF )
 ROM_END
@@ -906,7 +912,6 @@ ROM_START( c128drit )
 	ROM_LOAD( "325167-01.bin", 0x120000, 0x2000, BAD_DUMP CRC(bad36b88) SHA1(9119b27a1bf885fa4c76fff5d858c74c194dd2b8) )
 
 	ROM_REGION( 0x10000, "m8502", ROMREGION_ERASEFF )
-	C1571CR_ROM("cpu_vc1571")
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASEFF )
 	ROM_REGION( 0x100, "gfx2", ROMREGION_ERASEFF )
 ROM_END
@@ -921,31 +926,10 @@ ROM_START( c128d81 )
 	ROM_LOAD( "390059-01.bin", 0x120000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )
 
 	ROM_REGION( 0x10000, "m8502", ROMREGION_ERASEFF )
-	C1581_ROM("cpu_vc1571")
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASEFF )
 	ROM_REGION( 0x100, "gfx2", ROMREGION_ERASEFF )
 ROM_END
 
-
-
-/*************************************
- *
- *  System configuration(s)
- *
- *************************************/
-
-
-static SYSTEM_CONFIG_START(c128)
-	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(c128d)
-	CONFIG_DEVICE(c1571_device_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(c128d81)
-	CONFIG_DEVICE(c1581_device_getinfo)
-SYSTEM_CONFIG_END
 
 
 /***************************************************************************
@@ -956,25 +940,25 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME     PARENT COMPAT MACHINE   INPUT    INIT      CONFIG COMPANY                             FULLNAME            FLAGS */
 
-COMP( 1985, c128,      0,     0,   c128,     c128,    c128,     c128,  "Commodore Business Machines Co.", "Commodore 128 (NTSC)", 0)
-COMP( 1985, c128cr,    c128,  0,   c128,     c128,    c128,     c128,  "Commodore Business Machines Co.", "Commodore 128CR (NTSC, proto?)", 0)
+COMP( 1985, c128,      0,     0,   c128,     c128,    c128,     0,  "Commodore Business Machines Co.", "Commodore 128 (NTSC)", 0)
+COMP( 1985, c128cr,    c128,  0,   c128,     c128,    c128,     0,  "Commodore Business Machines Co.", "Commodore 128CR (NTSC, proto?)", 0)
 
-COMP( 1985, c128sfi,   c128,  0,   c128pal,  c128fra, c128pal,  c128,  "Commodore Business Machines Co.", "Commodore 128 (PAL, Swedish / Finnish)", 0)
-COMP( 1985, c128fino,  c128,  0,   c128pal,  c128swe, c128pal,  c128,  "Commodore Business Machines Co.", "Commodore 128 (PAL, Finland, Unconfirmed Dumps)", 0)
-COMP( 1985, c128fra,   c128,  0,   c128pal,  c128fra, c128pal,  c128,  "Commodore Business Machines Co.", "Commodore 128 (PAL, France)", 0)
-COMP( 1985, c128ger,   c128,  0,   c128pal,  c128ger, c128pal,  c128,  "Commodore Business Machines Co.", "Commodore 128 (PAL, Germany)", 0)
-COMP( 1985, c128nor,   c128,  0,   c128pal,  c128ita, c128pal,  c128,  "Commodore Business Machines Co.", "Commodore 128 (PAL, Norway)", 0)
+COMP( 1985, c128sfi,   c128,  0,   c128pal,  c128fra, c128pal,  0,  "Commodore Business Machines Co.", "Commodore 128 (PAL, Swedish / Finnish)", 0)
+COMP( 1985, c128fino,  c128,  0,   c128pal,  c128swe, c128pal,  0,  "Commodore Business Machines Co.", "Commodore 128 (PAL, Finland, Unconfirmed Dumps)", 0)
+COMP( 1985, c128fra,   c128,  0,   c128pal,  c128fra, c128pal,  0,  "Commodore Business Machines Co.", "Commodore 128 (PAL, France)", 0)
+COMP( 1985, c128ger,   c128,  0,   c128pal,  c128ger, c128pal,  0,  "Commodore Business Machines Co.", "Commodore 128 (PAL, Germany)", 0)
+COMP( 1985, c128nor,   c128,  0,   c128pal,  c128ita, c128pal,  0,  "Commodore Business Machines Co.", "Commodore 128 (PAL, Norway)", 0)
 // we miss other countries: Spain, Belgium, etc.
 
 // the following drivers use a 1571 floppy drive
-COMP( 1985, c128dpr,   c128,  0,   c128d,    c128,    c128d,    c128d, "Commodore Business Machines Co.", "Commodore 128D (NTSC, proto)", GAME_NOT_WORKING)
-COMP( 1985, c128d,     c128,  0,   c128dpal, c128,    c128dpal, c128d, "Commodore Business Machines Co.", "Commodore 128D (PAL)", GAME_NOT_WORKING)
+COMP( 1985, c128dpr,   c128,  0,   c128d,    c128,    c128d,    0, "Commodore Business Machines Co.", "Commodore 128D (NTSC, proto)", GAME_NOT_WORKING)
+COMP( 1985, c128d,     c128,  0,   c128dpal, c128,    c128dpal, 0, "Commodore Business Machines Co.", "Commodore 128D (PAL)", GAME_NOT_WORKING)
 
 // the following drivers use a 1571CR floppy drive
-COMP( 1986, c128dcr,   c128,  0,   c128dcr,  c128,    c128dcr,  c128d, "Commodore Business Machines Co.", "Commodore 128DCR (NTSC)", GAME_NOT_WORKING)
-COMP( 1986, c128drde,  c128,  0,   c128dcrp, c128ger, c128dcrp, c128d, "Commodore Business Machines Co.", "Commodore 128DCR (PAL, Germany)", GAME_NOT_WORKING)
-COMP( 1986, c128drit,  c128,  0,   c128dcrp, c128ita, c128dcrp, c128d, "Commodore Business Machines Co.", "Commodore 128DCR (PAL, Italy)", GAME_NOT_WORKING)
-COMP( 1986, c128drsw,  c128,  0,   c128dcrp, c128swe, c128dcrp, c128d, "Commodore Business Machines Co.", "Commodore 128DCR (PAL, Sweden)", GAME_NOT_WORKING)
+COMP( 1986, c128dcr,   c128,  0,   c128dcr,  c128,    c128dcr,  0, "Commodore Business Machines Co.", "Commodore 128DCR (NTSC)", GAME_NOT_WORKING)
+COMP( 1986, c128drde,  c128,  0,   c128dcrp, c128ger, c128dcrp, 0, "Commodore Business Machines Co.", "Commodore 128DCR (PAL, Germany)", GAME_NOT_WORKING)
+COMP( 1986, c128drit,  c128,  0,   c128dcrp, c128ita, c128dcrp, 0, "Commodore Business Machines Co.", "Commodore 128DCR (PAL, Italy)", GAME_NOT_WORKING)
+COMP( 1986, c128drsw,  c128,  0,   c128dcrp, c128swe, c128dcrp, 0, "Commodore Business Machines Co.", "Commodore 128DCR (PAL, Sweden)", GAME_NOT_WORKING)
 
 // the following driver is a c128 with 1581 floppy drive. it allows us to document 1581 firmware dumps, but it does not do much more
-COMP( 1986, c128d81,   c128,  0,   c128d81,  c128,    c128d81,  c128d81, "Commodore Business Machines Co.", "Commodore 128D/81 (NTSC, proto)", GAME_NOT_WORKING)
+COMP( 1986, c128d81,   c128,  0,   c128d81,  c128,    c128d81,  0, "Commodore Business Machines Co.", "Commodore 128D/81 (NTSC, proto)", GAME_NOT_WORKING)

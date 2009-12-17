@@ -24,9 +24,6 @@
 #include "video/vdc8563.h"
 
 #include "includes/cbm.h"
-#include "includes/cbmdrive.h"
-#include "includes/vc1541.h"
-
 #include "includes/c64.h"
 
 #include "devices/cassette.h"
@@ -70,7 +67,6 @@ static int c64_io_enabled;
 static int is_sx64;				// temporary workaround until we implement full vc1541 emulation for every c64 set
 static UINT8 c64_cart_n_banks = 0;
 
-static UINT8 serial_clock, serial_data, serial_atn;
 static UINT8 vicirq;
 
 static void c64_nmi( running_machine *machine )
@@ -866,7 +862,6 @@ DRIVER_INIT( sx64 )
 	c64_cia1_on = 1;
 	c64_tape_on = 0;
 	c64_common_driver_init(machine);
-	cbm_drive_config(machine, type_1541, 0, 0, "cpu_vc1540", 8);
 }
 
 MACHINE_START( c64 )
@@ -875,17 +870,6 @@ MACHINE_START( c64 )
 
 	c64_io_mirror = auto_alloc_array(machine, UINT8, 0x1000);
 	c64_io_enabled = 0;
-
-	if (is_sx64)
-	{
-		cbm_drive_reset(machine);
-	}
-	else if (c64_cia1_on)
-	{
-		cbm_drive_0_config(SERIAL, 8);
-		cbm_drive_1_config(SERIAL, 9);
-		serial_clock = serial_data = serial_atn = 1;
-	}
 
 	c64_vicaddr = c64_memory;
 	vicirq = 0;

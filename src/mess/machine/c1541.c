@@ -290,10 +290,10 @@ static TIMER_CALLBACK( bit_tick )
 }
 
 /*-------------------------------------------------
-    c1541_atn_w - serial bus attention
+    c1541_iec_atn_w - serial bus attention
 -------------------------------------------------*/
 
-static CBM_IEC_ATN( c1541 )
+WRITE_LINE_DEVICE_HANDLER( c1541_iec_atn_w )
 {
 	c1541_t *c1541 = get_safe_token(device);
 	int data_out = !c1541->data_out && !(c1541->atna ^ !state);
@@ -304,10 +304,10 @@ static CBM_IEC_ATN( c1541 )
 }
 
 /*-------------------------------------------------
-    c1541_reset_w - serial bus reset
+    c1541_iec_reset_w - serial bus reset
 -------------------------------------------------*/
 
-static CBM_IEC_RESET( c1541 )
+WRITE_LINE_DEVICE_HANDLER( c1541_iec_reset_w )
 {
 	if (!state)
 	{
@@ -1074,8 +1074,6 @@ DEVICE_GET_INFO( c1540 )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1541);						break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1541);						break;
-		case DEVINFO_FCT_CBM_IEC_ATN:					info->f = (genf *)CBM_IEC_ATN_NAME(c1541);					break;
-		case DEVINFO_FCT_CBM_IEC_RESET:					info->f = (genf *)CBM_IEC_RESET_NAME(c1541);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore VIC-1540");						break;

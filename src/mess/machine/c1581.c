@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Commodore 1581 Single Disk Drive emulation
+    Commodore 1581/1563 Single Disk Drive emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -68,14 +68,14 @@ INLINE c1581_t *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-	assert(device->type == C1581);
+	assert((device->type == C1581) || (device->type == C1563));
 	return (c1581_t *)device->token;
 }
 
 INLINE c1581_config *get_safe_config(const device_config *device)
 {
 	assert(device != NULL);
-	assert(device->type == C1581);
+	assert((device->type == C1581) || (device->type == C1563));
 	return (c1581_config *)device->inline_config;
 }
 
@@ -84,10 +84,10 @@ INLINE c1581_config *get_safe_config(const device_config *device)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    c1581_atn_w - serial bus attention
+    c1581_iec_atn_w - serial bus attention
 -------------------------------------------------*/
 
-static CBM_IEC_ATN( c1581 )
+WRITE_LINE_DEVICE_HANDLER( c1581_iec_atn_w )
 {
 	c1581_t *c1581 = get_safe_token(device);
 	int data_out = !c1581->data_out && !(c1581->atn_ack && !state);
@@ -98,10 +98,10 @@ static CBM_IEC_ATN( c1581 )
 }
 
 /*-------------------------------------------------
-    c1581_reset_w - serial bus reset
+    c1581_iec_reset_w - serial bus reset
 -------------------------------------------------*/
 
-static CBM_IEC_RESET( c1581 )
+WRITE_LINE_DEVICE_HANDLER( c1581_iec_reset_w )
 {
 	if (!state)
 	{
@@ -118,6 +118,17 @@ static ADDRESS_MAP_START( c1581_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE(M8520_TAG, cia_r, cia_w)
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE(WD1770_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("c1581", 0)
+ADDRESS_MAP_END
+
+/*-------------------------------------------------
+    ADDRESS_MAP( c1563_map )
+-------------------------------------------------*/
+
+static ADDRESS_MAP_START( c1563_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
+	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE(M8520_TAG, cia_r, cia_w)
+	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE(WD1770_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("c1563", 0)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -322,6 +333,20 @@ static MACHINE_DRIVER_START( c1581 )
 MACHINE_DRIVER_END
 
 /*-------------------------------------------------
+    MACHINE_DRIVER( c1563 )
+-------------------------------------------------*/
+
+static MACHINE_DRIVER_START( c1563 )
+	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
+	MDRV_CPU_PROGRAM_MAP(c1563_map)
+
+	MDRV_CIA8520_ADD(M8520_TAG, XTAL_16MHz/8, c1581_cia_intf)
+	MDRV_WD1770_ADD(WD1770_TAG, /*XTAL_16MHz/2,*/ c1581_wd1770_intf)
+
+	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1581_floppy_config)
+MACHINE_DRIVER_END
+
+/*-------------------------------------------------
     ROM( c1581 )
 -------------------------------------------------*/
 
@@ -403,8 +428,6 @@ DEVICE_GET_INFO( c1581 )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1581);						break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1581);						break;
-		case DEVINFO_FCT_CBM_IEC_ATN:					info->f = (genf *)CBM_IEC_ATN_NAME(c1581);					break;
-		case DEVINFO_FCT_CBM_IEC_RESET:					info->f = (genf *)CBM_IEC_RESET_NAME(c1581);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1581");							break;
@@ -412,5 +435,24 @@ DEVICE_GET_INFO( c1581 )
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
+	}
+}
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( c1563 )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( c1563 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers --- */
+		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c1563);							break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c1563);			break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1563");							break;
+
+		default:										DEVICE_GET_INFO_CALL(c1581);								break;
 	}
 }

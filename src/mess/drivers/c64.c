@@ -482,7 +482,7 @@ static const m6502_interface c64_m6510_interface =
 static CBM_IEC_DAISY( cbm_iec_daisy )
 {
 	{ "cia_1" },
-	{ "c1541" },
+	{ C1541_IEC("c1541") },
 	{ NULL}
 };
 

@@ -10,24 +10,16 @@
 ***************************************************************************/
 
 #include "driver.h"
-
-#include "cpu/m6502/m6502.h"
-#include "sound/sid6581.h"
-#include "machine/6526cia.h"
-
-#include "includes/cbm.h"
-#include "includes/cbmserb.h"
-#include "includes/cbmdrive.h"
-#include "includes/vc1541.h"
-#include "video/vic6567.h"
-#include "video/vdc8563.h"
-
-
 #include "includes/c128.h"
 #include "includes/c64.h"
-
+#include "includes/cbm.h"
+#include "machine/cbmiec.h"
+#include "cpu/m6502/m6502.h"
 #include "devices/cassette.h"
-
+#include "machine/6526cia.h"
+#include "sound/sid6581.h"
+#include "video/vic6567.h"
+#include "video/vdc8563.h"
 
 #define VERBOSE_LEVEL 0
 #define DBG_LOG( MACHINE, N, M, A ) \
@@ -77,9 +69,7 @@ static UINT8 c128_keyline[3] = {0xff, 0xff, 0xff};
 
 static int c128_va1617;
 static int c128_cia1_on;
-static UINT8 serial_clock, serial_data, serial_atn;
 static UINT8 vicirq;
-static int emulated_drive;
 
 static void c128_nmi( running_machine *machine )
 {
@@ -237,12 +227,12 @@ const cia6526_interface c128_pal_cia0 =
 static READ8_DEVICE_HANDLER( c128_cia1_port_a_r )
 {
 	UINT8 value = 0xff;
-	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
+	const device_config *serbus = devtag_get_device(device->machine, "iec");
 
-	if (!serial_clock || !cbm_serial_clock_read(serbus, 0))
+	if (!cbm_iec_clk_r(serbus))
 		value &= ~0x40;
 
-	if (!serial_data || !cbm_serial_data_read(serbus, 0))
+	if (!cbm_iec_data_r(serbus))
 		value &= ~0x80;
 
 	return value;
@@ -251,11 +241,11 @@ static READ8_DEVICE_HANDLER( c128_cia1_port_a_r )
 static WRITE8_DEVICE_HANDLER( c128_cia1_port_a_w )
 {
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
-	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
+	const device_config *serbus = devtag_get_device(device->machine, "iec");
 
-	cbm_serial_clock_write(serbus, 0, serial_clock = !(data & 0x10));
-	cbm_serial_data_write(serbus, 0, serial_data = !(data & 0x20));
-	cbm_serial_atn_write(serbus, 0, serial_atn = !(data & 0x08));
+	cbm_iec_clk_w(serbus, device, !(data & 0x10));
+	cbm_iec_data_w(serbus, device, !(data & 0x20));
+	cbm_iec_atn_w(serbus, device, !(data & 0x08));
 	c64_vicaddr = c64_memory + helper[data & 0x03];
 	c128_vicaddr = c64_memory + helper[data & 0x03] + c128_va1617;
 }
@@ -1099,7 +1089,6 @@ DRIVER_INIT( c128 )
 {
 	c64_tape_on = 1;
 	c64_pal = 0;
-	emulated_drive = 0;
 	c128_common_driver_init(machine);
 	vic6567_init(1, c64_pal, c128_dma_read, c128_dma_read_color, c128_vic_interrupt);
 	vic2_set_rastering(0);
@@ -1111,7 +1100,6 @@ DRIVER_INIT( c128pal )
 {
 	c64_tape_on = 1;
 	c64_pal = 1;
-	emulated_drive = 0;
 	c128_common_driver_init(machine);
 	vic6567_init(1, c64_pal, c128_dma_read, c128_dma_read_color, c128_vic_interrupt);
 	vic2_set_rastering(1);
@@ -1122,51 +1110,30 @@ DRIVER_INIT( c128pal )
 DRIVER_INIT( c128d )
 {
 	DRIVER_INIT_CALL( c128 );
-	emulated_drive = 1;
-	cbm_drive_config(machine, type_1571, 0, 0, "cpu_vc1571", 8);
 }
 
 DRIVER_INIT( c128dpal )
 {
 	DRIVER_INIT_CALL( c128pal );
-	emulated_drive = 1;
-	cbm_drive_config(machine, type_1571, 0, 0, "cpu_vc1571", 8);
 }
 
 DRIVER_INIT( c128dcr )
 {
 	DRIVER_INIT_CALL( c128 );
-	emulated_drive = 1;
-	cbm_drive_config(machine, type_1571cr, 0, 0, "cpu_vc1571", 8);
 }
 
 DRIVER_INIT( c128dcrp )
 {
 	DRIVER_INIT_CALL( c128pal );
-	emulated_drive = 1;
-	cbm_drive_config(machine, type_1571cr, 0, 0, "cpu_vc1571", 8);
 }
 
 DRIVER_INIT( c128d81 )
 {
 	DRIVER_INIT_CALL( c128 );
-	emulated_drive = 1;
-	cbm_drive_config(machine, type_1581, 0, 0, "cpu_vc1571", 8);
 }
 
 MACHINE_START( c128 )
 {
-	if (emulated_drive)
-	{
-		cbm_drive_reset(machine);
-	}
-	else if (c128_cia1_on)
-	{
-		cbm_drive_0_config(SERIAL, 8);
-		cbm_drive_1_config(SERIAL, 9);
-		serial_clock = serial_data = serial_atn = 1;
-	}
-
 // This was in MACHINE_START( c64 ), but never called
 // TO DO: find its correct use, when fixing c64 mode
 	if (c64mode)

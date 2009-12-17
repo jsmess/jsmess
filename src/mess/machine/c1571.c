@@ -29,6 +29,19 @@
 #define M6526_TAG		"u20"
 #define WD1770_TAG		"u11"
 
+static const double C1571_BITRATE[4] =
+{
+	XTAL_16MHz/13.0,	/* tracks 1-17 */
+	XTAL_16MHz/14.0,	/* tracks 18-24 */
+	XTAL_16MHz/15.0, 	/* tracks 25-30 */
+	XTAL_16MHz/16.0		/* tracks 31-42 */
+};
+
+#define SYNC_MARK			0x3ff		/* 10 consecutive 1-bits */
+
+#define TRACK_BUFFER_SIZE	8194		/* 2 bytes track length + maximum of 8192 bytes of GCR encoded data */
+#define TRACK_DATA_START	2
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -38,12 +51,24 @@ struct _c1571_t
 {
 	/* abstractions */
 	int address;
+	UINT8 track_buffer[TRACK_BUFFER_SIZE];				/* track data buffer */
+	int track_len;						/* track length */
+	int buffer_pos;						/* current byte position within track buffer */
+	int bit_pos;						/* current bit position within track buffer byte */
+	int bit_count;						/* current data byte bit counter */
+	UINT16 data;						/* data shift register */
 
 	/* signals */
-	int data_out;
-	int atn_ack;
+	UINT8 yb;							/* GCR data byte to write */
+	int byte;							/* byte ready */
+	int atna;							/* attention acknowledge */
+	int ds;								/* density select */
+	int stp;							/* stepping motor */
 	int soe;							/* s? output enable */
 	int mode;							/* mode (0 = write, 1 = read) */
+
+	int data_out;
+	int atn_ack;
 
 	/* interrupts */
 	int via0_irq;						/* VIA #0 interrupt request */
@@ -58,6 +83,9 @@ struct _c1571_t
 	const device_config *wd1770;
 	const device_config *serial_bus;
 	const device_config *image;
+
+	/* timers */
+	emu_timer *bit_timer;
 };
 
 /***************************************************************************
@@ -84,10 +112,68 @@ INLINE c1571_config *get_safe_config(const device_config *device)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    c1571_atn_w - serial bus attention
+    TIMER_CALLBACK( bit_tick )
 -------------------------------------------------*/
 
-static CBM_IEC_ATN( c1571 )
+static TIMER_CALLBACK( bit_tick )
+{
+	const device_config *device = (device_config *)ptr;
+	c1571_t *c1571 = get_safe_token(device);
+	int byte = 0;
+
+	/* shift in data from the read head */
+	c1571->data <<= 1;
+	c1571->data |= BIT(c1571->track_buffer[c1571->buffer_pos], c1571->bit_pos);
+	c1571->bit_pos--;
+	c1571->bit_count++;
+
+	if (c1571->bit_pos < 0)
+	{
+		c1571->bit_pos = 7;
+		c1571->buffer_pos++;
+
+		if (c1571->buffer_pos > c1571->track_len + 1)
+		{
+			/* loop to the start of the track */
+			c1571->buffer_pos = TRACK_DATA_START;
+		}
+	}
+
+	if ((c1571->data & SYNC_MARK) == SYNC_MARK)
+	{
+		/* SYNC detected */
+		c1571->bit_count = 0;
+	}
+
+	if (c1571->bit_count > 7)
+	{
+		/* byte ready */
+		c1571->bit_count = 0;
+		byte = 1;
+
+		if (!(c1571->data & 0xff))
+		{
+			/* simulate weak bits with randomness */
+			c1571->data = (c1571->data & 0xff00) | (mame_rand(machine) & 0xff);
+		}
+	}
+
+	if (c1571->byte != byte)
+	{
+		int byte_ready = !(byte && c1571->soe);
+
+		cpu_set_input_line(c1571->cpu, M6502_SET_OVERFLOW, byte_ready);
+		via_ca1_w(c1571->via1, 0, byte_ready);
+
+		c1571->byte = byte;
+	}
+}
+
+/*-------------------------------------------------
+    c1571_iec_atn_w - serial bus attention
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( c1571_iec_atn_w )
 {
 	c1571_t *c1571 = get_safe_token(device);
 	int data_out = !c1571->data_out && !(c1571->atn_ack ^ !state);
@@ -98,10 +184,10 @@ static CBM_IEC_ATN( c1571 )
 }
 
 /*-------------------------------------------------
-    c1571_reset_w - serial bus reset
+    c1571_iec_reset_w - serial bus reset
 -------------------------------------------------*/
 
-static CBM_IEC_RESET( c1571 )
+WRITE_LINE_DEVICE_HANDLER( c1571_iec_reset_w )
 {
 	if (!state)
 	{
@@ -203,6 +289,14 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
     */
 
 	c1571_t *c1571 = get_safe_token(device->owner);
+
+	/* 1/2 MHz */
+	UINT32 clock = BIT(data, 5) ? XTAL_16MHz/8 : XTAL_16MHz/16;
+
+	device_set_clock(c1571->cpu, clock);
+	device_set_clock(c1571->cia, clock);
+	device_set_clock(c1571->via0, clock);
+	device_set_clock(c1571->via1, clock);
 
 	/* side */
 	wd17xx_set_side(c1571->wd1770, BIT(data, 2));
@@ -392,13 +486,68 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
         PB7     _SYNC       SYNC detect line
 
     */
+
+	c1571_t *c1571 = get_safe_token(device->owner);
+	int stp = data & 0x03;
+	int ds = (data >> 5) & 0x03;
+	int mtr = BIT(data, 2);
+
+	/* stepper motor */
+	if (c1571->stp != stp)
+	{
+		int tracks = 0;
+
+		switch (c1571->stp)
+		{
+		case 0:	if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
+		case 1:	if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
+		case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
+		case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
+		}
+
+		if (tracks != 0)
+		{
+			c1571->track_len = TRACK_BUFFER_SIZE;
+			c1571->buffer_pos = TRACK_DATA_START;
+			c1571->bit_pos = 7;
+			c1571->bit_count = 0;
+
+			/* step read/write head */
+			floppy_drive_seek(c1571->image, tracks);
+
+			/* read track data */
+			floppy_drive_read_track_data_info_buffer(c1571->image, 0, c1571->track_buffer, &c1571->track_len);
+
+			/* extract track length */
+			c1571->track_len = (c1571->track_buffer[1] << 8) | c1571->track_buffer[0];
+		}
+
+		c1571->stp = stp;
+	}
+
+	/* spindle motor */
+	floppy_mon_w(c1571->image, !mtr);
+	timer_enable(c1571->bit_timer, mtr);
+
+	/* activity LED */
+
+	/* density select */
+	if (c1571->ds != ds)
+	{
+		timer_adjust_periodic(c1571->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C1571_BITRATE[ds]/4));
+		c1571->ds = ds;
+	}
 }
 
 static WRITE_LINE_DEVICE_HANDLER( soe_w )
 {
 	c1571_t *c1571 = get_safe_token(device->owner);
+	int byte_ready = !(state && c1571->byte);
 
 	c1571->soe = state;
+
+	cpu_set_input_line(c1571->cpu, M6502_SET_OVERFLOW, byte_ready);
+	via_ca1_w(device, 0, byte_ready);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( mode_w )
@@ -467,8 +616,8 @@ static const wd17xx_interface c1571_wd1770_intf =
 -------------------------------------------------*/
 
 static FLOPPY_OPTIONS_START( c1571 )
-	FLOPPY_OPTION( c1571, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
-//  FLOPPY_OPTION( c1571, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
+	FLOPPY_OPTION( c1571, "g64", "Commodore 1571 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
+//  FLOPPY_OPTION( c1571, "d64", "Commodore 1571 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
 //  FLOPPY_OPTION( c1571, "d71", "Commodore 1571 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
 FLOPPY_OPTIONS_END
 
@@ -509,12 +658,12 @@ static const floppy_config c1571_floppy_config =
 -------------------------------------------------*/
 
 static MACHINE_DRIVER_START( c1570 )
-	MDRV_CPU_ADD(M6502_TAG, M6502, 2000000)
+	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(c1570_map)
 
-	MDRV_VIA6522_ADD(M6522_0_TAG, 2000000, c1571_via0_intf)
-	MDRV_VIA6522_ADD(M6522_1_TAG, 2000000, c1571_via1_intf)
-	MDRV_CIA6526_ADD(M6526_TAG, CIA6526R1, 2000000, c1571_cia_intf)
+	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/8, c1571_via0_intf)
+	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/8, c1571_via1_intf)
+	MDRV_CIA6526_ADD(M6526_TAG, CIA6526R1, XTAL_16MHz/8, c1571_cia_intf)
 	MDRV_WD1770_ADD(WD1770_TAG, c1571_wd1770_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1570_floppy_config)
@@ -525,12 +674,12 @@ MACHINE_DRIVER_END
 -------------------------------------------------*/
 
 static MACHINE_DRIVER_START( c1571 )
-	MDRV_CPU_ADD(M6502_TAG, M6502, 2000000)
+	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(c1571_map)
 
-	MDRV_VIA6522_ADD(M6522_0_TAG, 2000000, c1571_via0_intf)
-	MDRV_VIA6522_ADD(M6522_1_TAG, 2000000, c1571_via1_intf)
-	MDRV_CIA6526_ADD(M6526_TAG, CIA6526R1, 2000000, c1571_cia_intf)
+	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/8, c1571_via0_intf)
+	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/8, c1571_via1_intf)
+	MDRV_CIA6526_ADD(M6526_TAG, CIA6526R1, XTAL_16MHz/8, c1571_cia_intf)
 	MDRV_WD1770_ADD(WD1770_TAG, c1571_wd1770_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_config)
@@ -541,12 +690,12 @@ MACHINE_DRIVER_END
 -------------------------------------------------*/
 
 static MACHINE_DRIVER_START( c1571cr )
-	MDRV_CPU_ADD(M6502_TAG, M6502, 2000000)
+	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(c1571cr_map)
 
-	MDRV_VIA6522_ADD(M6522_0_TAG, 2000000, c1571_via0_intf)
-	MDRV_VIA6522_ADD(M6522_1_TAG, 2000000, c1571_via1_intf)
-	MDRV_CIA6526_ADD(M6526_TAG, CIA6526R1, 2000000, c1571_cia_intf)
+	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/8, c1571_via0_intf)
+	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/8, c1571_via1_intf)
+	MDRV_CIA6526_ADD(M6526_TAG, CIA6526R1, XTAL_16MHz/8, c1571_cia_intf)
 	MDRV_WD1770_ADD(WD1770_TAG, c1571_wd1770_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_config)
@@ -604,6 +753,12 @@ static DEVICE_START( c1571 )
 	c1571->serial_bus = devtag_get_device(device->machine, config->serial_bus_tag);
 	c1571->image = device_find_child_by_tag(device, FLOPPY_0);
 
+	/* set floppy density */
+	wd17xx_set_density(c1571->wd1770, DEN_MFM_LO);
+
+	/* allocate data timer */
+	c1571->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
+
 	/* register for state saving */
 }
 
@@ -643,8 +798,6 @@ DEVICE_GET_INFO( c1570 )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c1571);						break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(c1571);						break;
-		case DEVINFO_FCT_CBM_IEC_ATN:					info->f = (genf *)CBM_IEC_ATN_NAME(c1571);					break;
-		case DEVINFO_FCT_CBM_IEC_RESET:					info->f = (genf *)CBM_IEC_RESET_NAME(c1571);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1570");							break;
