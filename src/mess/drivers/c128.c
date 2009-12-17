@@ -589,7 +589,7 @@ static CBM_IEC_DAISY( c128_iec_bus )
 static CBM_IEC_DAISY( c128d81_iec_bus )
 {
 	{ "cia_1", DEVCB_DEVICE_LINE("cia_0", mos6526_flag_w) },
-	{ C1581_IEC("c1581") },
+	{ C1581_IEC("c1563") },
 	{ NULL}
 };
 
