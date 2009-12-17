@@ -135,7 +135,7 @@ static void set_busy_flag(hd61830_t *hd61830, int period)
     hd61830_status_r - status read
 -------------------------------------------------*/
 
-static READ8_DEVICE_HANDLER( hd61830_status_r )
+READ8_DEVICE_HANDLER( hd61830_status_r )
 {
 	hd61830_t *hd61830 = get_safe_token(device);
 
@@ -148,7 +148,7 @@ static READ8_DEVICE_HANDLER( hd61830_status_r )
     hd61830_control_w - control write
 -------------------------------------------------*/
 
-static WRITE8_DEVICE_HANDLER( hd61830_control_w )
+WRITE8_DEVICE_HANDLER( hd61830_control_w )
 {
 	hd61830_t *hd61830 = get_safe_token(device);
 
@@ -159,7 +159,7 @@ static WRITE8_DEVICE_HANDLER( hd61830_control_w )
     hd61830_data_r - data read
 -------------------------------------------------*/
 
-static READ8_DEVICE_HANDLER( hd61830_data_r )
+READ8_DEVICE_HANDLER( hd61830_data_r )
 {
 	hd61830_t *hd61830 = get_safe_token(device);
 
@@ -178,7 +178,7 @@ static READ8_DEVICE_HANDLER( hd61830_data_r )
     hd61830_data_w - data write
 -------------------------------------------------*/
 
-static WRITE8_DEVICE_HANDLER( hd61830_data_w )
+WRITE8_DEVICE_HANDLER( hd61830_data_w )
 {
 	hd61830_t *hd61830 = get_safe_token(device);
 

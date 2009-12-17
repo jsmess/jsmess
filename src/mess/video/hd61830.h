@@ -44,6 +44,12 @@ DEVICE_GET_INFO( hd61830 );
 READ8_DEVICE_HANDLER( hd61830_r );
 WRITE8_DEVICE_HANDLER( hd61830_w );
 
+READ8_DEVICE_HANDLER( hd61830_status_r );
+WRITE8_DEVICE_HANDLER( hd61830_control_w );
+
+READ8_DEVICE_HANDLER( hd61830_data_r );
+WRITE8_DEVICE_HANDLER( hd61830_data_w );
+
 /* screen update */
 void hd61830_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
 
