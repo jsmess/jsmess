@@ -248,12 +248,15 @@ DRVLIBS = \
 	$(MESSOBJ)/amiga.a \
 	$(MESSOBJ)/amstrad.a \
 	$(MESSOBJ)/apf.a \
+	$(MESSOBJ)/apple.a \
 	$(MESSOBJ)/applied.a \
 	$(MESSOBJ)/arcadia.a \
 	$(MESSOBJ)/ascii.a \
 	$(MESSOBJ)/at.a \
+	$(MESSOBJ)/atari.a \
 	$(MESSOBJ)/bally.a \
 	$(MESSOBJ)/bandai.a \
+	$(MESSOBJ)/be.a \
 	$(MESSOBJ)/bnpo.a \
 	$(MESSOBJ)/bondwell.a \
 	$(MESSOBJ)/booth.a \
@@ -267,6 +270,7 @@ DRVLIBS = \
 	$(MESSOBJ)/coleco.a \
 	$(MESSOBJ)/comx.a \
 	$(MESSOBJ)/concept.a \
+	$(MESSOBJ)/conitec.a \
 	$(MESSOBJ)/cybiko.a \
 	$(MESSOBJ)/dai.a \
 	$(MESSOBJ)/ddr.a \
@@ -296,6 +300,7 @@ DRVLIBS = \
 	$(MESSOBJ)/hegener.a \
 	$(MESSOBJ)/homebrew.a \
 	$(MESSOBJ)/homelab.a \
+	$(MESSOBJ)/hp.a \
 	$(MESSOBJ)/intel.a \
 	$(MESSOBJ)/intelgnt.a \
 	$(MESSOBJ)/interact.a \
@@ -305,6 +310,7 @@ DRVLIBS = \
 	$(MESSOBJ)/kaypro.a \
 	$(MESSOBJ)/koei.a \
 	$(MESSOBJ)/kyocera.a \
+	$(MESSOBJ)/luxor.a \
 	$(MESSOBJ)/magnavox.a \
 	$(MESSOBJ)/matsushi.a \
 	$(MESSOBJ)/mattel.a \
@@ -364,25 +370,19 @@ DRVLIBS = \
 	$(MESSOBJ)/tem.a \
 	$(MESSOBJ)/tesla.a \
 	$(MESSOBJ)/thomson.a \
+	$(MESSOBJ)/ti.a \
 	$(MESSOBJ)/tiger.a \
 	$(MESSOBJ)/tiki.a \
 	$(MESSOBJ)/tomy.a \
+	$(MESSOBJ)/trs.a \
 	$(MESSOBJ)/unisys.a \
 	$(MESSOBJ)/veb.a \
+	$(MESSOBJ)/visual.a \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/xerox.a \
 	$(MESSOBJ)/zvt.a \
-	$(MESSOBJ)/visual.a \
-	$(MESSOBJ)/trs.a \
-	$(MESSOBJ)/conitec.a \
-	$(MESSOBJ)/atari.a \
-	$(MESSOBJ)/ti.a \
-	$(MESSOBJ)/luxor.a \
-	$(MESSOBJ)/be.a \
-	$(MESSOBJ)/apple.a \
 	$(MESSOBJ)/shared.a \
-#	$(MESSOBJ)/hp.a \
 
 #-------------------------------------------------
 # the following files are general components and

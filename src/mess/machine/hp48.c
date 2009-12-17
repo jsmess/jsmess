@@ -53,7 +53,8 @@ typedef struct
 	read8_space_func read;
 	write8_space_func write;
 	void* data;                  /* non-NULL for banks */
-
+	int isnop;
+	
 	/* configurable part */
 	UINT8  state;                /* one of HP48_MODULE_ */
 	UINT32 base;                 /* base address */
@@ -800,7 +801,8 @@ static void hp48_apply_modules( running_machine *machine, void* param )
 		UINT32 mirror = nselect_mask & ~off_mask;
 		UINT32 end = base + (off_mask & nselect_mask);
 		char bank[10];
-
+		sprintf(bank,"bank%d",i);
+		
 		if ( hp48_modules[i].state != HP48_MODULE_CONFIGURED ) continue;
 
 		if ( (i == 4) && !nce2_enable ) continue;
@@ -812,15 +814,29 @@ static void hp48_apply_modules( running_machine *machine, void* param )
 				  select_mask, hp48_module_names[i] );
 			continue;
 		}
-		memory_install_read8_handler( space, base, end, 0, mirror, hp48_modules[i].read );
-		memory_install_write8_handler( space, base, end, 0, mirror, hp48_modules[i].write );
-
+		if ((hp48_modules[i].data == NULL) && (hp48_modules[i].write == NULL) && (hp48_modules[i].read == NULL)) {
+			memory_unmap_readwrite(space, base, end, 0, mirror);
+		} else {
+			if (hp48_modules[i].data !=NULL) {
+				memory_install_read_bank( space, base, end, 0, mirror, bank );
+			} else {
+				memory_install_read8_handler( space, base, end, 0, mirror, hp48_modules[i].read );
+			}
+			if (hp48_modules[i].isnop == 1) {
+				memory_nop_write(space, base, end, 0, mirror);
+			} else {
+				if (hp48_modules[i].data !=NULL) {
+					memory_install_write_bank( space, base, end, 0, mirror, bank );
+				} else {
+					memory_install_write8_handler( space, base, end, 0, mirror, hp48_modules[i].write );
+				}
+			}
+		}
 		LOG(( "hp48_apply_modules: module %s configured at %05x-%05x, mirror %05x\n",
 		      hp48_module_names[i], base, end, mirror ));
 
 		if ( hp48_modules[i].data )
 		{
-			sprintf(bank,"bank%d",i);
 			memory_set_bankptr( space->machine, bank, hp48_modules[i].data );
 		}
 
@@ -1004,8 +1020,12 @@ static void hp48_fill_port( const device_config* image )
 	hp48_port_data[conf->port] = malloc( 2 * size );
 	memset( hp48_port_data[conf->port], 0, 2 * size );
 	hp48_modules[conf->module].off_mask = 2 * (( size > 128 * 1024 ) ? 128 * 1024 : size) - 1;
-	hp48_modules[conf->module].read     = SMH_BANK((FPTR)conf->module);
-	hp48_modules[conf->module].write    = hp48_port_write[conf->port] ? (void*)SMH_BANK((FPTR)conf->module) : SMH_NOP;
+	hp48_modules[conf->module].read     = NULL;
+	hp48_modules[conf->module].write    = NULL;
+	hp48_modules[conf->module].isnop    = 0;
+	if (hp48_port_write[conf->port]) {
+		hp48_modules[conf->module].isnop    = 1;
+	} 
 	hp48_modules[conf->module].data     = hp48_port_data[conf->port];
 	hp48_apply_modules( image->machine, NULL );
 }
@@ -1015,8 +1035,8 @@ static void hp48_unfill_port( const device_config* image )
 {
 	struct hp48_port_config* conf = (struct hp48_port_config*) image->static_config;
 	hp48_modules[conf->module].off_mask = 0x00fff;  /* 2 KB */
-	hp48_modules[conf->module].read     = SMH_UNMAP;
-	hp48_modules[conf->module].write    = SMH_UNMAP;
+	hp48_modules[conf->module].read     = NULL;
+	hp48_modules[conf->module].write    = NULL;
 	hp48_modules[conf->module].data     = NULL;
 }
 
@@ -1122,8 +1142,8 @@ DRIVER_INIT( hp48 )
 	for ( i = 0; i < 6; i++ )
 	{
 		hp48_modules[i].off_mask = 0x00fff;  /* 2 KB */
-		hp48_modules[i].read     = SMH_UNMAP;
-		hp48_modules[i].write    = SMH_UNMAP;
+		hp48_modules[i].read     = NULL;
+		hp48_modules[i].write    = NULL;
 		hp48_modules[i].data     = NULL;
 	}
 	hp48_port_size[0] = 0;
@@ -1168,7 +1188,7 @@ static void hp48_machine_start( running_machine *machine, hp48_models model )
 	hp48_bank_switch = 0;
 
 	/* static module configuration */
-
+	memset(hp48_modules,0,sizeof(hp48_modules)); // to put all on 0
 	/* I/O RAM */
 	hp48_modules[0].off_mask = 0x0003f;  /* 32 B */
 	hp48_modules[0].read     = hp48_io_r;
@@ -1176,8 +1196,8 @@ static void hp48_machine_start( running_machine *machine, hp48_models model )
 
 	/* internal RAM */
 	hp48_modules[1].off_mask = 2 * ram_size - 1;
-	hp48_modules[1].read     = SMH_BANK(1);
-	hp48_modules[1].write    = SMH_BANK(1);
+	hp48_modules[1].read	 = NULL;
+	hp48_modules[1].write	 = NULL;
 	hp48_modules[1].data     = ram;
 
 	if ( HP48_G_SERIES )
@@ -1185,13 +1205,14 @@ static void hp48_machine_start( running_machine *machine, hp48_models model )
                 /* bank switcher */
 		hp48_modules[2].off_mask = 0x00fff;  /* 2 KB */
 		hp48_modules[2].read     = hp48_bank_r;
-		hp48_modules[2].write    = SMH_NOP;
+		hp48_modules[2].write    = NULL;
 	}
 
 	/* ROM */
 	hp48_modules[5].off_mask = 2 * rom_size - 1;
-	hp48_modules[5].read     = SMH_BANK(5);
-	hp48_modules[5].write    = SMH_NOP;
+	hp48_modules[5].read	 = NULL;
+	hp48_modules[5].write    = NULL;
+	hp48_modules[5].isnop    = 1;
 	hp48_modules[5].data     = rom;
 
 	/* timers */

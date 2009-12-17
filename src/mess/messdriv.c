@@ -1069,15 +1069,15 @@ const game_driver * const drivers[] =
     DRIVER( comquest )  /* Comquest Plus German                             */
 
     /* Hewlett Packard */
-//mess0135u3    DRIVER( hp38g )
-//mess0135u3    DRIVER( hp39g )
-//mess0135u3    DRIVER( hp48s )     /* HP 48S */
-//mess0135u3    DRIVER( hp48sx )    /* HP 48SX */
-//mess0135u3    DRIVER( hp48g )     /* HP 48G */
-//mess0135u3    DRIVER( hp48gx )    /* HP 48GX */
-//mess0135u3    DRIVER( hp48gp )        /* HP 48G+ */
-//mess0135u3    DRIVER( hp49g )
-//mess0135u3    DRIVER( hp16500b )
+    DRIVER( hp38g )
+    DRIVER( hp39g )
+    DRIVER( hp48s )     /* HP 48S */
+    DRIVER( hp48sx )    /* HP 48SX */
+    DRIVER( hp48g )     /* HP 48G */
+    DRIVER( hp48gx )    /* HP 48GX */
+    DRIVER( hp48gp )        /* HP 48G+ */
+    DRIVER( hp49g )
+    DRIVER( hp16500b )
 
     /* SpectraVideo */
     DRIVER( svi318 )    /* SVI-318 (PAL)                                    */
