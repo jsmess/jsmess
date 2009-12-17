@@ -434,6 +434,7 @@ const game_driver * const drivers[] =
     DRIVER( c64cpal )   /* Commodore 64C (PAL)                              */
     DRIVER( c64g )      /* Commodore 64G (PAL)                              */
     DRIVER( c64gs )     /* Commodore 64 Games System                        */
+    DRIVER( clcd )      /* Commodore LCD	                                */
 
     DRIVER( b500 )      /* Commodore B500                                   */
     DRIVER( b128 )      /* Commodore B128                                   */

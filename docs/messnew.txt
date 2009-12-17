@@ -30,6 +30,7 @@ Skeleton drivers:
 - Callan Unistar Terminal
 - CCS Model 2422B
 - CCS Model 2810
+- Commodore LCD [Curt Coder]
 - Dual Systems 68000
 - Exelvision Exeltel
 - Hewlett-Packard HP16500b [R. Belmont]

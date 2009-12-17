@@ -689,6 +689,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c1571.o		\
 	$(MESS_MACHINE)/c1581.o		\
 	$(MESS_FORMATS)/g64_dsk.o	\
+	$(MESS_DRIVERS)/clcd.o		\
 
 $(MESSOBJ)/cbmshare.a:			\
 	$(MESS_FORMATS)/cbm_tap.o 	\
