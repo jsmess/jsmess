@@ -590,7 +590,7 @@ void towns_crtc_draw_scan_layer_hicolour(bitmap_t* bitmap,const rectangle* rect,
 				off &= 0x7ffff;  // 1 layer
 		
 			colour = (towns_gfxvram[off+(layer*0x40000)+1] << 8) | towns_gfxvram[off+(layer*0x40000)];
-			if(colour != 0 && colour < 0x8000)
+			if(colour < 0x8000)
 			{
 				*BITMAP_ADDR32(bitmap,scanline,x) =
 					((colour & 0x001f) << 3)
@@ -609,7 +609,7 @@ void towns_crtc_draw_scan_layer_hicolour(bitmap_t* bitmap,const rectangle* rect,
 			else
 				off &= 0x7ffff;  // 1 layer
 			colour = (towns_gfxvram[off+(layer*0x40000)+1] << 8) | towns_gfxvram[off+(layer*0x40000)];
-			if(colour != 0 && colour < 0x8000)
+			if(colour < 0x8000)
 			{
 				*BITMAP_ADDR32(bitmap,scanline,x) =
 					((colour & 0x001f) << 3)
