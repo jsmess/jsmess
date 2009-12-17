@@ -158,7 +158,8 @@
 #define STA_1_SEEK_ERR	0x10	/* seek error */
 #define STA_1_HD_LOADED 0x20	/* head loaded */
 #define STA_1_WRITE_PRO 0x40	/* floppy is write protected */
-#define STA_1_NOT_READY 0x80	/* controller not ready */
+#define STA_1_NOT_READY 0x80	/* drive not ready */
+#define STA_1_MOTOR_ON	0x80	/* status of the Motor On output (WD1770 and WD1772 only) */
 
 /* Type II and III additional flags */
 #define FDC_DELETED_AM	0x01	/* read/write deleted address mark */
@@ -316,7 +317,6 @@ struct _wd1770_state
 	INT8	direction;				/* last step direction */
 
 	UINT8	status_drq; 			/* status register data request bit */
-	UINT8	status_ipl; 			/* status register toggle index pulse bit */
 	UINT8	busy_count; 			/* how long to keep busy bit set */
 
 	UINT8	buffer[6144];			/* I/O buffer (holds up to a whole track) */
@@ -335,7 +335,6 @@ struct _wd1770_state
 	emu_timer	*timer, *timer_rs, *timer_ws, *timer_rid;
 	int		data_direction;
 
-	UINT8   ipl;					/* index pulse */
 	int     hld_count;				/* head loaded counter */
 
 	emu_timer *busy_timer;
@@ -807,7 +806,7 @@ static void wd17xx_index_pulse_callback(const device_config *controller, const d
 	if (img != w->drive)
 		return;
 
-	w->ipl = state;
+	w->idx = state;
 
 	if (w->hld_count)
 		w->hld_count--;
@@ -1288,36 +1287,35 @@ READ_LINE_DEVICE_HANDLER( wd17xx_intrq_r )
 READ8_DEVICE_HANDLER( wd17xx_status_r )
 {
 	wd1770_state *w = get_safe_token(device);
-	int result = w->status;
+	int result;
 
 	wd17xx_clear_intrq(device);
+
+	/* bit 7, 'not ready' or 'motor on' */
+	if (device->type == WD1770 || device->type == WD1772)
+	{
+		w->status &= ~STA_1_MOTOR_ON;
+		w->status |= w->mo << 7;
+	}
+	else
+	{
+		w->status &= ~STA_1_NOT_READY;
+		if (!floppy_drive_get_flag_state(w->drive, FLOPPY_DRIVE_READY))
+			w->status |= STA_1_NOT_READY;
+	}
+
+	result = w->status;
 
 	/* type 1 command or force int command? */
 	if ((w->command_type==TYPE_I) || (w->command_type==TYPE_IV))
 	{
-		/* toggle index pulse */
-		result &= ~STA_1_IPL;
-		if (w->ipl) result |= STA_1_IPL;
+		result &= ~(STA_1_IPL | STA_1_TRACK0);
 
-		/* set track 0 state */
-		result &=~STA_1_TRACK0;
-		if (floppy_tk00_r(w->drive) == CLEAR_LINE)
-			result |= STA_1_TRACK0;
+		/* bit 1, index pulse */
+		result |= w->idx << 1;
 
-	//  floppy_drive_set_ready_state(w->drive, 1,1);
-		w->status &= ~STA_1_NOT_READY;
-
-		/* TODO: What is this?  We need some more info on this */
-		if ((w->type == WD_TYPE_179X) || (w->type == WD_TYPE_1793) || (w->type == WD_TYPE_1773) || (w->type == WD_TYPE_1771))
-		{
-			if (!floppy_drive_get_flag_state(w->drive, FLOPPY_DRIVE_READY))
-				w->status |= STA_1_NOT_READY;
-		}
-		else
-		{
-			if (floppy_drive_get_flag_state(w->drive, FLOPPY_DRIVE_READY))
-				w->status |= STA_1_NOT_READY;
-		}
+		/* bit 2, track 0 state, inverted */
+		result |= !floppy_tk00_r(w->drive) << 2;
 
 		if (w->command_type==TYPE_I)
 		{
@@ -1326,6 +1324,7 @@ READ8_DEVICE_HANDLER( wd17xx_status_r )
 			else
 				w->status &= ~ STA_1_HD_LOADED;
 		}
+
 		if (w->command_type==TYPE_IV) result &= 0x63; /* to allow microbee to boot up */
 	}
 
@@ -1445,7 +1444,13 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 {
 	wd1770_state *w = get_safe_token(device);
 
-	floppy_mon_w(w->drive, CLEAR_LINE);
+	/* only the WD1770 and WD1772 have a 'motor on' line */
+	if (device->type == WD1770 || device->type == WD1772)
+	{
+		w->mo = ASSERT_LINE;
+		floppy_mon_w(w->drive, CLEAR_LINE);
+	}
+
 	floppy_drive_set_ready_state(w->drive, 1,0);
 
 	/* also cleared by writing command */
