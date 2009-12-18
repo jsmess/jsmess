@@ -837,6 +837,10 @@ static MACHINE_RESET(pc6001m2)
 		UINT8 *ROM = memory_region(machine, "maincpu");
 		memory_set_bankptr(machine, "bank1", &ROM[BASICROM(0)]);
 		memory_set_bankptr(machine, "bank2", &ROM[BASICROM(1)]);
+		// Added next two lines to prevent crash of driver, please update according to neeeds
+		memory_set_bankptr(machine, "bank3", &ROM[BASICROM(0)]);
+		memory_set_bankptr(machine, "bank4", &ROM[BASICROM(1)]);
+		
 		memory_set_bankptr(machine, "bank5", &ROM[WRAM(4)]);
 		memory_set_bankptr(machine, "bank6", &ROM[WRAM(5)]);
 		memory_set_bankptr(machine, "bank7", &ROM[WRAM(6)]);

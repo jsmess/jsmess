@@ -73,6 +73,8 @@
 #include "machine/wd17xx.h"
 #include "machine/ds1315.h"
 #include "machine/msm6242.h"
+#include "devices/flopdrv.h"
+#include "formats/coco_dsk.h"
 
 
 /***************************************************************************
@@ -462,6 +464,18 @@ static void fdc_coco_w(const device_config *device, offs_t addr, UINT8 data)
 }
 
 
+static const floppy_config coco_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(coco),
+	DO_NOT_KEEP_GEOMETRY
+};
+
 /*-------------------------------------------------
     DEVICE_GET_INFO(coco_cartridge_pcb_fdc_coco) -
     get info function for the CoCo FDC
@@ -473,6 +487,7 @@ DEVICE_GET_INFO(coco_cartridge_pcb_fdc_coco)
 		MDRV_WD1773_ADD(WD_TAG, coco_wd17xx_interface)
 		MDRV_MSM6242_ADD(DISTO_TAG)
 		MDRV_DS1315_ADD(CLOUD9_TAG)
+		MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 	MACHINE_DRIVER_END
 
 	static const fdc_hardware_type hwtype =
@@ -623,6 +638,7 @@ DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon)
 {
 	static MACHINE_DRIVER_START(dragon_fdc)
 		MDRV_WD179X_ADD(WD_TAG, coco_wd17xx_interface)
+		MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 	MACHINE_DRIVER_END
 
 	static const fdc_hardware_type hwtype =

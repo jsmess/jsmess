@@ -814,8 +814,6 @@ static MACHINE_DRIVER_START( dragon32 )
 	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
-	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
-
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
@@ -864,8 +862,6 @@ static MACHINE_DRIVER_START( dragon64 )
 	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
-	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
-
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
@@ -913,8 +909,6 @@ static MACHINE_DRIVER_START( d64plus )
 	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
-
-	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -1021,8 +1015,6 @@ static MACHINE_DRIVER_START( tanodr64 )
 	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
-	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
-
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
@@ -1068,8 +1060,6 @@ static MACHINE_DRIVER_START( coco )
 	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
-
-	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -1117,8 +1107,6 @@ static MACHINE_DRIVER_START( coco2 )
 	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
-	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
-
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
@@ -1164,8 +1152,6 @@ static MACHINE_DRIVER_START( coco2b )
 	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
-
-	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -1224,8 +1210,6 @@ static MACHINE_DRIVER_START( coco3 )
 	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco3_cart_w)
 	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
-
-	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
