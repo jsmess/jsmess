@@ -1570,5 +1570,6 @@ const game_driver * const drivers[] =
 	DRIVER( ipb )
 	DRIVER( ipc )
 	DRIVER( ipds )
+	DRIVER( sbc6510 )
 
 #endif /* DRIVER_RECURSIVE */

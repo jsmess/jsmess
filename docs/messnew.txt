@@ -59,6 +59,7 @@ Skeleton drivers:
 - Sage II
 - SAPI-1 ZPS 2
 - SAPI-1 ZPS 3
+- SBC6510
 - Sharp PC-E220
 - Sun-1
 - SWTPC 6800
