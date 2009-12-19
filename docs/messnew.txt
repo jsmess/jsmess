@@ -79,6 +79,8 @@ System Driver Changes:
 
 - [EXIDY] Improved sound compatibility.  [Robbbert]
 
+- [GBA] Remapped Select button to MESS default.  [Justin Kerk]
+
 - [GLASGOW] Upgraded artwork to be clickable. Fixed various driver
   problems. Chess can be played by using the mouse.  [Robbbert]
 
