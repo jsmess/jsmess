@@ -101,6 +101,7 @@ static rectangle towns_crtc_layerscr[2];  // each layer has independent sizes
 extern UINT32* towns_vram;
 extern UINT8* towns_gfxvram;
 extern UINT8* towns_txtvram;
+extern UINT8* towns_sprram;
 
 extern UINT32 towns_mainmem_enable;
 extern UINT32 towns_ankcg_enable;
@@ -388,7 +389,7 @@ READ8_HANDLER(towns_video_5c8_r)
 		case 0x00:  // 0x5c8 - disable TVRAM?
 		if(towns_tvram_enable != 0)
 		{
-			//towns_tvram_enable = 0;
+			towns_tvram_enable = 0;
 			return 0x80;
 		}
 		else
@@ -487,9 +488,9 @@ WRITE8_HANDLER(towns_video_ff81_w)
 
 /*
  *  Sprite RAM, low memory
- *  Writing to 0xc8xxx or 0xcaxxx activates TVRAM mode
- *  Writing to I/O port 0x5c8 disables TVRAM mode
- *     (bit 7 returns high if TVRAM mode was previously active)
+ *  Writing to 0xc8xxx or 0xcaxxx activates TVRAM
+ *  Writing to I/O port 0x5c8 disables TVRAM
+ *     (bit 7 returns high if TVRAM was previously active)
  *
  *  In TVRAM mode:
  *    0xc8000-0xc8fff: ASCII text (2 bytes each: ISO646 code, then attribute)
@@ -503,7 +504,12 @@ READ8_HANDLER(towns_spriteram_low_r)
 	if(offset < 0x1000)
 	{  // 0xc8000-0xc8fff
 		if(towns_mainmem_enable == 0)
-			return towns_txtvram[offset];
+		{
+			if(towns_tvram_enable == 0)
+				return towns_sprram[offset];
+			else
+				return towns_txtvram[offset];
+		}
 		else
 			return RAM[offset + 0xc8000];
 	}
@@ -517,7 +523,10 @@ READ8_HANDLER(towns_spriteram_low_r)
 		{
 			if(towns_ankcg_enable != 0 && offset < 0x2800)
 				return ROM[0x180000 + 0x3d000 + (offset-0x2000)];
-			return towns_txtvram[offset];
+			if(towns_tvram_enable == 0)
+				return towns_sprram[offset];
+			else
+				return towns_txtvram[offset];
 		}
 		else
 			return RAM[offset + 0xca000];
@@ -548,6 +557,17 @@ WRITE8_HANDLER(towns_spriteram_low_w)
 		else
 			RAM[offset + 0xca000] = data;
 	}
+}
+
+// Should this area return TVRAM if enabled?
+READ8_HANDLER( towns_spriteram_r)
+{
+	return towns_sprram[offset];
+}
+
+WRITE8_HANDLER( towns_spriteram_w)
+{
+	towns_sprram[offset] = data;
 }
 
 void towns_crtc_draw_scan_layer_hicolour(bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
@@ -694,14 +714,19 @@ void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int la
 	int x;
 	UINT8 colour;
 	int hzoom = 1;
+	int linesize;
 
-	if(towns_vram_page_sel != 0)
-		off = 0x20000;
+//	if(towns_vram_page_sel != 0)
+//		off = 0x20000;
+	if(layer == 0)
+		linesize = towns_crtc_reg[20] * 4;
+	else
+		linesize = towns_crtc_reg[24] * 4;
+
 	if(layer != 0)
 	{
 		if(!(towns_video_reg[0] & 0x10))
 			return;
-		off += 0x40000;
 		off += towns_crtc_reg[21];  // initial offset
 		if(towns_crtc_reg[27] & 0x0100)
 			hzoom = 2;
@@ -713,13 +738,13 @@ void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int la
 			hzoom = 2;
 	}
 
-	off += (line * ((rect->max_x - rect->min_x) / 2));  // offset at this scanline
+	off += line * linesize;
 
 	if(hzoom == 1)
 	{
 		for(x=rect->min_x;x<rect->max_x;x+=2)
 		{
-			colour = towns_gfxvram[off] >> 4;
+			colour = towns_gfxvram[off+(layer*0x40000)] >> 4;
 			if(colour != 0)
 			{
 				*BITMAP_ADDR32(bitmap,scanline,x+1) =
@@ -727,7 +752,7 @@ void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int la
 					| (towns_palette_g[colour] << 8)
 					| (towns_palette_b[colour]);
 			}
-			colour = towns_gfxvram[off] & 0x0f;
+			colour = towns_gfxvram[off+(layer*0x40000)] & 0x0f;
 			if(colour != 0)
 			{
 				*BITMAP_ADDR32(bitmap,scanline,x) =
@@ -742,7 +767,11 @@ void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int la
 	{  // x2 horizontal zoom
 		for(x=rect->min_x;x<rect->max_x;x+=4)
 		{
-			colour = towns_gfxvram[off] >> 4;
+			if(towns_video_reg[0] & 0x10)
+				off &= 0x3ffff;  // 2 layers
+			else
+				off &= 0x7ffff;  // 1 layer
+			colour = towns_gfxvram[off+(layer*0x40000)] >> 4;
 			if(colour != 0)
 			{
 				*BITMAP_ADDR32(bitmap,scanline,x+2) =
@@ -754,7 +783,7 @@ void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int la
 					| (towns_palette_g[colour] << 8)
 					| (towns_palette_b[colour]);
 			}
-			colour = towns_gfxvram[off] & 0x0f;
+			colour = towns_gfxvram[off+(layer*0x40000)] & 0x0f;
 			if(colour != 0)
 			{
 				*BITMAP_ADDR32(bitmap,scanline,x) =
@@ -871,13 +900,23 @@ void towns_crtc_draw_layer(bitmap_t* bitmap,const rectangle* rect,int layer)
 	}
 }
 
-VIDEO_START( towns )
+void draw_text_layer(running_machine* machine,bitmap_t* bitmap, const rectangle* rect)
 {
-	towns_vram_wplane = 0x00;
-}
-
-VIDEO_UPDATE( towns )
-{
+/*
+ *  Text layer format
+ *  2 bytes per character at both 0xc8000 and 0xca000
+ *  0xc8xxx: Byte 1: ASCII character
+ *           Byte 2: Attributes
+ *             bits 2-0: GRB (or is it BRG?)
+ *             bit 3: Inverse
+ *             bit 4: Blink
+ *             bit 5: high brightness
+ *             bits 7-6: Kanji high/low
+ *
+ *  If either bits 6 or 7 are high, then a fullwidth Kanji character is displayed
+ *  at this location.  The character displayed is represented by a 2-byte
+ *  JIS code at the same offset at 0xca000.
+ */
 	int x,y;
 	UINT8 colour;
 	UINT32 colourcode;
@@ -885,6 +924,67 @@ VIDEO_UPDATE( towns )
 	UINT16 code;
 	int off = 0;
 
+	for(y=0;y<40;y++)
+	{
+		off = 160 * y;
+		for(x=0;x<80;x++)
+		{
+			colour = towns_txtvram[off+1] & 0x07;
+			if(towns_txtvram[off+1] & 0x20)
+			{  // Bright
+				colourcode = (((colour & 0x02) ? 0xfe : 0x00) << 16)
+					| (((colour & 0x04) ? 0xfe : 0x00) << 8)
+					| ((colour & 0x01) ? 0xfe : 0x00);
+			}
+			else
+			{
+				colourcode = (((colour & 0x02) ? 0x7f : 0x00) << 16)
+					| (((colour & 0x04) ? 0x7f : 0x00) << 8)
+					| ((colour & 0x01) ? 0x7f : 0x00);
+			}
+
+			if((towns_txtvram[off+1] & 0xc0) != 0)
+			{	// double width
+				if(towns_txtvram[off+1] & 0x40)
+				{
+					row = (towns_txtvram[off+0x2000] - 32);
+					code = 0;
+					if(row <= 8)
+					{
+						code = (row & 0x07) * 0x20;
+						code += ((towns_txtvram[off+0x2001]-32) & 0x1f)
+								| (((towns_txtvram[off+0x2001]-32) & 0x40) << 2)
+								| (((towns_txtvram[off+0x2001]-32) & 0x20) << 4);
+					}
+					if(row >= 16)  // Kanji
+					{
+						code = 0x400;
+						code += ((towns_txtvram[off+0x2001]) & 0x1f)
+								+ (((towns_txtvram[off+0x2001]-32) & 0x60) << 4)
+								+ ((row & 0x0f) << 5)
+								+ (((row-16) & 0x70) * 0x60);
+					}
+					drawgfx_transpen_raw(bitmap,rect,machine->gfx[1],code,
+						colourcode,	0,0,towns_crtc_layerscr[0].min_x+(x*8),towns_crtc_layerscr[0].min_y+(y*16),0);
+				}
+			}
+			else
+			{
+				drawgfx_transpen_raw(bitmap,rect,machine->gfx[0],towns_txtvram[off],
+					colourcode,	0,0,towns_crtc_layerscr[0].min_x+(x*8),towns_crtc_layerscr[0].min_y+(y*16),0);
+			}
+			off += 2;
+		}
+	}
+}
+
+VIDEO_START( towns )
+{
+	towns_vram_wplane = 0x00;
+}
+
+VIDEO_UPDATE( towns )
+{
 	bitmap_fill(bitmap,cliprect,0x00000000);
 
 	if(!(towns_video_reg[1] & 0x01))
@@ -902,78 +1002,7 @@ VIDEO_UPDATE( towns )
 			towns_crtc_draw_layer(bitmap,&towns_crtc_layerscr[1],1);
 	}
 
-
-	// draw text layer
-/*
- *  Text layer format
- *  2 bytes per character at both 0xc8000 and 0xca000
- *  0xc8xxx: Byte 1: ASCII character
- *           Byte 2: Attributes
- *             bits 2-0: GRB (or is it BRG?)
- *             bit 3: Inverse
- *             bit 4: Blink
- *             bit 5: high brightness
- *             bits 7-6: Kanji high/low
- *
- *  If either bits 6 or 7 are high, then a fullwidth Kanji character is displayed
- *  at this location.  The character displayed is represented by a 2-byte
- *  JIS code at the same offset at 0xca000.
- */
-	if(towns_tvram_enable != 0)
-	{
-		for(y=0;y<40;y++)
-		{
-			off = 160 * y;
-			for(x=0;x<80;x++)
-			{
-				colour = towns_txtvram[off+1] & 0x07;
-				if(towns_txtvram[off+1] & 0x20)
-				{  // Bright
-					colourcode = (((colour & 0x02) ? 0xfe : 0x00) << 16)
-						| (((colour & 0x04) ? 0xfe : 0x00) << 8)
-						| ((colour & 0x01) ? 0xfe : 0x00);
-				}
-				else
-				{
-					colourcode = (((colour & 0x02) ? 0x7f : 0x00) << 16)
-						| (((colour & 0x04) ? 0x7f : 0x00) << 8)
-						| ((colour & 0x01) ? 0x7f : 0x00);
-				}
-
-				if((towns_txtvram[off+1] & 0xc0) != 0)
-				{	// double width
-					if(towns_txtvram[off+1] & 0x40)
-					{
-						row = (towns_txtvram[off+0x2000] - 32);
-						code = 0;
-						if(row <= 8)
-						{
-							code = (row & 0x07) * 0x20;
-							code += ((towns_txtvram[off+0x2001]-32) & 0x1f)
-									| (((towns_txtvram[off+0x2001]-32) & 0x40) << 2)
-									| (((towns_txtvram[off+0x2001]-32) & 0x20) << 4);
-						}
-						if(row >= 16)  // Kanji
-						{
-							code = 0x400;
-							code += ((towns_txtvram[off+0x2001]) & 0x1f)
-									+ (((towns_txtvram[off+0x2001]-32) & 0x60) << 4)
-									+ ((row & 0x0f) << 5)
-									+ (((row-16) & 0x70) * 0x60);
-						}
-						drawgfx_transpen_raw(bitmap,cliprect,screen->machine->gfx[1],code,
-							colourcode,	0,0,towns_crtc_layerscr[0].min_x+(x*8),towns_crtc_layerscr[0].min_y+(y*16),0);
-					}
-				}
-				else
-				{
-					drawgfx_transpen_raw(bitmap,cliprect,screen->machine->gfx[0],towns_txtvram[off],
-						colourcode,	0,0,towns_crtc_layerscr[0].min_x+(x*8),towns_crtc_layerscr[0].min_y+(y*16),0);
-				}
-				off += 2;
-			}
-		}
-	}
+	draw_text_layer(screen->machine,bitmap,cliprect);
 
 #ifdef CRTC_REG_DISP
 	popmessage("CRTC: %i %i %i %i %i %i %i %i %i\n%i %i %i %i | %i %i %i %i\n%i %i %i %i | %i %i %i %i\nZOOM: %04x\nVideo: %02x %02x\nText=%i",
