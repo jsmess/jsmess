@@ -1357,6 +1357,7 @@ static UINT8 snes_dbg_video( running_machine *machine, bitmap_t *bitmap, UINT16 
 
 #define SNES_DBG_HORZ_POS 545
 
+	printf( "snes_dbg_video: %d\n", curline );
 	/* Check if the user has enabled or disabled stuff */
 	if( curline == 0 )
 	{
@@ -1366,6 +1367,11 @@ static UINT8 snes_dbg_video( running_machine *machine, bitmap_t *bitmap, UINT16 
 		if( !debug_options.input_count-- )
 		{
 			UINT8 toggles = input_port_read_safe(machine, "DEBUG2", 0);
+			printf( "Checking\n" );
+			if(toggles)
+			{
+				printf( "%02x\n", toggles );
+			}
 			if( toggles & 0x1 )
 				debug_options.bg_disabled[0] = !debug_options.bg_disabled[0];
 			if( toggles & 0x2 )
