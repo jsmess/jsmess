@@ -2845,9 +2845,6 @@ void mac_nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state
 	UINT8 masks[6] = { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20 };
 	mac_state *mac = machine->driver_data;
 
-	// NuBus slot must be 9 through E
-	assert((slot >= 9) && (slot <= 0xe));
-
 	slot -= 9;
 
 	if (state)
