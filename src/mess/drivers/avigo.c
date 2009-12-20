@@ -112,13 +112,13 @@ static void avigo_setbank(running_machine *machine, int bank, void *address, rea
 	{
 		memory_install_read8_handler(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0, rh);
 	} else {
-		memory_nop_read(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0);
+//		memory_nop_read(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0);
 	}
 	if (wh)
 	{
 		memory_install_write8_handler(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0, wh);
 	} else {
-		memory_nop_write(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0);
+//		memory_nop_write(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0);
 	}
 }
 

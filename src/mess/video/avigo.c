@@ -15,7 +15,7 @@
 
 /* mem size = 0x017c0 */
 
-static unsigned char *avigo_video_memory;
+static UINT8 *avigo_video_memory;
 
 /* current column to read/write */
 static UINT8 avigo_screen_column = 0;
@@ -53,60 +53,44 @@ void	avigo_vh_set_stylus_marker_position(int x,int y)
 
 READ8_HANDLER(avigo_vid_memory_r)
 {
-        unsigned char *ptr;
+	if (!offset)
+		return avigo_screen_column;
 
-        if (offset==0)
-        {
-           return avigo_screen_column;
-        }
+	if ((offset<0x0100) || (offset>=0x01f0))
+	{
+		LOG(("vid mem read: %04x\n", offset));
+		return 0;
+	}
 
-        if ((offset<0x0100) || (offset>=0x01f0))
-        {
-			LOG(("vid mem read: %04x\n", offset));
-
-			return 0;
-
-		}
-
-		/* 0x0100-0x01f0 contains data for selected column */
-		ptr = avigo_video_memory + avigo_screen_column + ((offset-0x0100)*(AVIGO_SCREEN_WIDTH>>3));
-
-		return ptr[0];
+	/* 0x0100-0x01f0 contains data for selected column */
+	return avigo_video_memory[avigo_screen_column + ((offset&0xff)*(AVIGO_SCREEN_WIDTH>>3))];
 }
 
 WRITE8_HANDLER(avigo_vid_memory_w)
 {
-		if (offset==0)
+	if (!offset)
+	{
+		/* select column to read/write */
+		avigo_screen_column = data;
+
+		LOG(("vid mem column write: %02x\n",data));
+
+		if (data>=(AVIGO_SCREEN_WIDTH>>3))
 		{
-			/* select column to read/write */
-			avigo_screen_column = data;
-
-			LOG(("vid mem column write: %02x\n",data));
-
-			if (data>=(AVIGO_SCREEN_WIDTH>>3))
-			{
-				LOG(("error: vid mem column write: %02x\n",data));
-			}
-			return;
+			LOG(("error: vid mem column write: %02x\n",data));
+		}
+		return;
         }
 
         if ((offset<0x0100) || (offset>=0x01f0))
         {
-			LOG(("vid mem write: %04x %02x\n", offset, data));
-			return;
+		LOG(("vid mem write: %04x %02x\n", offset, data));
+		return;
         }
 
-        if ((offset>=0x0100) && (offset<=0x01f0))
-        {
-			unsigned char *ptr;
 
-			/* 0x0100-0x01f0 contains data for selected column */
-			ptr = avigo_video_memory + avigo_screen_column + ((offset-0x0100)*(AVIGO_SCREEN_WIDTH>>3));
-
-			ptr[0] = data;
-
-			return;
-        }
+	/* 0x0100-0x01f0 contains data for selected column */
+	avigo_video_memory[avigo_screen_column + ((offset&0xff)*(AVIGO_SCREEN_WIDTH>>3))] = data;
 }
 
 VIDEO_START( avigo )
@@ -115,7 +99,7 @@ VIDEO_START( avigo )
 	avigo_screen_column = 0;
 
 	/* allocate video memory */
-	avigo_video_memory = auto_alloc_array(machine, UINT8, ((AVIGO_SCREEN_WIDTH>>3)*AVIGO_SCREEN_HEIGHT));
+	avigo_video_memory = auto_alloc_array(machine, UINT8, ((AVIGO_SCREEN_WIDTH>>3)*AVIGO_SCREEN_HEIGHT+1));
 	machine->gfx[0] = stylus_pointer = gfx_element_alloc(machine, &pointerlayout, pointermask, machine->config->total_colors / 16, 0);
 
 	stylus_pointer->total_colors = 3;
