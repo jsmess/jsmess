@@ -3025,6 +3025,8 @@ static void render_spans_32(running_machine *machine, int start, int end, TILE* 
 
 #include "rdpspn16.c"
 
+//#include "rdptri.c"
+
 static void triangle(running_machine *machine, UINT32 w1, UINT32 w2, int shade, int texture, int zbuffer)
 {
 	int j;
