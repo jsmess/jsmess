@@ -80,6 +80,9 @@ static WRITE8_DEVICE_HANDLER( pio_system_w )
 
 	wd17xx_set_side(kaypro_fdc, (data & 4) ? 1 : 0);	/* only has one side but this circuit exists... */
 
+	output_set_value("ledA",(data & 1) ? 1 : 0);		/* LEDs in artwork */
+	output_set_value("ledB",(data & 2) ? 1 : 0);
+
 	kaypro_system_port = data;
 }
 
@@ -187,6 +190,9 @@ WRITE8_HANDLER( kaypro2x_system_port_w )
 		wd17xx_set_drive(kaypro_fdc, 1);
 
 	wd17xx_set_side(kaypro_fdc, (data & 4) ? 0 : 1);
+
+	output_set_value("ledA",(data & 1) ? 1 : 0);		/* LEDs in artwork */
+	output_set_value("ledB",(data & 2) ? 1 : 0);
 
 	kaypro_system_port = data;
 }
