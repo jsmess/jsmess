@@ -2,7 +2,7 @@
 
     wd17xx.h
 
-    Implementations of the Western Digital 17xx and 19xx families of
+    Implementations of the Western Digital 17xx and 27xx families of
     floppy disk controllers
 
 *********************************************************************/

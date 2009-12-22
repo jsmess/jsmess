@@ -202,22 +202,6 @@
 /* Type IV commands */
 #define FDC_FORCE_INT	0xd0	/* force interrupt */
 
-/* enumeration to specify the type of FDC; there are subtle differences */
-typedef enum
-{
-	WD_TYPE_1770,
-	WD_TYPE_1771,
-	WD_TYPE_1772,
-	WD_TYPE_1773,
-	WD_TYPE_179X,
-	WD_TYPE_1793,
-	WD_TYPE_2793,
-
-	/* duplicate constants */
-	WD_TYPE_177X = WD_TYPE_1770,
-	WD_TYPE_MB8877 = WD_TYPE_179X
-} wd17xx_type_t;
-
 /* structure describing a double density track */
 #define TRKSIZE_DD		6144
 #if 0
@@ -307,7 +291,7 @@ struct _wd1770_state
 
 
 	DENSITY   density;				/* FM/MFM, single / double density */
-	wd17xx_type_t type;
+
 	UINT8	track_reg;				/* value of track register */
 	UINT8	command_type;			/* last command type */
 	UINT8	head;					/* current head # */
@@ -422,8 +406,7 @@ static void calc_crc(UINT16 *crc, UINT8 value)
 
 static int wd17xx_has_side_select(const device_config *device)
 {
-	wd1770_state *w = get_safe_token(device);
-	return (w->type == WD_TYPE_1773) || (w->type == WD_TYPE_1793) || (w->type == WD_TYPE_2793);
+	return (device->type == WD1773 || device->type == WD1793 || device->type == WD2793);
 }
 
 static int wd17xx_get_datarate_in_us(DENSITY density)
@@ -588,7 +571,7 @@ static void write_track(const device_config *device)
 	}
 #endif
 
-	if (w->type == WD_TYPE_1771)
+	if (device->type == WD1771)
 		w->data_count = TRKSIZE_SD;
 	else
 		w->data_count = (w->density) ? TRKSIZE_DD : TRKSIZE_SD;
@@ -726,7 +709,7 @@ static void read_track(const device_config *device)
 	}
 #endif
 
-	if (w->type == WD_TYPE_1771)
+	if (device->type == WD1771)
 		w->data_count = TRKSIZE_SD;
 	else
 		w->data_count = (w->density) ? TRKSIZE_DD : TRKSIZE_SD;
@@ -1570,7 +1553,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 				{
 				w->command = data & ~FDC_MASK_TYPE_III;
 				w->data_offset = 0;
-				if (w->type == WD_TYPE_1771)
+				if (device->type == WD1771)
 					w->data_count = TRKSIZE_SD;
 				else
 					w->data_count = (w->density) ? TRKSIZE_DD : TRKSIZE_SD;
@@ -1867,23 +1850,11 @@ static DEVICE_START( wd1770 )
 	devcb_resolve_write_line(&w->out_intrq_func, &w->intf->out_intrq_func, device);
 	devcb_resolve_write_line(&w->out_drq_func, &w->intf->out_drq_func, device);
 
-	/* model specific values */
-	w->type = WD_TYPE_1770;
-
 	/* stepping rate depends on the clock */
 	w->stepping_rate[0] = 6;
 	w->stepping_rate[1] = 12;
 	w->stepping_rate[2] = 20;
 	w->stepping_rate[3] = 30;
-}
-
-static DEVICE_START( wd1771 )
-{
-	wd1770_state *w = get_safe_token(device);
-
-	DEVICE_START_CALL(wd1770);
-
-	w->type = WD_TYPE_1771;
 }
 
 static DEVICE_START( wd1772 )
@@ -1892,67 +1863,11 @@ static DEVICE_START( wd1772 )
 
 	DEVICE_START_CALL(wd1770);
 
-	w->type = WD_TYPE_1772;
-
 	/* the 1772 has faster track stepping rates */
 	w->stepping_rate[0] = 6;
 	w->stepping_rate[1] = 12;
 	w->stepping_rate[2] = 2;
 	w->stepping_rate[3] = 3;
-}
-
-static DEVICE_START( wd1773 )
-{
-	wd1770_state *w = get_safe_token(device);
-
-	DEVICE_START_CALL(wd1770);
-
-	w->type = WD_TYPE_1773;
-}
-
-static DEVICE_START( wd179x )
-{
-	wd1770_state *w = get_safe_token(device);
-
-	DEVICE_START_CALL(wd1770);
-
-	w->type = WD_TYPE_179X;
-}
-
-static DEVICE_START( wd1793 )
-{
-	wd1770_state *w = get_safe_token(device);
-
-	DEVICE_START_CALL(wd1770);
-
-	w->type = WD_TYPE_1793;
-}
-
-static DEVICE_START( wd2793 )
-{
-	wd1770_state *w = get_safe_token(device);
-
-	DEVICE_START_CALL(wd1770);
-
-	w->type = WD_TYPE_2793;
-}
-
-static DEVICE_START( wd177x )
-{
-	wd1770_state *w = get_safe_token(device);
-
-	DEVICE_START_CALL(wd1770);
-
-	w->type = WD_TYPE_177X;
-}
-
-static DEVICE_START( mb8877 )
-{
-	wd1770_state *w = get_safe_token(device);
-
-	DEVICE_START_CALL(wd1770);
-
-	w->type = WD_TYPE_MB8877;
 }
 
 static DEVICE_RESET( wd1770 )
@@ -2012,7 +1927,7 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #include "devtempl.h"
 
 #define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1771##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_FEATURES	0
 #define DEVTEMPLATE_DERIVED_NAME		"WD1771"
 #include "devtempl.h"
 
@@ -2022,31 +1937,31 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #include "devtempl.h"
 
 #define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1773##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_FEATURES	0
 #define DEVTEMPLATE_DERIVED_NAME		"WD1773"
 #include "devtempl.h"
 
 #define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd179x##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_FEATURES	0
 #define DEVTEMPLATE_DERIVED_NAME		"WD179x"
 #include "devtempl.h"
 
 #define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1793##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_FEATURES	0
 #define DEVTEMPLATE_DERIVED_NAME		"WD1793"
 #include "devtempl.h"
 
 #define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd2793##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_FEATURES	0
 #define DEVTEMPLATE_DERIVED_NAME		"WD2793"
 #include "devtempl.h"
 
 #define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd177x##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_FEATURES	0
 #define DEVTEMPLATE_DERIVED_NAME		"WD179x"
 #include "devtempl.h"
 
 #define DEVTEMPLATE_DERIVED_ID(p,s)		p##mb8877##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_FEATURES	0
 #define DEVTEMPLATE_DERIVED_NAME		"MB8877"
 #include "devtempl.h"
