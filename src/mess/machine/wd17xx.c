@@ -314,6 +314,9 @@ struct _wd1770_state
 
 	int     hld_count;				/* head loaded counter */
 
+	/* timers to delay execution/completion of commands */
+	emu_timer *timer_cmd, *timer_data, *timer_rs, *timer_ws;
+
 	/* this is the drive currently selected */
 	const device_config *drive;
 
@@ -480,7 +483,7 @@ static void wd17xx_set_busy(const device_config *device, attotime duration)
 
 	w->status |= STA_1_BUSY;
 
-	timer_set(device->machine, duration, (void *)device, 0, wd17xx_command_callback);
+	timer_adjust_oneshot(w->timer_cmd, duration, 0);
 }
 
 
@@ -912,7 +915,7 @@ static void wd17xx_complete_command(const device_config *device, int delay)
 	usecs = 12;
 
 	/* set new timer */
-	timer_set(device->machine, ATTOTIME_IN_USEC(usecs), (void *)device, 0, wd17xx_command_callback);
+	timer_adjust_oneshot(w->timer_cmd, ATTOTIME_IN_USEC(usecs), 0);
 }
 
 
@@ -1064,7 +1067,7 @@ static void wd17xx_timed_data_request(const device_config *device)
 	usecs = wd17xx_get_datarate_in_us(w->density);
 
 	/* set new timer */
-	timer_set(device->machine, ATTOTIME_IN_USEC(usecs), (void *)device, 0, wd17xx_data_callback);
+	timer_adjust_oneshot(w->timer_data, ATTOTIME_IN_USEC(usecs), 0);
 }
 
 
@@ -1078,7 +1081,7 @@ static void wd17xx_timed_read_sector_request(const device_config *device)
 	usecs = w->pause_time; /* How long should we wait? How about 40 micro seconds? */
 
 	/* set new timer */
-	timer_set(device->machine, ATTOTIME_IN_USEC(usecs), (void *)device, 0, wd17xx_read_sector_callback);
+	timer_adjust_oneshot(w->timer_rs, ATTOTIME_IN_USEC(usecs), 0);
 }
 
 
@@ -1092,7 +1095,7 @@ static void wd17xx_timed_write_sector_request(const device_config *device)
 	usecs = w->pause_time; /* How long should we wait? How about 40 micro seconds? */
 
 	/* set new timer */
-	timer_set(device->machine, ATTOTIME_IN_USEC(usecs), (void *)device, 0, wd17xx_write_sector_callback);
+	timer_adjust_oneshot(w->timer_ws, ATTOTIME_IN_USEC(usecs), 0);
 }
 
 
@@ -1801,6 +1804,12 @@ static DEVICE_START( wd1770 )
 	w->status = STA_1_TRACK0;
 	w->density = DEN_MFM_LO;
 	w->pause_time = 40;
+
+	/* allocate timers */
+	w->timer_cmd = timer_alloc(device->machine, wd17xx_command_callback, (void *)device);
+	w->timer_data = timer_alloc(device->machine, wd17xx_data_callback, (void *)device);
+	w->timer_rs = timer_alloc(device->machine, wd17xx_read_sector_callback, (void *)device);
+	w->timer_ws = timer_alloc(device->machine, wd17xx_write_sector_callback, (void *)device);
 
 	/* resolve callbacks */
 	devcb_resolve_write_line(&w->out_intrq_func, &w->intf->out_intrq_func, device);
