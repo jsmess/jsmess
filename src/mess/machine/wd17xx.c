@@ -247,12 +247,6 @@ static const UINT8 track_SD[][2] = {
 };
 #endif
 
-enum
-{
-	MISCCALLBACK_COMMAND = 0,
-	MISCCALLBACK_DATA
-};
-
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -316,12 +310,9 @@ struct _wd1770_state
 
 	UINT8	ddam;					/* ddam of sector found - used when reading */
 	UINT8	sector_data_id;
-	emu_timer	*timer, *timer_rs, *timer_ws, *timer_rid;
 	int		data_direction;
 
 	int     hld_count;				/* head loaded counter */
-
-	emu_timer *busy_timer;
 
 	/* this is the drive currently selected */
 	const device_config *drive;
@@ -358,10 +349,7 @@ const wd17xx_interface default_wd17xx_interface_2_drives =
 
 static void wd17xx_complete_command(const device_config *device, int delay);
 static void wd17xx_timed_data_request(const device_config *device);
-static TIMER_CALLBACK(wd17xx_misc_timer_callback);
-static TIMER_CALLBACK(wd17xx_read_sector_callback);
-static TIMER_CALLBACK(wd17xx_write_sector_callback);
-static void wd17xx_index_pulse_callback(const device_config *controller,const device_config *img, int state);
+static void wd17xx_index_pulse_callback(const device_config *controller, const device_config *img, int state);
 
 
 /*****************************************************************************
@@ -471,16 +459,19 @@ static void	wd17xx_set_intrq(const device_config *device)
 	devcb_call_write_line(&w->out_intrq_func, w->intrq);
 }
 
-
-
-static TIMER_CALLBACK( wd17xx_busy_callback )
+/* set intrq after delay */
+static TIMER_CALLBACK( wd17xx_command_callback )
 {
 	const device_config *device = ptr;
-	wd1770_state *w = get_safe_token(device);
 	wd17xx_set_intrq(device);
-	timer_reset(w->busy_timer, attotime_never);
 }
 
+/* set drq after delay */
+static TIMER_CALLBACK( wd17xx_data_callback )
+{
+	const device_config *device = ptr;
+	wd17xx_set_drq(device);
+}
 
 
 static void wd17xx_set_busy(const device_config *device, attotime duration)
@@ -488,9 +479,9 @@ static void wd17xx_set_busy(const device_config *device, attotime duration)
 	wd1770_state *w = get_safe_token(device);
 
 	w->status |= STA_1_BUSY;
-	timer_adjust_oneshot(w->busy_timer, duration, 0);
-}
 
+	timer_set(device->machine, duration, (void *)device, 0, wd17xx_command_callback);
+}
 
 
 /* BUSY COUNT DOESN'T WORK PROPERLY! */
@@ -892,31 +883,6 @@ static void wd17xx_read_sector(const device_config *device)
 }
 
 
-
-static TIMER_CALLBACK(wd17xx_misc_timer_callback)
-{
-	const device_config *device = ptr;
-	int callback_type = param;
-	wd1770_state *w = get_safe_token(device);
-
-	switch(callback_type) {
-	case MISCCALLBACK_COMMAND:
-		/* command callback */
-		wd17xx_set_intrq(device);
-		break;
-
-	case MISCCALLBACK_DATA:
-		/* data callback */
-		/* ok, trigger data request now */
-		wd17xx_set_drq(device);
-		break;
-	}
-
-	/* stop it, but don't allow it to be free'd */
-	timer_reset(w->timer, attotime_never);
-}
-
-
 /* called on error, or when command is actually completed */
 /* KT - I have used a timer for systems that use interrupt driven transfers.
 A interrupt occurs after the last byte has been read. If it occurs at the time
@@ -946,7 +912,7 @@ static void wd17xx_complete_command(const device_config *device, int delay)
 	usecs = 12;
 
 	/* set new timer */
-	timer_adjust_oneshot(w->timer, ATTOTIME_IN_USEC(usecs), MISCCALLBACK_COMMAND);
+	timer_set(device->machine, ATTOTIME_IN_USEC(usecs), (void *)device, 0, wd17xx_command_callback);
 }
 
 
@@ -1036,9 +1002,6 @@ static TIMER_CALLBACK( wd17xx_read_sector_callback )
 		wd17xx_complete_command(device, DELAY_NOTREADY);
 	else
 		wd17xx_read_sector(device);
-
-	/* stop it, but don't allow it to be free'd */
-	timer_reset(w->timer_rs, attotime_never);
 }
 
 
@@ -1088,9 +1051,6 @@ static TIMER_CALLBACK(wd17xx_write_sector_callback)
 			}
 		}
 	}
-
-	/* stop it, but don't allow it to be free'd */
-	timer_reset(w->timer_ws, attotime_never);
 }
 
 
@@ -1104,7 +1064,7 @@ static void wd17xx_timed_data_request(const device_config *device)
 	usecs = wd17xx_get_datarate_in_us(w->density);
 
 	/* set new timer */
-	timer_adjust_oneshot(w->timer, ATTOTIME_IN_USEC(usecs), MISCCALLBACK_DATA);
+	timer_set(device->machine, ATTOTIME_IN_USEC(usecs), (void *)device, 0, wd17xx_data_callback);
 }
 
 
@@ -1118,7 +1078,7 @@ static void wd17xx_timed_read_sector_request(const device_config *device)
 	usecs = w->pause_time; /* How long should we wait? How about 40 micro seconds? */
 
 	/* set new timer */
-	timer_reset(w->timer_rs, ATTOTIME_IN_USEC(usecs));
+	timer_set(device->machine, ATTOTIME_IN_USEC(usecs), (void *)device, 0, wd17xx_read_sector_callback);
 }
 
 
@@ -1132,7 +1092,7 @@ static void wd17xx_timed_write_sector_request(const device_config *device)
 	usecs = w->pause_time; /* How long should we wait? How about 40 micro seconds? */
 
 	/* set new timer */
-	timer_reset(w->timer_ws, ATTOTIME_IN_USEC(usecs));
+	timer_set(device->machine, ATTOTIME_IN_USEC(usecs), (void *)device, 0, wd17xx_write_sector_callback);
 }
 
 
@@ -1840,10 +1800,6 @@ static DEVICE_START( wd1770 )
 
 	w->status = STA_1_TRACK0;
 	w->density = DEN_MFM_LO;
-	w->busy_timer = timer_alloc(device->machine, wd17xx_busy_callback, (void*)device);
-	w->timer = timer_alloc(device->machine, wd17xx_misc_timer_callback, (void*)device);
-	w->timer_rs = timer_alloc(device->machine, wd17xx_read_sector_callback, (void*)device);
-	w->timer_ws = timer_alloc(device->machine, wd17xx_write_sector_callback, (void*)device);
 	w->pause_time = 40;
 
 	/* resolve callbacks */
