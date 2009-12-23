@@ -2,6 +2,7 @@
 #define TI99_DSK_H_
 
 #include "machine/wd17xx.h"
+#include "formats/flopimg.h"
 
 FLOPPY_OPTIONS_EXTERN(ti99);
 

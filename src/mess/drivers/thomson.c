@@ -75,6 +75,8 @@
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "devices/messram.h"
+#include "machine/serial.h"
+
 
 /**************************** common *******************************/
 
@@ -196,76 +198,23 @@ static INPUT_PORTS_START( thom_lightpen )
 
 INPUT_PORTS_END
 
-
 /* ------------ serial ------------ */
 
-static const char *const thom_serial_names[3][3]=
-{
-	{ "cc90232", "c232", "RS232 (older, CC 90-232)" },
-	{ "rf57932", "r232", "RS232 (newer, RF 57-932)" },
-	{ "modem", "modm", "Modem" }
-};
+#define THOM_SERIAL_CC90323	DEVICE_GET_INFO_NAME(thom_serial_cc90323)
 
-static void thom_serial_getinfo ( const mess_device_class *devclass, UINT32 state, union devinfo *info )
-{
-	switch ( state ) {
-	case MESS_DEVINFO_INT_COUNT:
-		info->i = 3;
-		break;
-	case MESS_DEVINFO_INT_TYPE:
-		info->i = IO_SERIAL;
-		break;
-	case MESS_DEVINFO_INT_READABLE:
-		info->i = 1;
-		break;
-	case MESS_DEVINFO_INT_WRITEABLE:
-		info->i = 1;
-		break;
-	case MESS_DEVINFO_INT_CREATABLE:
-		info->i = 1;
-		break;
+#define MDRV_THOM_SERIAL_CC90323_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, THOM_SERIAL_CC90323, 0)
+	
+#define THOM_SERIAL_RF57232	DEVICE_GET_INFO_NAME(thom_serial_rf57232)
 
-	case MESS_DEVINFO_PTR_START:
-		info->start = DEVICE_START_NAME(thom_serial);
-		break;
-	case MESS_DEVINFO_PTR_LOAD:
-		info->load = DEVICE_IMAGE_LOAD_NAME(thom_serial);
-		break;
-	case MESS_DEVINFO_PTR_UNLOAD:
-		info->unload = DEVICE_IMAGE_UNLOAD_NAME(thom_serial);
-		break;
+#define MDRV_THOM_SERIAL_RF57232_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, THOM_SERIAL_RF57232, 0)
+	
+#define THOM_SERIAL_MODEM	DEVICE_GET_INFO_NAME(thom_serial_modem)
 
-	case MESS_DEVINFO_STR_NAME+0:
-	case MESS_DEVINFO_STR_NAME+1:
-	case MESS_DEVINFO_STR_NAME+2:
-		strcpy( info->s = device_temp_str(),
-			thom_serial_names[ state - MESS_DEVINFO_STR_NAME ][ 0 ] );
-		break;
-	case MESS_DEVINFO_STR_SHORT_NAME+0:
-	case MESS_DEVINFO_STR_SHORT_NAME+1:
-	case MESS_DEVINFO_STR_SHORT_NAME+2:
-		strcpy( info->s = device_temp_str(),
-			thom_serial_names[ state - MESS_DEVINFO_STR_SHORT_NAME ][ 1 ] );
-		break;
-	case MESS_DEVINFO_STR_DESCRIPTION+0:
-	case MESS_DEVINFO_STR_DESCRIPTION+1:
-	case MESS_DEVINFO_STR_DESCRIPTION+2:
-		strcpy( info->s = device_temp_str(),
-			thom_serial_names[ state - MESS_DEVINFO_STR_DESCRIPTION ][ 2 ] );
-		break;
-
-	case MESS_DEVINFO_STR_DEV_FILE:
-		strcpy( info->s = device_temp_str(), "serial" );
-		break;
-	case MESS_DEVINFO_STR_FILE_EXTENSIONS:
-		strcpy( info->s = device_temp_str(), "txt" );
-		break;
-
-	}
-}
-
-
-
+#define MDRV_THOM_SERIAL_MODEM_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, THOM_SERIAL_MODEM, 0)
+	
 /************************** T9000 / TO7 *******************************
 
 TO7 (1982)
@@ -646,11 +595,11 @@ static const floppy_config thomson_floppy_config =
 };
 
 /* ------------ config ------------ */
-
+/*
 static SYSTEM_CONFIG_START ( to )
      CONFIG_DEVICE ( thom_serial_getinfo )
 SYSTEM_CONFIG_END
-
+*/
 
 /* ------------ driver ------------ */
 
@@ -728,6 +677,10 @@ static MACHINE_DRIVER_START ( to7 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("40K")
 	MDRV_RAM_EXTRA_OPTIONS("24K,48K")
+	
+	MDRV_THOM_SERIAL_CC90323_ADD("cc90232")
+	MDRV_THOM_SERIAL_RF57232_ADD("rf57932")
+	MDRV_THOM_SERIAL_MODEM_ADD("modem")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( t9000 )
@@ -735,9 +688,9 @@ static MACHINE_DRIVER_START ( t9000 )
 MACHINE_DRIVER_END
 
 
-COMP ( 1982, to7, 0, 0, to7, to7, 0, to, "Thomson", "TO7", 0 )
+COMP ( 1982, to7, 0, 0, to7, to7, 0, 0, "Thomson", "TO7", 0 )
 
-COMP ( 1980, t9000, to7, 0, t9000, t9000, 0, to, "Thomson", "T9000", 0 )
+COMP ( 1980, t9000, to7, 0, t9000, t9000, 0, 0, "Thomson", "T9000", 0 )
 
 
 /***************************** TO7/70 *********************************
@@ -917,9 +870,9 @@ static MACHINE_DRIVER_START ( to770a )
      MDRV_IMPORT_FROM ( to770 )
 MACHINE_DRIVER_END
 
-COMP ( 1984, to770, 0, 0, to770, to770, 0, to, "Thomson", "TO7/70", 0 )
+COMP ( 1984, to770, 0, 0, to770, to770, 0, 0, "Thomson", "TO7/70", 0 )
 
-COMP ( 1984, to770a, to770, 0, to770a, to770a, 0, to, "Thomson", "TO7/70 arabic", 0 )
+COMP ( 1984, to770a, to770, 0, to770a, to770a, 0, 0, "Thomson", "TO7/70 arabic", 0 )
 
 
 /************************* MO5 / MO5E *********************************
@@ -1105,9 +1058,9 @@ static MACHINE_DRIVER_START ( mo5e )
 MACHINE_DRIVER_END
 
 
-COMP ( 1984, mo5, 0, 0, mo5, mo5, 0, to, "Thomson", "MO5", 0 )
+COMP ( 1984, mo5, 0, 0, mo5, mo5, 0, 0, "Thomson", "MO5", 0 )
 
-COMP ( 1986, mo5e, mo5, 0, mo5e, mo5e, 0, to, "Thomson", "MO5E", 0 )
+COMP ( 1986, mo5e, mo5, 0, mo5e, mo5e, 0, 0, "Thomson", "MO5E", 0 )
 
 
 /********************************* TO9 *******************************
@@ -1441,7 +1394,7 @@ static MACHINE_DRIVER_START ( to9 )
 MACHINE_DRIVER_END
 
 
-COMP ( 1985, to9, 0, 0, to9, to9, 0, to, "Thomson", "TO9", GAME_IMPERFECT_COLORS )
+COMP ( 1985, to9, 0, 0, to9, to9, 0, 0, "Thomson", "TO9", GAME_IMPERFECT_COLORS )
 
 
 /******************************** TO8 ********************************
@@ -1664,9 +1617,9 @@ static MACHINE_DRIVER_START ( to8d )
 MACHINE_DRIVER_END
 
 
-COMP ( 1986, to8, 0, 0, to8, to8, 0, to, "Thomson", "TO8", 0 )
+COMP ( 1986, to8, 0, 0, to8, to8, 0, 0, "Thomson", "TO8", 0 )
 
-COMP ( 1987, to8d, to8, 0, to8d, to8d, 0, to, "Thomson", "TO8D", 0 )
+COMP ( 1987, to8d, to8, 0, to8d, to8d, 0, 0, "Thomson", "TO8D", 0 )
 
 
 /******************************** TO9+ *******************************
@@ -1809,7 +1762,7 @@ static MACHINE_DRIVER_START ( to9p )
 	MDRV_RAM_DEFAULT_SIZE("512K")
 MACHINE_DRIVER_END
 
-COMP ( 1986, to9p, 0, 0, to9p, to9p, 0, to, "Thomson", "TO9+", 0 )
+COMP ( 1986, to9p, 0, 0, to9p, to9p, 0, 0, "Thomson", "TO9+", 0 )
 
 
 
@@ -2150,9 +2103,9 @@ static MACHINE_DRIVER_START ( pro128 )
      MDRV_IMPORT_FROM ( mo6 )
 MACHINE_DRIVER_END
 
-COMP ( 1986, mo6, 0, 0, mo6, mo6, 0, to, "Thomson", "MO6", 0 )
+COMP ( 1986, mo6, 0, 0, mo6, mo6, 0, 0, "Thomson", "MO6", 0 )
 
-COMP ( 1986, pro128, mo6, 0, pro128, pro128, 0, to, "Olivetti / Thomson", "Prodest PC 128", 0 )
+COMP ( 1986, pro128, mo6, 0, pro128, pro128, 0, 0, "Olivetti / Thomson", "Prodest PC 128", 0 )
 
 
 
@@ -2374,4 +2327,4 @@ static MACHINE_DRIVER_START ( mo5nr )
 	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 
-COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, 0, to, "Thomson", "MO5 NR", 0 )
+COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, 0, 0, "Thomson", "MO5 NR", 0 )

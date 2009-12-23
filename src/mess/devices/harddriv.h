@@ -9,7 +9,6 @@
 #ifndef MESS_HD_H
 #define MESS_HD_H
 
-#include "device.h"
 #include "image.h"
 #include "harddisk.h"
 

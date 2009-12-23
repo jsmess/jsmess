@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "device.h"
 #include "cococart.h"
 #include "machine/6551.h"
 

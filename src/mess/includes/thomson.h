@@ -44,12 +44,6 @@
 #define THOM_SOUND_GAME   1 /* 6-bit game port DAC */
 #define THOM_SOUND_SPEECH 2 /* speach synthesis */
 
-/* serial devices */
-#define THOM_SERIAL_CC90323  0 /* RS232 port in I/O extension */
-#define THOM_SERIAL_RF57232  1 /* RS232 extension */
-#define THOM_SERIAL_MODEM    2 /* modem extension */
-
-
 /* bank-switching */
 #define THOM_CART_BANK  "bank2" /* cartridge ROM */
 #define THOM_RAM_BANK   "bank3" /* data RAM */
@@ -57,9 +51,9 @@
 #define THOM_BASE_BANK  "bank5" /* system RAM */
 
 /* serial */
-extern DEVICE_START( thom_serial );
-extern DEVICE_IMAGE_LOAD( thom_serial );
-extern DEVICE_IMAGE_UNLOAD( thom_serial );
+DEVICE_GET_INFO( thom_serial_cc90323 );
+DEVICE_GET_INFO( thom_serial_rf57232 );
+DEVICE_GET_INFO( thom_serial_modem );
 
 extern const pia6821_interface to7_pia6821_sys;
 extern const pia6821_interface to7_pia6821_io;

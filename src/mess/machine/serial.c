@@ -36,11 +36,6 @@ setup serial interface software in driver and let the transfer begin */
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-/* number of serial streams supported. This is also the number
-of serial ports supported */
-#define MAX_SERIAL_DEVICES	4
-
-
 /* a read/write bit stream. used to transmit data and to receive data */
 struct data_stream
 {
@@ -55,9 +50,8 @@ struct data_stream
 	unsigned long ByteCount;
 };
 
-
-/* a serial device */
-struct serial_device
+typedef struct _serial_t serial_t;
+struct _serial_t
 {
 	/* transmit data bit-stream */
 	struct data_stream transmit;
@@ -84,9 +78,16 @@ struct serial_device
 	void	*timer;
 };
 
+INLINE serial_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	
+	return (serial_t *)device->token;
+}
+
 
 /* the serial streams */
-static struct serial_device	serial_devices[MAX_SERIAL_DEVICES];
 static TIMER_CALLBACK(serial_device_baud_rate_callback);
 
 
@@ -127,72 +128,67 @@ static unsigned char serial_helper_get_parity(unsigned char data)
 
 static void serial_device_in_callback(running_machine *machine, int id, unsigned long status)
 {
-	serial_devices[id].connection.input_state = status;
+/*	serial_t *ser = get_safe_token(device);
+	
+	ser->connection.input_state = status;*/
 }
 
 /***** SERIAL DEVICE ******/
-void serial_device_setup(const device_config *image, int baud_rate, int num_data_bits, int stop_bit_count, int parity_code)
+void serial_device_setup(const device_config *device, int baud_rate, int num_data_bits, int stop_bit_count, int parity_code)
 {
-	int id = image_index_in_device(image);
+	serial_t *ser = get_safe_token(device);
 
-	/* check id is valid */
-	if ((id<0) || (id>=MAX_SERIAL_DEVICES))
-		return;
+	ser->BaudRate = baud_rate;
+	ser->data_form.word_length = num_data_bits;
+	ser->data_form.stop_bit_count = stop_bit_count;
+	ser->data_form.parity = parity_code;
+	ser->timer = timer_alloc(device->machine, serial_device_baud_rate_callback, (void *)device);
 
-	serial_devices[id].BaudRate = baud_rate;
-	serial_devices[id].data_form.word_length = num_data_bits;
-	serial_devices[id].data_form.stop_bit_count = stop_bit_count;
-	serial_devices[id].data_form.parity = parity_code;
-	serial_devices[id].timer = timer_alloc(image->machine, serial_device_baud_rate_callback, NULL);
-
-	serial_connection_init(image->machine, &serial_devices[id].connection);
-	serial_connection_set_in_callback(image->machine, &serial_devices[id].connection, serial_device_in_callback);
+	serial_connection_init(device->machine,&ser->connection);
+	serial_connection_set_in_callback(device->machine,&ser->connection, serial_device_in_callback);
 
 	/* signal to other end it is clear to send! */
 	/* data is initially high state */
 	/* set /rts */
-	serial_devices[id].connection.State |= SERIAL_STATE_RTS;
+	ser->connection.State |= SERIAL_STATE_RTS;
 	/* signal to other end data is ready to be accepted */
 	/* set /dtr */
-	serial_devices[id].connection.State |= SERIAL_STATE_DTR;
-	set_out_data_bit(serial_devices[id].connection.State, 1);
-	serial_connection_out(image->machine,&serial_devices[id].connection);
-	transmit_register_reset(&serial_devices[id].transmit_reg);
-	receive_register_reset(&serial_devices[id].receive_reg);
-	receive_register_setup(&serial_devices[id].receive_reg, &serial_devices[id].data_form);
+	ser->connection.State |= SERIAL_STATE_DTR;
+	set_out_data_bit(ser->connection.State, 1);
+	serial_connection_out(device->machine,&ser->connection);
+	transmit_register_reset(&ser->transmit_reg);
+	receive_register_reset(&ser->receive_reg);
+	receive_register_setup(&ser->receive_reg, &ser->data_form);
 }
 
 
-unsigned long serial_device_get_state(int id)
+unsigned long serial_device_get_state(const device_config *device)
 {
-	if ((id<0) || (id>=MAX_SERIAL_DEVICES))
-		return 0;
-	return serial_devices[id].connection.State;
+	serial_t *ser = get_safe_token(device);
+	
+	return ser->connection.State;
 }
 
-void serial_device_set_transmit_state(const device_config *image, int state)
+void serial_device_set_transmit_state(const device_config *device, int state)
 {
 	int previous_state;
-	int id = image_index_in_device(image);
+	serial_t *ser = get_safe_token(device);
 
-	if ((id<0) || (id>=MAX_SERIAL_DEVICES))
-		return;
+	previous_state = ser->transmit_state;
 
-	previous_state = serial_devices[id].transmit_state;
-
-	serial_devices[id].transmit_state = state;
+	ser->transmit_state = state;
 
 	if ((state^previous_state)!=0)
 	{
 		if (state)
 		{
 			/* start timer */
-			timer_adjust_periodic(serial_devices[id].timer, attotime_zero, id, ATTOTIME_IN_HZ(serial_devices[id].BaudRate));
+			timer_adjust_periodic(ser->timer, attotime_zero, 0, ATTOTIME_IN_HZ(ser->BaudRate));
 		}
 		else
 		{
 			/* remove timer */
-			timer_reset(serial_devices[id].timer, attotime_never);
+			timer_reset(ser->timer, attotime_never);
 		}
 	}
 
@@ -475,66 +471,62 @@ void	transmit_register_send_bit(running_machine *machine, struct serial_transmit
 	serial_connection_out(machine, connection);
 }
 
-static void serial_protocol_none_sent_char(int id)
+static void serial_protocol_none_sent_char(const device_config *device)
 {
 	int i;
 	int bit;
 	unsigned char data_byte;
-
+	serial_t *ser = get_safe_token(device);
+	
 	/* generate byte to transmit */
 	data_byte = 0;
-	for (i=0; i<serial_devices[id].data_form.word_length; i++)
+	for (i=0; i<ser->data_form.word_length; i++)
 	{
 		data_byte = data_byte<<1;
-		bit = data_stream_get_data_bit_from_data_byte(&serial_devices[id].transmit);
+		bit = data_stream_get_data_bit_from_data_byte(&ser->transmit);
 		data_byte = data_byte|bit;
 	}
 	/* setup register */
-	transmit_register_setup(&serial_devices[id].transmit_reg,&serial_devices[id].data_form, data_byte);
+	transmit_register_setup(&ser->transmit_reg,&ser->data_form, data_byte);
 
 	logerror("serial device transmitted char: %02x\n",data_byte);
 }
 
 static TIMER_CALLBACK(serial_device_baud_rate_callback)
 {
-	int id = param;
+	serial_t *ser = get_safe_token(ptr);
 
 	/* receive data into receive register */
-	receive_register_update_bit(&serial_devices[id].receive_reg, get_in_data_bit(serial_devices[id].connection.input_state));
+	receive_register_update_bit(&ser->receive_reg, get_in_data_bit(ser->connection.input_state));
 
-	if (serial_devices[id].receive_reg.flags & RECEIVE_REGISTER_FULL)
+	if (ser->receive_reg.flags & RECEIVE_REGISTER_FULL)
 	{
 		//logerror("SERIAL DEVICE\n");
-		receive_register_extract(&serial_devices[id].receive_reg, &serial_devices[id].data_form);
+		receive_register_extract(&ser->receive_reg, &ser->data_form);
 
-		logerror("serial device receive char: %02x\n",serial_devices[id].receive_reg.byte_received);
+		logerror("serial device receive char: %02x\n",ser->receive_reg.byte_received);
 	}
 
 	/* is transmit empty? */
-	if (serial_devices[id].transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)
+	if (ser->transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)
 	{
 		/* char has been sent, execute callback */
-		serial_protocol_none_sent_char(id);
+		serial_protocol_none_sent_char(ptr);
 	}
 
 	/* other side says it is clear to send? */
-	if (serial_devices[id].connection.input_state & SERIAL_STATE_CTS)
+	if (ser->connection.input_state & SERIAL_STATE_CTS)
 	{
 		/* send bit */
-		transmit_register_send_bit(machine, &serial_devices[id].transmit_reg, &serial_devices[id].connection);
+		transmit_register_send_bit(machine, &ser->transmit_reg, &ser->connection);
 	}
 }
 
 /* connect the specified connection to this serial device */
-void serial_device_connect(const device_config *image, struct serial_connection *connection)
+void serial_device_connect(const device_config *device, struct serial_connection *connection)
 {
-	int id = image_index_in_device(image);
-
-	/* check id is valid */
-	if ((id<0) || (id>=MAX_SERIAL_DEVICES))
-		return;
-
-	serial_connection_link(image->machine, connection, &serial_devices[id].connection);
+	serial_t *ser = get_safe_token(device);
+	serial_connection_link(device->machine, connection, &ser->connection);
 }
 
 
@@ -597,26 +589,27 @@ static void data_stream_init(struct data_stream *stream, unsigned char *pData, u
 	data_stream_reset(stream);
 }
 
-DEVICE_START(serial_device)
+DEVICE_START(serial)
 {
-	int id = image_index_in_device(device);
-	memset(&serial_devices[id], 0, sizeof(serial_devices[id]));
+	//serial_t *ser = get_safe_token(device);		
 }
 
-DEVICE_IMAGE_LOAD(serial_device)
+DEVICE_RESET(serial)
 {
-	int id = image_index_in_device(image);
+//	serial_t *ser = get_safe_token(device);
+}
+
+DEVICE_IMAGE_LOAD(serial)
+{
 	int data_length;
 	unsigned char *data;
 
-	/* check id is valid */
-	if ((id<0) || (id>=MAX_SERIAL_DEVICES))
-		return INIT_FAIL;
+	serial_t *ser = get_safe_token(image);
 
 	/* load file and setup transmit data */
 	if (serial_device_load_internal(image, &data, &data_length))
 	{
-		data_stream_init(&serial_devices[id].transmit, data, data_length);
+		data_stream_init(&ser->transmit, data, data_length);
 		return INIT_PASS;
 	}
 
@@ -624,15 +617,41 @@ DEVICE_IMAGE_LOAD(serial_device)
 }
 
 
-DEVICE_IMAGE_UNLOAD(serial_device)
+DEVICE_IMAGE_UNLOAD(serial)
 {
-	int id = image_index_in_device(image);
+	serial_t *ser = get_safe_token(image);
 
 	/* stop transmit */
 	serial_device_set_transmit_state(image, 0);
 	/* free streams */
-	data_stream_free(&serial_devices[id].transmit);
-	data_stream_free(&serial_devices[id].receive);
+	data_stream_free(&ser->transmit);
+	data_stream_free(&ser->receive);
+}
+
+
+DEVICE_GET_INFO( serial )
+{
+	switch ( state )
+	{
+		case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;           			break;
+		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(serial_t);								break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;											break;
+		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_SERIAL;                                	break;
+		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
+		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                        	break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 1;                                        	break;
+
+		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( serial );          	break;
+		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( serial );				break;
+		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( serial ); 	break;
+		case DEVINFO_FCT_IMAGE_UNLOAD:		        info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(serial );	break;
+		case DEVINFO_STR_NAME:		                strcpy( info->s, "Serial port");	                    break;
+		case DEVINFO_STR_FAMILY:                    strcpy(info->s, "Serial port");	                        break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "");                                    break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");									break;
+		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);								break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright the MESS Team"); 			break;
+	}
 }
 
 /*******************************************************************************/
@@ -676,7 +695,7 @@ void	serial_connection_init(running_machine *machine, struct serial_connection *
 }
 
 /* set callback which will be executed when in status has changed */
-void	serial_connection_set_in_callback(running_machine *machine, struct serial_connection *connection, void (*in_cb)(running_machine *machine, int id, unsigned long state))
+void	serial_connection_set_in_callback(running_machine *machine, struct serial_connection *connection, void (*in_cb)(running_machine *machine, int id, unsigned long status))
 {
 	connection->in_callback = in_cb;
 }
@@ -707,4 +726,4 @@ void	serial_connection_link(running_machine *machine, struct serial_connection *
 	serial_connection_out(machine,connection_a);
 	/* let a know the state of b */
 	serial_connection_out(machine,connection_b);
-}
+} 

@@ -9,7 +9,6 @@
 #ifndef __TI99CART_H__
 #define __TI99CART_H__
 
-#include "device.h"
 #include "image.h"
 
 #define TI99_MULTICART			DEVICE_GET_INFO_NAME(ti99_multicart)

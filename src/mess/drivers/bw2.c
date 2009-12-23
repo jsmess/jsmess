@@ -235,31 +235,6 @@ static WRITE8_HANDLER( ramcard_bank_w )
 	memory_set_bank(space->machine, "bank1", state->bank);
 }
 
-/* Serial */
-
-static DEVICE_IMAGE_LOAD( bw2_serial )
-{
-	bw2_state *state = image->machine->driver_data;
-
-	/* filename specified */
-	if (device_load_serial_device(image) == INIT_PASS)
-	{
-		/* setup transmit parameters */
-		serial_device_setup(image, 9600 >> input_port_read(image->machine, "BAUD"), 8, 1, SERIAL_PARITY_NONE);
-
-		/* connect serial chip to serial device */
-		msm8251_connect_to_serial_device(state->msm8251, image);
-
-		/* and start transmit */
-		serial_device_set_transmit_state(image, 1);
-
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
-
-
 /* Floppy */
 static WRITE_LINE_DEVICE_HANDLER( bw2_wd17xx_drq_w )
 {
@@ -805,6 +780,47 @@ static const wd17xx_interface bw2_wd17xx_interface =
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
+/* Serial */
+
+static DEVICE_IMAGE_LOAD( bw2_serial )
+{
+	bw2_state *state = image->machine->driver_data;
+
+	if (device_load_serial(image) == INIT_PASS)
+	{
+		serial_device_setup(image, 9600 >> input_port_read(image->machine, "BAUD"), 8, 1, SERIAL_PARITY_NONE);
+
+		msm8251_connect_to_serial_device(state->msm8251, image);
+
+		serial_device_set_transmit_state(image, 1);
+
+		return INIT_PASS;
+	}
+
+	return INIT_FAIL;
+}
+
+
+static DEVICE_GET_INFO( bw2_serial )
+{
+	switch ( state )
+	{
+		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( bw2_serial );    break;
+		case DEVINFO_STR_NAME:		                strcpy(info->s, "BW2 serial port");	                    break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                         break;
+		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
+		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0;                                        	break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 0;                                        	break;		
+		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+	}
+}
+
+#define BW2_SERIAL	DEVICE_GET_INFO_NAME(bw2_serial)
+
+#define MDRV_BW2_SERIAL_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, BW2_SERIAL, 0)
+	
+
 static MACHINE_DRIVER_START( bw2 )
 	MDRV_DRIVER_DATA(bw2_state)
 
@@ -848,6 +864,8 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
 	MDRV_RAM_EXTRA_OPTIONS("96K,128K,160K,192K,224K")
+	
+	MDRV_BW2_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -867,49 +885,5 @@ ROM_START( bw2 )
 	ROM_LOAD("ramcard-10.bin", 0x0000, 0x4000, CRC(68cde1ba) SHA1(a776a27d64f7b857565594beb63aa2cd692dcf04))
 ROM_END
 
-static void bw2_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* serial */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:
-			info->i = IO_SERIAL;
-			break;
-		case MESS_DEVINFO_INT_READABLE:
-			info->i = 1;
-			break;
-		case MESS_DEVINFO_INT_WRITEABLE:
-			info->i = 0;
-			break;
-		case MESS_DEVINFO_INT_CREATABLE:
-			info->i = 0;
-			break;
-		case MESS_DEVINFO_INT_COUNT:
-			info->i = 1;
-			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:
-			info->start = DEVICE_START_NAME(serial_device);
-			break;
-		case MESS_DEVINFO_PTR_LOAD:
-			info->load = DEVICE_IMAGE_LOAD_NAME(bw2_serial);
-			break;
-		case MESS_DEVINFO_PTR_UNLOAD:
-			info->unload = DEVICE_IMAGE_UNLOAD_NAME(serial_device);
-			break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:
-			strcpy(info->s = device_temp_str(), "txt");
-			break;
-	}
-}
-
-static SYSTEM_CONFIG_START( bw2 )
-	CONFIG_DEVICE( bw2_serial_getinfo )
-SYSTEM_CONFIG_END
-
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   INIT    CONFIG  COMPANY      FULLNAME  FLAGS */
-COMP( 1985, bw2,    0,      0,      bw2,      bw2,    bw2,    bw2,    "Bondwell",  "BW 2",   0 )
+COMP( 1985, bw2,    0,      0,      bw2,      bw2,    bw2,    0,    "Bondwell",  "BW 2",   0 )

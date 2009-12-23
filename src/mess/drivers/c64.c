@@ -333,12 +333,57 @@ the Edu64-1 used the full C64 BIOS. Confirmations are needed, anyway.
 
 /* devices config */
 #include "includes/cbm.h"
-#include "includes/cbmdrive.h"
-#include "includes/vc1541.h"
 #include "machine/cbmiec.h"
 #include "machine/c1541.h"
 
 #include "includes/c64.h"
+
+#define VC1540_ROM( cpu )	\
+	ROM_REGION( 0x10000, cpu, 0 )	\
+	ROM_LOAD( "325302-01.ua2", 0xc000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )	\
+	ROM_LOAD( "325303-01.ub3", 0xe000, 0x2000, CRC(10b39158) SHA1(56dfe79b26f50af4e83fd9604857756d196516b9) )
+
+/*
+    rev. 01 - It is believed to be the first revision of the 1541 firmware. The service manual says that this ROM
+        is for North America and Japan only.
+    rev. 02 - Second version of the 1541 firmware. The service manual says that this ROM was not available in North
+        America (Japan only?).
+    rev. 03 - It is said to be the first version that is usable in Europe (in the service manual?).
+    rev. 05 - From an old-style 1541 with short board.
+    rev. 06AA - From an old-style 1541 with short board.
+*/
+#define VC1541_ROM( cpu )	\
+	ROM_REGION( 0x10000, cpu, 0 )	\
+	ROM_SYSTEM_BIOS( 0, "rev1", "VC-1541 rev. 01" )	\
+	ROMX_LOAD( "325302-01.ua2", 0xc000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11), ROM_BIOS(1) )	\
+	ROMX_LOAD( "901229-01.ub3", 0xe000, 0x2000, CRC(9a48d3f0) SHA1(7a1054c6156b51c25410caec0f609efb079d3a77), ROM_BIOS(1) )	\
+	ROM_SYSTEM_BIOS( 1, "rev2", "VC-1541 rev. 02" )	\
+	ROMX_LOAD( "325302-01.ua2", 0xc000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11), ROM_BIOS(2) )	\
+	ROMX_LOAD( "901229-02.ub3", 0xe000, 0x2000, CRC(b29bab75) SHA1(91321142e226168b1139c30c83896933f317d000), ROM_BIOS(2) )	\
+	ROM_SYSTEM_BIOS( 2, "rev3", "VC-1541 rev. 03" )	\
+	ROMX_LOAD( "325302-01.ua2", 0xc000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11), ROM_BIOS(3) )	\
+	ROMX_LOAD( "901229-03.ub3", 0xe000, 0x2000, CRC(9126e74a) SHA1(03d17bd745066f1ead801c5183ac1d3af7809744), ROM_BIOS(3) )	\
+	ROM_SYSTEM_BIOS( 3, "rev5", "VC-1541 rev. 05" )	\
+	ROMX_LOAD( "325302-01.ua2", 0xc000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11), ROM_BIOS(4) )	\
+	ROMX_LOAD( "901229-05.ub3", 0xe000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b), ROM_BIOS(4) )	\
+	ROM_SYSTEM_BIOS( 4, "rev6aa", "VC-1541 rev. 06AA" )	\
+	ROMX_LOAD( "325302-01.ua2", 0xc000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11), ROM_BIOS(5) )	\
+	ROMX_LOAD( "901229-06aa.ub3", 0xe000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0), ROM_BIOS(5) )	\
+	ROM_SYSTEM_BIOS( 5, "rev1c", "VC-1541C rev. 01" )	\
+	ROMX_LOAD( "251968-01.ua2", 0xc000, 0x4000, CRC(1b3ca08d) SHA1(8e893932de8cce244117fcea4c46b7c39c6a7765), ROM_BIOS(6) )	\
+	ROM_SYSTEM_BIOS( 6, "rev2c", "VC-1541C rev. 02" )	\
+	ROMX_LOAD( "251968-02.ua2", 0xc000, 0x4000, CRC(2d862d20) SHA1(38a7a489c7bbc8661cf63476bf1eb07b38b1c704), ROM_BIOS(7) )	\
+	ROM_SYSTEM_BIOS( 7, "rev3ii", "VC-1541-II" )	\
+	ROMX_LOAD( "251968-03.u4", 0xc000, 0x4000, CRC(899fa3c5) SHA1(d3b78c3dbac55f5199f33f3fe0036439811f7fb3), ROM_BIOS(8) )	\
+	ROM_SYSTEM_BIOS( 8, "reviin", "VC-1541-II (with Newtronics D500)" )	\
+	ROMX_LOAD( "355640-01.u4", 0xc000, 0x4000, CRC(57224cde) SHA1(ab16f56989b27d89babe5f89c5a8cb3da71a82f0), ROM_BIOS(9) )	\
+
+
+
+// currently not used (hacked drive firmware with more RAM)
+#define DOLPHIN_ROM( cpu )	\
+	ROM_REGION( 0x10000, cpu, 0 )	\
+	ROM_LOAD( "c1541.rom", 0xa000, 0x6000, CRC(bd8e42b2) SHA1(d6aff55fc70876fa72be45c666b6f42b92689b4d) )
 
 
 /*************************************

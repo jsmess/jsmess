@@ -9,7 +9,6 @@
 #include "driver.h"
 #include "timer.h"
 #include "state.h"
-#include "device.h"
 
 #include "devices/xmodem.h"
 #include "devices/kermit.h"

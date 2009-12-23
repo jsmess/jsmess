@@ -5,7 +5,6 @@
 #define __FLOPDRV_H__
 
 #include "devcb.h"
-#include "device.h"
 #include "image.h"
 #include "formats/flopimg.h"
 

@@ -104,7 +104,6 @@ enum
 struct serial_connection
 {
 	int id;
-
 	/* state of this side */
 	unsigned long State;
 
@@ -125,13 +124,13 @@ struct serial_connection
 void serial_connection_init(running_machine *machine, struct serial_connection *connection);
 
 /* set callback which will be executed when in status has changed */
-void serial_connection_set_in_callback(running_machine *machine, struct serial_connection *connection, void (*in_cb)(running_machine *machine, int id, unsigned long state));
+void serial_connection_set_in_callback(running_machine *machine, struct serial_connection *connection, void (*in_cb)(running_machine *machine, int id, unsigned long status));
 
 /* output status, if callback is setup it will be executed with the new status */
 void serial_connection_out(running_machine *machine, struct serial_connection *connection);
 
 /* join two serial connections */
-void serial_connection_link(running_machine *machine, struct serial_connection *connection_a, struct serial_connection *connection_b);
+void serial_connection_link(running_machine *machine, struct serial_connection *connection_a, struct serial_connection *connection_b);  
 
 
 /*******************************************************************************/
@@ -221,17 +220,22 @@ void serial_helper_setup(void);
 /*******************************************************************************/
 /**** SERIAL DEVICE ****/
 
-unsigned long serial_device_get_state(int id);
+unsigned long serial_device_get_state(const device_config *device);
 
 /* connect this device to the emulated serial chip */
 /* id is the serial device to connect to */
 /* connection is the serial connection to connect to the serial device */
 void serial_device_connect(const device_config *image, struct serial_connection *connection);
 
-/* init this device */
-DEVICE_START(serial_device);
-DEVICE_IMAGE_LOAD(serial_device);
-DEVICE_IMAGE_UNLOAD(serial_device);
+#define SERIAL	DEVICE_GET_INFO_NAME(serial)
+
+#define MDRV_SERIAL_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, SERIAL, 0)
+
+/* device interface */
+DEVICE_GET_INFO( serial );
+DEVICE_START(serial);
+DEVICE_IMAGE_LOAD(serial);
 
 void serial_device_setup(const device_config *image, int baud_rate, int num_data_bits, int stop_bit_count, int parity_code);
 

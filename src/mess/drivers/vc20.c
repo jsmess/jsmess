@@ -94,11 +94,16 @@ interface; no special expansion modules like ieee488 interface
 #include "includes/cbm.h"
 #include "machine/cbmiec.h"
 #include "machine/c1541.h"
-#include "includes/vc1541.h"
 #include "includes/cbmieeeb.h"
 #include "devices/messram.h"
 #include "includes/vc20.h"
 
+// I'm not 100% sure about U3B/U3E locations used below for ROM names
+// I need a picture to confirm these, since the part listing above is not really clear (without a pic of the board)
+#define C2031_ROM( cpu )	\
+	ROM_REGION( 0x10000, cpu, 0 )	\
+	ROM_LOAD( "901484-03.u3b", 0xc000, 0x2000, CRC(ee4b893b) SHA1(54d608f7f07860f24186749f21c96724dd48bc50) )		\
+	ROM_LOAD( "901484-05.u3e", 0xe000, 0x2000, CRC(6a629054) SHA1(ec6b75ecfdd4744e5d57979ef6af990444c11ae1) )
 
 /*************************************
  *

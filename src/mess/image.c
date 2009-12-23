@@ -16,7 +16,6 @@
 #include "image.h"
 #include "hash.h"
 #include "unzip.h"
-#include "devices/flopdrv.h"
 #include "utils.h"
 #include "hashfile.h"
 #include "mamecore.h"

@@ -1102,6 +1102,40 @@ static MACHINE_RESET( abc806 )
 	z80dart_ctsb_w(state->z80dart, 0); // 0 = 50Hz, 1 = 60Hz
 }
 
+static DEVICE_IMAGE_LOAD( abc800_serial )
+{
+	/* filename specified */
+	if (device_load_serial(image)==INIT_PASS)
+	{
+		/* setup transmit parameters */
+		serial_device_setup(image, 9600 >> input_port_read(image->machine, "BAUD"), 8, 1, SERIAL_PARITY_NONE);
+
+		/* and start transmit */
+		serial_device_set_transmit_state(image, 1);
+
+		return INIT_PASS;
+	}
+
+	return INIT_FAIL;
+}
+
+
+static DEVICE_GET_INFO( abc800_serial )
+{
+	switch ( state )
+	{
+		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( abc800_serial );    break;
+		case DEVINFO_STR_NAME:		                strcpy(info->s, "ABC800 serial port");	                         break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                           break;
+		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+	}
+}
+
+#define ABC800_SERIAL	DEVICE_GET_INFO_NAME(abc800_serial)
+
+#define MDRV_ABC800_SERIAL_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, ABC800_SERIAL, 0)
+	
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( abc800m )
@@ -1142,6 +1176,8 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
 	MDRV_RAM_EXTRA_OPTIONS("32K")
+	
+	MDRV_ABC800_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc800c )
@@ -1182,6 +1218,8 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
 	MDRV_RAM_EXTRA_OPTIONS("32K")
+	
+	MDRV_ABC800_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc802 )
@@ -1221,6 +1259,8 @@ static MACHINE_DRIVER_START( abc802 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
+	
+	MDRV_ABC800_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc806 )
@@ -1259,6 +1299,8 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("160K") // 32KB + 128KB
 	MDRV_RAM_EXTRA_OPTIONS("544K") // 32KB + 512KB
+	
+	MDRV_ABC800_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -1370,47 +1412,6 @@ ROM_START( abc806 )
 	ROM_LOAD( "64 90240-01.2d", 0x0000, 0x0400, NO_DUMP ) // "ABC P4-11" PAL16L8, memory mapper
 ROM_END
 
-/* System Configuration */
-static DEVICE_IMAGE_LOAD( abc800_serial )
-{
-	/* filename specified */
-	if (device_load_serial_device(image)==INIT_PASS)
-	{
-		/* setup transmit parameters */
-		serial_device_setup(image, 9600 >> input_port_read(image->machine, "BAUD"), 8, 1, SERIAL_PARITY_NONE);
-
-		/* and start transmit */
-		serial_device_set_transmit_state(image, 1);
-
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
-
-static void abc800_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* serial */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
-		case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(serial_device); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(abc800_serial); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(serial_device); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "txt"); break;
-	}
-}
-
-static SYSTEM_CONFIG_START( abc800 )
-	CONFIG_DEVICE(abc800_serial_getinfo)
-SYSTEM_CONFIG_END
-
 /* Driver Initialization */
 
 static DIRECT_UPDATE_HANDLER( abc800_direct_update_handler )
@@ -1504,7 +1505,7 @@ static DRIVER_INIT( abc806 )
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY             FULLNAME        FLAGS */
-COMP( 1981, abc800m,    0,			0,      abc800m,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 M/HR", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-COMP( 1981, abc800c,    abc800m,    0,      abc800c,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 C/HR", GAME_NOT_WORKING )
-COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802, abc800, "Luxor Datorer AB", "ABC 802",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806, abc800, "Luxor Datorer AB", "ABC 806",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1981, abc800m,    0,			0,      abc800m,    abc800, abc800, 0, "Luxor Datorer AB", "ABC 800 M/HR", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1981, abc800c,    abc800m,    0,      abc800c,    abc800, abc800, 0, "Luxor Datorer AB", "ABC 800 C/HR", GAME_NOT_WORKING )
+COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802, 0, "Luxor Datorer AB", "ABC 802",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806, 0, "Luxor Datorer AB", "ABC 806",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

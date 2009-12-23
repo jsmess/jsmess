@@ -1490,6 +1490,41 @@ static const cassette_config newbrain_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
 };
 
+
+static DEVICE_IMAGE_LOAD( newbrain_serial )
+{
+	if (device_load_serial(image)==INIT_PASS)
+	{
+		serial_device_setup(image, 9600, 8, 1, SERIAL_PARITY_NONE);
+
+		serial_device_set_transmit_state(image, 1);
+
+		return INIT_PASS;
+	}
+
+	return INIT_FAIL;
+}
+
+
+static DEVICE_GET_INFO( newbrain_serial )
+{
+	switch ( state )
+	{
+		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( newbrain_serial );    break;
+		case DEVINFO_STR_NAME:		                strcpy(info->s, "Newbrain serial port");	                    break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                         break;
+		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
+		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0;                                        	break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 0;                                        	break;		
+		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+	}
+}
+
+#define NEWBRAIN_SERIAL	DEVICE_GET_INFO_NAME(newbrain_serial)
+
+#define MDRV_NEWBRAIN_SERIAL_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, NEWBRAIN_SERIAL, 0)
+
 static MACHINE_DRIVER_START( newbrain_a )
 	MDRV_DRIVER_DATA(newbrain_state)
 
@@ -1519,6 +1554,8 @@ static MACHINE_DRIVER_START( newbrain_a )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
+	
+	MDRV_NEWBRAIN_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
 static FLOPPY_OPTIONS_START(newbrain)
@@ -1666,52 +1703,11 @@ ROM_START( newbraim )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "char eprom iss 1.ic453", 0x0000, 0x0a01, BAD_DUMP CRC(46ecbc65) SHA1(3fe064d49a4de5e3b7383752e98ad35a674e26dd) ) // 8248R7
 ROM_END
-
-/* System Configuration */
-static DEVICE_IMAGE_LOAD( newbrain_serial )
-{
-	/* filename specified */
-	if (device_load_serial_device(image)==INIT_PASS)
-	{
-		/* setup transmit parameters */
-		serial_device_setup(image, 9600, 8, 1, SERIAL_PARITY_NONE);
-
-		/* and start transmit */
-		serial_device_set_transmit_state(image, 1);
-
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
-
-static void newbrain_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* serial */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
-		case MESS_DEVINFO_INT_COUNT:						info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(serial_device); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(newbrain_serial); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(serial_device); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "txt"); break;
-	}
-}
-
-static SYSTEM_CONFIG_START( newbrain )
-	CONFIG_DEVICE(newbrain_serial_getinfo)
-SYSTEM_CONFIG_END
-
+	
 /* System Drivers */
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE         INPUT       INIT    CONFIG          COMPANY                         FULLNAME        FLAGS
-COMP( 1981, newbrain,	0,			0,		newbrain_a,		newbrain,   0, 		newbrain,		"Grundy Business Systems Ltd.",	"NewBrain AD",	GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1981, newbraie,	newbrain,	0,		newbrain_eim,	newbrain,   0, 		newbrain,		"Grundy Business Systems Ltd.",	"NewBrain AD with Expansion Interface",	GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1981, newbraia,	newbrain,	0,		newbrain_a,		newbrain,   0, 		newbrain,		"Grundy Business Systems Ltd.",	"NewBrain A",	GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1981, newbraim,	newbrain,	0,		newbrain_a,		newbrain,   0, 		newbrain,		"Grundy Business Systems Ltd.",	"NewBrain MD",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbrain,	0,			0,		newbrain_a,		newbrain,   0, 		0,		"Grundy Business Systems Ltd.",	"NewBrain AD",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbraie,	newbrain,	0,		newbrain_eim,	newbrain,   0, 		0,		"Grundy Business Systems Ltd.",	"NewBrain AD with Expansion Interface",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbraia,	newbrain,	0,		newbrain_a,		newbrain,   0, 		0,		"Grundy Business Systems Ltd.",	"NewBrain A",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbraim,	newbrain,	0,		newbrain_a,		newbrain,   0, 		0,		"Grundy Business Systems Ltd.",	"NewBrain MD",	GAME_NOT_WORKING | GAME_NO_SOUND )

@@ -140,27 +140,3 @@ DEVICE_IMAGE_UNLOAD( nc_pcmcia_card )
 }
 
 
-/*************************************************************************************************/
-/* Serial */
-
-DEVICE_IMAGE_LOAD( nc_serial )
-{
-	const device_config *uart = devtag_get_device(image->machine, "uart");
-
-	/* filename specified */
-	if (device_load_serial_device(image)==INIT_PASS)
-	{
-		/* setup transmit parameters */
-		serial_device_setup(image, 9600, 8, 1, SERIAL_PARITY_NONE);
-
-		/* connect serial chip to serial device */
-		msm8251_connect_to_serial_device(uart, image);
-
-		/* and start transmit */
-		serial_device_set_transmit_state(image,1);
-
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}

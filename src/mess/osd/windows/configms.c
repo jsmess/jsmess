@@ -13,7 +13,6 @@
 #include "driver.h"
 #include "winmain.h"
 #include "menu.h"
-#include "device.h"
 #include "configms.h"
 #include "pool.h"
 #include "config.h"

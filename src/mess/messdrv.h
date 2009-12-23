@@ -12,7 +12,6 @@
 #include <assert.h>
 
 #include "inputx.h"
-#include "formats/flopimg.h"
 #include "unicode.h"
 #include "device.h"
 

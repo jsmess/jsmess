@@ -9,7 +9,6 @@
 #ifndef __AESCART_H__
 #define __AESCART_H__
 
-#include "device.h"
 #include "image.h"
 
 #define AES_MULTICART			DEVICE_GET_INFO_NAME(aes_multicart)

@@ -10,7 +10,6 @@
 #define APPLDRIV_H
 
 #include "mame.h"
-#include "device.h"
 
 void apple525_set_lines(const device_config *device,UINT8 lines);
 void apple525_set_enable_lines(const device_config *device,int enable_mask);

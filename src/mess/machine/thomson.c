@@ -382,64 +382,81 @@ static void thom_set_caps_led ( running_machine *machine, int led )
 
 static struct serial_connection to7_io_line;
 
-
-
-DEVICE_START( thom_serial )
-{
-	const device_config *acia = devtag_get_device(device->machine, "acia");
-	int idx = image_index_in_device(device);
-
-	DEVICE_START_CALL(serial_device);
-
-	switch ( idx ) {
-
-	case THOM_SERIAL_CC90323:
-		LOG(( "thom_serial_init: init CD 90-320 RS232 device\n" ));
-		serial_device_connect( device, &to7_io_line );
-		break;
-
-	case THOM_SERIAL_RF57232:
-		LOG(( "thom_serial_init: init RF 57-232 RS232 device\n" ));
-		acia_6551_connect_to_serial_device( acia, device );
-		break;
-
-	case THOM_SERIAL_MODEM:
-		LOG(( "thom_serial_init: init MODEM (MD 90-120) device\n" ));
-		break;
-
-	default:
-		fatalerror( "thom_serial_init: unknown serial device index %i\n", idx );
-		break;
-	}
-
-	serial_device_setup( device, 2400, 7, 2, SERIAL_PARITY_NONE ); /* default */
+static DEVICE_START( thom_serial_cc90323 )
+{	
+	DEVICE_START_CALL(serial);
+	LOG(( "thom_serial_init: init CD 90-320 RS232 device\n" ));
+	serial_device_connect( device, &to7_io_line );
+	serial_device_setup( device, 2400, 7, 2, SERIAL_PARITY_NONE );
 	serial_device_set_transmit_state( device, 1 );
 }
 
-
-
-DEVICE_IMAGE_UNLOAD( thom_serial )
+static DEVICE_START( thom_serial_rf57232 )
 {
-	device_unload_serial_device( image );
+	const device_config *acia = devtag_get_device(device->machine, "acia");
+	DEVICE_START_CALL(serial);
+	LOG(( "thom_serial_init: init RF 57-232 RS232 device\n" ));
+	acia_6551_connect_to_serial_device( acia, device );
+	serial_device_setup( device, 2400, 7, 2, SERIAL_PARITY_NONE );
+	serial_device_set_transmit_state( device, 1 );
 }
 
-
-
-DEVICE_IMAGE_LOAD( thom_serial )
+static DEVICE_START( thom_serial_modem )
 {
-	int idx = image_index_in_device( image );
+	DEVICE_START_CALL(serial);
+	LOG(( "thom_serial_init: init MODEM (MD 90-120) device\n" ));
+	serial_device_setup( device, 2400, 7, 2, SERIAL_PARITY_NONE );
+	serial_device_set_transmit_state( device, 1 );
+}
 
-	if ( device_load_serial_device( image ) != INIT_PASS )
+static DEVICE_IMAGE_LOAD( thom_serial )
+{
+	if ( device_load_serial( image ) != INIT_PASS )
 	{
-		logerror( "thom_serial_load: could not load serial image in device %i\n", idx );
+		logerror( "thom_serial_load: could not load serial image in device\n");
 		return INIT_FAIL;
 	}
 
 	return INIT_PASS;
 }
 
+DEVICE_GET_INFO( thom_serial_cc90323 )
+{
+	switch ( state )
+	{
+		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( thom_serial_cc90323 );    break;
+		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( thom_serial );break;
+		case DEVINFO_STR_NAME:		                strcpy(info->s, "CD 90-320 RS232");	                 break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                  break;
+		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+	}
+}
+
+DEVICE_GET_INFO( thom_serial_rf57232 )
+{
+	switch ( state )
+	{
+		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( thom_serial_rf57232 );    break;
+		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( thom_serial );break;
+		case DEVINFO_STR_NAME:		                strcpy(info->s, "RF 57-232 RS232");	                 break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                  break;
+		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+	}
+}
 
 
+DEVICE_GET_INFO( thom_serial_modem )
+{
+	switch ( state )
+	{
+		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( thom_serial_modem );    break;
+		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( thom_serial );break;
+		case DEVINFO_STR_NAME:		                strcpy(info->s, "MODEM (MD 90-120)");	                 break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                  break;
+		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+	}
+}
+		
 /* ------------ 6850 defines ------------ */
 
 #define ACIA_6850_RDRF  0x01    /* Receive data register full */
@@ -751,10 +768,11 @@ typedef enum
 static to7_io_dev to7_io_mode( running_machine *machine )
 {
 	const device_config *centronics = devtag_get_device(machine, "centronics");
+	const device_config *serial = devtag_get_device(machine, "cc90232");
 
 	if (centronics_pe_r(centronics) == TRUE)
 		return TO7_IO_CENTRONICS;
-	else if ( image_exists( image_from_devtype_and_index( machine, IO_SERIAL, THOM_SERIAL_CC90323 ) ) )
+	else if ( image_exists( serial ))
 		return TO7_IO_RS232;
 	return TO7_IO_NONE;
 }

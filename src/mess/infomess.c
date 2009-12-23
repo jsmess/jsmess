@@ -14,6 +14,7 @@
 #include "hash.h"
 #include "xmlfile.h"
 #include "infomess.h"
+#include "device.h"
 #include "devices/messram.h"
 
 /*************************************

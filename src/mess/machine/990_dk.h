@@ -1,6 +1,7 @@
 /*
     990_dk.h: include file for 990_dk.c
 */
+#include "formats/flopimg.h"
 
 FLOPPY_OPTIONS_EXTERN(fd800);
 

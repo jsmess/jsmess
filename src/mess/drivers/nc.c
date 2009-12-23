@@ -1613,6 +1613,49 @@ static INPUT_PORTS_START(nc200)
 INPUT_PORTS_END
 
 
+/* Serial */
+static DEVICE_IMAGE_LOAD( nc_serial )
+{
+	const device_config *uart = devtag_get_device(image->machine, "uart");
+
+	/* filename specified */
+	if (device_load_serial(image)==INIT_PASS)
+	{
+		/* setup transmit parameters */
+		serial_device_setup(image, 9600, 8, 1, SERIAL_PARITY_NONE);
+
+		/* connect serial chip to serial device */
+		msm8251_connect_to_serial_device(uart, image);
+
+		/* and start transmit */
+		serial_device_set_transmit_state(image,1);
+
+		return INIT_PASS;
+	}
+
+	return INIT_FAIL;
+
+}
+
+static DEVICE_GET_INFO( nc_serial )
+{
+	switch ( state )
+	{
+		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( nc_serial );    break;
+		case DEVINFO_STR_NAME:		                strcpy(info->s, "BW2 serial port");	                    break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                         break;
+		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
+		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0;                                        	break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 0;                                        	break;		
+		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+	}
+}
+
+#define NC_SERIAL	DEVICE_GET_INFO_NAME(nc_serial)
+
+#define MDRV_NC_SERIAL_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, NC_SERIAL, 0)
+
 /**********************************************************************************************************/
 
 static MACHINE_DRIVER_START( nc100 )
@@ -1666,6 +1709,8 @@ static MACHINE_DRIVER_START( nc100 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
+	
+	MDRV_NC_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
 static const floppy_config nc200_floppy_config =
@@ -1738,38 +1783,12 @@ ROM_END
 
 
 ROM_START(nc200)
-        ROM_REGION(((64*1024)+(512*1024)), "maincpu",0)
-        ROM_LOAD("nc200.rom", 0x010000, 0x080000, CRC(bb8180e7) SHA1(fb5c93b0a3e199202c6a12548d2617f7a09bae47))
+	ROM_REGION(((64*1024)+(512*1024)), "maincpu",0)
+	ROM_LOAD("nc200.rom", 0x010000, 0x080000, CRC(bb8180e7) SHA1(fb5c93b0a3e199202c6a12548d2617f7a09bae47))
 ROM_END
 
-static void nc_common_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* serial */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(serial_device); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(nc_serial); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(serial_device); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "txt"); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(nc_common)
-	CONFIG_DEVICE(nc_common_serial_getinfo)
-SYSTEM_CONFIG_END
-
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY         FULLNAME    FLAGS */
-COMP( 1992, nc100,  0,      0,      nc100,  nc100,  0,      nc_common,  "Amstrad plc",  "NC100",    0 )
-COMP( 1992, nc150,  nc100,  0,      nc100,  nc100,  0,      nc_common,  "Amstrad plc",  "NC150",    0 )
-COMP( 1993, nc200,  0,      0,      nc200,  nc200,  0,      nc_common,  "Amstrad plc",  "NC200",    0 )
+COMP( 1992, nc100,  0,      0,      nc100,  nc100,  0,      0,  "Amstrad plc",  "NC100",    0 )
+COMP( 1992, nc150,  nc100,  0,      nc100,  nc100,  0,      0,  "Amstrad plc",  "NC150",    0 )
+COMP( 1993, nc200,  0,      0,      nc200,  nc200,  0,      0,  "Amstrad plc",  "NC200",    0 )
 

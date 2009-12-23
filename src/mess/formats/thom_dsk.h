@@ -1,7 +1,6 @@
 #ifndef THOM_DSK
 #define THOM_DSK
 
-#include "device.h"
 #include "devices/flopdrv.h"
 
 /* recognized image formats:

@@ -53,7 +53,4 @@ DEVICE_START( nc_pcmcia_card );
 DEVICE_IMAGE_LOAD( nc_pcmcia_card );
 DEVICE_IMAGE_UNLOAD( nc_pcmcia_card );
 
-DEVICE_IMAGE_LOAD( nc_serial );
-
-
 #endif /* NC_H_ */

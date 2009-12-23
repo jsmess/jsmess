@@ -1,6 +1,5 @@
 
 #include "driver.h"
-#include "device.h"
 #include "ti85_ser.h"
 
 enum

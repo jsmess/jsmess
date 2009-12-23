@@ -8,6 +8,7 @@
 #define __MSX_H__
 
 #include "machine/wd17xx.h"
+#include "formats/flopimg.h"
 
 #define MSX_MAX_CARTS	(2)
 

@@ -9,7 +9,6 @@
 #ifndef THOMFLOP_H_
 #define THOMFLOP_H_
 
-#include "device.h"
 #include "image.h"
 #include "machine/mc6843.h"
 #include "machine/mc6854.h"

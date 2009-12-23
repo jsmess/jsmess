@@ -32,40 +32,33 @@ static MACHINE_START(apexc)
     the user to enter such a loader manually, but it would take hours...)
 */
 
-typedef struct cylinder
+typedef struct _apexc_cylinder_t apexc_cylinder_t;
+struct _apexc_cylinder_t
 {
-	const device_config *fd;
 	int writable;
-} cylinder;
-
-static cylinder apexc_cylinder;
+};
 
 /*
     Open cylinder image and read RAM
 */
 static DEVICE_IMAGE_LOAD( apexc_cylinder )
 {
-	/* open file */
-	apexc_cylinder.fd = image;
-	/* tell whether the image is writable */
-	apexc_cylinder.writable = image_is_writable(image);
-
-	if (apexc_cylinder.fd)
-	{	/* load RAM contents */
-
-		image_fread(apexc_cylinder.fd, memory_region(image->machine, "maincpu"), /*0x8000*/0x1000);
+	/* load RAM contents */
+	apexc_cylinder_t *cyl = (apexc_cylinder_t *)image->token;
+	cyl->writable = image_is_writable(image);
+	
+	image_fread(image, memory_region(image->machine, "maincpu"), /*0x8000*/0x1000);
 #ifdef LSB_FIRST
-		{	/* fix endianness */
-			UINT32 *RAM;
-			int i;
+	{	/* fix endianness */
+		UINT32 *RAM;
+		int i;
 
-			RAM = (UINT32 *) memory_region(image->machine, "maincpu");
+		RAM = (UINT32 *) memory_region(image->machine, "maincpu");
 
-			for (i=0; i < /*0x2000*/0x0400; i++)
-				RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
-		}
-#endif
+		for (i=0; i < /*0x2000*/0x0400; i++)
+			RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
 	}
+#endif	
 
 	return INIT_PASS;
 }
@@ -75,10 +68,11 @@ static DEVICE_IMAGE_LOAD( apexc_cylinder )
 */
 static DEVICE_IMAGE_UNLOAD( apexc_cylinder )
 {
-	if (apexc_cylinder.fd && apexc_cylinder.writable)
+	apexc_cylinder_t *cyl = (apexc_cylinder_t *)image->token;
+	if (cyl->writable)
 	{	/* save RAM contents */
 		/* rewind file */
-		image_fseek(apexc_cylinder.fd, 0, SEEK_SET);
+		image_fseek(image, 0, SEEK_SET);
 #ifdef LSB_FIRST
 		{	/* fix endianness */
 			UINT32 *RAM;
@@ -91,10 +85,50 @@ static DEVICE_IMAGE_UNLOAD( apexc_cylinder )
 		}
 #endif
 		/* write */
-		image_fwrite(apexc_cylinder.fd, memory_region(image->machine, "maincpu"), /*0x8000*/0x1000);
+		image_fwrite(image, memory_region(image->machine, "maincpu"), /*0x8000*/0x1000);
 	}
 }
 
+static DEVICE_START(apexc_cylinder)
+{
+}
+
+static DEVICE_RESET(apexc_cylinder)
+{
+}
+
+static DEVICE_GET_INFO( apexc_cylinder )
+{
+	switch ( state )
+	{
+		case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;           			break;
+		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(apexc_cylinder_t);						break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;											break;
+		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_CYLINDER;                                	break;
+		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
+		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                        	break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 0;                                        	break;
+		case DEVINFO_INT_IMAGE_RESET_ON_LOAD:	    info->i = 1;                                        	break;
+
+		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( apexc_cylinder );          	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( apexc_cylinder );				break;
+		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( apexc_cylinder ); 	break;
+		case DEVINFO_FCT_IMAGE_UNLOAD:		        info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(apexc_cylinder );	break;
+		case DEVINFO_STR_NAME:		                strcpy( info->s, "APEXC Cylinder");	                    break;
+		case DEVINFO_STR_FAMILY:                    strcpy(info->s, "Cylinder");	                    	break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "apc");                                 break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");									break;
+		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);								break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright the MESS Team"); 			break;
+	}
+}
+
+#define APEXC_CYLINDER	DEVICE_GET_INFO_NAME(apexc_cylinder)
+
+#define MDRV_APEXC_CYLINDER_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, APEXC_CYLINDER, 0)
+	
 
 /*
     APEXC tape support
@@ -141,73 +175,87 @@ static DEVICE_IMAGE_UNLOAD( apexc_cylinder )
     11111                   Letters
 */
 
-typedef struct tape
+typedef struct _apexc_tape_t apexc_tape_t;
+struct _apexc_tape_t
 {
-	const device_config *fd;
-} tape;
-
-static tape apexc_tapes[2];
-
-
-
-static void apexc_get_open_mode(int id,
-	unsigned int *readable, unsigned int *writeable, unsigned int *creatable)
+	int dummy;
+};
+static DEVICE_START(apexc_tape)
 {
-	/* unit 0 is read-only, unit 1 is write-only */
-	if (id)
+}
+
+static DEVICE_RESET(apexc_tape)
+{
+}
+static DEVICE_GET_INFO( apexc_tape )
+{
+	switch ( state )
 	{
-		*readable = 0;
-		*writeable = 1;
-		*creatable = 1;
-	}
-	else
-	{
-		*readable = 1;
-		*writeable = 1;
-		*creatable = 1;
+		case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;           			break;
+		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(apexc_tape_t);							break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;											break;
+		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_PUNCHTAPE;                                	break;
+		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
+		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                        	break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 1;                                        	break;
+		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( apexc_tape );          	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( apexc_tape );				break;
+
+		case DEVINFO_STR_NAME:		                strcpy( info->s, "APEXC Tape");                break;
+		case DEVINFO_STR_FAMILY:                    strcpy(info->s, "Punch tape");	                    	break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "tap");                                 break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");									break;
+		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);								break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright the MESS Team"); 			break;
 	}
 }
 
 
+#define APEXC_TAPE	DEVICE_GET_INFO_NAME(apexc_tape)
 
-static DEVICE_START( apexc_tape )
+#define MDRV_APEXC_TAPE_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, APEXC_TAPE, 0)
+
+static DEVICE_GET_INFO( apexc_tape_ro)
 {
+	switch ( state )
+	{
+		case DEVINFO_STR_NAME:		                strcpy(info->s, "APEXC Tape Read-Only");	                    break;
+		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
+		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0;                                        	break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 0;                                        	break;		
+		default: 									DEVICE_GET_INFO_CALL(apexc_tape);	break;
+	}
 }
 
+#define APEXC_TAPE_RO	DEVICE_GET_INFO_NAME(apexc_tape_ro)
 
+#define MDRV_APEXC_TAPE_RO_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, APEXC_TAPE_RO, 0)
 
 /*
     Open a tape image
 */
-static DEVICE_IMAGE_LOAD( apexc_tape )
-{
-	int id = image_index_in_device(image);
-	tape *t = &apexc_tapes[id];
 
-	/* open file */
-	t->fd = image;
-
-	return INIT_PASS;
-}
-
-static READ8_HANDLER(tape_read)
+static READ8_DEVICE_HANDLER(tape_read)
 {
 	UINT8 reply;
 
-	if (apexc_tapes[0].fd && (image_fread(apexc_tapes[0].fd, & reply, 1) == 1))
+	if (image_exists(device) && (image_fread(device, & reply, 1) == 1))
 		return reply & 0x1f;
 	else
 		return 0;	/* unit not ready - I don't know what we should do */
 }
 
-static WRITE8_HANDLER(tape_write)
+static WRITE8_DEVICE_HANDLER(tape_write)
 {
 	UINT8 data5 = (data & 0x1f);
 
-	if (apexc_tapes[1].fd)
-		image_fwrite(apexc_tapes[1].fd, & data5, 1);
+	if (image_exists(device)) 
+		image_fwrite(device, & data5, 1);
 
-	apexc_teletyper_putchar(space->machine, data & 0x1f);	/* display on screen */
+	apexc_teletyper_putchar(device->machine, data & 0x1f);	/* display on screen */
 }
 
 /*
@@ -789,7 +837,8 @@ static ADDRESS_MAP_START(apexc_mem_map, ADDRESS_SPACE_PROGRAM, 32)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(apexc_io_map, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0, 0) AM_READWRITE(tape_read, tape_write)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("tape_ro",tape_read)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("tape",tape_write)
 ADDRESS_MAP_END
 
 
@@ -822,6 +871,9 @@ static MACHINE_DRIVER_START(apexc)
 	MDRV_VIDEO_START(apexc)
 	MDRV_VIDEO_UPDATE(apexc)
 
+	MDRV_APEXC_CYLINDER_ADD("cylinder")
+	MDRV_APEXC_TAPE_ADD("tape")
+	MDRV_APEXC_TAPE_RO_ADD("tape_ro")
 MACHINE_DRIVER_END
 
 ROM_START(apexc)
@@ -833,52 +885,6 @@ ROM_START(apexc)
 		/* space filled with our font */
 ROM_END
 
-static void apexc_cylinder_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cylinder */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CYLINDER; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_RESET_ON_LOAD:					info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(apexc_cylinder); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(apexc_cylinder); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "apc"); break;
-	}
-}
-
-static void apexc_punchtape_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* punchtape */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_PUNCHTAPE; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(apexc_tape); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(apexc_tape); break;
-		case MESS_DEVINFO_PTR_GET_DISPOSITIONS:				info->getdispositions = apexc_get_open_mode; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap"); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(apexc)
-	CONFIG_DEVICE(apexc_cylinder_getinfo)
-	CONFIG_DEVICE(apexc_punchtape_getinfo)
-SYSTEM_CONFIG_END
-
 /*         YEAR     NAME        PARENT          COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY     FULLNAME */
-//COMP(      1951,    apexc53,    0,              0,      apexc53,    apexc,  apexc,  apexc,  "Booth",    "APEXC (as described in 1953)" , GAME_NOT_WORKING)
-COMP(      1955,	apexc,		/*apexc53*/0,	0,		apexc,		apexc,	apexc,	apexc,	"Booth",	"APEXC (as described in 1957)" , 0)
+//COMP(      1951,    apexc53,    0,              0,      apexc53,    apexc,  apexc,  0,  "Booth",    "APEXC (as described in 1953)" , GAME_NOT_WORKING)
+COMP(      1955,	apexc,		/*apexc53*/0,	0,		apexc,		apexc,	apexc,	0,	"Booth",	"APEXC (as described in 1957)" , 0)

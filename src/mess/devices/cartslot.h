@@ -7,7 +7,6 @@
 #ifndef __CARTSLOT_H__
 #define __CARTSLOT_H__
 
-#include "device.h"
 #include "image.h"
 #include "multcart.h"
 

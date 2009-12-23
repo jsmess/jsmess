@@ -9,7 +9,7 @@
 #include "hashfile.h"
 #include "pool.h"
 #include "expat.h"
-
+#include "device.h"
 
 /***************************************************************************
     TYPE DEFINITIONS

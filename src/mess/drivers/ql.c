@@ -658,6 +658,24 @@ static const floppy_config ql_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+static DEVICE_GET_INFO( ql_serial )
+{
+	switch ( state )
+	{
+		case DEVINFO_STR_NAME:		                strcpy(info->s, "QL serial port");	                    break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                 break;
+		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+	}
+}
+
+#define QL_SERIAL	DEVICE_GET_INFO_NAME(ql_serial)
+
+#define MDRV_QL_SERIAL_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, QL_SERIAL, 0)
+
+#define MDRV_QL_SERIAL_REMOVE(_tag)		\
+  MDRV_DEVICE_REMOVE(_tag)
+  
 static MACHINE_DRIVER_START( ql )
 	MDRV_DRIVER_DATA(ql_state)
 
@@ -711,6 +729,8 @@ static MACHINE_DRIVER_START( ql )
 	MDRV_RAM_DEFAULT_SIZE("128K")
 	MDRV_RAM_EXTRA_OPTIONS("192K,256K,384K,640K,896K")
 
+	MDRV_QL_SERIAL_ADD("serial0")
+	MDRV_QL_SERIAL_ADD("serial1")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ql_ntsc )
@@ -729,6 +749,9 @@ static MACHINE_DRIVER_START( opd )
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
 	MDRV_RAM_EXTRA_OPTIONS("256K")
+	
+	MDRV_QL_SERIAL_REMOVE("serial0")
+	MDRV_QL_SERIAL_REMOVE("serial1")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megaopd )
@@ -908,41 +931,19 @@ static QUICKLOAD_LOAD( ql )
 
 	return INIT_PASS;
 }
-
-static void ql_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* serial */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
-		case MESS_DEVINFO_INT_COUNT:						info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(serial_device); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(serial_device); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(serial_device); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "txt"); break;
-	}
-}
-
-static SYSTEM_CONFIG_START( ql )
-	CONFIG_DEVICE(ql_serial_getinfo)
-SYSTEM_CONFIG_END
-
+	
 /* Computer Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY                     FULLNAME        FLAGS */
-COMP( 1984, ql,     0,      0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (UK)",      GAME_SUPPORTS_SAVE )
-COMP( 1985, ql_us,  ql,     0,      ql_ntsc,    ql,     0,      ql,     "Sinclair Research Ltd",    "QL (USA)",     GAME_SUPPORTS_SAVE )
-COMP( 1985, ql_es,  ql,     0,      ql,         ql_es,  0,      ql,     "Sinclair Research Ltd",    "QL (Spain)",   GAME_SUPPORTS_SAVE )
-COMP( 1985, ql_fr,  ql,     0,      ql,         ql_fr,  0,      ql,     "Sinclair Research Ltd",    "QL (France)",  GAME_NOT_WORKING )
-COMP( 1985, ql_de,  ql,     0,      ql,         ql_de,  0,      ql,     "Sinclair Research Ltd",    "QL (Germany)", GAME_SUPPORTS_SAVE )
-COMP( 1985, ql_it,  ql,     0,      ql,         ql_it,  0,      ql,     "Sinclair Research Ltd",    "QL (Italy)",   GAME_SUPPORTS_SAVE )
-COMP( 1985, ql_se,  ql,     0,      ql,         ql_se,  0,      ql,     "Sinclair Research Ltd",    "QL (Sweden)",  GAME_NOT_WORKING )
-COMP( 1985, ql_dk,  ql,     0,      ql,         ql_dk,  0,      ql,     "Sinclair Research Ltd",    "QL (Denmark)", GAME_NOT_WORKING )
-COMP( 1985, ql_gr,  ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Greece)",  GAME_SUPPORTS_SAVE )
+COMP( 1984, ql,     0,      0,      ql,         ql,     0,      0,     "Sinclair Research Ltd",    "QL (UK)",      GAME_SUPPORTS_SAVE )
+COMP( 1985, ql_us,  ql,     0,      ql_ntsc,    ql,     0,      0,     "Sinclair Research Ltd",    "QL (USA)",     GAME_SUPPORTS_SAVE )
+COMP( 1985, ql_es,  ql,     0,      ql,         ql_es,  0,      0,     "Sinclair Research Ltd",    "QL (Spain)",   GAME_SUPPORTS_SAVE )
+COMP( 1985, ql_fr,  ql,     0,      ql,         ql_fr,  0,      0,     "Sinclair Research Ltd",    "QL (France)",  GAME_NOT_WORKING )
+COMP( 1985, ql_de,  ql,     0,      ql,         ql_de,  0,      0,     "Sinclair Research Ltd",    "QL (Germany)", GAME_SUPPORTS_SAVE )
+COMP( 1985, ql_it,  ql,     0,      ql,         ql_it,  0,      0,     "Sinclair Research Ltd",    "QL (Italy)",   GAME_SUPPORTS_SAVE )
+COMP( 1985, ql_se,  ql,     0,      ql,         ql_se,  0,      0,     "Sinclair Research Ltd",    "QL (Sweden)",  GAME_NOT_WORKING )
+COMP( 1985, ql_dk,  ql,     0,      ql,         ql_dk,  0,      0,     "Sinclair Research Ltd",    "QL (Denmark)", GAME_NOT_WORKING )
+COMP( 1985, ql_gr,  ql,     0,      ql,         ql,     0,      0,     "Sinclair Research Ltd",    "QL (Greece)",  GAME_SUPPORTS_SAVE )
+// last two did not used system config
 COMP( 1984, tonto,  0,		0,		opd,		ql,		0,		0,		"British Telecom Business Systems", "Merlin M1800 Tonto", GAME_NOT_WORKING )
 COMP( 1986, megaopd,tonto,	0,		megaopd,	ql,		0,		0,		"International Computer Limited", "MegaOPD (USA)", GAME_NOT_WORKING )

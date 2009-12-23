@@ -2,7 +2,6 @@
 #ifndef __TI85SERIAL_H_
 #define __TI85SERIAL_H_
 
-#include "device.h"
 
 #define TI85SERIAL	DEVICE_GET_INFO_NAME(ti85serial)
 #define TI86SERIAL	DEVICE_GET_INFO_NAME(ti86serial)

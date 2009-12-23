@@ -9,7 +9,6 @@
 #ifndef THOM_CAS
 #define THOM_CAS
 
-#include "device.h"
 
 
 /******************** TO7 ************************/

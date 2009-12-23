@@ -1794,6 +1794,38 @@ static DEVICE_IMAGE_LOAD( atarist_cart )
 	return INIT_FAIL;
 }
 
+static DEVICE_IMAGE_LOAD( atarist_serial )
+{
+	/* filename specified */	
+	if (device_load_serial(image)==INIT_PASS)
+	{
+		serial_device_setup(image, 9600, 8, 1, SERIAL_PARITY_NONE);
+
+		serial_device_set_transmit_state(image, 1);
+
+		return INIT_PASS;
+	}
+
+	return INIT_FAIL;
+}
+
+
+static DEVICE_GET_INFO( atarist_serial )
+{
+	switch ( state )
+	{
+		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( atarist_serial );    break;
+		case DEVINFO_STR_NAME:		                strcpy(info->s, "Atari ST serial port");	                    break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                         break;
+		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+	}
+}
+
+#define ATARIST_SERIAL	DEVICE_GET_INFO_NAME(atarist_serial)
+
+#define MDRV_ATARIST_SERIAL_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, ATARIST_SERIAL, 0)
+	
 static const floppy_config atarist_floppy_config =
 {
 	DEVCB_NULL,
@@ -1862,6 +1894,8 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1024K")  // 1040ST
 	MDRV_RAM_EXTRA_OPTIONS("512K,256K") //  520ST ,260ST
+	
+	MDRV_ATARIST_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megast )
@@ -1936,6 +1970,8 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1024K")  // 1040STe
 	MDRV_RAM_EXTRA_OPTIONS("512K") //  520STe
+	
+	MDRV_ATARIST_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megaste )
@@ -1951,6 +1987,8 @@ static MACHINE_DRIVER_START( megaste )
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("4M")  //  Mega STe 4
 	MDRV_RAM_EXTRA_OPTIONS("2M,1M") //  Mega STe 2 ,Mega STe 1
+	
+	MDRV_ATARIST_SERIAL_ADD("serial2")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( stbook )
@@ -2004,6 +2042,9 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4M")
 	MDRV_RAM_EXTRA_OPTIONS("1M")
+	
+	MDRV_ATARIST_SERIAL_ADD("serial")
+	MDRV_ATARIST_SERIAL_ADD("serial2")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -2142,85 +2183,19 @@ ROM_START( falcon40 )
 	ROM_SYSTEM_BIOS( 0, "tos492", "TOS 4.92" )
 	ROMX_LOAD( "tos492.img", 0xe00000, 0x080000, BAD_DUMP CRC(bc8e497f) SHA1(747a38042844a6b632dcd9a76d8525fccb5eb892), ROM_BIOS(2) )
 ROM_END
-
-/* System Configuration */
-static DEVICE_IMAGE_LOAD( atarist_serial )
-{
-	/* filename specified */
-	if (device_load_serial_device(image)==INIT_PASS)
-	{
-		/* setup transmit parameters */
-		serial_device_setup(image, 9600, 8, 1, SERIAL_PARITY_NONE);
-
-		/* and start transmit */
-		serial_device_set_transmit_state(image, 1);
-
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
-
-static void atarist_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* serial */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
-		case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(serial_device); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(atarist_serial); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(serial_device); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "txt"); break;
-	}
-}
-
-static void megaste_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* serial */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
-		case MESS_DEVINFO_INT_COUNT:						info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(serial_device); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(atarist_serial); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(serial_device); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "txt"); break;
-	}
-}
-
-static SYSTEM_CONFIG_START( atarist )
-	CONFIG_DEVICE(atarist_serial_getinfo)
-	// MIDI
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( megaste )
-	CONFIG_DEVICE(megaste_serial_getinfo)
-SYSTEM_CONFIG_END
-
-
-
+	
 /* System Drivers */
 
 /*     YEAR  NAME    PARENT    COMPAT   MACHINE   INPUT     INIT    CONFIG   COMPANY    FULLNAME */
-COMP( 1985, atarist,  0,        0,		atarist,  atarist,  0,     atarist,  "Atari", "Atari ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1987, megast,   atarist,  0,		megast,   atarist,  0,     atarist,   "Atari", "Atari Mega ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
+COMP( 1985, atarist,  0,        0,		atarist,  atarist,  0,     0,  "Atari", "Atari ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1987, megast,   atarist,  0,		megast,   atarist,  0,     0,   "Atari", "Atari Mega ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
 /*
-COMP( 1989, stacy,    atarist,  0,      stacy,    stacy,    0,     atarist,    "Atari", "Atari Stacy", GAME_NOT_WORKING )
+COMP( 1989, stacy,    atarist,  0,      stacy,    stacy,    0,     0,    "Atari", "Atari Stacy", GAME_NOT_WORKING )
 */
-COMP( 1989, atariste, 0,		0,		atariste, atariste, 0,     atarist, "Atari", "Atari STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
-COMP( 1990, stbook,   atariste, 0,		stbook,   stbook,   0,     megaste,	 "Atari", "Atari STBook", GAME_NOT_WORKING )
-COMP( 1991, megaste,  atariste, 0,		megaste,  atarist,  0,     megaste,  "Atari", "Atari Mega STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
+COMP( 1989, atariste, 0,		0,		atariste, atariste, 0,     0, "Atari", "Atari STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
+// last two use measte config
+COMP( 1990, stbook,   atariste, 0,		stbook,   stbook,   0,     0,	 "Atari", "Atari STBook", GAME_NOT_WORKING )
+COMP( 1991, megaste,  atariste, 0,		megaste,  atarist,  0,     0,  "Atari", "Atari Mega STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
 /*
 COMP( 1991, stpad,    atariste, 0,      stpad,    stpad,    0,     stpad,    "Atari", "Atari STPad (prototype)", GAME_NOT_WORKING )
 COMP( 1990, tt030,    0,        0,      tt030,    tt030,    0,     tt030,    "Atari", "Atari TT030", GAME_NOT_WORKING )
