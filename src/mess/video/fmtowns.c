@@ -634,7 +634,7 @@ void render_sprite_4(bitmap_t* bitmap, UINT32 poffset, UINT32 coffset, UINT16 x,
 			voffset += (xpos & 0x1ff) * 2;
 			voffset &= 0x3ffff;
 			voffset += (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
-			if(xpos <= rect->max_x && ypos <= rect->max_y && col != 0)
+			if(xpos <= rect->max_x && ypos <= rect->max_y && pixel != 0)
 			{
 				towns_gfxvram[voffset+1] = (col & 0xff00) >> 8;
 				towns_gfxvram[voffset] = col & 0x00ff;
@@ -644,7 +644,7 @@ void render_sprite_4(bitmap_t* bitmap, UINT32 poffset, UINT32 coffset, UINT16 x,
 			col = towns_sprram[coffset+(pixel*2)] | (towns_sprram[coffset+(pixel*2)+1] << 8);
 			voffset &= 0x3ffff;
 			voffset += (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
-			if(xpos <= rect->max_x && ypos <= rect->max_y && col != 0)
+			if(xpos <= rect->max_x && ypos <= rect->max_y && pixel != 0)
 			{
 				towns_gfxvram[voffset+1] = (col & 0xff00) >> 8;
 				towns_gfxvram[voffset] = col & 0x00ff;
