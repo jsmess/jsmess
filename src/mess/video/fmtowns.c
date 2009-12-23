@@ -69,6 +69,19 @@
  *      YM (bit 2) - unknown
  *      peltype (bits 4 and 5)
  *
+ * 
+ *	Sprite registers:
+ * 
+ * 	0,1:	Maximum sprite (last one to render?) (10-bit)
+ * 
+ * 	1 (bit 7):	Enable sprite display
+ * 
+ * 	2,3:	X offset (9-bit)
+ * 
+ *  4,5:	Y offset (9-bit)
+ * 
+ * 	6 (bit 4):	VRAM location (0=0x40000,1=0x60000)
+ * 
  */
 
 #include "driver.h"
@@ -77,6 +90,7 @@
 #include "includes/fmtowns.h"
 
 //#define CRTC_REG_DISP 1
+//#define SPR_DEBUG 1
 
 static UINT8 towns_vram_wplane;
 static UINT8 towns_vram_rplane;
@@ -92,6 +106,8 @@ static UINT8 towns_crtc_sel;  // selected CRTC register
 static UINT16 towns_crtc_reg[32];
 static UINT8 towns_video_sel;  // selected video register
 static UINT8 towns_video_reg[2];
+static UINT8 towns_sprite_sel;  // selected sprite register
+static UINT8 towns_sprite_reg[8];
 static UINT8 towns_tvram_enable;
 static UINT16 towns_kanji_offset;
 static UINT8 towns_kanji_code_h;
@@ -105,6 +121,8 @@ extern UINT8* towns_sprram;
 
 extern UINT32 towns_mainmem_enable;
 extern UINT32 towns_ankcg_enable;
+
+static UINT32 pshift;  // for debugging
 
 void towns_crtc_refresh_mode(running_machine* machine)
 {
@@ -344,6 +362,11 @@ READ8_HANDLER(towns_video_440_r)
 			}
 			else
 				return 0x00;
+		case 0x10:
+			return towns_sprite_sel;
+		case 0x12:
+			logerror("SPR: reading register %i (0x452) [%02x]\n",towns_sprite_sel,towns_sprite_reg[towns_sprite_sel]);
+			return towns_sprite_reg[towns_sprite_sel];
 		default:
 			logerror("VID: read port %04x\n",offset+0x440);
 	}
@@ -375,6 +398,13 @@ WRITE8_HANDLER(towns_video_440_w)
 		case 0x0a:
 			logerror("Video: writing register %i (0x44a) [%02x]\n",towns_video_sel,data);
 			towns_video_reg[towns_video_sel] = data;
+			break;
+		case 0x10:
+			towns_sprite_sel = data & 0x07;
+			break;
+		case 0x12:
+			logerror("SPR: writing register %i (0x452) [%02x]\n",towns_sprite_sel,data);
+			towns_sprite_reg[towns_sprite_sel] = data;
 			break;
 		default:
 			logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0x440);
@@ -559,7 +589,6 @@ WRITE8_HANDLER(towns_spriteram_low_w)
 	}
 }
 
-// Should this area return TVRAM if enabled?
 READ8_HANDLER( towns_spriteram_r)
 {
 	return towns_sprram[offset];
@@ -568,6 +597,139 @@ READ8_HANDLER( towns_spriteram_r)
 WRITE8_HANDLER( towns_spriteram_w)
 {
 	towns_sprram[offset] = data;
+}
+
+/*
+ *  Sprites
+ * 
+ * 	Max. 1024, 16x16, 16 colours per sprite
+ * 	128kB Sprite RAM (8kB attributes, 120kB pattern/colour data)
+ * 	Sprites are rendered directly to VRAM layer 1 (VRAM offset 0x40000 or 0x60000)
+ * 
+ * 	Sprite RAM format:
+ * 		4 words per sprite
+ * 		+0: X position (10-bit)
+ * 		+2: Y position (10-bit)
+ * 		+4: Sprite Attribute
+ * 			bit 15: enforce offsets (regs 2-5)
+ * 			bits 10-0: Sprite RAM offset containing sprite pattern
+ * 			TODO: other attributes (zoom?)
+ * 		+6: Sprite Colour
+ * 			bit 15: use colour data in located in sprite RAM offset in bits 11-0 (x32) 
+ */
+void render_sprite_4(bitmap_t* bitmap, UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, const rectangle* rect)
+{
+	UINT16 xpos,ypos;
+	UINT16 col,pixel;
+	UINT32 voffset;
+	
+	for(ypos=y;ypos<y+16;ypos++)
+	{
+		for(xpos=x;xpos<x+16;xpos+=2)
+		{
+			voffset = 0;
+			pixel = towns_sprram[poffset] & 0x0f;
+			col = towns_sprram[coffset+(pixel*2)] | (towns_sprram[coffset+(pixel*2)+1] << 8);
+			voffset += (towns_crtc_reg[24] * 4) * ypos;  // scanline size in bytes * y pos
+			voffset += (xpos & 0x1ff) * 2;
+			voffset &= 0x3ffff;
+			voffset += (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
+			if(xpos <= rect->max_x && ypos <= rect->max_y && col != 0)
+			{
+				towns_gfxvram[voffset+1] = (col & 0xff00) >> 8;
+				towns_gfxvram[voffset] = col & 0x00ff;
+			}
+			voffset+=2;
+			pixel = (towns_sprram[poffset] & 0xf0) >> 4;
+			col = towns_sprram[coffset+(pixel*2)] | (towns_sprram[coffset+(pixel*2)+1] << 8);
+			voffset &= 0x3ffff;
+			voffset += (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
+			if(xpos <= rect->max_x && ypos <= rect->max_y && col != 0)
+			{
+				towns_gfxvram[voffset+1] = (col & 0xff00) >> 8;
+				towns_gfxvram[voffset] = col & 0x00ff;
+			}
+			poffset++;
+		}
+	}
+}
+
+void render_sprite_16(bitmap_t* bitmap, UINT32 poffset, UINT16 x, UINT16 y, const rectangle* rect)
+{
+	UINT16 xpos,ypos;
+	UINT16 col;//,pixel;
+	UINT32 voffset;
+	
+	for(ypos=y;ypos<y+16;ypos++)
+	{
+		for(xpos=x;xpos<x+16;xpos++)
+		{
+			voffset = (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
+			col = towns_sprram[poffset] | (towns_sprram[poffset+1] << 8);
+			voffset += (towns_crtc_reg[24] * 4) * ypos;  // scanline size in bytes * y pos
+			voffset += (xpos & 0x1ff) * 2;
+			voffset &= 0x7ffff;
+			if(xpos <= rect->max_x && ypos <= rect->max_y)
+			{
+				towns_gfxvram[voffset+1] = (col & 0xff00) >> 8;
+				towns_gfxvram[voffset] = col & 0x00ff;
+			}
+			poffset+=2;
+		}
+	}
+}
+
+void draw_sprites(running_machine* machine,bitmap_t* bitmap, const rectangle* rect)
+{
+	UINT16 sprite_limit = (towns_sprite_reg[0] | (towns_sprite_reg[1] << 8)) & 0x3ff;
+	int n;
+	UINT16 x,y,attr,colour;
+	UINT16 xoff = (towns_sprite_reg[2] | (towns_sprite_reg[3] << 8)) & 0x1ff;
+	UINT16 yoff = (towns_sprite_reg[4] | (towns_sprite_reg[5] << 8)) & 0x1ff;
+	UINT32 poffset,coffset;
+	
+	if(!(towns_sprite_reg[1] & 0x80))
+		return;
+		
+	// clears VRAM for each frame?
+	memset(towns_gfxvram+0x40000,0x80,0x40000);
+	
+	for(n=sprite_limit;n<1024;n++)
+	{
+		x = towns_sprram[8*n] | (towns_sprram[8*n+1] << 8);
+		y = towns_sprram[8*n+2] | (towns_sprram[8*n+3] << 8);
+		attr = towns_sprram[8*n+4] | (towns_sprram[8*n+5] << 8);
+		colour = towns_sprram[8*n+6] | (towns_sprram[8*n+7] << 8);
+		if(attr & 0x8000)
+		{
+			x += xoff;
+			y += yoff;
+		}
+		x &= 0x1ff;
+		y &= 0x1ff;
+		
+		if(colour & 0x8000)
+		{
+			poffset = (attr & 0x3ff) << 7;
+			coffset = (colour & 0xfff) << 5;
+#ifdef SPR_DEBUG
+			printf("Sprite4 #%i, X %i Y %i Attr %04x Col %04x Poff %05x Coff %05x\n",
+				n,x,y,attr,colour,poffset,coffset);
+#endif
+			if(!(colour & 0x2000))
+				render_sprite_4(bitmap,(poffset+pshift)&0x1ffff,coffset,x,y,rect);
+		}
+		else
+		{
+			poffset = (attr & 0x3ff) << 7;
+			coffset = (colour & 0xfff) << 5;
+#ifdef SPR_DEBUG
+			printf("Sprite16 #%i, X %i Y %i Attr %04x Col %04x Poff %05x Coff %05x\n",
+				n,x,y,attr,colour,poffset,coffset);
+#endif
+			render_sprite_16(bitmap,(poffset+pshift)&0x1ffff,x,y,rect);
+		}
+	}
 }
 
 void towns_crtc_draw_scan_layer_hicolour(bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
@@ -800,7 +962,7 @@ void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int la
 	}
 }
 
-void towns_crtc_draw_layer(bitmap_t* bitmap,const rectangle* rect,int layer)
+void towns_crtc_draw_layer(running_machine* machine,bitmap_t* bitmap,const rectangle* rect,int layer)
 {
 	int line;
 	int scanline;
@@ -854,6 +1016,9 @@ void towns_crtc_draw_layer(bitmap_t* bitmap,const rectangle* rect,int layer)
 	}
 	else
 	{
+		if(towns_sprite_reg[1] & 0x80)  // if sprites are enabled, then sprites are drawn on this layer.
+			draw_sprites(machine,bitmap,rect);
+			
 		scanline = rect->min_y;
 		height = (rect->max_y - rect->min_y);
 		if(towns_crtc_reg[27] & 0x1000)
@@ -990,19 +1155,28 @@ VIDEO_UPDATE( towns )
 	if(!(towns_video_reg[1] & 0x01))
 	{
 		if(!input_code_pressed(screen->machine,KEYCODE_Q))
-			towns_crtc_draw_layer(bitmap,&towns_crtc_layerscr[1],1);
+			towns_crtc_draw_layer(screen->machine,bitmap,&towns_crtc_layerscr[1],1);
 		if(!input_code_pressed(screen->machine,KEYCODE_W))
-			towns_crtc_draw_layer(bitmap,&towns_crtc_layerscr[0],0);
+			towns_crtc_draw_layer(screen->machine,bitmap,&towns_crtc_layerscr[0],0);
 	}
 	else
 	{
 		if(!input_code_pressed(screen->machine,KEYCODE_Q))
-			towns_crtc_draw_layer(bitmap,&towns_crtc_layerscr[0],0);
+			towns_crtc_draw_layer(screen->machine,bitmap,&towns_crtc_layerscr[0],0);
 		if(!input_code_pressed(screen->machine,KEYCODE_W))
-			towns_crtc_draw_layer(bitmap,&towns_crtc_layerscr[1],1);
+			towns_crtc_draw_layer(screen->machine,bitmap,&towns_crtc_layerscr[1],1);
 	}
 
-	draw_text_layer(screen->machine,bitmap,cliprect);
+	if(!(towns_sprite_reg[1] & 0x80))  // if sprites are not enabled
+		draw_text_layer(screen->machine,bitmap,cliprect);
+
+#ifdef SPR_DEBUG
+	if(input_code_pressed(screen->machine,KEYCODE_O))
+		pshift+=0x80;
+	if(input_code_pressed(screen->machine,KEYCODE_I))
+		pshift-=0x80;
+	popmessage("Pixel shift = %08x",pshift);
+#endif
 
 #ifdef CRTC_REG_DISP
 	popmessage("CRTC: %i %i %i %i %i %i %i %i %i\n%i %i %i %i | %i %i %i %i\n%i %i %i %i | %i %i %i %i\nZOOM: %04x\nVideo: %02x %02x\nText=%i",
