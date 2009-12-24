@@ -516,7 +516,7 @@ static WRITE8_HANDLER( at_kbdc8042_p2_w )
 	if ( st->pic8259_master )
 		pic8259_set_irq_line(st->pic8259_master, 1, ( data & 0x10 ) ? ASSERT_LINE : CLEAR_LINE );
 
-	at_kbdc8042.clock_signal = ( data & 0x40 ) ? 1 : 0;
+	at_kbdc8042.clock_signal = ( data & 0x40 ) ? 0 : 1;
 	at_kbdc8042.data_signal = ( data & 0x80 ) ? 1 : 0;
 
 	at_kbdc8042.data_callback( space, 0, at_kbdc8042.data_signal );
