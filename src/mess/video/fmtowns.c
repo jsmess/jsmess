@@ -656,9 +656,9 @@ void render_sprite_4(bitmap_t* bitmap, UINT32 poffset, UINT32 coffset, UINT16 x,
 		{
 			voffset = 0;
 			if(xflip)
-				pixel = (towns_sprram[poffset] & 0xf0) >> 4;
-			else
 				pixel = towns_sprram[poffset] & 0x0f;
+			else
+				pixel = (towns_sprram[poffset] & 0xf0) >> 4;
 			col = towns_sprram[coffset+(pixel*2)] | (towns_sprram[coffset+(pixel*2)+1] << 8);
 			voffset += (towns_crtc_reg[24] * 4) * ypos;  // scanline size in bytes * y pos
 			voffset += (xpos & 0x1ff) * 2;
