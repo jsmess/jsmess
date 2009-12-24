@@ -380,7 +380,7 @@ INPUT_PORTS_END
 static READ8_DEVICE_HANDLER( a1200_cia_0_portA_r )
 {
 	UINT8 ret = input_port_read(device->machine, "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
-	ret |= amiga_fdc_status_r();
+	ret |= amiga_fdc_status_r(devtag_get_device(device->machine, "fdc"));
 	return ret;
 }
 
@@ -414,7 +414,7 @@ static const cia6526_interface a1200_cia_1_intf =
 	0,													/* tod_clock */
 	{
 		{ DEVCB_NULL, DEVCB_NULL },									/* port A */
-		{ DEVCB_NULL, DEVCB_HANDLER(amiga_fdc_control_w) }			/* port B */
+		{ DEVCB_NULL, DEVCB_DEVICE_HANDLER("fdc", amiga_fdc_control_w) }			/* port B */
 	}
 };
 
@@ -462,6 +462,8 @@ static MACHINE_DRIVER_START( a1200n )
 	/* cia */
 	MDRV_CIA8520_ADD("cia_0", AMIGA_68EC020_NTSC_CLOCK / 10, a1200_cia_0_intf)
 	MDRV_CIA8520_ADD("cia_1", AMIGA_68EC020_NTSC_CLOCK / 10, a1200_cia_1_intf)
+	
+	MDRV_AMIGA_FDC_ADD("fdc")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a1200p )
@@ -555,7 +557,7 @@ ROM_END
 
 static UINT16 a1200_read_dskbytr(running_machine *machine)
 {
-	return amiga_fdc_get_byte();
+	return amiga_fdc_get_byte(devtag_get_device(machine, "fdc"));
 }
 
 static void a1200_write_dsklen(running_machine *machine, UINT16 data)
@@ -563,7 +565,7 @@ static void a1200_write_dsklen(running_machine *machine, UINT16 data)
 	if ( data & 0x8000 )
 	{
 		if ( CUSTOM_REG(REG_DSKLEN) & 0x8000 )
-			amiga_fdc_setup_dma(machine);
+			amiga_fdc_setup_dma(devtag_get_device(machine, "fdc"));
 	}
 }
 
@@ -620,18 +622,9 @@ static DRIVER_INIT( cd32 )
 	amiga_akiko_init(machine);
 }
 
-/***************************************************************************
-  System config
-***************************************************************************/
-
-static SYSTEM_CONFIG_START(a1200)
-	CONFIG_DEVICE(amiga_floppy_getinfo)
-SYSTEM_CONFIG_END
-
-
 /***************************************************************************************************/
 
 /*    YEAR  NAME     PARENT   COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY       FULLNAME */
-COMP( 1992, a1200n,  0,       0,      a1200n, a1200,  a1200,  a1200,  "Commodore",  "Amiga 1200 (NTSC)" , GAME_NOT_WORKING )
-COMP( 1992, a1200p,  a1200n,  0,      a1200p, a1200,  a1200,  a1200,  "Commodore",  "Amiga 1200 (PAL)" , GAME_NOT_WORKING )
-CONS( 1993, cd32,    0,       0,      cd32,   cd32,   cd32,   0,      "Commodore",  "Amiga CD32 (NTSC)" , GAME_NOT_WORKING )
+COMP( 1992, a1200n,  0,       0,      a1200n, a1200,  a1200,  0,  	"Commodore",  "Amiga 1200 (NTSC)" , GAME_NOT_WORKING )
+COMP( 1992, a1200p,  a1200n,  0,      a1200p, a1200,  a1200,  0,  	"Commodore",  "Amiga 1200 (PAL)" , GAME_NOT_WORKING )
+CONS( 1993, cd32,    0,       0,      cd32,   cd32,   cd32,   0,    "Commodore",  "Amiga CD32 (NTSC)" , GAME_NOT_WORKING )

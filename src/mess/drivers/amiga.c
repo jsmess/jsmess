@@ -315,7 +315,7 @@ static const cia6526_interface cia_1_intf =
 	0,													/* tod_clock */
 	{
 		{ DEVCB_DEVICE_HANDLER("centronics", amiga_cia_1_porta_r), DEVCB_NULL },	/* port A */
-		{ DEVCB_NULL, DEVCB_HANDLER(amiga_fdc_control_w) }					/* port B */
+		{ DEVCB_NULL, DEVCB_DEVICE_HANDLER("fdc", amiga_fdc_control_w) }					/* port B */
 	}
 };
 
@@ -402,6 +402,8 @@ static MACHINE_DRIVER_START( ntsc )
 	/* cia */
 	MDRV_CIA8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_ntsc_intf)
 	MDRV_CIA8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK, cia_1_intf)
+	
+	MDRV_AMIGA_FDC_ADD("fdc")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a1000n )
@@ -487,7 +489,7 @@ MACHINE_DRIVER_END
 static READ8_DEVICE_HANDLER( amiga_cia_0_portA_r )
 {
 	UINT8 ret = input_port_read(device->machine, "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
-	ret |= amiga_fdc_status_r();
+	ret |= amiga_fdc_status_r(devtag_get_device(device->machine, "fdc"));
 	return ret;
 }
 
@@ -556,14 +558,14 @@ static UINT16 amiga_read_joy1dat(running_machine *machine)
 
 static UINT16 amiga_read_dskbytr(running_machine *machine)
 {
-	return amiga_fdc_get_byte();
+	return amiga_fdc_get_byte(devtag_get_device(machine, "fdc"));
 }
 
 static void amiga_write_dsklen(running_machine *machine, UINT16 data)
 {
 	if ( data & 0x8000 ) {
 		if ( CUSTOM_REG(REG_DSKLEN) & 0x8000 )
-			amiga_fdc_setup_dma(machine);
+			amiga_fdc_setup_dma(devtag_get_device(machine, "fdc"));
 	}
 }
 
@@ -729,23 +731,13 @@ ROM_START( cdtv )
 	ROM_LOAD("252608-01.u62", 0x000, 0x1000, NO_DUMP)
 ROM_END
 
-
-/***************************************************************************
-    SYSTEM CONFIG
-***************************************************************************/
-
-static SYSTEM_CONFIG_START( amiga )
-	CONFIG_DEVICE(amiga_floppy_getinfo)
-SYSTEM_CONFIG_END
-
-
 /***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                             FULLNAME                 FLAGS */
-COMP( 1985, a1000n, 0,      0,      a1000n, amiga,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 1000 (NTSC)",     GAME_IMPERFECT_GRAPHICS )
-COMP( 1985, a1000p, a1000n, 0,      a1000p, amiga,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 1000 (PAL)",      GAME_IMPERFECT_GRAPHICS )
-COMP( 1987, a500n,  0,      0,      a500n,  amiga,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 500 (NTSC, OCS)", GAME_IMPERFECT_GRAPHICS )
-COMP( 1987, a500p,  a500n,  0,      a500p,  amiga,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 500 (PAL, OCS)",  GAME_IMPERFECT_GRAPHICS )
+COMP( 1985, a1000n, 0,      0,      a1000n, amiga,  amiga,  0,  	"Commodore Business Machines Co.",  "Amiga 1000 (NTSC)",     GAME_IMPERFECT_GRAPHICS )
+COMP( 1985, a1000p, a1000n, 0,      a1000p, amiga,  amiga,  0,  	"Commodore Business Machines Co.",  "Amiga 1000 (PAL)",      GAME_IMPERFECT_GRAPHICS )
+COMP( 1987, a500n,  0,      0,      a500n,  amiga,  amiga,  0,  	"Commodore Business Machines Co.",  "Amiga 500 (NTSC, OCS)", GAME_IMPERFECT_GRAPHICS )
+COMP( 1987, a500p,  a500n,  0,      a500p,  amiga,  amiga,  0,  	"Commodore Business Machines Co.",  "Amiga 500 (PAL, OCS)",  GAME_IMPERFECT_GRAPHICS )
 COMP( 1991, cdtv,   0,      0,      cdtv,   cdtv,   cdtv,   0,      "Commodore Business Machines Co.",  "CDTV (NTSC)",           GAME_IMPERFECT_GRAPHICS )

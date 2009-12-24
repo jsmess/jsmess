@@ -93,3 +93,17 @@ FLOPPY_OPTIONS_START( amiga )
 		SECTORS([11]/22)
 	)
 FLOPPY_OPTIONS_END
+
+FLOPPY_OPTIONS_START( amiga_only )
+	FLOPPY_OPTION(
+		ami_dsk,
+		"adf",
+		"Amiga floppy disk image",
+		amiga_dsk_identify,
+		amiga_dsk_construct,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([11]/22)
+	)
+		{ NULL }
+};

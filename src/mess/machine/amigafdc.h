@@ -2,10 +2,24 @@
 #define AMIGAFDC_H
 
 WRITE8_DEVICE_HANDLER( amiga_fdc_control_w );
-int amiga_fdc_status_r( void );
-unsigned short amiga_fdc_get_byte( void );
-void amiga_fdc_setup_dma( running_machine *machine );
+UINT8  amiga_fdc_status_r (const device_config *device);
+UINT16 amiga_fdc_get_byte (const device_config *device);
+void amiga_fdc_setup_dma( const device_config *device );
 
-void amiga_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+#define AMIGA_FDC		DEVICE_GET_INFO_NAME(amiga_fdc)
+
+#define MDRV_AMIGA_FDC_ADD(_tag)	\
+	MDRV_DEVICE_ADD((_tag),  AMIGA_FDC, 0)
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+DEVICE_GET_INFO(amiga_fdc);
 
 #endif /* AMIGAFDC_H */

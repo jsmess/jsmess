@@ -399,6 +399,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_DEVICES)/cassette.o	\
 	$(MESS_DEVICES)/chd_cd.o	\
 	$(MESS_FORMATS)/imd_dsk.o	\
+	$(MESS_FORMATS)/ami_dsk.o	\
 	$(MESS_FORMATS)/td0_dsk.o	\
 	$(MESS_FORMATS)/cqm_dsk.o	\
 	$(MESS_FORMATS)/dsk_dsk.o	\
