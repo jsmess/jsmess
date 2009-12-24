@@ -612,23 +612,53 @@ WRITE8_HANDLER( towns_spriteram_w)
  * 		+2: Y position (10-bit)
  * 		+4: Sprite Attribute
  * 			bit 15: enforce offsets (regs 2-5)
+ * 			bit 12,13: flip sprite
  * 			bits 10-0: Sprite RAM offset containing sprite pattern
  * 			TODO: other attributes (zoom?)
  * 		+6: Sprite Colour
  * 			bit 15: use colour data in located in sprite RAM offset in bits 11-0 (x32) 
  */
-void render_sprite_4(bitmap_t* bitmap, UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, const rectangle* rect)
+void render_sprite_4(bitmap_t* bitmap, UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
 {
 	UINT16 xpos,ypos;
 	UINT16 col,pixel;
 	UINT32 voffset;
+	int xstart,xend,xdir,ystart,yend,ydir;
 	
-	for(ypos=y;ypos<y+16;ypos++)
+	if(xflip)
 	{
-		for(xpos=x;xpos<x+16;xpos+=2)
+		xstart = x+16;
+		xend = x;
+		xdir = -2;
+	}
+	else
+	{
+		xstart = x;
+		xend = x+16;
+		xdir = 2;
+	}
+	if(yflip)
+	{
+		ystart = y+16;
+		yend = y;
+		ydir = -1;
+	}
+	else
+	{
+		ystart = y;
+		yend = y+16;
+		ydir = 1;
+	}
+	
+	for(ypos=ystart;ypos!=yend;ypos+=ydir)
+	{
+		for(xpos=xstart;xpos!=xend;xpos+=xdir)
 		{
 			voffset = 0;
-			pixel = towns_sprram[poffset] & 0x0f;
+			if(xflip)
+				pixel = (towns_sprram[poffset] & 0xf0) >> 4;
+			else
+				pixel = towns_sprram[poffset] & 0x0f;
 			col = towns_sprram[coffset+(pixel*2)] | (towns_sprram[coffset+(pixel*2)+1] << 8);
 			voffset += (towns_crtc_reg[24] * 4) * ypos;  // scanline size in bytes * y pos
 			voffset += (xpos & 0x1ff) * 2;
@@ -639,8 +669,16 @@ void render_sprite_4(bitmap_t* bitmap, UINT32 poffset, UINT32 coffset, UINT16 x,
 				towns_gfxvram[voffset+1] = (col & 0xff00) >> 8;
 				towns_gfxvram[voffset] = col & 0x00ff;
 			}
-			voffset+=2;
-			pixel = (towns_sprram[poffset] & 0xf0) >> 4;
+			if(xflip)
+			{
+				voffset+=2;
+				pixel = (towns_sprram[poffset] & 0xf0) >> 4;
+			}
+			else
+			{
+				voffset-=2;
+				pixel = towns_sprram[poffset] & 0x0f;
+			}
 			col = towns_sprram[coffset+(pixel*2)] | (towns_sprram[coffset+(pixel*2)+1] << 8);
 			voffset &= 0x3ffff;
 			voffset += (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
@@ -654,15 +692,41 @@ void render_sprite_4(bitmap_t* bitmap, UINT32 poffset, UINT32 coffset, UINT16 x,
 	}
 }
 
-void render_sprite_16(bitmap_t* bitmap, UINT32 poffset, UINT16 x, UINT16 y, const rectangle* rect)
+void render_sprite_16(bitmap_t* bitmap, UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
 {
 	UINT16 xpos,ypos;
-	UINT16 col;//,pixel;
+	UINT16 col;
 	UINT32 voffset;
+	int xstart,ystart,xend,yend,xdir,ydir;
 	
-	for(ypos=y;ypos<y+16;ypos++)
+	if(xflip)
 	{
-		for(xpos=x;xpos<x+16;xpos++)
+		xstart = x+16;
+		xend = x;
+		xdir = -1;
+	}
+	else
+	{
+		xstart = x;
+		xend = x+16;
+		xdir = 1;
+	}
+	if(yflip)
+	{
+		ystart = y+16;
+		yend = y;
+		ydir = -1;
+	}
+	else
+	{
+		ystart = y;
+		yend = y+16;
+		ydir = 1;
+	}
+	
+	for(ypos=ystart;ypos!=yend;ypos+=ydir)
+	{
+		for(xpos=xstart;xpos!=xend;xpos+=xdir)
 		{
 			voffset = (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
 			col = towns_sprram[poffset] | (towns_sprram[poffset+1] << 8);
@@ -717,7 +781,7 @@ void draw_sprites(running_machine* machine,bitmap_t* bitmap, const rectangle* re
 				n,x,y,attr,colour,poffset,coffset);
 #endif
 			if(!(colour & 0x2000))
-				render_sprite_4(bitmap,(poffset+pshift)&0x1ffff,coffset,x,y,rect);
+				render_sprite_4(bitmap,(poffset+pshift)&0x1ffff,coffset,x,y,attr&0x2000,attr&0x1000,rect);
 		}
 		else
 		{
@@ -727,7 +791,7 @@ void draw_sprites(running_machine* machine,bitmap_t* bitmap, const rectangle* re
 			printf("Sprite16 #%i, X %i Y %i Attr %04x Col %04x Poff %05x Coff %05x\n",
 				n,x,y,attr,colour,poffset,coffset);
 #endif
-			render_sprite_16(bitmap,(poffset+pshift)&0x1ffff,x,y,rect);
+			render_sprite_16(bitmap,(poffset+pshift)&0x1ffff,x,y,attr&0x2000,attr&0x1000,rect);
 		}
 	}
 }
