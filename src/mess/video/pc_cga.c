@@ -127,7 +127,7 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( pcvideo_cga_at )
 	PORT_START( "pcvideo_cga_config" )
-	PORT_BIT( 0x03, 0x01, IPT_UNUSED )	/* Always use fat characters */
+	PORT_BIT( 0x03, 0x00, IPT_UNUSED )	/* Always use fat characters */
 	PORT_CONFNAME( 0x1C, 0x00, "CGA monitor type")
 	PORT_CONFSETTING(0x00, "Colour RGB")
 	PORT_CONFSETTING(0x04, "Mono RGB")
