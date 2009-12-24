@@ -620,27 +620,27 @@ WRITE8_HANDLER( towns_spriteram_w)
  */
 void render_sprite_4(bitmap_t* bitmap, UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
 {
-	UINT16 xpos,ypos;
+	INT16 xpos,ypos;
 	UINT16 col,pixel;
 	UINT32 voffset;
 	int xstart,xend,xdir,ystart,yend,ydir;
 	
 	if(xflip)
 	{
-		xstart = x+16;
-		xend = x;
+		xstart = x+14;
+		xend = x-2;
 		xdir = -2;
 	}
 	else
 	{
-		xstart = x;
-		xend = x+16;
+		xstart = x+2;
+		xend = x+18;
 		xdir = 2;
 	}
 	if(yflip)
 	{
-		ystart = y+16;
-		yend = y;
+		ystart = y+15;
+		yend = y-1;
 		ydir = -1;
 	}
 	else
@@ -694,7 +694,7 @@ void render_sprite_4(bitmap_t* bitmap, UINT32 poffset, UINT32 coffset, UINT16 x,
 
 void render_sprite_16(bitmap_t* bitmap, UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
 {
-	UINT16 xpos,ypos;
+	INT16 xpos,ypos;
 	UINT16 col;
 	UINT32 voffset;
 	int xstart,ystart,xend,yend,xdir,ydir;
@@ -707,14 +707,14 @@ void render_sprite_16(bitmap_t* bitmap, UINT32 poffset, UINT16 x, UINT16 y, UINT
 	}
 	else
 	{
-		xstart = x;
-		xend = x+16;
+		xstart = x+1;
+		xend = x+17;
 		xdir = 1;
 	}
 	if(yflip)
 	{
-		ystart = y+16;
-		yend = y;
+		ystart = y+15;
+		yend = y-1;
 		ydir = -1;
 	}
 	else
