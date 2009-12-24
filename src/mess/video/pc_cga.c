@@ -125,24 +125,6 @@ INPUT_PORTS_START( pcvideo_cga )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( pcvideo_cga_at )
-	PORT_START( "pcvideo_cga_config" )
-	PORT_BIT( 0x03, 0x00, IPT_UNUSED )	/* Always use fat characters */
-	PORT_CONFNAME( 0x1C, 0x00, "CGA monitor type")
-	PORT_CONFSETTING(0x00, "Colour RGB")
-	PORT_CONFSETTING(0x04, "Mono RGB")
-	PORT_CONFSETTING(0x08, "Colour composite")
-	PORT_CONFSETTING(0x0C, "Television")
-	PORT_CONFSETTING(0x10, "LCD")
-	PORT_CONFNAME( 0xE0, 0x00, "CGA chipset")
-	PORT_CONFSETTING(0x00, "IBM")
-	PORT_CONFSETTING(0x20, "Amstrad PC1512")
-	PORT_CONFSETTING(0x40, "Amstrad PPC512")
-	PORT_CONFSETTING(0x60, "ATI")
-	PORT_CONFSETTING(0x80, "Paradise")
-INPUT_PORTS_END
-
-
 INPUT_PORTS_START( pcvideo_pc1512 )
 	PORT_START( "pcvideo_cga_config" )
 	PORT_CONFNAME( 0x03, 0x03, "CGA character set")

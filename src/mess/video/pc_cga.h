@@ -9,7 +9,6 @@
 
 MACHINE_DRIVER_EXTERN( pcvideo_cga );
 INPUT_PORTS_EXTERN( pcvideo_cga );
-INPUT_PORTS_EXTERN( pcvideo_cga_at );
 
 /* has a special 640x200 in 16 color mode, 4 banks at 0xb8000 */
 MACHINE_DRIVER_EXTERN( pcvideo_pc1512 );
