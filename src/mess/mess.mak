@@ -495,6 +495,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_DEVICES)/appldriv.o	\
 	$(MESS_FORMATS)/ap2_dsk.o	\
 	$(MESS_FORMATS)/ap_dsk35.o	\
+	$(MESS_FORMATS)/hect_tap.o	\
 
 
 

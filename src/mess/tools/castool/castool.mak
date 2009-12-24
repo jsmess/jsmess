@@ -44,6 +44,7 @@ CASTOOL_LIB_OBJS =						\
 	$(MESS_FORMATS)/fmsx_cas.o          \
 	$(MESS_FORMATS)/gtp_cas.o           \
 	$(MESS_FORMATS)/jupi_tap.o          \
+	$(MESS_FORMATS)/hect_tap.o          \
 	$(MESS_FORMATS)/kim1_cas.o          \
 	$(MESS_FORMATS)/lviv_lvt.o          \
 	$(MESS_FORMATS)/mz_cas.o            \

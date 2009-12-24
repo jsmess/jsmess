@@ -15,7 +15,7 @@
 
                => add Keyboard,
                => add color,
-               => add cassette,
+               => add cassette(24/12/09 add the *.K7 and *.FOR format for the file and castools),
                => add sn76477 sound and 1bit sound,
                => add joysticks (stick, pot, fire)
                => add BR/HR switching
@@ -50,6 +50,7 @@
 #include "driver.h"
 #include "machine/pckeybrd.h"
 #include "devices/cassette.h"
+#include "formats/hect_tap.h"
 #include "devices/printer.h"
 #include "sound/wave.h"      // for K7 sound
 #include "sound/sn76477.h"   // for sn sound
@@ -154,7 +155,7 @@ static const struct CassetteOptions hector_cassette_options = {
 
 static const cassette_config hector_cassette_config =
 {
-	cassette_default_formats,
+	hector_cassette_formats,
 	&hector_cassette_options,
 	CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER
 };
