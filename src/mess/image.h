@@ -56,7 +56,8 @@ typedef enum
     IO_QUICKLOAD,   /* 12 - Allow to load program/data into memory, without matching any actual device */
     IO_MEMCARD,     /* 13 - Memory card */
     IO_CDROM,       /* 14 - optical CD-ROM disc */
-    IO_COUNT        /* 15 - Total Number of IO_devices for searching */
+	IO_MAGTAPE,     /* 15 - Magentic tape */
+    IO_COUNT        /* 16 - Total Number of IO_devices for searching */
 } iodevice_t;
 
 

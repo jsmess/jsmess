@@ -102,7 +102,8 @@ static const device_entry s_devices[] =
 	{ IO_SNAPSHOT,	"snapshot",	"Snapshots" },
 	{ IO_QUICKLOAD,	"snapshot",	"Quickloads" },
 	{ IO_MEMCARD,	NULL,		"Memory cards" },
-	{ IO_CDROM,		NULL,		"CD-ROM images" }
+	{ IO_CDROM,		NULL,		"CD-ROM images" },
+	{ IO_MAGTAPE,	NULL,		"Magnetic tapes" }
 };
 
 

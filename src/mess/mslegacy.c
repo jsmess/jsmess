@@ -63,7 +63,8 @@ static const char *const mess_default_text[] =
 	"Snapshot",
 	"Quickload",
 	"Memory Card",
-	"CD-ROM"
+	"CD-ROM",
+	"Magnetic Tape"
 };
 
 

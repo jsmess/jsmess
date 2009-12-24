@@ -101,8 +101,9 @@ static const mess_device_type_info device_info_array[] =
 	{ IO_PARALLEL,	"parallel",		"parl" }, /*  9 */
 	{ IO_SNAPSHOT,	"snapshot",		"dump" }, /* 10 */
 	{ IO_QUICKLOAD,	"quickload",	"quik" }, /* 11 */
-	{ IO_MEMCARD,	"memcard",		"memc" }, /* 12 */
+	{ IO_MEMCARD,	"memcard",		"memc" }, /* 12 */	
 	{ IO_CDROM,     "cdrom",        "cdrm" }, /* 13 */
+	{ IO_MAGTAPE,	"magtape",		"magt" }, /* 14 */
 };
 
 

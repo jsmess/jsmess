@@ -65,7 +65,8 @@ enum
 	UI_snapshot,
 	UI_quickload,
 	UI_memcard,
-	UI_cdrom
+	UI_cdrom,
+	UI_magtape
 };
 
 

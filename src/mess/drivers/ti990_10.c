@@ -296,7 +296,7 @@ static void ti990_10_cassette_getinfo(const mess_device_class *devclass, UINT32 
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
+		case MESS_DEVINFO_INT_TYPE:							info->i = IO_MAGTAPE; break;
 		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
 		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
 		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
