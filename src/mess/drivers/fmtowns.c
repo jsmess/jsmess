@@ -157,6 +157,7 @@ static UINT8 towns_kb_output;  // key output
 static UINT8 towns_kb_extend;  // extended key output
 static emu_timer* towns_kb_timer;
 static UINT8 towns_fm_irq_flag;
+static UINT8 towns_pad_mask;
 
 static struct towns_cdrom_controller
 {
@@ -726,13 +727,49 @@ static WRITE8_HANDLER(towns_sound_ctrl_w)
 	// TODO:
 }
 
+// Controller ports
+// Joysticks are multiplexed, with fire buttons available when bits 0 and 1 of port 0x4d6 are high. (bits 2 and 3 for second port?)
 static READ32_HANDLER(towns_padport_r)
 {
-	logerror("PADPORT: read mask %08x\n",mem_mask);
-	if(ACCESSING_BITS_0_7)
-		return input_port_read(space->machine,"joy1");;
+	UINT32 ret = 0;
+	UINT8 extra1 = input_port_read(space->machine,"joy1_ex");
+	UINT8 extra2 = input_port_read(space->machine,"joy2_ex");
 
-	return 0x00;
+	if(towns_pad_mask & 0x10)
+		ret |= (input_port_read(space->machine,"joy1") & 0x3f) | 0x00000040;
+	else
+		ret |= 0x0000003f;
+
+	if(towns_pad_mask & 0x20)
+		ret |= ((input_port_read(space->machine,"joy2") & 0x3f) << 16) | 0x00400000;
+	else
+		ret |= 0x003f0000;
+	
+	if(extra1 & 0x01) // Run button = left+right
+		ret &= ~0x0000000c;
+	if(extra2 & 0x01)
+		ret &= ~0x000c0000;
+	if(extra1 & 0x02) // Select button = up+down
+		ret &= ~0x00000003;
+	if(extra2 & 0x02)
+		ret &= ~0x00030000;
+
+	if((extra1 & 0x10) && (towns_pad_mask & 0x01))
+		ret &= ~0x00000010;
+	if((extra1 & 0x20) && (towns_pad_mask & 0x02))
+		ret &= ~0x00000020;
+	if((extra2 & 0x10) && (towns_pad_mask & 0x04))
+		ret &= ~0x00100000;
+	if((extra2 & 0x20) && (towns_pad_mask & 0x08))
+		ret &= ~0x00200000;
+
+	return ret;
+}
+
+static WRITE32_HANDLER(towns_pad_mask_w)
+{
+	if(ACCESSING_BITS_16_23)
+		towns_pad_mask = (data & 0x00ff0000) >> 16;
 }
 
 static READ8_HANDLER( towns_cmos8_r )
@@ -1673,7 +1710,7 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   // Joystick / Mouse ports(?)
   AM_RANGE(0x04d0,0x04d3) AM_READ(towns_padport_r)
   // Sound (YM3438 [FM], RF5c68 [PCM])
-  AM_RANGE(0x04d4,0x04d7) AM_NOP  // R/W  -- (0x4d5) mute?
+  AM_RANGE(0x04d4,0x04d7) AM_WRITE(towns_pad_mask_w)
   AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8("fm",ym3438_r,ym3438_w,0x00ff00ff)
   AM_RANGE(0x04e0,0x04e3) AM_NOP  // R/W  -- volume ports
   AM_RANGE(0x04e8,0x04ef) AM_READWRITE8(towns_sound_ctrl_r,towns_sound_ctrl_w,0xffffffff)
@@ -1838,11 +1875,40 @@ static INPUT_PORTS_START( towns )
     PORT_BIT(0x00000002,IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
     PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(1)
     PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
-    PORT_BIT(0x00000010,IP_ACTIVE_LOW, IPT_START) PORT_PLAYER(1)
-    PORT_BIT(0x00000020,IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
-    PORT_BIT(0x00000040,IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1)
-    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_PLAYER(1)
+    PORT_BIT(0x00000010,IP_ACTIVE_LOW, IPT_UNUSED)
+    PORT_BIT(0x00000020,IP_ACTIVE_LOW, IPT_UNUSED)
+    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED)
+    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED)
 
+  PORT_START("joy1_ex")
+    PORT_BIT(0x00000001,IP_ACTIVE_HIGH, IPT_START) PORT_NAME("1P Run") PORT_PLAYER(1)
+    PORT_BIT(0x00000002,IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("1P Select") PORT_PLAYER(1)
+    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_UNUSED)
+    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_UNUSED)
+    PORT_BIT(0x00000010,IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1)
+    PORT_BIT(0x00000020,IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(1)
+    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED)
+    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED)
+
+  PORT_START("joy2")
+    PORT_BIT(0x00000001,IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2)
+    PORT_BIT(0x00000002,IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
+    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
+    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
+    PORT_BIT(0x00000010,IP_ACTIVE_LOW, IPT_UNUSED)
+    PORT_BIT(0x00000020,IP_ACTIVE_LOW, IPT_UNUSED)
+    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED)
+    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED)
+
+  PORT_START("joy2_ex")
+    PORT_BIT(0x00000001,IP_ACTIVE_HIGH, IPT_START) PORT_NAME("2P Run") PORT_PLAYER(2)
+    PORT_BIT(0x00000002,IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("2P Select") PORT_PLAYER(2)
+    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_UNUSED)
+    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_UNUSED)
+    PORT_BIT(0x00000010,IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2)
+    PORT_BIT(0x00000020,IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2)
+    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED)
+    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 static TIMER_CALLBACK( towns_vblank_end )
@@ -1894,6 +1960,7 @@ static MACHINE_RESET( towns )
 	towns_update_video_banks(cpu_get_address_space(cputag_get_cpu(machine,"maincpu"),ADDRESS_SPACE_PROGRAM));
 	towns_kb_status = 0x18;
 	towns_kb_irq1_enable = 0;
+	towns_pad_mask = 0x7f;
 	towns_cd.status = 0x01;  // CDROM controller ready
 	towns_cd.buffer_ptr = -1;
 	timer_adjust_periodic(towns_rtc_timer,attotime_zero,0,ATTOTIME_IN_HZ(1));
