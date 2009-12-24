@@ -16,7 +16,6 @@
 /* Components */
 #include "cpu/z80/z80.h"
 #include "includes/cbmserb.h"
-#include "includes/cbmdrive.h"
 #include "sound/speaker.h"
 
 /* Devices */
@@ -262,8 +261,8 @@ MACHINE_RESET( primob )
 {
 	primo_common_machine_init(machine);
 
-	cbm_drive_0_config(SERIAL, 8);
-	cbm_drive_1_config(SERIAL, 9);
+//removed	cbm_drive_0_config(SERIAL, 8);
+//removed	cbm_drive_1_config(SERIAL, 9);
 }
 
 /*******************************************************************************

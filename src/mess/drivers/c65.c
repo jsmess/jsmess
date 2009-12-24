@@ -62,7 +62,6 @@ bus serial (available in all modes), a Fast and a Burst serial bus
 
 /* devices config */
 #include "includes/cbm.h"
-#include "includes/cbmdrive.h"
 
 #include "includes/c64.h"
 #include "includes/c65.h"
@@ -245,7 +244,7 @@ static MACHINE_DRIVER_START( c65 )
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, 3500000, c65_ntsc_cia1)
 
 	/* floppy from serial bus */
-	MDRV_IMPORT_FROM(simulated_drive)
+//removed	MDRV_IMPORT_FROM(simulated_drive)
 
 	MDRV_IMPORT_FROM(c64_cartslot)
 
@@ -304,17 +303,6 @@ ROM_START( c64dx )
 	ROM_LOAD( "910429.bin", 0x20000, 0x20000, CRC(b025805c) SHA1(c3b05665684f74adbe33052a2d10170a1063ee7d) )
 ROM_END
 
-
-/*************************************
- *
- *  System configuration(s)
- *
- *************************************/
-static SYSTEM_CONFIG_START( c65 )
-	// to investigate which carts could work in the c65 expansion port!
-	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-SYSTEM_CONFIG_END
-
 /***************************************************************************
 
   Game driver(s)
@@ -323,5 +311,5 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                         FULLNAME                                              FLAGS */
 
-COMP( 1991, c65,    0,      0,      c65,    c65,    c65,    c65,    "Commodore Electronics, Ltd.",  "Commodore 65 Development System (Prototype, NTSC)", GAME_NOT_WORKING )
-COMP( 1991, c64dx,  c65,    0,      c65pal, c65ger, c65pal, c65,    "Commodore Electronics, Ltd.",  "Commodore 64DX Development System (Prototype, PAL, German)", GAME_NOT_WORKING )
+COMP( 1991, c65,    0,      0,      c65,    c65,    c65,    0,    "Commodore Electronics, Ltd.",  "Commodore 65 Development System (Prototype, NTSC)", GAME_NOT_WORKING )
+COMP( 1991, c64dx,  c65,    0,      c65pal, c65ger, c65pal, 0,    "Commodore Electronics, Ltd.",  "Commodore 64DX Development System (Prototype, PAL, German)", GAME_NOT_WORKING )

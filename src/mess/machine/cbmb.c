@@ -14,7 +14,6 @@
 #include "video/vic6567.h"
 #include "includes/cbmserb.h"
 #include "includes/cbmieeeb.h"
-#include "includes/cbmdrive.h"
 
 #include "includes/cbmb.h"
 
@@ -344,8 +343,8 @@ DRIVER_INIT( p500 )
 
 MACHINE_RESET( cbmb )
 {
-	cbm_drive_0_config (IEEE8ON ? IEEE : 0, 8);
-	cbm_drive_1_config (IEEE9ON ? IEEE : 0, 9);
+//removed	cbm_drive_0_config (IEEE8ON ? IEEE : 0, 8);
+//removed	cbm_drive_1_config (IEEE9ON ? IEEE : 0, 9);
 }
 
 

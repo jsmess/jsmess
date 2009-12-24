@@ -122,7 +122,6 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 #include "sound/sid6581.h"
 
 #include "machine/6525tpi.h"
-#include "includes/vc1541.h"
 #include "machine/cbmipt.h"
 #include "video/ted7360.h"
 #include "devices/messram.h"
@@ -131,7 +130,6 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 
 /* devices config */
 #include "includes/cbm.h"
-#include "includes/cbmdrive.h"
 #include "machine/cbmiec.h"
 
 #include "includes/c16.h"
@@ -369,12 +367,12 @@ static PALETTE_INIT( c16 )
 
 static const tpi6525_interface c16_tpi6525_tpi_2_intf =
 {
-	c1551_0_read_data,
-	c1551_0_read_status,
-	c1551_0_read_handshake,
-	c1551_0_write_data,
+	NULL, //removed c1551_0_read_data,
+	NULL, //removed c1551_0_read_status,
+	NULL, //removed c1551_0_read_handshake,
+	NULL, //removed c1551_0_write_data,
 	NULL,
-	c1551_0_write_handshake,
+	NULL, //removed c1551_0_write_handshake,
 	NULL,
 	NULL,
 	NULL
@@ -382,12 +380,12 @@ static const tpi6525_interface c16_tpi6525_tpi_2_intf =
 
 static const tpi6525_interface c16_tpi6525_tpi_2_c1551_intf =
 {
-	c1551x_read_data,
-	c1551x_read_status,
-	c1551x_read_handshake,
-	c1551x_write_data,
+	NULL, //removed c1551x_read_data,
+	NULL, //removed c1551x_read_status,
+	NULL, //removed c1551x_read_handshake,
+	NULL, //removed c1551x_write_data,
 	NULL,
-	c1551x_write_handshake,
+	NULL, //removed c1551x_write_handshake,
 	NULL,
 	NULL,
 	NULL
@@ -395,12 +393,12 @@ static const tpi6525_interface c16_tpi6525_tpi_2_c1551_intf =
 
 static const tpi6525_interface c16_tpi6525_tpi_3_intf =
 {
-	c1551_1_read_data,
-	c1551_1_read_status,
-	c1551_1_read_handshake,
-	c1551_1_write_data,
+	NULL, //removed c1551_1_read_data,
+	NULL, //removed c1551_1_read_status,
+	NULL, //removed c1551_1_read_handshake,
+	NULL, //removed c1551_1_write_data,
 	NULL,
-	c1551_1_write_handshake,
+	NULL, //removed c1551_1_write_handshake,
 	NULL,
 	NULL,
 	NULL
@@ -491,7 +489,7 @@ static MACHINE_DRIVER_START( c16c )
 	/* emulation code currently supports only one drive */
 	MDRV_DEVICE_REMOVE("tpi6535_tpi_3")
 
-	MDRV_IMPORT_FROM( cpu_c1551 )
+//removed 	MDRV_IMPORT_FROM( cpu_c1551 )
 #ifdef CPU_SYNC
 	MDRV_QUANTUM_TIME(HZ(60))
 #else
@@ -546,7 +544,7 @@ static MACHINE_DRIVER_START( plus4c )
 	/* emulation code currently supports only one drive */
 	MDRV_DEVICE_REMOVE("tpi6535_tpi_3")
 
-	MDRV_IMPORT_FROM( cpu_c1551 )
+//removed	MDRV_IMPORT_FROM( cpu_c1551 )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -601,6 +599,9 @@ MACHINE_DRIVER_END
  *  ROM definition(s)
  *
  *************************************/
+#define C1551_ROM( cpu )	\
+	ROM_REGION( 0x10000, cpu, 0 )	\
+	ROM_LOAD( "318008-01.u4", 0xc000, 0x4000, CRC(6d16d024) SHA1(fae3c788ad9a6cc2dbdfbcf6c0264b2ca921d55e) )
 
 ROM_START( c232 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -700,31 +701,6 @@ ROM_START( plus4v )
 	ROM_LOAD( "317054-01.bin", 0x1c000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693) )
 ROM_END
 
-
-/*************************************
- *
- *  System configuration(s)
- *
- *************************************/
-
-
-static SYSTEM_CONFIG_START(c16)
-	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(c16c)
-	CONFIG_DEVICE(c1551_device_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(plus)
-	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(plusc)
-	CONFIG_DEVICE(c1551_device_getinfo)
-SYSTEM_CONFIG_END
-
-
 /***************************************************************************
 
   Game driver(s)
@@ -733,19 +709,19 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME  PARENT COMPAT MACHINE INPUT   INIT   CONFIG    COMPANY                             FULLNAME            FLAGS */
 
-COMP( 1984, c16,     0,     0,  c16,    c16,    c16,    c16,     "Commodore Business Machines Co.",  "Commodore 16 (PAL)", 0)
-COMP( 1984, c16c,    c16,   0,  c16c,   c16,    c16c,   c16c,    "Commodore Business Machines Co.",  "Commodore 16 (PAL, 1551)", 0 )
+COMP( 1984, c16,     0,     0,  c16,    c16,    c16,    0,    "Commodore Business Machines Co.",  "Commodore 16 (PAL)", 0)
+COMP( 1984, c16c,    c16,   0,  c16c,   c16,    c16c,   0,    "Commodore Business Machines Co.",  "Commodore 16 (PAL, 1551)", 0 )
 COMP( 1984, c16v,    c16,   0,  c16v,   c16,    c16v,   0,    "Commodore Business Machines Co.",  "Commodore 16 (PAL, VC1541)", GAME_NOT_WORKING)
-COMP( 1984, c16hun,  c16,   0,  c16,    c16,    c16,    c16,     "Commodore Business Machines Co.",  "Commodore 16 Novotrade (PAL, Hungary)", 0)
+COMP( 1984, c16hun,  c16,   0,  c16,    c16,    c16,    0,    "Commodore Business Machines Co.",  "Commodore 16 Novotrade (PAL, Hungary)", 0)
 
-COMP( 1984, c116,    c16,   0,  c16,    c16,    c16,    c16,     "Commodore Business Machines Co.",  "Commodore 116 (PAL)", 0)
-COMP( 1984, c116c,	 c16,   0,  c16c,   c16,    c16c,   c16c,    "Commodore Business Machines Co.",  "Commodore 116 (PAL, 1551)", 0 )
+COMP( 1984, c116,    c16,   0,  c16,    c16,    c16,    0,    "Commodore Business Machines Co.",  "Commodore 116 (PAL)", 0)
+COMP( 1984, c116c,	 c16,   0,  c16c,   c16,    c16c,   0,    "Commodore Business Machines Co.",  "Commodore 116 (PAL, 1551)", 0 )
 COMP( 1984, c116v,   c16,   0,  c16v,   c16,    c16v,   0,    "Commodore Business Machines Co.",  "Commodore 116 (PAL, VC1541)", GAME_NOT_WORKING)
 
-COMP( 1984, plus4,   c16,   0,  plus4,  plus4,  c16,    plus,    "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC)", 0)
-COMP( 1984, plus4c,  c16,   0,  plus4c, plus4,  c16c,   plusc,   "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, 1551)", 0 )
-COMP( 1984, plus4v,  c16,   0,  plus4v, plus4,  c16v,   0,   "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, VC1541)", GAME_NOT_WORKING)
+COMP( 1984, plus4,   c16,   0,  plus4,  plus4,  c16,    0,    "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC)", 0)
+COMP( 1984, plus4c,  c16,   0,  plus4c, plus4,  c16c,   0,    "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, 1551)", 0 )
+COMP( 1984, plus4v,  c16,   0,  plus4v, plus4,  c16v,   0,    "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, VC1541)", GAME_NOT_WORKING)
 
-COMP( 1984, c232,    c16,   0,  c16,    c16,    c16,    c16,     "Commodore Business Machines Co.",  "Commodore 232 (Prototype)", 0)
-COMP( 1984, c264,    c16,   0,  c264,   plus4,  c16,    plus,    "Commodore Business Machines Co.",  "Commodore 264 (Prototype)", 0)
-COMP( 1984, c364,    c16,   0,  c364,   plus4,  c16,    plus,    "Commodore Business Machines Co.",  "Commodore V364 (Prototype)", GAME_IMPERFECT_SOUND)
+COMP( 1984, c232,    c16,   0,  c16,    c16,    c16,    0,    "Commodore Business Machines Co.",  "Commodore 232 (Prototype)", 0)
+COMP( 1984, c264,    c16,   0,  c264,   plus4,  c16,    0,    "Commodore Business Machines Co.",  "Commodore 264 (Prototype)", 0)
+COMP( 1984, c364,    c16,   0,  c364,   plus4,  c16,    0,    "Commodore Business Machines Co.",  "Commodore V364 (Prototype)", GAME_IMPERFECT_SOUND)

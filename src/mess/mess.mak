@@ -696,8 +696,6 @@ $(MESSOBJ)/cbmshare.a:			\
 	$(MESS_FORMATS)/cbm_tap.o 	\
 	$(MESS_MACHINE)/6525tpi.o	\
 	$(MESS_MACHINE)/cbm.o		\
-	$(MESS_MACHINE)/cbmdrive.o	\
-	$(MESS_MACHINE)/vc1541.o	\
 	$(MESS_MACHINE)/cbmieeeb.o 	\
 	$(MESS_MACHINE)/cbmserb.o 	\
 	$(MESS_MACHINE)/cbmipt.o   	\

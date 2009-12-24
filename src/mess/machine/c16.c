@@ -16,8 +16,6 @@
 #include "machine/6525tpi.h"
 #include "video/ted7360.h"
 #include "machine/cbmiec.h"
-#include "includes/vc1541.h"
-#include "includes/cbmdrive.h"
 
 #include "includes/c16.h"
 
@@ -459,11 +457,11 @@ static void c16_common_driver_init( running_machine *machine )
 
 	memset(messram_get_ptr(devtag_get_device(machine, "messram")) + (0xfd40 % messram_get_size(devtag_get_device(machine, "messram"))), 0xff, 0x20);
 
-	if (has_c1551)		/* C1551 */
-		c1551_config(machine, "cpu_c1551");
+//removed	if (has_c1551)		/* C1551 */
+//removed		c1551_config(machine, "cpu_c1551");
 
-	if (has_vc1541)		/* VC1541 */
-		cbm_drive_config(machine, type_1541, 0, 0, "cpu_vc1540", 8);
+//removed	if (has_vc1541)		/* VC1541 */
+//removed		cbm_drive_config(machine, type_1541, 0, 0, "cpu_vc1540", 8);
 }
 
 static void c16_driver_init( running_machine *machine )
@@ -577,19 +575,19 @@ MACHINE_RESET( c16 )
 	{
 		memory_nop_readwrite(space, 0xfec0, 0xfedf, 0, 0);
 	}
-	if (has_c1551)		/* c1551 */
-	{
-		c1551_drive_reset();
-	}
-	if (has_vc1541)		/* vc1541 */
-	{
-		cbm_drive_reset(machine);
-	}
-	else								/* simulated drives */
-	{
-		cbm_drive_0_config(SERIAL, 8);
-		cbm_drive_1_config(SERIAL, 9);
-	}
+//removed	if (has_c1551)		/* c1551 */
+//removed	{
+//removed		c1551_drive_reset();
+//removed	}
+//removed	if (has_vc1541)		/* vc1541 */
+//removed	{
+//removed		cbm_drive_reset(machine);
+//removed	}
+//removed	else								/* simulated drives */
+//removed	{
+//removed		cbm_drive_0_config(SERIAL, 8);
+//removed		cbm_drive_1_config(SERIAL, 9);
+//removed	}
 }
 
 

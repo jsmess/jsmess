@@ -21,7 +21,6 @@
 #include "video/vic6560.h"
 #include "machine/cbmiec.h"
 #include "includes/cbmieeeb.h"
-#include "includes/cbmdrive.h"
 
 #include "includes/vc20.h"
 
@@ -635,12 +634,13 @@ MACHINE_RESET( vic20 )
 {
 	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
 
-	if (ieee)
+// removed	
+/*	if (ieee)
 	{
 		cbm_drive_0_config(IEEE, 8);
 		cbm_drive_1_config(IEEE, 9);
 	}
-
+*/
 	via_ca1_w(via_0, 0, vc20_via0_read_ca1(via_0, 0));
 
 	/* Set up memory banks */

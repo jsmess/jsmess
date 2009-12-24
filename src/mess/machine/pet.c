@@ -13,7 +13,6 @@
 #include "machine/6522via.h"
 #include "includes/cbmserb.h"
 #include "includes/cbmieeeb.h"
-#include "includes/cbmdrive.h"
 
 #include "includes/pet.h"
 
@@ -717,8 +716,8 @@ MACHINE_RESET( pet )
 		cbm8096_w(cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, 0);
 	}
 
-	cbm_drive_0_config (input_port_read(machine, "CFG") & 2 ? IEEE : 0, 8);
-	cbm_drive_1_config (input_port_read(machine, "CFG") & 1 ? IEEE : 0, 9);
+//removed	cbm_drive_0_config (input_port_read(machine, "CFG") & 2 ? IEEE : 0, 8);
+//removed	cbm_drive_1_config (input_port_read(machine, "CFG") & 1 ? IEEE : 0, 9);
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 }
 

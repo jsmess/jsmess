@@ -14,7 +14,6 @@
 
 #include "includes/cbm.h"
 #include "includes/cbmserb.h"
-#include "includes/cbmdrive.h"
 
 #include "includes/c65.h"
 #include "includes/c64.h"
@@ -1046,8 +1045,8 @@ MACHINE_START( c65 )
 	/* clear upper memory */
 	memset(messram_get_ptr(devtag_get_device(machine, "messram")) + 128*1024, 0xff, messram_get_size(devtag_get_device(machine, "messram")) -  128*1024);
 
-	cbm_drive_0_config (SERIAL, 10);
-	cbm_drive_1_config (SERIAL, 11);
+//removed	cbm_drive_0_config (SERIAL, 10);
+//removed	cbm_drive_1_config (SERIAL, 11);
 	c64_vicaddr = c64_memory;
 
 	c64mode = 0;

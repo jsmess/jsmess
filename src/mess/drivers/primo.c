@@ -114,8 +114,6 @@ Interrupts:
 #include "devices/cartslot.h"
 #include "formats/primoptp.h"
 
-#include "includes/cbmdrive.h"
-
 static ADDRESS_MAP_START( primoa_port, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x3f ) AM_READWRITE( primo_be_1_r, primo_ki_1_w )
@@ -283,7 +281,7 @@ static MACHINE_DRIVER_START( primoa32 )
 	/* floppy from serial bus */
 	/* for some reason machine/primo.c sets up the serial bus
     but no floppy drive has been apparently added... incomplete driver? */
-	MDRV_IMPORT_FROM(simulated_drive)
+//removed	MDRV_IMPORT_FROM(simulated_drive)
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart1")
@@ -402,22 +400,6 @@ ROM_START( primoc64 )
 	ROM_CART_LOAD("cart2", 0x14000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_CART_LOAD("cart1", 0x18000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
-
-
-#ifdef UNUSED_FUNCTION
-static void primo_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-    switch(state)
-    {
-        case MESS_DEVINFO_STR_DESCRIPTION+0:                    strcpy(info->s = device_temp_str(), "EPROM Expansion Bank #1"); break;
-        case MESS_DEVINFO_STR_DESCRIPTION+1:                    strcpy(info->s = device_temp_str(), "EPROM Expansion Bank #2"); break;
-        case MESS_DEVINFO_STR_DESCRIPTION+2:                    strcpy(info->s = device_temp_str(), "EPROM Expansion Bank #3"); break;
-        case MESS_DEVINFO_STR_DESCRIPTION+3:                    strcpy(info->s = device_temp_str(), "EPROM Expansion Bank #4"); break;
-
-        default:                                        cartslot_device_getinfo(devclass, state, info); break;
-    }
-}
-#endif
 
 /*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  INIT     CONFIG COMPANY  FULLNAME */
 COMP ( 1984, primoa32, 0,        0,     primoa32, primo, primo32, 0, "Microkey", "Primo A-32" , 0)

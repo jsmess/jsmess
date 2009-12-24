@@ -356,10 +356,6 @@ INLINE cbm_ieee_bus_t *get_safe_token(const device_config *device)
     IMPLEMENTATION
 ***************************************************************************/
 
-/* This is needed for c2031_state - It will eventually disappear */
-#include "includes/cbmdrive.h"
-
-
 #define VERBOSE_LEVEL 0
 #define DBG_LOG( MACHINE, N, M, A ) \
 	do { \
@@ -400,8 +396,8 @@ void cbm_ieee_dav_w( const device_config *ieeedev, int device, int data )
 
 //  DBG_LOG(ieeedev->machine, 1, "cbm ieee dav", ("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	ieeebus->bus[device].dav = data;
-	if (device == 0)
-		c2031_state(ieeedev->machine, cbm_drive);
+//removed	if (device == 0)
+//removed		c2031_state(ieeedev->machine, cbm_drive);
 }
 
 WRITE8_DEVICE_HANDLER( cbm_ieee_dav_write )
@@ -415,8 +411,8 @@ void cbm_ieee_nrfd_w( const device_config *ieeedev, int device, int data )
 
 //  DBG_LOG(ieeedev->machine, 1, "cbm ieee nrfd", ("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	ieeebus->bus[device].nrfd = data;
-	if (device == 0)
-		c2031_state(ieeedev->machine, cbm_drive);
+//removed	if (device == 0)
+//removed		c2031_state(ieeedev->machine, cbm_drive);
 }
 
 WRITE8_DEVICE_HANDLER( cbm_ieee_nrfd_write )
@@ -430,8 +426,8 @@ void cbm_ieee_ndac_w( const device_config *ieeedev, int device, int data )
 
 //  DBG_LOG(ieeedev->machine, 1, "cbm ieee ndac",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	ieeebus->bus[device].ndac = data;
-	if (device == 0)
-		c2031_state(ieeedev->machine, cbm_drive);
+//removed	if (device == 0)
+//removed		c2031_state(ieeedev->machine, cbm_drive);
 }
 
 WRITE8_DEVICE_HANDLER( cbm_ieee_ndac_write )
@@ -445,8 +441,8 @@ void cbm_ieee_atn_w( const device_config *ieeedev, int device, int data )
 
 //  DBG_LOG(ieeedev->machine, 1, "cbm ieee atn",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	ieeebus->bus[device].atn = data;
-	if (device == 0)
-		c2031_state(ieeedev->machine, cbm_drive);
+//removed	if (device == 0)
+//removed		c2031_state(ieeedev->machine, cbm_drive);
 }
 
 WRITE8_DEVICE_HANDLER( cbm_ieee_atn_write )
@@ -460,8 +456,8 @@ void cbm_ieee_eoi_w( const device_config *ieeedev, int device, int data )
 
 //  DBG_LOG(ieeedev->machine, 1, "cbm ieee eoi", ("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	ieeebus->bus[device].eoi = data;
-	if (device == 0)
-		c2031_state(ieeedev->machine, cbm_drive);
+//removed	if (device == 0)
+//removed		c2031_state(ieeedev->machine, cbm_drive);
 }
 
 WRITE8_DEVICE_HANDLER( cbm_ieee_eoi_write )
@@ -475,8 +471,8 @@ void cbm_ieee_data_w( const device_config *ieeedev, int device, int data )
 
 //  DBG_LOG(ieeedev->machine, 1, "cbm ieee data", ("%.4x dev:%d %.2x\n", activecpu_get_pc(), device, data));
 	ieeebus->bus[device].data = data;
-	if (device == 0)
-		c2031_state(ieeedev->machine, cbm_drive);
+//removed	if (device == 0)
+//removed		c2031_state(ieeedev->machine, cbm_drive);
 }
 
 WRITE8_DEVICE_HANDLER( cbm_ieee_data_write )
