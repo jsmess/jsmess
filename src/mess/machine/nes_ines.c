@@ -2829,6 +2829,8 @@ static WRITE8_HANDLER( mapper41_w )
 
 *************************************************************/
 
+extern emu_timer	*nes_irq_timer;
+
 static WRITE8_HANDLER( mapper42_w )
 {
 	LOG_MMC(("mapper42_w, offset: %04x, data: %02x\n", offset, data));

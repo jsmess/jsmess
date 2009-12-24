@@ -17,6 +17,8 @@
 #include "cpu/m6502/m6502.h"
 #include "devices/cartslot.h"
 #include "sound/nes_apu.h"
+#include "devices/flopdrv.h"
+#include "formats/nes_dsk.h"
 
 
 static READ8_DEVICE_HANDLER( psg_4015_r )
@@ -182,6 +184,18 @@ static const ppu2c0x_interface nes_ppu_interface =
 	ppu_nmi
 };
 
+static const floppy_config nes_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(nes_only),
+	DO_NOT_KEEP_GEOMETRY
+};
+
 
 static MACHINE_DRIVER_START( nes )
 	/* basic machine hardware */
@@ -268,12 +282,15 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( famicom )
 	MDRV_IMPORT_FROM( nes )
+	MDRV_MACHINE_START( famicom )
 
 	MDRV_CARTSLOT_MODIFY("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("nes,unf")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(nes_cart)
 	MDRV_CARTSLOT_PARTIALHASH(nes_partialhash)
+	
+	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, nes_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -379,33 +396,6 @@ ROM_START( dendy )
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
 
-
-static void famicom_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_FLOPPY; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:					info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATABLE:					info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(nes_disk); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(nes_disk); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(nes_disk); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk,fds"); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(famicom)
-	CONFIG_DEVICE(famicom_floppy_getinfo)
-SYSTEM_CONFIG_END
-
 /***************************************************************************
 
   Game driver(s)
@@ -415,8 +405,8 @@ SYSTEM_CONFIG_END
 /*     YEAR  NAME      PARENT  COMPAT MACHINE   INPUT    INIT   CONFIG   COMPANY       FULLNAME */
 CONS( 1985, nes,       0,      0,     nes,      nes,     0,     0,       "Nintendo",  "Nintendo Entertainment System / Famicom (NTSC)", GAME_IMPERFECT_GRAPHICS )
 CONS( 1987, nespal,    nes,    0,     nespal,   nes,     0,     0,       "Nintendo",  "Nintendo Entertainment System (PAL)", GAME_IMPERFECT_GRAPHICS )
-CONS( 1983, famicom,   nes,    0,     famicom,  famicom, 0,     famicom, "Nintendo",  "Famicom Disk System", GAME_IMPERFECT_GRAPHICS )
-CONS( 1986, famitwin,  nes,    0,     famicom,  famicom, 0,     famicom, "Sharp",     "Famicom Twin", GAME_IMPERFECT_GRAPHICS )
+CONS( 1983, famicom,   nes,    0,     famicom,  famicom, famicom, 	0, 		 "Nintendo",  "Famicom Disk System", GAME_IMPERFECT_GRAPHICS )
+CONS( 1986, famitwin,  nes,    0,     famicom,  famicom, famicom, 	0, 		 "Sharp",     "Famicom Twin", GAME_IMPERFECT_GRAPHICS )
 CONS( 198?, m82,       nes,    0,     nes,      nes,     0,     0,       "Nintendo",  "M82 Display Unit", GAME_IMPERFECT_GRAPHICS )
 CONS( 1996, drpcjr,    nes,    0,     famicom,  nes,     0,     0,       "Bung",      "Doctor PC Jr", GAME_IMPERFECT_GRAPHICS )
 CONS( 199?, dendy,     nes,    0,     dendy,    nes,     0,     0,       "Steepler",  "Dendy Classic", GAME_IMPERFECT_GRAPHICS )

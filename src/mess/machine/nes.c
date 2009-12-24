@@ -5,6 +5,8 @@
 #include "machine/nes_mmc.h"
 #include "sound/nes_apu.h"
 #include "devices/cartslot.h"
+#include "devices/flopdrv.h"
+#include "formats/flopimg.h"
 #include "image.h"
 #include "hash.h"
 
@@ -221,10 +223,20 @@ MACHINE_RESET( nes )
 	cputag_reset(machine, "maincpu");
 }
 
+emu_timer	*nes_irq_timer;
+
+static TIMER_CALLBACK( nes_irq_callback )
+{
+	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+	timer_adjust_oneshot(nes_irq_timer, attotime_never, 0);
+}
+
 MACHINE_START( nes )
 {
 	init_nes_core(machine);
 	add_exit_callback(machine, nes_machine_stop);
+	
+	nes_irq_timer = timer_alloc(machine, nes_irq_callback, NULL);
 }
 
 static void nes_machine_stop( running_machine *machine )
@@ -913,8 +925,34 @@ void nes_partialhash( char *dest, const unsigned char *data, unsigned long lengt
 }
 
 
-DEVICE_START( nes_disk )
+static void nes_load_proc(const device_config *image)
 {
+	image_fseek(image, 0, SEEK_END);
+	nes_fds.sides = (image_ftell(image) - 16) / 65500;
+	nes_fds.data = image_realloc(image, nes_fds.data, nes_fds.sides * 65500);
+	image_fseek(image, 0x10, SEEK_SET);
+	image_fread(image, nes_fds.data, 65500 * nes_fds.sides);
+	return;
+}
+
+static void nes_unload_proc(const device_config *image)
+{
+	/* TODO: should write out changes here as well */
+	nes_fds.sides =  0;
+	nes_fds.data = NULL;
+}
+
+DRIVER_INIT( famicom) 
+{	
+	nes_fds.sides = 0;
+	nes_fds.data = NULL;
+	
+	floppy_install_load_proc(floppy_get_device(machine,0), nes_load_proc);
+	floppy_install_unload_proc(floppy_get_device(machine,0), nes_unload_proc);
+}
+
+MACHINE_START( famicom )
+{	
 	/* clear some of the cart variables we don't use */
 	nes.trainer = 0;
 	nes.battery = 0;
@@ -926,43 +964,6 @@ DEVICE_START( nes_disk )
 	nes.four_screen_vram = 0;
 	nes.hard_mirroring = 0;
 
-	nes_fds.sides = 0;
-	nes_fds.data = NULL;
-}
-
-
-DEVICE_IMAGE_LOAD( nes_disk )
-{
-	unsigned char magic[4];
-
-	/* See if it has a  redundant header on it */
-	image_fread(image, magic, 4);
-	if ((magic[0] == 'F') && (magic[1] == 'D') && (magic[2] == 'S'))
-	{
-		/* Skip past the redundant header */
-		image_fseek(image, 0x10, SEEK_SET);
-	}
-	else
-		/* otherwise, point to the start of the image */
-		image_fseek(image, 0, SEEK_SET);
-
-	/* read in all the sides */
-	while (!image_feof(image))
-	{
-		nes_fds.sides ++;
-		nes_fds.data = image_realloc(image, nes_fds.data, nes_fds.sides * 65500);
-		if (!nes_fds.data)
-			return INIT_FAIL;
-		image_fread(image, nes_fds.data + ((nes_fds.sides - 1) * 65500), 65500);
-	}
-
-	logerror("Number of sides: %d\n", nes_fds.sides);
-
-	return INIT_PASS;
-}
-
-DEVICE_IMAGE_UNLOAD( nes_disk )
-{
-	/* TODO: should write out changes here as well */
-	nes_fds.data = NULL;
+	nes_fds.sides = 0;	
+	MACHINE_START_CALL( nes );
 }

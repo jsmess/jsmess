@@ -263,8 +263,6 @@ static UINT8 map153_bank_latch;
 
 static int mapper_warning;
 
-static emu_timer	*nes_irq_timer;
-
 
 /*************************************************************
 
@@ -286,12 +284,6 @@ static emu_timer	*nes_irq_timer;
     care separately in init_nes_core
 
 *************************************************************/
-
-static TIMER_CALLBACK( nes_irq_callback )
-{
-	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-	timer_adjust_oneshot(nes_irq_timer, attotime_never, 0);
-}
 
 WRITE8_HANDLER( nes_chr_w )
 {
@@ -1584,9 +1576,6 @@ int nes_mapper_reset( running_machine *machine, int mmc_num )
 	ppu2c0x_set_scanline_callback(state->ppu, mapper ? mapper->mmc_scanline : NULL);
 	ppu2c0x_set_hblank_callback(state->ppu, mapper ? mapper->mmc_hblank : NULL);
 
-	if (!nes_irq_timer)
-		nes_irq_timer = timer_alloc(machine, nes_irq_callback, NULL);
-
 	mapper_warning = 0;
 
 	nes_mmc5_vram_control = 0;
@@ -1651,8 +1640,6 @@ int nes_unif_reset( running_machine *machine, const char *board )
 	ppu2c0x_set_scanline_callback(state->ppu, unif_board ? unif_board->mmc_scanline : NULL);
 	ppu2c0x_set_hblank_callback(state->ppu, unif_board ? unif_board->mmc_hblank : NULL);
 
-	if (!nes_irq_timer)
-		nes_irq_timer = timer_alloc(machine, nes_irq_callback, NULL);
 
 	/* Point the WRAM/battery area to the first RAM bank */
 	memory_set_bankptr(machine, "bank5", &nes.wram[0x0000]);

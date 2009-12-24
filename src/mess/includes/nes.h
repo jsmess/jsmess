@@ -96,6 +96,9 @@ DEVICE_IMAGE_UNLOAD(nes_disk);
 MACHINE_START( nes );
 MACHINE_RESET( nes );
 
+MACHINE_START( famicom );
+DRIVER_INIT( famicom );
+
 READ8_HANDLER( nes_IN0_r );
 READ8_HANDLER( nes_IN1_r );
 
