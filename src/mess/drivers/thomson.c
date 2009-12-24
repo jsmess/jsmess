@@ -594,13 +594,6 @@ static const floppy_config thomson_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
-/* ------------ config ------------ */
-/*
-static SYSTEM_CONFIG_START ( to )
-     CONFIG_DEVICE ( thom_serial_getinfo )
-SYSTEM_CONFIG_END
-*/
-
 /* ------------ driver ------------ */
 
 static MACHINE_DRIVER_START ( to7 )

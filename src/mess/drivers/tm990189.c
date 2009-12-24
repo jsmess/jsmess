@@ -45,7 +45,7 @@
 #include "devices/cassette.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
-
+#include "machine/serial.h"
 
 static int load_state;
 static int ic_state;
@@ -88,11 +88,13 @@ static emu_timer *rs232_input_timer;
 
 static MACHINE_RESET( tm990_189 )
 {
-	displayena_timer = timer_alloc(machine, NULL, NULL);
-
 	hold_load(machine);
 }
 
+static MACHINE_START( tm990_189 )
+{
+	displayena_timer = timer_alloc(machine, NULL, NULL);
+}
 static const TMS9928a_interface tms9918_interface =
 {
 	TMS99x8,
@@ -104,17 +106,17 @@ static const TMS9928a_interface tms9918_interface =
 static MACHINE_START( tm990_189_v )
 {
 	TMS9928A_configure(&tms9918_interface);
-}
-
-static MACHINE_RESET( tm990_189_v )
-{
+	
 	displayena_timer = timer_alloc(machine, NULL, NULL);
 
 	joy1x_timer = timer_alloc(machine, NULL, NULL);
 	joy1y_timer = timer_alloc(machine, NULL, NULL);
 	joy2x_timer = timer_alloc(machine, NULL, NULL);
 	joy2y_timer = timer_alloc(machine, NULL, NULL);
+}
 
+static MACHINE_RESET( tm990_189_v )
+{
 	hold_load(machine);
 
 	TMS9928A_reset();
@@ -361,7 +363,7 @@ static TIMER_CALLBACK(rs232_input_callback)
 
 	if (/*rs232_rts &&*/ /*(mame_ftell(rs232_fp) < mame_fsize(rs232_fp))*/1)
 	{
-		if (image_fread(rs232_fp, &buf, 1) == 1)
+		if (image_fread(ptr, &buf, 1) == 1)
 			tms9902_push_data(devtag_get_device(machine, "tms9902"), buf);
 	}
 }
@@ -371,15 +373,8 @@ static TIMER_CALLBACK(rs232_input_callback)
 */
 static DEVICE_IMAGE_LOAD( tm990_189_rs232 )
 {
-	int id = image_index_in_device(image);
-
-	if (id != 0)
-		return INIT_FAIL;
-
-	rs232_fp = image;
-
 	tms9902_set_dsr(devtag_get_device(image->machine, "tms9902"), 1);
-	rs232_input_timer = timer_alloc(image->machine, rs232_input_callback, NULL);
+	rs232_input_timer = timer_alloc(image->machine, rs232_input_callback, (void*)image);
 	timer_adjust_periodic(rs232_input_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(10));
 
 	return INIT_PASS;
@@ -390,17 +385,31 @@ static DEVICE_IMAGE_LOAD( tm990_189_rs232 )
 */
 static DEVICE_IMAGE_UNLOAD( tm990_189_rs232 )
 {
-	int id = image_index_in_device(image);
-
-	if (id != 0)
-		return;
-
-	rs232_fp = NULL;
-
 	tms9902_set_dsr(devtag_get_device(image->machine, "tms9902"), 0);
 
 	timer_reset(rs232_input_timer, attotime_never);	/* FIXME - timers should only be allocated once */
 }
+
+static DEVICE_GET_INFO( tm990_189_rs232 )
+{
+	switch ( state )
+	{
+		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( tm990_189_rs232 );    break;
+		case DEVINFO_FCT_IMAGE_UNLOAD:		        info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME( tm990_189_rs232 );    break;
+		case DEVINFO_STR_NAME:		                strcpy(info->s, "TM990/189 RS232 port");	                    break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "");                                         break;
+		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
+		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                        	break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 1;                                        	break;		
+		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+	}
+}
+
+#define TM990_189_RS232	DEVICE_GET_INFO_NAME(tm990_189_rs232)
+
+#define MDRV_TM990_189_RS232_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, TM990_189_RS232, 0)
+	
 
 static TMS9902_RST_CALLBACK( rts_callback )
 {
@@ -752,6 +761,7 @@ static MACHINE_DRIVER_START(tm990_189)
 	MDRV_CPU_PROGRAM_MAP(tm990_189_memmap)
 	MDRV_CPU_IO_MAP(tm990_189_cru_map)
 
+	MDRV_MACHINE_START( tm990_189 )
 	MDRV_MACHINE_RESET( tm990_189 )
 
 	/* video hardware - we emulate a 8-segment LED display */
@@ -785,6 +795,8 @@ static MACHINE_DRIVER_START(tm990_189)
 	MDRV_TMS9901_ADD("tms9901_1", sys9901reset_param)
 	/* tms9902 */
 	MDRV_TMS9902_ADD("tms9902", tms9902_params)
+	
+	MDRV_TM990_189_RS232_ADD("rs232")
 MACHINE_DRIVER_END
 
 #define LEFT_BORDER		15
@@ -829,6 +841,8 @@ static MACHINE_DRIVER_START(tm990_189_v)
 	MDRV_TMS9901_ADD("tms9901_1", sys9901reset_param)
 	/* tms9902 */
 	MDRV_TMS9902_ADD("tms9902", tms9902_params)
+	
+	MDRV_TM990_189_RS232_ADD("rs232")
 MACHINE_DRIVER_END
 
 
@@ -955,32 +969,6 @@ static INPUT_PORTS_START(tm990_189)
 	PORT_BIT( 0x3ff, 0x1aa,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0xd2,0x282 ) PORT_PLAYER(2) PORT_REVERSE
 INPUT_PORTS_END
 
-static void tm990_189_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* serial */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(tm990_189_rs232); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(tm990_189_rs232); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), ""); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(tm990_189)
-	/* a tape interface and a rs232 interface... */
-	CONFIG_DEVICE(tm990_189_serial_getinfo)
-SYSTEM_CONFIG_END
-
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY                 FULLNAME */
-COMP( 1978,	990189,	  0,		0,		tm990_189,	tm990_189,	0,		tm990_189,	"Texas Instruments",	"TM 990/189 University Board microcomputer with University Basic" , 0)
-COMP( 1980,	990189v,  990189,	0,		tm990_189_v,tm990_189,	0,		tm990_189,	"Texas Instruments",	"TM 990/189 University Board microcomputer with University Basic and Video Board Interface" , 0)
+COMP( 1978,	990189,	  0,		0,		tm990_189,	tm990_189,	0,		0,			"Texas Instruments",	"TM 990/189 University Board microcomputer with University Basic" , 0)
+COMP( 1980,	990189v,  990189,	0,		tm990_189_v,tm990_189,	0,		0,			"Texas Instruments",	"TM 990/189 University Board microcomputer with University Basic and Video Board Interface" , 0)
