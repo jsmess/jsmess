@@ -21,6 +21,10 @@
     - Many general fixes to pow3000/lambda.
     - Added sound to pc8300/pow3000/lambda.
 
+    24/12/2009 (Robbbert)
+    - Added rom mirror, this fixes ringo470
+    - Added back the F4 character display
+
     To do / problems:
     - Some memory areas are not mirrored as they should.
     - Video hardware is not fully emulated, so it does not support pseudo hi-res and hi-res modes.
@@ -46,8 +50,7 @@
 /* Memory Maps */
 
 static ADDRESS_MAP_START( zx80_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_NOP
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_MIRROR(0x2000)
 	AM_RANGE(0xc000, 0xffff) AM_RAM_READ(zx_ram_r)
 ADDRESS_MAP_END
 
@@ -291,6 +294,38 @@ static INPUT_PORTS_START( pow3000 )
 INPUT_PORTS_END
 
 
+/* F4 character display */
+
+static const gfx_layout zx_gfx_layout =
+{
+	8, 8,							   /* 8x8 pixels */
+	64,								   /* 64 codes */
+	1,								   /* 1 bit per pixel */
+	{0},							   /* no bitplanes */
+	/* x offsets */
+	{0, 1, 2, 3, 4, 5, 6, 7},
+	/* y offsets */
+	{0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8},
+	8 * 8							   /* eight bytes per code */
+};
+
+
+/* Graphics Decode Information */
+
+static GFXDECODE_START( zx80 )
+	GFXDECODE_ENTRY( "maincpu", 0x0e00, zx_gfx_layout,  0, 2 )
+GFXDECODE_END
+
+static GFXDECODE_START( zx81 )
+	GFXDECODE_ENTRY( "maincpu", 0x1e00, zx_gfx_layout,  0, 2 )
+GFXDECODE_END
+
+static GFXDECODE_START( pc8300 )
+	GFXDECODE_ENTRY( "gfx1", 0, zx_gfx_layout,  0, 2 )
+GFXDECODE_END
+
+
+
 /* Palette Initialization */
 
 
@@ -362,6 +397,7 @@ static MACHINE_DRIVER_START( zx80 )
 	MDRV_SCREEN_SIZE(ZX81_PIXELS_PER_SCANLINE, ZX81_PAL_SCANLINES)
 	MDRV_SCREEN_VISIBLE_AREA(0, ZX81_PIXELS_PER_SCANLINE-1, 0, ZX81_PAL_SCANLINES-1)
 
+	MDRV_GFXDECODE(zx80)
 	MDRV_PALETTE_LENGTH(4)
 	MDRV_PALETTE_INIT(zx80)
 
@@ -389,6 +425,8 @@ static MACHINE_DRIVER_START( zx81 )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(zx81_io_map)
+
+	MDRV_GFXDECODE(zx81)
 
 	MDRV_CASSETTE_MODIFY( "cassette", zx81_cassette_config )
 MACHINE_DRIVER_END
@@ -420,6 +458,7 @@ static MACHINE_DRIVER_START( pc8300 )
 	MDRV_SCREEN_SIZE(ZX81_PIXELS_PER_SCANLINE, ZX81_NTSC_SCANLINES)
 	MDRV_SCREEN_VISIBLE_AREA(0, ZX81_PIXELS_PER_SCANLINE-1, 0, ZX81_NTSC_SCANLINES-1)
 
+	MDRV_GFXDECODE(pc8300)
 	MDRV_PALETTE_INIT(zx80)
 
 	/* internal ram */
@@ -435,6 +474,7 @@ static MACHINE_DRIVER_START( pow3000 )
 
 	MDRV_MACHINE_RESET(pow3000)
 
+	MDRV_GFXDECODE(pc8300)
 	MDRV_PALETTE_INIT(zx80)
 
 	/* internal ram */
@@ -528,8 +568,8 @@ COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     0,    "S
 COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     0,    "Timex Sinclair",           "Timex Sinclair 1000", 0 )
 COMP( 1983, ts1500,     zx81,   0,      ts1500,     zx81,       zx,     0,    "Timex Sinclair",           "Timex Sinclair 1500", 0 )
 COMP( 1983, tk85,     	zx81,   0,      ts1000,     zx81,       zx,     0,    "Microdigital",             "TK85",                0 )
-COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,       zx,     0,    "Ritas do Brasil Ltda",     "Ringo 470", GAME_NOT_WORKING )
+COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,       zx,     0,    "Ritas do Brasil Ltda",     "Ringo 470",           0 )
 COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,     zx,     0,    "Your Computer",            "PC8300",              0 )
-COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     0, 	  "Creon Enterprises",        "Power 3000",          0 )
-COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000,    zx,     0, 	  "Lambda Electronics Ltd",   "Lambda 8300",         0 )
-COMP( 1997, zx97,       zx81,   0,      zx81,       zx81,    	zx,     0,    "Wilf Rigter",		       "ZX97",	  GAME_NOT_WORKING )
+COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     0,    "Creon Enterprises",        "Power 3000",          0 )
+COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000,    zx,     0,    "Lambda Electronics Ltd",   "Lambda 8300",         0 )
+COMP( 1997, zx97,       zx81,   0,      zx81,       zx81,    	zx,     0,    "Wilf Rigter",              "ZX97",	  GAME_NOT_WORKING )
