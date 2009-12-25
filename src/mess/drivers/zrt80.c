@@ -185,36 +185,55 @@ static const ins8250_interface zrt80_com_interface =
 	NULL,
 	NULL
 };
+
+/* F4 Character Displayer */
+static const gfx_layout zrt80_charlayout =
+{
+	8, 16,					/* 8 x 16 characters */
+	128,					/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8, 8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( zrt80 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, zrt80_charlayout, 0, 1 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( zrt80 )
-    /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
-    MDRV_CPU_PROGRAM_MAP(zrt80_mem)
-    MDRV_CPU_IO_MAP(zrt80_io)
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
+	MDRV_CPU_PROGRAM_MAP(zrt80_mem)
+	MDRV_CPU_IO_MAP(zrt80_io)
 
-    MDRV_MACHINE_RESET(zrt80)
+	MDRV_MACHINE_RESET(zrt80)
 
-    /* video hardware */
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640, 200)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
+	MDRV_GFXDECODE(zrt80)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_MC6845_ADD("crtc", MC6845, XTAL_20MHz / 8, zrt80_crtc6845_interface)
 
-    MDRV_VIDEO_START(zrt80)
-    MDRV_VIDEO_UPDATE(zrt80)
+	MDRV_VIDEO_START(zrt80)
+	MDRV_VIDEO_UPDATE(zrt80)
 
-    MDRV_INS8250_ADD( "ins8250", zrt80_com_interface )
+	MDRV_INS8250_ADD( "ins8250", zrt80_com_interface )
 MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( zrt80 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "zrt80mon.z25", 0x0000, 0x1000, CRC(e6ea96dc) SHA1(e3075e30bb2b85f9288d0b8b8cdf1d2b4f7586fd))
 	//z24 is 2nd chip, used as expansion
 	ROM_REGION( 0x0800, "chargen", 0 )
