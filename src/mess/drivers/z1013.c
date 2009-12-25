@@ -146,6 +146,25 @@ INPUT_PORTS_END
 
 INPUT_PORTS_EXTERN( k7659 );
 
+/* F4 Character Displayer */
+static const gfx_layout z1013_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	512,					/* 2 x 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8, 8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( z1013 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, z1013_charlayout, 0, 1 )
+GFXDECODE_END
+
+
 /* Machine driver */
 static MACHINE_DRIVER_START( z1013 )
 	/* basic machine hardware */
@@ -163,6 +182,7 @@ static MACHINE_DRIVER_START( z1013 )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
 
+	MDRV_GFXDECODE(z1013)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
