@@ -2530,6 +2530,17 @@ static WRITE8_DEVICE_HANDLER(mac_via2_out_b)
  * Main
  * *************************************************************************/
 
+MACHINE_START( mac )
+{
+	mac_state *mac = machine->driver_data;
+	if (has_adb(mac))
+	{
+		mac_adb_timer = timer_alloc(machine, mac_adb_tick, NULL);
+		timer_adjust_oneshot(mac_adb_timer, attotime_never, 0);
+	}
+	mac_scanline_timer = timer_alloc(machine, mac_scanline_tick, NULL);
+	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);	
+}
 MACHINE_RESET(mac)
 {
 	mac_state *mac = machine->driver_data;
@@ -2564,9 +2575,6 @@ MACHINE_RESET(mac)
 	if (has_adb(mac))
 	{
 		adb_reset(mac);
-
-		mac_adb_timer = timer_alloc(machine, mac_adb_tick, NULL);
-		timer_adjust_oneshot(mac_adb_timer, attotime_never, 0);
 	}
 
 	if ((mac->mac_model == MODEL_MAC_SE) || (mac->mac_model == MODEL_MAC_CLASSIC))
@@ -2580,9 +2588,6 @@ MACHINE_RESET(mac)
 	scsi_interrupt = 0;
 	mac->via2_ca1 = 0;
 	mac->mac_nubus_irq_state = 0xff;
-
-	mac_scanline_timer = timer_alloc(machine, mac_scanline_tick, NULL);
-	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
 	debug_cpu_set_dasm_override(cputag_get_cpu(machine, "maincpu"), CPU_DISASSEMBLE_NAME(mac_dasm_override));
 }
@@ -2726,6 +2731,8 @@ static void macscsi_exit(running_machine *machine)
 
 MACHINE_START( macscsi )
 {
+	MACHINE_START_CALL(mac);
+	
 	ncr5380_init(machine, &macplus_5380intf);
 
 	add_exit_callback(machine, macscsi_exit);

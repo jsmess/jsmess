@@ -90,6 +90,7 @@ extern const via6522_interface mac_via6522_2_intf;
 extern const via6522_interface mac_via6522_adb_intf;
 
 MACHINE_START( macscsi );
+MACHINE_START( mac );
 MACHINE_RESET( mac );
 
 DRIVER_INIT(mac128k512k);
