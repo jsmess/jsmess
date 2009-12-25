@@ -16,7 +16,6 @@ COREDEFS += -DMESS
 # add some additional include libraries for the mame files
 CFLAGS += \
 	-I$(SRC)/mame \
-	-I$(SRC)/mame/includes \
 	-I$(SRC)/mess/osd \
 	-I$(SRC)/mess/osd/$(OSD)
 
