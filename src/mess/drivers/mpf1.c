@@ -361,6 +361,8 @@ static MACHINE_START( mpf1 )
 	state_save_register_global(machine, state->_break);
 	state_save_register_global(machine, state->m1);
 	state_save_register_global(machine, state->lednum);
+
+	timer_pulse(machine,  ATTOTIME_IN_HZ(1), NULL, 0, check_halt_callback);
 }
 
 static MACHINE_RESET( mpf1 )
@@ -368,8 +370,6 @@ static MACHINE_RESET( mpf1 )
 	mpf1_state *state = machine->driver_data;
 
 	state->lednum = 0;
-
-	timer_pulse(machine,  ATTOTIME_IN_HZ(1), NULL, 0, check_halt_callback);
 }
 
 /* Machine Drivers */

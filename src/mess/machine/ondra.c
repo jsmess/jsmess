@@ -94,10 +94,9 @@ MACHINE_RESET( ondra )
 	ondra_bank1_status = 0;
 	ondra_bank2_status = 0;
 	ondra_update_banks(machine);
-
-	timer_pulse(machine, ATTOTIME_IN_HZ(10), NULL, 0, nmi_check_callback);
 }
 
 MACHINE_START(ondra)
 {
+	timer_pulse(machine, ATTOTIME_IN_HZ(10), NULL, 0, nmi_check_callback);
 }

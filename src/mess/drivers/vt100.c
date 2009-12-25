@@ -275,6 +275,11 @@ static IRQ_CALLBACK(vt100_irq_callback)
 	return retVal;
 }
 
+static MACHINE_START(vt100)
+{
+	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
+}
+
 static MACHINE_RESET(vt100)
 {
 	vt100_keyboard_int = 0;
@@ -289,7 +294,6 @@ static MACHINE_RESET(vt100)
 	output_set_value("l4_led", 	  1);
 
 	vt100_key_scan = 0;
-	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
 
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), vt100_irq_callback);
 }
@@ -326,6 +330,7 @@ static MACHINE_DRIVER_START( vt100 )
 	MDRV_CPU_IO_MAP(vt100_io)
 	MDRV_CPU_VBLANK_INT("screen", vt100_vertical_interrupt)
 
+	MDRV_MACHINE_START(vt100)
 	MDRV_MACHINE_RESET(vt100)
 
     /* video hardware */

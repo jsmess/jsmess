@@ -180,6 +180,7 @@ MACHINE_START( vector06 )
 {
 	const device_config *fdc = devtag_get_device(machine, "wd1793");
 	wd17xx_set_density (fdc, DEN_FM_HI);
+	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, reset_check_callback);
 }
 
 MACHINE_RESET( vector06 )
@@ -200,5 +201,4 @@ MACHINE_RESET( vector06 )
 	vector06_keyboard_mask = 0;
 	vector06_color_index = 0;
 	vector06_video_mode = 0;
-	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, reset_check_callback);
 }

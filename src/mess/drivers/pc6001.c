@@ -805,16 +805,20 @@ static TIMER_CALLBACK(keyboard_callback)
 	}
 }
 
+static MACHINE_START(pc6001)
+{
+	/* TODO: accurate timing on these (especially for the first one) */
+	timer_pulse(machine, ATTOTIME_IN_HZ(540), NULL, 0, audio_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(250), NULL, 0, keyboard_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(160), NULL, 0, cassette_callback);
+}
+
 static MACHINE_RESET(pc6001)
 {
 	port_c_8255=0;
 	//pc6001_video_ram =  pc6001_ram;
 
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"),pc6001_irq_callback);
-	/* TODO: accurate timing on these (especially for the first one) */
-	timer_pulse(machine, ATTOTIME_IN_HZ(540), NULL, 0, audio_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(250), NULL, 0, keyboard_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(160), NULL, 0, cassette_callback);
 	cas_switch = 0;
 	cas_offset = 0;
 }
@@ -825,10 +829,6 @@ static MACHINE_RESET(pc6001m2)
 	//pc6001_video_ram =  pc6001_ram;
 
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"),pc6001_irq_callback);
-	/* TODO: accurate timing on these (especially for the first one) */
-	timer_pulse(machine, ATTOTIME_IN_HZ(540), NULL, 0, audio_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(250), NULL, 0, keyboard_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(160), NULL, 0, cassette_callback);
 	cas_switch = 0;
 	cas_offset = 0;
 
@@ -883,7 +883,7 @@ static MACHINE_DRIVER_START( pc6001 )
 	MDRV_CPU_VBLANK_INT("screen", pc6001_interrupt)
 
 //  MDRV_CPU_ADD("subcpu", I8049, 7987200)
-
+	MDRV_MACHINE_START(pc6001)
 	MDRV_MACHINE_RESET(pc6001)
 
 	/* video hardware */

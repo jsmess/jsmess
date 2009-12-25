@@ -216,12 +216,13 @@ DRIVER_INIT ( poly88 )
 
 	serial_connection_init(machine, &poly88_cassette_serial_connection);
 	serial_connection_set_in_callback(machine, &poly88_cassette_serial_connection, poly88_cassette_write);
+
+	timer_pulse(machine, ATTOTIME_IN_HZ(24000), NULL, 0, keyboard_callback);
 }
 
 MACHINE_RESET(poly88)
 {
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), poly88_irq_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(24000), NULL, 0, keyboard_callback);
 	intr = 0;
 	last_code = 0;
 

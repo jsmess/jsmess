@@ -397,6 +397,11 @@ static TIMER_CALLBACK(keyboard_callback)
 	}
 }
 
+static MACHINE_START(nanos)
+{
+	timer_pulse(machine, ATTOTIME_IN_HZ(24000), NULL, 0, keyboard_callback);
+}
+
 static MACHINE_RESET(nanos)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -410,7 +415,6 @@ static MACHINE_RESET(nanos)
 
 	floppy_mon_w(floppy_get_device(space->machine, 0), CLEAR_LINE);
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
-	timer_pulse(machine, ATTOTIME_IN_HZ(24000), NULL, 0, keyboard_callback);
 }
 
 static const z80pio_interface nanos_z80pio_intf =
@@ -462,7 +466,7 @@ static MACHINE_DRIVER_START( nanos )
     MDRV_CPU_IO_MAP(nanos_io)
     MDRV_CPU_CONFIG(nanos_daisy_chain)
 
-
+	MDRV_MACHINE_START(nanos)
     MDRV_MACHINE_RESET(nanos)
 
     /* video hardware */

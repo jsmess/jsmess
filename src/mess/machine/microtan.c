@@ -921,6 +921,7 @@ DRIVER_INIT( microtan )
             break;
     }
 
+	microtan_timer = timer_alloc(machine, microtan_read_cassette, NULL);
 }
 
 MACHINE_RESET( microtan )
@@ -933,6 +934,4 @@ MACHINE_RESET( microtan )
         keyrows[i] = input_port_read(machine, keynames[i-1]);
 	}
     set_led_status(machine, 1, (keyrows[3] & 0x80) ? 0 : 1);
-
-	microtan_timer = timer_alloc(machine, microtan_read_cassette, NULL);
 }

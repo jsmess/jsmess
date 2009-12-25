@@ -705,7 +705,7 @@ static void command_image_preload(running_machine *machine)
 
 static const device_config *find_device_by_identity(running_machine *machine, const messtest_device_identity *ident)
 {
-	const device_config *device;
+	const device_config *device = NULL;
 
 	/* look up the image slot */
 	if (ident->type == IO_UNKNOWN)

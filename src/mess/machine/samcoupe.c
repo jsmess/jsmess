@@ -226,6 +226,11 @@ UINT8 samcoupe_mouse_r(running_machine *machine)
 	return result;
 }
 
+MACHINE_START( samcoupe )
+{
+	coupe_asic *asic = machine->driver_data;
+	asic->mouse_reset = timer_alloc(machine, samcoupe_mouse_reset, 0);
+}
 
 /***************************************************************************
     RESET
@@ -245,7 +250,6 @@ MACHINE_RESET( samcoupe )
 	asic->status = 0x1f;    /* no interrupts active */
 
 	/* initialize mouse */
-	asic->mouse_reset = timer_alloc(space->machine, samcoupe_mouse_reset, 0);
 	asic->mouse_index = 0;
 	asic->mouse_data[0] = 0xff;
 	asic->mouse_data[1] = 0xff;

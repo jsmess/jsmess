@@ -1403,6 +1403,10 @@ static void setup_banks( running_machine *machine )
 MACHINE_START( sms )
 {
 	add_exit_callback(machine, sms_machine_stop);
+	sms_state.rapid_fire_timer = timer_alloc(machine, rapid_fire_callback , NULL);
+	timer_adjust_periodic(sms_state.rapid_fire_timer, ATTOTIME_IN_HZ(10), 0, ATTOTIME_IN_HZ(10));
+	/* Check if lightgun has been chosen as input: if so, enable crosshair */
+	timer_set(machine, attotime_zero, NULL, 0, lightgun_tick);	
 }
 
 
@@ -1444,8 +1448,6 @@ MACHINE_RESET( sms )
 
 	sms_state.rapid_fire_state_1 = 0;
 	sms_state.rapid_fire_state_2 = 0;
-	sms_state.rapid_fire_timer = timer_alloc(machine, rapid_fire_callback , NULL);
-	timer_adjust_periodic(sms_state.rapid_fire_timer, ATTOTIME_IN_HZ(10), 0, ATTOTIME_IN_HZ(10));
 
 	sms_state.last_paddle_read_time = 0;
 	sms_state.paddle_read_state = 0;
@@ -1466,9 +1468,6 @@ MACHINE_RESET( sms )
 	sms_state.sscope_state = 0;
 
 	sms_state.tvdraw_data = 0;
-
-	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	timer_set(space->machine, attotime_zero, NULL, 0, lightgun_tick);
 }
 
 

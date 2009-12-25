@@ -466,11 +466,6 @@ MACHINE_RESET( osborne1 )
 
 	memset( messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000, 0xFF, 0x1000 );
 
-	osborne1.video_timer = timer_alloc(machine,  osborne1_video_callback , NULL);
-	timer_adjust_oneshot(osborne1.video_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0 ), 0);
-
-	timer_set(machine,  attotime_zero, NULL, 0, setup_osborne1 );
-
 	for(drive=0;drive<2;drive++)
 	{
 		floppy_install_load_proc(floppy_get_device(machine, drive), osborne1_load_proc);
@@ -489,6 +484,10 @@ DRIVER_INIT( osborne1 )
 
 	/* Configure the 6850 ACIA */
 //  acia6850_config( 0, &osborne1_6850_config );
+	osborne1.video_timer = timer_alloc(machine,  osborne1_video_callback , NULL);
+	timer_adjust_oneshot(osborne1.video_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0 ), 0);
+
+	timer_set(machine,  attotime_zero, NULL, 0, setup_osborne1 );
 }
 
 

@@ -2064,8 +2064,6 @@ static MACHINE_RESET( x1 )
 	pcg_index[0] = pcg_index[1] = pcg_index[2] = 0;
 
 	//cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), x1_irq_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(16), NULL, 0, cmt_wind_timer);
 
 	cmt_current_cmd = 0;
 	cmt_test = 0;
@@ -2081,6 +2079,11 @@ static MACHINE_RESET( x1 )
 	}
 }
 
+static MACHINE_START( x1 )
+{	
+	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(16), NULL, 0, cmt_wind_timer);
+}
 static PALETTE_INIT(x1)
 {
 	int i;
@@ -2141,6 +2144,7 @@ static MACHINE_DRIVER_START( x1 )
 
 	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf )
 
+	MDRV_MACHINE_START(x1)
 	MDRV_MACHINE_RESET(x1)
 
 	/* video hardware */

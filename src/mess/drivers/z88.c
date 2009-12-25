@@ -293,11 +293,14 @@ static void z88_refresh_memory_bank(running_machine *machine, int bank)
 	}
 }
 
+static MACHINE_START( z88 )
+{
+	timer_pulse(machine, ATTOTIME_IN_MSEC(5), NULL, 0, z88_rtc_timer_callback);
+}
+
 static MACHINE_RESET( z88 )
 {
 	memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0x0ff, messram_get_size(devtag_get_device(machine, "messram")));
-
-	timer_pulse(machine, ATTOTIME_IN_MSEC(5), NULL, 0, z88_rtc_timer_callback);
 
 	blink_reset();
 
@@ -740,6 +743,7 @@ static MACHINE_DRIVER_START( z88 )
 	MDRV_CPU_IO_MAP(z88_io)
 	MDRV_QUANTUM_TIME(HZ(60))
 
+	MDRV_MACHINE_START( z88 )
 	MDRV_MACHINE_RESET( z88 )
 
 	/* video hardware */

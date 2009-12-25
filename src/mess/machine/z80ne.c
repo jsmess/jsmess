@@ -328,7 +328,6 @@ static MACHINE_RESET(z80ne_base)
     	lx383_key[i] = 0xf0 | i;
     lx383_scan_counter = 0x0f;
     lx383_downsampler = LX383_DOWNSAMPLING;
-    timer_pulse(machine,  ATTOTIME_IN_HZ(1000), NULL, 0, z80ne_kbd_scan );
 
 	/* Initialize cassette interface */
 	switch(input_port_read(machine, "LX.385") & 0x07)
@@ -437,6 +436,7 @@ MACHINE_START( z80ne )
 	state_save_register_item_array( machine, "z80ne", NULL, 0, lx383_key );
 	state_save_register_item( machine, "z80ne", NULL, 0, nmi_delay_counter );
 	cassette_timer = timer_alloc(machine, z80ne_cassette_tc, NULL);
+    timer_pulse(machine,  ATTOTIME_IN_HZ(1000), NULL, 0, z80ne_kbd_scan );	
 }
 
 MACHINE_START( z80net )

@@ -130,7 +130,6 @@ static void pc8801_init_interrupt(running_machine *machine)
 	interrupt_mask_reg = 0xf8;
 	interrupt_trig_reg = 0x0;
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), pc8801_interrupt_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(600), NULL, 0, pc8801_timer_interrupt);
 }
 
 WRITE8_HANDLER( pc88sr_outport_30 )
@@ -826,6 +825,8 @@ MACHINE_START( pc88srl )
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);
 	upd1990a_oe_w(state->upd1990a, 1);
+	
+	timer_pulse(machine, ATTOTIME_IN_HZ(600), NULL, 0, pc8801_timer_interrupt);
 }
 
 MACHINE_RESET( pc88srl )

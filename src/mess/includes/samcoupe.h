@@ -52,6 +52,7 @@ void samcoupe_update_memory(const address_space *space);
 UINT8 samcoupe_mouse_r(running_machine *machine);
 
 WRITE8_HANDLER( samcoupe_ext_mem_w );
+MACHINE_START( samcoupe );
 MACHINE_RESET( samcoupe );
 
 

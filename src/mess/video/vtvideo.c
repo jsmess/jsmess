@@ -265,6 +265,13 @@ void vt_video_update(const device_config *device, bitmap_t *bitmap, const rectan
 /*-------------------------------------------------
     DEVICE_START( vt_video )
 -------------------------------------------------*/
+static TIMER_CALLBACK(lba7_change)
+{
+	const device_config *device = ptr;
+	vt_video_t *vt = get_safe_token(device);
+
+	vt->lba7 = (vt->lba7) ? 0 : 1;
+}
 
 static DEVICE_START( vt_video )
 {
@@ -282,15 +289,10 @@ static DEVICE_START( vt_video )
   	vt->gfx = memory_region(device->machine, intf->char_rom_region_tag);
 	assert(vt->gfx != NULL);
 
+    // LBA7 is scan line frequency update
+	timer_pulse(device->machine, ATTOTIME_IN_NSEC(31778), (void *) device, 0, lba7_change);
 }
 
-static TIMER_CALLBACK(lba7_change)
-{
-	const device_config *device = ptr;
-	vt_video_t *vt = get_safe_token(device);
-
-	vt->lba7 = (vt->lba7) ? 0 : 1;
-}
 
 /*-------------------------------------------------
     DEVICE_RESET( vt_video )
@@ -314,8 +316,6 @@ static DEVICE_RESET( vt_video )
     vt->frequency = 60;
     vt->interlaced = 1;
 	vt->skip_lines = 2; // for 60Hz
-    // LBA7 is scan line frequency update
-	timer_pulse(device->machine, ATTOTIME_IN_NSEC(31778), (void *) device, 0, lba7_change);
 }
 
 /*-------------------------------------------------

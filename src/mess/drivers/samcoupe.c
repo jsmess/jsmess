@@ -568,6 +568,7 @@ static MACHINE_DRIVER_START( samcoupe )
 	MDRV_CPU_IO_MAP(samcoupe_io)
 	MDRV_CPU_VBLANK_INT("screen", samcoupe_frame_interrupt)
 
+	MDRV_MACHINE_START(samcoupe)
 	MDRV_MACHINE_RESET(samcoupe)
 	MDRV_DRIVER_DATA(coupe_asic)
 
