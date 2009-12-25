@@ -180,14 +180,14 @@ struct _apexc_tape_t
 {
 	int dummy;
 };
-static DEVICE_START(apexc_tape)
+static DEVICE_START(apexc_tape_puncher)
 {
 }
 
-static DEVICE_RESET(apexc_tape)
+static DEVICE_RESET(apexc_tape_puncher)
 {
 }
-static DEVICE_GET_INFO( apexc_tape )
+static DEVICE_GET_INFO(apexc_tape_puncher)
 {
 	switch ( state )
 	{
@@ -195,14 +195,14 @@ static DEVICE_GET_INFO( apexc_tape )
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(apexc_tape_t);							break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;											break;
 		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_PUNCHTAPE;                                	break;
-		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
+		case DEVINFO_INT_IMAGE_READABLE:            info->i = 0;                                        	break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                        	break;
 		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 1;                                        	break;
-		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( apexc_tape );          	break;
+		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME(apexc_tape_puncher);          	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( apexc_tape );				break;
+		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME(apexc_tape_puncher);				break;
 
-		case DEVINFO_STR_NAME:		                strcpy( info->s, "APEXC Tape");                break;
+		case DEVINFO_STR_NAME:		                strcpy( info->s, "APEXC Tape Puncher");                break;
 		case DEVINFO_STR_FAMILY:                    strcpy(info->s, "Punch tape");	                    	break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "tap");                                 break;
 		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");									break;
@@ -212,27 +212,27 @@ static DEVICE_GET_INFO( apexc_tape )
 }
 
 
-#define APEXC_TAPE	DEVICE_GET_INFO_NAME(apexc_tape)
+#define APEXC_TAPE_PUNCHER	DEVICE_GET_INFO_NAME(apexc_tape_puncher)
 
-#define MDRV_APEXC_TAPE_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, APEXC_TAPE, 0)
+#define MDRV_APEXC_TAPE_PUNCHER_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, APEXC_TAPE_PUNCHER, 0)
 
-static DEVICE_GET_INFO( apexc_tape_ro)
+static DEVICE_GET_INFO(apexc_tape_reader)
 {
 	switch ( state )
 	{
-		case DEVINFO_STR_NAME:		                strcpy(info->s, "APEXC Tape Read-Only");	                    break;
+		case DEVINFO_STR_NAME:		                strcpy(info->s, "APEXC Tape Reader");	                    break;
 		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0;                                        	break;
 		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 0;                                        	break;		
-		default: 									DEVICE_GET_INFO_CALL(apexc_tape);	break;
+		default: 									DEVICE_GET_INFO_CALL(apexc_tape_puncher);	break;
 	}
 }
 
-#define APEXC_TAPE_RO	DEVICE_GET_INFO_NAME(apexc_tape_ro)
+#define APEXC_TAPE_READER	DEVICE_GET_INFO_NAME(apexc_tape_reader)
 
-#define MDRV_APEXC_TAPE_RO_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, APEXC_TAPE_RO, 0)
+#define MDRV_APEXC_TAPE_READER_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, APEXC_TAPE_READER, 0)
 
 /*
     Open a tape image
@@ -837,8 +837,8 @@ static ADDRESS_MAP_START(apexc_mem_map, ADDRESS_SPACE_PROGRAM, 32)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(apexc_io_map, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("tape_ro",tape_read)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("tape",tape_write)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("tape_reader",tape_read)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("tape_puncher",tape_write)
 ADDRESS_MAP_END
 
 
@@ -872,8 +872,8 @@ static MACHINE_DRIVER_START(apexc)
 	MDRV_VIDEO_UPDATE(apexc)
 
 	MDRV_APEXC_CYLINDER_ADD("cylinder")
-	MDRV_APEXC_TAPE_ADD("tape")
-	MDRV_APEXC_TAPE_RO_ADD("tape_ro")
+	MDRV_APEXC_TAPE_PUNCHER_ADD("tape_puncher")
+	MDRV_APEXC_TAPE_READER_ADD("tape_reader")
 MACHINE_DRIVER_END
 
 ROM_START(apexc)
@@ -886,5 +886,5 @@ ROM_START(apexc)
 ROM_END
 
 /*         YEAR     NAME        PARENT          COMPAT  MACHINE     INPUT   INIT  COMPANY     FULLNAME */
-//COMP(      1951,    apexc53,    0,              0,      apexc53,    apexc,  apexc,   "Booth",    "APEXC (as described in 1953)" , GAME_NOT_WORKING)
-COMP(      1955,	apexc,		/*apexc53*/0,	0,		apexc,		apexc,	apexc,	"Booth",	"APEXC (as described in 1957)" , 0)
+//COMP(      1951,    apexc53,    0,              0,      apexc53,    apexc,  apexc,   "Booth",    "All Purpose Electronic X-ray Computer (as described in 1953)" , GAME_NOT_WORKING)
+COMP(      1955,	apexc,		/*apexc53*/0,	0,		apexc,		apexc,	apexc,	"Booth",	"All Purpose Electronic X-ray Computer (as described in 1957)" , 0)
