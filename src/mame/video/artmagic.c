@@ -8,7 +8,7 @@
 #include "profiler.h"
 #include "cpu/tms34010/tms34010.h"
 #include "video/tlc34076.h"
-#include "artmagic.h"
+#include "includes/artmagic.h"
 
 
 #define INSTANT_BLIT		1
@@ -61,6 +61,7 @@ VIDEO_START( artmagic )
 	blitter_base = (UINT16 *)memory_region(machine, "gfx1");
 	blitter_mask = memory_region_length(machine, "gfx1")/2 - 1;
 
+	tlc34076_state_save(machine);
 	state_save_register_global_array(machine, artmagic_xor);
 	state_save_register_global(machine, artmagic_is_stoneball);
 	state_save_register_global_array(machine, blitter_data);

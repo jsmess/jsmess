@@ -43,7 +43,7 @@ static ADDRESS_MAP_START (cgenie_mem, ADDRESS_SPACE_PROGRAM, 8)
 //  AM_RANGE(0x4000, 0xbfff) AM_RAM // set up in MACHINE_START
 //  AM_RANGE(0xc000, 0xdfff) AM_ROM // installed in cgenie_init_machine
 //  AM_RANGE(0xe000, 0xefff) AM_ROM // installed in cgenie_init_machine
-	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE( cgenie_colorram_r, cgenie_colorram_w ) AM_BASE_GENERIC( colorram )
+	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE( cgenie_colorram_r, cgenie_colorram_w ) AM_BASE( &cgenie_colorram )
 	AM_RANGE(0xf400, 0xf7ff) AM_READWRITE( cgenie_fontram_r, cgenie_fontram_w) AM_BASE( &cgenie_fontram )
 	AM_RANGE(0xf800, 0xf8ff) AM_READ( cgenie_keyboard_r )
 	AM_RANGE(0xf900, 0xffdf) AM_NOP

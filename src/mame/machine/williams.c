@@ -10,15 +10,10 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/ticket.h"
-#include "williams.h"
+#include "includes/williams.h"
 #include "sound/dac.h"
 #include "sound/hc55516.h"
 
-
-/* timers */
-static emu_timer *scanline_timer;
-static emu_timer *scan240_timer;
-static emu_timer *scan254_timer;
 
 /* banking addresses set by the drivers */
 UINT8 *mayday_protection;
@@ -49,7 +44,6 @@ static void mysticm_main_irq(const device_config *device, int state);
 static void tshoot_main_irq(const device_config *device, int state);
 
 /* Lotto Fun-specific code */
-static READ8_DEVICE_HANDLER( lottofun_input_port_0_r );
 static WRITE8_DEVICE_HANDLER( lottofun_coin_lock_w );
 
 /* Turkey Shoot-specific code */
@@ -62,19 +56,6 @@ static WRITE8_DEVICE_HANDLER( joust2_snd_cmd_w );
 static WRITE8_DEVICE_HANDLER( joust2_pia_3_cb1_w );
 
 
-
-/*************************************
- *
- *  Trampoline functions
- *
- *************************************/
-
-static READ8_DEVICE_HANDLER( input_port_0_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 0)); }
-static READ8_DEVICE_HANDLER( input_port_1_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 1)); }
-static READ8_DEVICE_HANDLER( input_port_2_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 2)); }
-static READ8_DEVICE_HANDLER( input_port_3_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 3)); }
-static READ8_DEVICE_HANDLER( input_port_4_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 4)); }
-
 /*************************************
  *
  *  Generic old-Williams PIA interfaces
@@ -84,7 +65,7 @@ static READ8_DEVICE_HANDLER( input_port_4_device_r ) { return input_port_read_di
 /* Generic PIA 0, maps to input ports 0 and 1 */
 const pia6821_interface williams_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_0_device_r), DEVCB_HANDLER(input_port_1_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
@@ -94,7 +75,7 @@ const pia6821_interface williams_pia_0_intf =
 /* muxing done in williams_mux_r */
 const pia6821_interface williams_muxed_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_0_device_r), DEVCB_HANDLER(input_port_1_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(williams_port_select_w),
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
@@ -102,7 +83,7 @@ const pia6821_interface williams_muxed_pia_0_intf =
 /* Generic 49-way joystick PIA 0 for Sinistar/Blaster */
 const pia6821_interface williams_49way_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(williams_49way_port_0_r), DEVCB_HANDLER(input_port_1_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(williams_49way_port_0_r), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
@@ -110,7 +91,7 @@ const pia6821_interface williams_49way_pia_0_intf =
 /* Muxing 49-way joystick PIA 0 for Blaster kit */
 const pia6821_interface williams_49way_muxed_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(williams_input_port_49way_0_5_r), DEVCB_HANDLER(input_port_1_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(williams_input_port_49way_0_5_r), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(williams_port_select_w),
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
@@ -118,7 +99,7 @@ const pia6821_interface williams_49way_muxed_pia_0_intf =
 /* Generic PIA 1, maps to input port 2, sound command out, and IRQs */
 const pia6821_interface williams_pia_1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_2_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(williams_snd_cmd_w), DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
 };
@@ -142,8 +123,8 @@ const pia6821_interface williams_snd_pia_intf =
 /* Special PIA 0 for Lotto Fun, to handle the controls and ticket dispenser */
 const pia6821_interface lottofun_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(lottofun_input_port_0_r), DEVCB_HANDLER(input_port_1_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, ticket_dispenser_w), DEVCB_HANDLER(lottofun_coin_lock_w), DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DEVICE_HANDLER("ticket", ticket_dispenser_w), DEVCB_HANDLER(lottofun_coin_lock_w), DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
 
@@ -158,7 +139,7 @@ const pia6821_interface sinistar_snd_pia_intf =
 /* Special PIA 1 for PlayBall, doesn't set the high bits on sound commands */
 const pia6821_interface playball_pia_1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_2_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(playball_snd_cmd_w), DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
 };
@@ -166,7 +147,7 @@ const pia6821_interface playball_pia_1_intf =
 /* extra PIA 3 for Speed Ball */
 const pia6821_interface spdball_pia_3_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_3_device_r), DEVCB_HANDLER(input_port_4_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN3"), DEVCB_INPUT_PORT("IN4"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
@@ -182,7 +163,7 @@ const pia6821_interface spdball_pia_3_intf =
 /* Generic muxing PIA 0, maps to input ports 0/3 and 1; port select is CA2 */
 const pia6821_interface williams2_muxed_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_0_device_r), DEVCB_HANDLER(input_port_1_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(williams_port_select_w), DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
@@ -190,7 +171,7 @@ const pia6821_interface williams2_muxed_pia_0_intf =
 /* Generic PIA 1, maps to input port 2, sound command out, and IRQs */
 const pia6821_interface williams2_pia_1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_2_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("pia_2", pia6821_ca1_w),
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
 };
@@ -214,7 +195,7 @@ const pia6821_interface williams2_snd_pia_intf =
 /* Mystic Marathon PIA 0 */
 const pia6821_interface mysticm_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_0_device_r), DEVCB_HANDLER(input_port_1_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_firq), DEVCB_LINE(mysticm_main_irq)
 };
@@ -222,7 +203,7 @@ const pia6821_interface mysticm_pia_0_intf =
 /* Mystic Marathon PIA 1 */
 const pia6821_interface mysticm_pia_1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_2_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("pia_2", pia6821_ca1_w),
 	/*irqs   : A/B             */ DEVCB_LINE(mysticm_main_irq), DEVCB_LINE(mysticm_main_irq)
 };
@@ -230,7 +211,7 @@ const pia6821_interface mysticm_pia_1_intf =
 /* Turkey Shoot PIA 0 */
 const pia6821_interface tshoot_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(tshoot_input_port_0_3_r), DEVCB_HANDLER(input_port_1_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(tshoot_input_port_0_3_r), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(tshoot_lamp_w), DEVCB_HANDLER(williams_port_select_w), DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(tshoot_main_irq), DEVCB_LINE(tshoot_main_irq)
 };
@@ -238,7 +219,7 @@ const pia6821_interface tshoot_pia_0_intf =
 /* Turkey Shoot PIA 1 */
 const pia6821_interface tshoot_pia_1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_2_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("pia_2", pia6821_ca1_w),
 	/*irqs   : A/B             */ DEVCB_LINE(tshoot_main_irq), DEVCB_LINE(tshoot_main_irq)
 };
@@ -254,7 +235,7 @@ const pia6821_interface tshoot_snd_pia_intf =
 /* Joust 2 PIA 1 */
 const pia6821_interface joust2_pia_1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_2_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(joust2_snd_cmd_w), DEVCB_HANDLER(joust2_pia_3_cb1_w), DEVCB_DEVICE_HANDLER("pia_2", pia6821_ca1_w),
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
 };
@@ -267,9 +248,9 @@ const pia6821_interface joust2_pia_1_intf =
  *
  *************************************/
 
-static TIMER_CALLBACK( williams_va11_callback )
+TIMER_DEVICE_CALLBACK( williams_va11_callback )
 {
-	const device_config *pia_1 = devtag_get_device(machine, "pia_1");
+	const device_config *pia_1 = devtag_get_device(timer->machine, "pia_1");
 	int scanline = param;
 
 	/* the IRQ signal comes into CB1, and is set to VA11 */
@@ -278,7 +259,7 @@ static TIMER_CALLBACK( williams_va11_callback )
 	/* set a timer for the next update */
 	scanline += 0x20;
 	if (scanline >= 256) scanline = 0;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_device_adjust_oneshot(timer, video_screen_get_time_until_pos(timer->machine->primary_screen, scanline, 0), scanline);
 }
 
 
@@ -291,18 +272,18 @@ static TIMER_CALLBACK( williams_count240_off_callback )
 }
 
 
-static TIMER_CALLBACK( williams_count240_callback )
+TIMER_DEVICE_CALLBACK( williams_count240_callback )
 {
-	const device_config *pia_1 = devtag_get_device(machine, "pia_1");
+	const device_config *pia_1 = devtag_get_device(timer->machine, "pia_1");
 
 	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
 	pia6821_ca1_w(pia_1, 0, 1);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, williams_count240_off_callback);
+	timer_set(timer->machine, video_screen_get_time_until_pos(timer->machine->primary_screen, 0, 0), NULL, 0, williams_count240_off_callback);
 
 	/* set a timer for next frame */
-	timer_adjust_oneshot(scan240_timer, video_screen_get_time_until_pos(machine->primary_screen, 240, 0), 0);
+	timer_device_adjust_oneshot(timer, video_screen_get_time_until_pos(timer->machine->primary_screen, 240, 0), 0);
 }
 
 
@@ -369,30 +350,35 @@ static void tshoot_main_irq(const device_config *device, int state)
  *
  *************************************/
 
-static MACHINE_RESET( williams_common )
+static MACHINE_START( williams_common )
 {
-	/* reset the ticket dispenser (Lotto Fun) */
-	ticket_dispenser_init(machine, 70, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
-
-	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
-	scanline_timer = timer_alloc(machine, williams_va11_callback, NULL);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
-
-	/* also set a timer to go off on scanline 240 */
-	scan240_timer = timer_alloc(machine, williams_count240_callback, NULL);
-	timer_adjust_oneshot(scan240_timer, video_screen_get_time_until_pos(machine->primary_screen, 240, 0), 0);
+	/* configure the memory bank */
+	memory_configure_bank(machine, "bank1", 0, 1, williams_videoram, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "maincpu") + 0x10000, 0);
 
 	state_save_register_global(machine, vram_bank);
+}
+
+
+static MACHINE_RESET( williams_common )
+{
+	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
+	timer_device_adjust_oneshot(devtag_get_device(machine, "scan_timer"), video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+
+	/* also set a timer to go off on scanline 240 */
+	timer_device_adjust_oneshot(devtag_get_device(machine, "240_timer"), video_screen_get_time_until_pos(machine->primary_screen, 240, 0), 0);
+}
+
+
+MACHINE_START( williams )
+{
+	MACHINE_START_CALL(williams_common);
 }
 
 
 MACHINE_RESET( williams )
 {
 	MACHINE_RESET_CALL(williams_common);
-
-	/* configure the memory bank */
-	memory_configure_bank(machine, "bank1", 0, 1, williams_videoram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "maincpu") + 0x10000, 0);
 }
 
 
@@ -403,10 +389,10 @@ MACHINE_RESET( williams )
  *
  *************************************/
 
-static TIMER_CALLBACK( williams2_va11_callback )
+TIMER_DEVICE_CALLBACK( williams2_va11_callback )
 {
-	const device_config *pia_0 = devtag_get_device(machine, "pia_0");
-	const device_config *pia_1 = devtag_get_device(machine, "pia_1");
+	const device_config *pia_0 = devtag_get_device(timer->machine, "pia_0");
+	const device_config *pia_1 = devtag_get_device(timer->machine, "pia_1");
 	int scanline = param;
 
 	/* the IRQ signal comes into CB1, and is set to VA11 */
@@ -416,7 +402,7 @@ static TIMER_CALLBACK( williams2_va11_callback )
 	/* set a timer for the next update */
 	scanline += 0x20;
 	if (scanline >= 256) scanline = 0;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_device_adjust_oneshot(timer, video_screen_get_time_until_pos(timer->machine->primary_screen, scanline, 0), scanline);
 }
 
 
@@ -429,18 +415,18 @@ static TIMER_CALLBACK( williams2_endscreen_off_callback )
 }
 
 
-static TIMER_CALLBACK( williams2_endscreen_callback )
+TIMER_DEVICE_CALLBACK( williams2_endscreen_callback )
 {
-	const device_config *pia_0 = devtag_get_device(machine, "pia_0");
+	const device_config *pia_0 = devtag_get_device(timer->machine, "pia_0");
 
 	/* the /ENDSCREEN signal comes into CA1 */
 	pia6821_ca1_w(pia_0, 0, 0);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 8, 0), NULL, 0, williams2_endscreen_off_callback);
+	timer_set(timer->machine, video_screen_get_time_until_pos(timer->machine->primary_screen, 8, 0), NULL, 0, williams2_endscreen_off_callback);
 
 	/* set a timer for next frame */
-	timer_adjust_oneshot(scan254_timer, video_screen_get_time_until_pos(machine->primary_screen, 254, 0), 0);
+	timer_device_adjust_oneshot(timer, video_screen_get_time_until_pos(timer->machine->primary_screen, 254, 0), 0);
 }
 
 
@@ -458,27 +444,30 @@ static STATE_POSTLOAD( williams2_postload )
 }
 
 
-MACHINE_RESET( williams2 )
+MACHINE_START( williams2 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-
 	/* configure memory banks */
 	memory_configure_bank(machine, "bank1", 0, 1, williams_videoram, 0);
 	memory_configure_bank(machine, "bank1", 1, 4, memory_region(machine, "maincpu") + 0x10000, 0x10000);
+
+	/* register for save states */
+	state_save_register_global(machine, vram_bank);
+	state_save_register_postload(machine, williams2_postload, NULL);
+}
+
+
+MACHINE_RESET( williams2 )
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* make sure our banking is reset */
 	williams2_bank_select_w(space, 0, 0);
 
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
-	scanline_timer = timer_alloc(machine, williams2_va11_callback, NULL);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_device_adjust_oneshot(devtag_get_device(machine, "scan_timer"), video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
 	/* also set a timer to go off on scanline 254 */
-	scan254_timer = timer_alloc(machine, williams2_endscreen_callback, NULL);
-	timer_adjust_oneshot(scan254_timer, video_screen_get_time_until_pos(machine->primary_screen, 254, 0), 0);
-
-	state_save_register_global(machine, vram_bank);
-	state_save_register_postload(machine, williams2_postload, NULL);
+	timer_device_adjust_oneshot(devtag_get_device(machine, "254_timer"), video_screen_get_time_until_pos(machine->primary_screen, 254, 0), 0);
 }
 
 
@@ -737,17 +726,24 @@ static STATE_POSTLOAD( defender_postload )
 }
 
 
+MACHINE_START( defender )
+{
+	MACHINE_START_CALL(williams_common);
+
+	/* configure the banking and make sure it is reset to 0 */
+	memory_configure_bank(machine, "bank1", 0, 9, &memory_region(machine, "maincpu")[0x10000], 0x1000);
+
+	state_save_register_postload(machine, defender_postload, NULL);
+}
+
+
 MACHINE_RESET( defender )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	MACHINE_RESET_CALL(williams_common);
 
-	/* configure the banking and make sure it is reset to 0 */
-	memory_configure_bank(machine, "bank1", 0, 9, &memory_region(machine, "maincpu")[0x10000], 0x1000);
 	defender_bank_select_w(space, 0, 0);
-
-	state_save_register_postload(machine, defender_postload, NULL);
 }
 
 
@@ -834,9 +830,9 @@ WRITE8_HANDLER( sinistar_vram_select_w )
  *
  *************************************/
 
-MACHINE_RESET( blaster )
+MACHINE_START( blaster )
 {
-	MACHINE_RESET_CALL(williams_common);
+	MACHINE_START_CALL(williams_common);
 
 	/* banking is different for blaster */
 	memory_configure_bank(machine, "bank1", 0, 1, williams_videoram, 0);
@@ -846,6 +842,12 @@ MACHINE_RESET( blaster )
 	memory_configure_bank(machine, "bank2", 1, 16, memory_region(machine, "maincpu") + 0x10000, 0x0000);
 
 	state_save_register_global(machine, blaster_bank);
+}
+
+
+MACHINE_RESET( blaster )
+{
+	MACHINE_RESET_CALL(williams_common);
 }
 
 
@@ -884,18 +886,12 @@ WRITE8_HANDLER( blaster_bank_select_w )
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( lottofun_input_port_0_r )
-{
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-
-	/* merge in the ticket dispenser status */
-	return input_port_read(device->machine, "IN0") | ticket_dispenser_r(space, offset);
-}
-
 static WRITE8_DEVICE_HANDLER( lottofun_coin_lock_w )
 {
 	coin_lockout_global_w(device->machine, data & 1); /* bit 5 of PIC control port A */
 }
+
+
 
 /*************************************
  *
@@ -957,7 +953,9 @@ static WRITE8_DEVICE_HANDLER( tshoot_lamp_w )
 
 MACHINE_START( joust2 )
 {
+	MACHINE_START_CALL(williams2);
 	williams_cvsd_init(machine);
+	state_save_register_global(machine, joust2_current_sound_data);
 }
 
 
@@ -968,7 +966,6 @@ MACHINE_RESET( joust2 )
 	/* standard init */
 	MACHINE_RESET_CALL(williams2);
 	pia6821_ca1_w(pia_3, 0, 1);
-	state_save_register_global(machine, joust2_current_sound_data);
 }
 
 

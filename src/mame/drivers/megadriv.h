@@ -17,6 +17,8 @@ INPUT_PORTS_EXTERN( megadri6 );
 INPUT_PORTS_EXTERN( ssf2ghw );
 INPUT_PORTS_EXTERN( megdsvp );
 
+MACHINE_DRIVER_EXTERN( megadriv_timers );
+
 MACHINE_DRIVER_EXTERN( megdsvppal );
 MACHINE_DRIVER_EXTERN( megadriv );
 MACHINE_DRIVER_EXTERN( megadpal );
@@ -53,6 +55,7 @@ extern void (*megadrive_io_write_data_port_ptr)(running_machine *machine, int of
 extern UINT8 megadrive_io_data_regs[3];
 extern UINT8 megadrive_io_ctrl_regs[3];
 
+MACHINE_START( megadriv );
 MACHINE_RESET( megadriv );
 VIDEO_START( megadriv );
 VIDEO_UPDATE( megadriv );

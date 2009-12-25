@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "machine/atarigen.h"
-#include "cyberbal.h"
+#include "includes/cyberbal.h"
 
 
 #define SCREEN_WIDTH		(42*16)
@@ -172,6 +172,12 @@ static void video_start_cyberbal_common(running_machine* machine, int screens)
 		tilemap_set_scrollx(state->atarigen.alpha2_tilemap, 0, 0);
 		tilemap_set_transparent_pen(state->atarigen.alpha2_tilemap, 0);
 	}
+
+	/* save states */
+	state_save_register_global_array(machine, state->current_slip);
+	state_save_register_global_array(machine, state->playfield_palette_bank);
+	state_save_register_global_array(machine, state->playfield_xscroll);
+	state_save_register_global_array(machine, state->playfield_yscroll);
 }
 
 

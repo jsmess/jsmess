@@ -84,8 +84,6 @@ static int KeyFakeUnshiftState;
 static int KeyAutoRepeatKey;
 static int KeyAutoRepeatTimer;
 
-static void machine_stop_geneve(running_machine *machine);
-
 /*
     GROM support.
 
@@ -161,7 +159,6 @@ MACHINE_START( geneve )
 	ti99_floppy_controllers_init_all(machine);
 	ti99_ide_init(machine);
 	ti99_usbsm_init(machine);
-	add_exit_callback(machine, machine_stop_geneve);
 
 	/* set up RAM pointers */
 	ROM_ptr = memory_region(machine, "maincpu") + offset_rom_geneve;
@@ -239,7 +236,6 @@ MACHINE_RESET( geneve )
 	if (has_ide)
 	{
 		ti99_ide_reset(machine, TRUE);
-		ti99_ide_load_memcard(machine);
 	}
 
 	if (has_usb_sm)
@@ -248,13 +244,6 @@ MACHINE_RESET( geneve )
 	/* reset CPU */
 	cputag_reset(machine, "maincpu");
 }
-
-static void machine_stop_geneve(running_machine *machine)
-{
-	if (has_ide)
-		ti99_ide_save_memcard();
-}
-
 
 /*
     video initialization.

@@ -6,6 +6,9 @@
 
 /*----------- defined in video/pacman.c -----------*/
 
+extern UINT8 *pacman_videoram;
+extern UINT8 *pacman_colorram;
+
 PALETTE_INIT( pacman );
 VIDEO_START( pacman );
 VIDEO_UPDATE( pacman );
@@ -58,11 +61,13 @@ void jumpshot_decode(running_machine *machine);
 
 /*----------- defined in machine/theglobp.c -----------*/
 
+MACHINE_START( theglobp );
 MACHINE_RESET( theglobp );
 READ8_HANDLER( theglobp_decrypt_rom );
 
 
 /*----------- defined in machine/acitya.c -------------*/
 
+MACHINE_START( acitya );
 MACHINE_RESET( acitya );
 READ8_HANDLER( acitya_decrypt_rom );

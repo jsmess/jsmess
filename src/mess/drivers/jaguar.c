@@ -161,9 +161,6 @@ static MACHINE_RESET( jaguar )
 	jaguargpu_ctrl_w(cputag_get_cpu(machine, "gpu"), G_CTRL, 0, 0xffffffff);
 	jaguardsp_ctrl_w(cputag_get_cpu(machine, "audiocpu"), D_CTRL, 0, 0xffffffff);
 
-	/* init the sound system */
-	cojag_sound_reset(machine);
-
 	joystick_data = 0xffffffff;
 	eeprom_bit_count = 0;
 }

@@ -41,7 +41,7 @@ Historical notes: TI made several last minute design changes.
 #include "machine/idectrl.h"
 #include "machine/smc92x4.h"
 #include "machine/mm58274c.h"
-
+#include "machine/rtc65271.h"
 #include "devices/ti99cart.h"
 
 /*
@@ -561,7 +561,8 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
-	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
+	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )	
+	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
@@ -615,6 +616,7 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
+	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
@@ -667,6 +669,7 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
+	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
@@ -721,6 +724,7 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
+	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
@@ -782,6 +786,7 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
+	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )

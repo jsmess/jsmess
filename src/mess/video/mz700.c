@@ -49,6 +49,7 @@ PALETTE_INIT( mz700 )
 VIDEO_UPDATE( mz700 )
 {
 	int offs;
+	mz_state *mz = screen->machine->driver_data;
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
@@ -59,7 +60,7 @@ VIDEO_UPDATE( mz700 )
 		sy = (offs / 40) * 8;
 		sx = (offs % 40) * 8;
 
-		color = screen->machine->generic.colorram.u8[offs];
+		color = mz->colorram[offs];
 		code = screen->machine->generic.videoram.u8[offs] | (color & 0x80) << 1;
 
 		drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], code, color, 0, 0, sx, sy);

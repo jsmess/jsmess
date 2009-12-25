@@ -505,7 +505,7 @@ DIP locations verified for:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "arkanoid.h"
+#include "includes/arkanoid.h"
 #include "sound/ay8910.h"
 #include "cpu/m6805/m6805.h"
 
@@ -1305,6 +1305,8 @@ static DRIVER_INIT( block2 )
 	}
 
 	memcpy(srcgfx, buffer, 0x18000);
+
+	free(buffer);
 
 	state->bootleg_id = BLOCK2;
 	arkanoid_bootleg_init(machine);

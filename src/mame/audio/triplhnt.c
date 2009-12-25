@@ -4,7 +4,7 @@
 
 *************************************************************************/
 #include "driver.h"
-#include "triplhnt.h"
+#include "includes/triplhnt.h"
 #include "sound/discrete.h"
 
 
@@ -130,7 +130,7 @@ DISCRETE_SOUND_START(triplhnt)
 	/************************************************/
 	/* Bear Roar is a VCO with noise mixed in.      */
 	/************************************************/
-	DISCRETE_ADJUSTMENT_TAG(NODE_20,
+	DISCRETE_ADJUSTMENT(NODE_20,
 				10000,	// R86 + R88 @ 0
 				260000,	// R86 + R88 @ max
 				DISC_LOGADJ, "BEAR")

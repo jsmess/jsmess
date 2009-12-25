@@ -77,7 +77,7 @@
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/pokey.h"
-#include "irobot.h"
+#include "includes/irobot.h"
 
 
 
@@ -305,6 +305,9 @@ static MACHINE_DRIVER_START( irobot )
 	MDRV_PALETTE_INIT(irobot)
 	MDRV_VIDEO_START(irobot)
 	MDRV_VIDEO_UPDATE(irobot)
+
+	MDRV_TIMER_ADD("irvg_timer", irobot_irvg_done_callback)
+	MDRV_TIMER_ADD("irmb_timer", irobot_irmb_done_callback)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

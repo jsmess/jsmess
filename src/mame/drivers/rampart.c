@@ -24,7 +24,7 @@
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "rampart.h"
+#include "includes/rampart.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
 
@@ -59,6 +59,12 @@ static void scanline_update(const device_config *screen, int scanline)
  *  Initialization
  *
  *************************************/
+
+static MACHINE_START( rampart )
+{
+	atarigen_init(machine);
+}
+
 
 static MACHINE_RESET( rampart )
 {
@@ -343,6 +349,7 @@ static MACHINE_DRIVER_START( rampart )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
+	MDRV_MACHINE_START(rampart)
 	MDRV_MACHINE_RESET(rampart)
 	MDRV_NVRAM_HANDLER(atarigen)
 	MDRV_WATCHDOG_VBLANK_INIT(8)

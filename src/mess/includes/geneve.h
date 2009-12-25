@@ -43,5 +43,6 @@ WRITE8_HANDLER ( geneve_w );
 WRITE8_HANDLER ( geneve_peb_mode_cru_w );
 
 extern const tms9901_interface tms9901reset_param_ti99;
+void ti99_clk_interrupt_callback(const device_config *device, int state);
 
 #endif /* GENEVE_H_ */

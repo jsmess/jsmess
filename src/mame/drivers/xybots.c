@@ -21,7 +21,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
-#include "xybots.h"
+#include "includes/xybots.h"
 
 
 
@@ -36,6 +36,12 @@ static void update_interrupts(running_machine *machine)
 	xybots_state *state = (xybots_state *)machine->driver_data;
 	cputag_set_input_line(machine, "maincpu", 1, state->atarigen.video_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 2, state->atarigen.sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+static MACHINE_START( xybots )
+{
+	atarigen_init(machine);
 }
 
 
@@ -193,6 +199,7 @@ static MACHINE_DRIVER_START( xybots )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
+	MDRV_MACHINE_START(xybots)
 	MDRV_MACHINE_RESET(xybots)
 	MDRV_NVRAM_HANDLER(atarigen)
 

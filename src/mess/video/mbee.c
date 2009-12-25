@@ -45,7 +45,7 @@ static UINT8 m6545_video_bank = 0;
 static UINT8 mbee_pcg_color_latch = 0;
 
 UINT8 *mbee_pcgram;
-
+static UINT8 *colorram;
 static UINT8 mc6845_cursor[16];				// cursor shape
 static void mc6845_cursor_configure(void);
 static void mc6845_screen_configure(running_machine *machine);
@@ -79,7 +79,7 @@ WRITE8_HANDLER ( mbee_pcg_color_w )
 	if( (m6545_video_bank & 0x01) || (mbee_pcg_color_latch & 0x40) == 0 )
 		mbee_pcgram[0x0800 | offset] = data;
 	else
-		space->machine->generic.colorram.u8[offset] = data;
+		colorram[offset] = data;
 }
 
 static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
@@ -467,7 +467,7 @@ VIDEO_START( mbeeic )
 {
 	UINT8 *ram = memory_region(machine, "maincpu");
 	machine->generic.videoram.u8 = ram+0x15000;
-	machine->generic.colorram.u8 = ram+0x15800;
+	colorram = ram+0x15800;
 	mbee_pcgram = ram+0x11000;
 }
 
@@ -541,7 +541,7 @@ VIDEO_UPDATE( mbeeic )
 				UINT8 inv=0;
 				mem = (x + screen_home) & 0x7ff;
 				chr = screen->machine->generic.videoram.u8[mem];
-				col = screen->machine->generic.colorram.u8[mem] | colourm;					// read a byte of colour
+				col = colorram[mem] | colourm;					// read a byte of colour
 				if ((x & 15) == 0) keyboard_matrix_r(screen->machine, x);	// actually happens for every scanline of every character, but imposes too much unnecessary overhead */
 
 				/* process cursor */

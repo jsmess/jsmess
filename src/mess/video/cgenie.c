@@ -283,7 +283,7 @@ static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, 
 
 				/* translate defined character sets */
 				code += cgenie_font_offset[(code >> 6) & 3];
-				drawgfx_opaque(bitmap, &r, machine->gfx[0], code, machine->generic.colorram.u8[i&0x3ff],
+				drawgfx_opaque(bitmap, &r, machine->gfx[0], code, cgenie_colorram[i&0x3ff],
 					0, 0, r.min_x, r.min_y);
 			}
 
@@ -312,7 +312,7 @@ static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, 
 				rc.max_x = r.max_x;
 				rc.min_y = r.min_y + (crt.cursor_top & 15);
 				rc.max_y = r.min_y + (crt.cursor_bottom & 15);
-				drawgfx_opaque(bitmap, &rc, machine->gfx[0], 0x7f, machine->generic.colorram.u8[i&0x3ff],
+				drawgfx_opaque(bitmap, &rc, machine->gfx[0], 0x7f, cgenie_colorram[i&0x3ff],
 					0, 0, rc.min_x, rc.min_y);
 			}
 		}
@@ -364,9 +364,9 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 
 				/* translate defined character sets */
 				code += cgenie_font_offset[(code >> 6) & 3];
-				drawgfx_opaque(machine->generic.tmpbitmap, &r, machine->gfx[0], code, machine->generic.colorram.u8[i&0x3ff] + 16,
+				drawgfx_opaque(machine->generic.tmpbitmap, &r, machine->gfx[0], code, cgenie_colorram[i&0x3ff] + 16,
 					0, 0, r.min_x, r.min_y);
-				drawgfx_opaque(dlybitmap, &r, machine->gfx[0], code, machine->generic.colorram.u8[i&0x3ff] + 32,
+				drawgfx_opaque(dlybitmap, &r, machine->gfx[0], code, cgenie_colorram[i&0x3ff] + 32,
 					0, 0, r.min_x, r.min_y);
 			}
 
@@ -396,9 +396,9 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 				rc.min_y = r.min_y + (crt.cursor_top & 15);
 				rc.max_y = r.min_y + (crt.cursor_bottom & 15);
 
-				drawgfx_opaque(machine->generic.tmpbitmap, &rc, machine->gfx[0], 0x7f, machine->generic.colorram.u8[i&0x3ff] + 16,
+				drawgfx_opaque(machine->generic.tmpbitmap, &rc, machine->gfx[0], 0x7f, cgenie_colorram[i&0x3ff] + 16,
 					0, 0, rc.min_x, rc.min_y);
-				drawgfx_opaque(dlybitmap, &rc, machine->gfx[0], 0x7f, machine->generic.colorram.u8[i&0x3ff] + 32,
+				drawgfx_opaque(dlybitmap, &rc, machine->gfx[0], 0x7f, cgenie_colorram[i&0x3ff] + 32,
 					0, 0, rc.min_x, rc.min_y);
 			}
 		}

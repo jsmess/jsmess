@@ -38,7 +38,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/rescap.h"
 #include "sound/discrete.h"
-#include "nitedrvr.h"
+#include "includes/nitedrvr.h"
 
 /* Memory Map */
 
@@ -136,13 +136,15 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( nitedrvr )
 	// basic machine hardware
-	MDRV_CPU_ADD("maincpu", M6502, 12096000/12) // 1 MHz
+	MDRV_CPU_ADD("maincpu", M6502, XTAL_12_096MHz/12) // 1 MHz
 	MDRV_CPU_PROGRAM_MAP(nitedrvr_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_WATCHDOG_VBLANK_INIT(3)
 
 	MDRV_MACHINE_START(nitedrvr)
 	MDRV_MACHINE_RESET(nitedrvr)
+
+	MDRV_TIMER_ADD_PERIODIC("crash_timer", nitedrvr_crash_toggle_callback, NSEC(PERIOD_OF_555_ASTABLE_NSEC(RES_K(180), 330, CAP_U(1))))
 
 	// video hardware
 

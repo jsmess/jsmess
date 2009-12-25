@@ -20,7 +20,7 @@
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
-#include "relief.h"
+#include "includes/relief.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
 
@@ -63,6 +63,12 @@ static WRITE16_HANDLER( relief_atarivc_w )
  *  Initialization
  *
  *************************************/
+
+static MACHINE_START( relief )
+{
+	atarigen_init(machine);
+}
+
 
 static MACHINE_RESET( relief )
 {
@@ -293,6 +299,7 @@ static MACHINE_DRIVER_START( relief )
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
+	MDRV_MACHINE_START(relief)
 	MDRV_MACHINE_RESET(relief)
 	MDRV_NVRAM_HANDLER(atarigen)
 

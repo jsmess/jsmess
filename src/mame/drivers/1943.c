@@ -14,6 +14,13 @@
 
 /*
 
+    SERVICE TEST INFORMATION:
+
+    - To access the unreachable tests (#4-7) in the Service Test, when starting
+    up the machine after it has been set into Test Mode, hold down the left
+    coin switch.
+
+
     TODO:
 
     - use priority PROM for drawing sprites
@@ -24,7 +31,7 @@
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-#include "1943.h"
+#include "includes/1943.h"
 
 
 /* Read/Write Handlers */

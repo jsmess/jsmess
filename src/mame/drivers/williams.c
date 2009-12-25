@@ -497,12 +497,15 @@
 #include "sound/dac.h"
 #include "sound/hc55516.h"
 #include "machine/6821pia.h"
+#include "machine/ticket.h"
 #include "audio/williams.h"
-#include "williams.h"
+#include "includes/williams.h"
 
 
 #define MASTER_CLOCK		(12000000)
 #define SOUND_CLOCK			(3579000)
+
+
 
 /*************************************
  *
@@ -1237,7 +1240,7 @@ static INPUT_PORTS_START( lottofun )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* Used by ticket dispenser */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
 
 	PORT_START("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1432,8 +1435,12 @@ static MACHINE_DRIVER_START( defender )
 	MDRV_CPU_ADD("soundcpu", M6808, SOUND_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(defender_sound_map)
 
+	MDRV_MACHINE_START(defender)
 	MDRV_MACHINE_RESET(defender)
 	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	MDRV_TIMER_ADD("scan_timer", williams_va11_callback)
+	MDRV_TIMER_ADD("240_timer", williams_count240_callback)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
@@ -1477,6 +1484,7 @@ static MACHINE_DRIVER_START( williams )
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
+	MDRV_MACHINE_START(williams)
 	MDRV_MACHINE_RESET(williams)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(6, 298-1, 7, 247-1)
@@ -1520,6 +1528,7 @@ static MACHINE_DRIVER_START( lottofun )
 
 	/* pia */
 	MDRV_PIA6821_MODIFY("pia_0", lottofun_pia_0_intf)
+	MDRV_TICKET_DISPENSER_ADD("ticket", 70, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_DRIVER_END
 
 
@@ -1531,6 +1540,7 @@ static MACHINE_DRIVER_START( alienar )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(williams_map)
 
+	MDRV_MACHINE_START(williams)
 	MDRV_MACHINE_RESET(williams)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(6, 298-1, 7, 247-1)
@@ -1582,6 +1592,7 @@ static MACHINE_DRIVER_START( blaster )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(blaster_map)
 
+	MDRV_MACHINE_START(blaster)
 	MDRV_MACHINE_RESET(blaster)
 
 	/* video hardware */
@@ -1612,8 +1623,12 @@ static MACHINE_DRIVER_START( williams2 )
 	MDRV_CPU_ADD("soundcpu", M6808, MASTER_CLOCK/3)	/* yes, this is different from the older games */
 	MDRV_CPU_PROGRAM_MAP(williams2_sound_map)
 
+	MDRV_MACHINE_START(williams2)
 	MDRV_MACHINE_RESET(williams2)
 	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	MDRV_TIMER_ADD("scan_timer", williams2_va11_callback)
+	MDRV_TIMER_ADD("254_timer", williams2_endscreen_callback)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)

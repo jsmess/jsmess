@@ -21,7 +21,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
-#include "thunderj.h"
+#include "includes/thunderj.h"
 
 
 
@@ -37,6 +37,15 @@ static void update_interrupts(running_machine *machine)
 	cputag_set_input_line(machine, "maincpu", 4, state->atarigen.scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "extra", 4, state->atarigen.scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 6, state->atarigen.sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+static MACHINE_START( thunderj )
+{
+	thunderj_state *state = (thunderj_state *)machine->driver_data;
+	atarigen_init(machine);
+
+	state_save_register_global(machine, state->alpha_tile_bank);
 }
 
 
@@ -284,6 +293,7 @@ static MACHINE_DRIVER_START( thunderj )
 	MDRV_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(extra_map)
 
+	MDRV_MACHINE_START(thunderj)
 	MDRV_MACHINE_RESET(thunderj)
 	MDRV_NVRAM_HANDLER(atarigen)
 

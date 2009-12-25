@@ -11,19 +11,20 @@ colour, including the word "Konami"
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "video/konamiic.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
-#include "konamipt.h"
+#include "video/konicdev.h"
+#include "includes/konamipt.h"
 
-VIDEO_START( asterix );
 VIDEO_UPDATE( asterix );
 WRITE16_HANDLER( asterix_spritebank_w );
 
+extern void asterix_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
+extern void asterix_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask);
+
 static UINT8 cur_control2;
-static int init_eeprom_count;
 
 static const eeprom_interface eeprom_intf =
 {
@@ -36,44 +37,6 @@ static const eeprom_interface eeprom_intf =
 	"1100110000000" /* unlock command */
 };
 
-static NVRAM_HANDLER( asterix )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-		{
-			init_eeprom_count = 0;
-			eeprom_load(file);
-		}
-		else
-			init_eeprom_count = 10;
-	}
-}
-
-static READ16_HANDLER( control1_r )
-{
-	int res;
-
-	/* bit 8  is EEPROM data */
-	/* bit 9  is EEPROM ready */
-	/* bit 10 is service button */
-	res = input_port_read(space->machine, "IN1");
-
-	if (init_eeprom_count)
-	{
-		init_eeprom_count--;
-		res &= 0xfbff;
-	}
-
-	return res;
-}
-
-
-
 #if 0
 static READ16_HANDLER( control2_r )
 {
@@ -83,26 +46,27 @@ static READ16_HANDLER( control2_r )
 
 static WRITE16_HANDLER( control2_w )
 {
+	const device_config *k056832 = devtag_get_device(space->machine, "k056832");
+
 	if (ACCESSING_BITS_0_7)
 	{
 		cur_control2 = data;
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-
-		eeprom_write_bit(data & 0x01);
-		eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 
 		/* bit 5 is select tile bank */
-		K056832_set_tile_bank((data & 0x20) >> 5);
+		k056832_set_tile_bank(k056832, (data & 0x20) >> 5);
 	}
 }
 
 static INTERRUPT_GEN( asterix_interrupt )
 {
+	const device_config *k056832 = devtag_get_device(device->machine, "k056832");
+
 	// global interrupt masking
-	if (!K056832_is_IRQ_enabled(0)) return;
+	if (!k056832_is_irq_enabled(k056832, 0)) return;
 
 	cpu_set_input_line(device, 5, HOLD_LINE); /* ??? All irqs have the same vector, and the
                                               mask used is 0 or 7 */
@@ -179,24 +143,24 @@ static WRITE16_HANDLER( protection_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
-	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE(K053245_word_r, K053245_word_w)
+	AM_RANGE(0x180000, 0x1807ff) AM_DEVREADWRITE("k053244", k053245_word_r, k053245_word_w)
 	AM_RANGE(0x180800, 0x180fff) AM_RAM								// extra RAM, or mirror for the above?
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(K053244_word_r, K053244_word_w)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("k053244", k053244_word_r, k053244_word_w)
 	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x300000, 0x30001f) AM_READWRITE(K053244_lsb_r, K053244_lsb_w)
+	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE("k053244", k053244_lsb_r, k053244_lsb_w)
 	AM_RANGE(0x380000, 0x380001) AM_READ_PORT("IN0")
-	AM_RANGE(0x380002, 0x380003) AM_READ(control1_r)
+	AM_RANGE(0x380002, 0x380003) AM_READ_PORT("IN1")
 	AM_RANGE(0x380100, 0x380101) AM_WRITE(control2_w)
 	AM_RANGE(0x380200, 0x380203) AM_DEVREADWRITE8("konami", asterix_sound_r, k053260_w, 0x00ff)
 	AM_RANGE(0x380300, 0x380301) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x380400, 0x380401) AM_WRITE(asterix_spritebank_w)
-	AM_RANGE(0x380500, 0x38051f) AM_WRITE(K053251_lsb_w)
+	AM_RANGE(0x380500, 0x38051f) AM_DEVWRITE("k053251", k053251_lsb_w)
 	AM_RANGE(0x380600, 0x380601) AM_NOP								// Watchdog
-	AM_RANGE(0x380700, 0x380707) AM_WRITE(K056832_b_word_w)
+	AM_RANGE(0x380700, 0x380707) AM_DEVWRITE("k056832", k056832_b_word_w)
 	AM_RANGE(0x380800, 0x380803) AM_WRITE(protection_w)
-	AM_RANGE(0x400000, 0x400fff) AM_READWRITE(K056832_ram_half_word_r, K056832_ram_half_word_w)
-	AM_RANGE(0x420000, 0x421fff) AM_READ(K056832_old_rom_word_r)	// Passthrough to tile roms
-	AM_RANGE(0x440000, 0x44003f) AM_WRITE(K056832_word_w)
+	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("k056832", k056832_ram_half_word_r, k056832_ram_half_word_w)
+	AM_RANGE(0x420000, 0x421fff) AM_DEVREAD("k056832", k056832_old_rom_word_r)	// Passthrough to tile roms
+	AM_RANGE(0x440000, 0x44003f) AM_DEVWRITE("k056832", k056832_word_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -220,11 +184,35 @@ static INPUT_PORTS_START( asterix )
 
 	PORT_START("IN1")
 	KONAMI16_LSB(2, IPT_UNKNOWN, IPT_START2)
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	// EEPROM data
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNUSED )	// EEPROM ready (always 1)
 	PORT_SERVICE_NO_TOGGLE(0x0400, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 INPUT_PORTS_END
+
+
+static const k056832_interface asterix_k056832_intf =
+{
+	"gfx1", 0,
+	K056832_BPP_4,
+	1, 1,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	asterix_tile_callback, "none"
+};
+
+static const k05324x_interface asterix_k05324x_intf =
+{
+	"gfx2", 1,
+	NORMAL_PLANE_ORDER,
+	-3, -1,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	asterix_sprite_callback
+};
 
 static MACHINE_DRIVER_START( asterix )
 
@@ -236,7 +224,7 @@ static MACHINE_DRIVER_START( asterix )
 	MDRV_CPU_ADD("audiocpu", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_NVRAM_HANDLER(asterix)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -249,8 +237,11 @@ static MACHINE_DRIVER_START( asterix )
 	MDRV_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(asterix)
 	MDRV_VIDEO_UPDATE(asterix)
+
+	MDRV_K056832_ADD("k056832", asterix_k056832_intf)
+	MDRV_K053244_ADD("k053244", asterix_k05324x_intf)
+	MDRV_K053251_ADD("k053251")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -356,9 +347,6 @@ ROM_END
 
 static DRIVER_INIT( asterix )
 {
-	konami_rom_deinterleave_2(machine, "gfx1");
-	konami_rom_deinterleave_2(machine, "gfx2");
-
 #if 0
 	*(UINT16 *)(memory_region(machine, "maincpu") + 0x07f34) = 0x602a;
 	*(UINT16 *)(memory_region(machine, "maincpu") + 0x00008) = 0x0400;

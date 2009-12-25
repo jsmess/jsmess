@@ -452,7 +452,7 @@ or Fatal Fury for example).
 #include "cpu/nec/nec.h"
 #include "deprecat.h"
 #include "cpu/mips/mips3.h"
-#include "hng64.h"
+#include "includes/hng64.h"
 
 int hng64_mcu_type = 0;
 static UINT32 fake_mcu_time;
@@ -472,7 +472,7 @@ extern UINT32 *hng64_videoram;
 extern UINT32 *hng64_tcram;
 extern UINT32 *hng64_3dregs;
 
-extern UINT32 hng64_dls[2][0x81];
+extern void hng64_command3d(running_machine* machine, const UINT16* packet);
 
 extern UINT8 hng64_screen_dis;
 
@@ -621,9 +621,9 @@ static READ32_HANDLER( hng64_sysregs_r )
 /* preliminary dma code, dma is used to copy program code -> ram */
 static INT32 hng_dma_start,hng_dma_dst,hng_dma_len;
 
-static void hng64_do_dma (const address_space *space)
+static void hng64_do_dma(const address_space *space)
 {
-	printf("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
+	//printf("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
 
 	while (hng_dma_len>=0)
 	{
@@ -659,6 +659,9 @@ static WRITE32_HANDLER( hng64_sysregs_w )
 
 	switch(offset*4)
 	{
+		//case 0x100c: Extremely likely to be involved with the ROZ groundplane.
+		//             Probably tells the groundplane which scanline to start drawing at.
+
 		case 0x1084: //MIPS->MCU latch port
 			hng_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
 			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
@@ -869,19 +872,42 @@ static WRITE32_HANDLER( hng64_3d_2_w )
 
 
 
-// The 3d 'display list'
-// is it a fifo?
+// The 3d 'display list' - is it a fifo?
 // sams64 / sams64_2 access it in a very different way to fatal fury...
 static WRITE32_HANDLER( dl_w )
 {
-	COMBINE_DATA (&hng64_dl[offset]);
+	int i;
+	UINT16 packet3d[16];
+
+	COMBINE_DATA(&hng64_dl[offset]);
+
+	if (offset == 0x08 || offset == 0x7f ||	// Special buggers.
+		offset == 0x10 || offset == 0x18 ||
+		offset == 0x20 || offset == 0x28 ||
+		offset == 0x30 || offset == 0x38 ||
+		offset == 0x40 || offset == 0x48 ||
+		offset == 0x50 || offset == 0x58 ||
+		offset == 0x60 || offset == 0x68 ||
+		offset == 0x70 || offset == 0x78)
+	{
+		// Create a 3d packet
+		UINT16 packetStart = offset - 0x08;
+		if (offset == 0x7f) packetStart += 1;
+
+		for (i = 0; i < 0x08; i++)
+		{
+			packet3d[i*2+0] = (hng64_dl[packetStart+i] & 0xffff0000) >> 16;
+			packet3d[i*2+1] = (hng64_dl[packetStart+i] & 0x0000ffff);
+		}
+
+		// Send it off to the 3d subsystem.
+		hng64_command3d(space->machine, packet3d);
+	}
 }
 
 #if 0
 static READ32_HANDLER( dl_r )
 {
-
-
 //  mame_printf_debug("dl R (%08x) : %x %x\n", cpu_get_pc(space->cpu), offset, hng64_dl[offset]);
 //  usrintf_showmessage("dl R (%08x) : %x %x", cpu_get_pc(space->cpu), offset, hng64_dl[offset]);
 	return hng64_dl[offset];
@@ -894,14 +920,18 @@ static READ32_HANDLER( dl_r )
 // Some kind of buffering of the display lists, or 'render current buffer' write?
 static WRITE32_HANDLER( dl_control_w )
 {
-	if (activeBuffer==0 || activeBuffer==1)
-		memcpy(&hng64_dls[activeBuffer][0],&hng64_dl[0],0x200);
+	//printf("\n");   // Debug - ajg
+	// TODO: put this back in.
+	/*
+    if (activeBuffer==0 || activeBuffer==1)
+        memcpy(&hng64_dls[activeBuffer][0],&hng64_dl[0],0x200);
 
-	// Only if it's VALID (hack)
-	if (data & 1)
-		activeBuffer = 0;
-	if (data & 2)
-		activeBuffer = 1;
+    // Only if it's VALID (hack)
+    if (data & 1)
+        activeBuffer = 0;
+    if (data & 2)
+        activeBuffer = 1;
+    */
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1070,11 +1100,12 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x2000d800, 0x2000e3ff) AM_WRITE(hng64_sprite_clear_even_w)
 	AM_RANGE(0x2000e400, 0x2000efff) AM_WRITE(hng64_sprite_clear_odd_w)
 	AM_RANGE(0x20010000, 0x20010013) AM_RAM AM_BASE(&hng64_spriteregs)
-	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_BASE(&hng64_videoram)// Tilemap
+	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_BASE(&hng64_videoram)	// Tilemap
 	AM_RANGE(0x20190000, 0x20190037) AM_RAM AM_BASE(&hng64_videoregs)
 	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE(&hng64_tcram)	// Transition Control
-	AM_RANGE(0x20300000, 0x203001ff) AM_RAM_WRITE(dl_w) AM_BASE(&hng64_dl)		// 3d Display List
+	AM_RANGE(0x20300000, 0x203001ff) AM_RAM_WRITE(dl_w) AM_BASE(&hng64_dl)	// 3d Display List
+//  AM_RANGE(0x20300200, 0x20300213) AM_RAM_WRITE(xxxx) AM_BASE(&xxxxxxxx)  // 3d Display List Upload?
 	AM_RANGE(0x20300214, 0x20300217) AM_WRITE(dl_control_w)
 	AM_RANGE(0x20300218, 0x2030021b) AM_READ(unk_vreg_r)
 
@@ -1698,6 +1729,10 @@ static DRIVER_INIT( hng64 )
 //  hng64_patch_bios_region(machine, 4); // 'Others'
 #endif
 
+	/* 1 meg of virtual address space for the com cpu */
+	hng64_com_virtual_mem = auto_alloc_array(machine, UINT8, 0x100000);
+	hng64_com_op_base     = auto_alloc_array(machine, UINT8, 0x10000);
+
 	hng64_soundram=auto_alloc_array(machine, UINT16, 0x200000/2);
 	DRIVER_INIT_CALL(hng64_reorder_gfx);
 }
@@ -1710,6 +1745,7 @@ static DRIVER_INIT(hng64_fght)
 
 static DRIVER_INIT( fatfurwa )
 {
+	/* FILE* fp = fopen("/tmp/test.bin", "wb"); fwrite(memory_region(machine, "verts"), 1, 0x0c00000*2, fp); fclose(fp); */
 	DRIVER_INIT_CALL(hng64_fght);
 	hng64_mcu_type = FIGHT_MCU;
 }
@@ -1803,10 +1839,6 @@ static MACHINE_RESET(hyperneo)
 	/* Comm CPU */
 	KL5C80_init();
 
-	/* 1 meg of virtual address space for the com cpu */
-	hng64_com_virtual_mem = auto_alloc_array(machine, UINT8, 0x100000);
-	hng64_com_op_base     = auto_alloc_array(machine, UINT8, 0x10000);
-
 	/* Fill up virtual memory with ROM */
 	for (i = 0x0; i < 0x100000; i++)
 		hng64_com_virtual_mem[i] = rom[i];
@@ -1861,6 +1893,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( hng64 )
+	/* BIOS */
 	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
 	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
 	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS and unknown ROM */
@@ -1876,9 +1909,9 @@ ROM_START( hng64 )
 	ROM_REGION( 0x1000000, "samples", ROMREGION_ERASEFF ) /* Sound Samples? */
 ROM_END
 
+
 /* roads edge might need a different bios (driving board bios?) */
 ROM_START( roadedge )
-
 	/* BIOS */
 	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
 	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
@@ -1937,7 +1970,6 @@ ROM_START( roadedge )
 ROM_END
 
 
-
 ROM_START( sams64 )
 	/* BIOS */
 	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
@@ -1982,7 +2014,6 @@ ROM_START( sams64 )
 	ROM_LOAD( "002-tx02a.14", 0x0400000, 0x400000, CRC(d5074be2) SHA1(c33e9b9f0d21ad5ad31d8f988b3c7378d374fc1b) )
 	ROM_LOAD( "002-tx03a.15", 0x0800000, 0x400000, CRC(68c313f7) SHA1(90ce8d0d19a994647c7167e3b256ff31647e575a) )
 	ROM_LOAD( "002-tx04a.16", 0x0c00000, 0x400000, CRC(f7dac24f) SHA1(1215354f28cbeb9fc38f6a7acae450ad5f34bb6a) )
-
 
 	/* X,Y,Z Vertex ROMs */
 	ROM_REGION( 0x1800000, "verts", 0 )
@@ -2181,7 +2212,6 @@ ROM_END
 
 
 ROM_START( fatfurwa )
-
 	/* BIOS */
 	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
 	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
@@ -2239,7 +2269,7 @@ ROM_START( fatfurwa )
 	ROM_LOAD( "006tx04a.16",0x0c00000, 0x400000, CRC(82d61652) SHA1(28303ae9e2545a4cb0b5843f9e73407754f41e9e) )
 
 	/* X,Y,Z Vertex ROMs */
-	ROM_REGION16_BE( 0x0c00000, "verts", 0 )
+	ROM_REGION( 0x0c00000, "verts", 0 )
 	ROMX_LOAD( "006vt01a.17", 0x0000000, 0x400000, CRC(5c20ed4c) SHA1(df679f518292d70b9f23d2bddabf975d56b96910), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "006vt02a.18", 0x0000002, 0x400000, CRC(150eb717) SHA1(9acb067346eb386256047c0f1d24dc8fcc2118ca), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "006vt03a.19", 0x0000004, 0x400000, CRC(021cfcaf) SHA1(fb8b5f50d3490b31f0a4c3e6d3ae1b98bae41c97), ROM_GROUPWORD | ROM_SKIP(4) )
@@ -2311,7 +2341,7 @@ ROM_START( buriki )
 	ROM_LOAD( "007tx04a.16",0x0c00000, 0x400000, CRC(02aa3f46) SHA1(1fca89c70586f8ebcdf669ecac121afa5cdf623f) )
 
 	/* X,Y,Z Vertex ROMs */
-	ROM_REGION16_BE( 0x0c00000, "verts", 0 )
+	ROM_REGION( 0x0c00000, "verts", 0 )
 	ROMX_LOAD( "007vt01a.17", 0x0000000, 0x400000, CRC(f78a0376) SHA1(fde4ddd4bf326ae5f1ed10311c237b13b62e060c), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "007vt02a.18", 0x0000002, 0x400000, CRC(f365f608) SHA1(035fd9b829b7720c4aee6fdf204c080e6157994f), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "007vt03a.19", 0x0000004, 0x400000, CRC(ba05654d) SHA1(b7fe532732c0af7860c8eded3c5abd304d74e08e), ROM_GROUPWORD | ROM_SKIP(4) )

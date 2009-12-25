@@ -87,10 +87,10 @@ void ti99_ide_interrupt(const device_config *device, int state)
 
     clock interrupt callback
 */
-static void clk_interrupt_callback(running_machine *machine, int state)
+void ti99_clk_interrupt_callback(const device_config *device, int state)
 {
 	clk_irq = state;
-	ti99_peb_set_ila_bit(machine, inta_ide_clk_bit, state);
+	ti99_peb_set_ila_bit(device->machine, inta_ide_clk_bit, state);
 }
 
 /*
@@ -98,7 +98,7 @@ static void clk_interrupt_callback(running_machine *machine, int state)
 */
 void ti99_ide_init(running_machine *machine)
 {
-	rtc65271_init(machine, memory_region(machine, region_dsr) + offset_ide_ram2, clk_interrupt_callback);
+//	rtc65271_init(machine, memory_region(machine, region_dsr) + offset_ide_ram2, clk_interrupt_callback);
 	ti99_ide_RAM = memory_region(machine, region_dsr) + offset_ide_ram;
 }
 
@@ -114,46 +114,6 @@ void ti99_ide_reset(running_machine *machine, int in_tms9995_mode)
 	cru_register = 0;
 
 	tms9995_mode = in_tms9995_mode;
-}
-
-int ti99_ide_load_memcard(running_machine *machine)
-{
-	file_error filerr;
-	mame_file *file;
-
-	filerr = mame_fopen(SEARCHPATH_MEMCARD, "ide.nv", OPEN_FLAG_READ, &file);
-	if (filerr != FILERR_NONE)
-		return /*1*/0;
-	if (rtc65271_file_load(machine, file))
-	{
-		mame_fclose(file);
-		return 1;
-	}
-
-	mame_fclose(file);
-	return 0;
-}
-
-int ti99_ide_save_memcard(void)
-{
-	file_error filerr;
-	mame_file *file;
-
-	/*if (ti99_ide_get_dirty_flag())*/
-	{
-		filerr = mame_fopen(SEARCHPATH_MEMCARD, "ide.nv", OPEN_FLAG_WRITE, &file);
-		if (filerr != FILERR_NONE)
-			return 1;
-		if (rtc65271_file_save(file))
-		{
-			mame_fclose(file);
-			return 1;
-		}
-
-		mame_fclose(file);
-	}
-
-	return 0;
 }
 
 /*
@@ -224,7 +184,7 @@ static void ide_cru_w(running_machine *machine, int offset, int data)
 static READ8_HANDLER(ide_mem_r)
 {
 	int reply = 0;
-
+	const device_config *ide_rtc = devtag_get_device(space->machine, "ide_rtc");
 
 	if ((offset <= 0xff) && (sram_enable == sram_enable_dip))
 	{	/* registers */
@@ -233,18 +193,18 @@ static READ8_HANDLER(ide_mem_r)
 		case 0:		/* RTC RAM */
 			if (offset & 0x80)
 				/* RTC RAM page register */
-				reply = rtc65271_r(1, (offset & 0x1f) | 0x20);
+				reply = rtc65271_xram_r(ide_rtc, (offset & 0x1f) | 0x20);
 			else
 				/* RTC RAM read */
-				reply = rtc65271_r(1, offset);
+				reply = rtc65271_xram_r(ide_rtc, offset);
 			break;
 		case 1:		/* RTC registers */
 			if (offset & 0x10)
 				/* register data */
-				reply = rtc65271_r(0, 1);
+				reply = rtc65271_rtc_r(ide_rtc, 1);
 			else
 				/* register select */
-				reply = rtc65271_r(0, 0);
+				reply = rtc65271_rtc_r(ide_rtc, 0);
 			break;
 		case 2:		/* IDE registers set 1 (CS1Fx) */
 			if (tms9995_mode ? (!(offset & 1)) : (offset & 1))
@@ -288,6 +248,8 @@ static READ8_HANDLER(ide_mem_r)
 */
 static WRITE8_HANDLER(ide_mem_w)
 {
+	const device_config *ide_rtc = devtag_get_device(space->machine, "ide_rtc");
+
 	if (cru_register & cru_reg_page_switching)
 	{
 		cur_page = (offset >> 1) & page_mask;
@@ -300,18 +262,18 @@ static WRITE8_HANDLER(ide_mem_w)
 		case 0:		/* RTC RAM */
 			if (offset & 0x80)
 				/* RTC RAM page register */
-				rtc65271_w(1, (offset & 0x1f) | 0x20, data);
+				rtc65271_xram_w(ide_rtc,(offset & 0x1f) | 0x20, data);
 			else
 				/* RTC RAM write */
-				rtc65271_w(1, offset, data);
+				rtc65271_xram_w(ide_rtc,offset, data);
 			break;
 		case 1:		/* RTC registers */
 			if (offset & 0x10)
 				/* register data */
-				rtc65271_w(0, 1, data);
+				rtc65271_rtc_w(ide_rtc, 1, data);
 			else
 				/* register select */
-				rtc65271_w(0, 0, data);
+				rtc65271_rtc_w(ide_rtc, 0, data);
 			break;
 		case 2:		/* IDE registers set 1 (CS1Fx) */
 #if 0

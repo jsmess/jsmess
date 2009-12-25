@@ -21,7 +21,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
-#include "toobin.h"
+#include "includes/toobin.h"
 
 #define MASTER_CLOCK		XTAL_32MHz
 
@@ -39,6 +39,12 @@ static void update_interrupts(running_machine *machine)
 	cputag_set_input_line(machine, "maincpu", 1, state->atarigen.scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 2, state->atarigen.sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 3, state->atarigen.scanline_int_state && state->atarigen.sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+static MACHINE_START( toobin )
+{
+	atarigen_init(machine);
 }
 
 
@@ -224,6 +230,7 @@ static MACHINE_DRIVER_START( toobin )
 	MDRV_CPU_ADD("maincpu", M68010, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
+	MDRV_MACHINE_START(toobin)
 	MDRV_MACHINE_RESET(toobin)
 	MDRV_NVRAM_HANDLER(atarigen)
 	MDRV_WATCHDOG_VBLANK_INIT(8)

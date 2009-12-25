@@ -37,12 +37,12 @@
 
 #include "driver.h"
 
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/k054539.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
 
 VIDEO_START( rng );
 VIDEO_UPDATE( rng );
@@ -52,9 +52,9 @@ WRITE16_HANDLER( rng_ttl_ram_w );
 WRITE16_HANDLER( rng_936_videoram_w );
 
 extern UINT16 *rng_936_videoram;
+extern void rng_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask);
 
 static UINT16 *rng_sysreg;
-static int init_eeprom_count;
 static int rng_z80_control;
 static int rng_sound_status;
 
@@ -69,24 +69,6 @@ static const eeprom_interface eeprom_intf =
 	"0100110000000" /* unlock command */
 };
 
-static NVRAM_HANDLER( rungun )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-		{
-			init_eeprom_count = 0;
-			eeprom_load(file);
-		}
-		else
-			init_eeprom_count = 10;
-	}
-}
-
 static READ16_HANDLER( rng_sysregs_r )
 {
 	UINT16 data = 0;
@@ -95,20 +77,20 @@ static READ16_HANDLER( rng_sysregs_r )
 	{
 		case 0x00/2:
 			if (input_port_read(space->machine, "DSW") & 0x20)
-				return(input_port_read(space->machine, "P1") | input_port_read(space->machine, "P3")<<8);
+				return(input_port_read(space->machine, "P1") | input_port_read(space->machine, "P3") << 8);
 			else
 			{
 				data = input_port_read(space->machine, "P1") & input_port_read(space->machine, "P3");
-				return(data<<8 | data);
+				return(data << 8 | data);
 			}
 
 		case 0x02/2:
 			if (input_port_read(space->machine, "DSW") & 0x20)
-				return(input_port_read(space->machine, "P2") | input_port_read(space->machine, "P4")<<8);
+				return(input_port_read(space->machine, "P2") | input_port_read(space->machine, "P4") << 8);
 			else
 			{
 				data = input_port_read(space->machine, "P2") & input_port_read(space->machine, "P4");
-				return(data<<8 | data);
+				return(data << 8 | data);
 			}
 
 		case 0x04/2:
@@ -123,12 +105,6 @@ static READ16_HANDLER( rng_sysregs_r )
 			if (ACCESSING_BITS_0_7)
 			{
 				data = input_port_read(space->machine, "DSW");
-
-				if (init_eeprom_count)
-				{
-					init_eeprom_count--;
-					data &= 0xf7;
-				}
 			}
 			return((rng_sysreg[0x06/2] & 0xff00) | data);
 	}
@@ -138,6 +114,7 @@ static READ16_HANDLER( rng_sysregs_r )
 
 static WRITE16_HANDLER( rng_sysregs_w )
 {
+	const device_config *k055673 = devtag_get_device(space->machine, "k055673");
 	COMBINE_DATA(rng_sysreg + offset);
 
 	switch (offset)
@@ -153,9 +130,7 @@ static WRITE16_HANDLER( rng_sysregs_w )
             */
 			if (ACCESSING_BITS_0_7)
 			{
-				eeprom_write_bit((data & 0x01) ? 1 : 0);
-				eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-				eeprom_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+				input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 			}
 
 			if (!(data & 0x40))
@@ -169,7 +144,7 @@ static WRITE16_HANDLER( rng_sysregs_w )
                 bit 2 : OBJCHA
                 bit 3 : enable IRQ 5
             */
-			K053246_set_OBJCHA_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+			k053246_set_objcha_line(k055673, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	}
 }
@@ -212,25 +187,25 @@ static ADDRESS_MAP_START( rungun_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x380000, 0x39ffff) AM_RAM											// work RAM
 	AM_RANGE(0x400000, 0x43ffff) AM_READNOP	// AM_READ( K053936_0_rom_r )       // '936 ROM readback window
 	AM_RANGE(0x480000, 0x48001f) AM_READWRITE(rng_sysregs_r,rng_sysregs_w) AM_BASE(&rng_sysreg)
-	AM_RANGE(0x4c0000, 0x4c001f) AM_READ(K053252_word_r)						// CCU (for scanline and vblank polling)
+	AM_RANGE(0x4c0000, 0x4c001f) AM_DEVREAD("k053252", k053252_word_r)						// CCU (for scanline and vblank polling)
 	AM_RANGE(0x540000, 0x540001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x58000c, 0x58000d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x58000e, 0x58000f) AM_WRITE(sound_cmd2_w)
 	AM_RANGE(0x580014, 0x580015) AM_READ(sound_status_msb_r)
 	AM_RANGE(0x580000, 0x58001f) AM_RAM											// sound regs read/write fall-through
-	AM_RANGE(0x5c0000, 0x5c000d) AM_READ(K053246_word_r)						// 246A ROM readback window
-	AM_RANGE(0x5c0010, 0x5c001f) AM_WRITE(K053247_reg_word_w)
-	AM_RANGE(0x600000, 0x600fff) AM_READWRITE(K053247_word_r,K053247_word_w)	// OBJ RAM
+	AM_RANGE(0x5c0000, 0x5c000d) AM_DEVREAD("k055673", k053246_word_r)						// 246A ROM readback window
+	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVWRITE("k055673", k053247_reg_word_w)
+	AM_RANGE(0x600000, 0x600fff) AM_DEVREADWRITE("k055673", k053247_word_r, k053247_word_w)	// OBJ RAM
 	AM_RANGE(0x601000, 0x601fff) AM_RAM											// communication? second monitor buffer?
-	AM_RANGE(0x640000, 0x640007) AM_WRITE(K053246_word_w)						// '246A registers
-	AM_RANGE(0x680000, 0x68001f) AM_WRITEONLY AM_BASE(&K053936_0_ctrl)			// '936 registers
+	AM_RANGE(0x640000, 0x640007) AM_DEVWRITE("k055673", k053246_word_w)						// '246A registers
+	AM_RANGE(0x680000, 0x68001f) AM_DEVWRITE("k053936", k053936_ctrl_w)			// '936 registers
 	AM_RANGE(0x6c0000, 0x6cffff) AM_RAM_WRITE(rng_936_videoram_w) AM_BASE(&rng_936_videoram)	// PSAC2 ('936) RAM (34v + 35v)
-	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_BASE(&K053936_0_linectrl)			// PSAC "Line RAM"
+	AM_RANGE(0x700000, 0x7007ff) AM_DEVREADWRITE("k053936", k053936_linectrl_r, k053936_linectrl_w)			// PSAC "Line RAM"
 	AM_RANGE(0x740000, 0x741fff) AM_READWRITE(rng_ttl_ram_r,rng_ttl_ram_w)		// text plane RAM
 	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITENOP									// watchdog
 #if RNG_DEBUG
-	AM_RANGE(0x5c0010, 0x5c001f) AM_READ(K053247_reg_word_r)
-	AM_RANGE(0x640000, 0x640007) AM_READ(K053246_reg_word_r)
+	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVREAD("k055673", k053247_reg_word_r)
+	AM_RANGE(0x640000, 0x640007) AM_DEVREAD("k055673", k053246_reg_word_r)
 #endif
 ADDRESS_MAP_END
 
@@ -277,10 +252,62 @@ static ADDRESS_MAP_START( rungun_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static const k054539_interface k054539_config =
-{
-	"shared"
-};
+static INPUT_PORTS_START( rng )
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
+	PORT_DIPNAME( 0x0100, 0x0000, "Freeze" )
+	PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x0100, DEF_STR( On ) )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x10, 0x00, "Monitors" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPNAME( 0x20, 0x00, "Number of players" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPNAME( 0x40, 0x00, "Sound Output" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Mono ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
+	PORT_DIPNAME( 0x04, 0x04, "Bit2 (Unknown)" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Bit7 (Unknown)" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+
+	PORT_START("P1")
+	KONAMI8_B123_START(1)
+
+	PORT_START("P2")
+	KONAMI8_B123_START(2)
+
+	PORT_START("P3")
+	KONAMI8_B123_START(3)
+
+	PORT_START("P4")
+	KONAMI8_B123_START(4)
+INPUT_PORTS_END
+
+
 
 /**********************************************************************************/
 
@@ -301,6 +328,30 @@ static GFXDECODE_START( rungun )
 	GFXDECODE_ENTRY( "gfx1", 0, bglayout, 0x0000, 64 )
 GFXDECODE_END
 
+
+
+static const k054539_interface k054539_config =
+{
+	"shared"
+};
+
+
+static const k053936_interface rng_k053936_intf =
+{
+	0, 34, 9
+};
+
+static const k053247_interface rng_k055673_intf =
+{
+	"screen",
+	"gfx2", 1,
+	K055673_LAYOUT_RNG,
+	-8, 15,
+	KONAMI_ROM_DEINTERLEAVE_NONE,	// there is some interleave in VIDEO_START...
+	rng_sprite_callback
+};
+
+
 static MACHINE_DRIVER_START( rng )
 
 	/* basic machine hardware */
@@ -317,7 +368,8 @@ static MACHINE_DRIVER_START( rng )
 	MDRV_GFXDECODE(rungun)
 
 	MDRV_MACHINE_RESET(rng)
-	MDRV_NVRAM_HANDLER(rungun)
+
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_BEFORE_VBLANK)
@@ -334,6 +386,10 @@ static MACHINE_DRIVER_START( rng )
 	MDRV_VIDEO_START(rng)
 	MDRV_VIDEO_UPDATE(rng)
 
+	MDRV_K053936_ADD("k053936", rng_k053936_intf)
+	MDRV_K055673_ADD("k055673", rng_k055673_intf)
+	MDRV_K053252_ADD("k053252")
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -347,56 +403,6 @@ static MACHINE_DRIVER_START( rng )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
-
-static INPUT_PORTS_START( rng )
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
-	PORT_DIPNAME( 0x0100, 0x0000, "Freeze" )
-	PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x0100, DEF_STR( On ) )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("DSW")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x10, 0x00, "Monitors" )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x10, "2" )
-	PORT_DIPNAME( 0x20, 0x00, "Number of players" )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0x20, "4" )
-	PORT_DIPNAME( 0x40, 0x00, "Sound Output" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Mono ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
-	PORT_DIPNAME( 0x04, 0x04, "Bit2 (Unknown)" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Bit7 (Unknown)" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("P1")
-	KONAMI8_B123_START(1)
-
-	PORT_START("P2")
-	KONAMI8_B123_START(2)
-
-	PORT_START("P3")
-	KONAMI8_B123_START(3)
-
-	PORT_START("P4")
-	KONAMI8_B123_START(4)
-INPUT_PORTS_END
 
 
 ROM_START( rungun )
@@ -597,7 +603,6 @@ static MACHINE_RESET( rng )
 
 	memset(rng_sysreg, 0, 0x20);
 
-	init_eeprom_count = 0;
 	rng_z80_control = 0;
 	rng_sound_status = 0;
 }

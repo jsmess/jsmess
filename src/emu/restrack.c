@@ -13,6 +13,7 @@
 #include "pool.h"
 #include "timer.h"
 #include "state.h"
+#include "mame.h"
 
 
 
@@ -143,7 +144,6 @@ void begin_resource_tracking(void)
 	pool_type_register(new_pool, OBJTYPE_ASTRING, "String", astring_destructor);
 	pool_type_register(new_pool, OBJTYPE_BITMAP, "Bitmap", bitmap_destructor);
 	pool_type_register(new_pool, OBJTYPE_TIMER, "Timer", timer_destructor);
-	pool_type_register(new_pool, OBJTYPE_STATEREG, "Save State Registration", state_destructor);
 
 	/* increment the tag counter */
 	resource_tracking_tag++;
@@ -188,6 +188,7 @@ static object_pool *current_pool(void)
 
 void *restrack_register_object(object_type type, void *ptr, size_t size, const char *file, int line)
 {
+if (resource_tracking_tag == 2) mame_printf_warning("restrack_register_object(%p,%ld) called within reset scope by %s, line %d\n", ptr, (long) size, file, line);
 	return pool_object_add_file_line(current_pool(), type, ptr, size, file, line);
 }
 
@@ -200,6 +201,7 @@ void *restrack_register_object(object_type type, void *ptr, size_t size, const c
 void *auto_malloc_file_line(running_machine *machine, size_t size, const char *file, int line)
 {
 	void *result = pool_malloc_file_line(current_pool(), size, file, line);
+if (resource_tracking_tag == 2) mame_printf_warning("auto_malloc(%ld) called within reset scope by %s, line %d\n", (long) size, file, line);
 #ifdef MAME_DEBUG
 	rand_memory(result, size);
 #endif
@@ -226,6 +228,7 @@ void *auto_realloc_file_line(running_machine *machine, void *ptr, size_t size, c
 		}
 		assert_always(tag > 0, "Failed to find alloc in pool");
 	}
+else if (resource_tracking_tag == 2) mame_printf_warning("auto_realloc(%p, %ld) called within reset scope by %s, line %d\n", ptr, (long) size, file, line);
 
 	return pool_realloc_file_line(pool, ptr, size, file, line);
 }
@@ -238,6 +241,7 @@ void *auto_realloc_file_line(running_machine *machine, void *ptr, size_t size, c
 
 char *auto_strdup_file_line(running_machine *machine, const char *str, const char *file, int line)
 {
+if (resource_tracking_tag == 2) mame_printf_warning("auto_strdup() called within reset scope by %s, line %d\n", file, line);
 	return pool_strdup_file_line(current_pool(), str, file, line);
 }
 
@@ -249,6 +253,7 @@ char *auto_strdup_file_line(running_machine *machine, const char *str, const cha
 
 char *auto_strdup_allow_null_file_line(running_machine *machine, const char *str, const char *file, int line)
 {
+if (resource_tracking_tag == 2) mame_printf_warning("auto_strdup_allow_null() called within reset scope by %s, line %d\n", file, line);
 	return (str != NULL) ? auto_strdup_file_line(machine, str, file, line) : NULL;
 }
 
@@ -260,6 +265,7 @@ char *auto_strdup_allow_null_file_line(running_machine *machine, const char *str
 
 astring *auto_astring_alloc_file_line(running_machine *machine, const char *file, int line)
 {
+if (resource_tracking_tag == 2) mame_printf_warning("auto_astring_alloc() called within reset scope by %s, line %d\n", file, line);
 	return (astring *)restrack_register_object(OBJTYPE_ASTRING, astring_alloc(), 0, file, line);
 }
 
@@ -271,6 +277,7 @@ astring *auto_astring_alloc_file_line(running_machine *machine, const char *file
 
 bitmap_t *auto_bitmap_alloc_file_line(running_machine *machine, int width, int height, bitmap_format format, const char *file, int line)
 {
+if (resource_tracking_tag == 2) mame_printf_warning("auto_bitmap_alloc(%d,%d) called within reset scope by %s, line %d\n", width, height, file, line);
 	return (bitmap_t *)restrack_register_object(OBJTYPE_BITMAP, bitmap_alloc(width, height, format), width * height, file, line);
 }
 

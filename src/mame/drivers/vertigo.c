@@ -13,8 +13,9 @@
 #include "cpu/m6805/m6805.h"
 #include "cpu/m68000/m68000.h"
 #include "video/vector.h"
-#include "vertigo.h"
-#include "exidy440.h"
+#include "includes/vertigo.h"
+#include "includes/exidy440.h"
+#include "machine/74148.h"
 #include "machine/pit8253.h"
 
 
@@ -114,11 +115,14 @@ static MACHINE_DRIVER_START( vertigo )
 
 	MDRV_PIT8254_ADD( "pit8254", vertigo_pit8254_config )
 
+	MDRV_74148_ADD( "74148", vertigo_update_irq )
+
 	/* motor controller */
 	/*
     MDRV_CPU_ADD("motor", M6805, 1000000)
     MDRV_CPU_PROGRAM_MAP(vertigo_motor)
     */
+	MDRV_MACHINE_START(vertigo)
 	MDRV_MACHINE_RESET(vertigo)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

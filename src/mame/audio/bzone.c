@@ -20,7 +20,7 @@ D0  explosion enable        gates a noise generator
 #include <math.h>
 #include "driver.h"
 #include "streams.h"
-#include "bzone.h"
+#include "includes/bzone.h"
 
 #include "sound/discrete.h"
 #include "sound/pokey.h"
@@ -292,7 +292,7 @@ static DISCRETE_SOUND_START(bzone)
 	DISCRETE_BITS_DECODE(NODE_10, BZ_INPUT, 0, 7, 1)      		 /* IC M2, bits 0 - 7 */
 
 	/* the pot is 250K, but we will use a smaller range to get a better adjustment range */
-	DISCRETE_ADJUSTMENT_TAG(BZ_R11_POT, RES_K(75), RES_K(10), DISC_LINADJ, "R11")
+	DISCRETE_ADJUSTMENT(BZ_R11_POT, RES_K(75), RES_K(10), DISC_LINADJ, "R11")
 
 
 	/************************************************/

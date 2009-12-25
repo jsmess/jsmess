@@ -6,11 +6,11 @@
 
 #include "driver.h"
 #include "debugger.h"
-#include "dc.h"
+#include "includes/dc.h"
 #include "cpu/sh4/sh4.h"
 #include "sound/aica.h"
-#include "naomibd.h"
-#include "naomi.h"
+#include "includes/naomibd.h"
+#include "includes/naomi.h"
 
 #define DEBUG_REGISTERS	(1)
 
@@ -1336,6 +1336,7 @@ static TIMER_CALLBACK(dc_rtc_increment)
 
 MACHINE_START( dc )
 {
+	dc_rtc_timer = timer_alloc(machine, dc_rtc_increment, 0);
 }
 
 MACHINE_RESET( dc )
@@ -1348,7 +1349,6 @@ MACHINE_RESET( dc )
 	memset(dc_rtcregister, 0, sizeof(dc_rtcregister));
 	memset(dc_coin_counts, 0, sizeof(dc_coin_counts));
 
-	dc_rtc_timer = timer_alloc(machine, dc_rtc_increment, 0);
 	timer_adjust_periodic(dc_rtc_timer, attotime_zero, 0, ATTOTIME_IN_SEC(1));
 
 	dc_sysctrl_regs[SB_SBREV] = 0x0b;

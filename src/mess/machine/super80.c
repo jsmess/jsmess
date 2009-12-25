@@ -15,7 +15,7 @@
     d2 super80 screen off (=2mhz) or on (bursts of 2mhz at 50hz = 1mhz) */
 
 UINT8 super80_shared=0xff;
-
+UINT8 *super80_colorram;
 static const device_config *super80_z80pio;
 static const device_config *super80_speaker;
 static const device_config *super80_cassette;
@@ -273,7 +273,7 @@ DRIVER_INIT( super80v )
 {
 	super80_pcgram = memory_region(machine, "maincpu")+0xf000;
 	machine->generic.videoram.u8 = memory_region(machine, "maincpu")+0x18000;
-	machine->generic.colorram.u8 = memory_region(machine, "maincpu")+0x1C000;
+	super80_colorram = memory_region(machine, "maincpu")+0x1C000;
 	driver_init_common(machine);
 }
 

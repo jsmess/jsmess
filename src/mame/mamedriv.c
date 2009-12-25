@@ -2277,6 +2277,7 @@ const game_driver * const drivers[] =
 	DRIVER( kbash2 )	/* bootleg */
 	DRIVER( truxton2 )	/* TP-024 (c) 1992 Toaplan */
 	DRIVER( pipibibs )	/* TP-025 */
+	DRIVER( pipibibsa )	/* TP-025 */
 	DRIVER( whoopee )	/* TP-025 */
 	DRIVER( pipibibi )	/* (c) 1991 Ryouta Kikaku (bootleg?) */
 	DRIVER( fixeight )	/* TP-026 (c) 1992 + Taito license */
@@ -2913,8 +2914,9 @@ V-V                           TP-027
 	DRIVER( pzloop2 )	/* 02/03/2001 (c) 2001 Mitchell (Euro) */
 	DRIVER( pzloop2j )	/* 05/02/2001 (c) 2001 Mitchell (Japan) */
 	DRIVER( choko )		/* 20/08/2001 (c) 2001 Mitchell (Japan) */
+	DRIVER( hsf2 )		/* 02/02/2004 (c) 2004 Hyper Street Fighter 2 (USA) */
 	DRIVER( hsf2j )		/* 22/12/2003 (c) 2003 Hyper Street Fighter 2 (Japan) */
-	DRIVER( hsf2 )		/* 02/02/2004 (c) 2004 Hyper Street Fighter 2 (Asia) */
+	DRIVER( hsf2a )		/* 02/02/2004 (c) 2004 Hyper Street Fighter 2 (Asia) */
 
 	/* CPS2 'Phoenix' bootlegs */
 	DRIVER( ssf2ud )
@@ -5010,6 +5012,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( cninja1 )	/* MAG (c) 1991 Data East Corporation (World) */
 	DRIVER( cninjau )	/* MAG (c) 1991 Data East Corporation (US) */
 	DRIVER( joemac )	/* MAG (c) 1991 Data East Corporation (Japan) */
+	DRIVER( cninjabl )	/* bootleg */
 	DRIVER( stoneage )	/* bootleg */
 	DRIVER( robocop2 )	/* MAH (c) 1991 Data East Corporation (World) */
 	DRIVER( robocop2u )	/* MAH (c) 1991 Data East Corporation (US) */
@@ -5288,11 +5291,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( contrajb )	/* bootleg */
 	DRIVER( gryzor )	/* GX633 (c) 1987 */
 	DRIVER( gryzora )	/* GX633 (c) 1987 */
-	DRIVER( combasc )	/* GX611 (c) 1988 */
-	DRIVER( combasct )	/* GX611 (c) 1987 */
-	DRIVER( combascj )	/* GX611 (c) 1987 (Japan) */
+	DRIVER( combatsc )	/* GX611 (c) 1988 */
+	DRIVER( combatsct )	/* GX611 (c) 1987 */
+	DRIVER( combatscj )	/* GX611 (c) 1987 (Japan) */
 	DRIVER( bootcamp )	/* GX611 (c) 1987 */
-	DRIVER( combascb )	/* bootleg */
+	DRIVER( combatscb )	/* bootleg */
 	DRIVER( rockrage )	/* GX620 (c) 1986 (World?) */
 	DRIVER( rockragea )	/* GX620 (c) 1986 (Prototype?) */
 	DRIVER( rockragej )	/* GX620 (c) 1986 (Japan) */
@@ -6916,6 +6919,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Midway Zeus games */
 	DRIVER( mk4 )		/* (c) 1997 Midway (v3.0) Latest offical release */
 	DRIVER( mk4a )		/* (c) 1997 Midway (v2.1) */
+	DRIVER( mk4b )		/* (c) 1997 Midway (v1.0) */
 	DRIVER( invasnab )	/* (c) 1999 Midway (v5.0) Latest offical release */
 	DRIVER( invasnv4 )	/* (c) 1999 Midway (v4.0) */
 	DRIVER( crusnexo )	/* (c) 1999 Midway (v2.4) Latest offical release */
@@ -7193,6 +7197,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( jujub )		/* (c) 1989 Tad (Japan) */
 	DRIVER( bloodbro )	/* (c) 1990 Tad */
 	DRIVER( bloodbroa )	/* (c) 1990 Tad */
+	DRIVER( bloodbrob )	/* (c) 1990 Tad */
 	DRIVER( weststry )	/* bootleg */
 	DRIVER( skysmash )	/* (c) 1990 Nihon System Inc. */
 	DRIVER( legionna )	/* (c) 1992 Tad (World) */
@@ -8279,6 +8284,7 @@ Other Sun games
 	DRIVER( kovshp )
 	DRIVER( oldsplus )
 	DRIVER( killbldp )
+	DRIVER( happy6 )
 	DRIVER( svg )
 
 	/* Spirit Tech. Corp. */

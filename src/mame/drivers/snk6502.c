@@ -268,7 +268,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
 #include "video/mc6845.h"
 #include "sound/sn76477.h"
 #include "sound/samples.h"
-#include "snk6502.h"
+#include "includes/snk6502.h"
 
 
 #define MASTER_CLOCK	XTAL_11_289MHz
@@ -284,9 +284,8 @@ Stephh's notes (based on the games M6502 code and some tests) :
 
 /* binary counter (1.4MHz update) */
 static UINT8 sasuke_counter;
-static emu_timer *sasuke_timer;
 
-static TIMER_CALLBACK( sasuke_update_counter )
+static TIMER_DEVICE_CALLBACK( sasuke_update_counter )
 {
 	sasuke_counter += 0x10;
 }
@@ -294,9 +293,6 @@ static TIMER_CALLBACK( sasuke_update_counter )
 static void sasuke_start_counter(running_machine *machine)
 {
 	sasuke_counter = 0;
-
-	sasuke_timer = timer_alloc(machine, sasuke_update_counter, NULL);
-	timer_adjust_periodic(sasuke_timer, attotime_zero, 0, ATTOTIME_IN_HZ(MASTER_CLOCK / 8));	// 1.4 MHz
 }
 
 
@@ -326,8 +322,8 @@ static CUSTOM_INPUT( sasuke_count_r )
 static ADDRESS_MAP_START( sasuke_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE(&snk6502_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE(&snk6502_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE(&snk6502_colorram)
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE(&snk6502_charram)
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_register_w)
@@ -345,8 +341,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( satansat_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE(&snk6502_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE(&snk6502_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE(&snk6502_colorram)
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE(&snk6502_charram)
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_register_w)
@@ -364,8 +360,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vanguard_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE(&snk6502_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE(&snk6502_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE(&snk6502_colorram)
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE(&snk6502_charram)
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_register_w)
@@ -385,8 +381,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fantasy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE(&snk6502_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE(&snk6502_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE(&snk6502_colorram)
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE(&snk6502_charram)
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x2001, 0x2001) AM_DEVWRITE("crtc", mc6845_register_w)
@@ -405,8 +401,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pballoon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE(&snk6502_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE(&snk6502_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE(&snk6502_colorram)
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE(&snk6502_charram)
 	AM_RANGE(0x3000, 0x9fff) AM_ROM
 	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("crtc", mc6845_address_w)
@@ -846,6 +842,8 @@ static MACHINE_DRIVER_START( sasuke )
 	MDRV_VIDEO_UPDATE(snk6502)
 
 	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / 16, mc6845_intf)
+
+	MDRV_TIMER_ADD_PERIODIC("sasuke_timer", sasuke_update_counter, HZ(MASTER_CLOCK / 8))	// 1.4 MHz
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")

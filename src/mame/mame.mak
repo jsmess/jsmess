@@ -76,6 +76,7 @@ CPUS += SH2
 CPUS += SH4
 CPUS += DSP32C
 CPUS += PIC16C5X
+CPUS += PIC16C62X
 CPUS += G65816
 CPUS += SPC700
 CPUS += E1
@@ -181,6 +182,7 @@ SOUNDS += K007232
 SOUNDS += K051649
 SOUNDS += K053260
 SOUNDS += K054539
+SOUNDS += K056800
 SOUNDS += SEGAPCM
 SOUNDS += MULTIPCM
 SOUNDS += SCSP
@@ -326,7 +328,6 @@ DRVLIBS = \
 #-------------------------------------------------
 
 $(MAMEOBJ)/shared.a: \
-	$(MACHINE)/mb14241.o \
 	$(MACHINE)/nmk112.o \
 	$(MACHINE)/pckeybrd.o \
 	$(MACHINE)/pcshare.o \
@@ -845,7 +846,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/xmen.o $(VIDEO)/xmen.o \
 	$(DRIVERS)/yiear.o $(VIDEO)/yiear.o \
 	$(DRIVERS)/zr107.o \
-	$(MACHINE)/konamiic.o $(VIDEO)/konamiic.o \
+	$(VIDEO)/konamiic.o $(VIDEO)/konicdev.o \
 
 $(MAMEOBJ)/maygay.a: \
 	$(DRIVERS)/maygay1b.o \

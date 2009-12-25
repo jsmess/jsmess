@@ -223,7 +223,7 @@ int state_save_registration_allowed(running_machine *machine)
     array of data in memory
 -------------------------------------------------*/
 
-void state_save_register_memory(running_machine *machine, const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount)
+void state_save_register_memory(running_machine *machine, const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount, const char *file, int line)
 {
 	state_private *global = machine->state_data;
 	state_entry **entryptr, *next;
@@ -234,15 +234,15 @@ void state_save_register_memory(running_machine *machine, const char *module, co
 	/* check for invalid timing */
 	if (!global->reg_allowed)
 	{
-		logerror("Attempt to register save state entry after state registration is closed! module %s tag %s name %s\n",module, tag, name);
+		logerror("Attempt to register save state entry after state registration is closed!\nFile: %s, line %d, module %s tag %s name %s\n", file, line, module, tag, name);
 		if (machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
-			fatalerror("Attempt to register save state entry after state registration is closed! module %s tag %s name %s\n", module, tag, name);
+			fatalerror("Attempt to register save state entry after state registration is closed!\nFile: %s, line %d, module %s tag %s name %s\n", file, line, module, tag, name);
 		global->illegal_regs++;
 		return;
 	}
 
 	/* create the full name */
-	totalname = astring_alloc();
+	totalname = auto_astring_alloc(machine);
 	if (tag != NULL)
 		astring_printf(totalname, "%s/%s/%X/%s", module, tag, index, name);
 	else
@@ -263,7 +263,7 @@ void state_save_register_memory(running_machine *machine, const char *module, co
 
 	/* didn't find one; allocate a new one */
 	next = *entryptr;
-	*entryptr = alloc_clear_or_die(state_entry);
+	*entryptr = auto_alloc_clear(machine, state_entry);
 
 	/* fill in the rest */
 	(*entryptr)->next      = next;
@@ -272,7 +272,6 @@ void state_save_register_memory(running_machine *machine, const char *module, co
 	(*entryptr)->name      = totalname;
 	(*entryptr)->typesize  = valsize;
 	(*entryptr)->typecount = valcount;
-	restrack_register_object(OBJTYPE_STATEREG, *entryptr, 0, __FILE__, __LINE__);
 }
 
 
@@ -281,9 +280,9 @@ void state_save_register_memory(running_machine *machine, const char *module, co
     bitmap to be saved
 -------------------------------------------------*/
 
-void state_save_register_bitmap(running_machine *machine, const char *module, const char *tag, UINT32 index, const char *name, bitmap_t *val)
+void state_save_register_bitmap(running_machine *machine, const char *module, const char *tag, UINT32 index, const char *name, bitmap_t *val, const char *file, int line)
 {
-	state_save_register_memory(machine, module, tag, index, name, val->base, val->bpp / 8, val->rowpixels * val->height);
+	state_save_register_memory(machine, module, tag, index, name, val->base, val->bpp / 8, val->rowpixels * val->height, file, line);
 }
 
 
@@ -312,14 +311,13 @@ void state_save_register_presave(running_machine *machine, state_presave_func fu
 			fatalerror("Duplicate save state function (%p, %p)", param, func);
 
 	/* allocate a new entry */
-	*cbptr = alloc_or_die(state_callback);
+	*cbptr = auto_alloc(machine, state_callback);
 
 	/* fill it in */
 	(*cbptr)->next         = NULL;
 	(*cbptr)->machine      = machine;
 	(*cbptr)->func.presave = func;
 	(*cbptr)->param        = param;
-	restrack_register_object(OBJTYPE_STATEREG, *cbptr, 1, __FILE__, __LINE__);
 }
 
 
@@ -343,92 +341,13 @@ void state_save_register_postload(running_machine *machine, state_postload_func 
 			fatalerror("Duplicate save state function (%p, %p)", param, func);
 
 	/* allocate a new entry */
-	*cbptr = alloc_or_die(state_callback);
+	*cbptr = auto_alloc(machine, state_callback);
 
 	/* fill it in */
 	(*cbptr)->next          = NULL;
 	(*cbptr)->machine       = machine;
 	(*cbptr)->func.postload = func;
 	(*cbptr)->param         = param;
-	restrack_register_object(OBJTYPE_STATEREG, *cbptr, 2, __FILE__, __LINE__);
-}
-
-
-
-/***************************************************************************
-    REGISTRATION FREEING
-***************************************************************************/
-
-/*-------------------------------------------------
-    func_free - free registered functions attached
-    to the current resource tag
--------------------------------------------------*/
-
-static void func_free(state_callback **rootptr, void *ptr)
-{
-	state_callback **cbptr;
-
-	/* iterate over the function list */
-	for (cbptr = rootptr; *cbptr != NULL; cbptr = &(*cbptr)->next)
-		if (*cbptr == ptr)
-		{
-			state_callback *cb = *cbptr;
-
-			/* de-link us from the list and free our memory */
-			*cbptr = (*cbptr)->next;
-			free(cb);
-			break;
-		}
-}
-
-
-/*-------------------------------------------------
-    state_save_free - free all registrations that
-    have been tagged with the current resource
-    tag
--------------------------------------------------*/
-
-void state_destructor(void *ptr, size_t size)
-{
-	state_private *global = NULL;
-
-	/* size of 0 means an entry */
-	if (size == 0)
-	{
-		state_entry **entryptr;
-
-		/* iterate over entries */
-		global = ((state_entry *)ptr)->machine->state_data;
-		for (entryptr = &global->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next)
-			if (*entryptr == ptr)
-			{
-				state_entry *entry = *entryptr;
-
-				/* de-link us from the list and free our memory */
-				*entryptr = (*entryptr)->next;
-				astring_free(entry->name);
-				free(entry);
-				break;
-			}
-	}
-
-	/* size of 1 means a pre function */
-	else if (size == 1)
-	{
-		global = ((state_callback *)ptr)->machine->state_data;
-		func_free(&global->prefunclist, ptr);
-	}
-
-	/* size of 2 means a post function */
-	else if (size == 2)
-	{
-		global = ((state_callback *)ptr)->machine->state_data;
-		func_free(&global->postfunclist, ptr);
-	}
-
-	/* if we're clear of all registrations, reset the invalid counter */
-	if (global != NULL && global->entrylist == NULL && global->prefunclist == NULL && global->postfunclist == NULL)
-		global->illegal_regs = 0;
 }
 
 

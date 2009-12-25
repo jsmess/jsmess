@@ -21,7 +21,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
-#include "blstroid.h"
+#include "includes/blstroid.h"
 
 
 
@@ -43,6 +43,12 @@ static void update_interrupts(running_machine *machine)
 static WRITE16_HANDLER( blstroid_halt_until_hblank_0_w )
 {
 	atarigen_halt_until_hblank_0(space->machine->primary_screen);
+}
+
+
+static MACHINE_START( blstroid )
+{
+	atarigen_init(machine);
 }
 
 
@@ -202,6 +208,7 @@ static MACHINE_DRIVER_START( blstroid )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
+	MDRV_MACHINE_START(blstroid)
 	MDRV_MACHINE_RESET(blstroid)
 	MDRV_NVRAM_HANDLER(atarigen)
 

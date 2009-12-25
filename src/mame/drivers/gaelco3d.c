@@ -144,10 +144,10 @@ REF. 970429
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "gaelco3d.h"
+#include "includes/gaelco3d.h"
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/dmadac.h"
 
 #define	LOG				0
@@ -164,7 +164,7 @@ static offs_t tms_offset_xor;
 static UINT8 analog_ports[4];
 static UINT8 framenum;
 
-static emu_timer *adsp_autobuffer_timer;
+static const device_config *adsp_autobuffer_timer;
 static UINT16 *adsp_control_regs;
 static UINT16 *adsp_fastram_base;
 static UINT8 adsp_ireg;
@@ -172,7 +172,6 @@ static offs_t adsp_ireg_base, adsp_incs, adsp_size;
 static const device_config *dmadac[SOUND_CHANNELS];
 
 static void adsp_tx_callback(const device_config *device, int port, INT32 data);
-static TIMER_CALLBACK( adsp_autobuffer_irq );
 
 
 /*************************************
@@ -180,6 +179,20 @@ static TIMER_CALLBACK( adsp_autobuffer_irq );
  *  Machine init
  *
  *************************************/
+
+static MACHINE_START( gaelco3d )
+{
+	/* Save state support */
+	state_save_register_global(machine, sound_data);
+	state_save_register_global(machine, sound_status);
+	state_save_register_global_array(machine, analog_ports);
+	state_save_register_global(machine, framenum);
+	state_save_register_global(machine, adsp_ireg);
+	state_save_register_global(machine, adsp_ireg_base);
+	state_save_register_global(machine, adsp_incs);
+	state_save_register_global(machine, adsp_size);
+}
+
 
 static MACHINE_RESET( common )
 {
@@ -197,7 +210,7 @@ static MACHINE_RESET( common )
 	}
 
 	/* allocate a timer for feeding the autobuffer */
-	adsp_autobuffer_timer = timer_alloc(machine, adsp_autobuffer_irq, NULL);
+	adsp_autobuffer_timer = devtag_get_device(machine, "adsp_timer");
 
 	memory_configure_bank(machine, "bank1", 0, 256, memory_region(machine, "user1"), 0x4000);
 	memory_set_bank(machine, "bank1", 0);
@@ -211,16 +224,6 @@ static MACHINE_RESET( common )
 		sprintf(buffer, "dac%d", i + 1);
 		dmadac[i] = devtag_get_device(machine, buffer);
 	}
-
-	/* Save state support */
-	state_save_register_global(machine, sound_data);
-	state_save_register_global(machine, sound_status);
-	state_save_register_global_array(machine, analog_ports);
-	state_save_register_global(machine, framenum);
-	state_save_register_global(machine, adsp_ireg);
-	state_save_register_global(machine, adsp_ireg_base);
-	state_save_register_global(machine, adsp_incs);
-	state_save_register_global(machine, adsp_size);
 }
 
 
@@ -228,7 +231,6 @@ static MACHINE_RESET( gaelco3d )
 {
 	MACHINE_RESET_CALL( common );
 	tms_offset_xor = 0;
-	state_save_register_global(machine, tms_offset_xor);
 }
 
 
@@ -236,7 +238,6 @@ static MACHINE_RESET( gaelco3d2 )
 {
 	MACHINE_RESET_CALL( common );
 	tms_offset_xor = BYTE_XOR_BE(0);
-	state_save_register_global(machine, tms_offset_xor);
 }
 
 
@@ -267,10 +268,10 @@ static WRITE16_HANDLER( irq_ack_w )
  *
  *************************************/
 
-static READ16_HANDLER( eeprom_data_r )
+static READ16_DEVICE_HANDLER( eeprom_data_r )
 {
 	UINT16 result = 0xffff;
-	if (eeprom_read_bit())
+	if (eepromdev_read_bit(device))
 		result ^= 0x0004;
 	if (LOG)
 		logerror("eeprom_data_r(%02X)\n", result);
@@ -278,24 +279,24 @@ static READ16_HANDLER( eeprom_data_r )
 }
 
 
-static WRITE16_HANDLER( eeprom_data_w )
+static WRITE16_DEVICE_HANDLER( eeprom_data_w )
 {
 	if (ACCESSING_BITS_0_7)
-		eeprom_write_bit(data & 0x01);
+		eepromdev_write_bit(device, data & 0x01);
 }
 
 
-static WRITE16_HANDLER( eeprom_clock_w )
+static WRITE16_DEVICE_HANDLER( eeprom_clock_w )
 {
 	if (ACCESSING_BITS_0_7)
-		eeprom_set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+		eepromdev_set_clock_line(device, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static WRITE16_HANDLER( eeprom_cs_w )
+static WRITE16_DEVICE_HANDLER( eeprom_cs_w )
 {
 	if (ACCESSING_BITS_0_7)
-		eeprom_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		eepromdev_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -530,7 +531,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			if ((data & 0x0800) == 0)
 			{
 				dmadac_enable(&dmadac[0], SOUND_CHANNELS, 0);
-				timer_adjust_oneshot(adsp_autobuffer_timer, attotime_never, 0);
+				timer_device_adjust_oneshot(adsp_autobuffer_timer, attotime_never, 0);
 			}
 			break;
 
@@ -539,7 +540,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			if ((data & 0x0002) == 0)
 			{
 				dmadac_enable(&dmadac[0], SOUND_CHANNELS, 0);
-				timer_adjust_oneshot(adsp_autobuffer_timer, attotime_never, 0);
+				timer_device_adjust_oneshot(adsp_autobuffer_timer, attotime_never, 0);
 			}
 			break;
 
@@ -568,10 +569,10 @@ static WRITE16_HANDLER( adsp_rombank_w )
  *
  *************************************/
 
-static TIMER_CALLBACK( adsp_autobuffer_irq )
+static TIMER_DEVICE_CALLBACK( adsp_autobuffer_irq )
 {
 	/* get the index register */
-	int reg = cpu_get_reg(cputag_get_cpu(machine, "adsp"), ADSP2100_I0 + adsp_ireg);
+	int reg = cpu_get_reg(cputag_get_cpu(timer->machine, "adsp"), ADSP2100_I0 + adsp_ireg);
 
 	/* copy the current data into the buffer */
 // logerror("ADSP buffer: I%d=%04X incs=%04X size=%04X\n", adsp_ireg, reg, adsp_incs, adsp_size);
@@ -588,11 +589,11 @@ static TIMER_CALLBACK( adsp_autobuffer_irq )
 		reg = adsp_ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		generic_pulse_irq_line(cputag_get_cpu(machine, "adsp"), ADSP2105_IRQ1);
+		generic_pulse_irq_line(cputag_get_cpu(timer->machine, "adsp"), ADSP2105_IRQ1);
 	}
 
 	/* store it */
-	cpu_set_reg(cputag_get_cpu(machine, "adsp"), ADSP2100_I0 + adsp_ireg, reg);
+	cpu_set_reg(cputag_get_cpu(timer->machine, "adsp"), ADSP2100_I0 + adsp_ireg, reg);
 }
 
 
@@ -647,7 +648,7 @@ static void adsp_tx_callback(const device_config *device, int port, INT32 data)
 			/* fire off a timer wich will hit every half-buffer */
 			sample_period = attotime_div(attotime_mul(sample_period, adsp_size), SOUND_CHANNELS * adsp_incs);
 
-			timer_adjust_periodic(adsp_autobuffer_timer, sample_period, 0, sample_period);
+			timer_device_adjust_periodic(adsp_autobuffer_timer, sample_period, 0, sample_period);
 
 			return;
 		}
@@ -659,7 +660,7 @@ static void adsp_tx_callback(const device_config *device, int port, INT32 data)
 	dmadac_enable(&dmadac[0], SOUND_CHANNELS, 0);
 
 	/* remove timer */
-	timer_adjust_oneshot(adsp_autobuffer_timer, attotime_never, 0);
+	timer_device_adjust_oneshot(adsp_autobuffer_timer, attotime_never, 0);
 }
 
 
@@ -741,13 +742,13 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x51003c, 0x51003d) AM_READ_PORT("IN3")
 	AM_RANGE(0x510040, 0x510041) AM_WRITE(sound_data_w)
 	AM_RANGE(0x510042, 0x510043) AM_READ(sound_status_r)
-	AM_RANGE(0x510100, 0x510101) AM_READ(eeprom_data_r)
+	AM_RANGE(0x510100, 0x510101) AM_DEVREAD("eeprom", eeprom_data_r)
 	AM_RANGE(0x510100, 0x510101) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x51010a, 0x51010b) AM_WRITENOP		// very noisy when starting a new game
-	AM_RANGE(0x510110, 0x510113) AM_WRITE(eeprom_data_w)
+	AM_RANGE(0x510110, 0x510113) AM_DEVWRITE("eeprom", eeprom_data_w)
 	AM_RANGE(0x510116, 0x510117) AM_WRITE(tms_control3_w)
-	AM_RANGE(0x510118, 0x51011b) AM_WRITE(eeprom_clock_w)
-	AM_RANGE(0x510120, 0x510123) AM_WRITE(eeprom_cs_w)
+	AM_RANGE(0x510118, 0x51011b) AM_DEVWRITE("eeprom", eeprom_clock_w)
+	AM_RANGE(0x510120, 0x510123) AM_DEVWRITE("eeprom", eeprom_cs_w)
 	AM_RANGE(0x51012a, 0x51012b) AM_WRITE(tms_reset_w)
 	AM_RANGE(0x510132, 0x510133) AM_WRITE(tms_irq_w)
 	AM_RANGE(0x510146, 0x510147) AM_WRITE(led_0_w)
@@ -768,13 +769,13 @@ static ADDRESS_MAP_START( main020_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x51003c, 0x51003f) AM_READ_PORT("IN3")
 	AM_RANGE(0x510040, 0x510043) AM_READ16(sound_status_r, 0x0000ffff)
 	AM_RANGE(0x510040, 0x510043) AM_WRITE16(sound_data_w, 0xffff0000)
-	AM_RANGE(0x510100, 0x510103) AM_READ16(eeprom_data_r, 0xffff0000)
+	AM_RANGE(0x510100, 0x510103) AM_DEVREAD16("eeprom", eeprom_data_r, 0xffff0000)
 	AM_RANGE(0x510100, 0x510103) AM_WRITE16(irq_ack_w, 0xffff0000)
 	AM_RANGE(0x510104, 0x510107) AM_WRITE(unknown_107_w)
-	AM_RANGE(0x510110, 0x510113) AM_WRITE16(eeprom_data_w, 0x0000ffff)
+	AM_RANGE(0x510110, 0x510113) AM_DEVWRITE16("eeprom", eeprom_data_w, 0x0000ffff)
 	AM_RANGE(0x510114, 0x510117) AM_WRITE16(tms_control3_w, 0x0000ffff)
-	AM_RANGE(0x510118, 0x51011b) AM_WRITE16(eeprom_clock_w, 0x0000ffff)
-	AM_RANGE(0x510120, 0x510123) AM_WRITE16(eeprom_cs_w, 0x0000ffff)
+	AM_RANGE(0x510118, 0x51011b) AM_DEVWRITE16("eeprom", eeprom_clock_w, 0x0000ffff)
+	AM_RANGE(0x510120, 0x510123) AM_DEVWRITE16("eeprom", eeprom_cs_w, 0x0000ffff)
 	AM_RANGE(0x510124, 0x510127) AM_WRITE(unknown_127_w)
 	AM_RANGE(0x510128, 0x51012b) AM_WRITE16(tms_reset_w, 0x0000ffff)
 	AM_RANGE(0x510130, 0x510133) AM_WRITE16(tms_irq_w, 0x0000ffff)
@@ -804,7 +805,7 @@ static ADDRESS_MAP_START( adsp_data_map, ADDRESS_SPACE_DATA, 16 )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(adsp_rombank_w)
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x2000) AM_READWRITE(sound_data_r, sound_status_w)
-	AM_RANGE(0x3800, 0x39ff) AM_RAM	AM_BASE(&adsp_fastram_base)	/* 512 words internal RAM */
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE(&adsp_fastram_base)	/* 512 words internal RAM */
 	AM_RANGE(0x3fe0, 0x3fff) AM_WRITE(adsp_control_w) AM_BASE(&adsp_control_regs)
 ADDRESS_MAP_END
 
@@ -966,10 +967,14 @@ static MACHINE_DRIVER_START( gaelco3d )
 	MDRV_CPU_PROGRAM_MAP(adsp_program_map)
 	MDRV_CPU_DATA_MAP(adsp_data_map)
 
+	MDRV_MACHINE_START(gaelco3d)
 	MDRV_MACHINE_RESET(gaelco3d)
-	MDRV_NVRAM_HANDLER(93C66B)
+
+	MDRV_EEPROM_93C66B_NODEFAULT_ADD("eeprom")
 
 	MDRV_QUANTUM_TIME(HZ(6000))
+
+	MDRV_TIMER_ADD("adsp_timer", adsp_autobuffer_irq)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

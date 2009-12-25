@@ -26,7 +26,7 @@
 #include "sound/dac.h"
 #include "rendlay.h"
 #include "audio/atarijsa.h"
-#include "cyberbal.h"
+#include "includes/cyberbal.h"
 
 
 /*************************************
@@ -40,6 +40,20 @@ static void update_interrupts(running_machine *machine)
 	cyberbal_state *state = (cyberbal_state *)machine->driver_data;
 	cputag_set_input_line(machine, "maincpu", 1, state->atarigen.sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "extra", 1, state->atarigen.video_int_state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+static MACHINE_START( cyberbal )
+{
+	cyberbal_state *state = (cyberbal_state *)machine->driver_data;
+	atarigen_init(machine);
+
+	state_save_register_global(machine, state->fast_68k_int);
+	state_save_register_global(machine, state->io_68k_int);
+	state_save_register_global(machine, state->sound_data_from_68k);
+	state_save_register_global(machine, state->sound_data_from_6502);
+	state_save_register_global(machine, state->sound_data_from_68k_ready);
+	state_save_register_global(machine, state->sound_data_from_6502_ready);
 }
 
 
@@ -436,6 +450,7 @@ static MACHINE_DRIVER_START( cyberbal )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
+	MDRV_MACHINE_START(cyberbal)
 	MDRV_MACHINE_RESET(cyberbal)
 	MDRV_NVRAM_HANDLER(atarigen)
 
@@ -483,6 +498,7 @@ static MACHINE_DRIVER_START( cyberb2p )
 	MDRV_CPU_PROGRAM_MAP(cyberb2p_map)
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
+	MDRV_MACHINE_START(cyberbal)
 	MDRV_MACHINE_RESET(cyberb2p)
 	MDRV_NVRAM_HANDLER(atarigen)
 

@@ -52,7 +52,7 @@ write:
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "dday.h"
+#include "includes/dday.h"
 
 
 static ADDRESS_MAP_START( dday_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -353,5 +353,5 @@ ROM_START( ddayc )
 ROM_END
 
 
-GAME( 1982, dday,  0,    dday, dday,  0, ROT0, "Olympia", "D-Day", GAME_IMPERFECT_COLORS )
-GAME( 1982, ddayc, dday, dday, ddayc, 0, ROT0, "Olympia (Centuri license)", "D-Day (Centuri)", GAME_IMPERFECT_COLORS )
+GAME( 1982, dday,  0,    dday, dday,  0, ROT0, "Olympia", "D-Day", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1982, ddayc, dday, dday, ddayc, 0, ROT0, "Olympia (Centuri license)", "D-Day (Centuri)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )

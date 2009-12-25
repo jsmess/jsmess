@@ -114,7 +114,7 @@ static void adjust_display_position_interrupt_timer(running_machine *machine)
 }
 
 
-void neogeo_set_display_position_interrupt_control(UINT16 data)
+void neogeo_set_display_position_interrupt_control(running_machine *machine,UINT16 data)
 {
 	display_position_interrupt_control = data;
 }
@@ -764,7 +764,7 @@ static WRITE16_HANDLER( system_control_w )
 		case 0x01: set_main_cpu_vector_table_source(space->machine, bit);
 				   set_audio_cpu_rom_source(space, bit); /* this is a guess */
 				   break;
-		case 0x05: neogeo_set_fixed_layer_source(bit); break;
+		case 0x05: neogeo_set_fixed_layer_source(space->machine,bit); break;
 		case 0x06: set_save_ram_unlock(bit); break;
 		case 0x07: neogeo_set_palette_bank(space->machine, bit); break;
 
@@ -855,7 +855,7 @@ static MACHINE_RESET( neogeo )
 		system_control_w(space, offs, 0, 0x00ff);
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 
-	neogeo_reset_rng();
+	neogeo_reset_rng(machine);
 
 	start_interrupt_timers(machine);
 
@@ -863,7 +863,7 @@ static MACHINE_RESET( neogeo )
 	update_interrupts(machine);
 
 	/* AES apparently always uses the cartridge's fixed bank mode */
-	neogeo_set_fixed_layer_source(1);
+	neogeo_set_fixed_layer_source(machine,1);
 }
 
 

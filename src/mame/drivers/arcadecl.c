@@ -68,7 +68,7 @@
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "arcadecl.h"
+#include "includes/arcadecl.h"
 #include "sound/okim6295.h"
 
 
@@ -102,6 +102,12 @@ static void scanline_update(const device_config *screen, int scanline)
  *  Initialization
  *
  *************************************/
+
+static MACHINE_START( arcadecl )
+{
+	atarigen_init(machine);
+}
+
 
 static MACHINE_RESET( arcadecl )
 {
@@ -324,6 +330,7 @@ static MACHINE_DRIVER_START( arcadecl )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
+	MDRV_MACHINE_START(arcadecl)
 	MDRV_MACHINE_RESET(arcadecl)
 	MDRV_NVRAM_HANDLER(atarigen)
 

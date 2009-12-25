@@ -58,6 +58,7 @@
 #include "devices/harddriv.h"
 #include "machine/idectrl.h"
 #include "machine/smc92x4.h"
+#include "machine/rtc65271.h"
 
 static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")								/*system ROM*/
@@ -297,6 +298,7 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
+	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
 
 	/* MDRV_CASSETTE_ADD( "cassette", default_cassette_config ) */
 

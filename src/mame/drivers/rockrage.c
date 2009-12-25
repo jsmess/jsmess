@@ -50,30 +50,23 @@ Notes:
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/hd6309/hd6309.h"
-#include "video/konamiic.h"
 #include "sound/2151intf.h"
 #include "sound/vlm5030.h"
+#include "video/konicdev.h"
+#include "includes/rockrage.h"
 
-/* from video */
-VIDEO_START( rockrage );
-VIDEO_UPDATE( rockrage );
-WRITE8_HANDLER( rockrage_vreg_w );
-PALETTE_INIT( rockrage );
 
 static INTERRUPT_GEN( rockrage_interrupt )
 {
-	if (K007342_is_INT_enabled())
-        cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
+	rockrage_state *state = (rockrage_state *)device->machine->driver_data;
+	if (k007342_is_int_enabled(state->k007342))
+		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( rockrage_bankswitch_w )
 {
-	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
-
 	/* bits 4-6 = bank number */
-	bankaddress = 0x10000 + ((data & 0x70) >> 4) * 0x2000;
-	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
+	memory_set_bank(space->machine, "bank1", (data & 0x70) >> 4);
 
 	/* bits 0 & 1 = coin counters */
 	coin_counter_w(space->machine, 0,data & 0x01);
@@ -84,28 +77,29 @@ static WRITE8_HANDLER( rockrage_bankswitch_w )
 
 static WRITE8_HANDLER( rockrage_sh_irqtrigger_w )
 {
+	rockrage_state *state = (rockrage_state *)space->machine->driver_data;
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static READ8_DEVICE_HANDLER( rockrage_VLM5030_busy_r )
 {
-	return ( vlm5030_bsy(device) ? 1 : 0 );
+	return (vlm5030_bsy(device) ? 1 : 0);
 }
 
 static WRITE8_DEVICE_HANDLER( rockrage_speech_w )
 {
 	/* bit2 = data bus enable */
-	vlm5030_rst( device, ( data >> 1 ) & 0x01 );
-	vlm5030_st( device, ( data >> 0 ) & 0x01 );
+	vlm5030_rst(device, (data >> 1) & 0x01);
+	vlm5030_st(device, (data >> 0) & 0x01);
 }
 
 static ADDRESS_MAP_START( rockrage_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(K007342_r,K007342_w)					/* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_READWRITE(K007420_r,K007420_w)					/* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_READWRITE(K007342_scroll_r,K007342_scroll_w)	/* Scroll RAM */
-	AM_RANGE(0x2400, 0x247f) AM_RAM AM_BASE_GENERIC(paletteram)						/* Palette */
-	AM_RANGE(0x2600, 0x2607) AM_WRITE(K007342_vreg_w)							/* Video Registers */
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_r, k007342_w)					/* Color RAM + Video RAM */
+	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_r, k007420_w)					/* Sprite RAM */
+	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_scroll_r, k007342_scroll_w)	/* Scroll RAM */
+	AM_RANGE(0x2400, 0x247f) AM_RAM AM_BASE_MEMBER(rockrage_state, paletteram)						/* Palette */
+	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE("k007342", k007342_vreg_w)							/* Video Registers */
 	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P1")
 	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P2")
@@ -266,7 +260,45 @@ GFXDECODE_END
 
 ***************************************************************************/
 
+static const k007342_interface rockrage_k007342_intf =
+{
+	0,	rockrage_tile_callback
+};
+
+static const k007420_interface rockrage_k007420_intf =
+{
+	0x3ff, rockrage_sprite_callback
+};
+
+
+static MACHINE_START( rockrage )
+{
+	rockrage_state *state = (rockrage_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x2000);
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->k007342 = devtag_get_device(machine, "k007342");
+	state->k007420 = devtag_get_device(machine, "k007420");
+
+	state_save_register_global(machine, state->vreg);
+	state_save_register_global_array(machine, state->layer_colorbase);
+}
+
+static MACHINE_RESET( rockrage )
+{
+	rockrage_state *state = (rockrage_state *)machine->driver_data;
+
+	state->vreg = 0;
+	state->layer_colorbase[0] = 0x00;
+	state->layer_colorbase[1] = 0x10;
+}
+
 static MACHINE_DRIVER_START( rockrage )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(rockrage_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)		/* 24MHz/8 */
@@ -276,6 +308,9 @@ static MACHINE_DRIVER_START( rockrage )
 	MDRV_CPU_ADD("audiocpu", M6809, 1500000)		/* 24MHz/16 */
 	MDRV_CPU_PROGRAM_MAP(rockrage_sound_map)
 
+	MDRV_MACHINE_START(rockrage)
+	MDRV_MACHINE_RESET(rockrage)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -284,11 +319,13 @@ static MACHINE_DRIVER_START( rockrage )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
+	MDRV_K007342_ADD("k007342", rockrage_k007342_intf)
+	MDRV_K007420_ADD("k007420", rockrage_k007420_intf)
+
 	MDRV_GFXDECODE(rockrage)
 	MDRV_PALETTE_LENGTH(64 + 2*16*16)
 
 	MDRV_PALETTE_INIT(rockrage)
-	MDRV_VIDEO_START(rockrage)
 	MDRV_VIDEO_UPDATE(rockrage)
 
 	/* sound hardware */
@@ -394,6 +431,6 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1986, rockrage, 0,        rockrage, rockrage, 0, ROT0, "Konami", "Rock'n Rage (World)", 0 )
-GAME( 1986, rockragea,rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Rock'n Rage (Prototype?)", 0 )
-GAME( 1986, rockragej,rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Koi no Hotrock (Japan)", 0 )
+GAME( 1986, rockrage, 0,        rockrage, rockrage, 0, ROT0, "Konami", "Rock'n Rage (World)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rockragea,rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Rock'n Rage (Prototype?)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rockragej,rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Koi no Hotrock (Japan)", GAME_SUPPORTS_SAVE )

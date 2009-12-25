@@ -198,3 +198,4 @@ WRITE8_HANDLER ( ti99_8_w );
 extern const tms9901_interface tms9901reset_param_ti99_4x;
 extern const tms9901_interface tms9901reset_param_ti99_8;
 
+void ti99_clk_interrupt_callback(const device_config *device, int state);

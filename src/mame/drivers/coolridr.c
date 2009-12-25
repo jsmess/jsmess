@@ -22,11 +22,9 @@ Sega 1994
 
 This game runs on SYSTEM-H1 hardware. Only one known game exists on this
 PCB and this is it. The hardware seems overly complex for a 2D bike
-racing game? This might have been an experimental design transitioning
-between Model 1 and Model 2 or a step up from ST-V's 2D to pseudo 3D/2.5D?
-The design of the PCB is very similar to vanilla Model 2
+racing game? The design of the PCB is very similar to vanilla Model 2
 (i.e. Daytona etc). However instead of fully custom-badged chips,
-many of the custom chips are off-the-shelf Hitachi gate-arrays.
+many of the custom chips are off-the-shelf Hitachi/Toshiba gate-arrays.
 
 
 PCB Layouts
@@ -60,7 +58,8 @@ Notes:
                 JP9 set to 1-2
                 JP10-12 open (no jumpers) but JP12 pin 2 tied to JP10 pin 1
       IC*     - IC29-IC32 are 27C4002 EPROM
-                All other ROMs are 42 pin DIP 16M mask ROM
+                IC1-IC10 are DIP42 32M mask ROM
+                IC11-IC18 are DIP42 16M mask ROM
 
 
 SYSTEM-H1 COMMUNICATION-BD
@@ -70,7 +69,7 @@ SYSTEM-H1 COMMUNICATION-BD
 |                 CN2              |
 |       74F74   74F245  MB84256    |
 |       74F373  74F245  MB84256    |
-|MB89273A         CN1              |
+|MB89237A         CN1              |
 |                                  |
 |       74F138 74F04   74F125      |
 |                                  |
@@ -84,10 +83,14 @@ SYSTEM-H1 COMMUNICATION-BD
 |       LED               CN3      |
 |----------------------------------|
 Notes: (All IC's shown)
-      CN1/2 - Connectors joining to CPU board
-      CN3   - Connector joining to Filter board
-      RX/TX - Optical cable connections for network (not used)
-      JP*   - 3x 2-pin jumpers. JP1 shorted, other jumpers open
+      CN1/2   - Connectors joining to CPU board
+      CN3     - Connector joining to Filter board
+      RX/TX   - Optical cable connections for network (not used)
+      JP*     - 3x 2-pin jumpers. JP1 shorted, other jumpers open
+      MB84256 - Fujitsu MB84256 32k x8 SRAM (NDIP28)
+      MB89374 - Fujitsu MB89374 Data Link Controller (SDIP42)
+      MB89237A- Fujitsu MB89237A 8-Bit Proprietary Microcontroller (?) (DIP40)
+      SN75179 - Texas Instruments SN75179 Differential Driver and Receiver Pair (DIP8)
 
 
 SYSTEM-H1 CPU BD
@@ -197,7 +200,7 @@ Notes:
       M5M411860   - Mitsubishi M5M411860TP435SF00-7 DRAM with fast page mode, 64k-words x 18 bits per word (maybe?) (TSOP42)
       TC55328     - Toshiba TC55328AJ-15 32k x8 SRAM (SOJ24)
       PAL1        - GAL16V8B also marked '315-5803' (DIP20)
-      PAL2        - GAL16V8B also marked '315-5804' (DIP20)
+      PAL2        - GAL16V8B also marked '315-5864' (DIP20)
       Sega Custom - 315-5648 (QFP64, x4)
                     315-5691 also marked 'HG62S0791R17F' (QFP208)
                     315-5692 also marked 'HG51B152FD' (QFP256)
@@ -208,6 +211,25 @@ Notes:
                     315-5697 (QFP208)
                     315-5698 (QFP144)
 
+*******************************************************************************************************
+
+Note: This hardware appears to have been designed as a test-bed for a new RLE based compression system
+      used by the zooming sprites.  It is possible that Sega planned on using this for ST-V, but
+      decided against it. Video/CPU part numbers give an interesting insight, since video hardware #
+      sits between Model 1 & Model 2.
+
+                 Year on
+      System      PCB     PCB #      PALs
+      ---------------------------------------------------------
+      System32    1990    837-7428   315-5441 315-5442
+      SysMulti32  1992    837-8676   315-5596
+      Model 1     1992    837-8886   315-5546 315-5483 315-5484
+      Model 2     1994    837-10071  315-5737 315-5741
+      Model 2A    1994    837-10848  315-5737 315-5815
+      STV         1994    837-10934  315-5833
+
+      H1 (CPU)    1994    837-10389  315-5800 315-5801 315-5802
+      H1 (Video)  1994    837-9621   315-5803 315-5864
 
 ******************************************************************************************************/
 
@@ -1088,30 +1110,19 @@ ROM_START( coolridr )
 	ROM_REGION( 0x100000, "sub", 0 ) /* SH1 */
 	ROM_LOAD16_WORD_SWAP( "ep17662.12", 0x000000, 0x020000,  CRC(50d66b1f) SHA1(f7b7f2f5b403a13b162f941c338a3e1207762a0b) )
 
-	/* these 10 interleave somehow?? */
-	ROM_REGION( 0x1600000, "gfx5", ROMREGION_ERASEFF ) /* Other Roms */
+	/* these are compressed sprite data */
+	ROM_REGION( 0x2800000, "gfx5", ROMREGION_ERASEFF )
 	/* logical interleaving according to the readme? */
-	ROM_LOAD32_WORD_SWAP( "mp17640.1", 0x0000002, 0x0200000, CRC(5ecd98c7) SHA1(22027c1e9e6195d27f29a5779695d8597f68809e) )
-	ROM_LOAD32_WORD_SWAP( "mp17645.6", 0x0000000, 0x0200000, CRC(00954173) SHA1(863f32565296448ef10992dc3c0480411eb2b193) )
-	ROM_LOAD32_WORD_SWAP( "mp17641.2", 0x0400002, 0x0200000, CRC(a59b0605) SHA1(c93f84fd58f1942b40b7a55058e02a18a3dec3af) )
-	ROM_LOAD32_WORD_SWAP( "mp17646.7", 0x0400000, 0x0200000, CRC(7ae4d92e) SHA1(8a0eaa5dce112289ac5d16ad5dc7f5895e71e87b) )
-	ROM_LOAD32_WORD_SWAP( "mp17642.3", 0x0800002, 0x0200000, CRC(5f8a1827) SHA1(23179d751777436f2a4f652132001d5e425d8cd5) )
-	ROM_LOAD32_WORD_SWAP( "mp17647.8", 0x0800000, 0x0200000, CRC(082faee8) SHA1(c047b8475517f96f481c09471a77aa0d103631d6) )
-	ROM_LOAD32_WORD_SWAP( "mp17643.4", 0x0c00002, 0x0200000, CRC(44a05dd0) SHA1(32aa86f8761ec6ffceb63979c44828603c244e7d) )
-	ROM_LOAD32_WORD_SWAP( "mp17648.9", 0x0c00000, 0x0200000, CRC(0791802f) SHA1(acad55bbd22c7e955a729c8abed9509fc6f10927) )
-	ROM_LOAD32_WORD_SWAP( "mp17644.5", 0x1000002, 0x0200000, CRC(be2763c5) SHA1(1044b0a73e334337b0b9ac958df59480aedfb942) )
-	ROM_LOAD32_WORD_SWAP( "mp17649.10",0x1000000, 0x0200000, CRC(567fbc0a) SHA1(3999c99b26f13d97ac1c58de00a44049ee7775fd) )
-
-/*  ROMX_LOAD( "mp17640.1", 0x0000000, 0x0200000, CRC(5ecd98c7) SHA1(22027c1e9e6195d27f29a5779695d8597f68809e), ROM_SKIP(9) )
-    ROMX_LOAD( "mp17641.2", 0x0000001, 0x0200000, CRC(a59b0605) SHA1(c93f84fd58f1942b40b7a55058e02a18a3dec3af), ROM_SKIP(9) )
-    ROMX_LOAD( "mp17642.3", 0x0000002, 0x0200000, CRC(5f8a1827) SHA1(23179d751777436f2a4f652132001d5e425d8cd5), ROM_SKIP(9) )
-    ROMX_LOAD( "mp17643.4", 0x0000003, 0x0200000, CRC(44a05dd0) SHA1(32aa86f8761ec6ffceb63979c44828603c244e7d), ROM_SKIP(9) )
-    ROMX_LOAD( "mp17644.5", 0x0000004, 0x0200000, CRC(be2763c5) SHA1(1044b0a73e334337b0b9ac958df59480aedfb942), ROM_SKIP(9) )
-    ROMX_LOAD( "mp17645.6", 0x0000005, 0x0200000, CRC(00954173) SHA1(863f32565296448ef10992dc3c0480411eb2b193), ROM_SKIP(9) )
-    ROMX_LOAD( "mp17646.7", 0x0000006, 0x0200000, CRC(7ae4d92e) SHA1(8a0eaa5dce112289ac5d16ad5dc7f5895e71e87b), ROM_SKIP(9) )
-    ROMX_LOAD( "mp17647.8", 0x0000007, 0x0200000, CRC(082faee8) SHA1(c047b8475517f96f481c09471a77aa0d103631d6), ROM_SKIP(9) )
-    ROMX_LOAD( "mp17648.9", 0x0000008, 0x0200000, CRC(0791802f) SHA1(acad55bbd22c7e955a729c8abed9509fc6f10927), ROM_SKIP(9) )
-    ROMX_LOAD( "mp17649.10",0x0000009, 0x0200000, CRC(567fbc0a) SHA1(3999c99b26f13d97ac1c58de00a44049ee7775fd), ROM_SKIP(9) )*/
+	ROM_LOAD32_WORD_SWAP( "mpr-17640.ic1", 0x0000002, 0x0400000, CRC(981e3e69) SHA1(d242055e0359ec4b5fac4676b2f974fbc974cc68) )
+	ROM_LOAD32_WORD_SWAP( "mpr-17645.ic6", 0x0000000, 0x0400000, CRC(56968d07) SHA1(e88c3d66ea05affb4681a25d155f097bd1b5a84b) )
+	ROM_LOAD32_WORD_SWAP( "mpr-17641.ic2", 0x0800002, 0x0400000, CRC(fccc3dae) SHA1(0df7fd8b1110ba9063dc4dc40301267229cb9a35) )
+	ROM_LOAD32_WORD_SWAP( "mpr-17646.ic7", 0x0800000, 0x0400000, CRC(b77eb2ad) SHA1(b832c0f1798aca39adba840d56ae96a75346670a) )
+	ROM_LOAD32_WORD_SWAP( "mpr-17642.ic3", 0x1000002, 0x0400000, CRC(1a5bcc73) SHA1(a7df04c0a326323ea185db5f55b3e0449d76c535) )
+	ROM_LOAD32_WORD_SWAP( "mpr-17647.ic8", 0x1000000, 0x0400000, CRC(9dd9330c) SHA1(c91a7f497c1f4bd283bd683b06dff88893724d51) )
+	ROM_LOAD32_WORD_SWAP( "mpr-17643.ic4", 0x1800002, 0x0400000, CRC(5100f23b) SHA1(659c2300399ff1cbd24fb1eb18cfd6c26e06fd96) )
+	ROM_LOAD32_WORD_SWAP( "mpr-17648.ic9", 0x1800000, 0x0400000, CRC(bf184cce) SHA1(62c004ea279f9a649d21426369336c2e1f9d24da) )
+	ROM_LOAD32_WORD_SWAP( "mpr-17644.ic5", 0x2000002, 0x0400000, CRC(80199c79) SHA1(e525d8ee9f9176101629853e50cca73b02b16a38) )
+	ROM_LOAD32_WORD_SWAP( "mpr-17649.ic10",0x2000000, 0x0400000, CRC(618c47ae) SHA1(5b69ad36fcf8e70d34c3b2fc71412ce953c5ceb3) )
 ROM_END
 
 /*TODO: there must be an irq line with custom vector located somewhere that writes to here...*/

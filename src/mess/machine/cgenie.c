@@ -25,6 +25,7 @@
 #define TAPE_HEADER "Colour Genie - Virtual Tape File"
 
 UINT8 *cgenie_fontram;
+UINT8 *cgenie_colorram;
 
 
 int cgenie_tv_mode = -1;
@@ -531,7 +532,7 @@ WRITE8_HANDLER( cgenie_videoram_w )
 
  READ8_HANDLER( cgenie_colorram_r )
 {
-	return space->machine->generic.colorram.u8[offset] | 0xf0;
+	return cgenie_colorram[offset] | 0xf0;
 }
 
 WRITE8_HANDLER( cgenie_colorram_w )
@@ -539,11 +540,11 @@ WRITE8_HANDLER( cgenie_colorram_w )
 	/* only bits 0 to 3 */
 	data &= 15;
 	/* nothing changed ? */
-	if( data == space->machine->generic.colorram.u8[offset] )
+	if( data == cgenie_colorram[offset] )
 		return;
 
 	/* set new value */
-	space->machine->generic.colorram.u8[offset] = data;
+	cgenie_colorram[offset] = data;
 	/* make offset relative to video frame buffer offset */
 	offset = (offset + (cgenie_get_register(12) << 8) + cgenie_get_register(13)) & 0x3ff;
 }

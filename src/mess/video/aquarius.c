@@ -11,6 +11,8 @@
 
 static tilemap *aquarius_tilemap;
 
+UINT8 *aquarius_colorram;
+
 static const rgb_t aquarius_colors[] =
 {
 	RGB_BLACK,					/* Black */
@@ -72,7 +74,7 @@ WRITE8_HANDLER( aquarius_videoram_w )
 
 WRITE8_HANDLER( aquarius_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	aquarius_colorram[offset] = data;
 	tilemap_mark_tile_dirty(aquarius_tilemap, offset);
 }
 
@@ -80,7 +82,7 @@ static TILE_GET_INFO(aquarius_gettileinfo)
 {
 	int bank = 0;
 	int code = machine->generic.videoram.u8[tile_index];
-	int color = machine->generic.colorram.u8[tile_index];
+	int color = aquarius_colorram[tile_index];
 	int flags = 0;
 
 	SET_TILE_INFO(bank, code, color, flags);

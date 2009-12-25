@@ -165,7 +165,7 @@ Measurements -
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
-#include "badlands.h"
+#include "includes/badlands.h"
 #include "sound/2151intf.h"
 
 
@@ -193,6 +193,16 @@ static void scanline_update(const device_config *screen, int scanline)
 		atarigen_6502_irq_ack_r(space, 0);
 	else if (!(input_port_read(screen->machine, "FE4000") & 0x40))
 		atarigen_6502_irq_gen(cputag_get_cpu(screen->machine, "audiocpu"));
+}
+
+
+static MACHINE_START( badlands )
+{
+	badlands_state *state = (badlands_state *)machine->driver_data;
+
+	atarigen_init(machine);
+
+	state_save_register_global_array(machine, state->pedal_value);
 }
 
 
@@ -504,6 +514,7 @@ static MACHINE_DRIVER_START( badlands )
 	MDRV_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MDRV_CPU_PROGRAM_MAP(audio_map)
 
+	MDRV_MACHINE_START(badlands)
 	MDRV_MACHINE_RESET(badlands)
 	MDRV_NVRAM_HANDLER(atarigen)
 
@@ -713,6 +724,7 @@ static MACHINE_DRIVER_START( badlandb )
 //  MDRV_CPU_ADD("audiocpu", Z80, 2800000/8)
 //  MDRV_CPU_PROGRAM_MAP(bootleg_soundmap)
 
+	MDRV_MACHINE_START(badlands)
 	MDRV_MACHINE_RESET(badlandb)
 	MDRV_NVRAM_HANDLER(atarigen)
 

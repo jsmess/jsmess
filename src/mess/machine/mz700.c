@@ -89,7 +89,7 @@ DRIVER_INIT( mz700 )
 
 	machine->generic.videoram_size = 0x800;
 	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, machine->generic.videoram_size);
-	machine->generic.colorram.u8 = auto_alloc_array(machine, UINT8, 0x800);
+	mz->colorram = auto_alloc_array(machine, UINT8, 0x800);
 }
 
 DRIVER_INIT( mz800 )
@@ -101,7 +101,7 @@ DRIVER_INIT( mz800 )
 	/* video ram */
 	machine->generic.videoram_size = 0x4000;
 	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, machine->generic.videoram_size);
-	machine->generic.colorram.u8 = machine->generic.videoram.u8 + 0x800;
+	mz->colorram = machine->generic.videoram.u8 + 0x800;
 
 	/* character generator ram */
 	mz->cgram = auto_alloc_array(machine, UINT8, 0x1000);
@@ -274,7 +274,7 @@ WRITE8_HANDLER( mz700_bank_3_w )
 
 			/* switch in colorram */
 			memory_install_readwrite_bank(spc, 0xd800, 0xdfff, 0, 0, "bank9");
-			memory_set_bankptr(space->machine, "bank9", space->machine->generic.colorram.u8);
+			memory_set_bankptr(space->machine, "bank9", mz->colorram);
 
 			mz->mz700_ram_vram = TRUE;
 

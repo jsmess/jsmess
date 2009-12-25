@@ -354,12 +354,14 @@
 
 /* function definition for a get info callback */
 #define TILE_GET_INFO(_name)			void _name(running_machine *machine, tile_data *tileinfo, tilemap_memory_index tile_index, void *param)
+#define TILE_GET_INFO_DEVICE(_name)		void _name(const device_config *device, tile_data *tileinfo, tilemap_memory_index tile_index, void *param)
 
 /* function definition for a logical-to-memory mapper */
 #define TILEMAP_MAPPER(_name)			tilemap_memory_index _name(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 
 /* useful macro inside of a TILE_GET_INFO callback to set tile information  */
-#define SET_TILE_INFO(GFX,CODE,COLOR,FLAGS) tileinfo_set(machine, tileinfo, GFX, CODE, COLOR, FLAGS)
+#define SET_TILE_INFO(GFX,CODE,COLOR,FLAGS)         tileinfo_set(machine, tileinfo, GFX, CODE, COLOR, FLAGS)
+#define SET_TILE_INFO_DEVICE(GFX,CODE,COLOR,FLAGS)  tileinfo_set(device->machine, tileinfo, GFX, CODE, COLOR, FLAGS)
 
 /* Macros for setting tile attributes in the TILE_GET_INFO callback: */
 /*   TILE_FLIP_YX assumes that flipy is in bit 1 and flipx is in bit 0 */

@@ -14,198 +14,41 @@
 
 #include "driver.h"
 #include "video/s2636.h"
+#include "video/saa5050.h"
+#include "includes/malzak.h"
 
-static INT8 frame_count;
-
-#define SAA5050_DBLHI	0x0001
-#define SAA5050_SEPGR	0x0002
-#define SAA5050_FLASH	0x0004
-#define SAA5050_BOX		0x0008
-#define SAA5050_GRAPH	0x0010
-#define SAA5050_CONCEAL	0x0020
-#define SAA5050_HOLDGR	0x0040
-
-#define SAA5050_BLACK   0
-#define SAA5050_WHITE   7
-
-static struct
-{
-	UINT16	saa5050_flags;
-	UINT8	saa5050_forecol;
-	UINT8	saa5050_backcol;
-	UINT8	saa5050_prvcol;
-	UINT8	saa5050_prvchr;
-} saa5050_state;
-
-
-UINT8* saa5050_vidram;  /* Video RAM for SAA 5050 */
-
-int malzak_x;
-int malzak_y;
-
-static struct playfield
-{
-	//int x;
-	//int y;
-	int code;
-} field[256];
 
 VIDEO_UPDATE( malzak )
 {
-	int code, colour;
+	malzak_state *state = (malzak_state *)screen->machine->driver_data;
 	int sx, sy;
 	int x,y;
 	bitmap_t *s2636_0_bitmap;
 	bitmap_t *s2636_1_bitmap;
-	const device_config *s2636_0 = devtag_get_device(screen->machine, "s2636_0");
-	const device_config *s2636_1 = devtag_get_device(screen->machine, "s2636_1");
 
-	bitmap_fill(bitmap,0,0);
+	bitmap_fill(bitmap, 0, 0);
 
-	// SAA 5050 - Teletext character generator
-	for (sy = 24; sy >= 0; sy--)
-	{
-		/* Set start of line state */
-		saa5050_state.saa5050_flags = 0;
-		saa5050_state.saa5050_prvchr = 32;
-		saa5050_state.saa5050_forecol = SAA5050_WHITE;
-		saa5050_state.saa5050_prvcol = SAA5050_WHITE;
-		saa5050_state.saa5050_backcol = SAA5050_BLACK;
-
-		for (sx = 0; sx < 42; sx++)
-		{
-			int blank = 0;
-			code = saa5050_vidram[sy * 64 + sx];
-			if (code < 32)
-			{
-				switch (code) {
-				case 0x00:
-					blank = 1;  // code 0x00 should not display anything
-					break;      // unless HOLDGR is set
-				case 0x01: case 0x02: case 0x03: case 0x04:
-				case 0x05: case 0x06: case 0x07:
-					saa5050_state.saa5050_prvcol = saa5050_state.saa5050_forecol = code;
-					saa5050_state.saa5050_flags &= ~(SAA5050_GRAPH | SAA5050_CONCEAL);
-					break;
-				case 0x11: case 0x12: case 0x13: case 0x14:
-				case 0x15: case 0x16: case 0x17:
-					saa5050_state.saa5050_prvcol = (saa5050_state.saa5050_forecol =
-						(code & 0x07));
-					saa5050_state.saa5050_flags &= ~SAA5050_CONCEAL;
-					saa5050_state.saa5050_flags |= SAA5050_GRAPH;
-					break;
-				case 0x08:
-					saa5050_state.saa5050_flags |= SAA5050_FLASH;
-					break;
-				case 0x09:
-					saa5050_state.saa5050_flags &= ~SAA5050_FLASH;
-					break;
-				case 0x0a:
-					saa5050_state.saa5050_flags |= SAA5050_BOX;
-					break;
-				case 0x0b:
-					saa5050_state.saa5050_flags &= ~SAA5050_BOX;
-					break;
-				case 0x0c:
-					saa5050_state.saa5050_flags &= ~SAA5050_DBLHI;
-					break;
-				case 0x0d:
-					saa5050_state.saa5050_flags |= SAA5050_DBLHI;
-					break;
-				case 0x18:
-					saa5050_state.saa5050_flags |= SAA5050_CONCEAL;
-					break;
-				case 0x19:
-					saa5050_state.saa5050_flags |= SAA5050_SEPGR;
-					break;
-				case 0x1a:
-					saa5050_state.saa5050_flags &= ~SAA5050_SEPGR;
-					break;
-				case 0x1c:
-					saa5050_state.saa5050_backcol = SAA5050_BLACK;
-					break;
-				case 0x1d:
-                  saa5050_state.saa5050_backcol = saa5050_state.saa5050_prvcol;
-					break;
-				case 0x1e:
-					saa5050_state.saa5050_flags |= SAA5050_HOLDGR;
-					break;
-				case 0x1f:
-					saa5050_state.saa5050_flags &= ~SAA5050_HOLDGR;
-					break;
-				}
-				if (saa5050_state.saa5050_flags & SAA5050_HOLDGR)
-	  				code = saa5050_state.saa5050_prvchr;
-				else
-					code = 32;
-			}
-
-			if (code & 0x80)
-				colour = (saa5050_state.saa5050_forecol << 3) | saa5050_state.saa5050_backcol;
-			else
-				colour = saa5050_state.saa5050_forecol | (saa5050_state.saa5050_backcol << 3);
-
-			if (saa5050_state.saa5050_flags & SAA5050_CONCEAL)
-				code = 32;
-			else if ((saa5050_state.saa5050_flags & SAA5050_FLASH) && (frame_count > 38))
-				code = 32;
-			else
-			{
-				saa5050_state.saa5050_prvchr = code;
-				if ((saa5050_state.saa5050_flags & SAA5050_GRAPH) && (code & 0x20))
-				{
-					code += (code & 0x40) ? 64 : 96;
-					if (saa5050_state.saa5050_flags & SAA5050_SEPGR)
-						code += 64;
-				}
-			}
-
-			if((blank == 0) || (saa5050_state.saa5050_flags & SAA5050_HOLDGR))
-			{
-				if (saa5050_state.saa5050_flags & SAA5050_DBLHI)
-				{
-					drawgfx_opaque (bitmap, cliprect, screen->machine->gfx[2], code, colour, 0, 0,
-						sx * 6, sy * 10);
-					drawgfx_opaque (bitmap, cliprect, screen->machine->gfx[3], code, colour, 0, 0,
-						sx * 6, (sy + 1) * 10);
-				}
-				else
-				{
-					drawgfx_opaque (bitmap, cliprect, screen->machine->gfx[1], code, colour, 0, 0,
-						sx * 6, sy * 10);
-				}
-			}
-		}
-		if (saa5050_state.saa5050_flags & SAA5050_DBLHI)
-		{
-			sy--;
-			saa5050_state.saa5050_flags &= ~SAA5050_DBLHI;
-		}
-	}
-
-	frame_count++;
-	if(frame_count > 50)
-		frame_count = 0;
+	saa5050_update(state->saa5050, bitmap, cliprect);
+	saa5050_frame_advance(state->saa5050);
 
 	// playfield - not sure exactly how this works...
-	for(x = 0;x < 16;x++)
-		for(y = 0; y < 16;y++)
+	for (x = 0; x < 16; x++)
+		for (y = 0; y < 16; y++)
 		{
-			sx = ((x*16-48) - malzak_x);
-			sy = ((y*16) - malzak_y);
+			sx = ((x * 16 - 48) - state->malzak_x);
+			sy = ((y * 16) - state->malzak_y);
 
-			if(sx < -271)
-				sx+=512;
-			if(sx < -15)
-				sx+=256;
+			if (sx < -271)
+				sx += 512;
+			if (sx < -15)
+				sx += 256;
 
-			drawgfx_transpen(bitmap,cliprect, screen->machine->gfx[0],field[x*16 + y].code,7,0,0,
-				sx, sy, 0);
+			drawgfx_transpen(bitmap,cliprect, screen->machine->gfx[0], state->playfield_code[x * 16 + y], 7, 0, 0, sx, sy, 0);
 		}
 
-    /* update the S2636 chips */
-	s2636_0_bitmap = s2636_update(s2636_0, cliprect);
-	s2636_1_bitmap = s2636_update(s2636_1, cliprect);
+	/* update the S2636 chips */
+	s2636_0_bitmap = s2636_update(state->s2636_0, cliprect);
+	s2636_1_bitmap = s2636_update(state->s2636_1, cliprect);
 
 	/* copy the S2636 images into the main bitmap */
 	{
@@ -234,10 +77,11 @@ VIDEO_UPDATE( malzak )
 
 WRITE8_HANDLER( malzak_playfield_w )
 {
-	int tile = ((malzak_x / 16) * 16) + (offset / 16);
+	malzak_state *state = (malzak_state *)space->machine->driver_data;
+	int tile = ((state->malzak_x / 16) * 16) + (offset / 16);
 
-//  field[tile].x = malzak_x / 16;
-//  field[tile].y = malzak_y;
-	field[tile].code = (data & 0x1f);
-	logerror("GFX: 0x16%02x write 0x%02x\n",offset,data);
+//  state->playfield_x[tile] = state->malzak_x / 16;
+//  state->playfield_y[tile] = state->malzak_y;
+	state->playfield_code[tile] = (data & 0x1f);
+	logerror("GFX: 0x16%02x write 0x%02x\n", offset, data);
 }

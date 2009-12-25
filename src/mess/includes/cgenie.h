@@ -15,6 +15,7 @@ READ8_DEVICE_HANDLER( cgenie_sh_control_port_r );
 WRITE8_DEVICE_HANDLER( cgenie_sh_control_port_w );
 
 extern UINT8 *cgenie_fontram;
+extern UINT8 *cgenie_colorram;
 extern const wd17xx_interface cgenie_wd17xx_interface;
 
 extern int cgenie_tv_mode;

@@ -23,7 +23,7 @@
 #include "cpu/m68000/m68000.h"
 #include "audio/atarijsa.h"
 #include "video/atarirle.h"
-#include "atarigx2.h"
+#include "includes/atarigx2.h"
 
 
 
@@ -38,6 +38,12 @@ static void update_interrupts(running_machine *machine)
 	atarigx2_state *state = (atarigx2_state *)machine->driver_data;
 	cputag_set_input_line(machine, "maincpu", 4, state->atarigen.video_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 5, state->atarigen.sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+static MACHINE_START( atarigx2 )
+{
+	atarigen_init(machine);
 }
 
 
@@ -1392,6 +1398,7 @@ static MACHINE_DRIVER_START( atarigx2 )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
+	MDRV_MACHINE_START(atarigx2)
 	MDRV_MACHINE_RESET(atarigx2)
 	MDRV_NVRAM_HANDLER(atarigen)
 

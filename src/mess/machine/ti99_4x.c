@@ -596,7 +596,6 @@ MACHINE_RESET( ti99 )
 
 	if (has_ide) {
 		ti99_ide_reset(machine, ti99_model == model_99_8);
-		ti99_ide_load_memcard(machine);
 	}
 
 	if (has_hsgpl)	{
@@ -625,9 +624,6 @@ MACHINE_RESET( ti99 )
 #ifdef UNUSED_FUNCTION
 void machine_stop_ti99(void)
 {
-	if (has_ide)
-		ti99_ide_save_memcard();
-
 	if (has_hsgpl)
 		ti99_hsgpl_save_memcard();
 

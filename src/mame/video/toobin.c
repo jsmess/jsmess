@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "machine/atarigen.h"
-#include "toobin.h"
+#include "includes/toobin.h"
 
 
 
@@ -97,6 +97,8 @@ VIDEO_START( toobin )
 
 	/* allocate a playfield bitmap for rendering */
 	state->pfbitmap = auto_bitmap_alloc(machine, video_screen_get_width(machine->primary_screen), video_screen_get_height(machine->primary_screen), BITMAP_FORMAT_INDEXED16);
+
+	state_save_register_global(machine, state->brightness);
 }
 
 

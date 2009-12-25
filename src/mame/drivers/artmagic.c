@@ -25,7 +25,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms34010/tms34010.h"
 #include "video/tlc34076.h"
-#include "artmagic.h"
+#include "includes/artmagic.h"
 #include "sound/okim6295.h"
 
 
@@ -94,7 +94,6 @@ static MACHINE_RESET( artmagic )
 	tms_irq = hack_irq = 0;
 	update_irq_state(machine);
 	tlc34076_reset(6);
-	tlc34076_state_save(machine);
 }
 
 

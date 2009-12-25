@@ -42,6 +42,7 @@ struct _mz_state
 
 	int hires_mode;			/* 1 if in 640x200 mode */
 	int screen; 			/* screen designation */
+	UINT8 *colorram;
 };
 
 

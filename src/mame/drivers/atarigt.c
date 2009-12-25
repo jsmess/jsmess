@@ -23,7 +23,7 @@
 #include "video/atarirle.h"
 #include "cpu/m68000/m68000.h"
 #include "audio/cage.h"
-#include "atarigt.h"
+#include "includes/atarigt.h"
 
 
 #define LOG_PROTECTION		(0)
@@ -53,6 +53,12 @@ static void update_interrupts(running_machine *machine)
 	cputag_set_input_line(machine, "maincpu", 3, state->atarigen.sound_int_state    ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 4, state->atarigen.video_int_state    ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 6, state->atarigen.scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+static MACHINE_START( atarigt )
+{
+	atarigen_init(machine);
 }
 
 
@@ -793,6 +799,7 @@ static MACHINE_DRIVER_START( atarigt )
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 	MDRV_CPU_PERIODIC_INT(atarigen_scanline_int_gen, 250)
 
+	MDRV_MACHINE_START(atarigt)
 	MDRV_MACHINE_RESET(atarigt)
 	MDRV_NVRAM_HANDLER(atarigen)
 

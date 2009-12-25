@@ -20,7 +20,7 @@
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "audio/atarijsa.h"
-#include "skullxbo.h"
+#include "includes/skullxbo.h"
 
 
 
@@ -67,6 +67,12 @@ static void alpha_row_update(const device_config *screen, int scanline)
 static WRITE16_HANDLER( skullxbo_halt_until_hblank_0_w )
 {
 	atarigen_halt_until_hblank_0(space->machine->primary_screen);
+}
+
+
+static MACHINE_START( skullxbo )
+{
+	atarigen_init(machine);
 }
 
 
@@ -255,6 +261,7 @@ static MACHINE_DRIVER_START( skullxbo )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
+	MDRV_MACHINE_START(skullxbo)
 	MDRV_MACHINE_RESET(skullxbo)
 	MDRV_NVRAM_HANDLER(atarigen)
 

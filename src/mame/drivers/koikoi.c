@@ -8,8 +8,8 @@ driver by
 
 TODO:
 - map missing inputs (temp mapped to z-x-left shift)
-- is there (still..) some kind of protection ? timers looks weird (2nd player timer is frozen)
-- colors (afaik color(?) prom outputs are connected to one of pals), might help to have a screenshot of the original thing.
+- is there (still..) some kind of protection ? timers looks weird (2nd player timer is frozen) (this seems fixed now -AS)
+- colors (afaik color(?) prom outputs are connected to one of pals), Missing color prom apparently.
 
 
 Basic hw is...
@@ -78,24 +78,48 @@ static TILE_GET_INFO( get_tile_info )
 	SET_TILE_INFO( 0, code, color, flip);
 }
 
-static PALETTE_INIT( koikoi ) //wrong
+static PALETTE_INIT( koikoi )
 {
 	int i;
 
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x10);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x10; i++)
+	{
+		int bit0, bit1, bit2;
+		int r, g, b;
+
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		/* blue component */
+		bit0 = 0;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+	}
+
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x20;
+
+	/* characters/sprites */
 	for (i = 0; i < 0x100; i++)
 	{
-		int bit0, bit1, bit2, bit3, r, g, b;
-
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 2) & 0x01;
-		bit2 = (color_prom[i] >> 1) & 0x01;
-		bit3 = (color_prom[i] >> 0) & 0x01;
-
-		r = bit0 * 0xaa + bit3 * 0x55;
-		g = bit1 * 0xaa + bit3 * 0x55;
-		b = bit2 * 0xaa + bit3 * 0x55;
-
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 }
 
@@ -165,7 +189,7 @@ static READ8_DEVICE_HANDLER( input_r )
 
 static WRITE8_DEVICE_HANDLER( unknown_w )
 {
-	//unknown... could be input select (player 1 or 2 = fd/fe or ef/df(??) )
+	//xor'ed mux select, player 1 = 1,2,4,8, player 2 = 0x10, 0x20, 0x40, 0x80
 }
 
 static READ8_HANDLER( io_r )
@@ -202,7 +226,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( koikoi_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_WRITENOP //unknown , many writes
+	AM_RANGE(0x02, 0x02) AM_WRITENOP //watchdog
 	AM_RANGE(0x03, 0x03) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
@@ -263,7 +287,7 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Graphics definitions
+ *  Graphic definitions
  *
  *************************************/
 
@@ -272,8 +296,7 @@ static const gfx_layout tilelayout =
 	8, 8,
 	RGN_FRAC(1,3),
 	3,
-	{ RGN_FRAC(0,3), RGN_FRAC(2,3), RGN_FRAC(1,3) },
-	//{ RGN_FRAC(2,3), RGN_FRAC(0,3), RGN_FRAC(1,3) },
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
@@ -384,8 +407,9 @@ ROM_START( koikoi )
 	ROM_LOAD( "ic26", 0x1000, 0x1000, CRC(79cb1e93) SHA1(4d08b3d88727b437673f7a51d47396f19bbc3caa) )
 	ROM_LOAD( "ic18", 0x2000, 0x1000, CRC(c209362d) SHA1(0620c19fe72e8407db0f487b6413c5d45ac8046c) )
 
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "prom.ic23", 0x000, 0x100,  CRC(f1d169a6) SHA1(5ee4b1dfe61e8b97a90cc113ba234298189f1a73) )
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "prom.x",    0x000, 0x020,  NO_DUMP )
+	ROM_LOAD( "prom.ic23", 0x020, 0x100,  CRC(f1d169a6) SHA1(5ee4b1dfe61e8b97a90cc113ba234298189f1a73) )
 
 	ROM_REGION( 0x0a00, "plds", 0 )
 	ROM_LOAD( "pal16r8-10_pink.ic9",   0x0000, 0x0104, CRC(9f8fdb95) SHA1(cdcdb1a6baef18961cf6c75fba0c3aba47f3edbb) )

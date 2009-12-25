@@ -69,11 +69,12 @@ Custom ICs - 053260        - sound chip (QFP80)
 #include "driver.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "cpu/z80/z80.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
+#include "machine/eepromdev.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
 #include "includes/simpsons.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
 
 
 /***************************************************************************
@@ -85,21 +86,21 @@ Custom ICs - 053260        - sound chip (QFP80)
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1f80, 0x1f80) AM_READ_PORT("COIN")
-	AM_RANGE(0x1f81, 0x1f81) AM_READ(simpsons_eeprom_r)
+	AM_RANGE(0x1f81, 0x1f81) AM_READ_PORT("TEST")
 	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("P1")
 	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P2")
 	AM_RANGE(0x1f92, 0x1f92) AM_READ_PORT("P3")
 	AM_RANGE(0x1f93, 0x1f93) AM_READ_PORT("P4")
-	AM_RANGE(0x1fa0, 0x1fa7) AM_WRITE(K053246_w)
-	AM_RANGE(0x1fb0, 0x1fbf) AM_WRITE(K053251_w)
+	AM_RANGE(0x1fa0, 0x1fa7) AM_DEVWRITE("k053246", k053246_w)
+	AM_RANGE(0x1fb0, 0x1fbf) AM_DEVWRITE("k053251", k053251_w)
 	AM_RANGE(0x1fc0, 0x1fc0) AM_WRITE(simpsons_coin_counter_w)
 	AM_RANGE(0x1fc2, 0x1fc2) AM_WRITE(simpsons_eeprom_w)
 	AM_RANGE(0x1fc4, 0x1fc4) AM_READ(simpsons_sound_interrupt_r)
 	AM_RANGE(0x1fc6, 0x1fc7) AM_DEVREADWRITE("konami", simpsons_sound_r, k053260_w)
-	AM_RANGE(0x1fc8, 0x1fc9) AM_READ(K053246_r)
+	AM_RANGE(0x1fc8, 0x1fc9) AM_DEVREAD("k053246", k053246_r)
 	AM_RANGE(0x1fca, 0x1fca) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank4")
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(K052109_r, K052109_w)
+	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE("k052109", k052109_r, k052109_w)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -174,7 +175,14 @@ static INPUT_PORTS_START( simpsons )
 
 	PORT_START("TEST")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	// eeprom ack
+	PORT_BIT( 0xce, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( simpsn2p )
@@ -200,9 +208,16 @@ static INPUT_PORTS_START( simpsn2p )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) //SERVICE3 Unused
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) //SERVICE4 Unused
 
-	PORT_START("TEST") /* IN5 */
+	PORT_START("TEST")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	// eeprom ack
+	PORT_BIT( 0xce, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
 INPUT_PORTS_END
 
 
@@ -215,10 +230,13 @@ INPUT_PORTS_END
 
 static void simpsons_objdma(running_machine *machine)
 {
+	const device_config *k053246 = devtag_get_device(machine, "k053246");
 	int counter, num_inactive;
 	UINT16 *src, *dst;
 
-	K053247_export_config(&dst, 0, 0, 0, &counter);
+	k053247_get_ram(k053246, &dst);
+	counter = k053247_get_dy(k053246);
+
 	src = machine->generic.spriteram.u16;
 	num_inactive = counter = 256;
 
@@ -242,19 +260,51 @@ static TIMER_CALLBACK( dmaend_callback )
 		cputag_set_input_line(machine, "maincpu", KONAMI_FIRQ_LINE, HOLD_LINE);
 }
 
+
 static INTERRUPT_GEN( simpsons_irq )
 {
-	if (K053246_is_IRQ_enabled())
+	const device_config *k053246 = devtag_get_device(device->machine, "k053246");
+	const device_config *k052109 = devtag_get_device(device->machine, "k052109");
+
+	if (k053246_is_irq_enabled(k053246))
 	{
 		simpsons_objdma(device->machine);
-
 		// 32+256us delay at 8MHz dotclock; artificially shortened since actual V-blank length is unknown
 		timer_set(device->machine, ATTOTIME_IN_USEC(30), NULL, 0, dmaend_callback);
 	}
 
-	if (K052109_is_IRQ_enabled())
+	if (k052109_is_irq_enabled(k052109))
 		cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }
+
+static const k052109_interface simpsons_k052109_intf =
+{
+	"gfx1", 0,
+	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	simpsons_tile_callback
+};
+
+static const k053247_interface simpsons_k053246_intf =
+{
+	"screen",
+	"gfx2", 1,
+	NORMAL_PLANE_ORDER,
+	53, 23,
+	KONAMI_ROM_DEINTERLEAVE_4,
+	simpsons_sprite_callback
+};
+
+static const eeprom_interface eeprom_intf =
+{
+	7,				/* address bits */
+	8,				/* data bits */
+	"011000",		/*  read command */
+	"011100",		/* write command */
+	0,				/* erase command */
+	"0100000000000",/* lock command */
+	"0100110000000" /* unlock command */
+};
 
 static MACHINE_DRIVER_START( simpsons )
 
@@ -268,7 +318,8 @@ static MACHINE_DRIVER_START( simpsons )
 								/* NMIs are generated by the 053260 */
 
 	MDRV_MACHINE_RESET(simpsons)
-	MDRV_NVRAM_HANDLER(simpsons)
+
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -282,8 +333,11 @@ static MACHINE_DRIVER_START( simpsons )
 
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(simpsons)
 	MDRV_VIDEO_UPDATE(simpsons)
+
+	MDRV_K052109_ADD("k052109", simpsons_k052109_intf)
+	MDRV_K053246_ADD("k053246", simpsons_k053246_intf)
+	MDRV_K053251_ADD("k053251")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -475,16 +529,10 @@ ROM_END
 
 ***************************************************************************/
 
-static DRIVER_INIT( simpsons )
-{
-	konami_rom_deinterleave_2(machine, "gfx1");
-	konami_rom_deinterleave_4(machine, "gfx2");
-}
-
 // the region warning, if one exists, is shown after the high-score screen in attract mode
-GAME( 1991, simpsons,    0,        simpsons, simpsons, simpsons, ROT0, "Konami", "The Simpsons (4 Players World, set 1)", 0 )
-GAME( 1991, simpsons4pa, simpsons, simpsons, simpsons, simpsons, ROT0, "Konami", "The Simpsons (4 Players World, set 2)", 0 )
-GAME( 1991, simpsons2p,  simpsons, simpsons, simpsn2p, simpsons, ROT0, "Konami", "The Simpsons (2 Players World, set 1)", 0 )
-GAME( 1991, simpsons2p2, simpsons, simpsons, simpsons, simpsons, ROT0, "Konami", "The Simpsons (2 Players World, set 2)", 0 )
-GAME( 1991, simpsons2pa, simpsons, simpsons, simpsn2p, simpsons, ROT0, "Konami", "The Simpsons (2 Players Asia)", 0 )
-GAME( 1991, simpsons2pj, simpsons, simpsons, simpsn2p, simpsons, ROT0, "Konami", "The Simpsons (2 Players Japan)", 0 )
+GAME( 1991, simpsons,    0,        simpsons, simpsons, 0, ROT0, "Konami", "The Simpsons (4 Players World, set 1)", 0 )
+GAME( 1991, simpsons4pa, simpsons, simpsons, simpsons, 0, ROT0, "Konami", "The Simpsons (4 Players World, set 2)", 0 )
+GAME( 1991, simpsons2p,  simpsons, simpsons, simpsn2p, 0, ROT0, "Konami", "The Simpsons (2 Players World, set 1)", 0 )
+GAME( 1991, simpsons2p2, simpsons, simpsons, simpsons, 0, ROT0, "Konami", "The Simpsons (2 Players World, set 2)", 0 )
+GAME( 1991, simpsons2pa, simpsons, simpsons, simpsn2p, 0, ROT0, "Konami", "The Simpsons (2 Players Asia)", 0 )
+GAME( 1991, simpsons2pj, simpsons, simpsons, simpsn2p, 0, ROT0, "Konami", "The Simpsons (2 Players Japan)", 0 )

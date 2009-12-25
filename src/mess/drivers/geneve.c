@@ -218,7 +218,7 @@
 #include "machine/idectrl.h"
 #include "machine/smc92x4.h"
 #include "machine/mm58274c.h"
-
+#include "machine/rtc65271.h"
 
 /*
     memory map
@@ -510,6 +510,7 @@ static MACHINE_DRIVER_START(geneve_60hz)
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
+	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
 
 	/* rtc */
 	MDRV_MM58274C_ADD("mm58274c", geneve_mm58274c_interface)

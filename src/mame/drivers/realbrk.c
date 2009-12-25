@@ -45,7 +45,7 @@ To Do:
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "machine/tmp68301.h"
-#include "realbrk.h"
+#include "includes/realbrk.h"
 #include "sound/2413intf.h"
 #include "sound/ymz280b.h"
 
@@ -680,6 +680,7 @@ static MACHINE_DRIVER_START( realbrk )
 	MDRV_CPU_PROGRAM_MAP(realbrk_mem)
 	MDRV_CPU_VBLANK_INT("screen", realbrk_interrupt)
 
+	MDRV_MACHINE_START( tmp68301 )
 	MDRV_MACHINE_RESET( tmp68301 )
 
 	/* video hardware */

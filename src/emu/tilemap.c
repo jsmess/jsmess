@@ -297,9 +297,6 @@ void tilemap_init(running_machine *machine)
 
 	if (screen_width != 0 && screen_height != 0)
 	{
-		machine->tilemap_data = auto_alloc_clear(machine, tilemap_private);
-		machine->tilemap_data->tailptr = &machine->tilemap_data->list;
-
 		machine->priority_bitmap = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED8);
 		add_exit_callback(machine, tilemap_exit);
 	}
@@ -340,8 +337,16 @@ tilemap *tilemap_create_device(const device_config *device, tile_get_info_device
 static tilemap *tilemap_create_common(running_machine *machine, void *get_info_object, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
 {
 	tilemap *tmap;
-	int tilemap_instance = machine->tilemap_data->instance;
+	int tilemap_instance;
 	int group;
+
+	/* if no tilemap private data yet, allocate it */
+	if (machine->tilemap_data == NULL)
+	{
+		machine->tilemap_data = auto_alloc_clear(machine, tilemap_private);
+		machine->tilemap_data->tailptr = &machine->tilemap_data->list;
+	}
+	tilemap_instance = machine->tilemap_data->instance;
 
 	/* allocate the tilemap itself */
 	tmap = alloc_clear_or_die(tilemap);
@@ -471,6 +476,10 @@ void tilemap_set_flip(tilemap *tmap, UINT32 attributes)
 void tilemap_set_flip_all(running_machine *machine, UINT32 attributes)
 {
 	tilemap *tmap;
+
+	if (machine->tilemap_data == NULL)
+		return;
+
 	for (tmap = machine->tilemap_data->list; tmap != NULL; tmap = tmap->next)
 		tilemap_set_flip(tmap, attributes);
 }
@@ -971,6 +980,9 @@ int tilemap_count(running_machine *machine)
 	tilemap *tmap;
 	int count = 0;
 
+	if (machine->tilemap_data == NULL)
+		return 0;
+
 	/* find by the tilemap index */
 	for (tmap = machine->tilemap_data->list; tmap != NULL; tmap = tmap->next)
 		count++;
@@ -1103,13 +1115,13 @@ static void tilemap_exit(running_machine *machine)
 	tilemap_private *tilemap_data = machine->tilemap_data;
 
 	/* free all the tilemaps in the list */
-	while (tilemap_data->list != NULL)
-	{
-		tilemap *next = tilemap_data->list->next;
-		tilemap_dispose(tilemap_data->list);
-		tilemap_data->list = next;
-	}
-	tilemap_data->tailptr = &tilemap_data->list;
+	if (tilemap_data != NULL)
+		while (tilemap_data->list != NULL)
+		{
+			tilemap *next = tilemap_data->list->next;
+			tilemap_dispose(tilemap_data->list);
+			tilemap_data->list = next;
+		}
 }
 
 

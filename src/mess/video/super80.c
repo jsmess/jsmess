@@ -19,7 +19,7 @@ static const UINT8 *FNT;
 static UINT8 chr,col,gfx,fg,bg;
 static UINT16 mem,x;
 static UINT8 options;
-
+extern UINT8 *super80_colorram;
 
 /**************************** PALETTES for super80m and super80v ******************************************/
 
@@ -307,7 +307,7 @@ READ8_HANDLER( super80v_low_r )
 	if (super80_shared & 4)
 		return space->machine->generic.videoram.u8[offset];
 	else
-		return space->machine->generic.colorram.u8[offset];
+		return super80_colorram[offset];
 }
 
 WRITE8_HANDLER( super80v_low_w )
@@ -315,13 +315,13 @@ WRITE8_HANDLER( super80v_low_w )
 	if (super80_shared & 4)
 		space->machine->generic.videoram.u8[offset] = data;
 	else
-		space->machine->generic.colorram.u8[offset] = data;
+		super80_colorram[offset] = data;
 }
 
 READ8_HANDLER( super80v_high_r )
 {
 	if (~super80_shared & 4)
-		return space->machine->generic.colorram.u8[0x800+offset];
+		return super80_colorram[0x800+offset];
 
 	if (super80_shared & 0x10)
 		return super80_pcgram[0x800+offset];
@@ -332,7 +332,7 @@ READ8_HANDLER( super80v_high_r )
 WRITE8_HANDLER( super80v_high_w )
 {
 	if (~super80_shared & 4)
-		space->machine->generic.colorram.u8[offset+0x800] = data;
+		super80_colorram[offset+0x800] = data;
 	else
 	{
 		space->machine->generic.videoram.u8[offset+0x800] = data;
@@ -429,7 +429,7 @@ MC6845_UPDATE_ROW( super80v_update_row )
 
 		if (~options & 0x40)
 		{
- 			col = device->machine->generic.colorram.u8[mem];					/* byte of colour to display */
+ 			col = super80_colorram[mem];					/* byte of colour to display */
 			fg = col & 0x0f;
 			bg = (col & 0xf0) >> 4;
 		}

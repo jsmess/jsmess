@@ -569,6 +569,13 @@ static READ8_HANDLER( rranger_soundstatus_r )
 	return 0x02;
 }
 
+static WRITE8_HANDLER( sranger_prot_w )
+{
+	/* check code at 0x2ce2 (in sranger), protection is so dire that I can't even exactly
+       estabilish if what I'm doing can be considered or not a kludge... -AS */
+	memory_write_byte(space,0xcd99,0xff);
+}
+
 static ADDRESS_MAP_START( rranger_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")						// Banked ROM
@@ -577,7 +584,7 @@ static ADDRESS_MAP_START( rranger_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P1")					// P1 (Inputs)
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0xc004, 0xc004) AM_READ(rranger_soundstatus_r	)	// Latch Status?
-	AM_RANGE(0xc200, 0xc200) AM_NOP								// Protection?
+	AM_RANGE(0xc200, 0xc200) AM_READNOP AM_WRITE(sranger_prot_w)// Protection?
 	AM_RANGE(0xc280, 0xc280) AM_WRITENOP	// ? NMI Ack
 	AM_RANGE(0xc280, 0xc280) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0xc2c0, 0xc2c0) AM_READ_PORT("DSW2")				// DSW 2
@@ -821,11 +828,44 @@ ADDRESS_MAP_END
                                 Spark Man
 ***************************************************************************/
 
-/* Probably wrong: */
-static WRITE8_HANDLER( sparkman_nmi_w )
+/*
+Thrash protection code snippet:
+
+0B48: 3E 81         ld   a,$81
+0B4A: 32 BF C3      ld   ($C3BF),a
+0B4D: 21 10 D0      ld   hl,$C808
+0B50: 11 11 D0      ld   de,$C809
+0B53: ED 5F         ld   a,r  ;check this, pretty pointless
+0B55: 77            ld   (hl),a
+0B56: 01 80 00      ld   bc,$0080
+0B59: ED B0         ldir
+0B5B: 3E 18         ld   a,$18
+0B5D: 32 C4 C3      ld   ($C3C4),a
+0B60: 21 67 13      ld   hl,$0B67
+0B63: 22 00 D0      ld   ($C800),hl
+0B66: C9            ret
+
+*/
+
+static UINT8 suna8_trash_prot, *suna8_wram;
+
+/* This is a command-based protection. */
+static WRITE8_HANDLER( sparkman_cmd_prot_w )
 {
-	suna8_nmi_enable = data & 0x01;
-	if (data & ~0x01) 	logerror("CPU #0 - PC %04X: unknown nmi bits: %02X\n",cpu_get_pc(space->cpu),data);
+	switch(data)
+	{
+		case 0xa6: suna8_nmi_enable = 1; break;
+		case 0x00: suna8_nmi_enable = 0; break;
+		case 0x18: suna8_trash_prot = 0; break;
+		case 0x81: suna8_trash_prot = 1; break;
+		default: logerror("CPU #0 - PC %04X: unknown protection command: %02X\n",cpu_get_pc(space->cpu),data);
+	}
+}
+
+static WRITE8_HANDLER( suna8_wram_w )
+{
+	if(!suna8_trash_prot)
+		suna8_wram[offset] = data;
 }
 
 /*
@@ -853,7 +893,10 @@ static WRITE8_HANDLER( sparkman_leds_w )
 */
 static WRITE8_HANDLER( sparkman_spritebank_w )
 {
-	suna8_spritebank = (data >> 1) & 1;
+	if(data == 0xf7) //???
+		suna8_spritebank = 0;
+	else
+		suna8_spritebank = (data) & 1;
 	if (data & ~0x02) 	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
@@ -888,11 +931,11 @@ static ADDRESS_MAP_START( sparkman_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc200, 0xc200) AM_WRITE(sparkman_spritebank_w		)	// Sprite RAM Bank
 	AM_RANGE(0xc280, 0xc280) AM_WRITE(sparkman_rombank_w		)	// ROM Bank (?mirrored up to c2ff?)
 	AM_RANGE(0xc300, 0xc300) AM_WRITE(sparkman_flipscreen_w		)	// Flip Screen
-	AM_RANGE(0xc380, 0xc380) AM_WRITE(sparkman_nmi_w			)	// ? NMI related ?
+	AM_RANGE(0xc380, 0xc3ff) AM_WRITE(sparkman_cmd_prot_w		)	// Protection
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(sparkman_leds_w			)	// Leds + Coin Counter
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_w				)	// To Sound CPU
 	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram	)	// Palette (Banked??)
-	AM_RANGE(0xc800, 0xdfff) AM_RAM									// RAM
+	AM_RANGE(0xc800, 0xdfff) AM_RAM_WRITE(suna8_wram_w) AM_BASE(&suna8_wram)								// RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w	)	// Sprites (Banked)
 ADDRESS_MAP_END
 
@@ -2080,12 +2123,12 @@ ROM_START( brickzn )
 	ROM_LOAD( "brickzon.011", 0x00000, 0x10000, CRC(6c54161a) SHA1(ea216d9f45b441acd56b9fed81a83e3bfe299fbd) )
 
 	ROM_REGION( 0xc0000, "gfx1", ROMREGION_INVERT )	/* Sprites */
-	ROM_LOAD( "brickzon.002", 0x00000, 0x20000, CRC(241f0659) SHA1(71b577bf7097b3b367d068df42f991d515f9003a) )
-	ROM_LOAD( "brickzon.001", 0x20000, 0x20000, CRC(6970ada9) SHA1(5cfe5dcf25af7aff67ee5d78eb963d598251025f) )
-	ROM_LOAD( "brickzon.003", 0x40000, 0x20000, CRC(2e4f194b) SHA1(86da1a582ea274f2af96d3e3e2ac72bcaf3638cb) )
-	ROM_LOAD( "brickzon.005", 0x60000, 0x20000, CRC(118f8392) SHA1(598fa4df3ae348ec9796cd6d90c3045bec546da3) )
-	ROM_LOAD( "brickzon.004", 0x80000, 0x20000, CRC(2be5f335) SHA1(dc870a3c5303cb2ea1fea4a25f53db016ed5ecee) )
-	ROM_LOAD( "brickzon.006", 0xa0000, 0x20000, CRC(bbf31081) SHA1(1fdbd0e0853082345225e18df340184a7a604b78) )
+	ROM_LOAD( "brickzon.005", 0x00000, 0x20000, CRC(118f8392) SHA1(598fa4df3ae348ec9796cd6d90c3045bec546da3) )
+	ROM_LOAD( "brickzon.004", 0x20000, 0x20000, CRC(2be5f335) SHA1(dc870a3c5303cb2ea1fea4a25f53db016ed5ecee) )
+	ROM_LOAD( "brickzon.006", 0x40000, 0x20000, CRC(bbf31081) SHA1(1fdbd0e0853082345225e18df340184a7a604b78) )
+	ROM_LOAD( "brickzon.002", 0x60000, 0x20000, CRC(241f0659) SHA1(71b577bf7097b3b367d068df42f991d515f9003a) )
+	ROM_LOAD( "brickzon.001", 0x80000, 0x20000, CRC(6970ada9) SHA1(5cfe5dcf25af7aff67ee5d78eb963d598251025f) )
+	ROM_LOAD( "brickzon.003", 0xa0000, 0x20000, CRC(2e4f194b) SHA1(86da1a582ea274f2af96d3e3e2ac72bcaf3638cb) )
 ROM_END
 
 ROM_START( brickzn3 )
@@ -2271,16 +2314,16 @@ static DRIVER_INIT( suna8 )
 }
 
 /* Working Games */
-GAME( 1988, rranger,  0,        rranger,  rranger,  suna8,    ROT0,  "SunA (Sharp Image license)", "Rough Ranger (v2.0)", 0)
+GAME( 1988, sranger,  0,        rranger,  rranger,  suna8,    ROT0,  "SunA", "Super Ranger (v2.0)", 0 )
+GAME( 1988, rranger,  sranger,  rranger,  rranger,  suna8,    ROT0,  "SunA (Sharp Image license)", "Rough Ranger (v2.0, unprotected, bootleg?)", 0) //protection is patched out in this.
+GAME( 1988, srangerb, sranger,  rranger,  rranger,  suna8,    ROT0,  "bootleg", "Super Ranger (bootleg)", 0 )
+GAME( 1988, srangerw, sranger,  rranger,  rranger,  suna8,    ROT0,  "SunA (WDK license)", "Super Ranger (WDK)", 0 )
 GAME( 1988, hardhead, 0,        hardhead, hardhead, hardhead, ROT0,  "SunA", "Hard Head" , 0)
 GAME( 1988, hardheadb,hardhead, hardhead, hardhead, hardhedb, ROT0,  "bootleg", "Hard Head (bootleg)" , 0)
 GAME( 1988, pop_hh,   hardhead, hardhead, hardhead, hardhedb, ROT0,  "bootleg", "Popper (Hard Head bootleg)" , 0)
 GAME( 1991, hardhea2, 0,        hardhea2, hardhea2, hardhea2, ROT0,  "SunA", "Hard Head 2 (v2.0)" , 0 )
 
 /* Non Working Games */
-GAME( 1988, sranger,  rranger,  rranger,  rranger,  suna8,    ROT0,  "SunA", "Super Ranger (v2.0)", GAME_NOT_WORKING )
-GAME( 1988, srangerb, rranger,  rranger,  rranger,  suna8,    ROT0,  "bootleg", "Super Ranger (bootleg)", GAME_NOT_WORKING )
-GAME( 1988, srangerw, rranger,  rranger,  rranger,  suna8,    ROT0,  "SunA (WDK license)", "Super Ranger (WDK)", GAME_NOT_WORKING )
 GAME( 1989, sparkman, 0,        sparkman, sparkman, sparkman, ROT0,  "SunA", "Spark Man (v 2.0)", GAME_NOT_WORKING )
 GAME( 1990, starfigh, 0,        starfigh, hardhea2, starfigh, ROT90, "SunA", "Star Fighter (v1)", GAME_NOT_WORKING )
 GAME( 1992, brickzn,  0,        brickzn,  brickzn,  brickzn,  ROT90, "SunA", "Brick Zone (v5.0)", GAME_NOT_WORKING )

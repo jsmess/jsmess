@@ -16,14 +16,14 @@ likewise be a 2 screen game
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
-#include "video/konamiic.h"
-#include "machine/eeprom.h"
+#include "video/konicdev.h"
+#include "machine/eepromdev.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
 #include "sound/k054539.h"
 #include "rendlay.h"
 #include "includes/xmen.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
 
 UINT16 xmen_current_frame;
 
@@ -39,9 +39,6 @@ UINT16*xmen6p_tilemapright;
 
 ***************************************************************************/
 
-static int init_eeprom_count;
-
-
 static const eeprom_interface eeprom_intf =
 {
 	7,				/* address bits */
@@ -53,45 +50,12 @@ static const eeprom_interface eeprom_intf =
 	"0100110000000" /* unlock command */
 };
 
-static NVRAM_HANDLER( xmen )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-		{
-			init_eeprom_count = 0;
-			eeprom_load(file);
-		}
-		else
-			init_eeprom_count = 10;
-	}
-}
-
-static READ16_HANDLER( eeprom_r )
-{
-	int res;
-
-logerror("%06x eeprom_r\n",cpu_get_pc(space->cpu));
-	/* bit 6 is EEPROM data */
-	/* bit 7 is EEPROM ready */
-	/* bit 14 is service button */
-	res = input_port_read(space->machine, "EEPROM");
-	if (init_eeprom_count)
-	{
-		init_eeprom_count--;
-		res &= 0xbfff;
-	}
-	return res;
-}
-
-
 static WRITE16_HANDLER( eeprom_w )
 {
-logerror("%06x: write %04x to 108000\n",cpu_get_pc(space->cpu),data);
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	const device_config *k053246 = devtag_get_device(space->machine, "k053246");
+
+	logerror("%06x: write %04x to 108000\n",cpu_get_pc(space->cpu),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = coin counter */
@@ -100,16 +64,14 @@ logerror("%06x: write %04x to 108000\n",cpu_get_pc(space->cpu),data);
 		/* bit 2 is data */
 		/* bit 3 is clock (active high) */
 		/* bit 4 is cs (active low) */
-		eeprom_write_bit(data & 0x04);
-		eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
 		/* bit 8 = enable sprite ROM reading */
-		K053246_set_OBJCHA_line((data & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
+		k053246_set_objcha_line(k053246, (data & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
 		/* bit 9 = enable char ROM reading through the video RAM */
-		K052109_set_RMRD_line((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(k052109, (data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -161,22 +123,22 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(K053247_word_r, K053247_word_w)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("k053246", k053247_word_r, k053247_word_w)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM
 	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
-	AM_RANGE(0x108020, 0x108027) AM_WRITE(K053246_word_w)
+	AM_RANGE(0x108020, 0x108027) AM_DEVWRITE("k053246", k053246_word_w)
 	AM_RANGE(0x10804c, 0x10804d) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x10804e, 0x10804f) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x108054, 0x108055) AM_READ(sound_status_r)
-	AM_RANGE(0x108060, 0x10807f) AM_WRITE(K053251_lsb_w)
+	AM_RANGE(0x108060, 0x10807f) AM_DEVWRITE("k053251", k053251_lsb_w)
 	AM_RANGE(0x10a000, 0x10a001) AM_READ_PORT("P2_P4") AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x10a002, 0x10a003) AM_READ_PORT("P1_P3")
-	AM_RANGE(0x10a004, 0x10a005) AM_READ(eeprom_r)
-	AM_RANGE(0x10a00c, 0x10a00d) AM_READ(K053246_word_r)
+	AM_RANGE(0x10a004, 0x10a005) AM_READ_PORT("EEPROM")
+	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD("k053246", k053246_word_r)
 	AM_RANGE(0x110000, 0x113fff) AM_RAM		/* main RAM */
 	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
-	AM_RANGE(0x18c000, 0x197fff) AM_READWRITE(K052109_lsb_r, K052109_lsb_w)
+	AM_RANGE(0x18c000, 0x197fff) AM_DEVREADWRITE("k052109", k052109_lsb_r, k052109_lsb_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -200,19 +162,19 @@ static ADDRESS_MAP_START( 6p_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x103000, 0x103fff) AM_RAM		/* 6p - a buffer? */
 	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
-	AM_RANGE(0x108020, 0x108027) AM_WRITE(K053246_word_w) /* sprites */
+	AM_RANGE(0x108020, 0x108027) AM_DEVWRITE("k053246", k053246_word_w) /* sprites */
 	AM_RANGE(0x10804c, 0x10804d) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x10804e, 0x10804f) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x108054, 0x108055) AM_READ(sound_status_r)
-	AM_RANGE(0x108060, 0x10807f) AM_WRITE(K053251_lsb_w)
+	AM_RANGE(0x108060, 0x10807f) AM_DEVWRITE("k053251", k053251_lsb_w)
 	AM_RANGE(0x10a000, 0x10a001) AM_READ_PORT("P2_P4") AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x10a002, 0x10a003) AM_READ_PORT("P1_P3")
-	AM_RANGE(0x10a004, 0x10a005) AM_READ(eeprom_r)
+	AM_RANGE(0x10a004, 0x10a005) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x10a006, 0x10a007) AM_READ_PORT("P5_P6")
-	AM_RANGE(0x10a00c, 0x10a00d) AM_READ(K053246_word_r) /* sprites */
+	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD("k053246", k053246_word_r) /* sprites */
 	AM_RANGE(0x110000, 0x113fff) AM_RAM		/* main RAM */
 	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
-/*  AM_RANGE(0x18c000, 0x197fff) AM_WRITE(K052109_lsb_w) AM_BASE(&xmen6p_tilemapleft) */
+/*  AM_RANGE(0x18c000, 0x197fff) AM_DEVWRITE("k052109", k052109_lsb_w) AM_BASE(&xmen6p_tilemapleft) */
 	AM_RANGE(0x18c000, 0x197fff) AM_RAM AM_BASE(&xmen6p_tilemapleft) /* left tilemap (p1,p2,p3 counters) */
 /*
     AM_RANGE(0x1ac000, 0x1af7ff) AM_READONLY
@@ -260,7 +222,7 @@ static INPUT_PORTS_START( xmen )
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* EEPROM status - always 1 */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
@@ -269,6 +231,11 @@ static INPUT_PORTS_START( xmen )
 	PORT_BIT( 0x3000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( xmen2p )
@@ -284,7 +251,7 @@ static INPUT_PORTS_START( xmen2p )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x003c, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* EEPROM status - always 1 */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
@@ -293,6 +260,11 @@ static INPUT_PORTS_START( xmen2p )
 	PORT_BIT( 0x3000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 INPUT_PORTS_END
 
 static CUSTOM_INPUT( xmen_frame_r )
@@ -315,7 +287,7 @@ static INPUT_PORTS_START( xmen6p )
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* EEPROM status - always 1 */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
@@ -325,6 +297,11 @@ static INPUT_PORTS_START( xmen6p )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START6 ) /* not verified */
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xmen_frame_r, NULL)	/* screen indicator? */
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 INPUT_PORTS_END
 
 
@@ -346,6 +323,25 @@ static MACHINE_START( xmen )
 	state_save_register_postload(machine, xmen_postload, NULL);
 }
 
+
+static const k052109_interface xmen_k052109_intf =
+{
+	"gfx1", 0,
+	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	xmen_tile_callback
+};
+
+static const k053247_interface xmen_k053246_intf =
+{
+	"screen",
+	"gfx2", 1,
+	NORMAL_PLANE_ORDER,
+	53, -2,
+	KONAMI_ROM_DEINTERLEAVE_4,
+	xmen_sprite_callback
+};
+
 static MACHINE_DRIVER_START( xmen )
 
 	/* basic machine hardware */
@@ -358,7 +354,7 @@ static MACHINE_DRIVER_START( xmen )
 
 	MDRV_MACHINE_START(xmen)
 
-	MDRV_NVRAM_HANDLER(xmen)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -371,8 +367,11 @@ static MACHINE_DRIVER_START( xmen )
 	MDRV_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )	/* correct, same issue of TMNT2 */
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(xmen)
 	MDRV_VIDEO_UPDATE(xmen)
+
+	MDRV_K052109_ADD("k052109", xmen_k052109_intf)
+	MDRV_K053246_ADD("k053246", xmen_k053246_intf)
+	MDRV_K053251_ADD("k053251")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -402,7 +401,7 @@ static INTERRUPT_GEN( xmen6p_interrupt )
 	}
 	else
 	{
-//      if (xmen_irqenabled&0x04)
+//      if (xmen_irqenabled & 0x04)
 //      {
 			irq3_line_hold(device);
 //          xmen_current_frame = 0x00;
@@ -410,6 +409,16 @@ static INTERRUPT_GEN( xmen6p_interrupt )
 //      }
 	}
 }
+
+static const k053247_interface xmen6p_k053246_intf =
+{
+	"lscreen",	/* is this correct? */
+	"gfx2", 1,
+	NORMAL_PLANE_ORDER,
+	53, -2,
+	KONAMI_ROM_DEINTERLEAVE_4,
+	xmen_sprite_callback
+};
 
 static MACHINE_DRIVER_START( xmen6p )
 
@@ -421,10 +430,9 @@ static MACHINE_DRIVER_START( xmen6p )
 	MDRV_CPU_ADD("audiocpu", Z80,8000000)	/* verified with M1, guessed but accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
-
-	MDRV_NVRAM_HANDLER(xmen)
-
 	MDRV_MACHINE_RESET(xmen6p)
+
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -445,10 +453,13 @@ static MACHINE_DRIVER_START( xmen6p )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(16*8, 52*8-1, 2*8, 30*8-1)
 
-
 	MDRV_VIDEO_START(xmen6p)
 	MDRV_VIDEO_UPDATE(xmen6p)
 	MDRV_VIDEO_EOF(xmen6p)
+
+	MDRV_K052109_ADD("k052109", xmen_k052109_intf)
+	MDRV_K053246_ADD("k053246", xmen6p_k053246_intf)
+	MDRV_K053251_ADD("k053251")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -774,21 +785,12 @@ ROM_START( xmen6pu )
 	ROM_LOAD( "065-a06.1d",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
 ROM_END
 
+GAME( 1992, xmen,    0,    xmen, xmen,    0,   ROT0, "Konami", "X-Men (4 Players ver UBB)", 0 ) /* Second "version" letter denotes players, A=2 players, B=4 players, C=6 players ??? */
+GAME( 1992, xmenj,   xmen, xmen, xmen,    0,   ROT0, "Konami", "X-Men (4 Players ver JBA)", 0 )
+GAME( 1992, xmene,   xmen, xmen, xmen,    0,   ROT0, "Konami", "X-Men (4 Players ver EBA)", 0 )
+GAME( 1992, xmen2pe, xmen, xmen, xmen2p,  0,   ROT0, "Konami", "X-Men (2 Players ver EAA)", 0 )
+GAME( 1992, xmen2pa, xmen, xmen, xmen2p,  0,   ROT0, "Konami", "X-Men (2 Players ver AAA)", 0 )
+GAME( 1992, xmen2pj, xmen, xmen, xmen2p,  0,   ROT0, "Konami", "X-Men (2 Players ver JAA)", 0 )
 
-
-
-static DRIVER_INIT( xmen )
-{
-	konami_rom_deinterleave_2(machine, "gfx1");
-	konami_rom_deinterleave_4(machine, "gfx2");
-}
-
-GAME( 1992, xmen,    0,    xmen, xmen,   xmen,   ROT0, "Konami", "X-Men (4 Players ver UBB)", 0 ) /* Second "version" letter denotes players, A=2 players, B=4 players, C=6 players ??? */
-GAME( 1992, xmenj,   xmen, xmen, xmen,   xmen,   ROT0, "Konami", "X-Men (4 Players ver JBA)", 0 )
-GAME( 1992, xmene,   xmen, xmen, xmen,   xmen,   ROT0, "Konami", "X-Men (4 Players ver EBA)", 0 )
-GAME( 1992, xmen2pe, xmen, xmen, xmen2p, xmen,   ROT0, "Konami", "X-Men (2 Players ver EAA)", 0 )
-GAME( 1992, xmen2pa, xmen, xmen, xmen2p, xmen,   ROT0, "Konami", "X-Men (2 Players ver AAA)", 0 )
-GAME( 1992, xmen2pj, xmen, xmen, xmen2p, xmen,   ROT0, "Konami", "X-Men (2 Players ver JAA)", 0 )
-
-GAME( 1992, xmen6p,  xmen, xmen6p,xmen6p,   xmen, ROT0, "Konami", "X-Men (6 Players ver ECB)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, xmen6pu, xmen, xmen6p,xmen6p,   xmen, ROT0, "Konami", "X-Men (6 Players ver UCB)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, xmen6p,  xmen, xmen6p,xmen6p, 0,   ROT0, "Konami", "X-Men (6 Players ver ECB)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, xmen6pu, xmen, xmen6p,xmen6p, 0,   ROT0, "Konami", "X-Men (6 Players ver UCB)", GAME_IMPERFECT_GRAPHICS )

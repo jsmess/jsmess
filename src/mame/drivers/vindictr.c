@@ -20,7 +20,7 @@
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "audio/atarijsa.h"
-#include "vindictr.h"
+#include "includes/vindictr.h"
 
 
 
@@ -35,6 +35,12 @@ static void update_interrupts(running_machine *machine)
 	vindictr_state *state = (vindictr_state *)machine->driver_data;
 	cputag_set_input_line(machine, "maincpu", 4, state->atarigen.scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 6, state->atarigen.sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+static MACHINE_START( vindictr )
+{
+	atarigen_init(machine);
 }
 
 
@@ -194,6 +200,7 @@ static MACHINE_DRIVER_START( vindictr )
 	MDRV_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
+	MDRV_MACHINE_START(vindictr)
 	MDRV_MACHINE_RESET(vindictr)
 	MDRV_NVRAM_HANDLER(atarigen)
 
