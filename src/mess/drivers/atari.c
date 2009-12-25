@@ -856,8 +856,8 @@ static const pokey_interface atari_pokey_interface =
 		DEVCB_INPUT_PORT("analog_7")
 	},
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, atari_serin_r),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, atari_serout_w),
+	DEVCB_DEVICE_HANDLER("fdc", atari_serin_r),
+	DEVCB_DEVICE_HANDLER("fdc", atari_serout_w),
 	atari_interrupt_cb,
 };
 
@@ -873,7 +873,7 @@ static const pia6821_interface atari_pia_interface =
 	DEVCB_NULL,		/* port A out */
 	DEVCB_NULL,		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_LINE(atarifdc_pia_cb2_w),		/* port CB2 out */
+	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
 	DEVCB_NULL		/* IRQB */
 };
@@ -889,7 +889,7 @@ static const pia6821_interface a600xl_pia_interface =
 	DEVCB_NULL,		/* port A out */
 	DEVCB_HANDLER(a600xl_pia_pb_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_LINE(atarifdc_pia_cb2_w),		/* port CB2 out */
+	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
 	DEVCB_NULL		/* IRQB */
 };
@@ -905,7 +905,7 @@ static const pia6821_interface a1200xl_pia_interface =
 	DEVCB_NULL,		/* port A out */
 	DEVCB_HANDLER(a1200xl_pia_pb_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_LINE(atarifdc_pia_cb2_w),		/* port CB2 out */
+	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
 	DEVCB_NULL		/* IRQB */
 };
@@ -921,7 +921,7 @@ static const pia6821_interface a800xl_pia_interface =
 	DEVCB_NULL,		/* port A out */
 	DEVCB_HANDLER(a800xl_pia_pb_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_LINE(atarifdc_pia_cb2_w),		/* port CB2 out */
+	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
 	DEVCB_NULL		/* IRQB */
 };
@@ -981,6 +981,8 @@ static MACHINE_DRIVER_START( atari_common_nodac )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("40K")
+	
+	MDRV_ATARI_FDC_ADD("fdc")
 MACHINE_DRIVER_END
 
 
@@ -1254,36 +1256,6 @@ ROM_END
 
 /**************************************************************
  *
- * Configs
- *
- **************************************************************/
-
-static void atari_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_FLOPPY; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(a800_floppy); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "atr,dsk,xfd"); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(atari)
-	CONFIG_DEVICE(atari_floppy_getinfo)
-SYSTEM_CONFIG_END
-
-/**************************************************************
- *
  * Driver initializations
  *
  **************************************************************/
@@ -1306,18 +1278,18 @@ static DRIVER_INIT( a600xl )
  **************************************************************/
 
 /*     YEAR  NAME      PARENT    COMPAT MACHINE     INPUT    INIT    CONFIG   COMPANY    FULLNAME */
-COMP ( 1979, a400,     0,        0,     a400,       a800,    0,      atari,    "Atari",   "Atari 400 (NTSC)", 0)
-COMP ( 1979, a400pal,  a400,     0,     a400pal,    a800,    0,      atari,    "Atari",   "Atari 400 (PAL)",  0)
-COMP ( 1979, a800,     0,        0,     a800,       a800,    0,      atari,    "Atari",   "Atari 800 (NTSC)", 0)
-COMP ( 1979, a800pal,  a800,     0,     a800pal,    a800,    0,      atari,    "Atari",   "Atari 800 (PAL)",  0)
-COMP ( 1982, a1200xl,  a800,     0,     a1200xl,    a800xl,  a800xl, atari,    "Atari",   "Atari 1200XL",     GAME_NOT_WORKING )		// 64k RAM
-COMP ( 1983, a600xl,   a800xl,   0,     a600xl,     a800xl,  a600xl, atari,   "Atari",   "Atari 600XL",      GAME_NOT_WORKING )		// 16k RAM
-COMP ( 1983, a800xl,   0,		 0,     a800xl,     a800xl,  a800xl, atari,    "Atari",   "Atari 800XL (NTSC)",GAME_IMPERFECT_GRAPHICS )		// 64k RAM
-COMP ( 1983, a800xlp,  a800xl,	 0,     a800xlpal,  a800xl,  a800xl, atari,    "Atari",   "Atari 800XL (PAL)", GAME_IMPERFECT_GRAPHICS )		// 64k RAM
-COMP ( 1986, a65xe,    a800xl,   0,     a800xl,     a800xl,  a800xl, atari,    "Atari",   "Atari 65XE",       GAME_NOT_WORKING )		// 64k RAM
-COMP ( 1986, a65xea,   a800xl,   0,     a800xl,     a800xl,  a800xl, atari,    "Atari",   "Atari 65XE (Arabic)", GAME_NOT_WORKING )
-COMP ( 1986, a130xe,   a800xl,   0,     a800xl,     a800xl,  a800xl, atari,    "Atari",   "Atari 130XE",      GAME_NOT_WORKING )		// 128k RAM
-COMP ( 1986, a800xe,   a800xl,   0,     a800xl,     a800xl,  a800xl, atari,    "Atari",   "Atari 800XE",      GAME_NOT_WORKING )		// 64k RAM
-COMP ( 1987, xegs,     0,        0,     a800xl,     a800xl,  a800xl, atari,    "Atari",   "Atari XE Game System", GAME_NOT_WORKING )	// 64k RAM
+COMP ( 1979, a400,     0,        0,     a400,       a800,    0,      0,    	"Atari",   "Atari 400 (NTSC)", 0)
+COMP ( 1979, a400pal,  a400,     0,     a400pal,    a800,    0,      0,    	"Atari",   "Atari 400 (PAL)",  0)
+COMP ( 1979, a800,     0,        0,     a800,       a800,    0,      0,    	"Atari",   "Atari 800 (NTSC)", 0)
+COMP ( 1979, a800pal,  a800,     0,     a800pal,    a800,    0,      0,    	"Atari",   "Atari 800 (PAL)",  0)
+COMP ( 1982, a1200xl,  a800,     0,     a1200xl,    a800xl,  a800xl, 0,    	"Atari",   "Atari 1200XL",     GAME_NOT_WORKING )		// 64k RAM
+COMP ( 1983, a600xl,   a800xl,   0,     a600xl,     a800xl,  a600xl, 0,   	"Atari",   "Atari 600XL",      GAME_NOT_WORKING )		// 16k RAM
+COMP ( 1983, a800xl,   0,		 0,     a800xl,     a800xl,  a800xl, 0,    	"Atari",   "Atari 800XL (NTSC)",GAME_IMPERFECT_GRAPHICS )		// 64k RAM
+COMP ( 1983, a800xlp,  a800xl,	 0,     a800xlpal,  a800xl,  a800xl, 0,    	"Atari",   "Atari 800XL (PAL)", GAME_IMPERFECT_GRAPHICS )		// 64k RAM
+COMP ( 1986, a65xe,    a800xl,   0,     a800xl,     a800xl,  a800xl, 0,    	"Atari",   "Atari 65XE",       GAME_NOT_WORKING )		// 64k RAM
+COMP ( 1986, a65xea,   a800xl,   0,     a800xl,     a800xl,  a800xl, 0,    	"Atari",   "Atari 65XE (Arabic)", GAME_NOT_WORKING )
+COMP ( 1986, a130xe,   a800xl,   0,     a800xl,     a800xl,  a800xl, 0,    	"Atari",   "Atari 130XE",      GAME_NOT_WORKING )		// 128k RAM
+COMP ( 1986, a800xe,   a800xl,   0,     a800xl,     a800xl,  a800xl, 0,    	"Atari",   "Atari 800XE",      GAME_NOT_WORKING )		// 64k RAM
+COMP ( 1987, xegs,     0,        0,     a800xl,     a800xl,  a800xl, 0,    	"Atari",   "Atari XE Game System", GAME_NOT_WORKING )	// 64k RAM
 
-CONS ( 1982, a5200,    0,        0,     a5200,      a5200,   0,      atari,    "Atari",   "Atari 5200",       0)
+CONS ( 1982, a5200,    0,        0,     a5200,      a5200,   0,      0,    	"Atari",   "Atari 5200",       0)

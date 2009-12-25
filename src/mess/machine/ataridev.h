@@ -30,10 +30,24 @@ DEVICE_IMAGE_UNLOAD( a5200_cart );
 
 
 /*----------- defined in machine/atarifdc.c -----------*/
+/***************************************************************************
+    MACROS
+***************************************************************************/
 
-DEVICE_IMAGE_LOAD( a800_floppy );
-READ8_HANDLER( atari_serin_r );
-WRITE8_HANDLER( atari_serout_w );
+#define ATARI_FDC		DEVICE_GET_INFO_NAME(atari_fdc)
+
+#define MDRV_ATARI_FDC_ADD(_tag)	\
+	MDRV_DEVICE_ADD((_tag),  ATARI_FDC, 0)
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+DEVICE_GET_INFO(atari_fdc);
+
+READ8_DEVICE_HANDLER( atari_serin_r );
+WRITE8_DEVICE_HANDLER( atari_serout_w );
 WRITE_LINE_DEVICE_HANDLER( atarifdc_pia_cb2_w );
 
 #endif /* _ATARIDEV_H */
