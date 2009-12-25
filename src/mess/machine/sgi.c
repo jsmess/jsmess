@@ -489,6 +489,12 @@ static TIMER_CALLBACK(mc_update_callback)
 	sgi_mc_update();
 }
 
+void sgi_mc_timer_init(running_machine *machine)
+{
+	tMC_UpdateTimer = timer_alloc(machine,  mc_update_callback , NULL);
+	timer_adjust_periodic(tMC_UpdateTimer, ATTOTIME_IN_HZ(10000), 0, ATTOTIME_IN_HZ(10000));
+}
+
 void sgi_mc_init(running_machine *machine)
 {
 	nMC_CPUControl0 = 0;
@@ -532,8 +538,6 @@ void sgi_mc_init(running_machine *machine)
 	nMC_DMAGIO64Addr = 0;
 	nMC_DMAMode = 0;
 	nMC_DMAZoomByteCnt = 0;
-	tMC_UpdateTimer = timer_alloc(machine,  mc_update_callback , NULL);
-	timer_adjust_periodic(tMC_UpdateTimer, ATTOTIME_IN_HZ(10000), 0, ATTOTIME_IN_HZ(10000));
 
 	// if Indigo2, ID appropriately
 	if (!strcmp(machine->gamedrv->name, "ip244415"))

@@ -294,6 +294,8 @@ static MACHINE_START( kim1 )
 	state_save_register_item(machine, "kim1", NULL, 0, kim1_u2_port_b );
 	state_save_register_item(machine, "kim1", NULL, 0, kim1_311_output );
 	state_save_register_item(machine, "kim1", NULL, 0, kim1_cassette_high_count );
+	timer_pulse(machine,  ATTOTIME_IN_HZ(60), NULL, 0, kim1_update_leds );
+	timer_pulse(machine,  ATTOTIME_IN_HZ(44100), NULL, 0, kim1_cassette_input );
 }
 
 
@@ -301,8 +303,6 @@ static MACHINE_RESET( kim1 )
 {
 	int i;
 
-	timer_pulse(machine,  ATTOTIME_IN_HZ(60), NULL, 0, kim1_update_leds );
-	timer_pulse(machine,  ATTOTIME_IN_HZ(44100), NULL, 0, kim1_cassette_input );
 
 	for ( i = 0; i < 6; i++ )
 	{

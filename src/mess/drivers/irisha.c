@@ -140,6 +140,7 @@ static MACHINE_DRIVER_START( irisha )
     MDRV_CPU_PROGRAM_MAP(irisha_mem)
    	MDRV_CPU_IO_MAP(irisha_io)
 
+	MDRV_MACHINE_START( irisha )
    	MDRV_MACHINE_RESET( irisha )
 
     MDRV_I8255A_ADD( "ppi8255", irisha_ppi8255_interface )

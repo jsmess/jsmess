@@ -12,6 +12,7 @@
 /*----------- defined in machine/irisha.c -----------*/
 
 extern DRIVER_INIT( irisha );
+extern MACHINE_START( irisha );
 extern MACHINE_RESET( irisha );
 extern const i8255a_interface irisha_ppi8255_interface;
 extern const struct pit8253_config irisha_pit8253_intf;

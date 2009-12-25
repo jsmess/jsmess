@@ -69,9 +69,9 @@ static TIMER_CALLBACK(keyboard_callback)
 }
 
 
-/* Driver initialization */
-DRIVER_INIT(bk0010)
+MACHINE_START(bk0010)
 {
+	timer_pulse(machine, ATTOTIME_IN_HZ(2400), NULL, 0, keyboard_callback);
 }
 
 static IRQ_CALLBACK(bk0010_irq_callback)
@@ -83,7 +83,6 @@ static IRQ_CALLBACK(bk0010_irq_callback)
 MACHINE_RESET( bk0010 )
 {
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), bk0010_irq_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(2400), NULL, 0, keyboard_callback);
 
 	kbd_state = 0;
 	bk_scrool = 01330;

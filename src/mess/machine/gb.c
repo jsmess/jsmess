@@ -292,10 +292,6 @@ static void gb_init(running_machine *machine)
 
 	gb_sound_w(devtag_get_device(space->machine, "custom"), 0x16, 0x00 );       /* Initialize sound hardware */
 
-	/* Allocate the serial timer, and disable it */
-	gb_driver_data.gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
-	timer_enable( gb_driver_data.gb_serial_timer, 0 );
-
 	gb_driver_data.divcount = 0;
 	gb_driver_data.triggering_irq = 0;
 	gb_driver_data.gb_io[0x07] = 0xF8;		/* Upper bits of TIMEFRQ register are set to 1 */
@@ -304,6 +300,10 @@ static void gb_init(running_machine *machine)
 MACHINE_START( gb )
 {
 	add_exit_callback(machine, gb_machine_stop);
+	
+	/* Allocate the serial timer, and disable it */
+	gb_driver_data.gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
+	timer_enable( gb_driver_data.gb_serial_timer, 0 );
 }
 
 MACHINE_RESET( gb )

@@ -27,6 +27,7 @@ extern const msm8251_interface compis_usart_interface;
 extern const upd765_interface compis_fdc_interface;
 
 DRIVER_INIT(compis);
+MACHINE_START(compis);
 MACHINE_RESET(compis);
 INTERRUPT_GEN(compis_vblank_int);
 

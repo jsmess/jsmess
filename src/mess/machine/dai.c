@@ -144,13 +144,13 @@ MACHINE_START( dai )
 	dai_tms5501 = devtag_get_device(machine, "tms5501");
 
 	memory_configure_bank(machine, "bank2", 0, 4, memory_region(machine, "maincpu") + 0x010000, 0x1000);
+	timer_set(machine, attotime_zero, NULL, 0, dai_bootstrap_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(100),NULL,0,dai_timer);	/* timer for tms5501 */
 }
 
 MACHINE_RESET( dai )
 {
 	memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
-	timer_set(machine, attotime_zero, NULL, 0, dai_bootstrap_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(100),NULL,0,dai_timer);	/* timer for tms5501 */
 }
 
 /***************************************************************************

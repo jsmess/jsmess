@@ -564,6 +564,11 @@ static TIMER_CALLBACK(ip20_timer)
 	timer_set(machine, ATTOTIME_IN_MSEC(1), NULL, 0, ip20_timer);
 }
 
+static MACHINE_START( ip204415 )
+{
+	sgi_mc_timer_init(machine);
+}
+
 static MACHINE_RESET( ip204415 )
 {
 	wd33c93_init(machine, &scsi_intf);
@@ -598,6 +603,7 @@ static MACHINE_DRIVER_START( ip204415 )
 	MDRV_CPU_CONFIG( config )
 	MDRV_CPU_PROGRAM_MAP( ip204415_map)
 
+	MDRV_MACHINE_START( ip204415 )
 	MDRV_MACHINE_RESET( ip204415 )
 	MDRV_NVRAM_HANDLER(93C56)
 

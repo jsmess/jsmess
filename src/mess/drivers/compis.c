@@ -281,6 +281,7 @@ static MACHINE_DRIVER_START( compis )
 
 	MDRV_QUANTUM_TIME(HZ(60))
 
+	MDRV_MACHINE_START(compis)
 	MDRV_MACHINE_RESET(compis)
 
 	MDRV_PIT8253_ADD( "pit8253", compis_pit8253_config )

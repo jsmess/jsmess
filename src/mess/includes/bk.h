@@ -12,7 +12,7 @@
 
 extern UINT16 bk_scrool;
 
-extern DRIVER_INIT( bk0010 );
+extern MACHINE_START( bk0010 );
 extern MACHINE_RESET( bk0010 );
 
 extern READ16_HANDLER (bk_key_state_r);

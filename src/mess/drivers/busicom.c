@@ -190,13 +190,18 @@ static TIMER_CALLBACK(timer_callback)
 	i4004_set_test(cputag_get_cpu(machine, "maincpu"),timer);
 
 }
+
+static MACHINE_START(busicom)
+{
+	timer_pulse(machine, ATTOTIME_IN_MSEC(28*2), NULL, 0, timer_callback);
+}
+
 static MACHINE_RESET(busicom)
 {
 	int i,j;
 	drum_index =0;
 	keyboard_shifter = 0;
 	printer_shifter = 0;
-	timer_pulse(machine, ATTOTIME_IN_MSEC(28*2), NULL, 0, timer_callback);
 
 	for(i=0;i<17;i++) {
 		for(j=0;j<11;j++) {
@@ -217,6 +222,7 @@ static MACHINE_DRIVER_START( busicom )
     MDRV_CPU_IO_MAP(busicom_io)
 
     MDRV_MACHINE_RESET(busicom)
+	MDRV_MACHINE_START(busicom)
 
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)

@@ -896,12 +896,6 @@ static void kc_keyboard_init(running_machine *machine)
 	/* head and tail of list is at beginning */
 	keyboard_data.head = (keyboard_data.tail = 0);
 
-	/* 50 Hz is just a arbitrary value - used to put scan-codes into the queue for transmitting */
-	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, kc_keyboard_update);
-
-	/* timer to transmit pulses to kc base unit */
-	timer_pulse(machine, ATTOTIME_IN_USEC(1024), NULL, 0, kc_keyboard_transmit_timer_callback);
-
 	/* kc keyboard is not transmitting */
 	keyboard_data.transmit_state = KC_KEYBOARD_TRANSMIT_IDLE;
 
@@ -1797,9 +1791,23 @@ Z80CTC_INTERFACE( kc85_ctc_intf )
     DEVCB_LINE(kc85_zc2_callback)
 };
 
-static void	kc85_common_init(running_machine *machine)
+MACHINE_START(kc85) 
 {
 	kc_cassette_init(machine);
+	
+	// from keyboard init
+	/* 50 Hz is just a arbitrary value - used to put scan-codes into the queue for transmitting */
+	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, kc_keyboard_update);
+
+	/* timer to transmit pulses to kc base unit */
+	timer_pulse(machine, ATTOTIME_IN_USEC(1024), NULL, 0, kc_keyboard_transmit_timer_callback);	
+
+	timer_pulse(machine, ATTOTIME_IN_HZ(15625), (void *)devtag_get_device(machine, "z80ctc"), 0, kc85_15khz_timer_callback);
+	timer_set(machine, attotime_zero, NULL, 0, kc85_reset_timer_callback);
+}
+
+static void	kc85_common_init(running_machine *machine)
+{
 	kc_keyboard_init(machine);
 
 	/* kc85 has a 50 Hz input to the ctc channel 2 and 3 */
@@ -1809,8 +1817,6 @@ static void	kc85_common_init(running_machine *machine)
 	kc85_50hz_state = 0;
 	kc85_15khz_state = 0;
 	kc85_15khz_count = 0;
-	timer_pulse(machine, ATTOTIME_IN_HZ(15625), (void *)devtag_get_device(machine, "z80ctc"), 0, kc85_15khz_timer_callback);
-	timer_set(machine, attotime_zero, NULL, 0, kc85_reset_timer_callback);
 	kc85_module_system_init();
 }
 

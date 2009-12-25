@@ -1475,15 +1475,17 @@ DRIVER_INIT( compis )
 	memset (&compis, 0, sizeof (compis) );
 }
 
+MACHINE_START( compis )
+{
+	/* CPU */
+	compis_cpu_init(machine);
+}
 /*-------------------------------------------------------------------------*/
 /* Name: compis                                                            */
 /* Desc: Machine - Init                                                    */
 /*-------------------------------------------------------------------------*/
 MACHINE_RESET( compis )
 {
-	/* CPU */
-	compis_cpu_init(machine);
-
 	/* FDC */
 	compis_fdc_reset(machine);
 

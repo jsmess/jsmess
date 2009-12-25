@@ -533,6 +533,7 @@ static const TMS9928a_interface tms9928a_interface =
 static MACHINE_START( coleco )
 {
 	TMS9928A_configure(&tms9928a_interface);
+	timer_pulse(machine, ATTOTIME_IN_MSEC(20), NULL, 0, paddle_callback);
 }
 
 static MACHINE_RESET( coleco )
@@ -540,7 +541,6 @@ static MACHINE_RESET( coleco )
 	last_state = 0;
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), INPUT_LINE_IRQ0, 0xff);
 	memset(&memory_region(machine, "maincpu")[0x6000], 0xff, 0x400);	// initialize RAM
-	timer_pulse(machine, ATTOTIME_IN_MSEC(20), NULL, 0, paddle_callback);
 }
 
 //static int coleco_cart_verify(const UINT8 *cartdata, size_t size)

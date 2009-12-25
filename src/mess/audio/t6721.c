@@ -110,8 +110,12 @@ static TIMER_CALLBACK(c364_speech_timer)
 
 void c364_speech_init(running_machine *machine)
 {
-	memset(&speech, 0, sizeof(speech));
 	speech.timer = timer_alloc(machine, c364_speech_timer, NULL);
+}
+
+void c364_speech_reset(running_machine *machine)
+{
+	memset(&speech, 0, sizeof(speech));
 }
 
 WRITE8_HANDLER(c364_speech_w)

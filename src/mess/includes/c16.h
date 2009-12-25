@@ -45,6 +45,7 @@ extern DRIVER_INIT( c16 );
 extern DRIVER_INIT( c16c );
 extern DRIVER_INIT( c16v );
 extern MACHINE_RESET( c16 );
+extern MACHINE_START( c16 );
 extern INTERRUPT_GEN( c16_frame_interrupt );
 
 MACHINE_DRIVER_EXTERN( c16_cartslot );
@@ -56,6 +57,7 @@ extern WRITE8_HANDLER(c364_speech_w);
 extern READ8_HANDLER(c364_speech_r);
 
 extern void c364_speech_init(running_machine *machine);
+extern void c364_speech_reset(running_machine *machine);
 
 
 #endif /* C16_H_ */

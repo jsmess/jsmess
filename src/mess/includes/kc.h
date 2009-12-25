@@ -46,6 +46,7 @@ unsigned char *kc85_4_get_video_ram_base(int bank, int colour);
 extern const upd765_interface kc_fdc_interface;
 extern QUICKLOAD_LOAD( kc );
 
+MACHINE_START( kc85 );
 MACHINE_RESET( kc85_3 );
 MACHINE_RESET( kc85_4 );
 MACHINE_RESET( kc85_4d );

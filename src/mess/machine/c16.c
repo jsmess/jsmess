@@ -507,13 +507,17 @@ DRIVER_INIT( c16v )
 	c16_driver_init(machine);
 }
 
+MACHINE_START( c16 )
+{
+	c364_speech_init(machine);
+}
 
 MACHINE_RESET( c16 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const device_config *sid = devtag_get_device(space->machine, "sid");
 
-	c364_speech_init(machine);
+	c364_speech_reset(machine);
 
 	if (read_cfg1(machine) & 0x80)  /* SID card present */
 	{
