@@ -101,6 +101,45 @@ ADDRESS_MAP_END
 
 /***************************************************************
 
+    F4 CHARACTER DISPLAYER
+
+****************************************************************/
+static const gfx_layout kayproii_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static const gfx_layout kaypro2x_charlayout =
+{
+	8, 16,					/* 8 x 16 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( kayproii )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, kayproii_charlayout, 0, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START( kaypro2x )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, kaypro2x_charlayout, 0, 1 )
+GFXDECODE_END
+
+/***************************************************************
+
     Interfaces
 
 ****************************************************************/
@@ -197,6 +236,7 @@ static MACHINE_DRIVER_START( kayproii )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(80*7, 24*10)
 	MDRV_SCREEN_VISIBLE_AREA(0,80*7-1,0,24*10-1)
+	MDRV_GFXDECODE(kayproii)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(kaypro)
 
@@ -236,6 +276,7 @@ static MACHINE_DRIVER_START( kaypro2x )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(80*8, 25*16)
 	MDRV_SCREEN_VISIBLE_AREA(0,80*8-1,0,25*16-1)
+	MDRV_GFXDECODE(kaypro2x)
 	MDRV_PALETTE_LENGTH(3)
 	MDRV_PALETTE_INIT(kaypro)
 
@@ -355,9 +396,9 @@ ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    INIT    CONFIG       COMPANY  FULLNAME */
 COMP( 1982, kayproii,   0,        0,    kayproii, kay_kbd, 0,      0,	"Non Linear Systems",  "Kaypro II - 2/83" , 0 )
-COMP( 1983, kaypro4,    kayproii, 0,    kayproii, kay_kbd, 0,      0,    "Non Linear Systems",  "Kaypro 4 - 4/83" , GAME_NOT_WORKING ) // model 81-004
+COMP( 1983, kaypro4,    kayproii, 0,    kayproii, kay_kbd, 0,      0,    "Non Linear Systems",  "Kaypro 4 - 4/83" , 0 ) // model 81-004
 COMP( 1983, kaypro4p88, kayproii, 0,    kayproii, kay_kbd, 0,      0,    "Non Linear Systems",  "Kaypro 4 plus88 - 4/83" , GAME_NOT_WORKING ) // model 81-004 with an added 8088 daughterboard and rom
-COMP( 198?, omni2,      kayproii, 0,    omni2,    kay_kbd, 0,      0,    "Non Linear Systems",  "Omni II" , GAME_NOT_WORKING )
+COMP( 198?, omni2,      kayproii, 0,    omni2,    kay_kbd, 0,      0,    "Non Linear Systems",  "Omni II" , 0 )
 COMP( 1984, kaypro2x,   0,        0,    kaypro2x, kay_kbd, 0,      0,    "Non Linear Systems",  "Kaypro 2x" , GAME_NOT_WORKING ) // model 81-025
 COMP( 1984, kaypro4a,   0,        0,    kaypro2x, kay_kbd, 0,      0,    "Non Linear Systems",  "Kaypro 4 - 4/84" , GAME_NOT_WORKING ) // model 81-015
 // Kaypro 4/84 plus 88 goes here, model 81-015 with an added 8088 daughterboard and rom
