@@ -81,14 +81,12 @@ static MACHINE_START( ti990_10 )
 	MACHINE_START_CALL( ti990_hdc );
 }
 
-
 static MACHINE_RESET( ti990_10 )
 {
 	ti990_hold_load(machine);
 
 	ti990_reset_int();
 
-	ti990_tpc_init(machine, ti990_set_int9);
 	ti990_hdc_init(machine, ti990_set_int13);
 }
 
@@ -158,7 +156,7 @@ static ADDRESS_MAP_START(ti990_10_memmap, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x100000, 0x1ff7ff) AM_NOP		/* free TILINE space */
 	AM_RANGE(0x1ff800, 0x1ff81f) AM_READWRITE(ti990_hdc_r, ti990_hdc_w)	/* disk controller TPCS */
 	AM_RANGE(0x1ff820, 0x1ff87f) AM_NOP		/* free TPCS */
-	AM_RANGE(0x1ff880, 0x1ff89f) AM_READWRITE(ti990_tpc_r, ti990_tpc_w)	/* tape controller TPCS */
+	AM_RANGE(0x1ff880, 0x1ff89f) AM_DEVREADWRITE("tpc",ti990_tpc_r, ti990_tpc_w)	/* tape controller TPCS */
 	AM_RANGE(0x1ff8a0, 0x1ffbff) AM_NOP		/* free TPCS */
 	AM_RANGE(0x1ffc00, 0x1fffff) AM_ROM		/* LOAD ROM */
 
@@ -191,7 +189,10 @@ static const ti990_10reset_param reset_params =
 	ti990_set_int2
 };
 
-
+static const ti990_tpc_interface ti990_tpc =
+{
+	ti990_set_int9
+};
 
 static MACHINE_DRIVER_START(ti990_10)
 	/* basic machine hardware */
@@ -227,6 +228,8 @@ static MACHINE_DRIVER_START(ti990_10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_IMPORT_FROM( ti990_hdc )
+	
+	MDRV_TI990_TAPE_CTRL_ADD("tpc",ti990_tpc)
 MACHINE_DRIVER_END
 
 
@@ -289,32 +292,5 @@ static INPUT_PORTS_START(ti990_10)
 	VDT911_KEY_PORTS
 INPUT_PORTS_END
 
-
-static void ti990_10_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_MAGTAPE; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(ti990_tape); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(ti990_tape); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(ti990_tape); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap"); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(ti990_10)
-	CONFIG_DEVICE(ti990_10_cassette_getinfo)
-SYSTEM_CONFIG_END
-
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY                 FULLNAME */
-COMP( 1975,	ti990_10,	0,		0,		ti990_10,	ti990_10,	ti990_10,	ti990_10,	"Texas Instruments",	"TI Model 990/10 Minicomputer System" , GAME_NOT_WORKING )
+COMP( 1975,	ti990_10,	0,		0,		ti990_10,	ti990_10,	ti990_10,	0,	"Texas Instruments",	"TI Model 990/10 Minicomputer System" , GAME_NOT_WORKING )
