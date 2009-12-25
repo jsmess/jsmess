@@ -331,6 +331,29 @@ static const z80_daisy_chain mbee_daisy_chain[] =
 	{ NULL }
 };
 
+/**************************** F4 CHARACTER DISPLAYER */
+static const gfx_layout mbee_charlayout =
+{
+	8,16,					/* 8 x 16 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8, 8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+/* This will show the 128 characters in the ROM + whatever happens to be in the PCG */
+static GFXDECODE_START( mbee )
+	GFXDECODE_ENTRY( "maincpu", 0x11000, mbee_charlayout, 0, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START( mbeeic )
+	GFXDECODE_ENTRY( "maincpu", 0x11000, mbee_charlayout, 0, 48 )
+GFXDECODE_END
+
 static FLOPPY_OPTIONS_START(mbee)
 	FLOPPY_OPTION(ss80, "ss80", "SS80 disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
@@ -388,6 +411,8 @@ static MACHINE_DRIVER_START( mbee )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 19*16)			/* need at least 17 lines for NET */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 19*16-1)
+
+	MDRV_GFXDECODE(mbee)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
@@ -427,6 +452,8 @@ static MACHINE_DRIVER_START( mbeeic )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(80*8, 310)
 	MDRV_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 19*16-1)
+
+	MDRV_GFXDECODE(mbeeic)
 	MDRV_PALETTE_LENGTH(96)
 	MDRV_PALETTE_INIT(mbeeic)
 
