@@ -436,6 +436,93 @@ static INPUT_PORTS_START( trs80m3 )
 INPUT_PORTS_END
 
 
+/**************************** F4 CHARACTER DISPLAYER ***********************************************************/
+static const gfx_layout trs80_charlayout =
+{
+	8, 8,			/* 8 x 8 characters */
+	128,			/* 128 characters */
+	1,			/* 1 bits per pixel */
+	{ 0 },			/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{  0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8		   /* every char takes 8 bytes */
+};
+
+static const gfx_layout ht1080z_charlayout =
+{
+	5, 12,			/* 5 x 12 characters */
+	128,			/* 128 characters */
+	1,			/* 1 bits per pixel */
+	{ 0 },			/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{  0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16		   /* every char takes 16 bytes */
+};
+
+static const gfx_layout trs80m4_charlayout =
+{
+	8, 8,			/* 8 x 8 characters */
+	256,			/* 256 characters */
+	1,			/* 1 bits per pixel */
+	{ 0 },			/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{  0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8		   /* every char takes 8 bytes */
+};
+
+static const gfx_layout lnw80_charlayout =
+{
+	8, 8,			/* 8 x 8 characters */
+	128,			/* 128 characters */
+	1,			/* 1 bits per pixel */
+	{ 0 },			/* no bitplanes */
+	/* x offsets */
+	{ 7, 5, 6, 1, 0, 2, 4, 3 },
+	/* y offsets */
+	{  0*8, 512*8, 256*8, 768*8, 1*8, 513*8, 257*8, 769*8 },
+	8*2		   /* every char takes 8 bytes */
+};
+
+static const gfx_layout radionic_charlayout =
+{
+	8, 16,			/* 8 x 16 characters */
+	256,			/* 256 characters */
+	1,			/* 1 bits per pixel */
+	{ 0 },			/* no bitplanes */
+	/* x offsets */
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	/* y offsets */
+	{  0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 2048*8, 2049*8, 2050*8, 2051*8, 2052*8, 2053*8, 2054*8, 2055*8 },
+	8*8		   /* every char takes 16 bytes */
+};
+
+static GFXDECODE_START(trs80)
+	GFXDECODE_ENTRY( "gfx1", 0, trs80_charlayout, 0, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START(ht1080z)
+	GFXDECODE_ENTRY( "gfx1", 0, ht1080z_charlayout, 0, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START(trs80m4)
+	GFXDECODE_ENTRY( "gfx1", 0, trs80m4_charlayout, 0, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START(lnw80)
+	GFXDECODE_ENTRY( "gfx1", 0, lnw80_charlayout, 0, 4 )
+GFXDECODE_END
+
+static GFXDECODE_START(radionic)
+	GFXDECODE_ENTRY( "gfx1", 0, radionic_charlayout, 0, 1 )
+GFXDECODE_END
+
+
 static const cassette_config trs80l2_cassette_config =
 {
 	trs80l2_cassette_formats,
@@ -471,6 +558,7 @@ static MACHINE_DRIVER_START( trs80 )		// the original model I, level I, with no 
 	MDRV_CPU_PROGRAM_MAP(trs80_map)
 	MDRV_CPU_IO_MAP(trs80_io)
 
+	MDRV_MACHINE_START( trs80 )
 	MDRV_MACHINE_RESET( trs80 )
 
 	/* video hardware */
@@ -479,7 +567,9 @@ static MACHINE_DRIVER_START( trs80 )		// the original model I, level I, with no 
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*FW, 16*FH)
-	MDRV_SCREEN_VISIBLE_AREA(0*FW,64*FW-1,0*FH,16*FH-1)
+	MDRV_SCREEN_VISIBLE_AREA(0,64*FW-1,0,16*FH-1)
+
+	MDRV_GFXDECODE(trs80)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
@@ -523,6 +613,7 @@ static MACHINE_DRIVER_START( model3 )
 
 	MDRV_MACHINE_RESET( trs80m4 )
 
+	MDRV_GFXDECODE(trs80m4)
 	MDRV_VIDEO_UPDATE( trs80m4 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(80*8, 240)
@@ -550,6 +641,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ht1080z )
 	MDRV_IMPORT_FROM( sys80 )
 	MDRV_VIDEO_UPDATE( ht1080z )
+	MDRV_GFXDECODE(ht1080z)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( lnw80 )
@@ -559,6 +651,7 @@ static MACHINE_DRIVER_START( lnw80 )
 	MDRV_CPU_IO_MAP( lnw80_io)
 	MDRV_MACHINE_RESET( lnw80 )
 
+	MDRV_GFXDECODE(lnw80)
 	MDRV_PALETTE_LENGTH(8)
 	MDRV_PALETTE_INIT(lnw80)
 	MDRV_VIDEO_UPDATE(lnw80)
@@ -572,7 +665,8 @@ static MACHINE_DRIVER_START( radionic )
 	MDRV_VIDEO_UPDATE( radionic )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(64*8, 16*16)
-	MDRV_SCREEN_VISIBLE_AREA(0*8,64*8-1,0*16,16*16-1)
+	MDRV_SCREEN_VISIBLE_AREA(0,64*8-1,0,16*16-1)
+	MDRV_GFXDECODE(radionic)
 MACHINE_DRIVER_END
 
 

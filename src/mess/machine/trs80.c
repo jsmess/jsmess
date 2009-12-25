@@ -941,9 +941,8 @@ READ8_HANDLER( trs80_keyboard_r )
  *  Machine              *
  *************************************/
 
-MACHINE_RESET( trs80 )
+MACHINE_START( trs80 )
 {
-	cassette_data = 0;
 	cassette_data_timer = timer_alloc(machine,  cassette_data_callback, NULL );
 	timer_adjust_periodic( cassette_data_timer, attotime_zero, 0, ATTOTIME_IN_HZ(11025) );
 	trs80_printer = devtag_get_device(machine, "centronics");
@@ -954,10 +953,16 @@ MACHINE_RESET( trs80 )
 	machine->generic.videoram_size = 0x800;
 }
 
+MACHINE_RESET( trs80 )
+{
+	cassette_data = 0;
+}
+
 MACHINE_RESET( trs80m4 )
 {
 	const address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	MACHINE_RESET_CALL(trs80);
+	cassette_data = 0;
+
 	memory_install_read_bank (mem, 0x0000, 0x0fff, 0, 0, "bank1");
 	memory_install_read_bank (mem, 0x1000, 0x37e7, 0, 0, "bank2");
 	memory_install_read_bank (mem, 0x37e8, 0x37e9, 0, 0, "bank3");
@@ -984,7 +989,7 @@ MACHINE_RESET( trs80m4 )
 MACHINE_RESET( lnw80 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	MACHINE_RESET_CALL(trs80);
+	cassette_data = 0;
 	trs80_reg_load = 1;
 	lnw80_fe_w(space, 0, 0);
 }
