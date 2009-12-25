@@ -85,11 +85,12 @@
 
     Sound:
 
-    external speaker connected to the parallel port
-    speaker is connected to all pins. All pins need to be toggled at the same time.
+    External speaker connected to the parallel port.
+    There was a dac you could make instead, this is supported.
 
 
     Kevin Thacker [MESS driver]
+    Robbbert [Various corrections and additions over the years]
 
  ******************************************************************************
 
@@ -98,7 +99,7 @@
     The Sorcerer has a bus connection for S100 equipment. This allows the connection
     of disk drives, provided that suitable driver/boot software is loaded.
 
-    The driver "exidy" emulates a Sorcerer with 4 floppy disk drives fitted, and 32k of ram.
+    The driver "exidy" emulates a Sorcerer with 4 floppy disk drives fitted, and 44k of ram.
 
     The driver "exidyd" emulates the most common form, a cassette-based system with 48k of ram.
 
@@ -132,6 +133,9 @@ We emulate the use of two cassette units. An option allows you to hear the sound
 of the tape during playback.
 
 The sorcerer has a UART device used by the serial interface and the cassette system.
+
+An examination of the disk controller boot rom shows the controller is not a
+standard one; a custom implementation will need to be written.
 
 
 ********************************************************************************/
@@ -319,6 +323,26 @@ static INPUT_PORTS_START(exidy)
 	PORT_CONFSETTING(    0x00, DEF_STR(Off))
 INPUT_PORTS_END
 
+/**************************** F4 CHARACTER DISPLAYER ******************************************************/
+
+static const gfx_layout exidy_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+/* This will show the 128 characters in the ROM + whatever happens to be in the PCG */
+static GFXDECODE_START( exidy )
+	GFXDECODE_ENTRY( "maincpu", 0xf800, exidy_charlayout, 0, 1 )
+GFXDECODE_END
+
 /**********************************************************************************************************/
 
 static const ay31015_config exidy_ay31015_config =
@@ -367,6 +391,8 @@ static MACHINE_DRIVER_START( exidy )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 30*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 30*8-1)
+
+	MDRV_GFXDECODE(exidy)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
@@ -408,9 +434,6 @@ static MACHINE_DRIVER_START( exidyd )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(exidyd_mem)
-
-	MDRV_MACHINE_START( exidy )
-	MDRV_MACHINE_RESET( exidy )
 
 	MDRV_FLOPPY_4_DRIVES_REMOVE()
 MACHINE_DRIVER_END
