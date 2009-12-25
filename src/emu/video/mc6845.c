@@ -846,7 +846,7 @@ void mc6845_update(const device_config *device, bitmap_t *bitmap, const rectangl
 		if (mc6845->intf->end_update != NULL)
 			mc6845->intf->end_update(device, bitmap, cliprect, param);
 
-		popmessage(NULL);
+	//	popmessage(NULL);
 	}
 	else
 		popmessage("Invalid MC6845 screen parameters - display disabled!!!");
