@@ -1815,8 +1815,7 @@ WRITE8_HANDLER( lynx_memory_config_w )
 }
 
 static void lynx_reset(running_machine *machine)
-{
-	int i;
+{	
 	lynx_memory_config_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0);
 
 	cputag_set_input_line(machine, "maincpu", M65SC02_IRQ_LINE, CLEAR_LINE);
@@ -1837,9 +1836,6 @@ static void lynx_reset(running_machine *machine)
 
 	lynx_uart_reset();
 
-	for (i = 0; i < NR_LYNX_TIMERS; i++)
-		lynx_timer_init(machine, i);
-
 	lynx_audio_reset();
 
 	// hack to allow current object loading to work
@@ -1858,6 +1854,7 @@ static STATE_POSTLOAD( lynx_postload )
 
 MACHINE_START( lynx )
 {
+	int i;
 	state_save_register_global(machine, lynx_memory_config);
 	state_save_register_global_pointer(machine, lynx_mem_fe00, lynx_mem_fe00_size);
 	state_save_register_postload(machine, lynx_postload, NULL);
@@ -1870,6 +1867,10 @@ MACHINE_START( lynx )
 	memset(&suzy, 0, sizeof(suzy));
 
 	add_reset_callback(machine, lynx_reset);
+	
+	for (i = 0; i < NR_LYNX_TIMERS; i++)
+		lynx_timer_init(machine, i);
+
 }
 
 

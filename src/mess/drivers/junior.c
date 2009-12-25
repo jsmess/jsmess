@@ -174,14 +174,13 @@ static MACHINE_START( junior )
 {
 	state_save_register_item(machine, "junior", NULL, 0, junior_port_a );
 	state_save_register_item(machine, "junior", NULL, 0, junior_port_b );
+	timer_pulse(machine,  ATTOTIME_IN_HZ(50), NULL, 0, junior_update_leds );
 }
 
 
 static MACHINE_RESET(junior)
 {
 	int i;
-
-	timer_pulse(machine,  ATTOTIME_IN_HZ(50), NULL, 0, junior_update_leds );
 
 	for ( i = 0; i < 6; i++ )
 	{

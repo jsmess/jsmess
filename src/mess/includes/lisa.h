@@ -28,6 +28,7 @@ DRIVER_INIT( lisa2 );
 DRIVER_INIT( lisa210 );
 DRIVER_INIT( mac_xl );
 
+MACHINE_START( lisa );
 MACHINE_RESET( lisa );
 
 INTERRUPT_GEN( lisa_interrupt );

@@ -546,7 +546,6 @@ static void pcjr_keyb_init(running_machine *machine)
 	pcjr_keyb.transferring = 0;
 	pcjr_keyb.latch = 0;
 	pcjr_keyb.raw_keyb_data = 0;
-	pcjr_keyb.keyb_signal_timer = timer_alloc(machine,  pcjr_keyb_signal_callback, NULL );
 	pc_keyb_set_clock( 1 );
 }
 
@@ -1365,6 +1364,8 @@ MACHINE_RESET( pc )
 MACHINE_START( pcjr )
 {
 	pc_fdc_init( machine, &pcjr_fdc_interface_nc );
+	pcjr_keyb.keyb_signal_timer = timer_alloc(machine,  pcjr_keyb_signal_callback, NULL );
+	pc_int_delay_timer = timer_alloc(machine,  pcjr_delayed_pic8259_irq, NULL );	
 }
 
 
@@ -1388,7 +1389,6 @@ MACHINE_RESET( pcjr )
 	speaker_level_w( speaker, 0 );
 
 	pcjr_keyb_init(machine);
-	pc_int_delay_timer = timer_alloc(machine,  pcjr_delayed_pic8259_irq, NULL );
 }
 
 

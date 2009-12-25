@@ -4493,18 +4493,6 @@ static MACHINE_START( cdi )
 	scc68070_register_globals(machine);
 	cdic_register_globals(machine);
 	slave_register_globals(machine);
-}
-
-static MACHINE_RESET( cdi )
-{
-	UINT16 *src   = (UINT16*)memory_region(machine, "maincpu");
-	UINT16 *dst   = planea;
-	const device_config *cdrom_dev = devtag_get_device(machine, "cdrom");
-	memcpy(dst, src, 0x8);
-
-	scc68070_init(machine, &scc68070_regs);
-	cdic_init(machine, &cdic_regs);
-	slave_init(machine, &slave_regs);
 
 	scc68070_regs.timers.timer0_timer = timer_alloc(machine, scc68070_timer0_callback, 0);
 	timer_adjust_oneshot(scc68070_regs.timers.timer0_timer, attotime_never, 0);
@@ -4520,6 +4508,18 @@ static MACHINE_RESET( cdi )
 
 	cdic_regs.audio_sample_timer = timer_alloc(machine, audio_sample_trigger, 0);
 	timer_adjust_oneshot(cdic_regs.audio_sample_timer, attotime_never, 0);
+}
+
+static MACHINE_RESET( cdi )
+{
+	UINT16 *src   = (UINT16*)memory_region(machine, "maincpu");
+	UINT16 *dst   = planea;
+	const device_config *cdrom_dev = devtag_get_device(machine, "cdrom");
+	memcpy(dst, src, 0x8);
+
+	scc68070_init(machine, &scc68070_regs);
+	cdic_init(machine, &cdic_regs);
+	slave_init(machine, &slave_regs);
 
 	if( cdrom_dev )
 	{

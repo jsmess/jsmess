@@ -764,9 +764,6 @@ static void init_COPS(running_machine *machine)
 {
 	COPS_Ready = 0;
 
-	/* read command every ms (don't know the real value) */
-	timer_pulse(machine, ATTOTIME_IN_MSEC(1), NULL, 0, set_COPS_ready);
-
 	reset_COPS();
 }
 
@@ -1137,10 +1134,16 @@ DRIVER_INIT( mac_xl )
 	bad_parity_table = auto_alloc_array(machine, UINT8, 0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
-MACHINE_RESET( lisa )
+MACHINE_START( lisa )
 {
 	mouse_timer = timer_alloc(machine, handle_mouse, NULL);
 
+	/* read command every ms (don't know the real value) */
+	timer_pulse(machine, ATTOTIME_IN_MSEC(1), NULL, 0, set_COPS_ready);	
+}
+
+MACHINE_RESET( lisa )
+{
 	lisa_ram_ptr = memory_region(machine, "maincpu") + RAM_OFFSET;
 	lisa_rom_ptr = memory_region(machine, "maincpu") + ROM_OFFSET;
 
