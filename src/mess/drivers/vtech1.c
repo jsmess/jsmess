@@ -1142,16 +1142,16 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT   INIT     CONFIG  COMPANY                   FULLNAME                          FLAGS */
-COMP( 1983, laser110,  0,        0,      laser110,  vtech1, vtech1,  0, "Video Technology",       "Laser 110",                      0 )
-COMP( 1983, las110de,  laser110, 0,      laser110,  vtech1, vtech1,  0, "Sanyo",                  "Laser 110 (Germany)",            0 )
-COMP( 1983, laser200,  0,        0,      laser200,  vtech1, vtech1,  0, "Video Technology",       "Laser 200",                      0 )
-COMP( 1983, vz200de,   laser200, 0,      laser200,  vtech1, vtech1,  0, "Video Technology",       "VZ-200 (Germany & Netherlands)", 0 )
-COMP( 1983, fellow,    laser200, 0,      laser200,  vtech1, vtech1,  0, "Salora",                 "Fellow (Finland)",               0 )
-COMP( 1983, tx8000,    laser200, 0,      laser200,  vtech1, vtech1,  0, "Texet",                  "TX-8000 (UK)",                   0 )
-COMP( 1984, laser210,  0,        0,      laser210,  vtech1, vtech1,  0, "Video Technology",       "Laser 210",                      0 )
-COMP( 1984, vz200,     laser210, 0,      laser210,  vtech1, vtech1,  0, "Dick Smith Electronics", "VZ-200 (Oceania)",               0 )
-COMP( 1984, las210de,  laser210, 0,      laser210,  vtech1, vtech1,  0, "Sanyo",                  "Laser 210 (Germany)",            0 )
-COMP( 1984, laser310,  0,        0,      laser310,  vtech1, vtech1,  0, "Video Technology",       "Laser 310",                      0 )
-COMP( 1984, vz300,     laser310, 0,      laser310,  vtech1, vtech1,  0, "Dick Smith Electronics", "VZ-300 (Oceania)",               0 )
-COMP( 1984, laser310h, laser310, 0,      laser310h, vtech1, vtech1h, 0, "Video Technology",       "Laser 310 (SHRG)",               GAME_COMPUTER_MODIFIED )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT   INIT     COMPANY                   FULLNAME                          FLAGS */
+COMP( 1983, laser110,  0,        0,      laser110,  vtech1, vtech1,  "Video Technology",       "Laser 110",                      0 )
+COMP( 1983, las110de,  laser110, 0,      laser110,  vtech1, vtech1,  "Sanyo",                  "Laser 110 (Germany)",            0 )
+COMP( 1983, laser200,  0,        0,      laser200,  vtech1, vtech1,  "Video Technology",       "Laser 200",                      0 )
+COMP( 1983, vz200de,   laser200, 0,      laser200,  vtech1, vtech1,  "Video Technology",       "VZ-200 (Germany & Netherlands)", 0 )
+COMP( 1983, fellow,    laser200, 0,      laser200,  vtech1, vtech1,  "Salora",                 "Fellow (Finland)",               0 )
+COMP( 1983, tx8000,    laser200, 0,      laser200,  vtech1, vtech1,  "Texet",                  "TX-8000 (UK)",                   0 )
+COMP( 1984, laser210,  0,        0,      laser210,  vtech1, vtech1,  "Video Technology",       "Laser 210",                      0 )
+COMP( 1984, vz200,     laser210, 0,      laser210,  vtech1, vtech1,  "Dick Smith Electronics", "VZ-200 (Oceania)",               0 )
+COMP( 1984, las210de,  laser210, 0,      laser210,  vtech1, vtech1,  "Sanyo",                  "Laser 210 (Germany)",            0 )
+COMP( 1984, laser310,  0,        0,      laser310,  vtech1, vtech1,  "Video Technology",       "Laser 310",                      0 )
+COMP( 1984, vz300,     laser310, 0,      laser310,  vtech1, vtech1,  "Dick Smith Electronics", "VZ-300 (Oceania)",               0 )
+COMP( 1984, laser310h, laser310, 0,      laser310h, vtech1, vtech1h, "Video Technology",       "Laser 310 (SHRG)",               GAME_COMPUTER_MODIFIED )

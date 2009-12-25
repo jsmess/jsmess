@@ -556,5 +556,5 @@ ROM_START( craft )
 	ROM_LOAD( "eeprom.raw", 0x0000, 0x0200, CRC(e18a2af9) SHA1(81fc6f2d391edfd3244870214fac37929af0ac0c) )
 ROM_END
 
-/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      CONFIG    COMPANY          FULLNAME */
-CONS(2008, craft,    0,        0,        craft,    craft,    craft,    0,        "Linus Akesson", "Craft", GAME_NO_SOUND | GAME_NOT_WORKING)
+/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY          FULLNAME */
+CONS(2008, craft,    0,        0,        craft,    craft,    craft,    "Linus Akesson", "Craft", GAME_NO_SOUND | GAME_NOT_WORKING)

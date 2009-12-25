@@ -586,6 +586,6 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME            PARENT      COMPAT      MACHINE     INPUT       INIT        CONFIG  COMPANY FULLNAME        FLAGS */
-COMP( 1979, pc8001,			0,			0,			pc8001,		pc8001,		0,			0,		"NEC",	"PC-8001",		GAME_NOT_WORKING )
-COMP( 1983, pc8001mk2,		pc8001,		0,			pc8001mk2,	pc8001,		0,			0,		"NEC",	"PC-8001mkII",	GAME_NOT_WORKING )
+/*    YEAR  NAME            PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY FULLNAME        FLAGS */
+COMP( 1979, pc8001,			0,			0,			pc8001,		pc8001,		0,			"NEC",	"PC-8001",		GAME_NOT_WORKING )
+COMP( 1983, pc8001mk2,		pc8001,		0,			pc8001mk2,	pc8001,		0,			"NEC",	"PC-8001mkII",	GAME_NOT_WORKING )

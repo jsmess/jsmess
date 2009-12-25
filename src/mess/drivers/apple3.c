@@ -199,6 +199,6 @@ ROM_START(apple3)
 	ROM_LOAD( "apple3.rom", 0x0000, 0x1000, CRC(55e8eec9) SHA1(579ee4cd2b208d62915a0aa482ddc2744ff5e967))
 ROM_END
 
-/*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT    INIT    CONFIG  COMPANY             FULLNAME */
-COMP( 1980,	apple3,		0,		0,		apple3,    apple3,	apple3,	0,	"Apple Computer",	"Apple ///", GAME_NOT_WORKING )
+/*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT    INIT    COMPANY             FULLNAME */
+COMP( 1980,	apple3,		0,		0,		apple3,    apple3,	apple3,		"Apple Computer",	"Apple ///", GAME_NOT_WORKING )
 

@@ -472,7 +472,7 @@ ROM_START(exidyd)
 	ROM_LOAD_OPTIONAL("bruce.dat",   0x0000, 0x0020, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1)) /* video prom */
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT      MACHINE INPUT   INIT    CONFIG  COMPANY        FULLNAME */
-COMP(1979, exidy,   0,		0,	exidy,	exidy,	exidy,	0,	"Exidy Inc", "Sorcerer", 0 )
-COMP(1979, exidyd,  exidy,	0,	exidyd,	exidy,	exidy,	0,	"Exidy Inc", "Sorcerer (Cassette only)", 0 )
+/*    YEAR  NAME    PARENT  COMPAT      MACHINE INPUT   INIT    COMPANY        FULLNAME */
+COMP(1979, exidy,   0,		0,	exidy,	exidy,	exidy,		"Exidy Inc", "Sorcerer", 0 )
+COMP(1979, exidyd,  exidy,	0,	exidyd,	exidy,	exidy,		"Exidy Inc", "Sorcerer (Cassette only)", 0 )
 

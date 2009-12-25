@@ -391,10 +391,10 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP(1983, hec2hrp,  0,       0,     hec2hrp, 	hec2hrp, 0,  	  0,  	 "Micronique",   "Hector 2HR+",	GAME_IMPERFECT_SOUND)
-COMP(????, victor,   hec2hrp, 0, 	 hec2hrp,   hec2hrp, 0,       0,  	 "Micronique",   "Victor",	GAME_IMPERFECT_SOUND)
-COMP(1983, hec2hr ,  hec2hrp, 0,     hec2hr, 	hec2hrp, 0,  	  0,  	 "Micronique",   "Hector 2HR",	GAME_IMPERFECT_SOUND)
-COMP(1984, hec2hrx,  hec2hrp, 0,     hec2hrp, 	hec2hrp, 0,  	  0,  	 "Micronique",   "Hector HRX",	GAME_IMPERFECT_SOUND)
-COMP(1985, hec2mx80, hec2hrp, 0,    hec2mx80, 	hec2hrp, 0,  	  0,  	 "Micronique",   "Hector MX 80c" ,	GAME_IMPERFECT_SOUND)
-COMP(1985, hec2mx40, hec2hrp, 0,    hec2mx40, 	hec2hrp, 0,  	  0,  	 "Micronique",   "Hector MX 40c" ,	GAME_IMPERFECT_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
+COMP(1983, hec2hrp,  0,       0,     hec2hrp, 	hec2hrp, 0,  	 "Micronique",   "Hector 2HR+",	GAME_IMPERFECT_SOUND)
+COMP(????, victor,   hec2hrp, 0, 	 hec2hrp,   hec2hrp, 0,      "Micronique",   "Victor",	GAME_IMPERFECT_SOUND)
+COMP(1983, hec2hr ,  hec2hrp, 0,     hec2hr, 	hec2hrp, 0,  	 "Micronique",   "Hector 2HR",	GAME_IMPERFECT_SOUND)
+COMP(1984, hec2hrx,  hec2hrp, 0,     hec2hrp, 	hec2hrp, 0,  	 "Micronique",   "Hector HRX",	GAME_IMPERFECT_SOUND)
+COMP(1985, hec2mx80, hec2hrp, 0,    hec2mx80, 	hec2hrp, 0,  	 "Micronique",   "Hector MX 80c" ,	GAME_IMPERFECT_SOUND)
+COMP(1985, hec2mx40, hec2hrp, 0,    hec2mx40, 	hec2hrp, 0,  	 "Micronique",   "Hector MX 40c" ,	GAME_IMPERFECT_SOUND)

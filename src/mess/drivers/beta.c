@@ -300,5 +300,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY         FULLNAME    FLAGS */
-COMP( 1984, beta,	0,		0,		beta,	beta,	0,		0,		"Pitronics",	"Beta",		GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY         FULLNAME    FLAGS */
+COMP( 1984, beta,	0,		0,		beta,	beta,	0,		"Pitronics",	"Beta",		GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

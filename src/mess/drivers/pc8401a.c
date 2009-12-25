@@ -717,9 +717,9 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY FULLNAME */
-COMP( 1984,	pc8401a,	0,		0,		pc8401a,	pc8401a,	0,		0,	"NEC",	"PC-8401A-LS", GAME_NOT_WORKING )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY FULLNAME */
+COMP( 1984,	pc8401a,	0,		0,		pc8401a,	pc8401a,	0,		"NEC",	"PC-8401A-LS", GAME_NOT_WORKING )
 /*
-COMP( 1984, pc8401bd,   pc8401a,0,      pc8401a,    pc8401a,    0,      0,    "NEC",  "PC-8401BD", GAME_NOT_WORKING )
+COMP( 1984, pc8401bd,   pc8401a,0,      pc8401a,    pc8401a,    0,      "NEC",  "PC-8401BD", GAME_NOT_WORKING )
 */
-COMP( 1985, pc8500,		0,		0,		pc8500,		pc8401a,	0,		0,		"NEC",	"PC-8500", GAME_NOT_WORKING )
+COMP( 1985, pc8500,		0,		0,		pc8500,		pc8401a,	0,		"NEC",	"PC-8500", GAME_NOT_WORKING )

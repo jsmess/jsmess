@@ -707,21 +707,21 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME  PARENT COMPAT MACHINE INPUT   INIT   CONFIG    COMPANY                             FULLNAME            FLAGS */
+/*    YEAR  NAME  PARENT COMPAT MACHINE INPUT   INIT      COMPANY                             FULLNAME            FLAGS */
 
-COMP( 1984, c16,     0,     0,  c16,    c16,    c16,    0,    "Commodore Business Machines Co.",  "Commodore 16 (PAL)", 0)
-COMP( 1984, c16c,    c16,   0,  c16c,   c16,    c16c,   0,    "Commodore Business Machines Co.",  "Commodore 16 (PAL, 1551)", 0 )
-COMP( 1984, c16v,    c16,   0,  c16v,   c16,    c16v,   0,    "Commodore Business Machines Co.",  "Commodore 16 (PAL, VC1541)", GAME_NOT_WORKING)
-COMP( 1984, c16hun,  c16,   0,  c16,    c16,    c16,    0,    "Commodore Business Machines Co.",  "Commodore 16 Novotrade (PAL, Hungary)", 0)
+COMP( 1984, c16,     0,     0,  c16,    c16,    c16,   "Commodore Business Machines Co.",  "Commodore 16 (PAL)", 0)
+COMP( 1984, c16c,    c16,   0,  c16c,   c16,    c16c,  "Commodore Business Machines Co.",  "Commodore 16 (PAL, 1551)", 0 )
+COMP( 1984, c16v,    c16,   0,  c16v,   c16,    c16v,  "Commodore Business Machines Co.",  "Commodore 16 (PAL, VC1541)", GAME_NOT_WORKING)
+COMP( 1984, c16hun,  c16,   0,  c16,    c16,    c16,   "Commodore Business Machines Co.",  "Commodore 16 Novotrade (PAL, Hungary)", 0)
 
-COMP( 1984, c116,    c16,   0,  c16,    c16,    c16,    0,    "Commodore Business Machines Co.",  "Commodore 116 (PAL)", 0)
-COMP( 1984, c116c,	 c16,   0,  c16c,   c16,    c16c,   0,    "Commodore Business Machines Co.",  "Commodore 116 (PAL, 1551)", 0 )
-COMP( 1984, c116v,   c16,   0,  c16v,   c16,    c16v,   0,    "Commodore Business Machines Co.",  "Commodore 116 (PAL, VC1541)", GAME_NOT_WORKING)
+COMP( 1984, c116,    c16,   0,  c16,    c16,    c16,   "Commodore Business Machines Co.",  "Commodore 116 (PAL)", 0)
+COMP( 1984, c116c,	 c16,   0,  c16c,   c16,    c16c,  "Commodore Business Machines Co.",  "Commodore 116 (PAL, 1551)", 0 )
+COMP( 1984, c116v,   c16,   0,  c16v,   c16,    c16v,  "Commodore Business Machines Co.",  "Commodore 116 (PAL, VC1541)", GAME_NOT_WORKING)
 
-COMP( 1984, plus4,   c16,   0,  plus4,  plus4,  c16,    0,    "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC)", 0)
-COMP( 1984, plus4c,  c16,   0,  plus4c, plus4,  c16c,   0,    "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, 1551)", 0 )
-COMP( 1984, plus4v,  c16,   0,  plus4v, plus4,  c16v,   0,    "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, VC1541)", GAME_NOT_WORKING)
+COMP( 1984, plus4,   c16,   0,  plus4,  plus4,  c16,   "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC)", 0)
+COMP( 1984, plus4c,  c16,   0,  plus4c, plus4,  c16c,  "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, 1551)", 0 )
+COMP( 1984, plus4v,  c16,   0,  plus4v, plus4,  c16v,  "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, VC1541)", GAME_NOT_WORKING)
 
-COMP( 1984, c232,    c16,   0,  c16,    c16,    c16,    0,    "Commodore Business Machines Co.",  "Commodore 232 (Prototype)", 0)
-COMP( 1984, c264,    c16,   0,  c264,   plus4,  c16,    0,    "Commodore Business Machines Co.",  "Commodore 264 (Prototype)", 0)
-COMP( 1984, c364,    c16,   0,  c364,   plus4,  c16,    0,    "Commodore Business Machines Co.",  "Commodore V364 (Prototype)", GAME_IMPERFECT_SOUND)
+COMP( 1984, c232,    c16,   0,  c16,    c16,    c16,   "Commodore Business Machines Co.",  "Commodore 232 (Prototype)", 0)
+COMP( 1984, c264,    c16,   0,  c264,   plus4,  c16,   "Commodore Business Machines Co.",  "Commodore 264 (Prototype)", 0)
+COMP( 1984, c364,    c16,   0,  c364,   plus4,  c16,   "Commodore Business Machines Co.",  "Commodore V364 (Prototype)", GAME_IMPERFECT_SOUND)

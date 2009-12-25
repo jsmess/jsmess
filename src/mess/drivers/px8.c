@@ -132,5 +132,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY  FULLNAME  FLAGS */
-COMP( 1984, px8,  0,      0,      px8,     px8,   0,    0,    "Epson", "PX-8",   GAME_NOT_WORKING )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY  FULLNAME  FLAGS */
+COMP( 1984, px8,  0,      0,      px8,     px8,   0,    "Epson", "PX-8",   GAME_NOT_WORKING )

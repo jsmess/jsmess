@@ -92,6 +92,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1979, sdk86,  0,       0, 	sdk86, 	sdk86, 	 0,  	  0,  	 "Intel",   "SDK-86",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
+COMP( 1979, sdk86,  0,       0, 	sdk86, 	sdk86, 	 0,  	  	 "Intel",   "SDK-86",		GAME_NOT_WORKING)
 

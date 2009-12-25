@@ -20,7 +20,7 @@ software_config *software_config_alloc(int driver_index, core_options *opts, has
 	config = alloc_clear_or_die(software_config);
 
 	// allocate the machine config
-	config->mconfig = machine_config_alloc_with_mess_devices(drivers[driver_index]);
+	config->mconfig = machine_config_alloc(drivers[driver_index]->machine_config);
 
 	// allocate the hash file
 	driver = drivers[driver_index];

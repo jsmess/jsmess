@@ -138,7 +138,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, k1003,  0,       0, 	k1003, 	k1003, 	 0,  	  0,  	 "Robotron",   "K1003",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
+COMP( ????, k1003,  0,       0, 	k1003, 	k1003, 	 0,  	   	 "Robotron",   "K1003",		GAME_NOT_WORKING)
 
 

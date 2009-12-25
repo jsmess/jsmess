@@ -250,6 +250,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1974, busicom,  0,       0, 	busicom, 	busicom, 	 0,  	  0,    "Business Computer Corporation",   "Busicom 141-PF",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
+COMP( 1974, busicom,  0,       0, 	busicom, 	busicom, 	 0,  "Business Computer Corporation",   "Busicom 141-PF",		GAME_NOT_WORKING)
 

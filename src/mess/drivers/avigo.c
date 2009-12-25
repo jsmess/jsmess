@@ -916,6 +916,6 @@ ROM_START(avigo)
 	ROM_LOAD("avigo.rom", 0x010000, 0x0150000, CRC(160ee4a6) SHA1(4d09201a3876de16808bd92989f3d8d7182d72b3))
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY   FULLNAME */
-COMP(1997,	avigo,	0,		0,		avigo,	avigo,	0,		0,	"Texas Instruments", "TI Avigo 100 PDA",GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY   FULLNAME */
+COMP(1997,	avigo,	0,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 100 PDA",GAME_NOT_WORKING)
 

@@ -508,7 +508,7 @@ static void intvkbd_cassette_getinfo(const mess_device_class *devclass, UINT32 s
 
 ***************************************************************************/
 
-/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT   INIT CONFIG COMPANY      FULLNAME */
-CONS( 1979, intv,	0,	0,	intv,     intv, 	0,	0,	"Mattel",    "Intellivision", 0 )
-CONS( 1981, intvsrs,	intv,	0,	intv,     intv, 	0,	0,	"Mattel",    "Intellivision (Sears)", 0 )
-COMP( 1981, intvkbd,	intv,	0,	intvkbd,  intvkbd, 	0,	0,	"Mattel",    "Intellivision Keyboard Component (Unreleased)", GAME_NOT_WORKING)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT   INIT    	COMPANY      FULLNAME */
+CONS( 1979, intv,	0,	0,	intv,     intv, 	0,			"Mattel",    "Intellivision", 0 )
+CONS( 1981, intvsrs,	intv,	0,	intv,     intv, 	0,	"Mattel",    "Intellivision (Sears)", 0 )
+COMP( 1981, intvkbd,	intv,	0,	intvkbd,  intvkbd, 	0,	"Mattel",    "Intellivision Keyboard Component (Unreleased)", GAME_NOT_WORKING)

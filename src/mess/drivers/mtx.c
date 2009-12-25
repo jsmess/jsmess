@@ -358,7 +358,7 @@ ROM_END
  *
  *************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     CONFIG,  COMPANY          FULLNAME   FLAGS */
-COMP( 1983, mtx512,   0,		0,		mtx512,   mtx512,   mtx512,  0,  "Memotech Ltd.", "MTX 512", 0 )
-COMP( 1983, mtx500,   mtx512,   0,      mtx500,   mtx512,   mtx512,  0,  "Memotech Ltd.", "MTX 500", 0 )
-COMP( 1984, rs128,    mtx512,   0,      rs128,    mtx512,   rs128,   0,   "Memotech Ltd.", "RS 128",  0 )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY          FULLNAME   FLAGS */
+COMP( 1983, mtx512,   0,		0,		mtx512,   mtx512,   mtx512,  "Memotech Ltd.", "MTX 512", 0 )
+COMP( 1983, mtx500,   mtx512,   0,      mtx500,   mtx512,   mtx512,  "Memotech Ltd.", "MTX 500", 0 )
+COMP( 1984, rs128,    mtx512,   0,      rs128,    mtx512,   rs128,   "Memotech Ltd.", "RS 128",  0 )

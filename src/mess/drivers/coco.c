@@ -1377,17 +1377,17 @@ ROM_END
 /* use 64K rams, and will boot with 4k, if this is selected, so I have     */
 /* split these to avoid confusion -- PHS                                   */
 
-/*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT      INIT    CONFIG COMPANY                 FULLNAME */
-COMP(  1980,    coco,       0,      0,      coco,      coco,      0,      0,     "Tandy Radio Shack",	         "Color Computer", 0)
-COMP(  1981,    cocoe,      coco,   0,      cocoe,     coco,      0,      0,     "Tandy Radio Shack",	         "Color Computer (Extended BASIC 1.0)", 0)
-COMP(  1983,    coco2,      coco,   0,      coco2,     coco,      0,      0,     "Tandy Radio Shack",	         "Color Computer 2", 0)
-COMP(  1985?,   coco2b,     coco,   0,      coco2b,    coco,      0,      0,     "Tandy Radio Shack",	         "Color Computer 2B", 0)
-COMP(  1986,    coco3,      coco,   0,      coco3,     coco3,     0,      0,     "Tandy Radio Shack",	         "Color Computer 3 (NTSC)", 0)
-COMP(  1986,    coco3p,     coco,   0,      coco3p,    coco3,     0,      0,     "Tandy Radio Shack",	         "Color Computer 3 (PAL)", 0)
-COMP(  19??,    coco3h,     coco,   0,      coco3h,    coco3,     0,      0,     "Tandy Radio Shack",	         "Color Computer 3 (NTSC; HD6309)", GAME_COMPUTER_MODIFIED)
-COMP(  1982,    dragon32,   coco,   0,      dragon32,  dragon32,  0,      0,     "Dragon Data Ltd",            "Dragon 32", 0)
-COMP(  1983,    dragon64,   coco,   0,      dragon64,  dragon32,  0,      0,     "Dragon Data Ltd",            "Dragon 64", 0)
-COMP(  1983,    d64plus,    coco,   0,      d64plus,   dragon32,  0,      0,     "Dragon Data Ltd",            "Dragon 64 Plus", 0)
-COMP(  1983,    tanodr64,   coco,   0,      tanodr64,  dragon32,  0,      0,     "Dragon Data Ltd / Tano Ltd", "Tano Dragon 64 (NTSC)", 0)
-COMP(  1984,    dgnalpha,   coco,   0,      dgnalpha,  dragon32,  0,      0,     "Dragon Data Ltd",            "Dragon Alpha Prototype", 0)
-COMP(  1984,    cp400,      coco,   0,      coco,      coco,      0,      0,     "Prologica",                  "CP400", 0)
+/*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT      INIT    COMPANY                 FULLNAME */
+COMP(  1980,    coco,       0,      0,      coco,      coco,      0,      "Tandy Radio Shack",	         "Color Computer", 0)
+COMP(  1981,    cocoe,      coco,   0,      cocoe,     coco,      0,      "Tandy Radio Shack",	         "Color Computer (Extended BASIC 1.0)", 0)
+COMP(  1983,    coco2,      coco,   0,      coco2,     coco,      0,      "Tandy Radio Shack",	         "Color Computer 2", 0)
+COMP(  1985?,   coco2b,     coco,   0,      coco2b,    coco,      0,      "Tandy Radio Shack",	         "Color Computer 2B", 0)
+COMP(  1986,    coco3,      coco,   0,      coco3,     coco3,     0,      "Tandy Radio Shack",	         "Color Computer 3 (NTSC)", 0)
+COMP(  1986,    coco3p,     coco,   0,      coco3p,    coco3,     0,      "Tandy Radio Shack",	         "Color Computer 3 (PAL)", 0)
+COMP(  19??,    coco3h,     coco,   0,      coco3h,    coco3,     0,      "Tandy Radio Shack",	         "Color Computer 3 (NTSC; HD6309)", GAME_COMPUTER_MODIFIED)
+COMP(  1982,    dragon32,   coco,   0,      dragon32,  dragon32,  0,      "Dragon Data Ltd",            "Dragon 32", 0)
+COMP(  1983,    dragon64,   coco,   0,      dragon64,  dragon32,  0,      "Dragon Data Ltd",            "Dragon 64", 0)
+COMP(  1983,    d64plus,    coco,   0,      d64plus,   dragon32,  0,      "Dragon Data Ltd",            "Dragon 64 Plus", 0)
+COMP(  1983,    tanodr64,   coco,   0,      tanodr64,  dragon32,  0,      "Dragon Data Ltd / Tano Ltd", "Tano Dragon 64 (NTSC)", 0)
+COMP(  1984,    dgnalpha,   coco,   0,      dgnalpha,  dragon32,  0,      "Dragon Data Ltd",            "Dragon Alpha Prototype", 0)
+COMP(  1984,    cp400,      coco,   0,      coco,      coco,      0,      "Prologica",                  "CP400", 0)

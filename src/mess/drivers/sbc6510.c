@@ -111,6 +111,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 2009, sbc6510,  0,       0, 	sbc6510, 	sbc6510, 	 0,  0,  	 "Josip Perusanec",   "SBC6510",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
+COMP( 2009, sbc6510,  0,       0, 	sbc6510, 	sbc6510, 	 0,   "Josip Perusanec",   "SBC6510",		GAME_NOT_WORKING)
 

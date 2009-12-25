@@ -220,5 +220,5 @@ ROM_START( partner )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1987, partner, radio86,   0, 	partner, 	partner,partner, 0,  "SAM SKB VM", 	"Partner-01.01",	GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   INIT    	COMPANY   FULLNAME       FLAGS */
+COMP( 1987, partner, radio86,   0, 	partner, 	partner,partner,  	"SAM SKB VM", 	"Partner-01.01",	GAME_NOT_WORKING)

@@ -672,16 +672,16 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1978, vt100,  0,       0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT100",		GAME_NOT_WORKING)
-COMP( 1978, vt100wp,  vt100, 0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT100-Wx",		GAME_NOT_WORKING)
-//COMP( 1978, vt100stp,  vt100,       0,    vt100,   vt100,      0,       0,     "DEC",   "VT100 w/VT1xx-AC STP",       GAME_NOT_WORKING)
-COMP( 1981, vt101,  0,       0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT101",		GAME_NOT_WORKING)
-COMP( 1981, vt102,  vt101,   0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT102",		GAME_NOT_WORKING)
-COMP( 1979, vt103,  vt100,   0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT103",		GAME_NOT_WORKING)
-COMP( 1978, vt105,  vt100,   0,     vt100,   vt100, 	 0,  	  0,  	 "DEC",   "VT105",		GAME_NOT_WORKING)
-COMP( 1978, vt110,  vt100,   0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT110",		GAME_NOT_WORKING)
-COMP( 1981, vt125,  vt100,   0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT125",		GAME_NOT_WORKING)
-COMP( 1981, vt131,  /*vt101*/0,       0,     vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT131",		GAME_NOT_WORKING)	// this should be a vt101 clone, once the vt101 has been enabled (i.e. its roms dumped)
-//COMP( 1979, vt132,  vt100,   0,    vt100,   vt100,     0,       0,     "DEC",   "VT132",      GAME_NOT_WORKING)
-COMP( 1983, vt180,  vt100,   0,     vt100,   vt100, 	 0,  	  0,  	 "DEC",   "VT180",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY FULLNAME       FLAGS */
+COMP( 1978, vt100,  0,       0,     vt100, 	 vt100, 	 0,  	 "DEC",   "VT100",		GAME_NOT_WORKING)
+COMP( 1978, vt100wp,  vt100, 0,     vt100, 	 vt100, 	 0,  	 "DEC",   "VT100-Wx",		GAME_NOT_WORKING)
+//COMP( 1978, vt100stp,  vt100,       0,    vt100,   vt100,       0,     "DEC",   "VT100 w/VT1xx-AC STP",       GAME_NOT_WORKING)
+COMP( 1981, vt101,  0,       0,     vt100, 	 vt100, 	 0,  	 "DEC",   "VT101",		GAME_NOT_WORKING)
+COMP( 1981, vt102,  vt101,   0,     vt100, 	 vt100, 	 0,  	 "DEC",   "VT102",		GAME_NOT_WORKING)
+COMP( 1979, vt103,  vt100,   0,     vt100, 	 vt100, 	 0,  	 "DEC",   "VT103",		GAME_NOT_WORKING)
+COMP( 1978, vt105,  vt100,   0,     vt100,   vt100, 	 0,  	 "DEC",   "VT105",		GAME_NOT_WORKING)
+COMP( 1978, vt110,  vt100,   0,     vt100, 	 vt100, 	 0,  	 "DEC",   "VT110",		GAME_NOT_WORKING)
+COMP( 1981, vt125,  vt100,   0,     vt100, 	 vt100, 	 0,  	 "DEC",   "VT125",		GAME_NOT_WORKING)
+COMP( 1981, vt131,  /*vt101*/0, 0,  vt100, 	 vt100, 	 0,  	 "DEC",   "VT131",		GAME_NOT_WORKING)	// this should be a vt101 clone, once the vt101 has been enabled (i.e. its roms dumped)
+//COMP( 1979, vt132,  vt100,   0,    vt100,   vt100,     0,      "DEC",   "VT132",      GAME_NOT_WORKING)
+COMP( 1983, vt180,  vt100,   0,     vt100,   vt100, 	 0,  	 "DEC",   "VT180",		GAME_NOT_WORKING)

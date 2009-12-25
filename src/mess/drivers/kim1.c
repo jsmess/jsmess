@@ -354,5 +354,5 @@ ROM_START(kim1)
 ROM_END
 
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG  COMPANY   FULLNAME */
-COMP( 1975, kim1,	  0, 		0,		kim1,	  kim1, 	0,		  0,	  "MOS Technologies",  "KIM-1" , GAME_SUPPORTS_SAVE)
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    COMPANY   FULLNAME */
+COMP( 1975, kim1,	  0, 		0,		kim1,	  kim1, 	0,		"MOS Technologies",  "KIM-1" , GAME_SUPPORTS_SAVE)

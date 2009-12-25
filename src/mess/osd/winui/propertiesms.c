@@ -399,7 +399,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 	(void)ComboBox_ResetContent(control);
 
 	// allocate the machine config
-	cfg = machine_config_alloc_with_mess_devices(gamedrv);
+	cfg = machine_config_alloc(gamedrv->machine_config);
 
 	// identify how many options that we have
 	device = device_list_first(&cfg->devicelist, MESSRAM);

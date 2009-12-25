@@ -441,6 +441,6 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT INIT    CONFIG  COMPANY                   FULLNAME */
-COMP( 1956, tx0_64kw, 0, 	0,	tx0_64kw, tx0,	tx0,	0,	"MIT", "TX-0 original demonstrator (64 kWords of RAM)" , 0)
-COMP( 1962, tx0_8kw,  tx0_64kw,	0,	tx0_8kw,  tx0,	tx0,	0,	"MIT", "TX-0 upgraded system (8 kWords of RAM)" , 0)
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT INIT     COMPANY                   FULLNAME */
+COMP( 1956, tx0_64kw, 0, 	0,	tx0_64kw, tx0,	tx0,			"MIT", "TX-0 original demonstrator (64 kWords of RAM)" , 0)
+COMP( 1962, tx0_8kw,  tx0_64kw,	0,	tx0_8kw,  tx0,	tx0,		"MIT", "TX-0 upgraded system (8 kWords of RAM)" , 0)

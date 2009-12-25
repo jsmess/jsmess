@@ -91,8 +91,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY                 FULLNAME                FLAGS */
-COMP( 1987, next,  	0,      	0, 	next, 		next, 	 0,  	  0,  	 "Next Software, Inc",   "NeXT",				GAME_NOT_WORKING)
-COMP( 1990, nextnt, next,       0, 	next040, 	next, 	 0,  	  0,  	 "Next Software, Inc",   "NeXT (Non Turbo)",	GAME_NOT_WORKING)
-COMP( 1992, nexttrb,next,       0, 	next040, 	next, 	 0,  	  0,  	 "Next Software, Inc",   "NeXT (Turbo)",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                 FULLNAME                FLAGS */
+COMP( 1987, next,  	0,      	0, 	next, 		next, 	 0,  	 "Next Software, Inc",   "NeXT",				GAME_NOT_WORKING)
+COMP( 1990, nextnt, next,       0, 	next040, 	next, 	 0,  	 "Next Software, Inc",   "NeXT (Non Turbo)",	GAME_NOT_WORKING)
+COMP( 1992, nexttrb,next,       0, 	next040, 	next, 	 0,  	 "Next Software, Inc",   "NeXT (Turbo)",		GAME_NOT_WORKING)
 

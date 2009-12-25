@@ -345,10 +345,10 @@ ROM_START( mz80b )
 ROM_END
 
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT   INIT   CONFIG  COMPANY    FULLNAME */
-COMP( 1979, mz80kj,   0,        0,      mz80kj,  mz80k,  mz80k, 0,      "Sharp",   "MZ-80K (Japanese)", 0 )
-COMP( 1979, mz80k,    mz80kj,   0,      mz80k,   mz80k,  mz80k, 0,      "Sharp",   "MZ-80K", 0 )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT   INIT   COMPANY    FULLNAME */
+COMP( 1979, mz80kj,   0,        0,      mz80kj,  mz80k,  mz80k, "Sharp",   "MZ-80K (Japanese)", 0 )
+COMP( 1979, mz80k,    mz80kj,   0,      mz80k,   mz80k,  mz80k, "Sharp",   "MZ-80K", 0 )
 
 // These may need a separate driver!
-COMP( 1982, mz80a,    0,        0,      mz80k,   mz80a,  mz80k, 0,      "Sharp",   "MZ-80A", GAME_NOT_WORKING )
-COMP( 1981, mz80b,    0,        0,      mz80k,   mz80k,  mz80k, 0,      "Sharp",   "MZ-80B", GAME_NOT_WORKING )
+COMP( 1982, mz80a,    0,        0,      mz80k,   mz80a,  mz80k, "Sharp",   "MZ-80A", GAME_NOT_WORKING )
+COMP( 1981, mz80b,    0,        0,      mz80k,   mz80k,  mz80k, "Sharp",   "MZ-80B", GAME_NOT_WORKING )

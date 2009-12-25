@@ -717,6 +717,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY FULLNAME */
-COMP( 1982, adam,   0,		coleco,	adam,   adam,   0,		0,	"Coleco", "Adam" , 0)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY FULLNAME */
+COMP( 1982, adam,   0,		coleco,	adam,   adam,   0,		"Coleco", "Adam" , 0)
 

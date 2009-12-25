@@ -66,6 +66,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY FULLNAME        FLAGS */
-CONS( 1994, pcfx,       0,      0,      pcfx,       0,      0,      0,      "NEC",  "PC-FX",        GAME_NOT_WORKING )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY FULLNAME        FLAGS */
+CONS( 1994, pcfx,       0,      0,      pcfx,       0,      0,      "NEC",  "PC-FX",        GAME_NOT_WORKING )
 

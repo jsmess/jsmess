@@ -11,10 +11,7 @@
 
 #include <stdarg.h>
 
-struct SystemConfigurationParamBlock;
-
 #include "image.h"
-#include "artworkx.h"
 #include "memory.h"
 #include "configms.h"
 #include "messopts.h"

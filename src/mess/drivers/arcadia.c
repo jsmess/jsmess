@@ -691,7 +691,7 @@ static DRIVER_INIT( arcadia )
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE   INPUT     INIT        COMPANY     FULLNAME */
 // marketed from several firms/names
 
-CONS(1982,	arcadia,	0,			0,		arcadia,  arcadia,  arcadia,	0,	"Emerson",		"Arcadia 2001", GAME_IMPERFECT_SOUND )
+CONS(1982,	arcadia,	0,			0,		arcadia,  arcadia,  arcadia,	"Emerson",		"Arcadia 2001", GAME_IMPERFECT_SOUND )
 // schmid tvg 2000 (developer? PAL)
 
 // different cartridge connector
@@ -699,4 +699,4 @@ CONS(1982,	arcadia,	0,			0,		arcadia,  arcadia,  arcadia,	0,	"Emerson",		"Arcadi
 
 // different cartridge connector (same size as mpt03, but different pinout!)
 // 16 keys instead of 12
-CONS(198?, vcg,		arcadia,	0,		arcadia,  vcg,		arcadia,	0,	"Palladium",		"Video-Computer-Game", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+CONS(198?, vcg,		arcadia,	0,		arcadia,  vcg,		arcadia,	"Palladium",		"Video-Computer-Game", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

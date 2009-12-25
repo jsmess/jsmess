@@ -2186,20 +2186,20 @@ ROM_END
 	
 /* System Drivers */
 
-/*     YEAR  NAME    PARENT    COMPAT   MACHINE   INPUT     INIT    CONFIG   COMPANY    FULLNAME */
-COMP( 1985, atarist,  0,        0,		atarist,  atarist,  0,     0,  "Atari", "Atari ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1987, megast,   atarist,  0,		megast,   atarist,  0,     0,   "Atari", "Atari Mega ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
+/*     YEAR  NAME    PARENT    COMPAT   MACHINE   INPUT     INIT   COMPANY    FULLNAME */
+COMP( 1985, atarist,  0,        0,		atarist,  atarist,  0,     "Atari", "Atari ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1987, megast,   atarist,  0,		megast,   atarist,  0,     "Atari", "Atari Mega ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
 /*
-COMP( 1989, stacy,    atarist,  0,      stacy,    stacy,    0,     0,    "Atari", "Atari Stacy", GAME_NOT_WORKING )
+COMP( 1989, stacy,    atarist,  0,      stacy,    stacy,    0,     "Atari", "Atari Stacy", GAME_NOT_WORKING )
 */
-COMP( 1989, atariste, 0,		0,		atariste, atariste, 0,     0, "Atari", "Atari STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
+COMP( 1989, atariste, 0,		0,		atariste, atariste, 0,     "Atari", "Atari STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
 // last two use measte config
-COMP( 1990, stbook,   atariste, 0,		stbook,   stbook,   0,     0,	 "Atari", "Atari STBook", GAME_NOT_WORKING )
-COMP( 1991, megaste,  atariste, 0,		megaste,  atarist,  0,     0,  "Atari", "Atari Mega STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
+COMP( 1990, stbook,   atariste, 0,		stbook,   stbook,   0,     "Atari", "Atari STBook", GAME_NOT_WORKING )
+COMP( 1991, megaste,  atariste, 0,		megaste,  atarist,  0,     "Atari", "Atari Mega STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
 /*
-COMP( 1991, stpad,    atariste, 0,      stpad,    stpad,    0,     stpad,    "Atari", "Atari STPad (prototype)", GAME_NOT_WORKING )
-COMP( 1990, tt030,    0,        0,      tt030,    tt030,    0,     tt030,    "Atari", "Atari TT030", GAME_NOT_WORKING )
-COMP( 1992, fx1,      0,        0,      falcon,   falcon,   0,     falcon,   "Atari", "Atari FX-1 (prototype)", GAME_NOT_WORKING )
-COMP( 1992, falcon,   0,        0,      falcon,   falcon,   0,     falcon,   "Atari", "Atari Falcon030", GAME_NOT_WORKING )
-COMP( 1992, falcon40, falcon,   0,      falcon40, falcon,   0,     falcon,   "Atari", "Atari Falcon040 (prototype)", GAME_NOT_WORKING )
+COMP( 1991, stpad,    atariste, 0,      stpad,    stpad,    0,     "Atari", "Atari STPad (prototype)", GAME_NOT_WORKING )
+COMP( 1990, tt030,    0,        0,      tt030,    tt030,    0,     "Atari", "Atari TT030", GAME_NOT_WORKING )
+COMP( 1992, fx1,      0,        0,      falcon,   falcon,   0,     "Atari", "Atari FX-1 (prototype)", GAME_NOT_WORKING )
+COMP( 1992, falcon,   0,        0,      falcon,   falcon,   0,     "Atari", "Atari Falcon030", GAME_NOT_WORKING )
+COMP( 1992, falcon40, falcon,   0,      falcon40, falcon,   0,     "Atari", "Atari Falcon040 (prototype)", GAME_NOT_WORKING )
 */

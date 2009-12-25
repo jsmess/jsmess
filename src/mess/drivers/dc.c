@@ -337,9 +337,9 @@ static INPUT_PORTS_START( dc )
 INPUT_PORTS_END
 
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY FULLNAME */
-CONS( 1999, dc,		dcjp,	0,	dc,	dc,	dc,	0, 	"Sega", "Dreamcast (US NTSC)", GAME_NOT_WORKING )
-CONS( 1998, dcjp,	0,	0,	dc,	dc,	dc,	0, 	"Sega", "Dreamcast (Japan NTSC)", GAME_NOT_WORKING )
-CONS( 1999, dceu,	dcjp,	0,	dc,	dc,	dc,	0, 	"Sega", "Dreamcast (European PAL)", GAME_NOT_WORKING )
-CONS( 1998, dcdev,	dcjp,	0,	dc,	dc,	dc,	0, 	"Sega", "HKT-0120 Sega Dreamcast Development Box", GAME_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT      COMPANY FULLNAME */
+CONS( 1999, dc,		dcjp,	0,	dc,	dc,	dc,	"Sega", "Dreamcast (US NTSC)", GAME_NOT_WORKING )
+CONS( 1998, dcjp,	0,		0,	dc,	dc,	dc,	"Sega", "Dreamcast (Japan NTSC)", GAME_NOT_WORKING )
+CONS( 1999, dceu,	dcjp,	0,	dc,	dc,	dc,	"Sega", "Dreamcast (European PAL)", GAME_NOT_WORKING )
+CONS( 1998, dcdev,	dcjp,	0,	dc,	dc,	dc,	"Sega", "HKT-0120 Sega Dreamcast Development Box", GAME_NOT_WORKING )
 

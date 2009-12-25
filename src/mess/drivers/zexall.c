@@ -170,6 +170,6 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT CONFIG      COMPANY                     FULLNAME                            FLAGS */
-COMP( 199?, zexall,   0,          0,      zexall,   zexall, zexall,   0,   "Frank Cringle",        "Zexall z80 test suite", 0 )
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                            FLAGS */
+COMP( 199?, zexall,   0,          0,      zexall,   zexall, zexall,      "Frank Cringle",        "Zexall z80 test suite", 0 )
 

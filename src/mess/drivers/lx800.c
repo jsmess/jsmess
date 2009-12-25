@@ -273,5 +273,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY  FULLNAME  FLAGS */
-COMP( 1987, lx800, 0,      0,      lx800,   lx800, 0,    0,      "Epson", "LX-800", GAME_NOT_WORKING )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY  FULLNAME  FLAGS */
+COMP( 1987, lx800, 0,      0,      lx800,   lx800, 0,    "Epson", "LX-800", GAME_NOT_WORKING )

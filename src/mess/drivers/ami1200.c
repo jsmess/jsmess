@@ -624,7 +624,7 @@ static DRIVER_INIT( cd32 )
 
 /***************************************************************************************************/
 
-/*    YEAR  NAME     PARENT   COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY       FULLNAME */
-COMP( 1992, a1200n,  0,       0,      a1200n, a1200,  a1200,  0,  	"Commodore",  "Amiga 1200 (NTSC)" , GAME_NOT_WORKING )
-COMP( 1992, a1200p,  a1200n,  0,      a1200p, a1200,  a1200,  0,  	"Commodore",  "Amiga 1200 (PAL)" , GAME_NOT_WORKING )
-CONS( 1993, cd32,    0,       0,      cd32,   cd32,   cd32,   0,    "Commodore",  "Amiga CD32 (NTSC)" , GAME_NOT_WORKING )
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE INPUT   INIT      COMPANY       FULLNAME */
+COMP( 1992, a1200n,  0,       0,      a1200n, a1200,  a1200,  "Commodore",  "Amiga 1200 (NTSC)" , GAME_NOT_WORKING )
+COMP( 1992, a1200p,  a1200n,  0,      a1200p, a1200,  a1200,  "Commodore",  "Amiga 1200 (PAL)" , GAME_NOT_WORKING )
+CONS( 1993, cd32,    0,       0,      cd32,   cd32,   cd32,   "Commodore",  "Amiga CD32 (NTSC)" , GAME_NOT_WORKING )

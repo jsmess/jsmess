@@ -136,7 +136,7 @@ ROM_START( gamecom )
 	ROM_REGION( 0x200000, "user2", ROMREGION_ERASEFF )
 ROM_END
 
-/*    YEAR  NAME     PARENT COMPAT MACHINE  INPUT    INIT CONFIG   COMPANY  FULLNAME */
-CONS( 1997, gamecom, 0,     0,     gamecom, gamecom, gamecom,   0, "Tiger", "Game.com", GAME_NOT_WORKING )
+/*    YEAR  NAME     PARENT COMPAT MACHINE  INPUT    INIT    COMPANY  FULLNAME */
+CONS( 1997, gamecom, 0,     0,     gamecom, gamecom, gamecom,"Tiger", "Game.com", GAME_NOT_WORKING )
 
 

@@ -2540,5 +2540,5 @@ static DRIVER_INIT(gbadv)
 	memory_set_direct_update_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), gba_direct );
 }
 
-/*    YEAR  NAME PARENT COMPAT MACHINE INPUT   INIT   CONFIG COMPANY     FULLNAME */
-CONS( 2001, gba, 0,     0,     gbadv,  gbadv,  gbadv, 0,     "Nintendo", "Game Boy Advance", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
+/*    YEAR  NAME PARENT COMPAT MACHINE INPUT   INIT   COMPANY     FULLNAME */
+CONS( 2001, gba, 0,     0,     gbadv,  gbadv,  gbadv, "Nintendo", "Game Boy Advance", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)

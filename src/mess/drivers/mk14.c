@@ -150,6 +150,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG   COMPANY                   FULLNAME     FLAGS */
-COMP( 1977, mk14,  0,       0, 		mk14, 		mk14, 	 0,  	  0,  	 "Science of Cambridge",   "MK-14",		0)
+/*    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                   FULLNAME     FLAGS */
+COMP( 1977, mk14,  0,       0, 		mk14, 		mk14, 	 0,  	"Science of Cambridge",   "MK-14",		0)
 

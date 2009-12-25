@@ -489,5 +489,5 @@ static DRIVER_INIT( mc1000 )
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY             FULLNAME        FLAGS */
-COMP( 1985,	mc1000,		0,			0,		mc1000,		mc1000,		mc1000,		0,		"CCE",				"MC-1000",		GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME        FLAGS */
+COMP( 1985,	mc1000,		0,			0,		mc1000,		mc1000,		mc1000,		"CCE",				"MC-1000",		GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

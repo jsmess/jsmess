@@ -1023,8 +1023,8 @@ static DRIVER_INIT( tmc1800 )
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY         FULLNAME        FLAGS */
-COMP( 1977, tmc1800,    0,      0,      tmc1800,    tmc1800,    tmc1800,    0,    "Telercas Oy",  "Telmac 1800",  GAME_NOT_WORKING )
-COMP( 1977, osc1000b,   tmc1800,0,      osc1000b,   tmc1800,    tmc1800,    0,   "OSCOM Oy",		"OSCOM 1000B",  GAME_NOT_WORKING )
-COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc2000,    0,		    0,    "Telercas Oy",  "Telmac 2000",  GAME_SUPPORTS_SAVE )
-COMP( 1980, oscnano,	tmc2000,0,		oscnano,	oscnano,	0,			0,	"OSCOM Oy",		"OSCOM Nano",	GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY         FULLNAME        FLAGS */
+COMP( 1977, tmc1800,    0,      0,      tmc1800,    tmc1800,    tmc1800,     "Telercas Oy",  "Telmac 1800",  GAME_NOT_WORKING )
+COMP( 1977, osc1000b,   tmc1800,0,      osc1000b,   tmc1800,    tmc1800,    "OSCOM Oy",		"OSCOM 1000B",  GAME_NOT_WORKING )
+COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc2000,    0,		    "Telercas Oy",  "Telmac 2000",  GAME_SUPPORTS_SAVE )
+COMP( 1980, oscnano,	tmc2000,0,		oscnano,	oscnano,	0,			"OSCOM Oy",		"OSCOM Nano",	GAME_SUPPORTS_SAVE )

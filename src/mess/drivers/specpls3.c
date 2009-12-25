@@ -460,10 +460,10 @@ ROM_START(sp3eata)
 	ROM_CART_LOAD("cart", 0x10000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE         INPUT       INIT    CONFIG      COMPANY     FULLNAME */
-COMP( 1987, specpl2a, spec128,  0,		spectrum_plus3, spec_plus,	0,		0,	"Amstrad plc",          "ZX Spectrum +2a" , 0 )
-COMP( 1987, specpls3, spec128,  0,		spectrum_plus3, spec_plus,	0,		0,	"Amstrad plc",          "ZX Spectrum +3" , 0 )
-COMP( 2000, specpl3e, spec128,  0,		spectrum_plus3, spec_plus,	0,		0,	"Amstrad plc",          "ZX Spectrum +3e" , GAME_COMPUTER_MODIFIED )
-COMP( 2002, sp3e8bit, spec128,  0,		spectrum_plus3, spec_plus,	0,		0,	"Amstrad plc",          "ZX Spectrum +3e 8bit IDE" , GAME_COMPUTER_MODIFIED )
-COMP( 2002, sp3eata,  spec128,  0,		spectrum_plus3, spec_plus,	0,		0,	"Amstrad plc",          "ZX Spectrum +3e 8bit ZXATASP" , GAME_COMPUTER_MODIFIED )
-COMP( 2002, sp3ezcf,  spec128,  0,		spectrum_plus3, spec_plus,	0,		0,	"Amstrad plc",          "ZX Spectrum +3e 8bit ZXCF" , GAME_COMPUTER_MODIFIED )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE         INPUT       INIT    COMPANY     FULLNAME */
+COMP( 1987, specpl2a, spec128,  0,		spectrum_plus3, spec_plus,	0,		"Amstrad plc",          "ZX Spectrum +2a" , 0 )
+COMP( 1987, specpls3, spec128,  0,		spectrum_plus3, spec_plus,	0,		"Amstrad plc",          "ZX Spectrum +3" , 0 )
+COMP( 2000, specpl3e, spec128,  0,		spectrum_plus3, spec_plus,	0,		"Amstrad plc",          "ZX Spectrum +3e" , GAME_COMPUTER_MODIFIED )
+COMP( 2002, sp3e8bit, spec128,  0,		spectrum_plus3, spec_plus,	0,		"Amstrad plc",          "ZX Spectrum +3e 8bit IDE" , GAME_COMPUTER_MODIFIED )
+COMP( 2002, sp3eata,  spec128,  0,		spectrum_plus3, spec_plus,	0,		"Amstrad plc",          "ZX Spectrum +3e 8bit ZXATASP" , GAME_COMPUTER_MODIFIED )
+COMP( 2002, sp3ezcf,  spec128,  0,		spectrum_plus3, spec_plus,	0,		"Amstrad plc",          "ZX Spectrum +3e 8bit ZXCF" , GAME_COMPUTER_MODIFIED )

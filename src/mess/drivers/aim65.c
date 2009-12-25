@@ -268,5 +268,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*   YEAR  NAME         PARENT  COMPAT  MACHINE  INPUT   INIT    CONFIG  COMPANY     FULLNAME  FLAGS */
-COMP(1977, aim65,		0,      0,      aim65,   aim65,  0,      0,  "Rockwell", "AIM 65", 0)
+/*   YEAR  NAME         PARENT  COMPAT  MACHINE  INPUT   INIT    COMPANY     FULLNAME  FLAGS */
+COMP(1977, aim65,		0,      0,      aim65,   aim65,  0,      "Rockwell", "AIM 65", 0)

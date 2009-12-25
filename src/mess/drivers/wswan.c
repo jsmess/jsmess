@@ -192,7 +192,7 @@ ROM_START( wscolor )
 //  ROM_LOAD_OPTIONAL( "wsc_bios.bin", 0x0000, 0x0001, NO_DUMP )
 ROM_END
 
-/*     YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY   FULLNAME*/
-CONS( 1999, wswan,   0,      0,      wswan,   wswan, 0,    0,  "Bandai", "WonderSwan",       GAME_IMPERFECT_SOUND )
-CONS( 2000, wscolor, wswan,  0,      wscolor, wswan, 0,    0,  "Bandai", "WonderSwan Color", GAME_IMPERFECT_SOUND )
+/*     YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT COMPANY   FULLNAME*/
+CONS( 1999, wswan,   0,      0,      wswan,   wswan, 0,    "Bandai", "WonderSwan",       GAME_IMPERFECT_SOUND )
+CONS( 2000, wscolor, wswan,  0,      wscolor, wswan, 0,    "Bandai", "WonderSwan Color", GAME_IMPERFECT_SOUND )
 

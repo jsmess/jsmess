@@ -299,5 +299,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1982, spc1000,  0,       0, 	spc1000, 	spc1000, 	 0,  	  0,  	 "Samsung",   "SPC-1000",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
+COMP( 1982, spc1000,  0,       0, 	spc1000, 	spc1000, 	 0,  "Samsung",   "SPC-1000",		GAME_NOT_WORKING)

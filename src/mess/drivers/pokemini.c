@@ -103,5 +103,5 @@ ROM_START( pokemini )
 ROM_END
 
 
-CONS( 1999, pokemini, 0, 0, pokemini, pokemini, pokemini, 0, "Nintendo", "Pokemon Mini", GAME_NOT_WORKING )
+CONS( 1999, pokemini, 0, 0, pokemini, pokemini, pokemini, "Nintendo", "Pokemon Mini", GAME_NOT_WORKING )
 

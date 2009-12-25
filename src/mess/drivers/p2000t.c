@@ -306,7 +306,7 @@ ROM_START(p2000m)
 	ROM_LOAD("p2000.chr", 0x0140, 0x08c0, BAD_DUMP CRC(78c17e3e) SHA1(4e1c59dc484505de1dc0b1ba7e5f70a54b0d4ccc))
 ROM_END
 
-/*      YEAR    NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY     FULLNAME */
-COMP (	1980,	p2000t,	0,	0,	p2000t,	p2000t,		0,	0,	"Philips",	"Philips P2000T" , 0)
-COMP (	1980,	p2000m,	p2000t,	0,	p2000m,	p2000t,		0,	0,	"Philips",	"Philips P2000M" , 0)
+/*      YEAR    NAME    PARENT  COMPAT  MACHINE     INPUT       INIT      COMPANY     FULLNAME */
+COMP (	1980,	p2000t,	0,	0,	p2000t,	p2000t,		0,		"Philips",	"Philips P2000T" , 0)
+COMP (	1980,	p2000m,	p2000t,	0,	p2000m,	p2000t,		0,		"Philips",	"Philips P2000M" , 0)
 

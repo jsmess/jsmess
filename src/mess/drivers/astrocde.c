@@ -210,6 +210,6 @@ static DRIVER_INIT( astrocde )
  *
  *************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      CONFIG    COMPANY                FULLNAME                     FLAGS */
-CONS( 1978, astrocde, 0,        0,        astrocde, astrocde, astrocde, 0, "Bally Manufacturing", "Bally Professional Arcade", GAME_SUPPORTS_SAVE )
-CONS( 1977, astrocdw, astrocde, 0,        astrocde, astrocde, astrocde, 0, "Bally Manufacturing", "Bally Computer System",     GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY                FULLNAME                     FLAGS */
+CONS( 1978, astrocde, 0,        0,        astrocde, astrocde, astrocde, "Bally Manufacturing", "Bally Professional Arcade", GAME_SUPPORTS_SAVE )
+CONS( 1977, astrocdw, astrocde, 0,        astrocde, astrocde, astrocde, "Bally Manufacturing", "Bally Computer System",     GAME_SUPPORTS_SAVE )

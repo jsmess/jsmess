@@ -137,7 +137,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1982, md2,  	0,       0, 	microdec, 	microdec, 	 0,  	  0,  	 "Morrow Designs",   "Micro Decision MD-2",		GAME_NOT_WORKING)
-COMP( 1982, md3,  	md2,       0, 	microdec, 	microdec, 	 0,  	  0,  	 "Morrow Designs",   "Micro Decision MD-3",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
+COMP( 1982, md2,  	0,       0, 	microdec, 	microdec, 	 0,   "Morrow Designs",   "Micro Decision MD-2",		GAME_NOT_WORKING)
+COMP( 1982, md3,  	md2,       0, 	microdec, 	microdec, 	 0,   "Morrow Designs",   "Micro Decision MD-3",		GAME_NOT_WORKING)
 

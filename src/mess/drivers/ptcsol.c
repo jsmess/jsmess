@@ -89,5 +89,5 @@ ROM_START( sol20 )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  INIT   CONFIG COMPANY     FULLNAME   FLAGS */
-COMP( 1976, sol20,  0,      0,      sol20,   sol20, 0,     0, "Processor Technology Corporation",  "SOL-20", GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  INIT   COMPANY     FULLNAME   FLAGS */
+COMP( 1976, sol20,  0,      0,      sol20,   sol20, 0,     "Processor Technology Corporation",  "SOL-20", GAME_NOT_WORKING)

@@ -482,11 +482,11 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY      FULLNAME */
-COMP( 1982, mz700,    0,        0,      mz700,    mz700,    mz700,  0,  "Sharp",     "MZ-700", 0 )
-COMP( 1982, mz700j,   mz700,    0,      mz700,    mz700,    mz700,  0,  "Sharp",     "MZ-700 (Japan)", 0 )
-COMP( 1984, mz800,    0,        0,      mz800,    mz800,    mz800,  0,  "Sharp",     "MZ-800", GAME_NOT_WORKING )
-COMP( 1984, mz1500,   0,        0,      mz800,    mz800,    mz800,  0,  "Sharp",     "MZ-1500", GAME_NOT_WORKING )	// Japanese version of the MZ-800
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    COMPANY      FULLNAME */
+COMP( 1982, mz700,    0,        0,      mz700,    mz700,    mz700,  "Sharp",     "MZ-700", 0 )
+COMP( 1982, mz700j,   mz700,    0,      mz700,    mz700,    mz700,  "Sharp",     "MZ-700 (Japan)", 0 )
+COMP( 1984, mz800,    0,        0,      mz800,    mz800,    mz800,  "Sharp",     "MZ-800", GAME_NOT_WORKING )
+COMP( 1984, mz1500,   0,        0,      mz800,    mz800,    mz800,  "Sharp",     "MZ-1500", GAME_NOT_WORKING )	// Japanese version of the MZ-800
 
 // MZ-2500 probably needs a separate driver...
-COMP( 1985, mz2500,   0,        0,      mz2500,   0,        0,      0,      "Sharp",     "MZ-2500", GAME_NOT_WORKING )
+COMP( 1985, mz2500,   0,        0,      mz2500,   0,        0,      "Sharp",     "MZ-2500", GAME_NOT_WORKING )

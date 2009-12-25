@@ -578,6 +578,6 @@ ROM_END
 
 #define rom_ti99_8e rom_ti99_8
 
-/*      YEAR    NAME        PARENT      COMPAT  MACHINE     INPUT   INIT        CONFIG      COMPANY                 FULLNAME */
-COMP(	1983,	ti99_8,		0,	0,	ti99_8_60hz,ti99_8,	ti99_8,	0,	"Texas Instruments",	"TI-99/8 Computer (US)" , 0)
-COMP(	1983,	ti99_8e,	ti99_8,	0,	ti99_8_50hz,ti99_8,	ti99_8,	0,	"Texas Instruments",	"TI-99/8 Computer (Europe)" , 0 )
+/*      YEAR    NAME        PARENT  COMPAT  MACHINE     INPUT   INIT      COMPANY                 FULLNAME */
+COMP(	1983,	ti99_8,		0,		0,	ti99_8_60hz,ti99_8,	ti99_8,		"Texas Instruments",	"TI-99/8 Computer (US)" , 0)
+COMP(	1983,	ti99_8e,	ti99_8,	0,	ti99_8_50hz,ti99_8,	ti99_8,		"Texas Instruments",	"TI-99/8 Computer (Europe)" , 0 )

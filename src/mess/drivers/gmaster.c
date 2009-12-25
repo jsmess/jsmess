@@ -303,6 +303,5 @@ static int gmaster_load_rom(running_machine *machine, int id)
 }
 #endif
 
-/*    YEAR      NAME            PARENT  MACHINE   INPUT     INIT
-      COMPANY                 FULLNAME */
-CONS( 1990, gmaster,       0,          0, gmaster,  gmaster,    gmaster,   0, "Hartung", "Game Master", GAME_IMPERFECT_SOUND)
+/*    YEAR      NAME            PARENT  MACHINE   INPUT     INIT  COMPANY                 FULLNAME */
+CONS( 1990, gmaster,       0,          0, gmaster,  gmaster,    gmaster,    "Hartung", "Game Master", GAME_IMPERFECT_SOUND)

@@ -278,5 +278,5 @@ ROM_START(apple1)
 ROM_END
 
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY             FULLNAME */
-COMP( 1976,	apple1,	0,		0,		apple1,		apple1,		apple1,	0,	"Apple Computer",	"Apple I" , 0)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY             FULLNAME */
+COMP( 1976,	apple1,	0,		0,		apple1,		apple1,		apple1,	"Apple Computer",	"Apple I" , 0)

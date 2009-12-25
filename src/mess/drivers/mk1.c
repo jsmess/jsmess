@@ -204,6 +204,6 @@ ROM_END
 ***************************************************************************/
 
 // seams to be developed by mostek (MK)
-/*     YEAR   NAME  PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                 FULLNAME */
-CONS( 1979,  mk1,  0, 		0,		mk1,	mk1,	0,	0,	"Computer Electronic",  "Chess Champion MK I", 0 )
+/*     YEAR   NAME  PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                 FULLNAME */
+CONS( 1979,  mk1,  0, 		0,		mk1,	mk1,	0,		"Computer Electronic",  "Chess Champion MK I", 0 )
 

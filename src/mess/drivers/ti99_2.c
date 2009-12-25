@@ -399,6 +399,6 @@ ROM_END
 /* Hex-bus disk controller: supports up to 4 floppy disk drives */
 /* None of these is supported (tape should be easy to emulate) */
 
-/*      YEAR    NAME        PARENT      COMPAT  MACHINE     INPUT   INIT        CONFIG      COMPANY                 FULLNAME */
-COMP(	1983,	ti99_224,	0,		0,	ti99_2,	ti99_2,	ti99_2_24,	0,		"Texas Instruments",	"TI-99/2 BASIC Computer (24kb ROMs)" , GAME_NOT_WORKING )
-COMP(	1983,	ti99_232,	ti99_224,	0,	ti99_2,	ti99_2,	ti99_2_32,	0,		"Texas Instruments",	"TI-99/2 BASIC Computer (32kb ROMs)" , GAME_NOT_WORKING )
+/*      YEAR    NAME        PARENT      COMPAT  MACHINE     INPUT   INIT        COMPANY                 FULLNAME */
+COMP(	1983,	ti99_224,	0,			0,	ti99_2,	ti99_2,	ti99_2_24,			"Texas Instruments",	"TI-99/2 BASIC Computer (24kb ROMs)" , GAME_NOT_WORKING )
+COMP(	1983,	ti99_232,	ti99_224,	0,	ti99_2,	ti99_2,	ti99_2_32,			"Texas Instruments",	"TI-99/2 BASIC Computer (32kb ROMs)" , GAME_NOT_WORKING )

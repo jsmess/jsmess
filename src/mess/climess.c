@@ -66,7 +66,7 @@ int info_listdevices(core_options *opts, const char *gamename)
 		if (!core_strwildcmp(gamename, drivers[i]->name))
 		{
 			/* allocate the machine config */
-			config = machine_config_alloc_with_mess_devices(drivers[i]);
+			config = machine_config_alloc(drivers[i]->machine_config);
 
 			driver_name = drivers[i]->name;
 
@@ -97,7 +97,6 @@ int info_listdevices(core_options *opts, const char *gamename)
 
 	/* clean up our tracked resources */
 	exit_resource_tracking();
-
 	return 0;
 }
 

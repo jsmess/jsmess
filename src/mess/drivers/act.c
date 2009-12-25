@@ -582,8 +582,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT MACHINE INPUT   INIT  CONFIG COMPANY  FULLNAME                 FLAGS */
-COMP( 1984, aprixi,    0,    0,     act_xi,    act,    0,    0,     "ACT",   "Apricot Xi",            GAME_NOT_WORKING)
-COMP( 1984, aprif1,    0,    0,     act_f1,    act,    0,    0,     "ACT",   "Apricot F1",            GAME_NOT_WORKING)
-COMP( 1985, aprif10,   0,    0,     act_f1,    act,    0,    0,     "ACT",   "Apricot F10",           GAME_NOT_WORKING)
-COMP( 1984, aprifp,    0,    0,     act_f1,    act,    0,    0,     "ACT",   "Apricot Portable / FP", GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT MACHINE INPUT   INIT   COMPANY  FULLNAME                 FLAGS */
+COMP( 1984, aprixi,    0,    0,     act_xi,    act,    0, "ACT",   "Apricot Xi",            GAME_NOT_WORKING)
+COMP( 1984, aprif1,    0,    0,     act_f1,    act,    0, "ACT",   "Apricot F1",            GAME_NOT_WORKING)
+COMP( 1985, aprif10,   0,    0,     act_f1,    act,    0, "ACT",   "Apricot F10",           GAME_NOT_WORKING)
+COMP( 1984, aprifp,    0,    0,     act_f1,    act,    0, "ACT",   "Apricot Portable / FP", GAME_NOT_WORKING)

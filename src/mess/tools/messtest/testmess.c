@@ -18,6 +18,7 @@
 #include "video/generic.h"
 #include "render.h"
 #include "messopts.h"
+#include "device.h"
 #include "devices/messram.h"
 #include "debug/debugcpu.h"
 
@@ -711,11 +712,6 @@ static const device_config *find_device_by_identity(running_machine *machine, co
 	{
 		/* no device_type was specified; use the new preferred mechanism */
 		device = devtag_get_device(machine, ident->tag);
-	}
-	else
-	{
-		/* perform a legacy lookup by device type */
-		device = image_from_devtype_and_index(machine, ident->type, ident->slot);
 	}
 
 	/* did the image slot lookup fail? */

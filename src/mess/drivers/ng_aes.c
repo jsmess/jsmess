@@ -1326,6 +1326,6 @@ ROM_START( neocdz )
 ROM_END
 
 
-CONS( 1990, aes,    0,   0,   aes,      aes,   neogeo,   0, "SNK", "Neo-Geo AES", 0)
-CONS( 1994, neocd,  aes, 0,   neogeo,   aes,   neogeo,   0, "SNK", "Neo-Geo CD", GAME_NOT_WORKING )
-CONS( 1996, neocdz, aes, 0,   neogeo,   aes,   neogeo,   0, "SNK", "Neo-Geo CDZ", GAME_NOT_WORKING )
+CONS( 1990, aes,    0,   0,   aes,      aes,   neogeo,  "SNK", "Neo-Geo AES", 0)
+CONS( 1994, neocd,  aes, 0,   neogeo,   aes,   neogeo,  "SNK", "Neo-Geo CD", GAME_NOT_WORKING )
+CONS( 1996, neocdz, aes, 0,   neogeo,   aes,   neogeo,  "SNK", "Neo-Geo CDZ", GAME_NOT_WORKING )

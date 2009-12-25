@@ -100,6 +100,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1982, sun1,  0,       0, 		 sun1, 		sun1, 	 0,  	  0,  	 "Sun Microsystems",   "Sun-1",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
+COMP( 1982, sun1,  0,       0, 		 sun1, 		sun1, 	 0,  	 "Sun Microsystems",   "Sun-1",		GAME_NOT_WORKING)
 

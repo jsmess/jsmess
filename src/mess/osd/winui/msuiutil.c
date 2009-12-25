@@ -19,7 +19,7 @@ BOOL DriverHasDevice(const game_driver *gamedrv, iodevice_t type)
 	const device_config *device;
 
 	// allocate the machine config
-	config = machine_config_alloc_with_mess_devices(gamedrv);
+	config = machine_config_alloc(gamedrv->machine_config);
 
 	for (device = image_device_first(config); device != NULL; device = image_device_next(device))
 	{

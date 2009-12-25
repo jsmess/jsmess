@@ -334,9 +334,9 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY     FULLNAME                                      FLAGS */
-CONS( 1989, snes,    0,      0,      snes,    snes,  0,    0,   "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-CONS( 1989, snessfx, snes,   0,      snessfx, snes,  0,    0,   "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC), SuperFX", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-CONS( 1991, snespal, snes,   0,      snespal, snes,  0,    0,   "Nintendo", "Super Nintendo Entertainment System (PAL)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-CONS( 1991, snespsfx,snes,   0,      snespsfx,snes,  0,    0,   "Nintendo", "Super Nintendo Entertainment System (PAL), SuperFX",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-CONS( 199?, sfcbox,  snes,   0,      snes,    snes,  0,    0,   "Nintendo", "Super Famicom Box (NTSC)", GAME_NOT_WORKING )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY     FULLNAME                                      FLAGS */
+CONS( 1989, snes,    0,      0,      snes,    snes,  0,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+CONS( 1989, snessfx, snes,   0,      snessfx, snes,  0,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC), SuperFX", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+CONS( 1991, snespal, snes,   0,      snespal, snes,  0,    "Nintendo", "Super Nintendo Entertainment System (PAL)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+CONS( 1991, snespsfx,snes,   0,      snespsfx,snes,  0,    "Nintendo", "Super Nintendo Entertainment System (PAL), SuperFX",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+CONS( 199?, sfcbox,  snes,   0,      snes,    snes,  0,    "Nintendo", "Super Famicom Box (NTSC)", GAME_NOT_WORKING )

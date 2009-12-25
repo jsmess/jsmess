@@ -182,6 +182,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG  COMPANY                FULLNAME            FLAGS */
-COMP( 2008, 4004clk,  0,    0, 		4004clk, 	4004clk,  0,  	 0,  	 "John L. Weinrich",   "4004 Nixie Clock", GAME_SUPPORTS_SAVE)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                FULLNAME            FLAGS */
+COMP( 2008, 4004clk,  0,    0, 		4004clk, 	4004clk,  0,  	 "John L. Weinrich",   "4004 Nixie Clock", GAME_SUPPORTS_SAVE)
 

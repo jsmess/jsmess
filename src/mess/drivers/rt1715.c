@@ -83,6 +83,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1986, rt1715, 0,      0, 		rt1715, 	rt1715,rt1715, 0,  "Robotron", 	"Robotron 1715",	GAME_NOT_WORKING)
-COMP( 1986, rt1715w,rt1715, 0, 		rt1715, 	rt1715,rt1715, 0,  "Robotron", 	"Robotron 1715W",	GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   INIT   COMPANY   FULLNAME       FLAGS */
+COMP( 1986, rt1715, 0,      0, 		rt1715, 	rt1715,rt1715, "Robotron", 	"Robotron 1715",	GAME_NOT_WORKING)
+COMP( 1986, rt1715w,rt1715, 0, 		rt1715, 	rt1715,rt1715, "Robotron", 	"Robotron 1715W",	GAME_NOT_WORKING)

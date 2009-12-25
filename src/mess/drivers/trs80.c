@@ -860,15 +860,15 @@ static DRIVER_INIT( lnw80 )
 	machine->generic.videoram.u8 = memory_region(machine, "gfx2")+0x4000;
 }
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT      CONFIG       COMPANY  FULLNAME */
-COMP( 1977, trs80,    0,	0,	trs80,    trs80,   trs80,    0,		"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0 )
-COMP( 1978, trs80l2,  trs80,	0,	model1,   trs80,   trs80l2,  0,	"Tandy Radio Shack",  "TRS-80 Model I (Level II Basic)" , 0 )
-COMP( 1983, radionic, trs80,	0,	radionic, trs80,   trs80,    0,	"Komtek",  "Radionic" , 0 )
-COMP( 1980, sys80,    trs80,	0,	sys80,    trs80,   trs80l2,  0,	"EACA Computers Ltd.","System-80" , 0 )
-COMP( 1981, lnw80,    trs80,	0,	lnw80,    trs80m3, lnw80,    0,	"LNW Research","LNW-80", 0 )
-COMP( 1980, trs80m3,  trs80,	0,	model3,   trs80m3, trs80m4,  0,	"Tandy Radio Shack",  "TRS-80 Model III", 0 )
-COMP( 1980, trs80m4,  trs80,	0,	model4,   trs80m3, trs80m4,  0,	"Tandy Radio Shack",  "TRS-80 Model 4", 0 )
-COMP( 1983, trs80m4p, trs80,	0,	model4p,  trs80m3, trs80m4p, 0,	"Tandy Radio Shack",  "TRS-80 Model 4P", 0 )
-COMP( 1983, ht1080z,  trs80,	0,	ht1080z,  trs80,   trs80l2,  0,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series I" , 0 )
-COMP( 1984, ht1080z2, trs80,	0,	ht1080z,  trs80,   trs80l2,  0,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series II" , 0 )
-COMP( 1985, ht108064, trs80,	0,	ht1080z,  trs80,   trs80,    0,	"Hiradastechnika Szovetkezet",  "HT-1080Z/64" , 0 )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT  COMPANY  FULLNAME */
+COMP( 1977, trs80,    0,		0,	trs80,    trs80,   trs80,    "Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0 )
+COMP( 1978, trs80l2,  trs80,	0,	model1,   trs80,   trs80l2,  "Tandy Radio Shack",  "TRS-80 Model I (Level II Basic)" , 0 )
+COMP( 1983, radionic, trs80,	0,	radionic, trs80,   trs80,    "Komtek",  "Radionic" , 0 )
+COMP( 1980, sys80,    trs80,	0,	sys80,    trs80,   trs80l2,  "EACA Computers Ltd.","System-80" , 0 )
+COMP( 1981, lnw80,    trs80,	0,	lnw80,    trs80m3, lnw80,    "LNW Research","LNW-80", 0 )
+COMP( 1980, trs80m3,  trs80,	0,	model3,   trs80m3, trs80m4,  "Tandy Radio Shack",  "TRS-80 Model III", 0 )
+COMP( 1980, trs80m4,  trs80,	0,	model4,   trs80m3, trs80m4,  "Tandy Radio Shack",  "TRS-80 Model 4", 0 )
+COMP( 1983, trs80m4p, trs80,	0,	model4p,  trs80m3, trs80m4p, "Tandy Radio Shack",  "TRS-80 Model 4P", 0 )
+COMP( 1983, ht1080z,  trs80,	0,	ht1080z,  trs80,   trs80l2,  "Hiradastechnika Szovetkezet",  "HT-1080Z Series I" , 0 )
+COMP( 1984, ht1080z2, trs80,	0,	ht1080z,  trs80,   trs80l2,  "Hiradastechnika Szovetkezet",  "HT-1080Z Series II" , 0 )
+COMP( 1985, ht108064, trs80,	0,	ht1080z,  trs80,   trs80,    "Hiradastechnika Szovetkezet",  "HT-1080Z/64" , 0 )

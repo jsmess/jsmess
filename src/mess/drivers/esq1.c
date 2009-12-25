@@ -185,4 +185,4 @@ ROM_START( esq1 )
         ROM_LOAD( "esq1wavhi.bin", 0x8000, 0x8000, CRC(94c554a3) SHA1(ed0318e5253637585559e8cf24c06d6115bd18f6) )
 ROM_END
 
-CONS( 1987, esq1, 0, 0, esq1, esq1, 0, 0, "Ensoniq", "ESQ-1", GAME_NOT_WORKING )
+CONS( 1987, esq1, 0, 0, esq1, esq1, 0, "Ensoniq", "ESQ-1", GAME_NOT_WORKING )

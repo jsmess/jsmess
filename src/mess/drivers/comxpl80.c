@@ -215,5 +215,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     INIT  CONFIG  COMPANY                         FULLNAME        FLAGS
-COMP( 1987, comxpl80,	0,		0,		comxpl80,	comxpl80, 0, 	0,		"Comx World Operations Ltd",	"COMX PL-80",	GAME_NOT_WORKING | GAME_NO_SOUND )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     INIT  COMPANY                         FULLNAME        FLAGS
+COMP( 1987, comxpl80,	0,		0,		comxpl80,	comxpl80, 0, 	"Comx World Operations Ltd",	"COMX PL-80",	GAME_NOT_WORKING | GAME_NO_SOUND )

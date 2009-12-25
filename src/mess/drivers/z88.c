@@ -782,5 +782,5 @@ ROM_START(z88)
   	ROMX_LOAD("z88v401fi.rom", 0x010000, 0x020000, CRC(ecd7f3f6) SHA1(bf8d3e083f1959e5a0d7e9c8d2ad0c14abd46381), ROM_BIOS(3) )
 ROM_END
 
-/*     YEAR     NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY                 FULLNAME */
-COMP( 1988,	z88,	0,		0,		z88,		z88,		0,		0,	"Cambridge Computers",	"Z88",GAME_NOT_WORKING)
+/*     YEAR     NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                 FULLNAME */
+COMP( 1988,	z88,	0,		0,		z88,		z88,		0,			"Cambridge Computers",	"Z88",GAME_NOT_WORKING)

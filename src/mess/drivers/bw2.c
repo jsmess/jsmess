@@ -885,5 +885,5 @@ ROM_START( bw2 )
 	ROM_LOAD("ramcard-10.bin", 0x0000, 0x4000, CRC(68cde1ba) SHA1(a776a27d64f7b857565594beb63aa2cd692dcf04))
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   INIT    CONFIG  COMPANY      FULLNAME  FLAGS */
-COMP( 1985, bw2,    0,      0,      bw2,      bw2,    bw2,    0,    "Bondwell",  "BW 2",   0 )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   INIT    COMPANY      FULLNAME  FLAGS */
+COMP( 1985, bw2,    0,      0,      bw2,      bw2,    bw2,    "Bondwell",  "BW 2",   0 )

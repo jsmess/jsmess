@@ -348,5 +348,5 @@ ROM_START (jupiter)
 	ROM_LOAD ("jupiter.hi", 0x1000, 0x1000, CRC(4009f636) SHA1(98c5d4bcd74bcf014268cf4c00b2007ea5cc21f3))
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY   FULLNAME */
-COMP( 1981, jupiter,  0,	0,	jupiter,  jupiter,  jupiter,  0,	"Cantab",  "Jupiter Ace" , 0)
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT        COMPANY   FULLNAME */
+COMP( 1981, jupiter,  0,	0,	jupiter,  jupiter,  jupiter,  	"Cantab",  "Jupiter Ace" , 0)

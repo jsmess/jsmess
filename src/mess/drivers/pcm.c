@@ -108,6 +108,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1988, pcm, 	 0,       0, 	 pcm, 		k7659, 	 0,  	  0,  "Mugler/Mathes",   "PC/M",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
+COMP( 1988, pcm, 	 0,       0, 	 pcm, 		k7659, 	 0,  	 "Mugler/Mathes",   "PC/M",		GAME_NOT_WORKING)
 

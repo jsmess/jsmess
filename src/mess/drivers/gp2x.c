@@ -365,8 +365,8 @@ ROM_START(gp2x4)
         ROM_LOAD( "gp2xyaffs.img", 0x300000, 0x2dfed0, CRC(e77efc53) SHA1(21477ff77aacb84005bc465a03066d71031a6098) )
 ROM_END
 
-CONS(2005, gp2x,  0,    0, gp2x, gp2x, 0, 0, "Game Park Holdings", "GP2X 2.0", GAME_NOT_WORKING|GAME_NO_SOUND)
-CONS(2005, gp2x3, gp2x, 0, gp2x, gp2x, 0, 0, "Game Park Holdings", "GP2X 3.0", GAME_NOT_WORKING|GAME_NO_SOUND)
-CONS(2005, gp2x4, gp2x, 0, gp2x, gp2x, 0, 0, "Game Park Holdings", "GP2X 4.0", GAME_NOT_WORKING|GAME_NO_SOUND)
+CONS(2005, gp2x,  0,    0, gp2x, gp2x, 0, "Game Park Holdings", "GP2X 2.0", GAME_NOT_WORKING|GAME_NO_SOUND)
+CONS(2005, gp2x3, gp2x, 0, gp2x, gp2x, 0, "Game Park Holdings", "GP2X 3.0", GAME_NOT_WORKING|GAME_NO_SOUND)
+CONS(2005, gp2x4, gp2x, 0, gp2x, gp2x, 0, "Game Park Holdings", "GP2X 4.0", GAME_NOT_WORKING|GAME_NO_SOUND)
 
 

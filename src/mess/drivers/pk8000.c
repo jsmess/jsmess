@@ -375,7 +375,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1987, vesta,  0,       0, 	pk8000, 	pk8000, 	 0,  	  0,  	 "BP EVM",   "PK8000 Vesta",		0)
-COMP( 1987, hobby,  vesta,   0, 	pk8000, 	pk8000, 	 0,  	  0,  	 "BP EVM",   "PK8000 Sura/Hobby",	0)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
+COMP( 1987, vesta,  0,       0, 	pk8000, 	pk8000, 	 0,   "BP EVM",   "PK8000 Vesta",		0)
+COMP( 1987, hobby,  vesta,   0, 	pk8000, 	pk8000, 	 0,   "BP EVM",   "PK8000 Sura/Hobby",	0)
 

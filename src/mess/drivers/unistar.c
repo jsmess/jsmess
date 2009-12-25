@@ -71,6 +71,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG     COMPANY                  FULLNAME                    FLAGS */
-COMP( ????, unistar,  0,       0, 	unistar, 	unistar, 	 0, 	0,  	 "Callan Data Systems",   "Unistar Terminal",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT        COMPANY                  FULLNAME                    FLAGS */
+COMP( ????, unistar,  0,       0, 	unistar, 	unistar, 	 0,  	 "Callan Data Systems",   "Unistar Terminal",		GAME_NOT_WORKING)
 

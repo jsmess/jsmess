@@ -68,5 +68,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, qtsbc,  0,       0, 	qtsbc, 	qtsbc, 	 0,  	  0,  	 "Computer Systems Inc.",   "QT SBC +2/4",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
+COMP( ????, qtsbc,  0,       0, 	qtsbc, 	qtsbc, 	 0,  	   	 "Computer Systems Inc.",   "QT SBC +2/4",		GAME_NOT_WORKING)

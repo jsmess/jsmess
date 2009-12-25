@@ -649,5 +649,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  CONFIG    COMPANY                        FULLNAME     FLAGS */
-COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, 0,    0, "Miles Gordon Technology plc", "SAM Coupe", 0 )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY                        FULLNAME     FLAGS */
+COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, 0,    "Miles Gordon Technology plc", "SAM Coupe", 0 )

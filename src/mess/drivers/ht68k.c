@@ -138,6 +138,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY                     FULLNAME                    FLAGS */
-COMP( 1987, ht68k,  0,       0, 	 ht68k, 	ht68k, 	 0,  	  0,  	"Hawthorne Technologies",   "TinyGiant HT68k",		0)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                     FULLNAME                    FLAGS */
+COMP( 1987, ht68k,  0,       0, 	 ht68k, 	ht68k, 	 0,  	 "Hawthorne Technologies",   "TinyGiant HT68k",		0)
 

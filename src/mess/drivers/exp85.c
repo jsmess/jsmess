@@ -265,5 +265,5 @@ ROM_START( exp85 )
 ROM_END
 
 /* System Drivers */
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY         FULLNAME        FLAGS */
-COMP( 1979, exp85,  0,		0,		exp85,	exp85,	0,		0,	"Netronics",	"Explorer/85",	GAME_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY         FULLNAME        FLAGS */
+COMP( 1979, exp85,  0,		0,		exp85,	exp85,	0,		"Netronics",	"Explorer/85",	GAME_NOT_WORKING )

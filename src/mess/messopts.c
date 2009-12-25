@@ -129,7 +129,7 @@ void mess_add_device_options(core_options *opts, const game_driver *driver)
 	machine_config *config;
 
 	/* create the configuration */
-	config = machine_config_alloc_with_mess_devices(driver);
+	config = machine_config_alloc(driver->machine_config);
 
 	/* enumerate our callback for every device */
 	mess_enumerate_devices(opts, config, driver, add_device_options_for_device);

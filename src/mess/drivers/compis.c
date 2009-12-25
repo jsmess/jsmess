@@ -353,6 +353,6 @@ ROM_START( compis2 )
 	ROM_LOAD( "cmpkey13.u1", 0x0000, 0x0800, CRC(3f87d138) SHA1(c04e2d325b9c04818bc7c47c3bf32b13862b11ec) )
 ROM_END
 
-/*   YEAR   NAME        PARENT  COMPAT MACHINE  INPUT   INIT    CONFIG  COMPANY     FULLNAME */
-COMP(1985,	compis,		0,		0,     compis,	compis,	compis,	0,	"Telenova", "Compis" , GAME_NOT_WORKING)
-COMP(1986,	compis2,	compis,	0,     compis,	compis,	compis,	0,	"Telenova", "Compis II" , GAME_NOT_WORKING)
+/*   YEAR   NAME        PARENT  COMPAT MACHINE  INPUT   INIT    COMPANY     FULLNAME */
+COMP(1985,	compis,		0,		0,     compis,	compis,	compis,	"Telenova", "Compis" , GAME_NOT_WORKING)
+COMP(1986,	compis2,	compis,	0,     compis,	compis,	compis,	"Telenova", "Compis II" , GAME_NOT_WORKING)

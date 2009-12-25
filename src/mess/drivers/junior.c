@@ -220,6 +220,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1980, junior,  0,       0, 	junior, 	junior, 	 0,  	  0,  	 "Elektor Electronics",   "Junior Computer",		GAME_SUPPORTS_SAVE)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
+COMP( 1980, junior,  0,       0, 	junior, 	junior, 	 0,   "Elektor Electronics",   "Junior Computer",		GAME_SUPPORTS_SAVE)
 

@@ -402,11 +402,11 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR  NAME      PARENT  COMPAT MACHINE   INPUT    INIT   CONFIG   COMPANY       FULLNAME */
-CONS( 1985, nes,       0,      0,     nes,      nes,     0,     0,       "Nintendo",  "Nintendo Entertainment System / Famicom (NTSC)", GAME_IMPERFECT_GRAPHICS )
-CONS( 1987, nespal,    nes,    0,     nespal,   nes,     0,     0,       "Nintendo",  "Nintendo Entertainment System (PAL)", GAME_IMPERFECT_GRAPHICS )
-CONS( 1983, famicom,   nes,    0,     famicom,  famicom, famicom, 	0, 		 "Nintendo",  "Famicom Disk System", GAME_IMPERFECT_GRAPHICS )
-CONS( 1986, famitwin,  nes,    0,     famicom,  famicom, famicom, 	0, 		 "Sharp",     "Famicom Twin", GAME_IMPERFECT_GRAPHICS )
-CONS( 198?, m82,       nes,    0,     nes,      nes,     0,     0,       "Nintendo",  "M82 Display Unit", GAME_IMPERFECT_GRAPHICS )
-CONS( 1996, drpcjr,    nes,    0,     famicom,  nes,     0,     0,       "Bung",      "Doctor PC Jr", GAME_IMPERFECT_GRAPHICS )
-CONS( 199?, dendy,     nes,    0,     dendy,    nes,     0,     0,       "Steepler",  "Dendy Classic", GAME_IMPERFECT_GRAPHICS )
+/*     YEAR  NAME      PARENT  COMPAT MACHINE   INPUT    INIT    COMPANY       FULLNAME */
+CONS( 1985, nes,       0,      0,     nes,      nes,     0,      "Nintendo",  "Nintendo Entertainment System / Famicom (NTSC)", GAME_IMPERFECT_GRAPHICS )
+CONS( 1987, nespal,    nes,    0,     nespal,   nes,     0,      "Nintendo",  "Nintendo Entertainment System (PAL)", GAME_IMPERFECT_GRAPHICS )
+CONS( 1983, famicom,   nes,    0,     famicom,  famicom, famicom,"Nintendo",  "Famicom Disk System", GAME_IMPERFECT_GRAPHICS )
+CONS( 1986, famitwin,  nes,    0,     famicom,  famicom, famicom,"Sharp",     "Famicom Twin", GAME_IMPERFECT_GRAPHICS )
+CONS( 198?, m82,       nes,    0,     nes,      nes,     0,      "Nintendo",  "M82 Display Unit", GAME_IMPERFECT_GRAPHICS )
+CONS( 1996, drpcjr,    nes,    0,     famicom,  nes,     0,      "Bung",      "Doctor PC Jr", GAME_IMPERFECT_GRAPHICS )
+CONS( 199?, dendy,     nes,    0,     dendy,    nes,     0,      "Steepler",  "Dendy Classic", GAME_IMPERFECT_GRAPHICS )

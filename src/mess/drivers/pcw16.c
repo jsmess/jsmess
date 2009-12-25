@@ -1455,5 +1455,5 @@ ROM_START(pcw16)
 ROM_END
 
 
-/*     YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT     INIT   CONFIG,  COMPANY          FULLNAME */
-COMP( 1995, pcw16,	  0,		0,		pcw16,	   pcw16,    pcw16,	    0,   "Amstrad plc",   "PCW16", GAME_NOT_WORKING )
+/*     YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT     INIT    COMPANY          FULLNAME */
+COMP( 1995, pcw16,	  0,		0,		pcw16,	   pcw16,    pcw16,	 "Amstrad plc",   "PCW16", GAME_NOT_WORKING )

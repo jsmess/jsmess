@@ -576,7 +576,7 @@ ROM_START(genmod)
 	ROM_LOAD_OPTIONAL("spchrom.bin", 0x0000, 0x8000, CRC(58b155f7) SHA1(382292295c00dff348d7e17c5ce4da12a1d87763)) /* system speech ROM */
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT    INIT      CONFIG  COMPANY     FULLNAME */
-COMP( 1987,geneve,   0,		0,		geneve_60hz,  geneve,  geneve,	0,	"Myarc",	"Geneve 9640" , 0)
-COMP( 1990,genmod,   geneve,	0,		geneve_60hz,  geneve,  genmod,	0,	"Myarc",	"Geneve 9640 (with Genmod modification)" , 0)
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT    INIT       COMPANY     FULLNAME */
+COMP( 1987,geneve,   0,		0,		geneve_60hz,  geneve,  geneve,		"Myarc",	"Geneve 9640" , 0)
+COMP( 1990,genmod,   geneve,	0,		geneve_60hz,  geneve,  genmod,	"Myarc",	"Geneve 9640 (with Genmod modification)" , 0)
 

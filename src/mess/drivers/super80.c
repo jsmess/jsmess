@@ -664,10 +664,10 @@ ROM_START( super80v )
 	ROM_LOAD("s80hmce.ic24",  0xf000, 0x0800, CRC(a6488a1e) SHA1(7ba613d70a37a6b738dcd80c2bb9988ff1f011ef) )
 ROM_END
 
-/*    YEAR  NAME      PARENT COMPAT MACHINE INPUT     INIT       CONFIG   COMPANY       FULLNAME */
-COMP( 1981, super80,  0,       0, super80,  super80,  super80,  0, "Dick Smith Electronics","Super-80 (V1.2)" , 0)
-COMP( 1981, super80d, super80, 0, super80d, super80d, super80,  0, "Dick Smith Electronics","Super-80 (V2.2)" , 0)
-COMP( 1981, super80e, super80, 0, super80e, super80d, super80,  0, "Dick Smith Electronics","Super-80 (El Graphix 4)" , 0)
-COMP( 1981, super80m, super80, 0, super80m, super80m, super80,  0, "Dick Smith Electronics","Super-80 (8R0)" , 0)
-COMP( 1981, super80r, super80, 0, super80r, super80r, super80v, 0, "Dick Smith Electronics","Super-80 (with VDUEB)" , 0)
-COMP( 1981, super80v, super80, 0, super80v, super80v, super80v, 0, "Dick Smith Electronics","Super-80 (with enhanced VDUEB)" , 0)
+/*    YEAR  NAME      PARENT COMPAT MACHINE INPUT     INIT      COMPANY       FULLNAME */
+COMP( 1981, super80,  0,       0, super80,  super80,  super80,  "Dick Smith Electronics","Super-80 (V1.2)" , 0)
+COMP( 1981, super80d, super80, 0, super80d, super80d, super80,  "Dick Smith Electronics","Super-80 (V2.2)" , 0)
+COMP( 1981, super80e, super80, 0, super80e, super80d, super80,  "Dick Smith Electronics","Super-80 (El Graphix 4)" , 0)
+COMP( 1981, super80m, super80, 0, super80m, super80m, super80,  "Dick Smith Electronics","Super-80 (8R0)" , 0)
+COMP( 1981, super80r, super80, 0, super80r, super80r, super80v, "Dick Smith Electronics","Super-80 (with VDUEB)" , 0)
+COMP( 1981, super80v, super80, 0, super80v, super80v, super80v, "Dick Smith Electronics","Super-80 (with enhanced VDUEB)" , 0)

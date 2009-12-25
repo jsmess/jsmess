@@ -1787,8 +1787,8 @@ ROM_START(nc200)
 	ROM_LOAD("nc200.rom", 0x010000, 0x080000, CRC(bb8180e7) SHA1(fb5c93b0a3e199202c6a12548d2617f7a09bae47))
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY         FULLNAME    FLAGS */
-COMP( 1992, nc100,  0,      0,      nc100,  nc100,  0,      0,  "Amstrad plc",  "NC100",    0 )
-COMP( 1992, nc150,  nc100,  0,      nc100,  nc100,  0,      0,  "Amstrad plc",  "NC150",    0 )
-COMP( 1993, nc200,  0,      0,      nc200,  nc200,  0,      0,  "Amstrad plc",  "NC200",    0 )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY         FULLNAME    FLAGS */
+COMP( 1992, nc100,  0,      0,      nc100,  nc100,  0,      "Amstrad plc",  "NC100",    0 )
+COMP( 1992, nc150,  nc100,  0,      nc100,  nc100,  0,      "Amstrad plc",  "NC150",    0 )
+COMP( 1993, nc200,  0,      0,      nc200,  nc200,  0,      "Amstrad plc",  "NC200",    0 )
 

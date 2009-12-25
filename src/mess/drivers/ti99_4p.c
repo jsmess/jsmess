@@ -338,5 +338,5 @@ ROM_START(ti99_4p)
 	ROM_LOAD_OPTIONAL("spchrom.bin", 0x0000, 0x8000, CRC(58b155f7) SHA1(382292295c00dff348d7e17c5ce4da12a1d87763)) /* system speech ROM */
 ROM_END
 
-/*    YEAR  NAME      PARENT   COMPAT   MACHINE      INPUT    INIT     CONFIG   COMPANY     FULLNAME */
-COMP( 1996, ti99_4p,  0,	   0,		ti99_4p_60hz, ti99_4p, ti99_4p, 0,"snug",		"SGCPU (a.k.a. 99/4P)" , GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT   COMPAT   MACHINE      INPUT    INIT      COMPANY     FULLNAME */
+COMP( 1996, ti99_4p,  0,	   0,		ti99_4p_60hz, ti99_4p, ti99_4p, "snug",		"SGCPU (a.k.a. 99/4P)" , GAME_NOT_WORKING )

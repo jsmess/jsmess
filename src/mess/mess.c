@@ -48,9 +48,6 @@ void mess_predevice_init(running_machine *machine)
 	/* initialize natural keyboard support */
 	inputx_init(machine);
 
-	/* allocate the IODevice struct */
-	mess_devices_setup(machine, (machine_config *) machine->config, machine->gamedrv);
-
 	/* init all devices */
 	image_init(machine);
 

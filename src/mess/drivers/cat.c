@@ -437,6 +437,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME  PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1985, swyft,0,       0, 		swyft, 		swyft, 	 0,  	  0,  	 "Information Applicance Inc.",   "Swyft",		GAME_NOT_WORKING)
-COMP( 1987, cat,  swyft,   0, 		cat, 		cat, 	 0,  	  0,  	 "Canon",   "Cat",		GAME_NOT_WORKING)
+/*    YEAR  NAME  PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
+COMP( 1985, swyft,0,       0, 		swyft, 		swyft, 	 0,  	"Information Applicance Inc.",   "Swyft",		GAME_NOT_WORKING)
+COMP( 1987, cat,  swyft,   0, 		cat, 		cat, 	 0,  	"Canon",   "Cat",		GAME_NOT_WORKING)

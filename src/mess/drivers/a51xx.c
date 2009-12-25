@@ -136,6 +136,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, a5120,  0,       0, 	a5120, 	a5120, 	 0,  	  0,  	 "Robotron",   "A5120",		GAME_NOT_WORKING)
-COMP( ????, a5130,  a5120,   0, 	a5130, 	a5130, 	 0,  	  0,  	 "Robotron",   "A5130",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
+COMP( ????, a5120,  0,       0, 	a5120, 	a5120, 	 0,  	   	 "Robotron",   "A5120",		GAME_NOT_WORKING)
+COMP( ????, a5130,  a5120,   0, 	a5130, 	a5130, 	 0,  	   	 "Robotron",   "A5130",		GAME_NOT_WORKING)

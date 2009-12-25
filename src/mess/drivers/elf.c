@@ -367,5 +367,5 @@ static QUICKLOAD_LOAD( elf )
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY         FULLNAME    FLAGS */
-COMP( 1978, elf2,	0,		0,		elf2,	elf2,	0,		0,	"Netronics",	"Elf II",	GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY         FULLNAME    FLAGS */
+COMP( 1978, elf2,	0,		0,		elf2,	elf2,	0,		"Netronics",	"Elf II",	GAME_SUPPORTS_SAVE )

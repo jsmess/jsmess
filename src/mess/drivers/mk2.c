@@ -218,6 +218,6 @@ ROM_END
 */
 
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG    COMPANY   FULLNAME */
-CONS( 1979,	mk2,	0,		0,		mk2,	mk2,	0,		0,	  "Quelle International",  "Chess Champion MK II", 0)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY   FULLNAME */
+CONS( 1979,	mk2,	0,		0,		mk2,	mk2,	0,		"Quelle International",  "Chess Champion MK II", 0)
 // second design sold (same computer/program?)

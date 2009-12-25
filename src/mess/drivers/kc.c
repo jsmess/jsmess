@@ -511,9 +511,9 @@ ROM_START(kc85_5)
 	ROMX_LOAD( "caos43e.855", 0x1A000, 0x2000, CRC(b66fc6c3) SHA1(521ac2fbded4148220f8af2d5a5ab99634364079), ROM_BIOS(2))
 ROM_END
 
-/*     YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT     INIT  CONFIG  COMPANY   FULLNAME */
-COMP( 1987, kc85_2,   0,	   0,		kc85_3,  kc85,     0,    0,   "VEB Mikroelektronik", "HC900 / KC 85/2", GAME_NOT_WORKING)
-COMP( 1987, kc85_3,   kc85_2,  0,		kc85_3,  kc85,     0,    0,   "VEB Mikroelektronik", "KC 85/3", GAME_NOT_WORKING)
-COMP( 1989, kc85_4,   kc85_2,  0,		kc85_4,  kc85,     0,    0,   "VEB Mikroelektronik", "KC 85/4", GAME_NOT_WORKING)
-COMP( 1989, kc85_4d,  kc85_2,  0,		kc85_4d, kc85,     0,    0,  "VEB Mikroelektronik", "KC 85/4 + Disk Interface Module (D004)", GAME_NOT_WORKING)
-COMP( 1989, kc85_5,   kc85_2,  0,		kc85_4,  kc85,     0,    0,   "VEB Mikroelektronik", "KC 85/5", GAME_NOT_WORKING)
+/*     YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT     INIT  COMPANY   FULLNAME */
+COMP( 1987, kc85_2,   0,	   0,		kc85_3,  kc85,     0,    "VEB Mikroelektronik", "HC900 / KC 85/2", GAME_NOT_WORKING)
+COMP( 1987, kc85_3,   kc85_2,  0,		kc85_3,  kc85,     0,    "VEB Mikroelektronik", "KC 85/3", GAME_NOT_WORKING)
+COMP( 1989, kc85_4,   kc85_2,  0,		kc85_4,  kc85,     0,    "VEB Mikroelektronik", "KC 85/4", GAME_NOT_WORKING)
+COMP( 1989, kc85_4d,  kc85_2,  0,		kc85_4d, kc85,     0,    "VEB Mikroelektronik", "KC 85/4 + Disk Interface Module (D004)", GAME_NOT_WORKING)
+COMP( 1989, kc85_5,   kc85_2,  0,		kc85_4,  kc85,     0,    "VEB Mikroelektronik", "KC 85/5", GAME_NOT_WORKING)

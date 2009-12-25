@@ -629,6 +629,6 @@ ROM_END
 
 /* Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                             FULLNAME                    FLAGS */
-COMP( 1978, abc80,  0,      0,      abc80,  abc80,  0,      0,  "Luxor Datorer AB",					"ABC 80 (Sweden, Finland)",	GAME_SUPPORTS_SAVE )
-COMP( 1978, abc80h, abc80,  0,      abc80,  abc80,  0,      0,  "Budapesti Radiotechnikai Gyar",	"ABC 80 (Hungary)",			GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                             FULLNAME                    FLAGS */
+COMP( 1978, abc80,  0,      0,      abc80,  abc80,  0,      "Luxor Datorer AB",					"ABC 80 (Sweden, Finland)",	GAME_SUPPORTS_SAVE )
+COMP( 1978, abc80h, abc80,  0,      abc80,  abc80,  0,      "Budapesti Radiotechnikai Gyar",	"ABC 80 (Hungary)",			GAME_SUPPORTS_SAVE )

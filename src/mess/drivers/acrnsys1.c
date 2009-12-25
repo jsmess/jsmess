@@ -183,5 +183,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     INIT  CONFIG  COMPANY  FULLNAME    FLAGS */
-COMP( 1978, acrnsys1, 0,     0,     acrnsys1, acrnsys1, 0,    0,      "Acorn", "System 1", GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     INIT  COMPANY  FULLNAME    FLAGS */
+COMP( 1978, acrnsys1, 0,     0,     acrnsys1, acrnsys1, 0,    "Acorn", "System 1", GAME_NOT_WORKING )

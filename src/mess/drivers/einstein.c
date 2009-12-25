@@ -1019,7 +1019,7 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT           INIT  CONFIG,   COMPANY   FULLNAME                             FLAGS */
-COMP( 1984, einstein, 0,        0,		einstein, einstein,       0,    0, "Tatung", "Einstein TC-01",                    0 )
-COMP( 1984, einstei2, einstein, 0,		einstei2, einstein_80col, 0,    0, "Tatung", "Einstein TC-01 + 80 column device", 0 )
-COMP( 1984, einst256, 0,        0,		einstein, einstein,       0,    0, "Tatung", "Einstein 256",						 GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT           INIT  COMPANY   FULLNAME                             FLAGS */
+COMP( 1984, einstein, 0,        0,		einstein, einstein,       0,    "Tatung", "Einstein TC-01",                    0 )
+COMP( 1984, einstei2, einstein, 0,		einstei2, einstein_80col, 0,    "Tatung", "Einstein TC-01 + 80 column device", 0 )
+COMP( 1984, einst256, 0,        0,		einstein, einstein,       0,    "Tatung", "Einstein 256",						 GAME_NOT_WORKING )

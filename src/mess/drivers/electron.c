@@ -200,5 +200,5 @@ static MACHINE_DRIVER_START( electron )
 MACHINE_DRIVER_END
 
 
-/*     YEAR  NAME      PARENT COMPAT    MACHINE   INPUT     INIT  CONFIG    COMPANY  FULLNAME */
-COMP ( 1983, electron, 0,     0,        electron, electron, 0,    0,        "Acorn", "Acorn Electron", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+/*     YEAR  NAME      PARENT COMPAT    MACHINE   INPUT     INIT  COMPANY  FULLNAME */
+COMP ( 1983, electron, 0,     0,        electron, electron, 0,    "Acorn", "Acorn Electron", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

@@ -535,5 +535,5 @@ static DRIVER_INIT( pasogo )
 
 /*    YEAR      NAME            PARENT  MACHINE   INPUT     INIT
       COMPANY                 FULLNAME */
-CONS( 1996, pasogo,       0,          0, pasogo,  pasogo,    pasogo,   0, "KOEI", "PasoGo", GAME_NO_SOUND|GAME_NOT_WORKING)
+CONS( 1996, pasogo,       0,          0, pasogo,  pasogo,    pasogo,   "KOEI", "PasoGo", GAME_NO_SOUND|GAME_NOT_WORKING)
 

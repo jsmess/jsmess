@@ -79,5 +79,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY      FULLNAME      FLAGS */
-COMP( 1990, a3000, 0,      0,      a3000,   a3000, 0,    0,      "Commodore", "Amiga 3000", GAME_NOT_WORKING )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY      FULLNAME      FLAGS */
+COMP( 1990, a3000, 0,      0,      a3000,   a3000, 0,    "Commodore", "Amiga 3000", GAME_NOT_WORKING )

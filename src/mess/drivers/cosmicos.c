@@ -671,5 +671,5 @@ static DRIVER_INIT( cosmicos )
 	memory_set_direct_update_handler(program, cosmicos_direct_update_handler);
 }
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY             FULLNAME    FLAGS */
-COMP( 1979, cosmicos,	0,		0,		cosmicos,	cosmicos,	cosmicos,	0,			"Radio Bulletin",	"Cosmicos",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME    FLAGS */
+COMP( 1979, cosmicos,	0,		0,		cosmicos,	cosmicos,	cosmicos,	"Radio Bulletin",	"Cosmicos",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )

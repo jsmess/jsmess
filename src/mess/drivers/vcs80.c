@@ -243,5 +243,5 @@ static DRIVER_INIT( vcs80 )
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY             FULLNAME    FLAGS */
-COMP( 1983, vcs80,  0,		0,		vcs80,	vcs80,	vcs80,	0,	"Eckhard Schiller",	"VCS-80",	GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY             FULLNAME    FLAGS */
+COMP( 1983, vcs80,  0,		0,		vcs80,	vcs80,	vcs80,	"Eckhard Schiller",	"VCS-80",	GAME_SUPPORTS_SAVE )

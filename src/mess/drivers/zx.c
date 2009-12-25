@@ -562,14 +562,14 @@ ROM_END
 
 /* Game Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY                     FULLNAME                FLAGS */
-COMP( 1980, zx80,       0,      0,      zx80,       zx80,       zx,     0,    "Sinclair Research",        "ZX-80",               0 )
-COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     0,    "Sinclair Research",        "ZX-81",               0 )
-COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     0,    "Timex Sinclair",           "Timex Sinclair 1000", 0 )
-COMP( 1983, ts1500,     zx81,   0,      ts1500,     zx81,       zx,     0,    "Timex Sinclair",           "Timex Sinclair 1500", 0 )
-COMP( 1983, tk85,     	zx81,   0,      ts1000,     zx81,       zx,     0,    "Microdigital",             "TK85",                0 )
-COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,       zx,     0,    "Ritas do Brasil Ltda",     "Ringo 470",           0 )
-COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,     zx,     0,    "Your Computer",            "PC8300",              0 )
-COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     0,    "Creon Enterprises",        "Power 3000",          0 )
-COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000,    zx,     0,    "Lambda Electronics Ltd",   "Lambda 8300",         0 )
-COMP( 1997, zx97,       zx81,   0,      zx81,       zx81,    	zx,     0,    "Wilf Rigter",              "ZX97",	  GAME_NOT_WORKING )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT      COMPANY                     FULLNAME                FLAGS */
+COMP( 1980, zx80,       0,      0,      zx80,       zx80,       zx,     "Sinclair Research",        "ZX-80",               0 )
+COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     "Sinclair Research",        "ZX-81",               0 )
+COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     "Timex Sinclair",           "Timex Sinclair 1000", 0 )
+COMP( 1983, ts1500,     zx81,   0,      ts1500,     zx81,       zx,     "Timex Sinclair",           "Timex Sinclair 1500", 0 )
+COMP( 1983, tk85,     	zx81,   0,      ts1000,     zx81,       zx,     "Microdigital",             "TK85",                0 )
+COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,       zx,     "Ritas do Brasil Ltda",     "Ringo 470",           0 )
+COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,     zx,     "Your Computer",            "PC8300",              0 )
+COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     "Creon Enterprises",        "Power 3000",          0 )
+COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000,    zx,     "Lambda Electronics Ltd",   "Lambda 8300",         0 )
+COMP( 1997, zx97,       zx81,   0,      zx81,       zx81,    	zx,     "Wilf Rigter",              "ZX97",	  GAME_NOT_WORKING )

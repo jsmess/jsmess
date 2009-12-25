@@ -524,10 +524,10 @@ ROM_START( sv328n80 )
 ROM_END
 
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY         FULLNAME                    FLAGS */
-COMP( 1983, svi318,     0,      0,      svi318,     svi318, svi318, 0, "Spectravideo", "SVI-318 (PAL)",            0 )
-COMP( 1983, svi318n,    svi318, 0,      svi318n,    svi318, svi318, 0, "Spectravideo", "SVI-318 (NTSC)",           0 )
-COMP( 1983, svi328,     svi318, 0,      svi328,     svi328, svi318, 0, "Spectravideo", "SVI-328 (PAL)",            0 )
-COMP( 1983, svi328n,    svi318, 0,      svi328n,    svi328, svi318, 0, "Spectravideo", "SVI-328 (NTSC)",           0 )
-COMP( 1983, sv328p80,   svi318, 0,      svi328_806,    svi328, svi318, 0, "Spectravideo", "SVI-328 (PAL) + SVI-806 80 column card", 0 )
-COMP( 1983, sv328n80,   svi318, 0,      svi328n_806,   svi328, svi318, 0, "Spectravideo", "SVI-328 (NTSC) + SVI-806 80 column card", 0 )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT     COMPANY         FULLNAME                    FLAGS */
+COMP( 1983, svi318,     0,      0,      svi318,     svi318, svi318,  "Spectravideo", "SVI-318 (PAL)",            0 )
+COMP( 1983, svi318n,    svi318, 0,      svi318n,    svi318, svi318,  "Spectravideo", "SVI-318 (NTSC)",           0 )
+COMP( 1983, svi328,     svi318, 0,      svi328,     svi328, svi318,  "Spectravideo", "SVI-328 (PAL)",            0 )
+COMP( 1983, svi328n,    svi318, 0,      svi328n,    svi328, svi318,  "Spectravideo", "SVI-328 (NTSC)",           0 )
+COMP( 1983, sv328p80,   svi318, 0,      svi328_806,    svi328, svi318, "Spectravideo", "SVI-328 (PAL) + SVI-806 80 column card", 0 )
+COMP( 1983, sv328n80,   svi318, 0,      svi328n_806,   svi328, svi318, "Spectravideo", "SVI-328 (NTSC) + SVI-806 80 column card", 0 )

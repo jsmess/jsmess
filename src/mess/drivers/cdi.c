@@ -4608,5 +4608,5 @@ ROM_END
 *      Game driver(s)    *
 *************************/
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      CONFIG    COMPANY     FULLNAME   FLAGS */
-CONS( 1991, cdimono1, 0,        0,        cdimono1, cdi,      0,        0,        "Philips",  "CD-i (Mono-I)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY     FULLNAME   FLAGS */
+CONS( 1991, cdimono1, 0,        0,        cdimono1, cdi,      0,        "Philips",  "CD-i (Mono-I)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

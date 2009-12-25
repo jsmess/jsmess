@@ -733,15 +733,15 @@ ROM_START (ti84pse)
 ROM_END
 
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                 FULLNAME                        FLAGS */
-COMP( 1990, ti81,       0,      0,      ti81,   ti81,   0,      0,		"Texas Instruments",    "TI-81",                        0 )
-COMP( 1992, ti85,       0,      0,      ti85d,  ti85,   0,      0,      "Texas Instruments",    "TI-85",                        0 )
-COMP( 1993, ti82,       0,      0,      ti82,   ti82,   0,      0,		"Texas Instruments",    "TI-82",                        0 )
-COMP( 1994, ti81v2,     ti81,   0,      ti82,   ti81,   0,      0,		"Texas Instruments",    "TI-81 v2.0",                   0 )
-COMP( 1996, ti83,       0,      0,      ti83,   ti83,   0,      0,		"Texas Instruments",    "TI-83",                        0 )
-COMP( 1997, ti86,       0,      0,      ti86d,  ti85,   0,      0,  	"Texas Instruments",    "TI-86",                        0 )
-COMP( 1998, ti73,       0,      0,      ti83p,  ti82,   0,      0,		"Texas Instruments",    "TI-73",                        GAME_NOT_WORKING )
-COMP( 1999, ti83p,      0,      0,      ti83p,  ti82,   0,      0,		"Texas Instruments",    "TI-83 Plus",                   0 )
-COMP( 2001, ti83pse,    0,      0,      ti85,   ti85,   0,      0,		"Texas Instruments",    "TI-83 Plus Silver Edition",    GAME_NOT_WORKING )
-//COMP( 2004, ti84p,      0,      0,      ti85,   ti85,   0,      0,   "Texas Instruments",    "TI-84 Plus",                   GAME_NOT_WORKING )
-COMP( 2004, ti84pse,    0,      0,      ti85,   ti85,   0,      0,		"Texas Instruments",    "TI-84 Plus Silver Edition",    GAME_NOT_WORKING )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT   COMPANY                 FULLNAME                        FLAGS */
+COMP( 1990, ti81,       0,      0,      ti81,   ti81,   0,     "Texas Instruments",    "TI-81",                        0 )
+COMP( 1992, ti85,       0,      0,      ti85d,  ti85,   0,     "Texas Instruments",    "TI-85",                        0 )
+COMP( 1993, ti82,       0,      0,      ti82,   ti82,   0,     "Texas Instruments",    "TI-82",                        0 )
+COMP( 1994, ti81v2,     ti81,   0,      ti82,   ti81,   0,     "Texas Instruments",    "TI-81 v2.0",                   0 )
+COMP( 1996, ti83,       0,      0,      ti83,   ti83,   0,     "Texas Instruments",    "TI-83",                        0 )
+COMP( 1997, ti86,       0,      0,      ti86d,  ti85,   0,     "Texas Instruments",    "TI-86",                        0 )
+COMP( 1998, ti73,       0,      0,      ti83p,  ti82,   0,     "Texas Instruments",    "TI-73",                        GAME_NOT_WORKING )
+COMP( 1999, ti83p,      0,      0,      ti83p,  ti82,   0,     "Texas Instruments",    "TI-83 Plus",                   0 )
+COMP( 2001, ti83pse,    0,      0,      ti85,   ti85,   0,     "Texas Instruments",    "TI-83 Plus Silver Edition",    GAME_NOT_WORKING )
+//COMP( 2004, ti84p,      0,      0,      ti85,   ti85,   0,   "Texas Instruments",    "TI-84 Plus",                   GAME_NOT_WORKING )
+COMP( 2004, ti84pse,    0,      0,      ti85,   ti85,   0,     "Texas Instruments",    "TI-84 Plus Silver Edition",    GAME_NOT_WORKING )

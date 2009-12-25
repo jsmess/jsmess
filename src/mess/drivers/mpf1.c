@@ -504,6 +504,6 @@ static DRIVER_INIT( mpf1 )
 	memory_set_direct_update_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), mpf1_direct_update_handler);
 }
 
-COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  mpf1, 0, "Multitech", "Micro Professor 1", 0)
-COMP( 1979, mpf1b, mpf1, 0, mpf1b,mpf1b, mpf1, 0, "Multitech", "Micro Professor 1B", 0)
-COMP( 1982, mpf1p, mpf1, 0, mpf1p,mpf1b, mpf1, 0, "Multitech", "Micro Professor 1 Plus", GAME_NOT_WORKING)
+COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  mpf1, "Multitech", "Micro Professor 1", 0)
+COMP( 1979, mpf1b, mpf1, 0, mpf1b,mpf1b, mpf1, "Multitech", "Micro Professor 1B", 0)
+COMP( 1982, mpf1p, mpf1, 0, mpf1p,mpf1b, mpf1, "Multitech", "Micro Professor 1 Plus", GAME_NOT_WORKING)

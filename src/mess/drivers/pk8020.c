@@ -230,5 +230,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY                  FULLNAME   FLAGS */
-COMP( 1987, korvet, 	 0,  	 0,	pk8020, 	pk8020, 	pk8020, 0,  "", 					 "PK8020 Korvet",	 0)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
+COMP( 1987, korvet, 	 0,  	 0,	pk8020, 	pk8020, 	pk8020,  "", 					 "PK8020 Korvet",	 0)

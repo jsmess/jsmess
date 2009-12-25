@@ -112,6 +112,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1991, pce220,  0,       0, 	pce220, 	pce220,  0,   0,  	 "Sharp",   "PC-E220",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
+COMP( 1991, pce220,  0,       0, 	pce220, 	pce220,  0,   "Sharp",   "PC-E220",		GAME_NOT_WORKING)
 

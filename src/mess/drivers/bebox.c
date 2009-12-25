@@ -200,6 +200,6 @@ ROM_START(bebox2)
 	ROM_LOAD( "bootnub.rom", 0x000000, 0x4000, CRC(5348d09a) SHA1(1b637a3d7a2b072aa128dd5c037bbb440d525c1a) )
 ROM_END
 
-/*     YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY             FULLNAME */
-COMP( 1995,  bebox,    0,      0,      bebox,    bebox,    bebox,  0,  "Be Incorporated",  "BeBox Dual603-66", GAME_NOT_WORKING )
-COMP( 1996,  bebox2,   bebox,  0,      bebox2,   bebox,    bebox,  0,  "Be Incorporated",  "BeBox Dual603-133", GAME_NOT_WORKING )
+/*     YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     INIT    COMPANY             FULLNAME */
+COMP( 1995,  bebox,    0,      0,      bebox,    bebox,    bebox,   "Be Incorporated",  "BeBox Dual603-66", GAME_NOT_WORKING )
+COMP( 1996,  bebox2,   bebox,  0,      bebox2,   bebox,    bebox,   "Be Incorporated",  "BeBox Dual603-133", GAME_NOT_WORKING )

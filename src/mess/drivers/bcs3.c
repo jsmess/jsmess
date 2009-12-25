@@ -477,8 +477,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1984, bcs3,   0,       0,      bcs3, 	bcs3, 	 0,  	  0,  "Eckhard Schiller",   "BCS 3 rev 2.4", GAME_NOT_WORKING)
-COMP( 1986, bcs3a,  bcs3,    0,      bcs3a, 	bcs3, 	 0,  	  0,  "Eckhard Schiller",   "BCS 3 rev 3.1 29-column", GAME_NOT_WORKING)
-COMP( 1986, bcs3b,  bcs3,    0,      bcs3b, 	bcs3, 	 0,  	  0,  "Eckhard Schiller",   "BCS 3 rev 3.1 40-column", GAME_NOT_WORKING)
-COMP( 198?, bcs3c,  bcs3,    0,      bcs3c, 	bcs3, 	 0,  	  0,  "Eckhard Schiller",   "BCS 3 rev 3.3", GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
+COMP( 1984, bcs3,   0,       0,      bcs3, 	bcs3, 	 0,  	     "Eckhard Schiller",   "BCS 3 rev 2.4", GAME_NOT_WORKING)
+COMP( 1986, bcs3a,  bcs3,    0,      bcs3a, 	bcs3, 	 0,  	 "Eckhard Schiller",   "BCS 3 rev 3.1 29-column", GAME_NOT_WORKING)
+COMP( 1986, bcs3b,  bcs3,    0,      bcs3b, 	bcs3, 	 0,  	 "Eckhard Schiller",   "BCS 3 rev 3.1 40-column", GAME_NOT_WORKING)
+COMP( 198?, bcs3c,  bcs3,    0,      bcs3c, 	bcs3, 	 0,  	 "Eckhard Schiller",   "BCS 3 rev 3.3", GAME_NOT_WORKING)

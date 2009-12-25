@@ -885,6 +885,6 @@ ROM_START(apexc)
 		/* space filled with our font */
 ROM_END
 
-/*         YEAR     NAME        PARENT          COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY     FULLNAME */
-//COMP(      1951,    apexc53,    0,              0,      apexc53,    apexc,  apexc,  0,  "Booth",    "APEXC (as described in 1953)" , GAME_NOT_WORKING)
-COMP(      1955,	apexc,		/*apexc53*/0,	0,		apexc,		apexc,	apexc,	0,	"Booth",	"APEXC (as described in 1957)" , 0)
+/*         YEAR     NAME        PARENT          COMPAT  MACHINE     INPUT   INIT  COMPANY     FULLNAME */
+//COMP(      1951,    apexc53,    0,              0,      apexc53,    apexc,  apexc,   "Booth",    "APEXC (as described in 1953)" , GAME_NOT_WORKING)
+COMP(      1955,	apexc,		/*apexc53*/0,	0,		apexc,		apexc,	apexc,	"Booth",	"APEXC (as described in 1957)" , 0)

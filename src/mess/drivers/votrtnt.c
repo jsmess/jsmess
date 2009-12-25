@@ -114,6 +114,6 @@ static ACIA6850_INTERFACE( acia_intf )
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT CONFIG      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1980, votrtnt,   0,          0,      votrtnt,   votrtnt, 0,   0,   "Votrax",        "Type 'N Talk",                        GAME_NOT_WORKING )
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                            FLAGS */
+COMP( 1980, votrtnt,   0,          0,      votrtnt,   votrtnt, 0,     "Votrax",        "Type 'N Talk",                        GAME_NOT_WORKING )
 

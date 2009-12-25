@@ -620,5 +620,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY                 FULLNAME        FLAGS */
-COMP( 1980, xor100,		0,		0,		xor100,		xor100,		0,		0,		"Xor Data Science",		"XOR S-100-12",	GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                 FULLNAME        FLAGS */
+COMP( 1980, xor100,		0,		0,		xor100,		xor100,		0,		"Xor Data Science",		"XOR S-100-12",	GAME_SUPPORTS_SAVE )

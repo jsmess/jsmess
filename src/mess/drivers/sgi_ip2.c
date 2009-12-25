@@ -518,5 +518,5 @@ ROM_START( sgi_ip2 )
 	ROM_LOAD( "sgi-ip2-u93.ip2.2-008.od",  0x10000, 0x8000, CRC(bf967590) SHA1(1aac48e4f5531a25c5482f64de5cd3c7a9931f11) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE  INPUT     INIT     CONFIG    COMPANY                   FULLNAME */
-COMP( 1985, sgi_ip2,  0,        0,        sgi_ip2, sgi_ip2,  sgi_ip2, 0,        "Silicon Graphics, Inc.", "IRIS 3130 (IP2)", GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE  INPUT     INIT     COMPANY                   FULLNAME */
+COMP( 1985, sgi_ip2,  0,        0,        sgi_ip2, sgi_ip2,  sgi_ip2, "Silicon Graphics, Inc.", "IRIS 3130 (IP2)", GAME_NOT_WORKING )

@@ -36,6 +36,7 @@
 #include "messui.h"
 #include "winutf8.h"
 #include "swconfig.h"
+#include "device.h"
 #include "zippath.h"
 
 
@@ -420,8 +421,8 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 
 	begin_resource_tracking();
 
-	// allocate the machine config
-	config = machine_config_alloc_with_mess_devices(drivers[drvindex]);
+	// allocate the machine config	
+	config = machine_config_alloc(drivers[drvindex]->machine_config);
 
 	nPos = 0;
 	for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
@@ -814,7 +815,7 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config *de
 	drvindex = Picker_GetSelectedItem(hwndList);
 
 	// allocate the machine config
-	config = machine_config_alloc_with_mess_devices(drivers[drvindex]);
+	config = machine_config_alloc(drivers[drvindex]->machine_config);
 
 	SetupImageTypes(config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
 

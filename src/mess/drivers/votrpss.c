@@ -185,6 +185,6 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT CONFIG      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1982, votrpss,   0,          0,      votrpss,   votrpss, 0,   0,   "Votrax",        "Personal Speech System",                        GAME_NOT_WORKING )
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                            FLAGS */
+COMP( 1982, votrpss,   0,          0,      votrpss,   votrpss, 0,      "Votrax",        "Personal Speech System",                        GAME_NOT_WORKING )
 

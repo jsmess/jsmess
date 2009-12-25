@@ -627,6 +627,6 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE      INPUT    INIT  CONFIG    COMPANY  FULLNAME               FLAGS */
-COMP( 1983, sordm5,	  0,      0,      sord_m5,	   sord_m5, 0,    0,        "Sord",  "Sord M5",             0 )
-COMP( 1983, srdm5fd5, sordm5, 0,      sord_m5_fd5, sord_m5, 0,    0, "Sord",  "Sord M5 + PI5 + FD5", GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE      INPUT    INIT  COMPANY  FULLNAME               FLAGS */
+COMP( 1983, sordm5,	  0,      0,      sord_m5,	   sord_m5, 0,    "Sord",  "Sord M5",             0 )
+COMP( 1983, srdm5fd5, sordm5, 0,      sord_m5_fd5, sord_m5, 0,    "Sord",  "Sord M5 + PI5 + FD5", GAME_NOT_WORKING )

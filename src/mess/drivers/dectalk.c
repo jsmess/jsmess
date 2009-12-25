@@ -790,5 +790,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY     FULLNAME            FLAGS */
-COMP( 1984, dectalk,	0,		0,		dectalk,	dectalk,	dectalk,	0,	"DEC",		"DECTalk DTC-01",	GAME_NOT_WORKING )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT      COMPANY     FULLNAME            FLAGS */
+COMP( 1984, dectalk,	0,		0,		dectalk,	dectalk,	dectalk,  "DEC",		"DECTalk DTC-01",	GAME_NOT_WORKING )

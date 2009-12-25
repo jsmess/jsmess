@@ -73,6 +73,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, beehive,  0,       0, 	beehive, 	beehive, 	 0,  	  0,  	 "BeeHive",   "DM3270",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
+COMP( ????, beehive,  0,       0, 	beehive, 	beehive, 	 0,  "BeeHive",   "DM3270",		GAME_NOT_WORKING)
 

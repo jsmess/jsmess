@@ -401,11 +401,11 @@ ROM_START( primoc64 )
 	ROM_CART_LOAD("cart1", 0x18000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
-/*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  INIT     CONFIG COMPANY  FULLNAME */
-COMP ( 1984, primoa32, 0,        0,     primoa32, primo, primo32, 0, "Microkey", "Primo A-32" , 0)
-COMP ( 1984, primoa48, primoa32, 0,     primoa48, primo, primo48, 0, "Microkey", "Primo A-48" , 0)
-COMP ( 1984, primoa64, primoa32, 0,     primoa64, primo, primo64, 0, "Microkey", "Primo A-64" , 0)
-COMP ( 1984, primob32, primoa32, 0,     primob32, primo, primo32, 0, "Microkey", "Primo B-32" , 0)
-COMP ( 1984, primob48, primoa32, 0,     primob48, primo, primo48, 0, "Microkey", "Primo B-48" , 0)
-COMP ( 1984, primob64, primoa32, 0,     primob64, primo, primo64, 0, "Microkey", "Primo B-64" , 0)
-COMP ( 1984, primoc64, primoa32, 0,     primoc64, primo, primo64, 0, "Microkey", "Primo C-64" , GAME_NOT_WORKING)
+/*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  INIT     COMPANY  FULLNAME */
+COMP ( 1984, primoa32, 0,        0,     primoa32, primo, primo32, "Microkey", "Primo A-32" , 0)
+COMP ( 1984, primoa48, primoa32, 0,     primoa48, primo, primo48, "Microkey", "Primo A-48" , 0)
+COMP ( 1984, primoa64, primoa32, 0,     primoa64, primo, primo64, "Microkey", "Primo A-64" , 0)
+COMP ( 1984, primob32, primoa32, 0,     primob32, primo, primo32, "Microkey", "Primo B-32" , 0)
+COMP ( 1984, primob48, primoa32, 0,     primob48, primo, primo48, "Microkey", "Primo B-48" , 0)
+COMP ( 1984, primob64, primoa32, 0,     primob64, primo, primo64, "Microkey", "Primo B-64" , 0)
+COMP ( 1984, primoc64, primoa32, 0,     primoc64, primo, primo64, "Microkey", "Primo C-64" , GAME_NOT_WORKING)

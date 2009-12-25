@@ -73,6 +73,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1988, mk90,  0,       0, 	mk90, 	mk90, 	 0,  	  0,  	 "Elektronika",   "MK-90",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
+COMP( 1988, mk90,  0,       0, 			mk90, 	mk90, 	 0,  	 "Elektronika",   "MK-90",		GAME_NOT_WORKING)
 

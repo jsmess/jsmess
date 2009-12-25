@@ -459,8 +459,8 @@ ROM_END
     Lisa drivers boot MacWorks, but do not boot the Lisa OS, which is why we set
     the GAME_NOT_WORKING flag...
 */
-/*     YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  INIT      CONFIG   COMPANY  FULLNAME */
-COMP( 1983, lisa,     0,	0,	lisa,     lisa,	 lisa2,    0,	"Apple Computer",  "Lisa", GAME_NOT_WORKING )
-COMP( 1984, lisa2,    0,	0,	lisa,     lisa,	 lisa2,    0,	"Apple Computer",  "Lisa2", GAME_NOT_WORKING )
-COMP( 1984, lisa210,  lisa2,	0,	lisa210,  lisa,	 lisa210,  0,	"Apple Computer",  "Lisa2/10", GAME_NOT_WORKING )
-COMP( 1985, macxl,    lisa2,	0,	macxl,    lisa,	 mac_xl,   0,	"Apple Computer",  "Macintosh XL", /*GAME_NOT_WORKING*/0 )
+/*     YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  INIT   COMPANY  FULLNAME */
+COMP( 1983, lisa,     0,	0,	lisa,     lisa,	 lisa2,    		"Apple Computer",  "Lisa", GAME_NOT_WORKING )
+COMP( 1984, lisa2,    0,	0,	lisa,     lisa,	 lisa2,    		"Apple Computer",  "Lisa2", GAME_NOT_WORKING )
+COMP( 1984, lisa210,  lisa2,	0,	lisa210,  lisa,	 lisa210, 	"Apple Computer",  "Lisa2/10", GAME_NOT_WORKING )
+COMP( 1985, macxl,    lisa2,	0,	macxl,    lisa,	 mac_xl,  	"Apple Computer",  "Macintosh XL", /*GAME_NOT_WORKING*/0 )

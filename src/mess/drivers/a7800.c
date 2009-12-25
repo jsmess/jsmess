@@ -337,6 +337,6 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     INIT          CONFIG      COMPANY   FULLNAME */
-CONS( 1986, a7800,    0,        0,		a7800_ntsc,	a7800,    a7800_ntsc,	0,		"Atari",  "Atari 7800 (NTSC)" , 0)
-CONS( 1986, a7800p,   a7800,    0,		a7800_pal,	a7800,    a7800_pal,	0,		"Atari",  "Atari 7800 (PAL)" , 0)
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     INIT          COMPANY   FULLNAME */
+CONS( 1986, a7800,    0,        0,		a7800_ntsc,	a7800,    a7800_ntsc,	"Atari",  "Atari 7800 (NTSC)" , 0)
+CONS( 1986, a7800p,   a7800,    0,		a7800_pal,	a7800,    a7800_pal,	"Atari",  "Atari 7800 (PAL)" , 0)

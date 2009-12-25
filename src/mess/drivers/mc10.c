@@ -451,6 +451,6 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY              FULLNAME  FLAGS */
-COMP( 1983, mc10,  0,      0,      mc10,    mc10,  mc10, 0,   "Tandy Radio Shack", "MC-10",  GAME_SUPPORTS_SAVE )
-COMP( 1983, alice, mc10,   0,      mc10,    alice, mc10, 0,   "Matra & Hachette",  "Alice",  GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY              FULLNAME  FLAGS */
+COMP( 1983, mc10,  0,      0,      mc10,    mc10,  mc10, "Tandy Radio Shack", "MC-10",  GAME_SUPPORTS_SAVE )
+COMP( 1983, alice, mc10,   0,      mc10,    alice, mc10, "Matra & Hachette",  "Alice",  GAME_SUPPORTS_SAVE )

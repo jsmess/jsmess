@@ -109,7 +109,7 @@ ROM_START( basic31 )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1985, basic52,  0,       0, 	basic52, 	basic52, 	 0,  	  0,  	 "Intel",   "MCS BASIC 52",		GAME_NOT_WORKING)
-COMP( 1985, basic31,  basic52, 0, 	basic31, 	basic52, 	 0,  	  0,  	 "Intel",   "MCS BASIC 31",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
+COMP( 1985, basic52,  0,       0, 	basic52, 	basic52, 	 0,  "Intel",   "MCS BASIC 52",		GAME_NOT_WORKING)
+COMP( 1985, basic31,  basic52, 0, 	basic31, 	basic52, 	 0,  "Intel",   "MCS BASIC 31",		GAME_NOT_WORKING)
 

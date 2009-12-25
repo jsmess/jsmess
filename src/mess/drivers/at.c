@@ -1129,14 +1129,14 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT       INIT        CONFIG   COMPANY     FULLNAME */
-COMP ( 1984, ibm5170,  0,       ibm5160, ibm5170,   atcga,	atega,	    0,   "International Business Machines",  "IBM PC/AT 5170", GAME_NOT_WORKING )
-COMP ( 1985, ibm5170a, ibm5170, 0,       ibm5170a,  atcga,  atega,      0,   "International Business Machines",  "IBM PC/AT 5170 8MHz", GAME_NOT_WORKING )
-COMP ( 1985, ibm5162,  ibm5170, 0,       ibm5162,   atcga,  atcga,      0,   "International Business Machines",  "IBM PC/XT-286 5162", GAME_NOT_WORKING )
-COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, atvga,	ps2m30286,  0,   "International Business Machines",  "IBM PS2 Model 30 286", GAME_NOT_WORKING )
-COMP ( 1987, at,       ibm5170, 0,       ibm5162,  atcga,	atcga,	    0,   "",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1989, neat,     ibm5170, 0,       ibm5162,  atcga,	atcga,	    0,   "",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga,	at386,	    0,   "MITAC INC",  "PC/AT 386 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga,	at386,	    0,   "",  "PC/AT 486 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga,	at586,	    0,   "",  "PC/AT 586 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,	at_vga,     0,   "",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )
+/*     YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT       INIT    COMPANY     FULLNAME */
+COMP ( 1984, ibm5170,  0,       ibm5160, ibm5170,   atcga,	atega,	    "International Business Machines",  "IBM PC/AT 5170", GAME_NOT_WORKING )
+COMP ( 1985, ibm5170a, ibm5170, 0,       ibm5170a,  atcga,  atega,      "International Business Machines",  "IBM PC/AT 5170 8MHz", GAME_NOT_WORKING )
+COMP ( 1985, ibm5162,  ibm5170, 0,       ibm5162,   atcga,  atcga,      "International Business Machines",  "IBM PC/XT-286 5162", GAME_NOT_WORKING )
+COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, atvga,	ps2m30286,  "International Business Machines",  "IBM PS2 Model 30 286", GAME_NOT_WORKING )
+COMP ( 1987, at,       ibm5170, 0,       ibm5162,  atcga,	atcga,	    "",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1989, neat,     ibm5170, 0,       ibm5162,  atcga,	atcga,	    "",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga,	at386,	    "MITAC INC",  "PC/AT 386 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga,	at386,	    "",  "PC/AT 486 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga,	at586,	    "",  "PC/AT 586 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,	at_vga,     "",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )

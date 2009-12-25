@@ -242,5 +242,5 @@ ROM_START(dai)
 	ROM_LOAD ("nch.bin", 0x0000, 0x1000, CRC(a9f5b30b) SHA1(24119b2984ab4e50dc0dabae1065ff6d6c1f237d))
 ROM_END
 
-/*    YEAR  NAME PARENT  COMPAT MACHINE INPUT   INIT    CONFIG  COMPANY                FULLNAME */
-COMP( 1978, dai, 0,      0,	dai,	dai,	0,	0,	"Data Applications International", "DAI Personal Computer", 0)
+/*    YEAR  NAME PARENT  COMPAT MACHINE INPUT   INIT     COMPANY                FULLNAME */
+COMP( 1978, dai, 0,      0,	dai,	dai,	0,		"Data Applications International", "DAI Personal Computer", 0)

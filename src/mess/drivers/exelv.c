@@ -597,6 +597,6 @@ ROM_START(exeltel)
 ROM_END
 
 
-/*      YEAR    NAME    PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG      COMPANY         FULLNAME */
-COMP(	1984,	exl100, 0,          0,      exl100,     exelv,  0,		0,      "Exelvision",   "EXL 100" , GAME_NOT_WORKING)
-COMP(	1986,	exeltel,exl100,     0,		exeltel,	exelv,	0,		0,		"Exelvision",	"Exeltel" , GAME_NOT_WORKING)
+/*      YEAR    NAME    PARENT      COMPAT  MACHINE     INPUT   INIT    COMPANY         FULLNAME */
+COMP(	1984,	exl100, 0,          0,      exl100,     exelv,  0,		"Exelvision",   "EXL 100" , GAME_NOT_WORKING)
+COMP(	1986,	exeltel,exl100,     0,		exeltel,	exelv,	0,		"Exelvision",	"Exeltel" , GAME_NOT_WORKING)

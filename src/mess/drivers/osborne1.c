@@ -275,5 +275,5 @@ ROM_START( osborne1 )
 	ROM_LOAD( "osbchr.bin", 0x0000, 0x800, BAD_DUMP CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY     FULLNAME        FLAGS */
-COMP( 1981, osborne1,   0,      0,      osborne1,   osborne1,   osborne1,   0,   "Osborne",  "Osborne-1",    0 )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME        FLAGS */
+COMP( 1981, osborne1,   0,      0,      osborne1,   osborne1,   osborne1,   "Osborne",  "Osborne-1",    0 )

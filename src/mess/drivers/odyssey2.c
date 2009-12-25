@@ -323,9 +323,9 @@ ROM_START (g7400)
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_MIRROR)
 ROM_END
 
-/*     YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY     FULLNAME     FLAGS */
-COMP( 1978, odyssey2, 0,		0,		odyssey2, odyssey2, odyssey2, 0, 	"Magnavox", "Odyssey 2", GAME_IMPERFECT_SOUND )
-COMP( 1979, videopac, odyssey2,	0,		videopac, odyssey2, odyssey2, 0, 	"Philips", "Videopac G7000/C52", GAME_IMPERFECT_SOUND )
-COMP( 1983, g7400, odyssey2, 0,			g7400,    odyssey2, odyssey2, 0, 	"Philips", "Videopac Plus G7400", GAME_NOT_WORKING )
+/*     YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     INIT      COMPANY     FULLNAME     FLAGS */
+COMP( 1978, odyssey2, 0,		0,		odyssey2, odyssey2, odyssey2, "Magnavox", "Odyssey 2", GAME_IMPERFECT_SOUND )
+COMP( 1979, videopac, odyssey2,	0,		videopac, odyssey2, odyssey2, "Philips", "Videopac G7000/C52", GAME_IMPERFECT_SOUND )
+COMP( 1983, g7400, odyssey2, 0,			g7400,    odyssey2, odyssey2, "Philips", "Videopac Plus G7400", GAME_NOT_WORKING )
 
 

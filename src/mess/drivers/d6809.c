@@ -67,6 +67,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 198?, d6809,  0,       0, 	d6809, 	d6809, 	 0,  	  0,  	 "Dunfield",   "6809 Portable",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
+COMP( 198?, d6809,  0,       0, 	d6809, 	d6809, 	 0,  	  	 "Dunfield",   "6809 Portable",		GAME_NOT_WORKING)
 

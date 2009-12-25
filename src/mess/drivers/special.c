@@ -566,9 +566,9 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT       INIT    CONFIG      COMPANY              FULLNAME       FLAGS */
-COMP( 1985, special,    0,     	0, 		special, 	special, 	special, 0,         "", 				 "Specialist",		0)
-COMP( 1985, specialp,   special,0, 		specialp, 	specialp, 	special, 0,         "", 				 "Specialist + hires graph",		0)
-COMP( 1985, lik,    	special,0, 		special, 	lik,		special, 0,         "", 				 "Lik",		 		0)
-COMP( 1985, specimx,   	special,0, 		specimx, 	specimx, 	specimx, 0,   		"", 				 "Specialist MX", 	0)
-COMP( 1994, erik,   	special,0, 		erik, 		special, 	erik, 	 0,     	"", 				 "Erik", 	0)
+/*    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT       INIT        COMPANY              FULLNAME       FLAGS */
+COMP( 1985, special,    0,     	0, 		special, 	special, 	special,    "", 				 "Specialist",		0)
+COMP( 1985, specialp,   special,0, 		specialp, 	specialp, 	special,    "", 				 "Specialist + hires graph",		0)
+COMP( 1985, lik,    	special,0, 		special, 	lik,		special,    "", 				 "Lik",		 		0)
+COMP( 1985, specimx,   	special,0, 		specimx, 	specimx, 	specimx,	"", 				 "Specialist MX", 	0)
+COMP( 1994, erik,   	special,0, 		erik, 		special, 	erik, 		"", 				 "Erik", 	0)

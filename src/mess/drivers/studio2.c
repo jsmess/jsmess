@@ -679,11 +679,11 @@ static DRIVER_INIT( studio2 )
 
 /* Game Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY   FULLNAME */
-CONS( 1977,	studio2,	0,		0,		studio2,	studio2,	studio2,	0,			"RCA",		"Studio II", GAME_SUPPORTS_SAVE )
-CONS( 1978, visicom,	studio2,0,		visicom,	studio2,	studio2,	0,			"Toshiba",	"Visicom (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-CONS( 1978,	mpt02s,		studio2,0,		mpt02,		studio2,	studio2,	0,			"Soundic",	"MPT-02 Victory Home TV Programmer (Austria)", GAME_NOT_WORKING )
-CONS( 1978,	mpt02h,		studio2,0,		mpt02,		studio2,	studio2,	0,			"Hanimex",	"MPT-02 Jeu TV Programmable (France)", GAME_NOT_WORKING )
-CONS( 1978,	mtc9016,	studio2,0,		mpt02,		studio2,	studio2,	0,			"Mustang",	"9016 Telespiel Computer (Germany)", GAME_NOT_WORKING )
-CONS( 1978, shmc1200,	studio2,0,		mpt02,		studio2,	studio2,	0,			"Sheen",	"1200 Micro Computer (Australia)", GAME_NOT_WORKING )
-CONS( 1978, eti660,		studio2,0,		mpt02,		studio2,	studio2,	0,			"Electronics Today International",	"ETI-660 (Australia)", GAME_NOT_WORKING )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY   FULLNAME */
+CONS( 1977,	studio2,	0,		0,		studio2,	studio2,	studio2,	"RCA",		"Studio II", GAME_SUPPORTS_SAVE )
+CONS( 1978, visicom,	studio2,0,		visicom,	studio2,	studio2,	"Toshiba",	"Visicom (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+CONS( 1978,	mpt02s,		studio2,0,		mpt02,		studio2,	studio2,	"Soundic",	"MPT-02 Victory Home TV Programmer (Austria)", GAME_NOT_WORKING )
+CONS( 1978,	mpt02h,		studio2,0,		mpt02,		studio2,	studio2,	"Hanimex",	"MPT-02 Jeu TV Programmable (France)", GAME_NOT_WORKING )
+CONS( 1978,	mtc9016,	studio2,0,		mpt02,		studio2,	studio2,	"Mustang",	"9016 Telespiel Computer (Germany)", GAME_NOT_WORKING )
+CONS( 1978, shmc1200,	studio2,0,		mpt02,		studio2,	studio2,	"Sheen",	"1200 Micro Computer (Australia)", GAME_NOT_WORKING )
+CONS( 1978, eti660,		studio2,0,		mpt02,		studio2,	studio2,	"Electronics Today International",	"ETI-660 (Australia)", GAME_NOT_WORKING )

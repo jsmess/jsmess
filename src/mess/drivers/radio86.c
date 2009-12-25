@@ -474,13 +474,13 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1986, radio86,  0,       0, 	radio86, 	radio86, radio86,  0,  "", "Radio-86RK",	0)
-COMP( 1986, radio16,  radio86, 0, 	radio16, 	radio86, radio86,  0,  "", "Radio-86RK (16K RAM)",	0)
-COMP( 1986, radio4k,  radio86, 0, 	radio86, 	radio86, radio86,  0,  "", "Radio-86RK (4K ROM)",	0)
-COMP( 1986, radiorom, radio86, 0, 	radiorom, 	radio86, radio86,  0,  "", "Radio-86RK (ROM-Disk)",	0)
-COMP( 1986, radioram, radio86, 0, 	radioram, 	radio86, radioram, 0,  "", "Radio-86RK (ROM/RAM Disk)",	0)
-COMP( 1986, spektr01, radio86, 0, 	radio86, 	radio86, radio86,  0,  "", "Spektr-001",	0)
-COMP( 1986, rk7007,   radio86, 0, 	rk7007, 	ms7007,  radio86,  0,  "", "Radio-86RK (MS7007)",	0)
-COMP( 1986, rk700716, radio86, 0, 	rk700716, 	ms7007,  radio86,  0,  "", "Radio-86RK (MS7007 16K RAM)",	0)
-COMP( 1986, mikron2,  radio86, 0, 	mikron2, 	radio86, radio86,  0,  "", "Mikron-2",	0)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
+COMP( 1986, radio86,  0,       0, 	radio86, 	radio86, radio86, "", "Radio-86RK",	0)
+COMP( 1986, radio16,  radio86, 0, 	radio16, 	radio86, radio86, "", "Radio-86RK (16K RAM)",	0)
+COMP( 1986, radio4k,  radio86, 0, 	radio86, 	radio86, radio86, "", "Radio-86RK (4K ROM)",	0)
+COMP( 1986, radiorom, radio86, 0, 	radiorom, 	radio86, radio86, "", "Radio-86RK (ROM-Disk)",	0)
+COMP( 1986, radioram, radio86, 0, 	radioram, 	radio86, radioram,"", "Radio-86RK (ROM/RAM Disk)",	0)
+COMP( 1986, spektr01, radio86, 0, 	radio86, 	radio86, radio86, "", "Spektr-001",	0)
+COMP( 1986, rk7007,   radio86, 0, 	rk7007, 	ms7007,  radio86, "", "Radio-86RK (MS7007)",	0)
+COMP( 1986, rk700716, radio86, 0, 	rk700716, 	ms7007,  radio86, "", "Radio-86RK (MS7007 16K RAM)",	0)
+COMP( 1986, mikron2,  radio86, 0, 	mikron2, 	radio86, radio86, "", "Mikron-2",	0)

@@ -270,5 +270,5 @@ ROM_START(tec1)
 //  ROMX_LOAD("tec1a.rom",   0x0000, 0x0800, CRC(60daea3c) SHA1(383b7e7f02e91fb18c87eb03c5949e31156771d4), ROM_BIOS(2))
 ROM_END
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT      CONFIG       COMPANY  FULLNAME */
-COMP( 1984, tec1,     0,      0,      tec1,       tec1,    0,        0,		"Talking Electronics magazine",  "TEC-1" , 0 )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT       COMPANY  FULLNAME */
+COMP( 1984, tec1,     0,      0,      tec1,       tec1,    0,  		"Talking Electronics magazine",  "TEC-1" , 0 )

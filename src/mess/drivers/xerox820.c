@@ -787,11 +787,11 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY                         FULLNAME        FLAGS */
-COMP( 1981, xerox820,	0,			0,		xerox820,	xerox820,	0,		0,	"Xerox",						"Xerox 820",	0)
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME        FLAGS */
+COMP( 1981, xerox820,	0,			0,		xerox820,	xerox820,	0,		"Xerox",						"Xerox 820",	0)
 /*
-COMP( 1980, bigboard,   0,          0,      bigboard,   bigboard,   0,      bigboard,   "Digital Research Computers",   "Big Board",    GAME_NOT_WORKING)
-COMP( 1983, bigbord2,   0,          0,      bigbord2,   bigboard,   0,      bigbord2,   "Digital Research Computers",   "Big Board II", GAME_NOT_WORKING)
-COMP( 1983, xerox820ii, 0,          0,      xerox820ii, xerox820,   0,      xerox820ii, "Xerox",                        "Xerox 820-II", GAME_NOT_WORKING)
-COMP( 1983, xerox168,   0,          0,      xerox168,   xerox168,   0,      xerox168,   "Xerox",                        "Xerox 16/8",   GAME_NOT_WORKING)
+COMP( 1980, bigboard,   0,          0,      bigboard,   bigboard,   0,      "Digital Research Computers",   "Big Board",    GAME_NOT_WORKING)
+COMP( 1983, bigbord2,   0,          0,      bigbord2,   bigboard,   0,      "Digital Research Computers",   "Big Board II", GAME_NOT_WORKING)
+COMP( 1983, xerox820ii, 0,          0,      xerox820ii, xerox820,   0,      "Xerox",                        "Xerox 820-II", GAME_NOT_WORKING)
+COMP( 1983, xerox168,   0,          0,      xerox168,   xerox168,   0,      "Xerox",                        "Xerox 16/8",   GAME_NOT_WORKING)
 */

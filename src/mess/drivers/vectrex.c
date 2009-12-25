@@ -224,6 +224,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT        CONFIG      COMPANY FULLNAME */
-CONS(1982, vectrex,  0,        0,      vectrex,  vectrex,  vectrex,    0,    "General Consumer Electronics",   "Vectrex" , ROT270)
-CONS(1984, raaspec,  vectrex,  0,      raaspec,  raaspec,  vectrex,    0,       "Roy Abel & Associates",   "Spectrum I+" , ROT270)
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT       COMPANY FULLNAME */
+CONS(1982, vectrex,  0,        0,      vectrex,  vectrex,  vectrex,    "General Consumer Electronics",   "Vectrex" , ROT270)
+CONS(1984, raaspec,  vectrex,  0,      raaspec,  raaspec,  vectrex,    "Roy Abel & Associates",   "Spectrum I+" , ROT270)

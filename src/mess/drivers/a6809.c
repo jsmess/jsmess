@@ -72,6 +72,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, a6809,  0,       0, 	a6809, 	a6809, 	 0,  	  0,  	 "Acorn",   "6809",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
+COMP( ????, a6809,  0,       0, 	a6809, 	a6809, 	 0,  	   	 "Acorn",   "6809",		GAME_NOT_WORKING)
 

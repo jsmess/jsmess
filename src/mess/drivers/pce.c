@@ -264,7 +264,7 @@ ROM_END
 #define rom_tg16 rom_pce
 #define rom_sgx rom_pce
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT    INIT   CONFIG  COMPANY  FULLNAME */
-CONS( 1987, pce,    0,      0,      pce,    pce,     pce,   0,	"Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_SOUND )
-CONS( 1989, tg16,   pce,    0,      pce,    pce,     tg16,  0,	"Nippon Electronic Company", "TurboGrafx 16", GAME_IMPERFECT_SOUND )
-CONS( 1989, sgx,    pce,    0,      sgx,    pce,     sgx,   0,	"Nippon Electronic Company", "SuperGrafx", GAME_IMPERFECT_SOUND )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT    INIT   COMPANY  FULLNAME */
+CONS( 1987, pce,    0,      0,      pce,    pce,     pce,   "Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_SOUND )
+CONS( 1989, tg16,   pce,    0,      pce,    pce,     tg16,  "Nippon Electronic Company", "TurboGrafx 16", GAME_IMPERFECT_SOUND )
+CONS( 1989, sgx,    pce,    0,      sgx,    pce,     sgx,   "Nippon Electronic Company", "SuperGrafx", GAME_IMPERFECT_SOUND )

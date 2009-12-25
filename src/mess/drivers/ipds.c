@@ -103,6 +103,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, ipds,  0,       0, 			ipds, 	ipds, 	 0,  	  0,  	 "Intel",   "iPDS",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
+COMP( ????, ipds,  0,       0, 			ipds, 	ipds, 	 0,  	"Intel",   "iPDS",		GAME_NOT_WORKING)
 

@@ -427,11 +427,11 @@ ROM_START(drwrt200)
 	ROM_LOAD("drwrt200.bin", 0x000000, 0x100000, CRC(3c39483c) SHA1(48293e6bdb7e7322d76da7174b716243c0ab7c2c) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     INIT    CONFIG  COMPANY    FULLNAME            FLAGS */
-COMP( 199?, wales210,        0, 0,      nakajies210, nakajies, 0,      0,      "Walther", "ES-210",           GAME_NOT_WORKING )	/* German */
-COMP( 199?, dator3k,  wales210, 0,      nakajies210, nakajies, 0,      0,      "Dator",   "Dator 3000",       GAME_NOT_WORKING )	/* Spanish */
-COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies, 0,      0,      "NTS",     "DreamWriter T400", GAME_NOT_WORKING )	/* English */
-COMP( 199?, drwrt200, wales210, 0,      nakajies250, nakajies, 0,      0,      "NTS",     "DreamWriter T200", GAME_NOT_WORKING )	/* English */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     INIT    COMPANY    FULLNAME            FLAGS */
+COMP( 199?, wales210,        0, 0,      nakajies210, nakajies, 0,      "Walther", "ES-210",           GAME_NOT_WORKING )	/* German */
+COMP( 199?, dator3k,  wales210, 0,      nakajies210, nakajies, 0,      "Dator",   "Dator 3000",       GAME_NOT_WORKING )	/* Spanish */
+COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies, 0,      "NTS",     "DreamWriter T400", GAME_NOT_WORKING )	/* English */
+COMP( 199?, drwrt200, wales210, 0,      nakajies250, nakajies, 0,      "NTS",     "DreamWriter T200", GAME_NOT_WORKING )	/* English */
 
 
 

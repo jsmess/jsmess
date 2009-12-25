@@ -357,5 +357,5 @@ ROM_START(dgnbeta)
 	ROM_LOAD("betachar.rom"	,0x0000	,0x2000	,CRC(ca79d66c) SHA1(8e2090d471dd97a53785a7f44a49d3c8c85b41f2))
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY             FULLNAME                    FLAGS */
-COMP( 1984, dgnbeta,    0,      0,      dgnbeta,    dgnbeta,    0,      0,    "Dragon Data Ltd",  "Dragon Beta Prototype",    0 )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY             FULLNAME                    FLAGS */
+COMP( 1984, dgnbeta,    0,      0,      dgnbeta,    dgnbeta,    0,      "Dragon Data Ltd",  "Dragon Beta Prototype",    0 )

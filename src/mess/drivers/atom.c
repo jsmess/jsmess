@@ -374,6 +374,6 @@ ROM_START (atomeb)
 	ROM_LOAD ("atomicw.rom",0x018000,0x1000, CRC(a3fd737d) SHA1(d418d9322c69c49106ed2c268ad0864c0f2c4c1b))    // Atomic Windows
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG   COMPANY   FULLNAME */
-COMP( 1979, atom,     0,        0,		atom,     atom,     0,        0,    "Acorn",  "Atom" , 0)
-COMP( 1979, atomeb,   atom,     0,		atomeb,   atom,     0,        0,    "Acorn",  "Atom with Eprom Box" , 0)
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      COMPANY   FULLNAME */
+COMP( 1979, atom,     0,        0,		atom,     atom,     0,        "Acorn",  "Atom" , 0)
+COMP( 1979, atomeb,   atom,     0,		atomeb,   atom,     0,        "Acorn",  "Atom with Eprom Box" , 0)

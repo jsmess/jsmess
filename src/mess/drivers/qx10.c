@@ -563,5 +563,5 @@ static DRIVER_INIT(qx10)
 
 }
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1983, qx10,  0,       0, 	qx10, 	qx10, 	 qx10,  	  0,  	 "Epson",   "QX-10",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
+COMP( 1983, qx10,  0,       0, 	qx10, 	qx10, 	 qx10,  	   	  "Epson",   "QX-10",		GAME_NOT_WORKING)

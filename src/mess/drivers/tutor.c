@@ -694,5 +694,5 @@ ROM_START(tutor)
 	ROM_LOAD("tutor2.bin", 0x8000, 0x4000, CRC(05f228f5) SHA1(46a14a45f6f9e2c30663a2b87ce60c42768a78d0))      /* BASIC ROM */
 ROM_END
 
-/*      YEAR    NAME    PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG      COMPANY     FULLNAME */
-COMP(	1983?,	tutor,	0,			0,		tutor,		tutor,	tutor,	0,		"Tomy",		"Tomy Tutor" , 0)
+/*      YEAR    NAME    PARENT      COMPAT  MACHINE     INPUT   INIT    COMPANY     FULLNAME */
+COMP(	1983?,	tutor,	0,			0,		tutor,		tutor,	tutor,	"Tomy",		"Tomy Tutor" , 0)

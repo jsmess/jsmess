@@ -239,7 +239,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME         PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY                  FULLNAME   FLAGS */
-COMP( 1987, vector06, 	 0,  	 	0,	vector06, 	vector06, 	vector06, 0,  "", 					 "Vector 06c",	 GAME_NOT_WORKING)
-COMP( 1987, vec1200, 	 vector06, 	0,	vector06, 	vector06, 	vector06, 0,  "", 					 "Vector 1200",	 GAME_NOT_WORKING)
-COMP( 1987, pk6128c, 	 vector06,  0,	vector06, 	vector06, 	vector06, 0,  "", 					 "PK-6128c",	 GAME_NOT_WORKING)
+/*    YEAR  NAME         PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
+COMP( 1987, vector06, 	 0,  	 	0,	vector06, 	vector06, 	vector06, "", 					 "Vector 06c",	 GAME_NOT_WORKING)
+COMP( 1987, vec1200, 	 vector06, 	0,	vector06, 	vector06, 	vector06, "", 					 "Vector 1200",	 GAME_NOT_WORKING)
+COMP( 1987, pk6128c, 	 vector06,  0,	vector06, 	vector06, 	vector06, "", 					 "PK-6128c",	 GAME_NOT_WORKING)

@@ -82,6 +82,6 @@ ROM_START(m40)
   	ROMX_LOAD( "m40rom-6.0", 0x0000, 0x4000, CRC(8114ebec) SHA1(4e2c65b95718c77a87dbee0288f323bd1c8837a3), ROM_BIOS(4))
 ROM_END
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   INIT CONFIG  COMPANY     FULLNAME        FLAGS */
-COMP( 1981, m20,   0,      0,      m20,    m20,    m20, 	0,  	"Olivetti", "Olivetti L1 M20", GAME_NOT_WORKING)
-COMP( 1981, m40,   m20,    0,      m20,    m20,    m20, 	0,  	"Olivetti", "Olivetti L1 M40", GAME_NOT_WORKING)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   INIT COMPANY     FULLNAME        FLAGS */
+COMP( 1981, m20,   0,      0,      m20,    m20,    m20,	"Olivetti", "Olivetti L1 M20", GAME_NOT_WORKING)
+COMP( 1981, m40,   m20,    0,      m20,    m20,    m20, "Olivetti", "Olivetti L1 M40", GAME_NOT_WORKING)

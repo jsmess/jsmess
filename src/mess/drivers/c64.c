@@ -794,26 +794,26 @@ ROM_END
 
 ***************************************************************************/
 
-/*   YEAR  NAME   PARENT COMPAT MACHINE  INPUT    INIT    CONFIG    COMPANY                            FULLNAME */
+/*   YEAR  NAME   PARENT COMPAT MACHINE  INPUT    INIT     COMPANY                            FULLNAME */
 
-COMP(1982, max,	    0,    0,    ultimax, c64,     ultimax, 0,       "Commodore Business Machines Co.", "Commodore Max Machine", 0)
+COMP(1982, max,	    0,    0,    ultimax, c64,     ultimax, "Commodore Business Machines Co.", "Commodore Max Machine", 0)
 
-COMP(1982, c64,     0,    0,    c64,     c64,     c64,     0,       "Commodore Business Machines Co.", "Commodore 64 (NTSC)", 0)
-COMP(1982, c64pal,  c64,  0,    c64pal,  c64,     c64pal,  0,       "Commodore Business Machines Co.", "Commodore 64 (PAL)", 0)
-COMP(1982, c64jpn,  c64,  0,    c64,     c64,     c64,     0,       "Commodore Business Machines Co.", "Commodore 64 (Japan)", 0)
-COMP(1982, vic64s,  c64,  0,    c64pal,  vic64s,  c64pal,  0,       "Commodore Business Machines Co.", "VIC 64S", 0)
-COMP(1982, c64swe,  c64,  0,    c64pal,  vic64s,  c64pal,  0,       "Commodore Business Machines Co.", "Commodore 64 (Sweden/Finland)", 0)
+COMP(1982, c64,     0,    0,    c64,     c64,     c64,     "Commodore Business Machines Co.", "Commodore 64 (NTSC)", 0)
+COMP(1982, c64pal,  c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines Co.", "Commodore 64 (PAL)", 0)
+COMP(1982, c64jpn,  c64,  0,    c64,     c64,     c64,     "Commodore Business Machines Co.", "Commodore 64 (Japan)", 0)
+COMP(1982, vic64s,  c64,  0,    c64pal,  vic64s,  c64pal,  "Commodore Business Machines Co.", "VIC 64S", 0)
+COMP(1982, c64swe,  c64,  0,    c64pal,  vic64s,  c64pal,  "Commodore Business Machines Co.", "Commodore 64 (Sweden/Finland)", 0)
 
-COMP(1983, pet64,	c64,  0,    pet64,   c64,     c64,     0,       "Commodore Business Machines Co.", "PET 64 (NTSC)", 0)
-COMP(1983, cbm4064, c64,  0,    pet64,   c64,     c64,     0,       "Commodore Business Machines Co.", "CBM 4064 (NTSC)", 0)
-COMP(1983, edu64,   c64,  0,    pet64,   c64,     c64,     0,       "Commodore Business Machines Co.", "Educator 64 (NTSC)", 0) // maybe different palette?
+COMP(1983, pet64,	c64,  0,    pet64,   c64,     c64,     "Commodore Business Machines Co.", "PET 64 (NTSC)", 0)
+COMP(1983, cbm4064, c64,  0,    pet64,   c64,     c64,     "Commodore Business Machines Co.", "CBM 4064 (NTSC)", 0)
+COMP(1983, edu64,   c64,  0,    pet64,   c64,     c64,     "Commodore Business Machines Co.", "Educator 64 (NTSC)", 0) // maybe different palette?
 
-COMP(1984, sx64,    c64,  0,    sx64,    c64,     sx64,    0,       "Commodore Business Machines Co.", "SX-64 Executive Computer (PAL)", GAME_NOT_WORKING)
-COMP(1984, vip64,   c64,  0,    sx64,    vip64,   sx64,    0,       "Commodore Business Machines Co.", "VIP64 (SX64 PAL), Swedish Expansion Kit", GAME_NOT_WORKING)
-COMP(198?, dx64,    c64,  0,    sx64,    c64,     sx64,    0,       "Commodore Business Machines Co.", "DX-64 (Prototype, PAL)", GAME_NOT_WORKING)
+COMP(1984, sx64,    c64,  0,    sx64,    c64,     sx64,    "Commodore Business Machines Co.", "SX-64 Executive Computer (PAL)", GAME_NOT_WORKING)
+COMP(1984, vip64,   c64,  0,    sx64,    vip64,   sx64,    "Commodore Business Machines Co.", "VIP64 (SX64 PAL), Swedish Expansion Kit", GAME_NOT_WORKING)
+COMP(198?, dx64,    c64,  0,    sx64,    c64,     sx64,    "Commodore Business Machines Co.", "DX-64 (Prototype, PAL)", GAME_NOT_WORKING)
 
-COMP(1986, c64c,    c64,  0,    c64,     c64,     c64,     0,       "Commodore Business Machines Co.", "Commodore 64C (NTSC)", 0)
-COMP(1986, c64cpal, c64,  0,    c64pal,  c64,     c64pal,  0,       "Commodore Business Machines Co.", "Commodore 64C (PAL)", 0)
-COMP(1986, c64g,    c64,  0,    c64pal,  c64,     c64pal,  0,       "Commodore Business Machines Co.", "Commodore 64G (PAL)", 0)
+COMP(1986, c64c,    c64,  0,    c64,     c64,     c64,     "Commodore Business Machines Co.", "Commodore 64C (NTSC)", 0)
+COMP(1986, c64cpal, c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines Co.", "Commodore 64C (PAL)", 0)
+COMP(1986, c64g,    c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines Co.", "Commodore 64G (PAL)", 0)
 
-CONS(1990, c64gs,   c64,  0,    c64gs,   c64gs,   c64gs,   0,       "Commodore Business Machines Co.", "Commodore 64 Games System (PAL)", 0)
+CONS(1990, c64gs,   c64,  0,    c64gs,   c64gs,   c64gs,   "Commodore Business Machines Co.", "Commodore 64 Games System (PAL)", 0)

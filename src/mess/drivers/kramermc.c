@@ -144,5 +144,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT  CONFIG COMPANY                 FULLNAME   FLAGS */
-COMP( 1987, kramermc,     0,      0, 	kramermc, 	kramermc, 	kramermc, 0,  "Manfred Kramer", "Kramer MC",		 0)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT  				 COMPANY                 FULLNAME   FLAGS */
+COMP( 1987, kramermc,     0,      0, 	kramermc, 	kramermc, 	kramermc,"Manfred Kramer", "Kramer MC",		 0)

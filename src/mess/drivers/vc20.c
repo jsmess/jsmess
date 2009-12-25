@@ -467,19 +467,19 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT COMPAT MACHINE INPUT    INIT     CONFIG     COMPANY                             FULLNAME            FLAGS */
+/*    YEAR  NAME      PARENT COMPAT MACHINE INPUT    INIT     COMPANY                             FULLNAME            FLAGS */
 
-COMP( 1981, vic1001,   vic20,  0,  vic20,   vic1001,  vic20,  0,     "Commodore Business Machines Co.",  "VIC-1001 (NTSC, Japan)", GAME_IMPERFECT_SOUND)
-
-COMP( 1981, vic20,     0,      0,   vic20,  vic20,    vic20,  0,     "Commodore Business Machines Co.",  "VIC 20 (NTSC)", GAME_IMPERFECT_SOUND)
-COMP( 1981, vic20cr,   vic20,  0,   vic20,  vic20,    vic20,  0,     "Commodore Business Machines Co.",  "VIC 20CR (NTSC)", GAME_IMPERFECT_SOUND)
-COMP( 1981, vic20i,    vic20,  0,   vic20i, vic20,    vic20i, 0,     "Commodore Business Machines Co.",  "VIC 20 (NTSC, IEEE488 Interface - SYS45065)", GAME_IMPERFECT_SOUND)
-COMP( 1981, vic20v,    vic20,  0,   vic20v, vic20,    vic20v, 0,     "Commodore Business Machines Co.",  "VIC 20 (NTSC, VC1540)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-
-COMP( 1981, vic20pal,  vic20,  0,   vc20,   vc20,     vc20,   0,     "Commodore Business Machines Co.",  "VC 20 (PAL)", GAME_IMPERFECT_SOUND)
-COMP( 1981, vic20crp,  vic20,  0,   vc20,   vc20,     vc20,   0,     "Commodore Business Machines Co.",  "VC 20CR (PAL)", GAME_IMPERFECT_SOUND)
-COMP( 1981, vic20plv,  vic20,  0,   vc20v,  vic20,    vc20v,  0,     "Commodore Business Machines Co.",  "VC 20 (PAL, VC1540)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-COMP( 1981, vc20,      vic20,  0,   vc20,   vc20,     vc20,   0,     "Commodore Business Machines Co.",  "VIC 20 (PAL, Germany)", GAME_IMPERFECT_SOUND)
-COMP( 1981, vc20v,     vic20,  0,   vc20v,  vic20,    vc20v,  0,     "Commodore Business Machines Co.",  "VIC 20 (PAL, Germany, VC1540)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-
-COMP( 1981, vic20swe,  vic20,  0,   vc20,   vic20swe, vc20,   0,     "Commodore Business Machines Co.",  "VIC 20 (PAL, Swedish Expansion Kit)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic1001,   vic20,  0,  vic20,   vic1001,  vic20,  "Commodore Business Machines Co.",  "VIC-1001 (NTSC, Japan)", GAME_IMPERFECT_SOUND)
+ 
+COMP( 1981, vic20,     0,      0,   vic20,  vic20,    vic20,  "Commodore Business Machines Co.",  "VIC 20 (NTSC)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic20cr,   vic20,  0,   vic20,  vic20,    vic20,  "Commodore Business Machines Co.",  "VIC 20CR (NTSC)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic20i,    vic20,  0,   vic20i, vic20,    vic20i, "Commodore Business Machines Co.",  "VIC 20 (NTSC, IEEE488 Interface - SYS45065)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic20v,    vic20,  0,   vic20v, vic20,    vic20v, "Commodore Business Machines Co.",  "VIC 20 (NTSC, VC1540)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+ 
+COMP( 1981, vic20pal,  vic20,  0,   vc20,   vc20,     vc20,   "Commodore Business Machines Co.",  "VC 20 (PAL)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic20crp,  vic20,  0,   vc20,   vc20,     vc20,   "Commodore Business Machines Co.",  "VC 20CR (PAL)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic20plv,  vic20,  0,   vc20v,  vic20,    vc20v,  "Commodore Business Machines Co.",  "VC 20 (PAL, VC1540)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+COMP( 1981, vc20,      vic20,  0,   vc20,   vc20,     vc20,   "Commodore Business Machines Co.",  "VIC 20 (PAL, Germany)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vc20v,     vic20,  0,   vc20v,  vic20,    vc20v,  "Commodore Business Machines Co.",  "VIC 20 (PAL, Germany, VC1540)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+ 
+COMP( 1981, vic20swe,  vic20,  0,   vc20,   vic20swe, vc20,   "Commodore Business Machines Co.",  "VIC 20 (PAL, Swedish Expansion Kit)", GAME_IMPERFECT_SOUND)
