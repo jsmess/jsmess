@@ -321,6 +321,25 @@ static INTERRUPT_GEN( vt100_vertical_interrupt )
 	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
+/* F4 Character Displayer */
+static const gfx_layout vt100_charlayout =
+{
+	8, 16,					/* 8 x 16 characters */
+	256,					/* 2 x 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8, 8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( vt100 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, vt100_charlayout, 0, 1 )
+GFXDECODE_END
+
+
 #define XTAL_24_8832MHz	 24883200
 
 static MACHINE_DRIVER_START( vt100 )
@@ -340,6 +359,7 @@ static MACHINE_DRIVER_START( vt100 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(80*10, 30*10)
 	MDRV_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 30*10-1)
+	MDRV_GFXDECODE(vt100)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(monochrome_green)
 
