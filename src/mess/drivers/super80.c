@@ -337,6 +337,84 @@ static INPUT_PORTS_START( super80r )
 INPUT_PORTS_END
 
 
+/**************************** F4 CHARACTER DISPLAYER ***********************************************************/
+
+static const gfx_layout super80_charlayout =
+{
+	8,10,					/* 8 x 10 characters */
+	64,					/* 64 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{  0*8,  2*8,  4*8,  6*8,  8*8, 10*8, 12*8, 14*8, 1*8,  3*8,  5*8,  7*8,  9*8, 11*8, 13*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static const gfx_layout super80d_charlayout =
+{
+	8,10,					/* 8 x 10 characters */
+	128,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{  0*8,  2*8,  4*8,  6*8,  8*8, 10*8, 12*8, 14*8, 1*8,  3*8,  5*8,  7*8,  9*8, 11*8, 13*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static const gfx_layout super80e_charlayout =
+{
+	8,10,					/* 8 x 10 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{  0*8,  2*8,  4*8,  6*8,  8*8, 10*8, 12*8, 14*8, 1*8,  3*8,  5*8,  7*8,  9*8, 11*8, 13*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static const gfx_layout super80v_charlayout =
+{
+	8,16,					/* 8 x 16 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8, 8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( super80 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, super80_charlayout, 0, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START( super80d )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, super80d_charlayout, 0, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START( super80e )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, super80e_charlayout, 0, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START( super80m )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, super80e_charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0x1000, super80d_charlayout, 0, 8 )
+GFXDECODE_END
+
+/* This will show the 128 characters in the ROM + whatever happens to be in the PCG */
+static GFXDECODE_START( super80v )
+	GFXDECODE_ENTRY( "maincpu", 0xf000, super80v_charlayout, 0, 8 )
+GFXDECODE_END
+
+
+
 /**************************** BASIC MACHINE CONSTRUCTION ***********************************************************/
 
 
@@ -399,6 +477,7 @@ static MACHINE_DRIVER_START( super80 )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
+	MDRV_GFXDECODE(super80)
 	MDRV_DEFAULT_LAYOUT( layout_super80 )
 	MDRV_VIDEO_START(super80)
 	MDRV_VIDEO_UPDATE(super80)
@@ -425,11 +504,13 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80d )
 	MDRV_IMPORT_FROM(super80)
+	MDRV_GFXDECODE(super80d)
 	MDRV_VIDEO_UPDATE(super80d)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80e )
 	MDRV_IMPORT_FROM(super80)
+	MDRV_GFXDECODE(super80e)
 	MDRV_VIDEO_UPDATE(super80e)
 MACHINE_DRIVER_END
 
@@ -438,6 +519,7 @@ static MACHINE_DRIVER_START( super80m )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(super80m_map)
 
+	MDRV_GFXDECODE(super80m)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(super80m)
 	MDRV_VIDEO_EOF(super80m)
@@ -465,6 +547,7 @@ static MACHINE_DRIVER_START( super80v )
 
 	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / SUPER80V_DOTS, super80v_crtc)
 
+	MDRV_GFXDECODE(super80v)
 	MDRV_DEFAULT_LAYOUT( layout_super80 )
 	MDRV_VIDEO_START(super80v)
 	MDRV_VIDEO_EOF(super80m)
