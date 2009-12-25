@@ -633,8 +633,8 @@ void render_sprite_4(bitmap_t* bitmap, UINT32 poffset, UINT32 coffset, UINT16 x,
 	}
 	else
 	{
-		xstart = x+2;
-		xend = x+18;
+		xstart = x+1;
+		xend = x+17;
 		xdir = 2;
 	}
 	if(yflip)
@@ -813,19 +813,19 @@ void towns_crtc_draw_scan_layer_hicolour(bitmap_t* bitmap,const rectangle* rect,
 	{
 		if(!(towns_video_reg[0] & 0x10))
 			return;
-		off += (towns_crtc_reg[21] & 0xfffe) << 2;  // initial offset
+		off += (towns_crtc_reg[21]) << 2;  // initial offset
 		if(towns_crtc_reg[27] & 0x0100)
 			hzoom = 2;
 	}
 	else
 	{
-		off += (towns_crtc_reg[17] & 0xfffe) << 2;  // initial offset
+		off += (towns_crtc_reg[17]) << 2;  // initial offset
 		if(towns_crtc_reg[27] & 0x0001)
 			hzoom = 2;
 	}
 
 	off += line * linesize;
-	
+
 	if(hzoom == 1)
 	{
 		for(x=rect->min_x;x<rect->max_x;x++)
