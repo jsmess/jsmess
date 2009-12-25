@@ -376,65 +376,54 @@ ROM_START(tx0_8kw)
 		/* space filled with our font */
 ROM_END
 
+/*
 static void tx0_punchtape_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	/* punchtape */
 	switch(state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_TYPE:							info->i = IO_PUNCHTAPE; break;
 		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(tx0_tape); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(tx0_tape); break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(tx0_tape); break;
 		case MESS_DEVINFO_PTR_GET_DISPOSITIONS:				info->getdispositions = tx0_tape_get_open_mode; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap,rim"); break;
 	}
 }
 
 static void tx0_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	/* printer */
 	switch(state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_TYPE:							info->i = IO_PRINTER; break;
 		case MESS_DEVINFO_INT_READABLE:						info->i = 0; break;
 		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
 		case MESS_DEVINFO_INT_CREATABLE:						info->i = 1; break;
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(tx0_typewriter); break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(tx0_typewriter); break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "typ"); break;
 	}
 }
 
 static void tx0_magtape_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	/* magtape */
 	switch(state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_TYPE:							info->i = IO_MAGTAPE; break;
 		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
 		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
 		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(tx0_magtape); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(tx0_magtape); break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(tx0_magtape); break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap"); break;
 	}
 }
@@ -444,7 +433,7 @@ static SYSTEM_CONFIG_START(tx0)
 	CONFIG_DEVICE(tx0_magtape_getinfo)
 	CONFIG_DEVICE(tx0_printer_getinfo)
 SYSTEM_CONFIG_END
-
+*/
 
 /***************************************************************************
 
@@ -453,5 +442,5 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT INIT    CONFIG  COMPANY                   FULLNAME */
-COMP( 1956, tx0_64kw, 0, 	0,	tx0_64kw, tx0,	tx0,	tx0,	"MIT", "TX-0 original demonstrator (64 kWords of RAM)" , 0)
-COMP( 1962, tx0_8kw,  tx0_64kw,	0,	tx0_8kw,  tx0,	tx0,	tx0,	"MIT", "TX-0 upgraded system (8 kWords of RAM)" , 0)
+COMP( 1956, tx0_64kw, 0, 	0,	tx0_64kw, tx0,	tx0,	0,	"MIT", "TX-0 original demonstrator (64 kWords of RAM)" , 0)
+COMP( 1962, tx0_8kw,  tx0_64kw,	0,	tx0_8kw,  tx0,	tx0,	0,	"MIT", "TX-0 upgraded system (8 kWords of RAM)" , 0)

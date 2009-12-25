@@ -403,65 +403,53 @@ ROM_START(pdp1)
 	ROM_REGION(pdp1_fontdata_size, "gfx1", ROMREGION_ERASEFF)
 		/* space filled with our font */
 ROM_END
-
+/*
 static void pdp1_punchtape_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	/* punchtape */
 	switch(state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_TYPE:							info->i = IO_PUNCHTAPE; break;
 		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(pdp1_tape); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(pdp1_tape); break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(pdp1_tape); break;
 		case MESS_DEVINFO_PTR_GET_DISPOSITIONS:				info->getdispositions = pdp1_get_open_mode; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap,rim"); break;
 	}
 }
 
 static void pdp1_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	/* printer */
 	switch(state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_TYPE:							info->i = IO_PRINTER; break;
 		case MESS_DEVINFO_INT_READABLE:						info->i = 0; break;
 		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
 		case MESS_DEVINFO_INT_CREATABLE:						info->i = 1; break;
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(pdp1_typewriter); break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(pdp1_typewriter); break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "typ"); break;
 	}
 }
 
 static void pdp1_cylinder_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	/* cylinder */
 	switch(state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CYLINDER; break;
 		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
 		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
 		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(pdp1_drum); break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(pdp1_drum); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "drm"); break;
 	}
 }
@@ -471,7 +459,7 @@ static SYSTEM_CONFIG_START(pdp1)
 	CONFIG_DEVICE(pdp1_printer_getinfo)
 	CONFIG_DEVICE(pdp1_cylinder_getinfo)
 SYSTEM_CONFIG_END
-
+*/
 
 /***************************************************************************
 
@@ -480,4 +468,4 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY FULLNAME */
-COMP( 1961, pdp1,	  0, 		0,		pdp1,	  pdp1, 	0,		pdp1,	"Digital Equipment Corporation",  "PDP-1" , 0)
+COMP( 1961, pdp1,	  0, 		0,		pdp1,	  pdp1, 	0,		0,	"Digital Equipment Corporation",  "PDP-1" , 0)

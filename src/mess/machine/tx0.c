@@ -186,7 +186,7 @@ void tx0_tape_get_open_mode(int id,	unsigned int *readable, unsigned int *writea
 	}
 }
 
-
+#if 0
 DEVICE_START( tx0_tape )
 {
 }
@@ -260,7 +260,7 @@ DEVICE_IMAGE_UNLOAD( tx0_tape )
 		break;
 	}
 }
-
+#endif
 /*
     Read a byte from perforated tape
 */
