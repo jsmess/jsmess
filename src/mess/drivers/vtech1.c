@@ -119,6 +119,7 @@ Notes:
 #include "sound/wave.h"
 #include "sound/speaker.h"
 #include "devices/cartslot.h"
+#include "devices/flopdrv.h"
 #include "devices/snapquik.h"
 #include "devices/cassette.h"
 #include "devices/z80bin.h"
@@ -291,28 +292,15 @@ static Z80BIN_EXECUTE( vtech1 )
 /***************************************************************************
     FLOPPY DRIVE
 ***************************************************************************/
-
-static const device_config *vtech1_file(running_machine *machine)
-{
-	vtech1_state *vtech1 = machine->driver_data;
-
-	if (vtech1->drive < 0)
-		return NULL;
-
-	return image_from_devtype_and_index(machine, IO_FLOPPY, vtech1->drive);
-}
-
-static DEVICE_IMAGE_LOAD( vtech1_floppy )
+static void vtech1_load_proc(const device_config *image)
 {
 	vtech1_state *vtech1 = image->machine->driver_data;
-	int id = image_index_in_device(image);
-
+	int id = floppy_get_drive(image);
+	
 	if (image_is_writable(image))
 		vtech1->fdc_wrprot[id] = 0x00;
 	else
 		vtech1->fdc_wrprot[id] = 0x80;
-
-	return INIT_PASS;
 }
 
 static void vtech1_get_track(running_machine *machine)
@@ -320,13 +308,13 @@ static void vtech1_get_track(running_machine *machine)
 	vtech1_state *vtech1 = machine->driver_data;
 
 	/* drive selected or and image file ok? */
-	if (vtech1->drive >= 0 && image_exists(vtech1_file(machine)))
+	if (vtech1->drive >= 0 && image_exists(floppy_get_device(machine,vtech1->drive)))
 	{
 		int size, offs;
 		size = TRKSIZE_VZ;
 		offs = TRKSIZE_VZ * vtech1->fdc_track_x2[vtech1->drive]/2;
-		image_fseek(vtech1_file(machine), offs, SEEK_SET);
-		size = image_fread(vtech1_file(machine), vtech1->fdc_data, size);
+		image_fseek(floppy_get_device(machine,vtech1->drive), offs, SEEK_SET);
+		size = image_fread(floppy_get_device(machine,vtech1->drive), vtech1->fdc_data, size);
 		if (LOG_VTECH1_FDC)
 			logerror("get track @$%05x $%04x bytes\n", offs, size);
     }
@@ -339,12 +327,12 @@ static void vtech1_put_track(running_machine *machine)
 	vtech1_state *vtech1 = machine->driver_data;
 
     /* drive selected and image file ok? */
-	if (vtech1->drive >= 0 && vtech1_file(machine) != NULL)
+	if (vtech1->drive >= 0 && floppy_get_device(machine,vtech1->drive) != NULL)
 	{
 		int size, offs;
 		offs = TRKSIZE_VZ * vtech1->fdc_track_x2[vtech1->drive]/2;
-		image_fseek(vtech1_file(machine), offs + vtech1->fdc_start, SEEK_SET);
-		size = image_fwrite(vtech1_file(machine), &vtech1->fdc_data[vtech1->fdc_start], vtech1->fdc_write);
+		image_fseek(floppy_get_device(machine,vtech1->drive), offs + vtech1->fdc_start, SEEK_SET);
+		size = image_fwrite(floppy_get_device(machine,vtech1->drive), &vtech1->fdc_data[vtech1->fdc_start], vtech1->fdc_write);
 		if (LOG_VTECH1_FDC)
 			logerror("put track @$%05X+$%X $%04X/$%04X bytes\n", offs, vtech1->fdc_start, size, vtech1->fdc_write);
     }
@@ -494,6 +482,41 @@ static WRITE8_HANDLER( vtech1_fdc_w )
     }
 }
 
+static FLOPPY_IDENTIFY( vtech1_dsk_identify )
+{
+	*vote = 100;
+	return FLOPPY_ERROR_SUCCESS;
+}
+
+
+static FLOPPY_CONSTRUCT( vtech1_dsk_construct )
+{
+	return FLOPPY_ERROR_SUCCESS;
+}
+
+FLOPPY_OPTIONS_START( vtech1_only )
+	FLOPPY_OPTION(
+		vtech1_dsk,
+		"dsk",
+		"Laser floppy disk image",
+		vtech1_dsk_identify,
+		vtech1_dsk_construct,
+		NULL
+	)
+		{ NULL }
+};
+
+static const floppy_config vtech1_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(vtech1_only),
+	DO_NOT_KEEP_GEOMETRY
+};
 
 /***************************************************************************
     PRINTER
@@ -658,6 +681,7 @@ static DRIVER_INIT( vtech1 )
 {
 	vtech1_state *vtech1 = machine->driver_data;
 	const address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	int id;
 
 	/* find devices */
 	vtech1->mc6847 = devtag_get_device(machine, "mc6847");
@@ -706,11 +730,16 @@ static DRIVER_INIT( vtech1 )
 	vtech1->fdc_write = 0;
 	vtech1->fdc_offs = 0;
 	vtech1->fdc_latch = 0;
+	
+	for(id=0;id<2;id++) 
+	{
+		floppy_install_load_proc(floppy_get_device(machine, id), vtech1_load_proc);
+	}	
 }
 
 static DRIVER_INIT( vtech1h )
 {
-	const address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);	
 
 	DRIVER_INIT_CALL(vtech1);
 
@@ -720,9 +749,8 @@ static DRIVER_INIT( vtech1h )
 
 	memory_install_readwrite_bank(prg, 0x7000, 0x77ff, 0, 0, "bank4");
 	memory_configure_bank(machine, "bank4", 0, 4, machine->generic.videoram.u8, 0x800);
-	memory_set_bank(machine, "bank4", 0);
+	memory_set_bank(machine, "bank4", 0);	
 }
-
 
 /***************************************************************************
     ADDRESS MAPS
@@ -1015,6 +1043,8 @@ static MACHINE_DRIVER_START( laser110 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("66K")
 	MDRV_RAM_EXTRA_OPTIONS("2K,18K,4098K")
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(vtech1_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( laser200 )
@@ -1108,49 +1138,20 @@ ROM_END
 #define rom_vz300       rom_laser310
 #define rom_laser310h   rom_laser310
 
-
-/***************************************************************************
-    SYSTEM_CONFIG
-***************************************************************************/
-
-static void vtech1_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:				info->i = IO_FLOPPY; break;
-		case MESS_DEVINFO_INT_READABLE:			info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:		info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:		info->i = 1; break;
-		case MESS_DEVINFO_INT_COUNT:			info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:				info->load = DEVICE_IMAGE_LOAD_NAME(vtech1_floppy); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "dsk"); break;
-	}
-}
-
-static SYSTEM_CONFIG_START( vtech1 )
-    CONFIG_DEVICE(vtech1_floppy_getinfo)
-SYSTEM_CONFIG_END
-
-
 /***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT   INIT     CONFIG  COMPANY                   FULLNAME                          FLAGS */
-COMP( 1983, laser110,  0,        0,      laser110,  vtech1, vtech1,  vtech1, "Video Technology",       "Laser 110",                      0 )
-COMP( 1983, las110de,  laser110, 0,      laser110,  vtech1, vtech1,  vtech1, "Sanyo",                  "Laser 110 (Germany)",            0 )
-COMP( 1983, laser200,  0,        0,      laser200,  vtech1, vtech1,  vtech1, "Video Technology",       "Laser 200",                      0 )
-COMP( 1983, vz200de,   laser200, 0,      laser200,  vtech1, vtech1,  vtech1, "Video Technology",       "VZ-200 (Germany & Netherlands)", 0 )
-COMP( 1983, fellow,    laser200, 0,      laser200,  vtech1, vtech1,  vtech1, "Salora",                 "Fellow (Finland)",               0 )
-COMP( 1983, tx8000,    laser200, 0,      laser200,  vtech1, vtech1,  vtech1, "Texet",                  "TX-8000 (UK)",                   0 )
-COMP( 1984, laser210,  0,        0,      laser210,  vtech1, vtech1,  vtech1, "Video Technology",       "Laser 210",                      0 )
-COMP( 1984, vz200,     laser210, 0,      laser210,  vtech1, vtech1,  vtech1, "Dick Smith Electronics", "VZ-200 (Oceania)",               0 )
-COMP( 1984, las210de,  laser210, 0,      laser210,  vtech1, vtech1,  vtech1, "Sanyo",                  "Laser 210 (Germany)",            0 )
-COMP( 1984, laser310,  0,        0,      laser310,  vtech1, vtech1,  vtech1, "Video Technology",       "Laser 310",                      0 )
-COMP( 1984, vz300,     laser310, 0,      laser310,  vtech1, vtech1,  vtech1, "Dick Smith Electronics", "VZ-300 (Oceania)",               0 )
-COMP( 1984, laser310h, laser310, 0,      laser310h, vtech1, vtech1h, vtech1, "Video Technology",       "Laser 310 (SHRG)",               GAME_COMPUTER_MODIFIED )
+COMP( 1983, laser110,  0,        0,      laser110,  vtech1, vtech1,  0, "Video Technology",       "Laser 110",                      0 )
+COMP( 1983, las110de,  laser110, 0,      laser110,  vtech1, vtech1,  0, "Sanyo",                  "Laser 110 (Germany)",            0 )
+COMP( 1983, laser200,  0,        0,      laser200,  vtech1, vtech1,  0, "Video Technology",       "Laser 200",                      0 )
+COMP( 1983, vz200de,   laser200, 0,      laser200,  vtech1, vtech1,  0, "Video Technology",       "VZ-200 (Germany & Netherlands)", 0 )
+COMP( 1983, fellow,    laser200, 0,      laser200,  vtech1, vtech1,  0, "Salora",                 "Fellow (Finland)",               0 )
+COMP( 1983, tx8000,    laser200, 0,      laser200,  vtech1, vtech1,  0, "Texet",                  "TX-8000 (UK)",                   0 )
+COMP( 1984, laser210,  0,        0,      laser210,  vtech1, vtech1,  0, "Video Technology",       "Laser 210",                      0 )
+COMP( 1984, vz200,     laser210, 0,      laser210,  vtech1, vtech1,  0, "Dick Smith Electronics", "VZ-200 (Oceania)",               0 )
+COMP( 1984, las210de,  laser210, 0,      laser210,  vtech1, vtech1,  0, "Sanyo",                  "Laser 210 (Germany)",            0 )
+COMP( 1984, laser310,  0,        0,      laser310,  vtech1, vtech1,  0, "Video Technology",       "Laser 310",                      0 )
+COMP( 1984, vz300,     laser310, 0,      laser310,  vtech1, vtech1,  0, "Dick Smith Electronics", "VZ-300 (Oceania)",               0 )
+COMP( 1984, laser310h, laser310, 0,      laser310h, vtech1, vtech1h, 0, "Video Technology",       "Laser 310 (SHRG)",               GAME_COMPUTER_MODIFIED )
