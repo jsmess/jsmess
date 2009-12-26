@@ -68,6 +68,37 @@ static VIDEO_UPDATE( vg5k )
 	return 0;
 }
 
+/* F4 Character Displayer */
+static const gfx_layout vg5k_charlayout =
+{
+	8, 16,					/* 8 x 16 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	/* y offsets */
+	{ 0, 8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( vg5k )
+	GFXDECODE_ENTRY( "gfx1", 0x2000, vg5k_charlayout, 0, 4 )
+GFXDECODE_END
+
+static DRIVER_INIT( vg5k )
+{
+	UINT8 *FNT = memory_region(machine, "gfx1");
+	UINT16 a,b,c,d,dest=0x2000;
+
+	/* Unscramble the chargen rom as the format is too complex for gfxdecode to handle unaided */
+	for (a = 0; a < 8192; a+=4096)
+		for (b = 0; b < 2048; b+=64)
+			for (c = 0; c < 4; c++)
+				for (d = 0; d < 64; d+=4)
+					FNT[dest++]=FNT[a|b|c|d];
+}
+	
 static MACHINE_DRIVER_START( vg5k )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -83,6 +114,8 @@ static MACHINE_DRIVER_START( vg5k )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+
+	MDRV_GFXDECODE(vg5k)
 	MDRV_PALETTE_LENGTH(8)
 
 	MDRV_VIDEO_START(vg5k)
@@ -101,10 +134,10 @@ ROM_START( vg5k )
 	ROM_SYSTEM_BIOS(1, "alt", "VG 5000 (alt)")
 	ROMX_LOAD( "vg5k.rom", 0x0000, 0x4000, BAD_DUMP CRC(a6f4a0ea) SHA1(58eccce33cc21fc17bc83921018f531b8001eda3), ROM_BIOS(2) )	// from dcvg5k
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )			// from dcvg5k
 ROM_END
 
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  INIT   COMPANY     FULLNAME   FLAGS */
-COMP( 1984, vg5k,   0,      0,      vg5k,    vg5k,  0,     "Philips",  "VG-5000", GAME_NOT_WORKING)
+COMP( 1984, vg5k,   0,      0,      vg5k,    vg5k,  vg5k, "Philips",  "VG-5000", GAME_NOT_WORKING)

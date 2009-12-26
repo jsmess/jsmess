@@ -37,6 +37,24 @@ static VIDEO_UPDATE( unior )
     return 0;
 }
 
+/* F4 Character Displayer */
+static const gfx_layout unior_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{  0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( unior )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, unior_charlayout, 0, 1 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( unior )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",8080, 2222222)
@@ -52,6 +70,7 @@ static MACHINE_DRIVER_START( unior )
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MDRV_SCREEN_SIZE(640, 480)
     MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_GFXDECODE(unior)
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
 
