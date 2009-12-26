@@ -384,6 +384,24 @@ static const mc6845_interface svi806_crtc6845_interface =
 	NULL
 };
 
+/* F4 Character Displayer */
+static const gfx_layout svi328_charlayout =
+{
+	8, 8,					/* 8 x 16 characters */
+	256,					/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8, 8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( svi328 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, svi328_charlayout, 0, 9 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( svi328_806 )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", Z80, 3579545 )	/* 3.579545 MHz */
@@ -415,6 +433,7 @@ static MACHINE_DRIVER_START( svi328_806 )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MDRV_SCREEN_SIZE(640, 400)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
+	MDRV_GFXDECODE(svi328)
 
 	MDRV_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 8, svi806_crtc6845_interface)
 
