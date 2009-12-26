@@ -11,7 +11,7 @@
 /*----------- defined in machine/pokemini.c -----------*/
 
 extern UINT8 *pokemini_ram;
-MACHINE_RESET( pokemini );
+MACHINE_START( pokemini );
 WRITE8_HANDLER( pokemini_hwreg_w );
 READ8_HANDLER( pokemini_hwreg_r );
 

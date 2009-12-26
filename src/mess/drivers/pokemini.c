@@ -59,7 +59,7 @@ static MACHINE_DRIVER_START( pokemini )
 
 	MDRV_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_RESET( pokemini )
+	MDRV_MACHINE_START( pokemini )
 
 	MDRV_NVRAM_HANDLER( i2cmem_0 )
 
