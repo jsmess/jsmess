@@ -1329,7 +1329,7 @@ static void pcw16_reset(running_machine *machine)
 }
 
 
-static MACHINE_RESET( pcw16 )
+static MACHINE_START( pcw16 )
 {
 	const device_config *speaker = devtag_get_device(machine, "beep");
 	pcw16_system_status = 0;
@@ -1398,7 +1398,7 @@ static MACHINE_DRIVER_START( pcw16 )
 	MDRV_CPU_IO_MAP(pcw16_io)
 	MDRV_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_RESET( pcw16 )
+	MDRV_MACHINE_START( pcw16 )
 	MDRV_NVRAM_HANDLER( pcw16 )
 
 	MDRV_NS16550_ADD( "ns16550_1", pcw16_com_interface[0] )				/* TODO: Verify uart model */

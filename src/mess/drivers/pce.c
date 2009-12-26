@@ -173,7 +173,7 @@ static MACHINE_DRIVER_START( pce )
 	MDRV_CPU_VBLANK_INT_HACK(pce_interrupt, VDC_LPF)
 	MDRV_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_RESET( pce )
+	MDRV_MACHINE_START( pce )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -217,7 +217,7 @@ static MACHINE_DRIVER_START( sgx )
 	MDRV_CPU_VBLANK_INT_HACK(sgx_interrupt, VDC_LPF)
 	MDRV_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_RESET( pce )
+	MDRV_MACHINE_START( pce )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

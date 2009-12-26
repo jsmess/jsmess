@@ -240,7 +240,7 @@ DRIVER_INIT( sgx )
 	pce.io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
 
-MACHINE_RESET( pce )
+MACHINE_START( pce )
 {
 	pce_cd_init( machine );
 }

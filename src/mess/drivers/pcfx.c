@@ -34,6 +34,9 @@ static ADDRESS_MAP_START( pcfx_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE( 0x80500000, 0x805000FF ) AM_NOP	/* HuC6273 */
 ADDRESS_MAP_END
 
+static INPUT_PORTS_START( pcfx )
+INPUT_PORTS_END
+
 
 static MACHINE_RESET( pcfx )
 {
@@ -67,5 +70,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY FULLNAME        FLAGS */
-CONS( 1994, pcfx,       0,      0,      pcfx,       0,      0,      "NEC",  "PC-FX",        GAME_NOT_WORKING )
+CONS( 1994, pcfx,       0,      0,      pcfx,       pcfx,      0,      "NEC",  "PC-FX",        GAME_NOT_WORKING )
 
