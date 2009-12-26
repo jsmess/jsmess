@@ -7,8 +7,8 @@
 
 #define LOG 1
 
-//static INPUT_PORTS_START( stopthie )
-//INPUT_PORTS_END
+static INPUT_PORTS_START( stopthie )
+INPUT_PORTS_END
 
 
 static READ8_DEVICE_HANDLER( stopthie_read_k )
@@ -72,5 +72,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY            FULLNAME      FLAGS */
-CONS( 1979, stopthie,   0,      0,      stopthie,   0,      0,      "Parker Brothers", "Stop Thief", GAME_NOT_WORKING )
+CONS( 1979, stopthie,   0,      0,      stopthie,   stopthie,  0,      "Parker Brothers", "Stop Thief", GAME_NOT_WORKING )
 
