@@ -2024,7 +2024,7 @@ int win_setup_menus(running_machine *machine, HMODULE module, HMENU menu_bar)
 	};
 
 	// verify that our magic numbers work
-	assert((ID_DEVICE_0 + IO_COUNT * MAX_DEV_INSTANCES * DEVOPTION_MAX) < ID_JOYSTICK_0);
+	assert((ID_DEVICE_0 + IO_COUNT * DEVOPTION_MAX) < ID_JOYSTICK_0);
 
 	// initialize critical values
 	joystick_menu_setup = 0;
