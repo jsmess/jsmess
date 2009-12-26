@@ -49,22 +49,7 @@ static const char *const mess_default_text[] =
 	"[empty slot]",
 	"Input Devices",
 	"Quit Fileselector",
-	"File Specification",	/* IMPORTANT: be careful to ensure that the following */
-	"Cartridge",		/* device list matches the order found in device.h    */
-	"Floppy Disk",		/* and is ALWAYS placed after "File Specification"    */
-	"Hard Disk",
-	"Cylinder",
-	"Cassette",
-	"Punched Card",
-	"Punched Tape",
-	"Printer",
-	"Serial Port",
-	"Parallel Port",
-	"Snapshot",
-	"Quickload",
-	"Memory Card",
-	"CD-ROM",
-	"Magnetic Tape"
+	"File Specification"
 };
 
 

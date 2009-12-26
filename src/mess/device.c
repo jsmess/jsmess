@@ -91,33 +91,3 @@ iodevice_t device_typeid(const char *name)
 	}
 	return -1;
 }
-
-/*************************************
- *
- *  Diagnostics
- *
- *************************************/
-
-int device_valididtychecks(void)
-{
-	int error = 0;
-	int i;
-
-	/* Check the device struct array */
-	for (i = 0; i < ARRAY_LENGTH(device_info_array); i++)
-	{
-		if (!device_info_array[i].name)
-		{
-			mame_printf_error("device_info_array[%d].name appears to be NULL\n", i);
-			error = 1;
-		}
-
-		if (!device_info_array[i].shortname)
-		{
-			mame_printf_error("device_info_array[%d].shortname appears to be NULL\n", i);
-			error = 1;
-		}
-	}
-	return error;
-} 
-

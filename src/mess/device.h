@@ -29,6 +29,5 @@
 const char *device_typename(iodevice_t type);
 const char *device_brieftypename(iodevice_t type);
 iodevice_t device_typeid(const char *name);
-int device_valididtychecks(void);
 
 #endif /* DEVICE_H */

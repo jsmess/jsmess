@@ -92,7 +92,6 @@ int mess_validitychecks(void)
 
 	/* call other validity checks */
 	error = mess_validate_natural_keyboard_statics() || error;
-	error = device_valididtychecks() || error;
 
 	return error;
 }
