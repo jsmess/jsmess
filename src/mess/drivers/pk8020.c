@@ -168,9 +168,28 @@ static const floppy_config pk8020_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+/* F4 Character Displayer */
+static const gfx_layout pk8020_charlayout =
+{
+	8, 16,					/* 8 x 16 characters */
+	512,					/* 512 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( pk8020 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, pk8020_charlayout, 0, 4 )
+GFXDECODE_END
+
+
 /* Machine driver */
 static MACHINE_DRIVER_START( pk8020 )
-  /* basic machine hardware */
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, XTAL_20MHz / 8)
 	MDRV_CPU_PROGRAM_MAP(pk8020_mem)
 	MDRV_CPU_IO_MAP(pk8020_io)
@@ -178,32 +197,31 @@ static MACHINE_DRIVER_START( pk8020 )
 
 	MDRV_MACHINE_RESET( pk8020 )
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MDRV_GFXDECODE(pk8020)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(pk8020)
 
 	MDRV_VIDEO_START(pk8020)
 	MDRV_VIDEO_UPDATE(pk8020)
 
-    MDRV_I8255A_ADD( "ppi8255_1", pk8020_ppi8255_interface_1 )
-    MDRV_I8255A_ADD( "ppi8255_2", pk8020_ppi8255_interface_2 )
-    MDRV_I8255A_ADD( "ppi8255_3", pk8020_ppi8255_interface_3 )
-
-    MDRV_PIT8253_ADD( "pit8253", pk8020_pit8253_intf )
-
+	MDRV_I8255A_ADD( "ppi8255_1", pk8020_ppi8255_interface_1 )
+	MDRV_I8255A_ADD( "ppi8255_2", pk8020_ppi8255_interface_2 )
+	MDRV_I8255A_ADD( "ppi8255_3", pk8020_ppi8255_interface_3 )
+	MDRV_PIT8253_ADD( "pit8253", pk8020_pit8253_intf )
 	MDRV_PIC8259_ADD( "pic8259", pk8020_pic8259_config )
 	MDRV_MSM8251_ADD( "rs232", default_msm8251_interface)
 	MDRV_MSM8251_ADD( "lan", default_msm8251_interface)
 
 	MDRV_WD1793_ADD( "wd1793", default_wd17xx_interface )
 
-    /* audio hardware */
+	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -222,8 +240,8 @@ MACHINE_DRIVER_END
 /* ROM definition */
 
 ROM_START( korvet )
-    ROM_REGION( 0x16000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "korvet11.rom", 0x10000, 0x6000, CRC(81BDC2AF) SHA1(c3484c3f1f3d252475979283c073286b8661d2b9) )
+	ROM_REGION( 0x16000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "korvet11.rom", 0x10000, 0x6000, CRC(81BDC2AF) SHA1(c3484c3f1f3d252475979283c073286b8661d2b9) )
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD ( "korvet2.fnt", 0x0000, 0x2000, CRC(FB1CD3D4))
 ROM_END
@@ -231,4 +249,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
-COMP( 1987, korvet, 	 0,  	 0,	pk8020, 	pk8020, 	pk8020,  "", 					 "PK8020 Korvet",	 0)
+COMP( 1987, korvet, 	 0,  	 0,	pk8020, 	pk8020, 	pk8020,  "", "PK8020 Korvet",	 0)

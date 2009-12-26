@@ -482,14 +482,33 @@ static MACHINE_RESET(qx10)
 	update_memory_mapping(machine);
 }
 
+/* F4 Character Displayer */
+static const gfx_layout qx10_charlayout =
+{
+	8, 16,					/* 8 x 16 characters */
+	128,					/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	/* y offsets */
+	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8, 8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( qx10 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, qx10_charlayout, 1, 7 )
+GFXDECODE_END
+
+
 static MACHINE_DRIVER_START( qx10 )
-    /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, MAIN_CLK / 4)
-    MDRV_CPU_PROGRAM_MAP(qx10_mem)
-    MDRV_CPU_IO_MAP(qx10_io)
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu",Z80, MAIN_CLK / 4)
+	MDRV_CPU_PROGRAM_MAP(qx10_mem)
+	MDRV_CPU_IO_MAP(qx10_io)
 
 	MDRV_MACHINE_START(qx10)
-    MDRV_MACHINE_RESET(qx10)
+	MDRV_MACHINE_RESET(qx10)
 
 	MDRV_PIT8253_ADD("pit8253_1", qx10_pit8253_1_config)
 	MDRV_PIT8253_ADD("pit8253_2", qx10_pit8253_2_config)
@@ -504,18 +523,19 @@ static MACHINE_DRIVER_START( qx10 )
 
 	MDRV_DRIVER_DATA(qx10_state)
 
-    /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MDRV_PALETTE_LENGTH(COMPIS_PALETTE_SIZE)
-    MDRV_PALETTE_INIT(compis_gdc)
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(640, 480)
+	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_GFXDECODE(qx10)
+	MDRV_PALETTE_LENGTH(COMPIS_PALETTE_SIZE)
+	MDRV_PALETTE_INIT(compis_gdc)
 
-    MDRV_VIDEO_START(compis_gdc)
-    MDRV_VIDEO_UPDATE(compis_gdc)
+	MDRV_VIDEO_START(compis_gdc)
+	MDRV_VIDEO_UPDATE(compis_gdc)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -533,7 +553,7 @@ ROM_START( qx10 )
 	ROM_REGION( 0x800, "i8039", 0 )
 	ROM_LOAD( "m12020a.3e", 0x0000, 0x0800, CRC(fa27f333) SHA1(73d27084ca7b002d5f370220d8da6623a6e82132))
 
-	/* This rom looks like a character generator */
+	/* This rom is a character generator containing special characters only */
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "qge.2e", 0x0000, 0x0800, CRC(ed93cb81) SHA1(579e68bde3f4184ded7d89b72c6936824f48d10b))
 ROM_END

@@ -22,7 +22,7 @@ static ADDRESS_MAP_START( plan80_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( plan80 )
+static INPUT_PORTS_START( plan80 )
 INPUT_PORTS_END
 
 
@@ -60,6 +60,25 @@ static VIDEO_UPDATE( plan80 )
 	return 0;
 }
 
+/* F4 Character Displayer */
+static const gfx_layout plan80_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( plan80 )
+	GFXDECODE_ENTRY( "gfx", 0x0000, plan80_charlayout, 0, 1 )
+GFXDECODE_END
+
+
 static MACHINE_DRIVER_START( plan80 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",8080, 2048000)
@@ -75,6 +94,7 @@ static MACHINE_DRIVER_START( plan80 )
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MDRV_SCREEN_SIZE(48*6, 32*8)
     MDRV_SCREEN_VISIBLE_AREA(0, 48*6-1, 0, 32*8-1)
+	MDRV_GFXDECODE(plan80)
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
 
