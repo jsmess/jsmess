@@ -40,21 +40,40 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( rt1715 )
 INPUT_PORTS_END
 
+/* F4 Character Displayer */
+static const gfx_layout rt1715_charlayout =
+{
+	8, 16,					/* 8 x 16 characters */
+	128,					/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*128, 1*128*8, 2*128*8, 3*128*8, 4*128*8, 5*128*8, 6*128*8, 7*128*8, 8*128*8, 9*128*8, 10*128*8, 11*128*8, 12*128*8, 13*128*8, 14*128*8, 15*128*8 },
+	8					/* every char takes 1 x 16 bytes */
+};
+
+static GFXDECODE_START( rt1715 )
+	GFXDECODE_ENTRY( "gfx", 0x0000, rt1715_charlayout, 0, 1 )
+GFXDECODE_END
+
 /* Machine driver */
 static MACHINE_DRIVER_START( rt1715 )
-  /* basic machine hardware */
-  MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
-  MDRV_CPU_PROGRAM_MAP(rt1715_mem)
-  MDRV_CPU_IO_MAP(rt1715_io)
-  MDRV_MACHINE_RESET( rt1715 )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MDRV_CPU_PROGRAM_MAP(rt1715_mem)
+	MDRV_CPU_IO_MAP(rt1715_io)
+	MDRV_MACHINE_RESET( rt1715 )
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(78*6, 30*10)
 	MDRV_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
+	MDRV_GFXDECODE(rt1715)
 	MDRV_PALETTE_LENGTH(3)
 	MDRV_PALETTE_INIT(rt1715)
 

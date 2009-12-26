@@ -314,6 +314,25 @@ static const cassette_config radio86_cassette_config =
 };
 
 
+/* F4 Character Displayer */
+static const gfx_layout radio86_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	128,					/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( radio86 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, radio86_charlayout, 0, 1 )
+GFXDECODE_END
+
+
 /* Machine driver */
 static MACHINE_DRIVER_START( radio86 )
 	/* basic machine hardware */
@@ -332,6 +351,7 @@ static MACHINE_DRIVER_START( radio86 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(78*6, 30*10)
 	MDRV_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
+	MDRV_GFXDECODE(radio86)
 	MDRV_PALETTE_LENGTH(3)
 	MDRV_PALETTE_INIT(radio86)
 
