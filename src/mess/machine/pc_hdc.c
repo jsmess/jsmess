@@ -36,9 +36,9 @@
 #include "memconv.h"
 
 
-#define LOG_HDC_STATUS		0
-#define LOG_HDC_CALL		0
-#define LOG_HDC_DATA		0
+#define LOG_HDC_STATUS		1
+#define LOG_HDC_CALL		1
+#define LOG_HDC_DATA		1
 
 
 #define MAX_HARD	2
@@ -330,7 +330,7 @@ static int get_lbasector(running_machine *machine)
 /* the following crap is an abomination; it is a relic of the old crappy DMA
  * implementation that threw the idea of "emulating the hardware" to the wind
  */
-static UINT8 *hdcdma_data;
+static UINT8 hdcdma_data[512];
 static UINT8 *hdcdma_src;
 static UINT8 *hdcdma_dst;
 static int hdcdma_read;
@@ -373,6 +373,12 @@ int pc_hdc_dack_r(running_machine *machine)
         }
 	}
 
+	if ( ! no_dma() )
+	{
+		assert( pc_hdc_dma8237 != NULL );
+		i8237_dreq3_w( pc_hdc_dma8237, ( hdcdma_read || hdcdma_size ) ? 1 : 0 );
+	}
+
 	return result;
 }
 
@@ -408,6 +414,12 @@ void pc_hdc_dack_w(running_machine *machine, int data)
         }
         hdcdma_dst = hdcdma_data;
     }
+
+	if ( ! no_dma() )
+	{
+		assert( pc_hdc_dma8237 != NULL );
+		i8237_dreq3_w( pc_hdc_dma8237, ( hdcdma_write || hdcdma_size ) ? 1 : 0 );
+	}
 }
 
 
@@ -415,7 +427,6 @@ void pc_hdc_dack_w(running_machine *machine, int data)
 static void execute_read(running_machine *machine)
 {
 	hard_disk_file *disk = pc_hdc_file(machine, idx);
-	UINT8 data[512], *src = data;
 	int size = sector_cnt[idx] * 512;
 	int read_ = 0;
 
@@ -423,8 +434,7 @@ static void execute_read(running_machine *machine)
 	if (!disk)
 		return;
 
-	hdcdma_data = data;
-	hdcdma_src = src;
+	hdcdma_src = hdcdma_data;
 	hdcdma_read = read_;
 	hdcdma_size = size;
 
@@ -437,7 +447,8 @@ static void execute_read(running_machine *machine)
 	}
 	else
 	{
-		i8237_run_transfer(pc_hdc_dma8237, HDC_DMA);
+		assert( pc_hdc_dma8237 != NULL );
+		i8237_dreq3_w( pc_hdc_dma8237, 1 );
 	}
 }
 
@@ -446,7 +457,6 @@ static void execute_read(running_machine *machine)
 static void execute_write(running_machine *machine)
 {
 	hard_disk_file *disk = pc_hdc_file(machine, idx);
-	UINT8 data[512], *dst = data;
 	int size = sector_cnt[idx] * 512;
 	int write_ = 512;
 
@@ -454,8 +464,7 @@ static void execute_write(running_machine *machine)
 	if (!disk)
 		return;
 
-	hdcdma_data = data;
-	hdcdma_dst = dst;
+	hdcdma_dst = hdcdma_data;
 	hdcdma_write = write_;
 	hdcdma_size = size;
 
@@ -469,7 +478,8 @@ static void execute_write(running_machine *machine)
 	}
 	else
 	{
-		i8237_run_transfer(pc_hdc_dma8237, HDC_DMA);
+		assert( pc_hdc_dma8237 != NULL );
+		i8237_dreq3_w( pc_hdc_dma8237, 1 );
 	}
 }
 
