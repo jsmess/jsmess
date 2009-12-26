@@ -75,9 +75,6 @@ MACHINE_RESET( gamecom )
 	memory_set_bankptr( machine, "bank3", rom );
 	memory_set_bankptr( machine, "bank4", rom );
 
-	/* should possibly go in a DRIVER_INIT piece? */
-	gamecom_clock_timer = timer_alloc(machine,  gamecom_clock_timer_callback , NULL);
-
 	cartridge = NULL;
 	/* disable DMA and timer */
 	gamecom_dma.enabled = 0;
@@ -611,6 +608,7 @@ DRIVER_INIT( gamecom )
 {
 	gamecom_cpu = cputag_get_cpu(machine, "maincpu");
 	gamecom_iram = devtag_get_info_ptr(machine, "maincpu", CPUINFO_PTR_SM8500_INTERNAL_RAM);
+	gamecom_clock_timer = timer_alloc(machine,  gamecom_clock_timer_callback , NULL);
 }
 
 DEVICE_IMAGE_LOAD( gamecom_cart )

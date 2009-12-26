@@ -95,11 +95,11 @@ DRIVER_INIT(llc1)
 
 MACHINE_RESET( llc1 )
 {
-	timer_pulse(machine, ATTOTIME_IN_HZ(5), NULL, 0, keyboard_callback);
 }
 
 MACHINE_START(llc1)
 {
+	timer_pulse(machine, ATTOTIME_IN_HZ(5), NULL, 0, keyboard_callback);
 }
 
 DRIVER_INIT(llc2)

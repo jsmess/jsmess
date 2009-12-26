@@ -365,12 +365,12 @@ static MACHINE_RESET(fk1)
 	memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
 
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), fk1_irq_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(24000), NULL, 0, keyboard_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, vsync_callback);
 }
 
-static VIDEO_START( fk1 )
+static MACHINE_START( fk1 )
 {
+	timer_pulse(machine, ATTOTIME_IN_HZ(24000), NULL, 0, keyboard_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, vsync_callback);
 }
 
 static VIDEO_UPDATE( fk1 )
@@ -398,6 +398,7 @@ static MACHINE_DRIVER_START( fk1 )
     MDRV_CPU_PROGRAM_MAP(fk1_mem)
     MDRV_CPU_IO_MAP(fk1_io)
 
+    MDRV_MACHINE_START(fk1)
     MDRV_MACHINE_RESET(fk1)
 
     /* video hardware */
@@ -410,7 +411,6 @@ static MACHINE_DRIVER_START( fk1 )
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_START(fk1)
     MDRV_VIDEO_UPDATE(fk1)
 
 	MDRV_PIT8253_ADD( "pit8253", fk1_pit8253_intf )
