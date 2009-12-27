@@ -340,10 +340,8 @@ static int disk_decode_nib(UINT8 *data, const UINT8 *nibble, int *volume, int *t
 		else
 		{
 			/* 3 * 2 bit */
-			if (i + 0x00 < APPLE2_SECTOR_SIZE)
-				data[i + 0x00] = ((newvalue >> 1) & 0x01) | ((newvalue << 1) & 0x02);
-			if (i + 0x56 < APPLE2_SECTOR_SIZE)
-				data[i + 0x56] = ((newvalue >> 3) & 0x01) | ((newvalue >> 1) & 0x02);
+			data[i + 0x00] = ((newvalue >> 1) & 0x01) | ((newvalue << 1) & 0x02);
+			data[i + 0x56] = ((newvalue >> 3) & 0x01) | ((newvalue >> 1) & 0x02);
 			if (i + 0xAC < APPLE2_SECTOR_SIZE)
 				data[i + 0xAC] = ((newvalue >> 5) & 0x01) | ((newvalue >> 3) & 0x02);
 		}
@@ -435,8 +433,12 @@ static void disk_encode_nib(UINT8 *nibble, const UINT8 *data, int volume, int tr
 			oldvalue |= (data[i + 0x00] & 0x02) >> 1;
 			oldvalue |= (data[i + 0x56] & 0x01) << 3;
 			oldvalue |= (data[i + 0x56] & 0x02) << 1;
-			oldvalue |= (data[i + 0xAC] & 0x01) << 5;
-			oldvalue |= (data[i + 0xAC] & 0x02) << 3;
+			if (i + 0xAC < APPLE2_SECTOR_SIZE)
+			{
+				oldvalue |= (data[i + 0xAC] & 0x01) << 5;
+				oldvalue |= (data[i + 0xAC] & 0x02) << 3;
+			}
+
 		}
 		xorvalue ^= oldvalue;
 		nibble[28+i] = translate6[xorvalue & 0x3F];
