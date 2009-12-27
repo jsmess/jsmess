@@ -84,21 +84,41 @@ static const mc6845_interface h19_crtc6845_interface =
 	NULL
 };
 
+/* F4 Character Displayer */
+static const gfx_layout h19_charlayout =
+{
+	8, 10,					/* 8 x 10 characters */
+	128,					/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( h19 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, h19_charlayout, 0, 1 )
+GFXDECODE_END
+
+
 static MACHINE_DRIVER_START( h19 )
-    /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_12_288MHz / 6) // From schematics
-    MDRV_CPU_PROGRAM_MAP(h19_mem)
-    MDRV_CPU_IO_MAP(h19_io)
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu",Z80, XTAL_12_288MHz / 6) // From schematics
+	MDRV_CPU_PROGRAM_MAP(h19_mem)
+	MDRV_CPU_IO_MAP(h19_io)
 
-    MDRV_MACHINE_RESET(h19)
+	MDRV_MACHINE_RESET(h19)
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640, 200)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
+	MDRV_GFXDECODE(h19)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
@@ -110,19 +130,21 @@ MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( h19 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-    // Original
-    ROM_SYSTEM_BIOS(0, "orig", "Original")
-    ROMX_LOAD( "2732_444-46_h19code.bin", 0x0000, 0x1000, CRC(F4447DA0) SHA1(fb4093d5b763be21a9580a0defebed664b1f7a7b), ROM_BIOS(1))
-    // Super H19 ROM (
-    ROM_SYSTEM_BIOS(1, "super", "Super 19")
-    ROMX_LOAD( "2732_super19_h447.bin", 0x0000, 0x1000, CRC(68FBFF54) SHA1(c0aa7199900709d717b07e43305dfdf36824da9b), ROM_BIOS(2))
-    // Watzman ROM
-    ROM_SYSTEM_BIOS(2, "watzman", "Watzman")
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	// Original
+	ROM_SYSTEM_BIOS(0, "orig", "Original")
+	ROMX_LOAD( "2732_444-46_h19code.bin", 0x0000, 0x1000, CRC(F4447DA0) SHA1(fb4093d5b763be21a9580a0defebed664b1f7a7b), ROM_BIOS(1))
+	// Super H19 ROM (
+	ROM_SYSTEM_BIOS(1, "super", "Super 19")
+	ROMX_LOAD( "2732_super19_h447.bin", 0x0000, 0x1000, CRC(68FBFF54) SHA1(c0aa7199900709d717b07e43305dfdf36824da9b), ROM_BIOS(2))
+	// Watzman ROM
+	ROM_SYSTEM_BIOS(2, "watzman", "Watzman")
 	ROMX_LOAD( "watzman.bin", 0x0000, 0x1000, CRC(8168b6dc) SHA1(bfaebb9d766edbe545d24bc2b6630be4f3aa0ce9), ROM_BIOS(3))
+
 	ROM_REGION( 0x0800, "chargen", 0 )
 	// Original font dump
   	ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+
   	ROM_REGION( 0x0800, "keyboard", 0 )
   	// Original dump
   	ROM_LOAD( "2716_444-37_h19keyb.bin", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
@@ -134,5 +156,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, h19,  0,       0, 	h19, 	h19, 	 0,  	   	 "Heath, Inc.",   "Heathkit H19",		GAME_NOT_WORKING)
+COMP( ????, h19,     0,       0, 	h19, 	h19, 	 0,  	"Heath, Inc.", "Heathkit H19", GAME_NOT_WORKING)
 

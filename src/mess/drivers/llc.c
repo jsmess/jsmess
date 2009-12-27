@@ -278,6 +278,41 @@ static const z80_daisy_chain llc1_daisy_chain[] =
 	{ NULL }
 };
 
+/* F4 Character Displayer */
+static const gfx_layout llc1_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	128,					/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0, 1*128*8, 2*128*8, 3*128*8, 4*128*8, 5*128*8, 6*128*8, 7*128*8 },
+	8					/* every char takes 8 x 1 bytes */
+};
+
+static const gfx_layout llc2_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( llc1 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, llc1_charlayout, 0, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START( llc2 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, llc2_charlayout, 0, 1 )
+GFXDECODE_END
+
 /* Machine driver */
 static MACHINE_DRIVER_START( llc1 )
 	/* basic machine hardware */
@@ -289,18 +324,19 @@ static MACHINE_DRIVER_START( llc1 )
 	MDRV_MACHINE_START( llc1 )
 	MDRV_MACHINE_RESET( llc1 )
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 16*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*8-1)
+	MDRV_GFXDECODE(llc1)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_VIDEO_START(llc1)
-    MDRV_VIDEO_UPDATE(llc1)
+	MDRV_VIDEO_UPDATE(llc1)
 
 	MDRV_Z80PIO_ADD( "z80pio", llc1_z80pio_intf )
 	MDRV_Z80CTC_ADD( "z80ctc", XTAL_3MHz, llc1_ctc_intf )
@@ -314,18 +350,19 @@ static MACHINE_DRIVER_START( llc2 )
 
 	MDRV_MACHINE_RESET( llc2 )
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
+	MDRV_GFXDECODE(llc2)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_VIDEO_START(llc2)
-    MDRV_VIDEO_UPDATE(llc2)
+	MDRV_VIDEO_UPDATE(llc2)
 
 	MDRV_Z80PIO_ADD( "z80pio", llc2_z80pio_intf )
 	MDRV_Z80CTC_ADD( "z80ctc", XTAL_3MHz, llc2_ctc_intf )

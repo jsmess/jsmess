@@ -166,6 +166,25 @@ static const floppy_config partner_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+/* F4 Character Displayer */
+static const gfx_layout partner_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	512,					/* 512 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( partner )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, partner_charlayout, 0, 1 )
+GFXDECODE_END
+
+
 static MACHINE_DRIVER_START( partner )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", 8080, XTAL_16MHz / 9)
@@ -184,6 +203,7 @@ static MACHINE_DRIVER_START( partner )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(78*6, 30*10)
 	MDRV_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
+	MDRV_GFXDECODE(partner)
 	MDRV_PALETTE_LENGTH(3)
 	MDRV_PALETTE_INIT(radio86)
 

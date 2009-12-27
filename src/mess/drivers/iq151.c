@@ -37,6 +37,38 @@ static VIDEO_UPDATE( iq151 )
     return 0;
 }
 
+/* F4 Character Displayer */
+static const gfx_layout iq151_32_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	128,					/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static const gfx_layout iq151_64_charlayout =
+{
+	6, 8,					/* 6 x 8 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( iq151 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, iq151_32_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0400, iq151_64_charlayout, 0, 1 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( iq151 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -52,6 +84,7 @@ static MACHINE_DRIVER_START( iq151 )
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MDRV_SCREEN_SIZE(640, 480)
     MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_GFXDECODE(iq151)
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
 
@@ -69,7 +102,7 @@ ROM_START( iq151 )
 	ROM_LOAD( "iq151_monitor_disasm.rom", 0xf000, 0x1000, CRC(45c2174e) SHA1(703e3271a124c3ef9330ae399308afd903316ab9))
 	ROM_LOAD( "iq151_monitor_orig.rom", 0xf000, 0x1000, CRC(acd10268) SHA1(4d75c73f155ed4dc2ac51a9c22232f869cca95e2))
 
-	ROM_REGION( 0x0c00, "gfx1", 0 )
+	ROM_REGION( 0x0c00, "chargen", 0 )
 	ROM_LOAD( "iq151_video32font.rom", 0x0000, 0x0400, CRC(395567a7) SHA1(18800543daf4daed3f048193c6ae923b4b0e87db))
 	ROM_LOAD( "iq151_video64font.rom", 0x0400, 0x0800, CRC(cb6f43c0) SHA1(4b2c1d41838d569228f61568c1a16a8d68b3dadf))
 ROM_END
@@ -77,5 +110,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 198?, iq151,  0,       0, 	iq151, 	iq151, 	 0,  	  	 "ZPA Novy Bor",   "IQ-151",		GAME_NOT_WORKING)
+COMP( 198?, iq151,  0,       0, 	iq151, 	iq151, 	 0,  	"ZPA Novy Bor", "IQ-151", GAME_NOT_WORKING)
 

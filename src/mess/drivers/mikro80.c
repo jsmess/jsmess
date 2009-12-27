@@ -146,27 +146,46 @@ static const cassette_config mikro80_cassette_config =
 };
 
 
+/* F4 Character Displayer */
+static const gfx_layout mikro80_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( mikro80 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, mikro80_charlayout, 0, 1 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( mikro80 )
-    /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",8080, 2000000)
-    MDRV_CPU_PROGRAM_MAP(mikro80_mem)
-    MDRV_CPU_IO_MAP(mikro80_io)
-    MDRV_MACHINE_RESET( mikro80 )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu",8080, 2000000)
+	MDRV_CPU_PROGRAM_MAP(mikro80_mem)
+	MDRV_CPU_IO_MAP(mikro80_io)
+	MDRV_MACHINE_RESET( mikro80 )
 
 	MDRV_I8255A_ADD( "ppi8255", mikro80_ppi8255_interface )
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
+	MDRV_GFXDECODE(mikro80)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_VIDEO_START(mikro80)
-    MDRV_VIDEO_UPDATE(mikro80)
+	MDRV_VIDEO_UPDATE(mikro80)
 
  	MDRV_SPEAKER_STANDARD_MONO("mono")
    	MDRV_SOUND_WAVE_ADD("wave", "cassette")
@@ -176,10 +195,10 @@ static MACHINE_DRIVER_START( mikro80 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( radio99 )
-    /* basic machine hardware */
-    MDRV_IMPORT_FROM(mikro80)
-    MDRV_CPU_MODIFY("maincpu")
-    MDRV_CPU_IO_MAP(radio99_io)
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(mikro80)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_IO_MAP(radio99_io)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 16.00)
@@ -189,14 +208,14 @@ MACHINE_DRIVER_END
 /* ROM definition */
 
 ROM_START( mikro80 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "mikro80.rom", 0xf800, 0x0800, CRC(63a4b72a) SHA1(6bd3e396539a15e2ccffa7486cae06ef6ddd1d03))
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "mikro80.rom", 0xf800, 0x0800, CRC(63a4b72a) SHA1(6bd3e396539a15e2ccffa7486cae06ef6ddd1d03))
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("mikro80.fnt", 0x0000, 0x0800, CRC(43eb72bb) SHA1(761319cc6747661b33e84aa449cec83800543b5b) )
 ROM_END
 
 ROM_START( radio99 )
-    ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "monrk88.bin", 0xf800, 0x0800, CRC(5415D847) SHA1(c8233c72548bc79846b9d998766a10df349c5bda))
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("mikro80.fnt", 0x0000, 0x0800, CRC(43eb72bb) SHA1(761319cc6747661b33e84aa449cec83800543b5b) )
@@ -205,5 +224,5 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
-COMP( 1983, mikro80, 	 0,  	 0,	mikro80, 	mikro80, 	mikro80, "", 					 "Mikro-80",	 0)
-COMP( 1993, radio99, mikro80,  	 0,	radio99, 	mikro80, 	radio99, "", 					 "Radio-99DM",	 0)
+COMP( 1983, mikro80, 	 0,  	 0,	mikro80, 	mikro80, 	mikro80, "", "Mikro-80",	 0)
+COMP( 1993, radio99, mikro80,  	 0,	radio99, 	mikro80, 	radio99, "", "Radio-99DM",	 0)

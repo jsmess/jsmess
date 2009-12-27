@@ -379,29 +379,49 @@ static const cassette_config amu880_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
 };
 
+/* F4 Character Displayer */
+static const gfx_layout amu880_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	128,					/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( amu880 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, amu880_charlayout, 0, 1 )
+GFXDECODE_END
+
+
 static MACHINE_DRIVER_START( amu880 )
 	MDRV_DRIVER_DATA(amu880_state)
 
 	/* basic machine hardware */
-    MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz/4) /* U880D */
-    MDRV_CPU_PROGRAM_MAP(amu880_mem)
-    MDRV_CPU_IO_MAP(amu880_io)
+	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz/4) /* U880D */
+	MDRV_CPU_PROGRAM_MAP(amu880_mem)
+	MDRV_CPU_IO_MAP(amu880_io)
 	MDRV_CPU_CONFIG(amu880_daisy_chain)
 
-    MDRV_MACHINE_START(amu880)
+	MDRV_MACHINE_START(amu880)
 
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, HZ(1500))
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(9000000, 576, 0*6, 64*6, 320, 0*10, 24*10)
 
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+	MDRV_GFXDECODE(amu880)
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_START(amu880)
-    MDRV_VIDEO_UPDATE(amu880)
+	MDRV_VIDEO_START(amu880)
+	MDRV_VIDEO_UPDATE(amu880)
 
 	/* devices */
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_10MHz/4, ctc_intf)

@@ -785,6 +785,25 @@ static const floppy_config bw14_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+/* F4 Character Displayer */
+static const gfx_layout bw12_charlayout =
+{
+	8, 9,					/* 8 x 9 characters */
+	256,					/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( bw12 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, bw12_charlayout, 0, 1 )
+GFXDECODE_END
+
+
 /* Machine Driver */
 static MACHINE_DRIVER_START( common )
 	MDRV_DRIVER_DATA(bw12_state)
@@ -805,6 +824,7 @@ static MACHINE_DRIVER_START( common )
 	MDRV_SCREEN_SIZE(640, 200)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
+	MDRV_GFXDECODE(bw12)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(monochrome_amber)
 

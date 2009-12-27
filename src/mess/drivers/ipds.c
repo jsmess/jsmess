@@ -67,6 +67,24 @@ static VIDEO_UPDATE( ipds )
 	return 0;
 }
 
+/* F4 Character Displayer */
+static const gfx_layout ipds_charlayout =
+{
+	8, 11,					/* 8 x 11 characters */
+	128,					/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( ipds )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, ipds_charlayout, 0, 1 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( ipds )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",8085A, XTAL_19_6608MHz / 4)
@@ -82,6 +100,7 @@ static MACHINE_DRIVER_START( ipds )
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MDRV_SCREEN_SIZE(640, 480)
     MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_GFXDECODE(ipds)
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
 	
@@ -104,5 +123,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( ????, ipds,  0,       0, 			ipds, 	ipds, 	 0,  	"Intel",   "iPDS",		GAME_NOT_WORKING)
+COMP( ????, ipds,  0,       0, 	     ipds, 	ipds, 	 0,  	"Intel",   "iPDS",	GAME_NOT_WORKING)
 

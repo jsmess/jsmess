@@ -162,6 +162,25 @@ static const cassette_config galaxy_cassette_config =
 };
 
 
+/* F4 Character Displayer */
+static const gfx_layout galaxy_charlayout =
+{
+	8, 16,					/* 8 x 16 characters */
+	128,					/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	/* y offsets */
+	{ 0, 1*128*8, 2*128*8, 3*128*8, 4*128*8, 5*128*8, 6*128*8, 7*128*8, 8*128*8, 9*128*8, 10*128*8, 11*128*8, 12*128*8, 13*128*8, 14*128*8, 15*128*8 },
+	8					/* every char takes 1 x 16 bytes */
+};
+
+static GFXDECODE_START( galaxy )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxy_charlayout, 0, 1 )
+GFXDECODE_END
+
+
 static MACHINE_DRIVER_START( galaxy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL / 2)
@@ -176,6 +195,7 @@ static MACHINE_DRIVER_START( galaxy )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 212)
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
+	MDRV_GFXDECODE(galaxy)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT( black_and_white )
 

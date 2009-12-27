@@ -375,6 +375,25 @@ static const floppy_config comx35_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+/* F4 Character Displayer */
+static const gfx_layout comx35_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( comx35 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, comx35_charlayout, 0, 36 )
+GFXDECODE_END
+
+
 static MACHINE_DRIVER_START( comx35_pal )
 	MDRV_DRIVER_DATA(comx35_state)
 
@@ -389,6 +408,7 @@ static MACHINE_DRIVER_START( comx35_pal )
 
 	/* sound and video hardware */
 	MDRV_IMPORT_FROM(comx35_pal_video)
+	MDRV_GFXDECODE(comx35)
 
 	/* peripheral hardware */
 	MDRV_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_PAL / 8)
@@ -418,6 +438,7 @@ static MACHINE_DRIVER_START( comx35_ntsc )
 
 	/* sound and video hardware */
 	MDRV_IMPORT_FROM(comx35_ntsc_video)
+	MDRV_GFXDECODE(comx35)
 
 	/* peripheral hardware */
 	MDRV_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_NTSC / 8)

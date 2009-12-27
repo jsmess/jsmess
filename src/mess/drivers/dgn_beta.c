@@ -297,6 +297,25 @@ static const floppy_config dgnbeta_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+/* F4 Character Displayer */
+static const gfx_layout dgnbeta_charlayout =
+{
+	8, 10,					/* 8 x 10 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( dgnbeta )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, dgnbeta_charlayout, 0, 8 )
+GFXDECODE_END
+
+
 static MACHINE_DRIVER_START( dgnbeta )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
@@ -316,6 +335,7 @@ static MACHINE_DRIVER_START( dgnbeta )
 
 	MDRV_SCREEN_SIZE(700,550)
 	MDRV_SCREEN_VISIBLE_AREA(0, 699, 0, 549)
+	MDRV_GFXDECODE(dgnbeta)
 	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(dgnbeta_palette) / 3)
 	MDRV_PALETTE_INIT( dgnbeta )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)

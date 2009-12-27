@@ -181,6 +181,24 @@ static const cassette_config dai_cassette_config =
 	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
 
+/* F4 Character Displayer */
+static const gfx_layout dai_charlayout =
+{
+	8, 16,					/* 8 x 16 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( dai )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, dai_charlayout, 0, 8 )
+GFXDECODE_END
+
 /* machine definition */
 static MACHINE_DRIVER_START( dai )
 	/* basic machine hardware */
@@ -203,6 +221,7 @@ static MACHINE_DRIVER_START( dai )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(1056, 542)
 	MDRV_SCREEN_VISIBLE_AREA(0, 1056-1, 0, 302-1)
+	MDRV_GFXDECODE(dai)
 	MDRV_PALETTE_LENGTH(sizeof (dai_palette) / 3)
 	MDRV_PALETTE_INIT( dai )
 
