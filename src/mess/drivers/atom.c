@@ -299,7 +299,7 @@ static MACHINE_DRIVER_START( atom )
 	MDRV_CPU_ADD("maincpu", M65C02, X2 / 4)
 	MDRV_CPU_PROGRAM_MAP(atom_mem)
 
-	MDRV_MACHINE_RESET( atom )
+	MDRV_MACHINE_START( atom )
 
 	MDRV_I8255A_ADD( "ppi8255", atom_8255_int )
 
@@ -344,7 +344,7 @@ static MACHINE_DRIVER_START( atomeb )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(atomeb_mem)
 
-	MDRV_MACHINE_RESET( atomeb )
+	MDRV_MACHINE_START( atomeb )
 MACHINE_DRIVER_END
 
 

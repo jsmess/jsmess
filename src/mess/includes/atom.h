@@ -30,7 +30,7 @@ extern const i8255a_interface atom_8255_int;
 extern const via6522_interface atom_6522_interface;
 extern const i8271_interface atom_8271_interface;
 
-MACHINE_RESET( atom );
+MACHINE_START( atom );
 QUICKLOAD_LOAD( atom );
 READ8_DEVICE_HANDLER (atom_8255_porta_r);
 READ8_DEVICE_HANDLER (atom_8255_portb_r);
@@ -43,7 +43,7 @@ READ8_HANDLER(atom_eprom_box_r);
 WRITE8_HANDLER(atom_eprom_box_w);
 void atom_eprom_box_init(running_machine *machine);
 
-MACHINE_RESET( atomeb );
+MACHINE_START( atomeb );
 
 READ8_DEVICE_HANDLER( atom_mc6847_videoram_r );
 VIDEO_UPDATE( atom );

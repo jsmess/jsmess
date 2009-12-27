@@ -128,7 +128,6 @@ MACHINE_RESET( cgenie )
 
 	cass_level = 0;
 	cass_bit = 1;
-	timer_pulse(machine,  ATTOTIME_IN_HZ(11025), NULL, 0, handle_cassette_input );
 }
 
 MACHINE_START( cgenie )
@@ -158,6 +157,7 @@ MACHINE_START( cgenie )
 	memory_install_write8_handler(space, 0x4000, 0x4000 + messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, cgenie_videoram_w);
 	machine->generic.videoram.u8 = messram_get_ptr(devtag_get_device(machine, "messram"));
 	memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
+	timer_pulse(machine,  ATTOTIME_IN_HZ(11025), NULL, 0, handle_cassette_input );
 }
 
 /*************************************

@@ -174,7 +174,7 @@ static TIMER_CALLBACK(atom_timer_callback)
 	}
 }
 
-MACHINE_RESET( atom )
+MACHINE_START( atom )
 {
 	atom_8255_porta = 0xff;
 	atom_8255_portb = 0xff;
@@ -389,9 +389,9 @@ READ8_HANDLER(atom_eprom_box_r)
 	return selected_eprom;
 }
 
-MACHINE_RESET( atomeb )
+MACHINE_START( atomeb )
 {
-	MACHINE_RESET_CALL(atom);
+	MACHINE_START_CALL(atom);
 	atom_eprom_box_init(machine);
 }
 

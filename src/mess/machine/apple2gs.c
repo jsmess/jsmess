@@ -1720,17 +1720,8 @@ static READ8_HANDLER( apple2gs_read_vector )
 
 MACHINE_RESET( apple2gs )
 {
-	apple2gs_clock_timer = timer_alloc(machine, apple2gs_clock_tick, NULL);
-	timer_adjust_periodic(apple2gs_clock_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
-
-	apple2gs_qsecond_timer = timer_alloc(machine, apple2gs_qsecond_tick, NULL);
-	timer_adjust_periodic(apple2gs_qsecond_timer, ATTOTIME_IN_USEC(266700), 0, ATTOTIME_IN_USEC(266700));
-
-	apple2gs_scanline_timer = timer_alloc(machine, apple2gs_scanline_tick, NULL);
-	timer_adjust_oneshot(apple2gs_scanline_timer, attotime_never, 0);
-
-	// fire on scanline zero
-	timer_adjust_oneshot(apple2gs_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+/* Something needs to be here? 
+	When F3 pressed, the video mode changes and the machine goes into Basic */
 }
 
 MACHINE_START( apple2gs )
@@ -1831,4 +1822,16 @@ MACHINE_START( apple2gs )
 	state_save_register_item(machine, "SNDGLUCTRL", NULL,0, sndglu_ctrl);
 	state_save_register_item(machine, "SNDGLUADDR", NULL,0, sndglu_addr);
 	state_save_register_item(machine, "SNDGLUDUMMYRD", NULL,0, sndglu_dummy_read);
+
+	apple2gs_clock_timer = timer_alloc(machine, apple2gs_clock_tick, NULL);
+	timer_adjust_periodic(apple2gs_clock_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
+
+	apple2gs_qsecond_timer = timer_alloc(machine, apple2gs_qsecond_tick, NULL);
+	timer_adjust_periodic(apple2gs_qsecond_timer, ATTOTIME_IN_USEC(266700), 0, ATTOTIME_IN_USEC(266700));
+
+	apple2gs_scanline_timer = timer_alloc(machine, apple2gs_scanline_tick, NULL);
+	timer_adjust_oneshot(apple2gs_scanline_timer, attotime_never, 0);
+
+	// fire on scanline zero
+	timer_adjust_oneshot(apple2gs_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }

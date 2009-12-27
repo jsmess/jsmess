@@ -595,6 +595,7 @@ static const TMS9928a_interface tms9928a_interface =
 static MACHINE_START( adam )
 {
 	TMS9928A_configure(&tms9928a_interface);
+	timer_pulse(machine, ATTOTIME_IN_MSEC(20), NULL, 0, adam_paddle_callback);
 }
 
 static MACHINE_RESET( adam )
@@ -622,7 +623,6 @@ static MACHINE_RESET( adam )
 	adam_clear_keyboard_buffer();
 
 	memset(&memory_region(machine, "maincpu")[0x0000], 0xFF, 0x20000); /* Initializing RAM */
-	timer_pulse(machine, ATTOTIME_IN_MSEC(20), NULL, 0, adam_paddle_callback);
 }
 
 static const floppy_config adam_floppy_config =
