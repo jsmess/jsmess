@@ -607,6 +607,24 @@ static ADDRESS_MAP_START( prof80_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x9e, 0x9e) AM_MIRROR(0xff00) AM_WRITE(unio_ctrl_w)
 //  AM_RANGE(0x9c, 0x9c) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_data_w)
 //  AM_RANGE(0x9d, 0x9d) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_data_w)
+//	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_READ(gripc_r)
+//	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0xff00) AM_READWRITE(gripd_r, gripd_w)
+	AM_RANGE(0xd8, 0xd8) AM_MIRROR(0xff00) AM_WRITE(flr_w)
+	AM_RANGE(0xda, 0xda) AM_MIRROR(0xff00) AM_READ(status_r)
+	AM_RANGE(0xdb, 0xdb) AM_MIRROR(0xff00) AM_READ(status2_r)
+	AM_RANGE(0xdc, 0xdc) AM_MIRROR(0xff00) AM_DEVREAD(UPD765_TAG, upd765_status_r)
+	AM_RANGE(0xdd, 0xdd) AM_MIRROR(0xff00) AM_DEVREADWRITE(UPD765_TAG, upd765_data_r, upd765_data_w)
+	AM_RANGE(0xde, 0xde) AM_MIRROR(0xff01) AM_MASK(0xff00) AM_WRITE(par_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( prof80_grip_io, ADDRESS_SPACE_IO, 8 )
+//  AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80STI_TAG, z80sti_r, z80sti_w)
+//  AM_RANGE(0x94, 0x95) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80SIO_TAG, z80sio_d_r, z80sio_d_w)
+//  AM_RANGE(0x96, 0x97) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80SIO_TAG, z80sio_c_r, z80sio_c_w)
+	AM_RANGE(0x9e, 0x9e) AM_MIRROR(0xff00) AM_WRITE(unio_ctrl_w)
+//  AM_RANGE(0x9c, 0x9c) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_data_w)
+//  AM_RANGE(0x9d, 0x9d) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_data_w)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_READ(gripc_r)
 	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0xff00) AM_READWRITE(gripd_r, gripd_w)
 	AM_RANGE(0xd8, 0xd8) AM_MIRROR(0xff00) AM_WRITE(flr_w)
@@ -1260,6 +1278,16 @@ static const speaker_interface grip_speaker_interface =
 	speaker_levels
 };
 
+static VIDEO_START( prof80 )
+{
+}
+
+static VIDEO_UPDATE( prof80 )
+{
+	return 0;
+}
+
+
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( prof80 )
@@ -1278,6 +1306,19 @@ static MACHINE_DRIVER_START( prof80 )
 	MDRV_UPD765A_ADD(UPD765_TAG, prof80_upd765_interface)
 	MDRV_FLOPPY_4_DRIVES_ADD(prof80_floppy_config)
 
+    /* video hardware */
+    MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
+    MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MDRV_SCREEN_SIZE(640, 480)
+    MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
+    MDRV_PALETTE_LENGTH(2)
+    MDRV_PALETTE_INIT(black_and_white)
+
+    MDRV_VIDEO_START(prof80)
+    MDRV_VIDEO_UPDATE(prof80)
+	
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
@@ -1285,6 +1326,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( grip )
 	MDRV_IMPORT_FROM(prof80)
+
+    MDRV_CPU_MODIFY(Z80_TAG)
+    MDRV_CPU_IO_MAP(prof80_grip_io)
 
     /* basic machine hardware */
 	MDRV_CPU_ADD(GRIP_Z80_TAG, Z80, XTAL_16MHz/4)
@@ -1297,15 +1341,6 @@ static MACHINE_DRIVER_START( grip )
 	/* keyboard hack */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, HZ(50))
 
-    /* video hardware */
-    MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
 
     MDRV_VIDEO_START(grip)
     MDRV_VIDEO_UPDATE(grip)
