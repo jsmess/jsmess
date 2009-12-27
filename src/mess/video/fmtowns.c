@@ -618,7 +618,7 @@ WRITE8_HANDLER( towns_spriteram_w)
  * 		+6: Sprite Colour
  * 			bit 15: use colour data in located in sprite RAM offset in bits 11-0 (x32) 
  */
-void render_sprite_4(bitmap_t* bitmap, UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
+void render_sprite_4(UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
 {
 	INT16 xpos,ypos;
 	UINT16 col,pixel;
@@ -692,7 +692,7 @@ void render_sprite_4(bitmap_t* bitmap, UINT32 poffset, UINT32 coffset, UINT16 x,
 	}
 }
 
-void render_sprite_16(bitmap_t* bitmap, UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
+void render_sprite_16(UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
 {
 	INT16 xpos,ypos;
 	UINT16 col;
@@ -743,7 +743,7 @@ void render_sprite_16(bitmap_t* bitmap, UINT32 poffset, UINT16 x, UINT16 y, UINT
 	}
 }
 
-void draw_sprites(running_machine* machine,bitmap_t* bitmap, const rectangle* rect)
+void draw_sprites(running_machine* machine, const rectangle* rect)
 {
 	UINT16 sprite_limit = (towns_sprite_reg[0] | (towns_sprite_reg[1] << 8)) & 0x3ff;
 	int n;
@@ -781,7 +781,7 @@ void draw_sprites(running_machine* machine,bitmap_t* bitmap, const rectangle* re
 				n,x,y,attr,colour,poffset,coffset);
 #endif
 			if(!(colour & 0x2000))
-				render_sprite_4(bitmap,(poffset+pshift)&0x1ffff,coffset,x,y,attr&0x2000,attr&0x1000,rect);
+				render_sprite_4((poffset+pshift)&0x1ffff,coffset,x,y,attr&0x2000,attr&0x1000,rect);
 		}
 		else
 		{
@@ -791,7 +791,7 @@ void draw_sprites(running_machine* machine,bitmap_t* bitmap, const rectangle* re
 			printf("Sprite16 #%i, X %i Y %i Attr %04x Col %04x Poff %05x Coff %05x\n",
 				n,x,y,attr,colour,poffset,coffset);
 #endif
-			render_sprite_16(bitmap,(poffset+pshift)&0x1ffff,x,y,attr&0x2000,attr&0x1000,rect);
+			render_sprite_16((poffset+pshift)&0x1ffff,x,y,attr&0x2000,attr&0x1000,rect);
 		}
 	}
 }
@@ -1080,9 +1080,6 @@ void towns_crtc_draw_layer(running_machine* machine,bitmap_t* bitmap,const recta
 	}
 	else
 	{
-		if(towns_sprite_reg[1] & 0x80)  // if sprites are enabled, then sprites are drawn on this layer.
-			draw_sprites(machine,bitmap,rect);
-			
 		scanline = rect->min_y;
 		height = (rect->max_y - rect->min_y);
 		if(towns_crtc_reg[27] & 0x1000)
@@ -1205,6 +1202,22 @@ void draw_text_layer(running_machine* machine,bitmap_t* bitmap, const rectangle*
 			off += 2;
 		}
 	}
+}
+
+static TIMER_CALLBACK( towns_vblank_end )
+{
+	// here we'll clear the vsync signal, I presume it goes low on it's own eventually
+	const device_config* dev = ptr;
+	pic8259_set_irq_line(dev,3,0);  // IRQ11 = VSync
+}
+
+INTERRUPT_GEN( towns_vsync_irq )
+{
+	const device_config* dev = devtag_get_device(device->machine,"pic8259_slave");
+	pic8259_set_irq_line(dev,3,1);  // IRQ11 = VSync
+	timer_set(device->machine,video_screen_get_time_until_vblank_end(device->machine->primary_screen),(void*)dev,0,towns_vblank_end);
+	if(towns_sprite_reg[1] & 0x80)  // if sprites are enabled, then sprites are drawn on this layer.
+		draw_sprites(dev->machine,&towns_crtc_layerscr[1]);
 }
 
 VIDEO_START( towns )

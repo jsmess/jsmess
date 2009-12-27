@@ -1911,19 +1911,6 @@ static INPUT_PORTS_START( towns )
     PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static TIMER_CALLBACK( towns_vblank_end )
-{
-	// here we'll clear the vsync signal, I presume it goes low on it's own eventually
-	pic8259_set_irq_line(ptr,3,0);  // IRQ11 = VSync
-}
-
-static INTERRUPT_GEN( towns_vsync_irq )
-{
-	const device_config* dev = devtag_get_device(device->machine,"pic8259_slave");
-	pic8259_set_irq_line(dev,3,1);  // IRQ11 = VSync
-	timer_set(device->machine,video_screen_get_time_until_vblank_end(device->machine->primary_screen),(void*)dev,0,towns_vblank_end);
-}
-
 static DRIVER_INIT( towns )
 {
 	towns_vram = auto_alloc_array(machine,UINT32,0x20000);

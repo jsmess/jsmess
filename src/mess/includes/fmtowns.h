@@ -25,6 +25,7 @@ WRITE8_HANDLER( towns_spriteram_w);
 
 void towns_update_video_banks(const address_space*);
 
+INTERRUPT_GEN( towns_vsync_irq );
 VIDEO_START( towns );
 VIDEO_UPDATE( towns );
 
