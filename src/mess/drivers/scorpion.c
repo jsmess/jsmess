@@ -322,14 +322,17 @@ static MACHINE_RESET( scorpion )
 	scorpion_256_port_1ffd_data = 0;
 
 	scorpion_update_memory(machine);
-
+}
+static MACHINE_START( scorpion )
+{
 	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, nmi_check_callback);
 }
-
 static MACHINE_DRIVER_START( scorpion )
 	MDRV_IMPORT_FROM( spectrum_128 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(scorpion_io)
+	
+	MDRV_MACHINE_START( scorpion )
 	MDRV_MACHINE_RESET( scorpion )
 
 	MDRV_BETA_DISK_ADD(BETA_DISK_TAG)
