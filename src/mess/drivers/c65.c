@@ -65,7 +65,7 @@ bus serial (available in all modes), a Fast and a Burst serial bus
 
 #include "includes/c64.h"
 #include "includes/c65.h"
-
+#include "includes/cbmserb.h"
 #include "devices/messram.h"
 
 /*************************************
@@ -200,6 +200,19 @@ static const sid6581_interface c65_sound_interface =
 	c64_paddle_read
 };
 
+static const cbm_serial_bus_interface cbm_sim_drive_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL
+};
 
 
 /*************************************
@@ -245,6 +258,7 @@ static MACHINE_DRIVER_START( c65 )
 
 	/* floppy from serial bus */
 //removed	MDRV_IMPORT_FROM(simulated_drive)
+	MDRV_CBM_SERBUS_ADD("serial_bus", cbm_sim_drive_interface)
 
 	MDRV_IMPORT_FROM(c64_cartslot)
 
