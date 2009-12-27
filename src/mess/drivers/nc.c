@@ -1335,8 +1335,6 @@ static MACHINE_RESET( nc200 )
 
     nc_common_init_machine(machine);
 
-	mc146818_init(machine, MC146818_STANDARD);
-
 	nc200_uart_interrupt_irq = 0;
 
 	nc_common_open_stream_for_reading(machine);
@@ -1369,6 +1367,18 @@ static MACHINE_START( nc200 )
     nc_type = NC_TYPE_200;
 
 	add_exit_callback(machine, nc200_machine_stop);
+	
+	/* keyboard timer */
+	nc_keyboard_timer = timer_alloc(machine, nc_keyboard_timer_callback, NULL);
+	timer_adjust_oneshot(nc_keyboard_timer, ATTOTIME_IN_MSEC(10), 0);
+
+	/* dummy timer */
+	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, dummy_timer_callback);
+
+	/* serial timer */
+	nc_serial_timer = timer_alloc(machine, nc_serial_timer_callback, NULL);	
+
+	mc146818_init(machine, MC146818_STANDARD);	
 }
 
 /*
@@ -1642,7 +1652,7 @@ static DEVICE_GET_INFO( nc_serial )
 	switch ( state )
 	{
 		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( nc_serial );    break;
-		case DEVINFO_STR_NAME:		                strcpy(info->s, "BW2 serial port");	                    break;
+		case DEVINFO_STR_NAME:		                strcpy(info->s, "NC serial port");	                    break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                         break;
 		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0;                                        	break;
