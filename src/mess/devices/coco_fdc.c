@@ -486,8 +486,7 @@ DEVICE_GET_INFO(coco_cartridge_pcb_fdc_coco)
 	static MACHINE_DRIVER_START(coco_fdc)
 		MDRV_WD1773_ADD(WD_TAG, coco_wd17xx_interface)
 		MDRV_MSM6242_ADD(DISTO_TAG)
-		MDRV_DS1315_ADD(CLOUD9_TAG)
-		MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+		MDRV_DS1315_ADD(CLOUD9_TAG)		
 	MACHINE_DRIVER_END
 
 	static const fdc_hardware_type hwtype =
@@ -638,7 +637,6 @@ DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon)
 {
 	static MACHINE_DRIVER_START(dragon_fdc)
 		MDRV_WD179X_ADD(WD_TAG, coco_wd17xx_interface)
-		MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 	MACHINE_DRIVER_END
 
 	static const fdc_hardware_type hwtype =
