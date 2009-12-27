@@ -1283,13 +1283,25 @@ static TIMER_CALLBACK( gb_video_init_vbl )
 	cputag_set_input_line( machine, "maincpu", VBL_INT, ASSERT_LINE );
 }
 
-void gb_video_init( running_machine *machine, int mode )
+MACHINE_START( gb_video )
+{
+	gb_lcd.lcd_timer = timer_alloc(machine, gb_lcd_timer_proc, NULL);
+}
+
+MACHINE_START( gbc_video )
+{
+	gb_lcd.lcd_timer = timer_alloc(machine, gbc_lcd_timer_proc, NULL);
+}
+
+void gb_video_reset( running_machine *machine, int mode )
 {
 	int	i;
 	int vram_size = 0x2000;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	emu_timer *old_timer = gb_lcd.lcd_timer;
 
 	memset( &gb_lcd, 0, sizeof(gb_lcd) );
+	gb_lcd.lcd_timer = old_timer;
 
 	if (mode == GB_VIDEO_CGB) vram_size = 0x4000;
 
@@ -1328,7 +1340,6 @@ void gb_video_init( running_machine *machine, int mode )
 	switch( mode )
 	{
 	case GB_VIDEO_DMG:
-		gb_lcd.lcd_timer = timer_alloc(machine,  gb_lcd_timer_proc , NULL);
 		timer_adjust_oneshot(gb_lcd.lcd_timer, cputag_clocks_to_attotime(machine, "maincpu", 456), 0);
 
 		/* set the scanline update function */
@@ -1338,8 +1349,6 @@ void gb_video_init( running_machine *machine, int mode )
 
 		break;
 	case GB_VIDEO_MGB:
-		gb_lcd.lcd_timer = timer_alloc(machine,  gb_lcd_timer_proc , NULL);
-
 		/* set the scanline update function */
 		update_scanline = gb_update_scanline;
 		/* Initialize part of VRAM. This code must be deleted when we have added the bios dump */
@@ -1369,16 +1378,12 @@ void gb_video_init( running_machine *machine, int mode )
 
 		break;
 	case GB_VIDEO_SGB:
-		gb_lcd.lcd_timer = timer_alloc(machine,  gb_lcd_timer_proc , NULL);
-
 		/* set the scanline update function */
 		update_scanline = sgb_update_scanline;
 
 		break;
 
 	case GB_VIDEO_CGB:
-		gb_lcd.lcd_timer = timer_alloc(machine,  gbc_lcd_timer_proc , NULL);
-
 		/* set the scanline update function */
 		update_scanline = cgb_update_scanline;
 

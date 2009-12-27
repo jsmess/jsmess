@@ -304,13 +304,26 @@ MACHINE_START( gb )
 	/* Allocate the serial timer, and disable it */
 	gb_driver_data.gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
 	timer_enable( gb_driver_data.gb_serial_timer, 0 );
+
+	MACHINE_START_CALL( gb_video );
+}
+
+MACHINE_START( gbc )
+{
+	add_exit_callback(machine, gb_machine_stop);
+
+	/* Allocate the serial timer, and disable it */
+	gb_driver_data.gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
+	timer_enable( gb_driver_data.gb_serial_timer, 0 );
+
+	MACHINE_START_CALL( gbc_video );
 }
 
 MACHINE_RESET( gb )
 {
 	gb_init(machine);
 
-	gb_video_init( machine, GB_VIDEO_DMG );
+	gb_video_reset( machine, GB_VIDEO_DMG );
 
 	gb_rom16_0000( machine, gb_driver_data.ROMMap[gb_driver_data.ROMBank00] );
 
@@ -324,7 +337,7 @@ MACHINE_RESET( sgb )
 {
 	gb_init(machine);
 
-	gb_video_init( machine, GB_VIDEO_SGB );
+	gb_video_reset( machine, GB_VIDEO_SGB );
 
 	gb_init_regs(machine);
 
@@ -359,7 +372,7 @@ MACHINE_RESET( gbpocket )
 {
 	gb_init(machine);
 
-	gb_video_init( machine, GB_VIDEO_MGB );
+	gb_video_reset( machine, GB_VIDEO_MGB );
 
 	gb_init_regs(machine);
 
@@ -380,7 +393,7 @@ MACHINE_RESET( gbc )
 
 	gb_init(machine);
 
-	gb_video_init( machine, GB_VIDEO_CGB );
+	gb_video_reset( machine, GB_VIDEO_CGB );
 
 	gb_init_regs(machine);
 
@@ -2026,12 +2039,21 @@ READ8_HANDLER( gbc_io2_r )
 
  ****************************************************************************/
 
+MACHINE_START( megaduck )
+{
+	/* Allocate the serial timer, and disable it */
+	gb_driver_data.gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
+	timer_enable( gb_driver_data.gb_serial_timer, 0 );
+
+	MACHINE_START_CALL( gb_video );
+}
+
 MACHINE_RESET( megaduck )
 {
 	/* We may have to add some more stuff here, if not then it can be merged back into gb */
 	gb_init(machine);
 
-	gb_video_init( machine, GB_VIDEO_DMG );
+	gb_video_reset( machine, GB_VIDEO_DMG );
 }
 
 /*
