@@ -1851,7 +1851,7 @@ static DEVICE_RESET( wd1770 )
 	for (i = 0; i < 4; i++)
 	{
 		if(w->intf->floppy_drive_tags[i]!=NULL) {
-			const device_config *img;
+			const device_config *img = NULL;
 
 			if (device->owner != NULL)
 				img = device_find_child_by_tag(device->owner, w->intf->floppy_drive_tags[i]);
