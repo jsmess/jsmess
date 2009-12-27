@@ -231,6 +231,14 @@ MACHINE_START( wswan )
 	ws_bios_bank = NULL;
 	system_type = WSWAN;
 	add_exit_callback( machine, wswan_machine_stop );
+	wswan_vdp.timer = timer_alloc( machine, wswan_scanline_interrupt, &wswan_vdp );
+	timer_adjust_periodic( wswan_vdp.timer, ticks_to_attotime( 256, 3072000 ), 0, ticks_to_attotime( 256, 3072000 ) );
+
+	wswan_setup_bios(machine);
+
+	/* Set up RTC timer */
+	if ( rtc.present )
+		timer_pulse(machine,  ATTOTIME_IN_SEC(1), NULL, 0, wswan_rtc_callback );
 }
 
 MACHINE_START( wscolor )
@@ -238,13 +246,19 @@ MACHINE_START( wscolor )
 	ws_bios_bank = NULL;
 	system_type = WSC;
 	add_exit_callback( machine, wswan_machine_stop );
+	wswan_vdp.timer = timer_alloc( machine, wswan_scanline_interrupt, &wswan_vdp );
+	timer_adjust_periodic( wswan_vdp.timer, ticks_to_attotime( 256, 3072000 ), 0, ticks_to_attotime( 256, 3072000 ) );
+
+	wswan_setup_bios(machine);
+
+	/* Set up RTC timer */
+	if ( rtc.present )
+		timer_pulse(machine,  ATTOTIME_IN_SEC(1), NULL, 0, wswan_rtc_callback );
 }
 
 MACHINE_RESET( wswan )
 {
 	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
-
-	wswan_setup_bios(machine);
 
 	/* Intialize ports */
 	memcpy( ws_portram, ws_portram_init, 256 );
@@ -260,8 +274,6 @@ MACHINE_RESET( wswan )
 	wswan_vdp.color_mode = 0;
 	wswan_vdp.colors_16 = 0;
 	wswan_vdp.tile_packed = 0;
-	wswan_vdp.timer = timer_alloc( machine, wswan_scanline_interrupt, &wswan_vdp );
-	timer_adjust_periodic( wswan_vdp.timer, ticks_to_attotime( 256, 3072000 ), 0, ticks_to_attotime( 256, 3072000 ) );
 
 	/* Initialize sound DMA */
 	memset( &sound_dma, 0, sizeof( sound_dma ) );
@@ -283,13 +295,6 @@ MACHINE_RESET( wswan )
 	wswan_bios_disabled = 0;
 	memory_set_bankptr( machine, "bank15", ws_bios_bank );
 //  memory_set_bankptr( machine, 15, ROMMap[(ROMBanks - 1) & (ROMBanks - 1)] );
-
-	/* Set up RTC timer */
-	if ( rtc.present )
-	{
-		timer_pulse(machine,  ATTOTIME_IN_SEC(1), NULL, 0, wswan_rtc_callback );
-	}
-
 }
 
 NVRAM_HANDLER( wswan )

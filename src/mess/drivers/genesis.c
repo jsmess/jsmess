@@ -322,17 +322,21 @@ INPUT_PORTS_END
  *
  *************************************/
 
+static MACHINE_START( ms_megadriv )
+{
+	mess_init_6buttons_pad(machine);
+}
+
 static MACHINE_RESET( ms_megadriv )
 {
 	MACHINE_RESET_CALL( megadriv );
 	MACHINE_RESET_CALL( md_mappers );
-
-	mess_init_6buttons_pad(machine);
 }
 
 static MACHINE_DRIVER_START( ms_megadriv )
 	MDRV_IMPORT_FROM(megadriv)
 
+	MDRV_MACHINE_START( ms_megadriv )
 	MDRV_MACHINE_RESET( ms_megadriv )
 
 	MDRV_IMPORT_FROM( genesis_cartslot )
@@ -341,6 +345,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ms_megadpal )
 	MDRV_IMPORT_FROM(megadpal)
 
+	MDRV_MACHINE_START( ms_megadriv )
 	MDRV_MACHINE_RESET( ms_megadriv )
 
 	MDRV_IMPORT_FROM( genesis_cartslot )
@@ -349,6 +354,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ms_megdsvp )
 	MDRV_IMPORT_FROM(megdsvp)
 
+	MDRV_MACHINE_START( ms_megadriv )
 	MDRV_MACHINE_RESET( ms_megadriv )
 
 	MDRV_IMPORT_FROM( genesis_cartslot )

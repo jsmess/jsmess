@@ -295,14 +295,12 @@ static READ32_HANDLER( jaguar_eeprom_cs )
 
 static READ32_HANDLER( gpuctrl_r )
 {
-	if (protection_check == 1)
-	{
-		protection_check++;
-		jaguar_gpu_ram[0] = 0x3d0dead;
-		return 0x80000000;
-	}
-	else
-		return jaguargpu_ctrl_r(cputag_get_cpu(space->machine, "gpu"), offset);
+	UINT32 result = jaguargpu_ctrl_r(cputag_get_cpu(space->machine, "gpu"), offset);
+	if (protection_check != 1) return result;
+
+	protection_check++;
+	jaguar_gpu_ram[0] = 0x3d0dead;
+	return 0x80000000;
 }
 
 
@@ -631,6 +629,8 @@ static MACHINE_DRIVER_START( jaguar )
 
 	MDRV_MACHINE_RESET(jaguar)
 	MDRV_NVRAM_HANDLER(jaguar)
+
+	MDRV_TIMER_ADD("serial_timer", jaguar_serial_callback)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
