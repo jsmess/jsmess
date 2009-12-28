@@ -3,8 +3,32 @@
 #include "includes/3do.h"
 
 typedef struct {
-	UINT32	revision;
-	UINT32	memory_configuration;
+	UINT32	revision;		/* 03300000 */
+	UINT32	msysbits;		/* 03300004 */
+	UINT32	mctl;			/* 03300008 */
+	UINT32	sltime;			/* 0330000c */
+	UINT32	abortbits;		/* 03300020 */
+	UINT32	privbits;		/* 03300024 */
+	UINT32	statbits;		/* 03300028 */
+	UINT32	diag;			/* 03300040 */
+
+	UINT32	ccobctl0;		/* 03300110 */
+	UINT32	ppmpc;			/* 03300120 */
+
+	UINT32	regctl0;		/* 03300130 */
+	UINT32	regctl1;		/* 03300134 */
+	UINT32	regctl2;		/* 03300138 */
+	UINT32	regctl3;		/* 0330013c */
+	UINT32	xyposh;			/* 03300140 */
+	UINT32	xyposl;			/* 03300144 */
+	UINT32	linedxyh;		/* 03300148 */
+	UINT32	linedxyl;		/* 0330014c */
+	UINT32	dxyh;			/* 03300150 */
+	UINT32	dxyl;			/* 03300154 */
+	UINT32	ddxyh;			/* 03300158 */
+	UINT32	ddxyl;			/* 0330015c */
+
+	UINT32	pip[16];		/* 03300180-033001bc (W); 03300180-033001fc (R)*/
 } MADAM;
 
 
@@ -125,10 +149,82 @@ WRITE32_HANDLER( _3do_vram_sport_w ) {
 READ32_HANDLER( _3do_madam_r ) {
 	logerror( "%08X: MADAM read offset = %08X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset );
 	switch( offset ) {
-	case 0:		/* 03300000 - Revision */
+	case 0x0000/4:		/* 03300000 - Revision */
 		return madam.revision;
-	case 1:		/* 03300004 - Memory configuration */
-		return madam.memory_configuration;
+	case 0x0008/4:
+		return madam.mctl;
+	case 0x000c/4:
+		return madam.sltime;
+	case 0x0020/4:
+		return madam.abortbits;
+	case 0x0024/4:
+		return madam.privbits;
+	case 0x0028/4:
+		return madam.statbits;
+	case 0x0040/4:
+		return madam.diag;
+	case 0x0110/4:
+		return madam.ccobctl0;
+	case 0x0120/4:
+		return madam.ppmpc;
+	case 0x0130/4:
+		return madam.regctl0;
+	case 0x0134/4:
+		return madam.regctl1;
+	case 0x0138/4:
+		return madam.regctl2;
+	case 0x013c/4:
+		return madam.regctl3;
+	case 0x0140/4:
+		return madam.xyposh;
+	case 0x0144/4:
+		return madam.xyposl;
+	case 0x0148/4:
+		return madam.linedxyh;
+	case 0x014c/4:
+		return madam.linedxyl;
+	case 0x0150/4:
+		return madam.dxyh;
+	case 0x0154/4:
+		return madam.dxyl;
+	case 0x0158/4:
+		return madam.ddxyh;
+	case 0x015c/4:
+		return madam.ddxyl;
+	case 0x0180/4:
+	case 0x0188/4:
+	case 0x0190/4:
+	case 0x0198/4:
+	case 0x01a0/4:
+	case 0x01a8/4:
+	case 0x01b0/4:
+	case 0x01b8/4:
+	case 0x01c0/4:
+	case 0x01c8/4:
+	case 0x01d0/4:
+	case 0x01d8/4:
+	case 0x01e0/4:
+	case 0x01e8/4:
+	case 0x01f0/4:
+	case 0x01f8/4:
+		return madam.pip[(offset/2) & 0x0f] & 0xffff;
+	case 0x0184/4:
+	case 0x018c/4:
+	case 0x0194/4:
+	case 0x019c/4:
+	case 0x01a4/4:
+	case 0x01ac/4:
+	case 0x01b4/4:
+	case 0x01bc/4:
+	case 0x01c4/4:
+	case 0x01cc/4:
+	case 0x01d4/4:
+	case 0x01dc/4:
+	case 0x01e4/4:
+	case 0x01ec/4:
+	case 0x01f4/4:
+	case 0x01fc/4:
+		return madam.pip[(offset/2) & 0x0f] >> 16;
 	}
 	return 0;
 }
@@ -137,13 +233,96 @@ READ32_HANDLER( _3do_madam_r ) {
 WRITE32_HANDLER( _3do_madam_w ) {
 	logerror( "%08X: MADAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset, data, mem_mask );
 	switch( offset ) {
-	case 0x01:	/* 03300004 - Memory configuration 29 = 2MB DRAM, 1MB VRAM */
-		madam.memory_configuration = data;
+	case 0x0004/4:	/* 03300004 - Memory configuration 29 = 2MB DRAM, 1MB VRAM */
+		madam.msysbits = data;
 		break;
-	case 0x03:	/* 0330000C - ?? during boot first value written is 00178906 */
+	case 0x0008/4:
+		madam.mctl = data;
 		break;
-	case 0x08:	/* 03300020 - ?? during boot 00000000 is written here */
+	case 0x000c/4:
+		madam.sltime = data;
 		break;
+	case 0x0020/4:
+		madam.abortbits = data;
+		break;
+	case 0x0024/4:
+		madam.privbits = data;
+		break;
+	case 0x0028/4:
+		madam.statbits = data;
+	case 0x0040/4:
+		madam.diag = 1;
+		break;
+
+	/* CEL */
+	case 0x0100/4:	/* 03300100 - SPRSTRT - Start the CEL engine (W) */
+	case 0x0104/4:	/* 03300104 - SPRSTOP - Stop the CEL engine (W) */
+	case 0x0108/4:	/* 03300108 - SPRCNTU - Continue the CEL engine (W) */
+	case 0x010c/4:	/* 0330010c - SPRPAUS - Pause the the CEL engine (W) */
+		break;
+	case 0x0110/4:	/* 03300110 - CCOBCTL0 - CCoB control (RW) */
+		madam.ccobctl0 = data;
+		break;
+	case 0x0129/4:	/* 03300120 - PPMPC (RW) */
+		madam.ppmpc = data;
+		break;
+
+	/* Regis */
+	case 0x0130/4:
+		madam.regctl0 = data;
+		break;
+	case 0x0134/4:
+		madam.regctl1 = data;
+		break;
+	case 0x0138/4:
+		madam.regctl2 = data;
+		break;
+	case 0x013c/4:
+		madam.regctl3 = data;
+		break;
+	case 0x0140/4:
+		madam.xyposh = data;
+		break;
+	case 0x0144/4:
+		madam.xyposl = data;
+		break;
+	case 0x0148/4:
+		madam.linedxyh = data;
+		break;
+	case 0x014c/4:
+		madam.linedxyl = data;
+		break;
+	case 0x0150/4:
+		madam.dxyh = data;
+		break;
+	case 0x0154/4:
+		madam.dxyl = data;
+		break;
+	case 0x0158/4:
+		madam.ddxyh = data;
+		break;
+	case 0x015c/4:
+		madam.ddxyl = data;
+		break;
+
+	/* Pip */
+	case 0x0180/4:
+	case 0x0184/4:
+	case 0x0188/4:
+	case 0x018c/4:
+	case 0x0190/4:
+	case 0x0194/4:
+	case 0x0198/4:
+	case 0x019c/4:
+	case 0x01a0/4:
+	case 0x01a4/4:
+	case 0x01a8/4:
+	case 0x01ac/4:
+	case 0x01b0/4:
+	case 0x01b4/4:
+	case 0x01b8/4:
+	case 0x01bc/4:
+		madam.pip[offset & 0x0f] = data;
 	}
 }
 
@@ -151,7 +330,7 @@ WRITE32_HANDLER( _3do_madam_w ) {
 void _3do_madam_init( void )
 {
 	memset( &madam, 0, sizeof(MADAM) );
-	madam.revision = 0x00000001;
+	madam.revision = 0x01020000;
 }
 
 
