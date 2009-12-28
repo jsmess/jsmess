@@ -1,11 +1,11 @@
 /***************************************************************************
 
-    mips3.h
+    rsp.h
 
     Interface file for the universal machine language-based
     Reality Signal Processor (RSP) emulator.
 
-    Copyright the MESS etam
+    Copyright the MESS team
     Released for general non-commercial use under the MAME license
     Visit http://mamedev.org for licensing and usage restrictions.
 
@@ -164,6 +164,11 @@ typedef struct
 			INT16 mid;
 			INT16 high;
 		} h;
+		struct
+		{
+			INT32 zl;
+			INT32 mh;
+		} w;
 #else
 		struct
 		{
@@ -172,6 +177,11 @@ typedef struct
 			INT16 low;
 			INT16 z;
 		} h;
+		struct
+		{
+			INT32 mh;
+			INT32 zl;
+		} w;
 #endif
 	};
 } ACCUMULATOR;
