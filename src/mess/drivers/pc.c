@@ -1458,6 +1458,12 @@ static const floppy_config ibmpc_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+static const kb_keytronic_interface pc_keytronic_intf =
+{
+	DEVCB_MEMORY_HANDLER("maincpu", IO, ibm5150_kb_set_clock_signal),
+	DEVCB_MEMORY_HANDLER("maincpu", IO, ibm5150_kb_set_data_signal),
+};
+
 
 #define MDRV_CPU_PC(mem, port, type, clock, vblankfunc)	\
 	MDRV_CPU_ADD("maincpu", type, clock)				\
@@ -1546,7 +1552,7 @@ static MACHINE_DRIVER_START( pcmda )
 #endif
 
 	/* keyboard */
-	MDRV_IMPORT_FROM( kb_keytronic )
+	MDRV_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
 
 	/* printer */
 	MDRV_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -1615,7 +1621,7 @@ static MACHINE_DRIVER_START( pcherc )
 #endif
 
 	/* keyboard */
-	MDRV_IMPORT_FROM( kb_keytronic )
+	MDRV_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
 
 	/* printer */
 	MDRV_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -1694,7 +1700,7 @@ static MACHINE_DRIVER_START( ibm5150 )
 #endif
 
 	/* keyboard */
-	MDRV_IMPORT_FROM( kb_keytronic )
+	MDRV_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
 
 	/* printer */
 	MDRV_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -1760,7 +1766,7 @@ static MACHINE_DRIVER_START( pccga )
 #endif
 
 	/* keyboard */
-	MDRV_IMPORT_FROM( kb_keytronic )
+	MDRV_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
 
 	/* printer */
 	MDRV_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -1908,7 +1914,7 @@ static MACHINE_DRIVER_START( ibm5160 )
 #endif
 
 	/* keyboard */
-	MDRV_IMPORT_FROM( kb_keytronic )
+	MDRV_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
 
 	/* printer */
 	MDRV_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -2499,10 +2505,6 @@ ROM_START( ibm5150 )
 	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
 	ROM_REGION(0x2000,"gfx1", 0)
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
-
-	/* 8051 keytronic KB3270/PC keyboard controller */
-	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
-	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
 #ifdef UNUSED_DEFINITION
@@ -2529,10 +2531,6 @@ ROM_START( bw230 )
 	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
 	ROM_REGION(0x2000,"gfx1", 0)
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
-
-	/* 8051 keytronic KB3270/PC keyboard controller */
-	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
-	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
 
@@ -2544,10 +2542,6 @@ ROM_START( pcmda )
 	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
 	ROM_REGION(0x08100,"gfx1", 0)
 	ROM_LOAD("5788005.u33", 0x00000, 0x02000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
-
-	/* 8051 keytronic KB3270/PC keyboard controller */
-	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
-	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
 
@@ -2557,10 +2551,6 @@ ROM_START( pcherc )
 	ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
 	ROM_REGION(0x1000,"gfx1", 0)
 	ROM_LOAD("um2301.bin",  0x00000, 0x1000, CRC(0827bdac) SHA1(15f1aceeee8b31f0d860ff420643e3c7f29b5ffc))
-
-	/* 8051 keytronic KB3270/PC keyboard controller */
-	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
-	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
 
@@ -2573,10 +2563,6 @@ ROM_START( pc )
 	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
 	ROM_REGION(0x2000,"gfx1", 0)
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
-
-	/* 8051 keytronic KB3270/PC keyboard controller */
-	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
-	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
 
@@ -2818,10 +2804,6 @@ ROM_START( ibm5160 )
 //  ROM_REGION(0x4000,"gfx2", 0)
 //      ROM_LOAD("1504161.u11", 0x00000, 0x2000, CRC(d9246cf5) SHA1(2eaed495893a4e6649b04d10dada7b5ef4abd140)) /* silkscreen: "AMI 8613MAJ // 9591-041 // S2364B // 1504161 // PHILIPPINES" - Purpose: Pixels 0 thru 7 of built-in 3270 terminal font*/
 //      ROM_LOAD("1504162.u26", 0x02000, 0x2000, CRC(59e1dc32) SHA1(337b5cced203345a5acfb02532d6b5f526902ee7)) /* silkscreen: "AMI 8607MAH // 9591-042 // S2364B // 1504162 // PHILIPPINES" - Purpose: Pixel 8 of built-in 3270 terminal font*/
-
-	/* 8051 keytronic KB3270/PC keyboard controller */
-	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
-	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
 
@@ -2961,11 +2943,8 @@ ROM_START( dgone )
 	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
 	ROM_REGION(0x2000,"gfx1", 0)
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
-
-	/* 8051 keytronic keyboard controller */
-	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
-	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
+
 
 /***************************************************************************
 

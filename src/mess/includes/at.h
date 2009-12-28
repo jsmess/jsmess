@@ -40,6 +40,8 @@ MACHINE_DRIVER_EXTERN( at_kbdc8042 );
 
 READ8_HANDLER(at_kbdc8042_r);
 WRITE8_HANDLER(at_kbdc8042_w);
+WRITE8_HANDLER( at_kbdc8042_set_clock_signal );
+WRITE8_HANDLER( at_kbdc8042_set_data_signal );
 
 DRIVER_INIT( atcga );
 DRIVER_INIT( atega );

@@ -36,8 +36,6 @@ struct _pc_state
 	UINT8					ppi_data_signal;
 	UINT8					ppi_shift_register;
 	UINT8					ppi_shift_enable;
-	write8_space_func		ppi_clock_callback;
-	write8_space_func		ppi_data_callback;
 };
 
 /*----------- defined in machine/pc.c -----------*/
@@ -64,6 +62,9 @@ READ8_HANDLER( pcjr_nmi_enable_r );
 
 READ8_HANDLER( pc_page_r );
 WRITE8_HANDLER( pc_page_w );
+
+WRITE8_HANDLER( ibm5150_kb_set_clock_signal );
+WRITE8_HANDLER( ibm5150_kb_set_data_signal );
 
 DRIVER_INIT( ibm5150 );
 DRIVER_INIT( pccga );

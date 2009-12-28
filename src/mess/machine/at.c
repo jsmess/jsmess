@@ -484,8 +484,6 @@ static struct {
 	UINT8					offset1;
 	UINT8					clock_signal;
 	UINT8					data_signal;
-	write8_space_func		clock_callback;
-	write8_space_func		data_callback;
 } at_kbdc8042;
 
 
@@ -505,6 +503,7 @@ static READ8_HANDLER( at_kbdc8042_p2_r )
 static WRITE8_HANDLER( at_kbdc8042_p2_w )
 {
 	at_state *st = space->machine->driver_data;
+	const device_config *keyboard = devtag_get_device(space->machine, "keyboard");
 
 	logerror("%04x: writing $%02x to P2\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), data );
 
@@ -519,8 +518,8 @@ static WRITE8_HANDLER( at_kbdc8042_p2_w )
 	at_kbdc8042.clock_signal = ( data & 0x40 ) ? 0 : 1;
 	at_kbdc8042.data_signal = ( data & 0x80 ) ? 1 : 0;
 
-	at_kbdc8042.data_callback( space, 0, at_kbdc8042.data_signal );
-	at_kbdc8042.clock_callback( space, 0, at_kbdc8042.clock_signal );
+	kb_keytronic_data_w(keyboard, at_kbdc8042.data_signal);
+	kb_keytronic_clock_w(keyboard, at_kbdc8042.clock_signal);
 }
 
 
@@ -536,23 +535,15 @@ static READ8_HANDLER( at_kbdc8042_t1_r )
 }
 
 
-static WRITE8_HANDLER( at_kbdc8042_set_clock_signal )
+WRITE8_HANDLER( at_kbdc8042_set_clock_signal )
 {
 	at_kbdc8042.clock_signal = data;
 }
 
 
-static WRITE8_HANDLER( at_kbdc8042_set_data_signal )
+WRITE8_HANDLER( at_kbdc8042_set_data_signal )
 {
 	at_kbdc8042.data_signal = data;
-}
-
-
-static void at_kbdc8042_set_keyboard_interface( running_machine *machine, write8_space_func clock_cb, write8_space_func data_cb )
-{
-	at_kbdc8042.offset1 = 0xFF;
-	at_kbdc8042.clock_callback = clock_cb;
-	at_kbdc8042.data_callback = data_cb;
 }
 
 
@@ -672,9 +663,7 @@ DRIVER_INIT( atcga )
 	};
 	init_at_common(machine, &at8042);
 
-	/* Attach keyboard to the keyboard controller */
-	at_kbdc8042_set_keyboard_interface( machine, kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
-	kb_keytronic_set_host_interface( machine, at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
+	at_kbdc8042.offset1 = 0xff;
 }
 
 
@@ -696,9 +685,7 @@ DRIVER_INIT( atega )
 		*dst++ = *src--;
 	}
 
-	/* Attach keyboard to the keyboard controller */
-	at_kbdc8042_set_keyboard_interface( machine, kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
-	kb_keytronic_set_host_interface( machine, at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
+	at_kbdc8042.offset1 = 0xff;
 }
 
 
@@ -712,9 +699,7 @@ DRIVER_INIT( at386 )
 	init_at_common(machine, &at8042);
 	pc_vga_init(machine, &vga_interface, NULL);
 
-	/* Attach keyboard to the keyboard controller */
-	at_kbdc8042_set_keyboard_interface( machine, kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
-	kb_keytronic_set_host_interface( machine, at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
+	at_kbdc8042.offset1 = 0xff;
 }
 
 
@@ -736,9 +721,7 @@ DRIVER_INIT( at_vga )
 	pc_turbo_setup(machine, machine->firstcpu, "DSW2", 0x02, 4.77/12, 1);
 	pc_vga_init(machine, &vga_interface, NULL);
 
-	/* Attach keyboard to the keyboard controller */
-	at_kbdc8042_set_keyboard_interface( machine, kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
-	kb_keytronic_set_host_interface( machine, at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
+	at_kbdc8042.offset1 = 0xff;
 }
 
 
@@ -753,9 +736,7 @@ DRIVER_INIT( ps2m30286 )
 	pc_turbo_setup(machine, machine->firstcpu, "DSW2", 0x02, 4.77/12, 1);
 	pc_vga_init(machine, &vga_interface, NULL);
 
-	/* Attach keyboard to the keyboard controller */
-	at_kbdc8042_set_keyboard_interface( machine, kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
-	kb_keytronic_set_host_interface( machine, at_kbdc8042_set_clock_signal, at_kbdc8042_set_data_signal );
+	at_kbdc8042.offset1 = 0xff;
 }
 
 
@@ -776,7 +757,7 @@ MACHINE_START( at )
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), at_irq_callback);
 	/* FDC/HDC hardware */
 	pc_fdc_init( machine, &fdc_interface );
-	pc_hdc_setup(machine, pc_set_irq_line);	
+	pc_hdc_setup(machine, pc_set_irq_line);
 }
 
 
@@ -791,6 +772,6 @@ MACHINE_RESET( at )
 	st->dma8237_2 = devtag_get_device(machine, "dma8237_2");
 	st->pit8254 = devtag_get_device(machine, "pit8254");
 	pc_mouse_set_serial_port( devtag_get_device(machine, "ns16450_0") );
-	pc_hdc_set_dma8237_device( st->dma8237_1 );	
+	pc_hdc_set_dma8237_device( st->dma8237_1 );
 }
 

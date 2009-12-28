@@ -1,18 +1,54 @@
-#ifndef __KB_KEYTRO_H_
-#define __KB_KEYTRO_H_
+/***************************************************************************
 
-#define KEYTRONIC_KB3270PC_CPU	"kb_kb3270_pc"
+    Keytronic Keyboard
 
-WRITE8_HANDLER( kb_keytronic_set_clock_signal );
-WRITE8_HANDLER( kb_keytronic_set_data_signal );
+***************************************************************************/
 
-/* The code expects kb_keytronic_set_host_interface to be called at init or reset time to
-   initialize the internal callbacks.
- */
-void kb_keytronic_set_host_interface( running_machine *machine, write8_space_func clock_cb, write8_space_func data_cb );
+#ifndef __KB_KEYTRO_H__
+#define __KB_KEYTRO_H__
+
+#include "devcb.h"
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _kb_keytronic_interface kb_keytronic_interface;
+struct _kb_keytronic_interface
+{
+	devcb_write_line out_clock_func;
+	devcb_write_line out_data_func;
+};
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+extern DEVICE_GET_INFO( kb_keytr );
+
+WRITE_LINE_DEVICE_HANDLER( kb_keytronic_clock_w );
+WRITE_LINE_DEVICE_HANDLER( kb_keytronic_data_w );
+
+
+/***************************************************************************
+    INPUT PORTS
+***************************************************************************/
 
 INPUT_PORTS_EXTERN( kb_keytronic_pc );
 INPUT_PORTS_EXTERN( kb_keytronic_at );
-MACHINE_DRIVER_EXTERN( kb_keytronic );
 
-#endif  /* __KB_KEYTRO_H_ */
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define KB_KEYTRONIC DEVICE_GET_INFO_NAME(kb_keytr)
+
+#define MDRV_KB_KEYTRONIC_ADD(_tag, _interface) \
+	MDRV_DEVICE_ADD(_tag, KB_KEYTRONIC, 0) \
+	MDRV_DEVICE_CONFIG(_interface)
+
+
+#endif  /* __KB_KEYTRO_H__ */

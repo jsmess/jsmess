@@ -746,6 +746,8 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_porta_w )
 static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portb_w )
 {
 	pc_state *st = device->machine->driver_data;
+	const device_config *keyboard = devtag_get_device(device->machine, "keyboard");
+
 	/* KB controller port B */
 	st->ppi_portb = data;
 	st->ppi_portc_switch_high = data & 0x08;
@@ -757,8 +759,7 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portb_w )
 	cassette_change_state( devtag_get_device(device->machine, "cassette"), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	st->ppi_clock_signal = ( st->ppi_keyb_clock ) ? 1 : 0;
-
-	st->ppi_clock_callback( cpu_get_address_space( device->machine->firstcpu, ADDRESS_SPACE_PROGRAM ), 0, st->ppi_clock_signal );
+	kb_keytronic_clock_w(keyboard, st->ppi_clock_signal);
 
 	/* If PB7 is set clear the shift register and reset the IRQ line */
 	if ( st->ppi_keyboard_clear )
@@ -779,9 +780,11 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portc_w )
 }
 
 
-static WRITE8_HANDLER( ibm5150_kb_set_clock_signal )
+WRITE8_HANDLER( ibm5150_kb_set_clock_signal )
 {
 	pc_state *st = space->machine->driver_data;
+	const device_config *keyboard = devtag_get_device(space->machine, "keyboard");
+
 	if ( st->ppi_clock_signal != data )
 	{
 		if ( st->ppi_keyb_clock && st->ppi_shift_enable )
@@ -800,33 +803,25 @@ static WRITE8_HANDLER( ibm5150_kb_set_clock_signal )
 						pic8259_set_irq_line(st->pic8259, 1, 1);
 						st->ppi_shift_enable = 0;
 						st->ppi_clock_signal = 0;
-						st->ppi_clock_callback( space, 0, 0 );
+						kb_keytronic_clock_w(keyboard, st->ppi_clock_signal);
 					}
 				}
 			}
 		}
 	}
 
-	st->ppi_clock_callback( space, 0, st->ppi_clock_signal );
+	kb_keytronic_clock_w(keyboard, st->ppi_clock_signal);
 }
 
 
-static WRITE8_HANDLER( ibm5150_kb_set_data_signal )
+WRITE8_HANDLER( ibm5150_kb_set_data_signal )
 {
 	pc_state *st = space->machine->driver_data;
+	const device_config *keyboard = devtag_get_device(space->machine, "keyboard");
 
 	st->ppi_data_signal = data;
 
-	st->ppi_data_callback( space, 0, st->ppi_data_signal );
-}
-
-
-static void ibm5150_set_keyboard_interface( running_machine *machine, write8_space_func clock_cb, write8_space_func data_cb )
-{
-	pc_state *st = machine->driver_data;
-
-	st->ppi_clock_callback = clock_cb;
-	st->ppi_data_callback = data_cb;
+	kb_keytronic_data_w(keyboard, st->ppi_data_signal);
 }
 
 
@@ -909,6 +904,8 @@ static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
 static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 {
 	pc_state *st = device->machine->driver_data;
+	const device_config *keyboard = devtag_get_device(device->machine, "keyboard");
+
 	/* PPI controller port B*/
 	st->ppi_portb = data;
 	st->ppi_portc_switch_high = data & 0x08;
@@ -918,7 +915,7 @@ static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 	pc_speaker_set_spkrdata( device->machine, data & 0x02 );
 
 	st->ppi_clock_signal = ( st->ppi_keyb_clock ) ? 1 : 0;
-	st->ppi_clock_callback( cpu_get_address_space( device->machine->firstcpu, ADDRESS_SPACE_PROGRAM ), 0, st->ppi_clock_signal );
+	kb_keytronic_clock_w(keyboard, st->ppi_clock_signal);
 
 	/* If PB7 is set clear the shift register and reset the IRQ line */
 	if ( st->ppi_keyboard_clear )
@@ -1166,10 +1163,6 @@ DRIVER_INIT( ibm5150 )
 {
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
 	pc_rtc_init(machine);
-
-	/* Attach keyboard to the keyboard controller */
-	ibm5150_set_keyboard_interface( machine, kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
-	kb_keytronic_set_host_interface( machine, ibm5150_kb_set_clock_signal, ibm5150_kb_set_data_signal );
 }
 
 
@@ -1177,10 +1170,6 @@ DRIVER_INIT( pccga )
 {
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
 	pc_rtc_init(machine);
-
-	/* Attach keyboard to the keyboard controller */
-	ibm5150_set_keyboard_interface( machine, kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
-	kb_keytronic_set_host_interface( machine, ibm5150_kb_set_clock_signal, ibm5150_kb_set_data_signal );
 }
 
 
@@ -1188,10 +1177,6 @@ DRIVER_INIT( bondwell )
 {
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
 	pc_turbo_setup(machine, machine->firstcpu, "DSW2", 0x02, 4.77/12, 1);
-
-	/* Attach keyboard to the keyboard controller */
-	ibm5150_set_keyboard_interface( machine, kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
-	kb_keytronic_set_host_interface( machine, ibm5150_kb_set_clock_signal, ibm5150_kb_set_data_signal );
 }
 
 DRIVER_INIT( pcmda )
@@ -1365,7 +1350,7 @@ MACHINE_START( pcjr )
 {
 	pc_fdc_init( machine, &pcjr_fdc_interface_nc );
 	pcjr_keyb.keyb_signal_timer = timer_alloc(machine,  pcjr_keyb_signal_callback, NULL );
-	pc_int_delay_timer = timer_alloc(machine,  pcjr_delayed_pic8259_irq, NULL );	
+	pc_int_delay_timer = timer_alloc(machine,  pcjr_delayed_pic8259_irq, NULL );
 }
 
 

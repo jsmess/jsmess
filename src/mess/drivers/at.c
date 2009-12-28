@@ -97,7 +97,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( at386_map, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)							 
+	ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x000a0000, 0x000bffff) AM_NOP
 //  AM_RANGE(0x000b8000, 0x000bffff) AM_READWRITE(SMH_RAM, pc_video_videoram32_w) AM_BASE((UINT32 **) &videoram) AM_SIZE(&videoram_size)
@@ -456,6 +456,13 @@ static const floppy_config ibmat_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+static const kb_keytronic_interface at_keytronic_intf =
+{
+	DEVCB_MEMORY_HANDLER("kbdc8042", IO, at_kbdc8042_set_clock_signal),
+	DEVCB_MEMORY_HANDLER("kbdc8042", IO, at_kbdc8042_set_data_signal),
+};
+
+
 static MACHINE_DRIVER_START( ibm5170 )
 	MDRV_DRIVER_DATA(at_state)
 	/* basic machine hardware */
@@ -502,7 +509,7 @@ static MACHINE_DRIVER_START( ibm5170 )
 #endif
 	MDRV_IMPORT_FROM( at_kbdc8042 )
 
-	MDRV_IMPORT_FROM( kb_keytronic )
+	MDRV_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 
@@ -572,7 +579,7 @@ static MACHINE_DRIVER_START( ibm5162 )
 
 	MDRV_IMPORT_FROM( at_kbdc8042 )
 
-	MDRV_IMPORT_FROM( kb_keytronic )
+	MDRV_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 
@@ -644,7 +651,7 @@ static MACHINE_DRIVER_START( ps2m30286 )
 
 	MDRV_IMPORT_FROM( at_kbdc8042 )
 
-	MDRV_IMPORT_FROM( kb_keytronic )
+	MDRV_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 
@@ -718,7 +725,7 @@ static MACHINE_DRIVER_START( atvga )
 
 	MDRV_IMPORT_FROM( at_kbdc8042 )
 
-	MDRV_IMPORT_FROM( kb_keytronic )
+	MDRV_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 
@@ -793,7 +800,7 @@ static MACHINE_DRIVER_START( at386 )
 
 	MDRV_IMPORT_FROM( at_kbdc8042 )
 
-	MDRV_IMPORT_FROM( kb_keytronic )
+	MDRV_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -892,10 +899,6 @@ ROM_START( ibm5170 )
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 
-	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
-	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
-	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
-
 	/* Mainboard PALS */
 	ROM_REGION( 0x2000, "pals", 0 )
 	ROM_LOAD("1501824.pal14l4.u87", 0x0000, 0x0800, NO_DUMP) /* MMI 1501824 717750 // (C)1983 IBM(M) */
@@ -934,10 +937,6 @@ ROM_START( ibm5170a )
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 
-	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
-	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
-	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
-
 	/* Mainboard PALS */
 	ROM_REGION( 0x2000, "pals", 0 )
 	ROM_LOAD("1501824.pal14l4.u87", 0x0000, 0x0800, NO_DUMP) /* MMI 1501824 717750 // (C)1983 IBM(M) */
@@ -967,10 +966,6 @@ ROM_START( ibm5162 ) //MB p/n 62x1168
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 
-	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
-	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
-	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
-
 	/* Mainboard PALS */
 	ROM_REGION( 0x2000, "pals", 0 )
 	ROM_LOAD("59x7599.pal20l8.u27", 0x0000, 0x0800, NO_DUMP) /* MMI PAL20L8ACN5 8631 // N59X7599 IBM (C)85 K3 */
@@ -997,10 +992,6 @@ ROM_START( i8530286 )
 	/* 8042 keyboard controller */
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
-
-	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
-	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
-	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
 
@@ -1021,10 +1012,6 @@ ROM_START( at )
 	/* 8042 keyboard controller */
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
-
-	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
-	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
-	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
 
@@ -1040,10 +1027,6 @@ ROM_START( atvga )
 	/* 8042 keyboard controller */
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
-
-	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
-	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
-	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
 
@@ -1064,10 +1047,6 @@ ROM_START( neat )
 	/* 8042 keyboard controller */
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
-
-	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
-	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
-	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
 
@@ -1081,10 +1060,6 @@ ROM_START( at386 )
 	/* 8042 keyboard controller */
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
-
-	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
-	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
-	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
 
@@ -1104,10 +1079,6 @@ ROM_START( at486 )
 	/* 8042 keyboard controller */
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
-
-	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
-	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
-	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
 
@@ -1120,11 +1091,8 @@ ROM_START( at586 )
 	/* 8042 keyboard controller */
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
-
-	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
-	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
-	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
+
 
 /***************************************************************************
 
