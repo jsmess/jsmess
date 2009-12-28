@@ -791,5 +791,6 @@ MACHINE_RESET( at )
 	st->dma8237_2 = devtag_get_device(machine, "dma8237_2");
 	st->pit8254 = devtag_get_device(machine, "pit8254");
 	pc_mouse_set_serial_port( devtag_get_device(machine, "ns16450_0") );
+	pc_hdc_set_dma8237_device( st->dma8237_1 );	
 }
 
