@@ -1467,6 +1467,38 @@ static const floppy_config ibmpc_floppy_config =
 	MDRV_CPU_CONFIG(i86_address_mask)
 
 
+/* F4 Character Displayer */
+static const gfx_layout pc_16_charlayout =
+{
+	8, 16,					/* 8 x 16 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 2048*8, 2049*8, 2050*8, 2051*8, 2052*8, 2053*8, 2054*8, 2055*8 },
+	8*8					/* every char takes 2 x 8 bytes */
+};
+
+static const gfx_layout pc_8_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	512,					/* 512 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( pcmda )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout, 1, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0x1000, pc_8_charlayout, 1, 1 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( pcmda )
 	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
@@ -1495,6 +1527,7 @@ static MACHINE_DRIVER_START( pcmda )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_mda )
+	MDRV_GFXDECODE(pcmda)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1533,6 +1566,10 @@ static MACHINE_DRIVER_START( pcmda )
 MACHINE_DRIVER_END
 
 
+static GFXDECODE_START( pcherc )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout, 1, 1 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( pcherc )
 	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
@@ -1559,6 +1596,7 @@ static MACHINE_DRIVER_START( pcherc )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_hercules )
+	MDRV_GFXDECODE(pcherc)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1604,6 +1642,11 @@ static const cassette_config ibm5150_cassette_config =
 	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
 
+static GFXDECODE_START( ibm5150 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout, 3, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0x1000, pc_8_charlayout, 3, 1 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( ibm5150 )
 	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
@@ -1632,6 +1675,7 @@ static MACHINE_DRIVER_START( ibm5150 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
+	MDRV_GFXDECODE(ibm5150)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1697,6 +1741,7 @@ static MACHINE_DRIVER_START( pccga )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
+	MDRV_GFXDECODE(ibm5150)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1735,6 +1780,37 @@ static MACHINE_DRIVER_START( pccga )
 MACHINE_DRIVER_END
 
 
+static const gfx_layout europc_8_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static const gfx_layout europc_16_charlayout =
+{
+	8, 16,					/* 8 x 16 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( europc )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, europc_8_charlayout, 3, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0x0800, europc_16_charlayout, 3, 1 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( europc )
 	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
@@ -1758,6 +1834,7 @@ static MACHINE_DRIVER_START( europc )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_aga )
+	MDRV_GFXDECODE(europc)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1812,6 +1889,7 @@ static MACHINE_DRIVER_START( ibm5160 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
+	MDRV_GFXDECODE(ibm5150)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1850,6 +1928,23 @@ static MACHINE_DRIVER_START( ibm5160 )
 MACHINE_DRIVER_END
 
 
+static const gfx_layout pc200_charlayout =
+{
+	8, 16,					/* 8 x 16 characters */
+	2048,					/* 2048 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( pc200 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, pc200_charlayout, 3, 1 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( pc200 )
 	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
@@ -1873,6 +1968,7 @@ static MACHINE_DRIVER_START( pc200 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pc200 )
+	MDRV_GFXDECODE(pc200)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1898,6 +1994,23 @@ MACHINE_DRIVER_END
 
 
 
+
+static const gfx_layout pc1512_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	1024,					/* 1024 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( pc1512 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, pc1512_charlayout, 3, 1 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( ppc512 )
 	MDRV_DRIVER_DATA(pc_state)
@@ -1926,6 +2039,7 @@ static MACHINE_DRIVER_START( ppc512 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pc200 )
+	MDRV_GFXDECODE(pc200)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1982,6 +2096,7 @@ static MACHINE_DRIVER_START( pc1512 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pc1512 )
+	MDRV_GFXDECODE(pc1512)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2031,6 +2146,7 @@ static MACHINE_DRIVER_START( pc1640 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_ega )
+	MDRV_GFXDECODE(pc1512)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2139,6 +2255,7 @@ static MACHINE_DRIVER_START( t1000hx )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_t1000 )
+	MDRV_GFXDECODE(europc)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2188,6 +2305,7 @@ static MACHINE_DRIVER_START( t1000_16 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_t1000 )
+	MDRV_GFXDECODE(europc)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2216,6 +2334,10 @@ static MACHINE_DRIVER_START( t1000_16 )
 MACHINE_DRIVER_END
 
 
+static GFXDECODE_START( ibmpcjr )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_8_charlayout, 3, 1 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
@@ -2235,6 +2357,7 @@ static MACHINE_DRIVER_START( ibmpcjr )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pcjr )
+	MDRV_GFXDECODE(ibmpcjr)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2850,32 +2973,32 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR     NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1981,	ibm5150,	0,			0,	ibm5150,    ibm5150,    ibm5150,    "International Business Machines",  "IBM PC 5150" , 0)
-COMP(  1984,	dgone,		ibm5150,	0,	pccga,      pccga,	    pccga,	    "Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
-COMP(  1985,	bw230,		ibm5150,	0,	pccga,		bondwell,   bondwell,	"Bondwell Holding",  "BW230 (PRO28 Series)", 0 )
-COMP(  1988,	europc,		ibm5150,	0,	europc,     europc,		europc,     "Schneider Rdf. AG",  "EURO PC", GAME_NOT_WORKING)
+/*     YEAR     NAME		PARENT		COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
+COMP(  1981,	ibm5150,	0,		0,	ibm5150,    ibm5150,	ibm5150,    "International Business Machines",  "IBM PC 5150" , 0)
+COMP(  1984,	dgone,		ibm5150,	0,	pccga,      pccga,	pccga,	    "Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
+COMP(  1985,	bw230,		ibm5150,	0,	pccga,	    bondwell,   bondwell,   "Bondwell Holding",  "BW230 (PRO28 Series)", GAME_NOT_WORKING )
+COMP(  1988,	europc,		ibm5150,	0,	europc,     europc,	europc,     "Schneider Rdf. AG",  "EURO PC", GAME_NOT_WORKING)
 
 // pcjr (better graphics, better sound)
-COMP(  1983,	ibmpcjr,	ibm5150,	0,	ibmpcjr,    tandy1t,	pcjr,       "International Business Machines",  "IBM PC Jr", GAME_NOT_WORKING|GAME_IMPERFECT_COLORS )
+COMP(  1983,	ibmpcjr,	ibm5150,	0,	ibmpcjr,    tandy1t,	pcjr,       "International Business Machines",  "IBM PC Jr", GAME_IMPERFECT_COLORS )
 
 // tandy 1000
-COMP(  1987,	t1000hx,	ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,	"Tandy Radio Shack",  "Tandy 1000HX", 0)
-COMP(  1987,	t1000sx,	ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,	"Tandy Radio Shack",  "Tandy 1000SX", GAME_NOT_WORKING)
-COMP(  1989,    t1000rl,    ibm5150,    0,  t1000_16,   tandy1t,    t1000hx,    "Tandy Radio Shack",  "Tandy 1000RL", GAME_NOT_WORKING )
+COMP(  1987,	t1000hx,	ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000HX", 0)
+COMP(  1987,	t1000sx,	ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000SX", GAME_NOT_WORKING)
+COMP(  1989,    t1000rl,	ibm5150,	0,	t1000_16,   tandy1t,    t1000hx,    "Tandy Radio Shack",  "Tandy 1000RL", 0)
 
 // xt class (pc but 8086)
-COMP(  1982,	ibm5160,	ibm5150,	0,	ibm5160,    ibm5150,	ibm5150,	"International Business Machines",  "IBM XT 5160" , 0)
-COMP(  1988,	pc200,		ibm5150,	0,	pc200,		pc200,		pc200,		"Sinclair Research",  "PC200 Professional Series", GAME_NOT_WORKING)
-COMP(  1988,	pc20,		ibm5150,	0,	pc200,		pc200,		pc200,		"Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
-COMP(  1987,	ppc512,		ibm5150,	0,	ppc512,		pc200,		ppc512,		"Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
-COMP(  1987,	ppc640,		ibm5150,	0,	ppc640,		pc200,		ppc512,		"Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
-COMP(  1986,	pc1512,		ibm5150,	0,	pc1512,     pc1512,		pc1512,		"Amstrad plc",  "Amstrad PC1512 (version 1)", GAME_NOT_WORKING)
-COMP(  198?,	pc1512v2,	ibm5150,	0,	pc1512,     pc1512,		pc1512,		"Amstrad plc",  "Amstrad PC1512 (version 2)", GAME_NOT_WORKING)
-COMP(  1987,	pc1640,		ibm5150,	0,	pc1640,     pc1640,		pc1640,		"Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
+COMP(  1982,	ibm5160,	ibm5150,	0,	ibm5160,    ibm5150,	ibm5150,    "International Business Machines",  "IBM XT 5160" , 0)
+COMP(  1988,	pc200,		ibm5150,	0,	pc200,	    pc200,	pc200,	    "Sinclair Research",  "PC200 Professional Series", GAME_NOT_WORKING)
+COMP(  1988,	pc20,		ibm5150,	0,	pc200,	    pc200,	pc200,	    "Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
+COMP(  1987,	ppc512,		ibm5150,	0,	ppc512,	    pc200,	ppc512,	    "Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
+COMP(  1987,	ppc640,		ibm5150,	0,	ppc640,	    pc200,	ppc512,	    "Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
+COMP(  1986,	pc1512,		ibm5150,	0,	pc1512,     pc1512,	pc1512,	    "Amstrad plc",  "Amstrad PC1512 (version 1)", GAME_NOT_WORKING)
+COMP(  198?,	pc1512v2,	ibm5150,	0,	pc1512,     pc1512,	pc1512,	    "Amstrad plc",  "Amstrad PC1512 (version 2)", GAME_NOT_WORKING)
+COMP(  1987,	pc1640,		ibm5150,	0,	pc1640,     pc1640,	pc1640,	    "Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
 // pc2086 pc1512 with vga??
-COMP(  1987,	pc,			ibm5150,	0,	pccga,		pccga,		pccga,		"Generic",  "PC (CGA)" , 0)
-COMP ( 1987,	pcmda,		ibm5150,	0,	pcmda,      pcmda,		ibm5150,    "Generic",  "PC (MDA)" , 0)
-COMP ( 1987,    pcherc,		ibm5150,	0,	pcherc,     pcmda,      ibm5150,	"Generic",  "PC (Hercules)" , 0)
-COMP ( 1987,	xtvga,		ibm5150,	0,	xtvga,      xtvga,		pc_vga,		"Generic",  "PC/XT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING)
+COMP(  1987,	pc,		ibm5150,	0,	pccga,	    pccga,	pccga,	    "Generic",  "PC (CGA)" , 0)
+COMP ( 1987,	pcmda,		ibm5150,	0,	pcmda,      pcmda,	ibm5150,    "Generic",  "PC (MDA)" , 0)
+COMP ( 1987,    pcherc,		ibm5150,	0,	pcherc,     pcmda,      ibm5150,    "Generic",  "PC (Hercules)" , 0)
+COMP ( 1987,	xtvga,		ibm5150,	0,	xtvga,      xtvga,	pc_vga,	    "Generic",  "PC/XT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING)
 
