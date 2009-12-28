@@ -459,30 +459,49 @@ static const floppy_config nanos_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+/* F4 Character Displayer */
+static const gfx_layout nanos_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( nanos )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, nanos_charlayout, 0, 1 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( nanos )
-    /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(nanos_mem)
-    MDRV_CPU_IO_MAP(nanos_io)
-    MDRV_CPU_CONFIG(nanos_daisy_chain)
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MDRV_CPU_PROGRAM_MAP(nanos_mem)
+	MDRV_CPU_IO_MAP(nanos_io)
+	MDRV_CPU_CONFIG(nanos_daisy_chain)
 
 	MDRV_MACHINE_START(nanos)
-    MDRV_MACHINE_RESET(nanos)
+	MDRV_MACHINE_RESET(nanos)
 
-    /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(80*8, 25*10)
 	MDRV_SCREEN_VISIBLE_AREA(0,80*8-1,0,25*10-1)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+	MDRV_GFXDECODE(nanos)
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_START(nanos)
-    MDRV_VIDEO_UPDATE(nanos)
+	MDRV_VIDEO_START(nanos)
+	MDRV_VIDEO_UPDATE(nanos)
 
-    /* devices */
+	/* devices */
 	MDRV_Z80CTC_ADD( "z80ctc_0", XTAL_4MHz, ctc_intf)
 	MDRV_Z80CTC_ADD( "z80ctc_1", XTAL_4MHz, ctc_intf)
 	MDRV_Z80PIO_ADD( "z80pio_0", pio1_intf)
@@ -508,7 +527,6 @@ ROM_START( nanos )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "zg_nanos.rom", 0x0000, 0x0800, CRC(5682d3f9) SHA1(5b738972c815757821c050ee38b002654f8da163))
-
 ROM_END
 
 /* Driver */

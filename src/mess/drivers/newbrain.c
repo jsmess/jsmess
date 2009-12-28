@@ -1520,6 +1520,24 @@ static DEVICE_GET_INFO( newbrain_serial )
 	}
 }
 
+/* F4 Character Displayer */
+static const gfx_layout newbrain_charlayout =
+{
+	8, 10,					/* 8 x 10 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*256*8, 1*256*8, 2*256*8, 3*256*8, 4*256*8, 5*256*8, 6*256*8, 7*256*8, 8*256*8, 9*256*8, 10*256*8, 11*256*8, 12*256*8, 13*256*8, 14*256*8, 15*256*8 },
+	8					/* every char takes 16 x 1 bytes */
+};
+
+static GFXDECODE_START( newbrain )
+	GFXDECODE_ENTRY( "chargen", 0x0000, newbrain_charlayout, 0, 1 )
+GFXDECODE_END
+
 #define NEWBRAIN_SERIAL	DEVICE_GET_INFO_NAME(newbrain_serial)
 
 #define MDRV_NEWBRAIN_SERIAL_ADD(_tag) \
@@ -1537,6 +1555,8 @@ static MACHINE_DRIVER_START( newbrain_a )
 	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/N
 	MDRV_CPU_IO_MAP(newbrain_cop_io_map)
 	MDRV_CPU_CONFIG(newbrain_cop_intf)
+
+	MDRV_GFXDECODE(newbrain)
 
 	MDRV_TIMER_ADD_PERIODIC("cop_regint", cop_regint_tick, MSEC(12.5)) // HACK
 
@@ -1640,7 +1660,7 @@ ROM_START( newbrain )
 	ROM_REGION( 0x400, COP420_TAG, 0 )
 	ROM_LOAD( "cop420.419", 0x000, 0x400, NO_DUMP )
 
-	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_REGION( 0x1000, "chargen", 0 )	/* The missing part of this rom should be filled with zeroes */
 	ROM_LOAD( "char eprom iss 1.ic453", 0x0000, 0x0a01, BAD_DUMP CRC(46ecbc65) SHA1(3fe064d49a4de5e3b7383752e98ad35a674e26dd) ) // 8248R7
 ROM_END
 
@@ -1707,7 +1727,7 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE         INPUT       INIT    COMPANY                         FULLNAME        FLAGS
-COMP( 1981, newbrain,	0,			0,		newbrain_a,		newbrain,   0, 		"Grundy Business Systems Ltd.",	"NewBrain AD",	GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1981, newbraie,	newbrain,	0,		newbrain_eim,	newbrain,   0, 		"Grundy Business Systems Ltd.",	"NewBrain AD with Expansion Interface",	GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1981, newbraia,	newbrain,	0,		newbrain_a,		newbrain,   0, 		"Grundy Business Systems Ltd.",	"NewBrain A",	GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1981, newbraim,	newbrain,	0,		newbrain_a,		newbrain,   0, 		"Grundy Business Systems Ltd.",	"NewBrain MD",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbrain,	0,	    0,      newbrain_a,	    newbrain,   0, 	"Grundy Business Systems Ltd.",	"NewBrain AD",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbraie,	newbrain,   0,	    newbrain_eim,   newbrain,   0, 	"Grundy Business Systems Ltd.",	"NewBrain AD with Expansion Interface",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbraia,	newbrain,   0,	    newbrain_a,	    newbrain,   0, 	"Grundy Business Systems Ltd.",	"NewBrain A",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbraim,	newbrain,   0,	    newbrain_a,	    newbrain,   0, 	"Grundy Business Systems Ltd.",	"NewBrain MD",	GAME_NOT_WORKING | GAME_NO_SOUND )

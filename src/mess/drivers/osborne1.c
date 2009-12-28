@@ -220,6 +220,24 @@ static const floppy_config osborne1_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+/* F4 Character Displayer */
+static const gfx_layout osborne1_charlayout =
+{
+	8, 10,					/* 8 x 10 characters */
+	128,					/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*128*8, 1*128*8, 2*128*8, 3*128*8, 4*128*8, 5*128*8, 6*128*8, 7*128*8, 8*128*8, 9*128*8 },
+	8					/* every char takes 16 x 1 bytes */
+};
+
+static GFXDECODE_START( osborne1 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, osborne1_charlayout, 0, 1 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( osborne1 )
 	MDRV_CPU_ADD( "maincpu", Z80, MAIN_CLOCK/4 )
 	MDRV_CPU_PROGRAM_MAP( osborne1_mem)
@@ -235,6 +253,7 @@ static MACHINE_DRIVER_START( osborne1 )
 	MDRV_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 512, 0, 416, 260, 0, 240 )
 	MDRV_VIDEO_START( generic_bitmapped )
 	MDRV_VIDEO_UPDATE( generic_bitmapped )
+	MDRV_GFXDECODE(osborne1)
 	MDRV_PALETTE_LENGTH( 3 )
 	MDRV_PALETTE_INIT( osborne1 )
 

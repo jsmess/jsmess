@@ -755,6 +755,25 @@ static const floppy_config osi_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+/* F4 Character Displayer */
+static const gfx_layout osi_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( osi )
+	GFXDECODE_ENTRY( "chargen", 0x0000, osi_charlayout, 0, 1 )
+GFXDECODE_END
+
+
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( osi600 )
@@ -766,8 +785,9 @@ static MACHINE_DRIVER_START( osi600 )
 
 	MDRV_MACHINE_START(osi600)
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_IMPORT_FROM(osi600_video)
+	MDRV_GFXDECODE(osi)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -796,8 +816,9 @@ static MACHINE_DRIVER_START( uk101 )
 
 	MDRV_MACHINE_START(osi600)
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_IMPORT_FROM(uk101_video)
+	MDRV_GFXDECODE(osi)
 
 	/* cassette ACIA */
 	MDRV_ACIA6850_ADD("acia_0", uk101_acia_intf)
@@ -820,8 +841,9 @@ static MACHINE_DRIVER_START( c1p )
 
 	MDRV_MACHINE_START(c1p)
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_IMPORT_FROM(osi630_video)
+	MDRV_GFXDECODE(osi)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -914,8 +936,8 @@ static DRIVER_INIT( c1p )
 /* System Drivers */
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY            FULLNAME
-COMP( 1978, sb2m600b,	0,			0,		osi600,		osi600,		0, 		"Ohio Scientific", "Superboard II Model 600 (Rev. B)", 0)
-//COMP( 1980, sb2m600c, 0,          0,      osi600c,    osi600,     0,      "Ohio Scientific", "Superboard II Model 600 (Rev. C)", 0)
-COMP( 1980, c1p,		sb2m600b,	0,		c1p,		osi600,		c1p,	"Ohio Scientific", "Challenger 1P Series 2", GAME_NOT_WORKING)
-COMP( 1980, c1pmf,		sb2m600b,	0,		c1pmf,		osi600,		c1p,	"Ohio Scientific", "Challenger 1P MF Series 2", GAME_NOT_WORKING)
-COMP( 1979,	uk101,		sb2m600b,	0,		uk101,		uk101,		0, 		"Compukit",        "UK101", GAME_NOT_WORKING)
+COMP( 1978, sb2m600b,	0,		0,	osi600,   osi600,    0,		"Ohio Scientific", "Superboard II Model 600 (Rev. B)", GAME_NOT_WORKING)
+//COMP( 1980, sb2m600c, 0,      	0,      osi600c,  osi600,    0,		"Ohio Scientific", "Superboard II Model 600 (Rev. C)", GAME_NOT_WORKING)
+COMP( 1980, c1p,	sb2m600b,	0,	c1p,	  osi600,    c1p,	"Ohio Scientific", "Challenger 1P Series 2", GAME_NOT_WORKING)
+COMP( 1980, c1pmf,	sb2m600b,	0,	c1pmf,	  osi600,    c1p,	"Ohio Scientific", "Challenger 1P MF Series 2", GAME_NOT_WORKING)
+COMP( 1979, uk101,	sb2m600b,	0,	uk101,	  uk101,     0, 	"Compukit",        "UK101", GAME_NOT_WORKING)
