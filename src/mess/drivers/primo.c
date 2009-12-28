@@ -113,6 +113,7 @@ Interrupts:
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
 #include "formats/primoptp.h"
+#include "includes/cbmserb.h"
 
 static ADDRESS_MAP_START( primoa_port, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -244,6 +245,20 @@ static const cassette_config primo_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED
 };
 
+static const cbm_serial_bus_interface primo_drive_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL
+};
+
 static MACHINE_DRIVER_START( primoa32 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", Z80, 2500000 )
@@ -281,7 +296,7 @@ static MACHINE_DRIVER_START( primoa32 )
 	/* floppy from serial bus */
 	/* for some reason machine/primo.c sets up the serial bus
     but no floppy drive has been apparently added... incomplete driver? */
-//removed	MDRV_IMPORT_FROM(simulated_drive)
+	MDRV_CBM_SERBUS_ADD("serial_bus", primo_drive_interface)
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart1")

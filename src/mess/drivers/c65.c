@@ -200,7 +200,7 @@ static const sid6581_interface c65_sound_interface =
 	c64_paddle_read
 };
 
-static const cbm_serial_bus_interface cbm_sim_drive_interface =
+static const cbm_serial_bus_interface c65_drive_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -257,8 +257,7 @@ static MACHINE_DRIVER_START( c65 )
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, 3500000, c65_ntsc_cia1)
 
 	/* floppy from serial bus */
-//removed	MDRV_IMPORT_FROM(simulated_drive)
-	MDRV_CBM_SERBUS_ADD("serial_bus", cbm_sim_drive_interface)
+	MDRV_CBM_SERBUS_ADD("serial_bus", c65_drive_interface)
 
 	MDRV_IMPORT_FROM(c64_cartslot)
 
