@@ -82,7 +82,7 @@
 
 	calculate_clamp_diffs(tilenum);
 
-	set_shade_for_rects(); // Needed by Pilotwings 64
+	shade_color.c = 0;	// Needed by Pilotwings 64
 
 	if(rect->flip)
 	{
@@ -94,27 +94,48 @@
 		rect->dsdx= temp;
 	}
 
-	t = ((int)(rect->t)) << 5;
+	CACHE_TEXTURE_PARAMS(tex_tile);
+
+	if(y1 < clipy1)
+	{
+		rect->t += rect->dtdy * (clipy1 - y1);
+		y1 = clipy1;
+	}
+	if(y2 > clipy2)
+	{
+		y2 = clipy2;
+	}
+	if(x1 < clipx1)
+	{
+		rect->s += rect->dsdx * (clipx1 - x1);
+		x1 = clipx1;
+	}
+	if(x2 > clipx2)
+	{
+		x2 = clipx2;
+	}
+	rect->dsdx >>= 5;
+	rect->dtdy >>= 5;
+
+	t = ((int)(rect->t));
 
 	for (j = y1; j < y2; j++)
 	{
-		if (j >= clipy1 && j < clipy2)
-		{
 			int fb_index = j * fb_width;
 #if defined(MAGICDITHER) || defined(BAYERDITHER)
 			int mline = (j & 3) << 2;
 #endif
-			s = ((int)(rect->s)) << 5;
+			s = ((int)(rect->s));
 
 			for (i = x1; i < x2; i++)
 			{
-				if (i >= clipx1 && i < clipx2)
-				{
 					COLOR c;
 #if defined(ZUPDATE)
 					int rendered = 0;
 #endif
+#if defined(MAGICDITHER) || defined(BAYERDITHER)
 					int dith = 0;
+#endif
 					int curpixel = fb_index + i;
 					UINT16* fbcur = &fb[curpixel ^ WORD_ADDR_XOR];
 					UINT8* hbcur = &hb[curpixel ^ BYTE_ADDR_XOR];
@@ -125,9 +146,9 @@
 
 					curpixel_cvg = 8;
 
-					TEXTURE_PIPELINE(&texel0_color, s >> 5, t >> 5, tex_tile);
+					texel0_color.c = TEXTURE_PIPELINE(s, t, tex_tile);
 
-					COLOR_COMBINER1(&c);
+					c.c = COLOR_COMBINER1();
 
 #if defined(MAGICDITHER)
 					dith = magic_matrix[mline + ((i ^ WORD_ADDR_XOR) & 3)];
@@ -138,16 +159,22 @@
 #if defined(ZCOMPARE)
 					if (z_compare(fbcur, hbcur, zbcur, zhbcur, ((UINT32)primitive_z)<<3,primitive_delta_z))
 					{
-#if defined(ZUPDATE)
-						rendered = BLENDER1_16(fbcur, hbcur, c, dith);
-#else
-						BLENDER1_16(fbcur, hbcur, c, dith);
 #endif
-					}
-#elif defined(ZUPDATE)
-					rendered = BLENDER1_16(fbcur, hbcur, c, dith);
+#if defined(MAGICDITHER) || defined(BAYERDITHER)
+#if defined(ZUPDATE)
+						rendered = BLENDER1_16_DITH(fbcur, hbcur, c, dith);
 #else
-					BLENDER1_16(fbcur, hbcur, c, dith);
+						BLENDER1_16_DITH(fbcur, hbcur, c, dith);
+#endif
+#else
+#if defined(ZUPDATE)
+						rendered = BLENDER1_16_NDITH(fbcur, hbcur, c);
+#else
+						BLENDER1_16_NDITH(fbcur, hbcur, c);
+#endif
+#endif
+#if defined(ZCOMPARE)
+					}
 #endif
 
 #if defined(ZUPDATE)
@@ -156,11 +183,10 @@
 						z_store(zbcur, zhbcur, ((UINT32)primitive_z) << 3,primitive_delta_z);
 					}
 #endif
-				}
+
 
 				s += (int)(rect->dsdx);
 			}
-		}
 		t += (int)(rect->dtdy);
 	}
 }
@@ -264,7 +290,7 @@
 	}
 
 
-	set_shade_for_rects(); // Needed by Pilotwings 64
+	shade_color.c = 0;	// Needed by Pilotwings 64
 
 	if(rect->flip)
 	{
@@ -304,18 +330,23 @@
 					UINT16* zbcur = &zb[curpixel ^ WORD_ADDR_XOR];
 					UINT8* zhbcur = &zhb[curpixel ^ BYTE_ADDR_XOR];
 #endif
+#if defined(MAGICDITHER) || defined(BAYERDITHER)
 					int dith = 0;
+#endif
 
 					curpixel_cvg = 8;
 
 					ss = s >> 5;
 					st = t >> 5;
 
-					TEXTURE_PIPELINE(&texel0_color, ss, st, tex_tile);
-					TEXTURE_PIPELINE(&texel1_color, ss, st, tex_tile2);
+					CACHE_TEXTURE_PARAMS(tex_tile);
+					texel0_color.c = TEXTURE_PIPELINE(ss, st, tex_tile);
 
-					COLOR_COMBINER2_C0(&c1);
-					COLOR_COMBINER2_C1(&c2);
+					CACHE_TEXTURE_PARAMS(tex_tile2);
+					texel1_color.c = TEXTURE_PIPELINE(ss, st, tex_tile2);
+
+					c1.c = COLOR_COMBINER2_C0();
+					c2.c = COLOR_COMBINER2_C1();
 
 #if defined(MAGICDITHER)
 					dith = magic_matrix[mline + ((i ^ WORD_ADDR_XOR) & 3)];
@@ -326,18 +357,22 @@
 #if defined(ZCOMPARE)
 					if (z_compare(fbcur, hbcur, zbcur, zhbcur, ((UINT32)primitive_z)<<3,primitive_delta_z))
 					{
-#if defined(ZUPDATE)
-						rendered = BLENDER2_16(fbcur, hbcur, c1, c2, dith);
-#else
-						BLENDER2_16(fbcur, hbcur, c1, c2, dith);
 #endif
+#if defined(MAGICDITHER) || defined(BAYERDITHER)
+#if defined(ZUPDATE)
+						rendered = BLENDER2_16_DITH(fbcur, hbcur, c1, c2, dith);
+#else
+						BLENDER2_16_DITH(fbcur, hbcur, c1, c2, dith);
+#endif
+#else
+#if defined(ZUPDATE)
+						rendered = BLENDER2_16_NDITH(fbcur, hbcur, c1, c2);
+#else
+						BLENDER2_16_NDITH(fbcur, hbcur, c1, c2);
+#endif
+#endif
+#if defined(ZCOMPARE)
 					}
-#else
-#if defined(ZUPDATE)
-					rendered = BLENDER2_16(fbcur, hbcur, c1, c2, dith);
-#else
-					BLENDER2_16(fbcur, hbcur, c1, c2, dith);
-#endif
 #endif
 
 #if defined(ZUPDATE)
@@ -430,7 +465,7 @@
 
 	calculate_clamp_diffs(tilenum);
 
-	set_shade_for_rects(); // Needed by Pilotwings 64
+	shade_color.c = 0;	// Needed by Pilotwings 64
 
 	if(rect->flip)
 	{
@@ -443,6 +478,8 @@
 	}
 
 	t = ((int)(rect->t)) << 5;
+
+	CACHE_TEXTURE_PARAMS(tex_tile);
 
 	for (j = y1; j < y2; j++)
 	{
@@ -458,7 +495,7 @@
 					ss = s >> 5;
 					st = t >> 5;
 
-					TEXTURE_PIPELINE(&texel0_color, ss, st, tex_tile);
+					texel0_color.c = TEXTURE_PIPELINE(ss, st, tex_tile);
 
 					curpixel_cvg = 8;
 
