@@ -766,12 +766,17 @@ static IRQ_CALLBACK(at_irq_callback)
 	return pic8259_acknowledge( st->pic8259_master);
 }
 
-
+static void pc_set_irq_line(running_machine *machine,int irq, int state) {
+	pc_state *st = machine->driver_data;
+	pic8259_set_irq_line(st->pic8259, irq, state);
+}
 
 MACHINE_START( at )
 {
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), at_irq_callback);
+	/* FDC/HDC hardware */
 	pc_fdc_init( machine, &fdc_interface );
+	pc_hdc_setup(machine, pc_set_irq_line);	
 }
 
 
