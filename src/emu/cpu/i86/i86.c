@@ -52,6 +52,8 @@ struct _i8086_state
 	UINT8 rep_in_progress;
 	INT32 extra_cycles;       /* extra cycles for interrupts */
 
+    int halted;         /* Is the CPU halted ? */
+    
 	UINT16 ip;
 	UINT32 sp;
 
@@ -183,6 +185,7 @@ static void i8086_state_register(const device_config *device)
 	state_save_register_device_item(device, 0, cpustate->nmi_state);
 	state_save_register_device_item(device, 0, cpustate->irq_state);
 	state_save_register_device_item(device, 0, cpustate->extra_cycles);
+    state_save_register_device_item(device, 0, cpustate->halted);   
 	state_save_register_device_item(device, 0, cpustate->test_state);	/* PJB 03/05 */
 	state_save_register_device_item(device, 0, cpustate->rep_in_progress);	/* PJB 03/05 */
 }
@@ -256,6 +259,8 @@ static CPU_RESET( i8086 )
 	cpustate->base[CS] = SegBase(CS);
 	cpustate->pc = 0xffff0 & AMASK;
 	ExpandFlags(cpustate->flags);
+
+    cpustate->halted=0;
 }
 
 static CPU_EXIT( i8086 )
@@ -267,6 +272,11 @@ static CPU_EXIT( i8086 )
 
 static void set_irq_line(i8086_state *cpustate, int irqline, int state)
 {
+	if (state != CLEAR_LINE && cpustate->halted)
+	{
+		cpustate->halted = 0;
+	}
+
 	if (irqline == INPUT_LINE_NMI)
 	{
 		if (cpustate->nmi_state == state)
@@ -275,8 +285,10 @@ static void set_irq_line(i8086_state *cpustate, int irqline, int state)
 
 		/* on a rising edge, signal the NMI */
 		if (state != CLEAR_LINE)
+        {
 			PREFIX(_interrupt)(cpustate, I8086_NMI_INT_VECTOR);
-	}
+        }
+    }
 	else
 	{
 		cpustate->irq_state = state;
@@ -296,6 +308,12 @@ static void set_test_line(i8086_state *cpustate, int state)
 static CPU_EXECUTE( i8086 )
 {
 	i8086_state *cpustate = get_safe_token(device);
+
+
+  	if (cpustate->halted)
+	{
+        return cycles;
+    }
 
 	/* copy over the cycle counts if they're not correct */
 	if (timing.id != 8086)

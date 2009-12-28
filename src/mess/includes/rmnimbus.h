@@ -11,6 +11,7 @@
 
 #define DEBUG_TEXT  0x01
 #define DEBUG_DB    0x02
+#define DEBUG_PIXEL 0x04
 
 #define MAINCPU_TAG "maincpu"
 
@@ -59,8 +60,9 @@ WRITE16_HANDLER (nimbus_io_w);
 
 /* Z80 SIO for keyboard */
 
-#define Z80SIO_TAG		"z80sio"
-#define NIMBUS_KEYROWS  1
+#define Z80SIO_TAG		    "z80sio"
+#define NIMBUS_KEYROWS      11
+#define KEYBOARD_QUEUE_SIZE 32
 
 extern const z80sio_interface sio_intf;
 

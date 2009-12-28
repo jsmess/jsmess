@@ -29,14 +29,15 @@
 /*-------------------------------------------------------------------------*/
 
 /* CPU 80186 */
-#define LATCH_INTS 1
-#define LOG_PORTS 0
-#define LOG_INTERRUPTS 0
-#define LOG_INTERRUPTS_EXT 0
-#define LOG_TIMER 0
-#define LOG_OPTIMIZATION 0
-#define LOG_DMA 1
+#define LATCH_INTS          1
+#define LOG_PORTS           0
+#define LOG_INTERRUPTS      0
+#define LOG_INTERRUPTS_EXT  0
+#define LOG_TIMER           0
+#define LOG_OPTIMIZATION    0
+#define LOG_DMA             0
 #define CPU_RESUME_TRIGGER	7123
+#define LOG_KEYBOARD        1
 
 /* 80186 internal stuff */
 struct mem_state
@@ -106,7 +107,16 @@ const z80sio_interface sio_intf =
 	sio_serial_receive		/* receive handler */
 };
 
-static UINT8    keyrows[NIMBUS_KEYROWS];
+struct keybord_state
+{
+    UINT8       keyrows[NIMBUS_KEYROWS];
+    emu_timer   *keyscan_timer;
+    UINT8       queue[KEYBOARD_QUEUE_SIZE];
+	UINT8       head;
+	UINT8       tail;
+} keyboard;
+
+
 
 /* Floppy drives WD2793 */
 
@@ -133,7 +143,6 @@ static void drq_callback(running_machine *machine, int which);
 
 static void execute_debug_irq(running_machine *machine, int ref, int params, const char *param[]);
 static void execute_debug_intmasks(running_machine *machine, int ref, int params, const char *param[]);
-static void execute_debug_key(running_machine *machine, int ref, int params, const char *param[]);
 
 static int instruction_hook(const device_config *device, offs_t curpc);
 static void decode_subbios(const device_config *device,offs_t pc);
@@ -142,6 +151,8 @@ static void decode_dssi_f_plot_character_string(const device_config *device,UINT
 static void decode_dssi_f_set_new_clt(const device_config *device,UINT16  ds, UINT16 si);
 static void fdc_reset(void);
 
+static void keyboard_reset(void);
+static TIMER_CALLBACK(keyscan_callback);
 
 #define num_ioports 0x80
 static UINT16   IOPorts[num_ioports];
@@ -699,28 +710,27 @@ static void drq_callback(running_machine *machine, int which)
            
         return;
     }
-
  
     if(dma->control & DEST_MIO)
     {
         dest_space=memory_space;
-        logerror("dest=memory\n");
+        //logerror("dest=memory\n");
     }
     else
     {
         dest_space=io_space;
-        logerror("dest=I/O\n");
+        //logerror("dest=I/O\n");
     }
     
     if(dma->control & SRC_MIO)
     {
         src_space=memory_space;
-        logerror("src=memory\n");
+        //logerror("src=memory\n");
     }
     else
     {
         src_space=io_space;
-        logerror("src=I/O\n");
+        //logerror("src=I/O\n");
     }
     
     // Do the transfer
@@ -773,7 +783,7 @@ static void drq_callback(running_machine *machine, int which)
 		i186.intr.request |= 0x04 << which;
 		update_interrupt_state(machine);      
     }
-    logerror("DMA callback done\n");
+    //logerror("DMA callback done\n");
 }
 
 /*-------------------------------------------------------------------------*/
@@ -1249,6 +1259,7 @@ MACHINE_RESET(nimbus)
 	/* CPU */
 	nimbus_cpu_reset(machine); 
     fdc_reset();
+    keyboard_reset();
 }
 
 DRIVER_INIT(nimbus)
@@ -1259,15 +1270,15 @@ MACHINE_START( nimbus )
 {
     /* init cpu */
     nimbus_cpu_init(machine);
+
+    keyboard.keyscan_timer=timer_alloc(machine, keyscan_callback, NULL);
     
 	/* setup debug commands */
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		debug_console_register_command(machine, "nimbus_irq", CMDFLAG_NONE, 0, 0, 1, execute_debug_irq);
         debug_console_register_command(machine, "nimbus_intmasks", CMDFLAG_NONE, 0, 0, 0, execute_debug_intmasks);
-        debug_console_register_command(machine, "nimbus_key", CMDFLAG_NONE, 0, 0, 1, execute_debug_key);
-  
-        
+
         /* set up the instruction hook */
         debug_cpu_set_instruction_hook(cputag_get_cpu(machine, MAINCPU_TAG), instruction_hook);
      
@@ -1326,25 +1337,6 @@ static void execute_debug_intmasks(running_machine *machine, int ref, int params
     debug_console_printf(machine,"i186.intr.ack_mask  = %04X\n",i186.intr.ack_mask);
     debug_console_printf(machine,"i186.intr.in_service= %04X\n",i186.intr.in_service);
 }
-
-static void execute_debug_key(running_machine *machine, int ref, int params, const char *param[])
-{
-    int Key;
-    
-    if(params>0)
-    {   
-        sscanf(param[0],"%d",&Key);
-        
-        nextkey=Key;
-    }
-    else
-    {
-        debug_console_printf(machine,"Error, you must supply a keycode\n");
-    }
-	
-    
-}
-
 
 /*-----------------------------------------------
     instruction_hook - per-instruction hook
@@ -1736,6 +1728,78 @@ WRITE16_HANDLER( nimbus_io_w )
     }
 }
 
+
+/* 
+    Keyboard emulation 
+    
+*/
+
+static void keyboard_reset(void)
+{
+    memset(keyboard.keyrows,0xFF,NIMBUS_KEYROWS);
+    
+    // Setup timer to scan keyboard.
+    timer_adjust_periodic(keyboard.keyscan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(50));
+
+}
+
+static void queue_scancode(UINT8 scancode)
+{
+	keyboard.queue[keyboard.head] = scancode;
+	keyboard.head++;
+	keyboard.head %= (sizeof(keyboard.queue) / sizeof(keyboard.queue[0]));
+}
+
+static int keyboard_queue_read(void)
+{
+	int data;
+	if (keyboard.tail == keyboard.head)
+		return -1;
+
+	data = keyboard.queue[keyboard.tail];
+
+	if (LOG_KEYBOARD)
+		logerror("at_keyboard_read(): Keyboard Read 0x%02x\n",data);
+
+	keyboard.tail++;
+	keyboard.tail %= sizeof(keyboard.queue) / sizeof(keyboard.queue[0]);
+	return data;
+}
+
+static TIMER_CALLBACK(keyscan_callback)
+{
+    UINT8   keyrow;
+    UINT8   row;
+    UINT8   bitno;
+    UINT8   mask;
+    static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4",
+                                             "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", 
+                                             "KEY10"};
+
+    for(row=0;row<NIMBUS_KEYROWS;row++)
+    {
+        keyrow=input_port_read(machine, keynames[row]);
+        
+        for(mask=0x80, bitno=7;mask>0;mask=mask>>1, bitno-=1)
+        {
+            if(!(keyrow & mask) && (keyboard.keyrows[row] & mask))
+            {
+                logerror("keypress %02X\n",(row<<3)+bitno);
+                queue_scancode((row<<3)+bitno);
+            }
+   
+            if((keyrow & mask) && !(keyboard.keyrows[row] & mask))
+            {
+                logerror("keyrelease %02X\n",0x80+(row<<3)+bitno);  
+                queue_scancode(0x80+(row<<3)+bitno);
+            }
+        }
+        
+        keyboard.keyrows[row]=keyrow;
+    }
+}
+
+
 /* 
 
 Z80SIO, used for the keyboard interface 
@@ -1820,37 +1884,9 @@ WRITE8_DEVICE_HANDLER( sio_serial_transmit )
 
 int sio_serial_receive( const device_config *device, int channel )
 {
-    UINT8   keyrow;
-    UINT8   row;
-    static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4",
-                                             "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
-    int     key;
-
 	if(channel==0)
     {
-        key=-1;
-        
-        //logerror("Read keyboard\n");
-        for(row=0;row<NIMBUS_KEYROWS;row++)
-        {
-            keyrow=input_port_read(device->machine, keynames[row]);
-            if(keyrows[row]!=keyrow)
-            {
-                keyrows[row]=keyrow;
-                key=~keyrow & 0xff;
-            }
-        }
-        
-        if (nextkey!=0)
-        {
-            key=nextkey;
-            nextkey=0;
-        }
-        
-        if(key!=-1) 
-            logerror("Keypressed=%02X\n",key);
-        
-        return key;
+        return keyboard_queue_read();      
     }
     else
         return -1;

@@ -116,7 +116,9 @@ static void set_pixel(UINT16 x, UINT16 y, UINT8 on_off )
     
     vaddr=(BYTES_PER_LINE*y)+(x / ppb);
     pixel_offset=(x % ppb);
-    last=video_mem[vaddr];
+    last=(vaddr<VRAM_SIZE) ? video_mem[vaddr] : 0
+    
+    ;
     colour=on_off ? (reg024&0x0F) : ((reg024&0xF0)>>4);
     
     if(bpp==2)
@@ -134,13 +136,21 @@ static void set_pixel(UINT16 x, UINT16 y, UINT8 on_off )
         lshifts=4-rshifts;        
     }
     
-    if(reg022 & XOR_MASK)
-        video_mem[vaddr]=(video_mem[vaddr] & mask) ^ (colour<<(lshifts)); 
-    else
-        video_mem[vaddr]=(video_mem[vaddr] & mask) | (colour<<(lshifts)); 
+    if(vaddr<VRAM_SIZE)
+    {
+        if(reg022 & XOR_MASK)
+            video_mem[vaddr]=(video_mem[vaddr] & mask) ^ (colour<<(lshifts)); 
+        else
+            video_mem[vaddr]=(video_mem[vaddr] & mask) | (colour<<(lshifts)); 
 
-    if(debug_on & DEBUG_TEXT)
-        logerror("set_pixel(X=%04X, y=%04x, pixel_offset=%02X, on_off=%02X), vaddr=%04X, mask=%02X, last=%02X, current=%02X\n",x,y,pixel_offset,on_off,vaddr,mask,last,video_mem[vaddr]);
+        if(debug_on & (DEBUG_TEXT | DEBUG_PIXEL))
+            logerror("set_pixel(X=%04X, y=%04x, pixel_offset=%02X, on_off=%02X), vaddr=%04X, mask=%02X, last=%02X, current=%02X\n",x,y,pixel_offset,on_off,vaddr,mask,last,video_mem[vaddr]);
+    }
+    else
+    {
+        if(debug_on & (DEBUG_TEXT | DEBUG_PIXEL))
+            logerror("ERROR: vaddr=%05X > VRAM_SIZE=%05X\n",vaddr,VRAM_SIZE);
+    }
 }
 
 
@@ -149,6 +159,9 @@ static void write_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT16    mem_m
     UINT8   bit;
     UINT16  pixel_x;
     UINT8   shifts;
+
+    if(debug_on & (DEBUG_TEXT | DEBUG_PIXEL))
+        logerror("write_pixel_line(x=%04X, y=%04X, data=%04X, mem_mask=%04X,width=%02X)\n",x,y,data,mem_mask,width);
     
     shifts=(width==4) ? 2 : 1;    
     
@@ -162,6 +175,9 @@ static void write_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT16    mem_m
 
 static void write_pixel_data(UINT16 x, UINT16 y, UINT16    data, UINT16    mem_mask)
 {    
+    if(debug_on & (DEBUG_TEXT | DEBUG_PIXEL))
+        logerror("write_pixel_data(x=%04X, y=%04X, data=%04X, mem_mask=%04X), reg022=%04X\n",x,y,data,mem_mask,reg022);
+    
     switch (reg022 & WIDTH_MASK)
     {
         case 0x00   : write_pixel_line(x,y,data,mem_mask,16); break;
