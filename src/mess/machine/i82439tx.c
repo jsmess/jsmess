@@ -115,7 +115,7 @@ static void intel82439tx_configure_memory(running_machine *machine, UINT8 val, o
 	if (val & 0x02)
 		memory_install_write32_handler(space, begin, end, 0, 0, wh);
 	else
-		memory_nop_read(space, begin, end, 0, 0);
+		memory_nop_write(space, begin, end, 0, 0);
 }
 
 
