@@ -927,9 +927,11 @@ void nes_partialhash( char *dest, const unsigned char *data, unsigned long lengt
 
 static void nes_load_proc(const device_config *image)
 {
+	nes_fds.sides = 0;	
+	
 	image_fseek(image, 0, SEEK_END);
 	nes_fds.sides = (image_ftell(image) - 16) / 65500;
-	nes_fds.data = image_realloc(image, nes_fds.data, nes_fds.sides * 65500);
+	nes_fds.data = image_malloc(image, nes_fds.sides * 65500);
 	image_fseek(image, 0x10, SEEK_SET);
 	image_fread(image, nes_fds.data, 65500 * nes_fds.sides);
 	return;
@@ -939,19 +941,10 @@ static void nes_unload_proc(const device_config *image)
 {
 	/* TODO: should write out changes here as well */
 	nes_fds.sides =  0;
-	nes_fds.data = NULL;
+	image_freeptr(image,nes_fds.data);
 }
 
 DRIVER_INIT( famicom) 
-{	
-	nes_fds.sides = 0;
-	nes_fds.data = NULL;
-	
-	floppy_install_load_proc(floppy_get_device(machine,0), nes_load_proc);
-	floppy_install_unload_proc(floppy_get_device(machine,0), nes_unload_proc);
-}
-
-MACHINE_START( famicom )
 {	
 	/* clear some of the cart variables we don't use */
 	nes.trainer = 0;
@@ -964,6 +957,9 @@ MACHINE_START( famicom )
 	nes.four_screen_vram = 0;
 	nes.hard_mirroring = 0;
 
-	nes_fds.sides = 0;	
-	MACHINE_START_CALL( nes );
+	nes_fds.sides = 0;
+	nes_fds.data = NULL;
+	
+	floppy_install_load_proc(floppy_get_device(machine,0), nes_load_proc);
+	floppy_install_unload_proc(floppy_get_device(machine,0), nes_unload_proc);
 }

@@ -282,7 +282,6 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( famicom )
 	MDRV_IMPORT_FROM( nes )
-	MDRV_MACHINE_START( famicom )
 
 	MDRV_CARTSLOT_MODIFY("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("nes,unf")
@@ -408,5 +407,5 @@ CONS( 1987, nespal,    nes,    0,     nespal,   nes,     0,      "Nintendo",  "N
 CONS( 1983, famicom,   nes,    0,     famicom,  famicom, famicom,"Nintendo",  "Famicom Disk System", GAME_IMPERFECT_GRAPHICS )
 CONS( 1986, famitwin,  nes,    0,     famicom,  famicom, famicom,"Sharp",     "Famicom Twin", GAME_IMPERFECT_GRAPHICS )
 CONS( 198?, m82,       nes,    0,     nes,      nes,     0,      "Nintendo",  "M82 Display Unit", GAME_IMPERFECT_GRAPHICS )
-CONS( 1996, drpcjr,    nes,    0,     famicom,  nes,     0,      "Bung",      "Doctor PC Jr", GAME_IMPERFECT_GRAPHICS )
+CONS( 1996, drpcjr,    nes,    0,     famicom,  famicom, famicom,"Bung",      "Doctor PC Jr", GAME_IMPERFECT_GRAPHICS )
 CONS( 199?, dendy,     nes,    0,     dendy,    nes,     0,      "Steepler",  "Dendy Classic", GAME_IMPERFECT_GRAPHICS )
