@@ -16,8 +16,8 @@ WRITE32_HANDLER( _3do_nvarea_w );
 READ32_HANDLER( _3do_unk_318_r );
 WRITE32_HANDLER( _3do_unk_318_w );
 
-READ32_HANDLER( _3do_vram_sport_r );
-WRITE32_HANDLER( _3do_vram_sport_w );
+READ32_HANDLER( _3do_svf_r );
+WRITE32_HANDLER( _3do_svf_w );
 
 READ32_HANDLER( _3do_madam_r );
 WRITE32_HANDLER( _3do_madam_w );

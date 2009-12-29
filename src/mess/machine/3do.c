@@ -46,6 +46,7 @@ typedef struct {
 //static UINT32 unk_318_data_0 = 0;
 static MADAM	madam;
 static CLIO		clio;
+static UINT32	svf_color;
 
 
 READ32_HANDLER( _3do_nvarea_r ) {
@@ -128,24 +129,36 @@ WRITE32_HANDLER( _3do_unk_318_w )
 }
 
 
-
-READ32_HANDLER( _3do_vram_sport_r ) {
-	logerror( "%08X: VRAM SPORT read offset = %08X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset );
-	switch( offset ) {
-	case 0x1840:	/* 03206100 - ?? */
+READ32_HANDLER( _3do_svf_r )
+{
+	logerror( "%08X: SVF read offset = %08X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset*4 );
+	switch( offset & ( 0xE000 / 4 ) )
+	{
+	case 0x0000/4:		/* SPORT transfer */
 		break;
-	case 0x1A40:	/* 03206900 - ?? */
+	case 0x2000/4:		/* Write to color register */
+		return svf_color;
+	case 0x4000/4:		/* Flash write */
+		break;
+	case 0x6000/4:		/* CAS before RAS refresh/reset (CBR). Used to initialize VRAM mode during boot. */
 		break;
 	}
 	return 0;
 }
 
-WRITE32_HANDLER( _3do_vram_sport_w ) {
-	logerror( "%08X: VRAM SPORT write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset, data, mem_mask );
-	switch( offset ) {
-	case 0x0800:	/* 03202000 - ?? during boot 00190019 gets written */
+WRITE32_HANDLER( _3do_svf_w )
+{
+	logerror( "%08X: SVF write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset*4, data, mem_mask );
+	switch( offset & ( 0xe000 / 4 ) )
+	{
+	case 0x0000/4:		/* SPORT transfer */
 		break;
-	case 0x1180:	/* 03204600-0320472c - ?? during boot FFFFFFFF gets written to this block */
+	case 0x2000/4:		/* Write to color register */
+		svf_color = data;
+		break;
+	case 0x4000/4:		/* Flash write */
+		break;
+	case 0x6000/4:		/* CAS before RAS refresh/reset (CBR). Used to initialize VRAM mode during boot. */
 		break;
 	}
 }
