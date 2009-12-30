@@ -864,7 +864,7 @@ static void MessCreateDevice(const device_config *dev)
 static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength)
 {
 	BOOL bResult;
-	char *s;
+	TCHAR *s;
 	int i;
 	mess_image_type imagetypes[64];
 	HWND hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
@@ -932,7 +932,7 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength)
 {
 	BOOL bResult;
-	char *s;
+	TCHAR *s;
 	int i;
 	mess_image_type imagetypes[64];
 	HWND hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
