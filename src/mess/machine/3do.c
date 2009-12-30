@@ -39,7 +39,28 @@ typedef struct {
 
 
 typedef struct {
-	UINT32	dummy;
+	UINT32	revision;		/* 03400000 */
+	UINT32	csysbits;		/* 03400004 */
+	UINT32	vint0;			/* 03400008 */
+	UINT32	vint1;			/* 0340000c */
+	UINT32	audin;			/* 03400020 */
+	UINT32	audout;			/* 03400024 */
+	UINT32	cstatbits;		/* 03400028 */
+	UINT32	wdog;			/* 0340002c */
+	UINT32	hcnt;			/* 03400030 */
+	UINT32	vcnt;			/* 03400034 */
+	UINT32	seed;			/* 03400038 */
+	UINT32	random;			/* 0340004c */
+	UINT32	irq0;			/* 03400040 / 03400044 */
+	UINT32	irq0_enable;	/* 03400048 / 0340004c */
+	UINT32	mode;			/* 03400050 / 03400054 */
+	UINT32	badbits;		/* 03400058 */
+	UINT32	spare;			/* 0340005c */
+	UINT32	irq1;			/* 03400060 / 03400064 */
+	UINT32	irq1_enable;	/* 03400068 / 0340006c */
+	UINT32	hdelay;			/* 03400080 */
+	UINT32	adbio;			/* 03400084 */
+	UINT32	adbctl;			/* 03400088 */
 } CLIO;
 
 
@@ -502,15 +523,34 @@ READ32_HANDLER( _3do_clio_r )
 
 	switch( offset )
 	{
-		case 0x0a: return 0x40;
-		case 0x0d:
+	case 0x0000/4:
+		return clio.revision;
+	case 0x0020/4:
+		return clio.audin;
+	case 0x0024/4:
+		return clio.audout;
+	case 0x0028/4:
+		return clio.cstatbits;
+	case 0x0030/4:
+		return clio.hcnt;
+	case 0x0034/4:
 		{
 			static const UINT32 irq_sequence[3] = { 0, 4, 12 };
 			static int counter = 0;
 
 			return irq_sequence[(counter++)%3];
 		}
-		break;
+		return clio.vcnt;
+	case 0x0038/4:
+		return clio.seed;
+	case 0x003c/4:
+		return clio.random;
+	case 0x0080/4:
+		return clio.hdelay;
+	case 0x0084/4:
+		return clio.adbio;
+	case 0x0088/4:
+		return clio.adbctl;
 	}
 	return 0;
 }
@@ -521,22 +561,91 @@ WRITE32_HANDLER( _3do_clio_w )
 
 	switch( offset )
 	{
-		case 0x09:	/* 03400024 - VDL display control word ? c0020f0f is written here during boot */
-			break;
+	case 0x0004/4:
+		clio.csysbits = data;
+		break;
+	case 0x0008/4:
+		clio.vint0 = data;
+		break;
+	case 0x000c/4:
+		clio.vint1 = data;
+		break;
+	case 0x0020/4:
+		clio.audin = data;
+		break;
+	case 0x0024/4:	/* 03400024 - c0020f0f is written here during boot */
+		clio.audout = data;
+		break;
+	case 0x0028/4:	/* 03400028 - bits 0,1, and 6 are tested (irq sources?) */
+		clio.cstatbits = data;
+		break;
+	case 0x002c/4:	/* 0340002C - ?? during boot 0000000B is written here counter reload related?? */
+		clio.wdog = data;
+		break;
+	case 0x0030/4:
+		clio.hcnt = data;
+		break;
+	case 0x0034/4:
+		clio.vcnt = data;
+		break;
+	case 0x0038/4:
+		clio.seed = data;
+		break;
+	case 0x0040/4:
+		clio.irq0 |= data;
+		break;
+	case 0x0044/4:
+		clio.irq0 &= ~data;
+		break;
+	case 0x0048/4:
+		clio.irq0_enable |= data;
+		break;
+	case 0x004c/4:
+		clio.irq0_enable &= ~data;
+		break;
+	case 0x0050/4:
+		clio.mode |= data;
+		break;
+	case 0x0054/4:
+		clio.mode &= ~data;
+		break;
+	case 0x0058/4:
+		clio.badbits = data;
+		break;
+	case 0x005c/4:
+		clio.spare = data;
+		break;
+	case 0x0060/4:
+		clio.irq1 |= data;
+		break;
+	case 0x0064/4:
+		clio.irq1 &= ~data;
+		break;
+	case 0x0068/4:
+		clio.irq1_enable |= data;
+		break;
+	case 0x006c/4:
+		clio.irq1_enable &= ~data;
+		break;
+	case 0x0080/4:
+		clio.hdelay = data;
+		break;
+	case 0x0084/4:
+		clio.adbio = data;
+		break;
+	case 0x0088/4:
+		clio.adbctl = data;
+		break;
 
-		case 0x0A:	/* 03400028 - bits 0,1, and 6 are tested (irq sources?) */
-			break;
-
-		case 0x0B:	/* 0340002C - ?? during boot 0000000B is written here counter reload related?? */
-			break;
-
-		case 0x88:	/* set timer frequency */
-			break;
+	case 0x88:	/* set timer frequency */
+		break;
 	}
 }
 
 void _3do_clio_init( void )
 {
 	memset( &clio, 0, sizeof(CLIO) );
+	clio.revision = 0x02022000;
+	clio.cstatbits = 0x40;
 }
 
