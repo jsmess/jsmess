@@ -456,8 +456,10 @@ void ti99_fdc_reset(running_machine *machine)
 	use_80_track_drives = FALSE;
 
 	ti99_peb_set_card_handlers(0x1100, & fdc_handlers);
-	wd17xx_reset(fdc);		/* resets the fdc */
-	wd17xx_set_density(fdc,DEN_FM_LO);
+	if (fdc) {
+		wd17xx_reset(fdc);		/* resets the fdc */
+		wd17xx_set_density(fdc,DEN_FM_LO);
+	}
 }
 
 /*
