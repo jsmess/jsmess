@@ -1,23 +1,43 @@
+/*
+ * Serial eeproms
+ *
+ */
+
 #include "driver.h"
-#include "eeprom.h"
+#include "machine/eeprom.h"
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 #define SERIAL_BUFFER_LENGTH 40
-#define MEMORY_SIZE 1024
 
-static const eeprom_interface *intf;
+typedef struct _eeprom_state eeprom_state;
+struct _eeprom_state
+{
+	const eeprom_interface *intf;
+	int serial_count;
+	UINT8 serial_buffer[SERIAL_BUFFER_LENGTH];
+	int data_bits;
+	int read_address;
+	int clock_count;
+	int latch,reset_line,clock_line,sending;
+	int locked;
+	int reset_delay;
+};
 
-static int serial_count;
-static UINT8 serial_buffer[SERIAL_BUFFER_LENGTH];
-static UINT8 eeprom_data[MEMORY_SIZE];
-static int eeprom_data_bits;
-static int eeprom_read_address;
-static int eeprom_clock_count;
-static int latch,reset_line,clock_line,sending;
-static int locked;
-static int reset_delay;
+/*-------------------------------------------------
+    get_safe_token - makes sure that the passed
+    in device is, in fact, an I2C memory
+-------------------------------------------------*/
+
+INLINE eeprom_state *get_safe_token(const device_config *device)
+{
+	assert( device != NULL );
+	assert( device->token != NULL );
+	assert( device->type == EEPROM );
+
+	return (eeprom_state *)device->token;
+}
 
 /*
     eeprom_command_match:
@@ -66,7 +86,7 @@ static int eeprom_command_match(const char *buf, const char *cmd, int len)
 				{
 					case '0':
 					case '1':
-					  	if (b == c)	{	cmd++;			}
+						if (b == c)	{	cmd++;			}
 						else		{	buf++;	len--;	}
 						break;
 					default:	return 0;
@@ -105,195 +125,140 @@ const eeprom_interface eeprom_interface_93C66B =
 //  "*10010xxxxxx", /* erase all */
 };
 
-NVRAM_HANDLER( 93C46 )
+static void eeprom_write(const device_config *device, int bit)
 {
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C46);
-		if (file)	eeprom_load(file);
-	}
-}
+	eeprom_state *eestate = get_safe_token(device);
 
-NVRAM_HANDLER( 93C66B )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C66B);
-		if (file)	eeprom_load(file);
-	}
-}
-
-void eeprom_init(running_machine *machine, const eeprom_interface *interface)
-{
-	intf = interface;
-
-	if ((1 << intf->address_bits) * intf->data_bits / 8 > MEMORY_SIZE)
-	{
-		fatalerror("EEPROM larger than eeprom.c allows");
-	}
-
-	memset(eeprom_data,0xff,(1 << intf->address_bits) * intf->data_bits / 8);
-	serial_count = 0;
-	latch = 0;
-	reset_line = ASSERT_LINE;
-	clock_line = ASSERT_LINE;
-	eeprom_read_address = 0;
-	sending = 0;
-	if (intf->cmd_unlock) locked = 1;
-	else locked = 0;
-
-	state_save_register_global_array(machine, eeprom_data);
-	state_save_register_global_array(machine, serial_buffer);
-	state_save_register_global(machine, clock_line);
-	state_save_register_global(machine, reset_line);
-	state_save_register_global(machine, locked);
-	state_save_register_global(machine, serial_count);
-	state_save_register_global(machine, latch);
-	state_save_register_global(machine, reset_delay);
-	state_save_register_global(machine, eeprom_clock_count);
-	state_save_register_global(machine, eeprom_data_bits);
-	state_save_register_global(machine, eeprom_read_address);
-}
-
-static void eeprom_write(int bit)
-{
 	LOG(("EEPROM write bit %d\n",bit));
 
-	if (serial_count >= SERIAL_BUFFER_LENGTH-1)
+	if (eestate->serial_count >= SERIAL_BUFFER_LENGTH-1)
 	{
 		logerror("error: EEPROM serial buffer overflow\n");
 		return;
 	}
 
-	serial_buffer[serial_count++] = (bit ? '1' : '0');
-	serial_buffer[serial_count] = 0;	/* nul terminate so we can treat it as a string */
+	eestate->serial_buffer[eestate->serial_count++] = (bit ? '1' : '0');
+	eestate->serial_buffer[eestate->serial_count] = 0;	/* nul terminate so we can treat it as a string */
 
-	if ( (serial_count > intf->address_bits) &&
-	      eeprom_command_match((char*)serial_buffer,intf->cmd_read,strlen((char*)serial_buffer)-intf->address_bits) )
+	if ( (eestate->serial_count > eestate->intf->address_bits) &&
+	      eeprom_command_match((char*)(eestate->serial_buffer),eestate->intf->cmd_read,strlen((char*)(eestate->serial_buffer))-eestate->intf->address_bits) )
 	{
 		int i,address;
 
 		address = 0;
-		for (i = serial_count-intf->address_bits;i < serial_count;i++)
+		for (i = eestate->serial_count-eestate->intf->address_bits;i < eestate->serial_count;i++)
 		{
 			address <<= 1;
-			if (serial_buffer[i] == '1') address |= 1;
+			if (eestate->serial_buffer[i] == '1') address |= 1;
 		}
-		if (intf->data_bits == 16)
-			eeprom_data_bits = (eeprom_data[2*address+0] << 8) + eeprom_data[2*address+1];
+		if (eestate->intf->data_bits == 16)
+			eestate->data_bits = memory_read_word(device->space[0], address * 2);
 		else
-			eeprom_data_bits = eeprom_data[address];
-		eeprom_read_address = address;
-		eeprom_clock_count = 0;
-		sending = 1;
-		serial_count = 0;
-logerror("EEPROM read %04x from address %02x\n",eeprom_data_bits,address);
+			eestate->data_bits = memory_read_byte(device->space[0], address);
+		eestate->read_address = address;
+		eestate->clock_count = 0;
+		eestate->sending = 1;
+		eestate->serial_count = 0;
+logerror("EEPROM read %04x from address %02x\n",eestate->data_bits,address);
 	}
-	else if ( (serial_count > intf->address_bits) &&
-	           eeprom_command_match((char*)serial_buffer,intf->cmd_erase,strlen((char*)serial_buffer)-intf->address_bits) )
+	else if ( (eestate->serial_count > eestate->intf->address_bits) &&
+	           eeprom_command_match((char*)(eestate->serial_buffer),eestate->intf->cmd_erase,strlen((char*)(eestate->serial_buffer))-eestate->intf->address_bits) )
 	{
 		int i,address;
 
 		address = 0;
-		for (i = serial_count-intf->address_bits;i < serial_count;i++)
+		for (i = eestate->serial_count-eestate->intf->address_bits;i < eestate->serial_count;i++)
 		{
 			address <<= 1;
-			if (serial_buffer[i] == '1') address |= 1;
+			if (eestate->serial_buffer[i] == '1') address |= 1;
 		}
 logerror("EEPROM erase address %02x\n",address);
-		if (locked == 0)
+		if (eestate->locked == 0)
 		{
-			if (intf->data_bits == 16)
-			{
-				eeprom_data[2*address+0] = 0xff;
-				eeprom_data[2*address+1] = 0xff;
-			}
+			if (eestate->intf->data_bits == 16)
+				memory_write_word(device->space[0], address * 2, 0x0000);
 			else
-				eeprom_data[address] = 0xff;
+				memory_write_byte(device->space[0], address, 0x00);
 		}
 		else
 logerror("Error: EEPROM is locked\n");
-		serial_count = 0;
+		eestate->serial_count = 0;
 	}
-	else if ( (serial_count > (intf->address_bits + intf->data_bits)) &&
-	           eeprom_command_match((char*)serial_buffer,intf->cmd_write,strlen((char*)serial_buffer)-(intf->address_bits + intf->data_bits)) )
+	else if ( (eestate->serial_count > (eestate->intf->address_bits + eestate->intf->data_bits)) &&
+	           eeprom_command_match((char*)(eestate->serial_buffer),eestate->intf->cmd_write,strlen((char*)(eestate->serial_buffer))-(eestate->intf->address_bits + eestate->intf->data_bits)) )
 	{
 		int i,address,data;
 
 		address = 0;
-		for (i = serial_count-intf->data_bits-intf->address_bits;i < (serial_count-intf->data_bits);i++)
+		for (i = eestate->serial_count-eestate->intf->data_bits-eestate->intf->address_bits;i < (eestate->serial_count-eestate->intf->data_bits);i++)
 		{
 			address <<= 1;
-			if (serial_buffer[i] == '1') address |= 1;
+			if (eestate->serial_buffer[i] == '1') address |= 1;
 		}
 		data = 0;
-		for (i = serial_count-intf->data_bits;i < serial_count;i++)
+		for (i = eestate->serial_count-eestate->intf->data_bits;i < eestate->serial_count;i++)
 		{
 			data <<= 1;
-			if (serial_buffer[i] == '1') data |= 1;
+			if (eestate->serial_buffer[i] == '1') data |= 1;
 		}
 logerror("EEPROM write %04x to address %02x\n",data,address);
-		if (locked == 0)
+		if (eestate->locked == 0)
 		{
-			if (intf->data_bits == 16)
-			{
-				eeprom_data[2*address+0] = data >> 8;
-				eeprom_data[2*address+1] = data & 0xff;
-			}
+			if (eestate->intf->data_bits == 16)
+				memory_write_word(device->space[0], address * 2, data);
 			else
-				eeprom_data[address] = data;
+				memory_write_byte(device->space[0], address, 0x00);
 		}
 		else
 logerror("Error: EEPROM is locked\n");
-		serial_count = 0;
+		eestate->serial_count = 0;
 	}
-	else if ( eeprom_command_match((char*)serial_buffer,intf->cmd_lock,strlen((char*)serial_buffer)) )
+	else if ( eeprom_command_match((char*)(eestate->serial_buffer),eestate->intf->cmd_lock,strlen((char*)(eestate->serial_buffer))) )
 	{
 logerror("EEPROM lock\n");
-		locked = 1;
-		serial_count = 0;
+		eestate->locked = 1;
+		eestate->serial_count = 0;
 	}
-	else if ( eeprom_command_match((char*)serial_buffer,intf->cmd_unlock,strlen((char*)serial_buffer)) )
+	else if ( eeprom_command_match((char*)(eestate->serial_buffer),eestate->intf->cmd_unlock,strlen((char*)(eestate->serial_buffer))) )
 	{
 logerror("EEPROM unlock\n");
-		locked = 0;
-		serial_count = 0;
+		eestate->locked = 0;
+		eestate->serial_count = 0;
 	}
 }
 
-static void eeprom_reset(void)
+static void eeprom_reset(eeprom_state *eestate)
 {
-if (serial_count)
-	logerror("EEPROM reset, buffer = %s\n",serial_buffer);
+	if (eestate->serial_count)
+		logerror("EEPROM reset, buffer = %s\n",eestate->serial_buffer);
 
-	serial_count = 0;
-	sending = 0;
-	reset_delay = intf->reset_delay;	/* delay a little before returning setting data to 1 (needed by wbeachvl) */
+	eestate->serial_count = 0;
+	eestate->sending = 0;
+	eestate->reset_delay = eestate->intf->reset_delay;	/* delay a little before returning setting data to 1 (needed by wbeachvl) */
 }
 
 
-void eeprom_write_bit(int bit)
+WRITE_LINE_DEVICE_HANDLER( eeprom_write_bit )
 {
-	LOG(("write bit %d\n",bit));
-	latch = bit;
+	eeprom_state *eestate = get_safe_token(device);
+
+	LOG(("write bit %d\n",state));
+	eestate->latch = state;
 }
 
-int eeprom_read_bit(void)
+READ_LINE_DEVICE_HANDLER( eeprom_read_bit )
 {
+	eeprom_state *eestate = get_safe_token(device);
 	int res;
 
-	if (sending)
-		res = (eeprom_data_bits >> intf->data_bits) & 1;
+	if (eestate->sending)
+		res = (eestate->data_bits >> eestate->intf->data_bits) & 1;
 	else
 	{
-		if (reset_delay > 0)
+		if (eestate->reset_delay > 0)
 		{
 			/* this is needed by wbeachvl */
-			reset_delay--;
+			eestate->reset_delay--;
 			res = 0;
 		}
 		else
@@ -305,72 +270,167 @@ int eeprom_read_bit(void)
 	return res;
 }
 
-CUSTOM_INPUT( eeprom_bit_r )
+WRITE_LINE_DEVICE_HANDLER( eeprom_set_cs_line )
 {
-	return eeprom_read_bit();
-}
+	eeprom_state *eestate = get_safe_token(device);
 
-void eeprom_set_cs_line(int state)
-{
 	LOG(("set reset line %d\n",state));
-	reset_line = state;
+	eestate->reset_line = state;
 
-	if (reset_line != CLEAR_LINE)
-		eeprom_reset();
+	if (eestate->reset_line != CLEAR_LINE)
+		eeprom_reset(eestate);
 }
 
-void eeprom_set_clock_line(int state)
+WRITE_LINE_DEVICE_HANDLER( eeprom_set_clock_line )
 {
+	eeprom_state *eestate = get_safe_token(device);
+
 	LOG(("set clock line %d\n",state));
-	if (state == PULSE_LINE || (clock_line == CLEAR_LINE && state != CLEAR_LINE))
+	if (state == PULSE_LINE || (eestate->clock_line == CLEAR_LINE && state != CLEAR_LINE))
 	{
-		if (reset_line == CLEAR_LINE)
+		if (eestate->reset_line == CLEAR_LINE)
 		{
-			if (sending)
+			if (eestate->sending)
 			{
-				if (eeprom_clock_count == intf->data_bits && intf->enable_multi_read)
+				if (eestate->clock_count == eestate->intf->data_bits && eestate->intf->enable_multi_read)
 				{
-					eeprom_read_address = (eeprom_read_address + 1) & ((1 << intf->address_bits) - 1);
-					if (intf->data_bits == 16)
-						eeprom_data_bits = (eeprom_data[2*eeprom_read_address+0] << 8) + eeprom_data[2*eeprom_read_address+1];
+					eestate->read_address = (eestate->read_address + 1) & ((1 << eestate->intf->address_bits) - 1);
+					if (eestate->intf->data_bits == 16)
+						eestate->data_bits = memory_read_word(device->space[0], eestate->read_address * 2);
 					else
-						eeprom_data_bits = eeprom_data[eeprom_read_address];
-					eeprom_clock_count = 0;
-logerror("EEPROM read %04x from address %02x\n",eeprom_data_bits,eeprom_read_address);
+						eestate->data_bits = memory_read_byte(device->space[0], eestate->read_address);
+					eestate->clock_count = 0;
+logerror("EEPROM read %04x from address %02x\n",eestate->data_bits,eestate->read_address);
 				}
-				eeprom_data_bits = (eeprom_data_bits << 1) | 1;
-				eeprom_clock_count++;
+				eestate->data_bits = (eestate->data_bits << 1) | 1;
+				eestate->clock_count++;
 			}
 			else
-				eeprom_write(latch);
+				eeprom_write(device,eestate->latch);
 		}
 	}
 
-	clock_line = state;
+	eestate->clock_line = state;
 }
 
 
-void eeprom_load(mame_file *f)
+static DEVICE_NVRAM( eeprom )
 {
-	mame_fread(f,eeprom_data,(1 << intf->address_bits) * intf->data_bits / 8);
+	eeprom_state *eestate = get_safe_token(device);
+	UINT32 eeprom_length = 1 << eestate->intf->address_bits;
+	UINT32 eeprom_bytes = eeprom_length * eestate->intf->data_bits / 8;
+	UINT32 offs;
+
+	if (read_or_write)
+	{
+		UINT8 *buffer = alloc_array_or_die(UINT8, eeprom_bytes);
+		for (offs = 0; offs < eeprom_bytes; offs++)
+			buffer[offs] = memory_read_byte(device->space[0], offs);
+		mame_fwrite(file, buffer, eeprom_bytes);
+		free(buffer);
+	}
+	else if (file != NULL)
+	{
+		UINT8 *buffer = alloc_array_or_die(UINT8, eeprom_bytes);
+		mame_fread(file, buffer, eeprom_bytes);
+		for (offs = 0; offs < eeprom_bytes; offs++)
+			memory_write_byte(device->space[0], offs, buffer[offs]);
+		free(buffer);
+	}
+	else
+	{
+		const eeprom_config *config = (const eeprom_config *)device->inline_config;
+		UINT16 default_value = 0xffff;
+		int offs;
+
+		/* initialize to the default value */
+		if (config->default_value != 0)
+			default_value = config->default_value;
+		for (offs = 0; offs < eeprom_length; offs++)
+			if (eestate->intf->data_bits == 8)
+				memory_write_byte(device->space[0], offs, default_value);
+			else
+				memory_write_word(device->space[0], offs * 2, default_value);
+
+		/* handle hard-coded data from the driver */
+		if (config->default_data != NULL)
+			for (offs = 0; offs < config->default_data_size; offs++)
+				memory_write_byte(device->space[0], offs, config->default_data[offs]);
+
+		/* populate from a memory region if present */
+		if (device->region != NULL)
+		{
+			UINT32 region_flags = memory_region_flags(device->machine, device->tag);
+
+			if (device->regionbytes != eeprom_bytes)
+				fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)", device->tag, eeprom_bytes);
+			if (eestate->intf->data_bits == 8 && (region_flags & ROMREGION_WIDTHMASK) != ROMREGION_8BIT)
+				fatalerror("eeprom region '%s' needs to be an 8-bit region", device->tag);
+			if (eestate->intf->data_bits == 16 && ((region_flags & ROMREGION_WIDTHMASK) != ROMREGION_16BIT || (region_flags & ROMREGION_ENDIANMASK) != ROMREGION_BE))
+				fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region (flags=%08x)", device->tag, region_flags);
+
+			for (offs = 0; offs < eeprom_length; offs++)
+				if (eestate->intf->data_bits == 8)
+					memory_write_byte(device->space[0], offs, device->region[offs]);
+				else
+					memory_write_word(device->space[0], offs * 2, ((UINT16 *)device->region)[offs]);
+		}
+	}
 }
 
-void eeprom_save(mame_file *f)
+static DEVICE_START( eeprom )
 {
-	mame_fwrite(f,eeprom_data,(1 << intf->address_bits) * intf->data_bits / 8);
+	eeprom_state *eestate = get_safe_token(device);
+	const eeprom_config *config;
+
+	/* validate some basic stuff */
+	assert(device != NULL);
+	assert(device->inline_config != NULL);
+	assert(device->machine != NULL);
+	assert(device->machine->config != NULL);
+
+	config = (const eeprom_config *)device->inline_config;
+
+	eestate->intf = config->pinterface;
+
+	eestate->serial_count = 0;
+	eestate->latch = 0;
+	eestate->reset_line = ASSERT_LINE;
+	eestate->clock_line = ASSERT_LINE;
+	eestate->read_address = 0;
+	eestate->sending = 0;
+	if (eestate->intf->cmd_unlock) eestate->locked = 1;
+	else eestate->locked = 0;
+
+	state_save_register_device_item_pointer( device, 0, eestate->serial_buffer, SERIAL_BUFFER_LENGTH);
+	state_save_register_device_item( device, 0, eestate->clock_line);
+	state_save_register_device_item( device, 0, eestate->reset_line);
+	state_save_register_device_item( device, 0, eestate->locked);
+	state_save_register_device_item( device, 0, eestate->serial_count);
+	state_save_register_device_item( device, 0, eestate->latch);
+	state_save_register_device_item( device, 0, eestate->reset_delay);
+	state_save_register_device_item( device, 0, eestate->clock_count);
+	state_save_register_device_item( device, 0, eestate->data_bits);
+	state_save_register_device_item( device, 0, eestate->read_address);
 }
 
-void eeprom_set_data(const UINT8 *data, int length)
-{
-	memcpy(eeprom_data, data, length);
-}
+static ADDRESS_MAP_START( eeprom_map8, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+ADDRESS_MAP_END
 
-void *eeprom_get_data_pointer(UINT32 *length, UINT32 *size)
-{
-	if (length != NULL && intf != NULL)
-		*length = 1 << intf->address_bits;
-	if (size != NULL && intf != NULL)
-		*size = intf->data_bits / 8;
+static ADDRESS_MAP_START( eeprom_map16, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+ADDRESS_MAP_END
 
-	return eeprom_data;
-}
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+
+#define DEVTEMPLATE_ID(p,s)			p##eeprom##s
+#define DEVTEMPLATE_FEATURES		DT_HAS_START | DT_HAS_NVRAM | DT_HAS_INLINE_CONFIG | DT_HAS_PROGRAM_SPACE
+#define DEVTEMPLATE_NAME			"EEPROM"
+#define DEVTEMPLATE_FAMILY			"EEPROM"
+#define DEVTEMPLATE_ENDIANNESS		ENDIANNESS_BIG
+#define DEVTEMPLATE_PGM_DATAWIDTH	(((const eeprom_config *)device->inline_config)->pinterface->data_bits)
+#define DEVTEMPLATE_PGM_ADDRWIDTH	(((const eeprom_config *)device->inline_config)->pinterface->address_bits)
+#define DEVTEMPLATE_PGM_ADDRSHIFT	(((const eeprom_config *)device->inline_config)->pinterface->data_bits == 8 ? 0 : -1)
+#define DEVTEMPLATE_PGM_DEFMAP		(((const eeprom_config *)device->inline_config)->pinterface->data_bits == 8 ? (const void *)ADDRESS_MAP_NAME(eeprom_map8) : (const void *)ADDRESS_MAP_NAME(eeprom_map16))
+#include "devtempl.h"

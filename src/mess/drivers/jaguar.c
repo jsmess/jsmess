@@ -175,8 +175,6 @@ static MACHINE_RESET( jaguar )
 *   0xF14000 (read data), F14800 (increment clock, write data), F15000 (reset for next word)
 *
 ********************************************************************/
-
-
 static mame_file *jaguar_nvram_fopen( running_machine *machine, UINT32 openflags)
 {
 	const device_config *image = devtag_get_device(machine, "cart");
@@ -199,20 +197,15 @@ static void jaguar_nvram_load(running_machine *machine)
 	mame_file *nvram_file = NULL;
 	const device_config *device;
 
-	if (machine->config->nvram_handler != NULL)
-	{
-		nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_READ);
-		if (nvram_file) eeprom_load(nvram_file);
-	}
-
 	for (device = (device_config *)machine->config->devicelist.head; device != NULL; device = device->next)
 	{
 		device_nvram_func nvram = (device_nvram_func)device_get_info_fct(device, DEVINFO_FCT_NVRAM);
 		if (nvram != NULL)
 		{
 			if (nvram_file == NULL)
-				nvram_file = nvram_fopen(machine, OPEN_FLAG_READ);
-			(*nvram)(device, nvram_file, 0);
+				nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_READ);
+			if (nvram_file != NULL) 
+				(*nvram)(device, nvram_file, 0);		
 		}
 	}
 
@@ -225,21 +218,15 @@ static void jaguar_nvram_save(running_machine *machine)
 {
 	mame_file *nvram_file = NULL;
 	const device_config *device;
-
-	if (machine->config->nvram_handler != NULL)
-	{
-		nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (nvram_file) eeprom_save(nvram_file);
-	}
-
 	for (device = (device_config *)machine->config->devicelist.head; device != NULL; device = device->next)
 	{
 		device_nvram_func nvram = (device_nvram_func)device_get_info_fct(device, DEVINFO_FCT_NVRAM);
 		if (nvram != NULL)
 		{
 			if (nvram_file == NULL)
-				nvram_file = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			(*nvram)(device, nvram_file, 1);
+				nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			if (nvram_file != NULL)
+				(*nvram)(device, nvram_file, 1);		
 		}
 	}
 
@@ -248,13 +235,12 @@ static void jaguar_nvram_save(running_machine *machine)
 }
 
 static NVRAM_HANDLER( jaguar )
-{
-	if (read_or_write)
+{		
+	if (read_or_write)	{		
 		jaguar_nvram_save(machine);
+	}
 	else
 	{
-		eeprom_init(machine, &eeprom_interface_93C46);
-
 		if (file)
 			jaguar_nvram_load(machine);
 	}
@@ -262,26 +248,29 @@ static NVRAM_HANDLER( jaguar )
 
 static WRITE32_HANDLER( jaguar_eeprom_w )
 {
+	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
 	eeprom_bit_count++;
 	if (eeprom_bit_count != 9)		/* kill extra bit at end of address */
 	{
-		eeprom_write_bit(data >> 31);
-		eeprom_set_clock_line(PULSE_LINE);
+		eeprom_write_bit(eeprom,data >> 31);
+		eeprom_set_clock_line(eeprom,PULSE_LINE);
 	}
 }
 
 static READ32_HANDLER( jaguar_eeprom_clk )
 {
-	eeprom_set_clock_line(PULSE_LINE);	/* get next bit when reading */
+	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+	eeprom_set_clock_line(eeprom,PULSE_LINE);	/* get next bit when reading */
 	return 0;
 }
 
 static READ32_HANDLER( jaguar_eeprom_cs )
 {
-	eeprom_set_cs_line(ASSERT_LINE);	/* must do at end of an operation */
-	eeprom_set_cs_line(CLEAR_LINE);		/* enable chip for next operation */
-	eeprom_write_bit(1);			/* write a start bit */
-	eeprom_set_clock_line(PULSE_LINE);
+	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+	eeprom_set_cs_line(eeprom,ASSERT_LINE);	/* must do at end of an operation */
+	eeprom_set_cs_line(eeprom,CLEAR_LINE);		/* enable chip for next operation */
+	eeprom_write_bit(eeprom,1);			/* write a start bit */
+	eeprom_set_clock_line(eeprom,PULSE_LINE);
 	eeprom_bit_count = 0;
 	return 0;
 }
@@ -375,7 +364,7 @@ static READ32_HANDLER( joystick_r )
 		}
 	}
 
-	joystick_result |= eeprom_read_bit();
+	joystick_result |= eeprom_read_bit(devtag_get_device(space->machine, "eeprom"));
 	joybuts_result |= (input_port_read(space->machine, "CONFIG") & 0x10);
 
 	return (joystick_result << 16) | joybuts_result;
@@ -657,6 +646,8 @@ static MACHINE_DRIVER_START( jaguar )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("jag,abs,rom,j64,j01")
 	MDRV_CARTSLOT_LOAD(jaguar)
+	
+	MDRV_EEPROM_93C46_ADD("eeprom")
 MACHINE_DRIVER_END
 
 

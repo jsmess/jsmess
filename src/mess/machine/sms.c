@@ -3,7 +3,6 @@
 #include "includes/sms.h"
 #include "video/smsvdp.h"
 #include "sound/2413intf.h"
-#include "machine/eeprom.h"
 #include "devices/cartslot.h"
 
 #define VERBOSE 0

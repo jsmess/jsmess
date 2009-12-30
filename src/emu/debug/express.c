@@ -91,7 +91,6 @@ enum
 	TIN_MEMORY_SPACE3_PHYS	= (EXPSPACE_SPACE3_PHYSICAL  << TIN_MEMORY_SPACE_SHIFT),
 	TIN_MEMORY_OPCODE		= (EXPSPACE_OPCODE           << TIN_MEMORY_SPACE_SHIFT),
 	TIN_MEMORY_RAMWRITE		= (EXPSPACE_RAMWRITE         << TIN_MEMORY_SPACE_SHIFT),
-	TIN_MEMORY_EEPROM		= (EXPSPACE_EEPROM	         << TIN_MEMORY_SPACE_SHIFT),
 	TIN_MEMORY_REGION		= (EXPSPACE_REGION           << TIN_MEMORY_SPACE_SHIFT),
 
 	TIN_MEMORY_INDEX_SHIFT	= 16,
@@ -190,7 +189,7 @@ struct _symbol_table
 {
 	symbol_table *			parent;							/* pointer to the parent symbol table */
 	void *					globalref;						/* global reference parameter */
-	internal_symbol_entry *	hash[SYM_TABLE_HASH_SIZE]; 		/* hash table */
+	internal_symbol_entry *	hash[SYM_TABLE_HASH_SIZE];		/* hash table */
 };
 
 
@@ -206,9 +205,9 @@ struct _expression_string
 /* typedef struct _parsed_expression parsed_expression -- defined in express.h */
 struct _parsed_expression
 {
-	const symbol_table *	table; 							/* symbol table */
+	const symbol_table *	table;							/* symbol table */
 	char *					original_string;				/* original string (prior to parsing) */
-	express_callbacks 		callbacks;						/* callbacks */
+	express_callbacks		callbacks;						/* callbacks */
 	void *					cbparam;						/* callbakc parameter */
 	expression_string *		stringlist; 					/* string list */
 	UINT16					stringcount;					/* number of strings allocated so far */
@@ -586,7 +585,6 @@ static EXPRERR parse_memory_operator(parsed_expression *expr, int offset, const 
 		case '3':	*flags |= physical ? TIN_MEMORY_SPACE3_PHYS  : TIN_MEMORY_SPACE3_LOG;	break;
 		case 'o':	*flags |= TIN_MEMORY_OPCODE;											break;
 		case 'r':	*flags |= TIN_MEMORY_RAMWRITE;											break;
-		case 'e':	*flags |= TIN_MEMORY_EEPROM;											break;
 		case 'm':	*flags |= TIN_MEMORY_REGION;											break;
 		default:	return MAKE_EXPRERR_INVALID_MEMORY_SPACE(offset + (buffer - startbuffer));
 	}

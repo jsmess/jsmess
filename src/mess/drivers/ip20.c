@@ -62,30 +62,6 @@ static const eeprom_interface eeprom_interface_93C56 =
 	"*10011xxxxxxx",	// unlock       100x 11xxxx
 };
 
-static NVRAM_HANDLER(93C56)
-{
-	if (read_or_write)
-	{
-		eeprom_save(file);
-	}
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C56);
-		if (file)
-		{
-			eeprom_load(file);
-		}
-		else
-		{
-			UINT32 length;
-			void *dat;
-
-			dat = eeprom_get_data_pointer(&length, NULL);
-			memset(dat, 0, length);
-		}
-	}
-}
-
 static UINT8 nHPC_MiscStatus;
 static UINT32 nHPC_ParBufPtr;
 static UINT32 nHPC_LocalIOReg0Mask;
@@ -152,7 +128,7 @@ static READ32_HANDLER( hpc_r )
 		return nHPC_MiscStatus;
 	case 0x01bc:
 //      verboselog(machine, 2, "HPC CPU Serial EEPROM Read\n" );
-		return ( ( eeprom_read_bit() << 4 ) );
+		return ( ( eeprom_read_bit(devtag_get_device(space->machine, "eeprom")) << 4 ) );
 	case 0x01c4:
 		verboselog(machine, 2, "HPC Local IO Register 0 Mask Read: %08x (%08x)\n", nHPC_LocalIOReg0Mask, mem_mask );
 		return nHPC_LocalIOReg0Mask;
@@ -227,8 +203,10 @@ static READ32_HANDLER( hpc_r )
 static WRITE32_HANDLER( hpc_w )
 {
 	const device_config *scc;
+	const device_config *eeprom;
 	running_machine *machine = space->machine;
 
+	eeprom = devtag_get_device(space->machine, "eeprom");
 	offset <<= 2;
 	if( offset >= 0x0e00 && offset <= 0x0e7c )
 	{
@@ -341,9 +319,9 @@ static WRITE32_HANDLER( hpc_w )
 		{
 			verboselog(machine, 2, "    CPU board LED on\n" );
 		}
-		eeprom_write_bit( (data & 0x00000008) ? 1 : 0 );
-		eeprom_set_cs_line( (data & 0x00000002) ? ASSERT_LINE : CLEAR_LINE );
-		eeprom_set_clock_line( (data & 0x00000004) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_write_bit(eeprom, (data & 0x00000008) ? 1 : 0 );
+		eeprom_set_cs_line(eeprom,(data & 0x00000002) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line(eeprom,(data & 0x00000004) ? CLEAR_LINE : ASSERT_LINE );
 		break;
 	case 0x01c4:
 		verboselog(machine, 2, "HPC Local IO Register 0 Mask Write: %08x (%08x)\n", data, mem_mask );
@@ -601,7 +579,6 @@ static MACHINE_DRIVER_START( ip204415 )
 	MDRV_CPU_PROGRAM_MAP( ip204415_map)
 
 	MDRV_MACHINE_START( ip204415 )
-	MDRV_NVRAM_HANDLER(93C56)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -623,6 +600,8 @@ static MACHINE_DRIVER_START( ip204415 )
 	MDRV_SCC8530_ADD("scc")
 
 	MDRV_CDROM_ADD( "cdrom" )
+	
+	MDRV_EEPROM_ADD("eeprom", eeprom_interface_93C56)
 MACHINE_DRIVER_END
 
 ROM_START( ip204415 )

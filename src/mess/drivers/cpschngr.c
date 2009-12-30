@@ -158,26 +158,15 @@ static const eeprom_interface qsound_eeprom_interface =
 	"0111"	/* erase command */
 };
 
-static NVRAM_HANDLER( qsound )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &qsound_eeprom_interface);
-
-		if (file)
-			eeprom_load(file);
-	}
-}
-
 static READ16_HANDLER( cps1_eeprom_port_r )
 {
-	return eeprom_read_bit();
+	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+	return eeprom_read_bit(eeprom);
 }
 
 static WRITE16_HANDLER( cps1_eeprom_port_w )
 {
+	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
 		/*
@@ -185,9 +174,9 @@ static WRITE16_HANDLER( cps1_eeprom_port_w )
         bit 6 = clock
         bit 7 = cs
         */
-		eeprom_write_bit(data & 0x01);
-		eeprom_set_cs_line((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(eeprom,data & 0x01);
+		eeprom_set_cs_line(eeprom,(data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line(eeprom,(data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -425,8 +414,6 @@ static MACHINE_DRIVER_START( qsound )
 	MDRV_CPU_PROGRAM_MAP(qsound_sub_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 250)	/* ?? */
 
-	MDRV_NVRAM_HANDLER(qsound)
-
 	/* sound hardware */
 	MDRV_DEVICE_REMOVE("mono")
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -437,6 +424,8 @@ static MACHINE_DRIVER_START( qsound )
 	MDRV_SOUND_ADD("qsound", QSOUND, QSOUND_CLOCK)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	
+	MDRV_EEPROM_ADD("eeprom", qsound_eeprom_interface)
 MACHINE_DRIVER_END
 
 /***************************************
