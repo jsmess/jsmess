@@ -308,7 +308,7 @@ READ32_HANDLER( _3do_madam_r ) {
 	case 0x0670/4: case 0x0674/4: case 0x0678/4: case 0x067c/4:
 	case 0x0680/4: case 0x0684/4: case 0x0688/4: case 0x068c/4:
 	case 0x0690/4: case 0x0694/4: case 0x0698/4: case 0x069c/4:
-		return madam.mult[(offset & 0xff)/4];
+		return madam.mult[offset & 0xff];
 	case 0x07f0/4:
 		return madam.mult_control;
 	case 0x07f8/4:
@@ -476,7 +476,7 @@ WRITE32_HANDLER( _3do_madam_w ) {
 	case 0x0670/4: case 0x0674/4: case 0x0678/4: case 0x067c/4:
 	case 0x0680/4: case 0x0684/4: case 0x0688/4: case 0x068c/4:
 	case 0x0690/4: case 0x0694/4: case 0x0698/4: case 0x069c/4:
-		madam.mult[(offset & 0xff)/4] = data;
+		madam.mult[offset & 0xff] = data;
 	case 0x07f0/4:
 		madam.mult_control |= data;
 		break;
