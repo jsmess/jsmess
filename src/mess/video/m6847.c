@@ -1669,7 +1669,7 @@ static void text_mode(const device_config *device, int scanline, UINT32 *RESTRIC
 				char_data = 0xff;
 			}
 		} else {
-			if (mc6847->get_char_rom)
+			if ((attr & M6847_INTEXT) && !(attr & M6847_AS) && mc6847->get_char_rom)
 				char_data = mc6847->get_char_rom(device->machine,byte,scanline % 12);
 			else
 				char_data = mc6847->fontdata[attr_index][byte][scanline % 12];

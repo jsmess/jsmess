@@ -73,10 +73,12 @@ static WRITE8_DEVICE_HANDLER(spc1000_gmode_w)
 {
 	GMODE = data;
 
+	// GMODE layout: CSS|NA|PS2|PS1|~A/G|GM0|GM1|NA
+	//	[PS2,PS1] is used to set screen 0/1 pages
 	mc6847_gm1_w(device, BIT(data, 1));
-	mc6847_gm2_w(device, BIT(data, 2));
+	mc6847_gm0_w(device, BIT(data, 2));
 	mc6847_ag_w(device, BIT(data, 3));
-	mc6847_gm0_w(device, BIT(data, 7));
+	mc6847_css_w(device, BIT(data, 7));	
 }
 
 static READ8_DEVICE_HANDLER(spc1000_gmode_r)
@@ -208,10 +210,25 @@ static MACHINE_RESET(spc1000)
 }
 
 static READ8_DEVICE_HANDLER( spc1000_mc6847_videoram_r )
-{
-	mc6847_inv_w(device, BIT(spc1000_video_ram[offset], 7));
+{	
+	// GMODE layout: CSS|NA|PS2|PS1|~A/G|GM0|GM1|NA
+	//	[PS2,PS1] is used to set screen 0/1 pages
+	if ( !BIT(GMODE, 3) ) {	// text mode (~A/G set to A)
+		unsigned int page = (BIT(GMODE, 5) << 1) | BIT(GMODE, 4);
+		mc6847_inv_w(device, BIT(spc1000_video_ram[offset+page*0x200+0x800], 0));
+		mc6847_css_w(device, BIT(spc1000_video_ram[offset+page*0x200+0x800], 1));
+		mc6847_as_w(device, BIT(spc1000_video_ram[offset+page*0x200+0x800], 2));
+		mc6847_intext_w(device, BIT(spc1000_video_ram[offset+page*0x200+0x800], 3));
+		return spc1000_video_ram[offset+page*0x200];
+	} else {	// graphics mode: uses full 6KB of VRAM
+		return spc1000_video_ram[offset];
+	}
+}
 
-	return spc1000_video_ram[offset];
+
+static UINT8 spc1000_get_char_rom(running_machine *machine, UINT8 ch, int line)
+{
+	return spc1000_video_ram[0x1000+(ch&0x7F)*16+line];
 }
 
 static VIDEO_START( spc1000 )
@@ -241,18 +258,18 @@ static const cassette_config spc1000_cassette_config =
 
 static const mc6847_interface spc1000_mc6847_intf =
 {
-	DEVCB_HANDLER(spc1000_mc6847_videoram_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_HANDLER(spc1000_mc6847_videoram_r),	// data fetch
+	DEVCB_LINE_VCC,								// GM2 [hardwired to 1]
+	DEVCB_NULL,									// GM1
+	DEVCB_NULL,									// GM0
+	DEVCB_NULL,									// INVEXT
+	DEVCB_NULL,									// INV
+	DEVCB_NULL,									// ~A/S
+	DEVCB_NULL,									// ~A/G
+	DEVCB_NULL,									// CSS
+	DEVCB_NULL,									// FS (output)
+	DEVCB_NULL,									// HS (output)
+	DEVCB_NULL									// RS (output)
 };
 
 static MACHINE_DRIVER_START( spc1000 )
@@ -274,7 +291,8 @@ static MACHINE_DRIVER_START( spc1000 )
 	MDRV_VIDEO_UPDATE(spc1000)
 
 	MDRV_MC6847_ADD("mc6847", spc1000_mc6847_intf)
-	MDRV_MC6847_TYPE(M6847_VERSION_M6847T1_NTSC)
+	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC)
+	MDRV_MC6847_CHAR_ROM(spc1000_get_char_rom)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
