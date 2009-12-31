@@ -876,6 +876,7 @@ static MACHINE_DRIVER_START( amstrad )
 
 	MDRV_QUANTUM_TIME(HZ(60))
 
+	MDRV_MACHINE_START( amstrad )
 	MDRV_MACHINE_RESET( amstrad )
 
 	MDRV_I8255A_ADD( "ppi8255", amstrad_ppi8255_interface )

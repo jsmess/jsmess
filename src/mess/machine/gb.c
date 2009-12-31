@@ -333,6 +333,12 @@ MACHINE_RESET( gb )
 	gb_driver_data.divcount = 0x0004;
 }
 
+
+MACHINE_START( sgb )
+{
+	sgb_tile_data = auto_alloc_array_clear(machine, UINT8, 0x2000 );
+}
+
 MACHINE_RESET( sgb )
 {
 	gb_init(machine);
@@ -346,7 +352,6 @@ MACHINE_RESET( sgb )
 	/* Enable BIOS rom */
 	memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") );
 
-	sgb_tile_data = auto_alloc_array_clear(machine, UINT8, 0x2000 );
 	memset( sgb_tile_data, 0, 0x2000 );
 
 	sgb_window_mask = 0;

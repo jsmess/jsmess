@@ -3285,6 +3285,11 @@ static void amstrad_common_init(running_machine *machine)
 }
 
 
+MACHINE_START( amstrad )
+{
+
+	multiface_init(machine);
+}
 MACHINE_RESET( amstrad )
 {
 	int i;
@@ -3302,7 +3307,6 @@ MACHINE_RESET( amstrad )
 	amstrad_reset_machine(machine);
 //  amstrad_init_palette(machine);
 
-	multiface_init(machine);
 
 }
 

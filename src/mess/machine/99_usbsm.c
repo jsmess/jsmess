@@ -75,6 +75,7 @@ static int tms9995_mode;
 void ti99_usbsm_init(running_machine *machine)
 {
 	ti99_usbsm_RAM = auto_alloc_array(machine, UINT16, 0x100000/2);
+	strataflash_init(machine, 0);
 }
 
 /*
@@ -82,9 +83,6 @@ void ti99_usbsm_init(running_machine *machine)
 */
 int ti99_usbsm_reset(running_machine *machine, int in_tms9995_mode)
 {
-	if (strataflash_init(machine, 0))
-		return 1;
-
 	ti99_peb_set_card_handlers(0x1600, & usbsm_handlers);
 
 	feeprom_page = 0;

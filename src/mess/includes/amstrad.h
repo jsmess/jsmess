@@ -30,6 +30,7 @@ READ8_HANDLER ( amstrad_psg_porta_read );
 
 WRITE_LINE_DEVICE_HANDLER( aleste_interrupt );
 
+MACHINE_START( amstrad );
 MACHINE_RESET( amstrad );
 MACHINE_RESET( kccomp );
 MACHINE_START( plus );

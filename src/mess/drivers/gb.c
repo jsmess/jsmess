@@ -599,6 +599,7 @@ static MACHINE_DRIVER_START( supergb )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CONFIG(sgb_cpu_reset)
 
+	MDRV_MACHINE_START( sgb )
 	MDRV_MACHINE_RESET( sgb )
 
 	MDRV_DEFAULT_LAYOUT(layout_horizont)	/* runs on a TV, not an LCD */

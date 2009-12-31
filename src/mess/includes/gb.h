@@ -75,6 +75,7 @@ extern UINT8 sgb_tile_map[2048];	/* 32x32 tile map data (0-tile,1-attribute) */
 extern UINT8 sgb_window_mask;		/* Current GB screen mask               */
 extern UINT8 sgb_hack;				/* Flag set if we're using a hack       */
 
+extern MACHINE_START( sgb );
 extern MACHINE_RESET( sgb );
 extern WRITE8_HANDLER ( sgb_io_w );
 
