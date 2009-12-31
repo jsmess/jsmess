@@ -85,7 +85,6 @@ WRITE8_HANDLER( nimbus_fdc_w );
 
 #define NO_DRIVE_SELECTED   0xFF
 
-
 /* Video stuff */
 READ16_HANDLER (nimbus_video_io_r);
 WRITE16_HANDLER (nimbus_video_io_w);
@@ -93,10 +92,13 @@ WRITE16_HANDLER (nimbus_video_io_w);
 VIDEO_START( nimbus );
 VIDEO_EOF( nimbus );
 VIDEO_UPDATE( nimbus );
+VIDEO_RESET( nimbus );
 
-#define VRAM_NAME   "nimbusvram"
-#define VRAM_SIZE   (64*1024)
+#define SCREEN_WIDTH_PIXELS     640
+#define SCREEN_HEIGHT_LINES     250
 
+#define BYTES_PER_LINE          (SCREEN_WIDTH_PIXELS/2)
+#define PIXELS_PER_BYTE         2
 
 #define LINEAR_ADDR(seg,ofs)    ((seg<<4)+ofs)
 
@@ -135,18 +137,3 @@ typedef struct
 } t_nimbus_brush;
 
 #define OUTPUT_SEGOFS(mess,seg,ofs)  logerror("%s=%04X:%04X [%08X]\n",mess,seg,ofs,((seg<<4)+ofs))
-
-
-/*
-
-    Grapics registers (best guesses)
-    
-    Addr    width   purpose
-    
-    0x000C  word    Y co-ordinate 
-    0x0012  word    X co-ordinate
-    
-    0x0014  byte
-    0x001A  word
-    
-*/

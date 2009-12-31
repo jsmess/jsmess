@@ -1,11 +1,11 @@
-/*
+/* 
     machine/rmnimbus.c
-
+    
     Machine driver for the Research Machines Nimbus.
-
+    
     Phill Harvey-Smith
     2009-11-29.
-
+    
     80186 internal DMA/Timer/PIC code borrowed from Compis driver.
     Perhaps this needs merging into the 80186 core.....
 */
@@ -37,7 +37,9 @@
 #define LOG_OPTIMIZATION    0
 #define LOG_DMA             0
 #define CPU_RESUME_TRIGGER	7123
-#define LOG_KEYBOARD        1
+#define LOG_KEYBOARD        0
+#define LOG_SIO             0
+#define LOG_DISK            0
 
 /* 80186 internal stuff */
 struct mem_state
@@ -149,6 +151,8 @@ static void decode_subbios(const device_config *device,offs_t pc);
 static void decode_dssi_f_fill_area(const device_config *device,UINT16  ds, UINT16 si);
 static void decode_dssi_f_plot_character_string(const device_config *device,UINT16  ds, UINT16 si);
 static void decode_dssi_f_set_new_clt(const device_config *device,UINT16  ds, UINT16 si);
+static void decode_dssi_f_plonk_char(const device_config *device,UINT16  ds, UINT16 si);
+
 static void fdc_reset(void);
 
 static void keyboard_reset(void);
@@ -187,17 +191,16 @@ static IRQ_CALLBACK(int_callback)
 	i186.intr.request &= ~(i186.intr.ack_mask & 0x0f);
 #endif
 
-    if(i186.intr.request!=oldreq)
+	if((LOG_INTERRUPTS) && (i186.intr.request!=oldreq))
         logerror("i186.intr.request changed from %02X to %02X\n",oldreq,i186.intr.request);
 
     old=i186.intr.in_service;
 
 	i186.intr.in_service |= i186.intr.ack_mask;
-
-    if (LOG_INTERRUPTS)
-        if(i186.intr.in_service!=old)
-            logerror("i186.intr.in_service changed from %02X to %02X\n",old,i186.intr.in_service);
-
+	
+    if((LOG_INTERRUPTS) && (i186.intr.in_service!=old))
+        logerror("i186.intr.in_service changed from %02X to %02X\n",old,i186.intr.in_service);
+    
     if (i186.intr.ack_mask == 0x0001)
 	{
 		switch (i186.intr.poll_status & 0x1f)
@@ -215,8 +218,8 @@ static IRQ_CALLBACK(int_callback)
 	/* return the vector */
     switch(i186.intr.poll_status & 0x1F)
     {
-        case 0x0C   : vector=(i186.intr.ext[0] & EXTINT_CTRL_CASCADE) ? i186.intr.ext_vector[0] : (i186.intr.poll_status & 0x1f); logerror("int 0x0c vector=%02X\n",vector); break;
-        case 0x0D   : vector=(i186.intr.ext[1] & EXTINT_CTRL_CASCADE) ? i186.intr.ext_vector[1] : (i186.intr.poll_status & 0x1f); logerror("int 0x0D vector=%02X\n",vector); break;
+        case 0x0C   : vector=(i186.intr.ext[0] & EXTINT_CTRL_CASCADE) ? i186.intr.ext_vector[0] : (i186.intr.poll_status & 0x1f); break;
+        case 0x0D   : vector=(i186.intr.ext[1] & EXTINT_CTRL_CASCADE) ? i186.intr.ext_vector[1] : (i186.intr.poll_status & 0x1f); break;
         default :
             vector=i186.intr.poll_status & 0x1f; break;
     }
@@ -225,20 +228,20 @@ static IRQ_CALLBACK(int_callback)
 	{
         logerror("i186.intr.ext[0]=%04X i186.intr.ext[1]=%04X\n",i186.intr.ext[0],i186.intr.ext[1]);
         logerror("Ext vectors : %02X %02X\n",i186.intr.ext_vector[0],i186.intr.ext_vector[1]);
-        logerror("Calling vector %02X\n",vector);
+        logerror("Int %02X Calling vector %02X\n",i186.intr.poll_status,vector);
     }
-
+    
     return vector;
 }
 
 
 static void update_interrupt_state(running_machine *machine)
-{
+{   
     int new_vector = 0;
     int Priority;
     int IntNo;
 
-	if (LOG_INTERRUPTS)
+	if (LOG_INTERRUPTS) 
         logerror("update_interrupt_status: req=%04X stat=%04X serv=%04X priority_mask=%4X\n", i186.intr.request, i186.intr.status, i186.intr.in_service, i186.intr.priority_mask);
 
 	/* loop over priorities */
@@ -295,7 +298,7 @@ static void update_interrupt_state(running_machine *machine)
 			{
                 if (LOG_INTERRUPTS)
                     logerror("Int%d priority=%d\n",IntNo,Priority);
-
+                
                 /* if we're already servicing something at this level, don't generate anything new */
 				if (i186.intr.in_service & (0x10 << IntNo))
 					return;
@@ -308,8 +311,7 @@ static void update_interrupt_state(running_machine *machine)
 
 					/* set the clear mask and generate the int */
 					i186.intr.ack_mask = 0x0010 << IntNo;
-                    logerror("External int !\n");
-					goto generate_int;
+                    goto generate_int;
 				}
 			}
 	}
@@ -391,14 +393,14 @@ static void handle_eoi(running_machine *machine,int data)
 static void external_int(running_machine *machine, UINT16 intno, UINT8 vector)
 {
 	if (LOG_INTERRUPTS_EXT) logerror("generating external int %02X, vector %02X\n",intno,vector);
-
+ 
    // Only 4 external ints
     if(intno>3)
     {
         logerror("external_int() invalid external interupt no : 0x%02X (can only be 0..3)\n",intno);
         return;
     }
-
+    
     // Only set external vector if cascade mode enabled, only valid for
     // int 0 & int 1
     if (intno<2)
@@ -406,7 +408,7 @@ static void external_int(running_machine *machine, UINT16 intno, UINT8 vector)
         if(i186.intr.ext[intno] & EXTINT_CTRL_CASCADE)
             i186.intr.ext_vector[intno]=vector;
     }
-
+    
     // Turn on the requested request bit and handle interrupt
     i186.intr.request |= (0x010 << intno);
     update_interrupt_state(machine);
@@ -483,7 +485,8 @@ static void internal_timer_update(running_machine *machine,
 	struct timer_state *t = &i186.timer[which];
 	int update_int_timer = 0;
 
-    logerror("internal_timer_update: %d, new_count=%d, new_maxA=%d, new_maxB=%d,new_control=%d",which,new_count,new_maxA,new_maxB,new_control);
+    if (LOG_TIMER) 
+        logerror("internal_timer_update: %d, new_count=%d, new_maxA=%d, new_maxB=%d,new_control=%d\n",which,new_count,new_maxA,new_maxB,new_control);
 
 	/* if we have a new count and we're on, update things */
 	if (new_count != -1)
@@ -527,7 +530,7 @@ static void internal_timer_update(running_machine *machine,
          		new_maxB = 0x10000;
       		}
    	}
-
+    
 
 	/* handle control changes */
 	if (new_control != -1)
@@ -646,7 +649,7 @@ static void update_dma_control(running_machine *machine, int which, int new_cont
 
 	/* check for control bits we don't handle */
 	diff = new_control ^ d->control;
-	if (diff & 0x6811)
+	if ((LOG_DMA) && (diff & 0x6811))
 	  logerror("%05X:ERROR! - unsupported DMA mode %04X\n",
 		   cpu_get_pc(cputag_get_cpu(machine, MAINCPU_TAG)), new_control);
 
@@ -656,15 +659,15 @@ static void update_dma_control(running_machine *machine, int which, int new_cont
 		/* make sure the parameters meet our expectations */
 		if ((new_control & 0xfe00) != 0x1600)
 		{
-			logerror("Unexpected DMA control %02X\n", new_control);
+			if (LOG_DMA) logerror("Unexpected DMA control %02X\n", new_control);
 		}
 		else if (/*!is_redline &&*/ ((d->dest & 1) || (d->dest & 0x3f) > 0x0b))
 		{
-			logerror("Unexpected DMA destination %02X\n", d->dest);
+			if (LOG_DMA) logerror("Unexpected DMA destination %02X\n", d->dest);
 		}
 		else if (/*is_redline && */ (d->dest & 0xf000) != 0x4000 && (d->dest & 0xf000) != 0x5000)
 		{
-			logerror("Unexpected DMA destination %02X\n", d->dest);
+			if (LOG_DMA) logerror("Unexpected DMA destination %02X\n", d->dest);
 		}
 
 		/* otherwise, set a timer */
@@ -692,10 +695,10 @@ static void drq_callback(running_machine *machine, int which)
     struct dma_state *dma = &i186.dma[which];
 	const address_space *memory_space   = cpu_get_address_space(cputag_get_cpu(machine, MAINCPU_TAG), ADDRESS_SPACE_PROGRAM);
     const address_space *io_space       = cpu_get_address_space(cputag_get_cpu(machine, MAINCPU_TAG), ADDRESS_SPACE_IO);
-
+    
     const address_space *src_space;
     const address_space *dest_space;
-
+    
     UINT16  dma_word;
     UINT8   dma_byte;
     UINT8   incdec_size;
@@ -707,83 +710,64 @@ static void drq_callback(running_machine *machine, int which)
     {
         logerror("%05X:ERROR! - drq%d with dma channel stopped\n",
 		   cpu_get_pc(cputag_get_cpu(machine, MAINCPU_TAG)), which);
-
+           
         return;
     }
-
+ 
     if(dma->control & DEST_MIO)
-    {
         dest_space=memory_space;
-        //logerror("dest=memory\n");
-    }
     else
-    {
         dest_space=io_space;
-        //logerror("dest=I/O\n");
-    }
-
+    
     if(dma->control & SRC_MIO)
-    {
         src_space=memory_space;
-        //logerror("src=memory\n");
-    }
     else
-    {
         src_space=io_space;
-        //logerror("src=I/O\n");
-    }
-
+    
     // Do the transfer
     if(dma->control & BYTE_WORD)
     {
-        //logerror("moving word\n");
         dma_word=memory_read_word(src_space,dma->source);
         memory_write_word(dest_space,dma->dest,dma_word);
         incdec_size=2;
     }
     else
     {
-        //logerror("moving byte\n");
         dma_byte=memory_read_byte(src_space,dma->source);
         memory_write_byte(dest_space,dma->dest,dma_byte);
         incdec_size=1;
     }
-
+    
     // Increment or Decrement destination ans source pointers as needed
-    //logerror("incrementing destination\n");
     switch (dma->control & DEST_INCDEC_MASK)
     {
         case DEST_DECREMENT     : dma->dest -= incdec_size;
         case DEST_INCREMENT     : dma->dest += incdec_size;
     }
-
-    //logerror("incrementing source\n");
+    
     switch (dma->control & SRC_INCDEC_MASK)
     {
         case SRC_DECREMENT     : dma->source -= incdec_size;
         case SRC_INCREMENT     : dma->source += incdec_size;
     }
-
+    
     // decrement count
     dma->count -= 1;
-
-    //logerror("Check term on zero\n");
+    
     // Terminate if count is zero, and terminate flag set
     if((dma->control & TERMINATE_ON_ZERO) && (dma->count==0))
     {
         dma->control &= ~ST_STOP;
-        logerror("DMA terminated\n");
+        if (LOG_DMA) logerror("DMA terminated\n");
     }
-
-    //logerror("Check int on zero\n");
+    
     // Interrupt if count is zero, and interrupt flag set
     if((dma->control & INTERRUPT_ON_ZERO) && (dma->count==0))
     {
 		if (LOG_DMA) logerror("DMA%d - requesting interrupt: count = %04X, source = %04X\n", which, dma->count, dma->source);
 		i186.intr.request |= 0x04 << which;
-		update_interrupt_state(machine);
+		update_interrupt_state(machine);      
     }
-    //logerror("DMA callback done\n");
 }
 
 /*-------------------------------------------------------------------------*/
@@ -794,7 +778,7 @@ static void nimbus_cpu_init(running_machine *machine)
 {
 
     logerror("Machine reset\n");
-
+    
 	/* create timers here so they stick around */
 	i186.timer[0].int_timer = timer_alloc(machine, internal_timer_int, NULL);
 	i186.timer[1].int_timer = timer_alloc(machine, internal_timer_int, NULL);
@@ -818,17 +802,17 @@ static void nimbus_cpu_reset(running_machine *machine)
 	i186.intr.ext[2]			= 0x000f;
 	i186.intr.ext[3]			= 0x000f;
     i186.intr.in_service        = 0x0000;
-
+    
     /* External vectors by default to internal int 0/1 vectors */
     i186.intr.ext_vector[0]		= 0x000C;
 	i186.intr.ext_vector[1]		= 0x000D;
-
+	
     i186.intr.pending           = 0x0000;
 	i186.intr.ack_mask          = 0x0000;
 	i186.intr.request           = 0x0000;
 	i186.intr.status            = 0x0000;
 	i186.intr.poll_status       = 0x0000;
-
+	
     logerror("CPU reset done\n");
 }
 
@@ -1257,7 +1241,7 @@ WRITE16_HANDLER( i186_internal_port_w )
 MACHINE_RESET(nimbus)
 {
 	/* CPU */
-	nimbus_cpu_reset(machine);
+	nimbus_cpu_reset(machine); 
     fdc_reset();
     keyboard_reset();
 }
@@ -1272,7 +1256,7 @@ MACHINE_START( nimbus )
     nimbus_cpu_init(machine);
 
     keyboard.keyscan_timer=timer_alloc(machine, keyscan_callback, NULL);
-
+    
 	/* setup debug commands */
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 	{
@@ -1281,7 +1265,7 @@ MACHINE_START( nimbus )
 
         /* set up the instruction hook */
         debug_cpu_set_instruction_hook(cputag_get_cpu(machine, MAINCPU_TAG), instruction_hook);
-
+     
     }
 }
 
@@ -1289,13 +1273,13 @@ static void execute_debug_irq(running_machine *machine, int ref, int params, con
 {
     int IntNo;
     int IntMask;
-
+    
     if(params>0)
-    {
+    {   
         sscanf(param[0],"%d",&IntNo);
-
+        
         IntMask=0x0000;
-
+    
         switch (IntNo)
         {
             case 0  : IntMask=0x010; break;
@@ -1303,36 +1287,36 @@ static void execute_debug_irq(running_machine *machine, int ref, int params, con
             case 2  : IntMask=0x040; break;
             case 3  : IntMask=0x080; break;
         }
-
+        
         i186.intr.request |= IntMask;
         update_interrupt_state(machine);
-
+        
         debug_console_printf(machine,"triggering IRQ%d, IntMask=%4.4X, i186.intr.request=%4.4X\n",IntNo,IntMask,i186.intr.request);
-
+        
 //        cputag_set_input_line(machine, MAINCPU_TAG, IntNo, HOLD_LINE );
 //        cputag_set_input_line(machine, MAINCPU_TAG, IntNo, CLEAR_LINE );
-
+        
     }
     else
     {
         debug_console_printf(machine,"Error, you must supply an intno to trigger\n");
     }
-
-
+	
+    
 }
 
 
 static void execute_debug_intmasks(running_machine *machine, int ref, int params, const char *param[])
 {
     int IntNo;
-
-
+    
+    
     debug_console_printf(machine,"i186.intr.priority_mask=%4X\n",i186.intr.priority_mask);
     for(IntNo=0; IntNo<4; IntNo++)
     {
         debug_console_printf(machine,"extInt%d mask=%4X\n",IntNo,i186.intr.ext[IntNo]);
     }
-
+    
     debug_console_printf(machine,"i186.intr.request   = %04X\n",i186.intr.request);
     debug_console_printf(machine,"i186.intr.ack_mask  = %04X\n",i186.intr.ack_mask);
     debug_console_printf(machine,"i186.intr.in_service= %04X\n",i186.intr.in_service);
@@ -1346,12 +1330,12 @@ static int instruction_hook(const device_config *device, offs_t curpc)
 {
     const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
     UINT8               *addr_ptr;
-
+    
     addr_ptr = memory_get_read_ptr(space,curpc);
-
+        
     if ((addr_ptr !=NULL) && (addr_ptr[0]==0xCD) && (addr_ptr[1]==0xF0))
         decode_subbios(device,curpc);
-
+    
     return 0;
 }
 
@@ -1364,50 +1348,50 @@ static void decode_subbios(const device_config *device,offs_t pc)
     char    type_str[80];
     char    drv_str[80];
     char    func_str[80];
-
+    
     void (*dump_dssi)(const device_config *,UINT16, UINT16) = NULL;
 
     const device_config *cpu = cputag_get_cpu(device->machine,MAINCPU_TAG);
-
+    
     UINT16  ax = cpu_get_reg(cpu,I8086_AX);
     UINT16  bx = cpu_get_reg(cpu,I8086_BX);
     UINT16  cx = cpu_get_reg(cpu,I8086_CX);
     UINT16  ds = cpu_get_reg(cpu,I8086_DS);
     UINT16  si = cpu_get_reg(cpu,I8086_SI);
-
+    
     logerror("=======================================================================\n");
     logerror("Sub-bios call at %08X, AX=%04X, BX=%04X, CX=%04X, DS:SI=%04X:%04X\n",pc,ax,bx,cx,ds,si);
 
     set_type("invalid");
     set_drv("invalid");
     set_func("invalid");
-
+    
 
     switch (cx)
     {
-        case 0   :
+        case 0   : 
         {
             set_type("t_mummu");
             set_drv("d_mummu");
-
+            
             switch (ax)
             {
                 case 0  : set_func("f_get_version_number"); break;
                 case 1  : set_func("f_add_type_code"); break;
                 case 2  : set_func("f_del_typc_code"); break;
                 case 3  : set_func("f_get_TCB"); break;
-                case 4  : set_func("f_add_driver_cdoe"); break;
+                case 4  : set_func("f_add_driver_code"); break;
                 case 5  : set_func("f_del_driver_code"); break;
                 case 6  : set_func("f_get_DCB"); break;
                 case 7  : set_func("f_get_copyright"); break;
             }
         }; break;
-
-        case 1   :
+        
+        case 1   : 
         {
             set_type("t_character");
             set_drv("d_printer");
-
+            
             switch(ax)
             {
                 case 0  : set_func("f_get_version_number"); break;
@@ -1421,11 +1405,11 @@ static void decode_subbios(const device_config *device,offs_t pc)
                 case 8  : set_func("f_set_IO_parameters"); break;
             }
         }; break;
-
-        case 2   :
+        
+        case 2   : 
         {
             set_type("t_disk");
-
+            
             switch(bx)
             {
                 case 0  : set_drv("d_floppy"); break;
@@ -1434,10 +1418,10 @@ static void decode_subbios(const device_config *device,offs_t pc)
                 case 3  : set_drv("d_rompack"); break;
                 case 4  : set_drv("d_eeprom"); break;
             }
-
+            
             switch(ax)
             {
-                case 0  : set_func("f_get_version_number"); break;
+                case 0  : set_func("f_get_version_number"); break;            
                 case 1  : set_func("f_initialise_unit"); break;
                 case 2  : set_func("f_pseudo_init_unit"); break;
                 case 3  : set_func("f_get_device_status"); break;
@@ -1448,128 +1432,128 @@ static void decode_subbios(const device_config *device,offs_t pc)
                 case 8  : set_func("f_recalibrate"); break;
                 case 9  : set_func("f_motors_off"); break;
             }
-
+            
         }; break;
-
-        case 3   :
+        
+        case 3   : 
         {
             set_type("t_piconet");
             switch(ax)
             {
-                case 0  : set_func("f_get_version_number"); break;
+                case 0  : set_func("f_get_version_number"); break;            
             }
         }; break;
-
-        case 4   :
+        
+        case 4   : 
         {
             set_type("t_tick");
             set_drv("d_tick");
-
+            
             switch(ax)
             {
-                case 0  : set_func("f_get_version_number"); break;
-                case 1  : set_func("f_ticks_per_second"); break;
-                case 2  : set_func("f_link_tick_routine"); break;
-                case 3  : set_func("f_unlink_tick_routine"); break;
+                case 0  : set_func("f_get_version_number"); break; 
+                case 1  : set_func("f_ticks_per_second"); break; 
+                case 2  : set_func("f_link_tick_routine"); break; 
+                case 3  : set_func("f_unlink_tick_routine"); break;            
             }
         }; break;
-
-        case 5   :
+        
+        case 5   : 
         {
             set_type("t_graphics_input");
             switch(ax)
             {
-                case 0  : set_func("f_get_version_number"); break;
+                case 0  : set_func("f_get_version_number"); break;            
             }
         }; break;
-
-        case 6   :
+        
+        case 6   : 
         {
             set_type("t_graphics_output");
             set_drv("d_ngc_screen");
 
             switch(ax)
             {
-                case 0  : set_func("f_get_version_number");                 break;
-                case 1  : set_func("f_graphics_output_cold_start");         break;
-                case 2  : set_func("f_graphics_output_warm_start");         break;
-                case 3  : set_func("f_graphics_output_off");                break;
-                case 4  : set_func("f_reinit_graphics_output");             break;
-                case 5  : set_func("f_polymarker");                         break;
-                case 6  : set_func("f_polyline");                           break;
-                case 7  : set_func("f_fill_area"); dump_dssi=&decode_dssi_f_fill_area; break;
-                case 8  : set_func("f_flood_fill_area"); break;
-                case 9  : set_func("f_plot_character_string"); dump_dssi=&decode_dssi_f_plot_character_string; break;
-                case 10 : set_func("f_define_graphics_clipping_area"); break;
-                case 11 : set_func("f_enquire_clipping_area_limits"); break;
-                case 12 : set_func("f_select_graphics_clipping_area"); break;
-                case 13 : set_func("f_enq_selctd_graphics_clip_area"); break;
-                case 14 : set_func("f_set_clt_element"); break;
-                case 15 : set_func("f_enquire_clt_element"); break;
-                case 16 : set_func("f_set_new_clt"); dump_dssi=&decode_dssi_f_set_new_clt; break;
-                case 17 : set_func("f_enquire_clt_contents"); break;
-                case 18 : set_func("f_define_dithering_pattern"); break;
-                case 19 : set_func("f_enquire_dithering_pattern"); break;
-                case 20 : set_func("f_draw_sprite"); break;
-                case 21 : set_func("f_move_sprite"); break;
-                case 22 : set_func("f_erase_sprite"); break;
-                case 23 : set_func("f_read_pixel"); break;
-                case 24 : set_func("f_read_to_limit"); break;
-                case 25 : set_func("f_read_area_pixel"); break;
-                case 26 : set_func("f_write_area_pixel"); break;
-                case 27 : set_func("f_copy_area_pixel"); break;
+                case 0  : set_func("f_get_version_number");                 break; 
+                case 1  : set_func("f_graphics_output_cold_start");         break; 
+                case 2  : set_func("f_graphics_output_warm_start");         break; 
+                case 3  : set_func("f_graphics_output_off");                break; 
+                case 4  : set_func("f_reinit_graphics_output");             break; 
+                case 5  : set_func("f_polymarker");                         break; 
+                case 6  : set_func("f_polyline");                           break; 
+                case 7  : set_func("f_fill_area"); dump_dssi=&decode_dssi_f_fill_area; break; 
+                case 8  : set_func("f_flood_fill_area"); break; 
+                case 9  : set_func("f_plot_character_string"); dump_dssi=&decode_dssi_f_plot_character_string; break; 
+                case 10 : set_func("f_define_graphics_clipping_area"); break; 
+                case 11 : set_func("f_enquire_clipping_area_limits"); break; 
+                case 12 : set_func("f_select_graphics_clipping_area"); break; 
+                case 13 : set_func("f_enq_selctd_graphics_clip_area"); break; 
+                case 14 : set_func("f_set_clt_element"); break; 
+                case 15 : set_func("f_enquire_clt_element"); break; 
+                case 16 : set_func("f_set_new_clt"); dump_dssi=&decode_dssi_f_set_new_clt; break; 
+                case 17 : set_func("f_enquire_clt_contents"); break; 
+                case 18 : set_func("f_define_dithering_pattern"); break; 
+                case 19 : set_func("f_enquire_dithering_pattern"); break; 
+                case 20 : set_func("f_draw_sprite"); break; 
+                case 21 : set_func("f_move_sprite"); break; 
+                case 22 : set_func("f_erase_sprite"); break; 
+                case 23 : set_func("f_read_pixel"); break; 
+                case 24 : set_func("f_read_to_limit"); break; 
+                case 25 : set_func("f_read_area_pixel"); break; 
+                case 26 : set_func("f_write_area_pixel"); break; 
+                case 27 : set_func("f_copy_area_pixel"); break; 
 
-                case 29 : set_func("f_read_area_word"); break;
-                case 30 : set_func("f_write_area_word"); break;
-                case 31 : set_func("f_copy_area_word"); break;
-                case 32 : set_func("f_swap_area_word"); break;
-                case 33 : set_func("f_set_border_colour"); break;
-                case 34 : set_func("f_enquire_border_colour"); break;
-                case 35 : set_func("f_enquire_miscellaneous_data"); break;
-                case 36  : set_func("f_circle"); break;
+                case 29 : set_func("f_read_area_word"); break; 
+                case 30 : set_func("f_write_area_word"); break; 
+                case 31 : set_func("f_copy_area_word"); break; 
+                case 32 : set_func("f_swap_area_word"); break; 
+                case 33 : set_func("f_set_border_colour"); break; 
+                case 34 : set_func("f_enquire_border_colour"); break; 
+                case 35 : set_func("f_enquire_miscellaneous_data"); break; 
+                case 36  : set_func("f_circle"); break; 
 
-                case 38 : set_func("f_arc_of_ellipse"); break;
-                case 39 : set_func("f_isin"); break;
-                case 40 : set_func("f_icos"); break;
-                case 41 : set_func("f_define_hatching_pattern"); break;
-                case 42 : set_func("f_enquire_hatching_pattern"); break;
-                case 43 : set_func("f_enquire_display_line"); break;
-                case 44 : set_func("f_plonk_logo"); break;
+                case 38 : set_func("f_arc_of_ellipse"); break; 
+                case 39 : set_func("f_isin"); break; 
+                case 40 : set_func("f_icos"); break; 
+                case 41 : set_func("f_define_hatching_pattern"); break; 
+                case 42 : set_func("f_enquire_hatching_pattern"); break; 
+                case 43 : set_func("f_enquire_display_line"); break; 
+                case 44 : set_func("f_plonk_logo"); break; 
             }
         }; break;
-
-        case 7   :
+        
+        case 7   : 
         {
             set_type("t_zend");
             switch(ax)
             {
-                case 0  : set_func("f_get_version_number"); break;
+                case 0  : set_func("f_get_version_number"); break;            
             }
         }; break;
-
-        case 8   :
+        
+        case 8   : 
         {
             set_type("t_zep");
             switch(ax)
             {
-                case 0  : set_func("f_get_version_number"); break;
+                case 0  : set_func("f_get_version_number"); break;            
             }
         }; break;
-
-        case 9   :
+        
+        case 9   : 
         {
             set_type("t_raw_console");
-
+            
             switch(bx)
             {
-                case 0  :
+                case 0  : 
                 {
                     set_drv("d_screen");
-
+            
                     switch(ax)
                     {
-                        case 0  : set_func("f_get_version_number"); break;
-                        case 1  : set_func("f_plonk_char"); break;
+                        case 0  : set_func("f_get_version_number"); break;            
+                        case 1  : set_func("f_plonk_char"); dump_dssi=decode_dssi_f_plonk_char; break;
                         case 2  : set_func("f_plonk_cursor"); break;
                         case 3  : set_func("f_kill_cursor"); break;
                         case 4  : set_func("f_scroll"); break;
@@ -1581,14 +1565,14 @@ static void decode_subbios(const device_config *device,offs_t pc)
                         case 10 : set_func("f_set_cursor_flash_rate"); break;
                     }
                 }; break;
-
+            
                 case 1  :
                 {
                     set_drv("d_keyboard");
-
+                    
                     switch(ax)
                     {
-                        case 0  : set_func("f_get_version_number"); break;
+                        case 0  : set_func("f_get_version_number"); break;            
                         case 1  : set_func("f_init_keyboard"); break;
                         case 2  : set_func("f_get_last_key_code"); break;
                         case 3  : set_func("f_get_bitmap"); break;
@@ -1596,28 +1580,28 @@ static void decode_subbios(const device_config *device,offs_t pc)
                 }; break;
             }
         }; break;
-
-        case 10   :
+        
+        case 10   : 
         {
             set_type("t_acoustics");
             switch(ax)
             {
-                case 0  : set_func("f_get_version_number"); break;
+                case 0  : set_func("f_get_version_number"); break;            
             }
         }; break;
-
-        case 11   :
+        
+        case 11   : 
         {
             set_type("t_hard_sums");
             switch(ax)
             {
-                case 0  : set_func("f_get_version_number"); break;
+                case 0  : set_func("f_get_version_number"); break;            
             }
-        }; break;
+        }; break;    
     }
-
+    
     logerror("Type=%s, Driver=%s, Function=%s\n",type_str,drv_str,func_str);
-
+    
     if(dump_dssi!=NULL)
         dump_dssi(device,ds,si);
     logerror("=======================================================================\n");
@@ -1636,26 +1620,26 @@ void *get_dssi_ptr(const address_space *space, UINT16   ds, UINT16 si)
 static void decode_dssi_f_fill_area(const device_config *device,UINT16  ds, UINT16 si)
 {
     const address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
-
+ 
     UINT16          *addr_ptr;
     t_area_params   *area_params;
     t_nimbus_brush  *brush;
     int             cocount;
 
     area_params = get_dssi_ptr(space,ds,si);
-
+    
     OUTPUT_SEGOFS("SegBrush:OfsBrush",area_params->seg_brush,area_params->ofs_brush);
     brush=memory_get_read_ptr(space, LINEAR_ADDR(area_params->seg_brush,area_params->ofs_brush));
-
+    
     logerror("Brush params\n");
     logerror("Style=%04X,          StyleIndex=%04X\n",brush->style,brush->style_index);
     logerror("Colour1=%04X,        Colour2=%04X\n",brush->colour1,brush->colour2);
     logerror("transparency=%04X,   boundry_spec=%04X\n",brush->transparency,brush->boundary_spec);
     logerror("boundry colour=%04X, save colour=%04X\n",brush->boundary_colour,brush->save_colour);
-
-
+            
+    
     OUTPUT_SEGOFS("SegData:OfsData",area_params->seg_data,area_params->ofs_data);
-
+    
     addr_ptr = memory_get_read_ptr(space, LINEAR_ADDR(area_params->seg_data,area_params->ofs_data));
     for(cocount=0; cocount < area_params->count; cocount++)
     {
@@ -1666,18 +1650,18 @@ static void decode_dssi_f_fill_area(const device_config *device,UINT16  ds, UINT
 static void decode_dssi_f_plot_character_string(const device_config *device,UINT16  ds, UINT16 si)
 {
     const address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
-
+ 
     UINT8          *char_ptr;
     t_plot_string_params   *plot_string_params;
     int             charno;
-
+       
     plot_string_params=get_dssi_ptr(space,ds,si);
-
+    
     OUTPUT_SEGOFS("SegFont:OfsFont",plot_string_params->seg_font,plot_string_params->ofs_font);
     OUTPUT_SEGOFS("SegData:OfsData",plot_string_params->seg_data,plot_string_params->ofs_data);
-
+    
     logerror("x=%d, y=%d, length=%d\n",plot_string_params->x,plot_string_params->y,plot_string_params->length);
-
+    
     char_ptr=memory_get_read_ptr(space, LINEAR_ADDR(plot_string_params->seg_data,plot_string_params->ofs_data));
 
     if (plot_string_params->length==0xFFFF)
@@ -1685,7 +1669,7 @@ static void decode_dssi_f_plot_character_string(const device_config *device,UINT
     else
         for(charno=0;charno<plot_string_params->length;charno++)
             logerror("%c",char_ptr[charno]);
-
+        
     logerror("\n");
 }
 
@@ -1695,20 +1679,32 @@ static void decode_dssi_f_set_new_clt(const device_config *device,UINT16  ds, UI
     UINT16  *new_colours;
     int     colour;
     new_colours=get_dssi_ptr(space,ds,si);
-
+    
     OUTPUT_SEGOFS("SegColours:OfsColours",ds,si);
-
+    
     for(colour=0;colour<16;colour++)
         logerror("colour #%02X=%04X\n",colour,new_colours[colour]);
-
+    
 }
+
+static void decode_dssi_f_plonk_char(const device_config *device,UINT16  ds, UINT16 si)
+{
+    const address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
+    UINT16  *params;
+    params=get_dssi_ptr(space,ds,si);
+    
+    OUTPUT_SEGOFS("SegParams:OfsParams",ds,si);
+
+    logerror("plonked_char=%c\n",params[0]);
+}
+
 
 READ16_HANDLER( nimbus_io_r )
 {
     int pc=cpu_get_pc(space->cpu);
-
+    
     logerror("Nimbus IOR at pc=%08X from %04X mask=%04X, data=%04X\n",pc,(offset*2)+0x30,mem_mask,IOPorts[offset]);
-
+    
     switch (offset*2)
     {
         default         : return IOPorts[offset]; break;
@@ -1721,7 +1717,7 @@ WRITE16_HANDLER( nimbus_io_w )
     int pc=cpu_get_pc(space->cpu);
 
     logerror("Nimbus IOW at %08X write of %04X to %04X mask=%04X\n",pc,data,(offset*2)+0x30,mem_mask);
-
+    
     switch (offset*2)
     {
         default         : COMBINE_DATA(&IOPorts[offset]); break;
@@ -1729,15 +1725,15 @@ WRITE16_HANDLER( nimbus_io_w )
 }
 
 
-/*
-    Keyboard emulation
-
+/* 
+    Keyboard emulation 
+    
 */
 
 static void keyboard_reset(void)
 {
     memset(keyboard.keyrows,0xFF,NIMBUS_KEYROWS);
-
+    
     // Setup timer to scan keyboard.
     timer_adjust_periodic(keyboard.keyscan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(50));
 
@@ -1759,7 +1755,7 @@ static int keyboard_queue_read(void)
 	data = keyboard.queue[keyboard.tail];
 
 	if (LOG_KEYBOARD)
-		logerror("at_keyboard_read(): Keyboard Read 0x%02x\n",data);
+		logerror("keyboard_queue_read(): Keyboard Read 0x%02x\n",data);
 
 	keyboard.tail++;
 	keyboard.tail %= ARRAY_LENGTH(keyboard.queue);
@@ -1773,36 +1769,36 @@ static TIMER_CALLBACK(keyscan_callback)
     UINT8   bitno;
     UINT8   mask;
     static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4",
-                                             "KEY5", "KEY6", "KEY7", "KEY8", "KEY9",
+                                             "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", 
                                              "KEY10"};
 
     for(row=0;row<NIMBUS_KEYROWS;row++)
     {
         keyrow=input_port_read(machine, keynames[row]);
-
+        
         for(mask=0x80, bitno=7;mask>0;mask=mask>>1, bitno-=1)
         {
             if(!(keyrow & mask) && (keyboard.keyrows[row] & mask))
             {
-                logerror("keypress %02X\n",(row<<3)+bitno);
+                if (LOG_KEYBOARD) logerror("keypress %02X\n",(row<<3)+bitno);
                 queue_scancode((row<<3)+bitno);
             }
-
+   
             if((keyrow & mask) && !(keyboard.keyrows[row] & mask))
             {
-                logerror("keyrelease %02X\n",0x80+(row<<3)+bitno);
+                if (LOG_KEYBOARD) logerror("keyrelease %02X\n",0x80+(row<<3)+bitno);  
                 queue_scancode(0x80+(row<<3)+bitno);
             }
         }
-
+        
         keyboard.keyrows[row]=keyrow;
     }
 }
 
 
-/*
+/* 
 
-Z80SIO, used for the keyboard interface
+Z80SIO, used for the keyboard interface 
 
 */
 
@@ -1810,14 +1806,14 @@ READ8_DEVICE_HANDLER( sio_r )
 {
     int pc=cpu_get_pc(cputag_get_cpu(device->machine,MAINCPU_TAG));
     UINT8 result = 0;
-
+    
 	switch (offset*2)
 	{
         case 0 :
-            result=z80sio_d_r(device, 0);
+            result=z80sio_d_r(device, 0); 
             break;
         case 2 :
-            result=z80sio_d_r(device, 1);
+            result=z80sio_d_r(device, 1); 
             break;
         case 4 :
             result=z80sio_c_r(device, 0);
@@ -1827,7 +1823,8 @@ READ8_DEVICE_HANDLER( sio_r )
             break;
 	}
 
-    logerror("Nimbus SIOR at pc=%08X from %04X data=%02X\n",pc,(offset*2)+0xF0,result);
+    if(LOG_SIO)
+        logerror("Nimbus SIOR at pc=%08X from %04X data=%02X\n",pc,(offset*2)+0xF0,result);
 
 	return result;
 }
@@ -1836,7 +1833,8 @@ WRITE8_DEVICE_HANDLER( sio_w )
 {
     int pc=cpu_get_pc(cputag_get_cpu(device->machine,MAINCPU_TAG));
 
-    logerror("Nimbus SIOW at %08X write of %02X to %04X\n",pc,data,(offset*2)+0xF0);
+    if(LOG_SIO)
+        logerror("Nimbus SIOW at %08X write of %02X to %04X\n",pc,data,(offset*2)+0xF0);
 
 	switch (offset*2)
 	{
@@ -1859,13 +1857,14 @@ WRITE8_DEVICE_HANDLER( sio_w )
 
 void sio_interrupt(const device_config *device, int state)
 {
-    logerror("SIO Interrupt state=%02X\n",state);
+    if(LOG_SIO)
+        logerror("SIO Interrupt state=%02X\n",state);
 
     // Don't re-trigger if already active !
     if(state!=sio_int_state)
     {
         sio_int_state=state;
-
+        
         if(state)
             external_int(device->machine,0,0x9C);
     }
@@ -1886,7 +1885,7 @@ int sio_serial_receive( const device_config *device, int channel )
 {
 	if(channel==0)
     {
-        return keyboard_queue_read();
+        return keyboard_queue_read();      
     }
     else
         return -1;
@@ -1904,18 +1903,21 @@ static void fdc_reset(void)
 
 static WRITE_LINE_DEVICE_HANDLER( nimbus_fdc_intrq_w )
 {
-	logerror("nimbus_fdc_intrq_w(%d)\n", state);
+    if(LOG_DISK)
+        logerror("nimbus_fdc_intrq_w(%d)\n", state);
 
     if(state && nimbus_fdc.irq_enabled)
     {
         external_int(device->machine,0,0x80);
-    }
+    } 
 }
 
 static WRITE_LINE_DEVICE_HANDLER( nimbus_fdc_drq_w )
 {
-	logerror("nimbus_fdc_drq_w(%d)\n", state);
 
+    if(LOG_DISK)
+        logerror("nimbus_fdc_drq_w(%d)\n", state);
+    
     if(state && nimbus_fdc.drq_enabled)
         drq_callback(device->machine,1);
 }
@@ -1926,12 +1928,12 @@ READ8_HANDLER( nimbus_fdc_r )
 	const device_config *fdc = devtag_get_device(space->machine, FDC_TAG);
     int pc=cpu_get_pc(space->cpu);
     const device_config *drive = devtag_get_device(space->machine, nimbus_wd17xx_interface.floppy_drive_tags[nimbus_fdc.diskno]);
-
+	
     switch(offset*2)
 	{
 		case 0x08 :
 			result = wd17xx_status_r(fdc, 0);
-			logerror("Disk status=%2.2X\n",result);
+			if (LOG_DISK) logerror("Disk status=%2.2X\n",result);
 			break;
 		case 0x0A :
 			result = wd17xx_track_r(fdc, 0);
@@ -1945,13 +1947,14 @@ READ8_HANDLER( nimbus_fdc_r )
         case 0x10 :
             result = (nimbus_fdc.motor_on                                    ? 0x04 : 0x00) |
                      (floppy_drive_get_flag_state(drive, FLOPPY_DRIVE_INDEX) ? 0x00 : 0x02) |
-                     (floppy_drive_get_flag_state(drive, FLOPPY_DRIVE_READY) ? 0x01 : 0x00);
+                     (floppy_drive_get_flag_state(drive, FLOPPY_DRIVE_READY) ? 0x01 : 0x00);      
             break;
 		default:
 			break;
 	}
 
-    logerror("Nimbus FDCR at pc=%08X from %04X data=%02X\n",pc,(offset*2)+0x400,result);
+    if(LOG_DISK)
+        logerror("Nimbus FDCR at pc=%08X from %04X data=%02X\n",pc,(offset*2)+0x400,result);
 
 	return result;
 }
@@ -1961,7 +1964,8 @@ WRITE8_HANDLER( nimbus_fdc_w )
 	const device_config *fdc = devtag_get_device(space->machine, FDC_TAG);
     int pc=cpu_get_pc(space->cpu);
 
-    logerror("Nimbus FDCW at %08X write of %02X to %04X\n",pc,data,(offset*2)+0x400);
+    if(LOG_DISK)
+        logerror("Nimbus FDCW at %08X write of %02X to %04X\n",pc,data,(offset*2)+0x400);
 
     switch(offset*2)
 	{
@@ -1971,7 +1975,7 @@ WRITE8_HANDLER( nimbus_fdc_w )
                 case 0x01 : nimbus_fdc.diskno=0; break;
                 case 0x02 : nimbus_fdc.diskno=1; break;
                 case 0x04 : nimbus_fdc.diskno=2; break;
-                case 0x08 : nimbus_fdc.diskno=3; break;
+                case 0x08 : nimbus_fdc.diskno=3; break;  
                 //default : nimbus_fdc.diskno=NO_DRIVE_SELECTED; break; // no drive selected
             }
             if (nimbus_fdc.diskno!=NO_DRIVE_SELECTED)
@@ -1982,7 +1986,7 @@ WRITE8_HANDLER( nimbus_fdc_w )
             nimbus_fdc.motor_on=(data & 0x20);
             nimbus_fdc.drq_enabled=(data & 0x80);
             nimbus_fdc.irq_enabled=1;
-
+            
             // Nimbus FDC is hard wired for double density
             wd17xx_set_density(fdc, DEN_MFM_LO);
 			break;
