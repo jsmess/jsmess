@@ -23,11 +23,15 @@ f00000 - bit 15 is probably vblank bit.
 static UINT16 supracan_m6502_reset;
 static UINT8 *supracan_soundram;
 static UINT16 *supracan_soundram_16;
+static UINT16 supracan_video_regs[256];
+static emu_timer *supracan_video_timer;
 
 
 static READ16_HANDLER( supracan_unk1_r );
 static WRITE16_HANDLER( supracan_soundram_w );
 static WRITE16_HANDLER( supracan_sound_w );
+static READ16_HANDLER( supracan_video_r );
+static WRITE16_HANDLER( supracan_video_w );
 
 
 static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -36,25 +40,41 @@ static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xe88400, 0xe88c87 ) AM_RAM	/* Unknown, some data gets copied here during boot */
 	AM_RANGE( 0xe8f000, 0xe8ffff ) AM_RAM_WRITE( supracan_soundram_w ) AM_BASE( &supracan_soundram_16 )
 	AM_RANGE( 0xe90000, 0xe9001f ) AM_WRITE( supracan_sound_w )
-	AM_RANGE( 0xf00000, 0xf001ff ) AM_RAM	/* Unknown */
+	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE( supracan_video_r, supracan_video_w )
 	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM	/* Unknown, some data gets copied here during boot */
 	AM_RANGE( 0xf40000, 0xf43fff ) AM_RAM	/* Unknown, some data gets copied here during boot */
-	AM_RANGE( 0xf44000, 0xf4401f ) AM_RAM	/* Unknown */
+	AM_RANGE( 0xf44000, 0xf441ff ) AM_RAM	/* Unknown */
 	AM_RANGE( 0xf44200, 0xf443ff ) AM_RAM	/* Unknown, some data gets copied here during boot. Possibly a tilemap?? */
-	AM_RANGE( 0xf44400, 0xf445ff ) AM_RAM	/* Unknown, some data gets copied here during boot */
+	AM_RANGE( 0xf44400, 0xf445ff ) AM_RAM	/* Unknown, some data gets copied here during boot. Looks like the Functech logo is here */
+	AM_RANGE( 0xf44600, 0xf44fff ) AM_RAM	/* Unknown, stuff gets written here. Zoom table?? */
 	AM_RANGE( 0xfc0000, 0xfcffff ) AM_RAM	/* System work ram */
 	AM_RANGE( 0xff8000, 0xffffff ) AM_RAM	/* System work ram */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( supracan_sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE( 0x0000, 0x01ff ) AM_RAM
+	AM_RANGE( 0x0000, 0x03ff ) AM_RAM
 	AM_RANGE( 0xf000, 0xffff ) AM_RAM AM_BASE( &supracan_soundram )
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( supracan )
 INPUT_PORTS_END
+
+
+static PALETTE_INIT( supracan )
+{
+	int i, r, g, b;
+
+	for( i = 0; i < 32768; i++ )
+	{
+		/* TODO: Verfiy that we are taking the proper bits for r, g, and b. */
+		r = (i & 0x1f) << 3;
+		g = ((i >> 5) & 0x1f) << 3;
+		b = ((i >> 10) & 0x1f) << 3;
+		palette_set_color_rgb( machine, i, r, g, b );
+	}
+}
 
 
 static WRITE16_HANDLER( supracan_soundram_w )
@@ -101,6 +121,38 @@ static WRITE16_HANDLER( supracan_sound_w )
 }
 
 
+static READ16_HANDLER( supracan_video_r )
+{
+	UINT16 data = supracan_video_regs[offset];
+
+	return data;
+}
+
+
+static TIMER_CALLBACK( supracan_video_callback )
+{
+	int vpos = video_screen_get_vpos(machine->primary_screen);
+
+	switch( vpos )
+	{
+	case 0:
+		supracan_video_regs[0] &= 0x7fff;
+		break;
+	case 240:
+		supracan_video_regs[0] |= 0x8000;
+		break;
+	}
+
+	timer_adjust_oneshot( supracan_video_timer, video_screen_get_time_until_pos( machine->primary_screen, ( vpos + 1 ) & 0xff, 0 ), 0 );
+}
+
+
+static WRITE16_HANDLER( supracan_video_w )
+{
+	supracan_video_regs[offset] = data;
+}
+
+
 static DEVICE_IMAGE_LOAD( supracan_cart )
 {
 	UINT8 *cart = memory_region( image->machine, "cart" );
@@ -122,9 +174,16 @@ static DEVICE_IMAGE_LOAD( supracan_cart )
 }
 
 
+static MACHINE_START( supracan )
+{
+	supracan_video_timer = timer_alloc( machine, supracan_video_callback, NULL );
+}
+
+
 static MACHINE_RESET( supracan )
 {
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
+	timer_adjust_oneshot( supracan_video_timer, video_screen_get_time_until_pos( machine->primary_screen, 0, 0 ), 0 );
 }
 
 
@@ -135,13 +194,15 @@ static MACHINE_DRIVER_START( supracan )
 	MDRV_CPU_ADD( "soundcpu", M6502, XTAL_3_579545MHz )		/* TODO: Verfiy actual clock */
 	MDRV_CPU_PROGRAM_MAP( supracan_sound_mem )
 
+	MDRV_MACHINE_START( supracan )
 	MDRV_MACHINE_RESET( supracan )
 
-	MDRV_SCREEN_ADD( "screen", LCD )
-	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )
-	MDRV_SCREEN_SIZE( 320, 240 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 319, 0, 239 )
-	MDRV_SCREEN_REFRESH_RATE( 60 )
+	MDRV_SCREEN_ADD( "screen", RASTER )
+	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
+	MDRV_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, 348, 0, 320, 256, 0, 240 )	/* No idea if this is correct */
+
+	MDRV_PALETTE_LENGTH( 32768 )
+	MDRV_PALETTE_INIT( supracan )
 
 	MDRV_CARTSLOT_ADD( "cart" )
 	MDRV_CARTSLOT_EXTENSION_LIST( "bin" )
