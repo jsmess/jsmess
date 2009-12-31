@@ -10,6 +10,7 @@
 #include "driver.h"
 #include "image.h"
 #include "cpu/i86/i86.h"
+#include "cpu/mcs51/mcs51.h"
 #include "devices/flopdrv.h"
 #include "devices/messram.h"
 #include "formats/flopimg.h"
@@ -185,7 +186,23 @@ static INPUT_PORTS_START( nimbus )
     //PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP1")    PORT_CODE(KEYCODE_1_PAD)        PORT_CHAR('1')
 INPUT_PORTS_END
 
+static ADDRESS_MAP_START(nimbus_iocpu_mem, ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x7fff) AM_RAM
+	//AM_RANGE(0x8000, 0x9fff) AM_ROM // EPROM
+	//AM_RANGE(0xc000, 0xdfff) // Expansion block
+	//AM_RANGE(0xe000, 0xffff) // Expansion block
+ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( nimbus_iocpu_io , ADDRESS_SPACE_IO, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x7fff) AM_RAM
+	//AM_RANGE(0x8000, 0x9fff) AM_ROM // EPROM
+	//AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)  // PPI-8255
+	//AM_RANGE(0xc000, 0xdfff) // Expansion block
+	//AM_RANGE(0xe000, 0xffff) // Expansion block
+ADDRESS_MAP_END
 
 
 static PALETTE_INIT( nimbus )
@@ -203,6 +220,10 @@ static MACHINE_DRIVER_START( nimbus )
     MDRV_CPU_ADD(MAINCPU_TAG, I80186, 10000000)
     MDRV_CPU_PROGRAM_MAP(nimbus_mem)
     MDRV_CPU_IO_MAP(nimbus_io)
+ 
+    MDRV_CPU_ADD(IOCPU_TAG, I8031, 8000000)
+    MDRV_CPU_PROGRAM_MAP(nimbus_iocpu_mem)
+    MDRV_CPU_IO_MAP(nimbus_iocpu_io)
  
     MDRV_MACHINE_START( nimbus )
  
@@ -251,8 +272,11 @@ ROM_START( nimbus )
 	ROM_RELOAD(0xf0001,0x8000)
     ROM_LOAD16_BYTE("sys-2-1.32f-22779-1989-10-20.rom", 0x0000, 0x8000, CRC(0be3db64) SHA1(af806405ec6fbc20385705f90d5059a47de17b08))
 	ROM_RELOAD(0xf0000,0x8000)
-    
+
+    ROM_REGION( 0x4000, IOCPU_TAG, 0 )
+    ROM_LOAD("hexec-v1.02u-13488-1985-10-29.rom", 0x0000, 0x1000, CRC(75c6adfd) SHA1(0f11e0b7386c6368d20e1fc7a6196d670f924825))
 ROM_END
+
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT  COMPANY  FULLNAME   FLAGS */
 COMP( 1986, nimbus,     0,      0,      nimbus, nimbus, 0,   "Research Machines", "nimbus", GAME_NO_SOUND | GAME_NOT_WORKING)

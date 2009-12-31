@@ -371,7 +371,7 @@ static void write_reg_004(void)
 
 static void write_reg_010(void)
 {
-    write_pixel_data(0,vidregs[reg00C],vidregs[reg010]);    
+    write_pixel_data(vidregs[reg002],vidregs[reg00C],vidregs[reg010]);    
 }
 
 static void write_reg_012(void)
@@ -420,7 +420,6 @@ static void video_debug(running_machine *machine, int ref, int params, const cha
     {
         debug_console_printf(machine,"Error usage : nimbus_vid_debug <debuglevel>\n");
         debug_console_printf(machine,"Current debuglevel=%02X\n",debug_on);
-        debug_console_printf(machine,"VRAM size=%02X\n",VRAM_SIZE);
     }
 }
 

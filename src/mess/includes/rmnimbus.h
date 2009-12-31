@@ -14,6 +14,7 @@
 #define DEBUG_PIXEL 0x04
 
 #define MAINCPU_TAG "maincpu"
+#define IOCPU_TAG   "iocpu"
 
 DRIVER_INIT(nimbus);
 MACHINE_RESET(nimbus);
