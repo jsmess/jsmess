@@ -1647,7 +1647,7 @@ static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0xc2100000, 0xc213ffff) AM_ROM AM_REGION("user",0x180000)  // FONT ROM
   AM_RANGE(0xc2140000, 0xc2141fff) AM_READWRITE8(towns_cmos_r,towns_cmos_w,0xffffffff) // CMOS (mirror?)
   AM_RANGE(0xc2180000, 0xc21fffff) AM_ROM AM_REGION("user",0x080000)  // F20 ROM
-  AM_RANGE(0xc2200000, 0xc2200fff) AM_NOP  // WAVE RAM
+  AM_RANGE(0xc2200000, 0xc2200fff) AM_DEVREADWRITE8("pcm",rf5c68_mem_r,rf5c68_mem_w,0xffffffff)  // WAVE RAM
   AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 ADDRESS_MAP_END
 
@@ -1670,6 +1670,7 @@ static ADDRESS_MAP_START(marty_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x00c00000, 0x00c1ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffffffff) // Sprite RAM
   AM_RANGE(0x00e80000, 0x00efffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
   AM_RANGE(0x00f00000, 0x00f7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
+  AM_RANGE(0x00f80000, 0x00f80fff) AM_DEVREADWRITE8("pcm",rf5c68_mem_r,rf5c68_mem_w,0xffffffff)  // WAVE RAM
   AM_RANGE(0x00fc0000, 0x00ffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 /*  AM_RANGE(0x80000000, 0x8007ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x180000) // VRAM
   AM_RANGE(0x81000000, 0x8101ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffffffff) // Sprite RAM
@@ -2075,8 +2076,8 @@ static MACHINE_DRIVER_START( towns )
 	MDRV_SOUND_ADD("fm", YM3438, 53693100 / 7) // actual clock speed unknown
 	MDRV_SOUND_CONFIG(ym3438_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("pcm", RF5C68, 2150000)  // actual clock speed unknown
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ADD("pcm", RF5C68, 53693100 / 7)  // actual clock speed unknown
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 	MDRV_SOUND_ADD("cdda",CDDA,0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
