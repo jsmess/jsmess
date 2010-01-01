@@ -307,7 +307,7 @@ static struct {
 			UINT8 ram1[2][16];
 			struct	{
 				UINT8 y,x;
-					} pos[4];
+			} pos[4];
 			UINT8 ram2[4];
 			UINT8 vpos;
 			UINT8 sound1, sound2;
@@ -325,9 +325,9 @@ static struct {
 			// 0x1a00
 			UINT8 chars2[13][16];
 			UINT8 ram3[3][16];
-			} d;
-		} reg;
-	bitmap_t *bitmap;
+	} d;
+    } reg;
+    bitmap_t *bitmap;
 } arcadia_video={ 0 };
 
 VIDEO_START( arcadia )

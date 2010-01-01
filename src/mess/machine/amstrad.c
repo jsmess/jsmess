@@ -1620,7 +1620,7 @@ static WRITE8_HANDLER(multiface_io_write)
 				default:
 				   break;
 
-		 }
+		}
 
 }
 
@@ -2882,8 +2882,8 @@ static void update_psg(running_machine *machine)
 		}
 		return;
 	}
-  switch (amstrad_Psg_FunctionSelected)
-  {
+	switch (amstrad_Psg_FunctionSelected)
+	{
   	case 0:
 		{/* Inactive */
 		} break;
@@ -2903,8 +2903,9 @@ static void update_psg(running_machine *machine)
 			prev_reg = ppi_port_outputs[amstrad_ppi_PortA];
   		}
 		break;
-  	default: {
-    } break;
+  	default:
+		{
+		} break;
 	}
 }
 
@@ -3055,9 +3056,11 @@ READ8_HANDLER ( amstrad_psg_porta_read )
    If keyboard matrix line 11-14 are selected, the byte is always &ff.
    After testing on a real CPC, it is found that these never change, they always return &FF. */
 
-	static const char *const keynames[] = { "keyboard_row_0", "keyboard_row_1", "keyboard_row_2", "keyboard_row_3", "keyboard_row_4",
-										"keyboard_row_5", "keyboard_row_6", "keyboard_row_7", "keyboard_row_8", "keyboard_row_9",
-										"keyboard_row_10" };
+	static const char *const keynames[] = {
+		"keyboard_row_0", "keyboard_row_1", "keyboard_row_2", "keyboard_row_3", "keyboard_row_4",
+		"keyboard_row_5", "keyboard_row_6", "keyboard_row_7", "keyboard_row_8", "keyboard_row_9",
+		"keyboard_row_10"
+	};
 
 	if ( ( ppi_port_outputs[amstrad_ppi_PortC] & 0x0F ) > 10)
 	{

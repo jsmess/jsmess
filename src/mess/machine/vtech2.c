@@ -153,7 +153,8 @@ WRITE8_HANDLER( laser_bank_select_w )
         "ROM lo","ROM hi","MM I/O","Video RAM lo",
         "RAM #0","RAM #1","RAM #2","RAM #3",
         "RAM #4","RAM #5","RAM #6","RAM #7/Video RAM hi",
-        "ext ROM #0","ext ROM #1","ext ROM #2","ext ROM #3"};
+        "ext ROM #0","ext ROM #1","ext ROM #2","ext ROM #3"
+    };
 	char bank[10];
 	offset %= 4;
     data &= 15;

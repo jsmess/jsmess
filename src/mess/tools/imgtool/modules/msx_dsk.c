@@ -45,7 +45,8 @@
 #include "utils.h"
 
 
-typedef struct {
+typedef struct
+	{
 	imgtool_image			base;
 	char			*file_name;
 	imgtool_stream 			*file_handle;
@@ -172,10 +173,10 @@ IMAGEMODULE(
 #define 	FORMAT_MULTI	(3)
 
 static int msx_dsk_image_init(const imgtool_module *mod, imgtool_stream *f, imgtool_image **outimg)
-{
+	{
 	DSK_IMAGE *image;
 	int size, disks, correct, format;
-    UINT8 header;
+	UINT8 header;
 
 	size = stream_size (f);
 	if (size < (360*1024) )

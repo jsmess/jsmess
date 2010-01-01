@@ -1218,13 +1218,13 @@ static void gdc_command_processor(UINT8 command)
 /*-------------------------------------------------------------------------*/
 static int gdc_nbr_expected_params(UINT8 command)
 {
-	switch(command)
-	{
-		/* Video control commands */
+    switch(command)
+    {
+      /* Video control commands */
 
-		case CMD_START:
-		case CMD_VSYNC_SLAVE:
-		case CMD_VSYNC_MASTER:
+      case CMD_START:
+      case CMD_VSYNC_SLAVE:
+      case CMD_VSYNC_MASTER:
       case CMD_BCTRL_OFF:
       case CMD_BCTRL_ON:
       case CMD_FIGD:
@@ -1263,8 +1263,7 @@ static int gdc_nbr_expected_params(UINT8 command)
                   return 16;
             }
          }
-   }
-
+    }
 }
 
 
@@ -1384,8 +1383,8 @@ READ8_HANDLER (compis_gdc_r)
          data = 0xff;
          data = 0x00;
          break;
-   }
-   LOG((" returns %1X\n", data));
+	}
+	LOG((" returns %1X\n", data));
 	return(data);
 }
 

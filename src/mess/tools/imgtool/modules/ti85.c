@@ -31,7 +31,8 @@ static const char *const var_type[] = {
 		"Range settings",		//0x18
 		"Range settings",		//0x19
 		"Range settings",		//0x1a
-		"Range settings"};		//0x1b
+		"Range settings"		//0x1b
+};
 
 typedef struct {
 	char signature[0x08];
@@ -429,7 +430,8 @@ static int ti85_file_create(const imgtool_module *mod, imgtool_stream *f, const 
 	ti85_header header = {	{'*','*','T','I','8','5','*','*'},
 				{0x1a, 0x0c, 0x00},
 				"",
-				{0x00, 0x00} };
+				{0x00, 0x00}
+	};
 
 	char checksum[] = {0x00, 0x00};
 

@@ -2164,7 +2164,7 @@ static TIMER_CALLBACK( line_timer_callback )
 								} \
 							} \
 						} \
-					 } \
+					} \
 				} \
 			} \
 		} \

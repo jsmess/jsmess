@@ -528,7 +528,7 @@ static void internal_timer_update(running_machine *machine,
 		if (new_maxB == 0)
 		{
          		new_maxB = 0x10000;
-      		}
+		}
    	}
     
 
@@ -602,7 +602,7 @@ static void internal_timer_update(running_machine *machine,
 	      	else
 	      	{
 	        	timer_adjust_oneshot(t->int_timer, attotime_never, which);
-		}
+	      	}
 	}
 }
 
@@ -1768,9 +1768,11 @@ static TIMER_CALLBACK(keyscan_callback)
     UINT8   row;
     UINT8   bitno;
     UINT8   mask;
-    static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4",
-                                             "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", 
-                                             "KEY10"};
+    static const char *const keynames[] = {
+        "KEY0", "KEY1", "KEY2", "KEY3", "KEY4",
+        "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", 
+        "KEY10"
+    };
 
     for(row=0;row<NIMBUS_KEYROWS;row++)
     {

@@ -1773,7 +1773,7 @@ MSX_SLOT_LOADSRAM(fmpac)
 		if ((mame_fread (f, buf, PAC_HEADER_LEN) == PAC_HEADER_LEN) &&
 			!strncmp (buf, PAC_HEADER, PAC_HEADER_LEN) &&
 			mame_fread (f, state->cart.fmpac.mem, 0x1ffe))
-			{
+		{
 			logerror ("fmpac: info: sram loaded\n");
 			mame_fclose (f);
 			return 0;
@@ -1805,7 +1805,7 @@ MSX_SLOT_SAVESRAM(fmpac)
 	{
 		if ((mame_fwrite (f, PAC_HEADER, PAC_HEADER_LEN) == PAC_HEADER_LEN) &&
 			(mame_fwrite (f, state->cart.fmpac.mem, 0x1ffe) == 0x1ffe))
-			{
+		{
 			logerror ("fmpac: info: sram saved\n");
 			mame_fclose (f);
 			return 0;

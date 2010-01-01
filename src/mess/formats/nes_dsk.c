@@ -62,5 +62,4 @@ FLOPPY_OPTIONS_START( nes_only )
 		nes_dsk_construct,
 		NULL
 	)
-		{ NULL }
-};
+FLOPPY_OPTIONS_END0

@@ -228,7 +228,7 @@ static int uef_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 	int pos;
 	INT16 *p = buffer;
 
-        if ( bytes[0] == 0x1f && bytes[1] == 0x8b ) {
+	if ( bytes[0] == 0x1f && bytes[1] == 0x8b ) {
 		if ( gz_ptr == NULL ) {
 			return 1;
 		}

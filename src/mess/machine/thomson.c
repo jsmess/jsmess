@@ -701,8 +701,10 @@ static READ8_DEVICE_HANDLER ( to7_sys_porta_in )
 		int keyline = pia6821_get_output_b( device );
 		UINT8 val = 0xff;
 		int i;
-		static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
-											"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
+		static const char *const keynames[] = {
+			"keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
+			"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7"
+		};
 
 		for ( i = 0; i < 8; i++ )
 		{
@@ -1621,8 +1623,10 @@ static WRITE8_DEVICE_HANDLER ( to770_sys_cb2_out )
 static READ8_DEVICE_HANDLER ( to770_sys_porta_in )
 {
 	/* keyboard */
-	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
-										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
+	static const char *const keynames[] = {
+		"keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
+		"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7"
+	};
 	int keyline = pia6821_get_output_b( device ) & 7;
 
 	return input_port_read(device->machine, keynames[7 - keyline]);
@@ -1934,8 +1938,10 @@ static READ8_DEVICE_HANDLER ( mo5_sys_portb_in )
 	UINT8 portb = pia6821_get_output_b( device );
 	int col = (portb >> 1) & 7;       /* key column */
 	int lin = 7 - ((portb >> 4) & 7); /* key line */
-	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
-										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
+	static const char *const keynames[] = {
+		"keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
+		"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7"
+	};
 
 	return ( input_port_read(device->machine, keynames[lin]) & (1 << col) ) ? 0x80 : 0;
 }
@@ -2606,8 +2612,10 @@ static int to9_kbd_ktest ( running_machine *machine )
 {
 	int line, bit;
 	UINT8 port;
-	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", "keyboard_4",
-										"keyboard_5", "keyboard_6", "keyboard_7", "keyboard_8", "keyboard_9" };
+	static const char *const keynames[] = {
+		"keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", "keyboard_4",
+		"keyboard_5", "keyboard_6", "keyboard_7", "keyboard_8", "keyboard_9"
+	};
 
 	for ( line = 0; line < 10; line++ )
 	{
@@ -2840,8 +2848,10 @@ static int to9_kbd_get_key( running_machine *machine )
 	int shift   = ! (input_port_read(machine, "keyboard_9") & 1);
 	int key = -1, line, bit;
 	UINT8 port;
-	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", "keyboard_4",
-										"keyboard_5", "keyboard_6", "keyboard_7", "keyboard_8", "keyboard_9" };
+	static const char *const keynames[] = {
+		"keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", "keyboard_4",
+		"keyboard_5", "keyboard_6", "keyboard_7", "keyboard_8", "keyboard_9"
+	};
 
 	for ( line = 0; line < 10; line++ )
 	{
@@ -3239,8 +3249,10 @@ static int to8_kbd_ktest ( running_machine *machine )
 {
 	int line, bit;
 	UINT8 port;
-	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", "keyboard_4",
-										"keyboard_5", "keyboard_6", "keyboard_7", "keyboard_8", "keyboard_9" };
+	static const char *const keynames[] = {
+		"keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", "keyboard_4",
+		"keyboard_5", "keyboard_6", "keyboard_7", "keyboard_8", "keyboard_9"
+	};
 
 	if ( input_port_read(machine, "config") & 2 )
 		return 0; /* disabled */
@@ -3271,8 +3283,10 @@ static int to8_kbd_get_key( running_machine *machine )
 	int shift   = (input_port_read(machine, "keyboard_9") & 1) ? 0 : 0x080;
 	int key = -1, line, bit;
 	UINT8 port;
-	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", "keyboard_4",
-										"keyboard_5", "keyboard_6", "keyboard_7", "keyboard_8", "keyboard_9" };
+	static const char *const keynames[] = {
+		"keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", "keyboard_4",
+		"keyboard_5", "keyboard_6", "keyboard_7", "keyboard_8", "keyboard_9"
+	};
 
 	if ( input_port_read(machine, "config") & 2 )
 		return -1; /* disabled */
@@ -4644,8 +4658,10 @@ static READ8_DEVICE_HANDLER ( mo6_sys_portb_in )
 	UINT8 portb = pia6821_get_output_b( device );
 	int col = (portb >> 4) & 7;    /* B bits 4-6: kbd column */
 	int lin = (portb >> 1) & 7;    /* B bits 1-3: kbd line */
-	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", "keyboard_4",
-										"keyboard_5", "keyboard_6", "keyboard_7", "keyboard_8", "keyboard_9" };
+	static const char *const keynames[] = {
+		"keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", "keyboard_4",
+		"keyboard_5", "keyboard_6", "keyboard_7", "keyboard_8", "keyboard_9"
+	};
 
 	if ( ! (porta & 8) )
 		lin = 8;     /* A bit 3: 9-th kbd line select */
@@ -5044,8 +5060,10 @@ static READ8_DEVICE_HANDLER ( mo5nr_sys_portb_in )
 	UINT8 portb = pia6821_get_output_b( device );
 	int col = (portb >> 4) & 7;    /* B bits 4-6: kbd column */
 	int lin = (portb >> 1) & 7;    /* B bits 1-3: kbd line */
-	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
-										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
+	static const char *const keynames[] = {
+		"keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
+		"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7"
+	};
 
 	return ( input_port_read(device->machine, keynames[lin]) & (1 << col) ) ? 0x80 : 0;
 	/* bit 7: key up */

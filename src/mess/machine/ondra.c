@@ -42,7 +42,7 @@ static READ8_HANDLER( ondra_keyboard_r )
 		retVal |= input_port_read(space->machine, keynames[ondra_keyboard_line]);
 	}
 	return retVal;
- }
+}
 
 static void ondra_update_banks(running_machine *machine)
 {

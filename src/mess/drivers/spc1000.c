@@ -63,9 +63,10 @@ static READ8_HANDLER(spc1000_video_ram_r)
 }
 
 static READ8_HANDLER(spc1000_keyboard_r) {
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3",
-											"LINE4", "LINE5", "LINE6", "LINE7",
-											"LINE8", "LINE9" };
+	static const char *const keynames[] = {
+		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4",
+		"LINE5", "LINE6", "LINE7", "LINE8", "LINE9"
+	};
 	return input_port_read(space->machine, keynames[offset]);
 }
 

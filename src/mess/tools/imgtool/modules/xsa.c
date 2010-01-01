@@ -9,7 +9,8 @@
 #include "utils.h"
 
 
-typedef struct {
+typedef struct
+	{
 	imgtool_image			base;
 	char			*file_name;
 	imgtool_stream 			*file_handle;
@@ -211,7 +212,8 @@ static unsigned cpdist[tblsize+1];
 static unsigned cpdbmask[tblsize];
 static const unsigned cpdext[] = { /* Extra bits for distance codes */
           0,  0,  0,  0,  1,  2,  3,  4,
-          5,  6,  7,  8,  9, 10, 11, 12};
+          5,  6,  7,  8,  9, 10, 11, 12
+};
 
 static SHORT tblsizes[tblsize];
 static huf_node huftbl[2*tblsize-1];
@@ -323,7 +325,7 @@ static int xsa_extract (imgtool_stream *in, imgtool_stream *out)
     do  {
 		if (1 != stream_read (in, &byt, 1) )
 			return IMGTOOLERR_READERROR;
-		} while (byt);
+    } while (byt);
 	in_stream = in;
     bitcnt = 0;         /* nog geen bits gelezen               */
 

@@ -68,8 +68,10 @@ static TIMER_CALLBACK(keyboard_callback)
 {
 	int i,j;
 	UINT8 c;
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4",
-		"LINE5", "LINE6", "LINE7", "LINE8", "LINE9", "LINE10", "LINE11" };
+	static const char *const keynames[] = {
+		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4",
+		"LINE5", "LINE6", "LINE7", "LINE8", "LINE9", "LINE10", "LINE11"
+	};
 
 	for(i = 0; i < 12; i++)
 	{

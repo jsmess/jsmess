@@ -484,7 +484,8 @@ DRIVER_INIT( mekd2 )
 		".b.cccccccc...........b." \
 		".b.cccccccc...........b." \
 		".bbbbbbbbbbbbbbbbbbbbbb." \
-		"........................"};
+		"........................"
+	};
 
 	dst = memory_region(machine, "gfx1");
 	memset(dst, 0, memory_region_length(machine, "gfx1"));

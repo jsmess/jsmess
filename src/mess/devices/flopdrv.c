@@ -980,7 +980,8 @@ DEVICE_GET_INFO(floppy)
 		case DEVINFO_INT_IMAGE_TYPE:				info->i = IO_FLOPPY; break;
 		case DEVINFO_INT_IMAGE_READABLE:			info->i = 1; break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1; break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	{
+		case DEVINFO_INT_IMAGE_CREATABLE:
+											{
 												int cnt = 0;
 												if ( device && device->static_config )
 												{
@@ -999,14 +1000,15 @@ DEVICE_GET_INFO(floppy)
 		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(floppy); break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(floppy); break;
 		case DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE:		info->p = (void *)floppy_option_guide; break;
-		case DEVINFO_INT_IMAGE_CREATE_OPTCOUNT:		{
+		case DEVINFO_INT_IMAGE_CREATE_OPTCOUNT:
+		{
 			const struct FloppyFormat *floppy_options = ((floppy_config*)device->static_config)->formats;
 			int count;
 			for (count = 0; floppy_options[count].construct; count++)
 				;
 			info->i = count;
 			break;
-			}
+		}
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:						strcpy(info->s, "Floppy Disk"); break;

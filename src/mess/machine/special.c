@@ -292,7 +292,7 @@ WRITE8_HANDLER( specimx_disk_ctrl_w )
 		 		wd17xx_set_drive(fdc,data & 1);
 		 		break;
 
-  }
+	}
 }
 
 /*
@@ -430,5 +430,5 @@ WRITE8_HANDLER( erik_disk_reg_w )
 	else
 	{
 		wd17xx_set_density (fdc,DEN_FM_HI);
-  }
+	}
 }

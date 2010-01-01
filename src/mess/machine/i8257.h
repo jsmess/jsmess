@@ -52,7 +52,8 @@
 	{ DEVCB_MEMORY_HANDLER(_tag, _space, _func), \
 	  DEVCB_MEMORY_HANDLER(_tag, _space, _func), \
 	  DEVCB_MEMORY_HANDLER(_tag, _space, _func), \
-	  DEVCB_MEMORY_HANDLER(_tag, _space, _func) }
+	  DEVCB_MEMORY_HANDLER(_tag, _space, _func) \
+	}
 
 #define I8257_CHANNELS	4
 

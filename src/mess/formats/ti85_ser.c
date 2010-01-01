@@ -179,7 +179,7 @@ static int ti85_alloc_serial_data_memory (const device_config *device, UINT32 si
 			free (ti85serial->receive_buffer);
 			ti85serial->receive_buffer = NULL;
 			return 0;
-	        }
+		}
 	}
 	return 1;
 }

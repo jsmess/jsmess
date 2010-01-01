@@ -329,9 +329,9 @@ static void maria_draw_scanline(running_machine *machine)
 						inc_hpos_by_2();
 						break;
 
-					}	/* endswitch (mode) */
-				}	/* endwhile (ind_bytes > 0)*/
-		 	}	/* endfor (x=0; x<width; x++) */
+				}	/* endswitch (mode) */
+			}	/* endwhile (ind_bytes > 0)*/
+	 	}	/* endfor (x=0; x<width; x++) */
 	}	/* endwhile (READ_MEM(dl + 1) != 0) */
 }
 

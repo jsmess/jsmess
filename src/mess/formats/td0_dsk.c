@@ -621,7 +621,7 @@ static int Decode(UINT8 *buf, int len)  /* Decoding/Uncompressing */
                     tdctl.bufpos = (tdctl.r - pos - 1) & (N - 1);
                     tdctl.bufcnt = c - 255 + THRESHOLD;
                     tdctl.bufndx = 0;
-                 }
+                }
             }
             else { // still chars from last string
                 while( tdctl.bufndx < tdctl.bufcnt && count < len ) {
@@ -635,7 +635,7 @@ static int Decode(UINT8 *buf, int len)  /* Decoding/Uncompressing */
                 // reset bufcnt after copy string from text_buf[]
                 if(tdctl.bufndx >= tdctl.bufcnt)
                     tdctl.bufndx = tdctl.bufcnt = 0;
-        }
+            }
     }
     return(count); // count == len, success
 }

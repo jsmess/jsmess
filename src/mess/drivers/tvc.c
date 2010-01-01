@@ -95,8 +95,10 @@ static WRITE8_HANDLER( tvc_keyboard_w )
 
 static READ8_HANDLER( tvc_keyboard_r )
 {
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
-											"LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF"};
+	static const char *const keynames[] = {
+		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
+		"LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF"
+	};
 	return input_port_read(space->machine, keynames[tvc_keyline & 0x0f]);
 }
 

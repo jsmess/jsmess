@@ -83,7 +83,8 @@ static const D64_HEADER d64_header={
 	0, // 1571 0x80
 	{ { 0 } },
 	{ '\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0',
-	  '\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0' },
+	  '\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0'
+	},
 	{ 0xa0, 0xa0 }, { 0xa0, 0xa0 } , 0xa0, { '2', 'A' } , { '\xa0','\xa0','\xa0','\xa0' },
 };
 
@@ -121,7 +122,8 @@ static const D81_HEADER d81_header={
 	40,3,'D',
 	0,
 	{ '\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0',
-	  '\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0', 0xa0, 0xa0 },
+	  '\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0','\xa0', 0xa0, 0xa0
+	},
 	{ 0xa0, 0xa0 } , 0xa0, { '3', 'D' } , { '\xa0','\xa0' },
 };
 

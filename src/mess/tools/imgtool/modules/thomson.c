@@ -641,7 +641,7 @@ static int thom_get_file_size(thom_floppy* f, unsigned head, thom_dirent* d)
     else return -1;
     timeout--;
     if ( timeout < 0 ) return -1;
-   }
+  }
 }
 
 /* number of blocks used by file */
@@ -1067,7 +1067,7 @@ static imgtoolerr_t thom_write_file(imgtool_partition *part,
     break;
   case 1: d.format = 0; break;
   case 2: d.format = 0xff; break;
-  }
+ }
 
  /* comment */
  comment = option_resolution_lookup_string( opts, 'C' );

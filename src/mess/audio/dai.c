@@ -24,13 +24,15 @@ static const UINT16 dai_osc_volume_table[] = {
 					   0,  500, 1000, 1500,
 					2000, 2500, 3000, 3500,
 					4000, 4500, 5000, 5500,
-					6000, 6500, 7000, 7500};
+					6000, 6500, 7000, 7500
+};
 
 static const UINT16 dai_noise_volume_table[] = {
 					     0,    0,    0,    0,
 					     0,    0,    0,    0,
 				           500, 1000, 1500, 2000,
-					  2500, 3000, 3500, 4000};
+					  2500, 3000, 3500, 4000
+};
 
 void dai_set_input(running_machine *machine, int index, int state)
 {

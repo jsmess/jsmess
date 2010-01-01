@@ -545,7 +545,7 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 						for ( m = 0x01; m > 0; m <<= 1, x++ )
 						{
 							if ( chr & m )
-							 {
+							{
 								if ( x >= 0 && x < 160 )
 								{
 									/* Check if we collide with an already drawn source object */

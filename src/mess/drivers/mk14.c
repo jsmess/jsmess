@@ -27,8 +27,9 @@ F00-FFF  256 bytes RAM (Standard) / VDU RAM  Decoded by 1111
 
 */
 static const char *const keynames[] = {
-							"LINE0", "LINE1", "LINE2", "LINE3",
-							"LINE4", "LINE5", "LINE6", "LINE7"};
+	"LINE0", "LINE1", "LINE2", "LINE3",
+	"LINE4", "LINE5", "LINE6", "LINE7"
+};
 
 static READ8_HANDLER(keyboard_r)
 {

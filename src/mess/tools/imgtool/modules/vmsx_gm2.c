@@ -19,7 +19,8 @@
 
 #define NewName "gmaster2.mem"
 
-typedef struct {
+typedef struct
+	{
 	imgtool_image			base;
 	imgtool_stream 			*file_handle;
 	int 			size;

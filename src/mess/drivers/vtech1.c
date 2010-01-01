@@ -264,14 +264,16 @@ static Z80BIN_EXECUTE( vtech1 )
 
 	if (start_address == 0x7ae9)
 	{
-		UINT8 i, data[]={
+		UINT8 i;
+		static const UINT8 data[]={
 			0xe5,			// PUSH HL  ;save pcode pointer
 			0x2a, 0x1c, 0x79,	// LD HL,(791C) ;get saved end_addr+1
 			0x22, 0xf9, 0x78,	// LD (78F9),HL ;move it to correct place
 			0x21, 0x39, 0x78,	// LD HL,7839   ;point to control flag
 			0xcb, 0xf6,		// SET 6,(HL)   ;turn on autorun (cb b6 = manual run)
 			0xcb, 0x9e,		// RES 3,(HL)   ;turn off verify (just in case)
-			0xc3, 0xcf, 0x36,};	// JP 36CF  ;enter bios at autorun point
+			0xc3, 0xcf, 0x36	// JP 36CF  ;enter bios at autorun point
+		};
 
 		for (i = 0; i < ARRAY_LENGTH(data); i++)
 			memory_write_byte(space, 0x791e + i, data[i]);
@@ -503,8 +505,7 @@ FLOPPY_OPTIONS_START( vtech1_only )
 		vtech1_dsk_construct,
 		NULL
 	)
-		{ NULL }
-};
+FLOPPY_OPTIONS_END0
 
 static const floppy_config vtech1_floppy_config =
 {

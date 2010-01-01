@@ -174,7 +174,8 @@ static unsigned long detect_2600controllers(running_machine *machine)
 									{ 0x43, 0x58, 0x2d, 0x32, 10}, // Missile Command CX22 TrackBall
 									{ 0x43, 0x58, 0x2d, 0x38, 11}, // Missile Command CX80 TrackBall
 									{ 0x4e, 0xa8, 0xa4, 0xa2, 12}, // Omega Race for Joystick ONLY
-									{ 0xa6, 0xef, 0xb5, 0x38, 8}}; // Warlords.. paddles ONLY
+									{ 0xa6, 0xef, 0xb5, 0x38, 8} // Warlords.. paddles ONLY
+	};
 	// start with this.. if anyone finds a game that does NOT work with both controllers enabled
 	// it can be fixed here with a new signature (note that the Coleco Gemini has this setup also)
 	left = JOYS+PADD; right = JOYS+PADD;
@@ -297,7 +298,8 @@ static int detect_modeFE(running_machine *machine)
 									{ 0x20, 0x00, 0xd0, 0xc6, 0xc5 },
 									{ 0x20, 0xc3, 0xf8, 0xa5, 0x82 },
 									{ 0xd0, 0xfb, 0x20, 0x73, 0xfe },
-									{ 0x20, 0x00, 0xf0, 0x84, 0xd6 }};
+									{ 0x20, 0x00, 0xf0, 0x84, 0xd6 }
+	};
 	if (cart_size == 0x2000)
 	{
 		UINT8 *cart = CART;
@@ -325,7 +327,8 @@ static int detect_modeE0(running_machine *machine)
 									{ 0x8d, 0xe9, 0xff },
 									{ 0xad, 0xe9, 0xff },
 									{ 0xad, 0xed, 0xff },
-									{ 0xad, 0xf3, 0xbf }};
+									{ 0xad, 0xf3, 0xbf }
+	};
 	if (cart_size == 0x2000)
 	{
 		UINT8 *cart = CART;
@@ -349,7 +352,8 @@ static int detect_modeCV(running_machine *machine)
 	int i,j,numfound = 0;
 	static const unsigned char signatures[][3] = {
 									{ 0x9d, 0xff, 0xf3 },
-									{ 0x99, 0x00, 0xf4 }};
+									{ 0x99, 0x00, 0xf4 }
+	};
 	if (cart_size == 0x0800 || cart_size == 0x1000)
 	{
 		UINT8 *cart = CART;
@@ -372,7 +376,8 @@ static int detect_modeFV(running_machine *machine)
 {
 	int i,j,numfound = 0;
 	static const unsigned char signatures[][3] = {
-									{ 0x2c, 0xd0, 0xff }};
+									{ 0x2c, 0xd0, 0xff }
+	};
 	if (cart_size == 0x2000)
 	{
 		UINT8 *cart = CART;
@@ -397,7 +402,8 @@ static int detect_modeJVP(running_machine *machine)
 	int i,j,numfound = 0;
 	static const unsigned char signatures[][4] = {
 									{ 0x2c, 0xc0, 0xef, 0x60 },
-									{ 0x8d, 0xa0, 0x0f, 0xf0 }};
+									{ 0x8d, 0xa0, 0x0f, 0xf0 }
+	};
 	if (cart_size == 0x4000 || cart_size == 0x2000)
 	{
 		UINT8 *cart = CART;
@@ -421,7 +427,8 @@ static int detect_modeE7(running_machine *machine)
 	int i,j,numfound = 0;
 	static const unsigned char signatures[][3] = {
 									{ 0xad, 0xe5, 0xff },
-									{ 0x8d, 0xe7, 0xff }};
+									{ 0x8d, 0xe7, 0xff }
+	};
 	if (cart_size == 0x2000 || cart_size == 0x4000)
 	{
 		UINT8 *cart = CART;
@@ -509,7 +516,8 @@ static int detect_super_chip(running_machine *machine)
 	UINT8 *cart = CART;
 	static const unsigned char signatures[][5] = {
 									{ 0xa2, 0x7f, 0x9d, 0x00, 0xf0 }, // dig dug
-									{ 0xae, 0xf6, 0xff, 0x4c, 0x00 }}; // off the wall
+									{ 0xae, 0xf6, 0xff, 0x4c, 0x00 } // off the wall
+	};
 
 	if (cart_size == 0x4000)
 	{

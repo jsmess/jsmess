@@ -659,7 +659,7 @@ WRITE8_HANDLER ( ti82_port_0002_w )
 }
 
 WRITE8_HANDLER ( ti82_port_0010_w)
- {
+{
 	if (data == 0x00 || data == 0x01)
 		ti82_video_mode = data;
 	if (data >= 0x04 && data <= 0x07)
@@ -766,7 +766,7 @@ WRITE8_HANDLER ( ti83p_port_0007_w )
 }
 
 WRITE8_HANDLER ( ti83p_port_0010_w)
- {
+{
 	if (data == 0x00 || data == 0x01)
 		ti82_video_mode = data;
 	if (data == 0x02 || data == 0x03)

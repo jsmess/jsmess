@@ -209,7 +209,7 @@ VIDEO_UPDATE( ts2068 )
                 unsigned short inkcolor = (ts2068_port_ff_data & 0x38) >> 3;
                 for (count = 0; count < 192; count++)
                         ts2068_64col_scanline(screen->machine,bitmap, count, TS2068_TOP_BORDER, inkcolor);
-	}
+        }
         else if ((ts2068_port_ff_data & 7) == 2)
         {
                 /* Extended Color mode */

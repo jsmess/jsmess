@@ -1287,7 +1287,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 
 		/* Check for 8KB on-cart RAM */
 		if (strstr(extrainfo, "8KB_CART_RAM"))
-		 {
+		{
 			sms_state.cartridge[index].features |= CF_ONCART_RAM;
 			sms_state.cartridge[index].ram_size = 0x2000;
 			sms_state.cartridge[index].cartRAM = auto_alloc_array(image->machine, UINT8, sms_state.cartridge[index].ram_size);

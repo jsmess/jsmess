@@ -288,7 +288,7 @@ void spectrum_plus3_update_memory(running_machine *machine)
 			memory_set_bankptr(machine, "bank4", ram_data);
 
 			logerror("extended memory paging: %02x\n", MemorySelection);
-		}
+	}
 }
 
 

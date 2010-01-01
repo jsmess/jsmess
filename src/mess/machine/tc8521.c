@@ -367,11 +367,11 @@ static TIMER_CALLBACK(tc8521_timer_callback)
 								}
 							 }
 						  }
-						}
+					  }
 
-						tc8521_alarm_check(device);
-					}
-				}
+					  tc8521_alarm_check(device);
+				   }
+			   }
 			}
 		}
 	}

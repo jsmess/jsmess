@@ -219,7 +219,7 @@ VIDEO_UPDATE( ti85 )
 					  + ((*(ti85_frames+5*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01);
 
 				*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_palette[ti85_LCD_contrast&0x1f][brightnes];
-	                }
+			}
 	return 0;
 }
 
@@ -257,7 +257,7 @@ VIDEO_UPDATE( ti82 )
 					  + ((*(ti85_frames+5*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01);
 
 				*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_palette[ti85_LCD_contrast&0x1f][brightnes];
-	                }
+			}
 	return 0;
 }
 

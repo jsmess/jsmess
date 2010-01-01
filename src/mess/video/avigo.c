@@ -80,7 +80,7 @@ WRITE8_HANDLER(avigo_vid_memory_w)
 			LOG(("error: vid mem column write: %02x\n",data));
 		}
 		return;
-        }
+	}
 
         if ((offset<0x0100) || (offset>=0x01f0))
         {

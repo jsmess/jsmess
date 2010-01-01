@@ -176,8 +176,8 @@ VIDEO_UPDATE( z88 )
 			ptr+=2;
 
 			/* inverted graphics? */
-				if (byte1 & Z88_SCR_HW_REV)
-				{
+			if (byte1 & Z88_SCR_HW_REV)
+			{
 				pen1 = 0;
 
 				if (byte1 & Z88_SCR_HW_GRY)
@@ -188,9 +188,9 @@ VIDEO_UPDATE( z88 )
 				{
 					pen0 = 1;
 				}
-				}
-				else
-                {
+			}
+			else
+			{
 				pen0 = 0;
 				if (byte1 & Z88_SCR_HW_GRY)
 				{

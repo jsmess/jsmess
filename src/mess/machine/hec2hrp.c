@@ -140,7 +140,7 @@ int i, j, n;
  }
  j = 1;
  if (n==0x00) // Reset machine ! (on ESC key)
-  {
+ {
   		  cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
           if (!strncmp(machine->gamedrv->name , "hec2xxxx" , 4) |
               !strncmp(machine->gamedrv->name , "victor" , 6)     ) // aviable for all HR machines
@@ -467,15 +467,15 @@ void Mise_A_Jour_Etat(int Adresse, int Value )
       AU[15] =  ((Value & 0x040 )==0) ? 0 : 1 ;
       break;
    }
-   case 0x3000:
+  case 0x3000:
    // Mixer modification
    {
       ValMixer = (Value & 7) ;
        break;
-    }
-    default: break;
+   }
+  default: break;
 
-   } //switch
+ } //switch
 }
 
 

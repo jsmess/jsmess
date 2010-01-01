@@ -21,8 +21,10 @@
 
 static UINT8 *textram;
 static UINT8 *border;
-static UINT8 io_reg[0x20] = { 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-						0, 0, 0, 0, 0, 0, 0, 0, 0, 0	};
+static UINT8 io_reg[0x20] = {
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
 
 static const UINT8 jr200_keycodes[4][9][8] =
 {

@@ -75,7 +75,7 @@ VIDEO_UPDATE( orion128 )
 										color += 8;
 									 }
 									 break;
-						 }
+						}
 				}
 				*BITMAP_ADDR16(bitmap, y, x*8+(7-b)) = color;
 			}

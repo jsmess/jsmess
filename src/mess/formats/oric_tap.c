@@ -453,7 +453,7 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 					for (i=0; i<100; i++)
 					{
                                             p = oric_output_bit(p,1);
-                                        }
+					}
 
 					oric_cassette_state = ORIC_CASSETTE_WRITE_DATA;
 					oric_data_count = 0;

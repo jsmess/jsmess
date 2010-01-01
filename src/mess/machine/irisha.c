@@ -46,7 +46,8 @@ MACHINE_RESET( irisha )
 static const char *const keynames[] = {
 							"LINE0", "LINE1", "LINE2", "LINE3",
 							"LINE4", "LINE5", "LINE6", "LINE7",
-							"LINE8", "LINE9"};
+							"LINE8", "LINE9"
+};
 
 static READ8_DEVICE_HANDLER (irisha_8255_portb_r )
 {

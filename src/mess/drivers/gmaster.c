@@ -60,7 +60,7 @@ static WRITE8_HANDLER( gmaster_io_w )
 	{
 		memory_region(space->machine, "maincpu")[0x4000 + offset] = data;
 		logerror("%.4x external memory %.4x written %.2x\n", (int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), 0x4000 + offset, data);
-    }
+	}
 	else
 	{
 		switch (offset)
@@ -110,8 +110,8 @@ static WRITE8_HANDLER( gmaster_io_w )
 			break;
 		default:
 			logerror("%.4x memory %.4x written %.2x\n", (int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), 0x4000 + offset, data);
+		}
 	}
-    }
 }
 
 static READ8_HANDLER( gmaster_port_r )

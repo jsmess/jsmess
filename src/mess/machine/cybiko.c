@@ -475,11 +475,12 @@ static READ8_HANDLER( cybiko_io_reg_r )
 		}
 		break;
 		// serial dataflash
-		case H8S_IO_PORT3 :  {
+		case H8S_IO_PORT3 :
+		{
 				const device_config *device = devtag_get_device(space->machine, "flash1");
 				if (at45dbxx_pin_so(device)) data = data | H8S_P3_RXD1;
-			}
-			break;
+		}
+		break;
 
 		// rs232
 		case H8S_IO_PORT5 : if (cybiko_rs232_pin_rxd()) data = data | H8S_P5_RXD2; break;

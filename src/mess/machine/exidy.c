@@ -312,8 +312,10 @@ READ8_HANDLER(exidy_fe_r)
      - tied high, allowing PARIN and PAROUT bios routines to run */
 
 	UINT8 data = 0xc0;
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
-										"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15" };
+	static const char *const keynames[] = {
+		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
+		"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15"
+	};
 
 	/* bit 5 - vsync (inverted) */
 	data |= (((~input_port_read(space->machine, "VS")) & 0x01)<<5);
@@ -363,11 +365,13 @@ Z80BIN_EXECUTE( exidy )
 
 	if ((start_address == 0x1d5) || (execute_address == 0xc858))
 	{
-		UINT8 i, data[]={
+		UINT8 i;
+		static const UINT8 data[]={
 			0xcd, 0x26, 0xc4,	// CALL C426    ;set up other pointers
 			0x21, 0xd4, 1,		// LD HL,01D4   ;start of program address (used by C689)
 			0x36, 0,		// LD (HL),00   ;make sure dummy end-of-line is there
-			0xc3, 0x89, 0xc6,};	// JP C689  ;run program
+			0xc3, 0x89, 0xc6	// JP C689  ;run program
+		};
 
 		for (i = 0; i < ARRAY_LENGTH(data); i++)
 			memory_write_byte(space, 0xf01f + i, data[i]);

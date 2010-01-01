@@ -45,8 +45,10 @@ WRITE8_HANDLER(z1013_keyboard_w) {
 
 static READ8_DEVICE_HANDLER (z1013_port_b_r)
 {
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3",
-		"LINE4", "LINE5", "LINE6", "LINE7" };
+	static const char *const keynames[] = {
+		"LINE0", "LINE1", "LINE2", "LINE3",
+		"LINE4", "LINE5", "LINE6", "LINE7"
+	};
 	UINT8 data = input_port_read(device->machine, keynames[z1013_keyboard_line & 7]);
 	if (z1013_keyboard_part==0x10) {
 		return (data >> 4) & 0x0f;

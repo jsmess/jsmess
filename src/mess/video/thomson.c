@@ -429,10 +429,12 @@ typedef void ( *thom_scandraw ) ( running_machine *machine, UINT8* vram, UINT16*
 			UINT8 rama = vram[ 0      ];			\
 			UINT8 ramb = vram[ 0x2000 ];
 
+#define END_UPDATE							\
+		}							\
+	}
+
 #define UPDATE_HI( name )  UPDATE( name, 16 )
 #define UPDATE_LOW( name ) UPDATE( name,  8 )
-
-#define END_UPDATE } }
 
 
 
@@ -746,9 +748,10 @@ END_UPDATE
 
 UPDATE_HI( overlay3 )
 {
-	static const int p[2][2][2][2] =
-		{ { { { 0, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } },
-		  { { { 8, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } } };
+	static const int p[2][2][2][2] = {
+		  { { { 0, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } },
+		  { { { 8, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } }
+	};
 	int i;
 	for ( i = 0; i < 16; i += 4, rama >>= 1, ramb >>= 1 )
 		dst[ 15 - i ] = dst[ 14 - i ] = dst[ 13 - i ] = dst[ 12 - i ] =
@@ -759,9 +762,10 @@ END_UPDATE
 
 UPDATE_LOW( overlay3 )
 {
-	static const int p[2][2][2][2] =
-		{ { { { 0, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } },
-		  { { { 8, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } } };
+	static const int p[2][2][2][2] = {
+		  { { { 0, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } },
+		  { { { 8, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } }
+	};
 	int i;
 	for ( i = 0; i < 8; i += 2, rama >>= 1, ramb >>= 1 )
 		dst[ 7 - i ] = dst[ 6 - i ] =
@@ -958,8 +962,8 @@ VIDEO_UPDATE ( thom )
 		do
 		{
 			y++;
-			ypos ++ /* += scale */; }
-		while ( y < ybot && thom_border_l[ y ] == -1 );
+			ypos ++ /* += scale */;
+		} while ( y < ybot && thom_border_l[ y ] == -1 );
 		wrect.max_y = ypos - 1;
 		bitmap_fill( bitmap, &wrect , border);
 	}

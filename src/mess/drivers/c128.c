@@ -219,8 +219,8 @@ static ADDRESS_MAP_START(c128_z80_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 #else
 	/* best to do reuse bankswitching numbers */
-	AM_RANGE(0x0000, 0x03ff) AM_READ_BANK("bank10") AM_WRITE_BANK(1))
-	AM_RANGE(0x0400, 0x0fff) AM_READ_BANK("bank11") AM_WRITE_BANK(2))
+	AM_RANGE(0x0000, 0x03ff) AM_READ_BANK("bank10") AM_WRITE_BANK("bank1")
+	AM_RANGE(0x0400, 0x0fff) AM_READ_BANK("bank11") AM_WRITE_BANK("bank2")
 	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK("bank3")
 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank4")
 	AM_RANGE(0x4000, 0xbfff) AM_RAMBANK("bank5")

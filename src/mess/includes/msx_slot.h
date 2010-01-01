@@ -158,8 +158,10 @@ typedef struct {
 } msx_slot;
 
 extern const msx_slot msx_slot_list[];
+
 #define MSX_SLOT_START \
 const msx_slot msx_slot_list[] = {
+
 #define MSX_SLOT_ROM(type, ent) { \
 	type,							\
 	MSX_MEM_ROM,					\
@@ -169,7 +171,9 @@ const msx_slot msx_slot_list[] = {
 	slot_##ent##_map,				\
 	NULL,							\
 	NULL,							\
-	NULL },
+	NULL							\
+},
+
 #define MSX_SLOT_RAM(type, ent) { \
 	type,							\
 	MSX_MEM_RAM,					\
@@ -179,7 +183,9 @@ const msx_slot msx_slot_list[] = {
 	slot_##ent##_map,				\
 	NULL,							\
 	NULL,							\
-	NULL },
+	NULL							\
+},
+
 #define MSX_SLOT(type, ent) { \
 	type,							\
 	MSX_MEM_HANDLER,				\
@@ -189,7 +195,9 @@ const msx_slot msx_slot_list[] = {
 	slot_##ent##_map,				\
 	slot_##ent##_write,				\
 	NULL,							\
-	NULL },
+	NULL							\
+},
+
 #define MSX_SLOT_SRAM(type, ent) { \
 	type,							\
 	MSX_MEM_HANDLER,				\
@@ -199,7 +207,9 @@ const msx_slot msx_slot_list[] = {
 	slot_##ent##_map,				\
 	slot_##ent##_write,				\
 	slot_##ent##_loadsram,			\
-	slot_##ent##_savesram },
+	slot_##ent##_savesram			\
+},
+
 #define MSX_SLOT_NULL(type) { \
 	type,							\
 	MSX_MEM_ROM,					\
@@ -209,7 +219,9 @@ const msx_slot msx_slot_list[] = {
 	NULL,							\
 	NULL,							\
 	NULL,							\
-	NULL },
+	NULL							\
+},
+
 #define MSX_SLOT_END \
 	{ SLOT_END, 0, "", NULL, NULL, NULL, NULL, NULL } \
 };
@@ -234,9 +246,9 @@ typedef struct {
 
 extern const msx_driver_struct msx_driver_list[];
 
-#define MSX_DRIVER_LIST 	\
+#define MSX_DRIVER_LIST		\
 const msx_driver_struct msx_driver_list[] = {
-#define MSX_DRIVER(foo) 	\
+#define MSX_DRIVER(foo)		\
 		{ #foo, msx_slot_layout_##foo },
 #define MSX_DRIVER_END		\
 		{ "", NULL }		\

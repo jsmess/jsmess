@@ -2126,7 +2126,8 @@ static imgtoolerr_t prodos_diskimage_setattrs(imgtool_partition *partition, cons
 	if (err)
 		return err;
 
-	return IMGTOOLERR_SUCCESS;}
+	return IMGTOOLERR_SUCCESS;
+}
 
 
 

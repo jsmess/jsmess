@@ -131,7 +131,8 @@ Source Changes:
   update to this core.  [MAME team]
 
 - Cleanups (static qualifiers, headers, renames, reduced global symbols, dead
-  code cleanups and more multisession friendly init code).  [Atari Ace]
+  code cleanups, brace cleanups, and more multisession friendly init code).
+  [Atari Ace]
 
 - WD17xx write track supported in proper way instead of using more 
   sector writes [Michael Zapf]

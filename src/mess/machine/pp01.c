@@ -207,8 +207,10 @@ static WRITE8_DEVICE_HANDLER (pp01_8255_porta_w )
 static UINT8 pp01_key_line = 0;
 static READ8_DEVICE_HANDLER (pp01_8255_portb_r )
 {
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
-											"LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF" };
+	static const char *const keynames[] = {
+		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
+		"LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF"
+	};
 
 	return (input_port_read(device->machine,keynames[pp01_key_line]) & 0x3F) | (input_port_read(device->machine,"LINEALL") & 0xC0);
 }

@@ -102,6 +102,9 @@ FLOPPY_CONSTRUCT(d88_dsk_construct);
 	const struct FloppyFormat floppyoptions_##name[] =								\
 	{																			\
 
+#define FLOPPY_OPTIONS_END0 \
+		{ NULL }							\
+	};
 
 #define FLOPPY_OPTIONS_EXTERN(name)												\
 	extern const struct FloppyFormat floppyoptions_##name[]							\
@@ -115,8 +118,7 @@ FLOPPY_CONSTRUCT(d88_dsk_construct);
 		FLOPPY_OPTION( cqm, "cqm,dsk", "CopyQM floppy disk image",	cqm_dsk_identify, cqm_dsk_construct, NULL) \
 		FLOPPY_OPTION( dsk, "dsk", "DSK floppy disk image",	dsk_dsk_identify, dsk_dsk_construct, NULL) \
 		FLOPPY_OPTION( d88, "d77,d88",	"D88 Floppy Disk image", d88_dsk_identify, d88_dsk_construct, NULL)\
-		{ NULL }							\
-	};
+	FLOPPY_OPTIONS_END0
 
 FLOPPY_OPTIONS_EXTERN(default);
 

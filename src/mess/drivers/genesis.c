@@ -90,8 +90,10 @@ static void mess_init_6buttons_pad(running_machine *machine)
 /* They're needed to give the users the choice between different controllers */
 static UINT8 mess_md_io_read_data_port(running_machine *machine, int portnum)
 {
-	static const char *const pad6names[2][4] = {{ "PAD1_6B", "PAD2_6B", "UNUSED", "UNUSED" },
-												{ "EXTRA1", "EXTRA2", "UNUSED", "UNUSED" }};
+	static const char *const pad6names[2][4] = {
+		{ "PAD1_6B", "PAD2_6B", "UNUSED", "UNUSED" },
+		{ "EXTRA1", "EXTRA2", "UNUSED", "UNUSED" }
+	};
 	static const char *const pad3names[4] = { "PAD1_3B", "PAD2_3B", "UNUSED", "UNUSED" };
 
 	UINT8 retdata;

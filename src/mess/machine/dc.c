@@ -520,7 +520,7 @@ static WRITE32_HANDLER( atapi_w )
 					break;
 			}
 		}
-	 }
+	}
 }
 
 static void dreamcast_atapi_exit(running_machine* machine)

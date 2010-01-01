@@ -592,7 +592,7 @@ void m6845_clock(running_machine *machine)
                         crtc.HSYNC=True;
                         if (crtc.intf->out_HS_func) (crtc.intf->out_HS_func)(machine, 0,crtc.HSYNC); /* call HS update */
                 }
-        }
+	}
 
         if (crtc.HSYNC)
         {

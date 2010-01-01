@@ -539,7 +539,7 @@ static void tms3556_draw_line(bitmap_t *bmp, int line)
 	double_lines = 0;
 
 #if 0
-	if (vdp.controlRegs[4] & 0x??
+	if ( vdp.controlRegs[4] & 0x?? )
 	{   // interlaced mode
 		ln = BITMAP_ADDR16(bmp, line, vdp.field);
 	}

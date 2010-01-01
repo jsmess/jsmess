@@ -600,8 +600,10 @@ static READ8_DEVICE_HANDLER(d_pia0_pb_r)
 	int RetVal;
 	int Idx;
 	int Selected;
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4",
-										"KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
+	static const char *const keynames[] = {
+		"KEY0", "KEY1", "KEY2", "KEY3", "KEY4",
+		"KEY5", "KEY6", "KEY7", "KEY8", "KEY9"
+	};
 
 	LOG_KEYBOARD(("PB Read\n"));
 
@@ -1028,8 +1030,10 @@ static void ScanInKeyboard(void)
 #if 0
 	int	Idx;
 	int	Row;
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4",
-										"KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
+	static const char *const keynames[] = {
+		"KEY0", "KEY1", "KEY2", "KEY3", "KEY4",
+		"KEY5", "KEY6", "KEY7", "KEY8", "KEY9"
+	};
 
 	LOG_KEYBOARD(("Scanning Host keyboard\n"));
 

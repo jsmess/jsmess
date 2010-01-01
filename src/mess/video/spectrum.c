@@ -152,11 +152,11 @@ VIDEO_UPDATE( spectrum )
                                         spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,ink);
                                 else
                                         spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,pap);
-			}
+                        }
                 scr++;
                 attr++;
                 }
-	}
+        }
 
 	border_draw(screen->machine, bitmap, full_refresh,
 		SPEC_TOP_BORDER, SPEC_DISPLAY_YSIZE, SPEC_BOTTOM_BORDER,

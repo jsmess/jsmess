@@ -796,8 +796,7 @@ FLOPPY_OPTIONS_START( atari_only )
 		atari_dsk_construct,
 		NULL
 	)
-		{ NULL }
-};
+FLOPPY_OPTIONS_END0
 
 static const floppy_config atari_floppy_config =
 {

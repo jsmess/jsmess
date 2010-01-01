@@ -60,10 +60,12 @@ static UINT8 vt100_key_scan = 0;
 static TIMER_CALLBACK(keyboard_callback)
 {
 	int i;
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3",
-											"LINE4", "LINE5", "LINE6", "LINE7",
-											"LINE8", "LINE9", "LINEA", "LINEB",
-											"LINEC", "LINED", "LINEE", "LINEF" };
+	static const char *const keynames[] = {
+		"LINE0", "LINE1", "LINE2", "LINE3",
+		"LINE4", "LINE5", "LINE6", "LINE7",
+		"LINE8", "LINE9", "LINEA", "LINEB",
+		"LINEC", "LINED", "LINEE", "LINEF"
+	};
 	UINT8 code;
 	if (vt100_key_scan == 1) {
 		for(i = 0; i < 16; i++)
@@ -100,8 +102,10 @@ static READ8_HANDLER(vt100_keyboard_r)
 }
 static WRITE8_HANDLER(vt100_baud_rate_w)
 {
-	double baud_rate[] = { 50, 75, 110, 134.5, 150, 200, 300, 600, 1200,
-		1800, 2000, 2400, 3600, 4800, 9600, 19200 };
+	static const double baud_rate[] = {
+		50, 75, 110, 134.5, 150, 200, 300, 600, 1200,
+		1800, 2000, 2400, 3600, 4800, 9600, 19200
+	};
 
 	vt100_send_baud_rate = baud_rate[(data >>4) & 0x0f];
 	vt100_recv_baud_rate = baud_rate[data & 0x0f];

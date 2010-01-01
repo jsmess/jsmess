@@ -105,5 +105,4 @@ FLOPPY_OPTIONS_START( amiga_only )
 		TRACKS([80])
 		SECTORS([11]/22)
 	)
-		{ NULL }
-};
+FLOPPY_OPTIONS_END0

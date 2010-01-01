@@ -506,8 +506,10 @@ static WRITE8_HANDLER( newbrain_cop_d_w )
 
 	newbrain_state *state = space->machine->driver_data;
 
-	static const char *const keynames[] = { "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7",
-										"D8", "D9", "D10", "D11", "D12", "D13", "D14", "D15" };
+	static const char *const keynames[] = {
+		"D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7",
+		"D8", "D9", "D10", "D11", "D12", "D13", "D14", "D15"
+	};
 
 	/* keyboard row reset */
 

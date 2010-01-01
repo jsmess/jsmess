@@ -188,8 +188,10 @@ static READ8_DEVICE_HANDLER ( svi318_ppi_port_a_r )
 static READ8_DEVICE_HANDLER ( svi318_ppi_port_b_r )
 {
 	int row;
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5",
-										"LINE6", "LINE7", "LINE8", "LINE9", "LINE10" };
+	static const char *const keynames[] = {
+		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5",
+		"LINE6", "LINE7", "LINE8", "LINE9", "LINE10"
+	};
 
 	row = svi.keyboard_row;
 	if (row <= 10)
@@ -467,7 +469,8 @@ static const UINT8 cc_op[0x100] = {
  5+1,10+1,10+1,10+1,10+1,11+1, 7+1,11+1, 5+1,10+1,10+1, 0+1,10+1,17+1, 7+1,11+1,
  5+1,10+1,10+1,11+1,10+1,11+1, 7+1,11+1, 5+1, 4+1,10+1,11+1,10+1, 0+1, 7+1,11+1,
  5+1,10+1,10+1,19+1,10+1,11+1, 7+1,11+1, 5+1, 4+1,10+1, 4+1,10+1, 0+1, 7+1,11+1,
- 5+1,10+1,10+1, 4+1,10+1,11+1, 7+1,11+1, 5+1, 6+1,10+1, 4+1,10+1, 0+1, 7+1,11+1};
+ 5+1,10+1,10+1, 4+1,10+1,11+1, 7+1,11+1, 5+1, 6+1,10+1, 4+1,10+1, 0+1, 7+1,11+1
+};
 
 static const UINT8 cc_cb[0x100] = {
  8+2, 8+2, 8+2, 8+2, 8+2, 8+2,15+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2,15+2, 8+2,
@@ -485,7 +488,8 @@ static const UINT8 cc_cb[0x100] = {
  8+2, 8+2, 8+2, 8+2, 8+2, 8+2,15+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2,15+2, 8+2,
  8+2, 8+2, 8+2, 8+2, 8+2, 8+2,15+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2,15+2, 8+2,
  8+2, 8+2, 8+2, 8+2, 8+2, 8+2,15+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2,15+2, 8+2,
- 8+2, 8+2, 8+2, 8+2, 8+2, 8+2,15+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2,15+2, 8+2};
+ 8+2, 8+2, 8+2, 8+2, 8+2, 8+2,15+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2,15+2, 8+2
+};
 
 static const UINT8 cc_ed[0x100] = {
  8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2,
@@ -503,7 +507,8 @@ static const UINT8 cc_ed[0x100] = {
  8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2,
  8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2,
  8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2,
- 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2};
+ 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2, 8+2
+};
 
 static const UINT8 cc_xy[0x100] = {
  4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2,15+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2,
@@ -521,7 +526,8 @@ static const UINT8 cc_xy[0x100] = {
  4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 0+2, 4+2, 4+2, 4+2, 4+2,
  4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2,
  4+2,14+2, 4+2,23+2, 4+2,15+2, 4+2, 4+2, 4+2, 8+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2,
- 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2,10+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2};
+ 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2,10+2, 4+2, 4+2, 4+2, 4+2, 4+2, 4+2
+};
 
 static const UINT8 cc_xycb[0x100] = {
 23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,
@@ -539,7 +545,8 @@ static const UINT8 cc_xycb[0x100] = {
 23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,
 23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,
 23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,
-23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2};
+23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2,23+2
+};
 
 /* extra cycles if jr/jp/call taken and 'interrupt latency' on rst 0-7 */
 static const UINT8 cc_ex[0x100] = {
@@ -558,7 +565,8 @@ static const UINT8 cc_ex[0x100] = {
  6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2,
  6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2,
  6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2,
- 6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2+1};
+ 6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2+1
+};
 
 
 DRIVER_INIT( svi318 )
@@ -823,8 +831,7 @@ int svi318_cassette_present(running_machine *machine, int id)
 READ8_HANDLER( svi318_io_ext_r )
 {
 	UINT8 data = 0xff;
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
-	const device_config *printer = devtag_get_device(space->machine, "centronics");
+	const device_config *device;
 
 	if (svi.bankLow == SVI_CART)
 	{
@@ -834,7 +841,8 @@ READ8_HANDLER( svi318_io_ext_r )
 	switch( offset )
 	{
 	case 0x12:
-		data = 0xfe | centronics_busy_r(printer);
+		device = devtag_get_device(space->machine, "centronics");
+		data = 0xfe | centronics_busy_r(device);
 		break;
 
 	case 0x20:
@@ -845,7 +853,8 @@ READ8_HANDLER( svi318_io_ext_r )
 	case 0x25:
 	case 0x26:
 	case 0x27:
-		data = ins8250_r(devtag_get_device(space->machine, "ins8250_0"), offset & 7);
+		device = devtag_get_device(space->machine, "ins8250_0");
+		data = ins8250_r(device, offset & 7);
 		break;
 
 	case 0x28:
@@ -856,28 +865,32 @@ READ8_HANDLER( svi318_io_ext_r )
 	case 0x2D:
 	case 0x2E:
 	case 0x2F:
-		data = ins8250_r(devtag_get_device(space->machine, "ins8250_1"), offset & 7);
+		device = devtag_get_device(space->machine, "ins8250_1");
+		data = ins8250_r(device, offset & 7);
 		break;
 
 	case 0x30:
-		data = wd17xx_status_r(fdc, 0);
+		device = devtag_get_device(space->machine, "wd179x");
+		data = wd17xx_status_r(device, 0);
 		break;
 	case 0x31:
-		data = wd17xx_track_r(fdc, 0);
+		device = devtag_get_device(space->machine, "wd179x");
+		data = wd17xx_track_r(device, 0);
 		break;
 	case 0x32:
-		data = wd17xx_sector_r(fdc, 0);
+		device = devtag_get_device(space->machine, "wd179x");
+		data = wd17xx_sector_r(device, 0);
 		break;
 	case 0x33:
-		data = wd17xx_data_r(fdc, 0);
+		device = devtag_get_device(space->machine, "wd179x");
+		data = wd17xx_data_r(device, 0);
 		break;
 	case 0x34:
 		data = svi318_fdc_irqdrq_r(space, 0);
 		break;
-	case 0x51: {
-		const device_config *devconf = devtag_get_device(space->machine, "crtc");
-		data = mc6845_register_r(devconf, 0);
-		}
+	case 0x51:
+		device = devtag_get_device(space->machine, "crtc");
+		data = mc6845_register_r(device, 0);
 		break;
 	}
 
@@ -886,8 +899,7 @@ READ8_HANDLER( svi318_io_ext_r )
 
 WRITE8_HANDLER( svi318_io_ext_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
-	const device_config *printer = devtag_get_device(space->machine, "centronics");
+	const device_config *device;
 
 	if (svi.bankLow == SVI_CART)
 	{
@@ -897,11 +909,13 @@ WRITE8_HANDLER( svi318_io_ext_w )
 	switch( offset )
 	{
 	case 0x10:
-		centronics_data_w(printer, 0, data);
+		device = devtag_get_device(space->machine, "centronics");
+		centronics_data_w(device, 0, data);
 		break;
 
 	case 0x11:
-		centronics_strobe_w(printer, BIT(data, 0));
+		device = devtag_get_device(space->machine, "centronics");
+		centronics_strobe_w(device, BIT(data, 0));
 		break;
 
 	case 0x20:
@@ -912,7 +926,8 @@ WRITE8_HANDLER( svi318_io_ext_w )
 	case 0x25:
 	case 0x26:
 	case 0x27:
-		ins8250_w(devtag_get_device(space->machine, "ins8250_0"), offset & 7, data);
+		device = devtag_get_device(space->machine, "ins8250_0");
+		ins8250_w(device, offset & 7, data);
 		break;
 
 	case 0x28:
@@ -923,20 +938,25 @@ WRITE8_HANDLER( svi318_io_ext_w )
 	case 0x2D:
 	case 0x2E:
 	case 0x2F:
-		ins8250_w(devtag_get_device(space->machine, "ins8250_1"), offset & 7, data);
+		device = devtag_get_device(space->machine, "ins8250_1");
+		ins8250_w(device, offset & 7, data);
 		break;
 
 	case 0x30:
-		wd17xx_command_w(fdc, 0, data);
+		device = devtag_get_device(space->machine, "wd179x");
+		wd17xx_command_w(device, 0, data);
 		break;
 	case 0x31:
-		wd17xx_track_w(fdc, 0, data);
+		device = devtag_get_device(space->machine, "wd179x");
+		wd17xx_track_w(device, 0, data);
 		break;
 	case 0x32:
-		wd17xx_sector_w(fdc, 0, data);
+		device = devtag_get_device(space->machine, "wd179x");
+		wd17xx_sector_w(device, 0, data);
 		break;
 	case 0x33:
-		wd17xx_data_w(fdc, 0, data);
+		device = devtag_get_device(space->machine, "wd179x");
+		wd17xx_data_w(device, 0, data);
 		break;
 	case 0x34:
 		svi318_fdc_drive_motor_w(space, 0, data);
@@ -945,15 +965,13 @@ WRITE8_HANDLER( svi318_io_ext_w )
 		svi318_fdc_density_side_w(space, 0, data);
 		break;
 
-	case 0x50: {
-		const device_config *devconf = devtag_get_device(space->machine, "crtc");
-		mc6845_address_w(devconf, 0, data);
-		}
+	case 0x50:
+		device = devtag_get_device(space->machine, "crtc");
+		mc6845_address_w(device, 0, data);
 		break;
-	case 0x51: {
-		const device_config *devconf = devtag_get_device(space->machine, "crtc");
-		mc6845_register_w(devconf, 0, data);
-		}
+	case 0x51:
+		device = devtag_get_device(space->machine, "crtc");
+		mc6845_register_w(device, 0, data);
 		break;
 
 	case 0x58:

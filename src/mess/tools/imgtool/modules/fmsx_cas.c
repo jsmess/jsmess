@@ -13,7 +13,8 @@
     mess/formats/fmsx_cas.[ch] files, for the actual conversion.
 */
 
-typedef struct {
+typedef struct
+	{
 	imgtool_image			base;
 	char			*file_name;
 	imgtool_stream 			*file_handle;

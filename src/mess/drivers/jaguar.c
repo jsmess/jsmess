@@ -334,12 +334,10 @@ static READ32_HANDLER( joystick_r )
 	UINT16 joybuts_result = 0xffef;
 	int i;
 	static const char *const keynames[2][8] =
-			{
-				{ "JOY0", "JOY1", "JOY2", "JOY3",
-						"JOY4", "JOY5", "JOY6", "JOY7" },
-				{ "BUTTONS0", "BUTTONS1", "BUTTONS2", "BUTTONS3",
-						"BUTTONS4", "BUTTONS5", "BUTTONS6", "BUTTONS7" }
-			};
+	{
+		{ "JOY0", "JOY1", "JOY2", "JOY3", "JOY4", "JOY5", "JOY6", "JOY7" },
+		{ "BUTTONS0", "BUTTONS1", "BUTTONS2", "BUTTONS3", "BUTTONS4", "BUTTONS5", "BUTTONS6", "BUTTONS7" }
+	};
 
 	/*
      *   16        12        8         4         0

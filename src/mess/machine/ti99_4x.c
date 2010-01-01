@@ -2156,8 +2156,10 @@ static WRITE8_DEVICE_HANDLER( ti99_AlphaW )
 static READ8_DEVICE_HANDLER( ti99_8_R9901_0 )
 {
 	int answer;
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
-										"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15" };
+	static const char *const keynames[] = {
+		"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
+		"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15"
+	};
 
 	if (has_mecmouse && (KeyCol == 15))
 	{
@@ -2189,8 +2191,10 @@ static READ8_DEVICE_HANDLER( ti99_8_R9901_0 )
 static READ8_DEVICE_HANDLER( ti99_8_R9901_1 )
 {
 	int answer;
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
-										"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15" };
+	static const char *const keynames[] = {
+		"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
+		"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15"
+	};
 
 	if (has_mecmouse && (KeyCol == 15))
 	{

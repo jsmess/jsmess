@@ -811,7 +811,7 @@ static void internal_timer_update(running_machine *machine,
 		if (new_maxB == 0)
 		{
          		new_maxB = 0x10000;
-      		}
+		}
    	}
 
 
@@ -884,7 +884,7 @@ static void internal_timer_update(running_machine *machine,
 	      	else
 	      	{
 	        	timer_adjust_oneshot(t->int_timer, attotime_never, which);
-		}
+	      	}
 	}
 }
 

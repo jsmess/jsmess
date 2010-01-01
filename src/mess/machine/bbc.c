@@ -809,8 +809,10 @@ static int column = 0;
 
 INTERRUPT_GEN( bbcb_keyscan )
 {
-	static const char *const colnames[] = { "COL0", "COL1", "COL2", "COL3", "COL4",
-										"COL5", "COL6", "COL7", "COL8", "COL9" };
+	static const char *const colnames[] = {
+		"COL0", "COL1", "COL2", "COL3", "COL4",
+		"COL5", "COL6", "COL7", "COL8", "COL9"
+	};
 	const device_config *via_0 = devtag_get_device(device->machine, "via6522_0");
 
   	/* only do auto scan if keyboard is not enabled */
@@ -845,8 +847,10 @@ INTERRUPT_GEN( bbcb_keyscan )
 
 INTERRUPT_GEN( bbcm_keyscan )
 {
-	static const char *const colnames[] = { "COL0", "COL1", "COL2", "COL3", "COL4",
-										"COL5", "COL6", "COL7", "COL8", "COL9" };
+	static const char *const colnames[] = {
+		"COL0", "COL1", "COL2", "COL3", "COL4",
+		"COL5", "COL6", "COL7", "COL8", "COL9"
+	};
 	const device_config *via_0 = devtag_get_device(device->machine, "via6522_0");
 
   	/* only do auto scan if keyboard is not enabled */
@@ -859,7 +863,7 @@ INTERRUPT_GEN( bbcm_keyscan )
 
 		/* this IF should be removed as soon as the dip switches (keyboard keys) are set for the master */
 		if (column < 10)
-			{
+		{
 			/* KBD IC4 8 input NAND gate */
 			/* set the value of via_system ca2, by checking for any keys
                  being pressed on the selected column */
@@ -887,8 +891,10 @@ static int bbc_keyboard(const address_space *space, int data)
 	int bit;
 	int row;
 	int res;
-	static const char *const colnames[] = { "COL0", "COL1", "COL2", "COL3", "COL4",
-										"COL5", "COL6", "COL7", "COL8", "COL9" };
+	static const char *const colnames[] = {
+		"COL0", "COL1", "COL2", "COL3", "COL4",
+		"COL5", "COL6", "COL7", "COL8", "COL9"
+	};
 	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
 
 	column = data & 0x0f;

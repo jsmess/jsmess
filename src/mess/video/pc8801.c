@@ -323,7 +323,7 @@ int pc8801_is_vram_select( running_machine *machine )
 				memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, write_gvram_alu3_bank5);
 				memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, write_gvram_alu3_bank6);
 				break;
-     			}
+			}
       		return 1;
 		}
 		else
@@ -512,7 +512,7 @@ VIDEO_UPDATE( pc8801 )
 				attr_new &= ~TX_BL;
 				if ((blink_count / blink_period) & 1)
 					attr_new ^= TX_REV;
-		      }
+			}
 
 			if (attr_new & TX_CUR)
 			{
@@ -760,7 +760,7 @@ WRITE8_HANDLER( pc88_crtc_w )
 		default:
 			logerror("pc8801: illegal crtc command 0x%.2x.\n", data);
 			return;
-    		}
+		}
 	}
 	else
 	{

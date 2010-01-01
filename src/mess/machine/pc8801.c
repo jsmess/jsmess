@@ -599,7 +599,8 @@ static void fix_V1V2(void)
   if(is_V2mode) pc88sr_is_highspeed=1;
   switch((is_Nbasic ? 1 : 0) |
 	 (is_V2mode ? 2 : 0) |
-	 (pc88sr_is_highspeed ? 4 : 0)) {
+	 (pc88sr_is_highspeed ? 4 : 0))
+  {
   case 0:
     logerror("N88-BASIC(V1-S)");
     break;

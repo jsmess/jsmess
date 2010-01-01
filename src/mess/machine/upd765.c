@@ -1517,7 +1517,7 @@ static TIMER_CALLBACK(upd765_continue_command)
 
 				/* sector id == EOT */
 				if (upd765_sector_count_complete(device) || upd765_read_data_stop(device))
-			    {
+				{
 					upd765_read_complete(device);
 				}
 				else
@@ -1525,8 +1525,8 @@ static TIMER_CALLBACK(upd765_continue_command)
 					upd765_increment_sector(device);
 					upd765_read_data(device);
 				}
-				}
-				break;
+			}
+			break;
 
 			default:
 				break;

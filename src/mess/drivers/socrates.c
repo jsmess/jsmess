@@ -465,8 +465,8 @@ static WRITE8_HANDLER( socrates_scroll_w )
 
 static rgb_t socrates_create_color(UINT8 color)
 {
-rgb_t composedcolor;
-double lumatable[256] = {
+  rgb_t composedcolor;
+  double lumatable[256] = {
     LUMA_COL_0
     LUMA_COL_COMMON
     LUMA_COL_2
@@ -484,7 +484,7 @@ double lumatable[256] = {
     LUMA_COL_COMMON
     LUMA_COL_F
   };
-double chromaintensity[256] = {
+  double chromaintensity[256] = {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     CHROMA_COL_COMMON
     CHROMA_COL_2

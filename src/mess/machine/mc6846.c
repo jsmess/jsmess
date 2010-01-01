@@ -343,11 +343,12 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 	case 1:
 	{
 		static const char *const cp2[8] =
-			{
+		{
 			"in,neg-edge", "in,neg-edge,intr", "in,pos-edge", "in,pos-edge,intr",
 			"out,intr-ack", "out,i/o-ack", "out,0", "out,1"
 		};
-		static const char *const cp1[8] = {
+		static const char *const cp1[8] =
+		{
 			"neg-edge", "neg-edge,intr", "pos-edge", "pos-edge,intr",
 			"latched,neg-edge", "latched,neg-edge,intr",
 			"latcged,pos-edge", "latcged,pos-edge,intr"

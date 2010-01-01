@@ -419,24 +419,26 @@ DEVICE_GET_INFO( cartslot )
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0; break;
 		case DEVINFO_INT_IMAGE_CREATABLE:			info->i = 0; break;
 		case DEVINFO_INT_IMAGE_RESET_ON_LOAD:		info->i = 1; break;
-		case DEVINFO_INT_IMAGE_MUST_BE_LOADED:		if ( device && device->inline_config) {
-														info->i = get_config(device)->must_be_loaded;
-													} else {
-														info->i = 0;
-													}
-													break;
+		case DEVINFO_INT_IMAGE_MUST_BE_LOADED:
+			if ( device && device->inline_config) {
+				info->i = get_config(device)->must_be_loaded;
+			} else {
+				info->i = 0;
+			}
+			break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(cartslot);					break;
 		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(cartslot);		break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(cartslot);		break;
 		case DEVINFO_FCT_GET_IMAGE_DEVICES:			info->f = (genf *) DEVICE_GET_IMAGE_DEVICES_NAME(cartslot);	break;
-		case DEVINFO_FCT_IMAGE_PARTIAL_HASH:		if ( device && device->inline_config && get_config(device)->device_partialhash) {
-														info->f = (genf *) get_config(device)->device_partialhash;
-													} else {
-														info->f = NULL;
-													}
-													break;
+		case DEVINFO_FCT_IMAGE_PARTIAL_HASH:
+			if ( device && device->inline_config && get_config(device)->device_partialhash) {
+				info->f = (genf *) get_config(device)->device_partialhash;
+			} else {
+				info->f = NULL;
+			}
+			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:						strcpy(info->s, "Cartslot"); break;
