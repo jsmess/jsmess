@@ -81,7 +81,7 @@ struct _pci_bus_state
 	const device_config *	busdevice;
 	const pci_bus_config *	config;
 	const device_config *	device[32];
-	offs_t					address;
+	UINT32					address;
 	INT8					devicenum;
 };
 
@@ -162,7 +162,7 @@ WRITE32_DEVICE_HANDLER( pci_32le_w )
 			{
 				int busnum = (pcibus->address >> 16) & 0xff;
 				int devicenum = (pcibus->address >> 11) & 0x1f;
-				pcibus->devicenum = (busnum == pcibus->config->busnum) ? devicenum : -1;
+				pcibus->devicenum = devicenum;//(busnum == pcibus->config->busnum) ? devicenum : -1;
 			}
 			break;
 

@@ -702,14 +702,6 @@ DRIVER_INIT( at386 )
 	at_kbdc8042.offset1 = 0xff;
 }
 
-
-
-DRIVER_INIT( at586 )
-{
-	DRIVER_INIT_CALL(at386);
-	intel82439tx_init(machine);
-}
-
 DRIVER_INIT( at_vga )
 {
 	static const struct kbdc8042_interface at8042 =
@@ -775,3 +767,14 @@ MACHINE_RESET( at )
 	pc_hdc_set_dma8237_device( st->dma8237_1 );
 }
 
+MACHINE_START( at586 )
+{
+	MACHINE_START_CALL(at);
+	intel82439tx_init(machine);
+}
+
+MACHINE_RESET( at586 )
+{
+	MACHINE_RESET_CALL(at);
+	intel82439tx_reset(machine);
+}

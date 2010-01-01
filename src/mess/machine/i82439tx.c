@@ -212,11 +212,14 @@ void intel82439tx_pci_write(const device_config *busdevice, const device_config 
 }
 
 
-
 void intel82439tx_init(running_machine *machine)
 {
-	/* setup PCI */
 	i82439tx = auto_alloc(machine, struct intel82439tx_info);
+}
+
+void intel82439tx_reset(running_machine *machine)
+{
+	/* setup PCI */
 	memset(i82439tx, 0, sizeof(*i82439tx));
 	i82439tx->regs[0x00] = 0x14020000;
 	i82439tx->regs[0x01] = 0x01520000;

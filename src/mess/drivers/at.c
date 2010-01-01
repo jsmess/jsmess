@@ -832,6 +832,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( at586 )
 	MDRV_IMPORT_FROM( at386 )
 
+	MDRV_MACHINE_START( at586 )
+	MDRV_MACHINE_RESET( at586 )
+	
 	MDRV_CPU_REPLACE("maincpu", PENTIUM, 60000000)
 	MDRV_CPU_PROGRAM_MAP(at586_map)
 	MDRV_CPU_IO_MAP(at586_io)
@@ -1224,5 +1227,5 @@ COMP ( 1987, at,       ibm5170, 0,       ibm5162,  atcga,	atcga,	    "",  "PC/AT
 COMP ( 1989, neat,     ibm5170, 0,       ibm5162,  atcga,	atcga,	    "",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga,	at386,	    "MITAC INC",  "PC/AT 386 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga,	at386,	    "",  "PC/AT 486 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga,	at586,	    "",  "PC/AT 586 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga,	at386,	    "",  "PC/AT 586 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,	at_vga,     "",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )

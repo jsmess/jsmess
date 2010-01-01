@@ -46,12 +46,13 @@ WRITE8_HANDLER( at_kbdc8042_set_data_signal );
 DRIVER_INIT( atcga );
 DRIVER_INIT( atega );
 DRIVER_INIT( at386 );
-DRIVER_INIT( at586 );
 
 DRIVER_INIT( at_vga );
 DRIVER_INIT( ps2m30286 );
 
 MACHINE_START( at );
 MACHINE_RESET( at );
+MACHINE_START( at586 );
+MACHINE_RESET( at586 );
 
 #endif /* AT_H_ */
