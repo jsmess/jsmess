@@ -18,7 +18,7 @@
 /* Address maps */
 static ADDRESS_MAP_START(irisha_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM  // ROM
-  AM_RANGE( 0x4000, 0xffff ) AM_RAM  // RAM
+	AM_RANGE( 0x4000, 0xffff ) AM_RAM  // RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( irisha_io , ADDRESS_SPACE_IO, 8)
@@ -133,34 +133,53 @@ static INPUT_PORTS_START( irisha )
    	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 INPUT_PORTS_END
 
+/* F4 Character Displayer */
+static const gfx_layout irisha_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( irisha )
+	GFXDECODE_ENTRY( "maincpu", 0x3800, irisha_charlayout, 0, 1 )
+GFXDECODE_END
+
 /* Machine driver */
 static MACHINE_DRIVER_START( irisha )
-    /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", 8080, XTAL_16MHz / 9)
-    MDRV_CPU_PROGRAM_MAP(irisha_mem)
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", 8080, XTAL_16MHz / 9)
+	MDRV_CPU_PROGRAM_MAP(irisha_mem)
    	MDRV_CPU_IO_MAP(irisha_io)
 
 	MDRV_MACHINE_START( irisha )
    	MDRV_MACHINE_RESET( irisha )
 
-    MDRV_I8255A_ADD( "ppi8255", irisha_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", irisha_ppi8255_interface )
 
 	MDRV_PIT8253_ADD( "pit8253", irisha_pit8253_intf )
 
 	MDRV_PIC8259_ADD( "pic8259", irisha_pic8259_config )
 
-    /* video hardware */
-		MDRV_SCREEN_ADD("screen", RASTER)
-		MDRV_SCREEN_REFRESH_RATE(50)
-		MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-		MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-		MDRV_SCREEN_SIZE(320, 200)
-		MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-		MDRV_PALETTE_LENGTH(2)
-		MDRV_PALETTE_INIT(black_and_white)
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(320, 200)
+	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MDRV_GFXDECODE(irisha)
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)
 
-		MDRV_VIDEO_START(irisha)
-    MDRV_VIDEO_UPDATE(irisha)
+	MDRV_VIDEO_START(irisha)
+	MDRV_VIDEO_UPDATE(irisha)
 
 	/* uart */
 	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
@@ -169,8 +188,8 @@ MACHINE_DRIVER_END
 /* ROM definition */
 
 ROM_START( irisha )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "irisha.rom", 0x0000, 0x4000, BAD_DUMP CRC(B3CC0BB4) )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "irisha.rom", 0x0000, 0x4000, BAD_DUMP CRC(B3CC0BB4) )
 ROM_END
 
 /* Driver */

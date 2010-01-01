@@ -304,23 +304,64 @@ INPUT_PORTS_END
     GFX LAYOUT
 ***************************************************************************/
 
-static const gfx_layout char_layout =
+static const gfx_layout mz700_layout =
 {
 	8, 8,		/* 8 x 8 graphics */
 	512,		/* 512 codes */
-	1,			/* 1 bit per pixel */
+	1,		/* 1 bit per pixel */
 	{ 0 },		/* no bitplanes */
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8 * 8		/* code takes 8 times 8 bits */
 };
 
+static const gfx_layout mz2500_cg_layout =
+{
+	8, 8,		/* 8 x 8 graphics */
+	256,		/* 512 codes */
+	1,		/* 1 bit per pixel */
+	{ 0 },		/* no bitplanes */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8 * 8		/* code takes 8 times 8 bits */
+};
+
+/* gfx1 is mostly 16x16, but there are some 8x8 characters */
+static const gfx_layout mz2500_8_layout =
+{
+	8, 8,		/* 8 x 8 graphics */
+	1920,		/* 1920 codes */
+	1,		/* 1 bit per pixel */
+	{ 0 },		/* no bitplanes */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8 * 8		/* code takes 8 times 8 bits */
+};
+
+static const gfx_layout mz2500_16_layout =
+{
+	16, 16,		/* 16 x 16 graphics */
+	8192,		/* 8192 codes */
+	1,		/* 1 bit per pixel */
+	{ 0 },		/* no bitplanes */
+	{ 0, 1, 2, 3, 4, 5, 6, 7, 128, 129, 130, 131, 132, 133, 134, 135 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	16 * 16		/* code takes 16 times 16 bits */
+};
+
 static GFXDECODE_START( mz700 )
-	GFXDECODE_ENTRY("cgrom", 0, char_layout, 0, 256)
+	GFXDECODE_ENTRY("cgrom", 0, mz700_layout, 0, 256)
 GFXDECODE_END
 
 static GFXDECODE_START( mz800 )
-	GFXDECODE_ENTRY(NULL, 0, char_layout, 0, 256)
+	GFXDECODE_ENTRY(NULL, 0, mz700_layout, 0, 256)
+	GFXDECODE_ENTRY("monitor", 0x1000, mz700_layout, 0, 256)	// for mz800 viewer only
+GFXDECODE_END
+
+static GFXDECODE_START( mz2500 )
+	GFXDECODE_ENTRY("cgrom", 0, mz2500_cg_layout, 0, 256)
+	GFXDECODE_ENTRY("gfx1", 0x4400, mz2500_8_layout, 0, 256)	// for viewer only
+	GFXDECODE_ENTRY("gfx1", 0, mz2500_16_layout, 0, 256)		// for viewer only
 GFXDECODE_END
 
 
@@ -424,7 +465,7 @@ static MACHINE_DRIVER_START( mz2500 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz/2, 568, 0, 40*8, 312, 0, 25*8)
 
-	MDRV_GFXDECODE(mz700)
+	MDRV_GFXDECODE(mz2500)
 	MDRV_PALETTE_LENGTH(256*2)
 	MDRV_PALETTE_INIT(mz700)
 

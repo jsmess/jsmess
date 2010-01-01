@@ -354,7 +354,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( jr200 )
-	GFXDECODE_ENTRY( "char", 0, tiles8x8_layout, 0, 0x100 )
+	GFXDECODE_ENTRY( "char", 0, tiles8x8_layout, 0, 64 )
 GFXDECODE_END
 
 
@@ -373,9 +373,9 @@ static MACHINE_DRIVER_START( jr200 )
 	MDRV_CPU_ADD("maincpu", M6802, 890000) /* MN1800A */
 	MDRV_CPU_PROGRAM_MAP(jr200_mem)
 	MDRV_CPU_IO_MAP(jr200_io)
-// MDRV_CPU_VBLANK_INT("screen", jr200_irq)
-MDRV_CPU_PERIODIC_INT(jr200_nmi,20)
-MDRV_CPU_PERIODIC_INT(jr200_irq,20)
+	// MDRV_CPU_VBLANK_INT("screen", jr200_irq)
+	MDRV_CPU_PERIODIC_INT(jr200_nmi,20)
+	MDRV_CPU_PERIODIC_INT(jr200_irq,20)
 /*
     MDRV_CPU_ADD("mn1544", MN1544, ?)
 */

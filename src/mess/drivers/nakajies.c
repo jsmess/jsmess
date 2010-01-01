@@ -334,6 +334,36 @@ static MACHINE_RESET( nakajies )
 	state->irq_active = 0;
 }
 
+/* F4 Character Displayer */
+static const gfx_layout nakajies_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	2331,					/* 2331 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( wales210 )
+	GFXDECODE_ENTRY( "bios", 0x55043, nakajies_charlayout, 0, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START( dator3k )
+	GFXDECODE_ENTRY( "bios", 0x54fb1, nakajies_charlayout, 0, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START( drwrt200 )
+	GFXDECODE_ENTRY( "bios", 0xdbbeb, nakajies_charlayout, 0, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START( drwrt400 )
+	GFXDECODE_ENTRY( "bios", 0x580b6, nakajies_charlayout, 0, 1 )
+GFXDECODE_END
+
 
 static MACHINE_DRIVER_START( nakajies210 )
 	MDRV_CPU_ADD( "v20hl", V20, X301 / 2 )
@@ -349,6 +379,7 @@ static MACHINE_DRIVER_START( nakajies210 )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MDRV_SCREEN_SIZE( 80 * 6, 8 * 8 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
+	MDRV_GFXDECODE(wales210)
 	MDRV_PALETTE_LENGTH( 2 )
 
 	/* sound */
@@ -357,6 +388,10 @@ static MACHINE_DRIVER_START( nakajies210 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( dator3k )
+	MDRV_IMPORT_FROM( nakajies210 )
+	MDRV_GFXDECODE(dator3k)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( nakajies220 )
 	MDRV_CPU_ADD( "v20hl", V20, X301 / 2 )
@@ -372,6 +407,7 @@ static MACHINE_DRIVER_START( nakajies220 )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MDRV_SCREEN_SIZE( 80 * 6, 8 * 8 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
+	MDRV_GFXDECODE(drwrt400)
 	MDRV_PALETTE_LENGTH( 2 )
 
 	/* sound */
@@ -395,6 +431,7 @@ static MACHINE_DRIVER_START( nakajies250 )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MDRV_SCREEN_SIZE( 80 * 6, 8 * 8 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
+	MDRV_GFXDECODE(drwrt200)
 	MDRV_PALETTE_LENGTH( 2 )
 
 	/* sound */
@@ -429,7 +466,7 @@ ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     INIT    COMPANY    FULLNAME            FLAGS */
 COMP( 199?, wales210,        0, 0,      nakajies210, nakajies, 0,      "Walther", "ES-210",           GAME_NOT_WORKING )	/* German */
-COMP( 199?, dator3k,  wales210, 0,      nakajies210, nakajies, 0,      "Dator",   "Dator 3000",       GAME_NOT_WORKING )	/* Spanish */
+COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies, 0,      "Dator",   "Dator 3000",       GAME_NOT_WORKING )	/* Spanish */
 COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies, 0,      "NTS",     "DreamWriter T400", GAME_NOT_WORKING )	/* English */
 COMP( 199?, drwrt200, wales210, 0,      nakajies250, nakajies, 0,      "NTS",     "DreamWriter T200", GAME_NOT_WORKING )	/* English */
 
