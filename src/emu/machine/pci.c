@@ -162,7 +162,7 @@ WRITE32_DEVICE_HANDLER( pci_32le_w )
 			{
 				int busnum = (pcibus->address >> 16) & 0xff;
 				int devicenum = (pcibus->address >> 11) & 0x1f;
-				pcibus->devicenum = devicenum;//(busnum == pcibus->config->busnum) ? devicenum : -1;
+				pcibus->devicenum = (busnum == pcibus->config->busnum) ? devicenum : -1;
 			}
 			break;
 
