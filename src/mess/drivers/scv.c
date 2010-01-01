@@ -20,12 +20,13 @@ static WRITE8_HANDLER( scv_portc_w );
 static UINT8 *scv_vram;
 static UINT8 scv_porta;
 static UINT8 scv_portc;
+static emu_timer *scv_vb_timer;
 
 
 static ADDRESS_MAP_START( scv_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM		/* BIOS */
 
-	AM_RANGE( 0x2000, 0x33ff ) AM_RAM AM_BASE( &scv_vram )
+	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_BASE( &scv_vram )	/* VRAM + 4 registers */
 
 	AM_RANGE( 0x8000, 0xff7f ) AM_ROM AM_REGION("cart", 0)
 	AM_RANGE( 0xff80, 0xffff ) AM_RAM		/* upd7801 internal RAM */
@@ -136,6 +137,137 @@ static DEVICE_IMAGE_LOAD( scv_cart )
 }
 
 
+static PALETTE_INIT( scv )
+{
+	/* Palette borrowed from eSCV. No idea if this is correct */
+	palette_set_color_rgb( machine,  0,   0,  90, 156 );
+	palette_set_color_rgb( machine,  1,   0,   0,   0 );
+	palette_set_color_rgb( machine,  2,  58, 148, 255 );
+	palette_set_color_rgb( machine,  3,   0,   0, 255 );
+	palette_set_color_rgb( machine,  4,  16, 214,   0 );
+	palette_set_color_rgb( machine,  5,  66, 255,  16 );
+	palette_set_color_rgb( machine,  6, 123, 230, 197 );
+	palette_set_color_rgb( machine,  7,   0, 173,   0 );
+	palette_set_color_rgb( machine,  8, 255,  41, 148 );
+	palette_set_color_rgb( machine,  9, 255,  49,  16 );
+	palette_set_color_rgb( machine, 10, 255,  58, 255 );
+	palette_set_color_rgb( machine, 11, 239, 156, 255 );
+	palette_set_color_rgb( machine, 12, 255, 206,  33 );
+	palette_set_color_rgb( machine, 13,  74, 123,  16 );
+	palette_set_color_rgb( machine, 14, 165, 148, 165 );
+	palette_set_color_rgb( machine, 15, 255, 255, 255 );
+}
+
+
+static TIMER_CALLBACK( scv_vb_callback )
+{
+	int vpos = video_screen_get_vpos(machine->primary_screen);
+
+	switch( vpos )
+	{
+	case 240:
+		cputag_set_input_line(machine, "maincpu", UPD7810_INTF2, CLEAR_LINE);
+		break;
+	case 0:
+		cputag_set_input_line(machine, "maincpu", UPD7810_INTF2, ASSERT_LINE);
+		break;
+	}
+
+	timer_adjust_oneshot( scv_vb_timer, video_screen_get_time_until_pos( machine->primary_screen, ( vpos + 1 ) % 262, 0 ), 0 );
+}
+
+
+static void plot_sprite_part( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 pat, UINT8 col )
+{
+	if ( pat & 0x08 )
+		*BITMAP_ADDR16( bitmap, y, x ) = col;
+	if ( pat & 0x04 && x < 255 )
+		*BITMAP_ADDR16( bitmap, y, x + 1 ) = col;
+	if ( pat & 0x02 && x < 254 )
+		*BITMAP_ADDR16( bitmap, y, x + 2 ) = col;
+	if ( pat & 0x01 && x < 253 )
+		*BITMAP_ADDR16( bitmap, y, x + 3 ) = col;
+}
+
+
+static VIDEO_UPDATE( scv )
+{
+	/* Draw background */
+
+	/* Draw sprites */
+	if ( scv_vram[0x1400] & 0x10 )
+	{
+		int i, j;
+
+/*
+00 37 CE 00 01 FF FF 08 11 FF FF 88 11 FF FF 88
+00 F7 FE 00 00 30 C8 00 00 11 00 00 00 00 A4 00
+
+00000000 00110111 11001110 00000000 00000001 11111111 11111111 00001000 00010001 11111111 11111111 10001000 000010001 11111111 11111111 10001000
+00000000 11110111 11111110 00000000 00000000 00110000 11001000 00000000 00000000 00010001 00000000 00000000 000000000 00000000 10100100 00000000
+
+0000 0011 1100 0000 +0 Hi +1 Hi +2 Hi +3 Hi
+0000 0111 1110 0000 +0 Lo +1 Lo +2 Lo +3 Lo
+0000 1111 1111 1000 +4
+0001 1111 1111 1000 +4
+0001 1111 1111 1000 +8
+0001 1111 1111 1000 +8
+0001 1111 1111 1000 +12
+0001 1111 1111 1000 +12
+0000 1111 1111 0000 +16
+0000 0111 1110 0000 +16
+0000 0011 1100 0000 +20
+0000 0000 1000 0000 +20
+0000 0001 0000 0000 +24
+0000 0001 0000 0000 +24
+0000 0000 1010 0000 +28
+0000 0000 0100 0000 +28
+*/
+		for ( i = 0; i < 128; i++ )
+		{
+			UINT8 spr_y = scv_vram[ 0x1200 + i * 4 ];
+			UINT8 col = scv_vram[ 0x1201 + i * 4 ] & 0x0f;
+			UINT8 spr_x = scv_vram[ 0x1202 + i * 4 ];
+			UINT8 tile_idx = scv_vram[ 0x1203 + i * 4 ];
+
+			for ( j = 0; j < 8; j++ )
+			{
+				UINT8 pat0 = scv_vram[ tile_idx * 32 + j * 4 + 0 ];
+				UINT8 pat1 = scv_vram[ tile_idx * 32 + j * 4 + 1 ];
+				UINT8 pat2 = scv_vram[ tile_idx * 32 + j * 4 + 2 ];
+				UINT8 pat3 = scv_vram[ tile_idx * 32 + j * 4 + 3 ];
+
+				plot_sprite_part( bitmap, spr_x     , spr_y, pat0 >> 4, col );
+				plot_sprite_part( bitmap, spr_x +  4, spr_y, pat1 >> 4, col );
+				plot_sprite_part( bitmap, spr_x +  8, spr_y, pat2 >> 4, col );
+				plot_sprite_part( bitmap, spr_x + 12, spr_y, pat3 >> 4, col );
+
+				plot_sprite_part( bitmap, spr_x     , spr_y + 1, pat0 & 0x0f, col );
+				plot_sprite_part( bitmap, spr_x +  4, spr_y + 1, pat1 & 0x0f, col );
+				plot_sprite_part( bitmap, spr_x +  8, spr_y + 1, pat2 & 0x0f, col );
+				plot_sprite_part( bitmap, spr_x + 12, spr_y + 1, pat3 & 0x0f, col );
+
+				spr_y += 2;
+			}
+		}
+	}
+
+	return 0;
+}
+
+
+static MACHINE_START( scv )
+{
+	scv_vb_timer = timer_alloc( machine, scv_vb_callback, NULL );
+}
+
+
+static MACHINE_RESET( scv )
+{
+	timer_adjust_oneshot( scv_vb_timer, video_screen_get_time_until_pos( machine->primary_screen, 0, 0 ), 0 );
+}
+
+
 static const UPD7810_CONFIG scv_cpu_config = { TYPE_7801, NULL };
 
 
@@ -145,13 +277,18 @@ static MACHINE_DRIVER_START( scv )
 	MDRV_CPU_IO_MAP( scv_io )
 	MDRV_CPU_CONFIG( scv_cpu_config )
 
+	MDRV_MACHINE_START( scv )
+	MDRV_MACHINE_RESET( scv )
+
 	MDRV_SCREEN_ADD( "screen", RASTER )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MDRV_SCREEN_RAW_PARAMS( XTAL_14_31818MHz/2, 456, 0, 256, 262, 0, 200 )	/* TODO: Verify */
 
-	MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_LENGTH( 16 )
+	MDRV_PALETTE_INIT( scv )
 
 	/* Video chip is EPOCH TV-1 */
+	MDRV_VIDEO_UPDATE( scv )
 
 	/* Sound is generated by UPD1771C clocked at XTAL_6MHz */
 
@@ -168,11 +305,15 @@ static MACHINE_DRIVER_START( scv_pal )
 	MDRV_CPU_IO_MAP( scv_io )
 	MDRV_CPU_CONFIG( scv_cpu_config )
 
+	MDRV_MACHINE_START( scv )
+	MDRV_MACHINE_RESET( scv )
+
 	MDRV_SCREEN_ADD( "screen", RASTER )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MDRV_SCREEN_RAW_PARAMS( XTAL_13_4MHz/2, 456, 0, 256, 342, 0, 200 )		/* TODO: Verify */
 
-	MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_LENGTH( 16 )
+	MDRV_PALETTE_INIT( scv )
 
 	/* Video chip is EPOCH TV-1A */
 
