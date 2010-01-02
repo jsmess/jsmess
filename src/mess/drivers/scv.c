@@ -216,25 +216,62 @@ INLINE void draw_sprite( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 tile_idx, UIN
 }
 
 
+INLINE void draw_semi_graph( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 data, UINT8 col )
+{
+	int i;
+
+	if ( ! data )
+		return;
+
+	for ( i = 0; i < 4; i++ )
+	{
+		*BITMAP_ADDR16(bitmap, y + i, x + 0) = col;
+		*BITMAP_ADDR16(bitmap, y + i, x + 1) = col;
+		*BITMAP_ADDR16(bitmap, y + i, x + 2) = col;
+		*BITMAP_ADDR16(bitmap, y + i, x + 3) = col;
+	}
+}
+
+
 static VIDEO_UPDATE( scv )
 {
 	int x, y;
-//	UINT8 fg = scv_vram[0x1403] >> 4;
+	UINT8 fg = scv_vram[0x1403] >> 4;
 	UINT8 bg = scv_vram[0x1403] & 0x0f;
 
 	/* Clear the screen */
-	for ( y = 0; y < 256; y++ )
-		for ( x = 0; x < 256; x++ )
-			*BITMAP_ADDR16( bitmap, y, x ) = bg;
+	bitmap_fill( bitmap, cliprect, bg );
 
 	/* Draw background */
+	switch ( scv_vram[0x1400] & 0x03 )
+	{
+	case 0x01:		/* Semi graphics mode */
+		for ( y = 0; y < 16; y++ )
+		{
+			for ( x = 0; x < 32; x++ )
+			{
+				UINT8 d = scv_vram[ 0x1000 + y * 32 + x ];
 
-	/* Draw sprites */
+				draw_semi_graph( bitmap, x * 8    , y * 16     , d & 0x80, fg );
+				draw_semi_graph( bitmap, x * 8 + 4, y * 16     , d & 0x40, fg );
+				draw_semi_graph( bitmap, x * 8    , y * 16 +  4, d & 0x20, fg );
+				draw_semi_graph( bitmap, x * 8 + 4, y * 16 +  4, d & 0x10, fg );
+				draw_semi_graph( bitmap, x * 8    , y * 16 +  8, d & 0x08, fg );
+				draw_semi_graph( bitmap, x * 8 + 4, y * 16 +  8, d & 0x04, fg );
+				draw_semi_graph( bitmap, x * 8    , y * 16 + 12, d & 0x02, fg );
+				draw_semi_graph( bitmap, x * 8 + 4, y * 16 + 12, d & 0x01, fg );
+			}
+		}
+		break;
+	case 0x03:		/* Block graphics mode */
+		break;
+	default:		/* Text mode */
+		break;
+	}
+
+	/* Draw sprites if enabled */
 	if ( scv_vram[0x1400] & 0x10 )
 	{
-		static const UINT8 spr_2col_lut0[16] = { 0, 15, 12, 13, 10, 11, 8, 9, 6, 7, 4, 5, 2, 3, 1, 1 };
-		static const UINT8 spr_2col_lut1[16] = { 0, 1, 8, 11, 2, 3, 10, 9, 4, 5, 12, 13, 6, 7, 14, 15 };
-
 		int i;
 
 		for ( i = 0; i < 128; i++ )
@@ -249,12 +286,18 @@ static VIDEO_UPDATE( scv )
 			if ( !col )
 				continue;
 
+			/* Check if 2 color sprites are enabled */
 			if ( ( scv_vram[0x1400] & 0x20 ) && ( i & 0x20 ) )
 			{
 				/* 2 color sprite handling */
 				draw_sprite( bitmap, spr_x, spr_y, tile_idx, col );
 				if ( x_32 || y_32 )
+				{
+					static const UINT8 spr_2col_lut0[16] = { 0, 15, 12, 13, 10, 11, 8, 9, 6, 7, 4, 5, 2, 3, 1, 1 };
+					static const UINT8 spr_2col_lut1[16] = { 0, 1, 8, 11, 2, 3, 10, 9, 4, 5, 12, 13, 6, 7, 14, 15 };
+
 					draw_sprite( bitmap, spr_x, spr_y, tile_idx + 8 * x_32 + y_32, ( i & 0x40 ) ? spr_2col_lut1[col] : spr_2col_lut0[col] );
+				}
 			}
 			else
 			{
