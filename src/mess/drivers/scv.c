@@ -232,10 +232,12 @@ static VIDEO_UPDATE( scv )
 */
 		for ( i = 0; i < 128; i++ )
 		{
-			UINT8 spr_y = scv_vram[ 0x1200 + i * 4 ];
+			UINT8 spr_y = scv_vram[ 0x1200 + i * 4 ] & 0xfe;
+			UINT8 y_32 = scv_vram[ 0x1200 + i * 4 ] & 0x01;		/* Xx32 sprite */
 			UINT8 col = scv_vram[ 0x1201 + i * 4 ] & 0x0f;
-			UINT8 spr_x = scv_vram[ 0x1202 + i * 4 ];
-			UINT8 tile_idx = scv_vram[ 0x1203 + i * 4 ];
+			UINT8 spr_x = scv_vram[ 0x1202 + i * 4 ] & 0xfe;
+			UINT8 x_32 = scv_vram[ 0x1202 + i * 4 ] & 0x01;		/* 32xX sprite */
+			UINT8 tile_idx = scv_vram[ 0x1203 + i * 4 ] & 0x7f;
 
 			for ( j = 0; j < 8; j++ )
 			{
@@ -254,7 +256,68 @@ static VIDEO_UPDATE( scv )
 				plot_sprite_part( bitmap, spr_x +  8, spr_y + 1, pat2 & 0x0f, col );
 				plot_sprite_part( bitmap, spr_x + 12, spr_y + 1, pat3 & 0x0f, col );
 
+				if ( x_32 )
+				{
+					pat0 = scv_vram[ ( tile_idx + 8 ) * 32 + j * 4 + 0 ];
+					pat1 = scv_vram[ ( tile_idx + 8 ) * 32 + j * 4 + 1 ];
+					pat2 = scv_vram[ ( tile_idx + 8 ) * 32 + j * 4 + 2 ];
+					pat3 = scv_vram[ ( tile_idx + 8 ) * 32 + j * 4 + 3 ];
+
+					plot_sprite_part( bitmap, spr_x + 16, spr_y, pat0 >> 4, col );
+					plot_sprite_part( bitmap, spr_x + 20, spr_y, pat1 >> 4, col );
+					plot_sprite_part( bitmap, spr_x + 24, spr_y, pat2 >> 4, col );
+					plot_sprite_part( bitmap, spr_x + 28, spr_y, pat3 >> 4, col );
+
+					plot_sprite_part( bitmap, spr_x + 16, spr_y + 1, pat0 & 0x0f, col );
+					plot_sprite_part( bitmap, spr_x + 20, spr_y + 1, pat1 & 0x0f, col );
+					plot_sprite_part( bitmap, spr_x + 24, spr_y + 1, pat2 & 0x0f, col );
+					plot_sprite_part( bitmap, spr_x + 28, spr_y + 1, pat3 & 0x0f, col );
+				}
+
 				spr_y += 2;
+			}
+
+			if ( y_32 )
+			{
+				tile_idx += 1;
+
+				for ( j = 0; j < 8; j++ )
+				{
+					UINT8 pat0 = scv_vram[ tile_idx * 32 + j * 4 + 0 ];
+					UINT8 pat1 = scv_vram[ tile_idx * 32 + j * 4 + 1 ];
+					UINT8 pat2 = scv_vram[ tile_idx * 32 + j * 4 + 2 ];
+					UINT8 pat3 = scv_vram[ tile_idx * 32 + j * 4 + 3 ];
+
+					plot_sprite_part( bitmap, spr_x     , spr_y, pat0 >> 4, col );
+					plot_sprite_part( bitmap, spr_x +  4, spr_y, pat1 >> 4, col );
+					plot_sprite_part( bitmap, spr_x +  8, spr_y, pat2 >> 4, col );
+					plot_sprite_part( bitmap, spr_x + 12, spr_y, pat3 >> 4, col );
+
+					plot_sprite_part( bitmap, spr_x     , spr_y + 1, pat0 & 0x0f, col );
+					plot_sprite_part( bitmap, spr_x +  4, spr_y + 1, pat1 & 0x0f, col );
+					plot_sprite_part( bitmap, spr_x +  8, spr_y + 1, pat2 & 0x0f, col );
+					plot_sprite_part( bitmap, spr_x + 12, spr_y + 1, pat3 & 0x0f, col );
+
+					if ( x_32 )
+					{
+						pat0 = scv_vram[ ( tile_idx + 8 ) * 32 + j * 4 + 0 ];
+						pat1 = scv_vram[ ( tile_idx + 8 ) * 32 + j * 4 + 1 ];
+						pat2 = scv_vram[ ( tile_idx + 8 ) * 32 + j * 4 + 2 ];
+						pat3 = scv_vram[ ( tile_idx + 8 ) * 32 + j * 4 + 3 ];
+
+						plot_sprite_part( bitmap, spr_x + 16, spr_y, pat0 >> 4, col );
+						plot_sprite_part( bitmap, spr_x + 20, spr_y, pat1 >> 4, col );
+						plot_sprite_part( bitmap, spr_x + 24, spr_y, pat2 >> 4, col );
+						plot_sprite_part( bitmap, spr_x + 28, spr_y, pat3 >> 4, col );
+
+						plot_sprite_part( bitmap, spr_x + 16, spr_y + 1, pat0 & 0x0f, col );
+						plot_sprite_part( bitmap, spr_x + 20, spr_y + 1, pat1 & 0x0f, col );
+						plot_sprite_part( bitmap, spr_x + 24, spr_y + 1, pat2 & 0x0f, col );
+						plot_sprite_part( bitmap, spr_x + 28, spr_y + 1, pat3 & 0x0f, col );
+					}
+
+					spr_y += 2;
+				}
 			}
 		}
 	}
