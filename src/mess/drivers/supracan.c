@@ -30,10 +30,7 @@ static UINT8 *supracan_soundram;
 static UINT16 *supracan_soundram_16;
 static UINT16 supracan_video_regs[256];
 static emu_timer *supracan_video_timer;
-static UINT16 *supracan_charram;
 static UINT16 *supracan_vram;
-static UINT16 *supracan_rram;
-static UINT16 *supracan_rozpal;
 
 static READ16_HANDLER( supracan_unk1_r );
 static WRITE16_HANDLER( supracan_soundram_w );
@@ -68,12 +65,15 @@ static VIDEO_START( supracan )
 
 }
 
+/* FIXME: vram is currently hardcoded, but there's an high chance it's tied to some video registers */
 static VIDEO_UPDATE( supracan )
 {
 	int x,y,count;
 	const gfx_element *gfx = screen->machine->gfx[0];
 
-	count = 0;
+	bitmap_fill(bitmap, cliprect, 0);
+
+	count = 0x4400/2;
 
 	for (y=0;y<64;y++)
 	{
@@ -82,7 +82,7 @@ static VIDEO_UPDATE( supracan )
 			static UINT16 dot_data;
 
 			/* FIXME: likely to be clutted */
-			dot_data = supracan_rram[count] ^ 0xffff;
+			dot_data = supracan_vram[count] ^ 0xffff;
 
 			*BITMAP_ADDR16(bitmap, y, 128+x+0) = ((dot_data >> 14) & 0x0003) + 0x20;
 			*BITMAP_ADDR16(bitmap, y, 128+x+1) = ((dot_data >> 12) & 0x0003) + 0x20;
@@ -96,7 +96,7 @@ static VIDEO_UPDATE( supracan )
 		}
 	}
 
-	count = 0;
+	count = 0x4200/2;
 
 	for (y=0;y<16;y++)
 	{
@@ -107,6 +107,22 @@ static VIDEO_UPDATE( supracan )
 			tile = (supracan_vram[count] & 0x00ff);
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
 			count++;
+		}
+	}
+
+	{
+		int x,y,spr_offs,col,i,spr_base;
+
+		spr_base = 0x1d000;
+
+		for(i=spr_base/2;i<(spr_base+0x100)/2;i+=4)
+		{
+			y = supracan_vram[i+0] & 0xff;
+			x = supracan_vram[i+3] & 0xff;
+			spr_offs = supracan_vram[i+2] & 0x1ff;;
+			col = (supracan_vram[i+1] & 0x000f);
+
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],spr_offs,col,0,0,x,y,0);
 		}
 	}
 
@@ -216,13 +232,9 @@ static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xe90020, 0xe9002b ) AM_WRITE( supracan_dma_w )
 	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE( supracan_video_r, supracan_video_w )
 	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE( 0xf40000, 0xf43fff ) AM_RAM_WRITE(supracan_char_w) AM_BASE(&supracan_charram)	/* Unknown, some data gets copied here during boot */
-	AM_RANGE( 0xf44000, 0xf441ff ) AM_RAM AM_BASE(&supracan_rozpal) /* Unknown */
-	AM_RANGE( 0xf44200, 0xf443ff ) AM_RAM AM_BASE(&supracan_vram)	/* Foreground tilemap layer */
-	AM_RANGE( 0xf44400, 0xf445ff ) AM_RAM AM_BASE(&supracan_rram)	/* ROZ layer tiles */
-	AM_RANGE( 0xf44600, 0xf44fff ) AM_RAM	/* Unknown, stuff gets written here. Zoom table?? */
-	AM_RANGE( 0xf48000, 0xf4ffff ) AM_RAM /* more character data */
-	AM_RANGE( 0xf5d000, 0xf5d0ff ) AM_RAM
+	AM_RANGE( 0xf40000, 0xf5ffff ) AM_RAM_WRITE(supracan_char_w) AM_BASE(&supracan_vram)	/* Unknown, some data gets copied here during boot */
+//	AM_RANGE( 0xf44000, 0xf441ff ) AM_RAM AM_BASE(&supracan_rozpal) /* clut data for the ROZ? */
+//	AM_RANGE( 0xf44600, 0xf44fff ) AM_RAM	/* Unknown, stuff gets written here. Zoom table?? */
 	AM_RANGE( 0xfc0000, 0xfcffff ) AM_RAM 	/* System work ram */
 	AM_RANGE( 0xff8000, 0xffffff ) AM_RAM	/* System work ram */
 ADDRESS_MAP_END
@@ -235,13 +247,13 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( supracan_char_w )
 {
-	COMBINE_DATA(&supracan_charram[offset]);
+	COMBINE_DATA(&supracan_vram[offset]);
 
 	{
 		UINT8 *gfx = memory_region(space->machine, "ram_gfx");
 
-		gfx[offset*2+0] = (supracan_charram[offset] & 0xff00) >> 8;
-		gfx[offset*2+1] = (supracan_charram[offset] & 0x00ff) >> 0;
+		gfx[offset*2+0] = (supracan_vram[offset] & 0xff00) >> 8;
+		gfx[offset*2+1] = (supracan_vram[offset] & 0x00ff) >> 0;
 
 		gfx_element_mark_dirty(space->machine->gfx[0], offset/32);
 		gfx_element_mark_dirty(space->machine->gfx[1], offset/16);
@@ -382,7 +394,6 @@ static WRITE16_HANDLER( supracan_video_w )
 			acan_sprdma_regs.count = data;
 			break;
 		case 0x1e/2:
-			//if(data != 0xa000)
 			//printf("%08x %08x %04x %04x\n",acan_sprdma_regs.src,acan_sprdma_regs.dst,acan_sprdma_regs.count,data);
 			if(data & 0xa000) //0x2000 selects dword transfer?
 			{
@@ -390,7 +401,7 @@ static WRITE16_HANDLER( supracan_video_w )
 				{
 					if(data & 0x0100) //dma 0x00 fill (or fixed value?)
 					{
-						memory_write_dword(space, acan_sprdma_regs.dst, 0x00000000);
+						memory_write_dword(space, acan_sprdma_regs.dst, 0);
 						acan_sprdma_regs.dst+=4;
 					}
 					else
@@ -506,7 +517,7 @@ MACHINE_DRIVER_END
 ROM_START( supracan )
 	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x4000, "ram_gfx", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "ram_gfx", ROMREGION_ERASEFF )
 
 //	ROM_REGION( 0x8000, "spr_gfx", ROMREGION_ERASEFF )
 
