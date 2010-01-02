@@ -20,13 +20,13 @@ struct _hyprduel_state
 	UINT16 *  irq_enable;
 	UINT16 *  sharedram1;
 	UINT16 *  sharedram3;
-  	UINT16 *  spriteram;
-  	UINT16 *  paletteram;
+	UINT16 *  spriteram;
+	UINT16 *  paletteram;
 	size_t    tiletable_size;
 	size_t    spriteram_size;
 
 	/* video-related */
-	tilemap   *bg_tilemap[3];
+	tilemap_t   *bg_tilemap[3];
 	UINT8     *empty_tiles;
 	UINT8     *dirtyindex;
 	int       sprite_xoffs, sprite_yoffs, sprite_yoffs_sub;

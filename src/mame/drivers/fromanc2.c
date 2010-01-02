@@ -19,7 +19,7 @@
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/2610intf.h"
 #include "rendlay.h"
 #include "includes/fromanc2.h"
@@ -209,7 +209,7 @@ static ADDRESS_MAP_START( fromanc2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd01000, 0xd01001) AM_WRITE(fromanc2_sndcmd_w)			// SOUND REQ (1P/2P)
 	AM_RANGE(0xd01100, 0xd01101) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd01200, 0xd01201) AM_WRITE(fromanc2_subcpu_w)			// SUB CPU WRITE
-	AM_RANGE(0xd01300, 0xd01301) AM_READ(fromanc2_subcpu_r 	)			// SUB CPU READ
+	AM_RANGE(0xd01300, 0xd01301) AM_READ(fromanc2_subcpu_r	)			// SUB CPU READ
 	AM_RANGE(0xd01400, 0xd01401) AM_WRITE(fromanc2_gfxbank_0_w)			// GFXBANK (1P)
 	AM_RANGE(0xd01500, 0xd01501) AM_WRITE(fromanc2_gfxbank_1_w)			// GFXBANK (2P)
 	AM_RANGE(0xd01600, 0xd01601) AM_WRITE(fromanc2_eeprom_w)			// EEPROM DATA
@@ -328,7 +328,7 @@ static INPUT_PORTS_START( fromanc2 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(subcpu_int_r, NULL)		// SUBCPU INT FLAG
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sndcpu_nmi_r, NULL)		// SNDCPU NMI FLAG
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(subcpu_nmi_r, NULL)		// SUBCPU NMI FLAG
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Service Mode (1P)" ) PORT_CODE(KEYCODE_F2)	// TEST (1P)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Service Mode (2P)" ) PORT_CODE(KEYCODE_F2)	// TEST (2P)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -411,18 +411,18 @@ static INPUT_PORTS_START( fromanc2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fromancr )
 	PORT_INCLUDE( fromanc2 )
 
 	PORT_MODIFY("EEPROMOUT")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fromanc4 )
@@ -436,14 +436,14 @@ static INPUT_PORTS_START( fromanc4 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sndcpu_nmi_r, NULL)		// SNDCPU NMI FLAG
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("EEPROMOUT")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
 INPUT_PORTS_END
 
 
@@ -577,7 +577,7 @@ static MACHINE_DRIVER_START( fromanc2 )
 	MDRV_MACHINE_START(fromanc2)
 	MDRV_MACHINE_RESET(fromanc2)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_GFXDECODE(fromanc2)
@@ -632,7 +632,7 @@ static MACHINE_DRIVER_START( fromancr )
 	MDRV_MACHINE_START(fromanc2)
 	MDRV_MACHINE_RESET(fromanc2)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_GFXDECODE(fromancr)
@@ -683,7 +683,7 @@ static MACHINE_DRIVER_START( fromanc4 )
 	MDRV_MACHINE_START(fromanc4)
 	MDRV_MACHINE_RESET(fromanc2)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_GFXDECODE(fromancr)

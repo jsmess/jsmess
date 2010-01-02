@@ -37,7 +37,7 @@ lev 7 : 0x7c : 0000 0000 - x
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "includes/kickgoal.h"
 
@@ -449,7 +449,7 @@ static READ16_HANDLER( kickgoal_eeprom_r )
 	kickgoal_state *state = (kickgoal_state *)space->machine->driver_data;
 	if (ACCESSING_BITS_0_7)
 	{
-		return eepromdev_read_bit(state->eeprom);
+		return eeprom_read_bit(state->eeprom);
 	}
 	return 0;
 }
@@ -463,13 +463,13 @@ static WRITE16_HANDLER( kickgoal_eeprom_w )
 		switch (offset)
 		{
 			case 0:
-				eepromdev_set_cs_line(state->eeprom, (data & 0x0001) ? CLEAR_LINE : ASSERT_LINE);
+				eeprom_set_cs_line(state->eeprom, (data & 0x0001) ? CLEAR_LINE : ASSERT_LINE);
 				break;
 			case 1:
-				eepromdev_set_clock_line(state->eeprom, (data & 0x0001) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_set_clock_line(state->eeprom, (data & 0x0001) ? ASSERT_LINE : CLEAR_LINE);
 				break;
 			case 2:
-				eepromdev_write_bit(state->eeprom, data & 0x0001);
+				eeprom_write_bit(state->eeprom, data & 0x0001);
 				break;
 		}
 	}
@@ -692,7 +692,8 @@ static MACHINE_DRIVER_START( kickgoal )
 	MDRV_MACHINE_START(kickgoal)
 	MDRV_MACHINE_RESET(kickgoal)
 
-	MDRV_EEPROM_93C46_ADD("eeprom", 128, kickgoal_default_eeprom_type1)
+	MDRV_EEPROM_93C46_ADD("eeprom")
+	MDRV_EEPROM_DATA(kickgoal_default_eeprom_type1, 128)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -733,7 +734,8 @@ static MACHINE_DRIVER_START( actionhw )
 	MDRV_MACHINE_START(kickgoal)
 	MDRV_MACHINE_RESET(kickgoal)
 
-	MDRV_EEPROM_93C46_ADD("eeprom", 128, kickgoal_default_eeprom_type1)
+	MDRV_EEPROM_93C46_ADD("eeprom")
+	MDRV_EEPROM_DATA(kickgoal_default_eeprom_type1, 128)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

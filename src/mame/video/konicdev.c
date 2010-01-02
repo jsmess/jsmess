@@ -1174,10 +1174,10 @@ static void konami_shuffle_16(UINT16 *buf,int len)
 
 	len /= 2;
 
-	for (i = 0;i < len/2;i++)
+	for (i = 0; i < len / 2; i++)
 	{
-		t = buf[len/2 + i];
-		buf[len/2 + i] = buf[len + i];
+		t = buf[len / 2 + i];
+		buf[len / 2 + i] = buf[len + i];
 		buf[len + i] = t;
 	}
 
@@ -1196,10 +1196,10 @@ static void konami_shuffle_8(UINT8 *buf,int len)
 
 	len /= 2;
 
-	for (i = 0;i < len/2;i++)
+	for (i = 0; i < len / 2; i++)
 	{
-		t = buf[len/2 + i];
-		buf[len/2 + i] = buf[len + i];
+		t = buf[len / 2 + i];
+		buf[len / 2 + i] = buf[len + i];
 		buf[len + i] = t;
 	}
 
@@ -1541,7 +1541,7 @@ struct _k007342_state
 	UINT8    *colorram_0;
 	UINT8    *colorram_1;
 
-	tilemap  *tilemap[2];
+	tilemap_t  *tilemap[2];
 	int      flipscreen, gfxnum, int_enabled;
 	UINT8    regs[8];
 	UINT16   scrollx[2];
@@ -2103,7 +2103,7 @@ struct _k052109_state
 	UINT8    *colorram_A;
 	UINT8    *colorram_B;
 
-	tilemap  *tilemap[3];
+	tilemap_t  *tilemap[3];
 	int      tileflip_enable, gfxnum;
 	UINT8    charrombank[4];
 	UINT8    charrombank_2[4];
@@ -2611,10 +2611,9 @@ static TILE_GET_INFO_DEVICE( k052109_get_tile_info2 )
 }
 
 
-//static STATE_POSTLOAD( k052109_tileflip_reset )
-void k052109_postload_tileflip_reset( const device_config *device )
+static STATE_POSTLOAD( k052109_tileflip_reset )
 {
-	k052109_state *k052109 = k052109_get_safe_token(device);
+	k052109_state *k052109 = (k052109_state *)param;
 	int data = k052109->ram[0x1e80];
 	tilemap_set_flip(k052109->tilemap[0], (data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	tilemap_set_flip(k052109->tilemap[1], (data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -2678,7 +2677,7 @@ static DEVICE_START( k052109 )
 	k052109->tilemap[1] = tilemap_create_device(device, k052109_get_tile_info1, tilemap_scan_rows, 8, 8, 64, 32);
 	k052109->tilemap[2] = tilemap_create_device(device, k052109_get_tile_info2, tilemap_scan_rows, 8, 8, 64, 32);
 
-	k052109->ram = auto_alloc_array(machine, UINT8, 0x6000);
+	k052109->ram = auto_alloc_array_clear(machine, UINT8, 0x6000);
 
 	k052109->colorram_F = &k052109->ram[0x0000];
 	k052109->colorram_A = &k052109->ram[0x0800];
@@ -2704,8 +2703,7 @@ static DEVICE_START( k052109 )
 	state_save_register_device_item_array(device, 0, k052109->dx);
 	state_save_register_device_item_array(device, 0, k052109->dy);
 	state_save_register_device_item(device, 0, k052109->has_extra_video_ram);
-
-//  state_save_register_postload(machine, k052109_tileflip_reset, NULL);    // to be moved into the drivers
+	state_save_register_postload(device->machine, k052109_tileflip_reset, k052109);
 }
 
 static DEVICE_RESET( k052109 )
@@ -4017,7 +4015,7 @@ static DEVICE_START( k05324x )
 		16,16,
 		0,
 		4,
-  		{ 24, 16, 8, 0 },
+		{ 24, 16, 8, 0 },
 		{ 0, 1, 2, 3, 4, 5, 6, 7,
 				8*32+0, 8*32+1, 8*32+2, 8*32+3, 8*32+4, 8*32+5, 8*32+6, 8*32+7 },
 		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
@@ -5066,7 +5064,7 @@ struct _k051316_state
 {
 	UINT8    *ram;
 
-	tilemap  *tmap;
+	tilemap_t  *tmap;
 
 	int      gfxnum, wraparound, bpp;
 	int      offset[2];
@@ -5417,7 +5415,7 @@ READ16_DEVICE_HANDLER( k053936_linectrl_r )
 
 // there is another implementation of this in  video/konamigx.c (!)
 //  why? shall they be merged?
-void k053936_zoom_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, tilemap *tmap, int flags, UINT32 priority, int glfgreat_hack )
+void k053936_zoom_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack )
 {
 	k053936_state *k053936= k053936_get_safe_token(device);
 	if (!tmap)
@@ -5609,17 +5607,6 @@ INLINE k053251_state *k053251_get_safe_token( const device_config *device )
     DEVICE HANDLERS
 *****************************************************************************/
 
-void k053251_postload_reset_indexes( const device_config *device )
-{
-	k053251_state *k053251 = k053251_get_safe_token(device);
-
-	k053251->palette_index[0] = 32 * ((k053251->ram[9] >> 0) & 0x03);
-	k053251->palette_index[1] = 32 * ((k053251->ram[9] >> 2) & 0x03);
-	k053251->palette_index[2] = 32 * ((k053251->ram[9] >> 4) & 0x03);
-	k053251->palette_index[3] = 16 * ((k053251->ram[10] >> 0) & 0x07);
-	k053251->palette_index[4] = 16 * ((k053251->ram[10] >> 3) & 0x07);
-}
-
 WRITE8_DEVICE_HANDLER( k053251_w )
 {
 	k053251_state *k053251 = k053251_get_safe_token(device);
@@ -5703,6 +5690,17 @@ void k053251_set_tmap_dirty( const device_config *device, int tmap_num, int data
 	k053251->dirty_tmap[tmap_num] = data ? 1 : 0;
 }
 
+static STATE_POSTLOAD( k053251_reset_indexes )
+{
+	k053251_state *k053251 = (k053251_state *)param;
+
+	k053251->palette_index[0] = 32 * ((k053251->ram[9] >> 0) & 0x03);
+	k053251->palette_index[1] = 32 * ((k053251->ram[9] >> 2) & 0x03);
+	k053251->palette_index[2] = 32 * ((k053251->ram[9] >> 4) & 0x03);
+	k053251->palette_index[3] = 16 * ((k053251->ram[10] >> 0) & 0x07);
+	k053251->palette_index[4] = 16 * ((k053251->ram[10] >> 3) & 0x07);
+}
+
 
 /*****************************************************************************
     DEVICE INTERFACE
@@ -5715,6 +5713,8 @@ static DEVICE_START( k053251 )
 	state_save_register_device_item_array(device, 0, k053251->ram);
 	state_save_register_device_item(device, 0, k053251->tilemaps_set);
 	state_save_register_device_item_array(device, 0, k053251->dirty_tmap);
+
+	state_save_register_postload(device->machine, k053251_reset_indexes, k053251);
 }
 
 static DEVICE_RESET( k053251 )
@@ -6008,7 +6008,7 @@ static DEVICE_RESET( k051733 )
 typedef struct _k056832_state k056832_state;
 struct _k056832_state
 {
-	tilemap   *tilemap[K056832_PAGE_COUNT];
+	tilemap_t   *tilemap[K056832_PAGE_COUNT];
 	bitmap_t  *pixmap[K056832_PAGE_COUNT];
 
 	UINT16    regs[0x20];	// 157/832 regs group 1
@@ -6086,10 +6086,8 @@ INLINE const k056832_interface *k056832_get_interface( const device_config *devi
 #define k056832_mark_line_dirty(P, L) if (L < 0x100) k056832->line_dirty[P][L >> 5] |= 1 << (L & 0x1f)
 #define k056832_mark_all_lines_dirty(P) k056832->all_lines_dirty[P] = 1
 
-static void k056832_mark_page_dirty( const device_config *device, int page )
+static void k056832_mark_page_dirty( k056832_state *k056832, int page )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-
 	if (k056832->page_tile_mode[page])
 		tilemap_mark_all_tiles_dirty(k056832->tilemap[page]);
 	else
@@ -6108,14 +6106,13 @@ void k056832_mark_plane_dirty( const device_config *device, int layer )
 		if (k056832->layer_assoc_with_page[i] == layer)
 		{
 			k056832->page_tile_mode[i] = tilemode;
-			k056832_mark_page_dirty(device, i);
+			k056832_mark_page_dirty(k056832, i);
 		}
 	}
 }
 
-void k056832_mark_all_tmaps_dirty( const device_config *device )
+static void k056832_mark_all_tilemaps_dirty( k056832_state *k056832 )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
 	int i;
 
 	for (i = 0; i < K056832_PAGE_COUNT; i++)
@@ -6123,14 +6120,20 @@ void k056832_mark_all_tmaps_dirty( const device_config *device )
 		if (k056832->layer_assoc_with_page[i] != -1)
 		{
 			k056832->page_tile_mode[i] = k056832->layer_tile_mode[k056832->layer_assoc_with_page[i]];
-			k056832_mark_page_dirty(device, i);
+			k056832_mark_page_dirty(k056832, i);
 		}
 	}
 }
 
-static void k056832_update_page_layout( const device_config *device )
+/* moo.c needs to call this in its VIDEO_UPDATE */
+void k056832_mark_all_tmaps_dirty( const device_config *device )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
+	k056832_mark_all_tilemaps_dirty(k056832);
+}
+
+static void k056832_update_page_layout( k056832_state *k056832 )
+{
 	int layer, rowstart, rowspan, colstart, colspan, r, c, page_idx, setlayer;
 
 	// enable layer association by default
@@ -6179,7 +6182,7 @@ static void k056832_update_page_layout( const device_config *device )
 	}
 
 	// refresh associated tilemaps
-	k056832_mark_all_tmaps_dirty(device);
+	k056832_mark_all_tilemaps_dirty(k056832);
 }
 
 int k056832_get_lookup( const device_config *device, int bits )
@@ -6202,7 +6205,7 @@ INLINE void k056832_get_tile_info( const device_config *device, tile_data *tilei
 	{
 		int flips, palm1, pals2, palm2;
 	}
-	k056832_shiftmasks[4] = {{6,0x3f,0,0x00},{4,0x0f,2,0x30},{2,0x03,2,0x3c},{0,0x00,2,0x3f}};
+	k056832_shiftmasks[4] = {{6, 0x3f, 0, 0x00}, {4, 0x0f, 2, 0x30}, {2, 0x03, 2, 0x3c}, {0, 0x00, 2, 0x3f}};
 
 	const struct K056832_SHIFTMASKS *smptr;
 	int layer, flip, fbits, attr, code, color, flags;
@@ -6258,12 +6261,11 @@ static TILE_GET_INFO_DEVICE( k056832_get_tile_infod ) { k056832_get_tile_info(de
 static TILE_GET_INFO_DEVICE( k056832_get_tile_infoe ) { k056832_get_tile_info(device, tileinfo, tile_index, 0xe); }
 static TILE_GET_INFO_DEVICE( k056832_get_tile_infof ) { k056832_get_tile_info(device, tileinfo, tile_index, 0xf); }
 
-static void k056832_change_rambank( const device_config *device )
+static void k056832_change_rambank( k056832_state *k056832 )
 {
 	/* ------xx page col
      * ---xx--- page row
      */
-	k056832_state *k056832 = k056832_get_safe_token(device);
 	int bank = k056832->regs[0x19];
 
 	if (k056832->regs[0] & 0x02)	// external linescroll enable
@@ -6274,7 +6276,7 @@ static void k056832_change_rambank( const device_config *device )
 	k056832->selected_page_x4096 = k056832->selected_page << 12;
 
 	// refresh associated tilemaps
-	k056832_mark_all_tmaps_dirty(device);
+	k056832_mark_all_tilemaps_dirty(k056832);
 }
 
 int k056832_get_current_rambank( const device_config *device )
@@ -6285,9 +6287,8 @@ int k056832_get_current_rambank( const device_config *device )
 	return ((bank >> 1) & 0xc) | (bank & 3);
 }
 
-static void k056832_change_rombank( const device_config *device )
+static void k056832_change_rombank( k056832_state *k056832 )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
 	int bank;
 
 	if (k056832->uses_tile_banks)	/* Asterix */
@@ -6313,7 +6314,7 @@ void k056832_set_tile_bank( const device_config *device, int bank )
 		k056832_mark_plane_dirty(device, 3);
 	}
 
-	k056832_change_rombank(device);
+	k056832_change_rombank(k056832);
 }
 
 /* call if a game uses external linescroll */
@@ -6711,7 +6712,7 @@ WRITE16_DEVICE_HANDLER( k056832_ram_half_word_w )
 		if (k056832->page_tile_mode[k056832->selected_page])
 			tilemap_mark_tile_dirty(k056832->tilemap[k056832->selected_page], dofs);
 		else
-       		k056832_mark_line_dirty(k056832->selected_page, dofs);
+    		k056832_mark_line_dirty(k056832->selected_page, dofs);
 	}
 }
 
@@ -6771,7 +6772,7 @@ WRITE16_DEVICE_HANDLER( k056832_word_w )
 
 				if ((new_data & 0x02) != (old_data & 0x02))
 				{
-					k056832_change_rambank(device);
+					k056832_change_rambank(k056832);
 				}
 			break;
 
@@ -6807,12 +6808,12 @@ WRITE16_DEVICE_HANDLER( k056832_word_w )
 			//case 0x0a/2: break;
 
 			case 0x32/2:
-				k056832_change_rambank(device);
+				k056832_change_rambank(k056832);
 			break;
 
 			case 0x34/2: /* ROM bank select for checksum */
 			case 0x36/2: /* secondary ROM bank select for use with tile banking */
-				k056832_change_rombank(device);
+				k056832_change_rombank(k056832);
 			break;
 
 			// extended tile address
@@ -6832,7 +6833,7 @@ WRITE16_DEVICE_HANDLER( k056832_word_w )
 					k056832->y[layer] = (new_data & 0x18) >> 3;
 					k056832->h[layer] = (new_data & 0x3);
 					k056832->active_layer = layer;
-					k056832_update_page_layout(device);
+					k056832_update_page_layout(k056832);
 				} else
 
 				if (offset >= 0x18/2 && offset <= 0x1e/2)
@@ -6840,7 +6841,7 @@ WRITE16_DEVICE_HANDLER( k056832_word_w )
 					k056832->x[layer] = (new_data & 0x18) >> 3;
 					k056832->w[layer] = (new_data & 0x03);
 					k056832->active_layer = layer;
-					k056832_update_page_layout(device);
+					k056832_update_page_layout(k056832);
 				} else
 
 				if (offset >= 0x20/2 && offset <= 0x26/2)
@@ -6920,7 +6921,7 @@ static int k056832_update_linemap( const device_config *device, bitmap_t *bitmap
 
 	{
 		rectangle zerorect;
-		tilemap *tmap;
+		tilemap_t *tmap;
 		UINT32 *dirty;
 		int all_dirty;
 		bitmap_t* xprmap;
@@ -7045,7 +7046,7 @@ void k056832_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 	int cminy, cmaxy, cminx, cmaxx;
 	int dminy, dmaxy, dminx, dmaxx;
 	rectangle drawrect;
-	tilemap *tmap;
+	tilemap_t *tmap;
 	UINT16 *p_scroll_data;
 	UINT16 ram16[2];
 
@@ -7240,7 +7241,7 @@ void k056832_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 				if (k056832->last_colorbase[pageIndex] != new_colorbase)
 				{
 					k056832->last_colorbase[pageIndex] = new_colorbase;
-					k056832_mark_page_dirty(device, pageIndex);
+					k056832_mark_page_dirty(k056832, pageIndex);
 				}
 			}
 			else
@@ -7352,7 +7353,7 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 	int cminy, cmaxy, cminx, cmaxx;
 	int dminy, dmaxy, dminx, dmaxx;
 	rectangle drawrect;
-	tilemap *tmap;
+	tilemap_t *tmap;
 	UINT16 *p_scroll_data;
 	UINT16 ram16[2];
 
@@ -7517,7 +7518,7 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 				if (k056832->last_colorbase[pageIndex] != new_colorbase)
 				{
 					k056832->last_colorbase[pageIndex] = new_colorbase;
-					k056832_mark_page_dirty(device, pageIndex);
+					k056832_mark_page_dirty(k056832, pageIndex);
 				}
 			}
 			else
@@ -7666,12 +7667,13 @@ int k056832_read_register( const device_config *device, int regnum )
 	return(k056832->regs[regnum]);
 }
 
-//static STATE_POSTLOAD( k056832_postload )
-void k056832_postload( const device_config *device )
+static STATE_POSTLOAD( k056832_postload )
 {
-	k056832_update_page_layout(device);
-	k056832_change_rambank(device);
-	k056832_change_rombank(device);
+	k056832_state *k056832 = (k056832_state *)param;
+
+	k056832_update_page_layout(k056832);
+	k056832_change_rambank(k056832);
+	k056832_change_rombank(k056832);
 }
 
 /*****************************************************************************
@@ -7685,7 +7687,7 @@ static DEVICE_START( k056832 )
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	const k056832_interface *intf = k056832_get_interface(device);
 	running_machine *machine = device->machine;
-	tilemap *tmap;
+	tilemap_t *tmap;
 	int i;
 	UINT32 total;
 	static const gfx_layout charlayout8 =
@@ -7870,10 +7872,10 @@ static DEVICE_START( k056832 )
 	memset(k056832->regs,     0x00, sizeof(k056832->regs) );
 	memset(k056832->regsb,    0x00, sizeof(k056832->regsb) );
 
-	k056832_update_page_layout(device);
+	k056832_update_page_layout(k056832);
 
-	k056832_change_rambank(device);
-	k056832_change_rombank(device);
+	k056832_change_rambank(k056832);
+	k056832_change_rombank(k056832);
 
 	state_save_register_device_item_pointer(device, 0, k056832->videoram, 0x10000);
 	state_save_register_device_item_array(device, 0, k056832->regs);
@@ -7910,7 +7912,7 @@ static DEVICE_START( k056832 )
 		state_save_register_device_item(device, i, k056832->last_colorbase[i]);
 	}
 
-//  state_save_register_postload(device->machine, k056832_postload, NULL);
+	state_save_register_postload(device->machine, k056832_postload, k056832);
 }
 
 /***************************************************************************/
@@ -8961,7 +8963,1790 @@ static DEVICE_RESET( k053252 )
 }
 
 
-// debug handlers
+// Newer Konami devices
+
+// from video/gticlub.c
+
+
+
+/*****************************************************************************/
+/* Konami K001006 Custom 3D Texel Renderer chip (KS10081) */
+
+/***************************************************************************/
+/*                                                                         */
+/*                                  001006                                 */
+/*                                                                         */
+/***************************************************************************/
+
+typedef struct _k001006_state k001006_state;
+struct _k001006_state
+{
+	const device_config *screen;
+
+	UINT16 *     pal_ram;
+	UINT16 *     unknown_ram;
+	UINT32       addr;
+	int          device_sel;
+
+	UINT32 *     palette;
+
+	const char     *gfx_region;
+};
+
+/*****************************************************************************
+    INLINE FUNCTIONS
+*****************************************************************************/
+
+INLINE k001006_state *k001006_get_safe_token( const device_config *device )
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == K001006);
+
+	return (k001006_state *)device->token;
+}
+
+INLINE const k001006_interface *k001006_get_interface( const device_config *device )
+{
+	assert(device != NULL);
+	assert((device->type == K001006));
+	return (const k001006_interface *) device->static_config;
+}
+
+/*****************************************************************************
+    DEVICE HANDLERS
+*****************************************************************************/
+
+READ32_DEVICE_HANDLER( k001006_r )
+{
+	k001006_state *k001006 = k001006_get_safe_token(device);
+
+	if (offset == 1)
+	{
+		switch (k001006->device_sel)
+		{
+			case 0x0b:		// CG Board ROM read
+			{
+				UINT16 *rom = (UINT16*)memory_region(device->machine, k001006->gfx_region);
+				return rom[k001006->addr / 2] << 16;
+			}
+			case 0x0d:		// Palette RAM read
+			{
+				UINT32 addr = k001006->addr;
+
+				k001006->addr += 2;
+				return k001006->pal_ram[addr >> 1];
+			}
+			case 0x0f:		// Unknown RAM read
+			{
+				return k001006->unknown_ram[k001006->addr++];
+			}
+			default:
+			{
+				fatalerror("k001006_r, unknown device %02X", k001006->device_sel);
+			}
+		}
+	}
+	return 0;
+}
+
+WRITE32_DEVICE_HANDLER( k001006_w )
+{
+	k001006_state *k001006 = k001006_get_safe_token(device);
+
+	if (offset == 0)
+	{
+		COMBINE_DATA(&k001006->addr);
+	}
+	else if (offset == 1)
+	{
+		switch (k001006->device_sel)
+		{
+			case 0xd:	// Palette RAM write
+			{
+				int r, g, b, a;
+				UINT32 index = k001006->addr;
+
+				k001006->pal_ram[index >> 1] = data & 0xffff;
+
+				a = (data & 0x8000) ? 0x00 : 0xff;
+				b = ((data >> 10) & 0x1f) << 3;
+				g = ((data >>  5) & 0x1f) << 3;
+				r = ((data >>  0) & 0x1f) << 3;
+				b |= (b >> 5);
+				g |= (g >> 5);
+				r |= (r >> 5);
+				k001006->palette[index >> 1] = MAKE_ARGB(a, r, g, b);
+
+				k001006->addr += 2;
+				break;
+			}
+			case 0xf:	// Unknown RAM write
+			{
+			//  mame_printf_debug("Unknown RAM %08X = %04X\n", k001006->addr, data & 0xffff);
+				k001006->unknown_ram[k001006->addr++] = data & 0xffff;
+				break;
+			}
+			default:
+			{
+				mame_printf_debug("k001006_w: device %02X, write %04X to %08X\n", k001006->device_sel, data & 0xffff, k001006->addr++);
+			}
+		}
+	}
+	else if (offset == 2)
+	{
+		if (ACCESSING_BITS_16_31)
+		{
+			k001006->device_sel = (data >> 16) & 0xf;
+		}
+	}
+}
+
+UINT32 k001006_get_palette( const device_config *device, int index )
+{
+	k001006_state *k001006 = k001006_get_safe_token(device);
+	return k001006->palette[index];
+}
+
+/*****************************************************************************
+    DEVICE INTERFACE
+*****************************************************************************/
+
+static DEVICE_START( k001006 )
+{
+	k001006_state *k001006 = k001006_get_safe_token(device);
+	const k001006_interface *intf = k001006_get_interface(device);
+
+	k001006->pal_ram = auto_alloc_array_clear(device->machine, UINT16, 0x800);
+	k001006->unknown_ram = auto_alloc_array_clear(device->machine, UINT16, 0x1000);
+	k001006->palette = auto_alloc_array(device->machine, UINT32, 0x800);
+
+	k001006->gfx_region = intf->gfx_region;
+
+	state_save_register_device_item_pointer(device, 0, k001006->pal_ram, 0x800*sizeof(UINT16));
+	state_save_register_device_item_pointer(device, 0, k001006->unknown_ram, 0x1000*sizeof(UINT16));
+	state_save_register_device_item_pointer(device, 0, k001006->palette, 0x800*sizeof(UINT32));
+	state_save_register_device_item(device, 0, k001006->device_sel);
+	state_save_register_device_item(device, 0, k001006->addr);
+}
+
+static DEVICE_RESET( k001006 )
+{
+	k001006_state *k001006 = k001006_get_safe_token(device);
+
+	k001006->addr = 0;
+	k001006->device_sel = 0;
+	memset(k001006->palette, 0, 0x800*sizeof(UINT32));
+}
+
+
+/*****************************************************************************/
+/* Konami K001005 Custom 3D Pixel Renderer chip (KS10071) */
+
+/***************************************************************************/
+/*                                                                         */
+/*                                  001005                                 */
+/*                                                                         */
+/***************************************************************************/
+
+#include "video/poly.h"
+#include "cpu/sharc/sharc.h"
+
+typedef struct _poly_extra_data poly_extra_data;
+struct _poly_extra_data
+{
+	UINT32 color;
+	int texture_x, texture_y;
+	int texture_page;
+	int texture_palette;
+	int texture_mirror_x;
+	int texture_mirror_y;
+};
+
+typedef struct _k001005_state k001005_state;
+struct _k001005_state
+{
+	const device_config *screen;
+	const device_config *cpu;
+	const device_config *dsp;
+	const device_config *k001006_1;
+	const device_config *k001006_2;
+
+	UINT8  *     texture;
+	UINT16 *     ram[2];
+	UINT32 *     fifo;
+	UINT32 *     _3d_fifo;
+
+	UINT32    status;
+	bitmap_t *bitmap[2];
+	bitmap_t *zbuffer;
+	rectangle cliprect;
+	int    ram_ptr;
+	int    fifo_read_ptr;
+	int    fifo_write_ptr;
+	int    _3d_fifo_ptr;
+
+	int tex_mirror_table[4][128];
+
+	int bitmap_page;
+
+	poly_manager *poly;
+	poly_vertex prev_v[4];
+	int prev_poly_type;
+
+	UINT8 *gfxrom;
+};
+
+static const int decode_x_gti[8] = {  0, 16, 2, 18, 4, 20, 6, 22 };
+static const int decode_y_gti[16] = {  0, 8, 32, 40, 1, 9, 33, 41, 64, 72, 96, 104, 65, 73, 97, 105 };
+
+static const int decode_x_zr107[8] = {  0, 16, 1, 17, 2, 18, 3, 19 };
+static const int decode_y_zr107[16] = {  0, 8, 32, 40, 4, 12, 36, 44, 64, 72, 96, 104, 68, 76, 100, 108 };
+
+
+/*****************************************************************************
+    INLINE FUNCTIONS
+*****************************************************************************/
+
+INLINE k001005_state *k001005_get_safe_token( const device_config *device )
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == K001005);
+
+	return (k001005_state *)device->token;
+}
+
+INLINE const k001005_interface *k001005_get_interface( const device_config *device )
+{
+	assert(device != NULL);
+	assert((device->type == K001005));
+	return (const k001005_interface *) device->static_config;
+}
+
+/*****************************************************************************
+    DEVICE HANDLERS
+*****************************************************************************/
+
+static void k001005_render_polygons( const device_config *device );
+
+// rearranges the texture data to a more practical order
+void k001005_preprocess_texture_data( UINT8 *rom, int length, int gticlub )
+{
+	int index;
+	int i, x, y;
+	UINT8 temp[0x40000];
+
+	const int *decode_x;
+	const int *decode_y;
+
+	if (gticlub)
+	{
+		decode_x = decode_x_gti;
+		decode_y = decode_y_gti;
+	}
+	else
+	{
+		decode_x = decode_x_zr107;
+		decode_y = decode_y_zr107;
+	}
+
+	for (index = 0; index < length; index += 0x40000)
+	{
+		int offset = index;
+
+		memset(temp, 0, 0x40000);
+
+		for (i = 0; i < 0x800; i++)
+		{
+			int tx = ((i & 0x400) >> 5) | ((i & 0x100) >> 4) | ((i & 0x40) >> 3) | ((i & 0x10) >> 2) | ((i & 0x4) >> 1) | (i & 0x1);
+			int ty = ((i & 0x200) >> 5) | ((i & 0x80) >> 4) | ((i & 0x20) >> 3) | ((i & 0x8) >> 2) | ((i & 0x2) >> 1);
+
+			tx <<= 3;
+			ty <<= 4;
+
+			for (y = 0; y < 16; y++)
+			{
+				for (x = 0; x < 8; x++)
+				{
+					UINT8 pixel = rom[offset + decode_y[y] + decode_x[x]];
+
+					temp[((ty + y) * 512) + (tx + x)] = pixel;
+				}
+			}
+
+			offset += 128;
+		}
+
+		memcpy(&rom[index], temp, 0x40000);
+	}
+}
+
+void k001005_swap_buffers( const device_config *device )
+{
+	k001005_state *k001005 = k001005_get_safe_token(device);
+
+	k001005->bitmap_page ^= 1;
+
+	//if (k001005->status == 2)
+	{
+		bitmap_fill(k001005->bitmap[k001005->bitmap_page], &k001005->cliprect, device->machine->pens[0] & 0x00ffffff);
+		bitmap_fill(k001005->zbuffer, &k001005->cliprect, 0xffffffff);
+	}
+}
+
+READ32_DEVICE_HANDLER( k001005_r )
+{
+	k001005_state *k001005 = k001005_get_safe_token(device);
+
+	switch(offset)
+	{
+		case 0x000:			// FIFO read, high 16 bits
+		{
+			UINT16 value = k001005->fifo[k001005->fifo_read_ptr] >> 16;
+		//  mame_printf_debug("FIFO_r0: %08X\n", k001005->fifo_ptr);
+			return value;
+		}
+
+		case 0x001:			// FIFO read, low 16 bits
+		{
+			UINT16 value = k001005->fifo[k001005->fifo_read_ptr] & 0xffff;
+		//  mame_printf_debug("FIFO_r1: %08X\n", k001005->fifo_ptr);
+
+			if (k001005->status != 1 && k001005->status != 2)
+			{
+				if (k001005->fifo_read_ptr < 0x3ff)
+				{
+					//cpu_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, CLEAR_LINE);
+					sharc_set_flag_input(k001005->dsp, 1, CLEAR_LINE);
+				}
+				else
+				{
+					//cpu_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, ASSERT_LINE);
+					sharc_set_flag_input(k001005->dsp, 1, ASSERT_LINE);
+				}
+			}
+			else
+			{
+				//cpu_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, ASSERT_LINE);
+				sharc_set_flag_input(k001005->dsp, 1, ASSERT_LINE);
+			}
+
+			k001005->fifo_read_ptr++;
+			k001005->fifo_read_ptr &= 0x7ff;
+			return value;
+		}
+
+		case 0x11b:			// status ?
+			return 0x8002;
+
+		case 0x11c:			// slave status ?
+			return 0x8000;
+
+		case 0x11f:
+			if (k001005->ram_ptr >= 0x400000)
+			{
+				return k001005->ram[1][(k001005->ram_ptr++) & 0x3fffff];
+			}
+			else
+			{
+				return k001005->ram[0][(k001005->ram_ptr++) & 0x3fffff];
+			}
+
+		default:
+			//mame_printf_debug("k001005->r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
+			break;
+	}
+	return 0;
+}
+
+WRITE32_DEVICE_HANDLER( k001005_w )
+{
+	k001005_state *k001005 = k001005_get_safe_token(device);
+
+	switch (offset)
+	{
+		case 0x000:			// FIFO write
+		{
+			if (k001005->status != 1 && k001005->status != 2)
+			{
+				if (k001005->fifo_write_ptr < 0x400)
+				{
+					//cpu_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, ASSERT_LINE);
+					sharc_set_flag_input(k001005->dsp, 1, ASSERT_LINE);
+				}
+				else
+				{
+					//cpu_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, CLEAR_LINE);
+					sharc_set_flag_input(k001005->dsp, 1, CLEAR_LINE);
+				}
+			}
+			else
+			{
+				//cpu_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, ASSERT_LINE);
+				sharc_set_flag_input(k001005->dsp, 1, ASSERT_LINE);
+			}
+
+	    //  mame_printf_debug("K001005 FIFO write: %08X at %08X\n", data, cpu_get_pc(space->cpu));
+			k001005->fifo[k001005->fifo_write_ptr] = data;
+			k001005->fifo_write_ptr++;
+			k001005->fifo_write_ptr &= 0x7ff;
+
+			k001005->_3d_fifo[k001005->_3d_fifo_ptr++] = data;
+
+			// !!! HACK to get past the FIFO B test (GTI Club & Thunder Hurricane) !!!
+			if (cpu_get_pc(k001005->cpu) == 0x201ee)
+			{
+				// This is used to make the SHARC timeout
+				cpu_spinuntil_trigger(k001005->cpu, 10000);
+			}
+			// !!! HACK to get past the FIFO B test (Winding Heat & Midnight Run) !!!
+			if (cpu_get_pc(k001005->cpu) == 0x201e6)
+			{
+				// This is used to make the SHARC timeout
+				cpu_spinuntil_trigger(k001005->cpu, 10000);
+			}
+
+			break;
+		}
+
+		case 0x100: break;
+
+	//  case 0x10a:     poly_r = data & 0xff; break;
+	//  case 0x10b:     poly_g = data & 0xff; break;
+	//  case 0x10c:     poly_b = data & 0xff; break;
+
+		case 0x11a:
+			k001005->status = data;
+			k001005->fifo_write_ptr = 0;
+			k001005->fifo_read_ptr = 0;
+
+			if (data == 2 && k001005->_3d_fifo_ptr > 0)
+			{
+				k001005_swap_buffers(device);
+				k001005_render_polygons(device);
+				poly_wait(k001005->poly, "render_polygons");
+				k001005->_3d_fifo_ptr = 0;
+			}
+			break;
+
+		case 0x11d:
+			k001005->fifo_write_ptr = 0;
+			k001005->fifo_read_ptr = 0;
+			break;
+
+		case 0x11e:
+			k001005->ram_ptr = data;
+			break;
+
+		case 0x11f:
+			if (k001005->ram_ptr >= 0x400000)
+			{
+				k001005->ram[1][(k001005->ram_ptr++) & 0x3fffff] = data & 0xffff;
+			}
+			else
+			{
+				k001005->ram[0][(k001005->ram_ptr++) & 0x3fffff] = data & 0xffff;
+			}
+			break;
+
+		default:
+			//mame_printf_debug("k001005->w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
+			break;
+	}
+
+}
+
+/* emu/video/poly.c cannot handle atm callbacks passing a device parameter */
+#define POLY_DEVICE 0
+
+#if POLY_DEVICE
+static void draw_scanline( const device_config *device, void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid )
+{
+	k001005_state *k001005 = k001005_get_safe_token(device);
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	bitmap_t *destmap = (bitmap_t *)dest;
+	float z = extent->param[0].start;
+	float dz = extent->param[0].dpdx;
+	UINT32 *fb = BITMAP_ADDR32(destmap, scanline, 0);
+	UINT32 *zb = BITMAP_ADDR32(k001005->zbuffer, scanline, 0);
+	UINT32 color = extra->color;
+	int x;
+
+	for (x = extent->startx; x < extent->stopx; x++)
+	{
+		UINT32 iz = (UINT32)z >> 16;
+
+		if (iz <= zb[x])
+		{
+			if (color & 0xff000000)
+			{
+				fb[x] = color;
+				zb[x] = iz;
+			}
+		}
+
+		z += dz;
+	}
+}
+#endif
+
+#if POLY_DEVICE
+static void draw_scanline_tex( const device_config *device, void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid )
+{
+	k001005_state *k001005 = k001005_get_safe_token(device);
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	bitmap_t *destmap = (bitmap_t *)dest;
+	UINT8 *texrom = k001005->gfxrom + (extra->texture_page * 0x40000);
+	const device_config *pal_device = (extra->texture_palette & 0x8) ? k001005->k001006_2 : k001005->k001006_1;
+	int palette_index = (extra->texture_palette & 0x7) * 256;
+	float z = extent->param[0].start;
+	float u = extent->param[1].start;
+	float v = extent->param[2].start;
+	float w = extent->param[3].start;
+	float dz = extent->param[0].dpdx;
+	float du = extent->param[1].dpdx;
+	float dv = extent->param[2].dpdx;
+	float dw = extent->param[3].dpdx;
+	int texture_mirror_x = extra->texture_mirror_x;
+	int texture_mirror_y = extra->texture_mirror_y;
+	int texture_x = extra->texture_x;
+	int texture_y = extra->texture_y;
+	int x;
+
+	UINT32 *fb = BITMAP_ADDR32(destmap, scanline, 0);
+	UINT32 *zb = BITMAP_ADDR32(k001005->zbuffer, scanline, 0);
+
+	for (x = extent->startx; x < extent->stopx; x++)
+	{
+		UINT32 iz = (UINT32)z >> 16;
+		//int iu = u >> 16;
+		//int iv = v >> 16;
+
+		if (iz < zb[x])
+		{
+			float oow = 1.0f / w;
+			UINT32 color;
+			int iu, iv;
+			int iiv, iiu, texel;
+
+			iu = u * oow;
+			iv = v * oow;
+
+			iiu = texture_x + k001005->tex_mirror_table[texture_mirror_x][(iu >> 4) & 0x7f];
+			iiv = texture_y + k001005->tex_mirror_table[texture_mirror_y][(iv >> 4) & 0x7f];
+			texel = texrom[((iiv & 0x1ff) * 512) + (iiu & 0x1ff)];
+			color = k001006_get_palette(pal_device, palette_index + texel);
+
+			if (color & 0xff000000)
+			{
+				fb[x] = color;
+				zb[x] = iz;
+			}
+		}
+
+		u += du;
+		v += dv;
+		z += dz;
+		w += dw;
+	}
+}
+#endif
+
+
+static void k001005_render_polygons( const device_config *device )
+{
+	k001005_state *k001005 = k001005_get_safe_token(device);
+	int i, j;
+#if POLY_DEVICE
+	const rectangle *visarea = video_screen_get_visible_area(k001005->screen);
+#endif
+
+//  mame_printf_debug("k001005->fifo_ptr = %08X\n", k001005->_3d_fifo_ptr);
+
+	for (i = 0; i < k001005->_3d_fifo_ptr; i++)
+	{
+		if (k001005->_3d_fifo[i] == 0x80000003)
+		{
+			poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(k001005->poly);
+			poly_vertex v[4];
+			int r, g, b, a;
+			UINT32 color;
+			int index = i;
+
+			++index;
+
+			for (j = 0; j < 4; j++)
+			{
+				int x, y;
+
+				x = ((k001005->_3d_fifo[index] >>  0) & 0x3fff);
+				y = ((k001005->_3d_fifo[index] >> 16) & 0x1fff);
+				x |= ((x & 0x2000) ? 0xffffc000 : 0);
+				y |= ((y & 0x1000) ? 0xffffe000 : 0);
+				++index;
+
+				v[j].x = ((float)(x) / 16.0f) + 256.0f;
+				v[j].y = ((float)(-y) / 16.0f) + 192.0f;
+				v[j].p[0] = 0;	/* ??? */
+			}
+
+			++index;
+
+			r = (k001005->_3d_fifo[index] >>  0) & 0xff;
+			g = (k001005->_3d_fifo[index] >>  8) & 0xff;
+			b = (k001005->_3d_fifo[index] >> 16) & 0xff;
+			a = (k001005->_3d_fifo[index] >> 24) & 0xff;
+			color = (a << 24) | (r << 16) | (g << 8) | (b);
+			++index;
+
+			extra->color = color;
+#if POLY_DEVICE
+			poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline, 1, &v[0], &v[1], &v[2]);
+			poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline, 1, &v[0], &v[2], &v[3]);
+//          poly_render_polygon(k001005->poly, k001005->bitmap[k001005->bitmap_page],  visarea, draw_scanline, 1, 4, v);
+#endif
+			i = index - 1;
+		}
+		else if (k001005->_3d_fifo[i] == 0x800000ae || k001005->_3d_fifo[i] == 0x8000008e ||
+				 k001005->_3d_fifo[i] == 0x80000096 || k001005->_3d_fifo[i] == 0x800000b6 ||
+				 k001005->_3d_fifo[i] == 0x8000002e || k001005->_3d_fifo[i] == 0x8000000e ||
+				 k001005->_3d_fifo[i] == 0x80000016 || k001005->_3d_fifo[i] == 0x80000036 ||
+				 k001005->_3d_fifo[i] == 0x800000aa || k001005->_3d_fifo[i] == 0x800000a8 ||
+				 k001005->_3d_fifo[i] == 0x800000b2)
+		{
+			// 0x00: xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx    Command
+			//
+			// 0x01: xxxx---- -------- -------- --------    Texture palette
+			// 0x01: -------- -------x xxxx---- --------    Texture page
+			// 0x01: -------- -------- ----x-x- x-x-x-x-    Texture X / 8
+			// 0x01: -------- -------- -----x-x -x-x-x-x    Texture Y / 8
+
+			poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(k001005->poly);
+			poly_vertex v[4];
+			int tx, ty;
+			UINT32 color = 0;
+			UINT32 header;
+			UINT32 command;
+			int num_verts = 0;
+			int index = i;
+			int poly_type = 0;
+
+			command = k001005->_3d_fifo[index++];
+			header = k001005->_3d_fifo[index++];
+
+			for (j = 0; j < 4; j++)
+			{
+				INT16 u2, v2;
+				int x, y, z;
+				int end = 0;
+
+				x = ((k001005->_3d_fifo[index] >>  0) & 0x3fff);
+				y = ((k001005->_3d_fifo[index] >> 16) & 0x1fff);
+				x |= ((x & 0x2000) ? 0xffffc000 : 0);
+				y |= ((y & 0x1000) ? 0xffffe000 : 0);
+
+				poly_type = k001005->_3d_fifo[index] & 0x4000;
+				end = k001005->_3d_fifo[index] & 0x8000;
+				++index;
+
+				z = k001005->_3d_fifo[index];
+				++index;
+
+				if (end)
+				{
+					color = k001005->_3d_fifo[index];
+					++index;
+
+					u2 = (k001005->_3d_fifo[index] >> 16) & 0xffff;
+					v2 = (k001005->_3d_fifo[index] >>  0) & 0xffff;
+					++index;
+				}
+				else
+				{
+					u2 = (k001005->_3d_fifo[index] >> 16) & 0xffff;
+					v2 = (k001005->_3d_fifo[index] >>  0) & 0xffff;
+					++index;
+				}
+
+				v[j].x = ((float)(x) / 16.0f) + 256.0f;
+				v[j].y = ((float)(-y) / 16.0f) + 192.0f;
+				v[j].p[0] = *(float*)(&z);
+				v[j].p[3] = 1.0f / v[j].p[0];
+				v[j].p[1] = u2 * v[j].p[3];
+				v[j].p[2] = v2 * v[j].p[3];
+
+				++num_verts;
+
+				if (end)
+					break;
+			}
+
+			ty = ((header & 0x400) >> 5) |
+				 ((header & 0x100) >> 4) |
+				 ((header & 0x040) >> 3) |
+				 ((header & 0x010) >> 2) |
+				 ((header & 0x004) >> 1) |
+				 ((header & 0x001) >> 0);
+
+			tx = ((header & 0x800) >> 6) |
+				 ((header & 0x200) >> 5) |
+				 ((header & 0x080) >> 4) |
+				 ((header & 0x020) >> 3) |
+				 ((header & 0x008) >> 2) |
+				 ((header & 0x002) >> 1);
+
+			extra->texture_x = tx * 8;
+			extra->texture_y = ty * 8;
+
+			extra->texture_page = (header >> 12) & 0x1f;
+			extra->texture_palette = (header >> 28) & 0xf;
+
+			extra->texture_mirror_x = ((command & 0x10) ? 0x2 : 0) | ((header & 0x00400000) ? 0x1 : 0);
+			extra->texture_mirror_y = ((command & 0x10) ? 0x2 : 0) | ((header & 0x00400000) ? 0x1 : 0);
+
+			extra->color = color;
+
+			if (num_verts < 3)
+			{
+#if POLY_DEVICE
+				poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, &k001005->prev_v[2], &v[0], &v[1]);
+				if (k001005->prev_poly_type)
+					poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, &k001005->prev_v[2], &k001005->prev_v[3], &v[0]);
+//              if (k001005->prev_poly_type)
+//                  poly_render_quad(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, &k001005->prev_v[2], &k001005->prev_v[3], &v[0], &v[1]);
+//              else
+//                  poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, &k001005->prev_v[2], &v[0], &v[1]);
+#endif
+				memcpy(&k001005->prev_v[0], &k001005->prev_v[2], sizeof(poly_vertex));
+				memcpy(&k001005->prev_v[1], &k001005->prev_v[3], sizeof(poly_vertex));
+				memcpy(&k001005->prev_v[2], &v[0], sizeof(poly_vertex));
+				memcpy(&k001005->prev_v[3], &v[1], sizeof(poly_vertex));
+			}
+			else
+			{
+#if POLY_DEVICE
+				poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, &v[0], &v[1], &v[2]);
+				if (num_verts > 3)
+					poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, &v[2], &v[3], &v[0]);
+//              poly_render_polygon(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, num_verts, v);
+#endif
+				memcpy(k001005->prev_v, v, sizeof(poly_vertex) * 4);
+			}
+
+			k001005->prev_poly_type = poly_type;
+
+			while ((k001005->_3d_fifo[index] & 0xffffff00) != 0x80000000 && index < k001005->_3d_fifo_ptr)
+			{
+				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(k001005->poly);
+				int new_verts = 0;
+
+				if (poly_type)
+				{
+					memcpy(&v[0], &k001005->prev_v[2], sizeof(poly_vertex));
+					memcpy(&v[1], &k001005->prev_v[3], sizeof(poly_vertex));
+				}
+				else
+				{
+					memcpy(&v[0], &k001005->prev_v[1], sizeof(poly_vertex));
+					memcpy(&v[1], &k001005->prev_v[2], sizeof(poly_vertex));
+				}
+
+				for (j = 2; j < 4; j++)
+				{
+					INT16 u2, v2;
+					int x, y, z;
+					int end = 0;
+
+					x = ((k001005->_3d_fifo[index] >>  0) & 0x3fff);
+					y = ((k001005->_3d_fifo[index] >> 16) & 0x1fff);
+					x |= ((x & 0x2000) ? 0xffffc000 : 0);
+					y |= ((y & 0x1000) ? 0xffffe000 : 0);
+
+					poly_type = k001005->_3d_fifo[index] & 0x4000;
+					end = k001005->_3d_fifo[index] & 0x8000;
+					++index;
+
+					z = k001005->_3d_fifo[index];
+					++index;
+
+					if (end)
+					{
+						color = k001005->_3d_fifo[index];
+						++index;
+
+						u2 = (k001005->_3d_fifo[index] >> 16) & 0xffff;
+						v2 = (k001005->_3d_fifo[index] >>  0) & 0xffff;
+						++index;
+					}
+					else
+					{
+						u2 = (k001005->_3d_fifo[index] >> 16) & 0xffff;
+						v2 = (k001005->_3d_fifo[index] >>  0) & 0xffff;
+						++index;
+					}
+
+					v[j].x = ((float)(x) / 16.0f) + 256.0f;
+					v[j].y = ((float)(-y) / 16.0f) + 192.0f;
+					v[j].p[0] = *(float*)(&z);
+					v[j].p[3] = 1.0f / v[j].p[0];
+					v[j].p[1] = u2 * v[j].p[3];
+					v[j].p[2] = v2 * v[j].p[3];
+
+					++new_verts;
+
+					if (end)
+						break;
+				}
+
+				extra->texture_x = tx * 8;
+				extra->texture_y = ty * 8;
+
+				extra->texture_page = (header >> 12) & 0x1f;
+				extra->texture_palette = (header >> 28) & 0xf;
+
+				extra->texture_mirror_x = ((command & 0x10) ? 0x2 : 0) | ((header & 0x00400000) ? 0x1 : 0);
+				extra->texture_mirror_y = ((command & 0x10) ? 0x2 : 0) | ((header & 0x00400000) ? 0x1 : 0);
+
+				extra->color = color;
+
+#if POLY_DEVICE
+				poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, &v[0], &v[1], &v[2]);
+				if (new_verts > 1)
+					poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, &v[2], &v[3], &v[0]);
+//              poly_render_polygon(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, new_verts + 2, v);
+#endif
+				memcpy(k001005->prev_v, v, sizeof(poly_vertex) * 4);
+			};
+
+			i = index - 1;
+		}
+		else if (k001005->_3d_fifo[i] == 0x80000006 || k001005->_3d_fifo[i] == 0x80000026 ||
+				 k001005->_3d_fifo[i] == 0x80000020 || k001005->_3d_fifo[i] == 0x80000022)
+		{
+			poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(k001005->poly);
+			poly_vertex v[4];
+			int r, g, b, a;
+			UINT32 color;
+			int num_verts = 0;
+			int index = i;
+			int poly_type = 0;
+
+			++index;
+
+			for (j = 0; j < 4; j++)
+			{
+				int x, y, z;
+				int end = 0;
+
+				x = ((k001005->_3d_fifo[index] >>  0) & 0x3fff);
+				y = ((k001005->_3d_fifo[index] >> 16) & 0x1fff);
+				x |= ((x & 0x2000) ? 0xffffc000 : 0);
+				y |= ((y & 0x1000) ? 0xffffe000 : 0);
+
+				poly_type = k001005->_3d_fifo[index] & 0x4000;
+				end = k001005->_3d_fifo[index] & 0x8000;
+				++index;
+
+				z = k001005->_3d_fifo[index];
+				++index;
+
+				v[j].x = ((float)(x) / 16.0f) + 256.0f;
+				v[j].y = ((float)(-y) / 16.0f) + 192.0f;
+				v[j].p[0] = *(float*)(&z);
+
+				++num_verts;
+
+				if (end)
+					break;
+			}
+
+			r = (k001005->_3d_fifo[index] >>  0) & 0xff;
+			g = (k001005->_3d_fifo[index] >>  8) & 0xff;
+			b = (k001005->_3d_fifo[index] >> 16) & 0xff;
+			a = (k001005->_3d_fifo[index] >> 24) & 0xff;
+			color = (a << 24) | (r << 16) | (g << 8) | (b);
+			index++;
+
+			extra->color = color;
+
+#if POLY_DEVICE
+			poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline, 1, &v[0], &v[1], &v[2]);
+			if (num_verts > 3)
+				poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline, 1, &v[2], &v[3], &v[0]);
+//          poly_render_polygon(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline, 1, num_verts, v);
+#endif
+			memcpy(k001005->prev_v, v, sizeof(poly_vertex) * 4);
+
+			while ((k001005->_3d_fifo[index] & 0xffffff00) != 0x80000000 && index < k001005->_3d_fifo_ptr)
+			{
+				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(k001005->poly);
+				int new_verts = 0;
+
+				if (poly_type)
+				{
+					memcpy(&v[0], &k001005->prev_v[2], sizeof(poly_vertex));
+					memcpy(&v[1], &k001005->prev_v[3], sizeof(poly_vertex));
+				}
+				else
+				{
+					memcpy(&v[0], &k001005->prev_v[1], sizeof(poly_vertex));
+					memcpy(&v[1], &k001005->prev_v[2], sizeof(poly_vertex));
+				}
+
+				for (j = 2; j < 4; j++)
+				{
+					int x, y, z;
+					int end = 0;
+
+					x = ((k001005->_3d_fifo[index] >>  0) & 0x3fff);
+					y = ((k001005->_3d_fifo[index] >> 16) & 0x1fff);
+					x |= ((x & 0x2000) ? 0xffffc000 : 0);
+					y |= ((y & 0x1000) ? 0xffffe000 : 0);
+
+					poly_type = k001005->_3d_fifo[index] & 0x4000;
+					end = k001005->_3d_fifo[index] & 0x8000;
+					++index;
+
+					z = k001005->_3d_fifo[index];
+					++index;
+
+					v[j].x = ((float)(x) / 16.0f) + 256.0f;
+					v[j].y = ((float)(-y) / 16.0f) + 192.0f;
+					v[j].p[0] = *(float*)(&z);
+
+					++new_verts;
+
+					if (end)
+						break;
+				}
+
+				r = (k001005->_3d_fifo[index] >>  0) & 0xff;
+				g = (k001005->_3d_fifo[index] >>  8) & 0xff;
+				b = (k001005->_3d_fifo[index] >> 16) & 0xff;
+				a = (k001005->_3d_fifo[index] >> 24) & 0xff;
+				color = (a << 24) | (r << 16) | (g << 8) | (b);
+				index++;
+
+				extra->color = color;
+
+#if POLY_DEVICE
+				poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline, 1, &v[0], &v[1], &v[2]);
+				if (new_verts > 1)
+					poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline, 1, &v[0], &v[2], &v[3]);
+//              poly_render_polygon(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline, 1, new_verts + 2, v);
+#endif
+				memcpy(k001005->prev_v, v, sizeof(poly_vertex) * 4);
+			};
+
+			i = index - 1;
+		}
+		else if (k001005->_3d_fifo[i] == 0x80000000)
+		{
+
+		}
+		else if ((k001005->_3d_fifo[i] & 0xffffff00) == 0x80000000)
+		{
+			/*
+            mame_printf_debug("Unknown polygon type %08X:\n", k001005->_3d_fifo[i]);
+            for (j = 0; j < 0x20; j++)
+            {
+                mame_printf_debug("  %02X: %08X\n", j, k001005->_3d_fifo[i + 1 + j]);
+            }
+            mame_printf_debug("\n");
+            */
+		}
+	}
+}
+
+void k001005_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect )
+{
+	k001005_state *k001005 = k001005_get_safe_token(device);
+	int i, j;
+
+	memcpy(&k001005->cliprect, cliprect, sizeof(rectangle));
+
+	for (j = cliprect->min_y; j <= cliprect->max_y; j++)
+	{
+		UINT32 *bmp = BITMAP_ADDR32(bitmap, j, 0);
+		UINT32 *src = BITMAP_ADDR32(k001005->bitmap[k001005->bitmap_page ^ 1], j, 0);
+
+		for (i = cliprect->min_x; i <= cliprect->max_x; i++)
+		{
+			if (src[i] & 0xff000000)
+			{
+				bmp[i] = src[i];
+			}
+		}
+	}
+}
+
+/*****************************************************************************
+    DEVICE INTERFACE
+*****************************************************************************/
+
+static DEVICE_START( k001005 )
+{
+	k001005_state *k001005 = k001005_get_safe_token(device);
+	const k001005_interface *intf = k001005_get_interface(device);
+	int i, width, height;
+
+	k001005->cpu = devtag_get_device(device->machine, intf->cpu);
+	k001005->dsp = devtag_get_device(device->machine, intf->dsp);
+	k001005->k001006_1 = devtag_get_device(device->machine, intf->k001006_1);
+	k001005->k001006_2 = devtag_get_device(device->machine, intf->k001006_2);
+
+	k001005->screen = devtag_get_device(device->machine, intf->screen);
+	width = video_screen_get_width(k001005->screen);
+	height = video_screen_get_height(k001005->screen);
+	k001005->zbuffer = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED32);
+
+	k001005->gfxrom = memory_region(device->machine, intf->gfx_memory_region);
+
+	k001005->bitmap[0] = video_screen_auto_bitmap_alloc(k001005->screen);
+	k001005->bitmap[1] = video_screen_auto_bitmap_alloc(k001005->screen);
+
+	k001005->texture = auto_alloc_array(device->machine, UINT8, 0x800000);
+
+	k001005->ram[0] = auto_alloc_array(device->machine, UINT16, 0x140000);
+	k001005->ram[1] = auto_alloc_array(device->machine, UINT16, 0x140000);
+
+	k001005->fifo = auto_alloc_array(device->machine, UINT32, 0x800);
+
+	k001005->_3d_fifo = auto_alloc_array(device->machine, UINT32, 0x10000);
+
+	k001005->poly = poly_alloc(device->machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
+
+	for (i = 0; i < 128; i++)
+	{
+		k001005->tex_mirror_table[0][i] = i & 0x3f;
+		k001005->tex_mirror_table[1][i] = i & 0x3f;
+		k001005->tex_mirror_table[2][i] = ((i & 0x3f) >= 0x20) ? (0x1f - (i & 0x1f)) : i & 0x1f;
+		k001005->tex_mirror_table[3][i] = ((i & 0x7f) >= 0x40) ? (0x3f - (i & 0x3f)) : i & 0x3f;
+	}
+
+
+	state_save_register_device_item_pointer(device, 0, k001005->texture, 0x800000);
+	state_save_register_device_item_pointer(device, 0, k001005->ram[0], 0x140000);
+	state_save_register_device_item_pointer(device, 0, k001005->ram[1], 0x140000);
+	state_save_register_device_item_pointer(device, 0, k001005->fifo, 0x800);
+	state_save_register_device_item_pointer(device, 0, k001005->_3d_fifo, 0x10000);
+	state_save_register_device_item(device, 0, k001005->status);
+	state_save_register_device_item(device, 0, k001005->ram_ptr);
+	state_save_register_device_item(device, 0, k001005->fifo_read_ptr);
+	state_save_register_device_item(device, 0, k001005->fifo_write_ptr);
+	state_save_register_device_item(device, 0, k001005->_3d_fifo_ptr);
+	state_save_register_device_item(device, 0, k001005->bitmap_page);
+	state_save_register_device_item(device, 0, k001005->prev_poly_type);
+	state_save_register_device_item_bitmap(device, 0, k001005->bitmap[0]);
+	state_save_register_device_item_bitmap(device, 0, k001005->bitmap[1]);
+	state_save_register_device_item_bitmap(device, 0, k001005->zbuffer);
+
+	// FIXME: shall we save poly as well?
+}
+
+static DEVICE_RESET( k001005 )
+{
+	k001005_state *k001005 = k001005_get_safe_token(device);
+
+	k001005->status = 0;
+	k001005->ram_ptr = 0;
+	k001005->fifo_read_ptr = 0;
+	k001005->fifo_write_ptr = 0;
+	k001005->_3d_fifo_ptr = 0;
+	k001005->bitmap_page = 0;
+
+	memset(k001005->prev_v, 0, sizeof(k001005->prev_v));
+	k001005->prev_poly_type = 0;
+}
+
+static DEVICE_STOP( k001005 )
+{
+	k001005_state *k001005 = k001005_get_safe_token(device);
+	poly_free(k001005->poly);
+}
+
+
+// from drivers/nwk-tr
+
+/***************************************************************************/
+/*                                                                         */
+/*                                  001604                                 */
+/*                                                                         */
+/***************************************************************************/
+
+
+typedef struct _k001604_state k001604_state;
+struct _k001604_state
+{
+	const device_config *screen;
+	tilemap_t        *layer_8x8[2];
+	tilemap_t        *layer_roz[2];
+	int            gfx_index[2];
+
+	UINT32 *       tile_ram;
+	UINT32 *       char_ram;
+	UINT32 *       reg;
+
+	int            layer_size;
+	int            roz_size;
+};
+
+
+#define K001604_NUM_TILES_LAYER0		16384
+#define K001604_NUM_TILES_LAYER1		4096
+
+/*****************************************************************************
+    INLINE FUNCTIONS
+*****************************************************************************/
+
+INLINE k001604_state *k001604_get_safe_token( const device_config *device )
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == K001604);
+
+	return (k001604_state *)device->token;
+}
+
+INLINE const k001604_interface *k001604_get_interface( const device_config *device )
+{
+	assert(device != NULL);
+	assert((device->type == K001604));
+	return (const k001604_interface *) device->static_config;
+}
+
+/*****************************************************************************
+    DEVICE HANDLERS
+*****************************************************************************/
+
+static const gfx_layout k001604_char_layout_layer_8x8 =
+{
+	8, 8,
+	K001604_NUM_TILES_LAYER0,
+	8,
+	{ 8,9,10,11,12,13,14,15 },
+	{ 1*16, 0*16, 3*16, 2*16, 5*16, 4*16, 7*16, 6*16 },
+	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128 },
+	8*128
+};
+
+static const gfx_layout k001604_char_layout_layer_16x16 =
+{
+	16, 16,
+	K001604_NUM_TILES_LAYER1,
+	8,
+	{ 8,9,10,11,12,13,14,15 },
+	{ 1*16, 0*16, 3*16, 2*16, 5*16, 4*16, 7*16, 6*16, 9*16, 8*16, 11*16, 10*16, 13*16, 12*16, 15*16, 14*16 },
+	{ 0*256, 1*256, 2*256, 3*256, 4*256, 5*256, 6*256, 7*256, 8*256, 9*256, 10*256, 11*256, 12*256, 13*256, 14*256, 15*256 },
+	16*256
+};
+
+
+/* FIXME: The TILEMAP_MAPPER below depends on parameters passed by the device interface (being game dependent).
+we might simplify the code, by passing the whole TILEMAP_MAPPER as a callback in the interface, but is it really worth? */
+
+static TILEMAP_MAPPER( k001604_scan_layer_8x8_0_size0 )
+{
+	/* logical (col,row) -> memory offset */
+	return (row * 128) + col;
+}
+
+static TILEMAP_MAPPER( k001604_scan_layer_8x8_0_size1 )
+{
+	/* logical (col,row) -> memory offset */
+	return (row * 256) + col;
+}
+
+static TILEMAP_MAPPER( k001604_scan_layer_8x8_1_size0 )
+{
+	/* logical (col,row) -> memory offset */
+	return (row * 128) + col + 64;
+}
+
+static TILEMAP_MAPPER( k001604_scan_layer_8x8_1_size1 )
+{
+	/* logical (col,row) -> memory offset */
+	return (row * 256) + col + 64;
+}
+
+static TILEMAP_MAPPER( slrasslt_scan_layer_8x8_0_size0 )
+{
+	/* logical (col,row) -> memory offset */
+	return (row * 128) + col + 16384;
+}
+
+static TILEMAP_MAPPER( slrasslt_scan_layer_8x8_1_size0 )
+{
+	/* logical (col,row) -> memory offset */
+	return (row * 128) + col + 64 + 16384;
+}
+
+static TILEMAP_MAPPER( k001604_scan_layer_roz_0_size0 )
+{
+	/* logical (col,row) -> memory offset */
+	return (row * 128) + col;
+}
+
+static TILEMAP_MAPPER( k001604_scan_layer_roz_0_size1 )
+{
+	/* logical (col,row) -> memory offset */
+	return (row * 256) + col + 128;
+}
+
+static TILEMAP_MAPPER( k001604_scan_layer_roz_1_size0 )
+{
+	/* logical (col,row) -> memory offset */
+	return (row * 128) + col + 64;
+}
+
+static TILEMAP_MAPPER( k001604_scan_layer_roz_1_size1 )
+{
+	/* logical (col,row) -> memory offset */
+	return (row * 256) + col + 128 + 64;
+}
+
+static TILE_GET_INFO_DEVICE( k001604_tile_info_layer_8x8 )
+{
+	k001604_state *k001604 = k001604_get_safe_token(device);
+	UINT32 val = k001604->tile_ram[tile_index];
+	int color = (val >> 17) & 0x1f;
+	int tile = (val & 0x7fff);
+	int flags = 0;
+
+	if (val & 0x400000)
+		flags |= TILE_FLIPX;
+	if (val & 0x800000)
+		flags |= TILE_FLIPY;
+
+	SET_TILE_INFO_DEVICE(k001604->gfx_index[0], tile, color, flags);
+}
+
+static TILE_GET_INFO_DEVICE( k001604_tile_info_layer_roz )
+{
+	k001604_state *k001604 = k001604_get_safe_token(device);
+	UINT32 val = k001604->tile_ram[tile_index];
+	int flags = 0;
+	int color = (val >> 17) & 0x1f;
+	int tile = val & 0x7ff;
+
+	if (val & 0x400000)
+		flags |= TILE_FLIPX;
+	if (val & 0x800000)
+		flags |= TILE_FLIPY;
+
+	tile += k001604->roz_size ? 0x800 : 0x2000;
+
+	SET_TILE_INFO_DEVICE(k001604->gfx_index[k001604->roz_size], tile, color, flags);
+}
+
+
+void k001604_draw_back_layer( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect )
+{
+	k001604_state *k001604 = k001604_get_safe_token(device);
+	int layer;
+	int num_layers;
+	bitmap_fill(bitmap, cliprect, 0);
+
+	num_layers = k001604->layer_size ? 2 : 1;
+
+	for (layer = 0; layer < num_layers; layer++)
+	{
+		int reg = 0x08;
+
+		INT32 x  = (INT16)((k001604->reg[reg + 0] >> 16) & 0xffff);
+		INT32 y  = (INT16)((k001604->reg[reg + 0] >>  0) & 0xffff);
+		INT32 xx = (INT16)((k001604->reg[reg + 1] >>  0) & 0xffff);
+		INT32 xy = (INT16)((k001604->reg[reg + 1] >> 16) & 0xffff);
+		INT32 yx = (INT16)((k001604->reg[reg + 2] >>  0) & 0xffff);
+		INT32 yy = (INT16)((k001604->reg[reg + 2] >> 16) & 0xffff);
+
+		x  = (x + 320) * 256;
+		y  = (y + 208) * 256;
+		xx = (xx);
+		xy = (-xy);
+		yx = (-yx);
+		yy = (yy);
+
+		if ((k001604->reg[0x6c / 4] & (0x08 >> layer)) != 0)
+		{
+			tilemap_draw_roz(bitmap, cliprect, k001604->layer_roz[layer],
+							 x << 5, y << 5, xx << 5, xy << 5, yx << 5, yy << 5, 1, 0, 0);
+		}
+	}
+}
+
+void k001604_draw_front_layer( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect )
+{
+	k001604_state *k001604 = k001604_get_safe_token(device);
+
+	//tilemap_draw(bitmap, cliprect, k001604->layer_8x8[1], 0,0);
+	tilemap_draw(bitmap, cliprect, k001604->layer_8x8[0], 0,0);
+}
+
+READ32_DEVICE_HANDLER( k001604_tile_r )
+{
+//  int chip = get_cgboard_id();
+	k001604_state *k001604 = k001604_get_safe_token(device);
+
+	return k001604->tile_ram[offset];
+}
+
+READ32_DEVICE_HANDLER( k001604_char_r )
+{
+//  int chip = get_cgboard_id();
+	k001604_state *k001604 = k001604_get_safe_token(device);
+
+	int set, bank;
+	UINT32 addr;
+
+	set = (k001604->reg[0x60 / 4] & 0x1000000) ? 0x100000 : 0;
+
+	if (set)
+		bank = (k001604->reg[0x60 / 4] >> 8) & 0x3;
+	else
+		bank = (k001604->reg[0x60 / 4] & 0x3);
+
+	addr = offset + ((set + (bank * 0x40000)) / 4);
+
+	return k001604->char_ram[addr];
+}
+
+WRITE32_DEVICE_HANDLER( k001604_tile_w )
+{
+//  int chip = get_cgboard_id();
+	k001604_state *k001604 = k001604_get_safe_token(device);
+
+	int x, y;
+	COMBINE_DATA(k001604->tile_ram + offset);
+
+	if (k001604->layer_size)
+	{
+		x = offset & 0xff;
+		y = offset / 256;
+	}
+	else
+	{
+		x = offset & 0x7f;
+		y = offset / 128;
+	}
+
+	if (k001604->layer_size)
+	{
+		if (x < 64)
+		{
+			tilemap_mark_tile_dirty(k001604->layer_8x8[0], offset);
+		}
+		else if (x < 128)
+		{
+			tilemap_mark_tile_dirty(k001604->layer_8x8[1], offset);
+		}
+		else if (x < 192)
+		{
+			tilemap_mark_tile_dirty(k001604->layer_roz[0], offset);
+		}
+		else
+		{
+			tilemap_mark_tile_dirty(k001604->layer_roz[1], offset);
+		}
+	}
+	else
+	{
+		if (x < 64)
+		{
+			tilemap_mark_tile_dirty(k001604->layer_8x8[0], offset);
+			tilemap_mark_tile_dirty(k001604->layer_roz[0], offset);
+		}
+		else
+		{
+			tilemap_mark_tile_dirty(k001604->layer_8x8[1], offset);
+			tilemap_mark_tile_dirty(k001604->layer_roz[1], offset);
+		}
+	}
+}
+
+WRITE32_DEVICE_HANDLER( k001604_char_w )
+{
+//  int chip = get_cgboard_id();
+	k001604_state *k001604 = k001604_get_safe_token(device);
+
+	int set, bank;
+	UINT32 addr;
+
+	set = (k001604->reg[0x60/4] & 0x1000000) ? 0x100000 : 0;
+
+	if (set)
+		bank = (k001604->reg[0x60 / 4] >> 8) & 0x3;
+	else
+		bank = (k001604->reg[0x60 / 4] & 0x3);
+
+	addr = offset + ((set + (bank * 0x40000)) / 4);
+
+	COMBINE_DATA(k001604->char_ram + addr);
+
+	gfx_element_mark_dirty(device->machine->gfx[k001604->gfx_index[0]], addr / 32);
+	gfx_element_mark_dirty(device->machine->gfx[k001604->gfx_index[1]], addr / 128);
+}
+
+WRITE32_DEVICE_HANDLER( k001604_reg_w )
+{
+//  int chip = get_cgboard_id();
+	k001604_state *k001604 = k001604_get_safe_token(device);
+
+	COMBINE_DATA(k001604->reg + offset);
+
+	switch (offset)
+	{
+		case 0x8:
+		case 0x9:
+		case 0xa:
+			//printf("K001604_reg_w %02X, %08X, %08X\n", offset, data, mem_mask);
+			break;
+	}
+
+	if (offset != 0x08 && offset != 0x09 && offset != 0x0a /*&& offset != 0x17 && offset != 0x18*/)
+	{
+		//printf("K001604_reg_w (%d), %02X, %08X, %08X at %08X\n", chip, offset, data, mem_mask, cpu_get_pc(space->cpu));
+	}
+}
+
+READ32_DEVICE_HANDLER( k001604_reg_r )
+{
+//  int chip = get_cgboard_id();
+	k001604_state *k001604 = k001604_get_safe_token(device);
+
+	switch (offset)
+	{
+		case 0x54/4:	return mame_rand(device->machine) << 16; break;
+		case 0x5c/4:	return mame_rand(device->machine) << 16 | mame_rand(device->machine); break;
+	}
+
+	return k001604->reg[offset];
+}
+
+
+/*****************************************************************************
+    DEVICE INTERFACE
+*****************************************************************************/
+
+static DEVICE_START( k001604 )
+{
+	k001604_state *k001604 = k001604_get_safe_token(device);
+	const k001604_interface *intf = k001604_get_interface(device);
+	int roz_tile_size;
+
+	k001604->layer_size = intf->layer_size;		// 0 -> width = 128 tiles, 1 -> width = 256 tiles
+	k001604->roz_size = intf->roz_size;		// 0 -> 8x8, 1 -> 16x16
+
+	k001604->gfx_index[0] = intf->gfx_index_1;
+	k001604->gfx_index[1] = intf->gfx_index_2;
+
+	k001604->char_ram = auto_alloc_array(device->machine, UINT32, 0x200000 / 4);
+	k001604->tile_ram = auto_alloc_array(device->machine, UINT32, 0x20000 / 4);
+	k001604->reg = auto_alloc_array(device->machine, UINT32, 0x400 / 4);
+
+	/* create tilemaps */
+	roz_tile_size = k001604->roz_size ? 16 : 8;
+	if (!intf->is_slrasslt)
+	{
+		if (k001604->layer_size)
+		{
+			k001604->layer_8x8[0] = tilemap_create_device(device, k001604_tile_info_layer_8x8, k001604_scan_layer_8x8_0_size1, 8, 8, 64, 64);
+			k001604->layer_8x8[1] = tilemap_create_device(device, k001604_tile_info_layer_8x8, k001604_scan_layer_8x8_1_size1, 8, 8, 64, 64);
+			k001604->layer_roz[0] = tilemap_create_device(device, k001604_tile_info_layer_roz, k001604_scan_layer_roz_0_size1, roz_tile_size, roz_tile_size, 64, 64);
+			k001604->layer_roz[1] = tilemap_create_device(device, k001604_tile_info_layer_roz, k001604_scan_layer_roz_1_size1, roz_tile_size, roz_tile_size, 64, 64);
+		}
+		else
+		{
+			k001604->layer_8x8[0] = tilemap_create_device(device, k001604_tile_info_layer_8x8, k001604_scan_layer_8x8_0_size0, 8, 8, 64, 64);
+			k001604->layer_8x8[1] = tilemap_create_device(device, k001604_tile_info_layer_8x8, k001604_scan_layer_8x8_1_size0, 8, 8, 64, 64);
+			k001604->layer_roz[0] = tilemap_create_device(device, k001604_tile_info_layer_roz, k001604_scan_layer_roz_0_size0, roz_tile_size, roz_tile_size, 128, 64);
+			k001604->layer_roz[1] = tilemap_create_device(device, k001604_tile_info_layer_roz, k001604_scan_layer_roz_1_size0, roz_tile_size, roz_tile_size, 64, 64);
+		}
+	}
+	else	/* slrasslt has shifted tilemaps (but only has k001604->layer_size =  0) */
+	{
+		k001604->layer_8x8[0] = tilemap_create_device(device, k001604_tile_info_layer_8x8, slrasslt_scan_layer_8x8_0_size0, 8, 8, 64, 64);
+		k001604->layer_8x8[1] = tilemap_create_device(device, k001604_tile_info_layer_8x8, slrasslt_scan_layer_8x8_1_size0, 8, 8, 64, 64);
+		k001604->layer_roz[0] = tilemap_create_device(device, k001604_tile_info_layer_roz, k001604_scan_layer_roz_0_size0, roz_tile_size, roz_tile_size, 128, 64);
+		k001604->layer_roz[1] = tilemap_create_device(device, k001604_tile_info_layer_roz, k001604_scan_layer_roz_1_size0, roz_tile_size, roz_tile_size, 64, 64);
+	}
+
+	tilemap_set_transparent_pen(k001604->layer_8x8[0], 0);
+	tilemap_set_transparent_pen(k001604->layer_8x8[1], 0);
+
+	device->machine->gfx[k001604->gfx_index[0]] = gfx_element_alloc(device->machine, &k001604_char_layout_layer_8x8, (UINT8*)&k001604->char_ram[0], device->machine->config->total_colors / 16, 0);
+	device->machine->gfx[k001604->gfx_index[1]] = gfx_element_alloc(device->machine, &k001604_char_layout_layer_16x16, (UINT8*)&k001604->char_ram[0], device->machine->config->total_colors / 16, 0);
+
+	state_save_register_device_item_pointer(device, 0, k001604->reg, 0x400 / 4);
+	state_save_register_device_item_pointer(device, 0, k001604->char_ram, 0x200000 / 4);
+	state_save_register_device_item_pointer(device, 0, k001604->tile_ram, 0x20000 / 4);
+}
+
+static DEVICE_RESET( k001604 )
+{
+	k001604_state *k001604 = k001604_get_safe_token(device);
+
+	memset(k001604->char_ram, 0, 0x200000);
+	memset(k001604->tile_ram, 0, 0x10000);
+	memset(k001604->reg, 0, 0x400);
+}
+
+
+// from drivers/hornet.c
+
+/***************************************************************************/
+/*                                                                         */
+/*                                  037122                                 */
+/*                                                                         */
+/***************************************************************************/
+
+typedef struct _k037122_state k037122_state;
+struct _k037122_state
+{
+	const device_config *screen;
+	tilemap_t        *layer[2];
+	int            gfx_index;
+
+	UINT32 *       tile_ram;
+	UINT32 *       char_ram;
+	UINT32 *       reg;
+};
+
+
+#define K037122_NUM_TILES		16384
+
+/*****************************************************************************
+    INLINE FUNCTIONS
+*****************************************************************************/
+
+INLINE k037122_state *k037122_get_safe_token( const device_config *device )
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == K037122);
+
+	return (k037122_state *)device->token;
+}
+
+INLINE const k037122_interface *k037122_get_interface( const device_config *device )
+{
+	assert(device != NULL);
+	assert((device->type == K037122));
+	return (const k037122_interface *) device->static_config;
+}
+
+/*****************************************************************************
+    DEVICE HANDLERS
+*****************************************************************************/
+
+static const gfx_layout k037122_char_layout =
+{
+	8, 8,
+	K037122_NUM_TILES,
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	{ 1*16, 0*16, 3*16, 2*16, 5*16, 4*16, 7*16, 6*16 },
+	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128 },
+	8*128
+};
+
+static TILE_GET_INFO_DEVICE( k037122_tile_info_layer0 )
+{
+	k037122_state *k037122 = k037122_get_safe_token(device);
+	UINT32 val = k037122->tile_ram[tile_index + (0x8000/4)];
+	int color = (val >> 17) & 0x1f;
+	int tile = val & 0x3fff;
+	int flags = 0;
+
+	if (val & 0x400000)
+		flags |= TILE_FLIPX;
+	if (val & 0x800000)
+		flags |= TILE_FLIPY;
+
+	SET_TILE_INFO_DEVICE(k037122->gfx_index, tile, color, flags);
+}
+
+static TILE_GET_INFO_DEVICE( k037122_tile_info_layer1 )
+{
+	k037122_state *k037122 = k037122_get_safe_token(device);
+	UINT32 val = k037122->tile_ram[tile_index];
+	int color = (val >> 17) & 0x1f;
+	int tile = val & 0x3fff;
+	int flags = 0;
+
+	if (val & 0x400000)
+		flags |= TILE_FLIPX;
+	if (val & 0x800000)
+		flags |= TILE_FLIPY;
+
+	SET_TILE_INFO_DEVICE(k037122->gfx_index, tile, color, flags);
+}
+
+
+void k037122_tile_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect )
+{
+	k037122_state *k037122 = k037122_get_safe_token(device);
+	const rectangle *visarea = video_screen_get_visible_area(k037122->screen);
+
+	if (k037122->reg[0xc] & 0x10000)
+	{
+		tilemap_set_scrolldx(k037122->layer[1], visarea->min_x, visarea->min_x);
+		tilemap_set_scrolldy(k037122->layer[1], visarea->min_y, visarea->min_y);
+		tilemap_draw(bitmap, cliprect, k037122->layer[1], 0, 0);
+	}
+	else
+	{
+		tilemap_set_scrolldx(k037122->layer[0], visarea->min_x, visarea->min_x);
+		tilemap_set_scrolldy(k037122->layer[0], visarea->min_y, visarea->min_y);
+		tilemap_draw(bitmap, cliprect, k037122->layer[0], 0, 0);
+	}
+}
+
+static void update_palette_color( const device_config *device, UINT32 palette_base, int color )
+{
+	k037122_state *k037122 = k037122_get_safe_token(device);
+	UINT32 data = k037122->tile_ram[(palette_base / 4) + color];
+
+	palette_set_color_rgb(device->machine, color, pal5bit(data >> 6), pal6bit(data >> 0), pal5bit(data >> 11));
+}
+
+READ32_DEVICE_HANDLER( k037122_sram_r )
+{
+//  int chip = get_cgboard_id();
+	k037122_state *k037122 = k037122_get_safe_token(device);
+
+	return k037122->tile_ram[offset];
+}
+
+WRITE32_DEVICE_HANDLER( k037122_sram_w )
+{
+//  int chip = get_cgboard_id();
+	k037122_state *k037122 = k037122_get_safe_token(device);
+
+	COMBINE_DATA(k037122->tile_ram + offset);
+
+	if (k037122->reg[0xc] & 0x10000)
+	{
+		if (offset < 0x8000 / 4)
+		{
+			tilemap_mark_tile_dirty(k037122->layer[1], offset);
+		}
+		else if (offset >= 0x8000 / 4 && offset < 0x18000 / 4)
+		{
+			tilemap_mark_tile_dirty(k037122->layer[0], offset - (0x8000 / 4));
+		}
+		else if (offset >= 0x18000 / 4)
+		{
+			update_palette_color(device, 0x18000, offset - (0x18000 / 4));
+		}
+	}
+	else
+	{
+		if (offset < 0x8000 / 4)
+		{
+			update_palette_color(device, 0, offset);
+		}
+		else if (offset >= 0x8000 / 4 && offset < 0x18000 / 4)
+		{
+			tilemap_mark_tile_dirty(k037122->layer[0], offset - (0x8000 / 4));
+		}
+		else if (offset >= 0x18000 / 4)
+		{
+			tilemap_mark_tile_dirty(k037122->layer[1], offset - (0x18000 / 4));
+		}
+	}
+}
+
+
+READ32_DEVICE_HANDLER( k037122_char_r )
+{
+//  int chip = get_cgboard_id();
+	k037122_state *k037122 = k037122_get_safe_token(device);
+	int bank = k037122->reg[0x30 / 4] & 0x7;
+
+	return k037122->char_ram[offset + (bank * (0x40000 / 4))];
+}
+
+WRITE32_DEVICE_HANDLER( k037122_char_w )
+{
+//  int chip = get_cgboard_id();
+	k037122_state *k037122 = k037122_get_safe_token(device);
+	int bank = k037122->reg[0x30 / 4] & 0x7;
+	UINT32 addr = offset + (bank * (0x40000/4));
+
+	COMBINE_DATA(k037122->char_ram + addr);
+	gfx_element_mark_dirty(device->machine->gfx[k037122->gfx_index], addr / 32);
+}
+
+READ32_DEVICE_HANDLER( k037122_reg_r )
+{
+//  int chip = get_cgboard_id();
+	k037122_state *k037122 = k037122_get_safe_token(device);
+
+	switch (offset)
+	{
+		case 0x14/4:
+		{
+			return 0x000003fa;
+		}
+	}
+	return k037122->reg[offset];
+}
+
+WRITE32_DEVICE_HANDLER( k037122_reg_w )
+{
+//  int chip = get_cgboard_id();
+	k037122_state *k037122 = k037122_get_safe_token(device);
+
+	COMBINE_DATA(k037122->reg + offset);
+}
+
+/*****************************************************************************
+    DEVICE INTERFACE
+*****************************************************************************/
+
+static DEVICE_START( k037122 )
+{
+	k037122_state *k037122 = k037122_get_safe_token(device);
+	const k037122_interface *intf = k037122_get_interface(device);
+
+	k037122->screen = devtag_get_device(device->machine, intf->screen);
+	k037122->gfx_index = intf->gfx_index;
+
+	k037122->char_ram = auto_alloc_array(device->machine, UINT32, 0x200000 / 4);
+	k037122->tile_ram = auto_alloc_array(device->machine, UINT32, 0x20000 / 4);
+	k037122->reg = auto_alloc_array(device->machine, UINT32, 0x400 / 4);
+
+	k037122->layer[0] = tilemap_create_device(device, k037122_tile_info_layer0, tilemap_scan_rows, 8, 8, 256, 64);
+	k037122->layer[1] = tilemap_create_device(device, k037122_tile_info_layer1, tilemap_scan_rows, 8, 8, 128, 64);
+
+	tilemap_set_transparent_pen(k037122->layer[0], 0);
+	tilemap_set_transparent_pen(k037122->layer[1], 0);
+
+	device->machine->gfx[k037122->gfx_index] = gfx_element_alloc(device->machine, &k037122_char_layout, (UINT8*)k037122->char_ram, device->machine->config->total_colors / 16, 0);
+
+	state_save_register_device_item_pointer(device, 0, k037122->reg, 0x400 / 4);
+	state_save_register_device_item_pointer(device, 0, k037122->char_ram, 0x200000 / 4);
+	state_save_register_device_item_pointer(device, 0, k037122->tile_ram, 0x20000 / 4);
+}
+
+static DEVICE_RESET( k037122 )
+{
+	k037122_state *k037122 = k037122_get_safe_token(device);
+
+	memset(k037122->char_ram, 0, 0x200000);
+	memset(k037122->tile_ram, 0, 0x20000);
+	memset(k037122->reg, 0, 0x400);
+}
+
+
+/***************************************************************************/
+/*                                                                         */
+/*                         misc debug handlers                             */
+/*                                                                         */
+/***************************************************************************/
+
 READ16_DEVICE_HANDLER( k056832_word_r )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
@@ -9034,7 +10819,14 @@ READ16_DEVICE_HANDLER( k053244_reg_word_r )
 	return(k053244->regs[offset * 2] << 8 | k053244->regs[offset * 2 + 1]);
 }
 
-/*************************************************************************/
+
+
+/***************************************************************************/
+/*                                                                         */
+/*                         DEVICE_GET_INFOs                                */
+/*                                                                         */
+/***************************************************************************/
+
 
 DEVICE_GET_INFO( k007121 )
 {
@@ -9428,6 +11220,97 @@ DEVICE_GET_INFO( k053252 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:					strcpy(info->s, "Konami 053252");				break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Konami Video IC");					break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;
+	}
+}
+
+DEVICE_GET_INFO( k001006 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k001006_state);					break;
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k001006);		break;
+		case DEVINFO_FCT_STOP:					/* Nothing */									break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(k001006);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:					strcpy(info->s, "Konami 001006");				break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Konami Video IC");					break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;
+	}
+}
+
+
+DEVICE_GET_INFO( k001005 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k001005_state);					break;
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k001005);		break;
+		case DEVINFO_FCT_STOP:					info->stop = DEVICE_STOP_NAME(k001005);		break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(k001005);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:					strcpy(info->s, "Konami 001005");				break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Konami Video IC");					break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;
+	}
+}
+
+
+DEVICE_GET_INFO( k001604 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k001604_state);					break;
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k001604);		break;
+		case DEVINFO_FCT_STOP:					/* Nothing */									break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(k001604);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:					strcpy(info->s, "Konami 001604");				break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Konami Video IC");					break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;
+	}
+}
+
+
+DEVICE_GET_INFO( k037122 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k037122_state);					break;
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k037122);		break;
+		case DEVINFO_FCT_STOP:					/* Nothing */									break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(k037122);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:					strcpy(info->s, "Konami 0371222");				break;
 		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Konami Video IC");					break;
 		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
 		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;

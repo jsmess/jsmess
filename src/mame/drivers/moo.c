@@ -44,7 +44,7 @@ Bucky:
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "sound/k054539.h"
@@ -322,7 +322,7 @@ static ADDRESS_MAP_START( moobl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r, control2_w)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE(&workram)		 /* Work RAM */
-	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_BASE_GENERIC(spriteram) 	 /* Sprite RAM */
+	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_BASE_GENERIC(spriteram)	 /* Sprite RAM */
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w) /* Graphic planes */
 	AM_RANGE(0x1a2000, 0x1a3fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)	/* Graphic planes mirror */
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_DEVREAD("k056832", k056832_rom_word_r)	/* Passthrough to tile roms */
@@ -393,7 +393,7 @@ static INPUT_PORTS_START( moo )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW)
@@ -409,9 +409,9 @@ static INPUT_PORTS_START( moo )
 	PORT_DIPSETTING(    0x80, "4")
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
 
 	PORT_START("P1_P3")
 	KONAMI16_LSB( 1, IPT_UNKNOWN, IPT_START1 )
@@ -498,7 +498,7 @@ static MACHINE_DRIVER_START( moo )
 	MDRV_MACHINE_START(moo)
 	MDRV_MACHINE_RESET(moo)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -542,7 +542,7 @@ static MACHINE_DRIVER_START( moobl )
 	MDRV_MACHINE_START(moo)
 	MDRV_MACHINE_RESET(moo)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)

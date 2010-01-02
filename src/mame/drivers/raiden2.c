@@ -145,7 +145,7 @@ Current Problem(s) - in order of priority
 #include "includes/raiden2.h"
 
 
-static tilemap *background_layer,*midground_layer,*foreground_layer,*text_layer;
+static tilemap_t *background_layer,*midground_layer,*foreground_layer,*text_layer;
 static UINT16 *back_data,*fore_data,*mid_data, *w1ram;
 static int bg_bank, fg_bank, mid_bank;
 static int bg_col, fg_col, mid_col;
@@ -329,7 +329,7 @@ static TILE_GET_INFO( get_text_tile_info )
 }
 
 #if 0
-static void set_scroll(tilemap *tm, int plane)
+static void set_scroll(tilemap_t *tm, int plane)
 {
 	int x = mainram[0x620/2+plane*2+0];
 	int y = mainram[0x620/2+plane*2+1];
@@ -937,7 +937,7 @@ static ADDRESS_MAP_START( nzerotea_mem, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x006d8, 0x006d9) AM_WRITE(bbbbll_w) // scroll?
 	AM_RANGE(0x006dc, 0x006dd) AM_READ(nzerotea_unknown_r)
 //  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
-	//AM_RANGE(0x00700, 0x00701) AM_WRITE(rdx_v33_eeprom_w)
+	//AM_RANGE(0x00700, 0x00701) AM_DEVWRITE("eeprom", rdx_v33_eeprom_w)
 	AM_RANGE(0x00740, 0x00741) AM_READ(nzerotea_unknown_r)
 	AM_RANGE(0x00744, 0x00745) AM_READ(r2_playerin_r)
 	AM_RANGE(0x0074c, 0x0074d) AM_READ(rdx_v33_system_r)
@@ -1977,6 +1977,9 @@ ROM_START( r2dx_v33 )
 
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPDX */
 	ROM_LOAD( "copx_d3.357",   0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-r2dx_v33.bin", 0x0000, 0x0080, CRC(ba454777) SHA1(101c5364e8664d17bfb1e759515d135a2673d67e) )
 ROM_END
 
 /*
@@ -2031,20 +2034,20 @@ ROM_START( xsedae )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD16_BYTE( "5.u077",	0x000000,	0x010000, CRC(478deced) SHA1(88cd72cb76bbc1c4255c3dfae4b9a10af9b050b2) )
- 	ROM_LOAD16_BYTE( "6.u072",	0x000001,	0x010000, CRC(a788402d) SHA1(8a1ac4760cf75cd2e32c1d15f36ad15cce3d411b) )
+	ROM_LOAD16_BYTE( "6.u072",	0x000001,	0x010000, CRC(a788402d) SHA1(8a1ac4760cf75cd2e32c1d15f36ad15cce3d411b) )
 
- 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
- 	ROM_LOAD( "bg-1.u075",   0x000000, 0x100000, CRC(ac087560) SHA1(b6473b20c55ec090961cfc46a024b3c5b707ec25) )
- 	ROM_LOAD( "7.u0714",     0x100000, 0x080000, CRC(296105dc) SHA1(c2b80d681646f504b03c2dde13e37b1d820f82d2) )
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "bg-1.u075",   0x000000, 0x100000, CRC(ac087560) SHA1(b6473b20c55ec090961cfc46a024b3c5b707ec25) )
+	ROM_LOAD( "7.u0714",     0x100000, 0x080000, CRC(296105dc) SHA1(c2b80d681646f504b03c2dde13e37b1d820f82d2) )
 
- 	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (not encrypted) */
- 	ROM_LOAD32_WORD( "obj-1.u0811",  0x000000, 0x100000, CRC(e65f1b4e) SHA1(b04be9af41ce868e64071715252c4ff228891cf0) )
- 	ROM_LOAD32_WORD( "obj-2.u082",   0x000002, 0x100000, CRC(e753e7ad) SHA1(643ab39ac1b7df686a16b1ed6fdcb686720ca8e8) )
+	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (not encrypted) */
+	ROM_LOAD32_WORD( "obj-1.u0811",  0x000000, 0x100000, CRC(e65f1b4e) SHA1(b04be9af41ce868e64071715252c4ff228891cf0) )
+	ROM_LOAD32_WORD( "obj-2.u082",   0x000002, 0x100000, CRC(e753e7ad) SHA1(643ab39ac1b7df686a16b1ed6fdcb686720ca8e8) )
 
- 	ROM_REGION( 0x100000, "oki1", 0 )	/* ADPCM samples */
- 	ROM_LOAD( "9.u105", 0x00000, 0x40000, CRC(a7a0c5f9) SHA1(7882681ac152642aa4f859071f195842068b214b) )
+	ROM_REGION( 0x100000, "oki1", 0 )	/* ADPCM samples */
+	ROM_LOAD( "9.u105", 0x00000, 0x40000, CRC(a7a0c5f9) SHA1(7882681ac152642aa4f859071f195842068b214b) )
 
- 	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASEFF )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASEFF )	/* ADPCM samples */
 ROM_END
 
 static DRIVER_INIT (raiden2)
@@ -2067,36 +2070,13 @@ static DRIVER_INIT (xsedae)
 }
 
 
-static const UINT8 r2_v33_default_eeprom_type1[32] =
-{
-	0x41, 0x52, 0x44, 0x49, 0x4E, 0x45, 0x49, 0x49, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x91, 0x80,
-	0x80, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
-};
-
-static NVRAM_HANDLER( rdx_v33 )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C46);
-
-		if (file) eeprom_load(file);
-		else
-		{
-			eeprom_set_data(r2_v33_default_eeprom_type1,32);
-		}
-	}
-}
-
-
-static WRITE16_HANDLER( rdx_v33_eeprom_w )
+static WRITE16_DEVICE_HANDLER( rdx_v33_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		eeprom_set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom_write_bit(data & 0x20);
-		eeprom_set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line(device, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(device, data & 0x20);
+		eeprom_set_cs_line(device, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
 		if (data&0xc7) logerror("eeprom_w extra bits used %04x\n",data);
 	}
@@ -2133,7 +2113,7 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x006d8, 0x006d9) AM_WRITE(bbbbll_w) // scroll?
 	AM_RANGE(0x006dc, 0x006dd) AM_READ(rdx_v33_unknown2_r)
 //  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
-	AM_RANGE(0x00700, 0x00701) AM_WRITE(rdx_v33_eeprom_w)
+	AM_RANGE(0x00700, 0x00701) AM_DEVWRITE("eeprom", rdx_v33_eeprom_w)
 	AM_RANGE(0x00740, 0x00741) AM_READ(rdx_v33_unknown2_r)
 	AM_RANGE(0x00744, 0x00745) AM_READ(r2_playerin_r)
 	AM_RANGE(0x0074c, 0x0074d) AM_READ(rdx_v33_system_r)
@@ -2177,7 +2157,7 @@ static INPUT_PORTS_START( rdx_v33 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0040, 0x0040, "Test Mode" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
@@ -2195,7 +2175,7 @@ static INPUT_PORTS_START( rdx_v33 )
     PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
     PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
- 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
@@ -2217,7 +2197,7 @@ static INPUT_PORTS_START( nzerotea )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0040, 0x0040, "Test Mode" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
@@ -2235,7 +2215,7 @@ static INPUT_PORTS_START( nzerotea )
     PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
     PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
- 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
@@ -2267,7 +2247,8 @@ static MACHINE_DRIVER_START( rdx_v33 )
 	MDRV_CPU_VBLANK_INT("screen", rdx_v33_interrupt)
 
 	MDRV_MACHINE_RESET(rdx_v33)
-	MDRV_NVRAM_HANDLER(rdx_v33)
+
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -87,7 +87,7 @@ static WRITE8_HANDLER( cmmb_paletteram_w )
 
 static READ8_HANDLER( cmmb_input_r )
 {
-	printf("%02x R\n",offset);
+	//printf("%02x R\n",offset);
 	switch(offset)
 	{
 		case 0x00: return input_port_read(space->machine, "IN2");
@@ -113,7 +113,7 @@ static UINT8 irq_mask;
 
 static WRITE8_HANDLER( cmmb_output_w )
 {
-	printf("%02x -> [%02x] W\n",data,offset);
+	//printf("%02x -> [%02x] W\n",data,offset);
 	switch(offset)
 	{
 		case 0x01:
@@ -202,7 +202,7 @@ static INPUT_PORTS_START( cmmb )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_START("IN2")
@@ -307,7 +307,7 @@ MACHINE_DRIVER_END
 ROM_START( cmmb162 )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "cmmb162.bin",   0x10000, 0x40000, CRC(71a5a75d) SHA1(0ad7b97580082cda98cb1e8aab8efcf491d0ed25) )
-	ROM_COPY( "maincpu", 	   0x18000, 0x08000, 0x08000 )
+	ROM_COPY( "maincpu",	   0x18000, 0x08000, 0x08000 )
 
 	ROM_REGION( 0x1000, "gfx", ROMREGION_ERASE00 )
 ROM_END

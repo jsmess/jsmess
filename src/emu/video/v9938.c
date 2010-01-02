@@ -65,7 +65,7 @@ typedef struct {
 		UINT8 LO;
 		UINT8 CM;
 		UINT8 MXS, MXD;
-		} MMC;
+	} MMC;
 	int  VdpOpsCnt;
 	void (*VdpEngine)(void);
 } V9938;
@@ -91,7 +91,8 @@ static V9938 *vdp = NULL;
 static const char *const v9938_modes[] = {
 	"TEXT 1", "MULTICOLOR", "GRAPHIC 1", "GRAPHIC 2", "GRAPHIC 3",
 	"GRAPHIC 4", "GRAPHIC 5", "GRAPHIC 6", "GRAPHIC 7", "TEXT 2",
-	"UNKNOWN" };
+	"UNKNOWN"
+};
 
 static void v9938_register_write (running_machine *machine, int reg, int data);
 static void v9938_update_command (void);
@@ -246,8 +247,8 @@ static void v9938_palette_w(UINT8 data)
 		vdp->palReg[indexp*2+1] = data & 0x07;
 		/* update palette */
 		vdp->pal_ind16[indexp] = (((int)vdp->pal_write << 2) & 0x01c0)  |
-						 	   (((int)data << 3) & 0x0038)  |
-						 		((int)vdp->pal_write & 0x0007);
+							   (((int)data << 3) & 0x0038)  |
+								((int)vdp->pal_write & 0x0007);
 
 		vdp->contReg[0x10] = (vdp->contReg[0x10] + 1) & 15;
 		vdp->pal_write_first = 0;
@@ -263,7 +264,7 @@ WRITE8_HANDLER( v9938_0_palette_w )
 {
 	vdp = &vdps[0];
 	v9938_palette_w(data);
-};
+}
 
 WRITE8_HANDLER( v9938_1_palette_w )
 {
@@ -291,7 +292,7 @@ static void v9938_reset_palette (void)
 		2, 6, 5, /* 13: magenta */
 		5, 5, 5, /* 14: gray */
 		7, 7, 7  /* 15: white */
-        };
+	};
 	int i, red, ind;
 
 	for (i=0;i<16;i++)
@@ -328,7 +329,7 @@ static void v9938_vram_write (int offset, int data)
 	if ( (vdp->mode == V9938_MODE_GRAPHIC6) || (vdp->mode == V9938_MODE_GRAPHIC7) )
 		{
         newoffset = ((offset & 1) << 16) | (offset >> 1);
-   		if (newoffset < vdp->vram_size)
+		if (newoffset < vdp->vram_size)
         	vdp->vram[newoffset] = data;
 		}
 	else
@@ -375,19 +376,19 @@ static void v9938_vram_w( UINT8 data )
 		}
 	}
 
- WRITE8_HANDLER (v9938_0_vram_w)
- {
-	 vdp = &vdps[0];
-	 v9938_vram_w( data );
- }
+WRITE8_HANDLER (v9938_0_vram_w)
+{
+	vdp = &vdps[0];
+	v9938_vram_w( data );
+}
 
- WRITE8_HANDLER (v9938_1_vram_w)
- {
-	 vdp = &vdps[1];
-	 v9938_vram_w( data );
- }
+WRITE8_HANDLER (v9938_1_vram_w)
+{
+	vdp = &vdps[1];
+	v9938_vram_w( data );
+}
 
- static UINT8 v9938_vram_r(void)
+static UINT8 v9938_vram_r(void)
 	{
 	UINT8 ret;
 	int address;
@@ -584,10 +585,12 @@ static void v9938_check_int (running_machine *machine)
 	n = ( (vdp->contReg[1] & 0x20) && (vdp->statReg[0] & 0x80) /*&& vdp->vblank_int*/) ||
 		( (vdp->statReg[1] & 0x01) && (vdp->contReg[0] & 0x10) );
 
-	/*if(n && vdp->vblank_int)
-    {
-        vdp->vblank_int = 0;
-    }*/
+#if 0
+	if(n && vdp->vblank_int)
+		{
+		vdp->vblank_int = 0;
+		}
+#endif
 
 	if (n != vdp->INT)
 		{
@@ -741,7 +744,7 @@ static void v9938_register_write (running_machine *machine, int reg, int data)
 	vdp->contReg[reg] = data;
 }
 
- static UINT8 v9938_status_r(running_machine *machine)
+static UINT8 v9938_status_r(running_machine *machine)
 	{
 	int reg;
 	UINT8 ret;
@@ -835,10 +838,10 @@ READ8_HANDLER( v9938_1_status_r )
 #define V9938_BPP	(16)
 #define V9938_WIDTH	(512 + 32)
 #include "v9938mod.c"
-#undef 	V9938_WIDTH
+#undef	V9938_WIDTH
 #define V9938_WIDTH	(256 + 16)
 #include "v9938mod.c"
-#undef 	V9938_WIDTH
+#undef	V9938_WIDTH
 #undef	V9938_BPP
 
 static void v9938_sprite_mode1 (int line, UINT8 *col)
@@ -932,13 +935,13 @@ static void v9938_sprite_mode1 (int line, UINT8 *col)
 								{
 								if (col[x+1] & 0x40)
     	                        	{
-       		                    	/* we have a collision! */
+    		                    	/* we have a collision! */
 									if (p2 < 4)
 										vdp->statReg[0] |= 0x20;
                             		}
                         		if ( !(col[x+1] & 0x80) )
 	                            	{
-   		                         	if (c || (vdp->contReg[8] & 0x20) )
+		                        	if (c || (vdp->contReg[8] & 0x20) )
 										col[x+1] |= 0xc0 | c;
 									else
 										col[x+1] |= 0x80;
@@ -1696,22 +1699,36 @@ static const UINT8 Mask[4] = { 0x0F,0x03,0x0F,0xFF };
 static const int  PPB[4]  = { 2,4,2,1 };
 static const int  PPL[4]  = { 256,512,512,256 };
 
-                      /*  SprOn SprOn SprOf SprOf */
-                      /*  ScrOf ScrOn ScrOf ScrOn */
-static const int srch_timing[8]={ 818, 1025,  818,  830,   /* ntsc */
-                            696,  854,  696,  684 }; /* pal  */
-static const int line_timing[8]={ 1063, 1259, 1063, 1161,
-                            904,  1026, 904,  953 };
-static const int hmmv_timing[8]={ 439,  549,  439,  531,
-                            366,  439,  366,  427 };
-static const int lmmv_timing[8]={ 873,  1135, 873, 1056,
-                            732,  909,  732,  854 };
-static const int ymmm_timing[8]={ 586,  952,  586,  610,
-                            488,  720,  488,  500 };
-static const int hmmm_timing[8]={ 818,  1111, 818,  854,
-                            684,  879,  684,  708 };
-static const int lmmm_timing[8]={ 1160, 1599, 1160, 1172,
-                            964,  1257, 964,  977 };
+/*  SprOn SprOn SprOf SprOf */
+/*  ScrOf ScrOn ScrOf ScrOn */
+static const int srch_timing[8]={
+  818, 1025,  818,  830, /* ntsc */
+  696,  854,  696,  684  /* pal  */
+};
+static const int line_timing[8]={
+  1063, 1259, 1063, 1161,
+  904,  1026, 904,  953
+};
+static const int hmmv_timing[8]={
+  439,  549,  439,  531,
+  366,  439,  366,  427
+};
+static const int lmmv_timing[8]={
+  873,  1135, 873, 1056,
+  732,  909,  732,  854
+};
+static const int ymmm_timing[8]={
+  586,  952,  586,  610,
+  488,  720,  488,  500
+};
+static const int hmmm_timing[8]={
+  818,  1111, 818,  854,
+  684,  879,  684,  708
+};
+static const int lmmm_timing[8]={
+  1160, 1599, 1160, 1172,
+  964,  1257, 964,  977
+};
 
 /** VDPVRMP() **********************************************/
 /** Calculate addr of a pixel in vram                       **/

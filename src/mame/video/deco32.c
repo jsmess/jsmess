@@ -10,7 +10,7 @@ UINT32 *dragngun_sprite_lookup_0_ram, *dragngun_sprite_lookup_1_ram;
 UINT32 *deco32_ace_ram;
 
 static UINT8 *dirty_palette;
-static tilemap *pf1_tilemap,*pf1a_tilemap,*pf2_tilemap,*pf3_tilemap,*pf4_tilemap;
+static tilemap_t *pf1_tilemap,*pf1a_tilemap,*pf2_tilemap,*pf3_tilemap,*pf4_tilemap;
 static int deco32_pf1_bank,deco32_pf2_bank,deco32_pf3_bank,deco32_pf4_bank;
 static int deco32_pf1_flip,deco32_pf2_flip,deco32_pf3_flip,deco32_pf4_flip;
 static int deco32_pf2_colourbank,deco32_pf4_colourbank,deco32_pri;
@@ -972,8 +972,6 @@ VIDEO_START( captaven )
 	pf1a_tilemap =tilemap_create(machine, get_pf1a_tile_info,   deco16_scan_rows,16,16,64,32);
 	pf2_tilemap = tilemap_create(machine, get_pf2_tile_info,    deco16_scan_rows,16,16,64,32);
 	pf3_tilemap = tilemap_create(machine, get_ca_pf3_tile_info, tilemap_scan_rows,16,16,32,32);
-	deco32_raster_display_list=auto_alloc_array(machine, UINT16, 10 * 256 / 2);
-	memset(deco32_raster_display_list, 0, 10 * 256);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf1a_tilemap,0);
@@ -1000,7 +998,6 @@ VIDEO_START( fghthist )
 	tilemap_set_transparent_pen(pf2_tilemap,0);
 	tilemap_set_transparent_pen(pf3_tilemap,0);
 
-	deco32_raster_display_list=0;
 	deco32_pf2_colourbank=deco32_pf4_colourbank=0;
 	has_ace_ram=0;
 }
@@ -1072,7 +1069,6 @@ VIDEO_START( nslasher )
 	tilemap_set_transparent_pen(pf3_tilemap,0);
 	memset(dirty_palette,0,4096);
 
-	deco32_raster_display_list=0;
 	deco32_pf2_colourbank=16;
 	deco32_pf4_colourbank=16;
 	state_save_register_global(machine, deco32_pri);
@@ -1084,7 +1080,6 @@ VIDEO_START( nslasher )
 VIDEO_EOF( captaven )
 {
 	memcpy(machine->generic.buffered_spriteram.u32,machine->generic.spriteram.u32,machine->generic.spriteram_size);
-	deco32_raster_display_position=0;
 }
 
 VIDEO_EOF( dragngun )
@@ -1111,79 +1106,7 @@ static void print_debug_info(bitmap_t *bitmap)
 
 #endif
 
-static void tilemap_raster_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, int pri)
-{
-	int ptr=0,sx0,sy0,sx1,sy1,start,end=0;
-	rectangle clip;
-	int overflow=deco32_raster_display_position;
-
-	clip.min_x = cliprect->min_x;
-	clip.max_x = cliprect->max_x;
-
-	/* Finish list up to end of visible display */
-	deco32_raster_display_list[overflow++]=255;
-	deco32_raster_display_list[overflow++]=deco32_pf12_control[1];
-	deco32_raster_display_list[overflow++]=deco32_pf12_control[2];
-	deco32_raster_display_list[overflow++]=deco32_pf12_control[3];
-	deco32_raster_display_list[overflow++]=deco32_pf12_control[4];
-
-	while (ptr<overflow) {
-		start=end;
-		end=deco32_raster_display_list[ptr++];
-		sx0=deco32_raster_display_list[ptr++];
-		sy0=deco32_raster_display_list[ptr++];
-		sx1=deco32_raster_display_list[ptr++];
-		sy1=deco32_raster_display_list[ptr++];
-
-		clip.min_y = start;
-		clip.max_y = end;
-
-		tilemap_set_scrollx(pf2_tilemap,0,sx1);
-		tilemap_set_scrolly(pf2_tilemap,0,sy1);
-		tilemap_draw(bitmap,&clip,pf2_tilemap,flags,pri);
-	}
-}
-
-static void combined_tilemap_draw(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	const bitmap_t *bitmap0 = tilemap_get_pixmap(pf3_tilemap);
-	const bitmap_t *bitmap1 = tilemap_get_pixmap(pf4_tilemap);
-	int x,y,p;
-
-	const UINT16 width_mask=0x3ff;
-	const UINT16 height_mask=0x1ff;
-	const UINT16 y_src=deco32_pf34_control[2];
-//  const UINT32 *rows=deco32_pf3_rowscroll;
-
-	const UINT16 *bitmap0_y;
-	const UINT16 *bitmap1_y;
-	UINT32 *bitmap2_y;
-
-	UINT16 x_src;
-
-	for (y=8; y<248; y++) {
-		const int py=(y_src+y)&height_mask;
-
-		bitmap0_y=BITMAP_ADDR16(bitmap0, py, 0);
-		bitmap1_y=BITMAP_ADDR16(bitmap1, py, 0);
-		bitmap2_y=BITMAP_ADDR32(bitmap, y, 0);
-
-		/* Todo:  Should add row enable, and col scroll, but never used as far as I can see */
-		x_src=(deco32_pf34_control[1] + deco32_pf3_rowscroll[py])&width_mask;
-
-		for (x=0; x<320; x++) {
-
-			/* 0x200 is palette base for this tilemap */
-			p = 0x200 +((bitmap0_y[x_src]&0xf) | ((bitmap0_y[x_src]&0x30)<<4) | ((bitmap1_y[x_src]&0xf)<<4));
-
-			bitmap2_y[x]=machine->pens[p];
-
-			x_src=(x_src+1)&width_mask;
-		}
-	}
-}
-
-static void deco32_setup_scroll(tilemap *pf_tilemap, UINT16 height, UINT8 control0, UINT8 control1, UINT16 sy, UINT16 sx, UINT32 *rowdata, UINT32 *coldata)
+static void deco32_setup_scroll(tilemap_t *pf_tilemap, UINT16 height, UINT8 control0, UINT8 control1, UINT16 sy, UINT16 sx, UINT32 *rowdata, UINT32 *coldata)
 {
 	int rows,offs;
 
@@ -1225,6 +1148,48 @@ static void deco32_setup_scroll(tilemap *pf_tilemap, UINT16 height, UINT8 contro
 	}
 }
 
+
+static void combined_tilemap_draw(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	const bitmap_t *bitmap0 = tilemap_get_pixmap(pf3_tilemap);
+	const bitmap_t *bitmap1 = tilemap_get_pixmap(pf4_tilemap);
+	int x,y,p;
+
+	const UINT16 width_mask=0x3ff;
+	const UINT16 height_mask=0x1ff;
+	const UINT16 y_src=deco32_pf34_control[2];
+//  const UINT32 *rows=deco32_pf3_rowscroll;
+
+	const UINT16 *bitmap0_y;
+	const UINT16 *bitmap1_y;
+	UINT32 *bitmap2_y;
+
+	UINT16 x_src;
+
+	for (y=8; y<248; y++) {
+		const int py=(y_src+y)&height_mask;
+
+		bitmap0_y=BITMAP_ADDR16(bitmap0, py, 0);
+		bitmap1_y=BITMAP_ADDR16(bitmap1, py, 0);
+		bitmap2_y=BITMAP_ADDR32(bitmap, y, 0);
+
+		/* Todo:  Should add row enable, and col scroll, but never used as far as I can see */
+		x_src=(deco32_pf34_control[1] + deco32_pf3_rowscroll[py])&width_mask;
+
+		for (x=0; x<320; x++) {
+
+			/* 0x200 is palette base for this tilemap */
+			p = 0x200 +((bitmap0_y[x_src]&0xf) | ((bitmap0_y[x_src]&0x30)<<4) | ((bitmap1_y[x_src]&0xf)<<4));
+
+			bitmap2_y[x]=machine->pens[p];
+
+			x_src=(x_src+1)&width_mask;
+		}
+	}
+}
+
+
+
 /******************************************************************************/
 
 VIDEO_UPDATE( captaven )
@@ -1265,16 +1230,10 @@ VIDEO_UPDATE( captaven )
 		else
 			bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
-		if (deco32_raster_display_position)
-			tilemap_raster_draw(bitmap,cliprect,0,2);
-		else
-			tilemap_draw(bitmap,cliprect,pf2_tilemap,0,2);
+		tilemap_draw(bitmap,cliprect,pf2_tilemap,0,2);
 	} else {
 		if (pf2_enable) {
-			if (deco32_raster_display_position)
-				tilemap_raster_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
-			else
-				tilemap_draw(bitmap,cliprect,pf2_tilemap,0,1);
+			tilemap_draw(bitmap,cliprect,pf2_tilemap,0,1);
 		}
 		else
 			bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));

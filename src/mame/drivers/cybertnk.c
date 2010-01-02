@@ -175,7 +175,7 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 #include "deprecat.h"
 #include "sound/8950intf.h"
 
-static tilemap *tx_tilemap;
+static tilemap_t *tx_tilemap;
 static UINT16 *tx_vram;
 static UINT16 *shared_ram;
 static UINT16 *io_ram;
@@ -506,7 +506,7 @@ static INPUT_PORTS_START( cybertnk )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_BIT( 	  0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(	  0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const gfx_layout tile_8x8x4 =

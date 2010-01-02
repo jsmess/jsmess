@@ -246,18 +246,6 @@ static TIMER_CALLBACK( interrupt5 )
                 EPROM
 **********************************************************/
 
-static const UINT8 default_eeprom[128]=
-{
-	0x02,0x01,0x11,0x12,0x01,0x01,0x01,0x00,0x80,0x80,0x30,0x01,0x00,0x00,0x62,0x45,
-	0xe0,0xa0,0xff,0x28,0xff,0xff,0xfa,0xd7,0x33,0x28,0x00,0x00,0x33,0x28,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0xe0,0xa0,0xff,0x28,0xff,0xff,0xff,0xff,0xfa,0xd7,
-	0x33,0x28,0x00,0x00,0x33,0x28,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
-};
-
 static const eeprom_interface undrfire_eeprom_interface =
 {
 	6,				/* address bits */
@@ -268,19 +256,6 @@ static const eeprom_interface undrfire_eeprom_interface =
 	"0100000000",	/* unlock command */
 	"0100110000",	/* lock command */
 };
-
-static NVRAM_HANDLER( undrfire )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else {
-		eeprom_init(machine, &undrfire_eeprom_interface);
-		if (file)
-			eeprom_load(file);
-		else
-			eeprom_set_data(default_eeprom,128);  /* Default the gun setup values */
-	}
-}
 
 
 /**********************************************************
@@ -305,7 +280,7 @@ static READ32_HANDLER( undrfire_input_r )
 		{
 			return input_port_read(space->machine, "SYSTEM") | (coin_word << 16);
 		}
- 	}
+	}
 
 	return 0xffffffff;
 }
@@ -323,9 +298,10 @@ static WRITE32_HANDLER( undrfire_input_w )
 
 			if (ACCESSING_BITS_0_7)
 			{
-				eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				eeprom_write_bit(data & 0x40);
-				eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				const device_config *device = devtag_get_device(space->machine, "eeprom");
+				eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_write_bit(device, data & 0x40);
+				eeprom_set_cs_line(device, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 				return;
 			}
 
@@ -501,10 +477,10 @@ static ADDRESS_MAP_START( undrfire_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x500000, 0x500007) AM_READWRITE(undrfire_input_r, undrfire_input_w)		/* eerom etc. */
 	AM_RANGE(0x600000, 0x600007) AM_READWRITE(unknown_hardware_r, unknown_int_req_w)	/* int request for unknown hardware */
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_BASE(&f3_shared_ram)
-	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0480SCP_long_r, TC0480SCP_long_w)		/* tilemaps */
-	AM_RANGE(0x830000, 0x83002f) AM_READWRITE(TC0480SCP_ctrl_long_r, TC0480SCP_ctrl_long_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_READWRITE(TC0100SCN_long_r, TC0100SCN_long_w)		/* piv tilemaps */
-	AM_RANGE(0x920000, 0x92000f) AM_READWRITE(TC0100SCN_ctrl_long_r, TC0100SCN_ctrl_long_w)
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)		/* tilemaps */
+	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
+	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_long_r, tc0100scn_long_w)		/* piv tilemaps */
+	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_long_r, tc0100scn_ctrl_long_w)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE(color_ram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xb00000, 0xb003ff) AM_RAM							/* single bytes, blending ??? */
 	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w)		/* perhaps port based rotate control? */
@@ -520,10 +496,10 @@ static ADDRESS_MAP_START( cbombers_cpua_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x500000, 0x500007) AM_READWRITE(undrfire_input_r, undrfire_input_w)
 	AM_RANGE(0x600000, 0x600007) AM_READWRITE(cbombers_adc_r, cbombers_adc_w)
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_BASE(&f3_shared_ram)
-	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0480SCP_long_r, TC0480SCP_long_w)		/* tilemaps */
-	AM_RANGE(0x830000, 0x83002f) AM_READWRITE(TC0480SCP_ctrl_long_r, TC0480SCP_ctrl_long_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_READWRITE(TC0100SCN_long_r, TC0100SCN_long_w)		/* piv tilemaps */
-	AM_RANGE(0x920000, 0x92000f) AM_READWRITE(TC0100SCN_ctrl_long_r, TC0100SCN_ctrl_long_w)
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)		/* tilemaps */
+	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
+	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_long_r, tc0100scn_long_w)		/* piv tilemaps */
+	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_long_r, tc0100scn_ctrl_long_w)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE(color_ram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xb00000, 0xb0000f) AM_RAM /* ? */
 	AM_RANGE(0xc00000, 0xc00007) AM_RAM /* LAN controller? */
@@ -534,7 +510,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cbombers_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM	/* local ram */
-//  AM_RANGE(0x600000, 0x60ffff) AM_WRITE(TC0480SCP_word_w) /* Only written upon errors */
+//  AM_RANGE(0x600000, 0x60ffff) AM_DEVWRITE("tc0480scp", tc0480scp_word_w) /* Only written upon errors */
 	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(shared_ram_r, shared_ram_w)
 //  AM_RANGE(0xa00000, 0xa001ff) AM_RAM /* Extra road control?? */
 ADDRESS_MAP_END
@@ -553,7 +529,7 @@ static INPUT_PORTS_START( undrfire )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* reserved for EEROM */
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)	/* reserved for EEROM */
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -621,7 +597,7 @@ static INPUT_PORTS_START( cbombers )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* reserved for EEROM */
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)	/* reserved for EEROM */
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -719,9 +695,29 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( undrfire_interrupt )
 {
-	frame_counter^=1;
+	frame_counter ^= 1;
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
+
+static const tc0100scn_interface undrfire_tc0100scn_intf =
+{
+	"screen",
+	2, 3,		/* gfxnum, txnum */
+	50, 8,		/* x_offset, y_offset */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	0, 0
+};
+
+static const tc0480scp_interface undrfire_tc0480scp_intf =
+{
+	1, 4,		/* gfxnum, txnum */
+	0,		/* pixels */
+	0x24, 0,		/* x_offset, y_offset */
+	-1, 0,		/* text_xoff, text_yoff */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0		/* col_base */
+};
 
 static MACHINE_DRIVER_START( undrfire )
 
@@ -730,7 +726,7 @@ static MACHINE_DRIVER_START( undrfire )
 	MDRV_CPU_PROGRAM_MAP(undrfire_map)
 	MDRV_CPU_VBLANK_INT("screen", undrfire_interrupt)
 
-	MDRV_NVRAM_HANDLER(undrfire)
+	MDRV_EEPROM_ADD("eeprom", undrfire_eeprom_interface)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -745,6 +741,9 @@ static MACHINE_DRIVER_START( undrfire )
 
 	MDRV_VIDEO_START(undrfire)
 	MDRV_VIDEO_UPDATE(undrfire)
+
+	MDRV_TC0100SCN_ADD("tc0100scn", undrfire_tc0100scn_intf)
+	MDRV_TC0480SCP_ADD("tc0480scp", undrfire_tc0480scp_intf)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(taito_f3_sound)
@@ -764,7 +763,7 @@ static MACHINE_DRIVER_START( cbombers )
 
 	MDRV_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
 
-	MDRV_NVRAM_HANDLER(undrfire)
+	MDRV_EEPROM_ADD("eeprom", undrfire_eeprom_interface)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -774,12 +773,14 @@ static MACHINE_DRIVER_START( cbombers )
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 3*8, 32*8-1)
 
-
 	MDRV_GFXDECODE(cbombers)
 	MDRV_PALETTE_LENGTH(16384)
 
 	MDRV_VIDEO_START(undrfire)
 	MDRV_VIDEO_UPDATE(cbombers)
+
+	MDRV_TC0100SCN_ADD("tc0100scn", undrfire_tc0100scn_intf)
+	MDRV_TC0480SCP_ADD("tc0480scp", undrfire_tc0480scp_intf)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(taito_f3_sound)
@@ -824,6 +825,9 @@ ROM_START( undrfire )
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "d67-01", 0x000000, 0x200000, CRC(a2f18122) SHA1(640014c6e6d66c59fe0accf370ad3bab9f40429a) )	/* Ensoniq samples */
 	ROM_LOAD16_BYTE( "d67-02", 0xc00000, 0x200000, CRC(fceb715e) SHA1(9326513acb0696669d4f2345649ab37c8c6ed171) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "eeprom-undrfire.bin", 0x0000, 0x0080, CRC(9f7368f4) SHA1(4bb28e6eb3a72a06341199f0d744ed0ce13bce2c) )
 ROM_END
 
 
@@ -861,6 +865,9 @@ ROM_START( undrfireu )
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "d67-01", 0x000000, 0x200000, CRC(a2f18122) SHA1(640014c6e6d66c59fe0accf370ad3bab9f40429a) )	/* Ensoniq samples */
 	ROM_LOAD16_BYTE( "d67-02", 0xc00000, 0x200000, CRC(fceb715e) SHA1(9326513acb0696669d4f2345649ab37c8c6ed171) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "eeprom-undrfire.bin", 0x0000, 0x0080, CRC(9f7368f4) SHA1(4bb28e6eb3a72a06341199f0d744ed0ce13bce2c) )
 ROM_END
 
 ROM_START( undrfirej )
@@ -897,6 +904,9 @@ ROM_START( undrfirej )
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "d67-01", 0x000000, 0x200000, CRC(a2f18122) SHA1(640014c6e6d66c59fe0accf370ad3bab9f40429a) )	/* Ensoniq samples */
 	ROM_LOAD16_BYTE( "d67-02", 0xc00000, 0x200000, CRC(fceb715e) SHA1(9326513acb0696669d4f2345649ab37c8c6ed171) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "eeprom-undrfire.bin", 0x0000, 0x0080, CRC(9f7368f4) SHA1(4bb28e6eb3a72a06341199f0d744ed0ce13bce2c) )
 ROM_END
 
 ROM_START( cbombers )
@@ -948,6 +958,9 @@ ROM_START( cbombers )
 	ROM_LOAD16_BYTE( "d83_02.ic39", 0x000000, 0x200000, CRC(2abca020) SHA1(3491a95651ca89b7fe6d040b8576fa7646bfe84b) )
 	ROM_RELOAD     (                0x400000, 0x200000 )
 	ROM_LOAD16_BYTE( "d83_03.ic18", 0x800000, 0x200000, CRC(1b2d9ec3) SHA1(ead6b5542ad3987ef0f9ea01ce7f960abc9119b3) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "eeprom-cbombers.bin", 0x0000, 0x0080, CRC(9f7368f4) SHA1(4bb28e6eb3a72a06341199f0d744ed0ce13bce2c) )
 ROM_END
 
 

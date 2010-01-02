@@ -267,7 +267,7 @@ struct _drcbe_state
 	const device_config *	device;					/* CPU device we are associated with */
 	drcuml_state *			drcuml;					/* pointer back to our owner */
 	drccache *				cache;					/* pointer to the cache */
-	drcuml_machine_state 	state;					/* state of the machine */
+	drcuml_machine_state	state;					/* state of the machine */
 	drchash_state *			hash;					/* hash table state */
 	drcmap_state *			map;					/* code map */
 	drclabel_list *			labels;                 /* label list */
@@ -695,7 +695,7 @@ static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, const 
 		0xffc0, 	/* DRCUML_FMOD_TRUNC */
 		0x9fc0, 	/* DRCUML_FMOD_ROUND */
 		0xdfc0, 	/* DRCUML_FMOD_CEIL */
-		0xbfc0	 	/* DRCUML_FMOD_FLOOR */
+		0xbfc0		/* DRCUML_FMOD_FLOOR */
 	};
 	drcbe_state *drcbe;
 	int opnum, entry;
@@ -1246,6 +1246,29 @@ static void emit_mov_r32_p32(drcbe_state *drcbe, x86code **dst, UINT8 reg, const
 		if (reg != param->value)
 			emit_mov_r32_r32(dst, reg, param->value);									// mov   reg,param
 	}
+}
+
+
+/*-------------------------------------------------
+    emit_movsx_r64_p32 - move a 32-bit parameter
+    sign-extended into a register
+-------------------------------------------------*/
+
+static void emit_movsx_r64_p32(drcbe_state *drcbe, x86code **dst, UINT8 reg, const drcuml_parameter *param)
+{
+	if (param->type == DRCUML_PTYPE_IMMEDIATE)
+	{
+		if (param->value == 0)
+			emit_xor_r32_r32(dst, reg, reg);											// xor   reg,reg
+		else if ((INT32)param->value >= 0)
+			emit_mov_r32_imm(dst, reg, param->value);									// mov   reg,param
+		else
+			emit_mov_r64_imm(dst, reg, (INT32)param->value);							// mov   reg,param
+	}
+	else if (param->type == DRCUML_PTYPE_MEMORY)
+		emit_movsxd_r64_m32(dst, reg, MABS(drcbe, param->value));						// movsxd reg,[param]
+	else if (param->type == DRCUML_PTYPE_INT_REGISTER)
+		emit_movsxd_r64_r32(dst, reg, param->value);									// movsdx reg,param
 }
 
 
@@ -3679,6 +3702,7 @@ static x86code *op_getflgs(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 static x86code *op_save(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
 	drcuml_parameter dstp;
+	int regoffs;
 	int regnum;
 
 	/* validate instruction */
@@ -3707,26 +3731,28 @@ static x86code *op_save(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	emit_mov_m32_r32(&dst, MBD(REG_RCX, offsetof(drcuml_machine_state, exp)), REG_EAX);	// mov    state->exp,eax
 
 	/* copy integer registers */
+	regoffs = offsetof(drcuml_machine_state, r);
 	for (regnum = 0; regnum < ARRAY_LENGTH(drcbe->state.r); regnum++)
 	{
 		if (int_register_map[regnum] != 0)
-			emit_mov_m64_r64(&dst, MBD(REG_RCX, offsetof(drcuml_machine_state, r[regnum].d)), int_register_map[regnum]);
+			emit_mov_m64_r64(&dst, MBD(REG_RCX, regoffs + 8 * regnum), int_register_map[regnum]);
 		else
 		{
 			emit_mov_r64_m64(&dst, REG_RAX, MABS(drcbe, &drcbe->state.r[regnum].d));
-			emit_mov_m64_r64(&dst, MBD(REG_RCX, offsetof(drcuml_machine_state, r[regnum].d)), REG_RAX);
+			emit_mov_m64_r64(&dst, MBD(REG_RCX, regoffs + 8 * regnum), REG_RAX);
 		}
 	}
 
 	/* copy FP registers */
+	regoffs = offsetof(drcuml_machine_state, f);
 	for (regnum = 0; regnum < ARRAY_LENGTH(drcbe->state.f); regnum++)
 	{
 		if (float_register_map[regnum] != 0)
-			emit_movsd_m64_r128(&dst, MBD(REG_RCX, offsetof(drcuml_machine_state, f[regnum].d)), float_register_map[regnum]);
+			emit_movsd_m64_r128(&dst, MBD(REG_RCX, regoffs + 8 * regnum), float_register_map[regnum]);
 		else
 		{
 			emit_mov_r64_m64(&dst, REG_RAX, MABS(drcbe, &drcbe->state.f[regnum].d));
-			emit_mov_m64_r64(&dst, MBD(REG_RCX, offsetof(drcuml_machine_state, f[regnum].d)), REG_RAX);
+			emit_mov_m64_r64(&dst, MBD(REG_RCX, regoffs + 8 * regnum), REG_RAX);
 		}
 	}
 
@@ -3741,6 +3767,7 @@ static x86code *op_save(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 static x86code *op_restore(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
 	drcuml_parameter dstp;
+	int regoffs;
 	int regnum;
 
 	/* validate instruction */
@@ -3754,25 +3781,27 @@ static x86code *op_restore(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 	emit_mov_r64_imm(&dst, REG_ECX, dstp.value);										// mov    rcx,dstp
 
 	/* copy integer registers */
+	regoffs = offsetof(drcuml_machine_state, r);
 	for (regnum = 0; regnum < ARRAY_LENGTH(drcbe->state.r); regnum++)
 	{
 		if (int_register_map[regnum] != 0)
-			emit_mov_r64_m64(&dst, int_register_map[regnum], MBD(REG_RCX, offsetof(drcuml_machine_state, r[regnum].d)));
+			emit_mov_r64_m64(&dst, int_register_map[regnum], MBD(REG_RCX, regoffs + 8 * regnum));
 		else
 		{
-			emit_mov_r64_m64(&dst, REG_RAX, MBD(REG_RCX, offsetof(drcuml_machine_state, r[regnum].d)));
+			emit_mov_r64_m64(&dst, REG_RAX, MBD(REG_RCX, regoffs + 8 * regnum));
 			emit_mov_m64_r64(&dst, MABS(drcbe, &drcbe->state.r[regnum].d), REG_RAX);
 		}
 	}
 
 	/* copy FP registers */
+	regoffs = offsetof(drcuml_machine_state, f);
 	for (regnum = 0; regnum < ARRAY_LENGTH(drcbe->state.f); regnum++)
 	{
 		if (float_register_map[regnum] != 0)
-			emit_movsd_r128_m64(&dst, float_register_map[regnum], MBD(REG_RCX, offsetof(drcuml_machine_state, f[regnum].d)));
+			emit_movsd_r128_m64(&dst, float_register_map[regnum], MBD(REG_RCX, regoffs + 8 * regnum));
 		else
 		{
-			emit_mov_r64_m64(&dst, REG_RAX, MBD(REG_RCX, offsetof(drcuml_machine_state, f[regnum].d)));
+			emit_mov_r64_m64(&dst, REG_RAX, MBD(REG_RCX, regoffs + 8 * regnum));
 			emit_mov_m64_r64(&dst, MABS(drcbe, &drcbe->state.f[regnum].d), REG_RAX);
 		}
 	}
@@ -3843,7 +3872,7 @@ static x86code *op_load(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	else
 	{
 		int indreg = param_select_register(REG_ECX, &indp, NULL);
-		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);
+		emit_movsx_r64_p32(drcbe, &dst, indreg, &indp);
 		if (size == DRCUML_SIZE_BYTE)
 			emit_movzx_r32_m8(&dst, dstreg, MBISD(basereg, indreg, scale, baseoffs));	// movzx dstreg,[basep + scale*indp]
 		else if (size == DRCUML_SIZE_WORD)
@@ -3919,7 +3948,7 @@ static x86code *op_loads(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	else
 	{
 		int indreg = param_select_register(REG_ECX, &indp, NULL);
-		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);
+		emit_movsx_r64_p32(drcbe, &dst, indreg, &indp);
 		if (inst->size == 4)
 		{
 			if (size == DRCUML_SIZE_BYTE)
@@ -4025,7 +4054,7 @@ static x86code *op_store(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	else
 	{
 		int indreg = param_select_register(REG_ECX, &indp, NULL);
-		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);									// mov   indreg,indp
+		emit_movsx_r64_p32(drcbe, &dst, indreg, &indp);									// mov   indreg,indp
 
 		/* immediate source */
 		if (srcp.type == DRCUML_PTYPE_IMMEDIATE)

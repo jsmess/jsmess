@@ -18,8 +18,8 @@
 #define SWIMMER_BG_SPLIT	(0x18 * 8)
 #define YAMATO_SKY_PEN_BASE	(0x60)
 
-static tilemap *pf_tilemap;
-static tilemap *bs_tilemap;
+static tilemap_t *pf_tilemap;
+static tilemap_t *bs_tilemap;
 
 UINT8 *cclimber_videoram;
 UINT8 *cclimber_colorram;
@@ -36,7 +36,7 @@ UINT8 *swimmer_palettebank;
 
 UINT8 *toprollr_bg_videoram;
 UINT8 *toprollr_bg_coloram;
-static tilemap *toproller_bg_tilemap;
+static tilemap_t *toproller_bg_tilemap;
 
 
 /***************************************************************************
@@ -743,7 +743,7 @@ VIDEO_UPDATE( toprollr )
 
 	tilemap_set_scrollx(toproller_bg_tilemap, 0, toprollr_bg_videoram[0]);
 	tilemap_set_flip(toproller_bg_tilemap, (CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |
-								 		   (CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
+										   (CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
 	tilemap_mark_all_tiles_dirty(toproller_bg_tilemap);
 	tilemap_draw(bitmap, &scroll_area_clip, toproller_bg_tilemap, 0, 0);
 

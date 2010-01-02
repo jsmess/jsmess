@@ -174,7 +174,7 @@ static INT16 calc_compute_x(void)
 	else if ((hit.x1p >= hit.x2p) && (hit.x1p < (hit.x2p + hit.x2s)))	// x1p inside x2
 		x_coll = (hit.x2s - (hit.x1p - hit.x2p));
 	else																// normal/no overlap
-	 	x_coll = ((hit.x1s + hit.x2s)/2) - abs((hit.x1p + hit.x1s/2) - (hit.x2p + hit.x2s/2));
+		x_coll = ((hit.x1s + hit.x2s)/2) - abs((hit.x1p + hit.x1s/2) - (hit.x2p + hit.x2s/2));
 
 	return x_coll;
 }
@@ -1670,7 +1670,7 @@ static const INT16 calc3_keydata[0x40*0x100] = {
   -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
   -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
   -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
- };
+};
 
 // global so we can use them in the filename when we save out the data (debug..)
 static UINT8 calc3_decryption_key_byte;
@@ -1814,14 +1814,11 @@ static int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* d
 					//printf("save to eeprom\n");
 
 					{
-						UINT32 length, size;
-						UINT8 *dat;
-
-						dat = (UINT8 *)eeprom_get_data_pointer(&length, &size);
+						const address_space *eeprom_space = cputag_get_address_space(space->machine, "eeprom", ADDRESS_SPACE_0);
 
 						for (i=0;i<0x80;i++)
 						{
-							dat[i] = memory_read_byte(space, calc3_eeprom_addr+0x200000+i);
+							memory_write_byte(eeprom_space, i, memory_read_byte(space, calc3_eeprom_addr+0x200000+i));
 						}
 
 					}
@@ -2121,7 +2118,7 @@ void calc3_mcu_run(running_machine *machine)
 	if (mcu_command == 0) return;
 
 	logerror("%s : MCU executed command at %04X: %04X\n",
-	 	cpuexec_describe_context(machine),calc3_mcu_command_offset,mcu_command);
+		cpuexec_describe_context(machine),calc3_mcu_command_offset,mcu_command);
 
 
 	if (mcu_command>0)
@@ -2164,14 +2161,11 @@ void calc3_mcu_run(running_machine *machine)
             */
 
 			{
-				UINT32 length, size;
-				UINT8 *dat;
-
-				dat = (UINT8 *)eeprom_get_data_pointer(&length, &size);
+				const address_space *eeprom_space = cputag_get_address_space(space->machine, "eeprom", ADDRESS_SPACE_0);
 
 				for (i=0;i<0x80;i++)
 				{
-					memory_write_byte(space, calc3_eeprom_addr+0x200000+i, dat[i]);
+					memory_write_byte(space, calc3_eeprom_addr+0x200000+i, memory_read_byte(eeprom_space, i));
 				}
 
 			}

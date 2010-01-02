@@ -56,7 +56,7 @@ WRITE16_HANDLER( dai2kaku_flipscreen_w )
 
 ***************************************************************************/
 
-static tilemap	*tilemap_0,*tilemap_1,	// Backgrounds
+static tilemap_t	*tilemap_0,*tilemap_1,	// Backgrounds
 						*tilemap_2;				// Text
 
 
@@ -504,12 +504,14 @@ VIDEO_UPDATE(realbrk)
 
 #ifdef MAME_DEBUG
 if ( input_code_pressed(screen->machine, KEYCODE_Z) )
-{	int msk = 0;
+{
+	int msk = 0;
 	if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
 	if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
 	if (input_code_pressed(screen->machine, KEYCODE_E))	msk |= 4;
 	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 8;
-	if (msk != 0) layers_ctrl &= msk;	}
+	if (msk != 0) layers_ctrl &= msk;
+}
 #endif
 
 	if (disable_video)
@@ -572,12 +574,14 @@ VIDEO_UPDATE(dai2kaku)
 
 #ifdef MAME_DEBUG
 if ( input_code_pressed(screen->machine, KEYCODE_Z) )
-{	int msk = 0;
+{
+	int msk = 0;
 	if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
 	if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
 	if (input_code_pressed(screen->machine, KEYCODE_E))	msk |= 4;
 	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 8;
-	if (msk != 0) layers_ctrl &= msk;	}
+	if (msk != 0) layers_ctrl &= msk;
+}
 #endif
 
 	if (disable_video)

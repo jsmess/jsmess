@@ -2,7 +2,7 @@
 
 #include "driver.h"
 
-static tilemap *bsb_tilemap, *bsb_tilemap2, *bsb_tilemap3;
+static tilemap_t *bsb_tilemap, *bsb_tilemap2, *bsb_tilemap3;
 
 extern UINT16 *bsb_videoram, *bsb_videoram2, *bsb_videoram3;
 extern UINT16 *bsb_vidreg1, *bsb_vidreg2;
@@ -67,7 +67,7 @@ static TILE_GET_INFO( get_bsb_tile_info )
 	int tileno,col;
 
 	tileno = bsb_videoram[tile_index] & 0x0fff;
-	col= 	bsb_videoram[tile_index] & 0xf000;
+	col=	bsb_videoram[tile_index] & 0xf000;
 
 	SET_TILE_INFO(0,tileno,col>>12,0);
 }
@@ -83,7 +83,7 @@ static TILE_GET_INFO( get_bsb_tile2_info )
 	int tileno,col;
 
 	tileno = bsb_videoram2[tile_index] & 0x0fff;
-	col= 	bsb_videoram2[tile_index] & 0xf000;
+	col=	bsb_videoram2[tile_index] & 0xf000;
 
 	SET_TILE_INFO(1,tileno,col>>12,0);
 }
@@ -100,7 +100,7 @@ static TILE_GET_INFO( get_bsb_tile3_info )
 	int tileno,col;
 
 	tileno = bsb_videoram3[tile_index] & 0x0fff;
-	col= 	bsb_videoram3[tile_index] & 0xf000;
+	col=	bsb_videoram3[tile_index] & 0xf000;
 
 	SET_TILE_INFO(1,tileno+0x2000,(col>>12)+(0x100/16),0);
 }

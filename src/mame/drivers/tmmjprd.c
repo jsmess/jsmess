@@ -460,7 +460,7 @@ static WRITE32_HANDLER( tmmjprd_blitter_w )
 
 static UINT8 mux_data;
 
-static WRITE32_HANDLER( tmmjprd_eeprom_write )
+static WRITE32_DEVICE_HANDLER( tmmjprd_eeprom_write )
 {
 	// don't disturb the EEPROM if we're not actually writing to it
 	// (in particular, data & 0x100 here with mask = ffff00ff looks to be the watchdog)
@@ -470,13 +470,13 @@ static WRITE32_HANDLER( tmmjprd_eeprom_write )
 	if (mem_mask == 0xff000000)
 	{
 		// latch the bit
-		eeprom_write_bit(data & 0x01000000);
+		eeprom_write_bit(device, data & 0x01000000);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x04000000) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line(device, (data & 0x04000000) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line(device, (data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -507,7 +507,7 @@ static INPUT_PORTS_START( tmmjprd )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Right Screen Coin B") // might actually be service 1
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	// CHECK!
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)	// CHECK!
 
 	PORT_START("PL1_1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(1)
@@ -650,7 +650,7 @@ static ADDRESS_MAP_START( tmmjprd_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x200160, 0x200177) AM_WRITEONLY AM_BASE( &tmmjprd_tilemap_regs[3] ) // tilemap regs4
 	AM_RANGE(0x200200, 0x20021b) AM_WRITEONLY AM_BASE( &tmmjprd_spriteregs ) // sprregs?
 //  AM_RANGE(0x200300, 0x200303) AM_WRITE(tmmjprd_rombank_w) // used during rom testing, rombank/area select + something else?
-  	AM_RANGE(0x20040c, 0x20040f) AM_WRITE(tmmjprd_brt_1_w)
+	AM_RANGE(0x20040c, 0x20040f) AM_WRITE(tmmjprd_brt_1_w)
     AM_RANGE(0x200410, 0x200413) AM_WRITE(tmmjprd_brt_2_w)
 //  AM_RANGE(0x200500, 0x200503) AM_WRITEONLY AM_BASE( &tmmjprd_viewregs7 )
 //  AM_RANGE(0x200700, 0x20070f) AM_WRITE(tmmjprd_blitter_w) AM_BASE( &tmmjprd_blitterregs )
@@ -667,7 +667,7 @@ static ADDRESS_MAP_START( tmmjprd_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x290000, 0x29bfff) AM_RAM AM_BASE(&tmmjprd_spriteram)
 	AM_RANGE(0x29c000, 0x29ffff) AM_RAM_WRITE(tmmjprd_paletteram_dword_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x400000, 0x400003) AM_READ(tmmjprd_mux_r) AM_WRITE(tmmjprd_eeprom_write)
+	AM_RANGE(0x400000, 0x400003) AM_READ(tmmjprd_mux_r) AM_DEVWRITE("eeprom", tmmjprd_eeprom_write)
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -718,7 +718,7 @@ static MACHINE_DRIVER_START( tmmjprd )
 	MDRV_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
 	MDRV_CPU_PROGRAM_MAP(tmmjprd_map)
 	MDRV_CPU_VBLANK_INT_HACK(tmmjprd_interrupt,2)
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	MDRV_GFXDECODE(tmmjprd)
 
@@ -766,7 +766,7 @@ ROM_START( tmmjprd )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD32_BYTE( "p00.bin", 0x000000, 0x080000, CRC(a1efd960) SHA1(7f41ab58de32777bccbfe28e6e5a1f2dca35bb90) )
 	ROM_LOAD32_BYTE( "p01.bin", 0x000001, 0x080000, CRC(9c325374) SHA1(1ddf1c292fc1bcf4dcefb5d4aa3abdeb1489c020) )
- 	ROM_LOAD32_BYTE( "p02.bin", 0x000002, 0x080000, CRC(729a5f12) SHA1(615704d36afdceb4b1ff2e5dc34856e614181e16) )
+	ROM_LOAD32_BYTE( "p02.bin", 0x000002, 0x080000, CRC(729a5f12) SHA1(615704d36afdceb4b1ff2e5dc34856e614181e16) )
 	ROM_LOAD32_BYTE( "p03.bin", 0x000003, 0x080000, CRC(595615ab) SHA1(aca746d74aa6e7e856eb5c9b740d884778743b27) )
 
 	ROM_REGION( 0x2000000, "gfx1", 0 ) /* Sprite Roms */
@@ -777,7 +777,7 @@ ROM_START( tmmjprd )
 	ROM_LOAD32_WORD( "10.bin", 0x1800002, 0x400000, CRC(5ab6af41) SHA1(e29cee23c84e17dd8dabd2ec71e622c25418646e) )
 	ROM_LOAD32_WORD( "11.bin", 0x0800002, 0x400000, CRC(1d1fd633) SHA1(655be5b72bb70a90d23e49512ca84d9978d87b0b) )
 	ROM_LOAD32_WORD( "12.bin", 0x1800000, 0x400000, CRC(5b8bb9d6) SHA1(ee93774077d8a2ddcf70869a9c2f4961219a85b4) )
- 	ROM_LOAD32_WORD( "13.bin", 0x0800000, 0x400000, CRC(d950df0a) SHA1(3b109341ab4ad87005113fb481b5d1ed9a82f50f) )
+	ROM_LOAD32_WORD( "13.bin", 0x0800000, 0x400000, CRC(d950df0a) SHA1(3b109341ab4ad87005113fb481b5d1ed9a82f50f) )
 
 	ROM_REGION( 0x2000000, "gfx2", 0 ) /* BG Roms */
 	ROM_LOAD32_WORD( "40.bin", 0x0000000, 0x400000, CRC(8bedc606) SHA1(7159c8b86e8d7d5ae202c239638483ccdc7dfc25) )
@@ -798,7 +798,7 @@ ROM_START( tmpdoki )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD32_BYTE( "u70_p0.bin", 0x000000, 0x080000, CRC(c0ee1942) SHA1(0cebc3e326d84e200c2399208d810c0ac767dbb4) )
 	ROM_LOAD32_BYTE( "u72_p1.bin", 0x000001, 0x080000, CRC(3c1bc6f6) SHA1(7b3719d4bb52e45db793564b0ccee067fd7af4e4) )
- 	ROM_LOAD32_BYTE( "u71_p2.bin", 0x000002, 0x080000, CRC(f2091cce) SHA1(88c6822eb1546e914c2644264367e71fb2a82be3) )
+	ROM_LOAD32_BYTE( "u71_p2.bin", 0x000002, 0x080000, CRC(f2091cce) SHA1(88c6822eb1546e914c2644264367e71fb2a82be3) )
 	ROM_LOAD32_BYTE( "u73_p3.bin", 0x000003, 0x080000, CRC(cca8ef13) SHA1(d5b077f3d8d38262e69d058a7d61e4563332abce) )
 
 	ROM_REGION( 0x2000000, "gfx1", 0 ) /* Sprite Roms */
@@ -809,7 +809,7 @@ ROM_START( tmpdoki )
 	ROM_LOAD32_WORD( "10.bin", 0x1800002, 0x400000, CRC(5ab6af41) SHA1(e29cee23c84e17dd8dabd2ec71e622c25418646e) )
 	ROM_LOAD32_WORD( "11.bin", 0x0800002, 0x400000, CRC(1d1fd633) SHA1(655be5b72bb70a90d23e49512ca84d9978d87b0b) )
 	ROM_LOAD32_WORD( "12.bin", 0x1800000, 0x400000, CRC(5b8bb9d6) SHA1(ee93774077d8a2ddcf70869a9c2f4961219a85b4) )
- 	ROM_LOAD32_WORD( "13.bin", 0x0800000, 0x400000, CRC(d950df0a) SHA1(3b109341ab4ad87005113fb481b5d1ed9a82f50f) )
+	ROM_LOAD32_WORD( "13.bin", 0x0800000, 0x400000, CRC(d950df0a) SHA1(3b109341ab4ad87005113fb481b5d1ed9a82f50f) )
 
 	ROM_REGION( 0x2000000, "gfx2", 0 ) /* BG Roms */
 	ROM_LOAD32_WORD( "40.bin", 0x0000000, 0x400000, CRC(8bedc606) SHA1(7159c8b86e8d7d5ae202c239638483ccdc7dfc25) )

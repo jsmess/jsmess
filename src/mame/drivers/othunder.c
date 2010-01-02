@@ -236,6 +236,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 #include "video/taitoic.h"
+#include "machine/taitoio.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
@@ -299,18 +300,6 @@ The eeprom unlock command is different, and the write/clock/reset
 bits are different.
 ******************************************************************/
 
-static const UINT8 default_eeprom[128]=
-{
-	0x00,0x00,0x00,0xff,0x00,0x01,0x41,0x41,0x00,0x00,0x00,0xff,0x00,0x00,0xf0,0xf0,
-	0x00,0x00,0x00,0xff,0x00,0x01,0x41,0x41,0x00,0x00,0x00,0xff,0x00,0x00,0xf0,0xf0,
-	0x00,0x80,0x00,0x80,0x00,0x80,0x00,0x80,0x00,0x01,0x40,0x00,0x00,0x00,0xf0,0x00,
-	0x00,0x01,0x42,0x85,0x00,0x00,0xf1,0xe3,0x00,0x01,0x40,0x00,0x00,0x00,0xf0,0x00,
-	0x00,0x01,0x42,0x85,0x00,0x00,0xf1,0xe3,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
-};
-
 static const eeprom_interface eeprom_intf =
 {
 	6,				/* address bits */
@@ -319,32 +308,13 @@ static const eeprom_interface eeprom_intf =
 	"0101",			/* write command */
 	"0111",			/* erase command */
 	"0100000000",	/* lock command */
-	"0100111111" 	/* unlock command */
+	"0100111111"	/* unlock command */
 };
 
-static NVRAM_HANDLER( othunder )
+static WRITE16_HANDLER( othunder_tc0220ioc_w )
 {
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
+	const device_config *device;
 
-		if (file)
-			eeprom_load(file);
-		else
-			eeprom_set_data(default_eeprom,128);  /* Default the gun setup values */
-	}
-}
-
-static int eeprom_r(void)
-{
-	return (eeprom_read_bit() & 0x01)<<7;
-}
-
-
-static WRITE16_HANDLER( othunder_TC0220IOC_w )
-{
 	if (ACCESSING_BITS_0_7)
 	{
 		switch (offset)
@@ -366,13 +336,15 @@ static WRITE16_HANDLER( othunder_TC0220IOC_w )
 if (data & 4)
 	popmessage("OBPRI SET!");
 
-				eeprom_write_bit(data & 0x40);
-				eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				device = devtag_get_device(space->machine, "eeprom");
+				eeprom_write_bit(device, data & 0x40);
+				eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_set_cs_line(device, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 				break;
 
 			default:
-				TC0220IOC_w(space,offset,data & 0xff);
+				device = devtag_get_device(space->machine, "tc0220ioc");
+				tc0220ioc_w(device, offset, data & 0xff);
 		}
 	}
 }
@@ -382,15 +354,19 @@ if (data & 4)
             GAME INPUTS
 **********************************************************/
 
-static READ16_HANDLER( othunder_TC0220IOC_r )
+static READ16_HANDLER( othunder_tc0220ioc_r )
 {
+	const device_config *device;
+
 	switch (offset)
 	{
 		case 0x03:
-			return eeprom_r();
+			device = devtag_get_device(space->machine, "eeprom");
+			return (eeprom_read_bit(device) & 1) << 7;
 
 		default:
-			return TC0220IOC_r( space, offset );
+			device = devtag_get_device(space->machine, "tc0220ioc");
+			return tc0220ioc_r(device, offset);
 	}
 }
 
@@ -499,12 +475,12 @@ static WRITE8_HANDLER( othunder_TC0310FAM_w )
 static ADDRESS_MAP_START( othunder_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x090000, 0x09000f) AM_READWRITE(othunder_TC0220IOC_r, othunder_TC0220IOC_w)
+	AM_RANGE(0x090000, 0x09000f) AM_READWRITE(othunder_tc0220ioc_r, othunder_tc0220ioc_w)
 //  AM_RANGE(0x090006, 0x090007) AM_WRITE(eeprom_w)
 //  AM_RANGE(0x09000c, 0x09000d) AM_WRITENOP   /* ?? (keeps writing 0x77) */
-	AM_RANGE(0x100000, 0x100007) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_rbswap_word_w)	/* palette */
-	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
-	AM_RANGE(0x220000, 0x22000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
+	AM_RANGE(0x100000, 0x100007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_rbswap_word_w)	/* palette */
+	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x220000, 0x22000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x300000, 0x300003) AM_READWRITE(othunder_sound_r, othunder_sound_w)
 	AM_RANGE(0x400000, 0x4005ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x500000, 0x500007) AM_READWRITE(othunder_lightgun_r, othunder_lightgun_w)
@@ -687,6 +663,27 @@ static const ym2610_interface ym2610_config =
                  MACHINE DRIVERS
 ***********************************************************/
 
+static const tc0100scn_interface othunder_tc0100scn_intf =
+{
+	"screen",
+	1, 2,		/* gfxnum, txnum */
+	4, 0,		/* x_offset, y_offset */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	0, 0
+};
+
+static const tc0110pcr_interface othunder_tc0110pcr_intf =
+{
+	0
+};
+
+static const tc0220ioc_interface othunder_io_intf =
+{
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+};
+
 static MACHINE_DRIVER_START( othunder )
 
 	/* basic machine hardware */
@@ -698,9 +695,12 @@ static MACHINE_DRIVER_START( othunder )
 	MDRV_CPU_ADD("audiocpu", Z80,16000000/4 )	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_map)
 
-	MDRV_NVRAM_HANDLER(othunder)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+
 	MDRV_MACHINE_START(othunder)
 	MDRV_MACHINE_RESET(othunder)
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", othunder_io_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -715,6 +715,9 @@ static MACHINE_DRIVER_START( othunder )
 
 	MDRV_VIDEO_START(othunder)
 	MDRV_VIDEO_UPDATE(othunder)
+
+	MDRV_TC0100SCN_ADD("tc0100scn", othunder_tc0100scn_intf)
+	MDRV_TC0110PCR_ADD("tc0110pcr", othunder_tc0110pcr_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -782,6 +785,9 @@ ROM_START( othunder )
 	ROM_LOAD( "pal16l8a-b67-11.ic36",  0x0200, 0x0104, CRC(3177fb06) SHA1(c128277fe03342d9ec8da3c6e08a404a3f010547) )
 	ROM_LOAD( "pal20l8b-b67-12.ic37",  0x0400, 0x0144, CRC(a47c2798) SHA1(8c963efd416b3f6586cb12afb9417dc95c2bc574) )
 	ROM_LOAD( "pal20l8b-b67-10.ic33",  0x0600, 0x0144, CRC(4ced09c7) SHA1(519e6152cc5e4cb3ec24c4dc09101dddf22988aa) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-othunder.bin", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
 ROM_START( othunderu )
@@ -818,6 +824,9 @@ ROM_START( othunderu )
 	ROM_LOAD( "pal16l8a-b67-11.ic36",  0x0200, 0x0104, CRC(3177fb06) SHA1(c128277fe03342d9ec8da3c6e08a404a3f010547) )
 	ROM_LOAD( "pal20l8b-b67-12.ic37",  0x0400, 0x0144, CRC(a47c2798) SHA1(8c963efd416b3f6586cb12afb9417dc95c2bc574) )
 	ROM_LOAD( "pal20l8b-b67-10.ic33",  0x0600, 0x0144, CRC(4ced09c7) SHA1(519e6152cc5e4cb3ec24c4dc09101dddf22988aa) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-othunder.bin", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
 ROM_START( othunderuo )
@@ -854,6 +863,9 @@ ROM_START( othunderuo )
 	ROM_LOAD( "pal16l8a-b67-11.ic36",  0x0200, 0x0104, CRC(3177fb06) SHA1(c128277fe03342d9ec8da3c6e08a404a3f010547) )
 	ROM_LOAD( "pal20l8b-b67-12.ic37",  0x0400, 0x0144, CRC(a47c2798) SHA1(8c963efd416b3f6586cb12afb9417dc95c2bc574) )
 	ROM_LOAD( "pal20l8b-b67-10.ic33",  0x0600, 0x0144, CRC(4ced09c7) SHA1(519e6152cc5e4cb3ec24c4dc09101dddf22988aa) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-othunder.bin", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
 ROM_START( othunderj )
@@ -890,6 +902,9 @@ ROM_START( othunderj )
 	ROM_LOAD( "pal16l8a-b67-11.ic36",  0x0200, 0x0104, CRC(3177fb06) SHA1(c128277fe03342d9ec8da3c6e08a404a3f010547) )
 	ROM_LOAD( "pal20l8b-b67-12.ic37",  0x0400, 0x0144, CRC(a47c2798) SHA1(8c963efd416b3f6586cb12afb9417dc95c2bc574) )
 	ROM_LOAD( "pal20l8b-b67-10.ic33",  0x0600, 0x0144, CRC(4ced09c7) SHA1(519e6152cc5e4cb3ec24c4dc09101dddf22988aa) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-othunder.bin", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
 

@@ -380,7 +380,7 @@ static MACHINE_DRIVER_START( pasha2 )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(pasha2)
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

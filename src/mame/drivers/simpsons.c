@@ -70,7 +70,7 @@ Custom ICs - 053260        - sound chip (QFP80)
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "cpu/z80/z80.h"
 #include "video/konicdev.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
 #include "includes/simpsons.h"
@@ -175,14 +175,14 @@ static INPUT_PORTS_START( simpsons )
 
 	PORT_START("TEST")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	// eeprom ack
 	PORT_BIT( 0xce, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( simpsn2p )
@@ -210,14 +210,14 @@ static INPUT_PORTS_START( simpsn2p )
 
 	PORT_START("TEST")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	// eeprom ack
 	PORT_BIT( 0xce, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
 INPUT_PORTS_END
 
 
@@ -319,7 +319,7 @@ static MACHINE_DRIVER_START( simpsons )
 
 	MDRV_MACHINE_RESET(simpsons)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -397,7 +397,7 @@ ROM_START( simpsons4pa ) /* World 4 Player, later? (by use of later leters) */
 
 	ROM_REGION( 0x28000, "audiocpu", 0 ) /* Z80 code + banks */
 	ROM_LOAD( "072-e03.6g", 0x00000, 0x08000, CRC(866b7a35) SHA1(98905764eb4c7d968ccc17618a1f24ee12e33c0e) )
-	ROM_CONTINUE(     	0x10000, 0x18000 )
+	ROM_CONTINUE(   	0x10000, 0x18000 )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
 	ROM_LOAD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) ) /* tiles */

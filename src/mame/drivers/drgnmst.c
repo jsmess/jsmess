@@ -356,15 +356,15 @@ static const gfx_layout drgnmst_char32x32_layout =
 	RGN_FRAC(1,2),
 	4,
 	{ 24,8, 16,0 },
-	{ 	RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+1,RGN_FRAC(1,2)+2,RGN_FRAC(1,2)+3,RGN_FRAC(1,2)+4,RGN_FRAC(1,2)+5,RGN_FRAC(1,2)+6,RGN_FRAC(1,2)+7,
+	{	RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+1,RGN_FRAC(1,2)+2,RGN_FRAC(1,2)+3,RGN_FRAC(1,2)+4,RGN_FRAC(1,2)+5,RGN_FRAC(1,2)+6,RGN_FRAC(1,2)+7,
 		0,1,2,3,4,5,6,7,
 	    RGN_FRAC(1,2)+32,RGN_FRAC(1,2)+33,RGN_FRAC(1,2)+34,RGN_FRAC(1,2)+35,RGN_FRAC(1,2)+36,RGN_FRAC(1,2)+37,RGN_FRAC(1,2)+38,RGN_FRAC(1,2)+39,
 		32,33,34,35,36,37,38,39 },
 
 	{	 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
 		 8*64, 9*64,10*64,11*64,12*64,13*64,14*64,15*64,
-	 	16*64,17*64,18*64,19*64,20*64,21*64,22*64,23*64,
-	 	24*64,25*64,26*64,27*64,28*64,29*64,30*64,31*64 },
+		16*64,17*64,18*64,19*64,20*64,21*64,22*64,23*64,
+		24*64,25*64,26*64,27*64,28*64,29*64,30*64,31*64 },
 	32*64
 };
 
@@ -531,7 +531,7 @@ static DRIVER_INIT( drgnmst )
 		if ((drgnmst_PICROM_HEX[src_pos + 0] == ':') &&
 			(drgnmst_PICROM_HEX[src_pos + 1] == '1') &&
 			(drgnmst_PICROM_HEX[src_pos + 2] == '0'))
-			{
+		{
 			src_pos += 9;
 
 			for (offs = 0; offs < 32; offs += 4)
@@ -559,7 +559,7 @@ static DRIVER_INIT( drgnmst )
 			(drgnmst_PICROM_HEX[src_pos + 1] == '0') &&
 			(drgnmst_PICROM_HEX[src_pos + 2] == '2') &&
 			(drgnmst_PICROM_HEX[src_pos + 3] == '1'))
-			{
+		{
 			src_pos += 9;
 
 			data_hi = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + 0]));

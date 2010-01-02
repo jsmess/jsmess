@@ -72,19 +72,6 @@ static WRITE16_HANDLER( stoneage_sound_w )
 
 static TIMER_DEVICE_CALLBACK( interrupt_gen )
 {
-	int scanline = param;
-
-	/* Save state of scroll registers before the IRQ */
-	deco16_raster_display_list[deco16_raster_display_position++] = scanline;
-	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf12_control[1] & 0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf12_control[2] & 0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf12_control[3] & 0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf12_control[4] & 0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf34_control[1] & 0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf34_control[2] & 0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf34_control[3] & 0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf34_control[4] & 0xffff;
-
 	cputag_set_input_line(timer->machine, "maincpu", (cninja_irq_mask&0x10) ? 3 : 4, ASSERT_LINE);
 	timer_device_adjust_oneshot(raster_irq_timer, attotime_never, 0);
 }
@@ -122,7 +109,9 @@ static WRITE16_HANDLER( cninja_irq_w )
 	case 1: /* Raster IRQ scanline position, only valid for values between 1 & 239 (0 and 240-256 do NOT generate IRQ's) */
 		cninja_scanline=data&0xff;
 		if ((cninja_irq_mask&0x2)==0 && cninja_scanline>0 && cninja_scanline<240)
+		{
 			timer_device_adjust_oneshot(raster_irq_timer, video_screen_get_time_until_pos(space->machine->primary_screen, cninja_scanline, 0), cninja_scanline);
+		}
 		else
 			timer_device_adjust_oneshot(raster_irq_timer,attotime_never,0);
 		return;
@@ -136,7 +125,7 @@ static WRITE16_HANDLER( cninja_irq_w )
 
 static READ16_HANDLER( robocop2_prot_r )
 {
- 	switch (offset<<1) {
+	switch (offset<<1) {
 		case 0x41a: /* Player 1 & 2 input ports */
 			return input_port_read(space->machine, "IN0");
 		case 0x320: /* Coins */
@@ -153,16 +142,30 @@ static READ16_HANDLER( robocop2_prot_r )
 
 /**********************************************************************************/
 
+static WRITE16_HANDLER( deco16_pf12_control_w )
+{
+	COMBINE_DATA(&deco16_pf12_control[offset]);
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+}
+
+
+static WRITE16_HANDLER( deco16_pf34_control_w )
+{
+	COMBINE_DATA(&deco16_pf34_control[offset]);
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+}
+
+
 static ADDRESS_MAP_START( cninja_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 
-	AM_RANGE(0x140000, 0x14000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x140000, 0x14000f) AM_WRITE(deco16_pf12_control_w) AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x144000, 0x144fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
 	AM_RANGE(0x146000, 0x146fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
 	AM_RANGE(0x14c000, 0x14c7ff) AM_WRITEONLY AM_BASE(&deco16_pf1_rowscroll)
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
 
-	AM_RANGE(0x150000, 0x15000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
+	AM_RANGE(0x150000, 0x15000f) AM_WRITE(deco16_pf34_control_w) AM_BASE(&deco16_pf34_control)
 	AM_RANGE(0x154000, 0x154fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
 	AM_RANGE(0x156000, 0x156fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
@@ -174,8 +177,8 @@ static ADDRESS_MAP_START( cninja_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x1a4000, 0x1a47ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) 				/* Sprites */
 	AM_RANGE(0x1b4000, 0x1b4001) AM_WRITE(buffer_spriteram16_w) /* DMA flag */
-	AM_RANGE(0x1bc000, 0x1bc0ff) AM_WRITE(deco16_104_cninja_prot_w) AM_BASE(&deco16_prot_ram) 		/* Protection writes */
-	AM_RANGE(0x1bc000, 0x1bcfff) AM_READ(deco16_104_cninja_prot_r) AM_BASE(&deco16_prot_ram) 		/* Protection device */
+	AM_RANGE(0x1bc000, 0x1bc0ff) AM_WRITE(deco16_104_cninja_prot_w) AM_BASE(&deco16_prot_ram)		/* Protection writes */
+	AM_RANGE(0x1bc000, 0x1bcfff) AM_READ(deco16_104_cninja_prot_r) AM_BASE(&deco16_prot_ram)		/* Protection device */
 
 	AM_RANGE(0x308000, 0x308fff) AM_WRITENOP /* Bootleg only */
 ADDRESS_MAP_END
@@ -190,13 +193,13 @@ static ADDRESS_MAP_START( cninjabl_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x138000, 0x1387ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* bootleg sprite-ram (sprites rewritten here in new format) */
 
-	AM_RANGE(0x140000, 0x14000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x140000, 0x14000f) AM_WRITE(deco16_pf12_control_w) AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x144000, 0x144fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
 	AM_RANGE(0x146000, 0x146fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
 	AM_RANGE(0x14c000, 0x14c7ff) AM_WRITEONLY AM_BASE(&deco16_pf1_rowscroll)
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
 
-	AM_RANGE(0x150000, 0x15000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control) // not used / incorrect on this
+	AM_RANGE(0x150000, 0x15000f) AM_WRITE(deco16_pf34_control_w) AM_BASE(&deco16_pf34_control) // not used / incorrect on this
 	AM_RANGE(0x154000, 0x154fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
 	AM_RANGE(0x156000, 0x156fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
@@ -218,13 +221,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( edrandy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
-	AM_RANGE(0x140000, 0x14000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x140000, 0x14000f) AM_WRITE(deco16_pf12_control_w) AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x144000, 0x144fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
 	AM_RANGE(0x146000, 0x146fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
 	AM_RANGE(0x14c000, 0x14c7ff) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
 
-	AM_RANGE(0x150000, 0x15000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
+	AM_RANGE(0x150000, 0x15000f) AM_WRITE(deco16_pf34_control_w) AM_BASE(&deco16_pf34_control)
 	AM_RANGE(0x154000, 0x154fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
 	AM_RANGE(0x156000, 0x156fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
@@ -242,16 +245,17 @@ static ADDRESS_MAP_START( edrandy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1bc800, 0x1bcfff) AM_WRITENOP /* Another bug in game code?  Sprite list can overrun.  Doesn't seem to mirror */
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START( robocop2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
-	AM_RANGE(0x140000, 0x14000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x140000, 0x14000f) AM_WRITE(deco16_pf12_control_w) AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x144000, 0x144fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
 	AM_RANGE(0x146000, 0x146fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
 	AM_RANGE(0x14c000, 0x14c7ff) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
 
-	AM_RANGE(0x150000, 0x15000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
+	AM_RANGE(0x150000, 0x15000f) AM_WRITE(deco16_pf34_control_w) AM_BASE(&deco16_pf34_control)
 	AM_RANGE(0x154000, 0x154fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
 	AM_RANGE(0x156000, 0x156fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
@@ -281,13 +285,13 @@ static ADDRESS_MAP_START( mutantf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READWRITE(deco16_71_r, buffer_spriteram16_w)
 	AM_RANGE(0x1e0000, 0x1e0001) AM_WRITE(buffer_spriteram16_2_w)
 
-	AM_RANGE(0x300000, 0x30000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x300000, 0x30000f) AM_WRITE(deco16_pf12_control_w) AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x304000, 0x305fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
 	AM_RANGE(0x306000, 0x307fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
 	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
 	AM_RANGE(0x30a000, 0x30a7ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
 
-	AM_RANGE(0x310000, 0x31000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
+	AM_RANGE(0x310000, 0x31000f) AM_WRITE(deco16_pf34_control_w) AM_BASE(&deco16_pf34_control)
 	AM_RANGE(0x314000, 0x315fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
 	AM_RANGE(0x316000, 0x317fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
 	AM_RANGE(0x318000, 0x3187ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
@@ -770,7 +774,6 @@ static MACHINE_DRIVER_START( cninja )
 
 	MDRV_VIDEO_START(cninja)
 	MDRV_VIDEO_UPDATE(cninja)
-	MDRV_VIDEO_EOF(cninja)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -820,7 +823,6 @@ static MACHINE_DRIVER_START( stoneage )
 
 	MDRV_VIDEO_START(stoneage)
 	MDRV_VIDEO_UPDATE(cninja)
-	MDRV_VIDEO_EOF(cninja)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -866,9 +868,8 @@ static MACHINE_DRIVER_START( cninjabl )
 	MDRV_GFXDECODE(cninjabl)
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(stoneage)
-	MDRV_VIDEO_UPDATE(cninja)
-	MDRV_VIDEO_EOF(cninja)
+	MDRV_VIDEO_START(cninja)
+	MDRV_VIDEO_UPDATE(cninjabl)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -912,7 +913,6 @@ static MACHINE_DRIVER_START( edrandy )
 
 	MDRV_VIDEO_START(edrandy)
 	MDRV_VIDEO_UPDATE(edrandy)
-	MDRV_VIDEO_EOF(cninja)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -962,7 +962,6 @@ static MACHINE_DRIVER_START( robocop2 )
 
 	MDRV_VIDEO_START(robocop2)
 	MDRV_VIDEO_UPDATE(robocop2)
-	MDRV_VIDEO_EOF(cninja)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1272,10 +1271,10 @@ ROM_END
 
 ROM_START( edrandy ) /* World ver 3 */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
-  	ROM_LOAD16_BYTE( "gg-00-2.k1", 0x00000, 0x20000, CRC(ce1ba964) SHA1(da21734721344eff41a64a7f2382d5c027a24782) )
+	ROM_LOAD16_BYTE( "gg-00-2.k1", 0x00000, 0x20000, CRC(ce1ba964) SHA1(da21734721344eff41a64a7f2382d5c027a24782) )
 	ROM_LOAD16_BYTE( "gg-04-2.k3", 0x00001, 0x20000, CRC(24caed19) SHA1(bdca689dbb13685e71d3385a9ff7b356d2459d45) )
 	ROM_LOAD16_BYTE( "gg-01-2.j1", 0x40000, 0x20000, CRC(33677b80) SHA1(d16b926053a61723d321a50f5cabf3e5faebadcf) )
- 	ROM_LOAD16_BYTE( "gg-05-2.j3", 0x40001, 0x20000, CRC(79a68ca6) SHA1(b1ec168ffe7aace481055a8f38d88ed71994191d) )
+	ROM_LOAD16_BYTE( "gg-05-2.j3", 0x40001, 0x20000, CRC(79a68ca6) SHA1(b1ec168ffe7aace481055a8f38d88ed71994191d) )
 	ROM_LOAD16_BYTE( "ge-02.h1",   0x80000, 0x20000, CRC(c2969fbb) SHA1(faa7da7f5271108dbbc95d111caa2c986e494933) )
 	ROM_LOAD16_BYTE( "ge-06.h3",   0x80001, 0x20000, CRC(5c2e6418) SHA1(b9ed769b27c37959fcba2acd6dba02ccd62149e7) )
 	ROM_LOAD16_BYTE( "ge-03.f1",   0xc0000, 0x20000, CRC(5e7b19a8) SHA1(637945e36c3665c74d31f4b14e600e93ed9be054) )
@@ -1285,7 +1284,7 @@ ROM_START( edrandy ) /* World ver 3 */
 	ROM_LOAD( "ge-09.k13",    0x00000, 0x10000, CRC(9f94c60b) SHA1(56edf63850189b2168c602e1f21492ef14662682) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
- 	ROM_LOAD16_BYTE( "gg-10.y6",    0x000001, 0x10000, CRC(b96c6cbe) SHA1(1f3a18387f360705d2f2ab8f5780a270621e107f) )
+	ROM_LOAD16_BYTE( "gg-10.y6",    0x000001, 0x10000, CRC(b96c6cbe) SHA1(1f3a18387f360705d2f2ab8f5780a270621e107f) )
 	ROM_LOAD16_BYTE( "gg-11.z6",    0x000000, 0x10000, CRC(ee567448) SHA1(40c673535b9edf7b8bbb4912235bbb09ef77e221) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
@@ -1321,10 +1320,10 @@ ROM_END
 
 ROM_START( edrandy2 ) /* World ver 2 */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
-  	ROM_LOAD16_BYTE( "gg00-1.k1", 0x00000, 0x20000, CRC(a029cc4a) SHA1(3801fd6df6d1299972eeadbdbba1b0b7acf89139) )
-  	ROM_LOAD16_BYTE( "gg04-1.k3", 0x00001, 0x20000, CRC(8b7928a4) SHA1(4075713a830c9d5e324bb790468ec555fa747106) )
+	ROM_LOAD16_BYTE( "gg00-1.k1", 0x00000, 0x20000, CRC(a029cc4a) SHA1(3801fd6df6d1299972eeadbdbba1b0b7acf89139) )
+	ROM_LOAD16_BYTE( "gg04-1.k3", 0x00001, 0x20000, CRC(8b7928a4) SHA1(4075713a830c9d5e324bb790468ec555fa747106) )
 	ROM_LOAD16_BYTE( "gg01-1.j1", 0x40000, 0x20000, CRC(84360123) SHA1(3e9241cf68839c15d7a1209fe735b51ed90a1de7) )
- 	ROM_LOAD16_BYTE( "gg05-1.j3", 0x40001, 0x20000, CRC(0bf85d9d) SHA1(7b7c1c32d3f0de7e675cea3d2ba4f28e9ce387a9) )
+	ROM_LOAD16_BYTE( "gg05-1.j3", 0x40001, 0x20000, CRC(0bf85d9d) SHA1(7b7c1c32d3f0de7e675cea3d2ba4f28e9ce387a9) )
 	ROM_LOAD16_BYTE( "ge-02.h1",  0x80000, 0x20000, CRC(c2969fbb) SHA1(faa7da7f5271108dbbc95d111caa2c986e494933) )
 	ROM_LOAD16_BYTE( "ge-06.h3",  0x80001, 0x20000, CRC(5c2e6418) SHA1(b9ed769b27c37959fcba2acd6dba02ccd62149e7) )
 	ROM_LOAD16_BYTE( "ge-03.f1",  0xc0000, 0x20000, CRC(5e7b19a8) SHA1(637945e36c3665c74d31f4b14e600e93ed9be054) )
@@ -1334,7 +1333,7 @@ ROM_START( edrandy2 ) /* World ver 2 */
 	ROM_LOAD( "ge-09.k13",    0x00000, 0x10000, CRC(9f94c60b) SHA1(56edf63850189b2168c602e1f21492ef14662682) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
- 	ROM_LOAD16_BYTE( "gg-10.y6",    0x000001, 0x10000, CRC(b96c6cbe) SHA1(1f3a18387f360705d2f2ab8f5780a270621e107f) )
+	ROM_LOAD16_BYTE( "gg-10.y6",    0x000001, 0x10000, CRC(b96c6cbe) SHA1(1f3a18387f360705d2f2ab8f5780a270621e107f) )
 	ROM_LOAD16_BYTE( "gg-11.z6",    0x000000, 0x10000, CRC(ee567448) SHA1(40c673535b9edf7b8bbb4912235bbb09ef77e221) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
@@ -1370,10 +1369,10 @@ ROM_END
 
 ROM_START( edrandy1 ) /* World ver 1 */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
-  	ROM_LOAD16_BYTE( "1.k1",     0x00000, 0x20000, CRC(f184cdaa) SHA1(7d4a1e8acf6737a9d74d78eb414f32885ffa9846) ) /* roms were simply labeled 1 through 12 */
-  	ROM_LOAD16_BYTE( "5.k3",     0x00001, 0x20000, CRC(7e3a4b81) SHA1(e768dd710a8b38add9fd8d9bfc88ad3a3c353ba5) )
+	ROM_LOAD16_BYTE( "1.k1",     0x00000, 0x20000, CRC(f184cdaa) SHA1(7d4a1e8acf6737a9d74d78eb414f32885ffa9846) ) /* roms were simply labeled 1 through 12 */
+	ROM_LOAD16_BYTE( "5.k3",     0x00001, 0x20000, CRC(7e3a4b81) SHA1(e768dd710a8b38add9fd8d9bfc88ad3a3c353ba5) )
 	ROM_LOAD16_BYTE( "2.j1",     0x40000, 0x20000, CRC(212cd593) SHA1(2f4feeffa1c4a5f1345d78586a303a85fd365c23) )
- 	ROM_LOAD16_BYTE( "6.j3",     0x40001, 0x20000, CRC(4a96fb07) SHA1(5b7f46b2fa6ef947e0467f31ecca04877318ead4) )
+	ROM_LOAD16_BYTE( "6.j3",     0x40001, 0x20000, CRC(4a96fb07) SHA1(5b7f46b2fa6ef947e0467f31ecca04877318ead4) )
 	ROM_LOAD16_BYTE( "ge-02.h1", 0x80000, 0x20000, CRC(c2969fbb) SHA1(faa7da7f5271108dbbc95d111caa2c986e494933) ) /* labeled as "3" */
 	ROM_LOAD16_BYTE( "ge-06.h3", 0x80001, 0x20000, CRC(5c2e6418) SHA1(b9ed769b27c37959fcba2acd6dba02ccd62149e7) ) /* labeled as "7" */
 	ROM_LOAD16_BYTE( "ge-03.f1", 0xc0000, 0x20000, CRC(5e7b19a8) SHA1(637945e36c3665c74d31f4b14e600e93ed9be054) ) /* labeled as "4" */
@@ -1384,7 +1383,7 @@ ROM_START( edrandy1 ) /* World ver 1 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* Original graphics, later revised for the World sets above?? */
 	ROM_LOAD16_BYTE( "ge-10.y6",    0x000001, 0x10000, CRC(2528d795) SHA1(8081b5d13875287a75f868a0566a2d06e0e42949) ) /* labeled as "12" */
-  	ROM_LOAD16_BYTE( "ge-11.z6",    0x000000, 0x10000, CRC(e34a931e) SHA1(0e06359347e48d53ee96d6551d34685110b0f5fb) ) /* labeled as "11" */
+	ROM_LOAD16_BYTE( "ge-11.z6",    0x000000, 0x10000, CRC(e34a931e) SHA1(0e06359347e48d53ee96d6551d34685110b0f5fb) ) /* labeled as "11" */
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
 	ROM_LOAD( "mad-00",   0x000000, 0x40000, CRC(3735b22d) SHA1(fd9c3dc7a880592104c091730b9016641043987a) ) /* tiles 1 */
@@ -1419,10 +1418,10 @@ ROM_END
 
 ROM_START( edrandyj ) /* Japan ver 3 */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
-  	ROM_LOAD16_BYTE( "ge-00-2.k1",   0x00000, 0x20000, CRC(b3d2403c) SHA1(9747dbe7905e1453e3e7764c874c523c54970e2e) )
-  	ROM_LOAD16_BYTE( "ge-04-2.k3",   0x00001, 0x20000, CRC(8a9624d6) SHA1(d5a9b56bc8a1d67fa28df95299cb205e9c965310) )
+	ROM_LOAD16_BYTE( "ge-00-2.k1",   0x00000, 0x20000, CRC(b3d2403c) SHA1(9747dbe7905e1453e3e7764c874c523c54970e2e) )
+	ROM_LOAD16_BYTE( "ge-04-2.k3",   0x00001, 0x20000, CRC(8a9624d6) SHA1(d5a9b56bc8a1d67fa28df95299cb205e9c965310) )
 	ROM_LOAD16_BYTE( "ge-01-2.j1",   0x40000, 0x20000, CRC(84360123) SHA1(3e9241cf68839c15d7a1209fe735b51ed90a1de7) )
- 	ROM_LOAD16_BYTE( "ge-05-2.j3",   0x40001, 0x20000, CRC(0bf85d9d) SHA1(7b7c1c32d3f0de7e675cea3d2ba4f28e9ce387a9) )
+	ROM_LOAD16_BYTE( "ge-05-2.j3",   0x40001, 0x20000, CRC(0bf85d9d) SHA1(7b7c1c32d3f0de7e675cea3d2ba4f28e9ce387a9) )
 	ROM_LOAD16_BYTE( "ge-02.h1",     0x80000, 0x20000, CRC(c2969fbb) SHA1(faa7da7f5271108dbbc95d111caa2c986e494933) )
 	ROM_LOAD16_BYTE( "ge-06.h3",     0x80001, 0x20000, CRC(5c2e6418) SHA1(b9ed769b27c37959fcba2acd6dba02ccd62149e7) )
 	ROM_LOAD16_BYTE( "ge-03.f1",     0xc0000, 0x20000, CRC(5e7b19a8) SHA1(637945e36c3665c74d31f4b14e600e93ed9be054) )
@@ -1433,7 +1432,7 @@ ROM_START( edrandyj ) /* Japan ver 3 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "ge-10.y6",    0x000001, 0x10000, CRC(2528d795) SHA1(8081b5d13875287a75f868a0566a2d06e0e42949) )
-  	ROM_LOAD16_BYTE( "ge-11.z6",    0x000000, 0x10000, CRC(e34a931e) SHA1(0e06359347e48d53ee96d6551d34685110b0f5fb) )
+	ROM_LOAD16_BYTE( "ge-11.z6",    0x000000, 0x10000, CRC(e34a931e) SHA1(0e06359347e48d53ee96d6551d34685110b0f5fb) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
 	ROM_LOAD( "mad-00",   0x000000, 0x40000, CRC(3735b22d) SHA1(fd9c3dc7a880592104c091730b9016641043987a) ) /* tiles 1 */

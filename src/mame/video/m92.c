@@ -45,8 +45,8 @@
 typedef struct _pf_layer_info pf_layer_info;
 struct _pf_layer_info
 {
-	tilemap *		tmap;
-	tilemap *		wide_tmap;
+	tilemap_t *		tmap;
+	tilemap_t *		wide_tmap;
 	UINT16			vram_base;
 	UINT16			control[4];
 };
@@ -311,7 +311,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			if (buffered_spriteram16[offs+2] & 0x0080) pri_back=0; else pri_back=2;
 
-		 	sprite= buffered_spriteram16[offs+1];
+			sprite= buffered_spriteram16[offs+1];
 			colour = buffered_spriteram16[offs+2] & 0x007f;
 			pri_sprite= (buffered_spriteram16[offs+0] & 0xe000) >> 13;
 

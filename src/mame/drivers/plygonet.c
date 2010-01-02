@@ -85,7 +85,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/dsp56k/dsp56k.h"
 #include "sound/k054539.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 
 VIDEO_START( polygonet );
 VIDEO_UPDATE( polygonet );
@@ -123,7 +123,7 @@ static READ32_DEVICE_HANDLER( polygonet_eeprom_r )
 {
 	if (ACCESSING_BITS_0_15)
 	{
-		return 0x0200 | (eepromdev_read_bit(device) << 8);
+		return 0x0200 | (eeprom_read_bit(device) << 8);
 	}
 	else
 	{
@@ -311,7 +311,7 @@ static WRITE32_HANDLER( plygonet_palette_w )
 
 	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
- 	r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
+	r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
 	g = (space->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
 	b = (space->machine->generic.paletteram.u32[offset] >> 0) & 0xff;
 
@@ -606,7 +606,7 @@ static const gfx_layout bglayout =
 	4,
 	{ 0, 1, 2, 3 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
- 	  8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	  8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4,
 	  9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
 
@@ -652,7 +652,7 @@ static MACHINE_DRIVER_START( plygonet )
 
 	MDRV_GFXDECODE(plygonet)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
 	MDRV_QUANTUM_TIME(HZ(1200000))
@@ -710,9 +710,9 @@ static INPUT_PORTS_START( polygonet )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( polynetw )
@@ -737,9 +737,9 @@ static INPUT_PORTS_START( polynetw )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
 INPUT_PORTS_END
 
 
@@ -789,7 +789,7 @@ ROM_START( plygonet )
 	ROM_LOAD( "305b06.18g", 0x000000, 0x20000, CRC(decd6e42) SHA1(4c23dcb1d68132d3381007096e014ee4b6007086) )
 
 	/* '936 tiles */
- 	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "305b07.20d", 0x000000, 0x40000, CRC(e4320bc3) SHA1(b0bb2dac40d42f97da94516d4ebe29b1c3d77c37) )
 
 	/* sound data */
@@ -815,7 +815,7 @@ ROM_START( polynetw )
 	ROM_LOAD( "305a06.18g", 0x000000, 0x020000, CRC(4b9b7e9c) SHA1(8c3c0f1ec7e26fd9552f6da1e6bdd7ff4453ba57) )
 
 	/* '936 tiles */
- 	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "305a07.20d", 0x000000, 0x020000, CRC(0959283b) SHA1(482caf96e8e430b87810508b1a1420cd3b58f203) )
 
 	/* sound data */

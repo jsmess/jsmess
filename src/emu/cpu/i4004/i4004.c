@@ -201,7 +201,7 @@ static void execute_one(i4004_state *cpustate, int opcode)
 	cpustate->icount -= 8;
 	switch (opcode)
 	{
-		case 0x00: 	/* NOP  */
+		case 0x00:	/* NOP  */
 			/* no op */
 			break;
 		case 0x10: case 0x11: case 0x12: case 0x13:
@@ -395,7 +395,7 @@ static void execute_one(i4004_state *cpustate, int opcode)
 			cpustate->C = 0;
 			break;
 		case 0xf2: /* IAC */
-			cpustate->A = cpustate->A++;
+			cpustate->A += 1;
 			cpustate->C = cpustate->A >> 4;
 			cpustate->A &= 0x0f;
 			break;
@@ -581,12 +581,12 @@ CPU_GET_INFO( i4004 )
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 		info->i = 0;							break;
 
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 			info->i = 12;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 			info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 12;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:			info->i = 0;							break;
 
 		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 8;							break; // Only lower 4 bits used
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 				info->i = 6;							break; // 4 I/O for each ROM chip and 4 OUT for each RAM
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 				info->i = 0;							break; // There could be 4 chips in 16 banks for RAM
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 6;							break; // 4 I/O for each ROM chip and 4 OUT for each RAM
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;							break; // There could be 4 chips in 16 banks for RAM
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(i4004);				break;

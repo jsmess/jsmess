@@ -81,7 +81,7 @@ struct _pci_bus_state
 	const device_config *	busdevice;
 	const pci_bus_config *	config;
 	const device_config *	device[32];
-	UINT32					address;
+	offs_t					address;
 	INT8					devicenum;
 };
 

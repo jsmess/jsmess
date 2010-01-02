@@ -70,7 +70,7 @@ TODO:
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/2610intf.h"
 #include "includes/inufuku.h"
 
@@ -233,13 +233,13 @@ static INPUT_PORTS_START( inufuku )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundflag_r, NULL)	// pending sound command
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 
 	PORT_START("P3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
@@ -366,7 +366,7 @@ static MACHINE_DRIVER_START( inufuku )
 	MDRV_MACHINE_START(inufuku)
 	MDRV_MACHINE_RESET(inufuku)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

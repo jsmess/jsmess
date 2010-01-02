@@ -212,8 +212,8 @@ Playfield tile info:
 #define DARIUSG_KLUDGE
 //#define DEBUG_F3 1
 
-static tilemap *pf1_tilemap,*pf2_tilemap,*pf3_tilemap,*pf4_tilemap;
-static tilemap *pixel_layer,*vram_layer;
+static tilemap_t *pf1_tilemap,*pf2_tilemap,*pf3_tilemap,*pf4_tilemap;
+static tilemap_t *pixel_layer,*vram_layer;
 static UINT32 *spriteram32_buffered;
 static UINT32 f3_control_0[8];
 static UINT32 f3_control_1[8];
@@ -529,7 +529,7 @@ static TILE_GET_INFO( get_tile_info_vram )
 	int flags=0;
 
 	if (tile_index&1)
-	   	vram_tile = (machine->generic.videoram.u32[tile_index>>1]&0xffff);
+		vram_tile = (machine->generic.videoram.u32[tile_index>>1]&0xffff);
 	else
 		vram_tile = (machine->generic.videoram.u32[tile_index>>1]>>16);
 
@@ -557,7 +557,7 @@ static TILE_GET_INFO( get_tile_info_pixel )
 		col_off=((tile_index%32)*0x40)+((tile_index&0xfe0)>>5);
 
 	if (col_off&1)
-	   	vram_tile = (machine->generic.videoram.u32[col_off>>1]&0xffff);
+		vram_tile = (machine->generic.videoram.u32[col_off>>1]&0xffff);
 	else
 		vram_tile = (machine->generic.videoram.u32[col_off>>1]>>16);
 
@@ -856,11 +856,11 @@ WRITE32_HANDLER( f3_palette_24bit_w )
 	/* This is weird - why are only the sprites and VRAM palettes 21 bit? */
 	else if (f3_game==CLEOPATR) {
 		if (offset<0x100 || offset>0x1000) {
-		 	r = ((space->machine->generic.paletteram.u32[offset] >>16) & 0x7f)<<1;
+			r = ((space->machine->generic.paletteram.u32[offset] >>16) & 0x7f)<<1;
 			g = ((space->machine->generic.paletteram.u32[offset] >> 8) & 0x7f)<<1;
 			b = ((space->machine->generic.paletteram.u32[offset] >> 0) & 0x7f)<<1;
 		} else {
-		 	r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
+			r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
 			g = (space->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
 			b = (space->machine->generic.paletteram.u32[offset] >> 0) & 0xff;
 		}
@@ -869,11 +869,11 @@ WRITE32_HANDLER( f3_palette_24bit_w )
 	/* Another weird couple - perhaps this is alpha blending related? */
 	else if (f3_game==TWINQIX || f3_game==RECALH) {
 		if (offset>0x1c00) {
-		 	r = ((space->machine->generic.paletteram.u32[offset] >>16) & 0x7f)<<1;
+			r = ((space->machine->generic.paletteram.u32[offset] >>16) & 0x7f)<<1;
 			g = ((space->machine->generic.paletteram.u32[offset] >> 8) & 0x7f)<<1;
 			b = ((space->machine->generic.paletteram.u32[offset] >> 0) & 0x7f)<<1;
 		} else {
-		 	r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
+			r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
 			g = (space->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
 			b = (space->machine->generic.paletteram.u32[offset] >> 0) & 0xff;
 		}
@@ -881,7 +881,7 @@ WRITE32_HANDLER( f3_palette_24bit_w )
 
 	/* All other games - standard 24 bit palette */
 	else {
-	 	r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
+		r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
 		g = (space->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
 		b = (space->machine->generic.paletteram.u32[offset] >> 0) & 0xff;
 	}
@@ -1845,7 +1845,7 @@ static void get_spritealphaclip_info(void)
 }
 
 /* sx and sy are 16.16 fixed point numbers */
-static void get_line_ram_info(running_machine *machine, tilemap *tmap, int sx, int sy, int pos, UINT32 *f3_pf_data_n)
+static void get_line_ram_info(running_machine *machine, tilemap_t *tmap, int sx, int sy, int pos, UINT32 *f3_pf_data_n)
 {
 	struct f3_playfield_line_inf *line_t=&pf_line_inf[pos];
 	const bitmap_t *srcbitmap;
@@ -1979,7 +1979,7 @@ static void get_line_ram_info(running_machine *machine, tilemap *tmap, int sx, i
 
 		if (!pri || (!flipscreen && y<24) || (flipscreen && y>231) ||
 			(pri&0xc000)==0xc000 || !(pri&0x2000)/**/)
- 			line_enable=0;
+			line_enable=0;
 		else if(pri&0x4000)	//alpha1
 			line_enable=2;
 		else if(pri&0x8000)	//alpha2
@@ -2065,7 +2065,7 @@ static void get_line_ram_info(running_machine *machine, tilemap *tmap, int sx, i
 	}
 }
 
-static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx, int sy)
+static void get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_tilemap, int sx, int sy)
 {
 	const struct f3_spritealpha_line_inf *sprite_alpha_line_t=&sa_line_inf[0];
 	struct f3_playfield_line_inf *line_t=&pf_line_inf[4];
@@ -2116,7 +2116,7 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 
 		if (!pri || (!flipscreen && y<24) || (flipscreen && y>231) ||
 			(pri&0xc000)==0xc000 || !(pri&0x2000)/**/)
- 			line_enable=0;
+			line_enable=0;
 		else if(pri&0x4000)	//alpha1
 			line_enable=2;
 		else if(pri&0x8000)	//alpha2
@@ -3139,7 +3139,7 @@ static void get_sprite_info(running_machine *machine, const UINT32 *spriteram32_
 		}
 
 		/* These features are common to sprite and block parts */
-  		flipx = spritecont&0x1;
+		flipx = spritecont&0x1;
 		flipy = spritecont&0x2;
 		multi = spritecont&0x8;
 		last_x=x;

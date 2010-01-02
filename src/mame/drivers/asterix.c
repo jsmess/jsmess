@@ -12,7 +12,7 @@ colour, including the word "Konami"
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
 #include "video/konicdev.h"
@@ -184,15 +184,15 @@ static INPUT_PORTS_START( asterix )
 
 	PORT_START("IN1")
 	KONAMI16_LSB(2, IPT_UNKNOWN, IPT_START2)
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNUSED )	// EEPROM ready (always 1)
 	PORT_SERVICE_NO_TOGGLE(0x0400, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
 INPUT_PORTS_END
 
 
@@ -224,7 +224,7 @@ static MACHINE_DRIVER_START( asterix )
 	MDRV_CPU_ADD("audiocpu", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

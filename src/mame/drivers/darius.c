@@ -253,10 +253,10 @@ static ADDRESS_MAP_START( darius_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x0b0000, 0x0b0001) AM_WRITE(darius_watchdog_w)
 	AM_RANGE(0xc00000, 0xc0007f) AM_READWRITE(darius_ioc_r, darius_ioc_w)			/* inputs, sound */
-	AM_RANGE(0xd00000, 0xd0ffff) AM_READWRITE(PC080SN_word_0_r, PC080SN_word_0_w)	/* tilemaps */
-	AM_RANGE(0xd20000, 0xd20003) AM_WRITE(PC080SN_yscroll_word_0_w)
-	AM_RANGE(0xd40000, 0xd40003) AM_WRITE(PC080SN_xscroll_word_0_w)
-	AM_RANGE(0xd50000, 0xd50003) AM_WRITE(PC080SN_ctrl_word_0_w)
+	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_word_r, pc080sn_word_w)	/* tilemaps */
+	AM_RANGE(0xd20000, 0xd20003) AM_DEVWRITE("pc080sn", pc080sn_yscroll_word_w)
+	AM_RANGE(0xd40000, 0xd40003) AM_DEVWRITE("pc080sn", pc080sn_xscroll_word_w)
+	AM_RANGE(0xd50000, 0xd50003) AM_DEVWRITE("pc080sn", pc080sn_ctrl_word_w)
 	AM_RANGE(0xd80000, 0xd80fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)/* palette */
 	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("share1") AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")
@@ -807,6 +807,12 @@ static const ym2203_interface ym2203_interface_2 =
                        MACHINE DRIVERS
 ***********************************************************/
 
+static const pc080sn_interface darius_pc080sn_intf =
+{
+	1,	 /* gfxnum */
+	-16, 8, 0, 1	/* x_offset, y_offset, y_invert, dblwidth */
+};
+
 static MACHINE_DRIVER_START( darius )
 
 	/* basic machine hardware */
@@ -858,6 +864,8 @@ static MACHINE_DRIVER_START( darius )
 
 	MDRV_VIDEO_START(darius)
 	MDRV_VIDEO_UPDATE(darius)
+
+	MDRV_PC080SN_ADD("pc080sn", darius_pc080sn_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -944,7 +952,7 @@ ROM_START( darius )
 	ROM_LOAD16_BYTE( "a96_31.187",  0x40000, 0x10000, CRC(e9bb5d89) SHA1(a5d08129c32b97e2cce84496945766fd32b6506e) )	/* 2 data roms */
 	ROM_LOAD16_BYTE( "a96_30.154",  0x40001, 0x10000, CRC(9eb5e127) SHA1(50e2fe5ec7f79ecf1fb5107298da13ef5ab37162) )
 
-   	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 sound cpu */
+	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 sound cpu */
 	ROM_LOAD( "a96_57.33",  0x00000, 0x10000, CRC(33ceb730) SHA1(05070ea503ac57ff8445145d6f97115f7aad90a5) )
 
 	ROM_REGION( 0x80000, "cpub", 0 )	/* 68000 code */
@@ -982,12 +990,12 @@ ROM_START( darius )
 	ROM_LOAD32_BYTE( "da-64.bin",    0x80002, 0x10000, CRC(814c676f) SHA1(a6a64e65a3c163ecfede14b48ea70c20050248c3) )
 	ROM_LOAD32_BYTE( "da-65.bin",    0x80003, 0x10000, CRC(14eee326) SHA1(41760fada2a5e34ee6c9250af927baf650d9cfc4) )
 
- 	ROM_REGION( 0x8000, "gfx3", 0 )			/* 8x8 SCR tiles */
+	ROM_REGION( 0x8000, "gfx3", 0 )			/* 8x8 SCR tiles */
 	/* There's only one of each of these on a real board */
 	ROM_LOAD16_BYTE( "a96_54.143",   0x0000, 0x4000, CRC(51c02ae2) SHA1(27d2a6c649d047da1f22758569cb36531e3bf8bc) )
 	ROM_LOAD16_BYTE( "a96_55.144",   0x0001, 0x4000, CRC(771e4d98) SHA1(0e8ce5d569775883f4bc777b9bd49eb23ba7b42e) )
 
- 	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_REGION( 0x1000, "user1", 0 )
 	ROM_LOAD16_BYTE( "a96-24.163",   0x0000, 0x0400, CRC(0fa8be7f) SHA1(079686b5d65b4b966591090d8c0e13e66dc5beca) )	/* proms, currently unused */
 	ROM_LOAD16_BYTE( "a96-25.164",   0x0400, 0x0400, CRC(265508a6) SHA1(f8ee1c658b33ae76d8a457a4042d9b4b58247823) )
 	ROM_LOAD16_BYTE( "a96-26.165",   0x0800, 0x0400, CRC(4891b9c0) SHA1(1f550a9a4ad3ca379f88f5865ed1b281c7b87f31) )
@@ -1002,7 +1010,7 @@ ROM_START( dariusj )
 	ROM_LOAD16_BYTE( "a96_31.187",   0x40000, 0x10000, CRC(e9bb5d89) SHA1(a5d08129c32b97e2cce84496945766fd32b6506e) )	/* 2 data roms */
 	ROM_LOAD16_BYTE( "a96_30.154",   0x40001, 0x10000, CRC(9eb5e127) SHA1(50e2fe5ec7f79ecf1fb5107298da13ef5ab37162) )
 
-   	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 sound cpu */
+	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 sound cpu */
 	ROM_LOAD( "a96_57.33",  0x00000, 0x10000, CRC(33ceb730) SHA1(05070ea503ac57ff8445145d6f97115f7aad90a5) )
 
 	ROM_REGION( 0x80000, "cpub", 0 )	/* 68000 code */
@@ -1038,11 +1046,11 @@ ROM_START( dariusj )
 	ROM_LOAD32_BYTE( "a96_38.176",   0x80002, 0x10000, CRC(e4f3e3a7) SHA1(0baa8a672516bcc4f17f40f429ac3d227de16625) )
 	ROM_LOAD32_BYTE( "a96_39.197",   0x80003, 0x10000, CRC(ea30920f) SHA1(91d47b10886d6c243bc676435e300cb3b5fcca33) )
 
- 	ROM_REGION( 0x8000, "gfx3", 0 )			/* 8x8 SCR tiles */
+	ROM_REGION( 0x8000, "gfx3", 0 )			/* 8x8 SCR tiles */
 	ROM_LOAD16_BYTE( "a96_54.143",   0x0000, 0x4000, CRC(51c02ae2) SHA1(27d2a6c649d047da1f22758569cb36531e3bf8bc) )
 	ROM_LOAD16_BYTE( "a96_55.144",   0x0001, 0x4000, CRC(771e4d98) SHA1(0e8ce5d569775883f4bc777b9bd49eb23ba7b42e) )
 
- 	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_REGION( 0x1000, "user1", 0 )
 	ROM_LOAD16_BYTE( "a96-24.163",   0x0000, 0x0400, CRC(0fa8be7f) SHA1(079686b5d65b4b966591090d8c0e13e66dc5beca) )	/* proms, currently unused */
 	ROM_LOAD16_BYTE( "a96-25.164",   0x0400, 0x0400, CRC(265508a6) SHA1(f8ee1c658b33ae76d8a457a4042d9b4b58247823) )
 	ROM_LOAD16_BYTE( "a96-26.165",   0x0800, 0x0400, CRC(4891b9c0) SHA1(1f550a9a4ad3ca379f88f5865ed1b281c7b87f31) )
@@ -1057,7 +1065,7 @@ ROM_START( dariuso )
 	ROM_LOAD16_BYTE( "a96_31.187",   0x40000, 0x10000, CRC(e9bb5d89) SHA1(a5d08129c32b97e2cce84496945766fd32b6506e) )	/* 2 data roms */
 	ROM_LOAD16_BYTE( "a96_30.154",   0x40001, 0x10000, CRC(9eb5e127) SHA1(50e2fe5ec7f79ecf1fb5107298da13ef5ab37162) )
 
-   	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 sound cpu */
+	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 sound cpu */
 	ROM_LOAD( "a96_57.33",  0x00000, 0x10000, CRC(33ceb730) SHA1(05070ea503ac57ff8445145d6f97115f7aad90a5) )
 
 	ROM_REGION( 0x80000, "cpub", 0 )	/* 68000 code */
@@ -1093,11 +1101,11 @@ ROM_START( dariuso )
 	ROM_LOAD32_BYTE( "a96_38.176",   0x80002, 0x10000, CRC(e4f3e3a7) SHA1(0baa8a672516bcc4f17f40f429ac3d227de16625) )
 	ROM_LOAD32_BYTE( "a96_39.197",   0x80003, 0x10000, CRC(ea30920f) SHA1(91d47b10886d6c243bc676435e300cb3b5fcca33) )
 
- 	ROM_REGION( 0x8000, "gfx3", 0 )			/* 8x8 SCR tiles */
+	ROM_REGION( 0x8000, "gfx3", 0 )			/* 8x8 SCR tiles */
 	ROM_LOAD16_BYTE( "a96_54.143",   0x0000, 0x4000, CRC(51c02ae2) SHA1(27d2a6c649d047da1f22758569cb36531e3bf8bc) )
 	ROM_LOAD16_BYTE( "a96_55.144",   0x0001, 0x4000, CRC(771e4d98) SHA1(0e8ce5d569775883f4bc777b9bd49eb23ba7b42e) )
 
- 	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_REGION( 0x1000, "user1", 0 )
 	ROM_LOAD16_BYTE( "a96-24.163",   0x0000, 0x0400, CRC(0fa8be7f) SHA1(079686b5d65b4b966591090d8c0e13e66dc5beca) )	/* proms, currently unused */
 	ROM_LOAD16_BYTE( "a96-25.164",   0x0400, 0x0400, CRC(265508a6) SHA1(f8ee1c658b33ae76d8a457a4042d9b4b58247823) )
 	ROM_LOAD16_BYTE( "a96-26.165",   0x0800, 0x0400, CRC(4891b9c0) SHA1(1f550a9a4ad3ca379f88f5865ed1b281c7b87f31) )
@@ -1112,7 +1120,7 @@ ROM_START( dariuse )
 	ROM_LOAD16_BYTE( "dae-70.bin",   0x40000, 0x10000, CRC(54590b31) SHA1(2b89846f14a5cb19b58ab4999bc5ae11671bbb5a) )	/* 2 data roms */
 	ROM_LOAD16_BYTE( "a96_30.154",   0x40001, 0x10000, CRC(9eb5e127) SHA1(50e2fe5ec7f79ecf1fb5107298da13ef5ab37162) )	// dae-69.bin
 
-   	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 sound cpu */
+	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 sound cpu */
 	ROM_LOAD( "a96_57.33",  0x00000, 0x10000, CRC(33ceb730) SHA1(05070ea503ac57ff8445145d6f97115f7aad90a5) )
 
 	ROM_REGION( 0x80000, "cpub", 0 )	/* 68000 code */
@@ -1148,11 +1156,11 @@ ROM_START( dariuse )
 	ROM_LOAD32_BYTE( "a96_38.176",   0x80002, 0x10000, CRC(e4f3e3a7) SHA1(0baa8a672516bcc4f17f40f429ac3d227de16625) )
 	ROM_LOAD32_BYTE( "a96_39.197",   0x80003, 0x10000, CRC(ea30920f) SHA1(91d47b10886d6c243bc676435e300cb3b5fcca33) )
 
- 	ROM_REGION( 0x8000, "gfx3", 0 )			/* 8x8 SCR tiles */
+	ROM_REGION( 0x8000, "gfx3", 0 )			/* 8x8 SCR tiles */
 	ROM_LOAD16_BYTE( "a96_54.143",   0x0000, 0x4000, CRC(51c02ae2) SHA1(27d2a6c649d047da1f22758569cb36531e3bf8bc) )
 	ROM_LOAD16_BYTE( "a96_55.144",   0x0001, 0x4000, CRC(771e4d98) SHA1(0e8ce5d569775883f4bc777b9bd49eb23ba7b42e) )
 
- 	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_REGION( 0x1000, "user1", 0 )
 	ROM_LOAD16_BYTE( "a96-24.163",   0x0000, 0x0400, CRC(0fa8be7f) SHA1(079686b5d65b4b966591090d8c0e13e66dc5beca) )	/* proms, currently unused */
 	ROM_LOAD16_BYTE( "a96-25.164",   0x0400, 0x0400, CRC(265508a6) SHA1(f8ee1c658b33ae76d8a457a4042d9b4b58247823) )
 	ROM_LOAD16_BYTE( "a96-26.165",   0x0800, 0x0400, CRC(4891b9c0) SHA1(1f550a9a4ad3ca379f88f5865ed1b281c7b87f31) )

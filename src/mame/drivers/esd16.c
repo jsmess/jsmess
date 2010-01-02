@@ -44,7 +44,7 @@ Head Panic
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 #include "includes/esd16.h"
@@ -118,7 +118,7 @@ static READ16_HANDLER( esd_eeprom_r )
 	esd16_state *state = (esd16_state *)space->machine->driver_data;
 	if (ACCESSING_BITS_8_15)
 	{
-		return ((eepromdev_read_bit(state->eeprom) & 0x01) << 15);
+		return ((eeprom_read_bit(state->eeprom) & 0x01) << 15);
 	}
 
 //  logerror("(0x%06x) unk EEPROM read: %04x\n", cpu_get_pc(space->cpu), mem_mask);
@@ -146,8 +146,8 @@ static ADDRESS_MAP_START( hedpanic_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb00004, 0xb00007) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, scroll_1)									//
 	AM_RANGE(0xb00008, 0xb00009) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, headpanic_platform_x)
 	AM_RANGE(0xb0000a, 0xb0000b) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, headpanic_platform_y)
-	AM_RANGE(0xb0000c, 0xb0000d) AM_WRITENOP 																// ??
-	AM_RANGE(0xb0000e, 0xb0000f) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, head_layersize) 								// ??
+	AM_RANGE(0xb0000c, 0xb0000d) AM_WRITENOP																// ??
+	AM_RANGE(0xb0000e, 0xb0000f) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, head_layersize)								// ??
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP // IRQ Ack
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("SYSTEM")
@@ -182,9 +182,9 @@ static ADDRESS_MAP_START( mchampdx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700004, 0x700007) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, scroll_1)									//
 	AM_RANGE(0x700008, 0x700009) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, headpanic_platform_x) 							// not used in mchampdx?
 	AM_RANGE(0x70000a, 0x70000b) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, headpanic_platform_y) 							// not used in mchampdx?
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITENOP 																// ??
-	AM_RANGE(0x70000e, 0x70000f) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, head_layersize) 								// ??
-	AM_RANGE(0xd00008, 0xd00009) AM_WRITE(hedpanic_platform_w) 												// not used in mchampdx?
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITENOP																// ??
+	AM_RANGE(0x70000e, 0x70000f) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, head_layersize)								// ??
+	AM_RANGE(0xd00008, 0xd00009) AM_WRITE(hedpanic_platform_w)												// not used in mchampdx?
 ADDRESS_MAP_END
 
 /* Tang Tang - like the others but again with different addresses */
@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( tangtang_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400004, 0x400007) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, scroll_1)									//
 	AM_RANGE(0x400008, 0x400009) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, headpanic_platform_x) 							// not used in mchampdx?
 	AM_RANGE(0x40000a, 0x40000b) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, headpanic_platform_y) 							// not used in mchampdx?
-	AM_RANGE(0x40000c, 0x40000d) AM_WRITENOP 																// ??
+	AM_RANGE(0x40000c, 0x40000d) AM_WRITENOP																// ??
 	AM_RANGE(0x40000e, 0x40000f) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, head_layersize)									// ??
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP	// IRQ Ack
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P1_P2")
@@ -377,9 +377,9 @@ static INPUT_PORTS_START( hedpanic )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
 INPUT_PORTS_END
 
 
@@ -414,9 +414,9 @@ static INPUT_PORTS_START( swatpolc )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -587,7 +587,7 @@ static MACHINE_DRIVER_START( hedpanic )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hedpanic_map)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	MDRV_PALETTE_LENGTH(0x1000/2)
 

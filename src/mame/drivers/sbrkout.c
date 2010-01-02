@@ -58,7 +58,7 @@
 static emu_timer *scanline_timer;
 static emu_timer *pot_timer;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 static UINT8 sync2_value;
 static UINT8 pot_mask[2];
@@ -478,7 +478,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( sbrkout )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502,MAIN_CLOCK/16) 	   /* 375 KHz? Should be 750KHz? */
+	MDRV_CPU_ADD("maincpu", M6502,MAIN_CLOCK/16)	   /* 375 KHz? Should be 750KHz? */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_START(sbrkout)

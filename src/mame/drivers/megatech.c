@@ -266,7 +266,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	UINT8* bios_region;
 	char tempname[20];
 
-	printf("game 0 selected\n");
+	//printf("game 0 selected\n");
 
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE);
 	cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, ASSERT_LINE);
@@ -294,7 +294,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 		// knows from the cart pinout
 		if (bios_region[0x8000]==2)
 		{
-			printf("SMS cart!!, CPU not running\n");
+			//printf("SMS cart!!, CPU not running\n");
 			mtech_bios.current_game_is_sms = 1;
 			megatech_set_genz80_as_sms_standard_map(machine, "genesis_snd_z80", MAPPER_STANDARD);
 			cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, CLEAR_LINE);
@@ -304,7 +304,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 		}
 		else if (bios_region[0x8000]==1)
 		{
-			printf("Genesis Cart, CPU0 running\n");
+			//printf("Genesis Cart, CPU0 running\n");
 			mtech_bios.current_game_is_sms = 0;
 			megatech_set_megadrive_z80_as_megadrive_z80(machine, "genesis_snd_z80");
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
@@ -406,7 +406,7 @@ static WRITE8_HANDLER (mt_z80_bank_w)
 		mtech_bios.mt_bank_bank_pos = 0;
 		mtech_bios.mt_bank_addr = mtech_bios.mt_bank_partial;
 		mtech_bios.mt_bank_partial = 0;
-		printf("MT z80 bank set to %08x\n", mtech_bios.mt_bank_addr);
+		//printf("MT z80 bank set to %08x\n", mtech_bios.mt_bank_addr);
 
 	}
 }
@@ -424,8 +424,8 @@ static WRITE8_HANDLER( megatech_banked_ram_w )
 
 
 static ADDRESS_MAP_START( megatech_bios_map, ADDRESS_SPACE_PROGRAM, 8 )
- 	AM_RANGE(0x0000, 0x2fff) AM_ROM // from bios rom (0x0000-0x2fff populated in ROM)
- 	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(megatech_banked_ram_r, megatech_banked_ram_w) // copies instruction data here at startup, must be banked
+	AM_RANGE(0x0000, 0x2fff) AM_ROM // from bios rom (0x0000-0x2fff populated in ROM)
+	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(megatech_banked_ram_r, megatech_banked_ram_w) // copies instruction data here at startup, must be banked
 	AM_RANGE(0x4000, 0x5fff) AM_RAM // plain ram?
 	AM_RANGE(0x6000, 0x6000) AM_WRITE( mt_z80_bank_w )
 	AM_RANGE(0x6400, 0x6400) AM_READ_PORT("BIOS_DSW0")
@@ -435,7 +435,7 @@ static ADDRESS_MAP_START( megatech_bios_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("BIOS_IN1")
 	AM_RANGE(0x6802, 0x6807) AM_READWRITE(bios_ctrl_r, bios_ctrl_w)
 //  AM_RANGE(0x6805, 0x6805) AM_READ_PORT("???")
- 	AM_RANGE(0x7000, 0x77ff) AM_ROM // from bios rom (0x7000-0x77ff populated in ROM)
+	AM_RANGE(0x7000, 0x77ff) AM_ROM // from bios rom (0x7000-0x77ff populated in ROM)
 	//AM_RANGE(0x7800, 0x7fff) AM_RAM // ?
 	AM_RANGE(0x8000, 0x9fff) AM_READ(megatech_instr_r) // window into 68k address space, reads instr rom and writes to reset banks on z80 carts?
 ADDRESS_MAP_END

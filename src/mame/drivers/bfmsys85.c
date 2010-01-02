@@ -324,7 +324,7 @@ static WRITE8_HANDLER( mux_ctrl_w )
 		case 0xE0:	  // End of interrupt
 		break;
 
-  }
+	}
 }
 
 static READ8_HANDLER( mux_ctrl_r )
@@ -484,4 +484,4 @@ ROM_START( m_supcrd )
 ROM_END
 
 //    year,name,     parent, machine,  input,           init, monitor,     company,     fullname,            flags
-GAME( 1985,m_supcrd, 0, 	bfmsys85, bfmsys85,  		0,	  0,       "BFM/ELAM",   "Supercards (Dutch, Game Card 39-340-271?)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1985,m_supcrd, 0, 	bfmsys85, bfmsys85, 		0,	  0,       "BFM/ELAM",   "Supercards (Dutch, Game Card 39-340-271?)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )

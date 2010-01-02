@@ -24,7 +24,7 @@ static int taitojc_gfx_index;
 
 static UINT32 *taitojc_char_ram;
 static UINT32 *taitojc_tile_ram;
-static tilemap *taitojc_tilemap;
+static tilemap_t *taitojc_tilemap;
 
 static poly_manager *poly;
 
@@ -178,7 +178,7 @@ VIDEO_START( taitojc )
 	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	add_exit_callback(machine, taitojc_exit);
 
- 	/* find first empty slot to decode gfx */
+	/* find first empty slot to decode gfx */
 	for (taitojc_gfx_index = 0; taitojc_gfx_index < MAX_GFX_ELEMENTS; taitojc_gfx_index++)
 		if (machine->gfx[taitojc_gfx_index] == 0)
 			break;

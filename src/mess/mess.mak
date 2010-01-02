@@ -348,7 +348,7 @@ DRVLIBS = \
 	$(MESSOBJ)/poly88.a \
 	$(MESSOBJ)/radio.a \
 	$(MESSOBJ)/rca.a \
-    $(MESSOBJ)/rm.a \
+	$(MESSOBJ)/rm.a \
 	$(MESSOBJ)/robotron.a \
 	$(MESSOBJ)/rockwell.a \
 	$(MESSOBJ)/samcoupe.a \

@@ -17,7 +17,7 @@ likewise be a 2 screen game
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "video/konicdev.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
 #include "sound/k054539.h"
@@ -222,7 +222,7 @@ static INPUT_PORTS_START( xmen )
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* EEPROM status - always 1 */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
@@ -233,9 +233,9 @@ static INPUT_PORTS_START( xmen )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( xmen2p )
@@ -251,7 +251,7 @@ static INPUT_PORTS_START( xmen2p )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x003c, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* EEPROM status - always 1 */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
@@ -262,9 +262,9 @@ static INPUT_PORTS_START( xmen2p )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
 static CUSTOM_INPUT( xmen_frame_r )
@@ -287,7 +287,7 @@ static INPUT_PORTS_START( xmen6p )
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* EEPROM status - always 1 */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
@@ -299,9 +299,9 @@ static INPUT_PORTS_START( xmen6p )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xmen_frame_r, NULL)	/* screen indicator? */
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
 
@@ -354,7 +354,7 @@ static MACHINE_DRIVER_START( xmen )
 
 	MDRV_MACHINE_START(xmen)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -432,7 +432,7 @@ static MACHINE_DRIVER_START( xmen6p )
 
 	MDRV_MACHINE_RESET(xmen6p)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

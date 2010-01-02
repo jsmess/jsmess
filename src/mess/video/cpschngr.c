@@ -132,7 +132,7 @@ static UINT16 *cps1_other;
 static int cps1_last_sprite_offset;     /* Offset of the last sprite */
 static int cps1_stars_enabled[2];          /* Layer enabled [Y/N] */
 
-static tilemap *cps1_bg_tilemap[3];
+static tilemap_t *cps1_bg_tilemap[3];
 
 
 static int cps1_scroll1x, cps1_scroll1y;

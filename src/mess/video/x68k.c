@@ -45,10 +45,10 @@ static bitmap_t* x68k_gfx_0_bitmap_256;  // 256 colour, 512x512, 2 pages
 static bitmap_t* x68k_gfx_1_bitmap_256;
 static bitmap_t* x68k_gfx_0_bitmap_65536;  // 65536 colour, 512x512, 1 page
 
-static tilemap* x68k_bg0_8;  // two 64x64 tilemaps, 8x8 characters
-static tilemap* x68k_bg1_8;
-static tilemap* x68k_bg0_16;  // two 64x64 tilemaps, 16x16 characters
-static tilemap* x68k_bg1_16;
+static tilemap_t* x68k_bg0_8;  // two 64x64 tilemaps, 8x8 characters
+static tilemap_t* x68k_bg1_8;
+static tilemap_t* x68k_bg0_16;  // two 64x64 tilemaps, 16x16 characters
+static tilemap_t* x68k_bg1_16;
 
 static int sprite_shift;
 
@@ -1129,8 +1129,8 @@ VIDEO_UPDATE( x68000 )
 	int priority;
 	int xscr,yscr;
 	int x;
-	tilemap* x68k_bg0;
-	tilemap* x68k_bg1;
+	tilemap_t* x68k_bg0;
+	tilemap_t* x68k_bg1;
 	UINT8 *rom;
 
 	if((x68k_spritereg[0x408] & 0x03) == 0x00)  // Sprite/BG H-Res 0=8x8, 1=16x16, 2 or 3 = undefined.

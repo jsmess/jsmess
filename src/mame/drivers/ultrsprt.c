@@ -12,7 +12,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "sound/k054539.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "machine/konppc.h"
 #include "sound/k056800.h"
 
@@ -160,13 +160,13 @@ static INPUT_PORTS_START( ultrsprt )
 	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_START2 )
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_SERVICE_NO_TOGGLE( 0x08000000, IP_ACTIVE_LOW )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 
 	PORT_START("STICKX1")
 	PORT_BIT( 0xfff, 0x800, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -213,10 +213,10 @@ static MACHINE_DRIVER_START( ultrsprt )
 
 	MDRV_QUANTUM_TIME(HZ(12000))
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 	MDRV_MACHINE_START(ultrsprt)
 
- 	/* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))

@@ -1,225 +1,345 @@
+/*************************************************************************
+
+    taitoic.h
+
+    Implementation of various Taito custom video & input ICs
+
+**************************************************************************/
+
+#include "devcb.h"
+
 /***************************************************************************
-                Taito Custom Chips
+    TYPE DEFINITIONS
 ***************************************************************************/
 
-extern const int TC0100SCN_SINGLE_VDU;	/* value set in taitoic.c */
+typedef struct _pc080sn_interface pc080sn_interface;
+struct _pc080sn_interface
+{
+	int                gfxnum;
 
-extern UINT8 TC0360PRI_regs[16];
-
-extern UINT16	*TC0080VCO_chain_ram_0;
-extern UINT16	*TC0080VCO_chain_ram_1;
-extern UINT16	*TC0080VCO_spriteram;
-extern UINT16	*TC0080VCO_scroll_ram;
-extern int	TC0080VCO_flipscreen;
-
-int TC0100SCN_count(running_machine *machine);
-int TC0110PCR_mask(running_machine *machine);
-int has_TC0150ROD(running_machine *machine);
-int has_TC0280GRD(running_machine *machine);
-int has_TC0360PRI(running_machine *machine);
-int has_TC0430GRW(running_machine *machine);
-int has_TC0480SCP(running_machine *machine);
+	int                x_offset, y_offset;
+	int                y_invert;
+	int                dblwidth;
+};
 
 
-/***************************************************************************/
+typedef struct _pc090oj_interface pc090oj_interface;
+struct _pc090oj_interface
+{
+	int                gfxnum;
 
-void PC080SN_vh_start(running_machine *machine,int chips,int gfxnum,int x_offset,int y_offset,int y_invert,int opaque,int dblwidth);
-READ16_HANDLER ( PC080SN_word_0_r );
-WRITE16_HANDLER( PC080SN_word_0_w );
-WRITE16_HANDLER( PC080SN_xscroll_word_0_w );
-WRITE16_HANDLER( PC080SN_yscroll_word_0_w );
-WRITE16_HANDLER( PC080SN_ctrl_word_0_w );
-READ16_HANDLER ( PC080SN_word_1_r );
-WRITE16_HANDLER( PC080SN_word_1_w );
-WRITE16_HANDLER( PC080SN_xscroll_word_1_w );
-WRITE16_HANDLER( PC080SN_yscroll_word_1_w );
-WRITE16_HANDLER( PC080SN_ctrl_word_1_w );
-void PC080SN_set_scroll(int chip,int tilemap_num,int scrollx,int scrolly);
-void PC080SN_set_trans_pen(int chip,int tilemap_num,int pen);
-void PC080SN_tilemap_update(void);
-void PC080SN_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority);
-void PC080SN_tilemap_draw_offset(bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority,int xoffs,int yoffs);
+	int                x_offset, y_offset;
+	int                use_buffer;
+};
+
+
+typedef struct _tc0080vco_interface tc0080vco_interface;
+struct _tc0080vco_interface
+{
+	int                gfxnum;
+	int                txnum;
+
+	int                bg_xoffs, bg_yoffs;
+	int                bg_flip_yoffs;
+
+	int                has_fg0;	/* for debug */
+};
+
+typedef struct _tc0100scn_interface tc0100scn_interface;
+struct _tc0100scn_interface
+{
+	const char         *screen;
+
+	int                gfxnum;
+	int                txnum;
+
+	int                x_offset, y_offset;
+	int                flip_xoffs, flip_yoffs;
+	int                flip_text_xoffs, flip_text_yoffs;
+
+	int                multiscrn_xoffs;
+	int                multiscrn_hack;
+};
+
+
+typedef struct _tc0280grd_interface tc0280grd_interface;
+struct _tc0280grd_interface
+{
+	int                gfxnum;
+};
+
+
+typedef struct _tc0480scp_interface tc0480scp_interface;
+struct _tc0480scp_interface
+{
+	int                gfxnum;
+	int                txnum;
+
+	int                pixels;
+
+	int                x_offset, y_offset;
+	int                text_xoffs, text_yoffs;
+	int                flip_xoffs, flip_yoffs;
+
+	int                col_base;
+};
+
+
+typedef struct _tc0150rod_interface tc0150rod_interface;
+struct _tc0150rod_interface
+{
+	const char      *gfx_region;	/* gfx region for the road */
+};
+
+
+typedef struct _tc0110pcr_interface tc0110pcr_interface;
+struct _tc0110pcr_interface
+{
+	int               pal_offs;
+};
+
+typedef struct _tc0180vcu_interface tc0180vcu_interface;
+struct _tc0180vcu_interface
+{
+	int            bg_color_base;
+	int            fg_color_base;
+	int            tx_color_base;
+};
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+DEVICE_GET_INFO( pc080sn );
+DEVICE_GET_INFO( pc090oj );
+DEVICE_GET_INFO( tc0080vco );
+DEVICE_GET_INFO( tc0100scn );
+DEVICE_GET_INFO( tc0280grd );
+DEVICE_GET_INFO( tc0360pri );
+DEVICE_GET_INFO( tc0480scp );
+DEVICE_GET_INFO( tc0150rod );
+DEVICE_GET_INFO( tc0110pcr );
+DEVICE_GET_INFO( tc0180vcu );
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define PC080SN DEVICE_GET_INFO_NAME( pc080sn )
+
+#define MDRV_PC080SN_ADD(_tag, _interface) \
+	MDRV_DEVICE_ADD(_tag, PC080SN, 0) \
+	MDRV_DEVICE_CONFIG(_interface)
+
+#define PC090OJ DEVICE_GET_INFO_NAME( pc090oj )
+
+#define MDRV_PC090OJ_ADD(_tag, _interface) \
+	MDRV_DEVICE_ADD(_tag, PC090OJ, 0) \
+	MDRV_DEVICE_CONFIG(_interface)
+
+#define TC0080VCO DEVICE_GET_INFO_NAME( tc0080vco )
+
+#define MDRV_TC0080VCO_ADD(_tag, _interface) \
+	MDRV_DEVICE_ADD(_tag, TC0080VCO, 0) \
+	MDRV_DEVICE_CONFIG(_interface)
+
+#define TC0100SCN DEVICE_GET_INFO_NAME( tc0100scn )
+
+#define MDRV_TC0100SCN_ADD(_tag, _interface) \
+	MDRV_DEVICE_ADD(_tag, TC0100SCN, 0) \
+	MDRV_DEVICE_CONFIG(_interface)
+
+#define TC0280GRD DEVICE_GET_INFO_NAME( tc0280grd )
+#define TC0430GRW DEVICE_GET_INFO_NAME( tc0280grd )
+
+#define MDRV_TC0280GRD_ADD(_tag, _interface) \
+	MDRV_DEVICE_ADD(_tag, TC0280GRD, 0) \
+	MDRV_DEVICE_CONFIG(_interface)
+
+#define MDRV_TC0430GRW_ADD(_tag, _interface) \
+	MDRV_DEVICE_ADD(_tag, TC0430GRW, 0) \
+	MDRV_DEVICE_CONFIG(_interface)
+
+#define TC0360PRI DEVICE_GET_INFO_NAME( tc0360pri )
+
+#define MDRV_TC0360PRI_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, TC0360PRI, 0)
+
+#define TC0150ROD DEVICE_GET_INFO_NAME( tc0150rod )
+
+#define MDRV_TC0150ROD_ADD(_tag, _interface) \
+	MDRV_DEVICE_ADD(_tag, TC0150ROD, 0) \
+	MDRV_DEVICE_CONFIG(_interface)
+
+#define TC0480SCP DEVICE_GET_INFO_NAME( tc0480scp )
+
+#define MDRV_TC0480SCP_ADD(_tag, _interface) \
+	MDRV_DEVICE_ADD(_tag, TC0480SCP, 0) \
+	MDRV_DEVICE_CONFIG(_interface)
+
+#define TC0110PCR DEVICE_GET_INFO_NAME( tc0110pcr )
+
+#define MDRV_TC0110PCR_ADD(_tag, _interface) \
+	MDRV_DEVICE_ADD(_tag, TC0110PCR, 0) \
+	MDRV_DEVICE_CONFIG(_interface)
+
+#define TC0180VCU DEVICE_GET_INFO_NAME( tc0180vcu )
+
+#define MDRV_TC0180VCU_ADD(_tag, _interface) \
+	MDRV_DEVICE_ADD(_tag, TC0180VCU, 0) \
+	MDRV_DEVICE_CONFIG(_interface)
+
+
+/***************************************************************************
+    DEVICE I/O FUNCTIONS
+***************************************************************************/
+
+/**  PC080SN  **/
+READ16_DEVICE_HANDLER( pc080sn_word_r );
+WRITE16_DEVICE_HANDLER( pc080sn_word_w );
+WRITE16_DEVICE_HANDLER( pc080sn_xscroll_word_w );
+WRITE16_DEVICE_HANDLER( pc080sn_yscroll_word_w );
+WRITE16_DEVICE_HANDLER( pc080sn_ctrl_word_w );
+
+void pc080sn_set_scroll(const device_config *device, int tilemap_num, int scrollx, int scrolly);
+void pc080sn_set_trans_pen(const device_config *device, int tilemap_num, int pen);
+void pc080sn_tilemap_update(const device_config *device);
+void pc080sn_tilemap_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority);
+void pc080sn_tilemap_draw_offset(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority, int xoffs, int yoffs);
 
 /* For Topspeed */
-void PC080SN_tilemap_draw_special(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority,UINT16 *ram);
+void pc080sn_tilemap_draw_special(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority, UINT16 *ram);
 
 
-/***************************************************************************/
+/**  PC090OJ  **/
+READ16_DEVICE_HANDLER( pc090oj_word_r );
+WRITE16_DEVICE_HANDLER( pc090oj_word_w );
 
-void PC090OJ_vh_start(running_machine *machine,int gfxnum,int x_offset,int y_offset,int use_buffer);
-
-READ16_HANDLER( PC090OJ_word_0_r );
-WRITE16_HANDLER( PC090OJ_word_0_w );
-
-void PC090OJ_eof_callback(void);
-void PC090OJ_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,int pri_type);
-
-extern UINT16 PC090OJ_sprite_ctrl;
+void pc090oj_set_sprite_ctrl(const device_config *device, UINT16 sprctrl);
+void pc090oj_eof_callback(const device_config *device);
+void pc090oj_draw_sprites(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int pri_type);
 
 
-/***************************************************************************/
+/** TC0080VCO **/
+READ16_DEVICE_HANDLER( tc0080vco_word_r );
+WRITE16_DEVICE_HANDLER( tc0080vco_word_w );
 
-void TC0080VCO_vh_start(running_machine *machine, int gfxnum,int has_fg0,int bg_xoffs,int bg_yoffs,int bg_flip_yoffs);
+void tc0080vco_tilemap_update(const device_config *device);
+void tc0080vco_tilemap_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority);
 
-READ16_HANDLER ( TC0080VCO_word_r );
-WRITE16_HANDLER( TC0080VCO_word_w );
+READ16_DEVICE_HANDLER( tc0080vco_cram_0_r );
+READ16_DEVICE_HANDLER( tc0080vco_cram_1_r );
+READ16_DEVICE_HANDLER( tc0080vco_sprram_r );
+READ16_DEVICE_HANDLER( tc0080vco_scrram_r );
+READ_LINE_DEVICE_HANDLER( tc0080vco_flipscreen_r );
 
-void TC0080VCO_tilemap_update(running_machine *machine);
-void TC0080VCO_tilemap_draw(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority);
 
-
-/***************************************************************************/
-
-/* When writing a driver pass zero for all the offsets initially then
-   tweak them later. Most TC0100SCN games have y_offset=0 */
-
-void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_offset,int y_offset,int flip_xoffs,
-		int flip_yoffs,int flip_text_xoffs,int flip_text_yoffs,int multiscrn_xoffs);
+/** TC0100SCN **/
+#define TC0100SCN_SINGLE_VDU    1024
 
 /* Function to set separate color banks for the three tilemapped layers.
    To change from the default (0,0,0) use after calling TC0100SCN_vh_start */
-void TC0100SCN_set_colbanks(int bg0,int bg1,int fg);
+void tc0100scn_set_colbanks(const device_config *device, int bg0, int bg1, int tx);
 
 /* Function to set separate color banks for each TC0100SCN.
    To change from the default (0,0,0) use after calling TC0100SCN_vh_start */
-void TC0100SCN_set_chip_colbanks(int chip0,int chip1,int chip2);
+void tc0100scn_set_colbank(const device_config *device, int colbank);
 
 /* Function to set bg tilemask < 0xffff */
-void TC0100SCN_set_bg_tilemask(int mask);
+void tc0100scn_set_bg_tilemask(const device_config *device, int mask);
 
 /* Function to for Mjnquest to select gfx bank */
-WRITE16_HANDLER( TC0100SCN_gfxbank_w );
+WRITE16_DEVICE_HANDLER( tc0100scn_gfxbank_w );
 
-READ16_HANDLER ( TC0100SCN_word_0_r );
-WRITE16_HANDLER( TC0100SCN_word_0_w );
-READ16_HANDLER ( TC0100SCN_ctrl_word_0_r );
-WRITE16_HANDLER( TC0100SCN_ctrl_word_0_w );
-READ16_HANDLER ( TC0100SCN_word_1_r );
-WRITE16_HANDLER( TC0100SCN_word_1_w );
-READ16_HANDLER ( TC0100SCN_ctrl_word_1_r );
-WRITE16_HANDLER( TC0100SCN_ctrl_word_1_w );
-READ16_HANDLER ( TC0100SCN_word_2_r );
-WRITE16_HANDLER( TC0100SCN_word_2_w );
-READ16_HANDLER ( TC0100SCN_ctrl_word_2_r );
-WRITE16_HANDLER( TC0100SCN_ctrl_word_2_w );
+READ16_DEVICE_HANDLER( tc0100scn_word_r );
+WRITE16_DEVICE_HANDLER( tc0100scn_word_w );
+READ16_DEVICE_HANDLER( tc0100scn_ctrl_word_r );
+WRITE16_DEVICE_HANDLER( tc0100scn_ctrl_word_w );
 
 /* Functions for use with 68020 (Under Fire) */
-READ32_HANDLER ( TC0100SCN_long_r );
-WRITE32_HANDLER( TC0100SCN_long_w );
-READ32_HANDLER ( TC0100SCN_ctrl_long_r );
-WRITE32_HANDLER( TC0100SCN_ctrl_long_w );
+READ32_DEVICE_HANDLER( tc0100scn_long_r );
+WRITE32_DEVICE_HANDLER( tc0100scn_long_w );
+READ32_DEVICE_HANDLER( tc0100scn_ctrl_long_r );
+WRITE32_DEVICE_HANDLER( tc0100scn_ctrl_long_w );
 
-/* Functions to write multiple TC0100SCNs with the same data */
-WRITE16_HANDLER( TC0100SCN_dual_screen_w );
-WRITE16_HANDLER( TC0100SCN_triple_screen_w );
-
-void TC0100SCN_tilemap_update(running_machine *machine);
-int TC0100SCN_tilemap_draw(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority);
+void tc0100scn_tilemap_update(const device_config *device);
+int tc0100scn_tilemap_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority);
 
 /* returns 0 or 1 depending on the lowest priority tilemap set in the internal
    register. Use this function to draw tilemaps in the correct order. */
-int TC0100SCN_bottomlayer(int chip);
+int tc0100scn_bottomlayer(const device_config *device);
 
 
-/***************************************************************************/
+/** TC0280GRD & TC0430GRW **/
+READ16_DEVICE_HANDLER( tc0280grd_word_r );
+WRITE16_DEVICE_HANDLER( tc0280grd_word_w );
+WRITE16_DEVICE_HANDLER( tc0280grd_ctrl_word_w );
+void tc0280grd_tilemap_update(const device_config *device, int base_color);
+void tc0280grd_zoom_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int xoffset, int yoffset, UINT32 priority);
 
-void TC0280GRD_vh_start(running_machine *machine, int gfxnum);
-READ16_HANDLER ( TC0280GRD_word_r );
-WRITE16_HANDLER( TC0280GRD_word_w );
-WRITE16_HANDLER( TC0280GRD_ctrl_word_w );
-void TC0280GRD_tilemap_update(int base_color);
-void TC0280GRD_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,int xoffset,int yoffset,UINT32 priority);
-
-void TC0430GRW_vh_start(running_machine *machine, int gfxnum);
-READ16_HANDLER ( TC0430GRW_word_r );
-WRITE16_HANDLER( TC0430GRW_word_w );
-WRITE16_HANDLER( TC0430GRW_ctrl_word_w );
-void TC0430GRW_tilemap_update(int base_color);
-void TC0430GRW_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,int xoffset,int yoffset,UINT32 priority);
+READ16_DEVICE_HANDLER( tc0430grw_word_r );
+WRITE16_DEVICE_HANDLER( tc0430grw_word_w );
+WRITE16_DEVICE_HANDLER( tc0430grw_ctrl_word_w );
+void tc0430grw_tilemap_update(const device_config *device, int base_color);
+void tc0430grw_zoom_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int xoffset, int yoffset, UINT32 priority);
 
 
-/***************************************************************************/
+/** TC0360PRI **/
+WRITE8_DEVICE_HANDLER( tc0360pri_w );
+READ8_DEVICE_HANDLER( tc0360pri_r );
 
+
+/** TC0480SCP **/
 /* When writing a driver, pass zero for the text and flip offsets initially:
    then tweak them once you have the 4 bg layer positions correct. Col_base
    may be needed when tilemaps use a palette area from sprites. */
 
-void TC0480SCP_vh_start(running_machine *machine, int gfxnum,int pixels,int x_offset,int y_offset,int text_xoffs,int text_yoffs,int flip_xoffs,int flip_yoffs,int col_base);
-READ16_HANDLER ( TC0480SCP_word_r );
-WRITE16_HANDLER( TC0480SCP_word_w );
-READ16_HANDLER ( TC0480SCP_ctrl_word_r );
-WRITE16_HANDLER( TC0480SCP_ctrl_word_w );
+READ16_DEVICE_HANDLER( tc0480scp_word_r );
+WRITE16_DEVICE_HANDLER( tc0480scp_word_w );
+READ16_DEVICE_HANDLER( tc0480scp_ctrl_word_r );
+WRITE16_DEVICE_HANDLER( tc0480scp_ctrl_word_w );
 
 /* Functions for use with 68020 (Super-Z system) */
-READ32_HANDLER ( TC0480SCP_long_r );
-WRITE32_HANDLER( TC0480SCP_long_w );
-READ32_HANDLER ( TC0480SCP_ctrl_long_r );
-WRITE32_HANDLER( TC0480SCP_ctrl_long_w );
+READ32_DEVICE_HANDLER( tc0480scp_long_r );
+WRITE32_DEVICE_HANDLER( tc0480scp_long_w );
+READ32_DEVICE_HANDLER( tc0480scp_ctrl_long_r );
+WRITE32_DEVICE_HANDLER( tc0480scp_ctrl_long_w );
 
-void TC0480SCP_tilemap_update(running_machine *machine);
-void TC0480SCP_tilemap_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority);
+void tc0480scp_tilemap_update(const device_config *device);
+void tc0480scp_tilemap_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority);
 
 /* Returns the priority order of the bg tilemaps set in the internal
    register. The order in which the four layers should be drawn is
    returned in the lowest four nibbles  (msn = bottom layer; lsn = top) */
-int TC0480SCP_get_bg_priority(void);
+int tc0480scp_get_bg_priority(const device_config *device);
 
 /* Undrfire needs to read this for a sprite/tile priority hack */
-extern int TC0480SCP_pri_reg;
+READ8_DEVICE_HANDLER( tc0480scp_pri_reg_r );
 
 
-/***************************************************************************/
-
-READ16_HANDLER( TC0150ROD_word_r );
-WRITE16_HANDLER( TC0150ROD_word_w );
-void TC0150ROD_vh_start(running_machine *machine);
-void TC0150ROD_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int y_offs,int palette_offs,int type,int road_trans,UINT32 low_priority,UINT32 high_priority);
+/** TC0150ROD **/
+READ16_DEVICE_HANDLER( tc0150rod_word_r );
+WRITE16_DEVICE_HANDLER( tc0150rod_word_w );
+void tc0150rod_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int y_offs, int palette_offs, int type, int road_trans, UINT32 low_priority, UINT32 high_priority);
 
 
-/***************************************************************************/
-
-void TC0110PCR_vh_start(running_machine *machine);
-void TC0110PCR_1_vh_start(running_machine *machine);	/* 2nd chip */
-void TC0110PCR_2_vh_start(running_machine *machine);	/* 3rd chip */
-READ16_HANDLER ( TC0110PCR_word_r );
-READ16_HANDLER ( TC0110PCR_word_1_r );	/* 2nd chip */
-READ16_HANDLER ( TC0110PCR_word_2_r );	/* 3rd chip */
-WRITE16_HANDLER( TC0110PCR_word_w );	/* color index goes up in step of 2 */
-WRITE16_HANDLER( TC0110PCR_step1_word_w );	/* color index goes up in step of 1 */
-WRITE16_HANDLER( TC0110PCR_step1_word_1_w );	/* 2nd chip */
-WRITE16_HANDLER( TC0110PCR_step1_word_2_w );	/* 3rd chip */
-WRITE16_HANDLER( TC0110PCR_step1_rbswap_word_w );	/* swaps red and blue components */
-WRITE16_HANDLER( TC0110PCR_step1_4bpg_word_w );	/* only 4 bits per color gun */
-
-void TC0360PRI_vh_start(running_machine *machine);	/* must be called to ensure regs saved in state.c */
-WRITE8_HANDLER( TC0360PRI_w );
+/** TC0110PCR **/
+READ16_DEVICE_HANDLER( tc0110pcr_word_r );
+WRITE16_DEVICE_HANDLER( tc0110pcr_word_w );	/* color index goes up in step of 2 */
+WRITE16_DEVICE_HANDLER( tc0110pcr_step1_word_w );	/* color index goes up in step of 1 */
+WRITE16_DEVICE_HANDLER( tc0110pcr_step1_rbswap_word_w );	/* swaps red and blue components */
+WRITE16_DEVICE_HANDLER( tc0110pcr_step1_4bpg_word_w );	/* only 4 bits per color gun */
 
 
-/***************************************************************************/
-
-/* I/O chips, all extremely similar. The TC0220IOC was sometimes addressed
-   through a port, typically on earlier games. */
-
-READ8_HANDLER ( TC0220IOC_r );
-WRITE8_HANDLER( TC0220IOC_w );
-READ8_HANDLER ( TC0220IOC_port_r );
-WRITE8_HANDLER( TC0220IOC_port_w );
-READ8_HANDLER ( TC0220IOC_portreg_r );
-WRITE8_HANDLER( TC0220IOC_portreg_w );
-
-READ8_HANDLER ( TC0510NIO_r );
-WRITE8_HANDLER( TC0510NIO_w );
-
-READ16_HANDLER ( TC0510NIO_halfword_r );
-WRITE16_HANDLER( TC0510NIO_halfword_w );
-READ16_HANDLER ( TC0510NIO_halfword_wordswap_r );
-WRITE16_HANDLER( TC0510NIO_halfword_wordswap_w );
-
-READ8_HANDLER ( TC0640FIO_r );
-WRITE8_HANDLER( TC0640FIO_w );
-
-READ16_HANDLER ( TC0640FIO_halfword_r );
-WRITE16_HANDLER( TC0640FIO_halfword_w );
-READ16_HANDLER ( TC0640FIO_halfword_byteswap_r );
-WRITE16_HANDLER( TC0640FIO_halfword_byteswap_w );
-
+/** TC0180VCU **/
+READ8_DEVICE_HANDLER( tc0180vcu_get_fb_page );
+WRITE8_DEVICE_HANDLER( tc0180vcu_set_fb_page );
+READ8_DEVICE_HANDLER( tc0180vcu_get_videoctrl );
+READ16_DEVICE_HANDLER( tc0180vcu_ctrl_r );
+WRITE16_DEVICE_HANDLER( tc0180vcu_ctrl_w );
+READ16_DEVICE_HANDLER( tc0180vcu_scroll_r );
+WRITE16_DEVICE_HANDLER( tc0180vcu_scroll_w );
+READ16_DEVICE_HANDLER( tc0180vcu_word_r );
+WRITE16_DEVICE_HANDLER( tc0180vcu_word_w );
+void tc0180vcu_tilemap_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int tmap_num, int plane);

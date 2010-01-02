@@ -175,7 +175,7 @@ static const int gfxlookup[][4]=
    { 0x1b78000, 0x017b5db, 512, 256 },
    { 0x1bd8000, 0x017f2e6, 512, 256 },
    { -1,-1,-1,-1}
- };
+};
 
 static WRITE16_HANDLER( sliver_RAMDAC_offset_w )
 {
@@ -354,8 +354,8 @@ static WRITE16_HANDLER( jpeg2_w )
 				jpeg_w = gfxlookup[idx][2];
 				jpeg_h = gfxlookup[idx][3];
 				render_jpeg(space->machine);
-		}
-		else
+			}
+			else
 			{
 				jpeg_addr = -1;
 			}
@@ -492,7 +492,7 @@ static INPUT_PORTS_START( sliver )
 	PORT_DIPSETTING(	0x000c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(	0x000b, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(	0x0000, DEF_STR( Free_Play ) )
- 	PORT_DIPNAME( 0x0030, 0x0020, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0030, 0x0020, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x0030, "2" )
 	PORT_DIPSETTING(    0x0020, "3" )
 	PORT_DIPSETTING(    0x0010, "4" )

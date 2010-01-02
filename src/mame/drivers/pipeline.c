@@ -55,8 +55,8 @@ Notes:
 #include "cpu/z80/z80daisy.h"
 #include "cpu/m6805/m6805.h"
 
-static tilemap *tilemap1;
-static tilemap *tilemap2;
+static tilemap_t *tilemap1;
+static tilemap_t *tilemap2;
 
 static UINT8 *vram1;
 static UINT8 *vram2;
@@ -186,8 +186,8 @@ static WRITE8_HANDLER(vram2_w)
 		 palram[offset]=data;
 		 if(offset<0x300)
 		 {
-		 	offset&=0xff;
-		 	palette_set_color_rgb(space->machine, offset, pal6bit(palram[offset]), pal6bit(palram[offset+0x100]), pal6bit(palram[offset+0x200]));
+			offset&=0xff;
+			palette_set_color_rgb(space->machine, offset, pal6bit(palram[offset]), pal6bit(palram[offset+0x100]), pal6bit(palram[offset+0x200]));
 		 }
 	}
 }

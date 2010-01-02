@@ -645,7 +645,7 @@ static READ8_HANDLER( horshoes_trackx_hi_r )
 
 #define COMMON_BANKS_MAP \
 	AM_RANGE(0x0000, 0x5fff) AM_ROM			\
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1") 			\
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")			\
 	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank2") AM_WRITE(bank0_w) \
 	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK("bank3") AM_WRITE(bank1_w) \
 	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank4") AM_WRITE(bank2_w) \
@@ -1019,7 +1019,7 @@ static INPUT_PORTS_START( champwr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
- 	PORT_START("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1955,14 +1955,14 @@ static const ym2203_interface ym2203_interface_single =
 static MACHINE_DRIVER_START( fhawk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
 	MDRV_CPU_PROGRAM_MAP(fhawk_map)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(fhawk_3_map)
 
-	MDRV_CPU_ADD("slave", Z80, 12000000/3) 	/* verified on pcb */
+	MDRV_CPU_ADD("slave", Z80, XTAL_12MHz/3)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(fhawk_2_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,3) /* fixes slow down problems */
 
@@ -1989,7 +1989,7 @@ static MACHINE_DRIVER_START( fhawk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 3000000) /* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)		/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface_triple)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
@@ -2021,7 +2021,7 @@ static MACHINE_DRIVER_START( champwr )
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
@@ -2044,7 +2044,7 @@ static MACHINE_DRIVER_START( raimais )
 	MDRV_MACHINE_RESET(raimais)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("ymsnd", YM2610, 8000000) /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
+	MDRV_SOUND_REPLACE("ymsnd", YM2610, XTAL_8MHz)		/* verified on pcb (8Mhz OSC is also for the 2nd z80) */
 	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
@@ -2055,11 +2055,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kurikint )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
 	MDRV_CPU_PROGRAM_MAP(kurikint_map)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
-	MDRV_CPU_ADD("audiocpu",  Z80, 12000000/3) 	/* verified on pcb */
+	MDRV_CPU_ADD("audiocpu",  Z80, XTAL_12MHz/3)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(kurikint_2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -2086,7 +2086,7 @@ static MACHINE_DRIVER_START( kurikint )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 3000000) /* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)		/* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
@@ -2107,7 +2107,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( plotting )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
 	MDRV_CPU_PROGRAM_MAP(plotting_map)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
@@ -2132,7 +2132,7 @@ static MACHINE_DRIVER_START( plotting )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 3330000) /* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_13_33056MHz/4)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface_single)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
@@ -2197,11 +2197,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( evilston )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 13330560/2) 	/* not verfied */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* not verified */
 	MDRV_CPU_PROGRAM_MAP(evilston_map)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 12000000/3) 	/* not verified */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)		/* not verified */
 	MDRV_CPU_PROGRAM_MAP(evilston_2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -2228,14 +2228,26 @@ static MACHINE_DRIVER_START( evilston )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 12000000/4) /* not verified */
+	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)		/* not verified */
 	MDRV_SOUND_ROUTE(0, "mono", 0.00)
 	MDRV_SOUND_ROUTE(1, "mono", 0.00)
 	MDRV_SOUND_ROUTE(2, "mono", 0.00)
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( lagirl )
 
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(plotting)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(cachat_map)
+	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_27_2109MHz/4)
+
+	/* sound hardware */
+	MDRV_SOUND_REPLACE("ymsnd", YM2203, XTAL_27_2109MHz/8)
+
+	MDRV_MACHINE_RESET(cachat)
+MACHINE_DRIVER_END
 
 
 ROM_START( raimais )
@@ -2682,7 +2694,7 @@ ROM_START( cachat )
 	ROM_LOAD( "pal20l8b-c63-01.14", 0x0000, 0x0144, CRC(14a7dd2a) SHA1(2a39ca6069bdac553d73c34db6f50f880559113c) )
 ROM_END
 
-ROM_START( tubeit )
+ROM_START( tubeit ) /* Title changed. Year, copyright and manufacture removed */
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "t-i_02.6", 0x00000, 0x20000, CRC(54730669) SHA1(a44ebd31a8588a133a7552a39fa8d52ba1985e45) )
 	ROM_RELOAD(           0x10000, 0x20000 )
@@ -2744,7 +2756,7 @@ ROM_END
 /*
 
 LA Girl
-(no manufacturer/year?)
+Clearly a bootleg / hack of Play Girls by Hot-B, reportedly by Ta Ta Electronics, 1993
 
 PCB Layout
 ----------
@@ -2849,9 +2861,8 @@ GAME( 1993, cachat,    0,        cachat,   cachat,   0,        ROT0,   "Taito Co
 GAME( 1993, tubeit,    cachat,   cachat,   tubeit,   0,        ROT0,   "Taito Corporation", "Tube-It", 0 )  // No (c) message
 GAME( 199?, cubybop,   0,        cachat,   cubybop,  0,        ROT0,   "Taito Corporation", "Cuby Bop (Location Test)", 0 ) // No (c) message
 
-GAME( 1992, plgirls,   0,        cachat,   plgirls,  0,        ROT270, "Hot-B.", "Play Girls", 0 )
-GAME( 1993, plgirls2,  0,        cachat,   plgirls2, 0,        ROT270, "Hot-B.", "Play Girls 2", 0 )
-
-GAME( 199?, lagirl,   0,         cachat,   plgirls,  0,        ROT270, "<unknown>", "LA Girl", 0 )
+GAME( 1992, plgirls,   0,        cachat,   plgirls,  0,        ROT270, "Hot-B.",  "Play Girls", 0 )
+GAME( 1992, lagirl,    plgirls,  cachat,   plgirls,  0,        ROT270, "bootleg", "LA Girl", 0 ) /* bootleg hardware with changed title & backgrounds */
+GAME( 1993, plgirls2,  0,        cachat,   plgirls2, 0,        ROT270, "Hot-B.",  "Play Girls 2", 0 )
 
 GAME( 1990, evilston,  0,        evilston, evilston, evilston, ROT270, "Spacy Industrial, Ltd.", "Evil Stone", 0 )

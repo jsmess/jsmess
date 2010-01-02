@@ -9,7 +9,7 @@
 #include "driver.h"
 #include "includes/aquarius.h"
 
-static tilemap *aquarius_tilemap;
+static tilemap_t *aquarius_tilemap;
 
 UINT8 *aquarius_colorram;
 

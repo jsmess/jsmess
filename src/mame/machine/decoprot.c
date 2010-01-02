@@ -462,7 +462,7 @@ READ16_HANDLER( deco16_66_prot_r ) /* Mutant Fighter */
 	if (offset!=0x6a/2)
 		mutantf_port_6a_hack=0x2866;
 
- 	switch (offset*2) {
+	switch (offset*2) {
 		case 0xac: /* Dip switches */
 			return input_port_read(space->machine, "DSW");
 		case 0xc2: /* Dip switches */
@@ -616,7 +616,7 @@ WRITE16_HANDLER( deco16_104_cninja_prot_w )
 
 READ16_HANDLER( deco16_104_cninja_prot_r )
 {
- 	switch (offset<<1) {
+	switch (offset<<1) {
 		case 0x80: /* Master level control */
 			return deco16_prot_ram[0];
 
@@ -1311,7 +1311,7 @@ static READ16_HANDLER( deco16_146_core_prot_r )
 
 //  case 0x582: return input_port_read(space->machine, "IN0"); /* IN0 */
 //  case 0x672: return input_port_read(space->machine, "IN1"); /* IN1 */
-//  case 0x04c: return eeprom_read_bit();
+//  case 0x04c: return eeprom_read_bit(devtag_get_device(space->machine, "eeprom"));
 
 	case 0x468:
 		val=DECO_PORT(0x570);
@@ -1660,7 +1660,7 @@ READ32_HANDLER( deco16_146_fghthist_prot_r )
 	{
 	case 0x582: return (input_port_read(space->machine, "IN0")<<16) | 0xffff; /* IN0 */
 	case 0x672: return (input_port_read(space->machine, "IN1")<<16) | 0xffff; /* IN1 */
-	case 0x04c: return (eeprom_read_bit()<<16) | 0xffff;
+	case 0x04c: return (eeprom_read_bit(devtag_get_device(space->machine, "eeprom"))<<16) | 0xffff;
 	}
 
 	/* Handle 'one shots' - writing data to an address, then immediately reading it back */
@@ -1686,7 +1686,7 @@ READ32_HANDLER( deco16_146_fghthist_prot_r )
 		&& addr!=0x5ae && addr!=0x50a && addr!=0x476 && addr!=0x328 && addr!=0x3e && addr!=0x558 // dbl check these later
 		&& addr!=0x444 && addr!=0x46a // confirmed
 		&& cpu_get_pc(space->cpu)!=0x16448 // hmm
- 		&& addr!=0x67a
+		&& addr!=0x67a
 		&& addr!=0x6c2 && addr!=0xac && addr!=0x416 && addr!=0x2c2 // confirmed
 		&& addr!=0x3d8
 		&& addr!=0x250 && addr!=0x306 && addr!=0x608 && addr!=0x52e // confirmed

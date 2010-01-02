@@ -196,13 +196,13 @@ enum
        | LSMD1    | LSMD0    | VRESO1   | VRESO0   |    --    | HRESO2   | HRESO1   | HRESO0   |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_TVMD 	((stv_vdp2_regs[0x000/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_TVMD	((stv_vdp2_regs[0x000/4] >> 16)&0x0000ffff)
 
 	#define STV_VDP2_DISP   ((STV_VDP2_TVMD & 0x8000) >> 15)
 	#define STV_VDP2_BDCLMD	((STV_VDP2_TVMD & 0x0100) >> 8)
-	#define STV_VDP2_LSMD 	((STV_VDP2_TVMD & 0x00c0) >> 6)
-	#define STV_VDP2_VRES 	((STV_VDP2_TVMD & 0x0030) >> 4)
-	#define STV_VDP2_HRES 	((STV_VDP2_TVMD & 0x0007) >> 0)
+	#define STV_VDP2_LSMD	((STV_VDP2_TVMD & 0x00c0) >> 6)
+	#define STV_VDP2_VRES	((STV_VDP2_TVMD & 0x0030) >> 4)
+	#define STV_VDP2_HRES	((STV_VDP2_TVMD & 0x0007) >> 0)
 
 /* 180002 - r/w - EXTEN - External Signal Enable Register
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -2242,7 +2242,7 @@ static void stv_vdp2_fill_rotation_parameter_table( running_machine *machine, UI
 			case 6:	popmessage( "cx = %x, cy = %x, cz = %x", RP.cx, RP.cy, RP.cz ); break;
 			case 7:	popmessage( "mx = %x, my = %x", RP.mx, RP.my ); break;
 			case 8:	popmessage( "kx = %x, ky = %x", RP.kx, RP.ky ); break;
-	 		case 9:	popmessage( "kast = %x, dkast = %x, dkax = %x", RP.kast, RP.dkast, RP.dkax ); break;
+			case 9:	popmessage( "kast = %x, dkast = %x, dkax = %x", RP.kast, RP.dkast, RP.dkax ); break;
 			case 10: break;
 		}
 	}
@@ -2677,12 +2677,12 @@ static void stv_vdp2_compute_color_offset_RGB555( int *r, int *g, int *b, int co
 		*g = (STV_VDP2_COBG & 0x100) ? (*g - (0xff - (STV_VDP2_COBG & 0xff))) : ((STV_VDP2_COBG & 0xff) + *g);
 		*b = (STV_VDP2_COBB & 0x100) ? (*b - (0xff - (STV_VDP2_COBB & 0xff))) : ((STV_VDP2_COBB & 0xff) + *b);
 	}
-	if(*r < 0) 		{ *r = 0; }
-	if(*r > 0xff) 	{ *r = 0xff; }
-	if(*g < 0) 		{ *g = 0; }
-	if(*g > 0xff) 	{ *g = 0xff; }
-	if(*b < 0) 		{ *b = 0; }
-	if(*b > 0xff) 	{ *b = 0xff; }
+	if(*r < 0)		{ *r = 0; }
+	if(*r > 0xff)	{ *r = 0xff; }
+	if(*g < 0)		{ *g = 0; }
+	if(*g > 0xff)	{ *g = 0xff; }
+	if(*b < 0)		{ *b = 0; }
+	if(*b > 0xff)	{ *b = 0xff; }
 	*r >>= 3;
 	*g >>= 3;
 	*b >>= 3;
@@ -2706,12 +2706,12 @@ static void stv_vdp2_compute_color_offset_RGB555_UINT16(UINT16 *rgb, int cor)
 		_g = (STV_VDP2_COBG & 0x100) ? (_g - (0xff - (STV_VDP2_COBG & 0xff))) : ((STV_VDP2_COBG & 0xff) + _g);
 		_b = (STV_VDP2_COBB & 0x100) ? (_b - (0xff - (STV_VDP2_COBB & 0xff))) : ((STV_VDP2_COBB & 0xff) + _b);
 	}
-	if(_r < 0) 		{ _r = 0; }
-	if(_r > 0xff) 	{ _r = 0xff; }
-	if(_g < 0) 		{ _g = 0; }
-	if(_g > 0xff) 	{ _g = 0xff; }
-	if(_b < 0) 		{ _b = 0; }
-	if(_b > 0xff) 	{ _b = 0xff; }
+	if(_r < 0)		{ _r = 0; }
+	if(_r > 0xff)	{ _r = 0xff; }
+	if(_g < 0)		{ _g = 0; }
+	if(_g > 0xff)	{ _g = 0xff; }
+	if(_b < 0)		{ _b = 0; }
+	if(_b > 0xff)	{ _b = 0xff; }
 	_r >>= 3;
 	_g >>= 3;
 	_b >>= 3;
@@ -3135,7 +3135,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 					}
 					/*Guess: myfairlady needs that the vertical resolution is doubled because it's using the double density mode.*/
 					if(STV_VDP2_LSMD == 3) { gfxdata += xlinesize*(yy>>16); }
-					else 				   { gfxdata += xlinesize; }
+					else				   { gfxdata += xlinesize; }
 					if ( gfxdata >= gfxdatahigh ) gfxdata = gfxdatalow + (gfxdata - gfxdatahigh);
 				}
 			}
@@ -4854,7 +4854,7 @@ static void stv_vdp2_draw_rotation_screen(running_machine *machine, bitmap_t *bi
 	else
 	{
 		if ( stv_vdp2_roz_bitmap[iRP-1] == NULL )
-			stv_vdp2_roz_bitmap[iRP-1] = auto_bitmap_alloc(machine, 4096, 4096, video_screen_get_format(machine->primary_screen));
+			stv_vdp2_roz_bitmap[iRP-1] = bitmap_alloc(4096, 4096, video_screen_get_format(machine->primary_screen));
 
 		roz_clip_rect.min_x = roz_clip_rect.min_y = 0;
 		if ( (iRP == 1 && STV_VDP2_RAOVR == 3) ||
@@ -5396,8 +5396,19 @@ static STATE_POSTLOAD( stv_vdp2_state_save_postload )
 	refresh_palette_data(machine);
 }
 
+static void stv_vdp2_exit (running_machine *machine)
+{
+	if (stv_vdp2_roz_bitmap[0] != NULL)
+		bitmap_free(stv_vdp2_roz_bitmap[0]);
+	if (stv_vdp2_roz_bitmap[1] != NULL)
+		bitmap_free(stv_vdp2_roz_bitmap[1]);
+	stv_vdp2_roz_bitmap[0] =  stv_vdp2_roz_bitmap[1] = NULL;
+}
+
 static int stv_vdp2_start (running_machine *machine)
 {
+	add_exit_callback(machine, stv_vdp2_exit);
+
 	stv_vdp2_regs = auto_alloc_array_clear(machine, UINT32, 0x040000/4 );
 	stv_vdp2_vram = auto_alloc_array_clear(machine, UINT32, 0x100000/4 ); // actually we only need half of it since we don't emulate extra 4mbit ram cart.
 	stv_vdp2_cram = auto_alloc_array_clear(machine, UINT32, 0x080000/4 );
@@ -5520,11 +5531,11 @@ static void	stv_vdp2_fade_effects(running_machine *machine)
 		t_g = (STV_VDP2_COAG & 0x100) ? (RGB_GREEN(color) - (0x100 - (STV_VDP2_COAG & 0xff))) : ((STV_VDP2_COAG & 0xff) + RGB_GREEN(color));
 		t_b = (STV_VDP2_COAB & 0x100) ? (RGB_BLUE(color) - (0x100 - (STV_VDP2_COAB & 0xff))) : ((STV_VDP2_COAB & 0xff) + RGB_BLUE(color));
 		if(t_r < 0) 	{ t_r = 0; }
-		if(t_r > 0xff) 	{ t_r = 0xff; }
+		if(t_r > 0xff)	{ t_r = 0xff; }
 		if(t_g < 0) 	{ t_g = 0; }
-		if(t_g > 0xff) 	{ t_g = 0xff; }
+		if(t_g > 0xff)	{ t_g = 0xff; }
 		if(t_b < 0) 	{ t_b = 0; }
-		if(t_b > 0xff) 	{ t_b = 0xff; }
+		if(t_b > 0xff)	{ t_b = 0xff; }
 		r = t_r;
 		g = t_g;
 		b = t_b;
@@ -5536,11 +5547,11 @@ static void	stv_vdp2_fade_effects(running_machine *machine)
 		t_g = (STV_VDP2_COBG & 0x100) ? (RGB_GREEN(color) - (0xff - (STV_VDP2_COBG & 0xff))) : ((STV_VDP2_COBG & 0xff) + RGB_GREEN(color));
 		t_b = (STV_VDP2_COBB & 0x100) ? (RGB_BLUE(color) - (0xff - (STV_VDP2_COBB & 0xff))) : ((STV_VDP2_COBB & 0xff) + RGB_BLUE(color));
 		if(t_r < 0) 	{ t_r = 0; }
-		if(t_r > 0xff) 	{ t_r = 0xff; }
+		if(t_r > 0xff)	{ t_r = 0xff; }
 		if(t_g < 0) 	{ t_g = 0; }
-		if(t_g > 0xff) 	{ t_g = 0xff; }
+		if(t_g > 0xff)	{ t_g = 0xff; }
 		if(t_b < 0) 	{ t_b = 0; }
-		if(t_b > 0xff) 	{ t_b = 0xff; }
+		if(t_b > 0xff)	{ t_b = 0xff; }
 		r = t_r;
 		g = t_g;
 		b = t_b;
@@ -5585,7 +5596,7 @@ Window Registers are hooked up like this ATM:
 static void stv_vdp2_get_window0_coordinates(UINT16 *s_x, UINT16 *e_x, UINT16 *s_y, UINT16 *e_y)
 {
 	/*W0*/
- 	switch(STV_VDP2_LSMD & 3)
+	switch(STV_VDP2_LSMD & 3)
 	{
 		case 0:
 		case 1:
@@ -5792,8 +5803,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	UINT16 *bitmap_line, *bitmap_line2 = NULL;
 	UINT8  interlace_framebuffer;
 	UINT8  double_x;
-	static const UINT16 sprite_colormask_table[] = { 0x07ff, 0x07ff, 0x07ff, 0x07ff, 0x03ff, 0x07ff, 0x03ff, 0x01ff,
-										0x007f, 0x003f, 0x003f, 0x003f, 0x0ff, 0x0ff, 0x0ff, 0x0ff };
+	static const UINT16 sprite_colormask_table[] = {
+		0x07ff, 0x07ff, 0x07ff, 0x07ff, 0x03ff, 0x07ff, 0x03ff, 0x01ff,
+		0x007f, 0x003f, 0x003f, 0x003f, 0x00ff, 0x00ff, 0x00ff, 0x00ff
+	};
 	static const UINT16 priority_shift_table[] = { 14, 13, 14, 13, 13, 12, 12, 12, 7, 7, 6, 0, 7, 7, 6, 0 };
 	static const UINT16 priority_mask_table[]  = {  3,  7,  1,  3,  3,  7,  7,  7, 1, 1, 3, 0, 1, 1, 3, 0 };
 	static const UINT16 ccrr_shift_table[] =	 { 11, 11, 11, 11, 10, 11, 10,  9, 0, 6, 0, 6, 0, 6, 0, 6 };

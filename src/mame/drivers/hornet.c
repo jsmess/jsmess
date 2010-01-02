@@ -311,7 +311,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "machine/konppc.h"
 #include "video/voodoo.h"
 #include "machine/timekpr.h"
@@ -319,6 +319,7 @@
 #include "rendlay.h"
 #include "machine/adc1213x.h"
 #include "sound/k056800.h"
+#include "machine/k033906.h"
 
 static UINT8 led_reg0, led_reg1;
 static UINT32 *workram;
@@ -334,7 +335,7 @@ static UINT32 jvs_sdata_ptr = 0;
 static UINT32 *K037122_tile_ram[MAX_K037122_CHIPS];
 static UINT32 *K037122_char_ram[MAX_K037122_CHIPS];
 static int K037122_gfx_index[MAX_K037122_CHIPS];
-static tilemap *K037122_layer[MAX_K037122_CHIPS][2];
+static tilemap_t *K037122_layer[MAX_K037122_CHIPS][2];
 static UINT32 *K037122_reg[MAX_K037122_CHIPS];
 
 #define K037122_NUM_TILES		16384
@@ -653,7 +654,7 @@ static READ8_HANDLER( sysreg_r )
                 0x02 = ADDOR (ADC DOR)
                 0x01 = ADDO (ADC DO)
             */
-			r = 0xf0 | (eepromdev_read_bit(eeprom) << 3);
+			r = 0xf0 | (eeprom_read_bit(eeprom) << 3);
 			r |= adc1213x_do_r(adc12138, 0) | (adc1213x_eoc_r(adc12138, 0) << 2);
 			break;
 
@@ -968,9 +969,9 @@ static INPUT_PORTS_START( hornet )
 	PORT_DIPSETTING( 0x00, "15KHz" )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sscope )
@@ -1020,9 +1021,9 @@ static INPUT_PORTS_START( sscope )
 	PORT_DIPSETTING( 0x00, "15KHz" )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
 static const sharc_config sharc_cfg =
@@ -1100,6 +1101,16 @@ static const k056800_interface hornet_k056800_interface =
 	sound_irq_callback
 };
 
+static const k033906_interface hornet_k033906_intf_0 =
+{
+	"voodoo0"
+};
+
+static const k033906_interface hornet_k033906_intf_1 =
+{
+	"voodoo1"
+};
+
 static MACHINE_DRIVER_START( hornet )
 
 	/* basic machine hardware */
@@ -1118,14 +1129,16 @@ static MACHINE_DRIVER_START( hornet )
 	MDRV_MACHINE_START( hornet )
 	MDRV_MACHINE_RESET( hornet )
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	MDRV_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "screen")
 	MDRV_3DFX_VOODOO_CPU("dsp")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
 
- 	/* video hardware */
+	MDRV_K033906_ADD("k033906_1", hornet_k033906_intf_0)
+
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -1191,6 +1204,8 @@ static MACHINE_DRIVER_START( hornet_2board )
 	MDRV_3DFX_VOODOO_CPU("dsp2")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_1)
+
+	MDRV_K033906_ADD("k033906_2", hornet_k033906_intf_1)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(65536)
@@ -1382,8 +1397,6 @@ static DRIVER_INIT(hornet)
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_HORNET);
 	set_cgboard_texture_bank(machine, 0, "bank5", memory_region(machine, "user5"));
 
-	K033906_init(machine);
-
 	led_reg0 = led_reg1 = 0x7f;
 
 	ppc4xx_spu_set_tx_handler(cputag_get_cpu(machine, "maincpu"), jamma_jvs_w);
@@ -1394,8 +1407,6 @@ static DRIVER_INIT(hornet_2board)
 	init_konami_cgboard(machine, 2, CGBOARD_TYPE_HORNET);
 	set_cgboard_texture_bank(machine, 0, "bank5", memory_region(machine, "user5"));
 	set_cgboard_texture_bank(machine, 1, "bank6", memory_region(machine, "user5"));
-
-	K033906_init(machine);
 
 	led_reg0 = led_reg1 = 0x7f;
 

@@ -20,7 +20,7 @@ static UINT32 stars_scrollx,stars_scrolly;
 
 static INT32 galaga_gfxbank; // used by catsbee
 
-static tilemap *tx_tilemap;
+static tilemap_t *tx_tilemap;
 
 /*
 Galaga star line and pixel locations pulled directly from
@@ -549,7 +549,7 @@ static void draw_stars(bitmap_t *bitmap, const rectangle *cliprect )
 
 	if ( galaga_starcontrol[5] == 1 )
 	{
-  		int star_cntr;
+		int star_cntr;
 		int set_a, set_b;
 
 		/* two sets of stars controlled by these bits */

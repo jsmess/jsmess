@@ -255,7 +255,7 @@ To Do / Unknowns:
 #include "cpu/nec/nec.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "machine/nmk112.h"
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
@@ -353,10 +353,6 @@ static MACHINE_RESET( bgaregga )
 	memory_configure_bank(machine, "bank1", 0, 16, Z80, 0x4000);
 	memory_set_bank(machine, "bank1", 4);
 
-	if (memory_region(machine, "oki1") != NULL)
-		NMK112_init(0, "oki1", "oki2");
-	else
-		NMK112_init(0, "oki", "oki");
 	MACHINE_RESET_CALL(toaplan2);
 }
 
@@ -925,7 +921,7 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 		}
 		else if (mcu_data == 0xff00)
 		{
-#if 0 		/* check the 37B6 code */
+#if 0		/* check the 37B6 code */
 			/* copy nvram data to shared ram after post is complete */
 			fixeight_sharedram[0] = fixeight_nvram[0];	/* Dip Switch A */
 			fixeight_sharedram[1] = fixeight_nvram[1];	/* Dip Switch B */
@@ -1091,26 +1087,34 @@ static WRITE8_HANDLER( bgaregga_bankswitch_w )
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_0 )
 {
-	NMK112_okibank_w(space, 0,  data		& 0x0f);	// chip 0 bank 0
-	NMK112_okibank_w(space, 1, (data >> 4)	& 0x0f);	// chip 0 bank 1
+	const device_config *nmk112 = devtag_get_device(space->machine, "nmk112");
+
+	nmk112_okibank_w(nmk112, 0,  data		& 0x0f);	// chip 0 bank 0
+	nmk112_okibank_w(nmk112, 1, (data >> 4)	& 0x0f);	// chip 0 bank 1
 }
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_1 )
 {
-	NMK112_okibank_w(space, 2,  data		& 0x0f);	// chip 0 bank 2
-	NMK112_okibank_w(space, 3, (data >> 4)	& 0x0f);	// chip 0 bank 3
+	const device_config *nmk112 = devtag_get_device(space->machine, "nmk112");
+
+	nmk112_okibank_w(nmk112, 2,  data		& 0x0f);	// chip 0 bank 2
+	nmk112_okibank_w(nmk112, 3, (data >> 4)	& 0x0f);	// chip 0 bank 3
 }
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_2 )
 {
-	NMK112_okibank_w(space, 4,  data		& 0x0f);	// chip 1 bank 0
-	NMK112_okibank_w(space, 5, (data >> 4)	& 0x0f);	// chip 1 bank 1
+	const device_config *nmk112 = devtag_get_device(space->machine, "nmk112");
+
+	nmk112_okibank_w(nmk112, 4,  data		& 0x0f);	// chip 1 bank 0
+	nmk112_okibank_w(nmk112, 5, (data >> 4)	& 0x0f);	// chip 1 bank 1
 }
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_3 )
 {
-	NMK112_okibank_w(space, 6,  data		& 0x0f);	// chip 1 bank 2
-	NMK112_okibank_w(space, 7, (data >> 4)	& 0x0f);	// chip 1 bank 3
+	const device_config *nmk112 = devtag_get_device(space->machine, "nmk112");
+
+	nmk112_okibank_w(nmk112, 6,  data		& 0x0f);	// chip 1 bank 2
+	nmk112_okibank_w(nmk112, 7, (data >> 4)	& 0x0f);	// chip 1 bank 3
 }
 
 
@@ -1275,7 +1279,7 @@ static READ16_HANDLER( bbakraid_nvram_r )
     */
 
 	int data;
-	data  = ((eepromdev_read_bit(eeprom) & 0x01) << 4);
+	data  = ((eeprom_read_bit(eeprom) & 0x01) << 4);
 	data |= ((raizing_Z80_busreq >> 4) & 0x01);	/* Loop BUSRQ to BUSAK */
 
 	return data;
@@ -2183,7 +2187,7 @@ static INPUT_PORTS_START( ghox )
 	PORT_DIPSETTING(		0x0020, "2" )
 	PORT_DIPSETTING(		0x0000, "3" )
 	PORT_DIPSETTING(		0x0010, "5" )
-	PORT_DIPNAME( 0x0040, 	0x0000, "Invulnerability" )			PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability" )			PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW2:8")
@@ -3270,9 +3274,9 @@ static INPUT_PORTS_START( bbakraid )
 	PORT_DIPSETTING(		0x8000, DEF_STR( On ) )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
 INPUT_PORTS_END
 
 
@@ -4043,6 +4047,17 @@ static const UINT8 ts007spy_decryption_table[256] = {
 
 static const nec_config ts007spy_config ={ ts007spy_decryption_table, };
 
+
+static const nmk112_interface bgaregga_nmk112_intf =
+{
+	"oki", "oki", 0
+};
+
+static const nmk112_interface batrider_nmk112_intf =
+{
+	"oki1", "oki2", 0
+};
+
 static MACHINE_DRIVER_START( batsugun )
 
 	/* basic machine hardware */
@@ -4247,6 +4262,8 @@ static MACHINE_DRIVER_START( bgaregga )
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/16)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_NMK112_ADD("nmk112", bgaregga_nmk112_intf)
 MACHINE_DRIVER_END
 
 
@@ -4293,6 +4310,8 @@ static MACHINE_DRIVER_START( batrider )
 	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_32MHz/10)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_NMK112_ADD("nmk112", batrider_nmk112_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bbakraid )
@@ -4310,7 +4329,7 @@ static MACHINE_DRIVER_START( bbakraid )
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(toaplan2)
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", bbakraid_93C66_intf)
+	MDRV_EEPROM_ADD("eeprom", bbakraid_93C66_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -4340,7 +4359,8 @@ static MACHINE_DRIVER_START( bbakradu )
 	MDRV_IMPORT_FROM(bbakraid)
 
 	MDRV_DEVICE_REMOVE("eeprom")
-	MDRV_EEPROM_ADD("eeprom", bbakraid_93C66_intf, 512, bbakraid_unlim_default)
+	MDRV_EEPROM_ADD("eeprom", bbakraid_93C66_intf)
+	MDRV_EEPROM_DATA(bbakraid_unlim_default, 512)
 MACHINE_DRIVER_END
 
 
@@ -5120,7 +5140,7 @@ ROM_END
 ROM_START( batrid )
 	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0_europe.u22", 0x000000, 0x080000, CRC(91d3e975) SHA1(682885fc17f2424d475c282f239f42faf1aae076) )
- 	ROM_LOAD16_BYTE( "prg1b.u23", 0x000001, 0x080000, CRC(8e70b492) SHA1(f84f2039826ae815afb058d71c1dbd190f9d524d) )
+	ROM_LOAD16_BYTE( "prg1b.u23", 0x000001, 0x080000, CRC(8e70b492) SHA1(f84f2039826ae815afb058d71c1dbd190f9d524d) )
 	ROM_LOAD16_BYTE( "prg2.u21" , 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
 	ROM_LOAD16_BYTE( "prg3.u24" , 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
 
@@ -5144,7 +5164,7 @@ ROM_END
 ROM_START( batridu )
 	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0_usa.u22", 0x000000, 0x080000, CRC(2049d007) SHA1(f2a43547a6fc5083b03c1d59a85abbf6e1ce4cd9) )
-  	ROM_LOAD16_BYTE( "prg1b.u23", 0x000001, 0x080000, CRC(8e70b492) SHA1(f84f2039826ae815afb058d71c1dbd190f9d524d) )
+	ROM_LOAD16_BYTE( "prg1b.u23", 0x000001, 0x080000, CRC(8e70b492) SHA1(f84f2039826ae815afb058d71c1dbd190f9d524d) )
 	ROM_LOAD16_BYTE( "prg2.u21" , 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
 	ROM_LOAD16_BYTE( "prg3.u24" , 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
 
@@ -5168,7 +5188,7 @@ ROM_END
 ROM_START( batridc )
 	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0_china.u22", 0x000000, 0x080000, CRC(c3b91f7e) SHA1(6b2376c37808dccda296d90ccd7f577ccff4e4dc) )
-  	ROM_LOAD16_BYTE( "prg1b.u23", 0x000001, 0x080000, CRC(8e70b492) SHA1(f84f2039826ae815afb058d71c1dbd190f9d524d) )
+	ROM_LOAD16_BYTE( "prg1b.u23", 0x000001, 0x080000, CRC(8e70b492) SHA1(f84f2039826ae815afb058d71c1dbd190f9d524d) )
 	ROM_LOAD16_BYTE( "prg2.u21" , 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
 	ROM_LOAD16_BYTE( "prg3.u24" , 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
 

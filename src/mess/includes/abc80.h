@@ -61,7 +61,7 @@ struct _abc80_state
 	/* video state */
 	UINT8 *video_ram;
 	UINT8 *video_80_ram;
-	tilemap *tx_tilemap;
+	tilemap_t *tx_tilemap;
 	int blink;
 	int char_bank;
 	int char_row;

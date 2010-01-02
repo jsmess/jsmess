@@ -244,15 +244,24 @@ static UINT8 nslasher_sound_irq;
 
 /**********************************************************************************/
 
+
+static WRITE32_HANDLER( deco32_pf12_control_w )
+{
+	COMBINE_DATA(&deco32_pf12_control[offset]);
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+}
+
+
+static WRITE32_HANDLER( deco32_pf34_control_w )
+{
+	COMBINE_DATA(&deco32_pf34_control[offset]);
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+}
+
+
+
 static TIMER_DEVICE_CALLBACK( interrupt_gen )
 {
-	/* Save state of scroll registers before the IRQ */
-	deco32_raster_display_list[deco32_raster_display_position++]=video_screen_get_vpos(timer->machine->primary_screen);
-	deco32_raster_display_list[deco32_raster_display_position++]=deco32_pf12_control[1]&0xffff;
-	deco32_raster_display_list[deco32_raster_display_position++]=deco32_pf12_control[2]&0xffff;
-	deco32_raster_display_list[deco32_raster_display_position++]=deco32_pf12_control[3]&0xffff;
-	deco32_raster_display_list[deco32_raster_display_position++]=deco32_pf12_control[4]&0xffff;
-
 	cputag_set_input_line(timer->machine, "maincpu", ARM_IRQ_LINE, HOLD_LINE);
 }
 
@@ -305,7 +314,10 @@ static WRITE32_HANDLER( deco32_irq_controller_w )
 	case 1: /* Raster IRQ scanline position, only valid for values between 1 & 239 (0 and 240-256 do NOT generate IRQ's) */
 		scanline=(data&0xff);
 		if (raster_enable && scanline>0 && scanline<240)
-			timer_device_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(space->machine->primary_screen, scanline-1, 320),0);
+		{
+			// needs +16 for the raster to align on captaven intro? (might just be our screen size / visible area / layer offsets need adjusting instead)
+			timer_device_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(space->machine->primary_screen, scanline+16, 320),0);
+		}
 		else
 			timer_device_adjust_oneshot(raster_irq_timer,attotime_never,0);
 		break;
@@ -351,7 +363,7 @@ static READ32_HANDLER( fghthist_control_r )
 	switch (offset) {
 	case 0: return 0xffff0000 | input_port_read(space->machine, "IN0");
 	case 1: return 0xffff0000 | input_port_read(space->machine, "IN1"); //check top bits??
-	case 2: return 0xfffffffe | eeprom_read_bit();
+	case 2: return 0xfffffffe | eeprom_read_bit(devtag_get_device(space->machine, "eeprom"));
 	}
 
 	return 0xffffffff;
@@ -360,9 +372,10 @@ static READ32_HANDLER( fghthist_control_r )
 static WRITE32_HANDLER( fghthist_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7) {
-		eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom_write_bit(data & 0x10);
-		eeprom_set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		const device_config *device = devtag_get_device(space->machine, "eeprom");
+		eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(device, data & 0x10);
+		eeprom_set_cs_line(device, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 		deco32_pri_w(space,0,data&0x1,0xffffffff); /* Bit 0 - layer priority toggle */
 	}
@@ -429,20 +442,20 @@ static WRITE32_HANDLER( dragngun_lightgun_w )
 	dragngun_lightgun_port=offset;
 }
 
-static READ32_HANDLER( dragngun_eeprom_r )
+static READ32_DEVICE_HANDLER( dragngun_eeprom_r )
 {
-	return 0xfffffffe | eeprom_read_bit();
+	return 0xfffffffe | eeprom_read_bit(device);
 }
 
-static WRITE32_HANDLER( dragngun_eeprom_w )
+static WRITE32_DEVICE_HANDLER( dragngun_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7) {
-		eeprom_set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom_write_bit(data & 0x1);
-		eeprom_set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line(device, (data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(device, data & 0x1);
+		eeprom_set_cs_line(device, (data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 		return;
 	}
-	logerror("%08x:Write control 1 %08x %08x\n",cpu_get_pc(space->cpu),offset,data);
+	logerror("%s:Write control 1 %08x %08x\n",cpuexec_describe_context(device->machine),offset,data);
 }
 
 /**********************************************************************************/
@@ -481,7 +494,7 @@ static WRITE32_HANDLER( tattass_control_w )
 	static int pendingCommand=0; /* 1 = read, 2 = write */
 	static int readBitCount=0;
 	static int byteAddr=0;
-	UINT8 *eeprom=(UINT8 *)eeprom_get_data_pointer(NULL,NULL);
+	const address_space *eeprom_space = cputag_get_address_space(space->machine, "eeprom", ADDRESS_SPACE_0);
 
 	/* Eprom in low byte */
 	if (mem_mask==0x000000ff) { /* Byte write to low byte only (different from word writing including low byte) */
@@ -531,7 +544,7 @@ static WRITE32_HANDLER( tattass_control_w )
 				int d=readBitCount/8;
 				int m=7-(readBitCount%8);
 				int a=(byteAddr+d)%1024;
-				int b=eeprom[a];
+				int b=memory_read_byte(eeprom_space, a);
 
 				tattass_eprom_bit=(b>>m)&1;
 
@@ -548,7 +561,7 @@ static WRITE32_HANDLER( tattass_control_w )
 					int b=(buffer[24]<<7)|(buffer[25]<<6)|(buffer[26]<<5)|(buffer[27]<<4)
 						|(buffer[28]<<3)|(buffer[29]<<2)|(buffer[30]<<1)|(buffer[31]<<0);
 
-					eeprom[byteAddr]=b;
+					memory_write_byte(eeprom_space, byteAddr, b);
 				}
 				lastClock=data&0x20;
 				return;
@@ -563,7 +576,7 @@ static WRITE32_HANDLER( tattass_control_w )
 
 				/* Check for read command */
 				if (buffer[0] && buffer[1]) {
-					tattass_eprom_bit=(eeprom[byteAddr]>>7)&1;
+					tattass_eprom_bit=(memory_read_byte(eeprom_space, byteAddr)>>7)&1;
 					readBitCount=1;
 					pendingCommand=1;
 				}
@@ -617,7 +630,7 @@ static READ32_HANDLER( nslasher_prot_r )
 	switch (offset<<1) {
 	case 0x280: return input_port_read(space->machine, "IN0") << 16| 0xffff; /* IN0 */
 	case 0x4c4: return input_port_read(space->machine, "IN1") << 16| 0xffff; /* IN1 */
-	case 0x35a: return (eeprom_read_bit()<< 16) | 0xffff; // Debug switch in low word??
+	case 0x35a: return (eeprom_read_bit(devtag_get_device(space->machine, "eeprom"))<< 16) | 0xffff; // Debug switch in low word??
 	}
 
 	//logerror("%08x: Read unmapped prot %08x (%08x)\n",cpu_get_pc(space->cpu),offset<<1,mem_mask);
@@ -629,9 +642,10 @@ static WRITE32_HANDLER( nslasher_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom_write_bit(data & 0x10);
-		eeprom_set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		const device_config *device = devtag_get_device(space->machine, "eeprom");
+		eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(device, data & 0x10);
+		eeprom_set_cs_line(device, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 		deco32_pri_w(space,0,data&0x3,0xffffffff); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
 	}
@@ -671,14 +685,14 @@ static ADDRESS_MAP_START( captaven_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x178000, 0x178003) AM_WRITE(deco32_pri_w)
 
-	AM_RANGE(0x180000, 0x18001f) AM_RAM AM_BASE(&deco32_pf12_control)
+	AM_RANGE(0x180000, 0x18001f) AM_RAM_WRITE(deco32_pf12_control_w) AM_BASE(&deco32_pf12_control)
 	AM_RANGE(0x190000, 0x191fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE(&deco32_pf1_data)
 	AM_RANGE(0x192000, 0x193fff) AM_WRITE(deco32_pf1_data_w) /* Mirror address - bug in program code */
 	AM_RANGE(0x194000, 0x195fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE(&deco32_pf2_data)
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_RAM AM_BASE(&deco32_pf1_rowscroll)
 	AM_RANGE(0x1a4000, 0x1a5fff) AM_RAM AM_BASE(&deco32_pf2_rowscroll)
 
-	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM AM_BASE(&deco32_pf34_control)
+	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE(&deco32_pf34_control)
 	AM_RANGE(0x1d0000, 0x1d1fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE(&deco32_pf3_data)
 	AM_RANGE(0x1e0000, 0x1e1fff) AM_RAM AM_BASE(&deco32_pf3_rowscroll)
 ADDRESS_MAP_END
@@ -704,13 +718,13 @@ static ADDRESS_MAP_START( fghthist_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x184000, 0x185fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE(&deco32_pf2_data)
 	AM_RANGE(0x192000, 0x192fff) AM_RAM AM_BASE(&deco32_pf1_rowscroll)
 	AM_RANGE(0x194000, 0x194fff) AM_RAM AM_BASE(&deco32_pf2_rowscroll)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_RAM AM_BASE(&deco32_pf12_control)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_RAM_WRITE(deco32_pf12_control_w) AM_BASE(&deco32_pf12_control)
 
 	AM_RANGE(0x1c2000, 0x1c3fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE(&deco32_pf3_data)
 	AM_RANGE(0x1c4000, 0x1c5fff) AM_RAM_WRITE(deco32_pf4_data_w) AM_BASE(&deco32_pf4_data)
 	AM_RANGE(0x1d2000, 0x1d2fff) AM_RAM AM_BASE(&deco32_pf3_rowscroll)
 	AM_RANGE(0x1d4000, 0x1d4fff) AM_RAM AM_BASE(&deco32_pf4_rowscroll)
-	AM_RANGE(0x1e0000, 0x1e001f) AM_RAM AM_BASE(&deco32_pf34_control)
+	AM_RANGE(0x1e0000, 0x1e001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE(&deco32_pf34_control)
 
 	AM_RANGE(0x16c000, 0x16c01f) AM_READNOP
 	AM_RANGE(0x17c000, 0x17c03f) AM_READNOP
@@ -737,17 +751,19 @@ static ADDRESS_MAP_START( fghthsta_memmap, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x184000, 0x185fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE(&deco32_pf2_data)
 	AM_RANGE(0x192000, 0x192fff) AM_RAM AM_BASE(&deco32_pf1_rowscroll)
 	AM_RANGE(0x194000, 0x194fff) AM_RAM AM_BASE(&deco32_pf2_rowscroll)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_RAM AM_BASE(&deco32_pf12_control)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_RAM_WRITE(deco32_pf12_control_w) AM_BASE(&deco32_pf12_control)
 
 	AM_RANGE(0x1c2000, 0x1c3fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE(&deco32_pf3_data)
 	AM_RANGE(0x1c4000, 0x1c5fff) AM_RAM_WRITE(deco32_pf4_data_w) AM_BASE(&deco32_pf4_data)
 	AM_RANGE(0x1d2000, 0x1d2fff) AM_RAM AM_BASE(&deco32_pf3_rowscroll)
 	AM_RANGE(0x1d4000, 0x1d4fff) AM_RAM AM_BASE(&deco32_pf4_rowscroll)
-	AM_RANGE(0x1e0000, 0x1e001f) AM_RAM AM_BASE(&deco32_pf34_control)
+	AM_RANGE(0x1e0000, 0x1e001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE(&deco32_pf34_control)
 
 	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(deco16_146_fghthist_prot_r, deco16_146_fghthist_prot_w) AM_BASE(&deco32_prot_ram)
 ADDRESS_MAP_END
 
+// the video drawing (especially sprite) code on this is too slow to cope with proper partial updates
+// raster effects appear to need some work on it anyway?
 static ADDRESS_MAP_START( dragngun_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_BASE(&deco32_ram)
@@ -758,12 +774,14 @@ static ADDRESS_MAP_START( dragngun_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x138000, 0x138003) AM_NOP /* Palette dma complete in bit 0x8? ack?  return 0 else tight loop */
 	AM_RANGE(0x138008, 0x13800b) AM_WRITE(deco32_palette_dma_w)
 
+//  AM_RANGE(0x180000, 0x18001f) AM_RAM_WRITE(deco32_pf12_control_w) AM_BASE(&deco32_pf12_control)
 	AM_RANGE(0x180000, 0x18001f) AM_RAM AM_BASE(&deco32_pf12_control)
 	AM_RANGE(0x190000, 0x191fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE(&deco32_pf1_data)
 	AM_RANGE(0x194000, 0x195fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE(&deco32_pf2_data)
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_RAM AM_BASE(&deco32_pf1_rowscroll)
 	AM_RANGE(0x1a4000, 0x1a4fff) AM_RAM AM_BASE(&deco32_pf2_rowscroll)
 
+//  AM_RANGE(0x1c0000, 0x1c001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE(&deco32_pf34_control)
 	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM AM_BASE(&deco32_pf34_control)
 	AM_RANGE(0x1d0000, 0x1d1fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE(&deco32_pf3_data)
 	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(deco32_pf4_data_w) AM_BASE(&deco32_pf4_data)
@@ -787,7 +805,7 @@ static ADDRESS_MAP_START( dragngun_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("oki3", okim6295_r, okim6295_w, 0x000000ff)
 	AM_RANGE(0x410000, 0x410003) AM_WRITENOP /* Some kind of serial bit-stream - digital volume control? */
-	AM_RANGE(0x420000, 0x420003) AM_READWRITE(dragngun_eeprom_r, dragngun_eeprom_w)
+	AM_RANGE(0x420000, 0x420003) AM_DEVREADWRITE("eeprom", dragngun_eeprom_r, dragngun_eeprom_w)
 	AM_RANGE(0x438000, 0x438003) AM_READ(dragngun_lightgun_r)
 	AM_RANGE(0x430000, 0x43001f) AM_WRITE(dragngun_lightgun_w)
 	AM_RANGE(0x440000, 0x440003) AM_READ(dragngun_service_r)
@@ -809,12 +827,14 @@ static ADDRESS_MAP_START( lockload_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x170000, 0x170007) AM_READ(lockload_gun_mirror_r) /* Not on Dragongun */
 	AM_RANGE(0x178008, 0x17800f) AM_WRITENOP /* Gun read ACK's */
 
+//  AM_RANGE(0x180000, 0x18001f) AM_RAM_WRITE(deco32_pf12_control_w) AM_BASE(&deco32_pf12_control)
 	AM_RANGE(0x180000, 0x18001f) AM_RAM AM_BASE(&deco32_pf12_control)
 	AM_RANGE(0x190000, 0x191fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE(&deco32_pf1_data)
 	AM_RANGE(0x194000, 0x195fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE(&deco32_pf2_data)
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_RAM AM_BASE(&deco32_pf1_rowscroll)
 	AM_RANGE(0x1a4000, 0x1a4fff) AM_RAM AM_BASE(&deco32_pf2_rowscroll)
 
+//  AM_RANGE(0x1c0000, 0x1c001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE(&deco32_pf34_control)
 	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM AM_BASE(&deco32_pf34_control)
 	AM_RANGE(0x1d0000, 0x1d1fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE(&deco32_pf3_data)
 	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(deco32_pf4_data_w) AM_BASE(&deco32_pf4_data)
@@ -834,7 +854,7 @@ static ADDRESS_MAP_START( lockload_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM
 
 	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("oki3", okim6295_r, okim6295_w, 0x000000ff)
-	AM_RANGE(0x420000, 0x420003) AM_READWRITE(dragngun_eeprom_r, dragngun_eeprom_w)
+	AM_RANGE(0x420000, 0x420003) AM_DEVREADWRITE("eeprom", dragngun_eeprom_r, dragngun_eeprom_w)
 //  AM_RANGE(0x430000, 0x43001f) AM_WRITE(dragngun_lightgun_w)
 //  AM_RANGE(0x438000, 0x438003) AM_READ(dragngun_lightgun_r)
 	AM_RANGE(0x440000, 0x440003) AM_READ(dragngun_service_r)
@@ -847,8 +867,8 @@ static ADDRESS_MAP_START( tattass_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0f8000, 0x0fffff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_BASE(&deco32_ram)
 	AM_RANGE(0x120000, 0x120003) AM_NOP				/* ACIA (unused) */
-	AM_RANGE(0x130000, 0x130003) AM_WRITENOP 		/* Coin port (unused?) */
-	AM_RANGE(0x140000, 0x140003) AM_WRITENOP 		/* Vblank ack */
+	AM_RANGE(0x130000, 0x130003) AM_WRITENOP		/* Coin port (unused?) */
+	AM_RANGE(0x140000, 0x140003) AM_WRITENOP		/* Vblank ack */
 	AM_RANGE(0x150000, 0x150003) AM_WRITE(tattass_control_w) /* Volume port/Eprom/Priority */
 
 	AM_RANGE(0x162000, 0x162fff) AM_RAM				/* 'Jack' RAM!? */
@@ -875,13 +895,13 @@ static ADDRESS_MAP_START( tattass_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x184000, 0x185fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE(&deco32_pf2_data)
 	AM_RANGE(0x192000, 0x193fff) AM_RAM AM_BASE(&deco32_pf1_rowscroll)
 	AM_RANGE(0x194000, 0x195fff) AM_RAM AM_BASE(&deco32_pf2_rowscroll)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_RAM AM_BASE(&deco32_pf12_control)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_RAM_WRITE(deco32_pf12_control_w) AM_BASE(&deco32_pf12_control)
 
 	AM_RANGE(0x1c2000, 0x1c3fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE(&deco32_pf3_data)
 	AM_RANGE(0x1c4000, 0x1c5fff) AM_RAM_WRITE(deco32_pf4_data_w) AM_BASE(&deco32_pf4_data)
 	AM_RANGE(0x1d2000, 0x1d3fff) AM_RAM AM_BASE(&deco32_pf3_rowscroll)
 	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM AM_BASE(&deco32_pf4_rowscroll)
-	AM_RANGE(0x1e0000, 0x1e001f) AM_RAM AM_BASE(&deco32_pf34_control)
+	AM_RANGE(0x1e0000, 0x1e001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE(&deco32_pf34_control)
 
 	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(tattass_prot_r, tattass_prot_w) AM_BASE(&deco32_prot_ram)
 ADDRESS_MAP_END
@@ -890,8 +910,8 @@ static ADDRESS_MAP_START( nslasher_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_BASE(&deco32_ram)
 	AM_RANGE(0x120000, 0x1200ff) AM_NOP							/* ACIA (unused) */
-	AM_RANGE(0x140000, 0x140003) AM_WRITENOP 					/* Vblank ack */
-	AM_RANGE(0x150000, 0x150003) AM_WRITE(nslasher_eeprom_w) 	/* Volume port/Eprom/Priority */
+	AM_RANGE(0x140000, 0x140003) AM_WRITENOP					/* Vblank ack */
+	AM_RANGE(0x150000, 0x150003) AM_WRITE(nslasher_eeprom_w)	/* Volume port/Eprom/Priority */
 
 	AM_RANGE(0x163000, 0x16309f) AM_RAM_WRITE(deco32_ace_ram_w) AM_BASE(&deco32_ace_ram) /* 'Ace' RAM!? */
 	AM_RANGE(0x164000, 0x164003) AM_WRITENOP /* Palette control BG2/3 ($1a constant) */
@@ -915,13 +935,13 @@ static ADDRESS_MAP_START( nslasher_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x184000, 0x185fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE(&deco32_pf2_data)
 	AM_RANGE(0x192000, 0x193fff) AM_RAM AM_BASE(&deco32_pf1_rowscroll)
 	AM_RANGE(0x194000, 0x195fff) AM_RAM AM_BASE(&deco32_pf2_rowscroll)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_RAM AM_BASE(&deco32_pf12_control)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_RAM_WRITE(deco32_pf12_control_w) AM_BASE(&deco32_pf12_control)
 
 	AM_RANGE(0x1c2000, 0x1c3fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE(&deco32_pf3_data)
 	AM_RANGE(0x1c4000, 0x1c5fff) AM_RAM_WRITE(deco32_pf4_data_w) AM_BASE(&deco32_pf4_data)
 	AM_RANGE(0x1d2000, 0x1d3fff) AM_RAM AM_BASE(&deco32_pf3_rowscroll)
 	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM AM_BASE(&deco32_pf4_rowscroll)
-	AM_RANGE(0x1e0000, 0x1e001f) AM_RAM AM_BASE(&deco32_pf34_control)
+	AM_RANGE(0x1e0000, 0x1e001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE(&deco32_pf34_control)
 
 	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(nslasher_prot_r, nslasher_prot_w) AM_BASE(&deco32_prot_ram)
 ADDRESS_MAP_END
@@ -1609,49 +1629,11 @@ static const ym2151_interface ym2151_interface_nslasher =
 	sound_bankswitch_w
 };
 
-static const UINT8 tattass_default_eprom[0x160] =
-{
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x4a,0x45,0x4b,0x19,
-	0x4e,0x4c,0x4b,0x14,0x4b,0x4a,0x4d,0x0f, 0x42,0x4c,0x53,0x0c,0x4a,0x57,0x43,0x0a,
-	0x41,0x44,0x51,0x0a,0x4a,0x41,0x4b,0x09, 0x4b,0x52,0x54,0x08,0x4c,0x4f,0x4e,0x08,
-	0x4c,0x46,0x53,0x07,0x53,0x4c,0x53,0x05, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x02,0x01,0x01,0x01, 0x01,0x00,0x00,0x00,0x00,0x01,0x01,0x01,
-	0x01,0x02,0x02,0xff,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x63,0x00,0x00,0x00, 0x02,0x03,0x00,0x03,0x00,0x00,0x00,0x02,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
-};
-
 static const eeprom_interface eeprom_interface_tattass =
 {
 	10,				// address bits 10  ==> } 1024 byte eprom
 	8,				// data bits    8
 };
-
-static NVRAM_HANDLER(tattass)
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_tattass);
-		if (file) eeprom_load(file);
-		else memcpy(eeprom_get_data_pointer(NULL,NULL),tattass_default_eprom,0x160);
-	}
-}
 
 /**********************************************************************************/
 
@@ -1729,7 +1711,7 @@ static MACHINE_DRIVER_START( fghthist )
 	MDRV_CPU_ADD("audiocpu", H6280, 32220000/8)
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
@@ -1775,7 +1757,7 @@ static MACHINE_DRIVER_START( fghthsta )
 	MDRV_CPU_ADD("audiocpu", H6280, 32220000/8)
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
@@ -1822,7 +1804,7 @@ static MACHINE_DRIVER_START( dragngun )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(deco32)
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	MDRV_TIMER_ADD("int_timer", interrupt_gen)
 
@@ -1877,7 +1859,7 @@ static MACHINE_DRIVER_START( lockload )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(deco32)
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	MDRV_TIMER_ADD("int_timer", interrupt_gen)
 
@@ -1932,7 +1914,7 @@ static MACHINE_DRIVER_START( tattass )
 	MDRV_CPU_PROGRAM_MAP(tattass_sound_map)
 	MDRV_CPU_PERIODIC_INT(tattass_snd_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
 
-	MDRV_NVRAM_HANDLER(tattass)
+	MDRV_EEPROM_ADD("eeprom", eeprom_interface_tattass)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
@@ -1970,7 +1952,7 @@ static MACHINE_DRIVER_START( nslasher )
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* to improve main<->audio comms */
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
@@ -2027,25 +2009,25 @@ ROM_START( captaven )
 
 	ROM_REGION( 0x500000, "gfx2", 0 )
 	ROM_LOAD( "man-05.16a",	0x000000,  0x40000,  CRC(d44d1995) SHA1(e88e1a59a4b24ad058f21538f6e9bbba94a166b4) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x140000,  0x40000 )
-	ROM_CONTINUE( 			0x280000,  0x40000 )
-	ROM_CONTINUE( 			0x3c0000,  0x40000 )
+	ROM_CONTINUE(			0x140000,  0x40000 )
+	ROM_CONTINUE(			0x280000,  0x40000 )
+	ROM_CONTINUE(			0x3c0000,  0x40000 )
 	ROM_LOAD( "man-04.14a",	0x040000,  0x40000,  CRC(541492a1) SHA1(2e0ab12555fc46001a815e76e3a0cd21f385f82a) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x180000,  0x40000 )
-	ROM_CONTINUE( 			0x2c0000,  0x40000 )
-	ROM_CONTINUE( 			0x400000,  0x40000 )
+	ROM_CONTINUE(			0x180000,  0x40000 )
+	ROM_CONTINUE(			0x2c0000,  0x40000 )
+	ROM_CONTINUE(			0x400000,  0x40000 )
 	ROM_LOAD( "man-03.12a",	0x080000,  0x40000,  CRC(2d9c52b2) SHA1(8f6f4fe4f1a63099f889068991b34f9432b04fd7) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x1c0000,  0x40000 )
-	ROM_CONTINUE( 			0x300000,  0x40000 )
-	ROM_CONTINUE( 			0x440000,  0x40000 )
+	ROM_CONTINUE(			0x1c0000,  0x40000 )
+	ROM_CONTINUE(			0x300000,  0x40000 )
+	ROM_CONTINUE(			0x440000,  0x40000 )
 	ROM_LOAD( "man-02.11a",	0x0c0000,  0x40000,  CRC(07674c05) SHA1(08b33721d7eba4a1ff2e282f77eeb56535a52923) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x200000,  0x40000 )
-	ROM_CONTINUE( 			0x340000,  0x40000 )
-	ROM_CONTINUE( 			0x480000,  0x40000 )
+	ROM_CONTINUE(			0x200000,  0x40000 )
+	ROM_CONTINUE(			0x340000,  0x40000 )
+	ROM_CONTINUE(			0x480000,  0x40000 )
 	ROM_LOAD( "man-01.10a",	0x100000,  0x40000,  CRC(ae714ada) SHA1(b4d5806265d422c8b837489afe93731f584e4adf) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x240000,  0x40000 )
-	ROM_CONTINUE( 			0x380000,  0x40000 )
-	ROM_CONTINUE( 			0x4c0000,  0x40000 )
+	ROM_CONTINUE(			0x240000,  0x40000 )
+	ROM_CONTINUE(			0x380000,  0x40000 )
+	ROM_CONTINUE(			0x4c0000,  0x40000 )
 
 	ROM_REGION( 0x400000, "gfx3", 0 ) /* Sprites */
 	ROM_LOAD16_BYTE( "man-06.17a",	0x000000,  0x100000,  CRC(a9a64297) SHA1(e4cb441207b1907461c90c32c05a461c9bd30756) )
@@ -2079,25 +2061,25 @@ ROM_START( captavena )
 
 	ROM_REGION( 0x500000, "gfx2", 0 )
 	ROM_LOAD( "man-05.16a",	0x000000,  0x40000,  CRC(d44d1995) SHA1(e88e1a59a4b24ad058f21538f6e9bbba94a166b4) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x140000,  0x40000 )
-	ROM_CONTINUE( 			0x280000,  0x40000 )
-	ROM_CONTINUE( 			0x3c0000,  0x40000 )
+	ROM_CONTINUE(			0x140000,  0x40000 )
+	ROM_CONTINUE(			0x280000,  0x40000 )
+	ROM_CONTINUE(			0x3c0000,  0x40000 )
 	ROM_LOAD( "man-04.14a",	0x040000,  0x40000,  CRC(541492a1) SHA1(2e0ab12555fc46001a815e76e3a0cd21f385f82a) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x180000,  0x40000 )
-	ROM_CONTINUE( 			0x2c0000,  0x40000 )
-	ROM_CONTINUE( 			0x400000,  0x40000 )
+	ROM_CONTINUE(			0x180000,  0x40000 )
+	ROM_CONTINUE(			0x2c0000,  0x40000 )
+	ROM_CONTINUE(			0x400000,  0x40000 )
 	ROM_LOAD( "man-03.12a",	0x080000,  0x40000,  CRC(2d9c52b2) SHA1(8f6f4fe4f1a63099f889068991b34f9432b04fd7) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x1c0000,  0x40000 )
-	ROM_CONTINUE( 			0x300000,  0x40000 )
-	ROM_CONTINUE( 			0x440000,  0x40000 )
+	ROM_CONTINUE(			0x1c0000,  0x40000 )
+	ROM_CONTINUE(			0x300000,  0x40000 )
+	ROM_CONTINUE(			0x440000,  0x40000 )
 	ROM_LOAD( "man-02.11a",	0x0c0000,  0x40000,  CRC(07674c05) SHA1(08b33721d7eba4a1ff2e282f77eeb56535a52923) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x200000,  0x40000 )
-	ROM_CONTINUE( 			0x340000,  0x40000 )
-	ROM_CONTINUE( 			0x480000,  0x40000 )
+	ROM_CONTINUE(			0x200000,  0x40000 )
+	ROM_CONTINUE(			0x340000,  0x40000 )
+	ROM_CONTINUE(			0x480000,  0x40000 )
 	ROM_LOAD( "man-01.10a",	0x100000,  0x40000,  CRC(ae714ada) SHA1(b4d5806265d422c8b837489afe93731f584e4adf) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x240000,  0x40000 )
-	ROM_CONTINUE( 			0x380000,  0x40000 )
-	ROM_CONTINUE( 			0x4c0000,  0x40000 )
+	ROM_CONTINUE(			0x240000,  0x40000 )
+	ROM_CONTINUE(			0x380000,  0x40000 )
+	ROM_CONTINUE(			0x4c0000,  0x40000 )
 
 	ROM_REGION( 0x400000, "gfx3", 0 ) /* Sprites */
 	ROM_LOAD16_BYTE( "man-06.17a",	0x000000,  0x100000,  CRC(a9a64297) SHA1(e4cb441207b1907461c90c32c05a461c9bd30756) )
@@ -2131,25 +2113,25 @@ ROM_START( captavene )
 
 	ROM_REGION( 0x500000, "gfx2", 0 )
 	ROM_LOAD( "man-05.16a",	0x000000,  0x40000,  CRC(d44d1995) SHA1(e88e1a59a4b24ad058f21538f6e9bbba94a166b4) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x140000,  0x40000 )
-	ROM_CONTINUE( 			0x280000,  0x40000 )
-	ROM_CONTINUE( 			0x3c0000,  0x40000 )
+	ROM_CONTINUE(			0x140000,  0x40000 )
+	ROM_CONTINUE(			0x280000,  0x40000 )
+	ROM_CONTINUE(			0x3c0000,  0x40000 )
 	ROM_LOAD( "man-04.14a",	0x040000,  0x40000,  CRC(541492a1) SHA1(2e0ab12555fc46001a815e76e3a0cd21f385f82a) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x180000,  0x40000 )
-	ROM_CONTINUE( 			0x2c0000,  0x40000 )
-	ROM_CONTINUE( 			0x400000,  0x40000 )
+	ROM_CONTINUE(			0x180000,  0x40000 )
+	ROM_CONTINUE(			0x2c0000,  0x40000 )
+	ROM_CONTINUE(			0x400000,  0x40000 )
 	ROM_LOAD( "man-03.12a",	0x080000,  0x40000,  CRC(2d9c52b2) SHA1(8f6f4fe4f1a63099f889068991b34f9432b04fd7) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x1c0000,  0x40000 )
-	ROM_CONTINUE( 			0x300000,  0x40000 )
-	ROM_CONTINUE( 			0x440000,  0x40000 )
+	ROM_CONTINUE(			0x1c0000,  0x40000 )
+	ROM_CONTINUE(			0x300000,  0x40000 )
+	ROM_CONTINUE(			0x440000,  0x40000 )
 	ROM_LOAD( "man-02.11a",	0x0c0000,  0x40000,  CRC(07674c05) SHA1(08b33721d7eba4a1ff2e282f77eeb56535a52923) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x200000,  0x40000 )
-	ROM_CONTINUE( 			0x340000,  0x40000 )
-	ROM_CONTINUE( 			0x480000,  0x40000 )
+	ROM_CONTINUE(			0x200000,  0x40000 )
+	ROM_CONTINUE(			0x340000,  0x40000 )
+	ROM_CONTINUE(			0x480000,  0x40000 )
 	ROM_LOAD( "man-01.10a",	0x100000,  0x40000,  CRC(ae714ada) SHA1(b4d5806265d422c8b837489afe93731f584e4adf) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x240000,  0x40000 )
-	ROM_CONTINUE( 			0x380000,  0x40000 )
-	ROM_CONTINUE( 			0x4c0000,  0x40000 )
+	ROM_CONTINUE(			0x240000,  0x40000 )
+	ROM_CONTINUE(			0x380000,  0x40000 )
+	ROM_CONTINUE(			0x4c0000,  0x40000 )
 
 	ROM_REGION( 0x400000, "gfx3", 0 ) /* Sprites */
 	ROM_LOAD16_BYTE( "man-06.17a",	0x000000,  0x100000,  CRC(a9a64297) SHA1(e4cb441207b1907461c90c32c05a461c9bd30756) )
@@ -2189,25 +2171,25 @@ ROM_START( captavenu )
 
 	ROM_REGION( 0x500000, "gfx2", 0 )
 	ROM_LOAD( "man-05.16a",	0x000000,  0x40000,  CRC(d44d1995) SHA1(e88e1a59a4b24ad058f21538f6e9bbba94a166b4) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x140000,  0x40000 )
-	ROM_CONTINUE( 			0x280000,  0x40000 )
-	ROM_CONTINUE( 			0x3c0000,  0x40000 )
+	ROM_CONTINUE(			0x140000,  0x40000 )
+	ROM_CONTINUE(			0x280000,  0x40000 )
+	ROM_CONTINUE(			0x3c0000,  0x40000 )
 	ROM_LOAD( "man-04.14a",	0x040000,  0x40000,  CRC(541492a1) SHA1(2e0ab12555fc46001a815e76e3a0cd21f385f82a) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x180000,  0x40000 )
-	ROM_CONTINUE( 			0x2c0000,  0x40000 )
-	ROM_CONTINUE( 			0x400000,  0x40000 )
+	ROM_CONTINUE(			0x180000,  0x40000 )
+	ROM_CONTINUE(			0x2c0000,  0x40000 )
+	ROM_CONTINUE(			0x400000,  0x40000 )
 	ROM_LOAD( "man-03.12a",	0x080000,  0x40000,  CRC(2d9c52b2) SHA1(8f6f4fe4f1a63099f889068991b34f9432b04fd7) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x1c0000,  0x40000 )
-	ROM_CONTINUE( 			0x300000,  0x40000 )
-	ROM_CONTINUE( 			0x440000,  0x40000 )
+	ROM_CONTINUE(			0x1c0000,  0x40000 )
+	ROM_CONTINUE(			0x300000,  0x40000 )
+	ROM_CONTINUE(			0x440000,  0x40000 )
 	ROM_LOAD( "man-02.11a",	0x0c0000,  0x40000,  CRC(07674c05) SHA1(08b33721d7eba4a1ff2e282f77eeb56535a52923) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x200000,  0x40000 )
-	ROM_CONTINUE( 			0x340000,  0x40000 )
-	ROM_CONTINUE( 			0x480000,  0x40000 )
+	ROM_CONTINUE(			0x200000,  0x40000 )
+	ROM_CONTINUE(			0x340000,  0x40000 )
+	ROM_CONTINUE(			0x480000,  0x40000 )
 	ROM_LOAD( "man-01.10a",	0x100000,  0x40000,  CRC(ae714ada) SHA1(b4d5806265d422c8b837489afe93731f584e4adf) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x240000,  0x40000 )
-	ROM_CONTINUE( 			0x380000,  0x40000 )
-	ROM_CONTINUE( 			0x4c0000,  0x40000 )
+	ROM_CONTINUE(			0x240000,  0x40000 )
+	ROM_CONTINUE(			0x380000,  0x40000 )
+	ROM_CONTINUE(			0x4c0000,  0x40000 )
 
 	ROM_REGION( 0x400000, "gfx3", 0 ) /* Sprites */
 	ROM_LOAD16_BYTE( "man-06.17a",	0x000000,  0x100000,  CRC(a9a64297) SHA1(e4cb441207b1907461c90c32c05a461c9bd30756) )
@@ -2241,25 +2223,25 @@ ROM_START( captavenuu )
 
 	ROM_REGION( 0x500000, "gfx2", 0 )
 	ROM_LOAD( "man-05.16a",	0x000000,  0x40000,  CRC(d44d1995) SHA1(e88e1a59a4b24ad058f21538f6e9bbba94a166b4) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x140000,  0x40000 )
-	ROM_CONTINUE( 			0x280000,  0x40000 )
-	ROM_CONTINUE( 			0x3c0000,  0x40000 )
+	ROM_CONTINUE(			0x140000,  0x40000 )
+	ROM_CONTINUE(			0x280000,  0x40000 )
+	ROM_CONTINUE(			0x3c0000,  0x40000 )
 	ROM_LOAD( "man-04.14a",	0x040000,  0x40000,  CRC(541492a1) SHA1(2e0ab12555fc46001a815e76e3a0cd21f385f82a) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x180000,  0x40000 )
-	ROM_CONTINUE( 			0x2c0000,  0x40000 )
-	ROM_CONTINUE( 			0x400000,  0x40000 )
+	ROM_CONTINUE(			0x180000,  0x40000 )
+	ROM_CONTINUE(			0x2c0000,  0x40000 )
+	ROM_CONTINUE(			0x400000,  0x40000 )
 	ROM_LOAD( "man-03.12a",	0x080000,  0x40000,  CRC(2d9c52b2) SHA1(8f6f4fe4f1a63099f889068991b34f9432b04fd7) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x1c0000,  0x40000 )
-	ROM_CONTINUE( 			0x300000,  0x40000 )
-	ROM_CONTINUE( 			0x440000,  0x40000 )
+	ROM_CONTINUE(			0x1c0000,  0x40000 )
+	ROM_CONTINUE(			0x300000,  0x40000 )
+	ROM_CONTINUE(			0x440000,  0x40000 )
 	ROM_LOAD( "man-02.11a",	0x0c0000,  0x40000,  CRC(07674c05) SHA1(08b33721d7eba4a1ff2e282f77eeb56535a52923) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x200000,  0x40000 )
-	ROM_CONTINUE( 			0x340000,  0x40000 )
-	ROM_CONTINUE( 			0x480000,  0x40000 )
+	ROM_CONTINUE(			0x200000,  0x40000 )
+	ROM_CONTINUE(			0x340000,  0x40000 )
+	ROM_CONTINUE(			0x480000,  0x40000 )
 	ROM_LOAD( "man-01.10a",	0x100000,  0x40000,  CRC(ae714ada) SHA1(b4d5806265d422c8b837489afe93731f584e4adf) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x240000,  0x40000 )
-	ROM_CONTINUE( 			0x380000,  0x40000 )
-	ROM_CONTINUE( 			0x4c0000,  0x40000 )
+	ROM_CONTINUE(			0x240000,  0x40000 )
+	ROM_CONTINUE(			0x380000,  0x40000 )
+	ROM_CONTINUE(			0x4c0000,  0x40000 )
 
 	ROM_REGION( 0x400000, "gfx3", 0 ) /* Sprites */
 	ROM_LOAD16_BYTE( "man-06.17a",	0x000000,  0x100000,  CRC(a9a64297) SHA1(e4cb441207b1907461c90c32c05a461c9bd30756) )
@@ -2293,25 +2275,25 @@ ROM_START( captavenua )
 
 	ROM_REGION( 0x500000, "gfx2", 0 )
 	ROM_LOAD( "man-05.16a",	0x000000,  0x40000,  CRC(d44d1995) SHA1(e88e1a59a4b24ad058f21538f6e9bbba94a166b4) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x140000,  0x40000 )
-	ROM_CONTINUE( 			0x280000,  0x40000 )
-	ROM_CONTINUE( 			0x3c0000,  0x40000 )
+	ROM_CONTINUE(			0x140000,  0x40000 )
+	ROM_CONTINUE(			0x280000,  0x40000 )
+	ROM_CONTINUE(			0x3c0000,  0x40000 )
 	ROM_LOAD( "man-04.14a",	0x040000,  0x40000,  CRC(541492a1) SHA1(2e0ab12555fc46001a815e76e3a0cd21f385f82a) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x180000,  0x40000 )
-	ROM_CONTINUE( 			0x2c0000,  0x40000 )
-	ROM_CONTINUE( 			0x400000,  0x40000 )
+	ROM_CONTINUE(			0x180000,  0x40000 )
+	ROM_CONTINUE(			0x2c0000,  0x40000 )
+	ROM_CONTINUE(			0x400000,  0x40000 )
 	ROM_LOAD( "man-03.12a",	0x080000,  0x40000,  CRC(2d9c52b2) SHA1(8f6f4fe4f1a63099f889068991b34f9432b04fd7) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x1c0000,  0x40000 )
-	ROM_CONTINUE( 			0x300000,  0x40000 )
-	ROM_CONTINUE( 			0x440000,  0x40000 )
+	ROM_CONTINUE(			0x1c0000,  0x40000 )
+	ROM_CONTINUE(			0x300000,  0x40000 )
+	ROM_CONTINUE(			0x440000,  0x40000 )
 	ROM_LOAD( "man-02.11a",	0x0c0000,  0x40000,  CRC(07674c05) SHA1(08b33721d7eba4a1ff2e282f77eeb56535a52923) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x200000,  0x40000 )
-	ROM_CONTINUE( 			0x340000,  0x40000 )
-	ROM_CONTINUE( 			0x480000,  0x40000 )
+	ROM_CONTINUE(			0x200000,  0x40000 )
+	ROM_CONTINUE(			0x340000,  0x40000 )
+	ROM_CONTINUE(			0x480000,  0x40000 )
 	ROM_LOAD( "man-01.10a",	0x100000,  0x40000,  CRC(ae714ada) SHA1(b4d5806265d422c8b837489afe93731f584e4adf) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x240000,  0x40000 )
-	ROM_CONTINUE( 			0x380000,  0x40000 )
-	ROM_CONTINUE( 			0x4c0000,  0x40000 )
+	ROM_CONTINUE(			0x240000,  0x40000 )
+	ROM_CONTINUE(			0x380000,  0x40000 )
+	ROM_CONTINUE(			0x4c0000,  0x40000 )
 
 	ROM_REGION( 0x400000, "gfx3", 0 ) /* Sprites */
 	ROM_LOAD16_BYTE( "man-06.17a",	0x000000,  0x100000,  CRC(a9a64297) SHA1(e4cb441207b1907461c90c32c05a461c9bd30756) )
@@ -2345,25 +2327,25 @@ ROM_START( captavenj )
 
 	ROM_REGION( 0x500000, "gfx2", 0 )
 	ROM_LOAD( "man-05.16a",	0x000000,  0x40000,  CRC(d44d1995) SHA1(e88e1a59a4b24ad058f21538f6e9bbba94a166b4) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x140000,  0x40000 )
-	ROM_CONTINUE( 			0x280000,  0x40000 )
-	ROM_CONTINUE( 			0x3c0000,  0x40000 )
+	ROM_CONTINUE(			0x140000,  0x40000 )
+	ROM_CONTINUE(			0x280000,  0x40000 )
+	ROM_CONTINUE(			0x3c0000,  0x40000 )
 	ROM_LOAD( "man-04.14a",	0x040000,  0x40000,  CRC(541492a1) SHA1(2e0ab12555fc46001a815e76e3a0cd21f385f82a) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x180000,  0x40000 )
-	ROM_CONTINUE( 			0x2c0000,  0x40000 )
-	ROM_CONTINUE( 			0x400000,  0x40000 )
+	ROM_CONTINUE(			0x180000,  0x40000 )
+	ROM_CONTINUE(			0x2c0000,  0x40000 )
+	ROM_CONTINUE(			0x400000,  0x40000 )
 	ROM_LOAD( "man-03.12a",	0x080000,  0x40000,  CRC(2d9c52b2) SHA1(8f6f4fe4f1a63099f889068991b34f9432b04fd7) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x1c0000,  0x40000 )
-	ROM_CONTINUE( 			0x300000,  0x40000 )
-	ROM_CONTINUE( 			0x440000,  0x40000 )
+	ROM_CONTINUE(			0x1c0000,  0x40000 )
+	ROM_CONTINUE(			0x300000,  0x40000 )
+	ROM_CONTINUE(			0x440000,  0x40000 )
 	ROM_LOAD( "man-02.11a",	0x0c0000,  0x40000,  CRC(07674c05) SHA1(08b33721d7eba4a1ff2e282f77eeb56535a52923) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x200000,  0x40000 )
-	ROM_CONTINUE( 			0x340000,  0x40000 )
-	ROM_CONTINUE( 			0x480000,  0x40000 )
+	ROM_CONTINUE(			0x200000,  0x40000 )
+	ROM_CONTINUE(			0x340000,  0x40000 )
+	ROM_CONTINUE(			0x480000,  0x40000 )
 	ROM_LOAD( "man-01.10a",	0x100000,  0x40000,  CRC(ae714ada) SHA1(b4d5806265d422c8b837489afe93731f584e4adf) ) /* Encrypted tiles */
-	ROM_CONTINUE( 			0x240000,  0x40000 )
-	ROM_CONTINUE( 			0x380000,  0x40000 )
-	ROM_CONTINUE( 			0x4c0000,  0x40000 )
+	ROM_CONTINUE(			0x240000,  0x40000 )
+	ROM_CONTINUE(			0x380000,  0x40000 )
+	ROM_CONTINUE(			0x4c0000,  0x40000 )
 
 	ROM_REGION( 0x400000, "gfx3", 0 ) /* Sprites */
 	ROM_LOAD16_BYTE( "man-06.17a",	0x000000,  0x100000,  CRC(a9a64297) SHA1(e4cb441207b1907461c90c32c05a461c9bd30756) )
@@ -2815,6 +2797,9 @@ ROM_START( tattass )
 	ROM_LOAD( "u21.snd",  0x080000, 0x80000,  CRC(10b2110c) SHA1(83e5938ed22da2874022e1dc8df76c72d95c448d) )
 	ROM_LOAD( "u36.snd",  0x100000, 0x80000,  CRC(3b73abe2) SHA1(195096e2302e84123b23b4ccd982fb3ab9afe42c) )
 	ROM_LOAD( "u37.snd",  0x180000, 0x80000,  CRC(986066b5) SHA1(9dd1a14de81733617cf51293674a8e26fc5cec68) )
+
+	ROM_REGION( 0x400, "eeprom", 0 )
+	ROM_LOAD( "eeprom-tattass.bin", 0x0000, 0x0400, CRC(7140f40c) SHA1(4fb7897933046b6adaf00b4626d5fd23d0e8a666) )
 ROM_END
 
 ROM_START( tattassa )
@@ -2885,6 +2870,9 @@ ROM_START( tattassa )
 	ROM_LOAD( "u21.snd",  0x080000, 0x80000,  CRC(10b2110c) SHA1(83e5938ed22da2874022e1dc8df76c72d95c448d) )
 	ROM_LOAD( "u36.snd",  0x100000, 0x80000,  CRC(3b73abe2) SHA1(195096e2302e84123b23b4ccd982fb3ab9afe42c) )
 	ROM_LOAD( "u37.snd",  0x180000, 0x80000,  CRC(986066b5) SHA1(9dd1a14de81733617cf51293674a8e26fc5cec68) )
+
+	ROM_REGION( 0x400, "eeprom", 0 )
+	ROM_LOAD( "eeprom-tattass.bin", 0x0000, 0x0400, CRC(7140f40c) SHA1(4fb7897933046b6adaf00b4626d5fd23d0e8a666) )
 ROM_END
 
 ROM_START( nslasher )

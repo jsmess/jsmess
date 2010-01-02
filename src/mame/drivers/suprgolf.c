@@ -24,7 +24,7 @@
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 
-static tilemap *suprgolf_tilemap;
+static tilemap_t *suprgolf_tilemap;
 static UINT8 *suprgolf_bg_vram;
 static UINT16 *suprgolf_bg_fb,*suprgolf_fg_fb;
 static int suprgolf_rom_bank;
@@ -319,9 +319,9 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)	/* release power? */
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )               			/* 1P */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )             			/* 1P */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)			/* POW */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )  	                	/* 1P */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 ) 	                	/* 1P */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)			/* POW */
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )

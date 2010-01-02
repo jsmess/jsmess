@@ -402,8 +402,8 @@ struct tilemap_info
 	UINT16			latched_yscroll[4];				/* latched Y scroll values */
 	UINT16			latched_pageselect[4];			/* latched page select values */
 	INT32			xoffs;							/* X scroll offset */
-	tilemap *		tilemaps[16];					/* up to 16 tilemap pages */
-	tilemap *		textmap;						/* a single text tilemap */
+	tilemap_t *		tilemaps[16];					/* up to 16 tilemap pages */
+	tilemap_t *		textmap;						/* a single text tilemap */
 	struct tilemap_callback_info tmap_info[16];		/* callback info for 16 tilemap pages */
 	struct tilemap_callback_info textmap_info;		/* callback info for a single textmap page */
 	void			(*reset)(running_machine *machine, struct tilemap_info *info);/* reset callback */
@@ -1970,7 +1970,7 @@ static void segaic16_sprites_16a_draw(running_machine *machine, struct sprite_in
  *
  *******************************************************************************************/
 
-#define system16b_draw_pixel() 												\
+#define system16b_draw_pixel()												\
 	/* only draw if onscreen, not 0 or 15 */								\
 	if (x >= cliprect->min_x && x <= cliprect->max_x && pix != 0 && pix != 15) \
 	{																		\
@@ -1999,7 +1999,7 @@ static void segaic16_sprites_16b_draw(running_machine *machine, struct sprite_in
 {
 	UINT8 numbanks;
 	const UINT16 *spritebase;
-  	UINT16 *data;
+	UINT16 *data;
 
 	spritebase = (const UINT16 *)memory_region(machine, "gfx2");
 	if (!spritebase)
@@ -2697,8 +2697,8 @@ static void segaic16_sprites_yboard_draw(running_machine *machine, struct sprite
 /* make this an actual function */
 #define system16a_bootleg_draw_core()													\
 	{																					\
-		const UINT16 *spritedata; 														\
-		int x, y, pix, xdelta = 1; 														\
+		const UINT16 *spritedata;														\
+		int x, y, pix, xdelta = 1;														\
 																						\
 		xpos += info->xoffs;															\
 		xpos &= 0x1ff;																	\

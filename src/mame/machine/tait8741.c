@@ -11,7 +11,7 @@ Taito 8741 emulation
 #include "tait8741.h"
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x) do { if (VERBOSE) printf x; } while (0)
 
 /****************************************************************************
 
@@ -419,6 +419,7 @@ void josvolly_8741_reset(void)
 	i8741[1].initReadPort = "DSW2";  /* DSW2 */
 	i8741[2].initReadPort = "DSW1";  /* DUMMY */
 	i8741[3].initReadPort = "DSW2";  /* DUMMY */
+
 }
 
 /* transmit data finish callback */
@@ -533,3 +534,100 @@ WRITE8_HANDLER( josvolly_8741_0_w ){ josvolly_8741_w(space,0,offset,data); }
 READ8_HANDLER( josvolly_8741_0_r ) { return josvolly_8741_r(space,0,offset); }
 WRITE8_HANDLER( josvolly_8741_1_w ) { josvolly_8741_w(space,1,offset,data); }
 READ8_HANDLER( josvolly_8741_1_r ) { return josvolly_8741_r(space,1,offset); }
+
+static struct
+{
+	UINT8 rxd;
+	UINT8 txd;
+	UINT8 rst;
+}cyclemb_mcu;
+
+void cyclemb_8741_reset(running_machine *machine)
+{
+	cyclemb_mcu.txd = 0;
+	cyclemb_mcu.rst = 1;
+}
+
+static void cyclemb_8741_w(const address_space *space, int num, int offset, int data)
+{
+	if(offset == 1) //command port
+	{
+		printf("%02x CMD PC=%04x\n",data,cpu_get_pc(space->cpu));
+		switch(data)
+		{
+			case 0:
+				cyclemb_mcu.rxd = 0x40;
+				cyclemb_mcu.rst = 0;
+				break;
+			case 1:
+				/*
+                status codes:
+                0x06 sub NG IOX2
+                0x05 sub NG IOX1
+                0x04 sub NG CIOS
+                0x03 sub NG OPN
+                0x02 sub NG ROM
+                0x01 sub NG RAM
+                0x00 ok
+                */
+				cyclemb_mcu.rxd = 0x40;
+				cyclemb_mcu.rst = 0;
+				break;
+			case 2:
+				cyclemb_mcu.rxd = (input_port_read(space->machine, "DSW2") & 0x1f) << 2;
+				cyclemb_mcu.rst = 0;
+				break;
+			case 3:
+				//cyclemb_mcu.rxd = input_port_read(space->machine, "DSW2");
+				cyclemb_mcu.rst = 1;
+				break;
+		}
+	}
+	else //data port
+	{
+		printf("%02x DATA PC=%04x\n",data,cpu_get_pc(space->cpu));
+		cyclemb_mcu.txd = data;
+	}
+}
+
+static INT8 cyclemb_8741_r(const address_space *space,int num,int offset)
+{
+	if(offset == 1) //status port
+	{
+		printf("STATUS PC=%04x\n",cpu_get_pc(space->cpu));
+
+		return 1;
+	}
+	else //data port
+	{
+		printf("READ PC=%04x\n",cpu_get_pc(space->cpu));
+		if(cyclemb_mcu.rst)
+		{
+			/* FIXME: mame rands are supposedly parity checks or signals that the i8741 sends to the main z80 for telling him what kind of input
+                      this specific packet contains. DSW3 surely contains something else too... */
+			/* FIXME: remove cpu_get_pc hack */
+			switch(cpu_get_pc(space->cpu))
+			{
+				case 0x760: cyclemb_mcu.rxd = ((input_port_read(space->machine,"DSW1") & 0x1f) << 2); break;
+				case 0x35c:
+				{
+					static UINT8 mux_r;
+					mux_r^=0x20;
+					if(mux_r & 0x20)
+						cyclemb_mcu.rxd = ((input_port_read(space->machine,"DSW3")) & 0x9f) | (mux_r) | (mame_rand(space->machine) & 0x40);
+					else
+						cyclemb_mcu.rxd = ((input_port_read(space->machine,"IN0")) & 0x9f) | (mux_r) | (mame_rand(space->machine) & 0x40);
+				}
+				break;
+			}
+		}
+
+		return cyclemb_mcu.rxd;
+	}
+
+	return 0;
+}
+
+
+WRITE8_HANDLER( cyclemb_8741_0_w ){ cyclemb_8741_w(space,0,offset,data); }
+READ8_HANDLER( cyclemb_8741_0_r ) { return cyclemb_8741_r(space,0,offset); }

@@ -9,7 +9,7 @@
 
 UINT16 *legionna_back_data,*legionna_fore_data,*legionna_mid_data,*legionna_scrollram16,*legionna_textram;
 
-static tilemap *background_layer,*foreground_layer,*midground_layer,*text_layer;
+static tilemap_t *background_layer,*foreground_layer,*midground_layer,*text_layer;
 UINT16 legionna_layer_disable;
 
 /******************************************************************************/
@@ -415,8 +415,8 @@ VIDEO_UPDATE( grainbow )
 	tilemap_set_scrolly( midground_layer,  0, legionna_scrollram16[3] );
 	tilemap_set_scrollx( foreground_layer, 0, legionna_scrollram16[4] );
 	tilemap_set_scrolly( foreground_layer, 0, legionna_scrollram16[5] );
-  	tilemap_set_scrollx( text_layer, 0,  legionna_scrollram16[6] );
-  	tilemap_set_scrolly( text_layer, 0,  legionna_scrollram16[7] );
+	tilemap_set_scrollx( text_layer, 0,  legionna_scrollram16[6] );
+	tilemap_set_scrolly( text_layer, 0,  legionna_scrollram16[7] );
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 

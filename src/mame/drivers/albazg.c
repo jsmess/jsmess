@@ -55,7 +55,7 @@ Code disassembling
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 #include "machine/8255ppi.h"
@@ -72,7 +72,7 @@ struct _albazg_state
 //  UINT8 *  paletteram_2;  // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap  *bg_tilemap;
+	tilemap_t  *bg_tilemap;
 
 	/* misc */
 	UINT8 mux_data;
@@ -280,7 +280,7 @@ static INPUT_PORTS_START( yumefuda )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Coin Out")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Pay Out")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Init SW")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0")
@@ -334,9 +334,9 @@ static INPUT_PORTS_START( yumefuda )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
 
 	/* Unused, on the PCB there's just one bank */
 	PORT_START("DSW1")
@@ -404,7 +404,7 @@ static MACHINE_DRIVER_START( yumefuda )
 	MDRV_MACHINE_START(yumefuda)
 	MDRV_MACHINE_RESET(yumefuda)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	MDRV_WATCHDOG_VBLANK_INIT(8) // timing is unknown
 

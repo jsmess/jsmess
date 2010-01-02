@@ -169,7 +169,7 @@ maybe some priority issues / sprite placement issues..
 #include "cpu/m6809/m6809.h"
 #include "cpu/hd6309/hd6309.h"
 #include "cpu/z80/z80.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/k054539.h"
 
 #define MAIN_CLOCK		XTAL_24MHz
@@ -507,7 +507,7 @@ static INPUT_PORTS_START( lethalen )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("DSW")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* it must be 1 ? */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -525,9 +525,9 @@ static INPUT_PORTS_START( lethalen )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Stereo ) )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
 
 	PORT_START("LIGHT0_X")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
@@ -641,7 +641,8 @@ static MACHINE_DRIVER_START( lethalen )
 	MDRV_MACHINE_START(lethalen)
 	MDRV_MACHINE_RESET(lethalen)
 
-	MDRV_EEPROM_ADD("eeprom", eeprom_intf, 48, lethalen_default_eeprom)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_DATA(lethalen_default_eeprom, 48)
 
 	MDRV_GFXDECODE(lethal)
 

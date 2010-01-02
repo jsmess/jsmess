@@ -122,7 +122,7 @@ static READ32_HANDLER( superchs_input_r )
 
 		case 0x01:
 			return coin_word<<16;
- 	}
+	}
 
 	return 0xffffffff;
 }
@@ -151,9 +151,10 @@ static WRITE32_HANDLER( superchs_input_w )
 
 			if (ACCESSING_BITS_0_7)
 			{
-				eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				eeprom_write_bit(data & 0x40);
-				eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				const device_config *device = devtag_get_device(space->machine, "eeprom");
+				eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_write_bit(device, data & 0x40);
+				eeprom_set_cs_line(device, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 				return;
 			}
 
@@ -234,8 +235,8 @@ static ADDRESS_MAP_START( superchs_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_BASE(&superchs_ram)
 	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x180000, 0x18ffff) AM_READWRITE(TC0480SCP_long_r, TC0480SCP_long_w)
-	AM_RANGE(0x1b0000, 0x1b002f) AM_READWRITE(TC0480SCP_ctrl_long_r, TC0480SCP_ctrl_long_w)
+	AM_RANGE(0x180000, 0x18ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)
+	AM_RANGE(0x1b0000, 0x1b002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&shared_ram)
 	AM_RANGE(0x240000, 0x240003) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE(superchs_palette_w) AM_BASE_GENERIC(paletteram)
@@ -247,7 +248,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( superchs_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x600000, 0x60ffff) AM_WRITE(TC0480SCP_word_w) /* Only written upon errors */
+	AM_RANGE(0x600000, 0x60ffff) AM_DEVWRITE("tc0480scp", tc0480scp_word_w) /* Only written upon errors */
 	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(shared_ram_r, shared_ram_w)
 	AM_RANGE(0xa00000, 0xa001ff) AM_RAM	/* Extra road control?? */
 ADDRESS_MAP_END
@@ -263,7 +264,7 @@ static INPUT_PORTS_START( superchs )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_CUSTOM(eeprom_bit_r, NULL)	/* reserved for EEROM */
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)	/* reserved for EEROM */
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_PLAYER(1)	/* seat center (cockpit only) */
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -359,31 +360,15 @@ static const eeprom_interface superchs_eeprom_interface =
 	"0100110000",	/* lock command */
 };
 
-static const UINT8 default_eeprom[128]={
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x00,0x53,0x00,0x2e,0x00,0x43,0x00,0x00,
-	0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0xff,0xff,0xff,0xff,0x00,0x01,
-	0x00,0x01,0x00,0x01,0x00,0x00,0x00,0x01,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x00,0x80,0xff,0xff,0xff,0xff,
-	0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0xff
-};
-
-static NVRAM_HANDLER( superchs )
+static const tc0480scp_interface superchs_tc0480scp_intf =
 {
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &superchs_eeprom_interface);
-
-		if (file)
-			eeprom_load(file);
-		else
-			eeprom_set_data(default_eeprom,128);  /* Default the wheel setup values */
-	}
-}
+	1, 2,		/* gfxnum, txnum */
+	0,		/* pixels */
+	0x20, 0x08,		/* x_offset, y_offset */
+	-1, 0,		/* text_xoff, text_yoff */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0		/* col_base */
+};
 
 static MACHINE_DRIVER_START( superchs )
 
@@ -398,7 +383,7 @@ static MACHINE_DRIVER_START( superchs )
 
 	MDRV_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
 
-	MDRV_NVRAM_HANDLER(superchs)
+	MDRV_EEPROM_ADD("eeprom", superchs_eeprom_interface)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -413,6 +398,8 @@ static MACHINE_DRIVER_START( superchs )
 
 	MDRV_VIDEO_START(superchs)
 	MDRV_VIDEO_UPDATE(superchs)
+
+	MDRV_TC0480SCP_ADD("tc0480scp", superchs_tc0480scp_intf)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(taito_f3_sound)
@@ -453,6 +440,9 @@ ROM_START( superchs )
 	ROM_LOAD16_BYTE( "d46-12.4", 0x000000, 0x200000, CRC(a24a53a8) SHA1(5d5fb87a94ceabda89360064d7d9b6d23c4c606b) )
 	ROM_RELOAD     (             0x400000, 0x200000 )
 	ROM_LOAD16_BYTE( "d46-11.5", 0x800000, 0x200000, CRC(d4ea0f56) SHA1(dc8d2ed3c11d0b6f9ebdfde805188884320235e6) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "eeprom-superchs.bin", 0x0000, 0x0080, CRC(230f0753) SHA1(4c692b35083da71ed866b233c7c9b152a914c95c) )
 ROM_END
 
 static READ32_HANDLER( main_cycle_r )

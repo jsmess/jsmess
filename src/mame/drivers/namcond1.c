@@ -287,7 +287,13 @@ static MACHINE_DRIVER_START( namcond1 )
 	MDRV_CPU_ADD("maincpu", M68000, 12288000)
 	MDRV_CPU_PROGRAM_MAP(namcond1_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
-	MDRV_CPU_PERIODIC_INT(ygv608_timed_interrupt, 1000)
+
+	// I've disabled this for now, I don't think it's correct, it breaks ncv2 'game options' in test
+	// mode (and could also be responsible for the random resets?)
+	// also, if you log the timing of it and the scanlines on which the interrupt fires, it doesn't
+	// seem correct for the intended purpose?
+	//MDRV_CPU_PERIODIC_INT(ygv608_timed_interrupt, 1000)
+
 
 	MDRV_CPU_ADD("mcu", H83002, 16384000 )
 	MDRV_CPU_PROGRAM_MAP( nd1h8rwmap)
@@ -336,7 +342,7 @@ ROM_START( ncv1 )
 	ROM_REGION( 0x200000,"gfx1", 0 )	/* 2MB character generator */
 	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
 
-	ROM_REGION( 0x200000,"c352", 0 ) 	/* 2MB sound data */
+	ROM_REGION( 0x200000,"c352", 0 )	/* 2MB sound data */
     ROM_LOAD( "nc1voice.7b",     0x000000, 0x200000, CRC(91c85bd6) SHA1(c2af8b1518b2b601f2b14c3f327e7e3eae9e29fc) )
 ROM_END
 
@@ -351,7 +357,7 @@ ROM_START( ncv1j )
 	ROM_REGION( 0x200000,"gfx1", 0 )	/* 2MB character generator */
 	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
 
-	ROM_REGION( 0x200000,"c352", 0 ) 	/* 2MB sound data */
+	ROM_REGION( 0x200000,"c352", 0 )	/* 2MB sound data */
     ROM_LOAD( "nc1voice.7b",     0x000000, 0x200000, CRC(91c85bd6) SHA1(c2af8b1518b2b601f2b14c3f327e7e3eae9e29fc) )
 ROM_END
 
@@ -366,7 +372,7 @@ ROM_START( ncv1j2 )
 	ROM_REGION( 0x200000,"gfx1", 0 )	/* 2MB character generator */
 	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
 
-	ROM_REGION( 0x200000,"c352", 0 ) 	/* 2MB sound data */
+	ROM_REGION( 0x200000,"c352", 0 )	/* 2MB sound data */
     ROM_LOAD( "nc1voice.7b",     0x000000, 0x200000, CRC(91c85bd6) SHA1(c2af8b1518b2b601f2b14c3f327e7e3eae9e29fc) )
 ROM_END
 
@@ -382,7 +388,7 @@ ROM_START( ncv2 )
 	ROM_LOAD( "ncs1cg0.10e",         0x000000, 0x200000, CRC(fdd24dbe) SHA1(4dceaae3d853075f58a7408be879afc91d80292e) )
 	ROM_LOAD( "ncs1cg1.10e",         0x200000, 0x200000, CRC(007b19de) SHA1(d3c093543511ec1dd2f8be6db45f33820123cabc) )
 
-	ROM_REGION( 0x200000,"c352", 0 ) 	/* 2MB sound data */
+	ROM_REGION( 0x200000,"c352", 0 )	/* 2MB sound data */
     ROM_LOAD( "ncs1voic.7c",     0x000000, 0x200000, CRC(ed05fd88) SHA1(ad88632c89a9946708fc6b4c9247e1bae9b2944b) )
 ROM_END
 
@@ -398,7 +404,7 @@ ROM_START( ncv2j )
 	ROM_LOAD( "ncs1cg0.10e",         0x000000, 0x200000, CRC(fdd24dbe) SHA1(4dceaae3d853075f58a7408be879afc91d80292e) )
 	ROM_LOAD( "ncs1cg1.10e",         0x200000, 0x200000, CRC(007b19de) SHA1(d3c093543511ec1dd2f8be6db45f33820123cabc) )
 
-	ROM_REGION( 0x200000,"c352", 0 ) 	/* 2MB sound data */
+	ROM_REGION( 0x200000,"c352", 0 )	/* 2MB sound data */
     ROM_LOAD( "ncs1voic.7c",     0x000000, 0x200000, CRC(ed05fd88) SHA1(ad88632c89a9946708fc6b4c9247e1bae9b2944b) )
 ROM_END
 

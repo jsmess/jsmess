@@ -25,7 +25,7 @@ size_t rpunch_bitmapram_size;
 
 int rpunch_sprite_palette;
 
-static tilemap *background[2];
+static tilemap_t *background[2];
 
 static UINT16 videoflags;
 static UINT8 crtc_register;
@@ -263,8 +263,8 @@ static void draw_bitmap(bitmap_t *bitmap, const rectangle *cliprect)
 			coldat = (rpunch_bitmapram[count]>>8 )&0xf; if (coldat!=15) *BITMAP_ADDR16(bitmap, y, ((x*4+1)-4)&0x1ff) = coldat+colourbase;
 			coldat = (rpunch_bitmapram[count]>>4 )&0xf; if (coldat!=15) *BITMAP_ADDR16(bitmap, y, ((x*4+2)-4)&0x1ff) = coldat+colourbase;
 			coldat = (rpunch_bitmapram[count]>>0 )&0xf; if (coldat!=15) *BITMAP_ADDR16(bitmap, y, ((x*4+3)-4)&0x1ff) = coldat+colourbase;
-  	 		count++;
-  		}
+			count++;
+		}
 	}
 }
 

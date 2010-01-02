@@ -957,7 +957,7 @@ static ADDRESS_MAP_START( bangball_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe78860, 0xe7886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window)		// Tilemap Window
 	AM_RANGE(0xe78870, 0xe7887b) AM_WRITEONLY AM_BASE(&metro_scroll)					// Scroll
 	AM_RANGE(0xe78880, 0xe78881) AM_WRITENOP											// ? increasing
-	AM_RANGE(0xe78890, 0xe78891) AM_WRITENOP 											// ? increasing
+	AM_RANGE(0xe78890, 0xe78891) AM_WRITENOP											// ? increasing
 	AM_RANGE(0xe788a2, 0xe788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)		// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0xe788a4, 0xe788a5) AM_WRITEONLY AM_BASE(&metro_irq_enable)				// IRQ Enable
 	AM_RANGE(0xe788aa, 0xe788ab) AM_WRITEONLY AM_BASE(&metro_rombank)					// Rom Bank
@@ -1026,7 +1026,7 @@ static ADDRESS_MAP_START( daitorid_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x4788aa, 0x4788ab) AM_WRITEONLY AM_BASE(&metro_rombank)					// Rom Bank
 	AM_RANGE(0x4788ac, 0x4788ad) AM_WRITEONLY AM_BASE(&metro_screenctrl)				// Screen Control
 	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_BASE(&metro_videoregs)					// Video Registers
-	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w) 		// To Sound CPU
+	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w)		// To Sound CPU
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("DSW0")
 	AM_RANGE(0xc00006, 0xc00007) AM_READ_PORT("IN2")
@@ -1269,23 +1269,23 @@ static READ16_HANDLER( gakusai_input_r )
 	return 0xffff;
 }
 
-static READ16_HANDLER( gakusai_eeprom_r )
+static READ16_DEVICE_HANDLER( gakusai_eeprom_r )
 {
-	return eeprom_read_bit() & 1;
+	return eeprom_read_bit(device) & 1;
 }
 
-static WRITE16_HANDLER( gakusai_eeprom_w )
+static WRITE16_DEVICE_HANDLER( gakusai_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
-		eeprom_write_bit(data & 0x01);
+		eeprom_write_bit(device, data & 0x01);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line(device, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line(device, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -1317,7 +1317,7 @@ static ADDRESS_MAP_START( gakusai_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE("oki", gakusai_oki_bank_lo_w)				// Sound
 	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)	// Sound
-	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(gakusai_eeprom_r,gakusai_eeprom_w)		// EEPROM
+	AM_RANGE(0xc00000, 0xc00001) AM_DEVREADWRITE("eeprom", gakusai_eeprom_r,gakusai_eeprom_w)		// EEPROM
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE("oki", gakusai_oki_bank_hi_w)
 ADDRESS_MAP_END
 
@@ -1356,7 +1356,7 @@ static ADDRESS_MAP_START( gakusai2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("oki", gakusai_oki_bank_hi_w)
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)	// Sound
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
-	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE(gakusai_eeprom_r,gakusai_eeprom_w)		// EEPROM
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE("eeprom", gakusai_eeprom_r,gakusai_eeprom_w)		// EEPROM
 ADDRESS_MAP_END
 
 
@@ -1364,34 +1364,34 @@ ADDRESS_MAP_END
                         Mahjong Doukyuusei Special
 ***************************************************************************/
 
-static READ16_HANDLER( dokyusp_eeprom_r )
+static READ16_DEVICE_HANDLER( dokyusp_eeprom_r )
 {
 	// clock line asserted: write latch or select next bit to read
-	eeprom_set_clock_line(CLEAR_LINE);
-	eeprom_set_clock_line(ASSERT_LINE);
+	eeprom_set_clock_line(device, CLEAR_LINE);
+	eeprom_set_clock_line(device, ASSERT_LINE);
 
-	return eeprom_read_bit() & 1;
+	return eeprom_read_bit(device) & 1;
 }
 
-static WRITE16_HANDLER( dokyusp_eeprom_bit_w )
+static WRITE16_DEVICE_HANDLER( dokyusp_eeprom_bit_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
-		eeprom_write_bit(data & 0x01);
+		eeprom_write_bit(device, data & 0x01);
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line(CLEAR_LINE);
-		eeprom_set_clock_line(ASSERT_LINE);
+		eeprom_set_clock_line(device, CLEAR_LINE);
+		eeprom_set_clock_line(device, ASSERT_LINE);
 	}
 }
 
-static WRITE16_HANDLER( dokyusp_eeprom_reset_w )
+static WRITE16_DEVICE_HANDLER( dokyusp_eeprom_reset_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -1423,8 +1423,8 @@ static ADDRESS_MAP_START( dokyusp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE("oki", gakusai_oki_bank_lo_w)				// Sound
 	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)	// Sound
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(dokyusp_eeprom_reset_w)						// EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(dokyusp_eeprom_r,dokyusp_eeprom_bit_w)	// EEPROM
+	AM_RANGE(0xc00000, 0xc00001) AM_DEVWRITE("eeprom", dokyusp_eeprom_reset_w)						// EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE("eeprom", dokyusp_eeprom_r,dokyusp_eeprom_bit_w)	// EEPROM
 ADDRESS_MAP_END
 
 
@@ -1486,7 +1486,7 @@ static ADDRESS_MAP_START( pangpoms_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
 	AM_RANGE(0x478860, 0x47886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window)		// Tilemap Window
 	AM_RANGE(0x478870, 0x47887b) AM_WRITEONLY AM_BASE(&metro_scroll)					// Scroll Regs
-	AM_RANGE(0x478880, 0x478881) AM_WRITENOP						   					// ? increasing
+	AM_RANGE(0x478880, 0x478881) AM_WRITENOP											// ? increasing
 	AM_RANGE(0x478890, 0x478891) AM_WRITENOP											// ? increasing
 	AM_RANGE(0x4788a2, 0x4788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)		// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x4788a4, 0x4788a5) AM_WRITEONLY AM_BASE(&metro_irq_enable)				// IRQ Enable
@@ -1798,7 +1798,7 @@ static ADDRESS_MAP_START( puzzlet_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x778840, 0x77884f ) AM_WRITE( metro_blitter_w )	AM_BASE( &metro_blitter_regs )	// Tiles Blitter
 	AM_RANGE( 0x778860, 0x77886b ) AM_WRITE( metro_window_w )	AM_BASE( &metro_window )	// Tilemap Window
 	AM_RANGE( 0x778870, 0x77887b ) AM_WRITEONLY		AM_BASE( &metro_scroll )	// Scroll
-	AM_RANGE( 0x778890, 0x778891 ) AM_WRITENOP 	// ? increasing
+	AM_RANGE( 0x778890, 0x778891 ) AM_WRITENOP	// ? increasing
 	AM_RANGE( 0x7788a2, 0x7788a3 ) AM_WRITE( metro_irq_cause_w )	// IRQ Cause
 	AM_RANGE( 0x7788a4, 0x7788a5 ) AM_WRITE( puzzlet_irq_enable_w ) AM_BASE( &metro_irq_enable )	// IRQ Enable
 
@@ -3847,20 +3847,6 @@ static MACHINE_DRIVER_START( dokyusei )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_DRIVER_END
 
-static NVRAM_HANDLER( dokyusp )
-{
-	static const UINT8 def_data[] = {0x00,0xe0};
-
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C46);
-		if (file)	eeprom_load(file);
-		else		eeprom_set_data(def_data,sizeof(def_data)/sizeof(def_data[0]));
-	}
-}
-
 static MACHINE_DRIVER_START( dokyusp )
 
 	/* basic machine hardware */
@@ -3869,7 +3855,7 @@ static MACHINE_DRIVER_START( dokyusp )
 	MDRV_CPU_VBLANK_INT("screen", gakusai_interrupt)
 
 	MDRV_MACHINE_RESET(metro)
-	MDRV_NVRAM_HANDLER(dokyusp)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -3907,7 +3893,7 @@ static MACHINE_DRIVER_START( gakusai )
 	MDRV_CPU_VBLANK_INT("screen", gakusai_interrupt)
 
 	MDRV_MACHINE_RESET(metro)
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -3945,7 +3931,7 @@ static MACHINE_DRIVER_START( gakusai2 )
 	MDRV_CPU_VBLANK_INT("screen", gakusai_interrupt)
 
 	MDRV_MACHINE_RESET(metro)
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -5331,6 +5317,9 @@ ROM_START( dokyusp )
 
 	ROM_REGION( 0x200000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "7.bin", 0x000000, 0x200000, CRC(763985e1) SHA1(395d925b79922de5060a3f59de99fbcc9bd40fad) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-dokyusp.bin", 0x0000, 0x0080, CRC(cf159485) SHA1(f8e9c89e1b7c8bcd77ae5f55e334f79285f602a8) )
 ROM_END
 
 

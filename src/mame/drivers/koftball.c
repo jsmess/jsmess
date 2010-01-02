@@ -35,7 +35,7 @@ ft5_v6_c4.u58 /
 
 
 static UINT16 *bmc_1_videoram, *bmc_2_videoram,*main_ram;
-static tilemap *tilemap_1,*tilemap_2;
+static tilemap_t *tilemap_1,*tilemap_2;
 static UINT8 *bmc_colorram;
 static int clr_offset=0;
 
@@ -108,7 +108,7 @@ static READ16_HANDLER(prot_r)
 		case 0x8000: return 0x0f0f;
 	}
 
-	logerror("unk prot r %x %x\n",prot_data, 	cpu_get_previouspc(space->cpu));
+	logerror("unk prot r %x %x\n",prot_data,	cpu_get_previouspc(space->cpu));
 	return mame_rand(space->machine);
 }
 

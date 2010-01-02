@@ -14,7 +14,7 @@ UINT8 *tsamurai_bg_videoram;
 static int bgcolor;
 static int textbank1, textbank2;
 
-static tilemap *background, *foreground;
+static tilemap_t *background, *foreground;
 
 
 /***************************************************************************
@@ -268,7 +268,7 @@ VIDEO_UPDATE( vsgongf )
 			k++;
 			vsgongf_color = k;
 			tilemap_mark_all_tiles_dirty( foreground );
-			}
+		}
 	}
 	#endif
 

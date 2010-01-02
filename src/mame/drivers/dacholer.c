@@ -34,7 +34,7 @@ struct _dacholer_state
 	size_t   spriteram_size;
 
 	/* video-related */
-	tilemap  *bg_tilemap,*fg_tilemap;
+	tilemap_t  *bg_tilemap,*fg_tilemap;
 	int      bg_bank;
 
 	/* sound-related */
@@ -424,7 +424,7 @@ static void adpcm_int( const device_config *device )
 static const msm5205_interface msm_interface =
 {
 	adpcm_int,			/* interrupt function */
-	MSM5205_S96_4B 	/* 1 / 96 = 3906.25Hz playback  - guess */
+	MSM5205_S96_4B	/* 1 / 96 = 3906.25Hz playback  - guess */
 };
 
 

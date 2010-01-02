@@ -554,7 +554,7 @@ static UINT8 vdp_ctrl_r(const address_space *space, struct sms_vdp *chip)
 	UINT8 retvalue;
 
 	retvalue = (chip->frame_irq_pending<<7) |
-	   	       (chip->sprite_overflow<<6) |
+		       (chip->sprite_overflow<<6) |
 	           (chip->sprite_collision<<5);
 
 	chip->cmd_pend = 0;
@@ -1669,13 +1669,13 @@ void megatech_set_genz80_as_sms_standard_map(running_machine *machine, const cha
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
 
 	/* main ram area */
-	sms_mainram = memory_install_ram(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0x2000, NULL);
+	sms_mainram = (UINT8 *)memory_install_ram(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0x2000, NULL);
 	memset(sms_mainram,0x00,0x2000);
 
 	megatech_set_genz80_as_sms_standard_ports(machine,  tag);
 
 	/* fixed rom bank area */
-	sms_rom = memory_install_rom(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, NULL);
+	sms_rom = (UINT8 *)memory_install_rom(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, NULL);
 
 	memcpy(sms_rom, memory_region(machine, "maincpu"), 0xc000);
 

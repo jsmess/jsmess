@@ -16,7 +16,7 @@
 #include "cpu/z80/z80.h"
 #include "includes/cps1.h"	// needed for decoding functions only
 #include "includes/cbasebal.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
 
@@ -174,16 +174,16 @@ static INPUT_PORTS_START( cbasebal )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_VBLANK )		/* ? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 
 	PORT_START( "IO_01" )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 
 	PORT_START( "IO_02" )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
 
 	PORT_START( "IO_03" )
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
 INPUT_PORTS_END
 
 
@@ -292,7 +292,7 @@ static MACHINE_DRIVER_START( cbasebal )
 	MDRV_MACHINE_START(cbasebal)
 	MDRV_MACHINE_RESET(cbasebal)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", cbasebal_eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", cbasebal_eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

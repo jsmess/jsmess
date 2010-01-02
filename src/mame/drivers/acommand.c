@@ -60,7 +60,7 @@ JALCF1   BIN     1,048,576  02-07-99  1:11a JALCF1.BIN
 #include "deprecat.h"
 #include "sound/okim6295.h"
 
-static tilemap *tx_tilemap,*bg_tilemap;
+static tilemap_t *tx_tilemap,*bg_tilemap;
 static UINT16 *ac_txvram,*ac_bgvram;
 static UINT16 *ac_vregs;
 
@@ -273,7 +273,7 @@ static UINT16 *ac_devram;
 
 static READ16_HANDLER(ac_devices_r)
 {
-  	logerror("(PC=%06x) read at %04x\n",cpu_get_pc(space->cpu),offset*2);
+	logerror("(PC=%06x) read at %04x\n",cpu_get_pc(space->cpu),offset*2);
 
 	switch(offset)
 	{

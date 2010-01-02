@@ -39,10 +39,10 @@ static INT32 gx_tilebanks[8], gx_oldbanks[8];
 static int gx_tilemode, gx_rozenable, psac_colorbase, last_psac_colorbase;
 static int gx_specialrozenable; // type 1 roz, with voxel height-map, rendered from 2 source tilemaps (which include height data) to temp bitmap for further processing
 static int gx_rushingheroes_hack;
-static tilemap *gx_psac_tilemap, *gx_psac_tilemap2;
+static tilemap_t *gx_psac_tilemap, *gx_psac_tilemap2;
 extern UINT32 *gx_psacram, *gx_subpaletteram32;
 static bitmap_t* type3_roz_temp_bitmap;
-static tilemap* gx_psac_tilemap_alt;
+static tilemap_t* gx_psac_tilemap_alt;
 
 static int konamigx_has_dual_screen;
 int konamigx_current_frame;
@@ -265,7 +265,7 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 // adapted from generic K053936_zoom_draw()
 static void K053936GP_zoom_draw(running_machine *machine,
 		int chip, UINT16 *ctrl, UINT16 *linectrl,
-		bitmap_t *bitmap, const rectangle *cliprect, tilemap *tmap,
+		bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tmap,
 		int tilebpp, int blend, int alpha)
 {
 	bitmap_t *src_bitmap;
@@ -336,13 +336,13 @@ static void K053936GP_zoom_draw(running_machine *machine,
 }
 
 void K053936GP_0_zoom_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
-		tilemap *tmap, int tilebpp, int blend, int alpha)
+		tilemap_t *tmap, int tilebpp, int blend, int alpha)
 {
 	K053936GP_zoom_draw(machine, 0,K053936_0_ctrl,K053936_0_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha);
 }
 
 void K053936GP_1_zoom_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
-		tilemap *tmap, int tilebpp, int blend, int alpha)
+		tilemap_t *tmap, int tilebpp, int blend, int alpha)
 {
 	K053936GP_zoom_draw(machine, 1,K053936_1_ctrl,K053936_1_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha);
 }
@@ -1140,8 +1140,8 @@ void konamigx_objdma(void)
 }
 
 void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
-					tilemap *sub1, int sub1flags,
-					tilemap *sub2, int sub2flags,
+					tilemap_t *sub1, int sub1flags,
+					tilemap_t *sub2, int sub2flags,
 					int mixerflags, bitmap_t *extra_bitmap, int rushingheroes_hack)
 {
 	static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
@@ -1831,8 +1831,8 @@ WRITE32_HANDLER( konamigx_type3_psac2_bank_w )
 /* Soccer Superstars (tile and flip bits now TRUSTED) */
  static TILE_GET_INFO( get_gx_psac3_tile_info )
  {
- 	int tileno, colour, flip;
- 	UINT8 *tmap = memory_region(machine, "gfx4");
+	int tileno, colour, flip;
+	UINT8 *tmap = memory_region(machine, "gfx4");
 
 	int base_index = tile_index;
 
@@ -1843,17 +1843,17 @@ WRITE32_HANDLER( konamigx_type3_psac2_bank_w )
 	tileno =  tmap[base_index*2] | ((tmap[(base_index*2)+1] & 0x0f)<<8);
 	colour = (tmap[(base_index*2)+1]&0xc0)>>6;
 
- 	flip = 0;
+	flip = 0;
 	if (tmap[(base_index*2)+1] & 0x20) flip |= TILE_FLIPY;
 	if (tmap[(base_index*2)+1] & 0x10) flip |= TILE_FLIPX;
 
- 	SET_TILE_INFO(0, tileno, colour, flip);
+	SET_TILE_INFO(0, tileno, colour, flip);
  }
 
  static TILE_GET_INFO( get_gx_psac3_alt_tile_info )
  {
- 	int tileno, colour, flip;
- 	UINT8 *tmap = memory_region(machine, "gfx4")+0x20000;
+	int tileno, colour, flip;
+	UINT8 *tmap = memory_region(machine, "gfx4")+0x20000;
 
 	int base_index = tile_index;
 
@@ -1864,11 +1864,11 @@ WRITE32_HANDLER( konamigx_type3_psac2_bank_w )
 	tileno =  tmap[base_index*2] | ((tmap[(base_index*2)+1] & 0x0f)<<8);
 	colour = (tmap[(base_index*2)+1]&0xc0)>>6;
 
- 	flip = 0;
+	flip = 0;
 	if (tmap[(base_index*2)+1] & 0x20) flip |= TILE_FLIPY;
 	if (tmap[(base_index*2)+1] & 0x10) flip |= TILE_FLIPX;
 
- 	SET_TILE_INFO(0, tileno, colour, flip);
+	SET_TILE_INFO(0, tileno, colour, flip);
  }
 
 
@@ -2053,7 +2053,7 @@ VIDEO_START(konamigx_5bpp)
 	} else
 
 	if (!strcmp(machine->gamedrv->name,"gokuparo") || !strcmp(machine->gamedrv->name,"fantjour"))
- 	{
+	{
 		K053247GP_set_SpriteOffset(-46, -23);
 	} else
 
@@ -2345,7 +2345,7 @@ VIDEO_UPDATE(konamigx)
 					{
 						int r,g,b;
 
- 						r = (screen->machine->generic.paletteram.u32[offset] >>16) & 0xff;
+						r = (screen->machine->generic.paletteram.u32[offset] >>16) & 0xff;
 						g = (screen->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
 						b = (screen->machine->generic.paletteram.u32[offset] >> 0) & 0xff;
 
@@ -2392,7 +2392,7 @@ VIDEO_UPDATE(konamigx)
 					{
 						int r,g,b;
 
- 						r = (gx_subpaletteram32[offset] >>16) & 0xff;
+						r = (gx_subpaletteram32[offset] >>16) & 0xff;
 						g = (gx_subpaletteram32[offset] >> 8) & 0xff;
 						b = (gx_subpaletteram32[offset] >> 0) & 0xff;
 
@@ -2467,8 +2467,8 @@ VIDEO_UPDATE(konamigx)
 	{
 		konamigx_mixer(screen->machine, bitmap, cliprect, gx_psac_tilemap, GXSUB_8BPP,0,0,  0, 0, gx_rushingheroes_hack);
 	}
- 	// hack, draw the roz tilemap if W is held
- 	// todo: fix so that it works with the mixer without crashing(!)
+	// hack, draw the roz tilemap if W is held
+	// todo: fix so that it works with the mixer without crashing(!)
 	else if (gx_specialrozenable == 2)
 	{
 		// we're going to throw half of this away anyway in post-process, so only render what's needed
@@ -2486,7 +2486,7 @@ VIDEO_UPDATE(konamigx)
 	}
 	else
 	{
- 		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, 0, 0, 0, 0, gx_rushingheroes_hack);
+		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, 0, 0, 0, 0, gx_rushingheroes_hack);
 	}
 
 
@@ -2551,7 +2551,7 @@ WRITE32_HANDLER( konamigx_palette_w )
 
 	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
- 	r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
+	r = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
 	g = (space->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
 	b = (space->machine->generic.paletteram.u32[offset] >> 0) & 0xff;
 
@@ -2564,7 +2564,7 @@ WRITE32_HANDLER( konamigx_palette2_w )
 
 	COMBINE_DATA(&gx_subpaletteram32[offset]);
 
- 	r = (gx_subpaletteram32[offset] >>16) & 0xff;
+	r = (gx_subpaletteram32[offset] >>16) & 0xff;
 	g = (gx_subpaletteram32[offset] >> 8) & 0xff;
 	b = (gx_subpaletteram32[offset] >> 0) & 0xff;
 

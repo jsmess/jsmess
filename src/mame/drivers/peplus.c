@@ -173,14 +173,14 @@ Stephh's log (2007.11.28) :
 #include "pe_keno.lh"
 #include "pe_slots.lh"
 
-#define MASTER_CLOCK 		XTAL_20MHz
+#define MASTER_CLOCK		XTAL_20MHz
 #define CPU_CLOCK			((MASTER_CLOCK)/2)		/* divided by 2 - 7474 */
 #define MC6845_CLOCK		((MASTER_CLOCK)/8/3)
 #define SOUND_CLOCK			((MASTER_CLOCK)/12)
 
 static UINT16 autohold_addr; /* address to patch in program RAM to enable autohold feature */
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static UINT8 wingboard;
 static UINT8 jumper_e16_e17; /* Set this to TRUE when CG chips are 27c512 instead of 27c256 */
 
@@ -343,7 +343,7 @@ static void handle_lightpen( const device_config *device )
     yt = y_val * (vis_area->max_y - vis_area->min_y) / 1024 + vis_area->min_y;
 
      timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, yt, xt), (void *) device, 0, assert_lp_cb);
- }
+}
 
 static WRITE_LINE_DEVICE_HANDLER(crtc_vsync)
 {

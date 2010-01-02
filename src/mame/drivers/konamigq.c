@@ -50,7 +50,7 @@
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
 #include "includes/konamigx.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "machine/am53cf96.h"
 #include "harddisk.h"
 #include "sound/k054539.h"
@@ -369,7 +369,8 @@ static MACHINE_DRIVER_START( konamigq )
 
 	MDRV_MACHINE_START( konamigq )
 	MDRV_MACHINE_RESET( konamigq )
-	MDRV_EEPROM_93C46_ADD("eeprom", 128, konamigq_def_eeprom)
+	MDRV_EEPROM_93C46_ADD("eeprom")
+	MDRV_EEPROM_DATA(konamigq_def_eeprom, 128)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -475,12 +476,12 @@ static INPUT_PORTS_START( konamigq )
 	PORT_DIPSETTING(    0x00, "Independent" )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
 INPUT_PORTS_END
 
 ROM_START( cryptklr )

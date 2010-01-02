@@ -13,7 +13,7 @@ OTHER:  ASTRO 0001B, EEPROM
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/okim6295.h"
 
 typedef struct _astrocrp_state astrocrp_state;
@@ -226,12 +226,12 @@ static INPUT_PORTS_START( showhand )
 
 	PORT_START( "EEPROMIN" )
 	PORT_BIT( 0xfff7, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( showhanc )
@@ -255,12 +255,12 @@ static INPUT_PORTS_START( showhanc )
 
 	PORT_START( "EEPROMIN" )
 	PORT_BIT( 0xfff7, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -315,7 +315,8 @@ static MACHINE_DRIVER_START( showhand )
 	MDRV_MACHINE_START(showhand)
 	MDRV_MACHINE_RESET(showhand)
 
-	MDRV_EEPROM_93C46_ADD("eeprom", sizeof(showhand_default_eeprom), showhand_default_eeprom)
+	MDRV_EEPROM_93C46_ADD("eeprom")
+	MDRV_EEPROM_DATA(showhand_default_eeprom, sizeof(showhand_default_eeprom))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

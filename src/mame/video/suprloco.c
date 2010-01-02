@@ -11,7 +11,7 @@
 UINT8 *suprloco_videoram;
 UINT8 *suprloco_scrollram;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static int control;
 
 #define SPR_Y_TOP		0
@@ -129,7 +129,7 @@ WRITE8_HANDLER( suprloco_control_w )
 {
 	/* There is probably a palette select in here */
 
-   	/* Bit 0   - coin counter A */
+	/* Bit 0   - coin counter A */
 	/* Bit 1   - coin counter B (only used if coinage differs from A) */
 	/* Bit 2-3 - probably unused */
 	/* Bit 4   - ??? */

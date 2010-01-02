@@ -374,7 +374,7 @@ $(MAMEOBJ)/aristocr.a: \
 	$(MACHINE)/archimds.o \
 
 $(MAMEOBJ)/atari.a: \
- 	$(DRIVERS)/atarigx2.o $(VIDEO)/atarigx2.o \
+	$(DRIVERS)/atarigx2.o $(VIDEO)/atarigx2.o \
 	$(DRIVERS)/arcadecl.o $(VIDEO)/arcadecl.o \
 	$(DRIVERS)/asteroid.o $(MACHINE)/asteroid.o $(AUDIO)/asteroid.o $(AUDIO)/llander.o \
 	$(DRIVERS)/atarifb.o $(MACHINE)/atarifb.o $(AUDIO)/atarifb.o $(VIDEO)/atarifb.o \
@@ -417,6 +417,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/klax.o $(VIDEO)/klax.o \
 	$(DRIVERS)/liberatr.o $(VIDEO)/liberatr.o \
 	$(DRIVERS)/mediagx.o \
+	$(DRIVERS)/metalmx.o \
 	$(DRIVERS)/mgolf.o \
 	$(DRIVERS)/mhavoc.o $(MACHINE)/mhavoc.o \
 	$(DRIVERS)/missile.o \
@@ -1261,6 +1262,7 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/champbwl.o \
 	$(DRIVERS)/changela.o $(VIDEO)/changela.o \
 	$(DRIVERS)/crbaloon.o $(VIDEO)/crbaloon.o $(AUDIO)/crbaloon.o \
+	$(DRIVERS)/cyclemb.o \
 	$(DRIVERS)/darius.o $(VIDEO)/darius.o \
 	$(DRIVERS)/darkmist.o $(VIDEO)/darkmist.o \
 	$(DRIVERS)/exzisus.o $(VIDEO)/exzisus.o \
@@ -1323,6 +1325,7 @@ $(MAMEOBJ)/taito.a: \
 	$(MACHINE)/daikaiju.o \
 	$(AUDIO)/taitosnd.o \
 	$(AUDIO)/t5182.o \
+	$(MACHINE)/taitoio.o \
 	$(VIDEO)/taitoic.o \
 
 $(MAMEOBJ)/tatsumi.a: \
@@ -1855,7 +1858,7 @@ $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
 $(DRIVERS)/galaxian.o:	$(MAMESRC)/drivers/galdrvr.c
 $(DRIVERS)/mpu4.o:		$(MAMESRC)/drivers/mpu4drvr.c
 $(DRIVERS)/neogeo.o:	$(MAMESRC)/drivers/neodrvr.c
-$(MACHINE)/snes.o: 		$(MAMESRC)/machine/snesdsp1.c \
+$(MACHINE)/snes.o:		$(MAMESRC)/machine/snesdsp1.c \
 				$(MAMESRC)/machine/snesdsp2.c \
 				$(MAMESRC)/machine/snesdsp3.c \
 				$(MAMESRC)/machine/snesdsp4.c \
@@ -1869,5 +1872,5 @@ $(MACHINE)/snes.o: 		$(MAMESRC)/machine/snesdsp1.c \
 				$(MAMESRC)/machine/snessdd1.c \
 				$(MAMESRC)/machine/snes7110.c \
 				$(MAMESRC)/machine/snesst10.c
-$(VIDEO)/model2.o: 		$(MAMESRC)/video/model2rd.c
-$(VIDEO)/model3.o: 		$(MAMESRC)/video/m3raster.c
+$(VIDEO)/model2.o:		$(MAMESRC)/video/model2rd.c
+$(VIDEO)/model3.o:		$(MAMESRC)/video/m3raster.c

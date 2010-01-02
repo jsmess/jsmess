@@ -34,7 +34,7 @@ struct _decocass_state
 	size_t    objectram_size;
 
 	/* video-related */
-	tilemap   *fg_tilemap, *bg_tilemap_l, *bg_tilemap_r;
+	tilemap_t   *fg_tilemap, *bg_tilemap_l, *bg_tilemap_r;
 	INT32     watchdog_count;
 	INT32     watchdog_flip;
 	INT32     color_missiles;
@@ -92,10 +92,10 @@ struct _decocass_state
 
 	/* dongle type #4: status */
 	INT32     type4_ctrs;		/* latched PROM address (E5x0 LSB, E5x1 MSB) */
-	INT32     type4_latch; 		/* latched enable PROM (1100xxxx written to E5x1) */
+	INT32     type4_latch;		/* latched enable PROM (1100xxxx written to E5x1) */
 
 	/* dongle type #5: status */
-	INT32     type5_latch; 		/* latched enable PROM (1100xxxx written to E5x1) */
+	INT32     type5_latch;		/* latched enable PROM (1100xxxx written to E5x1) */
 
 	/* devices */
 	const device_config *maincpu;

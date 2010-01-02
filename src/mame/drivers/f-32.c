@@ -13,7 +13,7 @@
 
 #include "driver.h"
 #include "cpu/e132xs/e132xs.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 
@@ -110,16 +110,16 @@ static INPUT_PORTS_START( mosaicf2 )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
 
 	PORT_START( "EEPROMCLK" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
 
 	PORT_START( "EEPROMCS" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( mosaicf2 )
@@ -133,7 +133,7 @@ static MACHINE_DRIVER_START( mosaicf2 )
 	MDRV_CPU_IO_MAP(mosaicf2_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

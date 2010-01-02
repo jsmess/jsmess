@@ -321,8 +321,8 @@ INLINE void m37710i_interrupt_software(m37710i_cpu_struct *cpustate, uint vector
 /* Effective-address based memory access macros */
 #define read_8_NORM(A)		m37710i_read_8_normal(cpustate, A)
 #define read_8_IMM(A)		m37710i_read_8_immediate(cpustate, A)
-#define read_8_D(A)	   	m37710i_read_8_direct(cpustate, A)
-#define read_8_A(A)	   	m37710i_read_8_normal(cpustate, A)
+#define read_8_D(A)		m37710i_read_8_direct(cpustate, A)
+#define read_8_A(A)		m37710i_read_8_normal(cpustate, A)
 #define read_8_AL(A)		m37710i_read_8_normal(cpustate, A)
 #define read_8_DX(A)		m37710i_read_8_direct(cpustate, A)
 #define read_8_DY(A)		m37710i_read_8_direct(cpustate, A)
@@ -337,7 +337,7 @@ INLINE void m37710i_interrupt_software(m37710i_cpu_struct *cpustate, uint vector
 #define read_8_DIY(A)		m37710i_read_8_normal(cpustate, A)
 #define read_8_DLIY(A)		m37710i_read_8_normal(cpustate, A)
 #define read_8_AXI(A)		m37710i_read_8_normal(cpustate, A)
-#define read_8_S(A)	   	m37710i_read_8_normal(cpustate, A)
+#define read_8_S(A)		m37710i_read_8_normal(cpustate, A)
 #define read_8_SIY(A)		m37710i_read_8_normal(cpustate, A)
 
 #define read_16_NORM(A)		m37710i_read_16_normal(cpustate, A)
@@ -480,7 +480,7 @@ INLINE void m37710i_interrupt_software(m37710i_cpu_struct *cpustate, uint vector
 #define OPER_24_DIY(cpustate)	read_24_DIY(EA_DIY(cpustate))
 #define OPER_24_DLIY(cpustate)	read_24_DLIY(EA_DLIY(cpustate))
 #define OPER_24_AXI(cpustate)	read_24_AXI(EA_AXI(cpustate))
-#define OPER_24_S(cpustate)	  	read_24_S(EA_S(cpustate))
+#define OPER_24_S(cpustate)		read_24_S(EA_S(cpustate))
 #define OPER_24_SIY(cpustate)	read_24_SIY(EA_SIY(cpustate))
 
 INLINE uint EA_IMM8(m37710i_cpu_struct *cpustate)  {REG_PC += 1; return REG_PB | MAKE_UINT_16(REG_PC-1);}
@@ -1270,24 +1270,24 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			REG_IM2 = read_8_NORM(EA_##MODE(cpustate)); 	\
 			REG_IM = read_8_NORM(REG_PC);		\
 			REG_PC++;				\
-			DST = OPER_8_IMM(cpustate);	  		\
+			DST = OPER_8_IMM(cpustate);			\
 			if ((REG_IM2 & REG_IM) == REG_IM)	\
-			{				   	\
-				CLK(CLK_OP + CLK_RELATIVE_8 + 1); 	\
+			{					\
+				CLK(CLK_OP + CLK_RELATIVE_8 + 1);	\
 				m37710i_branch_8(cpustate, DST);		\
 				BREAKOUT;			\
 			}
 #else
 #define OP_BBS(MODE)														\
 			CLK(CLK_OP + CLK_R16 + CLK_##MODE);	\
-			REG_IM2 = read_16_NORM(EA_##MODE(cpustate)); 	\
+			REG_IM2 = read_16_NORM(EA_##MODE(cpustate));	\
 			REG_IM = read_16_NORM(REG_PC);		\
 			REG_PC++;				\
 			REG_PC++;				\
-			DST = OPER_8_IMM(cpustate);	  		\
+			DST = OPER_8_IMM(cpustate);			\
 			if ((REG_IM2 & REG_IM) == REG_IM)	\
-			{				   	\
-				CLK(CLK_OP + CLK_RELATIVE_8 + 1); 	\
+			{					\
+				CLK(CLK_OP + CLK_RELATIVE_8 + 1);	\
 				m37710i_branch_8(cpustate, DST);		\
 				BREAKOUT;			\
 			}
@@ -1301,24 +1301,24 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			REG_IM2 = read_8_NORM(EA_##MODE(cpustate)); 	\
 			REG_IM = read_8_NORM(REG_PC);		\
 			REG_PC++;				\
-			DST = OPER_8_IMM(cpustate);	  		\
-			if ((REG_IM2 & REG_IM) == 0)   		\
-			{				   	\
-				CLK(CLK_OP + CLK_RELATIVE_8 + 1); 	\
+			DST = OPER_8_IMM(cpustate);			\
+			if ((REG_IM2 & REG_IM) == 0)		\
+			{					\
+				CLK(CLK_OP + CLK_RELATIVE_8 + 1);	\
 				m37710i_branch_8(cpustate, DST);		\
 				BREAKOUT;			\
 			}
 #else
 #define OP_BBC(MODE)														\
 			CLK(CLK_OP + CLK_R16 + CLK_##MODE);	\
-			REG_IM2 = read_16_NORM(EA_##MODE(cpustate)); 	\
+			REG_IM2 = read_16_NORM(EA_##MODE(cpustate));	\
 			REG_IM = read_16_NORM(REG_PC);		\
 			REG_PC++;				\
 			REG_PC++;				\
-			DST = OPER_8_IMM(cpustate);	  		\
+			DST = OPER_8_IMM(cpustate);			\
 			if ((REG_IM2 & REG_IM) == 0)		\
-			{				   	\
-				CLK(CLK_OP + CLK_RELATIVE_8 + 1); 	\
+			{					\
+				CLK(CLK_OP + CLK_RELATIVE_8 + 1);	\
 				m37710i_branch_8(cpustate, DST);		\
 				BREAKOUT;			\
 			}
@@ -1425,7 +1425,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 				REG_A--;								\
 				if ((REG_A&0xffff) != 0) \
 				{\
-				  	REG_PC -= 3; \
+					REG_PC -= 3; \
 				}\
 				else \
 				{ \
@@ -1433,11 +1433,11 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 					{ \
 						REG_A = 0xff; \
 						REG_B = 0xff00; \
-			}																\
+					}																\
 					else \
-			{																\
-				REG_A = 0xffff;												\
-			}																\
+					{																\
+						REG_A = 0xffff;												\
+					}																\
 				} \
 			}
 #else
@@ -1455,7 +1455,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 				REG_A--;								\
 				if ((REG_A&0xffff) != 0) \
 				{\
-				  	REG_PC -= 3; \
+					REG_PC -= 3; \
 				}\
 				else \
 				{ \
@@ -1463,11 +1463,11 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 					{ \
 						REG_A = 0xff; \
 						REG_B = 0xff00; \
-			}																\
+					}																\
 					else \
-			{																\
-				REG_A = 0xffff;												\
-			}																\
+					{																\
+						REG_A = 0xffff;												\
+					}																\
 				} \
 			}
 #endif
@@ -1489,7 +1489,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 				REG_A--;								\
 				if ((REG_A&0xffff) != 0) \
 				{\
-				  	REG_PC -= 3; \
+					REG_PC -= 3; \
 				}\
 				else \
 				{ \
@@ -1497,11 +1497,11 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 					{ \
 						REG_A = 0xff; \
 						REG_B = 0xff00; \
-			}																\
+					}																\
 					else \
-			{																\
-				REG_A = 0xffff;												\
-			}																\
+					{																\
+						REG_A = 0xffff;												\
+					}																\
 				} \
 			}
 #else
@@ -1519,7 +1519,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 				REG_A--;								\
 				if ((REG_A&0xffff) != 0) \
 				{\
-				  	REG_PC -= 3; \
+					REG_PC -= 3; \
 				}\
 				else \
 				{ \
@@ -1527,11 +1527,11 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 					{ \
 						REG_A = 0xff; \
 						REG_B = 0xff00; \
-			}																\
+					}																\
 					else \
-			{																\
-				REG_A = 0xffff;												\
-			}																\
+					{																\
+						REG_A = 0xffff;												\
+					}																\
 				} \
 			}
 #endif
@@ -2644,7 +2644,7 @@ OP(11a, OP_DECB  (             ) ) /* DEB     (C) */
 OP(11d, OP_ORB   ( AX          ) ) /* ORB ax      */
 OP(11f, OP_ORB   ( ALX         ) ) /* ORB alx (G) */
 OP(129, OP_ANDB  ( IMM         ) ) /* ANDB imm     */
-OP(12a, OP_ROLB  ( 	       ) ) /* ROL Bacc    */
+OP(12a, OP_ROLB  (	       ) ) /* ROL Bacc    */
 OP(13a, OP_INCB  (             ) ) /* INB     (C) */
 OP(148, OP_PHAB  (             ) ) /* PHB          */
 OP(149, OP_EORB  ( IMM         ) ) /* EORB imm     */
@@ -2932,7 +2932,7 @@ TABLE_FUNCTION(void, set_reg, (m37710i_cpu_struct *cpustate, int regnum, uint va
 		case M37710_Y: REG_Y = MAKE_UINT_16(val); break;
 #endif
 		case M37710_IRQ_STATE: FTABLE_SET_LINE(cpustate, M37710_LINE_IRQ0, val == 0 ? CLEAR_LINE : ASSERT_LINE); break;
-		 }
+	}
 }
 
 TABLE_FUNCTION(int, execute, (m37710i_cpu_struct *cpustate, int clocks))

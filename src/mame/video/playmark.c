@@ -8,7 +8,7 @@ UINT16 *wbeachvl_rowscroll;
 
 static int bgscrollx,bgscrolly,bg_enable,bg_full_size;
 static int fgscrollx,fg_rowscroll_enable;
-static tilemap *tx_tilemap,*fg_tilemap,*bg_tilemap;
+static tilemap_t *tx_tilemap,*fg_tilemap,*bg_tilemap;
 
 static int xoffset = 0;
 static int yoffset = 0;
@@ -363,7 +363,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			pri = 2;
 
 		pdrawgfx_transpen(bitmap,cliprect,machine->gfx[0],
-		 		 code,
+				 code,
 				 color,
 				 flipx,0,
 				 sx + xoffset,sy + yoffset,

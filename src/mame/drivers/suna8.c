@@ -208,7 +208,7 @@ static DRIVER_INIT( hardhea2 )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	memory_region(machine, "maincpu");
 	size_t	size	=	memory_region_length(machine, "maincpu");
-	UINT8   *decrypt = 	auto_alloc_array(machine, UINT8, size);
+	UINT8   *decrypt =	auto_alloc_array(machine, UINT8, size);
 	UINT8 x;
 	int i;
 
@@ -295,7 +295,7 @@ static DRIVER_INIT( starfigh )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	memory_region(machine, "maincpu");
 	size_t	size	=	memory_region_length(machine, "maincpu");
-	UINT8   *decrypt = 	auto_alloc_array(machine, UINT8, size);
+	UINT8   *decrypt =	auto_alloc_array(machine, UINT8, size);
 	UINT8 x;
 	int i;
 
@@ -363,7 +363,7 @@ static DRIVER_INIT( sparkman )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	memory_region(machine, "maincpu");
 	size_t	size	=	memory_region_length(machine, "maincpu");
-	UINT8   *decrypt = 	auto_alloc_array(machine, UINT8, size);
+	UINT8   *decrypt =	auto_alloc_array(machine, UINT8, size);
 	UINT8 x;
 	int i;
 
@@ -490,7 +490,7 @@ static WRITE8_HANDLER( hardhead_bankswitch_w )
 {
 	int bank = data & 0x0f;
 
-	if (data & ~0xef) 	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0xef)	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 	memory_set_bank(space->machine, "bank1", bank);
 }
 
@@ -546,7 +546,7 @@ static WRITE8_HANDLER( rranger_bankswitch_w )
 	int bank = data & 0x07;
 	if ((~data & 0x10) && (bank >= 4))	bank += 4;
 
-	if (data & ~0xf7) 	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0xf7)	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 
 	memory_set_bank(space->machine, "bank1", bank);
 
@@ -616,7 +616,7 @@ static READ8_HANDLER( brickzn_c140_r )
 static WRITE8_HANDLER( brickzn_palettebank_w )
 {
 	suna8_palettebank = (data >> 1) & 1;
-	if (data & ~0x02) 	logerror("CPU #0 - PC %04X: unknown palettebank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0x02)	logerror("CPU #0 - PC %04X: unknown palettebank bits: %02X\n",cpu_get_pc(space->cpu),data);
 
 	/* Also used as soundlatch - depending on c0c0? */
 	soundlatch_w(space,0,data);
@@ -630,7 +630,7 @@ static WRITE8_HANDLER( brickzn_palettebank_w )
 static WRITE8_HANDLER( brickzn_spritebank_w )
 {
 	suna8_spritebank = (data >> 1) & 1;
-	if (data & ~0x03) 	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0x03)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
 	flip_screen_set(space->machine,  data & 0x01 );
 }
 
@@ -647,7 +647,7 @@ static WRITE8_HANDLER( brickzn_rombank_w )
 {
 	int bank = data & 0x0f;
 
-	if (data & ~0x0f) 	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0x0f)	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 
 	memory_set_bank(space->machine, "bank1", bank);
 	suna8_rombank = data;
@@ -693,7 +693,7 @@ static WRITE8_HANDLER( hardhea2_nmi_w )
 static WRITE8_HANDLER( hardhea2_flipscreen_w )
 {
 	flip_screen_set(space->machine, data & 0x01);
-	if (data & ~0x01) 	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0x01)	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE8_HANDLER( hardhea2_leds_w )
@@ -712,7 +712,7 @@ static WRITE8_HANDLER( hardhea2_leds_w )
 static WRITE8_HANDLER( hardhea2_spritebank_w )
 {
 	suna8_spritebank = (data >> 1) & 1;
-	if (data & ~0x02) 	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0x02)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 /*
@@ -723,7 +723,7 @@ static WRITE8_HANDLER( hardhea2_rombank_w )
 {
 	int bank = data & 0x0f;
 
-	if (data & ~0x0f) 	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0x0f)	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 
 	memory_set_bank(space->machine, "bank1", bank);
 	suna8_rombank = data;
@@ -797,7 +797,7 @@ static UINT8 spritebank_latch;
 static WRITE8_HANDLER( starfigh_spritebank_latch_w )
 {
 	spritebank_latch = (data >> 2) & 1;
-	if (data & ~0x04) 	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0x04)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE8_HANDLER( starfigh_spritebank_w )
@@ -857,7 +857,10 @@ static WRITE8_HANDLER( sparkman_cmd_prot_w )
 		case 0xa6: suna8_nmi_enable = 1; break;
 		case 0x00: suna8_nmi_enable = 0; break;
 		case 0x18: suna8_trash_prot = 0; break;
+		case 0xce: suna8_trash_prot = 0; break;
 		case 0x81: suna8_trash_prot = 1; break;
+		case 0x99: suna8_trash_prot = 1; break;
+		case 0x54: suna8_spritebank = 1; break;
 		default: logerror("CPU #0 - PC %04X: unknown protection command: %02X\n",cpu_get_pc(space->cpu),data);
 	}
 }
@@ -875,15 +878,19 @@ static WRITE8_HANDLER( suna8_wram_w )
 static WRITE8_HANDLER( sparkman_flipscreen_w )
 {
 	flip_screen_set(space->machine, data & 0x01);
-	if (data & ~0x01) 	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(space->cpu),data);
+	//if (data & ~0x01)     logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE8_HANDLER( sparkman_leds_w )
 {
 	set_led_status(space->machine, 0, data & 0x01);
 	set_led_status(space->machine, 1, data & 0x02);
-	coin_counter_w(space->machine, 0, data & 0x04);
-	if (data & ~0x07)	logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(space->cpu),data);
+	//if (data & ~0x03) logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(space->cpu),data);
+}
+
+static WRITE8_HANDLER( sparkman_coin_counter_w )
+{
+	coin_counter_w(space->machine, 0, data & 0x01);
 }
 
 /*
@@ -897,7 +904,7 @@ static WRITE8_HANDLER( sparkman_spritebank_w )
 		suna8_spritebank = 0;
 	else
 		suna8_spritebank = (data) & 1;
-	if (data & ~0x02) 	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	//if (data & ~0x02)     logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 /*
@@ -908,7 +915,7 @@ static WRITE8_HANDLER( sparkman_rombank_w )
 {
 	int bank = data & 0x0f;
 
-	if (data & ~0x0f) 	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	//if (data & ~0x0f)     logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 
 	memory_set_bank(space->machine, "bank1", bank);
 	suna8_rombank = data;
@@ -918,6 +925,13 @@ static READ8_HANDLER( sparkman_c0a3_r )
 {
 	return (video_screen_get_frame_number(space->machine->primary_screen) & 1) ? 0x80 : 0;
 }
+
+#if 0
+static WRITE8_HANDLER( sparkman_en_trash_w )
+{
+	suna8_trash_prot = 1;
+}
+#endif
 
 static ADDRESS_MAP_START( sparkman_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM									// ROM
@@ -932,7 +946,8 @@ static ADDRESS_MAP_START( sparkman_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc280, 0xc280) AM_WRITE(sparkman_rombank_w		)	// ROM Bank (?mirrored up to c2ff?)
 	AM_RANGE(0xc300, 0xc300) AM_WRITE(sparkman_flipscreen_w		)	// Flip Screen
 	AM_RANGE(0xc380, 0xc3ff) AM_WRITE(sparkman_cmd_prot_w		)	// Protection
-	AM_RANGE(0xc400, 0xc400) AM_WRITE(sparkman_leds_w			)	// Leds + Coin Counter
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(sparkman_leds_w			)	// Leds
+	AM_RANGE(0xc480, 0xc480) AM_WRITE(sparkman_coin_counter_w   )   // Coin Counter
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_w				)	// To Sound CPU
 	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram	)	// Palette (Banked??)
 	AM_RANGE(0xc800, 0xdfff) AM_RAM_WRITE(suna8_wram_w) AM_BASE(&suna8_wram)								// RAM
@@ -2300,6 +2315,35 @@ ROM_START( sparkman )
 ROM_END
 
 
+ROM_START( sparkmana )
+	ROM_REGION( 0x50000, "maincpu", 0 )		/* Main Z80 Code */
+	ROM_LOAD( "p9.7f",       0x00000, 0x08000, CRC(b114cb2b) SHA1(4f79bf65ef17147004f7a8d1d6a58dac0293cdc7) ) // sparkman.e7 99.972534% (9 bytes differ, version string is the same)
+	ROM_LOAD( "sparkman.g7", 0x10000, 0x10000, CRC(48b4a31e) SHA1(771d1f1a2ce950ce2b661a4081471e98a7a7d53e) )
+	ROM_LOAD( "sparkman.g8", 0x20000, 0x10000, CRC(b8a4a557) SHA1(10251b49fb44fb1e7c71fde8fe9544df29d27346) )
+	ROM_LOAD( "sparkman.i7", 0x30000, 0x10000, CRC(f5f38e1f) SHA1(25f0abbac1298fad1f8e7202db05e48c3598bc88) )
+	ROM_LOAD( "sparkman.i8", 0x40000, 0x10000,  CRC(e54eea25) SHA1(b8ea884ee1a24953b6406f2d1edf103700f542d2) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Music Z80 Code */
+	ROM_LOAD( "sparkman.h11", 0x00000, 0x08000, CRC(06822f3d) SHA1(d30592cecbcd4dbf67e5a8d9c151d60b3232a54d) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )	/* Sprites */
+	ROM_LOAD( "sparkman.u4", 0x00000, 0x10000, CRC(17c16ce4) SHA1(b4127e9aedab69193bef1d85e68003e225913417) )
+	ROM_LOAD( "sparkman.t1", 0x10000, 0x10000, CRC(2e474203) SHA1(a407126d92e529568129d5246f89d51330ff5d32) )
+	ROM_LOAD( "sparkman.r1", 0x20000, 0x08000, CRC(7115cfe7) SHA1(05fde6279a1edc97e79b1ff3f72b2da400a6a409) )
+	ROM_LOAD( "sparkman.u1", 0x30000, 0x10000, CRC(39dbd414) SHA1(03fe938ed1191329b6a2f7ed54c6ef69273998df) )
+
+	ROM_LOAD( "sparkman.u6", 0x40000, 0x10000, CRC(414222ea) SHA1(e05f0504c6e735c73027312a85cc55fc98728e53) )
+	ROM_LOAD( "sparkman.t2", 0x50000, 0x10000, CRC(0df5da2a) SHA1(abbd5ba22b30f17d203ecece7afafa0cbe78352c) )
+	ROM_LOAD( "sparkman.r2", 0x60000, 0x08000, CRC(6904bde2) SHA1(c426fa0c29b1874c729b981467f219c422f863aa) )
+	ROM_LOAD( "sparkman.u2", 0x70000, 0x10000, CRC(e6551db9) SHA1(bed2a9ba72895f3ba876b4e0a41c33ea8a3c5af2) )
+
+	ROM_REGION( 0x8000, "samples", 0 )		/* Samples */
+	ROM_LOAD( "sparkman.b10", 0x0000, 0x8000, CRC(46c7d4d8) SHA1(99f38cc044390ee4646498667ad2bf536ce91e8f) )
+
+	ROM_REGION( 0x8000, "samples2", 0 )		/* Samples */
+	ROM_LOAD( "sprkman.b11", 0x0000, 0x8000, CRC(d6823a62) SHA1(f8ce748aa7bdc9c95799dd111fd872717e46d416) )
+ROM_END
+
 /***************************************************************************
 
 
@@ -2324,7 +2368,8 @@ GAME( 1988, pop_hh,   hardhead, hardhead, hardhead, hardhedb, ROT0,  "bootleg", 
 GAME( 1991, hardhea2, 0,        hardhea2, hardhea2, hardhea2, ROT0,  "SunA", "Hard Head 2 (v2.0)" , 0 )
 
 /* Non Working Games */
-GAME( 1989, sparkman, 0,        sparkman, sparkman, sparkman, ROT0,  "SunA", "Spark Man (v 2.0)", GAME_NOT_WORKING )
+GAME( 1989, sparkman, 0,        sparkman, sparkman, sparkman, ROT0,  "SunA", "Spark Man (v 2.0, set 1)", GAME_NOT_WORKING )
+GAME( 1989, sparkmana,sparkman, sparkman, sparkman, sparkman, ROT0,  "SunA", "Spark Man (v 2.0, set 2)", GAME_NOT_WORKING )
 GAME( 1990, starfigh, 0,        starfigh, hardhea2, starfigh, ROT90, "SunA", "Star Fighter (v1)", GAME_NOT_WORKING )
 GAME( 1992, brickzn,  0,        brickzn,  brickzn,  brickzn,  ROT90, "SunA", "Brick Zone (v5.0)", GAME_NOT_WORKING )
 GAME( 1992, brickzn3, brickzn,  brickzn,  brickzn,  brickzn3, ROT90, "SunA", "Brick Zone (v4.0)", GAME_NOT_WORKING )

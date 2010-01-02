@@ -224,6 +224,9 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
+#include "machine/adc1038.h"
+#include "machine/k056230.h"
+#include "machine/k033906.h"
 #include "sound/rf5c400.h"
 #include "video/voodoo.h"
 #include "video/gticlub.h"
@@ -318,149 +321,11 @@ static const eeprom_interface eeprom_intf =
 	0				/* reset_delay */
 };
 
-static void eeprom_handler(running_machine *machine, mame_file *file, int read_or_write)
-{
-	if (read_or_write)
-	{
-		if (file)
-		{
-			eeprom_save(file);
-		}
-	}
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-		if (file)
-		{
-			eeprom_load(file);
-		}
-		else
-		{
-			// set default eeprom
-			UINT8 eepdata[0x200];
-			memset(eepdata, 0xff, 0x200);
-
-			if (mame_stricmp(machine->gamedrv->name, "slrasslt") == 0)
-			{
-				// magic number
-				eepdata[0x4] = 0x96;
-				eepdata[0x5] = 0x72;
-			}
-
-			eeprom_set_data(eepdata, 0x200);
-		}
-	}
-}
-
-static int adc1038_cycle;
-static int adc1038_clk;
-static int adc1038_adr;
-static int adc1038_data_in;
-static int adc1038_data_out;
-static int adc1038_adc_data;
-static int adc1038_sars;
-static int adc1038_gticlub_hack;
-
-static void adc1038_init(running_machine *machine)
-{
-	adc1038_cycle = 0;
-	adc1038_clk = 0;
-	adc1038_adr = 0;
-	adc1038_data_in = 0;
-	adc1038_data_out = 0;
-	adc1038_adc_data = 0;
-	adc1038_sars = 1;
-	adc1038_gticlub_hack = (mame_stricmp(machine->gamedrv->name, "gticlub") == 0 ||
-		mame_stricmp(machine->gamedrv->name, "gticlubj") == 0) ? 1 : 0;
-}
-
-static int adc1038_do_r(void)
-{
-	//printf("ADC DO\n");
-	return adc1038_data_out & 1;
-}
-
-static void adc1038_di_w(int bit)
-{
-	adc1038_data_in = bit & 1;
-}
-
-static void adc1038_clk_w(running_machine *machine, int bit)
-{
-	// GTI Club doesn't sync on SARS
-	if (adc1038_gticlub_hack)
-	{
-		if (adc1038_clk == 0 && bit == 0)
-		{
-			adc1038_cycle = 0;
-
-			switch (adc1038_adr)
-			{
-				case 0: adc1038_adc_data = input_port_read(machine, "AN0"); break;
-				case 1: adc1038_adc_data = input_port_read(machine, "AN1"); break;
-				case 2: adc1038_adc_data = input_port_read(machine, "AN2"); break;
-				case 3: adc1038_adc_data = input_port_read(machine, "AN3"); break;
-				case 4: adc1038_adc_data = 0x000; break;
-				case 5: adc1038_adc_data = 0x000; break;
-				case 6: adc1038_adc_data = 0x000; break;
-				case 7: adc1038_adc_data = 0x000; break;
-			}
-		}
-	}
-
-	if (bit == 1)
-	{
-		//printf("ADC CLK, DI = %d, cycle = %d\n", adc1038_data_in, adc1038_cycle);
-
-		if (adc1038_cycle == 0)			// A2
-		{
-			adc1038_adr = 0;
-			adc1038_adr |= (adc1038_data_in << 2);
-		}
-		else if (adc1038_cycle == 1)	// A1
-		{
-			adc1038_adr |= (adc1038_data_in << 1);
-		}
-		else if (adc1038_cycle == 2)	// A0
-		{
-			adc1038_adr |= (adc1038_data_in << 0);
-		}
-
-		adc1038_data_out = (adc1038_adc_data & 0x200) ? 1 : 0;
-		adc1038_adc_data <<= 1;
-
-		adc1038_cycle++;
-	}
-
-	adc1038_clk = bit;
-}
-
-static int adc1038_sars_r(running_machine *machine)
-{
-	adc1038_cycle = 0;
-
-	switch (adc1038_adr)
-	{
-		case 0: adc1038_adc_data = input_port_read(machine, "AN0"); break;
-		case 1: adc1038_adc_data = input_port_read(machine, "AN1"); break;
-		case 2: adc1038_adc_data = input_port_read(machine, "AN2"); break;
-		case 3: adc1038_adc_data = input_port_read(machine, "AN3"); break;
-		case 4: adc1038_adc_data = 0x000; break;
-		case 5: adc1038_adc_data = 0x000; break;
-		case 6: adc1038_adc_data = 0x000; break;
-		case 7: adc1038_adc_data = 0x000; break;
-	}
-
-	adc1038_data_out = (adc1038_adc_data & 0x200) ? 1 : 0;
-	adc1038_adc_data <<= 1;
-
-	adc1038_sars ^= 1;
-	return adc1038_sars;
-}
-
 static READ8_HANDLER( sysreg_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
+	const device_config *adc1038 = devtag_get_device(space->machine, "adc1038");
+	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
 
 	switch (offset)
 	{
@@ -470,7 +335,7 @@ static READ8_HANDLER( sysreg_r )
 			return input_port_read(space->machine, portnames[offset]);
 
 		case 2:
-			return adc1038_sars_r(space->machine) << 7;
+			return adc1038_sars_read(adc1038) << 7;
 
 		case 4:
 		{
@@ -480,8 +345,8 @@ static READ8_HANDLER( sysreg_r )
 			// a = ADC readout
 			// e = EEPROM data out
 
-			UINT32 eeprom_bit = (eeprom_read_bit() << 1);
-			UINT32 adc_bit = (adc1038_do_r() << 2);
+			UINT32 eeprom_bit = (eeprom_read_bit(eeprom) << 1);
+			UINT32 adc_bit = (adc1038_do_read(adc1038) << 2);
 			return (eeprom_bit | adc_bit);
 		}
 
@@ -494,6 +359,9 @@ static READ8_HANDLER( sysreg_r )
 
 static WRITE8_HANDLER( sysreg_w )
 {
+	const device_config *adc1038 = devtag_get_device(space->machine, "adc1038");
+	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+
 	switch (offset)
 	{
 		case 0:
@@ -505,9 +373,9 @@ static WRITE8_HANDLER( sysreg_w )
 			break;
 
 		case 3:
-			eeprom_write_bit((data & 0x01) ? 1 : 0);
-			eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
-			eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+			eeprom_write_bit(eeprom, (data & 0x01) ? 1 : 0);
+			eeprom_set_clock_line(eeprom, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+			eeprom_set_cs_line(eeprom, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 4:
@@ -517,77 +385,12 @@ static WRITE8_HANDLER( sysreg_w )
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
 				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 
-			adc1038_di_w((data >> 0) & 1);
-			adc1038_clk_w(space->machine, (data >> 1) & 1);
+			adc1038_di_write(adc1038, (data >> 0) & 1);
+			adc1038_clk_write(adc1038, (data >> 1) & 1);
 
 			set_cgboard_id((data >> 4) & 0x3);
 			break;
 	}
-}
-
-/* Konami K056230 (LANC) */
-READ8_HANDLER( K056230_r )
-{
-	switch (offset)
-	{
-		case 0:		// Status register
-		{
-			return 0x08;
-		}
-	}
-
-//  mame_printf_debug("K056230_r: %d at %08X\n", offset, cpu_get_pc(space->cpu));
-
-	return 0;
-}
-
-static TIMER_CALLBACK( network_irq_clear )
-{
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ2, CLEAR_LINE);
-}
-
-WRITE8_HANDLER( K056230_w )
-{
-	switch (offset)
-	{
-		case 0:		// Mode register
-		{
-			break;
-		}
-		case 1:		// Control register
-		{
-			if (data & 0x20)
-			{
-				// Thunder Hurricane breaks otherwise...
-				if (mame_stricmp(space->machine->gamedrv->name, "thunderh") != 0)
-				{
-					cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ2, ASSERT_LINE);
-					timer_set(space->machine, ATTOTIME_IN_USEC(10), NULL, 0, network_irq_clear);
-				}
-			}
-//          else
-//              cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ2, CLEAR_LINE);
-			break;
-		}
-		case 2:		// Sub ID register
-		{
-			break;
-		}
-	}
-//  mame_printf_debug("K056230_w: %d, %02X at %08X\n", offset, data, cpu_get_pc(space->cpu));
-}
-
-UINT32 *lanc_ram;
-READ32_HANDLER( lanc_ram_r )
-{
-//  mame_printf_debug("LANC_RAM_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
-	return lanc_ram[offset & 0x7ff];
-}
-
-WRITE32_HANDLER( lanc_ram_w )
-{
-//  mame_printf_debug("LANC_RAM_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
-	COMBINE_DATA(lanc_ram + (offset & 0x7ff));
 }
 
 /******************************************************************/
@@ -612,8 +415,8 @@ static ADDRESS_MAP_START( gticlub_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x78080000, 0x7808000f) AM_READWRITE(K001006_1_r, K001006_1_w)
 	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
-	AM_RANGE(0x7e008000, 0x7e009fff) AM_READWRITE8(K056230_r, K056230_w, 0xffffffff)
-	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_READWRITE(lanc_ram_r, lanc_ram_w) AM_BASE(&lanc_ram)
+	AM_RANGE(0x7e008000, 0x7e009fff) AM_DEVREADWRITE8("k056230", k056230_r, k056230_w, 0xffffffff)
+	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_DEVREADWRITE("k056230", lanc_ram_r, lanc_ram_w)
 	AM_RANGE(0x7e00c000, 0x7e00c007) AM_DEVWRITE("k056800", k056800_host_w)
 	AM_RANGE(0x7e00c000, 0x7e00c007) AM_DEVREAD("k056800", k056800_host_r)		// Hang Pilot
 	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_DEVREAD("k056800", k056800_host_r)
@@ -689,15 +492,10 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static NVRAM_HANDLER(gticlub)
-{
-	eeprom_handler(machine, file, read_or_write);
-}
-
 static INPUT_PORTS_START( gticlub )
 	PORT_START("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )		// View switch
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) 		// Shift Down
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )		// Shift Down
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )		// Shift Up
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )		// AT/MT switch
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
@@ -916,6 +714,50 @@ static const k056800_interface gticlub_k056800_interface =
 	sound_irq_callback
 };
 
+
+static int adc1038_input_callback( const device_config *device, int input )
+{
+	int value = 0;
+	switch (input)
+	{
+	case 0: value = input_port_read(device->machine, "AN0"); break;
+	case 1: value = input_port_read(device->machine, "AN1"); break;
+	case 2: value = input_port_read(device->machine, "AN2"); break;
+	case 3: value = input_port_read(device->machine, "AN3"); break;
+	case 4: value = 0x000; break;
+	case 5: value = 0x000; break;
+	case 6: value = 0x000; break;
+	case 7: value = 0x000; break;
+	}
+
+	return value;
+}
+
+static const adc1038_interface gticlub_adc1038_intf =
+{
+	1,
+	adc1038_input_callback
+};
+
+static const adc1038_interface thunderh_adc1038_intf =
+{
+	0,
+	adc1038_input_callback
+};
+
+static const k056230_interface gticlub_k056230_intf =
+{
+	"maincpu",
+	0
+};
+
+static const k056230_interface thunderh_k056230_intf =
+{
+	"maincpu",
+	1
+};
+
+
 static MACHINE_RESET( gticlub )
 {
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
@@ -937,11 +779,16 @@ static MACHINE_DRIVER_START( gticlub )
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
-	MDRV_NVRAM_HANDLER(gticlub)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+
 	MDRV_MACHINE_START(gticlub)
 	MDRV_MACHINE_RESET(gticlub)
 
- 	/* video hardware */
+	MDRV_ADC1038_ADD("adc1038", gticlub_adc1038_intf)
+
+	MDRV_K056230_ADD("k056230", gticlub_k056230_intf)
+
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -961,6 +808,36 @@ static MACHINE_DRIVER_START( gticlub )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( thunderh )
+
+	MDRV_IMPORT_FROM(gticlub)
+
+	MDRV_DEVICE_REMOVE("adc1038")
+	MDRV_ADC1038_ADD("adc1038", thunderh_adc1038_intf)
+
+	MDRV_DEVICE_REMOVE("k056230")
+	MDRV_K056230_ADD("k056230", thunderh_k056230_intf)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( slrasslt )
+
+	MDRV_IMPORT_FROM(gticlub)
+
+	MDRV_DEVICE_REMOVE("adc1038")
+	MDRV_ADC1038_ADD("adc1038", thunderh_adc1038_intf)
+MACHINE_DRIVER_END
+
+
+static const k033906_interface hangplt_k033906_intf_0 =
+{
+	"voodoo0"
+};
+
+static const k033906_interface hangplt_k033906_intf_1 =
+{
+	"voodoo1"
+};
 
 static MACHINE_RESET( hangplt )
 {
@@ -987,9 +864,13 @@ static MACHINE_DRIVER_START( hangplt )
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
-	MDRV_NVRAM_HANDLER(gticlub)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+
 	MDRV_MACHINE_START(gticlub)
 	MDRV_MACHINE_RESET(hangplt)
+
+	MDRV_ADC1038_ADD("adc1038", thunderh_adc1038_intf)
+	MDRV_K056230_ADD("k056230", gticlub_k056230_intf)
 
 	MDRV_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "lscreen")
 	MDRV_3DFX_VOODOO_CPU("dsp")
@@ -1003,7 +884,10 @@ static MACHINE_DRIVER_START( hangplt )
 	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 2)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_1)
 
- 	/* video hardware */
+	MDRV_K033906_ADD("k033906_1", hangplt_k033906_intf_0)
+	MDRV_K033906_ADD("k033906_2", hangplt_k033906_intf_1)
+
+	/* video hardware */
 	MDRV_PALETTE_LENGTH(65536)
 
 	MDRV_SCREEN_ADD("lscreen", RASTER)
@@ -1198,6 +1082,9 @@ ROM_START( slrasslt ) /* USA version UAA */
 	ROM_LOAD64_WORD( "792a14.13d", 0x000002, 0x200000, CRC(cf57e830) SHA1(607b4dec3b8180a63e29d9dab1ca28d7226dda1e) )
 	ROM_LOAD64_WORD( "792a15.9d",  0x000004, 0x200000, CRC(1c5531cb) SHA1(1b514f181c92e16d07bfe4719604f1e4caf15377) )
 	ROM_LOAD64_WORD( "792a16.4d",  0x000006, 0x200000, CRC(df89e392) SHA1(af37c5460d43bf8d8a1ab4213c4528083a7363c2) )
+
+	ROM_REGION16_BE(0x200, "eeprom", 0) /* default eeprom with magic number */
+	ROM_LOAD16_WORD( "eeprom-slrasslt.bin", 0x0000, 0x0200, CRC(924b4ed8) SHA1(247bf0c1394cbab3af03c26b9c016302b9b5723c) )
 ROM_END
 
 ROM_START( hangplt ) /* Japan version JAB */
@@ -1231,8 +1118,6 @@ static DRIVER_INIT(gticlub)
 	gticlub_led_reg0 = gticlub_led_reg1 = 0x7f;
 
 	K001005_preprocess_texture_data(memory_region(machine, "gfx1"), memory_region_length(machine, "gfx1"), 1);
-
-	adc1038_init(machine);
 }
 
 static DRIVER_INIT(hangplt)
@@ -1244,18 +1129,14 @@ static DRIVER_INIT(hangplt)
 	sharc_dataram_0 = auto_alloc_array(machine, UINT32, 0x100000/4);
 	sharc_dataram_1 = auto_alloc_array(machine, UINT32, 0x100000/4);
 	gticlub_led_reg0 = gticlub_led_reg1 = 0x7f;
-
-	K033906_init(machine);
-
-	adc1038_init(machine);
 }
 
 /*************************************************************************/
 
-GAME( 1996, gticlub,  0,        gticlub, gticlub,  gticlub, ROT0, "Konami", "GTI Club (ver EAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1996, gticluba, gticlub,  gticlub, gticlub,  gticlub, ROT0, "Konami", "GTI Club (ver AAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1996, gticlubj, gticlub,  gticlub, gticlub,  gticlub, ROT0, "Konami", "GTI Club (ver JAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1996, thunderh, 0,        gticlub, thunderh, gticlub, ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1996, thunderhu,thunderh, gticlub, thunderh, gticlub, ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1997, slrasslt, 0,        gticlub, slrasslt, gticlub, ROT0, "Konami", "Solar Assault (ver UAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAMEL( 1997, hangplt, 0,        hangplt, hangplt,  hangplt, ROT0, "Konami", "Hang Pilot", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND, layout_dualhovu )
+GAME( 1996, gticlub,  0,        gticlub,  gticlub,  gticlub, ROT0, "Konami", "GTI Club (ver EAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1996, gticluba, gticlub,  gticlub,  gticlub,  gticlub, ROT0, "Konami", "GTI Club (ver AAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1996, gticlubj, gticlub,  gticlub,  gticlub,  gticlub, ROT0, "Konami", "GTI Club (ver JAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1996, thunderh, 0,        thunderh, thunderh, gticlub, ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1996, thunderhu,thunderh, thunderh, thunderh, gticlub, ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1997, slrasslt, 0,        slrasslt, slrasslt, gticlub, ROT0, "Konami", "Solar Assault (ver UAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAMEL( 1997, hangplt, 0,        hangplt,  hangplt,  hangplt, ROT0, "Konami", "Hang Pilot", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND, layout_dualhovu )

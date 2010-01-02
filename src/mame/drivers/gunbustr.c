@@ -115,9 +115,10 @@ popmessage(t);
 
 			if (ACCESSING_BITS_0_7)
 			{
-				eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				eeprom_write_bit(data & 0x40);
-				eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				const device_config *device = devtag_get_device(space->machine, "eeprom");
+				eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_write_bit(device, data & 0x40);
+				eeprom_set_cs_line(device, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 				return;
 			}
 			return;
@@ -184,8 +185,8 @@ static ADDRESS_MAP_START( gunbustr_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x400004, 0x400007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x400000, 0x400007) AM_WRITE(gunbustr_input_w)											/* eerom etc. */
 	AM_RANGE(0x500000, 0x500003) AM_READWRITE(gunbustr_gun_r, gunbustr_gun_w)						/* gun coord read */
-	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0480SCP_long_r, TC0480SCP_long_w)
-	AM_RANGE(0x830000, 0x83002f) AM_READWRITE(TC0480SCP_ctrl_long_r, TC0480SCP_ctrl_long_w)
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)
+	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
 	AM_RANGE(0x900000, 0x901fff) AM_RAM_WRITE(gunbustr_palette_w) AM_BASE_GENERIC(paletteram)			/* Palette ram */
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM																/* network ram ?? */
 ADDRESS_MAP_END
@@ -203,7 +204,7 @@ static INPUT_PORTS_START( gunbustr )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -302,17 +303,6 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static const UINT8 default_eeprom[128]={
-	0x00,0x01,0x00,0x85,0x00,0xfd,0x00,0xff,0x00,0x67,0x00,0x02,0x00,0x00,0x00,0x7b,
-	0x00,0xff,0x00,0xff,0x00,0x78,0x00,0x03,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0x01,0x01,0x00,0x00,0x01,0x02,0x00,0x00,0x01,0x01,0x00,0x00,0x00,0x10,0x00,0x00,
-	0x21,0x13,0x14,0x00,0x00,0x00,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
-};
-
 static const eeprom_interface gunbustr_eeprom_interface =
 {
 	6,				/* address bits */
@@ -324,18 +314,15 @@ static const eeprom_interface gunbustr_eeprom_interface =
 	"0100110000",	/* lock command */
 };
 
-static NVRAM_HANDLER( gunbustr )
+static const tc0480scp_interface gunbustr_tc0480scp_intf =
 {
-	if (read_or_write)
-		eeprom_save(file);
-	else {
-		eeprom_init(machine, &gunbustr_eeprom_interface);
-		if (file)
-			eeprom_load(file);
-		else
-			eeprom_set_data(default_eeprom,128);  /* Default the gun setup values */
-	}
-}
+	1, 2,		/* gfxnum, txnum */
+	0,		/* pixels */
+	0x20, 0x07,		/* x_offset, y_offset */
+	-1, -1,		/* text_xoff, text_yoff */
+	-1, 0,		/* flip_xoff, flip_yoff */
+	0		/* col_base */
+};
 
 static MACHINE_DRIVER_START( gunbustr )
 
@@ -344,7 +331,7 @@ static MACHINE_DRIVER_START( gunbustr )
 	MDRV_CPU_PROGRAM_MAP(gunbustr_map)
 	MDRV_CPU_VBLANK_INT("screen", gunbustr_interrupt) /* VBL */
 
-	MDRV_NVRAM_HANDLER(gunbustr)
+	MDRV_EEPROM_ADD("eeprom", gunbustr_eeprom_interface)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -359,6 +346,8 @@ static MACHINE_DRIVER_START( gunbustr )
 
 	MDRV_VIDEO_START(gunbustr)
 	MDRV_VIDEO_UPDATE(gunbustr)
+
+	MDRV_TC0480SCP_ADD("tc0480scp", gunbustr_tc0480scp_intf)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(taito_f3_sound)
@@ -395,6 +384,9 @@ ROM_START( gunbustr )
 	ROM_RELOAD(0x400000,0x100000)
 	ROM_LOAD16_BYTE( "d27-09.bin", 0x200000, 0x100000, CRC(3e060304) SHA1(c4da4a94c168c3a454409d758c3ed45babbab170) ) // CA, CB
 	ROM_LOAD16_BYTE( "d27-10.bin", 0x600000, 0x100000, CRC(ed894fe1) SHA1(5bf2fb6abdcf25bc525a2c3b29dbf7aca0b18fea) ) // -std-
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-gunbustr.bin", 0x0000, 0x0080, CRC(af7dc017) SHA1(5ff106cccd2679025cdd81fbc133d32148e2818c) )
 ROM_END
 
 static READ32_HANDLER( main_cycle_r )

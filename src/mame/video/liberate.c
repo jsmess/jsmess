@@ -15,7 +15,7 @@
 UINT8 *liberate_videoram;
 UINT8 *liberate_colorram;
 static int background_color, background_disable;
-static tilemap *background_tilemap, *fix_tilemap;
+static tilemap_t *background_tilemap, *fix_tilemap;
 static UINT8 deco16_io_ram[16];
 extern UINT8 *prosoccr_charram;
 extern UINT8 *prosport_bg_vram;
@@ -354,7 +354,7 @@ static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 	for (offs = 0x000;offs < 0x800;offs += 4)
 	{
-	  	if ((spriteram[offs+0]&1)!=1) continue;
+		if ((spriteram[offs+0]&1)!=1) continue;
 
 		code = spriteram[offs+1] + ((spriteram[offs+0]&0x3)<<8);
 		code2=code+1;

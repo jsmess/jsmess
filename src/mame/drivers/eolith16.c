@@ -12,7 +12,7 @@
 #include "driver.h"
 #include "cpu/e132xs/e132xs.h"
 #include "deprecat.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "includes/eolithsp.h"
 
@@ -75,7 +75,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( eolith16 )
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(eolith_speedup_getvblank, NULL)
 	PORT_BIT( 0xff6f, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -98,9 +98,9 @@ static INPUT_PORTS_START( eolith16 )
 	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
 INPUT_PORTS_END
 
 static VIDEO_START( eolith16 )
@@ -162,7 +162,7 @@ static MACHINE_DRIVER_START( eolith16 )
 	MDRV_CPU_PROGRAM_MAP(eolith16_map)
 	MDRV_CPU_VBLANK_INT_HACK(eolith_speedup,262)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_interface_93C66)
+	MDRV_EEPROM_ADD("eeprom", eeprom_interface_93C66)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

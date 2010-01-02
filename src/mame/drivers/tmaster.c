@@ -105,7 +105,7 @@ To Do:
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/okim6295.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "machine/microtch.h"
 #include "machine/68681.h"
 
@@ -337,7 +337,7 @@ static void tmaster_draw(running_machine *machine)
 	bitmap_t *bitmap;
 
 	buffer	=	(tmaster_regs[0x02/2] >> 8) & 3;	// 1 bit per layer, selects the currently displayed buffer
- 	sw		=	 tmaster_regs[0x04/2];
+	sw		=	 tmaster_regs[0x04/2];
 	sx		=	 tmaster_regs[0x06/2];
 	sh		=	 tmaster_regs[0x08/2] + 1;
 	sy		=	 tmaster_regs[0x0a/2];
@@ -547,7 +547,7 @@ static READ16_HANDLER( galgames_eeprom_r )
 {
 	const device_config *eeprom = devtag_get_device(space->machine, galgames_eeprom_names[galgames_cart]);
 
-	return eepromdev_read_bit(eeprom) ? 0x80 : 0x00;
+	return eeprom_read_bit(eeprom) ? 0x80 : 0x00;
 }
 
 static WRITE16_HANDLER( galgames_eeprom_w )
@@ -560,10 +560,10 @@ static WRITE16_HANDLER( galgames_eeprom_w )
 		const device_config *eeprom = devtag_get_device(space->machine, galgames_eeprom_names[galgames_cart]);
 
 		// latch the bit
-		eepromdev_write_bit(eeprom, data & 0x0001);
+		eeprom_write_bit(eeprom, data & 0x0001);
 
 		// clock line asserted: write latch or select next bit to read
-		eepromdev_set_clock_line(eeprom, (data & 0x0002) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line(eeprom, (data & 0x0002) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -633,7 +633,7 @@ static WRITE16_HANDLER( galgames_cart_sel_w )
 		{
 			case 0x07:		// 7 resets the eeprom
 				for (i = 0; i < 5; i++)
-					eepromdev_set_cs_line(devtag_get_device(space->machine, galgames_eeprom_names[i]), ASSERT_LINE);
+					eeprom_set_cs_line(devtag_get_device(space->machine, galgames_eeprom_names[i]), ASSERT_LINE);
 				break;
 
 			case 0x00:
@@ -641,12 +641,12 @@ static WRITE16_HANDLER( galgames_cart_sel_w )
 			case 0x02:
 			case 0x03:
 			case 0x04:
-				eepromdev_set_cs_line(devtag_get_device(space->machine, galgames_eeprom_names[data & 0xff]), CLEAR_LINE);
+				eeprom_set_cs_line(devtag_get_device(space->machine, galgames_eeprom_names[data & 0xff]), CLEAR_LINE);
 				galgames_update_rombank(space->machine, data & 0xff);
 				break;
 
 			default:
-				eepromdev_set_cs_line(devtag_get_device(space->machine, galgames_eeprom_names[0]), CLEAR_LINE);
+				eeprom_set_cs_line(devtag_get_device(space->machine, galgames_eeprom_names[0]), CLEAR_LINE);
 				galgames_update_rombank(space->machine, 0);
 				logerror("%06x: unknown cart sel = %04x\n", cpu_get_pc(space->cpu), data);
 				break;
@@ -766,8 +766,8 @@ static INPUT_PORTS_START( tmaster )
 	PORT_INCLUDE( microtouch )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) 	// "M. Coin 1 Input"
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) 	// "M. Coin 2 Input"
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )	// "M. Coin 1 Input"
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )	// "M. Coin 2 Input"
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BILL1 ) PORT_IMPULSE(2)	// "DBV Input"
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -945,11 +945,11 @@ static MACHINE_DRIVER_START( galgames )
 	MDRV_CPU_VBLANK_INT_HACK(galgames_interrupt, 1+20)	// ??
 
 	// 5 EEPROMs on the motherboard (for BIOS + 4 Carts)
-	MDRV_EEPROM_NODEFAULT_ADD(GALGAMES_EEPROM_BIOS,  galgames_eeprom_interface)
-	MDRV_EEPROM_NODEFAULT_ADD(GALGAMES_EEPROM_CART1, galgames_eeprom_interface)
-	MDRV_EEPROM_NODEFAULT_ADD(GALGAMES_EEPROM_CART2, galgames_eeprom_interface)
-	MDRV_EEPROM_NODEFAULT_ADD(GALGAMES_EEPROM_CART3, galgames_eeprom_interface)
-	MDRV_EEPROM_NODEFAULT_ADD(GALGAMES_EEPROM_CART4, galgames_eeprom_interface)
+	MDRV_EEPROM_ADD(GALGAMES_EEPROM_BIOS,  galgames_eeprom_interface)
+	MDRV_EEPROM_ADD(GALGAMES_EEPROM_CART1, galgames_eeprom_interface)
+	MDRV_EEPROM_ADD(GALGAMES_EEPROM_CART2, galgames_eeprom_interface)
+	MDRV_EEPROM_ADD(GALGAMES_EEPROM_CART3, galgames_eeprom_interface)
+	MDRV_EEPROM_ADD(GALGAMES_EEPROM_CART4, galgames_eeprom_interface)
 
 	MDRV_MACHINE_RESET( galgames )
 

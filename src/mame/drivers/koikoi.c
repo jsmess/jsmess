@@ -52,7 +52,7 @@ struct _koikoi_state
 	UINT8 *  videoram;
 
 	/* video-related */
-	tilemap  *tmap;
+	tilemap_t  *tmap;
 
 	/* misc */
 	int inputcnt;
@@ -318,7 +318,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,		 			DEVCB_HANDLER(input_r),
+	DEVCB_NULL,					DEVCB_HANDLER(input_r),
 	DEVCB_HANDLER(unknown_w),	DEVCB_NULL
 };
 

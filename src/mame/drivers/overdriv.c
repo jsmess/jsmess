@@ -22,7 +22,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "video/konicdev.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( overdriv_slave_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x108000, 0x10800f) AM_NOP	// K053250 #1
 	AM_RANGE(0x118000, 0x118fff) AM_DEVREADWRITE("k053246", k053247_word_r, k053247_word_w)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREAD("k053246", k053246_word_r)
-	AM_RANGE(0x128000, 0x128001) AM_READWRITE(cpuB_ctrl_r,cpuB_ctrl_w) 	/* enable K053247 ROM reading, plus something else */
+	AM_RANGE(0x128000, 0x128001) AM_READWRITE(cpuB_ctrl_r,cpuB_ctrl_w)	/* enable K053247 ROM reading, plus something else */
 	AM_RANGE(0x130000, 0x130007) AM_DEVWRITE("k053246", k053246_word_w)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x208000, 0x20bfff) AM_RAM
@@ -230,7 +230,7 @@ static INPUT_PORTS_START( overdriv )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")
@@ -247,9 +247,9 @@ static INPUT_PORTS_START( overdriv )
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(50)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
 
@@ -325,7 +325,8 @@ static MACHINE_DRIVER_START( overdriv )
 
 	MDRV_MACHINE_RESET(overdriv)
 
-	MDRV_EEPROM_ADD("eeprom", eeprom_intf, 128, overdriv_default_eeprom)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_DATA(overdriv_default_eeprom, 128)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

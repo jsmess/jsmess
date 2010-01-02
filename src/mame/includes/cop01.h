@@ -14,12 +14,12 @@ struct _cop01_state
 	size_t         spriteram_size;
 
 	/* video-related */
-	tilemap        *bg_tilemap, *fg_tilemap;
+	tilemap_t        *bg_tilemap, *fg_tilemap;
 	UINT8          vreg[4];
 
 	/* sound-related */
 	int            pulse;
-	int            timer; 	// kludge for ym3526 in mightguy
+	int            timer;	// kludge for ym3526 in mightguy
 
 	/* devices */
 	const device_config *audiocpu;

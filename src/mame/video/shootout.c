@@ -5,7 +5,7 @@
 
 #include "driver.h"
 
-static tilemap *background, *foreground;
+static tilemap_t *background, *foreground;
 extern UINT8 *shootout_textram;
 
 
@@ -149,7 +149,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						vx,vy,
 						machine->priority_bitmap,
 						priority_mask,0);
-				}
+			}
 		}
 		source -= 4;
 	}

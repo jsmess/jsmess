@@ -40,7 +40,7 @@ Known Issues
 #include "cpu/m68000/m68000.h"
 #include "video/konicdev.h"
 #include "cpu/z80/z80.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/k054539.h"
 #include "includes/konamipt.h"
 
@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( gijoe_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x110000, 0x110007) AM_DEVWRITE("k053246", k053246_word_w)
 	AM_RANGE(0x120000, 0x121fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)		// Graphic planes
 	AM_RANGE(0x122000, 0x123fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)		// Graphic planes mirror read
-	AM_RANGE(0x130000, 0x131fff) AM_DEVREAD("k056832", k056832_rom_word_r) 								// Passthrough to tile roms
+	AM_RANGE(0x130000, 0x131fff) AM_DEVREAD("k056832", k056832_rom_word_r)								// Passthrough to tile roms
 	AM_RANGE(0x160000, 0x160007) AM_DEVWRITE("k056832", k056832_b_word_w)									// VSCCS (board dependent)
 	AM_RANGE(0x170000, 0x170001) AM_WRITENOP												// Watchdog
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE(&gijoe_workram)					// Main RAM.  Spec. 180000-1803ff, 180400-187fff
@@ -221,14 +221,14 @@ static INPUT_PORTS_START( gijoe )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_START3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_START4 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_SPECIAL )	// EEPROM ready (always 1)
 	PORT_SERVICE_NO_TOGGLE( 0x0800, IP_ACTIVE_LOW )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1 )
@@ -297,7 +297,7 @@ static MACHINE_DRIVER_START( gijoe )
 
 	MDRV_MACHINE_START(gijoe)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_UPDATE_BEFORE_VBLANK)

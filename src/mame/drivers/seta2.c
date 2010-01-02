@@ -533,7 +533,7 @@ The same H8/3007 code "FC21 IOPR-0" at U49 is used for FUNCUBE 2,3,4 & 5
 #include "cpu/m68000/m68000.h"
 #include "machine/tmp68301.h"
 #include "cpu/h83002/h8.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/x1_010.h"
 #include "includes/seta.h"
 
@@ -602,14 +602,14 @@ ADDRESS_MAP_END
 
 static READ16_DEVICE_HANDLER( gundamex_eeprom_r )
 {
-	return ((eepromdev_read_bit(device) & 1)) << 3;
+	return ((eeprom_read_bit(device) & 1)) << 3;
 }
 
 static WRITE16_DEVICE_HANDLER( gundamex_eeprom_w )
 {
-		eepromdev_set_clock_line(device, (data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-		eepromdev_write_bit(device, data & 0x1);
-		eepromdev_set_cs_line(device, (data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line(device, (data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(device, data & 0x1);
+		eeprom_set_cs_line(device, (data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( gundamex_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1121,7 +1121,7 @@ static INPUT_PORTS_START( gundamex )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "Freeze" ) PORT_DIPLOCATION("SW1:6") 	/* Listed as "Unused" */
+	PORT_DIPNAME( 0x0020, 0x0020, "Freeze" ) PORT_DIPLOCATION("SW1:6")	/* Listed as "Unused" */
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0040, 0x0040, "Show Targets" ) PORT_DIPLOCATION("SW1:7") /* Listed as "Unused" */
@@ -2308,7 +2308,7 @@ static MACHINE_DRIVER_START( gundamex )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gundamex_map)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")

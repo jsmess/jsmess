@@ -147,7 +147,7 @@ REF. 970429
 #include "includes/gaelco3d.h"
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/dmadac.h"
 
 #define	LOG				0
@@ -271,7 +271,7 @@ static WRITE16_HANDLER( irq_ack_w )
 static READ16_DEVICE_HANDLER( eeprom_data_r )
 {
 	UINT16 result = 0xffff;
-	if (eepromdev_read_bit(device))
+	if (eeprom_read_bit(device))
 		result ^= 0x0004;
 	if (LOG)
 		logerror("eeprom_data_r(%02X)\n", result);
@@ -282,21 +282,21 @@ static READ16_DEVICE_HANDLER( eeprom_data_r )
 static WRITE16_DEVICE_HANDLER( eeprom_data_w )
 {
 	if (ACCESSING_BITS_0_7)
-		eepromdev_write_bit(device, data & 0x01);
+		eeprom_write_bit(device, data & 0x01);
 }
 
 
 static WRITE16_DEVICE_HANDLER( eeprom_clock_w )
 {
 	if (ACCESSING_BITS_0_7)
-		eepromdev_set_clock_line(device, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_set_clock_line(device, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static WRITE16_DEVICE_HANDLER( eeprom_cs_w )
 {
 	if (ACCESSING_BITS_0_7)
-		eepromdev_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -642,7 +642,7 @@ static void adsp_tx_callback(const device_config *device, int port, INT32 data)
 			/* now put it down to samples, so we know what the channel frequency has to be */
 			sample_period = attotime_mul(sample_period, 16 * SOUND_CHANNELS);
 
- 			dmadac_set_frequency(&dmadac[0], SOUND_CHANNELS, ATTOSECONDS_TO_HZ(sample_period.attoseconds));
+			dmadac_set_frequency(&dmadac[0], SOUND_CHANNELS, ATTOSECONDS_TO_HZ(sample_period.attoseconds));
 			dmadac_enable(&dmadac[0], SOUND_CHANNELS, 1);
 
 			/* fire off a timer wich will hit every half-buffer */
@@ -970,7 +970,7 @@ static MACHINE_DRIVER_START( gaelco3d )
 	MDRV_MACHINE_START(gaelco3d)
 	MDRV_MACHINE_RESET(gaelco3d)
 
-	MDRV_EEPROM_93C66B_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C66B_ADD("eeprom")
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 

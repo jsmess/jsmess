@@ -14,7 +14,7 @@
 static  int nycaptor_mask=0;
 #endif
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 static int char_bank,palette_bank,gfxctrl;
 
 UINT8 *nycaptor_scrlram;
@@ -130,7 +130,7 @@ WRITE8_HANDLER( nycaptor_gfxctrl_w )
 
 READ8_HANDLER( nycaptor_gfxctrl_r )
 {
-		return 	gfxctrl;
+		return	gfxctrl;
 }
 
 READ8_HANDLER( nycaptor_scrlram_r )
@@ -151,17 +151,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	{
 		int pr = nycaptor_spriteram[0x9f-i];
 		int offs = (pr & 0x1f) * 4;
+		int code,sx,sy,flipx,flipy,pal,priori;
+
+		code = nycaptor_spriteram[offs+2] + ((nycaptor_spriteram[offs+1] & 0x10) << 4);//1 bit wolny = 0x20
+		pal=nycaptor_spriteram[offs+1] & 0x0f;
+		sx = nycaptor_spriteram[offs+3];
+		sy = 240-nycaptor_spriteram[offs+0];
+		priori=(pr&0xe0)>>5;
+		if(priori==pri)
 		{
-			int code,sx,sy,flipx,flipy,pal,priori;
-			code = nycaptor_spriteram[offs+2] + ((nycaptor_spriteram[offs+1] & 0x10) << 4);//1 bit wolny = 0x20
-			pal=nycaptor_spriteram[offs+1] & 0x0f;
-			sx = nycaptor_spriteram[offs+3];
-			sy = 240-nycaptor_spriteram[offs+0];
-			priori=(pr&0xe0)>>5;
-      if(priori==pri)
-      {
 #if NYCAPTOR_DEBUG
-      if(nycaptor_mask&(1<<(pri+4)))pal=0xd;
+			if(nycaptor_mask&(1<<(pri+4)))pal=0xd;
 #endif
 			flipx = ((nycaptor_spriteram[offs+1]&0x40)>>6);
 			flipy = ((nycaptor_spriteram[offs+1]&0x80)>>7);
@@ -180,8 +180,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				        pal,
 				        flipx,flipy,
 					      sx,sy,15);
-					}
-				}
+			}
 		}
 	}
 }
@@ -228,34 +227,34 @@ VIDEO_UPDATE( nycaptor )
   nycaptor_setmask(screen->machine);
   if(nycaptor_mask&0x1000)
   {
-     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|3,0);
-     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|3,0);
-     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|2,0);
-     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|2,0);
-     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|1,0);
-     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|1,0);
-     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|0,0);
-     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|0,0);
-     	draw_sprites(screen->machine, bitmap,cliprect,0);
-     	draw_sprites(screen->machine, bitmap,cliprect,1);
-     	draw_sprites(screen->machine, bitmap,cliprect,2);
-     	draw_sprites(screen->machine, bitmap,cliprect,3);
-     	draw_sprites(screen->machine, bitmap,cliprect,4);
-     	draw_sprites(screen->machine, bitmap,cliprect,5);
-     	draw_sprites(screen->machine, bitmap,cliprect,6);
-     	draw_sprites(screen->machine, bitmap,cliprect,7);
+    	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|3,0);
+    	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|3,0);
+    	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|2,0);
+    	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|2,0);
+    	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|1,0);
+    	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|1,0);
+    	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|0,0);
+    	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|0,0);
+    	draw_sprites(screen->machine, bitmap,cliprect,0);
+    	draw_sprites(screen->machine, bitmap,cliprect,1);
+    	draw_sprites(screen->machine, bitmap,cliprect,2);
+    	draw_sprites(screen->machine, bitmap,cliprect,3);
+    	draw_sprites(screen->machine, bitmap,cliprect,4);
+    	draw_sprites(screen->machine, bitmap,cliprect,5);
+    	draw_sprites(screen->machine, bitmap,cliprect,6);
+    	draw_sprites(screen->machine, bitmap,cliprect,7);
   }
  else
 #endif
  switch (nycaptor_spot()&3)
  {
   case 0:
-  	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|3,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|3,0);
     draw_sprites(screen->machine, bitmap,cliprect,6);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|3,0);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|2,0);
 	  tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|2,0);
-   	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|1,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|1,0);
     draw_sprites(screen->machine, bitmap,cliprect,3);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|1,0);
     draw_sprites(screen->machine, bitmap,cliprect,0);
@@ -281,7 +280,7 @@ VIDEO_UPDATE( nycaptor )
   break;
 
   case 2:
-   	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|3,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|3,0);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|3,0);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|1,0);
     draw_sprites(screen->machine, bitmap,cliprect,1);

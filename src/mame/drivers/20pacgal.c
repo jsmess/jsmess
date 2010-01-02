@@ -37,7 +37,7 @@
 
 #include "driver.h"
 #include "cpu/z180/z180.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/namco.h"
 #include "sound/dac.h"
 #include "includes/20pacgal.h"
@@ -244,12 +244,12 @@ static INPUT_PORTS_START( 20pacgal )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	/* bit 7 is EEPROM data */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)	/* bit 7 is EEPROM data */
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)		/* bit 5 is cs (active low) */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)	/* bit 6 is clock (active high) */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)		/* bit 7 is data */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)		/* bit 5 is cs (active low) */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)	/* bit 6 is clock (active high) */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)		/* bit 7 is data */
 INPUT_PORTS_END
 
 
@@ -289,7 +289,7 @@ static MACHINE_DRIVER_START( 20pacgal )
 	MDRV_MACHINE_START(20pacgal)
 	MDRV_MACHINE_RESET(20pacgal)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", _20pacgal_eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", _20pacgal_eeprom_intf)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(20pacgal_video)

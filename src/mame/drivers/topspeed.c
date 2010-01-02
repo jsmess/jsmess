@@ -234,6 +234,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
+#include "machine/taitoio.h"
 #include "audio/taitosnd.h"
 #include "sound/2151intf.h"
 #include "sound/msm5205.h"
@@ -335,10 +336,11 @@ static INTERRUPT_GEN( topspeed_cpub_interrupt )
 
 static READ8_HANDLER( topspeed_input_bypass_r )
 {
-	UINT8 port = TC0220IOC_port_r(space,0);	/* read port number */
+	const device_config *tc0220ioc = devtag_get_device(space->machine, "tc0220ioc");
+	UINT8 port = tc0220ioc_port_r(tc0220ioc, 0);	/* read port number */
 	int steer = 0;
-	int analogue_steer = input_port_read_safe(space->machine, STEER_PORT_TAG,0x00);
-	int fake = input_port_read_safe(space->machine, FAKE_PORT_TAG,0x00);
+	int analogue_steer = input_port_read_safe(space->machine, STEER_PORT_TAG, 0x00);
+	int fake = input_port_read_safe(space->machine, FAKE_PORT_TAG, 0x00);
 
 	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
 	{
@@ -356,9 +358,7 @@ static READ8_HANDLER( topspeed_input_bypass_r )
 		if (fake & 0x01)	/* pressing left */
 			steer = 0xff80;
 
-		/* To allow hiscore input we must let you return to
-           continuous input type while you press up */
-
+		/* To allow hiscore input we must let you return to continuous input type while you press up */
 		if (fake & 0x04)	/* pressing up */
 			steer = analogue_steer;
 	}
@@ -372,7 +372,7 @@ static READ8_HANDLER( topspeed_input_bypass_r )
 			return steer >> 8;
 
 		default:
-			return TC0220IOC_portreg_r(space,offset);
+			return tc0220ioc_portreg_r(tc0220ioc, offset);
 	}
 }
 
@@ -459,14 +459,14 @@ static ADDRESS_MAP_START( topspeed_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x7e0002, 0x7e0003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x800000, 0x8003ff) AM_RAM AM_BASE(&topspeed_raster_ctrl)
 	AM_RANGE(0x800400, 0x80ffff) AM_RAM
-	AM_RANGE(0xa00000, 0xa0ffff) AM_READWRITE(PC080SN_word_0_r, PC080SN_word_0_w)
-	AM_RANGE(0xa20000, 0xa20003) AM_WRITE(PC080SN_yscroll_word_0_w)
-	AM_RANGE(0xa40000, 0xa40003) AM_WRITE(PC080SN_xscroll_word_0_w)
-	AM_RANGE(0xa50000, 0xa50003) AM_WRITE(PC080SN_ctrl_word_0_w)
-	AM_RANGE(0xb00000, 0xb0ffff) AM_READWRITE(PC080SN_word_1_r, PC080SN_word_1_w)
-	AM_RANGE(0xb20000, 0xb20003) AM_WRITE(PC080SN_yscroll_word_1_w)
-	AM_RANGE(0xb40000, 0xb40003) AM_WRITE(PC080SN_xscroll_word_1_w)
-	AM_RANGE(0xb50000, 0xb50003) AM_WRITE(PC080SN_ctrl_word_1_w)
+	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE("pc080sn_1", pc080sn_word_r, pc080sn_word_w)
+	AM_RANGE(0xa20000, 0xa20003) AM_DEVWRITE("pc080sn_1", pc080sn_yscroll_word_w)
+	AM_RANGE(0xa40000, 0xa40003) AM_DEVWRITE("pc080sn_1", pc080sn_xscroll_word_w)
+	AM_RANGE(0xa50000, 0xa50003) AM_DEVWRITE("pc080sn_1", pc080sn_ctrl_word_w)
+	AM_RANGE(0xb00000, 0xb0ffff) AM_DEVREADWRITE("pc080sn_2", pc080sn_word_r, pc080sn_word_w)
+	AM_RANGE(0xb20000, 0xb20003) AM_DEVWRITE("pc080sn_2", pc080sn_yscroll_word_w)
+	AM_RANGE(0xb40000, 0xb40003) AM_DEVWRITE("pc080sn_2", pc080sn_xscroll_word_w)
+	AM_RANGE(0xb50000, 0xb50003) AM_DEVWRITE("pc080sn_2", pc080sn_ctrl_word_w)
 	AM_RANGE(0xd00000, 0xd00fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_BASE(&topspeed_spritemap)
 ADDRESS_MAP_END
@@ -474,8 +474,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( topspeed_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x400000, 0X40ffff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(&sharedram)
-	AM_RANGE(0x880000, 0x880001) AM_READWRITE8(topspeed_input_bypass_r, TC0220IOC_portreg_w, 0x00ff)
-	AM_RANGE(0x880002, 0x880003) AM_READWRITE8(TC0220IOC_port_r, TC0220IOC_port_w, 0x00ff)
+	AM_RANGE(0x880000, 0x880001) AM_READ8(topspeed_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
+	AM_RANGE(0x880002, 0x880003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x900000, 0x9003ff) AM_READWRITE(topspeed_motor_r, topspeed_motor_w)	/* motor CPU */
 ADDRESS_MAP_END
 
@@ -670,6 +670,18 @@ static MACHINE_RESET( topspeed )
 	adpcm_data = -1;
 }
 
+static const pc080sn_interface topspeed_pc080sn_intf =
+{
+	1,	 /* gfxnum */
+	0, 8, 0, 0	/* x_offset, y_offset, y_invert, dblwidth */
+};
+
+static const tc0220ioc_interface topspeed_io_intf =
+{
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+};
+
 static MACHINE_DRIVER_START( topspeed )
 
 	/* basic machine hardware */
@@ -687,6 +699,8 @@ static MACHINE_DRIVER_START( topspeed )
 	MDRV_MACHINE_START(topspeed)
 	MDRV_MACHINE_RESET(topspeed)
 
+	MDRV_TC0220IOC_ADD("tc0220ioc", topspeed_io_intf)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -698,8 +712,10 @@ static MACHINE_DRIVER_START( topspeed )
 	MDRV_GFXDECODE(topspeed)
 	MDRV_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_START(topspeed)
 	MDRV_VIDEO_UPDATE(topspeed)
+
+	MDRV_PC080SN_ADD("pc080sn_1", topspeed_pc080sn_intf)
+	MDRV_PC080SN_ADD("pc080sn_2", topspeed_pc080sn_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -857,4 +873,3 @@ static DRIVER_INIT( topspeed )
 GAMEL( 1987, topspeed, 0,        topspeed, topspeed, topspeed, ROT0, "Taito Corporation Japan", "Top Speed (World)", 0, layout_topspeed )
 GAMEL( 1987, topspeedu,topspeed, topspeed, fullthrl, topspeed, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)", 0, layout_topspeed )
 GAMEL( 1987, fullthrl, topspeed, topspeed, fullthrl, topspeed, ROT0, "Taito Corporation", "Full Throttle (Japan)", 0, layout_topspeed )
-

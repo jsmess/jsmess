@@ -20,7 +20,7 @@ static UINT8 *current_bitmap_videoram_accessed;
 static UINT8 *current_bitmap_videoram_displayed;
 static UINT16 *palette_ram;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 /***************************************************************************
 
@@ -144,7 +144,7 @@ WRITE8_HANDLER( graph_processor_w )
 
 			adjust_xy(offset);
 			break;
-		}
+	}
 }
 
 WRITE8_HANDLER( cloak_videoram_w )

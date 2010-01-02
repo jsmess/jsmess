@@ -19,7 +19,7 @@
 UINT8 microtan_chunky_graphics = 0;
 UINT8 *microtan_chunky_buffer = NULL;
 
-static tilemap *bg_tilemap;
+static tilemap_t *bg_tilemap;
 
 WRITE8_HANDLER( microtan_videoram_w )
 {

@@ -233,7 +233,7 @@ Stephh's log (2006.09.20) :
 #include "cpu/z80/z80.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "sound/qsound.h"
@@ -2214,12 +2214,12 @@ static INPUT_PORTS_START( wof )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
 /* Needs further checking */
@@ -2249,12 +2249,12 @@ static INPUT_PORTS_START( dino )
 	PORT_INCLUDE( dinopic )
 
 	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
 /* Needs further checking */
@@ -2287,12 +2287,12 @@ static INPUT_PORTS_START( punisher )
 	PORT_INCLUDE( punipic )
 
 	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
 /* Needs further checking */
@@ -2321,12 +2321,12 @@ static INPUT_PORTS_START( slammast )
 	PORT_BIT( 0xf7, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
 /* Needs further checking */
@@ -2558,12 +2558,12 @@ static INPUT_PORTS_START( pang3 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
 /* Needs further checking */
@@ -2837,7 +2837,7 @@ static MACHINE_DRIVER_START( pang3 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(cps1_12MHz)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", pang3_eeprom_interface)
+	MDRV_EEPROM_ADD("eeprom", pang3_eeprom_interface)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( qsound )
@@ -2855,7 +2855,7 @@ static MACHINE_DRIVER_START( qsound )
 
 	MDRV_MACHINE_START(qsound)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", qsound_eeprom_interface)
+	MDRV_EEPROM_ADD("eeprom", qsound_eeprom_interface)
 
 	/* sound hardware */
 	MDRV_DEVICE_REMOVE("mono")
@@ -2914,7 +2914,7 @@ static MACHINE_DRIVER_START( wofhfh )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(cps1_12MHz)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", qsound_eeprom_interface)
+	MDRV_EEPROM_ADD("eeprom", qsound_eeprom_interface)
 MACHINE_DRIVER_END
 
 /* incomplete */
@@ -4358,6 +4358,39 @@ ROM_START( ffightj2 )
 	ROM_LOAD( "s222b.1a",     0x0000, 0x0117, NO_DUMP )
 	ROM_LOAD( "lwio.12c",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )
 ROM_END
+
+/* B-Board 88622B */
+ROM_START( ffightjh )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "ff.23.bin",    0x00000, 0x80000, CRC(ae3dda7f) SHA1(5f08ce1e6b6b0d45994d3354d59ef79f489c7ad7) )
+	ROM_LOAD16_WORD_SWAP( "ff.22.bin",    0x80000, 0x80000, CRC(b2d5a3aa) SHA1(b60f7480d3d3ceebad4c21025394bacc154d7042) )
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROMX_LOAD( "ff.01.bin",  0x000000, 0x80000, CRC(969d18e2) SHA1(7a30b7434e34ec98838a9ab8d953b2ef467d562e), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ff.02.bin",  0x000002, 0x80000, CRC(02b59f99) SHA1(c1cb2bbf95c2006baad58b0a5a7278f1a8999901), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ff.03.bin",  0x000004, 0x80000, CRC(01d507ae) SHA1(d7813daa5bd74bebdbbea578acb20ad3c8816997), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ff.04.bin",  0x000006, 0x80000, CRC(f7c4ceb0) SHA1(3e9cf6379f06c5a736b4a0aadb7fbda914b91190), ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "ff.09.bin",   0x00000, 0x08000, CRC(b8367eb5) SHA1(ec3db29fdd6200e9a8f4f8073a7e34aef731354f) )
+	ROM_CONTINUE(            0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
+	ROM_LOAD( "ff.18.bin",  0x00000, 0x20000, CRC(375c66e7) SHA1(36189e23209ce4ae5d9cbabd1574540d0591e7b3) )	// == ff_18.11c
+	ROM_LOAD( "ff.19.bin",  0x20000, 0x20000, CRC(1ef137f9) SHA1(974b5e72aa28b87ebfa7438efbdfeda769dedf5e) )	// == ff_19.12c
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "s222b.1a",     0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "lwio.12c",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )
+ROM_END
+
 
 /* FIXME B-Board uncertain but should be 89624B from the program ROM names */
 ROM_START( 1941 )
@@ -8778,6 +8811,7 @@ GAME( 1989, ffightub, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom"
 GAME( 1989, ffightj,  ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1989, ffightj1, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan 900305)", GAME_SUPPORTS_SAVE )
 GAME( 1989, ffightj2, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan 900112)", GAME_SUPPORTS_SAVE )
+GAME( 1989, ffightjh, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Street Smart / Final Fight (Japan, hack)", GAME_SUPPORTS_SAVE )
 GAME( 1990, 1941,     0,        cps1_10MHz, 1941,     cps1,     ROT270, "Capcom", "1941 - Counter Attack (World)", GAME_SUPPORTS_SAVE )
 GAME( 1990, 1941j,    1941,     cps1_10MHz, 1941,     cps1,     ROT270, "Capcom", "1941 - Counter Attack (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, mercs,    0,        cps1_10MHz, mercs,    cps1,     ROT270, "Capcom", "Mercs (World 900302)", GAME_SUPPORTS_SAVE )					// "ETC"

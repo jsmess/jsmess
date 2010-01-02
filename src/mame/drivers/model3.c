@@ -1164,33 +1164,8 @@ static const eeprom_interface eeprom_intf =
 	5				/* reset_delay (Lost World needs this, very similar to wbeachvl in playmark.c) */
 };
 
-static void eeprom_handler(running_machine *machine, mame_file *file, int read_or_write)
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-		if (file)	eeprom_load(file);
-	}
-}
-
 static NVRAM_HANDLER( model3 )
 {
-	const char *name = machine->gamedrv->name;
-	if( mame_stricmp(name, "lostwsga") == 0 ||
-		mame_stricmp(name, "dirtdvls") == 0 ||
-		mame_stricmp(name, "dirtdvlsa") == 0 ||
-		mame_stricmp(name, "lemans24") == 0 ||
-		mame_stricmp(name, "magtruck") == 0 ||
-		mame_stricmp(name, "von2") == 0 ||
-		mame_stricmp(name, "von254g") == 0)
-	{
-		eeprom_handler(machine, file, read_or_write);
-	} else {
-		NVRAM_HANDLER_CALL(93C46);
-	}
-
 	if (read_or_write)
 	{
 		mame_fwrite(file, model3_backup, 0x1ffff);
@@ -1394,10 +1369,11 @@ static WRITE64_HANDLER( model3_ctrl_w )
 		case 0:
 			if (ACCESSING_BITS_56_63)
 			{
+				const device_config *device = devtag_get_device(space->machine, "eeprom");
 				int reg = (data >> 56) & 0xff;
-				eeprom_write_bit((reg & 0x20) ? 1 : 0);
-				eeprom_set_clock_line((reg & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-				eeprom_set_cs_line((reg & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+				eeprom_write_bit(device, (reg & 0x20) ? 1 : 0);
+				eeprom_set_clock_line(device, (reg & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_set_cs_line(device, (reg & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 				model3_controls_bank = reg & 0xff;
 			}
 			return;
@@ -1851,7 +1827,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button B") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button B") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2086,7 +2062,7 @@ static INPUT_PORTS_START( skichamp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )		/* Select 2 */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button B") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button B") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -4641,7 +4617,7 @@ static WRITE16_HANDLER( model3snd_ctrl )
 		UINT8 *snd = memory_region(space->machine, "scsp2");
 		if (data & 0x20)
 		{
-	  		memory_set_bankptr(space->machine, "bank4", snd + 0x200000);
+			memory_set_bankptr(space->machine, "bank4", snd + 0x200000);
 			memory_set_bankptr(space->machine, "bank5", snd + 0x600000);
 		}
 		else
@@ -4668,7 +4644,7 @@ static int scsp_last_line = 0;
 
 static void scsp_irq(const device_config *device, int irq)
 {
- 	if (irq > 0)
+	if (irq > 0)
 	{
 		scsp_last_line = irq;
 		cputag_set_input_line(device->machine, "audiocpu", irq, ASSERT_LINE);
@@ -4735,15 +4711,17 @@ static MACHINE_DRIVER_START( model3_10 )
 	MDRV_CPU_ADD("maincpu", PPC603E, 66000000)
 	MDRV_CPU_CONFIG(model3_10)
 	MDRV_CPU_PROGRAM_MAP(model3_mem)
- 	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model3_snd)
 
- 	MDRV_QUANTUM_TIME(HZ(600))
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_START(model3_10)
 	MDRV_MACHINE_RESET(model3_10)
+
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 	MDRV_NVRAM_HANDLER(model3)
 
 
@@ -4775,13 +4753,15 @@ static MACHINE_DRIVER_START( model3_15 )
 	MDRV_CPU_ADD("maincpu", PPC603E, 100000000)
 	MDRV_CPU_CONFIG(model3_15)
 	MDRV_CPU_PROGRAM_MAP(model3_mem)
- 	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model3_snd)
 
 	MDRV_MACHINE_START(model3_15)
 	MDRV_MACHINE_RESET(model3_15)
+
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 	MDRV_NVRAM_HANDLER(model3)
 
 
@@ -4813,13 +4793,15 @@ static MACHINE_DRIVER_START( model3_20 )
 	MDRV_CPU_ADD("maincpu", PPC603R, 166000000)
 	MDRV_CPU_CONFIG(model3_2x)
 	MDRV_CPU_PROGRAM_MAP(model3_mem)
- 	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model3_snd)
 
 	MDRV_MACHINE_START(model3_20)
 	MDRV_MACHINE_RESET(model3_20)
+
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 	MDRV_NVRAM_HANDLER(model3)
 
 
@@ -4851,13 +4833,15 @@ static MACHINE_DRIVER_START( model3_21 )
 	MDRV_CPU_ADD("maincpu", PPC603R, 166000000)
 	MDRV_CPU_CONFIG(model3_2x)
 	MDRV_CPU_PROGRAM_MAP(model3_mem)
- 	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model3_snd)
 
 	MDRV_MACHINE_START(model3_21)
 	MDRV_MACHINE_RESET(model3_21)
+
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 	MDRV_NVRAM_HANDLER(model3)
 
 

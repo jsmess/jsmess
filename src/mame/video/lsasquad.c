@@ -82,9 +82,9 @@ static int draw_layer_daikaiju(running_machine *machine, bitmap_t *bitmap, const
 		scrolly = -lsasquad_scrollram[offs+0];
 		scrollx =  lsasquad_scrollram[offs+3];
 
-	 	//check for global x scroll used in bg layer in game (starts at offset 0 in scrollram
-	 	// and game name/logo on title screen (starts in the middle of scrollram, but with different
-	 	// (NOT unique )id than prev coulmn(s)
+		//check for global x scroll used in bg layer in game (starts at offset 0 in scrollram
+		// and game name/logo on title screen (starts in the middle of scrollram, but with different
+		// (NOT unique )id than prev coulmn(s)
 
 		if( *previd!=1 )
 		{
@@ -119,19 +119,19 @@ static int draw_layer_daikaiju(running_machine *machine, bitmap_t *bitmap, const
 
 
 			if((type==0 && color!=0x0d) || (type !=0 && color==0x0d))
-				{
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+			{
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 					code,
 					color,
 					flip_screen_get(machine),flip_screen_get(machine),
 					sx,sy,15);
-			if (sx > 248)	/* wraparound */
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+				if (sx > 248)	/* wraparound */
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 						code,
 						color,
 						flip_screen_get(machine),flip_screen_get(machine),
 						sx-256,sy,15);
-					}
+			}
 		}
 	}
 	return offs;

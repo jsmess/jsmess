@@ -129,7 +129,7 @@ struct _bigfghtr_state
 //  UINT16 *      paletteram;   // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap       *bg_tilemap, *fg_tilemap, *tx_tilemap;
+	tilemap_t       *bg_tilemap, *fg_tilemap, *tx_tilemap;
 	UINT16        fg_scrollx, fg_scrolly;
 	UINT16        vreg;
 	UINT16        scroll_x, scroll_y;
@@ -259,7 +259,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 				code & 0xfff,
 				color,
- 				flipx,flipy,
+				flipx,flipy,
 				sx,sy,15);
 		}
 	}

@@ -1261,11 +1261,11 @@ static void PREFIX86(_inc_di)(i8086_state *cpustate)    /* Opcode 0x47 */
 }
 
 #define DecWordReg(Reg) 					\
-{ 											\
+{											\
 	unsigned tmp = (unsigned)cpustate->regs.w[Reg]; \
-    unsigned tmp1 = tmp-1; 					\
+    unsigned tmp1 = tmp-1;					\
     SetOFW_Sub(tmp1,1,tmp); 				\
-    SetAF(tmp1,tmp,1); 						\
+    SetAF(tmp1,tmp,1);						\
 	SetSZPF_Word(tmp1);						\
 	cpustate->regs.w[Reg]=tmp1; 					\
 	ICOUNT -= timing.incdec_r16;			\
@@ -1489,7 +1489,7 @@ static void PREFIX86(_jbe)(i8086_state *cpustate)    /* Opcode 0x76 */
 static void PREFIX86(_jnbe)(i8086_state *cpustate)    /* Opcode 0x77 */
 {
 	int tmp = (int)((INT8)FETCH);
-	 if (!(CF || ZF)) {
+	if (!(CF || ZF)) {
 		cpustate->pc += tmp;
 		ICOUNT -= timing.jcc_t;
 /* ASG - can probably assume this is safe
@@ -1934,11 +1934,11 @@ static void PREFIX86(_popw)(i8086_state *cpustate)    /* Opcode 0x8f */
 }
 
 
-#define XchgAXReg(Reg) 				\
-{ 									\
-    WORD tmp; 						\
-	tmp = cpustate->regs.w[Reg]; 			\
-	cpustate->regs.w[Reg] = cpustate->regs.w[AX]; 	\
+#define XchgAXReg(Reg)				\
+{									\
+    WORD tmp;						\
+	tmp = cpustate->regs.w[Reg];			\
+	cpustate->regs.w[Reg] = cpustate->regs.w[AX];	\
 	cpustate->regs.w[AX] = tmp; 			\
 	ICOUNT -= timing.xchg_ar16; 	\
 }
@@ -2569,7 +2569,7 @@ static void PREFIX86(_loope)(i8086_state *cpustate)    /* Opcode 0xe1 */
 		 cpustate->pc += disp;
 /* ASG - can probably assume this is safe
          CHANGE_PC(cpustate->pc);*/
-	 } else ICOUNT -= timing.loope_nt;
+	} else ICOUNT -= timing.loope_nt;
 }
 
 static void PREFIX86(_loop)(i8086_state *cpustate)    /* Opcode 0xe2 */
@@ -2729,13 +2729,13 @@ static void PREFIX(_repne)(i8086_state *cpustate)    /* Opcode 0xf2 */
 
 static void PREFIX(_repe)(i8086_state *cpustate)    /* Opcode 0xf3 */
 {
-	 PREFIX(rep)(cpustate, 1);
+	PREFIX(rep)(cpustate, 1);
 }
 
 #ifndef I80186
 static void PREFIX86(_hlt)(i8086_state *cpustate)    /* Opcode 0xf4 */
 {
-    cpustate->halted=1;
+	cpustate->halted=1;
 	ICOUNT = 0;
 }
 
@@ -3053,11 +3053,11 @@ static void PREFIX86(_fepre)(i8086_state *cpustate)    /* Opcode 0xfe */
 
 	ICOUNT -= (ModRM >= 0xc0) ? timing.incdec_r8 : timing.incdec_m8;
     if ((ModRM & 0x38) == 0)  /* INC eb */
-	 {
+	{
 		tmp1 = tmp+1;
 		SetOFB_Add(tmp1,tmp,1);
     }
-	 else  /* DEC eb */
+	else  /* DEC eb */
     {
 		tmp1 = tmp-1;
 		SetOFB_Sub(tmp1,1,tmp);
@@ -3156,7 +3156,7 @@ static void PREFIX86(_ffpre)(i8086_state *cpustate)    /* Opcode 0xff */
 		tmp = GetRMWord(ModRM);
 		PUSH(tmp);
 		break;
-	 }
+	}
 }
 
 

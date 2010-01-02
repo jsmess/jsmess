@@ -202,7 +202,7 @@ struct _device_field_info
 {
 	device_field_info *			next;				/* linked list of info for this port */
 	const input_field_config *	field;				/* pointer to the input field referenced */
-	const device_config * 		device;				/* device */
+	const device_config *		device;				/* device */
 	UINT8						shift;				/* shift to apply to the final result */
 	input_port_value			oldval;				/* last value */
 };
@@ -256,7 +256,7 @@ struct _input_port_private
 	input_type_state *			type_to_typestate[__ipt_max][MAX_PLAYERS]; /* map from type/player to type state */
 
 	/* specific special global input states */
-	digital_joystick_state 		joystick_info[MAX_PLAYERS][DIGITAL_JOYSTICKS_PER_PLAYER]; /* joystick states */
+	digital_joystick_state		joystick_info[MAX_PLAYERS][DIGITAL_JOYSTICKS_PER_PLAYER]; /* joystick states */
 
 	/* frame time tracking */
 	attotime					last_frame_time;	/* time of the last frame callback */
@@ -2084,6 +2084,10 @@ profiler_mark_start(PROFILER_INPUT);
 		mess_input_port_update_hook(machine, port, &port->state->digital);
 #endif /* MESS */
 
+		/* handle playback/record */
+		playback_port(port);
+		record_port(port);
+
 		/* call device line changed handlers */
 		newvalue = input_port_read_direct(port);
 		for (device_field = port->state->writedevicelist; device_field; device_field = device_field->next)
@@ -2099,13 +2103,6 @@ profiler_mark_start(PROFILER_INPUT);
 					device_field->oldval = newval;
 				}
 			}
-	}
-
-	/* handle playback/record */
-	for (port = machine->portlist.head; port != NULL; port = port->next)
-	{
-		playback_port(port);
-		record_port(port);
 	}
 
 profiler_mark_end();
@@ -2476,7 +2473,7 @@ static void port_config_detokenize(input_port_list *portlist, const input_port_t
 					tagmap_error err = tagmap_add_unique_hash(portlist->map, curport->tag, curport, FALSE);
 					if (err == TMERR_DUPLICATE)
 					{
-						const input_port_config *match = tagmap_find_hash_only(portlist->map, curport->tag);
+						const input_port_config *match = (const input_port_config *)tagmap_find_hash_only(portlist->map, curport->tag);
 						error_buf_append(errorbuf, errorbuflen, "tag '%s' has same hash as tag '%s'; please change one of them", curport->tag, match->tag);
 					}
 				}

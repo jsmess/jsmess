@@ -252,8 +252,10 @@ static READ16_HANDLER( soundlatch_ack_r )
 		return data;
 	}
 	else
-	{	logerror("CPU #1 - PC %04X: Sound Buffer 2 Underflow Error\n",cpu_get_pc(space->cpu));
-		return 0xff;	}
+	{
+		logerror("CPU #1 - PC %04X: Sound Buffer 2 Underflow Error\n",cpu_get_pc(space->cpu));
+		return 0xff;
+	}
 }
 
 
@@ -277,86 +279,72 @@ static WRITE8_HANDLER( soundlatch_ack_w )
 
 ***************************************************************************/
 
-static const UINT8 cave_default_eeprom_type1[16] =	{0x00,0x0C,0x11,0x0D,0xFF,0xFF,0xFF,0xFF,0x00,0x00,0x11,0x11,0xFF,0xFF,0xFF,0xFF};  /* DFeveron, Guwange */
-static const UINT8 cave_default_eeprom_type1feversos[18] =	{0x00,0x0C,0x16,0x27,0xFF,0xFF,0xFF,0xFF,0x00,0x00,0x11,0x11,0xFF,0xFF,0xFF,0xFF,0x05,0x19};  /* Fever SOS (code checks for the 0x0519 or it won't boot) */
-static const UINT8 cave_default_eeprom_type2[16] =	{0x00,0x0C,0xFF,0xFB,0xFF,0xFF,0xFF,0xFF,0x00,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};  /* Esprade, DonPachi, DDonPachi */
-static const UINT8 cave_default_eeprom_type3[16] =	{0x00,0x03,0x08,0x00,0xFF,0xFF,0xFF,0xFF,0x08,0x00,0x00,0x00,0xFF,0xFF,0xFF,0xFF};  /* UoPoko */
-static const UINT8 cave_default_eeprom_type4[16] =	{0xF3,0xFE,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};  /* Hotdog Storm */
-static const UINT8 cave_default_eeprom_type5[16] =	{0xED,0xFF,0x00,0x00,0x12,0x31,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};  /* Mazinger Z (6th byte is country code) */
-static const UINT8 cave_default_eeprom_type6[18] =	{0xa5,0x00,0xa5,0x00,0xa5,0x00,0xa5,0x00,0xa5,0x01,0xa5,0x01,0xa5,0x04,0xa5,0x01,0xa5,0x02};	/* Sailor Moon (last byte is country code) */
-// Air Gallet. Byte 1f is the country code (0==JAPAN,U.S.A,EUROPE,HONGKONG,TAIWAN,KOREA)
-static const UINT8 cave_default_eeprom_type7[48] =	{0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-												 0x00,0x00,0x00,0x00,0x00,0x03,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,
-												 0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x00,0x00,0xff,0xff,0xff,0xff,0xff,0xff};
-
-static const UINT8 *cave_default_eeprom;
-static int cave_default_eeprom_length;
 static int cave_region_byte;
 
-static WRITE16_HANDLER( cave_eeprom_msb_w )
+static WRITE16_DEVICE_HANDLER( cave_eeprom_msb_w )
 {
 	if (data & ~0xfe00)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(space->cpu),data);
+		logerror("%s: Unknown EEPROM bit written %04X\n",cpuexec_describe_context(device->machine),data);
 
 	if ( ACCESSING_BITS_8_15 )  // even address
 	{
-		coin_lockout_w(space->machine, 1,~data & 0x8000);
-		coin_lockout_w(space->machine, 0,~data & 0x4000);
-		coin_counter_w(space->machine, 1, data & 0x2000);
-		coin_counter_w(space->machine, 0, data & 0x1000);
+		coin_lockout_w(device->machine, 1,~data & 0x8000);
+		coin_lockout_w(device->machine, 0,~data & 0x4000);
+		coin_counter_w(device->machine, 1, data & 0x2000);
+		coin_counter_w(device->machine, 0, data & 0x1000);
 
 		// latch the bit
-		eeprom_write_bit(data & 0x0800);
+		eeprom_write_bit(device, data & 0x0800);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line(device, (data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line(device, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
-static WRITE16_HANDLER( sailormn_eeprom_msb_w )
+static WRITE16_DEVICE_HANDLER( sailormn_eeprom_msb_w )
 {
 	sailormn_tilebank_w    ( data &  0x0100 );
-	cave_eeprom_msb_w(space,offset,data & ~0x0100,mem_mask);
+	cave_eeprom_msb_w(device,offset,data & ~0x0100,mem_mask);
 }
 
-static WRITE16_HANDLER( hotdogst_eeprom_msb_w )
+static WRITE16_DEVICE_HANDLER( hotdogst_eeprom_msb_w )
 {
 	if ( ACCESSING_BITS_8_15 )  // even address
 	{
 		// latch the bit
-		eeprom_write_bit(data & 0x0800);
+		eeprom_write_bit(device, data & 0x0800);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line(device, (data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x0400) ? CLEAR_LINE: ASSERT_LINE );
+		eeprom_set_clock_line(device, (data & 0x0400) ? CLEAR_LINE: ASSERT_LINE );
 	}
 }
 
-static WRITE16_HANDLER( cave_eeprom_lsb_w )
+static WRITE16_DEVICE_HANDLER( cave_eeprom_lsb_w )
 {
 	if (data & ~0x00ef)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(space->cpu),data);
+		logerror("%s: Unknown EEPROM bit written %04X\n",cpuexec_describe_context(device->machine),data);
 
 	if ( ACCESSING_BITS_0_7 )  // odd address
 	{
-		coin_lockout_w(space->machine, 1,~data & 0x0008);
-		coin_lockout_w(space->machine, 0,~data & 0x0004);
-		coin_counter_w(space->machine, 1, data & 0x0002);
-		coin_counter_w(space->machine, 0, data & 0x0001);
+		coin_lockout_w(device->machine, 1,~data & 0x0008);
+		coin_lockout_w(device->machine, 0,~data & 0x0004);
+		coin_counter_w(device->machine, 1, data & 0x0002);
+		coin_counter_w(device->machine, 0, data & 0x0001);
 
 		// latch the bit
-		eeprom_write_bit(data & 0x80);
+		eeprom_write_bit(device, data & 0x80);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line(device, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line(device, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -372,43 +360,26 @@ static WRITE16_HANDLER( gaia_coin_lsb_w )
 
 /*  - No coin lockouts
     - Writing 0xcf00 shouldn't send a 1 bit to the eeprom   */
-static WRITE16_HANDLER( metmqstr_eeprom_msb_w )
+static WRITE16_DEVICE_HANDLER( metmqstr_eeprom_msb_w )
 {
 	if (data & ~0xff00)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(space->cpu),data);
+		logerror("%s: Unknown EEPROM bit written %04X\n",cpuexec_describe_context(device->machine),data);
 
 	if ( ACCESSING_BITS_8_15 )  // even address
 	{
-		coin_counter_w(space->machine, 1, data & 0x2000);
-		coin_counter_w(space->machine, 0, data & 0x1000);
+		coin_counter_w(device->machine, 1, data & 0x2000);
+		coin_counter_w(device->machine, 0, data & 0x1000);
 
 		if (~data & 0x0100)
 		{
 			// latch the bit
-			eeprom_write_bit(data & 0x0800);
+			eeprom_write_bit(device, data & 0x0800);
 
 			// reset line asserted: reset.
-			eeprom_set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
+			eeprom_set_cs_line(device, (data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
 
 			// clock line asserted: write latch or select next bit to read
-			eeprom_set_clock_line((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE );
-		}
-	}
-}
-
-static NVRAM_HANDLER( cave )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C46);
-
-		if (file) eeprom_load(file);
-		else
-		{
-			if (cave_default_eeprom)	/* Set the EEPROM to Factory Defaults */
-				eeprom_set_data(cave_default_eeprom,cave_default_eeprom_length);
+			eeprom_set_clock_line(device, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE );
 		}
 	}
 }
@@ -426,23 +397,6 @@ static const eeprom_interface eeprom_interface_93C46_8bit =
 //  "*10001xxxx"    // write all    1 00 01xxxx dddddddddddddddd
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
-
-static NVRAM_HANDLER( korokoro )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C46_8bit);
-
-		if (file) eeprom_load(file);
-		else
-		{
-			if (cave_default_eeprom)	/* Set the EEPROM to Factory Defaults */
-				eeprom_set_data(cave_default_eeprom,cave_default_eeprom_length);
-		}
-	}
-}
 
 
 
@@ -479,7 +433,7 @@ static ADDRESS_MAP_START( dfeveron_map, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_BASE(&cave_vctrl_1)									// Layer 1 Control
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("IN0")											// Inputs
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("IN1")											// Inputs + EEPROM
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(cave_eeprom_msb_w)									// EEPROM
+	AM_RANGE(0xc00000, 0xc00001) AM_DEVWRITE("eeprom", cave_eeprom_msb_w)						// EEPROM
 ADDRESS_MAP_END
 
 
@@ -504,7 +458,7 @@ static ADDRESS_MAP_START( ddonpach_map, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_BASE_GENERIC(paletteram) AM_SIZE(&cave_paletteram_size)	// Palette
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("IN0"				)								// Inputs
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("IN1"				)								// Inputs + EEPROM
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(cave_eeprom_msb_w)									// EEPROM
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE("eeprom", cave_eeprom_msb_w)						// EEPROM
 ADDRESS_MAP_END
 
 
@@ -552,10 +506,10 @@ static ADDRESS_MAP_START( donpachi_map, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0xa08000, 0xa08fff) AM_RAM AM_BASE_GENERIC(paletteram) AM_SIZE(&cave_paletteram_size)		// Palette
 	AM_RANGE(0xb00000, 0xb00003) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)				// M6295
 	AM_RANGE(0xb00010, 0xb00013) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)				//
-	AM_RANGE(0xb00020, 0xb0002f) AM_WRITE(NMK112_okibank_lsb_w)											//
+	AM_RANGE(0xb00020, 0xb0002f) AM_DEVWRITE("nmk112", nmk112_okibank_lsb_w)											//
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")													// Inputs
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")													// Inputs + EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(cave_eeprom_msb_w)											// EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE("eeprom", cave_eeprom_msb_w)								// EEPROM
 ADDRESS_MAP_END
 
 
@@ -580,7 +534,7 @@ static ADDRESS_MAP_START( esprade_map, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_BASE_GENERIC(paletteram) AM_SIZE(&cave_paletteram_size)	// Palette
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("IN0"				)	// Inputs
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("IN1"				)	// Inputs + EEPROM
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(cave_eeprom_msb_w				)	// EEPROM
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE("eeprom", cave_eeprom_msb_w)						// EEPROM
 ADDRESS_MAP_END
 
 
@@ -634,7 +588,7 @@ static ADDRESS_MAP_START( guwange_map, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_BASE(&cave_vctrl_2)									// Layer 2 Control
 /**/AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_BASE_GENERIC(paletteram) AM_SIZE(&cave_paletteram_size)	// Palette
 	AM_RANGE(0xd00010, 0xd00011) AM_READ_PORT("IN0")											// Inputs
-	AM_RANGE(0xd00010, 0xd00011) AM_WRITE(cave_eeprom_lsb_w)									// EEPROM
+	AM_RANGE(0xd00010, 0xd00011) AM_DEVWRITE("eeprom", cave_eeprom_lsb_w)						// EEPROM
 	AM_RANGE(0xd00012, 0xd00013) AM_READ_PORT("IN1")											// Inputs + EEPROM
 //  AM_RANGE(0xd00012, 0xd00013) AM_WRITENOP                                              // ?
 //  AM_RANGE(0xd00014, 0xd00015) AM_WRITENOP                                              // ? $800068 in dfeveron ? probably Watchdog
@@ -661,7 +615,7 @@ static ADDRESS_MAP_START( hotdogst_map, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0xc00000, 0xc00005) AM_RAM AM_BASE(&cave_vctrl_2)									// Layer 2 Control
 	AM_RANGE(0xc80000, 0xc80001) AM_READ_PORT("IN0")											// Inputs
 	AM_RANGE(0xc80002, 0xc80003) AM_READ_PORT("IN1")											// Inputs + EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(hotdogst_eeprom_msb_w)								// EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE("eeprom", hotdogst_eeprom_msb_w)					// EEPROM
 	AM_RANGE(0xd00002, 0xd00003) AM_WRITENOP											// ???
 /**/AM_RANGE(0xf00000, 0xf07fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)			// Sprites
 /**/AM_RANGE(0xf08000, 0xf0ffff) AM_RAM AM_BASE(&cave_spriteram16_2)							// Sprites?
@@ -706,11 +660,11 @@ static WRITE16_HANDLER( korokoro_leds_w )
 
 static int hopper;
 
-static WRITE16_HANDLER( korokoro_eeprom_msb_w )
+static WRITE16_DEVICE_HANDLER( korokoro_eeprom_msb_w )
 {
 	if (data & ~0x7000)
 	{
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(space->cpu),data);
+		logerror("%s: Unknown EEPROM bit written %04X\n",cpuexec_describe_context(device->machine),data);
 		COMBINE_DATA( &leds[1] );
 		show_leds();
 	}
@@ -720,13 +674,13 @@ static WRITE16_HANDLER( korokoro_eeprom_msb_w )
 		hopper = data & 0x0100;	// ???
 
 		// latch the bit
-		eeprom_write_bit(data & 0x4000);
+		eeprom_write_bit(device, data & 0x4000);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line(device, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line(device, (data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -752,7 +706,7 @@ static ADDRESS_MAP_START( korokoro_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("IN0")														// Inputs + ???
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1")														// Inputs + EEPROM
 	AM_RANGE(0x280008, 0x280009) AM_WRITE(korokoro_leds_w)
-	AM_RANGE(0x28000a, 0x28000b) AM_WRITE(korokoro_eeprom_msb_w)											// EEPROM
+	AM_RANGE(0x28000a, 0x28000b) AM_DEVWRITE("eeprom", korokoro_eeprom_msb_w)								// EEPROM
 	AM_RANGE(0x28000c, 0x28000d) AM_WRITENOP															// 0 (watchdog?)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM																		// RAM
 ADDRESS_MAP_END
@@ -777,7 +731,7 @@ static ADDRESS_MAP_START( mazinger_map, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0x700000, 0x700005) AM_RAM AM_BASE(&cave_vctrl_0)									// Layer 0 Control
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("IN0")											// Inputs
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("IN1")											// Inputs + EEPROM
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(cave_eeprom_msb_w)									// EEPROM
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE("eeprom", cave_eeprom_msb_w)						// EEPROM
 /**/AM_RANGE(0xc08000, 0xc0ffff) AM_RAM AM_BASE_GENERIC(paletteram) AM_SIZE(&cave_paletteram_size)	// Palette
 	AM_RANGE(0xd00000, 0xd7ffff) AM_ROMBANK("bank1")													// ROM
 ADDRESS_MAP_END
@@ -809,7 +763,7 @@ static ADDRESS_MAP_START( metmqstr_map, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0xc00000, 0xc00005) AM_RAM AM_BASE(&cave_vctrl_0)									// Layer 0 Control
 	AM_RANGE(0xc80000, 0xc80001) AM_READ_PORT("IN0")											// Inputs
 	AM_RANGE(0xc80002, 0xc80003) AM_READ_PORT("IN1")											// Inputs + EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(metmqstr_eeprom_msb_w)								// EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE("eeprom", metmqstr_eeprom_msb_w)					// EEPROM
 	AM_RANGE(0xf00000, 0xf07fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)			// Sprites
 	AM_RANGE(0xf08000, 0xf0ffff) AM_RAM AM_BASE(&cave_spriteram16_2)							// RAM
 ADDRESS_MAP_END
@@ -819,9 +773,9 @@ ADDRESS_MAP_END
                                 Power Instinct 2
 ***************************************************************************/
 
-static READ16_HANDLER( pwrinst2_eeprom_r )
+static READ16_DEVICE_HANDLER( pwrinst2_eeprom_r )
 {
-	return ~8 + ((eeprom_read_bit() & 1) ? 8 : 0);
+	return ~8 + ((eeprom_read_bit(device) & 1) ? 8 : 0);
 }
 
 INLINE void vctrl_w(UINT16 *VCTRL, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
@@ -850,7 +804,7 @@ static ADDRESS_MAP_START( pwrinst2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN0")													// Inputs
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("IN1")													//
 	AM_RANGE(0x600000, 0x6fffff) AM_ROM AM_REGION("user1", 0)											// extra data ROM space
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(cave_eeprom_msb_w)											// EEPROM
+	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE("eeprom", cave_eeprom_msb_w)								// EEPROM
 	AM_RANGE(0x800000, 0x807fff) AM_RAM_WRITE(cave_vram_2_w) AM_BASE(&cave_vram_2)						// Layer 2
 	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0)						// Layer 0
 	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE(&cave_vram_1)						// Layer 1
@@ -865,7 +819,7 @@ static ADDRESS_MAP_START( pwrinst2_map, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0xc80000, 0xc80005) AM_RAM_WRITE(pwrinst2_vctrl_3_w) AM_BASE(&cave_vctrl_3)				// Layer 3 Control
 	AM_RANGE(0xd80000, 0xd80001) AM_READ(soundlatch_ack_r)												// ? From Sound CPU
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(sound_cmd_w)													// To Sound CPU
-	AM_RANGE(0xe80000, 0xe80001) AM_READ(pwrinst2_eeprom_r)												// EEPROM
+	AM_RANGE(0xe80000, 0xe80001) AM_DEVREAD("eeprom", pwrinst2_eeprom_r)								// EEPROM
 	AM_RANGE(0xf00000, 0xf04fff) AM_RAM AM_BASE_GENERIC(paletteram) AM_SIZE(&cave_paletteram_size)			// Palette
 ADDRESS_MAP_END
 
@@ -908,7 +862,7 @@ static ADDRESS_MAP_START( sailormn_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x510000, 0x510001) AM_RAM																	// (agallet)
 	AM_RANGE(0x600000, 0x600001) AM_READ(sailormn_input0_r)												// Inputs + Watchdog!
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("IN1")													// Inputs + EEPROM
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(sailormn_eeprom_msb_w)										// EEPROM
+	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE("eeprom", sailormn_eeprom_msb_w)							// EEPROM
 	AM_RANGE(0x800000, 0x807fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0)						// Layer 0
 	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE(&cave_vram_1)						// Layer 1
 	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_2_w) AM_BASE(&cave_vram_2)						// Layer 2
@@ -941,7 +895,7 @@ static ADDRESS_MAP_START( uopoko_map, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_GENERIC(paletteram) AM_SIZE(&cave_paletteram_size)	// Palette
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("IN0")											// Inputs
 	AM_RANGE(0x900002, 0x900003) AM_READ_PORT("IN1")											// Inputs + EEPROM
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(cave_eeprom_msb_w)									// EEPROM
+	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("eeprom", cave_eeprom_msb_w)						// EEPROM
 ADDRESS_MAP_END
 
 
@@ -1099,7 +1053,7 @@ static ADDRESS_MAP_START( pwrinst2_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)	// M6295
 	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)	//
-	AM_RANGE(0x10, 0x17) AM_WRITE(NMK112_okibank_w)							// Samples bank
+	AM_RANGE(0x10, 0x17) AM_DEVWRITE("nmk112", nmk112_okibank_w)							// Samples bank
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)			//
 	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch_ack_w)							// To Main CPU
 //  AM_RANGE(0x51, 0x51) AM_WRITENOP                                  // ?? volume
@@ -1219,7 +1173,7 @@ static INPUT_PORTS_START( cave )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(6)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1395,7 +1349,7 @@ static INPUT_PORTS_START( guwange )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1439,7 +1393,7 @@ static INPUT_PORTS_START( korokoro )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1671,7 +1625,7 @@ static MACHINE_RESET( cave )
 	/* modify the eeprom on a reset with the desired region for the games that have the
        region factory set in eeprom */
 	if (cave_region_byte >= 0)
-		((UINT8 *)eeprom_get_data_pointer(NULL,NULL))[cave_region_byte] =  input_port_read(machine, "EEPROM");
+		memory_write_byte(cputag_get_address_space(machine, "eeprom", ADDRESS_SPACE_0), cave_region_byte, input_port_read(machine, "EEPROM"));
 }
 
 static const ymz280b_interface ymz280b_intf =
@@ -1699,7 +1653,6 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
-
 /***************************************************************************
                                 Dangun Feveron
 ***************************************************************************/
@@ -1712,7 +1665,7 @@ static MACHINE_DRIVER_START( dfeveron )
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
-	MDRV_NVRAM_HANDLER(cave)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1743,6 +1696,7 @@ MACHINE_DRIVER_END
                                 Dodonpachi
 ***************************************************************************/
 
+
 static MACHINE_DRIVER_START( ddonpach )
 
 	/* basic machine hardware */
@@ -1751,7 +1705,7 @@ static MACHINE_DRIVER_START( ddonpach )
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
-	MDRV_NVRAM_HANDLER(cave)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1782,6 +1736,11 @@ MACHINE_DRIVER_END
                                     Donpachi
 ***************************************************************************/
 
+static const nmk112_interface donpachi_nmk112_intf =
+{
+	"oki1", "oki2", 1 << 0	// chip #0 (music) is not paged
+};
+
 static MACHINE_DRIVER_START( donpachi )
 
 	/* basic machine hardware */
@@ -1790,7 +1749,7 @@ static MACHINE_DRIVER_START( donpachi )
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
-	MDRV_NVRAM_HANDLER(cave)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1819,6 +1778,8 @@ static MACHINE_DRIVER_START( donpachi )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	MDRV_NMK112_ADD("nmk112", donpachi_nmk112_intf)
 MACHINE_DRIVER_END
 
 
@@ -1834,7 +1795,7 @@ static MACHINE_DRIVER_START( esprade )
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
-	MDRV_NVRAM_HANDLER(cave)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1911,7 +1872,7 @@ static MACHINE_DRIVER_START( guwange )
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
-	MDRV_NVRAM_HANDLER(cave)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1953,7 +1914,7 @@ static MACHINE_DRIVER_START( hotdogst )
 	MDRV_CPU_IO_MAP(hotdogst_sound_portmap)
 
 	MDRV_MACHINE_RESET(cave)
-	MDRV_NVRAM_HANDLER(cave)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2003,7 +1964,7 @@ static MACHINE_DRIVER_START( korokoro )
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
-	MDRV_NVRAM_HANDLER(korokoro)
+	MDRV_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2048,7 +2009,7 @@ static MACHINE_DRIVER_START( mazinger )
 	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
 	MDRV_MACHINE_RESET(cave)
-	MDRV_NVRAM_HANDLER(cave)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2104,7 +2065,7 @@ static MACHINE_DRIVER_START( metmqstr )
 	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
 	MDRV_MACHINE_RESET(cave)	/* start with the watchdog armed */
-	MDRV_NVRAM_HANDLER(cave)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2147,6 +2108,11 @@ MACHINE_DRIVER_END
 
 /*  X1 = 12 MHz, X2 = 28 MHz, X3 = 16 MHz. OKI: / 165 mode A ; / 132 mode B */
 
+static const nmk112_interface pwrinst2_nmk112_intf =
+{
+	"oki1", "oki2", 0
+};
+
 static MACHINE_DRIVER_START( pwrinst2 )
 
 	/* basic machine hardware */
@@ -2159,7 +2125,7 @@ static MACHINE_DRIVER_START( pwrinst2 )
 	MDRV_CPU_IO_MAP(pwrinst2_sound_portmap)
 
 	MDRV_MACHINE_RESET(cave)
-	MDRV_NVRAM_HANDLER(cave)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2199,6 +2165,8 @@ static MACHINE_DRIVER_START( pwrinst2 )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+
+	MDRV_NMK112_ADD("nmk112", pwrinst2_nmk112_intf)
 MACHINE_DRIVER_END
 
 
@@ -2220,7 +2188,7 @@ static MACHINE_DRIVER_START( sailormn )
 //  MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(cave)
-	MDRV_NVRAM_HANDLER(cave)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2267,7 +2235,7 @@ static MACHINE_DRIVER_START( uopoko )
 	MDRV_CPU_PROGRAM_MAP(uopoko_map)
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MDRV_NVRAM_HANDLER(cave)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2437,6 +2405,9 @@ ROM_START( agallet ) /* PCB showed "Taiwan Only" on the copyright notice screen.
 	ROM_REGION( 0x240000, "oki2", 0 )	/* OKIM6295 #1 Samples */
 	/* Leave the 0x40000 bytes addressable by the chip empty */
 	ROM_LOAD( "bp962a.u47", 0x040000, 0x200000, CRC(6d4e9737) SHA1(81c7ecdfc2d38d0b35e26745866f6672f566f936) )	// 16 x $20000, FIRST AND SECOND HALF IDENTICAL
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-agallet.bin", 0x0000, 0x0080, CRC(ec38bf65) SHA1(cb8d9eacc0cf55a0c6b187e6673e3354554314b5) )
 ROM_END
 
 
@@ -2466,6 +2437,9 @@ ROM_START( dfeveron )
 
 	ROM_REGION( 0x400000, "ymz", 0 )	/* Samples */
 	ROM_LOAD( "cv01-u19.bin", 0x000000, 0x400000, CRC(5f5514da) SHA1(53f27364aee544572a82649c9ff29bacc642b732) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-dfeveron.bin", 0x0000, 0x0080, CRC(c3174959) SHA1(29b5c94722756481e4f84bfd75dee15fdb5c8cf7) )
 ROM_END
 
 /*
@@ -2569,6 +2543,9 @@ ROM_START( feversos )
 
 	ROM_REGION( 0x400000, "ymz", 0 )	/* Samples */
 	ROM_LOAD( "cv01-u19.bin", 0x000000, 0x400000, CRC(5f5514da) SHA1(53f27364aee544572a82649c9ff29bacc642b732) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-feversos.bin", 0x0000, 0x0080, CRC(d80303aa) SHA1(8580f7c2223c72614516d800a98465e362c333ef) )
 ROM_END
 
 /***************************************************************************
@@ -2607,6 +2584,9 @@ ROM_START( ddonpach )
 	ROM_REGION( 0x400000, "ymz", 0 )	/* Samples */
 	ROM_LOAD( "u6.bin", 0x000000, 0x200000, CRC(9dfdafaf) SHA1(f5cb450cdc78a20c3a74c6dac05c9ac3cba08327) )
 	ROM_LOAD( "u7.bin", 0x200000, 0x200000, CRC(795b17d5) SHA1(cbfc29f1df9600c82e0fdae00edd00da5b73e14c) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-ddonpach.bin", 0x0000, 0x0080, CRC(315fb546) SHA1(7f597107d1610fc286413e0e93c794c80c0c554f) )
 ROM_END
 
 
@@ -2633,6 +2613,9 @@ ROM_START( ddonpachj )
 	ROM_REGION( 0x400000, "ymz", 0 )	/* Samples */
 	ROM_LOAD( "u6.bin", 0x000000, 0x200000, CRC(9dfdafaf) SHA1(f5cb450cdc78a20c3a74c6dac05c9ac3cba08327) )
 	ROM_LOAD( "u7.bin", 0x200000, 0x200000, CRC(795b17d5) SHA1(cbfc29f1df9600c82e0fdae00edd00da5b73e14c) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-ddonpach.bin", 0x0000, 0x0080, CRC(315fb546) SHA1(7f597107d1610fc286413e0e93c794c80c0c554f) )
 ROM_END
 
 
@@ -2700,6 +2683,9 @@ ROM_START( donpachi )
 	/* Leave the 0x40000 bytes addressable by the chip empty */
 	ROM_LOAD( "atdp.u32", 0x040000, 0x100000, CRC(0d89fcca) SHA1(e16ed15fa5e72537822f7b37e83ccfed0fa87338) )
 	ROM_LOAD( "atdp.u33", 0x140000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-donpachi.bin", 0x0000, 0x0080, CRC(315fb546) SHA1(7f597107d1610fc286413e0e93c794c80c0c554f) )
 ROM_END
 
 ROM_START( donpachij )
@@ -2727,6 +2713,9 @@ ROM_START( donpachij )
 	/* Leave the 0x40000 bytes addressable by the chip empty */
 	ROM_LOAD( "atdp.u32", 0x040000, 0x100000, CRC(0d89fcca) SHA1(e16ed15fa5e72537822f7b37e83ccfed0fa87338) )
 	ROM_LOAD( "atdp.u33", 0x140000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-donpachi.bin", 0x0000, 0x0080, CRC(315fb546) SHA1(7f597107d1610fc286413e0e93c794c80c0c554f) )
 ROM_END
 
 ROM_START( donpachikr )
@@ -2754,6 +2743,9 @@ ROM_START( donpachikr )
 	/* Leave the 0x40000 bytes addressable by the chip empty */
 	ROM_LOAD( "atdp.u32", 0x040000, 0x100000, CRC(0d89fcca) SHA1(e16ed15fa5e72537822f7b37e83ccfed0fa87338) )
 	ROM_LOAD( "atdp.u33", 0x140000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-donpachi.bin", 0x0000, 0x0080, CRC(315fb546) SHA1(7f597107d1610fc286413e0e93c794c80c0c554f) )
 ROM_END
 
 ROM_START( donpachihk )
@@ -2781,6 +2773,9 @@ ROM_START( donpachihk )
 	/* Leave the 0x40000 bytes addressable by the chip empty */
 	ROM_LOAD( "atdp.u32", 0x040000, 0x100000, CRC(0d89fcca) SHA1(e16ed15fa5e72537822f7b37e83ccfed0fa87338) )
 	ROM_LOAD( "atdp.u33", 0x140000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-donpachi.bin", 0x0000, 0x0080, CRC(315fb546) SHA1(7f597107d1610fc286413e0e93c794c80c0c554f) )
 ROM_END
 
 
@@ -2817,6 +2812,9 @@ ROM_START( esprade )
 
 	ROM_REGION( 0x400000, "ymz", 0 )	/* Samples */
 	ROM_LOAD( "u19.bin", 0x000000, 0x400000, CRC(f54b1cab) SHA1(34d70bb5798de85d892c062001d9ac1d6604fd9f) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-esprade.bin", 0x0000, 0x0080, CRC(315fb546) SHA1(7f597107d1610fc286413e0e93c794c80c0c554f) )
 ROM_END
 
 ROM_START( espradej )
@@ -2843,6 +2841,9 @@ ROM_START( espradej )
 
 	ROM_REGION( 0x400000, "ymz", 0 )	/* Samples */
 	ROM_LOAD( "u19.bin", 0x000000, 0x400000, CRC(f54b1cab) SHA1(34d70bb5798de85d892c062001d9ac1d6604fd9f) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-esprade.bin", 0x0000, 0x0080, CRC(315fb546) SHA1(7f597107d1610fc286413e0e93c794c80c0c554f) )
 ROM_END
 
 ROM_START( espradejo )
@@ -2869,6 +2870,9 @@ ROM_START( espradejo )
 
 	ROM_REGION( 0x400000, "ymz", 0 )	/* Samples */
 	ROM_LOAD( "u19.bin", 0x000000, 0x400000, CRC(f54b1cab) SHA1(34d70bb5798de85d892c062001d9ac1d6604fd9f) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-esprade.bin", 0x0000, 0x0080, CRC(315fb546) SHA1(7f597107d1610fc286413e0e93c794c80c0c554f) )
 ROM_END
 
 
@@ -3044,6 +3048,9 @@ ROM_START( guwange )
     ROM_LOAD( "u0259.bin",   0x0000, 0x0001, NO_DUMP ) /* XC9536-15PC44C Located at U0249. (Chip label different then label silk screened onto the board.) */
     ROM_LOAD( "u108.bin",    0x0000, 0x0001, NO_DUMP ) /* XC9536-15PC44C Located at U108. */
     ROM_LOAD( "u084.bin",    0x0000, 0x0001, NO_DUMP ) /* XC9536-15PC44C Located at U084. */
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-guwange.bin", 0x0000, 0x0080, CRC(c3174959) SHA1(29b5c94722756481e4f84bfd75dee15fdb5c8cf7) )
 ROM_END
 
 
@@ -3093,6 +3100,9 @@ ROM_START( hotdogst )
 	ROM_REGION( 0xc0000, "oki", 0 )	/* Samples */
 	/* Leave the 0x40000 bytes addressable by the chip empty */
 	ROM_LOAD( "mp1u65", 0x40000, 0x80000, CRC(4868be1b) SHA1(32b8234b19fdbe07fa5057fa7965e36807e35e77) )	// 1xxxxxxxxxxxxxxxxxx = 0xFF, 4 x 0x20000
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-hotdogst.bin", 0x0000, 0x0080, CRC(12b4f934) SHA1(5b28d8fbd78869db78ce49e541a9d65558841966) )
 ROM_END
 
 
@@ -3207,6 +3217,9 @@ ROM_START( mazinger )
 	ROM_REGION( 0x0c0000, "oki", 0 )	/* Samples */
 	/* Leave the 0x40000 bytes addressable by the chip empty */
 	ROM_LOAD( "bp943a-4.u64", 0x040000, 0x080000, CRC(3fc7f29a) SHA1(feb21b918243c0a03dfa4a80cc80b86be4f62680) )	// 4 x $20000
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-mazinger.bin", 0x0000, 0x0080, CRC(4f6225c6) SHA1(ed8e1c3ca9b961778cd317deb0dd8a0143eaab4f) )
 ROM_END
 
 
@@ -3681,6 +3694,9 @@ ROM_START( sailormn )
 	ROM_RELOAD(           0x0c0000, 0x080000             )
 	ROM_RELOAD(           0x140000, 0x080000             )
 	ROM_RELOAD(           0x1c0000, 0x080000             )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-sailormn.bin", 0x0000, 0x0080, CRC(59a7dc50) SHA1(6b116bdfbde42192b01678cb0b9bab0f2e56fd28) )
 ROM_END
 
 ROM_START( sailormno )
@@ -3725,6 +3741,9 @@ ROM_START( sailormno )
 	ROM_RELOAD(           0x0c0000, 0x080000             )
 	ROM_RELOAD(           0x140000, 0x080000             )
 	ROM_RELOAD(           0x1c0000, 0x080000             )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-sailormn.bin", 0x0000, 0x0080, CRC(59a7dc50) SHA1(6b116bdfbde42192b01678cb0b9bab0f2e56fd28) )
 ROM_END
 
 
@@ -3749,6 +3768,9 @@ ROM_START( uopoko )
 
 	ROM_REGION( 0x200000, "ymz", 0 )	/* Samples */
 	ROM_LOAD( "u4.bin", 0x000000, 0x200000, CRC(a2d0d755) SHA1(f8493ef7f367f3dc2a229ba785ac67bc5c2c54c0) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-uopoko.bin", 0x0000, 0x0080, CRC(f4a24b95) SHA1(4043f0ffed24e38b4f7dbe1a5a4a9e79bdde7dfd) )
 ROM_END
 
 ROM_START( uopokoj )
@@ -3764,6 +3786,9 @@ ROM_START( uopokoj )
 
 	ROM_REGION( 0x200000, "ymz", 0 )	/* Samples */
 	ROM_LOAD( "u4.bin", 0x000000, 0x200000, CRC(a2d0d755) SHA1(f8493ef7f367f3dc2a229ba785ac67bc5c2c54c0) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-uopoko.bin", 0x0000, 0x0080, CRC(f4a24b95) SHA1(4043f0ffed24e38b4f7dbe1a5a4a9e79bdde7dfd) )
 ROM_END
 
 
@@ -3802,8 +3827,6 @@ static void sailormn_unpack_tiles( running_machine *machine, const char *region 
 
 static void init_cave(running_machine *machine)
 {
-	cave_default_eeprom = 0;
-	cave_default_eeprom_length = 0;
 	cave_region_byte = -1;
 
 	cave_spritetype = 0;	// Normal sprites
@@ -3811,9 +3834,8 @@ static void init_cave(running_machine *machine)
 	time_vblank_irq = 100;
 
 	irq_level = 1;
-
-	NMK112_init(0, "oki1", "oki2");
 }
+
 
 static DRIVER_INIT( agallet )
 {
@@ -3821,8 +3843,6 @@ static DRIVER_INIT( agallet )
 
 	sailormn_unpack_tiles( machine, "gfx4" );
 
-	cave_default_eeprom = cave_default_eeprom_type7;
-	cave_default_eeprom_length = sizeof(cave_default_eeprom_type7);
 	cave_region_byte = 0x1f;
 
 	unpack_sprites(machine);
@@ -3835,8 +3855,6 @@ static DRIVER_INIT( dfeveron )
 {
 	init_cave(machine);
 
-	cave_default_eeprom = cave_default_eeprom_type1;
-	cave_default_eeprom_length = sizeof(cave_default_eeprom_type1);
 	cave_region_byte = -1;
 
 	unpack_sprites(machine);
@@ -3847,8 +3865,6 @@ static DRIVER_INIT( feversos )
 {
 	init_cave(machine);
 
-	cave_default_eeprom = cave_default_eeprom_type1feversos;
-	cave_default_eeprom_length = sizeof(cave_default_eeprom_type1feversos);
 	cave_region_byte = -1;
 
 	unpack_sprites(machine);
@@ -3859,8 +3875,6 @@ static DRIVER_INIT( ddonpach )
 {
 	init_cave(machine);
 
-	cave_default_eeprom = cave_default_eeprom_type2;
-	cave_default_eeprom_length = sizeof(cave_default_eeprom_type2);
 	cave_region_byte = -1;
 
 	ddonpach_unpack_sprites(machine);
@@ -3872,23 +3886,18 @@ static DRIVER_INIT( donpachi )
 {
 	init_cave(machine);
 
-	cave_default_eeprom = cave_default_eeprom_type2;
-	cave_default_eeprom_length = sizeof(cave_default_eeprom_type2);
 	cave_region_byte = -1;
 
 	ddonpach_unpack_sprites(machine);
 	cave_spritetype = 1;	// "different" sprites (no zooming?)
 	time_vblank_irq = 90;
-
-	NMK112_init(1<<0, "oki1", "oki2");	// chip #0 (music) is not paged
 }
+
 
 static DRIVER_INIT( esprade )
 {
 	init_cave(machine);
 
-	cave_default_eeprom = cave_default_eeprom_type2;
-	cave_default_eeprom_length = sizeof(cave_default_eeprom_type2);
 	cave_region_byte = -1;
 
 	esprade_unpack_sprites(machine);
@@ -3917,8 +3926,6 @@ static DRIVER_INIT( guwange )
 {
 	init_cave(machine);
 
-	cave_default_eeprom = cave_default_eeprom_type1;
-	cave_default_eeprom_length = sizeof(cave_default_eeprom_type1);
 	cave_region_byte = -1;
 
 	esprade_unpack_sprites(machine);
@@ -3929,8 +3936,6 @@ static DRIVER_INIT( hotdogst )
 {
 	init_cave(machine);
 
-	cave_default_eeprom = cave_default_eeprom_type4;
-	cave_default_eeprom_length = sizeof(cave_default_eeprom_type4);
 	cave_region_byte = -1;
 
 	unpack_sprites(machine);
@@ -3956,8 +3961,6 @@ static DRIVER_INIT( mazinger )
 		free(buffer);
 	}
 
-	cave_default_eeprom = cave_default_eeprom_type5;
-	cave_default_eeprom_length = sizeof(cave_default_eeprom_type5);
 	cave_region_byte = 0x05;
 
 	unpack_sprites(machine);
@@ -3992,7 +3995,8 @@ static DRIVER_INIT( pwrins2j )
 
 	buffer = alloc_array_or_die(UINT8, len);
 	{
-		 for(i=0; i<len/2; i++) 		{
+		for(i=0; i<len/2; i++)
+		{
 			j = BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7, 2,4,6,1,5,3, 0);
 			if(((j & 6) == 0) || ((j & 6) == 6))
 				j ^= 6;
@@ -4047,8 +4051,6 @@ static DRIVER_INIT( sailormn )
 
 	sailormn_unpack_tiles( machine, "gfx4" );
 
-	cave_default_eeprom = cave_default_eeprom_type6;
-	cave_default_eeprom_length = sizeof(cave_default_eeprom_type6);
 	cave_region_byte = 0x11;
 
 	unpack_sprites(machine);
@@ -4061,8 +4063,6 @@ static DRIVER_INIT( uopoko )
 {
 	init_cave(machine);
 
-	cave_default_eeprom = cave_default_eeprom_type3;
-	cave_default_eeprom_length = sizeof(cave_default_eeprom_type4);
 	cave_region_byte = -1;
 
 	unpack_sprites(machine);
@@ -4088,32 +4088,32 @@ static DRIVER_INIT( korokoro )
 
 ***************************************************************************/
 
-GAME( 1994, pwrinst2, 0,        pwrinst2, metmqstr, pwrinst2, ROT0,   "Atlus/Cave",                           "Power Instinct 2 (US, Ver. 94/04/08)"			, 0 )
-GAME( 1994, pwrinst2j,pwrinst2, pwrinst2, metmqstr, pwrins2j, ROT0,   "Atlus/Cave",                           "Gouketsuji Ichizoku 2 (Japan, Ver. 94/04/08)"		, 0 )
-GAME( 1994, mazinger, 0,        mazinger, mazinger, mazinger, ROT90,  "Banpresto/Dynamic Pl. Toei Animation", "Mazinger Z (International/Japan)"			, 0 ) // region in eeprom
+GAME( 1994, pwrinst2,   0,        pwrinst2, metmqstr, pwrinst2, ROT0,   "Atlus/Cave",                           "Power Instinct 2 (US, Ver. 94/04/08)"			, 0 )
+GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, pwrins2j, ROT0,   "Atlus/Cave",                           "Gouketsuji Ichizoku 2 (Japan, Ver. 94/04/08)"		, 0 )
+GAME( 1994, mazinger,   0,        mazinger, mazinger, mazinger, ROT90,  "Banpresto/Dynamic Pl. Toei Animation", "Mazinger Z (International/Japan)"			, 0 ) // region in eeprom
 GAME( 1995, donpachi,   0,        donpachi, cave,     donpachi, ROT270, "Atlus/Cave",                           "DonPachi (US)"						, 0 )
 GAME( 1995, donpachij,  donpachi, donpachi, cave,     donpachi, ROT270, "Atlus/Cave",                           "DonPachi (Japan)"					, 0 )
 GAME( 1995, donpachikr, donpachi, donpachi, cave,     donpachi, ROT270, "Atlus/Cave",                           "DonPachi (Korea)"					, 0 )
 GAME( 1995, donpachihk, donpachi, donpachi, cave,     donpachi, ROT270, "Atlus/Cave",                           "DonPachi (Hong Kong)"					, 0 )
-GAME( 1995, metmqstr, 0,        metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto/Pandorabox",                 "Metamoqester (International)"				, 0 )
-GAME( 1995, nmaster,  metmqstr, metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto/Pandorabox",                 "Oni - The Ninja Master (Japan)"				, 0 )
-GAME( 1995, plegends, 0,        pwrinst2, metmqstr, pwrins2j, ROT0,   "Atlus/Cave",                           "Power Instinct Legends (US, Ver. 95/06/20)"		, 0 )
-GAME( 1995, plegendsj,plegends, pwrinst2, metmqstr, pwrins2j, ROT0,   "Atlus/Cave",                           "Gouketsuji Ichizoku Saikyou Densetsu (Japan, Ver. 95/06/20)", 0 )
-GAME( 1995, sailormn, 0,        sailormn, sailormn, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (JUEHTK, Ver. 95/03/22B)"	, 0 ) // region in eeprom
-GAME( 1995, sailormno,sailormn, sailormn, sailormn, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (JUEHTK, Ver. 95/03/22)"	, 0 ) // region in eeprom
-GAME( 1996, agallet,  0,        sailormn, sailormn, agallet,  ROT270, "Banpresto / Gazelle",                  "Air Gallet (JUEHTK)"					, 0 ) // board was taiwan, region in eeprom
-GAME( 1996, hotdogst, 0,        hotdogst, cave,     hotdogst, ROT90,  "Marble",                               "Hotdog Storm (International)"				, 0 )
-GAME( 1997, ddonpach, 0,        ddonpach, cave,     ddonpach, ROT270, "Atlus/Cave",                           "DoDonPachi (International, Master Ver. 97/02/05)"	, 0 )
-GAME( 1997, ddonpachj,ddonpach, ddonpach, cave,     ddonpach, ROT270, "Atlus/Cave",                           "DoDonPachi (Japan, Master Ver. 97/02/05)"		, 0 )
-GAME( 1998, dfeveron, feversos, dfeveron, cave,     dfeveron, ROT270, "Cave (Nihon System license)",          "Dangun Feveron (Japan, Ver. 98/09/17)"			, 0 )
-GAME( 1998, feversos, 0,        dfeveron, cave,     feversos, ROT270, "Cave (Nihon System license)",          "Fever SOS (International, Ver. 98/09/25)"		, 0 )
-GAME( 1998, esprade,  0,        esprade,  cave,     esprade,  ROT270, "Atlus/Cave",                           "ESP Ra.De. (International, Ver. 98/04/22)"		, 0 )
-GAME( 1998, espradej, esprade,  esprade,  cave,     esprade,  ROT270, "Atlus/Cave",                           "ESP Ra.De. (Japan, Ver. 98/04/21)"			, 0 )
-GAME( 1998, espradejo,esprade,  esprade,  cave,     esprade,  ROT270, "Atlus/Cave",                           "ESP Ra.De. (Japan, Ver. 98/04/14)"			, 0 )
-GAME( 1998, uopoko,   0,        uopoko,   cave,     uopoko,   ROT0,   "Cave (Jaleco license)",                "Puzzle Uo Poko (International)"				, 0 )
-GAME( 1998, uopokoj,  uopoko,   uopoko,   cave,     uopoko,   ROT0,   "Cave (Jaleco license)",                "Puzzle Uo Poko (Japan)"					, 0 )
-GAME( 1999, guwange,  0,        guwange,  guwange,  guwange,  ROT270, "Atlus/Cave",                           "Guwange (Japan, Master Ver. 99/06/24)"			, 0 )
-GAME( 1999, gaia,     0,        gaia,     gaia,     gaia,     ROT0,   "Noise Factory",                        "Gaia Crusaders",		GAME_IMPERFECT_SOUND ) // cuts out occasionally
-GAME( 2001, theroes,  0,        gaia,     theroes,  gaia,     ROT0,   "Primetek Investments",                 "Thunder Heroes",		GAME_IMPERFECT_SOUND ) // cuts out occasionally
+GAME( 1995, metmqstr,   0,        metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto/Pandorabox",                 "Metamoqester (International)"				, 0 )
+GAME( 1995, nmaster,    metmqstr, metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto/Pandorabox",                 "Oni - The Ninja Master (Japan)"				, 0 )
+GAME( 1995, plegends,   0,        pwrinst2, metmqstr, pwrins2j, ROT0,   "Atlus/Cave",                           "Power Instinct Legends (US, Ver. 95/06/20)"		, 0 )
+GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, pwrins2j, ROT0,   "Atlus/Cave",                           "Gouketsuji Ichizoku Saikyou Densetsu (Japan, Ver. 95/06/20)", 0 )
+GAME( 1995, sailormn,   0,        sailormn, sailormn, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (JUEHTK, Ver. 95/03/22B)"	, 0 ) // region in eeprom
+GAME( 1995, sailormno,  sailormn, sailormn, sailormn, sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (JUEHTK, Ver. 95/03/22)"	, 0 ) // region in eeprom
+GAME( 1996, agallet,    0,        sailormn, sailormn, agallet,  ROT270, "Banpresto / Gazelle",                  "Air Gallet (JUEHTK)"					, 0 ) // board was taiwan, region in eeprom
+GAME( 1996, hotdogst,   0,        hotdogst, cave,     hotdogst, ROT90,  "Marble",                               "Hotdog Storm (International)"				, 0 )
+GAME( 1997, ddonpach,   0,        ddonpach, cave,     ddonpach, ROT270, "Atlus/Cave",                           "DoDonPachi (International, Master Ver. 97/02/05)"	, 0 )
+GAME( 1997, ddonpachj,  ddonpach, ddonpach, cave,     ddonpach, ROT270, "Atlus/Cave",                           "DoDonPachi (Japan, Master Ver. 97/02/05)"		, 0 )
+GAME( 1998, dfeveron,   feversos, dfeveron, cave,     dfeveron, ROT270, "Cave (Nihon System license)",          "Dangun Feveron (Japan, Ver. 98/09/17)"			, 0 )
+GAME( 1998, feversos,   0,        dfeveron, cave,     feversos, ROT270, "Cave (Nihon System license)",          "Fever SOS (International, Ver. 98/09/25)"		, 0 )
+GAME( 1998, esprade,    0,        esprade,  cave,     esprade,  ROT270, "Atlus/Cave",                           "ESP Ra.De. (International, Ver. 98/04/22)"		, 0 )
+GAME( 1998, espradej,   esprade,  esprade,  cave,     esprade,  ROT270, "Atlus/Cave",                           "ESP Ra.De. (Japan, Ver. 98/04/21)"			, 0 )
+GAME( 1998, espradejo,  esprade,  esprade,  cave,     esprade,  ROT270, "Atlus/Cave",                           "ESP Ra.De. (Japan, Ver. 98/04/14)"			, 0 )
+GAME( 1998, uopoko,     0,        uopoko,   cave,     uopoko,   ROT0,   "Cave (Jaleco license)",                "Puzzle Uo Poko (International)"				, 0 )
+GAME( 1998, uopokoj,    uopoko,   uopoko,   cave,     uopoko,   ROT0,   "Cave (Jaleco license)",                "Puzzle Uo Poko (Japan)"					, 0 )
+GAME( 1999, guwange,    0,        guwange,  guwange,  guwange,  ROT270, "Atlus/Cave",                           "Guwange (Japan, Master Ver. 99/06/24)"			, 0 )
+GAME( 1999, gaia,       0,        gaia,     gaia,     gaia,     ROT0,   "Noise Factory",                        "Gaia Crusaders",		GAME_IMPERFECT_SOUND ) // cuts out occasionally
+GAME( 2001, theroes,    0,        gaia,     theroes,  gaia,     ROT0,   "Primetek Investments",                 "Thunder Heroes",		GAME_IMPERFECT_SOUND ) // cuts out occasionally
 
-GAME( 1999, korokoro, 0,        korokoro, korokoro, korokoro, ROT0,   "Takumi",                               "Koro Koro Quest (Japan)"					, 0 )
+GAME( 1999, korokoro,   0,        korokoro, korokoro, korokoro, ROT0,   "Takumi",                               "Koro Koro Quest (Japan)"					, 0 )

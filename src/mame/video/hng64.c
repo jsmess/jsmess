@@ -10,20 +10,20 @@
 static UINT8 additive_tilemap_debug;
 
 UINT32* hng64_videoram;
-static tilemap *hng64_tilemap0_8x8;
-static tilemap *hng64_tilemap1_8x8;
-static tilemap *hng64_tilemap2_8x8;
-static tilemap *hng64_tilemap3_8x8;
+static tilemap_t *hng64_tilemap0_8x8;
+static tilemap_t *hng64_tilemap1_8x8;
+static tilemap_t *hng64_tilemap2_8x8;
+static tilemap_t *hng64_tilemap3_8x8;
 
-static tilemap *hng64_tilemap0_16x16;
-static tilemap *hng64_tilemap1_16x16;
-static tilemap *hng64_tilemap2_16x16;
-static tilemap *hng64_tilemap3_16x16;
+static tilemap_t *hng64_tilemap0_16x16;
+static tilemap_t *hng64_tilemap1_16x16;
+static tilemap_t *hng64_tilemap2_16x16;
+static tilemap_t *hng64_tilemap3_16x16;
 
-static tilemap *hng64_tilemap0_16x16_alt;
-static tilemap *hng64_tilemap1_16x16_alt;
-static tilemap *hng64_tilemap2_16x16_alt;
-static tilemap *hng64_tilemap3_16x16_alt;
+static tilemap_t *hng64_tilemap0_16x16_alt;
+static tilemap_t *hng64_tilemap1_16x16_alt;
+static tilemap_t *hng64_tilemap2_16x16_alt;
+static tilemap_t *hng64_tilemap3_16x16_alt;
 
 UINT32 *hng64_spriteram;
 UINT32 *hng64_videoregs;
@@ -97,7 +97,7 @@ static void hng64_mark_tile_dirty( int tilemap, int tile_index )
 }
 
 
-#define PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32(DEST, PRIORITY, SOURCE) 					\
+#define PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32(DEST, PRIORITY, SOURCE)					\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\
@@ -719,7 +719,7 @@ struct _blit_parameters
 {
 	bitmap_t *			bitmap;
 	rectangle			cliprect;
-	UINT32 				tilemap_priority_code;
+	UINT32				tilemap_priority_code;
 	UINT8				mask;
 	UINT8				value;
 	UINT8				alpha;
@@ -728,7 +728,7 @@ struct _blit_parameters
 
 
 
-static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap *tmap, bitmap_t *dest, const rectangle *cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat)
+static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bitmap_t *dest, const rectangle *cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat)
 {
 	/* start with nothing */
 	memset(blit, 0, sizeof(*blit));
@@ -804,16 +804,16 @@ INLINE UINT32 alpha_additive_r32(UINT32 d, UINT32 s, UINT8 level)
 -------------------------------------------------*/
 
 #define HNG64_ROZ_PLOT_PIXEL(INPUT_VAL)											        \
-do {																	  	        \
+do {																		        \
 	if (blit->drawformat == HNG64_TILEMAP_NORMAL)									\
-		*(UINT32 *)dest = clut[INPUT_VAL];								  	        \
+		*(UINT32 *)dest = clut[INPUT_VAL];									        \
 	else if (blit->drawformat == HNG64_TILEMAP_ADDITIVE)			                \
 		*(UINT32 *)dest = alpha_additive_r32(*(UINT32 *)dest, clut[INPUT_VAL], alpha);	\
 	else if (blit->drawformat == HNG64_TILEMAP_ALPHA)		                        \
 		*(UINT32 *)dest = alpha_blend_r32(*(UINT32 *)dest, clut[INPUT_VAL], alpha);	\
 } while (0)
 
-static void hng64_tilemap_draw_roz_core(running_machine* machine, tilemap *tmap, const blit_parameters *blit,
+static void hng64_tilemap_draw_roz_core(running_machine* machine, tilemap_t *tmap, const blit_parameters *blit,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound)
 {
 	const pen_t *clut = &machine->pens[blit->tilemap_priority_code >> 16];
@@ -991,7 +991,7 @@ static void hng64_tilemap_draw_roz_core(running_machine* machine, tilemap *tmap,
 
 
 
-static void hng64_tilemap_draw_roz_primask(running_machine* machine, bitmap_t *dest, const rectangle *cliprect, tilemap *tmap,
+static void hng64_tilemap_draw_roz_primask(running_machine* machine, bitmap_t *dest, const rectangle *cliprect, tilemap_t *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat)
 {
@@ -1019,7 +1019,7 @@ profiler_mark_end();
 }
 
 
-INLINE void hng64_tilemap_draw_roz(running_machine* machine, bitmap_t *dest, const rectangle *cliprect, tilemap *tmap,
+INLINE void hng64_tilemap_draw_roz(running_machine* machine, bitmap_t *dest, const rectangle *cliprect, tilemap_t *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority, hng64trans_t drawformat)
 {
@@ -1030,7 +1030,7 @@ INLINE void hng64_tilemap_draw_roz(running_machine* machine, bitmap_t *dest, con
 
 static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int tm )
 {
-	tilemap* tilemap = 0;
+	tilemap_t* tilemap = 0;
 	UINT32 scrollbase = 0;
 	UINT32 tileregs = 0;
 	int transmask;
@@ -1044,7 +1044,7 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 		debug_blend_enabled = 1;
 
 	if ((global_dimensions != 0) && (global_dimensions != 3))
- 		popmessage("unsupported global_dimensions on tilemaps");
+		popmessage("unsupported global_dimensions on tilemaps");
 
 	if (tm==0)
 	{
@@ -1491,7 +1491,6 @@ VIDEO_UPDATE( hng64 )
 	draw_sprites(screen->machine, bitmap,cliprect);
 
 	// 3d really shouldn't be last, but you don't see some cool stuff right now if it's put before sprites.
-	if (hng64_mcu_type != RACING_MCU) // disable on racing games until it stops crashing MAME!
 	{
 		int x, y;
 
@@ -1510,7 +1509,7 @@ VIDEO_UPDATE( hng64 )
 				src++;
 			}
 		}
-		//printf("\n");   /* Debug - ajg */
+		//printf("NEW FRAME!\n");   /* Debug - ajg */
 		clear3d(screen->machine);
 	}
 
@@ -1678,7 +1677,7 @@ struct polygon
 
 	INT8 texIndex;				// Which texture to draw from (0x00-0x0f)
 	INT8 texType;				// How to index into the texture
-	UINT8 palIndex;				// Which palette to use when rasterizing
+	UINT32 palOffset;			// The base offset where this object's palette starts.
 };
 
 static void setIdentity(float *matrix);
@@ -1689,9 +1688,9 @@ static void vecmatmul4(float *product, const float *a, const float *b);
 
 static void performFrustumClip(struct polygon *p);
 static void drawShaded(running_machine *machine, struct polygon *p);
-//static void plot(INT32 x, INT32 y, INT32 color, bitmap_t *bitmap);
-//static void drawline2d(INT32 x0, INT32 y0, INT32 x1, INT32 y1, INT32 color, bitmap_t *bitmap);
-//static void DrawWireframe(struct polygon *p, bitmap_t *bitmap);
+//static void plot(running_machine *machine, INT32 x, INT32 y, UINT32 color);
+//static void drawline2d(running_machine *machine, INT32 x0, INT32 y0, INT32 x1, INT32 y1, UINT32 color);
+//static void DrawWireframe(running_machine *machine, struct polygon *p);
 
 static float uToF(UINT16 input);
 
@@ -1768,9 +1767,11 @@ static void set3dFlags(const UINT16* packet)
     // [14] - ???? ... ? ''  ''
     // [15] - ???? ... ? ''  ''
     ////////////*/
-	paletteState3d  = (packet[8] & 0xff00) >> 8;
-	paletteState3d += ((hng64_3dregs[0x00/4] & 0x2000) >> 9); /* Palette is + 0x0800 in buriki. */
+	paletteState3d = (packet[8] & 0xff00) >> 8;
 	/* FIXME: Buriki One door colors in attract mode still aren't quite right, investigate... */
+	/* FIXME: This really isn't correct - commenting out this line fixes the palette in roadedge snk intro */
+	/*        But Xrally likes the offset...  */
+	paletteState3d += ((hng64_3dregs[0x00/4] & 0x2000) >> 9); /* Palette is + 0x0800 in buriki. */
 }
 
 // Operation 0012
@@ -2043,8 +2044,9 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				polys[*numPolys].texIndex = -1;
 			}
 
-			// Set the polygon's palette
-			polys[*numPolys].palIndex = paletteState3d;
+			// Set the polygon's palette offset
+			// TODO: Figure this out for real.  It doesn't work like this in roadedge.
+			polys[*numPolys].palOffset = paletteState3d * 0x80;
 
 			switch(chunkType)
 			{
@@ -2060,7 +2062,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
             // ---- ---x - 1 = Has per-vert normals
             /////////////////////////*/
 
-			// 33 word chunk, 3 vertices, per-vertex UVs & normals
+			// 33 word chunk, 3 vertices, per-vertex UVs & normals, per-face normal
 			case 0x05:	// 0000 0101
 			case 0x0f:	// 0000 1111
 				for (m = 0; m < 3; m++)
@@ -2101,6 +2103,8 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			// 24 word chunk, 3 vertices, per-vertex UVs
 			case 0x04:	// 0000 0100
 			case 0x0e:	// 0000 1110
+			case 0x24:	// 0010 0100        - TODO: I'm missing a lot of geo in the driving game intros
+			case 0x2e:	// 0010 1110
 				for (m = 0; m < 3; m++)
 				{
 					polys[*numPolys].vert[m].worldCoords[0] = uToF(threeDPointer[3 + (6*m)]);
@@ -2136,9 +2140,9 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				break;
 
 
-			// 15 word chunk, 1 vertex, per-vertex UVs & normals
-			case 0x97:	// 1001 0111
+			// 15 word chunk, 1 vertex, per-vertex UVs & normals, face normal
 			case 0x87:	// 1000 0111
+			case 0x97:	// 1001 0111
 			case 0xd7:	// 1101 0111
 				// Copy over the proper vertices from the previous triangle...
 				memcpy(&polys[*numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
@@ -2176,7 +2180,11 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 
 			// 12 word chunk, 1 vertex, per-vertex UVs
+			case 0x86:	// 1000 0110
 			case 0x96:	// 1001 0110
+			case 0xb6:	// 1011 0110        - TODO: I'm missing a lot of geo in the driving game intros.
+			case 0xc6:	// 1100 0110
+			case 0xd6:	// 1101 0110
 				// Copy over the proper vertices from the previous triangle...
 				memcpy(&polys[*numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
 				memcpy(&polys[*numPolys].vert[2], &lastPoly.vert[2], sizeof(struct polyVert));
@@ -2211,93 +2219,21 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 				// TODO: I'm not reading 3 necessary words here (maybe face normal) !!!
 
+				/* DEBUG
+                printf("0x?6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
+                for (m = 0; m < 13; m++)
+                    printf("%04x ", threeDPointer[m]);
+                printf("\n");
+                for (m = 0; m < 13; m++)
+                    printf("%3.4f ", uToF(threeDPointer[m]));
+                printf("\n\n");
+                */
+
 				chunkLength = 12;
 				break;
 
-#if 0
-			// TODO: DECODE THESE GUYS //
-			case 0x2e:	// 0010 1110
-				/* There's something fishy about this guy - see 0x7a below.  Very likely not fixed-length */
-				/*
-                printf("0x2e : %08x\n", address[k]*3*2);
-                for (m = 0; m < 37; m++)
-                    printf("%04x ", threeDPointer[m]);
-                printf("\n\n");
-                */
-				chunkLength = 36;
-			break;
-
-			/* This shouldn't exist. */
-			/* There's something funky going on with 0x2e - it's often well-behaved, except for
-               when it "ends" with e67a.  Maybe this chunkLength thing isn't where it's at?
-               Luckily the 0x7a is always at the end of a series of 2 chunks (2e,7a) so ignoring
-               it won't kill us for now. */
-			case 0x7a:	// 0111 1010
-				/*
-                printf("0x7a : %08x (%d/%d)\n", mame_rand(machine), l, size[k]);
-                for (m = 0; m < 100; m++)
-                    printf("%04x ", threeDPointer[m]);
-                printf("\n\n");
-                */
-				chunkLength = 0;
-			break;
-
-			case 0x24:	// 0010 0100
-				/*
-                printf("0x24 : %08x\n", address[k]*3*2);
-                for (m = 0; m < 49; m++)
-                    printf("%04x ", threeDPointer[m]);
-                printf("\n\n");
-                */
-				chunkLength = 48;
-			break;
-
-			case 0xb6:	// 1011 0110
-				/*
-                printf("0xb6 : %08x\n", address[k]*3*2);
-                for (m = 0; m < 13; m++)
-                    printf("%04x ", threeDPointer[m]);
-                printf("\n\n");
-                */
-				chunkLength = 12;
-			break;
-
-			case 0x86:	// 1000 0110
-				/* Very likely not fixed-length since it leads into c6 & d6 */
-				/*
-                printf("0x86 : %08x\n", address[k]*3*2);
-                for (m = 0; m < 13; m++)
-                    printf("%04x ", threeDPointer[m]);
-                printf("\n\n");
-                */
-				chunkLength = 12;
-			break;
-
-			/* Are c6 and d6 just insanely long? They aren't at the end of the numTris like 0x7a */
-			case 0xc6:	// 1100 0110
-				/*
-                printf("0xc6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]);
-                for (m = 0; m < 100; m++)
-                    printf("%04x ", threeDPointer[m]);
-                printf("\n\n");
-                */
-				chunkLength = 0;
-			break;
-
-			/* Are c6 and d6 just insanely long? They aren't at the end of numTris like 0x7a */
-			case 0xd6:	// 1101 0110
-				/*
-                printf("0xd6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]);
-                for (m = 0; m < 100; m++)
-                    printf("%04x ", threeDPointer[m]);
-                printf("\n\n");
-                */
-				chunkLength = 0;
-			break;
-#endif
-
 			default:
-				logerror("UNKNOWN geometry CHUNK TYPE : %02x\n", chunkType);
+				printf("UNKNOWN geometry CHUNK TYPE : %02x\n", chunkType);
 				chunkLength = 0;
 				break;
 			}
@@ -2443,7 +2379,7 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 
 	/* A temporary place to put some polygons.  This will optimize away if the compiler's any good. */
 	int numPolys = 0;
-	struct polygon* polys = malloc(sizeof(struct polygon) * (1024*5));
+	struct polygon* polys = (struct polygon*)malloc(sizeof(struct polygon) * (1024*5));
 
 	//printf("packet type : %04x\n", packet[0]);
 	switch (packet[0])
@@ -2460,6 +2396,7 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		break;
 
 	case 0x0011:	// Palette / Model flags?
+		//printPacket(packet, 1);
 		set3dFlags(packet);
 		break;
 
@@ -2475,7 +2412,7 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		{
 			if (polys[i].visible)
 			{
-				//DrawWireframe(&polys[i], bitmap);
+				//DrawWireframe(machine, &polys[i]);
 				drawShaded(machine, &polys[i]);
 			}
 		}
@@ -2483,16 +2420,18 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		numPolys = 0;
 		break;
 
-	case 0x0101:	// Unknown: Geometry?
+	case 0x0101:	// Geometry of a different type - bbust2.
 		break;
 
-	case 0x0102:	// Unknown: Geometry?
+	case 0x0102:	// Geometry of a different type - sams games.
 		break;
 
 	case 0x1000:	// Unknown: Some sort of global flags?
+		//printPacket(packet, 1);
 		break;
 
 	case 0x1001:	// Unknown: Some sort of global flags (a group of 4, actually)?
+		//printPacket(packet, 1);
 		break;
 
 	default:
@@ -2786,15 +2725,14 @@ static void performFrustumClip(struct polygon *p)
 // wireframe rendering //
 /////////////////////////
 #ifdef UNUSED_FUNCTION
-static void plot(INT32 x, INT32 y, INT32 color, bitmap_t *bitmap)
+static void plot(running_machine *machine, INT32 x, INT32 y, UINT32 color)
 {
-	*BITMAP_ADDR32(bitmap, y, x) = MAKE_ARGB((UINT8)255, (UINT8)color, (UINT8)color, (UINT8)color);
+	UINT32* cb = &(colorBuffer3d[(y * video_screen_get_visible_area(machine->primary_screen)->max_x) + x]);
+	*cb = color;
 }
-#endif
 
-#ifdef UNUSED_FUNCTION
 // Stolen from http://en.wikipedia.org/wiki/Bresenham's_line_algorithm (no copyright denoted) - the non-optimized version
-static void drawline2d(INT32 x0, INT32 y0, INT32 x1, INT32 y1, INT32 color, bitmap_t *bitmap)
+static void drawline2d(running_machine *machine, INT32 x0, INT32 y0, INT32 x1, INT32 y1, UINT32 color)
 {
 #define SWAP(a,b) tmpswap = a; a = b; b = tmpswap;
 
@@ -2832,11 +2770,11 @@ static void drawline2d(INT32 x0, INT32 y0, INT32 x1, INT32 y1, INT32 color, bitm
 	{
 		if (steep)
 		{
-			plot(x0,y0,color, bitmap);
+			plot(machine, x0, y0, color);
 		}
 		else
 		{
-			plot(y0,x0,color, bitmap);
+			plot(machine, y0, x0, color);
 		}
 		while (e >= 0)
 		{
@@ -2849,17 +2787,16 @@ static void drawline2d(INT32 x0, INT32 y0, INT32 x1, INT32 y1, INT32 color, bitm
 	}
 #undef SWAP
 }
-#endif
 
-#ifdef UNUSED_FUNCTION
-static void DrawWireframe(struct polygon *p, bitmap_t *bitmap)
+static void DrawWireframe(running_machine *machine, struct polygon *p)
 {
 	int j;
 	for (j = 0; j < p->n; j++)
 	{
 		// mame_printf_debug("now drawing : %f %f %f, %f %f %f\n", p->vert[j].clipCoords[0], p->vert[j].clipCoords[1], p->vert[j].clipCoords[2], p->vert[(j+1)%p->n].clipCoords[0], p->vert[(j+1)%p->n].clipCoords[1], p->vert[(j+1)%p->n].clipCoords[2]);
 		// mame_printf_debug("%f %f %f %f\n", p->vert[j].clipCoords[0], p->vert[j].clipCoords[1], p->vert[(j+1)%p->n].clipCoords[0], p->vert[(j+1)%p->n].clipCoords[1]);
-		drawline2d(p->vert[j].clipCoords[0], p->vert[j].clipCoords[1], p->vert[(j+1)%p->n].clipCoords[0], p->vert[(j+1)%p->n].clipCoords[1], 255, bitmap);
+		UINT32 color = MAKE_ARGB((UINT8)255, (UINT8)255, (UINT8)0, (UINT8)0);
+		drawline2d(machine, p->vert[j].clipCoords[0], p->vert[j].clipCoords[1], p->vert[(j+1)%p->n].clipCoords[0], p->vert[(j+1)%p->n].clipCoords[1], color);
 	}
 
 	// SHOWS THE CLIPPING //
@@ -2873,7 +2810,6 @@ static void DrawWireframe(struct polygon *p, bitmap_t *bitmap)
     */
 }
 #endif
-
 
 ///////////////////////
 // polygon rendering //
@@ -2889,7 +2825,7 @@ static void DrawWireframe(struct polygon *p, bitmap_t *bitmap)
 /**     Output: none                                                **/
 /*********************************************************************/
 INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
-										  int Wrapping, int Filtering, int Function,
+										  int textureType, int palOffset, int texIndex,
 										  int x_start, int x_end, int y, float z_start, float z_delta,
 										  float w_start, float w_delta, float r_start, float r_delta,
 										  float g_start, float g_delta, float b_start, float b_delta,
@@ -2903,8 +2839,8 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 	UINT8 paletteEntry;
 	float t_coord, s_coord;
 
-	if (Function >= 0)
-		textureOffset = &gfx[Function * 1024 * 1024];
+	if (texIndex >= 0)
+		textureOffset = &gfx[texIndex * 1024 * 1024];
 	else
 		textureOffset = 0x00;
 
@@ -2917,9 +2853,9 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 			s_coord = s_start / w_start;
 
 			// GET THE TEXTURE INDEX
-			if (Function >= 0)
+			if (texIndex >= 0)
 			{
-				if (Wrapping == 0x8 || Wrapping == 0xc)
+				if (textureType == 0x8 || textureType == 0xc)
 					paletteEntry = textureOffset[(((int)(s_coord*1024.0f))*1024 + (int)(t_coord*1024.0f))];
 				else
 					paletteEntry = textureOffset[(((int)(s_coord*512.0f))*1024 + (int)(t_coord*512.0f))];
@@ -2930,8 +2866,8 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 					// Greyscale texture - for Buriki...
 					// *BITMAP_ADDR32(Color, y, x_start) = MAKE_ARGB(255, (UINT8)paletteEntry, (UINT8)paletteEntry, (UINT8)paletteEntry);
 
-					// *BITMAP_ADDR32(Color, y, x_start) = machine->pens[(128*(Filtering))+paletteEntry];
-					*cb = machine->pens[(128*(Filtering))+paletteEntry];
+					// *BITMAP_ADDR32(Color, y, x_start) = machine->pens[palOffset + paletteEntry];
+					*cb = machine->pens[palOffset + paletteEntry];
 					*db = z_start;
 				}
 			}
@@ -2988,7 +2924,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 											float A[4], float B[4], float C[4],
 											float Ca[3], float Cb[3], float Cc[3], // PER-VERTEX RGB COLORS
 											float Ta[2], float Tb[2], float Tc[2], // PER-VERTEX (S,T) TEX-COORDS
-											int Wrapping, int Filtering, int Function)
+											int textureType, int palOffset, int texIndex)
 {
 	// Get our order of points by increasing y-coord
 	float *p_min = ((A[1] <= B[1]) && (A[1] <= C[1])) ? A : ((B[1] <= A[1]) && (B[1] <= C[1])) ? B : C;
@@ -3179,7 +3115,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 
 		// Pass the horizontal line to the filler, this could be put in the routine
 		// then interpolate for the next values of x and z
-		FillSmoothTexPCHorizontalLine(machine, Wrapping, Filtering, Function,
+		FillSmoothTexPCHorizontalLine(machine, textureType, palOffset, texIndex,
 			x_start, x_end, y_min, z_interp_x, z_delta_x, w_interp_x, w_delta_x,
 			r_interp_x, r_delta_x, g_interp_x, g_delta_x, b_interp_x, b_delta_x,
 			s_interp_x, s_delta_x, t_interp_x, t_delta_x);
@@ -3259,7 +3195,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 
 		// Pass the horizontal line to the filler, this could be put in the routine
 		// then interpolate for the next values of x and z
-		FillSmoothTexPCHorizontalLine(machine, Wrapping, Filtering, Function,
+		FillSmoothTexPCHorizontalLine(machine, textureType, palOffset, texIndex,
 			x_start, x_end, y_mid, z_interp_x, z_delta_x, w_interp_x, w_delta_x,
 			r_interp_x, r_delta_x, g_interp_x, g_delta_x, b_interp_x, b_delta_x,
 			s_interp_x, s_delta_x, t_interp_x, t_delta_x);
@@ -3295,7 +3231,7 @@ static void drawShaded(running_machine *machine, struct polygon *p)
 										p->vert[0].clipCoords, p->vert[j].clipCoords, p->vert[j+1].clipCoords,
 										p->vert[0].light,      p->vert[j].light,      p->vert[j+1].light,
 										p->vert[0].texCoords,  p->vert[j].texCoords,  p->vert[j+1].texCoords,
-										p->texType, p->palIndex, p->texIndex);
+										p->texType, p->palOffset, p->texIndex);
 
 	}
 }

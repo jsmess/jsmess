@@ -315,6 +315,7 @@ rumbling on a subwoofer in the cabinet.)
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
+#include "machine/taitoio.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
@@ -400,6 +401,17 @@ static WRITE8_HANDLER( ninjaw_pancontrol )
 }
 
 
+WRITE16_HANDLER( tc0100scn_triple_screen_w )
+{
+	const device_config *tc0100scn_1 = devtag_get_device(space->machine, "tc0100scn_1");
+	const device_config *tc0100scn_2 = devtag_get_device(space->machine, "tc0100scn_2");
+	const device_config *tc0100scn_3 = devtag_get_device(space->machine, "tc0100scn_3");
+
+	tc0100scn_word_w(tc0100scn_1, offset, data, mem_mask);
+	tc0100scn_word_w(tc0100scn_2, offset, data, mem_mask);
+	tc0100scn_word_w(tc0100scn_3, offset, data, mem_mask);
+}
+
 /***********************************************************
              MEMORY STRUCTURES
 ***********************************************************/
@@ -407,21 +419,21 @@ static WRITE8_HANDLER( ninjaw_pancontrol )
 static ADDRESS_MAP_START( ninjaw_master_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM														/* main ram */
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE8(TC0220IOC_portreg_r,TC0220IOC_portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_READWRITE8(TC0220IOC_port_r,TC0220IOC_port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x220000, 0x220003) AM_READWRITE(ninjaw_sound_r,ninjaw_sound_w)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("share2") AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x280000, 0x293fff) AM_READWRITE(TC0100SCN_word_0_r,TC0100SCN_triple_screen_w)	/* tilemaps (1st screen/all screens) */
-	AM_RANGE(0x2a0000, 0x2a000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r,TC0100SCN_ctrl_word_0_w)
-	AM_RANGE(0x2c0000, 0x2d3fff) AM_READWRITE(TC0100SCN_word_1_r,TC0100SCN_word_1_w)		/* tilemaps (2nd screen) */
-	AM_RANGE(0x2e0000, 0x2e000f) AM_READWRITE(TC0100SCN_ctrl_word_1_r,TC0100SCN_ctrl_word_1_w)
-	AM_RANGE(0x300000, 0x313fff) AM_READWRITE(TC0100SCN_word_2_r,TC0100SCN_word_2_w)		/* tilemaps (3rd screen) */
-	AM_RANGE(0x320000, 0x32000f) AM_READWRITE(TC0100SCN_ctrl_word_2_r,TC0100SCN_ctrl_word_2_w)
-	AM_RANGE(0x340000, 0x340007) AM_READWRITE(TC0110PCR_word_r,TC0110PCR_step1_word_w)		/* palette (1st screen) */
-	AM_RANGE(0x350000, 0x350007) AM_READWRITE(TC0110PCR_word_1_r,TC0110PCR_step1_word_1_w)	/* palette (2nd screen) */
-	AM_RANGE(0x360000, 0x360007) AM_READWRITE(TC0110PCR_word_2_r,TC0110PCR_step1_word_2_w)	/* palette (3rd screen) */
+	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD("tc0100scn_1", tc0100scn_word_r) AM_WRITE(tc0100scn_triple_screen_w)	/* tilemaps (1st screen/all screens) */
+	AM_RANGE(0x2a0000, 0x2a000f) AM_DEVREADWRITE("tc0100scn_1", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
+	AM_RANGE(0x2c0000, 0x2d3fff) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_word_r, tc0100scn_word_w)		/* tilemaps (2nd screen) */
+	AM_RANGE(0x2e0000, 0x2e000f) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
+	AM_RANGE(0x300000, 0x313fff) AM_DEVREADWRITE("tc0100scn_3", tc0100scn_word_r, tc0100scn_word_w)		/* tilemaps (3rd screen) */
+	AM_RANGE(0x320000, 0x32000f) AM_DEVREADWRITE("tc0100scn_3", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
+	AM_RANGE(0x340000, 0x340007) AM_DEVREADWRITE("tc0110pcr_1", tc0110pcr_word_r, tc0110pcr_step1_word_w)		/* palette (1st screen) */
+	AM_RANGE(0x350000, 0x350007) AM_DEVREADWRITE("tc0110pcr_2", tc0110pcr_word_r, tc0110pcr_step1_word_w)		/* palette (2nd screen) */
+	AM_RANGE(0x360000, 0x360007) AM_DEVREADWRITE("tc0110pcr_3", tc0110pcr_word_r, tc0110pcr_step1_word_w)		/* palette (3rd screen) */
 ADDRESS_MAP_END
 
 // NB there could be conflicts between which cpu writes what to the
@@ -430,44 +442,44 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ninjaw_slave_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM	/* main ram */
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE8(TC0220IOC_portreg_r,TC0220IOC_portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_READWRITE8(TC0220IOC_port_r,TC0220IOC_port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x280000, 0x293fff) AM_READWRITE(TC0100SCN_word_0_r,TC0100SCN_triple_screen_w)	/* tilemaps (1st screen/all screens) */
-	AM_RANGE(0x340000, 0x340007) AM_READWRITE(TC0110PCR_word_r,TC0110PCR_step1_word_w)		/* palette (1st screen) */
-	AM_RANGE(0x350000, 0x350007) AM_READWRITE(TC0110PCR_word_1_r,TC0110PCR_step1_word_1_w)	/* palette (2nd screen) */
-	AM_RANGE(0x360000, 0x360007) AM_READWRITE(TC0110PCR_word_2_r,TC0110PCR_step1_word_2_w)	/* palette (3rd screen) */
+	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD("tc0100scn_1", tc0100scn_word_r) AM_WRITE(tc0100scn_triple_screen_w)	/* tilemaps (1st screen/all screens) */
+	AM_RANGE(0x340000, 0x340007) AM_DEVREADWRITE("tc0110pcr_1", tc0110pcr_word_r, tc0110pcr_step1_word_w)		/* palette (1st screen) */
+	AM_RANGE(0x350000, 0x350007) AM_DEVREADWRITE("tc0110pcr_2", tc0110pcr_word_r, tc0110pcr_step1_word_w)		/* palette (2nd screen) */
+	AM_RANGE(0x360000, 0x360007) AM_DEVREADWRITE("tc0110pcr_3", tc0110pcr_word_r, tc0110pcr_step1_word_w)		/* palette (3rd screen) */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( darius2_master_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM							/* main ram */
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE8(TC0220IOC_portreg_r,TC0220IOC_portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_READWRITE8(TC0220IOC_port_r,TC0220IOC_port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x220000, 0x220003) AM_READWRITE(ninjaw_sound_r,ninjaw_sound_w)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("share2") AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x280000, 0x293fff) AM_READWRITE(TC0100SCN_word_0_r,TC0100SCN_triple_screen_w)	/* tilemaps (1st screen/all screens) */
-	AM_RANGE(0x2a0000, 0x2a000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r,TC0100SCN_ctrl_word_0_w)
-	AM_RANGE(0x2c0000, 0x2d3fff) AM_READWRITE(TC0100SCN_word_1_r,TC0100SCN_word_1_w)		/* tilemaps (2nd screen) */
-	AM_RANGE(0x2e0000, 0x2e000f) AM_READWRITE(TC0100SCN_ctrl_word_1_r,TC0100SCN_ctrl_word_1_w)
-	AM_RANGE(0x300000, 0x313fff) AM_READWRITE(TC0100SCN_word_2_r,TC0100SCN_word_2_w)		/* tilemaps (3rd screen) */
-	AM_RANGE(0x320000, 0x32000f) AM_READWRITE(TC0100SCN_ctrl_word_2_r,TC0100SCN_ctrl_word_2_w)
-	AM_RANGE(0x340000, 0x340007) AM_READWRITE(TC0110PCR_word_r,TC0110PCR_step1_word_w)		/* palette (1st screen) */
-	AM_RANGE(0x350000, 0x350007) AM_READWRITE(TC0110PCR_word_1_r,TC0110PCR_step1_word_1_w)	/* palette (2nd screen) */
-	AM_RANGE(0x360000, 0x360007) AM_READWRITE(TC0110PCR_word_2_r,TC0110PCR_step1_word_2_w)	/* palette (3rd screen) */
+	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD("tc0100scn_1", tc0100scn_word_r) AM_WRITE(tc0100scn_triple_screen_w)	/* tilemaps (1st screen/all screens) */
+	AM_RANGE(0x2a0000, 0x2a000f) AM_DEVREADWRITE("tc0100scn_1", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
+	AM_RANGE(0x2c0000, 0x2d3fff) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_word_r, tc0100scn_word_w)		/* tilemaps (2nd screen) */
+	AM_RANGE(0x2e0000, 0x2e000f) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
+	AM_RANGE(0x300000, 0x313fff) AM_DEVREADWRITE("tc0100scn_3", tc0100scn_word_r, tc0100scn_word_w)		/* tilemaps (3rd screen) */
+	AM_RANGE(0x320000, 0x32000f) AM_DEVREADWRITE("tc0100scn_3", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
+	AM_RANGE(0x340000, 0x340007) AM_DEVREADWRITE("tc0110pcr_1", tc0110pcr_word_r, tc0110pcr_step1_word_w)		/* palette (1st screen) */
+	AM_RANGE(0x350000, 0x350007) AM_DEVREADWRITE("tc0110pcr_2", tc0110pcr_word_r, tc0110pcr_step1_word_w)		/* palette (2nd screen) */
+	AM_RANGE(0x360000, 0x360007) AM_DEVREADWRITE("tc0110pcr_3", tc0110pcr_word_r, tc0110pcr_step1_word_w)		/* palette (3rd screen) */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( darius2_slave_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM														/* main ram */
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE8(TC0220IOC_portreg_r,TC0220IOC_portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_READWRITE8(TC0220IOC_port_r,TC0220IOC_port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x280000, 0x293fff) AM_READWRITE(TC0100SCN_word_0_r,TC0100SCN_triple_screen_w)	/* tilemaps (1st screen/all screens) */
+	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD("tc0100scn_1", tc0100scn_word_r) AM_WRITE(tc0100scn_triple_screen_w)	/* tilemaps (1st screen/all screens) */
 ADDRESS_MAP_END
 
 
@@ -681,6 +693,46 @@ to the scrolling background.
 Darius2: arbitrary interleaving of 10 to keep cpus synced.
 *************************************************************/
 
+static const tc0100scn_interface darius2_tc0100scn_intf_l =
+{
+	"lscreen",
+	1, 3,		/* gfxnum, txnum */
+	22, 0,		/* x_offset, y_offset */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	0, 0
+};
+
+static const tc0100scn_interface darius2_tc0100scn_intf_m =
+{
+	"mscreen",
+	2, 3,		/* gfxnum, txnum */
+	22, 0,		/* x_offset, y_offset */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	2, 1
+};
+
+static const tc0100scn_interface darius2_tc0100scn_intf_r =
+{
+	"rscreen",
+	2, 3,		/* gfxnum, txnum */
+	22, 0,		/* x_offset, y_offset */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	4, 1
+};
+
+static const tc0110pcr_interface darius2_tc0110pcr_intf_l = {	0	/* pal_offs / 0x1000 */	};
+static const tc0110pcr_interface darius2_tc0110pcr_intf_m = {	1	/* pal_offs / 0x1000 */	};
+static const tc0110pcr_interface darius2_tc0110pcr_intf_r = {	2	/* pal_offs / 0x1000 */	};
+
+static const tc0220ioc_interface ninjaw_io_intf =
+{
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+};
+
 static MACHINE_DRIVER_START( ninjaw )
 
 	/* basic machine hardware */
@@ -699,6 +751,8 @@ static MACHINE_DRIVER_START( ninjaw )
 
 	MDRV_MACHINE_START(ninjaw)
 	MDRV_MACHINE_RESET(ninjaw)
+
+	MDRV_TC0220IOC_ADD("tc0220ioc", ninjaw_io_intf)
 
 	/* video hardware */
 	MDRV_GFXDECODE(ninjaw)
@@ -728,6 +782,13 @@ static MACHINE_DRIVER_START( ninjaw )
 
 	MDRV_VIDEO_START(ninjaw)
 	MDRV_VIDEO_UPDATE(ninjaw)
+
+	MDRV_TC0100SCN_ADD("tc0100scn_1", darius2_tc0100scn_intf_l)
+	MDRV_TC0100SCN_ADD("tc0100scn_2", darius2_tc0100scn_intf_m)
+	MDRV_TC0100SCN_ADD("tc0100scn_3", darius2_tc0100scn_intf_r)
+	MDRV_TC0110PCR_ADD("tc0110pcr_1", darius2_tc0110pcr_intf_l)
+	MDRV_TC0110PCR_ADD("tc0110pcr_2", darius2_tc0110pcr_intf_m)
+	MDRV_TC0110PCR_ADD("tc0110pcr_3", darius2_tc0110pcr_intf_r)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -773,6 +834,8 @@ static MACHINE_DRIVER_START( darius2 )
 	MDRV_MACHINE_START(ninjaw)
 	MDRV_MACHINE_RESET(ninjaw)
 
+	MDRV_TC0220IOC_ADD("tc0220ioc", ninjaw_io_intf)
+
 	/* video hardware */
 	MDRV_GFXDECODE(ninjaw)
 	MDRV_PALETTE_LENGTH(4096*3)
@@ -801,6 +864,13 @@ static MACHINE_DRIVER_START( darius2 )
 
 	MDRV_VIDEO_START(ninjaw)
 	MDRV_VIDEO_UPDATE(ninjaw)
+
+	MDRV_TC0100SCN_ADD("tc0100scn_1", darius2_tc0100scn_intf_l)
+	MDRV_TC0100SCN_ADD("tc0100scn_2", darius2_tc0100scn_intf_m)
+	MDRV_TC0100SCN_ADD("tc0100scn_3", darius2_tc0100scn_intf_r)
+	MDRV_TC0110PCR_ADD("tc0110pcr_1", darius2_tc0110pcr_intf_l)
+	MDRV_TC0110PCR_ADD("tc0110pcr_2", darius2_tc0110pcr_intf_m)
+	MDRV_TC0110PCR_ADD("tc0110pcr_3", darius2_tc0110pcr_intf_r)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1015,4 +1085,3 @@ static MACHINE_RESET( ninjaw )
 GAME( 1987, ninjaw,   0,      ninjaw,  ninjaw,   0,  ROT0, "Taito Corporation Japan", "The Ninja Warriors (World)", 0 )
 GAME( 1987, ninjawj,  ninjaw, ninjaw,  ninjawj,  0,  ROT0, "Taito Corporation", "The Ninja Warriors (Japan)", 0 )
 GAME( 1989, darius2,  0,      darius2, darius2,  0,  ROT0, "Taito Corporation", "Darius II (Japan)", 0 )
-

@@ -170,20 +170,14 @@ Check gticlub.c for details on the bottom board.
 #include "sound/k054539.h"
 #include "machine/konppc.h"
 #include "machine/adc083x.h"
-#include "machine/eepromdev.h"
+#include "machine/k056230.h"
+#include "machine/eeprom.h"
 #include "video/konicdev.h"
 #include "video/gticlub.h"
 #include "sound/k056800.h"
 
 static UINT8 led_reg0, led_reg1;
 
-
-// defined in drivers/gticlub.c
-extern READ8_HANDLER(K056230_r);
-extern WRITE8_HANDLER(K056230_w);
-extern UINT32 *lanc_ram;
-extern READ32_HANDLER(lanc_ram_r);
-extern WRITE32_HANDLER(lanc_ram_w);
 
 
 // defined in drivers/nwk-tr.c
@@ -416,8 +410,8 @@ static ADDRESS_MAP_START( zr107_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x78040000, 0x7804000f) AM_READWRITE(K001006_0_r, K001006_0_w)
 	AM_RANGE(0x780c0000, 0x780c0007) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
-	AM_RANGE(0x7e008000, 0x7e009fff) AM_READWRITE8(K056230_r, K056230_w, 0xffffffff)				/* LANC registers */
-	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_READWRITE(lanc_ram_r, lanc_ram_w) AM_BASE(&lanc_ram)		/* LANC Buffer RAM (27E) */
+	AM_RANGE(0x7e008000, 0x7e009fff) AM_DEVREADWRITE8("k056230", k056230_r, k056230_w, 0xffffffff)				/* LANC registers */
+	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_DEVREADWRITE("k056230", lanc_ram_r, lanc_ram_w)		/* LANC Buffer RAM (27E) */
 	AM_RANGE(0x7e00c000, 0x7e00c007) AM_DEVWRITE("k056800", k056800_host_w)
 	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_DEVREAD("k056800", k056800_host_r)
 	AM_RANGE(0x7f800000, 0x7f9fffff) AM_ROM AM_SHARE("share2")
@@ -444,8 +438,8 @@ static ADDRESS_MAP_START( jetwave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE(K001006_1_r, K001006_1_w)
 	AM_RANGE(0x780c0000, 0x780c0007) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_MIRROR(0x80000000) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
-	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_READWRITE8(K056230_r, K056230_w, 0xffffffff)				/* LANC registers */
-	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_MIRROR(0x80000000) AM_READWRITE(lanc_ram_r, lanc_ram_w)	 AM_BASE(&lanc_ram)	/* LANC Buffer RAM (27E) */
+	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_DEVREADWRITE8("k056230", k056230_r, k056230_w, 0xffffffff)				/* LANC registers */
+	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k056230", lanc_ram_r, lanc_ram_w)	/* LANC Buffer RAM (27E) */
 	AM_RANGE(0x7e00c000, 0x7e00c007) AM_MIRROR(0x80000000) AM_DEVWRITE("k056800", k056800_host_w)
 	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_MIRROR(0x80000000) AM_DEVREAD("k056800", k056800_host_r)
 	AM_RANGE(0x7f000000, 0x7f3fffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION("user2", 0)
@@ -535,12 +529,12 @@ static INPUT_PORTS_START( zr107 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* PARAACK */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("adc0838",adc083x_sars_read)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom",eepromdev_read_bit)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom",eeprom_read_bit)
 
 	PORT_START("EEPROMOUT")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 
 	PORT_START("OUT4")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("adc0838", adc083x_cs_write)
@@ -705,6 +699,12 @@ static const k056832_interface zr107_k056832_intf =
 	game_tile_callback, "none"
 };
 
+static const k056230_interface zr107_k056230_intf =
+{
+	"maincpu",
+	0
+};
+
 /* PowerPC interrupts
 
     IRQ0:  Vblank
@@ -738,11 +738,13 @@ static MACHINE_DRIVER_START( zr107 )
 
 	MDRV_QUANTUM_TIME(HZ(30000))
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 	MDRV_MACHINE_START(zr107)
 	MDRV_MACHINE_RESET(zr107)
 
- 	/* video hardware */
+	MDRV_K056230_ADD("k056230", zr107_k056230_intf)
+
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -789,11 +791,13 @@ static MACHINE_DRIVER_START( jetwave )
 
 	MDRV_QUANTUM_TIME(HZ(30000))
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 	MDRV_MACHINE_START(zr107)
 	MDRV_MACHINE_RESET(zr107)
 
- 	/* video hardware */
+	MDRV_K056230_ADD("k056230", zr107_k056230_intf)
+
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)

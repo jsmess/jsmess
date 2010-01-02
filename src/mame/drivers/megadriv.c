@@ -436,7 +436,7 @@ static void write_cram_value(running_machine *machine, int offset, int data)
 	if (genvdp_use_cram)
 	{
 		int r,g,b;
-	  	r = ((data >> 1)&0x07);
+		r = ((data >> 1)&0x07);
 		g = ((data >> 5)&0x07);
 		b = ((data >> 9)&0x07);
 		palette_set_color_rgb(machine,offset,pal3bit(r),pal3bit(g),pal3bit(b));
@@ -518,8 +518,8 @@ static void megadriv_vdp_data_port_w(running_machine *machine, int data)
 	else
 	{
 
- 		switch (megadrive_vdp_code & 0x000f)
-	 	{
+		switch (megadrive_vdp_code & 0x000f)
+		{
 			case 0x0000:
 				logerror("Attempting to WRITE to DATA PORT in VRAM READ MODE\n");
 				break;
@@ -1016,8 +1016,8 @@ static UINT16 megadriv_vdp_data_port_r(running_machine *machine)
 
 	megadrive_vdp_command_pending = 0;
 
- 	switch (megadrive_vdp_code & 0x000f)
- 	{
+	switch (megadrive_vdp_code & 0x000f)
+	{
 		case 0x0000:
 			retdata = vdp_vram_r();
 			megadrive_vdp_address+=MEGADRIVE_REG0F_AUTO_INC;
@@ -5101,7 +5101,7 @@ static void genesis_render_videoline_to_videobuffer(int scanline)
 					else if (spritedata==0x3f)
 					{
 						/* This is a Shadow operator set shadow bit */
-						video_renderline[x] = video_renderline[x]|=0x2000;
+						video_renderline[x] = video_renderline[x]|0x2000;
 					}
 					else
 					{
@@ -6252,7 +6252,7 @@ static void megadriv_init_common(running_machine *machine)
 	_genesis_snd_z80_cpu = cputag_get_cpu(machine, "genesis_snd_z80");
 	if (_genesis_snd_z80_cpu != NULL)
 	{
-		printf("GENESIS Sound Z80 cpu found %d\n", cpu_get_index(_genesis_snd_z80_cpu) );
+		//printf("GENESIS Sound Z80 cpu found %d\n", cpu_get_index(_genesis_snd_z80_cpu) );
 
 		genz80.z80_prgram = auto_alloc_array(machine, UINT8, 0x2000);
 		memory_set_bankptr(machine,  "bank1", genz80.z80_prgram );

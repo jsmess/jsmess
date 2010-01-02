@@ -2,8 +2,8 @@
 
     rspdrc.c
 
-	Universal machine language-based Nintendo/SGI RSP emulator.
-	Written by Harmony of the MESS team.
+    Universal machine language-based Nintendo/SGI RSP emulator.
+    Written by Harmony of the MESS team.
 
     Copyright the MESS team.
     Released for general non-commercial use under the MAME license
@@ -39,7 +39,6 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 #define LOG_UML							(0)
 #define LOG_NATIVE						(0)
 
-#define DISABLE_FAST_REGISTERS			(0)
 #define SINGLE_INSTRUCTION_MODE			(0)
 
 #define DRC_LSV							(1)
@@ -47,12 +46,13 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 #define DRC_LDV							(1)
 #define DRC_LQV							(1)
 #define DRC_LPV							(1)
-#define DRC_LUV							(1)
+#define DRC_LUV							(0)
 
 #define DRC_SSV							(1)
 #define DRC_SLV							(1)
 #define DRC_SDV							(1)
 #define DRC_SQV							(1)
+#define DRC_SPV							(0) // Todo
 
 #define DRC_VMUDL						(0)
 #define DRC_VMUDM						(0)
@@ -60,12 +60,12 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 #define DRC_VMADN						(0)
 #define DRC_VMADH						(0)
 #define DRC_VADD						(0)
-#define DRC_VAND						(1)
-#define DRC_VNAND						(1)
-#define DRC_VOR							(1)
-#define DRC_VNOR						(1)
-#define DRC_VXOR						(1)
-#define DRC_VNXOR						(1)
+#define DRC_VAND						(0)
+#define DRC_VNAND						(0)
+#define DRC_VOR							(0)
+#define DRC_VNOR						(0)
+#define DRC_VXOR						(0)
+#define DRC_VNXOR						(0)
 
 
 /***************************************************************************
@@ -236,7 +236,9 @@ static void cfunc_rsp_sdv(void *param);
 static void cfunc_rsp_sqv(void *param);
 #endif
 static void cfunc_rsp_srv(void *param);
+#if !(DRC_SPV)
 static void cfunc_rsp_spv(void *param);
+#endif
 static void cfunc_rsp_suv(void *param);
 static void cfunc_rsp_shv(void *param);
 static void cfunc_rsp_sfv(void *param);
@@ -546,12 +548,12 @@ void rspdrc_add_dmem(const device_config *device, void *base)
     debugging
 -------------------------------------------------*/
 
-static void cfunc_printf_debug(void *param)
-{
-	rsp_state *rsp = (rsp_state *)param;
-	printf(rsp->impstate->format, rsp->impstate->arg0, rsp->impstate->arg1);
-	logerror(rsp->impstate->format, rsp->impstate->arg0, rsp->impstate->arg1);
-}
+//static void cfunc_printf_debug(void *param)
+//{
+//  rsp_state *rsp = (rsp_state *)param;
+//  printf(rsp->impstate->format, rsp->impstate->arg0, rsp->impstate->arg1);
+//  logerror(rsp->impstate->format, rsp->impstate->arg0, rsp->impstate->arg1);
+//}
 
 
 /*-------------------------------------------------
@@ -561,9 +563,9 @@ static void cfunc_printf_debug(void *param)
 
 //static void cfunc_printf_debug64(void *param)
 //{
-//	rsp_state *rsp = (rsp_state *)param;
-//	printf(rsp->impstate->format, (UINT32)(rsp->impstate->arg64 >> 32), (UINT32)(rsp->impstate->arg64 & 0x00000000ffffffff));
-//	logerror(rsp->impstate->format, (UINT32)(rsp->impstate->arg64 >> 32), (UINT32)(rsp->impstate->arg64 & 0x00000000ffffffff));
+//  rsp_state *rsp = (rsp_state *)param;
+//  printf(rsp->impstate->format, (UINT32)(rsp->impstate->arg64 >> 32), (UINT32)(rsp->impstate->arg64 & 0x00000000ffffffff));
+//  logerror(rsp->impstate->format, (UINT32)(rsp->impstate->arg64 >> 32), (UINT32)(rsp->impstate->arg64 & 0x00000000ffffffff));
 //}
 
 
@@ -1071,10 +1073,8 @@ static void cfunc_rsp_lpv(void *param)
 
 	for (i=0; i < 8; i++)
 	{
-		printf("%08x ", READ8(rsp, ea + (((16-index) + i) & 0xf)) << 8);
 		W_VREG_S(dest, i, READ8(rsp, ea + (((16-index) + i) & 0xf)) << 8);
 	}
-	printf("\n");
 }
 #endif
 
@@ -1291,9 +1291,7 @@ static int generate_lwc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 
 			index = 7 - index;
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
-			UML_SHR(block, IREG(0), IREG(0), IMM(1));								// shr     i0,i0,1
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE_XOR_BE(0)));					// xor     i0,i0,bytexor
-			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), WORD);			// load    i0,dmem,i0,word
+			UML_CALLH(block, rsp->impstate->read16);								// callh   read32
 			UML_STORE(block, &rsp->v[dest].s[index], IMM(0), IREG(0), WORD);		// store   v[dest][index],i0,word
 			return TRUE;
 #else
@@ -1308,7 +1306,7 @@ static int generate_lwc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
 			UML_CALLH(block, rsp->impstate->read32);								// callh   read32
-			UML_MOV(block, VLX(dest, index), IREG(0));								// mov     v[dest]index].i0
+			UML_MOV(block, VLX(dest, index), IREG(0));								// mov     v[dest][index].i0
 			return TRUE;
 #else
 			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
@@ -1322,12 +1320,12 @@ static int generate_lwc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
 			UML_CALLH(block, rsp->impstate->read32);								// callh   read32
-			UML_MOV(block, VLX(dest, index), IREG(0));								// mov     v[dest][index-1],i0
+			UML_MOV(block, VLX(dest, index), IREG(0));								// mov     v[dest][index],i0
 
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
 			UML_ADD(block, IREG(0), IREG(0), IMM(4));								// add     i0,i0,4
 			UML_CALLH(block, rsp->impstate->read32);								// callh   read32
-			UML_MOV(block, VLX(dest, index+1), IREG(0));								// mov     v[dest][index],i0
+			UML_MOV(block, VLX(dest, index+1), IREG(0));							// mov     v[dest][index+1],i0
 			return TRUE;
 #else
 			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
@@ -1457,13 +1455,13 @@ static int generate_lwc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 		case 0x07:		/* LUV */
 #if (DRC_LUV)
 	/*
-	ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+    ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
 
-	for (i=0; i < 8; i++)
-	{
-		W_VREG_S(dest, i, READ8(rsp, ea + (((16-index) + i) & 0xf)) << 7);
-	}
-	*/
+    for (i=0; i < 8; i++)
+    {
+        W_VREG_S(dest, i, READ8(rsp, ea + (((16-index) + i) & 0xf)) << 7);
+    }
+    */
 			offset <<= 3;
 
 			UML_ADD(block, IREG(2), R32(RSREG), IMM(offset));						// add     i2,<rsreg>,offset
@@ -1471,56 +1469,64 @@ static int generate_lwc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 
 			UML_AND(block, IREG(1), IREG(3), IMM(0x0000000f));						// and     i1,i1,0x0000000f
 			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
-			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));					// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);			// load    i0,dmem,i0,byte
 			UML_SHL(block, IREG(0), IREG(0), IMM(7));								// shl     i0,i0,8
 			UML_STORE(block, &rsp->v[dest].s[7], IMM(0), IREG(0), WORD);			// store   v[dest][7],i0,word
 
 			UML_ADD(block, IREG(1), IREG(3), IMM(1));								// add     i1,i3,1
 			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
 			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
-			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));					// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);			// load    i0,dmem,i0,byte
 			UML_SHL(block, IREG(0), IREG(0), IMM(7));								// shl     i0,i0,8
 			UML_STORE(block, &rsp->v[dest].s[6], IMM(0), IREG(0), WORD);			// store   v[dest][6],i0,word
 
 			UML_ADD(block, IREG(1), IREG(3), IMM(2));								// add     i1,i3,2
 			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
 			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
-			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));					// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);			// load    i0,dmem,i0,byte
 			UML_SHL(block, IREG(0), IREG(0), IMM(7));								// shl     i0,i0,8
 			UML_STORE(block, &rsp->v[dest].s[5], IMM(0), IREG(0), WORD);			// store   v[dest][5],i0,word
 
 			UML_ADD(block, IREG(1), IREG(3), IMM(3));								// add     i1,i3,3
 			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
 			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
-			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));					// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);			// load    i0,dmem,i0,byte
 			UML_SHL(block, IREG(0), IREG(0), IMM(7));								// shl     i0,i0,8
 			UML_STORE(block, &rsp->v[dest].s[4], IMM(0), IREG(0), WORD);			// store   v[dest][4],i0,word
 
 			UML_ADD(block, IREG(1), IREG(3), IMM(4));								// add     i1,i3,4
 			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
 			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
-			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));					// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);			// load    i0,dmem,i0,byte
 			UML_SHL(block, IREG(0), IREG(0), IMM(7));								// shl     i0,i0,8
 			UML_STORE(block, &rsp->v[dest].s[3], IMM(0), IREG(0), WORD);			// store   v[dest][3],i0,word
 
 			UML_ADD(block, IREG(1), IREG(3), IMM(5));								// add     i1,i3,5
 			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
 			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
-			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));					// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);			// load    i0,dmem,i0,byte
 			UML_SHL(block, IREG(0), IREG(0), IMM(7));								// shl     i0,i0,8
 			UML_STORE(block, &rsp->v[dest].s[2], IMM(0), IREG(0), WORD);			// store   v[dest][2],i0,word
 
 			UML_ADD(block, IREG(1), IREG(3), IMM(6));								// add     i1,i3,6
 			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
 			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
-			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));					// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);			// load    i0,dmem,i0,byte
 			UML_SHL(block, IREG(0), IREG(0), IMM(7));								// shl     i0,i0,8
 			UML_STORE(block, &rsp->v[dest].s[1], IMM(0), IREG(0), WORD);			// store   v[dest][1],i0,word
 
 			UML_ADD(block, IREG(1), IREG(3), IMM(7));								// add     i1,i3,7
 			UML_AND(block, IREG(1), IREG(1), IMM(0x0000000f));						// and     i1,i1,0x0000000f
 			UML_ADD(block, IREG(0), IREG(1), IREG(2));								// add     i0,i1,i2
-			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));					// xor     i0,i0,bytexor
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);			// load    i0,dmem,i0,byte
 			UML_SHL(block, IREG(0), IREG(0), IMM(7));								// shl     i0,i0,8
 			UML_STORE(block, &rsp->v[dest].s[0], IMM(0), IREG(0), WORD);			// store   v[dest][0],i0,word
 			return TRUE;
@@ -1731,6 +1737,7 @@ static void cfunc_rsp_srv(void *param)
 			}
 }
 
+#if !(DRC_SPV)
 static void cfunc_rsp_spv(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
@@ -1769,6 +1776,7 @@ static void cfunc_rsp_spv(void *param)
 				ea++;
 			}
 }
+#endif
 
 static void cfunc_rsp_suv(void *param)
 {
@@ -1992,10 +2000,10 @@ static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 			offset <<= 1;
 			index >>= 1;
 
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
-			UML_SHR(block, IREG(0), IREG(0), IMM(1));								// shr     i0,i0,1
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE_XOR_BE(0)));					// xor     i0,i0,byte4xor
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), VSX(dest, index), WORD);	// store   dmem,i0,v[dest].s[index],word
+			index = 7 - index;
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));				// add     i0,<rsreg>,offset
+			UML_LOAD(block, IREG(1), &rsp->v[dest].s[index], IMM(0), WORD);	// load    i1,v[dest].b[0],0,byte
+			UML_CALLH(block, rsp->impstate->write16);						// callh   read32
 			return TRUE;
 #else
 			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
@@ -2007,9 +2015,9 @@ static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 			offset <<= 2;
 			index >>= 2;
 
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
-			UML_MOV(block, IREG(1), VLX(dest, index));								// mov     i1,<rtreg>
-			UML_CALLH(block, rsp->impstate->write32);								// callh   write32
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));							// add     i0,<rsreg>,offset
+			UML_MOV(block, IREG(1), VLX(dest, index));									// mov     i1,v[dest].l[index]
+			UML_CALLH(block, rsp->impstate->write32);									// callh   read32
 			return TRUE;
 #else
 			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
@@ -2021,14 +2029,14 @@ static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 			offset <<= 3;
 			index >>= 2;
 
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
-			UML_MOV(block, IREG(1), VLX(dest, index));								// mov     i1,<rtreg>
-			UML_CALLH(block, rsp->impstate->write32);								// callh   write32
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));							// add     i0,<rsreg>,offset
+			UML_MOV(block, IREG(1), VLX(dest, index));									// mov     i1,v[dest].l[index]
+			UML_CALLH(block, rsp->impstate->write32);									// callh   write32
 
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));						// add     i0,<rsreg>,offset
-			UML_ADD(block, IREG(0), IREG(0), IMM(4));								// add     i0,i0,4
-			UML_MOV(block, IREG(1), VLX(dest, index+1));								// mov     i1,<rtreg>
-			UML_CALLH(block, rsp->impstate->write32);								// callh   write32
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));							// add     i0,<rsreg>,offset
+			UML_ADD(block, IREG(0), IREG(0), IMM(4));									// add     i0,i0,4
+			UML_MOV(block, IREG(1), VLX(dest, index+1));								// mov     i1,v[dest].l[index+1]
+			UML_CALLH(block, rsp->impstate->write32);									// callh   write32
 			return TRUE;
 #else
 			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
@@ -2051,9 +2059,10 @@ static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 
 		UML_LABEL(block, loopdest = compiler->labelnum++);							// loopdest:
 			UML_MOV(block, IREG(0), MEM(&rsp->impstate->arg0));						// mov     i0,arg0
+			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));					// xor     i0,i0,byte4xor
 			UML_SUB(block, IREG(1), IMM(15), IREG(3));								// sub     i1,15,i3
 			UML_LOAD(block, IREG(1), &rsp->v[dest].b[0], IREG(1), BYTE);			// load    i1,v[dest].b[0],i1,byte
-			UML_CALLH(block, rsp->impstate->write8);								// callh   read8
+			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);			// store   dmem,i0,i1,byte
 
 			UML_ADD(block, MEM(&rsp->impstate->arg0), MEM(&rsp->impstate->arg0), IMM(1));
 			UML_ADD(block, IREG(3), IREG(3), IMM(1));								// add     i3,i3,1
@@ -2070,8 +2079,11 @@ static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 			UML_CALLC(block, cfunc_rsp_srv, rsp);
 			return TRUE;
 		case 0x06:		/* SPV */
+#if (DRC_SPV)
+#else
 			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_spv, rsp);
+#endif
 			return TRUE;
 		case 0x07:		/* SUV */
 			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
@@ -2105,23 +2117,31 @@ static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 #if (DRC_VMADN)
 static void generate_saturate_accum_unsigned(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int accum)
 {
-	int skip, skip2;
+	/*
+    int skip, skip2;
 
-	UML_CMP(block, VACCUMWMH(accum), IMM(-32768));
-	UML_JMPc(block, IF_GE, skip = compiler->labelnum++);
-	UML_MOV(block, IREG(0), IMM(0));
-	UML_JMP(block, skip2 = compiler->labelnum++);
+    UML_CMP(block, VACCUMWMH(accum), IMM(-32768));
+    UML_JMPc(block, IF_GE, skip = compiler->labelnum++);
+    UML_MOV(block, IREG(0), IMM(0));
+    UML_JMP(block, skip2 = compiler->labelnum++);
 
-	UML_LABEL(block, skip);
-	UML_CMP(block, VACCUMWMH(accum), IMM(32767));
-	UML_JMPc(block, IF_L, skip = compiler->labelnum++);
-	UML_MOV(block, IREG(0), IMM(0x0000ffff));
-	UML_JMP(block, skip2);
+    UML_LABEL(block, skip);
+    UML_CMP(block, VACCUMWMH(accum), IMM(32767));
+    UML_JMPc(block, IF_L, skip = compiler->labelnum++);
+    UML_MOV(block, IREG(0), IMM(0x0000ffff));
+    UML_JMP(block, skip2);
 
-	UML_LABEL(block, skip);
+    UML_LABEL(block, skip);
+    UML_SEXT(block, IREG(0), VACCUMHL(accum), WORD);
+    UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff));
+    UML_LABEL(block, skip2);
+    */
 	UML_SEXT(block, IREG(0), VACCUMHL(accum), WORD);
 	UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff));
-	UML_LABEL(block, skip2);
+	UML_CMP(block, VACCUMWMH(accum), IMM(-32768));
+	UML_MOVc(block, IF_L, IREG(0), IMM(0));
+	UML_CMP(block, VACCUMWMH(accum), IMM(32767));
+	UML_MOVc(block, IF_GE, IREG(0), IMM(0x0000ffff));
 }
 #endif
 
@@ -2177,7 +2197,7 @@ INLINE UINT16 SATURATE_ACCUM_SIGNED(rsp_state *rsp, int accum)
 	return ACCUM(accum).h.mid;
 }
 
-#define WRITEBACK_RESULT() 					\
+#define WRITEBACK_RESULT()					\
 	do {									\
 		W_VREG_S_X(VDREG, 7, vres[0]);			\
 		W_VREG_S_X(VDREG, 6, vres[1]);			\
@@ -2251,54 +2271,54 @@ INLINE void cfunc_rsp_vmulf(void *param)
 
 	switch(EL)
 	{
-  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VMULF(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VMULF(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VMULF(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			break;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VMULF(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			break;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VMULF(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			break;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VMULF(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			break;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VMULF(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			break;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VMULF(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			break;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VMULF(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			break;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VMULF(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			break;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VMULF(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			break;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VMULF(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			break;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VMULF(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			break;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VMULF(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			break;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VMULF(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			break;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VMULF(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
+		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VMULF(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VMULF(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VMULF(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			break;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VMULF(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			break;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VMULF(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			break;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VMULF(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			break;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VMULF(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			break;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VMULF(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			break;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VMULF(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			break;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VMULF(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			break;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VMULF(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			break;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VMULF(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			break;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VMULF(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			break;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VMULF(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			break;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VMULF(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			break;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VMULF(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
 	}
 
 	WRITEBACK_RESULT();
@@ -2351,86 +2371,86 @@ INLINE void cfunc_rsp_vmulu(void *param)
 
 #define RSP_VMUDL_DRC(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
 	{ \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I0), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E20), WORD); \
- 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I0), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E20), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DAND(block, IREG(0), IREG(0), IMM(0x00000000ffff0000)); \
 		UML_DMOV(block, VACCUML(E10), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I1), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E21), WORD); \
- 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I1), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E21), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DAND(block, IREG(0), IREG(0), IMM(0x00000000ffff0000)); \
 		UML_DMOV(block, VACCUML(E11), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I2), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E22), WORD); \
- 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I2), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E22), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DAND(block, IREG(0), IREG(0), IMM(0x00000000ffff0000)); \
 		UML_DMOV(block, VACCUML(E12), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I3), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E23), WORD); \
- 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I3), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E23), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DAND(block, IREG(0), IREG(0), IMM(0x00000000ffff0000)); \
 		UML_DMOV(block, VACCUML(E13), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I4), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E24), WORD); \
- 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I4), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E24), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DAND(block, IREG(0), IREG(0), IMM(0x00000000ffff0000)); \
 		UML_DMOV(block, VACCUML(E14), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I5), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E25), WORD); \
- 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I5), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E25), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DAND(block, IREG(0), IREG(0), IMM(0x00000000ffff0000)); \
 		UML_DMOV(block, VACCUML(E15), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I6), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E26), WORD); \
- 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I6), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E26), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DAND(block, IREG(0), IREG(0), IMM(0x00000000ffff0000)); \
 		UML_DMOV(block, VACCUML(E16), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I7), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E27), WORD); \
- 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I7), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E27), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DAND(block, IREG(0), IREG(0), IMM(0x00000000ffff0000)); \
 		UML_DMOV(block, VACCUML(E17), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(0), VACCUMHL(E10), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
- 		UML_SEXT(block, IREG(0), VACCUMHL(E11), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
- 		UML_SEXT(block, IREG(0), VACCUMHL(E12), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
- 		UML_SEXT(block, IREG(0), VACCUMHL(E13), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
- 		UML_SEXT(block, IREG(0), VACCUMHL(E14), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
- 		UML_SEXT(block, IREG(0), VACCUMHL(E15), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
- 		UML_SEXT(block, IREG(0), VACCUMHL(E16), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
- 		UML_SEXT(block, IREG(0), VACCUMHL(E17), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
+		UML_SEXT(block, IREG(0), VACCUMHL(E10), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
+		UML_SEXT(block, IREG(0), VACCUMHL(E11), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
+		UML_SEXT(block, IREG(0), VACCUMHL(E12), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
+		UML_SEXT(block, IREG(0), VACCUMHL(E13), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
+		UML_SEXT(block, IREG(0), VACCUMHL(E14), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
+		UML_SEXT(block, IREG(0), VACCUMHL(E15), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
+		UML_SEXT(block, IREG(0), VACCUMHL(E16), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
+		UML_SEXT(block, IREG(0), VACCUMHL(E17), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
 	}
 
 static int generate_vmudl(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)	// vmudl
@@ -2447,54 +2467,54 @@ static int generate_vmudl(rsp_state *rsp, drcuml_block *block, compiler_state *c
 	// The middle slice of accumulator is stored into destination element
 	switch(EL)
 	{
-  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VMUDL_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VMUDL_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VMUDL_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			return TRUE;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VMUDL_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			return TRUE;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VMUDL_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			return TRUE;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VMUDL_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			return TRUE;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VMUDL_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			return TRUE;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VMUDL_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			return TRUE;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VMUDL_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			return TRUE;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VMUDL_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			return TRUE;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VMUDL_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			return TRUE;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VMUDL_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			return TRUE;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VMUDL_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			return TRUE;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VMUDL_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			return TRUE;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VMUDL_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			return TRUE;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VMUDL_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
+		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VMUDL_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VMUDL_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VMUDL_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			return TRUE;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VMUDL_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			return TRUE;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VMUDL_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			return TRUE;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VMUDL_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			return TRUE;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VMUDL_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			return TRUE;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VMUDL_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			return TRUE;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VMUDL_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			return TRUE;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VMUDL_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			return TRUE;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VMUDL_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			return TRUE;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VMUDL_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			return TRUE;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VMUDL_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			return TRUE;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VMUDL_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			return TRUE;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VMUDL_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			return TRUE;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VMUDL_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
 	}
 
 	return TRUE;
@@ -2510,20 +2530,29 @@ static int generate_vmudl(rsp_state *rsp, drcuml_block *block, compiler_state *c
 		ACCUM(E15).l = (((UINT32)(UINT16)R_VREG_S(VS1REG, E15) * (UINT32)(UINT16)R_VREG_S(VS2REG, E25)) & 0xffff0000); \
 		ACCUM(E16).l = (((UINT32)(UINT16)R_VREG_S(VS1REG, E16) * (UINT32)(UINT16)R_VREG_S(VS2REG, E26)) & 0xffff0000); \
 		ACCUM(E17).l = (((UINT32)(UINT16)R_VREG_S(VS1REG, E17) * (UINT32)(UINT16)R_VREG_S(VS2REG, E27)) & 0xffff0000); \
-		W_VREG_S(VDREG, E10, ACCUM(E10).h.low);			\
-		W_VREG_S(VDREG, E11, ACCUM(E11).h.low);			\
-		W_VREG_S(VDREG, E12, ACCUM(E12).h.low);			\
-		W_VREG_S(VDREG, E13, ACCUM(E13).h.low);			\
-		W_VREG_S(VDREG, E14, ACCUM(E14).h.low);			\
-		W_VREG_S(VDREG, E15, ACCUM(E15).h.low);			\
-		W_VREG_S(VDREG, E16, ACCUM(E16).h.low);			\
-		W_VREG_S(VDREG, E17, ACCUM(E17).h.low);			\
+		vres[E10] = ACCUM(E10).h.low; \
+		vres[E11] = ACCUM(E11).h.low; \
+		vres[E12] = ACCUM(E12).h.low; \
+		vres[E13] = ACCUM(E13).h.low; \
+		vres[E14] = ACCUM(E14).h.low; \
+		vres[E15] = ACCUM(E15).h.low; \
+		vres[E16] = ACCUM(E16).h.low; \
+		vres[E17] = ACCUM(E17).h.low; \
+		W_VREG_S_X(VDREG, 7, vres[0]);			\
+		W_VREG_S_X(VDREG, 6, vres[1]);			\
+		W_VREG_S_X(VDREG, 5, vres[2]);			\
+		W_VREG_S_X(VDREG, 4, vres[3]);			\
+		W_VREG_S_X(VDREG, 3, vres[4]);			\
+		W_VREG_S_X(VDREG, 2, vres[5]);			\
+		W_VREG_S_X(VDREG, 1, vres[6]);			\
+		W_VREG_S_X(VDREG, 0, vres[7]);			\
 	}
 
 INLINE void cfunc_rsp_vmudl(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
+	INT16 vres[8] = { 0 };
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
 	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001101 |
@@ -2535,54 +2564,54 @@ INLINE void cfunc_rsp_vmudl(void *param)
 
 	switch(EL)
 	{
-  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VMUDL(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VMUDL(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VMUDL(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
-  			break;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VMUDL(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
-  			break;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VMUDL(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
-  			break;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VMUDL(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
-  			break;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VMUDL(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
-  			break;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VMUDL(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
-  			break;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VMUDL(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  			break;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VMUDL(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-  			break;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VMUDL(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-  			break;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VMUDL(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-  			break;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VMUDL(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-  			break;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VMUDL(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
-  			break;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VMUDL(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
-  			break;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VMUDL(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-  			break;
+		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VMUDL(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VMUDL(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VMUDL(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+			break;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VMUDL(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+			break;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VMUDL(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+			break;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VMUDL(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+			break;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VMUDL(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+			break;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VMUDL(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+			break;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VMUDL(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+			break;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VMUDL(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+			break;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VMUDL(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+			break;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VMUDL(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+			break;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VMUDL(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+			break;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VMUDL(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+			break;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VMUDL(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+			break;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VMUDL(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+			break;
 	}
 }
 #endif
@@ -2594,86 +2623,86 @@ INLINE void cfunc_rsp_vmudl(void *param)
 
 #define RSP_VMUDM_DRC(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
 	{ \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I0), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E20), WORD); \
- 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I0), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E20), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DMOV(block, VACCUML(E10), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I1), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E21), WORD); \
- 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I1), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E21), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DMOV(block, VACCUML(E11), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I2), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E22), WORD); \
- 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I2), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E22), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DMOV(block, VACCUML(E12), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I3), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E23), WORD); \
- 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I3), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E23), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DMOV(block, VACCUML(E13), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I4), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E24), WORD); \
- 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I4), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E24), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DMOV(block, VACCUML(E14), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I5), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E25), WORD); \
- 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I5), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E25), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DMOV(block, VACCUML(E15), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I6), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E26), WORD); \
- 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I6), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E26), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DMOV(block, VACCUML(E16), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I7), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E27), WORD); \
- 		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I7), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E27), WORD); \
+		UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DMOV(block, VACCUML(E17), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(0), VACCUMHM(E10), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
- 		UML_SEXT(block, IREG(0), VACCUMHM(E11), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
- 		UML_SEXT(block, IREG(0), VACCUMHM(E12), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
- 		UML_SEXT(block, IREG(0), VACCUMHM(E13), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
- 		UML_SEXT(block, IREG(0), VACCUMHM(E14), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
- 		UML_SEXT(block, IREG(0), VACCUMHM(E15), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
- 		UML_SEXT(block, IREG(0), VACCUMHM(E16), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
- 		UML_SEXT(block, IREG(0), VACCUMHM(E17), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
+		UML_SEXT(block, IREG(0), VACCUMHM(E10), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
+		UML_SEXT(block, IREG(0), VACCUMHM(E11), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
+		UML_SEXT(block, IREG(0), VACCUMHM(E12), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
+		UML_SEXT(block, IREG(0), VACCUMHM(E13), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
+		UML_SEXT(block, IREG(0), VACCUMHM(E14), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
+		UML_SEXT(block, IREG(0), VACCUMHM(E15), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
+		UML_SEXT(block, IREG(0), VACCUMHM(E16), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
+		UML_SEXT(block, IREG(0), VACCUMHM(E17), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
 	}
 
 static int generate_vmudm(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)	// vmudl
@@ -2690,54 +2719,54 @@ static int generate_vmudm(rsp_state *rsp, drcuml_block *block, compiler_state *c
 	// The middle slice of accumulator is stored into destination element
 	switch(EL)
 	{
-  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VMUDM_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VMUDM_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VMUDM_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			return TRUE;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VMUDM_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			return TRUE;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VMUDM_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			return TRUE;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VMUDM_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			return TRUE;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VMUDM_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			return TRUE;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VMUDM_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			return TRUE;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VMUDM_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			return TRUE;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VMUDM_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			return TRUE;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VMUDM_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			return TRUE;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VMUDM_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			return TRUE;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VMUDM_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			return TRUE;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VMUDM_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			return TRUE;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VMUDM_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			return TRUE;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VMUDM_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
+		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VMUDM_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VMUDM_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VMUDM_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			return TRUE;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VMUDM_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			return TRUE;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VMUDM_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			return TRUE;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VMUDM_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			return TRUE;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VMUDM_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			return TRUE;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VMUDM_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			return TRUE;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VMUDM_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			return TRUE;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VMUDM_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			return TRUE;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VMUDM_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			return TRUE;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VMUDM_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			return TRUE;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VMUDM_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			return TRUE;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VMUDM_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			return TRUE;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VMUDM_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			return TRUE;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VMUDM_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
 	}
 
 	return TRUE;
@@ -2753,20 +2782,29 @@ static int generate_vmudm(rsp_state *rsp, drcuml_block *block, compiler_state *c
 		ACCUM(E15).l = (INT64)((INT32)(INT16)R_VREG_S_X(VS1REG, I5) * (UINT16)R_VREG_S_X(VS2REG, E25)) << 16; \
 		ACCUM(E16).l = (INT64)((INT32)(INT16)R_VREG_S_X(VS1REG, I6) * (UINT16)R_VREG_S_X(VS2REG, E26)) << 16; \
 		ACCUM(E17).l = (INT64)((INT32)(INT16)R_VREG_S_X(VS1REG, I7) * (UINT16)R_VREG_S_X(VS2REG, E27)) << 16; \
-		W_VREG_S_X(VDREG, I0, ACCUM(E10).h.mid);			\
-		W_VREG_S_X(VDREG, I1, ACCUM(E11).h.mid);			\
-		W_VREG_S_X(VDREG, I2, ACCUM(E12).h.mid);			\
-		W_VREG_S_X(VDREG, I3, ACCUM(E13).h.mid);			\
-		W_VREG_S_X(VDREG, I4, ACCUM(E14).h.mid);			\
-		W_VREG_S_X(VDREG, I5, ACCUM(E15).h.mid);			\
-		W_VREG_S_X(VDREG, I6, ACCUM(E16).h.mid);			\
-		W_VREG_S_X(VDREG, I7, ACCUM(E17).h.mid);			\
+		vres[E10] = ACCUM(E10).h.mid; \
+		vres[E11] = ACCUM(E11).h.mid; \
+		vres[E12] = ACCUM(E12).h.mid; \
+		vres[E13] = ACCUM(E13).h.mid; \
+		vres[E14] = ACCUM(E14).h.mid; \
+		vres[E15] = ACCUM(E15).h.mid; \
+		vres[E16] = ACCUM(E16).h.mid; \
+		vres[E17] = ACCUM(E17).h.mid; \
+		W_VREG_S_X(VDREG, 7, vres[0]);			\
+		W_VREG_S_X(VDREG, 6, vres[1]);			\
+		W_VREG_S_X(VDREG, 5, vres[2]);			\
+		W_VREG_S_X(VDREG, 4, vres[3]);			\
+		W_VREG_S_X(VDREG, 3, vres[4]);			\
+		W_VREG_S_X(VDREG, 2, vres[5]);			\
+		W_VREG_S_X(VDREG, 1, vres[6]);			\
+		W_VREG_S_X(VDREG, 0, vres[7]);			\
 	}
 
 INLINE void cfunc_rsp_vmudm(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
+	INT16 vres[8] = { 0 };
 	//int i;
 	// 31       25  24     20      15      10      5        0
 	// ------------------------------------------------------
@@ -2779,73 +2817,73 @@ INLINE void cfunc_rsp_vmudm(void *param)
 
 	switch(EL)
 	{
-  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VMUDM(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VMUDM(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VMUDM(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			break;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VMUDM(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			break;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VMUDM(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			break;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VMUDM(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			break;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VMUDM(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			break;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VMUDM(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			break;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VMUDM(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			break;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VMUDM(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			break;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VMUDM(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			break;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VMUDM(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			break;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VMUDM(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			break;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VMUDM(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			break;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VMUDM(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			break;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VMUDM(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
+		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VMUDM(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VMUDM(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VMUDM(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			break;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VMUDM(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			break;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VMUDM(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			break;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VMUDM(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			break;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VMUDM(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			break;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VMUDM(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			break;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VMUDM(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			break;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VMUDM(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			break;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VMUDM(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			break;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VMUDM(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			break;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VMUDM(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			break;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VMUDM(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			break;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VMUDM(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			break;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VMUDM(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
 	}
 
 	/*
-	for (i=0; i < 8; i++)
-	{
-		int del = VEC_EL_1(EL, i);
-		int sel = VEC_EL_2(EL, del);
-		INT32 s1 = (INT32)(INT16)R_VREG_S(VS1REG, del);
-		INT32 s2 = (UINT16)R_VREG_S(VS2REG, sel);	// not sign-extended
-		INT32 r =  s1 * s2;
+    for (i=0; i < 8; i++)
+    {
+        int del = VEC_EL_1(EL, i);
+        int sel = VEC_EL_2(EL, del);
+        INT32 s1 = (INT32)(INT16)R_VREG_S(VS1REG, del);
+        INT32 s2 = (UINT16)R_VREG_S(VS2REG, sel);   // not sign-extended
+        INT32 r =  s1 * s2;
 
-		W_ACCUM_H(del, (r < 0) ? 0xffff : 0);		// sign-extend to 48-bit
-		W_ACCUM_M(del, (INT16)(r >> 16));
-		W_ACCUM_L(del, (UINT16)(r));
+        W_ACCUM_H(del, (r < 0) ? 0xffff : 0);       // sign-extend to 48-bit
+        W_ACCUM_M(del, (INT16)(r >> 16));
+        W_ACCUM_L(del, (UINT16)(r));
 
-		vres[del] = ACCUM(del).h.mid;
-	}
-	WRITEBACK_RESULT();
-	*/
+        vres[del] = ACCUM(del).h.mid;
+    }
+    WRITEBACK_RESULT();
+    */
 }
 #endif
 
@@ -2884,54 +2922,54 @@ INLINE void cfunc_rsp_vmudn(void *param)
 
 	switch(EL)
 	{
-  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VMUDN(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VMUDN(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VMUDN(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
-  			break;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VMUDN(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
-  			break;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VMUDN(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
-  			break;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VMUDN(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
-  			break;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VMUDN(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
-  			break;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VMUDN(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
-  			break;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VMUDN(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  			break;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VMUDN(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-  			break;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VMUDN(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-  			break;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VMUDN(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-  			break;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VMUDN(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-  			break;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VMUDN(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
-  			break;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VMUDN(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
-  			break;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VMUDN(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-  			break;
+		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VMUDN(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VMUDN(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VMUDN(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+			break;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VMUDN(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+			break;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VMUDN(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+			break;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VMUDN(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+			break;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VMUDN(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+			break;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VMUDN(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+			break;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VMUDN(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+			break;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VMUDN(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+			break;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VMUDN(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+			break;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VMUDN(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+			break;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VMUDN(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+			break;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VMUDN(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+			break;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VMUDN(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+			break;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VMUDN(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+			break;
 	}
 }
 
@@ -3013,54 +3051,54 @@ INLINE void cfunc_rsp_vmacf(void *param)
 
 	switch(EL)
 	{
-  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VMACF(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VMACF(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VMACF(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
-  			break;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VMACF(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
-  			break;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VMACF(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
-  			break;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VMACF(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
-  			break;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VMACF(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
-  			break;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VMACF(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
-  			break;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VMACF(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  			break;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VMACF(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-  			break;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VMACF(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-  			break;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VMACF(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-  			break;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VMACF(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-  			break;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VMACF(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
-  			break;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VMACF(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
-  			break;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VMACF(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-  			break;
+		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VMACF(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VMACF(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VMACF(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+			break;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VMACF(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+			break;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VMACF(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+			break;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VMACF(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+			break;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VMACF(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+			break;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VMACF(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+			break;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VMACF(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+			break;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VMACF(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+			break;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VMACF(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+			break;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VMACF(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+			break;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VMACF(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+			break;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VMACF(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+			break;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VMACF(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+			break;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VMACF(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+			break;
 	}
 #if 0
 	for (i=0; i < 8; i++)
@@ -3180,86 +3218,86 @@ INLINE void cfunc_rsp_vmadl(void *param)
 
 #define RSP_VMADM_DRC(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
 	{ \
- 		UML_SEXT(block, IREG(0), VS(VS1REG, I0), WORD); \
- 		UML_SEXT(block, IREG(1), VS(VS2REG, E20), WORD); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I0), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E20), WORD); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DADD(block, VACCUML(E10), VACCUML(E10), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(0), VS(VS1REG, I1), WORD); \
- 		UML_SEXT(block, IREG(1), VS(VS2REG, E21), WORD); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I1), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E21), WORD); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DADD(block, VACCUML(E11), VACCUML(E11), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(0), VS(VS1REG, I2), WORD); \
- 		UML_SEXT(block, IREG(1), VS(VS2REG, E22), WORD); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I2), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E22), WORD); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DADD(block, VACCUML(E12), VACCUML(E12), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(0), VS(VS1REG, I3), WORD); \
- 		UML_SEXT(block, IREG(1), VS(VS2REG, E23), WORD); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I3), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E23), WORD); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DADD(block, VACCUML(E13), VACCUML(E13), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(0), VS(VS1REG, I4), WORD); \
- 		UML_SEXT(block, IREG(1), VS(VS2REG, E24), WORD); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I4), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E24), WORD); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DADD(block, VACCUML(E14), VACCUML(E14), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(0), VS(VS1REG, I5), WORD); \
- 		UML_SEXT(block, IREG(1), VS(VS2REG, E25), WORD); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I5), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E25), WORD); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DADD(block, VACCUML(E15), VACCUML(E15), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(0), VS(VS1REG, I6), WORD); \
- 		UML_SEXT(block, IREG(1), VS(VS2REG, E26), WORD); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I6), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E26), WORD); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DADD(block, VACCUML(E16), VACCUML(E16), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(0), VS(VS1REG, I7), WORD); \
- 		UML_SEXT(block, IREG(1), VS(VS2REG, E27), WORD); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(0), VS(VS1REG, I7), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS2REG, E27), WORD); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DADD(block, VACCUML(E17), VACCUML(E17), IREG(0)); \
  \
- 		generate_saturate_accum_signed(rsp, block, compiler, desc, E10); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_signed(rsp, block, compiler, desc, E11); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_signed(rsp, block, compiler, desc, E12); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_signed(rsp, block, compiler, desc, E13); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_signed(rsp, block, compiler, desc, E14); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_signed(rsp, block, compiler, desc, E15); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_signed(rsp, block, compiler, desc, E16); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_signed(rsp, block, compiler, desc, E17); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_signed(rsp, block, compiler, desc, E10); \
+		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_signed(rsp, block, compiler, desc, E11); \
+		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_signed(rsp, block, compiler, desc, E12); \
+		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_signed(rsp, block, compiler, desc, E13); \
+		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_signed(rsp, block, compiler, desc, E14); \
+		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_signed(rsp, block, compiler, desc, E15); \
+		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_signed(rsp, block, compiler, desc, E16); \
+		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_signed(rsp, block, compiler, desc, E17); \
+		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
 	}
 
 static int generate_vmadm(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)	// vmadm
@@ -3276,54 +3314,54 @@ static int generate_vmadm(rsp_state *rsp, drcuml_block *block, compiler_state *c
 	// The middle slice of accumulator is stored into destination element
 	switch(EL)
 	{
-  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VMADM_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VMADM_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VMADM_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			return TRUE;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VMADM_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			return TRUE;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VMADM_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			return TRUE;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VMADM_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			return TRUE;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VMADM_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			return TRUE;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VMADM_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			return TRUE;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VMADM_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			return TRUE;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VMADM_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			return TRUE;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VMADM_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			return TRUE;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VMADM_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			return TRUE;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VMADM_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			return TRUE;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VMADM_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			return TRUE;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VMADM_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			return TRUE;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VMADM_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
+		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VMADM_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VMADM_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VMADM_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			return TRUE;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VMADM_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			return TRUE;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VMADM_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			return TRUE;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VMADM_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			return TRUE;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VMADM_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			return TRUE;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VMADM_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			return TRUE;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VMADM_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			return TRUE;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VMADM_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			return TRUE;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VMADM_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			return TRUE;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VMADM_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			return TRUE;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VMADM_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			return TRUE;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VMADM_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			return TRUE;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VMADM_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			return TRUE;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VMADM_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
 	}
 
 	return TRUE;
@@ -3373,54 +3411,54 @@ INLINE void cfunc_rsp_vmadm(void *param)
 
 	switch(EL)
 	{
-  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VMADM(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VMADM(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VMADM(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
-  			break;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VMADM(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
-  			break;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VMADM(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
-  			break;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VMADM(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
-  			break;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VMADM(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
-  			break;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VMADM(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
-  			break;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VMADM(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  			break;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VMADM(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-  			break;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VMADM(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-  			break;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VMADM(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-  			break;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VMADM(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-  			break;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VMADM(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
-  			break;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VMADM(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
-  			break;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VMADM(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-  			break;
+		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VMADM(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VMADM(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VMADM(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+			break;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VMADM(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+			break;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VMADM(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+			break;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VMADM(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+			break;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VMADM(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+			break;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VMADM(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+			break;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VMADM(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+			break;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VMADM(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+			break;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VMADM(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+			break;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VMADM(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+			break;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VMADM(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+			break;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VMADM(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+			break;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VMADM(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+			break;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VMADM(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+			break;
 	}
 }
 #endif
@@ -3432,86 +3470,86 @@ INLINE void cfunc_rsp_vmadm(void *param)
 
 #define RSP_VMADN_DRC(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
 	{ \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I0), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E20), WORD); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I0), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E20), WORD); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DADD(block, VACCUML(E10), VACCUML(E10), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I1), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E21), WORD); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I1), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E21), WORD); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DADD(block, VACCUML(E11), VACCUML(E11), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I2), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E22), WORD); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I2), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E22), WORD); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DADD(block, VACCUML(E12), VACCUML(E12), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I3), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E23), WORD); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I3), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E23), WORD); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DADD(block, VACCUML(E13), VACCUML(E13), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I4), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E24), WORD); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I4), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E24), WORD); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DADD(block, VACCUML(E14), VACCUML(E14), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I5), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E25), WORD); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I5), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E25), WORD); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DADD(block, VACCUML(E15), VACCUML(E15), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I6), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E26), WORD); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I6), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E26), WORD); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DADD(block, VACCUML(E16), VACCUML(E16), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I7), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E27), WORD); \
- 		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I7), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E27), WORD); \
+		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff)); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_DSEXT(block, IREG(0), IREG(0), DWORD); \
 		UML_DSHL(block, IREG(0), IREG(0), IMM(16)); \
 		UML_DADD(block, VACCUML(E17), VACCUML(E17), IREG(0)); \
  \
- 		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E10); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E11); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E12); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E13); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E14); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E15); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E16); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E17); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E10); \
+		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E11); \
+		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E12); \
+		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E13); \
+		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E14); \
+		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E15); \
+		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E16); \
+		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_unsigned(rsp, block, compiler, desc, E17); \
+		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
 	}
 
 static int generate_vmadn(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)	// vmadn
@@ -3528,54 +3566,54 @@ static int generate_vmadn(rsp_state *rsp, drcuml_block *block, compiler_state *c
 	// The low slice of accumulator is stored into destination element
 	switch(EL)
 	{
-  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VMADN_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VMADN_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VMADN_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			return TRUE;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VMADN_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			return TRUE;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VMADN_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			return TRUE;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VMADN_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			return TRUE;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VMADN_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			return TRUE;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VMADN_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			return TRUE;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VMADN_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			return TRUE;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VMADN_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			return TRUE;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VMADN_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			return TRUE;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VMADN_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			return TRUE;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VMADN_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			return TRUE;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VMADN_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			return TRUE;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VMADN_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			return TRUE;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VMADN_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
+		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VMADN_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VMADN_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VMADN_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			return TRUE;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VMADN_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			return TRUE;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VMADN_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			return TRUE;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VMADN_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			return TRUE;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VMADN_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			return TRUE;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VMADN_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			return TRUE;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VMADN_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			return TRUE;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VMADN_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			return TRUE;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VMADN_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			return TRUE;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VMADN_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			return TRUE;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VMADN_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			return TRUE;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VMADN_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			return TRUE;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VMADN_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			return TRUE;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VMADN_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
 	}
 
 	return TRUE;
@@ -3624,54 +3662,54 @@ INLINE void cfunc_rsp_vmadn(void *param)
 	// The low slice of accumulator is stored into destination element
 	switch(EL)
 	{
-  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VMADN(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VMADN(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VMADN(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			break;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VMADN(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			break;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VMADN(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			break;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VMADN(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			break;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VMADN(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			break;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VMADN(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			break;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VMADN(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			break;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VMADN(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			break;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VMADN(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			break;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VMADN(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			break;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VMADN(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			break;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VMADN(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			break;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VMADN(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			break;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VMADN(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
+		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VMADN(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VMADN(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VMADN(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			break;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VMADN(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			break;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VMADN(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			break;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VMADN(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			break;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VMADN(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			break;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VMADN(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			break;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VMADN(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			break;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VMADN(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			break;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VMADN(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			break;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VMADN(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			break;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VMADN(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			break;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VMADN(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			break;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VMADN(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			break;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VMADN(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
 	}
 }
 #endif
@@ -3683,62 +3721,62 @@ INLINE void cfunc_rsp_vmadn(void *param)
 
 #define RSP_VMADH_DRC(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27, I0, I1, I2, I3, I4, I5, I6, I7) \
 	{ \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I0), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E20), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I0), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E20), WORD); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_ADD(block, VACCUMWMH(E10), VACCUMWMH(E10), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I1), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E21), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I1), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E21), WORD); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_ADD(block, VACCUMWMH(E11), VACCUMWMH(E11), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I2), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E22), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I2), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E22), WORD); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_ADD(block, VACCUMWMH(E12), VACCUMWMH(E12), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I3), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E23), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I3), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E23), WORD); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_ADD(block, VACCUMWMH(E13), VACCUMWMH(E13), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I4), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E24), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I4), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E24), WORD); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_ADD(block, VACCUMWMH(E14), VACCUMWMH(E14), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I5), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E25), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I5), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E25), WORD); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_ADD(block, VACCUMWMH(E15), VACCUMWMH(E15), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I6), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E26), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I6), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E26), WORD); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_ADD(block, VACCUMWMH(E16), VACCUMWMH(E16), IREG(0)); \
  \
- 		UML_SEXT(block, IREG(1), VS(VS1REG, I7), WORD); \
- 		UML_SEXT(block, IREG(0), VS(VS2REG, E27), WORD); \
+		UML_SEXT(block, IREG(1), VS(VS1REG, I7), WORD); \
+		UML_SEXT(block, IREG(0), VS(VS2REG, E27), WORD); \
 		UML_MULS(block, IREG(0), IREG(1), IREG(0), IREG(1)); \
 		UML_ADD(block, VACCUMWMH(E17), VACCUMWMH(E17), IREG(0)); \
  \
- 		generate_saturate_accum_signed(rsp, block, compiler, desc, E10); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_signed(rsp, block, compiler, desc, E11); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_signed(rsp, block, compiler, desc, E12); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_signed(rsp, block, compiler, desc, E13); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_signed(rsp, block, compiler, desc, E14); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_signed(rsp, block, compiler, desc, E15); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_signed(rsp, block, compiler, desc, E16); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
- 		generate_saturate_accum_signed(rsp, block, compiler, desc, E17); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_signed(rsp, block, compiler, desc, E10); \
+		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_signed(rsp, block, compiler, desc, E11); \
+		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_signed(rsp, block, compiler, desc, E12); \
+		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_signed(rsp, block, compiler, desc, E13); \
+		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_signed(rsp, block, compiler, desc, E14); \
+		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_signed(rsp, block, compiler, desc, E15); \
+		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_signed(rsp, block, compiler, desc, E16); \
+		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), IREG(0), WORD); \
+		generate_saturate_accum_signed(rsp, block, compiler, desc, E17); \
+		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), IREG(0), WORD); \
 	}
 
 static int generate_vmadh(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)	// vmadh
@@ -3755,54 +3793,54 @@ static int generate_vmadh(rsp_state *rsp, drcuml_block *block, compiler_state *c
 	// The low slice of accumulator is stored into destination element
 	switch(EL)
 	{
-  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VMADH_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VMADH_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VMADH_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			return TRUE;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VMADH_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			return TRUE;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VMADH_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			return TRUE;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VMADH_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			return TRUE;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VMADH_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			return TRUE;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VMADH_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			return TRUE;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VMADH_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			return TRUE;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VMADH_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			return TRUE;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VMADH_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			return TRUE;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VMADH_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			return TRUE;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VMADH_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			return TRUE;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VMADH_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			return TRUE;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VMADH_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			return TRUE;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VMADH_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
+		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VMADH_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VMADH_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VMADH_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			return TRUE;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VMADH_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			return TRUE;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VMADH_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			return TRUE;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VMADH_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			return TRUE;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VMADH_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			return TRUE;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VMADH_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			return TRUE;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VMADH_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			return TRUE;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VMADH_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			return TRUE;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VMADH_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			return TRUE;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VMADH_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			return TRUE;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VMADH_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			return TRUE;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VMADH_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			return TRUE;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VMADH_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			return TRUE;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VMADH_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
 	}
 
 	return TRUE;
@@ -3852,54 +3890,54 @@ INLINE void cfunc_rsp_vmadh(void *param)
 
 	switch(EL)
 	{
-  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VMADH(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VMADH(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VMADH(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			break;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VMADH(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			break;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VMADH(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			break;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VMADH(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			break;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VMADH(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			break;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VMADH(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			break;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VMADH(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			break;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VMADH(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			break;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VMADH(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			break;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VMADH(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			break;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VMADH(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			break;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VMADH(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			break;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VMADH(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			break;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VMADH(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
+		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VMADH(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VMADH(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VMADH(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			break;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VMADH(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			break;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VMADH(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			break;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VMADH(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			break;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VMADH(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			break;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VMADH(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			break;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VMADH(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			break;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VMADH(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			break;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VMADH(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			break;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VMADH(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			break;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VMADH(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			break;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VMADH(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			break;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VMADH(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			break;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VMADH(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
 	}
 }
 #endif
@@ -3933,12 +3971,12 @@ INLINE void cfunc_rsp_vmadh(void *param)
 		UML_CMP(block, IREG(0), IMM(-32768)); \
 		UML_JMPc(block, IF_G, inrange = compiler->labelnum++); \
  \
- 		UML_MOV(block, IREG(0), IMM(-32768)); \
+		UML_MOV(block, IREG(0), IMM(-32768)); \
  \
 	UML_LABEL(block, inrange); \
 	UML_LABEL(block, outofrange); \
  \
- 		UML_MOV(block, VRES(E10), IREG(0)); \
+		UML_MOV(block, VRES(E10), IREG(0)); \
  \
  \
 		UML_SEXT(block, IREG(0), VS(VS1REG, I1), WORD); \
@@ -3961,12 +3999,12 @@ INLINE void cfunc_rsp_vmadh(void *param)
 		UML_CMP(block, IREG(0), IMM(-32768)); \
 		UML_JMPc(block, IF_GE, inrange = compiler->labelnum++); \
  \
- 		UML_MOV(block, IREG(0), IMM(-32768)); \
+		UML_MOV(block, IREG(0), IMM(-32768)); \
  \
 	UML_LABEL(block, inrange); \
 	UML_LABEL(block, outofrange); \
  \
- 		UML_MOV(block, VRES(E11), IREG(0)); \
+		UML_MOV(block, VRES(E11), IREG(0)); \
  \
  \
 		UML_SEXT(block, IREG(0), VS(VS1REG, I2), WORD); \
@@ -3989,12 +4027,12 @@ INLINE void cfunc_rsp_vmadh(void *param)
 		UML_CMP(block, IREG(0), IMM(-32768)); \
 		UML_JMPc(block, IF_GE, inrange = compiler->labelnum++); \
  \
- 		UML_MOV(block, IREG(0), IMM(-32768)); \
+		UML_MOV(block, IREG(0), IMM(-32768)); \
  \
 	UML_LABEL(block, inrange); \
 	UML_LABEL(block, outofrange); \
  \
- 		UML_MOV(block, VRES(E12), IREG(0)); \
+		UML_MOV(block, VRES(E12), IREG(0)); \
  \
  \
 		UML_SEXT(block, IREG(0), VS(VS1REG, I3), WORD); \
@@ -4017,12 +4055,12 @@ INLINE void cfunc_rsp_vmadh(void *param)
 		UML_CMP(block, IREG(0), IMM(-32768)); \
 		UML_JMPc(block, IF_GE, inrange = compiler->labelnum++); \
  \
- 		UML_MOV(block, IREG(0), IMM(-32768)); \
+		UML_MOV(block, IREG(0), IMM(-32768)); \
  \
 	UML_LABEL(block, inrange); \
 	UML_LABEL(block, outofrange); \
  \
- 		UML_MOV(block, VRES(E13), IREG(0)); \
+		UML_MOV(block, VRES(E13), IREG(0)); \
  \
  \
 		UML_SEXT(block, IREG(0), VS(VS1REG, I4), WORD); \
@@ -4045,12 +4083,12 @@ INLINE void cfunc_rsp_vmadh(void *param)
 		UML_CMP(block, IREG(0), IMM(-32768)); \
 		UML_JMPc(block, IF_GE, inrange = compiler->labelnum++); \
  \
- 		UML_MOV(block, IREG(0), IMM(-32768)); \
+		UML_MOV(block, IREG(0), IMM(-32768)); \
  \
 	UML_LABEL(block, inrange); \
 	UML_LABEL(block, outofrange); \
  \
- 		UML_MOV(block, VRES(E14), IREG(0)); \
+		UML_MOV(block, VRES(E14), IREG(0)); \
  \
  \
 		UML_SEXT(block, IREG(0), VS(VS1REG, I5), WORD); \
@@ -4073,12 +4111,12 @@ INLINE void cfunc_rsp_vmadh(void *param)
 		UML_CMP(block, IREG(0), IMM(-32768)); \
 		UML_JMPc(block, IF_GE, inrange = compiler->labelnum++); \
  \
- 		UML_MOV(block, IREG(0), IMM(-32768)); \
+		UML_MOV(block, IREG(0), IMM(-32768)); \
  \
 	UML_LABEL(block, inrange); \
 	UML_LABEL(block, outofrange); \
  \
- 		UML_MOV(block, VRES(E15), IREG(0)); \
+		UML_MOV(block, VRES(E15), IREG(0)); \
  \
  \
 		UML_SEXT(block, IREG(0), VS(VS1REG, I6), WORD); \
@@ -4101,12 +4139,12 @@ INLINE void cfunc_rsp_vmadh(void *param)
 		UML_CMP(block, IREG(0), IMM(-32768)); \
 		UML_JMPc(block, IF_GE, inrange = compiler->labelnum++); \
  \
- 		UML_MOV(block, IREG(0), IMM(-32768)); \
+		UML_MOV(block, IREG(0), IMM(-32768)); \
  \
 	UML_LABEL(block, inrange); \
 	UML_LABEL(block, outofrange); \
  \
- 		UML_MOV(block, VRES(E16), IREG(0)); \
+		UML_MOV(block, VRES(E16), IREG(0)); \
  \
  \
 		UML_SEXT(block, IREG(0), VS(VS1REG, I7), WORD); \
@@ -4129,22 +4167,22 @@ INLINE void cfunc_rsp_vmadh(void *param)
 		UML_CMP(block, IREG(0), IMM(-32768)); \
 		UML_JMPc(block, IF_GE, inrange = compiler->labelnum++); \
  \
- 		UML_MOV(block, IREG(0), IMM(-32768)); \
+		UML_MOV(block, IREG(0), IMM(-32768)); \
  \
 	UML_LABEL(block, inrange); \
 	UML_LABEL(block, outofrange); \
  \
- 		UML_MOV(block, VRES(E17), IREG(0)); \
+		UML_MOV(block, VRES(E17), IREG(0)); \
  \
  \
- 		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), VRES(E10), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), VRES(E11), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), VRES(E12), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), VRES(E13), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), VRES(E14), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), VRES(E15), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), VRES(E16), WORD); \
- 		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), VRES(E17), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I0], IMM(0), VRES(E10), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I1], IMM(0), VRES(E11), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I2], IMM(0), VRES(E12), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I3], IMM(0), VRES(E13), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I4], IMM(0), VRES(E14), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I5], IMM(0), VRES(E15), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I6], IMM(0), VRES(E16), WORD); \
+		UML_STORE(block, &rsp->v[VDREG].s[I7], IMM(0), VRES(E17), WORD); \
 	}
 
 static int generate_vadd(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)	// vadd
@@ -4161,54 +4199,54 @@ static int generate_vadd(rsp_state *rsp, drcuml_block *block, compiler_state *co
 	// The low slice of accumulator is stored into destination element
 	switch(EL)
 	{
-  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VADD_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VADD_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VADD_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			return TRUE;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VADD_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			return TRUE;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VADD_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			return TRUE;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VADD_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			return TRUE;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VADD_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			return TRUE;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VADD_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			return TRUE;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VADD_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			return TRUE;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VADD_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			return TRUE;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VADD_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			return TRUE;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VADD_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			return TRUE;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VADD_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			return TRUE;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VADD_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			return TRUE;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VADD_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			return TRUE;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VADD_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
+		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VADD_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VADD_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VADD_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			return TRUE;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VADD_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			return TRUE;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VADD_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			return TRUE;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VADD_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			return TRUE;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VADD_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			return TRUE;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VADD_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			return TRUE;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VADD_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			return TRUE;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VADD_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			return TRUE;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VADD_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			return TRUE;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VADD_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			return TRUE;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VADD_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			return TRUE;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VADD_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			return TRUE;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VADD_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			return TRUE;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VADD_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
 	}
 
 	return TRUE;
@@ -4249,57 +4287,57 @@ INLINE void cfunc_rsp_vadd(void *param)
 	// Adds two vector registers and carry flag, the result is saturated to 32767
 
 	// TODO: check VS2REG == VDREG
-  	switch(EL)
-  	{
-  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VADD(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VADD(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VADD(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			break;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VADD(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			break;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VADD(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			break;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VADD(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			break;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VADD(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			break;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VADD(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			break;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VADD(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			break;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VADD(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			break;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VADD(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			break;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VADD(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			break;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VADD(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			break;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VADD(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			break;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VADD(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			break;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VADD(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
-  	}
+	switch(EL)
+	{
+		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VADD(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VADD(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VADD(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			break;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VADD(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			break;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VADD(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			break;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VADD(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			break;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VADD(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			break;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VADD(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			break;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VADD(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			break;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VADD(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			break;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VADD(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			break;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VADD(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			break;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VADD(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			break;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VADD(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			break;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VADD(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			break;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VADD(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
+	}
 	rsp->flag[0] = 0;
 	WRITEBACK_RESULT();
 }
@@ -4657,54 +4695,54 @@ INLINE void cfunc_rsp_vlt(void *param)
 
 	switch(EL)
 	{
-  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VLT(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VLT(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VLT(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			break;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VLT(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			break;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VLT(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			break;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VLT(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			break;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VLT(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			break;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VLT(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			break;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VLT(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			break;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VLT(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			break;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VLT(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			break;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VLT(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			break;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VLT(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			break;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VLT(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			break;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VLT(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			break;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VLT(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
+		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VLT(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VLT(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VLT(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			break;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VLT(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			break;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VLT(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			break;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VLT(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			break;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VLT(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			break;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VLT(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			break;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VLT(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			break;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VLT(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			break;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VLT(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			break;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VLT(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			break;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VLT(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			break;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VLT(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			break;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VLT(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			break;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VLT(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
 	}
 
 }
@@ -4987,54 +5025,54 @@ INLINE void cfunc_rsp_vge(void *param)
 #if 1
 	switch(EL)
 	{
-  		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VGE(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VGE(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VGE(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			break;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VGE(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			break;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VGE(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			break;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VGE(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			break;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VGE(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			break;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VGE(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			break;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VGE(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			break;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VGE(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			break;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VGE(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			break;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VGE(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			break;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VGE(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			break;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VGE(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			break;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VGE(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			break;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VGE(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			break;
+		case 0:    /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VGE(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VGE(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VGE(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			break;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VGE(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			break;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VGE(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			break;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VGE(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			break;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VGE(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			break;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VGE(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			break;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VGE(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			break;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VGE(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			break;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VGE(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			break;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VGE(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			break;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VGE(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			break;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VGE(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			break;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VGE(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			break;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VGE(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
 	}
 #else
 	rsp->flag[1] = 0;
@@ -5403,58 +5441,58 @@ INLINE void cfunc_rsp_vmrg(void *param)
 	//
 	// Merges two vectors according to compare flags
 
-  	switch(EL)
-  	{
-  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VMRG(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VMRG(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VMRG(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
-  			break;
-  		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VMRG(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
-  			break;
-  		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VMRG(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
-  			break;
-  		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VMRG(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
-  			break;
-  		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VMRG(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
-  			break;
-  		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VMRG(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
-  			break;
-  		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VMRG(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  			break;
-  		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VMRG(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-  			break;
-  		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VMRG(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-  			break;
-  		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VMRG(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-  			break;
-  		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VMRG(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-  			break;
-  		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VMRG(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
-  			break;
-  		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VMRG(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
-  			break;
-  		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VMRG(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-  			break;
-  	}
-  	WRITEBACK_RESULT();
+	switch(EL)
+	{
+		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VMRG(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VMRG(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VMRG(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+			break;
+		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VMRG(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+			break;
+		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VMRG(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+			break;
+		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VMRG(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+			break;
+		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VMRG(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+			break;
+		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VMRG(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+			break;
+		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VMRG(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+			break;
+		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VMRG(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+			break;
+		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VMRG(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+			break;
+		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VMRG(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+			break;
+		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VMRG(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+			break;
+		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VMRG(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+			break;
+		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VMRG(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+			break;
+		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VMRG(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+			break;
+	}
+	WRITEBACK_RESULT();
 }
 
 #if (DRC_VAND)
@@ -5529,59 +5567,59 @@ static int generate_vand(rsp_state *rsp, drcuml_block *block, compiler_state *co
 	//
 	// Bitwise AND of two vector registers
 
-  	switch(EL)
-  	{
-  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VAND_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VAND_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VAND_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			return TRUE;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VAND_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			return TRUE;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VAND_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			return TRUE;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VAND_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			return TRUE;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VAND_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			return TRUE;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VAND_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			return TRUE;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VAND_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			return TRUE;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VAND_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			return TRUE;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VAND_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			return TRUE;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VAND_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			return TRUE;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VAND_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			return TRUE;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VAND_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			return TRUE;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VAND_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			return TRUE;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VAND_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  	}
+	switch(EL)
+	{
+		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VAND_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VAND_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VAND_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			return TRUE;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VAND_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			return TRUE;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VAND_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			return TRUE;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VAND_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			return TRUE;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VAND_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			return TRUE;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VAND_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			return TRUE;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VAND_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			return TRUE;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VAND_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			return TRUE;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VAND_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			return TRUE;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VAND_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			return TRUE;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VAND_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			return TRUE;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VAND_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			return TRUE;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VAND_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			return TRUE;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VAND_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+	}
 
-  	return TRUE;
+	return TRUE;
 }
 #else
 #define RSP_VAND(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27) \
@@ -5614,58 +5652,58 @@ INLINE void cfunc_rsp_vand(void *param)
 	//
 	// Bitwise AND of two vector registers
 
-  	switch(EL)
-  	{
-  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VAND(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VAND(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VAND(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
-  			break;
-  		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VAND(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
-  			break;
-  		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VAND(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
-  			break;
-  		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VAND(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
-  			break;
-  		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VAND(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
-  			break;
-  		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VAND(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
-  			break;
-  		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VAND(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  			break;
-  		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VAND(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-  			break;
-  		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VAND(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-  			break;
-  		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VAND(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-  			break;
-  		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VAND(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-  			break;
-  		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VAND(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
-  			break;
-  		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VAND(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
-  			break;
-  		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VAND(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-  			break;
-  	}
-  	WRITEBACK_RESULT();
+	switch(EL)
+	{
+		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VAND(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VAND(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VAND(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+			break;
+		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VAND(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+			break;
+		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VAND(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+			break;
+		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VAND(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+			break;
+		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VAND(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+			break;
+		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VAND(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+			break;
+		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VAND(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+			break;
+		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VAND(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+			break;
+		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VAND(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+			break;
+		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VAND(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+			break;
+		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VAND(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+			break;
+		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VAND(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+			break;
+		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VAND(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+			break;
+		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VAND(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+			break;
+	}
+	WRITEBACK_RESULT();
 }
 #endif
 
@@ -5749,59 +5787,59 @@ static int generate_vnand(rsp_state *rsp, drcuml_block *block, compiler_state *c
 	//
 	// Bitwise NOT AND of two vector registers
 
-  	switch(EL)
-  	{
-  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VNAND_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VNAND_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VNAND_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			return TRUE;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VNAND_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			return TRUE;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VNAND_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			return TRUE;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VNAND_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			return TRUE;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VNAND_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			return TRUE;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VNAND_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			return TRUE;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VNAND_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			return TRUE;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VNAND_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			return TRUE;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VNAND_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			return TRUE;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VNAND_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			return TRUE;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VNAND_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			return TRUE;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VNAND_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			return TRUE;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VNAND_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			return TRUE;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VNAND_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  	}
+	switch(EL)
+	{
+		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VNAND_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VNAND_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VNAND_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			return TRUE;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VNAND_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			return TRUE;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VNAND_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			return TRUE;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VNAND_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			return TRUE;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VNAND_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			return TRUE;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VNAND_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			return TRUE;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VNAND_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			return TRUE;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VNAND_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			return TRUE;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VNAND_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			return TRUE;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VNAND_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			return TRUE;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VNAND_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			return TRUE;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VNAND_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			return TRUE;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VNAND_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			return TRUE;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VNAND_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+	}
 
-  	return TRUE;
+	return TRUE;
 }
 #else
 #define RSP_VNAND(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27) \
@@ -5834,58 +5872,58 @@ INLINE void cfunc_rsp_vnand(void *param)
 	//
 	// Bitwise NOT AND of two vector registers
 
-  	switch(EL)
-  	{
-  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VNAND(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VNAND(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VNAND(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
-  			break;
-  		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VNAND(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
-  			break;
-  		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VNAND(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
-  			break;
-  		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VNAND(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
-  			break;
-  		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VNAND(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
-  			break;
-  		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VNAND(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
-  			break;
-  		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VNAND(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  			break;
-  		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VNAND(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-  			break;
-  		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VNAND(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-  			break;
-  		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VNAND(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-  			break;
-  		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VNAND(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-  			break;
-  		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VNAND(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
-  			break;
-  		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VNAND(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
-  			break;
-  		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VNAND(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-  			break;
-  	}
-  	WRITEBACK_RESULT();
+	switch(EL)
+	{
+		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VNAND(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VNAND(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VNAND(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+			break;
+		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VNAND(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+			break;
+		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VNAND(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+			break;
+		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VNAND(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+			break;
+		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VNAND(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+			break;
+		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VNAND(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+			break;
+		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VNAND(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+			break;
+		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VNAND(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+			break;
+		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VNAND(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+			break;
+		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VNAND(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+			break;
+		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VNAND(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+			break;
+		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VNAND(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+			break;
+		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VNAND(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+			break;
+		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VNAND(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+			break;
+	}
+	WRITEBACK_RESULT();
 }
 #endif
 
@@ -5961,59 +5999,59 @@ static int generate_vor(rsp_state *rsp, drcuml_block *block, compiler_state *com
 	//
 	// Bitwise OR of two vector registers
 
-  	switch(EL)
-  	{
-  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VOR_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			return TRUE;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VOR_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			return TRUE;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VOR_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			return TRUE;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VOR_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			return TRUE;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VOR_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			return TRUE;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VOR_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			return TRUE;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VOR_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			return TRUE;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VOR_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			return TRUE;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VOR_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			return TRUE;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VOR_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			return TRUE;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VOR_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			return TRUE;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VOR_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			return TRUE;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VOR_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			return TRUE;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  	}
+	switch(EL)
+	{
+		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VOR_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			return TRUE;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VOR_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			return TRUE;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VOR_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			return TRUE;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VOR_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			return TRUE;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VOR_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			return TRUE;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VOR_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			return TRUE;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VOR_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			return TRUE;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VOR_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			return TRUE;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VOR_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			return TRUE;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VOR_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			return TRUE;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VOR_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			return TRUE;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VOR_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			return TRUE;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VOR_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			return TRUE;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+	}
 
-  	return TRUE;
+	return TRUE;
 }
 #else
 #define RSP_VOR(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27) \
@@ -6046,58 +6084,58 @@ INLINE void cfunc_rsp_vor(void *param)
 	//
 	// Bitwise OR of two vector registers
 
-  	switch(EL)
-  	{
-  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VOR(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
-  			break;
-  		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VOR(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
-  			break;
-  		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VOR(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
-  			break;
-  		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VOR(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
-  			break;
-  		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VOR(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
-  			break;
-  		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VOR(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
-  			break;
-  		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VOR(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  			break;
-  		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VOR(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-  			break;
-  		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VOR(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-  			break;
-  		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VOR(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-  			break;
-  		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VOR(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-  			break;
-  		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VOR(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
-  			break;
-  		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VOR(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
-  			break;
-  		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VOR(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-  			break;
-  	}
-  	WRITEBACK_RESULT();
+	switch(EL)
+	{
+		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VOR(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+			break;
+		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VOR(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+			break;
+		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VOR(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+			break;
+		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VOR(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+			break;
+		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VOR(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+			break;
+		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VOR(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+			break;
+		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VOR(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+			break;
+		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VOR(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+			break;
+		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VOR(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+			break;
+		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VOR(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+			break;
+		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VOR(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+			break;
+		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VOR(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+			break;
+		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VOR(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+			break;
+		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VOR(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+			break;
+	}
+	WRITEBACK_RESULT();
 }
 #endif
 
@@ -6181,59 +6219,59 @@ static int generate_vnor(rsp_state *rsp, drcuml_block *block, compiler_state *co
 	//
 	// Bitwise NOT OR of two vector registers
 
-  	switch(EL)
-  	{
-  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VNOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VNOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VNOR_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			return TRUE;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VNOR_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			return TRUE;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VNOR_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			return TRUE;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VNOR_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			return TRUE;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VNOR_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			return TRUE;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VNOR_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			return TRUE;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VNOR_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			return TRUE;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VNOR_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			return TRUE;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VNOR_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			return TRUE;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VNOR_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			return TRUE;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VNOR_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			return TRUE;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VNOR_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			return TRUE;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VNOR_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			return TRUE;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VNOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  	}
+	switch(EL)
+	{
+		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VNOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VNOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VNOR_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			return TRUE;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VNOR_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			return TRUE;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VNOR_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			return TRUE;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VNOR_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			return TRUE;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VNOR_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			return TRUE;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VNOR_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			return TRUE;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VNOR_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			return TRUE;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VNOR_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			return TRUE;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VNOR_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			return TRUE;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VNOR_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			return TRUE;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VNOR_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			return TRUE;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VNOR_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			return TRUE;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VNOR_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			return TRUE;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VNOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+	}
 
-  	return TRUE;
+	return TRUE;
 }
 #else
 #define RSP_VNOR(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27) \
@@ -6266,58 +6304,58 @@ INLINE void cfunc_rsp_vnor(void *param)
 	//
 	// Bitwise NOT OR of two vector registers
 
-  	switch(EL)
-  	{
-  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VNOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VNOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VNOR(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
-  			break;
-  		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VNOR(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
-  			break;
-  		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VNOR(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
-  			break;
-  		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VNOR(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
-  			break;
-  		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VNOR(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
-  			break;
-  		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VNOR(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
-  			break;
-  		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VNOR(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  			break;
-  		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VNOR(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-  			break;
-  		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VNOR(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-  			break;
-  		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VNOR(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-  			break;
-  		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VNOR(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-  			break;
-  		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VNOR(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
-  			break;
-  		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VNOR(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
-  			break;
-  		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VNOR(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-  			break;
-  	}
-  	WRITEBACK_RESULT();
+	switch(EL)
+	{
+		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VNOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VNOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VNOR(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+			break;
+		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VNOR(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+			break;
+		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VNOR(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+			break;
+		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VNOR(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+			break;
+		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VNOR(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+			break;
+		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VNOR(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+			break;
+		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VNOR(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+			break;
+		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VNOR(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+			break;
+		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VNOR(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+			break;
+		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VNOR(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+			break;
+		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VNOR(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+			break;
+		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VNOR(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+			break;
+		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VNOR(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+			break;
+		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VNOR(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+			break;
+	}
+	WRITEBACK_RESULT();
 }
 #endif
 
@@ -6393,59 +6431,59 @@ static int generate_vxor(rsp_state *rsp, drcuml_block *block, compiler_state *co
 	//
 	// Bitwise XOR of two vector registers
 
-  	switch(EL)
-  	{
-  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VXOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VXOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VXOR_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			return TRUE;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VXOR_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			return TRUE;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VXOR_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			return TRUE;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VXOR_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			return TRUE;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VXOR_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			return TRUE;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VXOR_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			return TRUE;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VXOR_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			return TRUE;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VXOR_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			return TRUE;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VXOR_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			return TRUE;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VXOR_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			return TRUE;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VXOR_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			return TRUE;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VXOR_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			return TRUE;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VXOR_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			return TRUE;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VXOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  	}
+	switch(EL)
+	{
+		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VXOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VXOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VXOR_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			return TRUE;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VXOR_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			return TRUE;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VXOR_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			return TRUE;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VXOR_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			return TRUE;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VXOR_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			return TRUE;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VXOR_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			return TRUE;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VXOR_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			return TRUE;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VXOR_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			return TRUE;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VXOR_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			return TRUE;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VXOR_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			return TRUE;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VXOR_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			return TRUE;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VXOR_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			return TRUE;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VXOR_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			return TRUE;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VXOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+	}
 
-  	return TRUE;
+	return TRUE;
 }
 #else
 #define RSP_VXOR(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27) \
@@ -6478,58 +6516,58 @@ INLINE void cfunc_rsp_vxor(void *param)
 	//
 	// Bitwise XOR of two vector registers
 
-  	switch(EL)
-  	{
-  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VXOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VXOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VXOR(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
-  			break;
-  		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VXOR(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
-  			break;
-  		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VXOR(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
-  			break;
-  		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VXOR(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
-  			break;
-  		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VXOR(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
-  			break;
-  		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VXOR(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
-  			break;
-  		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VXOR(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  			break;
-  		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VXOR(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-  			break;
-  		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VXOR(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-  			break;
-  		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VXOR(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-  			break;
-  		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VXOR(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-  			break;
-  		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VXOR(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
-  			break;
-  		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VXOR(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
-  			break;
-  		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VXOR(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-  			break;
-  	}
-  	WRITEBACK_RESULT();
+	switch(EL)
+	{
+		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VXOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VXOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VXOR(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+			break;
+		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VXOR(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+			break;
+		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VXOR(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+			break;
+		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VXOR(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+			break;
+		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VXOR(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+			break;
+		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VXOR(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+			break;
+		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VXOR(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+			break;
+		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VXOR(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+			break;
+		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VXOR(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+			break;
+		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VXOR(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+			break;
+		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VXOR(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+			break;
+		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VXOR(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+			break;
+		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VXOR(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+			break;
+		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VXOR(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+			break;
+	}
+	WRITEBACK_RESULT();
 }
 #endif
 
@@ -6613,59 +6651,59 @@ static int generate_vnxor(rsp_state *rsp, drcuml_block *block, compiler_state *c
 	//
 	// Bitwise NOT XOR of two vector registers
 
-  	switch(EL)
-  	{
-  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VNXOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VNXOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VNXOR_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
-  			return TRUE;
-  		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VNXOR_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
-  			return TRUE;
-  		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VNXOR_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
-  			return TRUE;
-  		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VNXOR_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
-  			return TRUE;
-  		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VNXOR_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
-  			return TRUE;
-  		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VNXOR_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
-  			return TRUE;
-  		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VNXOR_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
-  			return TRUE;
-  		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VNXOR_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
-  			return TRUE;
-  		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VNXOR_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
-  			return TRUE;
-  		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VNXOR_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
-  			return TRUE;
-  		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VNXOR_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
-  			return TRUE;
-  		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VNXOR_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
-  			return TRUE;
-  		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VNXOR_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
-  			return TRUE;
-  		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VNOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
-  			return TRUE;
-  	}
+	switch(EL)
+	{
+		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VNXOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 1:    /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VNXOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+		case 2:    /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VNXOR_DRC(1, 3, 5, 7, 0, 2, 4, 6, 7, 5, 3, 1, 7, 5, 3, 1, 6, 4, 2, 0, 7, 5, 3, 1);
+			return TRUE;
+		case 3:    /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VNXOR_DRC(0, 2, 4, 6, 1, 3, 5, 7, 6, 4, 2, 0, 6, 4, 2, 0, 7, 5, 3, 1, 6, 4, 2, 0);
+			return TRUE;
+		case 4:    /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VNXOR_DRC(1, 2, 3, 5, 6, 7, 0, 4, 7, 7, 7, 3, 3, 3, 7, 3, 6, 5, 4, 2, 1, 0, 7, 3);
+			return TRUE;
+		case 5:    /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VNXOR_DRC(0, 2, 3, 4, 6, 7, 1, 5, 6, 6, 6, 2, 2, 2, 6, 2, 7, 5, 4, 3, 1, 0, 6, 2);
+			return TRUE;
+		case 6:    /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VNXOR_DRC(0, 1, 3, 4, 5, 7, 2, 6, 5, 5, 5, 1, 1, 1, 5, 1, 7, 6, 4, 3, 2, 0, 5, 1);
+			return TRUE;
+		case 7:    /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VNXOR_DRC(0, 1, 2, 4, 5, 6, 3, 7, 4, 4, 4, 0, 0, 0, 4, 0, 7, 6, 5, 3, 2, 1, 4, 0);
+			return TRUE;
+		case 8:    /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VNXOR_DRC(1, 2, 3, 4, 5, 6, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 6, 5, 4, 3, 2, 1, 0, 7);
+			return TRUE;
+		case 9:    /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VNXOR_DRC(0, 2, 3, 4, 5, 6, 7, 1, 6, 6, 6, 6, 6, 6, 6, 6, 7, 5, 4, 3, 2, 1, 0, 6);
+			return TRUE;
+		case 10:   /* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VNXOR_DRC(0, 1, 3, 4, 5, 6, 7, 2, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 4, 3, 2, 1, 0, 5);
+			return TRUE;
+		case 11:   /* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VNXOR_DRC(0, 1, 2, 4, 5, 6, 7, 3, 4, 4, 4, 4, 4, 4, 4, 4, 7, 6, 5, 3, 2, 1, 0, 4);
+			return TRUE;
+		case 12:   /* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VNXOR_DRC(0, 1, 2, 3, 5, 6, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 5, 4, 2, 1, 0, 3);
+			return TRUE;
+		case 13:   /* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VNXOR_DRC(0, 1, 2, 3, 4, 6, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4, 3, 1, 0, 2);
+			return TRUE;
+		case 14:   /* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VNXOR_DRC(0, 1, 2, 3, 4, 5, 7, 6, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 4, 3, 2, 0, 1);
+			return TRUE;
+		case 15:   /* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VNOR_DRC(0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4, 3, 2, 1, 0);
+			return TRUE;
+	}
 
-  	return TRUE;
+	return TRUE;
 }
 #else
 #define RSP_VNXOR(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27) \
@@ -6698,58 +6736,58 @@ INLINE void cfunc_rsp_vnxor(void *param)
 	//
 	// Bitwise NOT XOR of two vector registers
 
-  	switch(EL)
-  	{
-  		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-  			RSP_VNXOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-  			RSP_VNXOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
-  			break;
-  		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-  			RSP_VNXOR(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
-  			break;
-  		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-  			RSP_VNXOR(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
-  			break;
-  		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-  			RSP_VNXOR(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
-  			break;
-  		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-  			RSP_VNXOR(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
-  			break;
-  		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-  			RSP_VNXOR(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
-  			break;
-  		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-  			RSP_VNXOR(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
-  			break;
-  		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-  			RSP_VNXOR(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  			break;
-  		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-  			RSP_VNXOR(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-  			break;
-  		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-  			RSP_VNXOR(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-  			break;
-  		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-  			RSP_VNXOR(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-  			break;
-  		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-  			RSP_VNXOR(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-  			break;
-  		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-  			RSP_VNXOR(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
-  			break;
-  		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-  			RSP_VNXOR(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
-  			break;
-  		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-  			RSP_VNXOR(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
-  			break;
-  	}
-  	WRITEBACK_RESULT();
+	switch(EL)
+	{
+		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+			RSP_VNXOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+			RSP_VNXOR(0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+			RSP_VNXOR(1, 3, 5, 7, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6);
+			break;
+		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+			RSP_VNXOR(0, 2, 4, 6, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7);
+			break;
+		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+			RSP_VNXOR(1, 2, 3, 5, 6, 7, 0, 4, 0, 0, 0, 4, 4, 4, 0, 4);
+			break;
+		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+			RSP_VNXOR(0, 2, 3, 4, 6, 7, 1, 5, 1, 1, 1, 5, 5, 5, 1, 5);
+			break;
+		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+			RSP_VNXOR(0, 1, 3, 4, 5, 7, 2, 6, 2, 2, 2, 6, 6, 6, 2, 6);
+			break;
+		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+			RSP_VNXOR(0, 1, 2, 4, 5, 6, 3, 7, 3, 3, 3, 7, 7, 7, 3, 7);
+			break;
+		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+			RSP_VNXOR(1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+			break;
+		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+			RSP_VNXOR(0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+			break;
+		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+			RSP_VNXOR(0, 1, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+			break;
+		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+			RSP_VNXOR(0, 1, 2, 4, 5, 6, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+			break;
+		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+			RSP_VNXOR(0, 1, 2, 3, 5, 6, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+			break;
+		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+			RSP_VNXOR(0, 1, 2, 3, 4, 6, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+			break;
+		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+			RSP_VNXOR(0, 1, 2, 3, 4, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+			break;
+		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+			RSP_VNXOR(0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7);
+			break;
+	}
+	WRITEBACK_RESULT();
 }
 #endif
 
@@ -7274,10 +7312,10 @@ static void cfunc_unimplemented(void *param)
     cfunc_fatalerror - a generic fatalerror call
 -------------------------------------------------*/
 
-static void cfunc_fatalerror(void *param)
-{
+//static void cfunc_fatalerror(void *param)
+//{
 	//fatalerror("fatalerror");
-}
+//}
 
 
 /***************************************************************************
@@ -7393,11 +7431,7 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 	drcuml_state *drcuml = rsp->impstate->drcuml;
 	drcuml_block *block;
 	jmp_buf errorbuf;
-	int unaligned_w2 = 1;
-	int aligned_w2 = 2;
-	int unaligned_w4 = 1;
-	int unaligned_r2 = 1;
-	int unaligned_r4 = 1;
+	int unaligned_case = 1;
 
 	/* if we get an error back, we're screwed */
 	if (setjmp(errorbuf) != 0)
@@ -7412,132 +7446,116 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 	alloc_handle(drcuml, handleptr, name);
 	UML_HANDLE(block, *handleptr);													// handle  *handleptr
 
-	UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));
-
 	// write:
 	if (iswrite)
 	{
 		if (size == 1)
 		{
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));			// xor     i0,i0,bytexor
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);	// store   dmem,i0,i1,byte
+#ifdef LSB_FIRST
+			UML_XOR(block, IREG(0), IREG(0), IMM(3));									// xor     i0,i0,3
+#endif
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
+			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);				// store   dmem,i0,i1,byte
 		}
 		else if (size == 2)
 		{
-			static const char text[] = "%08x: Unaligned word write to %08x\n";
+#ifdef LSB_FIRST
 			UML_TEST(block, IREG(0), IMM(1));											// test    i0,1
-			UML_JMPc(block, IF_NZ, unaligned_w2);										// jnz     <unaligned_w2>
-			UML_JMP(block, aligned_w2);													// jmp     <aligned_w2>
-
-			UML_LABEL(block, unaligned_w2);												// <unaligned_w2>:
-			UML_MOV(block, MEM(&rsp->impstate->format), IMM((FPTR)text));				// mov     [format],text
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(rsp->pc));					// mov     [arg0],rsp->pc
-			UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(0));							// mov     [arg1],i0
-			UML_CALLC(block, cfunc_printf_debug, rsp);									// callc   printf_debug
-			UML_CALLC(block, cfunc_fatalerror, rsp);
-
-			UML_LABEL(block, aligned_w2);												// <aligned_w2>:
-			UML_SHR(block, IREG(0), IREG(0), IMM(1));									// shr     i0,i0,1
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE_XOR_BE(0)));						// xor     i0,i0,bytexor
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), WORD);				// store   dmem,i0,i1,word
+			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
+			UML_XOR(block, IREG(0), IREG(0), IMM(2));									// xor     i0,i0,2
+#endif
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
+			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), WORD_x1);			// store   dmem,i0,i1,word_x1
+			UML_RET(block);
+#ifdef LSB_FIRST
+			UML_LABEL(block, unaligned_case);										// unaligned_case:
+			UML_AND(block, IREG(2), IREG(0), IMM(3));									// and     i2,i0,3
+			UML_AND(block, IREG(0), IREG(0), IMM(0xffc));								// and     i0,i0,0xffc
+			UML_SHL(block, IREG(2), IREG(2), IMM(3));									// shl     i2,i2,3
+			UML_DLOAD(block, IREG(3), rsp->impstate->dmem, IREG(0), QWORD_x1);			// dload   i3,dmem,i0,qword_x1
+			UML_ADD(block, IREG(2), IREG(2), IMM(48));									// add     i2,i2,48
+			UML_DROL(block, IREG(3), IREG(3), IREG(2));									// drol    i3,i3,i2
+			UML_DAND(block, IREG(1), IREG(1), IMM(0xffff));								// dand    i1,i1,0xffff
+			UML_DAND(block, IREG(3), IREG(3), IMM(U64(0xffffffffffff0000)));			// dand    i3,i3,~0xffff
+			UML_DOR(block, IREG(1), IREG(1), IREG(3));									// dor     i1,i1,i3
+			UML_DROR(block, IREG(1), IREG(1), IREG(2));									// dror    i1,i1,i2
+			UML_DSTORE(block, rsp->impstate->dmem, IREG(0), IREG(1), QWORD_x1); 		// dstore  dmem,i0,i1,qword_x1
+#endif
 		}
 		else if (size == 4)
 		{
+#ifdef LSB_FIRST
 			UML_TEST(block, IREG(0), IMM(3));											// test    i0,3
-			UML_JMPc(block, IF_NZ, unaligned_w4);										// jnz     <unaligned_w4>
-
+			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
+#endif
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
 			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), DWORD_x1);			// store   dmem,i0,i1,dword_x1
 			UML_RET(block);
-
-			UML_LABEL(block, unaligned_w4);
-			UML_ADD(block, IREG(0), IREG(0), IMM(3));
-
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);
-
-			UML_SHR(block, IREG(1), IREG(1), IMM(8));
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_SUB(block, IREG(0), IREG(0), IMM(1));
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);
-
-			UML_SHR(block, IREG(1), IREG(1), IMM(8));
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_SUB(block, IREG(0), IREG(0), IMM(1));
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);
-
-			UML_SHR(block, IREG(1), IREG(1), IMM(8));
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_SUB(block, IREG(0), IREG(0), IMM(1));
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);
+#ifdef LSB_FIRST
+			UML_LABEL(block, unaligned_case);										// unaligned_case:
+			UML_AND(block, IREG(2), IREG(0), IMM(3));									// and     i2,i0,3
+			UML_AND(block, IREG(0), IREG(0), IMM(0xffc));								// and     i0,i0,0xffc
+			UML_SHL(block, IREG(2), IREG(2), IMM(3));									// shl     i2,i2,3
+			UML_DLOAD(block, IREG(3), rsp->impstate->dmem, IREG(0), QWORD_x1);			// dload   i3,dmem,i0,qword_x1
+			UML_ADD(block, IREG(2), IREG(2), IMM(48));									// add     i2,i2,48
+			UML_DROL(block, IREG(3), IREG(3), IREG(2));									// drol    i3,i3,i2
+			UML_DAND(block, IREG(1), IREG(1), IMM(0xffffffff));							// dand    i1,i1,0xffffffff
+			UML_DAND(block, IREG(3), IREG(3), IMM(U64(0xffffffff00000000)));			// dand    i3,i3,~0xffffffff
+			UML_DOR(block, IREG(1), IREG(1), IREG(3));									// dor     i1,i1,i3
+			UML_DROR(block, IREG(1), IREG(1), IREG(2));									// dror    i1,i1,i2
+			UML_DSTORE(block, rsp->impstate->dmem, IREG(0), IREG(1), QWORD_x1); 		// dstore  dmem,i0,i1,qword_x1
+#endif
 		}
 	}
 	else
 	{
 		if (size == 1)
 		{
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));						// xor     i0,i0,bytexor
+#ifdef LSB_FIRST
+			UML_XOR(block, IREG(0), IREG(0), IMM(3));									// xor     i0,i0,3
+#endif
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
 			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);				// load    i0,dmem,i0,byte
 		}
 		else if (size == 2)
 		{
-			UML_TEST(block, IREG(0), IMM(1));											// test    i0,3
-			UML_JMPc(block, IF_NZ, unaligned_r2);										// jnz     <unaligned_r2>
-
-			UML_SHR(block, IREG(0), IREG(0), IMM(1));									// shr     i0,i0,1
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE_XOR_BE(0)));						// xor     i0,i0,bytexor
-			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), WORD);				// load    i0,dmem,i0,word
+#ifdef LSB_FIRST
+			UML_TEST(block, IREG(0), IMM(1));											// test    i0,1
+			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
+			UML_XOR(block, IREG(0), IREG(0), IMM(2));									// xor     i0,i0,2
+#endif
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), WORD_x1);			// load    i0,dmem,i0,word_x1
 			UML_RET(block);
-
-			UML_LABEL(block, unaligned_r2);
-			UML_MOV(block, IREG(2), IMM(0));
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-
-			UML_LOAD(block, IREG(3), rsp->impstate->dmem, IREG(0), BYTE);
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_ADD(block, IREG(0), IREG(0), IMM(1));
-			UML_XOR(block, IREG(0), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_OR(block, IREG(2), IREG(2), IREG(3));
-
-			UML_LOAD(block, IREG(3), rsp->impstate->dmem, IREG(0), BYTE);
-			UML_ADD(block, IREG(0), IREG(0), IMM(1));
-			UML_SHL(block, IREG(2), IREG(2), IMM(8));
-			UML_OR(block, IREG(2), IREG(2), IREG(3));
-
-			UML_MOV(block, IREG(0), IREG(2));
+#ifdef LSB_FIRST
+			UML_LABEL(block, unaligned_case);										// unaligned_case:
+			UML_AND(block, IREG(1), IREG(0), IMM(3));									// and     i1,i0,3
+			UML_AND(block, IREG(0), IREG(0), IMM(0xffc));								// and     i0,i0,0xffc
+			UML_SHL(block, IREG(1), IREG(1), IMM(3));									// shl     i1,i1,3
+			UML_DLOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), QWORD_x1);			// dload   i0,dmem,i0,qword_x1
+			UML_ADD(block, IREG(1), IREG(1), IMM(48));									// add     i1,i1,48
+			UML_DROL(block, IREG(0), IREG(0), IREG(1));									// drol    i0,i0,i1
+			UML_AND(block, IREG(0), IREG(0), IMM(0xffff));								// and     i0,i0,0xffff
+#endif
 		}
 		else if (size == 4)
 		{
+#ifdef LSB_FIRST
 			UML_TEST(block, IREG(0), IMM(3));											// test    i0,3
-			UML_JMPc(block, IF_NZ, unaligned_r4);										// jnz     <unaligned_r4>
-
-			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), DWORD_x1);			// load    i0,dmem,i0,dword
+			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
+#endif
+			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
+			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), DWORD_x1);			// load    i0,dmem,i0,dword_x1
 			UML_RET(block);
-
-			UML_LABEL(block, unaligned_r4);
-
-			UML_XOR(block, IREG(1), IREG(0), IMM(BYTE4_XOR_BE(0)));
-			UML_LOAD(block, IREG(3), rsp->impstate->dmem, IREG(1), BYTE);
-			UML_SHL(block, IREG(2), IREG(3), IMM(24));
-
-			UML_ADD(block, IREG(1), IREG(0), IMM(1));
-			UML_XOR(block, IREG(1), IREG(1), IMM(BYTE4_XOR_BE(0)));
-			UML_LOAD(block, IREG(3), rsp->impstate->dmem, IREG(1), BYTE);
-			UML_SHL(block, IREG(3), IREG(3), IMM(16));
-			UML_OR(block, IREG(2), IREG(2), IREG(3));
-
-			UML_ADD(block, IREG(1), IREG(0), IMM(2));
-			UML_XOR(block, IREG(1), IREG(1), IMM(BYTE4_XOR_BE(0)));
-			UML_LOAD(block, IREG(3), rsp->impstate->dmem, IREG(1), BYTE);
-			UML_SHL(block, IREG(3), IREG(3), IMM(8));
-			UML_OR(block, IREG(2), IREG(2), IREG(3));
-
-			UML_ADD(block, IREG(1), IREG(0), IMM(3));
-			UML_XOR(block, IREG(1), IREG(1), IMM(BYTE4_XOR_BE(0)));
-			UML_LOAD(block, IREG(3), rsp->impstate->dmem, IREG(1), BYTE);
-			UML_OR(block, IREG(0), IREG(2), IREG(3));
+#ifdef LSB_FIRST
+			UML_LABEL(block, unaligned_case);										// unaligned_case:
+			UML_AND(block, IREG(1), IREG(0), IMM(3));									// and     i1,i0,3
+			UML_AND(block, IREG(0), IREG(0), IMM(0xffc));								// and     i0,i0,0xffc
+			UML_SHL(block, IREG(1), IREG(1), IMM(3));									// shl     i1,i1,3
+			UML_DLOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), QWORD_x1);			// dload   i0,dmem,i0,qword_x1
+			UML_ADD(block, IREG(1), IREG(1), IMM(48));									// add     i1,i1,48
+			UML_DROL(block, IREG(0), IREG(0), IREG(1));									// drol    i0,i0,i1
+#endif
 		}
 	}
 	UML_RET(block);
@@ -7647,9 +7665,9 @@ static void generate_sequence_instruction(rsp_state *rsp, drcuml_block *block, c
 	/* if we hit an unmapped address, fatal error */
 	//if (desc->flags & OPFLAG_COMPILER_UNMAPPED)
 	//{
-	//	UML_MOV(block, MEM(&rsp->pc), IMM(desc->pc));								// mov     [pc],desc->pc
-	//	save_fast_iregs(rsp, block);
-	//	UML_EXIT(block, IMM(EXECUTE_UNMAPPED_CODE));								// exit    EXECUTE_UNMAPPED_CODE
+	//  UML_MOV(block, MEM(&rsp->pc), IMM(desc->pc));                               // mov     [pc],desc->pc
+	//  save_fast_iregs(rsp, block);
+	//  UML_EXIT(block, IMM(EXECUTE_UNMAPPED_CODE));                                // exit    EXECUTE_UNMAPPED_CODE
 	//}
 
 	/* otherwise, unless this is a virtual no-op, it's a regular instruction */
@@ -8170,8 +8188,8 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 
 		case 0x3a:	/* SWC2 - MIPS I */
 			return generate_swc2(rsp, block, compiler, desc);
-			//UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
-			//UML_CALLC(block, cfunc_swc2, rsp);										// callc   cfunc_mfc2
+			//UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));     // mov     [arg0],desc->opptr.l
+			//UML_CALLC(block, cfunc_swc2, rsp);                                        // callc   cfunc_mfc2
 			//return TRUE;
 
 		/* ----- coprocessor instructions ----- */
@@ -8406,7 +8424,7 @@ static int generate_cop2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 			{
 				UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));	// mov     [arg0],desc->opptr.l
 				UML_CALLC(block, cfunc_mfc2, rsp);									// callc   cfunc_mfc2
-				//UML_SEXT(block, R32(RTREG), IREG(0), DWORD);						// dsext   <rtreg>,i0,dword
+				//UML_SEXT(block, R32(RTREG), IREG(0), DWORD);                      // dsext   <rtreg>,i0,dword
 			}
 			return TRUE;
 
@@ -8415,7 +8433,7 @@ static int generate_cop2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 			{
 				UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));	// mov     [arg0],desc->opptr.l
 				UML_CALLC(block, cfunc_cfc2, rsp);									// callc   cfunc_cfc2
-				//UML_SEXT(block, R32(RTREG), IREG(0), DWORD);						// dsext   <rtreg>,i0,dword
+				//UML_SEXT(block, R32(RTREG), IREG(0), DWORD);                      // dsext   <rtreg>,i0,dword
 			}
 			return TRUE;
 
@@ -8600,11 +8618,11 @@ CPU_GET_INFO( rsp )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE:					info->i = CLEAR_LINE;					break;
 

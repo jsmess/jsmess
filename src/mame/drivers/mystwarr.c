@@ -28,7 +28,7 @@
 #include "includes/konamigx.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eepromdev.h"
+#include "machine/eeprom.h"
 #include "sound/k054539.h"
 #include "includes/konamipt.h"
 
@@ -320,7 +320,7 @@ static ADDRESS_MAP_START( metamrph_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x240000, 0x240007) AM_WRITE(K053246_word_w)
 	AM_RANGE(0x244000, 0x24400f) AM_READ(K055673_rom_word_r)
 	AM_RANGE(0x244010, 0x24401f) AM_WRITE(K053247_reg_word_w)
- 	AM_RANGE(0x24c000, 0x24ffff) AM_READWRITE(K053250_0_ram_r,K053250_0_ram_w) // "LVC RAM" (53250_ram)
+	AM_RANGE(0x24c000, 0x24ffff) AM_READWRITE(K053250_0_ram_r,K053250_0_ram_w) // "LVC RAM" (53250_ram)
 	AM_RANGE(0x250000, 0x25000f) AM_READWRITE(K053250_0_r,K053250_0_w)
 	AM_RANGE(0x254000, 0x25401f) AM_WRITE(K054338_word_w)
 	AM_RANGE(0x258000, 0x2580ff) AM_WRITE(K055555_word_w)
@@ -363,7 +363,7 @@ static ADDRESS_MAP_START( viostorm_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x240000, 0x240007) AM_WRITE(K053246_word_w)
 	AM_RANGE(0x244000, 0x24400f) AM_READ(K055673_rom_word_r)
 	AM_RANGE(0x244010, 0x24401f) AM_WRITE(K053247_reg_word_w)
- 	AM_RANGE(0x24c000, 0x24ffff) AM_RAM		// K053250_0_ram_r / K053250_0_ram_w
+	AM_RANGE(0x24c000, 0x24ffff) AM_RAM		// K053250_0_ram_r / K053250_0_ram_w
 	AM_RANGE(0x250000, 0x25000f) AM_RAM		// K053250_0_r / K053250_0_w
 	AM_RANGE(0x254000, 0x25401f) AM_WRITE(K054338_word_w)
 	AM_RANGE(0x258000, 0x2580ff) AM_WRITE(K055555_word_w)
@@ -459,7 +459,7 @@ static ADDRESS_MAP_START( martchmp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x404000, 0x404007) AM_WRITE(K053246_word_w)				// OBJSET1
 	AM_RANGE(0x40a000, 0x40a01f) AM_WRITE(K054338_word_w)				// CLTC
 	AM_RANGE(0x40c000, 0x40c03f) AM_WRITE(K056832_word_w)				// VACSET
-	AM_RANGE(0x40e000, 0x40e03f) AM_WRITE(K053990_martchmp_word_w) 		// protection
+	AM_RANGE(0x40e000, 0x40e03f) AM_WRITE(K053990_martchmp_word_w)		// protection
 	AM_RANGE(0x410000, 0x410001) AM_WRITE(mweeprom_w)
 	AM_RANGE(0x412000, 0x412001) AM_READWRITE(mccontrol_r,mccontrol_w)
 	AM_RANGE(0x414000, 0x414001) AM_READ_PORT("P1_P2")
@@ -494,7 +494,7 @@ static ADDRESS_MAP_START( dadandrn_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM							// main program and data ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(K053247_scattered_word_r,K053247_scattered_word_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x410000, 0x411fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM
-	AM_RANGE(0x412000, 0x413fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w) 	// tilemap RAM mirror read/write (essential)
+	AM_RANGE(0x412000, 0x413fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM mirror read/write (essential)
 	AM_RANGE(0x420000, 0x421fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x430000, 0x430007) AM_WRITE(K053246_word_w)
 	AM_RANGE(0x440000, 0x443fff) AM_READ(K056832_mw_rom_word_r)
@@ -542,7 +542,7 @@ static ADDRESS_MAP_START( gaiapols_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM								// main program
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(K053247_scattered_word_r,K053247_scattered_word_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x410000, 0x411fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)		// tilemap RAM
-	AM_RANGE(0x412000, 0x413fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w) 		// tilemap RAM mirror read / write (essential)
+	AM_RANGE(0x412000, 0x413fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)		// tilemap RAM mirror read / write (essential)
 	AM_RANGE(0x420000, 0x421fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x430000, 0x430007) AM_WRITE(K053246_word_w)
 	AM_RANGE(0x440000, 0x441fff) AM_READ(K056832_mw_rom_word_r)
@@ -568,9 +568,9 @@ static ADDRESS_MAP_START( gaiapols_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE(ddd_053936_enable_w)
 	AM_RANGE(0x6e0000, 0x6e0001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x800000, 0x87ffff) AM_READ(gai_053936_tilerom_0_r)	// 256k tilemap readback
-	AM_RANGE(0xa00000, 0xa7ffff) AM_READ(ddd_053936_tilerom_1_r) 	// 128k tilemap readback
+	AM_RANGE(0xa00000, 0xa7ffff) AM_READ(ddd_053936_tilerom_1_r)	// 128k tilemap readback
 	AM_RANGE(0xc00000, 0xdfffff) AM_READ(gai_053936_tilerom_2_r)	// tile character readback
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP 	// watchdog
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP	// watchdog
 #if MW_DEBUG
 	AM_RANGE(0x430000, 0x430007) AM_READ(K053246_reg_word_r)
 	AM_RANGE(0x450010, 0x45001f) AM_READ(K053247_reg_word_r)
@@ -641,7 +641,7 @@ static INPUT_PORTS_START( mystwarr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* game loops if this is set */
@@ -665,9 +665,9 @@ static INPUT_PORTS_START( mystwarr )
 	KONAMI16_MSB(4, IPT_BUTTON3, IPT_START4 )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( metamrph )
@@ -682,7 +682,7 @@ static INPUT_PORTS_START( metamrph )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
@@ -708,9 +708,9 @@ static INPUT_PORTS_START( metamrph )
 	KONAMI16_MSB(4, IPT_BUTTON3, IPT_START4 )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( viostorm )
@@ -725,7 +725,7 @@ static INPUT_PORTS_START( viostorm )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
@@ -751,9 +751,9 @@ static INPUT_PORTS_START( viostorm )
 	KONAMI16_MSB(4, IPT_BUTTON3, IPT_START4 )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dadandrn )
@@ -769,7 +769,7 @@ static INPUT_PORTS_START( dadandrn )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
@@ -792,9 +792,9 @@ static INPUT_PORTS_START( dadandrn )
 	KONAMI8_B123_START(4)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( martchmp )
@@ -809,7 +809,7 @@ static INPUT_PORTS_START( martchmp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* game loops if this is set */
@@ -831,9 +831,9 @@ static INPUT_PORTS_START( martchmp )
 	KONAMI16_MSB(4, IPT_BUTTON3, IPT_START4 )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
 INPUT_PORTS_END
 
 /**********************************************************************************/
@@ -970,7 +970,7 @@ static MACHINE_DRIVER_START( mystwarr )
 
 	MDRV_QUANTUM_TIME(HZ(1920))
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	MDRV_MACHINE_START(mystwarr)
 	MDRV_MACHINE_RESET(mystwarr)
@@ -1080,7 +1080,7 @@ static MACHINE_DRIVER_START( gaiapols )
 	MDRV_GFXDECODE(gaiapols)
 
 	MDRV_DEVICE_REMOVE("eeprom")
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", gaia_eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", gaia_eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_START(gaiapols)

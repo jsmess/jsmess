@@ -364,22 +364,6 @@ static NVRAM_HANDLER( ssv )
 			mame_fread(file, ssv_nvram, ssv_nvram_size);
 }
 
-static NVRAM_HANDLER( gdfs )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C46);
-
-		if (file) eeprom_load(file);
-		else
-		{
-			/* Set the EEPROM to Factory Defaults */
-		}
-	}
-}
-
 /***************************************************************************
 
 
@@ -429,7 +413,7 @@ static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
 	AM_RANGE(0x160000, 0x17ffff) AM_RAM																/*          */	\
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ(ssv_vblank_r			)									/*  Vblank? */	\
 /**/AM_RANGE(0x1c0002, 0x1c007f) AM_READONLY									/*  Scroll  */	\
-	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE(ssv_scroll_w) AM_BASE(&ssv_scroll)                 		/*  Scroll  */  \
+	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE(ssv_scroll_w) AM_BASE(&ssv_scroll)                		/*  Scroll  */  \
 	AM_RANGE(0x210002, 0x210003) AM_READ_PORT("DSW1")																\
 	AM_RANGE(0x210004, 0x210005) AM_READ_PORT("DSW2")																\
 	AM_RANGE(0x210008, 0x210009) AM_READ_PORT("P1")																	\
@@ -437,9 +421,9 @@ static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
 	AM_RANGE(0x21000c, 0x21000d) AM_READ_PORT("SYSTEM")																\
 	AM_RANGE(0x21000e, 0x21000f) AM_READNOP AM_WRITE(ssv_lockout_w)								/*  Lockout */	\
 	AM_RANGE(0x210010, 0x210011) AM_WRITENOP                                                        				\
-	AM_RANGE(0x230000, 0x230071) AM_WRITEONLY AM_BASE(&ssv_irq_vectors)	          		    /*  IRQ Vec */ 	\
-	AM_RANGE(0x240000, 0x240071) AM_WRITE(ssv_irq_ack_w )                                 			/*  IRQ Ack */	\
-	AM_RANGE(0x260000, 0x260001) AM_WRITE(ssv_irq_enable_w)                               			/*  IRQ En  */  \
+	AM_RANGE(0x230000, 0x230071) AM_WRITEONLY AM_BASE(&ssv_irq_vectors)	        		    /*  IRQ Vec */	\
+	AM_RANGE(0x240000, 0x240071) AM_WRITE(ssv_irq_ack_w )                               			/*  IRQ Ack */	\
+	AM_RANGE(0x260000, 0x260001) AM_WRITE(ssv_irq_enable_w)                             			/*  IRQ En  */  \
 	AM_RANGE(0x300000, 0x30007f) AM_DEVREADWRITE8("ensoniq", es5506_r, es5506_w, 0x00ff)			/*  Sound   */	\
 	AM_RANGE(0x482000, 0x482fff) AM_RAM_WRITE(dsp_w) AM_BASE(&dsp_ram)												\
 	AM_RANGE(_ROM, 0xffffff) AM_ROMBANK("bank1")														/*  ROM     */	\
@@ -477,19 +461,19 @@ ADDRESS_MAP_END
 static int gdfs_gfxram_bank, gdfs_lightgun_select;
 static UINT16 *gdfs_blitram;
 
-static READ16_HANDLER( gdfs_eeprom_r )
+static READ16_DEVICE_HANDLER( gdfs_eeprom_r )
 {
 	static const char *const gunnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
 
-	return (((gdfs_lightgun_select & 1) ? 0 : 0xff) ^ input_port_read(space->machine, gunnames[gdfs_lightgun_select])) | (eeprom_read_bit() << 8);
+	return (((gdfs_lightgun_select & 1) ? 0 : 0xff) ^ input_port_read(device->machine, gunnames[gdfs_lightgun_select])) | (eeprom_read_bit(device) << 8);
 }
 
-static WRITE16_HANDLER( gdfs_eeprom_w )
+static WRITE16_DEVICE_HANDLER( gdfs_eeprom_w )
 {
 	static UINT16 data_old;
 
 	if (data & ~0x7b00)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(space->cpu),data);
+		logerror("%s - Unknown EEPROM bit written %04X\n",cpuexec_describe_context(device->machine),data);
 
 	if ( ACCESSING_BITS_8_15 )
 	{
@@ -497,13 +481,13 @@ static WRITE16_HANDLER( gdfs_eeprom_w )
 //      data & 0x0001 ?
 
 		// latch the bit
-		eeprom_write_bit(data & 0x4000);
+		eeprom_write_bit(device, data & 0x4000);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line(device, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line(device, (data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
 
 		if (!(data_old & 0x0800) && (data & 0x0800))	// rising clock
 			gdfs_lightgun_select = (data & 0x0300) >> 8;
@@ -600,8 +584,8 @@ static ADDRESS_MAP_START( gdfs_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(gdfs_tmapram_w) AM_BASE(&gdfs_tmapram)
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM
 	AM_RANGE(0x440000, 0x44003f) AM_RAM AM_BASE(&gdfs_tmapscroll)
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(gdfs_eeprom_w)
-	AM_RANGE(0x540000, 0x540001) AM_READ(gdfs_eeprom_r)
+	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE("eeprom", gdfs_eeprom_w)
+	AM_RANGE(0x540000, 0x540001) AM_DEVREAD("eeprom", gdfs_eeprom_r)
 	AM_RANGE(0x600000, 0x600fff) AM_RAM
 	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_BASE_GENERIC(spriteram2)
 	AM_RANGE(0x8c0000, 0x8c00ff) AM_READWRITE(gdfs_blitram_r, gdfs_blitram_w) AM_BASE(&gdfs_blitram)
@@ -2617,7 +2601,7 @@ static const es5506_interface es5506_config =
 
 ***************************************************************************/
 
-static void init_ssv(void)
+static void init_ssv(int sprites_offsx, int sprites_offsy, int tilemap_offsx, int tilemap_offsy)
 {
 	int i;
 	for (i = 0; i < 16; i++)
@@ -2628,84 +2612,45 @@ static void init_ssv(void)
 	ssv_enable_video(1);
 	ssv_special = 0;
 	interrupt_ultrax = 0;
+
+	ssv_sprites_offsx = sprites_offsx;
+	ssv_sprites_offsy = sprites_offsy;
+	ssv_tilemap_offsx = tilemap_offsx;
+	ssv_tilemap_offsy = tilemap_offsy;
 }
 
-static void init_ssv_hypreac2(void)
+static void init_hypreac2(void)
 {
 	int i;
-
-	init_ssv();
 
 	for (i = 0; i < 16; i++)
 		ssv_tile_code[i]	=	(i << 16);
 }
 
 
-static DRIVER_INIT( drifto94 )		{	init_ssv();
-								ssv_sprites_offsx = -8;	ssv_sprites_offsy = +0xf0;
-								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xf0;	}
-static DRIVER_INIT( eaglshot )		{	init_ssv_hypreac2();
-								ssv_sprites_offsx = -8;	ssv_sprites_offsy = +0xf0;
-								ssv_tilemap_offsx = 0;	ssv_tilemap_offsy = -0xef; }
-static DRIVER_INIT( gdfs )			{	init_ssv();
-								ssv_sprites_offsx = -8;	ssv_sprites_offsy = 1;
-								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = 0;	}
-static DRIVER_INIT( hypreact )		{	init_ssv();
-								ssv_sprites_offsx = +0;	ssv_sprites_offsy = +0xf0;
-								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xf7;	}
-static DRIVER_INIT( hypreac2 )		{	init_ssv_hypreac2();	// different
-								ssv_sprites_offsx = +0;	ssv_sprites_offsy = +0xf0;
-								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xf8;	}
-static DRIVER_INIT( janjans1 )		{	init_ssv();
-								ssv_sprites_offsx = +0;	ssv_sprites_offsy = +0xe8;
-								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xf0;	}
-static DRIVER_INIT( keithlcy )		{	init_ssv();
-								ssv_sprites_offsx = -8;	ssv_sprites_offsy = +0xf1;
-								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xf0;	}
-static DRIVER_INIT( meosism )		{	init_ssv();
-								ssv_sprites_offsx = +0;	ssv_sprites_offsy = +0xe8;
-								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xef;	}
-static DRIVER_INIT( mslider )		{	init_ssv();
-								ssv_sprites_offsx =-16;	ssv_sprites_offsy = +0xf0;
-								ssv_tilemap_offsx = +8;	ssv_tilemap_offsy = -0xf1;	}
-static DRIVER_INIT( ryorioh )		{	init_ssv();
-								ssv_sprites_offsx = +0;	ssv_sprites_offsy = +0xe8;
-								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xf0;	}
-static DRIVER_INIT( srmp4 )		{	init_ssv();
-								ssv_sprites_offsx = -8;	ssv_sprites_offsy = +0xf0;
-								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xf0;
+static DRIVER_INIT( drifto94 )		{	init_ssv(-8, +0xf0, +0, -0xf0);	}
+static DRIVER_INIT( eaglshot )		{	init_ssv(-8, +0xf0, +0, -0xef); init_hypreac2();	}
+static DRIVER_INIT( gdfs )			{	init_ssv(-8, +0x01, +0, +0x00);	}
+static DRIVER_INIT( hypreact )		{	init_ssv(+0, +0xf0, +0, -0xf7);	}
+static DRIVER_INIT( hypreac2 )		{	init_ssv(+0, +0xf0, +0, -0xf8); init_hypreac2();	}
+static DRIVER_INIT( janjans1 )		{	init_ssv(+0, +0xe8, +0, -0xf0);	}
+static DRIVER_INIT( keithlcy )		{	init_ssv(-8, +0xf1, +0, -0xf0);	}
+static DRIVER_INIT( meosism )		{	init_ssv(+0, +0xe8, +0, -0xef);	}
+static DRIVER_INIT( mslider )		{	init_ssv(-16,+0xf0, +8, -0xf1);	}
+static DRIVER_INIT( ryorioh )		{	init_ssv(+0, +0xe8, +0, -0xf0);	}
+static DRIVER_INIT( srmp4 )			{	init_ssv(-8, +0xf0, +0, -0xf0);
 //  ((UINT16 *)memory_region(machine, "user1"))[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
-							}
-static DRIVER_INIT( srmp7 )		{	init_ssv();
-								ssv_sprites_offsx = +0;	ssv_sprites_offsy = -0xf;
-								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xf0;	}
-static DRIVER_INIT( stmblade )		{	init_ssv();
-								ssv_sprites_offsx = -8; ssv_sprites_offsy = +0xef;
-								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xf0;	}
-static DRIVER_INIT( survarts )		{	init_ssv();
-								ssv_sprites_offsx = +0;	ssv_sprites_offsy = +0xe8;
-								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xef;	}
-static DRIVER_INIT( dynagear )		{	init_ssv();
-								ssv_sprites_offsx = -8;	ssv_sprites_offsy = +0xec;
-								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xef;	}
-static DRIVER_INIT( sxyreact )		{	init_ssv_hypreac2();	// different
-								ssv_sprites_offsx = +0;	ssv_sprites_offsy = +0xe8;
-								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xef;	}
-static DRIVER_INIT( sxyreac2 )		{	init_ssv_hypreac2();
-								ssv_sprites_offsx = +0;	ssv_sprites_offsy = +0xe8;
-								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xef;	}
-static DRIVER_INIT( twineag2 )		{	init_ssv();interrupt_ultrax=1;
-								ssv_sprites_offsx = -6; ssv_sprites_offsy = +0x01;
-								ssv_tilemap_offsx = -2; ssv_tilemap_offsy = +0x00;	}
-static DRIVER_INIT( ultrax )		{	init_ssv();interrupt_ultrax=1;
-								ssv_sprites_offsx = -8;	ssv_sprites_offsy = +0x01;
-								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = +0x00;	}
-static DRIVER_INIT( vasara )		{	init_ssv();
-								ssv_sprites_offsx = +0;	ssv_sprites_offsy = +0xf0;
-								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xf8;	}
-static DRIVER_INIT( jsk )			{	init_ssv();
-								ssv_sprites_offsx = -8;	ssv_sprites_offsy = +0xf5;
-								ssv_tilemap_offsx = 0;	ssv_tilemap_offsy = -0xf4;	}
+}
+static DRIVER_INIT( srmp7 )		{	init_ssv(+0, -0x0f, +0, -0xf0);	}
+static DRIVER_INIT( stmblade )		{	init_ssv(-8, +0xef, +0, -0xf0);	}
+static DRIVER_INIT( survarts )		{	init_ssv(+0, +0xe8, +0, -0xef);	}
+static DRIVER_INIT( dynagear )		{	init_ssv(-8, +0xec, +0, -0xef);	}
+static DRIVER_INIT( sxyreact )		{	init_ssv(+0, +0xe8, +0, -0xef); init_hypreac2();	}	// different
+static DRIVER_INIT( sxyreac2 )		{	init_ssv(+0, +0xe8, +0, -0xef); init_hypreac2();	}
+static DRIVER_INIT( twineag2 )		{	init_ssv(-6, +0x01, -2, +0x00); interrupt_ultrax=1;	}
+static DRIVER_INIT( ultrax )		{	init_ssv(-8, +0x01, +0, +0x00); interrupt_ultrax=1;	}
+static DRIVER_INIT( vasara )		{	init_ssv(+0, +0xf0, +0, -0xf8);	}
+static DRIVER_INIT( jsk )			{	init_ssv(-8, +0xf5, +0, -0xf4);	}
 
 
 static MACHINE_DRIVER_START( ssv )
@@ -2761,7 +2706,7 @@ static MACHINE_DRIVER_START( gdfs )
 	MDRV_CPU_PROGRAM_MAP(gdfs_map)
 	MDRV_CPU_VBLANK_INT_HACK(gdfs_interrupt,1+4)
 
-	MDRV_NVRAM_HANDLER(gdfs)
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -3577,17 +3522,17 @@ ROM_START( koikois2 )
 	ROM_RELOAD(                 0x300001, 0x080000             )
 
 	ROM_REGION( 0x2000000, "gfx1", 0 ) /* Sprites */
- 	ROM_LOAD( "kk2-a0.bin", 0x0000000, 0x400000, CRC(b94b76c2) SHA1(07ce3e3946669c1bd2f022da9861164625be9c1b) )
- 	ROM_LOAD( "kk2-a1.bin", 0x0400000, 0x200000, CRC(a7c99f56) SHA1(de341e99f76446fab4d7f09c2d8a6f18554b5d2f) )
+	ROM_LOAD( "kk2-a0.bin", 0x0000000, 0x400000, CRC(b94b76c2) SHA1(07ce3e3946669c1bd2f022da9861164625be9c1b) )
+	ROM_LOAD( "kk2-a1.bin", 0x0400000, 0x200000, CRC(a7c99f56) SHA1(de341e99f76446fab4d7f09c2d8a6f18554b5d2f) )
 
- 	ROM_LOAD( "kk2-b0.bin", 0x0800000, 0x400000, CRC(4d028972) SHA1(732c874d3511c7bce006436d557ec24e54df0166) )
- 	ROM_LOAD( "kk2-b1.bin", 0x0c00000, 0x200000, CRC(778ec9fb) SHA1(5983f0292e274e3da098b461355e2c001f4881b3) )
+	ROM_LOAD( "kk2-b0.bin", 0x0800000, 0x400000, CRC(4d028972) SHA1(732c874d3511c7bce006436d557ec24e54df0166) )
+	ROM_LOAD( "kk2-b1.bin", 0x0c00000, 0x200000, CRC(778ec9fb) SHA1(5983f0292e274e3da098b461355e2c001f4881b3) )
 
- 	ROM_LOAD( "kk2-c0.bin", 0x1000000, 0x400000, CRC(34b699d9) SHA1(b5208d5f70f21725e54c9dc59de73f1a5646a72c) )
- 	ROM_LOAD( "kk2-c1.bin", 0x1400000, 0x200000, CRC(ab451e88) SHA1(0c4d6c0c758f2ab4210c201605dd573661b6c553) )
+	ROM_LOAD( "kk2-c0.bin", 0x1000000, 0x400000, CRC(34b699d9) SHA1(b5208d5f70f21725e54c9dc59de73f1a5646a72c) )
+	ROM_LOAD( "kk2-c1.bin", 0x1400000, 0x200000, CRC(ab451e88) SHA1(0c4d6c0c758f2ab4210c201605dd573661b6c553) )
 
- 	ROM_LOAD( "kk2-d0.bin", 0x1800000, 0x400000, CRC(0e3005a4) SHA1(fa8da58308d58bb6b2e8beb8ee8f7ea08b18f4d9) )
- 	ROM_LOAD( "kk2-d1.bin", 0x1c00000, 0x200000, CRC(17a02252) SHA1(c7aa61e27f197b3c497a65a9369e3a6a20c9f82a) )
+	ROM_LOAD( "kk2-d0.bin", 0x1800000, 0x400000, CRC(0e3005a4) SHA1(fa8da58308d58bb6b2e8beb8ee8f7ea08b18f4d9) )
+	ROM_LOAD( "kk2-d1.bin", 0x1c00000, 0x200000, CRC(17a02252) SHA1(c7aa61e27f197b3c497a65a9369e3a6a20c9f82a) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "kk2_snd0.bin", 0x000000, 0x200000, CRC(b27eaa94) SHA1(05baaef683a1fcd9eb8a7cfd5b280c05108e832f) )

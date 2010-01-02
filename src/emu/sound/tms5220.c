@@ -196,7 +196,7 @@ struct _tms5220_state
     */
 	UINT8 tms5220_speaking;	/* Speak or Speak External command in progress */
 	UINT8 speak_external;	/* Speak External command in progress */
-	UINT8 talk_status; 		/* tms5220 is really currently speaking */
+	UINT8 talk_status;		/* tms5220 is really currently speaking */
 	UINT8 first_frame;		/* we have just started speaking, and we are to parse the first frame */
 	UINT8 last_frame;		/* we are doing the frame of sound */
 	UINT8 buffer_low;		/* FIFO has less than 8 bytes in it */
@@ -785,12 +785,16 @@ static INT16 clip_and_wrap(INT16 cliptemp)
 	if (cliptemp > 2047) cliptemp = -2048 + (cliptemp-2047);
 	else if (cliptemp < -2048) cliptemp = 2047 - (cliptemp+2048);
 
-	if (cliptemp > 511) { mame_printf_debug ("cliptemp > 511\n");
-	    return 127<<8; }
-        else if (cliptemp < -512) { mame_printf_debug ("cliptemp < -512\n");
-	    return -128<<8; }
-        else
-            return cliptemp << 6;
+	if (cliptemp > 511) {
+		mame_printf_debug ("cliptemp > 511\n");
+		return 127<<8;
+	}
+	else if (cliptemp < -512) {
+		mame_printf_debug ("cliptemp < -512\n");
+		return -128<<8;
+	}
+	else
+	    return cliptemp << 6;
 }
 
 

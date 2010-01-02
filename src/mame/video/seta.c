@@ -141,8 +141,8 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 /* Variables only used here */
 
-static tilemap *tilemap_0, *tilemap_1;	// Layer 0
-static tilemap *tilemap_2, *tilemap_3;	// Layer 1
+static tilemap_t *tilemap_0, *tilemap_1;	// Layer 0
+static tilemap_t *tilemap_2, *tilemap_3;	// Layer 1
 static int tilemaps_flip;
 
 /* Variables used elsewhere */
@@ -909,7 +909,7 @@ static VIDEO_UPDATE( seta_layers )
 	int layers_ctrl = -1;
 	int enab_0, enab_1, x_0, x_1, y_0, y_1;
 
-	int order	= 	0;
+	int order	=	0;
 	int flip	=	(screen->machine->generic.spriteram.u16[ 0x600/2 ] & 0x40) >> 6;
 
 	const rectangle *visarea = video_screen_get_visible_area(screen);
