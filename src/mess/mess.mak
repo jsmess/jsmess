@@ -837,6 +837,7 @@ $(MESSOBJ)/entex.a:				\
 $(MESSOBJ)/epoch.a:				\
 	$(MESS_DRIVERS)/gamepock.o	\
 	$(MESS_MACHINE)/gamepock.o	\
+	$(MESS_DRIVERS)/scv.o		\
 
 $(MESSOBJ)/epson.a:				\
 	$(MESS_DRIVERS)/ex800.o		\
@@ -1572,7 +1573,6 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/msbc1.o		\
 	$(MESS_DRIVERS)/sbc6510.o	\
 	$(MESS_DRIVERS)/supracan.o	\
-	$(MESS_DRIVERS)/scv.o		\
 
 
 
