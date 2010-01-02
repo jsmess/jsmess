@@ -104,25 +104,44 @@ static VIDEO_UPDATE( supracan )
 		{
 			int tile;
 
-			tile = (supracan_vram[count] & 0x00ff);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
+			tile = (supracan_vram[count] & 0x01ff);
+			drawgfx_transpen(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8,0);
+			count++;
+		}
+	}
+
+	// Tilemap
+	count = 0x1e1c0/2;
+
+	for (y=0;y<16;y++)
+	{
+		for (x=0;x<32;x++)
+		{
+			int tile, flipx, pal;
+
+			tile = (supracan_vram[count] & 0x07ff);
+			flipx = (supracan_vram[count] & 0x0800) ? 1 : 0;
+			pal = (supracan_vram[count] & 0xf000) >> 12;
+
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],tile,pal,flipx,0,x*8,y*8,0);
 			count++;
 		}
 	}
 
 	{
 		int x,y,spr_offs,col,i,spr_base;
+		//UINT8 *sprdata = (UINT8*)(&supracan_vram[0x1d000/2]);
 
 		spr_base = 0x1d000;
 
 		for(i=spr_base/2;i<(spr_base+0x100)/2;i+=4)
 		{
-			y = supracan_vram[i+0] & 0xff;
-			x = supracan_vram[i+3] & 0xff;
-			spr_offs = supracan_vram[i+2] & 0x1ff;;
+			x = supracan_vram[i+2] & 0x1ff;
+			y = supracan_vram[i+0] & 0x0ff;
+			spr_offs = (supracan_vram[i+3] << 2) >> 4;
 			col = (supracan_vram[i+1] & 0x000f);
 
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],spr_offs,col,0,0,x,y,0);
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],supracan_vram[spr_offs/2] & 0x7ff,col,0,0,x,y,0);
 		}
 	}
 
