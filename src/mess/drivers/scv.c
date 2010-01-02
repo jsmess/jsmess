@@ -232,6 +232,39 @@ INLINE void draw_sprite( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 tile_idx, UIN
 }
 
 
+INLINE void draw_text( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 *char_data, UINT8 fg, UINT8 bg )
+{
+	int i;
+
+	for ( i = 0; i < 8; i++ )
+	{
+		UINT8 d = char_data[i];
+
+		*BITMAP_ADDR16( bitmap, y + i, x + 0 ) = ( d & 0x80 ) ? fg : bg;
+		*BITMAP_ADDR16( bitmap, y + i, x + 1 ) = ( d & 0x40 ) ? fg : bg;
+		*BITMAP_ADDR16( bitmap, y + i, x + 2 ) = ( d & 0x20 ) ? fg : bg;
+		*BITMAP_ADDR16( bitmap, y + i, x + 3 ) = ( d & 0x10 ) ? fg : bg;
+		*BITMAP_ADDR16( bitmap, y + i, x + 4 ) = ( d & 0x08 ) ? fg : bg;
+		*BITMAP_ADDR16( bitmap, y + i, x + 5 ) = ( d & 0x04 ) ? fg : bg;
+		*BITMAP_ADDR16( bitmap, y + i, x + 6 ) = ( d & 0x02 ) ? fg : bg;
+		*BITMAP_ADDR16( bitmap, y + i, x + 7 ) = ( d & 0x01 ) ? fg : bg;
+	}
+
+	for ( i = 8; i < 16; i++ )
+	{
+		*BITMAP_ADDR16( bitmap, y + i, x + 0 ) = bg;
+		*BITMAP_ADDR16( bitmap, y + i, x + 1 ) = bg;
+		*BITMAP_ADDR16( bitmap, y + i, x + 2 ) = bg;
+		*BITMAP_ADDR16( bitmap, y + i, x + 3 ) = bg;
+		*BITMAP_ADDR16( bitmap, y + i, x + 4 ) = bg;
+		*BITMAP_ADDR16( bitmap, y + i, x + 5 ) = bg;
+		*BITMAP_ADDR16( bitmap, y + i, x + 6 ) = bg;
+		*BITMAP_ADDR16( bitmap, y + i, x + 7 ) = bg;
+	}
+
+}
+
+
 INLINE void draw_semi_graph( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 data, UINT8 fg, UINT8 bg )
 {
 	UINT8 col = data ? fg : bg;
@@ -270,7 +303,7 @@ static VIDEO_UPDATE( scv )
 	int x, y;
 	UINT8 gr_fg = scv_vram[0x1403] >> 4;
 	UINT8 gr_bg = scv_vram[0x1403] & 0x0f;
-//	UINT8 fg = scv_vram[0x1401] >> 4;
+	UINT8 fg = scv_vram[0x1401] >> 4;
 	UINT8 bg = scv_vram[0x1401] & 0x0f;
 	int clip_x = ( scv_vram[0x1402] & 0x0f ) * 2;
 	int clip_y = scv_vram[0x1402] >> 4;
@@ -301,6 +334,8 @@ static VIDEO_UPDATE( scv )
 			if ( text_x && text_y )
 			{
 				/* Text mode */
+				UINT8 *char_data = memory_region( screen->machine, "charrom" ) + ( d & 0x7f ) * 8;
+				draw_text( bitmap, x * 8, y * 16, char_data, fg, bg );
 			}
 			else
 			{
@@ -492,6 +527,8 @@ MACHINE_DRIVER_END
 ROM_START( scv )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "upd7801g.s01", 0, 0x1000, CRC(7ac06182) SHA1(6e89d1227581c76441a53d605f9e324185f1da33) )
+	ROM_REGION( 0x400, "charrom", 0 )
+	ROM_LOAD( "epochtv.chr", 0, 0x400, BAD_DUMP CRC(4ea64ab2) SHA1(27d6400096fe7ed5fd851ab3f78e60e798364f0b) )
 
 	ROM_REGION( 0x8000, "cart", ROMREGION_ERASEFF )
 ROM_END
@@ -500,6 +537,8 @@ ROM_END
 ROM_START( scv_pal )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "upd7801g.s01", 0, 0x1000, CRC(7ac06182) SHA1(6e89d1227581c76441a53d605f9e324185f1da33) )
+	ROM_REGION( 0x400, "charrom", 0 )
+	ROM_LOAD( "epochtv.chr", 0, 0x400, BAD_DUMP CRC(4ea64ab2) SHA1(27d6400096fe7ed5fd851ab3f78e60e798364f0b) )
 
 	ROM_REGION( 0x8000, "cart", ROMREGION_ERASEFF )
 ROM_END
