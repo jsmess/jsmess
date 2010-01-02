@@ -50,9 +50,9 @@ typedef enum
 
 
 /* uncomment the following line for verbose information */
-#define LOG_VERBOSE		1
-#define LOG_COMMAND		1
-#define LOG_EXTRA		1
+#define LOG_VERBOSE		0
+#define LOG_COMMAND		0
+#define LOG_EXTRA		0
 #define LOG_INTERRUPT	0
 
 /* uncomment this to not allow end of cylinder "error" */
@@ -705,7 +705,8 @@ static void upd765_set_ready_change_callback(const device_config *controller, co
 	upd765_t *fdc = get_safe_token(controller);
 	int drive = floppy_get_drive(img);
 
-	logerror("upd765: ready state change\n");
+	if (LOG_EXTRA)
+		logerror("upd765: ready state change\n");
 
 	/* drive that changed state */
 	fdc->upd765_status[0] = 0x0c0 | drive;

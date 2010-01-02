@@ -106,7 +106,6 @@ static void intel82439tx_configure_memory(running_machine *machine, UINT8 val, o
 	const address_space* space = cpu_get_address_space(machine->firstcpu,ADDRESS_SPACE_PROGRAM);
 	char bank[10];
 	sprintf(bank,"bank%d",read_bank);
-	logerror("conf %02x\n",val);
 	memory_install_read_bank(space, begin, end, 0, 0, bank);
 	if (val & 0x01)
 		memory_set_bankptr(machine, bank, i82439tx->bios_ram + (begin - 0xC0000) / 4);

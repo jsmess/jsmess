@@ -36,9 +36,9 @@
 #include "memconv.h"
 
 
-#define LOG_HDC_STATUS		1
-#define LOG_HDC_CALL		1
-#define LOG_HDC_DATA		1
+#define LOG_HDC_STATUS		0
+#define LOG_HDC_CALL		0
+#define LOG_HDC_DATA		0
 
 
 #define MAX_HARD	2

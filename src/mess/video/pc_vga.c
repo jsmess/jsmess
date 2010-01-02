@@ -42,7 +42,7 @@
 ***************************************************************************/
 
 #define LOG_ACCESSES	0
-#define LOG_REGISTERS	1
+#define LOG_REGISTERS	0
 
 static PALETTE_INIT( ega );
 static PALETTE_INIT( vga );

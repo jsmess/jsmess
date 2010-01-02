@@ -489,7 +489,7 @@ static struct {
 
 static READ8_HANDLER( at_kbdc8042_p1_r )
 {
-	logerror("%04x: reading P1\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")) );
+	//logerror("%04x: reading P1\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")) );
 	return 0xFF;
 }
 
@@ -505,7 +505,7 @@ static WRITE8_HANDLER( at_kbdc8042_p2_w )
 	at_state *st = space->machine->driver_data;
 	const device_config *keyboard = devtag_get_device(space->machine, "keyboard");
 
-	logerror("%04x: writing $%02x to P2\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), data );
+	//logerror("%04x: writing $%02x to P2\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), data );
 
 	at_set_gate_a20( space->machine, ( data & 0x02 ) ? 1 : 0 );
 

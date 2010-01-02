@@ -248,7 +248,7 @@ static int pc_ide_status_r(DEVICE *This)
  *************************************************************************/
 WRITE8_HANDLER(at_mfm_0_w)
 {
-	logerror("ide write %.2x %.2x\n", offset, data);
+	//logerror("ide write %.2x %.2x\n", offset, data);
 	switch (offset) {
 	case 0: pc_ide_data_w(ide->devs+ide->drv, data);				break;
 	case 1: pc_ide_write_precomp_w(ide->devs+ide->drv, data);		break;
@@ -275,7 +275,7 @@ WRITE8_HANDLER(at_mfm_0_w)
 	case 6: data = pc_ide_drive_head_r(ide);		break;
 	case 7: data = pc_ide_status_r(ide->devs+ide->drv);			break;
 	}
-	logerror("ide read %.2x %.2x\n", offset, data);
+	//logerror("ide read %.2x %.2x\n", offset, data);
 	return data;
 }
 
