@@ -30,7 +30,7 @@ static UINT8 *supracan_soundram;
 static UINT16 *supracan_soundram_16;
 static UINT16 supracan_video_regs[256];
 static emu_timer *supracan_video_timer;
-static UINT16 *supracan_charram, *supracan_sprcharram;
+static UINT16 *supracan_charram;
 static UINT16 *supracan_vram;
 static UINT16 *supracan_rram;
 static UINT16 *supracan_rozpal;
@@ -123,9 +123,21 @@ typedef struct
 
 static _acan_dma_regs_t acan_dma_regs;
 
+typedef struct
+{
+	UINT32 src;
+	UINT32 dst;
+	UINT16 count;
+	UINT16 control;
+} _acan_sprdma_regs_t;
+
+static _acan_sprdma_regs_t acan_sprdma_regs;
+
+
 static WRITE16_HANDLER( supracan_dma_w )
 {
 	int i;
+
 	switch(offset)
 	{
 		case 0x00/2: // Source address MSW
@@ -156,9 +168,17 @@ static WRITE16_HANDLER( supracan_dma_w )
 				for(i = 0; i <= acan_dma_regs.count; i++)
 				{
 					if(data & 0x1000)
-						memory_write_word(space, acan_dma_regs.dest+=2, memory_read_word(space, acan_dma_regs.source+=2));
+					{
+						memory_write_word(space, acan_dma_regs.dest, memory_read_word(space, acan_dma_regs.source));
+						acan_dma_regs.dest+=2;
+						acan_dma_regs.source+=2;
+					}
 					else
-						memory_write_byte(space, acan_dma_regs.dest++, memory_read_byte(space, acan_dma_regs.source++));
+					{
+						memory_write_byte(space, acan_dma_regs.dest, memory_read_byte(space, acan_dma_regs.source));
+						acan_dma_regs.dest++;
+						acan_dma_regs.source++;
+					}
 				}
 			}
 			else
@@ -169,6 +189,7 @@ static WRITE16_HANDLER( supracan_dma_w )
 	}
 }
 
+#if 0
 static WRITE16_HANDLER( supracan_sprchar_w )
 {
 	COMBINE_DATA(&supracan_sprcharram[offset]);
@@ -179,9 +200,11 @@ static WRITE16_HANDLER( supracan_sprchar_w )
 		gfx[offset*2+0] = (supracan_sprcharram[offset] & 0xff00) >> 8;
 		gfx[offset*2+1] = (supracan_sprcharram[offset] & 0x00ff) >> 0;
 
-		gfx_element_mark_dirty(space->machine->gfx[1], offset/32);
+		gfx_element_mark_dirty(space->machine->gfx[1], offset/16);
+
 	}
 }
+#endif
 
 static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION( "cart", 0 )
@@ -198,7 +221,9 @@ static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xf44200, 0xf443ff ) AM_RAM AM_BASE(&supracan_vram)	/* Foreground tilemap layer */
 	AM_RANGE( 0xf44400, 0xf445ff ) AM_RAM AM_BASE(&supracan_rram)	/* ROZ layer tiles */
 	AM_RANGE( 0xf44600, 0xf44fff ) AM_RAM	/* Unknown, stuff gets written here. Zoom table?? */
-	AM_RANGE( 0xfc0000, 0xfcffff ) AM_RAM_WRITE( supracan_sprchar_w ) AM_BASE( &supracan_sprcharram )	/* System work ram */
+	AM_RANGE( 0xf48000, 0xf4ffff ) AM_RAM /* more character data */
+	AM_RANGE( 0xf5d000, 0xf5d0ff ) AM_RAM
+	AM_RANGE( 0xfc0000, 0xfcffff ) AM_RAM 	/* System work ram */
 	AM_RANGE( 0xff8000, 0xffffff ) AM_RAM	/* System work ram */
 ADDRESS_MAP_END
 
@@ -218,7 +243,8 @@ static WRITE16_HANDLER( supracan_char_w )
 		gfx[offset*2+0] = (supracan_charram[offset] & 0xff00) >> 8;
 		gfx[offset*2+1] = (supracan_charram[offset] & 0x00ff) >> 0;
 
-		gfx_element_mark_dirty(space->machine->gfx[0], offset/16);
+		gfx_element_mark_dirty(space->machine->gfx[0], offset/32);
+		gfx_element_mark_dirty(space->machine->gfx[1], offset/16);
 	}
 }
 
@@ -296,7 +322,7 @@ static READ16_HANDLER( supracan_video_r )
 		case 0: // VBlank flag
 			break;
 		default:
-			verboselog(space->machine, 0, "supracan_video_r: Unknown register: %08x (%04x & %04x)\n", 0xf0000 + (offset << 1), data, mem_mask);
+			verboselog(space->machine, 0, "supracan_video_r: Unknown register: %08x (%04x & %04x)\n", 0xf00000 + (offset << 1), data, mem_mask);
 			break;
 	}
 
@@ -321,13 +347,67 @@ static TIMER_CALLBACK( supracan_video_callback )
 	timer_adjust_oneshot( supracan_video_timer, video_screen_get_time_until_pos( machine->primary_screen, ( vpos + 1 ) & 0xff, 0 ), 0 );
 }
 
+/*
+0x188/0x18a is global x/y offset for the roz?
 
+f00018 is src
+f00012 is dst
+f0001c / f00016 are flags of some sort
+f00010 is the size
+f0001e is the trigger
+*/
 static WRITE16_HANDLER( supracan_video_w )
 {
+	int i;
+
 	switch(offset)
 	{
+		case 0x18/2: // Source address MSW
+			acan_sprdma_regs.src &= 0x0000ffff;
+			acan_sprdma_regs.src |= data << 16;
+			break;
+		case 0x1a/2: // Source address LSW
+			acan_sprdma_regs.src &= 0xffff0000;
+			acan_sprdma_regs.src |= data;
+			break;
+		case 0x12/2: // Destination address MSW
+			acan_sprdma_regs.dst &= 0x0000ffff;
+			acan_sprdma_regs.dst |= data << 16;
+			break;
+		case 0x14/2: // Destination address LSW
+			acan_sprdma_regs.dst &= 0xffff0000;
+			acan_sprdma_regs.dst |= data;
+			break;
+		case 0x10/2: // Byte count
+			acan_sprdma_regs.count = data;
+			break;
+		case 0x1e/2:
+			//if(data != 0xa000)
+			//printf("%08x %08x %04x %04x\n",acan_sprdma_regs.src,acan_sprdma_regs.dst,acan_sprdma_regs.count,data);
+			if(data & 0xa000) //0x2000 selects dword transfer?
+			{
+				for(i = 0; i <= acan_sprdma_regs.count; i++)
+				{
+					if(data & 0x0100) //dma 0x00 fill (or fixed value?)
+					{
+						memory_write_dword(space, acan_sprdma_regs.dst, 0x00000000);
+						acan_sprdma_regs.dst+=4;
+					}
+					else
+					{
+						memory_write_dword(space, acan_sprdma_regs.dst, memory_read_dword(space, acan_sprdma_regs.src));
+						acan_sprdma_regs.dst+=4;
+						acan_sprdma_regs.src+=4;
+					}
+				}
+			}
+			else
+			{
+				// ...
+			}
+			break;
 		default:
-			verboselog(space->machine, 0, "supracan_video_w: Unknown register: %08x = %04x & %04x\n", 0xf0000 + (offset << 1), data, mem_mask);
+			verboselog(space->machine, 0, "supracan_video_w: Unknown register: %08x = %04x & %04x\n", 0xf00000 + (offset << 1), data, mem_mask);
 			break;
 	}
 	supracan_video_regs[offset] = data;
@@ -391,7 +471,7 @@ static const gfx_layout supracan_sprlayout =
 
 static GFXDECODE_START( supracan )
 	GFXDECODE_ENTRY( "ram_gfx",  0, supracan_gfxlayout,   0, 1 )
-	GFXDECODE_ENTRY( "spr_gfx",  0, supracan_sprlayout,   0, 2 )
+	GFXDECODE_ENTRY( "ram_gfx",  0, supracan_sprlayout,   0, 0x10 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( supracan )
@@ -428,7 +508,7 @@ ROM_START( supracan )
 
 	ROM_REGION( 0x4000, "ram_gfx", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x8000, "spr_gfx", ROMREGION_ERASEFF )
+//	ROM_REGION( 0x8000, "spr_gfx", ROMREGION_ERASEFF )
 
 ROM_END
 
