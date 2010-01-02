@@ -177,7 +177,7 @@ static TIMER_CALLBACK( scv_vb_callback )
 }
 
 
-static void plot_sprite_part( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 pat, UINT8 col )
+INLINE void plot_sprite_part( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 pat, UINT8 col )
 {
 	if ( pat & 0x08 )
 		*BITMAP_ADDR16( bitmap, y, x ) = col;
@@ -187,6 +187,32 @@ static void plot_sprite_part( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 pat, UIN
 		*BITMAP_ADDR16( bitmap, y, x + 2 ) = col;
 	if ( pat & 0x01 && x < 253 )
 		*BITMAP_ADDR16( bitmap, y, x + 3 ) = col;
+}
+
+
+INLINE void draw_sprite( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 tile_idx, UINT8 col )
+{
+	int j;
+
+	for ( j = 0; j < 32; j += 4 )
+	{
+		UINT8 pat0 = scv_vram[ tile_idx * 32 + j + 0 ];
+		UINT8 pat1 = scv_vram[ tile_idx * 32 + j + 1 ];
+		UINT8 pat2 = scv_vram[ tile_idx * 32 + j + 2 ];
+		UINT8 pat3 = scv_vram[ tile_idx * 32 + j + 3 ];
+
+		plot_sprite_part( bitmap, x     , y, pat0 >> 4, col );
+		plot_sprite_part( bitmap, x +  4, y, pat1 >> 4, col );
+		plot_sprite_part( bitmap, x +  8, y, pat2 >> 4, col );
+		plot_sprite_part( bitmap, x + 12, y, pat3 >> 4, col );
+
+		plot_sprite_part( bitmap, x     , y + 1, pat0 & 0x0f, col );
+		plot_sprite_part( bitmap, x +  4, y + 1, pat1 & 0x0f, col );
+		plot_sprite_part( bitmap, x +  8, y + 1, pat2 & 0x0f, col );
+		plot_sprite_part( bitmap, x + 12, y + 1, pat3 & 0x0f, col );
+
+		y += 2;
+	}
 }
 
 
@@ -206,7 +232,10 @@ static VIDEO_UPDATE( scv )
 	/* Draw sprites */
 	if ( scv_vram[0x1400] & 0x10 )
 	{
-		int i, j;
+		static const UINT8 spr_2col_lut0[16] = { 0, 15, 12, 13, 10, 11, 8, 9, 6, 7, 4, 5, 2, 3, 1, 1 };
+		static const UINT8 spr_2col_lut1[16] = { 0, 1, 8, 11, 2, 3, 10, 9, 4, 5, 12, 13, 6, 7, 14, 15 };
+
+		int i;
 
 		for ( i = 0; i < 128; i++ )
 		{
@@ -217,84 +246,31 @@ static VIDEO_UPDATE( scv )
 			UINT8 x_32 = scv_vram[ 0x1202 + i * 4 ] & 0x01;		/* 32xX sprite */
 			UINT8 tile_idx = scv_vram[ 0x1203 + i * 4 ] & 0x7f;
 
-			for ( j = 0; j < 8; j++ )
+			if ( !col )
+				continue;
+
+			if ( ( scv_vram[0x1400] & 0x20 ) && ( i & 0x20 ) )
 			{
-				UINT8 pat0 = scv_vram[ tile_idx * 32 + j * 4 + 0 ];
-				UINT8 pat1 = scv_vram[ tile_idx * 32 + j * 4 + 1 ];
-				UINT8 pat2 = scv_vram[ tile_idx * 32 + j * 4 + 2 ];
-				UINT8 pat3 = scv_vram[ tile_idx * 32 + j * 4 + 3 ];
-
-				plot_sprite_part( bitmap, spr_x     , spr_y, pat0 >> 4, col );
-				plot_sprite_part( bitmap, spr_x +  4, spr_y, pat1 >> 4, col );
-				plot_sprite_part( bitmap, spr_x +  8, spr_y, pat2 >> 4, col );
-				plot_sprite_part( bitmap, spr_x + 12, spr_y, pat3 >> 4, col );
-
-				plot_sprite_part( bitmap, spr_x     , spr_y + 1, pat0 & 0x0f, col );
-				plot_sprite_part( bitmap, spr_x +  4, spr_y + 1, pat1 & 0x0f, col );
-				plot_sprite_part( bitmap, spr_x +  8, spr_y + 1, pat2 & 0x0f, col );
-				plot_sprite_part( bitmap, spr_x + 12, spr_y + 1, pat3 & 0x0f, col );
-
+				/* 2 color sprite handling */
+				draw_sprite( bitmap, spr_x, spr_y, tile_idx, col );
+				if ( x_32 || y_32 )
+					draw_sprite( bitmap, spr_x, spr_y, tile_idx + 8 * x_32 + y_32, ( i & 0x40 ) ? spr_2col_lut1[col] : spr_2col_lut0[col] );
+			}
+			else
+			{
+				/* regular sprite handling */
+				draw_sprite( bitmap, spr_x, spr_y, tile_idx, col );
 				if ( x_32 )
 				{
-					pat0 = scv_vram[ ( tile_idx + 8 ) * 32 + j * 4 + 0 ];
-					pat1 = scv_vram[ ( tile_idx + 8 ) * 32 + j * 4 + 1 ];
-					pat2 = scv_vram[ ( tile_idx + 8 ) * 32 + j * 4 + 2 ];
-					pat3 = scv_vram[ ( tile_idx + 8 ) * 32 + j * 4 + 3 ];
-
-					plot_sprite_part( bitmap, spr_x + 16, spr_y, pat0 >> 4, col );
-					plot_sprite_part( bitmap, spr_x + 20, spr_y, pat1 >> 4, col );
-					plot_sprite_part( bitmap, spr_x + 24, spr_y, pat2 >> 4, col );
-					plot_sprite_part( bitmap, spr_x + 28, spr_y, pat3 >> 4, col );
-
-					plot_sprite_part( bitmap, spr_x + 16, spr_y + 1, pat0 & 0x0f, col );
-					plot_sprite_part( bitmap, spr_x + 20, spr_y + 1, pat1 & 0x0f, col );
-					plot_sprite_part( bitmap, spr_x + 24, spr_y + 1, pat2 & 0x0f, col );
-					plot_sprite_part( bitmap, spr_x + 28, spr_y + 1, pat3 & 0x0f, col );
+					draw_sprite( bitmap, spr_x + 16, spr_y, tile_idx + 8, col );
 				}
-
-				spr_y += 2;
-			}
-
-			if ( y_32 )
-			{
-				tile_idx += 1;
-
-				for ( j = 0; j < 8; j++ )
+				if ( y_32 )
 				{
-					UINT8 pat0 = scv_vram[ tile_idx * 32 + j * 4 + 0 ];
-					UINT8 pat1 = scv_vram[ tile_idx * 32 + j * 4 + 1 ];
-					UINT8 pat2 = scv_vram[ tile_idx * 32 + j * 4 + 2 ];
-					UINT8 pat3 = scv_vram[ tile_idx * 32 + j * 4 + 3 ];
-
-					plot_sprite_part( bitmap, spr_x     , spr_y, pat0 >> 4, col );
-					plot_sprite_part( bitmap, spr_x +  4, spr_y, pat1 >> 4, col );
-					plot_sprite_part( bitmap, spr_x +  8, spr_y, pat2 >> 4, col );
-					plot_sprite_part( bitmap, spr_x + 12, spr_y, pat3 >> 4, col );
-
-					plot_sprite_part( bitmap, spr_x     , spr_y + 1, pat0 & 0x0f, col );
-					plot_sprite_part( bitmap, spr_x +  4, spr_y + 1, pat1 & 0x0f, col );
-					plot_sprite_part( bitmap, spr_x +  8, spr_y + 1, pat2 & 0x0f, col );
-					plot_sprite_part( bitmap, spr_x + 12, spr_y + 1, pat3 & 0x0f, col );
-
+					draw_sprite( bitmap, spr_x, spr_y + 16, tile_idx + 1, col );
 					if ( x_32 )
 					{
-						pat0 = scv_vram[ ( tile_idx + 8 ) * 32 + j * 4 + 0 ];
-						pat1 = scv_vram[ ( tile_idx + 8 ) * 32 + j * 4 + 1 ];
-						pat2 = scv_vram[ ( tile_idx + 8 ) * 32 + j * 4 + 2 ];
-						pat3 = scv_vram[ ( tile_idx + 8 ) * 32 + j * 4 + 3 ];
-
-						plot_sprite_part( bitmap, spr_x + 16, spr_y, pat0 >> 4, col );
-						plot_sprite_part( bitmap, spr_x + 20, spr_y, pat1 >> 4, col );
-						plot_sprite_part( bitmap, spr_x + 24, spr_y, pat2 >> 4, col );
-						plot_sprite_part( bitmap, spr_x + 28, spr_y, pat3 >> 4, col );
-
-						plot_sprite_part( bitmap, spr_x + 16, spr_y + 1, pat0 & 0x0f, col );
-						plot_sprite_part( bitmap, spr_x + 20, spr_y + 1, pat1 & 0x0f, col );
-						plot_sprite_part( bitmap, spr_x + 24, spr_y + 1, pat2 & 0x0f, col );
-						plot_sprite_part( bitmap, spr_x + 28, spr_y + 1, pat3 & 0x0f, col );
+						draw_sprite( bitmap, spr_x + 16, spr_y + 16, tile_idx + 9, col );
 					}
-
-					spr_y += 2;
 				}
 			}
 		}
@@ -330,7 +306,7 @@ static MACHINE_DRIVER_START( scv )
 
 	MDRV_SCREEN_ADD( "screen", RASTER )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_RAW_PARAMS( XTAL_14_31818MHz/2, 456, 0, 256, 262, 0, 200 )	/* TODO: Verify */
+	MDRV_SCREEN_RAW_PARAMS( XTAL_14_31818MHz/2, 456, 16, 240, 262, 16, 216 )	/* TODO: Verify */
 
 	MDRV_PALETTE_LENGTH( 16 )
 	MDRV_PALETTE_INIT( scv )
@@ -358,7 +334,7 @@ static MACHINE_DRIVER_START( scv_pal )
 
 	MDRV_SCREEN_ADD( "screen", RASTER )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_RAW_PARAMS( XTAL_13_4MHz/2, 456, 0, 256, 342, 0, 200 )		/* TODO: Verify */
+	MDRV_SCREEN_RAW_PARAMS( XTAL_13_4MHz/2, 456, 16, 240, 342, 16, 216 )		/* TODO: Verify */
 
 	MDRV_PALETTE_LENGTH( 16 )
 	MDRV_PALETTE_INIT( scv )
