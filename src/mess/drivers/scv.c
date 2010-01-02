@@ -231,6 +231,24 @@ INLINE void draw_semi_graph( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 data, UIN
 }
 
 
+INLINE void draw_block_graph( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 col )
+{
+	int i;
+
+	for ( i = 0; i < 8; i++ )
+	{
+		*BITMAP_ADDR16(bitmap, y + i, x + 0) = col;
+		*BITMAP_ADDR16(bitmap, y + i, x + 1) = col;
+		*BITMAP_ADDR16(bitmap, y + i, x + 2) = col;
+		*BITMAP_ADDR16(bitmap, y + i, x + 3) = col;
+		*BITMAP_ADDR16(bitmap, y + i, x + 4) = col;
+		*BITMAP_ADDR16(bitmap, y + i, x + 5) = col;
+		*BITMAP_ADDR16(bitmap, y + i, x + 6) = col;
+		*BITMAP_ADDR16(bitmap, y + i, x + 7) = col;
+	}
+}
+
+
 static VIDEO_UPDATE( scv )
 {
 	int x, y;
@@ -283,6 +301,8 @@ static VIDEO_UPDATE( scv )
 					draw_semi_graph( bitmap, x * 8 + 4, y * 16 + 12, d & 0x01, gr_fg, gr_bg );
 					break;
 				case 0x03:		/* Block graphics mode */
+					draw_block_graph( bitmap, x * 8, y * 16    , d >> 4 );
+					draw_block_graph( bitmap, x * 8, y * 16 + 8, d & 0x0f );
 					break;
 				default:		/* Otherwise draw nothing? */
 					break;
