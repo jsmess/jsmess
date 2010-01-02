@@ -20,6 +20,8 @@ Systems Promoted from GAME_NOT_WORKING:
 - Hector 2HR+ [JJ Stacino]
 - Hector 2HR [JJ Stacino]
 - Hector HRX [JJ Stacino]
+- Kaypro 4 [Robbbert]
+- Omni II [Robbbert]
 - Victor [JJ Stacino]
 - XOR S-100-12 [Curt Coder]
 
@@ -136,6 +138,8 @@ Source Changes:
 
 - WD17xx write track supported in proper way instead of using more 
   sector writes [Michael Zapf]
+
+- Added F4 character-set viewer to many computers [Robbbert]
 
 
 
