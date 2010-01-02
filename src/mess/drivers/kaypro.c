@@ -20,15 +20,14 @@
 
     Things that need doing:
 
-    - Need schematics of 2x and kaypro10 (used 2-84 which doesn't seem to be the same).
-      They currently are not reading any data from disk.
-
-    - omni2 and kaypro4 would (I believe) boot up if we had a proper boot disk. The IMD
-      conversions seem to have the tracks scrambled (e.g reading side 0 track 1 gives us
-      side 1 track 0).
+    - Kaypro2x and kaypro10 are not reading any data from disk, because it depends
+      on the index hole indication, which is not fully implemented in wd177x.
 
     - Kaypro2x and Kaypro10 don't centre the display at boot, but a soft reset fixes it.
       Perhaps the guesswork emulation of the video ULA is incomplete.
+
+    - Kaypro 4 plus 88 does work as a normal Kaypro, but the extra processor needs
+      to be worked out.
 
 
 **************************************************************************************************/
@@ -46,6 +45,7 @@
 #include "includes/kaypro.h"
 
 
+static READ8_HANDLER( kaypro2x_87) { return 0x7f; }	/* to bypass unemulated HD controller */
 
 /***********************************************************
 
@@ -95,7 +95,8 @@ static ADDRESS_MAP_START( kaypro2x_io, ADDRESS_SPACE_IO, 8 )
     AM_RANGE(0x85, 0x85) Hard Drive Cylinder high register I/O
     AM_RANGE(0x86, 0x86) Hard Drive Size / Drive / Head register I/O
     AM_RANGE(0x87, 0x87) Hard Drive READ status register, WRITE command register */
-	AM_RANGE(0x20, 0x87) AM_NOP
+	AM_RANGE(0x20, 0x86) AM_NOP
+	AM_RANGE(0x87, 0x87) AM_READ(kaypro2x_87)
 ADDRESS_MAP_END
 
 
@@ -292,7 +293,7 @@ static MACHINE_DRIVER_START( kaypro2x )
 
 	/* devices */
 	MDRV_QUICKLOAD_ADD("quickload", kaypro2x, "com,cpm", 3)
-	MDRV_WD179X_ADD("wd1793", kaypro_wd1793_interface )
+	MDRV_WD1793_ADD("wd1793", kaypro_wd1793_interface )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 	MDRV_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )
 	MDRV_Z80SIO_ADD( "z80sio_2x", 4800, kaypro_sio_intf )	/* extra sio for modem and printer */
