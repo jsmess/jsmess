@@ -63,6 +63,7 @@ static VIDEO_UPDATE( supracan )
 
 static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION( "cart", 0 )
+	AM_RANGE( 0xe80204, 0xe80205 ) AM_READ( supracan_unk1_r )
 	AM_RANGE( 0xe80300, 0xe80301 ) AM_READ( supracan_unk1_r )
 	AM_RANGE( 0xe88400, 0xe88c87 ) AM_RAM	/* Unknown, some data gets copied here during boot */
 	AM_RANGE( 0xe8f000, 0xe8ffff ) AM_RAM_WRITE( supracan_soundram_w ) AM_BASE( &supracan_soundram_16 )
@@ -94,7 +95,7 @@ static WRITE16_HANDLER( supracan_char_w )
 		gfx[offset*2+0] = (supracan_charram[offset] & 0xff00) >> 8;
 		gfx[offset*2+1] = (supracan_charram[offset] & 0x00ff) >> 0;
 
-		gfx_element_mark_dirty(space->machine->gfx[0], offset/64);
+		gfx_element_mark_dirty(space->machine->gfx[0], offset/32);
 	}
 }
 
@@ -248,6 +249,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( supracan )
 	MDRV_CPU_ADD( "maincpu", M68000, XTAL_10_738635MHz )		/* Correct frequency unknown */
 	MDRV_CPU_PROGRAM_MAP( supracan_mem )
+	MDRV_CPU_VBLANK_INT("screen", irq7_line_hold)
 
 	MDRV_CPU_ADD( "soundcpu", M6502, XTAL_3_579545MHz )		/* TODO: Verfiy actual clock */
 	MDRV_CPU_PROGRAM_MAP( supracan_sound_mem )
