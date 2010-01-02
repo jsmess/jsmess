@@ -30,12 +30,7 @@ static UINT8 *supracan_soundram;
 static UINT16 *supracan_soundram_16;
 static UINT16 supracan_video_regs[256];
 static emu_timer *supracan_video_timer;
-static UINT16 *supracan_unk1_dma_ram;
-static UINT16 *supracan_unk2_dma_ram;
-static UINT16 *supracan_unk3_dma_ram;
-static UINT16 *supracan_unk4_dma_ram;
-static UINT16 *supracan_unk5_dma_ram;
-static UINT16 *supracan_charram;
+static UINT16 *supracan_charram, *supracan_sprcharram;
 static UINT16 *supracan_vram;
 static UINT16 *supracan_rram;
 static UINT16 *supracan_rozpal;
@@ -147,9 +142,14 @@ static WRITE16_HANDLER( supracan_dma_w )
 			if(data & 0x8800)
 			{
 				verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes\n", acan_dma_regs.source, acan_dma_regs.dest, acan_dma_regs.count + 1);
+				//if(acan_dma_regs.dest != 0xf00200)
+				//	printf("%08x %08x %02x %04x\n",acan_dma_regs.source,acan_dma_regs.dest,acan_dma_regs.count + 1,data);
 				for(i = 0; i <= acan_dma_regs.count; i++)
 				{
-					memory_write_byte(space, acan_dma_regs.dest++, memory_read_byte(space, acan_dma_regs.source++));
+					if(data & 0x1000)
+						memory_write_word(space, acan_dma_regs.dest+=2, memory_read_word(space, acan_dma_regs.source+=2));
+					else
+						memory_write_byte(space, acan_dma_regs.dest++, memory_read_byte(space, acan_dma_regs.source++));
 				}
 			}
 			else
@@ -160,29 +160,18 @@ static WRITE16_HANDLER( supracan_dma_w )
 	}
 }
 
-static WRITE16_HANDLER( supracan_unk1_dma_w )
+static WRITE16_HANDLER( supracan_sprchar_w )
 {
-	COMBINE_DATA(&supracan_unk1_dma_ram[offset]);
-}
+	COMBINE_DATA(&supracan_sprcharram[offset]);
 
-static WRITE16_HANDLER( supracan_unk2_dma_w )
-{
-	COMBINE_DATA(&supracan_unk2_dma_ram[offset]);
-}
+	{
+		UINT8 *gfx = memory_region(space->machine, "spr_gfx");
 
-static WRITE16_HANDLER( supracan_unk3_dma_w )
-{
-	COMBINE_DATA(&supracan_unk3_dma_ram[offset]);
-}
+		gfx[offset*2+0] = (supracan_sprcharram[offset] & 0xff00) >> 8;
+		gfx[offset*2+1] = (supracan_sprcharram[offset] & 0x00ff) >> 0;
 
-static WRITE16_HANDLER( supracan_unk4_dma_w )
-{
-	COMBINE_DATA(&supracan_unk4_dma_ram[offset]);
-}
-
-static WRITE16_HANDLER( supracan_unk5_dma_w )
-{
-	COMBINE_DATA(&supracan_unk5_dma_ram[offset]);
+		gfx_element_mark_dirty(space->machine->gfx[1], offset/32);
+	}
 }
 
 static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -190,11 +179,7 @@ static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xe80204, 0xe80205 ) AM_READ( supracan_unk1_r )
 	AM_RANGE( 0xe80300, 0xe80301 ) AM_READ( supracan_unk1_r )
 	AM_RANGE( 0xe88400, 0xe88bff ) AM_RAM	/* Unknown, some data gets copied here during boot */
-	AM_RANGE( 0xe88c00, 0xe88dff ) AM_RAM_WRITE(supracan_unk1_dma_w) AM_BASE(&supracan_unk1_dma_ram) /* Unknown DMA target, likely gfx-related */
-	AM_RANGE( 0xe89000, 0xe897ff ) AM_RAM_WRITE(supracan_unk2_dma_w) AM_BASE(&supracan_unk2_dma_ram) /* Unknown DMA target, likely gfx-related */
-	AM_RANGE( 0xe8a000, 0xe8afff ) AM_RAM_WRITE(supracan_unk3_dma_w) AM_BASE(&supracan_unk3_dma_ram) /* Unknown DMA target, likely gfx-related */
-	AM_RANGE( 0xe8c000, 0xe8c7ff ) AM_RAM_WRITE(supracan_unk4_dma_w) AM_BASE(&supracan_unk4_dma_ram) /* Unknown DMA target, likely gfx-related */
-	AM_RANGE( 0xe8d000, 0xe8d3ff ) AM_RAM_WRITE(supracan_unk5_dma_w) AM_BASE(&supracan_unk5_dma_ram) /* Unknown DMA target, likely gfx-related */
+	AM_RANGE( 0xe88c00, 0xe8efff ) AM_RAM_WRITE( supracan_sprchar_w ) AM_BASE( &supracan_sprcharram ) /* Unknown DMA target, likely gfx-related */
 	AM_RANGE( 0xe8f000, 0xe8ffff ) AM_RAM_WRITE( supracan_soundram_w ) AM_BASE( &supracan_soundram_16 )
 	AM_RANGE( 0xe90000, 0xe9001f ) AM_WRITE( supracan_sound_w )
 	AM_RANGE( 0xe90020, 0xe9002b ) AM_WRITE( supracan_dma_w )
@@ -388,6 +373,7 @@ static const gfx_layout supracan_gfxlayout =
 
 static GFXDECODE_START( supracan )
 	GFXDECODE_ENTRY( "ram_gfx",  0, supracan_gfxlayout,   0, 1 )
+	GFXDECODE_ENTRY( "spr_gfx",  0, supracan_gfxlayout,   0, 2 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( supracan )
@@ -423,6 +409,9 @@ ROM_START( supracan )
 	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x4000, "ram_gfx", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x8000, "spr_gfx", ROMREGION_ERASEFF )
+
 ROM_END
 
 
