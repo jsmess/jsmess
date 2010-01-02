@@ -12,6 +12,12 @@ Controllers:
 
 f00000 - bit 15 is probably vblank bit.
 
+Known unemulated graphical effects:
+- The green blob of the A'Can logo should slide out from beneath the word
+  "A'Can"
+- The A'Can logo should have a scrolling ROZ layer beneath it
+- Sprites
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -19,13 +25,20 @@ f00000 - bit 15 is probably vblank bit.
 #include "cpu/m6502/m6502.h"
 #include "devices/cartslot.h"
 
-
 static UINT16 supracan_m6502_reset;
 static UINT8 *supracan_soundram;
 static UINT16 *supracan_soundram_16;
 static UINT16 supracan_video_regs[256];
 static emu_timer *supracan_video_timer;
-static UINT16 *supracan_charram, *supracan_vram;
+static UINT16 *supracan_unk1_dma_ram;
+static UINT16 *supracan_unk2_dma_ram;
+static UINT16 *supracan_unk3_dma_ram;
+static UINT16 *supracan_unk4_dma_ram;
+static UINT16 *supracan_unk5_dma_ram;
+static UINT16 *supracan_charram;
+static UINT16 *supracan_vram;
+static UINT16 *supracan_rram;
+static UINT16 *supracan_rozpal;
 
 static READ16_HANDLER( supracan_unk1_r );
 static WRITE16_HANDLER( supracan_soundram_w );
@@ -33,6 +46,27 @@ static WRITE16_HANDLER( supracan_sound_w );
 static READ16_HANDLER( supracan_video_r );
 static WRITE16_HANDLER( supracan_video_w );
 static WRITE16_HANDLER( supracan_char_w );
+
+#define VERBOSE_LEVEL	(99)
+
+#define ENABLE_VERBOSE_LOG (1)
+
+#if ENABLE_VERBOSE_LOG
+INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)
+{
+	if( VERBOSE_LEVEL >= n_level )
+	{
+		va_list v;
+		char buf[ 32768 ];
+		va_start( v, s_fmt );
+		vsprintf( buf, s_fmt, v );
+		va_end( v );
+		logerror( "%06x: %s", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), buf );
+	}
+}
+#else
+#define verboselog(x,y,z,...)
+#endif
 
 static VIDEO_START( supracan )
 {
@@ -43,6 +77,20 @@ static VIDEO_UPDATE( supracan )
 {
 	int x,y,count;
 	const gfx_element *gfx = screen->machine->gfx[0];
+
+	count = 0;
+
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<32;x += 4)
+		{
+			*BITMAP_ADDR16(bitmap, y, 128+x+0) = (supracan_rram[count] >> 12) & 0x000f;
+			*BITMAP_ADDR16(bitmap, y, 128+x+1) = (supracan_rram[count] >>  8) & 0x000f;
+			*BITMAP_ADDR16(bitmap, y, 128+x+2) = (supracan_rram[count] >>  4) & 0x000f;
+			*BITMAP_ADDR16(bitmap, y, 128+x+3) = (supracan_rram[count] >>  0) & 0x000f;
+			count++;
+		}
+	}
 
 	count = 0;
 
@@ -61,19 +109,101 @@ static VIDEO_UPDATE( supracan )
 	return 0;
 }
 
+typedef struct
+{
+	UINT32 source;
+	UINT32 dest;
+	UINT16 count;
+	UINT16 control;
+} _acan_dma_regs_t;
+
+static _acan_dma_regs_t acan_dma_regs;
+
+static WRITE16_HANDLER( supracan_dma_w )
+{
+	int i;
+	switch(offset)
+	{
+		case 0x00/2: // Source address MSW
+			acan_dma_regs.source &= 0x0000ffff;
+			acan_dma_regs.source |= data << 16;
+			break;
+		case 0x02/2: // Source address LSW
+			acan_dma_regs.source &= 0xffff0000;
+			acan_dma_regs.source |= data;
+			break;
+		case 0x04/2: // Destination address MSW
+			acan_dma_regs.dest &= 0x0000ffff;
+			acan_dma_regs.dest |= data << 16;
+			break;
+		case 0x06/2: // Destination address LSW
+			acan_dma_regs.dest &= 0xffff0000;
+			acan_dma_regs.dest |= data;
+			break;
+		case 0x08/2: // Byte count
+			acan_dma_regs.count = data;
+			break;
+		case 0x0a/2: // Control
+			if(data & 0x8800)
+			{
+				verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes\n", acan_dma_regs.source, acan_dma_regs.dest, acan_dma_regs.count + 1);
+				for(i = 0; i <= acan_dma_regs.count; i++)
+				{
+					memory_write_byte(space, acan_dma_regs.dest++, memory_read_byte(space, acan_dma_regs.source++));
+				}
+			}
+			else
+			{
+				verboselog(space->machine, 0, "supracan_dma_w: Unknown DMA kickoff value of %04x (other regs %08x, %08x, %d)\n", data, acan_dma_regs.source, acan_dma_regs.dest, acan_dma_regs.count + 1);
+			}
+			break;
+	}
+}
+
+static WRITE16_HANDLER( supracan_unk1_dma_w )
+{
+	COMBINE_DATA(&supracan_unk1_dma_ram[offset]);
+}
+
+static WRITE16_HANDLER( supracan_unk2_dma_w )
+{
+	COMBINE_DATA(&supracan_unk2_dma_ram[offset]);
+}
+
+static WRITE16_HANDLER( supracan_unk3_dma_w )
+{
+	COMBINE_DATA(&supracan_unk3_dma_ram[offset]);
+}
+
+static WRITE16_HANDLER( supracan_unk4_dma_w )
+{
+	COMBINE_DATA(&supracan_unk4_dma_ram[offset]);
+}
+
+static WRITE16_HANDLER( supracan_unk5_dma_w )
+{
+	COMBINE_DATA(&supracan_unk5_dma_ram[offset]);
+}
+
 static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION( "cart", 0 )
 	AM_RANGE( 0xe80204, 0xe80205 ) AM_READ( supracan_unk1_r )
 	AM_RANGE( 0xe80300, 0xe80301 ) AM_READ( supracan_unk1_r )
-	AM_RANGE( 0xe88400, 0xe88c87 ) AM_RAM	/* Unknown, some data gets copied here during boot */
+	AM_RANGE( 0xe88400, 0xe88bff ) AM_RAM	/* Unknown, some data gets copied here during boot */
+	AM_RANGE( 0xe88c00, 0xe88dff ) AM_RAM_WRITE(supracan_unk1_dma_w) AM_BASE(&supracan_unk1_dma_ram) /* Unknown DMA target, likely gfx-related */
+	AM_RANGE( 0xe89000, 0xe897ff ) AM_RAM_WRITE(supracan_unk2_dma_w) AM_BASE(&supracan_unk2_dma_ram) /* Unknown DMA target, likely gfx-related */
+	AM_RANGE( 0xe8a000, 0xe8afff ) AM_RAM_WRITE(supracan_unk3_dma_w) AM_BASE(&supracan_unk3_dma_ram) /* Unknown DMA target, likely gfx-related */
+	AM_RANGE( 0xe8c000, 0xe8c7ff ) AM_RAM_WRITE(supracan_unk4_dma_w) AM_BASE(&supracan_unk4_dma_ram) /* Unknown DMA target, likely gfx-related */
+	AM_RANGE( 0xe8d000, 0xe8d3ff ) AM_RAM_WRITE(supracan_unk5_dma_w) AM_BASE(&supracan_unk5_dma_ram) /* Unknown DMA target, likely gfx-related */
 	AM_RANGE( 0xe8f000, 0xe8ffff ) AM_RAM_WRITE( supracan_soundram_w ) AM_BASE( &supracan_soundram_16 )
 	AM_RANGE( 0xe90000, 0xe9001f ) AM_WRITE( supracan_sound_w )
+	AM_RANGE( 0xe90020, 0xe9002b ) AM_WRITE( supracan_dma_w )
 	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE( supracan_video_r, supracan_video_w )
 	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE( 0xf40000, 0xf43fff ) AM_RAM_WRITE(supracan_char_w) AM_BASE(&supracan_charram)	/* Unknown, some data gets copied here during boot */
-	AM_RANGE( 0xf44000, 0xf441ff ) AM_RAM	/* Unknown */
-	AM_RANGE( 0xf44200, 0xf443ff ) AM_RAM AM_BASE(&supracan_vram)	/* Unknown, some data gets copied here during boot. Possibly a tilemap?? */
-	AM_RANGE( 0xf44400, 0xf445ff ) AM_RAM	/* Unknown, some data gets copied here during boot. Looks like the Functech logo is here */
+	AM_RANGE( 0xf44000, 0xf441ff ) AM_RAM AM_BASE(&supracan_rozpal) /* Unknown */
+	AM_RANGE( 0xf44200, 0xf443ff ) AM_RAM AM_BASE(&supracan_vram)	/* Foreground tilemap layer */
+	AM_RANGE( 0xf44400, 0xf445ff ) AM_RAM AM_BASE(&supracan_rram)	/* ROZ layer tiles */
 	AM_RANGE( 0xf44600, 0xf44fff ) AM_RAM	/* Unknown, stuff gets written here. Zoom table?? */
 	AM_RANGE( 0xfc0000, 0xfcffff ) AM_RAM	/* System work ram */
 	AM_RANGE( 0xff8000, 0xffffff ) AM_RAM	/* System work ram */
@@ -105,18 +235,18 @@ INPUT_PORTS_END
 
 static PALETTE_INIT( supracan )
 {
-	#if 0
+	// Used for debugging purposes for now
+	//#if 0
 	int i, r, g, b;
 
 	for( i = 0; i < 32768; i++ )
 	{
-		/* TODO: Verfiy that we are taking the proper bits for r, g, and b. */
 		r = (i & 0x1f) << 3;
 		g = ((i >> 5) & 0x1f) << 3;
 		b = ((i >> 10) & 0x1f) << 3;
 		palette_set_color_rgb( machine, i, r, g, b );
 	}
-	#endif
+	//#endif
 }
 
 
@@ -168,6 +298,15 @@ static READ16_HANDLER( supracan_video_r )
 {
 	UINT16 data = supracan_video_regs[offset];
 
+	switch(offset)
+	{
+		case 0: // VBlank flag
+			break;
+		default:
+			verboselog(space->machine, 0, "supracan_video_r: Unknown register: %08x (%04x & %04x)\n", 0xf0000 + (offset << 1), data, mem_mask);
+			break;
+	}
+
 	return data;
 }
 
@@ -192,6 +331,12 @@ static TIMER_CALLBACK( supracan_video_callback )
 
 static WRITE16_HANDLER( supracan_video_w )
 {
+	switch(offset)
+	{
+		default:
+			verboselog(space->machine, 0, "supracan_video_w: Unknown register: %08x = %04x & %04x\n", 0xf0000 + (offset << 1), data, mem_mask);
+			break;
+	}
 	supracan_video_regs[offset] = data;
 }
 
@@ -242,9 +387,8 @@ static const gfx_layout supracan_gfxlayout =
 
 
 static GFXDECODE_START( supracan )
-	GFXDECODE_ENTRY( "ram_gfx", 0, supracan_gfxlayout,   0, 1 )
+	GFXDECODE_ENTRY( "ram_gfx",  0, supracan_gfxlayout,   0, 1 )
 GFXDECODE_END
-
 
 static MACHINE_DRIVER_START( supracan )
 	MDRV_CPU_ADD( "maincpu", M68000, XTAL_10_738635MHz )		/* Correct frequency unknown */
