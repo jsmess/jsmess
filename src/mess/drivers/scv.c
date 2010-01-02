@@ -192,6 +192,13 @@ static void plot_sprite_part( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 pat, UIN
 
 static VIDEO_UPDATE( scv )
 {
+	int x, y;
+
+	/* Clear the screen */
+	for ( y = 0; y < 256; y++ )
+		for ( x = 0; x < 256; x++ )
+			*BITMAP_ADDR16( bitmap, y, x ) = 0;
+
 	/* Draw background */
 
 	/* Draw sprites */
