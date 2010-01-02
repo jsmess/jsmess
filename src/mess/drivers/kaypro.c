@@ -210,7 +210,7 @@ static const floppy_config kayproii_floppy_config =
 };
 static const floppy_config kaypro2x_floppy_config =
 {
-	DEVCB_NULL,
+	DEVCB_LINE(wd17xx_idx_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
