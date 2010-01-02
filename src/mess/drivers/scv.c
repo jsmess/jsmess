@@ -216,12 +216,10 @@ INLINE void draw_sprite( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 tile_idx, UIN
 }
 
 
-INLINE void draw_semi_graph( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 data, UINT8 col )
+INLINE void draw_semi_graph( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 data, UINT8 fg, UINT8 bg )
 {
+	UINT8 col = data ? fg : bg;
 	int i;
-
-	if ( ! data )
-		return;
 
 	for ( i = 0; i < 4; i++ )
 	{
@@ -236,37 +234,61 @@ INLINE void draw_semi_graph( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 data, UIN
 static VIDEO_UPDATE( scv )
 {
 	int x, y;
-	UINT8 fg = scv_vram[0x1403] >> 4;
+//	UINT8 fg = scv_vram[0x1403] >> 4;
 	UINT8 bg = scv_vram[0x1403] & 0x0f;
+	UINT8 gr_fg = scv_vram[0x1401] >> 4;
+	UINT8 gr_bg = scv_vram[0x1401] & 0x0f;
+	int clip_x = ( scv_vram[0x1402] & 0x0f ) * 2;
+	int clip_y = scv_vram[0x1402] >> 4;
 
 	/* Clear the screen */
 	bitmap_fill( bitmap, cliprect, bg );
 
 	/* Draw background */
-	switch ( scv_vram[0x1400] & 0x03 )
+	for ( y = 0; y < 16; y++ )
 	{
-	case 0x01:		/* Semi graphics mode */
-		for ( y = 0; y < 16; y++ )
-		{
-			for ( x = 0; x < 32; x++ )
-			{
-				UINT8 d = scv_vram[ 0x1000 + y * 32 + x ];
+		int text_y = 0;
 
-				draw_semi_graph( bitmap, x * 8    , y * 16     , d & 0x80, fg );
-				draw_semi_graph( bitmap, x * 8 + 4, y * 16     , d & 0x40, fg );
-				draw_semi_graph( bitmap, x * 8    , y * 16 +  4, d & 0x20, fg );
-				draw_semi_graph( bitmap, x * 8 + 4, y * 16 +  4, d & 0x10, fg );
-				draw_semi_graph( bitmap, x * 8    , y * 16 +  8, d & 0x08, fg );
-				draw_semi_graph( bitmap, x * 8 + 4, y * 16 +  8, d & 0x04, fg );
-				draw_semi_graph( bitmap, x * 8    , y * 16 + 12, d & 0x02, fg );
-				draw_semi_graph( bitmap, x * 8 + 4, y * 16 + 12, d & 0x01, fg );
+		if ( y < clip_y )
+			text_y = ( scv_vram[0x1400] & 0x80 ) ? 0 : 1;
+		else
+			text_y = ( scv_vram[0x1400] & 0x80 ) ? 1 : 0;
+
+		for ( x = 0; x < 32; x++ )
+		{
+			int text_x = 0;
+			UINT8 d = scv_vram[ 0x1000 + y * 32 + x ];
+
+			if ( x < clip_x )
+				text_x = ( scv_vram[0x1400] & 0x40 ) ? 0 : 1;
+			else
+				text_x = ( scv_vram[0x1400] & 0x40 ) ? 1 : 0;
+
+			if ( text_x && text_y )
+			{
+				/* Text mode */
+			}
+			else
+			{
+				switch ( scv_vram[0x1400] & 0x03 )
+				{
+				case 0x01:		/* Semi graphics mode */
+					draw_semi_graph( bitmap, x * 8    , y * 16     , d & 0x80, gr_fg, gr_bg );
+					draw_semi_graph( bitmap, x * 8 + 4, y * 16     , d & 0x40, gr_fg, gr_bg );
+					draw_semi_graph( bitmap, x * 8    , y * 16 +  4, d & 0x20, gr_fg, gr_bg );
+					draw_semi_graph( bitmap, x * 8 + 4, y * 16 +  4, d & 0x10, gr_fg, gr_bg );
+					draw_semi_graph( bitmap, x * 8    , y * 16 +  8, d & 0x08, gr_fg, gr_bg );
+					draw_semi_graph( bitmap, x * 8 + 4, y * 16 +  8, d & 0x04, gr_fg, gr_bg );
+					draw_semi_graph( bitmap, x * 8    , y * 16 + 12, d & 0x02, gr_fg, gr_bg );
+					draw_semi_graph( bitmap, x * 8 + 4, y * 16 + 12, d & 0x01, gr_fg, gr_bg );
+					break;
+				case 0x03:		/* Block graphics mode */
+					break;
+				default:		/* Otherwise draw nothing? */
+					break;
+				}
 			}
 		}
-		break;
-	case 0x03:		/* Block graphics mode */
-		break;
-	default:		/* Text mode */
-		break;
 	}
 
 	/* Draw sprites if enabled */
@@ -349,7 +371,7 @@ static MACHINE_DRIVER_START( scv )
 
 	MDRV_SCREEN_ADD( "screen", RASTER )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_RAW_PARAMS( XTAL_14_31818MHz/2, 456, 16, 240, 262, 16, 216 )	/* TODO: Verify */
+	MDRV_SCREEN_RAW_PARAMS( XTAL_14_31818MHz/2, 456, 32, 224, 262, 32, 232 )	/* TODO: Verify */
 
 	MDRV_PALETTE_LENGTH( 16 )
 	MDRV_PALETTE_INIT( scv )
@@ -377,7 +399,7 @@ static MACHINE_DRIVER_START( scv_pal )
 
 	MDRV_SCREEN_ADD( "screen", RASTER )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_RAW_PARAMS( XTAL_13_4MHz/2, 456, 16, 240, 342, 16, 216 )		/* TODO: Verify */
+	MDRV_SCREEN_RAW_PARAMS( XTAL_13_4MHz/2, 456, 32, 224, 342, 32, 232 )		/* TODO: Verify */
 
 	MDRV_PALETTE_LENGTH( 16 )
 	MDRV_PALETTE_INIT( scv )
