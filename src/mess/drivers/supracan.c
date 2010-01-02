@@ -75,14 +75,23 @@ static VIDEO_UPDATE( supracan )
 
 	count = 0;
 
-	for (y=0;y<32;y++)
+	for (y=0;y<64;y++)
 	{
-		for (x=0;x<32;x += 4)
+		for (x=0;x<32;x += 8)
 		{
-			*BITMAP_ADDR16(bitmap, y, 128+x+0) = (supracan_rram[count] >> 12) & 0x000f;
-			*BITMAP_ADDR16(bitmap, y, 128+x+1) = (supracan_rram[count] >>  8) & 0x000f;
-			*BITMAP_ADDR16(bitmap, y, 128+x+2) = (supracan_rram[count] >>  4) & 0x000f;
-			*BITMAP_ADDR16(bitmap, y, 128+x+3) = (supracan_rram[count] >>  0) & 0x000f;
+			static UINT16 dot_data;
+
+			/* FIXME: likely to be clutted */
+			dot_data = supracan_rram[count] ^ 0xffff;
+
+			*BITMAP_ADDR16(bitmap, y, 128+x+0) = ((dot_data >> 14) & 0x0003) + 0x20;
+			*BITMAP_ADDR16(bitmap, y, 128+x+1) = ((dot_data >> 12) & 0x0003) + 0x20;
+			*BITMAP_ADDR16(bitmap, y, 128+x+2) = ((dot_data >> 10) & 0x0003) + 0x20;
+			*BITMAP_ADDR16(bitmap, y, 128+x+3) = ((dot_data >>  8) & 0x0003) + 0x20;
+			*BITMAP_ADDR16(bitmap, y, 128+x+4) = ((dot_data >>  6) & 0x0003) + 0x20;
+			*BITMAP_ADDR16(bitmap, y, 128+x+5) = ((dot_data >>  4) & 0x0003) + 0x20;
+			*BITMAP_ADDR16(bitmap, y, 128+x+6) = ((dot_data >>  2) & 0x0003) + 0x20;
+			*BITMAP_ADDR16(bitmap, y, 128+x+7) = ((dot_data >>  0) & 0x0003) + 0x20;
 			count++;
 		}
 	}
@@ -139,11 +148,11 @@ static WRITE16_HANDLER( supracan_dma_w )
 			acan_dma_regs.count = data;
 			break;
 		case 0x0a/2: // Control
+			//if(acan_dma_regs.dest != 0xf00200)
+			//	printf("%08x %08x %02x %04x\n",acan_dma_regs.source,acan_dma_regs.dest,acan_dma_regs.count + 1,data);
 			if(data & 0x8800)
 			{
 				verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes\n", acan_dma_regs.source, acan_dma_regs.dest, acan_dma_regs.count + 1);
-				//if(acan_dma_regs.dest != 0xf00200)
-				//	printf("%08x %08x %02x %04x\n",acan_dma_regs.source,acan_dma_regs.dest,acan_dma_regs.count + 1,data);
 				for(i = 0; i <= acan_dma_regs.count; i++)
 				{
 					if(data & 0x1000)
@@ -178,8 +187,7 @@ static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION( "cart", 0 )
 	AM_RANGE( 0xe80204, 0xe80205 ) AM_READ( supracan_unk1_r )
 	AM_RANGE( 0xe80300, 0xe80301 ) AM_READ( supracan_unk1_r )
-	AM_RANGE( 0xe88400, 0xe88bff ) AM_RAM	/* Unknown, some data gets copied here during boot */
-	AM_RANGE( 0xe88c00, 0xe8efff ) AM_RAM_WRITE( supracan_sprchar_w ) AM_BASE( &supracan_sprcharram ) /* Unknown DMA target, likely gfx-related */
+	AM_RANGE( 0xe88400, 0xe8efff ) AM_RAM	/* sample table + sample data */
 	AM_RANGE( 0xe8f000, 0xe8ffff ) AM_RAM_WRITE( supracan_soundram_w ) AM_BASE( &supracan_soundram_16 )
 	AM_RANGE( 0xe90000, 0xe9001f ) AM_WRITE( supracan_sound_w )
 	AM_RANGE( 0xe90020, 0xe9002b ) AM_WRITE( supracan_dma_w )
@@ -190,7 +198,7 @@ static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xf44200, 0xf443ff ) AM_RAM AM_BASE(&supracan_vram)	/* Foreground tilemap layer */
 	AM_RANGE( 0xf44400, 0xf445ff ) AM_RAM AM_BASE(&supracan_rram)	/* ROZ layer tiles */
 	AM_RANGE( 0xf44600, 0xf44fff ) AM_RAM	/* Unknown, stuff gets written here. Zoom table?? */
-	AM_RANGE( 0xfc0000, 0xfcffff ) AM_RAM	/* System work ram */
+	AM_RANGE( 0xfc0000, 0xfcffff ) AM_RAM_WRITE( supracan_sprchar_w ) AM_BASE( &supracan_sprcharram )	/* System work ram */
 	AM_RANGE( 0xff8000, 0xffffff ) AM_RAM	/* System work ram */
 ADDRESS_MAP_END
 
@@ -210,7 +218,7 @@ static WRITE16_HANDLER( supracan_char_w )
 		gfx[offset*2+0] = (supracan_charram[offset] & 0xff00) >> 8;
 		gfx[offset*2+1] = (supracan_charram[offset] & 0x00ff) >> 0;
 
-		gfx_element_mark_dirty(space->machine->gfx[0], offset/32);
+		gfx_element_mark_dirty(space->machine->gfx[0], offset/16);
 	}
 }
 
@@ -370,10 +378,20 @@ static const gfx_layout supracan_gfxlayout =
 	8*8*8
 };
 
+static const gfx_layout supracan_sprlayout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	8*32
+};
 
 static GFXDECODE_START( supracan )
 	GFXDECODE_ENTRY( "ram_gfx",  0, supracan_gfxlayout,   0, 1 )
-	GFXDECODE_ENTRY( "spr_gfx",  0, supracan_gfxlayout,   0, 2 )
+	GFXDECODE_ENTRY( "spr_gfx",  0, supracan_sprlayout,   0, 2 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( supracan )
