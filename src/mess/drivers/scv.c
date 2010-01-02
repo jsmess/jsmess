@@ -190,26 +190,42 @@ INLINE void plot_sprite_part( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 pat, UIN
 }
 
 
-INLINE void draw_sprite( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 tile_idx, UINT8 col )
+INLINE void draw_sprite( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 tile_idx, UINT8 col, UINT8 left, UINT8 right, UINT8 top, UINT8 bottom, UINT8 clip_y )
 {
 	int j;
 
-	for ( j = 0; j < 32; j += 4 )
+	y += clip_y * 2;
+	for ( j = clip_y * 4; j < 32; j += 4 )
 	{
 		UINT8 pat0 = scv_vram[ tile_idx * 32 + j + 0 ];
 		UINT8 pat1 = scv_vram[ tile_idx * 32 + j + 1 ];
 		UINT8 pat2 = scv_vram[ tile_idx * 32 + j + 2 ];
 		UINT8 pat3 = scv_vram[ tile_idx * 32 + j + 3 ];
 
-		plot_sprite_part( bitmap, x     , y, pat0 >> 4, col );
-		plot_sprite_part( bitmap, x +  4, y, pat1 >> 4, col );
-		plot_sprite_part( bitmap, x +  8, y, pat2 >> 4, col );
-		plot_sprite_part( bitmap, x + 12, y, pat3 >> 4, col );
+		if ( ( top && j < 16 ) || ( bottom && j >= 16 ) )
+		{
+			if ( left )
+			{
+				plot_sprite_part( bitmap, x     , y, pat0 >> 4, col );
+				plot_sprite_part( bitmap, x +  4, y, pat1 >> 4, col );
+			}
+			if ( right )
+			{
+				plot_sprite_part( bitmap, x +  8, y, pat2 >> 4, col );
+				plot_sprite_part( bitmap, x + 12, y, pat3 >> 4, col );
+			}
 
-		plot_sprite_part( bitmap, x     , y + 1, pat0 & 0x0f, col );
-		plot_sprite_part( bitmap, x +  4, y + 1, pat1 & 0x0f, col );
-		plot_sprite_part( bitmap, x +  8, y + 1, pat2 & 0x0f, col );
-		plot_sprite_part( bitmap, x + 12, y + 1, pat3 & 0x0f, col );
+			if ( left )
+			{
+				plot_sprite_part( bitmap, x     , y + 1, pat0 & 0x0f, col );
+				plot_sprite_part( bitmap, x +  4, y + 1, pat1 & 0x0f, col );
+			}
+			if ( right )
+			{
+				plot_sprite_part( bitmap, x +  8, y + 1, pat2 & 0x0f, col );
+				plot_sprite_part( bitmap, x + 12, y + 1, pat3 & 0x0f, col );
+			}
+		}
 
 		y += 2;
 	}
@@ -320,41 +336,79 @@ static VIDEO_UPDATE( scv )
 		{
 			UINT8 spr_y = scv_vram[ 0x1200 + i * 4 ] & 0xfe;
 			UINT8 y_32 = scv_vram[ 0x1200 + i * 4 ] & 0x01;		/* Xx32 sprite */
+			UINT8 clip = scv_vram[ 0x1201 + i * 4 ] >> 4;
 			UINT8 col = scv_vram[ 0x1201 + i * 4 ] & 0x0f;
 			UINT8 spr_x = scv_vram[ 0x1202 + i * 4 ] & 0xfe;
 			UINT8 x_32 = scv_vram[ 0x1202 + i * 4 ] & 0x01;		/* 32xX sprite */
 			UINT8 tile_idx = scv_vram[ 0x1203 + i * 4 ] & 0x7f;
+			UINT8 half = scv_vram[ 0x1203 + i * 4] & 0x80;
+			UINT8 left = 1;
+			UINT8 right = 1;
+			UINT8 top = 1;
+			UINT8 bottom = 1;
 
 			if ( !col )
 				continue;
+
+			if ( half )
+			{
+				if ( tile_idx & 0x40 )
+				{
+					if ( y_32 )
+					{
+						spr_y -= 8;
+						top = 0;
+						bottom = 1;
+						y_32 = 0;
+					}
+					else
+					{
+						top = 1;
+						bottom = 0;
+					}
+				}
+				if ( x_32 )
+				{
+					spr_x -= 8;
+					left = 0;
+					right = 1;
+					x_32 = 0;
+				}
+				else
+				{
+					left = 1;
+					right = 0;
+				}
+			}
 
 			/* Check if 2 color sprites are enabled */
 			if ( ( scv_vram[0x1400] & 0x20 ) && ( i & 0x20 ) )
 			{
 				/* 2 color sprite handling */
-				draw_sprite( bitmap, spr_x, spr_y, tile_idx, col );
+				draw_sprite( bitmap, spr_x, spr_y, tile_idx, col, left, right, top, bottom, clip );
 				if ( x_32 || y_32 )
 				{
 					static const UINT8 spr_2col_lut0[16] = { 0, 15, 12, 13, 10, 11, 8, 9, 6, 7, 4, 5, 2, 3, 1, 1 };
 					static const UINT8 spr_2col_lut1[16] = { 0, 1, 8, 11, 2, 3, 10, 9, 4, 5, 12, 13, 6, 7, 14, 15 };
 
-					draw_sprite( bitmap, spr_x, spr_y, tile_idx + 8 * x_32 + y_32, ( i & 0x40 ) ? spr_2col_lut1[col] : spr_2col_lut0[col] );
+					draw_sprite( bitmap, spr_x, spr_y, tile_idx + 8 * x_32 + y_32, ( i & 0x40 ) ? spr_2col_lut1[col] : spr_2col_lut0[col], left, right, top, bottom, clip );
 				}
 			}
 			else
 			{
 				/* regular sprite handling */
-				draw_sprite( bitmap, spr_x, spr_y, tile_idx, col );
+				draw_sprite( bitmap, spr_x, spr_y, tile_idx, col, left, right, top, bottom, clip );
 				if ( x_32 )
 				{
-					draw_sprite( bitmap, spr_x + 16, spr_y, tile_idx + 8, col );
+					draw_sprite( bitmap, spr_x + 16, spr_y, tile_idx + 8, col, 1, 1, top, bottom, clip );
 				}
 				if ( y_32 )
 				{
-					draw_sprite( bitmap, spr_x, spr_y + 16, tile_idx + 1, col );
+					clip &= 0x07;
+					draw_sprite( bitmap, spr_x, spr_y + 16, tile_idx + 1, col, left, right, 1, 1, clip );
 					if ( x_32 )
 					{
-						draw_sprite( bitmap, spr_x + 16, spr_y + 16, tile_idx + 9, col );
+						draw_sprite( bitmap, spr_x + 16, spr_y + 16, tile_idx + 9, col, 1, 1, 1, 1, clip );
 					}
 				}
 			}
