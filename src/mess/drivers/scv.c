@@ -268,10 +268,10 @@ INLINE void draw_block_graph( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 col )
 static VIDEO_UPDATE( scv )
 {
 	int x, y;
-//	UINT8 fg = scv_vram[0x1403] >> 4;
-	UINT8 bg = scv_vram[0x1403] & 0x0f;
-	UINT8 gr_fg = scv_vram[0x1401] >> 4;
-	UINT8 gr_bg = scv_vram[0x1401] & 0x0f;
+	UINT8 gr_fg = scv_vram[0x1403] >> 4;
+	UINT8 gr_bg = scv_vram[0x1403] & 0x0f;
+//	UINT8 fg = scv_vram[0x1401] >> 4;
+	UINT8 bg = scv_vram[0x1401] & 0x0f;
 	int clip_x = ( scv_vram[0x1402] & 0x0f ) * 2;
 	int clip_y = scv_vram[0x1402] >> 4;
 
