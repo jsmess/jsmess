@@ -195,8 +195,8 @@ static VIDEO_UPDATE( supracan )
 						ysize = 3;
 						break;
 					case 0x4428:
-						xsize = 2;
-						ysize = 2;
+						xsize = 4;
+						ysize = 3;
 						break;
 					case 0x442c:
 						xsize = 2;
