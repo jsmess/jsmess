@@ -289,6 +289,8 @@ WRITE8_HANDLER( kaypro2x_register_w )
 	else
 		mc6845_reg[mc6845_ind] = data;
 
+	mc6845_register_w( mc6845, 0, data );
+
 	if ((mc6845_ind == 1) || (mc6845_ind == 6) || (mc6845_ind == 9))
 		mc6845_screen_configure(space->machine);			/* adjust screen size */
 
@@ -297,8 +299,6 @@ WRITE8_HANDLER( kaypro2x_register_w )
 
 	if ((mc6845_ind > 17) && (mc6845_ind < 20))
 		mc6845_video_address = mc6845_reg[19] | ((mc6845_reg[18] & 0x3f) << 8);	/* internal ULA address */
-
-	mc6845_register_w( mc6845, 0, data );
 }
 
 READ8_HANDLER( kaypro_videoram_r )

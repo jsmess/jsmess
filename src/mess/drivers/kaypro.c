@@ -20,11 +20,9 @@
 
     Things that need doing:
 
-    - Kaypro2x and kaypro10 are not reading any data from disk, because it depends
-      on the index hole indication, which is not fully implemented in wd177x.
+    - Kaypro2x/4a are not booting.
 
-    - Kaypro2x and Kaypro10 don't centre the display at boot, but a soft reset fixes it.
-      Perhaps the guesswork emulation of the video ULA is incomplete.
+    - Hard Disk not emulated.
 
     - Kaypro 4 plus 88 does work as a normal Kaypro, but the extra processor needs
       to be worked out.
@@ -281,7 +279,7 @@ static MACHINE_DRIVER_START( kaypro2x )
 	MDRV_PALETTE_LENGTH(3)
 	MDRV_PALETTE_INIT(kaypro)
 
-	MDRV_MC6845_ADD("crtc", MC6845, 1500000, kaypro2x_crtc) /* comes out of ULA - needs to be measured */
+	MDRV_MC6845_ADD("crtc", MC6845, 2000000, kaypro2x_crtc) /* comes out of ULA - needs to be measured */
 
 	MDRV_VIDEO_START( kaypro )
 	MDRV_VIDEO_UPDATE( kaypro2x )
@@ -403,4 +401,4 @@ COMP( 198?, omni2,      kayproii, 0,    omni2,    kay_kbd, 0,      "Non Linear S
 COMP( 1984, kaypro2x,   0,        0,    kaypro2x, kay_kbd, 0,      "Non Linear Systems",  "Kaypro 2x" , GAME_NOT_WORKING ) // model 81-025
 COMP( 1984, kaypro4a,   0,        0,    kaypro2x, kay_kbd, 0,      "Non Linear Systems",  "Kaypro 4 - 4/84" , GAME_NOT_WORKING ) // model 81-015
 // Kaypro 4/84 plus 88 goes here, model 81-015 with an added 8088 daughterboard and rom
-COMP( 1983, kaypro10,   0,        0,    kaypro2x, kay_kbd, 0,      "Non Linear Systems",  "Kaypro 10" , GAME_NOT_WORKING ) // model 81-005
+COMP( 1983, kaypro10,   0,        0,    kaypro2x, kay_kbd, 0,      "Non Linear Systems",  "Kaypro 10" , 0 ) // model 81-005
