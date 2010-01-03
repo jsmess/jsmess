@@ -822,7 +822,7 @@ static const gfx_layout fontlayout =
 };
 
 static GFXDECODE_START( apexc )
-	GFXDECODE_ENTRY( "gfx1", 0, fontlayout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, fontlayout, 0, 2 )
 GFXDECODE_END
 
 
@@ -831,7 +831,7 @@ static ADDRESS_MAP_START(apexc_mem_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM	/* 1024 32-bit words (expandable to 8192) */
 	AM_RANGE(0x0400, 0x1fff) AM_NOP
 #else
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_REGION("maincpu", 0x0000)
 	AM_RANGE(0x1000, 0x7fff) AM_NOP
 #endif
 ADDRESS_MAP_END
@@ -886,5 +886,5 @@ ROM_START(apexc)
 ROM_END
 
 /*         YEAR     NAME        PARENT          COMPAT  MACHINE     INPUT   INIT  COMPANY     FULLNAME */
-//COMP(      1951,    apexc53,    0,              0,      apexc53,    apexc,  apexc,   "Booth",    "All Purpose Electronic X-ray Computer (as described in 1953)" , GAME_NOT_WORKING)
-COMP(      1955,	apexc,		/*apexc53*/0,	0,		apexc,		apexc,	apexc,	"Booth",	"All Purpose Electronic X-ray Computer (as described in 1957)" , 0)
+//COMP(      1951,    apexc53,    0,            0,      apexc53,    apexc,  apexc, "Booth", "All Purpose Electronic X-ray Computer (as described in 1953)" , GAME_NOT_WORKING)
+COMP(      1955,    apexc,	/*apexc53*/0,	0,	apexc,      apexc,  apexc, "Booth", "All Purpose Electronic X-ray Computer (as described in 1957)" , 0)
