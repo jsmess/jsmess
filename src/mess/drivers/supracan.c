@@ -344,8 +344,7 @@ static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xe80200, 0xe80201 ) AM_READ( supracan_inp0_r )
 	AM_RANGE( 0xe80204, 0xe80205 ) AM_READ( supracan_unk1_r )
 	AM_RANGE( 0xe80300, 0xe80301 ) AM_READ( supracan_unk1_r )
-	AM_RANGE( 0xe88400, 0xe8efff ) AM_RAM	/* sample table + sample data */
-	AM_RANGE( 0xe8f000, 0xe8ffff ) AM_RAM_WRITE( supracan_soundram_w ) AM_BASE( &supracan_soundram_16 )
+	AM_RANGE( 0xe88400, 0xe8ffff ) AM_RAM_WRITE( supracan_soundram_w ) AM_BASE( &supracan_soundram_16 )
 	AM_RANGE( 0xe90000, 0xe9001f ) AM_WRITE( supracan_sound_w )
 	AM_RANGE( 0xe90020, 0xe9002b ) AM_WRITE( supracan_dma_w )
 	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE( supracan_video_r, supracan_video_w )
@@ -360,7 +359,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( supracan_sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x03ff ) AM_RAM
-	AM_RANGE( 0xf000, 0xffff ) AM_RAM AM_BASE( &supracan_soundram )
+	AM_RANGE( 0x0411, 0x0411 ) AM_READ(soundlatch_r)
+//	AM_RANGE( 0x0420, 0x0420 ) AM_READ(status)
+//	AM_RANGE( 0x0420, 0x0420 ) AM_WRITE(data)
+//	AM_RANGE( 0x0422, 0x0422 ) AM_WRITE(address)
+	AM_RANGE( 0x8400, 0xffff ) AM_RAM AM_BASE( &supracan_soundram )
 ADDRESS_MAP_END
 
 static WRITE16_HANDLER( supracan_char_w )
@@ -436,26 +439,30 @@ static WRITE16_HANDLER( supracan_sound_w )
 {
 	switch ( offset )
 	{
-	case 0x001c/2:	/* Sound cpu control. Bit 0 tied to sound cpu RESET line */
-		if ( data & 0x01 )
-		{
-			if ( ! supracan_m6502_reset )
+		case 0x000a/2:
+			soundlatch_w(space, 0, (data & 0xff00) >> 8);
+		 	cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
+			break;
+		case 0x001c/2:	/* Sound cpu control. Bit 0 tied to sound cpu RESET line */
+			if ( data & 0x01 )
 			{
-				/* Reset and enable the sound cpu */
-				cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, CLEAR_LINE);
-				cputag_reset( space->machine, "soundcpu" );
+				if ( ! supracan_m6502_reset )
+				{
+					/* Reset and enable the sound cpu */
+					cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, CLEAR_LINE);
+					cputag_reset( space->machine, "soundcpu" );
+				}
 			}
-		}
-		else
-		{
-			/* Halt the sound cpu */
-			cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
-		}
-		supracan_m6502_reset = data & 0x01;
-		break;
-	default:
-		logerror("supracan_sound_w: writing %04x to unknown address %08x\n", data, 0xe90000 + offset * 2 );
-		break;
+			else
+			{
+				/* Halt the sound cpu */
+				cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
+			}
+			supracan_m6502_reset = data & 0x01;
+			break;
+		default:
+			printf("supracan_sound_w: writing %04x to unknown address %08x\n", data, 0xe90000 + offset * 2 );
+			break;
 	}
 }
 
@@ -685,9 +692,6 @@ ROM_START( supracan )
 	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x20000, "ram_gfx", ROMREGION_ERASEFF )
-
-//	ROM_REGION( 0x8000, "spr_gfx", ROMREGION_ERASEFF )
-
 ROM_END
 
 
