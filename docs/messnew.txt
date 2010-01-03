@@ -84,6 +84,20 @@ System Driver Changes:
 
 - [EXIDY] Improved sound compatibility.  [Robbbert]
 
+- [FMTOWNS] Various updates: [Barry Rodewald]
+  * Added FDC IRQ and disk density select
+  * Fixed ANK CG ROM enable
+  * Re-worked VRAM access, allowing startup logos to display on the Marty and Car Marty
+  * Added basic keyboard support
+  * Added standard 2 button joystick support
+  * Corrected text mode colours
+  * Implemented CD-ROM controller, and CD-DA support
+  * Hooked up YM3438 interrupts
+  * Re-worked video code to support a basic CRTC implementation
+  * Fixed VBlank IRQ
+  * Added sprite implementation
+  * Mapped RF5C68 wave RAM
+
 - [GBA] Remapped Select button to MESS default.  [Justin Kerk]
 
 - [GLASGOW] Upgraded artwork to be clickable. Fixed various driver
