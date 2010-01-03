@@ -29,9 +29,18 @@ Known unemulated graphical effects:
 static UINT16 supracan_m6502_reset;
 static UINT8 *supracan_soundram;
 static UINT16 *supracan_soundram_16;
-static UINT16 supracan_video_regs[256];
 static emu_timer *supracan_video_timer;
 static UINT16 *supracan_vram;
+
+static UINT16 supracan_video_regs[256];
+
+#define ACAN_VID_LAYER_EN	0x024/2
+#define ACAN_VID_XFORM32A_H	0x184/2
+#define ACAN_VID_XFORM32A_L	0x186/2
+#define ACAN_VID_XFORM32B_H	0x188/2
+#define ACAN_VID_XFORM32B_L	0x18a/2
+#define ACAN_VID_XFORM16A	0x18c/2
+#define ACAN_VID_XFORM16B	0x192/2
 
 static READ16_HANDLER( supracan_unk1_r );
 static WRITE16_HANDLER( supracan_soundram_w );
@@ -73,30 +82,41 @@ static VIDEO_UPDATE( supracan )
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	count = 0x4400/2;
-
 #if 0
-	for (y=0;y<64;y++)
 	{
-		for (x=0;x<32;x += 8)
+		count = 0x4400/2;
+
+		for (y=0;y<64;y++)
 		{
-			static UINT16 dot_data;
+			for (x = 0; x < 64; x += 16)
+			{
+				static UINT16 dot_data;
 
-			/* FIXME: likely to be clutted */
-			dot_data = supracan_vram[count] ^ 0xffff;
+				dot_data = supracan_vram[count] ^ 0xffff;
 
-			*BITMAP_ADDR16(bitmap, y, 128+x+0) = ((dot_data >> 14) & 0x0003) + 0x20;
-			*BITMAP_ADDR16(bitmap, y, 128+x+1) = ((dot_data >> 12) & 0x0003) + 0x20;
-			*BITMAP_ADDR16(bitmap, y, 128+x+2) = ((dot_data >> 10) & 0x0003) + 0x20;
-			*BITMAP_ADDR16(bitmap, y, 128+x+3) = ((dot_data >>  8) & 0x0003) + 0x20;
-			*BITMAP_ADDR16(bitmap, y, 128+x+4) = ((dot_data >>  6) & 0x0003) + 0x20;
-			*BITMAP_ADDR16(bitmap, y, 128+x+5) = ((dot_data >>  4) & 0x0003) + 0x20;
-			*BITMAP_ADDR16(bitmap, y, 128+x+6) = ((dot_data >>  2) & 0x0003) + 0x20;
-			*BITMAP_ADDR16(bitmap, y, 128+x+7) = ((dot_data >>  0) & 0x0003) + 0x20;
-			count++;
+				*BITMAP_ADDR16(bitmap, y, 128+x+ 0) = ((dot_data >> 15) & 0x0001) + 0x20;
+				*BITMAP_ADDR16(bitmap, y, 128+x+ 1) = ((dot_data >> 14) & 0x0001) + 0x20;
+				*BITMAP_ADDR16(bitmap, y, 128+x+ 2) = ((dot_data >> 13) & 0x0001) + 0x20;
+				*BITMAP_ADDR16(bitmap, y, 128+x+ 3) = ((dot_data >> 12) & 0x0001) + 0x20;
+				*BITMAP_ADDR16(bitmap, y, 128+x+ 4) = ((dot_data >> 11) & 0x0001) + 0x20;
+				*BITMAP_ADDR16(bitmap, y, 128+x+ 5) = ((dot_data >> 10) & 0x0001) + 0x20;
+				*BITMAP_ADDR16(bitmap, y, 128+x+ 6) = ((dot_data >>  9) & 0x0001) + 0x20;
+				*BITMAP_ADDR16(bitmap, y, 128+x+ 7) = ((dot_data >>  8) & 0x0001) + 0x20;
+				*BITMAP_ADDR16(bitmap, y, 128+x+ 8) = ((dot_data >>  7) & 0x0001) + 0x20;
+				*BITMAP_ADDR16(bitmap, y, 128+x+ 9) = ((dot_data >>  6) & 0x0001) + 0x20;
+				*BITMAP_ADDR16(bitmap, y, 128+x+10) = ((dot_data >>  5) & 0x0001) + 0x20;
+				*BITMAP_ADDR16(bitmap, y, 128+x+11) = ((dot_data >>  4) & 0x0001) + 0x20;
+				*BITMAP_ADDR16(bitmap, y, 128+x+12) = ((dot_data >>  3) & 0x0001) + 0x20;
+				*BITMAP_ADDR16(bitmap, y, 128+x+13) = ((dot_data >>  2) & 0x0001) + 0x20;
+				*BITMAP_ADDR16(bitmap, y, 128+x+14) = ((dot_data >>  1) & 0x0001) + 0x20;
+				*BITMAP_ADDR16(bitmap, y, 128+x+15) = ((dot_data >>  0) & 0x0001) + 0x20;
+				count++;
+			}
 		}
 	}
+#endif
 
+#if 0
 	count = 0x4200/2;
 
 	for (y=0;y<16;y++)
@@ -134,7 +154,15 @@ static VIDEO_UPDATE( supracan )
 	}
 
 	{
-		int x,y,xtile,ytile,xsize,ysize,bank,spr_offs,col,i,spr_base;
+		int x, y;
+		int xtile, ytile;
+		int xsize, ysize;
+		int bank;
+		int spr_offs;
+		int col;
+		int i;
+		int spr_base;
+		int hflip;
 		//UINT8 *sprdata = (UINT8*)(&supracan_vram[0x1d000/2]);
 
 		spr_base = 0x1d000;
@@ -145,6 +173,7 @@ static VIDEO_UPDATE( supracan )
 			y = supracan_vram[i+0] & 0x0ff;
 			spr_offs = supracan_vram[i+3] << 2;
 			bank = (supracan_vram[i+1] & 0xf000) >> 12;
+			hflip = (supracan_vram[i+1] & 0x0800) ? 1 : 0;
 
 			if(supracan_vram[i+3] != 0)
 			{
@@ -189,7 +218,7 @@ static VIDEO_UPDATE( supracan )
 						ysize = 3;
 						break;
 					case 0x442a:
-						xsize = 2;
+						xsize = 2 * (supracan_vram[i+1] & 7);
 						ysize = 3;
 						break;
 					case 0x442c:
@@ -226,16 +255,32 @@ static VIDEO_UPDATE( supracan )
 						ysize = 1;
 						break;
 				}
+
 				for(ytile = 0; ytile < ysize; ytile++)
 				{
-					for(xtile = 0; xtile < xsize; xtile++)
+					if(hflip)
 					{
-						UINT16 data = supracan_vram[spr_offs/2+ytile*xsize+xtile];
-						int tile = (bank * 0x200) + (data & 0x03ff);
-						int xflip = data & 0x0800;
-						int yflip = data & 0x0400;
-						col = (data & 0xf000) >> 12;
-						drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],tile,col,xflip,yflip,x+xtile*8,y+ytile*8,0);
+						for(xtile = (xsize - 1); xtile >= 0; xtile--)
+						{
+							UINT16 data = supracan_vram[spr_offs/2+ytile*xsize+xtile];
+							int tile = (bank * 0x200) + (data & 0x03ff);
+							int xflip = (data & 0x0800) ? 0 : 1;
+							int yflip = (data & 0x0400) ? 1 : 0;
+							col = (data & 0xf000) >> 12;
+							drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],tile,col,xflip,yflip,x+((xsize - 1) - xtile)*8,y+ytile*8,0);
+						}
+					}
+					else
+					{
+						for(xtile = 0; xtile < xsize; xtile++)
+						{
+							UINT16 data = supracan_vram[spr_offs/2+ytile*xsize+xtile];
+							int tile = (bank * 0x200) + (data & 0x03ff);
+							int xflip = (data & 0x0800) ? 1 : 0;
+							int yflip = (data & 0x0400) ? 1 : 0;
+							col = (data & 0xf000) >> 12;
+							drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],tile,col,xflip,yflip,x+xtile*8,y+ytile*8,0);
+						}
 					}
 				}
 			}
@@ -544,6 +589,15 @@ static WRITE16_HANDLER( supracan_video_w )
 			{
 				// ...
 			}
+			break;
+		// Affine transforms of some sort?
+		case ACAN_VID_XFORM32A_H:
+		case ACAN_VID_XFORM32A_L:
+		case ACAN_VID_XFORM32B_H:
+		case ACAN_VID_XFORM32B_L:
+		case ACAN_VID_XFORM16A:
+		case ACAN_VID_XFORM16B:
+			//printf( "%1.4f %1.4f %1.4f %1.4f\n", (INT32)((supracan_video_regs[ACAN_VID_XFORM32A_H] << 16) | supracan_video_regs[ACAN_VID_XFORM32A_L]) / 65536.0f, (INT32)((supracan_video_regs[ACAN_VID_XFORM32B_H] << 16) | supracan_video_regs[ACAN_VID_XFORM32B_L]) / 65536.0f, supracan_video_regs[ACAN_VID_XFORM16A] / 256.0f, supracan_video_regs[ACAN_VID_XFORM16B] / 256.0f);
 			break;
 		default:
 			verboselog(space->machine, 0, "supracan_video_w: Unknown register: %08x = %04x & %04x\n", 0xf00000 + (offset << 1), data, mem_mask);
