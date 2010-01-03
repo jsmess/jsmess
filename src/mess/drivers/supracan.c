@@ -70,7 +70,6 @@ static VIDEO_START( supracan )
 static VIDEO_UPDATE( supracan )
 {
 	int x,y,count;
-	const gfx_element *gfx = screen->machine->gfx[0];
 
 	bitmap_fill(bitmap, cliprect, 0);
 
@@ -106,13 +105,13 @@ static VIDEO_UPDATE( supracan )
 			int tile;
 
 			tile = (supracan_vram[count] & 0x01ff);
-			drawgfx_transpen(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8,0);
-				count++;
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tile,0,0,0,x*8,y*8,0);
+			count++;
 		}
 	}
 
 	// Tilemap 1
-	count = 0x1f000/2;
+	count = 0x1e000/2;
 
 	for (y=0;y<30;y++)
 	{
@@ -130,9 +129,9 @@ static VIDEO_UPDATE( supracan )
 	}
 
 	// Tilemap 2
-	count = 0x1e1c0/2;
+	count = 0x1f000/2;
 
-	for (y=0;y<16;y++)
+	for (y=0;y<30;y++)
 	{
 		for (x=0;x<32;x++)
 		{
@@ -180,8 +179,8 @@ static VIDEO_UPDATE( supracan )
 						ysize = 1;
 						break;
 					case 0x4228:
-						xsize = 8;
-						ysize = 1;
+						xsize = 4;
+						ysize = 2;
 						break;
 					case 0x422a:
 						xsize = 2;
@@ -196,12 +195,12 @@ static VIDEO_UPDATE( supracan )
 						ysize = 3;
 						break;
 					case 0x4428:
-						xsize = 3;
-						ysize = 1;
+						xsize = 2;
+						ysize = 2;
 						break;
 					case 0x442c:
-						xsize = 8;
-						ysize = 8;
+						xsize = 2;
+						ysize = 2;
 						break;
 					case 0x4628:
 						xsize = 8;
@@ -298,7 +297,7 @@ static WRITE16_HANDLER( supracan_dma_w )
 			//	printf("%08x %08x %02x %04x\n",acan_dma_regs.source,acan_dma_regs.dest,acan_dma_regs.count + 1,data);
 			if(data & 0x8800)
 			{
-				verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes\n", acan_dma_regs.source, acan_dma_regs.dest, acan_dma_regs.count + 1);
+				verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_dma_regs.source, acan_dma_regs.dest, acan_dma_regs.count + 1, data);
 				for(i = 0; i <= acan_dma_regs.count; i++)
 				{
 					if(data & 0x1000)
@@ -322,23 +321,6 @@ static WRITE16_HANDLER( supracan_dma_w )
 			break;
 	}
 }
-
-#if 0
-static WRITE16_HANDLER( supracan_sprchar_w )
-{
-	COMBINE_DATA(&supracan_sprcharram[offset]);
-
-	{
-		UINT8 *gfx = memory_region(space->machine, "spr_gfx");
-
-		gfx[offset*2+0] = (supracan_sprcharram[offset] & 0xff00) >> 8;
-		gfx[offset*2+1] = (supracan_sprcharram[offset] & 0x00ff) >> 0;
-
-		gfx_element_mark_dirty(space->machine->gfx[1], offset/16);
-
-	}
-}
-#endif
 
 static READ16_HANDLER( supracan_inp0_r )
 {
