@@ -195,7 +195,7 @@ MC6845_UPDATE_ROW( kaypro2x_update_row )
 		if ((ra == 15) && (attr & 8))	/* underline */
 			gfx = 0xff;
 		else
-			gfx = FNT[(chr<<4) | ra ];
+			gfx = FNT[(chr<<4) | ra ] ^ inv;
 
 		/* Display a scanline of a character (8 pixels) */
 		*p = ( gfx & 0x80 ) ? fg : bg; p++;
@@ -262,7 +262,7 @@ static void mc6845_screen_configure(running_machine *machine)
 	visarea.max_x = width-1;
 	visarea.min_y = 0;
 	visarea.max_y = height-1;
-	if ((width < 800) && (height < 400) && (bytes < 0x800))	/* bounds checking to prevent an assert or violation */
+	if ((width < 640) && (height < 400) && (bytes < 0x800))	/* bounds checking to prevent an assert or violation */
 		video_screen_set_visarea(machine->primary_screen, 0, width, 0, height);
 }
 
