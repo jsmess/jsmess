@@ -24,6 +24,7 @@ Known unemulated graphical effects:
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "devices/cartslot.h"
+#include "debugger.h"
 
 static UINT16 supracan_m6502_reset;
 static UINT8 *supracan_soundram;
@@ -147,7 +148,7 @@ static VIDEO_UPDATE( supracan )
 	}
 
 	{
-		int x,y,xtile,ytile,xsize,ysize,spr_offs,col,i,spr_base;
+		int x,y,xtile,ytile,xsize,ysize,bank,spr_offs,col,i,spr_base;
 		//UINT8 *sprdata = (UINT8*)(&supracan_vram[0x1d000/2]);
 
 		spr_base = 0x1d000;
@@ -158,6 +159,7 @@ static VIDEO_UPDATE( supracan )
 			y = supracan_vram[i+0] & 0x0ff;
 			spr_offs = supracan_vram[i+3] << 2;
 			col = (supracan_vram[i+1] & 0x000f);
+			bank = (supracan_vram[i+1] & 0xf000) >> 12;
 
 			if(supracan_vram[i+3] != 0)
 			{
@@ -174,7 +176,7 @@ static VIDEO_UPDATE( supracan )
 						ysize = 4;
 						break;
 					case 0x4028:
-						xsize = 4;
+						xsize = 10;
 						ysize = 1;
 						break;
 					case 0x4228:
@@ -187,7 +189,7 @@ static VIDEO_UPDATE( supracan )
 						break;
 					case 0x422e:
 						xsize = 2;
-						ysize = 4;
+						ysize = 2;
 						break;
 					case 0x442a:
 						xsize = 4;
@@ -196,6 +198,14 @@ static VIDEO_UPDATE( supracan )
 					case 0x4428:
 						xsize = 3;
 						ysize = 1;
+						break;
+					case 0x442c:
+						xsize = 8;
+						ysize = 8;
+						break;
+					case 0x4628:
+						xsize = 8;
+						ysize = 8;
 						break;
 					case 0x462a:
 						xsize = 4;
@@ -206,12 +216,12 @@ static VIDEO_UPDATE( supracan )
 						ysize = 5;
 						break;
 					case 0x5028:
-						xsize = 8;
-						ysize = 1;
+						xsize = 16;
+						ysize = 9;
 						break;
 					case 0x522a:
-						xsize = 4;
-						ysize = 1;
+						xsize = 16;
+						ysize = 9;
 						break;
 					default:
 						printf( "Unknown size: %04x\n", (supracan_vram[i+0] & 0xff00) | (supracan_vram[i+2] >> 8));
@@ -224,7 +234,7 @@ static VIDEO_UPDATE( supracan )
 					for(xtile = 0; xtile < xsize; xtile++)
 					{
 						UINT16 data = supracan_vram[spr_offs/2+ytile*xsize+xtile];
-						int tile = 0x400 + (data & 0x03ff);
+						int tile = (bank * 0x200) + (data & 0x03ff);
 						int xflip = data & 0x0800;
 						int yflip = data & 0x0400;
 						drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],tile,col,xflip,yflip,x+xtile*8,y+ytile*8,0);
@@ -330,8 +340,14 @@ static WRITE16_HANDLER( supracan_sprchar_w )
 }
 #endif
 
+static READ16_HANDLER( supracan_inp0_r )
+{
+	return input_port_read(space->machine, "INP0");
+}
+
 static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION( "cart", 0 )
+	AM_RANGE( 0xe80200, 0xe80201 ) AM_READ( supracan_inp0_r )
 	AM_RANGE( 0xe80204, 0xe80205 ) AM_READ( supracan_unk1_r )
 	AM_RANGE( 0xe80300, 0xe80301 ) AM_READ( supracan_unk1_r )
 	AM_RANGE( 0xe88400, 0xe8efff ) AM_RAM	/* sample table + sample data */
@@ -369,6 +385,23 @@ static WRITE16_HANDLER( supracan_char_w )
 }
 
 static INPUT_PORTS_START( supracan )
+	PORT_START("INP0")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN) //PORT_PLAYER(1) PORT_NAME("P1 Joypad Button 1")
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_NAME("P1 Joypad Right")
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_PLAYER(1) PORT_NAME("P1 Joypad Left")
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(1) PORT_NAME("P1 Joypad Down")
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_PLAYER(1) PORT_NAME("P1 Joypad Up")
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Joypad B1")
 INPUT_PORTS_END
 
 
