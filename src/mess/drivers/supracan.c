@@ -37,6 +37,7 @@ static UINT8 spr_flags;
 static UINT32 tilemap_base_addr[4];
 static int tilemap_scrollx[4],tilemap_scrolly[4];
 static UINT16 video_flags;
+static UINT16 tilemap_flags[4];
 
 static UINT16 supracan_video_regs[256];
 
@@ -88,8 +89,8 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 	int scrollx,scrolly;
 
 	count = (tilemap_base_addr[layer]);
-	scrollx = tilemap_scrollx[layer];
-	scrolly = tilemap_scrolly[layer];
+	scrollx = tilemap_scrollx[layer] & 0xff;
+	scrolly = tilemap_scrolly[layer] & 0xff;
 
 	for (y=0;y<32;y++)
 	{
@@ -102,7 +103,12 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 			pal = (supracan_vram[count] & 0xf000) >> 12;
 
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly,0);
-			//todo: wrap-around, untested by the current game
+			if(tilemap_flags[layer] & 0x20) //wrap-around enable
+			{
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],tile,pal,flipx,flipy,(x*8)-scrollx+256,(y*8)-scrolly,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly+256,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],tile,pal,flipx,flipy,(x*8)-scrollx+256,(y*8)-scrolly+256,0);
+			}
 			count++;
 		}
 	}
@@ -240,13 +246,12 @@ static VIDEO_UPDATE( supracan )
 		}
 	}
 #endif
-
-	if(video_flags & 0x80)
-		draw_tilemap(screen->machine,bitmap,cliprect,0);
-	if(video_flags & 0x40)
-		draw_tilemap(screen->machine,bitmap,cliprect,1);
 	if(video_flags & 0x20) //guess, not tested
 		draw_tilemap(screen->machine,bitmap,cliprect,2);
+	if(video_flags & 0x40)
+		draw_tilemap(screen->machine,bitmap,cliprect,1);
+	if(video_flags & 0x80)
+		draw_tilemap(screen->machine,bitmap,cliprect,0);
 	if(video_flags & 8)
 		draw_sprites(screen->machine,bitmap,cliprect);
 
@@ -383,22 +388,42 @@ static WRITE16_HANDLER( supracan_char_w )
 
 static INPUT_PORTS_START( supracan )
 	PORT_START("INP0")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN) //PORT_PLAYER(1) PORT_NAME("P1 Joypad Button 1")
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_NAME("P1 Joypad Right")
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_PLAYER(1) PORT_NAME("P1 Joypad Left")
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(1) PORT_NAME("P1 Joypad Down")
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_PLAYER(1) PORT_NAME("P1 Joypad Up")
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Joypad B1")
+	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("P1 Joypad Right")
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_NAME("P1 Joypad Left")
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_NAME("P1 Joypad Down")
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_NAME("P1 Joypad Up")
+	PORT_DIPNAME( 0x1000, 0x1000, "SYSTEM" )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Joypad B1")
 INPUT_PORTS_END
 
 
@@ -461,7 +486,7 @@ static WRITE16_HANDLER( supracan_sound_w )
 			supracan_m6502_reset = data & 0x01;
 			break;
 		default:
-			printf("supracan_sound_w: writing %04x to unknown address %08x\n", data, 0xe90000 + offset * 2 );
+			//printf("supracan_sound_w: writing %04x to unknown address %08x\n", data, 0xe90000 + offset * 2 );
 			break;
 	}
 }
@@ -573,12 +598,15 @@ static WRITE16_HANDLER( supracan_video_w )
 		case 0x26/2:
 			spr_flags = data;
 			break;
+		case 0x100/2: tilemap_flags[0] = data; break;
 		case 0x104/2: tilemap_scrollx[0] = data; break;
 		case 0x106/2: tilemap_scrolly[0] = data; break;
 		case 0x108/2: tilemap_base_addr[0] = (data) << 1; break;
+		case 0x120/2: tilemap_flags[1] = data; break;
 		case 0x124/2: tilemap_scrollx[1] = data; break;
 		case 0x126/2: tilemap_scrolly[1] = data; break;
 		case 0x128/2: tilemap_base_addr[1] = (data) << 1; break;
+		case 0x140/2: tilemap_flags[2] = data; break;
 		case 0x144/2: tilemap_scrollx[2] = data; break;
 		case 0x146/2: tilemap_scrolly[2] = data; break;
 		case 0x148/2: tilemap_base_addr[2] = (data) << 1; break;
