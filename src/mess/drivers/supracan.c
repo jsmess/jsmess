@@ -137,6 +137,7 @@ static VIDEO_UPDATE( supracan )
 	for (map = 0; map < 3; map++)
 	{
 		count = (0x1e000 + map * 0x800) / 2;
+
 		for (y=0;y<30;y++)
 		{
 			for (x=0;x<32;x++)
@@ -170,88 +171,32 @@ static VIDEO_UPDATE( supracan )
 
 		/*
 			[0]
-			---s sss- ---- ---- Y size
+			---h hhh- ---- ---- Y size
 			---- ---- yyyy yyyy Y offset
 			[1]
 			bbbb ---- ---- ---- sprite offset bank
 			---- d--- ---- ---- horizontal direction
+			---- ---- ---- -www X size
 			[2]
-			---- ---x xxxx xxxx X offset
+			---- ---S xxxx xxxx X offset
 			[3]
 			oooo oooo oooo oooo sprite pointer
 		*/
 
 		for(i=spr_base/2;i<(spr_base+(spr_limit*8))/2;i+=4)
 		{
-			x = supracan_vram[i+2] & 0x01ff;
+			x = supracan_vram[i+2] & 0x00ff;
 			y = supracan_vram[i+0] & 0x00ff;
 			spr_offs = supracan_vram[i+3] << 2;
 			bank = (supracan_vram[i+1] & 0xf000) >> 12;
 			hflip = (supracan_vram[i+1] & 0x0800) ? 1 : 0;
 
+			if(supracan_vram[i+2] & 0x100)
+				x-=256;
+
 			if(supracan_vram[i+3] != 0)
 			{
-				// HACK
-				// Some of these are likely wrong
-				switch((supracan_vram[i+0] & 0xff00) | ((supracan_vram[i+2] & 0xfe00) >> 8))
-				{
-					case 0x2412:
-						xsize = 4;
-						break;
-					case 0x2612:
-						xsize = 4;
-						break;
-					case 0x4028:
-						xsize = 3 * (supracan_vram[i+1] & 7);
-						break;
-					case 0x4228:
-						xsize = 2 * (supracan_vram[i+1] & 7);
-						break;
-					case 0x4428:
-						xsize = 4;
-						break;
-					case 0x4628:
-						xsize = 2 * (supracan_vram[i+1] & 7);
-						break;
-					case 0x5028:
-						xsize = 16;
-						break;
-					case 0x402a:
-						xsize = 2;
-						break;
-					case 0x422a:
-						xsize = 2;
-						break;
-					case 0x442a:
-						xsize = 2 * (supracan_vram[i+1] & 7);
-						break;
-					case 0x522a:
-						xsize = 16;
-						break;
-					case 0x422c:
-						xsize = 4;
-						break;
-					case 0x422e:
-						xsize = 2;
-						break;
-					case 0x442c:
-						xsize = 2;
-						break;
-					case 0x462a:
-						xsize = 4;
-						break;
-					case 0x462c:
-						xsize = 2;
-						break;
-					case 0x482a:
-						xsize = 4;
-						break;
-					default:
-						printf( "Unknown size: %04x\n", (supracan_vram[i+0] & 0xff00) | (supracan_vram[i+2] >> 8));
-						xsize = 1;
-						break;
-				}
-				//xsize = ((supracan_vram[i+1] & 0x0007) >> 0)*((supracan_vram[i+0] & 0x40) >> 4);
+				xsize = 1 << (supracan_vram[i+1] & 7);
 				ysize = ((supracan_vram[i+0] & 0x1e00) >> 9)+1;
 
 				for(ytile = 0; ytile < ysize; ytile++)
