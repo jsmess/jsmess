@@ -119,7 +119,7 @@ static VIDEO_UPDATE( supracan )
 		{
 			int tile, flipx, pal;
 
-			tile = (supracan_vram[count] & 0x07ff);
+			tile = (supracan_vram[count] & 0x03ff);
 			flipx = (supracan_vram[count] & 0x0800) ? 1 : 0;
 			pal = (supracan_vram[count] & 0xf000) >> 12;
 
@@ -137,7 +137,7 @@ static VIDEO_UPDATE( supracan )
 		{
 			int tile, flipx, pal;
 
-			tile = (supracan_vram[count] & 0x07ff);
+			tile = (supracan_vram[count] & 0x03ff);
 			flipx = (supracan_vram[count] & 0x0800) ? 1 : 0;
 			pal = (supracan_vram[count] & 0xf000) >> 12;
 
@@ -166,14 +166,14 @@ static VIDEO_UPDATE( supracan )
 				// Some of these are likely wrong
 				switch((supracan_vram[i+0] & 0xff00) | ((supracan_vram[i+2] & 0xfe00) >> 8))
 				{
-					case 0x2412:
-						xsize = 4;
-						ysize = 3;
-						break;
-					case 0x2612:
-						xsize = 4;
-						ysize = 4;
-						break;
+					//case 0x2412:
+					//	xsize = 4;
+					//	ysize = 3;
+					//	break;
+					//case 0x2612:
+					//	xsize = 4;
+					//	ysize = 4;
+					//	break;
 					case 0x4028:
 						xsize = 10;
 						ysize = 1;
@@ -190,21 +190,21 @@ static VIDEO_UPDATE( supracan )
 						xsize = 2;
 						ysize = 2;
 						break;
-					case 0x442a:
-						xsize = 4;
-						ysize = 3;
-						break;
 					case 0x4428:
 						xsize = 4;
 						ysize = 3;
 						break;
+					case 0x442a:
+						xsize = 2;
+						ysize = 3;
+						break;
 					case 0x442c:
 						xsize = 2;
-						ysize = 2;
+						ysize = 3;
 						break;
 					case 0x4628:
-						xsize = 8;
-						ysize = 8;
+						xsize = 2;
+						ysize = 4;
 						break;
 					case 0x462a:
 						xsize = 4;
@@ -236,6 +236,7 @@ static VIDEO_UPDATE( supracan )
 						int tile = (bank * 0x200) + (data & 0x03ff);
 						int xflip = data & 0x0800;
 						int yflip = data & 0x0400;
+						col = (data & 0xf000) >> 12;
 						drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],tile,col,xflip,yflip,x+xtile*8,y+ytile*8,0);
 					}
 				}
@@ -621,7 +622,7 @@ static MACHINE_DRIVER_START( supracan )
 
 	MDRV_SCREEN_ADD( "screen", RASTER )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, 348, 0, 320, 256, 0, 240 )	/* No idea if this is correct */
+	MDRV_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, 348, 0, 256, 256, 0, 240 )	/* No idea if this is correct */
 
 	MDRV_PALETTE_LENGTH( 32768 )
 	MDRV_PALETTE_INIT( supracan )
