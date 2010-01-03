@@ -31,6 +31,7 @@ static UINT8 *supracan_soundram;
 static UINT16 *supracan_soundram_16;
 static emu_timer *supracan_video_timer;
 static UINT16 *supracan_vram;
+static UINT16 spr_limit;
 
 static UINT16 supracan_video_regs[256];
 
@@ -167,7 +168,7 @@ static VIDEO_UPDATE( supracan )
 
 		spr_base = 0x1d000;
 
-		for(i=spr_base/2;i<(spr_base+0x1000)/2;i+=4)
+		for(i=spr_base/2;i<(spr_base+(spr_limit*8))/2;i+=4)
 		{
 			x = supracan_vram[i+2] & 0x1ff;
 			y = supracan_vram[i+0] & 0x0ff;
@@ -574,8 +575,9 @@ static WRITE16_HANDLER( supracan_video_w )
 				{
 					if(data & 0x0100) //dma 0x00 fill (or fixed value?)
 					{
-						memory_write_word(space, acan_sprdma_regs.dst, 0);
-						acan_sprdma_regs.dst+=2;
+						//memory_write_word(space, acan_sprdma_regs.dst, 0);
+						//acan_sprdma_regs.dst+=2;
+						memset(supracan_vram,0x00,0x020000);
 					}
 					else
 					{
@@ -589,6 +591,9 @@ static WRITE16_HANDLER( supracan_video_w )
 			{
 				// ...
 			}
+			break;
+		case 0x22/2:
+			spr_limit = data+1;
 			break;
 		// Affine transforms of some sort?
 		case ACAN_VID_XFORM32A_H:
