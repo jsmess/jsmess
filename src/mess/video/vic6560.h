@@ -93,29 +93,25 @@
 
 /*----------- defined in video/vic6560.c -----------*/
 
-extern UINT8 vic6560[16];
-
 /* call to init videodriver */
 /* pal version */
 /* dma_read: videochip fetched 12 bit data from system bus */
-extern void vic6560_init (int (*dma_read) (running_machine *machine, int), int (*dma_read_color) (running_machine *machine, int));
-extern void vic6561_init (int (*dma_read) (running_machine *machine, int), int (*dma_read_color) (running_machine *machine, int));
+void vic6560_init (int (*dma_read) (running_machine *machine, int), int (*dma_read_color) (running_machine *machine, int));
+void vic6561_init (int (*dma_read) (running_machine *machine, int), int (*dma_read_color) (running_machine *machine, int));
 
 /* internal */
 extern int vic6560_pal;
-
-extern VIDEO_START( vic6560 );
-extern VIDEO_UPDATE( vic6560 );
-extern const unsigned char vic6560_palette[16 * 3];
+extern UINT8 vic6560[16];
 
 extern INTERRUPT_GEN( vic656x_raster_interrupt );
-
 /* to be called when writting to port */
-extern WRITE8_HANDLER ( vic6560_port_w );
+WRITE8_HANDLER ( vic6560_port_w );
 
 /* to be called when reading from port */
-extern  READ8_HANDLER ( vic6560_port_r );
+READ8_HANDLER ( vic6560_port_r );
 
+MACHINE_DRIVER_EXTERN( vic6560_video );
+MACHINE_DRIVER_EXTERN( vic6561_video );
 
 /*----------- defined in audio/vic6560.c -----------*/
 

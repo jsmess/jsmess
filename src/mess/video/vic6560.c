@@ -11,8 +11,7 @@
 #include "utils.h"
 
 #include "vic6560.h"
-
-#include "includes/vc20.h"
+#include "sound/dac.h"
 
 #define VERBOSE_LEVEL 0
 #define DBG_LOG(N,M,A) \
@@ -25,7 +24,7 @@
 		} \
 	} while (0)
 
-const unsigned char vic6560_palette[] =
+static const unsigned char vic6560_palette[] =
 {
 /* ripped from vice, a very excellent emulator */
 /* black, white, red, cyan */
@@ -135,7 +134,7 @@ void vic6561_init (int (*dma_read) (running_machine *machine, int), int (*dma_re
 }
 
 
-VIDEO_START( vic6560 )
+static VIDEO_START( vic6560 )
 {
 	const device_config *screen = video_screen_first(machine->config);
 	int width = video_screen_get_width(screen);
@@ -402,8 +401,63 @@ INTERRUPT_GEN( vic656x_raster_interrupt )
 	}
 }
 
-VIDEO_UPDATE( vic6560 )
+static VIDEO_UPDATE( vic6560 )
 {
 	copybitmap(bitmap, vic6560_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
+
+static PALETTE_INIT( vic6560 )
+{
+	int i;
+
+	for ( i = 0; i < sizeof(vic6560_palette) / 3; i++ ) {
+		palette_set_color_rgb(machine, i, vic6560_palette[i*3], vic6560_palette[i*3+1], vic6560_palette[i*3+2]);
+	}
+}
+
+MACHINE_DRIVER_START( vic6560_video )
+    /* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(VIC6560_VRETRACERATE)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE((VIC6560_XSIZE + 7) & ~7, VIC6560_YSIZE)
+	MDRV_SCREEN_VISIBLE_AREA(VIC6560_MAME_XPOS, VIC6560_MAME_XPOS + VIC6560_MAME_XSIZE - 1, VIC6560_MAME_YPOS, VIC6560_MAME_YPOS + VIC6560_MAME_YSIZE - 1)
+	
+	MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_INIT(vic6560)
+
+	MDRV_VIDEO_START(vic6560)
+	MDRV_VIDEO_UPDATE(vic6560)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("custom", VIC6560, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_DRIVER_END
+
+MACHINE_DRIVER_START( vic6561_video )
+    /* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(VIC6561_VRETRACERATE)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE((VIC6561_XSIZE + 7) & ~7, VIC6561_YSIZE)
+	MDRV_SCREEN_VISIBLE_AREA(VIC6561_MAME_XPOS, VIC6561_MAME_XPOS + VIC6561_MAME_XSIZE - 1, VIC6561_MAME_YPOS, VIC6561_MAME_YPOS + VIC6561_MAME_YSIZE - 1)
+	
+	MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_INIT(vic6560)
+
+	MDRV_VIDEO_START(vic6560)
+	MDRV_VIDEO_UPDATE(vic6560)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("custom", VIC6560, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_DRIVER_END

@@ -674,8 +674,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_DRIVERS)/pet.o		\
 	$(MESS_MACHINE)/pet.o		\
 	$(MESS_DRIVERS)/c64.o		\
-	$(MESS_MACHINE)/vc20.o		\
-	$(MESS_DRIVERS)/vc20.o		\
+	$(MESS_DRIVERS)/vic20.o		\
 	$(MESS_AUDIO)/ted7360.o		\
 	$(MESS_AUDIO)/t6721.o		\
 	$(MESS_MACHINE)/c16.o		\

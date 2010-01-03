@@ -409,15 +409,8 @@ const game_driver * const drivers[] =
 
     DRIVER( vic1001 )   /* Commodore VIC-1001 (Japan)                       */
     DRIVER( vic20 )     /* Commodore VIC 20 (NTSC)                          */
-    DRIVER( vic20cr )   /* Commodore VIC 20CR (NTSC)                        */
-    DRIVER( vic20i )    /* Commodore VIC 20 (NTSC, IEEE488 Interface)       */
-    DRIVER( vic20v )    /* Commodore VIC 20 (NTSC, VC1540)                  */
-    DRIVER( vic20pal )  /* Commodore VIC 20 (PAL)                           */
-    DRIVER( vic20crp )  /* Commodore VIC 20CR (PAL)                         */
-    DRIVER( vic20plv )  /* Commodore VIC 20 (PAL, VC1540)                   */
-    DRIVER( vc20 )      /* Commodore VIC 20 (PAL, Germany)                  */
-    DRIVER( vc20v )     /* Commodore VIC 20 (PAL, VC1540)                   */
-    DRIVER( vic20swe )  /* Commodore VIC 20 (Swedish Expanson Kit)          */
+    DRIVER( vic20p )    /* Commodore VIC 20 (PAL)                           */
+    DRIVER( vic20s )    /* Commodore VIC 20 (Swedish Expanson Kit)          */
 
     DRIVER( max )       /* Commodore Max Machine (Japan)                    */
     DRIVER( c64 )       /* Commodore 64 (NTSC)                              */
