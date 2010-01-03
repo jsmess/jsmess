@@ -32,6 +32,11 @@ static UINT16 *supracan_soundram_16;
 static emu_timer *supracan_video_timer;
 static UINT16 *supracan_vram;
 static UINT16 spr_limit;
+static UINT32 spr_base_addr;
+static UINT8 spr_flags;
+static UINT32 tilemap_base_addr[4];
+static int tilemap_scrollx[4],tilemap_scrolly[4];
+static UINT16 video_flags;
 
 static UINT16 supracan_video_regs[256];
 
@@ -76,11 +81,114 @@ static VIDEO_START( supracan )
 
 }
 
+static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,int layer)
+{
+	UINT32 count;
+	int x,y;
+	int scrollx,scrolly;
+
+	count = (tilemap_base_addr[layer]);
+	scrollx = tilemap_scrollx[layer];
+	scrolly = tilemap_scrolly[layer];
+
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<32;x++)
+		{
+			int tile, flipx, flipy, pal;
+			tile = (supracan_vram[count] & 0x03ff);
+			flipx = (supracan_vram[count] & 0x0800) ? 1 : 0;
+			flipy = (supracan_vram[count] & 0x0400) ? 1 : 0;
+			pal = (supracan_vram[count] & 0xf000) >> 12;
+
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly,0);
+			//todo: wrap-around, untested by the current game
+			count++;
+		}
+	}
+}
+
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	int x, y;
+	int xtile, ytile;
+	int xsize, ysize;
+	int bank;
+	int spr_offs;
+	int col;
+	int i;
+	int spr_base;
+	int hflip;
+	int region;
+	//UINT8 *sprdata = (UINT8*)(&supracan_vram[0x1d000/2]);
+
+	spr_base = spr_base_addr;
+	region = (spr_flags & 1) ? 0 : 1; //8bpp : 4bpp
+
+	/*
+		[0]
+		---h hhh- ---- ---- Y size
+		---- ---- yyyy yyyy Y offset
+		[1]
+		bbbb ---- ---- ---- sprite offset bank
+		---- d--- ---- ---- horizontal direction
+		---- ---- ---- -www X size
+		[2]
+		---- ---S xxxx xxxx X offset
+		[3]
+		oooo oooo oooo oooo sprite pointer
+	*/
+
+	for(i=spr_base/2;i<(spr_base+(spr_limit*8))/2;i+=4)
+	{
+		x = supracan_vram[i+2] & 0x00ff;
+		y = supracan_vram[i+0] & 0x00ff;
+		spr_offs = supracan_vram[i+3] << 2;
+		bank = (supracan_vram[i+1] & 0xf000) >> 12;
+		hflip = (supracan_vram[i+1] & 0x0800) ? 1 : 0;
+
+		if(supracan_vram[i+2] & 0x100)
+			x-=256;
+
+		if(supracan_vram[i+3] != 0)
+		{
+			xsize = 1 << (supracan_vram[i+1] & 7);
+			ysize = ((supracan_vram[i+0] & 0x1e00) >> 9)+1;
+
+			for(ytile = 0; ytile < ysize; ytile++)
+			{
+				if(hflip)
+				{
+					for(xtile = (xsize - 1); xtile >= 0; xtile--)
+					{
+						UINT16 data = supracan_vram[spr_offs/2+ytile*xsize+xtile];
+						int tile = (bank * 0x200) + (data & 0x03ff);
+						int xflip = (data & 0x0800) ? 0 : 1;
+						int yflip = (data & 0x0400) ? 1 : 0;
+						col = (data & 0xf000) >> 12;
+						drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,col,xflip,yflip,x+((xsize - 1) - xtile)*8,y+ytile*8,0);
+					}
+				}
+				else
+				{
+					for(xtile = 0; xtile < xsize; xtile++)
+					{
+						UINT16 data = supracan_vram[spr_offs/2+ytile*xsize+xtile];
+						int tile = (bank * 0x200) + (data & 0x03ff);
+						int xflip = (data & 0x0800) ? 1 : 0;
+						int yflip = (data & 0x0400) ? 1 : 0;
+						col = (data & 0xf000) >> 12;
+						drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,col,xflip,yflip,x+xtile*8,y+ytile*8,0);
+					}
+				}
+			}
+		}
+	}
+}
+
 /* FIXME: vram is currently hardcoded, but there's an high chance it's tied to some video registers */
 static VIDEO_UPDATE( supracan )
 {
-	int x,y,map,count;
-
 	bitmap_fill(bitmap, cliprect, 0);
 
 #if 0
@@ -133,102 +241,14 @@ static VIDEO_UPDATE( supracan )
 	}
 #endif
 
-	// Tilemaps
-	for (map = 0; map < 3; map++)
-	{
-		count = (0x1e000 + map * 0x800) / 2;
-
-		for (y=0;y<30;y++)
-		{
-			for (x=0;x<32;x++)
-			{
-				int tile, flipx, flipy, pal;
-
-				tile = (supracan_vram[count] & 0x03ff);
-				flipx = (supracan_vram[count] & 0x0800) ? 1 : 0;
-				flipy = (supracan_vram[count] & 0x0400) ? 1 : 0;
-				pal = (supracan_vram[count] & 0xf000) >> 12;
-
-				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],tile,pal,flipx,flipy,x*8,y*8,0);
-				count++;
-			}
-		}
-	}
-
-	{
-		int x, y;
-		int xtile, ytile;
-		int xsize, ysize;
-		int bank;
-		int spr_offs;
-		int col;
-		int i;
-		int spr_base;
-		int hflip;
-		//UINT8 *sprdata = (UINT8*)(&supracan_vram[0x1d000/2]);
-
-		spr_base = 0x1d000;
-
-		/*
-			[0]
-			---h hhh- ---- ---- Y size
-			---- ---- yyyy yyyy Y offset
-			[1]
-			bbbb ---- ---- ---- sprite offset bank
-			---- d--- ---- ---- horizontal direction
-			---- ---- ---- -www X size
-			[2]
-			---- ---S xxxx xxxx X offset
-			[3]
-			oooo oooo oooo oooo sprite pointer
-		*/
-
-		for(i=spr_base/2;i<(spr_base+(spr_limit*8))/2;i+=4)
-		{
-			x = supracan_vram[i+2] & 0x00ff;
-			y = supracan_vram[i+0] & 0x00ff;
-			spr_offs = supracan_vram[i+3] << 2;
-			bank = (supracan_vram[i+1] & 0xf000) >> 12;
-			hflip = (supracan_vram[i+1] & 0x0800) ? 1 : 0;
-
-			if(supracan_vram[i+2] & 0x100)
-				x-=256;
-
-			if(supracan_vram[i+3] != 0)
-			{
-				xsize = 1 << (supracan_vram[i+1] & 7);
-				ysize = ((supracan_vram[i+0] & 0x1e00) >> 9)+1;
-
-				for(ytile = 0; ytile < ysize; ytile++)
-				{
-					if(hflip)
-					{
-						for(xtile = (xsize - 1); xtile >= 0; xtile--)
-						{
-							UINT16 data = supracan_vram[spr_offs/2+ytile*xsize+xtile];
-							int tile = (bank * 0x200) + (data & 0x03ff);
-							int xflip = (data & 0x0800) ? 0 : 1;
-							int yflip = (data & 0x0400) ? 1 : 0;
-							col = (data & 0xf000) >> 12;
-							drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],tile,col,xflip,yflip,x+((xsize - 1) - xtile)*8,y+ytile*8,0);
-						}
-					}
-					else
-					{
-						for(xtile = 0; xtile < xsize; xtile++)
-						{
-							UINT16 data = supracan_vram[spr_offs/2+ytile*xsize+xtile];
-							int tile = (bank * 0x200) + (data & 0x03ff);
-							int xflip = (data & 0x0800) ? 1 : 0;
-							int yflip = (data & 0x0400) ? 1 : 0;
-							col = (data & 0xf000) >> 12;
-							drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],tile,col,xflip,yflip,x+xtile*8,y+ytile*8,0);
-						}
-					}
-				}
-			}
-		}
-	}
+	if(video_flags & 0x80)
+		draw_tilemap(screen->machine,bitmap,cliprect,0);
+	if(video_flags & 0x40)
+		draw_tilemap(screen->machine,bitmap,cliprect,1);
+	if(video_flags & 0x20) //guess, not tested
+		draw_tilemap(screen->machine,bitmap,cliprect,2);
+	if(video_flags & 8)
+		draw_sprites(screen->machine,bitmap,cliprect);
 
 	return 0;
 }
@@ -534,9 +554,27 @@ static WRITE16_HANDLER( supracan_video_w )
 				// ...
 			}
 			break;
+		case 0x08/2:
+			video_flags = data;
+			break;
+		case 0x20/2:
+			spr_base_addr = data << 2;
+			break;
 		case 0x22/2:
 			spr_limit = data+1;
 			break;
+		case 0x26/2:
+			spr_flags = data;
+			break;
+		case 0x104/2: tilemap_scrollx[0] = data; break;
+		case 0x106/2: tilemap_scrolly[0] = data; break;
+		case 0x108/2: tilemap_base_addr[0] = (data) << 1; break;
+		case 0x124/2: tilemap_scrollx[1] = data; break;
+		case 0x126/2: tilemap_scrolly[1] = data; break;
+		case 0x128/2: tilemap_base_addr[1] = (data) << 1; break;
+		case 0x144/2: tilemap_scrollx[2] = data; break;
+		case 0x146/2: tilemap_scrolly[2] = data; break;
+		case 0x148/2: tilemap_base_addr[2] = (data) << 1; break;
 		// Affine transforms of some sort?
 		case ACAN_VID_XFORM32A_H:
 		case ACAN_VID_XFORM32A_L:
