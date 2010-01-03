@@ -23,6 +23,7 @@
     - Kaypro2x/4a are not booting.
 
     - Hard Disk not emulated.
+      The controller is a WD1002 (original version, for Winchester drives).
 
     - Kaypro 4 plus 88 does work as a normal Kaypro, but the extra processor needs
       to be worked out.
