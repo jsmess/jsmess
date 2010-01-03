@@ -75,6 +75,8 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
+- [APEXC] Fixed image loading [Robbbert]
+
 - [BETA] Fixed display flickering. [Curt Coder]
 
 - [C64] Emulated the Commodore 1541 disk drive at hardware level. 
