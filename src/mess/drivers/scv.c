@@ -328,17 +328,19 @@ INLINE void draw_text( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 *char_data, UIN
 }
 
 
-INLINE void draw_semi_graph( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 data, UINT8 fg, UINT8 bg )
+INLINE void draw_semi_graph( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 data, UINT8 fg )
 {
-	UINT8 col = data ? fg : bg;
 	int i;
+
+	if ( ! data )
+		return;
 
 	for ( i = 0; i < 4; i++ )
 	{
-		*BITMAP_ADDR16(bitmap, y + i, x + 0) = col;
-		*BITMAP_ADDR16(bitmap, y + i, x + 1) = col;
-		*BITMAP_ADDR16(bitmap, y + i, x + 2) = col;
-		*BITMAP_ADDR16(bitmap, y + i, x + 3) = col;
+		*BITMAP_ADDR16(bitmap, y + i, x + 0) = fg;
+		*BITMAP_ADDR16(bitmap, y + i, x + 1) = fg;
+		*BITMAP_ADDR16(bitmap, y + i, x + 2) = fg;
+		*BITMAP_ADDR16(bitmap, y + i, x + 3) = fg;
 	}
 }
 
@@ -364,15 +366,15 @@ INLINE void draw_block_graph( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 col )
 static VIDEO_UPDATE( scv )
 {
 	int x, y;
-	UINT8 gr_fg = scv_vram[0x1403] >> 4;
-	UINT8 gr_bg = scv_vram[0x1403] & 0x0f;
-	UINT8 fg = scv_vram[0x1401] >> 4;
-	UINT8 bg = scv_vram[0x1401] & 0x0f;
+	UINT8 fg = scv_vram[0x1403] >> 4;
+	UINT8 bg = scv_vram[0x1403] & 0x0f;
+	UINT8 gr_fg = scv_vram[0x1401] >> 4;
+	UINT8 gr_bg = scv_vram[0x1401] & 0x0f;
 	int clip_x = ( scv_vram[0x1402] & 0x0f ) * 2;
 	int clip_y = scv_vram[0x1402] >> 4;
 
 	/* Clear the screen */
-	bitmap_fill( bitmap, cliprect, bg );
+	bitmap_fill( bitmap, cliprect, gr_bg );
 
 	/* Draw background */
 	for ( y = 0; y < 16; y++ )
@@ -405,14 +407,14 @@ static VIDEO_UPDATE( scv )
 				switch ( scv_vram[0x1400] & 0x03 )
 				{
 				case 0x01:		/* Semi graphics mode */
-					draw_semi_graph( bitmap, x * 8    , y * 16     , d & 0x80, gr_fg, gr_bg );
-					draw_semi_graph( bitmap, x * 8 + 4, y * 16     , d & 0x40, gr_fg, gr_bg );
-					draw_semi_graph( bitmap, x * 8    , y * 16 +  4, d & 0x20, gr_fg, gr_bg );
-					draw_semi_graph( bitmap, x * 8 + 4, y * 16 +  4, d & 0x10, gr_fg, gr_bg );
-					draw_semi_graph( bitmap, x * 8    , y * 16 +  8, d & 0x08, gr_fg, gr_bg );
-					draw_semi_graph( bitmap, x * 8 + 4, y * 16 +  8, d & 0x04, gr_fg, gr_bg );
-					draw_semi_graph( bitmap, x * 8    , y * 16 + 12, d & 0x02, gr_fg, gr_bg );
-					draw_semi_graph( bitmap, x * 8 + 4, y * 16 + 12, d & 0x01, gr_fg, gr_bg );
+					draw_semi_graph( bitmap, x * 8    , y * 16     , d & 0x80, gr_fg );
+					draw_semi_graph( bitmap, x * 8 + 4, y * 16     , d & 0x40, gr_fg );
+					draw_semi_graph( bitmap, x * 8    , y * 16 +  4, d & 0x20, gr_fg );
+					draw_semi_graph( bitmap, x * 8 + 4, y * 16 +  4, d & 0x10, gr_fg );
+					draw_semi_graph( bitmap, x * 8    , y * 16 +  8, d & 0x08, gr_fg );
+					draw_semi_graph( bitmap, x * 8 + 4, y * 16 +  8, d & 0x04, gr_fg );
+					draw_semi_graph( bitmap, x * 8    , y * 16 + 12, d & 0x02, gr_fg );
+					draw_semi_graph( bitmap, x * 8 + 4, y * 16 + 12, d & 0x01, gr_fg );
 					break;
 				case 0x03:		/* Block graphics mode */
 					draw_block_graph( bitmap, x * 8, y * 16    , d >> 4 );
