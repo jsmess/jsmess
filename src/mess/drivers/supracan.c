@@ -106,11 +106,29 @@ static VIDEO_UPDATE( supracan )
 
 			tile = (supracan_vram[count] & 0x01ff);
 			drawgfx_transpen(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8,0);
+				count++;
+		}
+	}
+
+	// Tilemap 1
+	count = 0x1f000/2;
+
+	for (y=0;y<30;y++)
+	{
+		for (x=0;x<32;x++)
+		{
+			int tile, flipx, pal;
+
+			tile = (supracan_vram[count] & 0x07ff);
+			flipx = (supracan_vram[count] & 0x0800) ? 1 : 0;
+			pal = (supracan_vram[count] & 0xf000) >> 12;
+
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],tile,pal,flipx,0,x*8,y*8,0);
 			count++;
 		}
 	}
 
-	// Tilemap
+	// Tilemap 2
 	count = 0x1e1c0/2;
 
 	for (y=0;y<16;y++)
@@ -129,7 +147,7 @@ static VIDEO_UPDATE( supracan )
 	}
 
 	{
-		int x,y,spr_offs,col,i,spr_base;
+		int x,y,xtile,ytile,xsize,ysize,spr_offs,col,i,spr_base;
 		//UINT8 *sprdata = (UINT8*)(&supracan_vram[0x1d000/2]);
 
 		spr_base = 0x1d000;
@@ -138,10 +156,81 @@ static VIDEO_UPDATE( supracan )
 		{
 			x = supracan_vram[i+2] & 0x1ff;
 			y = supracan_vram[i+0] & 0x0ff;
-			spr_offs = (supracan_vram[i+3] << 2) >> 4;
+			spr_offs = supracan_vram[i+3] << 2;
 			col = (supracan_vram[i+1] & 0x000f);
 
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],supracan_vram[spr_offs/2] & 0x7ff,col,0,0,x,y,0);
+			if(supracan_vram[i+3] != 0)
+			{
+				// HACK
+				// Some of these are likely wrong
+				switch((supracan_vram[i+0] & 0xff00) | ((supracan_vram[i+2] & 0xfe00) >> 8))
+				{
+					case 0x2412:
+						xsize = 4;
+						ysize = 3;
+						break;
+					case 0x2612:
+						xsize = 4;
+						ysize = 4;
+						break;
+					case 0x4028:
+						xsize = 4;
+						ysize = 1;
+						break;
+					case 0x4228:
+						xsize = 8;
+						ysize = 1;
+						break;
+					case 0x422a:
+						xsize = 2;
+						ysize = 2;
+						break;
+					case 0x422e:
+						xsize = 2;
+						ysize = 4;
+						break;
+					case 0x442a:
+						xsize = 4;
+						ysize = 3;
+						break;
+					case 0x4428:
+						xsize = 3;
+						ysize = 1;
+						break;
+					case 0x462a:
+						xsize = 4;
+						ysize = 4;
+						break;
+					case 0x482a:
+						xsize = 4;
+						ysize = 5;
+						break;
+					case 0x5028:
+						xsize = 8;
+						ysize = 1;
+						break;
+					case 0x522a:
+						xsize = 4;
+						ysize = 1;
+						break;
+					default:
+						printf( "Unknown size: %04x\n", (supracan_vram[i+0] & 0xff00) | (supracan_vram[i+2] >> 8));
+						xsize = 1;
+						ysize = 1;
+						break;
+				}
+				for(ytile = 0; ytile < ysize; ytile++)
+				{
+					for(xtile = 0; xtile < xsize; xtile++)
+					{
+						UINT16 data = supracan_vram[spr_offs/2+ytile*xsize+xtile];
+						int tile = 0x400 + (data & 0x03ff);
+						int xflip = data & 0x0800;
+						int yflip = data & 0x0400;
+						drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],tile,col,xflip,yflip,x+xtile*8,y+ytile*8,0);
+					}
+				}
+			}
 		}
 	}
 
