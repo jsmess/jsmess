@@ -4,6 +4,7 @@ New System Drivers Supported:
 -----------------------------
 - Consul 2717 with PMD-32 [Miodrag Milanovic]
 - Elektor SC/MP [Miodrag Milanovic]
+- Epoch Super Cassette Vision [Wilbert Pol]
 - Hawthorne Technologies TinyGiant HT68k [Miodrag Milanovic]
 - Hector MX40c [JJ Stacino]
 - Hector MX80c [JJ Stacino]
@@ -35,7 +36,6 @@ Skeleton drivers:
 - CCS Model 2810
 - Commodore LCD [Curt Coder]
 - Dual Systems 68000
-- Epoch Super Cassette Vision [Wilbert Pol]
 - ETI-660 [Curt Coder]
 - Exelvision Exeltel
 - Funtech Super A'can [Wilbert Pol]

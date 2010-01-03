@@ -134,28 +134,28 @@ static READ8_HANDLER( scv_portb_r )
 {
 	UINT8 data = 0xff;
 
-	if ( scv_porta & 0x01 )
+	if ( ! ( scv_porta & 0x01 ) )
 		data &= input_port_read( space->machine, "PA0" );
 
-	if ( scv_porta & 0x02 )
+	if ( ! ( scv_porta & 0x02 ) )
 		data &= input_port_read( space->machine, "PA1" );
 
-	if ( scv_porta & 0x04 )
+	if ( ! ( scv_porta & 0x04 ) )
 		data &= input_port_read( space->machine, "PA2" );
 
-	if ( scv_porta & 0x08 )
+	if ( ! ( scv_porta & 0x08 ) )
 		data &= input_port_read( space->machine, "PA3" );
 
-	if ( scv_porta & 0x10 )
+	if ( ! ( scv_porta & 0x10 ) )
 		data &= input_port_read( space->machine, "PA4" );
 
-	if ( scv_porta & 0x20 )
+	if ( ! ( scv_porta & 0x20 ) )
 		data &= input_port_read( space->machine, "PA5" );
 
-	if ( scv_porta & 0x40 )
+	if ( ! ( scv_porta & 0x40 ) )
 		data &= input_port_read( space->machine, "PA6" );
 
-	if ( scv_porta & 0x80 )
+	if ( ! ( scv_porta & 0x80 ) )
 		data &= input_port_read( space->machine, "PA7" );
 
 	return data;
@@ -610,6 +610,6 @@ ROM_END
 
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT    COMPANY  FULLNAME                 FLAGS */
-CONS( 199?, scv,     0,      0,      scv,     scv,   0,      "Epoch", "Super Cassette Vision", GAME_NOT_WORKING )
-CONS( 199?, scv_pal, scv,    0,      scv_pal, scv,   0,      "Epoch", "Super Cassette Vision (PAL)", GAME_NOT_WORKING )
+CONS( 199?, scv,     0,      0,      scv,     scv,   0,      "Epoch", "Super Cassette Vision", GAME_IMPERFECT_SOUND )
+CONS( 199?, scv_pal, scv,    0,      scv_pal, scv,   0,      "Epoch", "Super Cassette Vision (PAL)", GAME_IMPERFECT_SOUND )
 
