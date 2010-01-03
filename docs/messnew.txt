@@ -21,6 +21,7 @@ Systems Promoted from GAME_NOT_WORKING:
 - Hector 2HR [JJ Stacino]
 - Hector HRX [JJ Stacino]
 - Kaypro 4 [Robbbert]
+- Kaypro 10 [Robbbert]
 - Omni II [Robbbert]
 - Victor [JJ Stacino]
 - XOR S-100-12 [Curt Coder]
