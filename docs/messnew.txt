@@ -158,6 +158,9 @@ Source Changes:
 
 - Added F4 character-set viewer to many computers [Robbbert]
 
+- The -listdevices option has been temporarily renamed to -listmedia,
+  until it is merged with MAME's -listdevices command [Robbbert]
+
 
 
 0.135
