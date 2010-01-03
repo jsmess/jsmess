@@ -37,45 +37,48 @@
                => add BR/HR switching
                => add bank switch for HRX
                => add device MX80c and bank switching for the ROM
-    Importante note : the keyboard function add been piked from
-                      DChector project : http://dchector.free.fr/ made by DanielCoulom
-                      (thank's Daniel)
+	   03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
+			   => add the port mapping for keyboard
+
+      don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
+      (and thank's to Daniel!)             
+
     TODO : Add the cartridge function,
            Adjust the one shot and A/D timing (sn76477)
 
 ****************************************************************************/
+/* Mapping for joystick see hec2hrp.c*/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/pckeybrd.h"
 #include "devices/cassette.h"
 #include "formats/hect_tap.h"
 #include "devices/printer.h"
-#include "sound/wave.h"      // for K7 sound
-#include "sound/sn76477.h"   // for sn sound
-#include "sound/discrete.h"  // for 1 Bit sound
+#include "sound/wave.h"      /* for K7 sound*/
+#include "sound/sn76477.h"   /* for sn sound*/
+#include "sound/discrete.h"  /* for 1 Bit sound*/
 
 #include "includes/hec2hrp.h"
 
 static ADDRESS_MAP_START(interact_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-    // Hardward address mapping
-//  AM_RANGE(0x0800,0x0808) AM_WRITE( hector_switch_bank_w)// Bank management not udsed in BR machine
-	AM_RANGE(0x1000,0x1000) AM_WRITE( hector_color_a_w)  // Color c0/c1
-	AM_RANGE(0x1800,0x1800) AM_WRITE( hector_color_b_w)  // Color c2/c3
-	AM_RANGE(0x2000,0x2003) AM_WRITE( hector_sn_2000_w)  // Sound
-	AM_RANGE(0x2800,0x2803) AM_WRITE( hector_sn_2800_w)  // Sound
-	AM_RANGE(0x3000,0x3000) AM_READWRITE( hector_cassette_r, hector_sn_3000_w)// Write necessary
-	AM_RANGE(0x3800,0x3807) AM_READWRITE( hector_keyboard_r, hector_keyboard_w)  // Keyboard
+    /* Hardward address mapping*/
+/*  AM_RANGE(0x0800,0x0808) AM_WRITE( hector_switch_bank_w)// Bank management not udsed in BR machine*/
+	AM_RANGE(0x1000,0x1000) AM_WRITE( hector_color_a_w)  /* Color c0/c1*/
+	AM_RANGE(0x1800,0x1800) AM_WRITE( hector_color_b_w)  /* Color c2/c3*/
+	AM_RANGE(0x2000,0x2003) AM_WRITE( hector_sn_2000_w)  /* Sound*/
+	AM_RANGE(0x2800,0x2803) AM_WRITE( hector_sn_2800_w)  /* Sound*/
+	AM_RANGE(0x3000,0x3000) AM_READWRITE( hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
+	AM_RANGE(0x3800,0x3807) AM_READWRITE( hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
 
-    // Main ROM page
-	AM_RANGE(0x0000,0x3fff) AM_ROM  //BANK(2)
- //   AM_RANGE(0x1000,0x3fff) AM_RAM
+    /* Main ROM page*/
+	AM_RANGE(0x0000,0x3fff) AM_ROM  /*BANK(2)*/
+ /*   AM_RANGE(0x1000,0x3fff) AM_RAM*/
 
-	// Vid??o br mapping
+	/* Video br mapping*/
 	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_GENERIC(videoram)
-	// continous RAM
+	/* continous RAM*/
     AM_RANGE(0x4A00,0xffff) AM_RAM
 
 ADDRESS_MAP_END
@@ -107,12 +110,6 @@ static MACHINE_RESET(interact)
 
 static MACHINE_START(interact)
 {
-	// Start keyboard
-    at_keyboard_init(machine, AT_KEYBOARD_TYPE_PC);
-    at_keyboard_reset(machine);
-    at_keyboard_set_scan_code_set(2);
-    at_keyboard_reset(machine);
-
 	hector_init(machine);
 }
 
@@ -128,7 +125,7 @@ static MACHINE_DRIVER_START( interact )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, XTAL_2MHz)
 	MDRV_CPU_PROGRAM_MAP(interact_mem)
-    MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the 8080 irq in Hz
+    MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) /*  put on the 8080 irq in Hz*/
 
 	MDRV_MACHINE_RESET(interact)
     MDRV_MACHINE_START(interact)
@@ -140,7 +137,7 @@ static MACHINE_DRIVER_START( interact )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 79)
 	MDRV_SCREEN_VISIBLE_AREA(0, 112, 0, 77)
-	MDRV_PALETTE_LENGTH(16)				// 8 colours, but only 4 at a time
+	MDRV_PALETTE_LENGTH(16)				/* 8 colours, but only 4 at a time*/
 	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_VIDEO_START(hec2hrp)
@@ -148,17 +145,17 @@ static MACHINE_DRIVER_START( interact )
 		/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(0, "mono", 0.1)// Sound level for cassette, as it is in mono => output channel=0
+	MDRV_SOUND_ROUTE(0, "mono", 0.1)  /* Sound level for cassette, as it is in mono => output channel=0*/
 
 	MDRV_SOUND_ADD("sn76477", SN76477, 0)
 	MDRV_SOUND_CONFIG(hector_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0) /* Son 1bit*/
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-    // Gestion cassette
+    /* Gestion cassette*/
     MDRV_CASSETTE_ADD( "cassette", interact_cassette_config )
 
 	/* printer */
@@ -171,7 +168,7 @@ static MACHINE_DRIVER_START( hector1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(interact_mem)
-    MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the 8080 irq in Hz
+    MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) /*  put on the 8080 irq in Hz*/
 
 	MDRV_MACHINE_RESET(interact)
     MDRV_MACHINE_START(interact)
@@ -183,7 +180,7 @@ static MACHINE_DRIVER_START( hector1 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 79)
 	MDRV_SCREEN_VISIBLE_AREA(0, 112, 0, 77)
-	MDRV_PALETTE_LENGTH(16)				// 8 colours, but only 4 at a time
+	MDRV_PALETTE_LENGTH(16)				/* 8 colours, but only 4 at a time*/
 	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_VIDEO_START(hec2hrp)
@@ -191,17 +188,17 @@ static MACHINE_DRIVER_START( hector1 )
 		/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(0, "mono", 0.1)// Sound level for cassette, as it is in mono => output channel=0
+	MDRV_SOUND_ROUTE(0, "mono", 0.1)/* Sound level for cassette, as it is in mono => output channel=0*/
 
 	MDRV_SOUND_ADD("sn76477", SN76477, 0)
 	MDRV_SOUND_CONFIG(hector_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0) /* Son 1bit*/
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-    // Gestion cassette
+    /* Gestion cassette*/
     MDRV_CASSETTE_ADD( "cassette", interact_cassette_config )
 
 	/* printer */
@@ -211,7 +208,93 @@ MACHINE_DRIVER_END
 
 /* Input ports */
 static INPUT_PORTS_START( interact )
-	PORT_INCLUDE( at_keyboard )
+	/* keyboard input */
+	PORT_START("KEY0") /* [0] - port 3000 @ 0 */
+	    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)	PORT_CHAR('\\') PORT_CHAR('|')
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space")			PORT_CODE(KEYCODE_SPACE)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return")			PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab")			PORT_CODE(KEYCODE_TAB)
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("<--")			PORT_CODE(KEYCODE_BACKSPACE)
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps Lock")      PORT_CODE(KEYCODE_CAPSLOCK)    
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl")			PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift")			PORT_CODE(KEYCODE_LSHIFT)     PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_START("KEY1") /* [1] - port 3000 @ 1 */    /* touches => 2  1  0  /  .  -  ,  +     */
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 \"")			PORT_CODE(KEYCODE_2) 	PORT_CHAR('2')
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 >") 			PORT_CODE(KEYCODE_1)	PORT_CHAR('1')
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 <") 			PORT_CODE(KEYCODE_0)	PORT_CHAR('0')
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)	    PORT_CHAR('.') PORT_CHAR('>')
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)	PORT_CHAR(',') PORT_CHAR('<')
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)	PORT_CHAR('-') PORT_CHAR('_')
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)	PORT_CHAR('=') PORT_CHAR('+')
+
+	PORT_START("KEY2") /* [1] - port 3000 @ 2 */     /* touches => .. 9  8  7  6  5  4  3  */
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 )")  			PORT_CODE(KEYCODE_9) 	PORT_CHAR('9')
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 (")	 		PORT_CODE(KEYCODE_8) 	PORT_CHAR('8')
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 :")			PORT_CODE(KEYCODE_7) 	PORT_CHAR('7')
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 !")	 		PORT_CODE(KEYCODE_6) 	PORT_CHAR('6')
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 %")	 		PORT_CODE(KEYCODE_5) 	PORT_CHAR('5')
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 $")	 		PORT_CODE(KEYCODE_4) 	PORT_CHAR('4') 
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 /")	  		PORT_CODE(KEYCODE_3) 	PORT_CHAR('3')
+	PORT_START("KEY3") /* [1] - port 3000 @ 3 */    /* touches =>  B  A  ..  ? .. =   ..  ;       */
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)	 PORT_CHAR('B')
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A")  		 PORT_CODE(KEYCODE_Q) 	PORT_CHAR('Q')
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)	PORT_CHAR('[') PORT_CHAR('{')
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)	PORT_CHAR(']') PORT_CHAR('}')
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)	   PORT_CHAR('/') PORT_CHAR('?')
+	PORT_START("KEY4") /* [1] - port 3000 @ 4 */
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)			PORT_CHAR('J')
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) 			PORT_CHAR('I')
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) 			PORT_CHAR('H')
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)			PORT_CHAR('G')
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) 			PORT_CHAR('F')
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)			PORT_CHAR('E')
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) 			PORT_CHAR('C')
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)			PORT_CHAR('D') 
+
+	PORT_START("KEY5") /* [1] - port 3000 @ 5 */
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)			PORT_CHAR('R')
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q")         PORT_CODE(KEYCODE_A)			PORT_CHAR('A')
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) 			PORT_CHAR('P')
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)			PORT_CHAR('O')
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) 			PORT_CHAR('N')
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) 			PORT_CHAR('L')
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)			PORT_CHAR('K') 
+
+	PORT_START("KEY6") /* [1] - port 3000 @ 6 */
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z")          PORT_CODE(KEYCODE_W)			PORT_CHAR('W')
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) 			PORT_CHAR('Y')
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X")          PORT_CODE(KEYCODE_X) 			PORT_CHAR('X')
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W")          PORT_CODE(KEYCODE_Z)			PORT_CHAR('Z')
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) 			PORT_CHAR('V')
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)			PORT_CHAR('U')
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) 			PORT_CHAR('T')
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)			PORT_CHAR('S') 
+		
+	PORT_START("KEY7") /* [1] - port 3000 @ 7  JOYSTICK */
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Joy(0) LEFT")		PORT_CODE(KEYCODE_LEFT)		PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Joy(0) RIGHT")		PORT_CODE(KEYCODE_RIGHT)	PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Joy(0) UP")			PORT_CODE(KEYCODE_UP)		PORT_CHAR(UCHAR_MAMEKEY(UP))
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Joy(0) DOWN")		PORT_CODE(KEYCODE_DOWN)		PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Joy(1) LEFT")		PORT_CODE(KEYCODE_1_PAD)	 /* Joy(1) on numpad*/
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Joy(1) RIGHT")		PORT_CODE(KEYCODE_3_PAD)	
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Joy(1) UP")			PORT_CODE(KEYCODE_5_PAD)	
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Joy(1) DOWN")		PORT_CODE(KEYCODE_2_PAD)
+
+	PORT_START("KEY8") /* [1] - port 3000 @ 8  not for the real machine, but to emulate the analog signal of the joystick */
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")				PORT_CODE(KEYCODE_ESC)		PORT_CHAR(27)
+		PORT_BIT(0x02, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Joy(0) FIRE")		PORT_CODE(KEYCODE_0_PAD)
+		PORT_BIT(0x04, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Joy(1) FIRE")		PORT_CODE(KEYCODE_PLUS_PAD)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Pot(0)+") PORT_CODE(KEYCODE_INSERT)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Pot(0)-") PORT_CODE(KEYCODE_DEL)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Pot(1)+") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME))
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Pot(1)-") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(END))
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 /* ROM definition */
@@ -229,4 +312,4 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
 COMP(1979, interact, 0, 		0,   interact, 	interact, 0,	 "Interact",   "Interact Family Computer", GAME_IMPERFECT_SOUND)
-COMP(????, hector1,  interact, 	0, 	 hector1, 	interact, 0,  	 "Micronique", "Hector 1",	GAME_IMPERFECT_SOUND)
+COMP(1983, hector1,  interact, 	0, 	 hector1, 	interact, 0,  	 "Micronique", "Hector 1",	GAME_IMPERFECT_SOUND)

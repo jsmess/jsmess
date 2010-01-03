@@ -10,6 +10,7 @@ You can find some *.K7 file on serveral server in France
  
  jj.stacino@aliceadsl.fr
 
+Updated 3/1/10 : use real value for timing.
 ********************************************************************/
 #include "hect_tap.h"
 
@@ -22,10 +23,12 @@ You can find some *.K7 file on serveral server in France
 static int cas_size;
 
 
-int  Header_cycles = 66; //Valeur Théorique = 44100 * 1.5 / 1000  // mesuré sur jeu Formule1 = 1,75ms
-int  Zero_cycles =   17; //Valeur Théorique = 44100 * 0.4 / 1000  // mesuré sur jeu Formule1 = 0,61ms
-int  Un_cycles =     40; //Valeur Théorique = 44100 * 0.9 / 1000  // mesuré sur jeu Formule1 = 1,13ms
-
+int  Header_cycles = 77; /* Valeur Théorique 66 = 44100 * 1.5 / 1000  // mesuré sur jeu Formule1 = 1,75ms*/
+int  Zero_cycles =   27; /* Valeur Théorique 17 = 44100 * 0.4 / 1000  // mesuré sur jeu Formule1 = 0,61ms*/
+int  Un_cycles =     50; /* Valeur Théorique 40 = 44100 * 0.9 / 1000  // mesuré sur jeu Formule1 = 1,13ms*/
+/* Here I prefer use the value that I read on a real tape, and not the theorical value; note that these 
+   value work best on my HRX...    Yo_fr   (jj.stacino@aliceadsl.fr)  */
+   
 /*******************************************************************
    Generate one high-low cycle of sample data
 ********************************************************************/
@@ -53,7 +56,7 @@ INLINE int hector_tap_cycle(INT16 *buffer, int sample_pos, int high, int low)
 
 INLINE int hector_tap_byte(INT16 *buffer, int sample_pos, UINT8 data)
 {
-// Writing an entire byte 
+/* Writing an entire byte */
 	int i, samples;
 
 	samples = 0;
@@ -72,7 +75,7 @@ INLINE int hector_tap_byte(INT16 *buffer, int sample_pos, UINT8 data)
 
 INLINE int hector_tap_synchro(INT16 *buffer, int sample_pos, int nb_synchro)
 {
-// Writing an entire byte 
+/* Writing an entire byte */
 	int i, samples;
 
 	samples = 0;
@@ -96,7 +99,7 @@ static int hector_handle_tap(INT16 *buffer, const UINT8 *casdata)
 	/* First 768 cycle of synchro */
 	sample_count += hector_tap_synchro( buffer, sample_count, 768-4 );		
 	
-	// Sur la longeure du fichier
+	/* on the entire file*/
     while( data_pos < cas_size )
 	{
 		UINT16	block_size;
@@ -131,14 +134,14 @@ static int hector_handle_tap(INT16 *buffer, const UINT8 *casdata)
 
         }
     }
-    //Finish by a zero
+    /*Finish by a zero*/
     sample_count += hector_tap_byte( buffer, sample_count, 0 );
     
 	return sample_count;
 }
-/////////////////////////////////////////////////////////////////////
+/*******************************************************************
 ////  FORTH DATA CASSETTE
-/////////////////////////////////////////////////////////////////////
+*******************************************************************/
 
 
 static int hector_handle_forth_tap(INT16 *buffer, const UINT8 *casdata)
@@ -151,27 +154,27 @@ static int hector_handle_forth_tap(INT16 *buffer, const UINT8 *casdata)
     block_count = 0;
     previous_block = 0;
 
-    // Out if len of file not modulo 822 octets    
+    /* Out if len of file not modulo 822 octets    */
 	if ( (cas_size % 822) != 0 )
 		return -1;
 
-	// on the entire file
+	/* on the entire file*/
     while( data_pos < cas_size )
 	{
 		UINT16	block_size;
 
-       // Starting a block with 768 cycle of synchro
+       /* Starting a block with 768 cycle of synchro*/
        sample_count += hector_tap_synchro( buffer, sample_count, 768 );
 
-		// Handle block lenght on tape data 
-		block_size = 822 ; // Fixed size for the forth
+		/* Handle block lenght on tape data */
+		block_size = 822 ; /* Fixed size for the forth*/
 
 		block_count=0;
 
-		// Data samples 
+		/* Data samples */
 		for ( ; block_size ; data_pos++, block_size-- )
         {
-		    // Make sure there are enough bytes left 
+		    /* Make sure there are enough bytes left */
 		    if ( data_pos > cas_size )
 			   return -1;
 
@@ -180,14 +183,14 @@ static int hector_handle_forth_tap(INT16 *buffer, const UINT8 *casdata)
         }
     }
 
-    //Finish by a zero
+    /*Finish by a zero*/
     sample_count += hector_tap_byte( buffer, sample_count, 0 );
     
 	return sample_count;
 }
-///////////////////////////////////////////////////////////////////////
+/*******************************************************************
 /////  END FORTH DATA CASSETTE
-///////////////////////////////////////////////////////////////////////
+*******************************************************************/
 
 
 /*******************************************************************
