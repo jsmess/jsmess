@@ -266,10 +266,10 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
 		}
 		else
 		{
-			if (elapsed_cycles > 0 && timer->phase == 1)
+			if (elapsed_cycles >= 0 && timer->phase == 1)
 			{
 				/* Counter load cycle */
-				--elapsed_cycles;
+				if (elapsed_cycles > 0) --elapsed_cycles;
 				timer->phase = 2;
 				load_counter_value( device, timer );
 			}

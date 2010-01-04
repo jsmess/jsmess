@@ -88,6 +88,7 @@ UINT32 intel82439tx_pci_read(const device_config *busdevice, const device_config
 		case 0x64:
 		case 0x68:
 		case 0x78:
+		case 0xC0:
 		case 0xE0:
 			result = i82439tx->regs[(offset - 0x50) / 4];
 			break;
@@ -156,6 +157,7 @@ void intel82439tx_pci_write(const device_config *busdevice, const device_config 
 		case 0x70:
 		case 0x74:
 		case 0x78:
+		case 0xC0:
 		case 0xE0:
 			switch(offset)
 			{				
@@ -198,15 +200,6 @@ void intel82439tx_pci_write(const device_config *busdevice, const device_config 
 		default:
 			fatalerror("intel82439tx_pci_write(): Unexpected PCI write 0x%02X <-- 0x%08X\n", offset, data);
 			break;
-	}
-
-	/* hack to compensate for weird issue (maybe the Pentium core needs to support caching? */
-	if ((cpu_get_reg(machine->firstcpu, REG_GENPC) == 0xFCB01) && !strcmp(machine->gamedrv->name, "at586"))
-	{
-		memory_region(machine, "user1")[0x3CB01] = 0xF3;
-		memory_region(machine, "user1")[0x3CB02] = 0xA4;
-		memory_region(machine, "user1")[0x3CB03] = 0x58;
-		memory_region(machine, "user1")[0x3CB04] = 0xEE;
 	}
 }
 
