@@ -593,6 +593,25 @@ static MACHINE_RESET( tc2048 )
 	MACHINE_RESET_CALL(spectrum);
 }
 
+
+/* F4 Character Displayer - tc2048 code is inherited from the spectrum */
+static const gfx_layout ts2068_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	96,					/* 96 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( ts2068 )
+	GFXDECODE_ENTRY( "maincpu", 0x13d00, ts2068_charlayout, 0, 8 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( ts2068 )
 	MDRV_IMPORT_FROM( spectrum_128 )
 	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_14_112MHz/4)        /* From Schematic; 3.528 MHz */
@@ -601,12 +620,13 @@ static MACHINE_DRIVER_START( ts2068 )
 
 	MDRV_MACHINE_RESET( ts2068 )
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(TS2068_SCREEN_WIDTH, TS2068_SCREEN_HEIGHT)
 	MDRV_SCREEN_VISIBLE_AREA(0, TS2068_SCREEN_WIDTH-1, 0, TS2068_SCREEN_HEIGHT-1)
+	MDRV_GFXDECODE(ts2068)
 
 	MDRV_VIDEO_UPDATE( ts2068 )
 	MDRV_VIDEO_EOF( ts2068 )
@@ -647,7 +667,7 @@ static MACHINE_DRIVER_START( tc2048 )
 
 	MDRV_MACHINE_RESET( tc2048 )
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(TS2068_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
 	MDRV_SCREEN_VISIBLE_AREA(0, TS2068_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)

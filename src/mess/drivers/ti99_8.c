@@ -372,6 +372,68 @@ static INPUT_PORTS_START(ti99_8)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1/*, "(2FIRE)", CODE_NONE, OSD_JOY2_FIRE, 0*/) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+
+/* F4 Character Displayer */
+static const gfx_layout ti99_7_charlayout =
+{
+	8, 7,					/* 8 x 7 characters */
+	96,					/* 96 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8 },
+	8*7					/* every char takes 7 bytes */
+};
+
+static const gfx_layout ti99_8_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	64,					/* 64 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static const gfx_layout ti99_c_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	1,					/* 1 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static const gfx_layout ti99_24_charlayout =
+{
+	24, 24,					/* 24 x 24 characters */
+	1,					/* 1 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7, 64, 65, 66, 67, 68, 69, 70, 71, 128, 129, 130, 131, 132, 133, 134, 135 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 24*8, 25*8, 26*8, 27*8, 28*8, 29*8, 30*8, 31*8, 48*8, 49*8, 50*8, 51*8, 52*8, 53*8, 54*8, 55*8 },
+	24*24					/* every char takes 72 bytes */
+};
+
+static GFXDECODE_START( ti99_8 )
+	GFXDECODE_ENTRY( region_grom, 0x050d, ti99_8_charlayout, 0, 8 )	// large
+	GFXDECODE_ENTRY( region_grom, 0x070d, ti99_7_charlayout, 0, 8 ) // small
+	GFXDECODE_ENTRY( region_grom, 0x09b4, ti99_24_charlayout, 0, 8 )// TI logo
+	GFXDECODE_ENTRY( region_grom, 0x09fc, ti99_c_charlayout, 0, 8 )	// (c)
+GFXDECODE_END
+
+
 /*
     TMS5220 speech synthesizer
 */
@@ -456,6 +518,7 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_GFXDECODE(ti99_8)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -510,6 +573,7 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_GFXDECODE(ti99_8)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

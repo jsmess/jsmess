@@ -475,6 +475,25 @@ INPUT_PORTS_START( spec_plus )
 INPUT_PORTS_END
 
 
+/* F4 Character Displayer */
+static const gfx_layout spectrum_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	96,					/* 96 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( spectrum )
+	GFXDECODE_ENTRY( "maincpu", 0x3d00, spectrum_charlayout, 0, 8 )
+GFXDECODE_END
+
+
 static INTERRUPT_GEN( spec_interrupt )
 {
 	cpu_set_input_line(device, 0, HOLD_LINE);
@@ -506,7 +525,7 @@ MACHINE_DRIVER_START( spectrum )
 	MDRV_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT( spectrum )
-
+	MDRV_GFXDECODE(spectrum)
 	MDRV_VIDEO_START( spectrum )
 	MDRV_VIDEO_UPDATE( spectrum )
 	MDRV_VIDEO_EOF( spectrum )
