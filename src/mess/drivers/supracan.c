@@ -363,9 +363,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( supracan_sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x03ff ) AM_RAM
 	AM_RANGE( 0x0411, 0x0411 ) AM_READ(soundlatch_r)
-//	AM_RANGE( 0x0420, 0x0420 ) AM_READ(status)
-//	AM_RANGE( 0x0420, 0x0420 ) AM_WRITE(data)
-//	AM_RANGE( 0x0422, 0x0422 ) AM_WRITE(address)
+	AM_RANGE( 0x0420, 0x0420 ) AM_READNOP //AM_READ(status)
+	AM_RANGE( 0x0420, 0x0420 ) AM_WRITENOP //AM_WRITE(data)
+	AM_RANGE( 0x0422, 0x0422 ) AM_WRITENOP //AM_WRITE(address)
 	AM_RANGE( 0x1000, 0xffff ) AM_RAM AM_BASE( &supracan_soundram )
 ADDRESS_MAP_END
 
@@ -690,9 +690,6 @@ static WRITE16_HANDLER( supracan_video_w )
 				// ...
 			}
 			break;
-		case 0x1c/2:
-			irq_mask = data & 1; //correct?
-			break;
 		case 0x08/2:
 			video_flags = data;
 			break;
@@ -726,8 +723,11 @@ static WRITE16_HANDLER( supracan_video_w )
 		case ACAN_VID_XFORM16B:
 			//printf( "%1.4f %1.4f %1.4f %1.4f\n", (INT32)((supracan_video_regs[ACAN_VID_XFORM32A_H] << 16) | supracan_video_regs[ACAN_VID_XFORM32A_L]) / 65536.0f, (INT32)((supracan_video_regs[ACAN_VID_XFORM32B_H] << 16) | supracan_video_regs[ACAN_VID_XFORM32B_L]) / 65536.0f, supracan_video_regs[ACAN_VID_XFORM16A] / 256.0f, supracan_video_regs[ACAN_VID_XFORM16B] / 256.0f);
 			break;
+		case 0x1f0/2:
+			irq_mask = (data & 8) ? 0 : 1;
+			break;
 		default:
-			verboselog(space->machine, 0, "supracan_video_w: Unknown register: %08x = %04x & %04x\n", 0xf00000 + (offset << 1), data, mem_mask);
+			//verboselog(space->machine, 0, "supracan_video_w: Unknown register: %08x = %04x & %04x\n", 0xf00000 + (offset << 1), data, mem_mask);
 			break;
 	}
 	supracan_video_regs[offset] = data;
