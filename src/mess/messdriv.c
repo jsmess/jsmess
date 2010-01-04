@@ -761,7 +761,7 @@ const game_driver * const drivers[] =
     DRIVER( mbeeic )    /* Microbee 32 IC                                   */
     DRIVER( mbeepc )    /* Microbee 32 PC                                   */
     DRIVER( mbeepc85 )  /* Microbee 32 PC85                                 */
-    DRIVER( mbeeppc )   /* Microbee 32 PPC85                                    */
+    DRIVER( mbeeppc )   /* Microbee 32 PPC85                                */
     DRIVER( mbee56 )    /* Microbee 56K (CP/M)                              */
     DRIVER( mbee64 )    /* Microbee 64K (CP/M)                              */
 
@@ -797,6 +797,7 @@ const game_driver * const drivers[] =
 
     /* EACA */
     DRIVER( cgenie )    /* Colour Genie EG2000                              */
+	DRIVER( cgenienz )  /* Colour Genie EG2000 (New Zealand)                */
     /* system 80 trs80 compatible */
 
     /* Video Technology  */

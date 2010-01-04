@@ -491,6 +491,23 @@ ROM_START (cgenie)
 
 ROM_END
 
+ROM_START (cgenienz)
+	ROM_REGION(0x13000,"maincpu",0)
+	ROM_SYSTEM_BIOS(0, "v1", "Revision 1 (24 rows)")
+	ROMX_LOAD( "cg-basic-rom-v1-pal-en.rom",   0x0000, 0x4000, CRC(844aaedd) SHA1(b7f984bc5cd979c7ad11ff909e8134f694aea7aa), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "v2", "Revision 2 (25 rows)")
+	ROMX_LOAD( "cgromv2.rom",   0x0000, 0x4000, CRC(cfb84e09) SHA1(e199e4429bab6f9fca2bb05e71324538928a693a), ROM_BIOS(2) )
+	ROM_LOAD ("cgdos.rom",   0x10000, 0x2000, CRC(2a96cf74) SHA1(6dcac110f87897e1ee7521aefbb3d77a14815893))
+	ROM_CART_LOAD("cart", 0x12000, 0x1000, ROM_NOMIRROR | ROM_OPTIONAL)
+
+	ROM_REGION(0x0c00,"gfx1",0)
+	ROM_LOAD ("cgenie1.fnt", 0x0000, 0x0800, CRC(4fed774a) SHA1(d53df8212b521892cc56be690db0bb474627d2ff))
+
+	/* Empty memory region for the character generator */
+	ROM_REGION(0x0800,"gfx2",ROMREGION_ERASEFF)
+
+ROM_END
+
 // Code below is previous non-working implementation , just for reference
 #if 0
 
@@ -632,3 +649,4 @@ DEVICE_IMAGE_LOAD( cgenie_floppy )
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY    FULLNAME */
 COMP( 1982, cgenie,   0,		0,		cgenie,   cgenie,	0,       "EACA Computers Ltd.",  "Colour Genie EG2000" , 0)
+COMP( 1982, cgenienz, cgenie,	0,		cgenie,   cgenie,	0,       "EACA Computers Ltd.",  "Colour Genie EG2000 (New Zealand)" , 0)
