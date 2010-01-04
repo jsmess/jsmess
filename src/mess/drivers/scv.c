@@ -531,6 +531,25 @@ static MACHINE_RESET( scv )
 }
 
 
+/* F4 Character Displayer */
+static const gfx_layout scv_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	128,					/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( scv )
+	GFXDECODE_ENTRY( "charrom", 0x0000, scv_charlayout, 0, 8 )
+GFXDECODE_END
+
+
 static const UPD7810_CONFIG scv_cpu_config = { TYPE_7801, NULL };
 
 
@@ -547,6 +566,7 @@ static MACHINE_DRIVER_START( scv )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MDRV_SCREEN_RAW_PARAMS( XTAL_14_31818MHz/2, 456, 32, 224, 262, 32, 232 )	/* TODO: Verify */
 
+	MDRV_GFXDECODE(scv)
 	MDRV_PALETTE_LENGTH( 16 )
 	MDRV_PALETTE_INIT( scv )
 
@@ -575,6 +595,7 @@ static MACHINE_DRIVER_START( scv_pal )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MDRV_SCREEN_RAW_PARAMS( XTAL_13_4MHz/2, 456, 32, 224, 342, 32, 232 )		/* TODO: Verify */
 
+	MDRV_GFXDECODE(scv)
 	MDRV_PALETTE_LENGTH( 16 )
 	MDRV_PALETTE_INIT( scv )
 
