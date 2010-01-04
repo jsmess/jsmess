@@ -38,6 +38,7 @@ static UINT32 tilemap_base_addr[4];
 static int tilemap_scrollx[4],tilemap_scrolly[4];
 static UINT16 video_flags;
 static UINT16 tilemap_flags[4];
+static UINT16 irq_mask;
 
 static UINT16 supracan_video_regs[256];
 
@@ -340,14 +341,14 @@ static WRITE16_HANDLER( supracan_dma_w )
 }
 
 static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION( "cart", 0 )
+	AM_RANGE( 0x000000, 0x3fffff ) AM_ROM AM_REGION( "cart", 0 )
 	AM_RANGE( 0xe80200, 0xe80201 ) AM_READ_PORT("P1")
 	AM_RANGE( 0xe80202, 0xe80203 ) AM_READ_PORT("P2")
 //	AM_RANGE( 0xe80204, 0xe80205 ) AM_READ( supracan_unk1_r ) //or'ed with player 2 inputs, why?
 	AM_RANGE( 0xe80208, 0xe80209 ) AM_READ_PORT("P3")
 	AM_RANGE( 0xe8020c, 0xe8020d ) AM_READ_PORT("P4")
 	AM_RANGE( 0xe80300, 0xe80301 ) AM_READ( supracan_unk1_r )
-	AM_RANGE( 0xe88400, 0xe8ffff ) AM_RAM_WRITE( supracan_soundram_w ) AM_BASE( &supracan_soundram_16 )
+	AM_RANGE( 0xe81000, 0xe8ffff ) AM_RAM_WRITE( supracan_soundram_w ) AM_BASE( &supracan_soundram_16 )
 	AM_RANGE( 0xe90000, 0xe9001f ) AM_WRITE( supracan_sound_w )
 	AM_RANGE( 0xe90020, 0xe9002b ) AM_WRITE( supracan_dma_w )
 	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE( supracan_video_r, supracan_video_w )
@@ -365,7 +366,7 @@ static ADDRESS_MAP_START( supracan_sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
 //	AM_RANGE( 0x0420, 0x0420 ) AM_READ(status)
 //	AM_RANGE( 0x0420, 0x0420 ) AM_WRITE(data)
 //	AM_RANGE( 0x0422, 0x0422 ) AM_WRITE(address)
-	AM_RANGE( 0x8400, 0xffff ) AM_RAM AM_BASE( &supracan_soundram )
+	AM_RANGE( 0x1000, 0xffff ) AM_RAM AM_BASE( &supracan_soundram )
 ADDRESS_MAP_END
 
 static WRITE16_HANDLER( supracan_char_w )
@@ -689,6 +690,9 @@ static WRITE16_HANDLER( supracan_video_w )
 				// ...
 			}
 			break;
+		case 0x1c/2:
+			irq_mask = data & 1; //correct?
+			break;
 		case 0x08/2:
 			video_flags = data;
 			break;
@@ -735,7 +739,7 @@ static DEVICE_IMAGE_LOAD( supracan_cart )
 	UINT8 *cart = memory_region( image->machine, "cart" );
 	int size = image_length( image );
 
-	if ( size != 0x80000 )
+	if ( size > 0x400000 )
 	{
 		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size" );
 		return INIT_FAIL;
@@ -761,6 +765,7 @@ static MACHINE_RESET( supracan )
 {
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
 	timer_adjust_oneshot( supracan_video_timer, video_screen_get_time_until_pos( machine->primary_screen, 0, 0 ), 0 );
+	irq_mask = 0;
 }
 
 static const gfx_layout supracan_gfxlayout =
@@ -790,10 +795,16 @@ static GFXDECODE_START( supracan )
 	GFXDECODE_ENTRY( "ram_gfx",  0, supracan_sprlayout,   0, 0x10 )
 GFXDECODE_END
 
+static INTERRUPT_GEN( supracan_irq )
+{
+	if(irq_mask)
+		cpu_set_input_line(device, 7, HOLD_LINE);
+}
+
 static MACHINE_DRIVER_START( supracan )
 	MDRV_CPU_ADD( "maincpu", M68000, XTAL_10_738635MHz )		/* Correct frequency unknown */
 	MDRV_CPU_PROGRAM_MAP( supracan_mem )
-	MDRV_CPU_VBLANK_INT("screen", irq7_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", supracan_irq)
 
 	MDRV_CPU_ADD( "soundcpu", M6502, XTAL_3_579545MHz )		/* TODO: Verfiy actual clock */
 	MDRV_CPU_PROGRAM_MAP( supracan_sound_mem )
@@ -820,13 +831,13 @@ MACHINE_DRIVER_END
 
 
 ROM_START( supracan )
-	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
+	ROM_REGION( 0x400000, "cart", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x20000, "ram_gfx", ROMREGION_ERASEFF )
 ROM_END
 
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     INIT    COMPANY                  FULLNAME        FLAGS */
-CONS( 1995, supracan,   0,      0,      supracan,   supracan, 0,      "Funtech Entertainment", "Super A'Can",  GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
+CONS( 1995, supracan,   0,      0,      supracan,   supracan, 0,      "Funtech Entertainment", "Super A'Can",  GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 
 
