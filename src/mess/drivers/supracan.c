@@ -16,7 +16,7 @@ Known unemulated graphical effects:
 - The green blob of the A'Can logo should slide out from beneath the word
   "A'Can"
 - The A'Can logo should have a scrolling ROZ layer beneath it
-- Sprites
+
 
 ***************************************************************************/
 
@@ -37,7 +37,7 @@ static UINT8 spr_flags;
 static UINT32 tilemap_base_addr[4];
 static int tilemap_scrollx[4],tilemap_scrolly[4];
 static UINT16 video_flags;
-static UINT16 tilemap_flags[4];
+static UINT16 tilemap_flags[4],tilemap_bank[4];
 static UINT16 irq_mask;
 
 static UINT16 supracan_video_regs[256];
@@ -88,27 +88,33 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 	UINT32 count;
 	int x,y;
 	int scrollx,scrolly;
+	int region;
+	int tile_bank;
+	int x_size;
 
 	count = (tilemap_base_addr[layer]);
-	scrollx = tilemap_scrollx[layer] & 0xff;
-	scrolly = tilemap_scrolly[layer] & 0xff;
+	scrollx = (tilemap_scrolly[layer] & 0x800) ? (0x100 - (tilemap_scrolly[layer] & 0xff)) : (tilemap_scrolly[layer] & 0xff);
+	scrolly = (tilemap_scrollx[layer] & 0x800) ? (0x100 - (tilemap_scrollx[layer] & 0xff)) : (tilemap_scrollx[layer] & 0xff);
+	region = (tilemap_flags[layer] & 0x200) ? 0 : 1;
+	tile_bank = (tilemap_bank[layer] & 0x4000) >> 4;
+	x_size = (video_flags & 0x8000) ? 32 : 64; //FIXME: temp kludge
 
 	for (y=0;y<32;y++)
 	{
-		for (x=0;x<32;x++)
+		for (x=0;x<x_size;x++)
 		{
 			int tile, flipx, flipy, pal;
-			tile = (supracan_vram[count] & 0x03ff);
+			tile = (supracan_vram[count] & 0x03ff) + tile_bank;
 			flipx = (supracan_vram[count] & 0x0800) ? 1 : 0;
 			flipy = (supracan_vram[count] & 0x0400) ? 1 : 0;
 			pal = (supracan_vram[count] & 0xf000) >> 12;
 
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly,0);
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly,0);
 			if(tilemap_flags[layer] & 0x20) //wrap-around enable
 			{
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],tile,pal,flipx,flipy,(x*8)-scrollx+256,(y*8)-scrolly,0);
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly+256,0);
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],tile,pal,flipx,flipy,(x*8)-scrollx+256,(y*8)-scrolly+256,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+256,(y*8)-scrolly,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly+256,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+256,(y*8)-scrolly+256,0);
 			}
 			count++;
 		}
@@ -307,13 +313,13 @@ static WRITE16_HANDLER( supracan_dma_w )
 			break;
 		case 0x0a/2: // Control
 			//if(acan_dma_regs.dest != 0xf00200)
-			//	printf("%08x %08x %02x %04x\n",acan_dma_regs.source,acan_dma_regs.dest,acan_dma_regs.count + 1,data);
+			//printf("%08x %08x %02x %04x\n",acan_dma_regs.source,acan_dma_regs.dest,acan_dma_regs.count + 1,data);
 			if(data & 0x8800)
 			{
-				if(data != 0x9800 && data != 0x8800)
-				{
-					fatalerror("%04x",data);
-				}
+				//if(data != 0x9800 && data != 0x8800)
+				//{
+				//	fatalerror("%04x",data);
+				//}
 				verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_dma_regs.source, acan_dma_regs.dest, acan_dma_regs.count + 1, data);
 				for(i = 0; i <= acan_dma_regs.count; i++)
 				{
@@ -569,8 +575,8 @@ static WRITE16_HANDLER( supracan_sound_w )
 	switch ( offset )
 	{
 		case 0x000a/2:
-			soundlatch_w(space, 0, (data & 0xff00) >> 8);
-		 	cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
+			//soundlatch_w(space, 0, (data & 0xff00) >> 8);
+		 	//cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
 			break;
 		case 0x001c/2:	/* Sound cpu control. Bit 0 tied to sound cpu RESET line */
 			if ( data & 0x01 )
@@ -578,8 +584,8 @@ static WRITE16_HANDLER( supracan_sound_w )
 				if ( ! supracan_m6502_reset )
 				{
 					/* Reset and enable the sound cpu */
-					cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, CLEAR_LINE);
-					cputag_reset( space->machine, "soundcpu" );
+					//cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, CLEAR_LINE);
+					//cputag_reset( space->machine, "soundcpu" );
 				}
 			}
 			else
@@ -667,7 +673,9 @@ static WRITE16_HANDLER( supracan_video_w )
 		case 0x1e/2:
 			//printf("%08x %08x %04x %04x\n",acan_sprdma_regs.src,acan_sprdma_regs.dst,acan_sprdma_regs.count,data);
 			verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_sprdma_regs.src, acan_sprdma_regs.dst, acan_sprdma_regs.count + 1, data);
-			if(data & 0xa000) //0x2000 selects dword transfer?
+
+			/* TODO: what's 0x2000 and 0x4000 for? */
+			if(data & 0x8000)
 			{
 				for(i = 0; i <= acan_sprdma_regs.count; i++)
 				{
@@ -706,14 +714,17 @@ static WRITE16_HANDLER( supracan_video_w )
 		case 0x104/2: tilemap_scrollx[0] = data; break;
 		case 0x106/2: tilemap_scrolly[0] = data; break;
 		case 0x108/2: tilemap_base_addr[0] = (data) << 1; break;
+		case 0x10a/2: tilemap_bank[0] = data; break;
 		case 0x120/2: tilemap_flags[1] = data; break;
 		case 0x124/2: tilemap_scrollx[1] = data; break;
 		case 0x126/2: tilemap_scrolly[1] = data; break;
 		case 0x128/2: tilemap_base_addr[1] = (data) << 1; break;
+		case 0x12a/2: tilemap_bank[1] = data; break;
 		case 0x140/2: tilemap_flags[2] = data; break;
 		case 0x144/2: tilemap_scrollx[2] = data; break;
 		case 0x146/2: tilemap_scrolly[2] = data; break;
 		case 0x148/2: tilemap_base_addr[2] = (data) << 1; break;
+		case 0x14a/2: tilemap_bank[2] = data; break;
 		// Affine transforms of some sort?
 		case ACAN_VID_XFORM32A_H:
 		case ACAN_VID_XFORM32A_L:
