@@ -92,6 +92,7 @@ static void write_reg_012(void);
 static void write_reg_014(void);
 static void write_reg_01A(void);
 static void write_reg_026(void);
+static void change_palette(running_machine *machine, UINT8 first, UINT16 colours);
 
 static void video_debug(running_machine *machine, int ref, int params, const char *param[]);
 static void video_regdump(running_machine *machine, int ref, int params, const char *param[]);
@@ -188,10 +189,10 @@ WRITE16_HANDLER (nimbus_video_io_w)
         case    reg022  : vidregs[reg022]=data; break;
         case    reg024  : vidregs[reg024]=data; break;
         case    reg026  : vidregs[reg026]=data; write_reg_026(); break;
-        case    reg028  : vidregs[reg028]=data; break;
-        case    reg02A  : vidregs[reg02A]=data; break;
-        case    reg02C  : vidregs[reg02C]=data; break;
-        case    reg02E  : vidregs[reg02E]=data; break;
+        case    reg028  : vidregs[reg028]=data; change_palette(space->machine,0,data); break;
+        case    reg02A  : vidregs[reg02A]=data; change_palette(space->machine,1,data); break;
+        case    reg02C  : vidregs[reg02C]=data; change_palette(space->machine,2,data); break;
+        case    reg02E  : vidregs[reg02E]=data; change_palette(space->machine,3,data); break;
         
         default         : break;
     }
@@ -389,7 +390,7 @@ static void write_reg_012(void)
 
 static void write_reg_014(void)
 {  
-    write_pixel_data(vidregs[reg002],++vidregs[reg00C],vidregs[reg014]);
+    write_pixel_data(vidregs[reg002],vidregs[reg00C]++,vidregs[reg014]);
 }
 
 static void write_reg_01A(void)
@@ -408,6 +409,24 @@ static void write_reg_026(void)
 
     if(debug_on & DEBUG_TEXT)
         logerror("reg 026 write, border_colour=%02X\n",border_colour);
+}
+
+static void change_palette(running_machine *machine, UINT8 first, UINT16 colours)
+{
+    UINT8   colourno;
+    UINT16  mask;
+    UINT8   shifts;
+    UINT8   paletteidx;
+    
+    shifts=12;
+    mask=0xF000;
+    for(colourno=first; colourno<SCREEN_NO_COLOURS; colourno+=4)
+    {
+        paletteidx=(colours & mask) >> shifts;
+        palette_set_color_rgb(machine, colourno, nimbus_palette[paletteidx][RED], nimbus_palette[paletteidx][GREEN], nimbus_palette[paletteidx][BLUE]);
+        mask=mask>>4;
+        shifts-=4;
+    }
 }
 
 static void video_debug(running_machine *machine, int ref, int params, const char *param[])

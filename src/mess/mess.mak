@@ -440,6 +440,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/ctronics.o	\
 	$(MESS_MACHINE)/com8116.o	\
 	$(MESS_MACHINE)/e0516.o		\
+    $(MESS_MACHINE)/er59256.o	\
 	$(MESS_MACHINE)/hd63450.o   \
 	$(MESS_MACHINE)/i8155.o		\
 	$(MESS_MACHINE)/i8212.o		\

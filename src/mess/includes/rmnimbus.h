@@ -59,6 +59,12 @@ WRITE16_HANDLER (i186_internal_port_w);
 READ16_HANDLER (nimbus_io_r);
 WRITE16_HANDLER (nimbus_io_w);
 
+/* External int vectors for chained interupts */
+#define EXTERNAL_INT_FDC        0x80
+#define EXTERNAL_INT_PC8031     0x8c
+#define EXTERNAL_INT_Z80SIO     0x9C
+#define EXTERNAL_INT_MSM5205    0x84
+
 /* Z80 SIO for keyboard */
 
 #define Z80SIO_TAG		    "z80sio"
@@ -86,6 +92,31 @@ WRITE8_HANDLER( nimbus_fdc_w );
 
 #define NO_DRIVE_SELECTED   0xFF
 
+/* 8031/8051 Peripheral controler */
+
+#define PC8031_RAMSIZE          0X004
+
+READ8_HANDLER( pc8031_r );
+WRITE8_HANDLER( pc8031_w );
+
+READ8_HANDLER( pc8031_iou_r );
+WRITE8_HANDLER( pc8031_iou_w );
+
+READ8_HANDLER( pc8031_port_r );
+WRITE8_HANDLER( pc8031_port_w );
+
+#define ER59256_TAG             "er59256"
+
+/* IO unit */
+
+#define FDC_INT_ENABLE          0x01
+#define MSM5205_INT_ENABLE      0x04
+#define PC8031_INT_ENABLE       0x10
+
+READ8_HANDLER( iou_r );
+WRITE8_HANDLER( iou_w );
+
+
 /* Video stuff */
 READ16_HANDLER (nimbus_video_io_r);
 WRITE16_HANDLER (nimbus_video_io_w);
@@ -97,9 +128,29 @@ VIDEO_RESET( nimbus );
 
 #define SCREEN_WIDTH_PIXELS     640
 #define SCREEN_HEIGHT_LINES     250
+#define SCREEN_NO_COLOURS       16
 
-#define BYTES_PER_LINE          (SCREEN_WIDTH_PIXELS/2)
-#define PIXELS_PER_BYTE         2
+#define RED                     0
+#define GREEN                   1
+#define BLUE                    2
+
+extern const unsigned char nimbus_palette[SCREEN_NO_COLOURS][3];
+
+/* Sound hardware */
+
+#define AY8910_TAG              "ay8910"
+#define MONO_TAG                "mono"
+
+READ8_HANDLER( sound_ay8910_r );
+WRITE8_HANDLER( sound_ay8910_w );
+
+WRITE8_HANDLER( sound_ay8910_porta_w );
+WRITE8_HANDLER( sound_ay8910_portb_w );
+
+
+#define MSM5205_TAG             "msm5205"
+
+void nimbus_msm5205_vck(const device_config *device);
 
 #define LINEAR_ADDR(seg,ofs)    ((seg<<4)+ofs)
 

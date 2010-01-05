@@ -17,10 +17,13 @@
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
 #include "devices/flopdrv.h"
+#include "machine/er59256.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/msm8251.h"
 #include "machine/z80sio.h"
+#include "sound/ay8910.h"
+#include "sound/msm5205.h"
 
 #include "includes/rmnimbus.h"
 
@@ -32,7 +35,7 @@
 #define LATCH_INTS          1
 #define LOG_PORTS           0
 #define LOG_INTERRUPTS      0
-#define LOG_INTERRUPTS_EXT  0
+#define LOG_INTERRUPTS_EXT  1
 #define LOG_TIMER           0
 #define LOG_OPTIMIZATION    0
 #define LOG_DMA             0
@@ -40,6 +43,11 @@
 #define LOG_KEYBOARD        0
 #define LOG_SIO             0
 #define LOG_DISK            0
+#define LOG_PC8031          0
+#define LOG_PC8031_186      1
+#define LOG_PC8031_PORT     0
+#define LOG_IOU             1
+#define LOG_SOUND           1
 
 /* 80186 internal stuff */
 struct mem_state
@@ -141,6 +149,21 @@ static struct _nimbus_fdc
 } nimbus_fdc;
 
 
+/* 8031 Peripheral controler */
+
+UINT8 pcregs[PC8031_RAMSIZE];
+UINT8 reg0C0_ptr;
+UINT8 reg0C2_ptr;
+
+/* IO Unit */
+
+UINT8 iou_reg092;
+UINT8 pc8031_int_pending;
+UINT8 pc8031_inc_pending;
+
+/* Sound */
+UINT8 last_playmode;
+
 static void drq_callback(running_machine *machine, int which);
 
 static void execute_debug_irq(running_machine *machine, int ref, int params, const char *param[]);
@@ -157,6 +180,10 @@ static void fdc_reset(void);
 
 static void keyboard_reset(void);
 static TIMER_CALLBACK(keyscan_callback);
+
+static void pc8031_reset(void);
+static void iou_reset(void);
+static void sound_reset(running_machine *machine);
 
 #define num_ioports 0x80
 static UINT16   IOPorts[num_ioports];
@@ -224,7 +251,7 @@ static IRQ_CALLBACK(int_callback)
             vector=i186.intr.poll_status & 0x1f; break;
     }
 
-    if (LOG_INTERRUPTS_EXT)
+    if (LOG_INTERRUPTS)
 	{
         logerror("i186.intr.ext[0]=%04X i186.intr.ext[1]=%04X\n",i186.intr.ext[0],i186.intr.ext[1]);
         logerror("Ext vectors : %02X %02X\n",i186.intr.ext_vector[0],i186.intr.ext_vector[1]);
@@ -1242,8 +1269,11 @@ MACHINE_RESET(nimbus)
 {
 	/* CPU */
 	nimbus_cpu_reset(machine); 
+    iou_reset();
     fdc_reset();
     keyboard_reset();
+    pc8031_reset();
+    sound_reset(machine);
 }
 
 DRIVER_INIT(nimbus)
@@ -1260,7 +1290,7 @@ MACHINE_START( nimbus )
 	/* setup debug commands */
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debug_console_register_command(machine, "nimbus_irq", CMDFLAG_NONE, 0, 0, 1, execute_debug_irq);
+		debug_console_register_command(machine, "nimbus_irq", CMDFLAG_NONE, 0, 0, 2, execute_debug_irq);
         debug_console_register_command(machine, "nimbus_intmasks", CMDFLAG_NONE, 0, 0, 0, execute_debug_intmasks);
 
         /* set up the instruction hook */
@@ -1272,34 +1302,19 @@ MACHINE_START( nimbus )
 static void execute_debug_irq(running_machine *machine, int ref, int params, const char *param[])
 {
     int IntNo;
-    int IntMask;
+    int Vector;
     
-    if(params>0)
+    if(params>1)
     {   
-        sscanf(param[0],"%d",&IntNo);
-        
-        IntMask=0x0000;
-    
-        switch (IntNo)
-        {
-            case 0  : IntMask=0x010; break;
-            case 1  : IntMask=0x020; break;
-            case 2  : IntMask=0x040; break;
-            case 3  : IntMask=0x080; break;
-        }
-        
-        i186.intr.request |= IntMask;
-        update_interrupt_state(machine);
-        
-        debug_console_printf(machine,"triggering IRQ%d, IntMask=%4.4X, i186.intr.request=%4.4X\n",IntNo,IntMask,i186.intr.request);
-        
-//        cputag_set_input_line(machine, MAINCPU_TAG, IntNo, HOLD_LINE );
-//        cputag_set_input_line(machine, MAINCPU_TAG, IntNo, CLEAR_LINE );
-        
+        sscanf(param[0],"%X",&IntNo);
+        sscanf(param[1],"%X",&Vector);
+
+        debug_console_printf(machine,"triggering IRQ%d, Vector=%02X\n",IntNo,Vector);
+        external_int(machine,IntNo,Vector);        
     }
     else
     {
-        debug_console_printf(machine,"Error, you must supply an intno to trigger\n");
+        debug_console_printf(machine,"Error, you must supply an intno and vector to trigger\n");
     }
 	
     
@@ -1438,9 +1453,22 @@ static void decode_subbios(const device_config *device,offs_t pc)
         case 3   : 
         {
             set_type("t_piconet");
+            set_drv("d_piconet");
+            
             switch(ax)
             {
-                case 0  : set_func("f_get_version_number"); break;            
+                case 0  : set_func("f_get_version_number"); break; 
+                case 1  : set_func("f_get_slave_status"); break;
+                case 2  : set_func("f_get_slave_map"); break;
+                case 3  : set_func("f_change_slave_addr"); break;
+                case 4  : set_func("f_read_slave_control"); break;
+                case 5  : set_func("f_write_slave_control"); break;
+                case 6  : set_func("f_send_data_byte"); break;
+                case 7  : set_func("f_request_data_byte"); break;
+                case 8  : set_func("f_send_data_block"); break;
+                case 9  : set_func("f_request_data_block"); break;
+                case 10 : set_func("f_reset_slave"); break;
+           
             }
         }; break;
         
@@ -1461,9 +1489,31 @@ static void decode_subbios(const device_config *device,offs_t pc)
         case 5   : 
         {
             set_type("t_graphics_input");
+
+            switch(bx)
+            {
+                case 0  : set_drv("d_mouse"); break; 
+                case 1  : set_drv("d_joystick_1"); break; 
+                case 2  : set_drv("d_joystick_2"); break; 
+            }
+            
+            
             switch(ax)
             {
                 case 0  : set_func("f_get_version_number"); break;            
+                case 1  : set_func("f_graphics_input_cold_start"); break;	
+                case 2  : set_func("f_graphics_input_device_off"); break;	
+                case 3  : set_func("f_return_button_status"); break;		
+                case 4  : set_func("f_return_switch_and_button_stat"); break;	
+                case 5  : set_func("f_start_tracking"); break;
+                case 6  : set_func("f_stop_tracking"); break;
+                case 7  : set_func("f_enquire_position"); break;
+                case 8  : set_func("f_set_position"); break;
+
+                case 10 : set_func("f_return_button_press_info"); break;
+                case 11 : set_func("f_return_button_release_info"); break;
+                case 12 : set_func("f_set_gain/f_set_squeaks_per_pixel_ratio"); break;
+                case 13 : set_func("f_enquire_graphics_in_misc_data"); break;
             }
         }; break;
         
@@ -1583,11 +1633,37 @@ static void decode_subbios(const device_config *device,offs_t pc)
         
         case 10   : 
         {
+
             set_type("t_acoustics");
-            switch(ax)
+                        
+            switch(bx)
             {
-                case 0  : set_func("f_get_version_number"); break;            
-            }
+                case 0  : 
+                {
+                    set_drv("d_sound");
+            
+                    switch(ax)
+                    {
+                        case 0  : set_func("f_get_version_number"); break;            
+                        case 1  : set_func("f_sound_enable"); break;
+                        case 2  : set_func("f_play_note"); break;
+                        case 3  : set_func("f_get_queue_status"); break;
+                    }
+                }; break;
+            
+                case 1  :
+                {
+                    set_drv("d_voice");
+
+                    switch(ax)
+                    {
+                        case 0  : set_func("f_get_version_number"); break;            
+                        case 1  : set_func("f_talk"); break;
+                        case 2  : set_func("f_wait_and_talk"); break;
+                        case 3  : set_func("f_test_talking"); break;
+                    }
+                }
+            }   
         }; break;
         
         case 11   : 
@@ -1868,7 +1944,7 @@ void sio_interrupt(const device_config *device, int state)
         sio_int_state=state;
         
         if(state)
-            external_int(device->machine,0,0x9C);
+            external_int(device->machine,0,EXTERNAL_INT_Z80SIO);
     }
 }
 
@@ -1908,9 +1984,9 @@ static WRITE_LINE_DEVICE_HANDLER( nimbus_fdc_intrq_w )
     if(LOG_DISK)
         logerror("nimbus_fdc_intrq_w(%d)\n", state);
 
-    if(state && nimbus_fdc.irq_enabled)
+    if(state && (iou_reg092 & FDC_INT_ENABLE))
     {
-        external_int(device->machine,0,0x80);
+        external_int(device->machine,0,EXTERNAL_INT_FDC);
     } 
 }
 
@@ -2006,4 +2082,285 @@ WRITE8_HANDLER( nimbus_fdc_w )
 			break;
 	}
 }
+
+/* 8031/8051 Peripheral controler 80186 side */
+
+#define REG_0C2_INIT        1
+#define INC_REG0C2_PTR()    reg0C2_ptr++; if (reg0C2_ptr==PC8031_RAMSIZE) reg0C2_ptr=REG_0C2_INIT; 
+#define CLEAR_PCREGS()      memset(&pcregs[1],0,PC8031_RAMSIZE-1);             
+
+static void pc8031_reset(void)
+{
+    logerror("peripheral controler reset\n");
+    
+    memset(&pcregs,0,sizeof(pcregs));
+    reg0C0_ptr=0;
+    reg0C2_ptr=REG_0C2_INIT;
+    pc8031_int_pending=0;
+    pc8031_inc_pending=0;
+}
+
+static void dump_pcregs(void)
+{
+    int regno;
+    
+    if(LOG_IOU)
+    {
+        logerror("pcregs: ");
+        for(regno=0;regno<PC8031_RAMSIZE;regno++)
+            logerror("%02X, ",pcregs[regno]);
+            
+        logerror("\n");
+    }
+}
+
+READ8_HANDLER( pc8031_r ) 
+{
+	int pc=cpu_get_pc(space->cpu);
+    UINT8   result;
+ 
+    switch(offset*2)
+    {
+        case 0x00   : result=pcregs[reg0C0_ptr];  
+                      reg0C2_ptr=REG_0C2_INIT; 
+                      CLEAR_PCREGS(); 
+                      break;
+                      
+        case 0x02   : result=pcregs[reg0C2_ptr]; 
+                      INC_REG0C2_PTR();
+                      break;
+                      
+        default : result=0; break;
+    }
+
+    if(LOG_PC8031_186)
+        logerror("Nimbus PCIOR %08X read of %04X returns %02X reg0C2_ptr=%02X\n",pc,(offset*2)+0xC0,result,reg0C2_ptr);
+    
+    dump_pcregs();
+    
+    return result;
+}
+
+WRITE8_HANDLER( pc8031_w )
+{
+	int pc=cpu_get_pc(space->cpu);
+
+    switch(offset*2)
+    {
+        case 0x00   : pcregs[reg0C0_ptr]=data; 
+                      //reg0C2_ptr=REG_0C2_INIT; 
+                      //CLEAR_PCREGS();
+                      pc8031_int_pending=1;
+                      break;
+                      
+        case 0x02   : pcregs[reg0C2_ptr]=data; 
+                      //INC_REG0C2_PTR();  
+                      pc8031_int_pending=1;
+                      pc8031_inc_pending=1;
+                      break;
+    }
+
+    if(LOG_PC8031_186)
+        logerror("Nimbus PCIOW %08X write of %02X to %04X, reg0C2_ptr=%02X,\n",pc,data,(offset*2)+0xC0,reg0C2_ptr);
+
+    dump_pcregs();
+}
+
+/* 8031/8051 Peripheral controler 8031/8051 side */
+
+READ8_HANDLER( pc8031_iou_r )
+{
+	int pc=cpu_get_pc(space->cpu);
+    UINT8   result;
+
+    result=pcregs[offset%PC8031_RAMSIZE];
+    
+    if(LOG_PC8031)
+        logerror("8031: PCIOR %04X read of %04X returns %02X\n",pc,offset,result); 
+    
+    //if(offset==0x00)
+    //{
+    //    reg0C2_ptr=REG_0C2_INIT;
+    //    CLEAR_PCREGS();
+    //}
+    
+    if((offset==reg0C2_ptr) && pc8031_inc_pending)
+    {
+        INC_REG0C2_PTR();
+        pc8031_inc_pending=0;
+    }
+
+    if((iou_reg092 & PC8031_INT_ENABLE) && pc8031_int_pending)
+    {
+        pc8031_int_pending=0x00;
+        external_int(space->machine,0,EXTERNAL_INT_PC8031);
+    }
+    
+    return result;
+}
+
+WRITE8_HANDLER( pc8031_iou_w )
+{
+	int pc=cpu_get_pc(space->cpu);
+
+    if(LOG_PC8031)
+        logerror("8031 PCIOW %04X write of %02X to %04X\n",pc,data,offset);
+
+    pcregs[offset%PC8031_RAMSIZE]=data;
+    
+//    if(offset==0x00)
+//    {
+//        reg0C2_ptr=REG_0C2_INIT;
+//        CLEAR_PCREGS();
+//    }
+}
+
+READ8_HANDLER( pc8031_port_r )
+{
+	const device_config *er59256 = devtag_get_device(space->machine, ER59256_TAG);
+    int pc=cpu_get_pc(space->cpu);
+    UINT8   result = 0;
+
+    if(LOG_PC8031_PORT)
+        logerror("8031: PCPORTR %04X read of %04X returns %02X\n",pc,offset,result); 
+
+    switch(offset)
+    {
+        case 0x01   : result=er59256_get_iobits(er59256);
+    }
+
+    return result;
+}
+
+WRITE8_HANDLER( pc8031_port_w )
+{
+	const device_config *er59256 = devtag_get_device(space->machine, ER59256_TAG);
+    int pc=cpu_get_pc(space->cpu);
+
+    switch (offset)
+    {
+        case 0x01   : er59256_set_iobits(er59256,(data&0x0F));
+    }
+
+    if(LOG_PC8031_PORT)
+        logerror("8031 PCPORTW %04X write of %02X to %04X\n",pc,data,offset);
+}
+
+
+
+/* IO Unit */
+READ8_HANDLER( iou_r )
+{
+	int pc=cpu_get_pc(space->cpu);
+    UINT8   result=0;
+
+    if(offset==0)
+    {
+        result=iou_reg092;
+    }
+
+    if(LOG_IOU)
+        logerror("Nimbus IOUR %08X read of %04X returns %02X\n",pc,(offset*2)+0x92,result);
+        
+    return result;
+}
+
+WRITE8_HANDLER( iou_w )
+{
+	int pc=cpu_get_pc(space->cpu);
+    const device_config *msm5205 = devtag_get_device(space->machine, MSM5205_TAG);
+
+    if(LOG_IOU)
+        logerror("Nimbus IOUW %08X write of %02X to %04X\n",pc,data,(offset*2)+0x92);
+
+    if(offset==0)
+    {
+        iou_reg092=data;
+        msm5205_reset_w(msm5205, (data & MSM5205_INT_ENABLE) ? 0 : 1);
+    }
+}
+
+static void iou_reset(void)
+{
+    iou_reg092=0x00;
+    pc8031_int_pending=0;
+}
+
+/* 
+    Sound hardware : AY8910
+  
+    I believe that the IO ports of the 8910 are used to control the ROMPack ports, however
+    this is currently un-implemented (and may never be as I don't have any rompacks!).
+    
+    The registers are mapped as so :
+    
+    Address     0xE0                0xE2
+    Read        Data                ????
+    Write       Register Address    Data
+ 
+*/    
+
+static void sound_reset(running_machine *machine)
+{
+    //const device_config *ay8910 = devtag_get_device(machine, AY8910_TAG);
+    const device_config *msm5205 = devtag_get_device(machine, MSM5205_TAG);
+
+    //ay8910_reset_ym(ay8910);
+    msm5205_reset_w(msm5205, 1);
+
+    last_playmode=MSM5205_S48_4B;
+    msm5205_playmode_w(msm5205,last_playmode);
+}
+
+READ8_HANDLER( sound_ay8910_r )
+{
+	const device_config *ay8910 = devtag_get_device(space->machine, AY8910_TAG);
+    UINT8   result=0;
+    
+    if ((offset*2)==0)
+        result=ay8910_r(ay8910,0);
+        
+    return result;
+}
+
+WRITE8_HANDLER( sound_ay8910_w )
+{
+	int pc=cpu_get_pc(space->cpu);
+	const device_config *ay8910 = devtag_get_device(space->machine, AY8910_TAG);
+    
+    if(LOG_SOUND)
+        logerror("Nimbus SoundW %05X write of %02X to %04X\n",pc,data,(offset*2)+0xE0);
+
+    switch (offset*2)
+    {
+        case 0x00   : ay8910_data_address_w(ay8910, 1, data); break;
+        case 0x02   : ay8910_data_address_w(ay8910, 0, data); break;
+    }
+
+}
+
+WRITE8_HANDLER( sound_ay8910_porta_w )
+{
+    const device_config *msm5205 = devtag_get_device(space->machine, MSM5205_TAG);
+
+    msm5205_data_w(msm5205, data);
+}
+
+WRITE8_HANDLER( sound_ay8910_portb_w )
+{
+    const device_config *msm5205 = devtag_get_device(space->machine, MSM5205_TAG);
+
+    if((data & 0x07)!=last_playmode)
+    {
+        last_playmode=(data & 0x07);
+        msm5205_playmode_w(msm5205, last_playmode);
+    }
+}
+
+void nimbus_msm5205_vck(const device_config *device)
+{
+    if(iou_reg092 & MSM5205_INT_ENABLE)
+        external_int(device->machine,0,EXTERNAL_INT_MSM5205);
+}
+
 

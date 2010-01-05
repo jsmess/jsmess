@@ -16,29 +16,32 @@
 #include "formats/flopimg.h"
 #include "formats/pc_dsk.h"
 #include "includes/rmnimbus.h"
+#include "machine/er59256.h"
 #include "machine/z80sio.h"
+#include "sound/ay8910.h"
+#include "sound/msm5205.h"
 
-static const unsigned char nimbus_palette[] =
+const unsigned char nimbus_palette[SCREEN_NO_COLOURS][3] =
 {
 	/*normal brightness */
-	0x00,0x00,0x00, 	/* black */
-	0x00,0x00,0x80,		/* blue */
-    0x80,0x00,0x00,		/* red */
-    0x80,0x00,0x80,		/* magenta */
-	0x00,0x80,0x00, 	/* green */
-    0x00,0x80,0x80,		/* cyan */
-	0x80,0x80,0x00,		/* yellow */
-	0x80,0x80,0x80,		/* light grey */
+	{ 0x00,0x00,0x00 },     /* black */
+	{ 0x00,0x00,0x80 },		 /* blue */
+    { 0x80,0x00,0x00 },		 /* red */
+    { 0x80,0x00,0x80 },		 /* magenta */
+	{ 0x00,0x80,0x00 }, 	 /* green */
+    { 0x00,0x80,0x80 },		 /* cyan */
+	{ 0x80,0x80,0x00 },		 /* yellow */
+	{ 0x80,0x80,0x80 },		 /* light grey */
 
 	/*enhanced brightness*/
-	0x40,0x40,0x40, 	/* dark grey */
-	0x00,0x00,0xFF,		/* light blue */
-	0xFF,0x00,0x00,		/* light red */
-	0xFF,0x00,0xFF,		/* light magenta */
-	0x00,0xFF,0x00, 	/* light green */
-	0x00,0xFF,0xFF,		/* light cyan */
-	0xFF,0xFF,0x00,		/* yellow */
-	0xFF,0xFF,0xFF		/* white */
+	{ 0x40,0x40,0x40 }, 	 /* dark grey */
+	{ 0x00,0x00,0xFF },		 /* light blue */
+	{ 0xFF,0x00,0x00 },		 /* light red */
+	{ 0xFF,0x00,0xFF },		 /* light magenta */
+	{ 0x00,0xFF,0x00 }, 	 /* light green */
+	{ 0x00,0xFF,0xFF },		 /* light cyan */
+	{ 0xFF,0xFF,0x00 },		 /* yellow */
+	{ 0xFF,0xFF,0xFF }		 /* white */
 };
 
 static const floppy_config nimbus_floppy_config =
@@ -53,6 +56,25 @@ static const floppy_config nimbus_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+/* Null port handlers for now, I believe that the IO ports are used for */
+/* the nimbus rompacks */
+
+static const ay8910_interface nimbus_ay8910_interface =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,	                    /* portA read */
+	DEVCB_NULL,    					/* portB read */
+	DEVCB_MEMORY_HANDLER(MAINCPU_TAG, PROGRAM, sound_ay8910_porta_w),   /* portA write */
+	DEVCB_MEMORY_HANDLER(MAINCPU_TAG, PROGRAM, sound_ay8910_portb_w)    /* portB write */
+};
+
+static const msm5205_interface msm5205_config =
+{
+	nimbus_msm5205_vck,	/* VCK function */
+	MSM5205_S48_4B		/* 8 kHz */
+};
+
 
 static ADDRESS_MAP_START(nimbus_mem, ADDRESS_SPACE_PROGRAM, 16)
     AM_RANGE( 0x00000, 0xEFFFF ) AM_RAM
@@ -61,7 +83,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(nimbus_io, ADDRESS_SPACE_IO, 16)
     AM_RANGE( 0x0000, 0x002f) AM_READWRITE( nimbus_video_io_r, nimbus_video_io_w)
-    AM_RANGE( 0x0030, 0x00ef) AM_READWRITE( nimbus_io_r, nimbus_io_w)
+    AM_RANGE( 0x0030, 0x008f) AM_READWRITE( nimbus_io_r, nimbus_io_w)
+    AM_RANGE( 0x0092, 0x0093) AM_READWRITE8( iou_r, iou_w, 0x00FF)
+    AM_RANGE( 0X00c0, 0X00cf) AM_READWRITE8( pc8031_r, pc8031_w, 0x00FF)
+    AM_RANGE( 0X00e0, 0X00ef) AM_READWRITE8( sound_ay8910_r, sound_ay8910_w, 0x00FF)
     AM_RANGE( 0X00f0, 0X00f7) AM_DEVREADWRITE8( Z80SIO_TAG, sio_r, sio_w, 0x00FF)
     AM_RANGE( 0x0400, 0x041f) AM_READWRITE8( nimbus_fdc_r, nimbus_fdc_w, 0x00FF)
 	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( i186_internal_port_r, i186_internal_port_w)/* CPU 80186         */
@@ -80,10 +105,10 @@ static INPUT_PORTS_START( nimbus )
     PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6")      PORT_CODE(KEYCODE_6)            PORT_CHAR('6')
 
 	PORT_START("KEY1") /* Key row 1 scancodes 08..0F */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7")      PORT_CODE(KEYCODE_1)            PORT_CHAR('7')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8")      PORT_CODE(KEYCODE_ESC)          PORT_CHAR('8')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9")      PORT_CODE(KEYCODE_1)            PORT_CHAR('9')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0")      PORT_CODE(KEYCODE_2)            PORT_CHAR('0')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7")      PORT_CODE(KEYCODE_7)            PORT_CHAR('7')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8")      PORT_CODE(KEYCODE_8)            PORT_CHAR('8')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9")      PORT_CODE(KEYCODE_9)            PORT_CHAR('9')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0")      PORT_CODE(KEYCODE_0)            PORT_CHAR('0')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-")      PORT_CODE(KEYCODE_MINUS)        PORT_CHAR('-')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("=")      PORT_CODE(KEYCODE_EQUALS)       PORT_CHAR('=')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BSPACE") PORT_CODE(KEYCODE_BACKSPACE)    PORT_CHAR(0x08)
@@ -190,27 +215,23 @@ static ADDRESS_MAP_START(nimbus_iocpu_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x7fff) AM_RAM
-	//AM_RANGE(0x8000, 0x9fff) AM_ROM // EPROM
-	//AM_RANGE(0xc000, 0xdfff) // Expansion block
-	//AM_RANGE(0xe000, 0xffff) // Expansion block
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nimbus_iocpu_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
-	//AM_RANGE(0x8000, 0x9fff) AM_ROM // EPROM
-	//AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)  // PPI-8255
-	//AM_RANGE(0xc000, 0xdfff) // Expansion block
-	//AM_RANGE(0xe000, 0xffff) // Expansion block
+    AM_RANGE(0x00000, 0x000FF) AM_READWRITE(pc8031_iou_r, pc8031_iou_w)
+	AM_RANGE(0x00010, 0x07fff) AM_RAM
+    AM_RANGE(0x20000, 0x20004) AM_READWRITE(pc8031_port_r, pc8031_port_w)
 ADDRESS_MAP_END
 
 
 static PALETTE_INIT( nimbus )
 {
-	int i;
+	int colourno;
 
-	for ( i = 0; i < sizeof(nimbus_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, nimbus_palette[i*3], nimbus_palette[i*3+1], nimbus_palette[i*3+2]);
+	for ( colourno = 0; colourno < SCREEN_NO_COLOURS; colourno++ ) 
+    {
+		palette_set_color_rgb(machine, colourno, nimbus_palette[colourno][RED], nimbus_palette[colourno][GREEN], nimbus_palette[colourno][BLUE]);
 	}
 }
 
@@ -221,7 +242,7 @@ static MACHINE_DRIVER_START( nimbus )
     MDRV_CPU_PROGRAM_MAP(nimbus_mem)
     MDRV_CPU_IO_MAP(nimbus_io)
  
-    MDRV_CPU_ADD(IOCPU_TAG, I8031, 8000000)
+    MDRV_CPU_ADD(IOCPU_TAG, I8031, 11059200)
     MDRV_CPU_PROGRAM_MAP(nimbus_iocpu_mem)
     MDRV_CPU_IO_MAP(nimbus_iocpu_io)
  
@@ -235,7 +256,7 @@ static MACHINE_DRIVER_START( nimbus )
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(100))
     MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
     
-    MDRV_PALETTE_LENGTH(ARRAY_LENGTH(nimbus_palette) / 3)
+    MDRV_PALETTE_LENGTH(SCREEN_NO_COLOURS * 3)
 	MDRV_PALETTE_INIT( nimbus )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
@@ -257,6 +278,18 @@ static MACHINE_DRIVER_START( nimbus )
     
     /* Peripheral chips */
     MDRV_Z80SIO_ADD(Z80SIO_TAG, 4000000, sio_intf)
+    
+    MDRV_ER59256_ADD(ER59256_TAG)
+    
+  	/* sound hardware */
+   	MDRV_SPEAKER_STANDARD_MONO(MONO_TAG)
+	MDRV_SOUND_ADD(AY8910_TAG, AY8910, 2000000)
+	MDRV_SOUND_CONFIG(nimbus_ay8910_interface)
+    
+   	MDRV_SOUND_ADD(MSM5205_TAG, MSM5205, 384000)
+	MDRV_SOUND_CONFIG(msm5205_config)
+    
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, MONO_TAG, 0.75)
 MACHINE_DRIVER_END
 
 
