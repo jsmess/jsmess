@@ -337,6 +337,12 @@ MACHINE_RESET( gb )
 MACHINE_START( sgb )
 {
 	sgb_tile_data = auto_alloc_array_clear(machine, UINT8, 0x2000 );
+
+	/* Allocate the serial timer, and disable it */
+	gb_driver_data.gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
+	timer_enable( gb_driver_data.gb_serial_timer, 0 );
+
+	MACHINE_START_CALL( gb_video );
 }
 
 MACHINE_RESET( sgb )
