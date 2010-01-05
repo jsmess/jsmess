@@ -267,6 +267,7 @@ void *image_ptr(const device_config *image);
 
 
 UINT8 *image_get_software_region(const device_config *image, const char *tag);
+UINT32 image_get_software_region_length(const device_config *image, const char *tag);
 const software_entry *image_software_entry(const device_config *image);
 
 

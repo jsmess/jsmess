@@ -1469,6 +1469,19 @@ UINT8 *image_get_software_region(const device_config *image, const char *tag)
 
 
 /*-------------------------------------------------
+    image_get_software_region_length
+-------------------------------------------------*/
+
+UINT32 image_get_software_region_length(const device_config *image, const char *tag)
+{
+    char full_tag[256];
+
+    sprintf( full_tag, "%s:%s:%s", image->tag, image_software_entry(image)->name, tag );
+    return memory_region_length( image->machine, full_tag );
+}
+
+
+/*-------------------------------------------------
     image_is_writable
 -------------------------------------------------*/
 
