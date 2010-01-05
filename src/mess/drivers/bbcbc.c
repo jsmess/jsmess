@@ -118,6 +118,39 @@ static const z80_daisy_chain bbcbc_daisy_chain[] =
 	{ NULL }
 };
 
+
+static DEVICE_START( bbcbc_cart )
+{
+	UINT8 *cart = memory_region(device->machine,  "maincpu" ) + 0x4000;
+
+	memset( cart, 0xFF, 0x8000 );
+}
+
+
+static DEVICE_IMAGE_LOAD( bbcbc_cart )
+{
+	UINT8 *cart = memory_region(image->machine,  "maincpu" ) + 0x4000;
+
+	if ( image_software_entry(image) == NULL )
+	{
+		int size = image_length( image );
+		if ( image_fread( image, cart, size ) != size ) {
+			image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
+			return INIT_FAIL;
+		}
+	}
+	else
+	{
+		UINT8 *reg = image_get_software_region( image, CARTRIDGE_REGION_ROM );
+		int reg_len = image_get_software_region_length( image, CARTRIDGE_REGION_ROM );
+
+		memcpy( cart, reg, MIN(reg_len, 0x8000) );
+	}
+
+	return INIT_PASS;
+
+}
+
 static MACHINE_START( bbcbc )
 {
 	TMS9928A_configure(&tms9129_interface);
@@ -145,6 +178,10 @@ static MACHINE_DRIVER_START( bbcbc )
 	MDRV_SCREEN_REFRESH_RATE( 50 )
 
 	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_START( bbcbc_cart )
+	MDRV_CARTSLOT_LOAD( bbcbc_cart )
+	MDRV_CARTSLOT_SOFTWARE_LIST( bbcbc_cart )
 MACHINE_DRIVER_END
 
 
@@ -152,7 +189,6 @@ ROM_START( bbcbc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("br_4_1.ic3", 0x0000, 0x2000, CRC(7c880d75) SHA1(954db096bd9e8edfef72946637a12f1083841fb0))
 	ROM_LOAD("br_4_2.ic4", 0x2000, 0x2000, CRC(16a33aef) SHA1(9529f9f792718a3715af2063b91a5fb18f741226))
-	ROM_CART_LOAD("cart", 0x4000, 0xBFFF, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 /***************************************************************************
