@@ -10,19 +10,6 @@
 #include "machine/i82439tx.h"
 #include "machine/pci.h"
 
-#define BANK_C0000_R	12
-#define BANK_C4000_R	13
-#define BANK_C8000_R	14
-#define BANK_CC000_R	15
-#define BANK_D0000_R	16
-#define BANK_D4000_R	17
-#define BANK_D8000_R	18
-#define BANK_DC000_R	19
-#define BANK_E0000_R	20
-#define BANK_E4000_R	21
-#define BANK_E8000_R	22
-#define BANK_EC000_R	23
-#define BANK_F0000_R	24
 
 struct intel82439tx_info
 {
@@ -30,23 +17,8 @@ struct intel82439tx_info
 	UINT32 bios_ram[0x40000 / 4];
 };
 
-
 static struct intel82439tx_info *i82439tx;
 
-
-static WRITE32_HANDLER(bank_c0000_w)	{ COMBINE_DATA(&i82439tx->bios_ram[offset + 0x00000 / 4]); }
-static WRITE32_HANDLER(bank_c4000_w)	{ COMBINE_DATA(&i82439tx->bios_ram[offset + 0x04000 / 4]); }
-static WRITE32_HANDLER(bank_c8000_w)	{ COMBINE_DATA(&i82439tx->bios_ram[offset + 0x08000 / 4]); }
-static WRITE32_HANDLER(bank_cc000_w)	{ COMBINE_DATA(&i82439tx->bios_ram[offset + 0x0c000 / 4]); }
-static WRITE32_HANDLER(bank_d0000_w)	{ COMBINE_DATA(&i82439tx->bios_ram[offset + 0x10000 / 4]); }
-static WRITE32_HANDLER(bank_d4000_w)	{ COMBINE_DATA(&i82439tx->bios_ram[offset + 0x14000 / 4]); }
-static WRITE32_HANDLER(bank_d8000_w)	{ COMBINE_DATA(&i82439tx->bios_ram[offset + 0x18000 / 4]); }
-static WRITE32_HANDLER(bank_dc000_w)	{ COMBINE_DATA(&i82439tx->bios_ram[offset + 0x1c000 / 4]); }
-static WRITE32_HANDLER(bank_e0000_w)	{ COMBINE_DATA(&i82439tx->bios_ram[offset + 0x20000 / 4]); }
-static WRITE32_HANDLER(bank_e4000_w)	{ COMBINE_DATA(&i82439tx->bios_ram[offset + 0x24000 / 4]); }
-static WRITE32_HANDLER(bank_e8000_w)	{ COMBINE_DATA(&i82439tx->bios_ram[offset + 0x28000 / 4]); }
-static WRITE32_HANDLER(bank_ec000_w)	{ COMBINE_DATA(&i82439tx->bios_ram[offset + 0x2c000 / 4]); }
-static WRITE32_HANDLER(bank_f0000_w)	{ COMBINE_DATA(&i82439tx->bios_ram[offset + 0x30000 / 4]); }
 
 UINT32 intel82439tx_pci_read(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 mem_mask)
 {
@@ -102,19 +74,29 @@ UINT32 intel82439tx_pci_read(const device_config *busdevice, const device_config
 
 
 
-static void intel82439tx_configure_memory(running_machine *machine, UINT8 val, offs_t begin, offs_t end, int read_bank, write32_space_func wh)
+static void intel82439tx_configure_memory(running_machine *machine, UINT8 val, offs_t begin, offs_t end)
 {
-	const address_space* space = cpu_get_address_space(machine->firstcpu,ADDRESS_SPACE_PROGRAM);
-	char bank[10];
-	sprintf(bank,"bank%d",read_bank);
-	memory_install_read_bank(space, begin, end, 0, 0, bank);
-	if (val & 0x01)
-		memory_set_bankptr(machine, bank, i82439tx->bios_ram + (begin - 0xC0000) / 4);
-	else
-		memory_set_bankptr(machine, bank, memory_region(machine, "user1") + (begin - 0xC0000));
+	const address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 
-	if (val & 0x02)
-		memory_install_write32_handler(space, begin, end, 0, 0, wh);
+	char read_bank[10];
+	sprintf(read_bank, "%05x_r", begin);
+
+	memory_install_read_bank(space, begin, end, 0, 0, read_bank);
+
+	if (BIT(val, 0))
+		memory_set_bankptr(machine, read_bank, i82439tx->bios_ram + (begin - 0xc0000) / 4);
+	else
+		memory_set_bankptr(machine, read_bank, memory_region(machine, "user1") + (begin - 0xc0000));
+
+	/* write enabled? */
+	if (BIT(val, 1))
+	{
+		char write_bank[10];
+		sprintf(write_bank, "%05x_w", begin);
+
+		memory_install_write_bank(space, begin, end, 0, 0, write_bank);
+		memory_set_bankptr(machine, write_bank, i82439tx->bios_ram + (begin - 0xc0000) / 4);
+	}
 	else
 		memory_nop_write(space, begin, end, 0, 0);
 }
@@ -160,37 +142,37 @@ void intel82439tx_pci_write(const device_config *busdevice, const device_config 
 		case 0xC0:
 		case 0xE0:
 			switch(offset)
-			{				
+			{
 				case 0x58:
 					if ((mem_mask & 0x0000f000))
-						intel82439tx_configure_memory(machine, data >> 12, 0xF0000, 0xFFFFF, BANK_F0000_R, bank_f0000_w);
+						intel82439tx_configure_memory(machine, data >> 12, 0xF0000, 0xFFFFF);
 					if ((mem_mask & 0x000f0000))
-						intel82439tx_configure_memory(machine, data >> 16, 0xC0000, 0xC3FFF, BANK_C0000_R, bank_c0000_w);
+						intel82439tx_configure_memory(machine, data >> 16, 0xC0000, 0xC3FFF);
 					if ((mem_mask & 0x00f00000))
-						intel82439tx_configure_memory(machine, data >> 20, 0xC4000, 0xC7FFF, BANK_C4000_R, bank_c4000_w);
+						intel82439tx_configure_memory(machine, data >> 20, 0xC4000, 0xC7FFF);
 					if ((mem_mask & 0x0f000000))
-						intel82439tx_configure_memory(machine, data >> 24, 0xC8000, 0xCCFFF, BANK_C8000_R, bank_c8000_w);
+						intel82439tx_configure_memory(machine, data >> 24, 0xC8000, 0xCCFFF);
 					if ((mem_mask & 0xf0000000))
-						intel82439tx_configure_memory(machine, data >> 28, 0xCC000, 0xCFFFF, BANK_CC000_R, bank_cc000_w);
+						intel82439tx_configure_memory(machine, data >> 28, 0xCC000, 0xCFFFF);
 					break;
 
 				case 0x5C:
 					if ((mem_mask & 0x0000000f))
-						intel82439tx_configure_memory(machine, data >>  0, 0xD0000, 0xD3FFF, BANK_D0000_R, bank_d0000_w);
+						intel82439tx_configure_memory(machine, data >>  0, 0xD0000, 0xD3FFF);
 					if ((mem_mask & 0x000000f0))
-						intel82439tx_configure_memory(machine, data >>  4, 0xD4000, 0xD7FFF, BANK_D4000_R, bank_d4000_w);
+						intel82439tx_configure_memory(machine, data >>  4, 0xD4000, 0xD7FFF);
 					if ((mem_mask & 0x00000f00))
-						intel82439tx_configure_memory(machine, data >>  8, 0xD8000, 0xDBFFF, BANK_D8000_R, bank_d8000_w);
+						intel82439tx_configure_memory(machine, data >>  8, 0xD8000, 0xDBFFF);
 					if ((mem_mask & 0x0000f000))
-						intel82439tx_configure_memory(machine, data >> 12, 0xDC000, 0xDFFFF, BANK_DC000_R, bank_dc000_w);
+						intel82439tx_configure_memory(machine, data >> 12, 0xDC000, 0xDFFFF);
 					if ((mem_mask & 0x000f0000))
-						intel82439tx_configure_memory(machine, data >> 16, 0xE0000, 0xE3FFF, BANK_E0000_R, bank_e0000_w);
+						intel82439tx_configure_memory(machine, data >> 16, 0xE0000, 0xE3FFF);
 					if ((mem_mask & 0x00f00000))
-						intel82439tx_configure_memory(machine, data >> 20, 0xE4000, 0xE7FFF, BANK_E4000_R, bank_e4000_w);
+						intel82439tx_configure_memory(machine, data >> 20, 0xE4000, 0xE7FFF);
 					if ((mem_mask & 0x0f000000))
-						intel82439tx_configure_memory(machine, data >> 24, 0xE8000, 0xECFFF, BANK_E8000_R, bank_e8000_w);
+						intel82439tx_configure_memory(machine, data >> 24, 0xE8000, 0xECFFF);
 					if ((mem_mask & 0xf0000000))
-						intel82439tx_configure_memory(machine, data >> 28, 0xEC000, 0xEFFFF, BANK_EC000_R, bank_ec000_w);
+						intel82439tx_configure_memory(machine, data >> 28, 0xEC000, 0xEFFFF);
 					break;
 			}
 
@@ -219,18 +201,17 @@ void intel82439tx_reset(running_machine *machine)
 	i82439tx->regs[0x04] = 0x02020202;
 	i82439tx->regs[0x05] = 0x00000002;
 
-	intel82439tx_configure_memory(machine, 0, 0xF0000, 0xFFFFF, BANK_F0000_R, bank_f0000_w);
-	intel82439tx_configure_memory(machine, 0, 0xC0000, 0xC3FFF, BANK_C0000_R, bank_c0000_w);
-	intel82439tx_configure_memory(machine, 0, 0xC4000, 0xC7FFF, BANK_C4000_R, bank_c4000_w);
-	intel82439tx_configure_memory(machine, 0, 0xC8000, 0xCCFFF, BANK_C8000_R, bank_c8000_w);
-	intel82439tx_configure_memory(machine, 0, 0xCC000, 0xCFFFF, BANK_CC000_R, bank_cc000_w);
-	intel82439tx_configure_memory(machine, 0, 0xD0000, 0xD3FFF, BANK_D0000_R, bank_d0000_w);
-	intel82439tx_configure_memory(machine, 0, 0xD4000, 0xD7FFF, BANK_D4000_R, bank_d4000_w);
-	intel82439tx_configure_memory(machine, 0, 0xD8000, 0xDBFFF, BANK_D8000_R, bank_d8000_w);
-	intel82439tx_configure_memory(machine, 0, 0xDC000, 0xDFFFF, BANK_DC000_R, bank_dc000_w);
-	intel82439tx_configure_memory(machine, 0, 0xE0000, 0xE3FFF, BANK_E0000_R, bank_e0000_w);
-	intel82439tx_configure_memory(machine, 0, 0xE4000, 0xE7FFF, BANK_E4000_R, bank_e4000_w);
-	intel82439tx_configure_memory(machine, 0, 0xE8000, 0xECFFF, BANK_E8000_R, bank_e8000_w);
-	intel82439tx_configure_memory(machine, 0, 0xEC000, 0xEFFFF, BANK_EC000_R, bank_ec000_w);
+	intel82439tx_configure_memory(machine, 0, 0xF0000, 0xFFFFF);
+	intel82439tx_configure_memory(machine, 0, 0xC0000, 0xC3FFF);
+	intel82439tx_configure_memory(machine, 0, 0xC4000, 0xC7FFF);
+	intel82439tx_configure_memory(machine, 0, 0xC8000, 0xCCFFF);
+	intel82439tx_configure_memory(machine, 0, 0xCC000, 0xCFFFF);
+	intel82439tx_configure_memory(machine, 0, 0xD0000, 0xD3FFF);
+	intel82439tx_configure_memory(machine, 0, 0xD4000, 0xD7FFF);
+	intel82439tx_configure_memory(machine, 0, 0xD8000, 0xDBFFF);
+	intel82439tx_configure_memory(machine, 0, 0xDC000, 0xDFFFF);
+	intel82439tx_configure_memory(machine, 0, 0xE0000, 0xE3FFF);
+	intel82439tx_configure_memory(machine, 0, 0xE4000, 0xE7FFF);
+	intel82439tx_configure_memory(machine, 0, 0xE8000, 0xECFFF);
+	intel82439tx_configure_memory(machine, 0, 0xEC000, 0xEFFFF);
 }
-
