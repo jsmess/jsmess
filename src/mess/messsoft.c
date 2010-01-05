@@ -38,6 +38,7 @@ const software_list * const software_lists[] =
 
 /****************SOFTWARE LISTS**********************************************/
 
+	SOFTWARE_LIST( bbcbc_cart )		/* BBC Bridge Companion cartridges */
 	SOFTWARE_LIST( gamepock_cart )	/* Epoch Game Pocket Computer cartridges */
 
 #endif /* SOFTWARE_LIST_RECURSIVE */
