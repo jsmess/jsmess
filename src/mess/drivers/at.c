@@ -18,6 +18,7 @@
 #include "machine/ins8250.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
+#include "machine/i82371ab.h"
 #include "machine/i82439tx.h"
 
 #include "machine/pit8253.h"
@@ -838,10 +839,12 @@ static MACHINE_DRIVER_START( at586 )
 	MDRV_CPU_PROGRAM_MAP(at586_map)
 	MDRV_CPU_IO_MAP(at586_io)
 
+	MDRV_I82371AB_ADD("i82371ab")
 	MDRV_I82439TX_ADD("i82439tx", "maincpu", "user1")
 
 	MDRV_PCI_BUS_ADD("pcibus", 0)
 	MDRV_PCI_BUS_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write)
+	MDRV_PCI_BUS_DEVICE(1, "i82371ab", i82371ab_pci_read, i82371ab_pci_write)
 MACHINE_DRIVER_END
 
 

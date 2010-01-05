@@ -444,6 +444,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/i8155.o		\
 	$(MESS_MACHINE)/i8212.o		\
 	$(MESS_MACHINE)/i8214.o		\
+	$(MESS_MACHINE)/i82371ab.o	\
 	$(MESS_MACHINE)/i82439tx.o	\
 	$(MESS_MACHINE)/i8271.o		\
 	$(MESS_MACHINE)/i8355.o		\

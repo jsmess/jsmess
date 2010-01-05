@@ -269,7 +269,7 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_ID(p,s)				p##i82439tx##s
 #define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET | DT_HAS_INLINE_CONFIG
 #define DEVTEMPLATE_NAME				"Intel 82439TX"
-#define DEVTEMPLATE_FAMILY				"System controller"
+#define DEVTEMPLATE_FAMILY				"North Bridge"
 #define DEVTEMPLATE_CLASS				DEVICE_CLASS_OTHER
 #define DEVTEMPLATE_VERSION				"1.0"
 #define DEVTEMPLATE_CREDITS				"Copyright MESS Team"
