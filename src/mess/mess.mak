@@ -247,6 +247,7 @@ DRVLIBS = \
 	$(MESSOBJ)/messdriv.o \
 	$(MESSOBJ)/messsoft.o \
 	$(MESSOBJ)/softlist.o \
+	$(MESSOBJ)/software.a \
 	$(MESSOBJ)/3do.a \
 	$(MESSOBJ)/acorn.a \
 	$(MESSOBJ)/amiga.a \
@@ -1664,6 +1665,14 @@ $(MESS_DRIVERS)/z80ne.o:	$(MESS_LAYOUT)/z80ne.lh   \
 							$(MESS_LAYOUT)/z80net.lh  \
 							$(MESS_LAYOUT)/z80netb.lh \
 							$(MESS_LAYOUT)/z80netf.lh
+
+
+#-------------------------------------------------
+# software information
+#-------------------------------------------------
+
+$(MESSOBJ)/software.a:					\
+	$(MESS_SOFTWARE)/gamepock_cart.o	\
 
 
 #-------------------------------------------------
