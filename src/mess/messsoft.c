@@ -21,6 +21,7 @@
 #define SOFTWARE_LIST_RECURSIVE
 
 /* step 1: declare all external references */
+#undef SOFTWARE_LIST
 #define SOFTWARE_LIST(NAME) extern const software_list software_list_##NAME;
 #include "messsoft.c"
 
