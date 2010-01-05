@@ -1,27 +1,78 @@
 /***************************************************************************
 
-    machine/i82439tx.c
-
-    Intel 82439TX PCI Bridge
+    Intel 82439TX System Controller (MTXC)
 
 ***************************************************************************/
 
 #include "driver.h"
-#include "machine/i82439tx.h"
-#include "machine/pci.h"
+#include "i82439tx.h"
 
 
-struct intel82439tx_info
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _i82439tx_state i82439tx_state;
+struct _i82439tx_state
 {
+	const address_space *space;
+	UINT8 *rom;
+
 	UINT32 regs[8];
 	UINT32 bios_ram[0x40000 / 4];
 };
 
-static struct intel82439tx_info *i82439tx;
 
+/*****************************************************************************
+    INLINE FUNCTIONS
+*****************************************************************************/
 
-UINT32 intel82439tx_pci_read(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 mem_mask)
+INLINE i82439tx_state *get_safe_token(const device_config *device)
 {
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == I82439TX);
+
+	return (i82439tx_state *)device->token;
+}
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+static void i82439tx_configure_memory(const device_config *device, UINT8 val, offs_t begin, offs_t end)
+{
+	i82439tx_state *i82439tx = get_safe_token(device);
+
+	switch (val & 0x03)
+	{
+	case 0:
+		memory_install_rom(i82439tx->space, begin, end, 0, 0, i82439tx->rom + (begin - 0xc0000));
+		memory_nop_write(i82439tx->space, begin, end, 0, 0);
+		break;
+	case 1:
+		memory_install_rom(i82439tx->space, begin, end, 0, 0, i82439tx->bios_ram + (begin - 0xc0000) / 4);
+		memory_nop_write(i82439tx->space, begin, end, 0, 0);
+		break;
+	case 2:
+		memory_install_rom(i82439tx->space, begin, end, 0, 0, i82439tx->rom + (begin - 0xc0000));
+		memory_install_writeonly(i82439tx->space, begin, end, 0, 0, i82439tx->bios_ram + (begin - 0xc0000) / 4);
+		break;
+	case 3:
+		memory_install_ram(i82439tx->space, begin, end, 0, 0, i82439tx->bios_ram + (begin - 0xc0000) / 4);
+		break;
+	}
+}
+
+
+/***************************************************************************
+    PCI INTERFACE
+***************************************************************************/
+
+UINT32 i82439tx_pci_read(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 mem_mask)
+{
+	i82439tx_state *i82439tx = get_safe_token(device);
 	UINT32 result = 0;
 
 	if (function != 0)
@@ -66,46 +117,15 @@ UINT32 intel82439tx_pci_read(const device_config *busdevice, const device_config
 			break;
 
 		default:
-			fatalerror("intel82439tx_pci_read(): Unexpected PCI read 0x%02X\n", offset);
+			fatalerror("i82439tx_pci_read(): Unexpected PCI read 0x%02X\n", offset);
 			break;
 	}
 	return result;
 }
 
-
-
-static void intel82439tx_configure_memory(running_machine *machine, UINT8 val, offs_t begin, offs_t end)
+void i82439tx_pci_write(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 data, UINT32 mem_mask)
 {
-	const address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
-
-	char read_bank[10];
-	sprintf(read_bank, "%05x_r", begin);
-
-	memory_install_read_bank(space, begin, end, 0, 0, read_bank);
-
-	if (BIT(val, 0))
-		memory_set_bankptr(machine, read_bank, i82439tx->bios_ram + (begin - 0xc0000) / 4);
-	else
-		memory_set_bankptr(machine, read_bank, memory_region(machine, "user1") + (begin - 0xc0000));
-
-	/* write enabled? */
-	if (BIT(val, 1))
-	{
-		char write_bank[10];
-		sprintf(write_bank, "%05x_w", begin);
-
-		memory_install_write_bank(space, begin, end, 0, 0, write_bank);
-		memory_set_bankptr(machine, write_bank, i82439tx->bios_ram + (begin - 0xc0000) / 4);
-	}
-	else
-		memory_nop_write(space, begin, end, 0, 0);
-}
-
-
-
-void intel82439tx_pci_write(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 data, UINT32 mem_mask)
-{
-	running_machine *machine = busdevice->machine;
+	i82439tx_state *i82439tx = get_safe_token(device);
 
 	if (function != 0)
 		return;
@@ -145,34 +165,34 @@ void intel82439tx_pci_write(const device_config *busdevice, const device_config 
 			{
 				case 0x58:
 					if ((mem_mask & 0x0000f000))
-						intel82439tx_configure_memory(machine, data >> 12, 0xF0000, 0xFFFFF);
+						i82439tx_configure_memory(device, data >> 12, 0xf0000, 0xfffff);
 					if ((mem_mask & 0x000f0000))
-						intel82439tx_configure_memory(machine, data >> 16, 0xC0000, 0xC3FFF);
+						i82439tx_configure_memory(device, data >> 16, 0xc0000, 0xc3fff);
 					if ((mem_mask & 0x00f00000))
-						intel82439tx_configure_memory(machine, data >> 20, 0xC4000, 0xC7FFF);
+						i82439tx_configure_memory(device, data >> 20, 0xc4000, 0xc7fff);
 					if ((mem_mask & 0x0f000000))
-						intel82439tx_configure_memory(machine, data >> 24, 0xC8000, 0xCCFFF);
+						i82439tx_configure_memory(device, data >> 24, 0xc8000, 0xccfff);
 					if ((mem_mask & 0xf0000000))
-						intel82439tx_configure_memory(machine, data >> 28, 0xCC000, 0xCFFFF);
+						i82439tx_configure_memory(device, data >> 28, 0xcc000, 0xcffff);
 					break;
 
 				case 0x5C:
 					if ((mem_mask & 0x0000000f))
-						intel82439tx_configure_memory(machine, data >>  0, 0xD0000, 0xD3FFF);
+						i82439tx_configure_memory(device, data >>  0, 0xd0000, 0xd3fff);
 					if ((mem_mask & 0x000000f0))
-						intel82439tx_configure_memory(machine, data >>  4, 0xD4000, 0xD7FFF);
+						i82439tx_configure_memory(device, data >>  4, 0xd4000, 0xd7fff);
 					if ((mem_mask & 0x00000f00))
-						intel82439tx_configure_memory(machine, data >>  8, 0xD8000, 0xDBFFF);
+						i82439tx_configure_memory(device, data >>  8, 0xd8000, 0xdbfff);
 					if ((mem_mask & 0x0000f000))
-						intel82439tx_configure_memory(machine, data >> 12, 0xDC000, 0xDFFFF);
+						i82439tx_configure_memory(device, data >> 12, 0xdc000, 0xdffff);
 					if ((mem_mask & 0x000f0000))
-						intel82439tx_configure_memory(machine, data >> 16, 0xE0000, 0xE3FFF);
+						i82439tx_configure_memory(device, data >> 16, 0xe0000, 0xe3fff);
 					if ((mem_mask & 0x00f00000))
-						intel82439tx_configure_memory(machine, data >> 20, 0xE4000, 0xE7FFF);
+						i82439tx_configure_memory(device, data >> 20, 0xe4000, 0xe7fff);
 					if ((mem_mask & 0x0f000000))
-						intel82439tx_configure_memory(machine, data >> 24, 0xE8000, 0xECFFF);
+						i82439tx_configure_memory(device, data >> 24, 0xe8000, 0xecfff);
 					if ((mem_mask & 0xf0000000))
-						intel82439tx_configure_memory(machine, data >> 28, 0xEC000, 0xEFFFF);
+						i82439tx_configure_memory(device, data >> 28, 0xec000, 0xeffff);
 					break;
 			}
 
@@ -180,38 +200,77 @@ void intel82439tx_pci_write(const device_config *busdevice, const device_config 
 			break;
 
 		default:
-			fatalerror("intel82439tx_pci_write(): Unexpected PCI write 0x%02X <-- 0x%08X\n", offset, data);
+			fatalerror("i82439tx_pci_write(): Unexpected PCI write 0x%02X <-- 0x%08X\n", offset, data);
 			break;
 	}
 }
 
 
-void intel82439tx_init(running_machine *machine)
+/*****************************************************************************
+    DEVICE INTERFACE
+*****************************************************************************/
+
+static DEVICE_START( i82439tx )
 {
-	i82439tx = auto_alloc(machine, struct intel82439tx_info);
+	i82439tx_state *i82439tx = get_safe_token(device);
+	i82439tx_config *config = device->inline_config;
+
+	/* get address space we are working on */
+	const device_config *cpu = devtag_get_device(device->machine, config->cputag);
+	assert(cpu != NULL);
+
+	i82439tx->space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
+
+	/* get rom region */
+	i82439tx->rom = memory_region(device->machine, config->rom_region);
+
+	/* setup save states */
+	state_save_register_device_item_array(device, 0, i82439tx->regs);
+	state_save_register_device_item_array(device, 0, i82439tx->bios_ram);
 }
 
-void intel82439tx_reset(running_machine *machine)
+static DEVICE_RESET( i82439tx )
 {
-	/* setup PCI */
-	memset(i82439tx, 0, sizeof(*i82439tx));
+	i82439tx_state *i82439tx = get_safe_token(device);
+
+	/* setup initial values */
 	i82439tx->regs[0x00] = 0x14020000;
 	i82439tx->regs[0x01] = 0x01520000;
 	i82439tx->regs[0x02] = 0x00000000;
+	i82439tx->regs[0x03] = 0x00000000;
 	i82439tx->regs[0x04] = 0x02020202;
 	i82439tx->regs[0x05] = 0x00000002;
+	i82439tx->regs[0x06] = 0x00000000;
+	i82439tx->regs[0x07] = 0x00000000;
 
-	intel82439tx_configure_memory(machine, 0, 0xF0000, 0xFFFFF);
-	intel82439tx_configure_memory(machine, 0, 0xC0000, 0xC3FFF);
-	intel82439tx_configure_memory(machine, 0, 0xC4000, 0xC7FFF);
-	intel82439tx_configure_memory(machine, 0, 0xC8000, 0xCCFFF);
-	intel82439tx_configure_memory(machine, 0, 0xCC000, 0xCFFFF);
-	intel82439tx_configure_memory(machine, 0, 0xD0000, 0xD3FFF);
-	intel82439tx_configure_memory(machine, 0, 0xD4000, 0xD7FFF);
-	intel82439tx_configure_memory(machine, 0, 0xD8000, 0xDBFFF);
-	intel82439tx_configure_memory(machine, 0, 0xDC000, 0xDFFFF);
-	intel82439tx_configure_memory(machine, 0, 0xE0000, 0xE3FFF);
-	intel82439tx_configure_memory(machine, 0, 0xE4000, 0xE7FFF);
-	intel82439tx_configure_memory(machine, 0, 0xE8000, 0xECFFF);
-	intel82439tx_configure_memory(machine, 0, 0xEC000, 0xEFFFF);
+	/* configure initial memory state */
+	i82439tx_configure_memory(device, 0, 0xf0000, 0xfffff);
+	i82439tx_configure_memory(device, 0, 0xc0000, 0xc3fff);
+	i82439tx_configure_memory(device, 0, 0xc4000, 0xc7fff);
+	i82439tx_configure_memory(device, 0, 0xc8000, 0xccfff);
+	i82439tx_configure_memory(device, 0, 0xcc000, 0xcffff);
+	i82439tx_configure_memory(device, 0, 0xd0000, 0xd3fff);
+	i82439tx_configure_memory(device, 0, 0xd4000, 0xd7fff);
+	i82439tx_configure_memory(device, 0, 0xd8000, 0xdbfff);
+	i82439tx_configure_memory(device, 0, 0xdc000, 0xdffff);
+	i82439tx_configure_memory(device, 0, 0xe0000, 0xe3fff);
+	i82439tx_configure_memory(device, 0, 0xe4000, 0xe7fff);
+	i82439tx_configure_memory(device, 0, 0xe8000, 0xecfff);
+	i82439tx_configure_memory(device, 0, 0xec000, 0xeffff);
 }
+
+
+/***************************************************************************
+    DEVICE GETINFO
+***************************************************************************/
+
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+
+#define DEVTEMPLATE_ID(p,s)				p##i82439tx##s
+#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET | DT_HAS_INLINE_CONFIG
+#define DEVTEMPLATE_NAME				"Intel 82439TX"
+#define DEVTEMPLATE_FAMILY				"System controller"
+#define DEVTEMPLATE_CLASS				DEVICE_CLASS_OTHER
+#define DEVTEMPLATE_VERSION				"1.0"
+#define DEVTEMPLATE_CREDITS				"Copyright MESS Team"
+#include "devtempl.h"

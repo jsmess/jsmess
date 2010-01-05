@@ -164,6 +164,7 @@ static WRITE32_HANDLER( at_kbdc8042_32le_w )
 	write32le_with_write8_handler(at_kbdc8042_w, space, offset, data, mem_mask);
 }
 
+
 static ADDRESS_MAP_START(at16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffff)
@@ -833,15 +834,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( at586 )
 	MDRV_IMPORT_FROM( at386 )
 
-	MDRV_MACHINE_START( at586 )
-	MDRV_MACHINE_RESET( at586 )
-	
 	MDRV_CPU_REPLACE("maincpu", PENTIUM, 60000000)
 	MDRV_CPU_PROGRAM_MAP(at586_map)
 	MDRV_CPU_IO_MAP(at586_io)
 
+	MDRV_I82439TX_ADD("i82439tx", "maincpu", "user1")
+
 	MDRV_PCI_BUS_ADD("pcibus", 0)
-	MDRV_PCI_BUS_DEVICE(0, NULL, intel82439tx_pci_read, intel82439tx_pci_write)
+	MDRV_PCI_BUS_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write)
 MACHINE_DRIVER_END
 
 
@@ -1001,7 +1001,7 @@ ROM_END
 
 ROM_START( at )
     ROM_REGION(0x1000000,"maincpu", 0)
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	
+    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 	ROM_SYSTEM_BIOS(0, "at", "PC 286")
     ROMX_LOAD("at110387.1", 0xf0001, 0x8000, CRC(679296a7) SHA1(ae891314cac614dfece686d8e1d74f4763cf40e3),ROM_SKIP(1) | ROM_BIOS(1) )
     ROMX_LOAD("at110387.0", 0xf0000, 0x8000, CRC(65ae1f97) SHA1(91a29c7deecf7a9afbba330e64e0eee9aafee4d1),ROM_SKIP(1) | ROM_BIOS(1) )
@@ -1206,7 +1206,7 @@ ROM_START( at586 )
 	ROM_LOAD("et4000.bin",  0x00000, 0x08000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
     ROM_LOAD("wdbios.rom",  0x08000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 	ROM_SYSTEM_BIOS(0, "sptx", "SP-586TX")
-    ROMX_LOAD("sp586tx.bin",   0x20000, 0x20000, CRC(1003d72c) SHA1(ec9224ff9b0fdfd6e462cb7bbf419875414739d6), ROM_BIOS(1))		
+    ROMX_LOAD("sp586tx.bin",   0x20000, 0x20000, CRC(1003d72c) SHA1(ec9224ff9b0fdfd6e462cb7bbf419875414739d6), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "unisys", "Unisys 586") // probably bad dump due to need of hac in i82439tx to work
     ROMX_LOAD("at586.bin",     0x20000, 0x20000, CRC(717037f5) SHA1(1d49d1b7a4a40d07d1a897b7f8c827754d76f824), ROM_BIOS(2))
 	/* 8042 keyboard controller */
