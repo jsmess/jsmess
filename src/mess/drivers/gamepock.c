@@ -1,9 +1,12 @@
 #include "driver.h"
+#include "softlist.h"
 #include "cpu/upd7810/upd7810.h"
 #include "sound/speaker.h"
 #include "devices/cartslot.h"
 #include "includes/gamepock.h"
 
+
+#define CARTRIDGE_REGION	"rom"
 
 static ADDRESS_MAP_START(gamepock_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -45,14 +48,21 @@ static DEVICE_START(gamepock_cart)
 
 static DEVICE_IMAGE_LOAD(gamepock_cart) {
 	UINT8 *cart = memory_region(image->machine,  "user1" );
-	int size = image_length( image );
 
-	if ( image_fread( image, cart, size ) != size ) {
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
-		return INIT_FAIL;
+	if ( image_software_entry(image) == NULL )
+	{
+		int size = image_length( image );
+		if ( image_fread( image, cart, size ) != size ) {
+			image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
+			return INIT_FAIL;
+		}
+	}
+	else
+	{
+		cart = image_get_software_region( image, CARTRIDGE_REGION );
 	}
 
-	memory_set_bankptr( image->machine, "bank1", memory_region(image->machine,  "user1" ) );
+	memory_set_bankptr( image->machine, "bank1", cart );
 
 	return INIT_PASS;
 }
@@ -87,13 +97,51 @@ static MACHINE_DRIVER_START( gamepock )
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_START(gamepock_cart)
 	MDRV_CARTSLOT_LOAD(gamepock_cart)
+	MDRV_CARTSLOT_SOFTWARE_LIST(gamepock_cart)
 MACHINE_DRIVER_END
+
 
 ROM_START( gamepock )
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "egpcboot.bin", 0x0000, 0x1000, CRC(ee1ea65d) SHA1(9c7731b5ead721d2cc7f7e2655c5fed9e56db8b0) )
 	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 ROM_END
+
+
+SOFTWARE_START( astrobom )
+	ROM_REGION( 0x2000, CARTRIDGE_REGION, 0 )
+	ROM_LOAD( "astrobom.bin", 0, 0x2000, CRC(b0fd260f) SHA1(453a0f3c0952ebd8e691316c39960731f1996c09) )
+SOFTWARE_END
+
+SOFTWARE_START( blockmaz )
+	ROM_REGION( 0x2000, CARTRIDGE_REGION, 0 )
+	ROM_LOAD( "blockmaz.bin", 0, 0x2000, CRC(cfb3291b) SHA1(50dc5736200986b326b372c17c233c4180474471) )
+SOFTWARE_END
+
+SOFTWARE_START( pokemahj )
+	ROM_REGION( 0x4000, CARTRIDGE_REGION, 0 )
+	ROM_LOAD( "pokemahj.bin", 0, 0x4000, CRC(5c3eed48) SHA1(918e1caa16cfae6b74da2026f3426d0a5818061c) )
+SOFTWARE_END
+
+SOFTWARE_START( pokereve )
+	ROM_REGION( 0x2000, CARTRIDGE_REGION, 0 )
+	ROM_LOAD( "pokereve.bin", 0, 0x2000, CRC(1c461f91) SHA1(ead4a4efe5439e2ec1f6befb50c350f73919da8d) )
+SOFTWARE_END
+
+SOFTWARE_START( soukoban )
+	ROM_REGION( 0x2000, CARTRIDGE_REGION, 0 )
+	ROM_LOAD( "soukoban.bin", 0, 0x2000, CRC(5d6f7819) SHA1(61ef6483e8f9935dd8b6351fd2bdfda3af3899bd) )
+SOFTWARE_END
+
+
+SOFTWARE_LIST_START( gamepock_cart, "Epoch Game Pocket Computer cartridges" )
+	SOFTWARE( astrobom, 0, 198x, "Epoch", "Astro Bomber", NULL, 0, 0 )
+	SOFTWARE( blockmaz, 0, 198x, "Epoch", "Block Maze", NULL, 0, 0 )
+	SOFTWARE( pokemahj, 0, 198x, "Epoch", "Pokekon Mahjongg", NULL, 0, 0 )
+	SOFTWARE( pokereve, 0, 198x, "Epoch", "Pokekon Reversi", NULL, 0, 0 )
+	SOFTWARE( soukoban, 0, 1985, "Epoch", "Soukoban - Store Keepers", NULL, 0, 0 )
+SOFTWARE_LIST_END
+
 
 CONS( 1984, gamepock, 0, 0, gamepock, gamepock, 0, "Epoch", "Game Pocket Computer", 0 )
 

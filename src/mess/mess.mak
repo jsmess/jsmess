@@ -245,6 +245,8 @@ SOUNDS += TMS5200
 
 DRVLIBS = \
 	$(MESSOBJ)/messdriv.o \
+	$(MESSOBJ)/messsoft.o \
+	$(MESSOBJ)/softlist.o \
 	$(MESSOBJ)/3do.a \
 	$(MESSOBJ)/acorn.a \
 	$(MESSOBJ)/amiga.a \
