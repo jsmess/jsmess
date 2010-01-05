@@ -332,7 +332,7 @@ static const cartslot_pcb_type *identify_pcb(const device_config *device)
 	multicart *mc;
 	int i;
 
-	if (image_exists(device))
+	if (image_software_entry(device) == NULL && image_exists(device))
 	{
 		/* try opening this as if it were a multicart */
 		multicart_open_error me = multicart_open(image_filename(device), device->machine->gamedrv->name, MULTICART_FLAGS_DONT_LOAD_RESOURCES, &mc);
@@ -452,6 +452,12 @@ DEVICE_GET_INFO( cartslot )
 			else
 			{
 				strcpy(info->s, "bin");
+			}
+			break;
+		case DEVINFO_STR_SOFTWARE_LIST:
+			if ( device && device->inline_config && get_config(device)->software_list_name )
+			{
+				strcpy(info->s, get_config(device)->software_list_name );
 			}
 			break;
 	}
