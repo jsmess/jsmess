@@ -283,7 +283,27 @@ static GFXDECODE_START( cgenie )
 GFXDECODE_END
 
 static const unsigned char cgenie_colors[] = {
-	 0*4,  0*4,  0*4,  /* background   */
+	0x00,0x00,0x00,
+	0x5e,0x5e,0x5e,  /* gray         */
+	0x11,0xff,0xea,  /* cyan         */
+	0xff,0x00,0x5e,  /* red          */
+	0xea,0xea,0xea,  /* white        */
+	0xff,0xf9,0x00,  /* yellow       */
+	0x6e,0xff,0x00,  /* green        */
+	0xff,0x52,0x00,  /* orange       */
+	0xea,0xff,0x00,  /* light yellow */
+	0x02,0x48,0xff,  /* blue         */
+	0x8e,0xd4,0xff,  /* light blue   */
+	0xff,0x12,0xff,  /* pink         */
+	0x88,0x43,0xff,  /* purple       */
+	0x8c,0x8c,0x8c,  /* light gray   */
+	0x00,0xfb,0x8c,  /* light cyan   */
+	0xd2,0x00,0xff,  /* magenta      */
+	0xff,0xff,0xff,  /* bright white */
+
+
+#if 0
+	0*4,  0*4,  0*4,  /* background   */
 
 /* this is the 'RGB monitor' version, strong and clean */
 	15*4, 15*4, 15*4,  /* gray         */
@@ -302,6 +322,7 @@ static const unsigned char cgenie_colors[] = {
 	 0*4, 63*4, 63*4,  /* light cyan   */
 	58*4,  0*4, 58*4,  /* magenta      */
 	63*4, 63*4, 63*4,  /* bright white */
+#endif
 
 /* this is the 'TV screen' version, weak and blurred by repeating pixels */
 	15*2+80, 15*2+80, 15*2+80,	/* gray         */
@@ -435,7 +456,7 @@ static MACHINE_DRIVER_START( cgenie )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(48*8, 32*8)
