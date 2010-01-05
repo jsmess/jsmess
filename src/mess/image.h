@@ -15,6 +15,7 @@
 #include "utils.h"
 #include "opresolv.h"
 #include "osdmess.h"
+#include "softlist.h"
 
 
 /***************************************************************************
@@ -144,6 +145,7 @@ enum
     DEVINFO_STR_IMAGE_CREATE_OPTNAME,
     DEVINFO_STR_IMAGE_CREATE_OPTDESC = DEVINFO_STR_IMAGE_CREATE_OPTNAME + DEVINFO_CREATE_OPTMAX,
     DEVINFO_STR_IMAGE_CREATE_OPTEXTS = DEVINFO_STR_IMAGE_CREATE_OPTDESC + DEVINFO_CREATE_OPTMAX,
+	DEVINFO_STR_SOFTWARE_LIST,
     DEVINFO_STR_IMAGE_LAST = DEVINFO_STR_IMAGE_FIRST + 0x0fff
 };
 
@@ -262,6 +264,10 @@ char *image_fgets(const device_config *image, char *s, UINT32 length);
 int image_feof(const device_config *image);
 
 void *image_ptr(const device_config *image);
+
+
+UINT8 *image_get_software_region(const device_config *image, const char *tag);
+const software_entry *image_software_entry(const device_config *image);
 
 
 
