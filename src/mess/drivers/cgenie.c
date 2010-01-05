@@ -283,7 +283,7 @@ static GFXDECODE_START( cgenie )
 GFXDECODE_END
 
 static const unsigned char cgenie_colors[] = {
-	0x00,0x00,0x00,
+	0x00,0x00,0x00,  /* background   */
 	0x5e,0x5e,0x5e,  /* gray         */
 	0x11,0xff,0xea,  /* cyan         */
 	0xff,0x00,0x5e,  /* red          */
@@ -297,7 +297,7 @@ static const unsigned char cgenie_colors[] = {
 	0xff,0x12,0xff,  /* pink         */
 	0x88,0x43,0xff,  /* purple       */
 	0x8c,0x8c,0x8c,  /* light gray   */
-	0x00,0xfb,0x8c,  /* light cyan   */
+	0x00,0xfb,0x8c,  /* turquoise    */
 	0xd2,0x00,0xff,  /* magenta      */
 	0xff,0xff,0xff,  /* bright white */
 
@@ -323,6 +323,64 @@ static const unsigned char cgenie_colors[] = {
 	58*4,  0*4, 58*4,  /* magenta      */
 	63*4, 63*4, 63*4,  /* bright white */
 #endif
+
+/* this is the 'TV screen' version, weak and blurred by repeating pixels */
+	15*2+80, 15*2+80, 15*2+80,	/* gray         */
+	 0*2+80, 48*2+80, 48*2+80,	/* cyan         */
+	60*2+80,  0*2+80,  0*2+80,	/* red          */
+	47*2+80, 47*2+80, 47*2+80,	/* white        */
+	55*2+80, 55*2+80,  0*2+80,	/* yellow       */
+	 0*2+80, 56*2+80,  0*2+80,	/* green        */
+	42*2+80, 32*2+80,  0*2+80,	/* orange       */
+	63*2+80, 63*2+80,  0*2+80,	/* light yellow */
+	 0*2+80,  0*2+80, 48*2+80,	/* blue         */
+	 0*2+80, 24*2+80, 63*2+80,	/* light blue   */
+	60*2+80,  0*2+80, 38*2+80,	/* pink         */
+	38*2+80,  0*2+80, 60*2+80,	/* purple       */
+	31*2+80, 31*2+80, 31*2+80,	/* light gray   */
+	 0*2+80, 63*2+80, 63*2+80,	/* light cyan   */
+	58*2+80,  0*2+80, 58*2+80,	/* magenta      */
+	63*2+80, 63*2+80, 63*2+80,	/* bright white */
+
+	15*2+96, 15*2+96, 15*2+96,	/* gray         */
+	 0*2+96, 48*2+96, 48*2+96,	/* cyan         */
+	60*2+96,  0*2+96,  0*2+96,	/* red          */
+	47*2+96, 47*2+96, 47*2+96,	/* white        */
+	55*2+96, 55*2+96,  0*2+96,	/* yellow       */
+	 0*2+96, 56*2+96,  0*2+96,	/* green        */
+	42*2+96, 32*2+96,  0*2+96,	/* orange       */
+	63*2+96, 63*2+96,  0*2+96,	/* light yellow */
+	 0*2+96,  0*2+96, 48*2+96,	/* blue         */
+	 0*2+96, 24*2+96, 63*2+96,	/* light blue   */
+	60*2+96,  0*2+96, 38*2+96,	/* pink         */
+	38*2+96,  0*2+96, 60*2+96,	/* purple       */
+	31*2+96, 31*2+96, 31*2+96,	/* light gray   */
+	 0*2+96, 63*2+96, 63*2+96,	/* light cyan   */
+	58*2+96,  0*2+96, 58*2+96,	/* magenta      */
+	63*2+96, 63*2+96, 63*2+96,	/* bright white */
+
+
+};
+
+static const unsigned char cgenienz_colors[] = {
+	0x00,0x00,0x00,  /* background   */
+	0xff,0xff,0xff,  /* gray         */
+	0x12,0xff,0xff,  /* cyan         */
+	0xff,0x6f,0xff,  /* red          */
+	0x31,0x77,0xff,  /* white        */
+	0xff,0xcb,0x00,  /* yellow       */
+	0x6e,0xff,0x00,  /* green        */
+	0xff,0x52,0x00,  /* orange       */
+	0x5e,0x5e,0x5e,  /* light yellow */
+	0xea,0xea,0xea,  /* blue         */
+	0x00,0xff,0xdd,  /* light blue   */
+	0xd2,0x00,0xff,  /* pink         */
+	0x02,0x48,0xff,  /* purple       */
+	0xff,0xf9,0x00,  /* light gray   */
+	0x00,0xda,0x00,  /* light cyan   */
+	0xff,0x22,0x00,  /* magenta      */
+	0x00,0x00,0x00,  /* bright white */
+
 
 /* this is the 'TV screen' version, weak and blurred by repeating pixels */
 	15*2+80, 15*2+80, 15*2+80,	/* gray         */
@@ -401,6 +459,21 @@ static PALETTE_INIT( cgenie )
 		colortable_entry_set_value(machine->colortable, i, cgenie_palette[i]);
 }
 
+static PALETTE_INIT( cgenienz )
+{
+	UINT8 i, r, g, b;
+
+	machine->colortable = colortable_alloc(machine, 49);
+
+	for ( i = 0; i < 49; i++ )
+	{
+		r = cgenienz_colors[i*3]; g = cgenienz_colors[i*3+1]; b = cgenienz_colors[i*3+2];
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+	}
+
+	for(i=0; i<108; i++)
+		colortable_entry_set_value(machine->colortable, i, cgenie_palette[i]);
+}
 
 static const ay8910_interface cgenie_ay8910_interface =
 {
@@ -442,9 +515,9 @@ static const floppy_config cgenie_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
-static MACHINE_DRIVER_START( cgenie )
+static MACHINE_DRIVER_START( cgenie_common )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 2216800)        /* 2,2168 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_17_73447MHz/8)        /* 2,2168 MHz */
 	MDRV_CPU_PROGRAM_MAP(cgenie_mem)
 	MDRV_CPU_IO_MAP(cgenie_io)
 	MDRV_CPU_VBLANK_INT("screen", cgenie_frame_interrupt)
@@ -456,15 +529,15 @@ static MACHINE_DRIVER_START( cgenie )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(48*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1,0*8,32*8-1)
 	MDRV_GFXDECODE( cgenie )
 	MDRV_PALETTE_LENGTH(108)
-	MDRV_PALETTE_INIT( cgenie )
 
+	// Actually the video is driven by an HD46505 clocked at XTAL_17_73447MHz/16
 	MDRV_VIDEO_START( cgenie )
 	MDRV_VIDEO_UPDATE( cgenie )
 
@@ -472,7 +545,7 @@ static MACHINE_DRIVER_START( cgenie )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("ay8910", AY8910, 2000000)
+	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_17_73447MHz/8)
 	MDRV_SOUND_CONFIG(cgenie_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
@@ -490,6 +563,18 @@ static MACHINE_DRIVER_START( cgenie )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
 	MDRV_RAM_EXTRA_OPTIONS("32K")
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( cgenie )
+	MDRV_IMPORT_FROM( cgenie_common )
+
+	MDRV_PALETTE_INIT( cgenie )
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( cgenienz )
+	MDRV_IMPORT_FROM( cgenie_common )
+
+	MDRV_PALETTE_INIT( cgenienz )
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -514,9 +599,9 @@ ROM_END
 
 ROM_START (cgenienz)
 	ROM_REGION(0x13000,"maincpu",0)
-	ROM_SYSTEM_BIOS(0, "v1", "Revision 1 (24 rows)")
+	ROM_SYSTEM_BIOS(0, "old", "Old ROM")
 	ROMX_LOAD( "cg-basic-rom-v1-pal-en.rom",   0x0000, 0x4000, CRC(844aaedd) SHA1(b7f984bc5cd979c7ad11ff909e8134f694aea7aa), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "v2", "Revision 2 (25 rows)")
+	ROM_SYSTEM_BIOS(1, "new", "New ROM")
 	ROMX_LOAD( "cgromv2.rom",   0x0000, 0x4000, CRC(cfb84e09) SHA1(e199e4429bab6f9fca2bb05e71324538928a693a), ROM_BIOS(2) )
 	ROM_LOAD ("cgdos.rom",   0x10000, 0x2000, CRC(2a96cf74) SHA1(6dcac110f87897e1ee7521aefbb3d77a14815893))
 	ROM_CART_LOAD("cart", 0x12000, 0x1000, ROM_NOMIRROR | ROM_OPTIONAL)
@@ -670,4 +755,4 @@ DEVICE_IMAGE_LOAD( cgenie_floppy )
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY    FULLNAME */
 COMP( 1982, cgenie,   0,		0,		cgenie,   cgenie,	0,       "EACA Computers Ltd.",  "Colour Genie EG2000" , 0)
-COMP( 1982, cgenienz, cgenie,	0,		cgenie,   cgenie,	0,       "EACA Computers Ltd.",  "Colour Genie EG2000 (New Zealand)" , 0)
+COMP( 1982, cgenienz, cgenie,	0,		cgenienz, cgenie,	0,       "EACA Computers Ltd.",  "Colour Genie EG2000 (New Zealand)" , 0)
