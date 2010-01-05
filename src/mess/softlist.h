@@ -41,9 +41,8 @@ struct _software_list
 
 #define SOFTWARE_LIST_NAME(name)					software_list_##name
 #define SOFTWARE_NAME(name)							software_##name
-#define SOFTWARE_LIST_START(name,desc) \
-	static const software_entry SOFTWARE_NAME(name)[]; \
-	const software_list SOFTWARE_LIST_NAME(name) = { #name, desc, software_##name }; \
+#define SOFTWARE_LIST(name,desc)					const software_list SOFTWARE_LIST_NAME(name) = { #name, desc, software_##name };
+#define SOFTWARE_LIST_START(name)	\
 	static const software_entry SOFTWARE_NAME(name)[] = {
 
 #define SOFTWARE_LIST_END							{ NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL } };

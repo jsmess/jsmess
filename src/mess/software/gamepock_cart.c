@@ -39,11 +39,13 @@ SOFTWARE_START( soukoban )
 SOFTWARE_END
 
 
-SOFTWARE_LIST_START( gamepock_cart, "Epoch Game Pocket Computer cartridges" )
+SOFTWARE_LIST_START( gamepock_cart )
 	SOFTWARE( astrobom, 0, 198x, "Epoch", "Astro Bomber", NULL, 0, 0 )
 	SOFTWARE( blockmaz, 0, 198x, "Epoch", "Block Maze", NULL, 0, 0 )
 	SOFTWARE( pokemahj, 0, 198x, "Epoch", "Pokekon Mahjongg", NULL, 0, 0 )
 	SOFTWARE( pokereve, 0, 198x, "Epoch", "Pokekon Reversi", NULL, 0, 0 )
 	SOFTWARE( soukoban, 0, 1985, "Epoch", "Soukoban - Store Keepers", NULL, 0, 0 )
 SOFTWARE_LIST_END
+
+SOFTWARE_LIST( gamepock_cart, "Epoch Game Pocket Computer cartridges" )
 
