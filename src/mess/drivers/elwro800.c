@@ -541,19 +541,38 @@ static const floppy_config elwro800jr_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+/* F4 Character Displayer */
+static const gfx_layout elwro800_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	128,					/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( elwro800 )
+	GFXDECODE_ENTRY( "maincpu", 0x3c00, elwro800_charlayout, 0, 8 )
+GFXDECODE_END
+
+
 static MACHINE_DRIVER_START( elwro800 )
 
 	MDRV_DRIVER_DATA(elwro800_state)
 
-    /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, 3500000)	/* 3.5 MHz */
-    MDRV_CPU_PROGRAM_MAP(elwro800_mem)
-    MDRV_CPU_IO_MAP(elwro800_io)
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu",Z80, 3500000)	/* 3.5 MHz */
+	MDRV_CPU_PROGRAM_MAP(elwro800_mem)
+	MDRV_CPU_IO_MAP(elwro800_io)
 	MDRV_CPU_VBLANK_INT("screen", elwro800jr_interrupt)
 
-    MDRV_MACHINE_RESET(elwro800)
+	MDRV_MACHINE_RESET(elwro800)
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50.08)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -562,13 +581,14 @@ static MACHINE_DRIVER_START( elwro800 )
 	MDRV_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT( spectrum )
+	MDRV_GFXDECODE(elwro800)
 
 	MDRV_VIDEO_START( spectrum )
 	MDRV_VIDEO_UPDATE( spectrum )
 	MDRV_VIDEO_EOF( spectrum )
 
 	MDRV_UPD765A_ADD("upd765", elwro800jr_upd765_interface)
-    MDRV_I8255A_ADD( "ppi8255", elwro800jr_ppi8255_interface)
+	MDRV_I8255A_ADD( "ppi8255", elwro800jr_ppi8255_interface)
 
 	/* printer */
 	MDRV_CENTRONICS_ADD("centronics", elwro800jr_centronics_interface)

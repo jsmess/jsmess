@@ -371,12 +371,31 @@ static const floppy_config specpls3_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+/* F4 Character Displayer */
+static const gfx_layout spectrum_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	96,					/* 96 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( specpls3 )
+	GFXDECODE_ENTRY( "maincpu", 0x1fd00, spectrum_charlayout, 0, 8 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( spectrum_plus3 )
 	MDRV_IMPORT_FROM( spectrum_128 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(spectrum_plus3_io)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50.01)
+	MDRV_GFXDECODE(specpls3)
 
 	MDRV_MACHINE_RESET( spectrum_plus3 )
 

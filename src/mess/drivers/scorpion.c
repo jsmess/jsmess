@@ -327,6 +327,62 @@ static MACHINE_START( scorpion )
 {
 	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, nmi_check_callback);
 }
+
+
+/* F4 Character Displayer */
+static const gfx_layout spectrum_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	96,					/* 96 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static const gfx_layout quorum_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	160,					/* 160 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static const gfx_layout profi_8_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	224,					/* 224 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( scorpion )
+	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
+GFXDECODE_END
+
+static GFXDECODE_START( profi )
+	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "maincpu", 0x1abfc, profi_8_charlayout, 0, 8 )
+	/* There are more characters after this, that haven't been decoded */
+GFXDECODE_END
+
+static GFXDECODE_START( quorum )
+	GFXDECODE_ENTRY( "maincpu", 0x1fb00, quorum_charlayout, 0, 8 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( scorpion )
 	MDRV_IMPORT_FROM( spectrum_128 )
 	MDRV_CPU_MODIFY("maincpu")
@@ -334,12 +390,23 @@ static MACHINE_DRIVER_START( scorpion )
 	
 	MDRV_MACHINE_START( scorpion )
 	MDRV_MACHINE_RESET( scorpion )
+	MDRV_GFXDECODE(scorpion)
 
 	MDRV_BETA_DISK_ADD(BETA_DISK_TAG)
 
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("256K")
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( profi )
+	MDRV_IMPORT_FROM( scorpion )
+	MDRV_GFXDECODE(profi)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( quorum )
+	MDRV_IMPORT_FROM( scorpion )
+	MDRV_GFXDECODE(quorum)
 MACHINE_DRIVER_END
 
 
@@ -357,29 +424,29 @@ ROM_START(scorpion)
 	ROMX_LOAD("scorp1.rom", 0x014000, 0x4000, CRC(9d513013) SHA1(367b5a102fb663beee8e7930b8c4acc219c1f7b3), ROM_BIOS(1))
 	ROMX_LOAD("scorp2.rom", 0x018000, 0x4000, CRC(fd0d3ce1) SHA1(07783ee295274d8ff15d935bfd787c8ac1d54900), ROM_BIOS(1))
 	ROMX_LOAD("scorp3.rom", 0x01c000, 0x4000, CRC(1fe1d003) SHA1(33703e97cc93b7edfcc0334b64233cf81b7930db), ROM_BIOS(1))
-    ROM_SYSTEM_BIOS(1, "v2", "V.2.92 joined")
-    ROMX_LOAD( "scorpion.rom", 0x010000, 0x10000, CRC(fef73c28) SHA1(66cecdadf992d8adb9c66deee929eb56600dc9bc), ROM_BIOS(2))
-    ROM_SYSTEM_BIOS(2, "v3", "V.2.94")
-    ROMX_LOAD( "scorp294.rom", 0x010000, 0x10000, CRC(99f57ce1) SHA1(083bb57ad52cc871b92d3e1794fd9790872c3584), ROM_BIOS(3))
-    ROM_SYSTEM_BIOS(3, "v4", "SMUC V.4.02")
-    ROMX_LOAD( "scorp402.rom", 0x010000, 0x20000, CRC(9fcf893d) SHA1(0cc7ba60f5cfc36e75bd3a5c90e26b2a1905a970), ROM_BIOS(4))
-    ROM_SYSTEM_BIOS(4, "v5", "ProfROM V.3.9f")
-    ROMX_LOAD( "prof_39f.rom", 0x010000, 0x20000, CRC(c55e64da) SHA1(cec7770fe26350f57f6c325a29db78787dc4521e), ROM_BIOS(5))
-    ROM_SYSTEM_BIOS(5, "v6", "ProfROM V.4.01")
-    ROMX_LOAD( "profrom.rom", 0x010000, 0x80000, CRC(b02d89de) SHA1(4cb85341e2a400e0e88869304d80af430266cdd1), ROM_BIOS(6))
+	ROM_SYSTEM_BIOS(1, "v2", "V.2.92 joined")
+	ROMX_LOAD( "scorpion.rom", 0x010000, 0x10000, CRC(fef73c28) SHA1(66cecdadf992d8adb9c66deee929eb56600dc9bc), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "v3", "V.2.94")
+	ROMX_LOAD( "scorp294.rom", 0x010000, 0x10000, CRC(99f57ce1) SHA1(083bb57ad52cc871b92d3e1794fd9790872c3584), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(3, "v4", "SMUC V.4.02")
+	ROMX_LOAD( "scorp402.rom", 0x010000, 0x20000, CRC(9fcf893d) SHA1(0cc7ba60f5cfc36e75bd3a5c90e26b2a1905a970), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(4, "v5", "ProfROM V.3.9f")
+	ROMX_LOAD( "prof_39f.rom", 0x010000, 0x20000, CRC(c55e64da) SHA1(cec7770fe26350f57f6c325a29db78787dc4521e), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(5, "v6", "ProfROM V.4.01")
+	ROMX_LOAD( "profrom.rom", 0x010000, 0x80000, CRC(b02d89de) SHA1(4cb85341e2a400e0e88869304d80af430266cdd1), ROM_BIOS(6))
 	ROM_SYSTEM_BIOS(6, "v7", "NeOS 256")
-    ROMX_LOAD("neos_256.rom", 0x010000, 0x4000, CRC(364ae09a) SHA1(bb6db1947415503a6bc48f33c603fb3a0dbb3690), ROM_BIOS(7))
+	ROMX_LOAD("neos_256.rom", 0x010000, 0x4000, CRC(364ae09a) SHA1(bb6db1947415503a6bc48f33c603fb3a0dbb3690), ROM_BIOS(7))
 	ROMX_LOAD("scorp1.rom",   0x014000, 0x4000, CRC(9d513013) SHA1(367b5a102fb663beee8e7930b8c4acc219c1f7b3), ROM_BIOS(7))
 	ROMX_LOAD("scorp2.rom",   0x018000, 0x4000, CRC(fd0d3ce1) SHA1(07783ee295274d8ff15d935bfd787c8ac1d54900), ROM_BIOS(7))
 	ROMX_LOAD("scorp3.rom",   0x01c000, 0x4000, CRC(1fe1d003) SHA1(33703e97cc93b7edfcc0334b64233cf81b7930db), ROM_BIOS(7))
-    ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 
 	ROM_REGION(0x01000, "keyboard", 0)
 	ROM_LOAD( "scrpkey.rom", 0x0000, 0x1000, CRC(e938a510) SHA1(2753993c97ff0fc6cff26ed792929abc1288dc6f))
 
 	ROM_REGION(0x010000, "gsound", 0)
-    ROM_LOAD( "gs104.rom", 0x0000, 0x8000, CRC(7a365ba6) SHA1(c865121306eb3a7d811d82fbcc653b4dc1d6fa3d))
-    ROM_LOAD( "gs105a.rom", 0x8000, 0x8000, CRC(1cd490c6) SHA1(1ba78923dc7d803e7995c165992e14e4608c2153))
+	ROM_LOAD( "gs104.rom", 0x0000, 0x8000, CRC(7a365ba6) SHA1(c865121306eb3a7d811d82fbcc653b4dc1d6fa3d))
+	ROM_LOAD( "gs105a.rom", 0x8000, 0x8000, CRC(1cd490c6) SHA1(1ba78923dc7d803e7995c165992e14e4608c2153))
 ROM_END
 
 ROM_START(profi)
@@ -410,17 +477,17 @@ ROM_END
 ROM_START( kay1024 )
 	ROM_REGION(0x020000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "v1", "ver 1")
-    ROMX_LOAD( "kay98.rom",    0x010000, 0x08000, CRC(7fbf2d43) SHA1(e555f2ed01ecf2231d493bd70a4d79b436e9f10e), ROM_BIOS(1))
-    ROMX_LOAD( "trd503.rom",   0x01c000, 0x04000, CRC(10751aba) SHA1(21695e3f2a8f796386ce66eea8a246b0ac44810c), ROM_BIOS(1))
+	ROMX_LOAD( "kay98.rom",    0x010000, 0x08000, CRC(7fbf2d43) SHA1(e555f2ed01ecf2231d493bd70a4d79b436e9f10e), ROM_BIOS(1))
+	ROMX_LOAD( "trd503.rom",   0x01c000, 0x04000, CRC(10751aba) SHA1(21695e3f2a8f796386ce66eea8a246b0ac44810c), ROM_BIOS(1))
   	ROM_SYSTEM_BIOS(1, "v2", "Kramis V0.2")
-    ROMX_LOAD( "kay1024b.rom", 0x010000, 0x10000, CRC(ab99c31e) SHA1(cfa9e6553aea72956fce4f0130c007981d684734), ROM_BIOS(2))
-    ROM_SYSTEM_BIOS(2, "v3", "Kramis V0.3")
+	ROMX_LOAD( "kay1024b.rom", 0x010000, 0x10000, CRC(ab99c31e) SHA1(cfa9e6553aea72956fce4f0130c007981d684734), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "v3", "Kramis V0.3")
   	ROMX_LOAD( "kay1024s.rom", 0x010000, 0x10000, CRC(67351caa) SHA1(1d9c0606b380c000ca1dfa33f90a122ecf9df1f1), ROM_BIOS(3))
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1994, scorpion, spec128,	 0,		scorpion,	spec_plus,	0,		"Zonov and Co.",		"Scorpion ZS-256", GAME_NOT_WORKING )
-COMP( 1991, profi, 	  spec128,	 0,		scorpion,	spec_plus,	0,		"Kondor and Kramis",		"Profi", GAME_NOT_WORKING )
-COMP( 1998, kay1024,  spec128,	 0,		scorpion,	spec_plus,	0,		"NEMO",		"Kay 1024", GAME_NOT_WORKING )
-COMP( ????, quorum,   spec128,	 0,		scorpion,	spec_plus,	0,		"",		"Quorum", GAME_NOT_WORKING )
+COMP( 1994, scorpion, spec128,	 0,	scorpion,	spec_plus,	0,		"Zonov and Co.",		"Scorpion ZS-256", GAME_NOT_WORKING )
+COMP( 1991, profi,    spec128,	 0,	profi,  	spec_plus,	0,		"Kondor and Kramis",		"Profi", GAME_NOT_WORKING )
+COMP( 1998, kay1024,  spec128,	 0,	scorpion,	spec_plus,	0,		"NEMO",		"Kay 1024", GAME_NOT_WORKING )
+COMP( ????, quorum,   spec128,	 0,	quorum, 	spec_plus,	0,		"",		"Quorum", GAME_NOT_WORKING )

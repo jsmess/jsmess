@@ -125,6 +125,24 @@ static MACHINE_RESET( pentagon )
 	pentagon_update_memory(machine);
 }
 
+/* F4 Character Displayer */
+static const gfx_layout spectrum_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	96,					/* 96 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( pentagon )
+	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( pentagon )
 	MDRV_IMPORT_FROM( spectrum_128 )
 	MDRV_CPU_MODIFY("maincpu")
@@ -132,6 +150,7 @@ static MACHINE_DRIVER_START( pentagon )
 	MDRV_MACHINE_RESET( pentagon )
 
 	MDRV_BETA_DISK_ADD(BETA_DISK_TAG)
+	MDRV_GFXDECODE(pentagon)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pent1024 )

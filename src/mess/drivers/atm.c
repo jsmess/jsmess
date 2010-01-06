@@ -119,6 +119,29 @@ static MACHINE_RESET( atm )
 	atm_update_memory(machine);
 }
 
+/* F4 Character Displayer */
+static const gfx_layout spectrum_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	96,					/* 96 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( atm )
+	GFXDECODE_ENTRY( "maincpu", 0x1fd00, spectrum_charlayout, 0, 8 )
+GFXDECODE_END
+
+static GFXDECODE_START( atmtb2 )
+	GFXDECODE_ENTRY( "maincpu", 0x13d00, spectrum_charlayout, 0, 8 )
+GFXDECODE_END
+
+
 static MACHINE_DRIVER_START( atm )
 	MDRV_IMPORT_FROM( spectrum_128 )
 	MDRV_CPU_MODIFY("maincpu")
@@ -126,8 +149,13 @@ static MACHINE_DRIVER_START( atm )
 	MDRV_MACHINE_RESET( atm )
 
 	MDRV_BETA_DISK_ADD(BETA_DISK_TAG)
+	MDRV_GFXDECODE(atm)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( atmtb2 )
+	MDRV_IMPORT_FROM( atm )
+	MDRV_GFXDECODE(atmtb2)
+MACHINE_DRIVER_END
 
 
 /***************************************************************************
@@ -148,7 +176,7 @@ ROM_START( atm )
 	ROMX_LOAD( "atm106-3.rom", 0x018000, 0x4000, CRC(124ad9e0) SHA1(d07fcdeca892ee80494d286ea9ea5bf3928a1aca), ROM_BIOS(3))
 	ROMX_LOAD( "atm106-4.rom", 0x01c000, 0x4000, CRC(f352f2ab) SHA1(6045500ab01be708cef62327e9821b4a358a4673), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(3, "v4", "v.1.03rs")
-    ROMX_LOAD( "atm103rs.rom", 0x010000, 0x10000, CRC(cdec1dfb) SHA1(08190807c6b110cb2e657d8e7d0ad18668915375), ROM_BIOS(4))
+	ROMX_LOAD( "atm103rs.rom", 0x010000, 0x10000, CRC(cdec1dfb) SHA1(08190807c6b110cb2e657d8e7d0ad18668915375), ROM_BIOS(4))
 
   	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
@@ -179,5 +207,5 @@ ROM_END
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
 COMP( 1991, atm, 	spec128,	0,		atm,	spec_plus,	0,			"MicroART",		"ATM", GAME_NOT_WORKING)
 //COMP( 1991, atmtb1,   spec128,    0,      atm,    spec_plus,  0,      "MicroART",     "ATM-turbo1", GAME_NOT_WORKING)
-COMP( 1993, atmtb2, spec128,	0,		atm,	spec_plus,	0,			"MicroART",		"ATM-turbo2", GAME_NOT_WORKING)
+COMP( 1993, atmtb2, spec128,	0,		atmtb2,	spec_plus,	0,			"MicroART",		"ATM-turbo2", GAME_NOT_WORKING)
 //COMP( 1994, turbo2, spec128,  0,      atm,    spec_plus,  0,          "MicroART",     "TURBO 2+", GAME_NOT_WORKING)

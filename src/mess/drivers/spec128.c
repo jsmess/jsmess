@@ -84,7 +84,7 @@ xx/xx/2001  KS -    TS-2068 sound fixed.
                 like monitors, tape copiers, decrunchers, etc.
                 works now.
                 Fixed problem with interrupt vector set to 0xffff (much
-            more 128k games works now).
+		more 128k games works now).
                 A useful used trick on the Spectrum is to set
                 interrupt vector to 0xffff (using the table
                 which contain 0xff's) and put a byte 0x18 hex,
@@ -96,13 +96,13 @@ xx/xx/2001  KS -    TS-2068 sound fixed.
                 causes Spectrum to reset. Fixing this problem
                 made much more software runing (i.e. Paperboy).
             Corrected frames per second value for 48k and 128k
-            Sincalir machines.
+            Sinclair machines.
                 There are 50.08 frames per second for Spectrum
                 48k what gives 69888 cycles for each frame and
                 50.021 for Spectrum 128/+2/+2A/+3 what gives
                 70908 cycles for each frame.
-            Remaped some Spectrum+ keys.
-                Presing F3 to reset was seting 0xf7 on keyboard
+            Remapped some Spectrum+ keys.
+                Pressing F3 to reset was seting 0xf7 on keyboard
                 input port. Problem occured for snapshots of
                 some programms where it was readed as pressing
                 key 4 (which is exit in Tapecopy by R. Dannhoefer
@@ -141,6 +141,10 @@ Notes:
 Very detailed infos about the ZX Spectrum +3e can be found at
 
 http://www.z88forever.org.uk/zxplus3e/
+
+
+The hc2000 corrupts its memory, especially if you type something, and the
+resulting mess can be seen in the F4 viewer display.
 
 *******************************************************************************/
 
@@ -262,6 +266,25 @@ static MACHINE_RESET( spectrum_128 )
 	MACHINE_RESET_CALL(spectrum);
 }
 
+/* F4 Character Displayer */
+static const gfx_layout spectrum_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	96,					/* 96 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( spec128 )
+	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
+GFXDECODE_END
+
+
 MACHINE_DRIVER_START( spectrum_128 )
 	MDRV_IMPORT_FROM( spectrum )
 
@@ -271,12 +294,13 @@ MACHINE_DRIVER_START( spectrum_128 )
 
 	MDRV_MACHINE_RESET( spectrum_128 )
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT( spectrum )
 	MDRV_SCREEN_REFRESH_RATE(50.021)
 	MDRV_VIDEO_START( spectrum_128 )
+	MDRV_GFXDECODE(spec128)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("ay8912", AY8912, 1773400)
