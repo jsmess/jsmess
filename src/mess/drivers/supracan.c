@@ -37,7 +37,7 @@ static UINT8 spr_flags;
 static UINT32 tilemap_base_addr[4];
 static int tilemap_scrollx[4],tilemap_scrolly[4];
 static UINT16 video_flags;
-static UINT16 tilemap_flags[4],tilemap_bank[4];
+static UINT16 tilemap_flags[4],tilemap_mode[4];
 static UINT16 irq_mask;
 
 static UINT16 supracan_video_regs[256];
@@ -89,17 +89,26 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 	int x,y;
 	int scrollx,scrolly;
 	int region;
-	int tile_bank;
+	int gfx_mode;
 	int x_size;
+	UINT16 tile_bank;
 
 	count = (tilemap_base_addr[layer]);
 	scrollx = (tilemap_scrolly[layer] & 0x800) ? (0x100 - (tilemap_scrolly[layer] & 0xff)) : (tilemap_scrolly[layer] & 0xff);
 	scrolly = (tilemap_scrollx[layer] & 0x800) ? (0x100 - (tilemap_scrollx[layer] & 0xff)) : (tilemap_scrollx[layer] & 0xff);
-	region = (tilemap_flags[layer] & 0x200) ? 0 : 1;
-	tile_bank = (tilemap_bank[layer] & 0x4000) >> 4;
-	x_size = (video_flags & 0x8000) ? 32 : 64; //FIXME: temp kludge
+	x_size = (tilemap_flags[layer] & 0x200) ? 64 : 32;
+	gfx_mode = (tilemap_mode[layer] & 0x7000) >> 12;
 
-	for (y=0;y<32;y++)
+	switch(gfx_mode)
+	{
+		case 7:  region = 2; tile_bank = 0x1c00; break;
+		case 4:  region = 0; tile_bank = 0x400;  break;
+		case 0:  region = 1; tile_bank = 0;      break;
+		default: region = 1; tile_bank = 0;      break;
+	}
+
+
+	for (y=0;y<64;y++)
 	{
 		for (x=0;x<x_size;x++)
 		{
@@ -199,7 +208,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-/* FIXME: vram is currently hardcoded, but there's an high chance it's tied to some video registers */
 static VIDEO_UPDATE( supracan )
 {
 	bitmap_fill(bitmap, cliprect, 0);
@@ -253,12 +261,24 @@ static VIDEO_UPDATE( supracan )
 		}
 	}
 #endif
+
 	if(video_flags & 0x20) //guess, not tested
 		draw_tilemap(screen->machine,bitmap,cliprect,2);
-	if(video_flags & 0x40)
-		draw_tilemap(screen->machine,bitmap,cliprect,1);
-	if(video_flags & 0x80)
-		draw_tilemap(screen->machine,bitmap,cliprect,0);
+
+	if((tilemap_flags[1] & 0x7000) < (tilemap_flags[0] & 0x7000)) //pri number?
+	{
+		if(video_flags & 0x80)
+			draw_tilemap(screen->machine,bitmap,cliprect,0);
+		if(video_flags & 0x40)
+			draw_tilemap(screen->machine,bitmap,cliprect,1);
+	}
+	else
+	{
+		if(video_flags & 0x40)
+			draw_tilemap(screen->machine,bitmap,cliprect,1);
+		if(video_flags & 0x80)
+			draw_tilemap(screen->machine,bitmap,cliprect,0);
+	}
 	if(video_flags & 8)
 		draw_sprites(screen->machine,bitmap,cliprect);
 
@@ -387,6 +407,7 @@ static WRITE16_HANDLER( supracan_char_w )
 
 		gfx_element_mark_dirty(space->machine->gfx[0], offset/32);
 		gfx_element_mark_dirty(space->machine->gfx[1], offset/16);
+		gfx_element_mark_dirty(space->machine->gfx[2], offset/8);
 	}
 }
 
@@ -714,17 +735,17 @@ static WRITE16_HANDLER( supracan_video_w )
 		case 0x104/2: tilemap_scrollx[0] = data; break;
 		case 0x106/2: tilemap_scrolly[0] = data; break;
 		case 0x108/2: tilemap_base_addr[0] = (data) << 1; break;
-		case 0x10a/2: tilemap_bank[0] = data; break;
+		case 0x10a/2: tilemap_mode[0] = data; break;
 		case 0x120/2: tilemap_flags[1] = data; break;
 		case 0x124/2: tilemap_scrollx[1] = data; break;
 		case 0x126/2: tilemap_scrolly[1] = data; break;
 		case 0x128/2: tilemap_base_addr[1] = (data) << 1; break;
-		case 0x12a/2: tilemap_bank[1] = data; break;
+		case 0x12a/2: tilemap_mode[1] = data; break;
 		case 0x140/2: tilemap_flags[2] = data; break;
 		case 0x144/2: tilemap_scrollx[2] = data; break;
 		case 0x146/2: tilemap_scrolly[2] = data; break;
 		case 0x148/2: tilemap_base_addr[2] = (data) << 1; break;
-		case 0x14a/2: tilemap_bank[2] = data; break;
+		case 0x14a/2: tilemap_mode[2] = data; break;
 		// Affine transforms of some sort?
 		case ACAN_VID_XFORM32A_H:
 		case ACAN_VID_XFORM32A_L:
@@ -779,7 +800,7 @@ static MACHINE_RESET( supracan )
 	irq_mask = 0;
 }
 
-static const gfx_layout supracan_gfxlayout =
+static const gfx_layout supracan_gfx8bpp =
 {
 	8,8,
 	RGN_FRAC(1,1),
@@ -790,7 +811,7 @@ static const gfx_layout supracan_gfxlayout =
 	8*8*8
 };
 
-static const gfx_layout supracan_sprlayout =
+static const gfx_layout supracan_gfx4bpp =
 {
 	8,8,
 	RGN_FRAC(1,1),
@@ -801,9 +822,22 @@ static const gfx_layout supracan_sprlayout =
 	8*32
 };
 
+static const gfx_layout supracan_gfx2bpp =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	2,
+	{ 0,1 },
+	{ 0*2, 1*2, 2*2, 3*2, 4*2, 5*2, 6*2, 7*2 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	8*16
+};
+
+
 static GFXDECODE_START( supracan )
-	GFXDECODE_ENTRY( "ram_gfx",  0, supracan_gfxlayout,   0, 1 )
-	GFXDECODE_ENTRY( "ram_gfx",  0, supracan_sprlayout,   0, 0x10 )
+	GFXDECODE_ENTRY( "ram_gfx",  0, supracan_gfx8bpp,   0, 1 )
+	GFXDECODE_ENTRY( "ram_gfx",  0, supracan_gfx4bpp,   0, 0x10 )
+	GFXDECODE_ENTRY( "ram_gfx",  0, supracan_gfx2bpp,   0, 0x10 )
 GFXDECODE_END
 
 static INTERRUPT_GEN( supracan_irq )
