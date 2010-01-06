@@ -380,6 +380,9 @@ static WRITE16_HANDLER( supracan_dma_w )
 						memory_write_word(space, acan_dma_regs.dest[ch], memory_read_word(space, acan_dma_regs.source[ch]));
 						acan_dma_regs.dest[ch]+=2;
 						acan_dma_regs.source[ch]+=2;
+						if(data & 0x0100)
+							if((acan_dma_regs.dest[ch] & 0xf) == 0)
+								acan_dma_regs.dest[ch]-=0x10;
 					}
 					else
 					{
@@ -741,8 +744,8 @@ static WRITE16_HANDLER( supracan_video_w )
 				rectangle visarea = *video_screen_get_visible_area(space->machine->primary_screen);
 
 				visarea.min_x = visarea.min_y = 0;
-				visarea.max_y = 240;
-				visarea.max_x = (video_flags & 0x100) ? 320 : 256;
+				visarea.max_y = 240 - 1;
+				visarea.max_x = ((video_flags & 0x100) ? 320 : 256) - 1;
 				video_screen_configure(space->machine->primary_screen, 348, 256, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds);
 			}
 			break;
