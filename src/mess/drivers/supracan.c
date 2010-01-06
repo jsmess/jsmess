@@ -90,13 +90,22 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 	int scrollx,scrolly;
 	int region;
 	int gfx_mode;
-	int x_size;
+	int size;
 	UINT16 tile_bank;
 
 	count = (tilemap_base_addr[layer]);
-	scrollx = (tilemap_scrolly[layer] & 0x800) ? (0x100 - (tilemap_scrolly[layer] & 0xff)) : (tilemap_scrolly[layer] & 0xff);
-	scrolly = (tilemap_scrollx[layer] & 0x800) ? (0x100 - (tilemap_scrollx[layer] & 0xff)) : (tilemap_scrollx[layer] & 0xff);
-	x_size = (tilemap_flags[layer] & 0x200) ? 64 : 32;
+	size = (tilemap_flags[layer] & 0x200) ? 64 : 32;
+	/* FIXME: swap scrollx / scrolly */
+	if(size == 64)
+	{
+		scrolly = (tilemap_scrolly[layer] & 0x800) ? ((tilemap_scrolly[layer] & 0x1ff) - 0x200) : (tilemap_scrolly[layer] & 0x1ff);
+		scrollx = (tilemap_scrollx[layer] & 0x800) ? ((tilemap_scrollx[layer] & 0x1ff) - 0x200) : (tilemap_scrollx[layer] & 0x1ff);
+	}
+	else
+	{
+		scrolly = (tilemap_scrolly[layer] & 0x800) ? ((tilemap_scrolly[layer] & 0xff) - 0x100) : (tilemap_scrolly[layer] & 0xff);
+		scrollx = (tilemap_scrollx[layer] & 0x800) ? ((tilemap_scrollx[layer] & 0xff) - 0x100) : (tilemap_scrollx[layer] & 0xff);
+	}
 	gfx_mode = (tilemap_mode[layer] & 0x7000) >> 12;
 
 	switch(gfx_mode)
@@ -108,9 +117,9 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 
 
-	for (y=0;y<64;y++)
+	for (y=0;y<size;y++)
 	{
-		for (x=0;x<x_size;x++)
+		for (x=0;x<size;x++)
 		{
 			int tile, flipx, flipy, pal;
 			tile = (supracan_vram[count] & 0x03ff) + tile_bank;
@@ -118,12 +127,25 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = (supracan_vram[count] & 0x0400) ? 1 : 0;
 			pal = (supracan_vram[count] & 0xf000) >> 12;
 
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly,0);
-			if(tilemap_flags[layer] & 0x20) //wrap-around enable
+			if(size == 64)
 			{
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+256,(y*8)-scrolly,0);
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly+256,0);
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+256,(y*8)-scrolly+256,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly,0);
+				if(tilemap_flags[layer] & 0x20) //wrap-around enable
+				{
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+512,(y*8)-scrolly,0);
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly+512,0);
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+512,(y*8)-scrolly+512,0);
+				}
+			}
+			else
+			{
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly,0);
+				if(tilemap_flags[layer] & 0x20) //wrap-around enable
+				{
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+256,(y*8)-scrolly,0);
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly+256,0);
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+256,(y*8)-scrolly+256,0);
+				}
 			}
 			count++;
 		}
@@ -333,13 +355,15 @@ static WRITE16_HANDLER( supracan_dma_w )
 			break;
 		case 0x0a/2: // Control
 			//if(acan_dma_regs.dest != 0xf00200)
-			//printf("%08x %08x %02x %04x\n",acan_dma_regs.source,acan_dma_regs.dest,acan_dma_regs.count + 1,data);
+			printf("%08x %08x %02x %04x\n",acan_dma_regs.source,acan_dma_regs.dest,acan_dma_regs.count + 1,data);
 			if(data & 0x8800)
 			{
 				//if(data != 0x9800 && data != 0x8800)
 				//{
 				//	fatalerror("%04x",data);
 				//}
+				if(data & 0x2000)
+					acan_dma_regs.source-=2;
 				verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_dma_regs.source, acan_dma_regs.dest, acan_dma_regs.count + 1, data);
 				for(i = 0; i <= acan_dma_regs.count; i++)
 				{
@@ -353,7 +377,10 @@ static WRITE16_HANDLER( supracan_dma_w )
 					{
 						memory_write_byte(space, acan_dma_regs.dest, memory_read_byte(space, acan_dma_regs.source));
 						acan_dma_regs.dest++;
-						acan_dma_regs.source++;
+						if(data & 0x2000)
+							acan_dma_regs.source--;
+						else
+							acan_dma_regs.source++;
 					}
 				}
 			}
@@ -431,9 +458,7 @@ static INPUT_PORTS_START( supracan )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Joypad B4")
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Joypad B2")
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("P1 Joypad Right")
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_NAME("P1 Joypad Left")
@@ -443,9 +468,7 @@ static INPUT_PORTS_START( supracan )
 	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x1000, DEF_STR( On ) )
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( On ) )
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Joypad B3")
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Joypad B1")
 
 	PORT_START("P2")
@@ -467,9 +490,7 @@ static INPUT_PORTS_START( supracan )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Joypad B4")
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Joypad B2")
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_NAME("P2 Joypad Right")
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_NAME("P2 Joypad Left")
@@ -479,9 +500,7 @@ static INPUT_PORTS_START( supracan )
 	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x1000, DEF_STR( On ) )
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( On ) )
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Joypad B3")
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Joypad B1")
 
 	PORT_START("P3")
@@ -503,9 +522,7 @@ static INPUT_PORTS_START( supracan )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(3) PORT_NAME("P3 Joypad B4")
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 Joypad B2")
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3) PORT_NAME("P3 Joypad Right")
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3) PORT_NAME("P3 Joypad Left")
@@ -515,9 +532,7 @@ static INPUT_PORTS_START( supracan )
 	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x1000, DEF_STR( On ) )
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_START3 )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( On ) )
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Joypad B3")
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 Joypad B1")
 
 	PORT_START("P4")
@@ -539,9 +554,7 @@ static INPUT_PORTS_START( supracan )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(4) PORT_NAME("P4 Joypad B4")
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("P4 Joypad B2")
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4) PORT_NAME("P4 Joypad Right")
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4) PORT_NAME("P4 Joypad Left")
@@ -551,9 +564,7 @@ static INPUT_PORTS_START( supracan )
 	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x1000, DEF_STR( On ) )
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_START4 )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( On ) )
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("P4 Joypad B3")
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 Joypad B1")
 INPUT_PORTS_END
 
