@@ -94,7 +94,7 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 	UINT16 tile_bank;
 
 	count = (tilemap_base_addr[layer]);
-	size = (tilemap_flags[layer] & 0x200) ? 64 : 32;
+	size = (video_flags & 0x100) ? 64 : 32;
 	/* FIXME: swap scrollx / scrolly */
 	if(size == 64)
 	{
@@ -362,8 +362,8 @@ static WRITE16_HANDLER( supracan_dma_w )
 				//{
 				//	fatalerror("%04x",data);
 				//}
-				if(data & 0x2000)
-					acan_dma_regs.source-=2;
+//				if(data & 0x2000)
+//					acan_dma_regs.source-=2;
 				verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_dma_regs.source, acan_dma_regs.dest, acan_dma_regs.count + 1, data);
 				for(i = 0; i <= acan_dma_regs.count; i++)
 				{
@@ -377,10 +377,7 @@ static WRITE16_HANDLER( supracan_dma_w )
 					{
 						memory_write_byte(space, acan_dma_regs.dest, memory_read_byte(space, acan_dma_regs.source));
 						acan_dma_regs.dest++;
-						if(data & 0x2000)
-							acan_dma_regs.source--;
-						else
-							acan_dma_regs.source++;
+						acan_dma_regs.source++;
 					}
 				}
 			}
@@ -404,6 +401,7 @@ static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xe81000, 0xe8ffff ) AM_RAM_WRITE( supracan_soundram_w ) AM_BASE( &supracan_soundram_16 )
 	AM_RANGE( 0xe90000, 0xe9001f ) AM_WRITE( supracan_sound_w )
 	AM_RANGE( 0xe90020, 0xe9002b ) AM_WRITE( supracan_dma_w )
+	AM_RANGE( 0xe90030, 0xe9003b ) AM_WRITE( supracan_dma_w ) //FIXME: clean me up
 	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE( supracan_video_r, supracan_video_w )
 	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE( 0xf40000, 0xf5ffff ) AM_RAM_WRITE(supracan_char_w) AM_BASE(&supracan_vram)	/* Unknown, some data gets copied here during boot */
