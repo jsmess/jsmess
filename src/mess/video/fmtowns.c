@@ -725,7 +725,7 @@ void render_sprite_16(UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 y
 			voffset += (towns_crtc_reg[24] * 4) * ypos;  // scanline size in bytes * y pos
 			voffset += (xpos & 0x1ff) * 2;
 			voffset &= 0x7ffff;
-			if(xpos <= rect->max_x && ypos <= rect->max_y)
+			if(xpos <= rect->max_x && ypos <= rect->max_y && col < 0x8000)
 			{
 				towns_gfxvram[voffset+1] = (col & 0xff00) >> 8;
 				towns_gfxvram[voffset] = col & 0x00ff;
