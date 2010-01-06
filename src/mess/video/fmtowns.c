@@ -655,10 +655,7 @@ void render_sprite_4(UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 
 		for(xpos=xstart;xpos!=xend;xpos+=xdir)
 		{
 			voffset = 0;
-			if(xflip)
-				pixel = towns_sprram[poffset] & 0x0f;
-			else
-				pixel = (towns_sprram[poffset] & 0xf0) >> 4;
+			pixel = (towns_sprram[poffset] & 0xf0) >> 4;
 			col = towns_sprram[coffset+(pixel*2)] | (towns_sprram[coffset+(pixel*2)+1] << 8);
 			voffset += (towns_crtc_reg[24] * 4) * ypos;  // scanline size in bytes * y pos
 			voffset += (xpos & 0x1ff) * 2;
@@ -670,15 +667,10 @@ void render_sprite_4(UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 
 				towns_gfxvram[voffset] = col & 0x00ff;
 			}
 			if(xflip)
-			{
 				voffset+=2;
-				pixel = (towns_sprram[poffset] & 0xf0) >> 4;
-			}
 			else
-			{
 				voffset-=2;
-				pixel = towns_sprram[poffset] & 0x0f;
-			}
+			pixel = towns_sprram[poffset] & 0x0f;
 			col = towns_sprram[coffset+(pixel*2)] | (towns_sprram[coffset+(pixel*2)+1] << 8);
 			voffset &= 0x3ffff;
 			voffset += (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
