@@ -401,7 +401,7 @@ static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xe81000, 0xe8ffff ) AM_RAM_WRITE( supracan_soundram_w ) AM_BASE( &supracan_soundram_16 )
 	AM_RANGE( 0xe90000, 0xe9001f ) AM_WRITE( supracan_sound_w )
 	AM_RANGE( 0xe90020, 0xe9002b ) AM_WRITE( supracan_dma_w )
-	AM_RANGE( 0xe90030, 0xe9003b ) AM_WRITE( supracan_dma_w ) //FIXME: clean me up
+//	AM_RANGE( 0xe90030, 0xe9003b ) AM_WRITE( supracan_dma_w ) //FIXME: scatter gather list?
 	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE( supracan_video_r, supracan_video_w )
 	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE( 0xf40000, 0xf5ffff ) AM_RAM_WRITE(supracan_char_w) AM_BASE(&supracan_vram)	/* Unknown, some data gets copied here during boot */
@@ -730,6 +730,14 @@ static WRITE16_HANDLER( supracan_video_w )
 			break;
 		case 0x08/2:
 			video_flags = data;
+			{
+				rectangle visarea = *video_screen_get_visible_area(space->machine->primary_screen);
+
+				visarea.min_x = visarea.min_y = 0;
+				visarea.max_y = 240;
+				visarea.max_x = (video_flags & 0x100) ? 320 : 256;
+				video_screen_configure(space->machine->primary_screen, 348, 256, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds);
+			}
 			break;
 		case 0x20/2:
 			spr_base_addr = data << 2;
