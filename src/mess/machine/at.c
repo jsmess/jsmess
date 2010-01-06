@@ -39,6 +39,7 @@
 #define LOG_KBDC	0
 
 static const SOUNDBLASTER_CONFIG soundblaster = { 1,5, {1,0} };
+static int poll_delay;
 
 
 /*************************************************************
@@ -512,7 +513,7 @@ static WRITE8_HANDLER( at_kbdc8042_p2_w )
 	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, ( data & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 
 	/* OPT BUF FULL is connected to IR1 on the master 8259 */
-	if ( st->pic8259_master )
+	if ( st->pic8259_master)
 		pic8259_set_irq_line(st->pic8259_master, 1, ( data & 0x10 ) ? ASSERT_LINE : CLEAR_LINE );
 
 	at_kbdc8042.clock_signal = ( data & 0x40 ) ? 0 : 1;
@@ -563,7 +564,6 @@ MACHINE_DRIVER_END
 
 READ8_HANDLER(at_kbdc8042_r)
 {
-	static int poll_delay = 4;
     UINT8 data = 0;
 	at_state *st = space->machine->driver_data;
 
@@ -765,4 +765,5 @@ MACHINE_RESET( at )
 	st->pit8254 = devtag_get_device(machine, "pit8254");
 	pc_mouse_set_serial_port( devtag_get_device(machine, "ns16450_0") );
 	pc_hdc_set_dma8237_device( st->dma8237_1 );
+	poll_delay = 4;
 }
