@@ -17,6 +17,7 @@
 typedef struct _i82371ab_config i82371ab_config;
 struct _i82371ab_config
 {
+	int dummy;
 };
 
 
