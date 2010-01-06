@@ -1530,7 +1530,7 @@ static void decode_subbios(const device_config *device,offs_t pc)
                 case 3  : set_func("f_graphics_output_off");                break; 
                 case 4  : set_func("f_reinit_graphics_output");             break; 
                 case 5  : set_func("f_polymarker");                         break; 
-                case 6  : set_func("f_polyline");                           break; 
+                case 6  : set_func("f_polyline"); dump_dssi=&decode_dssi_f_fill_area;   break; 
                 case 7  : set_func("f_fill_area"); dump_dssi=&decode_dssi_f_fill_area; break; 
                 case 8  : set_func("f_flood_fill_area"); break; 
                 case 9  : set_func("f_plot_character_string"); dump_dssi=&decode_dssi_f_plot_character_string; break; 

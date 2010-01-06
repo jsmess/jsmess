@@ -91,6 +91,7 @@ static void write_reg_010(void);
 static void write_reg_012(void);
 static void write_reg_014(void);
 static void write_reg_01A(void);
+static void write_reg_01C(void);
 static void write_reg_026(void);
 static void change_palette(running_machine *machine, UINT8 first, UINT16 colours);
 
@@ -182,7 +183,7 @@ WRITE16_HANDLER (nimbus_video_io_w)
         case    reg016  : vidregs[reg016]=data; break;
         case    reg018  : vidregs[reg018]=data; break;
         case    reg01A  : vidregs[reg01A]=data; write_reg_01A(); break;
-        case    reg01C  : vidregs[reg01C]=data; break;
+        case    reg01C  : vidregs[reg01C]=data; write_reg_01C();break;
         case    reg01E  : vidregs[reg01E]=data; break;
 
         case    reg020  : vidregs[reg020]=data; break;
@@ -396,6 +397,20 @@ static void write_reg_014(void)
 static void write_reg_01A(void)
 {
     write_pixel_data(++vidregs[reg002],vidregs[reg00C],vidregs[reg01A]);  
+}
+
+static void write_reg_01C()
+{
+    // I dunno if this is actually what is happening as the regs seem to be write only....
+    // doing this however does seem to make some programs (welcome from the welcom disk, 
+    // and others using the standard RM box menus) work correctly.
+    
+    if(IS_80COL)
+        vidregs[reg00C]=vidregs[reg01C];
+    else
+        vidregs[reg00C]=vidregs[reg01C]/2; 
+
+    write_pixel_data(vidregs[reg002],vidregs[reg01C],FG_COLOUR);
 }
 
 /*
