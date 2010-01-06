@@ -309,13 +309,11 @@ static VIDEO_UPDATE( supracan )
 
 typedef struct
 {
-	UINT32 source;
-	UINT32 dest;
-	UINT16 count;
-	UINT16 control;
+	UINT32 source[2];
+	UINT32 dest[2];
+	UINT16 count[2];
+	UINT16 control[2];
 } _acan_dma_regs_t;
-
-static _acan_dma_regs_t acan_dma_regs;
 
 typedef struct
 {
@@ -325,37 +323,47 @@ typedef struct
 	UINT16 control;
 } _acan_sprdma_regs_t;
 
+static _acan_dma_regs_t acan_dma_regs;
 static _acan_sprdma_regs_t acan_sprdma_regs;
 
 
 static WRITE16_HANDLER( supracan_dma_w )
 {
 	int i;
+	int ch;
+
+	ch = (offset < 0x10/2) ? 0 : 1;
 
 	switch(offset)
 	{
 		case 0x00/2: // Source address MSW
-			acan_dma_regs.source &= 0x0000ffff;
-			acan_dma_regs.source |= data << 16;
+		case 0x10/2:
+			acan_dma_regs.source[ch] &= 0x0000ffff;
+			acan_dma_regs.source[ch] |= data << 16;
 			break;
 		case 0x02/2: // Source address LSW
-			acan_dma_regs.source &= 0xffff0000;
-			acan_dma_regs.source |= data;
+		case 0x12/2:
+			acan_dma_regs.source[ch] &= 0xffff0000;
+			acan_dma_regs.source[ch] |= data;
 			break;
 		case 0x04/2: // Destination address MSW
-			acan_dma_regs.dest &= 0x0000ffff;
-			acan_dma_regs.dest |= data << 16;
+		case 0x14/2:
+			acan_dma_regs.dest[ch] &= 0x0000ffff;
+			acan_dma_regs.dest[ch] |= data << 16;
 			break;
 		case 0x06/2: // Destination address LSW
-			acan_dma_regs.dest &= 0xffff0000;
-			acan_dma_regs.dest |= data;
+		case 0x16/2:
+			acan_dma_regs.dest[ch] &= 0xffff0000;
+			acan_dma_regs.dest[ch] |= data;
 			break;
 		case 0x08/2: // Byte count
-			acan_dma_regs.count = data;
+		case 0x18/2:
+			acan_dma_regs.count[ch] = data;
 			break;
 		case 0x0a/2: // Control
+		case 0x1a/2:
 			//if(acan_dma_regs.dest != 0xf00200)
-			printf("%08x %08x %02x %04x\n",acan_dma_regs.source,acan_dma_regs.dest,acan_dma_regs.count + 1,data);
+			printf("%08x %08x %02x %04x\n",acan_dma_regs.source[ch],acan_dma_regs.dest[ch],acan_dma_regs.count[ch] + 1,data);
 			if(data & 0x8800)
 			{
 				//if(data != 0x9800 && data != 0x8800)
@@ -364,27 +372,27 @@ static WRITE16_HANDLER( supracan_dma_w )
 				//}
 //				if(data & 0x2000)
 //					acan_dma_regs.source-=2;
-				verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_dma_regs.source, acan_dma_regs.dest, acan_dma_regs.count + 1, data);
-				for(i = 0; i <= acan_dma_regs.count; i++)
+				verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_dma_regs.source[ch], acan_dma_regs.dest[ch], acan_dma_regs.count[ch] + 1, data);
+				for(i = 0; i <= acan_dma_regs.count[ch]; i++)
 				{
 					if(data & 0x1000)
 					{
-						memory_write_word(space, acan_dma_regs.dest, memory_read_word(space, acan_dma_regs.source));
-						acan_dma_regs.dest+=2;
-						acan_dma_regs.source+=2;
+						memory_write_word(space, acan_dma_regs.dest[ch], memory_read_word(space, acan_dma_regs.source[ch]));
+						acan_dma_regs.dest[ch]+=2;
+						acan_dma_regs.source[ch]+=2;
 					}
 					else
 					{
-						memory_write_byte(space, acan_dma_regs.dest, memory_read_byte(space, acan_dma_regs.source));
-						acan_dma_regs.dest++;
-						acan_dma_regs.source++;
+						memory_write_byte(space, acan_dma_regs.dest[ch], memory_read_byte(space, acan_dma_regs.source[ch]));
+						acan_dma_regs.dest[ch]++;
+						acan_dma_regs.source[ch]++;
 					}
 				}
 			}
 			else
 			{
-				verboselog(space->machine, 0, "supracan_dma_w: Unknown DMA kickoff value of %04x (other regs %08x, %08x, %d)\n", data, acan_dma_regs.source, acan_dma_regs.dest, acan_dma_regs.count + 1);
-				fatalerror("supracan_dma_w: Unknown DMA kickoff value of %04x (other regs %08x, %08x, %d)",data, acan_dma_regs.source, acan_dma_regs.dest, acan_dma_regs.count + 1);
+				verboselog(space->machine, 0, "supracan_dma_w: Unknown DMA kickoff value of %04x (other regs %08x, %08x, %d)\n", data, acan_dma_regs.source[ch], acan_dma_regs.dest[ch], acan_dma_regs.count[ch] + 1);
+				fatalerror("supracan_dma_w: Unknown DMA kickoff value of %04x (other regs %08x, %08x, %d)",data, acan_dma_regs.source[ch], acan_dma_regs.dest[ch], acan_dma_regs.count[ch] + 1);
 			}
 			break;
 	}
@@ -400,8 +408,7 @@ static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xe80300, 0xe80301 ) AM_READ( supracan_unk1_r )
 	AM_RANGE( 0xe81000, 0xe8ffff ) AM_RAM_WRITE( supracan_soundram_w ) AM_BASE( &supracan_soundram_16 )
 	AM_RANGE( 0xe90000, 0xe9001f ) AM_WRITE( supracan_sound_w )
-	AM_RANGE( 0xe90020, 0xe9002b ) AM_WRITE( supracan_dma_w )
-//	AM_RANGE( 0xe90030, 0xe9003b ) AM_WRITE( supracan_dma_w ) //FIXME: scatter gather list?
+	AM_RANGE( 0xe90020, 0xe9003f ) AM_WRITE( supracan_dma_w )
 	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE( supracan_video_r, supracan_video_w )
 	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE( 0xf40000, 0xf5ffff ) AM_RAM_WRITE(supracan_char_w) AM_BASE(&supracan_vram)	/* Unknown, some data gets copied here during boot */
