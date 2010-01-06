@@ -157,6 +157,9 @@ static UINT8 towns_kb_output;  // key output
 static UINT8 towns_kb_extend;  // extended key output
 static emu_timer* towns_kb_timer;
 static UINT8 towns_fm_irq_flag;
+static UINT8 towns_pcm_irq_flag;
+static UINT8 towns_pcm_channel_flag;
+static UINT8 towns_pcm_channel_mask;
 static UINT8 towns_pad_mask;
 
 static struct towns_cdrom_controller
@@ -715,6 +718,14 @@ static READ8_HANDLER(towns_sound_ctrl_r)
 		case 0x01:
 			if(towns_fm_irq_flag)
 				ret |= 0x01;
+			if(towns_pcm_irq_flag)
+				ret |= 0x08;
+			break;
+		case 0x03:
+			ret = towns_pcm_channel_flag;
+			towns_pcm_channel_flag = 0;
+			towns_pcm_irq_flag = 0;
+			pic8259_set_irq_line(devtag_get_device(space->machine,"pic8259_slave"),5,0);
 			break;
 		default:
 			logerror("FM: unimplemented port 0x%04x read\n",offset + 0x4e8);
@@ -724,7 +735,14 @@ static READ8_HANDLER(towns_sound_ctrl_r)
 
 static WRITE8_HANDLER(towns_sound_ctrl_w)
 {
-	// TODO:
+	switch(offset)
+	{
+		case 0x02:
+			towns_pcm_channel_mask = data;
+			break;
+		default:
+			logerror("FM: unimplemented port 0x%04x write %02x\n",offset + 0x4e8,data);
+	}
 }
 
 // Controller ports
@@ -1571,7 +1589,7 @@ static IRQ_CALLBACK( towns_irq_callback )
 	return r;
 }
 
-// YM3438 interrupt
+// YM3438 interrupt (IRQ 13)
 void towns_fm_irq(const device_config* device, int irq)
 {
 	const device_config* pic = devtag_get_device(device->machine,"pic8259_slave");
@@ -1585,6 +1603,17 @@ void towns_fm_irq(const device_config* device, int irq)
 		towns_fm_irq_flag = 0;
 		pic8259_set_irq_line(pic,5,0);
 	}
+}
+
+// PCM interrupt (IRQ 13)
+void towns_pcm_irq(const device_config* device, int channel)
+{
+	const device_config* pic = devtag_get_device(device->machine,"pic8259_slave");
+
+	towns_pcm_irq_flag = 1;
+	towns_pcm_channel_flag |= (1 << channel);
+	if(towns_pcm_channel_flag & (1 << channel))
+		pic8259_set_irq_line(pic,5,1);
 }
 
 static PIC8259_SET_INT_LINE( towns_pic_irq )
@@ -2025,6 +2054,11 @@ static const ym3438_interface ym3438_intf =
 	towns_fm_irq
 };
 
+static const rf5c68_interface rf5c68_intf =
+{
+	towns_pcm_irq
+};
+
 static const gfx_layout fnt_chars_16x16 =
 {
 	16,16,
@@ -2067,8 +2101,8 @@ static MACHINE_DRIVER_START( towns )
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-    MDRV_SCREEN_SIZE(640, 400)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
+    MDRV_SCREEN_SIZE(768,512)
+    MDRV_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
     MDRV_GFXDECODE(towns)
 
     /* sound hardware */
@@ -2077,6 +2111,7 @@ static MACHINE_DRIVER_START( towns )
 	MDRV_SOUND_CONFIG(ym3438_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("pcm", RF5C68, 53693100 / 7)  // actual clock speed unknown
+	MDRV_SOUND_CONFIG(rf5c68_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 	MDRV_SOUND_ADD("cdda",CDDA,0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
