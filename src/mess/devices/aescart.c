@@ -414,34 +414,31 @@ static DEVICE_START( aes_cartridge )
 static DEVICE_IMAGE_LOAD( aes_cartridge )
 {
 	const device_config *pcbdev = cartslot_get_pcb(image);
-	int result;
+	aes_pcb_t *pcb;
+	cartslot_t *cart;
+	multicart_open_error me;
 
-	if (pcbdev != NULL)
-	{
-		/* If we are here, we have a multicart. */
-		aes_pcb_t *pcb = (aes_pcb_t *)pcbdev->token;
-		cartslot_t *cart = (cartslot_t *)image->token;
-
-		/* try opening this as a multicart */
-		/* This line requires that cartslot_t be included in cartslot.h,
-        otherwise one cannot make use of multicart handling within such a
-        custom LOAD function. */
-		multicart_open_error me = multicart_open(image_filename(image), image->machine->gamedrv->name, MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
-
-		/* Now that we have loaded the image files, let the PCB put them all
-        together. This means we put the images in a structure which allows
-        for a quick access by the memory handlers. Every PCB defines an
-        own assembly method. */
-		if (me == MCERR_NONE)
-			result = pcb->assemble(pcbdev->machine, image);
-		else
-			fatalerror("Error loading multicart: %s\n", multicart_error_text(me));
-	}
-	else
-	{
+	if (pcbdev == NULL)
 		fatalerror("Error loading multicart: no pcb found.\n");
-	}
-	return result;
+
+	/* If we are here, we have a multicart. */
+	pcb = (aes_pcb_t *)pcbdev->token;
+	cart = (cartslot_t *)image->token;
+
+	/* try opening this as a multicart */
+	/* This line requires that cartslot_t be included in cartslot.h,
+    otherwise one cannot make use of multicart handling within such a
+    custom LOAD function. */
+	me = multicart_open(image_filename(image), image->machine->gamedrv->name, MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
+
+	/* Now that we have loaded the image files, let the PCB put them all
+    together. This means we put the images in a structure which allows
+    for a quick access by the memory handlers. Every PCB defines an
+    own assembly method. */
+    if (me != MCERR_NONE)
+		fatalerror("Error loading multicart: %s\n", multicart_error_text(me));
+
+	return pcb->assemble(pcbdev->machine, image);
 }
 
 /*
@@ -527,7 +524,7 @@ static DEVICE_STOP(aes_multicart)
 }
 
 static MACHINE_DRIVER_START(aes_multicart)
- 	MDRV_CARTSLOT_ADD("cartridge1")
+	MDRV_CARTSLOT_ADD("cartridge1")
 	MDRV_CARTSLOT_EXTENSION_LIST("rpk,bin")
 	MDRV_CARTSLOT_PCBTYPE(0, "none", AES_CARTRIDGE_PCB_NONE)
 	MDRV_CARTSLOT_PCBTYPE(1, "standard", AES_CARTRIDGE_PCB_STD)
