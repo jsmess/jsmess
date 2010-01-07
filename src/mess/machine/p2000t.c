@@ -62,8 +62,37 @@ READ8_HANDLER (	p2000t_port_000f_r )
 	return (0xff);
 }
 
-READ8_HANDLER (	p2000t_port_202f_r ) { return (0xff); }
 
+/*
+    Input port 0x2x
+
+    bit 0 - Printer input
+    bit 1 - Printer ready
+    bit 2 - Strap N (daisy/matrix)
+    bit 3 - Cassette write enabled
+    bit 4 - Cassette in position
+    bit 5 - Begin/end of tape
+    bit 6 - Cassette read clock
+    bit 7 - Cassette read data
+*/
+READ8_HANDLER (	p2000t_port_202f_r )
+{
+	return (0xff);
+}
+
+
+/*
+    Output Port 0x1x
+
+    bit 0 - Cassette write data
+    bit 1 - Cassette write command
+    bit 2 - Cassette rewind
+    bit 3 - Cassette forward
+    bit 4 - Unused
+    bit 5 - Unused
+    bit 6 - Keyboard interrupt enable
+    bit 7 - Printer output
+ */
 WRITE8_HANDLER ( p2000t_port_101f_w )
 {
 	p2000t_ports.port_101f = data;
