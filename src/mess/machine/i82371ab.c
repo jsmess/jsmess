@@ -19,13 +19,18 @@
 
 
 /***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+
+/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
 typedef struct _i82371ab_state i82371ab_state;
 struct _i82371ab_state
 {
-	UINT32 dummy;
+	UINT32 regs[4][0x100/4];
 };
 
 
@@ -47,37 +52,154 @@ INLINE i82371ab_state *get_safe_token(const device_config *device)
     PCI INTERFACE
 ***************************************************************************/
 
-UINT32 i82371ab_pci_read(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 mem_mask)
+static UINT32 i82371ab_pci_isa_r(const device_config *busdevice, const device_config *device, int offset, UINT32 mem_mask)
 {
-	UINT32 result = 0;
+	i82371ab_state *i82371ab = get_safe_token(device);
+	UINT32 result = i82371ab->regs[0][offset];
 
-	logerror("i82371ab_pci r function = %d, offset = %02x\n", function, offset);
-
-	if (function != 0)
-		return 0;
-
-	switch (offset)
-	{
-	case 0x00:
-		result = 0x71108086;
-		break;
-	case 0x04:
-		result = 0x00000000;
-		break;
-	case 0x08:
-		result = 0x06010000;
-		break;
-	case 0x0c:
-		result = 0x00800000;
-		break;
-	}
+	logerror("i82371ab_pci_isa_r, offset = %02x, mem_mask = %08x\n", offset, mem_mask);
 
 	return result;
 }
 
+void i82371ab_pci_isa_w(const device_config *busdevice, const device_config *device, int offset, UINT32 data, UINT32 mem_mask)
+{
+	i82371ab_state *i82371ab = get_safe_token(device);
+
+	logerror("i82371ab_pci_isa_w, offset = %02x, data = %08x, mem_mask = %08x\n", offset, data, mem_mask);
+
+	switch (offset)
+	{
+	case 0x04:
+		COMBINE_DATA(&i82371ab->regs[0][offset]);
+
+		/* clear reserved bits */
+		i82371ab->regs[0][offset] &= 0x00000005;
+
+		/* set new status */
+		i82371ab->regs[0][offset] |= 0x02800000;
+
+		break;
+	}
+}
+
+static UINT32 i82371ab_pci_ide_r(const device_config *busdevice, const device_config *device, int offset, UINT32 mem_mask)
+{
+	i82371ab_state *i82371ab = get_safe_token(device);
+	UINT32 result = i82371ab->regs[1][offset];
+
+	logerror("i82371ab_pci_ide_r, offset = %02x, mem_mask = %08x\n", offset, mem_mask);
+
+	return result;
+}
+
+void i82371ab_pci_ide_w(const device_config *busdevice, const device_config *device, int offset, UINT32 data, UINT32 mem_mask)
+{
+	i82371ab_state *i82371ab = get_safe_token(device);
+
+	logerror("i82371ab_pci_ide_w, offset = %02x, data = %08x, mem_mask = %08x\n", offset, data, mem_mask);
+
+	switch (offset)
+	{
+	case 0x04:
+		COMBINE_DATA(&i82371ab->regs[1][offset]);
+
+		/* clear reserved bits */
+		i82371ab->regs[1][offset] &= 0x00000005;
+
+		/* set new status */
+		i82371ab->regs[1][offset] |= 0x02800000;
+
+		break;
+	}
+}
+
+static UINT32 i82371ab_pci_usb_r(const device_config *busdevice, const device_config *device, int offset, UINT32 mem_mask)
+{
+	i82371ab_state *i82371ab = get_safe_token(device);
+	UINT32 result = i82371ab->regs[2][offset];
+
+	logerror("i82371ab_pci_usb_r, offset = %02x, mem_mask = %08x\n", offset, mem_mask);
+
+	return result;
+}
+
+void i82371ab_pci_usb_w(const device_config *busdevice, const device_config *device, int offset, UINT32 data, UINT32 mem_mask)
+{
+	i82371ab_state *i82371ab = get_safe_token(device);
+
+	logerror("i82371ab_pci_usb_w, offset = %02x, data = %08x, mem_mask = %08x\n", offset, data, mem_mask);
+
+	switch (offset)
+	{
+	case 0x04:
+		COMBINE_DATA(&i82371ab->regs[2][offset]);
+
+		/* clear reserved bits */
+		i82371ab->regs[2][offset] &= 0x00000005;
+
+		/* set new status */
+		i82371ab->regs[2][offset] |= 0x02800000;
+
+		break;
+	}
+}
+
+static UINT32 i82371ab_pci_acpi_r(const device_config *busdevice, const device_config *device, int offset, UINT32 mem_mask)
+{
+	i82371ab_state *i82371ab = get_safe_token(device);
+	UINT32 result = i82371ab->regs[3][offset];
+
+	logerror("i82371ab_pci_acpi_r, offset = %02x, mem_mask = %08x\n", offset, mem_mask);
+
+	return result;
+}
+
+void i82371ab_pci_acpi_w(const device_config *busdevice, const device_config *device, int offset, UINT32 data, UINT32 mem_mask)
+{
+	i82371ab_state *i82371ab = get_safe_token(device);
+
+	logerror("i82371ab_pci_acpi_w, offset = %02x, data = %08x, mem_mask = %08x\n", offset, data, mem_mask);
+
+	switch (offset)
+	{
+	case 0x04:
+		COMBINE_DATA(&i82371ab->regs[3][offset]);
+
+		/* clear reserved bits */
+		i82371ab->regs[3][offset] &= 0x00000005;
+
+		/* set new status */
+		i82371ab->regs[3][offset] |= 0x02800000;
+
+		break;
+	}
+}
+
+UINT32 i82371ab_pci_read(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 mem_mask)
+{
+	switch (function)
+	{
+	case 0: return i82371ab_pci_isa_r(busdevice, device, offset, mem_mask);
+	case 1: return i82371ab_pci_ide_r(busdevice, device, offset, mem_mask);
+	case 2: return i82371ab_pci_usb_r(busdevice, device, offset, mem_mask);
+	case 3: return i82371ab_pci_acpi_r(busdevice, device, offset, mem_mask);
+	}
+
+	logerror("i82371ab_pci_read: read from undefined function %d\n", function);
+
+	return 0;
+}
+
 void i82371ab_pci_write(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 data, UINT32 mem_mask)
 {
-	logerror("i82371ab_pci w function = %d, offset = %02x\n", function, offset);
+	switch (function)
+	{
+	case 0: i82371ab_pci_isa_w(busdevice, device, offset, data, mem_mask); break;
+	case 1: i82371ab_pci_ide_w(busdevice, device, offset, data, mem_mask); break;
+	case 2: i82371ab_pci_usb_w(busdevice, device, offset, data, mem_mask); break;
+	case 3: i82371ab_pci_acpi_w(busdevice, device, offset, data, mem_mask); break;
+	}
 }
 
 
@@ -89,16 +211,37 @@ static DEVICE_START( i82371ab )
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
 
-	i82371ab->dummy = 0;
-
 	/* setup save states */
+	state_save_register_device_item_2d_array(device, 0, i82371ab->regs);
 }
 
 static DEVICE_RESET( i82371ab )
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
 
-	i82371ab->dummy = 0;
+	/* isa */
+	i82371ab->regs[0][0x00] = 0x71108086;
+	i82371ab->regs[0][0x04] = 0x00000000;
+	i82371ab->regs[0][0x08] = 0x06010000;
+	i82371ab->regs[0][0x0c] = 0x00800000;
+
+	/* ide */
+	i82371ab->regs[1][0x00] = 0x71118086;
+	i82371ab->regs[1][0x04] = 0x02800000;
+	i82371ab->regs[1][0x08] = 0x01018000;
+	i82371ab->regs[1][0x0c] = 0x00000000;
+
+	/* usb */
+	i82371ab->regs[2][0x00] = 0x71128086;
+	i82371ab->regs[2][0x04] = 0x02800000;
+	i82371ab->regs[2][0x08] = 0x0c030000;
+	i82371ab->regs[2][0x0c] = 0x00000000;
+
+	/* acpi */
+	i82371ab->regs[3][0x00] = 0x71138086;
+	i82371ab->regs[3][0x04] = 0x02800000;
+	i82371ab->regs[3][0x08] = 0x06800000;
+	i82371ab->regs[3][0x0c] = 0x02800000;
 }
 
 
