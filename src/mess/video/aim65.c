@@ -86,8 +86,8 @@ static TIMER_CALLBACK(aim65_printer_timer)
 {
 	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
 
-	via_cb1_w(via_0, 0, printer_level);
-	via_ca1_w(via_0, 0, !printer_level);
+	via_cb1_w(via_0, printer_level);
+	via_ca1_w(via_0, !printer_level);
 	printer_level = !printer_level;
 	aim65_printer_inc();
 }
@@ -99,7 +99,7 @@ WRITE8_DEVICE_HANDLER( aim65_printer_on )
 	{
 		aim65_printer_cr();
 		timer_adjust_periodic(print_timer, attotime_zero, 0, ATTOTIME_IN_USEC(10));
-		via_cb1_w(device, 0, 0);
+		via_cb1_w(device, 0);
 		printer_level = 1;
 	}
 	else

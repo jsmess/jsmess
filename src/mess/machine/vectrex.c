@@ -295,8 +295,8 @@ TIMER_CALLBACK(vectrex_imager_eye)
 			timer_set (machine, double_to_attotime(rtime * 0.50), NULL, 1, vectrex_imager_eye);
 
 			/* Index hole sensor is connected to IO7 which triggers also CA1 of VIA */
-			via_ca1_w(via_0, 0, 1);
-			via_ca1_w(via_0, 0, 0);
+			via_ca1_w(via_0, 1);
+			via_ca1_w(via_0, 0);
 			vectrex_imager_pinlevel |= 0x80;
 			timer_set (machine, double_to_attotime(rtime / 360.0), &vectrex_imager_pinlevel, 0, update_level);
 		}

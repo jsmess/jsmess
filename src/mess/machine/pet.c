@@ -604,7 +604,7 @@ static TIMER_CALLBACK( pet_tape2_timer )
 	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
 //  cassette 2
 	UINT8 data = (cassette_input(devtag_get_device(machine, "cassette2")) > +0.0) ? 1 : 0;
-	via_cb1_w(via_0, 0, data);
+	via_cb1_w(via_0, data);
 }
 
 

@@ -711,8 +711,8 @@ ROM_END
 static INTERRUPT_GEN( bbcb_vsync )
 {
 	const device_config *via_0 = devtag_get_device(device->machine, "via6522_0");
-	via_ca1_w(via_0, 0,1);
-	via_ca1_w(via_0, 0,0);
+	via_ca1_w(via_0, 1);
+	via_ca1_w(via_0, 0);
 	bbc_frameclock();
 }
 
@@ -735,7 +735,7 @@ static const cassette_config bbc_cassette_config =
 
 static WRITE_LINE_DEVICE_HANDLER(bbcb_ack_w)
 {
-	via_ca1_w(device, 0, !state); /* ack seems to be inverted? */
+	via_ca1_w(device, !state); /* ack seems to be inverted? */
 }
 
 static const centronics_interface bbcb_centronics_config =

@@ -265,9 +265,9 @@ INTERRUPT_GEN( apple3_interrupt )
 {
 	const device_config *via_1 = devtag_get_device(device->machine, "via6522_1");
 
-	via_ca2_w(via_1, 0, (AY3600_keydata_strobe_r() & 0x80) ? 1 : 0);
-	via_cb1_w(via_1, 0, video_screen_get_vblank(device->machine->primary_screen));
-	via_cb2_w(via_1, 0, video_screen_get_vblank(device->machine->primary_screen));
+	via_ca2_w(via_1, (AY3600_keydata_strobe_r() & 0x80) ? 1 : 0);
+	via_cb1_w(via_1, video_screen_get_vblank(device->machine->primary_screen));
+	via_cb2_w(via_1, video_screen_get_vblank(device->machine->primary_screen));
 }
 
 

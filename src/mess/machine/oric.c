@@ -302,7 +302,7 @@ static TIMER_CALLBACK(oric_refresh_tape)
 		data = input_port_9>>4;
 	}
 
-	via_cb1_w(via_0, 0, data);
+	via_cb1_w(via_0, data);
 }
 
 static unsigned char previous_portb_data = 0;

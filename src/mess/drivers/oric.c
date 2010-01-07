@@ -355,7 +355,7 @@ static const cassette_config oric_cassette_config =
 static const centronics_interface oric_centronics_config =
 {
 	FALSE,
-	DEVCB_DEVICE_HANDLER("via6522_0", via_ca1_w),
+	DEVCB_DEVICE_LINE("via6522_0", via_ca1_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

@@ -175,8 +175,8 @@ MACHINE_START( aim65 )
 	/* Init RAM */
 	memory_install_ram(space, 0x0000, messram_get_size(ram) - 1, 0, 0, messram_get_ptr(ram));
 
-	via_cb1_w(via_0, 1, 1);
-	via_ca1_w(via_0, 1, 0);
+	via_cb1_w(via_0, 1);
+	via_ca1_w(via_0, 0);
 }
 
 

@@ -570,10 +570,10 @@ static TIMER_CALLBACK(kbd_clock)
 		{
 			/* Put data on CB2 if we are sending*/
 			if (mac->kbd_receive == FALSE)
-				via_cb2_w(via_0, 0, mac->kbd_shift_reg&0x80?1:0);
+				via_cb2_w(via_0, mac->kbd_shift_reg&0x80?1:0);
 			mac->kbd_shift_reg <<= 1;
-			via_cb1_w(via_0, 0, 0);
-			via_cb1_w(via_0, 0, 1);
+			via_cb1_w(via_0, 0);
+			via_cb1_w(via_0, 1);
 		}
 		if (mac->kbd_receive == TRUE)
 		{
@@ -1782,9 +1782,9 @@ static TIMER_CALLBACK(mac_adb_tick)
 
 	// do one clock transition on CB1 to advance the VIA shifter
 	mac->adb_extclock ^= 1;
-	via_cb1_w(via_0, 0, mac->adb_extclock);
+	via_cb1_w(via_0, mac->adb_extclock);
 	mac->adb_extclock ^= 1;
-	via_cb1_w(via_0, 0, mac->adb_extclock);
+	via_cb1_w(via_0, mac->adb_extclock);
 
 	mac->adb_timer_ticks--;
 	if (!mac->adb_timer_ticks)
@@ -2523,7 +2523,7 @@ static WRITE8_DEVICE_HANDLER(mac_via2_out_b)
 //	printf("VIA2 OUT B: %02x (MMU = %02x)\n", data, data & 0x08);
 
 	// chain 60.15 Hz to VIA1
-	via_ca1_w(via_0, 0, data>>7);
+	via_ca1_w(via_0, data>>7);
 }
 
 /* *************************************************************************
@@ -2868,7 +2868,7 @@ void mac_nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state
 		const device_config *via_1 = devtag_get_device(machine, "via6522_1");
 
 		mac->via2_ca1 ^= 1;
-		via_ca1_w(via_1, 0, mac->via2_ca1);
+		via_ca1_w(via_1, mac->via2_ca1);
 	}
 }
 
@@ -2904,7 +2904,7 @@ static void mac_vblank_irq(running_machine *machine)
 	if (mac->mac_model < MODEL_MAC_II)
 	{
 		ca1_data ^= 1;
-		via_ca1_w(via_0, 0, ca1_data);
+		via_ca1_w(via_0, ca1_data);
 	}
 
 	if (++irq_count == 60)
@@ -2913,7 +2913,7 @@ static void mac_vblank_irq(running_machine *machine)
 
 		ca2_data ^= 1;
 		/* signal 1 Hz irq on CA2 input on the VIA */
-		via_ca2_w(via_0, 0, ca2_data);
+		via_ca2_w(via_0, ca2_data);
 
 		rtc_incticks(mac);
 	}

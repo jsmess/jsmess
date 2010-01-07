@@ -283,7 +283,7 @@ static TIMER_CALLBACK( bit_tick )
 		int byte_ready = !(byte && c1541->soe);
 
 		cpu_set_input_line(c1541->cpu, M6502_SET_OVERFLOW, byte_ready);
-		via_ca1_w(c1541->via1, 0, byte_ready);
+		via_ca1_w(c1541->via1, byte_ready);
 
 		c1541->byte = byte;
 	}
@@ -298,7 +298,7 @@ WRITE_LINE_DEVICE_HANDLER( c1541_iec_atn_w )
 	c1541_t *c1541 = get_safe_token(device);
 	int data_out = !c1541->data_out && !(c1541->atna ^ !state);
 
-	via_ca1_w(c1541->via0, 0, !state);
+	via_ca1_w(c1541->via0, !state);
 
 	cbm_iec_data_w(c1541->serial_bus, device, data_out);
 }
@@ -786,7 +786,7 @@ static WRITE_LINE_DEVICE_HANDLER( soe_w )
 	c1541->soe = state;
 
 	cpu_set_input_line(c1541->cpu, M6502_SET_OVERFLOW, byte_ready);
-	via_ca1_w(device, 0, byte_ready);
+	via_ca1_w(device, byte_ready);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( mode_w )

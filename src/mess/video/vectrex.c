@@ -99,8 +99,8 @@ static TIMER_CALLBACK(lightpen_trigger)
 	if (vectrex_lightpen_port & 1)
 	{
 		const device_config *via_0 = devtag_get_device(machine, "via6522_0");
-		via_ca1_w(via_0, 0, 1);
-		via_ca1_w(via_0, 0, 0);
+		via_ca1_w(via_0, 1);
+		via_ca1_w(via_0, 0);
 	}
 
 	if (vectrex_lightpen_port & 2)

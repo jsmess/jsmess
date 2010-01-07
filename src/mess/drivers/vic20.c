@@ -149,7 +149,7 @@ static INPUT_PORTS_START( vic20 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
 
 	PORT_START( "SPECIAL" )  /* special keys */
-//	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Restore") PORT_CODE(KEYCODE_PRTSCR) PORT_WRITE_LINE_DEVICE(M6522_0_TAG, via_ca1_w)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Restore") PORT_CODE(KEYCODE_PRTSCR) PORT_WRITE_LINE_DEVICE(M6522_0_TAG, via_ca1_w)
 	PORT_DIPNAME( 0x01, 0x00, "Shift Lock (switch)") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( On ) )
@@ -455,7 +455,7 @@ static TIMER_DEVICE_CALLBACK( cassette_tick )
 	vic20_state *state = timer->machine->driver_data;
 	int data = (cassette_input(state->cassette) > +0.0) ? 1 : 0;
 	
-	via_ca1_w(state->via1, 0, data);
+	via_ca1_w(state->via1, data);
 }
 
 /* IEC Serial Bus */
@@ -463,7 +463,7 @@ static TIMER_DEVICE_CALLBACK( cassette_tick )
 static CBM_IEC_DAISY( cbm_iec_daisy )
 {
 	{ M6522_0_TAG },
-	{ M6522_1_TAG, DEVCB_DEVICE_HANDLER(M6522_1_TAG, via_cb1_w) },
+	{ M6522_1_TAG, DEVCB_DEVICE_LINE(M6522_1_TAG, via_cb1_w) },
 	{ C1541_IEC(C1540_TAG) },
 	{ NULL}
 };

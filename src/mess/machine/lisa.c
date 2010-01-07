@@ -351,8 +351,8 @@ INLINE void COPS_send_data_if_possible(running_machine *machine)
 			mouse_data_offset = -1;	/* we just phased out the mouse data in buffer */
 		fifo_head = (fifo_head+1) & 0x7;
 		fifo_size--;
-		via_ca1_w(via_0, 0, 1);		/* pulse ca1 so that VIA reads it */
-		via_ca1_w(via_0, 0, 0);		/* BTW, I have no idea how a real COPS does it ! */
+		via_ca1_w(via_0, 1);		/* pulse ca1 so that VIA reads it */
+		via_ca1_w(via_0, 0);		/* BTW, I have no idea how a real COPS does it ! */
 	}
 }
 

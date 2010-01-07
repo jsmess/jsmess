@@ -344,9 +344,9 @@ static TIMER_CALLBACK(microtan_read_cassette)
 
 	LOG(("microtan_read_cassette: %g\n", level));
 	if (level < -0.07)
-		via_cb2_w(via_0, 0, 0);
+		via_cb2_w(via_0, 0);
 	else if (level > +0.07)
-		via_cb2_w(via_0, 0, 1);
+		via_cb2_w(via_0, 1);
 }
 
 READ8_HANDLER( microtan_sound_r )

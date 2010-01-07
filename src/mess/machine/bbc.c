@@ -829,17 +829,17 @@ INTERRUPT_GEN( bbcb_keyscan )
                  being pressed on the selected column */
 			if ((input_port_read(device->machine, colnames[column]) | 0x01) != 0xff)
 			{
-				via_ca2_w(via_0, 0, 1);
+				via_ca2_w(via_0, 1);
 			}
 			else
 			{
-				via_ca2_w(via_0, 0, 0);
+				via_ca2_w(via_0, 0);
 			}
 
 		}
 		else
 		{
-			via_ca2_w(via_0, 0, 0);
+			via_ca2_w(via_0, 0);
 		}
 	}
 }
@@ -869,17 +869,17 @@ INTERRUPT_GEN( bbcm_keyscan )
                  being pressed on the selected column */
 			if ((input_port_read(device->machine, colnames[column]) | 0x01) != 0xff)
 			{
-				via_ca2_w(via_0, 0, 1);
+				via_ca2_w(via_0, 1);
 			}
 			else
 			{
-				via_ca2_w(via_0, 0, 0);
+				via_ca2_w(via_0, 0);
 			}
 
 		}
 		else
 		{
-			via_ca2_w(via_0, 0, 0);
+			via_ca2_w(via_0, 0);
 		}
 	}
 }
@@ -919,11 +919,11 @@ static int bbc_keyboard(const address_space *space, int data)
 
 	if ((res | 1) != 0xff)
 	{
-		via_ca2_w(via_0, 0, 1);
+		via_ca2_w(via_0, 1);
 	}
 	else
 	{
-		via_ca2_w(via_0, 0, 0);
+		via_ca2_w(via_0, 0);
 	}
 
 	return (data & 0x7f) | (bit<<7);
@@ -1343,7 +1343,7 @@ static UPD7002_GET_ANALOGUE(BBC_get_analogue_input)
 static UPD7002_EOC(BBC_uPD7002_EOC)
 {
 	const device_config *via_0 = devtag_get_device(device->machine, "via6522_0");
-	via_cb1_w(via_0, 0,data);
+	via_cb1_w(via_0, data);
 }
 
 const uPD7002_interface bbc_uPD7002 =
