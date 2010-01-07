@@ -21,13 +21,12 @@
 #define SOFTWARE_LIST_RECURSIVE
 
 /* step 1: declare all external references */
-#undef SOFTWARE_LIST
-#define SOFTWARE_LIST(NAME) extern const software_list software_list_##NAME;
+#define ADD_SOFTWARE_LIST(NAME) extern const software_list software_list_##NAME;
 #include "messsoft.c"
 
 /* step 2: define the software_list[] array */
-#undef SOFTWARE_LIST
-#define SOFTWARE_LIST(NAME) &software_list_##NAME,
+#undef ADD_SOFTWARE_LIST
+#define ADD_SOFTWARE_LIST(NAME) &software_list_##NAME,
 const software_list * const software_lists[] =
 {
 #include "messsoft.c"
@@ -38,7 +37,8 @@ const software_list * const software_lists[] =
 
 /****************SOFTWARE LISTS**********************************************/
 
-	SOFTWARE_LIST( bbcbc_cart )		/* BBC Bridge Companion cartridges */
-	SOFTWARE_LIST( gamepock_cart )	/* Epoch Game Pocket Computer cartridges */
+	ADD_SOFTWARE_LIST( bbcbc_cart )		/* BBC Bridge Companion cartridges */
+	ADD_SOFTWARE_LIST( gamepock_cart )	/* Epoch Game Pocket Computer cartridges */
+	ADD_SOFTWARE_LIST( supracan_cart )	/* Super A'Can cartridges */
 
 #endif /* SOFTWARE_LIST_RECURSIVE */

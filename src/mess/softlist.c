@@ -54,3 +54,16 @@ const software_entry* software_get_by_name(const software_list* list, const char
 	return NULL;
 }
 
+
+/*-------------------------------------------------
+    software_lists_get_count - returns the amount of
+    drivers
+-------------------------------------------------*/
+
+int software_lists_get_count(void)
+{
+    int count;
+
+    for (count = 0; software_lists[count] != NULL; count++) ;
+    return count;
+}

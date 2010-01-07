@@ -31,6 +31,7 @@ struct _software_entry
 typedef struct _software_list software_list;
 struct _software_list
 {
+	const char * source_file;
 	const char * name;
 	const char * description;
 	const software_entry *	entries;
@@ -41,7 +42,7 @@ struct _software_list
 
 #define SOFTWARE_LIST_NAME(name)					software_list_##name
 #define SOFTWARE_NAME(name)							software_##name
-#define SOFTWARE_LIST(name,desc)					const software_list SOFTWARE_LIST_NAME(name) = { #name, desc, software_##name };
+#define SOFTWARE_LIST(name,desc)					const software_list SOFTWARE_LIST_NAME(name) = { __FILE__, #name, desc, software_##name };
 #define SOFTWARE_LIST_START(name)	\
 	static const software_entry SOFTWARE_NAME(name)[] = {
 
@@ -69,5 +70,6 @@ extern const software_list * const software_lists[];
 
 const software_list* software_list_get_by_name(const char *name);
 const software_entry* software_get_by_name(const software_list* list, const char *name);
+int software_lists_get_count(void);
 
 #endif
