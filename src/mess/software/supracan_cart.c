@@ -34,12 +34,12 @@ SOFTWARE_END
 SOFTWARE_LIST_START( supracan_cart )
 	/* F001 - Fomosa Duel */
 	/* F002 - Sango Fighter */
-	/* F003 - The Son of Evil */
+	/* F003 - 1995 - Funtech - The Son of Evil */
 	/* F004 - Speedy Dragon/Sonic Dragon */
 	SOFTWARE( staiwbbl, 0, 199x, "Funtech?", "Super Taiwanese Baseball League", NULL, 0, 0 )	/* F005 */
-	/* F006 - Journey to the Laugh */
-	SOFTWARE( slghtsag, 0, 199x, "Funtech?", "Super Light Saga - Dragon Force", NULL, 0, 0 )	/* F007 */
-	/* F008 - Monopoly: Adventure in Africa */
+	/* F006 - 1995 - Funtech - Journey to the Laugh */
+	SOFTWARE( slghtsag, 0, 1996, "Kingformation", "Super Light Saga - Dragon Force", NULL, 0, 0 )	/* F007 */
+	/* F008 - 1995 - Funtech - Monopoly: Adventure in Africa */
 	/* F009 - Gambling Lord */
 	/* F010 - Magical Pool */
 	SOFTWARE( boomzoo,   0, 1996, "Funtech", "Boom Zoo", NULL, 0, 0 )	/* F011 */
