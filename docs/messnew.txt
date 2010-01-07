@@ -163,6 +163,9 @@ Source Changes:
 - The -listdevices option has been temporarily renamed to -listmedia,
   until it is merged with MAME's -listdevices command [Robbbert]
 
+- Fixed bug 1770. Listmedia will indicate if a driver has no devices,
+  or if the driver doesn't exist. [Robbbert]
+
 
 
 0.135
