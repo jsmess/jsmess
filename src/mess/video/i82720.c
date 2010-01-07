@@ -1022,7 +1022,7 @@ INLINE void gdc_cmd_gchrd(void)
                UINT16 bit = (gdc.pram[15-row] >> bitnbr) & 0x01;
                writeWord = bit ? 0xffff : 0x0000;
                writeWord = (dispregs->mask & writeWord) |
-                  ((~dispregs->mask) & gdc_mess.vram[dispregs->ead]);
+                  ((~dispregs->mask) & gdc_mess.vram[dispregs->ead % gdc_mess.vramsize]);
                /* The mode is set by wdat */
                gdc_write_data(writeWord, 0xffff, dispregs->cur_mod);
 

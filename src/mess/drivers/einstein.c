@@ -613,6 +613,7 @@ static MACHINE_START( einstein2 )
 {
 	einstein_state *einstein = machine->driver_data;
 	einstein->crtc_ram = auto_alloc_array(machine, UINT8, 2048);
+	MACHINE_START_CALL(einstein);
 }
 
 

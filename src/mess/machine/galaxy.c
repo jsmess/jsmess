@@ -182,7 +182,9 @@ MACHINE_RESET( galaxy )
 		memory_nop_read(space, 0x1000, 0x1fff, 0, 0);
 	}
 	memory_nop_write(space, 0x1000, 0x1fff, 0, 0);
-	memory_set_bankptr(machine,"bank10", memory_region(machine, "maincpu") + 0x1000);
+
+	if (input_port_read(machine, "ROM2"))
+		memory_set_bankptr(machine,"bank10", memory_region(machine, "maincpu") + 0x1000);
 
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), galaxy_irq_callback);
 	galaxy_interrupts_enabled = TRUE;
