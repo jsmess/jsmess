@@ -843,6 +843,7 @@ $(MESSOBJ)/epoch.a:				\
 	$(MESS_DRIVERS)/gamepock.o	\
 	$(MESS_MACHINE)/gamepock.o	\
 	$(MESS_DRIVERS)/scv.o		\
+	$(MESS_AUDIO)/upd1771.o		\
 
 $(MESSOBJ)/epson.a:				\
 	$(MESS_DRIVERS)/ex800.o		\
