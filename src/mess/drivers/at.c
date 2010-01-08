@@ -1220,6 +1220,29 @@ ROM_START( at586 )
 ROM_END
 
 
+/* FIC VT-503 (Intel TX chipset, ITE 8679 Super I/O) */
+ROM_START( ficvt503 )
+	ROM_REGION32_LE(0x40000, "user1", 0)
+	ROM_LOAD("et4000.bin",  0x00000, 0x08000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
+	ROM_LOAD("wdbios.rom",  0x08000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
+
+	ROM_SYSTEM_BIOS(0, "109gi13", "1.09GI13") /* 1997-10-02 */
+	ROMX_LOAD("109gi13.bin", 0x20000, 0x20000, CRC(0c32af48) SHA1(2cce40a98598f1ed1f398975f7a90c8be4200667), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "109gi14", "1.09GI14") /* 1997-11-07 */
+	ROMX_LOAD("109gi14.awd", 0x20000, 0x20000, CRC(588c5cc8) SHA1(710e5405850fd975b362a422bfe9bc6d6c9a36cd), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "109gi15", "1.09GI15") /* 1997-11-07 */
+	ROMX_LOAD("109gi15.awd", 0x20000, 0x20000, CRC(649a3481) SHA1(e681c6ab55a67cec5978dfffa75fcddc2aa0de4d), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(3, "109gi16", "1.09GI16") /* 2000-03-23 */
+	ROMX_LOAD("109gi16.bin", 0x20000, 0x20000, CRC(a928f271) SHA1(127a83a60752cc33b3ca49774488e511ec7bac55), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(4, "115gk140", "1.15GK140") /* 1999-03-03 */
+	ROMX_LOAD("115gk140.awd", 0x20000, 0x20000, CRC(65e88956) SHA1(f94bb0732e00b5b0f18f4e349db24a289f8379c5), ROM_BIOS(5))
+
+	/* 8042 keyboard controller */
+	ROM_REGION( 0x0800, "kbdc8042", 0 )
+	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
+ROM_END
+
+
 /***************************************************************************
 
   Game driver(s)
@@ -1237,3 +1260,4 @@ COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga,	at386,	    "MITAC INC
 COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga,	at386,	    "",  "PC/AT 486 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga,	at386,	    "",  "PC/AT 586 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,	at_vga,     "",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )
+COMP ( 1997, ficvt503, ibm5170, 0,       at586,     atvga,  at386,      "FIC", "VT-503", GAME_NOT_WORKING )
