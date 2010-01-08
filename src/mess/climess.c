@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "climess.h"
 #include "output.h"
+#include "hash.h"
 
 
 /*-------------------------------------------------
@@ -175,3 +176,43 @@ int info_listdevices(core_options *options, const char *gamename)
 
 	return (count > 0) ? MAMERR_NONE : MAMERR_NO_SUCH_GAME;
 }
+
+
+/*-------------------------------------------------
+    match_roms - scan for a matching software ROM by hash
+-------------------------------------------------*/
+void mess_match_roms(const char *hash, int length, int *found)
+{
+	int listnum;
+
+	for ( listnum = 0; software_lists[listnum] != NULL; listnum++ )
+	{
+		const software_list *swlist = software_lists[listnum];
+		int j;
+
+		for ( j = 0; swlist->entries[j].name != NULL; j++ )
+		{
+			const software_entry *sw = &swlist->entries[j];
+			const rom_entry *region, *rom;
+
+			for (region = &sw->rom_info[0]; region; region = rom_next_region(region))
+			{
+				for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+				{
+					if (hash_data_is_equal(hash, ROM_GETHASHDATA(rom), 0))
+					{
+						int baddump = hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_BAD_DUMP);
+
+						/* output information about the match */
+						if (*found != 0)
+							mame_printf_info("                    ");
+						mame_printf_info("= %s%-20s  %-10s %s [%s]\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), sw->name, sw->fullname, swlist->name);
+						(*found)++;
+					}
+				}
+			}
+		}
+	}
+}
+
+
