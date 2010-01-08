@@ -95,7 +95,7 @@ static const options_entry cli_options[] =
 	{ "romident",                 "0",        OPTION_COMMAND,    "compare files with known MAME roms" },
 	{ "listdevices;ld",           "0",        OPTION_COMMAND,    "list available devices" },
 #ifdef MESS
-	{ "listmedia;lm",             "0",        OPTION_COMMAND,    "list available devices" },
+	{ "listmedia;lm",             "0",        OPTION_COMMAND,    "list details of each device mountpoint" },
 #endif
 
 	{ NULL }
