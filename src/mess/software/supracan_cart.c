@@ -36,7 +36,7 @@ SOFTWARE_LIST_START( supracan_cart )
 	/* F002 - Sango Fighter */
 	/* F003 - 1995 - Funtech - The Son of Evil */
 	/* F004 - Speedy Dragon/Sonic Dragon */
-	SOFTWARE( staiwbbl, 0, 199x, "Funtech?", "Super Taiwanese Baseball League", NULL, 0, 0 )	/* F005 */
+	SOFTWARE( staiwbbl, 0, 1995, "C&E Soft", "Super Taiwanese Baseball League", NULL, 0, 0 )	/* F005 */
 	/* F006 - 1995 - Funtech - Journey to the Laugh */
 	SOFTWARE( slghtsag, 0, 1996, "Kingformation", "Super Light Saga - Dragon Force", NULL, 0, 0 )	/* F007 */
 	/* F008 - 1995 - Funtech - Monopoly: Adventure in Africa */
