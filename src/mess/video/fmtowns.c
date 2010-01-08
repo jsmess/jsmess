@@ -170,13 +170,26 @@ WRITE8_HANDLER( towns_gfx_high_w )
 
 READ8_HANDLER( towns_gfx_r )
 {
+	UINT8 ret = 0;
+	
 	if(towns_mainmem_enable != 0)
 		return messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset+0xc0000];
+
+	offset = offset << 2;
 
 	if(towns_vram_page_sel != 0)
 		offset += 0x20000;
 
-	return 0;
+	ret = (((towns_gfxvram[offset] >> towns_vram_rplane) << 7) & 0x80)
+		| (((towns_gfxvram[offset] >> towns_vram_rplane) << 2) & 0x40)
+		| (((towns_gfxvram[offset+1] >> towns_vram_rplane) << 5) & 0x20)
+		| (((towns_gfxvram[offset+1] >> towns_vram_rplane)) & 0x10)
+		| (((towns_gfxvram[offset+2] >> towns_vram_rplane) << 3) & 0x08)
+		| (((towns_gfxvram[offset+2] >> towns_vram_rplane) >> 2) & 0x04)
+		| (((towns_gfxvram[offset+3] >> towns_vram_rplane) << 1) & 0x02)
+		| (((towns_gfxvram[offset+3] >> towns_vram_rplane) >> 4) & 0x01);
+	
+	return ret;
 }
 
 WRITE8_HANDLER( towns_gfx_w )
@@ -287,7 +300,7 @@ WRITE8_HANDLER( towns_video_cff80_w )
 			towns_update_video_banks(space);
 			logerror("VGA: VRAM wplane select = 0x%02x\n",towns_vram_wplane);
 			break;
-		case 0x03:  // VRAM page select (bit 5)
+		case 0x03:  // VRAM page select (bit 4)
 			towns_vram_page_sel = data & 0x10;
 			break;
 		case 0x14:  // Kanji offset (high)
