@@ -9,6 +9,9 @@
   Bug fixes, SGB and GBC code                 Anthony Kruize     2002
   Improvements to match real hardware         Wilbert Pol        2006-2008
 
+  Timing is not accurate enough:
+  - Mode 3 takes 172 cycles (measuered with logic analyzer by costis)
+
 ***************************************************************************/
 
 #include "driver.h"
