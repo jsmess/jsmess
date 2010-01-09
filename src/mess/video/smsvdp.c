@@ -59,8 +59,13 @@ PAL frame timing
 #define STATUS_SPRCOL         0x20	/* Object collision flag */
 #define STATUS_HINT           0x02	/* Pending horizontal interrupt flag */
 
-#define HINT_HPOS             24
-#define VINT_HPOS             1	/* docs says should be near HINT time */
+#define VINT_HPOS             23
+#define HINT_HPOS             23
+#define VCOUNT_CHANGE_HPOS    22
+#define VINT_FLAG_HPOS        7
+#define SPROVR_HPOS           6
+#define SPRCOL_BASEHPOS       42
+#define DISPLAY_CB_HPOS       5  /* fix X-Scroll latchtime (Flubba's VDPTest) */
 
 #define GG_CRAM_SIZE          0x40	/* 32 colors x 2 bytes per color = 64 bytes */
 #define SMS_CRAM_SIZE         0x20	/* 32 colors x 1 bytes per color = 32 bytes */
@@ -106,7 +111,7 @@ struct _smsvdp_t
 	int              irq_state;                /* The status of the IRQ line of the VDP */
 	int              vdp_mode;                 /* Current mode of the VDP: 0,1,2,3,4 */
 	int              y_pixels;                 /* 192, 224, 240 */
-	int              line_counter;
+	UINT8            line_counter;
 	UINT8            hcounter;
 	UINT8            *VRAM;                    /* Pointer to VRAM */
 	UINT8            *CRAM;                    /* Pointer to CRAM */
@@ -230,8 +235,16 @@ static void set_display_settings( const device_config *device )
 READ8_DEVICE_HANDLER( sms_vdp_vcount_r )
 {
 	smsvdp_t *smsvdp = get_safe_token(device);
+	int vpos = video_screen_get_vpos(device->machine->primary_screen);
 
-	return (smsvdp->sms_frame_timing[INIT_VCOUNT] + video_screen_get_vpos(device->machine->primary_screen)) & 0xff;
+	if (video_screen_get_hpos(device->machine->primary_screen) < VCOUNT_CHANGE_HPOS)
+	{
+		vpos--;
+		if (vpos < 0)
+			vpos += video_screen_get_height(device->machine->primary_screen);
+	}
+
+	return (smsvdp->sms_frame_timing[INIT_VCOUNT] + vpos) & 0xff;
 }
 
 
@@ -259,14 +272,49 @@ void sms_vdp_set_ggsmsmode( const device_config *device, int mode )
 }
 
 
-static TIMER_CALLBACK( smsvdp_set_irq )
+static TIMER_CALLBACK( smsvdp_set_status )
 {
 	smsvdp_t *smsvdp = (smsvdp_t *) ptr;
 
-	smsvdp->irq_state = 1;
+	smsvdp->status |= (UINT8) param;
+}
 
-	if (smsvdp->int_callback)
-		smsvdp->int_callback(machine, ASSERT_LINE);
+
+static TIMER_CALLBACK( smsvdp_check_hint )
+{
+	smsvdp_t *smsvdp = (smsvdp_t *) ptr;
+
+	if (smsvdp->line_counter == 0x00)
+	{
+		smsvdp->line_counter = smsvdp->reg[0x0a];
+		smsvdp->status |= STATUS_HINT;
+	}
+	else
+	{
+		smsvdp->line_counter--;
+	}
+
+	if ((smsvdp->status & STATUS_HINT) && (smsvdp->reg[0x00] & 0x10))
+	{
+		smsvdp->irq_state = 1;
+
+		if (smsvdp->int_callback)
+			smsvdp->int_callback(machine, ASSERT_LINE);
+	}
+}
+
+
+static TIMER_CALLBACK( smsvdp_check_vint )
+{
+	smsvdp_t *smsvdp = (smsvdp_t *) ptr;
+
+	if ((smsvdp->status & STATUS_VINT) && (smsvdp->reg[0x01] & 0x20))
+	{
+		smsvdp->irq_state = 1;
+
+		if (smsvdp->int_callback)
+			smsvdp->int_callback(machine, ASSERT_LINE);
+	}
 }
 
 
@@ -308,21 +356,7 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 	{
 		if (vpos == vpos_limit)
 		{
-			if (smsvdp->line_counter == 0x00)
-			{
-				smsvdp->line_counter = smsvdp->reg[0x0a];
-				smsvdp->status |= STATUS_HINT;
-
-				if (smsvdp->reg[0x00] & 0x10)
-				{
-					/* Delay triggering of interrupt to allow software to read the status bit before the irq */
-					timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, vpos, HINT_HPOS), smsvdp, 0, smsvdp_set_irq);
-				}
-			}
-			else
-			{
-				smsvdp->line_counter -= 1;
-			}
+			timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, vpos, HINT_HPOS), smsvdp, 0, smsvdp_check_hint);
 		}
 		else
 		{
@@ -331,13 +365,8 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 
 		if (vpos == vpos_limit + 1)
 		{
-			smsvdp->status |= STATUS_VINT;
-
-			if (smsvdp->reg[0x01] & 0x20)
-			{
-				/* Delay triggering of interrupt to allow software to read the status bit before the irq */
-				timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, vpos, VINT_HPOS), smsvdp, 0, smsvdp_set_irq);
-			}
+			timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, vpos, VINT_FLAG_HPOS), smsvdp, (int)STATUS_VINT, smsvdp_set_status);
+			timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, vpos, VINT_HPOS), smsvdp, 0, smsvdp_check_vint);
 		}
 
 		sms_update_palette(smsvdp);
@@ -364,46 +393,24 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 	/* Check if we're in the active display area */
 	if (vpos >= vpos_limit)
 	{
-		rgb_t border_color;
-
 		if (vpos == vpos_limit)
 		{
 			smsvdp->reg9copy = smsvdp->reg[0x09];
 		}
 
-		if (smsvdp->line_counter == 0x00)
-		{
-			smsvdp->line_counter = smsvdp->reg[0x0a];
-			smsvdp->status |= STATUS_HINT;
-
-			if (smsvdp->reg[0x00] & 0x10)
-			{
-				/* Delay triggering of interrupt to allow software to read the status bit before the irq */
-				timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, vpos, HINT_HPOS), smsvdp, 0, smsvdp_set_irq);
-			}
-		}
-		else
-		{
-			smsvdp->line_counter -= 1;
-		}
+		timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, vpos, HINT_HPOS), smsvdp, 0, smsvdp_check_hint);
 
 		sms_update_palette(smsvdp);
-
-		/* Check if display is disabled */
-		if (!(smsvdp->reg[0x01] & 0x40))
-			border_color = RGB_BLACK;
-		else
-			border_color = machine->pens[smsvdp->current_palette[BACKDROP_COLOR]];
 
 		/* Draw left border */
 		rec.min_x = LBORDER_START;
 		rec.max_x = LBORDER_START + LBORDER_X_PIXELS - 1;
-		bitmap_fill(smsvdp->tmpbitmap, &rec, border_color);
+		bitmap_fill(smsvdp->tmpbitmap, &rec, machine->pens[smsvdp->current_palette[BACKDROP_COLOR]]);
 
 		/* Draw right border */
 		rec.min_x = LBORDER_START + LBORDER_X_PIXELS + 256;
 		rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
-		bitmap_fill(smsvdp->tmpbitmap, &rec, border_color);
+		bitmap_fill(smsvdp->tmpbitmap, &rec, machine->pens[smsvdp->current_palette[BACKDROP_COLOR]]);
 
 		sms_refresh_line(machine, smsvdp, smsvdp->tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit, vpos - vpos_limit);
 
@@ -434,6 +441,9 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 		sms_refresh_line(machine, smsvdp, smsvdp->tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit + smsvdp->sms_frame_timing[TOP_BORDER], vpos - (vpos_limit + smsvdp->sms_frame_timing[TOP_BORDER]));
 		return;
 	}
+
+	/* we're in the vertical or top blanking area */
+	smsvdp->line_counter = smsvdp->reg[0x0a];
 }
 
 
@@ -554,12 +564,9 @@ WRITE8_DEVICE_HANDLER( sms_vdp_ctrl_w )
 			if (reg_num == 0 || reg_num == 1)
 				set_display_settings(device);
 
-			if ((reg_num == 1) && (smsvdp->reg[0x01] & 0x20) && (smsvdp->status & STATUS_VINT))
+			if (reg_num == 1)
 			{
-				smsvdp->irq_state = 1;
-
-				if (smsvdp->int_callback)
-					smsvdp->int_callback(device->machine, ASSERT_LINE);
+				timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, video_screen_get_vpos(device->machine->primary_screen), VINT_HPOS), smsvdp, 0, smsvdp_check_vint);
 			}
 			smsvdp->addrmode = 0;
 			break;
@@ -571,19 +578,15 @@ WRITE8_DEVICE_HANDLER( sms_vdp_ctrl_w )
 }
 
 
-static void sms_refresh_line_mode4( smsvdp_t *smsvdp, int *line_buffer, int line )
+static void sms_refresh_line_mode4( smsvdp_t *smsvdp, int *line_buffer, int *priority_selected, int line )
 {
 	int tile_column;
 	int x_scroll, y_scroll, x_scroll_start_column;
-	int sprite_index;
-	int pixel_x, pixel_plot_x, priority_selected[256];
-	int sprite_x, sprite_y, sprite_line, sprite_tile_selected, sprite_height, sprite_zoom;
-	int sprite_buffer[8], sprite_buffer_count, sprite_buffer_index;
+	int pixel_x, pixel_plot_x;
 	int bit_plane_0, bit_plane_1, bit_plane_2, bit_plane_3;
 	int scroll_mod;
 	UINT16 name_table_address;
 	UINT8 *name_table;
-	UINT8 *sprite_table = smsvdp->VRAM + ((smsvdp->reg[0x05] << 7) & 0x3f00);
 
 	if (smsvdp->y_pixels != 192)
 	{
@@ -668,6 +671,17 @@ static void sms_refresh_line_mode4( smsvdp_t *smsvdp, int *line_buffer, int line
 			}
 		}
 	}
+}
+
+static void sms_refresh_mode4_sprites( running_machine *machine, smsvdp_t *smsvdp, int *line_buffer, int *priority_selected, int pixel_plot_y, int line )
+{
+	int sprite_index;
+	int pixel_x, pixel_plot_x;
+	int sprite_x, sprite_y, sprite_line, sprite_tile_selected, sprite_height, sprite_zoom;
+	int sprite_col_occurred, sprite_col_x;
+	int sprite_buffer[8], sprite_buffer_count, sprite_buffer_index;
+	int bit_plane_0, bit_plane_1, bit_plane_2, bit_plane_3;
+	UINT8 *sprite_table = smsvdp->VRAM + ((smsvdp->reg[0x05] << 7) & 0x3f00);
 
 	/* Draw sprite layer */
 	sprite_height = (smsvdp->reg[0x01] & 0x02 ? 16 : 8);
@@ -693,7 +707,7 @@ static void sms_refresh_line_mode4( smsvdp_t *smsvdp, int *line_buffer, int line
 			else if (line >= 0 && line < smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V])
 			{
 				/* Too many sprites per line */
-				smsvdp->status |= STATUS_SPROVR;
+				timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, pixel_plot_y + line, SPROVR_HPOS), smsvdp, (int)STATUS_SPROVR, smsvdp_set_status);
 			}
 			sprite_buffer_count++;
 		}
@@ -739,6 +753,9 @@ static void sms_refresh_line_mode4( smsvdp_t *smsvdp, int *line_buffer, int line
 		bit_plane_1 = smsvdp->VRAM[((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x01];
 		bit_plane_2 = smsvdp->VRAM[((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x02];
 		bit_plane_3 = smsvdp->VRAM[((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x03];
+
+		sprite_col_occurred = 0;
+		sprite_col_x = 0;
 
 		for (pixel_x = 0; pixel_x < 8 ; pixel_x++)
 		{
@@ -790,8 +807,11 @@ static void sms_refresh_line_mode4( smsvdp_t *smsvdp, int *line_buffer, int line
 				}
 				else
 				{
-					/* sprite collision occurred */
-					smsvdp->status |= STATUS_SPRCOL;
+					if (!sprite_col_occurred)
+					{
+						sprite_col_occurred = 1;
+						sprite_col_x = pixel_plot_x;
+					}
 				}
 				if (smsvdp->collision_buffer[pixel_plot_x + 1] != 1)
 				{
@@ -799,8 +819,11 @@ static void sms_refresh_line_mode4( smsvdp_t *smsvdp, int *line_buffer, int line
 				}
 				else
 				{
-					/* sprite collision occurred */
-					smsvdp->status |= STATUS_SPRCOL;
+					if (!sprite_col_occurred)
+					{
+						sprite_col_occurred = 1;
+						sprite_col_x = pixel_plot_x;
+					}
 				}
 			}
 			else
@@ -830,11 +853,16 @@ static void sms_refresh_line_mode4( smsvdp_t *smsvdp, int *line_buffer, int line
 				}
 				else
 				{
-					/* sprite collision occurred */
-					smsvdp->status |= STATUS_SPRCOL;
+					if (!sprite_col_occurred)
+					{
+						sprite_col_occurred = 1;
+						sprite_col_x = pixel_plot_x;
+					}
 				}
 			}
 		}
+		if (sprite_col_occurred)
+			timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, pixel_plot_y + line, SPRCOL_BASEHPOS + sprite_col_x), smsvdp, (int)STATUS_SPRCOL, smsvdp_set_status);
 	}
 
 	/* Fill column 0 with overscan color from reg[0x07] */
@@ -852,9 +880,10 @@ static void sms_refresh_line_mode4( smsvdp_t *smsvdp, int *line_buffer, int line
 }
 
 
-static void sms_refresh_tms9918_sprites( smsvdp_t *smsvdp, int *line_buffer, int line )
+static void sms_refresh_tms9918_sprites( running_machine *machine, smsvdp_t *smsvdp, int *line_buffer, int pixel_plot_y, int line )
 {
 	int pixel_plot_x;
+	int sprite_col_occurred, sprite_col_x;
 	int sprite_height, sprite_buffer_count, sprite_index, sprite_buffer[4], sprite_buffer_index;
 	UINT8 *sprite_table, *sprite_pattern_table;
 
@@ -885,7 +914,7 @@ static void sms_refresh_tms9918_sprites( smsvdp_t *smsvdp, int *line_buffer, int
 			else if (line >= 0 && line < smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V])
 			{
 				/* Too many sprites per line */
-				smsvdp->status |= STATUS_SPROVR;
+				timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, pixel_plot_y + line, SPROVR_HPOS), smsvdp, (int)STATUS_SPROVR, smsvdp_set_status);
 			}
 			sprite_buffer_count++;
 		}
@@ -942,6 +971,9 @@ static void sms_refresh_tms9918_sprites( smsvdp_t *smsvdp, int *line_buffer, int
 
 		pattern = sprite_pattern_table[sprite_tile_selected * 8 + sprite_line];
 
+		sprite_col_occurred = 0;
+		sprite_col_x = 0;
+
 		for (pixel_x = 0; pixel_x < 8; pixel_x++)
 		{
 			if (smsvdp->reg[0x01] & 0x01)
@@ -962,7 +994,11 @@ static void sms_refresh_tms9918_sprites( smsvdp_t *smsvdp, int *line_buffer, int
 					}
 					else
 					{
-						smsvdp->status |= STATUS_SPRCOL;
+						if (!sprite_col_occurred)
+						{
+							sprite_col_occurred = 1;
+							sprite_col_x = pixel_plot_x;
+						}
 					}
 
 					line_buffer[pixel_plot_x+1] = smsvdp->current_palette[pen_selected];
@@ -973,7 +1009,11 @@ static void sms_refresh_tms9918_sprites( smsvdp_t *smsvdp, int *line_buffer, int
 					}
 					else
 					{
-						smsvdp->status |= STATUS_SPRCOL;
+						if (!sprite_col_occurred)
+						{
+							sprite_col_occurred = 1;
+							sprite_col_x = pixel_plot_x;
+						}
 					}
 				}
 			}
@@ -996,7 +1036,11 @@ static void sms_refresh_tms9918_sprites( smsvdp_t *smsvdp, int *line_buffer, int
 					}
 					else
 					{
-						smsvdp->status |= STATUS_SPRCOL;
+						if (!sprite_col_occurred)
+						{
+							sprite_col_occurred = 1;
+							sprite_col_x = pixel_plot_x;
+						}
 					}
 				}
 			}
@@ -1029,7 +1073,11 @@ static void sms_refresh_tms9918_sprites( smsvdp_t *smsvdp, int *line_buffer, int
 						}
 						else
 						{
-							smsvdp->status |= STATUS_SPRCOL;
+							if (!sprite_col_occurred)
+							{
+								sprite_col_occurred = 1;
+								sprite_col_x = pixel_plot_x;
+							}
 						}
 
 						line_buffer[pixel_plot_x+1] = smsvdp->current_palette[pen_selected];
@@ -1040,7 +1088,11 @@ static void sms_refresh_tms9918_sprites( smsvdp_t *smsvdp, int *line_buffer, int
 						}
 						else
 						{
-							smsvdp->status |= STATUS_SPRCOL;
+							if (!sprite_col_occurred)
+							{
+								sprite_col_occurred = 1;
+								sprite_col_x = pixel_plot_x;
+							}
 						}
 					}
 				}
@@ -1063,12 +1115,18 @@ static void sms_refresh_tms9918_sprites( smsvdp_t *smsvdp, int *line_buffer, int
 						}
 						else
 						{
-							smsvdp->status |= STATUS_SPRCOL;
+							if (!sprite_col_occurred)
+							{
+								sprite_col_occurred = 1;
+								sprite_col_x = pixel_plot_x;
+							}
 						}
 					}
 				}
 			}
 		}
+		if (sprite_col_occurred)
+			timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, pixel_plot_y + line, SPRCOL_BASEHPOS + sprite_col_x), smsvdp, (int)STATUS_SPRCOL, smsvdp_set_status);
 	}
 }
 
@@ -1120,9 +1178,6 @@ static void sms_refresh_line_mode2( smsvdp_t *smsvdp, int *line_buffer, int line
 			line_buffer[pixel_plot_x] = smsvdp->current_palette[pen_selected];
 		}
 	}
-
-	/* Draw sprite layer */
-	sms_refresh_tms9918_sprites(smsvdp, line_buffer, line);
 }
 
 
@@ -1161,9 +1216,6 @@ static void sms_refresh_line_mode0( smsvdp_t *smsvdp, int *line_buffer, int line
 			line_buffer[pixel_plot_x] = smsvdp->current_palette[pen_selected];
 		}
 	}
-
-	/* Draw sprite layer */
-	sms_refresh_tms9918_sprites(smsvdp, line_buffer, line);
 }
 
 
@@ -1171,36 +1223,37 @@ static void sms_refresh_line( running_machine *machine, smsvdp_t *smsvdp, bitmap
 {
 	int x;
 	int *blitline_buffer = smsvdp->line_buffer;
+	int priority_selected[256];
 
 	switch( smsvdp->vdp_mode )
 	{
 	case 0:
-		sms_refresh_line_mode0(smsvdp, blitline_buffer, line);
+		if (line >= 0 && line < smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V])
+			sms_refresh_line_mode0(smsvdp, blitline_buffer, line);
+		sms_refresh_tms9918_sprites(machine, smsvdp, blitline_buffer, pixel_plot_y, line);
 		break;
 
 	case 2:
-		sms_refresh_line_mode2(smsvdp, blitline_buffer, line);
+		if (line >= 0 && line < smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V])
+			sms_refresh_line_mode2(smsvdp, blitline_buffer, line);
+		sms_refresh_tms9918_sprites(machine, smsvdp, blitline_buffer, pixel_plot_y, line);
 		break;
 
 	case 4:
 	default:
-		sms_refresh_line_mode4(smsvdp, blitline_buffer, line);
+		memset(priority_selected, 0, sizeof(priority_selected));
+		if (line >= 0 && line < smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V])
+			sms_refresh_line_mode4(smsvdp, blitline_buffer, priority_selected, line);
+		sms_refresh_mode4_sprites(machine, smsvdp, blitline_buffer, priority_selected, pixel_plot_y, line);
 		break;
 	}
 
-	if (line < 0 || line >= smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V])
+	/* Check if display is disabled or we're below/above active area */
+	if (!(smsvdp->reg[0x01] & 0x40) || line < 0 || line >= smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V])
 	{
 		for (x = 0; x < 256; x++)
 		{
 			blitline_buffer[x] = smsvdp->current_palette[BACKDROP_COLOR];
-		}
-	}
-	/* Check if display is disabled */
-	else if (!(smsvdp->reg[0x01] & 0x40))
-	{
-		for (x = 0; x < 256; x++)
-		{
-			blitline_buffer[x] = 0;
 		}
 	}
 
@@ -1459,7 +1512,7 @@ static DEVICE_START( smsvdp )
 	smsvdp->prev_bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED32);
 
 	smsvdp->smsvdp_display_timer = timer_alloc(device->machine, smsvdp_display_callback, smsvdp);
-	timer_adjust_periodic(smsvdp->smsvdp_display_timer, video_screen_get_time_until_pos(screen, 0, 0), 0, video_screen_get_scan_period(screen));
+	timer_adjust_periodic(smsvdp->smsvdp_display_timer, video_screen_get_time_until_pos(screen, 0, DISPLAY_CB_HPOS), 0, video_screen_get_scan_period(screen));
 
 	state_save_register_device_item(device, 0, smsvdp->status);
 	state_save_register_device_item(device, 0, smsvdp->reg9copy);
