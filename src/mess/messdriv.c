@@ -1572,5 +1572,6 @@ const game_driver * const drivers[] =
 	DRIVER( supracan )
 	DRIVER( scv )
 	DRIVER( scv_pal )
+	DRIVER( vii ) // Chintendo / KenSingTon / Jungle Soft / Siatronics Vii
 
 #endif /* DRIVER_RECURSIVE */

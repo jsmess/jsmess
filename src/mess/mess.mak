@@ -127,6 +127,7 @@ CPUS += SUPERFX
 CPUS += Z8
 CPUS += I8008
 CPUS += SCMP
+CPUS += UNSP
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
@@ -1579,6 +1580,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/msbc1.o		\
 	$(MESS_DRIVERS)/sbc6510.o	\
 	$(MESS_DRIVERS)/supracan.o	\
+	$(MESS_DRIVERS)/vii.o		\
 
 
 
