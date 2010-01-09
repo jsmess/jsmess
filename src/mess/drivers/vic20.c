@@ -239,7 +239,10 @@ static READ8_DEVICE_HANDLER( via0_pa_r )
 	data &= ~(input_port_read(device->machine, "JOY") & 0x3c);
 
 	/* cassette switch */
-	if ((cassette_get_state(state->cassette) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) data &= ~0x40;
+	if ((cassette_get_state(state->cassette) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) 
+		data &= ~0x40;
+	else
+		data |=  0x40;
 
 	return data;
 }
@@ -309,7 +312,7 @@ static WRITE8_DEVICE_HANDLER( via0_ca2_w )
 {
 	vic20_state *state = device->machine->driver_data;
 
-	if (BIT(data, 0))
+	if (!BIT(data, 0))
 	{
 		cassette_change_state(state->cassette, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		timer_device_adjust_periodic(state->cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
