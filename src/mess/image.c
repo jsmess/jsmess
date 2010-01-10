@@ -856,7 +856,11 @@ static int image_load_internal(const device_config *image, const char *path,
 
 		if ( slot->software_entry )
 		{
-			load_region_list(slot->dev, slot->software_list->name, slot->software_entry->name, slot->software_entry->rom_info );
+			char swname[256];
+
+			sprintf( swname, "%s:%s", slot->software_list->name, slot->software_entry->name );
+
+			load_software_region(slot->dev, swname, slot->software_entry->rom_info );
 
 			/* call device load or create */
 			if (image->token != NULL)
@@ -1461,9 +1465,13 @@ const software_entry *image_software_entry(const device_config *image)
 
 UINT8 *image_get_software_region(const device_config *image, const char *tag)
 {
+	image_slot_data *slot = find_image_slot(image);
 	char full_tag[256];
 
-	sprintf( full_tag, "%s:%s:%s", image->tag, image_software_entry(image)->name, tag );
+	if ( slot->software_list == NULL || slot->software_entry == NULL )
+		return NULL;
+
+	sprintf( full_tag, "%s:%s:%s", slot->software_list->name, slot->software_entry->name, tag );
 	return memory_region( image->machine, full_tag );
 }
 
