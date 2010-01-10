@@ -18,6 +18,8 @@ struct _unsp_state
 	UINT16 r[16];
 	UINT8 irq;
 	UINT8 fiq;
+	UINT16 curirq;
+	UINT16 sirq;
 	UINT8 sb;
 	UINT8 saved_sb;
 
