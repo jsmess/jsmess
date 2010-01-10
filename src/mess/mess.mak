@@ -1678,8 +1678,12 @@ $(MESS_DRIVERS)/z80ne.o:	$(MESS_LAYOUT)/z80ne.lh   \
 #-------------------------------------------------
 
 $(MESSOBJ)/software.a:					\
+	$(MESS_SOFTWARE)/32x_cart.o	\
 	$(MESS_SOFTWARE)/bbcbc_cart.o		\
+	$(MESS_SOFTWARE)/gamegear_cart.o	\
 	$(MESS_SOFTWARE)/gamepock_cart.o	\
+	$(MESS_SOFTWARE)/megadriv_cart.o	\
+	$(MESS_SOFTWARE)/sms_cart.o	\
 	$(MESS_SOFTWARE)/supracan_cart.o	\
 
 
