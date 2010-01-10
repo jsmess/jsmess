@@ -37,13 +37,13 @@ const software_list * const software_lists[] =
 
 /****************SOFTWARE LISTS**********************************************/
 
-//	ADD_SOFTWARE_LIST( _32x_cart )      /* Sega 32X cartridges */
+	ADD_SOFTWARE_LIST( _32x_cart )      /* Sega 32X cartridges */
 	ADD_SOFTWARE_LIST( bbcbc_cart )     /* BBC Bridge Companion cartridges */
 	ADD_SOFTWARE_LIST( gamegear_cart )  /* Sega Game Gear cartridges */
 	ADD_SOFTWARE_LIST( gamepock_cart )  /* Epoch Game Pocket Computer cartridges */
-//	ADD_SOFTWARE_LIST( megadriv_cart )  /* Sega MegaDrive / Genesis cartridges */
-//	ADD_SOFTWARE_LIST( megasvp_cart )   /* Sega MegaDrive / Genesis w/SVP cartridges */
-//	ADD_SOFTWARE_LIST( sms_cart )       /* Sega Master System cartridges */
+	ADD_SOFTWARE_LIST( megadriv_cart )  /* Sega MegaDrive / Genesis cartridges */
+	ADD_SOFTWARE_LIST( megasvp_cart )   /* Sega MegaDrive / Genesis w/SVP cartridges */
+	ADD_SOFTWARE_LIST( sms_cart )       /* Sega Master System cartridges */
 	ADD_SOFTWARE_LIST( supracan_cart )  /* Super A'Can cartridges */
 
 #endif /* SOFTWARE_LIST_RECURSIVE */

@@ -11,26 +11,6 @@
 
 #include "romload.h"
 
-#define REGION_W      "World"
-
-#define REGION_A      "Asia"
-#define REGION_B      "Brazil & South America"
-#define REGION_E      "Europe"
-#define REGION_J      "Japan"
-#define REGION_K      "Korea"
-#define REGION_O      "Australia & Oceania"
-#define REGION_U      "U.S.A. & North America"
-
-#define REGION_EU      "Europe, U.S.A."
-#define REGION_JA      "Japan, Asia"
-#define REGION_JU      "Japan, U.S.A."
-#define REGION_JK      "Japan, Korea"
-#define REGION_KU      "Korea, U.S.A."
-#define REGION_EJ      "Europe, Japan"
-#define REGION_BK      "Brazil, Korea"
-#define REGION_OU      "Australia, U.S.A."
-#define REGION_UA      "U.S.A., Asia"
-
 
 /* ----- software typedef ----- */
 
