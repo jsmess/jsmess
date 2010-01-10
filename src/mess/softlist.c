@@ -40,13 +40,21 @@ const software_list* software_list_get_by_name(const char *name)
 
 const software_entry* software_get_by_name(const software_list* list, const char *name)
 {
+	const char *softname;
 	int entrynum;
 
+	assert( name != NULL );
+
+	softname = strrchr( name, ':' );
+	if ( softname )
+		softname++;	/* Skip ':' */
+	else
+		softname = name;
 
 	/* scan for a match in the software list */
 	for ( entrynum = 0; list->entries[entrynum].name != NULL; entrynum++ )
 	{
-		if ( mame_stricmp( list->entries[entrynum].name, name ) == 0 )
+		if ( mame_stricmp( list->entries[entrynum].name, softname ) == 0 )
 		{
 			return &list->entries[entrynum];
 		}

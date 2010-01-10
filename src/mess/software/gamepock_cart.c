@@ -40,11 +40,11 @@ SOFTWARE_END
 
 
 SOFTWARE_LIST_START( gamepock_cart )
-	SOFTWARE( astrobom, 0, 1984, "Epoch", "Astro Bomber", NULL, 0, 0 )				/* Game 1 */
-	SOFTWARE( blockmaz, 0, 1984, "Epoch", "Block Maze", NULL, 0, 0 )				/* Game 2 */
-	SOFTWARE( pokemahj, 0, 1984, "Epoch", "Pokekon Mahjongg", NULL, 0, 0 )			/* Game 3 */
-	SOFTWARE( pokereve, 0, 1984, "Epoch", "Pokekon Reversi", NULL, 0, 0 )			/* Game 4 */
-	SOFTWARE( soukoban, 0, 1985, "Epoch", "Soukoban - Store Keepers", NULL, 0, 0 )	/* Game 5 */
+	SOFTWARE( astrobom, 0, 1984, "Epoch", "Astro Bomber", 0, 0 )				/* Game 1 */
+	SOFTWARE( blockmaz, 0, 1984, "Epoch", "Block Maze", 0, 0 )					/* Game 2 */
+	SOFTWARE( pokemahj, 0, 1984, "Epoch", "Pokekon Mahjongg", 0, 0 )			/* Game 3 */
+	SOFTWARE( pokereve, 0, 1984, "Epoch", "Pokekon Reversi", 0, 0 )				/* Game 4 */
+	SOFTWARE( soukoban, 0, 1985, "Epoch", "Soukoban - Store Keepers", 0, 0 )	/* Game 5 */
 SOFTWARE_LIST_END
 
 SOFTWARE_LIST( gamepock_cart, "Epoch Game Pocket Computer cartridges" )

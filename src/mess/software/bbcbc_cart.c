@@ -84,17 +84,17 @@ SOFTWARE_END
 
 
 SOFTWARE_LIST_START( bbcbc_cart )
-	SOFTWARE( advbidding,   0,         198x, "BBC", "Advanced Bidding", NULL, 0, 0 )
-	SOFTWARE( advdefence,   0,         198x, "BBC", "Advanded Defence", NULL, 0, 0 )
-	SOFTWARE( brbuilder,    0,         198x, "BBC", "Bridge Builder", NULL, 0, 0 )
-	SOFTWARE( brbuildera,   brbuilder, 198x, "BBC", "Bridge Builder (Alt)", NULL, 0, 0 )
-	SOFTWARE( clubplay1,    0,         198x, "BBC", "Club Play 1", NULL, 0, 0 )
-	SOFTWARE( clubplay2,    0,         198x, "BBC", "Club Play 2", NULL, 0, 0 )
-	SOFTWARE( clubplay2a,   clubplay2, 198x, "BBC", "Club Play 2 (Alt)", NULL, 0, 0 )
-	SOFTWARE( clubplay3,    0,         198x, "BBC", "Club Play 3", NULL, 0, 0 )
-	SOFTWARE( conventions1, 0,         198x, "BBC", "Conventions 1", NULL, 0, 0 )
-	SOFTWARE( duplicate1,   0,         198x, "BBC", "Duplicate 1", NULL, 0, 0 )
-	SOFTWARE( masterplay1,  0,         198x, "BBC", "Master Play 1", NULL, 0, 0 )
+	SOFTWARE( advbidding,   0,         198x, "BBC", "Advanced Bidding", 0, 0 )
+	SOFTWARE( advdefence,   0,         198x, "BBC", "Advanded Defence", 0, 0 )
+	SOFTWARE( brbuilder,    0,         198x, "BBC", "Bridge Builder", 0, 0 )
+	SOFTWARE( brbuildera,   brbuilder, 198x, "BBC", "Bridge Builder (Alt)", 0, 0 )
+	SOFTWARE( clubplay1,    0,         198x, "BBC", "Club Play 1", 0, 0 )
+	SOFTWARE( clubplay2,    0,         198x, "BBC", "Club Play 2", 0, 0 )
+	SOFTWARE( clubplay2a,   clubplay2, 198x, "BBC", "Club Play 2 (Alt)", 0, 0 )
+	SOFTWARE( clubplay3,    0,         198x, "BBC", "Club Play 3", 0, 0 )
+	SOFTWARE( conventions1, 0,         198x, "BBC", "Conventions 1", 0, 0 )
+	SOFTWARE( duplicate1,   0,         198x, "BBC", "Duplicate 1", 0, 0 )
+	SOFTWARE( masterplay1,  0,         198x, "BBC", "Master Play 1", 0, 0 )
 SOFTWARE_LIST_END
 
 

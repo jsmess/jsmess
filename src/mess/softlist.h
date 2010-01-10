@@ -42,7 +42,6 @@ struct _software_entry
 	const char *	fullname;			/* full name of the software */
 	const char *	release_date;		/* release date */
 	const char *	manufacturer;		/* manufacturer */
-	const char *	region;				/* region (World, USA, Japan, etc) */
 	UINT64			userflags;			/* freely usable flags, can be used to store things like board type or pcb features */
 	UINT32			flags;				/* general flags known to the framework */
 	const rom_entry	*rom_info;			/* rom information for the software */
@@ -67,15 +66,15 @@ struct _software_list
 #define SOFTWARE_LIST_START(name)	\
 	static const software_entry SOFTWARE_NAME(name)[] = {
 
-#define SOFTWARE_LIST_END							{ NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL } };
+#define SOFTWARE_LIST_END							{ NULL, NULL, NULL, NULL, NULL, 0, 0, NULL } };
 
 #define SOFTWARE_ROM_NAME(name)						software_rom_##name
 #define SOFTWARE_START(name)						static const rom_entry SOFTWARE_ROM_NAME(name)[] = {
 #define SOFTWARE_END								ROM_END
 
 
-#define SOFTWARE(name,parent,year,manufacturer,fullname,region,userflags,flags) \
-    { #name, #parent, fullname, #year, manufacturer, region, userflags, flags, SOFTWARE_ROM_NAME(name) },
+#define SOFTWARE(name,parent,year,manufacturer,fullname,userflags,flags) \
+    { #name, #parent, fullname, #year, manufacturer, userflags, flags, SOFTWARE_ROM_NAME(name) },
 
 
 /***************************************************************************

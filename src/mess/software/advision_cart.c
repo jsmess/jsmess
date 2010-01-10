@@ -34,10 +34,10 @@ SOFTWARE_END
 
 
 SOFTWARE_LIST_START( advision_cart )
-	SOFTWARE( defender, 0, 1982, "Entex Industries Inc.", "Defender", NULL, 0, 0 )				/* 6075 */
-	SOFTWARE( turtles , 0, 1982, "Entex Industries Inc.", "Turtles", NULL, 0, 0 )				/* 6076 */
-	SOFTWARE( supcobra, 0, 1982, "Entex Industries Inc.", "Super Cobra", NULL, 0, 0 )			/* 6077 */
-	SOFTWARE( spcforce, 0, 1982, "Entex Industries Inc.", "Space Force", NULL, 0, 0 )			/* 6078 */
+	SOFTWARE( defender, 0, 1982, "Entex Industries Inc.", "Defender", 0, 0 )				/* 6075 */
+	SOFTWARE( turtles , 0, 1982, "Entex Industries Inc.", "Turtles", 0, 0 )				/* 6076 */
+	SOFTWARE( supcobra, 0, 1982, "Entex Industries Inc.", "Super Cobra", 0, 0 )			/* 6077 */
+	SOFTWARE( spcforce, 0, 1982, "Entex Industries Inc.", "Space Force", 0, 0 )			/* 6078 */
 SOFTWARE_LIST_END
 
 SOFTWARE_LIST( advision_cart, "Entex Industries Inc. Adventure Vision cartridges" )
