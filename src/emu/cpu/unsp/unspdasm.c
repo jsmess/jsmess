@@ -164,7 +164,7 @@ CPU_DISASSEMBLE( unsp )
 
 				// ALU, Direct 16
 				case 3:
-					print("%s [%04x], %s", alu[OP0], imm16, reg[OPB]);
+					print("%s [%04x], %s, %s", alu[OP0], imm16, reg[OPA], reg[OPB]);
 					return UNSP_DASM_OK;
 
 				// ALU, Shifted

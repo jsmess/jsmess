@@ -303,6 +303,14 @@ static CPU_EXECUTE( unsp )
 							lres = r0 + (~r1 & 0x0000ffff) + 1;
 							unsp_update_nzsc(unsp, lres, r0, r1);
 							break;
+						case 6: // neg r, [bp+imm6]
+							r0 = UNSP_REG_I(OPA);
+							r1 = READ16(unsp, UNSP_REG(BP) + OPIMM);
+							lres = -r1;
+							UNSP_REG_I(OPA) = (UINT16)lres;
+							if(OPA == (UNSP_PC-1)) jumped = 1;
+							unsp_update_nz(unsp, lres);
+							break;
 						case 8: // xor r, [bp+imm6]
 							r0 = UNSP_REG_I(OPA);
 							r1 = READ16(unsp, UNSP_REG(BP) + OPIMM);
@@ -383,6 +391,14 @@ static CPU_EXECUTE( unsp )
 							UNSP_REG_I(OPA) = -OPIMM;
 							if(OPA == (UNSP_PC-1)) jumped = 1;
 							unsp_update_nz(unsp, UNSP_REG_I(OPA));
+							break;
+						case 8: // xor r, imm6
+							r0 = UNSP_REG_I(OPA);
+							r1 = OPIMM;
+							lres = r0 ^ r1;
+							UNSP_REG_I(OPA) = (UINT16)lres;
+							unsp_update_nz(unsp, lres);
+							if(OPA == (UNSP_PC-1)) jumped = 1;
 							break;
 						case 9: // load r, imm6
 							UNSP_REG_I(OPA) = OPIMM;
@@ -493,26 +509,59 @@ static CPU_EXECUTE( unsp )
 							{
 								case 0: // add r, [r]
 									r0 = UNSP_REG_I(OPA);
-									r1 = READ16(unsp, UNSP_REG_I(OPB));
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
 									lres = r0 + r1;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									unsp_update_nzsc(unsp, lres, r0, r1);
+									if(OPA == (UNSP_PC-1)) jumped = 1;
+									break;
+								case 1: // adc r, [r]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 + r1;
+									if(UNSP_REG(SR) & 0x0040) lres++;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									unsp_update_nzsc(unsp, lres, r0, r1);
+									if(OPA == (UNSP_PC-1)) jumped = 1;
+									break;
+								case 2: // sub r, [r]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 + (~r1 & 0x0000ffff) + 1;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									unsp_update_nzsc(unsp, lres, r0, r1);
+									if(OPA == (UNSP_PC-1)) jumped = 1;
+									break;
+								case 3: // sbc r, [r]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 + (~r1 & 0x0000ffff);
+									if(UNSP_REG(SR) & 0x0040) lres++;
 									UNSP_REG_I(OPA) = (UINT16)lres;
 									unsp_update_nzsc(unsp, lres, r0, r1);
 									if(OPA == (UNSP_PC-1)) jumped = 1;
 									break;
 								case 4: // cmp r, [r]
 									r0 = UNSP_REG_I(OPA);
-									r1 = READ16(unsp, UNSP_REG_I(OPB));
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
 									lres = r0 + (~r1 & 0x0000ffff) + 1;
 									unsp_update_nzsc(unsp, lres, r0, r1);
 									break;
+								case 6: // neg r, [r]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									UNSP_REG_I(OPA) = -r1;
+									unsp_update_nzsc(unsp, lres, r0, r1);
+									if(OPA == (UNSP_PC-1)) jumped = 1;
+									break;
 								case 9: // load r, [r]
-									UNSP_REG_I(OPA) = READ16(unsp, UNSP_REG_I(OPB));
+									UNSP_REG_I(OPA) = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
 									if(OPA == (UNSP_PC-1)) jumped = 1;
 									unsp_update_nz(unsp, UNSP_REG_I(OPA));
 									break;
 								case 10: // or r, [r]
 									r0 = UNSP_REG_I(OPA);
-									r1 = READ16(unsp, UNSP_REG_I(OPB));
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
 									lres = r0 | r1;
 									UNSP_REG_I(OPA) = (UINT16)lres;
 									if(OPA == (UNSP_PC-1)) jumped = 1;
@@ -520,14 +569,14 @@ static CPU_EXECUTE( unsp )
 									break;
 								case 11: // and r, [r]
 									r0 = UNSP_REG_I(OPA);
-									r1 = READ16(unsp, UNSP_REG_I(OPB));
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
 									lres = r0 & r1;
 									UNSP_REG_I(OPA) = (UINT16)lres;
 									if(OPA == (UNSP_PC-1)) jumped = 1;
 									unsp_update_nz(unsp, lres);
 									break;
 								case 13: // store r, [r]
-									WRITE16(unsp, UNSP_REG_I(OPB), UNSP_REG_I(OPA));
+									WRITE16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB), UNSP_REG_I(OPA));
 									break;
 								default:
 									unimplemented_opcode(unsp, op);
@@ -538,19 +587,106 @@ static CPU_EXECUTE( unsp )
 							//print("%s %s, [%s%s--]", alu[OP0], reg[OPA], (OPN & 4) ? "ds:" : "", reg[OPB]);
 							switch(OP0)
 							{
+								case 0: // add r, [<ds:>r--]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 + r1;
+									UNSP_REG_I(OPB)--;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nzsc(unsp, UNSP_REG_I(OPA), r0, r1);
+									break;
+								case 1: // adc r, [<ds:>r--]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 + r1;
+									if(UNSP_REG(SR) & 0x0040) lres++;
+									UNSP_REG_I(OPB)--;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nzsc(unsp, UNSP_REG_I(OPA), r0, r1);
+									break;
+								case 2: // sub r, [<ds:>r--]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 + (~r1 & 0x0000ffff) + 1;
+									UNSP_REG_I(OPB)--;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nzsc(unsp, UNSP_REG_I(OPA), r0, r1);
+									break;
+								case 3: // sbc r, [<ds:>r--]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 + (~r1 & 0x0000ffff);
+									if(UNSP_REG(SR) & 0x0040) lres++;
+									UNSP_REG_I(OPB)--;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nzsc(unsp, UNSP_REG_I(OPA), r0, r1);
+									break;
+								case 4: // cmp r, [<ds:>r--]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 + (~r1 & 0x0000ffff) + 1;
+									if(UNSP_REG(SR) & 0x0040) lres++;
+									UNSP_REG_I(OPB)--;
+									unsp_update_nzsc(unsp, lres, r0, r1);
+									break;
+								case 6: // neg r, [<ds:>r--]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = -r1;
+									UNSP_REG_I(OPB)--;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nz(unsp, UNSP_REG_I(OPA));
+									break;
+								case 8: // xor r, [<ds:>r--]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 ^ r1;
+									UNSP_REG_I(OPB)--;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nz(unsp, UNSP_REG_I(OPA));
+									break;
 								case 9: // load r, [<ds:>r--]
 									UNSP_REG_I(OPA) = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
 									UNSP_REG_I(OPB)--;
 									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
 									unsp_update_nz(unsp, UNSP_REG_I(OPA));
 									break;
+								case 10: // or r, [<ds:>r--]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 | r1;
+									UNSP_REG_I(OPB)--;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nz(unsp, UNSP_REG_I(OPA));
+									break;
+								case 11: // and r, [<ds:>r--]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 & r1;
+									UNSP_REG_I(OPB)--;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nz(unsp, UNSP_REG_I(OPA));
+									break;
+								case 12: // test r, [<ds:>r--]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 & r1;
+									UNSP_REG_I(OPB)--;
+									if(OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nz(unsp, UNSP_REG_I(OPA));
+									break;
 								case 13: // store r, [<ds:>r--]
 									WRITE16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB), UNSP_REG_I(OPA));
 									UNSP_REG_I(OPB)--;
-									if(OPB == (UNSP_PC-1))
-									{
-										jumped = 1;
-									}
+									if(OPB == (UNSP_PC-1)) jumped = 1;
 									break;
 								default:
 									unimplemented_opcode(unsp, op);
@@ -558,14 +694,101 @@ static CPU_EXECUTE( unsp )
 							}
 							break;
 						case 2:
-							//print("%s %s, [%s%s++]", alu[OP0], reg[OPA], (OPN & 4) ? "ds:" : "", reg[OPB]);
 							switch(OP0)
 							{
+								case 0: // add r, [<ds:>r++]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 + r1;
+									UNSP_REG_I(OPB)++;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nzsc(unsp, UNSP_REG_I(OPA), r0, r1);
+									break;
+								case 1: // adc r, [<ds:>r++]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 + r1;
+									if(UNSP_REG(SR) & 0x0040) lres++;
+									UNSP_REG_I(OPB)++;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nzsc(unsp, UNSP_REG_I(OPA), r0, r1);
+									break;
+								case 2: // sub r, [<ds:>r++]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 + (~r1 & 0x0000ffff) + 1;
+									UNSP_REG_I(OPB)++;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nzsc(unsp, UNSP_REG_I(OPA), r0, r1);
+									break;
+								case 3: // sbc r, [<ds:>r++]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 + (~r1 & 0x0000ffff);
+									if(UNSP_REG(SR) & 0x0040) lres++;
+									UNSP_REG_I(OPB)++;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nzsc(unsp, UNSP_REG_I(OPA), r0, r1);
+									break;
+								case 4: // cmp r, [<ds:>r++]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 + (~r1 & 0x0000ffff) + 1;
+									UNSP_REG_I(OPB)++;
+									if(OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nzsc(unsp, lres, r0, r1);
+									break;
+								case 6: // neg r, [<ds:>r++]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = -r1;
+									unsp_update_nz(unsp, lres);
+									UNSP_REG_I(OPB)++;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									break;
+								case 8: // xor r, [<ds:>r++]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 ^ r1;
+									unsp_update_nz(unsp, lres);
+									UNSP_REG_I(OPB)++;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									break;
 								case 9: // load r, [<ds:>r++]
 									UNSP_REG_I(OPA) = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
 									UNSP_REG_I(OPB)++;
 									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
 									unsp_update_nz(unsp, UNSP_REG_I(OPA));
+									break;
+								case 10: // or r, [<ds:>r++]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 | r1;
+									unsp_update_nz(unsp, lres);
+									UNSP_REG_I(OPB)++;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									break;
+								case 11: // and r, [<ds:>r++]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 & r1;
+									unsp_update_nz(unsp, lres);
+									UNSP_REG_I(OPB)++;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									break;
+								case 12: // test r, [<ds:>r++]
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 & r1;
+									unsp_update_nz(unsp, lres);
 									break;
 								case 13: // store r, [<ds:>r++]
 									WRITE16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB), UNSP_REG_I(OPA));
@@ -578,8 +801,100 @@ static CPU_EXECUTE( unsp )
 							}
 							break;
 						case 3:
-							//print("%s %s, [%s++%s]", alu[OP0], reg[OPA], (OPN & 4) ? "ds:" : "", reg[OPB]);
-							unimplemented_opcode(unsp, op);
+							switch(OP0)
+							{
+								case 0: // add r, [<ds:>++r]
+									UNSP_REG_I(OPB)++;
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 + r1;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nzsc(unsp, UNSP_REG_I(OPA), r0, r1);
+									break;
+								case 1: // adc r, [<ds:>++r]
+									UNSP_REG_I(OPB)++;
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 + r1;
+									if(UNSP_REG(SR) & 0x0040) lres++;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nzsc(unsp, UNSP_REG_I(OPA), r0, r1);
+									break;
+								case 2: // sub r, [<ds:>++r]
+									UNSP_REG_I(OPB)++;
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 + (~r1 & 0x0000ffff) + 1;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nzsc(unsp, UNSP_REG_I(OPA), r0, r1);
+									break;
+								case 3: // sbc r, [<ds:>++r]
+									UNSP_REG_I(OPB)++;
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 + (~r1 & 0x0000ffff);
+									if(UNSP_REG(SR) & 0x0040) lres++;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nzsc(unsp, UNSP_REG_I(OPA), r0, r1);
+									break;
+								case 6: // neg r, [<ds:>++r]
+									UNSP_REG_I(OPB)++;
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = -r1;
+									unsp_update_nz(unsp, lres);
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									break;
+								case 8: // xor r, [<ds:>++r]
+									UNSP_REG_I(OPB)++;
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 ^ r1;
+									unsp_update_nz(unsp, lres);
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									break;
+								case 9: // load r, [<ds:>++r]
+									UNSP_REG_I(OPB)++;
+									UNSP_REG_I(OPA) = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nz(unsp, UNSP_REG_I(OPA));
+									break;
+								case 10: // or r, [<ds:>++r]
+									UNSP_REG_I(OPB)++;
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 | r1;
+									unsp_update_nz(unsp, lres);
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									break;
+								case 11: // and r, [<ds:>++r]
+									UNSP_REG_I(OPB)++;
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 & r1;
+									unsp_update_nz(unsp, lres);
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1) || OPB == (UNSP_PC-1)) jumped = 1;
+									break;
+								case 12: // test r, [<ds:>++r]
+									UNSP_REG_I(OPB)++;
+									r0 = UNSP_REG_I(OPA);
+									r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+									lres = r0 & r1;
+									unsp_update_nz(unsp, lres);
+									if(OPB == (UNSP_PC-1)) jumped = 1;
+									break;
+								default:
+									unimplemented_opcode(unsp, op);
+									break;
+							}
 							break;
 					}
 					break;
@@ -596,6 +911,18 @@ static CPU_EXECUTE( unsp )
 									r0 = UNSP_REG_I(OPA);
 									r1 = UNSP_REG_I(OPB);
 									lres = r0 + r1;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									if(OPA == (UNSP_PC-1)) jumped = 1;
+									unsp_update_nzsc(unsp, lres, r0, r1);
+									break;
+								case 1: // adc r, r
+									r0 = UNSP_REG_I(OPA);
+									r1 = UNSP_REG_I(OPB);
+									lres = r0 + r1;
+									if(UNSP_REG(SR) & 0x0040)
+									{
+										lres++;
+									}
 									UNSP_REG_I(OPA) = (UINT16)lres;
 									if(OPA == (UNSP_PC-1)) jumped = 1;
 									unsp_update_nzsc(unsp, lres, r0, r1);
@@ -675,11 +1002,31 @@ static CPU_EXECUTE( unsp )
 										if(OPA == (UNSP_PC-1)) jumped = 1;
 										unsp_update_nzsc(unsp, lres, r0, r1);
 										break;
+									case 1: // adc r, r, imm16
+										UNSP_REG(PC)++;
+										r0 = UNSP_REG_I(OPB);
+										r1 = READ16(unsp, UNSP_LPC);
+										lres = r0 + r1;
+										if(UNSP_REG(SR) & 0x0040) lres++;
+										UNSP_REG_I(OPA) = (UINT16)lres;
+										if(OPA == (UNSP_PC-1)) jumped = 1;
+										unsp_update_nzsc(unsp, lres, r0, r1);
+										break;
 									case 2: // sub r, r, imm16
 										UNSP_REG(PC)++;
 										r0 = UNSP_REG_I(OPB);
 										r1 = READ16(unsp, UNSP_LPC);
 										lres = r0 + (~r1 & 0x0000ffff) + 1;
+										UNSP_REG_I(OPA) = (UINT16)lres;
+										if(OPA == (UNSP_PC-1)) jumped = 1;
+										unsp_update_nzsc(unsp, lres, r0, r1);
+										break;
+									case 3: // sbc r, r, imm16
+										UNSP_REG(PC)++;
+										r0 = UNSP_REG_I(OPB);
+										r1 = READ16(unsp, UNSP_LPC);
+										lres = r0 + (~r1 & 0x0000ffff);
+										if(UNSP_REG(SR) & 0x0040) lres++;
 										UNSP_REG_I(OPA) = (UINT16)lres;
 										if(OPA == (UNSP_PC-1)) jumped = 1;
 										unsp_update_nzsc(unsp, lres, r0, r1);
@@ -778,12 +1125,40 @@ static CPU_EXECUTE( unsp )
 									unsp_update_nzsc(unsp, lres, r0, r1);
 									if(OPA == (UNSP_PC-1)) jumped = 1;
 									break;
+								case 2: // sub r, [imm16]
+									UNSP_REG(PC)++;
+									r0 = UNSP_REG_I(OPB);
+									r1 = READ16(unsp, READ16(unsp, UNSP_LPC));
+									lres = r0 + (~r1 & 0x0000ffff) + 1;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									unsp_update_nzsc(unsp, lres, r0, r1);
+									if(OPA == (UNSP_PC-1)) jumped = 1;
+									break;
+								case 3: // sbc r, [imm16]
+									UNSP_REG(PC)++;
+									r0 = UNSP_REG_I(OPB);
+									r1 = READ16(unsp, READ16(unsp, UNSP_LPC));
+									lres = r0 + (~r1 & 0x0000ffff);
+									if(UNSP_REG(SR) & 0x0040) lres++;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									unsp_update_nzsc(unsp, lres, r0, r1);
+									if(OPA == (UNSP_PC-1)) jumped = 1;
+									break;
 								case 4: // cmp r, [imm16]
 									UNSP_REG(PC)++;
 									r0 = UNSP_REG_I(OPB);
 									r1 = READ16(unsp, READ16(unsp, UNSP_LPC));
 									lres = r0 + (~r1 & 0x0000ffff) + 1;
 									unsp_update_nzsc(unsp, lres, r0, r1);
+									break;
+								case 6: // neg r, [imm16]
+									UNSP_REG(PC)++;
+									r0 = UNSP_REG_I(OPB);
+									r1 = READ16(unsp, READ16(unsp, UNSP_LPC));
+									lres = -r1;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									unsp_update_nz(unsp, UNSP_REG_I(OPA));
+									if(OPA == (UNSP_PC-1)) jumped = 1;
 									break;
 								case 8: // xor r, [imm16]
 									UNSP_REG(PC)++;
@@ -809,6 +1184,22 @@ static CPU_EXECUTE( unsp )
 									unsp_update_nz(unsp, UNSP_REG_I(OPA));
 									if(OPA == (UNSP_PC-1)) jumped = 1;
 									break;
+								case 11: // and r, [imm16]
+									UNSP_REG(PC)++;
+									r0 = UNSP_REG_I(OPB);
+									r1 = READ16(unsp, READ16(unsp, UNSP_LPC));
+									lres = r0 & r1;
+									UNSP_REG_I(OPA) = (UINT16)lres;
+									unsp_update_nz(unsp, UNSP_REG_I(OPA));
+									if(OPA == (UNSP_PC-1)) jumped = 1;
+									break;
+								case 12: // test r, [imm16]
+									UNSP_REG(PC)++;
+									r0 = UNSP_REG_I(OPB);
+									r1 = READ16(unsp, READ16(unsp, UNSP_LPC));
+									lres = r0 & r1;
+									unsp_update_nz(unsp, UNSP_REG_I(OPA));
+									break;
 								default:
 									unimplemented_opcode(unsp, op);
 									break;
@@ -821,15 +1212,72 @@ static CPU_EXECUTE( unsp )
 							{
 								case 0: // add [imm16], r
 									UNSP_REG(PC)++;
-									r0 = READ16(unsp, READ16(unsp, UNSP_LPC));
+									r0 = UNSP_REG_I(OPA);
 									r1 = UNSP_REG_I(OPB);
 									lres = r0 + r1;
 									WRITE16(unsp, READ16(unsp, UNSP_LPC), (UINT16)lres);
 									unsp_update_nzsc(unsp, lres, r0, r1);
 									break;
+								case 1: // adc [imm16], r
+									UNSP_REG(PC)++;
+									r0 = UNSP_REG_I(OPA);
+									r1 = UNSP_REG_I(OPB);
+									lres = r0 + r1;
+									if(UNSP_REG(SR) & 0x0040) lres++;
+									WRITE16(unsp, READ16(unsp, UNSP_LPC), (UINT16)lres);
+									unsp_update_nzsc(unsp, lres, r0, r1);
+									break;
+								case 2: // sub [imm16], r
+									UNSP_REG(PC)++;
+									r0 = UNSP_REG_I(OPA);
+									r1 = UNSP_REG_I(OPB);
+									lres = r0 + (~r1 & 0x0000ffff) + 1;
+									WRITE16(unsp, READ16(unsp, UNSP_LPC), (UINT16)lres);
+									unsp_update_nzsc(unsp, lres, r0, r1);
+									break;
+								case 3: // sbc [imm16], r
+									UNSP_REG(PC)++;
+									r0 = UNSP_REG_I(OPA);
+									r1 = UNSP_REG_I(OPB);
+									lres = r0 + (~r1 & 0x0000ffff);
+									if(UNSP_REG(SR) & 0x0040) lres++;
+									WRITE16(unsp, READ16(unsp, UNSP_LPC), (UINT16)lres);
+									unsp_update_nzsc(unsp, lres, r0, r1);
+									break;
+								case 4: // cmp [imm16], r
+									UNSP_REG(PC)++;
+									r0 = UNSP_REG_I(OPA);
+									r1 = UNSP_REG_I(OPB);
+									lres = r0 + (~r1 & 0x0000ffff) + 1;
+									unsp_update_nzsc(unsp, lres, r0, r1);
+									break;
+								case 6: // neg [imm16], r
+									UNSP_REG(PC)++;
+									r0 = UNSP_REG_I(OPA);
+									r1 = UNSP_REG_I(OPB);
+									lres = -r1;
+									WRITE16(unsp, READ16(unsp, UNSP_LPC), (UINT16)lres);
+									unsp_update_nz(unsp, lres);
+									break;
+								case 8: // xor [imm16], r
+									UNSP_REG(PC)++;
+									r0 = UNSP_REG_I(OPA);
+									r1 = UNSP_REG_I(OPB);
+									lres = r0 ^ r1;
+									WRITE16(unsp, READ16(unsp, UNSP_LPC), (UINT16)lres);
+									unsp_update_nz(unsp, lres);
+									break;
+								case 10: // or [imm16], r
+									UNSP_REG(PC)++;
+									r0 = UNSP_REG_I(OPA);
+									r1 = UNSP_REG_I(OPB);
+									lres = r0 | r1;
+									WRITE16(unsp, READ16(unsp, UNSP_LPC), (UINT16)lres);
+									unsp_update_nz(unsp, lres);
+									break;
 								case 11: // and [imm16], r
 									UNSP_REG(PC)++;
-									r0 = READ16(unsp, READ16(unsp, UNSP_LPC));
+									r0 = UNSP_REG_I(OPA);
 									r1 = UNSP_REG_I(OPB);
 									lres = r0 & r1;
 									WRITE16(unsp, READ16(unsp, UNSP_LPC), (UINT16)lres);
@@ -947,8 +1395,9 @@ static CPU_EXECUTE( unsp )
 					}
 					else
 					{
-						//print("%s %s, %s %s %d", alu[OP0], reg[OPA], reg[OPB], (OPN & 4) ? "ror" : "rol", (OPN & 3) + 1);
-						unimplemented_opcode(unsp, op);
+						lres = ((((unsp->sb << 16) | UNSP_REG_I(OPB)) << 4) | unsp->sb) << (OPN + 1);
+						unsp->sb = (lres >> 20) & 0x0f;
+						r1 = (UINT16)(lres >> 4);
 					}
 					switch(OP0)
 					{
@@ -1042,21 +1491,19 @@ static CPU_EXECUTE( unsp )
 								//print("int irq,fiq");
 								unimplemented_opcode(unsp, op);
 								break;
-							case 8:
+							case 8: // irq off
 								unsp->irq &= ~1;
 								break;
-							case 9:
+							case 9: // irq on
 								unsp->irq |= 1;
 								break;
-							case 12:
+							case 12: // fiq off
 								unsp->fiq &= ~1;
 								break;
-							case 13:
+							case 13: // fiq on
 								unsp->fiq |= 1;
 								break;
-							case 37:
-								//print("nop");
-								unimplemented_opcode(unsp, op);
+							case 37: // nop
 								break;
 						}
 					}
