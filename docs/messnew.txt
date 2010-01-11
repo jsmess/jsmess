@@ -17,7 +17,7 @@ Skeleton drivers:
 - Digital Microsystems DMS-86
 - Digital Microsystems DMS-5000
 - Digital Microsystems ZSBC-3
-
+- Contel Codata Corporation Codata
 
 
 System Driver Changes:

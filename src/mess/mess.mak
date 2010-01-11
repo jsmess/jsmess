@@ -1584,6 +1584,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/zsbc3.o		\
 	$(MESS_DRIVERS)/dms5000.o	\
 	$(MESS_DRIVERS)/dms86.o		\
+	$(MESS_DRIVERS)/codata.o		\
 
 
 

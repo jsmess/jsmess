@@ -1576,5 +1576,6 @@ const game_driver * const drivers[] =
 	DRIVER( zsbc3 )
 	DRIVER( dms5000 )
 	DRIVER( dms86 )
+	DRIVER( codata )
 
 #endif /* DRIVER_RECURSIVE */
