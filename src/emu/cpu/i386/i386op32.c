@@ -2487,6 +2487,9 @@ static void I386OP(groupF7_32)(i386_state *cpustate)		// Opcode 0xf7
 					} else {
 						REG32(EDX) = (UINT32)remainder;
 						REG32(EAX) = (UINT32)result;
+
+						// this flag is actually undefined
+						cpustate->CF = 1;
 					}
 				} else {
 					/* TODO: Divide by zero */
@@ -2515,6 +2518,9 @@ static void I386OP(groupF7_32)(i386_state *cpustate)		// Opcode 0xf7
 					} else {
 						REG32(EDX) = (UINT32)remainder;
 						REG32(EAX) = (UINT32)result;
+
+						// this flag is actually undefined
+						cpustate->CF = 1;
 					}
 				} else {
 					/* TODO: Divide by zero */

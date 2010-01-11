@@ -93,7 +93,7 @@ static UINT32 get_flags(i386_state *cpustate)
 	f |= cpustate->IOP1 << 12;
 	f |= cpustate->IOP2 << 13;
 	f |= cpustate->NT << 14;
-	return (cpustate->eflags & 0xFFFF0000) | (f & 0xFFFF);
+	return (cpustate->eflags & cpustate->eflags_mask) | (f & 0xffff);
 }
 
 static void set_flags(i386_state *cpustate, UINT32 f )
@@ -110,6 +110,7 @@ static void set_flags(i386_state *cpustate, UINT32 f )
 	cpustate->IOP1 = (f & 0x1000) ? 1 : 0;
 	cpustate->IOP2 = (f & 0x2000) ? 1 : 0;
 	cpustate->NT = (f & 0x4000) ? 1 : 0;
+	cpustate->eflags = f & cpustate->eflags_mask;
 }
 
 static void sib_byte(i386_state *cpustate,UINT8 mod, UINT32* out_ea, UINT8* out_segment)
@@ -661,12 +662,17 @@ static CPU_RESET( i386 )
 
 	cpustate->a20_mask = ~0;
 
-	cpustate->cr[0] = 0;
+	cpustate->cr[0] = 0x7ffffff0; // reserved bits set to 1
 	cpustate->eflags = 0;
+	cpustate->eflags_mask = 0x00030000;
 	cpustate->eip = 0xfff0;
 
-	REG32(EAX) = 0x0308;	// Intel 386, stepping D1
-	REG32(EDX) = 0;
+	// [11:8] Family
+	// [ 7:4] Model
+	// [ 3:0] Stepping ID
+	// Family 3 (386), Model 0 (DX), Stepping 8 (D1)
+	REG32(EAX) = 0;
+	REG32(EDX) = (3 << 8) | (0 << 4) | (8);
 
 	build_opcode_table(cpustate, OP_I386);
 	cpustate->cycle_table_rm = cycle_table_rm[CPU_CYCLES_I386];
@@ -1110,12 +1116,17 @@ static CPU_RESET( i486 )
 
 	cpustate->a20_mask = ~0;
 
-	cpustate->cr[0] = 0;
+	cpustate->cr[0] = 0x00000010;
 	cpustate->eflags = 0;
+	cpustate->eflags_mask = 0x00070000;
 	cpustate->eip = 0xfff0;
 
-	REG32(EAX) = 0x0308;	// Intel 386, stepping D1
-	REG32(EDX) = 0;
+	// [11:8] Family
+	// [ 7:4] Model
+	// [ 3:0] Stepping ID
+	// Family 4 (486), Model 0/1 (DX), Stepping 3
+	REG32(EAX) = 0;
+	REG32(EDX) = (4 << 8) | (0 << 4) | (3);
 
 	build_opcode_table(cpustate, OP_I386 | OP_FPU | OP_I486);
 	cpustate->cycle_table_rm = cycle_table_rm[CPU_CYCLES_I486];
@@ -1221,12 +1232,17 @@ static CPU_RESET( pentium )
 
 	cpustate->a20_mask = ~0;
 
-	cpustate->cr[0] = 0;
+	cpustate->cr[0] = 0x00000010;
 	cpustate->eflags = 0;
+	cpustate->eflags_mask = 0x003b0000;
 	cpustate->eip = 0xfff0;
 
-	REG32(EAX) = 0x0308;	// Intel 386, stepping D1
-	REG32(EDX) = 0;
+	// [11:8] Family
+	// [ 7:4] Model
+	// [ 3:0] Stepping ID
+	// Family 5 (Pentium), Model 2 (75 - 200MHz), Stepping 5
+	REG32(EAX) = 0;
+	REG32(EDX) = (5 << 8) | (2 << 4) | (5);
 
 	build_opcode_table(cpustate, OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM);
 	cpustate->cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM];
@@ -1237,12 +1253,7 @@ static CPU_RESET( pentium )
 	cpustate->cpuid_id2 = 0x6c65746e;	// ntel
 
 	cpustate->cpuid_max_input_value_eax = 0x01;
-
-	// [11:8] Family
-	// [ 7:4] Model
-	// [ 3:0] Stepping ID
-	// Family 5 (Pentium), Model 2 (75 - 200MHz), Stepping 1
-	cpustate->cpu_version = (5 << 8) | (2 << 4) | (1);
+	cpustate->cpu_version = REG32(EDX);
 
 	// [ 0:0] FPU on chip
 	// [ 2:2] I/O breakpoints
@@ -1250,7 +1261,7 @@ static CPU_RESET( pentium )
 	// [ 5:5] Pentium CPU style model specific registers
 	// [ 7:7] Machine Check Exception
 	// [ 8:8] CMPXCHG8B instruction
-	cpustate->feature_flags = 0x00000000;
+	cpustate->feature_flags = 0x000001bf;
 
 	CHANGE_PC(cpustate,cpustate->eip);
 }
@@ -1352,12 +1363,17 @@ static CPU_RESET( mediagx )
 
 	cpustate->a20_mask = ~0;
 
-	cpustate->cr[0] = 0;
+	cpustate->cr[0] = 0x00000010;
 	cpustate->eflags = 0;
+	cpustate->eflags_mask = 0x00270000; /* TODO: is this correct? */
 	cpustate->eip = 0xfff0;
 
-	REG32(EAX) = 0x0308;	// Intel 386, stepping D1
-	REG32(EDX) = 0;
+	// [11:8] Family
+	// [ 7:4] Model
+	// [ 3:0] Stepping ID
+	// Family 4, Model 4 (MediaGX)
+	REG32(EAX) = 0;
+	REG32(EDX) = (4 << 8) | (4 << 4) | (1);	/* TODO: is this correct? */
 
 	build_opcode_table(cpustate, OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_CYRIX);
 	cpustate->cycle_table_rm = cycle_table_rm[CPU_CYCLES_MEDIAGX];
@@ -1368,19 +1384,9 @@ static CPU_RESET( mediagx )
 	cpustate->cpuid_id2 = 0x6d616574;	// tead
 
 	cpustate->cpuid_max_input_value_eax = 0x01;
-
-	// [11:8] Family
-	// [ 7:4] Model
-	// [ 3:0] Stepping ID
-	// Family 4, Model 4 (MediaGX)
-	cpustate->cpu_version = (4 << 8) | (4 << 4) | (1);
+	cpustate->cpu_version = REG32(EDX);
 
 	// [ 0:0] FPU on chip
-	// [ 2:2] I/O breakpoints
-	// [ 4:4] Time Stamp Counter
-	// [ 5:5] Pentium CPU style model specific registers
-	// [ 7:7] Machine Check Exception
-	// [ 8:8] CMPXCHG8B instruction
 	cpustate->feature_flags = 0x00000001;
 
 	CHANGE_PC(cpustate,cpustate->eip);
