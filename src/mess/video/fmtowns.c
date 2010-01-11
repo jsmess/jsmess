@@ -113,6 +113,8 @@ static UINT16 towns_kanji_offset;
 static UINT8 towns_kanji_code_h;
 static UINT8 towns_kanji_code_l;
 static rectangle towns_crtc_layerscr[2];  // each layer has independent sizes
+static UINT8 towns_display_plane;
+static UINT8 towns_display_page_sel;
 
 extern UINT32* towns_vram;
 extern UINT8* towns_gfxvram;
@@ -260,6 +262,8 @@ READ8_HANDLER( towns_video_cff80_r )
 			return towns_crtc_mix;
 		case 0x01:  // read/write plane select (bit 0-3 write, bit 6-7 read)
 			return ((towns_vram_rplane << 6) & 0xc0) | towns_vram_wplane;
+		case 0x02:  // display planes (bits 0-2,5), display page select (bit 4)
+			return towns_display_plane | towns_display_page_sel;
 		case 0x03:  // VRAM page select (bit 5)
 			if(towns_vram_page_sel != 0)
 				return 0x10;
@@ -299,6 +303,10 @@ WRITE8_HANDLER( towns_video_cff80_w )
 			towns_vram_rplane = (data & 0xc0) >> 6;
 			towns_update_video_banks(space);
 			logerror("VGA: VRAM wplane select = 0x%02x\n",towns_vram_wplane);
+			break;
+		case 0x02:  // display plane (bits 0-2), display page select (bit 4)
+			towns_display_plane = data & 0x27;
+			towns_display_page_sel = data & 0x10;
 			break;
 		case 0x03:  // VRAM page select (bit 4)
 			towns_vram_page_sel = data & 0x10;
@@ -814,6 +822,8 @@ void towns_crtc_draw_scan_layer_hicolour(bitmap_t* bitmap,const rectangle* rect,
 	else
 		linesize = towns_crtc_reg[24] * 4;
 
+	if(towns_display_page_sel != 0)
+		off = 0x20000;
 	if(layer != 0)
 	{
 		if(!(towns_video_reg[0] & 0x10))
@@ -883,7 +893,7 @@ void towns_crtc_draw_scan_layer_256(bitmap_t* bitmap,const rectangle* rect,int l
 	UINT8 colour;
 	int hzoom = 1;
 
-	if(towns_vram_page_sel != 0)
+	if(towns_display_page_sel != 0)
 		off = 0x20000;
 	if(layer != 0)
 	{
@@ -947,8 +957,8 @@ void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int la
 	int hzoom = 1;
 	int linesize;
 
-//	if(towns_vram_page_sel != 0)
-//		off = 0x20000;
+	if(towns_display_page_sel != 0)
+		off = 0x20000;
 	if(layer == 0)
 		linesize = towns_crtc_reg[20] * 4;
 	else
