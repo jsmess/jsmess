@@ -483,9 +483,9 @@ static READ16_HANDLER( vii_io_r )
 			val = vii_io_regs[offset];
 			break;
 
-		case 0x02 ... 0x05:
-		case 0x07 ... 0x0a:
-		case 0x0c ... 0x0f: // Other GPIO regs
+		case 0x02: case 0x03: case 0x04: case 0x05:
+		case 0x07: case 0x08: case 0x09: case 0x0a:
+		case 0x0c: case 0x0d: case 0x0e: case 0x0f: // Other GPIO regs
 			verboselog(space->machine, 3, "vii_io_r: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], vii_io_regs[offset], mem_mask);
 			break;
 
@@ -556,9 +556,9 @@ static WRITE16_HANDLER( vii_io_w )
 			offset++;
 			// Intentional fallthrough
 
-		case 0x02 ... 0x05: // Port A
-		case 0x07 ... 0x0a: // Port B
-		case 0x0c ... 0x0f: // Port C
+		case 0x02: case 0x03: case 0x04: case 0x05: // Port A
+		case 0x07: case 0x08: case 0x09: case 0x0a: // Port B
+		case 0x0c: case 0x0d: case 0x0e: case 0x0f: // Port C
 			verboselog(space->machine, 3, "vii_io_w: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], data, mem_mask);
 			COMBINE_DATA(&vii_io_regs[offset]);
 			vii_do_gpio(space->machine, offset);
