@@ -45,12 +45,46 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
 		logerror( "upd1771_w: received byte 0x%02x\n", data );
 
 	state->packet[ state->index ] = data;
-	state->index = ( state->index + 1 ) % MAX_PACKET_SIZE;
+	state->index = state->index + 1;
 
 	devcb_call_write_line( &state->ack_out_func, 0 );
 
-	/* Trigger ACK after 512??? cycles */
-	timer_adjust_oneshot( state->timer, ticks_to_attotime( 512, device->clock ), 0 );
+	/* Start of a new command */
+	if ( state->expected_bytes == 0 )
+	{
+		switch ( data )
+		{
+		case 0x00:		/* 00 - 1 byte command */
+			state->expected_bytes = 1;
+			break;
+		case 0x01:		/* 01 - 10 byte command */
+			state->expected_bytes = 10;
+		case 0x02:		/* 02 - 4 byte command */
+			state->expected_bytes = 4;
+			break;
+		default:
+			if (LOG)
+				logerror("upd1771: unknown command %02x received\n", data );
+			state->expected_bytes = 99;
+			break;
+		}
+	}
+
+	if ( state->index == state->expected_bytes )
+	{
+		/* The command packet has been transferred, handle the command */
+		if (LOG)
+			logerror("upd1771_w: handle command %02x\n", state->packet[0] );
+		state->expected_bytes = 0;
+	}
+	else
+	{
+		/* We need more data to complete the command packet */
+		/* Trigger ACK after 512??? cycles */
+		timer_adjust_oneshot( state->timer, ticks_to_attotime( 512, device->clock ), 0 );
+	}
+
+	state->index = state->index % MAX_PACKET_SIZE;
 }
 
 
