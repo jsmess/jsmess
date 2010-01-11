@@ -4,29 +4,31 @@
     Chintendo Vii
     -------------------
 
-    MESS skeleton driver by Harmony
+    MESS driver by Harmony
     Based largely off of Unununium, by segher
 
 
 *******************************************************************************
 
-INFO:
+    INFO:
 
-System runs on the SPG243 SoC
+        System runs on the SPG243 SoC
 
-STATUS:
+    STATUS:
 
-Skeleton driver
+        Semi-skeleton driver
 
-TODO:
+    TODO:
 
-Everything
+        Audio
+        Motion controls
 
 *******************************************************************************/
 
 #include "driver.h"
 #include "cpu/unsp/unsp.h"
 #include "devices/cartslot.h"
+#include "machine/i2cmem.h"
 
 static UINT16 *vii_ram;
 static UINT16 *vii_cart;
@@ -164,7 +166,7 @@ static void vii_blit(running_machine *machine, bitmap_t *bitmap, const rectangle
 
 			if((flags & 0x00100000) && yy < 240)
 			{
-				xx = (xx - vii_rowscroll[yy]) & 0x01ff;
+				xx = (xx - (INT16)vii_rowscroll[yy]) & 0x01ff;
 			}
 
 			if(xx < 320 && yy < 240)
@@ -329,6 +331,21 @@ static VIDEO_UPDATE( vii )
 #define VII_VIDEO_IRQ_ENABLE	vii_video_regs[0x62]
 #define VII_VIDEO_IRQ_STATUS	vii_video_regs[0x63]
 
+static void vii_do_dma(running_machine *machine, UINT32 len)
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT32 src = vii_video_regs[0x70];
+	UINT32 dst = vii_video_regs[0x71] + 0x2c00;
+	UINT32 j;
+
+	for(j = 0; j < len; j++)
+	{
+		memory_write_word_16le(space, (dst+j) << 1, memory_read_word_16le(space, (src+j) << 1));
+	}
+
+	vii_video_regs[0x72] = 0;
+}
+
 static READ16_HANDLER( vii_video_r )
 {
 	switch(offset)
@@ -364,6 +381,21 @@ static WRITE16_HANDLER( vii_video_w )
 			{
 				cputag_set_input_line(space->machine, "maincpu", UNSP_IRQ0_LINE, CLEAR_LINE);
 			}
+			break;
+
+		case 0x70: // Video DMA Source
+			verboselog(space->machine, 0, "vii_video_w: Video DMA Source = %04x (%04x)\n", data, mem_mask);
+			COMBINE_DATA(&vii_video_regs[offset]);
+			break;
+
+		case 0x71: // Video DMA Dest
+			verboselog(space->machine, 0, "vii_video_w: Video DMA Dest = %04x (%04x)\n", data, mem_mask);
+			COMBINE_DATA(&vii_video_regs[offset]);
+			break;
+
+		case 0x72: // Video DMA Length
+			verboselog(space->machine, 0, "vii_video_w: Video DMA Length = %04x (%04x)\n", data, mem_mask);
+			vii_do_dma(space->machine, data);
 			break;
 
 		default:
@@ -427,7 +459,7 @@ static void vii_do_gpio(running_machine *machine, UINT32 offset)
 		vii_switch_bank(machine, bank);
 	}
 
-	vii_io_regs[5*index + 5] = what;
+	vii_io_regs[5*index + 1] = what;
 }
 
 static void vii_do_i2c(running_machine *machine)
@@ -660,7 +692,8 @@ static INPUT_PORTS_START( vii )
 		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
 		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("Button A")
 		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("Button B")
-		PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("Button C")
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )		 PORT_PLAYER(1) PORT_NAME("Button D")
 INPUT_PORTS_END
 
 static DEVICE_IMAGE_LOAD( vii_cart )
@@ -697,7 +730,12 @@ static MACHINE_START( vii )
 	memset(vii_io_regs, 0, 0x100 * sizeof(UINT16));
 	vii_current_bank = 0;
 	vii_controller_timer = timer_alloc(machine, vii_controller_poller, 0);
-	//timer_adjust_periodic(vii_controller_timer, video_screen_get_time_until_pos(machine->primary_screen, 120, 0), 0, ATTOTIME_IN_HZ(60));
+	timer_adjust_periodic(vii_controller_timer, video_screen_get_time_until_pos(machine->primary_screen, 120, 0), 0, ATTOTIME_IN_HZ(60));
+
+	vii_controller_input[0] = 0;
+	vii_controller_input[4] = 0;
+	vii_controller_input[6] = 0xff;
+	vii_controller_input[7] = 0;
 }
 
 static MACHINE_RESET( vii )
@@ -710,9 +748,10 @@ static INTERRUPT_GEN( vii_vblank )
 	UINT32 y = mame_rand(device->machine) & 0x3ff;
 	UINT32 z = mame_rand(device->machine) & 0x3ff;
 
-	static UINT32 which = 1;
-	VII_VIDEO_IRQ_STATUS = VII_VIDEO_IRQ_ENABLE & which;
-	which ^= 3;
+	VII_VIDEO_IRQ_STATUS = VII_VIDEO_IRQ_ENABLE & 1;
+	//static UINT32 which = 1;
+	//VII_VIDEO_IRQ_STATUS = VII_VIDEO_IRQ_ENABLE & which;
+	//which ^= 3;
 	if(VII_VIDEO_IRQ_STATUS)
 	{
 		verboselog(device->machine, 0, "Video IRQ\n");
@@ -748,6 +787,8 @@ static MACHINE_DRIVER_START( vii )
 	MDRV_MACHINE_START( vii )
 	MDRV_MACHINE_RESET( vii )
 
+	MDRV_NVRAM_HANDLER( i2cmem_0 )
+
 	MDRV_SCREEN_ADD( "screen", RASTER )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -765,6 +806,11 @@ static MACHINE_DRIVER_START( vii )
 	MDRV_VIDEO_UPDATE( vii )
 MACHINE_DRIVER_END
 
+static DRIVER_INIT( vii )
+{
+	i2cmem_init(machine, 0, I2CMEM_SLAVE_ADDRESS, 0, 0x200, NULL);
+}
+
 ROM_START( vii )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
 
@@ -772,6 +818,6 @@ ROM_START( vii )
 ROM_END
 
 /*    YEAR  NAME     PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY                                              FULLNAME    FLAGS */
-CONS( 2007, vii,     0,        0,        vii,      vii,      0,        "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",      GAME_NOT_WORKING )
+CONS( 2007, vii,     0,        0,        vii,      vii,      vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",      GAME_NOT_WORKING )
 
 
