@@ -14,7 +14,9 @@ Systems Promoted from GAME_NOT_WORKING:
 
 Skeleton drivers: 
 -----------------
-(none)
+- Digital Microsystems DMS-86
+- Digital Microsystems DMS-5000
+- Digital Microsystems ZSBC-3
 
 
 

@@ -1581,6 +1581,9 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/sbc6510.o	\
 	$(MESS_DRIVERS)/supracan.o	\
 	$(MESS_DRIVERS)/vii.o		\
+	$(MESS_DRIVERS)/zsbc3.o		\
+	$(MESS_DRIVERS)/dms5000.o	\
+	$(MESS_DRIVERS)/dms86.o		\
 
 
 
