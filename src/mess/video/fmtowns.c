@@ -250,6 +250,34 @@ WRITE8_HANDLER( towns_gfx_w )
 	}
 }
 
+static void towns_update_kanji_offset(void)
+{
+	// this is a little over the top...
+	if(towns_kanji_code_h < 0x30)
+	{
+		towns_kanji_offset = ((towns_kanji_code_l & 0x1f) << 4)
+		                   | (((towns_kanji_code_l - 0x20) & 0x20) << 8)
+		                   | (((towns_kanji_code_l - 0x20) & 0x40) << 6)
+		                   | ((towns_kanji_code_h & 0x07) << 9);
+	}
+	else if(towns_kanji_code_h < 0x70)
+	{
+		towns_kanji_offset = ((towns_kanji_code_l & 0x1f) << 4)
+		                   + (((towns_kanji_code_l - 0x20) & 0x60) << 8)
+		                   + ((towns_kanji_code_h & 0x0f) << 9)
+		                   + (((towns_kanji_code_h - 0x30) & 0x70) * 0xc00)
+		                   + 0x8000;
+	}
+	else
+	{
+		towns_kanji_offset = ((towns_kanji_code_l & 0x1f) << 4)
+		                   | (((towns_kanji_code_l - 0x20) & 0x20) << 8)
+		                   | (((towns_kanji_code_l - 0x20) & 0x40) << 6)
+		                   | ((towns_kanji_code_h & 0x07) << 9)
+		                   | 0x38000;
+	}
+} 
+
 READ8_HANDLER( towns_video_cff80_r )
 {
 	UINT8* ROM = memory_region(space->machine,"user");
@@ -302,7 +330,7 @@ WRITE8_HANDLER( towns_video_cff80_w )
 			towns_vram_wplane = data & 0x0f;
 			towns_vram_rplane = (data & 0xc0) >> 6;
 			towns_update_video_banks(space);
-			logerror("VGA: VRAM wplane select = 0x%02x\n",towns_vram_wplane);
+			//logerror("VGA: VRAM wplane select = 0x%02x\n",towns_vram_wplane);
 			break;
 		case 0x02:  // display plane (bits 0-2), display page select (bit 4)
 			towns_display_plane = data & 0x27;
@@ -313,33 +341,13 @@ WRITE8_HANDLER( towns_video_cff80_w )
 			break;
 		case 0x14:  // Kanji offset (high)
 			towns_kanji_code_h = data & 0x7f;
+			towns_update_kanji_offset();
+			//logerror("VID: Kanji code set (high) = %02x %02x\n",towns_kanji_code_h,towns_kanji_code_l);
 			break;
 		case 0x15:  // Kanji offset (low)
 			towns_kanji_code_l = data & 0x7f;
-			// this is a little over the top...
-			if(towns_kanji_code_h < 0x30)
-			{
-				towns_kanji_offset = ((towns_kanji_code_l & 0x1f) << 4)
-				                   | (((towns_kanji_code_l - 0x20) & 0x20) << 8)
-				                   | (((towns_kanji_code_l - 0x20) & 0x40) << 6)
-				                   | ((towns_kanji_code_h & 0x07) << 9);
-			}
-			else if(towns_kanji_code_h < 0x70)
-			{
-				towns_kanji_offset = ((towns_kanji_code_l & 0x1f) << 4)
-				                   + (((towns_kanji_code_l - 0x20) & 0x60) << 8)
-				                   + ((towns_kanji_code_h & 0x0f) << 9)
-				                   + (((towns_kanji_code_h - 0x30) & 0x70) * 0xc00)
-				                   + 0x8000;
-			}
-			else
-			{
-				towns_kanji_offset = ((towns_kanji_code_l & 0x1f) << 4)
-				                   | (((towns_kanji_code_l - 0x20) & 0x20) << 8)
-				                   | (((towns_kanji_code_l - 0x20) & 0x40) << 6)
-				                   | ((towns_kanji_code_h & 0x07) << 9)
-				                   | 0x38000;
-			}
+			towns_update_kanji_offset();
+			//logerror("VID: Kanji code set (low) = %02x %02x\n",towns_kanji_code_h,towns_kanji_code_l);
 			break;
 		case 0x19:  // ANK CG ROM
 			towns_ankcg_enable = data & 0x01;
