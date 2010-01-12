@@ -1,27 +1,39 @@
 /******************************************************************************
 
 
-    Chintendo Vii
+    Vii / The Batman
     -------------------
 
     MESS driver by Harmony
-    Based largely off of Unununium, by segher
+    Based largely off of Unununium, by Segher
 
 
 *******************************************************************************
 
-    INFO:
+    Short Description:
 
-        System runs on the SPG243 SoC
+        Systems run on the SPG243 SoC
 
-    STATUS:
+    Status:
 
-        Semi-skeleton driver
+        Mostly working
 
-    TODO:
+    To-Do:
 
-        Audio
-        Motion controls
+        Audio (SPG243)
+        Motion controls (Vii)
+
+    Known u'nSP-Based Systems:
+
+        ND - SPG243 - Some form of Leapfrog "edutainment" system
+        ND - SPG243 - Star Wars: Clone Wars
+        ND - SPG243 - Toy Story
+        ND - SPG243 - Animal Art Studio
+        ND - SPG243 - Finding Nemo
+         D - SPG243 - The Batman
+         D - SPG243 - Wall-E
+         D - SPG243 - Chintendo / KenSingTon / Siatronics / Jungle Soft Vii
+        ND - Likely many more
 
 *******************************************************************************/
 
@@ -37,6 +49,7 @@ static UINT16 *vii_palette;
 static UINT16 *vii_spriteram;
 
 static UINT16 vii_video_regs[0x100];
+static UINT32 vii_centered_coordinates;
 
 #define PAGE_ENABLE_MASK		0x0008
 
@@ -56,6 +69,16 @@ static UINT8 vii_screen_b[320*240];
 static UINT16 vii_io_regs[0x100];
 static UINT16 vii_uart_rx_count;
 static UINT8 vii_controller_input[8];
+
+enum
+{
+	SPG243_VII = 0,
+	SPG243_BATMAN,
+
+	SPG243_MODEL_COUNT,
+};
+
+static UINT32 spg243_mode;
 
 #define VII_CTLR_IRQ_ENABLE		vii_io_regs[0x21]
 
@@ -268,14 +291,17 @@ static void vii_blit_sprite(running_machine *machine, bitmap_t *bitmap, const re
 		return;
 	}
 
-	x = 160 + x;
-	y = 120 - y;
+	if(vii_centered_coordinates)
+	{
+		x = 160 + x;
+		y = 120 - y;
 
-	h = 8 << ((flags & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	w = 8 << ((flags & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+		h = 8 << ((flags & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+		w = 8 << ((flags & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
-	x -= (w/2);
-	y -= (h/2) - 8;
+		x -= (w/2);
+		y -= (h/2) - 8;
+	}
 
 	x &= 0x01ff;
 	y &= 0x01ff;
@@ -453,10 +479,32 @@ static void vii_do_gpio(running_machine *machine, UINT32 offset)
 	UINT16 pull   = (~dir) & (~attr);
 	UINT16 what   = (buffer & (push | pull)) ^ (dir &~ attr);
 
-	if(index == 1)
+	if(spg243_mode == SPG243_VII)
 	{
-		UINT32 bank = ((what & 0x80) >> 7) | ((what & 0x20) >> 4);
-		vii_switch_bank(machine, bank);
+		if(index == 1)
+		{
+			UINT32 bank = ((what & 0x80) >> 7) | ((what & 0x20) >> 4);
+			vii_switch_bank(machine, bank);
+		}
+	}
+	else if(spg243_mode == SPG243_BATMAN)
+	{
+		if(index == 0)
+		{
+			UINT16 temp = input_port_read(machine, "P1");
+			what |= (temp & 0x0001) ? 0x8000 : 0;
+			what |= (temp & 0x0002) ? 0x4000 : 0;
+			what |= (temp & 0x0004) ? 0x2000 : 0;
+			what |= (temp & 0x0008) ? 0x1000 : 0;
+			what |= (temp & 0x0010) ? 0x0800 : 0;
+			what |= (temp & 0x0020) ? 0x0400 : 0;
+			what |= (temp & 0x0040) ? 0x0200 : 0;
+			what |= (temp & 0x0040) ? 0x0100 : 0;
+		}
+
+		if(index == 2)
+		{
+		}
 	}
 
 	vii_io_regs[5*index + 1] = what;
@@ -696,11 +744,22 @@ static INPUT_PORTS_START( vii )
 		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )		 PORT_PLAYER(1) PORT_NAME("Button D")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( batman )
+	PORT_START("P1")
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("Menu")
+		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("B Button")
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )		 PORT_PLAYER(1) PORT_NAME("X Button")
+INPUT_PORTS_END
+
 static DEVICE_IMAGE_LOAD( vii_cart )
 {
 	UINT8 *cart = memory_region( image->machine, "cart" );
 	int size = image_length( image );
-	//int i;
 
 	if( image_fread( image, cart, size ) != size )
 	{
@@ -710,18 +769,18 @@ static DEVICE_IMAGE_LOAD( vii_cart )
 
 	memcpy(vii_cart, cart + 0x4000*2, (0x400000 - 0x4000) * 2);
 
-	return INIT_PASS;
-}
-
-static emu_timer *vii_controller_timer;
-
-static TIMER_CALLBACK( vii_controller_poller )
-{
-	if(VII_CTLR_IRQ_ENABLE)
+	if( cart[0x3cd808] == 0x99 &&
+		cart[0x3cd809] == 0x99 &&
+		cart[0x3cd80a] == 0x83 &&
+		cart[0x3cd80b] == 0x5e &&
+		cart[0x3cd80c] == 0x52 &&
+		cart[0x3cd80d] == 0x6b &&
+		cart[0x3cd80e] == 0x78 &&
+		cart[0x3cd80f] == 0x7f )
 	{
-		//verboselog(machine, 0, "Controller IRQ\n");
-		//cputag_set_input_line(machine, "maincpu", UNSP_IRQ3_LINE, ASSERT_LINE);
+		vii_centered_coordinates = 0;
 	}
+	return INIT_PASS;
 }
 
 static MACHINE_START( vii )
@@ -729,8 +788,6 @@ static MACHINE_START( vii )
 	memset(vii_video_regs, 0, 0x100 * sizeof(UINT16));
 	memset(vii_io_regs, 0, 0x100 * sizeof(UINT16));
 	vii_current_bank = 0;
-	vii_controller_timer = timer_alloc(machine, vii_controller_poller, 0);
-	timer_adjust_periodic(vii_controller_timer, video_screen_get_time_until_pos(machine->primary_screen, 120, 0), 0, ATTOTIME_IN_HZ(60));
 
 	vii_controller_input[0] = 0;
 	vii_controller_input[4] = 0;
@@ -749,9 +806,6 @@ static INTERRUPT_GEN( vii_vblank )
 	UINT32 z = mame_rand(device->machine) & 0x3ff;
 
 	VII_VIDEO_IRQ_STATUS = VII_VIDEO_IRQ_ENABLE & 1;
-	//static UINT32 which = 1;
-	//VII_VIDEO_IRQ_STATUS = VII_VIDEO_IRQ_ENABLE & which;
-	//which ^= 3;
 	if(VII_VIDEO_IRQ_STATUS)
 	{
 		verboselog(device->machine, 0, "Video IRQ\n");
@@ -787,8 +841,6 @@ static MACHINE_DRIVER_START( vii )
 	MDRV_MACHINE_START( vii )
 	MDRV_MACHINE_RESET( vii )
 
-	MDRV_NVRAM_HANDLER( i2cmem_0 )
-
 	MDRV_SCREEN_ADD( "screen", RASTER )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -806,8 +858,38 @@ static MACHINE_DRIVER_START( vii )
 	MDRV_VIDEO_UPDATE( vii )
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( batman )
+	MDRV_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
+	MDRV_CPU_PROGRAM_MAP( vii_mem )
+	MDRV_CPU_VBLANK_INT("screen", vii_vblank)
+
+	MDRV_MACHINE_START( vii )
+	MDRV_MACHINE_RESET( vii )
+
+	MDRV_NVRAM_HANDLER( i2cmem_0 )
+
+	MDRV_SCREEN_ADD( "screen", RASTER )
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(320, 240)
+	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+
+	MDRV_PALETTE_LENGTH(32768)
+
+	MDRV_VIDEO_START( vii )
+	MDRV_VIDEO_UPDATE( vii )
+MACHINE_DRIVER_END
+
 static DRIVER_INIT( vii )
 {
+	spg243_mode = SPG243_VII;
+	vii_centered_coordinates = 1;
+}
+
+static DRIVER_INIT( batman )
+{
+	spg243_mode = SPG243_BATMAN;
+	vii_centered_coordinates = 1;
 	i2cmem_init(machine, 0, I2CMEM_SLAVE_ADDRESS, 0, 0x200, NULL);
 }
 
@@ -817,7 +899,11 @@ ROM_START( vii )
 	ROM_REGION( 0x2000000, "cart", ROMREGION_ERASE00 )
 ROM_END
 
-/*    YEAR  NAME     PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY                                              FULLNAME    FLAGS */
-CONS( 2007, vii,     0,        0,        vii,      vii,      vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",      GAME_NOT_WORKING )
+ROM_START( batman )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+    ROM_LOAD16_WORD_SWAP( "batman.bin", 0x000000, 0x400000, CRC(46f848e5) SHA1(5875d57bb3fe0cac5d20e626e4f82a0e5f9bb94c) )
+ROM_END
 
-
+/*    YEAR  NAME     PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY                                              FULLNAME      FLAGS */
+CONS( 2004, batman,  0,        0,        batman,   batman,   batman,   "JAKKS Pacific, Inc. / HotGen, Ltd.",                "The Batman", GAME_NO_SOUND )
+CONS( 2007, vii,     0,        0,        vii,      vii,      vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",        GAME_NOT_WORKING )

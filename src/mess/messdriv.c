@@ -1414,6 +1414,9 @@ const game_driver * const drivers[] =
     DRIVER( roma )          /* Roma                                         */
     DRIVER( roma32 )        /* Roma                                         */
 
+	/* JAKKS Pacific, Inc. / HotGen, Ltd. */
+	DRIVER( batman )	/* The Batman, 2004 */
+
 /*********** Misc ***********************************************************/
 
     DRIVER( ex800 ) /* Epson EX-800 printer */

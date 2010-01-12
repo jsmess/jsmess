@@ -786,7 +786,7 @@ static WRITE16_HANDLER( supracan_video_w )
 			irq_mask = (data & 8) ? 0 : 1;
 			break;
 		default:
-			//verboselog(space->machine, 0, "supracan_video_w: Unknown register: %08x = %04x & %04x\n", 0xf00000 + (offset << 1), data, mem_mask);
+			verboselog(space->machine, 0, "supracan_video_w: Unknown register: %08x = %04x & %04x\n", 0xf00000 + (offset << 1), data, mem_mask);
 			break;
 	}
 	supracan_video_regs[offset] = data;
