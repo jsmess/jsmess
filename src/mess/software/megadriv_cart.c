@@ -38,6 +38,14 @@ SOFTWARE_START( robocod )
 	*/
 SOFTWARE_END
 
+/* Splatterhouse Part 2 (Jpn) - proper dump */
+SOFTWARE_START( splatt2j )
+	ROM_REGION( 0x400000, CARTRIDGE_REGION_ROM, 0 ) /* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "sh2j.bin", 0x000000, 0x100000, CRC(adbd991b) SHA1(1a0032faec53f8cf21d3178939bbc5b2f844782a) )
+SOFTWARE_END
+
+
+
 // work out which sets these relate to
 /* Lotus */
 SOFTWARE_START( lotust )
@@ -1760,7 +1768,6 @@ MEGADRIVE_ROM_LOAD( spirou, "spirou (europe) (en,fr,de,es).bin",                
 MEGADRIVE_ROM_LOAD( splatt2, "splatterhouse 2 (europe).bin",                                                              0x000000 , 0x100000,   CRC(2559e03c) SHA1(e01940808006a346b8711a74fbfa173ec872624f) )
 MEGADRIVE_ROM_LOAD( splatt2u, "splatterhouse 2 (usa).bin",                                                                0x000000 , 0x100000,   CRC(2d1766e9) SHA1(59ec19ec442989d2738c055b9290661661d13f8f) )
 MEGADRIVE_ROM_LOAD( splatt3, "splatterhouse 3 (usa).bin",                                                                 0x000000 , 0x200000,   CRC(00f05d07) SHA1(7f29f00ec724e20cb93907f1e33ac4af16879827) )
-MEGADRIVE_ROM_LOAD( splatt2j, "splatterhouse part 2 (japan).bin",                                                         0x000000 , 0x100000,   CRC(9fb70301) SHA1(0c33bb0cf3de11f52aec8d90283b831d9d7d37af) )
 MEGADRIVE_ROM_LOAD( splatt3j1, "splatterhouse part 3 (j) [a1].bin",                                                       0x000000 , 0x200000,   CRC(ed68373a) SHA1(a42fc3b2a4f4c2db2f598244c2b137862b8e79ad) )
 MEGADRIVE_ROM_LOAD( splatt3j, "splatterhouse part 3 (japan, korea).bin",                                                  0x000000 , 0x200000,   CRC(31b83d22) SHA1(1fcb8adfdb19cb772adabac14e78c560d4f2e718) )
 MEGADRIVE_ROM_LOAD( sportg, "sport games (brazil).bin",                                                                   0x000000 , 0x200000,   CRC(7e3ecabf) SHA1(41604a07b0ac7dff9e01e6829cf84ca911620729) )
