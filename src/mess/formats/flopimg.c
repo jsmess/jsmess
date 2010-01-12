@@ -15,7 +15,7 @@
 
 #include "osdepend.h"
 #include "formats/flopimg.h"
-#include "tagpool.h"
+#include "pool.h"
 #include "utils.h"
 
 #define TRACK_LOADED		0x01
@@ -38,7 +38,8 @@ struct _floppy_image
 	UINT8 flags;
 
 	/* tagging system */
-	tag_pool tags;
+	object_pool *tags;
+	void *tag_data;
 };
 
 
@@ -79,7 +80,8 @@ static floppy_image *floppy_init(void *fp, const struct io_procs *procs, int fla
 		return NULL;
 
 	memset(floppy, 0, sizeof(*floppy));
-	tagpool_init(&floppy->tags);
+	floppy->tags = pool_alloc(NULL);
+	floppy->tag_data = NULL;
 	floppy->io.file = fp;
 	floppy->io.procs = procs;
 	floppy->io.filler = 0xFF;
@@ -321,7 +323,7 @@ static void floppy_close_internal(floppy_image *floppy, int close_file)
 			io_generic_close(&floppy->io);
 		if (floppy->loaded_track_data)
 			free(floppy->loaded_track_data);
-		tagpool_exit(&floppy->tags);
+		pool_free(floppy->tags);
 	}
 
 	free(floppy);
@@ -348,17 +350,18 @@ struct FloppyCallbacks *floppy_callbacks(floppy_image *floppy)
 
 
 
-void *floppy_tag(floppy_image *floppy, const char *tagname)
+void *floppy_tag(floppy_image *floppy)
 {
 	assert(floppy);
-	return tagpool_lookup(&floppy->tags, tagname);
+	return floppy->tag_data;
 }
 
 
 
-void *floppy_create_tag(floppy_image *floppy, const char *tagname, size_t tagsize)
+void *floppy_create_tag(floppy_image *floppy, size_t tagsize)
 {
-	return tagpool_alloc(&floppy->tags, tagname, tagsize);
+	floppy->tag_data = pool_malloc(floppy->tags,tagsize);
+	return floppy->tag_data;
 }
 
 

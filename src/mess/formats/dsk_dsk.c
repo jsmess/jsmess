@@ -16,8 +16,6 @@
 #define MV_CPC  	"MV - CPC"
 #define EXTENDED	"EXTENDED"
 
-#define dskDSK_TAG	"dskdsktag"
-
 struct dskdsk_tag
 {
 	int disk_image_type;  /* image type: standard or extended */
@@ -32,7 +30,7 @@ struct dskdsk_tag
 static struct dskdsk_tag *get_tag(floppy_image *floppy)
 {
 	struct dskdsk_tag *tag;
-	tag = floppy_tag(floppy, dskDSK_TAG);
+	tag = floppy_tag(floppy);
 	return tag;
 }
 
@@ -216,7 +214,7 @@ FLOPPY_CONSTRUCT( dsk_dsk_construct )
 
 	floppy_image_read(floppy, header, 0, 0x100);
 
-	tag = (struct dskdsk_tag *) floppy_create_tag(floppy, dskDSK_TAG, sizeof(struct dskdsk_tag));
+	tag = (struct dskdsk_tag *) floppy_create_tag(floppy, sizeof(struct dskdsk_tag));
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
 

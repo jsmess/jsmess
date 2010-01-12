@@ -13,8 +13,6 @@
 #include "formats/thom_dsk.h"
 #include "formats/basicdsk.h"
 
-#define SAP_DSK_TAG	"sapdsktag"
-
 static const int sap_magic_num = 0xB3; /* simple XOR crypt */
 
 
@@ -51,7 +49,7 @@ static UINT16 thom_sap_crc( UINT8* data, int size )
 static struct sap_dsk_tag *get_tag(floppy_image *floppy)
 {
 	struct sap_dsk_tag *tag;
-	tag = floppy_tag(floppy, SAP_DSK_TAG);
+	tag = floppy_tag(floppy);
 	return tag;
 }
 
@@ -216,7 +214,7 @@ static floperr_t sap_post_format(floppy_image *floppy, option_resolution *params
         int pos;
         UINT8 buf[256], header[4];
 	struct sap_dsk_tag *tag;
-        tag = (struct sap_dsk_tag *) floppy_create_tag(floppy, SAP_DSK_TAG, sizeof(struct sap_dsk_tag));
+        tag = (struct sap_dsk_tag *) floppy_create_tag(floppy, sizeof(struct sap_dsk_tag));
 
         /* default options */
         if ( !tag->tracks )
@@ -256,7 +254,7 @@ static FLOPPY_CONSTRUCT(sap_dsk_construct)
 	struct sap_dsk_tag *tag;
 	int i,j;
 	UINT8 fmt;
-	tag = (struct sap_dsk_tag *) floppy_create_tag(floppy, SAP_DSK_TAG, sizeof(struct sap_dsk_tag));
+	tag = (struct sap_dsk_tag *) floppy_create_tag(floppy, sizeof(struct sap_dsk_tag));
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
 

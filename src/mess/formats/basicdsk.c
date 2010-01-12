@@ -38,7 +38,7 @@ struct basicdsk_tag
 static const struct basicdsk_geometry *get_geometry(floppy_image *floppy)
 {
 	const struct basicdsk_tag *tag;
-	tag = floppy_tag(floppy, BASICDSK_TAG);
+	tag = floppy_tag(floppy);
 	return &tag->geometry;
 }
 
@@ -53,7 +53,7 @@ floperr_t basicdsk_construct(floppy_image *floppy, const struct basicdsk_geometr
 	assert(geometry->tracks);
 	assert(geometry->sectors);
 
-	tag = (struct basicdsk_tag *) floppy_create_tag(floppy, BASICDSK_TAG, sizeof(struct basicdsk_tag));
+	tag = (struct basicdsk_tag *) floppy_create_tag(floppy, sizeof(struct basicdsk_tag));
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
 	tag->geometry = *geometry;

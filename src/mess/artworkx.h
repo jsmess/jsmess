@@ -52,8 +52,6 @@ struct inputform_customization
 
 ***************************************************************************/
 
-void artwork_use_device_art(const device_config *img, const char *defaultartfile);
-
 int artwork_get_inputscreen_customizations(png_info *png, artwork_cust_type cust_type,
 	const char *section,
 	struct inputform_customization *customizations,

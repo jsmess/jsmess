@@ -28,7 +28,6 @@ struct mfm_disk_sector_info
 	UINT8 ddam;
 };
 
-#define ORICDSK_TAG	"oricdsktag"
 struct oricdsk_tag
 {
 	int tracks;
@@ -43,7 +42,7 @@ struct oricdsk_tag
 static struct oricdsk_tag *get_tag(floppy_image *floppy)
 {
 	struct oricdsk_tag *tag;
-	tag = floppy_tag(floppy, ORICDSK_TAG);
+	tag = floppy_tag(floppy);
 	return tag;
 }
 
@@ -284,7 +283,7 @@ static FLOPPY_CONSTRUCT(oric_dsk_construct)
 
 	floppy_image_read(floppy, header, 0, mfm_disk_header_size);
 
-	tag = (struct oricdsk_tag *) floppy_create_tag(floppy, ORICDSK_TAG, sizeof(struct oricdsk_tag));
+	tag = (struct oricdsk_tag *) floppy_create_tag(floppy, sizeof(struct oricdsk_tag));
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
 

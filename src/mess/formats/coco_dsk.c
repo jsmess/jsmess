@@ -618,7 +618,6 @@ struct dmk_tag
 	UINT32 track_size;
 };
 
-#define DMK_TAG					"dmktag"
 #define DMK_HEADER_LEN			16
 #define DMK_TOC_LEN				64
 #define DMK_IDAM_LENGTH			7
@@ -637,7 +636,7 @@ struct dmk_tag
 
 static struct dmk_tag *get_dmk_tag(floppy_image *floppy)
 {
-	return floppy_tag(floppy, DMK_TAG);
+	return floppy_tag(floppy);
 }
 
 
@@ -1128,7 +1127,7 @@ FLOPPY_CONSTRUCT(coco_dmk_construct)
 		coco_dmk_interpret_header(floppy, &heads, &tracks, &track_size);
 	}
 
-	tag = floppy_create_tag(floppy, DMK_TAG, sizeof(struct dmk_tag));
+	tag = floppy_create_tag(floppy, sizeof(struct dmk_tag));
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
 	tag->heads = heads;

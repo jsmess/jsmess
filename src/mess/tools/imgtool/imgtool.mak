@@ -33,9 +33,7 @@ LIBIMGTOOL = $(OBJ)/libimgtool.a
 IMGTOOL_LIB_OBJS =						\
 	$(OBJ)/version.o					\
 	$(EMUOBJ)/mamecore.o				\
-	$(MESSOBJ)/tagpool.o				\
 	$(MESSOBJ)/utils.o					\
-	$(MESSOBJ)/tagpool.o				\
 	$(MESSOBJ)/opresolv.o				\
 	$(MESS_FORMATS)/ioprocs.o			\
 	$(MESS_FORMATS)/flopimg.o			\

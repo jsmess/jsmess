@@ -11,8 +11,6 @@
 #include "driver.h"
 #include "device.h"
 #include "mslegacy.h"
-#include "pool.h"
-#include "tagpool.h"
 
 typedef struct _mess_device_type_info mess_device_type_info;
 struct _mess_device_type_info

@@ -76,9 +76,6 @@
 
 #include "formats/ap_dsk35.h"
 
-
-#define APPLE35_TAG "a35_tag"
-
 struct apple35_tag
 {
 	UINT32 data_offset;
@@ -189,7 +186,7 @@ static const UINT8 blk3[] =
 static struct apple35_tag *get_apple35_tag(floppy_image *floppy)
 {
 	struct apple35_tag *tag;
-	tag = (struct apple35_tag *) floppy_tag(floppy, APPLE35_TAG);
+	tag = (struct apple35_tag *) floppy_tag(floppy);
 	return tag;
 }
 
@@ -769,7 +766,7 @@ static floperr_t apple35_construct(floppy_image *floppy, UINT32 data_offset, UIN
 	}
 
 	/* create tag */
-	tag = (struct apple35_tag *) floppy_create_tag(floppy, APPLE35_TAG, sizeof(struct apple35_tag));
+	tag = (struct apple35_tag *) floppy_create_tag(floppy, sizeof(struct apple35_tag));
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
 	tag->data_offset = data_offset;

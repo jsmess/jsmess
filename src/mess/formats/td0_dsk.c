@@ -17,8 +17,6 @@
 #include "formats/flopimg.h"
 #include "devices/flopdrv.h"
 
-#define TD0_DSK_TAG	"td0tag"
-
 struct td0dsk_tag
 {
 	int heads;
@@ -32,7 +30,7 @@ struct td0dsk_tag
 static struct td0dsk_tag *get_tag(floppy_image *floppy)
 {
 	struct td0dsk_tag *tag;
-	tag = floppy_tag(floppy, TD0_DSK_TAG);
+	tag = floppy_tag(floppy);
 	return tag;
 }
 
@@ -657,7 +655,7 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 		return FLOPPY_ERROR_UNSUPPORTED;
 	}
 
-	tag = (struct td0dsk_tag *) floppy_create_tag(floppy, TD0_DSK_TAG, sizeof(struct td0dsk_tag));
+	tag = (struct td0dsk_tag *) floppy_create_tag(floppy, sizeof(struct td0dsk_tag));
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
 

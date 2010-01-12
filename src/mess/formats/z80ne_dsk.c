@@ -60,8 +60,6 @@ struct dmk_tag
 	UINT32 track_size;
 };
 
-#define DMK_TAG "z80nedmk"
-
 /* DMK file structure
  * See WD1711 documentation
  */
@@ -97,7 +95,7 @@ static const char needle_deleted_data_f8[] = "\x00\x00\x00\x00\x00\x00\x00\x00\x
 
 static struct dmk_tag *get_dmk_tag(floppy_image *floppy)
 {
-	return floppy_tag(floppy, DMK_TAG);
+	return floppy_tag(floppy);
 }
 
 
@@ -785,7 +783,7 @@ FLOPPY_CONSTRUCT(z80ne_dmk_construct)
 		z80ne_dmk_interpret_header(floppy, &heads, &tracks, &sectors, &track_size);
 	}
 
-	tag = floppy_create_tag(floppy, DMK_TAG, sizeof(struct dmk_tag));
+	tag = floppy_create_tag(floppy, sizeof(struct dmk_tag));
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
 	tag->heads = heads;

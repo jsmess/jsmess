@@ -11,8 +11,6 @@
 #include "formats/flopimg.h"
 #include "devices/flopdrv.h"
 
-#define IMD_DSK_TAG	"imdtag"
-
 struct imddsk_tag
 {
 	int heads;
@@ -25,7 +23,7 @@ struct imddsk_tag
 static struct imddsk_tag *get_tag(floppy_image *floppy)
 {
 	struct imddsk_tag *tag;
-	tag = floppy_tag(floppy, IMD_DSK_TAG);
+	tag = floppy_tag(floppy);
 	return tag;
 }
 
@@ -229,7 +227,7 @@ FLOPPY_CONSTRUCT( imd_dsk_construct )
 		return FLOPPY_ERROR_UNSUPPORTED;
 	}
 
-	tag = (struct imddsk_tag *) floppy_create_tag(floppy, IMD_DSK_TAG, sizeof(struct imddsk_tag));
+	tag = (struct imddsk_tag *) floppy_create_tag(floppy, sizeof(struct imddsk_tag));
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
 

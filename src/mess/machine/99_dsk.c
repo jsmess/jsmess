@@ -35,8 +35,6 @@
 
 
 #define MAX_FLOPPIES 4
-#define TI99DSK_TAG	"ti99dsktag"
-
 
 static int use_80_track_drives;
 
@@ -137,7 +135,7 @@ static UINT64 ti99_translate_offset(floppy_image *floppy, const struct basicdsk_
 static int ti99_tracktranslate(const device_config *image, floppy_image *floppy, int physical_track)
 {
 	struct ti99_geometry *geometry;
-	geometry = floppy_tag(floppy, TI99DSK_TAG);
+	geometry = floppy_tag(floppy);
 
 	if (use_80_track_drives && (geometry->tracksperside <= 40))
 		return physical_track/2;
@@ -327,7 +325,7 @@ static FLOPPY_CONSTRUCT(ti99_floppy_construct)
 	int success;
 	floperr_t err;
 
-	geometry1 = floppy_create_tag(floppy, TI99DSK_TAG, sizeof(*geometry1));
+	geometry1 = floppy_create_tag(floppy, sizeof(*geometry1));
 
 	ti99_guess_geometry(floppy, geometry1, NULL, &success);
 	if (! success)

@@ -11,7 +11,6 @@
 #include "formats/flopimg.h"
 #include "devices/flopdrv.h"
 
-#define CQM_DSK_TAG	"cqmtag"
 #define CQM_HEADER_SIZE 133
 
 struct cqmdsk_tag
@@ -32,7 +31,7 @@ struct cqmdsk_tag
 static struct cqmdsk_tag *get_tag(floppy_image *floppy)
 {
 	struct cqmdsk_tag *tag;
-	tag = floppy_tag(floppy, CQM_DSK_TAG);
+	tag = floppy_tag(floppy );
 	return tag;
 }
 
@@ -175,7 +174,7 @@ FLOPPY_CONSTRUCT( cqm_dsk_construct )
 		return FLOPPY_ERROR_UNSUPPORTED;
 	}
 
-	tag = (struct cqmdsk_tag *) floppy_create_tag(floppy, CQM_DSK_TAG, sizeof(struct cqmdsk_tag));
+	tag = (struct cqmdsk_tag *) floppy_create_tag(floppy, sizeof(struct cqmdsk_tag));
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
 

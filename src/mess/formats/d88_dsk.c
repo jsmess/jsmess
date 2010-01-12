@@ -43,7 +43,7 @@ struct d88_tag
 
 static struct d88_tag *get_d88_tag(floppy_image *floppy)
 {
-	return floppy_tag(floppy, "d88tag");
+	return floppy_tag(floppy);
 }
 
 static int d88_get_sector_id(floppy_image *floppy, int head, int track, int sector_index)
@@ -339,7 +339,7 @@ FLOPPY_CONSTRUCT(d88_dsk_construct)
 		d88_get_header(floppy,&size,&prot,&type,offs);
 	}
 
-	tag = floppy_create_tag(floppy,"d88tag",sizeof(struct d88_tag));
+	tag = floppy_create_tag(floppy,sizeof(struct d88_tag));
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
 

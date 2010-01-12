@@ -42,8 +42,6 @@
 
 #define LOG 0
 
-#define G64_DSK_TAG		"g64tag"
-
 #define HEADER_LENGTH	0x2ac		 /* standard length for 84 half tracks */
 #define HALF_TRACKS		84
 
@@ -64,7 +62,7 @@ INLINE float get_track_index(int track)
 static struct g64dsk_tag *get_tag(floppy_image *floppy)
 {
 	struct g64dsk_tag *tag;
-	tag = floppy_tag(floppy, G64_DSK_TAG);
+	tag = floppy_tag(floppy);
 	return tag;
 }
 
@@ -169,7 +167,7 @@ FLOPPY_CONSTRUCT( g64_dsk_construct )
 		return FLOPPY_ERROR_UNSUPPORTED;
 	}
 
-	tag = (struct g64dsk_tag *) floppy_create_tag(floppy, G64_DSK_TAG, sizeof(struct g64dsk_tag));
+	tag = (struct g64dsk_tag *) floppy_create_tag(floppy, sizeof(struct g64dsk_tag));
 
 	if (!tag) return FLOPPY_ERROR_OUTOFMEMORY;
 

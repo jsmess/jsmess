@@ -157,8 +157,8 @@ floperr_t floppy_identify(void *fp, const struct io_procs *procs, const char *ex
 	const struct FloppyFormat *formats, int *identified_format);
 
 /* functions useful within format constructors */
-void *floppy_tag(floppy_image *floppy, const char *tagname);
-void *floppy_create_tag(floppy_image *floppy, const char *tagname, size_t tagsize);
+void *floppy_tag(floppy_image *floppy);
+void *floppy_create_tag(floppy_image *floppy, size_t tagsize);
 struct FloppyCallbacks *floppy_callbacks(floppy_image *floppy);
 UINT8 floppy_get_filler(floppy_image *floppy);
 void floppy_set_filler(floppy_image *floppy, UINT8 filler);
