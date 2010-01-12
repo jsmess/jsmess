@@ -26,7 +26,7 @@ struct _eti660_state
 
 	/* video state */
 	int cdp1864_efx;
-	UINT8 *color_ram;
+	UINT8 color_ram[0x100];
 	UINT8 color;
 
 	/* devices */

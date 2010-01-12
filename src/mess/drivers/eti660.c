@@ -1,3 +1,14 @@
+/*
+
+	TODO:
+
+	- allocate color ram
+	- quickload
+	- keyboard
+	- color on
+
+*/
+
 #include "driver.h"
 #include "includes/eti660.h"
 #include "cpu/cdp1802/cdp1802.h"
@@ -9,8 +20,21 @@
 
 /* Read/Write Handlers */
 
+static WRITE8_DEVICE_HANDLER( pia_w )
+{
+	int pia_offset = cpu_get_reg(device->machine->firstcpu, CDP1802_R0 + cpu_get_reg(device->machine->firstcpu, CDP1802_X)) & 0x03;
+
+	pia6821_w(device, pia_offset, data);
+}
+
 static WRITE8_HANDLER( eti660_colorram_w )
 {
+	eti660_state *state = space->machine->driver_data;
+	int colorram_offset = cpu_get_reg(space->machine->firstcpu, CDP1802_R0 + cpu_get_reg(space->machine->firstcpu, CDP1802_X)) & 0xff;
+
+	colorram_offset = ((colorram_offset & 0xf8) >> 1) || (colorram_offset & 0x03);
+
+	state->color_ram[colorram_offset] = data;
 }
 
 /* Memory Maps */
@@ -22,6 +46,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( eti660_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE(MC6821_TAG, pia_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(eti660_colorram_w)
 	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispoff_r, cdp1864_tone_latch_w)
 ADDRESS_MAP_END
@@ -29,6 +54,29 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( eti660 )
+	PORT_START("PA0")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+
+	PORT_START("PA1")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+
+	PORT_START("PA2")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+
+	PORT_START("PA3")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
 INPUT_PORTS_END
 
 /* Video */
@@ -40,13 +88,25 @@ static WRITE_LINE_DEVICE_HANDLER( eti660_efx_w )
 	driver_state->cdp1864_efx = state;
 }
 
-static VIDEO_UPDATE( eti660 )
+static READ_LINE_DEVICE_HANDLER( rdata_r )
 {
-	eti660_state *state = screen->machine->driver_data;
+	eti660_state *state = device->machine->driver_data;
 
-	cdp1864_update(state->cdp1864, bitmap, cliprect);
+	return BIT(state->color, 0);
+}
 
-	return 0;
+static READ_LINE_DEVICE_HANDLER( bdata_r )
+{
+	eti660_state *state = device->machine->driver_data;
+
+	return BIT(state->color, 1);
+}
+
+static READ_LINE_DEVICE_HANDLER( gdata_r )
+{
+	eti660_state *state = device->machine->driver_data;
+
+	return BIT(state->color, 2);
 }
 
 static CDP1864_INTERFACE( eti660_cdp1864_intf )
@@ -54,9 +114,9 @@ static CDP1864_INTERFACE( eti660_cdp1864_intf )
 	CDP1802_TAG,
 	SCREEN_TAG,
 	CDP1864_INTERLACED,
-	DEVCB_LINE_VCC,
-	DEVCB_LINE_VCC,
-	DEVCB_LINE_VCC,
+	DEVCB_LINE(rdata_r),
+	DEVCB_LINE(bdata_r),
+	DEVCB_LINE(gdata_r),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_INT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT),
 	DEVCB_LINE(eti660_efx_w),
@@ -65,6 +125,15 @@ static CDP1864_INTERFACE( eti660_cdp1864_intf )
 	RES_K(4.7), /* R6 */
 	RES_K(4.7)	/* R4 */
 };
+
+static VIDEO_UPDATE( eti660 )
+{
+	eti660_state *state = screen->machine->driver_data;
+
+	cdp1864_update(state->cdp1864, bitmap, cliprect);
+
+	return 0;
+}
 
 /* CDP1802 Interface */
 
@@ -107,8 +176,9 @@ static WRITE_LINE_DEVICE_HANDLER( eti660_q_w )
 static WRITE8_DEVICE_HANDLER( eti660_dma_w )
 {
 	eti660_state *state = device->machine->driver_data;
+	UINT8 colorram_offset = ((offset & 0xf8) >> 1) || (offset & 0x03);
 
-	state->color = state->color_ram[offset / 4];
+	state->color = state->color_ram[colorram_offset];
 
 	cdp1864_con_w(state->cdp1864, 0); // HACK
 	cdp1864_dma_w(state->cdp1864, offset, data);
@@ -143,9 +213,15 @@ static READ8_DEVICE_HANDLER( eti660_pia_a_r )
 
     */
 
-//	eti660_state *state = device->machine->driver_data;
+	eti660_state *state = device->machine->driver_data;
+	UINT8 data = 0xf0;
 
-	return 0xf0;
+	if (!BIT(state->keylatch, 0)) data &= input_port_read(device->machine, "PA0");
+	if (!BIT(state->keylatch, 1)) data &= input_port_read(device->machine, "PA1");
+	if (!BIT(state->keylatch, 2)) data &= input_port_read(device->machine, "PA2");
+	if (!BIT(state->keylatch, 3)) data &= input_port_read(device->machine, "PA3");
+
+	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( eti660_pia_a_w )
@@ -170,7 +246,7 @@ static WRITE8_DEVICE_HANDLER( eti660_pia_a_w )
 	state->keylatch = data & 0x0f;
 }
 
-static const pia6821_interface bw12_pia_config =
+static const pia6821_interface eti660_mc6821_intf =
 {
 	DEVCB_HANDLER(eti660_pia_a_r),								/* port A input */
 	DEVCB_NULL,													/* port B input */
@@ -182,12 +258,18 @@ static const pia6821_interface bw12_pia_config =
 	DEVCB_NULL,													/* port B output */
 	DEVCB_NULL,													/* CA2 output */
 	DEVCB_NULL,													/* CB2 output */
-	DEVCB_NULL,DEVCB_NULL
-//	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),				/* IRQA output */
-//	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)				/* IRQB output */
+	DEVCB_NULL,													/* IRQA output */
+	DEVCB_NULL													/* IRQB output */
 };
 
 /* Machine Initialization */
+
+static TIMER_CALLBACK( set_cpu_mode )
+{
+	eti660_state *state = machine->driver_data;
+
+	state->cdp1802_mode = CDP1802_MODE_RUN;
+}
 
 static MACHINE_START( eti660 )
 {
@@ -200,6 +282,18 @@ static MACHINE_START( eti660 )
 	/* register for state saving */
 	state_save_register_global(machine, state->cdp1802_mode);
 	state_save_register_global(machine, state->cdp1864_efx);
+}
+
+static MACHINE_RESET( eti660 )
+{
+	eti660_state *state = machine->driver_data;
+
+	/* reset CPU */
+	state->cdp1802_mode = CDP1802_MODE_RESET;
+	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
+
+	/* reset CDP1864 */
+	device_reset(state->cdp1864);
 }
 
 /* Machine Drivers */
@@ -221,6 +315,7 @@ static MACHINE_DRIVER_START( eti660 )
 	MDRV_CPU_CONFIG(eti660_config)
 
 	MDRV_MACHINE_START(eti660)
+	MDRV_MACHINE_RESET(eti660)
 
     /* video hardware */
 	MDRV_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_8_867238MHz/5)
@@ -234,7 +329,7 @@ static MACHINE_DRIVER_START( eti660 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-//	MDRV_PIA6821_ADD(MC6821_TAG, eti660_mc6821_intf)
+	MDRV_PIA6821_ADD(MC6821_TAG, eti660_mc6821_intf)
 	MDRV_CASSETTE_ADD("cassette", eti660_cassette_config)
 	
 	/* internal ram */
@@ -251,4 +346,4 @@ ROM_START( eti660 )
 ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY								FULLNAME				FLAGS */
-COMP( 1978, eti660,		0,		0,		eti660,		eti660,		0,			"Electronics Today International",	"ETI-660 (Australia)",	GAME_NOT_WORKING )
+COMP( 1981, eti660,		0,		0,		eti660,		eti660,		0,			"Electronics Today International",	"ETI-660 (Australia)",	GAME_NOT_WORKING )
