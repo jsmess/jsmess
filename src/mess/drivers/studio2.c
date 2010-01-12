@@ -188,8 +188,8 @@ Notes:
 
 	- disable ic13/14 when cartridge plugged in
     - studio2 cpu clock from schematics
-    - visicom alternate videoram @ 0x1300 ?
     - mpt02/mustang cdp1864 colors
+	- visicom colors
     - discrete sound
     - Academy Apollo 80 (Germany)
 
@@ -243,10 +243,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( visicom_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x200) AM_RAM
-	AM_RANGE(0x1100, 0x11ff) AM_RAM
-//  AM_RANGE(0x1200, 0x12ff) AM_RAM
-	AM_RANGE(0x1300, 0x13ff) AM_RAM
+	AM_RANGE(0x1000, 0x10ff) AM_RAM
+	AM_RANGE(0x1100, 0x11ff) AM_RAM AM_BASE_MEMBER(studio2_state, color_ram)
+	AM_RANGE(0x1300, 0x13ff) AM_RAM AM_BASE_MEMBER(studio2_state, color_ram1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( visicom_io_map, ADDRESS_SPACE_IO, 8 )
@@ -320,6 +319,14 @@ static VIDEO_UPDATE( studio2 )
 	cdp1861_update(state->cdp1861, bitmap, cliprect);
 
 	return 0;
+}
+
+static PALETTE_INIT( visicom )
+{
+    palette_set_color_rgb(machine, 0, 0x00, 0x80, 0x00);
+    palette_set_color_rgb(machine, 1, 0x00, 0x00, 0xff);
+    palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00);
+    palette_set_color_rgb(machine, 3, 0xff, 0x00, 0x00);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( mpt02_efx_w )
@@ -577,10 +584,10 @@ static MACHINE_DRIVER_START( visicom )
 	MDRV_MACHINE_RESET(studio2)
 
     /* video hardware */
-	MDRV_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_3_579545MHz/2)
+	MDRV_CDP1861_SCREEN_ADD(SCREEN_TAG, XTAL_3_579545MHz/2)
 
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_LENGTH(4)
+	MDRV_PALETTE_INIT(visicom)
 	MDRV_VIDEO_UPDATE(studio2)
 
 	MDRV_CDP1861_ADD(CDP1861_TAG, XTAL_3_579545MHz/2/8, studio2_cdp1861_intf)
@@ -666,8 +673,8 @@ static DRIVER_INIT( studio2 )
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY   FULLNAME */
 CONS( 1977,	studio2,	0,		0,		studio2,	studio2,	studio2,	"RCA",		"Studio II", GAME_SUPPORTS_SAVE )
-CONS( 1978, visicom,	studio2,0,		visicom,	studio2,	studio2,	"Toshiba",	"Visicom (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-CONS( 1978,	mpt02,		studio2,0,		mpt02,		studio2,	studio2,	"Soundic",	"MPT-02 Victory Home TV Programmer (Austria)", GAME_NOT_WORKING )
+CONS( 1978, visicom,	studio2,0,		visicom,	studio2,	studio2,	"Toshiba",	"Visicom COM-100 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+CONS( 1978,	mpt02,		studio2,0,		mpt02,		studio2,	studio2,	"Soundic",	"Victory MPT-02 Home TV Programmer (Austria)", GAME_NOT_WORKING )
 CONS( 1978,	mpt02h,		studio2,0,		mpt02,		studio2,	studio2,	"Hanimex",	"MPT-02 Jeu TV Programmable (France)", GAME_NOT_WORKING )
 CONS( 1978,	mtc9016,	studio2,0,		mpt02,		studio2,	studio2,	"Mustang",	"9016 Telespiel Computer (Germany)", GAME_NOT_WORKING )
 CONS( 1978, shmc1200,	studio2,0,		mpt02,		studio2,	studio2,	"Sheen",	"1200 Micro Computer (Australia)", GAME_NOT_WORKING )
