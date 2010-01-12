@@ -144,11 +144,11 @@ const game_driver * const drivers[] =
     DRIVER( vp111 )     /* 1977 Cosmac VIP VP-111                           */
     DRIVER( studio2 )   /* 1977 Studio II                                   */
     DRIVER( visicom )
-	DRIVER( mpt02s )
+	DRIVER( mpt02 )
 	DRIVER( eti660 )
-//  DRIVER( mpt02h )
-//  DRIVER( mtc9016 )   /* 1978 Mustang 9016 Telespiel Computer             */
-//  DRIVER( shmc1200 )
+	DRIVER( mpt02h )
+	DRIVER( mtc9016 )   /* 1978 Mustang 9016 Telespiel Computer             */
+	DRIVER( shmc1200 )
 
     /* Ensoniq */
     DRIVER( esq1 )	/* 1986 ESQ-1 Digital Wave Synthesizer */
