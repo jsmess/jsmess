@@ -38,6 +38,7 @@ const software_list * const software_lists[] =
 /****************SOFTWARE LISTS**********************************************/
 
 	ADD_SOFTWARE_LIST( _32x_cart )      /* Sega 32X cartridges */
+	ADD_SOFTWARE_LIST( advision_cart )  /* Entex Adventure Vision */
 	ADD_SOFTWARE_LIST( bbcbc_cart )     /* BBC Bridge Companion cartridges */
 	ADD_SOFTWARE_LIST( gamecom_cart )   /* Tiger Game.com cartridges */
 	ADD_SOFTWARE_LIST( gamegear_cart )  /* Sega Game Gear cartridges */

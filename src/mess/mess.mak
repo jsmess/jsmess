@@ -751,7 +751,7 @@ $(MESSOBJ)/comx.a:				\
 	$(MESS_DRIVERS)/comxpl80.o	\
 	$(MESS_VIDEO)/comx35.o		\
 	$(MESS_MACHINE)/comx35.o	\
-	
+
 $(MESSOBJ)/concept.a:			\
 	$(MESS_DRIVERS)/concept.o   \
 	$(MESS_MACHINE)/concept.o	\
@@ -834,7 +834,7 @@ $(MESSOBJ)/elektor.a:			\
 
 $(MESSOBJ)/ensoniq.a:				\
 	$(MESS_DRIVERS)/esq1.o	\
-	
+
 $(MESSOBJ)/entex.a:				\
 	$(MESS_VIDEO)/advision.o	\
 	$(MESS_MACHINE)/advision.o	\
@@ -907,7 +907,7 @@ $(MESSOBJ)/heathkit.a:			\
 	$(MESS_DRIVERS)/h8.o		\
 	$(MESS_DRIVERS)/h19.o		\
 	$(MESS_DRIVERS)/h89.o		\
-	
+
 $(MESSOBJ)/hegener.a:			\
 	$(MESS_DRIVERS)/glasgow.o	\
 	$(MESS_DRIVERS)/mephisto.o	\
@@ -937,7 +937,7 @@ $(MESSOBJ)/interact.a:			\
 	$(MESS_DRIVERS)/interact.o	\
 	$(MESS_VIDEO)/hec2video.o	\
 	$(MESS_MACHINE)/hec2hrp.o   \
-	
+
 $(MESSOBJ)/intel.a:				\
 	$(MESS_DRIVERS)/sdk86.o		\
 	$(MESS_DRIVERS)/sdk85.o		\
@@ -1007,7 +1007,7 @@ $(MESSOBJ)/matsushi.a:			\
 
 $(MESSOBJ)/mchester.a:			\
 	$(MESS_DRIVERS)/ssem.o		\
-	
+
 $(MESSOBJ)/memotech.a:			\
 	$(MESS_DRIVERS)/mtx.o		\
 	$(MESS_MACHINE)/mtx.o		\
@@ -1651,7 +1651,7 @@ $(MESS_DRIVERS)/mk14.o:		$(MESS_LAYOUT)/mk14.lh
 $(MESS_DRIVERS)/mk2.o:		$(MESS_LAYOUT)/mk2.lh
 $(MESS_DRIVERS)/mpf1.o:		$(MESS_LAYOUT)/mpf1.lh \
 							$(MESS_LAYOUT)/mpf1b.lh \
-							$(MESS_LAYOUT)/mpf1p.lh 
+							$(MESS_LAYOUT)/mpf1p.lh
 $(MESS_DRIVERS)/mmd1.o:		$(MESS_LAYOUT)/mmd1.lh \
 							$(MESS_LAYOUT)/mmd2.lh
 $(MESS_DRIVERS)/newbrain.o:	$(MESS_LAYOUT)/newbrain.lh
@@ -1684,6 +1684,7 @@ $(MESS_DRIVERS)/z80ne.o:	$(MESS_LAYOUT)/z80ne.lh   \
 
 $(MESSOBJ)/software.a:					\
 	$(MESS_SOFTWARE)/32x_cart.o	\
+	$(MESS_SOFTWARE)/advision_cart.o	\
 	$(MESS_SOFTWARE)/bbcbc_cart.o		\
 	$(MESS_SOFTWARE)/gamecom_cart.o	\
 	$(MESS_SOFTWARE)/gamegear_cart.o	\
