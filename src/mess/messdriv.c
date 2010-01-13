@@ -149,6 +149,8 @@ const game_driver * const drivers[] =
 	DRIVER( mpt02h )
 	DRIVER( mtc9016 )   /* 1978 Mustang 9016 Telespiel Computer             */
 	DRIVER( shmc1200 )
+	DRIVER( cm1200 )
+	DRIVER( apollo80 )
 
     /* Ensoniq */
     DRIVER( esq1 )	/* 1986 ESQ-1 Digital Wave Synthesizer */

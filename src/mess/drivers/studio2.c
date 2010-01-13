@@ -187,11 +187,9 @@ Notes:
     TODO:
 
 	- disable ic13/14 when cartridge plugged in
-    - studio2 cpu clock from schematics
-    - mpt02/mustang cdp1864 colors
+    - mpt02 clones' colors
 	- visicom colors
-    - discrete sound
-    - Academy Apollo 80 (Germany)
+    - NE555 discrete sound
 
 */
 
@@ -257,7 +255,7 @@ static ADDRESS_MAP_START( mpt02_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x09ff) AM_RAM
 	AM_RANGE(0x0b00, 0x0b3f) AM_RAM AM_BASE_MEMBER(studio2_state, color_ram)
-	AM_RANGE(0x0c00, 0x0dff) AM_ROM
+	AM_RANGE(0x0c00, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpt02_io_map, ADDRESS_SPACE_IO, 8 )
@@ -336,14 +334,35 @@ static WRITE_LINE_DEVICE_HANDLER( mpt02_efx_w )
 	driver_state->cdp1864_efx = state;
 }
 
+static READ_LINE_DEVICE_HANDLER( rdata_r )
+{
+	studio2_state *state = device->machine->driver_data;
+
+	return BIT(state->color, 0);
+}
+
+static READ_LINE_DEVICE_HANDLER( bdata_r )
+{
+	studio2_state *state = device->machine->driver_data;
+
+	return BIT(state->color, 1);
+}
+
+static READ_LINE_DEVICE_HANDLER( gdata_r )
+{
+	studio2_state *state = device->machine->driver_data;
+
+	return BIT(state->color, 2);
+}
+
 static CDP1864_INTERFACE( mpt02_cdp1864_intf )
 {
 	CDP1802_TAG,
 	SCREEN_TAG,
 	CDP1864_INTERLACED,
-	DEVCB_LINE_VCC, // ?
-	DEVCB_LINE_VCC, // ?
-	DEVCB_LINE_VCC, // ?
+	DEVCB_LINE(rdata_r),
+	DEVCB_LINE(bdata_r),
+	DEVCB_LINE(gdata_r),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_INT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT),
 	DEVCB_LINE(mpt02_efx_w),
@@ -418,8 +437,9 @@ static CDP1802_EF_READ( mpt02_ef_r )
 static WRITE8_DEVICE_HANDLER( mpt02_dma_w )
 {
 	studio2_state *state = device->machine->driver_data;
+	UINT8 addr = ((offset & 0xe0) >> 2) | (offset & 0x07);
 
-	state->color = state->color_ram[offset / 4];
+	state->color = state->color_ram[addr];
 
 	cdp1864_con_w(state->cdp1864, 0); // HACK
 	cdp1864_dma_w(state->cdp1864, offset, data);
@@ -654,6 +674,8 @@ ROM_END
 #define rom_mpt02h rom_mpt02
 #define rom_mtc9016 rom_mpt02
 #define rom_shmc1200 rom_mpt02
+#define rom_cm1200 rom_mpt02
+#define rom_apollo80 rom_mpt02
 
 /* Driver Initialization */
 
@@ -674,7 +696,9 @@ static DRIVER_INIT( studio2 )
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY   FULLNAME */
 CONS( 1977,	studio2,	0,		0,		studio2,	studio2,	studio2,	"RCA",		"Studio II", GAME_SUPPORTS_SAVE )
 CONS( 1978, visicom,	studio2,0,		visicom,	studio2,	studio2,	"Toshiba",	"Visicom COM-100 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-CONS( 1978,	mpt02,		studio2,0,		mpt02,		studio2,	studio2,	"Soundic",	"Victory MPT-02 Home TV Programmer (Austria)", GAME_NOT_WORKING )
-CONS( 1978,	mpt02h,		studio2,0,		mpt02,		studio2,	studio2,	"Hanimex",	"MPT-02 Jeu TV Programmable (France)", GAME_NOT_WORKING )
-CONS( 1978,	mtc9016,	studio2,0,		mpt02,		studio2,	studio2,	"Mustang",	"9016 Telespiel Computer (Germany)", GAME_NOT_WORKING )
-CONS( 1978, shmc1200,	studio2,0,		mpt02,		studio2,	studio2,	"Sheen",	"1200 Micro Computer (Australia)", GAME_NOT_WORKING )
+CONS( 1978,	mpt02,		studio2,0,		mpt02,		studio2,	studio2,	"Soundic",	"Victory MPT-02 Home TV Programmer (Austria)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+CONS( 1978,	mpt02h,		studio2,0,		mpt02,		studio2,	studio2,	"Hanimex",	"MPT-02 Jeu TV Programmable (France)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+CONS( 1978,	mtc9016,	studio2,0,		mpt02,		studio2,	studio2,	"Mustang",	"9016 Telespiel Computer (Germany)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+CONS( 1978, shmc1200,	studio2,0,		mpt02,		studio2,	studio2,	"Sheen",	"1200 Micro Computer (Australia)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+CONS( 1978, cm1200,		studio2,0,		mpt02,		studio2,	studio2,	"Conic",	"M-1200 (?)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+CONS( 1978, apollo80,	studio2,0,		mpt02,		studio2,	studio2,	"Academy",	"Apollo 80 (Germany)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
