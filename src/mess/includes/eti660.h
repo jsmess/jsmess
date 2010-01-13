@@ -3,10 +3,10 @@
 
 #include "cpu/cdp1802/cdp1802.h"
 
-#define SCREEN_TAG	"screen"
-#define CDP1802_TAG "ic3"
-#define CDP1864_TAG "ic4"
-#define MC6821_TAG	"ic5"
+#define SCREEN_TAG		"screen"
+#define CDP1802_TAG		"ic3"
+#define CDP1864_TAG		"ic4"
+#define MC6821_TAG		"ic5"
 #define CASSETTE_TAG	"cassette"
 
 enum

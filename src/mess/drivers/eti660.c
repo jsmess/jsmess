@@ -2,9 +2,9 @@
 
 	TODO:
 
+	- does not boot!
 	- allocate color ram
 	- quickload
-	- keyboard
 	- color on
 
 */
@@ -18,11 +18,21 @@
 #include "machine/rescap.h"
 #include "sound/cdp1864.h"
 
+#define RX(_machine) \
+	cpu_get_reg(_machine->firstcpu, CDP1802_R0 + cpu_get_reg(_machine->firstcpu, CDP1802_X))
+
 /* Read/Write Handlers */
+
+static READ8_DEVICE_HANDLER( pia_r )
+{
+	int pia_offset = RX(device->machine) & 0x03;
+
+	return pia6821_r(device, pia_offset);
+}
 
 static WRITE8_DEVICE_HANDLER( pia_w )
 {
-	int pia_offset = cpu_get_reg(device->machine->firstcpu, CDP1802_R0 + cpu_get_reg(device->machine->firstcpu, CDP1802_X)) & 0x03;
+	int pia_offset = RX(device->machine) & 0x03;
 
 	pia6821_w(device, pia_offset, data);
 }
@@ -30,7 +40,7 @@ static WRITE8_DEVICE_HANDLER( pia_w )
 static WRITE8_HANDLER( eti660_colorram_w )
 {
 	eti660_state *state = space->machine->driver_data;
-	int colorram_offset = cpu_get_reg(space->machine->firstcpu, CDP1802_R0 + cpu_get_reg(space->machine->firstcpu, CDP1802_X)) & 0xff;
+	int colorram_offset = RX(space->machine) & 0xff;
 
 	colorram_offset = ((colorram_offset & 0xf8) >> 1) || (colorram_offset & 0x03);
 
@@ -46,12 +56,19 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( eti660_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE(MC6821_TAG, pia_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE(MC6821_TAG, pia_r, pia_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(eti660_colorram_w)
 	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispoff_r, cdp1864_tone_latch_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
+
+static INPUT_CHANGED( trigger_reset )
+{
+	eti660_state *state = field->port->machine->driver_data;
+
+	state->cdp1802_mode = newval ? CDP1802_MODE_RUN : CDP1802_MODE_RESET;
+}
 
 static INPUT_PORTS_START( eti660 )
 	PORT_START("PA0")
@@ -77,6 +94,10 @@ static INPUT_PORTS_START( eti660 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+
+	PORT_START("SPECIAL")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_R) PORT_CHANGED(trigger_reset, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("STEP") PORT_CODE(KEYCODE_S)
 INPUT_PORTS_END
 
 /* Video */
@@ -155,6 +176,9 @@ static CDP1802_EF_READ( eti660_ef_r )
 
 	/* tape input */
 	if (cassette_input(state->cassette) < 0) ef -= EF2;
+
+	/* STEP key */
+	if (!BIT(input_port_read(device->machine, "SPECIAL"), 1)) ef -= EF4;
 
 	return ef;
 }
@@ -290,7 +314,7 @@ static MACHINE_RESET( eti660 )
 
 	/* reset CPU */
 	state->cdp1802_mode = CDP1802_MODE_RESET;
-	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
+	timer_set(machine, ATTOTIME_IN_MSEC(0), NULL, 0, set_cpu_mode);
 
 	/* reset CDP1864 */
 	device_reset(state->cdp1864);
@@ -330,12 +354,11 @@ static MACHINE_DRIVER_START( eti660 )
 
 	/* devices */
 	MDRV_PIA6821_ADD(MC6821_TAG, eti660_mc6821_intf)
-	MDRV_CASSETTE_ADD("cassette", eti660_cassette_config)
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, eti660_cassette_config)
 	
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("1K")
-	MDRV_RAM_EXTRA_OPTIONS("3K")
+	MDRV_RAM_DEFAULT_SIZE("3K")
 MACHINE_DRIVER_END
 
 /* ROMs */
