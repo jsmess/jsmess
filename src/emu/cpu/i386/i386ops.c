@@ -2369,6 +2369,6 @@ static void I386OP(unimplemented)(i386_state *cpustate)
 
 static void I386OP(invalid)(i386_state *cpustate)
 {
-	//i386_trap(cpustate,6);
-	fatalerror("i386: Invalid opcode %02X at %08X", cpustate->opcode, cpustate->pc - 1);
+	logerror("i386: Invalid opcode %02X at %08X\n", cpustate->opcode, cpustate->pc - 1);
+	i386_trap(cpustate, 6, 0);
 }
