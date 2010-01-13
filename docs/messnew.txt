@@ -22,7 +22,7 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
-(none)
+- [MIKROMIK] Fixed memory banking regression. [Curt Coder]
 
 
 

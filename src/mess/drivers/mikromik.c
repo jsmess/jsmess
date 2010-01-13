@@ -80,10 +80,14 @@ static WRITE8_HANDLER( ls259_w )
 		memory_set_bank(space->machine, "bank1", d);
 
 		if (d)
+		{
 			memory_install_readwrite_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
+		}
 		else
+		{
 			memory_install_read_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
 			memory_unmap_write(program, 0x0000, 0x0fff, 0, 0);
+		}
 		break;
 
 	case 1: /* RECALL */
