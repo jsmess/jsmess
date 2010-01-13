@@ -339,7 +339,7 @@ static int general_cbm_loadsnap( const device_config *image, const char *file_ty
 	UINT32 bytesread;
 	UINT16 address = 0;
 	int i;
-	const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(image->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 
 	if (!file_type)
 		goto error;
