@@ -9,7 +9,9 @@
 
 #include "driver.h"
 #include "vic1112.h"
+#include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
+#include "machine/ieee488.h"
 
 /***************************************************************************
     PARAMETERS
@@ -27,7 +29,7 @@ struct _vic1112_t
 {
 	const device_config *via0;
 	const device_config *via1;
-	const device_config *ieee_bus;
+	const device_config *bus;
 };
 
 /***************************************************************************
@@ -54,8 +56,25 @@ INLINE vic1112_config *get_safe_config(const device_config *device)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    vic1112_ieee488_srq_w - IEEE-488 service
+	request
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( vic1112_ieee488_srq_w )
+{
+	vic1112_t *vic1112 = get_safe_token(device);
+
+	via_cb1_w(vic1112->bus, state);
+}
+
+/*-------------------------------------------------
     via6522_interface vic1112_via0_intf
 -------------------------------------------------*/
+
+static WRITE_LINE_DEVICE_HANDLER( via_irq_w )
+{
+	cpu_set_input_line(device->machine->firstcpu, M6502_IRQ_LINE, state);
+}
 
 static READ8_DEVICE_HANDLER( via0_pb_r )
 {
@@ -74,7 +93,22 @@ static READ8_DEVICE_HANDLER( via0_pb_r )
 
     */
 
-	return 0;
+	vic1112_t *vic1112 = get_safe_token(device->owner);
+	UINT8 data = 0;
+
+	/* data valid in */
+	data |= ieee488_dav_r(vic1112->bus) << 4;
+
+	/* not ready for data in */
+	data |= ieee488_nrfd_r(vic1112->bus) << 5;
+
+	/* not data accepted in */
+	data |= ieee488_ndac_r(vic1112->bus) << 6;
+
+	/* attention in */
+	data |= ieee488_atn_r(vic1112->bus) << 7;
+
+	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( via0_pb_w )
@@ -93,6 +127,20 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
         PB7     _ATN IN
 
     */
+
+	vic1112_t *vic1112 = get_safe_token(device->owner);
+
+	/* data valid out */
+	ieee488_dav_w(vic1112->bus, device->owner, BIT(data, 0));
+
+	/* not ready for data out */
+	ieee488_nrfd_w(vic1112->bus, device->owner, BIT(data, 1));
+
+	/* not data accepted out */
+	ieee488_ndac_w(vic1112->bus, device->owner, BIT(data, 2));
+
+	/* end or identify */
+	ieee488_eoi_w(vic1112->bus, device->owner, BIT(data, 3));
 }
 
 static const via6522_interface vic1112_via0_intf =
@@ -111,7 +159,7 @@ static const via6522_interface vic1112_via0_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_NULL
+	DEVCB_LINE(via_irq_w)
 };
 
 /*-------------------------------------------------
@@ -135,7 +183,9 @@ static READ8_DEVICE_HANDLER( via1_pa_r )
 
     */
 
-	return 0;
+	vic1112_t *vic1112 = get_safe_token(device->owner);
+
+	return ieee488_dio_r(vic1112->bus, 0);
 }
 
 static WRITE8_DEVICE_HANDLER( via1_pb_w )
@@ -154,6 +204,26 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
         PB7     DO8
 
     */
+
+	vic1112_t *vic1112 = get_safe_token(device->owner);
+
+	ieee488_dio_w(vic1112->bus, 0, data);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( via1_ca2_w )
+{
+	vic1112_t *vic1112 = get_safe_token(device->owner);
+
+	/* attention out */
+	ieee488_atn_w(vic1112->bus, device->owner, state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( via1_cb2_w )
+{
+	vic1112_t *vic1112 = get_safe_token(device->owner);
+
+	/* end or identify out */
+	ieee488_eoi_w(vic1112->bus, device->owner, state);
 }
 
 static const via6522_interface vic1112_via1_intf =
@@ -161,18 +231,18 @@ static const via6522_interface vic1112_via1_intf =
 	DEVCB_HANDLER(via1_pa_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_NULL, /* _SRQ IN */
 	DEVCB_NULL,
 	DEVCB_NULL,
 
 	DEVCB_NULL,
 	DEVCB_HANDLER(via1_pb_w),
 	DEVCB_NULL,
-	DEVCB_NULL, // _SRQ IN
-	DEVCB_NULL, // _ATN OUT
-	DEVCB_NULL, // _EOI
+	DEVCB_NULL,
+	DEVCB_LINE(via1_ca2_w),
+	DEVCB_LINE(via1_cb2_w),
 
-	DEVCB_NULL
+	DEVCB_LINE(via_irq_w)
 };
 
 /*-------------------------------------------------
@@ -189,8 +259,8 @@ MACHINE_DRIVER_END
 -------------------------------------------------*/
 
 ROM_START( vic1112 )
-	ROM_REGION( 0x800, "vic1112", ROMREGION_LOADBYNAME )
-	ROM_LOAD( "325329-03.u2", 0x000, 0x800, CRC(dd6147ba) SHA1(3945b9aa417f5905fa52f6f667a3e22add7ab15f) )
+	ROM_REGION( 0x800, VIC1112_TAG, ROMREGION_LOADBYNAME )
+	ROM_LOAD( "325329-03.u2", 0x000, 0x800, CRC(d37b6335) SHA1(828c965829d21c60e8c2d083caee045c639a270f) )
 ROM_END
 
 /*-------------------------------------------------
@@ -201,20 +271,23 @@ static DEVICE_START( vic1112 )
 {
 	vic1112_t *vic1112 = get_safe_token(device);
 	const vic1112_config *config = get_safe_config(device);
-
-	/* set IEEE address */
+	const address_space *program = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
 	vic1112->via0 = device_find_child_by_tag(device, M6522_0_TAG);
 	vic1112->via1 = device_find_child_by_tag(device, M6522_1_TAG);
-	vic1112->ieee_bus = devtag_get_device(device->machine, config->ieee_bus_tag);
+	vic1112->bus = devtag_get_device(device->machine, config->bus_tag);
 
 	/* set VIA clocks */
 	device_set_clock(vic1112->via0, cpu_get_clock(device->machine->firstcpu));
 	device_set_clock(vic1112->via1, cpu_get_clock(device->machine->firstcpu));
 
-	/* register for state saving */
-//	state_save_register_device_item(device, 0, vic1112->);
+	/* map VIAs to memory */
+	memory_install_readwrite8_device_handler(program, vic1112->via0, 0x9200, 0x920f, 0, 0, via_r, via_w);
+	memory_install_readwrite8_device_handler(program, vic1112->via1, 0x9210, 0x921f, 0, 0, via_r, via_w);
+
+	/* map ROM to memory */
+	memory_install_rom(program, 0xb000, 0xb7ff, 0, 0, memory_region(device->machine, VIC1112_TAG));
 }
 
 /*-------------------------------------------------
@@ -230,6 +303,8 @@ static DEVICE_RESET( vic1112 )
 	device_reset(vic1112->via1);
 
 	/* _IFC */
+	ieee488_ifc_w(vic1112->bus, device, 0);
+	ieee488_ifc_w(vic1112->bus, device, 1);
 }
 
 /*-------------------------------------------------

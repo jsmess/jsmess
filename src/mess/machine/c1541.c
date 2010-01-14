@@ -142,6 +142,7 @@
 #include "formats/g64_dsk.h"
 #include "machine/6522via.h"
 #include "machine/cbmiec.h"
+#include "machine/ieee488.h"
 
 /***************************************************************************
     PARAMETERS
@@ -201,7 +202,7 @@ struct _c1541_t
 	const device_config *cpu;
 	const device_config *via0;
 	const device_config *via1;
-	const device_config *serial_bus;
+	const device_config *bus;
 	const device_config *image;
 
 	/* timers */
@@ -300,7 +301,7 @@ WRITE_LINE_DEVICE_HANDLER( c1541_iec_atn_w )
 
 	via_ca1_w(c1541->via0, !state);
 
-	cbm_iec_data_w(c1541->serial_bus, device, data_out);
+	cbm_iec_data_w(c1541->bus, device, data_out);
 }
 
 /*-------------------------------------------------
@@ -308,6 +309,29 @@ WRITE_LINE_DEVICE_HANDLER( c1541_iec_atn_w )
 -------------------------------------------------*/
 
 WRITE_LINE_DEVICE_HANDLER( c1541_iec_reset_w )
+{
+	if (!state)
+	{
+		device_reset(device);
+	}
+}
+
+/*-------------------------------------------------
+    c2031_ieee488_atn_w - IEEE-488 bus attention
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( c2031_ieee488_atn_w )
+{
+	c1541_t *c1541 = get_safe_token(device);
+
+	via_ca1_w(c1541->via0, state);
+}
+
+/*-------------------------------------------------
+    c2031_ieee488_ifc_w - IEEE-488 bus reset
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( c2031_ieee488_ifc_w )
 {
 	if (!state)
 	{
@@ -410,16 +434,16 @@ static READ8_DEVICE_HANDLER( via0_pb_r )
 	UINT8 data = 0;
 
 	/* data in */
-	data = !cbm_iec_data_r(c1541->serial_bus);
+	data = !cbm_iec_data_r(c1541->bus);
 
 	/* clock in */
-	data |= !cbm_iec_clk_r(c1541->serial_bus) << 2;
+	data |= !cbm_iec_clk_r(c1541->bus) << 2;
 
 	/* serial bus address */
 	data |= c1541->address << 5;
 
 	/* attention in */
-	data |= !cbm_iec_atn_r(c1541->serial_bus) << 7;
+	data |= !cbm_iec_atn_r(c1541->bus) << 7;
 
 	return data;
 }
@@ -448,12 +472,12 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 	int atna = BIT(data, 4);
 
 	/* data out */
-	int serial_data = !data_out && !(atna ^ !cbm_iec_atn_r(c1541->serial_bus));
-	cbm_iec_data_w(c1541->serial_bus, device->owner, serial_data);
+	int serial_data = !data_out && !(atna ^ !cbm_iec_atn_r(c1541->bus));
+	cbm_iec_data_w(c1541->bus, device->owner, serial_data);
 	c1541->data_out = data_out;
 
 	/* clock out */
-	cbm_iec_clk_w(c1541->serial_bus, device->owner, !clk_out);
+	cbm_iec_clk_w(c1541->bus, device->owner, !clk_out);
 
 	/* attention acknowledge */
 	c1541->atna = atna;
@@ -544,7 +568,9 @@ static READ8_DEVICE_HANDLER( c2031_via0_pa_r )
 
     */
 
-	return 0;
+	c1541_t *c1541 = get_safe_token(device->owner);
+
+	return ieee488_dio_r(c1541->bus, 0);
 }
 
 static WRITE8_DEVICE_HANDLER( c2031_via0_pa_w )
@@ -563,6 +589,10 @@ static WRITE8_DEVICE_HANDLER( c2031_via0_pa_w )
         PA7     DI7
 
     */
+
+	c1541_t *c1541 = get_safe_token(device->owner);
+
+	ieee488_dio_w(c1541->bus, 0, data);
 }
 
 static READ8_DEVICE_HANDLER( c2031_via0_pb_r )
@@ -582,7 +612,25 @@ static READ8_DEVICE_HANDLER( c2031_via0_pb_r )
 
     */
 
-	return 0;
+	c1541_t *c1541 = get_safe_token(device->owner);
+	UINT8 data = 0;
+
+	/* not ready for data */
+	data |= ieee488_nrfd_r(c1541->bus) << 1;
+
+	/* not data accepted */
+	data |= ieee488_ndac_r(c1541->bus) << 2;
+
+	/* end or identify */
+	data |= ieee488_eoi_r(c1541->bus) << 3;
+
+	/* data valid */
+	data |= ieee488_dav_r(c1541->bus) << 6;
+
+	/* attention */
+	data |= ieee488_atn_r(c1541->bus) << 7;
+
+	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( c2031_via0_pb_w )
@@ -601,15 +649,41 @@ static WRITE8_DEVICE_HANDLER( c2031_via0_pb_w )
         PB7     _ATN
 
     */
+
+	c1541_t *c1541 = get_safe_token(device->owner);
+
+	/* attention acknowledge */
+
+	/* not ready for data */
+	ieee488_nrfd_w(c1541->bus, device->owner, BIT(data, 1));
+
+	/* not data accepted */
+	ieee488_ndac_w(c1541->bus, device->owner, BIT(data, 2));
+
+	/* end or identify */
+	ieee488_eoi_w(c1541->bus, device->owner, BIT(data, 3));
+}
+
+static READ_LINE_DEVICE_HANDLER( c2031_via0_ca1_r )
+{
+	c1541_t *c1541 = get_safe_token(device->owner);
+
+	return ieee488_atn_r(c1541->bus);
+}
+
+static READ_LINE_DEVICE_HANDLER( c2031_via0_ca2_r )
+{
+	/* device # selection */
+	return 0;
 }
 
 static const via6522_interface c2031_via0_intf =
 {
 	DEVCB_HANDLER(c2031_via0_pa_r),
 	DEVCB_HANDLER(c2031_via0_pb_r),
+	DEVCB_LINE(c2031_via0_ca1_r),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_LINE(c2031_via0_ca2_r),
 	DEVCB_NULL,
 
 	DEVCB_HANDLER(c2031_via0_pa_w),
@@ -617,7 +691,7 @@ static const via6522_interface c2031_via0_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_NULL, /* PLL SYN */
 
 	DEVCB_LINE(via0_irq_w)
 };
@@ -1011,7 +1085,7 @@ static DEVICE_START( c1541 )
 	/* find devices */
 	c1541->via0 = device_find_child_by_tag(device, M6522_0_TAG);
 	c1541->via1 = device_find_child_by_tag(device, M6522_1_TAG);
-	c1541->serial_bus = devtag_get_device(device->machine, config->serial_bus_tag);
+	c1541->bus = devtag_get_device(device->machine, config->bus_tag);
 	c1541->image = device_find_child_by_tag(device, FLOPPY_0);
 
 	/* allocate track buffer */
