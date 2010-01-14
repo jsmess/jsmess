@@ -1,0 +1,301 @@
+/**********************************************************************
+
+    IEEE-488.1 bus emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
+#include "driver.h"
+#include "ieee488.h"
+
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
+#define LOG 0
+
+enum
+{
+	EOI = 0,
+	DAV,
+	NRFD,
+	NDAC,
+	IFC,
+	SRQ,
+	ATN,
+	REN,
+	SIGNAL_COUNT
+};
+
+static const char *const SIGNAL_NAME[] = { "EOI", "DAV", "NRFD", "NDAC", "IFC", "SRQ", "ATN", "REN" };
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _ieee488_daisy_state ieee488_daisy_state;
+struct _ieee488_daisy_state
+{
+	ieee488_daisy_state			*next;			/* next device */
+	const device_config			*device;		/* associated device */
+
+	int line[SIGNAL_COUNT];						/* serial signal states */
+
+	devcb_resolved_write_line	out_line_func[SIGNAL_COUNT];
+};
+
+typedef struct _ieee488_t ieee488_t;
+struct _ieee488_t
+{
+	ieee488_daisy_state *daisy_state;
+	UINT8 dio;
+};
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE ieee488_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == IEEE488);
+	return (ieee488_t *)device->token;
+}
+
+INLINE const ieee488_daisy_chain *get_interface(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->type == IEEE488);
+	return (const ieee488_daisy_chain *) device->static_config;
+}
+
+INLINE int get_signal(const device_config *bus, int line)
+{
+	ieee488_t *ieee488 = get_safe_token(bus);
+	ieee488_daisy_state *daisy = ieee488->daisy_state;
+	int state = 1;
+
+	for ( ; daisy != NULL; daisy = daisy->next)
+	{
+		if (!daisy->line[line])
+		{
+			state = 0;
+			break;
+		}
+	}
+
+	return state;
+}
+
+INLINE void set_signal(const device_config *bus, const device_config *device, int line, int state)
+{
+	ieee488_t *ieee488 = get_safe_token(bus);
+	ieee488_daisy_state *daisy = ieee488->daisy_state;
+	int data = 1;
+
+	for ( ; daisy != NULL; daisy = daisy->next)
+	{
+		if (!strcmp(daisy->device->tag, device->tag))
+		{
+			if (daisy->line[line] != state)
+			{
+				if (LOG) logerror("IEEE-488: '%s' %s %u\n", device->tag, SIGNAL_NAME[line], state);
+				daisy->line[line] = state;
+			}
+			break;
+		}
+	}
+
+	data = get_signal(bus, line);
+	daisy = ieee488->daisy_state;
+
+	for ( ; daisy != NULL; daisy = daisy->next)
+	{
+		devcb_call_write_line(&daisy->out_line_func[line], data);
+	}
+
+	if (LOG) logerror("IEEE-488: EOI %u DAV %u NRFD %u NDAC %u IFC %u SRQ %u ATN %u REN %u DIO %02x\n",
+		get_signal(bus, EOI), get_signal(bus, DAV), get_signal(bus, NRFD), get_signal(bus, NDAC),
+		get_signal(bus, IFC), get_signal(bus, SRQ), get_signal(bus, ATN), get_signal(bus, REN), ieee488->dio);
+}
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+void ieee488_eoi_w(const device_config *ieee488, const device_config *device, int state)
+{
+	set_signal(ieee488, device, EOI, state);
+}
+
+READ_LINE_DEVICE_HANDLER( ieee488_eoi_r )
+{
+	return get_signal(device, EOI);
+}
+
+void ieee488_dav_w(const device_config *ieee488, const device_config *device, int state)
+{
+	set_signal(ieee488, device, DAV, state);
+}
+
+READ_LINE_DEVICE_HANDLER( ieee488_dav_r )
+{
+	return get_signal(device, DAV);
+}
+
+void ieee488_nrfd_w(const device_config *ieee488, const device_config *device, int state)
+{
+	set_signal(ieee488, device, NRFD, state);
+}
+
+READ_LINE_DEVICE_HANDLER( ieee488_nrfd_r )
+{
+	return get_signal(device, NRFD);
+}
+
+void ieee488_ndac_w(const device_config *ieee488, const device_config *device, int state)
+{
+	set_signal(ieee488, device, NDAC, state);
+}
+
+READ_LINE_DEVICE_HANDLER( ieee488_ndac_r )
+{
+	return get_signal(device, NDAC);
+}
+
+void ieee488_ifc_w(const device_config *ieee488, const device_config *device, int state)
+{
+	set_signal(ieee488, device, IFC, state);
+}
+
+READ_LINE_DEVICE_HANDLER( ieee488_ifc_r )
+{
+	return get_signal(device, IFC);
+}
+
+void ieee488_srq_w(const device_config *ieee488, const device_config *device, int state)
+{
+	set_signal(ieee488, device, SRQ, state);
+}
+
+READ_LINE_DEVICE_HANDLER( ieee488_srq_r )
+{
+	return get_signal(device, SRQ);
+}
+
+void ieee488_atn_w(const device_config *ieee488, const device_config *device, int state)
+{
+	set_signal(ieee488, device, ATN, state);
+}
+
+READ_LINE_DEVICE_HANDLER( ieee488_atn_r )
+{
+	return get_signal(device, ATN);
+}
+
+void ieee488_ren_w(const device_config *ieee488, const device_config *device, int state)
+{
+	set_signal(ieee488, device, REN, state);
+}
+
+READ_LINE_DEVICE_HANDLER( ieee488_ren_r )
+{
+	return get_signal(device, REN);
+}
+
+READ8_DEVICE_HANDLER( ieee488_dio_r )
+{
+	ieee488_t *ieee488 = get_safe_token(device);
+
+	return ieee488->dio;
+}
+
+WRITE8_DEVICE_HANDLER( ieee488_dio_w )
+{
+	ieee488_t *ieee488 = get_safe_token(device);
+
+	ieee488->dio = data;
+}
+
+/*-------------------------------------------------
+    DEVICE_START( ieee488 )
+-------------------------------------------------*/
+
+static DEVICE_START( ieee488 )
+{
+	ieee488_t *ieee488 = get_safe_token(device);
+	const ieee488_daisy_chain *daisy = get_interface(device);
+	int i;
+
+	astring *tempstring = astring_alloc();
+	ieee488_daisy_state *head = NULL;
+	ieee488_daisy_state **tailptr = &head;
+
+	/* create a linked list of devices */
+	for ( ; daisy->tag != NULL; daisy++)
+	{
+		*tailptr = auto_alloc(device->machine, ieee488_daisy_state);
+
+		(*tailptr)->next = NULL;
+		(*tailptr)->device = devtag_get_device(device->machine, daisy->tag);
+
+		if ((*tailptr)->device == NULL)
+		{
+			astring_free(tempstring);
+			fatalerror("Unable to locate device '%s'", daisy->tag);
+		}
+
+		for (i = SRQ; i < SIGNAL_COUNT; i++)
+		{
+			(*tailptr)->line[i] = 1;
+		}
+
+		devcb_resolve_write_line(&(*tailptr)->out_line_func[EOI], &daisy->out_eoi_func, device);
+		devcb_resolve_write_line(&(*tailptr)->out_line_func[DAV], &daisy->out_dav_func, device);
+		devcb_resolve_write_line(&(*tailptr)->out_line_func[NRFD], &daisy->out_nrfd_func, device);
+		devcb_resolve_write_line(&(*tailptr)->out_line_func[NDAC], &daisy->out_ndac_func, device);
+		devcb_resolve_write_line(&(*tailptr)->out_line_func[IFC], &daisy->out_ifc_func, device);
+		devcb_resolve_write_line(&(*tailptr)->out_line_func[SRQ], &daisy->out_srq_func, device);
+		devcb_resolve_write_line(&(*tailptr)->out_line_func[ATN], &daisy->out_atn_func, device);
+		devcb_resolve_write_line(&(*tailptr)->out_line_func[REN], &daisy->out_ren_func, device);
+
+		tailptr = &(*tailptr)->next;
+	}
+
+	ieee488->daisy_state = head;
+
+	astring_free(tempstring);
+
+	/* register for state saving */
+	state_save_register_device_item(device, 0, ieee488->dio);
+}
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( ieee488 )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( ieee488 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ieee488_t);								break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;												break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ieee488);					break;
+		case DEVINFO_FCT_STOP:							/* Nothing */												break;
+		case DEVINFO_FCT_RESET:							/* Nothing */												break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "IEEE-488.1 Bus");							break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "IEEE-488");								break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
+	}
+}
