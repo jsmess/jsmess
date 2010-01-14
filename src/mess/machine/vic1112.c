@@ -27,6 +27,10 @@
 typedef struct _vic1112_t vic1112_t;
 struct _vic1112_t
 {
+	int via0_irq;						/* VIA #0 interrupt request */
+	int via1_irq;						/* VIA #1 interrupt request */
+
+	/* devices */
 	const device_config *via0;
 	const device_config *via1;
 	const device_config *bus;
@@ -71,9 +75,13 @@ WRITE_LINE_DEVICE_HANDLER( vic1112_ieee488_srq_w )
     via6522_interface vic1112_via0_intf
 -------------------------------------------------*/
 
-static WRITE_LINE_DEVICE_HANDLER( via_irq_w )
+static WRITE_LINE_DEVICE_HANDLER( via0_irq_w )
 {
-	cpu_set_input_line(device->machine->firstcpu, M6502_IRQ_LINE, state);
+	vic1112_t *vic1112 = get_safe_token(device->owner);
+
+	vic1112->via0_irq = state;
+
+	cpu_set_input_line(device->machine->firstcpu, M6502_IRQ_LINE, (vic1112->via0_irq | vic1112->via1_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER( via0_pb_r )
@@ -95,6 +103,9 @@ static READ8_DEVICE_HANDLER( via0_pb_r )
 
 	vic1112_t *vic1112 = get_safe_token(device->owner);
 	UINT8 data = 0;
+
+	/* end or identify */
+	data |= ieee488_eoi_r(vic1112->bus) << 3;
 
 	/* data valid in */
 	data |= ieee488_dav_r(vic1112->bus) << 4;
@@ -159,55 +170,64 @@ static const via6522_interface vic1112_via0_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_LINE(via_irq_w)
+	DEVCB_LINE(via0_irq_w)
 };
 
 /*-------------------------------------------------
     via6522_interface vic1112_via1_intf
 -------------------------------------------------*/
 
-static READ8_DEVICE_HANDLER( via1_pa_r )
+static WRITE_LINE_DEVICE_HANDLER( via1_irq_w )
+{
+	vic1112_t *vic1112 = get_safe_token(device->owner);
+
+	vic1112->via1_irq = state;
+
+	cpu_set_input_line(device->machine->firstcpu, M6502_IRQ_LINE, (vic1112->via0_irq | vic1112->via1_irq) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static WRITE8_DEVICE_HANDLER( via1_pa_w )
 {
 	/*
 
         bit     description
 
-        PA0     DI1
-        PA1     DI2
-        PA2     DI3
-        PA3     DI4
-        PA4     DI5
-        PA5     DI6
-        PA6     DI7
-        PA7     DI8
+        PA0     DO1
+        PA1     DO2
+        PA2     DO3
+        PA3     DO4
+        PA4     DO5
+        PA5     DO6
+        PA6     DO7
+        PA7     DO8
+
+    */
+
+	vic1112_t *vic1112 = get_safe_token(device->owner);
+
+	ieee488_dio_w(vic1112->bus, device->owner, data);
+}
+
+static READ8_DEVICE_HANDLER( via1_pb_r )
+{
+	/*
+
+        bit     description
+
+        PB0     DI1
+        PB1     DI2
+        PB2     DI3
+        PB3     DI4
+        PB4     DI5
+        PB5     DI6
+        PB6     DI7
+        PB7     DI8
 
     */
 
 	vic1112_t *vic1112 = get_safe_token(device->owner);
 
 	return ieee488_dio_r(vic1112->bus, 0);
-}
-
-static WRITE8_DEVICE_HANDLER( via1_pb_w )
-{
-	/*
-
-        bit     description
-
-        PB0     DO1
-        PB1     DO2
-        PB2     DO3
-        PB3     DO4
-        PB4     DO5
-        PB5     DO6
-        PB6     DO7
-        PB7     DO8
-
-    */
-
-	vic1112_t *vic1112 = get_safe_token(device->owner);
-
-	ieee488_dio_w(vic1112->bus, 0, data);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( via1_ca2_w )
@@ -228,21 +248,21 @@ static WRITE_LINE_DEVICE_HANDLER( via1_cb2_w )
 
 static const via6522_interface vic1112_via1_intf =
 {
-	DEVCB_HANDLER(via1_pa_r),
 	DEVCB_NULL,
+	DEVCB_HANDLER(via1_pb_r),
 	DEVCB_NULL,
 	DEVCB_NULL, /* _SRQ IN */
 	DEVCB_NULL,
 	DEVCB_NULL,
 
+	DEVCB_HANDLER(via1_pa_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(via1_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_LINE(via1_ca2_w),
 	DEVCB_LINE(via1_cb2_w),
 
-	DEVCB_LINE(via_irq_w)
+	DEVCB_LINE(via1_irq_w)
 };
 
 /*-------------------------------------------------
@@ -283,11 +303,15 @@ static DEVICE_START( vic1112 )
 	device_set_clock(vic1112->via1, cpu_get_clock(device->machine->firstcpu));
 
 	/* map VIAs to memory */
-	memory_install_readwrite8_device_handler(program, vic1112->via0, 0x9200, 0x920f, 0, 0, via_r, via_w);
-	memory_install_readwrite8_device_handler(program, vic1112->via1, 0x9210, 0x921f, 0, 0, via_r, via_w);
+	memory_install_readwrite8_device_handler(program, vic1112->via0, 0x9800, 0x980f, 0, 0, via_r, via_w);
+	memory_install_readwrite8_device_handler(program, vic1112->via1, 0x9810, 0x981f, 0, 0, via_r, via_w);
 
 	/* map ROM to memory */
-	memory_install_rom(program, 0xb000, 0xb7ff, 0, 0, memory_region(device->machine, VIC1112_TAG));
+	memory_install_rom(program, 0xb000, 0xb7ff, 0, 0, memory_region(device->machine, "vic1112:vic1112"));
+
+	/* register for state saving */
+	state_save_register_device_item(device, 0, vic1112->via0_irq);
+	state_save_register_device_item(device, 0, vic1112->via1_irq);
 }
 
 /*-------------------------------------------------

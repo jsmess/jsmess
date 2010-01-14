@@ -198,6 +198,10 @@ struct _c1541_t
 	/* serial bus */
 	int data_out;						/* serial bus data output */
 
+	/* IEEE-488 bus */
+	int nrfd_out;						/* not ready for data */
+	int ndac_out;						/* not data accepted */
+
 	/* devices */
 	const device_config *cpu;
 	const device_config *via0;
@@ -323,8 +327,18 @@ WRITE_LINE_DEVICE_HANDLER( c1541_iec_reset_w )
 WRITE_LINE_DEVICE_HANDLER( c2031_ieee488_atn_w )
 {
 	c1541_t *c1541 = get_safe_token(device);
+	int nrfd = c1541->nrfd_out;
+	int ndac = c1541->ndac_out;
 
-	via_ca1_w(c1541->via0, state);
+	via_ca1_w(c1541->via0, !state);
+
+	if (!state ^ c1541->atna)
+	{
+		nrfd = ndac = 0;
+	}
+
+	ieee488_nrfd_w(c1541->bus, device, nrfd);
+	ieee488_ndac_w(c1541->bus, device, ndac);
 }
 
 /*-------------------------------------------------
@@ -592,7 +606,7 @@ static WRITE8_DEVICE_HANDLER( c2031_via0_pa_w )
 
 	c1541_t *c1541 = get_safe_token(device->owner);
 
-	ieee488_dio_w(c1541->bus, 0, data);
+	ieee488_dio_w(c1541->bus, device->owner, data);
 }
 
 static READ8_DEVICE_HANDLER( c2031_via0_pb_r )
@@ -613,6 +627,7 @@ static READ8_DEVICE_HANDLER( c2031_via0_pb_r )
     */
 
 	c1541_t *c1541 = get_safe_token(device->owner);
+
 	UINT8 data = 0;
 
 	/* not ready for data */
@@ -628,7 +643,7 @@ static READ8_DEVICE_HANDLER( c2031_via0_pb_r )
 	data |= ieee488_dav_r(c1541->bus) << 6;
 
 	/* attention */
-	data |= ieee488_atn_r(c1541->bus) << 7;
+	data |= !ieee488_atn_r(c1541->bus) << 7;
 
 	return data;
 }
@@ -652,16 +667,29 @@ static WRITE8_DEVICE_HANDLER( c2031_via0_pb_w )
 
 	c1541_t *c1541 = get_safe_token(device->owner);
 
-	/* attention acknowledge */
+	int atna = BIT(data, 0);
+	int nrfd = BIT(data, 1);
+	int ndac = BIT(data, 2);
 
 	/* not ready for data */
-	ieee488_nrfd_w(c1541->bus, device->owner, BIT(data, 1));
+	c1541->nrfd_out = nrfd;
 
 	/* not data accepted */
-	ieee488_ndac_w(c1541->bus, device->owner, BIT(data, 2));
+	c1541->ndac_out = ndac;
 
 	/* end or identify */
 	ieee488_eoi_w(c1541->bus, device->owner, BIT(data, 3));
+
+	/* attention acknowledge */
+	c1541->atna = atna;
+
+	if (!ieee488_atn_r(c1541->bus) ^ atna)
+	{
+		nrfd = ndac = 0;
+	}
+
+	ieee488_nrfd_w(c1541->bus, device->owner, nrfd);
+	ieee488_ndac_w(c1541->bus, device->owner, ndac);
 }
 
 static READ_LINE_DEVICE_HANDLER( c2031_via0_ca1_r )
@@ -673,8 +701,19 @@ static READ_LINE_DEVICE_HANDLER( c2031_via0_ca1_r )
 
 static READ_LINE_DEVICE_HANDLER( c2031_via0_ca2_r )
 {
+	c1541_t *c1541 = get_safe_token(device->owner);
+	int state = 0;
+
 	/* device # selection */
-	return 0;
+	switch (c1541->address)
+	{
+	case  8: state = (c1541->atna | c1541->nrfd_out);	break;
+	case  9: state = c1541->atna;						break;
+	case 10: state = c1541->nrfd_out;					break;
+	case 11: state = 0;									break;
+	}
+
+	return state;
 }
 
 static const via6522_interface c2031_via0_intf =
@@ -1112,6 +1151,8 @@ static DEVICE_START( c1541 )
 	state_save_register_device_item(device, 0, c1541->via0_irq);
 	state_save_register_device_item(device, 0, c1541->via1_irq);
 	state_save_register_device_item(device, 0, c1541->data_out);
+	state_save_register_device_item(device, 0, c1541->nrfd_out);
+	state_save_register_device_item(device, 0, c1541->ndac_out);
 }
 
 /*-------------------------------------------------

@@ -1,8 +1,10 @@
 /**********************************************************************
 
-    Commodore VIC-1112 IEEE-488 cartridge emulation
+    Commodore VIC-1112 IEEE-488 Interface Cartridge emulation
 
-    Copyright MESS Team.
+	SYS 45065 to start
+
+	Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/

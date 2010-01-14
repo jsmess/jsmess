@@ -1,6 +1,7 @@
 /**********************************************************************
 
-    IEEE-488.1 bus emulation
+    IEEE-488.1 General Purpose Interface Bus emulation
+	(aka HP-IB, GPIB, CBM IEEE)
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -41,7 +42,8 @@ struct _ieee488_daisy_state
 	ieee488_daisy_state			*next;			/* next device */
 	const device_config			*device;		/* associated device */
 
-	int line[SIGNAL_COUNT];						/* serial signal states */
+	int line[SIGNAL_COUNT];						/* control lines' state */
+	UINT8 dio;									/* data lines' state */
 
 	devcb_resolved_write_line	out_line_func[SIGNAL_COUNT];
 };
@@ -50,7 +52,6 @@ typedef struct _ieee488_t ieee488_t;
 struct _ieee488_t
 {
 	ieee488_daisy_state *daisy_state;
-	UINT8 dio;
 };
 
 /***************************************************************************
@@ -80,21 +81,31 @@ INLINE int get_signal(const device_config *bus, int line)
 
 	for ( ; daisy != NULL; daisy = daisy->next)
 	{
-		if (!daisy->line[line])
-		{
-			state = 0;
-			break;
-		}
+		state &= daisy->line[line];
 	}
 
 	return state;
+}
+
+INLINE int get_data(const device_config *bus)
+{
+	ieee488_t *ieee488 = get_safe_token(bus);
+	ieee488_daisy_state *daisy = ieee488->daisy_state;
+	UINT8 data = 0xff;
+
+	for ( ; daisy != NULL; daisy = daisy->next)
+	{
+		data &= daisy->dio;
+	}
+
+	return data;
 }
 
 INLINE void set_signal(const device_config *bus, const device_config *device, int line, int state)
 {
 	ieee488_t *ieee488 = get_safe_token(bus);
 	ieee488_daisy_state *daisy = ieee488->daisy_state;
-	int data = 1;
+	int new_state = 1;
 
 	for ( ; daisy != NULL; daisy = daisy->next)
 	{
@@ -109,26 +120,46 @@ INLINE void set_signal(const device_config *bus, const device_config *device, in
 		}
 	}
 
-	data = get_signal(bus, line);
+	new_state = get_signal(bus, line);
 	daisy = ieee488->daisy_state;
 
 	for ( ; daisy != NULL; daisy = daisy->next)
 	{
-		devcb_call_write_line(&daisy->out_line_func[line], data);
+		devcb_call_write_line(&daisy->out_line_func[line], new_state);
 	}
 
 	if (LOG) logerror("IEEE-488: EOI %u DAV %u NRFD %u NDAC %u IFC %u SRQ %u ATN %u REN %u DIO %02x\n",
 		get_signal(bus, EOI), get_signal(bus, DAV), get_signal(bus, NRFD), get_signal(bus, NDAC),
-		get_signal(bus, IFC), get_signal(bus, SRQ), get_signal(bus, ATN), get_signal(bus, REN), ieee488->dio);
+		get_signal(bus, IFC), get_signal(bus, SRQ), get_signal(bus, ATN), get_signal(bus, REN), get_data(bus));
+}
+
+INLINE void set_data(const device_config *bus, const device_config *device, UINT8 data)
+{
+	ieee488_t *ieee488 = get_safe_token(bus);
+	ieee488_daisy_state *daisy = ieee488->daisy_state;
+
+	for ( ; daisy != NULL; daisy = daisy->next)
+	{
+		if (!strcmp(daisy->device->tag, device->tag))
+		{
+			if (LOG) logerror("IEEE-488: '%s' DIO %02x\n", device->tag, data);
+			daisy->dio = data;
+			break;
+		}
+	}
+
+	if (LOG) logerror("IEEE-488: EOI %u DAV %u NRFD %u NDAC %u IFC %u SRQ %u ATN %u REN %u DIO %02x\n",
+		get_signal(bus, EOI), get_signal(bus, DAV), get_signal(bus, NRFD), get_signal(bus, NDAC),
+		get_signal(bus, IFC), get_signal(bus, SRQ), get_signal(bus, ATN), get_signal(bus, REN), get_data(bus));
 }
 
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
 
-void ieee488_eoi_w(const device_config *ieee488, const device_config *device, int state)
+void ieee488_eoi_w(const device_config *bus, const device_config *device, int state)
 {
-	set_signal(ieee488, device, EOI, state);
+	set_signal(bus, device, EOI, state);
 }
 
 READ_LINE_DEVICE_HANDLER( ieee488_eoi_r )
@@ -136,9 +167,9 @@ READ_LINE_DEVICE_HANDLER( ieee488_eoi_r )
 	return get_signal(device, EOI);
 }
 
-void ieee488_dav_w(const device_config *ieee488, const device_config *device, int state)
+void ieee488_dav_w(const device_config *bus, const device_config *device, int state)
 {
-	set_signal(ieee488, device, DAV, state);
+	set_signal(bus, device, DAV, state);
 }
 
 READ_LINE_DEVICE_HANDLER( ieee488_dav_r )
@@ -146,9 +177,9 @@ READ_LINE_DEVICE_HANDLER( ieee488_dav_r )
 	return get_signal(device, DAV);
 }
 
-void ieee488_nrfd_w(const device_config *ieee488, const device_config *device, int state)
+void ieee488_nrfd_w(const device_config *bus, const device_config *device, int state)
 {
-	set_signal(ieee488, device, NRFD, state);
+	set_signal(bus, device, NRFD, state);
 }
 
 READ_LINE_DEVICE_HANDLER( ieee488_nrfd_r )
@@ -156,9 +187,9 @@ READ_LINE_DEVICE_HANDLER( ieee488_nrfd_r )
 	return get_signal(device, NRFD);
 }
 
-void ieee488_ndac_w(const device_config *ieee488, const device_config *device, int state)
+void ieee488_ndac_w(const device_config *bus, const device_config *device, int state)
 {
-	set_signal(ieee488, device, NDAC, state);
+	set_signal(bus, device, NDAC, state);
 }
 
 READ_LINE_DEVICE_HANDLER( ieee488_ndac_r )
@@ -166,9 +197,9 @@ READ_LINE_DEVICE_HANDLER( ieee488_ndac_r )
 	return get_signal(device, NDAC);
 }
 
-void ieee488_ifc_w(const device_config *ieee488, const device_config *device, int state)
+void ieee488_ifc_w(const device_config *bus, const device_config *device, int state)
 {
-	set_signal(ieee488, device, IFC, state);
+	set_signal(bus, device, IFC, state);
 }
 
 READ_LINE_DEVICE_HANDLER( ieee488_ifc_r )
@@ -176,9 +207,9 @@ READ_LINE_DEVICE_HANDLER( ieee488_ifc_r )
 	return get_signal(device, IFC);
 }
 
-void ieee488_srq_w(const device_config *ieee488, const device_config *device, int state)
+void ieee488_srq_w(const device_config *bus, const device_config *device, int state)
 {
-	set_signal(ieee488, device, SRQ, state);
+	set_signal(bus, device, SRQ, state);
 }
 
 READ_LINE_DEVICE_HANDLER( ieee488_srq_r )
@@ -186,9 +217,9 @@ READ_LINE_DEVICE_HANDLER( ieee488_srq_r )
 	return get_signal(device, SRQ);
 }
 
-void ieee488_atn_w(const device_config *ieee488, const device_config *device, int state)
+void ieee488_atn_w(const device_config *bus, const device_config *device, int state)
 {
-	set_signal(ieee488, device, ATN, state);
+	set_signal(bus, device, ATN, state);
 }
 
 READ_LINE_DEVICE_HANDLER( ieee488_atn_r )
@@ -196,9 +227,9 @@ READ_LINE_DEVICE_HANDLER( ieee488_atn_r )
 	return get_signal(device, ATN);
 }
 
-void ieee488_ren_w(const device_config *ieee488, const device_config *device, int state)
+void ieee488_ren_w(const device_config *bus, const device_config *device, int state)
 {
-	set_signal(ieee488, device, REN, state);
+	set_signal(bus, device, REN, state);
 }
 
 READ_LINE_DEVICE_HANDLER( ieee488_ren_r )
@@ -208,16 +239,12 @@ READ_LINE_DEVICE_HANDLER( ieee488_ren_r )
 
 READ8_DEVICE_HANDLER( ieee488_dio_r )
 {
-	ieee488_t *ieee488 = get_safe_token(device);
-
-	return ieee488->dio;
+	return get_data(device);
 }
 
-WRITE8_DEVICE_HANDLER( ieee488_dio_w )
+void ieee488_dio_w(const device_config *bus, const device_config *device, UINT8 data)
 {
-	ieee488_t *ieee488 = get_safe_token(device);
-
-	ieee488->dio = data;
+	set_data(bus, device, data);
 }
 
 /*-------------------------------------------------
@@ -239,6 +266,7 @@ static DEVICE_START( ieee488 )
 	{
 		*tailptr = auto_alloc(device->machine, ieee488_daisy_state);
 
+		/* find device */
 		(*tailptr)->next = NULL;
 		(*tailptr)->device = devtag_get_device(device->machine, daisy->tag);
 
@@ -248,11 +276,16 @@ static DEVICE_START( ieee488 )
 			fatalerror("Unable to locate device '%s'", daisy->tag);
 		}
 
-		for (i = SRQ; i < SIGNAL_COUNT; i++)
+		/* set control lines to 'false' state */
+		for (i = EOI; i < SIGNAL_COUNT; i++)
 		{
 			(*tailptr)->line[i] = 1;
 		}
 
+		/* set data lines to 'false' state */
+		(*tailptr)->dio = 0xff;
+
+		/* resolve callbacks */
 		devcb_resolve_write_line(&(*tailptr)->out_line_func[EOI], &daisy->out_eoi_func, device);
 		devcb_resolve_write_line(&(*tailptr)->out_line_func[DAV], &daisy->out_dav_func, device);
 		devcb_resolve_write_line(&(*tailptr)->out_line_func[NRFD], &daisy->out_nrfd_func, device);
@@ -270,7 +303,7 @@ static DEVICE_START( ieee488 )
 	astring_free(tempstring);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, ieee488->dio);
+//	state_save_register_device_item(device, 0, ieee488->);
 }
 
 /*-------------------------------------------------
