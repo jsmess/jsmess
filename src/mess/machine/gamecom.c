@@ -44,6 +44,20 @@ typedef struct {
 	int check_value;
 } GAMECOM_TIMER;
 
+typedef struct
+{
+	UINT8 sgc;
+	UINT8 sg0l;
+	UINT8 sg1l;
+	UINT8 sg2l;
+	UINT16 sg0t;
+	UINT16 sg1t;
+	UINT16 sg2t;
+	UINT8 sgda;
+	UINT8 sg0w[16];
+	UINT8 sg1w[16];
+} gamecom_sound_t;
+
 UINT8 gamecom_internal_registers[0x80];
 static UINT8 *cartridge1 = NULL;
 static UINT8 *cartridge2 = NULL;
@@ -52,6 +66,7 @@ static UINT8 *cartridge = NULL;
 static emu_timer *gamecom_clock_timer = NULL;
 static GAMECOM_DMA gamecom_dma;
 static GAMECOM_TIMER gamecom_timer[2];
+static gamecom_sound_t gamecom_sound;
 
 //static const int gamecom_timer_limit[8] = { 2/2, 1024/2, 2048/2, 4096/2, 8192/2, 16384/2, 32768/2, 65536/2 };
 static const int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32768, 65536 };
@@ -64,7 +79,7 @@ static TIMER_CALLBACK(gamecom_clock_timer_callback)
 {
 	UINT8 val = ( ( gamecom_internal_registers[SM8521_CLKT] & 0x3F ) + 1 ) & 0x3F;
 	gamecom_internal_registers[SM8521_CLKT] = ( gamecom_internal_registers[SM8521_CLKT] & 0xC0 ) | val;
-	cputag_set_input_line(machine, "maincpu", CK_INT, HOLD_LINE );
+	cputag_set_input_line(machine, "maincpu", CK_INT, ASSERT_LINE );
 }
 
 MACHINE_RESET( gamecom )
@@ -342,6 +357,78 @@ WRITE8_HANDLER( gamecom_internal_w )
 		}
 		break;
 
+	/* Sound */
+	case SM8521_SGC:
+		gamecom_sound.sgc = data;
+		break;
+	case SM8521_SG0L:
+		gamecom_sound.sg0l = data;
+		break;
+	case SM8521_SG1L:
+		gamecom_sound.sg1l = data;
+		break;
+	case SM8521_SG0TH:
+		gamecom_sound.sg0t = ( gamecom_sound.sg0t & 0xFF ) | ( data << 8 );
+		break;
+	case SM8521_SG0TL:
+		gamecom_sound.sg0t = ( gamecom_sound.sg0t & 0xFF00 ) | data;
+		break;
+	case SM8521_SG1TH:
+		gamecom_sound.sg1t = ( gamecom_sound.sg1t & 0xFF ) | ( data << 8 );
+		break;
+	case SM8521_SG1TL:
+		gamecom_sound.sg1t = ( gamecom_sound.sg1t & 0xFF00 ) | data;
+		break;
+	case SM8521_SG2L:
+		gamecom_sound.sg2l = data;
+		break;
+	case SM8521_SG2TH:
+		gamecom_sound.sg2t = ( gamecom_sound.sg2t & 0xFF ) | ( data << 8 );
+		break;
+	case SM8521_SG2TL:
+		gamecom_sound.sg2t = ( gamecom_sound.sg2t & 0xFF00 ) | data;
+		break;
+	case SM8521_SGDA:
+		gamecom_sound.sgda = data;
+		break;
+
+	case SM8521_SG0W0:
+	case SM8521_SG0W1:
+	case SM8521_SG0W2:
+	case SM8521_SG0W3:
+	case SM8521_SG0W4:
+	case SM8521_SG0W5:
+	case SM8521_SG0W6:
+	case SM8521_SG0W7:
+	case SM8521_SG0W8:
+	case SM8521_SG0W9:
+	case SM8521_SG0W10:
+	case SM8521_SG0W11:
+	case SM8521_SG0W12:
+	case SM8521_SG0W13:
+	case SM8521_SG0W14:
+	case SM8521_SG0W15:
+		gamecom_sound.sg0w[offset - SM8521_SG0W0] = data;
+		break;
+	case SM8521_SG1W0:
+	case SM8521_SG1W1:
+	case SM8521_SG1W2:
+	case SM8521_SG1W3:
+	case SM8521_SG1W4:
+	case SM8521_SG1W5:
+	case SM8521_SG1W6:
+	case SM8521_SG1W7:
+	case SM8521_SG1W8:
+	case SM8521_SG1W9:
+	case SM8521_SG1W10:
+	case SM8521_SG1W11:
+	case SM8521_SG1W12:
+	case SM8521_SG1W13:
+	case SM8521_SG1W14:
+	case SM8521_SG1W15:
+		gamecom_sound.sg1w[offset - SM8521_SG1W0] = data;
+		break;
+
 	/* Reserved addresses */
 	case SM8521_18: case SM8521_1B:
 	case SM8521_29: case SM8521_2A: case SM8521_2F:
@@ -569,7 +656,7 @@ void gamecom_handle_dma( const device_config *device, int cycles )
 		gamecom_dma.dest_current = gamecom_dma.dest_line;
 	}
 	gamecom_dma.enabled = 0;
-	cputag_set_input_line(device->machine, "maincpu", DMA_INT, HOLD_LINE );
+	cputag_set_input_line(device->machine, "maincpu", DMA_INT, ASSERT_LINE );
 }
 
 void gamecom_update_timers( const device_config *device, int cycles )
@@ -584,7 +671,7 @@ void gamecom_update_timers( const device_config *device, int cycles )
 			if ( gamecom_timer[0].counter == gamecom_timer[0].check_value )
 			{
 				gamecom_timer[0].counter = 0;
-				cputag_set_input_line(device->machine, "maincpu", TIM0_INT, HOLD_LINE );
+				cputag_set_input_line(device->machine, "maincpu", TIM0_INT, ASSERT_LINE );
 			}
 		}
 	}
@@ -598,7 +685,7 @@ void gamecom_update_timers( const device_config *device, int cycles )
 			if ( gamecom_timer[1].counter == gamecom_timer[1].check_value )
 			{
 				gamecom_timer[1].counter = 0;
-				cputag_set_input_line(device->machine, "maincpu", TIM1_INT, HOLD_LINE );
+				cputag_set_input_line(device->machine, "maincpu", TIM1_INT, ASSERT_LINE );
 			}
 		}
 	}
