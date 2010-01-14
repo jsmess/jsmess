@@ -131,7 +131,7 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
         PB0     _DAV OUT
         PB1     _NRFD OUT
         PB2     _NDAC OUT
-        PB3     _EOI
+        PB3     _EOI IN
         PB4     _DAV IN
         PB5     _NRFD IN
         PB6     _NDAC IN
@@ -149,9 +149,6 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 
 	/* not data accepted out */
 	ieee488_ndac_w(vic1112->bus, device->owner, BIT(data, 2));
-
-	/* end or identify */
-	ieee488_eoi_w(vic1112->bus, device->owner, BIT(data, 3));
 }
 
 static const via6522_interface vic1112_via0_intf =
@@ -186,29 +183,7 @@ static WRITE_LINE_DEVICE_HANDLER( via1_irq_w )
 	cpu_set_input_line(device->machine->firstcpu, M6502_IRQ_LINE, (vic1112->via0_irq | vic1112->via1_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER( via1_pa_w )
-{
-	/*
-
-        bit     description
-
-        PA0     DO1
-        PA1     DO2
-        PA2     DO3
-        PA3     DO4
-        PA4     DO5
-        PA5     DO6
-        PA6     DO7
-        PA7     DO8
-
-    */
-
-	vic1112_t *vic1112 = get_safe_token(device->owner);
-
-	ieee488_dio_w(vic1112->bus, device->owner, data);
-}
-
-static READ8_DEVICE_HANDLER( via1_pb_r )
+static READ8_DEVICE_HANDLER( dio_r )
 {
 	/*
 
@@ -230,7 +205,29 @@ static READ8_DEVICE_HANDLER( via1_pb_r )
 	return ieee488_dio_r(vic1112->bus, 0);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( via1_ca2_w )
+static WRITE8_DEVICE_HANDLER( dio_w )
+{
+	/*
+
+        bit     description
+
+        PA0     DO1
+        PA1     DO2
+        PA2     DO3
+        PA3     DO4
+        PA4     DO5
+        PA5     DO6
+        PA6     DO7
+        PA7     DO8
+
+    */
+
+	vic1112_t *vic1112 = get_safe_token(device->owner);
+
+	ieee488_dio_w(vic1112->bus, device->owner, data);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( atn_w )
 {
 	vic1112_t *vic1112 = get_safe_token(device->owner);
 
@@ -238,7 +235,15 @@ static WRITE_LINE_DEVICE_HANDLER( via1_ca2_w )
 	ieee488_atn_w(vic1112->bus, device->owner, state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( via1_cb2_w )
+static READ_LINE_DEVICE_HANDLER( srq_r )
+{
+	vic1112_t *vic1112 = get_safe_token(device->owner);
+
+	/* service request in */
+	return ieee488_srq_r(vic1112->bus);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( eoi_w )
 {
 	vic1112_t *vic1112 = get_safe_token(device->owner);
 
@@ -249,18 +254,18 @@ static WRITE_LINE_DEVICE_HANDLER( via1_cb2_w )
 static const via6522_interface vic1112_via1_intf =
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(via1_pb_r),
+	DEVCB_HANDLER(dio_r),
 	DEVCB_NULL,
-	DEVCB_NULL, /* _SRQ IN */
+	DEVCB_LINE(srq_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_HANDLER(via1_pa_w),
+	DEVCB_HANDLER(dio_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(via1_ca2_w),
-	DEVCB_LINE(via1_cb2_w),
+	DEVCB_LINE(atn_w),
+	DEVCB_LINE(eoi_w),
 
 	DEVCB_LINE(via1_irq_w)
 };
