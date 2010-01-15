@@ -53,9 +53,10 @@ const software_list * const software_lists[] =
 	ADD_SOFTWARE_LIST( ngpc_cart )      /* SNK Neo Geo Pocket Color cartridges */
 	ADD_SOFTWARE_LIST( pasogo_cart )    /* Koei Pasogo cartridges */
 	ADD_SOFTWARE_LIST( pico_cart )      /* Sega Pico cartridges */
-	ADD_SOFTWARE_LIST( pokemini_cart )  /* Nintendo Pokémon Mini cartridges */
+	ADD_SOFTWARE_LIST( pokemini_cart )  /* Nintendo PokÃ©mon Mini cartridges */
 	ADD_SOFTWARE_LIST( sg1000_cart )    /* Sega SG-1000 & SG-1000 MarkII cartridges */
 	ADD_SOFTWARE_LIST( sms_cart )       /* Sega Master System cartridges */
+	ADD_SOFTWARE_LIST( spectrum_cart )  /* Sinclair ZX Spectrum cartridges */
 	ADD_SOFTWARE_LIST( supracan_cart )  /* Super A'Can cartridges */
 	ADD_SOFTWARE_LIST( svision_cart )   /* Watara Supervision cartridges */
 	ADD_SOFTWARE_LIST( vboy_cart )      /* Nintendo Virtual Boy cartridges */

@@ -1701,6 +1701,7 @@ $(MESSOBJ)/software.a:					\
 	$(MESS_SOFTWARE)/pokemini_cart.o	\
 	$(MESS_SOFTWARE)/sg1000_cart.o	\
 	$(MESS_SOFTWARE)/sms_cart.o	\
+	$(MESS_SOFTWARE)/spectrum_cart.o	\
 	$(MESS_SOFTWARE)/supracan_cart.o	\
 	$(MESS_SOFTWARE)/svision_cart.o	\
 	$(MESS_SOFTWARE)/vboy_cart.o	\
