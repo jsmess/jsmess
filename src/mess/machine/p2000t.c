@@ -40,6 +40,16 @@ static struct
 	UINT8 port_707f;
 } p2000t_ports;
 
+/*
+	Keyboard port 0x0x
+
+	If the keyboard interrupt is enabled, all keyboard matrix rows are
+	connected and reading from either of these ports will give the
+	keyboard status (FF=no key pressed)
+
+	If the keyboard interrupt is disabled, reading one of these ports
+	will read the corresponding keyboard matrix row
+*/
 READ8_HANDLER (	p2000t_port_000f_r )
 {
 	static const char *const keynames[] = {
@@ -92,23 +102,63 @@ READ8_HANDLER (	p2000t_port_202f_r )
     bit 5 - Unused
     bit 6 - Keyboard interrupt enable
     bit 7 - Printer output
- */
+*/
 WRITE8_HANDLER ( p2000t_port_101f_w )
 {
 	p2000t_ports.port_101f = data;
 }
 
+/*
+    Scroll Register 0x3x (P2000T only)
+
+    bit 0 - /
+    bit 1 - |
+    bit 2 - | Index of the first character
+    bit 3 - | to be displayed
+    bit 4 - |
+    bit 5 - |
+    bit 6 - \
+    bit 7 - Video disable (0 = enabled)
+*/
 WRITE8_HANDLER ( p2000t_port_303f_w )
 {
 	p2000t_ports.port_303f = data;
 }
 
+/*
+    Beeper 0x5x
+
+    bit 0 - Beeper
+    bit 1 - Unused
+    bit 2 - Unused
+    bit 3 - Unused
+    bit 4 - Unused
+    bit 5 - Unused
+    bit 6 - Unused
+    bit 7 - Unused
+*/
 WRITE8_HANDLER ( p2000t_port_505f_w )
 {
 	const device_config *speaker = devtag_get_device(space->machine, "speaker");
-	speaker_level_w(speaker, data & 0x01);
+	speaker_level_w(speaker, BIT(data,0));
 }
 
+/*
+    DISAS 0x7x (P2000M only)
+
+    bit 0 - Unused
+    bit 1 - DISAS enable
+    bit 2 - Unused
+    bit 3 - Unused
+    bit 4 - Unused
+    bit 5 - Unused
+    bit 6 - Unused
+    bit 7 - Unused
+
+	When the DISAS is active, the CPU has the highest priority and
+    video refresh is disabled when the CPU accesses video memory
+
+*/
 WRITE8_HANDLER ( p2000t_port_707f_w )
 {
 	p2000t_ports.port_707f = data;
