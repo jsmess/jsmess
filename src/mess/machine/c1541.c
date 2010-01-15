@@ -127,6 +127,7 @@
 
     TODO:
 
+	- C2031 device address is always 8
 	- ROM version selection
     - allocate track buffer runtime
     - accurate timing

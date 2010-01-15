@@ -2,6 +2,7 @@
 
 	TODO:
 
+	- C1540 is unreliable (VIA timing issues?)
 	- devicify VIC6560/6561
 	- clean up inputs
 	- clean up VIA interface
@@ -12,7 +13,6 @@
 	- SHIFT LOCK
 	- restore key
 	- light pen
-	- VIC-1540 does not load anything
 	- VIC21 (built in 21K ram)
 	- new cart system (rpk)
 
@@ -27,6 +27,8 @@
 #include "machine/6522via.h"
 #include "machine/c1541.h"
 #include "machine/cbmiec.h"
+#include "machine/ieee488.h"
+#include "machine/vic1112.h"
 #include "video/vic6560.h"
 
 /* Memory Maps */
@@ -426,28 +428,38 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 	state->key_col = data;
 }
 
-static WRITE8_DEVICE_HANDLER( via1_ca2_w )
+static WRITE_LINE_DEVICE_HANDLER( via1_ca2_w )
 {
-	vic20_state *state = device->machine->driver_data;
+	vic20_state *driver_state = device->machine->driver_data;
 
 	/* serial clock out */
-	cbm_iec_clk_w(state->iec, device, !BIT(data, 0));
+	cbm_iec_clk_w(driver_state->iec, device, !state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( via1_cb2_w )
+{
+	vic20_state *driver_state = device->machine->driver_data;
+
+	/* serial data out */
+	cbm_iec_data_w(driver_state->iec, device, !state);
 }
 
 static const via6522_interface vic20_via1_intf =
 {
 	DEVCB_HANDLER(via1_pa_r),
 	DEVCB_HANDLER(via1_pb_r),
-	DEVCB_NULL, // CASS READ
+	DEVCB_NULL, /* CASS READ */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
+
 	DEVCB_NULL,
 	DEVCB_HANDLER(via1_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(via1_ca2_w),
-	DEVCB_NULL,
+	DEVCB_LINE(via1_ca2_w),
+	DEVCB_LINE(via1_cb2_w),
+
 	DEVCB_CPU_INPUT_LINE(M6502_TAG, M6502_IRQ_LINE)
 };
 
@@ -468,6 +480,15 @@ static CBM_IEC_DAISY( cbm_iec_daisy )
 	{ M6522_0_TAG },
 	{ M6522_1_TAG, DEVCB_DEVICE_LINE(M6522_1_TAG, via_cb1_w) },
 	{ C1541_IEC(C1540_TAG) },
+	{ NULL}
+};
+
+/* IEEE-488 Bus */
+
+static IEEE488_DAISY( ieee488_daisy )
+{
+	{ VIC1112_IEEE488 },
+	{ C2031_IEEE488(C2031_TAG) },
 	{ NULL}
 };
 
@@ -503,6 +524,10 @@ static MACHINE_START( vic20_common )
 	state->iec = devtag_get_device(machine, IEC_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 	state->cassette_timer = devtag_get_device(machine, TIMER_C1530_TAG);
+
+	/* set VIA clocks */
+	device_set_clock(state->via0, cputag_get_clock(machine, M6502_TAG));
+	device_set_clock(state->via1, cputag_get_clock(machine, M6502_TAG));
 
 	/* memory expansions */
 	switch (messram_get_size(devtag_get_device(machine, "messram")))
@@ -594,11 +619,15 @@ static MACHINE_DRIVER_START( vic20_common )
 	MDRV_VIA6522_ADD(M6522_0_TAG, 0, vic20_via0_intf)
 	MDRV_VIA6522_ADD(M6522_1_TAG, 0, vic20_via1_intf)
 
-	MDRV_QUICKLOAD_ADD("quickload", cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MDRV_QUICKLOAD_ADD("quickload", cbm_vc20, "p00,prg", 0)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_config )
 	MDRV_CBM_IEC_ADD(IEC_TAG, cbm_iec_daisy)
 	MDRV_C1540_ADD(C1540_TAG, IEC_TAG, 8)
-
+/*
+	MDRV_IEEE488_ADD(IEEE488_TAG, ieee488_daisy)
+	MDRV_VIC1112_ADD(IEEE488_TAG)
+	MDRV_C2031_ADD(C2031_TAG, IEEE488_TAG, 9)
+*/
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("20,40,60,70,a0,b0")
 	MDRV_CARTSLOT_NOT_MANDATORY
@@ -673,5 +702,5 @@ ROM_END
 /*    YEAR  NAME		PARENT		COMPAT  MACHINE		INPUT   INIT    COMPANY							FULLNAME					FLAGS */
 COMP( 1980, vic1001,	0,			0,		vic20_ntsc,	vic20,	0,		"Commodore Business Machines",	"VIC-1001 (Japan)",			GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 COMP( 1981, vic20,		vic1001,	0,		vic20_ntsc,	vic20,	0,		"Commodore Business Machines",	"VIC-20 (NTSC)",			GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-COMP( 1981, vic20p,		vic1001,	0,		vic20_pal,	vic20,	0,		"Commodore Business Machines",	"VIC-20 (PAL)",				GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1981, vic20p,		vic1001,	0,		vic20_pal,	vic20,	0,		"Commodore Business Machines",	"VIC-20 / VC-20 (PAL)",		GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 COMP( 1981, vic20s,		vic1001,	0,		vic20_pal,	vic20s,	0,		"Commodore Business Machines",	"VIC-20 (Sweden/Finland)",	GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
