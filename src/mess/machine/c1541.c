@@ -127,6 +127,7 @@
 
     TODO:
 
+	- ROM version selection
     - allocate track buffer runtime
     - accurate timing
     - D64 to G64 conversion
@@ -680,6 +681,9 @@ static WRITE8_DEVICE_HANDLER( c2031_via0_pb_w )
 	/* end or identify */
 	ieee488_eoi_w(c1541->bus, device->owner, BIT(data, 3));
 
+	/* data valid */
+	ieee488_dav_w(c1541->bus, device->owner, BIT(data, 6));
+
 	/* attention acknowledge */
 	c1541->atna = atna;
 
@@ -696,7 +700,7 @@ static READ_LINE_DEVICE_HANDLER( c2031_via0_ca1_r )
 {
 	c1541_t *c1541 = get_safe_token(device->owner);
 
-	return ieee488_atn_r(c1541->bus);
+	return !ieee488_atn_r(c1541->bus);
 }
 
 static READ_LINE_DEVICE_HANDLER( c2031_via0_ca2_r )

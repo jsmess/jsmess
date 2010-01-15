@@ -314,6 +314,9 @@ static DEVICE_START( vic1112 )
 	/* map ROM to memory */
 	memory_install_rom(program, 0xb000, 0xb7ff, 0, 0, memory_region(device->machine, "vic1112:vic1112"));
 
+	/* ground REN */
+	ieee488_ren_w(vic1112->bus, device, 0);
+
 	/* register for state saving */
 	state_save_register_device_item(device, 0, vic1112->via0_irq);
 	state_save_register_device_item(device, 0, vic1112->via1_irq);
