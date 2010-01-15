@@ -11,8 +11,7 @@
 #include "includes/cbm.h"
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
-#include "includes/cbmserb.h"
-#include "includes/cbmieeeb.h"
+#include "machine/ieee488.h"
 
 #include "includes/pet.h"
 
@@ -85,7 +84,7 @@ static READ8_DEVICE_HANDLER( pet_pia0_port_a_read )
 	if ((cassette_get_state(devtag_get_device(device->machine, "cassette2")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x20;
 
-	if (!cbm_ieee_eoi_r(ieeebus, 0))
+	if (!ieee488_eoi_r(ieeebus))
 		data &= ~0x40;
 
 	return data;
@@ -156,7 +155,7 @@ static READ8_DEVICE_HANDLER( pet_pia0_ca1_in )
 static WRITE8_DEVICE_HANDLER( pet_pia0_ca2_out )
 {
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
-	cbm_ieee_eoi_write(ieeebus, 0, data);
+	ieee488_eoi_w(ieeebus, device, data);
 }
 
 static WRITE8_DEVICE_HANDLER( pet_pia0_cb2_out )
@@ -200,37 +199,37 @@ static WRITE_LINE_DEVICE_HANDLER( pet_irq )
 static READ8_DEVICE_HANDLER( pet_pia1_port_a_read )
 {
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
-	return cbm_ieee_data_r(ieeebus, 0);
+	return ieee488_dio_r(ieeebus, 0);
 }
 
 static WRITE8_DEVICE_HANDLER( pet_pia1_port_b_write )
 {
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
-	cbm_ieee_data_write(ieeebus, 0, data);
+	ieee488_dio_w(ieeebus, device, data);
 }
 
 static READ8_DEVICE_HANDLER( pet_pia1_ca1_read )
 {
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
-	return cbm_ieee_atn_r(ieeebus,0 );
+	return ieee488_atn_r(ieeebus);
 }
 
 static WRITE8_DEVICE_HANDLER( pet_pia1_ca2_write )
 {
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
-	cbm_ieee_ndac_write(ieeebus, 0, data);
+	ieee488_ndac_w(ieeebus, device, data);
 }
 
 static WRITE8_DEVICE_HANDLER( pet_pia1_cb2_write )
 {
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
-	cbm_ieee_dav_write(ieeebus, 0, data);
+	ieee488_dav_w(ieeebus, device, data);
 }
 
 static READ8_DEVICE_HANDLER( pet_pia1_cb1_read )
 {
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
-	return cbm_ieee_srq_r(ieeebus, 0);
+	return ieee488_srq_r(ieeebus);
 }
 
 const pia6821_interface pet_pia0 =
@@ -310,7 +309,7 @@ static READ8_DEVICE_HANDLER( pet_via_port_b_r )
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 	UINT8 data = 0;
 
-	if (cbm_ieee_ndac_r(ieeebus, 0))
+	if (ieee488_ndac_r(ieeebus))
 		data |= 0x01;
 
 	//  data & 0x08 -> cassette write (it seems to BOTH cassettes from schematics)
@@ -326,10 +325,10 @@ static READ8_DEVICE_HANDLER( pet_via_port_b_r )
 		timer_reset(datasette2_timer, attotime_never);
 	}
 
-	if (cbm_ieee_nrfd_r(ieeebus, 0))
+	if (ieee488_nrfd_r(ieeebus))
 		data |= 0x40;
 
-	if (cbm_ieee_dav_r(ieeebus, 0))
+	if (ieee488_dav_r(ieeebus))
 		data |= 0x80;
 
 	return data;
@@ -346,8 +345,8 @@ static READ8_DEVICE_HANDLER( pet_via_cb1_r )
 static WRITE8_DEVICE_HANDLER( pet_via_port_b_w )
 {
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
-	cbm_ieee_nrfd_write(ieeebus, 0, data & 2);
-	cbm_ieee_atn_write(ieeebus, 0, data & 4);
+	ieee488_nrfd_w(ieeebus, device, BIT(data, 1));
+	ieee488_atn_w(ieeebus, device, BIT(data, 2));
 }
 
 
@@ -689,6 +688,8 @@ DRIVER_INIT( superpet )
 MACHINE_RESET( pet )
 {
 	pet_state *state = machine->driver_data;
+	const device_config *ieeebus = devtag_get_device(machine, "ieee_bus");
+	const device_config *scapegoat = devtag_get_device(machine, "pia_0");
 
 	if (state->superpet)
 	{
@@ -723,6 +724,10 @@ MACHINE_RESET( pet )
 //removed	cbm_drive_0_config (input_port_read(machine, "CFG") & 2 ? IEEE : 0, 8);
 //removed	cbm_drive_1_config (input_port_read(machine, "CFG") & 1 ? IEEE : 0, 9);
 	device_reset(cputag_get_cpu(machine, "maincpu"));
+
+	ieee488_ren_w(ieeebus, scapegoat, 0);
+	ieee488_ifc_w(ieeebus, scapegoat, 0);
+	ieee488_ifc_w(ieeebus, scapegoat, 1);
 }
 
 

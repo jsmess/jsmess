@@ -76,7 +76,7 @@ Keyboard: Full-sized 102 key QWERTY (19 key numeric keypad!; 4 direction
 
 [To Do]
 
-* Support is still missing for: Sound, IEEE488, Floppy, internal slots
+* Support is still missing for: Sound, internal slots
 
 * Emulate 8088 co-processor for BX-256HP and eventually add its European
     counterpart CBM 730
@@ -104,7 +104,8 @@ Keyboard: Full-sized 102 key QWERTY (19 key numeric keypad!; 4 direction
 
 #include "includes/cbm.h"
 #include "includes/cbmb.h"
-#include "includes/cbmieeeb.h"
+#include "machine/ieee488.h"
+#include "machine/c1541.h"
 #include "machine/cbmipt.h"
 #include "video/vic6567.h"
 #include "video/mc6845.h"
@@ -320,10 +321,10 @@ static const mc6845_interface cbm700_crtc = {
 static const tpi6525_interface cbmb_tpi_0_intf =
 {
 	cbmb_tpi0_port_a_r,
-	NULL,
+	cbmb_tpi0_port_b_r,
 	NULL,
 	cbmb_tpi0_port_a_w,
-	NULL,
+	cbmb_tpi0_port_b_w,
 	NULL,
 	cbmb_change_font,
 	NULL,
@@ -343,6 +344,13 @@ static const tpi6525_interface cbmb_tpi_1_intf =
 	NULL
 };
 
+static IEEE488_DAISY( ieee488_daisy )
+{
+	{ "tpi6525_0" },
+	{ "cia" },
+	{ C2031_IEEE488("c2031") },
+	{ NULL}
+};
 
 static MACHINE_DRIVER_START( cbm600 )
 	MDRV_DRIVER_DATA(cbmb_state)
@@ -384,7 +392,8 @@ static MACHINE_DRIVER_START( cbm600 )
 	MDRV_TPI6525_ADD("tpi6525_1", cbmb_tpi_1_intf)
 
 	/* IEEE bus */
-	MDRV_CBM_IEEEBUS_ADD("ieee_bus")
+	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
+	MDRV_C2031_ADD("c2031", "ieee_bus", 8)
 
 	MDRV_IMPORT_FROM(cbmb_cartslot)
 MACHINE_DRIVER_END
@@ -456,7 +465,8 @@ static MACHINE_DRIVER_START( p500 )
 	MDRV_TPI6525_ADD("tpi6525_1", cbmb_tpi_1_intf)
 
 	/* IEEE bus */
-	MDRV_CBM_IEEEBUS_ADD("ieee_bus")
+	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
+	MDRV_C2031_ADD("c2031", "ieee_bus", 8)
 
 	MDRV_IMPORT_FROM(cbmb_cartslot)
 MACHINE_DRIVER_END

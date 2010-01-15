@@ -358,8 +358,6 @@ If no differences arise we can merge back the following sets:
 
 * Add sound support, for systems which had it
 
-* Add IEEE488 Interface support
-
 * Find out answers to the following details:
 
 + Did BASIC 2 also come as upgrade ROMs for PET 2001 with Static Board? If
@@ -390,10 +388,11 @@ normal keyboards?
 #include "machine/cbmipt.h"
 #include "video/mc6845.h"
 #include "devices/messram.h"
+#include "machine/c1541.h"
 
 /* devices config */
 #include "includes/cbm.h"
-#include "includes/cbmieeeb.h"
+#include "machine/ieee488.h"
 
 /*************************************
  *
@@ -644,6 +643,14 @@ static VIDEO_UPDATE( pet_crtc )
 	return 0;
 }
 
+static IEEE488_DAISY( ieee488_daisy )
+{
+	{ "pia_0" },
+	{ "pia_1", DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER("pia_1", pia6821_cb1_w), DEVCB_DEVICE_HANDLER("pia_1", pia6821_ca1_w), DEVCB_NULL },
+	{ "via6522_0" },
+	{ C2031_IEEE488("c2031") },
+	{ NULL}
+};
 
 /*************************************
  *
@@ -685,7 +692,8 @@ static MACHINE_DRIVER_START( pet_general )
 	MDRV_PIA6821_ADD( "pia_1", pet_pia1)
 
 	/* IEEE bus */
-	MDRV_CBM_IEEEBUS_ADD("ieee_bus")
+	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
+	MDRV_C2031_ADD("c2031", "ieee_bus", 8)
 MACHINE_DRIVER_END
 
 

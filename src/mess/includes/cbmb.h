@@ -43,6 +43,8 @@ WRITE8_HANDLER ( cbmb_colorram_w );
 
 READ8_DEVICE_HANDLER( cbmb_tpi0_port_a_r );
 WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_a_w );
+READ8_DEVICE_HANDLER( cbmb_tpi0_port_b_r );
+WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_b_w );
 
 WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_a );
 WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_b );

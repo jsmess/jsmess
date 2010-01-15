@@ -12,8 +12,7 @@
 
 #include "includes/cbm.h"
 #include "video/vic6567.h"
-#include "includes/cbmserb.h"
-#include "includes/cbmieeeb.h"
+#include "machine/ieee488.h"
 
 #include "includes/cbmb.h"
 
@@ -70,25 +69,25 @@ static UINT8 *cbmb_memory;
 READ8_DEVICE_HANDLER( cbmb_tpi0_port_a_r )
 {
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
-	int data = 0;
+	UINT8 data = 0;
 
-	if (cbm_ieee_nrfd_r(ieeebus, 0))
+	if (ieee488_nrfd_r(ieeebus))
 		data |= 0x80;
 
-	if (cbm_ieee_ndac_r(ieeebus, 0))
+	if (ieee488_ndac_r(ieeebus))
 		data |= 0x40;
 
-	if (cbm_ieee_eoi_r(ieeebus, 0))
+	if (ieee488_eoi_r(ieeebus))
 		data |= 0x20;
 
-	if (cbm_ieee_dav_r(ieeebus, 0))
+	if (ieee488_dav_r(ieeebus))
 		data |= 0x10;
 
-	if (cbm_ieee_atn_r(ieeebus, 0))
+	if (ieee488_atn_r(ieeebus))
 		data |= 0x08;
 
-/*  if (cbm_ieee_ren_r(ieeebus, 0))
-        data |= 0x04; */
+	if (ieee488_ren_r(ieeebus))
+        data |= 0x04;
 
 	return data;
 }
@@ -97,13 +96,34 @@ WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_a_w )
 {
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 
-	cbm_ieee_nrfd_write(ieeebus, 0, data & 0x80);
-	cbm_ieee_ndac_write(ieeebus, 0, data & 0x40);
-	cbm_ieee_eoi_write(ieeebus, 0, data & 0x20);
-	cbm_ieee_dav_write(ieeebus, 0, data & 0x10);
-	cbm_ieee_atn_write(ieeebus, 0, data & 0x08);
-/*  cbm_ieee_ren_write(ieeebus, 0, data & 0x04); */
-	logerror("cbm ieee %d %d\n", data & 0x02, data & 0x01);
+	ieee488_nrfd_w(ieeebus, device, BIT(data, 7));
+	ieee488_ndac_w(ieeebus, device, BIT(data, 6));
+	ieee488_eoi_w(ieeebus, device, BIT(data, 5));
+	ieee488_dav_w(ieeebus, device, BIT(data, 4));
+	ieee488_atn_w(ieeebus, device, BIT(data, 3));
+	ieee488_ren_w(ieeebus, device, BIT(data, 2));
+}
+
+READ8_DEVICE_HANDLER( cbmb_tpi0_port_b_r )
+{
+	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	UINT8 data = 0;
+
+	if (ieee488_srq_r(ieeebus))
+		data |= 0x02;
+
+	if (ieee488_ifc_r(ieeebus))
+		data |= 0x01;
+
+	return data;
+}
+
+WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_b_w )
+{
+	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+
+	ieee488_srq_w(ieeebus, device, BIT(data, 1));
+	ieee488_ifc_w(ieeebus, device, BIT(data, 0));
 }
 
 /* tpi at 0xfdf00
@@ -244,13 +264,13 @@ void cbmb_irq( const device_config *device, int level )
 static READ8_DEVICE_HANDLER( cbmb_cia_port_a_r )
 {
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
-	return cbm_ieee_data_r(ieeebus, 0);
+	return ieee488_dio_r(ieeebus, 0);
 }
 
 static WRITE8_DEVICE_HANDLER( cbmb_cia_port_a_w )
 {
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
-	cbm_ieee_data_write(ieeebus, 0, data);
+	ieee488_dio_w(ieeebus, device, data);
 }
 
 const cia6526_interface cbmb_cia =
