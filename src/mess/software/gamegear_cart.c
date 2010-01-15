@@ -16,9 +16,9 @@ SOFTWARE_START( set ) \
 SOFTWARE_END
 
 
-GAMEGEAR_ROM_LOAD( 5in1fun, "5 in 1 funpak (usa).bin",                                                  0x000000 , 0x40000,    CRC (f85a8ce8) SHA1 (dc8f5848fede37a914dbf1c104c3efb5a804ccbd) )
-GAMEGEAR_ROM_LOAD( aaharima, "aa harimanada (japan).bin",                                               0x000000 , 0x80000,    CRC (1d17d2a0) SHA1 (0fa7111fcd98670d4bef725d11e670e14eaaa7eb) )
-GAMEGEAR_ROM_LOAD( addamfam, "addams family, the (world).bin",                                          0x000000 , 0x40000,    CRC (1d01f999) SHA1 (3231d574e5eb0ac3a77b1d65d74f3a581819a9c7) )
+GAMEGEAR_ROM_LOAD( 5in1fun,    "5 in 1 funpak (usa).bin",                                               0x000000 , 0x40000,    CRC (f85a8ce8) SHA1 (dc8f5848fede37a914dbf1c104c3efb5a804ccbd) )
+GAMEGEAR_ROM_LOAD( aaharima,   "aa harimanada (japan).bin",                                             0x000000 , 0x80000,    CRC (1d17d2a0) SHA1 (0fa7111fcd98670d4bef725d11e670e14eaaa7eb) )
+GAMEGEAR_ROM_LOAD( addamfam,   "addams family, the (world).bin",                                        0x000000 , 0x40000,    CRC (1d01f999) SHA1 (3231d574e5eb0ac3a77b1d65d74f3a581819a9c7) )
 GAMEGEAR_ROM_LOAD( advbatmrp1, "adventures of batman & robin, the (prototype - apr 27,  1995).bin",     0x000000 , 0x7fff6,    CRC (acce0d15) SHA1 (ac60f308640eea536bb3007d2a0b78d95b81d160) )
 GAMEGEAR_ROM_LOAD( advbatmrp2, "adventures of batman & robin, the (prototype - apr 29,  1995 - a).bin", 0x000000 , 0x7fbdc,    CRC (14867057) SHA1 (7877c4f8c271c37fc7d72208460231e60e63b95e) )
 GAMEGEAR_ROM_LOAD( advbatmrp3, "adventures of batman & robin, the (prototype - apr 30,  1995).bin",     0x000000 , 0x7fbdc,    CRC (50376471) SHA1 (cda657eb423a8891304cb64cf4a43fd434c60588) )
@@ -27,16 +27,17 @@ GAMEGEAR_ROM_LOAD( advbatmrp5, "adventures of batman & robin, the (prototype - m
 GAMEGEAR_ROM_LOAD( advbatmrp6, "adventures of batman & robin, the (prototype - may 06,  1995 - b).bin", 0x000000 , 0x7fffa,    CRC (50c2f1ad) SHA1 (8cebb48b14c4c1ee4d168f764b074a87cc4e5324) )
 GAMEGEAR_ROM_LOAD( advbatmrp7, "adventures of batman & robin, the (prototype - may 06,  1995).bin",     0x000000 , 0x7fffa,    CRC (c403264a) SHA1 (0afd0624bd054430b7894c24e2fb186d5f44af99) )
 GAMEGEAR_ROM_LOAD( advbatmrp8, "adventures of batman & robin, the (prototype - may 07,  1995).bin",     0x000000 , 0x7fffa,    CRC (fc916fd7) SHA1 (ea5b5b79f92f5546a733efc10f42997956037463) )
-GAMEGEAR_ROM_LOAD( advbatmr, "adventures of batman & robin, the (usa, europe).bin",                     0x000000 , 0x80000,    CRC (bb4f23ff) SHA1 (50e8726be1b26d066ea9e2e2b5cd7407c356187e) )
-GAMEGEAR_ROM_LOAD( aerialasj, "aerial assault (japan) (v1.1).bin",                                      0x000000 , 0x20000,    CRC (04fe6dde) SHA1 (2a91ab5817938dddf2724df2dfd95a3bc6f5156d) )
-GAMEGEAR_ROM_LOAD( aerialas, "aerial assault (world).bin",                                              0x000000 , 0x20000,    CRC (3e549b7a) SHA1 (cbdbaaeb62a8483d9d5a8757b0f19233dfb9b416) )
-GAMEGEAR_ROM_LOAD( aladdinj, "aladdin (japan).bin",                                                     0x000000 , 0x80000,    CRC (770e95e1) SHA1 (7ddfd53e91d8220e4238d3994921bf18fe383717) )
-GAMEGEAR_ROM_LOAD( aladdinp1, "aladdin (prototype - dec 29,  1993).bin",                                0x000000 , 0x80000,    CRC (5b1f717f) SHA1 (ed303cb2debbc74f65a02f863e8c5bbb446155c4) )
-GAMEGEAR_ROM_LOAD( aladdinp2, "aladdin (prototype - jan 11,  1994).bin",                                0x000000 , 0x80000,    CRC (8a1693ab) SHA1 (7ec48d31a35006ccba4abcf108e187e0b222852b) )
-GAMEGEAR_ROM_LOAD( aladdinp3, "aladdin (prototype - jan 13,  1994).bin",                                0x000000 , 0x80000,    CRC (75a7f142) SHA1 (a968ee77938233a4ff94c73266c7fb36fa25657d) )
-GAMEGEAR_ROM_LOAD( aladdinp4, "aladdin (prototype with - jan 23,  1994).bin",                           0x000000 , 0x80000,    CRC (75a7f142) SHA1 (a968ee77938233a4ff94c73266c7fb36fa25657d) )
+GAMEGEAR_ROM_LOAD( advbatmr,   "adventures of batman & robin, the (usa, europe).bin",                   0x000000 , 0x80000,    CRC (bb4f23ff) SHA1 (50e8726be1b26d066ea9e2e2b5cd7407c356187e) )
+GAMEGEAR_ROM_LOAD( aerialasj,  "aerial assault (japan) (v1.1).bin",                                     0x000000 , 0x20000,    CRC (04fe6dde) SHA1 (2a91ab5817938dddf2724df2dfd95a3bc6f5156d) )
+GAMEGEAR_ROM_LOAD( aerialas,   "aerial assault (world).bin",                                            0x000000 , 0x20000,    CRC (3e549b7a) SHA1 (cbdbaaeb62a8483d9d5a8757b0f19233dfb9b416) )
+GAMEGEAR_ROM_LOAD( aladdinj,   "aladdin (japan).bin",                                                   0x000000 , 0x80000,    CRC (770e95e1) SHA1 (7ddfd53e91d8220e4238d3994921bf18fe383717) )
+GAMEGEAR_ROM_LOAD( aladdinp1,  "aladdin (prototype - dec 29,  1993).bin",                               0x000000 , 0x80000,    CRC (5b1f717f) SHA1 (ed303cb2debbc74f65a02f863e8c5bbb446155c4) )
+GAMEGEAR_ROM_LOAD( aladdinp2,  "aladdin (prototype - jan 11,  1994).bin",                               0x000000 , 0x80000,    CRC (8a1693ab) SHA1 (7ec48d31a35006ccba4abcf108e187e0b222852b) )
+GAMEGEAR_ROM_LOAD( aladdinp3,  "aladdin (prototype - jan 13,  1994).bin",                               0x000000 , 0x80000,    CRC (75a7f142) SHA1 (a968ee77938233a4ff94c73266c7fb36fa25657d) )
+GAMEGEAR_ROM_LOAD( aladdinp4,  "aladdin (prototype with - jan 23,  1994).bin",                          0x000000 , 0x80000,    CRC (75a7f142) SHA1 (a968ee77938233a4ff94c73266c7fb36fa25657d) )
 GAMEGEAR_ROM_LOAD( aladdin, "aladdin (usa, europe).bin",                                                0x000000 , 0x80000,    CRC (7a41c1dc) SHA1 (20ba7f5e5c801fbe48a537d2551a3d4525eb63e7) )
 GAMEGEAR_ROM_LOAD( alien3, "alien 3 (usa, europe).bin",                                                 0x000000 , 0x40000,    CRC (11a68c08) SHA1 (f3b976fefc331f37c3e4d883791eba68890279a5) )
+GAMEGEAR_ROM_LOAD( alien3j,  "alien 3 (jp).bin",                                                        0x000000,  0x40000,	 CRC(06f6eebb) SHA1(f09885d76ea7af75fb605261a08143d3ccdc4ca8) )
 GAMEGEAR_ROM_LOAD( asyndromj, "alien syndrome (japan).bin",                                             0x000000 , 0x20000,    CRC (ffe4ed47) SHA1 (b72e54493bfa7f13883a608bcf8c9f315dd490ca) )
 GAMEGEAR_ROM_LOAD( asyndrom, "alien syndrome (usa, europe).bin",                                        0x000000 , 0x20000,    CRC (bb5e10e0) SHA1 (112c7fba070eb7b6bdd41675d49caf934c17dc17) )
 GAMEGEAR_ROM_LOAD( andreaga, "andre agassi tennis (usa).bin",                                           0x000000 , 0x40000,    CRC (46c9fa3e) SHA1 (9bd46e137723795a62cca429effcdd51f3b71257) )
@@ -104,7 +105,8 @@ GAMEGEAR_ROM_LOAD( bonkrsp11, "bonkers wax up! (prototype - nov 26,  1994).bin",
 GAMEGEAR_ROM_LOAD( bonkrsp12, "bonkers wax up! (prototype - nov 29,  1994).bin",                      0x000000 , 0x80000,    CRC (ad6a62fa) SHA1 (4ad7947a4ffee9a76d146fecc9c3c2f6c5e680b7) )
 GAMEGEAR_ROM_LOAD( bonkrsp13, "bonkers wax up! (prototype - oct 31,  1994).bin",                      0x000000 , 0x80000,    CRC (777dfd80) SHA1 (160d28c7fd900ab25117247eccecf2ecdb164ce4) )
 GAMEGEAR_ROM_LOAD( bonkers, "bonkers wax up! (usa, europe).bin",                                     0x000000 , 0x80000,    CRC (bfceba5f) SHA1 (b98bd9467fe8bf782989172b576c7844f3666ae9) )
-GAMEGEAR_ROM_LOAD( bramst, "bram stoker's dracula (usa).bin",                                        0x000000 , 0x40000,    CRC (69ebe5fa) SHA1 (ea753b5dce4b319cc1709451a4c8cb55daf2b76b) )
+GAMEGEAR_ROM_LOAD( bramsta,  "bram stoker's dracula (usa).bin",                                      0x000000 , 0x40000,    CRC (69ebe5fa) SHA1 (ea753b5dce4b319cc1709451a4c8cb55daf2b76b) )
+GAMEGEAR_ROM_LOAD( bramst, "dracula (bram stoker's) (us).bin",                                       0x000000,  0x40000,	 CRC(d966ec47) SHA1(bde7280d4feab1c27dda228ef821c7a1c63a9e07) )
 GAMEGEAR_ROM_LOAD( bublbobl, "bubble bobble (usa, europe).bin",                                      0x000000 , 0x40000,    CRC (fba338c5) SHA1 (c2c99d798bd0d4960021743a55e74644ad9020c6) )
 GAMEGEAR_ROM_LOAD( bugsbun, "bugs bunny in double trouble (usa, europe).bin",                        0x000000 , 0x80000,    CRC (5c34d9cd) SHA1 (a29dabb90532ff6114437f28970203e16003c11e) )
 GAMEGEAR_ROM_LOAD( bustamov, "bust-a-move (usa, europe).bin",                                        0x000000 , 0x40000,    CRC (c90f29ef) SHA1 (e6bb5f72cffb11c8dd44ac3e378088b04cec1297) )
@@ -151,7 +153,8 @@ GAMEGEAR_ROM_LOAD( clutchit, "clutch hitter (usa).bin",                         
 GAMEGEAR_ROM_LOAD( cocakid, "coca cola kid (japan).bin",                                             0x000000 , 0x80000,    CRC (c7598b81) SHA1 (e0a6caba7d8433175a3b7f1dfb593f9ca2c67cd1) )
 GAMEGEAR_ROM_LOAD( columnsj, "columns (japan).bin",                                                  0x000000 , 0x8000,     CRC (f3ca6676) SHA1 (8b39ba23132af102b8dc313c5c1c211f4a4f27e1) )
 GAMEGEAR_ROM_LOAD( columns, "columns (usa, europe).bin",                                             0x000000 , 0x8000,     CRC (83fa26d9) SHA1 (05b73f39a90fd59e01262cbd3f4e7a21575d468a) )
-GAMEGEAR_ROM_LOAD( coolspot, "cool spot (usa).bin",                                                  0x000000 , 0x40000,    CRC (2c758fc8) SHA1 (c5f39a81c33327dc86b41d6f416efe09b131e14d) )
+GAMEGEAR_ROM_LOAD( coolspot, "cool spot.bin",                                                        0x000000,  0x40000,	 CRC(ba0714db) SHA1(68c94b4ebd33016c3f0b4ee2b6f5524040e5503e) )
+GAMEGEAR_ROM_LOAD( coolspotu, "cool spot (usa).bin",                                                 0x000000 , 0x40000,    CRC (2c758fc8) SHA1 (c5f39a81c33327dc86b41d6f416efe09b131e14d) )
 GAMEGEAR_ROM_LOAD( cosmicsp, "cosmic spacehead (europe).bin",                                        0x000000 , 0x40000,    CRC (6caa625b) SHA1 (c24f48ca3fb7df3b50b4353095c7a070653f3539) )
 GAMEGEAR_ROM_LOAD( crayon, "crayon shin-chan - taiketsu! kantam panic!! (japan).bin",                0x000000 , 0x80000,    CRC (03d28eab) SHA1 (65bcbd89637b8e6837cf36c7f1241eacf85abaa9) )
 GAMEGEAR_ROM_LOAD( crystalw, "crystal warriors (usa, europe).bin",                                   0x000000 , 0x40000,    CRC (529c864e) SHA1 (6b03183b7183de17ad6fbc9938599d3d18badc1a) )
@@ -183,10 +186,12 @@ GAMEGEAR_ROM_LOAD( dynaheadp1, "dynamite headdy (prototype - jul 01,  1994).bin"
 GAMEGEAR_ROM_LOAD( dynaheadp2, "dynamite headdy (prototype - jul 05,  1994).bin",                     0x000000 , 0x80000,    CRC (c7bea89a) SHA1 (59807e03d32837db34e2912d0e85db812edf823c) )
 GAMEGEAR_ROM_LOAD( dynaheadp3, "dynamite headdy (prototype - jun 15,  1994).bin",                     0x000000 , 0x80000,    CRC (7bf339c0) SHA1 (0e8bccb304898a80efcbae8351303103ec4145ee) )
 GAMEGEAR_ROM_LOAD( dynahead, "dynamite headdy (usa, europe).bin",                                    0x000000 , 0x80000,    CRC (610ff95c) SHA1 (a8c8b5252a885d466e044e6055336513d988e661) )
-GAMEGEAR_ROM_LOAD( ejim, "earthworm jim (usa).bin",                                                  0x000000 , 0x80000,    CRC (5d3f23a9) SHA1 (dbb149da0b0373f23750ed954dbb5e08bc634615) )
+GAMEGEAR_ROM_LOAD( ejim, "earthworm jim.bin",                                                        0x000000,  0x80000,	 CRC(691ae339) SHA1(841844e847de742fa62f2afb185aa7bea7f1951e) )
+GAMEGEAR_ROM_LOAD( ejimu, "earthworm jim (usa).bin",                                                 0x000000 , 0x80000,    CRC (5d3f23a9) SHA1 (dbb149da0b0373f23750ed954dbb5e08bc634615) )
 GAMEGEAR_ROM_LOAD( ecco2, "ecco ii - the tides of time (usa, europe).bin",                           0x000000 , 0x80000,    CRC (e2f3b203) SHA1 (61913f6803977bb54fda7c3d969dc2c0f7c6da62) )
 GAMEGEAR_ROM_LOAD( eccoj, "ecco the dolphin (japan).bin",                                            0x000000 , 0x80000,    CRC (a32eb9d5) SHA1 (5f0de698e8e0d4323b36bd78e2bd1af1c3370f3e) )
 GAMEGEAR_ROM_LOAD( ecco, "ecco the dolphin (usa, europe).bin",                                       0x000000 , 0x80000,    CRC (866c7113) SHA1 (7c6c8f44d5aa799726adc3a9e21c9f35cacea87f) )
+GAMEGEAR_ROM_LOAD( eccoa, "ecco the dolphin.bin",                                                    0x000000,  0x80000,	 CRC(866c7113) SHA1(7c6c8f44d5aa799726adc3a9e21c9f35cacea87f) )
 GAMEGEAR_ROM_LOAD( ecco2j, "ecco the dolphin ii (japan).bin",                                        0x000000 , 0x80000,    CRC (ba9cef4f) SHA1 (36095f4c92f6f66ed6bc20d9b96227d6fb0dae5b) )
 GAMEGEAR_ROM_LOAD( ernieeg, "ernie els golf (europe) (en,fr,de,es,it).bin",                          0x000000 , 0x40000,    CRC (5e53c7f7) SHA1 (a8d75c2af514dc81ba4dc66a508384d730a77ce4) )
 GAMEGEAR_ROM_LOAD( eternall, "eternal legend - eien no densetsu (japan).bin",                        0x000000 , 0x40000,    CRC (04302bbd) SHA1 (717b4e33cf3956e4194b912533bf1b7bf9d20725) )
@@ -200,7 +205,8 @@ GAMEGEAR_ROM_LOAD( factoryp, "factory panic (europe).bin",                      
 GAMEGEAR_ROM_LOAD( fantdizz, "fantastic dizzy (europe) (en,fr,de,es,it).bin",                        0x000000 , 0x40000,    CRC (c888222b) SHA1 (b6a13d51c72b576738f0d7e8e328db2ffeb0b38c) )
 GAMEGEAR_ROM_LOAD( fantzone, "fantasy zone gear (japan, europe).bin",                                0x000000 , 0x20000,    CRC (d69097e8) SHA1 (5951d500d6f53b0537f045adb85d94068a838f32) )
 GAMEGEAR_ROM_LOAD( fantzone1, "fantasy zone gear (ju) [a1].bin",                                     0x000000 , 0x20000,    CRC (365b92cf) SHA1 (002de139e9e330f2811cf56401b9e3cc7f233b91) )
-GAMEGEAR_ROM_LOAD( fatalfur, "fatal fury special (usa).bin",                                         0x000000 , 0x80000,    CRC (449787e2) SHA1 (7ce20ca34b7bc91ba7e73f830b40830ad6bafbc8) )
+GAMEGEAR_ROM_LOAD( fatfursp, "fatal fury special.bin",                                               0x000000,  0x80000,	 CRC(fbd76387) SHA1(2d69d1a7b57f04df097cf685a84beac9947165d4) )
+GAMEGEAR_ROM_LOAD( fatfurspu, "fatal fury special (usa).bin",                                        0x000000 , 0x80000,    CRC (449787e2) SHA1 (7ce20ca34b7bc91ba7e73f830b40830ad6bafbc8) )
 GAMEGEAR_ROM_LOAD( fifaj, "fifa international soccer (japan).bin",                                   0x000000 , 0x80000,    CRC (78159325) SHA1 (70385b99320f91fef54ea88123761af9d7ff54c5) )
 GAMEGEAR_ROM_LOAD( fifa, "fifa international soccer (usa, europe).bin",                              0x000000 , 0x80000,    CRC (e632a3a2) SHA1 (0725626fc9988b690fc1fc77b294d31b78cbfb5a) )
 GAMEGEAR_ROM_LOAD( fifa96, "fifa soccer 96 (usa, europe) (en,fr,de,es).bin",                         0x000000 , 0x80000,    CRC (c379de95) SHA1 (f928c32acba90ed5ebca131af03e76a0efb38797) )
@@ -438,6 +444,7 @@ GAMEGEAR_ROM_LOAD( ottifant, "ottifants, the (europe) (en,fr,de,es,it).bin",    
 GAMEGEAR_ROM_LOAD( outrunj, "out run (japan).bin",                                                   0x000000 , 0x20000,    CRC (d58cb27c) SHA1 (284a68102eb71958a3553626ea3dd56485453300) )
 GAMEGEAR_ROM_LOAD( outruneu, "out run europa (usa, europe).bin",                                     0x000000 , 0x40000,    CRC (f037ec00) SHA1 (dd842a7294eee7badf4353fbe3e5d87dd570c671) )
 GAMEGEAR_ROM_LOAD( outrun, "outrun (ju) [a1].bin",                                                   0x000000 , 0x20000,    CRC (4753c309) SHA1 (25d999bb8edfb59075d774050c68d5c9f286793d) )
+GAMEGEAR_ROM_LOAD( outruna, "out run.bin",                                                           0x000000,  0x20000,    CRC(9014b322) SHA1(41d5f3f95ca8cd288842bad7bb5f7940c2baa86d) )
 GAMEGEAR_ROM_LOAD( pacattck, "pac-attack (usa, europe).bin",                                         0x000000 , 0x20000,    CRC (9273ee2c) SHA1 (e9e3d7c116e82e7fe696ac3e043d14ece51e9f8e) )
 GAMEGEAR_ROM_LOAD( pacintim, "pac-in-time (unknown) (proto).bin",                                    0x000000 , 0x40000,    CRC (64c28e20) SHA1 (bc956615da23f13bddc491377b29631f9c0a4d5a) )
 GAMEGEAR_ROM_LOAD( pacman, "pac-man (japan).bin",                                                    0x000000 , 0x20000,    CRC (a16c5e58) SHA1 (d78b6aac927692f1b67e6a4b7494e2c7e709ae17) )
@@ -508,6 +515,7 @@ GAMEGEAR_ROM_LOAD( segagame, "sega game pack 4 in 1 (europe).bin",              
 GAMEGEAR_ROM_LOAD( sensible, "sensible soccer (europe).bin",                                         0x000000 , 0x20000,    CRC (5b68da75) SHA1 (c02830156779a27b79435ec0cbf7a03cbbfda920) )
 GAMEGEAR_ROM_LOAD( shadam, "shadam crusader - harukanaru oukoku (japan).bin",                        0x000000 , 0x80000,    CRC (09f9ed60) SHA1 (de4b546f61dd32106247d38643849f6aaeeedb07) )
 GAMEGEAR_ROM_LOAD( shangh2, "shanghai ii (japan).bin",                                               0x000000 , 0x20000,    CRC (2ae8c75f) SHA1 (5180891ec0ae08d784dd89222d9ffd7f88a59691) )
+GAMEGEAR_ROM_LOAD( shangh2a, "shanghai ii [v1] (jp).bin",                                            0x000000,  0x20000,	 CRC(81314249) SHA1(82210b387344aaebae8cf03029967cd0c906beff) )
 GAMEGEAR_ROM_LOAD( shaqfu, "shaq fu (usa, europe).bin",                                              0x000000 , 0x80000,    CRC (6fcb8ab0) SHA1 (bc9d0b0dc2b22b9530660f0a04b865492766c9d0) )
 GAMEGEAR_ROM_LOAD( shikinjo, "shikinjou (japan).bin",                                                0x000000 , 0x20000,    CRC (9c5c7f53) SHA1 (bf36130b1be4bce6c6eb7b87db00d420797c3611) )
 GAMEGEAR_ROM_LOAD( shinfrcg, "shining force gaiden - ensei, jashin no kuni e (japan).bin",           0x000000 , 0x80000,    CRC (4d1f4699) SHA1 (bea1bea94ea745691ad944eaadc8a5576057ed53) )
@@ -756,750 +764,757 @@ GAMEGEAR_ROM_LOAD( zoopu, "zoop (usa).bin",                                     
 /*
 Are the following cart dumped?
 
-- Alien^3 Jpn
 - Disney's The Lion King Jpn
 
 */
 
 SOFTWARE_LIST_START ( gamegear_cart )
-	SOFTWARE( 5in1fun,    0,        199?, "Sega License", "5 in 1 Funpak (USA)", 0, 0 )
+	SOFTWARE( 5in1fun,    0,        199?, "<unknown>", "5 in 1 Funpak (USA)", 0, 0 )
 	SOFTWARE( aaharima,   0,        1993, "Sega", "Aa Harimanada (Jpn)", 0, 0 )	/* Id: G-3327 - Developers: Sega - Releases: 1993-07-02 (Jpn) */
-	SOFTWARE( addamfam,   0,        199?, "Sega License", "The Addams Family (World)", 0, 0 )
-	SOFTWARE( advbatmrp1, advbatmr, 199?, "Sega License", "The Adventures of Batman & Robin (Prototype - Apr 27,  1995)", 0, 0 )
-	SOFTWARE( advbatmrp2, advbatmr, 199?, "Sega License", "The Adventures of Batman & Robin (Prototype - Apr 29,  1995 - A)", 0, 0 )
-	SOFTWARE( advbatmrp3, advbatmr, 199?, "Sega License", "The Adventures of Batman & Robin (Prototype - Apr 30,  1995)", 0, 0 )
-	SOFTWARE( advbatmrp4, advbatmr, 199?, "Sega License", "The Adventures of Batman & Robin (Prototype - May 02,  1995)", 0, 0 )
-	SOFTWARE( advbatmrp5, advbatmr, 199?, "Sega License", "The Adventures of Batman & Robin (Prototype - May 04,  1995)", 0, 0 )
-	SOFTWARE( advbatmrp6, advbatmr, 199?, "Sega License", "The Adventures of Batman & Robin (Prototype - May 06,  1995 - B)", 0, 0 )
-	SOFTWARE( advbatmrp7, advbatmr, 199?, "Sega License", "The Adventures of Batman & Robin (Prototype - May 06,  1995)", 0, 0 )
-	SOFTWARE( advbatmrp8, advbatmr, 199?, "Sega License", "The Adventures of Batman & Robin (Prototype - May 07,  1995)", 0, 0 )
-	SOFTWARE( advbatmr,   0,        199?, "Sega License", "The Adventures of Batman & Robin (Euro, USA)", 0, 0 )
+	SOFTWARE( addamfam,   0,        199?, "<unknown>", "The Addams Family (World)", 0, 0 )
+	SOFTWARE( advbatmrp1, advbatmr, 199?, "<unknown>", "The Adventures of Batman & Robin (Prototype - Apr 27,  1995)", 0, 0 )
+	SOFTWARE( advbatmrp2, advbatmr, 199?, "<unknown>", "The Adventures of Batman & Robin (Prototype - Apr 29,  1995 - A)", 0, 0 )
+	SOFTWARE( advbatmrp3, advbatmr, 199?, "<unknown>", "The Adventures of Batman & Robin (Prototype - Apr 30,  1995)", 0, 0 )
+	SOFTWARE( advbatmrp4, advbatmr, 199?, "<unknown>", "The Adventures of Batman & Robin (Prototype - May 02,  1995)", 0, 0 )
+	SOFTWARE( advbatmrp5, advbatmr, 199?, "<unknown>", "The Adventures of Batman & Robin (Prototype - May 04,  1995)", 0, 0 )
+	SOFTWARE( advbatmrp6, advbatmr, 199?, "<unknown>", "The Adventures of Batman & Robin (Prototype - May 06,  1995 - B)", 0, 0 )
+	SOFTWARE( advbatmrp7, advbatmr, 199?, "<unknown>", "The Adventures of Batman & Robin (Prototype - May 06,  1995)", 0, 0 )
+	SOFTWARE( advbatmrp8, advbatmr, 199?, "<unknown>", "The Adventures of Batman & Robin (Prototype - May 07,  1995)", 0, 0 )
+	SOFTWARE( advbatmr,   0,        199?, "<unknown>", "The Adventures of Batman & Robin (Euro, USA)", 0, 0 )
 	SOFTWARE( aerialasj,  aerialas, 1992, "Sega", "Aerial Assault (v1.1) (Jpn)", 0, 0 )	/* Id: G-3219 - Developers: Sega - Releases: 1992-06-05 (Jpn) */
-	SOFTWARE( aerialas,   0,        199?, "Sega License", "Aerial Assault (World)", 0, 0 )
+	SOFTWARE( aerialas,   0,        199?, "<unknown>", "Aerial Assault (World)", 0, 0 )
 	SOFTWARE( aladdinj,   aladdin,  1994, "Sega", "Disney's Aladdin (Jpn)", 0, 0 )	/* Id: G-3336 - Developers: SIMS - Releases: 1994-03-25 (Jpn) */
-	SOFTWARE( aladdinp1,  aladdin,  1994, "Sega License", "Disney's Aladdin (Prototype - Dec 29,  1993)", 0, 0 )
-	SOFTWARE( aladdinp2,  aladdin,  1994, "Sega License", "Disney's Aladdin (Prototype - Jan 11,  1994)", 0, 0 )
-	SOFTWARE( aladdinp3,  aladdin,  1994, "Sega License", "Disney's Aladdin (Prototype - Jan 13,  1994)", 0, 0 )
-	SOFTWARE( aladdinp4,  aladdin,  1994, "Sega License", "Disney's Aladdin (Prototype WITH - Jan 23,  1994)", 0, 0 )
-	SOFTWARE( aladdin,    0,        1994, "Sega License", "Disney's Aladdin (Euro, USA)", 0, 0 )
-	SOFTWARE( alien3,     0,        199?, "Sega License", "Alien 3 (Euro, USA)", 0, 0 )
+	SOFTWARE( aladdinp1,  aladdin,  1994, "<unknown>", "Disney's Aladdin (Prototype - Dec 29,  1993)", 0, 0 )
+	SOFTWARE( aladdinp2,  aladdin,  1994, "<unknown>", "Disney's Aladdin (Prototype - Jan 11,  1994)", 0, 0 )
+	SOFTWARE( aladdinp3,  aladdin,  1994, "<unknown>", "Disney's Aladdin (Prototype - Jan 13,  1994)", 0, 0 )
+	SOFTWARE( aladdinp4,  aladdin,  1994, "<unknown>", "Disney's Aladdin (Prototype WITH - Jan 23,  1994)", 0, 0 )
+	SOFTWARE( aladdin,    0,        1994, "<unknown>", "Disney's Aladdin (Euro, USA)", 0, 0 )
+	SOFTWARE( alien3,     0,        199?, "<unknown>", "Alien 3 (Euro, USA)", 0, 0 )
+	SOFTWARE( alien3j,    alien3,   199?, "<unknown>", "Alien 3 (Jpn)", 0, 0 )
 	SOFTWARE( asyndromj,  asyndrom, 1992, "SIMS", "Alien Syndrome (Jpn)", 0, 0 )	/* Id: T-44037 - Developers: Sega / SIMS - Releases: 1992-03-19 (Jpn) */
-	SOFTWARE( asyndrom,   0,        199?, "Sega License", "Alien Syndrome (Euro, USA)", 0, 0 )
-	SOFTWARE( andreaga,   0,        199?, "Sega License", "Andre Agassi Tennis (USA)", 0, 0 )
-	SOFTWARE( arcadecl,   0,        199?, "Sega License", "Arcade Classics (USA)", 0, 0 )
-	SOFTWARE( archriv,    0,        199?, "Sega License", "Arch Rivals (USA)", 0, 0 )
-	SOFTWARE( arena,      0,        199?, "Sega License", "Arena (Euro, USA)", 0, 0 )
-	SOFTWARE( arielmer,   0,        199?, "Sega License", "Ariel the Little Mermaid (Euro, USA)", 0, 0 )
+	SOFTWARE( asyndrom,   0,        199?, "<unknown>", "Alien Syndrome (Euro, USA)", 0, 0 )
+	SOFTWARE( andreaga,   0,        199?, "<unknown>", "Andre Agassi Tennis (USA)", 0, 0 )
+	SOFTWARE( arcadecl,   0,        199?, "<unknown>", "Arcade Classics (USA)", 0, 0 )
+	SOFTWARE( archriv,    0,        199?, "<unknown>", "Arch Rivals (USA)", 0, 0 )
+	SOFTWARE( arena,      0,        199?, "<unknown>", "Arena (Euro, USA)", 0, 0 )
+	SOFTWARE( arielmer,   0,        199?, "<unknown>", "Ariel the Little Mermaid (Euro, USA)", 0, 0 )
 	SOFTWARE( arliel,     0,        1991, "Sega", "Arliel - Crystal Densetsu (Jpn)", 0, 0 )	/* Id: G-3403 - Developers: Sega - Releases: 1991-12-13 (Jpn) */
-	SOFTWARE( asterix,    0,        199?, "Sega License", "Asterix (Prototype - Feb 16,  1994)", 0, 0 )
-	SOFTWARE( asterixa,   0,        199?, "Sega License", "Asterix (Prototype - Feb 22,  1994)", 0, 0 )
-	SOFTWARE( asterixb,   0,        199?, "Sega License", "Asterix (Prototype - Jan 25,  1994)", 0, 0 )
-	SOFTWARE( asterixc,   0,        199?, "Sega License", "Asterix (Prototype - Mar 13,  1994)", 0, 0 )
-	SOFTWARE( asterixd,   0,        199?, "Sega License", "Asterix (Prototype - Mar 15,  1994)", 0, 0 )
-	SOFTWARE( astergre,   0,        199?, "Sega License", "Asterix and the Great Rescue (En, Fr, De, Es, It) (Euro)", 0, 0 )
-	SOFTWARE( astergreu,  astergre, 199?, "Sega License", "Asterix and the Great Rescue (USA)", 0, 0 )
-	SOFTWARE( astermis,   0,        199?, "Sega License", "Asterix and the Secret Mission (En, Fr, De) (Euro)", 0, 0 )
-	SOFTWARE( axbattlr,   0,        199?, "Sega License", "Ax Battler - A Legend of Golden Axe (v2.4) (Euro, USA)", 0, 0 )
+	SOFTWARE( asterix,    0,        199?, "<unknown>", "Asterix (Prototype - Feb 16,  1994)", 0, 0 )
+	SOFTWARE( asterixa,   0,        199?, "<unknown>", "Asterix (Prototype - Feb 22,  1994)", 0, 0 )
+	SOFTWARE( asterixb,   0,        199?, "<unknown>", "Asterix (Prototype - Jan 25,  1994)", 0, 0 )
+	SOFTWARE( asterixc,   0,        199?, "<unknown>", "Asterix (Prototype - Mar 13,  1994)", 0, 0 )
+	SOFTWARE( asterixd,   0,        199?, "<unknown>", "Asterix (Prototype - Mar 15,  1994)", 0, 0 )
+	SOFTWARE( astergre,   0,        199?, "<unknown>", "Asterix and the Great Rescue (En, Fr, De, Es, It) (Euro)", 0, 0 )
+	SOFTWARE( astergreu,  astergre, 199?, "<unknown>", "Asterix and the Great Rescue (USA)", 0, 0 )
+	SOFTWARE( astermis,   0,        199?, "<unknown>", "Asterix and the Secret Mission (En, Fr, De) (Euro)", 0, 0 )
+	SOFTWARE( axbattlr,   0,        199?, "<unknown>", "Ax Battler - A Legend of Golden Axe (v2.4) (Euro, USA)", 0, 0 )
 	SOFTWARE( axbattlrj,  axbattlr, 1991, "Sega", "Ax Battler - Golden Axe Densetsu (v1.5) (Jpn)", 0, 0 )	/* Id: G-3306 - Developers: Aspect - Releases: 1991-11-01 (Jpn) */
 	SOFTWARE( ayrtonj,    ayrton,   1992, "Sega", "Ayrton Senna's Super Monaco GP II (Jpn)", 0, 0 )	/* Id: G-3312, G-3337 - Developers: Sega - Releases: 1992-08-28 (Jpn) */
-	SOFTWARE( ayrton,     0,        199?, "Sega License", "Ayrton Senna's Super Monaco GP II (Euro, USA)", 0, 0 )
-	SOFTWARE( bakubaku,   0,        199?, "Sega License", "Baku Baku Animal (USA)", 0, 0 )
+	SOFTWARE( ayrton,     0,        199?, "<unknown>", "Ayrton Senna's Super Monaco GP II (Euro, USA)", 0, 0 )
+	SOFTWARE( bakubaku,   0,        199?, "<unknown>", "Baku Baku Animal (USA)", 0, 0 )
 	SOFTWARE( bakubakuj,  0,        1996, "Sega", "Baku Baku Animal - Sekai Shiikugakari Senshu-ken (Jpn)", 0, 0 )	/* Id: G-3378 - Developers: Sega AM3 / SIMS / Minato Giken - Releases: 1996-01-26 (Jpn) */
-	SOFTWARE( barbie,     0,        199?, "Sega License", "Barbie Super Model (Unknown) (Proto)", 0, 0 )
-	SOFTWARE( bartman,    0,        199?, "Sega License", "Bartman Meets Radioactive Man (Euro, USA)", 0, 0 )
+	SOFTWARE( barbie,     0,        199?, "<unknown>", "Barbie Super Model (Unknown) (Proto)", 0, 0 )
+	SOFTWARE( bartman,    0,        199?, "<unknown>", "Bartman Meets Radioactive Man (Euro, USA)", 0, 0 )
 	SOFTWARE( batmanfv,   0,        199?, "Acclaim Entertainment", "Batman Forever (World)", 0, 0 )	/* Id: T-81187 - Developers: Probe - Releases: 1995-10-27 (Jpn) */
 	SOFTWARE( batmanrn,   0,        199?, "Sega", "Batman Returns (World)", 0, 0 )	/* Id: G-3314 - Developers: Sega - Releases: 1992-10-23 (Jpn) */
-	SOFTWARE( batterup,   0,        199?, "Sega License", "Batter Up (Euro, USA)", 0, 0 )
-	SOFTWARE( battlesh,   0,        199?, "Sega License", "Battleship (Euro, USA)", 0, 0 )
+	SOFTWARE( batterup,   0,        199?, "<unknown>", "Batter Up (Euro, USA)", 0, 0 )
+	SOFTWARE( battlesh,   0,        199?, "<unknown>", "Battleship (Euro, USA)", 0, 0 )
 	SOFTWARE( btoads,     0,        199?, "Sega", "Battletoads (Euro, Jpn)", 0, 0 )	/* Id: G-3311 - Developers: Rare - Releases: 1994-01-14 (Jpn) */
-	SOFTWARE( btoadsu,    btoads,   199?, "Sega License", "Battletoads (USA)", 0, 0 )
-	SOFTWARE( beavis,     0,        199?, "Sega License", "Beavis and Butt-head (Euro)", 0, 0 )
-	SOFTWARE( beavisu,    beavis,   199?, "Sega License", "Beavis and Butt-head (USA)", 0, 0 )
-	SOFTWARE( berensp,    berens,   199?, "Sega License", "Berenstain Bears (Prototype - Aug 01,  1994)", 0, 0 )
-	SOFTWARE( berensp1,   berens,   199?, "Sega License", "Berenstain Bears (Prototype - Aug 11,  1994 - A)", 0, 0 )
-	SOFTWARE( berensp2,   berens,   199?, "Sega License", "Berenstain Bears (Prototype - Aug 11,  1994)", 0, 0 )
-	SOFTWARE( berensp3,   berens,   199?, "Sega License", "Berenstain Bears (Prototype - Aug 12,  1994)", 0, 0 )
-	SOFTWARE( berensp4,   berens,   199?, "Sega License", "Berenstain Bears (Prototype - Aug 13,  1994)", 0, 0 )
-	SOFTWARE( berensp5,   berens,   199?, "Sega License", "Berenstain Bears (Prototype - Aug 14,  1994)", 0, 0 )
-	SOFTWARE( berensp6,   berens,   199?, "Sega License", "Berenstain Bears (Prototype - Aug 19,  1994)", 0, 0 )
-	SOFTWARE( berensp7,   berens,   199?, "Sega License", "Berenstain Bears (Prototype - Aug 20,  1994)", 0, 0 )
-	SOFTWARE( berensp8,   berens,   199?, "Sega License", "Berenstain Bears (Prototype - Aug 24,  1994)", 0, 0 )
-	SOFTWARE( berensp9,   berens,   199?, "Sega License", "Berenstain Bears (Prototype - Aug 25,  1994 - B)", 0, 0 )
-	SOFTWARE( beresp10,   berens,   199?, "Sega License", "Berenstain Bears (Prototype - Aug 26,  1994 - B)", 0, 0 )
-	SOFTWARE( beresp11,   berens,   199?, "Sega License", "Berenstain Bears (Prototype - Aug 26,  1994)", 0, 0 )
-	SOFTWARE( beresp12,   berens,   199?, "Sega License", "Berenstain Bears (Prototype - Jul 15,  1994 - B)", 0, 0 )
-	SOFTWARE( beresp13,   berens,   199?, "Sega License", "Berenstain Bears (Prototype - Jul 21,  1994)", 0, 0 )
-	SOFTWARE( beresp14,   berens,   199?, "Sega License", "Berenstain Bears (Prototype - Jul 22,  1994)", 0, 0 )
-	SOFTWARE( beresp15,   berens,   199?, "Sega License", "Berenstain Bears (Prototype - Jul 27,  1994)", 0, 0 )
-	SOFTWARE( beresp16,   berens,   199?, "Sega License", "Berenstain Bears (Prototype - Jun 28,  1994)", 0, 0 )
-	SOFTWARE( berens,     0,        199?, "Sega License", "The Berenstain Bears' Camping Adventure (USA)", 0, 0 )
+	SOFTWARE( btoadsu,    btoads,   199?, "<unknown>", "Battletoads (USA)", 0, 0 )
+	SOFTWARE( beavis,     0,        199?, "<unknown>", "Beavis and Butt-head (Euro)", 0, 0 )
+	SOFTWARE( beavisu,    beavis,   199?, "<unknown>", "Beavis and Butt-head (USA)", 0, 0 )
+	SOFTWARE( berensp,    berens,   199?, "<unknown>", "Berenstain Bears (Prototype - Aug 01,  1994)", 0, 0 )
+	SOFTWARE( berensp1,   berens,   199?, "<unknown>", "Berenstain Bears (Prototype - Aug 11,  1994 - A)", 0, 0 )
+	SOFTWARE( berensp2,   berens,   199?, "<unknown>", "Berenstain Bears (Prototype - Aug 11,  1994)", 0, 0 )
+	SOFTWARE( berensp3,   berens,   199?, "<unknown>", "Berenstain Bears (Prototype - Aug 12,  1994)", 0, 0 )
+	SOFTWARE( berensp4,   berens,   199?, "<unknown>", "Berenstain Bears (Prototype - Aug 13,  1994)", 0, 0 )
+	SOFTWARE( berensp5,   berens,   199?, "<unknown>", "Berenstain Bears (Prototype - Aug 14,  1994)", 0, 0 )
+	SOFTWARE( berensp6,   berens,   199?, "<unknown>", "Berenstain Bears (Prototype - Aug 19,  1994)", 0, 0 )
+	SOFTWARE( berensp7,   berens,   199?, "<unknown>", "Berenstain Bears (Prototype - Aug 20,  1994)", 0, 0 )
+	SOFTWARE( berensp8,   berens,   199?, "<unknown>", "Berenstain Bears (Prototype - Aug 24,  1994)", 0, 0 )
+	SOFTWARE( berensp9,   berens,   199?, "<unknown>", "Berenstain Bears (Prototype - Aug 25,  1994 - B)", 0, 0 )
+	SOFTWARE( beresp10,   berens,   199?, "<unknown>", "Berenstain Bears (Prototype - Aug 26,  1994 - B)", 0, 0 )
+	SOFTWARE( beresp11,   berens,   199?, "<unknown>", "Berenstain Bears (Prototype - Aug 26,  1994)", 0, 0 )
+	SOFTWARE( beresp12,   berens,   199?, "<unknown>", "Berenstain Bears (Prototype - Jul 15,  1994 - B)", 0, 0 )
+	SOFTWARE( beresp13,   berens,   199?, "<unknown>", "Berenstain Bears (Prototype - Jul 21,  1994)", 0, 0 )
+	SOFTWARE( beresp14,   berens,   199?, "<unknown>", "Berenstain Bears (Prototype - Jul 22,  1994)", 0, 0 )
+	SOFTWARE( beresp15,   berens,   199?, "<unknown>", "Berenstain Bears (Prototype - Jul 27,  1994)", 0, 0 )
+	SOFTWARE( beresp16,   berens,   199?, "<unknown>", "Berenstain Bears (Prototype - Jun 28,  1994)", 0, 0 )
+	SOFTWARE( berens,     0,        199?, "<unknown>", "The Berenstain Bears' Camping Adventure (USA)", 0, 0 )
 	SOFTWARE( berlin,     0,        1991, "Kaneko", "Berlin no Kabe - The Berlin Wall (Jpn)", 0, 0 )	/* Id: T-33017 - Developers: Kaneko / Inter State - Releases: 1991-11-29 (Jpn) */
-	SOFTWARE( bishou,     0,        199?, "Sega License", "Bishoujo Senshi Sailor Moon S (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( bonkersp,   bonkers,  199?, "Sega License", "Bonkers Wax Up! (Prototype - Dec 03,  1994)", 0, 0 )
-	SOFTWARE( bonkersp1,  bonkers,  199?, "Sega License", "Bonkers Wax Up! (Prototype - Dec 05,  1994)", 0, 0 )
-	SOFTWARE( bonkersp2,  bonkers,  199?, "Sega License", "Bonkers Wax Up! (Prototype - Dec 07,  1994 - C)", 0, 0 )
-	SOFTWARE( bonkersp3,  bonkers,  199?, "Sega License", "Bonkers Wax Up! (Prototype - Dec 08,  1994 - B)", 0, 0 )
-	SOFTWARE( bonkersp4,  bonkers,  199?, "Sega License", "Bonkers Wax Up! (Prototype - Dec 08,  1994 - C)", 0, 0 )
-	SOFTWARE( bonkersp5,  bonkers,  199?, "Sega License", "Bonkers Wax Up! (Prototype - Dec 11,  1994)", 0, 0 )
-	SOFTWARE( bonkersp6,  bonkers,  199?, "Sega License", "Bonkers Wax Up! (Prototype - Dec 12,  1994 - B)", 0, 0 )
-	SOFTWARE( bonkersp7,  bonkers,  199?, "Sega License", "Bonkers Wax Up! (Prototype - Dec 12,  1994 - D)", 0, 0 )
-	SOFTWARE( bonkersp8,  bonkers,  199?, "Sega License", "Bonkers Wax Up! (Prototype - Nov 15,  1994)", 0, 0 )
-	SOFTWARE( bonkersp9,  bonkers,  199?, "Sega License", "Bonkers Wax Up! (Prototype - Nov 21,  1994)", 0, 0 )
-	SOFTWARE( bonkrsp10,  bonkers,  199?, "Sega License", "Bonkers Wax Up! (Prototype - Nov 23,  1994)", 0, 0 )
-	SOFTWARE( bonkrsp11,  bonkers,  199?, "Sega License", "Bonkers Wax Up! (Prototype - Nov 26,  1994)", 0, 0 )
-	SOFTWARE( bonkrsp12,  bonkers,  199?, "Sega License", "Bonkers Wax Up! (Prototype - Nov 29,  1994)", 0, 0 )
-	SOFTWARE( bonkrsp13,  bonkers,  199?, "Sega License", "Bonkers Wax Up! (Prototype - Oct 31,  1994)", 0, 0 )
-	SOFTWARE( bonkers,    0,        199?, "Sega License", "Bonkers Wax Up! (Euro, USA)", 0, 0 )
-	SOFTWARE( bramst,     0,        199?, "Sega License", "Bram Stoker's Dracula (USA)", 0, 0 )
-	SOFTWARE( bublbobl,   0,        199?, "Sega License", "Bubble Bobble (Euro, USA)", 0, 0 )
-	SOFTWARE( bugsbun,    0,        199?, "Sega License", "Bugs Bunny in Double Trouble (Euro, USA)", 0, 0 )
-	SOFTWARE( bustamov,   0,        199?, "Sega License", "Bust-A-Move (Euro, USA)", 0, 0 )
+	SOFTWARE( bishou,     0,        199?, "<unknown>", "Bishoujo Senshi Sailor Moon S (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( bonkersp,   bonkers,  199?, "<unknown>", "Bonkers Wax Up! (Prototype - Dec 03,  1994)", 0, 0 )
+	SOFTWARE( bonkersp1,  bonkers,  199?, "<unknown>", "Bonkers Wax Up! (Prototype - Dec 05,  1994)", 0, 0 )
+	SOFTWARE( bonkersp2,  bonkers,  199?, "<unknown>", "Bonkers Wax Up! (Prototype - Dec 07,  1994 - C)", 0, 0 )
+	SOFTWARE( bonkersp3,  bonkers,  199?, "<unknown>", "Bonkers Wax Up! (Prototype - Dec 08,  1994 - B)", 0, 0 )
+	SOFTWARE( bonkersp4,  bonkers,  199?, "<unknown>", "Bonkers Wax Up! (Prototype - Dec 08,  1994 - C)", 0, 0 )
+	SOFTWARE( bonkersp5,  bonkers,  199?, "<unknown>", "Bonkers Wax Up! (Prototype - Dec 11,  1994)", 0, 0 )
+	SOFTWARE( bonkersp6,  bonkers,  199?, "<unknown>", "Bonkers Wax Up! (Prototype - Dec 12,  1994 - B)", 0, 0 )
+	SOFTWARE( bonkersp7,  bonkers,  199?, "<unknown>", "Bonkers Wax Up! (Prototype - Dec 12,  1994 - D)", 0, 0 )
+	SOFTWARE( bonkersp8,  bonkers,  199?, "<unknown>", "Bonkers Wax Up! (Prototype - Nov 15,  1994)", 0, 0 )
+	SOFTWARE( bonkersp9,  bonkers,  199?, "<unknown>", "Bonkers Wax Up! (Prototype - Nov 21,  1994)", 0, 0 )
+	SOFTWARE( bonkrsp10,  bonkers,  199?, "<unknown>", "Bonkers Wax Up! (Prototype - Nov 23,  1994)", 0, 0 )
+	SOFTWARE( bonkrsp11,  bonkers,  199?, "<unknown>", "Bonkers Wax Up! (Prototype - Nov 26,  1994)", 0, 0 )
+	SOFTWARE( bonkrsp12,  bonkers,  199?, "<unknown>", "Bonkers Wax Up! (Prototype - Nov 29,  1994)", 0, 0 )
+	SOFTWARE( bonkrsp13,  bonkers,  199?, "<unknown>", "Bonkers Wax Up! (Prototype - Oct 31,  1994)", 0, 0 )
+	SOFTWARE( bonkers,    0,        199?, "<unknown>", "Bonkers Wax Up! (Euro, USA)", 0, 0 )
+	SOFTWARE( bramst,     0,        199?, "<unknown>", "Bram Stoker's Dracula (USA", 0, 0 )
+	SOFTWARE( bramsta,    bramst,   19??, "<unknown>", "Bram Stoker's Dracula (USA, Alt?)", 0, 0 )
+	SOFTWARE( bublbobl,   0,        199?, "<unknown>", "Bubble Bobble (Euro, USA)", 0, 0 )
+	SOFTWARE( bugsbun,    0,        199?, "<unknown>", "Bugs Bunny in Double Trouble (Euro, USA)", 0, 0 )
+	SOFTWARE( bustamov,   0,        199?, "<unknown>", "Bust-A-Move (Euro, USA)", 0, 0 )
 	SOFTWARE( busterb,    0,        1992, "Riverhill Software", "Buster Ball (Jpn)", 0, 0 )	/* Id: T-53027 - Developers: ??? - Releases: 1992-03-20 (Jpn) */
 	SOFTWARE( busterf,    0,        1994, "Sega", "Buster Fight (Jpn)", 0, 0 )	/* Id: G-3341 - Developers: SIMS - Releases: 1994-02-11 (Jpn) */
-	SOFTWARE( caesar,     0,        199?, "Sega License", "Caesars Palace (USA)", 0, 0 )
-	SOFTWARE( captaven,   0,        199?, "Sega License", "Captain America and the Avengers (Euro, USA)", 0, 0 )
-	SOFTWARE( carlicen,   0,        199?, "Sega License", "Car Licence (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( casino,     0,        199?, "Sega License", "Casino Funpak (USA)", 0, 0 )
-	SOFTWARE( castlill,   0,        199?, "Sega License", "Castle of Illusion Starring Mickey Mouse (USA, Europe) (SMS Mode?)", 0, 0 )
-	SOFTWARE( chakan,     0,        199?, "Sega License", "Chakan (Euro, USA)", 0, 0 )
-	SOFTWARE( chessmst,   0,        199?, "Sega License", "The Chessmaster (Euro, USA)", 0, 0 )
-	SOFTWARE( chicagop,   chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jul 03,  1995)", 0, 0 )
-	SOFTWARE( chicagop1,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jul 05,  1995)", 0, 0 )
-	SOFTWARE( chicagop2,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jul 07,  1995)", 0, 0 )
-	SOFTWARE( chicagop3,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jul 10,  1995)", 0, 0 )
-	SOFTWARE( chicagop4,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jul 11,  1995)", 0, 0 )
-	SOFTWARE( chicagop5,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jul 19,  1995)", 0, 0 )
-	SOFTWARE( chicagop6,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jul 20,  1995)", 0, 0 )
-	SOFTWARE( chicagop7,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jul 21,  1995 - B)", 0, 0 )
-	SOFTWARE( chicagop8,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jul 21,  1995)", 0, 0 )
-	SOFTWARE( chicagop9,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jun 01,  1995)", 0, 0 )
-	SOFTWARE( chicgop10,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jun 05,  1995)", 0, 0 )
-	SOFTWARE( chicgop11,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jun 07,  1995)", 0, 0 )
-	SOFTWARE( chicgop12,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jun 08,  1995)", 0, 0 )
-	SOFTWARE( chicgop13,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jun 12,  1995)", 0, 0 )
-	SOFTWARE( chicgop14,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jun 14,  1995)", 0, 0 )
-	SOFTWARE( chicgop15,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jun 19,  1995)", 0, 0 )
-	SOFTWARE( chicgop16,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jun 20,  1995)", 0, 0 )
-	SOFTWARE( chicgop17,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jun 22,  1995)", 0, 0 )
-	SOFTWARE( chicgop18,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jun 26,  1995)", 0, 0 )
-	SOFTWARE( chicgop19,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jun 28,  1995)", 0, 0 )
-	SOFTWARE( chicgop20,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jun 29,  1995 - B)", 0, 0 )
-	SOFTWARE( chicgop21,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jun 29,  1995)", 0, 0 )
-	SOFTWARE( chicgop22,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - Jun 30,  1995 - B)", 0, 0 )
-	SOFTWARE( chicgop23,  chicago,  199?, "Sega License", "Chicago Syndicate (Prototype - May 05,  1995)", 0, 0 )
-	SOFTWARE( chicago,    0,        199?, "Sega License", "Chicago Syndicate (Euro, USA)", 0, 0 )
-	SOFTWARE( choplif3,   0,        199?, "Sega License", "Choplifter III (Euro, USA)", 0, 0 )
+	SOFTWARE( caesar,     0,        199?, "<unknown>", "Caesars Palace (USA)", 0, 0 )
+	SOFTWARE( captaven,   0,        199?, "<unknown>", "Captain America and the Avengers (Euro, USA)", 0, 0 )
+	SOFTWARE( carlicen,   0,        199?, "<unknown>", "Car Licence (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( casino,     0,        199?, "<unknown>", "Casino Funpak (USA)", 0, 0 )
+	SOFTWARE( castlill,   0,        199?, "<unknown>", "Castle of Illusion Starring Mickey Mouse (USA, Europe) (SMS Mode?)", 0, 0 )
+	SOFTWARE( chakan,     0,        199?, "<unknown>", "Chakan (Euro, USA)", 0, 0 )
+	SOFTWARE( chessmst,   0,        199?, "<unknown>", "The Chessmaster (Euro, USA)", 0, 0 )
+	SOFTWARE( chicagop,   chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jul 03,  1995)", 0, 0 )
+	SOFTWARE( chicagop1,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jul 05,  1995)", 0, 0 )
+	SOFTWARE( chicagop2,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jul 07,  1995)", 0, 0 )
+	SOFTWARE( chicagop3,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jul 10,  1995)", 0, 0 )
+	SOFTWARE( chicagop4,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jul 11,  1995)", 0, 0 )
+	SOFTWARE( chicagop5,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jul 19,  1995)", 0, 0 )
+	SOFTWARE( chicagop6,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jul 20,  1995)", 0, 0 )
+	SOFTWARE( chicagop7,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jul 21,  1995 - B)", 0, 0 )
+	SOFTWARE( chicagop8,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jul 21,  1995)", 0, 0 )
+	SOFTWARE( chicagop9,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jun 01,  1995)", 0, 0 )
+	SOFTWARE( chicgop10,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jun 05,  1995)", 0, 0 )
+	SOFTWARE( chicgop11,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jun 07,  1995)", 0, 0 )
+	SOFTWARE( chicgop12,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jun 08,  1995)", 0, 0 )
+	SOFTWARE( chicgop13,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jun 12,  1995)", 0, 0 )
+	SOFTWARE( chicgop14,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jun 14,  1995)", 0, 0 )
+	SOFTWARE( chicgop15,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jun 19,  1995)", 0, 0 )
+	SOFTWARE( chicgop16,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jun 20,  1995)", 0, 0 )
+	SOFTWARE( chicgop17,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jun 22,  1995)", 0, 0 )
+	SOFTWARE( chicgop18,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jun 26,  1995)", 0, 0 )
+	SOFTWARE( chicgop19,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jun 28,  1995)", 0, 0 )
+	SOFTWARE( chicgop20,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jun 29,  1995 - B)", 0, 0 )
+	SOFTWARE( chicgop21,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jun 29,  1995)", 0, 0 )
+	SOFTWARE( chicgop22,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - Jun 30,  1995 - B)", 0, 0 )
+	SOFTWARE( chicgop23,  chicago,  199?, "<unknown>", "Chicago Syndicate (Prototype - May 05,  1995)", 0, 0 )
+	SOFTWARE( chicago,    0,        199?, "<unknown>", "Chicago Syndicate (Euro, USA)", 0, 0 )
+	SOFTWARE( choplif3,   0,        199?, "<unknown>", "Choplifter III (Euro, USA)", 0, 0 )
 	SOFTWARE( chuckrck,   0,        199?, "Sega", "Chuck Rock (World)", 0, 0 )	/* Id: G-3320 - Developers: Core Design - Releases: 1992-10-30 (Jpn) */
-	SOFTWARE( chukrck2,   0,        199?, "Sega License", "Chuck Rock II - Son of Chuck (Euro)", 0, 0 )
-	SOFTWARE( chukrck2u,  chukrck2, 199?, "Sega License", "Chuck Rock II - Son of Chuck (USA)", 0, 0 )
-	SOFTWARE( cliffh,     0,        199?, "Sega License", "Cliffhanger (Euro, USA)", 0, 0 )
-	SOFTWARE( clutchit,   0,        199?, "Sega License", "Clutch Hitter (USA)", 0, 0 )
-	SOFTWARE( cocakid,    0,        199?, "Sega License", "Coca Cola Kid (Jpn)", 0, 0 )	/* Id: G-3101, G-3104 - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( chukrck2,   0,        199?, "<unknown>", "Chuck Rock II - Son of Chuck (Euro)", 0, 0 )
+	SOFTWARE( chukrck2u,  chukrck2, 199?, "<unknown>", "Chuck Rock II - Son of Chuck (USA)", 0, 0 )
+	SOFTWARE( cliffh,     0,        199?, "<unknown>", "Cliffhanger (Euro, USA)", 0, 0 )
+	SOFTWARE( clutchit,   0,        199?, "<unknown>", "Clutch Hitter (USA)", 0, 0 )
+	SOFTWARE( cocakid,    0,        199?, "<unknown>", "Coca Cola Kid (Jpn)", 0, 0 )	/* Id: G-3101, G-3104 - Developers:  - Releases:  (Jpn) */
 	SOFTWARE( columnsj,   columns,  199?, "Sega", "Columns (Jpn)", 0, 0 )	/* Id:  - Developers: Sega - Releases: 1990-10-06 (Jpn) */
-	SOFTWARE( columns,    0,        199?, "Sega License", "Columns (Euro, USA)", 0, 0 )
-	SOFTWARE( coolspot,   0,        199?, "Sega License", "Cool Spot (USA)", 0, 0 )
-	SOFTWARE( cosmicsp,   0,        199?, "Sega License", "Cosmic Spacehead (Euro)", 0, 0 )
+	SOFTWARE( columns,    0,        199?, "<unknown>", "Columns (Euro, USA)", 0, 0 )
+	SOFTWARE( coolspot,   0       , 19??, "<unknown>", "Cool Spot (Eur)", 0, 0 )
+	SOFTWARE( coolspotu,  coolspot, 199?, "<unknown>", "Cool Spot (USA)", 0, 0 )
+	SOFTWARE( cosmicsp,   0,        199?, "<unknown>", "Cosmic Spacehead (Euro)", 0, 0 )
 	SOFTWARE( crayon,     0,        199?, "Bandai", "Crayon Shin-chan - Taiketsu! Tankam Panic!! (Jpn)", 0, 0 )	/* Id: T-133047 - Developers: Minato Giken - Releases: 1995-02-24 (Jpn) */
-	SOFTWARE( crystalw,   0,        199?, "Sega License", "Crystal Warriors (Euro, USA)", 0, 0 )
-	SOFTWARE( cutthrot,   0,        199?, "Sega License", "Cutthroat Island (Euro, USA)", 0, 0 )
-	SOFTWARE( daffy,      0,        199?, "Sega License", "Daffy Duck in Hollywood (En, Fr, De, Es, It) (Euro)", 0, 0 )
-	SOFTWARE( deepduck, 0,        199?, "Sega License", "Deep Duck Trouble Starring Donald Duck (Euro, USA)", 0, 0 )
-	SOFTWARE( defoasis, 0,        199?, "Sega License", "Defenders of Oasis (Euro, USA)", 0, 0 )
-	SOFTWARE( desert, 0,        199?, "Sega License", "Desert Speedtrap (En, Fr, De, Es, It) (Euro)", 0, 0 )
-	SOFTWARE( desertu, desert,  199?, "Sega License", "Desert Speedtrap (USA)", 0, 0 )
-	SOFTWARE( dstrike, 0,        199?, "Sega License", "Desert Strike - Return to the Gulf (Euro, USA)", 0, 0 )
-	SOFTWARE( devilish, 0,        199?, "Sega License", "Devilish (Euro)", 0, 0 )
+	SOFTWARE( crystalw,   0,        199?, "<unknown>", "Crystal Warriors (Euro, USA)", 0, 0 )
+	SOFTWARE( cutthrot,   0,        199?, "<unknown>", "Cutthroat Island (Euro, USA)", 0, 0 )
+	SOFTWARE( daffy,      0,        199?, "<unknown>", "Daffy Duck in Hollywood (En, Fr, De, Es, It) (Euro)", 0, 0 )
+	SOFTWARE( deepduck, 0,        199?, "<unknown>", "Deep Duck Trouble Starring Donald Duck (Euro, USA)", 0, 0 )
+	SOFTWARE( defoasis, 0,        199?, "<unknown>", "Defenders of Oasis (Euro, USA)", 0, 0 )
+	SOFTWARE( desert, 0,        199?, "<unknown>", "Desert Speedtrap (En, Fr, De, Es, It) (Euro)", 0, 0 )
+	SOFTWARE( desertu, desert,  199?, "<unknown>", "Desert Speedtrap (USA)", 0, 0 )
+	SOFTWARE( dstrike, 0,        199?, "<unknown>", "Desert Strike - Return to the Gulf (Euro, USA)", 0, 0 )
+	SOFTWARE( devilish, 0,        199?, "<unknown>", "Devilish (Euro)", 0, 0 )
 	SOFTWARE( devilishj, devilish,  199?, "Genki", "Devilish (Jpn)", 0, 0 )	/* Id: T-28017 - Developers: Opera House - Releases: 1991-03-29 (Jpn) */
-	SOFTWARE( devilishu, devilish,  199?, "Sega License", "Devilish (USA)", 0, 0 )
+	SOFTWARE( devilishu, devilish,  199?, "<unknown>", "Devilish (USA)", 0, 0 )
 	SOFTWARE( donald42, 0,        199?, "Sega", "Donald Duck no 4-Tsu no Hihou (Jpn)", 0, 0 )	/* Id: G-3332 - Developers: Aspect - Releases: 1993-12-17 (Jpn) */
 	SOFTWARE( donaldld, 0,        1991, "Sega", "Donald Duck no Lucky Dime (Jpn)", 0, 0 )	/* Id: G-3309 - Developers: Sega - Releases: 1991-12-20 (Jpn) */
-	SOFTWARE( donaldmw, 0,        199?, "Sega License", "Donald no Magical World (En, Ja) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( doraemon, 0,        199?, "Sega License", "Doraemon - Waku Waku Pocket Paradise (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( ddragonb, ddragon,  199?, "Sega License", "Double Dragon (Beta) (Euro, USA)", 0, 0 )
-	SOFTWARE( ddragon, 0,        199?, "Sega License", "Double Dragon (Euro, USA)", 0, 0 )
-	SOFTWARE( drrobotn, 0,        199?, "Sega License", "Dr. Robotnik's Mean Bean Machine (Euro, USA)", 0, 0 )
-	SOFTWARE( dragon, 0,        199?, "Sega License", "Dragon - The Bruce Lee Story (Euro)", 0, 0 )
-	SOFTWARE( dragonu, dragon,  199?, "Sega License", "Dragon - The Bruce Lee Story (USA)", 0, 0 )
-	SOFTWARE( dragoncr, 0,        199?, "Sega License", "Dragon Crystal (Euro, USA)", 0, 0 )
-	SOFTWARE( dragoncrj, dragoncr,  199?, "Sega License", "Dragon Crystal - Tsurani no Meikyuu (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( dropzone, 0,        199?, "Sega License", "Dropzone (Euro)", 0, 0 )
-	SOFTWARE( dunkkids, 0,        199?, "Sega License", "Dunk Kids (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( dynaheadj, dynahead,  199?, "Sega License", "Dynamite Headdy (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( dynaheadp1, dynahead,  199?, "Sega License", "Dynamite Headdy (Prototype - Jul 01,  1994)", 0, 0 )
-	SOFTWARE( dynaheadp2, dynahead,  199?, "Sega License", "Dynamite Headdy (Prototype - Jul 05,  1994)", 0, 0 )
-	SOFTWARE( dynaheadp3, dynahead,  199?, "Sega License", "Dynamite Headdy (Prototype - Jun 15,  1994)", 0, 0 )
-	SOFTWARE( dynahead, 0,        199?, "Sega License", "Dynamite Headdy (Euro, USA)", 0, 0 )
-	SOFTWARE( ejim, 0,        199?, "Sega License", "Earthworm Jim (USA)", 0, 0 )
-	SOFTWARE( ecco2, 0,        199?, "Sega License", "Ecco II - The Tides of Time (Euro, USA)", 0, 0 )
-	SOFTWARE( eccoj, ecco,  199?, "Sega License", "Ecco the Dolphin (Jpn)", 0, 0 )
-	SOFTWARE( ecco, 0,        199?, "Sega License", "Ecco the Dolphin (Euro, USA)", 0, 0 )
-	SOFTWARE( ecco2j, ecco2,  199?, "Sega License", "Ecco the Dolphin II (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( ernieeg, 0,        199?, "Sega License", "Ernie Els Golf (En, Fr, De, Es, It) (Euro)", 0, 0 )
-	SOFTWARE( eternall, 0,        199?, "Sega License", "Eternal Legend - Eien no Densetsu (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( evander, 0,        199?, "Sega License", "Evander Holyfield Boxing (Euro, USA)", 0, 0 )
-	SOFTWARE( excdizzy, 0,        199?, "Sega License", "The Excellent Dizzy Collection (SMS Mode?) (Euro)", 0, 0 )
-	SOFTWARE( excdizzyp, excdizzy,  199?, "Sega License", "The Excellent Dizzy Collection (Prototype) (SMS Mode)", 0, 0 )
-	SOFTWARE( f15strik, 0,        199?, "Sega License", "F-15 Strike Eagle (Euro, USA)", 0, 0 )
-	SOFTWARE( f1, 0,        199?, "Sega License", "F1 (Euro, USA)", 0, 0 )
-	SOFTWARE( faceball, 0,        199?, "Sega License", "Faceball 2000 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( factoryp, 0,        199?, "Sega License", "Factory Panic (Euro)", 0, 0 )
-	SOFTWARE( fantdizz, 0,        199?, "Sega License", "Fantastic Dizzy (En, Fr, De, Es, It) (SMS Mode?) (Euro)", 0, 0 )
-	SOFTWARE( fantzone, 0,        199?, "Sega License", "Fantasy Zone Gear (Euro, Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( fantzone1, fantzone,  199?, "Sega License", "Fantasy Zone Gear (Alt) (Jpn, USA)", 0, 0 )
-	SOFTWARE( fatalfur, 0,        199?, "Sega License", "Fatal Fury Special (USA)", 0, 0 )
-	SOFTWARE( fifaj, fifa,  199?, "Sega License", "FIFA International Soccer (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( fifa, 0,        199?, "Sega License", "FIFA International Soccer (Euro, USA)", 0, 0 )
-	SOFTWARE( fifa96, 0,        199?, "Sega License", "FIFA Soccer 96 (En, Fr, De, Es) (Euro, USA)", 0, 0 )
-	SOFTWARE( foreman, 0,        199?, "Sega License", "Foreman for Real (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( frankt, 0,        199?, "Sega License", "Frank Thomas Big Hurt Baseball (USA)", 0, 0 )
-	SOFTWARE( fray, 0,        199?, "Sega License", "Fray - Shugyou Hen (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( fredcoupj, fredcoup,  199?, "Sega License", "Fred Couples' Golf (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( fredcoup, 0,        199?, "Sega License", "Fred Couples' Golf (USA)", 0, 0 )
-	SOFTWARE( frogger, 0,        199?, "Sega License", "Frogger (Proto) (USA)", 0, 0 )
-	SOFTWARE( slamdunk, 0,        199?, "Sega License", "From TV Animation - Slam Dunk - Shouri e no Starting 5 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( glocairj, glocair,  199?, "Sega License", "G-LOC Air Battle (v1.1) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( glocairj1, glocair,  199?, "Sega License", "G-LOC Air Battle (Jpn)", 0, 0 )
-	SOFTWARE( glocair, 0,        199?, "Sega License", "G-LOC Air Battle (Euro, USA)", 0, 0 )
-	SOFTWARE( galaga91, 0,        199?, "Sega License", "Galaga '91 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( galaga2, 0,        199?, "Sega License", "Galaga 2 (Euro)", 0, 0 )
-	SOFTWARE( gamble, 0,        199?, "Sega License", "Gamble Panic (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( gambler, 0,        199?, "Sega License", "Gambler Jikochuushinha (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( ganbare, 0,        199?, "Sega License", "Ganbare Gorby! (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( garfield, 0,        199?, "Sega License", "Garfield - Caught in the Act (Euro, USA)", 0, 0 )
-	SOFTWARE( garou, 0,        199?, "Sega License", "Garou Densetsu Special (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( gearstad, 0,        199?, "Sega License", "Gear Stadium (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( gearstah, 0,        199?, "Sega License", "Gear Stadium Heiseiban (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( gearwork, 0,        199?, "Sega License", "Gear Works (USA)", 0, 0 )
-	SOFTWARE( georgef, 0,        199?, "Sega License", "George Foreman's KO Boxing (Euro, USA)", 0, 0 )
-	SOFTWARE( ggaleste, 0,        199?, "Sega License", "GG Aleste (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( ggdora, 0,        199?, "Sega License", "GG Doraemon - Noranosuke no Yabou (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( ggport, 0,        199?, "Sega License", "GG Portrait - Pai Chen (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( ggport1, 0,        199?, "Sega License", "GG Portrait - Yuuki Akira (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( ggshinob, 0,        199?, "Sega License", "The GG Shinobi (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( godzilla, 0,        199?, "Sega License", "Godzilla - Kaijuu Daishingeki (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( gpriderj, gprider,  199?, "Sega License", "GP Rider (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( gpriderp, gprider,  199?, "Sega License", "GP Rider (Prototype - Jan 04,  1994)", 0, 0 )
-	SOFTWARE( gprider, 0,        199?, "Sega License", "GP Rider (Euro, USA)", 0, 0 )
-	SOFTWARE( greendog, 0,        199?, "Sega License", "Greendog (Euro, USA)", 0, 0 )
-	SOFTWARE( griffin, 0,        199?, "Sega License", "Griffin (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( gunstar, 0,        199?, "Sega License", "Gunstar Heroes (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( halleywj, halleyw,  199?, "Sega License", "Halley Wars (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( halleyw, 0,        199?, "Sega License", "Halley Wars (Euro, USA)", 0, 0 )
-	SOFTWARE( headbust, 0,        199?, "Sega License", "Head Buster (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( heavywc, 0,        199?, "Sega License", "Heavy Weight Champ (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( homea, 0,        199?, "Sega License", "Home Alone (Euro, USA)", 0, 0 )
-	SOFTWARE( honoo, 0,        199?, "Sega License", "Honoo no Toukyuuji - Dodge Danpei (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( hook, 0,        199?, "Sega License", "Hook (Euro, USA)", 0, 0 )
-	SOFTWARE( hurric, 0,        199?, "Sega License", "Hurricanes (Euro)", 0, 0 )
-	SOFTWARE( hyokkori, 0,        199?, "Sega License", "Hyokkori Hyoutan Jima - Hyoutan Jima no Daikoukai (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( hypery92, 0,        199?, "Sega License", "Hyper Pro Yakyuu '92 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( ichirgg, 0,        199?, "Sega License", "Ichidant~R GG (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( wakevamp, 0,        199?, "Sega License", "In the Wake of Vampire (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( incred, 0,        199?, "Sega License", "The Incredible Crash Dummies (Euro, USA)", 0, 0 )
-	SOFTWARE( incrhulk, 0,        199?, "Sega License", "The Incredible Hulk (Euro, USA)", 0, 0 )
-	SOFTWARE( indycrus1, indycrus,  199?, "Sega License", "Indiana Jones and the Last Crusade (Alt) (USA)", 0, 0 )
-	SOFTWARE( indycrus, 0,        199?, "Sega License", "Indiana Jones and the Last Crusade (Euro, USA)", 0, 0 )
-	SOFTWARE( ironman1, ironman,  199?, "Sega License", "Iron Man X-O Manowar in Heavy Metal (Alt) (USA)", 0, 0 )
-	SOFTWARE( ironman, 0,        199?, "Sega License", "Iron Man X-O Manowar in Heavy Metal (Euro, USA)", 0, 0 )
-	SOFTWARE( itchy, 0,        199?, "Sega License", "The Itchy & Scratchy Game (Euro, USA)", 0, 0 )
-	SOFTWARE( jleagu94, 0,        199?, "Sega License", "J.League GG Pro Striker '94 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( jleague, 0,        199?, "Sega License", "J.League Soccer - Dream Eleven (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( jb007, 0,        199?, "Sega License", "James Bond 007 - The Duel (Euro)", 0, 0 )
-	SOFTWARE( jpond3, 0,        199?, "Sega License", "James Pond 3 - Operation Starfi5h (Euro)", 0, 0 )
-	SOFTWARE( robocod, 0,        199?, "Sega License", "James Pond II - Codename RoboCod (USA)", 0, 0 )
-	SOFTWARE( jangpun2, 0,        199?, "Sega License", "Jang Pung II (SMS Mode) (Korea)", 0, 0 )
-	SOFTWARE( jeopardy, 0,        199?, "Sega License", "Jeopardy! (USA)", 0, 0 )
-	SOFTWARE( jeopards, 0,        199?, "Sega License", "Jeopardy! - Sports Edition (Euro, USA)", 0, 0 )
-	SOFTWARE( joemontj, joemont,  199?, "Sega License", "Joe Montana's Football (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( joemont, 0,        199?, "Sega License", "Joe Montana's Football (Euro, USA)", 0, 0 )
-	SOFTWARE( striderr, 0,        199?, "Sega License", "Journey from Darkness - Strider Returns (Euro, USA)", 0, 0 )
-	SOFTWARE( judged, 0,        199?, "Sega License", "Judge Dredd (Euro, USA)", 0, 0 )
-	SOFTWARE( junction, 0,        199?, "Sega License", "Junction (Euro, USA)", 0, 0 )
-	SOFTWARE( jungle, 0,        199?, "Sega License", "The Jungle Book (Euro)", 0, 0 )
-	SOFTWARE( jungleu, 0,        199?, "Sega License", "The Jungle Book (USA)", 0, 0 )
-	SOFTWARE( jurassicj, jurassic,  199?, "Sega License", "Jurassic Park (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( jurassic, 0,        199?, "Sega License", "Jurassic Park (Euro, USA)", 0, 0 )
-	SOFTWARE( kaitou, 0,        199?, "Sega License", "Kaitou Saint Tale (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( kawasaki, 0,        199?, "Sega License", "Kawasaki Superbike Challenge (Euro, USA)", 0, 0 )
-	SOFTWARE( kenyuu, 0,        199?, "Sega License", "Kenyuu Densetsu Yaiba (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( kickrush, 0,        199?, "Sega License", "Kick & Rush (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( kineticc, 0,        199?, "Sega License", "Kinetic Connection (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( kishin, 0,        199?, "Sega License", "Kishin Douji Zenki (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( klax, 0,        199?, "Sega License", "Klax (Euro, USA)", 0, 0 )
-	SOFTWARE( krusty, 0,        199?, "Sega License", "Krusty's Fun House (Euro, USA)", 0, 0 )
-	SOFTWARE( kunichan, 0,        199?, "Sega License", "Kuni-chan no Game Tengoku (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( kunichn2, 0,        199?, "Sega License", "Kuni-chan no Game Tengoku Part 2 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( landill, 0,        199?, "Sega License", "Land of Illusion Starring Mickey Mouse (Euro, USA)", 0, 0 )
-	SOFTWARE( lastact, 0,        199?, "Sega License", "Last Action Hero (USA)", 0, 0 )
-	SOFTWARE( legndillp, legndill,  199?, "Sega License", "Legend of Illusion Starring Mickey Mouse (Prototype - Oct 11,  1994)", 0, 0 )
-	SOFTWARE( legndillp1, legndill,  199?, "Sega License", "Legend of Illusion Starring Mickey Mouse (Prototype - Oct 14,  1994)", 0, 0 )
-	SOFTWARE( legndillp2, legndill,  199?, "Sega License", "Legend of Illusion Starring Mickey Mouse (Prototype - Oct 17,  1994)", 0, 0 )
-	SOFTWARE( legndillp3, legndill,  199?, "Sega License", "Legend of Illusion Starring Mickey Mouse (Prototype - Sep 22,  1994)", 0, 0 )
-	SOFTWARE( legndillp4, legndill,  199?, "Sega License", "Legend of Illusion Starring Mickey Mouse (Prototype - Sep 30,  1994 - SEL)", 0, 0 )
-	SOFTWARE( legndillp5, legndill,  199?, "Sega License", "Legend of Illusion Starring Mickey Mouse (Prototype - Sep 30,  1994)", 0, 0 )
-	SOFTWARE( legndill, 0,        199?, "Sega License", "Legend of Illusion Starring Mickey Mouse (Euro, USA)", 0, 0 )
-	SOFTWARE( lemmingsb, lemmings,  199?, "Sega License", "Lemmings (Beta) (World)", 0, 0 )
-	SOFTWARE( lemmings, 0,        199?, "Sega License", "Lemmings (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( lionkingt, lionking,  199?, "Sega License", "The Lion King (Trainer?) (Euro)", 0, 0 )
-	SOFTWARE( lionking, 0,        199?, "Sega License", "The Lion King (Euro)", 0, 0 )
-	SOFTWARE( lionkingp, lionking,  199?, "Sega License", "The Lion King (Prototype - Aug 03,  1994)", 0, 0 )
-	SOFTWARE( lionkingp1, lionking,  199?, "Sega License", "The Lion King (Prototype - Aug 11,  1994)", 0, 0 )
-	SOFTWARE( lionkingp2, lionking,  199?, "Sega License", "The Lion King (Prototype - Aug 12,  1994)", 0, 0 )
-	SOFTWARE( lionkingp3, lionking,  199?, "Sega License", "The Lion King (Prototype - Aug 13,  1994)", 0, 0 )
-	SOFTWARE( lionkingp4, lionking,  199?, "Sega License", "The Lion King (Prototype - Aug 14,  1994)", 0, 0 )
-	SOFTWARE( lionkingp5, lionking,  199?, "Sega License", "The Lion King (Prototype - Aug 15,  1994)", 0, 0 )
-	SOFTWARE( lionkingp6, lionking,  199?, "Sega License", "The Lion King (Prototype - Aug 16,  1994)", 0, 0 )
-	SOFTWARE( lionkingp7, lionking,  199?, "Sega License", "The Lion King (Prototype - Aug 17,  1994 - 2)", 0, 0 )
-	SOFTWARE( lionkingp8, lionking,  199?, "Sega License", "The Lion King (Prototype - Aug 17,  1994)", 0, 0 )
-	SOFTWARE( lionkingp9, lionking,  199?, "Sega License", "The Lion King (Prototype - Aug 20,  1994)", 0, 0 )
-	SOFTWARE( lionkingu, lionking,  199?, "Sega License", "The Lion King (Trainer?) (USA)", 0, 0 )
-	SOFTWARE( lionkingut, lionking,  199?, "Sega License", "The Lion King (USA)", 0, 0 )
-	SOFTWARE( lostwrld, 0,        199?, "Sega License", "The Lost World - Jurassic Park (USA)", 0, 0 )
-	SOFTWARE( luckydim, 0,        199?, "Sega License", "The Lucky Dime Caper (Euro, USA)", 0, 0 )
-	SOFTWARE( lunar, 0,        199?, "Sega License", "Lunar - Sanposuru Gakuen (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( madden95, 0,        199?, "Sega License", "Madden NFL '95 (USA)", 0, 0 )
-	SOFTWARE( madden96, 0,        199?, "Sega License", "Madden NFL '96 (USA)", 0, 0 )
-	SOFTWARE( madden96a, 0,        199?, "Sega License", "Madden NFL '96 (Euro, USA)", 0, 0 )
-	SOFTWARE( madoumna, 0,        199?, "Sega License", "Madou Monogatari A - Dokidoki Vacation (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( madoumon, 0,        199?, "Sega License", "Madou Monogatari I - 3-Tsu no Madoukyuu (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( madoumn2, 0,        199?, "Sega License", "Madou Monogatari II - Arle 16-Sai (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( madoumn3, 0,        199?, "Sega License", "Madou Monogatari III - Kyuukyoku Joou-sama (v1.1) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( madoumn3a, madoumn3,  199?, "Sega License", "Madou Monogatari III - Kyuukyoku Joou-sama (Jpn)", 0, 0 )
-	SOFTWARE( magicray, 0,        199?, "Sega License", "Magic Knight Rayearth (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( magicry2, 0,        199?, "Sega License", "Magic Knight Rayearth 2 - Making of Magic Knight (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( magiclpp, 0,        199?, "Sega License", "Magical Puzzle Popils (En, Ja) (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( magical, 0,        199?, "Sega License", "Magical Taruruuto-kun (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( majors, 0,        199?, "Sega License", "The Majors Pro Baseball (USA)", 0, 0 )
-	SOFTWARE( mappy, 0,        199?, "Sega License", "Mappy (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( marble, 0,        199?, "Sega License", "Marble Madness (Euro, USA)", 0, 0 )
-	SOFTWARE( marko, 0,        199?, "Sega License", "Marko's Magic Football (En, Fr, De, Es) (Euro)", 0, 0 )
-	SOFTWARE( megaman, 0,        199?, "Sega License", "Mega Man (Euro, USA)", 0, 0 )
-	SOFTWARE( lastbibl, 0,        199?, "Sega License", "Megami Tensei Gaiden - Last Bible (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( lastbibs, 0,        199?, "Sega License", "Megami Tensei Gaiden - Last Bible S (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( mickmack, 0,        199?, "Sega License", "Mick & Mack as the Global Gladiators (Euro, USA)", 0, 0 )
-	SOFTWARE( legndillj, legndill,  199?, "Sega License", "Mickey Mouse Densetsu no Oukoku - Legend of Illusion (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( castlillj, castlill,  199?, "Sega License", "Mickey Mouse no Castle Illusion (SMS Mode?) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( mickeymc, 0,        199?, "Sega License", "Mickey Mouse no Mahou no Crystal (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( mickeyuc, 0,        199?, "Sega License", "Mickey's Ultimate Challenge (Euro, USA)", 0, 0 )
-	SOFTWARE( micromac, 0,        199?, "Sega License", "Micro Machines (Euro)", 0, 0 )
-	SOFTWARE( micromc2, 0,        199?, "Sega License", "Micro Machines 2 - Turbo Tournament (Euro)", 0, 0 )
-	SOFTWARE( mmprp, mmpr,  199?, "Sega License", "Mighty Morphin Power Rangers (Prototype - Jul 16,  1994)", 0, 0 )
-	SOFTWARE( mmpr, 0,        199?, "Sega License", "Mighty Morphin Power Rangers (Euro, USA)", 0, 0 )
-	SOFTWARE( mmprtmp, mmprtm,  199?, "Sega License", "Mighty Morphin Power Rangers - The Movie (Prototype - May 30,  1995)", 0, 0 )
-	SOFTWARE( mmprtm, 0,        199?, "Sega License", "Mighty Morphin Power Rangers - The Movie (Euro, USA)", 0, 0 )
-	SOFTWARE( mlbpab, 0,        199?, "Sega License", "MLBPA Baseball (USA)", 0, 0 )
-	SOFTWARE( moldoran, 0,        199?, "Sega License", "Moldorian - Hikari to Yami no Sister (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( monstert, 0,        199?, "Sega License", "Monster Truck Wars (Euro, USA)", 0, 0 )
-	SOFTWARE( monstwld2, 0,        199?, "Sega License", "Monster World II - Dragon no Wana (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( mkj,   mk,  199?, "Sega License", "Mortal Kombat (v3.3) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( mk, 0,        199?, "Sega License", "Mortal Kombat (v2.6) (Euro, USA)", 0, 0 )
-	SOFTWARE( mk3, 0,        199?, "Sega License", "Mortal Kombat 3 (Euro)", 0, 0 )
-	SOFTWARE( mk2, 0,        199?, "Sega License", "Mortal Kombat II (World)", 0, 0 )
-	SOFTWARE( mspacman, 0,        199?, "Sega License", "Ms. Pac-Man (USA)", 0, 0 )
-	SOFTWARE( nazpuyo, 0,        199?, "Sega License", "Nazo Puyo (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( nazpuyo2, 0,        199?, "Sega License", "Nazo Puyo 2 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( nazpyoar1, nazpyoar,  199?, "Sega License", "Nazo Puyo Arle no Roux (Development Edition) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( nazpyoar, 0,        199?, "Sega License", "Nazo Puyo Arle no Roux (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( nbaactn, 0,        199?, "Sega License", "NBA Action (USA)", 0, 0 )
-	SOFTWARE( nbaactnp1, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Final A - Feb 28,  1994)", 0, 0 )
-	SOFTWARE( nbaactnp2, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Final B - Mar 01,  1994)", 0, 0 )
-	SOFTWARE( nbaactnp3, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Final C - Mar 02,  1994)", 0, 0 )
-	SOFTWARE( nbaactnp4, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Final D - Mar 03,  1994)", 0, 0 )
-	SOFTWARE( nbaactnp5, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Final E - Mar 04,  1994)", 0, 0 )
-	SOFTWARE( nbaactnp6, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Final F - Mar 04,  1994)", 0, 0 )
-	SOFTWARE( nbaactnp7, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Final G - Mar 05,  1994)", 0, 0 )
-	SOFTWARE( nbaactnp8, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Final H - Mar 08,  1994)", 0, 0 )
-	SOFTWARE( nbaactnp9, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Dec 01,  1993)", 0, 0 )
-	SOFTWARE( nbaactp10, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Feb 02,  1994)", 0, 0 )
-	SOFTWARE( nbaactp11, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Feb 03,  1994)", 0, 0 )
-	SOFTWARE( nbaactp12, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Feb 06,  1994)", 0, 0 )
-	SOFTWARE( nbaactp13, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Feb 08,  1994)", 0, 0 )
-	SOFTWARE( nbaactp14, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Feb 12,  1994)", 0, 0 )
-	SOFTWARE( nbaactp15, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Feb 15,  1994)", 0, 0 )
-	SOFTWARE( nbaactp16, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Feb 17,  1994)", 0, 0 )
-	SOFTWARE( nbaactp17, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Feb 20,  1994)", 0, 0 )
-	SOFTWARE( nbaactp18, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Feb 21,  1994)", 0, 0 )
-	SOFTWARE( nbaactp19, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Feb 24,  1994)", 0, 0 )
-	SOFTWARE( nbaactp20, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Feb 25,  1994 - B)", 0, 0 )
-	SOFTWARE( nbaactp21, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Feb 25,  1994)", 0, 0 )
-	SOFTWARE( nbaactp22, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Feb 26,  1994)", 0, 0 )
-	SOFTWARE( nbaactp23, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Feb 27,  1994)", 0, 0 )
-	SOFTWARE( nbaactp24, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Feb 28,  1994)", 0, 0 )
-	SOFTWARE( nbaactp25, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Jan 04,  1994)", 0, 0 )
-	SOFTWARE( nbaactp26, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Jan 06,  1994)", 0, 0 )
-	SOFTWARE( nbaactp27, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Jan 10,  1994)", 0, 0 )
-	SOFTWARE( nbaactp28, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Jan 24,  1994)", 0, 0 )
-	SOFTWARE( nbaactp29, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Jan 29,  1994)", 0, 0 )
-	SOFTWARE( nbaactp30, nbaactn,  199?, "Sega License", "NBA Action Starring David Robinson (Prototype - Nov 28,  1993)", 0, 0 )
-	SOFTWARE( nbajamj, nbajam,  199?, "Sega License", "NBA Jam (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( nbajam, 0,        199?, "Sega License", "NBA Jam (v1.1) (USA)", 0, 0 )
-	SOFTWARE( nbajam1, nbajam,  199?, "Sega License", "NBA Jam (Euro, USA)", 0, 0 )
-	SOFTWARE( nbajamte, 0,        199?, "Sega License", "NBA Jam Tournament Edition (Euro, USA)", 0, 0 )
-	SOFTWARE( nekodais, 0,        199?, "Sega License", "Neko Daisuki! (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( nfl95pa, nfl95,  199?, "Sega License", "NFL '95 (Prototype - Aug 08,  1994)", 0, 0 )
-	SOFTWARE( nfl95pb, nfl95,  199?, "Sega License", "NFL '95 (Prototype - Aug 25,  1994 - A)", 0, 0 )
-	SOFTWARE( nfl95pc, nfl95,  199?, "Sega License", "NFL '95 (Prototype - Aug 25,  1994 - B)", 0, 0 )
-	SOFTWARE( nfl95pd, nfl95,  199?, "Sega License", "NFL '95 (Prototype - Aug 25,  1994)", 0, 0 )
-	SOFTWARE( nfl95pe, nfl95,  199?, "Sega License", "NFL '95 (Prototype - Aug 26,  1994)", 0, 0 )
-	SOFTWARE( nfl95pf, nfl95,  199?, "Sega License", "NFL '95 (Prototype - Aug 31,  1994)", 0, 0 )
-	SOFTWARE( nfl95pg, nfl95,  199?, "Sega License", "NFL '95 (Prototype - Sep 02,  1994)", 0, 0 )
-	SOFTWARE( nfl95ph, nfl95,  199?, "Sega License", "NFL '95 (Prototype - Sep 08,  1994)", 0, 0 )
-	SOFTWARE( nfl95pi, nfl95,  199?, "Sega License", "NFL '95 (Prototype - Sep 10,  1994)", 0, 0 )
-	SOFTWARE( nfl95pj, nfl95,  199?, "Sega License", "NFL '95 (Prototype - Sep 11,  1994 - B)", 0, 0 )
-	SOFTWARE( nfl95pk, nfl95,  199?, "Sega License", "NFL '95 (Prototype - Sep 11,  1994 - C)", 0, 0 )
-	SOFTWARE( nfl95pl, nfl95,  199?, "Sega License", "NFL '95 (Prototype - Sep 12,  1994)", 0, 0 )
-	SOFTWARE( nfl95pm, nfl95,  199?, "Sega License", "NFL '95 (Prototype - Sep 14,  1994 - F)", 0, 0 )
-	SOFTWARE( nfl95pn, nfl95,  199?, "Sega License", "NFL '95 (Prototype - Sep 14,  1994)", 0, 0 )
-	SOFTWARE( nfl95, 0,        199?, "Sega License", "NFL '95 (USA)", 0, 0 )
-	SOFTWARE( nflqrt96, 0,        199?, "Sega License", "NFL Quarterback Club '96 (Euro, USA)", 0, 0 )
-	SOFTWARE( nflquart, 0,        199?, "Sega License", "NFL Quarterback Club (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( nhlallstpa, nhlallst,  199?, "Sega License", "NHL All-Star Hockey (Prototype - Dec 15,  1994)", 0, 0 )
-	SOFTWARE( nhlallstpb, nhlallst,  199?, "Sega License", "NHL All-Star Hockey (Prototype - Dec 22,  1994)", 0, 0 )
-	SOFTWARE( nhlallstpc, nhlallst,  199?, "Sega License", "NHL All-Star Hockey (Prototype - Dec 29,  1994)", 0, 0 )
-	SOFTWARE( nhlallstpd, nhlallst,  199?, "Sega License", "NHL All-Star Hockey (Prototype - Dec 31,  1994)", 0, 0 )
-	SOFTWARE( nhlallstpe, nhlallst,  199?, "Sega License", "NHL All-Star Hockey (Prototype - Jan 02,  1995)", 0, 0 )
-	SOFTWARE( nhlallstpf, nhlallst,  199?, "Sega License", "NHL All-Star Hockey (Prototype - Jan 03,  1995)", 0, 0 )
-	SOFTWARE( nhlallstpg, nhlallst,  199?, "Sega License", "NHL All-Star Hockey (Prototype - Jan 07,  1995)", 0, 0 )
-	SOFTWARE( nhlallstph, nhlallst,  199?, "Sega License", "NHL All-Star Hockey (Prototype - Jan 11,  1995)", 0, 0 )
-	SOFTWARE( nhlallstpi, nhlallst,  199?, "Sega License", "NHL All-Star Hockey (Prototype - Jan 13,  1995)", 0, 0 )
-	SOFTWARE( nhlallstpj, nhlallst,  199?, "Sega License", "NHL All-Star Hockey (Prototype - Jan 16,  1995)", 0, 0 )
-	SOFTWARE( nhlallstpk, nhlallst,  199?, "Sega License", "NHL All-Star Hockey (Prototype - Jan 20 ,1995)", 0, 0 )
-	SOFTWARE( nhlallstpl, nhlallst,  199?, "Sega License", "NHL All-Star Hockey (Prototype - Jan 21,  1995)", 0, 0 )
-	SOFTWARE( nhlallstpm, nhlallst,  199?, "Sega License", "NHL All-Star Hockey (Prototype - Jan 24,  1995 - A)", 0, 0 )
-	SOFTWARE( nhlallstpn, nhlallst,  199?, "Sega License", "NHL All-Star Hockey (Prototype - Jan 24,  1995 - B)", 0, 0 )
-	SOFTWARE( nhlallstpo, nhlallst,  199?, "Sega License", "NHL All-Star Hockey (Prototype - Jan 24,  1995 - C)", 0, 0 )
-	SOFTWARE( nhlallstpp, nhlallst,  199?, "Sega License", "NHL All-Star Hockey (Prototype - Jan 24,  1995)", 0, 0 )
-	SOFTWARE( nhlallstpq, nhlallst,  199?, "Sega License", "NHL All-Star Hockey (Prototype - Jan 25,  1995)", 0, 0 )
-	SOFTWARE( nhlallst, 0,        199?, "Sega License", "NHL All-Star Hockey (USA)", 0, 0 )
-	SOFTWARE( nhlhocky, 0,        199?, "Sega License", "NHL Hockey (Euro, USA)", 0, 0 )
-	SOFTWARE( ninjagj, ninjag,  199?, "Sega License", "Ninja Gaiden (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( ninjag, 0,        199?, "Sega License", "Ninja Gaiden (Euro, USA)", 0, 0 )
-	SOFTWARE( ninku, 0,        199?, "Sega License", "Ninku (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( ninku2, 0,        199?, "Sega License", "Ninku 2 - Tenkuuryuu e no Michi (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( ninkug, 0,        199?, "Sega License", "Ninku Gaiden - Hiroyuki Daikatsugeki (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( nomohide, 0,        199?, "Sega License", "Nomo Hideo no World Series Baseball (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( olympi, 0,        199?, "Sega License", "Olympic Gold (En, Fr, De, Es, It, Nl, Pt, Sv) (v1.1) (SMS Mode?) (Euro)", 0, 0 )
-	SOFTWARE( olympiju, olympi,  199?, "Sega License", "Olympic Gold (En, Fr, De, Es, It, Nl, Pt, Sv) (SMS Mode?) (Jpn, USA)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( ottifant, 0,        199?, "Sega License", "The Ottifants (En, Fr, De, Es, It) (Euro)", 0, 0 )
-	SOFTWARE( outrunj, outrun,  199?, "Sega License", "Out Run (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( outruneu, 0,        199?, "Sega License", "Out Run Europa (SMS Mode?) (Euro, USA)", 0, 0 )
-	SOFTWARE( outrun, 0,        199?, "Sega License", "OutRun (Alt) (Jpn, USA)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( pacattck, 0,        199?, "Sega License", "Pac-Attack (Euro, USA)", 0, 0 )
-	SOFTWARE( pacintim, 0,        199?, "Sega License", "Pac-In-Time (Unknown) (Proto)", 0, 0 )
-	SOFTWARE( pacman, 0,        199?, "Sega License", "Pac-Man (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( panzer, 0,        199?, "Sega License", "Panzer Dragoon Mini (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( paperboy, 0,        199?, "Sega License", "Paperboy (Euro, USA)", 0, 0 )
-	SOFTWARE( paperby2, 0,        199?, "Sega License", "Paperboy II (Euro, USA)", 0, 0 )
-	SOFTWARE( pengoj, 0,        199?, "Sega License", "Pengo (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( pengo, pengo,  199?, "Sega License", "Pengo (Euro, USA)", 0, 0 )
-	SOFTWARE( petclub, 0,        199?, "Sega License", "Pet Club Inu Daisuki! (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( psampras, 0,        199?, "Sega License", "Pete Sampras Tennis (Euro)", 0, 0 )
-	SOFTWARE( pga96, 0,        199?, "Sega License", "PGA Tour 96 (Euro, USA)", 0, 0 )
-	SOFTWARE( pgatour, 0,        199?, "Sega License", "PGA Tour Golf (v1.1) (USA)", 0, 0 )
-	SOFTWARE( pgatoura, pgatour,  199?, "Sega License", "PGA Tour Golf (Euro, USA)", 0, 0 )
-	SOFTWARE( pgatour2, 0,        199?, "Sega License", "PGA Tour Golf II (Euro, USA)", 0, 0 )
-	SOFTWARE( pstaradv, 0,        199?, "Sega License", "Phantasy Star Adventure (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( pstargai, 0,        199?, "Sega License", "Phantasy Star Gaiden (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( phantom, 0,        199?, "Sega License", "Phantom 2040 (Euro, USA)", 0, 0 )
-	SOFTWARE( pinballd, 0,        199?, "Sega License", "Pinball Dreams (USA)", 0, 0 )
-	SOFTWARE( pocketj, 0,        199?, "Sega License", "Pocket Jansou (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( pokerf, 0,        199?, "Sega License", "Poker Faced Paul's Blackjack (USA)", 0, 0 )
-	SOFTWARE( pokerf1, 0,        199?, "Sega License", "Poker Faced Paul's Gin (USA)", 0, 0 )
-	SOFTWARE( pokerf2, 0,        199?, "Sega License", "Poker Faced Paul's Poker (USA)", 0, 0 )
-	SOFTWARE( pokerf3, 0,        199?, "Sega License", "Poker Faced Paul's Solitaire (USA)", 0, 0 )
-	SOFTWARE( popbreak, 0,        199?, "Sega License", "Pop Breaker (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( popeye, 0,        199?, "Sega License", "Popeye no Beach Volleyball (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( pstrike2, 0,        199?, "Sega License", "Power Strike II (Euro, Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( predator, 0,        199?, "Sega License", "Predator 2 (SMS Mode?) (Euro, USA)", 0, 0 )
-	SOFTWARE( primal, 0,        199?, "Sega License", "Primal Rage (Euro, USA)", 0, 0 )
-	SOFTWARE( ppersiab, ppersia,  199?, "Sega License", "Prince of Persia (Beta) (SMS Mode?) (Euro, USA)", 0, 0 )
-	SOFTWARE( ppersia, 0,        199?, "Sega License", "Prince of Persia (SMS Mode?) (Euro, USA)", 0, 0 )
-	SOFTWARE( proyak91, 0,        199?, "Sega License", "The Pro Yakyuu '91 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( proyak94, 0,        199?, "Sega License", "Pro Yakyuu GG League '94 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( proyakgg, 0,        199?, "Sega License", "Pro Yakyuu GG League (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( psychicwj, psychicw,  199?, "Sega License", "Psychic World (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( psychicw, 0,        199?, "Sega License", "Psychic World (v1.1) (Euro, USA)", 0, 0 )
-	SOFTWARE( puttputtj, puttputt,  199?, "Sega License", "Putt & Putter (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( puttputt, 0,        199?, "Sega License", "Putt & Putter (Euro, USA)", 0, 0 )
-	SOFTWARE ( puyopuyo, 0,        199?, "Sega License", "Puyo Puyo (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( puyopyo2, 0,        199?, "Sega License", "Puyo Puyo 2 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( tantor, 0,        199?, "Sega License", "Puzzle and Action Tanto-R (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( pbobble, 0,        199?, "Sega License", "Puzzle Bobble (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( questf, 0,        199?, "Sega License", "Quest for the Shaven Yak Starring Ren Hoek & Stimpy (Euro, USA)", 0, 0 )
-	SOFTWARE( quizgear, 0,        199?, "Sega License", "The Quiz Gear Fight!! (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( rbibas, 0,        199?, "Sega License", "R.B.I. Baseball '94 (USA)", 0, 0 )
-	SOFTWARE( rcgp, 0,        199?, "Sega License", "R.C. Grand Prix (SMS Mode?) (Euro, USA)", 0, 0 )
-	SOFTWARE( rastansg, 0,        199?, "Sega License", "Rastan Saga (SMS Mode?) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( revenged, 0,        199?, "Sega License", "Revenge of Drancon (USA)", 0, 0 )
-	SOFTWARE( riddickj, riddick,  199?, "Sega License", "Riddick Bowe Boxing (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( riddick, 0,        199?, "Sega License", "Riddick Bowe Boxing (USA)", 0, 0 )
-	SOFTWARE( riserobo, 0,        199?, "Sega License", "Rise of the Robots (Euro, USA)", 0, 0 )
-	SOFTWARE( ristarp, ristar,  199?, "Sega License", "Ristar (Prototype - Nov 01,  1994)", 0, 0 )
-	SOFTWARE( ristarp1, ristar,  199?, "Sega License", "Ristar (Prototype - Nov 02,  1994)", 0, 0 )
-	SOFTWARE( ristarp2, ristar,  199?, "Sega License", "Ristar (Prototype - Oct 19,  1994)", 0, 0 )
-	SOFTWARE( ristarp3, ristar,  199?, "Sega License", "Ristar (Prototype - Oct 26,  1994)", 0, 0 )
-	SOFTWARE( ristarp4, ristar,  199?, "Sega License", "Ristar (Prototype - Sep 09,  1994)", 0, 0 )
-	SOFTWARE( ristar, 0,        199?, "Sega License", "Ristar - The Shooting Star (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( roadrash, 0,        199?, "Sega License", "Road Rash (USA)", 0, 0 )
-	SOFTWARE( robocop3, 0,        199?, "Sega License", "RoboCop 3 (Euro, USA)", 0, 0 )
-	SOFTWARE( roboterm, 0,        199?, "Sega License", "RoboCop versus The Terminator (Euro, USA)", 0, 0 )
-	SOFTWARE( royalstn, 0,        199?, "Sega License", "Royal Stone - Hirakareshi Toki no Tobira (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( ryuukyuu, 0,        199?, "Sega License", "Ryuukyuu (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( sslucifr, 0,        199?, "Sega License", "S.S. Lucifer - Man Overboard! (Euro)", 0, 0 )
-	SOFTWARE( samsho, 0,        199?, "Sega License", "Samurai Shodown (USA)", 0, 0 )
-	SOFTWARE( samspi, 0,        199?, "Sega License", "Samurai Spirits (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( scratchg, 0,        199?, "Sega License", "Scratch Golf (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( sdgundam, 0,        199?, "Sega License", "SD Gundam - Winner's History (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( segagame, 0,        199?, "Sega License", "Sega Game Pack 4 in 1 (Euro)", 0, 0 )
-	SOFTWARE( sensible, 0,        199?, "Sega License", "Sensible Soccer (Euro)", 0, 0 )
-	SOFTWARE( shadam, 0,        199?, "Sega License", "Shadam Crusader - Harukanaru Oukoku (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( shangh2, 0,        199?, "Sega License", "Shanghai II (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( shaqfu, 0,        199?, "Sega License", "Shaq Fu (Euro, USA)", 0, 0 )
-	SOFTWARE( shikinjo, 0,        199?, "Sega License", "Shikinjou (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( shinfrcg, 0,        199?, "Sega License", "Shining Force Gaiden - Ensei, Jashin no Kuni e (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( shinfrgf, 0,        199?, "Sega License", "Shining Force Gaiden - Final Conflict (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( shinfrg2, 0,        199?, "Sega License", "Shining Force Gaiden II - Jashin no Kakusei (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( shinfrc2p1, shinfrc2,  199?, "Sega License", "Shining Force II (Prototype - Apr 27,  1994)", 0, 0 )
-	SOFTWARE( shinfrc2p2, shinfrc2,  199?, "Sega License", "Shining Force II (Prototype - Jul 08,  1994)", 0, 0 )
-	SOFTWARE( shinfrc2p3, shinfrc2,  199?, "Sega License", "Shining Force II (Prototype - Jun 27,  1994)", 0, 0 )
-	SOFTWARE( shinfrc2p4, shinfrc2,  199?, "Sega License", "Shining Force II (Prototype - May 30,  1994)", 0, 0 )
-	SOFTWARE( shinfrc2, 0,        199?, "Sega License", "Shining Force II - The Sword of Hajya (Euro, USA)", 0, 0 )
-	SOFTWARE( shinobi, 0,        199?, "Sega License", "Shinobi (Euro, USA)", 0, 0 )
-	SOFTWARE( shinobi2, 0,        199?, "Sega License", "Shinobi II - The Silent Fury (World)", 0, 0 )
-	SOFTWARE( sidepock, 0,        199?, "Sega License", "Side Pocket (USA)", 0, 0 )
-	SOFTWARE( bartvssm, 0,        199?, "Sega License", "The Simpsons - Bart vs. The Space Mutants (Euro, USA)", 0, 0 )
-	SOFTWARE( bartvswd, 0,        199?, "Sega License", "The Simpsons - Bart vs. The World (Euro, USA)", 0, 0 )
-	SOFTWARE( skweek, 0,        199?, "Sega License", "Skweek (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( slider, 0,        199?, "Sega License", "Slider (Euro, USA)", 0, 0 )
-	SOFTWARE( smurfs, 0,        199?, "Sega License", "The Smurfs (Europe) (En,Fr,De,Es)", 0, 0 )
-	SOFTWARE( solitair, 0,        199?, "Sega License", "Solitaire Funpak (USA)", 0, 0 )
-	SOFTWARE( solitarp, 0,        199?, "Sega License", "Solitaire Poker (Euro, USA)", 0, 0 )
-	SOFTWARE( sonictls, 0,        199?, "Sega License", "Sonic & Tails (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( sonictl2, 0,        199?, "Sega License", "Sonic & Tails 2 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( sonicblsp1, sonicbls,  199?, "Sega License", "Sonic Blast (Prototype 611 - May 31,  1996, 13.49)", 0, 0 )
-	SOFTWARE( sonicblsp2, sonicbls,  199?, "Sega License", "Sonic Blast (Prototype 74 - Jul 17,  1996, 09.11)", 0, 0 )
-	SOFTWARE( sonicblsp3, sonicbls,  199?, "Sega License", "Sonic Blast (Prototype 806 - Aug 06,  1996, 18.37)", 0, 0 )
-	SOFTWARE( sonicblsp4, sonicbls,  199?, "Sega License", "Sonic Blast (Prototype 821 - Aug 22,  1996, 09.38)", 0, 0 )
-	SOFTWARE( sonicblsp5, sonicbls,  199?, "Sega License", "Sonic Blast (Prototype 827 - Aug 28,  1996, 11.13)", 0, 0 )
-	SOFTWARE( sonicblsp6, sonicbls,  199?, "Sega License", "Sonic Blast (Prototype 94 - Sep 02,  1996, 17.47)", 0, 0 )
-	SOFTWARE( sonicbls, 0,        199?, "Sega License", "Sonic Blast (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( sonicc, 0,        199?, "Sega License", "Sonic Chaos (Euro, USA)", 0, 0 )
-	SOFTWARE( sonicdrs, sonicdr,  199?, "Sega License", "Sonic Drift (Sample) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( sonicdr, 0,        199?, "Sega License", "Sonic Drift (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( sonicdr2, 0,        199?, "Sega License", "Sonic Drift 2 (Jpn, USA)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( soniclab, 0,        199?, "Sega License", "Sonic Labyrinth (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( sonicsp,  sonics,  199?, "Sega License", "Sonic Spinball (Prototype 0307 - Mar 07,  1994, 05.24)", 0, 0 )
-	SOFTWARE( sonicspa, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 031094 - Mar 10,  1994, 17.41)", 0, 0 )
-	SOFTWARE( sonicspb, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 031194 - Mar 11,  1994, 12.09)", 0, 0 )
-	SOFTWARE( sonicspc, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 032194 - Mar 21,  1994, 07.12)", 0, 0 )
-	SOFTWARE( sonicspd, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 0328 - Mar 28,  1994, 06.54)", 0, 0 )
-	SOFTWARE( sonicspe, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 0329 - Mar 29,  1994, 07.35)", 0, 0 )
-	SOFTWARE( sonicspf, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 0330 - Mar 30,  1994, 06.54)", 0, 0 )
-	SOFTWARE( sonicspg, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 0405 - Apr 05,  1994, 18.07)", 0, 0 )
-	SOFTWARE( sonicsph, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 0412 - Apr 12,  1994, 07.26)", 0, 0 )
-	SOFTWARE( sonicspi, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 0413 - Apr 13,  1994, 02.54)", 0, 0 )
-	SOFTWARE( sonicspj, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 0415 - Apr 15,  1994, 17.33)", 0, 0 )
-	SOFTWARE( sonicspk, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 0421 - Apr 21,  1994, 05.30)", 0, 0 )
-	SOFTWARE( sonicspl, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 0427 - Apr 27,  1994, 04.51)", 0, 0 )
-	SOFTWARE( sonicspm, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 0429 - Apr 29,  1994, 06.01)", 0, 0 )
-	SOFTWARE( sonicspn, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 0430 - Apr 29,  1994, 21.48)", 0, 0 )
-	SOFTWARE( sonicspo, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 0505 - May 05,  1994, 04.47)", 0, 0 )
-	SOFTWARE( sonicspp, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 0506 - May 06,  1994, 13.04)", 0, 0 )
-	SOFTWARE( sonicspq, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 0525 - May 25,  1994, 13.24)", 0, 0 )
-	SOFTWARE( sonicspr, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 0530 - May 30,  1994, 23.25)", 0, 0 )
-	SOFTWARE( sonicsps, sonics,  199?, "Sega License", "Sonic Spinball (Prototype 503B - May 03,  1994, 19.27)", 0, 0 )
-	SOFTWARE( sonics, sonics,  199?, "Sega License", "Sonic Spinball (Euro, USA)", 0, 0 )
-	SOFTWARE( sonicj, sonic,  199?, "Sega License", "Sonic The Hedgehog (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( sonicp, sonic,  199?, "Sega License", "Sonic The Hedgehog (Proto) (World)", 0, 0 )
-	SOFTWARE( sonic, 0,        199?, "Sega License", "Sonic The Hedgehog (v1.1) (World)", 0, 0 )
-	SOFTWARE( sonictrip, sonictri,  199?, "Sega License", "Sonic The Hedgehog - Triple Trouble (Prototype 0808 - Aug 08,  1994, 18.05)", 0, 0 )
-	SOFTWARE( sonictri, 0,        199?, "Sega License", "Sonic The Hedgehog - Triple Trouble (Euro, USA)", 0, 0 )
-	SOFTWARE( sonic2, 0,        199?, "Sega License", "Sonic The Hedgehog 2 (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( soukoban, 0,        199?, "Sega License", "Soukoban (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( sharr, 0,        199?, "Sega License", "Space Harrier (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( cheesep1, 0,        199?, "Sega License", "Speedy Gonzales Cheese Catastrophe (Prototype - Feb 17,  1995)", 0, 0 )
-	SOFTWARE( cheesep2, cheesp1,  199?, "Sega License", "Speedy Gonzales Cheese Catastrophe (Prototype - Feb 24,  1995)", 0, 0 )
-	SOFTWARE( spidsin6, 0,        199?, "Sega License", "Spider-Man - Return of the Sinister Six (Euro, USA)", 0, 0 )
-	SOFTWARE( spidxmen, 0,        199?, "Sega License", "Spider-Man and the X-Men in Arcade's Revenge (USA)", 0, 0 )
-	SOFTWARE( spidking, 0,        199?, "Sega License", "Spider-Man vs. The Kingpin (Euro, USA)", 0, 0 )
-	SOFTWARE( spirou, 0,        199?, "Sega License", "Spirou (Proto) (Euro)", 0, 0 )
-	SOFTWARE( sportill, 0,        199?, "Sega License", "Sports Illustrated Championship Football & Baseball (Euro, USA)", 0, 0 )
-	SOFTWARE( sportrvp1, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Apr 03,  1995 - 2MEG)", 0, 0 )
-	SOFTWARE( sportrvp2, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Apr 03,  1995 - QTEST)", 0, 0 )
-	SOFTWARE( sportrvp3, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Apr 04,  1995 - 2MEG)", 0, 0 )
-	SOFTWARE( sportrvp4, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Apr 05,  1995 - 2MEG - B)", 0, 0 )
-	SOFTWARE( sportrvp5, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Apr 05,  1995 - 2MEG - C)", 0, 0 )
-	SOFTWARE( sportrvp6, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Apr 05,  1995 - QTEST)", 0, 0 )
-	SOFTWARE( sportrvp7, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Apr 06,  1995 - 2MEG)", 0, 0 )
-	SOFTWARE( sportrvp8, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Apr 07,  1995 - 2MEG)", 0, 0 )
-	SOFTWARE( sportrvp9, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Apr 07,  1995 - QTEST)", 0, 0 )
-	SOFTWARE( sportvp10, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Apr 11,  1995 - 2MEG)", 0, 0 )
-	SOFTWARE( sportvp11, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Apr 12,  1995 - 2MEG)", 0, 0 )
-	SOFTWARE( sportvp12, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Apr 25,  1995 - 1MEG)", 0, 0 )
-	SOFTWARE( sportvp13, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Apr 25,  1995 - QTEST)", 0, 0 )
-	SOFTWARE( sportvp14, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Apr 27,  1995 - 1MEG)", 0, 0 )
-	SOFTWARE( sportvp15, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Apr 28,  1995 - 2MEG)", 0, 0 )
-	SOFTWARE( sportvp16, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 08,  1995)", 0, 0 )
-	SOFTWARE( sportvp17, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 09,  1995)", 0, 0 )
-	SOFTWARE( sportvp18, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 13,  1995)", 0, 0 )
-	SOFTWARE( sportvp19, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 16,  1995 - 1MEG)", 0, 0 )
-	SOFTWARE( sportvp20, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 16,  1995 - 2MEG)", 0, 0 )
-	SOFTWARE( sportvp21, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 17,  1995 - 2MEG)", 0, 0 )
-	SOFTWARE( sportvp22, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 20,  1995 - 2MEG)", 0, 0 )
-	SOFTWARE( sportvp23, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 20,  1995 - QTEST)", 0, 0 )
-	SOFTWARE( sportvp24, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 21,  1995 - 2MEG)", 0, 0 )
-	SOFTWARE( sportvp25, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 23,  1995 - 2MEG)", 0, 0 )
-	SOFTWARE( sportvp26, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 23,  1995 - ALGOTEST)", 0, 0 )
-	SOFTWARE( sportvp27, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 23,  1995 - QTEST)", 0, 0 )
-	SOFTWARE( sportvp28, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 27,  1995 - 2MEG)", 0, 0 )
-	SOFTWARE( sportvp29, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 27,  1995 - ALGOTEST)", 0, 0 )
-	SOFTWARE( sportvp30, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 29,  1995 - 2MEG)", 0, 0 )
-	SOFTWARE( sportvp31, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 29,  1995 - ALGOTEST)", 0, 0 )
-	SOFTWARE( sportvp32, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 29,  1995 - QTEST)", 0, 0 )
-	SOFTWARE( sportvp33, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 30,  1995 - 2MEG - D)", 0, 0 )
-	SOFTWARE( sportvp34, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - Mar 30,  1995 - QTEST)", 0, 0 )
-	SOFTWARE( sportvp35, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - May 02,  1995 - 2MEG)", 0, 0 )
-	SOFTWARE( sportvp36, sporttrv,  199?, "Sega License", "Sports Trivia (Prototype - May 04,  1995 - 1MEG)", 0, 0 )
-	SOFTWARE( sporttrv, 0,        199?, "Sega License", "Sports Trivia (USA)", 0, 0 )
-	SOFTWARE( sprtrvce, 0,        199?, "Sega License", "Sports Trivia - Championship Edition (Euro, USA)", 0, 0 )
-	SOFTWARE( stng, 0,        199?, "Sega License", "Star Trek - The Next Generation - The Advanced Holodeck Tutorial (USA)", 0, 0 )
-	SOFTWARE( strekg, 0,        199?, "Sega License", "Star Trek Generations - Beyond the Nexus (Euro, USA)", 0, 0 )
-	SOFTWARE( starwars, 0,        199?, "Sega License", "Star Wars (Euro)", 0, 0 )
-	SOFTWARE( starwarsu, starwars,  199?, "Sega License", "Star Wars (USA)", 0, 0 )
-	SOFTWARE( stargate, 0,        199?, "Sega License", "Stargate (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( donaldmw, 0,        199?, "<unknown>", "Donald no Magical World (En, Ja) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( doraemon, 0,        199?, "<unknown>", "Doraemon - Waku Waku Pocket Paradise (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( ddragonb, ddragon,  199?, "<unknown>", "Double Dragon (Beta) (Euro, USA)", 0, 0 )
+	SOFTWARE( ddragon, 0,        199?, "<unknown>", "Double Dragon (Euro, USA)", 0, 0 )
+	SOFTWARE( drrobotn, 0,        199?, "<unknown>", "Dr. Robotnik's Mean Bean Machine (Euro, USA)", 0, 0 )
+	SOFTWARE( dragon, 0,        199?, "<unknown>", "Dragon - The Bruce Lee Story (Euro)", 0, 0 )
+	SOFTWARE( dragonu, dragon,  199?, "<unknown>", "Dragon - The Bruce Lee Story (USA)", 0, 0 )
+	SOFTWARE( dragoncr, 0,        199?, "<unknown>", "Dragon Crystal (Euro, USA)", 0, 0 )
+	SOFTWARE( dragoncrj, dragoncr,  199?, "<unknown>", "Dragon Crystal - Tsurani no Meikyuu (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( dropzone, 0,        199?, "<unknown>", "Dropzone (Euro)", 0, 0 )
+	SOFTWARE( dunkkids, 0,        199?, "<unknown>", "Dunk Kids (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( dynaheadj, dynahead,  199?, "<unknown>", "Dynamite Headdy (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( dynaheadp1, dynahead,  199?, "<unknown>", "Dynamite Headdy (Prototype - Jul 01,  1994)", 0, 0 )
+	SOFTWARE( dynaheadp2, dynahead,  199?, "<unknown>", "Dynamite Headdy (Prototype - Jul 05,  1994)", 0, 0 )
+	SOFTWARE( dynaheadp3, dynahead,  199?, "<unknown>", "Dynamite Headdy (Prototype - Jun 15,  1994)", 0, 0 )
+	SOFTWARE( dynahead, 0,        199?, "<unknown>", "Dynamite Headdy (Euro, USA)", 0, 0 )
+	SOFTWARE( ejim, 0       , 19??, "<unknown>", "Earthworm Jim (Euro)", 0, 0 )
+	SOFTWARE( ejimu, ejim,        199?, "<unknown>", "Earthworm Jim (USA)", 0, 0 )
+	SOFTWARE( ecco2, 0,        199?, "<unknown>", "Ecco II - The Tides of Time (Euro, USA)", 0, 0 )
+	SOFTWARE( eccoj, ecco,  199?, "<unknown>", "Ecco the Dolphin (Jpn)", 0, 0 )
+	SOFTWARE( ecco, 0,        199?, "<unknown>", "Ecco the Dolphin (Euro, USA)", 0, 0 )
+	SOFTWARE( eccoa, ecco,    19??, "<unknown>", "Ecco the Dolphin (Alt?)", 0, 0 )
+	SOFTWARE( ecco2j, ecco2,  199?, "<unknown>", "Ecco the Dolphin II (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( ernieeg, 0,        199?, "<unknown>", "Ernie Els Golf (En, Fr, De, Es, It) (Euro)", 0, 0 )
+	SOFTWARE( eternall, 0,        199?, "<unknown>", "Eternal Legend - Eien no Densetsu (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( evander, 0,        199?, "<unknown>", "Evander Holyfield Boxing (Euro, USA)", 0, 0 )
+	SOFTWARE( excdizzy, 0,        199?, "<unknown>", "The Excellent Dizzy Collection (SMS Mode?) (Euro)", 0, 0 )
+	SOFTWARE( excdizzyp, excdizzy,  199?, "<unknown>", "The Excellent Dizzy Collection (Prototype) (SMS Mode)", 0, 0 )
+	SOFTWARE( f15strik, 0,        199?, "<unknown>", "F-15 Strike Eagle (Euro, USA)", 0, 0 )
+	SOFTWARE( f1, 0,        199?, "<unknown>", "F1 (Euro, USA)", 0, 0 )
+	SOFTWARE( faceball, 0,        199?, "<unknown>", "Faceball 2000 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( factoryp, 0,        199?, "<unknown>", "Factory Panic (Euro)", 0, 0 )
+	SOFTWARE( fantdizz, 0,        199?, "<unknown>", "Fantastic Dizzy (En, Fr, De, Es, It) (SMS Mode?) (Euro)", 0, 0 )
+	SOFTWARE( fantzone, 0,        199?, "<unknown>", "Fantasy Zone Gear (Euro, Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( fantzone1, fantzone,  199?, "<unknown>", "Fantasy Zone Gear (Alt) (Jpn, USA)", 0, 0 )
+	SOFTWARE( fatfursp, 0       , 19??, "<unknown>", "Fatal Fury Special (Euro)", 0, 0 )
+	SOFTWARE( fatfurspu, fatfursp,        199?, "<unknown>", "Fatal Fury Special (USA)", 0, 0 )
+	SOFTWARE( fifaj, fifa,  199?, "<unknown>", "FIFA International Soccer (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( fifa, 0,        199?, "<unknown>", "FIFA International Soccer (Euro, USA)", 0, 0 )
+	SOFTWARE( fifa96, 0,        199?, "<unknown>", "FIFA Soccer 96 (En, Fr, De, Es) (Euro, USA)", 0, 0 )
+	SOFTWARE( foreman, 0,        199?, "<unknown>", "Foreman for Real (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( frankt, 0,        199?, "<unknown>", "Frank Thomas Big Hurt Baseball (USA)", 0, 0 )
+	SOFTWARE( fray, 0,        199?, "<unknown>", "Fray - Shugyou Hen (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( fredcoupj, fredcoup,  199?, "<unknown>", "Fred Couples' Golf (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( fredcoup, 0,        199?, "<unknown>", "Fred Couples' Golf (USA)", 0, 0 )
+	SOFTWARE( frogger, 0,        199?, "<unknown>", "Frogger (Proto) (USA)", 0, 0 )
+	SOFTWARE( slamdunk, 0,        199?, "<unknown>", "From TV Animation - Slam Dunk - Shouri e no Starting 5 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( glocairj, glocair,  199?, "<unknown>", "G-LOC Air Battle (v1.1) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( glocairj1, glocair,  199?, "<unknown>", "G-LOC Air Battle (Jpn)", 0, 0 )
+	SOFTWARE( glocair, 0,        199?, "<unknown>", "G-LOC Air Battle (Euro, USA)", 0, 0 )
+	SOFTWARE( galaga91, 0,        199?, "<unknown>", "Galaga '91 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( galaga2, 0,        199?, "<unknown>", "Galaga 2 (Euro)", 0, 0 )
+	SOFTWARE( gamble, 0,        199?, "<unknown>", "Gamble Panic (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( gambler, 0,        199?, "<unknown>", "Gambler Jikochuushinha (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( ganbare, 0,        199?, "<unknown>", "Ganbare Gorby! (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( garfield, 0,        199?, "<unknown>", "Garfield - Caught in the Act (Euro, USA)", 0, 0 )
+	SOFTWARE( garou, 0,        199?, "<unknown>", "Garou Densetsu Special (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( gearstad, 0,        199?, "<unknown>", "Gear Stadium (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( gearstah, 0,        199?, "<unknown>", "Gear Stadium Heiseiban (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( gearwork, 0,        199?, "<unknown>", "Gear Works (USA)", 0, 0 )
+	SOFTWARE( georgef, 0,        199?, "<unknown>", "George Foreman's KO Boxing (Euro, USA)", 0, 0 )
+	SOFTWARE( ggaleste, 0,        199?, "<unknown>", "GG Aleste (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( ggdora, 0,        199?, "<unknown>", "GG Doraemon - Noranosuke no Yabou (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( ggport, 0,        199?, "<unknown>", "GG Portrait - Pai Chen (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( ggport1, 0,        199?, "<unknown>", "GG Portrait - Yuuki Akira (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( ggshinob, 0,        199?, "<unknown>", "The GG Shinobi (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( godzilla, 0,        199?, "<unknown>", "Godzilla - Kaijuu Daishingeki (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( gpriderj, gprider,  199?, "<unknown>", "GP Rider (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( gpriderp, gprider,  199?, "<unknown>", "GP Rider (Prototype - Jan 04,  1994)", 0, 0 )
+	SOFTWARE( gprider, 0,        199?, "<unknown>", "GP Rider (Euro, USA)", 0, 0 )
+	SOFTWARE( greendog, 0,        199?, "<unknown>", "Greendog (Euro, USA)", 0, 0 )
+	SOFTWARE( griffin, 0,        199?, "<unknown>", "Griffin (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( gunstar, 0,        199?, "<unknown>", "Gunstar Heroes (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( halleywj, halleyw,  199?, "<unknown>", "Halley Wars (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( halleyw, 0,        199?, "<unknown>", "Halley Wars (Euro, USA)", 0, 0 )
+	SOFTWARE( headbust, 0,        199?, "<unknown>", "Head Buster (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( heavywc, 0,        199?, "<unknown>", "Heavy Weight Champ (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( homea, 0,        199?, "<unknown>", "Home Alone (Euro, USA)", 0, 0 )
+	SOFTWARE( honoo, 0,        199?, "<unknown>", "Honoo no Toukyuuji - Dodge Danpei (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( hook, 0,        199?, "<unknown>", "Hook (Euro, USA)", 0, 0 )
+	SOFTWARE( hurric, 0,        199?, "<unknown>", "Hurricanes (Euro)", 0, 0 )
+	SOFTWARE( hyokkori, 0,        199?, "<unknown>", "Hyokkori Hyoutan Jima - Hyoutan Jima no Daikoukai (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( hypery92, 0,        199?, "<unknown>", "Hyper Pro Yakyuu '92 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( ichirgg, 0,        199?, "<unknown>", "Ichidant~R GG (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( wakevamp, 0,        199?, "<unknown>", "In the Wake of Vampire (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( incred, 0,        199?, "<unknown>", "The Incredible Crash Dummies (Euro, USA)", 0, 0 )
+	SOFTWARE( incrhulk, 0,        199?, "<unknown>", "The Incredible Hulk (Euro, USA)", 0, 0 )
+	SOFTWARE( indycrus1, indycrus,  199?, "<unknown>", "Indiana Jones and the Last Crusade (Alt) (USA)", 0, 0 )
+	SOFTWARE( indycrus, 0,        199?, "<unknown>", "Indiana Jones and the Last Crusade (Euro, USA)", 0, 0 )
+	SOFTWARE( ironman1, ironman,  199?, "<unknown>", "Iron Man X-O Manowar in Heavy Metal (Alt) (USA)", 0, 0 )
+	SOFTWARE( ironman, 0,        199?, "<unknown>", "Iron Man X-O Manowar in Heavy Metal (Euro, USA)", 0, 0 )
+	SOFTWARE( itchy, 0,        199?, "<unknown>", "The Itchy & Scratchy Game (Euro, USA)", 0, 0 )
+	SOFTWARE( jleagu94, 0,        199?, "<unknown>", "J.League GG Pro Striker '94 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( jleague, 0,        199?, "<unknown>", "J.League Soccer - Dream Eleven (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( jb007, 0,        199?, "<unknown>", "James Bond 007 - The Duel (Euro)", 0, 0 )
+	SOFTWARE( jpond3, 0,        199?, "<unknown>", "James Pond 3 - Operation Starfi5h (Euro)", 0, 0 )
+	SOFTWARE( robocod, 0,        199?, "<unknown>", "James Pond II - Codename RoboCod (USA)", 0, 0 )
+	SOFTWARE( jangpun2, 0,        199?, "<unknown>", "Jang Pung II (SMS Mode) (Korea)", 0, 0 )
+	SOFTWARE( jeopardy, 0,        199?, "<unknown>", "Jeopardy! (USA)", 0, 0 )
+	SOFTWARE( jeopards, 0,        199?, "<unknown>", "Jeopardy! - Sports Edition (Euro, USA)", 0, 0 )
+	SOFTWARE( joemontj, joemont,  199?, "<unknown>", "Joe Montana's Football (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( joemont, 0,        199?, "<unknown>", "Joe Montana's Football (Euro, USA)", 0, 0 )
+	SOFTWARE( striderr, 0,        199?, "<unknown>", "Journey from Darkness - Strider Returns (Euro, USA)", 0, 0 )
+	SOFTWARE( judged, 0,        199?, "<unknown>", "Judge Dredd (Euro, USA)", 0, 0 )
+	SOFTWARE( junction, 0,        199?, "<unknown>", "Junction (Euro, USA)", 0, 0 )
+	SOFTWARE( jungle, 0,        199?, "<unknown>", "The Jungle Book (Euro)", 0, 0 )
+	SOFTWARE( jungleu, 0,        199?, "<unknown>", "The Jungle Book (USA)", 0, 0 )
+	SOFTWARE( jurassicj, jurassic,  199?, "<unknown>", "Jurassic Park (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( jurassic, 0,        199?, "<unknown>", "Jurassic Park (Euro, USA)", 0, 0 )
+	SOFTWARE( kaitou, 0,        199?, "<unknown>", "Kaitou Saint Tale (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( kawasaki, 0,        199?, "<unknown>", "Kawasaki Superbike Challenge (Euro, USA)", 0, 0 )
+	SOFTWARE( kenyuu, 0,        199?, "<unknown>", "Kenyuu Densetsu Yaiba (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( kickrush, 0,        199?, "<unknown>", "Kick & Rush (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( kineticc, 0,        199?, "<unknown>", "Kinetic Connection (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( kishin, 0,        199?, "<unknown>", "Kishin Douji Zenki (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( klax, 0,        199?, "<unknown>", "Klax (Euro, USA)", 0, 0 )
+	SOFTWARE( krusty, 0,        199?, "<unknown>", "Krusty's Fun House (Euro, USA)", 0, 0 )
+	SOFTWARE( kunichan, 0,        199?, "<unknown>", "Kuni-chan no Game Tengoku (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( kunichn2, 0,        199?, "<unknown>", "Kuni-chan no Game Tengoku Part 2 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( landill, 0,        199?, "<unknown>", "Land of Illusion Starring Mickey Mouse (Euro, USA)", 0, 0 )
+	SOFTWARE( lastact, 0,        199?, "<unknown>", "Last Action Hero (USA)", 0, 0 )
+	SOFTWARE( legndillp, legndill,  199?, "<unknown>", "Legend of Illusion Starring Mickey Mouse (Prototype - Oct 11,  1994)", 0, 0 )
+	SOFTWARE( legndillp1, legndill,  199?, "<unknown>", "Legend of Illusion Starring Mickey Mouse (Prototype - Oct 14,  1994)", 0, 0 )
+	SOFTWARE( legndillp2, legndill,  199?, "<unknown>", "Legend of Illusion Starring Mickey Mouse (Prototype - Oct 17,  1994)", 0, 0 )
+	SOFTWARE( legndillp3, legndill,  199?, "<unknown>", "Legend of Illusion Starring Mickey Mouse (Prototype - Sep 22,  1994)", 0, 0 )
+	SOFTWARE( legndillp4, legndill,  199?, "<unknown>", "Legend of Illusion Starring Mickey Mouse (Prototype - Sep 30,  1994 - SEL)", 0, 0 )
+	SOFTWARE( legndillp5, legndill,  199?, "<unknown>", "Legend of Illusion Starring Mickey Mouse (Prototype - Sep 30,  1994)", 0, 0 )
+	SOFTWARE( legndill, 0,        199?, "<unknown>", "Legend of Illusion Starring Mickey Mouse (Euro, USA)", 0, 0 )
+	SOFTWARE( lemmingsb, lemmings,  199?, "<unknown>", "Lemmings (Beta) (World)", 0, 0 )
+	SOFTWARE( lemmings, 0,        199?, "<unknown>", "Lemmings (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( lionkingt, lionking,  199?, "<unknown>", "The Lion King (Trainer?) (Euro)", 0, 0 )
+	SOFTWARE( lionking, 0,        199?, "<unknown>", "The Lion King (Euro)", 0, 0 )
+	SOFTWARE( lionkingp, lionking,  199?, "<unknown>", "The Lion King (Prototype - Aug 03,  1994)", 0, 0 )
+	SOFTWARE( lionkingp1, lionking,  199?, "<unknown>", "The Lion King (Prototype - Aug 11,  1994)", 0, 0 )
+	SOFTWARE( lionkingp2, lionking,  199?, "<unknown>", "The Lion King (Prototype - Aug 12,  1994)", 0, 0 )
+	SOFTWARE( lionkingp3, lionking,  199?, "<unknown>", "The Lion King (Prototype - Aug 13,  1994)", 0, 0 )
+	SOFTWARE( lionkingp4, lionking,  199?, "<unknown>", "The Lion King (Prototype - Aug 14,  1994)", 0, 0 )
+	SOFTWARE( lionkingp5, lionking,  199?, "<unknown>", "The Lion King (Prototype - Aug 15,  1994)", 0, 0 )
+	SOFTWARE( lionkingp6, lionking,  199?, "<unknown>", "The Lion King (Prototype - Aug 16,  1994)", 0, 0 )
+	SOFTWARE( lionkingp7, lionking,  199?, "<unknown>", "The Lion King (Prototype - Aug 17,  1994 - 2)", 0, 0 )
+	SOFTWARE( lionkingp8, lionking,  199?, "<unknown>", "The Lion King (Prototype - Aug 17,  1994)", 0, 0 )
+	SOFTWARE( lionkingp9, lionking,  199?, "<unknown>", "The Lion King (Prototype - Aug 20,  1994)", 0, 0 )
+	SOFTWARE( lionkingu, lionking,  199?, "<unknown>", "The Lion King (Trainer?) (USA)", 0, 0 )
+	SOFTWARE( lionkingut, lionking,  199?, "<unknown>", "The Lion King (USA)", 0, 0 )
+	SOFTWARE( lostwrld, 0,        199?, "<unknown>", "The Lost World - Jurassic Park (USA)", 0, 0 )
+	SOFTWARE( luckydim, 0,        199?, "<unknown>", "The Lucky Dime Caper (Euro, USA)", 0, 0 )
+	SOFTWARE( lunar, 0,        199?, "<unknown>", "Lunar - Sanposuru Gakuen (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( madden95, 0,        199?, "<unknown>", "Madden NFL '95 (USA)", 0, 0 )
+	SOFTWARE( madden96, 0,        199?, "<unknown>", "Madden NFL '96 (USA)", 0, 0 )
+	SOFTWARE( madden96a, 0,        199?, "<unknown>", "Madden NFL '96 (Euro, USA)", 0, 0 )
+	SOFTWARE( madoumna, 0,        199?, "<unknown>", "Madou Monogatari A - Dokidoki Vacation (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( madoumon, 0,        199?, "<unknown>", "Madou Monogatari I - 3-Tsu no Madoukyuu (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( madoumn2, 0,        199?, "<unknown>", "Madou Monogatari II - Arle 16-Sai (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( madoumn3, 0,        199?, "<unknown>", "Madou Monogatari III - Kyuukyoku Joou-sama (v1.1) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( madoumn3a, madoumn3,  199?, "<unknown>", "Madou Monogatari III - Kyuukyoku Joou-sama (Jpn)", 0, 0 )
+	SOFTWARE( magicray, 0,        199?, "<unknown>", "Magic Knight Rayearth (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( magicry2, 0,        199?, "<unknown>", "Magic Knight Rayearth 2 - Making of Magic Knight (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( magiclpp, 0,        199?, "<unknown>", "Magical Puzzle Popils (En, Ja) (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( magical, 0,        199?, "<unknown>", "Magical Taruruuto-kun (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( majors, 0,        199?, "<unknown>", "The Majors Pro Baseball (USA)", 0, 0 )
+	SOFTWARE( mappy, 0,        199?, "<unknown>", "Mappy (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( marble, 0,        199?, "<unknown>", "Marble Madness (Euro, USA)", 0, 0 )
+	SOFTWARE( marko, 0,        199?, "<unknown>", "Marko's Magic Football (En, Fr, De, Es) (Euro)", 0, 0 )
+	SOFTWARE( megaman, 0,        199?, "<unknown>", "Mega Man (Euro, USA)", 0, 0 )
+	SOFTWARE( lastbibl, 0,        199?, "<unknown>", "Megami Tensei Gaiden - Last Bible (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( lastbibs, 0,        199?, "<unknown>", "Megami Tensei Gaiden - Last Bible S (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( mickmack, 0,        199?, "<unknown>", "Mick & Mack as the Global Gladiators (Euro, USA)", 0, 0 )
+	SOFTWARE( legndillj, legndill,  199?, "<unknown>", "Mickey Mouse Densetsu no Oukoku - Legend of Illusion (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( castlillj, castlill,  199?, "<unknown>", "Mickey Mouse no Castle Illusion (SMS Mode?) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( mickeymc, 0,        199?, "<unknown>", "Mickey Mouse no Mahou no Crystal (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( mickeyuc, 0,        199?, "<unknown>", "Mickey's Ultimate Challenge (Euro, USA)", 0, 0 )
+	SOFTWARE( micromac, 0,        199?, "<unknown>", "Micro Machines (Euro)", 0, 0 )
+	SOFTWARE( micromc2, 0,        199?, "<unknown>", "Micro Machines 2 - Turbo Tournament (Euro)", 0, 0 )
+	SOFTWARE( mmprp, mmpr,  199?, "<unknown>", "Mighty Morphin Power Rangers (Prototype - Jul 16,  1994)", 0, 0 )
+	SOFTWARE( mmpr, 0,        199?, "<unknown>", "Mighty Morphin Power Rangers (Euro, USA)", 0, 0 )
+	SOFTWARE( mmprtmp, mmprtm,  199?, "<unknown>", "Mighty Morphin Power Rangers - The Movie (Prototype - May 30,  1995)", 0, 0 )
+	SOFTWARE( mmprtm, 0,        199?, "<unknown>", "Mighty Morphin Power Rangers - The Movie (Euro, USA)", 0, 0 )
+	SOFTWARE( mlbpab, 0,        199?, "<unknown>", "MLBPA Baseball (USA)", 0, 0 )
+	SOFTWARE( moldoran, 0,        199?, "<unknown>", "Moldorian - Hikari to Yami no Sister (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( monstert, 0,        199?, "<unknown>", "Monster Truck Wars (Euro, USA)", 0, 0 )
+	SOFTWARE( monstwld2, 0,        199?, "<unknown>", "Monster World II - Dragon no Wana (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( mkj,   mk,  199?, "<unknown>", "Mortal Kombat (v3.3) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( mk, 0,        199?, "<unknown>", "Mortal Kombat (v2.6) (Euro, USA)", 0, 0 )
+	SOFTWARE( mk3, 0,        199?, "<unknown>", "Mortal Kombat 3 (Euro)", 0, 0 )
+	SOFTWARE( mk2, 0,        199?, "<unknown>", "Mortal Kombat II (World)", 0, 0 )
+	SOFTWARE( mspacman, 0,        199?, "<unknown>", "Ms. Pac-Man (USA)", 0, 0 )
+	SOFTWARE( nazpuyo, 0,        199?, "<unknown>", "Nazo Puyo (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( nazpuyo2, 0,        199?, "<unknown>", "Nazo Puyo 2 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( nazpyoar1, nazpyoar,  199?, "<unknown>", "Nazo Puyo Arle no Roux (Development Edition) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( nazpyoar, 0,        199?, "<unknown>", "Nazo Puyo Arle no Roux (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( nbaactn, 0,        199?, "<unknown>", "NBA Action (USA)", 0, 0 )
+	SOFTWARE( nbaactnp1, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Final A - Feb 28,  1994)", 0, 0 )
+	SOFTWARE( nbaactnp2, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Final B - Mar 01,  1994)", 0, 0 )
+	SOFTWARE( nbaactnp3, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Final C - Mar 02,  1994)", 0, 0 )
+	SOFTWARE( nbaactnp4, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Final D - Mar 03,  1994)", 0, 0 )
+	SOFTWARE( nbaactnp5, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Final E - Mar 04,  1994)", 0, 0 )
+	SOFTWARE( nbaactnp6, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Final F - Mar 04,  1994)", 0, 0 )
+	SOFTWARE( nbaactnp7, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Final G - Mar 05,  1994)", 0, 0 )
+	SOFTWARE( nbaactnp8, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Final H - Mar 08,  1994)", 0, 0 )
+	SOFTWARE( nbaactnp9, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Dec 01,  1993)", 0, 0 )
+	SOFTWARE( nbaactp10, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Feb 02,  1994)", 0, 0 )
+	SOFTWARE( nbaactp11, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Feb 03,  1994)", 0, 0 )
+	SOFTWARE( nbaactp12, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Feb 06,  1994)", 0, 0 )
+	SOFTWARE( nbaactp13, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Feb 08,  1994)", 0, 0 )
+	SOFTWARE( nbaactp14, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Feb 12,  1994)", 0, 0 )
+	SOFTWARE( nbaactp15, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Feb 15,  1994)", 0, 0 )
+	SOFTWARE( nbaactp16, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Feb 17,  1994)", 0, 0 )
+	SOFTWARE( nbaactp17, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Feb 20,  1994)", 0, 0 )
+	SOFTWARE( nbaactp18, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Feb 21,  1994)", 0, 0 )
+	SOFTWARE( nbaactp19, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Feb 24,  1994)", 0, 0 )
+	SOFTWARE( nbaactp20, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Feb 25,  1994 - B)", 0, 0 )
+	SOFTWARE( nbaactp21, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Feb 25,  1994)", 0, 0 )
+	SOFTWARE( nbaactp22, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Feb 26,  1994)", 0, 0 )
+	SOFTWARE( nbaactp23, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Feb 27,  1994)", 0, 0 )
+	SOFTWARE( nbaactp24, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Feb 28,  1994)", 0, 0 )
+	SOFTWARE( nbaactp25, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Jan 04,  1994)", 0, 0 )
+	SOFTWARE( nbaactp26, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Jan 06,  1994)", 0, 0 )
+	SOFTWARE( nbaactp27, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Jan 10,  1994)", 0, 0 )
+	SOFTWARE( nbaactp28, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Jan 24,  1994)", 0, 0 )
+	SOFTWARE( nbaactp29, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Jan 29,  1994)", 0, 0 )
+	SOFTWARE( nbaactp30, nbaactn,  199?, "<unknown>", "NBA Action Starring David Robinson (Prototype - Nov 28,  1993)", 0, 0 )
+	SOFTWARE( nbajamj, nbajam,  199?, "<unknown>", "NBA Jam (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( nbajam, 0,        199?, "<unknown>", "NBA Jam (v1.1) (USA)", 0, 0 )
+	SOFTWARE( nbajam1, nbajam,  199?, "<unknown>", "NBA Jam (Euro, USA)", 0, 0 )
+	SOFTWARE( nbajamte, 0,        199?, "<unknown>", "NBA Jam Tournament Edition (Euro, USA)", 0, 0 )
+	SOFTWARE( nekodais, 0,        199?, "<unknown>", "Neko Daisuki! (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( nfl95pa, nfl95,  199?, "<unknown>", "NFL '95 (Prototype - Aug 08,  1994)", 0, 0 )
+	SOFTWARE( nfl95pb, nfl95,  199?, "<unknown>", "NFL '95 (Prototype - Aug 25,  1994 - A)", 0, 0 )
+	SOFTWARE( nfl95pc, nfl95,  199?, "<unknown>", "NFL '95 (Prototype - Aug 25,  1994 - B)", 0, 0 )
+	SOFTWARE( nfl95pd, nfl95,  199?, "<unknown>", "NFL '95 (Prototype - Aug 25,  1994)", 0, 0 )
+	SOFTWARE( nfl95pe, nfl95,  199?, "<unknown>", "NFL '95 (Prototype - Aug 26,  1994)", 0, 0 )
+	SOFTWARE( nfl95pf, nfl95,  199?, "<unknown>", "NFL '95 (Prototype - Aug 31,  1994)", 0, 0 )
+	SOFTWARE( nfl95pg, nfl95,  199?, "<unknown>", "NFL '95 (Prototype - Sep 02,  1994)", 0, 0 )
+	SOFTWARE( nfl95ph, nfl95,  199?, "<unknown>", "NFL '95 (Prototype - Sep 08,  1994)", 0, 0 )
+	SOFTWARE( nfl95pi, nfl95,  199?, "<unknown>", "NFL '95 (Prototype - Sep 10,  1994)", 0, 0 )
+	SOFTWARE( nfl95pj, nfl95,  199?, "<unknown>", "NFL '95 (Prototype - Sep 11,  1994 - B)", 0, 0 )
+	SOFTWARE( nfl95pk, nfl95,  199?, "<unknown>", "NFL '95 (Prototype - Sep 11,  1994 - C)", 0, 0 )
+	SOFTWARE( nfl95pl, nfl95,  199?, "<unknown>", "NFL '95 (Prototype - Sep 12,  1994)", 0, 0 )
+	SOFTWARE( nfl95pm, nfl95,  199?, "<unknown>", "NFL '95 (Prototype - Sep 14,  1994 - F)", 0, 0 )
+	SOFTWARE( nfl95pn, nfl95,  199?, "<unknown>", "NFL '95 (Prototype - Sep 14,  1994)", 0, 0 )
+	SOFTWARE( nfl95, 0,        199?, "<unknown>", "NFL '95 (USA)", 0, 0 )
+	SOFTWARE( nflqrt96, 0,        199?, "<unknown>", "NFL Quarterback Club '96 (Euro, USA)", 0, 0 )
+	SOFTWARE( nflquart, 0,        199?, "<unknown>", "NFL Quarterback Club (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( nhlallstpa, nhlallst,  199?, "<unknown>", "NHL All-Star Hockey (Prototype - Dec 15,  1994)", 0, 0 )
+	SOFTWARE( nhlallstpb, nhlallst,  199?, "<unknown>", "NHL All-Star Hockey (Prototype - Dec 22,  1994)", 0, 0 )
+	SOFTWARE( nhlallstpc, nhlallst,  199?, "<unknown>", "NHL All-Star Hockey (Prototype - Dec 29,  1994)", 0, 0 )
+	SOFTWARE( nhlallstpd, nhlallst,  199?, "<unknown>", "NHL All-Star Hockey (Prototype - Dec 31,  1994)", 0, 0 )
+	SOFTWARE( nhlallstpe, nhlallst,  199?, "<unknown>", "NHL All-Star Hockey (Prototype - Jan 02,  1995)", 0, 0 )
+	SOFTWARE( nhlallstpf, nhlallst,  199?, "<unknown>", "NHL All-Star Hockey (Prototype - Jan 03,  1995)", 0, 0 )
+	SOFTWARE( nhlallstpg, nhlallst,  199?, "<unknown>", "NHL All-Star Hockey (Prototype - Jan 07,  1995)", 0, 0 )
+	SOFTWARE( nhlallstph, nhlallst,  199?, "<unknown>", "NHL All-Star Hockey (Prototype - Jan 11,  1995)", 0, 0 )
+	SOFTWARE( nhlallstpi, nhlallst,  199?, "<unknown>", "NHL All-Star Hockey (Prototype - Jan 13,  1995)", 0, 0 )
+	SOFTWARE( nhlallstpj, nhlallst,  199?, "<unknown>", "NHL All-Star Hockey (Prototype - Jan 16,  1995)", 0, 0 )
+	SOFTWARE( nhlallstpk, nhlallst,  199?, "<unknown>", "NHL All-Star Hockey (Prototype - Jan 20 ,1995)", 0, 0 )
+	SOFTWARE( nhlallstpl, nhlallst,  199?, "<unknown>", "NHL All-Star Hockey (Prototype - Jan 21,  1995)", 0, 0 )
+	SOFTWARE( nhlallstpm, nhlallst,  199?, "<unknown>", "NHL All-Star Hockey (Prototype - Jan 24,  1995 - A)", 0, 0 )
+	SOFTWARE( nhlallstpn, nhlallst,  199?, "<unknown>", "NHL All-Star Hockey (Prototype - Jan 24,  1995 - B)", 0, 0 )
+	SOFTWARE( nhlallstpo, nhlallst,  199?, "<unknown>", "NHL All-Star Hockey (Prototype - Jan 24,  1995 - C)", 0, 0 )
+	SOFTWARE( nhlallstpp, nhlallst,  199?, "<unknown>", "NHL All-Star Hockey (Prototype - Jan 24,  1995)", 0, 0 )
+	SOFTWARE( nhlallstpq, nhlallst,  199?, "<unknown>", "NHL All-Star Hockey (Prototype - Jan 25,  1995)", 0, 0 )
+	SOFTWARE( nhlallst, 0,        199?, "<unknown>", "NHL All-Star Hockey (USA)", 0, 0 )
+	SOFTWARE( nhlhocky, 0,        199?, "<unknown>", "NHL Hockey (Euro, USA)", 0, 0 )
+	SOFTWARE( ninjagj, ninjag,  199?, "<unknown>", "Ninja Gaiden (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( ninjag, 0,        199?, "<unknown>", "Ninja Gaiden (Euro, USA)", 0, 0 )
+	SOFTWARE( ninku, 0,        199?, "<unknown>", "Ninku (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( ninku2, 0,        199?, "<unknown>", "Ninku 2 - Tenkuuryuu e no Michi (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( ninkug, 0,        199?, "<unknown>", "Ninku Gaiden - Hiroyuki Daikatsugeki (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( nomohide, 0,        199?, "<unknown>", "Nomo Hideo no World Series Baseball (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( olympi, 0,        199?, "<unknown>", "Olympic Gold (En, Fr, De, Es, It, Nl, Pt, Sv) (v1.1) (SMS Mode?) (Euro)", 0, 0 )
+	SOFTWARE( olympiju, olympi,  199?, "<unknown>", "Olympic Gold (En, Fr, De, Es, It, Nl, Pt, Sv) (SMS Mode?) (Jpn, USA)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( ottifant, 0,        199?, "<unknown>", "The Ottifants (En, Fr, De, Es, It) (Euro)", 0, 0 )
+	SOFTWARE( outrunj, outrun,  199?, "<unknown>", "Out Run (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( outruneu, 0,        199?, "<unknown>", "Out Run Europa (SMS Mode?) (Euro, USA)", 0, 0 )
+	SOFTWARE( outrun, 0,        199?, "<unknown>", "OutRun (Alt) (Jpn, USA)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( outruna, outrun, 19??, "<unknown>", "Out Run (Alt 2?)", 0, 0 )
+	SOFTWARE( pacattck, 0,        199?, "<unknown>", "Pac-Attack (Euro, USA)", 0, 0 )
+	SOFTWARE( pacintim, 0,        199?, "<unknown>", "Pac-In-Time (Unknown) (Proto)", 0, 0 )
+	SOFTWARE( pacman, 0,        199?, "<unknown>", "Pac-Man (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( panzer, 0,        199?, "<unknown>", "Panzer Dragoon Mini (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( paperboy, 0,        199?, "<unknown>", "Paperboy (Euro, USA)", 0, 0 )
+	SOFTWARE( paperby2, 0,        199?, "<unknown>", "Paperboy II (Euro, USA)", 0, 0 )
+	SOFTWARE( pengoj, 0,        199?, "<unknown>", "Pengo (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( pengo, pengo,  199?, "<unknown>", "Pengo (Euro, USA)", 0, 0 )
+	SOFTWARE( petclub, 0,        199?, "<unknown>", "Pet Club Inu Daisuki! (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( psampras, 0,        199?, "<unknown>", "Pete Sampras Tennis (Euro)", 0, 0 )
+	SOFTWARE( pga96, 0,        199?, "<unknown>", "PGA Tour 96 (Euro, USA)", 0, 0 )
+	SOFTWARE( pgatour, 0,        199?, "<unknown>", "PGA Tour Golf (v1.1) (USA)", 0, 0 )
+	SOFTWARE( pgatoura, pgatour,  199?, "<unknown>", "PGA Tour Golf (Euro, USA)", 0, 0 )
+	SOFTWARE( pgatour2, 0,        199?, "<unknown>", "PGA Tour Golf II (Euro, USA)", 0, 0 )
+	SOFTWARE( pstaradv, 0,        199?, "<unknown>", "Phantasy Star Adventure (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( pstargai, 0,        199?, "<unknown>", "Phantasy Star Gaiden (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( phantom, 0,        199?, "<unknown>", "Phantom 2040 (Euro, USA)", 0, 0 )
+	SOFTWARE( pinballd, 0,        199?, "<unknown>", "Pinball Dreams (USA)", 0, 0 )
+	SOFTWARE( pocketj, 0,        199?, "<unknown>", "Pocket Jansou (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( pokerf, 0,        199?, "<unknown>", "Poker Faced Paul's Blackjack (USA)", 0, 0 )
+	SOFTWARE( pokerf1, 0,        199?, "<unknown>", "Poker Faced Paul's Gin (USA)", 0, 0 )
+	SOFTWARE( pokerf2, 0,        199?, "<unknown>", "Poker Faced Paul's Poker (USA)", 0, 0 )
+	SOFTWARE( pokerf3, 0,        199?, "<unknown>", "Poker Faced Paul's Solitaire (USA)", 0, 0 )
+	SOFTWARE( popbreak, 0,        199?, "<unknown>", "Pop Breaker (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( popeye, 0,        199?, "<unknown>", "Popeye no Beach Volleyball (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( pstrike2, 0,        199?, "<unknown>", "Power Strike II (Euro, Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( predator, 0,        199?, "<unknown>", "Predator 2 (SMS Mode?) (Euro, USA)", 0, 0 )
+	SOFTWARE( primal, 0,        199?, "<unknown>", "Primal Rage (Euro, USA)", 0, 0 )
+	SOFTWARE( ppersiab, ppersia,  199?, "<unknown>", "Prince of Persia (Beta) (SMS Mode?) (Euro, USA)", 0, 0 )
+	SOFTWARE( ppersia, 0,        199?, "<unknown>", "Prince of Persia (SMS Mode?) (Euro, USA)", 0, 0 )
+	SOFTWARE( proyak91, 0,        199?, "<unknown>", "The Pro Yakyuu '91 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( proyak94, 0,        199?, "<unknown>", "Pro Yakyuu GG League '94 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( proyakgg, 0,        199?, "<unknown>", "Pro Yakyuu GG League (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( psychicwj, psychicw,  199?, "<unknown>", "Psychic World (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( psychicw, 0,        199?, "<unknown>", "Psychic World (v1.1) (Euro, USA)", 0, 0 )
+	SOFTWARE( puttputtj, puttputt,  199?, "<unknown>", "Putt & Putter (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( puttputt, 0,        199?, "<unknown>", "Putt & Putter (Euro, USA)", 0, 0 )
+	SOFTWARE( puyopuyo, 0,        199?, "<unknown>", "Puyo Puyo (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( puyopyo2, 0,        199?, "<unknown>", "Puyo Puyo 2 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( tantor, 0,        199?, "<unknown>", "Puzzle and Action Tanto-R (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( pbobble, 0,        199?, "<unknown>", "Puzzle Bobble (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( questf, 0,        199?, "<unknown>", "Quest for the Shaven Yak Starring Ren Hoek & Stimpy (Euro, USA)", 0, 0 )
+	SOFTWARE( quizgear, 0,        199?, "<unknown>", "The Quiz Gear Fight!! (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( rbibas, 0,        199?, "<unknown>", "R.B.I. Baseball '94 (USA)", 0, 0 )
+	SOFTWARE( rcgp, 0,        199?, "<unknown>", "R.C. Grand Prix (SMS Mode?) (Euro, USA)", 0, 0 )
+	SOFTWARE( rastansg, 0,        199?, "<unknown>", "Rastan Saga (SMS Mode?) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( revenged, 0,        199?, "<unknown>", "Revenge of Drancon (USA)", 0, 0 )
+	SOFTWARE( riddickj, riddick,  199?, "<unknown>", "Riddick Bowe Boxing (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( riddick, 0,        199?, "<unknown>", "Riddick Bowe Boxing (USA)", 0, 0 )
+	SOFTWARE( riserobo, 0,        199?, "<unknown>", "Rise of the Robots (Euro, USA)", 0, 0 )
+	SOFTWARE( ristarp, ristar,  199?, "<unknown>", "Ristar (Prototype - Nov 01,  1994)", 0, 0 )
+	SOFTWARE( ristarp1, ristar,  199?, "<unknown>", "Ristar (Prototype - Nov 02,  1994)", 0, 0 )
+	SOFTWARE( ristarp2, ristar,  199?, "<unknown>", "Ristar (Prototype - Oct 19,  1994)", 0, 0 )
+	SOFTWARE( ristarp3, ristar,  199?, "<unknown>", "Ristar (Prototype - Oct 26,  1994)", 0, 0 )
+	SOFTWARE( ristarp4, ristar,  199?, "<unknown>", "Ristar (Prototype - Sep 09,  1994)", 0, 0 )
+	SOFTWARE( ristar, 0,        199?, "<unknown>", "Ristar - The Shooting Star (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( roadrash, 0,        199?, "<unknown>", "Road Rash (USA)", 0, 0 )
+	SOFTWARE( robocop3, 0,        199?, "<unknown>", "RoboCop 3 (Euro, USA)", 0, 0 )
+	SOFTWARE( roboterm, 0,        199?, "<unknown>", "RoboCop versus The Terminator (Euro, USA)", 0, 0 )
+	SOFTWARE( royalstn, 0,        199?, "<unknown>", "Royal Stone - Hirakareshi Toki no Tobira (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( ryuukyuu, 0,        199?, "<unknown>", "Ryuukyuu (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( sslucifr, 0,        199?, "<unknown>", "S.S. Lucifer - Man Overboard! (Euro)", 0, 0 )
+	SOFTWARE( samsho, 0,        199?, "<unknown>", "Samurai Shodown (USA)", 0, 0 )
+	SOFTWARE( samspi, 0,        199?, "<unknown>", "Samurai Spirits (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( scratchg, 0,        199?, "<unknown>", "Scratch Golf (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( sdgundam, 0,        199?, "<unknown>", "SD Gundam - Winner's History (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( segagame, 0,        199?, "<unknown>", "Sega Game Pack 4 in 1 (Euro)", 0, 0 )
+	SOFTWARE( sensible, 0,        199?, "<unknown>", "Sensible Soccer (Euro)", 0, 0 )
+	SOFTWARE( shadam, 0,        199?, "<unknown>", "Shadam Crusader - Harukanaru Oukoku (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( shangh2, 0,        199?, "<unknown>", "Shanghai II (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( shangh2a, shangh2, 19??, "<unknown>", "Shanghai II (Jpn, ver. 1)", 0, 0 )
+	SOFTWARE( shaqfu, 0,        199?, "<unknown>", "Shaq Fu (Euro, USA)", 0, 0 )
+	SOFTWARE( shikinjo, 0,        199?, "<unknown>", "Shikinjou (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( shinfrcg, 0,        199?, "<unknown>", "Shining Force Gaiden - Ensei, Jashin no Kuni e (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( shinfrgf, 0,        199?, "<unknown>", "Shining Force Gaiden - Final Conflict (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( shinfrg2, 0,        199?, "<unknown>", "Shining Force Gaiden II - Jashin no Kakusei (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( shinfrc2p1, shinfrc2,  199?, "<unknown>", "Shining Force II (Prototype - Apr 27,  1994)", 0, 0 )
+	SOFTWARE( shinfrc2p2, shinfrc2,  199?, "<unknown>", "Shining Force II (Prototype - Jul 08,  1994)", 0, 0 )
+	SOFTWARE( shinfrc2p3, shinfrc2,  199?, "<unknown>", "Shining Force II (Prototype - Jun 27,  1994)", 0, 0 )
+	SOFTWARE( shinfrc2p4, shinfrc2,  199?, "<unknown>", "Shining Force II (Prototype - May 30,  1994)", 0, 0 )
+	SOFTWARE( shinfrc2, 0,        199?, "<unknown>", "Shining Force II - The Sword of Hajya (Euro, USA)", 0, 0 )
+	SOFTWARE( shinobi, 0,        199?, "<unknown>", "Shinobi (Euro, USA)", 0, 0 )
+	SOFTWARE( shinobi2, 0,        199?, "<unknown>", "Shinobi II - The Silent Fury (World)", 0, 0 )
+	SOFTWARE( sidepock, 0,        199?, "<unknown>", "Side Pocket (USA)", 0, 0 )
+	SOFTWARE( bartvssm, 0,        199?, "<unknown>", "The Simpsons - Bart vs. The Space Mutants (Euro, USA)", 0, 0 )
+	SOFTWARE( bartvswd, 0,        199?, "<unknown>", "The Simpsons - Bart vs. The World (Euro, USA)", 0, 0 )
+	SOFTWARE( skweek, 0,        199?, "<unknown>", "Skweek (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( slider, 0,        199?, "<unknown>", "Slider (Euro, USA)", 0, 0 )
+	SOFTWARE( smurfs, 0,        199?, "<unknown>", "The Smurfs (Europe) (En,Fr,De,Es)", 0, 0 )
+	SOFTWARE( solitair, 0,        199?, "<unknown>", "Solitaire Funpak (USA)", 0, 0 )
+	SOFTWARE( solitarp, 0,        199?, "<unknown>", "Solitaire Poker (Euro, USA)", 0, 0 )
+	SOFTWARE( sonictls, 0,        199?, "<unknown>", "Sonic & Tails (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( sonictl2, 0,        199?, "<unknown>", "Sonic & Tails 2 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( sonicblsp1, sonicbls,  199?, "<unknown>", "Sonic Blast (Prototype 611 - May 31,  1996, 13.49)", 0, 0 )
+	SOFTWARE( sonicblsp2, sonicbls,  199?, "<unknown>", "Sonic Blast (Prototype 74 - Jul 17,  1996, 09.11)", 0, 0 )
+	SOFTWARE( sonicblsp3, sonicbls,  199?, "<unknown>", "Sonic Blast (Prototype 806 - Aug 06,  1996, 18.37)", 0, 0 )
+	SOFTWARE( sonicblsp4, sonicbls,  199?, "<unknown>", "Sonic Blast (Prototype 821 - Aug 22,  1996, 09.38)", 0, 0 )
+	SOFTWARE( sonicblsp5, sonicbls,  199?, "<unknown>", "Sonic Blast (Prototype 827 - Aug 28,  1996, 11.13)", 0, 0 )
+	SOFTWARE( sonicblsp6, sonicbls,  199?, "<unknown>", "Sonic Blast (Prototype 94 - Sep 02,  1996, 17.47)", 0, 0 )
+	SOFTWARE( sonicbls, 0,        199?, "<unknown>", "Sonic Blast (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( sonicc, 0,        199?, "<unknown>", "Sonic Chaos (Euro, USA)", 0, 0 )
+	SOFTWARE( sonicdrs, sonicdr,  199?, "<unknown>", "Sonic Drift (Sample) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( sonicdr, 0,        199?, "<unknown>", "Sonic Drift (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( sonicdr2, 0,        199?, "<unknown>", "Sonic Drift 2 (Jpn, USA)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( soniclab, 0,        199?, "<unknown>", "Sonic Labyrinth (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( sonicsp,  sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 0307 - Mar 07,  1994, 05.24)", 0, 0 )
+	SOFTWARE( sonicspa, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 031094 - Mar 10,  1994, 17.41)", 0, 0 )
+	SOFTWARE( sonicspb, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 031194 - Mar 11,  1994, 12.09)", 0, 0 )
+	SOFTWARE( sonicspc, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 032194 - Mar 21,  1994, 07.12)", 0, 0 )
+	SOFTWARE( sonicspd, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 0328 - Mar 28,  1994, 06.54)", 0, 0 )
+	SOFTWARE( sonicspe, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 0329 - Mar 29,  1994, 07.35)", 0, 0 )
+	SOFTWARE( sonicspf, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 0330 - Mar 30,  1994, 06.54)", 0, 0 )
+	SOFTWARE( sonicspg, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 0405 - Apr 05,  1994, 18.07)", 0, 0 )
+	SOFTWARE( sonicsph, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 0412 - Apr 12,  1994, 07.26)", 0, 0 )
+	SOFTWARE( sonicspi, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 0413 - Apr 13,  1994, 02.54)", 0, 0 )
+	SOFTWARE( sonicspj, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 0415 - Apr 15,  1994, 17.33)", 0, 0 )
+	SOFTWARE( sonicspk, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 0421 - Apr 21,  1994, 05.30)", 0, 0 )
+	SOFTWARE( sonicspl, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 0427 - Apr 27,  1994, 04.51)", 0, 0 )
+	SOFTWARE( sonicspm, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 0429 - Apr 29,  1994, 06.01)", 0, 0 )
+	SOFTWARE( sonicspn, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 0430 - Apr 29,  1994, 21.48)", 0, 0 )
+	SOFTWARE( sonicspo, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 0505 - May 05,  1994, 04.47)", 0, 0 )
+	SOFTWARE( sonicspp, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 0506 - May 06,  1994, 13.04)", 0, 0 )
+	SOFTWARE( sonicspq, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 0525 - May 25,  1994, 13.24)", 0, 0 )
+	SOFTWARE( sonicspr, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 0530 - May 30,  1994, 23.25)", 0, 0 )
+	SOFTWARE( sonicsps, sonics,  199?, "<unknown>", "Sonic Spinball (Prototype 503B - May 03,  1994, 19.27)", 0, 0 )
+	SOFTWARE( sonics, sonics,  199?, "<unknown>", "Sonic Spinball (Euro, USA)", 0, 0 )
+	SOFTWARE( sonicj, sonic,  199?, "<unknown>", "Sonic The Hedgehog (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( sonicp, sonic,  199?, "<unknown>", "Sonic The Hedgehog (Proto) (World)", 0, 0 )
+	SOFTWARE( sonic, 0,        199?, "<unknown>", "Sonic The Hedgehog (v1.1) (World)", 0, 0 )
+	SOFTWARE( sonictrip, sonictri,  199?, "<unknown>", "Sonic The Hedgehog - Triple Trouble (Prototype 0808 - Aug 08,  1994, 18.05)", 0, 0 )
+	SOFTWARE( sonictri, 0,        199?, "<unknown>", "Sonic The Hedgehog - Triple Trouble (Euro, USA)", 0, 0 )
+	SOFTWARE( sonic2, 0,        199?, "<unknown>", "Sonic The Hedgehog 2 (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( soukoban, 0,        199?, "<unknown>", "Soukoban (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( sharr, 0,        199?, "<unknown>", "Space Harrier (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( cheesep1, 0,        199?, "<unknown>", "Speedy Gonzales Cheese Catastrophe (Prototype - Feb 17,  1995)", 0, 0 )
+	SOFTWARE( cheesep2, cheesp1,  199?, "<unknown>", "Speedy Gonzales Cheese Catastrophe (Prototype - Feb 24,  1995)", 0, 0 )
+	SOFTWARE( spidsin6, 0,        199?, "<unknown>", "Spider-Man - Return of the Sinister Six (Euro, USA)", 0, 0 )
+	SOFTWARE( spidxmen, 0,        199?, "<unknown>", "Spider-Man and the X-Men in Arcade's Revenge (USA)", 0, 0 )
+	SOFTWARE( spidking, 0,        199?, "<unknown>", "Spider-Man vs. The Kingpin (Euro, USA)", 0, 0 )
+	SOFTWARE( spirou, 0,        199?, "<unknown>", "Spirou (Proto) (Euro)", 0, 0 )
+	SOFTWARE( sportill, 0,        199?, "<unknown>", "Sports Illustrated Championship Football & Baseball (Euro, USA)", 0, 0 )
+	SOFTWARE( sportrvp1, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Apr 03,  1995 - 2MEG)", 0, 0 )
+	SOFTWARE( sportrvp2, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Apr 03,  1995 - QTEST)", 0, 0 )
+	SOFTWARE( sportrvp3, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Apr 04,  1995 - 2MEG)", 0, 0 )
+	SOFTWARE( sportrvp4, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Apr 05,  1995 - 2MEG - B)", 0, 0 )
+	SOFTWARE( sportrvp5, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Apr 05,  1995 - 2MEG - C)", 0, 0 )
+	SOFTWARE( sportrvp6, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Apr 05,  1995 - QTEST)", 0, 0 )
+	SOFTWARE( sportrvp7, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Apr 06,  1995 - 2MEG)", 0, 0 )
+	SOFTWARE( sportrvp8, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Apr 07,  1995 - 2MEG)", 0, 0 )
+	SOFTWARE( sportrvp9, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Apr 07,  1995 - QTEST)", 0, 0 )
+	SOFTWARE( sportvp10, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Apr 11,  1995 - 2MEG)", 0, 0 )
+	SOFTWARE( sportvp11, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Apr 12,  1995 - 2MEG)", 0, 0 )
+	SOFTWARE( sportvp12, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Apr 25,  1995 - 1MEG)", 0, 0 )
+	SOFTWARE( sportvp13, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Apr 25,  1995 - QTEST)", 0, 0 )
+	SOFTWARE( sportvp14, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Apr 27,  1995 - 1MEG)", 0, 0 )
+	SOFTWARE( sportvp15, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Apr 28,  1995 - 2MEG)", 0, 0 )
+	SOFTWARE( sportvp16, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 08,  1995)", 0, 0 )
+	SOFTWARE( sportvp17, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 09,  1995)", 0, 0 )
+	SOFTWARE( sportvp18, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 13,  1995)", 0, 0 )
+	SOFTWARE( sportvp19, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 16,  1995 - 1MEG)", 0, 0 )
+	SOFTWARE( sportvp20, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 16,  1995 - 2MEG)", 0, 0 )
+	SOFTWARE( sportvp21, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 17,  1995 - 2MEG)", 0, 0 )
+	SOFTWARE( sportvp22, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 20,  1995 - 2MEG)", 0, 0 )
+	SOFTWARE( sportvp23, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 20,  1995 - QTEST)", 0, 0 )
+	SOFTWARE( sportvp24, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 21,  1995 - 2MEG)", 0, 0 )
+	SOFTWARE( sportvp25, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 23,  1995 - 2MEG)", 0, 0 )
+	SOFTWARE( sportvp26, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 23,  1995 - ALGOTEST)", 0, 0 )
+	SOFTWARE( sportvp27, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 23,  1995 - QTEST)", 0, 0 )
+	SOFTWARE( sportvp28, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 27,  1995 - 2MEG)", 0, 0 )
+	SOFTWARE( sportvp29, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 27,  1995 - ALGOTEST)", 0, 0 )
+	SOFTWARE( sportvp30, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 29,  1995 - 2MEG)", 0, 0 )
+	SOFTWARE( sportvp31, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 29,  1995 - ALGOTEST)", 0, 0 )
+	SOFTWARE( sportvp32, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 29,  1995 - QTEST)", 0, 0 )
+	SOFTWARE( sportvp33, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 30,  1995 - 2MEG - D)", 0, 0 )
+	SOFTWARE( sportvp34, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - Mar 30,  1995 - QTEST)", 0, 0 )
+	SOFTWARE( sportvp35, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - May 02,  1995 - 2MEG)", 0, 0 )
+	SOFTWARE( sportvp36, sporttrv,  199?, "<unknown>", "Sports Trivia (Prototype - May 04,  1995 - 1MEG)", 0, 0 )
+	SOFTWARE( sporttrv, 0,        199?, "<unknown>", "Sports Trivia (USA)", 0, 0 )
+	SOFTWARE( sprtrvce, 0,        199?, "<unknown>", "Sports Trivia - Championship Edition (Euro, USA)", 0, 0 )
+	SOFTWARE( stng, 0,        199?, "<unknown>", "Star Trek - The Next Generation - The Advanced Holodeck Tutorial (USA)", 0, 0 )
+	SOFTWARE( strekg, 0,        199?, "<unknown>", "Star Trek Generations - Beyond the Nexus (Euro, USA)", 0, 0 )
+	SOFTWARE( starwars, 0,        199?, "<unknown>", "Star Wars (Euro)", 0, 0 )
+	SOFTWARE( starwarsu, starwars,  199?, "<unknown>", "Star Wars (USA)", 0, 0 )
+	SOFTWARE( stargate, 0,        199?, "<unknown>", "Stargate (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
 	SOFTWARE( sor, 0,        1992, "Sega", "Streets of Rage (World) ~ Bare Knuckle (Jpn)", 0, 0 )	/* Id: G-3313 - Developers: Sega AM7 (CS2) / JSH - Releases: 1992-11-27 (Jpn) */
 	SOFTWARE( sor2, 0,        1993, "Sega", "Streets of Rage II (World) ~ Bare Knuckle II - Shitou e no Chingonka (Jpn)", 0, 0 )	/* Id: G-3328 - Developers: Ancient / H.I.C. / Shout! Designworks / JSH - Releases: 1993-07-23 (Jpn) */
-	SOFTWARE( striker, 0,        199?, "Sega License", "Striker (En, Fr, De, Es, It) (Euro)", 0, 0 )
-	SOFTWARE( suprbtnk, 0,        199?, "Sega License", "Super Battletank (USA)", 0, 0 )
-	SOFTWARE( supercolj, supercol,  199?, "Sega License", "Super Columns (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( supercolp, supercol,  199?, "Sega License", "Super Columns (Prototype - Dec 01,  1994)", 0, 0 )
-	SOFTWARE( supercolp1, supercol,  199?, "Sega License", "Super Columns (Prototype - Dec 15,  1994)", 0, 0 )
-	SOFTWARE( supercolp2, supercol,  199?, "Sega License", "Super Columns (Prototype - Dec 21,  1994)", 0, 0 )
-	SOFTWARE( supercolp3, supercol,  199?, "Sega License", "Super Columns (Prototype - Dec 26,  1994)", 0, 0 )
-	SOFTWARE( supercolp4, supercol,  199?, "Sega License", "Super Columns (Prototype - Dec 28,  1994)", 0, 0 )
-	SOFTWARE( supercolp5, supercol,  199?, "Sega License", "Super Columns (Prototype - Jan 06,  1995)", 0, 0 )
-	SOFTWARE( supercolp6, supercol,  199?, "Sega License", "Super Columns (Prototype - Nov 11,  1994)", 0, 0 )
-	SOFTWARE( supercol, 0,        199?, "Sega License", "Super Columns (Euro, USA)", 0, 0 )
-	SOFTWARE( superglf, 0,        199?, "Sega License", "Super Golf (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( suprkick, 0,        199?, "Sega License", "Super Kick Off (SMS Mode?) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( supermd2, 0,        199?, "Sega License", "Super Momotarou Dentetsu III (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( smgpj, 0,        199?, "Sega License", "Super Monaco GP (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( smgp, 0,        199?, "Sega License", "Super Monaco GP (Euro, USA)", 0, 0 )
-	SOFTWARE( superoff, 0,        199?, "Sega License", "Super Off Road (Euro, USA)", 0, 0 )
-	SOFTWARE( superoffu, superoff,  199?, "Sega License", "Super Off-Road (Alt) (USA)", 0, 0 )
-	SOFTWARE( suprjedi, 0,        199?, "Sega License", "Super Return of the Jedi (Euro, USA)", 0, 0 )
-	SOFTWARE( ssmashtv, 0,        199?, "Sega License", "Super Smash T.V. (World)", 0, 0 )
-	SOFTWARE( ssinv, 0,        199?, "Sega License", "Super Space Invaders (Euro, USA)", 0, 0 )
-	SOFTWARE( stetris, 0,        199?, "Sega License", "Super Tetris (SMS Mode?) (Korea)", 0, 0 )
-	SOFTWARE( superman, 0,        199?, "Sega License", "Superman - The Man of Steel (Euro)", 0, 0 )
-	SOFTWARE( surfninj, 0,        199?, "Sega License", "Surf Ninjas (USA)", 0, 0 )
-	SOFTWARE( sylvan, 0,        199?, "Sega License", "Sylvan Tale (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( t2ag, 0,        199?, "Sega License", "T2 - The Arcade Game (Euro, USA)", 0, 0 )
-	SOFTWARE( tailsadv, 0,        199?, "Sega License", "Tails Adventures (En, Ja) (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( tailskyp, 0,        199?, "Sega License", "Tails no Skypatrol (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( taisnmj, 0,        199?, "Sega License", "Taisen Mahjong HaoPai (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( taisnmj2, 0,        199?, "Sega License", "Taisen Mahjong HaoPai 2 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( taisendg, 0,        199?, "Sega License", "Taisen-gata Daisenryaku G (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( chasehq, 0,        199?, "Sega License", "Taito Chase H.Q. (SMS Mode) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( chasehq1, chasehq,  199?, "Sega License", "Taito Chase H.Q. (Alt, SMS Mode?) (Jpn)", 0, 0 )
-	SOFTWARE( talespin, 0,        199?, "Sega License", "Tale Spin (Euro, USA)", 0, 0 )
-	SOFTWARE( tamalymp, 0,        199?, "Sega License", "Tama & Friends Sanchoume Kouen - Tamalympic (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( tarot, 0,        199?, "Sega License", "Tarot no Yakata (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( tarzan, 0,        199?, "Sega License", "Tarzan - Lord of the Jungle (Euro)", 0, 0 )
-	SOFTWARE( tatakae, 0,        199?, "Sega License", "Tatakae! Pro Yakyuu Twin League (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( tazmarsp,  tazmars,  199?, "Sega License", "Taz in Escape from Mars (Prototype - Aug 10,  1994)", 0, 0 )
-	SOFTWARE( tazmarspa, tazmars,  199?, "Sega License", "Taz in Escape from Mars (Prototype - Aug 12,  1994)", 0, 0 )
-	SOFTWARE( tazmarspb, tazmars,  199?, "Sega License", "Taz in Escape from Mars (Prototype - Aug 14,  1994)", 0, 0 )
-	SOFTWARE( tazmarspc, tazmars,  199?, "Sega License", "Taz in Escape from Mars (Prototype - Aug 15,  1994)", 0, 0 )
-	SOFTWARE( tazmarspd, tazmars,  199?, "Sega License", "Taz in Escape from Mars (Prototype - Aug 19,  1994)", 0, 0 )
-	SOFTWARE( tazmarspe, tazmars,  199?, "Sega License", "Taz in Escape from Mars (Prototype - Aug 23,  1994)", 0, 0 )
-	SOFTWARE( tazmarspf, tazmars,  199?, "Sega License", "Taz in Escape from Mars (Prototype - Aug 29,  1994 - B)", 0, 0 )
-	SOFTWARE( tazmarspg, tazmars,  199?, "Sega License", "Taz in Escape from Mars (Prototype - Aug 30,  1994)", 0, 0 )
-	SOFTWARE( tazmarsph, tazmars,  199?, "Sega License", "Taz in Escape from Mars (Prototype - May 11,  1994)", 0, 0 )
-	SOFTWARE( tazmarspi, tazmars,  199?, "Sega License", "Taz in Escape from Mars (Prototype - Sep 02,  1994)", 0, 0 )
-	SOFTWARE( tazmarspj, tazmars,  199?, "Sega License", "Taz in Escape from Mars (Prototype - Sep 05,  1994 - B)", 0, 0 )
-	SOFTWARE( tazmarspk, tazmars,  199?, "Sega License", "Taz in Escape from Mars (Prototype - Sep 05,  1994 - C)", 0, 0 )
-	SOFTWARE( tazmarspl, tazmars,  199?, "Sega License", "Taz in Escape from Mars (Prototype - Sep 06,  1994 - D)", 0, 0 )
-	SOFTWARE( tazmarspm, tazmars,  199?, "Sega License", "Taz in Escape from Mars (Prototype - Sep 09,  1994 - B)", 0, 0 )
-	SOFTWARE( tazmarspn, tazmars,  199?, "Sega License", "Taz in Escape from Mars (Prototype - Sep 10,  1994)", 0, 0 )
-	SOFTWARE( tazmars, 0,        199?, "Sega License", "Taz in Escape from Mars (Euro, USA)", 0, 0 )
-	SOFTWARE( tazmania, 0,        199?, "Sega License", "Taz-Mania - The Search for the Lost Seabirds (Euro, USA)", 0, 0 )
-	SOFTWARE( tempojrp, tempojr,  199?, "Sega License", "Tempo Jr. (Prototype - Dec 05,  1994)", 0, 0 )
-	SOFTWARE( tempojrp1, tempojr,  199?, "Sega License", "Tempo Jr. (Prototype - Dec 12,  1994)", 0, 0 )
-	SOFTWARE( tempojrp2, tempojr,  199?, "Sega License", "Tempo Jr. (Prototype - Dec 26,  1994)", 0, 0 )
-	SOFTWARE( tempojrp3, tempojr,  199?, "Sega License", "Tempo Jr. (Prototype - Feb 06,  1995)", 0, 0 )
-	SOFTWARE( tempojrp4, tempojr,  199?, "Sega License", "Tempo Jr. (Prototype - Feb 15,  1995)", 0, 0 )
-	SOFTWARE( tempojrp5, tempojr,  199?, "Sega License", "Tempo Jr. (Prototype - Jan 17,  1995)", 0, 0 )
-	SOFTWARE( tempojrp6, tempojr,  199?, "Sega License", "Tempo Jr. (Prototype - Jan 20,  1995)", 0, 0 )
-	SOFTWARE( tempojrp7, tempojr,  199?, "Sega License", "Tempo Jr. (Prototype - Jan 31,  1995)", 0, 0 )
-	SOFTWARE( tempojrp8, tempojr,  199?, "Sega License", "Tempo Jr. (Prototype - Nov 28,  1994)", 0, 0 )
-	SOFTWARE( tempojr, 0,        199?, "Sega License", "Tempo Jr. (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( tengenwc, 0,        199?, "Sega License", "Tengen World Cup Soccer (Euro, USA)", 0, 0 )
-	SOFTWARE( t2jd, 0,        199?, "Sega License", "Terminator 2 - Judgment Day (Euro, USA)", 0, 0 )
-	SOFTWARE( termntr, 0,        199?, "Sega License", "The Terminator (Euro, USA)", 0, 0 )
-	SOFTWARE( tesserae, 0,        199?, "Sega License", "Tesserae (Euro, USA)", 0, 0 )
-	SOFTWARE( tintin, 0,        199?, "Sega License", "Tintin in Tibet (En, Fr, De, Es, Nl, Sv) (Euro)", 0, 0 )
-	SOFTWARE( tomjermv, 0,        199?, "Sega License", "Tom and Jerry - The Movie (USA)", 0, 0 )
-	SOFTWARE( torarete, 0,        199?, "Sega License", "Torarete Tamaruka (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( truelies, 0,        199?, "Sega License", "True Lies (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( ultimate, 0,        199?, "Sega License", "Ultimate Soccer (En, Fr, De, Es, It) (Euro, Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( ustrike, 0,        199?, "Sega License", "Urban Strike (Euro, USA)", 0, 0 )
-	SOFTWARE( vampir, 0,        199?, "Sega License", "Vampire - Master of Darkness (USA)", 0, 0 )
-	SOFTWARE( vfa, 0,        199?, "Sega License", "Virtua Fighter Animation (Euro, USA)", 0, 0 )
-	SOFTWARE( vfmini, 0,        199?, "Sega License", "Virtua Fighter Mini (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( vrtroop, 0,        199?, "Sega License", "VR Troopers (Euro, USA)", 0, 0 )
-	SOFTWARE( waganlnd, 0,        199?, "Sega License", "Wagan Land (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( waganlnd1, waganlnd,  199?, "Sega License", "Wagan Land (Alt) (Jpn)", 0, 0 )
-	SOFTWARE( wheelof, 0,        199?, "Sega License", "Wheel of Fortune (USA)", 0, 0 )
-	SOFTWARE( wimbledn, 0,        199?, "Sega License", "Wimbledon (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( winterolj, winterol,  199?, "Sega License", "Winter Olympics - Lillehammer '94 (En, Fr, De, Es, It, Pt, Sv, No) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( winterol,  0,        199?, "Sega License", "Winter Olympics - Lillehammer '94 (En, Fr, De, Es, It, Pt, Sv, No) (Euro, USA)", 0, 0 )
-	SOFTWARE( wizard, 0,        199?, "Sega License", "Wizard Pinball (Euro)", 0, 0 )
-	SOFTWARE( wolfch, 0,        199?, "Sega License", "Wolfchild (Euro)", 0, 0 )
-	SOFTWARE( wboy, 0,        199?, "Sega License", "Wonder Boy (Euro)", 0, 0 )
-	SOFTWARE( wboyj, wboy,  199?, "Sega License", "Wonder Boy (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( wboydtrap, 0,        199?, "Sega License", "Wonder Boy III - The Dragon's Trap (Euro)", 0, 0 )
-	SOFTWARE( wboydtrapb, wboydtrap,  199?, "Sega License", "Wonder Boy III - The Dragon's Trap (Beta) (Euro)", 0, 0 )
-	SOFTWARE( woodypop, 0,        199?, "Sega License", "Woody Pop (v1.1) (Euro, USA)", 0, 0 )
-	SOFTWARE( woodypop1, 0,        199?, "Sega License", "Woody Pop (Euro, USA)", 0, 0 )
-	SOFTWARE( wclead, 0,        199?, "Sega License", "World Class Leader Board (Euro, USA)", 0, 0 )
-	SOFTWARE( wcup94, 0,        199?, "Sega License", "World Cup USA 94 (En, Fr, De, Es, It, Nl, Pt, Sv) (Euro, USA)", 0, 0 )
-	SOFTWARE( wderby, 0,        199?, "Sega License", "World Derby (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( worlds95p1, worlds95,  199?, "Sega License", "World Series Baseball '95 (Prototype - Jul 09,  1994)", 0, 0 )
-	SOFTWARE( worlds95p2, worlds95,  199?, "Sega License", "World Series Baseball '95 (Prototype - Jul 19,  1994)", 0, 0 )
-	SOFTWARE( worlds95p3, worlds95,  199?, "Sega License", "World Series Baseball '95 (Prototype - Jul 22,  1994)", 0, 0 )
-	SOFTWARE( worlds95p4, worlds95,  199?, "Sega License", "World Series Baseball '95 (Prototype - Jul 28,  1994)", 0, 0 )
-	SOFTWARE( worlds95p5, worlds95,  199?, "Sega License", "World Series Baseball '95 (Prototype - Jul 29,  1994)", 0, 0 )
-	SOFTWARE( worlds95p6, worlds95,  199?, "Sega License", "World Series Baseball '95 (Prototype - Jun 29,  1994)", 0, 0 )
-	SOFTWARE( worlds95, 0,        199?, "Sega License", "World Series Baseball '95 (USA)", 0, 0 )
-	SOFTWARE( worldsb, 0,        199?, "Sega License", "World Series Baseball (v1.1) (USA)", 0, 0 )
-	SOFTWARE( worldsb1, worldsb,  199?, "Sega License", "World Series Baseball (USA)", 0, 0 )
-	SOFTWARE( wwfraw, 0,        199?, "Sega License", "WWF Raw (Euro, USA)", 0, 0 )
-	SOFTWARE( wwfwre, 0,        199?, "Sega License", "WWF Wrestlemania Steel Cage Challenge (SMS Mode?) (Euro)", 0, 0 )
-	SOFTWARE( xmen, 0,        199?, "Sega License", "X-Men (USA)", 0, 0 )
-	SOFTWARE( xmengamlp1, xmengaml,  199?, "Sega License", "X-Men - Gamemaster's Legacy (Prototype - Aug 10,  1994)", 0, 0 )
-	SOFTWARE( xmengamlp2, xmengaml,  199?, "Sega License", "X-Men - Gamemaster's Legacy (Prototype - Aug 15,  1994)", 0, 0 )
-	SOFTWARE( xmengamlp3, xmengaml,  199?, "Sega License", "X-Men - Gamemaster's Legacy (Prototype 36 - Aug 31,  1994)", 0, 0 )
-	SOFTWARE( xmengamlp4, xmengaml,  199?, "Sega License", "X-Men - Gamemaster's Legacy (Prototype 51 - Sep 06,  1994)", 0, 0 )
-	SOFTWARE( xmengaml, 0,        199?, "Sega License", "X-Men - Gamemaster's Legacy (Euro, USA)", 0, 0 )
-	SOFTWARE( xmenmojop1, xmenmojo,  199?, "Sega License", "X-Men - Mojo World (Prototype - Jun 05,  1996)", 0, 0 )
-	SOFTWARE( xmenmojop2, xmenmojo,  199?, "Sega License", "X-Men - Mojo World (Prototype - Jun 13,  1996)", 0, 0 )
-	SOFTWARE( xmenmojop3, xmenmojo,  199?, "Sega License", "X-Men - Mojo World (Prototype - Jun 24,  1996)", 0, 0 )
-	SOFTWARE( xmenmojop4, xmenmojo,  199?, "Sega License", "X-Men - Mojo World (Prototype - Jun 25,  1996)", 0, 0 )
-	SOFTWARE( xmenmojop5, xmenmojo,  199?, "Sega License", "X-Men - Mojo World (Prototype - Jun 27,  1996)", 0, 0 )
-	SOFTWARE( xmenmojop6, xmenmojo,  199?, "Sega License", "X-Men - Mojo World (Prototype - Jun 28,  1996)", 0, 0 )
-	SOFTWARE( xmenmojop7, xmenmojo,  199?, "Sega License", "X-Men - Mojo World (Prototype - Jun 29,  1996)", 0, 0 )
-	SOFTWARE( xmenmojo, 0,        199?, "Sega License", "X-Men - Mojo World (Euro, USA)", 0, 0 )
-	SOFTWARE( yogibear, 0,        199?, "Sega License", "Yogi Bear in Yogi Bear's Goldrush (Unknown) (Proto)", 0, 0 )
-	SOFTWARE( yuyuhaku, 0,        199?, "Sega License", "Yu Yu Hakusho - Horobishimono no Gyakushuu (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( yuyuhak2, 0,        199?, "Sega License", "Yu Yu Hakusho 2 - Gekitou! Nanakyou no Tatakai (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( zangear, 0,        199?, "Sega License", "Zan Gear (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( zool, 0,        199?, "Sega License", "Zool (USA)", 0, 0 )
-	SOFTWARE( zoolj, zool,  199?, "Sega License", "Zool no Yume Bouken (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
-	SOFTWARE( zoop, 0,        199?, "Sega License", "Zoop (Euro)", 0, 0 )
-	SOFTWARE( zoopu, zoop,  199?, "Sega License", "Zoop (USA)", 0, 0 )
+	SOFTWARE( striker, 0,        199?, "<unknown>", "Striker (En, Fr, De, Es, It) (Euro)", 0, 0 )
+	SOFTWARE( suprbtnk, 0,        199?, "<unknown>", "Super Battletank (USA)", 0, 0 )
+	SOFTWARE( supercolj, supercol,  199?, "<unknown>", "Super Columns (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( supercolp, supercol,  199?, "<unknown>", "Super Columns (Prototype - Dec 01,  1994)", 0, 0 )
+	SOFTWARE( supercolp1, supercol,  199?, "<unknown>", "Super Columns (Prototype - Dec 15,  1994)", 0, 0 )
+	SOFTWARE( supercolp2, supercol,  199?, "<unknown>", "Super Columns (Prototype - Dec 21,  1994)", 0, 0 )
+	SOFTWARE( supercolp3, supercol,  199?, "<unknown>", "Super Columns (Prototype - Dec 26,  1994)", 0, 0 )
+	SOFTWARE( supercolp4, supercol,  199?, "<unknown>", "Super Columns (Prototype - Dec 28,  1994)", 0, 0 )
+	SOFTWARE( supercolp5, supercol,  199?, "<unknown>", "Super Columns (Prototype - Jan 06,  1995)", 0, 0 )
+	SOFTWARE( supercolp6, supercol,  199?, "<unknown>", "Super Columns (Prototype - Nov 11,  1994)", 0, 0 )
+	SOFTWARE( supercol, 0,        199?, "<unknown>", "Super Columns (Euro, USA)", 0, 0 )
+	SOFTWARE( superglf, 0,        199?, "<unknown>", "Super Golf (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( suprkick, 0,        199?, "<unknown>", "Super Kick Off (SMS Mode?) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( supermd2, 0,        199?, "<unknown>", "Super Momotarou Dentetsu III (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( smgpj, 0,        199?, "<unknown>", "Super Monaco GP (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( smgp, 0,        199?, "<unknown>", "Super Monaco GP (Euro, USA)", 0, 0 )
+	SOFTWARE( superoff, 0,        199?, "<unknown>", "Super Off Road (Euro, USA)", 0, 0 )
+	SOFTWARE( superoffu, superoff,  199?, "<unknown>", "Super Off-Road (Alt) (USA)", 0, 0 )
+	SOFTWARE( suprjedi, 0,        199?, "<unknown>", "Super Return of the Jedi (Euro, USA)", 0, 0 )
+	SOFTWARE( ssmashtv, 0,        199?, "<unknown>", "Super Smash T.V. (World)", 0, 0 )
+	SOFTWARE( ssinv, 0,        199?, "<unknown>", "Super Space Invaders (Euro, USA)", 0, 0 )
+	SOFTWARE( stetris, 0,        199?, "<unknown>", "Super Tetris (SMS Mode?) (Korea)", 0, 0 )
+	SOFTWARE( superman, 0,        199?, "<unknown>", "Superman - The Man of Steel (Euro)", 0, 0 )
+	SOFTWARE( surfninj, 0,        199?, "<unknown>", "Surf Ninjas (USA)", 0, 0 )
+	SOFTWARE( sylvan, 0,        199?, "<unknown>", "Sylvan Tale (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( t2ag, 0,        199?, "<unknown>", "T2 - The Arcade Game (Euro, USA)", 0, 0 )
+	SOFTWARE( tailsadv, 0,        199?, "<unknown>", "Tails Adventures (En, Ja) (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( tailskyp, 0,        199?, "<unknown>", "Tails no Skypatrol (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( taisnmj, 0,        199?, "<unknown>", "Taisen Mahjong HaoPai (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( taisnmj2, 0,        199?, "<unknown>", "Taisen Mahjong HaoPai 2 (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( taisendg, 0,        199?, "<unknown>", "Taisen-gata Daisenryaku G (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( chasehq, 0,        199?, "<unknown>", "Taito Chase H.Q. (SMS Mode) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( chasehq1, chasehq,  199?, "<unknown>", "Taito Chase H.Q. (Alt, SMS Mode?) (Jpn)", 0, 0 )
+	SOFTWARE( talespin, 0,        199?, "<unknown>", "Tale Spin (Euro, USA)", 0, 0 )
+	SOFTWARE( tamalymp, 0,        199?, "<unknown>", "Tama & Friends Sanchoume Kouen - Tamalympic (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( tarot, 0,        199?, "<unknown>", "Tarot no Yakata (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( tarzan, 0,        199?, "<unknown>", "Tarzan - Lord of the Jungle (Euro)", 0, 0 )
+	SOFTWARE( tatakae, 0,        199?, "<unknown>", "Tatakae! Pro Yakyuu Twin League (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( tazmarsp,  tazmars,  199?, "<unknown>", "Taz in Escape from Mars (Prototype - Aug 10,  1994)", 0, 0 )
+	SOFTWARE( tazmarspa, tazmars,  199?, "<unknown>", "Taz in Escape from Mars (Prototype - Aug 12,  1994)", 0, 0 )
+	SOFTWARE( tazmarspb, tazmars,  199?, "<unknown>", "Taz in Escape from Mars (Prototype - Aug 14,  1994)", 0, 0 )
+	SOFTWARE( tazmarspc, tazmars,  199?, "<unknown>", "Taz in Escape from Mars (Prototype - Aug 15,  1994)", 0, 0 )
+	SOFTWARE( tazmarspd, tazmars,  199?, "<unknown>", "Taz in Escape from Mars (Prototype - Aug 19,  1994)", 0, 0 )
+	SOFTWARE( tazmarspe, tazmars,  199?, "<unknown>", "Taz in Escape from Mars (Prototype - Aug 23,  1994)", 0, 0 )
+	SOFTWARE( tazmarspf, tazmars,  199?, "<unknown>", "Taz in Escape from Mars (Prototype - Aug 29,  1994 - B)", 0, 0 )
+	SOFTWARE( tazmarspg, tazmars,  199?, "<unknown>", "Taz in Escape from Mars (Prototype - Aug 30,  1994)", 0, 0 )
+	SOFTWARE( tazmarsph, tazmars,  199?, "<unknown>", "Taz in Escape from Mars (Prototype - May 11,  1994)", 0, 0 )
+	SOFTWARE( tazmarspi, tazmars,  199?, "<unknown>", "Taz in Escape from Mars (Prototype - Sep 02,  1994)", 0, 0 )
+	SOFTWARE( tazmarspj, tazmars,  199?, "<unknown>", "Taz in Escape from Mars (Prototype - Sep 05,  1994 - B)", 0, 0 )
+	SOFTWARE( tazmarspk, tazmars,  199?, "<unknown>", "Taz in Escape from Mars (Prototype - Sep 05,  1994 - C)", 0, 0 )
+	SOFTWARE( tazmarspl, tazmars,  199?, "<unknown>", "Taz in Escape from Mars (Prototype - Sep 06,  1994 - D)", 0, 0 )
+	SOFTWARE( tazmarspm, tazmars,  199?, "<unknown>", "Taz in Escape from Mars (Prototype - Sep 09,  1994 - B)", 0, 0 )
+	SOFTWARE( tazmarspn, tazmars,  199?, "<unknown>", "Taz in Escape from Mars (Prototype - Sep 10,  1994)", 0, 0 )
+	SOFTWARE( tazmars, 0,        199?, "<unknown>", "Taz in Escape from Mars (Euro, USA)", 0, 0 )
+	SOFTWARE( tazmania, 0,        199?, "<unknown>", "Taz-Mania - The Search for the Lost Seabirds (Euro, USA)", 0, 0 )
+	SOFTWARE( tempojrp, tempojr,  199?, "<unknown>", "Tempo Jr. (Prototype - Dec 05,  1994)", 0, 0 )
+	SOFTWARE( tempojrp1, tempojr,  199?, "<unknown>", "Tempo Jr. (Prototype - Dec 12,  1994)", 0, 0 )
+	SOFTWARE( tempojrp2, tempojr,  199?, "<unknown>", "Tempo Jr. (Prototype - Dec 26,  1994)", 0, 0 )
+	SOFTWARE( tempojrp3, tempojr,  199?, "<unknown>", "Tempo Jr. (Prototype - Feb 06,  1995)", 0, 0 )
+	SOFTWARE( tempojrp4, tempojr,  199?, "<unknown>", "Tempo Jr. (Prototype - Feb 15,  1995)", 0, 0 )
+	SOFTWARE( tempojrp5, tempojr,  199?, "<unknown>", "Tempo Jr. (Prototype - Jan 17,  1995)", 0, 0 )
+	SOFTWARE( tempojrp6, tempojr,  199?, "<unknown>", "Tempo Jr. (Prototype - Jan 20,  1995)", 0, 0 )
+	SOFTWARE( tempojrp7, tempojr,  199?, "<unknown>", "Tempo Jr. (Prototype - Jan 31,  1995)", 0, 0 )
+	SOFTWARE( tempojrp8, tempojr,  199?, "<unknown>", "Tempo Jr. (Prototype - Nov 28,  1994)", 0, 0 )
+	SOFTWARE( tempojr, 0,        199?, "<unknown>", "Tempo Jr. (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( tengenwc, 0,        199?, "<unknown>", "Tengen World Cup Soccer (Euro, USA)", 0, 0 )
+	SOFTWARE( t2jd, 0,        199?, "<unknown>", "Terminator 2 - Judgment Day (Euro, USA)", 0, 0 )
+	SOFTWARE( termntr, 0,        199?, "<unknown>", "The Terminator (Euro, USA)", 0, 0 )
+	SOFTWARE( tesserae, 0,        199?, "<unknown>", "Tesserae (Euro, USA)", 0, 0 )
+	SOFTWARE( tintin, 0,        199?, "<unknown>", "Tintin in Tibet (En, Fr, De, Es, Nl, Sv) (Euro)", 0, 0 )
+	SOFTWARE( tomjermv, 0,        199?, "<unknown>", "Tom and Jerry - The Movie (USA)", 0, 0 )
+	SOFTWARE( torarete, 0,        199?, "<unknown>", "Torarete Tamaruka (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( truelies, 0,        199?, "<unknown>", "True Lies (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( ultimate, 0,        199?, "<unknown>", "Ultimate Soccer (En, Fr, De, Es, It) (Euro, Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( ustrike, 0,        199?, "<unknown>", "Urban Strike (Euro, USA)", 0, 0 )
+	SOFTWARE( vampir, 0,        199?, "<unknown>", "Vampire - Master of Darkness (USA)", 0, 0 )
+	SOFTWARE( vfa, 0,        199?, "<unknown>", "Virtua Fighter Animation (Euro, USA)", 0, 0 )
+	SOFTWARE( vfmini, 0,        199?, "<unknown>", "Virtua Fighter Mini (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( vrtroop, 0,        199?, "<unknown>", "VR Troopers (Euro, USA)", 0, 0 )
+	SOFTWARE( waganlnd, 0,        199?, "<unknown>", "Wagan Land (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( waganlnd1, waganlnd,  199?, "<unknown>", "Wagan Land (Alt) (Jpn)", 0, 0 )
+	SOFTWARE( wheelof, 0,        199?, "<unknown>", "Wheel of Fortune (USA)", 0, 0 )
+	SOFTWARE( wimbledn, 0,        199?, "<unknown>", "Wimbledon (World)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( winterolj, winterol,  199?, "<unknown>", "Winter Olympics - Lillehammer '94 (En, Fr, De, Es, It, Pt, Sv, No) (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( winterol,  0,        199?, "<unknown>", "Winter Olympics - Lillehammer '94 (En, Fr, De, Es, It, Pt, Sv, No) (Euro, USA)", 0, 0 )
+	SOFTWARE( wizard, 0,        199?, "<unknown>", "Wizard Pinball (Euro)", 0, 0 )
+	SOFTWARE( wolfch, 0,        199?, "<unknown>", "Wolfchild (Euro)", 0, 0 )
+	SOFTWARE( wboy, 0,        199?, "<unknown>", "Wonder Boy (Euro)", 0, 0 )
+	SOFTWARE( wboyj, wboy,  199?, "<unknown>", "Wonder Boy (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( wboydtrap, 0,        199?, "<unknown>", "Wonder Boy III - The Dragon's Trap (Euro)", 0, 0 )
+	SOFTWARE( wboydtrapb, wboydtrap,  199?, "<unknown>", "Wonder Boy III - The Dragon's Trap (Beta) (Euro)", 0, 0 )
+	SOFTWARE( woodypop, 0,        199?, "<unknown>", "Woody Pop (v1.1) (Euro, USA)", 0, 0 )
+	SOFTWARE( woodypop1, 0,        199?, "<unknown>", "Woody Pop (Euro, USA)", 0, 0 )
+	SOFTWARE( wclead, 0,        199?, "<unknown>", "World Class Leader Board (Euro, USA)", 0, 0 )
+	SOFTWARE( wcup94, 0,        199?, "<unknown>", "World Cup USA 94 (En, Fr, De, Es, It, Nl, Pt, Sv) (Euro, USA)", 0, 0 )
+	SOFTWARE( wderby, 0,        199?, "<unknown>", "World Derby (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( worlds95p1, worlds95,  199?, "<unknown>", "World Series Baseball '95 (Prototype - Jul 09,  1994)", 0, 0 )
+	SOFTWARE( worlds95p2, worlds95,  199?, "<unknown>", "World Series Baseball '95 (Prototype - Jul 19,  1994)", 0, 0 )
+	SOFTWARE( worlds95p3, worlds95,  199?, "<unknown>", "World Series Baseball '95 (Prototype - Jul 22,  1994)", 0, 0 )
+	SOFTWARE( worlds95p4, worlds95,  199?, "<unknown>", "World Series Baseball '95 (Prototype - Jul 28,  1994)", 0, 0 )
+	SOFTWARE( worlds95p5, worlds95,  199?, "<unknown>", "World Series Baseball '95 (Prototype - Jul 29,  1994)", 0, 0 )
+	SOFTWARE( worlds95p6, worlds95,  199?, "<unknown>", "World Series Baseball '95 (Prototype - Jun 29,  1994)", 0, 0 )
+	SOFTWARE( worlds95, 0,        199?, "<unknown>", "World Series Baseball '95 (USA)", 0, 0 )
+	SOFTWARE( worldsb, 0,        199?, "<unknown>", "World Series Baseball (v1.1) (USA)", 0, 0 )
+	SOFTWARE( worldsb1, worldsb,  199?, "<unknown>", "World Series Baseball (USA)", 0, 0 )
+	SOFTWARE( wwfraw, 0,        199?, "<unknown>", "WWF Raw (Euro, USA)", 0, 0 )
+	SOFTWARE( wwfwre, 0,        199?, "<unknown>", "WWF Wrestlemania Steel Cage Challenge (SMS Mode?) (Euro)", 0, 0 )
+	SOFTWARE( xmen, 0,        199?, "<unknown>", "X-Men (USA)", 0, 0 )
+	SOFTWARE( xmengamlp1, xmengaml,  199?, "<unknown>", "X-Men - Gamemaster's Legacy (Prototype - Aug 10,  1994)", 0, 0 )
+	SOFTWARE( xmengamlp2, xmengaml,  199?, "<unknown>", "X-Men - Gamemaster's Legacy (Prototype - Aug 15,  1994)", 0, 0 )
+	SOFTWARE( xmengamlp3, xmengaml,  199?, "<unknown>", "X-Men - Gamemaster's Legacy (Prototype 36 - Aug 31,  1994)", 0, 0 )
+	SOFTWARE( xmengamlp4, xmengaml,  199?, "<unknown>", "X-Men - Gamemaster's Legacy (Prototype 51 - Sep 06,  1994)", 0, 0 )
+	SOFTWARE( xmengaml, 0,        199?, "<unknown>", "X-Men - Gamemaster's Legacy (Euro, USA)", 0, 0 )
+	SOFTWARE( xmenmojop1, xmenmojo,  199?, "<unknown>", "X-Men - Mojo World (Prototype - Jun 05,  1996)", 0, 0 )
+	SOFTWARE( xmenmojop2, xmenmojo,  199?, "<unknown>", "X-Men - Mojo World (Prototype - Jun 13,  1996)", 0, 0 )
+	SOFTWARE( xmenmojop3, xmenmojo,  199?, "<unknown>", "X-Men - Mojo World (Prototype - Jun 24,  1996)", 0, 0 )
+	SOFTWARE( xmenmojop4, xmenmojo,  199?, "<unknown>", "X-Men - Mojo World (Prototype - Jun 25,  1996)", 0, 0 )
+	SOFTWARE( xmenmojop5, xmenmojo,  199?, "<unknown>", "X-Men - Mojo World (Prototype - Jun 27,  1996)", 0, 0 )
+	SOFTWARE( xmenmojop6, xmenmojo,  199?, "<unknown>", "X-Men - Mojo World (Prototype - Jun 28,  1996)", 0, 0 )
+	SOFTWARE( xmenmojop7, xmenmojo,  199?, "<unknown>", "X-Men - Mojo World (Prototype - Jun 29,  1996)", 0, 0 )
+	SOFTWARE( xmenmojo, 0,        199?, "<unknown>", "X-Men - Mojo World (Euro, USA)", 0, 0 )
+	SOFTWARE( yogibear, 0,        199?, "<unknown>", "Yogi Bear in Yogi Bear's Goldrush (Unknown) (Proto)", 0, 0 )
+	SOFTWARE( yuyuhaku, 0,        199?, "<unknown>", "Yu Yu Hakusho - Horobishimono no Gyakushuu (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( yuyuhak2, 0,        199?, "<unknown>", "Yu Yu Hakusho 2 - Gekitou! Nanakyou no Tatakai (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( zangear, 0,        199?, "<unknown>", "Zan Gear (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( zool, 0,        199?, "<unknown>", "Zool (USA)", 0, 0 )
+	SOFTWARE( zoolj, zool,  199?, "<unknown>", "Zool no Yume Bouken (Jpn)", 0, 0 )	/* Id:  - Developers:  - Releases:  (Jpn) */
+	SOFTWARE( zoop, 0,        199?, "<unknown>", "Zoop (Euro)", 0, 0 )
+	SOFTWARE( zoopu, zoop,  199?, "<unknown>", "Zoop (USA)", 0, 0 )
 SOFTWARE_LIST_END
 
 
-SOFTWARE_LIST ( gamegear_cart, "Sega Game Gear cartridges" )
 
+SOFTWARE_LIST ( gamegear_cart, "Sega Game Gear cartridges" )

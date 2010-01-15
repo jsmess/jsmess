@@ -27,7 +27,6 @@ NGP_ROM_LOAD( neocher,  "neo cherry master - real casino series (japan, europe) 
 NGP_ROM_LOAD( neocup98, "neo geo cup '98 (japan, europe) (en,ja).bin",                                               0x000000,  0x100000,	 CRC(33add5bd) SHA1(445743119c65a6765a0bdc849a12e9038192840c) )
 NGP_ROM_LOAD( ptennis,  "pocket tennis - pocket sports series (japan, europe) (en,ja).bin",                          0x000000,  0x80000,	 CRC(89410850) SHA1(59602e44c631a00b2db53196204a4bc22ccd7025) )
 NGP_ROM_LOAD( renketsu, "renketsu puzzle tsunagete pon! (japan).bin",                                                0x000000,  0x80000,	 CRC(37e79afc) SHA1(7a75e3b6874a18b29ba636ff22308d944a7901e6) )
-NGP_ROM_LOAD( samsho,   "samurai shodown! - pocket fighting series (japan, europe) (en,ja).bin",                     0x000000,  0x200000,	 CRC(32e4696a) SHA1(2c6adfa69e7aeada7d4198b373436eee35b70d01) )
 NGP_ROM_LOAD( shougi,   "shougi no tatsujin (japan).bin",                                                            0x000000,  0x80000,	 CRC(f34d0c9b) SHA1(ab0c33236f72d2b317d91d034756b56cfca1b0b4) )
 
 
@@ -113,6 +112,7 @@ NGP_ROM_LOAD( puzzlink,   "puzzle link (europe).bin",                           
 NGP_ROM_LOAD( puzzlnk2,   "puzzle link 2 (usa, europe).bin",                                                           0x000000,  0x100000,	 CRC(e2a09bb7) SHA1(d4522d1a454968cccd57b03c2aff99616d0b5174) )
 NGP_ROM_LOAD( renketsc,   "renketsu puzzle tsunagete pon! color (japan).bin",                                          0x000000,  0x80000,	 CRC(615f1f2f) SHA1(048b85a8e8e0cbd9324bc373fc875288f81c21db) )
 NGP_ROM_LOAD( rockmanb,   "rockman - battle & fighters (japan).bin",                                                   0x000000,  0x200000,	 CRC(9c861e49) SHA1(c0a6cdf9ba6c4e8f227ba52489f15f5053f0889c) )
+NGP_ROM_LOAD( samsho,     "samurai shodown! - pocket fighting series (japan, europe) (en,ja).bin",                     0x000000,  0x200000,	 CRC(32e4696a) SHA1(2c6adfa69e7aeada7d4198b373436eee35b70d01) )
 NGP_ROM_LOAD( samsho2,    "samurai shodown! 2 - pocket fighting series (world) (en,ja).bin",                           0x000000,  0x200000,	 CRC(4f7fb156) SHA1(2ec4da369d3b91af15defa64429bd9daac7ee9b5) )
 NGP_ROM_LOAD( shanghai,   "shanghai mini (world) (en,ja).bin",                                                         0x000000,  0x100000,	 CRC(90732d53) SHA1(3e3e625852ac4997d3e3739e59c16e9a74f40f19) )
 NGP_ROM_LOAD( evolutioj,  "shinki sekai evolution - hateshinai dungeon (japan).bin",                                   0x000000,  0x200000,	 CRC(e006f42f) SHA1(61827b7a13b3efe6a6b60f314fb0589a29c1bfd2) )
@@ -136,19 +136,20 @@ NGP_ROM_LOAD( wrestmad,   "wrestling madness (usa, europe) (beta).bin",         
 
 
 SOFTWARE_LIST_START( ngp_cart )
-	SOFTWARE( baseball, 0,        19??, "<unknown>", "Baseball Stars (Japan, Europe) (En,Ja).bin", 0, 0 )
-	SOFTWARE( dokodemo, 0,        19??, "<unknown>", "Dokodemo Mahjong (Japan).bin", 0, 0 )
-	SOFTWARE( kof_mlon, 0,        19??, "<unknown>", "King of Fighters R-1 & Melon-chan no Seichou Nikki (Japan) (Beta).bin", 0, 0 )
-	SOFTWARE( kofr1,    0,        19??, "<unknown>", "King of Fighters R-1 (Japan, Europe) (En,Ja).bin", 0, 0 )
-	SOFTWARE( melonchn, 0,        19??, "<unknown>", "Melon-chan no Seichou Nikki (Japan).bin", 0, 0 )
-	SOFTWARE( neocher,  0,        19??, "<unknown>", "Neo Cherry Master - Real Casino Series (Japan, Europe) (En,Ja).bin", 0, 0 )
-	SOFTWARE( neocup98, 0,        19??, "<unknown>", "Neo Geo Cup '98 (Japan, Europe) (En,Ja).bin", 0, 0 )
-	SOFTWARE( ptennis,  0,        19??, "<unknown>", "Pocket Tennis - Pocket Sports Series (Japan, Europe) (En,Ja).bin", 0, 0 )
-	SOFTWARE( renketsu, 0,        19??, "<unknown>", "Renketsu Puzzle Tsunagete Pon! (Japan).bin", 0, 0 )
-	SOFTWARE( samsho,   0,        19??, "<unknown>", "Samurai Shodown! - Pocket Fighting Series (Japan, Europe) (En,Ja).bin", 0, 0 )
-	SOFTWARE( shougi,   0,        19??, "<unknown>", "Shougi no Tatsujin (Japan).bin", 0, 0 )
+	SOFTWARE( baseball, 0,        1998, "SNK", "Pocket Sports Series - Baseball Stars", 0, 0 )		/* Id: NeoP00070 - Developer: SNK - Releases: 1998-11-26 (JPN) */
+	SOFTWARE( dokodemo, 0,        1999, "SNK", "Dokodemo Mahjong (Japan)", 0, 0 )				/* Id: NeoP00330 - Developer: ADK - Releases: 1999-04-29 (JPN) */
+	SOFTWARE( kof_mlon, 0,        199?, "SNK", "King of Fighters R-1 & Melon-chan no Seichou Nikki (Beta, Japan)", 0, 0 )
+	SOFTWARE( kofr1,    0,        1998, "SNK", "Pocket Fighting Series - King of Fighters R-1", 0, 0 )		/* Id: NeoP00010 - Developer: SNK - Releases: 1998-10-28 (JPN) */
+	SOFTWARE( melonchn, 0,        1998, "SNK", "Melon-chan no Seichou Nikki (Japan)", 0, 0 )		/* Id: NeoP00040 - Developer: ADK - Releases: 1998-10-28 (JPN) */
+	SOFTWARE( neocher,  0,        1998, "SNK", "Pocket Casino Series - Neo Cherry Master", 0, 0 )		/* Id: NeoP00140 - Developer: Dyna - Releases: 1998-12-25 (JPN) */
+	SOFTWARE( neocup98, 0,        1998, "SNK", "Pocket Sports Series - Neo Geo Cup '98", 0, 0 )		/* Id: NeoP00020 - Developer: SNK - Releases: 1998-10-28 (JPN) */
+	SOFTWARE( ptennis,  0,        1998, "SNK", "Pocket Sports Series - Pocket Tennis", 0, 0 )		/* Id: NeoP00090 - Developer: Yumeboko - Releases: 1998-10-28 (JPN) */
+	SOFTWARE( renketsu, 0,        1998, "SNK", "Renketsu Puzzle Tsunagete Pon! (Japan)", 0, 0 	)	/* Id: NeoP00120 - Developer: Yumeboko - Releases: 1998-10-28 (JPN) */
+	SOFTWARE( shougi,   0,        1998, "SNK", "Shougi no Tatsujin (Japan)", 0, 0 )		/* Id: NeoP00050 - Developer: ADK - Releases: 1998-11-20 (JPN) */
 SOFTWARE_LIST_END
 
+
+/* Some games below also work on NGP, see Notes (still in progress...) */
 SOFTWARE_LIST_START( ngpc_cart )
 	SOFTWARE( bakumats,   0,        19??, "<unknown>", "Bakumatsu Rouman Tokubetsu Hen - Gekka no Kenshi - Tsuki ni Saku Hana, Chiri Yuku Hana (Japan)", 0, 0 )
 	SOFTWARE( bstarsc,    0,        19??, "<unknown>", "Baseball Stars Color (World) (En,Ja)", 0, 0 )
@@ -197,10 +198,7 @@ SOFTWARE_LIST_START( ngpc_cart )
 	SOFTWARE( neochercb,  neocherc, 19??, "<unknown>", "Neo Cherry Master Color - Real Casino Series (World) (En,Ja) (Beta)", 0, 0 )
 	SOFTWARE( neocherc,   0,        19??, "<unknown>", "Neo Cherry Master Color - Real Casino Series (World) (En,Ja)", 0, 0 )
 	SOFTWARE( neoderby,   0,        19??, "<unknown>", "Neo Derby Champ Daiyosou (Japan)", 0, 0 )
-	SOFTWARE( neodrag1,   neodrag,  19??, "<unknown>", "Neo Dragon's Wild - Real Casino Series (World) (En,Ja) (v1.11)", 0, 0 )
-	SOFTWARE( neodrag,    0,        19??, "<unknown>", "Neo Dragon's Wild - Real Casino Series (World) (En,Ja) (v1.13)", 0, 0 )
 	SOFTWARE( neocuppl,   0,        19??, "<unknown>", "Neo Geo Cup '98 Plus (World) (En,Ja)", 0, 0 )
-	SOFTWARE( neomystr,   0,        19??, "<unknown>", "Neo Mystery Bonus - Real Casino Series (World) (En,Ja)", 0, 0 )
 	SOFTWARE( neoproyk,   0,        19??, "<unknown>", "Neo Poke Pro Yakyuu (Japan)", 0, 0 )
 	SOFTWARE( neoturfm,   0,        19??, "<unknown>", "Neo Turf Masters (World) (En,Ja)", 0, 0 )
 	SOFTWARE( nigeronp,   0,        19??, "<unknown>", "Nigeronpa (Japan)", 0, 0 )
@@ -231,6 +229,7 @@ SOFTWARE_LIST_START( ngpc_cart )
 	SOFTWARE( puzzlnk2,   0,        19??, "<unknown>", "Puzzle Link 2 (USA, Europe)", 0, 0 )
 	SOFTWARE( renketsc,   0,        19??, "<unknown>", "Renketsu Puzzle Tsunagete Pon! Color (Japan)", 0, 0 )
 	SOFTWARE( rockmanb,   0,        19??, "<unknown>", "Rockman - Battle & Fighters (Japan)", 0, 0 )
+	SOFTWARE( samsho,     0,        1998, "SNK", "Pocket Fighting Series - Samurai Spirit! ~ Samurai Shodown!", 0, 0 )	/* Id: NeoP00080 - Developer: SNK - Releases: 1998-12-25 (JPN) */
 	SOFTWARE( samsho2,    0,        19??, "<unknown>", "Samurai Shodown! 2 - Pocket Fighting Series (World) (En,Ja)", 0, 0 )
 	SOFTWARE( shanghai,   0,        19??, "<unknown>", "Shanghai Mini (World) (En,Ja)", 0, 0 )
 	SOFTWARE( evolutioj,  evolutio, 19??, "<unknown>", "Shinki Sekai Evolution - Hateshinai Dungeon (Japan)", 0, 0 )
