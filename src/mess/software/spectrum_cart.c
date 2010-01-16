@@ -16,7 +16,7 @@
 #define PCB_HUEHN		0x20   // Scott-Falk Hühn's 512 Kbytes cartridge
 #define PCB_SCARTIF2	0x40   // José Leandro Novellón Martínez' Super Cartucho IF2 512 Kbytes cartridge
 
-#define ZX48_ONLY		0x800000000   // 16 Kbytes configuration not allowed
+#define ZX48_ONLY		0x80000000   // 16 Kbytes configuration not allowed
 
 #define ZXSPECTRUM_ROM_LOAD( set, name, offset, length, hash )	\
 SOFTWARE_START( set ) \
@@ -72,27 +72,27 @@ SOFTWARE_LIST_START( spectrum_cart )
 	SOFTWARE( zxtest,	0,	1983,	"Sinclair Research Ltd",	"ZX Spectrum Test Cartridge",	0,	0 )
 
 /* The following 10 cartridges were licensed by Sinclair Research Ltd and officially listed on their catalogue */
-	SOFTWARE( spcraid,	0,	1982,	"Psion",					"Space Raiders",		0,	0 ) /* G9/R		5300 */
-	SOFTWARE( chess,	0,	1983,	"Psion",					"Chess",				0,	0 ) /* G10/R	5301 */
-	SOFTWARE( plntoids,	0,	1982,	"Psion",					"Planetoids",			0,	0 ) /* G12/R	5302 */
-	SOFTWARE( hunghora,	0,	1982,	"Psion",					"Hungry Horace",		0,	0 ) /* G13/R	5303 */
-	SOFTWARE( backgamm,	0,	1983,	"Psion",					"Backgammon",			0,	0 ) /* G22/R	5304 */
-	SOFTWARE( horaspid,	0,	1983,	"Psion",					"Horace & the Spiders",	0,	0 ) /* G24/R	5305 */
-	SOFTWARE( jetpac,	0,	1983,	"Ultimate Play The Game",	"Jet Pac",				0,	0 ) /* G27/R	5306 */
-	SOFTWARE( pssst,	0,	1983,	"Ultimate Play The Game",	"Pssst",				0,	0 ) /* G28/R	5307 */
-	SOFTWARE( tranzam,	0,	1983,	"Ultimate Play The Game",	"Tranz Am",				0,	0 ) /* G29/R	5308 */
-	SOFTWARE( cookie,	0,	1983,	"Ultimate Play The Game",	"Cookie",				0,	0 ) /* G30/R	5309 */
+	SOFTWARE( spcraid,	0,	1982,	"Psion",			"Space Raiders",	0,	0 ) /* G9/R		5300 */
+	SOFTWARE( chess,	0,	1983,	"Psion",			"Chess",		0,	0 ) /* G10/R	5301 */
+	SOFTWARE( plntoids,	0,	1982,	"Psion",			"Planetoids",		0,	0 ) /* G12/R	5302 */
+	SOFTWARE( hunghora,	0,	1982,	"Psion",			"Hungry Horace",	0,	0 ) /* G13/R	5303 */
+	SOFTWARE( backgamm,	0,	1983,	"Psion",			"Backgammon",		0,	0 ) /* G22/R	5304 */
+	SOFTWARE( horaspid,	0,	1983,	"Psion",			"Horace & the Spiders",	0,	0 ) /* G24/R	5305 */
+	SOFTWARE( jetpac,	0,	1983,	"Ultimate Play The Game",	"Jet Pac",		0,	0 ) /* G27/R	5306 */
+	SOFTWARE( pssst,	0,	1983,	"Ultimate Play The Game",	"Pssst",		0,	0 ) /* G28/R	5307 */
+	SOFTWARE( tranzam,	0,	1983,	"Ultimate Play The Game",	"Tranz Am",		0,	0 ) /* G29/R	5308 */
+	SOFTWARE( cookie,	0,	1983,	"Ultimate Play The Game",	"Cookie",		0,	0 ) /* G30/R	5309 */
 
 /* The following cartridges were created for Parker Brothers but scrapped short before release */
-	SOFTWARE( gyruss,	0,			1984,	"Parker Brothers",	"Gyruss (Prototype)",								ZX48_ONLY,	0 )
-	SOFTWARE( locomotn,	0,			1984,	"Parker Brothers",	"Loco Motion (Prototype)",							ZX48_ONLY,	0 )
-	SOFTWARE( montezum,	0,			1984,	"Parker Brothers",	"Montezuma's Revenge! (Prototype)",					ZX48_ONLY,	0 )
+	SOFTWARE( gyruss,	0,		1984,	"Parker Brothers",	"Gyruss (Prototype)",					ZX48_ONLY,	0 )
+	SOFTWARE( locomotn,	0,		1984,	"Parker Brothers",	"Loco Motion (Prototype)",				ZX48_ONLY,	0 )
+	SOFTWARE( montezum,	0,		1984,	"Parker Brothers",	"Montezuma's Revenge! (Prototype)",			ZX48_ONLY,	0 )
 	SOFTWARE( montezua,	montezum,	1984,	"Parker Brothers",	"Montezuma's Revenge! (Prototype, Alternate)",		ZX48_ONLY,	0 )
-	SOFTWARE( popeye,	0,			1984,	"Parker Brothers",	"Popeye (Prototype)",								ZX48_ONLY,	0 )
-	SOFTWARE( qbert,	0,			1984,	"Parker Brothers",	"Q*Bert (Prototype)",								ZX48_ONLY,	0 )
-	SOFTWARE( roj,		0,			1984,	"Parker Brothers",	"Return of the Jedi: Death Star Battle (Prototype)",ZX48_ONLY,	0 )
-	SOFTWARE( starwars,	0,			1984,	"Parker Brothers",	"Star Wars (Prototype)",							ZX48_ONLY,	0 )
-	SOFTWARE( starwara,	starwars,	1984,	"Parker Brothers",	"Star Wars (Prototype, Alternate)",					ZX48_ONLY,	0 )
+	SOFTWARE( popeye,	0,		1984,	"Parker Brothers",	"Popeye (Prototype)",					ZX48_ONLY,	0 )
+	SOFTWARE( qbert,	0,		1984,	"Parker Brothers",	"Q*Bert (Prototype)",					ZX48_ONLY,	0 )
+	SOFTWARE( roj,		0,		1984,	"Parker Brothers",	"Return of the Jedi: Death Star Battle (Prototype)",ZX48_ONLY,	0 )
+	SOFTWARE( starwars,	0,		1984,	"Parker Brothers",	"Star Wars (Prototype)",				ZX48_ONLY,	0 )
+	SOFTWARE( starwara,	starwars,	1984,	"Parker Brothers",	"Star Wars (Prototype, Alternate)",			ZX48_ONLY,	0 )
 
 /* Homebrews */
 	SOFTWARE( dethstar,	0,	1998,	"<Homebrew>",	"Death Star",	ZX48_ONLY,	0 )
