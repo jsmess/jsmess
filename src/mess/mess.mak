@@ -470,6 +470,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/pcf8593.o	\
 	$(MESS_MACHINE)/rp5c01a.o	\
 	$(MESS_MACHINE)/rp5c15.o	\
+    $(MESS_MACHINE)/scsibus.o   \
 	$(MESS_MACHINE)/serial.o	\
 	$(MESS_MACHINE)/smartmed.o	\
 	$(MESS_MACHINE)/smc92x4.o	\

@@ -12,11 +12,14 @@
 #include "cpu/i86/i86.h"
 #include "cpu/mcs51/mcs51.h"
 #include "devices/flopdrv.h"
+#include "devices/harddriv.h"
 #include "devices/messram.h"
 #include "formats/flopimg.h"
 #include "formats/pc_dsk.h"
 #include "includes/rmnimbus.h"
 #include "machine/er59256.h"
+#include "machine/scsi.h"
+#include "machine/scsibus.h"
 #include "machine/z80sio.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
@@ -75,6 +78,20 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B		/* 8 kHz */
 };
 
+static const SCSIConfigTable nimbus_scsi_dev_table =
+{
+	1,                                      /* 1 SCSI device */
+	{
+		{ SCSI_ID_0, HARDDISK0_TAG, SCSI_DEVICE_HARDDISK },
+	}
+};
+
+
+static const SCSIBus_interface scsibus_config =
+{
+    &nimbus_scsi_dev_table,
+    &nimbus_scsi_linechange
+};
 
 static ADDRESS_MAP_START(nimbus_mem, ADDRESS_SPACE_PROGRAM, 16)
     AM_RANGE( 0x00000, 0xEFFFF ) AM_RAM
@@ -88,7 +105,7 @@ static ADDRESS_MAP_START(nimbus_io, ADDRESS_SPACE_IO, 16)
     AM_RANGE( 0X00c0, 0X00cf) AM_READWRITE8( pc8031_r, pc8031_w, 0x00FF)
     AM_RANGE( 0X00e0, 0X00ef) AM_READWRITE8( sound_ay8910_r, sound_ay8910_w, 0x00FF)
     AM_RANGE( 0X00f0, 0X00f7) AM_DEVREADWRITE8( Z80SIO_TAG, sio_r, sio_w, 0x00FF)
-    AM_RANGE( 0x0400, 0x041f) AM_READWRITE8( nimbus_fdc_r, nimbus_fdc_w, 0x00FF)
+    AM_RANGE( 0x0400, 0x041f) AM_READWRITE8( nimbus_disk_r, nimbus_disk_w, 0x00FF)
 	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( i186_internal_port_r, i186_internal_port_w)/* CPU 80186         */
 ADDRESS_MAP_END
 
@@ -269,8 +286,12 @@ static MACHINE_DRIVER_START( nimbus )
     MDRV_VIDEO_RESET(nimbus)
 
 
+    /* Backing storage */
 	MDRV_WD2793_ADD(FDC_TAG, nimbus_wd17xx_interface )
 	MDRV_FLOPPY_4_DRIVES_ADD(nimbus_floppy_config)
+    
+    MDRV_HARDDISK_ADD(HARDDISK0_TAG)
+    MDRV_SCSIBUS_ADD(SCSIBUS_TAG, scsibus_config)
     
     MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("512K")

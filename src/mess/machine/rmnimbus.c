@@ -21,6 +21,8 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/msm8251.h"
+#include "machine/scsi.h"
+#include "machine/scsibus.h"
 #include "machine/z80sio.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
@@ -38,16 +40,18 @@
 #define LOG_INTERRUPTS_EXT  1
 #define LOG_TIMER           0
 #define LOG_OPTIMIZATION    0
-#define LOG_DMA             0
+#define LOG_DMA             1
 #define CPU_RESUME_TRIGGER	7123
 #define LOG_KEYBOARD        0
 #define LOG_SIO             0
-#define LOG_DISK            0
+#define LOG_DISK_FDD        0
+#define LOG_DISK_HDD        1
+#define LOG_DISK            1
 #define LOG_PC8031          0
-#define LOG_PC8031_186      1
+#define LOG_PC8031_186      0
 #define LOG_PC8031_PORT     0
-#define LOG_IOU             1
-#define LOG_SOUND           1
+#define LOG_IOU             0
+#define LOG_SOUND           0
 
 /* 80186 internal stuff */
 struct mem_state
@@ -140,14 +144,26 @@ const wd17xx_interface nimbus_wd17xx_interface =
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
-static struct _nimbus_fdc
-{
-    UINT8 drq_enabled;
-    UINT8 irq_enabled;
-    UINT8 diskno;
-    UINT8 motor_on;
-} nimbus_fdc;
 
+// Static data related to Floppy and SCSI hard disks
+static struct _nimbus_drives
+{
+    UINT8           reg400;
+    UINT8           reg410_in;
+    UINT8           reg410_out;
+    UINT8           reg418;
+
+    UINT8           drq_ff;
+} nimbus_drives;
+
+
+static const SCSIConfigTable SCSI_dev_table =
+{
+	1,                                      /* 1 SCSI device */
+	{
+		{ SCSI_ID_0, HARDDISK0_TAG, SCSI_DEVICE_HARDDISK },
+	}
+};
 
 /* 8031 Peripheral controler */
 
@@ -177,6 +193,11 @@ static void decode_dssi_f_set_new_clt(const device_config *device,UINT16  ds, UI
 static void decode_dssi_f_plonk_char(const device_config *device,UINT16  ds, UINT16 si);
 
 static void fdc_reset(void);
+static void generate_disk_int(running_machine *machine);
+static void hdc_reset(running_machine *machine);
+static void hdc_ctrl_write(running_machine *machine, UINT8 data);
+static void hdc_post_rw(running_machine *machine);
+static void hdc_drq(running_machine *machine);
 
 static void keyboard_reset(void);
 static TIMER_CALLBACK(keyscan_callback);
@@ -318,8 +339,7 @@ static void update_interrupt_state(running_machine *machine)
 				}
 			}
 
-        //logerror("Checking external ints\n");
-		/* check external interrupts */
+        /* check external interrupts */
 		for (IntNo = 0; IntNo < 4; IntNo++)
 			if ((i186.intr.ext[IntNo] & 0x0F) == Priority)
 			{
@@ -646,9 +666,6 @@ static TIMER_CALLBACK(dma_timer_callback)
 	int which = param;
 	struct dma_state *d = &i186.dma[which];
 
-	/* force an update and see if we're really done */
-	//stream_update(dma_stream, 0);
-
 	/* complete the status update */
 	d->control &= ~0x0002;
 	d->source += d->count;
@@ -700,16 +717,9 @@ static void update_dma_control(running_machine *machine, int which, int new_cont
 		/* otherwise, set a timer */
 		else
 		{
-//          int count = d->count;
-
-			/* adjust for redline racer */
-         	// int dacnum = (d->dest & 0x3f) / 2;
-
 			if (LOG_DMA) logerror("Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
 
 			d->finished = 0;
-/*          timer_adjust_oneshot(d->finish_timer,
-         ATTOTIME_IN_HZ(dac[dacnum].frequency) * (double)count, which);*/
 		}
 	}
 
@@ -974,42 +984,36 @@ READ16_HANDLER( i186_internal_port_r )
 		case 0x68:
 			if (LOG_PORTS) logerror("%05X:read 80186 DMA%d lower source address\n", cpu_get_pc(space->cpu), (offset - 0x60) / 8);
 			which = (offset - 0x60) / 8;
-//          stream_update(dma_stream, 0);
 			return i186.dma[which].source;
 
 		case 0x61:
 		case 0x69:
 			if (LOG_PORTS) logerror("%05X:read 80186 DMA%d upper source address\n", cpu_get_pc(space->cpu), (offset - 0x61) / 8);
 			which = (offset - 0x61) / 8;
-//          stream_update(dma_stream, 0);
 			return i186.dma[which].source >> 16;
 
 		case 0x62:
 		case 0x6a:
 			if (LOG_PORTS) logerror("%05X:read 80186 DMA%d lower dest address\n", cpu_get_pc(space->cpu), (offset - 0x62) / 8);
 			which = (offset - 0x62) / 8;
-//          stream_update(dma_stream, 0);
 			return i186.dma[which].dest;
 
 		case 0x63:
 		case 0x6b:
 			if (LOG_PORTS) logerror("%05X:read 80186 DMA%d upper dest address\n", cpu_get_pc(space->cpu), (offset - 0x63) / 8);
 			which = (offset - 0x63) / 8;
-//          stream_update(dma_stream, 0);
 			return i186.dma[which].dest >> 16;
 
 		case 0x64:
 		case 0x6c:
 			if (LOG_PORTS) logerror("%05X:read 80186 DMA%d transfer count\n", cpu_get_pc(space->cpu), (offset - 0x64) / 8);
 			which = (offset - 0x64) / 8;
-//          stream_update(dma_stream, 0);
 			return i186.dma[which].count;
 
 		case 0x65:
 		case 0x6d:
 			if (LOG_PORTS) logerror("%05X:read 80186 DMA%d control\n", cpu_get_pc(space->cpu), (offset - 0x65) / 8);
 			which = (offset - 0x65) / 8;
-//          stream_update(dma_stream, 0);
 			return i186.dma[which].control;
 
 		default:
@@ -1171,19 +1175,6 @@ WRITE16_HANDLER( i186_internal_port_w )
 			if (LOG_PORTS) logerror("%05X:80186 middle P chip select = %04X\n", cpu_get_pc(space->cpu), data16);
 			i186.mem.middle_size = data16 | 0x8038;
 
-			temp = (i186.mem.peripheral & 0xffc0) << 4;
-			if (i186.mem.middle_size & 0x0040)
-			{
-//              install_mem_read_handler(2, temp, temp + 0x2ff, peripheral_r);
-//              install_mem_write_handler(2, temp, temp + 0x2ff, peripheral_w);
-			}
-			else
-			{
-				temp &= 0xffff;
-//              install_port_read_handler(2, temp, temp + 0x2ff, peripheral_r);
-//              install_port_write_handler(2, temp, temp + 0x2ff, peripheral_w);
-			}
-
 			/* we need to do this at a time when the I86 context is swapped in */
 			/* this register is generally set once at startup and never again, so it's a good */
 			/* time to set it up */
@@ -1194,7 +1185,6 @@ WRITE16_HANDLER( i186_internal_port_w )
 		case 0x68:
 			if (LOG_PORTS) logerror("%05X:80186 DMA%d lower source address = %04X\n", cpu_get_pc(space->cpu), (offset - 0x60) / 8, data16);
 			which = (offset - 0x60) / 8;
-//          stream_update(dma_stream, 0);
 			i186.dma[which].source = (i186.dma[which].source & ~0x0ffff) | (data16 & 0x0ffff);
 			break;
 
@@ -1202,7 +1192,6 @@ WRITE16_HANDLER( i186_internal_port_w )
 		case 0x69:
 			if (LOG_PORTS) logerror("%05X:80186 DMA%d upper source address = %04X\n", cpu_get_pc(space->cpu), (offset - 0x61) / 8, data16);
 			which = (offset - 0x61) / 8;
-//          stream_update(dma_stream, 0);
 			i186.dma[which].source = (i186.dma[which].source & ~0xf0000) | ((data16 << 16) & 0xf0000);
 			break;
 
@@ -1210,7 +1199,6 @@ WRITE16_HANDLER( i186_internal_port_w )
 		case 0x6a:
 			if (LOG_PORTS) logerror("%05X:80186 DMA%d lower dest address = %04X\n", cpu_get_pc(space->cpu), (offset - 0x62) / 8, data16);
 			which = (offset - 0x62) / 8;
-//          stream_update(dma_stream, 0);
 			i186.dma[which].dest = (i186.dma[which].dest & ~0x0ffff) | (data16 & 0x0ffff);
 			break;
 
@@ -1218,7 +1206,6 @@ WRITE16_HANDLER( i186_internal_port_w )
 		case 0x6b:
 			if (LOG_PORTS) logerror("%05X:80186 DMA%d upper dest address = %04X\n", cpu_get_pc(space->cpu), (offset - 0x63) / 8, data16);
 			which = (offset - 0x63) / 8;
-//          stream_update(dma_stream, 0);
 			i186.dma[which].dest = (i186.dma[which].dest & ~0xf0000) | ((data16 << 16) & 0xf0000);
 			break;
 
@@ -1226,7 +1213,6 @@ WRITE16_HANDLER( i186_internal_port_w )
 		case 0x6c:
 			if (LOG_PORTS) logerror("%05X:80186 DMA%d transfer count = %04X\n", cpu_get_pc(space->cpu), (offset - 0x64) / 8, data16);
 			which = (offset - 0x64) / 8;
-//          stream_update(dma_stream, 0);
 			i186.dma[which].count = data16;
 			break;
 
@@ -1234,7 +1220,6 @@ WRITE16_HANDLER( i186_internal_port_w )
 		case 0x6d:
 			if (LOG_PORTS) logerror("%05X:80186 DMA%d control = %04X\n", cpu_get_pc(space->cpu), (offset - 0x65) / 8, data16);
 			which = (offset - 0x65) / 8;
-//          stream_update(dma_stream, 0);
 			update_dma_control(space->machine, which, data16);
 			break;
 
@@ -1256,7 +1241,6 @@ WRITE16_HANDLER( i186_internal_port_w )
 				memory_install_read16_handler(cputag_get_address_space(space->machine, MAINCPU_TAG, ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, i186_internal_port_r);
 				memory_install_write16_handler(cputag_get_address_space(space->machine, MAINCPU_TAG, ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, i186_internal_port_w);
 			}
-/*          popmessage("Sound CPU reset");*/
 			break;
 
 		default:
@@ -1271,6 +1255,7 @@ MACHINE_RESET(nimbus)
 	nimbus_cpu_reset(machine); 
     iou_reset();
     fdc_reset();
+    hdc_reset(machine);
     keyboard_reset();
     pc8031_reset();
     sound_reset(machine);
@@ -1973,45 +1958,65 @@ int sio_serial_receive( const device_config *device, int channel )
 
 static void fdc_reset(void)
 {
-    nimbus_fdc.irq_enabled=0;
-    nimbus_fdc.drq_enabled=0;
-    nimbus_fdc.diskno=0;
-    nimbus_fdc.motor_on=0;
+    nimbus_drives.reg400=0;
+    nimbus_drives.reg410_in=0;
+    nimbus_drives.reg410_out=0;
+}
+
+static void generate_disk_int(running_machine *machine)
+{
+    if(LOG_DISK)
+        logerror("nimbus_drives_intrq\n");
+
+    if(iou_reg092 & DISK_INT_ENABLE)
+    {
+        external_int(machine,0,EXTERNAL_INT_DISK);
+    } 
 }
 
 static WRITE_LINE_DEVICE_HANDLER( nimbus_fdc_intrq_w )
 {
-    if(LOG_DISK)
-        logerror("nimbus_fdc_intrq_w(%d)\n", state);
-
-    if(state && (iou_reg092 & FDC_INT_ENABLE))
-    {
-        external_int(device->machine,0,EXTERNAL_INT_FDC);
-    } 
+    if (state)
+        generate_disk_int(device->machine);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( nimbus_fdc_drq_w )
 {
 
     if(LOG_DISK)
-        logerror("nimbus_fdc_drq_w(%d)\n", state);
+        logerror("nimbus_drives_drq_w(%d)\n", state);
     
-    if(state && nimbus_fdc.drq_enabled)
+    if(state && FDC_DRQ_ENABLED())
         drq_callback(device->machine,1);
 }
 
-READ8_HANDLER( nimbus_fdc_r )
+/* 
+    0x410 read bits 
+  
+    0   Ready from floppy
+    1   Index pulse from floppy
+    2   Motor on from floppy
+    3   MSG from HDD
+    4   !BSY from HDD
+    5   !I/O from HDD
+    6   !C/D
+    7   !REQ from HDD
+*/
+
+READ8_HANDLER( nimbus_disk_r )
 {
    	int result = 0;
 	const device_config *fdc = devtag_get_device(space->machine, FDC_TAG);
+    const device_config *hdc = devtag_get_device(space->machine, SCSIBUS_TAG);
+    
     int pc=cpu_get_pc(space->cpu);
-    const device_config *drive = devtag_get_device(space->machine, nimbus_wd17xx_interface.floppy_drive_tags[nimbus_fdc.diskno]);
+    const device_config *drive = devtag_get_device(space->machine, nimbus_wd17xx_interface.floppy_drive_tags[FDC_DRIVE()]);
 	
     switch(offset*2)
 	{
 		case 0x08 :
 			result = wd17xx_status_r(fdc, 0);
-			if (LOG_DISK) logerror("Disk status=%2.2X\n",result);
+			if (LOG_DISK_FDD) logerror("Disk status=%2.2X\n",result);
 			break;
 		case 0x0A :
 			result = wd17xx_track_r(fdc, 0);
@@ -2023,51 +2028,81 @@ READ8_HANDLER( nimbus_fdc_r )
 			result = wd17xx_data_r(fdc, 0);
 			break;
         case 0x10 :
-            result = (nimbus_fdc.motor_on                                    ? 0x04 : 0x00) |
-                     (floppy_drive_get_flag_state(drive, FLOPPY_DRIVE_INDEX) ? 0x00 : 0x02) |
-                     (floppy_drive_get_flag_state(drive, FLOPPY_DRIVE_READY) ? 0x01 : 0x00);      
+            nimbus_drives.reg410_in &= ~FDC_BITS_410;
+            nimbus_drives.reg410_in |= (FDC_MOTOR() ? FDC_MOTOR_MASKI : 0x00);
+            nimbus_drives.reg410_in |= (floppy_drive_get_flag_state(drive, FLOPPY_DRIVE_INDEX) ? 0x00 : FDC_INDEX_MASK);
+            nimbus_drives.reg410_in |= (floppy_drive_get_flag_state(drive, FLOPPY_DRIVE_READY) ? FDC_READY_MASK : 0x00);      
+            
+            // Flip inverted bits
+            result=nimbus_drives.reg410_in ^ INV_BITS_410;
             break;
+        case 0x18 :
+            result = scsi_data_r(hdc);
+            hdc_post_rw(space->machine);
 		default:
 			break;
 	}
 
-    if(LOG_DISK)
+    if(LOG_DISK_FDD)
         logerror("Nimbus FDCR at pc=%08X from %04X data=%02X\n",pc,(offset*2)+0x400,result);
+
+    if((LOG_DISK_HDD) && ((offset*2)>=0x10))
+        logerror("Nimbus HDCR at pc=%08X from %04X data=%02X\n",pc,(offset*2)+0x400,result);
+    
 
 	return result;
 }
 
-WRITE8_HANDLER( nimbus_fdc_w )
+/*
+    0x400 write bits
+    
+    0   drive 0 select
+    1   drive 1 select
+    2   drive 2 select
+    3   drive 3 select
+    4   side select
+    5   fdc motor on
+    6   hdc drq enabled
+    7   fdc drq enabled
+    
+    0x410 write bits
+    
+    0   SCSI reset
+    1   SCSI SEL
+    2   SCSI IRQ Enable 
+*/
+
+WRITE8_HANDLER( nimbus_disk_w )
 {
 	const device_config *fdc = devtag_get_device(space->machine, FDC_TAG);
-    int pc=cpu_get_pc(space->cpu);
+    const device_config *hdc = devtag_get_device(space->machine, SCSIBUS_TAG);
+    int                 pc=cpu_get_pc(space->cpu);
+    UINT8               reg400_old = nimbus_drives.reg400;
+    
+    if(LOG_DISK_FDD)
+        logerror("Nimbus FDCW at %05X write of %02X to %04X\n",pc,data,(offset*2)+0x400);
 
-    if(LOG_DISK)
-        logerror("Nimbus FDCW at %08X write of %02X to %04X\n",pc,data,(offset*2)+0x400);
+    if((LOG_DISK_HDD) && (((offset*2)>=0x10) || (offset==0)))
+        logerror("Nimbus HDCW at %05X write of %02X to %04X\n",pc,data,(offset*2)+0x400);
 
     switch(offset*2)
 	{
         case 0x00 :
-            switch (data & 0x0F)
-            {
-                case 0x01 : nimbus_fdc.diskno=0; break;
-                case 0x02 : nimbus_fdc.diskno=1; break;
-                case 0x04 : nimbus_fdc.diskno=2; break;
-                case 0x08 : nimbus_fdc.diskno=3; break;  
-                //default : nimbus_fdc.diskno=NO_DRIVE_SELECTED; break; // no drive selected
-            }
-            if (nimbus_fdc.diskno!=NO_DRIVE_SELECTED)
-            {
-                wd17xx_set_drive(fdc, nimbus_fdc.diskno);
-                wd17xx_set_side(fdc, (data & 0x10) ? 1 : 0);
-            }
-            nimbus_fdc.motor_on=(data & 0x20);
-            nimbus_fdc.drq_enabled=(data & 0x80);
-            nimbus_fdc.irq_enabled=1;
+            nimbus_drives.reg400=data;
+			
+            wd17xx_set_drive(fdc,FDC_DRIVE());
+            wd17xx_set_side(fdc, FDC_SIDE());
             
             // Nimbus FDC is hard wired for double density
             wd17xx_set_density(fdc, DEN_MFM_LO);
-			break;
+
+            //logerror("nimbus_drives.reg400=%02X, data=%02X, drq_ff=%d\n",reg400_old,data,nimbus_drives.drq_ff);
+
+            // if we enable hdc drq with a pending condition, act on it
+            if((data & HDC_DRQ_MASK) && (~reg400_old & HDC_DRQ_MASK))
+                hdc_drq(space->machine);
+
+            break;
 		case 0x08 :
 			wd17xx_command_w(fdc, 0, data);
 			break;
@@ -2080,7 +2115,102 @@ WRITE8_HANDLER( nimbus_fdc_w )
 		case 0x0E :
 			wd17xx_data_w(fdc, 0, data);
 			break;
+        case 0x10 :
+            hdc_ctrl_write(space->machine,data);
+            break;
+    
+        case 0x18 :
+            scsi_data_w(hdc, data);
+            hdc_post_rw(space->machine);
+            break;
 	}
+}
+
+static void hdc_reset(running_machine *machine)
+{
+    const device_config *hdc = devtag_get_device(machine, SCSIBUS_TAG);
+
+    init_scsibus(hdc);
+
+    nimbus_drives.reg410_in=0;
+    nimbus_drives.reg410_in |= (get_scsi_line(hdc,SCSI_LINE_REQ) ? HDC_REQ_MASK : 0);
+    nimbus_drives.reg410_in |= (get_scsi_line(hdc,SCSI_LINE_CD)  ? HDC_CD_MASK  : 0);
+    nimbus_drives.reg410_in |= (get_scsi_line(hdc,SCSI_LINE_IO)  ? HDC_IO_MASK  : 0);
+    nimbus_drives.reg410_in |= (get_scsi_line(hdc,SCSI_LINE_BSY) ? HDC_BSY_MASK : 0);
+    nimbus_drives.reg410_in |= (get_scsi_line(hdc,SCSI_LINE_MSG) ? HDC_MSG_MASK : 0);
+    
+    nimbus_drives.drq_ff=0;
+}
+
+static void hdc_ctrl_write(running_machine *machine, UINT8 data)
+{
+	const device_config *hdc = devtag_get_device(machine, SCSIBUS_TAG);
+    
+    // If we enable the HDC interupt, and an interrupt is pending, go deal with it.
+    if(((data & HDC_IRQ_MASK) && (~nimbus_drives.reg410_out & HDC_IRQ_MASK)) && 
+       ((~nimbus_drives.reg410_in & HDC_INT_TRIGGER)==HDC_INT_TRIGGER))
+        generate_disk_int(machine);
+            
+    nimbus_drives.reg410_out=data;
+
+    set_scsi_line(hdc, SCSI_LINE_RESET, (data & HDC_RESET_MASK) ? 0 : 1);
+    set_scsi_line(hdc, SCSI_LINE_SEL, (data & HDC_SEL_MASK) ? 0 : 1);
+}
+
+static void hdc_post_rw(running_machine *machine)
+{
+    const device_config *hdc = devtag_get_device(machine, SCSIBUS_TAG);
+    
+    if((nimbus_drives.reg410_in & HDC_REQ_MASK)==0)
+        set_scsi_line(hdc,SCSI_LINE_ACK,0);
+}
+
+static void hdc_drq(running_machine *machine)
+{
+    if(HDC_DRQ_ENABLED() && nimbus_drives.drq_ff)
+    {
+        drq_callback(machine,1);
+        nimbus_drives.drq_ff=0;
+    }
+}
+
+void nimbus_scsi_linechange(const device_config *device, UINT8 line, UINT8 state)
+{
+    UINT8   mask = 0;
+    
+    switch (line)
+    {
+        case SCSI_LINE_REQ   : mask=HDC_REQ_MASK; break;
+        case SCSI_LINE_CD    : mask=HDC_CD_MASK; break;
+        case SCSI_LINE_IO    : mask=HDC_IO_MASK; break;
+        case SCSI_LINE_BSY   : mask=HDC_BSY_MASK; break;
+        case SCSI_LINE_MSG   : mask=HDC_MSG_MASK; break;
+    }
+    
+    if(state)
+        nimbus_drives.reg410_in|=mask;
+    else
+        nimbus_drives.reg410_in&=~mask;
+
+    
+    if(line==SCSI_LINE_REQ) 
+    {
+    //logerror("nimbus_scsi_linechange(%02X,%d), ~nimbus_drives.reg410_in=%02X, mask=%02X, (~reg410 & mask)=%02X, int_enabled=%d, int_enabled=%d\n",
+    //         line,state,~nimbus_drives.reg410_in,HDC_INT_TRIGGER,(~nimbus_drives.reg410_in & HDC_INT_TRIGGER),HDC_IRQ_ENABLED(),HDC_DRQ_ENABLED());
+        if (state==0)
+        {
+            if(HDC_IRQ_ENABLED() && ((~nimbus_drives.reg410_in & HDC_INT_TRIGGER)==HDC_INT_TRIGGER))
+                generate_disk_int(device->machine); 
+    
+            if((nimbus_drives.reg410_in & HDC_CD_MASK)==HDC_CD_MASK)
+            {   
+                nimbus_drives.drq_ff=1;
+                hdc_drq(device->machine);
+            }
+        }
+        else
+            set_scsi_line(device,SCSI_LINE_ACK,1);
+    }
 }
 
 /* 8031/8051 Peripheral controler 80186 side */
@@ -2136,7 +2266,8 @@ READ8_HANDLER( pc8031_r )
     if(LOG_PC8031_186)
         logerror("Nimbus PCIOR %08X read of %04X returns %02X reg0C2_ptr=%02X\n",pc,(offset*2)+0xC0,result,reg0C2_ptr);
     
-    dump_pcregs();
+    if(LOG_PC8031_186)
+        dump_pcregs();
     
     return result;
 }
