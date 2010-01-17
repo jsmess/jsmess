@@ -221,9 +221,9 @@ S32X_ROM_LOAD( zaxx2kp7,  "zaxxon's motherbase 2000(prototype - mar 15, 1995).bi
 S32X_ROM_LOAD( zaxx2kp8,  "zaxxon's motherbase 2000(prototype - mar 31, 1995).bin",                           0x000000, 0x200000,   CRC(1344f08b) SHA1(ed3b31494407f324f18db4f5056ad6df75dc1a10) )
 
 
-/* 
+/*
     Notes on GameId:
-    - first Id is the Japanese one, second Id is the USA one. European Ids are the same as USA with 
+    - first Id is the Japanese one, second Id is the USA one. European Ids are the same as USA with
       a -5x appended to the end, depending on the country/language (generic English titles have a -50)
  */
 
@@ -292,7 +292,7 @@ SOFTWARE_LIST_START( _32x_cart )
 	SOFTWARE( fifa96,   0,     1995, "Electronic Arts", "FIFA Soccer 96 (Euro - En, Fr, De, Es, It, Sv)", 0, 0 )
 
 	/* Id: GM5002, 84602 - Developers: Flashpoint Productions - Releases: 1994 (USA), 1995 (Euro), 1995-02-24 (JPN) */
-	SOFTWARE( golfmag,   0,       1994, "Sega", "Golf Magazine: 36 Great Holes Starring Fred Couples (Euro)", 0, 0 )	
+	SOFTWARE( golfmag,   0,       1994, "Sega", "Golf Magazine: 36 Great Holes Starring Fred Couples (Euro)", 0, 0 )
 	SOFTWARE( golfmagju, golfmag, 1994, "Sega", "Golf Magazine: 36 Great Holes Starring Fred Couples (Jpn, USA)", 0, 0 )
 	SOFTWARE( 36greath,  golfmag, 1994, "Sega", "36 Great Holes starring Fred Couples (Rev 1.x) (Prototype - Jul 06, 1994)", 0, 0 )
 	SOFTWARE( 36greath1, golfmag, 1994, "Sega", "36 Great Holes starring Fred Couples (Prototype - Dec 02, 1994)", 0, 0 )

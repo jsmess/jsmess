@@ -144,7 +144,7 @@ SOFTWARE_LIST_START( ngp_cart )
 	SOFTWARE( neocher,  0,        1998, "SNK", "Pocket Casino Series - Neo Cherry Master", 0, 0 )		/* Id: NeoP00140 - Developer: Dyna - Releases: 1998-12-25 (JPN) */
 	SOFTWARE( neocup98, 0,        1998, "SNK", "Pocket Sports Series - Neo Geo Cup '98", 0, 0 )		/* Id: NeoP00020 - Developer: SNK - Releases: 1998-10-28 (JPN) */
 	SOFTWARE( ptennis,  0,        1998, "SNK", "Pocket Sports Series - Pocket Tennis", 0, 0 )		/* Id: NeoP00090 - Developer: Yumeboko - Releases: 1998-10-28 (JPN) */
-	SOFTWARE( renketsu, 0,        1998, "SNK", "Renketsu Puzzle Tsunagete Pon! (Japan)", 0, 0 	)	/* Id: NeoP00120 - Developer: Yumeboko - Releases: 1998-10-28 (JPN) */
+	SOFTWARE( renketsu, 0,        1998, "SNK", "Renketsu Puzzle Tsunagete Pon! (Japan)", 0, 0	)	/* Id: NeoP00120 - Developer: Yumeboko - Releases: 1998-10-28 (JPN) */
 	SOFTWARE( shougi,   0,        1998, "SNK", "Shougi no Tatsujin (Japan)", 0, 0 )		/* Id: NeoP00050 - Developer: ADK - Releases: 1998-11-20 (JPN) */
 SOFTWARE_LIST_END
 

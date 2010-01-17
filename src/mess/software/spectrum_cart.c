@@ -13,8 +13,8 @@
 #define PCB_ZXC3		0x04   // Paul Farrow's ZXC3 cartridge
 #define PCB_DROY		0x08   // Droy's 32 Kbytes cartridge
 #define PCB_ZXFLASH		0x10   // Droy's ZX-Flash 512 Kbytes cartridge
-#define PCB_HUEHN		0x20   // Scott-Falk Hühn's 512 Kbytes cartridge
-#define PCB_SCARTIF2	0x40   // José Leandro Novellón Martínez' Super Cartucho IF2 512 Kbytes cartridge
+#define PCB_HUEHN		0x20   // Scott-Falk H??hn's 512 Kbytes cartridge
+#define PCB_SCARTIF2	0x40   // Jos?? Leandro Novell??n Mart??nez' Super Cartucho IF2 512 Kbytes cartridge
 
 #define ZX48_ONLY		0x80000000   // 16 Kbytes configuration not allowed
 
@@ -72,16 +72,16 @@ SOFTWARE_LIST_START( spectrum_cart )
 	SOFTWARE( zxtest,	0,	1983,	"Sinclair Research Ltd",	"ZX Spectrum Test Cartridge",	0,	0 )
 
 /* The following 10 cartridges were licensed by Sinclair Research Ltd and officially listed on their catalogue */
-	SOFTWARE( spcraid,	0,	1982,	"Psion",			"Space Raiders",	0,	0 ) /* G9/R		5300 */
-	SOFTWARE( chess,	0,	1983,	"Psion",			"Chess",		0,	0 ) /* G10/R	5301 */
-	SOFTWARE( plntoids,	0,	1982,	"Psion",			"Planetoids",		0,	0 ) /* G12/R	5302 */
-	SOFTWARE( hunghora,	0,	1982,	"Psion",			"Hungry Horace",	0,	0 ) /* G13/R	5303 */
-	SOFTWARE( backgamm,	0,	1983,	"Psion",			"Backgammon",		0,	0 ) /* G22/R	5304 */
-	SOFTWARE( horaspid,	0,	1983,	"Psion",			"Horace & the Spiders",	0,	0 ) /* G24/R	5305 */
-	SOFTWARE( jetpac,	0,	1983,	"Ultimate Play The Game",	"Jet Pac",		0,	0 ) /* G27/R	5306 */
-	SOFTWARE( pssst,	0,	1983,	"Ultimate Play The Game",	"Pssst",		0,	0 ) /* G28/R	5307 */
-	SOFTWARE( tranzam,	0,	1983,	"Ultimate Play The Game",	"Tranz Am",		0,	0 ) /* G29/R	5308 */
-	SOFTWARE( cookie,	0,	1983,	"Ultimate Play The Game",	"Cookie",		0,	0 ) /* G30/R	5309 */
+	SOFTWARE( spcraid,	0,	1982,	"Psion",			"Space Raiders",	0,	0 ) /* G9/R     5300 */
+	SOFTWARE( chess,	0,	1983,	"Psion",			"Chess",		0,	0 ) /* G10/R    5301 */
+	SOFTWARE( plntoids,	0,	1982,	"Psion",			"Planetoids",		0,	0 ) /* G12/R    5302 */
+	SOFTWARE( hunghora,	0,	1982,	"Psion",			"Hungry Horace",	0,	0 ) /* G13/R    5303 */
+	SOFTWARE( backgamm,	0,	1983,	"Psion",			"Backgammon",		0,	0 ) /* G22/R    5304 */
+	SOFTWARE( horaspid,	0,	1983,	"Psion",			"Horace & the Spiders",	0,	0 ) /* G24/R    5305 */
+	SOFTWARE( jetpac,	0,	1983,	"Ultimate Play The Game",	"Jet Pac",		0,	0 ) /* G27/R    5306 */
+	SOFTWARE( pssst,	0,	1983,	"Ultimate Play The Game",	"Pssst",		0,	0 ) /* G28/R    5307 */
+	SOFTWARE( tranzam,	0,	1983,	"Ultimate Play The Game",	"Tranz Am",		0,	0 ) /* G29/R    5308 */
+	SOFTWARE( cookie,	0,	1983,	"Ultimate Play The Game",	"Cookie",		0,	0 ) /* G30/R    5309 */
 
 /* The following cartridges were created for Parker Brothers but scrapped short before release */
 	SOFTWARE( gyruss,	0,		1984,	"Parker Brothers",	"Gyruss (Prototype)",					ZX48_ONLY,	0 )
@@ -105,13 +105,13 @@ SOFTWARE_LIST_START( spectrum_cart )
 	SOFTWARE( knlrdroy,	0,	2002,	"<Homebrew>",	"Knight Lore (Droy 32Kb PCB)", PCB_DROY,	0 )
 
 /*
-   The following conversion demonstrates the bank switching capabilities of Scott-Falk Hühn's PCB.
+   The following conversion demonstrates the bank switching capabilities of Scott-Falk H??hn's PCB.
    The 512 Kbytes PCB description and usage are described at http://s-huehn.de/spectrum/hardware2.htm#if2rom
 */
-	SOFTWARE( if2huehn,	0,	2007,	"<Homebrew>",	"512Kb Multicart Demo (Hühn PCB)", PCB_HUEHN,	0 ) // This demo cartridge uses just 16 of the 32 available banks
+	SOFTWARE( if2huehn,	0,	2007,	"<Homebrew>",	"512Kb Multicart Demo (H??hn PCB)", PCB_HUEHN,	0 ) // This demo cartridge uses just 16 of the 32 available banks
 
 /*
-   The following conversion demonstrates the bank switching capabilities of José Leandro Novellón Martínez' PCB.
+   The following conversion demonstrates the bank switching capabilities of Jos?? Leandro Novell??n Mart??nez' PCB.
    The 512 Kbytes PCB description and usage are described at http://www.speccy.org/trastero/cosas/JL/if2/IF2-1.html
 */
 	SOFTWARE( scartif2,	0,	2004,	"<Homebrew>",	"512Kb Multicart Demo (Super Cartucho IF2 PCB)", PCB_SCARTIF2,	0 ) // This demo cartridge uses just 16 of the 32 available banks

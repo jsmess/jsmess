@@ -504,9 +504,9 @@ SMS_ROM_LOAD( zool,      "zool - ninja of the 'nth' dimension (europe).bin",    
 
 
 
-/* 
+/*
     Notes on GameId:
-    - first Id is the Japanese one, second Id is the USA one. European Ids are the same as USA with 
+    - first Id is the Japanese one, second Id is the USA one. European Ids are the same as USA with
       a -5x appended to the end, depending on the country/language (generic English titles have a -50)
  */
 
@@ -554,7 +554,7 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( astrowj,    astrow,   1986, "Sega", "Astro Warrior (Jpn, USA)", 0, 0 )	/* Id: G-1312, 5069 - Releases: 1986-11-16 (JPN) */
 	SOFTWARE( fushigi,    astrow,   1985, "Sega", "Fushigi no Oshiro Pit Pot (Jpn)", 0, 0 )	/* Id: C-507 - Releases: 1985-12-14 (Jpn, card) */
 	SOFTWARE( fushigi1,   astrow,   1985, "<pirate>", "Fushigi no Oshiro Pit Pot (Pirate) (Jpn)", 0, 0 )
-	SOFTWARE( saposos,    astrow,   1995, "Tec Toy", "Sapo Xulé - S.O.S Lagoa Poluida (Brazil)", 0, 0 )
+	SOFTWARE( saposos,    astrow,   1995, "Tec Toy", "Sapo Xul? - S.O.S Lagoa Poluida (Brazil)", 0, 0 )
 	SOFTWARE( ayrton,     0,        1992, "Sega", "Ayrton Senna's Super Monaco GP II (Euro)", 0, 0 )	/* Id: 9011 */
 	SOFTWARE( aztecadv,   0,        1987, "Sega", "Aztec Adventure - The Golden Road to Paradise (World) ~ Nazca '88 - The Golden Road to Paradise (Jpn)", 0, 0 )	/* Id: G-1335, 5100 - Releases: 1987-09-20 (JPN) - Notes: FM support */
 	SOFTWARE( backtof2,   0,        1990, "Image Works", "Back to the Future Part II (Euro)", 0, 0 )	/* Id: 27010-50 */
@@ -822,7 +822,7 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( sms3samp,   0,        19??, "Tec Toy", "Promocao Especial M. System III Compact (Sample) (Brazil)", 0, 0 )
 	SOFTWARE( psychic,    0,        1991, "Sega", "Psychic World (Euro)", 0, 0 )	/* Id: 7066 */
 	SOFTWARE( psychof,    0,        1989, "Sega", "Psycho Fox (Euro, USA)", 0, 0 )	/* Id: 7032 */
-	SOFTWARE( sapomestr,  psychof,  1995, "Tec Toy", "Sapo Xulé - O Mestre do Kung Fu (Brazil)", 0, 0 )
+	SOFTWARE( sapomestr,  psychof,  1995, "Tec Toy", "Sapo Xul? - O Mestre do Kung Fu (Brazil)", 0, 0 )
 	SOFTWARE( puttputtb,  puttputt, 1992, "Sega", "Putt & Putter (Beta) (Euro)", 0, 0 )
 	SOFTWARE( puttputt,   0,        1992, "Sega", "Putt & Putter (Euro)", 0, 0 )	/* Id: 5122 */
 	SOFTWARE( quartet,    0,        1987, "Sega", "Quartet (Euro, USA)", 0, 0 )	/* Id: 5073 */
@@ -845,7 +845,7 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( running,    0,        1991, "Sega", "Running Battle (Euro)", 0, 0 )	/* Id: 7037 */
 	SOFTWARE( sagaia,     0,        1992, "Sega", "Sagaia (Euro)", 0, 0 )	/* Id: 7078 */
 	SOFTWARE( sangok3,    0,        1994, "Game Line", "Sangokushi 3 (Korea)", 0, 0 )
-	SOFTWARE( sapoxu,     0,        1995, "Tec Toy", "Sapo Xulé vs. Os Invasores do Brejo (Brazil)", 0, 0 )
+	SOFTWARE( sapoxu,     0,        1995, "Tec Toy", "Sapo Xul? vs. Os Invasores do Brejo (Brazil)", 0, 0 )
 	SOFTWARE( satell7a,   satell7,  1985, "<pirate>", "Satellite 7 (Pirate) (Jpn)", 0, 0 )
 	SOFTWARE( satell7,    0,        1985, "Sega", "Satellite 7 (Jpn)", 0, 0 )	/* Id: C-506 - Releases: 1985-12-20 (Jpn, card) */
 	SOFTWARE( schtroumb,  schtroum, 1996, "Infogrames", "Les Schtroumpfs Autour du Monde (En, Fr, De, Es) (Beta) (Euro)", 0, 0 )

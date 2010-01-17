@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    Nintendo Pokémon Mini cartridges
+    Nintendo Pok?mon Mini cartridges
 
 ***************************************************************************/
 
@@ -102,4 +102,4 @@ SOFTWARE_LIST_START( pokemini_cart )
 SOFTWARE_LIST_END
 
 
-SOFTWARE_LIST( pokemini_cart, "Nintendo Pokémon Mini cartridges" )
+SOFTWARE_LIST( pokemini_cart, "Nintendo Pok?mon Mini cartridges" )
