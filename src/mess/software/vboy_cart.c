@@ -47,34 +47,34 @@ VBOY_ROM_LOAD( vproyak,   "virtual pro yakyuu '95 (japan).bin",                 
 VBOY_ROM_LOAD( waterwld,  "waterworld (usa).bin",                                                                       0x000000,  0x200000,	 CRC(82a95e51) SHA1(dcc46484bd0acab0ac1ea178f425a0f5ccfb8dc2) )
 
 SOFTWARE_LIST_START( vboy_cart )
-	SOFTWARE( 3dtetris,  0,        19??, "<unknown>", "3-D Tetris (USA)", 0, 0 )
-	SOFTWARE( galactic,  0,        19??, "<unknown>", "Galactic Pinball (Japan, USA)", 0, 0 )
-	SOFTWARE( golf,      0,        19??, "<unknown>", "Golf (USA)", 0, 0 )
-	SOFTWARE( innsmout,  0,        19??, "<unknown>", "Innsmouth no Yakata (Japan)", 0, 0 )
-	SOFTWARE( jackbros,  0,        19??, "<unknown>", "Jack Bros. (USA)", 0, 0 )
-	SOFTWARE( jackbrosj, jackbros, 19??, "<unknown>", "Jack Bros. no Meiro de Hiihoo! (Japan)", 0, 0 )
-	SOFTWARE( mariocla,  0,        19??, "<unknown>", "Mario Clash (Japan, USA)", 0, 0 )
-	SOFTWARE( marioten,  0,        19??, "<unknown>", "Mario's Tennis (Japan, USA)", 0, 0 )
-	SOFTWARE( nesterfb,  0,        19??, "<unknown>", "Nester's Funky Bowling (USA)", 0, 0 )
-	SOFTWARE( panicbom,  0,        19??, "<unknown>", "Panic Bomber (USA)", 0, 0 )
-	SOFTWARE( redalarmj, redalarm, 19??, "<unknown>", "Red Alarm (Japan)", 0, 0 )
-	SOFTWARE( redalarm,  0,        19??, "<unknown>", "Red Alarm (USA)", 0, 0 )
-	SOFTWARE( sdgundam,  0,        19??, "<unknown>", "SD Gundam - Dimension War (Japan)", 0, 0 )
-	SOFTWARE( spaceinv,  0,        19??, "<unknown>", "Space Invaders - Virtual Collection (Japan)", 0, 0 )
-	SOFTWARE( ssquash,   0,        19??, "<unknown>", "Space Squash (Japan)", 0, 0 )
-	SOFTWARE( vgolf,     0,        19??, "<unknown>", "T&E Virtual Golf (Japan)", 0, 0 )
-	SOFTWARE( telerobo,  0,        19??, "<unknown>", "Teleroboxer (Japan, USA)", 0, 0 )
-	SOFTWARE( tobidase,  0,        19??, "<unknown>", "Tobidase! Panibon (Japan)", 0, 0 )
-	SOFTWARE( vtetris,   0,        19??, "<unknown>", "V-Tetris (Japan)", 0, 0 )
-	SOFTWARE( vforcej,   vforce,   19??, "<unknown>", "Vertical Force (Japan)", 0, 0 )
-	SOFTWARE( vforce,    0,        19??, "<unknown>", "Vertical Force (USA)", 0, 0 )
-	SOFTWARE( vbowling,  0,        19??, "<unknown>", "Virtual Bowling (Japan)", 0, 0 )
-	SOFTWARE( wariolnd,  0,        19??, "<unknown>", "Virtual Boy Wario Land (Japan, USA)", 0, 0 )
-	SOFTWARE( vfishing,  0,        19??, "<unknown>", "Virtual Fishing (Japan)", 0, 0 )
-	SOFTWARE( vlab,      0,        19??, "<unknown>", "Virtual Lab (Japan)", 0, 0 )
-	SOFTWARE( vleague,   0,        19??, "<unknown>", "Virtual League Baseball (USA)", 0, 0 )
-	SOFTWARE( vproyak,   0,        19??, "<unknown>", "Virtual Pro Yakyuu '95 (Japan)", 0, 0 )
-	SOFTWARE( waterwld,  0,        19??, "<unknown>", "Waterworld (USA)", 0, 0 )
+	SOFTWARE( 3dtetris,  0,        1996, "Nintendo", "3-D Tetris (USA)", 0, 0 )                       /* Id: VUE-VPBE-USA - Developers: T&E Soft */
+	SOFTWARE( galactic,  0,        1995, "Nintendo", "Galactic Pinball (Jpn, USA)", 0, 0 )            /* Id: VUE-VGPJ-JPN/USA - Developers: Intelligent Systems - Releases: 1995-07-01 (JPN) */
+	SOFTWARE( golf,      0,        1995, "Nintendo", "Golf (USA)", 0, 0 )                             /* Id: VUE-VVGE-USA - Developers: T&E Soft */   
+	SOFTWARE( innsmout,  0,        1995, "I'Max", "Innsmouth no Yakata (Jpn)", 0, 0 )                 /* Id: VUE-VIMJ-JPN - Developers: Betop (I'Max) - Releases: 1995-10-13 (JPN) */
+	SOFTWARE( jackbros,  0,        1995, "Atlus", "Jack Bros. (USA)", 0, 0 )                          /* Id: VUE-VJBE-USA - Developers: Atlus  */
+	SOFTWARE( jackbrosj, jackbros, 1995, "Atlus", "Jack Bros. no Meiro de Hiihoo! (Jpn)", 0, 0 )      /* Id: VUE-VJBJ-JPN - Developers: Atlus - Releases: 1995-09-29 (JPN) */
+	SOFTWARE( mariocla,  0,        1995, "Nintendo", "Mario Clash (Jpn, USA)", 0, 0 )                 /* Id: VUE-VMCJ-JPN/USA - Developers: Nintendo R&D1 - Releases: 1995-09-28 (JPN) */
+	SOFTWARE( marioten,  0,        1995, "Nintendo", "Mario's Tennis (Jpn, USA)", 0, 0 )              /* Id: VUE-VMTJ-JPN/USA - Developers: Nintendo R&D1 / Tose Software - Releases: 1995-07-21 (JPN) */
+	SOFTWARE( nesterfb,  0,        1996, "Nintendo", "Nester's Funky Bowling (USA)", 0, 0 )           /* Id: VUE-VNFE-USA - Developers: Nintendo IRD */ 
+	SOFTWARE( panicbom,  0,        1995, "Nintendo", "Panic Bomber (USA)", 0, 0 )                     /* Id: VUE-VH2E-USA - Developers: Raizing */ 
+	SOFTWARE( redalarmj, redalarm, 1995, "T&E Soft", "Red Alarm (Jpn)", 0, 0 )                        /* Id: VUE-VREJ-JPN - Developers: T&E Soft - Releases: 1995-07-21 (JPN) */
+	SOFTWARE( redalarm,  0,        1995, "Nintendo", "Red Alarm (USA)", 0, 0 )                        /* Id: VUE-VREE-USA - Developers: T&E Soft */
+	SOFTWARE( sdgundam,  0,        1995, "Bandai", "SD Gundam - Dimension War (Jpn)", 0, 0 )          /* Id: VUE-VSDJ-JPN - Developers: Bandai? - Releases: 1995-12-22 (JPN) */
+	SOFTWARE( spaceinv,  0,        1995, "Taito", "Space Invaders - Virtual Collection (Jpn)", 0, 0 ) /* Id: VUE-VSPJ-JPN - Developers: Taito - Releases: 1995-12-01 (JPN) */
+	SOFTWARE( ssquash,   0,        1995, "Coconuts Japan Entertainment", "Space Squash (Jpn)", 0, 0 ) /* Id: VUE-VSSJ-JPN - Developers: Tomcat System - Releases: 1995-09-29 (JPN) */
+	SOFTWARE( vgolf,     0,        1995, "T&E Soft", "T&E Virtual Golf (Jpn)", 0, 0 )                 /* Id: VUE-VVGJ-JPN - Developers: T&E Soft - Releases: 1995-08-11 (JPN) */
+	SOFTWARE( telerobo,  0,        1995, "Nintendo", "Teleroboxer (Jpn, USA)", 0, 0 )                 /* Id: VUE-VTBJ-JPN/USA - Developers: Nintendo R&D1 - Releases: 1995-07-21 (JPN) */
+	SOFTWARE( tobidase,  0,        1995, "Hudson", "Tobidase! Panibon (Jpn)", 0, 0 )                  /* Id: VUE-VH2J_JPN - Developers: Raizing - Releases: 1995-07-21 (JPN) */
+	SOFTWARE( vtetris,   0,        1995, "Bullet-Proof Software", "V-Tetris (Jpn)", 0, 0 )            /* Id: VUE-VTRJ-JPN - Developers: Locomotive - Releases: 1995-08-25 (JPN) */
+	SOFTWARE( vforcej,   vforce,   1995, "Hudson", "Vertical Force (Jpn)", 0, 0 )                     /* Id: VUE-VH3J-JPN - Developers: Hudson - Releases: 1995-08-12 (JPN) */
+	SOFTWARE( vforce,    0,        1995, "Nintendo", "Vertical Force (USA)", 0, 0 )                   /* Id: VUE-VH3E-USA - Developers: Hudson */
+	SOFTWARE( vbowling,  0,        1995, "Athena", "Virtual Bowling (Jpn)", 0, 0 )                    /* Id: VUE-VVBJ-JPN - Developers: Athena - Releases: 1995-12-22 (JPN) */
+	SOFTWARE( wariolnd,  0,        1995, "Nintendo", "Virtual Boy Wario Land (USA) ~ Virtual Boy Wario Land - Awazon no Hihou (Jpn)", 0, 0 ) /* Id: VUE-VWCJ-JPN/USA - Developers: Nintendo R&D1 - Releases: 1995-12-01 (JPN) */
+	SOFTWARE( vfishing,  0,        1995, "Pack-In-Video", "Virtual Fishing (Jpn)", 0, 0 )             /* Id: VUE-VVFJ-JPN - Developers: Pack-In-Video - Releases: 1995-10-16 (JPN) */
+	SOFTWARE( vlab,      0,        1995, "J-Wing", "Virtual Lab (Jpn)", 0, 0 )                        /* Id: VUE-VJVJ-JPN - Developers: J-Wing - Releases: 1995-12-08 (JPN) */
+	SOFTWARE( vleague,   0,        1995, "Kemco", "Virtual League Baseball (USA)", 0, 0 )             /* Id: VUE-VVPE-USA - Developers: Kemco */
+	SOFTWARE( vproyak,   0,        1995, "Kemco", "Virtual Pro Yakyuu '95 (Jpn)", 0, 0 )              /* Id: VUE-VVPJ-JPN - Developers: Kemco - Releases: 1995-08-11 (JPN) */
+	SOFTWARE( waterwld,  0,        1995, "Ocean", "Waterworld (USA)", 0, 0 )                          /* Id: VUE-VWEE-USA - Developers: Ocean */
 SOFTWARE_LIST_END
 
 SOFTWARE_LIST( vboy_cart, "Nintendo Virtual Boy cartridges" )

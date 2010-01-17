@@ -504,17 +504,17 @@ SMS_ROM_LOAD( zool,      "zool - ninja of the 'nth' dimension (europe).bin",    
 
 
 
-/*
+/* 
     Notes on GameId:
-    - first Id is the Japanese one, second Id is the USA one. European Ids are the same as USA with
+    - first Id is the Japanese one, second Id is the USA one. European Ids are the same as USA with 
       a -5x appended to the end, depending on the country/language (generic English titles have a -50)
  */
 
 SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( 20embr,     0,        1995, "Tec Toy", "20 em 1 (Brazil)", 0, 0 )	/* Id: 0002 */
 	SOFTWARE( aceoface,   0,        1991, "Sega", "Ace of Aces (Euro)", 0, 0 )	/* Id: 7054 */
-	SOFTWARE( actionfg1,  actionfg, 1986, "Sega", "Action Fighter (v1.1) (Euro, Jpn)", 0, 0 )	/* Id: G-1305, 5055 - Releases: 1986-08-17 (JPN) */
-	SOFTWARE( actionfg,   0,        1986, "Sega", "Action Fighter (v1.2) (Euro, USA)", 0, 0 )
+	SOFTWARE( actionfg1,  actionfg, 1986, "Sega", "Action Fighter (Euro, Jpn, v1.1)", 0, 0 )	/* Id: G-1305, 5055 - Releases: 1986-08-17 (JPN) */
+	SOFTWARE( actionfg,   0,        1986, "Sega", "Action Fighter (Euro, USA, v1.2)", 0, 0 )
 	SOFTWARE( addamfam,   0,        1993, "Flying Edge", "The Addams Family (Euro)", 0, 0 )	/* Id: 27067-50 */
 	SOFTWARE( aerialas,   0,        1990, "Sega", "Aerial Assault (Euro)", 0, 0 )	/* Id: 7041 */
 	SOFTWARE( aerialasu,  aerialas, 1990, "Sega", "Aerial Assault (USA)", 0, 0 )
@@ -525,9 +525,9 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( anmitsu,    alexhitw, 1987, "Sega", "Anmitsu Hime (Jpn)", 0, 0 )	/* Id: G-1328, 5116 - Releases: 1987-07-19 (JPN) - Note: the Western release, "Alex Kidd Hiigh-Tech World" is quite different */
 	SOFTWARE( alexlost,   0,        1988, "Sega", "Alex Kidd - The Lost Stars (World)", 0, 0 )	/* Id: G-1347, 7005 - Releases: 1988-03-10 (JPN) - Notes: FM support */
 	SOFTWARE( alexbmx,    0,        1987, "Sega", "Alex Kidd BMX Trial (Jpn)", 0, 0 )	/* Id: G-1330 - Releases: 1987-11-15 (JPN) - Notes: FM support */
-	SOFTWARE( alexkidd,   0,        1986, "Sega", "Alex Kidd in Miracle World (v1.1) (Euro, USA)", 0, 0 )
+	SOFTWARE( alexkidd,   0,        1986, "Sega", "Alex Kidd in Miracle World (Euro, USA, v1.1)", 0, 0 )
 	SOFTWARE( alexkiddj,  alexkidd, 1986, "Sega", "Alex Kidd no Miracle World (Jpn)", 0, 0 )	/* Id: G-1306, 5067 - Releases: 1986-11-01 (JPN) */
-	SOFTWARE( alexkiddb,  alexkidd, 1986, "<pirate>", "Alex Kidd in Miracle World (v1.1, Pirate) (Brazil)", 0, 0 )
+	SOFTWARE( alexkiddb,  alexkidd, 1986, "<pirate>", "Alex Kidd in Miracle World (Brazil, v1.1, Pirate)", 0, 0 )
 	SOFTWARE( alexkidd1,  alexkidd, 1986, "Sega", "Alex Kidd in Miracle World (Euro, USA)", 0, 0 )
 	SOFTWARE( alexshin,   0,        1990, "Sega", "Alex Kidd in Shinobi World (Euro, USA)", 0, 0 )	/* Id: 7044 */
 	SOFTWARE( alf,        0,        1989, "Sega", "Alf (USA)", 0, 0 )	/* Id: 5111? */
@@ -540,37 +540,37 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( ameripf,    0,        1989, "Sega", "American Pro Football (Euro)", 0, 0 )	/* Id: 7020 */
 	SOFTWARE( andreaga,   0,        1993, "TecMagik", "Andre Agassi Tennis (Euro)", 0, 0 )	/* Id: 27051-50 */
 	SOFTWARE( arcadesh,   0,        1992, "Virgin Interactive", "Arcade Smash Hits (Euro)", 0, 0 )	/* Id: 27032-50 */
-	SOFTWARE( argosnj1,   argosnj , 1988, "Tecmo", "Argos no Juujiken (Alt) (Jpn)", 0, 0 )	/* S-001 - Releases: 1988-03-25 (JPN) */
+	SOFTWARE( argosnj1,   argosnj , 1988, "Tecmo", "Argos no Juujiken (Jpn, Alt)", 0, 0 )	/* S-001 - Releases: 1988-03-25 (JPN) */
 	SOFTWARE( argosnj,    0,        1988, "Tecmo", "Argos no Juujiken (Jpn)", 0, 0 )
 	SOFTWARE( arielmer,   0,        1997, "Tec Toy", "Ariel - The Little Mermaid (Brazil)", 0, 0 )	/* Id: 026.350 - Releases: 1997 (BRA) */
-	SOFTWARE( assaultc,   0,        1990, "Sega", "Assault City (Light Phaser) (Euro)", 0, 0 )	/* Id: 7040 */
+	SOFTWARE( assaultc,   0,        1990, "Sega", "Assault City (Euro, Light Phaser version)", 0, 0 )	/* Id: 7040 */
 	SOFTWARE( assaultc1,  assaultc, 1990, "Sega", "Assault City (Euro)", 0, 0 )	/* Id: 7034 */
-	SOFTWARE( asterix,    0,        1901, "Sega", "Asterix (En, Fr) (v1.1) (Euro)", 0, 0 )	/* Id: 9008 */
-	SOFTWARE( asterix1,   asterix,  1991, "Sega", "Asterix (En, Fr) (Euro)", 0, 0 )
+	SOFTWARE( asterix,    0,        1901, "Sega", "Asterix (Euro, v1.1)", 0, 0 )	/* Id: 9008 */
+	SOFTWARE( asterix1,   asterix,  1991, "Sega", "Asterix (Euro)", 0, 0 )
 	SOFTWARE( tvcolos,    asterix,  1996, "Tec Toy", "As Aventuras da TV Colosso (Brazil)", 0, 0 )
-	SOFTWARE( astergre,   0,        1993, "Sega", "Asterix and the Great Rescue (En, Fr, De, Es, It) (Euro)", 0, 0 )	/* Id: 9032 */
-	SOFTWARE( astermis,   0,        1993, "Sega", "Asterix and the Secret Mission (En, Fr, De) (Euro)", 0, 0 )	/* Id: 9023 */
+	SOFTWARE( astergre,   0,        1993, "Sega", "Asterix and the Great Rescue (Euro)", 0, 0 )	/* Id: 9032 */
+	SOFTWARE( astermis,   0,        1993, "Sega", "Asterix and the Secret Mission (Euro)", 0, 0 )	/* Id: 9023 */
 	SOFTWARE( astrow,     0,        1987, "Sega", "Astro Warrior & Pit Pot (Euro)", 0, 0 )	/* Id: 6081 */
 	SOFTWARE( astrowj,    astrow,   1986, "Sega", "Astro Warrior (Jpn, USA)", 0, 0 )	/* Id: G-1312, 5069 - Releases: 1986-11-16 (JPN) */
 	SOFTWARE( fushigi,    astrow,   1985, "Sega", "Fushigi no Oshiro Pit Pot (Jpn)", 0, 0 )	/* Id: C-507 - Releases: 1985-12-14 (Jpn, card) */
-	SOFTWARE( fushigi1,   astrow,   1985, "<pirate>", "Fushigi no Oshiro Pit Pot (Pirate) (Jpn)", 0, 0 )
-	SOFTWARE( saposos,    astrow,   1995, "Tec Toy", "Sapo Xul? - S.O.S Lagoa Poluida (Brazil)", 0, 0 )
+	SOFTWARE( fushigi1,   astrow,   1985, "<pirate>", "Fushigi no Oshiro Pit Pot (Jpn, Pirate)", 0, 0 )
+	SOFTWARE( saposos,    astrow,   1995, "Tec Toy", "Sapo Xulé - S.O.S Lagoa Poluida (Brazil)", 0, 0 )
 	SOFTWARE( ayrton,     0,        1992, "Sega", "Ayrton Senna's Super Monaco GP II (Euro)", 0, 0 )	/* Id: 9011 */
 	SOFTWARE( aztecadv,   0,        1987, "Sega", "Aztec Adventure - The Golden Road to Paradise (World) ~ Nazca '88 - The Golden Road to Paradise (Jpn)", 0, 0 )	/* Id: G-1335, 5100 - Releases: 1987-09-20 (JPN) - Notes: FM support */
 	SOFTWARE( backtof2,   0,        1990, "Image Works", "Back to the Future Part II (Euro)", 0, 0 )	/* Id: 27010-50 */
 	SOFTWARE( backtof3,   0,        1992, "Image Works", "Back to the Future Part III (Euro)", 0, 0 )	/* Id: 27020-50 */
 	SOFTWARE( bakubaku,   0,        1996, "Tec Toy", "Baku Baku(Brazil)", 0, 0 )	/* Id: 025470 - Notes: Title screen says "Baku Baku Animal" */
 	SOFTWARE( bankpani,   0,        1987, "Sega", "Bank Panic (Euro)", 0, 0 )	/* Id: 4084 (Card), 4584 (Cart) */
-	SOFTWARE( bankpani1,  bankpani, 1987, "<pirate>", "Bank Panic (Pirate) (Euro)", 0, 0 )
+	SOFTWARE( bankpani1,  bankpani, 1987, "<pirate>", "Bank Panic (Euro, Pirate)", 0, 0 )
 	SOFTWARE( basketni,   0,        1989, "Sega", "Basketball Nightmare (Euro)", 0, 0 )	/* Id: 7025 - Notes: Title screen says "Basket Ball Nightmare" */
 	SOFTWARE( batmanre,   0,        1993, "Sega", "Batman Returns (Euro)", 0, 0 )	/* Id: 7112 */
 	SOFTWARE( battleor,   0,        1989, "Sega", "Battle Out Run (Euro)", 0, 0 )	/* Id: 7033 */
 	SOFTWARE( battlem,    0,        1994, "Tec Toy", "Battlemaniacs (Brazil)", 0, 0 )	/* Id: 027-370 */
 	SOFTWARE( blackblt,   0,        1986, "Sega", "Black Belt (Euro, USA)", 0, 0 )
-	SOFTWARE( hokuto1,    blackblt, 1986, "<pirate>", "Hokuto no Ken (Pirate) (Jpn)", 0, 0 )
+	SOFTWARE( hokuto1,    blackblt, 1986, "<pirate>", "Hokuto no Ken (Jpn, Pirate)", 0, 0 )
 	SOFTWARE( hokuto,     blackblt, 1986, "Sega", "Hokuto no Ken (Jpn)", 0, 0 )	/* Id: G-1303, 5054 - Releases: 1986-07-20 (JPN) - Motes: The Western version "Black Belt" is quite different */
 	SOFTWARE( bladeag,    0,        1988, "Sega", "Blade Eagle (World)", 0, 0 )	/* Id: G-1351, 8005 - Releases: 1988-03-26 (JPN) - Notes: FM support, 3D glasses support */
-	SOFTWARE( bladeag1,   bladeag,  1988, "Sega", "Blade Eagle (Beta) (World)", 0, 0 )
+	SOFTWARE( bladeag1,   bladeag,  1988, "Sega", "Blade Eagle (World, Prototype)", 0, 0 )
 	SOFTWARE( bomber,     0,        1989, "Sega", "Bomber Raid (World)", 0, 0 )	/* Id: G-1373, 27006 - Releases: 1989-02-04 (JPN) - Notes: FM support */
 	SOFTWARE( bonanza,    0,        1991, "Sega", "Bonanza Bros. (Euro)", 0, 0 )	/* Id: 7073 */
 	SOFTWARE( bonkers,    0,        1994, "Tec Toy", "Bonkers Wax Up! (Brazil)", 0, 0 )	/* Id: 028600 */
@@ -586,13 +586,13 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( casino,     0,        1989, "Sega", "Casino Games (Euro, USA)", 0, 0 )	/* Id: 7021 */
 	SOFTWARE( castelo,    0,        1997, "Tec Toy", "Castelo Ra-Tim-Bum (Brazil)", 0, 0 )	/* Id: 028.720 */
 	SOFTWARE( castlill,   0,        1990, "Sega", "Castle of Illusion Starring Mickey Mouse (Euro)", 0, 0 )	/* Id: 7053 */
-	SOFTWARE( castlills,  castlill, 1990, "Sega", "Castle of Illusion - Starring Mickey Mouse (Unknown) (Sample)", 0, 0 )
+	SOFTWARE( castlills,  castlill, 1990, "Sega", "Castle of Illusion Starring Mickey Mouse (Display Unit Sample)", 0, 0 )
 	SOFTWARE( castlillu,  castlill, 1990, "Sega", "Castle of Illusion Starring Mickey Mouse (USA)", 0, 0 )
 	SOFTWARE( champeur,   0,        1992, "TecMagik", "Champions of Europe (Euro)", 0, 0 )	/* Id: 7073 */
 	SOFTWARE( chmphock,   0,        1994, "U.S. Gold", "Championship Hockey (Euro)", 0, 0 )	/* Id: 27084-50 */
 	SOFTWARE( chapolim,   0,        1990, "Tec Toy", "Chapolim x Dracula - Um Duelo Assustador (Brazil)", 0, 0 )	/* Id: 023430 */
-	SOFTWARE( cheese,     0,        1995, "Sega", "Cheese Cat-astrophe Starring Speedy Gonzales (En, Fr, De, Es) (Euro)", 0, 0 )	/* Id: 9033 */
-	SOFTWARE( chopliftj,  choplift, 1986, "Sega", "Choplifter (Prototype) (Jpn)", 0, 0 )
+	SOFTWARE( cheese,     0,        1995, "Sega", "Cheese Cat-astrophe Starring Speedy Gonzales (Euro)", 0, 0 )	/* Id: 9033 */
+	SOFTWARE( chopliftj,  choplift, 1986, "Sega", "Choplifter (Jpn, Prototype)", 0, 0 )
 	SOFTWARE( choplift,   0,        1986, "Sega", "Choplifter (Euro, USA)", 0, 0 )	/* Id: 5051 */
 	SOFTWARE( borgman,    cyborgh,  1988, "Sega", "Chouon Senshi Borgman (Jpn)", 0, 0 )	/* Id: G-1371 - Releases: 1988-12-01 (JPN) - Notes: FM support */
 	SOFTWARE( borgmanp,   cyborgh,  1988, "Sega", "Chouon Senshi Borgman (Jpn, Prototype)", 0, 0 )
@@ -601,26 +601,25 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( chukrck2,   0,        1993, "Core Design", "Chuck Rock II - Son of Chuck (Euro)", 0, 0 )	/* Id: 29019 */
 	SOFTWARE( circuit,    worldgp,  1986, "Sega", "The Circuit (Jpn)", 0, 0 )	/* Id: G-1304 - Releases: 1986-09-21 (JPN) */
 	SOFTWARE( cloudmst,   0,        1989, "Sega", "Cloud Master (Euro, USA)", 0, 0 )	/* Id: 7027 */
-	SOFTWARE( colors,     0,        19??, "<unknown>", "Color & Switch Test (Unknown) (v1.3)", 0, 0 )
 	SOFTWARE( columns,    0,        1990, "Sega", "Columns (Euro, USA)", 0, 0 )	/* Id: 5120 */
 	SOFTWARE( columnsp,   columns,  1990, "Sega", "Columns (Euro, USA, Prototype)", 0, 0 )
 	SOFTWARE( comical,    0,        1986, "Sega", "Comical Machine Gun Joe (Jpn)", 0, 0 )	/* Id: C-511 - Releases: 1986-04-21 (Jpn, card) */
 	SOFTWARE( coolspot,   0,        1993, "Virgin Interactive", "Cool Spot (Euro)", 0, 0 )	/* Id: 27068-50 */
-	SOFTWARE( cosmic,     0,        1993, "Codemasters", "Cosmic Spacehead (En, Fr, De, Es) (Euro)", 0, 0 )	/* Id: 27074-50 */
+	SOFTWARE( cosmic,     0,        1993, "Codemasters", "Cosmic Spacehead (Euro)", 0, 0 )	/* Id: 27074-50 */
 	SOFTWARE( cybers,     0,        1990, "Sega", "The Cyber Shinobi (Euro)", 0, 0 )	/* Id: 7050 */
 	SOFTWARE( cyborgh,    0,        1988, "Sega", "Cyborg Hunter (Euro, USA)", 0, 0 )
-	SOFTWARE( daffy,      0,        1994, "Sega", "Daffy Duck in Hollywood (En, Fr, De, Es, It) (Euro)", 0, 0 )	/* Id: 9031 */
+	SOFTWARE( daffy,      0,        1994, "Sega", "Daffy Duck in Hollywood (Euro)", 0, 0 )	/* Id: 9031 */
 	SOFTWARE( dallye,     0,        1995, "Game Line", "Dallyeora Pigu-Wang (Korea)", 0, 0 )
 	SOFTWARE( danan,      0,        1990, "Sega", "Danan - The Jungle Fighter (Euro)", 0, 0 )	/* Id: 7049 */
 	SOFTWARE( deadang,    0,        1989, "Sega", "Dead Angle (Euro, USA)", 0, 0 )	/* Id: 7030 */
 	SOFTWARE( deepduck,   0,        1993, "Sega", "Deep Duck Trouble Starring Donald Duck (Euro)", 0, 0 )	/* Id: 9022 */
-	SOFTWARE( desert,     0,        1993, "Sega", "Desert Speedtrap Starring Road Runner and Wile E. Coyote (En, Fr, De, Es, It) (Euro)", 0, 0 )	/* Id: 7122 */
-	SOFTWARE( dstrike,    0,        1992, "Domark", "Desert Strike (En, Fr, De, Es) (Euro)", 0, 0 )	/* Id: 29010-50 */
+	SOFTWARE( desert,     0,        1993, "Sega", "Desert Speedtrap Starring Road Runner and Wile E. Coyote (Euro)", 0, 0 )	/* Id: 7122 */
+	SOFTWARE( dstrike,    0,        1992, "Domark", "Desert Strike (Euro)", 0, 0 )	/* Id: 29010-50 */
 	SOFTWARE( dicktr,     0,        1990, "Sega", "Dick Tracy (Euro, USA)", 0, 0 )	/* Id: 7057 */
-	SOFTWARE( dinobash,   0,        19??, "Codemasters", "Dinobasher Starring Bignose the Caveman (Prototype) (Euro)", 0, 0 )
+	SOFTWARE( dinobash,   0,        19??, "Codemasters", "Dinobasher Starring Bignose the Caveman (Euro, Prototype)", 0, 0 )
 	SOFTWARE( dinodool,   0,        19??, "<unknown>", "The Dinosaur Dooley (Korea)", 0, 0 )
 	SOFTWARE( ddragon,    0,        1988, "Sega", "Double Dragon (World)", 0, 0 )	/* Id: G-1369, 7012 - Releases: 1988-10-01 (JPN) - Notes: FM support */
-	SOFTWARE( doublhwk1,  doublhwk, 1990, "Sega", "Double Hawk (Beta) (Euro)", 0, 0 )
+	SOFTWARE( doublhwk1,  doublhwk, 1990, "Sega", "Double Hawk (Euro, Prototype)", 0, 0 )
 	SOFTWARE( doublhwk,   0,        1990, "Sega", "Double Hawk (Euro)", 0, 0 )	/* Id: 7036 */
 	SOFTWARE( doubltgt,   quartet,  1987, "Sega", "Double Target - Cynthia no Nemuri (Jpn)", 0, 0 )	/* Id: G-1314 - Releases: 1987-01-18 (JPN) */
 	SOFTWARE( drhello,    0,        19??, "<unknown>", "Dr. HELLO (Korea)", 0, 0 )
@@ -630,29 +629,29 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( dynaduke,   0,        1991, "Sega", "Dynamite Duke (Euro)", 0, 0 )	/* Id: 7067 */
 	SOFTWARE( dynadux,    0,        1989, "Sega", "Dynamite Dux (Euro)", 0, 0 )	/* Id: 7029 */
 	SOFTWARE( dynahead,   0,        1994, "Tec Toy", "Dynamite Headdy (Brazil)", 0, 0 )	/* Id: 028.570 */
-	SOFTWARE( eswatc,     0,        1990, "Sega", "E-SWAT - City Under Siege (Easy Version) (Euro, USA)", 0, 0 )	/* Id: 7042 */
-	SOFTWARE( eswatc1,    0,        1990, "Sega", "E-SWAT - City Under Siege (Hard Version) (Euro, USA)", 0, 0 )
+	SOFTWARE( eswatc,     0,        1990, "Sega", "E-SWAT - City Under Siege (Euro, USA, Easy Version)", 0, 0 )	/* Id: 7042 */
+	SOFTWARE( eswatc1,    0,        1990, "Sega", "E-SWAT - City Under Siege (Euro, USA, Hard Version)", 0, 0 )
 	SOFTWARE( ejim,       0,        1996, "Tec Toy", "Earthworm Jim (Brazil)", 0, 0 )	/* Id: 028.690 */
 	SOFTWARE( eccotide,   0,        1996, "Tec Toy", "Ecco - The Tides of Time (Brazil)", 0, 0 )	/* Id: 028.630 */
 	SOFTWARE( ecco,       0,        1993, "Sega", "Ecco the Dolphin (Euro)", 0, 0 )	/* Id: 9029 */
 	SOFTWARE( enduroj,    enduro,   1987, "Sega", "Enduro Racer (Jpn)", 0, 0 )	/* Id: G-1322, 5077 - Releases: 1987-05-18 (JPN) */
 	SOFTWARE( enduro,     0,        1987, "Sega", "Enduro Racer (Euro, USA)", 0, 0 )
-	SOFTWARE( excdizzy,   0,        19??, "Codemasters", "The Excellent Dizzy Collection (En, Fr, De, Es, It) (Prototype) (Euro, USA)", 0, 0 )
+	SOFTWARE( excdizzy,   0,        19??, "Codemasters", "The Excellent Dizzy Collection (Euro, USA, Prototype)", 0, 0 )
 	SOFTWARE( f16fight,   0,        1986, "Sega", "F-16 Fighter (Euro, USA)", 0, 0 )	/* Id: 4581 (Euro Cart re-release?) */
 	SOFTWARE( f16falcj,   f16fight, 1985, "Sega", "F-16 Fighting Falcon (Jpn)", 0, 0 )	/* Id: C-508, 4081 - Releases: 1985-12-22 (Jpn, card) */
 	SOFTWARE( f16falc,    f16fight, 1985, "Sega", "F-16 Fighting Falcon (USA)", 0, 0 )
 	SOFTWARE( f1,         0,        1993, "Domark", "F1 (Euro)", 0, 0 )	/* Id: 27072-50 */
-	SOFTWARE( fantdizz,   0,        1993, "Codemasters", "Fantastic Dizzy (En, Fr, De, Es, It) (Euro)", 0, 0 )	/* Id: 27074-50 */
+	SOFTWARE( fantdizz,   0,        1993, "Codemasters", "Fantastic Dizzy (Euro)", 0, 0 )	/* Id: 27074-50 */
 	SOFTWARE( fantzonej,  fantzone, 1986, "Sega", "Fantasy Zone (Jpn)", 0, 0 )	/* Id: G-1301, 5052 - Releases: 1986-06-15 (JPN) */
-	SOFTWARE( fantzone1,  fantzone, 1986, "Sega", "Fantasy Zone (v1.1) (Beta) (World)", 0, 0 )
-	SOFTWARE( fantzone,   0,        1986, "Sega", "Fantasy Zone (v1.2) (World)", 0, 0 )
+	SOFTWARE( fantzone1,  fantzone, 1986, "Sega", "Fantasy Zone (World, v1.1 Prototype)", 0, 0 )
+	SOFTWARE( fantzone,   0,        1986, "Sega", "Fantasy Zone (World, v1.2)", 0, 0 )
 	SOFTWARE( fantzonm,   0,        1987, "Sega", "Fantasy Zone - The Maze (Euro, USA)", 0, 0 )
 	SOFTWARE( opaopa,     fantzonm, 1987, "Sega", "Opa Opa (Jpn)", 0, 0 )	/* Id: G-1343 - Releases: 1987-12-20 (JPN) - Notes: FM support */
 	SOFTWARE( fantzon2,   0,        1987, "Sega", "Fantasy Zone II - The Tears of Opa-Opa (Euro, USA)", 0, 0 )	/* Id: 5108 */
 	SOFTWARE( fantzon2j,  fantzon2, 1987, "Sega", "Fantasy Zone II - Opa Opa no Namida (Jpn)", 0, 0 )	/* Id: G-1329, 7004 - Releases: 1987-10-17 (JPN) - Notes: FM support */
 	SOFTWARE( felipe,     0,        19??, "Tec Toy", "Felipe em Acao (Brazil)", 0, 0 )
 	SOFTWARE( ferias,     0,        1996, "Tec Toy", "Ferias Frustradas do Pica Pau (Brazil)", 0, 0 )	/* Id: 028.660 */
-	SOFTWARE( fifa,       0,        1994, "Tec Toy", "FIFA International Soccer (En, Es, Pt) (Brazil)", 0, 0 )	/* Id: 028.670 */
+	SOFTWARE( fifa,       0,        1994, "Tec Toy", "FIFA International Soccer (Brazil)", 0, 0 )	/* Id: 028.670 */
 	SOFTWARE( fireforg,   0,        1990, "Titus Arcade", "Fire & Forget II (Euro)", 0, 0 )	/* Id: 27009-50 */
 	SOFTWARE( fireice,    0,        1993, "Tec Toy", "Fire & Ice (Brazil)", 0, 0 )	/* Id: 027.360 */
 	SOFTWARE( flash,      0,        1993, "Sega", "The Flash (Euro)", 0, 0 )	/* Id: 7506 */
@@ -669,35 +668,35 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( gangster,   0,        1987, "Sega", "Gangster Town (Euro, USA)", 0, 0 )	/* Id: 5074 */
 	SOFTWARE( gauntlet,   0,        1990, "U.S. Gold", "Gauntlet (Euro)", 0, 0 )	/* Id: 25006 */
 	SOFTWARE( foremnko,    0,        1992, "Flying Edge", "George Foreman's KO Boxing (Euro)", 0, 0 )	/* Id: 27041-50 */
-	SOFTWARE( ghosthj1,   ghosth,   1986, "<pirate>", "Ghost House (Pirate) (Jpn)", 0, 0 )
+	SOFTWARE( ghosthj1,   ghosth,   1986, "<pirate>", "Ghost House (Jpn, Pirate)", 0, 0 )
 	SOFTWARE( ghosthj,    ghosth,   1986, "Sega", "Ghost House (Jpn)", 0, 0 )	/* Id: C-512, 4002 (Card), 4502 (Cart) - Releases: 1986-04-21 (Jpn, card) */
-	SOFTWARE( ghosthb,    ghosth,   1986, "Sega", "Ghost House (Beta) (Euro, USA)", 0, 0 )
+	SOFTWARE( ghosthb,    ghosth,   1986, "Sega", "Ghost House (Euro, USA, Prototype)", 0, 0 )
 	SOFTWARE( ghosth,     0,        1986, "Sega", "Ghost House (Euro, USA)", 0, 0 )
 	SOFTWARE( ghostbst,   0,        1989, "Sega", "Ghostbusters (Euro, USA)", 0, 0 )	/* Id: 5065 */
 	SOFTWARE( ghouls,     0,        1988, "Sega", "Ghouls'n Ghosts (Euro, USA)", 0, 0 )	/* Id: 7055 */
-	SOFTWARE( globalb,    global,   1987, "Sega", "Global Defense (Beta) (Euro, USA)", 0, 0 )
+	SOFTWARE( globalb,    global,   1987, "Sega", "Global Defense (Euro, USA, Prototype)", 0, 0 )
 	SOFTWARE( global,     0,        1987, "Sega", "Global Defense (Euro, USA)", 0, 0 )
 	SOFTWARE( sdi,        global,   1987, "Sega", "SDI (Jpn)", 0, 0 )	/* Id: G-1338, 5102 - Releases: 1987-10-24 (JPN) - Notes: FM support */
 	SOFTWARE( gaxe,       0,        1989, "Sega", "Golden Axe (Euro, USA)", 0, 0 )	/* Id: 9004 */
 	SOFTWARE( gaxewarr,   0,        1990, "Sega", "Golden Axe Warrior (Euro, USA)", 0, 0 )	/* Id: 7505 */
-	SOFTWARE( golfamanb,  golfaman, 1990, "Sega", "Golfamania (Beta) (Euro)", 0, 0 )
+	SOFTWARE( golfamanb,  golfaman, 1990, "Sega", "Golfamania (Euro, Prototype)", 0, 0 )
 	SOFTWARE( golfaman,   0,        1990, "Sega", "Golfamania (Euro)", 0, 0 )	/* Id: 7502 */
 	SOFTWARE( golvell,    0,        1988, "Sega", "Golvellius (Euro, USA)", 0, 0 )	/* Id: 7017 */
 	SOFTWARE( maougolv,   golvell,  1988, "Sega", "Maou Golvellius (Jpn)", 0, 0 )	/* Id: G-1363, 7017 - Releases: 1988-08-14 (JPN) - Notes: FM support */
 	SOFTWARE( maougolvp,  golvell,  1988, "Sega", "Maou Golvellius (Jpn, Prototype)", 0, 0 )
 	SOFTWARE( gprider,    0,        1993, "Sega", "GP Rider (Euro)", 0, 0 )	/* Id: 9013 */
-	SOFTWARE( greatbasj1, greatbas, 1985, "<pirate>", "Great Baseball (Pirate) (Jpn)", 0, 0 )
+	SOFTWARE( greatbasj1, greatbas, 1985, "<pirate>", "Great Baseball (Jpn, Pirate)", 0, 0 )
 	SOFTWARE( greatbasj,  greatbas, 1985, "Sega", "Great Baseball (Jpn)", 0, 0 )	/* Id: C-505, 5061 - Releases: 1985-12-15 (Jpn, card) */
 	SOFTWARE( greatbas,   0,        1985, "Sega", "Great Baseball (Euro, USA)", 0, 0 )
 	SOFTWARE( greatbsk,   0,        1987, "Sega", "Great Basketball (World)", 0, 0 )	/* Id: G-1320, 5071 - Releases: 1987-03-29 (JPN) */
 	SOFTWARE( greatftb,   0,        1987, "Sega", "Great Football (World)", 0, 0 )	/* Id: G-1321, 5058 - Releases: 1987-04-29 (JPN) */
 	SOFTWARE( greatglfj,  0,        1986, "Sega", "Great Golf (Jpn)", 0, 0 )	/* Id: G-1313 - Releases: 1986-12-20 (JPN) */
-	SOFTWARE( greatglf1,  greatglf, 1987, "Sega", "Great Golf (v1.0) (Euro, USA)", 0, 0 )
-	SOFTWARE( greatglfb,  greatglf, 1987, "Sega", "Great Golf (Beta) (World)", 0, 0 )
+	SOFTWARE( greatglf1,  greatglf, 1987, "Sega", "Great Golf (Euro, USA, v1.0)", 0, 0 )
+	SOFTWARE( greatglfb,  greatglf, 1987, "Sega", "Great Golf (World, Prototype)", 0, 0 )
 	SOFTWARE( greatglf,   0,        1987, "Sega", "Great Golf (World) ~ Masters Golf (Japan)", 0, 0 )	/* Id: G-1332, 5057 - Releases: 1987-10-10 (JPN) - Notes: FM support */
 	SOFTWARE( greatice,   0,        1987, "Sega", "Great Ice Hockey (Jpn, USA)", 0, 0 )	/* Id: 5062 (USA) - Releases: 1986 (USA), 1987 (Jpn, only 1000 copies as a prize for a contest) - Notes: FM support */
 	SOFTWARE( greatscr,   0,        1985, "Sega", "Great Soccer (Euro)", 0, 0 )
-	SOFTWARE( greatscrj1, greatscr, 1985, "<pirate>", "Great Soccer (Pirate) (Jpn)", 0, 0 )
+	SOFTWARE( greatscrj1, greatscr, 1985, "<pirate>", "Great Soccer (Jpn, Pirate)", 0, 0 )
 	SOFTWARE( greatscrj,  greatscr, 1985, "Sega", "Great Soccer (Jpn)", 0, 0 )	/* Id: C-504, 4082 (Euro card), 5059 - Releases: 1985-10-27 (Jpn, card) */
 	SOFTWARE( greattns,   superten, 1985, "Sega", "Great Tennis (Jpn)", 0, 0 )	/* Id: C-515 - Releases: 1985-12-22 (Jpn, card) */
 	SOFTWARE( greatvolj,  greatvol, 1987, "Sega", "Great Volleyball (Jpn)", 0, 0 )	/* Id: G-1317 - Releases: 1987-03-29 (JPN) */
@@ -710,14 +709,14 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( heroes,     0,        1991, "U.S. Gold", "Advanced Dungeon & Dragons - Heroes of the Lance (Euro)", 0, 0 )	/* Id: 29003-50 */
 	SOFTWARE( highsc,     0,        1986, "Sega", "High School! Kimengumi (Jpn)", 0, 0 )	/* Id: G-1309 - Releases: 1986-12-15 (JPN) */
 	SOFTWARE( homea,      0,        1993, "Sega", "Home Alone (Euro)", 0, 0 )	/* Id: 7109 */
-	SOFTWARE( hook,       0,        19??, "Sega", "Hook (Prototype) (Euro)", 0, 0 )
+	SOFTWARE( hook,       0,        19??, "Sega", "Hook (Euro, Prototype)", 0, 0 )
 	SOFTWARE( hoshiw,     0,        1988, "Sega", "Hoshi wo Sagashite... (Jpn)", 0, 0 )	/* Id: G-1354 - Releases: 1988-04-02 (JPN) - Notes: FM support */
 	SOFTWARE( hwaran,     0,        1988, "Samsung", "Hwarang Ui Geom (Korea)", 0, 0 )
-	SOFTWARE( impmissb,   impmiss,  1990, "U.S. Gold", "Impossible Mission (Beta) (Euro)", 0, 0 )
+	SOFTWARE( impmissb,   impmiss,  1990, "U.S. Gold", "Impossible Mission (Euro, Prototype)", 0, 0 )
 	SOFTWARE( impmiss,    0,        1990, "U.S. Gold", "Impossible Mission (Euro)", 0, 0 )	/* Id: 25007-50 */
 	SOFTWARE( incred,     0,        1993, "Flying Edge", "The Incredible Crash Dummies (Euro)", 0, 0 )	/* Id: 27057-50 */
 	SOFTWARE( incrhulk,   0,        1994, "U.S. Gold", "The Incredible Hulk (Euro)", 0, 0 )	/* Id: 29016-50 */
-	SOFTWARE( indycrusb,  indycrus, 1990, "U.S. Gold", "Indiana Jones and the Last Crusade (Beta) (Euro)", 0, 0 )
+	SOFTWARE( indycrusb,  indycrus, 1990, "U.S. Gold", "Indiana Jones and the Last Crusade (Euro, Prototype)", 0, 0 )
 	SOFTWARE( indycrus,   0,        1990, "U.S. Gold", "Indiana Jones and the Last Crusade (Euro)", 0, 0 )	/* Id: 27008-50 */
 	SOFTWARE( jamesb,     0,        1990, "Sega", "James 'Buster' Douglas Knockout Boxing (USA)", 0, 0 )	/* Id: 7063 */
 	SOFTWARE( jamesbp,    jamesb,   1990, "Sega", "James 'Buster' Douglas Knockout Boxing (USA, Prototype)", 0, 0 )
@@ -729,7 +728,7 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( jurassic,   0,        1993, "Sega", "Jurassic Park (Euro)", 0, 0 )	/* Id: 9030 */
 	SOFTWARE( kenseidj,   kenseid,  1988, "Sega", "Kenseiden (Jpn)", 0, 0 )	/* Id: G-1358, 7013 - Releases: 1988-06-02 (JPN) - Notes: FM support */
 	SOFTWARE( kenseid,    0,        1988, "Sega", "Kenseiden (Euro, USA)", 0, 0 )
-	SOFTWARE( kingsqb,    kingsq,   1989, "Parker Brothers", "King's Quest - Quest for the Crown (Beta) (USA)", 0, 0 )
+	SOFTWARE( kingsqb,    kingsq,   1989, "Parker Brothers", "King's Quest - Quest for the Crown (USA, Prototype)", 0, 0 )
 	SOFTWARE( kingsq,     0,        1989, "Parker Brothers", "King's Quest - Quest for the Crown (USA)", 0, 0 )	/* Id: 4360 */
 	SOFTWARE( klax,       0,        1991, "Tengen", "Klax (Euro)", 0, 0 )	/* Id: 301040-0160 */
 	SOFTWARE( krusty,     0,        1992, "Flying Edge", "Krusty's Fun House (Euro)", 0, 0 )	/* Id: 27056-50 */
@@ -737,16 +736,16 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( landill,    0,        1992, "Sega", "Land of Illusion Starring Mickey Mouse (Euro)", 0, 0 )	/* Id: 9014 */
 	SOFTWARE( laserg,     0,        1991, "Sega", "Laser Ghost (Euro)", 0, 0 )	/* Id: 7074 */
 	SOFTWARE( legndill,   0,        1994, "Tec Toy", "Legend of Illusion Starring Mickey Mouse (Brazil)", 0, 0 )	/* Id: 028750 */
-	SOFTWARE( lemmingsb,  lemmings, 1991, "Sega", "Lemmings (Beta) (Euro)", 0, 0 )
+	SOFTWARE( lemmingsb,  lemmings, 1991, "Sega", "Lemmings (Euro, Prototype)", 0, 0 )
 	SOFTWARE( lemmings,   0,        1991, "Sega", "Lemmings (Euro)", 0, 0 )	/* Id: 7108 */
 	SOFTWARE( lineof,     0,        1991, "Sega", "Line of Fire (Euro)", 0, 0 )	/* Id: 9006 */
 	SOFTWARE( lionking,   0,        1994, "Virgin Interactive", "Disney's The Lion King (Euro)", 0, 0 )	/* Id: 27081-5* */
 	SOFTWARE( lordswrdj,  lordswrd, 1988, "Sega", "Lord of Sword (Jpn)", 0, 0 )	/* Id: G-1361, 7016 - Releases: 1988-06-02 (JPN) - Notes: FM support */
 	SOFTWARE( lordswrd,   0,        1988, "Sega", "Lord of the Sword (Euro, USA)", 0, 0 )
 	SOFTWARE( loretta,    0,        1987, "Sega", "Loretta no Shouzou (Jpn)", 0, 0 )	/* Id: G-1315 - Releases: 1987-02-18 (JPN) */
-	SOFTWARE( luckydimb,  luckydim, 1991, "Sega", "The Lucky Dime Caper Starring Donald Duck (Beta) (Euro)", 0, 0 )
+	SOFTWARE( luckydimb,  luckydim, 1991, "Sega", "The Lucky Dime Caper Starring Donald Duck (Euro, Prototype)", 0, 0 )
 	SOFTWARE( luckydim,   0,        1991, "Sega", "The Lucky Dime Caper Starring Donald Duck (Euro)", 0, 0 )	/* Id: 7072 */
-	SOFTWARE( mahjongb,   mahjong,  1987, "Sega", "Mahjong Sengoku Jidai (Beta) (Jpn)", 0, 0 )
+	SOFTWARE( mahjongb,   mahjong,  1987, "Sega", "Mahjong Sengoku Jidai (Jpn, Prototype)", 0, 0 )
 	SOFTWARE( mahjong,    0,        1987, "Sega", "Mahjong Sengoku Jidai (Jpn)", 0, 0 )	/* Id: G-1337 - Releases: 1987-10-18 (JPN) */
 	SOFTWARE( makairet,   kungfuk,  1987, "Sega", "Makai Retsuden (Jpn)", 0, 0 )	/* Id: G-1324 - Releases: 1987-05-17 (JPN) */
 	SOFTWARE( marble,     0,        1992, "Virgin Interactive", "Marble Madness (Euro)", 0, 0 )	/* Id: 27024-50 */
@@ -758,13 +757,13 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( mazewalk,   mazehunt, 1988, "Sega", "Maze Walker (Jpn)", 0, 0 )	/* Id: G-1345, 8003 - Releases: 1988-01-31 (JPN) - Notes: FM support, 3D glasses support */
 	SOFTWARE( megumi,     0,        1988, "Sega", "Megumi Rescue (Jpn)", 0, 0 )	/* Id: G-1359 - Releases: 1988-07-30 (JPN) - Notes: FM support */
 	SOFTWARE( mercs,      0,        1990, "Sega", "Mercs (Euro)", 0, 0 )	/* Id: 9007 */
-	SOFTWARE( mwalkb,     mwalk,    1990, "Sega", "Michael Jackson's Moonwalker (Beta) (Euro, USA)", 0, 0 )
+	SOFTWARE( mwalkb,     mwalk,    1990, "Sega", "Michael Jackson's Moonwalker (Euro, USA, Prototype)", 0, 0 )
 	SOFTWARE( mwalk,      0,        1990, "Sega", "Michael Jackson's Moonwalker (Euro, USA)", 0, 0 )	/* Id: 7052 */
 	SOFTWARE( mickmack,   0,        1993, "Virgin Interactive", "Mick & Mack as the Global Gladiators (Euro)", 0, 0 )	/* Id: 27062-50 */
 	SOFTWARE( mickeyuc,   0,        1998, "Tec Toy", "Mickey's Ultimate Challenge (Brazil)", 0, 0 )	/* Id: 028.700 */
 	SOFTWARE( microm,     0,        1994, "Codemasters", "Micro Machines (Euro)", 0, 0 )	/* Id: 19001 */
 	SOFTWARE( miracle,    0,        1987, "Sega", "Miracle Warriors - Seal of the Dark Lord (Euro, USA)", 0, 0 )
-	SOFTWARE( miracleb,   miracle,  1987, "Sega", "Miracle Warriors - Seal of the Dark Lord (Beta) (Euro, USA)", 0, 0 )
+	SOFTWARE( miracleb,   miracle,  1987, "Sega", "Miracle Warriors - Seal of the Dark Lord (Euro, USA, Prototype)", 0, 0 )
 	SOFTWARE( hajafuin,   miracle,  1987, "Sega", "Haja no Fuuin (Jpn)", 0, 0 )	/* Id: G-1331, 7500 - Releases: 1987-10-18 (JPN) - Notes: FM support */
 	SOFTWARE( missil3d,   0,        19??, "Sega", "Missile Defense 3-D (Euro, USA)", 0, 0 )	/* Id: 8001 */
 	SOFTWARE( monica,     0,        19??, "Tec Toy", "Monica no Castelo do Dragao (Brazil)", 0, 0 )
@@ -778,17 +777,17 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( mspacman,   0,        1991, "Tengen", "Ms. Pac-Man (Euro)", 0, 0 )	/* Id: 301030-0160 */
 	SOFTWARE( myhero,     0,        1986, "Sega", "My Hero (Euro, USA)", 0, 0 )
 	SOFTWARE( seishun,    myhero,   1986, "Sega", "Seishun Scandal (Jpn)", 0, 0 )	/* Id: C-510, 4001 (card), 4501 (cart) - Releases: 1986-01-31 (Jpn, card) */
-	SOFTWARE( seishun1,   myhero,   1986, "<pirate>", "Seishyun Scandal (Pirate) (Jpn)", 0, 0 )
+	SOFTWARE( seishun1,   myhero,   1986, "<pirate>", "Seishyun Scandal (Jpn, Pirate)", 0, 0 )
 	SOFTWARE( nekkyu,     0,        1988, "Sega", "Nekkyuu Koushien (Jpn)", 0, 0 )	/* Id: G-1367 - Releases: 1988-09-09 (JPN) - Notes: FM support */
 	SOFTWARE( tnzs  ,     0,        1992, "TecMagik", "The New Zealand Story (Euro)", 0, 0 )	/* Id: 27035-50 */
-	SOFTWARE( ninjagb,    ninjag,   1992, "Sega", "Ninja Gaiden (Beta) (Euro)", 0, 0 )
+	SOFTWARE( ninjagb,    ninjag,   1992, "Sega", "Ninja Gaiden (Euro, Prototype)", 0, 0 )
 	SOFTWARE( ninjag,     0,        1992, "Sega", "Ninja Gaiden (Euro)", 0, 0 )	/* Id: 7101 */
 	SOFTWARE( ninja,      0,        1986, "Sega", "The Ninja (Euro, USA)", 0, 0 )
 	SOFTWARE( ninjaj,     ninja,    1986, "Sega", "The Ninja (Jpn)", 0, 0 )	/* Id: G-1308, 5066 - Releases: 1986-11-08 (JPN) */
-	SOFTWARE( olympi,     0,        1992, "U.S. Gold", "Olympic Gold (En, Fr, De, Es, It, Nl, Pt, Sv) (Euro)", 0, 0 )	/* Id: 27030-50 */
-	SOFTWARE( olympik,    olympi,   1992, "U.S. Gold", "Olympic Gold (En, Fr, De, Es, It, Nl, Pt, Sv) (Korea)", 0, 0 )
+	SOFTWARE( olympi,     0,        1992, "U.S. Gold", "Olympic Gold (Euro)", 0, 0 )	/* Id: 27030-50 */
+	SOFTWARE( olympik,    olympi,   1992, "U.S. Gold", "Olympic Gold (Korea)", 0, 0 )
 	SOFTWARE( opwolf,     0,        1990, "Sega", "Operation Wolf (Euro)", 0, 0 )	/* Id: 7039 */
-	SOFTWARE( ottifant,   0,        1993, "Sega", "The Ottifants (En, Fr, De, Es, It) (Euro)", 0, 0 )	/* Id: 7120 */
+	SOFTWARE( ottifant,   0,        1993, "Sega", "The Ottifants (Euro)", 0, 0 )	/* Id: 7120 */
 	SOFTWARE( outrun,     0,        1987, "Sega", "Out Run (World)", 0, 0 )	/* Id: G-1326, 7003 - Releases: 1987-06-30 (JPN) - Notes: FM support */
 	SOFTWARE( outrun3d,   0,        1991, "Sega", "Out Run 3-D (Euro)", 0, 0 )	/* Id: 8007 */
 	SOFTWARE( outruneu,   0,        1991, "U.S. Gold", "Out Run Europa (Euro)", 0, 0 )	/* Id: 27016-50 */
@@ -797,16 +796,16 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( paperboyu,  0,        1990, "Sega", "Paperboy (USA)", 0, 0 )
 	SOFTWARE( parlour,    0,        1987, "Sega", "Parlour Games (Euro, USA)", 0, 0 )
 	SOFTWARE( family,     parlour,  1987, "Sega", "Family Games (Jpn)", 0, 0 )	/* Id: G-1342, 5103 - Releases: 1987-12-27 (JPN) - Notes: FM support */
-	SOFTWARE( patriley,   0,        19??, "Sega", "Pat Riley Basketball (Prototype) (USA)", 0, 0 )
+	SOFTWARE( patriley,   0,        19??, "Sega", "Pat Riley Basketball (USA, Prototype)", 0, 0 )
 	SOFTWARE( penguin,    0,        1987, "Sega", "Penguin Land (Euro, USA)", 0, 0 )	/* Id: 5501 */
 	SOFTWARE( dokidoki,   penguin,  1987, "Sega", "Doki Doki Penguin Land - Uchuu Daibouken (Jpn)", 0, 0 )	/* Id: G-1334 - Releases: 1987-08-18 (JPN) - Notes: FM support */
 	SOFTWARE( pgatour,    0,        1991, "Tengen", "PGA Tour Golf (Euro)", 0, 0 )	/* Id: 27070-50 */
 	SOFTWARE( pstarb,     pstar,    1987, "Tec Toy", "Phantasy Star (Brazil)", 0, 0 )
-	SOFTWARE( pstarj1,    pstar,    1987, "Sega", "Phantasy Star (from Saturn Collection CD) (Jpn)", 0, 0 )
+	SOFTWARE( pstarj1,    pstar,    1987, "Sega", "Phantasy Star (Jpn, Saturn Collection CD)", 0, 0 )
 	SOFTWARE( pstarj,     pstar,    1987, "Sega", "Phantasy Star (Jpn)", 0, 0 )	/* Id: G-1341, 9500 - Releases: 1987-12-20 (JPN) - Notes: FM support */
 	SOFTWARE( pstark,     pstar,    1987, "Sega", "Phantasy Star (Korea)", 0, 0 )
-	SOFTWARE( pstar1,     pstar,    1987, "Sega", "Phantasy Star (v1.2) (Euro, USA)", 0, 0 )
-	SOFTWARE( pstar,      0,        1987, "Sega", "Phantasy Star (v1.3) (Euro, USA)", 0, 0 )
+	SOFTWARE( pstar1,     pstar,    1987, "Sega", "Phantasy Star (Euro, USA, v1.2)", 0, 0 )
+	SOFTWARE( pstar,      0,        1987, "Sega", "Phantasy Star (Euro, USA, v1.3)", 0, 0 )
 	SOFTWARE( pitfightb,  pitfight, 1991, "Tec Toy", "Pit Fighter (Brazil)", 0, 0 )
 	SOFTWARE( pitfight,   0,        1991, "Domark", "Pit Fighter (Euro)", 0, 0 )	/* Id: 29009-50 */
 	SOFTWARE( populous,   0,        1989, "TecMagik", "Populous (Euro)", 0, 0 )	/* Id: 27014-50 */
@@ -819,11 +818,11 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( prowrest,   0,        1986, "Sega", "Pro Wrestling (Euro, USA)", 0, 0 )
 	SOFTWARE( dumpmats,   prowrest, 1986, "Sega", "Gokuaku Doumei Dump Matsumoto (Jpn)", 0, 0 )	/* Id: G-1302, 5056 - Releases: 1986-07-20 (JPN) */
 	SOFTWARE( proyakyu,   0,        1987, "Sega", "The Pro Yakyuu Pennant Race (Jpn)", 0, 0 )	/* Id: G-1323 - Releases: 1987-08-17 (JPN) */
-	SOFTWARE( sms3samp,   0,        19??, "Tec Toy", "Promocao Especial M. System III Compact (Sample) (Brazil)", 0, 0 )
+	SOFTWARE( sms3samp,   0,        19??, "Tec Toy", "Promocao Especial M. System III Compact (Brazil, Sample)", 0, 0 )
 	SOFTWARE( psychic,    0,        1991, "Sega", "Psychic World (Euro)", 0, 0 )	/* Id: 7066 */
 	SOFTWARE( psychof,    0,        1989, "Sega", "Psycho Fox (Euro, USA)", 0, 0 )	/* Id: 7032 */
-	SOFTWARE( sapomestr,  psychof,  1995, "Tec Toy", "Sapo Xul? - O Mestre do Kung Fu (Brazil)", 0, 0 )
-	SOFTWARE( puttputtb,  puttputt, 1992, "Sega", "Putt & Putter (Beta) (Euro)", 0, 0 )
+	SOFTWARE( sapomestr,  psychof,  1995, "Tec Toy", "Sapo Xulé - O Mestre do Kung Fu (Brazil)", 0, 0 )
+	SOFTWARE( puttputtb,  puttputt, 1992, "Sega", "Putt & Putter (Euro, Prototype)", 0, 0 )
 	SOFTWARE( puttputt,   0,        1992, "Sega", "Putt & Putter (Euro)", 0, 0 )	/* Id: 5122 */
 	SOFTWARE( quartet,    0,        1987, "Sega", "Quartet (Euro, USA)", 0, 0 )	/* Id: 5073 */
 	SOFTWARE( questfsy,   0,        1993, "Tec Toy", "Quest for the Shaven Yak Starring Ren Hoek & Stimpy (Brazil)", 0, 0 )	/* Id: 028.540 */
@@ -845,11 +844,11 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( running,    0,        1991, "Sega", "Running Battle (Euro)", 0, 0 )	/* Id: 7037 */
 	SOFTWARE( sagaia,     0,        1992, "Sega", "Sagaia (Euro)", 0, 0 )	/* Id: 7078 */
 	SOFTWARE( sangok3,    0,        1994, "Game Line", "Sangokushi 3 (Korea)", 0, 0 )
-	SOFTWARE( sapoxu,     0,        1995, "Tec Toy", "Sapo Xul? vs. Os Invasores do Brejo (Brazil)", 0, 0 )
-	SOFTWARE( satell7a,   satell7,  1985, "<pirate>", "Satellite 7 (Pirate) (Jpn)", 0, 0 )
+	SOFTWARE( sapoxu,     0,        1995, "Tec Toy", "Sapo Xulé vs. Os Invasores do Brejo (Brazil)", 0, 0 )
+	SOFTWARE( satell7a,   satell7,  1985, "<pirate>", "Satellite 7 (Jpn, Pirate)", 0, 0 )
 	SOFTWARE( satell7,    0,        1985, "Sega", "Satellite 7 (Jpn)", 0, 0 )	/* Id: C-506 - Releases: 1985-12-20 (Jpn, card) */
-	SOFTWARE( schtroumb,  schtroum, 1996, "Infogrames", "Les Schtroumpfs Autour du Monde (En, Fr, De, Es) (Beta) (Euro)", 0, 0 )
-	SOFTWARE( schtroum,   0,        1996, "Infogrames", "Les Schtroumpfs Autour du Monde (En, Fr, De, Es) (Euro)", 0, 0 )	/* Id: 27085-50 */
+	SOFTWARE( schtroumb,  schtroum, 1996, "Infogrames", "Les Schtroumpfs Autour du Monde (Euro, Prototype)", 0, 0 )
+	SOFTWARE( schtroum,   0,        1996, "Infogrames", "Les Schtroumpfs Autour du Monde (Euro)", 0, 0 )	/* Id: 27085-50 */
 	SOFTWARE( scrambsp,   0,        1989, "Sega", "Scramble Spirits (Euro)", 0, 0 )	/* Id: 7031 */
 	SOFTWARE( secret,     0,        1986, "Sega", "Secret Command (Euro)", 0, 0 )
 	SOFTWARE( ashura,     secret,   1986, "Sega", "Ashura (Jpn)", 0, 0 )	/* Id: G-1307, 5064 (USA), 5081 (EUR) - Releases: 1986-11-16 (JPN) */
@@ -859,7 +858,7 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( sensible,   0,        1993, "Sony Imagesoft", "Sensible Soccer (Euro)", 0, 0 )	/* Id: 8011 */
 	SOFTWARE( shadow,     0,        1991, "Sega", "Shadow Dancer (Euro)", 0, 0 )	/* Id: 9009 */
 	SOFTWARE( beast,      0,        1991, "TecMagik", "Shadow of the Beast (Euro)", 0, 0 )	/* Id: 27019-50 */
-	SOFTWARE( shanghb,    shangh,   1988, "Sega", "Shanghai (Beta) (Euro, USA)", 0, 0 )
+	SOFTWARE( shanghb,    shangh,   1988, "Sega", "Shanghai (Euro, USA, Prototype)", 0, 0 )
 	SOFTWARE( shangh,     0,        1988, "Sega", "Shanghai (Euro, USA)", 0, 0 )	/* Id: 5110 */
 	SOFTWARE( shinobij,   0,        1988, "Sega", "Shinobi (Jpn)", 0, 0 )	/* Id: G-1353 - Releases: 1988-06-19 (JPN) - Notes: FM support */
 	SOFTWARE( shinobi,    0,        1988, "Sega", "Shinobi (Euro, USA)", 0, 0 )	/* Id: 7009 */
@@ -868,23 +867,23 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( bartvswd,   0,        1993, "Flying Edge", "The Simpsons - Bart vs. The World (Euro)", 0, 0 )	/* Id: 27053-50 */
 	SOFTWARE( sitio,      0,        1997, "Tec Toy", "Sitio do Picapau Amarelo (Brazil)", 0, 0 )
 	SOFTWARE( slapshot,   0,        1990, "Sega", "Slap Shot (Euro)", 0, 0 )	/* Id: 7035 */
-	SOFTWARE( slapshotu,  slapshot, 1990, "Sega", "Slap Shot (v1.1) (USA)", 0, 0 )
+	SOFTWARE( slapshotu,  slapshot, 1990, "Sega", "Slap Shot (USA, v1.1)", 0, 0 )
 	SOFTWARE( slapshotu1, slapshot, 1990, "Sega", "Slap Shot (USA)", 0, 0 )
-	SOFTWARE( smurfs,     0,        1994, "Infogrames", "The Smurfs (En, Fr, De, Es) (Euro)", 0, 0 )	/* Id: 27082-50 */
+	SOFTWARE( smurfs,     0,        1994, "Infogrames", "The Smurfs (Euro)", 0, 0 )	/* Id: 27082-50 */
 	SOFTWARE( solomon,    0,        1988, "Salio", "Solomon no Kagi - Oujo Rihita no Namida (Jpn)", 0, 0 )	/* 002 - Releases: 1988-04-17 (JPN) - Notes: FM support */
 	SOFTWARE( sonicbl,    0,        1997, "Tec Toy", "Sonic Blast (Brazil)", 0, 0 )	/* Id: 030.030 */
 	SOFTWARE( sonic,      0,        1991, "Sega", "Sonic The Hedgehog (Euro, USA)", 0, 0 )	/* Id: 7076 */
-	SOFTWARE( sonic2,     0,        1992, "Sega", "Sonic The Hedgehog 2 (v1.1) (Euro)", 0, 0 )	/* Id: 9015 */
+	SOFTWARE( sonic2,     0,        1992, "Sega", "Sonic The Hedgehog 2 (Euro, v1.1)", 0, 0 )	/* Id: 9015 */
 	SOFTWARE( sonic2a,    sonic2,   1992, "Sega", "Sonic The Hedgehog 2 (Euro)", 0, 0 )
 	SOFTWARE( sonicc,     0,        1993, "Sega", "Sonic The Hedgehog Chaos (Euro)", 0, 0 )	/* Id: 9021 */
 	SOFTWARE( sonicsp,    0,        1994, "Sega", "Sonic The Hedgehog Spinball (Euro)", 0, 0 )	/* Id: 9034 */
-	SOFTWARE( sonicedu,   0,        19??, "Sega", "Sonic's Edusoft (Unknown) (Prototype)", 0, 0 )
+	SOFTWARE( sonicedu,   0,        19??, "Sega", "Sonic's Edusoft (Prototype)", 0, 0 )
 	SOFTWARE( spacegun,   0,        1992, "Sega", "Space Gun (Euro)", 0, 0 )	/* Id: 9010 */
 	SOFTWARE( sharrj,     sharr,    1986, "Sega", "Space Harrier (Jpn)", 0, 0 )	/* Id: G-1310, 7001, 7080 - Releases: 1986-12-21 (JPN) */
 	SOFTWARE( sharr,      0,        1986, "Sega", "Space Harrier (Euro, USA)", 0, 0 )
 	SOFTWARE( sharr3d,    0,        1988, "Sega", "Space Harrier 3-D (Euro, USA)", 0, 0 )
 	SOFTWARE( sharr3dj,   sharr3d,  1988, "Sega", "Space Harrier 3D (Jpn)", 0, 0 )	/* Id: G-1349, 8004 - Releases: 1988-02-29 (JPN) - Notes: FM support, 3D glasses support  */
-	SOFTWARE( scib,       sci,      1992, "Sega", "Special Criminal Investigation (Beta) (Euro)", 0, 0 )
+	SOFTWARE( scib,       sci,      1992, "Sega", "Special Criminal Investigation (Euro, Prototype)", 0, 0 )
 	SOFTWARE( sci,        0,        1992, "Sega", "Special Criminal Investigation (Euro)", 0, 0 )	/* Id: 7079 */
 	SOFTWARE( speedbl,    0,        1990, "Image Works", "Speedball (Mirrorsoft) (Euro)", 0, 0 )	/* Id: 25009-50 */
 	SOFTWARE( speedblv,   0,        1992, "Virgin Interactive", "Speedball (Virgin) (Euro, USA)", 0, 0 )	/* Id: 25013-50 */
@@ -896,7 +895,7 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( sportsft,   0,        1987, "Sega", "Sports Pad Football (USA)", 0, 0 )	/* Id: 5060 */
 	SOFTWARE( sportssc,   0,        1988, "Sega", "Sports Pad Soccer (Jpn)", 0, 0 )	/* Id: G-1365 - Releases: 1988-10-29 (JPN) - Notes: Sports Pad support */
 	SOFTWARE( spyvsspyj,  spyvsspy, 1986, "Sega", "Spy vs Spy (Jpn)", 0, 0 )	/* Id: C-514, 4083 (Card), 4583 (Cart) - Releases: 1986-09-20 (Jpn, card) */
-	SOFTWARE( spyvsspyu,  spyvsspy, 1986, "Sega", "Spy vs. Spy (Display-Unit Cart) (USA)", 0, 0 )
+	SOFTWARE( spyvsspyu,  spyvsspy, 1986, "Sega", "Spy vs. Spy (USA, Display Unit Sample)", 0, 0 )
 	SOFTWARE( spyvsspy,   0,        1986, "Sega", "Spy vs. Spy (Euro, USA)", 0, 0 )
 	SOFTWARE( starwars,   0,        1993, "U.S. Gold", "Star Wars (Euro)", 0, 0 )	/* Id: 29014-50 */
 	SOFTWARE( sf2,        0,        1997, "Tec Toy", "Street Fighter II (Brazil)", 0, 0 )	/* Id: 030.010 */
@@ -906,10 +905,10 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( strider2,   0,        1992, "U.S. Gold", "Strider II (Euro)", 0, 0 )	/* Id: 29005-50 */
 	SOFTWARE( submarin,   0,        1990, "Sega", "Submarine Attack (Euro)", 0, 0 )	/* Id: 7048 */
 	SOFTWARE( sukeban,    0,        1987, "Sega", "Sukeban Deka II - Shoujo Tekkamen Densetsu (Jpn)", 0, 0 )	/* Id: G-1318 - Releases: 1987-04-19 (JPN) */
-	SOFTWARE( summergb,   summerg,  1991, "Sega", "Summer Games (Beta) (Euro)", 0, 0 )
+	SOFTWARE( summergb,   summerg,  1991, "Sega", "Summer Games (Euro, Prototype)", 0, 0 )
 	SOFTWARE( summerg,    0,        1991, "Sega", "Summer Games (Euro)", 0, 0 )	/* Id: 5119 */
-	SOFTWARE( suprbskt,   0,        19??, "<unknown>", "Super Basketball (Sample) (USA)", 0, 0 )
-	SOFTWARE( suprkick,   0,        1991, "U.S. Gold", "Super Kick Off (En, Fr, De, Es, It, Nl, Pt, Sv) (Euro)", 0, 0 )	/* Id: 27017-50 */
+	SOFTWARE( suprbskt,   0,        19??, "<unknown>", "Super Basketball (USA, Sample)", 0, 0 )
+	SOFTWARE( suprkick,   0,        1991, "U.S. Gold", "Super Kick Off (Euro)", 0, 0 )	/* Id: 27017-50 */
 	SOFTWARE( smgp,       0,        1990, "Sega", "Super Monaco GP (Euro)", 0, 0 )	/* Id: 7043 */
 	SOFTWARE( smgpu,      smgp,     1990, "Sega", "Super Monaco GP (USA)", 0, 0 )
 	SOFTWARE( suhocheo,   0,        19??, "<unknown>", "Suho Cheonsha (Korea)", 0, 0 )
@@ -922,13 +921,13 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( t2ag,       0,        1993, "Arena", "T2 - The Arcade Game (Euro)", 0, 0 )	/* Id: 27061-50 */
 	SOFTWARE( chasehq,    0,        1990, "Sega", "Taito Chase H.Q. (Euro)", 0, 0 )	/* Id: 7038 */
 	SOFTWARE( tazmars,    0,        19??, "Tec Toy", "Taz in Escape from Mars (Brazil)", 0, 0 )	/* Id: 028.620 */
-	SOFTWARE( tazmaniab,  tazmania, 1992, "Sega", "Taz-Mania (Beta) (Euro)", 0, 0 )
+	SOFTWARE( tazmaniab,  tazmania, 1992, "Sega", "Taz-Mania (Euro, Prototype)", 0, 0 )
 	SOFTWARE( tazmania,   0,        1992, "Sega", "Taz-Mania (Euro)", 0, 0 )	/* Id: 7111 */
-	SOFTWARE( tecmow92,   0,        19??, "Sega", "Tecmo World Cup '92 (Beta) (Euro)", 0, 0 )
+	SOFTWARE( tecmow92,   0,        19??, "Sega", "Tecmo World Cup '92 (Euro, Prototype)", 0, 0 )
 	SOFTWARE( tecmow93,   0,        1993, "Sega", "Tecmo World Cup '93 (Euro)", 0, 0 )	/* Id: 7106 */
 	SOFTWARE( teddyboy,   0,        1985, "Sega", "Teddy Boy (Euro, USA)", 0, 0 )
-	SOFTWARE( teddyboyj1, teddyboy, 1985, "<pirate>", "Teddy Boy Blues (Pirate) (Jpn)", 0, 0 )
-	SOFTWARE( teddyboyjp, teddyboy, 1985, "Sega", "Teddy Boy Blues (Prototype) (Ep-MyCard) (Jpn)", 0, 0 )
+	SOFTWARE( teddyboyj1, teddyboy, 1985, "<pirate>", "Teddy Boy Blues (Jpn, Pirate)", 0, 0 )
+	SOFTWARE( teddyboyjp, teddyboy, 1985, "Sega", "Teddy Boy Blues (Jpn, Ep-MyCard, Prototype)", 0, 0 )
 	SOFTWARE( teddyboyj,  teddyboy, 1985, "Sega", "Teddy Boy Blues (Jpn)", 0, 0 )	/* Id: C-501, 4003 (Card), 4503 (Cart) - Releases: 1985-10-20 (Jpn, card) */
 	SOFTWARE( gerald,     teddyboy, 19??, "Tec Toy", "Geraldinho (Brazil)", 0, 0 )
 	SOFTWARE( tennis,     0,        1989, "Sega", "Tennis Ace (Euro)", 0, 0 )	/* Id: 7028 */
@@ -940,19 +939,19 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( thunderbj,  0,        1988, "Sega", "Thunder Blade (Jpn)", 0, 0 )	/* Id: G-1360, 7011 - Releases: 1988-07-30 (JPN) - Notes: FM support */
 	SOFTWARE( thunderb,   0,        1988, "Sega", "Thunder Blade (Euro, USA)", 0, 0 )
 	SOFTWARE( timesold,   0,        1989, "Sega", "Time Soldiers (Euro, USA)", 0, 0 )	/* Id: 7024 */
-	SOFTWARE( tomjerry,   0,        1992, "Sega", "Tom & Jerry (Beta) (Euro)", 0, 0 )
+	SOFTWARE( tomjerry,   0,        1992, "Sega", "Tom & Jerry (Euro, Prototype)", 0, 0 )
 	SOFTWARE( tomjermv,   0,        1992, "Sega", "Tom and Jerry - The Movie (Euro)", 0, 0 )	/* Id: 7070 */
 	SOFTWARE( totowld3,   0,        1993, "Open Corp.", "Toto World 3 (Korea)", 0, 0 )
 	SOFTWARE( transbot,   0,        1985, "Sega", "TransBot (Euro, USA)", 0, 0 )
 	SOFTWARE( astrof,     transbot, 1985, "Sega", "Astro Flash (Jpn)", 0, 0 )	/* Id: C-503, 4004 (Card), 4504 (Cart) - Releases: 1985-12-22 (Jpn, card) */
-	SOFTWARE( astrof1,    transbot, 1985, "<pirate>", "Astro Flash (Pirate) (Jpn)", 0, 0 )
+	SOFTWARE( astrof1,    transbot, 1985, "<pirate>", "Astro Flash (Jpn, Pirate)", 0, 0 )
 	SOFTWARE( treinam,    0,        19??, "Tec Toy", "Treinamento Do Mymo (Brazil)", 0, 0 )
-	SOFTWARE( trivial,    0,        1992, "Domark", "Trivial Pursuit - Genus Edition (En, Fr, De, Es) (Euro)", 0, 0 )	/* Id: 29008-50 */
+	SOFTWARE( trivial,    0,        1992, "Domark", "Trivial Pursuit - Genus Edition (Euro)", 0, 0 )	/* Id: 29008-50 */
 	SOFTWARE( ttoriui,    0,        19??, "<unknown>", "Ttoriui Moheom  (Korea)", 0, 0 )
-	SOFTWARE( ultima4b,   0,        1990, "Sega", "Ultima IV - Quest of the Avatar (Beta) (Euro)", 0, 0 )
+	SOFTWARE( ultima4b,   0,        1990, "Sega", "Ultima IV - Quest of the Avatar (Euro, Prototype)", 0, 0 )
 	SOFTWARE( ultima4,    0,        1990, "Sega", "Ultima IV - Quest of the Avatar (Euro)", 0, 0 )	/* Id: 9501 */
-	SOFTWARE( ultimscr,   0,        1993, "Sega", "Ultimate Soccer (En, Fr, De, Es, It) (Euro)", 0, 0 )	/* Id: 7119 */
-	SOFTWARE( vampire,    0,        19??, "<unknown>", "Vampire (Beta) (Euro)", 0, 0 )
+	SOFTWARE( ultimscr,   0,        1993, "Sega", "Ultimate Soccer (Euro)", 0, 0 )	/* Id: 7119 */
+	SOFTWARE( vampire,    0,        19??, "<unknown>", "Vampire (Euro, Prototype)", 0, 0 )
 	SOFTWARE( vigilant,   0,        1989, "Sega", "Vigilante (Euro, USA)", 0, 0 )	/* Id: 7023 */
 	SOFTWARE( vf,         0,        1997, "Tec Toy", "Virtua Fighter Animation (Brazil)", 0, 0 )	/* Id: 030.020 */
 	SOFTWARE( waltpay,    0,        1989, "Sega", "Walter Payton Football (USA)", 0, 0 )	/* Id: 7020 */
@@ -961,24 +960,24 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( wwrld,      0,        1989, "Parker Brothers", "Where in the World is Carmen Sandiego (USA)", 0, 0 )	/* Id: 4350 */
 	SOFTWARE( wimbledn,   0,        1992, "Sega", "Wimbledon (Euro)", 0, 0 )	/* Id: 7100 */
 	SOFTWARE( wimbled2,   0,        1993, "Sega", "Wimbledon II (Euro)", 0, 0 )	/* Id: 7115 */
-	SOFTWARE( winterolb,  winterol, 1993, "U.S. Gold", "Winter Olympics - Lillehammer '94 (En, Fr, De, Es, It, Pt, Sv, No) (Brazil)", 0, 0 )
-	SOFTWARE( winterol,   0,        1993, "U.S. Gold", "Winter Olympics - Lillehammer '94 (En, Fr, De, Es, It, Pt, Sv, No) (Euro)", 0, 0 )	/* Id: 29015-50 */
+	SOFTWARE( winterolb,  winterol, 1993, "U.S. Gold", "Winter Olympics - Lillehammer '94 (Brazil)", 0, 0 )
+	SOFTWARE( winterol,   0,        1993, "U.S. Gold", "Winter Olympics - Lillehammer '94 (Euro)", 0, 0 )	/* Id: 29015-50 */
 	SOFTWARE( wolfch,     0,        1993, "Virgin Interactive", "Wolfchild (Euro)", 0, 0 )	/* Id: 27060-50 */
 	SOFTWARE( wboy,       0,        1987, "Sega", "Wonder Boy (Euro, USA)", 0, 0 )
 	SOFTWARE( wboyj,      wboy,     1987, "Sega", "Super Wonder Boy (Jpn)", 0, 0 )	/* Id: G-1316, 5068 - Releases: 1987-03-22 (JPN) */
 	SOFTWARE( wboy3,      0,        1989, "Sega", "Wonder Boy III - The Dragon's Trap (Euro, USA)", 0, 0 )	/* Id: 7026 */
 	SOFTWARE( turmamon,   wboy3,    1993, "Tec Toy", "Turma da Monica em O Resgate (Brazil)", 0, 0 )	/* Id: 026.260 */
-	SOFTWARE( wboymlnd,   0,        1988, "Sega", "Wonder Boy in Monster Land (v1.1) (Hacked?) (Euro, USA)", 0, 0 )
+	SOFTWARE( wboymlnd,   0,        1988, "Sega", "Wonder Boy in Monster Land (Euro, USA, v1.1, Hacked?)", 0, 0 )
 	SOFTWARE( wboymlndp,  wboymlnd, 1988, "Sega", "Wonder Boy in Monster Land (Prototype)", 0, 0 )
 	SOFTWARE( wboymlndu,  wboymlnd, 1988, "Sega", "Wonder Boy in Monster Land (Euro, USA)", 0, 0 )
 	SOFTWARE( wboymlndj,  wboymlnd, 1988, "Sega", "Super Wonder Boy - Monster World (Jpn)", 0, 0 )	/* Id: G-1346, 7007 - Releases: 1988-01-31 (JPN) - Notes: FM support */
-	SOFTWARE( wboymwldb,  wboymwld, 1993, "Sega", "Wonder Boy in Monster World (Beta) (Euro)", 0, 0 )
+	SOFTWARE( wboymwldb,  wboymwld, 1993, "Sega", "Wonder Boy in Monster World (Euro, Prototype)", 0, 0 )
 	SOFTWARE( wboymwld,   0,        1993, "Sega", "Wonder Boy in Monster World (Euro)", 0, 0 )	/* Id: 9012 */
 	SOFTWARE( woodypop,   0,        1987, "Sega", "Woody Pop - Shinjinrui no Block Kuzushi (Jpn)", 0, 0 )	/* Id: C-519 - Releases: 1987-03-15 (Jpn, card) */
 	SOFTWARE( wclead,     0,        1991, "U.S. Gold", "World Class Leader Board (Euro)", 0, 0 )	/* Id: 27015-50 */
 	SOFTWARE( wcup90,     0,        1990, "Sega", "World Cup Italia '90 (Euro)", 0, 0 )	/* Id: 5084 */
-	SOFTWARE( wcup94,     0,        1992, "Sega", "World Cup USA 94 (En, Fr, De, Es, It, Nl, Pt, Sv) (Euro)", 0, 0 )	/* Id: 29028-5* */
-	SOFTWARE( worldgb,    worldg,   1989, "Sega", "World Games (Beta) (Euro)", 0, 0 )
+	SOFTWARE( wcup94,     0,        1992, "Sega", "World Cup USA 94 (Euro)", 0, 0 )	/* Id: 29028-5* */
+	SOFTWARE( worldgb,    worldg,   1989, "Sega", "World Games (Euro, Prototype)", 0, 0 )
 	SOFTWARE( worldg,     0,        1989, "Sega", "World Games (Euro)", 0, 0 )	/* Id: 5114 */
 	SOFTWARE( worldgp,    0,        1986, "Sega", "World Grand Prix (Euro)", 0, 0 )	/* Id: 5080, 5053? */
 	SOFTWARE( worldgpu,   worldgp,  1986, "Sega", "World Grand Prix (USA)", 0, 0 )
@@ -989,13 +988,16 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( xenon2v,    0,        1991, "Virgin Interactive", "Xenon 2 - Megablast (Virgin) (Euro)", 0, 0 )	/* Id: 27038-50 */
 	SOFTWARE( ys,         ysomens,  1988, "Sega", "Ys (Jpn)", 0, 0 )	/* Id: G-1370, 7501 - Releases: 1988-10-15 (JPN) - Notes: FM support */
 	SOFTWARE( ysomens,    0,        1988, "Sega", "Ys - The Vanished Omens (Euro, USA)", 0, 0 )
-	SOFTWARE( zaxxon3db,  zaxxon3d, 1987, "Sega", "Zaxxon 3-D (Beta) (World)", 0, 0 )
+	SOFTWARE( zaxxon3db,  zaxxon3d, 1987, "Sega", "Zaxxon 3-D (World, Prototype)", 0, 0 )
 	SOFTWARE( zaxxon3d,   0,        1987, "Sega", "Zaxxon 3-D (World)", 0, 0 )	/* Id: G-1336, 8002 - Releases: 1987-11-07 (JPN) - Notes: FM support, 3D glasses support */
-	SOFTWARE( zillion,    0,        1987, "Sega", "Zillion (v1.2) (Euro)", 0, 0 )
-	SOFTWARE( zillionj,   zillion,  1987, "Sega", "Akai Koudan Zillion (Jpn) ~ Zillion (Euro) (En, Ja)", 0, 0 )	/* Id: G-1325, 5075 - Releases: 1987-05-24 (JPN) */
-	SOFTWARE( zillionu,   zillion,  1987, "Sega", "Zillion (v1.1) (USA)", 0, 0 )
+	SOFTWARE( zillion,    0,        1987, "Sega", "Zillion (Euro, v1.2)", 0, 0 )
+	SOFTWARE( zillionj,   zillion,  1987, "Sega", "Zillion (Euro) ~ Akai Koudan Zillion (Jpn)", 0, 0 )	/* Id: G-1325, 5075 - Releases: 1987-05-24 (JPN) */
+	SOFTWARE( zillionu,   zillion,  1987, "Sega", "Zillion (USA, v1.1)", 0, 0 )
 	SOFTWARE( zillion2,   0,        1987, "Sega", "Zillion II - The Tri Formation (Euro, USA) ~ Tri Formation (Jpn)", 0, 0 )	/* Id: G-1344, 5105 - Releases: 1987-12-13 (JPN) - Notes: FM support */
 	SOFTWARE( zool,       0,        1993, "Gremlin Interactive", "Zool - Ninja of the 'Nth' Dimension (Euro)", 0, 0 )	/* Id: 27075-50 */
+
+
+	SOFTWARE( colors,     0,        19??, "<unknown>", "Color & Switch Test (v1.3)", 0, 0 )
 SOFTWARE_LIST_END
 
 

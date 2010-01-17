@@ -9,7 +9,9 @@
 #include "devices/cartslot.h"
 
 
-// to verify this!
+#define COLOR_ONLY      0x01
+
+
 #define NGP_ROM_LOAD( set, name, offset, length, hash )	\
 SOFTWARE_START( set ) \
 	ROM_REGION( 0x400000, CARTRIDGE_REGION_ROM, ROMREGION_ERASEFF ) \
@@ -17,7 +19,7 @@ SOFTWARE_START( set ) \
 SOFTWARE_END
 
 
-// NGP Color
+// NGP
 NGP_ROM_LOAD( baseball, "baseball stars (japan, europe) (en,ja).bin",                                                0x000000,  0x100000,	 CRC(4781ae84) SHA1(8ece00f21ae49ed4777a9c990b2782465ef95380) )
 NGP_ROM_LOAD( dokodemo, "dokodemo mahjong (japan).bin",                                                              0x000000,  0x80000,	 CRC(78c21b5e) SHA1(d7edf6bb3773a5319dfd2a20e204c70e8cc6971e) )
 NGP_ROM_LOAD( kof_mlon, "king of fighters r-1 & melon-chan no seichou nikki (japan) (beta).bin",                     0x000000,  0x200000,	 CRC(2660bfc4) SHA1(a02d1b1113dbeac895832f1501029e40d9aab493) )
@@ -136,120 +138,123 @@ NGP_ROM_LOAD( wrestmad,   "wrestling madness (usa, europe) (beta).bin",         
 
 
 SOFTWARE_LIST_START( ngp_cart )
-	SOFTWARE( baseball, 0,        1998, "SNK", "Pocket Sports Series - Baseball Stars", 0, 0 )		/* Id: NeoP00070 - Developer: SNK - Releases: 1998-11-26 (JPN) */
-	SOFTWARE( dokodemo, 0,        1999, "SNK", "Dokodemo Mahjong (Japan)", 0, 0 )				/* Id: NeoP00330 - Developer: ADK - Releases: 1999-04-29 (JPN) */
-	SOFTWARE( kof_mlon, 0,        199?, "SNK", "King of Fighters R-1 & Melon-chan no Seichou Nikki (Beta, Japan)", 0, 0 )
-	SOFTWARE( kofr1,    0,        1998, "SNK", "Pocket Fighting Series - King of Fighters R-1", 0, 0 )		/* Id: NeoP00010 - Developer: SNK - Releases: 1998-10-28 (JPN) */
-	SOFTWARE( melonchn, 0,        1998, "SNK", "Melon-chan no Seichou Nikki (Japan)", 0, 0 )		/* Id: NeoP00040 - Developer: ADK - Releases: 1998-10-28 (JPN) */
-	SOFTWARE( neocher,  0,        1998, "SNK", "Pocket Casino Series - Neo Cherry Master", 0, 0 )		/* Id: NeoP00140 - Developer: Dyna - Releases: 1998-12-25 (JPN) */
-	SOFTWARE( neocup98, 0,        1998, "SNK", "Pocket Sports Series - Neo Geo Cup '98", 0, 0 )		/* Id: NeoP00020 - Developer: SNK - Releases: 1998-10-28 (JPN) */
-	SOFTWARE( ptennis,  0,        1998, "SNK", "Pocket Sports Series - Pocket Tennis", 0, 0 )		/* Id: NeoP00090 - Developer: Yumeboko - Releases: 1998-10-28 (JPN) */
-	SOFTWARE( renketsu, 0,        1998, "SNK", "Renketsu Puzzle Tsunagete Pon! (Japan)", 0, 0	)	/* Id: NeoP00120 - Developer: Yumeboko - Releases: 1998-10-28 (JPN) */
-	SOFTWARE( shougi,   0,        1998, "SNK", "Shougi no Tatsujin (Japan)", 0, 0 )		/* Id: NeoP00050 - Developer: ADK - Releases: 1998-11-20 (JPN) */
+	SOFTWARE( baseball,   0,        1998, "SNK", "Pocket Sports Series - Baseball Stars (Euro, Jpn)", 0, 0 )     /* Id: NeoP00070 - Developer: SNK - Releases: 1998-11-26 (JPN) */
+	SOFTWARE( kof_mlon,   0,        199?, "SNK", "King of Fighters R-1 & Melon-chan no Seichou Nikki (Jpn, Prototype)", 0, 0 )
+	SOFTWARE( kofr1,      0,        1998, "SNK", "Pocket Fighting Series - King of Fighters R-1 (Euro, Jpn)", 0, 0 ) /* Id: NeoP00010 - Developer: SNK - Releases: 1998-10-28 (JPN) */
+	SOFTWARE( melonchn,   0,        1998, "SNK", "Melon-chan no Seichou Nikki (Jpn)", 0, 0 )                     /* Id: NeoP00040 - Developer: ADK - Releases: 1998-10-28 (JPN) */
+	SOFTWARE( neocher,    0,        1998, "SNK", "Pocket Casino Series - Neo Cherry Master (Euro, Jpn)", 0, 0 )  /* Id: NeoP00140 - Developer: Dyna - Releases: 1998-12-25 (JPN) */
+	SOFTWARE( neocup98,   0,        1998, "SNK", "Pocket Sports Series - Neo Geo Cup '98 (Euro, Jpn)", 0, 0 )    /* Id: NeoP00020 - Developer: SNK - Releases: 1998-10-28 (JPN) */
+	SOFTWARE( ptennis,    0,        1998, "SNK", "Pocket Sports Series - Pocket Tennis (Euro, Jpn)", 0, 0 )      /* Id: NeoP00090 - Developer: Yumekobo - Releases: 1998-10-28 (JPN) */
+	SOFTWARE( renketsu,   0,        1998, "SNK", "Renketsu Puzzle Tsunagete Pon! (Jpn)", 0, 0	)                  /* Id: NeoP00120 - Developer: Yumekobo - Releases: 1998-10-28 (JPN) */
+	SOFTWARE( shougi,     0,        1998, "SNK", "Shougi no Tatsujin (Jpn)", 0, 0 )                              /* Id: NeoP00050 - Developer: ADK - Releases: 1998-11-20 (JPN) */
 SOFTWARE_LIST_END
 
 
-/* Some games below also work on NGP, see Notes (still in progress...) */
+/* FIXME: Euro & USA games still miss Id & COLOR_ONLY info */
 SOFTWARE_LIST_START( ngpc_cart )
-	SOFTWARE( bakumats,   0,        19??, "<unknown>", "Bakumatsu Rouman Tokubetsu Hen - Gekka no Kenshi - Tsuki ni Saku Hana, Chiri Yuku Hana (Japan)", 0, 0 )
-	SOFTWARE( bstarsc,    0,        19??, "<unknown>", "Baseball Stars Color (World) (En,Ja)", 0, 0 )
-	SOFTWARE( bigbang,    0,        19??, "<unknown>", "Big Bang Pro Wrestling (Japan) (En,Ja)", 0, 0 )
-	SOFTWARE( bikkuri,    0,        19??, "<unknown>", "Bikkuriman 2000 - Viva! Pocket Festiva! (Japan)", 0, 0 )
-	SOFTWARE( biomotorj,  biomotor, 19??, "<unknown>", "Biomotor Unitron (Japan)", 0, 0 )
-	SOFTWARE( biomotor,   0,        19??, "<unknown>", "Biomotor Unitron (USA, Europe)", 0, 0 )
-	SOFTWARE( bustamove,  pbobble,  19??, "<unknown>", "Bust-A-Move Pocket (USA)", 0, 0 )
-	SOFTWARE( coolboar,   0,        19??, "<unknown>", "Cool Boarders Pocket (Japan, Europe) (En,Ja)", 0, 0 )
-	SOFTWARE( coolcoolj,  coolcool, 19??, "<unknown>", "Cool Cool Jam (Japan)", 0, 0 )
-	SOFTWARE( coolcool,   0,        19??, "<unknown>", "Cool Cool Jam (USA, Europe) (Sample)", 0, 0 )
-	SOFTWARE( crushrol,   0,        19??, "<unknown>", "Crush Roller (World) (En,Ja)", 0, 0 )
-	SOFTWARE( darkarms,   0,        19??, "<unknown>", "Dark Arms - Beast Buster 1999 (World) (En,Ja)", 0, 0 )
-	SOFTWARE( deltawrp,   0,        19??, "<unknown>", "Delta Warp (Japan)", 0, 0 )
-	SOFTWARE( ogrebatl,   0,        19??, "<unknown>", "Densetsu no Ogre Battle Gaiden - Zenobia no Ouji (Japan)", 0, 0 )
-	SOFTWARE( dendego2b,  dendego2, 19??, "<unknown>", "Densha de Go! 2 on Neo Geo Pocket (Japan) (Beta)", 0, 0 )
-	SOFTWARE( dendego2,   0,        19??, "<unknown>", "Densha de Go! 2 on Neo Geo Pocket (Japan)", 0, 0 )
-	SOFTWARE( divealer1,  divealer, 19??, "<unknown>", "Dive Alert - Becky's Version (USA, Europe)", 0, 0 )
-	SOFTWARE( divealerj,  divealer, 19??, "<unknown>", "Dive Alert - Burn Hen (Japan)", 0, 0 )
-	SOFTWARE( divealer,   0,        19??, "<unknown>", "Dive Alert - Matt's Version (USA, Europe)", 0, 0 )
-	SOFTWARE( divealerj1, divealer, 19??, "<unknown>", "Dive Alert - Rebecca Hen (Japan)", 0, 0 )
-	SOFTWARE( dynaslug,   0,        19??, "<unknown>", "Dynamite Slugger (Japan, Europe) (En,Ja)", 0, 0 )
-	SOFTWARE( evolutio,   0,        19??, "<unknown>", "Evolution - Eternal Dungeons (Europe)", 0, 0 )
-	SOFTWARE( cotton,     0,        19??, "<unknown>", "Fantastic Night Dreams Cotton (Europe)", 0, 0 )
-	SOFTWARE( cottonj,    cotton,   19??, "<unknown>", "Fantastic Night Dreams Cotton (Japan)", 0, 0 )
-	SOFTWARE( faselei,    0,        19??, "<unknown>", "Faselei! (Europe)", 0, 0 )
-	SOFTWARE( faseleij,   faselei,  19??, "<unknown>", "Faselei! (Japan)", 0, 0 )
-	SOFTWARE( fatfury,    0,        19??, "<unknown>", "Fatal Fury F-Contact (World) (En,Ja)", 0, 0 )
-	SOFTWARE( ganbaren,   0,        19??, "<unknown>", "Ganbare Neo Poke-kun (Ka) (Japan)", 0, 0 )
-	SOFTWARE( infinity,   0,        19??, "<unknown>", "Infinity Cure (Japan)", 0, 0 )
-	SOFTWARE( kikousei,   0,        19??, "<unknown>", "Kikou Seiki Unitron - Sono Tsuide. Hikari Umareru Chi Yori. (Japan)", 0, 0 )
-	SOFTWARE( kofr2b,     kofr2,    19??, "<unknown>", "King of Fighters R-2 (World) (En,Ja) (Beta)", 0, 0 )
-	SOFTWARE( kofr2,      0,        19??, "<unknown>", "King of Fighters R-2 (World) (En,Ja)", 0, 0 )
-	SOFTWARE( kofpara,    0,        19??, "<unknown>", "King of Fighters, The - Battle de Paradise (Japan)", 0, 0 )
-	SOFTWARE( koikoi,     0,        19??, "<unknown>", "Koi Koi Mahjong (Japan)", 0, 0 )
-	SOFTWARE( lastblad,   0,        19??, "<unknown>", "Last Blade, The - Beyond the Destiny (Europe)", 0, 0 )
-	SOFTWARE( magdropj,   magdrop,  19??, "<unknown>", "Magical Drop Pocket (Japan)", 0, 0 )
-	SOFTWARE( magdrop,    0,        19??, "<unknown>", "Magical Drop Pocket (USA, Europe)", 0, 0 )
-	SOFTWARE( memories,   0,        19??, "<unknown>", "Memories Off - Pure (Japan)", 0, 0 )
-	SOFTWARE( mslug1st,   0,        19??, "<unknown>", "Metal Slug - 1st Mission (World) (En,Ja)", 0, 0 )
-	SOFTWARE( mslug2nd,   0,        19??, "<unknown>", "Metal Slug - 2nd Mission (World) (En,Ja)", 0, 0 )
-	SOFTWARE( mezase,     0,        19??, "<unknown>", "Mezase! Kanji Ou (Japan)", 0, 0 )
-	SOFTWARE( mizuki,     0,        19??, "<unknown>", "Mizuki Shigeru no Youkai Shashinkan (Japan)", 0, 0 )
-	SOFTWARE( neo21,      0,        19??, "<unknown>", "Neo 21 - Real Casino Series (World)", 0, 0 )
-	SOFTWARE( neobacca,   0,        19??, "<unknown>", "Neo Baccarat - Real Casino Series (World)", 0, 0 )
-	SOFTWARE( neochercb,  neocherc, 19??, "<unknown>", "Neo Cherry Master Color - Real Casino Series (World) (En,Ja) (Beta)", 0, 0 )
-	SOFTWARE( neocherc,   0,        19??, "<unknown>", "Neo Cherry Master Color - Real Casino Series (World) (En,Ja)", 0, 0 )
-	SOFTWARE( neoderby,   0,        19??, "<unknown>", "Neo Derby Champ Daiyosou (Japan)", 0, 0 )
-	SOFTWARE( neocuppl,   0,        19??, "<unknown>", "Neo Geo Cup '98 Plus (World) (En,Ja)", 0, 0 )
-	SOFTWARE( neoproyk,   0,        19??, "<unknown>", "Neo Poke Pro Yakyuu (Japan)", 0, 0 )
-	SOFTWARE( neoturfm,   0,        19??, "<unknown>", "Neo Turf Masters (World) (En,Ja)", 0, 0 )
-	SOFTWARE( nigeronp,   0,        19??, "<unknown>", "Nigeronpa (Japan)", 0, 0 )
-	SOFTWARE( oekakip,    0,        19??, "<unknown>", "Oekaki Puzzle (Japan)", 0, 0 )
-	SOFTWARE( pacworld,   0,        19??, "<unknown>", "Pac-Man (World) (En,Ja)", 0, 0 )
-	SOFTWARE( pslotazt,   0,        19??, "<unknown>", "Pachi-Slot Aruze Oukoku Pocket - Azteca (Japan)", 0, 0 )
-	SOFTWARE( pslotdk2,   0,        19??, "<unknown>", "Pachi-Slot Aruze Oukoku Pocket - Dekahel 2 (Japan)", 0, 0 )
-	SOFTWARE( pslotds2,   0,        19??, "<unknown>", "Pachi-Slot Aruze Oukoku Pocket - Delsol 2 (Japan)", 0, 0 )
-	SOFTWARE( pslotecp,   0,        19??, "<unknown>", "Pachi-Slot Aruze Oukoku Pocket - e-Cup (Japan)", 0, 0 )
-	SOFTWARE( pslothan1,  pslothan, 19??, "<unknown>", "Pachi-Slot Aruze Oukoku Pocket - Hanabi (Japan) (v1.02)", 0, 0 )
-	SOFTWARE( pslothan,   0,        19??, "<unknown>", "Pachi-Slot Aruze Oukoku Pocket - Hanabi (Japan) (v1.04)", 0, 0 )
-	SOFTWARE( pslotooh,   0,        19??, "<unknown>", "Pachi-Slot Aruze Oukoku Pocket - Oohanabi (Japan)", 0, 0 )
-	SOFTWARE( pslotpc2,   0,        19??, "<unknown>", "Pachi-Slot Aruze Oukoku Pocket - Porcano 2 (Japan)", 0, 0 )
-	SOFTWARE( pslotwrd,   0,        19??, "<unknown>", "Pachi-Slot Aruze Oukoku Pocket - Ward of Lights (Japan)", 0, 0 )
-	SOFTWARE( pachinko,   0,        19??, "<unknown>", "Pachinko Hisshou Guide - Pocket Parlor (Japan)", 0, 0 )
-	SOFTWARE( prtymail,   0,        19??, "<unknown>", "Party Mail (Japan)", 0, 0 )
-	SOFTWARE( picturep,   0,        19??, "<unknown>", "Picture Puzzle (USA, Europe)", 0, 0 )
-	SOFTWARE( pocklove,   0,        19??, "<unknown>", "Pocket Love if (Japan)", 0, 0 )
-	SOFTWARE( pockrev,    0,        19??, "<unknown>", "Pocket Reversi (Europe)", 0, 0 )
-	SOFTWARE( pockrevj,   0,        19??, "<unknown>", "Pocket Reversi (Japan)", 0, 0 )
-	SOFTWARE( ptennisc,   0,        19??, "<unknown>", "Pocket Tennis Color - Pocket Sports Series (World) (En,Ja)", 0, 0 )
-	SOFTWARE( puyopop1,   puyopop,  19??, "<unknown>", "Puyo Pop (World) (En,Ja) (v1.05)", 0, 0 )
-	SOFTWARE( puyopop,    0,        19??, "<unknown>", "Puyo Pop (World) (En,Ja) (v1.06)", 0, 0 )
-	SOFTWARE( pbobbleb,   pbobble,  19??, "<unknown>", "Puzzle Bobble Mini (Japan, Europe) (En,Ja) (Beta)", 0, 0 )
-	SOFTWARE( pbobblea,   pbobble,  19??, "<unknown>", "Puzzle Bobble Mini (Japan, Europe) (v1.09)", 0, 0 )
-	SOFTWARE( pbobble,    0,        19??, "<unknown>", "Puzzle Bobble Mini (Japan, Europe) (v1.10)", 0, 0 )
-	SOFTWARE( puzzlink,   0,        19??, "<unknown>", "Puzzle Link (Europe)", 0, 0 )
-	SOFTWARE( puzzlnk2,   0,        19??, "<unknown>", "Puzzle Link 2 (USA, Europe)", 0, 0 )
-	SOFTWARE( renketsc,   0,        19??, "<unknown>", "Renketsu Puzzle Tsunagete Pon! Color (Japan)", 0, 0 )
-	SOFTWARE( rockmanb,   0,        19??, "<unknown>", "Rockman - Battle & Fighters (Japan)", 0, 0 )
-	SOFTWARE( samsho,     0,        1998, "SNK", "Pocket Fighting Series - Samurai Spirit! ~ Samurai Shodown!", 0, 0 )	/* Id: NeoP00080 - Developer: SNK - Releases: 1998-12-25 (JPN) */
-	SOFTWARE( samsho2,    0,        19??, "<unknown>", "Samurai Shodown! 2 - Pocket Fighting Series (World) (En,Ja)", 0, 0 )
-	SOFTWARE( shanghai,   0,        19??, "<unknown>", "Shanghai Mini (World) (En,Ja)", 0, 0 )
-	SOFTWARE( evolutioj,  evolutio, 19??, "<unknown>", "Shinki Sekai Evolution - Hateshinai Dungeon (Japan)", 0, 0 )
-	SOFTWARE( shougic,    0,        19??, "<unknown>", "Shougi no Tatsujin Color (Japan)", 0, 0 )
-	SOFTWARE( snkgalsj,   snkgals,  19??, "<unknown>", "SNK Gals' Fighters (Japan)", 0, 0 )
-	SOFTWARE( snkgals,    0,        19??, "<unknown>", "SNK Gals' Fighters (USA, Europe)", 0, 0 )
-	SOFTWARE( svccard2,   0,        19??, "<unknown>", "SNK vs. Capcom - Card Fighters 2 - Expand Edition (Japan)", 0, 0 )
-	SOFTWARE( svccardc,   svccards, 19??, "<unknown>", "SNK vs. Capcom - Card Fighters' Clash - Capcom Version (USA, Europe)", 0, 0 )
-	SOFTWARE( svccards,   0,        19??, "<unknown>", "SNK vs. Capcom - Card Fighters' Clash - SNK Version (USA, Europe)", 0, 0 )
-	SOFTWARE( svccardj,   svccards, 19??, "<unknown>", "SNK vs. Capcom - Gekitotsu Card Fighters (Japan) (Beta)", 0, 0 )
-	SOFTWARE( svccardcj,  svccards, 19??, "<unknown>", "SNK vs. Capcom - Gekitotsu Card Fighters - Capcom Supporter Version (Japan)", 0, 0 )
-	SOFTWARE( svccardsj1, svccards, 19??, "<unknown>", "SNK vs. Capcom - Gekitotsu Card Fighters - SNK Supporter Version (Japan) (Beta)", 0, 0 )
-	SOFTWARE( svccardsj,  svccards, 19??, "<unknown>", "SNK vs. Capcom - Gekitotsu Card Fighters - SNK Supporter Version (Japan)", 0, 0 )
-	SOFTWARE( svc,        0,        19??, "<unknown>", "SNK vs. Capcom - The Match of the Millennium (World) (En,Ja)", 0, 0 )
-	SOFTWARE( sonicb,     sonic,    19??, "<unknown>", "Sonic the Hedgehog - Pocket Adventure (World) (Beta)", 0, 0 )
-	SOFTWARE( sonic,      0,        19??, "<unknown>", "Sonic the Hedgehog - Pocket Adventure (World)", 0, 0 )
-	SOFTWARE( soreike,    0,        19??, "<unknown>", "Soreike!! Hanafuda Doujou (Japan)", 0, 0 )
-	SOFTWARE( srmp,       0,        19??, "<unknown>", "Super Real Mahjong - Premium Collection (Japan)", 0, 0 )
-	SOFTWARE( tsunapn2,   0,        19??, "<unknown>", "Tsunagete Pon! 2 (Japan)", 0, 0 )
-	SOFTWARE( wrestmad,   0,        19??, "<unknown>", "Wrestling Madness (USA, Europe) (Beta)", 0, 0 )
+	SOFTWARE( bakumats,   0,        2000, "SNK", "Bakumatsu Rouman Tokubetsu Hen - Gekka no Kenshi - Tsuki ni Saku Hana, Chiri Yuku Hana (Jpn)", COLOR_ONLY, 0 )  /* Id: NeoP00640 - Developer: SNK - Releases: 2000-03-16 (JPN) */
+	SOFTWARE( bstarsc,    0,        1999, "SNK", "Pocket Sport Series - Baseball Stars Color (World)", 0, 0 )            /* Id: NeoP00250 - Developer: SNK - Releases: 1999-03-19 (JPN) */
+	SOFTWARE( bigbang,    0,        2000, "SNK", "Big Bang Pro Wrestling (Jpn)", COLOR_ONLY, 0 )                         /* Id: NeoP00660 - Developer: S-Neo - Releases: 2000-11-23 (JPN) */
+	SOFTWARE( bikkuri,    0,        2000, "Sega Toys", "Bikkuriman 2000 - Viva! Pocket Festiva! (Jpn)", COLOR_ONLY, 0 )  /* Id: NeoP00830 - Developer: Sega Toys - Releases: 2000-03-16 (JPN) */
+	SOFTWARE( biomotorj,  biomotor, 1999, "SNK", "BioMotor Unitron (Jpn)", 0, 0 )                                        /* Id: NeoP00100 - Developer: Yumekobo - Releases: 1999-04-15 (JPN) */
+	SOFTWARE( biomotor,   0,        1999, "SNK", "BioMotor Unitron (Euro, USA)", 0, 0 )
+	SOFTWARE( bustamove,  pbobble,  1999, "SNK", "Bust-A-Move Pocket (USA)", 0, 0 )
+	SOFTWARE( coolboar,   0,        2000, "UEP Systems", "Cool Boarders Pocket (Euro, Jpn)", COLOR_ONLY, 0 )             /* Id: NeoP00750 - Developer: UEP Systems - Releases: 2000-02-24 (JPN) */
+	SOFTWARE( coolcoolj,  coolcool, 2000, "SNK", "Cool Cool Jam (Jpn)", COLOR_ONLY, 0 )                                  /* Id: NeoP01000 - Developer: SNK - Releases: 2000-08-10 (JPN) */
+	SOFTWARE( coolcool,   0,        2000, "SNK", "Cool Cool Jam (Euro, USA, Sample)", 0, 0 )
+	SOFTWARE( crushrol,   0,        1999, "SNK", "Crush Roller (World)", 0, 0 )                                          /* Id: NeoP00380 - Developer: ADK - Releases: 1999-04-15 (JPN) */
+	SOFTWARE( darkarms,   0,        1999, "SNK", "Dark Arms - Beast Buster 1999 (World) ~ Beast Buster - Yami no Seitai Heiki (Jpn)", 0, 0 )  /* Id: NeoP00450 - Developer: SNK - Releases: 1999-10-21 (JPN) */
+	SOFTWARE( deltawrp,   0,        2000, "SNK", "Delta Warp (Jpn)", COLOR_ONLY, 0 )                                     /* Id: NeoP01030 - Developer: IOSYS - Releases: 2000-08-10 (JPN) */
+	SOFTWARE( ogrebatl,   0,        2000, "SNK", "Densetsu no Ogre Battle Gaiden - Zenobia no Ouji (Jpn)", COLOR_ONLY, 0 )  /* Id: NeoP00850 - Developer: Quest - Releases: 2000-06-22 (JPN) */
+	SOFTWARE( dendego2b,  dendego2, 1999, "SNK", "Densha de Go! 2 on Neo Geo Pocket (Jpn, Prototype)", 0, 0 )
+	SOFTWARE( dendego2,   0,        1999, "SNK", "Densha de Go! 2 on Neo Geo Pocket (Jpn)", 0, 0 )                       /* Id: NeoP00600 - Developer: Taito - Releases: 1999-10-21 (JPN) */
+	SOFTWARE( divealer1,  divealer, 1999, "SNK", "Dive Alert - Becky's Version (Euro, USA)", 0, 0 )
+	SOFTWARE( divealerj,  divealer, 1999, "SNK", "Dive Alert - Barn Hen (Jpn)", 0, 0 )                                   /* Id: NeoP00370 - Developer: Sacnoth - Releases: 1999-08-19 (JPN) */
+	SOFTWARE( divealer,   0,        1999, "SNK", "Dive Alert - Matt's Version (Euro, USA)", 0, 0 )
+	SOFTWARE( divealerj1, divealer, 1999, "SNK", "Dive Alert - Rebecca Hen (Jpn)", 0, 0 )                                /* Id: NeoP00360 - Developer: Sacnoth - Releases: 1999-08-19 (JPN) */
+	SOFTWARE( dokodemo,   0,        1999, "SNK", "Dokodemo Mahjong (Jpn)", 0, 0 )                                        /* Id: NeoP00330 - Developer: ADK - Releases: 1999-04-29 (JPN) */
+	SOFTWARE( dynaslug,   0,        2000, "SNK", "Dynamite Slugger (Euro, Jpn)", COLOR_ONLY, 0 )                         /* Id: NeoP00710 - Developer: ADK - Releases: 2000-05-25 (JPN) */
+	SOFTWARE( evolutio,   0,        2000, "SNK", "Evolution - Eternal Dungeons (Euro)", 0, 0 )
+	SOFTWARE( cotton,     0,        2000, "SNK", "Fantastic Night Dreams Cotton (Euro)", 0, 0 )
+	SOFTWARE( cottonj,    cotton,   2000, "Success", "Fantastic Night Dreams Cotton (Jpn)", 0, 0 )                       /* Id: NeoP00800 - Developer: Magitec - Releases: 2000-03-23 (JPN) */
+	SOFTWARE( faselei,    0,        2000, "SNK", "Faselei! (Euro)", 0, 0 )
+	SOFTWARE( faseleij,   faselei,  1999, "SNK", "Faselei! (Jpn)", 0, 0 )                                                /* Id: NeoP00510 - Developer: Sacnoth - Releases: 1999-12-29 (JPN) */
+	SOFTWARE( fatfury,    0,        1999, "SNK", "Pocket Fighting Series - Garou Densetsu First Contact ~ Fatal Fury F-Contact (World)", 0, 0 )    /* Id: NeoP00110 - Developer: SNK - Releases: 1999-05-27 (JPN) */
+	SOFTWARE( ganbaren,   0,        19??, "SNK", "Ganbare Neo Poke-kun (Jpn)", COLOR_ONLY, 0 )                           /* Id: NeoP00970 - Developer: SNK - Releases: 2000-06-08 (JPN) */
+	SOFTWARE( infinity,   0,        2000, "KID", "Infinity Cure (Jpn)", COLOR_ONLY, 0 )                                  /* Id: NeoP01090 - Developer: KID - Releases: 2000-11-23 (JPN) */
+	SOFTWARE( kikousei,   0,        2000, "SNK", "Kikou Seiki Unitron - Sono Tsuide. Hikari Umareru Chi Yori. (Jpn)", COLOR_ONLY, 0 )  /* Id: NeoP00500 - Developer: Yumekobo - Releases: 2000-01-20 (JPN) */
+	SOFTWARE( kofr2b,     kofr2,    1999, "SNK", "Pocket Fighting Series - King of Fighters R-2 (World, Prototype)", 0, 0 )
+	SOFTWARE( kofr2,      0,        1999, "SNK", "Pocket Fighting Series - King of Fighters R-2 (World)", 0, 0 )          /* Id: NeoP00230 - Developer: SNK - Releases: 1999-03-19 (JPN) */
+	SOFTWARE( kofpara,    0,        2000, "SNK", "The King of Fighters - Battle de Paradise (Jpn)", COLOR_ONLY, 0 )       /* Id: NeoP00920 - Developer: SNK - Releases: 2000-07-06 (JPN) */
+	SOFTWARE( koikoi,     0,        2000, "SNK", "Koi Koi Mahjong (Jpn)", COLOR_ONLY, 0 )                                 /* Id: NeoP00910 - Developer: Visco - Releases: 2000-03-09 (JPN) */
+	SOFTWARE( lastblad,   0,        2000, "SNK", "The Last Blade - Beyond the Destiny (Euro)", 0, 0 )
+	SOFTWARE( magdropj,   magdrop,  1999, "Data East", "Magical Drop Pocket (Jpn)", 0, 0 )                                /* Id: NeoP00480 - Developer: Sakata SAS - Releases: 1999-06-24 (JPN) */
+	SOFTWARE( magdrop,    0,        1999, "SNK", "Magical Drop Pocket (Euro, USA)", 0, 0 )
+	SOFTWARE( memories,   0,        2000, "KID", "Memories Off - Pure (Jpn)", COLOR_ONLY, 0 )                             /* Id: NeoP00870 - Developer: KID - Releases: 2000-04-27 (JPN) */
+	SOFTWARE( mslug1st,   0,        1999, "SNK", "Metal Slug - 1st Mission (World)", 0, 0 )                               /* Id: NeoP00210 - Developer: Ukiyotei - Releases: 1999-05-27 (JPN) */
+	SOFTWARE( mslug2nd,   0,        2000, "SNK", "Metal Slug - 2nd Mission (World)", COLOR_ONLY, 0 )                      /* Id: NeoP00610 - Developer: Ukiyotei - Releases: 2000-03-09 (JPN) */
+	SOFTWARE( mezase,     0,        2000, "SNK", "Mezase! Kanji Ou (Jpn)", COLOR_ONLY, 0 )                                /* Id: NeoP00630 - Developer: SNK - Releases: 2000-01-20 (JPN) */
+	SOFTWARE( mizuki,     0,        1999, "SNK", "Mizuki Shigeru no Youkai Shashinkan (Jpn)", COLOR_ONLY, 0 )             /* Id: NeoP00620 - Developer: Ukiyotei - Releases: 1999-12-29 (JPN) */
+	SOFTWARE( neo21,      0,        1999, "SNK", "Pocket Casino Series - Neo 21 (World)", 0, 0 )                          /* Id: NeoP00180 - Developer: Dyna - Releases: 1999-12-29 (JPN) */
+	SOFTWARE( neobacca,   0,        2000, "SNK", "Pocket Casino Series - Neo Baccarat (World)", 0, 0 )                    /* Id: NeoP00190 - Developer: Dyna - Releases: 2000-06-22 (JPN) */
+	SOFTWARE( neochercb,  neocherc, 1999, "SNK", "Pocket Casino Series - Neo Cherry Master Color (World, Prototype)", 0, 0 )
+	SOFTWARE( neocherc,   0,        1999, "SNK", "Pocket Casino Series - Neo Cherry Master Color (World)", 0, 0 )         /* Id: NeoP00240 - Developer: Dyna - Releases: 1999-03-19 (JPN) */
+	SOFTWARE( neodrag1,   neodrag,  1999, "SNK", "Pocket Casino Series - Neo Dragon's Wild (World, v1.11)", 0, 0 )
+	SOFTWARE( neodrag,    0,        1999, "SNK", "Pocket Casino Series - Neo Dragon's Wild (World, v1.13)", 0, 0 )        /* Id: NeoP00150 - Developer: Dyna - Releases: 1999-03-19 (JPN) */
+	SOFTWARE( neoderby,   0,        1999, "SNK", "Neo Derby Champ Daiyosou (Jpn)", 0, 0 )                                 /* Id: NeoP00170 - Developer: Dyna - Releases: 1999-04-22 (JPN) */
+	SOFTWARE( neocuppl,   0,        1999, "SNK", "Pocket Sport Series - Neo Geo Cup '98 Plus (World)", 0, 0 )             /* Id: NeoP00390 - Developer: SNK - Releases: 1999-04-15 (JPN) */
+	SOFTWARE( neomystr,   0,        1999, "SNK", "Pocket Casino Series - Neo Mystery Bonus (World)", 0, 0 )               /* Id: NeoP00160 - Developer: Dyna - Releases: 1999-03-19 (JPN) */
+	SOFTWARE( neoproyk,   0,        1999, "SNK", "Pocket Sport Series - Neo Poke Pro Yakyuu (Jpn)", 0, 0 )                /* Id: NeoP00260 - Developer: ADK - Releases: 1999-05-27 (JPN) */
+	SOFTWARE( neoturfm,   0,        1999, "SNK", "Pocket Sport Series - Big Tournament Golf ~ Neo Turf Masters (World)", 0, 0 )    /* Id: NeoP00350 - Developer: SNK - Releases: 1999-07-29 (JPN) */
+	SOFTWARE( nigeronp,   0,        2000, "SNK", "Nige-ron-pa (Jpn)", COLOR_ONLY, 0 )                                     /* Id: NeoP00960 - Developer: Denno Eizo - Releases: 2000-11-23 (JPN) */
+	SOFTWARE( oekakip,    0,        2000, "Success", "Oekaki Puzzle (Jpn)", COLOR_ONLY, 0 )                               /* Id: NeoP00810 - Developer: Success - Releases: 2000-04-27 (JPN) */
+	SOFTWARE( pacworld,   0,        1999, "SNK", "Pac-Man (World)", 0, 0 )                                                /* Id: NeoP00550 - Developer: Namco - Releases: 1999-08-26 (JPN) */
+	SOFTWARE( pslotazt,   0,        2000, "Aruze", "Pachi-Slot Aruze Oukoku Pocket - Azteca (Jpn)", COLOR_ONLY, 0 )       /* Id: NeoP00740 - Developer: Aruze - Releases: 2000-02-10 (JPN) */
+	SOFTWARE( pslotdk2,   0,        2001, "Aruze", "Pachi-Slot Aruze Oukoku Pocket - Dekahel 2 (Jpn)", COLOR_ONLY, 0 )    /* Id: NeoP01080 - Developer: Aruze - Releases: 2001-01-25 (JPN) */
+	SOFTWARE( pslotds2,   0,        2000, "Aruze", "Pachi-Slot Aruze Oukoku Pocket - Delsol 2 (Jpn)", COLOR_ONLY, 0 )     /* Id: NeoP01070 - Developer: Aruze - Releases: 2000-10-26 (JPN) */
+	SOFTWARE( pslotecp,   0,        2001, "Aruze", "Pachi-Slot Aruze Oukoku Pocket - e-Cup (Jpn)", COLOR_ONLY, 0 )        /* Id: NeoP01120 - Developer: Aruze - Releases: 2001-03-09 (JPN) */
+	SOFTWARE( pslothan1,  pslothan, 1999, "Aruze", "Pachi-Slot Aruze Oukoku Pocket - Hanabi (Jpn, v1.02)", 0, 0 )
+	SOFTWARE( pslothan,   0,        1999, "Aruze", "Pachi-Slot Aruze Oukoku Pocket - Hanabi (Jpn, v1.04)", 0, 0 )         /* Id: NeoP00520 - Developer: Aruze - Releases: 1999-10-21 (JPN) */
+	SOFTWARE( pslotooh,   0,        2000, "Aruze", "Pachi-Slot Aruze Oukoku Pocket - Oohanabi (Jpn)", COLOR_ONLY, 0 )     /* Id: NeoP01100 - Developer: Aruze - Releases: 2000-12-14 (JPN) */
+	SOFTWARE( pslotpc2,   0,        2000, "Aruze", "Pachi-Slot Aruze Oukoku Pocket - Porcano 2 (Jpn)", COLOR_ONLY, 0 )    /* Id: NeoP01020 - Developer: Aruze - Releases: 2000-07-20 (JPN) */
+	SOFTWARE( pslotwrd,   0,        2000, "Aruze", "Pachi-Slot Aruze Oukoku Pocket - Ward of Lights (Jpn)", COLOR_ONLY, 0 )  /* Id: NeoP00840 - Developer: Aruze - Releases: 2000-03-16 (JPN) */
+	SOFTWARE( pachinko,   0,        1999, "Japan Vistec", "Pachinko Hisshou Guide - Pocket Parlor (Jpn)", 0, 0 )          /* Id: NeoP00460 - Developer: Japan Vistec - Releases: 1999-11-25 (JPN) */
+	SOFTWARE( prtymail,   0,        1999, "SNK", "Party Mail (Jpn)", 0, 0 )                                               /* Id: NeoP00320 - Developer: ADK - Releases: 1999-12-22 (JPN) */
+	SOFTWARE( picturep,   0,        2000, "SNK", "Picture Puzzle (Euro, USA)", 0, 0 )
+	SOFTWARE( pocklove,   0,        1999, "KID", "Pocket Love if (Jpn)", 0, 0 )                                           /* Id: NeoP00440 - Developer: KID - Releases: 1999-10-21 (JPN) */
+	SOFTWARE( pockrev,    0,        2000, "SNK", "Pocket Reversi (Euro)", 0, 0 )
+	SOFTWARE( pockrevj,   0,        2000, "Success", "Pocket Reversi (Jpn)", COLOR_ONLY, 0 )                              /* Id: NeoP00790 - Developer: Success - Releases: 2000-01-27 (JPN) */
+	SOFTWARE( ptennisc,   0,        1999, "SNK", "Pocket Sport Series - Pocket Tennis Color (World)", 0, 0 )              /* Id: NeoP00280 - Developer: Yumekobo - Releases: 1999-03-19 (JPN) */
+	SOFTWARE( puyopop1,   puyopop,  1999, "SNK", "Puyo Pop (World, v1.05) ~ Puyo Pyuo Tsuu (Jpn, v1.05)", 0, 0 )
+	SOFTWARE( puyopop,    0,        1999, "SNK", "Puyo Pop (World, v1.06) ~ Puyo Pyuo Tsuu (Jpn, v1.06)", 0, 0 )          /* Id: NeoP00410 - Developer: Sega - Releases: 1999-07-22 (JPN) */
+	SOFTWARE( pbobbleb,   pbobble,  1999, "SNK", "Puzzle Bobble Mini (Euro, Jpn, Prototype)", 0, 0 )
+	SOFTWARE( pbobblea,   pbobble,  1999, "SNK", "Puzzle Bobble Mini (Euro, Jpn, v1.09)", 0, 0 )
+	SOFTWARE( pbobble,    0,        1999, "SNK", "Puzzle Bobble Mini (Euro, Jpn, v1.10)", 0, 0 )                          /* Id: NeoP00200 - Developer: Taito / Ukiyotei - Releases: 1999-03-26 (JPN) */
+	SOFTWARE( puzzlink,   0,        1999, "SNK", "Puzzle Link (Euro)", 0, 0 )
+	SOFTWARE( puzzlnk2,   0,        2000, "SNK", "Puzzle Link 2 (Euro, USA)", 0, 0 )
+	SOFTWARE( renketsc,   0,        1999, "SNK", "Renketsu Puzzle Tsunagete Pon! Color (Jpn)", 0, 0 )                     /* Id: NeoP00290 - Developer: Yumekobo - Releases: 1999-03-19 (JPN) */
+	SOFTWARE( rockmanb,   0,        2000, "Capcom", "Rockman - Battle & Fighters (Jpn)", 0, 0 )                           /* Id: NeoP00940 - Developer: Capcom - Releases: 2000-07-06 (JPN) */
+	SOFTWARE( samsho,     0,        1998, "SNK", "Pocket Fighting Series - Samurai Spirit! (Jpn) ~ Samurai Shodown! (Euro)", 0, 0 )	/* Id: NeoP00080 - Developer: SNK - Releases: 1998-12-25 (JPN) */
+	SOFTWARE( samsho2,    0,        1999, "SNK", "Pocket Fighting Series - Samurai Shodown! 2 (World)", 0, 0 )            /* Id: NeoP00300 - Developer: SNK - Releases: 1999-06-10 (JPN) */
+	SOFTWARE( shanghai,   0,        1999, "SNK", "Shanghai Mini (World)", 0, 0 )                                          /* Id: NeoP00260 - Developer: Activision - Releases: 1999-07-29 (JPN) */
+	SOFTWARE( evolutioj,  evolutio, 2000, "SNK", "Shinki Sekai Evolution - Hateshinai Dungeon (Jpn)", COLOR_ONLY, 0 )     /* Id: NeoP00820 - Developer: Entertainment Software Publishing - Releases: 2000-02-10 (JPN) */
+	SOFTWARE( shougic,    0,        1999, "SNK", "Shougi no Tatsujin Color (Jpn)", 0, 0 )                                 /* Id: NeoP00270 - Developer: ADK - Releases: 1999-03-19 (JPN) */
+	SOFTWARE( snkgalsj,   snkgals,  2000, "SNK", "SNK Gals' Fighters (Jpn)", COLOR_ONLY, 0 )                              /* Id: NeoP00650 - Developer: Yumekobo - Releases: 2000-01-27 (JPN) */
+	SOFTWARE( snkgals,    0,        2000, "SNK", "SNK Gals' Fighters (Euro, USA)", 0, 0 )
+	SOFTWARE( svccard2,   0,        2001, "SNK", "SNK vs. Capcom - Card Fighters 2 - Expand Edition (Jpn)", COLOR_ONLY, 0 )  /* Id: NeoP01160 - Developer: SNK - Releases: 2001-09-13 (JPN) */
+	SOFTWARE( svccardc,   svccards, 1999, "SNK", "SNK vs. Capcom - Card Fighters' Clash - Capcom Cardfighter's Version (Euro, USA)", 0, 0 )
+	SOFTWARE( svccards,   0,        1999, "SNK", "SNK vs. Capcom - Card Fighters' Clash - SNK Cardfighter's Version (Euro, USA)", 0, 0 )
+	SOFTWARE( svccardj,   svccards, 1999, "SNK", "SNK vs. Capcom - Gekitotsu Card Fighters (Jpn, Prototype)", 0, 0 )
+	SOFTWARE( svccardcj,  svccards, 1999, "SNK", "SNK vs. Capcom - Gekitotsu Card Fighters - Capcom Supporters Version (Jpn)", 0, 0 )  /* Id: NeoP00570 - Developer: SNK - Releases: 1999-10-21 (JPN) */
+	SOFTWARE( svccardsj1, svccards, 1999, "SNK", "SNK vs. Capcom - Gekitotsu Card Fighters - SNK Supporters Version (Jpn, Prototype)", 0, 0 )
+	SOFTWARE( svccardsj,  svccards, 1999, "SNK", "SNK vs. Capcom - Gekitotsu Card Fighters - SNK Supporters Version (Jpn)", 0, 0 )  /* Id: NeoP00560 - Developer: SNK - Releases: 1999-10-21 (JPN) */
+	SOFTWARE( svc,        0,        1999, "SNK", "SNK vs. Capcom - The Match of the Millennium (World) ~ Choujou Kessen Saikyou Fighters - SNK vs Capcom (Jpn)", COLOR_ONLY, 0 )  /* Id: NeoP00690 - Developer: SNK - Releases: 1999-12-22 (JPN) */
+	SOFTWARE( sonicb,     sonic,    2000, "SNK", "Sonic the Hedgehog - Pocket Adventure (World, Prototype)", COLOR_ONLY, 0 )
+	SOFTWARE( sonic,      0,        2000, "SNK", "Sonic the Hedgehog - Pocket Adventure (World)", COLOR_ONLY, 0 )         /* Id: NeoP00590 - Developer: Sega - Releases: 2000-05-25 (JPN) */
+	SOFTWARE( soreike,    0,        1999, "Dyna", "Soreike!! Hanafuda Doujou (Jpn)", 0, 0 )                               /* Id: NeoP00780 - Developer: Dyna - Releases: 1999-12-16 (JPN) */
+	SOFTWARE( srmp,       0,        2001, "SNK", "Super Real Mahjong - Premium Collection (Jpn)", COLOR_ONLY, 0 )         /* Id: NeoP01110 - Developer: Seta - Releases: 2001-03-09 (JPN) */
+	SOFTWARE( tsunapn2,   0,        1999, "SNK", "Tsunagete Pon! 2 (Jpn)", COLOR_ONLY, 0 )                                /* Id: NeoP00490 - Developer: Yumekobo - Releases: 1999-11-11 (JPN) */
+	SOFTWARE( wrestmad,   0,        19??, "<unknown>", "Wrestling Madness (Euro, USA, Prototype)", 0, 0 )
 SOFTWARE_LIST_END
 
 SOFTWARE_LIST( ngp_cart, "SNK Neo Geo Pocket cartridges" )
