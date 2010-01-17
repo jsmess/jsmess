@@ -765,7 +765,11 @@ static MACHINE_DRIVER_START( xerox820 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( xerox820ii )
-//  MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+	MDRV_IMPORT_FROM( xerox820 )
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( xerox168 )
+	MDRV_IMPORT_FROM( xerox820 )
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -795,23 +799,42 @@ ROM_END
 ROM_START( xerox820ii )
 	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x2000, "monitor", 0 )
-	ROM_LOAD( "x820ii.u33", 0x0000, 0x0800, NO_DUMP )
-	ROM_LOAD( "x820ii.u34", 0x0800, 0x0800, NO_DUMP )
-	ROM_LOAD( "x820ii.u35", 0x1000, 0x0800, NO_DUMP )
-	ROM_LOAD( "x820ii.u36", 0x1800, 0x0800, NO_DUMP )
+	ROM_REGION( 0x3000, "monitor", 0 )
+	ROM_DEFAULT_BIOS( "v404" )
+	ROM_SYSTEM_BIOS( 0, "v404", "Xerox Monitor v4.04" )
+	ROMX_LOAD( "537p3652.u33", 0x0000, 0x1000, CRC(16b569c4) SHA1(6c12ded1c6d5c4bd76ce67985a34aef3eff88735), ROM_BIOS(1) )
+	ROMX_LOAD( "537p3653.u34", 0x1000, 0x1000, CRC(1c84d047) SHA1(bc7b945799d468e4d9418f722217005d5efbd83f), ROM_BIOS(1) )
+	ROMX_LOAD( "537p3654.u35", 0x2000, 0x1000, CRC(ed6e3204) SHA1(cf7ff0c21d025e0740e4400e7904eebf5ab7f209), ROM_BIOS(1) )
 
-	ROM_REGION( 0x800, "chargen", 0 )
-	ROM_LOAD( "x820ii.u58", 0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD( "x820ii.u58", 0x0000, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3) )
+	ROM_LOAD( "x820ii.u57", 0x0800, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9) )
 ROM_END
 
+ROM_START( xerox168 )
+	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x3000, "monitor", 0 )
+	ROM_DEFAULT_BIOS( "v404" )
+	ROM_SYSTEM_BIOS( 0, "v404", "Xerox Monitor v4.04" )
+	ROMX_LOAD( "537p3652.u33", 0x0000, 0x1000, CRC(16b569c4) SHA1(6c12ded1c6d5c4bd76ce67985a34aef3eff88735), ROM_BIOS(1) )
+	ROMX_LOAD( "537p3653.u34", 0x1000, 0x1000, CRC(1c84d047) SHA1(bc7b945799d468e4d9418f722217005d5efbd83f), ROM_BIOS(1) )
+	ROMX_LOAD( "537p3654.u35", 0x2000, 0x1000, CRC(ed6e3204) SHA1(cf7ff0c21d025e0740e4400e7904eebf5ab7f209), ROM_BIOS(1) )
+
+	ROM_REGION( 0x1000, "8086", 0 )
+	ROM_LOAD( "8086.u33", 0x0000, 0x1000, CRC(ee49e3dc) SHA1(a5f20c74fc53f9d695d8894534ab69a39e2c38d8) )
+
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD( "x820ii.u58", 0x0000, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3) )
+	ROM_LOAD( "x820ii.u57", 0x0800, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9) )
+ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME        FLAGS */
 COMP( 1981, xerox820,	0,			0,		xerox820,	xerox820,	0,		"Xerox",						"Xerox 820",	0)
+COMP( 1983, xerox820ii, xerox820,   0,      xerox820ii, xerox820,   0,      "Xerox",                        "Xerox 820-II", GAME_NOT_WORKING)
+COMP( 1983, xerox168,   xerox820,   0,      xerox168,   xerox820,   0,      "Xerox",                        "Xerox 16/8",   GAME_NOT_WORKING)
 /*
 COMP( 1980, bigboard,   0,          0,      bigboard,   bigboard,   0,      "Digital Research Computers",   "Big Board",    GAME_NOT_WORKING)
 COMP( 1983, bigbord2,   0,          0,      bigbord2,   bigboard,   0,      "Digital Research Computers",   "Big Board II", GAME_NOT_WORKING)
-COMP( 1983, xerox820ii, 0,          0,      xerox820ii, xerox820,   0,      "Xerox",                        "Xerox 820-II", GAME_NOT_WORKING)
-COMP( 1983, xerox168,   0,          0,      xerox168,   xerox168,   0,      "Xerox",                        "Xerox 16/8",   GAME_NOT_WORKING)
 */

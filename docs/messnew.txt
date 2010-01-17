@@ -18,6 +18,8 @@ Skeleton drivers:
 - Digital Microsystems DMS-5000
 - Digital Microsystems ZSBC-3
 - Contel Codata Corporation Codata
+- Xerox 820-II [Curt Coder]
+- Xerox 16/8 [Curt Coder]
 
 
 System Driver Changes:
