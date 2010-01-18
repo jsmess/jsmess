@@ -10,9 +10,10 @@
 #define Z80CTC_TAG		"u99"
 #define WD1771_TAG		"u109"
 #define COM8116_TAG		"u76"
+#define I8086_TAG		"i8086"
 
-#define XEROX820_LCD_VIDEORAM_SIZE	0x1000
-#define XEROX820_LCD_VIDEORAM_MASK	0x0fff
+#define XEROX820_VIDEORAM_SIZE	0x1000
+#define XEROX820_VIDEORAM_MASK	0x0fff
 
 typedef struct _xerox820_state xerox820_state;
 struct _xerox820_state
@@ -27,6 +28,8 @@ struct _xerox820_state
 	UINT8 scroll;						/* vertical scroll */
 	int ncset2;							/* national character set */
 	int vatt;							/* X120 video attribute */
+	int lowlite;						/* low light attribute */
+	int chrom;							/* character ROM index */
 
 	/* floppy state */
 	int fdc_irq;						/* interrupt request */

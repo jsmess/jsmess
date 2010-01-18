@@ -4,17 +4,16 @@
 
         12/05/2009 Skeleton driver.
 
-
 ****************************************************************************/
 
 /*
 
     TODO:
 
-    - Big Board (+ Italian version MK-82)
-    - Big Board II (+ Italian version MK-83)
     - Xerox 820-II
     - Xerox 16/8
+    - Big Board (+ Italian version MK-82)
+    - Big Board II (+ Italian version MK-83)
     - Emerald Microware X120 board
     - type in Monitor v1.0 from manual
     - proper keyboard emulation (MCU?)
@@ -29,6 +28,7 @@
 #include "includes/xerox820.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
+#include "cpu/i86/i86.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
@@ -137,26 +137,43 @@ static TIMER_DEVICE_CALLBACK( xerox820_keyboard_tick )
 
 static void xerox820_bankswitch(running_machine *machine, int bank)
 {
+	xerox820_state *state = machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-
+	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	
 	if (bank)
 	{
 		/* ROM */
-		memory_install_read_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
-		memory_unmap_write(program, 0x0000, 0x0fff, 0, 0);
-		memory_unmap_readwrite(program, 0x1000, 0x2fff, 0, 0);
+		memory_install_rom(program, 0x0000, 0x0fff, 0, 0, memory_region(machine, "monitor"));
+		memory_unmap_readwrite(program, 0x1000, 0x1fff, 0, 0);
+		memory_install_ram(program, 0x3000, 0x3fff, 0, 0, state->video_ram);
+		memory_unmap_readwrite(program, 0x4000, 0xbfff, 0, 0);
 	}
 	else
 	{
 		/* RAM */
-		memory_install_readwrite_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
-		memory_install_readwrite_bank(program, 0x1000, 0x2fff, 0, 0, "bank2");
+		memory_install_ram(program, 0x0000, 0x3fff, 0, 0, ram);
 	}
+}
 
-	memory_install_readwrite_bank(program, 0x3000, 0x3fff, 0, 0, "bank3");
-
-	memory_set_bank(machine, "bank1", bank);
-	memory_set_bank(machine, "bank3", bank);
+static void xerox820ii_bankswitch(running_machine *machine, int bank)
+{
+	xerox820_state *state = machine->driver_data;
+	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	
+	if (bank)
+	{
+		/* ROM */
+		memory_install_rom(program, 0x0000, 0x2fff, 0, 0, memory_region(machine, "monitor"));
+		memory_install_ram(program, 0x3000, 0x3fff, 0, 0, state->video_ram);
+		memory_unmap_readwrite(program, 0x4000, 0xbfff, 0, 0);
+	}
+	else
+	{
+		/* RAM */
+		memory_install_ram(program, 0x0000, 0xbfff, 0, 0, ram);
+	}
 }
 
 static WRITE8_HANDLER( scroll_w )
@@ -186,13 +203,51 @@ static WRITE8_HANDLER( x120_system_w )
 }
 #endif
 
+static WRITE8_HANDLER( bell_w )
+{
+//	xerox820_state *state = space->machine->driver_data;
+}
+
+static WRITE8_HANDLER( slden_w )
+{
+	xerox820_state *state = space->machine->driver_data;
+
+	wd17xx_set_density(state->wd1771, offset ? DEN_MFM_HI : DEN_MFM_LO);
+}
+
+static WRITE8_HANDLER( chrom_w )
+{
+	xerox820_state *state = space->machine->driver_data;
+
+	state->chrom = offset;
+}
+
+static WRITE8_HANDLER( lowlite_w )
+{
+	xerox820_state *state = space->machine->driver_data;
+
+	state->lowlite = data;
+}
+
+static WRITE8_HANDLER( sync_w )
+{
+//	xerox820_state *state = space->machine->driver_data;
+
+	if (offset)
+	{
+		/* set external clocks for synchronous sio A */
+	}
+	else
+	{
+		/* set internal clocks for asynchronous sio A */
+	}
+}
+	
 /* Memory Maps */
 
 static ADDRESS_MAP_START( xerox820_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x1000, 0x2fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK("bank3")
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE_MEMBER(xerox820_state, video_ram)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -206,6 +261,26 @@ static ADDRESS_MAP_START( xerox820_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x14, 0x14) AM_MIRROR(0xff03) AM_MASK(0xff00) AM_WRITE(scroll_w)
 	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80KBPIO_TAG, z80pio_alt_r, z80pio_alt_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( xerox820ii_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE_MEMBER(xerox820_state, video_ram)
+	AM_RANGE(0xc000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( xerox820ii_io, ADDRESS_SPACE_IO, 8 )
+	AM_IMPORT_FROM(xerox820_io)
+	AM_RANGE(0x28, 0x29) AM_MIRROR(0xff00) AM_WRITE(bell_w)
+	AM_RANGE(0x30, 0x31) AM_MIRROR(0xff00) AM_WRITE(slden_w)
+	AM_RANGE(0x34, 0x35) AM_MIRROR(0xff00) AM_WRITE(chrom_w)
+	AM_RANGE(0x36, 0x36) AM_MIRROR(0xff00) AM_WRITE(lowlite_w)
+	AM_RANGE(0x68, 0x69) AM_MIRROR(0xff00) AM_WRITE(sync_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( xerox168_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM
+	AM_RANGE(0xff000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -311,14 +386,14 @@ INPUT_PORTS_END
 
 /* Z80 PIO */
 
-static WRITE_LINE_DEVICE_HANDLER( xerox820_pio_pbrdy_w )
+static WRITE_LINE_DEVICE_HANDLER( kbpio_pbrdy_w )
 {
 	xerox820_state *driver_state = device->machine->driver_data;
 
 	driver_state->pbrdy = state;
 }
 
-static READ8_DEVICE_HANDLER( xerox820_pio_port_a_r )
+static READ8_DEVICE_HANDLER( kbpio_pa_r )
 {
 	/*
 
@@ -340,7 +415,7 @@ static READ8_DEVICE_HANDLER( xerox820_pio_port_a_r )
 	return (state->dsdd << 5) | (state->_8n5 << 4) | (state->pbrdy << 3);
 };
 
-static WRITE8_DEVICE_HANDLER( xerox820_pio_port_a_w )
+static WRITE8_DEVICE_HANDLER( kbpio_pa_w )
 {
 	/*
 
@@ -377,12 +452,25 @@ static WRITE8_DEVICE_HANDLER( xerox820_pio_port_a_w )
 
 	/* display character set */
 	state->ncset2 = !BIT(data, 6);
+}
+
+static WRITE8_DEVICE_HANDLER( xerox820_kbpio_pa_w )
+{
+	kbpio_pa_w(device, offset, data);
 
 	/* bank switching */
 	xerox820_bankswitch(device->machine, BIT(data, 7));
 };
 
-static READ8_DEVICE_HANDLER( xerox820_pio_port_b_r )
+static WRITE8_DEVICE_HANDLER( xerox820ii_kbpio_pa_w )
+{
+	kbpio_pa_w(device, offset, data);
+
+	/* bank switching */
+	xerox820ii_bankswitch(device->machine, BIT(data, 7));
+};
+
+static READ8_DEVICE_HANDLER( kbpio_pb_r )
 {
 	/*
 
@@ -404,15 +492,26 @@ static READ8_DEVICE_HANDLER( xerox820_pio_port_b_r )
 	return state->keydata;
 };
 
-static const z80pio_interface kbpio_intf =
+static const z80pio_interface xerox820_kbpio_intf =
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
-	DEVCB_HANDLER(xerox820_pio_port_a_r),		/* port A read callback */
-	DEVCB_HANDLER(xerox820_pio_port_b_r),		/* port B read callback */
-	DEVCB_HANDLER(xerox820_pio_port_a_w),		/* port A write callback */
-	DEVCB_NULL,									/* port B write callback */
-	DEVCB_NULL,									/* portA ready active callback */
-	DEVCB_LINE(xerox820_pio_pbrdy_w)			/* portB ready active callback */
+	DEVCB_HANDLER(kbpio_pa_r),			/* port A read callback */
+	DEVCB_HANDLER(kbpio_pb_r),			/* port B read callback */
+	DEVCB_HANDLER(xerox820_kbpio_pa_w),	/* port A write callback */
+	DEVCB_NULL,							/* port B write callback */
+	DEVCB_NULL,							/* portA ready active callback */
+	DEVCB_LINE(kbpio_pbrdy_w)			/* portB ready active callback */
+};
+
+static const z80pio_interface xerox820ii_kbpio_intf =
+{
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
+	DEVCB_HANDLER(kbpio_pa_r),			/* port A read callback */
+	DEVCB_HANDLER(kbpio_pb_r),			/* port B read callback */
+	DEVCB_HANDLER(xerox820ii_kbpio_pa_w),	/* port A write callback */
+	DEVCB_NULL,							/* port B write callback */
+	DEVCB_NULL,							/* portA ready active callback */
+	DEVCB_LINE(kbpio_pbrdy_w)			/* portB ready active callback */
 };
 
 static const z80pio_interface gppio_intf =
@@ -435,7 +534,7 @@ static WRITE_LINE_DEVICE_HANDLER( z80daisy_interrupt )
 
 static const z80sio_interface sio_intf =
 {
-	z80daisy_interrupt,		/* interrupt handler */
+	z80daisy_interrupt,	/* interrupt handler */
 	NULL,				/* DTR changed handler */
 	NULL,				/* RTS changed handler */
 	NULL,				/* BREAK changed handler */
@@ -561,7 +660,7 @@ static VIDEO_UPDATE( xerox820 )
 			{
 				if (ra < 8)
 				{
-					chr = state->video_ram[x & XEROX820_LCD_VIDEORAM_MASK] ^ 0x80;
+					chr = state->video_ram[x & XEROX820_VIDEORAM_MASK] ^ 0x80;
 
 					/* Take care of flashing characters */
 					if ((chr < 0x80) && (framecnt & 0x08))
@@ -587,6 +686,7 @@ static VIDEO_UPDATE( xerox820 )
 	}
 	return 0;
 }
+
 static void xerox820_load_proc(const device_config *image)
 {
 	xerox820_state *state = image->machine->driver_data;
@@ -628,30 +728,13 @@ static MACHINE_START( xerox820 )
 	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
 	state->wd1771 = devtag_get_device(machine, WD1771_TAG);
 
-	/* allocate video memory */
-	state->video_ram = auto_alloc_array(machine, UINT8, XEROX820_LCD_VIDEORAM_SIZE);
-
-	/* setup memory banking */
-	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "monitor"), 0);
-
-	memory_configure_bank(machine, "bank2", 0, 1, memory_region(machine, Z80_TAG) + 0x1000, 0);
-	memory_set_bank(machine, "bank2", 0);
-
-	memory_configure_bank(machine, "bank3", 0, 1, memory_region(machine, Z80_TAG) + 0x3000, 0);
-	memory_configure_bank(machine, "bank3", 1, 1, state->video_ram, 0);
-
-	/* bank switch */
-	xerox820_bankswitch(machine, 1);
-
-	for(drive=0;drive<2;drive++)
+	for (drive = 0; drive < 2; drive++)
 	{
 		floppy_install_load_proc(floppy_get_device(machine, drive), xerox820_load_proc);
 	}
 
-
 	/* register for state saving */
-	state_save_register_global_pointer(machine, state->video_ram, XEROX820_LCD_VIDEORAM_SIZE);
+	state_save_register_global_pointer(machine, state->video_ram, XEROX820_VIDEORAM_SIZE);
 	state_save_register_global(machine, state->pbrdy);
 	state_save_register_global(machine, state->keydata);
 	state_save_register_global(machine, state->scroll);
@@ -663,7 +746,29 @@ static MACHINE_START( xerox820 )
 	state_save_register_global(machine, state->dsdd);
 }
 
-static FLOPPY_OPTIONS_START(xerox820 )
+static MACHINE_START( xerox820ii )
+{
+//	xerox820_state *state = machine->driver_data;
+
+	MACHINE_START_CALL(xerox820);
+
+	/* register for state saving */
+//	state_save_register_global(machine, state->);
+}
+
+static MACHINE_RESET( xerox820 )
+{
+	/* bank switch */
+	xerox820_bankswitch(machine, 1);
+}
+
+static MACHINE_RESET( xerox820ii )
+{
+	/* bank switch */
+	xerox820ii_bankswitch(machine, 1);
+}
+
+static FLOPPY_OPTIONS_START( xerox820 )
 	FLOPPY_OPTION( sssd8, "dsk", "8\" SSSD", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
 		TRACKS([77])
@@ -716,10 +821,27 @@ static const gfx_layout xerox820_charlayout =
 	8*8					/* every char takes 8 bytes */
 };
 
+static const gfx_layout xerox820_gfxlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8, 8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
 static GFXDECODE_START( xerox820 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, xerox820_charlayout, 0, 1 )
 GFXDECODE_END
 
+static GFXDECODE_START( xerox820ii )
+	GFXDECODE_ENTRY( "chargen", 0x0000, xerox820_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0800, xerox820_gfxlayout, 0, 1 )
+GFXDECODE_END
 
 /* Machine Drivers */
 
@@ -733,6 +855,7 @@ static MACHINE_DRIVER_START( xerox820 )
 	MDRV_CPU_CONFIG(xerox820_daisy_chain)
 
     MDRV_MACHINE_START(xerox820)
+    MDRV_MACHINE_RESET(xerox820)
 
     /* video hardware */
     MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -752,7 +875,7 @@ static MACHINE_DRIVER_START( xerox820 )
 
 	/* devices */
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, XTAL_20MHz/8, sio_intf)
-	MDRV_Z80PIO_ADD(Z80KBPIO_TAG, kbpio_intf)
+	MDRV_Z80PIO_ADD(Z80KBPIO_TAG, xerox820_kbpio_intf)
 	MDRV_Z80PIO_ADD(Z80GPPIO_TAG, gppio_intf)
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_20MHz/8, ctc_intf)
 	MDRV_WD1771_ADD(WD1771_TAG, wd1771_intf)
@@ -765,11 +888,57 @@ static MACHINE_DRIVER_START( xerox820 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( xerox820ii )
-	MDRV_IMPORT_FROM( xerox820 )
+	MDRV_DRIVER_DATA(xerox820_state)
+
+    /* basic machine hardware */
+    MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+    MDRV_CPU_PROGRAM_MAP(xerox820ii_mem)
+    MDRV_CPU_IO_MAP(xerox820ii_io)
+	MDRV_CPU_CONFIG(xerox820_daisy_chain)
+
+    MDRV_MACHINE_START(xerox820ii)
+    MDRV_MACHINE_RESET(xerox820ii)
+
+    /* video hardware */
+    MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
+
+	MDRV_GFXDECODE(xerox820ii)
+	MDRV_PALETTE_LENGTH(2)
+    MDRV_PALETTE_INIT(black_and_white)
+
+    MDRV_VIDEO_START(xerox820)
+    MDRV_VIDEO_UPDATE(xerox820)
+
+	/* keyboard */
+	MDRV_TIMER_ADD_PERIODIC("keyboard", xerox820_keyboard_tick, HZ(60))
+	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(XTAL_16MHz/4))
+
+	/* devices */
+	MDRV_Z80SIO_ADD(Z80SIO_TAG, XTAL_16MHz/4, sio_intf)
+	MDRV_Z80PIO_ADD(Z80KBPIO_TAG, xerox820ii_kbpio_intf)
+	MDRV_Z80PIO_ADD(Z80GPPIO_TAG, gppio_intf)
+	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)
+	MDRV_WD179X_ADD(WD1771_TAG, wd1771_intf) // WD1797
+	MDRV_FLOPPY_2_DRIVES_ADD(xerox820_floppy_config)
+	MDRV_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
+
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( xerox168 )
-	MDRV_IMPORT_FROM( xerox820 )
+	MDRV_IMPORT_FROM( xerox820ii )
+	
+	MDRV_CPU_ADD(I8086_TAG, I8086, 4770000)
+    MDRV_CPU_PROGRAM_MAP(xerox168_mem)
+
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("192K")
+	MDRV_RAM_EXTRA_OPTIONS("320K")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -797,37 +966,34 @@ ROM_START( xerox820 )
 ROM_END
 
 ROM_START( xerox820ii )
-	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
-
 	ROM_REGION( 0x3000, "monitor", 0 )
 	ROM_DEFAULT_BIOS( "v404" )
-	ROM_SYSTEM_BIOS( 0, "v404", "Xerox Monitor v4.04" )
+	ROM_SYSTEM_BIOS( 0, "v404", "Balcones Operating System v4.04" )
 	ROMX_LOAD( "537p3652.u33", 0x0000, 0x1000, CRC(16b569c4) SHA1(6c12ded1c6d5c4bd76ce67985a34aef3eff88735), ROM_BIOS(1) )
 	ROMX_LOAD( "537p3653.u34", 0x1000, 0x1000, CRC(1c84d047) SHA1(bc7b945799d468e4d9418f722217005d5efbd83f), ROM_BIOS(1) )
 	ROMX_LOAD( "537p3654.u35", 0x2000, 0x1000, CRC(ed6e3204) SHA1(cf7ff0c21d025e0740e4400e7904eebf5ab7f209), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "x820ii.u58", 0x0000, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3) )
-	ROM_LOAD( "x820ii.u57", 0x0800, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9) )
+	ROM_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9) )
+	ROM_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3) )
 ROM_END
 
 ROM_START( xerox168 )
-	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
-
 	ROM_REGION( 0x3000, "monitor", 0 )
 	ROM_DEFAULT_BIOS( "v404" )
-	ROM_SYSTEM_BIOS( 0, "v404", "Xerox Monitor v4.04" )
+	ROM_SYSTEM_BIOS( 0, "v404", "Balcones Operating System v4.04" )
 	ROMX_LOAD( "537p3652.u33", 0x0000, 0x1000, CRC(16b569c4) SHA1(6c12ded1c6d5c4bd76ce67985a34aef3eff88735), ROM_BIOS(1) )
 	ROMX_LOAD( "537p3653.u34", 0x1000, 0x1000, CRC(1c84d047) SHA1(bc7b945799d468e4d9418f722217005d5efbd83f), ROM_BIOS(1) )
 	ROMX_LOAD( "537p3654.u35", 0x2000, 0x1000, CRC(ed6e3204) SHA1(cf7ff0c21d025e0740e4400e7904eebf5ab7f209), ROM_BIOS(1) )
 
-	ROM_REGION( 0x1000, "8086", 0 )
+	ROM_REGION( 0x1000, I8086_TAG, 0 )
 	ROM_LOAD( "8086.u33", 0x0000, 0x1000, CRC(ee49e3dc) SHA1(a5f20c74fc53f9d695d8894534ab69a39e2c38d8) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "x820ii.u58", 0x0000, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3) )
-	ROM_LOAD( "x820ii.u57", 0x0800, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9) )
+	ROM_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9) )
+	ROM_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3) )
 ROM_END
+
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME        FLAGS */
