@@ -61,7 +61,7 @@ CRVISION_ROM_LOAD( tennisd1, "tensds6k.bin",          0x000000,  0x1800,	 CRC(2e
 CRVISION_ROM_LOAD( tennisd,  "tensds8k.bin",          0x000000,  0x2000,	 CRC(c914c092) SHA1(7b64efddb590332c192f6c4a6accce85a6d402c3) )
 
 // astrop1 differs from astropin only in the 1st byte. this image came from FunnyMu < 0.43, and it might be a bad dump (astropin has been confirmed good)
-CRVISION_ROM_LOAD( astropi1, "astro pinball.bin",     0x000000,  0x2000,	 CRC(cf7bdfc2) SHA1(38bcc856d604567dc6453205a8f858bdf2000330) )
+CRVISION_ROM_LOAD( astropin1, "astro pinball.bin",     0x000000,  0x2000,	 CRC(cf7bdfc2) SHA1(38bcc856d604567dc6453205a8f858bdf2000330) )
 
 // hapmon is a hex editor created by FunnyMu's author before the emulator and perfectly working on the real machine
 CRVISION_ROM_LOAD( hapmon,   "hapmon.bin",            0x000000,  0x1000,	 CRC(15d07b96) SHA1(89359dca952bc90644dfd7f546c184a8165faa14) )

@@ -286,7 +286,7 @@ SOFTWARE_LIST_START( _32x_cart )
 	SOFTWARE( doomrr2, doom,   1995, "Sega", "Doom RR (Prototype, 19950307)", 0, 0 )
 
 	/* Id: ?? - Developers: ?? - Releases: -  */
-	SOFTWARE( eccotdol, 0,     199?, "Sega License", "ECCO the Dolphin CinePak Demo (Jpn, USA, Developer Cart)", 0, 0 )
+	SOFTWARE( eccotdol, 0,     199?, "<unknown>", "ECCO the Dolphin CinePak Demo (Jpn, USA, Developer Cart)", 0, 0 )
 
 	/* Id: T-5002B - Developers: Extended Play / Probe - Releases: 1995 (Euro)  */
 	SOFTWARE( fifa96,   0,     1995, "Electronic Arts", "FIFA Soccer 96 (Euro)", 0, 0 )
@@ -349,14 +349,14 @@ SOFTWARE_LIST_START( _32x_cart )
 	SOFTWARE( kolibri,  0,      1995, "Sega", "Kolibri (Euro, USA)", 0, 0 )
 
 	/* Id: ?? - Developers: ?? - Releases: -  */
-	SOFTWARE( marsch,  0,      199?, "Sega License", "Mars Check Program Version 1.0 (Jpn, USA, SDK Build Set 1)", 0, 0 )
-	SOFTWARE( marsch1, marsch, 199?, "Sega License", "Mars Check Program Version 1.0 (Jpn, USA, SDK Build Set 2)", 0, 0 )
+	SOFTWARE( marsch,  0,      199?, "<unknown>", "Mars Check Program Version 1.0 (Jpn, USA, SDK Build Set 1)", 0, 0 )
+	SOFTWARE( marsch1, marsch, 199?, "<unknown>", "Mars Check Program Version 1.0 (Jpn, USA, SDK Build Set 2)", 0, 0 )
 
 	/* Id: ?? - Developers: ?? - Releases: -  */
-	SOFTWARE( marssa,  0,      199?, "Sega License", "Mars Sample Program - Gnu Sierra (Jpn, USA, SDK Build)", 0, 0 )
-	SOFTWARE( marssa1, marssa, 199?, "Sega License", "Mars Sample Program - Pharaoh (Jpn, USA, SDK Build)", 0, 0 )
-	SOFTWARE( marssa2, marssa, 199?, "Sega License", "Mars Sample Program - Runlength Mode Test (Jpn, USA, SDK Build)", 0, 0 )
-	SOFTWARE( marssa3, marssa, 199?, "Sega License", "Mars Sample Program - Texture Test (Jpn, USA, SDK Build)", 0, 0 )
+	SOFTWARE( marssa,  0,      199?, "<unknown>", "Mars Sample Program - Gnu Sierra (Jpn, USA, SDK Build)", 0, 0 )
+	SOFTWARE( marssa1, marssa, 199?, "<unknown>", "Mars Sample Program - Pharaoh (Jpn, USA, SDK Build)", 0, 0 )
+	SOFTWARE( marssa2, marssa, 199?, "<unknown>", "Mars Sample Program - Runlength Mode Test (Jpn, USA, SDK Build)", 0, 0 )
+	SOFTWARE( marssa3, marssa, 199?, "<unknown>", "Mars Sample Program - Texture Test (Jpn, USA, SDK Build)", 0, 0 )
 
 	/* Id: GM4008, 84511 - Developers: Sega - Releases: 1995 (USA, EUR), 1995-02-24 (JPN) */
 	SOFTWARE( metalhd,   0,       1995, "Sega", "Metal Head (Euro)", 0, 0 )
@@ -483,7 +483,7 @@ SOFTWARE_LIST_START( _32x_cart )
 	SOFTWARE( vfp6,   vf,     1995, "Sega", "Virtua Fighter (Prototype, 19950530)", 0, 0 )
 
 	/* Id: ?? - Developers: ?? - Releases: -  */
-	SOFTWARE( vham,   0,       1994, "Sega License", "Virtua Hamster (Usa, Prototype)," 0, 0 )
+	SOFTWARE( vham,   0,       1994, "<unknown>", "Virtua Hamster (Usa, Prototype)", 0, 0 )
 
 	/* Id: GM5001, 84601 - Developers: Sega AM2 - Releases: 1994 (EUR, USA), 1994-12-16 (JPN) */
 	SOFTWARE( vrd,    0,      1994, "Sega", "Virtua Racing Deluxe (Euro)", 0, 0 )
@@ -503,7 +503,7 @@ SOFTWARE_LIST_START( _32x_cart )
 	SOFTWARE( wwfwre, 0,       1995, "Acclaim Entertainment", "WWF WrestleMania: The Arcade Game (Usa)", 0, 0 )
 
 	/* Id: ?? - Developers: ?? - Releases: -  */
-	SOFTWARE( xmenusa, 0,       1995, "Sega License", "X-Men (Usa, Prototype)", 0, 0 )
+	SOFTWARE( xmenusa, 0,       1995, "<unknown>", "X-Men (Usa, Prototype)", 0, 0 )
 
 	/* Id: GM4012, 84512 - Developers: CRI - Releases: 1995 (EUR, USA), 1995-07-14 (JPN) */
 	SOFTWARE( zaxx2k,   0,        1995, "Sega", "Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA)", 0, 0 )
