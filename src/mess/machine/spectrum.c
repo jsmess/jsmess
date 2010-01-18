@@ -83,7 +83,7 @@ SNAPSHOT_LOAD(spectrum)
 
 	if (!mame_stricmp(file_type, "sna"))
 	{
-		if ((snapshot_size != 49179) && (snapshot_size != 131103) && (snapshot_size != 14787))
+		if ((snapshot_size != 49179) && (snapshot_size != 131103) && (snapshot_size != 147487))
 		{
 			logerror("Invalid .SNA file size.\n");
 			goto error;
