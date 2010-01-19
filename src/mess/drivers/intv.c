@@ -125,18 +125,6 @@ static const gfx_layout intv_gromlayout =
 	8 * 16
 };
 
-static const gfx_layout intv_gramlayout =
-{
-	16, 16,
-	64,
-	1,
-	{ 0 },
-	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7},
-	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8,
-	  4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
-	8 * 8
-};
-
 static const gfx_layout intvkbd_charlayout =
 {
 	8, 8,
@@ -150,12 +138,10 @@ static const gfx_layout intvkbd_charlayout =
 
 static GFXDECODE_START( intv )
 	GFXDECODE_ENTRY( "maincpu", 0x3000<<1, intv_gromlayout, 0, 256 )
-	GFXDECODE_ENTRY( 0, 0, intv_gramlayout, 0, 256 )    /* Dynamically decoded from RAM */
 GFXDECODE_END
 
 static GFXDECODE_START( intvkbd )
 	GFXDECODE_ENTRY( "maincpu", 0x3000<<1, intv_gromlayout, 0, 256 )
-	GFXDECODE_ENTRY( 0, 0, intv_gramlayout, 0, 256 )    /* Dynamically decoded from RAM */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, intvkbd_charlayout, 0, 256 )
 GFXDECODE_END
 

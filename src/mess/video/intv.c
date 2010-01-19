@@ -69,13 +69,11 @@ static int sprites_collide(int spriteNum0, int spriteNum1) {
     struct intv_sprite_type* s2 = &intv_sprite[spriteNum1];
 
     x1 = s1->xpos-8; x2 = s2->xpos-8;
-    y1 = s1->ypos-8; y2 = s2->ypos-8;
-    w1 = 8 * (s1->doublex ? 2 : 1);
-    w2 = 8 * (s2->doublex ? 2 : 1);
-    h1 = 8 * (s1->quady ? 4 : 1) * (s1->doubley ? 2 : 1) *
-            (s1->doubleyres ? 2 : 1);
-    h2 = 8 * (s2->quady ? 4 : 1) * (s2->doubley ? 2 : 1) *
-            (s2->doubleyres ? 2 : 1);
+    y1 = (s1->ypos-8)<<1; y2 = (s2->ypos-8)<<1;
+    w1 = (s1->doublex ? 2 : 1)<<3;
+    w2 = (s2->doublex ? 2 : 1)<<3;
+    h1 = (s1->quady ? 4 : 1) * (s1->doubley ? 2 : 1) * (s1->doubleyres ? 2 : 1)<<3;
+    h2 = (s2->quady ? 4 : 1) * (s2->doubley ? 2 : 1) * (s2->doubleyres ? 2 : 1)<<3;
 
     if ((x1 + w1 <= x2) || (y1 + h1 <= y2) ||
             (x1 >= x2 + w2) || (y1 >= y2 + h2))
@@ -84,10 +82,10 @@ static int sprites_collide(int spriteNum0, int spriteNum1) {
     //iterate over the intersecting bits to see if any touch
     x0 = MAX(x1, x2);
     y0 = MAX(y1, y2);
-    r0y = 2*(y0-y1);
-    r1y = 2*(y0-y2);
+    r0y = y0-y1;
+    r1y = y0-y2;
     width = MIN(x1+w1, x2+w2) - x0;
-    height = (MIN(y1+h1, y2+h2) - y0) * 2;
+    height = MIN(y1+h1, y2+h2) - y0;
     for (x = 0; x < width; x++) {
         for (y = 0; y < height; y++) {
             if (intv_sprite_buffers[spriteNum0][x0-x1+x][r0y+y] &&
@@ -378,12 +376,12 @@ static void copy_sprites_to_background(running_machine *machine, bitmap_t *bitma
         borderCollision = FALSE;
         foregroundCollision = FALSE;
 
-        spritePixelHeight = 8 * (s->quady ? 4 : 1) *
-                (s->doubley ? 2 : 1) * (s->doubleyres ? 2 : 1);
-        width = 8 * (s->doublex ? 2 : 1);
+        spritePixelHeight = (s->quady ? 4 : 1) *
+                (s->doubley ? 2 : 1) * (s->doubleyres ? 2 : 1)<<3;
+        width = (s->doublex ? 2 : 1)<<3;
 
-        leftX = (s->xpos-8)*2;
-        nextY = (s->ypos-8)*2;
+        leftX = (s->xpos-8)<<1;
+        nextY = (s->ypos-8)<<1;
 
         for (y = 0; y < spritePixelHeight; y++) {
             for (x = 0; x < width; x++) {
@@ -797,22 +795,22 @@ VIDEO_UPDATE( intvkbd )
 			{
 				offs = current_row*64+x;
 				drawgfx_transpen(bitmap, NULL,
-					screen->machine->gfx[2],
+					screen->machine->gfx[1],
 					screen->machine->generic.videoram.u8[offs],
 					7, /* white */
 					0,0,
-					x*8,y*8, 0);
+					x<<3,y<<3, 0);
 			}
 			if (current_row == tms9927_cursor_row)
 			{
 				/* draw the cursor as a solid white block */
 				/* (should use a filled rect here!) */
 				drawgfx_transpen(bitmap, NULL,
-					screen->machine->gfx[2],
+					screen->machine->gfx[1],
 					191, /* a block */
 					7,   /* white   */
 					0,0,
-					(tms9927_cursor_col-1)*8,y*8, 0);
+					(tms9927_cursor_col-1)<<3,y<<3, 0);
 			}
 			current_row = (current_row + 1) % tms9927_num_rows;
 		}
@@ -821,25 +819,25 @@ VIDEO_UPDATE( intvkbd )
 #if 0
 	// debugging
 	c = tape_motor_mode_desc[tape_motor_mode][0];
-	drawgfx_transpen(bitmap,&machine->screen[0].visarea, machine->gfx[2],
+	drawgfx_transpen(bitmap,&machine->screen[0].visarea, machine->gfx[1],
 		c,
 		1,
 		0,0,
 		0*8,0*8, 0);
 	for(y=0;y<5;y++)
 	{
-		drawgfx_transpen(bitmap,&machine->screen[0].visarea, machine->gfx[2],
+		drawgfx_transpen(bitmap,&machine->screen[0].visarea, machine->gfx[1],
 			tape_unknown_write[y]+'0',
 			1,
 			0,0,
 			0*8,(y+2)*8, 0);
 	}
-	drawgfx_transpen(bitmap,&machine->screen[0].visarea, machine->gfx[2],
+	drawgfx_transpen(bitmap,&machine->screen[0].visarea, machine->gfx[1],
 			tape_unknown_write[5]+'0',
 			1,
 			0,0,
 			0*8,8*8, 0);
-	drawgfx_transpen(bitmap,&machine->screen[0].visarea, machine->gfx[2],
+	drawgfx_transpen(bitmap,&machine->screen[0].visarea, machine->gfx[1],
 			tape_interrupts_enabled+'0',
 			1,
 			0,0,
