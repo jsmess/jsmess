@@ -114,6 +114,12 @@ static VIDEO_UPDATE( pv1000 )
 }
 
 
+static INTERRUPT_GEN( pv1000_irq )
+{
+	cpu_set_input_line(device, 0, HOLD_LINE);
+}
+
+
 static const gfx_layout pv1000_3bpp_gfx =
 {
 	8, 8,			/* 8x8 characters */
@@ -136,6 +142,8 @@ static MACHINE_DRIVER_START( pv1000 )
 	MDRV_CPU_ADD( "maincpu", Z80, 17897725/5 )
 	MDRV_CPU_PROGRAM_MAP( pv1000 )
 	MDRV_CPU_IO_MAP( pv1000_io )
+
+	MDRV_CPU_VBLANK_INT("screen", pv1000_irq)
 
 	MDRV_SCREEN_ADD( "screen", RASTER )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
