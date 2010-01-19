@@ -31,6 +31,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( pv1000_io_w )
 {
+//	logerror("pv1000_io_w offset=%02x, data=%02x\n", offset, data );
 	pv1000_io_regs[offset] = data;
 }
 
@@ -39,23 +40,50 @@ static READ8_HANDLER( pv1000_io_r )
 {
 	UINT8 data = pv1000_io_regs[offset];
 
+//	logerror("pv1000_io_r offset=%02x\n", offset );
+
+	switch ( offset )
+	{
+	case 0x05:
+		/* This input stuff is not working yet */
+		if ( pv1000_io_regs[5] & 0x08 )
+		{
+			data = input_port_read( space->machine, "IN3" );
+		}
+		if ( pv1000_io_regs[5] & 0x04 )
+		{
+		}
+		if ( pv1000_io_regs[5] & 0x02 )
+		{
+		}
+		if ( pv1000_io_regs[5] & 0x01 )
+		{
+		}
+		break;
+	}
+
 	return data;
 }
 
 
 static INPUT_PORTS_START( pv1000 )
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
 static PALETTE_INIT( pv1000 )
 {
 	palette_set_color_rgb( machine,  0,   0,   0,   0 );
-	palette_set_color_rgb( machine,  1, 255,   0,   0 );
+	palette_set_color_rgb( machine,  1,   0,   0, 255 );
 	palette_set_color_rgb( machine,  2,   0, 255,   0 );
-	palette_set_color_rgb( machine,  3, 255, 255,   0 );
-	palette_set_color_rgb( machine,  4,   0,   0, 255 );
+	palette_set_color_rgb( machine,  3,   0, 255, 255 );
+	palette_set_color_rgb( machine,  4, 255,   0,   0 );
 	palette_set_color_rgb( machine,  5, 255,   0, 255 );
-	palette_set_color_rgb( machine,  6,   0, 255, 255 );
+	palette_set_color_rgb( machine,  6, 255, 255,   0 );
 	palette_set_color_rgb( machine,  7, 255, 255, 255 );
 }
 
