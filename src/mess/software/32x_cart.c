@@ -209,7 +209,7 @@ S32X_ROM_LOAD( vrdu,      "virtua racing deluxe (usa).bin",                     
 S32X_ROM_LOAD( worlds,    "world series baseball starring deion sanders (usa).bin",                           0x000000, 0x300000,   CRC(6de1bc75) SHA1(ab3026eae46a775adb7eaebc13702699557ddc41) )
 S32X_ROM_LOAD( wwfraw,    "wwf raw (world).bin",                                                              0x000000, 0x400000,   CRC(8eb7cd2c) SHA1(94b974f2f69f0c10bc18b349fa4ff95ca56fa47b) )
 S32X_ROM_LOAD( wwfwre,    "wwf wrestlemania - the arcade game (usa).bin",                                     0x000000, 0x400000,   CRC(61833503) SHA1(551eedc963cba0e1410b3d229b332ef9ea061469) )
-S32X_ROM_LOAD( xmenusa,   "x-men (usa) (proto).bin",                                                          0x000000, 0x400000,   CRC(d61febc0) SHA1(cd3fa2ace2fdbf4b6402cb52eeb208010bf31029) )
+S32X_ROM_LOAD( xmen,      "x-men (usa) (proto).bin",                                                          0x000000, 0x400000,   CRC(d61febc0) SHA1(cd3fa2ace2fdbf4b6402cb52eeb208010bf31029) )
 S32X_ROM_LOAD( zaxx2kp,   "zaxxon's motherbase 2000(prototype - feb 10, 1995).bin",                           0x000000, 0x200000,   CRC(c65693af) SHA1(9db5a93ae5fc4045df342a9f53b904ef130debbf) )
 S32X_ROM_LOAD( zaxx2kp1,  "zaxxon's motherbase 2000(prototype - feb 21, 1995).bin",                           0x000000, 0x200000,   CRC(061c0cf2) SHA1(3a8c794139fe7255e7107877b2d0018a6eaa0300) )
 S32X_ROM_LOAD( zaxx2kp2,  "zaxxon's motherbase 2000(prototype - feb 23, 1995).bin",                           0x000000, 0x200000,   CRC(e92b36c5) SHA1(6c93f432610908950b594bb8d289fe81de88fbdf) )
@@ -232,7 +232,12 @@ S32X_ROM_LOAD( zaxx2kp8,  "zaxxon's motherbase 2000(prototype - mar 31, 1995).bi
     TO BE CONFIRMED:
     * Is Motherbase (European version of Zaxxon's Motherbase) undumped?
 
+    Known undumped prototypes:
+     - Soul Star
+     - Spot Goes to Hollywood
+
 */
+
 SOFTWARE_LIST_START( _32x_cart )
 	/* Id: GM4006, 84507 - Developers: Sega Development Division #2 / Rutubo Games - Releases: 1994 (USA), 1995 (Euro), 1995-01-13 (JPN) */
 	SOFTWARE( afterb,   0,      1994, "Sega", "After Burner Complete (Euro)", 0, 0 )
@@ -482,7 +487,7 @@ SOFTWARE_LIST_START( _32x_cart )
 	SOFTWARE( vfp5,   vf,     1995, "Sega", "Virtua Fighter (Prototype, 19950630)", 0, 0 )
 	SOFTWARE( vfp6,   vf,     1995, "Sega", "Virtua Fighter (Prototype, 19950530)", 0, 0 )
 
-	/* Id: ?? - Developers: ?? - Releases: -  */
+	/* Id: ?? - Developers: David A. Palmer Productions - Releases: -  */
 	SOFTWARE( vham,   0,       1994, "<unknown>", "Virtua Hamster (Usa, Prototype)", 0, 0 )
 
 	/* Id: GM5001, 84601 - Developers: Sega AM2 - Releases: 1994 (EUR, USA), 1994-12-16 (JPN) */
@@ -502,8 +507,8 @@ SOFTWARE_LIST_START( _32x_cart )
 	/* Id: T-8110B - Developers: Sculptured Software - Releases: 1995 (USA)  */
 	SOFTWARE( wwfwre, 0,       1995, "Acclaim Entertainment", "WWF WrestleMania: The Arcade Game (Usa)", 0, 0 )
 
-	/* Id: ?? - Developers: ?? - Releases: -  */
-	SOFTWARE( xmenusa, 0,       1995, "<unknown>", "X-Men (Usa, Prototype)", 0, 0 )
+	/* Id: ?? - Developers: Scavenger - Releases: -  */
+	SOFTWARE( xmen, 0,       1995, "<unknown>", "X-Men (Usa, Prototype)", 0, 0 )
 
 	/* Id: GM4012, 84512 - Developers: CRI - Releases: 1995 (EUR, USA), 1995-07-14 (JPN) */
 	SOFTWARE( zaxx2k,   0,        1995, "Sega", "Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA)", 0, 0 )

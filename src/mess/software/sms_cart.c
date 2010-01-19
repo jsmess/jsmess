@@ -545,7 +545,7 @@ SOFTWARE_LIST_START( sms_cart )
 	SOFTWARE( arielmer,   0,        1997, "Tec Toy", "Ariel - The Little Mermaid (Brazil)", 0, 0 )	/* Id: 026.350 - Releases: 1997 (BRA) */
 	SOFTWARE( assaultc,   0,        1990, "Sega", "Assault City (Euro, Light Phaser version)", 0, 0 )	/* Id: 7040 */
 	SOFTWARE( assaultc1,  assaultc, 1990, "Sega", "Assault City (Euro)", 0, 0 )	/* Id: 7034 */
-	SOFTWARE( asterix,    0,        1901, "Sega", "Asterix (Euro, v1.1)", 0, 0 )	/* Id: 9008 */
+	SOFTWARE( asterix,    0,        1991, "Sega", "Asterix (Euro, v1.1)", 0, 0 )	/* Id: 9008 */
 	SOFTWARE( asterix1,   asterix,  1991, "Sega", "Asterix (Euro)", 0, 0 )
 	SOFTWARE( tvcolos,    asterix,  1996, "Tec Toy", "As Aventuras da TV Colosso (Brazil)", 0, 0 )
 	SOFTWARE( astergre,   0,        1993, "Sega", "Asterix and the Great Rescue (Euro)", 0, 0 )	/* Id: 9032 */
