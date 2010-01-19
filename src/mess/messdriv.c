@@ -165,6 +165,9 @@ const game_driver * const drivers[] =
 	DRIVER( itttelma )  /* ITT Tele-Match Processor (PAL)	   */
 	DRIVER( ingtelma )  /* Ingelen Tele-Match Processor (PAL)	   */
 
+	/* Casio */
+	DRIVER( pv1000 )	/* Casio PV-1000 */
+
 	/* Coleco */
 	DRIVER( coleco )	/* ColecoVision (Original BIOS)	 */
 	DRIVER( colecoa )   /* ColecoVision (Thick Characters)	  */

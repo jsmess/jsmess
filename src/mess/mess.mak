@@ -269,6 +269,7 @@ DRVLIBS = \
 	$(MESSOBJ)/camputers.a \
 	$(MESSOBJ)/canon.a \
 	$(MESSOBJ)/capcom.a \
+	$(MESSOBJ)/casio.a \
 	$(MESSOBJ)/cbm.a \
 	$(MESSOBJ)/cbmshare.a \
 	$(MESSOBJ)/cccp.a \
@@ -676,6 +677,9 @@ $(MESSOBJ)/capcom.a:			\
 	$(MESS_DRIVERS)/cpschngr.o	\
 	$(MESS_VIDEO)/cpschngr.o	\
 	$(MAME_MACHINE)/kabuki.o	\
+
+$(MESSOBJ)/casio.a:				\
+	$(MESS_DRIVERS)/pv1000.o	\
 
 $(MESSOBJ)/cbm.a:				\
 	$(MESS_VIDEO)/pet.o			\
