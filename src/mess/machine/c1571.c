@@ -184,6 +184,28 @@ WRITE_LINE_DEVICE_HANDLER( c1571_iec_atn_w )
 }
 
 /*-------------------------------------------------
+    c1571_iec_srq_w - serial bus fast clock
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( c1571_iec_srq_w )
+{
+	c1571_t *c1571 = get_safe_token(device);
+
+	mos6526_cnt_w(c1571->cia, state);
+}
+
+/*-------------------------------------------------
+    c1571_iec_data_w - serial bus fast data
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( c1571_iec_data_w )
+{
+	c1571_t *c1571 = get_safe_token(device);
+
+	mos6526_sp_w(c1571->cia, state);
+}
+
+/*-------------------------------------------------
     c1571_iec_reset_w - serial bus reset
 -------------------------------------------------*/
 
@@ -204,7 +226,7 @@ static ADDRESS_MAP_START( c1570_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
 	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
 	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE(WD1770_TAG, wd17xx_r, wd17xx_w)
-	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE(M6526_TAG, cia_r, cia_w)
+	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE(M6526_TAG, mos6526_r, mos6526_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("c1570", 0)
 ADDRESS_MAP_END
 
@@ -217,7 +239,7 @@ static ADDRESS_MAP_START( c1571_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
 	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
 	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE(WD1770_TAG, wd17xx_r, wd17xx_w)
-	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE(M6526_TAG, cia_r, cia_w)
+	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE(M6526_TAG, mos6526_r, mos6526_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("c1571", 0)
 ADDRESS_MAP_END
 
@@ -577,7 +599,7 @@ static const via6522_interface c1571_via1_intf =
 };
 
 /*-------------------------------------------------
-    cia6526_interface c1571_cia_intf
+    mos6526_interface c1571_cia_intf
 -------------------------------------------------*/
 
 static WRITE_LINE_DEVICE_HANDLER( cia_irq_w )
@@ -589,15 +611,33 @@ static WRITE_LINE_DEVICE_HANDLER( cia_irq_w )
 	cpu_set_input_line(c1571->cpu, INPUT_LINE_IRQ0, (c1571->via0_irq | c1571->via1_irq | c1571->cia_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const cia6526_interface c1571_cia_intf =
+static WRITE_LINE_DEVICE_HANDLER( cia_cnt_w )
 {
+	c1571_t *c1571 = get_safe_token(device->owner);
+
+	/* fast clock out */
+	cbm_iec_srq_w(c1571->serial_bus, device->owner, state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( cia_sp_w )
+{
+	c1571_t *c1571 = get_safe_token(device->owner);
+
+	/* fast data out */
+	cbm_iec_data_w(c1571->serial_bus, device->owner, state);
+}
+
+static MOS6526_INTERFACE( c1571_cia_intf )
+{
+	10,
 	DEVCB_LINE(cia_irq_w),
 	DEVCB_NULL,
-	10, /* 1/10 second */
-	{
-		{ DEVCB_NULL, DEVCB_NULL },
-		{ DEVCB_NULL, DEVCB_NULL }
-	}
+	DEVCB_LINE(cia_cnt_w),
+	DEVCB_LINE(cia_sp_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /*-------------------------------------------------
@@ -663,7 +703,7 @@ static MACHINE_DRIVER_START( c1570 )
 
 	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/8, c1571_via0_intf)
 	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/8, c1571_via1_intf)
-	MDRV_CIA6526_ADD(M6526_TAG, CIA6526R1, XTAL_16MHz/8, c1571_cia_intf)
+	MDRV_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/8, c1571_cia_intf)
 	MDRV_WD1770_ADD(WD1770_TAG, c1571_wd1770_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1570_floppy_config)
@@ -679,7 +719,7 @@ static MACHINE_DRIVER_START( c1571 )
 
 	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/8, c1571_via0_intf)
 	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/8, c1571_via1_intf)
-	MDRV_CIA6526_ADD(M6526_TAG, CIA6526R1, XTAL_16MHz/8, c1571_cia_intf)
+	MDRV_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/8, c1571_cia_intf)
 	MDRV_WD1770_ADD(WD1770_TAG, c1571_wd1770_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_config)
@@ -695,7 +735,7 @@ static MACHINE_DRIVER_START( c1571cr )
 
 	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/8, c1571_via0_intf)
 	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/8, c1571_via1_intf)
-	MDRV_CIA6526_ADD(M6526_TAG, CIA6526R1, XTAL_16MHz/8, c1571_cia_intf)
+	MDRV_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/8, c1571_cia_intf)
 	MDRV_WD1770_ADD(WD1770_TAG, c1571_wd1770_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_config)

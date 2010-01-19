@@ -15,7 +15,6 @@
 	- WD1770 MO/RDY pin confusion
 	- ready signal polarity
 	- floppy access
-    - fast serial
     - power LED
     - activity LED
 
@@ -98,6 +97,28 @@ WRITE_LINE_DEVICE_HANDLER( c1581_iec_atn_w )
 }
 
 /*-------------------------------------------------
+    c1581_iec_srq_w - serial bus fast clock
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( c1581_iec_srq_w )
+{
+	c1581_t *c1581 = get_safe_token(device);
+
+	mos6526_cnt_w(c1581->cia, state);
+}
+
+/*-------------------------------------------------
+    c1581_iec_data_w - serial bus fast data
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( c1581_iec_data_w )
+{
+	c1581_t *c1581 = get_safe_token(device);
+
+	mos6526_sp_w(c1581->cia, state);
+}
+
+/*-------------------------------------------------
     c1581_iec_reset_w - serial bus reset
 -------------------------------------------------*/
 
@@ -115,7 +136,7 @@ WRITE_LINE_DEVICE_HANDLER( c1581_iec_reset_w )
 
 static ADDRESS_MAP_START( c1581_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE(M8520_TAG, cia_r, cia_w)
+	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE(M8520_TAG, mos6526_r, mos6526_w)
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE(WD1770_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("c1581", 0)
 ADDRESS_MAP_END
@@ -126,16 +147,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c1563_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE(M8520_TAG, cia_r, cia_w)
+	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE(M8520_TAG, mos6526_r, mos6526_w)
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE(WD1770_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("c1563", 0)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
-    cia6526_interface c1581_cia_intf
+    mos6526_interface cia_intf
 -------------------------------------------------*/
 
-static READ8_DEVICE_HANDLER( c1581_cia_pa_r )
+static READ8_DEVICE_HANDLER( cia_pa_r )
 {
 	/*
 
@@ -164,7 +185,7 @@ static READ8_DEVICE_HANDLER( c1581_cia_pa_r )
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( c1581_cia_pa_w )
+static WRITE8_DEVICE_HANDLER( cia_pa_w )
 {
 	/*
 
@@ -197,7 +218,7 @@ static WRITE8_DEVICE_HANDLER( c1581_cia_pa_w )
 
 }
 
-static READ8_DEVICE_HANDLER( c1581_cia_pb_r )
+static READ8_DEVICE_HANDLER( cia_pb_r )
 {
 	/*
 
@@ -232,7 +253,7 @@ static READ8_DEVICE_HANDLER( c1581_cia_pb_r )
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( c1581_cia_pb_w )
+static WRITE8_DEVICE_HANDLER( cia_pb_w )
 {
 	/*
 
@@ -267,22 +288,40 @@ static WRITE8_DEVICE_HANDLER( c1581_cia_pb_w )
 	c1581->atn_ack = BIT(data, 4);
 }
 
-static const cia6526_interface c1581_cia_intf =
+static WRITE_LINE_DEVICE_HANDLER( cia_cnt_w )
 {
+	c1581_t *c1581 = get_safe_token(device->owner);
+
+	/* fast clock out */
+	cbm_iec_srq_w(c1581->serial_bus, device->owner, state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( cia_sp_w )
+{
+	c1581_t *c1581 = get_safe_token(device->owner);
+
+	/* fast data out */
+	cbm_iec_data_w(c1581->serial_bus, device->owner, state);
+}
+
+static MOS8520_INTERFACE( cia_intf )
+{
+	XTAL_16MHz/8,
 	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0),
 	DEVCB_NULL,
-	XTAL_16MHz/8,
-	{
-		{ DEVCB_HANDLER(c1581_cia_pa_r), DEVCB_HANDLER(c1581_cia_pa_w) },
-		{ DEVCB_HANDLER(c1581_cia_pb_r), DEVCB_HANDLER(c1581_cia_pb_w) }
-	}
+	DEVCB_LINE(cia_cnt_w),
+	DEVCB_LINE(cia_sp_w),
+	DEVCB_HANDLER(cia_pa_r),
+	DEVCB_HANDLER(cia_pa_w),
+	DEVCB_HANDLER(cia_pb_r),
+	DEVCB_HANDLER(cia_pb_w),
 };
 
 /*-------------------------------------------------
-    wd17xx_interface c1581_wd1770_intf
+    wd17xx_interface wd1770_intf
 -------------------------------------------------*/
 
-static const wd17xx_interface c1581_wd1770_intf =
+static const wd17xx_interface wd1770_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -326,8 +365,8 @@ static MACHINE_DRIVER_START( c1581 )
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(c1581_map)
 
-	MDRV_CIA8520_ADD(M8520_TAG, XTAL_16MHz/8, c1581_cia_intf)
-	MDRV_WD1770_ADD(WD1770_TAG, /*XTAL_16MHz/2,*/ c1581_wd1770_intf)
+	MDRV_MOS8520_ADD(M8520_TAG, XTAL_16MHz/8, cia_intf)
+	MDRV_WD1770_ADD(WD1770_TAG, /*XTAL_16MHz/2,*/ wd1770_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1581_floppy_config)
 MACHINE_DRIVER_END
@@ -340,8 +379,8 @@ static MACHINE_DRIVER_START( c1563 )
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(c1563_map)
 
-	MDRV_CIA8520_ADD(M8520_TAG, XTAL_16MHz/8, c1581_cia_intf)
-	MDRV_WD1770_ADD(WD1770_TAG, /*XTAL_16MHz/2,*/ c1581_wd1770_intf)
+	MDRV_MOS8520_ADD(M8520_TAG, XTAL_16MHz/8, cia_intf)
+	MDRV_WD1770_ADD(WD1770_TAG, /*XTAL_16MHz/2,*/ wd1770_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1581_floppy_config)
 MACHINE_DRIVER_END

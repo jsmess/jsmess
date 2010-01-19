@@ -27,9 +27,9 @@ static void kbd_sendscancode( running_machine *machine, UINT8 scancode )
 	/* send over to the cia A */
 	for( j = 0; j < 8; j++ )
 	{
-		cia_set_input_cnt( cia, 0 );	/* lower cnt */
-		cia_set_input_sp( cia, ( scancode >> j ) & 1 ); /* set the serial data */
-		cia_set_input_cnt( cia, 1 );	/* raise cnt */
+		mos6526_cnt_w( cia, 0 );	/* lower cnt */
+		mos6526_sp_w( cia, ( scancode >> j ) & 1 ); /* set the serial data */
+		mos6526_cnt_w( cia, 1 );	/* raise cnt */
 	}
 }
 

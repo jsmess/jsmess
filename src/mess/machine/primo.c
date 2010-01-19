@@ -15,7 +15,7 @@
 
 /* Components */
 #include "cpu/z80/z80.h"
-#include "includes/cbmserb.h"
+#include "machine/cbmiec.h"
 #include "sound/speaker.h"
 
 /* Devices */
@@ -26,7 +26,6 @@
 
 static UINT8 primo_port_FD = 0x00;
 static int primo_nmi = 0;
-static int serial_atn = 1, serial_clock = 1, serial_data = 1;
 
 /*******************************************************************************
 
@@ -111,20 +110,21 @@ READ8_HANDLER( primo_be_2_r )
 	// bit 7, 6 - not used
 
 	// bit 5 - SCLK
-	if (!serial_clock || !cbm_serial_clock_read(serbus, 0))
+	if (!cbm_iec_clk_r(serbus))
 		data &= ~0x20;
 
 	// bit 4 - SDATA
-	if (!serial_data || !cbm_serial_data_read(serbus, 0))
+	if (!cbm_iec_data_r(serbus))
 		data &= ~0x10;
 
 	// bit 3 - SRQ
-//  data &= (!cbm_serial_request_read(serbus, 0)) ? ~0x08 : ~0x00;
+	if (!cbm_iec_srq_r(serbus))
+		data &= ~0x08;
 
 	// bit 2 - joystic 2 (not implemeted yet)
 
 	// bit 1 - ATN
-	if (!serial_atn || !cbm_serial_atn_read(serbus, 0))
+	if (!cbm_iec_atn_r(serbus))
 		data &= ~0x02;
 
 	// bit 0 - joystic 1 (not implemeted yet)
@@ -177,26 +177,21 @@ WRITE8_HANDLER( primo_ki_2_w )
 	// bit 7, 6 - not used
 
 	// bit 5 - SCLK
-	cbm_serial_clock_write(serbus, 0, serial_clock = !(data & 0x20));
-	logerror ("W - SCLK: %d ", serial_clock ? 1 : 0);
+	cbm_iec_clk_w(serbus, NULL, !BIT(data, 5));
 
 	// bit 4 - SDATA
-	cbm_serial_data_write(serbus, 0, serial_data = !(data & 0x10));
-	logerror ("SDATA: %d ", serial_data ? 1 : 0);
+	cbm_iec_data_w(serbus, NULL, !BIT(data, 4));
 
 	// bit 3 - not used
 
 	// bit 2 - SRQ
-	cbm_serial_request_write(serbus, 0, !(data & 0x04));
+	cbm_iec_srq_w(serbus, NULL, !BIT(data, 2));
 
 	// bit 1 - ATN
-	cbm_serial_atn_write(serbus, 0, serial_atn = !(data & 0x02));
-	logerror ("ATN: %d\n", serial_atn ? 1 : 0);
+	cbm_iec_atn_w(serbus, NULL, !BIT(data, 1));
 
 	// bit 0 - not used
 
-	if (data & 0x04)
-		logerror ("SRQ WRITE\n");
 //  logerror ("IOW KI-2 data:%02x\n", data);
 }
 

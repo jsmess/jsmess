@@ -30,7 +30,7 @@
 	MDRV_DEVICE_CONFIG_DATA32(c1581_config, address, _address)
 
 #define C1581_IEC(_tag) \
-	_tag, DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, c1581_iec_atn_w), DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, c1581_iec_reset_w)
+	_tag, DEVCB_DEVICE_LINE(_tag, c1581_iec_srq_w), DEVCB_DEVICE_LINE(_tag, c1581_iec_atn_w), DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, c1581_iec_data_w), DEVCB_DEVICE_LINE(_tag, c1581_iec_reset_w)
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -52,7 +52,9 @@ DEVICE_GET_INFO( c1581 );
 DEVICE_GET_INFO( c1563 );
 
 /* IEC interface */
+WRITE_LINE_DEVICE_HANDLER( c1581_iec_srq_w );
 WRITE_LINE_DEVICE_HANDLER( c1581_iec_atn_w );
+WRITE_LINE_DEVICE_HANDLER( c1581_iec_data_w );
 WRITE_LINE_DEVICE_HANDLER( c1581_iec_reset_w );
 
 #endif

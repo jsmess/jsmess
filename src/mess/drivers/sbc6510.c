@@ -59,16 +59,19 @@ static const ay8910_interface sbc6510_ay_interface =
 	DEVCB_NULL
 };
 
-const cia6526_interface sbc6510_ntsc_cia0 =
+const mos6526_interface sbc6510_ntsc_cia0 =
 {
+	10, /* 1/10 second */
 	DEVCB_NULL,
 	DEVCB_NULL,	/* pc_func */
-	10, /* 1/10 second */
-	{
-		{ DEVCB_NULL, DEVCB_NULL },
-		{ DEVCB_NULL, DEVCB_NULL }
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
+
 static MACHINE_DRIVER_START( sbc6510 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6510, XTAL_1MHz)
@@ -96,7 +99,7 @@ static MACHINE_DRIVER_START( sbc6510 )
 	MDRV_SOUND_CONFIG(sbc6510_ay_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	
 	
-	MDRV_CIA6526_ADD("cia_0", CIA6526R1, XTAL_1MHz, sbc6510_ntsc_cia0)
+	MDRV_MOS6526R1_ADD("cia_0", XTAL_1MHz, sbc6510_ntsc_cia0)
 MACHINE_DRIVER_END
 
 /* ROM definition */

@@ -7,17 +7,14 @@
 
 #include "driver.h"
 
+#include "includes/cbm.h"
+#include "includes/c65.h"
+#include "includes/c64.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
+#include "machine/cbmiec.h"
 #include "video/vic4567.h"
-
-#include "includes/cbm.h"
-#include "includes/cbmserb.h"
-
-#include "includes/c65.h"
-#include "includes/c64.h"
-
 #include "devices/messram.h"
 
 #define VERBOSE_LEVEL 0
@@ -38,7 +35,6 @@ static int c64mode;
 static UINT8 c65_6511_port;
 static UINT8 c65_keyline = { 0xff };
 
-static UINT8 serial_clock, serial_data, serial_atn;
 static UINT8 vicirq;
 
 /*UINT8 *c65_basic; */
@@ -54,7 +50,7 @@ static void c65_nmi( running_machine *machine )
 {
 	static int nmilevel = 0;
 	const device_config *cia_1 = devtag_get_device(machine, "cia_1");
-	int cia1irq = cia_get_irq(cia_1);
+	int cia1irq = mos6526_irq_r(cia_1);
 
 	if (nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
 	{
@@ -83,7 +79,7 @@ static void c65_nmi( running_machine *machine )
 
 static READ8_DEVICE_HANDLER( c65_cia0_port_a_r )
 {
-	UINT8 cia0portb = cia_get_output_b(devtag_get_device(device->machine, "cia_0"));
+	UINT8 cia0portb = mos6526_pb_r(devtag_get_device(device->machine, "cia_0"), 0);
 
 	return cbm_common_cia0_port_a_r(device, cia0portb);
 }
@@ -91,7 +87,7 @@ static READ8_DEVICE_HANDLER( c65_cia0_port_a_r )
 static READ8_DEVICE_HANDLER( c65_cia0_port_b_r )
 {
     UINT8 value = 0xff;
-	UINT8 cia0porta = cia_get_output_a(devtag_get_device(device->machine, "cia_0"));
+	UINT8 cia0porta = mos6526_pa_r(devtag_get_device(device->machine, "cia_0"), 0);
 
 	value &= cbm_common_cia0_port_b_r(device, cia0porta);
 
@@ -132,34 +128,36 @@ static void c65_vic_interrupt( running_machine *machine, int level )
 #if 1
 	if (level != vicirq)
 	{
-		c65_irq (machine, level || cia_get_irq(cia_0));
+		c65_irq (machine, level || mos6526_irq_r(cia_0));
 		vicirq = level;
 	}
 #endif
 }
 
-const cia6526_interface c65_ntsc_cia0 =
+const mos6526_interface c65_ntsc_cia0 =
 {
+	60,
 	DEVCB_LINE(c65_cia0_interrupt),
 	DEVCB_NULL,	/* pc_func */
-	60,
-
-	{
-		{ DEVCB_HANDLER(c65_cia0_port_a_r), DEVCB_NULL },
-		{ DEVCB_HANDLER(c65_cia0_port_b_r), DEVCB_HANDLER(c65_cia0_port_b_w) }
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(c65_cia0_port_a_r),
+	DEVCB_NULL,
+	DEVCB_HANDLER(c65_cia0_port_b_r),
+	DEVCB_HANDLER(c65_cia0_port_b_w)
 };
 
-const cia6526_interface c65_pal_cia0 =
+const mos6526_interface c65_pal_cia0 =
 {
+	50,
 	DEVCB_LINE(c65_cia0_interrupt),
 	DEVCB_NULL,	/* pc_func */
-	50,
-
-	{
-		{ DEVCB_HANDLER(c65_cia0_port_a_r), DEVCB_NULL },
-		{ DEVCB_HANDLER(c65_cia0_port_b_r), DEVCB_HANDLER(c65_cia0_port_b_w) }
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(c65_cia0_port_a_r),
+	DEVCB_NULL,
+	DEVCB_HANDLER(c65_cia0_port_b_r),
+	DEVCB_HANDLER(c65_cia0_port_b_w)
 };
 
 /*
@@ -190,10 +188,10 @@ static READ8_DEVICE_HANDLER( c65_cia1_port_a_r )
 	UINT8 value = 0xff;
 	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
 
-	if (!serial_clock || !cbm_serial_clock_read(serbus, 0))
+	if (!cbm_iec_clk_r(serbus))
 		value &= ~0x40;
 
-	if (!serial_data || !cbm_serial_data_read(serbus, 0))
+	if (!cbm_iec_data_r(serbus))
 		value &= ~0x80;
 
 	return value;
@@ -204,40 +202,42 @@ static WRITE8_DEVICE_HANDLER( c65_cia1_port_a_w )
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
 	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
 
-	cbm_serial_clock_write(serbus, 0, serial_clock = !(data & 0x10));
-	cbm_serial_data_write(serbus, 0, serial_data = !(data & 0x20));
-	cbm_serial_atn_write(serbus, 0, serial_atn = !(data & 0x08));
+	cbm_iec_atn_w(serbus, device, !BIT(data, 3));
+	cbm_iec_clk_w(serbus, device, !BIT(data, 4));
+	cbm_iec_data_w(serbus, device, !BIT(data, 5));
+
 	c64_vicaddr = c64_memory + helper[data & 0x03];
 }
 
-static void c65_cia1_interrupt( const device_config *device, int level )
+static WRITE_LINE_DEVICE_HANDLER( c65_cia1_interrupt )
 {
 	c65_nmi(device->machine);
 }
 
-
-const cia6526_interface c65_ntsc_cia1 =
+const mos6526_interface c65_ntsc_cia1 =
 {
+	60,
 	DEVCB_LINE(c65_cia1_interrupt),
 	DEVCB_NULL,	/* pc_func */
-	60,
-
-	{
-		{ DEVCB_HANDLER(c65_cia1_port_a_r), DEVCB_HANDLER(c65_cia1_port_a_w) },
-		{ DEVCB_NULL, DEVCB_NULL }
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(c65_cia1_port_a_r),
+	DEVCB_HANDLER(c65_cia1_port_a_w),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
-const cia6526_interface c65_pal_cia1 =
+const mos6526_interface c65_pal_cia1 =
 {
+	50,
 	DEVCB_LINE(c65_cia1_interrupt),
 	DEVCB_NULL,	/* pc_func */
-	50,
-
-	{
-		{ DEVCB_HANDLER(c65_cia1_port_a_r), DEVCB_HANDLER(c65_cia1_port_a_w) },
-		{ DEVCB_NULL, DEVCB_NULL }
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(c65_cia1_port_a_r),
+	DEVCB_HANDLER(c65_cia1_port_a_w),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /***********************************************
@@ -740,10 +740,10 @@ static WRITE8_HANDLER( c65_write_io_dc00 )
 	switch (offset & 0xf00)
 	{
 	case 0x000:
-		cia_w(cia_0, offset, data);
+		mos6526_w(cia_0, offset, data);
 		break;
 	case 0x100:
-		cia_w(cia_1, offset, data);
+		mos6526_w(cia_1, offset, data);
 		break;
 	case 0x200:
 	case 0x300:
@@ -802,9 +802,9 @@ static READ8_HANDLER( c65_read_io_dc00 )
 	switch (offset & 0x300)
 	{
 	case 0x000:
-		return cia_r(cia_0, offset);
+		return mos6526_r(cia_0, offset);
 	case 0x100:
-		return cia_r(cia_1, offset);
+		return mos6526_r(cia_1, offset);
 	case 0x200:
 	case 0x300:
 		DBG_LOG(space->machine, 1, "io read", ("%.3x\n", offset+0xc00));

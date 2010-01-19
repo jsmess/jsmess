@@ -398,7 +398,7 @@ static ADDRESS_MAP_START(ultimax_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(vic2_port_r, vic2_port_w)
 	AM_RANGE(0xd400, 0xd7ff) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE( c64_colorram_write) AM_BASE(&c64_colorram) /* colorram  */
-	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE("cia_0", cia_r, cia_w)
+	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE("cia_0", mos6526_r, mos6526_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE(&c64_romh)				/* ram or kernel rom */
 ADDRESS_MAP_END
 
@@ -570,8 +570,8 @@ static MACHINE_DRIVER_START( c64 )
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
 
 	/* cia */
-	MDRV_CIA6526_ADD("cia_0", CIA6526R1, VIC6567_CLOCK, c64_ntsc_cia0)
-	MDRV_CIA6526_ADD("cia_1", CIA6526R1, VIC6567_CLOCK, c64_ntsc_cia1)
+	MDRV_MOS6526R1_ADD("cia_0", VIC6567_CLOCK, c64_ntsc_cia0)
+	MDRV_MOS6526R1_ADD("cia_1", VIC6567_CLOCK, c64_ntsc_cia1)
 
 	/* floppy from serial bus */
 	MDRV_CBM_IEC_ADD("iec", cbm_iec_daisy)
@@ -612,8 +612,8 @@ static MACHINE_DRIVER_START( c64pal )
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
 
 	/* cia */
-	MDRV_CIA6526_ADD("cia_0", CIA6526R1, VIC6569_CLOCK, c64_pal_cia0)
-	MDRV_CIA6526_ADD("cia_1", CIA6526R1, VIC6569_CLOCK, c64_pal_cia1)
+	MDRV_MOS6526R1_ADD("cia_0", VIC6569_CLOCK, c64_pal_cia0)
+	MDRV_MOS6526R1_ADD("cia_1", VIC6569_CLOCK, c64_pal_cia1)
 
 	/* floppy from serial bus */
 	MDRV_CBM_IEC_ADD("iec", cbm_iec_daisy)

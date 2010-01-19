@@ -64,12 +64,6 @@ static WRITE16_HANDLER( amiga_clock_w )
     CENTRONICS PORT
 ***************************************************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( amiga_centronics_ack_w )
-{
-	if (state == FALSE)
-		cia_issue_index(device);
-}
-
 static READ8_DEVICE_HANDLER( amiga_cia_1_porta_r )
 {
 	UINT8 result = 0;
@@ -87,7 +81,7 @@ static READ8_DEVICE_HANDLER( amiga_cia_1_porta_r )
 static const centronics_interface amiga_centronics_config =
 {
 	FALSE,
-	DEVCB_DEVICE_LINE("cia_0", amiga_centronics_ack_w),
+	DEVCB_DEVICE_LINE("cia_0", mos6526_flag_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -286,59 +280,69 @@ static MACHINE_RESET( cdtv )
 	MACHINE_RESET_CALL( amigacd );
 }
 
-static const cia6526_interface cia_0_ntsc_intf =
+static const mos6526_interface cia_0_ntsc_intf =
 {
-	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
+	60,														/* tod_clock */
+	DEVCB_LINE(amiga_cia_0_irq),							/* irq_func */
 	DEVCB_DEVICE_LINE("centronics", centronics_strobe_w),	/* pc_func */
-	60,													/* tod_clock */
-	{
-		{ DEVCB_HANDLER(amiga_cia_0_portA_r), DEVCB_HANDLER(amiga_cia_0_portA_w) },			/* port A */
-		{ DEVCB_NULL, DEVCB_DEVICE_HANDLER("centronics", centronics_data_w) }	/* port B */
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(amiga_cia_0_portA_r),
+	DEVCB_HANDLER(amiga_cia_0_portA_w),						/* port A */
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w)	/* port B */
 };
 
-static const cia6526_interface cia_0_pal_intf =
+static const mos6526_interface cia_0_pal_intf =
 {
-	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
+	50,														/* tod_clock */
+	DEVCB_LINE(amiga_cia_0_irq),							/* irq_func */
 	DEVCB_DEVICE_LINE("centronics", centronics_strobe_w),	/* pc_func */
-	50,													/* tod_clock */
-	{
-		{ DEVCB_HANDLER(amiga_cia_0_portA_r), DEVCB_HANDLER(amiga_cia_0_portA_w) },			/* port A */
-		{ DEVCB_NULL, DEVCB_DEVICE_HANDLER("centronics", centronics_data_w) }	/* port B */
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(amiga_cia_0_portA_r), 
+	DEVCB_HANDLER(amiga_cia_0_portA_w),						/* port A */
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w)	/* port B */
 };
 
-static const cia6526_interface cia_1_intf =
+static const mos6526_interface cia_1_intf =
 {
-	DEVCB_LINE(amiga_cia_1_irq),									/* irq_func */
+	0,														/* tod_clock */
+	DEVCB_LINE(amiga_cia_1_irq),							/* irq_func */
+	DEVCB_NULL,												/* pc_func */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER("centronics", amiga_cia_1_porta_r),
+	DEVCB_NULL,												/* port A */
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER("fdc", amiga_fdc_control_w)		/* port B */
+};
+
+static const mos6526_interface cia_0_cdtv_intf =
+{
+	0,														/* tod_clock */
+	DEVCB_LINE(amiga_cia_0_irq),							/* irq_func */
+	DEVCB_DEVICE_LINE("centronics", centronics_strobe_w),	/* pc_func */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(amiga_cia_0_cdtv_portA_r), 
+	DEVCB_HANDLER(amiga_cia_0_portA_w),						/* port A */
+	DEVCB_NULL, 
+	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w)	/* port B */
+};
+
+static const mos6526_interface cia_1_cdtv_intf =
+{
+	0,														/* tod_clock */
+	DEVCB_LINE(amiga_cia_1_irq),							/* irq_func */
 	DEVCB_NULL,	/* pc_func */
-	0,													/* tod_clock */
-	{
-		{ DEVCB_DEVICE_HANDLER("centronics", amiga_cia_1_porta_r), DEVCB_NULL },	/* port A */
-		{ DEVCB_NULL, DEVCB_DEVICE_HANDLER("fdc", amiga_fdc_control_w) }					/* port B */
-	}
-};
-
-static const cia6526_interface cia_0_cdtv_intf =
-{
-	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
-	DEVCB_DEVICE_LINE("centronics", centronics_strobe_w),	/* pc_func */
-	0,													/* tod_clock */
-	{
-		{ DEVCB_HANDLER(amiga_cia_0_cdtv_portA_r), DEVCB_HANDLER(amiga_cia_0_portA_w) },	/* port A */
-		{ DEVCB_NULL, DEVCB_DEVICE_HANDLER("centronics", centronics_data_w) }	/* port B */
-	}
-};
-
-static const cia6526_interface cia_1_cdtv_intf =
-{
-	DEVCB_LINE(amiga_cia_1_irq),									/* irq_func */
-	DEVCB_NULL,	/* pc_func */
-	0,													/* tod_clock */
-	{
-		{ DEVCB_DEVICE_HANDLER("centronics", amiga_cia_1_porta_r), DEVCB_NULL, },	/* port A */
-		{ DEVCB_NULL, DEVCB_NULL }					/* port B */
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER("centronics", amiga_cia_1_porta_r),
+	DEVCB_NULL,												/* port A */
+	DEVCB_NULL,
+	DEVCB_NULL												/* port B */
 };
 
 static const tpi6525_interface cdtv_tpi_intf =
@@ -400,8 +404,8 @@ static MACHINE_DRIVER_START( ntsc )
 	MDRV_SOUND_ROUTE(3, "lspeaker", 0.50)
 
 	/* cia */
-	MDRV_CIA8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_ntsc_intf)
-	MDRV_CIA8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK, cia_1_intf)
+	MDRV_MOS8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_ntsc_intf)
+	MDRV_MOS8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK, cia_1_intf)
 	
 	MDRV_AMIGA_FDC_ADD("fdc")
 MACHINE_DRIVER_END
@@ -447,8 +451,8 @@ static MACHINE_DRIVER_START( cdtv )
 	/* cia */
 	MDRV_DEVICE_REMOVE("cia_0")
 	MDRV_DEVICE_REMOVE("cia_1")
-	MDRV_CIA8520_ADD("cia_0", CDTV_CLOCK_X1 / 40, cia_0_cdtv_intf)
-	MDRV_CIA8520_ADD("cia_1", CDTV_CLOCK_X1 / 4, cia_1_cdtv_intf)
+	MDRV_MOS8520_ADD("cia_0", CDTV_CLOCK_X1 / 40, cia_0_cdtv_intf)
+	MDRV_MOS8520_ADD("cia_1", CDTV_CLOCK_X1 / 4, cia_1_cdtv_intf)
 MACHINE_DRIVER_END
 
 
@@ -465,7 +469,7 @@ static MACHINE_DRIVER_START( pal )
 
 	/* cia */
 	MDRV_DEVICE_REMOVE("cia_0")
-	MDRV_CIA8520_ADD("cia_0", AMIGA_68000_PAL_CLOCK / 10, cia_0_pal_intf)
+	MDRV_MOS8520_ADD("cia_0", AMIGA_68000_PAL_CLOCK / 10, cia_0_pal_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a500p )

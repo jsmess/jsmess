@@ -36,7 +36,7 @@
 	MDRV_DEVICE_CONFIG_DATA32(c1571_config, address, _address)
 
 #define C1571_IEC(_tag) \
-	_tag, DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, c1571_iec_atn_w), DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, c1571_iec_reset_w)
+	_tag, DEVCB_DEVICE_LINE(_tag, c1571_iec_srq_w), DEVCB_DEVICE_LINE(_tag, c1571_iec_atn_w), DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, c1571_iec_data_w), DEVCB_DEVICE_LINE(_tag, c1571_iec_reset_w)
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -59,7 +59,9 @@ DEVICE_GET_INFO( c1571 );
 DEVICE_GET_INFO( c1571cr );
 
 /* IEC interface */
+WRITE_LINE_DEVICE_HANDLER( c1571_iec_srq_w );
 WRITE_LINE_DEVICE_HANDLER( c1571_iec_atn_w );
+WRITE_LINE_DEVICE_HANDLER( c1571_iec_data_w );
 WRITE_LINE_DEVICE_HANDLER( c1571_iec_reset_w );
 
 #endif

@@ -36,7 +36,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-(none)
+- [CIA6526] Refactored interface, and added SP/CNT callbacks. [Curt Coder]
 
 
 

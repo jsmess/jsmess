@@ -65,7 +65,7 @@ bus serial (available in all modes), a Fast and a Burst serial bus
 
 #include "includes/c64.h"
 #include "includes/c65.h"
-#include "includes/cbmserb.h"
+#include "machine/cbmiec.h"
 #include "devices/messram.h"
 
 /*************************************
@@ -200,20 +200,12 @@ static const sid6581_interface c65_sound_interface =
 	c64_paddle_read
 };
 
-static const cbm_serial_bus_interface c65_drive_interface =
+
+static CBM_IEC_DAISY( cbm_iec_daisy )
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL
+	{ "cia_1" },
+	{ NULL}
 };
-
 
 /*************************************
  *
@@ -253,11 +245,11 @@ static MACHINE_DRIVER_START( c65 )
 	MDRV_QUICKLOAD_ADD("quickload", cbm_c65, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cia */
-	MDRV_CIA6526_ADD("cia_0", CIA6526R1, 3500000, c65_ntsc_cia0)
-	MDRV_CIA6526_ADD("cia_1", CIA6526R1, 3500000, c65_ntsc_cia1)
+	MDRV_MOS6526R1_ADD("cia_0", 3500000, c65_ntsc_cia0)
+	MDRV_MOS6526R1_ADD("cia_1", 3500000, c65_ntsc_cia1)
 
 	/* floppy from serial bus */
-	MDRV_CBM_SERBUS_ADD("serial_bus", c65_drive_interface)
+	MDRV_CBM_IEC_ADD("serial_bus", cbm_iec_daisy)
 
 	MDRV_IMPORT_FROM(c64_cartslot)
 
@@ -284,8 +276,8 @@ static MACHINE_DRIVER_START( c65pal )
 	/* cia */
 	MDRV_DEVICE_REMOVE("cia_0")
 	MDRV_DEVICE_REMOVE("cia_1")
-	MDRV_CIA6526_ADD("cia_0", CIA6526R1, 3500000, c65_pal_cia0)
-	MDRV_CIA6526_ADD("cia_1", CIA6526R1, 3500000, c65_pal_cia1)
+	MDRV_MOS6526R1_ADD("cia_0", 3500000, c65_pal_cia0)
+	MDRV_MOS6526R1_ADD("cia_1", 3500000, c65_pal_cia1)
 MACHINE_DRIVER_END
 
 

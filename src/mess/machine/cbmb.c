@@ -273,16 +273,17 @@ static WRITE8_DEVICE_HANDLER( cbmb_cia_port_a_w )
 	ieee488_dio_w(ieeebus, device, data);
 }
 
-const cia6526_interface cbmb_cia =
+const mos6526_interface cbmb_cia =
 {
+	60,
 	DEVCB_DEVICE_LINE("tpi6525_0", tpi6525_irq2_level),
 	DEVCB_NULL,	/* pc_func */
-	60,
-
-	{
-		{ DEVCB_HANDLER(cbmb_cia_port_a_r), DEVCB_HANDLER(cbmb_cia_port_a_w) },
-		{ DEVCB_NULL, DEVCB_NULL }
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(cbmb_cia_port_a_r),
+	DEVCB_HANDLER(cbmb_cia_port_a_w),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 WRITE8_HANDLER( cbmb_colorram_w )

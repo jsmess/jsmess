@@ -57,8 +57,8 @@ extern UINT8 *c64_roml;
 extern UINT8 *c64_romh;
 extern UINT8 *c64_vicaddr, *c128_vicaddr;
 extern UINT8 c64_game, c64_exrom;
-extern const cia6526_interface c64_ntsc_cia0, c64_pal_cia0;
-extern const cia6526_interface c64_ntsc_cia1, c64_pal_cia1;
+extern const mos6526_interface c64_ntsc_cia0, c64_pal_cia0;
+extern const mos6526_interface c64_ntsc_cia1, c64_pal_cia1;
 
 MACHINE_DRIVER_EXTERN( c64_cartslot );
 MACHINE_DRIVER_EXTERN( ultimax_cartslot );

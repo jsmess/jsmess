@@ -37,7 +37,7 @@ extern UINT8 *cbmb_kernal;
 extern UINT8 *cbmb_videoram;
 extern UINT8 *cbmb_colorram;
 
-extern const cia6526_interface cbmb_cia;
+extern const mos6526_interface cbmb_cia;
 
 WRITE8_HANDLER ( cbmb_colorram_w );
 

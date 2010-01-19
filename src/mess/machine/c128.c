@@ -75,7 +75,7 @@ static void c128_nmi( running_machine *machine )
 {
 	static int nmilevel = 0;
 	const device_config *cia_1 = devtag_get_device(machine, "cia_1");
-	int cia1irq = cia_get_irq(cia_1);
+	int cia1irq = mos6526_irq_r(cia_1);
 
 	if (nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
 	{
@@ -111,7 +111,7 @@ static void c128_nmi( running_machine *machine )
 
 static READ8_DEVICE_HANDLER( c128_cia0_port_a_r )
 {
-	UINT8 cia0portb = cia_get_output_b(devtag_get_device(device->machine, "cia_0"));
+	UINT8 cia0portb = mos6526_pb_r(devtag_get_device(device->machine, "cia_0"), 0);
 
 	return cbm_common_cia0_port_a_r(device, cia0portb);
 }
@@ -119,7 +119,7 @@ static READ8_DEVICE_HANDLER( c128_cia0_port_a_r )
 static READ8_DEVICE_HANDLER( c128_cia0_port_b_r )
 {
 	UINT8 value = 0xff;
-	UINT8 cia0porta = cia_get_output_a(devtag_get_device(device->machine, "cia_0"));
+	UINT8 cia0porta = mos6526_pa_r(devtag_get_device(device->machine, "cia_0"), 0);
 
 	value &= cbm_common_cia0_port_b_r(device, cia0porta);
 
@@ -170,34 +170,36 @@ static void c128_vic_interrupt( running_machine *machine, int level )
 #if 1
 	if (level != vicirq)
 	{
-		c128_irq (machine, level || cia_get_irq(cia_0));
+		c128_irq (machine, level || mos6526_irq_r(cia_0));
 		vicirq = level;
 	}
 #endif
 }
 
-const cia6526_interface c128_ntsc_cia0 =
+const mos6526_interface c128_ntsc_cia0 =
 {
+	60,
 	DEVCB_LINE(c128_cia0_interrupt),
 	DEVCB_NULL,	/* pc_func */
-	60,
-
-	{
-		{ DEVCB_HANDLER(c128_cia0_port_a_r), DEVCB_NULL },
-		{ DEVCB_HANDLER(c128_cia0_port_b_r), DEVCB_HANDLER(c128_cia0_port_b_w) }
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(c128_cia0_port_a_r),
+	DEVCB_NULL,
+	DEVCB_HANDLER(c128_cia0_port_b_r),
+	DEVCB_HANDLER(c128_cia0_port_b_w)
 };
 
-const cia6526_interface c128_pal_cia0 =
+const mos6526_interface c128_pal_cia0 =
 {
+	50,
 	DEVCB_LINE(c128_cia0_interrupt),
 	DEVCB_NULL,	/* pc_func */
-	50,
-
-	{
-		{ DEVCB_HANDLER(c128_cia0_port_a_r), DEVCB_NULL },
-		{ DEVCB_HANDLER(c128_cia0_port_b_r), DEVCB_HANDLER(c128_cia0_port_b_w) }
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(c128_cia0_port_a_r),
+	DEVCB_NULL,
+	DEVCB_HANDLER(c128_cia0_port_b_r),
+	DEVCB_HANDLER(c128_cia0_port_b_w)
 };
 
 
@@ -255,28 +257,30 @@ static void c128_cia1_interrupt( const device_config *device, int level )
 	c128_nmi(device->machine);
 }
 
-const cia6526_interface c128_ntsc_cia1 =
+const mos6526_interface c128_ntsc_cia1 =
 {
+	60,
 	DEVCB_LINE(c128_cia1_interrupt),
 	DEVCB_NULL,	/* pc_func */
-	60,
-
-	{
-		{ DEVCB_HANDLER(c128_cia1_port_a_r), DEVCB_HANDLER(c128_cia1_port_a_w) },
-		{ DEVCB_NULL, DEVCB_NULL }
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(c128_cia1_port_a_r),
+	DEVCB_HANDLER(c128_cia1_port_a_w),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
-const cia6526_interface c128_pal_cia1 =
+const mos6526_interface c128_pal_cia1 =
 {
+	50,
 	DEVCB_LINE(c128_cia1_interrupt),
 	DEVCB_NULL,	/* pc_func */
-	50,
-
-	{
-		{ DEVCB_HANDLER(c128_cia1_port_a_r), DEVCB_HANDLER(c128_cia1_port_a_w) },
-		{ DEVCB_NULL, DEVCB_NULL }
-	}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(c128_cia1_port_a_r),
+	DEVCB_HANDLER(c128_cia1_port_a_w),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /***********************************************
@@ -333,10 +337,10 @@ WRITE8_HANDLER( c128_write_d000 )
 				c64_colorram[(offset & 0x3ff)|((c64_port6510&3)<<10)] = data | 0xf0; // maybe all 8 bit connected!
 		    break;
 		case 0xc:
-			cia_w(cia_0, offset, data);
+			mos6526_w(cia_0, offset, data);
 			break;
 		case 0xd:
-			cia_w(cia_1, offset, data);
+			mos6526_w(cia_1, offset, data);
 			break;
 		case 0xf:
 			c128_dma8726_port_w(space, offset&0xff,data);
@@ -369,17 +373,17 @@ static READ8_HANDLER( c128_read_io )
 	else if (offset == 0xc00)
 		{
 			cia_set_port_mask_value(cia_0, 0, input_port_read(space->machine, "CTRLSEL") & 0x80 ? c64_keyline[8] : c64_keyline[9] );
-			return cia_r(cia_0, offset);
+			return mos6526_r(cia_0, offset);
 		}
 	else if (offset == 0xc01)
 		{
 			cia_set_port_mask_value(cia_0, 1, input_port_read(space->machine, "CTRLSEL") & 0x80 ? c64_keyline[9] : c64_keyline[8] );
-			return cia_r(cia_0, offset);
+			return mos6526_r(cia_0, offset);
 		}
 	else if (offset < 0xd00)
-		return cia_r(cia_0, offset);
+		return mos6526_r(cia_0, offset);
 	else if (offset < 0xe00)
-		return cia_r(cia_1, offset);
+		return mos6526_r(cia_1, offset);
 	else if ((offset >= 0xf00) & (offset <= 0xfff))
 		return c128_dma8726_port_r(space, offset&0xff);
 	DBG_LOG(space->machine, 1, "io read", ("%.3x\n", offset));

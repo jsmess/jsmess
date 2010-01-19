@@ -139,7 +139,7 @@ static ADDRESS_MAP_START(cbmb_mem , ADDRESS_SPACE_PROGRAM, 8)
 	/* disk units */
 	AM_RANGE(0xfda00, 0xfdaff) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)
 	/* db00 coprocessor */
-	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREADWRITE("cia", cia_r, cia_w)
+	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREADWRITE("cia", mos6526_r, mos6526_w)
 	/* dd00 acia */
 	AM_RANGE(0xfde00, 0xfdeff) AM_DEVREADWRITE("tpi6525_0", tpi6525_r, tpi6525_w)
 	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVREADWRITE("tpi6525_1", tpi6525_r, tpi6525_w)
@@ -166,7 +166,7 @@ static ADDRESS_MAP_START(p500_mem , ADDRESS_SPACE_PROGRAM, 8)
 	/* disk units */
 	AM_RANGE(0xfda00, 0xfdaff) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)
 	/* db00 coprocessor */
-	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREADWRITE("cia", cia_r, cia_w)
+	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREADWRITE("cia", mos6526_r, mos6526_w)
 	/* dd00 acia */
 	AM_RANGE(0xfde00, 0xfdeff) AM_DEVREADWRITE("tpi6525_0", tpi6525_r, tpi6525_w)
 	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVREADWRITE("tpi6525_1", tpi6525_r, tpi6525_w)
@@ -385,7 +385,7 @@ static MACHINE_DRIVER_START( cbm600 )
 	MDRV_QUICKLOAD_ADD("quickload", cbmb, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cia */
-	MDRV_CIA6526_ADD("cia", CIA6526R1, 7833600, cbmb_cia)
+	MDRV_MOS6526R1_ADD("cia", 7833600, cbmb_cia)
 
 	/* tpi */
 	MDRV_TPI6525_ADD("tpi6525_0", cbmb_tpi_0_intf)
@@ -458,7 +458,7 @@ static MACHINE_DRIVER_START( p500 )
 	MDRV_QUICKLOAD_ADD("quickload", p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cia */
-	MDRV_CIA6526_ADD("cia", CIA6526R1, VIC6567_CLOCK, cbmb_cia)
+	MDRV_MOS6526R1_ADD("cia", VIC6567_CLOCK, cbmb_cia)
 
 	/* tpi */
 	MDRV_TPI6525_ADD("tpi6525_0", cbmb_tpi_0_intf)
