@@ -127,7 +127,6 @@
 
     TODO:
 
-	- C2031 device address is always 8
 	- ROM version selection
     - allocate track buffer runtime
     - accurate timing
@@ -371,9 +370,7 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( c1541_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_IMPORT_FROM(c1540_map)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1541", 0x0000)
 ADDRESS_MAP_END
 
@@ -382,9 +379,7 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( c1541c_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_IMPORT_FROM(c1540_map)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1541c", 0x0000)
 ADDRESS_MAP_END
 
@@ -393,9 +388,7 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( c1541ii_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_IMPORT_FROM(c1540_map)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1541ii", 0x0000)
 ADDRESS_MAP_END
 
@@ -404,9 +397,7 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( c2031_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_IMPORT_FROM(c1540_map)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c2031", 0x0000)
 ADDRESS_MAP_END
 
@@ -712,10 +703,10 @@ static READ_LINE_DEVICE_HANDLER( c2031_via0_ca2_r )
 	/* device # selection */
 	switch (c1541->address)
 	{
-	case  8: state = (c1541->atna | c1541->nrfd_out);	break;
-	case  9: state = c1541->atna;						break;
-	case 10: state = c1541->nrfd_out;					break;
-	case 11: state = 0;									break;
+	case 0: state = (c1541->atna | c1541->nrfd_out);	break;
+	case 1: state = c1541->atna;						break;
+	case 2: state = c1541->nrfd_out;					break;
+	case 3: state = 0;									break;
 	}
 
 	return state;
