@@ -710,7 +710,6 @@ $(MESSOBJ)/cbmshare.a:			\
 	$(MESS_FORMATS)/cbm_tap.o 	\
 	$(MESS_MACHINE)/6525tpi.o	\
 	$(MESS_MACHINE)/cbm.o		\
-	$(MESS_MACHINE)/cbmserb.o 	\
 	$(MESS_MACHINE)/cbmipt.o   	\
 	$(MESS_MACHINE)/c64.o    	\
 	$(MESS_MACHINE)/c65.o		\
