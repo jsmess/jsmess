@@ -370,7 +370,9 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( c1541_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_IMPORT_FROM(c1540_map)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1541", 0x0000)
 ADDRESS_MAP_END
 
@@ -379,7 +381,9 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( c1541c_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_IMPORT_FROM(c1540_map)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1541c", 0x0000)
 ADDRESS_MAP_END
 
@@ -388,7 +392,9 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( c1541ii_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_IMPORT_FROM(c1540_map)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1541ii", 0x0000)
 ADDRESS_MAP_END
 
@@ -397,7 +403,9 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( c2031_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_IMPORT_FROM(c1540_map)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c2031", 0x0000)
 ADDRESS_MAP_END
 
@@ -1039,33 +1047,6 @@ ROM_START( c1541 ) // schematic 1540008
 ROM_END
 
 /*-------------------------------------------------
-    ROM( c1541cr )
--------------------------------------------------*/
-
-ROM_START( c1541cr ) // schematic 1540049
-	ROM_REGION( 0x4000, "c1541cr", ROMREGION_LOADBYNAME )
-	ROM_LOAD( "325302-01.ub3", 0x0000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
-	ROM_LOAD( "901229-01.ub4", 0x2000, 0x2000, CRC(9a48d3f0) SHA1(7a1054c6156b51c25410caec0f609efb079d3a77) )
-	ROM_LOAD( "901229-02.ub4", 0x2000, 0x2000, CRC(b29bab75) SHA1(91321142e226168b1139c30c83896933f317d000) )
-	ROM_LOAD( "901229-03.ub4", 0x2000, 0x2000, CRC(9126e74a) SHA1(03d17bd745066f1ead801c5183ac1d3af7809744) )
-	ROM_LOAD( "901229-04.ub4", 0x2000, 0x2000, NO_DUMP )
-	ROM_LOAD( "901229-05 ae.ub4", 0x2000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b) )
-	ROM_LOAD( "901229-06 aa.ub4", 0x2000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0) )
-ROM_END
-
-/*-------------------------------------------------
-    ROM( c1541a )
--------------------------------------------------*/
-
-#define rom_c1541a rom_c1541cr // schematic 251748
-
-/*-------------------------------------------------
-    ROM( c1541a2 )
--------------------------------------------------*/
-
-#define rom_c1541a2 rom_c1541cr // schematic 251748
-
-/*-------------------------------------------------
     ROM( c1541c )
 -------------------------------------------------*/
 
@@ -1074,12 +1055,6 @@ ROM_START( c1541c ) // schematic ?
 	ROM_LOAD( "251968-01.ua2", 0x0000, 0x4000, CRC(1b3ca08d) SHA1(8e893932de8cce244117fcea4c46b7c39c6a7765) )
 	ROM_LOAD( "251968-02.ua2", 0x0000, 0x4000, CRC(2d862d20) SHA1(38a7a489c7bbc8661cf63476bf1eb07b38b1c704) )
 ROM_END
-
-/*-------------------------------------------------
-    ROM( c1541b )
--------------------------------------------------*/
-
-#define rom_c1541b rom_c1541c // schematic ?
 
 /*-------------------------------------------------
     ROM( c1541ii )
