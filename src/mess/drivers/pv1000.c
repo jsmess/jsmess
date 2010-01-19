@@ -10,29 +10,54 @@
 
 
 static UINT8 *pv1000_ram;
+static UINT8 pv1000_io_regs[8];
 
+
+static WRITE8_HANDLER( pv1000_io_w );
+static READ8_HANDLER( pv1000_io_r );
 
 static ADDRESS_MAP_START( pv1000, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x3fff ) AM_MIRROR( 0x4000 ) AM_ROM AM_REGION( "cart", 0 )
-	AM_RANGE( 0xb800, 0xbfff ) AM_RAM AM_BASE( &pv1000_ram )
+	AM_RANGE( 0xb800, 0xbbff ) AM_RAM AM_BASE( &pv1000_ram )
+	AM_RANGE( 0xbc00, 0xbfff ) AM_RAM AM_REGION( "gfxram", 0 )
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( pv1000_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK( 0xff )
-	AM_RANGE( 0xf8, 0xf8 ) AM_RAM	/* R?/W */
-	AM_RANGE( 0xf9, 0xf9 ) AM_RAM	/* R?/W */
-	AM_RANGE( 0xfa, 0xfa ) AM_RAM	/* R?/W */
-	AM_RANGE( 0xfb, 0xfb ) AM_RAM	/* R?/W */
-	AM_RANGE( 0xfc, 0xfc ) AM_RAM	/* R?/W */
-	AM_RANGE( 0xfd, 0xfd ) AM_RAM	/* R/W */
-	AM_RANGE( 0xfe, 0xfe ) AM_RAM	/* R?/W */
-	AM_RANGE( 0xff, 0xff ) AM_RAM	/* R?/W */
+	AM_RANGE( 0xf8, 0xff ) AM_READWRITE( pv1000_io_r, pv1000_io_w )
 ADDRESS_MAP_END
+
+
+static WRITE8_HANDLER( pv1000_io_w )
+{
+	pv1000_io_regs[offset] = data;
+}
+
+
+static READ8_HANDLER( pv1000_io_r )
+{
+	UINT8 data = pv1000_io_regs[offset];
+
+	return data;
+}
 
 
 static INPUT_PORTS_START( pv1000 )
 INPUT_PORTS_END
+
+
+static PALETTE_INIT( pv1000 )
+{
+	palette_set_color_rgb( machine,  0,   0,   0,   0 );
+	palette_set_color_rgb( machine,  1, 255,   0,   0 );
+	palette_set_color_rgb( machine,  2,   0, 255,   0 );
+	palette_set_color_rgb( machine,  3, 255, 255,   0 );
+	palette_set_color_rgb( machine,  4,   0,   0, 255 );
+	palette_set_color_rgb( machine,  5, 255,   0, 255 );
+	palette_set_color_rgb( machine,  6,   0, 255, 255 );
+	palette_set_color_rgb( machine,  7, 255, 255, 255 );
+}
 
 
 static DEVICE_IMAGE_LOAD( pv1000_cart )
@@ -62,6 +87,51 @@ static DEVICE_IMAGE_LOAD( pv1000_cart )
 }
 
 
+static VIDEO_UPDATE( pv1000 )
+{
+	int x, y;
+
+	for ( y = 0; y < 24; y++ )
+	{
+		for ( x = 0; x < 32; x++ )
+		{
+			UINT16 tile = pv1000_ram[ y * 32 + x ];
+
+			if ( tile < 0xe0 )
+			{
+				tile += ( pv1000_io_regs[7] * 8 );
+				drawgfx_opaque( bitmap, cliprect, screen->machine->gfx[0], tile, 0, 0, 0, x*8, y*8 );
+			}
+			else
+			{
+				tile -= 0xe0;
+				drawgfx_opaque( bitmap, cliprect, screen->machine->gfx[1], tile, 0, 0, 0, x*8, y*8 );
+			}
+		}
+	}
+
+	return 0;
+}
+
+
+static const gfx_layout pv1000_3bpp_gfx =
+{
+	8, 8,			/* 8x8 characters */
+	RGN_FRAC(1,1),
+	3,
+	{ 0, 8*8, 16*8 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8*4
+};
+
+
+static GFXDECODE_START( pv1000 )
+	GFXDECODE_ENTRY( "cart", 8, pv1000_3bpp_gfx, 0, 8 )
+	GFXDECODE_ENTRY( "gfxram", 8, pv1000_3bpp_gfx, 0, 8 )
+GFXDECODE_END
+
+
 static MACHINE_DRIVER_START( pv1000 )
 	MDRV_CPU_ADD( "maincpu", Z80, 17897725/5 )
 	MDRV_CPU_PROGRAM_MAP( pv1000 )
@@ -73,9 +143,12 @@ static MACHINE_DRIVER_START( pv1000 )
 	MDRV_SCREEN_SIZE(256, 192)
 	MDRV_SCREEN_VISIBLE_AREA( 0, 255, 0, 191 )
 
-	MDRV_PALETTE_LENGTH( 16 )
+	MDRV_PALETTE_LENGTH( 8 )
+	MDRV_PALETTE_INIT( pv1000 )
+	MDRV_GFXDECODE( pv1000 )
 
 	/* D65010G031 - Video & sound chip */
+	MDRV_VIDEO_UPDATE( pv1000 )
 
 	/* Cartridge slot */
 	MDRV_CARTSLOT_ADD( "cart" )
@@ -87,6 +160,7 @@ MACHINE_DRIVER_END
 
 ROM_START( pv1000 )
 	ROM_REGION( 0x4000, "cart", ROMREGION_ERASE00 ) 
+	ROM_REGION( 0x400, "gfxram", ROMREGION_ERASE00 )
 ROM_END
 
 
