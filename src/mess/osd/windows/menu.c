@@ -2148,3 +2148,11 @@ LRESULT CALLBACK win_mess_window_proc(HWND wnd, UINT message, WPARAM wparam, LPA
 	}
 	return 0;
 }
+
+void win_mess_dummy()
+{
+	char mess_directory[1024];
+    
+    /* first set up the working directory to be the MESS directory */
+    osd_get_emulator_directory(mess_directory, ARRAY_LENGTH(mess_directory));
+}

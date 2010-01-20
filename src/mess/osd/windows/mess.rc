@@ -154,6 +154,7 @@ END
 // Icon
 //
 
+IDI_ICON_MESS           ICON    DISCARDABLE     "../../osd/winui/res/mess.ico"
 IDI_ICON_CART           ICON    DISCARDABLE     "../../osd/winui/res/cpu.ico"
 IDI_ICON_HARD           ICON    DISCARDABLE     "../../osd/winui/res/harddisk.ico"
 IDI_ICON_CASS           ICON    DISCARDABLE     "../../mess/osd/winui/res/win_cass.ico"

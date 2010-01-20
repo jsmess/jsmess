@@ -190,6 +190,8 @@ static BOOL check_editbox(HWND control)
 	optreserr_t err;
 	HANDLE h;
 	void *val;
+	int i_val;
+	
 
 	guide = (const option_guide *) GetProp(control, guide_prop);
 	optspec = (const char *) GetProp(control, spec_prop);
@@ -199,8 +201,8 @@ static BOOL check_editbox(HWND control)
 	switch(guide->option_type)
 	{
 		case OPTIONTYPE_INT:
-			val = (void*)atoi(buf);
-			err = option_resolution_isvalidvalue(optspec, guide->parameter, (int)val);
+			i_val = atoi(buf);
+			err = option_resolution_isvalidvalue(optspec, guide->parameter, i_val);
 			if (err)
 			{
 				h = GetProp(control, value_prop);
@@ -210,7 +212,7 @@ static BOOL check_editbox(HWND control)
 			}
 			else
 			{
-				SetProp(control, value_prop, (HANDLE) val);
+				SetProp(control, value_prop, (HANDLE) i_val);
 			}
 			break;
 
