@@ -298,7 +298,7 @@ char *osd_get_clipboard_text(void)
 							length = CFDataGetLength (data_ref);
 							range = CFRangeMake (0,length);
 
-							result = malloc (length+1);
+							result = (char *)malloc (length+1);
 							if (result != NULL)
 							{
 								CFDataGetBytes (data_ref, range, (unsigned char *)result);
