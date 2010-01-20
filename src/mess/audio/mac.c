@@ -68,6 +68,13 @@ static STREAM_UPDATE( mac_sound_update )
 	INT16 last_val = 0;
 	stream_sample_t *buffer = outputs[0];
 	mac_sound *token = get_token(device);
+	mac_state *mac = (mac_state *)device->machine->driver_data;
+
+	if ((mac->mac_model == MODEL_MAC_PORTABLE) || (mac->mac_model == MODEL_MAC_PB100))
+	{
+		memset(buffer, 0, samples * sizeof(*buffer));
+		return;
+	}
 
 	/* if we're not enabled, just fill with 0 */
 	if (device->machine->sample_rate == 0)
@@ -104,6 +111,7 @@ static DEVICE_START(mac_sound)
 	mac_sound *token = get_token(device);
 
 	memset(token, 0, sizeof(*token));
+
 	token->snd_cache = auto_alloc_array(device->machine, UINT8, SND_CACHE_SIZE);
 	token->mac_stream = stream_create(device, 0, 1, MAC_SAMPLE_RATE, 0, mac_sound_update);
 }
