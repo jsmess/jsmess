@@ -104,7 +104,7 @@ int info_listdevices(core_options *opts, const char *gamename)
     games
 -------------------------------------------------*/
 
-int info_listdevices(core_options *options, const char *gamename)
+int info_listmedia(core_options *options, const char *gamename)
 {
 	int count = 0, devcount;
 	int drvindex;
