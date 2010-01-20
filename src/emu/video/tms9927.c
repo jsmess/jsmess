@@ -7,7 +7,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "tms9927.h"
 
 
@@ -259,7 +259,6 @@ static DEVICE_START( tms9927 )
 
 	/* validate arguments */
 	assert(device != NULL);
-	assert(device->tag != NULL);
 
 	tms->intf = (const tms9927_interface *)device->static_config;
 
@@ -273,7 +272,7 @@ static DEVICE_START( tms9927 )
 		tms->hpixels_per_column = tms->intf->hpixels_per_column;
 
 		/* get the screen device */
-		tms->screen = devtag_get_device(device->machine, tms->intf->screen_tag);
+		tms->screen = device->machine->device(tms->intf->screen_tag);
 		assert(tms->screen != NULL);
 
 		/* get the self-load PROM */

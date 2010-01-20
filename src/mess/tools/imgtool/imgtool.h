@@ -12,8 +12,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "emu.h"
 #include "osdepend.h"
-#include "mame.h"
 #include "formats/flopimg.h"
 #include "opresolv.h"
 #include "library.h"

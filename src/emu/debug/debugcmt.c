@@ -20,7 +20,8 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "xmlfile.h"
 #include "debugcmt.h"
 #include "debugcpu.h"
@@ -78,7 +79,6 @@ struct _debug_cpu_comment_group
 
 static int debug_comment_load_xml(running_machine *machine, mame_file *file);
 static void debug_comment_exit(running_machine *machine);
-static void debug_comment_free(running_machine *machine);
 
 
 
@@ -123,7 +123,7 @@ int debug_comment_add(const device_config *device, offs_t addr, const char *comm
 	int i = 0;
 
 	/* Create a new item to insert into the list */
-	debug_comment *insert_me = alloc_or_die(debug_comment);
+	debug_comment *insert_me = auto_alloc(device->machine, debug_comment);
 	insert_me->color = color;
 	insert_me->is_valid = 1;
 	insert_me->address = addr;
@@ -150,7 +150,7 @@ int debug_comment_add(const device_config *device, offs_t addr, const char *comm
 	/* Got an exact match?  Just replace */
 	if (match == 1)
 	{
-		free(comments->comment_info[insert_point]);
+		auto_free(device->machine, comments->comment_info[insert_point]);
 		comments->comment_info[insert_point] = insert_me;
 		comments->change_count++;
 
@@ -198,7 +198,7 @@ int debug_comment_remove(const device_config *device, offs_t addr, UINT32 c_crc)
 		return 0;
 
 	/* Okay, it's there, now remove it */
-	free(comments->comment_info[remove_index]);
+	auto_free(device->machine, comments->comment_info[remove_index]);
 
 	for (i = remove_index; i < comments->comment_count-1; i++)
 		comments->comment_info[i] = comments->comment_info[i+1];
@@ -412,12 +412,10 @@ int debug_comment_save(running_machine *machine)
 	if (total_comments > 0)
 	{
 		file_error filerr;
-		astring *fname;
 		mame_file *fp;
 
-		fname = astring_assemble_2(astring_alloc(), machine->basename, ".cmt");
-		filerr = mame_fopen(SEARCHPATH_COMMENT, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &fp);
-		astring_free(fname);
+		astring fname(machine->basename, ".cmt");
+		filerr = mame_fopen(SEARCHPATH_COMMENT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &fp);
 
 		if (filerr == FILERR_NONE)
 		{
@@ -444,11 +442,9 @@ int debug_comment_load(running_machine *machine)
 {
 	file_error filerr;
 	mame_file *fp;
-	astring *fname;
 
-	fname = astring_assemble_2(astring_alloc(), machine->basename, ".cmt");
-	filerr = mame_fopen(SEARCHPATH_COMMENT, astring_c(fname), OPEN_FLAG_READ, &fp);
-	astring_free(fname);
+	astring fname(machine->basename, ".cmt");
+	filerr = mame_fopen(SEARCHPATH_COMMENT, fname, OPEN_FLAG_READ, &fp);
 
 	if (filerr != FILERR_NONE) return 0;
 	debug_comment_load_xml(machine, fp);
@@ -487,7 +483,7 @@ static int debug_comment_load_xml(running_machine *machine, mame_file *fp)
 
 	for (cpunode = xml_get_sibling(systemnode->child, "cpu"); cpunode; cpunode = xml_get_sibling(cpunode->next, "cpu"))
 	{
-		const device_config *cpu = cputag_get_cpu(machine, xml_get_attribute_string(cpunode, "tag", ""));
+		const device_config *cpu = machine->device(xml_get_attribute_string(cpunode, "tag", ""));
 		if (cpu != NULL)
 		{
 			debug_cpu_comment_group *comments = cpu_get_debug_data(cpu)->comments;
@@ -496,7 +492,7 @@ static int debug_comment_load_xml(running_machine *machine, mame_file *fp)
 			for (datanode = xml_get_sibling(cpunode->child, "comment"); datanode; datanode = xml_get_sibling(datanode->next, "comment"))
 			{
 				/* Malloc the comment */
-				comments->comment_info[j] = (debug_comment*) malloc(sizeof(debug_comment));
+				comments->comment_info[j] = auto_alloc(machine, debug_comment);
 
 				comments->comment_info[j]->address = xml_get_attribute_int(datanode, "address", 0);
 				comments->comment_info[j]->color = xml_get_attribute_int(datanode, "color", 0);
@@ -530,29 +526,4 @@ error:
 static void debug_comment_exit(running_machine *machine)
 {
 	debug_comment_save(machine);
-	debug_comment_free(machine);
-}
-
-
-/*-------------------------------------------------------------------------
-    debug_comment_free - cleans up memory
--------------------------------------------------------------------------*/
-
-static void debug_comment_free(running_machine *machine)
-{
-	const device_config *cpu;
-
-	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
-	{
-		debug_cpu_comment_group *comments = cpu_get_debug_data(cpu)->comments;
-		if (comments != NULL)
-		{
-			int j;
-
-			for (j = 0; j < comments->comment_count; j++)
-				free(comments->comment_info[j]);
-
-			comments->comment_count = 0;
-		}
-	}
 }

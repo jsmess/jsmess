@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
@@ -56,7 +56,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(vector4)
 {
 	received_char = 0;
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC, 0xe000);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_PC, 0xe000);
 }
 
 static WRITE8_DEVICE_HANDLER( vector4_kbd_put )

@@ -117,7 +117,7 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 */
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
 

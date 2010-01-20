@@ -46,7 +46,7 @@ static const char *const msgs[] =
 
 const char *imgtool_error(imgtoolerr_t err)
 {
-	err = ERRORCODE(err) - 1;
+	err = (imgtoolerr_t)(ERRORCODE(err) - 1);
 	assert(err >= 0);
 	assert(err < ARRAY_LENGTH(msgs));
 	return msgs[err];

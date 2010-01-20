@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/ac1.h"
 
 #define AC1_VIDEO_MEMORY		0x1000

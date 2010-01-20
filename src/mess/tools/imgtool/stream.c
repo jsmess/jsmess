@@ -11,7 +11,7 @@
 #include <zlib.h>
 #include <assert.h>
 
-#include "mame.h"
+#include "emu.h"
 #include "unzip.h"
 #include "osdcore.h"
 #include "imgtool.h"
@@ -57,7 +57,7 @@ static imgtool_stream *stream_open_zip(const char *zipname, const char *subname,
 		goto error;
 	fclose(f);
 
-	imgfile = malloc(sizeof(struct _imgtool_stream));
+	imgfile = (imgtool_stream *)malloc(sizeof(struct _imgtool_stream));
 	if (!imgfile)
 		goto error;
 
@@ -77,7 +77,7 @@ static imgtool_stream *stream_open_zip(const char *zipname, const char *subname,
 		goto error;
 
 	imgfile->filesize = zipent->uncompressed_length;
-	imgfile->u.buffer = malloc(zipent->uncompressed_length);
+	imgfile->u.buffer = (UINT8*)malloc(zipent->uncompressed_length);
 	if (!imgfile->u.buffer)
 		goto error;
 
@@ -132,7 +132,7 @@ imgtool_stream *stream_open(const char *fname, int read_or_write)
 			len = strlen(fname);
 
 			/* can't open the file; try opening ZIP files with other names */
-			buf = malloc(len + 1);
+			buf = (char*)malloc(len + 1);
 			if (!buf)
 				goto error;
 			strcpy(buf, fname);
@@ -158,7 +158,7 @@ imgtool_stream *stream_open(const char *fname, int read_or_write)
 		goto error;
 	}
 
-	imgfile = malloc(sizeof(struct _imgtool_stream));
+	imgfile = (imgtool_stream *)malloc(sizeof(struct _imgtool_stream));
 	if (!imgfile)
 		goto error;
 
@@ -188,7 +188,7 @@ imgtool_stream *stream_open_write_stream(int size)
 {
 	imgtool_stream *imgfile;
 
-	imgfile = malloc(sizeof(struct _imgtool_stream));
+	imgfile = (imgtool_stream *)malloc(sizeof(struct _imgtool_stream));
 	if (!imgfile)
 		return NULL;
 
@@ -196,7 +196,7 @@ imgtool_stream *stream_open_write_stream(int size)
 	imgfile->write_protect = 0;
 	imgfile->position = 0;
 	imgfile->filesize = size;
-	imgfile->u.buffer = malloc(size);
+	imgfile->u.buffer = (UINT8*)malloc(size);
 
 	if (!imgfile->u.buffer)
 	{
@@ -213,7 +213,7 @@ imgtool_stream *stream_open_mem(void *buf, size_t sz)
 {
 	imgtool_stream *imgfile;
 
-	imgfile = malloc(sizeof(struct _imgtool_stream));
+	imgfile = (imgtool_stream *)malloc(sizeof(struct _imgtool_stream));
 	if (!imgfile)
 		return NULL;
 
@@ -223,7 +223,7 @@ imgtool_stream *stream_open_mem(void *buf, size_t sz)
 	imgfile->write_protect = 0;
 
 	imgfile->filesize = sz;
-	imgfile->u.buffer = buf;
+	imgfile->u.buffer = (UINT8*)buf;
 	return imgfile;
 }
 
@@ -312,10 +312,11 @@ UINT32 stream_write(imgtool_stream *s, const void *buf, UINT32 sz)
 				if (s->filesize < s->position + sz)
 				{
 					/* try to expand the buffer */
-					new_buffer = realloc(s->u.buffer, s->position + sz);
+					if (s->u.buffer) free(s->u.buffer);
+					new_buffer = malloc(s->position + sz);
 					if (new_buffer)
 					{
-						s->u.buffer = new_buffer;
+						s->u.buffer = (UINT8*)new_buffer;
 						s->filesize = s->position + sz;
 					}
 				}
@@ -458,7 +459,7 @@ int stream_crc(imgtool_stream *s, unsigned long *result)
 				free(ptr);
 				return IMGTOOLERR_READERROR;
 			}
-			*result = crc32(0, ptr, sz);
+			*result = crc32(0, (const Bytef*)ptr, sz);
 			free(ptr);
 			break;
 	}

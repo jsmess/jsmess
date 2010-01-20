@@ -27,7 +27,6 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-typedef enum _datamap_entry_type datamap_entry_type;
 enum _datamap_entry_type
 {
 	DM_NONE = 0,
@@ -36,9 +35,9 @@ enum _datamap_entry_type
 	DM_FLOAT,
 	DM_STRING
 };
+typedef enum _datamap_entry_type datamap_entry_type;
 
 
-typedef enum _datamap_callback_type datamap_callback_type;
 enum _datamap_callback_type
 {
 	DCT_READ_CONTROL,
@@ -47,6 +46,8 @@ enum _datamap_callback_type
 
 	DCT_COUNT
 };
+
+typedef enum _datamap_callback_type datamap_callback_type;
 
 
 typedef struct _datamap datamap;

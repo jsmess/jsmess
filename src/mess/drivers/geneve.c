@@ -197,7 +197,7 @@
     keyboard will be cleared as soon as it is buffered by the gate array.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/tms9900/tms9900.h"
 #include "sound/sn76496.h"
 #include "sound/tms5220.h"

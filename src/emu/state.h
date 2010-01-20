@@ -11,11 +11,16 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __STATE_H__
 #define __STATE_H__
 
-#include "mamecore.h"
-
+#ifdef __GNUC__
+#include <tr1/type_traits>
+#endif
 
 
 /***************************************************************************
@@ -51,16 +56,14 @@ typedef enum _state_save_error state_save_error;
 #define STATE_POSTLOAD(name) void name(running_machine *machine, void *param)
 
 
-#define IS_COMPATIBLE_TYPE(_valtype, _checktype)										\
-	(sizeof(_valtype) == sizeof(_checktype) && TYPES_COMPATIBLE(_valtype, _checktype))
-
-#define IS_VALID_SAVE_TYPE(_valtype)													\
-	(IS_COMPATIBLE_TYPE(_valtype, double) || IS_COMPATIBLE_TYPE(_valtype, float)  ||	\
-	 IS_COMPATIBLE_TYPE(_valtype, INT64)  || IS_COMPATIBLE_TYPE(_valtype, UINT64) ||	\
-	 IS_COMPATIBLE_TYPE(_valtype, INT32)  || IS_COMPATIBLE_TYPE(_valtype, UINT32) ||	\
-	 IS_COMPATIBLE_TYPE(_valtype, INT16)  || IS_COMPATIBLE_TYPE(_valtype, UINT16) ||	\
-	 IS_COMPATIBLE_TYPE(_valtype, INT8)   || IS_COMPATIBLE_TYPE(_valtype, UINT8) ||		\
-	 IS_COMPATIBLE_TYPE(_valtype, PAIR)   || IS_COMPATIBLE_TYPE(_valtype, PAIR64))
+#ifdef __GNUC__
+#define IS_VALID_SAVE_TYPE(_var) \
+	(std::tr1::is_arithmetic<typeof(_var)>::value || std::tr1::is_enum<typeof(_var)>::value || \
+	 std::tr1::is_same<typeof(_var), PAIR>::value || std::tr1::is_same<typeof(_var), PAIR64>::value)
+#else
+#define IS_VALID_SAVE_TYPE(_var) \
+	(sizeof(_var) == 1 || sizeof(_var) == 2 || sizeof(_var) == 4 || sizeof(_var) == 8)
+#endif
 
 
 /* generic registration; all further registrations are based on this */

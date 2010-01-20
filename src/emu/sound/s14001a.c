@@ -230,7 +230,7 @@ and off as it normally does during speech). Once START has gone low-high-low, th
  *
  */
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "s14001a.h"
 
@@ -581,7 +581,7 @@ static DEVICE_START( s14001a )
 		chip->filtervals[i] = SILENCE;
 	}
 
-	chip->SpeechRom = device->region;
+	chip->SpeechRom = *device->region;
 
 	chip->stream = stream_create(device, 0, 1, device->clock ? device->clock : device->machine->sample_rate, chip, s14001a_pcm_update);
 }

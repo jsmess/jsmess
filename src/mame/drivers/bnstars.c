@@ -86,7 +86,7 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
 #include "deprecat.h"
@@ -1293,7 +1293,7 @@ static void irq_init(running_machine *machine)
 {
 	irqreq = 0;
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
 }
 
 static void irq_raise(running_machine *machine, int level)

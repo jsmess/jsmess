@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "machine/teleprinter.h"
 #include "machine/terminal.h"
 
@@ -243,7 +243,7 @@ void generic_teleprinter_update(const device_config *device, bitmap_t *bitmap, c
 
 static TIMER_CALLBACK(keyboard_callback)
 {
-	teleprinter_state *term = get_safe_token(ptr);
+	teleprinter_state *term = get_safe_token((const device_config *)ptr);
 	term->last_code = terminal_keyboard_handler(machine, &term->teleprinter_keyboard_func, term->last_code, &term->scan_line);
 }
 

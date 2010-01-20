@@ -2,7 +2,7 @@
  PeT mess@utanet.at 2000,2001
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "streams.h"
 #include "includes/lynx.h"
 

@@ -11,7 +11,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/apple2.h"
 #include "machine/ap2_slot.h"
@@ -590,7 +590,7 @@ static const apple2_memmap_entry apple2_memmap_entries[] =
 void apple2_setvar(running_machine *machine, UINT32 val, UINT32 mask)
 {
 	LOG(("apple2_setvar(): val=0x%06x mask=0x%06x pc=0x%04x\n", val, mask,
-					(unsigned int) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC)));
+					(unsigned int) cpu_get_reg(devtag_get_device(machine, "maincpu"), REG_GENPC)));
 
 	assert((val & mask) == val);
 
@@ -1361,7 +1361,7 @@ MACHINE_START( apple2 )
 	memset(&mem_cfg, 0, sizeof(mem_cfg));
 	mem_cfg.first_bank = 1;
 	mem_cfg.memmap = apple2_memmap_entries;
-	mem_cfg.auxmem = apple2cp_ce00_ram;
+	mem_cfg.auxmem = (UINT8*)apple2cp_ce00_ram;
 	apple2_setup_memory(machine, &mem_cfg);
 
 	/* perform initial reset */

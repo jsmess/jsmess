@@ -6,7 +6,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "sgi.h"
 
 #define VERBOSE_LEVEL ( 2 )
@@ -20,11 +20,11 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", (unsigned) cpu_get_pc(cputag_get_cpu(machine, "maincpu")), buf );
+		logerror( "%08x: %s", (unsigned) cpu_get_pc(devtag_get_device(machine, "maincpu")), buf );
 	}
 }
 
-static void *tMC_UpdateTimer;
+static emu_timer *tMC_UpdateTimer;
 static UINT32 nMC_CPUControl0;
 static UINT32 nMC_CPUControl1;
 static UINT32 nMC_Watchdog;
@@ -59,7 +59,6 @@ static UINT32 nMC_DMATLBEntry2Lo;
 static UINT32 nMC_DMATLBEntry3Hi;
 static UINT32 nMC_DMATLBEntry3Lo;
 static UINT32 nMC_RPSSCounter;
-static UINT32 nMC_DMAMemAddr;
 static UINT32 nMC_DMAMemAddr;
 static UINT32 nMC_DMALineCntWidth;
 static UINT32 nMC_DMALineZoomStride;

@@ -2,7 +2,7 @@
  PeT mess@utanet.at September 2000
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/6530miot.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"

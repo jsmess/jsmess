@@ -7,7 +7,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "c1571.h"
 #include "cpu/m6502/m6502.h"
 #include "devices/flopdrv.h"

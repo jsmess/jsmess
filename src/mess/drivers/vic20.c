@@ -18,7 +18,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/vic20.h"
 #include "includes/cbm.h"
 #include "cpu/m6502/m6502.h"
@@ -228,7 +228,7 @@ static READ8_DEVICE_HANDLER( via0_pa_r )
 
     */
 
-	vic20_state *state = device->machine->driver_data;
+	vic20_state *state = (vic20_state *)device->machine->driver_data;
 	UINT8 data = 0xfc;
 
 	/* serial clock in */
@@ -266,7 +266,7 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
 
     */
 
-	vic20_state *state = device->machine->driver_data;
+	vic20_state *state = (vic20_state *)device->machine->driver_data;
 
 	/* serial attention out */
 	cbm_iec_atn_w(state->iec, device, !BIT(data, 7));
@@ -312,7 +312,7 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 
 static WRITE8_DEVICE_HANDLER( via0_ca2_w )
 {
-	vic20_state *state = device->machine->driver_data;
+	vic20_state *state = (vic20_state *)device->machine->driver_data;
 
 	if (!BIT(data, 0))
 	{
@@ -362,7 +362,7 @@ static READ8_DEVICE_HANDLER( via1_pa_r )
 
     */
 
-	vic20_state *state = device->machine->driver_data;
+	vic20_state *state = (vic20_state *)device->machine->driver_data;
 	UINT8 data = 0xff;
 
 	if (!BIT(state->key_col, 0)) data &= input_port_read(device->machine, "ROW0");
@@ -419,7 +419,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 
     */
 
-	vic20_state *state = device->machine->driver_data;
+	vic20_state *state = (vic20_state *)device->machine->driver_data;
 
 	/* cassette write */
 	cassette_output(devtag_get_device(device->machine, "cassette"), BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
@@ -430,7 +430,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( via1_ca2_w )
 {
-	vic20_state *driver_state = device->machine->driver_data;
+	vic20_state *driver_state = (vic20_state *)device->machine->driver_data;
 
 	/* serial clock out */
 	cbm_iec_clk_w(driver_state->iec, device, !state);
@@ -438,7 +438,7 @@ static WRITE_LINE_DEVICE_HANDLER( via1_ca2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( via1_cb2_w )
 {
-	vic20_state *driver_state = device->machine->driver_data;
+	vic20_state *driver_state = (vic20_state *)device->machine->driver_data;
 
 	/* serial data out */
 	cbm_iec_data_w(driver_state->iec, device, !state);
@@ -467,7 +467,7 @@ static const via6522_interface vic20_via1_intf =
 
 static TIMER_DEVICE_CALLBACK( cassette_tick )
 {
-	vic20_state *state = timer->machine->driver_data;
+	vic20_state *state = (vic20_state *)timer->machine->driver_data;
 	int data = (cassette_input(state->cassette) > +0.0) ? 1 : 0;
 	
 	via_ca1_w(state->via1, data);
@@ -515,7 +515,7 @@ static int vic6560_dma_read( running_machine *machine, int offset )
 
 static MACHINE_START( vic20_common )
 {
-	vic20_state *state = machine->driver_data;
+	vic20_state *state = (vic20_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */

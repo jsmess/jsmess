@@ -10,7 +10,7 @@
 #ifndef __C2040__
 #define __C2040__
 
-#include "driver.h"
+#include "emu.h"
 
 /***************************************************************************
     MACROS / CONSTANTS

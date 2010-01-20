@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "softlist.h"
 #include "devices/cartslot.h"
 

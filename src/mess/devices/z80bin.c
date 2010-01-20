@@ -7,7 +7,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "z80bin.h"
 #include "snapquik.h"
 
@@ -126,7 +126,7 @@ static QUICKLOAD_LOAD( z80bin )
 		else
 		{
 			if (autorun)
-				cpu_set_reg(cputag_get_cpu(image->machine, "maincpu"), REG_GENPC, exec_addr);
+				cpu_set_reg(devtag_get_device(image->machine, "maincpu"), REG_GENPC, exec_addr);
 		}
 	}
 

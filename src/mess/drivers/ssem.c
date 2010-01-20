@@ -4,7 +4,7 @@
     Driver by MooglyGuy
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/ssem/ssem.h"
 #include "devices/cartslot.h"
 #include <stdarg.h>

@@ -4,7 +4,7 @@
     Written by Ville Linde
 */
 
-#include "cpuintrf.h"
+#include "emu.h"
 #include "debugger.h"
 #include "rsp.h"
 
@@ -309,7 +309,7 @@ static CPU_INIT( rsp )
 
 	rsp->irq_callback = irqcallback;
 	rsp->device = device;
-	rsp->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	rsp->program = device->space(AS_PROGRAM);
 
 #if 1
     // Inaccurate.  RSP registers power on to a random state...

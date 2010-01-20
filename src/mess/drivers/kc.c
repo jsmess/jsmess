@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 /* Core includes */
-#include "driver.h"
+#include "emu.h"
 #include "includes/kc.h"
 
 /* Components */

@@ -9,7 +9,7 @@
 *********************************************************************/
 
 #include <string.h>
-#include "driver.h"
+#include "emu.h"
 #include "formats/thom_dsk.h"
 #include "formats/basicdsk.h"
 
@@ -49,7 +49,7 @@ static UINT16 thom_sap_crc( UINT8* data, int size )
 static struct sap_dsk_tag *get_tag(floppy_image *floppy)
 {
 	struct sap_dsk_tag *tag;
-	tag = floppy_tag(floppy);
+	tag = (sap_dsk_tag *)floppy_tag(floppy);
 	return tag;
 }
 

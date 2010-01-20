@@ -49,7 +49,7 @@
 ****************************************************************************/
 /* Mapping for joystick see hec2hrp.c*/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
@@ -94,7 +94,7 @@ static const cassette_config interact_cassette_config =
 {
 	hector_cassette_formats,
 	&interact_cassette_options,
-	CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER)
 };
 
 /* Discrete Sound */

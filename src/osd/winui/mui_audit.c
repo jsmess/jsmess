@@ -217,7 +217,7 @@ static DWORD WINAPI AuditThreadProc(LPVOID hDlg)
 			{
 				sprintf(buffer, "Checking Game %s - %s",
 					drivers[rom_index]->name, drivers[rom_index]->description);
-				win_set_window_text_utf8(hDlg, buffer);
+				win_set_window_text_utf8((HWND)hDlg, buffer);
 				ProcessNextRom();
 			}
 			else
@@ -226,13 +226,13 @@ static DWORD WINAPI AuditThreadProc(LPVOID hDlg)
 				{
 					sprintf(buffer, "Checking Game %s - %s",
 						drivers[sample_index]->name, drivers[sample_index]->description);
-					win_set_window_text_utf8(hDlg, buffer);
+					win_set_window_text_utf8((HWND)hDlg, buffer);
 					ProcessNextSample();
 				}
 				else
 				{
-					win_set_window_text_utf8(hDlg, "File Audit");
-					EnableWindow(GetDlgItem(hDlg, IDPAUSE), FALSE);
+					win_set_window_text_utf8((HWND)hDlg, "File Audit");
+					EnableWindow(GetDlgItem((HWND)hDlg, IDPAUSE), FALSE);
 					ExitThread(1);
 				}
 			}

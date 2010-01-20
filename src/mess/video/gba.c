@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/generic.h"
 #include "includes/gba.h"
 
@@ -23,7 +23,7 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), buf );
+		logerror( "%08x: %s", cpu_get_pc(devtag_get_device(machine, "maincpu")), buf );
 	}
 }
 
@@ -33,15 +33,15 @@ static int coeff[32] = {
 };
 
 /* Drawing functions */
-static void draw_roz_bitmap_scanline(gba_state *gba_state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth);
-static void draw_roz_scanline(gba_state *gba_state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed);
-static void draw_bg_scanline(gba_state *gba_state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, UINT32 hofs, UINT32 vofs);
-static void draw_gba_oam_window(gba_state *gba_state, running_machine *machine, UINT32 *scanline, int y);
-static void draw_gba_oam(gba_state *gba_state, running_machine *machine, UINT32 *scanline, int y);
-static void invalid_gba_draw_function(running_machine *machine, gba_state *gba_state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int aux);
+static void draw_roz_bitmap_scanline(gba_state_t *gba_state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth);
+static void draw_roz_scanline(gba_state_t *gba_state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed);
+static void draw_bg_scanline(gba_state_t *gba_state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, UINT32 hofs, UINT32 vofs);
+static void draw_gba_oam_window(gba_state_t *gba_state, running_machine *machine, UINT32 *scanline, int y);
+static void draw_gba_oam(gba_state_t *gba_state, running_machine *machine, UINT32 *scanline, int y);
+static void invalid_gba_draw_function(running_machine *machine, gba_state_t *gba_state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int aux);
 
 /* Utility functions */
-INLINE int is_in_window(gba_state *gba_state, int x, int window);
+INLINE int is_in_window(gba_state_t *gba_state, int x, int window);
 INLINE UINT32 alpha_blend_pixel(UINT32 color0, UINT32 color1, int ca, int cb);
 INLINE UINT32 increase_brightness(UINT32 color, int coeff);
 INLINE UINT32 decrease_brightness(UINT32 color, int coeff);
@@ -51,7 +51,7 @@ INLINE UINT32 decrease_brightness(UINT32 color, int coeff);
 #include "gbamode2.c"
 #include "gbam345.c"
 
-static void (*const gba_draw_scanline_modes[8][3])(running_machine *machine, gba_state *gba_state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int aux) =
+static void (*const gba_draw_scanline_modes[8][3])(running_machine *machine, gba_state_t *gba_state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int aux) =
 {
 	/* All modes have three sub-modes: No effects, effects, and windowed effects. */
 	{	/* Mode 0: 4 non-rotatable tilemaps and 1 OAM layer */
@@ -96,12 +96,12 @@ static void (*const gba_draw_scanline_modes[8][3])(running_machine *machine, gba
 	},
 };
 
-static void invalid_gba_draw_function(running_machine *machine, gba_state *gba_state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int aux)
+static void invalid_gba_draw_function(running_machine *machine, gba_state_t *gba_state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int aux)
 {
 	fatalerror( "Invalid screen mode (6 or 7)!\n" );
 }
 
-static void draw_roz_bitmap_scanline(gba_state *gba_state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth)
+static void draw_roz_bitmap_scanline(gba_state_t *gba_state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth)
 {
 	UINT8 *src8 = (UINT8 *)gba_state->gba_vram;
 	UINT16 *src16 = (UINT16 *)gba_state->gba_vram;
@@ -227,7 +227,7 @@ static void draw_roz_bitmap_scanline(gba_state *gba_state, UINT32 *scanline, int
 	}
 }
 
-static void draw_roz_scanline(gba_state *gba_state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed)
+static void draw_roz_scanline(gba_state_t *gba_state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed)
 {
 	UINT32 base, mapbase, size;
 	INT32 sizes[4] = { 128, 256, 512, 1024 };
@@ -412,7 +412,7 @@ static void draw_roz_scanline(gba_state *gba_state, UINT32 *scanline, int ypos, 
 	}
 }
 
-static void draw_bg_scanline(gba_state *gba_state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, UINT32 hofs, UINT32 vofs)
+static void draw_bg_scanline(gba_state_t *gba_state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, UINT32 hofs, UINT32 vofs)
 {
 	UINT8 *vram = (UINT8*)gba_state->gba_vram;
 	UINT16 *palette = (UINT16*)gba_state->gba_pram;
@@ -638,7 +638,7 @@ static void draw_bg_scanline(gba_state *gba_state, UINT32 *scanline, int ypos, U
 	}
 }
 
-static void draw_gba_oam_window(gba_state *gba_state, running_machine *machine, UINT32 *scanline, int y)
+static void draw_gba_oam_window(gba_state_t *gba_state, running_machine *machine, UINT32 *scanline, int y)
 {
 	INT16 gba_oamindex;
 	UINT32 tilebytebase, tileindex, tiledrawindex;
@@ -1084,7 +1084,7 @@ static void draw_gba_oam_window(gba_state *gba_state, running_machine *machine, 
 	}
 }
 
-static void draw_gba_oam(gba_state *gba_state, running_machine *machine, UINT32 *scanline, int y)
+static void draw_gba_oam(gba_state_t *gba_state, running_machine *machine, UINT32 *scanline, int y)
 {
 	INT16 gba_oamindex;
 	INT32 mosaiccnt = 0;
@@ -1677,7 +1677,7 @@ static void draw_gba_oam(gba_state *gba_state, running_machine *machine, UINT32 
 	}
 }
 
-INLINE int is_in_window(gba_state *gba_state, int x, int window)
+INLINE int is_in_window(gba_state_t *gba_state, int x, int window)
 {
 	int x0 = gba_state->WIN0H >> 8;
 	int x1 = gba_state->WIN0H & 0x00ff;
@@ -1769,7 +1769,7 @@ void gba_draw_scanline(running_machine *machine, int y)
 	UINT16 *scanline = BITMAP_ADDR16(bitmap, y, 0);
 	int i, x;
 	static UINT32 xferscan[7][240+2048];	// up to 1024 pixels of slop on either side to allow easier clip handling
-	gba_state *gba_state = machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 	UINT8 submode = 0;
 	int bpp = 0;
 

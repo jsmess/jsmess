@@ -26,7 +26,7 @@
  */
 
 
-#include "driver.h"
+#include "emu.h"
 #include "kermit.h"
 
 

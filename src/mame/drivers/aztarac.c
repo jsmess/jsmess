@@ -13,7 +13,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "video/vector.h"
@@ -36,7 +36,7 @@ static IRQ_CALLBACK(aztarac_irq_callback)
 
 static MACHINE_RESET( aztarac )
 {
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), aztarac_irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), aztarac_irq_callback);
 }
 
 

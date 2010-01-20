@@ -6,7 +6,7 @@
     3. MMD doesn't support auto-screen-resize, so we do it here. */
 
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/super80.h"
 
 

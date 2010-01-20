@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "ctronics.h"
 #include "devices/printer.h"
 
@@ -86,7 +86,7 @@ MACHINE_DRIVER_END
 static DEVICE_START( centronics )
 {
 	centronics_state *centronics = get_safe_token(device);
-	const centronics_interface *intf = device->static_config;
+	const centronics_interface *intf = (const centronics_interface *)device->static_config;
 
 	/* validate some basic stuff */
 	assert(device->static_config != NULL);

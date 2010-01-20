@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/terminal.h"
 

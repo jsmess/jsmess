@@ -15,7 +15,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cdp1862.h"
 
 /***************************************************************************
@@ -64,7 +64,7 @@ INLINE cdp1862_t *get_safe_token(const device_config *device)
 
 static void initialize_palette(const device_config *device)
 {
-	const cdp1862_interface *intf = device->static_config;
+	const cdp1862_interface *intf = (const cdp1862_interface *)device->static_config;
 	int i;
 
 	double res_total = intf->chr_r + intf->chr_g + intf->chr_b + intf->chr_bkg;
@@ -172,7 +172,7 @@ void cdp1862_update(const device_config *device, bitmap_t *bitmap, const rectang
 static DEVICE_START( cdp1862 )
 {
 	cdp1862_t *cdp1862 = get_safe_token(device);
-	const cdp1862_interface *intf = device->static_config;
+	const cdp1862_interface *intf = (const cdp1862_interface *)device->static_config;
 
 	/* resolve callbacks */
 	devcb_resolve_read_line(&cdp1862->in_rd_func, &intf->in_rd_func, device);

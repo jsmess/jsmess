@@ -57,7 +57,7 @@ Sound Board 1b11107
 
 ************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"
@@ -305,7 +305,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( quasar_interrupt )
 {
-	generic_pulse_irq_line_and_vector(device, 0, 0x03);
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
 }
 
 static const s2636_interface s2636_0_config =
@@ -333,7 +333,7 @@ static const s2636_interface s2636_2_config =
 // Quasar S2650 Main CPU, I8035 sound board
 // ****************************************
 
-MACHINE_START( quasar )
+static MACHINE_START( quasar )
 {
 	cvs_state *state = (cvs_state *)machine->driver_data;
 

@@ -9,20 +9,13 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "config.h"
 #include "xmlfile.h"
 
 
 #define DEBUG_CONFIG		0
-
-
-
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-#define CONFIG_VERSION			10
 
 
 
@@ -118,7 +111,6 @@ int config_load_settings(running_machine *machine)
 	config_type *type;
 	mame_file *file;
 	int loaded = 0;
-	astring *fname;
 
 	/* loop over all registrants and call their init function */
 	for (type = typelist; type; type = type->next)
@@ -128,16 +120,15 @@ int config_load_settings(running_machine *machine)
 	if (controller[0] != 0)
 	{
 		/* open the config file */
-		fname = astring_assemble_2(astring_alloc(), controller, ".cfg");
-		filerr = mame_fopen(SEARCHPATH_CTRLR, astring_c(fname), OPEN_FLAG_READ, &file);
-		astring_free(fname);
+		astring fname(controller, ".cfg");
+		filerr = mame_fopen(SEARCHPATH_CTRLR, fname, OPEN_FLAG_READ, &file);
 
 		if (filerr != FILERR_NONE)
-			fatalerror("Could not load controller file %s.cfg", controller);
+			throw emu_fatalerror("Could not load controller file %s.cfg", controller);
 
 		/* load the XML */
 		if (!config_load_xml(machine, file, CONFIG_TYPE_CONTROLLER))
-			fatalerror("Could not load controller file %s.cfg", controller);
+			throw emu_fatalerror("Could not load controller file %s.cfg", controller);
 		mame_fclose(file);
 	}
 
@@ -150,9 +141,8 @@ int config_load_settings(running_machine *machine)
 	}
 
 	/* finally, load the game-specific file */
-	fname = astring_assemble_2(astring_alloc(), machine->basename, ".cfg");
-	filerr = mame_fopen(SEARCHPATH_CONFIG, astring_c(fname), OPEN_FLAG_READ, &file);
-	astring_free(fname);
+	astring fname(machine->basename, ".cfg");
+	filerr = mame_fopen(SEARCHPATH_CONFIG, fname, OPEN_FLAG_READ, &file);
 
 	if (filerr == FILERR_NONE)
 	{
@@ -175,7 +165,6 @@ void config_save_settings(running_machine *machine)
 	file_error filerr;
 	config_type *type;
 	mame_file *file;
-	astring *fname;
 
 	/* loop over all registrants and call their init function */
 	for (type = typelist; type; type = type->next)
@@ -190,9 +179,8 @@ void config_save_settings(running_machine *machine)
 	}
 
 	/* finally, save the game-specific file */
-	fname = astring_assemble_2(astring_alloc(), machine->basename, ".cfg");
-	filerr = mame_fopen(SEARCHPATH_CONFIG, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
-	astring_free(fname);
+	astring fname(machine->basename, ".cfg");
+	filerr = mame_fopen(SEARCHPATH_CONFIG, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 
 	if (filerr == FILERR_NONE)
 	{

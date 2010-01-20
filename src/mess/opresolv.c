@@ -13,7 +13,7 @@
 
 #include "pool.h"
 #include "opresolv.h"
-#include "driver.h"
+#include "emu.h"
 
 enum resolution_entry_state
 {
@@ -214,12 +214,12 @@ option_resolution *option_resolution_create(const option_guide *guide, const cha
 	option_count = option_resolution_countoptions(guide, specification);
 
 	/* create a memory pool for this structure */
-	pool = pool_alloc(NULL);
+	pool = pool_alloc_lib(NULL);
 	if (!pool)
 		goto outofmemory;
 
 	/* allocate the main structure */
-	resolution = pool_malloc(pool, sizeof(option_resolution));
+	resolution = (option_resolution *)pool_malloc_lib(pool, sizeof(option_resolution));
 	if (!resolution)
 		goto outofmemory;
 	memset(resolution, 0, sizeof(*resolution));
@@ -228,7 +228,7 @@ option_resolution *option_resolution_create(const option_guide *guide, const cha
 	/* set up the entries list */
 	resolution->option_count = option_count;
 	resolution->specification = specification;
-	resolution->entries = pool_malloc(resolution->pool, sizeof(struct option_resolution_entry) * option_count);
+	resolution->entries = (option_resolution_entry *)pool_malloc_lib(resolution->pool, sizeof(struct option_resolution_entry) * option_count);
 	if (!resolution->entries)
 		goto outofmemory;
 	memset(resolution->entries, 0, sizeof(struct option_resolution_entry) * option_count);
@@ -295,7 +295,7 @@ optreserr_t option_resolution_add_param(option_resolution *resolution, const cha
 		break;
 
 	case OPTIONTYPE_STRING:
-		entry->u.str_value = pool_strdup(resolution->pool, value);
+		entry->u.str_value = pool_strdup_lib(resolution->pool, value);
 		if (!entry->u.str_value)
 		{
 			err = OPTIONRESOLUTION_ERROR_OUTOFMEMORY;
@@ -355,7 +355,7 @@ done:
 
 void option_resolution_close(option_resolution *resolution)
 {
-	pool_free(resolution->pool);
+	pool_free_lib(resolution->pool);
 }
 
 

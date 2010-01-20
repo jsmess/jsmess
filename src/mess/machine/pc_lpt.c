@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "pc_lpt.h"
 #include "machine/ctronics.h"
 
@@ -76,8 +76,8 @@ INLINE pc_lpt_state *get_safe_token(const device_config *device)
 static DEVICE_START( pc_lpt )
 {
 	pc_lpt_state *lpt = get_safe_token(device);
-	const pc_lpt_interface *intf = device->static_config;
-	astring *tempstring = astring_alloc();
+	const pc_lpt_interface *intf = (const pc_lpt_interface *)device->static_config;
+	astring tempstring;
 
 	/* validate some basic stuff */
 	assert(device->static_config != NULL);
@@ -90,7 +90,6 @@ static DEVICE_START( pc_lpt )
 	if (!lpt->centronics->started)
 	{
 		device_delay_init(device);
-		astring_free(tempstring);
 		return;
 	}
 
@@ -104,8 +103,6 @@ static DEVICE_START( pc_lpt )
 	state_save_register_device_item(device, 0, lpt->init);
 	state_save_register_device_item(device, 0, lpt->select);
 	state_save_register_device_item(device, 0, lpt->irq_enabled);
-
-	astring_free(tempstring);
 }
 
 static DEVICE_RESET( pc_lpt )
@@ -240,7 +237,7 @@ READ8_DEVICE_HANDLER( pc_lpt_r )
 	}
 
 	/* if we reach this its an error */
-	logerror("PC-LPT %s: Read from invalid offset %x\n", device->tag, offset);
+	logerror("PC-LPT %s: Read from invalid offset %x\n", device->tag.cstr(), offset);
 
 	return 0xff;
 }

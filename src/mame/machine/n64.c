@@ -1,11 +1,12 @@
 /* machine/n64.c - contains N64 hardware emulation shared between MAME and MESS */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/mips3com.h"
 #include "streams.h"
 #include "includes/n64.h"
 #include "sound/dmadac.h"
+#include "profiler.h"
 
 UINT32 *rdram;
 UINT32 *rsp_imem;
@@ -442,7 +443,7 @@ static void sp_set_status(const device_config *device, UINT32 status)
 	}
 }
 
-READ32_HANDLER( n64_sp_reg_r )
+READ32_DEVICE_HANDLER( n64_sp_reg_r )
 {
 	switch (offset)
 	{
@@ -456,7 +457,7 @@ READ32_HANDLER( n64_sp_reg_r )
 			return (sp_dma_skip << 20) | (sp_dma_count << 12) | sp_dma_length;
 
 		case 0x10/4:		// SP_STATUS_REG
-            return cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR);
+            return cpu_get_reg(device, RSP_SR);
 
 		case 0x14/4:		// SP_DMA_FULL_REG
 			return 0;
@@ -490,17 +491,17 @@ READ32_HANDLER( n64_sp_reg_r )
         	return ++dp_clock;
 
         case 0x40000/4:     // PC
-            return cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_PC) & 0x00000fff;
+            return cpu_get_reg(device, RSP_PC) & 0x00000fff;
 
         default:
-            logerror("sp_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
+            logerror("sp_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(device));
             break;
 	}
 
 	return 0;
 }
 
-WRITE32_HANDLER( n64_sp_reg_w )
+WRITE32_DEVICE_HANDLER( n64_sp_reg_w )
 {
 	if ((offset & 0x10000) == 0)
 	{
@@ -530,16 +531,19 @@ WRITE32_HANDLER( n64_sp_reg_w )
 
             case 0x10/4:        // RSP_STATUS_REG
             {
+            	UINT32 oldstatus = cpu_get_reg(device, RSP_SR);
+            	UINT32 newstatus = oldstatus;
+
                 // printf( "RSP_STATUS_REG Write; %08x\n", data );
                 if (data & 0x00000001)      // clear halt
                 {
                     //if (first_rsp)
                     //{
-                    //  cpu_spinuntil_trigger(space->cpu, 6789);
+                    //  cpu_spinuntil_trigger(device, 6789);
 
                         // printf( "Clearing RSP_STATUS_HALT\n" );
-                        cputag_set_input_line(space->machine, "rsp", INPUT_LINE_HALT, CLEAR_LINE);
-                        cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) & ~RSP_STATUS_HALT );
+                        cpu_set_input_line(device, INPUT_LINE_HALT, CLEAR_LINE);
+                        newstatus &= ~RSP_STATUS_HALT;
                         // RSP_STATUS &= ~RSP_STATUS_HALT;
                     //}
                     //else
@@ -550,130 +554,131 @@ WRITE32_HANDLER( n64_sp_reg_w )
                 if (data & 0x00000002)      // set halt
                 {
                     // printf( "Setting RSP_STATUS_HALT\n" );
-                    cputag_set_input_line(space->machine, "rsp", INPUT_LINE_HALT, ASSERT_LINE);
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) | RSP_STATUS_HALT );
+                    cpu_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
+                    newstatus |= RSP_STATUS_HALT;
                     // RSP_STATUS |= RSP_STATUS_HALT;
                 }
                 if (data & 0x00000004)
                 {
                     //printf( "Clearing RSP_STATUS_BROKE\n" );
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) & ~RSP_STATUS_BROKE );
+                    newstatus &= ~RSP_STATUS_BROKE;
                     // RSP_STATUS &= ~RSP_STATUS_BROKE;     // clear broke
                 }
                 if (data & 0x00000008)      // clear interrupt
                 {
-                    clear_rcp_interrupt(space->machine, SP_INTERRUPT);
+                    clear_rcp_interrupt(device->machine, SP_INTERRUPT);
                 }
                 if (data & 0x00000010)      // set interrupt
                 {
-                    signal_rcp_interrupt(space->machine, SP_INTERRUPT);
+                    signal_rcp_interrupt(device->machine, SP_INTERRUPT);
                 }
                 if (data & 0x00000020)
                 {
                     // printf( "Clearing RSP_STATUS_SSTEP\n" );
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) & ~RSP_STATUS_SSTEP );
+                    newstatus &= ~RSP_STATUS_SSTEP;
                     // RSP_STATUS &= ~RSP_STATUS_SSTEP;     // clear single step
                 }
                 if (data & 0x00000040)
                 {
                     //printf( "Setting RSP_STATUS_SSTEP\n" );
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) | RSP_STATUS_SSTEP );
-                    if( !( cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) & ( RSP_STATUS_BROKE | RSP_STATUS_HALT ) ) )
+                    newstatus |= RSP_STATUS_SSTEP;
+                    if( !( oldstatus & ( RSP_STATUS_BROKE | RSP_STATUS_HALT ) ) )
                     {
-                        cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_STEPCNT, 1 );
+                        cpu_set_reg(device, RSP_STEPCNT, 1 );
                     }
                     // RSP_STATUS |= RSP_STATUS_SSTEP;      // set single step
                 }
                 if (data & 0x00000080)
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) & ~RSP_STATUS_INTR_BREAK );
+                    newstatus &= ~RSP_STATUS_INTR_BREAK;
                     // RSP_STATUS &= ~RSP_STATUS_INTR_BREAK;    // clear interrupt on break
                 }
                 if (data & 0x00000100)
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) | RSP_STATUS_INTR_BREAK );
+                    newstatus |= RSP_STATUS_INTR_BREAK;
                     // RSP_STATUS |= RSP_STATUS_INTR_BREAK; // set interrupt on break
                 }
                 if (data & 0x00000200)
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) & ~RSP_STATUS_SIGNAL0 );
+                    newstatus &= ~RSP_STATUS_SIGNAL0;
                     // RSP_STATUS &= ~RSP_STATUS_SIGNAL0;       // clear signal 0
                 }
                 if (data & 0x00000400)
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) | RSP_STATUS_SIGNAL0 );
+                    newstatus |= RSP_STATUS_SIGNAL0;
                     // RSP_STATUS |= RSP_STATUS_SIGNAL0;        // set signal 0
                 }
                 if (data & 0x00000800)
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) & ~RSP_STATUS_SIGNAL1 );
+                    newstatus &= ~RSP_STATUS_SIGNAL1;
                     // RSP_STATUS &= ~RSP_STATUS_SIGNAL1;       // clear signal 1
                 }
                 if (data & 0x00001000)
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) | RSP_STATUS_SIGNAL1 );
+                    newstatus |= RSP_STATUS_SIGNAL1;
                     // RSP_STATUS |= RSP_STATUS_SIGNAL1;        // set signal 1
                 }
                 if (data & 0x00002000)
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) & ~RSP_STATUS_SIGNAL2 );
+                    newstatus &= ~RSP_STATUS_SIGNAL2 ;
                     // RSP_STATUS &= ~RSP_STATUS_SIGNAL2;       // clear signal 2
                 }
                 if (data & 0x00004000)
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) | RSP_STATUS_SIGNAL2 );
+                    newstatus |= RSP_STATUS_SIGNAL2;
                     // RSP_STATUS |= RSP_STATUS_SIGNAL2;        // set signal 2
                 }
                 if (data & 0x00008000)
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) & ~RSP_STATUS_SIGNAL3 );
+                    newstatus &= ~RSP_STATUS_SIGNAL3;
                     // RSP_STATUS &= ~RSP_STATUS_SIGNAL3;       // clear signal 3
                 }
                 if (data & 0x00010000)
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) | RSP_STATUS_SIGNAL3 );
+                    newstatus |= RSP_STATUS_SIGNAL3;
                     // RSP_STATUS |= RSP_STATUS_SIGNAL3;        // set signal 3
                 }
                 if (data & 0x00020000)
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) & ~RSP_STATUS_SIGNAL4 );
+                    newstatus &= ~RSP_STATUS_SIGNAL4;
                     // RSP_STATUS &= ~RSP_STATUS_SIGNAL4;       // clear signal 4
                 }
                 if (data & 0x00040000)
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) | RSP_STATUS_SIGNAL4 );
+                    newstatus |= RSP_STATUS_SIGNAL4;
                     // RSP_STATUS |= RSP_STATUS_SIGNAL4;        // set signal 4
                 }
                 if (data & 0x00080000)
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) & ~RSP_STATUS_SIGNAL5 );
+                    newstatus &= ~RSP_STATUS_SIGNAL5;
                     // RSP_STATUS &= ~RSP_STATUS_SIGNAL5;       // clear signal 5
                 }
                 if (data & 0x00100000)
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) | RSP_STATUS_SIGNAL5 );
+                    newstatus |= RSP_STATUS_SIGNAL5;
                     // RSP_STATUS |= RSP_STATUS_SIGNAL5;        // set signal 5
                 }
                 if (data & 0x00200000)
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) & ~RSP_STATUS_SIGNAL6 );
+                    newstatus &= ~RSP_STATUS_SIGNAL6;
                     // RSP_STATUS &= ~RSP_STATUS_SIGNAL6;       // clear signal 6
                 }
                 if (data & 0x00400000)
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) | RSP_STATUS_SIGNAL6 );
+                    newstatus |= RSP_STATUS_SIGNAL6;
                     // RSP_STATUS |= RSP_STATUS_SIGNAL6;        // set signal 6
                 }
                 if (data & 0x00800000)
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) & ~RSP_STATUS_SIGNAL7 );
+                    newstatus &= ~RSP_STATUS_SIGNAL7;
                     // RSP_STATUS &= ~RSP_STATUS_SIGNAL7;       // clear signal 7
                 }
                 if (data & 0x01000000)
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR, cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_SR) | RSP_STATUS_SIGNAL7 );
+                    newstatus |= RSP_STATUS_SIGNAL7;
                     // RSP_STATUS |= RSP_STATUS_SIGNAL7;        // set signal 7
                 }
+                cpu_set_reg(device, RSP_SR, newstatus);
                 break;
             }
 
@@ -686,7 +691,7 @@ WRITE32_HANDLER( n64_sp_reg_w )
 				break;
 
 			default:
-				logerror("sp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
+				logerror("sp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(device));
 				break;
 		}
 	}
@@ -696,18 +701,18 @@ WRITE32_HANDLER( n64_sp_reg_w )
         {
             case 0x00/4:        // SP_PC_REG
                 //printf( "Setting PC to: %08x\n", 0x04001000 | (data & 0xfff ) );
-                if( cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_NEXTPC) != 0xffffffff )
+                if( cpu_get_reg(device, RSP_NEXTPC) != 0xffffffff )
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_NEXTPC, 0x1000 | (data & 0xfff));
+                    cpu_set_reg(device, RSP_NEXTPC, 0x1000 | (data & 0xfff));
                 }
                 else
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_PC, 0x1000 | (data & 0xfff));
+                    cpu_set_reg(device, RSP_PC, 0x1000 | (data & 0xfff));
                 }
                 break;
 
             default:
-                logerror("sp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
+                logerror("sp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(device));
                 break;
 		}
 	}
@@ -725,7 +730,7 @@ void dp_full_sync(running_machine *machine)
 	signal_rcp_interrupt(machine, DP_INTERRUPT);
 }
 
-READ32_HANDLER( n64_dp_reg_r )
+READ32_DEVICE_HANDLER( n64_dp_reg_r )
 {
 	switch (offset)
 	{
@@ -742,14 +747,14 @@ READ32_HANDLER( n64_dp_reg_r )
 			return dp_status;
 
 		default:
-			logerror("dp_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
+			logerror("dp_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(device));
 			break;
 	}
 
 	return 0;
 }
 
-WRITE32_HANDLER( n64_dp_reg_w )
+WRITE32_DEVICE_HANDLER( n64_dp_reg_w )
 {
 	switch (offset)
 	{
@@ -760,7 +765,9 @@ WRITE32_HANDLER( n64_dp_reg_w )
 
 		case 0x04/4:		// DP_END_REG
 			dp_end = data;
-			rdp_process_list(space->machine);
+			profiler_mark_start(PROFILER_USER1);
+			rdp_process_list(device->machine);
+			profiler_mark_end();
 			break;
 
 		case 0x0c/4:		// DP_STATUS_REG
@@ -773,7 +780,7 @@ WRITE32_HANDLER( n64_dp_reg_w )
 			break;
 
 		default:
-			logerror("dp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
+			logerror("dp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(device));
 			break;
 	}
 }
@@ -1992,15 +1999,15 @@ WRITE32_HANDLER( n64_pif_ram_w )
 
 MACHINE_START( n64 )
 {
-	mips3drc_set_options(cputag_get_cpu(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	mips3drc_set_options(devtag_get_device(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x007fffff, FALSE, rdram);
+	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x007fffff, FALSE, rdram);
 
-	rspdrc_set_options(cputag_get_cpu(machine, "rsp"), 0);
-	rspdrc_add_imem(cputag_get_cpu(machine, "rsp"), rsp_imem);
-	rspdrc_add_dmem(cputag_get_cpu(machine, "rsp"), rsp_dmem);
-	rspdrc_flush_drc_cache(cputag_get_cpu(machine, "rsp"));
+	rspdrc_set_options(devtag_get_device(machine, "rsp"), 0);
+	rspdrc_add_imem(devtag_get_device(machine, "rsp"), rsp_imem);
+	rspdrc_add_dmem(devtag_get_device(machine, "rsp"), rsp_dmem);
+	rspdrc_flush_drc_cache(devtag_get_device(machine, "rsp"));
 
 	audio_timer = timer_alloc(machine, audio_timer_callback, NULL);
 }

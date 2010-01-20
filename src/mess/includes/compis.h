@@ -12,7 +12,7 @@
 #ifndef COMPIS_H_
 #define COMPIS_H_
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/msm8251.h"
 #include "machine/upd765.h"
 

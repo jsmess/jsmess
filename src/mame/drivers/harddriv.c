@@ -319,7 +319,7 @@ Notes:
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/tms32010/tms32010.h"
@@ -3488,11 +3488,13 @@ ROM_START( racedrivpan )
 	ROM_LOAD16_BYTE( "088-2016.bin", 0x0e0000, 0x010000, CRC(6a42b7e2) SHA1(2e0ff4b7e391106a976cb872f6311f6d35dca5b0) )
 	ROM_LOAD16_BYTE( "088-2015.bin", 0x0e0001, 0x010000, CRC(334e2a3b) SHA1(a19bfa7652845b9453c722091c773819ba248569) )
 
-	ROM_REGION16_BE( 0x60000, "user1", 0 )	/* 384k for ADSP object ROM */
-	ROM_LOAD16_BYTE( "136077-1021.10h", 0x000000, 0x010000, CRC(9831fe73) SHA1(5215ee89a0014399b7d829e443b16590a4679844) )
-	ROM_LOAD16_BYTE( "136077-1023.10k", 0x000001, 0x010000, CRC(74bf0e0e) SHA1(a3d91ecf13c3619e073324517a4a5afaae831982) )
-	ROM_LOAD16_BYTE( "136077-1022.10j", 0x020000, 0x010000, CRC(c0393c31) SHA1(31726c01eb0d4650936908c90d45161197b7efba) )
-	ROM_LOAD16_BYTE( "136077-1024.10l", 0x020001, 0x010000, CRC(1e2fb25f) SHA1(4940091bbad6144bce091d2737191d266d4b0310) )
+	ROM_REGION( 0x60000, "user1", 0 )		/* 384k for object ROM */
+	ROM_LOAD16_BYTE( "088-1017.bin",  0x00000, 0x10000, CRC(d92251e8) SHA1(deeeec54c4a61c3adf62f6b1b910135559090ee5) )
+	ROM_LOAD16_BYTE( "088-1018.bin",  0x00001, 0x10000, CRC(11a0a8f5) SHA1(d4ccc83fc99331d741bc9b8027ef20d72e3ad71a) )
+	ROM_LOAD16_BYTE( "088-1019.bin",  0x20000, 0x10000, CRC(5bb00676) SHA1(cad1cea8e43f9590fc71c00fab4eff0d447f9296) ) // == 136091-0019.2k (strtdriv)
+	ROM_LOAD16_BYTE( "088-1020.bin",  0x20001, 0x10000, CRC(311cef99) SHA1(9c466aabad7e80581e477253ec6f2fd245f9b9fd) ) // == 136091-0020.2r (strtdriv)
+	ROM_LOAD16_BYTE( "088-1021.bin",  0x40000, 0x10000, CRC(ce8e4886) SHA1(d29cd4761deb80ed179d0e503243739eebc0edb4) )
+	ROM_LOAD16_BYTE( "088-1022.bin",  0x40001, 0x10000, CRC(4f1e1c5d) SHA1(3e72813129cae9e9bf084bfb1b747aa46b92591e) )
 
 	/* ----------------------- */
 
@@ -3633,14 +3635,14 @@ ROM_END
 static void find_cpus(running_machine *machine)
 {
 	harddriv_state *state = (harddriv_state *)machine->driver_data;
-	state->maincpu = cputag_get_cpu(machine, "maincpu");
-	state->gsp = cputag_get_cpu(machine, "gsp");
-	state->msp = cputag_get_cpu(machine, "msp");
-	state->adsp = cputag_get_cpu(machine, "adsp");
-	state->soundcpu = cputag_get_cpu(machine, "soundcpu");
-	state->sounddsp = cputag_get_cpu(machine, "sounddsp");
-	state->jsacpu = cputag_get_cpu(machine, "jsa");
-	state->dsp32 = cputag_get_cpu(machine, "dsp32");
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->gsp = devtag_get_device(machine, "gsp");
+	state->msp = devtag_get_device(machine, "msp");
+	state->adsp = devtag_get_device(machine, "adsp");
+	state->soundcpu = devtag_get_device(machine, "soundcpu");
+	state->sounddsp = devtag_get_device(machine, "sounddsp");
+	state->jsacpu = devtag_get_device(machine, "jsa");
+	state->dsp32 = devtag_get_device(machine, "dsp32");
 }
 
 
@@ -3733,10 +3735,10 @@ static void init_ds3(running_machine *machine)
 
 	/* if we have a sound DSP, boot it */
 	if (state->soundcpu != NULL && cpu_get_type(state->soundcpu) == CPU_ADSP2105)
-		adsp2105_load_boot_data((UINT8 *)(state->soundcpu->region + 0x10000), (UINT32 *)state->soundcpu->region);
+		adsp2105_load_boot_data(state->soundcpu->region->base.u8 + 0x10000, state->soundcpu->region->base.u32);
 
 	if (state->sounddsp != NULL && cpu_get_type(state->sounddsp) == CPU_ADSP2105)
-		adsp2105_load_boot_data((UINT8 *)(state->sounddsp->region + 0x10000), (UINT32 *)state->sounddsp->region);
+		adsp2105_load_boot_data(state->sounddsp->region->base.u8 + 0x10000, state->sounddsp->region->base.u32);
 
 /*
 

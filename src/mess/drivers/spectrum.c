@@ -144,7 +144,7 @@ http://www.z88forever.org.uk/zxplus3e/
 
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
@@ -503,7 +503,7 @@ static const cassette_config spectrum_cassette_config =
 {
 	tzx_cassette_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 };
 
 MACHINE_DRIVER_START( spectrum )

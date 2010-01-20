@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "debugger.h"
 #include "cdp1802.h"
 
@@ -923,7 +923,7 @@ static CPU_EXECUTE( cdp1802 )
 			{
 			case CDP1802_MODE_LOAD:
 				// RUN mode cannot be initiated from LOAD mode
-				logerror("CDP1802 '%s' Tried to initiate RUN mode from LOAD mode\n", device->tag);
+				logerror("CDP1802 '%s' Tried to initiate RUN mode from LOAD mode\n", device->tag.cstr());
 				cpustate->mode = CDP1802_MODE_LOAD;
 				break;
 
@@ -978,8 +978,8 @@ static CPU_INIT( cdp1802 )
 	cpustate->state_table.subtypemask = 1;
 
 	/* find address spaces */
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	/* set initial values */
 	cpustate->p = mame_rand(device->machine) & 0x0f;

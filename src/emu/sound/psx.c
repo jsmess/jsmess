@@ -8,11 +8,8 @@
 
 ***************************************************************************/
 
-#include <stdarg.h>
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
-#include "cpuintrf.h"
-#include "cpuexec.h"
 #include "psx.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -241,7 +238,7 @@ static STREAM_UPDATE( PSXSPU_update )
 
 static void spu_read( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
-	struct psxinfo *chip = get_safe_token(devtag_get_device(machine, "spu"));
+	struct psxinfo *chip = get_safe_token(machine->device("spu"));
 	verboselog( machine, 1, "spu_read( %08x, %08x )\n", n_address, n_size );
 
 	while( n_size > 0 )
@@ -260,7 +257,7 @@ static void spu_read( running_machine *machine, UINT32 n_address, INT32 n_size )
 
 static void spu_write( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
-	struct psxinfo *chip = get_safe_token(devtag_get_device(machine, "spu"));
+	struct psxinfo *chip = get_safe_token(machine->device("spu"));
 	verboselog( machine, 1, "spu_write( %08x, %08x )\n", n_address, n_size );
 
 	while( n_size > 0 )

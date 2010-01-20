@@ -30,7 +30,7 @@ Static Program ROM (48K bytes)            4000-FFFF   R    D0-D7
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/tms5220.h"
 #include "sound/2151intf.h"
@@ -124,7 +124,7 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 	UINT8 *rgn;
 
 	/* copy in the parameters */
-	jsacpu = cputag_get_cpu(machine, "jsa");
+	jsacpu = devtag_get_device(machine, "jsa");
 	assert_always(jsacpu != NULL, "Could not find JSA CPU!");
 	test_port = testport;
 	test_mask = testmask;

@@ -50,7 +50,7 @@ bus serial (available in all modes), a Fast and a Burst serial bus
 */
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m4510.h"
 
 #include "sound/sid6581.h"

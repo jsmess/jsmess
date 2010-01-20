@@ -9,7 +9,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 
 static ADDRESS_MAP_START(x07_mem, ADDRESS_SPACE_PROGRAM, 8)

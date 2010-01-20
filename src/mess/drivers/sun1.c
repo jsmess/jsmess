@@ -10,7 +10,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/upd7201.h"
 #include "machine/terminal.h"
@@ -49,7 +49,7 @@ static MACHINE_RESET(sun1)
 
 	memcpy((UINT8*)sun1_ram,user1,0x4000);
 
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 }
 
 

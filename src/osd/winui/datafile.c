@@ -28,7 +28,7 @@
 
 // MAME/MAMEUI headers
 #include "osdcomm.h"
-#include "driver.h"
+#include "emu.h"
 #include "datafile.h"
 #include "mui_opts.h" // For MameUIGlobal()
 
@@ -123,7 +123,7 @@ static int GetGameNameIndex(const char *name)
 	}
 
 	/* uses our sorted array of driver names to get the index in log time */
-	driver_index_info = bsearch(&key,sorted_drivers,num_games,sizeof(driver_data_type),
+	driver_index_info = (driver_data_type *)bsearch(&key,sorted_drivers,num_games,sizeof(driver_data_type),
 								DriverDataCompareFunc);
 
 	if (driver_index_info == NULL)
@@ -425,7 +425,7 @@ static int index_datafile (struct tDatafileIndex **_index)
         if (ParseSeek (0L, SEEK_SET)) return 0;
 
         /* allocate index */
-        idx = *_index = malloc (num_games * sizeof (struct tDatafileIndex));
+        idx = *_index = (tDatafileIndex *)malloc (num_games * sizeof (struct tDatafileIndex));
         if (NULL == idx) return 0;
 
         /* loop through datafile */

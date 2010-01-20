@@ -1,7 +1,7 @@
 #ifndef UPD71071_H_
 #define UPD71071_H_
 
-#include "driver.h"
+#include "emu.h"
 
 typedef struct _upd71071_interface upd71071_intf;
 struct _upd71071_interface

@@ -10,7 +10,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cococart.h"
 #include "sound/dac.h"
 

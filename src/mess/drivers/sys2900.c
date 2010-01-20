@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 
 static ADDRESS_MAP_START(sys2900_mem, ADDRESS_SPACE_PROGRAM, 8)

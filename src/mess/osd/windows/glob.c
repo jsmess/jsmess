@@ -182,11 +182,7 @@ static int	 match __P((Char *, Char *, Char *));
 static void	 qprintf __P((const char *, Char *));
 #endif
 
-int
-glob(pattern, flags, errfunc, pglob)
-	const char *pattern;
-	int flags, (*errfunc) __P((const char *, int));
-	glob_t *pglob;
+int	glob (const char *pattern, int flags, int (*errfunc)(const char *, int), glob_t *pglob)
 {
 	const u_char *patnext;
 	int c;
@@ -234,9 +230,7 @@ glob(pattern, flags, errfunc, pglob)
  * invoke the standard globbing routine to glob the rest of the magic
  * characters
  */
-static int globexp1(pattern, pglob)
-	const Char *pattern;
-	glob_t *pglob;
+static int globexp1(const Char *pattern, glob_t *pglob)
 {
 	Char* ptr = (Char *) pattern;
 	int rv;
@@ -258,10 +252,7 @@ static int globexp1(pattern, pglob)
  * If it succeeds then it invokes globexp1 with the new pattern.
  * If it fails then it tries to glob the rest of the pattern and returns.
  */
-static int globexp2(ptr, pattern, pglob, rv)
-	const Char *ptr, *pattern;
-	glob_t *pglob;
-	int *rv;
+static int globexp2(const Char *ptr, const Char *pattern, glob_t *pglob, int *rv)
 {
 	int     i;
 	Char   *lm, *ls;
@@ -363,12 +354,7 @@ static int globexp2(ptr, pattern, pglob, rv)
 /*
  * expand tilde from the passwd file.
  */
-static const Char *
-globtilde(pattern, patbuf, patbuf_len, pglob)
-	const Char *pattern;
-	Char *patbuf;
-	size_t patbuf_len;
-	glob_t *pglob;
+static const Char *globtilde(const Char *pattern,Char *patbuf, size_t patbuf_len, glob_t *pglob)
 {
 	struct passwd *pwd;
 	char *h;
@@ -434,10 +420,7 @@ globtilde(pattern, patbuf, patbuf_len, pglob)
  * if things went well, nonzero if errors occurred.  It is not an error
  * to find no matches.
  */
-static int
-glob0(pattern, pglob)
-	const Char *pattern;
-	glob_t *pglob;
+static int glob0(const Char *pattern,glob_t *pglob)
 {
 	const Char *qpatnext;
 	int c, err, oldpathc;
@@ -519,17 +502,12 @@ glob0(pattern, pglob)
 	return(0);
 }
 
-static int DECL_SPEC
-compare(p, q)
-	const void *p, *q;
+static int compare(const void *p, const void *q)
 {
 	return(strcmp(*(char **)p, *(char **)q));
 }
 
-static int
-glob1(pattern, pglob)
-	Char *pattern;
-	glob_t *pglob;
+static int glob1(Char *pattern,glob_t *pglob)
 {
 	Char pathbuf[_MAX_PATH+1];
 
@@ -544,10 +522,7 @@ glob1(pattern, pglob)
  * of recursion for each segment in the pattern that contains one or more
  * meta characters.
  */
-static int
-glob2(pathbuf, pathend, pattern, pglob)
-	Char *pathbuf, *pathend, *pattern;
-	glob_t *pglob;
+static int glob2(Char *pathbuf, Char *pathend, Char *pattern,glob_t *pglob)
 {
 	Char *p, *q;
 	int anymeta;
@@ -602,10 +577,7 @@ glob2(pathbuf, pathend, pattern, pglob)
 	/* NOTREACHED */
 }
 
-static int
-glob3(pathbuf, pathend, pattern, restpattern, pglob)
-	Char *pathbuf, *pathend, *pattern, *restpattern;
-	glob_t *pglob;
+static int glob3(Char *pathbuf,Char *pathend,Char *pattern,Char *restpattern,glob_t *pglob)	
 {
 	register const osd_directory_entry *dp;
 	osd_directory *dirp;
@@ -683,10 +655,7 @@ glob3(pathbuf, pathend, pattern, restpattern, pglob)
  *  Either gl_pathc is zero and gl_pathv is NULL; or gl_pathc > 0 and
  *  gl_pathv points to (gl_offs + gl_pathc + 1) items.
  */
-static int
-globextend(path, pglob)
-	const Char *path;
-	glob_t *pglob;
+static int globextend(const Char *path, glob_t *pglob)
 {
 	register char **pathv;
 	register int i;
@@ -696,8 +665,8 @@ globextend(path, pglob)
 
 	newsize = sizeof(*pathv) * (2 + pglob->gl_pathc + pglob->gl_offs);
 	pathv = pglob->gl_pathv ?
-		    realloc((char *)pglob->gl_pathv, newsize) :
-		    malloc(newsize);
+		    (char **)realloc(pglob->gl_pathv, newsize) :
+		    (char **)malloc(newsize);
 	if (pathv == NULL)
 		return(GLOB_NOSPACE);
 
@@ -711,7 +680,7 @@ globextend(path, pglob)
 
 	for (p = path; *p++;)
 		continue;
-	if ((copy = malloc(p - path)) != NULL) {
+	if ((copy = (char *)malloc(p - path)) != NULL) {
 		g_Ctoc(path, copy);
 		pathv[pglob->gl_offs + pglob->gl_pathc++] = copy;
 	}
@@ -723,9 +692,7 @@ globextend(path, pglob)
  * pattern matching function for filenames.  Each occurrence of the *
  * pattern causes a recursion level.
  */
-static int
-match(name, pat, patend)
-	register Char *name, *pat, *patend;
+static int match(register Char *name, register Char *pat, register Char *patend)
 {
 	int ok, negate_range;
 	Char c, k;
@@ -771,9 +738,7 @@ match(name, pat, patend)
 }
 
 /* Free allocated data belonging to a glob_t structure. */
-void
-globfree(pglob)
-	glob_t *pglob;
+void globfree(glob_t *pglob)
 {
 	register int i;
 	register char **pp;
@@ -787,10 +752,7 @@ globfree(pglob)
 	}
 }
 
-static osd_directory *
-g_opendir(str, pglob)
-	register Char *str;
-	glob_t *pglob;
+static osd_directory *g_opendir(register Char *str,glob_t *pglob)	
 {
 	char buf[_MAX_PATH];
 
@@ -800,15 +762,12 @@ g_opendir(str, pglob)
 		g_Ctoc(str, buf);
 
 	if (pglob->gl_flags & GLOB_ALTDIRFUNC)
-		return((*pglob->gl_opendir)(buf));
+		return((osd_directory *)(*pglob->gl_opendir)(buf));
 
 	return osd_opendir(buf);
 }
 
-static Char *
-g_strchr(str, ch)
-	Char *str;
-	int ch;
+static Char *g_strchr(Char *str,int ch)	
 {
 	do {
 		if (*str == ch)
@@ -835,10 +794,7 @@ g_strcat(dst, src)
 }
 #endif
 
-static void
-g_Ctoc(str, buf)
-	register const Char *str;
-	char *buf;
+static void g_Ctoc(register const Char *str, char *buf)
 {
 	register char *dc;
 

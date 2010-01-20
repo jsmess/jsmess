@@ -37,7 +37,7 @@ typedef struct _cartslot_t cartslot_t;
 struct _cartslot_t
 {
 	const device_config *pcb_device;
-	multicart *mc;
+	multicart_t *mc;
 };
 
 

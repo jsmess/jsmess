@@ -23,8 +23,8 @@
 
 ***************************************************************************/
 
-#include "driver.h"
-#include "astring.h"
+#include "emu.h"
+
 #include <zlib.h>
 
 
@@ -64,7 +64,7 @@ struct _state_entry
 	state_entry *		next;				/* pointer to next entry */
 	running_machine *	machine;			/* pointer back to the owning machine */
 	void *				data;				/* pointer to the memory to save/restore */
-	astring *			name;				/* full name */
+	astring				name;				/* full name */
 	UINT8				typesize;			/* size of the raw data type */
 	UINT32				typecount;			/* number of items */
 	UINT32				offset;				/* offset within the final structure */
@@ -163,8 +163,42 @@ INLINE void flip_data(state_entry *entry)
     all registrations
 -------------------------------------------------*/
 
+enum test_enum_type { test_val };
+
+class test_class_type { public: int dummy; };
+
 void state_init(running_machine *machine)
 {
+	bool test_bool;
+	INT8 test_INT8;
+	UINT8 test_UINT8;
+	INT16 test_INT16;
+	UINT16 test_UINT16;
+	INT32 test_INT32;
+	UINT32 test_UINT32;
+	INT64 test_INT64;
+	UINT64 test_UINT64;
+	float test_float;
+	double test_double;
+	test_enum_type test_enum;
+	test_class_type test_class;
+
+	assert_always(IS_VALID_SAVE_TYPE(test_bool), "bool is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_INT8), "INT8 is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_UINT8), "UINT8 is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_INT16), "INT16 is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_UINT16), "UINT16 is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_INT32), "INT32 is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_UINT32), "UINT32 is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_INT64), "INT64 is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_UINT64), "UINT64 is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_float), "float is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_double), "double is not a valid type for save");
+	assert_always(IS_VALID_SAVE_TYPE(test_enum), "enums are not a valid type for save");
+#ifdef __GNUC__
+	assert_always(!IS_VALID_SAVE_TYPE(test_class), "classes are a valid type for save");
+#endif
+
 	machine->state_data = auto_alloc_clear(machine, state_private);
 }
 
@@ -227,7 +261,7 @@ void state_save_register_memory(running_machine *machine, const char *module, co
 {
 	state_private *global = machine->state_data;
 	state_entry **entryptr, *next;
-	astring *totalname;
+	astring totalname;
 
 	assert(valsize == 1 || valsize == 2 || valsize == 4 || valsize == 8);
 
@@ -242,23 +276,22 @@ void state_save_register_memory(running_machine *machine, const char *module, co
 	}
 
 	/* create the full name */
-	totalname = auto_astring_alloc(machine);
 	if (tag != NULL)
-		astring_printf(totalname, "%s/%s/%X/%s", module, tag, index, name);
+		totalname.printf("%s/%s/%X/%s", module, tag, index, name);
 	else
-		astring_printf(totalname, "%s/%X/%s", module, index, name);
+		totalname.printf("%s/%X/%s", module, index, name);
 
 	/* look for duplicates and an entry to insert in front of */
 	for (entryptr = &global->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next)
 	{
 		/* stop if the next guy's string is greater than ours */
-		int cmpval = astring_cmp((*entryptr)->name, totalname);
+		int cmpval = (*entryptr)->name.cmp(totalname);
 		if (cmpval > 0)
 			break;
 
 		/* error if we are equal */
 		if (cmpval == 0)
-			fatalerror("Duplicate save state registration entry (%s)", astring_c(totalname));
+			fatalerror("Duplicate save state registration entry (%s)", totalname.cstr());
 	}
 
 	/* didn't find one; allocate a new one */
@@ -373,7 +406,7 @@ static UINT32 get_signature(running_machine *machine)
 		UINT32 temp[2];
 
 		/* add the entry name to the CRC */
-		crc = crc32(crc, (UINT8 *)astring_c(entry->name), astring_len(entry->name));
+		crc = crc32(crc, (UINT8 *)entry->name.cstr(), entry->name.len());
 
 		/* add the type and size to the CRC */
 		temp[0] = LITTLE_ENDIANIZE_INT32(entry->typecount);
@@ -588,7 +621,7 @@ const char *state_save_get_indexed_item(running_machine *machine, int index, voi
 				*valsize = ss->typesize;
 			if (valcount != NULL)
 				*valcount = ss->typecount;
-			return astring_c(ss->name);
+			return ss->name;
 		}
 
 	return NULL;
@@ -606,6 +639,6 @@ void state_save_dump_registry(running_machine *machine)
 	state_entry *entry;
 
 	for (entry = global->entrylist; entry; entry=entry->next)
-		LOG(("%s: %d x %d\n", astring_c(entry->name), entry->typesize, entry->typecount));
+		LOG(("%s: %d x %d\n", entry->name.cstr(), entry->typesize, entry->typecount));
 }
 

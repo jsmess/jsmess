@@ -65,7 +65,7 @@ are attached to two switches. The keys appear twice in the keyboard matrix.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "kb_keytro.h"
 #include "cpu/mcs51/mcs51.h"
 
@@ -602,7 +602,7 @@ ROM_END
 static DEVICE_START( kb_keytr )
 {
 	kb_keytr_state *keytronic = get_safe_token(device);
-	const kb_keytronic_interface *intf = device->static_config;
+	const kb_keytronic_interface *intf = (const kb_keytronic_interface *)device->static_config;
 
 	/* find our cpu */
 	keytronic->cpu = device_find_child_by_tag(device, "kb_keytr");

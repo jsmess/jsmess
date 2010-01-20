@@ -9,7 +9,7 @@
 #ifndef __AP2_LANG__
 #define __AP2_LANG__
 
-#include "driver.h"
+#include "emu.h"
 
 
 /***************************************************************************

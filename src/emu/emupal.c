@@ -9,7 +9,7 @@
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 #define VERBOSE 0
 
@@ -59,8 +59,9 @@ struct _palette_private
 
 
 /* typedef struct _colortable_t colortable_t; */
-struct _colortable_t
+class colortable_t
 {
+public:
 	running_machine *	machine;			/* associated machine */
 	UINT32				entries;			/* number of entries */
 	UINT32				palentries;			/* number of palette entries */

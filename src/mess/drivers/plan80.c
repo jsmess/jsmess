@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 
 static UINT8* plan80_video_ram;

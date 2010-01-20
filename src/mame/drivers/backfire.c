@@ -11,7 +11,7 @@
 */
 
 #define DE156CPU ARM
-#include "driver.h"
+#include "emu.h"
 #include "includes/decocrpt.h"
 #include "includes/deco32.h"
 #include "machine/eeprom.h"
@@ -628,7 +628,7 @@ static void descramble_sound( running_machine *machine )
 {
 	UINT8 *rom = memory_region(machine, "ymz");
 	int length = 0x200000; // only the first rom is swapped on backfire!
-	UINT8 *buf1 = alloc_array_or_die(UINT8, length);
+	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
 	UINT32 x;
 
 	for (x=0;x<length;x++)
@@ -647,7 +647,7 @@ static void descramble_sound( running_machine *machine )
 
 	memcpy(rom,buf1,length);
 
-	free (buf1);
+	auto_free (machine, buf1);
 }
 
 static READ32_HANDLER( backfire_speedup_r )
@@ -666,7 +666,7 @@ static DRIVER_INIT( backfire )
 	deco56_decrypt_gfx(machine, "gfx1"); /* 141 */
 	deco56_decrypt_gfx(machine, "gfx2"); /* 141 */
 	deco156_decrypt(machine);
-	cpu_set_clockscale(cputag_get_cpu(machine, "maincpu"), 4.0f); /* core timings aren't accurate */
+	cpu_set_clockscale(devtag_get_device(machine, "maincpu"), 4.0f); /* core timings aren't accurate */
 	descramble_sound(machine);
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0170018, 0x017001b, 0, 0, backfire_speedup_r );
 }

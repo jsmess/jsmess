@@ -21,7 +21,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/hd6309/hd6309.h"
 #include "sound/wave.h"
@@ -761,7 +761,7 @@ static const cassette_config coco_cassette_config =
 {
 	coco_cassette_formats,
 	NULL,
-	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 };
 
 static const floppy_config coco_floppy_config =

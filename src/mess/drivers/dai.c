@@ -58,7 +58,7 @@ Timings:
 
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/wave.h"
 #include "machine/i8255a.h"
@@ -178,7 +178,7 @@ static const cassette_config dai_cassette_config =
 {
 	cassette_default_formats,
 	&dai_cassette_options,
-	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 };
 
 /* F4 Character Displayer */

@@ -13,7 +13,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cdrom.h"
 #include "debugger.h"
 #include "includes/dc.h"
@@ -104,7 +104,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		ddtdata.channel= -1;	// not used
 		ddtdata.mode= -1;		// copy from/to buffer
 		printf("ATAPI: DMA one sector to %x, %x remaining\n", atapi_xferbase, atapi_xferlen);
-		sh4_dma_ddt(cputag_get_cpu(machine, "maincpu"), &ddtdata);
+		sh4_dma_ddt(devtag_get_device(machine, "maincpu"), &ddtdata);
 
 		atapi_xferbase += 2048;
 	}

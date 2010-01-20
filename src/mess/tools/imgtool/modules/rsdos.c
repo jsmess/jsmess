@@ -56,7 +56,7 @@ static floperr_t get_rsdos_dirent(imgtool_image *f, int index_loc, struct rsdos_
 static floperr_t put_rsdos_dirent(imgtool_image *f, int index_loc, const struct rsdos_dirent *ent)
 {
 	if (index_loc >= MAX_DIRENTS)
-		return IMGTOOLERR_FILENOTFOUND;
+		return (floperr_t)IMGTOOLERR_FILENOTFOUND;
 	return floppy_write_sector(imgtool_floppy(f), 0, 17, 3, index_loc * 32, (void *) ent, sizeof(*ent), 0);	/* TODO: pass ddam argument from imgtool */
 }
 
@@ -112,7 +112,7 @@ static imgtoolerr_t lookup_rsdos_file(imgtool_image *f, const char *fname, struc
 
 	if (position)
 		*position = i - 1;
-	return 0;
+	return (imgtoolerr_t)0;
 }
 
 
@@ -348,7 +348,7 @@ static imgtoolerr_t rsdos_diskimage_freespace(imgtool_partition *partition, UINT
 			s += (9 * 256);
 	}
 	*size = s;
-	return FLOPPY_ERROR_SUCCESS;
+	return (imgtoolerr_t)FLOPPY_ERROR_SUCCESS;
 }
 
 
@@ -406,7 +406,7 @@ static imgtoolerr_t rsdos_diskimage_readfile(imgtool_partition *partition, const
 	if (size == (size_t) -1)
 		return IMGTOOLERR_CORRUPTIMAGE;
 
-	return 0;
+	return (imgtoolerr_t)0;
 }
 
 

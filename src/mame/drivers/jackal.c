@@ -70,7 +70,7 @@ Address          Dir Data     Description
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
 #include "includes/jackal.h"
@@ -95,28 +95,28 @@ static WRITE8_HANDLER( jackal_flipscreen_w )
 	flip_screen_set(space->machine, data & 0x08);
 }
 
-READ8_HANDLER( jackal_zram_r )
+static READ8_HANDLER( jackal_zram_r )
 {
 	jackal_state *state = (jackal_state *)space->machine->driver_data;
 	return state->rambank[0x0020 + offset];
 }
 
 
-READ8_HANDLER( jackal_voram_r )
+static READ8_HANDLER( jackal_voram_r )
 {
 	jackal_state *state = (jackal_state *)space->machine->driver_data;
 	return state->rambank[0x2000 + offset];
 }
 
 
-READ8_HANDLER( jackal_spriteram_r )
+static READ8_HANDLER( jackal_spriteram_r )
 {
 	jackal_state *state = (jackal_state *)space->machine->driver_data;
 	return state->spritebank[0x3000 + offset];
 }
 
 
-WRITE8_HANDLER( jackal_rambank_w )
+static WRITE8_HANDLER( jackal_rambank_w )
 {
 	jackal_state *state = (jackal_state *)space->machine->driver_data;
 	UINT8 *rgn = memory_region(space->machine, "master");
@@ -133,14 +133,14 @@ WRITE8_HANDLER( jackal_rambank_w )
 }
 
 
-WRITE8_HANDLER( jackal_zram_w )
+static WRITE8_HANDLER( jackal_zram_w )
 {
 	jackal_state *state = (jackal_state *)space->machine->driver_data;
 	state->rambank[0x0020 + offset] = data;
 }
 
 
-WRITE8_HANDLER( jackal_voram_w )
+static WRITE8_HANDLER( jackal_voram_w )
 {
 	jackal_state *state = (jackal_state *)space->machine->driver_data;
 
@@ -151,7 +151,7 @@ WRITE8_HANDLER( jackal_voram_w )
 }
 
 
-WRITE8_HANDLER( jackal_spriteram_w )
+static WRITE8_HANDLER( jackal_spriteram_w )
 {
 	jackal_state *state = (jackal_state *)space->machine->driver_data;
 	state->spritebank[0x3000 + offset] = data;
@@ -355,7 +355,7 @@ static MACHINE_RESET( jackal )
 
 	// HACK: running at the nominal clock rate, music stops working
 	// at the beginning of the game. This fixes it.
-	cpu_set_clockscale(cputag_get_cpu(machine, "slave"), 1.2f);
+	cpu_set_clockscale(devtag_get_device(machine, "slave"), 1.2f);
 
 	state->rambank = rgn;
 	state->spritebank = rgn;

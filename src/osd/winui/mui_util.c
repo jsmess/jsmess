@@ -30,8 +30,7 @@
 
 // MAME/MAMEUI headers
 #include "unzip.h"
-#include "devintrf.h"
-#include "sndintrf.h"
+#include "emu.h"
 #include "sound/samples.h"
 #include "winutf8.h"
 #include "strconv.h"
@@ -323,7 +322,7 @@ BOOL isDriverVector(const machine_config *config)
 	const device_config *screen = video_screen_first(config);
 
 	if (screen != NULL) {
-		const screen_config *scrconfig = screen->inline_config;
+		const screen_config *scrconfig = (const screen_config *)screen->inline_config;
 
 		/* parse "vector.ini" for vector games */
 		if (SCREEN_TYPE_VECTOR == scrconfig->type)
@@ -357,7 +356,7 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 	if (drivers_info == NULL)
 	{
 		int ndriver;
-		drivers_info = malloc(sizeof(struct DriversInfo) * driver_list_get_count(drivers));
+		drivers_info = (DriversInfo*)malloc(sizeof(struct DriversInfo) * driver_list_get_count(drivers));
 		for (ndriver = 0; ndriver < driver_list_get_count(drivers); ndriver++)
 		{
 			const game_driver *gamedrv = drivers[ndriver];
@@ -415,7 +414,6 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 			}
 			gameinfo->usesSamples = FALSE;
 			
-			if (HAS_SAMPLES || HAS_VLM5030)
 			{
 				const device_config *sound;
 				const char * const * samplenames = NULL;
@@ -424,10 +422,8 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 				{
 
 					{
-#if (HAS_SAMPLES)
 						if( sound_get_type(sound) == SOUND_SAMPLES )
 							samplenames = ((const samples_interface *)sound->static_config)->samplenames;
-#endif
 					}
 
 					if (samplenames != 0 && samplenames[0] != 0)
@@ -623,7 +619,7 @@ TCHAR* win_tstring_strdup(LPCTSTR str)
 	TCHAR *cpy = NULL;
 	if (str != NULL)
 	{
-		cpy = malloc((_tcslen(str) + 1) * sizeof(TCHAR));
+		cpy = (TCHAR*)malloc((_tcslen(str) + 1) * sizeof(TCHAR));
 		if (cpy != NULL)
 			_tcscpy(cpy, str);
 	}
@@ -646,7 +642,7 @@ HANDLE win_create_file_utf8(const char* filename, DWORD desiredmode, DWORD share
 	result = CreateFile(t_filename, desiredmode, sharemode, securityattributes, creationdisposition,
 						flagsandattributes, templatehandle);
 
-	free(t_filename);
+//	free(t_filename);
 						
 	return result;
 }
@@ -662,7 +658,7 @@ DWORD win_get_current_directory_utf8(DWORD bufferlength, char* buffer)
 	char* utf8_buffer = NULL;
 	
 	if( bufferlength > 0 ) {
-		t_buffer = malloc((bufferlength * sizeof(TCHAR)) + 1);
+		t_buffer = (TCHAR*)malloc((bufferlength * sizeof(TCHAR)) + 1);
 		if( !t_buffer )
 			return result;
 	}

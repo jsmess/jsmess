@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/snes.h"
 #include "devices/cartslot.h"
 #include "snescart.h"
@@ -124,7 +124,7 @@ static void snes_load_sram(running_machine *machine)
 	UINT8 ii;
 	UINT8 *battery_ram, *ptr;
 
-	battery_ram = alloc_array_or_die(UINT8, snes_cart.sram_max);
+	battery_ram = (UINT8*)malloc(snes_cart.sram_max);
 	ptr = battery_ram;
 	image_battery_load(devtag_get_device(machine, "cart"), battery_ram, snes_cart.sram_max);
 
@@ -170,7 +170,7 @@ static void snes_save_sram(running_machine *machine)
 	UINT8 ii;
 	UINT8 *battery_ram, *ptr;
 
-	battery_ram = alloc_array_or_die(UINT8, snes_cart.sram_max);
+	battery_ram = (UINT8*)malloc(snes_cart.sram_max);
 	ptr = battery_ram;
 
 	if (snes_cart.mode == SNES_MODE_20)

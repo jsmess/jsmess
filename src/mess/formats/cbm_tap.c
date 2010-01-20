@@ -92,7 +92,7 @@ Unfortunately, I have no such a .tap file to test, so my implementation
 below could be not working.  FP ]
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "formats/cbm_tap.h"
 
 

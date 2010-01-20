@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "image.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"

@@ -36,7 +36,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/tms9900/tms9900.h"
 #include "sound/dac.h"

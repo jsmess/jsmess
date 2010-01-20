@@ -15,7 +15,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "kb3600.h"
 
 /***************************************************************************
@@ -67,7 +67,7 @@ INLINE const ay3600_interface *get_interface(const device_config *device)
 
 static TIMER_CALLBACK( ay3600_scan_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	ay3600_t *ay3600 = get_safe_token(device);
 	const ay3600_interface *intf = get_interface(device);
 

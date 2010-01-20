@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/llc.h"
 
 UINT8 *llc_video_ram;

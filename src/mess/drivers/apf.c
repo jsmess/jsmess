@@ -13,7 +13,7 @@ todo for apf m1000:
  support special cartridges (basic, space destroyer)
 
  ******************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "video/m6847.h"
 
@@ -631,7 +631,7 @@ static const cassette_config apf_cassette_config =
 {
 	apf_cassette_formats,
 	NULL,
-	CASSETTE_PLAY
+	(cassette_state)(CASSETTE_PLAY)
 };
 
 static FLOPPY_OPTIONS_START(apfimag)

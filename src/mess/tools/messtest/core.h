@@ -9,7 +9,7 @@
 #ifndef CORE_H
 #define CORE_H
 
-#include "mame.h"
+#include "emu.h"
 #include "timer.h"
 #include "xmlfile.h"
 #include "pile.h"

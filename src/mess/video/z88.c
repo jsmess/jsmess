@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "devices/messram.h"
 #include "includes/z88.h"
 

@@ -27,7 +27,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/17 -
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/3526intf.h"
@@ -445,7 +445,7 @@ static MACHINE_RESET( galivan )
 {
 	galivan_state *state = (galivan_state *)machine->driver_data;
 
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 
 //  state->layers = 0x60;
 	state->layers = 0;
@@ -459,7 +459,7 @@ static MACHINE_RESET( ninjemak )
 {
 	galivan_state *state = (galivan_state *)machine->driver_data;
 
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 
 	state->scrollx[0] = state->scrollx[1] = 0;
 	state->scrolly[0] = state->scrolly[1] = 0;

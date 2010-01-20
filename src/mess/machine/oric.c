@@ -18,7 +18,7 @@
 
 
 #include <stdio.h>
-#include "driver.h"
+#include "emu.h"
 #include "includes/oric.h"
 #include "machine/wd17xx.h"
 #include "machine/6522via.h"
@@ -762,12 +762,12 @@ static WRITE8_HANDLER(oric_jasmin_w)
 			wd17xx_reset(fdc);
 			break;
 		case 0x0a:
-			//logerror("jasmin overlay ram w: %02x PC: %04x\n", data, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")));
+			//logerror("jasmin overlay ram w: %02x PC: %04x\n", data, cpu_get_pc(devtag_get_device(space->machine, "maincpu")));
 			port_3fa_w = data;
 			oric_jasmin_set_mem_0x0c000(space->machine);
 			break;
 		case 0x0b:
-			//logerror("jasmin romdis w: %02x PC: %04x\n", data, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")));
+			//logerror("jasmin romdis w: %02x PC: %04x\n", data, cpu_get_pc(devtag_get_device(space->machine, "maincpu")));
 			port_3fb_w = data;
 			oric_jasmin_set_mem_0x0c000(space->machine);
 			break;
@@ -1150,7 +1150,7 @@ MACHINE_RESET( oric )
 		}
 		break;
 	}
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 }
 
 
@@ -1185,7 +1185,7 @@ READ8_HANDLER ( oric_IO_r )
 	{
 		if ((offset & 0x0f)!=0x0d)
 		{
-			//logerror("via 0 r: %04x %04x\n",offset, (unsigned) cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), REG_GENPC));
+			//logerror("via 0 r: %04x %04x\n",offset, (unsigned) cpu_get_reg(devtag_get_device(space->machine, "maincpu"), REG_GENPC));
 		}
 	}
 	/* it is repeated */
@@ -1224,7 +1224,7 @@ WRITE8_HANDLER ( oric_IO_w )
 	}
 	if (enable_logging)
 	{
-		//logerror("via 0 w: %04x %02x %04x\n", offset, data,(unsigned) cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), REG_GENPC));
+		//logerror("via 0 w: %04x %02x %04x\n", offset, data,(unsigned) cpu_get_reg(devtag_get_device(space->machine, "maincpu"), REG_GENPC));
 	}
 
 	via_w(via_0, offset & 0x0f, data);

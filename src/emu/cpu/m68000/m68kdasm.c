@@ -25,11 +25,8 @@
 /* ================================ INCLUDES ============================== */
 /* ======================================================================== */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
 #define m68ki_cpu_core void
+#include "emu.h"
 #include "m68000.h"
 
 #ifndef DECL_SPEC

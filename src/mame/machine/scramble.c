@@ -7,7 +7,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "includes/galaxold.h"
@@ -20,7 +20,7 @@ MACHINE_RESET( scramble )
 {
 	MACHINE_RESET_CALL(galaxold);
 
-	if (cputag_get_cpu(machine, "audiocpu") != NULL)
+	if (devtag_get_device(machine, "audiocpu") != NULL)
 		scramble_sh_init(machine);
 
   security_2B_counter = 0;
@@ -60,7 +60,7 @@ static WRITE8_DEVICE_HANDLER( scramble_protection_w )
 
 static READ8_DEVICE_HANDLER( scramble_protection_r )
 {
-	switch (cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")))
+	switch (cpu_get_pc(devtag_get_device(device->machine, "maincpu")))
 	{
 	case 0x00a8: return 0xf0;
 	case 0x00be: return 0xb0;
@@ -457,24 +457,24 @@ DRIVER_INIT( rescue )
 	RAM = memory_region(machine, "gfx1");
 	len = memory_region_length(machine, "gfx1");
 
-	scratch = alloc_array_or_die(UINT8, len);
+	scratch = auto_alloc_array(machine, UINT8, len);
 
-		memcpy(scratch, RAM, len);
+	memcpy(scratch, RAM, len);
 
-		for (i = 0; i < len; i++)
-		{
-			int j;
+	for (i = 0; i < len; i++)
+	{
+		int j;
 
 
-			j = i & 0xa7f;
-			j |= ( bit(i,3) ^ bit(i,10) ) << 7;
-			j |= ( bit(i,1) ^ bit(i,7) ) << 8;
-			j |= ( bit(i,0) ^ bit(i,8) ) << 10;
+		j = i & 0xa7f;
+		j |= ( bit(i,3) ^ bit(i,10) ) << 7;
+		j |= ( bit(i,1) ^ bit(i,7) ) << 8;
+		j |= ( bit(i,0) ^ bit(i,8) ) << 10;
 
-			RAM[i] = scratch[j];
-		}
+		RAM[i] = scratch[j];
+	}
 
-		free(scratch);
+	auto_free(machine, scratch);
 }
 
 DRIVER_INIT( minefld )
@@ -493,25 +493,25 @@ DRIVER_INIT( minefld )
 	RAM = memory_region(machine, "gfx1");
 	len = memory_region_length(machine, "gfx1");
 
-	scratch = alloc_array_or_die(UINT8, len);
+	scratch = auto_alloc_array(machine, UINT8, len);
 
-		memcpy(scratch, RAM, len);
+	memcpy(scratch, RAM, len);
 
-		for (i = 0; i < len; i++)
-		{
-			int j;
+	for (i = 0; i < len; i++)
+	{
+		int j;
 
 
-			j  = i & 0xd5f;
-			j |= ( bit(i,3) ^ bit(i,7) ) << 5;
-			j |= ( bit(i,2) ^ bit(i,9) ^ ( bit(i,0) & bit(i,5) ) ^
-				 ( bit(i,3) & bit(i,7) & ( bit(i,0) ^ bit(i,5) ))) << 7;
-			j |= ( bit(i,0) ^ bit(i,5) ^ ( bit(i,3) & bit(i,7) ) ) << 9;
+		j  = i & 0xd5f;
+		j |= ( bit(i,3) ^ bit(i,7) ) << 5;
+		j |= ( bit(i,2) ^ bit(i,9) ^ ( bit(i,0) & bit(i,5) ) ^
+			 ( bit(i,3) & bit(i,7) & ( bit(i,0) ^ bit(i,5) ))) << 7;
+		j |= ( bit(i,0) ^ bit(i,5) ^ ( bit(i,3) & bit(i,7) ) ) << 9;
 
-			RAM[i] = scratch[j];
-		}
+		RAM[i] = scratch[j];
+	}
 
-		free(scratch);
+	auto_free(machine, scratch);
 }
 
 #ifdef UNUSED_FUNCTION

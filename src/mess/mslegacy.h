@@ -10,7 +10,7 @@
 #ifndef MSLEGACY_H
 #define MSLEGACY_H
 
-#include "driver.h"
+#include "emu.h"
 
 enum
 {

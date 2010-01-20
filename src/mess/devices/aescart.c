@@ -11,7 +11,7 @@
     uses this at some future point for MVS multi-cart.
 
 *********************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "aescart.h"
 #include "cartslot.h"
 #include "machine/ti99_4x.h"
@@ -118,7 +118,7 @@ static aescartridge_t *assemble_common(running_machine *machine, const device_co
 	{
 		sprintf(sprname1, "p%d", i+1);
 
-		socketcont = cartslot_get_socket(cartslot, sprname1);
+		socketcont = (UINT8*)cartslot_get_socket(cartslot, sprname1);
 		reslength = cartslot_get_resource_length(cartslot, sprname1);
 
 		if (socketcont != NULL)
@@ -129,7 +129,7 @@ static aescartridge_t *assemble_common(running_machine *machine, const device_co
 	}
 
 	// 1 m1 ROM
-	socketcont = cartslot_get_socket(cartslot, "m1");
+	socketcont = (UINT8*)cartslot_get_socket(cartslot, "m1");
 	reslength = cartslot_get_resource_length(cartslot, "m1");
 	if (socketcont != NULL)
 	{
@@ -147,7 +147,7 @@ static aescartridge_t *assemble_common(running_machine *machine, const device_co
 	{
 		sprintf(sprname1, "v1%d", i+1);
 
-		socketcont = cartslot_get_socket(cartslot, sprname1);
+		socketcont = (UINT8*)cartslot_get_socket(cartslot, sprname1);
 		reslength = cartslot_get_resource_length(cartslot, sprname1);
 
 		if (socketcont != NULL)
@@ -164,7 +164,7 @@ static aescartridge_t *assemble_common(running_machine *machine, const device_co
 	{
 		sprintf(sprname1, "v2%d", i+1);
 
-		socketcont = cartslot_get_socket(cartslot, sprname1);
+		socketcont = (UINT8*)cartslot_get_socket(cartslot, sprname1);
 		reslength = cartslot_get_resource_length(cartslot, sprname1);
 
 		if (socketcont != NULL)
@@ -175,7 +175,7 @@ static aescartridge_t *assemble_common(running_machine *machine, const device_co
 	}
 
 	// 1 s1 ROM
-	socketcont = cartslot_get_socket(cartslot, "s1");
+	socketcont = (UINT8*)cartslot_get_socket(cartslot, "s1");
 	reslength = cartslot_get_resource_length(cartslot, "s1");
 	if (socketcont != NULL)
 	{
@@ -195,8 +195,8 @@ static aescartridge_t *assemble_common(running_machine *machine, const device_co
 		sprintf(sprname1, "c%d", i+1);
 		sprintf(sprname2, "c%d", i+2);
 
-		spr1 = cartslot_get_socket(cartslot, sprname1);
-		spr2 = cartslot_get_socket(cartslot, sprname2);
+		spr1 = (UINT8*)cartslot_get_socket(cartslot, sprname1);
+		spr2 = (UINT8*)cartslot_get_socket(cartslot, sprname2);
 		reslength = cartslot_get_resource_length(cartslot, sprname1);
 
 		if ((spr1) && (spr2))
@@ -235,7 +235,7 @@ static void set_pointers(const device_config *pcb, int index)
 static DEVICE_START(aes_pcb_none)
 {
 	/* device is aes_cartslot:cartridge:pcb */
-//  printf("DEVICE_START(aes_pcb_none), tag of device=%s\n", device->tag);
+//  printf("DEVICE_START(aes_pcb_none), tag of device=%s\n", device->tag.cstr());
 	set_pointers(device, get_index_from_tagname(device->owner)-1);
 }
 
@@ -248,7 +248,7 @@ static DEVICE_START(aes_pcb_none)
 static DEVICE_START(aes_pcb_std)
 {
 	/* device is aes_cartslot:cartridge:pcb */
-//  printf("DEVICE_START(aes_pcb_std), tag of device=%s\n", device->tag);
+//  printf("DEVICE_START(aes_pcb_std), tag of device=%s\n", device->tag.cstr());
 	set_pointers(device, get_index_from_tagname(device->owner)-1);
 }
 
@@ -396,14 +396,13 @@ DEVICE_GET_INFO(aes_cartridge_pcb_std)
 */
 static DEVICE_START( aes_cartridge )
 {
-	cartslot_t *cart = device->token;
-	astring *tempstring = astring_alloc();
+	cartslot_t *cart = (cartslot_t *)device->token;
+	astring tempstring;
 
 	/* find the PCB device */
 	cart->pcb_device = devtag_get_device(
 		device->machine,
-		device_build_tag(tempstring, device, TAG_PCB));
-	astring_free(tempstring);
+		device_build_tag(tempstring, device, TAG_PCB));	
 }
 
 /*

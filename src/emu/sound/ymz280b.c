@@ -21,9 +21,7 @@
 */
 
 
-#include <math.h>
-
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "ymz280b.h"
 
@@ -652,7 +650,7 @@ static DEVICE_START( ymz280b )
 
 	/* initialize the rest of the structure */
 	chip->master_clock = (double)device->clock / 384.0;
-	chip->region_base = device->region;
+	chip->region_base = *device->region;
 	chip->irq_callback = intf->irq_callback;
 
 	/* create the stream */

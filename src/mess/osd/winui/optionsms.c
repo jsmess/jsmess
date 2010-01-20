@@ -8,7 +8,7 @@
 #include <wingdi.h>
 #include <winuser.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "mui_util.h"
 #include "mui_opts.h"
 #include "optionsms.h"

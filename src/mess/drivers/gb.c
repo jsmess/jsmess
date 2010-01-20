@@ -435,7 +435,7 @@ space. This mapper uses 32KB sized banks.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/gb.h"
 #include "cpu/lr35902/lr35902.h"
 #include "devices/cartslot.h"

@@ -8,7 +8,7 @@
 
 #include <ctype.h>
 
-#include "mame.h"
+#include "emu.h"
 #include "mess.h"
 #include "device.h"
 #include "inputx.h"

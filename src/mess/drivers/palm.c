@@ -9,7 +9,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/mc68328.h"
 #include "sound/dac.h"
@@ -107,7 +107,7 @@ static MACHINE_RESET( palm )
     memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, messram_get_size(devtag_get_device(machine, "messram")));
     memcpy(messram_get_ptr(devtag_get_device(machine, "messram")), bios, 0x20000);
 
-    device_reset(cputag_get_cpu(machine, "maincpu"));
+    device_reset(devtag_get_device(machine, "maincpu"));
 }
 
 
@@ -137,7 +137,7 @@ static WRITE8_DEVICE_HANDLER( palm_dac_transition )
 
 static DRIVER_INIT( palm )
 {
-    debug_cpu_set_dasm_override(cputag_get_cpu(machine, "maincpu"), CPU_DISASSEMBLE_NAME(palm_dasm_override));
+    debug_cpu_set_dasm_override(devtag_get_device(machine, "maincpu"), CPU_DISASSEMBLE_NAME(palm_dasm_override));
 }
 
 static const mc68328_interface palm_dragonball_iface =

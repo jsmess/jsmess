@@ -15,7 +15,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "upd1990a.h"
 
 /***************************************************************************
@@ -444,7 +444,7 @@ static void advance_seconds(upd1990a_t *upd1990a)
 
 static TIMER_CALLBACK( clock_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	upd1990a_t *upd1990a = get_safe_token(device);
 
 	advance_seconds(upd1990a);
@@ -456,7 +456,7 @@ static TIMER_CALLBACK( clock_tick )
 
 static TIMER_CALLBACK( tp_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	upd1990a_t *upd1990a = get_safe_token(device);
 
 	upd1990a->tp = !upd1990a->tp;
@@ -472,7 +472,7 @@ static TIMER_CALLBACK( tp_tick )
 
 static TIMER_CALLBACK( data_out_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	upd1990a_t *upd1990a = get_safe_token(device);
 
 	upd1990a->data_out = !upd1990a->data_out;

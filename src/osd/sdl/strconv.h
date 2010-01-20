@@ -10,11 +10,15 @@
 #ifndef __SDLSTRCONV__
 #define __SDLSTRCONV__
 
-#include "mamecore.h"
+#include "osdcore.h"
+
+
 
 //============================================================
 //  FUNCTION PROTOTYPES
 //============================================================
+
+#ifdef SDLMAME_WIN32
 
 CHAR *astring_from_utf8(const char *s) ATTR_MALLOC;
 char *utf8_from_astring(const CHAR *s) ATTR_MALLOC;
@@ -30,7 +34,7 @@ char *utf8_from_wstring(const WCHAR *s) ATTR_MALLOC;
 #define utf8_from_tstring	utf8_from_astring
 #endif // UNICODE
 
-
+#endif //SDLMAME_WIN32
 
 #endif // __SDLSTRCONV__
 

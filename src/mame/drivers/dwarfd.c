@@ -78,9 +78,176 @@ A |||                                                     |______|   |          
   3A (63S080N) dumped as 82S123
   7C = non populated
 
+=====================================================================================================
+(quarterh, quarterhb)
+
+----------------------------------------
+Quarterhorse by Electro-Sport Inc (1983)
+----------------------------------------
+
+Dumped by Ruben Panossian
+
+
+
+
+Location    Device         File ID            Checksum
+------------------------------------------------------
+CPU 9L       2732    9l_qh_10-2402_7193.bin     5B36    [ CPU ROM 1 Disc No.* ]
+CPU 9K       2732    9k_qh_10-2401_8193.bin     0EE6    [ CPU ROM 2 Disc No.* ]
+CPU 9J       2732    9j_qh_10-2400_9193.bin     6119    [ CPU ROM 3 Disc No.* ]
+CPU 9H       2732    9h_qh_50-2399_10193.bin    8D7C    [ CPU ROM 4 Disc No.* ]
+
+CPU 9L       2732    9l_qh_60-2402_7193.bin     8731    [ CPU ROM 1 Disc No.* ]
+CPU 9K       2732    9k_qh_60-2401_8193.bin     3C36    [ CPU ROM 2 Disc No.* ]
+CPU 9J       2732    9j_qh_60-2400_9193.bin     5165    [ CPU ROM 3 Disc No.* ]
+CPU 9H       2732    9h_qh_80-2399_10193.bin    DB83    [ CPU ROM 4 Disc No.* ]
+
+CPU 6D       2716    6d_qh_01-2398_11193.bin    9AA3    [    Character B2     ]
+CPU 6C       2716    6c_qh_01-2397_12193.bin    33C3    [    Character A2     ]
+CPU 6B       2716    6b_qh_01-2396_13193.bin    A95A    [    Character B1     ]
+CPU 6A       2716    6a_qh_01-2395_14193.bin    43C0    [    Character A1     ]
+CPU 3A      82S23    3a_bprom.bin               1005
+CPU 7H      82S23    7H_bprom.bin               1EB4
+LDP 2D       2716    -G_L-.bin                  0699    [      LDP Ctrl       ]
+
+
+* Disc ID: Rodessch & Associates, INC. Model QAB, Serial 01292 Pioneer Double sided
+  Disc ID: Rodessch & Associates, INC. Model QAA, Serial 00857 Pioneer Double sided
+
+
+
+Notes:  CPU - Main PCB                     QH Processor Board 5/5/83    13-637 B
+        LDP - LDP CTRL, Audio Input PCB    LDP Control                  13-909 A
+        VID - Video overlay PCB            ESI Video Switcher PCB       13-2321
+        DEC - NTSC Decoder PCB             ESI NTSC Decoder BD          13-2133
+        VLT - Voltage Monitor              ESI Voltage/Static Monitor   13-1586
+
+        Uses either a Pioneer PR-8210 or Magnavox VC-8010 Laserdisc player
+        The laserdisc player is modified - has a custom communication & audio cable
+
+
+
+Brief Hardware Overview
+-----------------------
+
+CPU 5F  Y1            10.595MHz Xtal
+CPU 7K  uPD8085AC     8085 CPU
+CPU 4E  P8275         Prog CRT Controller, Video Output Graphics Controller
+CPU 4D  AY-3-8910     Programmable Sound Generator
+CPU 9F  2114          1024x4 SRAM
+CPU 9E  2114          1024x4 SRAM
+CPU 9D  2114          1024x4 SRAM
+CPU 9C  M3-6514C      1024x4 CMOS SRAM, Battery Backed
+CPU 8F  2114          1024x4 SRAM
+CPU 8E  2114          1024x4 SRAM
+CPU 8D  2114          1024x4 SRAM
+CPU 8C  M3-6514C      1024x4 CMOS SRAM, Battery Backed
+
+=====================================================================================
+(quarterhb)
+
+----------------------------------------
+Quarterhorse by Electro-Sport Inc (1983)
+----------------------------------------
+
+Dumped by Grull Osgo
+
+Location    Device   File ID    Checksum
+----------------------------------------
+CPU 10A      27C128  a1.bin     9f26    [ CPU ROM   ]
+
+CPU 6H       27C128  a2.bin     7ccc    [ Character ]
+CPU 6K       27C128  a3.bin     ba34    [ Character ]
+
+LDP O7       27c128  a4.bin     2120    [ LDP Ctrl  ] (Add-On Board "7-50A" on O7-O9-010 IC Sockets)
+
+
+Notes:  CPU - Main Board includes NTSC decoder, video Switch & Audio control.
+    No Model or Serial number on PCB.
+        Uses a Pioneer LD-V2000 Laserdisc player.
+        The laserdisc player is modified - has a custom communication & audio cable (10 Wires Flat Cable).
+
+Brief Hardware Overview
+-----------------------
+
+CPU 5E  X-TAL         10.00MHz Xtal
+CPU 8B  M5L8085AC     8085 CPU
+CPU 4F  P8275         Prog CRT Controller, Video Output Graphics Controller
+CPU 4G  AY-3-8910     Programmable Sound Generator
+CPU 10B TMM2016       2048x8 SRAM, Battery Backed
+CPU 10D UM6116        2048X8 SRAM
+CPU 3K  82S123        32X8   TTL PROM
+CPU 4N  uPC1325       NTSC Decoder
+CPU 3A  NEC C1182H    Audio Amplifier
+CPU 10K Dip-SW        8 x Dip Switch bank.
+
+
+Quarter Horse LD (Pioneer)
+
+It has oly one side recorded. The other side has a video with a single slide ad. that says
+"The recorded  material is on the other side"
+
+Disk 1
+------
+Sticker:
+
+    09-251  A
+
+    HORSE RACE I
+
+    QUARTER HORSE
+
+    (C) 1981 DALE FRANK RODESCH
+    SAN DIEGO, CA USA
+
+Stamp on disk:
+
+    09-251A1-15
+
+
+
+Disk 2
+------
+Sticker:
+
+
+    09251   1
+
+    QUARTER HORSE
+
+    VIDEO DISK
+
+    (C) 1981 DALE FRANK RODESCH
+
+
+Stamp on disk:
+
+    09-251A1-01
+
+    09-251    A
+
+
+Disk 1
+------
+Sticker:
+
+    09-251  A
+
+    HORSE RACE I
+
+    QUARTER HORSE
+
+    (C) 1981 DALE FRANK RODESCH
+
+Stamp on disk:
+
+    09-251A1-06
+
+
+
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
@@ -809,6 +976,99 @@ ROM_START( dwarfd )
 	ROM_LOAD( "7h_7602.bin",0x20, 0x20, CRC(d5457333) SHA1(5872c868638c08faef7365d9c6e41dc3f070bd97) )
 ROM_END
 
+/*
+bp 32f9
+do pc=3319
+*/
+ROM_START( quarterh )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "9l_qh_60-2402_7193.bin",  0x0000, 0x1000, CRC(6a097741) SHA1(f42de58743f79447c8b2b7e3f2d1aa87da663231) )
+	ROM_LOAD( "9k_qh_60-2401_8193.bin",  0x1000, 0x1000, CRC(d958078c) SHA1(66d9cfaafe06042c93a4adb16480b4655857beeb) )
+	ROM_LOAD( "9j_qh_60-2400_9193.bin",  0x2000, 0x1000, CRC(90efa26e) SHA1(aa29e2d90692cd97a9d18c93d8a2ea13ef1eab71) )
+	ROM_LOAD( "9h_qh_80-2399_10193.bin", 0x3000, 0x1000, CRC(20be3f2f) SHA1(b6a67b664cc899e997742fb4350e3c8c1e23664a) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "6a_qh_01-2395_14193.bin",0x1000, 0x0800, CRC(98b8e844) SHA1(c8a2ec3cb61d6cdc3e8fadba23a9850afd8db05b) )
+	ROM_LOAD16_BYTE( "6b_qh_01-2396_13193.bin",0x0000, 0x0800, CRC(03a21561) SHA1(0f6d8d13d81712e3e1971fe41e48ce5dff888dfd) )
+	ROM_LOAD16_BYTE( "6c_qh_01-2397_12193.bin",0x1001, 0x0800, CRC(b0306417) SHA1(d8322009f39c937b6dc8fe3f591734f06213a9a3) )
+	ROM_LOAD16_BYTE( "6d_qh_01-2398_11193.bin",0x0001, 0x0800, CRC(1db80656) SHA1(5cbfc2e4ba0c8028ff5e0ba2ec6220d8afb8cfc2) )
+
+	ROM_REGION( 0x4000*2, "gfx2", 0 )
+	ROM_FILL(0,  0x4000*2, 0)
+
+	ROM_REGION( 0x800, "ld_data", 0 )
+	ROM_LOAD( "-g_l-.bin",  0x0000, 0x0800, CRC(05c09fa6) SHA1(92ec4c225e477194d2c134403d9ebf922149b51c) )
+
+	ROM_REGION( 0x40, "proms", 0 )
+	/* ??? colors */
+	ROM_LOAD( "3a_bprom.bin",0x00, 0x20, CRC(d4febd88) SHA1(37abb6508b375784f35d3eedc75ec7df4ef86048) )
+	/* memory map */
+	ROM_LOAD( "7h_bprom.bin",0x20, 0x20, CRC(c9618de2) SHA1(d5636546dbc57e6aab01dab79b2ead1dfef8fa5c) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "quarterh", 0, NO_DUMP )
+ROM_END
+
+ROM_START( quarterha )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "9l_qh_10-2402_7193.bin",  0x0000, 0x1000, CRC(4a688031) SHA1(ba5801dee72f28366d44e4ff80a4c8c93893617d) )
+	ROM_LOAD( "9k_qh_10-2401_8193.bin",  0x1000, 0x1000, CRC(f5239ec6) SHA1(822522ac2bb9221f25eaad88751216acf3fe6d41) )
+	ROM_LOAD( "9j_qh_10-2400_9193.bin",  0x2000, 0x1000, CRC(0b90860f) SHA1(6e5f79e1a7e1b477da8e0483f75e23129604564c) )
+	ROM_LOAD( "9h_qh_50-2399_10193.bin", 0x3000, 0x1000, CRC(7d96c776) SHA1(e97080b0b0f524c3f313d5f7b7f3b093fb071bf9) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "6a_qh_01-2395_14193.bin",0x1000, 0x0800, CRC(98b8e844) SHA1(c8a2ec3cb61d6cdc3e8fadba23a9850afd8db05b) )
+	ROM_LOAD16_BYTE( "6b_qh_01-2396_13193.bin",0x0000, 0x0800, CRC(03a21561) SHA1(0f6d8d13d81712e3e1971fe41e48ce5dff888dfd) )
+	ROM_LOAD16_BYTE( "6c_qh_01-2397_12193.bin",0x1001, 0x0800, CRC(b0306417) SHA1(d8322009f39c937b6dc8fe3f591734f06213a9a3) )
+	ROM_LOAD16_BYTE( "6d_qh_01-2398_11193.bin",0x0001, 0x0800, CRC(1db80656) SHA1(5cbfc2e4ba0c8028ff5e0ba2ec6220d8afb8cfc2) )
+
+	ROM_REGION( 0x4000*2, "gfx2", 0 )
+	ROM_FILL(0,  0x4000*2, 0)
+
+	ROM_REGION( 0x800, "ld_data", 0 )
+	ROM_LOAD( "-g_l-.bin",  0x0000, 0x0800, CRC(05c09fa6) SHA1(92ec4c225e477194d2c134403d9ebf922149b51c) )
+
+	ROM_REGION( 0x40, "proms", 0 )
+	/* ??? colors */
+	ROM_LOAD( "3a_bprom.bin",0x00, 0x20, CRC(d4febd88) SHA1(37abb6508b375784f35d3eedc75ec7df4ef86048) )
+	/* memory map */
+	ROM_LOAD( "7h_bprom.bin",0x20, 0x20, CRC(c9618de2) SHA1(d5636546dbc57e6aab01dab79b2ead1dfef8fa5c) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "quarterh", 0, NO_DUMP )
+ROM_END
+
+ROM_START( quarterhb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a1.bin",  0x0000, 0x4000, CRC(9eace6a3) SHA1(285945034b73ff660a5a138d7be2fa431c0872e1) )
+
+	ROM_REGION( 0x8000, "gfx_data", 0 )
+	ROM_LOAD16_BYTE( "a2.bin",0x0001, 0x4000, CRC(b8cf5e27) SHA1(a5b451ab94ea1f2dda18a2d8ef9b8e0e46621420) ) // - oversized dumps perhaps?
+	ROM_LOAD16_BYTE( "a3.bin",0x0000, 0x4000, CRC(8b5296b1) SHA1(9d27d85f2edb44b96acce3c3f3e611217dcef70d) ) // /
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_COPY("gfx_data", 0x0000, 0x1000, 0x0800 )
+	ROM_COPY("gfx_data", 0x0800, 0x0000, 0x0800 )
+	ROM_COPY("gfx_data", 0x1000, 0x1800, 0x0800 )
+	ROM_COPY("gfx_data", 0x1800, 0x0800, 0x0800 )
+
+	ROM_REGION( 0x4000*2, "gfx2", 0 )
+	ROM_FILL(0,  0x4000*2, 0)
+
+	ROM_REGION( 0x800, "ld_data", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x40, "proms", 0 )
+	/* ??? colors */
+	ROM_LOAD( "3a_50-1381_63s080n.bin",0x00, 0x20, CRC(451d0a72) SHA1(9ff6e2c5bd2b57bd607cb33e60e7ed25bea164b3) )
+	/* memory map */
+//  ROM_LOAD( "7h_7602.bin",0x20, 0x20, BAD_DUMP CRC(451d0a72) SHA1(9ff6e2c5bd2b57bd607cb33e60e7ed25bea164b3) )
+	ROM_LOAD( "7h_bprom.bin",0x20, 0x20, BAD_DUMP CRC(c9618de2) SHA1(d5636546dbc57e6aab01dab79b2ead1dfef8fa5c) ) //taken from the other set, might be bad
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "quarterh", 0, NO_DUMP )
+ROM_END
+
+
 static DRIVER_INIT(dwarfd)
 {
 	dwarfd_state *state = (dwarfd_state *)machine->driver_data;
@@ -859,4 +1119,7 @@ static DRIVER_INIT(dwarfd)
 
 }
 
-GAME( 1981, dwarfd, 0, dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Dwarfs Den", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1981, dwarfd,   0,         dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Dwarfs Den",            GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1983, quarterh, 0,         dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 1, Pioneer PR-8210)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1983, quarterha, quarterh, dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 2, Pioneer PR-8210)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1983, quarterhb, quarterh, dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 3, Pioneer LD-V2000)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

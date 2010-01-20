@@ -12,7 +12,7 @@ ToDo:
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/aim65.h"
 #include "cpu/m6502/m6502.h"
 #include "video/dl1416.h"

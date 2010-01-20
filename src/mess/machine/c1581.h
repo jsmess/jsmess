@@ -10,7 +10,7 @@
 #ifndef __C1581__
 #define __C1581__
 
-#include "driver.h"
+#include "emu.h"
 
 /***************************************************************************
     MACROS / CONSTANTS

@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/amiga.h"
 #include "amigakbd.h"
 #include "machine/6526cia.h"

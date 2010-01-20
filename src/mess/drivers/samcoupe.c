@@ -29,7 +29,7 @@
 ***************************************************************************/
 
 /* core includes */
-#include "driver.h"
+#include "emu.h"
 #include "includes/samcoupe.h"
 
 /* components */
@@ -118,13 +118,13 @@ static READ8_HANDLER( samcoupe_pen_r )
 
 static WRITE8_HANDLER( samcoupe_clut_w )
 {
-	coupe_asic *asic = space->machine->driver_data;
+	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
 	asic->clut[(offset >> 8) & 0x0f] = data & 0x7f;
 }
 
 static READ8_HANDLER( samcoupe_status_r )
 {
-	coupe_asic *asic = space->machine->driver_data;
+	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
 	UINT8 data = 0xe0;
 
 	/* bit 5-7, keyboard input */
@@ -145,20 +145,20 @@ static READ8_HANDLER( samcoupe_status_r )
 
 static WRITE8_HANDLER( samcoupe_line_int_w )
 {
-	coupe_asic *asic = space->machine->driver_data;
+	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
 	asic->line_int = data;
 }
 
 static READ8_HANDLER( samcoupe_lmpr_r )
 {
-	coupe_asic *asic = space->machine->driver_data;
+	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
 	return asic->lmpr;
 }
 
 static WRITE8_HANDLER( samcoupe_lmpr_w )
 {
 	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	coupe_asic *asic = space->machine->driver_data;
+	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
 
 	asic->lmpr = data;
 	samcoupe_update_memory(space_program);
@@ -166,14 +166,14 @@ static WRITE8_HANDLER( samcoupe_lmpr_w )
 
 static READ8_HANDLER( samcoupe_hmpr_r )
 {
-	coupe_asic *asic = space->machine->driver_data;
+	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
 	return asic->hmpr;
 }
 
 static WRITE8_HANDLER( samcoupe_hmpr_w )
 {
 	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	coupe_asic *asic = space->machine->driver_data;
+	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
 
 	asic->hmpr = data;
 	samcoupe_update_memory(space_program);
@@ -181,14 +181,14 @@ static WRITE8_HANDLER( samcoupe_hmpr_w )
 
 static READ8_HANDLER( samcoupe_vmpr_r )
 {
-	coupe_asic *asic = space->machine->driver_data;
+	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
 	return asic->vmpr;
 }
 
 static WRITE8_HANDLER( samcoupe_vmpr_w )
 {
 	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	coupe_asic *asic = space->machine->driver_data;
+	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
 
 	asic->vmpr = data;
 	samcoupe_update_memory(space_program);
@@ -247,7 +247,7 @@ static WRITE8_HANDLER( samcoupe_border_w )
 {
 	const device_config *cassette = devtag_get_device(space->machine, "cassette");
 	const device_config *speaker = devtag_get_device(space->machine, "speaker");
-	coupe_asic *asic = space->machine->driver_data;
+	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
 
 	asic->border = data;
 
@@ -260,7 +260,7 @@ static WRITE8_HANDLER( samcoupe_border_w )
 
 static READ8_HANDLER( samcoupe_attributes_r )
 {
-	coupe_asic *asic = space->machine->driver_data;
+	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
 
 	if (video_screen_get_vblank(space->machine->primary_screen))
 		return 0xff; /* border areas return 0xff */
@@ -326,7 +326,7 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( irq_off )
 {
-	coupe_asic *asic = machine->driver_data;
+	coupe_asic *asic = (coupe_asic *)machine->driver_data;
 
 	/* clear interrupt */
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
@@ -337,7 +337,7 @@ static TIMER_CALLBACK( irq_off )
 
 void samcoupe_irq(const device_config *device, UINT8 src)
 {
-	coupe_asic *asic = device->machine->driver_data;
+	coupe_asic *asic = (coupe_asic *)device->machine->driver_data;
 
 	/* assert irq and a timer to set it off again */
 	cpu_set_input_line(device, 0, ASSERT_LINE);
@@ -515,7 +515,7 @@ static const cassette_config samcoupe_cassette_config =
 {
 	tzx_cassette_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 };
 
 

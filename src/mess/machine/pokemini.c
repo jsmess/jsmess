@@ -6,7 +6,7 @@
 **********************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/speaker.h"
 #include "machine/i2cmem.h"
 #include "includes/pokemini.h"

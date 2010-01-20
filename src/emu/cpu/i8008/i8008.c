@@ -7,6 +7,7 @@
  *   Initial version by Miodrag Milanovic
  *
  *****************************************************************************/
+#include "emu.h"
 #include "debugger.h"
 #include "i8008.h"
 
@@ -568,8 +569,8 @@ static CPU_INIT( i8008 )
 
 	cpustate->device = device;
 
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->irq_callback = irqcallback;
 

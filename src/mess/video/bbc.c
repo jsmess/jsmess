@@ -8,7 +8,7 @@
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/bbc.h"
 #include "video/m6845.h"
 #include "saa505x.h"

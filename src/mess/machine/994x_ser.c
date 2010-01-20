@@ -20,7 +20,7 @@
     Raphael Nabet, 2003.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "ti99_4x.h"
 #include "99_peb.h"
 #include "tms9902.h"

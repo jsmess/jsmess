@@ -1,6 +1,6 @@
 /* Super80.c written by Robbbert, 2005-2009. See the MESS wiki for documentation. */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "sound/wave.h"
@@ -428,7 +428,7 @@ static const cassette_config super80_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 };
 
 

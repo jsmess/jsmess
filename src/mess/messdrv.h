@@ -6,22 +6,20 @@
 
 ***************************************************************************/
 
-#ifndef MESSDRV_H
-#define MESSDRV_H
+#ifndef __MESSDRV_H__
+#define __MESSDRV_H__
 
 #include <assert.h>
-
 #include "inputx.h"
-#include "unicode.h"
 
 /******************************************************************************
  * MESS' version of the GAME() macros of MAME
  * CONS is for consoles
  * COMP is for computers
  ******************************************************************************/
+ 
 #define CONS(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,COMPANY,FULLNAME,FLAGS)	\
-extern const game_driver driver_##NAME;   \
-const game_driver driver_##NAME = 	\
+extern const game_driver GAME_NAME(NAME) = 	\
 {											\
 	__FILE__,								\
 	#PARENT,								\
@@ -29,18 +27,17 @@ const game_driver driver_##NAME = 	\
 	FULLNAME,								\
 	#YEAR,									\
 	COMPANY,								\
-	machine_config_##MACHINE,				\
-	ipt_##INPUT,							\
-	driver_init_##INIT,						\
-	rom_##NAME,								\
+	MACHINE_DRIVER_NAME(MACHINE),			\
+	INPUT_PORTS_NAME(INPUT),				\
+	DRIVER_INIT_NAME(INIT),					\
+	ROM_NAME(NAME),							\
 	#COMPAT,								\
 	ROT0|(FLAGS),							\
 	NULL									\
 };
 
 #define COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,COMPANY,FULLNAME,FLAGS)	\
-extern const game_driver driver_##NAME;   \
-const game_driver driver_##NAME = 	\
+extern const game_driver GAME_NAME(NAME) = 	\
 {											\
 	__FILE__,								\
 	#PARENT,								\
@@ -48,13 +45,13 @@ const game_driver driver_##NAME = 	\
 	FULLNAME,								\
 	#YEAR,									\
 	COMPANY,								\
-	machine_config_##MACHINE,				\
-	ipt_##INPUT,							\
-	driver_init_##INIT,						\
-	rom_##NAME,								\
+	MACHINE_DRIVER_NAME(MACHINE),			\
+	INPUT_PORTS_NAME(INPUT),				\
+	DRIVER_INIT_NAME(INIT),					\
+	ROM_NAME(NAME),							\
 	#COMPAT,								\
 	ROT0|GAME_COMPUTER|(FLAGS),				\
 	NULL									\
 };
 
-#endif /* MESSDRV_H */
+#endif /* __MESSDRV_H__ */

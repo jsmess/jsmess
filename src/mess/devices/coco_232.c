@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cococart.h"
 #include "machine/6551.h"
 
@@ -54,14 +54,12 @@ INLINE coco_rs232_pcb_t *get_token(const device_config *device)
 static DEVICE_START(coco_rs232)
 {
 	coco_rs232_pcb_t *pak_pcb = get_token(device);
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 
 	memset(pak_pcb, 0, sizeof(*pak_pcb));
 	pak_pcb->cococart = device->owner->owner;
 	pak_pcb->cart = device->owner;
 	pak_pcb->uart = devtag_get_device(device->machine, device_build_tag(tempstring, device, UART_TAG));
-
-	astring_free(tempstring);
 }
 
 

@@ -27,7 +27,7 @@
 #include <assert.h>
 #include <math.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/6883sam.h"
 #include "video/coco6847.h"
 #include "includes/coco.h"

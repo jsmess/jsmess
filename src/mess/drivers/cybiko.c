@@ -11,7 +11,7 @@
 */
 
 /* Core includes */
-#include "driver.h"
+#include "emu.h"
 #include "sound/speaker.h"
 #include "includes/cybiko.h"
 

@@ -9,7 +9,7 @@ to make the standard pc driver one level more complex, so own driver
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i86/i86.h"
 #include "devices/cartslot.h"
 #include "machine/pic8259.h"
@@ -433,7 +433,7 @@ static IRQ_CALLBACK(pasogo_irq_callback)
 
 static MACHINE_RESET( pasogo )
 {
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), pasogo_irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), pasogo_irq_callback);
 }
 
 //static const unsigned i86_address_mask = 0x000fffff;

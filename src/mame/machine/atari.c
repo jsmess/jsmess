@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/atari.h"
 #include "sound/pokey.h"
@@ -324,7 +324,7 @@ static void console_write(const address_space *space, UINT8 data)
 {
 	const device_config *dac = devtag_get_device(space->machine, "dac");
 	if (data & 0x08)
-		dac_data_w(dac, -120);
+		dac_data_w(dac, (UINT8)-120);
 	else
 		dac_data_w(dac, +120);
 }
@@ -342,9 +342,9 @@ void atari_machine_start(running_machine *machine)
 
 	/* GTIA */
 	memset(&gtia_intf, 0, sizeof(gtia_intf));
-	if (input_port_by_tag(&machine->portlist, "console") != NULL)
+	if (machine->port("console") != NULL)
 		gtia_intf.console_read = console_read;
-	if (devtag_get_device(machine, "dac") != NULL)
+	if (machine->device("dac") != NULL)
 		gtia_intf.console_write = console_write;
 	gtia_init(machine, &gtia_intf);
 

@@ -45,7 +45,7 @@
 #include <d3d9.h>
 
 // MAME headers
-#include "mame.h"
+#include "emu.h"
 
 // MAMEOS headers
 #include "d3dintf.h"
@@ -134,7 +134,7 @@ d3d *drawd3d9_init(void)
 	}
 
 	// allocate an object to hold our data
-	d3dptr = alloc_or_die(d3d);
+	d3dptr = global_alloc(d3d);
 	d3dptr->version = 9;
 	d3dptr->d3dobj = d3d9;
 	d3dptr->dllhandle = dllhandle;
@@ -256,7 +256,7 @@ static ULONG d3d_release(d3d *d3dptr)
 	IDirect3D9 *d3d9 = (IDirect3D9 *)d3dptr->d3dobj;
 	ULONG result = IDirect3D9_Release(d3d9);
 	FreeLibrary(d3dptr->dllhandle);
-	free(d3dptr);
+	global_free(d3dptr);
 	return result;
 }
 

@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/terminal.h"
 #include "devices/snapquik.h"
@@ -82,7 +82,7 @@ QUICKLOAD_LOAD(altair)
 static MACHINE_RESET(altair)
 {
 	// Set startup addess done by turn-key
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), I8085_PC, 0xFD00);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), I8085_PC, 0xFD00);
 
 	term_data = 0;
 }

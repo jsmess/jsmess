@@ -11,12 +11,12 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __ROMLOAD_H__
 #define __ROMLOAD_H__
-
-#include "mamecore.h"
-#include "chd.h"
-#include "options.h"
 
 
 
@@ -126,8 +126,7 @@ enum
 typedef struct _rom_source rom_source;
 
 
-typedef struct _rom_entry rom_entry;
-struct _rom_entry
+struct rom_entry
 {
 	const char *	_name;				/* name of the file to load */
 	const char *	_hashdata;			/* hashing informations (checksums) */
@@ -307,7 +306,7 @@ int rom_source_is_gamedrv(const game_driver *drv, const rom_source *source);
 UINT32 rom_file_size(const rom_entry *romp);
 
 /* return the appropriate name for a rom region */
-astring *rom_region_name(astring *result, const game_driver *drv, const rom_source *source, const rom_entry *romp);
+astring &rom_region_name(astring &result, const game_driver *drv, const rom_source *source, const rom_entry *romp);
 
 
 

@@ -26,7 +26,7 @@ IRQ mode 1
 NMI
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/cgenie.h"
 #include "devices/flopdrv.h"
@@ -490,7 +490,7 @@ static const cassette_config cgenie_cassette_config =
 {
 	cgenie_cassette_formats,
 	NULL,
-	CASSETTE_STOPPED
+	(cassette_state)(CASSETTE_STOPPED)
 };
 
 // This is currently broken

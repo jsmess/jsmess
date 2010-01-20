@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "pc_mda.h"
 #include "pc_video.h"
 #include "video/mc6845.h"

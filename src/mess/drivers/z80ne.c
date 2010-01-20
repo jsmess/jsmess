@@ -89,7 +89,7 @@
 ******************************************************************************/
 
 /* Core includes */
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/z80ne.h"
 #include "devices/flopdrv.h"
@@ -419,14 +419,14 @@ static const cassette_config z80ne_cassettea_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 };
 
 static const cassette_config z80ne_cassetteb_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 };
 
 static const kr2376_interface lx388_kr2376_interface =

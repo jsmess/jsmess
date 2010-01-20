@@ -21,9 +21,7 @@
  **********************************************************************************************/
 
 
-#include <math.h>
-
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "okim6295.h"
 
@@ -216,7 +214,7 @@ static void generate_adpcm(okim6295_state *chip, struct ADPCMVoice *voice, INT16
 		while (samples)
 		{
 			/* compute the new amplitude and update the current step */
-			int nibble = memory_raw_read_byte(chip->device->space[0], base + sample / 2) >> (((sample & 1) << 2) ^ 4);
+			int nibble = memory_raw_read_byte(chip->device->space(), base + sample / 2) >> (((sample & 1) << 2) ^ 4);
 
 			/* output to the buffer, scaling by the volume */
 			/* signal in range -2048..2047, volume in range 2..32 => signal * volume / 2 in range -32768..32767 */
@@ -407,7 +405,7 @@ void okim6295_set_bank_base(const device_config *device, int base)
 	if (!info->bank_installed && base != 0)
 	{
 		/* override our memory map with a bank */
-		memory_install_read_bank(device->space[0], 0x00000, 0x3ffff, 0, 0, device->tag);
+		memory_install_read_bank(device->space(), 0x00000, 0x3ffff, 0, 0, device->tag);
 		info->bank_installed = TRUE;
 	}
 
@@ -415,7 +413,7 @@ void okim6295_set_bank_base(const device_config *device, int base)
 	if (info->bank_installed)
 	{
 		info->bank_offs = base;
-		memory_set_bankptr(device->machine, device->tag, device->region + base);
+		memory_set_bankptr(device->machine, device->tag, device->region->base.u8 + base);
 	}
 }
 
@@ -498,14 +496,14 @@ WRITE8_DEVICE_HANDLER( okim6295_w )
 				/* determine the start/stop positions */
 				base = info->command * 8;
 
-				start  = memory_raw_read_byte(device->space[0], base + 0) << 16;
-				start |= memory_raw_read_byte(device->space[0], base + 1) << 8;
-				start |= memory_raw_read_byte(device->space[0], base + 2) << 0;
+				start  = memory_raw_read_byte(device->space(), base + 0) << 16;
+				start |= memory_raw_read_byte(device->space(), base + 1) << 8;
+				start |= memory_raw_read_byte(device->space(), base + 2) << 0;
 				start &= 0x3ffff;
 
-				stop  = memory_raw_read_byte(device->space[0], base + 3) << 16;
-				stop |= memory_raw_read_byte(device->space[0], base + 4) << 8;
-				stop |= memory_raw_read_byte(device->space[0], base + 5) << 0;
+				stop  = memory_raw_read_byte(device->space(), base + 3) << 16;
+				stop |= memory_raw_read_byte(device->space(), base + 4) << 8;
+				stop |= memory_raw_read_byte(device->space(), base + 5) << 0;
 				stop &= 0x3ffff;
 
 				/* set up the voice to play this sample */
@@ -524,13 +522,13 @@ WRITE8_DEVICE_HANDLER( okim6295_w )
 					}
 					else
 					{
-						logerror("OKIM6295:'%s' requested to play sample %02x on non-stopped voice\n",device->tag,info->command);
+						logerror("OKIM6295:'%s' requested to play sample %02x on non-stopped voice\n",device->tag.cstr(),info->command);
 					}
 				}
 				/* invalid samples go here */
 				else
 				{
-					logerror("OKIM6295:'%s' requested to play invalid sample %02x\n",device->tag,info->command);
+					logerror("OKIM6295:'%s' requested to play invalid sample %02x\n",device->tag.cstr(),info->command);
 					voice->playing = 0;
 				}
 			}

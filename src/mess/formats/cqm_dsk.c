@@ -7,7 +7,7 @@
 *********************************************************************/
 
 #include <string.h>
-#include "driver.h"
+#include "emu.h"
 #include "formats/flopimg.h"
 #include "devices/flopdrv.h"
 
@@ -31,7 +31,7 @@ struct cqmdsk_tag
 static struct cqmdsk_tag *get_tag(floppy_image *floppy)
 {
 	struct cqmdsk_tag *tag;
-	tag = floppy_tag(floppy );
+	tag = (cqmdsk_tag *)floppy_tag(floppy );
 	return tag;
 }
 
@@ -193,7 +193,7 @@ FLOPPY_CONSTRUCT( cqm_dsk_construct )
 	pos = CQM_HEADER_SIZE + (header[0x70] << 8) + header[0x6f];
 	track = 0;
 	head = 0;
-	tag->buf = malloc(tag->sector_size*tag->sector_per_track);
+	tag->buf = (UINT8*)malloc(tag->sector_size*tag->sector_per_track);
 	do {
 		tag->track_offsets[(track<<1) + head] = pos;
 		s = 0;

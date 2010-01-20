@@ -13,7 +13,7 @@
    Date: 29/03/2008
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "xmodem.h"
 
 

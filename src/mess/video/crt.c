@@ -27,7 +27,7 @@ Theory of operation:
 
 #include <math.h>
 
-#include "driver.h"
+#include "emu.h"
 
 #include "video/crt.h"
 

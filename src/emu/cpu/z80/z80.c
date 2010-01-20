@@ -117,8 +117,8 @@
  *      http://www.msxnet.org/tech/z80-documented.pdf
  *****************************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
-#include "driver.h"
 #include "z80.h"
 #include "z80daisy.h"
 
@@ -824,7 +824,7 @@ INLINE UINT32 ARG16(z80_state *z80)
  ***************************************************************/
 #define RETN(Z) do {											\
 	LOG(("Z80 '%s' RETN z80->iff1:%d z80->iff2:%d\n",			\
-		(Z)->device->tag, (Z)->iff1, (Z)->iff2));				\
+		(Z)->device->tag.cstr(), (Z)->iff1, (Z)->iff2));		\
 	POP((Z), pc);												\
 	(Z)->WZ = (Z)->PC;											\
 	(Z)->iff1 = (Z)->iff2;										\
@@ -2093,7 +2093,7 @@ OP(xycb,ff) { z80->A = SET(7, RM(z80, z80->ea)); WM(z80, z80->ea,z80->A);			} /*
 
 OP(illegal,1) {
 	logerror("Z80 '%s' ill. opcode $%02x $%02x\n",
-			z80->device->tag, memory_decrypted_read_byte(z80->program, (z80->PCD-1)&0xffff), memory_decrypted_read_byte(z80->program, z80->PCD));
+			z80->device->tag.cstr(), memory_decrypted_read_byte(z80->program, (z80->PCD-1)&0xffff), memory_decrypted_read_byte(z80->program, z80->PCD));
 }
 
 /**********************************************************
@@ -2681,7 +2681,7 @@ OP(fd,ff) { illegal_1(z80); op_ff(z80);												} /* DB   FD          */
 OP(illegal,2)
 {
 	logerror("Z80 '%s' ill. opcode $ed $%02x\n",
-			z80->device->tag, memory_decrypted_read_byte(z80->program, (z80->PCD-1)&0xffff));
+			z80->device->tag.cstr(), memory_decrypted_read_byte(z80->program, (z80->PCD-1)&0xffff));
 }
 
 /**********************************************************
@@ -3289,7 +3289,7 @@ static void take_interrupt(z80_state *z80)
 	else
 		irq_vector = (*z80->irq_callback)(z80->device, 0);
 
-	LOG(("Z80 '%s' single int. irq_vector $%02x\n", z80->device->tag, irq_vector));
+	LOG(("Z80 '%s' single int. irq_vector $%02x\n", z80->device->tag.cstr(), irq_vector));
 
 	/* Interrupt mode 2. Call [i:databyte] */
 	if( z80->im == 2 )
@@ -3297,7 +3297,7 @@ static void take_interrupt(z80_state *z80)
 		irq_vector = (irq_vector & 0xff) | (z80->i << 8);
 		PUSH(z80, pc);
 		RM16(z80, irq_vector, &z80->pc);
-		LOG(("Z80 '%s' IM2 [$%04x] = $%04x\n", z80->device->tag, irq_vector, z80->PCD));
+		LOG(("Z80 '%s' IM2 [$%04x] = $%04x\n", z80->device->tag.cstr(), irq_vector, z80->PCD));
 		/* CALL opcode timing + 'interrupt latency' cycles */
 		z80->icount -= z80->cc_op[0xcd] + z80->cc_ex[0xff];
 	}
@@ -3305,7 +3305,7 @@ static void take_interrupt(z80_state *z80)
 	/* Interrupt mode 1. RST 38h */
 	if( z80->im == 1 )
 	{
-		LOG(("Z80 '%s' IM1 $0038\n", z80->device->tag));
+		LOG(("Z80 '%s' IM1 $0038\n", z80->device->tag.cstr()));
 		PUSH(z80, pc);
 		z80->PCD = 0x0038;
 		/* RST $38 + 'interrupt latency' cycles */
@@ -3316,7 +3316,7 @@ static void take_interrupt(z80_state *z80)
 		/* Interrupt mode 0. We check for CALL and JP instructions, */
 		/* if neither of these were found we assume a 1 byte opcode */
 		/* was placed on the databus                                */
-		LOG(("Z80 '%s' IM0 $%04x\n", z80->device->tag, irq_vector));
+		LOG(("Z80 '%s' IM0 $%04x\n", z80->device->tag.cstr(), irq_vector));
 
 		/* check for nop */
 		if (irq_vector != 0x00)
@@ -3362,12 +3362,8 @@ static CPU_INIT( z80 )
 		int oldval, newval, val;
 		UINT8 *padd, *padc, *psub, *psbc;
 		/* allocate big flag arrays once */
-		SZHVC_add = (UINT8 *)malloc(2*256*256);
-		SZHVC_sub = (UINT8 *)malloc(2*256*256);
-		if( !SZHVC_add || !SZHVC_sub )
-		{
-			fatalerror("Z80: failed to allocate 2 * 128K flags arrays!!!");
-		}
+		SZHVC_add = global_alloc_array(UINT8, 2*256*256);
+		SZHVC_sub = global_alloc_array(UINT8, 2*256*256);
 		padd = &SZHVC_add[	0*256];
 		padc = &SZHVC_add[256*256];
 		psub = &SZHVC_sub[	0*256];
@@ -3471,8 +3467,8 @@ static CPU_INIT( z80 )
 		z80->daisy = z80daisy_init(device, (const z80_daisy_chain *)device->static_config);
 	z80->irq_callback = irqcallback;
 	z80->device = device;
-	z80->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	z80->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	z80->program = device->space(AS_PROGRAM);
+	z80->io = device->space(AS_IO);
 	z80->IX = z80->IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	z80->F = ZF;			/* Zero flag is set */
 
@@ -3514,9 +3510,9 @@ static CPU_RESET( z80 )
 
 static CPU_EXIT( z80 )
 {
-	if (SZHVC_add) free(SZHVC_add);
+	global_free(SZHVC_add);
 	SZHVC_add = NULL;
-	if (SZHVC_sub) free(SZHVC_sub);
+	global_free(SZHVC_sub);
 	SZHVC_sub = NULL;
 }
 
@@ -3534,7 +3530,7 @@ static CPU_EXECUTE( z80 )
 	/* to just check here */
 	if (z80->nmi_pending)
 	{
-		LOG(("Z80 '%s' take NMI\n", z80->device->tag));
+		LOG(("Z80 '%s' take NMI\n", z80->device->tag.cstr()));
 		z80->PRVPC = -1;			/* there isn't a valid previous program counter */
 		LEAVE_HALT(z80);			/* Check if processor was halted */
 

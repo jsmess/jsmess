@@ -13,7 +13,7 @@
 #include <time.h>
 #include <assert.h>
 
-#include "mame.h"
+#include "emu.h"
 #include "imgtool.h"
 #include "mess.h"
 #include "main.h"
@@ -342,7 +342,7 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 	module = imgtool_find_module(argv[0]);
 	if (!module)
 	{
-		err = IMGTOOLERR_MODULENOTFOUND | IMGTOOLERR_SRC_MODULE;
+		err = (imgtoolerr_t)(IMGTOOLERR_MODULENOTFOUND | IMGTOOLERR_SRC_MODULE);
 		goto done;
 	}
 
@@ -362,7 +362,7 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 			goto done;
 
 		writefile_optguide = (const option_guide *) imgtool_partition_get_info_ptr(partition, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
-		writefile_optspec = imgtool_partition_get_info_ptr(partition, IMGTOOLINFO_STR_WRITEFILE_OPTSPEC);
+		writefile_optspec = (const char *)imgtool_partition_get_info_ptr(partition, IMGTOOLINFO_STR_WRITEFILE_OPTSPEC);
 
 		if (writefile_optguide && writefile_optspec)
 		{
@@ -595,7 +595,7 @@ static int cmd_create(const struct command *c, int argc, char *argv[])
 	module = imgtool_find_module(argv[0]);
 	if (!module)
 	{
-		err = IMGTOOLERR_MODULENOTFOUND | IMGTOOLERR_SRC_MODULE;
+		err = (imgtoolerr_t)(IMGTOOLERR_MODULENOTFOUND | IMGTOOLERR_SRC_MODULE);
 		goto error;
 	}
 
@@ -666,7 +666,7 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 	stream = stream_open(argv[5], OSD_FOPEN_WRITE);
 	if (!stream)
 	{
-		err = IMGTOOLERR_FILENOTFOUND | IMGTOOLERR_SRC_NATIVEFILE;
+		err = (imgtoolerr_t)(IMGTOOLERR_FILENOTFOUND | IMGTOOLERR_SRC_NATIVEFILE);
 		goto done;
 	}
 
@@ -704,7 +704,7 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 	stream = stream_open(argv[5], OSD_FOPEN_READ);
 	if (!stream)
 	{
-		err = IMGTOOLERR_FILENOTFOUND | IMGTOOLERR_SRC_NATIVEFILE;
+		err = (imgtoolerr_t)(IMGTOOLERR_FILENOTFOUND | IMGTOOLERR_SRC_NATIVEFILE);
 		goto done;
 	}
 
@@ -713,7 +713,7 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 	buffer = malloc(size);
 	if (!buffer)
 	{
-		err = IMGTOOLERR_OUTOFMEMORY;
+		err = (imgtoolerr_t)(IMGTOOLERR_OUTOFMEMORY);
 		goto done;
 	}
 
@@ -887,7 +887,7 @@ static int cmd_listdriveroptions(const struct command *c, int argc, char *argv[]
 	return 0;
 
 error:
-	reporterror(IMGTOOLERR_MODULENOTFOUND|IMGTOOLERR_SRC_MODULE, c, argv[0], NULL, NULL, NULL, NULL);
+	reporterror((imgtoolerr_t)(IMGTOOLERR_MODULENOTFOUND|IMGTOOLERR_SRC_MODULE), c, argv[0], NULL, NULL, NULL, NULL);
 	return -1;
 }
 

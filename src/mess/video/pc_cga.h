@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "video/pc_video.h"
 
 #define CGA_PALETTE_SETS 83	/* one for colour, one for mono,

@@ -19,17 +19,10 @@
 //  mess_cli_main - main entry proc for CLI MESS
 //============================================================
 
-#ifdef __GNUC__
-int __declspec(dllexport) mess_cli_main(int argc, char **argv)
-{
-	return mame_main(argc, argv);
-}
-#else
 int __declspec(dllexport) mess_cli_main(int argc, TCHAR **argv)
 {
 	return mame_main(argc, argv);
 }
-#endif
 
 
 
@@ -43,6 +36,7 @@ int __declspec(dllexport) mess_gui_main(
 	LPTSTR       lpCmdLine,
 	int          nCmdShow)
 {
-	extern int MameUIMain(HINSTANCE, LPTSTR, int);
+
+	extern int MameUIMain(HINSTANCE,LPTSTR,int);
 	return MameUIMain(hInstance, lpCmdLine, nCmdShow);
 }

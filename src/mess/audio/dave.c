@@ -13,7 +13,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "audio/dave.h"
 
 
@@ -85,7 +85,7 @@ struct _dave_t
 	/* update step */
 	int UpdateStep;
 
-	sound_stream *sound_stream;
+	sound_stream *sound_stream_var;
 
 	/* temp here */
 	int nick_virq;
@@ -168,7 +168,7 @@ static DEVICE_START( dave_sound )
     the volumes are mixed internally and output as left and right volume */
 
 	/* 3 tone channels + 1 noise channel */
-	dave->sound_stream = stream_create(device, 0, 2, device->machine->sample_rate, NULL, dave_update_sound);
+	dave->sound_stream_var = stream_create(device, 0, 2, device->machine->sample_rate, NULL, dave_update_sound);
 }
 
 
@@ -258,7 +258,7 @@ static void dave_refresh_selectable_int(const device_config *device)
 
 static TIMER_CALLBACK(dave_1khz_callback)
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	dave_t *dave = get_token(device);
 
 	/* time over - want int */
@@ -411,7 +411,7 @@ static WRITE8_DEVICE_HANDLER(dave_sound_w)
 	dave_t *dave = get_token(device);
 
 	/* update stream */
-	stream_update(dave->sound_stream);
+	stream_update(dave->sound_stream_var);
 
 	/* new write */
 	switch (offset)

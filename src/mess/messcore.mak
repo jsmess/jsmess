@@ -11,7 +11,7 @@
 # MESS core defines
 #-------------------------------------------------
 
-COREDEFS += -DMESS
+DEFS += -DMESS
 
 # add some additional include libraries for the mame files
 CFLAGS += \

@@ -14,7 +14,7 @@
 #ifndef __APPLEFDC_H__
 #define __APPLEFDC_H__
 
-#include "driver.h"
+#include "emu.h"
 
 
 

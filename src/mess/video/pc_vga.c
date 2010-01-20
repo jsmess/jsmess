@@ -28,7 +28,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "pc_vga.h"
 #include "pc_video.h"
 

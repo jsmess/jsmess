@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "includes/balsente.h"
 #include "sound/cem3394.h"
@@ -181,7 +181,7 @@ MACHINE_RESET( balsente )
 	memory_configure_bank(machine, "bank2", 0, numbanks, &memory_region(machine, "maincpu")[0x12000], 0x6000);
 	memory_set_bank(space->machine, "bank1", 0);
 	memory_set_bank(space->machine, "bank2", 0);
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 
 	/* start a timer to generate interrupts */
 	state->scanline_timer = devtag_get_device(machine, "scan_timer");

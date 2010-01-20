@@ -10,7 +10,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "vtvideo.h"
 
 /***************************************************************************
@@ -267,7 +267,7 @@ void vt_video_update(const device_config *device, bitmap_t *bitmap, const rectan
 -------------------------------------------------*/
 static TIMER_CALLBACK(lba7_change)
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	vt_video_t *vt = get_safe_token(device);
 
 	vt->lba7 = (vt->lba7) ? 0 : 1;

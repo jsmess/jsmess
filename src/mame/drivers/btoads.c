@@ -6,7 +6,7 @@
 
 **************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/tms34010/tms34010.h"
 #include "video/tlc34076.h"
@@ -68,7 +68,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 {
 	main_to_sound_data = param;
 	main_to_sound_ready = 1;
-	cpu_triggerint(cputag_get_cpu(machine, "audiocpu"));
+	cpu_triggerint(devtag_get_device(machine, "audiocpu"));
 
 	/* use a timer to make long transfers faster */
 	timer_set(machine, ATTOTIME_IN_USEC(50), NULL, 0, 0);

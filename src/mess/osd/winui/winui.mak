@@ -45,6 +45,7 @@ WINUIOBJS += \
 	$(WINUIOBJ)/dirwatch.o	\
 	$(WINUIOBJ)/datafile.o	\
 	$(WINUIOBJ)/mui_opts.o \
+	$(WINUIOBJ)/layout.o \
 	$(WINUIOBJ)/winui.o \
 	$(WINUIOBJ)/helpids.o \
 	$(MESS_WINUIOBJ)/messui.o \
@@ -72,7 +73,7 @@ $(WINUIOBJ)/helpids.o : $(WINUIOBJ)/helpids.c
 	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
 
 $(WINUIOBJ)/helpids.c : $(WINUIOBJ)/mkhelp$(EXE) $(WINUISRC)/resource.h $(WINUISRC)/resource.hm $(WINUISRC)/mameui.rc
-	$(WINUIOBJ)/mkhelp$(EXE) $(WINUISRC)/mameui.rc >$@
+	@"$(WINUIOBJ)/mkhelp$(EXE)" $(WINUISRC)/mameui.rc >$@
 
 # rule to build the generator
 $(WINUIOBJ)/mkhelp$(EXE): $(WINUIOBJ)/mkhelp.o $(LIBOCORE)
@@ -94,7 +95,7 @@ DEFS += -DWINVER=0x0400
 endif
 
 DEFS += \
-	-D_WIN32_IE=0x0500 \
+	-D_WIN32_IE=0x0501 \
 	-DDECL_SPEC= \
 	-DZEXTERN=extern \
 
@@ -126,4 +127,4 @@ $(MESS_WINUIOBJ)/messui.res:	$(WINUISRC)/mameui.rc $(MESS_WINUISRC)/messui.rc $(
 
 $(WINUIOBJ)/mamevers.rc: $(OBJ)/build/verinfo$(EXE) $(SRC)/version.c
 	@echo Emitting $@...
-	@$(VERINFO) -b mess $(SRC)/version.c  > $@
+	@"$(VERINFO)" -b mess $(SRC)/version.c  > $@

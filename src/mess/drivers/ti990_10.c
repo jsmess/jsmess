@@ -67,7 +67,7 @@ TODO :
     15: PROM programmer (actually not used)
 */
 
-#include "driver.h"
+#include "emu.h"
 
 #include "cpu/tms9900/tms9900.h"
 #include "sound/beep.h"

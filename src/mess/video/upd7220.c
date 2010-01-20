@@ -34,7 +34,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "upd7220.h"
 
 /***************************************************************************
@@ -321,7 +321,7 @@ static void update_vsync_timer(upd7220_t *upd7220, int state)
 
 static TIMER_CALLBACK( vsync_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	upd7220_t *upd7220 = get_safe_token(device);
 
 	if (param)
@@ -360,7 +360,7 @@ static void update_hsync_timer(upd7220_t *upd7220, int state)
 
 static TIMER_CALLBACK( hsync_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	upd7220_t *upd7220 = get_safe_token(device);
 
 	devcb_call_write_line(&upd7220->out_hsync_func, param);
@@ -390,7 +390,7 @@ static void update_blank_timer(upd7220_t *upd7220, int state)
 
 static TIMER_CALLBACK( blank_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	upd7220_t *upd7220 = get_safe_token(device);
 
 	if (param)
@@ -429,8 +429,8 @@ static void recompute_parameters(const device_config *device)
 
 	if (LOG)
 	{
-		logerror("uPD7220 '%s' Screen: %u x %u @ %f Hz\n", device->tag, horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
-		logerror("uPD7220 '%s' Visible Area: (%u, %u) - (%u, %u)\n", device->tag, visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+		logerror("uPD7220 '%s' Screen: %u x %u @ %f Hz\n", device->tag.cstr(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+		logerror("uPD7220 '%s' Visible Area: (%u, %u) - (%u, %u)\n", device->tag.cstr(), visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 	}
 
 	if (upd7220->m)
@@ -583,14 +583,14 @@ static void process_fifo(const device_config *device)
 	switch (translate_command(upd7220->cr))
 	{
 	case COMMAND_INVALID:
-		logerror("uPD7220 '%s' Invalid Command Byte %02x\n", device->tag, upd7220->cr);
+		logerror("uPD7220 '%s' Invalid Command Byte %02x\n", device->tag.cstr(), upd7220->cr);
 		break;
 
 	case COMMAND_RESET: /* reset */
 		switch (upd7220->param_ptr)
 		{
 		case 0:
-			if (LOG) logerror("uPD7220 '%s' RESET\n", device->tag);
+			if (LOG) logerror("uPD7220 '%s' RESET\n", device->tag.cstr());
 
 			upd7220->de = 0;
 			upd7220->ra[0] = upd7220->ra[1] = upd7220->ra[2] = 0;
@@ -615,16 +615,16 @@ static void process_fifo(const device_config *device)
 
 			if (LOG)
 			{
-				logerror("uPD7220 '%s' Mode: %02x\n", device->tag, upd7220->mode);
-				logerror("uPD7220 '%s' AW: %u\n", device->tag, upd7220->aw);
-				logerror("uPD7220 '%s' HS: %u\n", device->tag, upd7220->hs);
-				logerror("uPD7220 '%s' VS: %u\n", device->tag, upd7220->vs);
-				logerror("uPD7220 '%s' HFP: %u\n", device->tag, upd7220->hfp);
-				logerror("uPD7220 '%s' HBP: %u\n", device->tag, upd7220->hbp);
-				logerror("uPD7220 '%s' VFP: %u\n", device->tag, upd7220->vfp);
-				logerror("uPD7220 '%s' AL: %u\n", device->tag, upd7220->al);
-				logerror("uPD7220 '%s' VBP: %u\n", device->tag, upd7220->vbp);
-				logerror("uPD7220 '%s' PITCH: %u\n", device->tag, upd7220->pitch);
+				logerror("uPD7220 '%s' Mode: %02x\n", device->tag.cstr(), upd7220->mode);
+				logerror("uPD7220 '%s' AW: %u\n", device->tag.cstr(), upd7220->aw);
+				logerror("uPD7220 '%s' HS: %u\n", device->tag.cstr(), upd7220->hs);
+				logerror("uPD7220 '%s' VS: %u\n", device->tag.cstr(), upd7220->vs);
+				logerror("uPD7220 '%s' HFP: %u\n", device->tag.cstr(), upd7220->hfp);
+				logerror("uPD7220 '%s' HBP: %u\n", device->tag.cstr(), upd7220->hbp);
+				logerror("uPD7220 '%s' VFP: %u\n", device->tag.cstr(), upd7220->vfp);
+				logerror("uPD7220 '%s' AL: %u\n", device->tag.cstr(), upd7220->al);
+				logerror("uPD7220 '%s' VBP: %u\n", device->tag.cstr(), upd7220->vbp);
+				logerror("uPD7220 '%s' PITCH: %u\n", device->tag.cstr(), upd7220->pitch);
 			}
 
 			recompute_parameters(device);
@@ -649,16 +649,16 @@ static void process_fifo(const device_config *device)
 
 			if (LOG)
 			{
-				logerror("uPD7220 '%s' Mode: %02x\n", device->tag, upd7220->mode);
-				logerror("uPD7220 '%s' AW: %u\n", device->tag, upd7220->aw);
-				logerror("uPD7220 '%s' HS: %u\n", device->tag, upd7220->hs);
-				logerror("uPD7220 '%s' VS: %u\n", device->tag, upd7220->vs);
-				logerror("uPD7220 '%s' HFP: %u\n", device->tag, upd7220->hfp);
-				logerror("uPD7220 '%s' HBP: %u\n", device->tag, upd7220->hbp);
-				logerror("uPD7220 '%s' VFP: %u\n", device->tag, upd7220->vfp);
-				logerror("uPD7220 '%s' AL: %u\n", device->tag, upd7220->al);
-				logerror("uPD7220 '%s' VBP: %u\n", device->tag, upd7220->vbp);
-				logerror("uPD7220 '%s' PITCH: %u\n", device->tag, upd7220->pitch);
+				logerror("uPD7220 '%s' Mode: %02x\n", device->tag.cstr(), upd7220->mode);
+				logerror("uPD7220 '%s' AW: %u\n", device->tag.cstr(), upd7220->aw);
+				logerror("uPD7220 '%s' HS: %u\n", device->tag.cstr(), upd7220->hs);
+				logerror("uPD7220 '%s' VS: %u\n", device->tag.cstr(), upd7220->vs);
+				logerror("uPD7220 '%s' HFP: %u\n", device->tag.cstr(), upd7220->hfp);
+				logerror("uPD7220 '%s' HBP: %u\n", device->tag.cstr(), upd7220->hbp);
+				logerror("uPD7220 '%s' VFP: %u\n", device->tag.cstr(), upd7220->vfp);
+				logerror("uPD7220 '%s' AL: %u\n", device->tag.cstr(), upd7220->al);
+				logerror("uPD7220 '%s' VBP: %u\n", device->tag.cstr(), upd7220->vbp);
+				logerror("uPD7220 '%s' PITCH: %u\n", device->tag.cstr(), upd7220->pitch);
 			}
 
 			recompute_parameters(device);
@@ -668,7 +668,7 @@ static void process_fifo(const device_config *device)
 	case COMMAND_VSYNC: /* vertical sync mode */
 		upd7220->m = upd7220->cr & 0x01;
 
-		if (LOG) logerror("uPD7220 '%s' M: %u\n", device->tag, upd7220->m);
+		if (LOG) logerror("uPD7220 '%s' M: %u\n", device->tag.cstr(), upd7220->m);
 
 		recompute_parameters(device);
 		break;
@@ -685,12 +685,12 @@ static void process_fifo(const device_config *device)
 
 			if (LOG)
 			{
-				logerror("uPD7220 '%s' LR: %u\n", device->tag, upd7220->lr);
-				logerror("uPD7220 '%s' DC: %u\n", device->tag, upd7220->dc);
-				logerror("uPD7220 '%s' CTOP: %u\n", device->tag, upd7220->ctop);
-				logerror("uPD7220 '%s' SC: %u\n", device->tag, upd7220->sc);
-				logerror("uPD7220 '%s' BR: %u\n", device->tag, upd7220->br);
-				logerror("uPD7220 '%s' CBOT: %u\n", device->tag, upd7220->cbot);
+				logerror("uPD7220 '%s' LR: %u\n", device->tag.cstr(), upd7220->lr);
+				logerror("uPD7220 '%s' DC: %u\n", device->tag.cstr(), upd7220->dc);
+				logerror("uPD7220 '%s' CTOP: %u\n", device->tag.cstr(), upd7220->ctop);
+				logerror("uPD7220 '%s' SC: %u\n", device->tag.cstr(), upd7220->sc);
+				logerror("uPD7220 '%s' BR: %u\n", device->tag.cstr(), upd7220->br);
+				logerror("uPD7220 '%s' CBOT: %u\n", device->tag.cstr(), upd7220->cbot);
 			}
 		}
 		break;
@@ -698,13 +698,13 @@ static void process_fifo(const device_config *device)
 	case COMMAND_START: /* start display & end idle mode */
 		upd7220->de = 1;
 
-		if (LOG) logerror("uPD7220 '%s' DE: 1\n", device->tag);
+		if (LOG) logerror("uPD7220 '%s' DE: 1\n", device->tag.cstr());
 		break;
 
 	case COMMAND_BCTRL: /* display blanking control */
 		upd7220->de = upd7220->cr & 0x01;
 
-		if (LOG) logerror("uPD7220 '%s' DE: %u\n", device->tag, upd7220->de);
+		if (LOG) logerror("uPD7220 '%s' DE: %u\n", device->tag.cstr(), upd7220->de);
 		break;
 
 	case COMMAND_ZOOM: /* zoom factors specify */
@@ -713,8 +713,8 @@ static void process_fifo(const device_config *device)
 			upd7220->gchr = upd7220->pr[1] & 0x0f;
 			upd7220->disp = upd7220->pr[1] >> 4;
 
-			if (LOG) logerror("uPD7220 '%s' GCHR: %01x\n", device->tag, upd7220->gchr);
-			if (LOG) logerror("uPD7220 '%s' DISP: %01x\n", device->tag, upd7220->disp);
+			if (LOG) logerror("uPD7220 '%s' GCHR: %01x\n", device->tag.cstr(), upd7220->gchr);
+			if (LOG) logerror("uPD7220 '%s' DISP: %01x\n", device->tag.cstr(), upd7220->disp);
 		}
 		break;
 
@@ -724,8 +724,8 @@ static void process_fifo(const device_config *device)
 			upd7220->ead = ((upd7220->pr[3] & 0x03) << 16) | (upd7220->pr[2] << 8) | upd7220->pr[1];
 			upd7220->dad = upd7220->pr[3] >> 4;
 
-			if (LOG) logerror("uPD7220 '%s' EAD: %06x\n", device->tag, upd7220->ead);
-			if (LOG) logerror("uPD7220 '%s' DAD: %01x\n", device->tag, upd7220->ead);
+			if (LOG) logerror("uPD7220 '%s' EAD: %06x\n", device->tag.cstr(), upd7220->ead);
+			if (LOG) logerror("uPD7220 '%s' DAD: %01x\n", device->tag.cstr(), upd7220->ead);
 		}
 		break;
 
@@ -738,7 +738,7 @@ static void process_fifo(const device_config *device)
 		{
 			if (upd7220->ra_addr < 16)
 			{
-				if (LOG) logerror("uPD7220 '%s' RA%u: %02x\n", device->tag, upd7220->ra_addr, data);
+				if (LOG) logerror("uPD7220 '%s' RA%u: %02x\n", device->tag.cstr(), upd7220->ra_addr, data);
 
 				upd7220->ra[upd7220->ra_addr] = data;
 				upd7220->ra_addr++;
@@ -753,12 +753,12 @@ static void process_fifo(const device_config *device)
 		{
 			upd7220->pitch = data;
 
-			if (LOG) logerror("uPD7220 '%s' PITCH: %u\n", device->tag, upd7220->pitch);
+			if (LOG) logerror("uPD7220 '%s' PITCH: %u\n", device->tag.cstr(), upd7220->pitch);
 		}
 		break;
 
 	case COMMAND_WDAT: /* write data into display memory */
-		logerror("uPD7220 '%s' Unimplemented command WDAT\n", device->tag);
+		logerror("uPD7220 '%s' Unimplemented command WDAT\n", device->tag.cstr());
 
 		if (flag == FIFO_PARAMETER)
 		{
@@ -771,24 +771,24 @@ static void process_fifo(const device_config *device)
 		{
 			upd7220->mask = (upd7220->pr[2] << 8) | upd7220->pr[1];
 
-			if (LOG) logerror("uPD7220 '%s' MASK: %04x\n", device->tag, upd7220->mask);
+			if (LOG) logerror("uPD7220 '%s' MASK: %04x\n", device->tag.cstr(), upd7220->mask);
 		}
 		break;
 
 	case COMMAND_FIGS: /* figure drawing parameters specify */
-		logerror("uPD7220 '%s' Unimplemented command FIGS\n", device->tag);
+		logerror("uPD7220 '%s' Unimplemented command FIGS\n", device->tag.cstr());
 		break;
 
 	case COMMAND_FIGD: /* figure draw start */
-		logerror("uPD7220 '%s' Unimplemented command FIGD\n", device->tag);
+		logerror("uPD7220 '%s' Unimplemented command FIGD\n", device->tag.cstr());
 		break;
 
 	case COMMAND_GCHRD: /* graphics character draw and area filling start */
-		logerror("uPD7220 '%s' Unimplemented command GCHRD\n", device->tag);
+		logerror("uPD7220 '%s' Unimplemented command GCHRD\n", device->tag.cstr());
 		break;
 
 	case COMMAND_RDAT: /* read data from display memory */
-		logerror("uPD7220 '%s' Unimplemented command RDAT\n", device->tag);
+		logerror("uPD7220 '%s' Unimplemented command RDAT\n", device->tag.cstr());
 		break;
 
 	case COMMAND_CURD: /* cursor address read */
@@ -815,11 +815,11 @@ static void process_fifo(const device_config *device)
 		break;
 
 	case COMMAND_DMAR: /* DMA read request */
-		logerror("uPD7220 '%s' Unimplemented command DMAR\n", device->tag);
+		logerror("uPD7220 '%s' Unimplemented command DMAR\n", device->tag.cstr());
 		break;
 
 	case COMMAND_DMAW: /* DMA write request */
-		logerror("uPD7220 '%s' Unimplemented command DMAW\n", device->tag);
+		logerror("uPD7220 '%s' Unimplemented command DMAW\n", device->tag.cstr());
 		break;
 	}
 }
@@ -899,7 +899,7 @@ WRITE_LINE_DEVICE_HANDLER( upd7220_ext_sync_w )
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 
-	if (LOG) logerror("uPD7220 '%s' External Synchronization: %u\n", device->tag, state);
+	if (LOG) logerror("uPD7220 '%s' External Synchronization: %u\n", device->tag.cstr(), state);
 
 	if (state)
 	{
@@ -980,12 +980,12 @@ static void update_text(const device_config *device, bitmap_t *bitmap, const rec
 static void draw_graphics_line(const device_config *device, bitmap_t *bitmap, UINT32 addr, int y, int wd)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
-
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int sx;
 
 	for (sx = 0; sx < upd7220->aw; sx++)
 	{
-		UINT16 data = memory_raw_read_word(device->space[0], addr & 0x3ffff);
+		UINT16 data = memory_raw_read_word(space, addr & 0x3ffff);
 		upd7220->display_func(device, bitmap, y, sx << 4, addr, data);
 		if (wd) addr += 2; else addr++;
 	}
@@ -1052,7 +1052,7 @@ void upd7220_update(const device_config *device, bitmap_t *bitmap, const rectang
 			break;
 
 		case UPD7220_MODE_DISPLAY_INVALID:
-			logerror("uPD7220 '%s' Invalid Display Mode!\n", device->tag);
+			logerror("uPD7220 '%s' Invalid Display Mode!\n", device->tag.cstr());
 		}
 	}
 }

@@ -1,5 +1,5 @@
 #include <math.h>
-#include "driver.h"
+#include "emu.h"
 #include "includes/vectrex.h"
 #include "video/vector.h"
 #include "machine/6522via.h"

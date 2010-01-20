@@ -7,7 +7,7 @@
 #ifndef PC_FDC_H
 #define PC_FDC_H
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/upd765.h"
 
 /* interface has been seperated, so that it can be used in the super i/o chip */

@@ -17,6 +17,7 @@
  *   ops not used by VR are not implemented
  */
 
+#include "emu.h"
 #include "debugger.h"
 #include "ssp1601.h"
 
@@ -529,8 +530,8 @@ static CPU_INIT( ssp1601 )
 	memset(ssp1601_state, 0, sizeof(ssp1601_state_t));
 	ssp1601_state->gr[0].w.h = 0xffff; // constant reg
 	ssp1601_state->device = device;
-	ssp1601_state->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	ssp1601_state->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	ssp1601_state->program = device->space(AS_PROGRAM);
+	ssp1601_state->io = device->space(AS_IO);
 
 }
 

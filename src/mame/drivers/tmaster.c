@@ -101,7 +101,7 @@ To Do:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/okim6295.h"
@@ -936,7 +936,7 @@ static MACHINE_RESET( galgames )
 
 	galgames_update_rombank(machine, 0);
 
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 }
 
 static MACHINE_DRIVER_START( galgames )

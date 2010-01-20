@@ -64,7 +64,7 @@ FIX: PK Tetris have an input named AMUSE which I couldn't map.  Maybe it is
 
 #define VERBOSE 0
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/2413intf.h"
@@ -2084,7 +2084,7 @@ static DRIVER_INIT( number10 )
 	/* Descramble graphic */
 	rom = memory_region(machine, "gfx1");
 	length = memory_region_length(machine, "gfx1");
-	tmp = alloc_array_or_die(UINT8, length);
+	tmp = auto_alloc_array(machine, UINT8, length);
 	memcpy(tmp,rom,length);
 	for (A = 0;A < length;A++)
 	{
@@ -2092,7 +2092,7 @@ static DRIVER_INIT( number10 )
 		rom[A] = tmp[addr];
 	}
 
-	free(tmp);
+	auto_free(machine, tmp);
 }
 
 

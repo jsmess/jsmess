@@ -245,7 +245,7 @@ BOOL CreateMessIcons(void)
 	// create the icon index, if we havn't already
     if (!mess_icon_index)
 	{
-		mess_icon_index = pool_malloc(GetMameUIMemoryPool(), driver_list_get_count(drivers) * IO_COUNT * sizeof(*mess_icon_index));
+		mess_icon_index = (int*)pool_malloc_lib(GetMameUIMemoryPool(), driver_list_get_count(drivers) * IO_COUNT * sizeof(*mess_icon_index));
     }
 
     for (i = 0; i < (driver_list_get_count(drivers) * IO_COUNT); i++)
@@ -276,7 +276,7 @@ static int GetMessIcon(int drvindex, int nSoftwareType)
 
     if ((nSoftwareType >= 0) && (nSoftwareType < IO_COUNT))
 	{
-		iconname = device_brieftypename(nSoftwareType);
+		iconname = device_brieftypename((iodevice_t)nSoftwareType);
         the_index = (drvindex * IO_COUNT) + nSoftwareType;
 
         nIconPos = mess_icon_index[the_index];
@@ -419,7 +419,7 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 	LPCSTR pszSoftware;
 	BOOL bResult = FALSE;
 
-	begin_resource_tracking();
+//	begin_resource_tracking();
 
 	// allocate the machine config	
 	config = machine_config_alloc(drivers[drvindex]->machine_config);
@@ -809,7 +809,7 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config *de
 	char* utf8_filename;
 	machine_config *config;
 
-	begin_resource_tracking();
+//	begin_resource_tracking();
 
 	hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
 	drvindex = Picker_GetSelectedItem(hwndList);
@@ -1036,7 +1036,7 @@ static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem)
 	if (!nIcon)
 	{
 		if (nType == 0)
-			nType = IO_BAD;
+			nType = (iodevice_t)IO_BAD;
 		switch(nType)
 		{
 			case IO_UNKNOWN:
@@ -1124,7 +1124,7 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem)
 static HWND MyColumnDialogProc_hwndPicker;
 static int *MyColumnDialogProc_order;
 static int *MyColumnDialogProc_shown;
-
+/*
 static void MyGetRealColumnOrder(int *order)
 {
 	int i, nColumnCount;
@@ -1153,18 +1153,17 @@ static void MySetColumnInfo(int *order, int *shown)
 	pCallbacks->pfnSetColumnShown(shown);
 }
 
-
-
+	*/
 static INT_PTR CALLBACK MyColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	INT_PTR result = 0;
-	int nColumnCount = Picker_GetColumnCount(MyColumnDialogProc_hwndPicker);
-	const LPCTSTR *ppszColumnNames = Picker_GetColumnNames(MyColumnDialogProc_hwndPicker);
+	//int nColumnCount = Picker_GetColumnCount(MyColumnDialogProc_hwndPicker);
+	//const LPCTSTR *ppszColumnNames = Picker_GetColumnNames(MyColumnDialogProc_hwndPicker);
 
-	result = InternalColumnDialogProc(hDlg, Msg, wParam, lParam, nColumnCount,
+	/*result = InternalColumnDialogProc(hDlg, Msg, wParam, lParam, nColumnCount,
 		MyColumnDialogProc_shown, MyColumnDialogProc_order, ppszColumnNames,
 		MyGetRealColumnOrder, MyGetColumnInfo, MySetColumnInfo);
-
+*/
 	return result;
 }
 
@@ -1178,8 +1177,8 @@ static BOOL RunColumnDialog(HWND hwndPicker)
 	MyColumnDialogProc_hwndPicker = hwndPicker;
 	nColumnCount = Picker_GetColumnCount(MyColumnDialogProc_hwndPicker);
 
-	MyColumnDialogProc_order = alloca(nColumnCount * sizeof(int));
-	MyColumnDialogProc_shown = alloca(nColumnCount * sizeof(int));
+	MyColumnDialogProc_order = (int*)alloca(nColumnCount * sizeof(int));
+	MyColumnDialogProc_shown = (int*)alloca(nColumnCount * sizeof(int));
 	bResult = DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_COLUMNS), GetMainWindow(), MyColumnDialogProc);
 	return bResult;
 }

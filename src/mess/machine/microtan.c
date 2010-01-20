@@ -13,7 +13,7 @@
  *****************************************************************************/
 
 /* Core includes */
-#include "driver.h"
+#include "emu.h"
 #include "includes/microtan.h"
 
 /* Components */
@@ -609,7 +609,7 @@ static void store_key(running_machine *machine, int key)
 
 INTERRUPT_GEN( microtan_interrupt )
 {
-    int mod, row, col, chg, new;
+    int mod, row, col, chg, newvar;
     static int lastrow = 0, mask = 0x00, key = 0x00, repeat = 0, repeater = 0;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 
@@ -625,13 +625,13 @@ INTERRUPT_GEN( microtan_interrupt )
 
 
     row = 9;
-    new = input_port_read(device->machine, "ROW8");
-    chg = keyrows[--row] ^ new;
+    newvar = input_port_read(device->machine, "ROW8");
+    chg = keyrows[--row] ^ newvar;
 
 	while ( !chg && row > 0)
 	{
-		new = input_port_read(device->machine, keynames[row - 1]);
-		chg = keyrows[--row] ^ new;
+		newvar = input_port_read(device->machine, keynames[row - 1]);
+		chg = keyrows[--row] ^ newvar;
 	}
     if (!chg)
 		--row;
@@ -646,7 +646,7 @@ INTERRUPT_GEN( microtan_interrupt )
 		if( row == 3 && chg == 0x80 )
 			set_led_status(device->machine, 1, (keyrows[3] & 0x80) ? 0 : 1);
 
-        if (new & chg)  /* key(s) pressed ? */
+        if (newvar & chg)  /* key(s) pressed ? */
         {
             mod = 0;
 
@@ -662,13 +662,13 @@ INTERRUPT_GEN( microtan_interrupt )
             if (keyrows[3] & 0x80)
                 mod |= 4;
 
-            /* find new key */
+            /* find newvar key */
             mask = 0x01;
             for (col = 0; col < 8; col ++)
             {
                 if (chg & mask)
                 {
-                    new &= mask;
+                    newvar &= mask;
                     key = keyboard[mod][row][col];
                     break;
                 }
@@ -682,11 +682,11 @@ INTERRUPT_GEN( microtan_interrupt )
             else
             if( (row == 0) && (chg == 0x04) ) /* Ctrl-@ (NUL) */
                 store_key(device->machine, 0);
-            keyrows[row] |= new;
+            keyrows[row] |= newvar;
         }
         else
         {
-            keyrows[row] = new;
+            keyrows[row] = newvar;
         }
         repeat = repeater;
     }
@@ -702,12 +702,12 @@ static void microtan_set_cpu_regs(running_machine *machine,const UINT8 *snapshot
     LOG(("microtan_snapshot_copy: PC:%02X%02X P:%02X A:%02X X:%02X Y:%02X SP:1%02X",
         snapshot_buff[base+1], snapshot_buff[base+0], snapshot_buff[base+2], snapshot_buff[base+3],
         snapshot_buff[base+4], snapshot_buff[base+5], snapshot_buff[base+6]);
-    cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6502_PC, snapshot_buff[base+0] + 256 * snapshot_buff[base+1]));
-    cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6502_P, snapshot_buff[base+2]);
-    cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6502_A, snapshot_buff[base+3]);
-    cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6502_X, snapshot_buff[base+4]);
-    cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6502_Y, snapshot_buff[base+5]);
-    cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6502_S, snapshot_buff[base+6]);
+    cpu_set_reg(devtag_get_device(machine, "maincpu"), M6502_PC, snapshot_buff[base+0] + 256 * snapshot_buff[base+1]));
+    cpu_set_reg(devtag_get_device(machine, "maincpu"), M6502_P, snapshot_buff[base+2]);
+    cpu_set_reg(devtag_get_device(machine, "maincpu"), M6502_A, snapshot_buff[base+3]);
+    cpu_set_reg(devtag_get_device(machine, "maincpu"), M6502_X, snapshot_buff[base+4]);
+    cpu_set_reg(devtag_get_device(machine, "maincpu"), M6502_Y, snapshot_buff[base+5]);
+    cpu_set_reg(devtag_get_device(machine, "maincpu"), M6502_S, snapshot_buff[base+6]);
 }
 
 static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buff, int snapshot_size)
@@ -817,7 +817,7 @@ SNAPSHOT_LOAD( microtan )
 {
 	UINT8 *snapshot_buff;
 
-	snapshot_buff = image_ptr(image);
+	snapshot_buff = (UINT8*)image_ptr(image);
 	if (!snapshot_buff)
 		return INIT_FAIL;
 
@@ -836,7 +836,7 @@ QUICKLOAD_LOAD( microtan_hexfile )
 	int rc;
 
 	snapshot_size = 8263;   /* magic size */
-	snapshot_buff = malloc(snapshot_size);
+	snapshot_buff = (UINT8*)malloc(snapshot_size);
 	if (!snapshot_buff)
 	{
 		LOG(("microtan_hexfile_load: could not allocate %d bytes of buffer\n", snapshot_size));
@@ -844,7 +844,7 @@ QUICKLOAD_LOAD( microtan_hexfile )
 	}
 	memset(snapshot_buff, 0, snapshot_size);
 
-	buff = malloc(quickload_size + 1);
+	buff = (char*)malloc(quickload_size + 1);
 	if (!buff)
 	{
 		free(snapshot_buff);

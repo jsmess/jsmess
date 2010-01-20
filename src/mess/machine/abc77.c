@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "abc77.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/discrete.h"
@@ -91,7 +91,7 @@ static TIMER_DEVICE_CALLBACK( clock_tick )
 
 static TIMER_CALLBACK( reset_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	abc77_t *abc77 = get_safe_token(device);
 
 	cpu_set_input_line(abc77->cpu, INPUT_LINE_RESET, CLEAR_LINE);
@@ -401,7 +401,7 @@ WRITE_LINE_DEVICE_HANDLER( abc77_reset_w )
 
 static DEVICE_START( abc77 )
 {
-	abc77_t *abc77 = device->token;
+	abc77_t *abc77 = (abc77_t *)device->token;
 	const abc77_interface *intf = get_interface(device);
 
 	astring *tempstring = astring_alloc();
@@ -412,8 +412,8 @@ static DEVICE_START( abc77 )
 	devcb_resolve_write_line(&abc77->out_keydown_func, &intf->out_keydown_func, device);
 
 	/* find our CPU */
-	astring_printf(tempstring, "%s:%s", device->tag, I8035_TAG);
-	abc77->cpu = cputag_get_cpu(device->machine, astring_c(tempstring));
+	astring_printf(tempstring, "%s:%s", device->tag.cstr(), I8035_TAG);
+	abc77->cpu = devtag_get_device(device->machine, astring_c(tempstring));
 	astring_free(tempstring);
 
 	/* allocate reset timer */

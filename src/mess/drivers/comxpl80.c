@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6805/m6805.h"
 
 typedef struct _comxpl80_state comxpl80_state;
@@ -36,7 +36,7 @@ static WRITE8_HANDLER( pl80_port_a_w )
 
     */
 
-	comxpl80_state *state = space->machine->driver_data;
+	comxpl80_state *state = (comxpl80_state *)space->machine->driver_data;
 
 	state->y_motor_phase = data & 0x0f;
 	state->font_addr = (BIT(data, 4) << 12) | (state->font_addr & 0xfff);
@@ -85,7 +85,7 @@ static WRITE8_HANDLER( pl80_port_b_w )
 
     */
 
-	comxpl80_state *state = space->machine->driver_data;
+	comxpl80_state *state = (comxpl80_state *)space->machine->driver_data;
 
 	state->z_motor_phase = data & 0x0f;
 
@@ -109,7 +109,7 @@ static WRITE8_HANDLER( pl80_port_c_w )
 
     */
 
-	comxpl80_state *state = space->machine->driver_data;
+	comxpl80_state *state = (comxpl80_state *)space->machine->driver_data;
 
 	state->font_addr = (state->font_addr & 0x1f00) | data;
 
@@ -136,7 +136,7 @@ static READ8_HANDLER( pl80_port_d_r )
 
     */
 
-	comxpl80_state *state = space->machine->driver_data;
+	comxpl80_state *state = (comxpl80_state *)space->machine->driver_data;
 
 	return state->plotter_data;
 }

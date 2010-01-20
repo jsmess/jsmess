@@ -9,7 +9,7 @@
 ** SV-328 : 16KB Video RAM, 64KB RAM
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
@@ -269,7 +269,7 @@ static const cassette_config svi318_cassette_config =
 {
 	svi_cassette_formats,
 	NULL,
-	CASSETTE_PLAY
+	(cassette_state)(CASSETTE_PLAY)
 };
 
 static const floppy_config svi318_floppy_config =

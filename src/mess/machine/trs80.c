@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /* Core includes */
-#include "driver.h"
+#include "emu.h"
 #include "machine/ctronics.h"
 #include "machine/ay31015.h"
 #include "sound/speaker.h"
@@ -110,7 +110,7 @@ QUICKLOAD_LOAD( trs80_cmd )
 	unsigned offs = 0;
 	UINT8 *cmd_buff;
 
-	cmd_buff = malloc(quickload_size);
+	cmd_buff = (UINT8 *)malloc(quickload_size);
 	if (!cmd_buff)
 		return INIT_FAIL;
 
@@ -163,7 +163,7 @@ QUICKLOAD_LOAD( trs80_cmd )
 			quickload_size--;
 		}
 	}
-	cpu_set_reg(cputag_get_cpu(image->machine, "maincpu"), Z80_PC, entry);
+	cpu_set_reg(devtag_get_device(image->machine, "maincpu"), Z80_PC, entry);
 
 	free(cmd_buff);
 	return INIT_PASS;
@@ -641,7 +641,7 @@ WRITE8_HANDLER( trs80m4_f4_w )
 		wd17xx_set_side(trs80_fdc,head);
 	}
 
-	wd17xx_set_density(trs80_fdc, (data & 0x80) ? 1 : 0);
+	wd17xx_set_density(trs80_fdc, (DENSITY)((data & 0x80) ? 1 : 0));
 }
 
 WRITE8_HANDLER( sys80_f8_w )

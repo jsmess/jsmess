@@ -11,7 +11,7 @@
 #ifndef __IEEE488__
 #define __IEEE488__
 
-#include "driver.h"
+#include "emu.h"
 
 /***************************************************************************
     MACROS / CONSTANTS

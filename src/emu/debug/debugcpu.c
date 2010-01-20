@@ -15,8 +15,8 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "osdepend.h"
-#include "driver.h"
 #include "debugcpu.h"
 #include "debugcmd.h"
 #include "debugcmt.h"
@@ -204,12 +204,12 @@ void debug_cpu_init(running_machine *machine)
 
 		/* add a global symbol for the current instruction pointer */
 		symtable_add_register(info->symtable, "cycles", NULL, get_cycles, NULL);
-		if (cpu->space[ADDRESS_SPACE_PROGRAM] != NULL)
-			symtable_add_register(info->symtable, "logunmap", (void *)cpu->space[ADDRESS_SPACE_PROGRAM], get_logunmap, set_logunmap);
-		if (cpu->space[ADDRESS_SPACE_DATA] != NULL)
-			symtable_add_register(info->symtable, "logunmapd", (void *)cpu->space[ADDRESS_SPACE_DATA], get_logunmap, set_logunmap);
-		if (cpu->space[ADDRESS_SPACE_IO] != NULL)
-			symtable_add_register(info->symtable, "logunmapi", (void *)cpu->space[ADDRESS_SPACE_IO], get_logunmap, set_logunmap);
+		if (cpu->space(AS_PROGRAM) != NULL)
+			symtable_add_register(info->symtable, "logunmap", (void *)cpu->space(AS_PROGRAM), get_logunmap, set_logunmap);
+		if (cpu->space(AS_DATA) != NULL)
+			symtable_add_register(info->symtable, "logunmapd", (void *)cpu->space(AS_DATA), get_logunmap, set_logunmap);
+		if (cpu->space(AS_IO) != NULL)
+			symtable_add_register(info->symtable, "logunmapi", (void *)cpu->space(AS_IO), get_logunmap, set_logunmap);
 
 		/* add all registers into it */
 		for (regnum = 0; regnum < MAX_REGS; regnum++)
@@ -553,7 +553,7 @@ void debug_cpu_interrupt_hook(const device_config *device, int irqline)
 	if (info != NULL && (info->flags & DEBUG_FLAG_STOP_INTERRUPT) != 0 && (info->stopirq == -1 || info->stopirq == irqline))
 	{
 		global->execution_state = EXECUTION_STATE_STOPPED;
-		debug_console_printf(device->machine, "Stopped on interrupt (CPU '%s', IRQ %d)\n", device->tag, irqline);
+		debug_console_printf(device->machine, "Stopped on interrupt (CPU '%s', IRQ %d)\n", device->tag.cstr(), irqline);
 		compute_debug_flags(device);
 	}
 }
@@ -573,7 +573,7 @@ void debug_cpu_exception_hook(const device_config *device, int exception)
 	if ((info->flags & DEBUG_FLAG_STOP_EXCEPTION) != 0 && (info->stopexception == -1 || info->stopexception == exception))
 	{
 		global->execution_state = EXECUTION_STATE_STOPPED;
-		debug_console_printf(device->machine, "Stopped on exception (CPU '%s', exception %d)\n", device->tag, exception);
+		debug_console_printf(device->machine, "Stopped on exception (CPU '%s', exception %d)\n", device->tag.cstr(), exception);
 		compute_debug_flags(device);
 	}
 }
@@ -640,7 +640,7 @@ void debug_cpu_instruction_hook(const device_config *device, offs_t curpc)
 		/* check the temp running breakpoint and break if we hit it */
 		else if ((info->flags & DEBUG_FLAG_STOP_PC) != 0 && info->stopaddr == curpc)
 		{
-			debug_console_printf(device->machine, "Stopped at temporary breakpoint %X on CPU '%s'\n", info->stopaddr, device->tag);
+			debug_console_printf(device->machine, "Stopped at temporary breakpoint %X on CPU '%s'\n", info->stopaddr, device->tag.cstr());
 			global->execution_state = EXECUTION_STATE_STOPPED;
 		}
 
@@ -978,7 +978,7 @@ int debug_cpu_breakpoint_set(const device_config *device, offs_t address, parsed
 	assert_always(device != NULL, "debug_cpu_breakpoint_set() called with invalid cpu!");
 
 	/* allocate breakpoint */
-	bp = alloc_or_die(debug_cpu_breakpoint);
+	bp = auto_alloc(device->machine, debug_cpu_breakpoint);
 	bp->index = global->bpindex++;
 	bp->enabled = TRUE;
 	bp->address = address;
@@ -986,7 +986,7 @@ int debug_cpu_breakpoint_set(const device_config *device, offs_t address, parsed
 	bp->action = NULL;
 	if (action != NULL)
 	{
-		bp->action = alloc_array_or_die(char, strlen(action) + 1);
+		bp->action = auto_alloc_array(device->machine, char, strlen(action) + 1);
 		strcpy(bp->action, action);
 	}
 
@@ -1027,8 +1027,8 @@ int debug_cpu_breakpoint_clear(running_machine *machine, int bpnum)
 				if (bp->condition != NULL)
 					expression_free(bp->condition);
 				if (bp->action != NULL)
-					free(bp->action);
-				free(bp);
+					auto_free(machine, bp->action);
+				auto_free(machine, bp);
 
 				/* update the flags */
 				breakpoint_update_flags(info);
@@ -1082,7 +1082,7 @@ int debug_cpu_watchpoint_set(const address_space *space, int type, offs_t addres
 {
 	debugcpu_private *global = space->machine->debugcpu_data;
 	cpu_debug_data *info = cpu_get_debug_data(space->cpu);
-	debug_cpu_watchpoint *wp = alloc_or_die(debug_cpu_watchpoint);
+	debug_cpu_watchpoint *wp = auto_alloc(space->machine, debug_cpu_watchpoint);
 
 	/* fill in the structure */
 	wp->index = global->wpindex++;
@@ -1094,7 +1094,7 @@ int debug_cpu_watchpoint_set(const address_space *space, int type, offs_t addres
 	wp->action = NULL;
 	if (action != NULL)
 	{
-		wp->action = alloc_array_or_die(char, strlen(action) + 1);
+		wp->action = auto_alloc_array(space->machine, char, strlen(action) + 1);
 		strcpy(wp->action, action);
 	}
 
@@ -1138,8 +1138,8 @@ int debug_cpu_watchpoint_clear(running_machine *machine, int wpnum)
 					if (wp->condition != NULL)
 						expression_free(wp->condition);
 					if (wp->action != NULL)
-						free(wp->action);
-					free(wp);
+						auto_free(machine, wp->action);
+					auto_free(machine, wp);
 
 					watchpoint_update_flags(cpu_get_address_space(cpu, spacenum));
 					return TRUE;
@@ -1231,7 +1231,7 @@ void debug_cpu_trace(const device_config *device, FILE *file, int trace_over, co
 	info->trace.file = NULL;
 
 	if (info->trace.action != NULL)
-		free(info->trace.action);
+		auto_free(device->machine, info->trace.action);
 	info->trace.action = NULL;
 
 	/* open any new files */
@@ -1240,7 +1240,7 @@ void debug_cpu_trace(const device_config *device, FILE *file, int trace_over, co
 	info->trace.trace_over_target = ~0;
 	if (action != NULL)
 	{
-		info->trace.action = alloc_array_or_die(char, strlen(action) + 1);
+		info->trace.action = auto_alloc_array(device->machine, char, strlen(action) + 1);
 		strcpy(info->trace.action, action);
 	}
 
@@ -1301,14 +1301,14 @@ int debug_cpu_hotspot_track(const device_config *device, int numspots, int thres
 
 	/* if we already have tracking info, kill it */
 	if (info->hotspots)
-		free(info->hotspots);
+		auto_free(device->machine, info->hotspots);
 	info->hotspots = NULL;
 
 	/* only start tracking if we have a non-zero count */
 	if (numspots > 0)
 	{
 		/* allocate memory for hotspots */
-		info->hotspots = alloc_array_or_die(debug_hotspot_entry, numspots);
+		info->hotspots = auto_alloc_array(device->machine, debug_hotspot_entry, numspots);
 		memset(info->hotspots, 0xff, sizeof(*info->hotspots) * numspots);
 
 		/* fill in the info */
@@ -1937,7 +1937,7 @@ static void debug_cpu_exit(running_machine *machine)
 		if (info->trace.file != NULL)
 			fclose(info->trace.file);
 		if (info->trace.action != NULL)
-			free(info->trace.action);
+			auto_free(machine, info->trace.action);
 
 		/* free the symbol table */
 		if (info->symtable != NULL)

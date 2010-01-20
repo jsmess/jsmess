@@ -84,7 +84,7 @@ Some bugs left :
  ******************************************************************************/
 
 /* Core includes */
-#include "driver.h"
+#include "emu.h"
 #include "includes/amstrad.h"
 
 /* Components */
@@ -834,7 +834,7 @@ static const cassette_config amstrad_cassette_config =
 {
 	cdt_cassette_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 };
 
 static const floppy_config cpc6128_floppy_config =

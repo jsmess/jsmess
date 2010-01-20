@@ -51,7 +51,7 @@ TODO:
 */
 
 #include <math.h>
-#include "driver.h"
+#include "emu.h"
 #include "tms9901.h"
 #include "video/v9938.h"
 #include "audio/spchroms.h"
@@ -258,7 +258,7 @@ static UINT8 *sRAM_ptr_8;
 
 /* tms9900_ICount: used to implement memory waitstates (hack) */
 /* tms9995_ICount: used to implement memory waitstates (hack) */
-/* NPW 23-Feb-2004 - externs no longer needed because we now use cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),) */
+/* NPW 23-Feb-2004 - externs no longer needed because we now use cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),) */
 
 /* Link to the cartridge system. */
 static const device_config *cartslots;
@@ -502,12 +502,12 @@ MACHINE_RESET( ti99 )
 	else if (ti99_model == model_99_4p)
 		xRAM_kind = xRAM_kind_99_4p_1Mb;	/* hack */
 	else
-		xRAM_kind = (input_port_read(machine, "CFG") >> config_xRAM_bit) & config_xRAM_mask;
+		xRAM_kind = (xRAM_kind_t)((input_port_read(machine, "CFG") >> config_xRAM_bit) & config_xRAM_mask);
 	if (ti99_model == model_99_8)
 		has_speech = TRUE;
 	else
 		has_speech = (input_port_read(machine, "CFG") >> config_speech_bit) & config_speech_mask;
-	fdc_kind = (input_port_read(machine, "CFG") >> config_fdc_bit) & config_fdc_mask;
+	fdc_kind = (fdc_kind_t)((input_port_read(machine, "CFG") >> config_fdc_bit) & config_fdc_mask);
 	has_ide = (input_port_read(machine, "CFG") >> config_ide_bit) & config_ide_mask;
 	has_rs232 = (input_port_read(machine, "CFG") >> config_rs232_bit) & config_rs232_mask;
 	has_handset = (ti99_model == model_99_4) && ((input_port_read(machine, "CFG") >> config_handsets_bit) & config_handsets_mask);
@@ -698,7 +698,7 @@ void ti99_set_hsgpl_crdena(int data)
 */
 READ16_HANDLER ( ti99_nop_8_r )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	return (0);
@@ -706,7 +706,7 @@ READ16_HANDLER ( ti99_nop_8_r )
 
 WRITE16_HANDLER ( ti99_nop_8_w )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 }
 
@@ -718,7 +718,7 @@ READ16_HANDLER ( ti99_4p_cart_r )
 	if (ti99_4p_internal_rom6_enable)
 		return ti99_4p_internal_ROM6[offset];
 
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	if (hsgpl_crdena)
@@ -736,7 +736,7 @@ WRITE16_HANDLER ( ti99_4p_cart_w )
 		return;
 	}
 
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	if (hsgpl_crdena)
@@ -779,7 +779,7 @@ Theory:
 */
 WRITE16_HANDLER ( ti99_wsnd_w )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	sn76496_w(devtag_get_device(space->machine, "sn76496"), offset, (data >> 8) & 0xff);
@@ -790,7 +790,7 @@ WRITE16_HANDLER ( ti99_wsnd_w )
 */
 READ16_HANDLER ( ti99_rvdp_r )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	if (offset & 1)
@@ -808,7 +808,7 @@ READ16_HANDLER ( ti99_rvdp_r )
 */
 WRITE16_HANDLER ( ti99_wvdp_w )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	if (offset & 1)
@@ -826,7 +826,7 @@ WRITE16_HANDLER ( ti99_wvdp_w )
 */
 READ16_HANDLER ( ti99_rv38_r )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	if (offset & 1)
@@ -844,7 +844,7 @@ READ16_HANDLER ( ti99_rv38_r )
 */
 WRITE16_HANDLER ( ti99_wv38_w )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	switch (offset & 3)
@@ -873,7 +873,7 @@ WRITE16_HANDLER ( ti99_wv38_w )
 */
 static READ16_HANDLER ( ti99_rspeech_r )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-(18+3));		/* this is just a minimum, it can be more */
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-(18+3));		/* this is just a minimum, it can be more */
 
 	return ((int) tms5220_status_r(devtag_get_device(space->machine, "tms5220"), offset)) << 8;
 }
@@ -899,7 +899,7 @@ static void speech_kludge_callback(int dummy)
 */
 static WRITE16_HANDLER ( ti99_wspeech_w )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-(54+3));		/* this is just an approx. minimum, it can be much more */
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-(54+3));		/* this is just an approx. minimum, it can be much more */
 
 #if 1
 	/* the stupid design of the tms5220 core means that ready is cleared when
@@ -913,7 +913,7 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 
 		logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
 
-		cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-cycles_to_ready);
+		cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-cycles_to_ready);
 		timer_set(space->machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
 	}
 #endif
@@ -960,7 +960,7 @@ READ16_HANDLER ( ti99_grom_r )
 {
 	UINT16 reply;
 
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4 /*20+3*/);		/* from 4 to 23? */
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4 /*20+3*/);		/* from 4 to 23? */
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	/* This implementation features a multislot cartridge system which
@@ -1031,7 +1031,7 @@ READ16_HANDLER ( ti99_grom_r )
 */
 WRITE16_HANDLER ( ti99_grom_w )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4/*20+3*/);		/* from 4 to 23? */
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4/*20+3*/);		/* from 4 to 23? */
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	/* Activates a slot in the multi-cartridge extender. */
@@ -1160,7 +1160,7 @@ static WRITE8_HANDLER ( ti99_grom_w8 )
 */
 READ16_HANDLER ( ti99_4p_grom_r )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);		/* HSGPL is located on 8-bit bus? */
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);		/* HSGPL is located on 8-bit bus? */
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	return /*hsgpl_crdena ?*/ ti99_hsgpl_gpl_r(space, offset, mem_mask) /*: 0*/;
@@ -1171,7 +1171,7 @@ READ16_HANDLER ( ti99_4p_grom_r )
 */
 WRITE16_HANDLER ( ti99_4p_grom_w )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);		/* HSGPL is located on 8-bit bus? */
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);		/* HSGPL is located on 8-bit bus? */
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	/*if (hsgpl_crdena)*/
@@ -1245,7 +1245,7 @@ READ8_HANDLER( ti99_8_r )
 				/* speech read: >9000 */
 				if (! (offset & 1))
 				{
-					cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-16*4);		/* this is just a minimum, it can be more */
+					cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-16*4);		/* this is just a minimum, it can be more */
 					reply = tms5220_status_r(devtag_get_device(space->machine, "tms5220"), 0);
 				}
 				break;
@@ -1406,7 +1406,7 @@ WRITE8_HANDLER ( ti99_8_w )
 				/* speech write */
 				if (! (offset & 1))
 				{
-					cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-48*4);		/* this is just an approx. minimum, it can be much more */
+					cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-48*4);		/* this is just an approx. minimum, it can be much more */
 
 					/* the stupid design of the tms5220 core means that ready is cleared when
                     there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
@@ -1421,7 +1421,7 @@ WRITE8_HANDLER ( ti99_8_w )
 						logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready)
 							, (int) cycles_to_ready);
 
-						cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-cycles_to_ready);
+						cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-cycles_to_ready);
 						timer_set(space->machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
 					}
 
@@ -2461,7 +2461,7 @@ static void ti99_TIxram_init(running_machine *machine)
 /* low 8 kb: 0x2000-0x3fff */
 static READ16_HANDLER ( ti99_TIxramlow_r )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	return xRAM_ptr[offset];
@@ -2469,7 +2469,7 @@ static READ16_HANDLER ( ti99_TIxramlow_r )
 
 static WRITE16_HANDLER ( ti99_TIxramlow_w )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	COMBINE_DATA(xRAM_ptr + offset);
@@ -2478,7 +2478,7 @@ static WRITE16_HANDLER ( ti99_TIxramlow_w )
 /* high 24 kb: 0xa000-0xffff */
 static READ16_HANDLER ( ti99_TIxramhigh_r )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	return xRAM_ptr[offset+0x1000];
@@ -2486,7 +2486,7 @@ static READ16_HANDLER ( ti99_TIxramhigh_r )
 
 static WRITE16_HANDLER ( ti99_TIxramhigh_w )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	COMBINE_DATA(xRAM_ptr + offset+0x1000);
@@ -2569,7 +2569,7 @@ static WRITE8_HANDLER(sAMS_mapper_w)
 /* low 8 kb: 0x2000-0x3fff */
 static READ16_HANDLER ( ti99_sAMSxramlow_r )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	if (sAMS_mapper_on)
@@ -2580,7 +2580,7 @@ static READ16_HANDLER ( ti99_sAMSxramlow_r )
 
 static WRITE16_HANDLER ( ti99_sAMSxramlow_w )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	if (sAMS_mapper_on)
@@ -2592,7 +2592,7 @@ static WRITE16_HANDLER ( ti99_sAMSxramlow_w )
 /* high 24 kb: 0xa000-0xffff */
 static READ16_HANDLER ( ti99_sAMSxramhigh_r )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	if (sAMS_mapper_on)
@@ -2603,7 +2603,7 @@ static READ16_HANDLER ( ti99_sAMSxramhigh_r )
 
 static WRITE16_HANDLER ( ti99_sAMSxramhigh_w )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	if (sAMS_mapper_on)
@@ -2876,14 +2876,14 @@ static void myarc_cru_w(running_machine *machine, int offset, int data)
 /* low 8 kb: 0x2000-0x3fff */
 static READ16_HANDLER ( ti99_myarcxramlow_r )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 
 	return xRAM_ptr[myarc_cur_page_offset + offset];
 }
 
 static WRITE16_HANDLER ( ti99_myarcxramlow_w )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 
 	COMBINE_DATA(xRAM_ptr + myarc_cur_page_offset + offset);
 }
@@ -2891,14 +2891,14 @@ static WRITE16_HANDLER ( ti99_myarcxramlow_w )
 /* high 24 kb: 0xa000-0xffff */
 static READ16_HANDLER ( ti99_myarcxramhigh_r )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 
 	return xRAM_ptr[myarc_cur_page_offset + offset+0x1000];
 }
 
 static WRITE16_HANDLER ( ti99_myarcxramhigh_w )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 
 	COMBINE_DATA(xRAM_ptr + myarc_cur_page_offset + offset+0x1000);
 }

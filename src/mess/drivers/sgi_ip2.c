@@ -41,7 +41,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/dac.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc146818.h" /* TOD clock */
@@ -62,7 +62,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror("%08x: %s", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), buf);
+		logerror("%08x: %s", cpu_get_pc(devtag_get_device(machine, "maincpu")), buf);
 	}
 }
 #else
@@ -500,7 +500,7 @@ static DRIVER_INIT( sgi_ip2 )
 	UINT32 *dst = mainram;
 	memcpy(dst, src, 8);
 
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 
 	mc146818_init(machine, MC146818_IGNORE_CENTURY);
 }

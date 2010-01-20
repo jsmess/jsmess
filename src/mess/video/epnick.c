@@ -13,7 +13,7 @@
  *
  ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "epnick.h"
 #include "devices/messram.h"
 

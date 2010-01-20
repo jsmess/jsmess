@@ -88,7 +88,7 @@ Are the OKI M6295 clocks from Heavy Smash are correct at least for the Mitchell 
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/decocrpt.h"
 #include "includes/deco32.h"
 #include "cpu/arm/arm.h"
@@ -513,7 +513,7 @@ static DRIVER_INIT(simpl156)
 {
 	UINT8 *rom = memory_region(machine, "okimusic");
 	int length = memory_region_length(machine, "okimusic");
-	UINT8 *buf1 = alloc_array_or_die(UINT8, length);
+	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
 
 	UINT32 x;
 
@@ -534,7 +534,7 @@ static DRIVER_INIT(simpl156)
 
 	memcpy(rom,buf1,length);
 
-	free (buf1);
+	auto_free (machine, buf1);
 
 	deco56_decrypt_gfx(machine, "gfx1");
 	deco156_decrypt(machine);

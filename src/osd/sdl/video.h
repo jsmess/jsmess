@@ -56,7 +56,11 @@ typedef struct _sdl_monitor_info sdl_monitor_info;
 struct _sdl_monitor_info
 {
 	sdl_monitor_info  *	next;					// pointer to next monitor in list
+#ifdef PTR64
+	UINT64				handle;					// handle to the monitor
+#else
 	UINT32				handle;					// handle to the monitor
+#endif
 	int					monitor_width;
 	int					monitor_height;
 	char				monitor_device[64];
@@ -90,10 +94,10 @@ struct _sdl_video_config
 	int					novideo;				// don't draw, for pure CPU benchmarking
 
 	// global configuration
-	int					windowed;	 			// start windowed?
+	int					windowed;				// start windowed?
 	int					prescale;				// prescale factor (not currently supported)
-	int					keepaspect;	 			// keep aspect ratio?
-	int					numscreens;	 			// number of screens
+	int					keepaspect;				// keep aspect ratio?
+	int					numscreens;				// number of screens
 	int					centerh;
 	int					centerv;
 
@@ -113,7 +117,6 @@ struct _sdl_video_config
 
 	// OpenGL options
 	int					filter;			// enable filtering, disabled if glsl_filter>0
-	int					prescale_effect;
 	int					prefer16bpp_tex;
 	int					glsl;
 	int					glsl_filter;		// glsl filtering, >0 disables filter
@@ -133,7 +136,7 @@ struct _sdl_video_config
 	// X11 options
 	int					restrictonemonitor;	// in fullscreen, confine to Xinerama monitor 0
 
-	// YUV options	
+	// YUV options
 	int					scale_mode;
 };
 

@@ -5,7 +5,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/ti85.h"
 
 #define TI81_VIDEO_MEMORY_SIZE	 768

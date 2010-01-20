@@ -81,8 +81,6 @@ int CLIB_DECL main(int argc, char *argv[])
 	core_options *messtest_options = NULL;
 
 	/* test case for memory allocation system */
-	test_memory_pools();
-
 #ifdef _WIN32
 	/* expand wildcards so '*' can be used */
 	win_expand_wildcards(&argc, &argv);

@@ -25,8 +25,8 @@ Revisions:
 - Cleaned up faux x86 assembly.
 
 *********************************************************/
-#include <math.h>
-#include "sndintrf.h"
+
+#include "emu.h"
 #include "streams.h"
 #include "iremga20.h"
 
@@ -242,8 +242,8 @@ static DEVICE_START( iremga20 )
 	int i;
 
 	/* Initialize our chip structure */
-	chip->rom = device->region;
-	chip->rom_size = device->regionbytes;
+	chip->rom = *device->region;
+	chip->rom_size = device->region->bytes();
 
 	iremga20_reset(chip);
 

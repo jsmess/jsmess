@@ -4,7 +4,7 @@
     peter.trauner@jk.uni-linz.ac.at
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 
@@ -118,7 +118,7 @@ static  READ8_DEVICE_HANDLER( pet_pia0_port_b_read )
 static READ8_DEVICE_HANDLER( petb_pia0_port_b_read )
 {
 	UINT8 data = 0xff;
-	pet_state *state = device->machine->driver_data;
+	pet_state *state = (pet_state *)device->machine->driver_data;
 	static const char *const keynames[] = {
 		"ROW0", "ROW1", "ROW2", "ROW3", "ROW4",
 		"ROW5", "ROW6", "ROW7", "ROW8", "ROW9"
@@ -177,7 +177,7 @@ static WRITE_LINE_DEVICE_HANDLER( pet_irq )
 {
 	int level = state ? 1 : 0;
 	static int old_level = 0;
-	pet_state *driver_state = device->machine->driver_data;
+	pet_state *driver_state = (pet_state *)device->machine->driver_data;
 	if (level != old_level)
 	{
 		DBG_LOG(device->machine, 3, "mos6502", ("irq %s\n", level ? "start" : "end"));
@@ -610,7 +610,7 @@ static TIMER_CALLBACK( pet_tape2_timer )
 static void pet_common_driver_init( running_machine *machine )
 {
 	int i;
-	pet_state *state = machine->driver_data;
+	pet_state *state = (pet_state *)machine->driver_data;
 
 	pet_font = 0;
 
@@ -643,7 +643,7 @@ static void pet_common_driver_init( running_machine *machine )
 
 DRIVER_INIT( pet2001 )
 {
-	pet_state *state = machine->driver_data;
+	pet_state *state = (pet_state *)machine->driver_data;
 	pet_memory = messram_get_ptr(devtag_get_device(machine, "messram"));
 	pet_common_driver_init(machine);
 	state->pet_basic1 = 1;
@@ -659,7 +659,7 @@ DRIVER_INIT( pet )
 
 DRIVER_INIT( pet80 )
 {
-	pet_state *state = machine->driver_data;
+	pet_state *state = (pet_state *)machine->driver_data;
 	pet_memory = memory_region(machine, "maincpu");
 
 	pet_common_driver_init(machine);
@@ -672,7 +672,7 @@ DRIVER_INIT( pet80 )
 
 DRIVER_INIT( superpet )
 {
-	pet_state *state = machine->driver_data;
+	pet_state *state = (pet_state *)machine->driver_data;
 	pet_memory = messram_get_ptr(devtag_get_device(machine, "messram"));
 	pet_common_driver_init(machine);
 	state->superpet = 1;
@@ -687,7 +687,7 @@ DRIVER_INIT( superpet )
 
 MACHINE_RESET( pet )
 {
-	pet_state *state = machine->driver_data;
+	pet_state *state = (pet_state *)machine->driver_data;
 	const device_config *ieeebus = devtag_get_device(machine, "ieee_bus");
 	const device_config *scapegoat = devtag_get_device(machine, "pia_0");
 
@@ -723,7 +723,7 @@ MACHINE_RESET( pet )
 
 //removed	cbm_drive_0_config (input_port_read(machine, "CFG") & 2 ? IEEE : 0, 8);
 //removed	cbm_drive_1_config (input_port_read(machine, "CFG") & 1 ? IEEE : 0, 9);
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 
 	ieee488_ren_w(ieeebus, scapegoat, 0);
 	ieee488_ifc_w(ieeebus, scapegoat, 0);
@@ -733,7 +733,7 @@ MACHINE_RESET( pet )
 
 INTERRUPT_GEN( pet_frame_interrupt )
 {
-	pet_state *state = device->machine->driver_data;
+	pet_state *state = (pet_state *)device->machine->driver_data;
 	if (state->superpet)
 	{
 		if (input_port_read(device->machine, "CFG") & 0x04)

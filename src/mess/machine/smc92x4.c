@@ -13,7 +13,7 @@
     Raphael Nabet, 2003
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "devices/flopdrv.h"
 
 #include "smc92x4.h"
@@ -288,15 +288,15 @@ static int get_id_from_device( const device_config *device )
 {
 	int id = -1;
 
-	if ( ! strcmp( "harddisk1", device->tag ) )
+	if ( ! strcmp( "harddisk1", device->tag.cstr() ) )
 	{
 		id = 0;
 	}
-	else if ( ! strcmp( "harddisk2", device->tag ) )
+	else if ( ! strcmp( "harddisk2", device->tag.cstr() ) )
 	{
 		id = 1;
 	}
-	else if ( ! strcmp( "harddisk3", device->tag ) )
+	else if ( ! strcmp( "harddisk3", device->tag.cstr() ) )
 	{
 		id = 2;
 	}

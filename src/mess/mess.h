@@ -11,8 +11,8 @@
 
 #include <stdarg.h>
 
-#include "image.h"
-#include "memory.h"
+//#include "image.h"
+//#include "memory.h"
 #include "configms.h"
 #include "messopts.h"
 

@@ -29,7 +29,7 @@
  *
  *****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 #include "cpu/arm/arm.h"

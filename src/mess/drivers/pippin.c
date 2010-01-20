@@ -21,7 +21,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/powerpc/ppc.h"
 #include "devices/chd_cd.h"
 #include "sound/cdda.h"

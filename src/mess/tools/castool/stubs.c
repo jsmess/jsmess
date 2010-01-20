@@ -1,11 +1,13 @@
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
+#include "pool.h"
 #include <ctype.h>
 #include <stdarg.h>
 
 /* Variables to hold the status of various game options */
 static FILE *errorlog;
 
-const game_driver *const drivers[1];
+const game_driver *const drivers[1] = { NULL };
 int rompath_extra;
 int history_filename;
 int mameinfo_filename;
@@ -103,92 +105,9 @@ int resource_tracking_tag = 0;
     PROTOTYPES
 ***************************************************************************/
 
-static void astring_destructor(void *object, size_t size);
-static void bitmap_destructor(void *object, size_t size);
-
-
 /***************************************************************************
     CORE IMPLEMENTATION
 ***************************************************************************/
-
-/*-------------------------------------------------
-    init_resource_tracking - initialize the
-    resource tracking system
--------------------------------------------------*/
-
-void init_resource_tracking(void)
-{
-	resource_tracking_tag = 0;
-}
-
-
-/*-------------------------------------------------
-    exit_resource_tracking - tear down the
-    resource tracking system
--------------------------------------------------*/
-
-void exit_resource_tracking(void)
-{
-	while (resource_tracking_tag != 0)
-		end_resource_tracking();
-}
-
-
-/*-------------------------------------------------
-    memory_error - report a memory error
--------------------------------------------------*/
-
-static void memory_error(const char *message)
-{
-	fatalerror("%s", message);
-}
-
-
-/*-------------------------------------------------
-    begin_resource_tracking - start tracking
-    resources
--------------------------------------------------*/
-
-void begin_resource_tracking(void)
-{
-	object_pool *new_pool;
-
-	/* sanity check */
-	assert_always(resource_tracking_tag < ARRAY_LENGTH(pools), "Too many memory pools");
-
-	/* create a new pool */
-	new_pool = pool_alloc(memory_error);
-	if (!new_pool)
-		fatalerror("Failed to allocate new memory pool");
-	pools[resource_tracking_tag] = new_pool;
-
-	/* add resource types */
-	pool_type_register(new_pool, OBJTYPE_ASTRING, "String", astring_destructor);
-	pool_type_register(new_pool, OBJTYPE_BITMAP, "Bitmap", bitmap_destructor);
-	//pool_type_register(new_pool, OBJTYPE_TIMER, "Timer", timer_destructor);
-	//pool_type_register(new_pool, OBJTYPE_STATEREG, "Save State Registration", state_destructor);
-
-	/* increment the tag counter */
-	resource_tracking_tag++;
-}
-
-
-/*-------------------------------------------------
-    end_resource_tracking - stop tracking
-    resources
--------------------------------------------------*/
-
-void end_resource_tracking(void)
-{
-	/* decrement the tag counter */
-	resource_tracking_tag--;
-
-	/* free the memory pool */
-	pool_free(pools[resource_tracking_tag]);
-	pools[resource_tracking_tag] = NULL;
-}
-
-
 /*-------------------------------------------------
     current_pool - identifies the current memory
     pool
@@ -223,9 +142,6 @@ void *restrack_register_object(object_type type, void *ptr, size_t size, const c
 void *auto_malloc_file_line(running_machine *machine, size_t size, const char *file, int line)
 {
 	void *result = pool_malloc_file_line(current_pool(), size, file, line);
-#ifdef MAME_DEBUG
-	rand_memory(result, size);
-#endif
 	return result;
 }
 
@@ -275,39 +191,6 @@ char *auto_strdup_allow_null_file_line(running_machine *machine, const char *str
 	return (str != NULL) ? auto_strdup_file_line(machine, str, file, line) : NULL;
 }
 
-
-/*-------------------------------------------------
-    auto_astring_alloc_file_line - allocate
-    auto-freeing astring
--------------------------------------------------*/
-
-astring *auto_astring_alloc_file_line(running_machine *machine, const char *file, int line)
-{
-	return (astring *)restrack_register_object(OBJTYPE_ASTRING, astring_alloc(), 0, file, line);
-}
-
-
-
-/*-------------------------------------------------
-    astring_destructor - destructor for astring
-    objects
--------------------------------------------------*/
-
-static void astring_destructor(void *object, size_t size)
-{
-	astring_free((astring *)object);
-}
-
-
-/*-------------------------------------------------
-    bitmap_destructor - destructor for bitmap
-    objects
--------------------------------------------------*/
-
-static void bitmap_destructor(void *object, size_t size)
-{
-	bitmap_free((bitmap_t *)object);
-}
 
 
 void *malloc_or_die_file_line(size_t size, const char *file, int line)

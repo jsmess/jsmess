@@ -18,7 +18,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "mc6846.h"
 
 #define VERBOSE 0
@@ -587,7 +587,7 @@ static DEVICE_START( mc6846 )
 {
 	mc6846_t* mc6846 = get_safe_token( device );
 
-	mc6846->iface = device->static_config;
+	mc6846->iface = (const mc6846_interface*)device->static_config;
 	mc6846->interval = timer_alloc( device->machine, mc6846_timer_expire , (void*) device );
 	mc6846->one_shot = timer_alloc( device->machine, mc6846_timer_one_shot , (void*) device );
 

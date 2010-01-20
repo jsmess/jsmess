@@ -68,7 +68,7 @@ The End
 ************************************************
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
@@ -178,7 +178,7 @@ static WRITE8_HANDLER(audio_w)
 
 static WRITE8_DEVICE_HANDLER(ay_sel)
 {
-	if(cpu_get_previouspc(cputag_get_cpu(device->machine, "audiocpu"))==0x309)
+	if(cpu_get_previouspc(devtag_get_device(device->machine, "audiocpu"))==0x309)
 	{
 		ay8910_address_w(device,0,nAyCtrl);
 		ay8910_data_w(device,0,nAyData);

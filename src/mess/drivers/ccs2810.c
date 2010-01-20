@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
 
@@ -29,7 +29,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(ccs2810)
 {
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC, 0xf000);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_PC, 0xf000);
 }
 
 static VIDEO_START( ccs2810 )

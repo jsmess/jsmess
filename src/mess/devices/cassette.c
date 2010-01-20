@@ -6,8 +6,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
-#include "mame.h"
+#include "emu.h"
 #include "cassette.h"
 #include "formats/cassimg.h"
 #include "ui.h"
@@ -114,8 +113,8 @@ void cassette_change_state(const device_config *device, cassette_state state, ca
 	cassette_state new_state;
 
 	new_state = cassette->state;
-	new_state &= ~mask;
-	new_state |= (state & mask);
+	new_state = (cassette_state)(new_state & ~mask);
+	new_state = (cassette_state)(new_state | (state & mask));
 
 	if (new_state != cassette->state)
 	{
@@ -128,7 +127,7 @@ void cassette_change_state(const device_config *device, cassette_state state, ca
 
 void cassette_set_state(const device_config *device, cassette_state state)
 {
-	cassette_change_state(device, state, ~0);
+	cassette_change_state(device, state, (cassette_state)(~0));
 }
 
 
@@ -235,7 +234,7 @@ static DEVICE_START( cassette )
 	dev_cassette_t	*cassette = get_safe_token( device );
 
 	/* set to default state */
-	cassette->config = device->static_config;
+	cassette->config = (const cassette_config*)device->static_config;
 	cassette->cassette = NULL;
 	cassette->state = cassette->config->default_state;
 }
@@ -338,7 +337,7 @@ static void device_display_cassette(const device_config *image)
 	/* figure out where we are in the cassette */
 	position = cassette_get_position(image);
 	length = cassette_get_length(image);
-	uistate = cassette_get_state(image) & CASSETTE_MASK_UISTATE;
+	uistate = (cassette_state)(cassette_get_state(image) & CASSETTE_MASK_UISTATE);
 
 	/* choose a location on the screen */
 	x = 0.0f;
@@ -346,7 +345,7 @@ static void device_display_cassette(const device_config *image)
 
 	device = device_list_first( &image->machine->config->devicelist, CASSETTE );
 
-	while ( device && strcmp( device->tag, image->tag ) )
+	while ( device && strcmp( device->tag.cstr(), image->tag.cstr() ) )
 	{
 		y += 1;
 		device = device_list_next( device, CASSETTE );

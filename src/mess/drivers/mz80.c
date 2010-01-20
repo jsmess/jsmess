@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
@@ -252,7 +252,7 @@ static const cassette_config mz80k_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 };
 
 static TIMER_DEVICE_CALLBACK( ne555_tempo_callback )

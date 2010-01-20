@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/tnzs.h"
 
 
@@ -225,3 +225,4 @@ VIDEO_EOF( tnzs )
 		memcpy(&state->objram[0x1400], &state->objram[0x1c00], 0x0400);
 	}
 }
+

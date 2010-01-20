@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/jtc.h"
 #include "cpu/z8/z8.h"
 #include "devices/cassette.h"
@@ -34,7 +34,7 @@ static WRITE8_HANDLER( p2_w )
 
     */
 
-	jtc_state *state = space->machine->driver_data;
+	jtc_state *state = (jtc_state *)space->machine->driver_data;
 
 	centronics_strobe_w(state->centronics, BIT(data, 5));
 }
@@ -56,7 +56,7 @@ static READ8_HANDLER( p3_r )
 
     */
 
-	jtc_state *state = space->machine->driver_data;
+	jtc_state *state = (jtc_state *)space->machine->driver_data;
 
 	UINT8 data = 0;
 
@@ -83,7 +83,7 @@ static WRITE8_HANDLER( p3_w )
 
     */
 
-	jtc_state *state = space->machine->driver_data;
+	jtc_state *state = (jtc_state *)space->machine->driver_data;
 
 	/* tape */
 	cassette_output(state->cassette, BIT(data, 6) ? +1.0 : -1.0);
@@ -94,7 +94,7 @@ static WRITE8_HANDLER( p3_w )
 
 static READ8_HANDLER( es40_videoram_r )
 {
-	jtc_state *state = space->machine->driver_data;
+	jtc_state *state = (jtc_state *)space->machine->driver_data;
 
 	UINT8 data = 0;
 
@@ -108,7 +108,7 @@ static READ8_HANDLER( es40_videoram_r )
 
 static WRITE8_HANDLER( es40_videoram_w )
 {
-	jtc_state *state = space->machine->driver_data;
+	jtc_state *state = (jtc_state *)space->machine->driver_data;
 
 	if (state->video_bank & 0x80) state->color_ram_r[offset] = data;
 	if (state->video_bank & 0x40) state->color_ram_g[offset] = data;
@@ -118,7 +118,7 @@ static WRITE8_HANDLER( es40_videoram_w )
 
 static WRITE8_HANDLER( es40_banksel_w )
 {
-	jtc_state *state = space->machine->driver_data;
+	jtc_state *state = (jtc_state *)space->machine->driver_data;
 
 	state->video_bank = offset & 0xf0;
 }
@@ -510,7 +510,7 @@ static VIDEO_START( jtc )
 
 static VIDEO_UPDATE( jtc )
 {
-	jtc_state *state = screen->machine->driver_data;
+	jtc_state *state = (jtc_state *)screen->machine->driver_data;
 
 	int x, y, sx;
 
@@ -537,7 +537,7 @@ static VIDEO_START( jtc_es23 )
 
 static VIDEO_UPDATE( jtc_es23 )
 {
-	jtc_state *state = screen->machine->driver_data;
+	jtc_state *state = (jtc_state *)screen->machine->driver_data;
 
 	int x, y, sx;
 
@@ -564,7 +564,7 @@ static PALETTE_INIT( jtc_es40 )
 
 static VIDEO_START( jtc_es40 )
 {
-	jtc_state *state = machine->driver_data;
+	jtc_state *state = (jtc_state *)machine->driver_data;
 
 	/* allocate memory */
 	state->video_ram = auto_alloc_array(machine, UINT8, JTC_ES40_VIDEORAM_SIZE);
@@ -582,7 +582,7 @@ static VIDEO_START( jtc_es40 )
 
 static VIDEO_UPDATE( jtc_es40 )
 {
-	jtc_state *state = screen->machine->driver_data;
+	jtc_state *state = (jtc_state *)screen->machine->driver_data;
 
 	int x, y, sx;
 
@@ -611,7 +611,7 @@ static VIDEO_UPDATE( jtc_es40 )
 
 static MACHINE_START( jtc )
 {
-	jtc_state *state = machine->driver_data;
+	jtc_state *state = (jtc_state *)machine->driver_data;
 
 	/* find devices */
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
@@ -628,7 +628,7 @@ static const cassette_config jtc_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 };
 
 /* F4 Character Displayer */

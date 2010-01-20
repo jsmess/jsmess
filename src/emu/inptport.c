@@ -91,17 +91,16 @@
 
 ***************************************************************************/
 
-#include "osdepend.h"
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "config.h"
 #include "xmlfile.h"
 #include "profiler.h"
-#include "inputseq.h"
 #include "ui.h"
 #include "uiinput.h"
+
 #include <ctype.h>
 #include <time.h>
-#include <stdarg.h>
 
 #ifdef MESS
 #include "uimess.h"
@@ -711,13 +710,6 @@ void input_port_list_init(input_port_list *portlist, const input_port_token *tok
 {
 	/* initialize fields */
 	portlist->head = NULL;
-	portlist->map = NULL;
-	if (allocmap)
-	{
-		portlist->map = tagmap_alloc();
-		if (portlist->map == NULL)
-			fatalerror("Out of memory for input port map");
-	}
 
 	/* no tokens, no list */
 	if (tokens == NULL)
@@ -743,11 +735,6 @@ void input_port_list_deinit(input_port_list *portlist)
 	/* iterate over all ports and free them */
 	while (portlist->head != NULL)
 		port_config_free(&portlist->head);
-
-	/* free the map if present */
-	if (portlist->map != NULL)
-		tagmap_free(portlist->map);
-	portlist->map = NULL;
 }
 
 
@@ -1288,7 +1275,7 @@ input_port_value input_port_read_direct(const input_port_config *port)
 
 input_port_value input_port_read(running_machine *machine, const char *tag)
 {
-	const input_port_config *port = input_port_by_tag(&machine->portlist, tag);
+	const input_port_config *port = machine->port(tag);
 	if (port == NULL)
 		fatalerror("Unable to locate input port '%s'", tag);
 	return input_port_read_direct(port);
@@ -1303,7 +1290,7 @@ input_port_value input_port_read(running_machine *machine, const char *tag)
 
 input_port_value input_port_read_safe(running_machine *machine, const char *tag, UINT32 defvalue)
 {
-	const input_port_config *port = input_port_by_tag(&machine->portlist, tag);
+	const input_port_config *port = machine->port(tag);
 	return (port == NULL) ? defvalue : input_port_read_direct(port);
 }
 
@@ -1477,7 +1464,7 @@ void input_port_write_direct(const input_port_config *port, input_port_value dat
 
 void input_port_write(running_machine *machine, const char *tag, input_port_value value, input_port_value mask)
 {
-	const input_port_config *port = input_port_by_tag(&machine->portlist, tag);
+	const input_port_config *port = machine->port(tag);
 	if (port == NULL)
 		fatalerror("Unable to locate input port '%s'", tag);
 	input_port_write_direct(port, value, mask);
@@ -1491,7 +1478,7 @@ void input_port_write(running_machine *machine, const char *tag, input_port_valu
 
 void input_port_write_safe(running_machine *machine, const char *tag, input_port_value value, input_port_value mask)
 {
-	const input_port_config *port = input_port_by_tag(&machine->portlist, tag);
+	const input_port_config *port = machine->port(tag);
 	if (port != NULL)
 		input_port_write_direct(port, value, mask);
 }
@@ -1810,10 +1797,11 @@ static device_field_info *init_field_device_info(const input_field_config *field
 		info->shift++;
 
 	if (device_name != NULL)
-		info->device = devtag_get_device(field->port->machine, device_name);
+		info->device = field->port->machine->device(device_name);
 	else
 		info->device = (const device_config *) info;
 
+	info->oldval = field->defvalue >> info->shift;
 	return info;
 }
 
@@ -2429,6 +2417,7 @@ static void port_config_detokenize(input_port_list *portlist, const input_port_t
 	input_field_config *curfield = NULL;
 	input_port_config *curport = NULL;
 	input_port_value maskbits = 0;
+	tagmap_error err;
 	UINT16 category;	/* (MESS-specific) category */
 
 	/* loop over tokens until we hit the end */
@@ -2468,14 +2457,11 @@ static void port_config_detokenize(input_port_list *portlist, const input_port_t
 
 				curport = port_config_alloc(&portlist->head);
 				curport->tag = TOKEN_GET_STRING(ipt);
-				if (portlist->map != NULL)
+				err = portlist->map.add_unique_hash(curport->tag, curport, FALSE);
+				if (err == TMERR_DUPLICATE)
 				{
-					tagmap_error err = tagmap_add_unique_hash(portlist->map, curport->tag, curport, FALSE);
-					if (err == TMERR_DUPLICATE)
-					{
-						const input_port_config *match = (const input_port_config *)tagmap_find_hash_only(portlist->map, curport->tag);
-						error_buf_append(errorbuf, errorbuflen, "tag '%s' has same hash as tag '%s'; please change one of them", curport->tag, match->tag);
-					}
+					const input_port_config *match = portlist->map.find_hash_only(curport->tag);
+					error_buf_append(errorbuf, errorbuflen, "tag '%s' has same hash as tag '%s'; please change one of them", curport->tag, match->tag);
 				}
 				curfield = NULL;
 				cursetting = NULL;
@@ -3091,7 +3077,7 @@ static input_port_config *port_config_alloc(const input_port_config **listhead)
 	input_port_config *config;
 
 	/* allocate memory */
-	config = alloc_clear_or_die(input_port_config);
+	config = global_alloc_clear(input_port_config);
 
 	/* add it to the tail */
 	for (tailptr = listhead; *tailptr != NULL; tailptr = &(*tailptr)->next) ;
@@ -3118,7 +3104,7 @@ static void port_config_free(const input_port_config **portptr)
 	*portptr = port->next;
 
 	/* free ourself */
-	free(port);
+	global_free(port);
 }
 
 
@@ -3152,7 +3138,7 @@ static input_field_config *field_config_alloc(input_port_config *port, int type,
 	int seqtype;
 
 	/* allocate memory */
-	config = alloc_clear_or_die(input_field_config);
+	config = global_alloc_clear(input_field_config);
 
 	/* fill in the basic field values */
 	config->port = port;
@@ -3243,7 +3229,7 @@ static void field_config_free(input_field_config **fieldptr)
 	*fieldptr = (input_field_config *)field->next;
 
 	/* free ourself */
-	free(field);
+	global_free(field);
 }
 
 
@@ -3259,7 +3245,7 @@ static input_setting_config *setting_config_alloc(input_field_config *field, inp
 	input_setting_config *config;
 
 	/* allocate memory */
-	config = alloc_clear_or_die(input_setting_config);
+	config = global_alloc_clear(input_setting_config);
 
 	/* fill in the basic setting values */
 	config->field = field;
@@ -3287,7 +3273,7 @@ static void setting_config_free(input_setting_config **settingptr)
 	*settingptr = (input_setting_config *)setting->next;
 
 	/* free ourself */
-	free(setting);
+	global_free(setting);
 }
 
 
@@ -3318,7 +3304,7 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 		const char *comma, *colon, *number;
 
 		/* allocate a new entry */
-		*tailptr = alloc_clear_or_die(input_field_diplocation);
+		*tailptr = global_alloc_clear(input_field_diplocation);
 		entries++;
 
 		/* find the end of this entry */
@@ -3337,7 +3323,7 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 		/* allocate and copy the name if it is present */
 		if (colon != NULL)
 		{
-			(*tailptr)->swname = lastname = alloc_array_or_die(char, colon - tempbuf + 1);
+			(*tailptr)->swname = lastname = global_alloc_array(char, colon - tempbuf + 1);
 			strncpy(lastname, tempbuf, colon - tempbuf);
 			lastname[colon - tempbuf] = 0;
 			number = colon + 1;
@@ -3352,7 +3338,7 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 				error_buf_append(errorbuf, errorbuflen, "Switch location '%s' missing switch name!\n", location);
 				lastname = (char *)"UNK";
 			}
-			(*tailptr)->swname = namecopy = alloc_array_or_die(char, strlen(lastname) + 1);
+			(*tailptr)->swname = namecopy = global_alloc_array(char, strlen(lastname) + 1);
 			strcpy(namecopy, lastname);
 		}
 
@@ -3397,13 +3383,13 @@ static void diplocation_free(input_field_diplocation **diplocptr)
 
 	/* free the name */
 	if (diploc->swname != NULL)
-		free((void *)diploc->swname);
+		global_free(diploc->swname);
 
 	/* remove ourself from the list */
 	*diplocptr = (input_field_diplocation *)diploc->next;
 
 	/* free ourself */
-	free(diploc);
+	global_free(diploc);
 }
 
 
@@ -3584,8 +3570,8 @@ static void load_remap_table(running_machine *machine, xml_data_node *parentnode
 		int remapnum;
 
 		/* allocate tables */
-		oldtable = alloc_array_or_die(input_code, count);
-		newtable = alloc_array_or_die(input_code, count);
+		oldtable = global_alloc_array(input_code, count);
+		newtable = global_alloc_array(input_code, count);
 
 		/* build up the remap table */
 		count = 0;
@@ -3622,8 +3608,8 @@ static void load_remap_table(running_machine *machine, xml_data_node *parentnode
 		}
 
 		/* release the tables */
-		free(oldtable);
-		free(newtable);
+		global_free(oldtable);
+		global_free(newtable);
 	}
 }
 
@@ -3743,20 +3729,19 @@ static void save_config_callback(running_machine *machine, int config_type, xml_
 
 static void save_sequence(running_machine *machine, xml_data_node *parentnode, int type, int porttype, const input_seq *seq)
 {
-	astring *seqstring = astring_alloc();
+	astring seqstring;
 	xml_data_node *seqnode;
 
 	/* get the string for the sequence */
 	if (input_seq_get_1(seq) == SEQCODE_END)
-		astring_cpyc(seqstring, "NONE");
+		seqstring.cpy("NONE");
 	else
 		input_seq_to_tokens(machine, seqstring, seq);
 
 	/* add the new node */
-	seqnode = xml_add_child(parentnode, "newseq", astring_c(seqstring));
+	seqnode = xml_add_child(parentnode, "newseq", seqstring);
 	if (seqnode != NULL)
 		xml_set_attribute(seqnode, "type", seqtypestrings[type]);
-	astring_free(seqstring);
 }
 
 

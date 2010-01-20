@@ -16,7 +16,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "mm74c922.h"
 
 /***************************************************************************
@@ -84,7 +84,7 @@ static void change_output_lines(const device_config *device)
 	{
 		mm74c922->da = mm74c922->next_da;
 
-		if (LOG) logerror("MM74C922 '%s' Data Available: %u\n", device->tag, mm74c922->da);
+		if (LOG) logerror("MM74C922 '%s' Data Available: %u\n", device->tag.cstr(), mm74c922->da);
 
 		devcb_call_write_line(&mm74c922->out_da_func, mm74c922->da);
 	}
@@ -125,7 +125,7 @@ static void detect_keypress(const device_config *device)
 			mm74c922->next_da = 0;
 			mm74c922->data = 0xff; // high-Z
 
-			if (LOG) logerror("MM74C922 '%s' Key Released\n", device->tag);
+			if (LOG) logerror("MM74C922 '%s' Key Released\n", device->tag.cstr());
 		}
 	}
 	else
@@ -144,7 +144,7 @@ static void detect_keypress(const device_config *device)
 
 				mm74c922->data = (y << 2) | mm74c922->x;
 
-				if (LOG) logerror("MM74C922 '%s' Key Depressed: X %u Y %u = %02x\n", device->tag, mm74c922->x, y, mm74c922->data);
+				if (LOG) logerror("MM74C922 '%s' Key Depressed: X %u Y %u = %02x\n", device->tag.cstr(), mm74c922->x, y, mm74c922->data);
 				return;
 			}
 		}
@@ -157,7 +157,7 @@ static void detect_keypress(const device_config *device)
 
 static TIMER_CALLBACK( mm74c922_scan_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 
 	change_output_lines(device);
 	clock_scan_counters(device);
@@ -173,7 +173,7 @@ READ8_DEVICE_HANDLER( mm74c922_r )
 {
 	mm74c922_t *mm74c922 = get_safe_token(device);
 
-	if (LOG) logerror("MM74C922 '%s' Data Read: %02x\n", device->tag, mm74c922->data);
+	if (LOG) logerror("MM74C922 '%s' Data Read: %02x\n", device->tag.cstr(), mm74c922->data);
 
 	return mm74c922->data;
 }

@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/ut88.h"
 
 UINT8 *ut88_video_ram;

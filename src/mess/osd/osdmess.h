@@ -10,11 +10,7 @@
 #define __OSDMESS_H__
 
 #include "osdcore.h"
-#include "mamecore.h"
 #include "options.h"
-#include "devintrf.h"
-
-
 enum
 {
 	OSD_FOPEN_READ,

@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <tchar.h>
+#include "emu.h"
 #include "hexview.h"
 #include "utils.h"
 #include "winutils.h"

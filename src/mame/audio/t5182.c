@@ -144,7 +144,7 @@ rom.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "t5182.h"
 #include "sound/2151intf.h"
 
@@ -191,7 +191,7 @@ static TIMER_CALLBACK( setirq_callback )
 			break;
 	}
 
-	cpu = cputag_get_cpu(machine, CPUTAG_T5182);
+	cpu = devtag_get_device(machine, CPUTAG_T5182);
 
 	if (cpu == NULL)
 		return;

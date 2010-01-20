@@ -63,7 +63,7 @@
  *
  *****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/mz700.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255a.h"
@@ -85,13 +85,13 @@
 
 static TIMER_DEVICE_CALLBACK( ne556_cursor_callback )
 {
-	mz_state *mz = timer->machine->driver_data;
+	mz_state *mz = (mz_state *)timer->machine->driver_data;
 	mz->cursor_timer ^= 1;
 }
 
 static TIMER_DEVICE_CALLBACK( ne556_other_callback )
 {
-	mz_state *mz = timer->machine->driver_data;
+	mz_state *mz = (mz_state *)timer->machine->driver_data;
 	mz->other_timer ^= 1;
 }
 
@@ -373,7 +373,7 @@ static const cassette_config mz700_cassette_config =
 {
 	mz700_cassette_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 };
 
 

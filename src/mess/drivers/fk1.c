@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255a.h"
 #include "machine/pit8253.h"
@@ -364,7 +364,7 @@ static MACHINE_RESET(fk1)
 	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
 	memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
 
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), fk1_irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), fk1_irq_callback);
 }
 
 static MACHINE_START( fk1 )

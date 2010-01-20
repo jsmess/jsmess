@@ -10,7 +10,7 @@
 #ifndef __CBM_IEC__
 #define __CBM_IEC__
 
-#include "driver.h"
+#include "emu.h"
 
 /***************************************************************************
     MACROS / CONSTANTS

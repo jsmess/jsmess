@@ -38,7 +38,7 @@ struct basicdsk_tag
 static const struct basicdsk_geometry *get_geometry(floppy_image *floppy)
 {
 	const struct basicdsk_tag *tag;
-	tag = floppy_tag(floppy);
+	tag = (const basicdsk_tag *)floppy_tag(floppy);
 	return &tag->geometry;
 }
 

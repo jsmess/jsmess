@@ -51,7 +51,7 @@ Super System Card:
 - Ankoku Densetsu: graphics flake out during intro (DMA issues)
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "video/vdc.h"
 #include "cpu/h6280/h6280.h"

@@ -12,7 +12,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i86/i86.h"
 
 static ADDRESS_MAP_START(sdk86_mem, ADDRESS_SPACE_PROGRAM, 16)

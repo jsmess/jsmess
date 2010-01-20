@@ -6,7 +6,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "crtc_ega.h"
 
 
@@ -123,7 +123,7 @@ INLINE crtc_ega_t *get_safe_token(const device_config *device)
 
 static STATE_POSTLOAD( crtc_ega_state_save_postload )
 {
-	recompute_parameters(param, TRUE);
+	recompute_parameters((crtc_ega_t*)param, TRUE);
 }
 
 
@@ -417,7 +417,7 @@ static void update_vblank_changed_timers(crtc_ega_t *crtc_ega)
 
 static TIMER_CALLBACK( de_changed_timer_cb )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -429,7 +429,7 @@ static TIMER_CALLBACK( de_changed_timer_cb )
 
 static TIMER_CALLBACK( vsync_on_timer_cb )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -439,7 +439,7 @@ static TIMER_CALLBACK( vsync_on_timer_cb )
 
 static TIMER_CALLBACK( vsync_off_timer_cb )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -451,7 +451,7 @@ static TIMER_CALLBACK( vsync_off_timer_cb )
 
 static TIMER_CALLBACK( hsync_on_timer_cb )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -461,7 +461,7 @@ static TIMER_CALLBACK( hsync_on_timer_cb )
 
 static TIMER_CALLBACK( hsync_off_timer_cb )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -473,7 +473,7 @@ static TIMER_CALLBACK( hsync_off_timer_cb )
 
 static TIMER_CALLBACK( vblank_on_timer_cb )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -485,7 +485,7 @@ static TIMER_CALLBACK( vblank_on_timer_cb )
 
 static TIMER_CALLBACK( vblank_off_timer_cb )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -550,7 +550,7 @@ UINT8 crtc_ega_get_ra(const device_config *device)
 
 static TIMER_CALLBACK( light_pen_latch_timer_cb )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
 	crtc_ega->light_pen_addr = crtc_ega_get_ma(device);
@@ -723,7 +723,7 @@ static void common_start(const device_config *device, int device_type)
 	assert(device->tag != NULL);
 	assert(device->clock > 0);
 
-	crtc_ega->intf = device->static_config;
+	crtc_ega->intf = (const crtc_ega_interface*)device->static_config;
 	crtc_ega->device_type = device_type;
 
 	if (crtc_ega->intf != NULL)

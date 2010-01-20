@@ -2,7 +2,7 @@
  PeT mess@utanet.at 2000,2001
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/lynx.h"
 #include "cpu/m6502/m6502.h"
 
@@ -785,7 +785,7 @@ static void lynx_blitter(running_machine *machine)
 	int i; int o;int colors;
 
 	blitter.memory_accesses = 0;
-	blitter.mem = memory_get_read_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000);
+	blitter.mem = (UINT8*)memory_get_read_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000);
 
 	blitter.xoff   = GET_WORD(suzy.data, 0x04);
 	blitter.yoff   = GET_WORD(suzy.data, 0x06);
@@ -1343,7 +1343,7 @@ typedef struct {
 	UINT8	cntrl1;
 	UINT8	cntrl2;
 	int		counter;
-	void	*timer;
+	emu_timer	*timer;
 	int		timer_active;
 } LYNX_TIMER;
 

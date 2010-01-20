@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/pk8020.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/wd17xx.h"
@@ -988,7 +988,7 @@ MACHINE_RESET( pk8020 )
 {
 	const device_config *fdc = devtag_get_device(machine, "wd1793");
 	pk8020_set_bank(machine,0);
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), pk8020_irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), pk8020_irq_callback);
 
 	wd17xx_set_density (fdc,DEN_FM_HI);
 

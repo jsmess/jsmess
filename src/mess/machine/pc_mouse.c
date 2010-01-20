@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/ins8250.h"
 #include "includes/pc_mouse.h"
 

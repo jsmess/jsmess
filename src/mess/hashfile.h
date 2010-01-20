@@ -9,7 +9,7 @@
 #ifndef __HASHFILE_H__
 #define __HASHFILE_H__
 
-#include "driver.h"
+#include "emu.h"
 #include "hash.h"
 
 

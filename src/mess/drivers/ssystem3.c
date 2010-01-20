@@ -33,7 +33,7 @@ artwork for board display
 backup of playfield rom and picture/description of its board
 */
 
-#include "driver.h"
+#include "emu.h"
 
 #include "includes/ssystem3.h"
 #include "machine/6522via.h"
@@ -110,7 +110,7 @@ static void ssystem3_playfield_write(running_machine *machine, int reset, int si
       if (d) playfield.data|=1<<(playfield.bit^7);
       playfield.bit++;
       if (playfield.bit==8) {
-	logerror("%.4x playfield wrote %d %02x\n", (int)cpu_get_pc(cputag_get_cpu(machine, "maincpu")), playfield.count, playfield.data);
+	logerror("%.4x playfield wrote %d %02x\n", (int)cpu_get_pc(devtag_get_device(machine, "maincpu")), playfield.count, playfield.data);
 	playfield.u.data[playfield.count]=playfield.data;
 	playfield.bit=0;
 	playfield.count=(playfield.count+1)%ARRAY_LENGTH(playfield.u.data);

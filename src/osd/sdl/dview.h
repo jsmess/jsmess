@@ -3,8 +3,10 @@
 
 #include <gtk/gtk.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "video.h"
+#include "osdepend.h"
+
 #include "debug/debugvw.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"

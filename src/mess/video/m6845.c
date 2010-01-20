@@ -8,7 +8,7 @@
 
  ************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/m6845.h"
 
 #define True 1

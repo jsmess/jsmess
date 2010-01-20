@@ -47,7 +47,7 @@ PAL frame timing
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "video/smsvdp.h"
 
 #define IS_SMS1_VDP           (smsvdp->features & MODEL_315_5124)

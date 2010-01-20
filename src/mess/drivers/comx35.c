@@ -10,7 +10,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/comx35.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "sound/cdp1869.h"
@@ -202,14 +202,14 @@ INPUT_PORTS_END
 
 static CDP1802_MODE_READ( comx35_mode_r )
 {
-	comx35_state *state = device->machine->driver_data;
+	comx35_state *state = (comx35_state *)device->machine->driver_data;
 
-	return state->cdp1802_mode;
+	return (cdp1802_control_mode)state->cdp1802_mode;
 }
 
 static CDP1802_EF_READ( comx35_ef_r )
 {
-	comx35_state *state = device->machine->driver_data;
+	comx35_state *state = (comx35_state *)device->machine->driver_data;
 
 	int flags = 0x0f;
 
@@ -245,7 +245,7 @@ static CDP1802_EF_READ( comx35_ef_r )
 
 static CDP1802_SC_WRITE( comx35_sc_w )
 {
-	comx35_state *driver_state = device->machine->driver_data;
+	comx35_state *driver_state = (comx35_state *)device->machine->driver_data;
 
 	switch (state)
 	{
@@ -284,7 +284,7 @@ static CDP1802_SC_WRITE( comx35_sc_w )
 
 static WRITE_LINE_DEVICE_HANDLER( comx35_q_w )
 {
-	comx35_state *driver_state = device->machine->driver_data;
+	comx35_state *driver_state = (comx35_state *)device->machine->driver_data;
 
 	driver_state->cdp1802_q = state;
 
@@ -312,14 +312,14 @@ static CDP1802_INTERFACE( comx35_cdp1802_config )
 
 static WRITE_LINE_DEVICE_HANDLER( comx35_da_w )
 {
-	comx35_state *driver_state = device->machine->driver_data;
+	comx35_state *driver_state = (comx35_state *)device->machine->driver_data;
 
 	driver_state->cdp1871_efxa = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( comx35_rpt_w )
 {
-	comx35_state *driver_state = device->machine->driver_data;
+	comx35_state *driver_state = (comx35_state *)device->machine->driver_data;
 
 	driver_state->cdp1871_efxb = state;
 }
@@ -360,7 +360,7 @@ static const cassette_config comx35_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 };
 
 static const floppy_config comx35_floppy_config =

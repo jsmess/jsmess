@@ -10,7 +10,7 @@
 
 #include "formats/dim_dsk.h"
 #include "formats/basicdsk.h"
-#include "driver.h"
+#include "emu.h"
 
 FLOPPY_IDENTIFY(dim_dsk_identify)
 {

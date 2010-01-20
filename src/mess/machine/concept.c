@@ -4,7 +4,7 @@
     Raphael Nabet, Brett Wyer, 2003-2005
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/concept.h"
 #include "machine/6522via.h"
 #include "machine/mm58274c.h"	/* mm58274 seems to be compatible with mm58174 */
@@ -676,7 +676,7 @@ static WRITE8_HANDLER(concept_fdc_reg_w)
 
 static  READ8_HANDLER(concept_fdc_rom_r)
 {
-	static const UINT8 data[8] = "CORVUS01";
+	static const UINT8 data[] = "CORVUS01";
 	return (offset < 8) ? data[offset] : 0;
 }
 

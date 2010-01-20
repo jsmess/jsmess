@@ -1,7 +1,7 @@
 #ifndef OPTIONSMS_H
 #define OPTIONSMS_H
 
-#include "mame.h"
+#include "emu.h"
 #include "image.h"
 #include "options.h"
 

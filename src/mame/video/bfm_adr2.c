@@ -90,7 +90,7 @@ E000-FFFF  | R | D D D D D D D D | 8K ROM
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/bfm_bd1.h"  // vfd
 #include "video/bfm_adr2.h"
@@ -432,7 +432,7 @@ void adder2_decode_char_roms(running_machine *machine)
 	{
 		UINT8 *s;
 
-		s = alloc_array_or_die(UINT8,  0x40000 );
+		s = auto_alloc_array(machine, UINT8, 0x40000 );
 		{
 			int x, y;
 
@@ -459,7 +459,7 @@ void adder2_decode_char_roms(running_machine *machine)
 				}
 				y++;
 			}
-			free(s);
+			auto_free(machine, s);
 		}
 	}
 }

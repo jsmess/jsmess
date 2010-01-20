@@ -4,7 +4,7 @@
  *
  ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "memconv.h"
 #include "video/pc_aga.h"
 #include "video/pc_cga.h"

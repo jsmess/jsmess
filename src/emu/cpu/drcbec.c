@@ -10,11 +10,10 @@
 
 ***************************************************************************/
 
+#include "emu.h"
+#include "debugger.h"
 #include "drcuml.h"
 #include "drcbeut.h"
-#include "eminline.h"
-#include "debugger.h"
-#include <math.h>
 
 #ifdef _MSC_VER
 #include <float.h>
@@ -319,8 +318,7 @@ static const UINT32 condition_map[] =
 
 static UINT64 immediate_zero = 0;
 
-extern const drcbe_interface drcbe_c_be_interface;
-const drcbe_interface drcbe_c_be_interface =
+extern const drcbe_interface drcbe_c_be_interface =
 {
 	drcbec_alloc,
 	drcbec_free,
@@ -355,7 +353,7 @@ static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drccache *cache, const de
 	/* remember our pointers */
 	drcbe->device = device;
 	for (spacenum = 0; spacenum < ARRAY_LENGTH(drcbe->space); spacenum++)
-		drcbe->space[spacenum] = memory_find_address_space(device, spacenum);
+		drcbe->space[spacenum] = device->space(spacenum);
 	drcbe->drcuml = drcuml;
 	drcbe->cache = cache;
 

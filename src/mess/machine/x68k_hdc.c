@@ -23,7 +23,7 @@ static struct hd_state hd;
 
 static TIMER_CALLBACK( req_delay )
 {
-	sasi_ctrl_t* sasi = ptr;
+	sasi_ctrl_t* sasi = (sasi_ctrl_t*)ptr;
 	sasi->req = 1;
 	sasi->status_port |= 0x01;
 }
@@ -45,7 +45,7 @@ static void SASIWriteByte(const device_config* device, unsigned char val)
 
 DEVICE_START( x68k_hdc )
 {
-	sasi_ctrl_t* sasi = device->token;
+	sasi_ctrl_t* sasi = (sasi_ctrl_t*)device->token;
 
 	sasi->status = 0x00;
 	sasi->status_port = 0x00;
@@ -73,7 +73,7 @@ DEVICE_IMAGE_CREATE( sasihd )
 
 WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 {
-	sasi_ctrl_t* sasi = device->token;
+	sasi_ctrl_t* sasi = (sasi_ctrl_t*)device->token;
 	unsigned int lba = 0;
 	char* blk;
 
@@ -275,7 +275,7 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 						lba |= sasi->command[2] << 8;
 						lba |= (sasi->command[1] & 0x1f) << 16;
 						image_fseek(device,lba * 256,SEEK_SET);
-						blk = malloc(256*33);
+						blk = (char*)malloc(256*33);
 						memset(blk,0,256*33);
 						// formats 33 256-byte blocks
 						image_fwrite(device,blk,256*33);
@@ -328,7 +328,7 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 
 READ16_DEVICE_HANDLER( x68k_hdc_r )
 {
-	sasi_ctrl_t* sasi = device->token;
+	sasi_ctrl_t* sasi = (sasi_ctrl_t*)device->token;
 	int retval = 0xff;
 
 	switch(offset)

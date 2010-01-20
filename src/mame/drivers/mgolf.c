@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 
 static UINT8* mgolf_video_ram;
@@ -96,7 +96,7 @@ static TIMER_CALLBACK( interrupt_callback )
 
 	update_plunger(machine);
 
-	generic_pulse_irq_line(cputag_get_cpu(machine, "maincpu"), 0);
+	generic_pulse_irq_line(devtag_get_device(machine, "maincpu"), 0);
 
 	scanline = scanline + 32;
 

@@ -171,7 +171,7 @@
 
 ************************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
@@ -1975,7 +1975,7 @@ static const cassette_config x1_cassette_config =
 {
 	x1_cassette_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 };
 
 
@@ -2063,7 +2063,7 @@ static MACHINE_RESET( x1 )
 	io_bank_mode = 0;
 	pcg_index[0] = pcg_index[1] = pcg_index[2] = 0;
 
-	//cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), x1_irq_callback);
+	//cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), x1_irq_callback);
 
 	cmt_current_cmd = 0;
 	cmt_test = 0;

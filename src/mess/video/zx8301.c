@@ -16,7 +16,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "zx8301.h"
 
 /***************************************************************************
@@ -83,7 +83,7 @@ INLINE const zx8301_interface *get_interface(const device_config *device)
 
 static TIMER_CALLBACK( zx8301_flash_tick )
 {
-	zx8301_t *zx8301 = get_safe_token(ptr);
+	zx8301_t *zx8301 = get_safe_token((const device_config *)ptr);
 
 	zx8301->flash = !zx8301->flash;
 }
@@ -94,7 +94,7 @@ static TIMER_CALLBACK( zx8301_flash_tick )
 
 static TIMER_CALLBACK( zx8301_vsync_tick )
 {
-	zx8301_t *zx8301 = get_safe_token(ptr);
+	zx8301_t *zx8301 = get_safe_token((const device_config *)ptr);
 
 	//zx8301->vsync = !zx8301->vsync;
 
@@ -303,7 +303,7 @@ static DEVICE_START( zx8301 )
 	zx8301->vsync = 1;
 
 	/* get the cpu */
-	zx8301->cpu = cputag_get_cpu(device->machine, intf->cpu_tag);
+	zx8301->cpu = devtag_get_device(device->machine, intf->cpu_tag);
 
 	/* get the screen device */
 	zx8301->screen = devtag_get_device(device->machine, intf->screen_tag);

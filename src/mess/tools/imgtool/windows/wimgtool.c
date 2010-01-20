@@ -10,6 +10,7 @@
 #include <tchar.h>
 #include <ctype.h>
 
+#include "emu.h"
 #include "wimgtool.h"
 #include "wimgres.h"
 #include "pile.h"
@@ -20,7 +21,6 @@
 #include "winutf8.h"
 #include "winutil.h"
 #include "winutils.h"
-#include "mame.h"
 
 const TCHAR wimgtool_class[] = TEXT("wimgtool_class");
 const char wimgtool_producttext[] = "MESS Image Tool";
@@ -119,7 +119,7 @@ static imgtoolerr_t foreach_selected_item(HWND window,
 
 			if (selected_item >= 0)
 			{
-				entry = alloca(sizeof(*entry));
+				entry = (foreach_entry*)alloca(sizeof(*entry));
 				entry->next = NULL;
 
 				// retrieve the directory entry
@@ -399,7 +399,7 @@ static imgtoolerr_t append_dirent(HWND window, int index, const imgtool_dirent *
 			if (!extension)
 				extension = ".bin";
 
-			ptr = pile_getptr(&info->iconlist_extensions);
+			ptr = (const char *)pile_getptr(&info->iconlist_extensions);
 			size = pile_size(&info->iconlist_extensions);
 			icon_index = -1;
 
@@ -497,7 +497,7 @@ static imgtoolerr_t append_dirent(HWND window, int index, const imgtool_dirent *
 	{
 		ListView_SetItemText(info->listview, new_index, column_index++, (LPTSTR) TEXT("Corrupt"));
 	}
-	return 0;
+	return (imgtoolerr_t)0;
 }
 
 
@@ -807,7 +807,7 @@ static imgtoolerr_t setup_openfilename_struct(win_open_file_name *ofn, object_po
 	}
 	pile_putc(&pile, '\0');
 
-	filter = pool_malloc(pool, pile_size(&pile));
+	filter = (char*)pool_malloc_lib(pool, pile_size(&pile));
 	if (!filter)
 	{
 		err = IMGTOOLERR_OUTOFMEMORY;
@@ -829,7 +829,7 @@ static imgtoolerr_t setup_openfilename_struct(win_open_file_name *ofn, object_po
 		snprintf(ofn->filename, ARRAY_LENGTH(ofn->filename), "%s", info->filename);
 
 		// specify an initial directory
-		initial_dir = alloca((strlen(info->filename) + 1) * sizeof(*info->filename));
+		initial_dir = (char*)alloca((strlen(info->filename) + 1) * sizeof(*info->filename));
 		strcpy(initial_dir, info->filename);
 		dir_char = strrchr(initial_dir, '\\');
 		if (dir_char)
@@ -1069,7 +1069,7 @@ static void menu_new(HWND window)
 	const imgtool_module *module;
 	option_resolution *resolution = NULL;
 
-	pool = pool_alloc(NULL);
+	pool = pool_alloc_lib(NULL);
 
 	err = setup_openfilename_struct(&ofn, pool, window, TRUE);
 	if (err)
@@ -1099,7 +1099,7 @@ done:
 	if (resolution)
 		option_resolution_close(resolution);
 	if (pool)
-		pool_free(pool);
+		pool_free_lib(pool);
 }
 
 
@@ -1113,7 +1113,7 @@ static void menu_open(HWND window)
 	wimgtool_info *info;
 	int read_or_write;
 
-	pool = pool_alloc(NULL);
+	pool = pool_alloc_lib(NULL);
 	if (!pool)
 	{
 		err = IMGTOOLERR_OUTOFMEMORY;
@@ -1146,7 +1146,7 @@ done:
 	if (err)
 		wimgtool_report_error(window, err, ofn.filename, NULL);
 	if (pool)
-		pool_free(pool);
+		pool_free_lib(pool);
 }
 
 
@@ -1178,7 +1178,7 @@ static void menu_insert(HWND window)
 	ofn.flags = OFN_FILEMUSTEXIST | OFN_EXPLORER;
 	if (!win_get_file_name_dialog(&ofn))
 	{
-		err = 0;
+		err = (imgtoolerr_t)0;
 		goto done;
 	}
 
@@ -1553,7 +1553,7 @@ static LRESULT wimgtool_create(HWND window, CREATESTRUCT *pcs)
 	wimgtool_info *info;
 	static const int status_widths[3] = { 200, 400, -1 };
 
-	info = malloc(sizeof(*info));
+	info = (wimgtool_info*)malloc(sizeof(*info));
 	if (!info)
 		return -1;
 	memset(info, 0, sizeof(*info));
@@ -1585,7 +1585,7 @@ static LRESULT wimgtool_create(HWND window, CREATESTRUCT *pcs)
 	(void)ListView_SetImageList(info->listview, info->iconlist_small, LVSIL_SMALL);
 
 	// get icons
-	info->readonly_icon = LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_READONLY), IMAGE_ICON, 16, 16, 0);
+	info->readonly_icon = (HICON)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_READONLY), IMAGE_ICON, 16, 16, 0);
 	info->readonly_icon_index = ImageList_AddIcon(info->iconlist_normal, info->readonly_icon);
 	ImageList_AddIcon(info->iconlist_small, info->readonly_icon);
 	info->directory_icon_index = append_associated_icon(window, FOLDER_ICON);

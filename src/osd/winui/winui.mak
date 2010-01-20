@@ -85,7 +85,7 @@ DEFS += -DWINUI
 
 RC = @windres --use-temp-file
 
-RCDEFS = -DNDEBUG -D_WIN32_IE=0x0400
+RCDEFS = -DNDEBUG -D_WIN32_IE=0x0501
 
 # include UISRC direcotry
 RCFLAGS = -O coff -I $(UISRC) -I $(UIOBJ)

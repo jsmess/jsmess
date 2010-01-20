@@ -17,7 +17,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/huebler.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -31,7 +31,7 @@
 
 static TIMER_DEVICE_CALLBACK( keyboard_tick )
 {
-	amu880_state *state = timer->machine->driver_data;
+	amu880_state *state = (amu880_state *)timer->machine->driver_data;
 
 	state->key_y++;
 
@@ -81,7 +81,7 @@ static READ8_HANDLER( keyboard_r )
 
     */
 
-	amu880_state *state = space->machine->driver_data;
+	amu880_state *state = (amu880_state *)space->machine->driver_data;
 
 	static const char *const keynames[] = { "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12", "Y13", "Y14", "Y15" };
 
@@ -239,7 +239,7 @@ INPUT_PORTS_END
 
 static VIDEO_START( amu880 )
 {
-	amu880_state *state = machine->driver_data;
+	amu880_state *state = (amu880_state *)machine->driver_data;
 
 	/* find memory regions */
 	state->char_rom = memory_region(machine, "chargen");
@@ -247,7 +247,7 @@ static VIDEO_START( amu880 )
 
 static VIDEO_UPDATE( amu880 )
 {
-	amu880_state *state = screen->machine->driver_data;
+	amu880_state *state = (amu880_state *)screen->machine->driver_data;
 
 	int y, sx, x, line;
 
@@ -357,7 +357,7 @@ static const z80_daisy_chain amu880_daisy_chain[] =
 
 static MACHINE_START( amu880 )
 {
-	amu880_state *state = machine->driver_data;
+	amu880_state *state = (amu880_state *)machine->driver_data;
 
 	/* find devices */
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
@@ -376,7 +376,7 @@ static const cassette_config amu880_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 };
 
 /* F4 Character Displayer */

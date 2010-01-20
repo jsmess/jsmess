@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/amiga.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6526cia.h"
@@ -318,9 +318,9 @@ static void amiga_m68k_reset(const device_config *device)
 MACHINE_RESET( amiga )
 {
 	/* set m68k reset  function */
-	m68k_set_reset_callback(cputag_get_cpu(machine, "maincpu"), amiga_m68k_reset);
+	m68k_set_reset_callback(devtag_get_device(machine, "maincpu"), amiga_m68k_reset);
 
-	amiga_m68k_reset(cputag_get_cpu(machine, "maincpu"));
+	amiga_m68k_reset(devtag_get_device(machine, "maincpu"));
 
 	/* call the system-specific callback */
 	if (amiga_intf->reset_callback)

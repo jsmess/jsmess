@@ -18,7 +18,7 @@ One i/o port is used:
 ******************************************************************************/
 
 /* Core includes */
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 //#include "dectalk.lh" //  hack to avoid screenless system crash
 #include "machine/terminal.h"

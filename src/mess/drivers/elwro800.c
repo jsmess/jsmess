@@ -12,7 +12,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/spectrum.h"
 
 /* Components */
@@ -56,7 +56,7 @@ struct _elwro800_state
  *************************************/
 static DIRECT_UPDATE_HANDLER(elwro800_direct_handler)
 {
-	elwro800_state *state = space->machine->driver_data;
+	elwro800_state *state = (elwro800_state *)space->machine->driver_data;
 	if (state->ram_at_0000 && address == 0x66)
 	{
 		direct->raw = direct->decrypted = &elwro800_df_on_databus;
@@ -106,7 +106,7 @@ static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 	UINT8 *prom = memory_region(machine, "proms") + 0x200;
 	UINT8 cs;
 	UINT8 ls175;
-	elwro800_state *state = machine->driver_data;
+	elwro800_state *state = (elwro800_state *)machine->driver_data;
 
 	ls175 = BITSWAP8(data, 7, 6, 5, 4, 4, 5, 7, 6) & 0x0f;
 
@@ -224,7 +224,7 @@ static READ8_HANDLER(elwro800jr_io_r)
 {
 	UINT8 *prom = memory_region(space->machine, "proms");
 	UINT8 cs = prom[offset & 0x1ff];
-	elwro800_state *state = space->machine->driver_data;
+	elwro800_state *state = (elwro800_state *)space->machine->driver_data;
 
 	if (!BIT(cs,0))
 	{
@@ -521,7 +521,7 @@ static const cassette_config elwro800jr_cassette_config =
 {
 	tzx_cassette_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 };
 
 static INTERRUPT_GEN( elwro800jr_interrupt )

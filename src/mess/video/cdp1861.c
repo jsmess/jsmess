@@ -7,7 +7,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cdp1861.h"
 
 /***************************************************************************
@@ -74,7 +74,7 @@ INLINE const cdp1861_interface *get_interface(const device_config *device)
 
 static TIMER_CALLBACK( cdp1861_int_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	cdp1861_t *cdp1861 = get_safe_token(device);
 
 	int scanline = video_screen_get_vpos(cdp1861->screen);
@@ -105,7 +105,7 @@ static TIMER_CALLBACK( cdp1861_int_tick )
 
 static TIMER_CALLBACK( cdp1861_efx_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	cdp1861_t *cdp1861 = get_safe_token(device);
 
 	int scanline = video_screen_get_vpos(cdp1861->screen);
@@ -140,7 +140,7 @@ static TIMER_CALLBACK( cdp1861_efx_tick )
 
 static TIMER_CALLBACK( cdp1861_dma_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	cdp1861_t *cdp1861 = get_safe_token(device);
 
 	int scanline = video_screen_get_vpos(cdp1861->screen);
@@ -257,7 +257,7 @@ static DEVICE_START( cdp1861 )
 	devcb_resolve_write_line(&cdp1861->out_efx_func, &intf->out_efx_func, device);
 
 	/* get the cpu */
-	cdp1861->cpu = cputag_get_cpu(device->machine, intf->cpu_tag);
+	cdp1861->cpu = devtag_get_device(device->machine, intf->cpu_tag);
 
 	/* get the screen device */
 	cdp1861->screen = devtag_get_device(device->machine, intf->screen_tag);

@@ -1,5 +1,6 @@
-#include "tms57002.h"
+#include "emu.h"
 #include "debugger.h"
+#include "tms57002.h"
 
 CPU_DISASSEMBLE(tms57002);
 
@@ -1030,8 +1031,8 @@ INLINE int xmode(UINT32 opcode, char type)
 			return 1;
 	} else if(opcode & 0x200)
 		return 2;
-	else
-		return 1;
+
+	return 1;
 }
 
 INLINE int sfao(UINT32 st1)
@@ -1342,8 +1343,8 @@ static CPU_INIT(tms57002)
 	tms57002_t *s = get_safe_token(device);
 	tms57002_cache_flush(s);
 	s->sti = S_IDLE;
-	s->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	s->data    = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	s->program = device->space(AS_PROGRAM);
+	s->data    = device->space(AS_DATA);
 }
 
 

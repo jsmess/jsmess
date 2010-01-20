@@ -1006,7 +1006,7 @@ static imgtoolerr_t open_image_lvl1(imgtool_stream *file_handle, ti99_img_format
 		/* read vib */
 		reply = read_image_vib_no_geometry(file_handle, img_format, vib);
 		if (reply)
-			return reply;
+			return (imgtoolerr_t)reply;
 
 		/* extract geometry information */
 		totphysrecs = get_UINT16BE(vib->totphysrecs);
@@ -1033,23 +1033,23 @@ static imgtoolerr_t open_image_lvl1(imgtool_stream *file_handle, ti99_img_format
 				|| memcmp(vib->id, "DSK", 3) || (! strchr(" P", vib->protection))
 				|| (((img_format == if_mess) || (img_format == if_v9t9))
 					&& (stream_size(file_handle) != totphysrecs*256)))
-			return IMGTOOLERR_CORRUPTIMAGE;
+			return (imgtoolerr_t)IMGTOOLERR_CORRUPTIMAGE;
 
 		if ((img_format == if_pc99_fm) || (img_format == if_pc99_mfm))
 		{
-			l1_img->pc99_data_offset_array = malloc(sizeof(*l1_img->pc99_data_offset_array)*totphysrecs);
+			l1_img->pc99_data_offset_array = (UINT32*)malloc(sizeof(*l1_img->pc99_data_offset_array)*totphysrecs);
 			if (! l1_img->pc99_data_offset_array)
 				return IMGTOOLERR_OUTOFMEMORY;
 			reply = parse_pc99_image(file_handle, img_format == if_pc99_fm, 1, NULL, & l1_img->geometry, l1_img->pc99_data_offset_array, &l1_img->pc99_track_len);
 			if (reply)
 			{
 				free(l1_img->pc99_data_offset_array);
-				return reply;
+				return (imgtoolerr_t)reply;
 			}
 		}
 	}
 
-	return 0;
+	return (imgtoolerr_t)0;
 }
 
 /*
@@ -1492,15 +1492,21 @@ typedef struct ti99_lvl2_imgref_dsk
                                         and up to 3 subdirectories */
 } ti99_lvl2_imgref_dsk;
 
+enum win_vib_t
+{
+	win_vib_v1,
+	win_vib_v2
+};
 typedef struct ti99_lvl2_imgref_win
 {
-	enum
-	{
-		win_vib_v1,
-		win_vib_v2
-	} vib_version;			/* version of the vib record in aphysrec 0 (see win_vib_ddr) */
+	win_vib_t vib_version;			/* version of the vib record in aphysrec 0 (see win_vib_ddr) */
 } ti99_lvl2_imgref_win;
 
+enum l2i_t
+{
+	L2I_DSK,
+	L2I_WIN
+};
 typedef struct ti99_lvl2_imgref
 {
 	ti99_lvl1_imgref l1_img;/* image format, imgtool image handle, image geometry */
@@ -1525,11 +1531,7 @@ typedef struct ti99_lvl2_imgref
 
 	UINT8 abm[8192];		/* allocation bitmap */
 
-	enum
-	{
-		L2I_DSK,
-		L2I_WIN
-	} type;					/* structure format */
+	l2i_t type;					/* structure format */
 
 	union
 	{
@@ -1724,14 +1726,15 @@ typedef struct ti99_lvl2_fileref_tifiles
 	tifile_header hdr;
 } ti99_lvl2_fileref_tifiles;
 
+enum l2f_type_t
+{
+	L2F_DSK,
+	L2F_WIN,
+	L2F_TIFILES
+};
 typedef struct ti99_lvl2_fileref
 {
-	enum
-	{
-		L2F_DSK,
-		L2F_WIN,
-		L2F_TIFILES
-	} type;
+	l2f_type_t type;
 	union
 	{
 		ti99_lvl2_fileref_dsk dsk;
@@ -1747,8 +1750,8 @@ typedef struct ti99_lvl2_fileref
 */
 static int cat_file_compare_qsort(const void *p1, const void *p2)
 {
-	const file_entry *entry1 = p1;
-	const file_entry *entry2 = p2;
+	const file_entry *entry1 = (const file_entry *)p1;
+	const file_entry *entry2 = (const file_entry *)p2;
 
 	if ((entry1->fdr_ptr == 0) && (entry2->fdr_ptr == 0))
 		return 0;
@@ -1762,8 +1765,8 @@ static int cat_file_compare_qsort(const void *p1, const void *p2)
 
 static int cat_dir_compare_qsort(const void *p1, const void *p2)
 {
-	const dir_entry *entry1 = p1;
-	const dir_entry *entry2 = p2;
+	const dir_entry *entry1 = (const dir_entry *)p1;
+	const dir_entry *entry2 = (const dir_entry *)p2;
 
 	if ((entry1->dir_ptr == 0) && (entry2->dir_ptr == 0))
 		return 0;
@@ -4095,7 +4098,7 @@ static int dsk_image_init(imgtool_image *img, imgtool_stream *f, ti99_img_format
 */
 static imgtoolerr_t dsk_image_init_mess(imgtool_image *image, imgtool_stream *f)
 {
-	return dsk_image_init(image, f, if_mess);
+	return (imgtoolerr_t)dsk_image_init(image, f, if_mess);
 }
 
 /*
@@ -4103,7 +4106,7 @@ static imgtoolerr_t dsk_image_init_mess(imgtool_image *image, imgtool_stream *f)
 */
 static imgtoolerr_t dsk_image_init_v9t9(imgtool_image *image, imgtool_stream *f)
 {
-	return dsk_image_init(image, f, if_v9t9);
+	return (imgtoolerr_t)dsk_image_init(image, f, if_v9t9);
 }
 
 /*
@@ -4111,7 +4114,7 @@ static imgtoolerr_t dsk_image_init_v9t9(imgtool_image *image, imgtool_stream *f)
 */
 static imgtoolerr_t dsk_image_init_pc99_fm(imgtool_image *image, imgtool_stream *f)
 {
-	return dsk_image_init(image, f, if_pc99_fm);
+	return (imgtoolerr_t)dsk_image_init(image, f, if_pc99_fm);
 }
 
 /*
@@ -4119,7 +4122,7 @@ static imgtoolerr_t dsk_image_init_pc99_fm(imgtool_image *image, imgtool_stream 
 */
 static imgtoolerr_t dsk_image_init_pc99_mfm(imgtool_image *image, imgtool_stream *f)
 {
-	return dsk_image_init(image, f, if_pc99_mfm);
+	return (imgtoolerr_t)dsk_image_init(image, f, if_pc99_mfm);
 }
 
 /*
@@ -4135,7 +4138,7 @@ static imgtoolerr_t win_image_init(imgtool_image *img, imgtool_stream *f)
 	/* open disk image at level 1 */
 	reply = open_image_lvl1(f, if_harddisk, & image->l1_img, NULL);
 	if (reply)
-		return reply;
+		return (imgtoolerr_t)reply;
 
 	/* open disk image at level 2 */
 	image->type = L2I_WIN;
@@ -4143,7 +4146,7 @@ static imgtoolerr_t win_image_init(imgtool_image *img, imgtool_stream *f)
 	/* read VIB */
 	reply = read_absolute_physrec(&image->l1_img, 0, &vib);
 	if (reply)
-		return reply;
+		return (imgtoolerr_t)reply;
 
 	/* guess VIB version */
 	image->u.win.vib_version = memcmp(vib.u.vib_v1.id, "WIN", 3) ? win_vib_v2 : win_vib_v1;
@@ -4172,10 +4175,10 @@ static imgtoolerr_t win_image_init(imgtool_image *img, imgtool_stream *f)
 	{
 		reply = read_absolute_physrec(&image->l1_img, i+1, image->abm+i*256);
 		if (reply)
-			return reply;
+			return (imgtoolerr_t)reply;
 	}
 
-	return 0;
+	return (imgtoolerr_t)0;
 }
 
 /*
@@ -4217,7 +4220,7 @@ static imgtoolerr_t dsk_image_beginenum(imgtool_directory *enumeration, const ch
 	iter->index[0] = 0;
 	iter->cur_catalog = &iter->image->u.dsk.catalogs[0];
 
-	return 0;
+	return (imgtoolerr_t)0;
 }
 
 /*
@@ -4325,7 +4328,7 @@ static imgtoolerr_t dsk_image_nextenum(imgtool_directory *enumeration, imgtool_d
 		}
 	}
 
-	return 0;
+	return (imgtoolerr_t)0;
 }
 
 /*
@@ -4341,11 +4344,11 @@ static imgtoolerr_t win_image_beginenum(imgtool_directory *enumeration, const ch
 	iter->level = 0;
 	iter->listing_subdirs = 1;
 	iter->index[0] = 0;
-	errorcode = win_read_catalog(image, 0, &iter->catalog[0]);
+	errorcode = (imgtoolerr_t)win_read_catalog(image, 0, &iter->catalog[0]);
 	if (errorcode)
 		return errorcode;
 
-	return 0;
+	return (imgtoolerr_t)0;
 }
 
 /*
@@ -4424,7 +4427,7 @@ static imgtoolerr_t win_image_nextenum(imgtool_directory *enumeration, imgtool_d
 			if (reply)
 			{
 				ent->corrupt = 1;
-				return reply;
+				return (imgtoolerr_t)reply;
 			}
 		}
 		else
@@ -4469,7 +4472,7 @@ static imgtoolerr_t win_image_nextenum(imgtool_directory *enumeration, imgtool_d
 		}
 	}
 
-	return 0;
+	return (imgtoolerr_t)0;
 }
 
 /*
@@ -4522,21 +4525,21 @@ static imgtoolerr_t ti99_image_readfile(imgtool_partition *partition, const char
 	switch (image->type)
 	{
 	case L2I_DSK:
-		errorcode = open_file_lvl2_dsk(image, fpath, &src_file);
+		errorcode = (imgtoolerr_t)open_file_lvl2_dsk(image, fpath, &src_file);
 		break;
 
 	case L2I_WIN:
-		errorcode = open_file_lvl2_win(image, fpath, &src_file);
+		errorcode = (imgtoolerr_t)open_file_lvl2_win(image, fpath, &src_file);
 		break;
 
 	default:
-		errorcode = -1;
+		errorcode = (imgtoolerr_t)-1;
 		break;
 	}
 	if (errorcode)
 		return errorcode;
 
-	errorcode = new_file_lvl2_tifiles(destf, &dst_file);
+	errorcode = (imgtoolerr_t)new_file_lvl2_tifiles(destf, &dst_file);
 	if (errorcode)
 		return errorcode;
 
@@ -4544,14 +4547,14 @@ static imgtoolerr_t ti99_image_readfile(imgtool_partition *partition, const char
 	/* set up parameters */
 	set_file_flags(&dst_file, get_file_flags(&src_file));
 	set_file_recsperphysrec(&dst_file, get_file_recsperphysrec(&src_file));
-	errorcode = set_file_fphysrecs(&dst_file, get_file_fphysrecs(&src_file));
+	errorcode = (imgtoolerr_t)set_file_fphysrecs(&dst_file, get_file_fphysrecs(&src_file));
 	if (errorcode)
 		return errorcode;
 	set_file_eof(&dst_file, get_file_eof(&src_file));
-	errorcode = set_file_reclen(&dst_file, get_file_reclen(&src_file));
+	errorcode = (imgtoolerr_t)set_file_reclen(&dst_file, get_file_reclen(&src_file));
 	if (errorcode)
 		return errorcode;
-	errorcode = set_file_fixrecs(&dst_file, get_file_fixrecs(&src_file));
+	errorcode = (imgtoolerr_t)set_file_fixrecs(&dst_file, get_file_fixrecs(&src_file));
 	if (errorcode)
 		return errorcode;
 
@@ -4572,23 +4575,23 @@ static imgtoolerr_t ti99_image_readfile(imgtool_partition *partition, const char
 	set_file_update_date(&dst_file, date_time);
 
 	if (stream_write(destf, & dst_file.u.tifiles.hdr, 128) != 128)
-		return IMGTOOLERR_WRITEERROR;
+		return (imgtoolerr_t)IMGTOOLERR_WRITEERROR;
 
 	/* copy data to TIFILE */
 	fphysrecs = get_file_fphysrecs(&src_file);
 
 	for (i=0; i<fphysrecs; i++)
 	{
-		errorcode = read_file_physrec(& src_file, i, buf);
+		errorcode = (imgtoolerr_t)read_file_physrec(& src_file, i, buf);
 		if (errorcode)
 			return errorcode;
 
-		errorcode = write_file_physrec(& dst_file, i, buf);
+		errorcode = (imgtoolerr_t)write_file_physrec(& dst_file, i, buf);
 		if (errorcode)
 			return errorcode;
 	}
 
-	return 0;
+	return (imgtoolerr_t)0;
 
 #else
 
@@ -4666,27 +4669,27 @@ static imgtoolerr_t ti99_image_writefile(imgtool_partition *partition, const cha
 	switch (image->type)
 	{
 	case L2I_DSK:
-		errorcode = dsk_find_catalog_entry(image, fpath, &parent_ref_valid, &parent_ref, NULL, NULL);
+		errorcode = (imgtoolerr_t)dsk_find_catalog_entry(image, fpath, &parent_ref_valid, &parent_ref, NULL, NULL);
 		if (errorcode == 0)
 			/* file already exists: causes an error for now */
-			return IMGTOOLERR_UNEXPECTED;
+			return (imgtoolerr_t)IMGTOOLERR_UNEXPECTED;
 		else if ((! parent_ref_valid) || (errorcode != IMGTOOLERR_FILENOTFOUND))
-			return errorcode;
+			return (imgtoolerr_t)errorcode;
 		break;
 
 	case L2I_WIN:
-		errorcode = win_find_catalog_entry(image, fpath, &parent_ref_valid, &parent_ref, &catalog_buf, NULL, NULL);
+		errorcode = (imgtoolerr_t)win_find_catalog_entry(image, fpath, &parent_ref_valid, &parent_ref, &catalog_buf, NULL, NULL);
 		if (errorcode == 0)
 			/* file already exists: causes an error for now */
-			return IMGTOOLERR_UNEXPECTED;
+			return (imgtoolerr_t)IMGTOOLERR_UNEXPECTED;
 		else if ((! parent_ref_valid) || (errorcode != IMGTOOLERR_FILENOTFOUND))
-			return errorcode;
+			return (imgtoolerr_t)errorcode;
 		break;
 	}
 
-	errorcode = open_file_lvl2_tifiles(sourcef, & src_file);
+	errorcode =(imgtoolerr_t) open_file_lvl2_tifiles(sourcef, & src_file);
 	if (errorcode)
-		return errorcode;
+		return (imgtoolerr_t)errorcode;
 
 	/* create new file */
 	filename = strrchr(fpath, '.');
@@ -4698,31 +4701,31 @@ static imgtoolerr_t ti99_image_writefile(imgtool_partition *partition, const cha
 	switch (image->type)
 	{
 	case L2I_DSK:
-		errorcode = new_file_lvl2_dsk(image, parent_ref, ti_fname, &dst_file);
+		errorcode = (imgtoolerr_t)new_file_lvl2_dsk(image, parent_ref, ti_fname, &dst_file);
 		if (errorcode)
-			return errorcode;
+			return (imgtoolerr_t)errorcode;
 		break;
 
 	case L2I_WIN:
-		errorcode = new_file_lvl2_win(image, &catalog_buf, ti_fname, &dst_file);
+		errorcode = (imgtoolerr_t)new_file_lvl2_win(image, &catalog_buf, ti_fname, &dst_file);
 		if (errorcode)
-			return errorcode;
+			return (imgtoolerr_t)errorcode;
 		break;
 	}
 
 	/* set up parameters */
 	set_file_flags(&dst_file, get_file_flags(&src_file));
 	set_file_recsperphysrec(&dst_file, get_file_recsperphysrec(&src_file));
-	errorcode = set_file_fphysrecs(&dst_file, /*get_file_fphysrecs(&src_file)*/0);
+	errorcode = (imgtoolerr_t)set_file_fphysrecs(&dst_file, /*get_file_fphysrecs(&src_file)*/0);
 	if (errorcode)
-		return errorcode;
+		return (imgtoolerr_t)errorcode;
 	set_file_eof(&dst_file, get_file_eof(&src_file));
-	errorcode = set_file_reclen(&dst_file, get_file_reclen(&src_file));
+	errorcode = (imgtoolerr_t)set_file_reclen(&dst_file, get_file_reclen(&src_file));
 	if (errorcode)
-		return errorcode;
-	errorcode = set_file_fixrecs(&dst_file, get_file_fixrecs(&src_file));
+		return (imgtoolerr_t)errorcode;
+	errorcode = (imgtoolerr_t)set_file_fixrecs(&dst_file, get_file_fixrecs(&src_file));
 	if (errorcode)
-		return errorcode;
+		return (imgtoolerr_t)errorcode;
 
 	get_file_creation_date(&src_file, &date_time);
 #if 0
@@ -4745,15 +4748,15 @@ static imgtoolerr_t ti99_image_writefile(imgtool_partition *partition, const cha
 	switch (dst_file.type)
 	{
 	case L2F_DSK:
-		errorcode = dsk_alloc_file_physrecs(&dst_file.u.dsk, fphysrecs);
+		errorcode = (imgtoolerr_t)dsk_alloc_file_physrecs(&dst_file.u.dsk, fphysrecs);
 		if (errorcode)
-			return errorcode;
+			return (imgtoolerr_t)errorcode;
 		break;
 
 	case L2F_WIN:
-		errorcode = win_alloc_file_physrecs(&dst_file.u.win, fphysrecs);
+		errorcode = (imgtoolerr_t)win_alloc_file_physrecs(&dst_file.u.win, fphysrecs);
 		if (errorcode)
-			return errorcode;
+			return (imgtoolerr_t)errorcode;
 		break;
 
 	case L2F_TIFILES:
@@ -4764,11 +4767,11 @@ static imgtoolerr_t ti99_image_writefile(imgtool_partition *partition, const cha
 	for (i=0; i<fphysrecs; i++)
 	{
 		if (stream_read(sourcef, buf, 256) != 256)
-			return IMGTOOLERR_READERROR;
+			return (imgtoolerr_t)IMGTOOLERR_READERROR;
 
-		errorcode = write_file_physrec(& dst_file, i, buf);
+		errorcode = (imgtoolerr_t)write_file_physrec(& dst_file, i, buf);
 		if (errorcode)
-			return errorcode;
+			return (imgtoolerr_t)errorcode;
 	}
 
 	/* write fdr */
@@ -4776,7 +4779,7 @@ static imgtoolerr_t ti99_image_writefile(imgtool_partition *partition, const cha
 	{
 	case L2I_DSK:
 		if (write_absolute_physrec(& image->l1_img, dst_file.u.dsk.fdr_aphysrec, &dst_file.u.dsk.fdr))
-			return IMGTOOLERR_WRITEERROR;
+			return (imgtoolerr_t)IMGTOOLERR_WRITEERROR;
 		break;
 
 	case L2I_WIN:
@@ -4784,15 +4787,15 @@ static imgtoolerr_t ti99_image_writefile(imgtool_partition *partition, const cha
 		if (dst_file.u.win.curfdr_aphysrec == dst_file.u.win.eldestfdr_aphysrec)
 			set_win_fdr_fphysrecs(&dst_file.u.win.curfdr, dst_file.u.win.fphysrecs);
 		if (write_absolute_physrec(& image->l1_img, dst_file.u.win.curfdr_aphysrec, &dst_file.u.win.curfdr))
-			return IMGTOOLERR_WRITEERROR;
+			return (imgtoolerr_t)IMGTOOLERR_WRITEERROR;
 		if (dst_file.u.win.curfdr_aphysrec != dst_file.u.win.eldestfdr_aphysrec)
 		{
 			dst_file.u.win.curfdr_aphysrec = dst_file.u.win.eldestfdr_aphysrec;
 			if (read_absolute_physrec(& image->l1_img, dst_file.u.win.curfdr_aphysrec, &dst_file.u.win.curfdr))
-				return IMGTOOLERR_WRITEERROR;
+				return (imgtoolerr_t)IMGTOOLERR_WRITEERROR;
 			set_win_fdr_fphysrecs(&dst_file.u.win.curfdr, dst_file.u.win.fphysrecs);
 			if (write_absolute_physrec(& image->l1_img, dst_file.u.win.curfdr_aphysrec, &dst_file.u.win.curfdr))
-				return IMGTOOLERR_WRITEERROR;
+				return (imgtoolerr_t)IMGTOOLERR_WRITEERROR;
 		}
 		break;
 	}
@@ -4808,7 +4811,7 @@ static imgtoolerr_t ti99_image_writefile(imgtool_partition *partition, const cha
 			buf[2*i+1] = catalog->files[i].fdr_ptr & 0xff;
 		}
 		if (write_absolute_physrec(& image->l1_img, image->u.dsk.fdir_aphysrec[parent_ref], buf))
-			return IMGTOOLERR_WRITEERROR;
+			return (imgtoolerr_t)IMGTOOLERR_WRITEERROR;
 		break;
 
 	case L2I_WIN:
@@ -4818,10 +4821,10 @@ static imgtoolerr_t ti99_image_writefile(imgtool_partition *partition, const cha
 
 			/* update VIB/DDR and get FDIR AU address */
 			if (read_absolute_physrec(& image->l1_img, parent_ref * image->AUformat.physrecsperAU, &parent_ddr))
-				return IMGTOOLERR_READERROR;
+				return (imgtoolerr_t)IMGTOOLERR_READERROR;
 			parent_ddr.num_files = catalog_buf.num_files;
 			if (write_absolute_physrec(& image->l1_img, parent_ref * image->AUformat.physrecsperAU, &parent_ddr))
-				return IMGTOOLERR_WRITEERROR;
+				return (imgtoolerr_t)IMGTOOLERR_WRITEERROR;
 			fdir_AU = get_UINT16BE(parent_ddr.fdir_AU);
 
 			/* generate FDIR and save it */
@@ -4833,7 +4836,7 @@ static imgtoolerr_t ti99_image_writefile(imgtool_partition *partition, const cha
 			buf[254] = parent_ref >> 8;
 			buf[255] = parent_ref & 0xff;
 			if (write_absolute_physrec(& image->l1_img, fdir_AU * image->AUformat.physrecsperAU, buf))
-				return IMGTOOLERR_WRITEERROR;
+				return (imgtoolerr_t)IMGTOOLERR_WRITEERROR;
 		}
 		break;
 	}
@@ -4846,10 +4849,10 @@ static imgtoolerr_t ti99_image_writefile(imgtool_partition *partition, const cha
 			dsk_vib vib;
 
 			if (read_absolute_physrec(& image->l1_img, 0, &vib))
-				return IMGTOOLERR_READERROR;
+				return (imgtoolerr_t)IMGTOOLERR_READERROR;
 			memcpy(vib.abm, image->abm, 200);
 			if (write_absolute_physrec(& image->l1_img, 0, &vib))
-				return IMGTOOLERR_WRITEERROR;
+				return (imgtoolerr_t)IMGTOOLERR_WRITEERROR;
 		}
 		break;
 
@@ -4857,11 +4860,11 @@ static imgtoolerr_t ti99_image_writefile(imgtool_partition *partition, const cha
 		/* save allocation bitmap (aphysrecs 1 through n, n<=33) */
 		for (i=0; i < (image->AUformat.totAUs+2047)/2048; i++)
 			if (write_absolute_physrec(&image->l1_img, i+1, image->abm+i*256))
-				return IMGTOOLERR_WRITEERROR;
+				return (imgtoolerr_t)IMGTOOLERR_WRITEERROR;
 		break;
 	}
 
-	return 0;
+	return (imgtoolerr_t)0;
 }
 
 /*
@@ -4884,7 +4887,7 @@ static imgtoolerr_t dsk_image_deletefile(imgtool_partition *partition, const cha
 	if (check_fpath(fpath))
 		return IMGTOOLERR_BADFILENAME;
 
-	errorcode = dsk_find_catalog_entry(image, fpath, NULL, &parent_ref, &is_dir, &catalog_index);
+	errorcode = (imgtoolerr_t)dsk_find_catalog_entry(image, fpath, NULL, &parent_ref, &is_dir, &catalog_index);
 	if (errorcode)
 		return errorcode;
 
@@ -5005,7 +5008,7 @@ static imgtoolerr_t dsk_image_deletefile(imgtool_partition *partition, const cha
 		}
 	}
 
-	return 0;
+	return (imgtoolerr_t)0;
 }
 
 static imgtoolerr_t win_image_deletefile(imgtool_partition *partition, const char *fpath)
@@ -5024,11 +5027,11 @@ static imgtoolerr_t win_image_deletefile(imgtool_partition *partition, const cha
 
 
 	if (check_fpath(fpath))
-		return IMGTOOLERR_BADFILENAME;
+		return (imgtoolerr_t)IMGTOOLERR_BADFILENAME;
 
 	errorcode = win_find_catalog_entry(image, fpath, NULL, &parent_ddr_AU, &catalog, &is_dir, &catalog_index);
 	if (errorcode)
-		return errorcode;
+		return (imgtoolerr_t)errorcode;
 
 	if (is_dir)
 	{
@@ -5038,17 +5041,17 @@ static imgtoolerr_t win_image_deletefile(imgtool_partition *partition, const cha
 		/* Read DDR record */
 		DDR_AU = catalog.subdirs[catalog_index].dir_ptr;
 		if (read_absolute_physrec(& image->l1_img, DDR_AU*image->AUformat.physrecsperAU, &ddr_buf))
-			return IMGTOOLERR_READERROR;
+			return (imgtoolerr_t)IMGTOOLERR_READERROR;
 
 		/* read FDIR AU pointer */
 		cur_AU = get_UINT16BE(ddr_buf.fdir_AU);
 
 		/* sanity checks */
 		if ((ddr_buf.num_files > 127) || (ddr_buf.num_subdirs > 114) || (cur_AU > image->AUformat.totAUs))
-			return IMGTOOLERR_CORRUPTIMAGE;
+			return (imgtoolerr_t)IMGTOOLERR_CORRUPTIMAGE;
 
 		if ((ddr_buf.num_files != 0) || (ddr_buf.num_subdirs != 0))
-			return IMGTOOLERR_UNIMPLEMENTED;
+			return (imgtoolerr_t)IMGTOOLERR_UNIMPLEMENTED;
 
 		/* free fdir AU */
 		image->abm[cur_AU >> 3] &= ~ (1 << (cur_AU & 7));
@@ -5064,17 +5067,17 @@ static imgtoolerr_t win_image_deletefile(imgtool_partition *partition, const cha
 
 		/* update parent VIB/DDR */
 		if (read_absolute_physrec(& image->l1_img, parent_ddr_AU * image->AUformat.physrecsperAU, &ddr_buf))
-			return IMGTOOLERR_READERROR;
+			return (imgtoolerr_t)IMGTOOLERR_READERROR;
 		ddr_buf.num_subdirs = catalog.num_subdirs;
 		for (i=0; i<114; i++)
 			set_UINT16BE(&ddr_buf.subdir_AU[i], catalog.subdirs[i].dir_ptr);
 		if (write_absolute_physrec(& image->l1_img, parent_ddr_AU * image->AUformat.physrecsperAU, &ddr_buf))
-			return IMGTOOLERR_WRITEERROR;
+			return (imgtoolerr_t)IMGTOOLERR_WRITEERROR;
 
 		/* save allocation bitmap (aphysrecs 1 through n, n<=33) */
 		for (i=0; i < (image->AUformat.totAUs+2047)/2048; i++)
 			if (write_absolute_physrec(&image->l1_img, i+1, image->abm+i*256))
-				return IMGTOOLERR_WRITEERROR;
+				return (imgtoolerr_t)IMGTOOLERR_WRITEERROR;
 	}
 	else
 	{
@@ -5091,10 +5094,10 @@ static imgtoolerr_t win_image_deletefile(imgtool_partition *partition, const cha
 			cursibFDR_index = 0;
 			curfdr_aphysrec = catalog.files[catalog_index].fdr_ptr * image->AUformat.physrecsperAU;
 			if (read_absolute_physrec(& image->l1_img, curfdr_aphysrec, &fdr))
-				return IMGTOOLERR_READERROR;
+				return (imgtoolerr_t)IMGTOOLERR_READERROR;
 
 			if (get_UINT16BE(fdr.prevsibFDR_AU) != 0)
-				return IMGTOOLERR_CORRUPTIMAGE;
+				return (imgtoolerr_t)IMGTOOLERR_CORRUPTIMAGE;
 
 			while (1)
 			{
@@ -5118,17 +5121,17 @@ static imgtoolerr_t win_image_deletefile(imgtool_partition *partition, const cha
 
 				/* otherwise read next FDR */
 				if (get_UINT16BE(fdr.nextsibFDR_AU) >= image->AUformat.totAUs)
-					return IMGTOOLERR_CORRUPTIMAGE;
+					return (imgtoolerr_t)IMGTOOLERR_CORRUPTIMAGE;
 
 				prevfdr_aphysrec = curfdr_aphysrec;
 				curfdr_aphysrec = get_win_fdr_nextsibFDR_aphysrec(image, &fdr);
 				if (read_absolute_physrec(& image->l1_img, curfdr_aphysrec, &fdr))
-					return IMGTOOLERR_READERROR;
+					return (imgtoolerr_t)IMGTOOLERR_READERROR;
 				cursibFDR_index++;
 
 				/* check that back chaining is consistent with forward chaining */
 				if (get_win_fdr_prevsibFDR_aphysrec(image, &fdr) != prevfdr_aphysrec)
-					return IMGTOOLERR_CORRUPTIMAGE;
+					return (imgtoolerr_t)IMGTOOLERR_CORRUPTIMAGE;
 			}
 			if (! pastendoflist_flag)
 				endsibFDR_index = cursibFDR_index;
@@ -5174,7 +5177,7 @@ static imgtoolerr_t win_image_deletefile(imgtool_partition *partition, const cha
 				break;
 			curfdr_aphysrec = get_win_fdr_prevsibFDR_aphysrec(image, &fdr);
 			if (read_absolute_physrec(& image->l1_img, curfdr_aphysrec, &fdr))
-				return IMGTOOLERR_READERROR;
+				return (imgtoolerr_t)IMGTOOLERR_READERROR;
 			cursibFDR_index--;
 		}
 
@@ -5191,10 +5194,10 @@ static imgtoolerr_t win_image_deletefile(imgtool_partition *partition, const cha
 			win_vib_ddr parent_ddr;
 
 			if (read_absolute_physrec(& image->l1_img, parent_ddr_AU * image->AUformat.physrecsperAU, &parent_ddr))
-				return IMGTOOLERR_READERROR;
+				return (imgtoolerr_t)IMGTOOLERR_READERROR;
 			parent_ddr.num_files = catalog.num_files;
 			if (write_absolute_physrec(& image->l1_img, parent_ddr_AU * image->AUformat.physrecsperAU, &parent_ddr))
-				return IMGTOOLERR_WRITEERROR;
+				return (imgtoolerr_t)IMGTOOLERR_WRITEERROR;
 			cur_AU = get_UINT16BE(parent_ddr.fdir_AU);
 		}
 
@@ -5207,15 +5210,15 @@ static imgtoolerr_t win_image_deletefile(imgtool_partition *partition, const cha
 		buf[254] = parent_ddr_AU >> 8;
 		buf[255] = parent_ddr_AU & 0xff;
 		if (write_absolute_physrec(& image->l1_img, cur_AU * image->AUformat.physrecsperAU, buf))
-			return IMGTOOLERR_WRITEERROR;
+			return (imgtoolerr_t)IMGTOOLERR_WRITEERROR;
 
 		/* save allocation bitmap (aphysrecs 1 through n, n<=33) */
 		for (i=0; i < (image->AUformat.totAUs+2047)/2048; i++)
 			if (write_absolute_physrec(&image->l1_img, i+1, image->abm+i*256))
-				return IMGTOOLERR_WRITEERROR;
+				return (imgtoolerr_t)IMGTOOLERR_WRITEERROR;
 	}
 
-	return 0;
+	return (imgtoolerr_t)0;
 }
 
 /*
@@ -5228,7 +5231,7 @@ static imgtoolerr_t dsk_image_create(imgtool_image *image, imgtool_stream *f, op
 	const char *volname;
 	int density;
 	ti99_lvl1_imgref l1_img;
-	int protected;
+	int protected_var;
 
 	int totphysrecs, physrecsperAU, totAUs;
 
@@ -5245,7 +5248,7 @@ static imgtoolerr_t dsk_image_create(imgtool_image *image, imgtool_stream *f, op
 	l1_img.geometry.heads = option_resolution_lookup_int(createoptions, dsk_createopts_sides);
 	l1_img.geometry.cylinders = option_resolution_lookup_int(createoptions, dsk_createopts_tracks);
 	l1_img.geometry.secspertrack = option_resolution_lookup_int(createoptions, dsk_createopts_sectors);
-	protected = option_resolution_lookup_int(createoptions, dsk_createopts_protection);
+	protected_var = option_resolution_lookup_int(createoptions, dsk_createopts_protection);
 	density = option_resolution_lookup_int(createoptions, dsk_createopts_density);
 
 	/* NPW 03-DEC-2003 - Fixes a crash if volname is NULL */
@@ -5298,7 +5301,7 @@ static imgtoolerr_t dsk_image_create(imgtool_image *image, imgtool_stream *f, op
 	vib.id[0] = 'D';
 	vib.id[1] = 'S';
 	vib.id[2] = 'K';
-	vib.protection = protected ? 'P' : ' ';
+	vib.protection = protected_var ? 'P' : ' ';
 	vib.cylinders = l1_img.geometry.cylinders;
 	vib.heads = l1_img.geometry.heads;
 	vib.density = density;
@@ -5337,7 +5340,7 @@ static imgtoolerr_t dsk_image_create(imgtool_image *image, imgtool_stream *f, op
 			return IMGTOOLERR_WRITEERROR;
 
 
-	return dsk_image_init(image, f, img_format);
+	return (imgtoolerr_t)dsk_image_init(image, f, img_format);
 }
 
 /*

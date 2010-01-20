@@ -193,7 +193,7 @@ Notes:
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/studio2.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1861.h"
@@ -206,7 +206,7 @@ Notes:
 
 static WRITE8_HANDLER( keylatch_w )
 {
-	studio2_state *state = space->machine->driver_data;
+	studio2_state *state = (studio2_state *)space->machine->driver_data;
 
 	state->keylatch = data & 0x0f;
 }
@@ -296,7 +296,7 @@ INPUT_PORTS_END
 
 static WRITE_LINE_DEVICE_HANDLER( studio2_efx_w )
 {
-	studio2_state *driver_state = device->machine->driver_data;
+	studio2_state *driver_state = (studio2_state *)device->machine->driver_data;
 
 	driver_state->cdp1861_efx = state;
 }
@@ -312,7 +312,7 @@ static CDP1861_INTERFACE( studio2_cdp1861_intf )
 
 static VIDEO_UPDATE( studio2 )
 {
-	studio2_state *state = screen->machine->driver_data;
+	studio2_state *state = (studio2_state *)screen->machine->driver_data;
 
 	cdp1861_update(state->cdp1861, bitmap, cliprect);
 
@@ -329,28 +329,28 @@ static PALETTE_INIT( visicom )
 
 static WRITE_LINE_DEVICE_HANDLER( mpt02_efx_w )
 {
-	studio2_state *driver_state = device->machine->driver_data;
+	studio2_state *driver_state = (studio2_state *)device->machine->driver_data;
 
 	driver_state->cdp1864_efx = state;
 }
 
 static READ_LINE_DEVICE_HANDLER( rdata_r )
 {
-	studio2_state *state = device->machine->driver_data;
+	studio2_state *state = (studio2_state *)device->machine->driver_data;
 
 	return BIT(state->color, 0);
 }
 
 static READ_LINE_DEVICE_HANDLER( bdata_r )
 {
-	studio2_state *state = device->machine->driver_data;
+	studio2_state *state = (studio2_state *)device->machine->driver_data;
 
 	return BIT(state->color, 1);
 }
 
 static READ_LINE_DEVICE_HANDLER( gdata_r )
 {
-	studio2_state *state = device->machine->driver_data;
+	studio2_state *state = (studio2_state *)device->machine->driver_data;
 
 	return BIT(state->color, 2);
 }
@@ -374,7 +374,7 @@ static CDP1864_INTERFACE( mpt02_cdp1864_intf )
 
 static VIDEO_UPDATE( mpt02 )
 {
-	studio2_state *state = screen->machine->driver_data;
+	studio2_state *state = (studio2_state *)screen->machine->driver_data;
 
 	cdp1864_update(state->cdp1864, bitmap, cliprect);
 
@@ -385,14 +385,14 @@ static VIDEO_UPDATE( mpt02 )
 
 static CDP1802_MODE_READ( studio2_mode_r )
 {
-	studio2_state *state = device->machine->driver_data;
+	studio2_state *state = (studio2_state *)device->machine->driver_data;
 
 	return state->cdp1802_mode;
 }
 
 static CDP1802_EF_READ( studio2_ef_r )
 {
-	studio2_state *state = device->machine->driver_data;
+	studio2_state *state = (studio2_state *)device->machine->driver_data;
 
 	int ef = 0x0f;
 
@@ -422,7 +422,7 @@ static CDP1802_INTERFACE( studio2_config )
 
 static CDP1802_EF_READ( mpt02_ef_r )
 {
-	studio2_state *state = device->machine->driver_data;
+	studio2_state *state = (studio2_state *)device->machine->driver_data;
 
 	int ef = 0x0f;
 
@@ -436,7 +436,7 @@ static CDP1802_EF_READ( mpt02_ef_r )
 
 static WRITE8_DEVICE_HANDLER( mpt02_dma_w )
 {
-	studio2_state *state = device->machine->driver_data;
+	studio2_state *state = (studio2_state *)device->machine->driver_data;
 	UINT8 addr = ((offset & 0xe0) >> 2) | (offset & 0x07);
 
 	state->color = state->color_ram[addr];
@@ -459,14 +459,14 @@ static CDP1802_INTERFACE( mpt02_config )
 
 static TIMER_CALLBACK( set_cpu_mode )
 {
-	studio2_state *state = machine->driver_data;
+	studio2_state *state = (studio2_state *)machine->driver_data;
 
 	state->cdp1802_mode = CDP1802_MODE_RUN;
 }
 
 static MACHINE_START( studio2 )
 {
-	studio2_state *state = machine->driver_data;
+	studio2_state *state = (studio2_state *)machine->driver_data;
 
 	/* find devices */
 	state->cdp1861 = devtag_get_device(machine, CDP1861_TAG);
@@ -479,7 +479,7 @@ static MACHINE_START( studio2 )
 
 static MACHINE_RESET( studio2 )
 {
-	studio2_state *state = machine->driver_data;
+	studio2_state *state = (studio2_state *)machine->driver_data;
 
 	/* reset CPU */
 	state->cdp1802_mode = CDP1802_MODE_RESET;
@@ -491,7 +491,7 @@ static MACHINE_RESET( studio2 )
 
 static MACHINE_START( mpt02 )
 {
-	studio2_state *state = machine->driver_data;
+	studio2_state *state = (studio2_state *)machine->driver_data;
 
 	/* find devices */
 	state->cdp1864 = devtag_get_device(machine, CDP1864_TAG);
@@ -504,7 +504,7 @@ static MACHINE_START( mpt02 )
 
 static MACHINE_RESET( mpt02 )
 {
-	studio2_state *state = machine->driver_data;
+	studio2_state *state = (studio2_state *)machine->driver_data;
 
 	/* reset CPU */
 	state->cdp1802_mode = CDP1802_MODE_RESET;

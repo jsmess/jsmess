@@ -59,7 +59,7 @@ D.9B         [f99cac4b] /
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/nec/nec.h"
 #include "deprecat.h"
@@ -439,7 +439,7 @@ ROM_END
 
 static DRIVER_INIT( panicr )
 {
-	UINT8 *buf = alloc_array_or_die(UINT8, 0x80000);
+	UINT8 *buf = auto_alloc_array(machine, UINT8, 0x80000);
 	UINT8 *rom;
 	int size;
 	int i;
@@ -546,7 +546,7 @@ static DRIVER_INIT( panicr )
 			}
 	}
 
-	free(buf);
+	auto_free(machine, buf);
 }
 
 

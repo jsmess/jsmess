@@ -190,7 +190,7 @@ disabled). Perhaps power on/off related??
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/nec/nec.h"
 #include "sound/speaker.h"
 
@@ -233,7 +233,7 @@ ADDRESS_MAP_END
 
 static void nakajies_update_irqs( running_machine *machine )
 {
-	nakajies_state *state = machine->driver_data;
+	nakajies_state *state = (nakajies_state *)machine->driver_data;
 	UINT8 irq = state->irq_enabled & state->irq_active;
 	UINT8 vector = 0xff;
 
@@ -265,7 +265,7 @@ static READ8_HANDLER( irq_clear_r )
 
 static WRITE8_HANDLER( irq_clear_w )
 {
-	nakajies_state *state = space->machine->driver_data;
+	nakajies_state *state = (nakajies_state *)space->machine->driver_data;
 
 	state->irq_active &= ~data;
 	nakajies_update_irqs( space->machine );
@@ -274,7 +274,7 @@ static WRITE8_HANDLER( irq_clear_w )
 
 static READ8_HANDLER( irq_enable_r )
 {
-	nakajies_state *state = space->machine->driver_data;
+	nakajies_state *state = (nakajies_state *)space->machine->driver_data;
 
 	return state->irq_enabled;
 }
@@ -282,7 +282,7 @@ static READ8_HANDLER( irq_enable_r )
 
 static WRITE8_HANDLER( irq_enable_w )
 {
-	nakajies_state *state = space->machine->driver_data;
+	nakajies_state *state = (nakajies_state *)space->machine->driver_data;
 
 	state->irq_enabled = data;
 	nakajies_update_irqs( space->machine );
@@ -304,7 +304,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( trigger_irq )
 {
-	nakajies_state *state = field->port->machine->driver_data;
+	nakajies_state *state = (nakajies_state *)field->port->machine->driver_data;
 	UINT8 irqs = input_port_read( field->port->machine, "debug" );
 
 	state->irq_active |= irqs;
@@ -327,7 +327,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( nakajies )
 {
-	nakajies_state *state = machine->driver_data;
+	nakajies_state *state = (nakajies_state *)machine->driver_data;
 
 	state->cpu = devtag_get_device( machine, "v20hl" );
 	state->irq_enabled = 0;

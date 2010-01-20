@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "e0516.h"
 
 /***************************************************************************
@@ -55,7 +55,7 @@ INLINE e0516_t *get_safe_token(const device_config *device)
 
 static TIMER_CALLBACK( clock_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	e0516_t *e0516 = get_safe_token(device);
 
 	e0516->reg[E0516_REGISTER_SECOND]++;

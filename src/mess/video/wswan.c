@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/wswan.h"
 
 static int pal[16][16];

@@ -87,7 +87,7 @@ Start bit (low), Bit 0, Bit 1... highest bit, Parity bit (if enabled), 1-2 stop 
 
 ******************************************* COMMON CONTROLS ********************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "ay31015.h"
 
 typedef enum
@@ -232,7 +232,7 @@ static void ay31015_update_status_pins( const device_config *device )
 -------------------------------------------------*/
 static TIMER_CALLBACK( ay31015_rx_process )
 {
-	const device_config	*device = ptr;
+	const device_config	*device = (const device_config	*)ptr;
 	ay31015_t			*ay31015 = get_safe_token( device );
 
 	switch (ay31015->rx_state)
@@ -387,7 +387,7 @@ static TIMER_CALLBACK( ay31015_rx_process )
 -------------------------------------------------*/
 static TIMER_CALLBACK( ay31015_tx_process )
 {
-	const device_config	*device = ptr;
+	const device_config	*device = (const device_config *)ptr;
 	ay31015_t			*ay31015 = get_safe_token( device );
 
 	UINT8 t1;
@@ -711,7 +711,7 @@ static DEVICE_START(ay31015)
 {
 	ay31015_t	*ay31015 = get_safe_token(device);
 
-	ay31015->config = device->static_config;
+	ay31015->config = (const ay31015_config*)device->static_config;
 
 	ay31015->tx_clock = ay31015->config->transmitter_clock;
 	ay31015->rx_clock = ay31015->config->receiver_clock;

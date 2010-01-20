@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/spectrum.h"
 #include "eventlst.h"
 #include "devices/snapquik.h"
@@ -15,7 +15,7 @@ static const device_config* beta;
 
 static DIRECT_UPDATE_HANDLER( pentagon_direct )
 {
-	UINT16 pc = cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), REG_GENPCBASE);
+	UINT16 pc = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), REG_GENPCBASE);
 
 	if (beta->started && betadisk_is_active(beta))
 	{

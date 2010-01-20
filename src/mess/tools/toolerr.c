@@ -1,14 +1,12 @@
 #include <stdio.h>
 #include <stdarg.h>
-
-#include "mamecore.h"
-
+#include <stdlib.h>
 /*-------------------------------------------------
     fatalerror - print a message and escape back
     to the OSD layer
 -------------------------------------------------*/
 
-void CLIB_DECL fatalerror(const char *text, ...)
+extern "C" void fatalerror(const char *text, ...)
 {
 	va_list va;
 	va_start(va, text);

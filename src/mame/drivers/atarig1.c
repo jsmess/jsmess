@@ -18,7 +18,7 @@
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "audio/atarijsa.h"
 #include "video/atarirle.h"
@@ -1084,7 +1084,7 @@ static void init_g1_common(running_machine *machine, offs_t slapstic_base, int s
 		state_save_register_postload(machine, pitfighb_state_postload, NULL);
 	}
 	else if (slapstic != 0)
-		atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), slapstic_base, 0, slapstic);
+		atarigen_slapstic_init(devtag_get_device(machine, "maincpu"), slapstic_base, 0, slapstic);
 	atarijsa_init(machine, "IN0", 0x4000);
 
 	state->is_pitfight = is_pitfight;

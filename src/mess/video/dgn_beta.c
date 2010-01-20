@@ -79,7 +79,7 @@ the access to the video memory is unclear to me at the moment.
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/dgn_beta.h"
 #include "video/m6845.h"
 #include "devices/messram.h"
@@ -230,7 +230,7 @@ void dgnbeta_vid_set_gctrl(running_machine *machine, int data)
 				     data & GCtrlHiLo		? "Hi" : "Lo",
 				     data & GCtrlSWChar		? "C0" : "C1",
 				     data & GCtrlWI		? "Wi" : "  ",
-				     cpu_get_pc(cputag_get_cpu(machine,"maincpu")));
+				     cpu_get_pc(devtag_get_device(machine,"maincpu")));
 }
 
 // called when the 6845 changes the character row

@@ -10,7 +10,7 @@
 #ifndef __SED1330__
 #define __SED1330__
 
-#include "driver.h"
+#include "emu.h"
 #include "devcb.h"
 
 /***************************************************************************

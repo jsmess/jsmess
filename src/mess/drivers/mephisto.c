@@ -53,7 +53,7 @@ $8000-$FFF ROM
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 // #include "sound/dac.h"
 #include "sound/beep.h"

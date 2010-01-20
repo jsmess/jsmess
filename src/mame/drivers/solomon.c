@@ -5,7 +5,7 @@ Solomon's Key
 driver by Mirko Buffoni
 
 ***************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
@@ -67,6 +67,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe603, 0xe603) AM_READ(solomon_0xe603_r)
 	AM_RANGE(0xe604, 0xe604) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe605, 0xe605) AM_READ_PORT("DSW2")
+	AM_RANGE(0xe606, 0xe606) AM_READNOP	/* watchdog? */
 	AM_RANGE(0xe600, 0xe600) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xe604, 0xe604) AM_WRITE(solomon_flipscreen_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(solomon_sh_command_w)

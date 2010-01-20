@@ -23,7 +23,7 @@
 #ifndef __MOS6529__
 #define __MOS6529__
 
-#include "driver.h"
+#include "emu.h"
 #include "devcb.h"
 
 /***************************************************************************

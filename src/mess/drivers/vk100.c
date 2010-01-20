@@ -48,7 +48,7 @@ Notes:
       ROM4 - TP-01 (C) DEC 1980 23-190E2-00 P8316E AMD 35517 8117DPP
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 
 static ADDRESS_MAP_START(vk100_mem, ADDRESS_SPACE_PROGRAM, 8)

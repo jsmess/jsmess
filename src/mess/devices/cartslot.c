@@ -7,7 +7,7 @@
 **********************************************************************/
 
 #include <ctype.h>
-#include "driver.h"
+#include "emu.h"
 #include "cartslot.h"
 #include "multcart.h"
 
@@ -101,7 +101,7 @@ static int load_cartridge(const device_config *device, const rom_entry *romrgn, 
 		datawidth = ROMREGION_GETWIDTH(romrgn) / 8;
 
 		/* if the region is inverted, do that now */
-		cpu = cputag_get_cpu(device->machine, type);
+		cpu = devtag_get_device(device->machine, type);
 		if (cpu != NULL)
 		{
 			datawidth = cpu_get_databus_width(cpu, ADDRESS_SPACE_PROGRAM) / 8;
@@ -247,7 +247,7 @@ static DEVICE_START( cartslot )
 {
 	cartslot_t *cart = get_token(device);
 	const cartslot_config *config = get_config(device);
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 
 	/* if this cartridge has a custom DEVICE_START, use it */
 	if (config->device_start != NULL)
@@ -262,7 +262,7 @@ static DEVICE_START( cartslot )
 		device_build_tag(tempstring, device, TAG_PCB));
 
 done:
-	astring_free(tempstring);
+	return;
 }
 
 
@@ -329,7 +329,7 @@ static const cartslot_pcb_type *identify_pcb(const device_config *device)
 	const cartslot_config *config = get_config(device);
 	astring *pcb_name = astring_alloc();
 	const cartslot_pcb_type *pcb_type = NULL;
-	multicart *mc;
+	multicart_t *mc;
 	int i;
 
 	if (image_software_entry(device) == NULL && image_exists(device))
@@ -372,8 +372,6 @@ static const cartslot_pcb_type *identify_pcb(const device_config *device)
 		/* no device loaded; use the default */
 		pcb_type = (config->pcb_types[0].name != NULL) ? &config->pcb_types[0] : NULL;
 	}
-
-	astring_free(pcb_name);
 	return pcb_type;
 }
 
@@ -385,7 +383,7 @@ static const cartslot_pcb_type *identify_pcb(const device_config *device)
 static DEVICE_GET_IMAGE_DEVICES(cartslot)
 {
 	const cartslot_pcb_type *pcb_type;
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 
 	pcb_type = identify_pcb(device);
 	if (pcb_type != NULL)
@@ -397,8 +395,6 @@ static DEVICE_GET_IMAGE_DEVICES(cartslot)
 			device_build_tag(tempstring, device, TAG_PCB),
 			0);
 	}
-
-	astring_free(tempstring);
 }
 
 

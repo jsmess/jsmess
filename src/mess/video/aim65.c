@@ -5,7 +5,7 @@
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 #include "includes/aim65.h"
 #include "machine/6522via.h"

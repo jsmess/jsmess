@@ -77,7 +77,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms34010/tms34010.h"
 #include "sound/upd7759.h"
@@ -198,12 +198,12 @@ static MACHINE_RESET( jpmimpct )
 
 static WRITE16_HANDLER( m68k_tms_w )
 {
-	tms34010_host_w(cputag_get_cpu(space->machine, "dsp"), offset, data);
+	tms34010_host_w(devtag_get_device(space->machine, "dsp"), offset, data);
 }
 
 static READ16_HANDLER( m68k_tms_r )
 {
-	return tms34010_host_r(cputag_get_cpu(space->machine, "dsp"), offset);
+	return tms34010_host_r(devtag_get_device(space->machine, "dsp"), offset);
 }
 
 
@@ -651,10 +651,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tms_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
-	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0xf8000000) AM_RAM AM_BASE(&tms_vram)
+	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0xf8000000) AM_RAM AM_BASE(&jpmimpct_vram)
 	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0xf8000000) AM_ROM AM_REGION("user1", 0x100000)
 	AM_RANGE(0x02000000, 0x027fffff) AM_MIRROR(0xf8000000) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x01000000, 0x0100003f) AM_MIRROR(0xf87fffc0) AM_READWRITE(bt477_r, bt477_w)
+	AM_RANGE(0x01000000, 0x0100003f) AM_MIRROR(0xf87fffc0) AM_READWRITE(jpmimpct_bt477_r, jpmimpct_bt477_w)
 	AM_RANGE(0x07800000, 0x07bfffff) AM_MIRROR(0xf8400000) AM_RAM
 ADDRESS_MAP_END
 

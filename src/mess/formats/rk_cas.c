@@ -3,7 +3,7 @@
     Tape support for RK format
 
 */
-#include "driver.h"
+#include "emu.h"
 #include "formats/rk_cas.h"
 
 

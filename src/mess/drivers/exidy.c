@@ -140,7 +140,7 @@ standard one; a custom implementation will need to be written.
 
 ********************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/wave.h"
@@ -360,7 +360,7 @@ static const cassette_config exidy_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 };
 
 static const floppy_config exidy_floppy_config =

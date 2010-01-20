@@ -28,7 +28,7 @@
     4 0s: EOF mark
 */
 
-#include "driver.h"
+#include "emu.h"
 
 #include "990_tap.h"
 #include "image.h"
@@ -1044,7 +1044,7 @@ DEVICE_START(tap_990)
 	assert(device->static_config != NULL);
 	
 	/* copy interface pointer */
-	tpc->intf = device->static_config;
+	tpc->intf = (const ti990_tpc_interface*)device->static_config;
 	
 	memset(tpc->w, 0, sizeof(tpc->w));
 	/* The PE bit is always set for the MT3200 (but not MT1600) */

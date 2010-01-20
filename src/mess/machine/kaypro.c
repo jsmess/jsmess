@@ -1,5 +1,5 @@
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ctronics.h"
 #include "machine/kay_kbd.h"
@@ -68,7 +68,7 @@ static WRITE8_DEVICE_HANDLER( pio_system_w )
 		memory_set_bankptr(mem->machine, "bank3", memory_region(mem->machine, "rambank"));
 	}
 
-	wd17xx_set_density(kaypro_fdc, (data & 0x20) ? 0 : 1);
+	wd17xx_set_density(kaypro_fdc, (DENSITY)((data & 0x20) ? 0 : 1));
 
 	centronics_strobe_w(kaypro_printer, BIT(data, 4));
 
@@ -179,7 +179,7 @@ WRITE8_HANDLER( kaypro2x_system_port_w )
 		memory_set_bankptr(mem->machine, "bank3", memory_region(mem->machine, "rambank"));
 	}
 
-	wd17xx_set_density(kaypro_fdc, (data & 0x20) ? 0 : 1);
+	wd17xx_set_density(kaypro_fdc, (DENSITY)((data & 0x20) ? 0 : 1));
 
 	centronics_strobe_w(kaypro_printer, BIT(data, 3));
 
@@ -341,7 +341,7 @@ WRITE8_DEVICE_HANDLER( kaypro2x_sio_w )
 
 static TIMER_CALLBACK( kaypro_timer_callback )
 {
-	if (cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_HALT))
+	if (cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_HALT))
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -412,7 +412,7 @@ MACHINE_RESET( kaypro2x )
 
 QUICKLOAD_LOAD( kayproii )
 {
-	const device_config *cpu = cputag_get_cpu(image->machine, "maincpu");
+	const device_config *cpu = devtag_get_device(image->machine, "maincpu");
 	UINT8 *RAM = memory_region(image->machine, "rambank");
 	UINT16 i;
 	UINT8 data;
@@ -439,7 +439,7 @@ QUICKLOAD_LOAD( kayproii )
 QUICKLOAD_LOAD( kaypro2x )
 {
 	const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const device_config *cpu = cputag_get_cpu(image->machine, "maincpu");
+	const device_config *cpu = devtag_get_device(image->machine, "maincpu");
 	UINT8 *RAM = memory_region(image->machine, "rambank");
 	UINT16 i;
 	UINT8 data;

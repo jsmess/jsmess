@@ -4,7 +4,7 @@
  *
  ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/abc80.h"
 
 /* Graphics Layout */
@@ -37,7 +37,7 @@ static PALETTE_INIT( abc80 )
 
 static TILE_GET_INFO( abc80_get_tile_info )
 {
-	abc80_state *state = machine->driver_data;
+	abc80_state *state = (abc80_state *)machine->driver_data;
 
 	int attr = state->video_ram[tile_index];
 	int code = attr & 0x7f;
@@ -73,7 +73,7 @@ static UINT32 abc80_tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols, UINT3
 
 static TIMER_DEVICE_CALLBACK(abc80_blink_tick)
 {
-	abc80_state *state = timer->machine->driver_data;
+	abc80_state *state = (abc80_state *)timer->machine->driver_data;
 
 	state->blink = !state->blink;
 }
@@ -81,7 +81,7 @@ static TIMER_DEVICE_CALLBACK(abc80_blink_tick)
 #ifdef UNUSED_FUNCTION
 static void abc80_update(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	abc80_state *state = machine->driver_data;
+	abc80_state *state = (abc80_state *)machine->driver_data;
 	UINT16 videoram_addr;
 	int y, sx, c = 0, r = 0;
 
@@ -200,7 +200,7 @@ static void abc80_update(running_machine *machine, bitmap_t *bitmap, const recta
 
 static VIDEO_START( abc80 )
 {
-	abc80_state *state = machine->driver_data;
+	abc80_state *state = (abc80_state *)machine->driver_data;
 
 	/* create tx_tilemap */
 
@@ -226,7 +226,7 @@ static VIDEO_START( abc80 )
 
 static VIDEO_UPDATE( abc80 )
 {
-	abc80_state *state = screen->machine->driver_data;
+	abc80_state *state = (abc80_state *)screen->machine->driver_data;
 	rectangle rect;
 
 	rect.min_x = ABC80_HDSTART;

@@ -33,7 +33,7 @@
 #ifndef __ZX8301__
 #define __ZX8301__
 
-#include "driver.h"
+#include "emu.h"
 #include "devcb.h"
 
 /***************************************************************************

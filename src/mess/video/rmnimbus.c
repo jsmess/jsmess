@@ -21,7 +21,7 @@
     code on the real machine.  
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "video/border.h"
 #include "memory.h"
 #include "debug/debugcpu.h"

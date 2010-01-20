@@ -12,19 +12,19 @@
 
 #include <ctype.h>
 
-#include "mame.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "image.h"
 #include "hash.h"
 #include "unzip.h"
 #include "utils.h"
 #include "hashfile.h"
-#include "mamecore.h"
 #include "messopts.h"
 #include "ui.h"
 #include "device.h"
 #include "zippath.h"
 #include "softlist.h"
-
+#include "pool.h"
 
 
 /***************************************************************************
@@ -66,8 +66,8 @@ struct _image_slot_data
     unsigned int is_loading : 1;
 
 	/* Software list and software entry information */
-	const software_list *software_list;
-	const software_entry *software_entry;
+	const software_list *software_list_ptr;
+	const software_entry *software_entry_ptr;
 
     /* info read from the hash file */
     char *longname;
@@ -117,7 +117,7 @@ static image_slot_data *find_image_slot(const device_config *image);
     device_get_info_int_offline - return an integer
     state value from an allocated device; can be
     called offline
--------------------------------------------------*/
+1-------------------------------------------------*/
 
 INLINE INT64 device_get_info_int_offline(const device_config *device, UINT32 state)
 {
@@ -207,10 +207,6 @@ void image_init(running_machine *machine)
     image_device_format **formatptr;
     image_device_format *format;
 
-    /* sanity checks */
-    assert(DEVINFO_FCT_IMAGE_FIRST > DEVINFO_FCT_FIRST);
-    assert(DEVINFO_FCT_IMAGE_LAST < DEVINFO_FCT_DEVICE_SPECIFIC);
-
     /* first count all images, and identify multiply defined devices */
     count = image_device_count(machine->config);
 
@@ -230,7 +226,7 @@ void image_init(running_machine *machine)
         slot = &machine->images_data->slots[indx];
 
         /* create a memory pool, and allocated strings */
-        slot->mempool = pool_alloc(memory_error);
+        slot->mempool = pool_alloc_lib(memory_error);
         slot->name = astring_alloc();
         slot->working_directory = astring_alloc();
 
@@ -248,8 +244,8 @@ void image_init(running_machine *machine)
         slot->verify = (device_image_verify_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_VERIFY);
 
 		/* sodftware list and entry */
-		slot->software_list = software_list_get_by_name( device_get_info_string(slot->dev, DEVINFO_STR_SOFTWARE_LIST) );
-		slot->software_entry = NULL;
+		slot->software_list_ptr = software_list_get_by_name( device_get_info_string(slot->dev, DEVINFO_STR_SOFTWARE_LIST) );
+		slot->software_entry_ptr = NULL;
 
         /* creation option guide */
         slot->create_option_guide = (const option_guide *) device_get_info_ptr(slot->dev, DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE);
@@ -270,7 +266,7 @@ void image_init(running_machine *machine)
 	            format->name        = auto_strdup(machine, device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTNAME + i));
 	            format->description = auto_strdup(machine, device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTDESC + i));
 	            format->extensions  = auto_strdup(machine, device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTEXTS + i));
-	            format->optspec     = device_get_info_ptr(slot->dev, DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + i);
+	            format->optspec     = (char*)device_get_info_ptr(slot->dev, DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + i);
 
 	            /* and append it to the list */
 	            *formatptr = format;
@@ -309,7 +305,7 @@ void image_unload_all(running_machine *machine)
             image_unload_internal(slot);
 
             /* free the memory pool */
-            pool_free(slot->mempool);
+            pool_free_lib(slot->mempool);
             slot->mempool = NULL;
 
             /* free the allocated strings */
@@ -608,9 +604,9 @@ void image_device_compute_hash(char *dest, const device_config *device,
 
     /* compute the hash */
     if (partialhash != NULL)
-        partialhash(dest, data, length, functions);
+        partialhash(dest, (const unsigned char*)data, length, functions);
     else
-        hash_compute(dest, data, length, functions);
+        hash_compute(dest, (const unsigned char*)data, length, functions);
 }
 
 
@@ -702,7 +698,7 @@ static image_error_t set_image_filename(image_slot_data *image, const char *file
 
 static int is_loaded(image_slot_data *image)
 {
-    return (image->file != NULL) || (image->ptr != NULL) || (image->software_entry != NULL);
+    return (image->file != NULL) || (image->ptr != NULL) || (image->software_entry_ptr != NULL);
 }
 
 
@@ -850,15 +846,15 @@ static int image_load_internal(const device_config *image, const char *path,
 	/* Check if there's a software list defined for this device and use that if we're not creating an image */
 /* This piece below is commented out until load_region_list or something better is available in src/emu/romload */
 #if 0
-	if ( !is_create && slot->software_list )
+	if ( !is_create && slot->software_list_ptr )
 	{
-		slot->software_entry = software_get_by_name( slot->software_list, path );
+		slot->software_entry = software_get_by_name( slot->software_list_ptr, path );
 
 		if ( slot->software_entry )
 		{
 			char swname[256];
 
-			sprintf( swname, "%s:%s", slot->software_list->name, slot->software_entry->name );
+			sprintf( swname, "%s:%s", slot->software_list_ptr->name, slot->software_entry->name );
 
 			load_software_region(slot->dev, swname, slot->software_entry->rom_info );
 
@@ -906,7 +902,7 @@ static int image_load_internal(const device_config *image, const char *path,
         }
 
         /* verify the file */
-        err = (*slot->verify)(buffer, core_fsize(slot->file));
+        err = (image_error_t)(*slot->verify)((const UINT8*)buffer, core_fsize(slot->file));
         if (err)
         {
             slot->err = IMAGE_ERROR_INVALIDIMAGE;
@@ -920,7 +916,7 @@ static int image_load_internal(const device_config *image, const char *path,
         slot->create_format = create_format;
         slot->create_args = create_args;
 
-        err = image_finish_load(image);
+        err = (image_error_t)image_finish_load(image);
         if (err)
             goto done;
     }
@@ -1204,7 +1200,8 @@ static void run_hash(const device_config *image,
     *dest = '\0';
     size = (UINT32) image_length(image);
 
-    buf = alloc_array_or_die(UINT8, size);
+    buf = (UINT8*)malloc(size);
+	memset(buf,0,size);
 
     /* read the file */
     image_fseek(image, 0, SEEK_SET);
@@ -1454,7 +1451,7 @@ const software_entry *image_software_entry(const device_config *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 
-	return slot->software_entry;
+	return slot->software_entry_ptr;
 }
 
 
@@ -1468,10 +1465,10 @@ UINT8 *image_get_software_region(const device_config *image, const char *tag)
 	image_slot_data *slot = find_image_slot(image);
 	char full_tag[256];
 
-	if ( slot->software_list == NULL || slot->software_entry == NULL )
+	if ( slot->software_list_ptr == NULL || slot->software_entry_ptr == NULL )
 		return NULL;
 
-	sprintf( full_tag, "%s:%s:%s", slot->software_list->name, slot->software_entry->name, tag );
+	sprintf( full_tag, "%s:%s:%s", slot->software_list_ptr->name, slot->software_entry_ptr->name, tag );
 	return memory_region( image->machine, full_tag );
 }
 
@@ -1484,7 +1481,7 @@ UINT32 image_get_software_region_length(const device_config *image, const char *
 {
     char full_tag[256];
 
-    sprintf( full_tag, "%s:%s:%s", image->tag, image_software_entry(image)->name, tag );
+    sprintf( full_tag, "%s:%s:%s", image->tag.cstr(), image_software_entry(image)->name, tag );
     return memory_region_length( image->machine, full_tag );
 }
 
@@ -1753,7 +1750,7 @@ void *image_realloc(const device_config *image, void *ptr, size_t size)
     /* sanity checks */
     assert(is_loaded(slot) || slot->is_loading);
 
-    return pool_realloc(slot->mempool, ptr, size);
+    return pool_realloc_lib(slot->mempool, ptr, size);
 }
 
 
@@ -1765,7 +1762,7 @@ char *image_strdup(const device_config *image, const char *src)
     /* sanity checks */
     assert(is_loaded(slot) || slot->is_loading);
 
-    return pool_strdup(slot->mempool, src);
+    return pool_strdup_lib(slot->mempool, src);
 }
 
 

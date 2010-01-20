@@ -93,7 +93,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/pc8801.h"
 #include "cpu/z80/z80.h"
 #include "cpu/v30mz/nec.h"
@@ -573,7 +573,7 @@ static const cassette_config pc88_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 };
 
 /* Machine Drivers */

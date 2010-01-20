@@ -8,7 +8,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "devices/flopdrv.h"
 #include "includes/mbee.h"
 
@@ -165,7 +165,7 @@ WRITE8_HANDLER ( mbee_fdc_motor_w )
 
 	wd17xx_set_drive(mbee_fdc, data & 3);
 	wd17xx_set_side(mbee_fdc, (data & 4) ? 1 : 0);
-	wd17xx_set_density(mbee_fdc, (data & 8) ? 1 : 0);
+	wd17xx_set_density(mbee_fdc, (DENSITY)((data & 8) ? 1 : 0));
 }
 
 /***********************************************************
@@ -224,7 +224,7 @@ INTERRUPT_GEN( mbee_interrupt )
 
 Z80BIN_EXECUTE( mbee )
 {
-	const device_config *cpu = cputag_get_cpu(machine, "maincpu");
+	const device_config *cpu = devtag_get_device(machine, "maincpu");
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_write_word_16le(space, 0xa6, execute_address);			/* fix the EXEC command */
@@ -242,7 +242,7 @@ Z80BIN_EXECUTE( mbee )
 
 QUICKLOAD_LOAD( mbee )
 {
-	const device_config *cpu = cputag_get_cpu(image->machine, "maincpu");
+	const device_config *cpu = devtag_get_device(image->machine, "maincpu");
 	const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 i, j;
 	UINT8 data, sw = input_port_read(image->machine, "CONFIG") & 1;	/* reading the dipswitch: 1 = autorun */

@@ -61,7 +61,7 @@ To Do:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
@@ -1367,7 +1367,7 @@ static MACHINE_DRIVER_START( zerowing )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_RESET(zerozone)
+	MDRV_MACHINE_RESET(zerowing)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1485,7 +1485,7 @@ static MACHINE_DRIVER_START( outzone )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_RESET(zerozone)
+	MDRV_MACHINE_RESET(zerowing)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

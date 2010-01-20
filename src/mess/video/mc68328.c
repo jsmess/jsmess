@@ -7,7 +7,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/mc68328.h"
 #include "machine/mc68328.h"
 #include "devices/messram.h"

@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/kyocera.h"
 #include "video/hd44102.h"
 #include "video/hd61830.h"
@@ -11,7 +11,7 @@ static PALETTE_INIT( kc85 )
 
 static VIDEO_START( kc85 )
 {
-	kc85_state *state = machine->driver_data;
+	kc85_state *state = (kc85_state *)machine->driver_data;
 
 	/* find devices */
 	state->hd44102[0] = devtag_get_device(machine, "m1");
@@ -28,7 +28,7 @@ static VIDEO_START( kc85 )
 
 static VIDEO_UPDATE( kc85 )
 {
-	kc85_state *state = screen->machine->driver_data;
+	kc85_state *state = (kc85_state *)screen->machine->driver_data;
 	int i;
 
 	for (i = 0; i < 10; i++)
@@ -41,7 +41,7 @@ static VIDEO_UPDATE( kc85 )
 
 static VIDEO_START( tandy200 )
 {
-	tandy200_state *state = machine->driver_data;
+	tandy200_state *state = (tandy200_state *)machine->driver_data;
 
 	/* find devices */
 	state->hd61830 = devtag_get_device(machine, HD61830_TAG);
@@ -49,7 +49,7 @@ static VIDEO_START( tandy200 )
 
 static VIDEO_UPDATE( tandy200 )
 {
-	tandy200_state *state = screen->machine->driver_data;
+	tandy200_state *state = (tandy200_state *)screen->machine->driver_data;
 
 	hd61830_update(state->hd61830, bitmap, cliprect);
 

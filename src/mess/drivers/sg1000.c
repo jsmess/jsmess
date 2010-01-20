@@ -63,7 +63,7 @@ Notes:
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/sg1000.h"
 #include "devices/flopdrv.h"
@@ -79,6 +79,7 @@ Notes:
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 #include "devices/messram.h"
+#include "crsshair.h"
 
 /* Terebi Oekaki (TV Draw) */
 
@@ -99,7 +100,7 @@ Notes:
 
 static WRITE8_HANDLER( tvdraw_axis_w )
 {
-	sg1000_state *state = space->machine->driver_data;
+	sg1000_state *state = (sg1000_state *)space->machine->driver_data;
 
 	if (data & 0x01)
 	{
@@ -121,7 +122,7 @@ static READ8_HANDLER( tvdraw_status_r )
 
 static READ8_HANDLER( tvdraw_data_r )
 {
-	sg1000_state *state = space->machine->driver_data;
+	sg1000_state *state = (sg1000_state *)space->machine->driver_data;
 
 	return state->tvdraw_data;
 }
@@ -468,7 +469,7 @@ static TIMER_CALLBACK( lightgun_tick )
 
 static MACHINE_START( sg1000 )
 {
-	sg1000_state *state = machine->driver_data;
+	sg1000_state *state = (sg1000_state *)machine->driver_data;
 
 	/* configure VDP */
 	TMS9928A_configure(&tms9928a_interface);
@@ -497,7 +498,7 @@ static READ8_DEVICE_HANDLER( sc3000_ppi8255_a_r )
         PA7     Keyboard input
     */
 
-	sg1000_state *state = device->machine->driver_data;
+	sg1000_state *state = (sg1000_state *)device->machine->driver_data;
 
 	static const char *const keynames[] = { "PA0", "PA1", "PA2", "PA3", "PA4", "PA5", "PA6", "PA7" };
 
@@ -519,7 +520,7 @@ static READ8_DEVICE_HANDLER( sc3000_ppi8255_b_r )
         PB7     Cassette tape input
     */
 
-	sg1000_state *state = device->machine->driver_data;
+	sg1000_state *state = (sg1000_state *)device->machine->driver_data;
 
 	static const char *const keynames[] = { "PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7" };
 
@@ -553,7 +554,7 @@ static WRITE8_DEVICE_HANDLER( sc3000_ppi8255_c_w )
         PC7     /FEED to printer
     */
 
-	sg1000_state *state = device->machine->driver_data;
+	sg1000_state *state = (sg1000_state *)device->machine->driver_data;
 
 	/* keyboard */
 	state->keylatch = data & 0x07;
@@ -576,7 +577,7 @@ static I8255A_INTERFACE( sc3000_ppi8255_intf )
 
 static MACHINE_START( sc3000 )
 {
-	sg1000_state *state = machine->driver_data;
+	sg1000_state *state = (sg1000_state *)machine->driver_data;
 
 	/* find devices */
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
@@ -609,7 +610,7 @@ static READ8_DEVICE_HANDLER( sf7000_ppi8255_a_r )
         PA7
     */
 
-	sg1000_state *state = device->machine->driver_data;
+	sg1000_state *state = (sg1000_state *)device->machine->driver_data;
 	UINT8 result = 0;
 
 	result |= state->fdc_irq;
@@ -634,7 +635,7 @@ static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
         PC7     /STROBE to Centronics printer
     */
 
-	sg1000_state *state = device->machine->driver_data;
+	sg1000_state *state = (sg1000_state *)device->machine->driver_data;
 
 	/* floppy motor */
 	floppy_mon_w(floppy_get_device(device->machine, 0), BIT(data, 1));
@@ -678,14 +679,14 @@ static I8255A_INTERFACE( sf7000_8255_1_intf )
 
 static WRITE_LINE_DEVICE_HANDLER( sf7000_fdc_interrupt )
 {
-	sg1000_state *driver_state = device->machine->driver_data;
+	sg1000_state *driver_state = (sg1000_state *)device->machine->driver_data;
 
 	driver_state->fdc_irq = state;
 }
 
 static void sf7000_fdc_index_callback(const device_config *controller, const device_config *img, int state)
 {
-	sg1000_state *driver_state = img->machine->driver_data;
+	sg1000_state *driver_state = (sg1000_state *)img->machine->driver_data;
 
 	driver_state->fdc_index = state;
 }
@@ -702,7 +703,7 @@ static const struct upd765_interface sf7000_upd765_interface =
 
 static MACHINE_START( sf7000 )
 {
-	sg1000_state *state = machine->driver_data;
+	sg1000_state *state = (sg1000_state *)machine->driver_data;
 
 	/* find devices */
 	state->upd765 = devtag_get_device(machine, UPD765_TAG);
@@ -876,7 +877,7 @@ static const cassette_config sc3000_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 };
 
 static MACHINE_DRIVER_START( sc3000 )

@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "pc_t1t.h"
 #include "video/mc6845.h"
 #include "machine/pic8259.h"

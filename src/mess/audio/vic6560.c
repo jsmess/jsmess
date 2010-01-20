@@ -7,7 +7,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "streams.h"
 
 #include "video/vic6560.h"

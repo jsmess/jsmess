@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/wave.h"
@@ -133,7 +133,7 @@ static const cassette_config vector_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 };
 
 static FLOPPY_OPTIONS_START(vector)

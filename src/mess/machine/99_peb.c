@@ -100,7 +100,7 @@
     emulators as well.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "99_peb.h"
 
 /* TRUE if we are using the snug sgcpu 99/4p 16-bit extensions */
@@ -109,6 +109,10 @@ static int has_16bit_peb;
 /* handlers for each of 16 slots + 16 extra slots for ti-99/8 */
 static ti99_peb_card_handlers_t expansion_ports[16+16];
 
+enum width_t {
+	width_8bit = 0, 
+	width_16bit
+};
 /* expansion card structure for the snug sgcpu 99/4p system, which supports
 dynamical 16-bit accesses (TI did not design this!) */
 typedef struct ti99_4p_peb_card_handlers_t
@@ -116,7 +120,7 @@ typedef struct ti99_4p_peb_card_handlers_t
 	cru_read_handler cru_read;		/* card CRU read handler */
 	cru_write_handler cru_write;	/* card CRU handler */
 
-	enum {width_8bit = 0, width_16bit} width;
+	width_t width;
 	union
 	{
 		struct

@@ -10,7 +10,6 @@
 #define DEVICE_H
 
 // MAME headers
-#include "mamecore.h"
 #include "devintrf.h"
 
 // MESS headers

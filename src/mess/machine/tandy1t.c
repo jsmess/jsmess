@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 
 #include "machine/pckeybrd.h"
 
@@ -214,9 +214,9 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 	case 2:
 		tandy_ppi.portc = data;
 		if (data & 8)
-			cpu_set_clockscale(cputag_get_cpu(space->machine, "maincpu"), 1);
+			cpu_set_clockscale(devtag_get_device(space->machine, "maincpu"), 1);
 		else
-			cpu_set_clockscale(cputag_get_cpu(space->machine, "maincpu"), 4.77/8);
+			cpu_set_clockscale(devtag_get_device(space->machine, "maincpu"), 4.77/8);
 		break;
 	}
 }

@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/osi.h"
 
 /* Palette Initialization */
@@ -24,7 +24,7 @@ static PALETTE_INIT( osi630 )
 
 static VIDEO_START( osi600 )
 {
-	osi_state *state = machine->driver_data;
+	osi_state *state = (osi_state *)machine->driver_data;
 	UINT16 addr;
 
 	/* randomize video memory contents */
@@ -47,7 +47,7 @@ static VIDEO_START( osi600 )
 
 static VIDEO_UPDATE( osi600 )
 {
-	osi_state *state = screen->machine->driver_data;
+	osi_state *state = (osi_state *)screen->machine->driver_data;
 
 	int y, bit, sx;
 
@@ -124,7 +124,7 @@ static VIDEO_UPDATE( osi600 )
 
 static VIDEO_UPDATE( uk101 )
 {
-	osi_state *state = screen->machine->driver_data;
+	osi_state *state = (osi_state *)screen->machine->driver_data;
 
 	int y, bit, sx;
 

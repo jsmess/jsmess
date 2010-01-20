@@ -10,10 +10,8 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "x86log.h"
-#include "mame.h"
-
-#include <stddef.h>
 
 
 
@@ -54,7 +52,7 @@ struct _data_range_t
 /* the code logging context */
 struct _x86log_context
 {
-	astring *		filename;						/* name of the file */
+	astring			filename;						/* name of the file */
 	FILE *			file;							/* file we are logging to */
 
 	data_range_t	data_range[MAX_DATA_RANGES];	/* list of data ranges */
@@ -91,10 +89,10 @@ x86log_context *x86log_create_context(const char *filename)
 	x86log_context *log;
 
 	/* allocate the log */
-	log = alloc_clear_or_die(x86log_context);
+	log = global_alloc_clear(x86log_context);
 
 	/* allocate the filename */
-	log->filename = astring_dupc(filename);
+	log->filename.cpy(filename);
 
 	/* reset things */
 	reset_log(log);
@@ -113,8 +111,7 @@ void x86log_free_context(x86log_context *log)
 		fclose(log->file);
 
 	/* free the structure */
-	astring_free(log->filename);
-	free(log);
+	global_free(log);
 }
 
 
@@ -276,7 +273,7 @@ void x86log_printf(x86log_context *log, const char *format, ...)
 
 	/* open the file, creating it if necessary */
 	if (log->file == NULL)
-		log->file = fopen(astring_c(log->filename), "w");
+		log->file = fopen(log->filename, "w");
 	if (log->file == NULL)
 		return;
 

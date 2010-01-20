@@ -7,7 +7,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "dm9368.h"
 
 /***************************************************************************
@@ -70,7 +70,7 @@ WRITE8_DEVICE_HANDLER( dm9368_w )
 
 	if (!dm9368->rbi && !a)
 	{
-		if (LOG) logerror("DM9368 '%s' Blanked Rippling Zero\n", device->tag);
+		if (LOG) logerror("DM9368 '%s' Blanked Rippling Zero\n", device->tag.cstr());
 
 		/* blank rippling 0 */
 		output_set_digit_value(dm9368->digit, 0);
@@ -82,7 +82,7 @@ WRITE8_DEVICE_HANDLER( dm9368_w )
 	}
 	else
 	{
-		if (LOG) logerror("DM9368 '%s' Output Data: %u = %02x\n", device->tag, a, OUTPUT[a]);
+		if (LOG) logerror("DM9368 '%s' Output Data: %u = %02x\n", device->tag.cstr(), a, OUTPUT[a]);
 
 		output_set_digit_value(dm9368->digit, OUTPUT[a]);
 
@@ -103,7 +103,7 @@ WRITE_LINE_DEVICE_HANDLER( dm9368_rbi_w )
 
 	dm9368->rbi = state;
 
-	if (LOG) logerror("DM9368 '%s' Ripple Blanking Input: %u\n", device->tag, state);
+	if (LOG) logerror("DM9368 '%s' Ripple Blanking Input: %u\n", device->tag.cstr(), state);
 }
 
 /*-------------------------------------------------

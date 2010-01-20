@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/pc8401a.h"
 #include "video/sed1330.h"
 #include "video/mc6845.h"
@@ -14,7 +14,7 @@ static PALETTE_INIT( pc8401a )
 
 static VIDEO_START( pc8401a )
 {
-	pc8401a_state *state = machine->driver_data;
+	pc8401a_state *state = (pc8401a_state *)machine->driver_data;
 
 	/* allocate video memory */
 	state->video_ram = auto_alloc_array(machine, UINT8, PC8401A_LCD_VIDEORAM_SIZE);
@@ -32,7 +32,7 @@ static VIDEO_UPDATE( pc8401a )
 
 static VIDEO_START( pc8500 )
 {
-	pc8401a_state *state = machine->driver_data;
+	pc8401a_state *state = (pc8401a_state *)machine->driver_data;
 
 	/* find devices */
 	state->sed1330 = devtag_get_device(machine, SED1330_TAG);
@@ -48,7 +48,7 @@ static VIDEO_START( pc8500 )
 
 static VIDEO_UPDATE( pc8500 )
 {
-	pc8401a_state *state = screen->machine->driver_data;
+	pc8401a_state *state = (pc8401a_state *)screen->machine->driver_data;
 
 	if (screen == state->lcd)
 	{
@@ -66,14 +66,14 @@ static VIDEO_UPDATE( pc8500 )
 
 static READ8_HANDLER( pc8500_sed1330_vd_r )
 {
-	pc8401a_state *state = space->machine->driver_data;
+	pc8401a_state *state = (pc8401a_state *)space->machine->driver_data;
 
 	return state->video_ram[offset & PC8500_LCD_VIDEORAM_MASK];
 }
 
 static WRITE8_HANDLER( pc8500_sed1330_vd_w )
 {
-	pc8401a_state *state = space->machine->driver_data;
+	pc8401a_state *state = (pc8401a_state *)space->machine->driver_data;
 
 	state->video_ram[offset & PC8500_LCD_VIDEORAM_MASK] = data;
 }

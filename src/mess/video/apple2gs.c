@@ -7,7 +7,7 @@
 *********************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/apple2.h"
 #include "includes/apple2gs.h"
 

@@ -17,7 +17,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "z80sti.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -252,7 +252,7 @@ static void serial_receive(z80sti_t *z80sti)
 
 static TIMER_CALLBACK( rx_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	z80sti_t *z80sti = get_safe_token(device);
 
 	serial_receive(z80sti);
@@ -272,7 +272,7 @@ static void serial_transmit(z80sti_t *z80sti)
 
 static TIMER_CALLBACK( tx_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	z80sti_t *z80sti = get_safe_token(device);
 
 	serial_transmit(z80sti);
@@ -336,39 +336,39 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
 		switch (z80sti->pvr & 0x07)
 		{
 		case Z80STI_REGISTER_IR_SCR:
-			LOG(("Z80STI '%s' Sync Character Register: %x\n", device->tag, data));
+			LOG(("Z80STI '%s' Sync Character Register: %x\n", device->tag.cstr(), data));
 			z80sti->scr = data;
 			break;
 
 		case Z80STI_REGISTER_IR_TDDR:
-			LOG(("Z80STI '%s' Timer D Data Register: %x\n", device->tag, data));
+			LOG(("Z80STI '%s' Timer D Data Register: %x\n", device->tag.cstr(), data));
 			z80sti->tdr[TIMER_D] = data;
 			break;
 
 		case Z80STI_REGISTER_IR_TCDR:
-			LOG(("Z80STI '%s' Timer C Data Register: %x\n", device->tag, data));
+			LOG(("Z80STI '%s' Timer C Data Register: %x\n", device->tag.cstr(), data));
 			z80sti->tdr[TIMER_C] = data;
 			break;
 
 		case Z80STI_REGISTER_IR_AER:
-			LOG(("Z80STI '%s' Active Edge Register: %x\n", device->tag, data));
+			LOG(("Z80STI '%s' Active Edge Register: %x\n", device->tag.cstr(), data));
 			z80sti->aer = data;
 			break;
 
 		case Z80STI_REGISTER_IR_IERB:
-			LOG(("Z80STI '%s' Interrupt Enable Register B: %x\n", device->tag, data));
+			LOG(("Z80STI '%s' Interrupt Enable Register B: %x\n", device->tag.cstr(), data));
 			z80sti->ier = (z80sti->ier & 0xff00) | data;
 			check_interrupts(z80sti);
 			break;
 
 		case Z80STI_REGISTER_IR_IERA:
-			LOG(("Z80STI '%s' Interrupt Enable Register A: %x\n", device->tag, data));
+			LOG(("Z80STI '%s' Interrupt Enable Register A: %x\n", device->tag.cstr(), data));
 			z80sti->ier = (data << 8) | (z80sti->ier & 0xff);
 			check_interrupts(z80sti);
 			break;
 
 		case Z80STI_REGISTER_IR_DDR:
-			LOG(("Z80STI '%s' Data Direction Register: %x\n", device->tag, data));
+			LOG(("Z80STI '%s' Data Direction Register: %x\n", device->tag.cstr(), data));
 			z80sti->ddr = data;
 			break;
 
@@ -379,8 +379,8 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
 
 			z80sti->tcdc = data;
 
-			LOG(("Z80STI '%s' Timer C Prescaler: %u\n", device->tag, tcc));
-			LOG(("Z80STI '%s' Timer D Prescaler: %u\n", device->tag, tdc));
+			LOG(("Z80STI '%s' Timer C Prescaler: %u\n", device->tag.cstr(), tcc));
+			LOG(("Z80STI '%s' Timer D Prescaler: %u\n", device->tag.cstr(), tdc));
 
 			if (tcc)
 				timer_adjust_periodic(z80sti->timer[TIMER_C], ATTOTIME_IN_HZ(device->clock / tcc), 0, ATTOTIME_IN_HZ(device->clock / tcc));
@@ -394,7 +394,7 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
 
 			if (BIT(data, 7))
 			{
-				LOG(("Z80STI '%s' Timer A Reset\n", device->tag));
+				LOG(("Z80STI '%s' Timer A Reset\n", device->tag.cstr()));
 				z80sti->to[TIMER_A] = 0;
 
 				devcb_call_write_line(&z80sti->out_tao_func, z80sti->to[TIMER_A]);
@@ -402,7 +402,7 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
 
 			if (BIT(data, 3))
 			{
-				LOG(("Z80STI '%s' Timer B Reset\n", device->tag));
+				LOG(("Z80STI '%s' Timer B Reset\n", device->tag.cstr()));
 				z80sti->to[TIMER_B] = 0;
 
 				devcb_call_write_line(&z80sti->out_tbo_func, z80sti->to[TIMER_B]);
@@ -413,7 +413,7 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
 		break;
 
 	case Z80STI_REGISTER_GPIP:
-		LOG(("Z80STI '%s' General Purpose I/O Register: %x\n", device->tag, data));
+		LOG(("Z80STI '%s' General Purpose I/O Register: %x\n", device->tag.cstr(), data));
 		z80sti->gpip = data & z80sti->ddr;
 		devcb_call_write8(&z80sti->out_gpio_func, 0, z80sti->gpip);
 		break;
@@ -421,7 +421,7 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
 	case Z80STI_REGISTER_IPRB:
 		{
 		int i;
-		LOG(("Z80STI '%s' Interrupt Pending Register B: %x\n", device->tag, data));
+		LOG(("Z80STI '%s' Interrupt Pending Register B: %x\n", device->tag.cstr(), data));
 		z80sti->ipr &= (z80sti->ipr & 0xff00) | data;
 
 		for (i = 0; i < 16; i++)
@@ -436,7 +436,7 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
 	case Z80STI_REGISTER_IPRA:
 		{
 		int i;
-		LOG(("Z80STI '%s' Interrupt Pending Register A: %x\n", device->tag, data));
+		LOG(("Z80STI '%s' Interrupt Pending Register A: %x\n", device->tag.cstr(), data));
 		z80sti->ipr &= (data << 8) | (z80sti->ipr & 0xff);
 
 		for (i = 0; i < 16; i++)
@@ -449,32 +449,32 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
 		break;
 
 	case Z80STI_REGISTER_ISRB:
-		LOG(("Z80STI '%s' Interrupt In-Service Register B: %x\n", device->tag, data));
+		LOG(("Z80STI '%s' Interrupt In-Service Register B: %x\n", device->tag.cstr(), data));
 		z80sti->isr &= (z80sti->isr & 0xff00) | data;
 		break;
 
 	case Z80STI_REGISTER_ISRA:
-		LOG(("Z80STI '%s' Interrupt In-Service Register A: %x\n", device->tag, data));
+		LOG(("Z80STI '%s' Interrupt In-Service Register A: %x\n", device->tag.cstr(), data));
 		z80sti->isr &= (data << 8) | (z80sti->isr & 0xff);
 		break;
 
 	case Z80STI_REGISTER_IMRB:
-		LOG(("Z80STI '%s' Interrupt Mask Register B: %x\n", device->tag, data));
+		LOG(("Z80STI '%s' Interrupt Mask Register B: %x\n", device->tag.cstr(), data));
 		z80sti->imr = (z80sti->imr & 0xff00) | data;
 		z80sti->isr &= z80sti->imr;
 		check_interrupts(z80sti);
 		break;
 
 	case Z80STI_REGISTER_IMRA:
-		LOG(("Z80STI '%s' Interrupt Mask Register A: %x\n", device->tag, data));
+		LOG(("Z80STI '%s' Interrupt Mask Register A: %x\n", device->tag.cstr(), data));
 		z80sti->imr = (data << 8) | (z80sti->imr & 0xff);
 		z80sti->isr &= z80sti->imr;
 		check_interrupts(z80sti);
 		break;
 
 	case Z80STI_REGISTER_PVR:
-		LOG(("Z80STI '%s' Interrupt Vector: %02x\n", device->tag, data & 0xe0));
-		LOG(("Z80STI '%s' IR Address: %01x\n", device->tag, data & 0x07));
+		LOG(("Z80STI '%s' Interrupt Vector: %02x\n", device->tag.cstr(), data & 0xe0));
+		LOG(("Z80STI '%s' IR Address: %01x\n", device->tag.cstr(), data & 0x07));
 		z80sti->pvr = data;
 		break;
 
@@ -485,8 +485,8 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
 
 		z80sti->tabc = data;
 
-		LOG(("Z80STI '%s' Timer A Prescaler: %u\n", device->tag, tac));
-		LOG(("Z80STI '%s' Timer B Prescaler: %u\n", device->tag, tbc));
+		LOG(("Z80STI '%s' Timer A Prescaler: %u\n", device->tag.cstr(), tac));
+		LOG(("Z80STI '%s' Timer B Prescaler: %u\n", device->tag.cstr(), tbc));
 
 		if (tac)
 			timer_adjust_periodic(z80sti->timer[TIMER_A], ATTOTIME_IN_HZ(device->clock / tac), 0, ATTOTIME_IN_HZ(device->clock / tac));
@@ -501,12 +501,12 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
 		break;
 
 	case Z80STI_REGISTER_TBDR:
-		LOG(("Z80STI '%s' Timer B Data Register: %x\n", device->tag, data));
+		LOG(("Z80STI '%s' Timer B Data Register: %x\n", device->tag.cstr(), data));
 		z80sti->tdr[TIMER_B] = data;
 		break;
 
 	case Z80STI_REGISTER_TADR:
-		LOG(("Z80STI '%s' Timer A Data Register: %x\n", device->tag, data));
+		LOG(("Z80STI '%s' Timer A Data Register: %x\n", device->tag.cstr(), data));
 		z80sti->tdr[TIMER_A] = data;
 		break;
 #if 0
@@ -527,7 +527,7 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
         break;
 #endif
 	default:
-		LOG(("Z80STI '%s' Unsupported Register %x\n", device->tag, offset & 0x0f));
+		LOG(("Z80STI '%s' Unsupported Register %x\n", device->tag.cstr(), offset & 0x0f));
 	}
 }
 
@@ -584,7 +584,7 @@ static void timer_count(const device_config *device, int index)
 
 		if (z80sti->ier & (1 << INT_LEVEL_TIMER[index]))
 		{
-			LOG(("Z80STI '%s' Interrupt Pending for Timer %c\n", device->tag, 'A' + index));
+			LOG(("Z80STI '%s' Interrupt Pending for Timer %c\n", device->tag.cstr(), 'A' + index));
 
 			/* signal timer elapsed interrupt */
 			take_interrupt(z80sti, INT_LEVEL_TIMER[index]);
@@ -604,10 +604,10 @@ static void timer_count(const device_config *device, int index)
     TIMER_CALLBACK( timer_# )
 -------------------------------------------------*/
 
-static TIMER_CALLBACK( timer_a ) { timer_count(ptr, TIMER_A); }
-static TIMER_CALLBACK( timer_b ) { timer_count(ptr, TIMER_B); }
-static TIMER_CALLBACK( timer_c ) { timer_count(ptr, TIMER_C); }
-static TIMER_CALLBACK( timer_d ) { timer_count(ptr, TIMER_D); }
+static TIMER_CALLBACK( timer_a ) { timer_count((const device_config *)ptr, TIMER_A); }
+static TIMER_CALLBACK( timer_b ) { timer_count((const device_config *)ptr, TIMER_B); }
+static TIMER_CALLBACK( timer_c ) { timer_count((const device_config *)ptr, TIMER_C); }
+static TIMER_CALLBACK( timer_d ) { timer_count((const device_config *)ptr, TIMER_D); }
 
 /*-------------------------------------------------
     gpip_input - GPIP input line write
@@ -622,11 +622,11 @@ static void gpip_input(const device_config *device, int bit, int state)
 
 	if ((old_state ^ aer) && !(state ^ aer))
 	{
-		LOG(("Z80STI '%s' Edge Transition Detected on Bit: %u\n", device->tag, bit));
+		LOG(("Z80STI '%s' Edge Transition Detected on Bit: %u\n", device->tag.cstr(), bit));
 
 		if (z80sti->ier & (1 << INT_LEVEL_GPIP[bit]))
 		{
-			LOG(("Z80STI '%s' Interrupt Pending for P%u\n", device->tag, bit));
+			LOG(("Z80STI '%s' Interrupt Pending for P%u\n", device->tag.cstr(), bit));
 
 			take_interrupt(z80sti, INT_LEVEL_GPIP[bit]);
 		}
@@ -673,7 +673,7 @@ static int z80sti_irq_state(const device_config *device)
 		}
 	}
 
-	LOG(("Z80STI '%s' Interrupt State: %u\n", device->tag, state));
+	LOG(("Z80STI '%s' Interrupt State: %u\n", device->tag.cstr(), state));
 
 	return state;
 }
@@ -706,7 +706,7 @@ static int z80sti_irq_ack(const device_config *device)
 
 			check_interrupts(z80sti);
 
-			LOG(("Z80STI '%s' Interrupt Acknowledge Vector: %02x\n", device->tag, vector));
+			LOG(("Z80STI '%s' Interrupt Acknowledge Vector: %02x\n", device->tag.cstr(), vector));
 
 			return vector;
 		}
@@ -726,7 +726,7 @@ static void z80sti_irq_reti(const device_config *device)
 	z80sti_t *z80sti = get_safe_token(device);
 	int i;
 
-	LOG(("Z80STI '%s' Return from Interrupt\n", device->tag));
+	LOG(("Z80STI '%s' Return from Interrupt\n", device->tag.cstr()));
 
 	/* loop over all interrupt sources */
 	for (i = 15; i >= 0; i--)
@@ -755,7 +755,7 @@ static void z80sti_irq_reti(const device_config *device)
 static DEVICE_START( z80sti )
 {
 	z80sti_t *z80sti = get_safe_token(device);
-	const z80sti_interface *intf = device->static_config;
+	const z80sti_interface *intf = (const z80sti_interface *)device->static_config;
 
 	/* resolve callbacks */
 	devcb_resolve_read8(&z80sti->in_gpio_func, &intf->in_gpio_func, device);

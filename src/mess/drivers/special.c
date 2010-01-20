@@ -8,7 +8,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/dac.h"
@@ -393,7 +393,7 @@ static const cassette_config special_cassette_config =
 {
 	rks_cassette_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 };
 
 static const floppy_config specimx_floppy_config =

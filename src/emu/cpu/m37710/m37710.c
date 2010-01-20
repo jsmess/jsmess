@@ -51,8 +51,8 @@
         added save state support.
 */
 
+#include "emu.h"
 #include "debugger.h"
-#include "cpuexec.h"
 #include "m37710.h"
 #include "m37710cm.h"
 
@@ -896,8 +896,8 @@ static CPU_INIT( m37710 )
 
 	INT_ACK = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->ICount = 0;
 

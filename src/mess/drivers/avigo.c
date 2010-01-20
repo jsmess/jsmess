@@ -38,7 +38,7 @@
 
  ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/avigo.h"
 #include "machine/intelfsh.h"
@@ -403,7 +403,7 @@ static DIRECT_UPDATE_HANDLER( avigo_opbase_handler )
 	opbase_ptr = avigo_banked_opbase[address / 0x4000];
 	if (opbase_ptr != NULL)
 	{
-		direct->raw = direct->decrypted = opbase_ptr;
+		direct->raw = direct->decrypted = (UINT8*)opbase_ptr;
 		address = ~0;
 	}
 	return address;

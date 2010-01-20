@@ -58,7 +58,7 @@
 #include <math.h>
 #include <assert.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "debug/debugcon.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
@@ -734,7 +734,7 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
 
 		/* CPU un-halted let it run ! */
 		if (HALT_DMA == CLEAR_LINE)
-			cpu_yield(cputag_get_cpu(device->machine, "maincpu"));
+			cpu_yield(devtag_get_device(device->machine, "maincpu"));
 
 		d_pia1_pa_last = data & 0x80;
 	}
@@ -779,7 +779,7 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pb_w)
 
 		/* CPU un-halted let it run ! */
 		if (HALT_CPU == CLEAR_LINE)
-			cpu_yield(cputag_get_cpu(device->machine, "dma"));
+			cpu_yield(devtag_get_device(device->machine, "dma"));
 	}
 }
 
@@ -826,7 +826,7 @@ static WRITE8_DEVICE_HANDLER(d_pia2_pa_w)
 		{
 			cputag_set_input_line(device->machine, "dma", INPUT_LINE_NMI, ASSERT_LINE);
 			logerror("cpu_yield()\n");
-			cpu_yield(cputag_get_cpu(device->machine, "dma"));	/* Let DMA CPU run */
+			cpu_yield(devtag_get_device(device->machine, "dma"));	/* Let DMA CPU run */
 		}
 		else
 		{
@@ -1142,7 +1142,7 @@ MACHINE_START( dgnbeta )
 {
 	dgnbeta_init_video(machine);
 
-	debug_cpu_set_dasm_override(cputag_get_cpu(machine, "maincpu"), CPU_DISASSEMBLE_NAME(dgnbeta_dasm_override));
+	debug_cpu_set_dasm_override(devtag_get_device(machine, "maincpu"), CPU_DISASSEMBLE_NAME(dgnbeta_dasm_override));
 
 	add_reset_callback(machine, dgnbeta_reset);
 	dgnbeta_reset(machine);

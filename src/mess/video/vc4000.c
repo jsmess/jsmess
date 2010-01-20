@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "driver.h"
+#include "emu.h"
 
 #include "includes/vc4000.h"
 #include "cpu/s2650/s2650.h"
@@ -182,7 +182,7 @@ READ8_HANDLER(vc4000_video_r)
 	case 0xcc:		/* left joystick */
 		if (input_port_read(space->machine, "CONFIG")&1)
 		{		/* paddle */
-			if (!cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), S2650_FO))
+			if (!cpu_get_reg(devtag_get_device(space->machine, "maincpu"), S2650_FO))
 			{
 				data = input_port_read(space->machine, "JOYS") & 0x03;
 				switch (data)
@@ -221,7 +221,7 @@ READ8_HANDLER(vc4000_video_r)
 		}
 		else
 		{		/* buttons */
-			if (!cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), S2650_FO))
+			if (!cpu_get_reg(devtag_get_device(space->machine, "maincpu"), S2650_FO))
 			{
 				data = input_port_read(space->machine, "JOYS") & 0x03;
 				switch (data)
@@ -259,7 +259,7 @@ READ8_HANDLER(vc4000_video_r)
 	case 0xcd:		/* right joystick */
 		if (input_port_read(space->machine, "CONFIG")&1)
 		{
-			if (!cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), S2650_FO))
+			if (!cpu_get_reg(devtag_get_device(space->machine, "maincpu"), S2650_FO))
 			{
 				data = input_port_read(space->machine, "JOYS") & 0x30;
 				switch (data)
@@ -298,7 +298,7 @@ READ8_HANDLER(vc4000_video_r)
 		}
 		else
 		{
-			if (!cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), S2650_FO))
+			if (!cpu_get_reg(devtag_get_device(space->machine, "maincpu"), S2650_FO))
 			{
 				data = input_port_read(space->machine, "JOYS") & 0x30;
 				switch (data)

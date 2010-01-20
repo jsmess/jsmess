@@ -591,29 +591,29 @@ static floperr_t apple35_read_track(floppy_image *floppy, int head, int track, U
 		sony_nibblize35(sector_data, nibble_data, checksum);
 
 		for (i = 0; i < ARRAY_LENGTH(blk1); i++)
-			sony_filltrack(buffer, buflen, &pos, blk1[i]);
+			sony_filltrack((UINT8*)buffer, buflen, &pos, blk1[i]);
 
 		sum = (track ^ sector ^ side ^ tag->format_byte) & 0x3F;
 
-		sony_filltrack(buffer, buflen, &pos, diskbytes[track & 0x3f]);
-		sony_filltrack(buffer, buflen, &pos, diskbytes[sector]);
-		sony_filltrack(buffer, buflen, &pos, diskbytes[side]);
-		sony_filltrack(buffer, buflen, &pos, diskbytes[tag->format_byte]);
-		sony_filltrack(buffer, buflen, &pos, diskbytes[sum]);
+		sony_filltrack((UINT8*)buffer, buflen, &pos, diskbytes[track & 0x3f]);
+		sony_filltrack((UINT8*)buffer, buflen, &pos, diskbytes[sector]);
+		sony_filltrack((UINT8*)buffer, buflen, &pos, diskbytes[side]);
+		sony_filltrack((UINT8*)buffer, buflen, &pos, diskbytes[tag->format_byte]);
+		sony_filltrack((UINT8*)buffer, buflen, &pos, diskbytes[sum]);
 
 		for (i = 0; i < ARRAY_LENGTH(blk2); i++)
-			sony_filltrack(buffer, buflen, &pos, blk2[i]);
+			sony_filltrack((UINT8*)buffer, buflen, &pos, blk2[i]);
 
-		sony_filltrack(buffer, buflen, &pos, diskbytes[sector]);
+		sony_filltrack((UINT8*)buffer, buflen, &pos, diskbytes[sector]);
 
 		for (i = 0; i < ARRAY_LENGTH(nibble_data); i++)
-			sony_filltrack(buffer, buflen, &pos, diskbytes[nibble_data[i]]);
+			sony_filltrack((UINT8*)buffer, buflen, &pos, diskbytes[nibble_data[i]]);
 
 		for (i = 3; i >= 0; i--)
-			sony_filltrack(buffer, buflen, &pos, diskbytes[checksum[i]]);
+			sony_filltrack((UINT8*)buffer, buflen, &pos, diskbytes[checksum[i]]);
 
 		for (i = 0; i < ARRAY_LENGTH(blk3); i++)
-			sony_filltrack(buffer, buflen, &pos, blk3[i]);
+			sony_filltrack((UINT8*)buffer, buflen, &pos, blk3[i]);
 	}
 	return FLOPPY_ERROR_SUCCESS;
 }
@@ -645,32 +645,32 @@ static floperr_t apple35_write_track(floppy_image *floppy, int head, int track, 
 	/* do 2 rotations, in case the bit slip stuff prevent us to read the first sector */
 	for (j = 0; j < (buflen * 2); j++)
 	{
-		if (sony_fetchtrack(buffer, buflen, &pos) != 0xD5)
+		if (sony_fetchtrack((UINT8*)buffer, buflen, &pos) != 0xD5)
 			continue;
 		j++;
 
-		if (sony_fetchtrack(buffer, buflen, &pos) != 0xAA)
+		if (sony_fetchtrack((UINT8*)buffer, buflen, &pos) != 0xAA)
 			continue;
 		j++;
 
-		if (sony_fetchtrack(buffer, buflen, &pos) != 0x96)
+		if (sony_fetchtrack((UINT8*)buffer, buflen, &pos) != 0x96)
 			continue;
 		j++;
 
-		if (rev_diskbytes[sony_fetchtrack(buffer, buflen, &pos)] != (track & 0x3F))
+		if (rev_diskbytes[sony_fetchtrack((UINT8*)buffer, buflen, &pos)] != (track & 0x3F))
 			continue;
 		j++;
 
-		sector = rev_diskbytes[sony_fetchtrack(buffer, buflen, &pos)];
+		sector = rev_diskbytes[sony_fetchtrack((UINT8*)buffer, buflen, &pos)];
 		if ((sector < 0) || (sector >= sector_count))
 			continue;
 		j++;
 
-		if (rev_diskbytes[sony_fetchtrack(buffer, buflen, &pos)] != side)
+		if (rev_diskbytes[sony_fetchtrack((UINT8*)buffer, buflen, &pos)] != side)
 			continue;
 		j++;
 
-		format_byte = rev_diskbytes[sony_fetchtrack(buffer, buflen, &pos)];
+		format_byte = rev_diskbytes[sony_fetchtrack((UINT8*)buffer, buflen, &pos)];
 		if (format_byte != tag->format_byte)
 		{
 			/* this is an error, but not THAT critical, I guess */
@@ -678,52 +678,52 @@ static floperr_t apple35_write_track(floppy_image *floppy, int head, int track, 
 		j++;
 
 		sum = track ^ sector ^ side ^ format_byte;
-		if (rev_diskbytes[sony_fetchtrack(buffer, buflen, &pos)] != sum)
+		if (rev_diskbytes[sony_fetchtrack((UINT8*)buffer, buflen, &pos)] != sum)
 			continue;
 		j++;
 
-		if (sony_fetchtrack(buffer, buflen, &pos) != 0xDE)
+		if (sony_fetchtrack((UINT8*)buffer, buflen, &pos) != 0xDE)
 			continue;
 		j++;
 
-		if (sony_fetchtrack(buffer, buflen, &pos) != 0xAA)
+		if (sony_fetchtrack((UINT8*)buffer, buflen, &pos) != 0xAA)
 			continue;
 		j++;
 
-		while((val = sony_fetchtrack(buffer, buflen, &pos)) == 0xFF)
+		while((val = sony_fetchtrack((UINT8*)buffer, buflen, &pos)) == 0xFF)
 			j++;
 		if (val != 0xD5)
 			continue;	/* lost bit slip mark! */
 		j++;
 
-		if (sony_fetchtrack(buffer, buflen, &pos) != 0xAA)
+		if (sony_fetchtrack((UINT8*)buffer, buflen, &pos) != 0xAA)
 			continue;
 		j++;
 
-		if (sony_fetchtrack(buffer, buflen, &pos) != 0xAD)
+		if (sony_fetchtrack((UINT8*)buffer, buflen, &pos) != 0xAD)
 			continue;
 		j++;
 
 		/* should this be regarded as a critical error ??? */
-		if (rev_diskbytes[sony_fetchtrack(buffer, buflen, &pos)] != sector)
+		if (rev_diskbytes[sony_fetchtrack((UINT8*)buffer, buflen, &pos)] != sector)
 			continue;
 		j++;
 
 		for (i = 0; i < ARRAY_LENGTH(nibble_data); i++)
 		{
-			nibble_data[i] = rev_diskbytes[sony_fetchtrack(buffer, buflen, &pos)];
+			nibble_data[i] = rev_diskbytes[sony_fetchtrack((UINT8*)buffer, buflen, &pos)];
 			j++;
 		}
 
 		for (i = 3; i >= 0; i--)
 		{
 			/* should be checking checksum */
-			sony_fetchtrack(buffer, buflen, &pos);
+			sony_fetchtrack((UINT8*)buffer, buflen, &pos);
 		}
 
-		sony_fetchtrack(buffer, buflen, &pos);	/* should get 0xDE */
-		sony_fetchtrack(buffer, buflen, &pos);	/* should get 0xAA */
-		sony_fetchtrack(buffer, buflen, &pos);	/* should get 0xFF */
+		sony_fetchtrack((UINT8*)buffer, buflen, &pos);	/* should get 0xDE */
+		sony_fetchtrack((UINT8*)buffer, buflen, &pos);	/* should get 0xAA */
+		sony_fetchtrack((UINT8*)buffer, buflen, &pos);	/* should get 0xFF */
 
 		/* did we already write this sector? */
 		if ((found_sectors & (1 << sector)) == 0)

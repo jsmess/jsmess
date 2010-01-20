@@ -107,7 +107,7 @@ Notes:
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/v1050.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
@@ -131,7 +131,7 @@ INLINE const device_config *get_floppy_image(running_machine *machine, int drive
 
 void v1050_set_int(running_machine *machine, UINT8 mask, int state)
 {
-	v1050_state *driver_state = machine->driver_data;
+	v1050_state *driver_state = (v1050_state *)machine->driver_data;
 
 	if (state)
 	{
@@ -147,7 +147,7 @@ void v1050_set_int(running_machine *machine, UINT8 mask, int state)
 
 static void v1050_bankswitch(running_machine *machine)
 {
-	v1050_state *state = machine->driver_data;
+	v1050_state *state = (v1050_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	int bank = (state->bank >> 1) & 0x03;
@@ -248,7 +248,7 @@ static const UINT8 v1050_keycodes[4][12][8] =
 
 static void v1050_keyboard_scan(running_machine *machine)
 {
-	v1050_state *state = machine->driver_data;
+	v1050_state *state = (v1050_state *)machine->driver_data;
 
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9", "ROW10", "ROW11" };
 	int table = 0, row, col;
@@ -303,7 +303,7 @@ static TIMER_DEVICE_CALLBACK( v1050_keyboard_tick )
 
 static READ8_HANDLER( v1050_get_key )
 {
-	v1050_state *state = space->machine->driver_data;
+	v1050_state *state = (v1050_state *)space->machine->driver_data;
 
 	state->keyavail = 0;
 
@@ -314,7 +314,7 @@ static READ8_HANDLER( v1050_get_key )
 
 static READ8_HANDLER( v1050_get_key_status )
 {
-	v1050_state *state = space->machine->driver_data;
+	v1050_state *state = (v1050_state *)space->machine->driver_data;
 
 	UINT8 val =	msm8251_status_r(state->i8251_kb, 0);
 
@@ -325,7 +325,7 @@ static READ8_HANDLER( v1050_get_key_status )
 
 static WRITE8_HANDLER( v1050_i8214_w )
 {
-	v1050_state *state = space->machine->driver_data;
+	v1050_state *state = (v1050_state *)space->machine->driver_data;
 
 	i8214_b_w(state->i8214, 0, (data >> 1) & 0x0f);
 }
@@ -356,7 +356,7 @@ static WRITE8_HANDLER( dint_clr_w )
 
 static WRITE8_HANDLER( bank_w )
 {
-	v1050_state *state = space->machine->driver_data;
+	v1050_state *state = (v1050_state *)space->machine->driver_data;
 
 	state->bank = data;
 
@@ -379,7 +379,7 @@ static WRITE8_HANDLER( dvint_clr_w )
 
 static READ8_HANDLER( keyboard_r )
 {
-	v1050_state *state = space->machine->driver_data;
+	v1050_state *state = (v1050_state *)space->machine->driver_data;
 
 	static const char *const KEY_ROW[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "XA", "XB" };
 
@@ -388,7 +388,7 @@ static READ8_HANDLER( keyboard_r )
 
 static WRITE8_HANDLER( keyboard_w )
 {
-	v1050_state *state = space->machine->driver_data;
+	v1050_state *state = (v1050_state *)space->machine->driver_data;
 
 	state->keylatch = data & 0x0f;
 }
@@ -410,7 +410,7 @@ static WRITE8_HANDLER( p2_w )
 
     */
 
-	v1050_state *state = space->machine->driver_data;
+	v1050_state *state = (v1050_state *)space->machine->driver_data;
 
 	output_set_led_value(0, BIT(data, 5));
 //  discrete_sound_w(discrete, NODE_01, BIT(data, 6));
@@ -744,7 +744,7 @@ static MSM58321_INTERFACE( msm58321_intf )
 
 static WRITE8_DEVICE_HANDLER( crt_z80_8255_c_w )
 {
-	v1050_state *state = device->machine->driver_data;
+	v1050_state *state = (v1050_state *)device->machine->driver_data;
 
 	i8255a_pc2_w(state->i8255a_crt_m6502, BIT(data, 6));
 	i8255a_pc4_w(state->i8255a_crt_m6502, BIT(data, 7));
@@ -762,7 +762,7 @@ static I8255A_INTERFACE( disp_8255_intf )
 
 static WRITE8_DEVICE_HANDLER( crt_m6502_8255_c_w )
 {
-	v1050_state *state = device->machine->driver_data;
+	v1050_state *state = (v1050_state *)device->machine->driver_data;
 
 	i8255a_pc2_w(state->i8255a_crt_z80, BIT(data, 7));
 	i8255a_pc4_w(state->i8255a_crt_z80, BIT(data, 6));
@@ -797,7 +797,7 @@ static WRITE8_DEVICE_HANDLER( misc_8255_a_w )
 
     */
 
-	v1050_state *state = device->machine->driver_data;
+	v1050_state *state = (v1050_state *)device->machine->driver_data;
 
 	int f_motor_on = !BIT(data, 6);
 
@@ -822,7 +822,7 @@ static WRITE8_DEVICE_HANDLER( misc_8255_a_w )
 
 static WRITE8_DEVICE_HANDLER( misc_8255_b_w )
 {
-	v1050_state *state = device->machine->driver_data;
+	v1050_state *state = (v1050_state *)device->machine->driver_data;
 
 	centronics_data_w(state->centronics, 0, ~data & 0xff);
 }
@@ -844,7 +844,7 @@ static READ8_DEVICE_HANDLER( misc_8255_c_r )
 
     */
 
-	v1050_state *state = device->machine->driver_data;
+	v1050_state *state = (v1050_state *)device->machine->driver_data;
 
 	UINT8 data = 0;
 
@@ -871,7 +871,7 @@ static WRITE8_DEVICE_HANDLER( misc_8255_c_w )
 
     */
 
-	v1050_state *state = device->machine->driver_data;
+	v1050_state *state = (v1050_state *)device->machine->driver_data;
 
 	int baud_sel = (data >> 2) & 0x03;
 
@@ -929,7 +929,7 @@ static WRITE8_DEVICE_HANDLER( rtc_8255_b_w )
 
     */
 
-	v1050_state *state = device->machine->driver_data;
+	v1050_state *state = (v1050_state *)device->machine->driver_data;
 
 	state->int_mask = data;
 }
@@ -951,7 +951,7 @@ static READ8_DEVICE_HANDLER( rtc_8255_c_r )
 
     */
 
-	v1050_state *state = device->machine->driver_data;
+	v1050_state *state = (v1050_state *)device->machine->driver_data;
 
 	return msm58321_busy_r(state->msm58321) << 3;
 }
@@ -973,7 +973,7 @@ static WRITE8_DEVICE_HANDLER( rtc_8255_c_w )
 
     */
 
-	v1050_state *state = device->machine->driver_data;
+	v1050_state *state = (v1050_state *)device->machine->driver_data;
 
 	msm58321_address_write_w(state->msm58321, BIT(data, 4));
 	msm58321_write_w(state->msm58321, BIT(data, 5));
@@ -995,7 +995,7 @@ static I8255A_INTERFACE( rtc_8255_intf )
 
 static TIMER_DEVICE_CALLBACK( kb_8251_tick )
 {
-	v1050_state *state = timer->machine->driver_data;
+	v1050_state *state = (v1050_state *)timer->machine->driver_data;
 
 	msm8251_transmit_clock(state->i8251_kb);
 	msm8251_receive_clock(state->i8251_kb);
@@ -1017,7 +1017,7 @@ static const msm8251_interface kb_8251_intf =
 
 static TIMER_DEVICE_CALLBACK( sio_8251_tick )
 {
-	v1050_state *state = timer->machine->driver_data;
+	v1050_state *state = (v1050_state *)timer->machine->driver_data;
 
 	msm8251_transmit_clock(state->i8251_sio);
 	msm8251_receive_clock(state->i8251_sio);
@@ -1025,7 +1025,7 @@ static TIMER_DEVICE_CALLBACK( sio_8251_tick )
 
 static WRITE_LINE_DEVICE_HANDLER( sio_8251_rxrdy_w )
 {
-	v1050_state *driver_state = device->machine->driver_data;
+	v1050_state *driver_state = (v1050_state *)device->machine->driver_data;
 
 	driver_state->rxrdy = state;
 
@@ -1034,7 +1034,7 @@ static WRITE_LINE_DEVICE_HANDLER( sio_8251_rxrdy_w )
 
 static WRITE_LINE_DEVICE_HANDLER( sio_8251_txrdy_w )
 {
-	v1050_state *driver_state = device->machine->driver_data;
+	v1050_state *driver_state = (v1050_state *)device->machine->driver_data;
 
 	driver_state->txrdy = state;
 
@@ -1052,7 +1052,7 @@ static const msm8251_interface sio_8251_intf =
 
 static WRITE_LINE_DEVICE_HANDLER( v1050_mb8877_intrq_w )
 {
-	v1050_state *driver_state = device->machine->driver_data;
+	v1050_state *driver_state = (v1050_state *)device->machine->driver_data;
 
 	if (driver_state->f_int_enb)
 		v1050_set_int(device->machine, INT_FLOPPY, state);
@@ -1064,7 +1064,7 @@ static WRITE_LINE_DEVICE_HANDLER( v1050_mb8877_intrq_w )
 
 static WRITE_LINE_DEVICE_HANDLER( v1050_mb8877_drq_w )
 {
-	v1050_state *driver_state = device->machine->driver_data;
+	v1050_state *driver_state = (v1050_state *)device->machine->driver_data;
 
 	if (driver_state->f_int_enb)
 		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, state);
@@ -1086,7 +1086,7 @@ static const wd17xx_interface v1050_wd17xx_intf =
 
 static IRQ_CALLBACK( v1050_int_ack )
 {
-	v1050_state *state = device->machine->driver_data;
+	v1050_state *state = (v1050_state *)device->machine->driver_data;
 
 	UINT8 vector = 0xf0 | (i8214_a_r(state->i8214, 0) << 1);
 
@@ -1099,7 +1099,7 @@ static IRQ_CALLBACK( v1050_int_ack )
 
 static MACHINE_START( v1050 )
 {
-	v1050_state *state = machine->driver_data;
+	v1050_state *state = (v1050_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
@@ -1121,7 +1121,7 @@ static MACHINE_START( v1050 )
 	msm58321_cs1_w(state->msm58321, 1);
 
 	/* set CPU interrupt callback */
-	cpu_set_irq_callback(cputag_get_cpu(machine, Z80_TAG), v1050_int_ack);
+	cpu_set_irq_callback(devtag_get_device(machine, Z80_TAG), v1050_int_ack);
 
 	/* setup memory banking */
 	memory_configure_bank(machine, "bank1", 0, 2, messram_get_ptr(devtag_get_device(machine, "messram")), 0x10000);
@@ -1159,7 +1159,7 @@ static MACHINE_START( v1050 )
 
 static MACHINE_RESET( v1050 )
 {
-	v1050_state *state = machine->driver_data;
+	v1050_state *state = (v1050_state *)machine->driver_data;
 
 	state->bank = 0;
 

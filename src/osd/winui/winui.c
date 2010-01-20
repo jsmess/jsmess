@@ -27,7 +27,7 @@
 
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
-#define _WIN32_IE 0x0500
+#define _WIN32_IE 0x0501
 #include <windows.h>
 #include <windowsx.h>
 #include <shellapi.h>
@@ -47,7 +47,8 @@
 
 
 // MAME/MAMEUI headers
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "osdepend.h"
 #include "unzip.h"
 #include "winutf8.h"
@@ -254,7 +255,7 @@ struct _play_options
     function prototypes
  ***************************************************************************/
 
-static BOOL             Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow);
+static BOOL             Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow);
 static void             Win32UI_exit(void);
 
 static BOOL             PumpMessage(void);
@@ -833,7 +834,7 @@ static HBITMAP          hBackground  = 0;
 static MYBITMAPINFO     bmDesc;
 
 /* List view Column text */
-const LPCTSTR column_names[COLUMN_MAX] =
+extern const LPCTSTR column_names[COLUMN_MAX] =
 {
 #ifdef MESS
 	TEXT("System"),
@@ -985,7 +986,7 @@ static DWORD RunMAME(int nGameIndex, const play_options *playopts)
 }
 
 int MameUIMain(HINSTANCE    hInstance,
-                   LPSTR        lpCmdLine,
+                   LPWSTR        lpCmdLine,
                    int          nCmdShow)
 {
 	dprintf("MAMEUI starting\n");
@@ -1192,7 +1193,7 @@ HICON LoadIconFromFile(const char *iconname)
 				{
 					if (!mame_stricmp(entry->filename, tmpIcoName))
 					{
-						bufferPtr = malloc(entry->uncompressed_length);
+						bufferPtr = (PBYTE)malloc(entry->uncompressed_length);
 						if (bufferPtr)
 						{
 							ziperr = zip_file_decompress(zip, bufferPtr, entry->uncompressed_length);
@@ -1575,7 +1576,7 @@ int GetGameNameIndex(const char *name)
 	key.name = name;
 
 	// uses our sorted array of driver names to get the index in log time
-	driver_index_info = bsearch(&key,sorted_drivers,driver_list_get_count(drivers),sizeof(driver_data_type),
+	driver_index_info = (driver_data_type*)bsearch(&key,sorted_drivers,driver_list_get_count(drivers),sizeof(driver_data_type),
 								DriverDataCompareFunc);
 
 	if (driver_index_info == NULL)
@@ -1617,7 +1618,7 @@ static void RandomSelectBackground(void)
 	char szFile[MAX_PATH];
 	int count=0;
 	const char *szDir=GetBgDir();
-	char *buf=malloc(_MAX_FNAME * MAX_BGFILES);
+	char *buf=(char *)malloc(_MAX_FNAME * MAX_BGFILES);
 
 	if (buf == NULL)
 		return;
@@ -1691,7 +1692,7 @@ static void memory_error(const char *message)
 	exit(-1);
 }
 
-static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
+static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 	extern int mame_validitychecks(int game);
 	WNDCLASS	wndclass;
@@ -1703,7 +1704,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 	extern const char *mameinfo_filename;
 	LONG common_control_version = GetCommonControlVersion();
 	int validity_failed = 0;
-	TCHAR* t_inpdir;
+	TCHAR* t_inpdir = NULL;
 	LONG_PTR l;
 
 	dprintf("about to init options\n");
@@ -1717,14 +1718,14 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 	mame_set_output_channel(OUTPUT_CHANNEL_ERROR, winui_output_error, NULL, NULL, NULL);
 
 	// create the memory pool
-	mameui_pool = pool_alloc(memory_error);
+	mameui_pool = pool_alloc_lib(memory_error);
 
 	// custom per-game icons
-	icon_index = pool_malloc(mameui_pool, sizeof(int) * driver_list_get_count(drivers));
+	icon_index = (int*)pool_malloc_lib(mameui_pool, sizeof(int) * driver_list_get_count(drivers));
 	memset(icon_index, '\0', sizeof(int) * driver_list_get_count(drivers));
 
 	// sorted list of drivers by name
-	sorted_drivers = (driver_data_type *) pool_malloc(mameui_pool, sizeof(driver_data_type) * driver_list_get_count(drivers));
+	sorted_drivers = (driver_data_type *) pool_malloc_lib(mameui_pool, sizeof(driver_data_type) * driver_list_get_count(drivers));
 	memset(sorted_drivers, '\0', sizeof(driver_data_type) * driver_list_get_count(drivers));
 	for (i = 0; i < driver_list_get_count(drivers); i++)
 	{
@@ -1782,7 +1783,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 		return FALSE;
 
 	_tcscpy(last_directory,t_inpdir);
-	free(t_inpdir);
+	//free(t_inpdir);
 	hMain = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_MAIN), 0, NULL);
 	if (hMain == NULL)
 	{
@@ -2130,7 +2131,7 @@ static void Win32UI_exit()
 
 	HelpExit();
 
-	pool_free(mameui_pool);
+	pool_free_lib(mameui_pool);
 	mameui_pool = NULL;
 }
 	
@@ -2728,7 +2729,7 @@ static void SetAllWindowsFont(HWND hParent, const Resize *r, HFONT hTheFont, BOO
 		}
 		/* Take care of subcontrols, if appropriate */
 		if (r->items[i].subwindow != NULL)
-			SetAllWindowsFont(hControl, r->items[i].subwindow, hTheFont, bRedraw);
+			SetAllWindowsFont(hControl, (const Resize*)r->items[i].subwindow, hTheFont, bRedraw);
 		
 	}
 }
@@ -2811,7 +2812,7 @@ static void ResizeWindow(HWND hParent, Resize *r)
 
 		/* Take care of subcontrols, if appropriate */
 		if (ri->subwindow != NULL)
-			ResizeWindow(hControl, ri->subwindow);
+			ResizeWindow(hControl, (Resize*)ri->subwindow);
 
 		cmkindex++;
 	}
@@ -3255,7 +3256,7 @@ static void PaintBackgroundImage(HWND hWnd, HRGN hRgn, int x, int y)
 	GetClientRect(hWnd, &rcClient);
 
 	htempDC = CreateCompatibleDC(hDC);
-	oldBitmap = SelectObject(htempDC, hBackground);
+	oldBitmap = (HBITMAP)SelectObject(htempDC, hBackground);
 
 	if (hRgn == NULL)
 	{
@@ -5592,7 +5593,7 @@ static INT_PTR CALLBACK LanguageDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, L
 		}
 
 	case WM_HELP:
-		HelpFunction(((LPHELPINFO)lParam)->hItemHandle, MAMEUICONTEXTHELP, HH_TP_HELP_WM_HELP, (DWORD_PTR)dwHelpIDs);
+		HelpFunction((HWND)((LPHELPINFO)lParam)->hItemHandle, MAMEUICONTEXTHELP, HH_TP_HELP_WM_HELP, (DWORD_PTR)dwHelpIDs);
 		break;
 
 	case WM_CONTEXTMENU:
@@ -6592,7 +6593,7 @@ static LRESULT CALLBACK PictureWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 			width = GetScreenShotWidth();
 			height = GetScreenShotHeight();
 
-			old_bitmap = SelectObject(hdc_temp,GetScreenShotHandle());
+			old_bitmap = (HBITMAP)SelectObject(hdc_temp,GetScreenShotHandle());
 		}
 		else
 		{
@@ -6602,7 +6603,7 @@ static LRESULT CALLBACK PictureWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 			width = bmp.bmWidth;
 			height = bmp.bmHeight;
 
-			old_bitmap = SelectObject(hdc_temp,hMissing_bitmap);
+			old_bitmap = (HBITMAP)SelectObject(hdc_temp,hMissing_bitmap);
 		}
 
 		GetClientRect(hWnd,&rect);
@@ -6624,7 +6625,7 @@ static LRESULT CALLBACK PictureWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		region1 = CreateRectRgnIndirect(&rect);
 		region2 = CreateRectRgnIndirect(&rect2);
 		CombineRgn(region2,region2,region1,RGN_DIFF);
-		holdBrush = SelectObject(hdc, hBrush); 
+		holdBrush = (HBRUSH)SelectObject(hdc, hBrush); 
 
 		FillRgn(hdc,region2, hBrush );
 		SelectObject(hdc, holdBrush); 

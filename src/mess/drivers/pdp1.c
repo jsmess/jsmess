@@ -46,7 +46,7 @@ and the java source).
 
 #include <math.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/pdp1/pdp1.h"
 #include "includes/pdp1.h"
 #include "video/crt.h"

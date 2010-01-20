@@ -7,7 +7,7 @@
 ******************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/sym1.h"
 #include "includes/cbm.h"
 
@@ -116,7 +116,7 @@ static READ8_DEVICE_HANDLER(sym1_riot_b_r)
 
 static WRITE8_DEVICE_HANDLER(sym1_riot_a_w)
 {
-	logerror("%x: riot_a_w 0x%02x\n", cpu_get_pc( cputag_get_cpu(device->machine, "maincpu") ), data);
+	logerror("%x: riot_a_w 0x%02x\n", cpu_get_pc( devtag_get_device(device->machine, "maincpu") ), data);
 
 	/* save for later use */
 	riot_port_a = data;
@@ -125,7 +125,7 @@ static WRITE8_DEVICE_HANDLER(sym1_riot_a_w)
 
 static WRITE8_DEVICE_HANDLER(sym1_riot_b_w)
 {
-	logerror("%x: riot_b_w 0x%02x\n", cpu_get_pc( cputag_get_cpu(device->machine, "maincpu") ), data);
+	logerror("%x: riot_b_w 0x%02x\n", cpu_get_pc( devtag_get_device(device->machine, "maincpu") ), data);
 
 	/* save for later use */
 	riot_port_b = data;
@@ -297,5 +297,5 @@ MACHINE_RESET( sym1 )
 	memory_install_read_bank(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),0xf800, 0xffff, 0, 0, "bank1");
 	memory_nop_write(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),0xf800, 0xffff, 0, 0);
 	memory_set_bankptr(machine, "bank1", sym1_monitor + 0x800);
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 }

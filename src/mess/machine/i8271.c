@@ -12,7 +12,7 @@
 */
 
 
-#include "driver.h"
+#include "emu.h"
 #include "i8271.h"
 #include "devices/flopdrv.h"
 
@@ -86,8 +86,8 @@ struct _i8271_t
 	int data_direction;
 	const i8271_interface *intf;
 
-	void *data_timer;
-	void *command_complete_timer;
+	emu_timer *data_timer;
+	emu_timer *command_complete_timer;
 };
 
 typedef enum
@@ -258,7 +258,7 @@ static void i8271_seek_to_track(const device_config *device,int track)
 
 static TIMER_CALLBACK(i8271_data_timer_callback)
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	i8271_t *i8271 = get_safe_token(device);
 
 	/* ok, trigger data request now */
@@ -284,7 +284,7 @@ static void i8271_timed_data_request(const device_config *device)
 
 static TIMER_CALLBACK(i8271_timed_command_complete_callback)
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	i8271_t *i8271 = get_safe_token(device);
 
 	i8271_command_complete(device,1,1);
@@ -1544,7 +1544,7 @@ static DEVICE_START( i8271 )
 	assert(device->tag != NULL);
 	assert(device->static_config != NULL);
 
-	i8271->intf = device->static_config;
+	i8271->intf = (const i8271_interface*)device->static_config;
 
 	i8271->data_timer = timer_alloc(device->machine, i8271_data_timer_callback, (void *)device);
 	i8271->command_complete_timer = timer_alloc(device->machine, i8271_timed_command_complete_callback, (void *)device);

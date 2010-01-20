@@ -8,7 +8,7 @@
 
 #include <math.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "devices/cassette.h"
 #include "formats/cassimg.h"
 #include "includes/thomson.h"
@@ -796,13 +796,13 @@ const cassette_config to7_cassette_config =
 {
 	to7_cassette_formats,
 	NULL,
-	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 };
 
 const cassette_config mo5_cassette_config =
 {
 	mo5_cassette_formats,
 	NULL,
-	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 };
 

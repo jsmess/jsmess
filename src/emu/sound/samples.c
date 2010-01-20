@@ -1,4 +1,5 @@
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "streams.h"
 #include "samples.h"
 
@@ -210,23 +211,20 @@ loaded_samples *readsamples(running_machine *machine, const char *const *samplen
 		{
 			file_error filerr;
 			mame_file *f;
-			astring *fname;
 
-			fname = astring_assemble_3(astring_alloc(), basename, PATH_SEPARATOR, samplenames[i+skipfirst]);
-			filerr = mame_fopen(SEARCHPATH_SAMPLE, astring_c(fname), OPEN_FLAG_READ, &f);
+			astring fname(basename, PATH_SEPARATOR, samplenames[i+skipfirst]);
+			filerr = mame_fopen(SEARCHPATH_SAMPLE, fname, OPEN_FLAG_READ, &f);
 
 			if (filerr != FILERR_NONE && skipfirst)
 			{
-				astring_assemble_3(fname, samplenames[0] + 1, PATH_SEPARATOR, samplenames[i+skipfirst]);
-				filerr = mame_fopen(SEARCHPATH_SAMPLE, astring_c(fname), OPEN_FLAG_READ, &f);
+				astring fname(samplenames[0] + 1, PATH_SEPARATOR, samplenames[i+skipfirst]);
+				filerr = mame_fopen(SEARCHPATH_SAMPLE, fname, OPEN_FLAG_READ, &f);
 			}
 			if (filerr == FILERR_NONE)
 			{
 				read_wav_sample(machine, f, &samples->sample[i]);
 				mame_fclose(f);
 			}
-
-			astring_free(fname);
 		}
 
 	return samples;

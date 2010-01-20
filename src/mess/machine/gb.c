@@ -35,7 +35,7 @@
 ***************************************************************************/
 #define __MACHINE_GB_C
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/gb.h"
 #include "cpu/lr35902/lr35902.h"
 #include "devices/cartslot.h"
@@ -888,7 +888,7 @@ WRITE8_HANDLER ( gb_io_w )
 		break;
 	case 0x0F:						/* IF - Interrupt flag */
 		data &= 0x1F;
-		cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), LR35902_IF, data );
+		cpu_set_reg( devtag_get_device(space->machine, "maincpu"), LR35902_IF, data );
 		break;
 	}
 
@@ -1443,12 +1443,12 @@ WRITE8_HANDLER ( sgb_io_w )
 /* Interrupt Enable register */
 READ8_HANDLER( gb_ie_r )
 {
-	return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), LR35902_IE );
+	return cpu_get_reg( devtag_get_device(space->machine, "maincpu"), LR35902_IE );
 }
 
 WRITE8_HANDLER ( gb_ie_w )
 {
-	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), LR35902_IE, data & 0x1F );
+	cpu_set_reg( devtag_get_device(space->machine, "maincpu"), LR35902_IE, data & 0x1F );
 }
 
 /* IO read */
@@ -1468,7 +1468,7 @@ READ8_HANDLER ( gb_io_r )
 			return gb_driver_data.gb_io[offset];
 		case 0x0F:
 			/* Make sure the internal states are up to date */
-			return 0xE0 | cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), LR35902_IF );
+			return 0xE0 | cpu_get_reg( devtag_get_device(space->machine, "maincpu"), LR35902_IF );
 		default:
 			/* It seems unsupported registers return 0xFF */
 			return 0xFF;
@@ -2009,7 +2009,7 @@ WRITE8_HANDLER ( gbc_io2_w )
 	switch( offset )
 	{
 		case 0x0D:	/* KEY1 - Prepare speed switch */
-			cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), LR35902_SPEED, data );
+			cpu_set_reg( devtag_get_device(space->machine, "maincpu"), LR35902_SPEED, data );
 			return;
 		case 0x10:	/* BFF - Bios disable */
 			gb_rom16_0000( space->machine, gb_driver_data.ROMMap[gb_driver_data.ROMBank00] );
@@ -2033,7 +2033,7 @@ READ8_HANDLER( gbc_io2_r )
 	switch( offset )
 	{
 	case 0x0D:	/* KEY1 */
-		return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), LR35902_SPEED );
+		return cpu_get_reg( devtag_get_device(space->machine, "maincpu"), LR35902_SPEED );
 	case 0x16:	/* RP - Infrared port */
 		break;
 	case 0x30:	/* SVBK - RAM bank select */

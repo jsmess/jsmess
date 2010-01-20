@@ -9,8 +9,8 @@
 #ifndef CASSIMG_H
 #define CASSIMG_H
 
-#include "formats/ioprocs.h"
 #include "pool.h"
+#include "formats/ioprocs.h"
 
 /***************************************************************************
 

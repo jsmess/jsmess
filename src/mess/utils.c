@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include "emu.h"
 #include "utils.h"
 
 char *strncpyz(char *dest, const char *source, size_t len)

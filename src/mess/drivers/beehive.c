@@ -8,7 +8,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 
 static ADDRESS_MAP_START(beehive_mem, ADDRESS_SPACE_PROGRAM, 8)

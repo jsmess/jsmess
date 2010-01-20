@@ -424,7 +424,7 @@ static READ8_HANDLER( mapper5_l_r )
 
 static WRITE8_HANDLER( mapper5_l_w )
 {
-	nes_state *state = space->machine->driver_data;
+	nes_state *state = (nes_state *)space->machine->driver_data;
 
 //  static int vrom_next[4];
 	static int vrom_page_a;

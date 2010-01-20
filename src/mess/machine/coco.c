@@ -81,7 +81,7 @@ easier to manage.
 #include <math.h>
 #include <assert.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "debug/debugcpu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
@@ -101,6 +101,7 @@ easier to manage.
 #include "devices/cartslot.h"
 #include "devices/flopdrv.h"
 #include "devices/messram.h"
+#include "crsshair.h"
 
 /***************************************************************************
     PARAMETERS
@@ -599,17 +600,17 @@ static int load_pak_into_region(const device_config *image, int *pakbase, int *p
 
 static void pak_load_trailer(running_machine *machine, const pak_decodedtrailer *trailer)
 {
-	coco_state *state = machine->driver_data;
+	coco_state *state = (coco_state *)machine->driver_data;
 
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_PC, trailer->reg_pc);
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_X, trailer->reg_x);
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_Y, trailer->reg_y);
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_U, trailer->reg_u);
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_S, trailer->reg_s);
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_DP, trailer->reg_dp);
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_B, trailer->reg_b);
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_A, trailer->reg_a);
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_CC, trailer->reg_cc);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), M6809_PC, trailer->reg_pc);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), M6809_X, trailer->reg_x);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), M6809_Y, trailer->reg_y);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), M6809_U, trailer->reg_u);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), M6809_S, trailer->reg_s);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), M6809_DP, trailer->reg_dp);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), M6809_B, trailer->reg_b);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), M6809_A, trailer->reg_a);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), M6809_CC, trailer->reg_cc);
 
 	/* I seem to only be able to get a small amount of the PIA state from the
      * snapshot trailers. Thus I am going to configure the PIA myself. The
@@ -760,7 +761,7 @@ QUICKLOAD_LOAD ( coco )
 	int done = FALSE;
 
 	/* access the pointer and the length */
-	ptr = image_ptr(image);
+	ptr = (const UINT8*)image_ptr(image);
 	length = image_length(image);
 
 	while(!done && (position + 5 <= length))
@@ -774,7 +775,7 @@ QUICKLOAD_LOAD ( coco )
 		if (preamble != 0)
 		{
 			/* start address - just set the address and return */
-			cpu_set_reg(cputag_get_cpu(image->machine, "maincpu"), REG_GENPC, block_address);
+			cpu_set_reg(devtag_get_device(image->machine, "maincpu"), REG_GENPC, block_address);
 			done = TRUE;
 		}
 		else
@@ -908,7 +909,7 @@ enum
 
 static void d_recalc_irq(running_machine *machine)
 {
-	coco_state *state = machine->driver_data;
+	coco_state *state = (coco_state *)machine->driver_data;
 	UINT8 pia0_irq_a = pia6821_get_irq_a(state->pia_0);
 	UINT8 pia0_irq_b = pia6821_get_irq_b(state->pia_0);
 
@@ -920,7 +921,7 @@ static void d_recalc_irq(running_machine *machine)
 
 static void d_recalc_firq(running_machine *machine)
 {
-	coco_state *state = machine->driver_data;
+	coco_state *state = (coco_state *)machine->driver_data;
 	UINT8 pia1_firq_a = pia6821_get_irq_a(state->pia_1);
 	UINT8 pia1_firq_b = pia6821_get_irq_b(state->pia_1);
 	UINT8 pia2_firq_a = (state->pia_2 != NULL) ? pia6821_get_irq_a(state->pia_2) : 0x00;
@@ -1035,7 +1036,7 @@ static void coco3_raise_interrupt(running_machine *machine, UINT8 mask, int stat
 
 void coco3_horizontal_sync_callback(running_machine *machine,int data)
 {
-	coco_state *state = machine->driver_data;
+	coco_state *state = (coco_state *)machine->driver_data;
 	pia6821_ca1_w(state->pia_0, 0, data);
 	coco3_raise_interrupt(machine, COCO3_INT_HBORD, data);
 }
@@ -1044,7 +1045,7 @@ void coco3_horizontal_sync_callback(running_machine *machine,int data)
 
 void coco3_field_sync_callback(running_machine *machine,int data)
 {
-	coco_state *state = machine->driver_data;
+	coco_state *state = (coco_state *)machine->driver_data;
 	pia6821_cb1_w(state->pia_0, 0, data);
 }
 
@@ -1174,31 +1175,31 @@ static int coco_hiresjoy_ry( running_machine *machine )
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	coco_state *state = machine->driver_data;
+	coco_state *state = (coco_state *)machine->driver_data;
 	return state->cassette_device;
 }
 
 static const device_config *bitbanger_image(running_machine *machine)
 {
-	coco_state *state = machine->driver_data;
+	coco_state *state = (coco_state *)machine->driver_data;
 	return state->bitbanger_device;
 }
 
 static const device_config *printer_image(running_machine *machine)
 {
-	coco_state *state = machine->driver_data;
+	coco_state *state = (coco_state *)machine->driver_data;
 	return state->printer_device;
 }
 
 static const device_config *cococart_device(running_machine *machine)
 {
-	coco_state *state = machine->driver_data;
+	coco_state *state = (coco_state *)machine->driver_data;
 	return state->cococart_device;
 }
 
 static int get_soundmux_status(running_machine *machine)
 {
-	coco_state *state = machine->driver_data;
+	coco_state *state = (coco_state *)machine->driver_data;
 
 	int soundmux_status = 0;
 	if (pia6821_get_output_cb2(state->pia_1))
@@ -1241,7 +1242,7 @@ static void soundmux_update(running_machine *machine)
 
 static void coco_sound_update(running_machine *machine)
 {
-	coco_state *state = machine->driver_data;
+	coco_state *state = (coco_state *)machine->driver_data;
 
 	/* Call this function whenever you need to update the sound. It will
      * automatically mute any devices that are switched out.
@@ -1355,7 +1356,7 @@ static attotime get_relative_time( running_machine *machine, attotime absolute_t
 
 static UINT8 coco_update_keyboard( running_machine *machine )
 {
-	coco_state *state = machine->driver_data;
+	coco_state *state = (coco_state *)machine->driver_data;
 	UINT8 porta = 0x7f, port_za = 0x7f;
 	int joyval;
 	static const int joy_rat_table[] = {15, 24, 42, 33 };
@@ -1541,7 +1542,7 @@ static void printer_out_coco(running_machine *machine, int data)
 /* Printer output for the Dragon, output to Paralel port */
 static void printer_out_dragon(running_machine *machine, int data)
 {
-	coco_state *state = machine->driver_data;
+	coco_state *state = (coco_state *)machine->driver_data;
 
 	/* If strobe bit is high send data from pia0 port b to dragon parallel printer */
 	if (data & 0x02)
@@ -1734,7 +1735,7 @@ static void dragon_page_rom(running_machine *machine, int romswitch)
 /* The NMI line on the alphaAlpha is gated through IC16 (early PLD), and is gated by pia2 CA2  */
 static WRITE_LINE_DEVICE_HANDLER( dgnalpha_fdc_intrq_w )
 {
-	coco_state *cstate = device->machine->driver_data;
+	coco_state *cstate = (coco_state *)device->machine->driver_data;
 
 	if (state)
 	{
@@ -1758,7 +1759,7 @@ static WRITE_LINE_DEVICE_HANDLER( dgnalpha_fdc_intrq_w )
 /* for pia1 cb1 */
 static WRITE_LINE_DEVICE_HANDLER( dgnalpha_fdc_drq_w )
 {
-	coco_state *cstate = device->machine->driver_data;
+	coco_state *cstate = (coco_state *)device->machine->driver_data;
 	pia6821_cb1_w(cstate->pia_2, 0, state ? CARTLINE_ASSERTED : CARTLINE_CLEAR);
 }
 
@@ -1840,7 +1841,7 @@ static READ8_DEVICE_HANDLER ( d_pia1_pa_r )
 
 static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco )
 {
-	coco_state *state = device->machine->driver_data;
+	coco_state *state = (coco_state *)device->machine->driver_data;
 
 	/* This handles the reading of the memory sense switch (pb2) for the CoCo 1,
      * and serial-in (pb0). Serial-in not yet implemented. */
@@ -1884,7 +1885,7 @@ static READ8_DEVICE_HANDLER ( d_pia1_pb_r_dragon32 )
 
 static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco2 )
 {
-	coco_state *state = device->machine->driver_data;
+	coco_state *state = (coco_state *)device->machine->driver_data;
 
 	/* This handles the reading of the memory sense switch (pb2) for the CoCo 2 and 3,
      * and serial-in (pb0). Serial-in not yet implemented.
@@ -1974,7 +1975,7 @@ static SAM6883_SET_MPU_RATE( d_sam_set_mpurate )
      * TODO:  Make the overclock more accurate.  In dual speed, ROM was a fast
      * access but RAM was not.  I don't know how to simulate this.
      */
-    cpu_set_clockscale(cputag_get_cpu(device->machine, "maincpu"), val ? 2 : 1);
+    cpu_set_clockscale(devtag_get_device(device->machine, "maincpu"), val ? 2 : 1);
 }
 
 READ8_HANDLER(dgnalpha_mapped_irq_r)
@@ -2035,7 +2036,7 @@ static void setup_memory_map(running_machine *machine)
 
 	/* We need to init these vars from the sam, as this may be called from outside the sam callbacks */
 	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
-	coco_state *state = machine->driver_data;
+	coco_state *state = (coco_state *)machine->driver_data;
 	UINT8 memsize	= sam6883_memorysize(state->sam);
 	UINT8 maptype	= sam6883_maptype(state->sam);
 	//UINT8 pagemode  = sam6883_pagemode(machine);
@@ -2716,7 +2717,7 @@ static SAM6883_SET_MAP_TYPE( coco3_sam_set_maptype )
 
 void coco_cart_w(const device_config *device, int data)
 {
-	coco_state *state = device->machine->driver_data;
+	coco_state *state = (coco_state *)device->machine->driver_data;
 	pia6821_cb1_w(state->pia_1, 0, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -2788,7 +2789,7 @@ struct _machine_init_interface
 /* for everything except the coco3, so it made sense not to pass it as a parameter */
 static void generic_init_machine(running_machine *machine, const machine_init_interface *init)
 {
-	coco_state *state = (coco_state *) machine->driver_data;
+	coco_state *state = (coco_state *)(coco_state *) machine->driver_data;
 
 	/* locate devices */
 	state->cococart_device	= devtag_get_device(machine, "coco_cartslot");
@@ -2829,7 +2830,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	/* setup printer output callback */
 	printer_out = init->printer_out_;
 
-	debug_cpu_set_dasm_override(cputag_get_cpu(machine, "maincpu"), CPU_DISASSEMBLE_NAME(coco_dasm_override));
+	debug_cpu_set_dasm_override(devtag_get_device(machine, "maincpu"), CPU_DISASSEMBLE_NAME(coco_dasm_override));
 
 	state_save_register_global(machine, mux_sel1);
 	state_save_register_global(machine, mux_sel2);

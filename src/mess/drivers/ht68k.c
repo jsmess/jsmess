@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/68681.h"
 #include "devices/flopdrv.h"
@@ -37,7 +37,7 @@ static MACHINE_RESET(ht68k)
 
 	memcpy((UINT8*)ht68k_ram,user1,0x8000);
 
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 }
 
 static void duart_irq_handler(const device_config *device, UINT8 vector)

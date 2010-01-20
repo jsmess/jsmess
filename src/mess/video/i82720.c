@@ -12,7 +12,7 @@
 /* Include files                                                           */
 /*-------------------------------------------------------------------------*/
 
-#include "driver.h"
+#include "emu.h"
 #include "i82720.h"
 #include "memconv.h"
 #include <math.h>
@@ -571,7 +571,7 @@ static void gdc_cmd_sync(void)
 	/* Update display mode */
 	reg = (gdc.registers.command.sync[0] & 0x20) ? 0x02 : 0;
 	reg += (gdc.registers.command.sync[0] & 0x02) ? 0x01 : 0;
-	gdc.registers.display.display_mode = reg;
+	gdc.registers.display.display_mode = (gdc_display_mode)reg;
 
    LOG(("gdc_cmd_sync: mode byte = %02X\n",
                  gdc.registers.command.sync[0]));

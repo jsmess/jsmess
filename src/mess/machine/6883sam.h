@@ -17,7 +17,7 @@
 #ifndef __6833SAM_H__
 #define __6833SAM_H__
 
-#include "driver.h"
+#include "emu.h"
 #include "devcb.h"
 
 

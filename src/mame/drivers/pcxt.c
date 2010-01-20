@@ -60,9 +60,8 @@ the main program is 9th October 1990.
 
 ******************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i86/i86.h"
-#include "video/generic.h"
 #include "machine/pit8253.h"
 #include "machine/8255ppi.h"
 #include "machine/8237dma.h"
@@ -913,7 +912,7 @@ static MACHINE_RESET( filetto )
 	bank = -1;
 	lastvalue = -1;
 	hv_blank = 0;
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
 	filetto_devices.pit8253 = devtag_get_device( machine, "pit8253" );
 	filetto_devices.pic8259_1 = devtag_get_device( machine, "pic8259_1" );
 	filetto_devices.pic8259_2 = devtag_get_device( machine, "pic8259_2" );

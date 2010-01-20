@@ -185,7 +185,7 @@ TI-86 ports:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
 #include "includes/ti85.h"

@@ -13,8 +13,8 @@
 #include "../modules.h"
 #include "winutf8.h"
 
-int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance,
-	LPSTR command_line, int cmd_show)
+int WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance,
+	LPWSTR command_line_w, int cmd_show)
 {
 	MSG msg;
 	HWND window;
@@ -22,7 +22,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance,
 	int pos, rc = -1;
 	imgtoolerr_t err;
 	HACCEL accel = NULL;
-
+	LPSTR command_line = (LPSTR)command_line_w;
 	// initialize Windows classes
 	InitCommonControls();
 	if (!wimgtool_registerclass())

@@ -123,7 +123,8 @@ b) Exit the dialog.
 #include <tchar.h>
 
 // MAME/MAMEUI headers
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "info.h"
 #include "audit.h"
 #include "mui_audit.h"
@@ -395,7 +396,7 @@ static PROPSHEETPAGE *CreatePropSheetPages(HINSTANCE hInst, BOOL bOnlyDefault,
 
 	possiblePropSheets = (isGame) ? i + 1 : i - 1;
 
-	pspages = malloc(sizeof(PROPSHEETPAGE) * possiblePropSheets);
+	pspages = (PROPSHEETPAGE *)malloc(sizeof(PROPSHEETPAGE) * possiblePropSheets);
 	if (!pspages)
 		return NULL;
 
@@ -518,11 +519,11 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 	// Load the default options, pickup the next lower options set than the current level.
 	if (opt_type > OPTIONS_GLOBAL)
 	{
-		default_type -= 1;
+		default_type = (OPTIONS_TYPE)(default_type-1);
 		if (OPTIONS_VERTICAL == opt_type) {
 			//since VERTICAL and HORIZONTAL are equally ranked
 			//we need to subtract 2 from vertical to also get to correct default
-			default_type -= 1;
+			default_type = (OPTIONS_TYPE)(default_type-1);
 		}
 
 	}
@@ -734,7 +735,7 @@ static char *GameInfoScreen(UINT nIndex)
 		}
 		else {
 			for (; screen != NULL; screen = video_screen_next(screen)) {
-				const screen_config *scrconfig = screen->inline_config;
+				const screen_config *scrconfig = (const screen_config *)screen->inline_config;
 				char tmpbuf[256];
 
 				if (drivers[nIndex]->flags & ORIENTATION_SWAP_XY)
@@ -1013,7 +1014,7 @@ HWND hWnd;
 		}
 #endif
 
-		win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_TITLE),         GameInfoTitle(g_nPropertyMode, g_nGame));
+		win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_TITLE),         GameInfoTitle((OPTIONS_TYPE)g_nPropertyMode, g_nGame));
 		win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_MANUFACTURED),  GameInfoManufactured(g_nGame));
 		win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_STATUS),        GameInfoStatus(g_nGame, FALSE));
 		win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_CPU),           GameInfoCPU(g_nGame));
@@ -1049,7 +1050,7 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 	{
 	case WM_INITDIALOG:
 		/* Fill in the Game info at the top of the sheet */
-		win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_TITLE), GameInfoTitle(g_nPropertyMode, g_nGame));
+		win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_TITLE), GameInfoTitle((OPTIONS_TYPE)g_nPropertyMode, g_nGame));
 		InitializeOptions(hDlg);
 		InitializeMisc(hDlg);
 
@@ -1313,7 +1314,7 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 				EnableWindow(GetDlgItem(hDlg, IDC_PROP_RESET), g_bReset);
 
 				// Save or remove the current options
-				save_options(g_nPropertyMode, (g_bUseDefaults) ? NULL : pCurrentOpts, g_nGame);
+				save_options((OPTIONS_TYPE)g_nPropertyMode, (g_bUseDefaults) ? NULL : pCurrentOpts, g_nGame);
 
 				// Disable apply button
 				PropSheet_UnChanged(GetParent(hDlg), hDlg);
@@ -1464,7 +1465,7 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 
 	case WM_HELP:
 		/* User clicked the ? from the upper right on a control */
-		HelpFunction(((LPHELPINFO)lParam)->hItemHandle, MAMEUICONTEXTHELP, HH_TP_HELP_WM_HELP, GetHelpIDs());
+		HelpFunction((HWND)((LPHELPINFO)lParam)->hItemHandle, MAMEUICONTEXTHELP, HH_TP_HELP_WM_HELP, GetHelpIDs());
 		break;
 
 	case WM_CONTEXTMENU: 
@@ -2611,12 +2612,8 @@ static void SetYM3812Enabled(HWND hWnd, int nIndex)
 			sound = device_list_class_next(sound, DEVICE_CLASS_SOUND_CHIP))
 		{
 			if (nIndex <= -1
-#if HAS_YM3812
 				||  sound->type == SOUND_YM3812
-#endif
-#if HAS_YM2413
 				||  sound->type == SOUND_YM2413
-#endif
 			)
 				enabled = TRUE;
 		}
@@ -2632,7 +2629,6 @@ static void SetYM3812Enabled(HWND hWnd, int nIndex)
 static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 {
 	machine_config *config = NULL;
-#if (HAS_SAMPLES == 1) || (HAS_VLM5030 == 1)
 	BOOL enabled = FALSE;
 	HWND hCtrl;
 
@@ -2650,9 +2646,7 @@ static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 			for (sound = sound_first(config); sound != NULL; sound = sound_next(sound))
 			{
 				if (sound_get_type(sound) == SOUND_SAMPLES
-#if HAS_VLM5030
-					||  sound_get_type(sound) == SOUND_VLM5030
-#endif
+					//||  sound_get_type(sound) == SOUND_VLM5030
 					)
 				{
 					enabled = TRUE;
@@ -2663,7 +2657,6 @@ static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 		enabled = enabled && bSoundEnabled;
 		EnableWindow(hCtrl, enabled);
 	}
-#endif
 	if (config != NULL)
 	{
 		machine_config_free(config);

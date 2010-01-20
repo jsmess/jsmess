@@ -1,5 +1,5 @@
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/kaypro.h"
 
 static UINT8 mc6845_cursor[16];				// cursor shape

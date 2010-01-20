@@ -13,7 +13,7 @@ Notes:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/namco.h"
@@ -90,7 +90,7 @@ static WRITE8_HANDLER( skykid_bankswitch_w )
 static WRITE8_HANDLER( skykid_irq_1_ctrl_w )
 {
 	int bit = !BIT(offset,11);
-	cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), bit);
+	cpu_interrupt_enable(devtag_get_device(space->machine, "maincpu"), bit);
 	if (!bit)
 		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
@@ -98,7 +98,7 @@ static WRITE8_HANDLER( skykid_irq_1_ctrl_w )
 static WRITE8_HANDLER( skykid_irq_2_ctrl_w )
 {
 	int bit = !BIT(offset,13);
-	cpu_interrupt_enable(cputag_get_cpu(space->machine, "mcu"), bit);
+	cpu_interrupt_enable(devtag_get_device(space->machine, "mcu"), bit);
 	if (!bit)
 		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 }

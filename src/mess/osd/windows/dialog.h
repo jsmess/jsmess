@@ -8,7 +8,7 @@
 #define DIALOG_H
 
 #include <windows.h>
-#include "mame.h"
+#include "emu.h"
 #include "png.h"
 #include "opresolv.h"
 #include "winutils.h"

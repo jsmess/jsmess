@@ -1,5 +1,5 @@
 /* Core includes */
-#include "driver.h"
+#include "emu.h"
 #include "includes/kc.h"
 
 /* Components */
@@ -59,7 +59,7 @@ static int kc_load(const device_config *image, unsigned char **ptr)
 	if (datasize!=0)
 	{
 		/* malloc memory for this data */
-		data = malloc(datasize);
+		data = (unsigned char *)malloc(datasize);
 
 		if (data!=NULL)
 		{
@@ -224,8 +224,8 @@ const upd765_interface kc_fdc_interface=
 
 static TIMER_CALLBACK(kc85_disk_reset_timer_callback)
 {
-	cpu_set_reg(cputag_get_cpu(machine, "disc"), REG_GENPC, 0x0f000);
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, 0x0f000);
+	cpu_set_reg(devtag_get_device(machine, "disc"), REG_GENPC, 0x0f000);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENPC, 0x0f000);
 }
 
 static void kc_disc_interface_init(running_machine *machine)
@@ -1652,7 +1652,7 @@ static DIRECT_UPDATE_HANDLER( kc85_4_opbaseoverride )
 
 static TIMER_CALLBACK(kc85_reset_timer_callback)
 {
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, 0x0f000);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENPC, 0x0f000);
 }
 
  READ8_HANDLER ( kc85_pio_data_r )
@@ -1746,7 +1746,7 @@ static WRITE_LINE_DEVICE_HANDLER(kc85_zc1_callback)
 
 static TIMER_CALLBACK(kc85_15khz_timer_callback)
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 
 	/* toggle state of square wave */
 	kc85_15khz_state^=1;

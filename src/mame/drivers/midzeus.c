@@ -24,7 +24,7 @@ The Grid         v1.2   10/18/2000
 
 **************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/adsp2100/adsp2100.h"
@@ -94,7 +94,7 @@ static MACHINE_RESET( midzeus )
 {
 	memcpy(ram_base, memory_region(machine, "user1"), 0x40000*4);
 	*ram_base <<= 1;
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 
 	cmos_protected = TRUE;
 }

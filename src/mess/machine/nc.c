@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/nc.h"
 #include "machine/serial.h"
 #include "machine/msm8251.h"
@@ -65,7 +65,7 @@ static int nc_card_load(const device_config *image, unsigned char **ptr)
 	if (datasize!=0)
 	{
 		/* malloc memory for this data */
-		data = malloc(datasize);
+		data = (unsigned char *)malloc(datasize);
 
 		if (data!=NULL)
 		{

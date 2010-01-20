@@ -66,7 +66,7 @@
 
 #include <time.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/6522via.h"
 #include "machine/8530scc.h"
 #include "cpu/m68000/m68000.h"
@@ -173,7 +173,7 @@ static int has_adb(mac_state *mac)
 // handle disk enable lines
 void mac_fdc_set_enable_lines(const device_config *device,int enable_mask)
 {
-	mac_state *mac = device->machine->driver_data;
+	mac_state *mac = (mac_state *)device->machine->driver_data;
 
 	if (mac->mac_model != MODEL_MAC_SE)
 	{
@@ -230,7 +230,7 @@ static int scc_interrupt, via_interrupt, via2_interrupt, scsi_interrupt, last_ta
 
 static void mac_field_interrupts(running_machine *machine)
 {
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 
 	int take_interrupt = -1;
 
@@ -331,7 +331,7 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 	offs_t memory_size;
 	UINT8 *memory_data;
 	int is_rom;
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 
 	/* normalize overlay */
 	overlay = overlay ? TRUE : FALSE;
@@ -435,7 +435,7 @@ static int scan_keyboard(running_machine *machine)
 	int keybuf;
 	int keycode;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6" };
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 
 	if (mac->keycode_buf_index)
 	{
@@ -562,7 +562,7 @@ static TIMER_CALLBACK(kbd_clock)
 {
 	int i;
 	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 
 	if (mac->kbd_comm == TRUE)
 	{
@@ -591,7 +591,7 @@ static TIMER_CALLBACK(kbd_clock)
 
 static void kbd_shift_out(running_machine *machine, int data)
 {
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 
 	if (mac->kbd_comm == TRUE)
 	{
@@ -602,7 +602,7 @@ static void kbd_shift_out(running_machine *machine, int data)
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_cb2)
 {
-	mac_state *mac = device->machine->driver_data;
+	mac_state *mac = (mac_state *)device->machine->driver_data;
 
 	if (mac->kbd_comm == FALSE && data == 0)
 	{
@@ -633,7 +633,7 @@ static TIMER_CALLBACK(inquiry_timeout_func)
 */
 static void keyboard_receive(running_machine *machine, int val)
 {
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 
 	switch (val)
 	{
@@ -716,7 +716,7 @@ static void mouse_callback(running_machine *machine)
 	static int	count_x = 0, count_y = 0;
 	int		new_mx, new_my;
 	int		x_needs_update = 0, y_needs_update = 0;
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 
 	new_mx = input_port_read(machine, "MOUSE1");
 	new_my = input_port_read(machine, "MOUSE2");
@@ -927,7 +927,7 @@ WRITE16_HANDLER ( macii_scsi_w )
 
 static void mac_scsi_irq(running_machine *machine, int state)
 {
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 
 	if ((mac->mac_scsiirq_enable) && ((mac->mac_model == MODEL_MAC_SE) || (mac->mac_model == MODEL_MAC_CLASSIC)))
 	{
@@ -1256,7 +1256,7 @@ static void rtc_execute_cmd(mac_state *mac, int data)
 /* TODO : save write_protect flag, save time difference with host clock */
 NVRAM_HANDLER( mac )
 {
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 
 	if (read_or_write)
 	{
@@ -1397,7 +1397,7 @@ static int mac_adb_pollkbd(running_machine *machine, int update)
 {
 	int i, j, keybuf, report, codes[2], result;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 
 	codes[0] = codes[1] = 0x80;	// key up
 	report = result = 0;
@@ -1591,7 +1591,7 @@ static void mac_adb_accummouse( running_machine *machine, UINT8 *MouseX, UINT8 *
 static void mac_adb_talk(running_machine *machine)
 {
 	int addr, reg;
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 
 	addr = (mac->adb_command>>4);
 	reg = (mac->adb_command & 3);
@@ -1778,7 +1778,7 @@ static void mac_adb_talk(running_machine *machine)
 static TIMER_CALLBACK(mac_adb_tick)
 {
 	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 
 	// do one clock transition on CB1 to advance the VIA shifter
 	mac->adb_extclock ^= 1;
@@ -1836,7 +1836,7 @@ static TIMER_CALLBACK(mac_adb_tick)
 static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2)
 {
 	UINT8 ret;
-	mac_state *mac = device->machine->driver_data;
+	mac_state *mac = (mac_state *)device->machine->driver_data;
 
 	ret = (mac->adb_send & 0x80)>>7;
 	mac->adb_send <<= 1;
@@ -1848,7 +1848,7 @@ static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2)
 
 static WRITE8_DEVICE_HANDLER(mac_adb_via_out_cb2)
 {
-	mac_state *mac = device->machine->driver_data;
+	mac_state *mac = (mac_state *)device->machine->driver_data;
 
 //      printf("OUT CB2 = %x\n", data);
 	mac->adb_command <<= 1;
@@ -2080,7 +2080,7 @@ static void mac_egret_newaction(mac_state *mac, int state)
 
 static void adb_vblank(running_machine *machine)
 {
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 
 	if (mac->adb_state == ADB_STATE_IDLE)
 	{
@@ -2206,9 +2206,9 @@ static void adb_reset(mac_state *mac)
 
 static READ8_DEVICE_HANDLER(mac_via_in_a)
 {
-	mac_state *mac = device->machine->driver_data;
+	mac_state *mac = (mac_state *)device->machine->driver_data;
 
-//	printf("VIA1 IN_A (PC %x)\n", cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
+//	printf("VIA1 IN_A (PC %x)\n", cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
 
 	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
 	{
@@ -2258,7 +2258,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 static READ8_DEVICE_HANDLER(mac_via_in_b)
 {
 	int val = 0;
-	mac_state *mac = device->machine->driver_data;
+	mac_state *mac = (mac_state *)device->machine->driver_data;
 
 	// portable/PB100 is pretty different
 	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
@@ -2298,7 +2298,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 			val |= 1;
 	}
 
-//	printf("VIA1 IN_B = %02x (PC %x)\n", val, cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
+//	printf("VIA1 IN_B = %02x (PC %x)\n", val, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
 
 	return val;
 }
@@ -2307,9 +2307,9 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 {
 	const device_config *sound = devtag_get_device(device->machine, "custom");
 	const device_config *fdc = devtag_get_device(device->machine, "fdc");
-	mac_state *mac = device->machine->driver_data;
+	mac_state *mac = (mac_state *)device->machine->driver_data;
 
-//	printf("VIA1 OUT A: %02x (PC %x)\n", data, cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
+//	printf("VIA1 OUT A: %02x (PC %x)\n", data, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
 
 	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
 	{
@@ -2346,9 +2346,9 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 {
 	const device_config *sound = devtag_get_device(device->machine, "custom");
 	int new_rtc_rTCClk;
-	mac_state *mac = device->machine->driver_data;
+	mac_state *mac = (mac_state *)device->machine->driver_data;
 
-//	printf("VIA1 OUT B: %02x (PC %x)\n", data, cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
+//	printf("VIA1 OUT B: %02x (PC %x)\n", data, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
 
 	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
 	{
@@ -2478,7 +2478,7 @@ WRITE16_HANDLER ( mac_via2_w )
 static READ8_DEVICE_HANDLER(mac_via2_in_a)
 {
 	UINT8 result = 0xc0;
-	mac_state *mac = device->machine->driver_data;
+	mac_state *mac = (mac_state *)device->machine->driver_data;
 
 	result |= mac->mac_nubus_irq_state; 
 
@@ -2492,9 +2492,9 @@ static READ8_DEVICE_HANDLER(mac_via2_in_a)
 
 static READ8_DEVICE_HANDLER(mac_via2_in_b)
 {
-	mac_state *mac = device->machine->driver_data;
+	mac_state *mac =(mac_state *)device->machine->driver_data;
 
-//	logerror("VIA2 IN B (PC %x)\n", cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
+//	logerror("VIA2 IN B (PC %x)\n", cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
 
 	if ((mac->mac_model == MODEL_MAC_LC) || (mac->mac_model == MODEL_MAC_LC_II))
 	{
@@ -2511,14 +2511,14 @@ static READ8_DEVICE_HANDLER(mac_via2_in_b)
 
 static WRITE8_DEVICE_HANDLER(mac_via2_out_a)
 {
-//	logerror("VIA2 OUT A: %02x (PC %x)\n", data, cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
+//	logerror("VIA2 OUT A: %02x (PC %x)\n", data, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
 }
 
 static WRITE8_DEVICE_HANDLER(mac_via2_out_b)
 {
 	const device_config *via_0 = devtag_get_device(device->machine, "via6522_0");
 
-//	logerror("VIA2 OUT B: %02x (PC %x)\n", data, cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
+//	logerror("VIA2 OUT B: %02x (PC %x)\n", data, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
 
 //	printf("VIA2 OUT B: %02x (MMU = %02x)\n", data, data & 0x08);
 
@@ -2532,7 +2532,7 @@ static WRITE8_DEVICE_HANDLER(mac_via2_out_b)
 
 MACHINE_START( mac )
 {
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 	if (has_adb(mac))
 	{
 		mac_adb_timer = timer_alloc(machine, mac_adb_tick, NULL);
@@ -2543,7 +2543,7 @@ MACHINE_START( mac )
 }
 MACHINE_RESET(mac)
 {
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 	mac_model_t model_save;
 	emu_timer *timer_save;
 
@@ -2589,7 +2589,7 @@ MACHINE_RESET(mac)
 	mac->via2_ca1 = 0;
 	mac->mac_nubus_irq_state = 0xff;
 
-	debug_cpu_set_dasm_override(cputag_get_cpu(machine, "maincpu"), CPU_DISASSEMBLE_NAME(mac_dasm_override));
+	debug_cpu_set_dasm_override(devtag_get_device(machine, "maincpu"), CPU_DISASSEMBLE_NAME(mac_dasm_override));
 }
 
 
@@ -2597,7 +2597,7 @@ MACHINE_RESET(mac)
 static STATE_POSTLOAD( mac_state_load )
 {
 	int overlay;
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 
 	overlay = mac->mac_overlay; 
 	mac->mac_overlay = -1;
@@ -2607,7 +2607,7 @@ static STATE_POSTLOAD( mac_state_load )
 
 static DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
 {
-	mac_state *mac = space->machine->driver_data;
+	mac_state *mac = (mac_state *)space->machine->driver_data;
 
 	if (mac->mac_overlay != -1)
 	{
@@ -2650,7 +2650,7 @@ static DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
 
 static void mac_driver_init(running_machine *machine, mac_model_t model)
 {
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 
 	mac->mac_overlay = -1;
 	scsi_interrupt = 0;
@@ -2850,7 +2850,7 @@ DRIVER_INIT(macpb100)
 void mac_nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state)
 {
 	UINT8 masks[6] = { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20 };
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 
 	slot -= 9;
 
@@ -2876,7 +2876,7 @@ static void mac_vblank_irq(running_machine *machine)
 {
 	static int irq_count = 0, ca1_data = 0, ca2_data = 0;
 	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 
 	/* handle ADB keyboard/mouse */
 	if (has_adb(mac))
@@ -2935,7 +2935,7 @@ static void mac_vblank_irq(running_machine *machine)
 static TIMER_CALLBACK(mac_scanline_tick)
 {
 	int scanline;
-	mac_state *mac = machine->driver_data;
+	mac_state *mac = (mac_state *)machine->driver_data;
 
 	if (mac->mac_model < MODEL_MAC_II)
 	{

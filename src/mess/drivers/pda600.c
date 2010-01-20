@@ -53,7 +53,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z180/z180.h"
 
 static ADDRESS_MAP_START(pda600_mem, ADDRESS_SPACE_PROGRAM, 8)

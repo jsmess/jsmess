@@ -48,7 +48,7 @@ MESS adaptation by R. Belmont
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/2612intf.h"
 #include "../../mame/drivers/megadriv.h"
 

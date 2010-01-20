@@ -105,7 +105,7 @@
 *********************************************************************/
 
 #include <assert.h>
-#include "driver.h"
+#include "emu.h"
 
 #include "includes/apple2gs.h"
 #include "includes/apple2.h"
@@ -829,7 +829,7 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 
 		/* call Apple II interrupt handler */
 		if ((video_screen_get_vpos(machine->primary_screen) % 8) == 7)
-			apple2_interrupt(cputag_get_cpu(machine, "maincpu"));
+			apple2_interrupt(devtag_get_device(machine, "maincpu"));
 	}
 
 	timer_adjust_oneshot(apple2gs_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, (scanline+1)%262, 0), 0);
@@ -1729,7 +1729,7 @@ MACHINE_START( apple2gs )
 	apple2_init_common(machine);
 
 	/* set up Apple IIgs vectoring */
-	g65816_set_read_vector_callback(cputag_get_cpu(machine, "maincpu"), apple2gs_read_vector);
+	g65816_set_read_vector_callback(devtag_get_device(machine, "maincpu"), apple2gs_read_vector);
 
 	/* setup globals */
 	apple2gs_cur_slot6_image = NULL;

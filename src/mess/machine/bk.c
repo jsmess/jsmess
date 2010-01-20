@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "devices/cassette.h"
 #include "machine/i8255a.h"
 #include "includes/bk.h"
@@ -84,7 +84,7 @@ static IRQ_CALLBACK(bk0010_irq_callback)
 
 MACHINE_RESET( bk0010 )
 {
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), bk0010_irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), bk0010_irq_callback);
 
 	kbd_state = 0;
 	bk_scrool = 01330;

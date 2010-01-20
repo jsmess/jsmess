@@ -20,7 +20,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "rp5c01a.h"
 
 /***************************************************************************
@@ -166,14 +166,14 @@ WRITE8_DEVICE_HANDLER( rp5c01a_w )
 
 		if (LOG)
 		{
-			logerror("RP5C01A '%s' Mode %u\n", device->tag, data & RP5C01A_MODE_MASK);
-			logerror("RP5C01A '%s' Timer %s\n", device->tag, (data & RP5C01A_MODE_TIMER_EN ) ? "enabled" : "disabled");
-			logerror("RP5C01A '%s' Alarm %s\n", device->tag, (data & RP5C01A_MODE_ALARM_EN ) ? "enabled" : "disabled");
+			logerror("RP5C01A '%s' Mode %u\n", device->tag.cstr(), data & RP5C01A_MODE_MASK);
+			logerror("RP5C01A '%s' Timer %s\n", device->tag.cstr(), (data & RP5C01A_MODE_TIMER_EN ) ? "enabled" : "disabled");
+			logerror("RP5C01A '%s' Alarm %s\n", device->tag.cstr(), (data & RP5C01A_MODE_ALARM_EN ) ? "enabled" : "disabled");
 		}
 		break;
 
 	case RP5C01A_REGISTER_TEST:
-		if (LOG) logerror("RP5C01A '%s' Test %u not supported!\n", device->tag, data);
+		if (LOG) logerror("RP5C01A '%s' Test %u not supported!\n", device->tag.cstr(), data);
 		break;
 
 	case RP5C01A_REGISTER_RESET:
@@ -192,17 +192,17 @@ WRITE8_DEVICE_HANDLER( rp5c01a_w )
 
 		if (LOG)
 		{
-			if (data & RP5C01A_RESET_ALARM) logerror("RP5C01A '%s' Alarm Reset\n", device->tag);
-			if (data & RP5C01A_RESET_TIMER) logerror("RP5C01A '%s' Timer Reset not supported!\n", device->tag);
-			logerror("RP5C01A '%s' 16Hz Signal %s\n", device->tag, (data & RP5C01A_RESET_16_HZ) ? "disabled" : "enabled");
-			logerror("RP5C01A '%s' 1Hz Signal %s\n", device->tag, (data & RP5C01A_RESET_1_HZ) ? "disabled" : "enabled");
+			if (data & RP5C01A_RESET_ALARM) logerror("RP5C01A '%s' Alarm Reset\n", device->tag.cstr());
+			if (data & RP5C01A_RESET_TIMER) logerror("RP5C01A '%s' Timer Reset not supported!\n", device->tag.cstr());
+			logerror("RP5C01A '%s' 16Hz Signal %s\n", device->tag.cstr(), (data & RP5C01A_RESET_16_HZ) ? "disabled" : "enabled");
+			logerror("RP5C01A '%s' 1Hz Signal %s\n", device->tag.cstr(), (data & RP5C01A_RESET_1_HZ) ? "disabled" : "enabled");
 		}
 		break;
 
 	default:
 		rp5c01a->reg[mode][offset & 0x0f] = data;
 
-		if (LOG) logerror("RP5C01A '%s' Register %u Write %02x\n", device->tag, offset & 0x0f, data);
+		if (LOG) logerror("RP5C01A '%s' Register %u Write %02x\n", device->tag.cstr(), offset & 0x0f, data);
 		break;
 	}
 }
@@ -306,7 +306,7 @@ static void advance_seconds(rp5c01a_t *rp5c01a)
 
 static TIMER_CALLBACK( clock_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	rp5c01a_t *rp5c01a = get_safe_token(device);
 
 	advance_seconds(rp5c01a);
@@ -318,7 +318,7 @@ static TIMER_CALLBACK( clock_tick )
 
 static TIMER_CALLBACK( alarm_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	rp5c01a_t *rp5c01a = get_safe_token(device);
 
 	devcb_call_write_line(&rp5c01a->out_alarm_func, 0);

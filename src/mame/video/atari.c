@@ -6,7 +6,7 @@
     Juergen Buchmueller, June 1998
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/atari.h"
 #include "video/gtia.h"
 
@@ -1160,7 +1160,7 @@ static TIMER_CALLBACK( antic_steal_cycles )
 	LOG(("           @cycle #%3d steal %d cycles\n", cycle(machine), antic.steal_cycles));
 	after(machine, antic.steal_cycles, antic_line_done, "antic_line_done");
     antic.steal_cycles = 0;
-	cpu_spinuntil_trigger( cputag_get_cpu(machine, "maincpu"), TRIGGER_STEAL );
+	cpu_spinuntil_trigger( devtag_get_device(machine, "maincpu"), TRIGGER_STEAL );
 }
 
 

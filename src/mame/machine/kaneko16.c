@@ -12,7 +12,7 @@ Currently none of the MCUs' internal roms are dumped so simulation is used
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/kaneko16.h"
 
 #include "kanekotb.h"	// TOYBOX MCU trojaning results
@@ -2039,7 +2039,7 @@ DRIVER_INIT(calc3_scantables)
 
 	for (x=0;x<numregions;x++)
 	{
-		UINT8* tmpdstram = (UINT8*)malloc(0x2000);
+		UINT8* tmpdstram = auto_alloc_array(machine, UINT8, 0x2000);
 		int length;
 		memset(tmpdstram, 0x00,0x2000);
 		length = calc3_decompress_table(machine, x, tmpdstram, 0);
@@ -2072,7 +2072,7 @@ DRIVER_INIT(calc3_scantables)
 			}
 		}
 #endif
-		free(tmpdstram);
+		auto_free(machine, tmpdstram);
 	}
 
 	// there is also a 0x1000 block of data at the end.. same on both games, maybe it's related to the decryption tables??
@@ -2425,7 +2425,7 @@ TOYBOX_MCU_COM_W(3)
 */
 READ16_HANDLER( toybox_mcu_status_r )
 {
-	logerror("CPU %s (PC=%06X) : read MCU status\n", space->cpu->tag, cpu_get_previouspc(space->cpu));
+	logerror("CPU %s (PC=%06X) : read MCU status\n", space->cpu->tag.cstr(), cpu_get_previouspc(space->cpu));
 	return 0; // most games test bit 0 for failure
 }
 

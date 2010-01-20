@@ -1,5 +1,6 @@
 
-#include "driver.h"
+#include "emu.h"
+#include "coreutil.h"
 #include "cpu/h6280/h6280.h"
 #include "includes/pce.h"
 #include "devices/chd_cd.h"
@@ -407,7 +408,7 @@ static void pce_cd_nec_set_audio_start_position( running_machine *machine )
 		frame = pce_cd.toc->tracks[ bcd_2_dec( pce_cd.command_buffer[2] ) - 1 ].physframeofs;
 		break;
 	default:
-		assert( NULL == pce_cd_nec_set_audio_start_position );
+		//assert( NULL == pce_cd_nec_set_audio_start_position );
 		break;
 	}
 
@@ -453,7 +454,7 @@ static void pce_cd_nec_set_audio_stop_position( running_machine *machine )
 		frame = pce_cd.toc->tracks[ bcd_2_dec( pce_cd.command_buffer[2] ) - 1 ].physframeofs;
 		break;
 	default:
-		assert( NULL == pce_cd_nec_set_audio_start_position );
+		//assert( NULL == pce_cd_nec_set_audio_start_position );
 		break;
 	}
 
@@ -476,7 +477,7 @@ static void pce_cd_nec_set_audio_stop_position( running_machine *machine )
 		pce_cd.cdda_status = PCE_CD_CDDA_OFF;
 		cdda_stop_audio( devtag_get_device( machine, "cdda" ) );
 		pce_cd.end_frame = pce_cd.last_frame;
-		assert( NULL == pce_cd_nec_set_audio_stop_position );
+//		assert( NULL == pce_cd_nec_set_audio_stop_position );
 	}
 
 	pce_cd_reply_status_byte( SCSI_STATUS_OK );
@@ -610,7 +611,7 @@ static void pce_cd_nec_get_dir_info( running_machine *machine )
 		pce_cd.data_buffer_size = 4;
 		break;
 	default:
-		assert( pce_cd_nec_get_dir_info == NULL );  // Not implemented yet
+//		assert( pce_cd_nec_get_dir_info == NULL );  // Not implemented yet
 		break;
 	}
 

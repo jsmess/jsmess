@@ -17,7 +17,7 @@
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "audio/atarijsa.h"
 #include "includes/skullxbo.h"
@@ -41,7 +41,7 @@ static void update_interrupts(running_machine *machine)
 
 static TIMER_CALLBACK( irq_gen )
 {
-	atarigen_scanline_int_gen(cputag_get_cpu(machine, "maincpu"));
+	atarigen_scanline_int_gen(devtag_get_device(machine, "maincpu"));
 }
 
 

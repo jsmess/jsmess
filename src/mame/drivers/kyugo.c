@@ -21,7 +21,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
@@ -467,7 +467,7 @@ static MACHINE_RESET( kyugo )
 	kyugo_state *state = (kyugo_state *)machine->driver_data;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	// must start with interrupts and sub CPU disabled
-	cpu_interrupt_enable(cputag_get_cpu(machine, "maincpu"), 0);
+	cpu_interrupt_enable(devtag_get_device(machine, "maincpu"), 0);
 	kyugo_sub_cpu_control_w(space, 0, 0);
 
 	state->scroll_x_lo = 0;

@@ -15,7 +15,7 @@
 #include <time.h>
 #include <assert.h>
 
-#include "mame.h"
+#include "emu.h"
 #include "mess.h"
 #include "fileio.h"
 #ifdef WIN32
@@ -140,10 +140,6 @@ int CLIB_DECL main(int argc, char *argv[])
 	win_expand_wildcards(&argc, &argv);
 #endif /* WIN32 */
 
-
-	init_resource_tracking();
-	begin_resource_tracking();
-
 	if (argc > 1)
 	{
 		if (!mame_stricmp("convert", argv[1]))
@@ -195,8 +191,5 @@ int CLIB_DECL main(int argc, char *argv[])
 	fprintf(stderr, "        castool.exe convert tzx game.tzx game.wav\n\n");
 
 theend :
-	/* clean up our tracked resources */
-	exit_resource_tracking();
-
 	return 0;
 }

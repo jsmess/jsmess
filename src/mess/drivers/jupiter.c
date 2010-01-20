@@ -26,7 +26,7 @@ Ports:
         Keyboard input, tape, and buzzer
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/jupiter.h"
 #include "devices/cartslot.h"
@@ -303,7 +303,7 @@ static const cassette_config jupiter_cassette_config =
 {
 	jupiter_cassette_formats,
 	NULL,
-	CASSETTE_STOPPED
+	(cassette_state)(CASSETTE_STOPPED)
 };
 
 /* machine definition */

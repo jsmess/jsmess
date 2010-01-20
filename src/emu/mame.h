@@ -9,27 +9,22 @@
 
 ***************************************************************************/
 
+#pragma once
+
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __MAME_H__
 #define __MAME_H__
 
-#include "mamecore.h"
-#include "video.h"
-#include "crsshair.h"
-#include "restrack.h"
-#include "options.h"
-#include "inptport.h"
-#include "cpuintrf.h"
-#include <stdarg.h>
-
-#ifdef MESS
-#include "image.h"
-#include "uimess.h"
-#endif /* MESS */
 
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
+
+const int MAX_GFX_ELEMENTS = 32;
 
 /* return values from run_game */
 enum
@@ -67,10 +62,6 @@ enum
 #define DEBUG_FLAG_WPW_PROGRAM	0x00000100		/* watchpoints are enabled for PROGRAM memory writes */
 #define DEBUG_FLAG_WPW_DATA		0x00000200		/* watchpoints are enabled for DATA memory writes */
 #define DEBUG_FLAG_WPW_IO		0x00000400		/* watchpoints are enabled for IO memory writes */
-
-
-/* maxima */
-#define MAX_GFX_ELEMENTS		32
 
 
 /* MESS vs. MAME abstractions */
@@ -115,14 +106,29 @@ typedef enum _output_channel output_channel;
 
 
 /***************************************************************************
+    MACROS
+***************************************************************************/
+
+// global allocation helpers
+#define auto_alloc(m, t)				pool_alloc(static_cast<running_machine *>(m)->respool, t)
+#define auto_alloc_clear(m, t)			pool_alloc_clear(static_cast<running_machine *>(m)->respool, t)
+#define auto_alloc_array(m, t, c)		pool_alloc_array(static_cast<running_machine *>(m)->respool, t, c)
+#define auto_alloc_array_clear(m, t, c)	pool_alloc_array_clear(static_cast<running_machine *>(m)->respool, t, c)
+#define auto_free(m, v)					pool_free(static_cast<running_machine *>(m)->respool, v)
+
+#define auto_bitmap_alloc(m, w, h, f)	auto_alloc(m, bitmap_t(w, h, f))
+#define auto_strdup(m, s)				strcpy(auto_alloc_array(m, char, strlen(s) + 1), s)
+
+
+
+/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* output channel callback */
-typedef void (*output_callback_func)(void *param, const char *format, va_list argptr);
+// forward declarations
+class gfx_element;
+class colortable_t;
 
-
-/* forward type declarations */
 typedef struct _mame_private mame_private;
 typedef struct _cpuexec_private cpuexec_private;
 typedef struct _timer_private timer_private;
@@ -145,15 +151,38 @@ typedef struct _generic_video_private generic_video_private;
 typedef struct _generic_audio_private generic_audio_private;
 
 
-/* structure to hold a pointer/size pair for generic pointers */
-typedef union _generic_ptr generic_ptr;
-union _generic_ptr
+/* output channel callback */
+typedef void (*output_callback_func)(void *param, const char *format, va_list argptr);
+
+
+// memory region
+class region_info
 {
-	void *		v;
-	UINT8 *		u8;
-	UINT16 *	u16;
-	UINT32 *	u32;
-	UINT64 *	u64;
+	DISABLE_COPYING(region_info);
+
+	running_machine *		machine;
+
+public:
+	region_info(running_machine *machine, const char *_name, UINT32 _length, UINT32 _flags);
+	~region_info();
+
+	operator void *() const { return (this != NULL) ? base.v : NULL; }
+	operator INT8 *() const { return (this != NULL) ? base.i8 : NULL; }
+	operator UINT8 *() const { return (this != NULL) ? base.u8 : NULL; }
+	operator INT16 *() const { return (this != NULL) ? base.i16 : NULL; }
+	operator UINT16 *() const { return (this != NULL) ? base.u16 : NULL; }
+	operator INT32 *() const { return (this != NULL) ? base.i32 : NULL; }
+	operator UINT32 *() const { return (this != NULL) ? base.u32 : NULL; }
+	operator INT64 *() const { return (this != NULL) ? base.i64 : NULL; }
+	operator UINT64 *() const { return (this != NULL) ? base.u64 : NULL; }
+
+	UINT32 bytes() const { return (this != NULL) ? length : 0; }
+
+	region_info *			next;
+	astring					name;
+	generic_ptr				base;
+	UINT32					length;
+	UINT32					flags;
 };
 
 
@@ -178,9 +207,20 @@ struct _generic_pointers
 
 
 /* description of the currently-running machine */
-/* typedef struct _running_machine running_machine; -- in mamecore.h */
-struct _running_machine
+class running_machine
 {
+	DISABLE_COPYING(running_machine);
+
+public:
+	running_machine(const game_driver *driver);
+	~running_machine();
+
+	inline const device_config *device(const char *tag);
+	inline const input_port_config *port(const char *tag);
+	inline const region_info *region(const char *tag);
+
+	resource_pool			respool;			/* pool of resources for this machine */
+
 	/* configuration data */
 	const machine_config *	config;				/* points to the constructed machine_config */
 	input_port_list			portlist;			/* points to a list of input port configurations */
@@ -199,7 +239,7 @@ struct _running_machine
 
 	/* palette-related information */
 	const pen_t *			pens;				/* remapped palette pen numbers */
-	struct _colortable_t *	colortable;			/* global colortable for remapping */
+	colortable_t *			colortable;			/* global colortable for remapping */
 	pen_t *					shadow_table;		/* table for looking up a shadowed pen */
 	bitmap_t *				priority_bitmap;	/* priority bitmap */
 
@@ -273,7 +313,6 @@ struct _mame_system_time
 ***************************************************************************/
 
 extern const char mame_disclaimer[];
-extern char giant_string_buffer[];
 
 extern const char build_version[];
 
@@ -357,6 +396,9 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
 /* free an allocated memory region */
 void memory_region_free(running_machine *machine, const char *name);
 
+/* return a pointer to the information struct for a given memory region */
+region_info *memory_region_info(running_machine *machine, const char *name);
+
 /* return a pointer to a specified memory region */
 UINT8 *memory_region(running_machine *machine, const char *name);
 
@@ -423,5 +465,27 @@ void mame_get_current_datetime(running_machine *machine, mame_system_time *systi
 #ifdef MESS
 #include "mess.h"
 #endif /* MESS */
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+inline const device_config *running_machine::device(const char *tag)
+{
+	return device_list_find_by_tag(&config->devicelist, tag);
+}
+
+inline const input_port_config *running_machine::port(const char *tag)
+{
+	return input_port_by_tag(&portlist, tag);
+}
+
+inline const region_info *running_machine::region(const char *tag)
+{
+	return memory_region_info(this, tag);
+}
+
 
 #endif	/* __MAME_H__ */

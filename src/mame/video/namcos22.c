@@ -33,8 +33,7 @@ SPOT TABLE test
 03F2B2: 06B9 0000 0001 00E0 AB08   addi.l  #$1, $e0ab08.l
 */
 
-#include "driver.h"
-#include "eminline.h"
+#include "emu.h"
 #include "video/rgbutil.h"
 #include "includes/namcos22.h"
 #include "video/poly.h"
@@ -837,7 +836,7 @@ MallocSceneNode( running_machine *machine )
    }
    else
    {
-	  node = alloc_or_die(struct SceneNode);
+	  node = auto_alloc(machine, struct SceneNode);
    }
    memset( node, 0, sizeof(*node) );
    return node;
@@ -2199,13 +2198,6 @@ static void namcos22_reset(running_machine *machine)
 
 static void namcos22_exit(running_machine *machine)
 {
-	while (mpFreeSceneNode != NULL)
-	{
-		struct SceneNode *node = mpFreeSceneNode;
-		mpFreeSceneNode = node->nextInBucket;
-		free(node);
-	}
-
 	poly_free(poly);
 }
 

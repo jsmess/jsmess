@@ -17,7 +17,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "hd44102.h"
 
 /***************************************************************************
@@ -105,25 +105,25 @@ static WRITE8_DEVICE_HANDLER( hd44102_control_w )
 	switch (data)
 	{
 	case HD44102_CONTROL_DISPLAY_OFF:
-		if (LOG) logerror("HD44102 '%s' Display Off\n", device->tag);
+		if (LOG) logerror("HD44102 '%s' Display Off\n", device->tag.cstr());
 
 		hd44102->status |= HD44102_STATUS_DISPLAY_OFF;
 		break;
 
 	case HD44102_CONTROL_DISPLAY_ON:
-		if (LOG) logerror("HD44102 '%s' Display On\n", device->tag);
+		if (LOG) logerror("HD44102 '%s' Display On\n", device->tag.cstr());
 
 		hd44102->status &= ~HD44102_STATUS_DISPLAY_OFF;
 		break;
 
 	case HD44102_CONTROL_COUNT_DOWN_MODE:
-		if (LOG) logerror("HD44102 '%s' Count Down Mode\n", device->tag);
+		if (LOG) logerror("HD44102 '%s' Count Down Mode\n", device->tag.cstr());
 
 		hd44102->status &= ~HD44102_STATUS_COUNT_UP;
 		break;
 
 	case HD44102_CONTROL_COUNT_UP_MODE:
-		if (LOG) logerror("HD44102 '%s' Count Up Mode\n", device->tag);
+		if (LOG) logerror("HD44102 '%s' Count Up Mode\n", device->tag.cstr());
 
 		hd44102->status |= HD44102_STATUS_COUNT_UP;
 		break;
@@ -135,17 +135,17 @@ static WRITE8_DEVICE_HANDLER( hd44102_control_w )
 
 		if ((data & HD44102_CONTROL_Y_ADDRESS_MASK) == HD44102_CONTROL_DISPLAY_START_PAGE)
 		{
-			if (LOG) logerror("HD44102 '%s' Display Start Page %u\n", device->tag, x);
+			if (LOG) logerror("HD44102 '%s' Display Start Page %u\n", device->tag.cstr(), x);
 
 			hd44102->page = x;
 		}
 		else if (y > 49)
 		{
-			logerror("HD44102 '%s' Invalid Address X %u Y %u (%02x)!\n", device->tag, data, x, y);
+			logerror("HD44102 '%s' Invalid Address X %u Y %u (%02x)!\n", device->tag.cstr(), data, x, y);
 		}
 		else
 		{
-			if (LOG) logerror("HD44102 '%s' Address X %u Y %u (%02x)\n", device->tag, data, x, y);
+			if (LOG) logerror("HD44102 '%s' Address X %u Y %u (%02x)\n", device->tag.cstr(), data, x, y);
 
 			hd44102->x = x;
 			hd44102->y = y;

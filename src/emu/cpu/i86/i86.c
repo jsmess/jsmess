@@ -4,8 +4,8 @@
 ****************************************************************************/
 /* 26.March 2000 PeT changed set_irq_line */
 
+#include "emu.h"
 #include "debugger.h"
-#include "cpuintrf.h"
 
 #include "host.h"
 #include "i86priv.h"
@@ -218,8 +218,8 @@ static CPU_INIT( i8086 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	/* set up the state table */
 	cpustate->state = state_table_template;
@@ -252,8 +252,8 @@ static CPU_RESET( i8086 )
 	cpustate->mem = save_mem;
 	cpustate->state = save_state;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->sregs[CS] = 0xf000;
 	cpustate->base[CS] = SegBase(CS);
@@ -295,7 +295,7 @@ static void set_irq_line(i8086_state *cpustate, int irqline, int state)
 
 		/* if the IF is set, signal an interrupt */
 		if (state != CLEAR_LINE && cpustate->IF)
-			PREFIX(_interrupt)(cpustate, -1);
+			PREFIX(_interrupt)(cpustate, (UINT32)-1);
 	}
 }
 

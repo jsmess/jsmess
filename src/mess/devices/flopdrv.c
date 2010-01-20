@@ -12,7 +12,7 @@
     - Override write protect if disk image has been opened in read mode
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "flopdrv.h"
 
 #define VERBOSE		0
@@ -228,7 +228,7 @@ static UINT64 image_fsize_thunk(void *file)
 
 /* ----------------------------------------------------------------------- */
 
-const struct io_procs mess_ioprocs =
+struct io_procs mess_ioprocs =
 {
 	NULL,
 	image_fseek_thunk,
@@ -244,7 +244,7 @@ static void floppy_drive_set_geometry_absolute(const device_config *img, int tra
 	pDrive->num_sides = sides;
 }
 
-void floppy_drive_set_geometry(const device_config *img, floppy_type type)
+void floppy_drive_set_geometry(const device_config *img, floppy_type_t type)
 {
 	int max_track, num_sides;
 
@@ -317,12 +317,12 @@ static void floppy_drive_index_func(const device_config *img)
 	if (drive->idx)
 	{
 		drive->idx = 0;
-		timer_adjust_oneshot(drive->index_timer, double_to_attotime(ms*19/20/1000.0), 0);
+		timer_adjust_oneshot((emu_timer*)drive->index_timer, double_to_attotime(ms*19/20/1000.0), 0);
 	}
 	else
 	{
 		drive->idx = 1;
-		timer_adjust_oneshot(drive->index_timer, double_to_attotime(ms/20/1000.0), 0);
+		timer_adjust_oneshot((emu_timer*)drive->index_timer, double_to_attotime(ms/20/1000.0), 0);
 	}
 
 	devcb_call_write_line(&drive->out_idx_func, drive->idx);
@@ -543,7 +543,7 @@ void floppy_drive_read_sector_data(const device_config *img, int side, int index
 		floppy_read_indexed_sector(flopimg->floppy, side, flopimg->track, index1, 0, ptr, length);
 
 		if (LOG_FLOPPY)
-			log_readwrite("sector_read", side, flopimg->track, index1, ptr, length);
+			log_readwrite("sector_read", side, flopimg->track, index1, (const char *)ptr, length);
 
 	}
 }
@@ -558,7 +558,7 @@ void floppy_drive_write_sector_data(const device_config *img, int side, int inde
 			return;
 
 		if (LOG_FLOPPY)
-			log_readwrite("sector_write", side, flopimg->track, index1, ptr, length);
+			log_readwrite("sector_write", side, flopimg->track, index1, (const char *)ptr, length);
 
 		floppy_write_indexed_sector(flopimg->floppy, side, flopimg->track, index1, 0, ptr, length, ddam);
 	}
@@ -618,7 +618,7 @@ void floppy_drive_set_controller(const device_config *img, const device_config *
 DEVICE_START( floppy )
 {
 	floppy_drive *floppy = get_safe_token( device );
-	floppy->config = device->static_config;
+	floppy->config = (const floppy_config*)device->static_config;
 	floppy_drive_init(device);
 
 	floppy->drive_id = floppy_get_drive(device);
@@ -870,7 +870,7 @@ WRITE_LINE_DEVICE_HANDLER( floppy_mon_w )
 
 		/* on -> off */
 		else if (drive->mon == CLEAR_LINE && state)
-			timer_adjust_oneshot(drive->index_timer, attotime_zero, 0);
+			timer_adjust_oneshot((emu_timer*)drive->index_timer, attotime_zero, 0);
 	}
 
 	drive->mon = state;

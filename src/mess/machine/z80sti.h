@@ -33,7 +33,7 @@
 #ifndef __Z80STI__
 #define __Z80STI__
 
-#include "driver.h"
+#include "emu.h"
 #include "devcb.h"
 
 /***************************************************************************

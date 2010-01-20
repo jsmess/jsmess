@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 
 static ADDRESS_MAP_START(msbc1_mem, ADDRESS_SPACE_PROGRAM, 16)

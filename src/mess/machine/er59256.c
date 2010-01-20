@@ -7,7 +7,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "er59256.h"
 
 /* LOGLEVEL 0=no logging, 1=just commands and data, 2=everything ! */

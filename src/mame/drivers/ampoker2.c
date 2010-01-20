@@ -364,7 +364,7 @@
 
 #define MASTER_CLOCK	XTAL_6MHz
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "ampoker2.lh"
@@ -1274,7 +1274,6 @@ static DRIVER_INIT( rabbitpk )
 {
 
 	UINT8 *rom = memory_region(machine, "maincpu");
-	UINT8 *buffer;
 	int size = memory_region_length(machine, "maincpu");
 	int start = 0;
 	int i;
@@ -1291,11 +1290,6 @@ static DRIVER_INIT( rabbitpk )
 	{
 		rom[i] = BITSWAP8(rom[i], 1, 2, 5, 4, 3, 0, 7, 6) ^ dec_base[(i >> 2) & 0x1f];
 	}
-
-	buffer = alloc_array_or_die(UINT8, size);
-	memcpy(buffer, rom, size);
-
-	free(buffer);
 }
 
 

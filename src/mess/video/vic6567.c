@@ -66,7 +66,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "vic6567.h"
 #include "vic4567.h"
 #include "utils.h"

@@ -76,7 +76,7 @@ WRITE8_DEVICE_HANDLER( mos6529_w )
 
 static DEVICE_START( mos6529 )
 {
-	mos6529_t *mos6529 = device->token;
+	mos6529_t *mos6529 = (mos6529_t *)device->token;
 	const mos6529_interface *intf = get_interface(device);
 
 	/* resolve callbacks */

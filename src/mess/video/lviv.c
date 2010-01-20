@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/lviv.h"
 
 const unsigned char lviv_palette[8*3] =

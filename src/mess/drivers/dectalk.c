@@ -139,7 +139,7 @@ DUART is INT level 6
 #undef SERIAL_TO_STDERR
 
 /* Core includes */
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
 #include "dectalk.lh" //  hack to avoid screenless system crash
@@ -319,7 +319,7 @@ static void dectalk_reset(const device_config *device)
 static MACHINE_RESET( dectalk )
 {
 	/* hook the RESET line, which resets a slew of other components */
-	m68k_set_reset_callback(cputag_get_cpu(machine, "maincpu"), dectalk_reset);
+	m68k_set_reset_callback(devtag_get_device(machine, "maincpu"), dectalk_reset);
 }
 
 /* Begin 68k i/o handlers */

@@ -4,7 +4,7 @@
 
 **********************************************************************/
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "upd1771.h"
 

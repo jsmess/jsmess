@@ -22,7 +22,7 @@ typedef enum
 	FLOPPY_DRIVE_DS_40,
 	FLOPPY_DRIVE_SS_80,
 	FLOPPY_DRIVE_DS_80
-} floppy_type;
+} floppy_type_t;
 
 typedef enum
 {
@@ -39,7 +39,7 @@ struct floppy_config_t
 	devcb_write_line out_wpt_func;  /* write protect */
 	devcb_write_line out_rdy_func;  /* ready */
 
-	floppy_type floppy_type;
+	floppy_type_t floppy_type;
 	const struct FloppyFormat *formats;
 	keep_geometry keep_drive_geometry;
 };
@@ -125,7 +125,7 @@ int floppy_get_drive_by_type(const device_config *image,int ftype);
 void *flopimg_get_custom_data(const device_config *image);
 void flopimg_alloc_custom_data(const device_config *image,void *custom);
 
-void floppy_drive_set_geometry(const device_config *img, floppy_type type);
+void floppy_drive_set_geometry(const device_config *img, floppy_type_t type);
 
 /* drive select lines */
 WRITE_LINE_DEVICE_HANDLER( floppy_ds0_w );

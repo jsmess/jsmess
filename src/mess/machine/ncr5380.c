@@ -20,7 +20,7 @@
  *
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "ncr5380.h"
 
 #define VERBOSE	(0)

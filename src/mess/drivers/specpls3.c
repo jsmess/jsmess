@@ -144,7 +144,7 @@ http://www.z88forever.org.uk/zxplus3e/
 
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/spectrum.h"
 #include "eventlst.h"
 #include "devices/snapquik.h"

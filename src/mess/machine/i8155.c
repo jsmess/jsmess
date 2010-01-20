@@ -232,7 +232,7 @@ INLINE void write_port(i8155_t *i8155, int port, UINT8 data)
 
 static TIMER_CALLBACK( counter_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	i8155_t *i8155 = get_safe_token(device);
 
 	/* count down */
@@ -470,7 +470,7 @@ WRITE8_DEVICE_HANDLER( i8155_ram_w )
 
 static DEVICE_START( i8155 )
 {
-	i8155_t *i8155 = device->token;
+	i8155_t *i8155 = (i8155_t *)device->token;
 	const i8155_interface *intf = get_interface(device);
 
 	/* resolve callbacks */
@@ -501,7 +501,7 @@ static DEVICE_START( i8155 )
 
 static DEVICE_RESET( i8155 )
 {
-	i8155_t *i8155 = device->token;
+	i8155_t *i8155 = (i8155_t *)device->token;
 
 	/* clear output registers */
 	i8155->output[I8155_PORT_A] = 0;

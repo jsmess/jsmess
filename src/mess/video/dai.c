@@ -12,7 +12,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/i8255a.h"
 #include "includes/dai.h"
 

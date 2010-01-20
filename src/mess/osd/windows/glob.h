@@ -295,9 +295,7 @@ typedef struct {
 #define	GLOB_NOSPACE	(-1)	/* Malloc call failed. */
 #define	GLOB_ABEND	(-2)	/* Unignored error. */
 
-__BEGIN_DECLS
-int	glob __P((const char *, int, int (*)(const char *, int), glob_t *));
-void	globfree __P((glob_t *));
-__END_DECLS
+int	glob (const char *, int, int (*)(const char *, int), glob_t *);
+void	globfree(glob_t *);
 
 #endif /* !_GLOB_H_ */

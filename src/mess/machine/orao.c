@@ -7,7 +7,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/dac.h"
 #include "devices/cassette.h"
 #include "includes/orao.h"

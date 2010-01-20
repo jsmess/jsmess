@@ -4,7 +4,8 @@
     Raphael Nabet, 2003.
 */
 
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "ti99_4x.h"
 #include "99_peb.h"
 #include "99_hsgpl.h"

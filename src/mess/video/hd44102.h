@@ -10,7 +10,7 @@
 #ifndef __HD44102__
 #define __HD44102__
 
-#include "driver.h"
+#include "emu.h"
 #include "devcb.h"
 
 /***************************************************************************

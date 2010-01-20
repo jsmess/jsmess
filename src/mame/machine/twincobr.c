@@ -3,7 +3,7 @@
  *  Communications and memory functions between shared CPU memory spaces    *
  ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
 #include "includes/twincobr.h"
@@ -16,7 +16,7 @@
 
 
 int toaplan_main_cpu;	/* Main CPU type.  0 = 68000, 1 = Z80 */
-int twincobr_intenable;
+static int twincobr_intenable;
 int wardner_membank;
 static int twincobr_dsp_on;
 static int twincobr_dsp_BIO;

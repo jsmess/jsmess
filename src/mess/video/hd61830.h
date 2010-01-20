@@ -10,7 +10,7 @@
 #ifndef __HD61830__
 #define __HD61830__
 
-#include "driver.h"
+#include "emu.h"
 #include "devcb.h"
 
 /***************************************************************************

@@ -181,7 +181,7 @@ TODO:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/tait8741.h"
 #include "cpu/z80/z80.h"
@@ -272,7 +272,7 @@ static MACHINE_RESET( gladiator )
 	{
 		UINT8 *rom = memory_region(machine, "audiocpu") + 0x10000;
 		memory_set_bankptr(machine, "bank2",rom);
-		device_reset(cputag_get_cpu(machine, "audiocpu"));
+		device_reset(devtag_get_device(machine, "audiocpu"));
 	}
 }
 

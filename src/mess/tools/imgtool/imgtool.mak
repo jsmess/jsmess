@@ -32,7 +32,10 @@ LIBIMGTOOL = $(OBJ)/libimgtool.a
 # imgtool lib objects
 IMGTOOL_LIB_OBJS =						\
 	$(OBJ)/version.o					\
-	$(EMUOBJ)/mamecore.o				\
+	$(EMUOBJ)/emualloc.o 				\
+	$(EMUOBJ)/emucore.o					\
+	$(EMUOBJ)/emuopts.o 				\
+	$(EMUOBJ)/memory.o 					\
 	$(MESSOBJ)/utils.o					\
 	$(MESSOBJ)/opresolv.o				\
 	$(MESS_FORMATS)/ioprocs.o			\

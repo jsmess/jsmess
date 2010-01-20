@@ -15,7 +15,7 @@ Todo:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/gamecom.h"
 #include "cpu/sm8500/sm8500.h"
 #include "devices/cartslot.h"

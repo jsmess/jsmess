@@ -4,7 +4,7 @@
  *
  ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/abc80x.h"
 #include "machine/z80dart.h"
 #include "video/mc6845.h"
@@ -13,14 +13,14 @@
 
 READ8_HANDLER( abc802_charram_r )
 {
-	abc802_state *state = space->machine->driver_data;
+	abc802_state *state = (abc802_state *) space->machine->driver_data;
 
 	return state->charram[offset];
 }
 
 WRITE8_HANDLER( abc802_charram_w )
 {
-	abc802_state *state = space->machine->driver_data;
+	abc802_state *state = (abc802_state *) space->machine->driver_data;
 
 	state->charram[offset] = data;
 }
@@ -68,7 +68,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 
     */
 
-	abc802_state *state = device->machine->driver_data;
+	abc802_state *state = (abc802_state *) device->machine->driver_data;
 
 	int column;
 	int rf = 0, rc = 0, rg = 0;
@@ -170,7 +170,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 
 static WRITE_LINE_DEVICE_HANDLER( abc802_vsync_changed )
 {
-	abc802_state *driver_state = device->machine->driver_data;
+	abc802_state *driver_state = (abc802_state *)device->machine->driver_data;
 
 	if (!state)
 	{
@@ -209,7 +209,7 @@ static const mc6845_interface abc802_mc6845_interface = {
 
 static VIDEO_START( abc802 )
 {
-	abc802_state *state = machine->driver_data;
+	abc802_state *state = (abc802_state *) machine->driver_data;
 
 	/* allocate memory */
 
@@ -236,7 +236,7 @@ static VIDEO_START( abc802 )
 
 static VIDEO_UPDATE( abc802 )
 {
-	abc802_state *state = screen->machine->driver_data;
+	abc802_state *state = (abc802_state *) screen->machine->driver_data;
 
 	/* expand visible area to workaround MC6845 */
 	video_screen_set_visarea(screen, 0, 767, 0, 311);

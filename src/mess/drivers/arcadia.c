@@ -118,7 +118,7 @@ anything in hardware. No cartridge has been found which uses them.
  ******************************************************************************/
 
 #include <assert.h>
-#include "driver.h"
+#include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "includes/arcadia.h"
 #include "devices/cartslot.h"

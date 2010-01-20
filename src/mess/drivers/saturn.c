@@ -160,7 +160,7 @@ cpu #0 (PC=0601023A): unmapped program memory dword write to 02000000 = 00000000
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/sh2/sh2.h"
 #include "machine/stvcd.h"
@@ -169,7 +169,7 @@ cpu #0 (PC=0601023A): unmapped program memory dword write to 02000000 = 00000000
 #include "devices/chd_cd.h"
 #include "devices/cartslot.h"
 #include "includes/stv.h"
-
+#include "coreutil.h"
 
 #define USE_SLAVE 1
 
@@ -228,7 +228,7 @@ static INT32  scu_size_0,		/* Transfer DMA size lv 0*/
 			  scu_size_1,		/* lv 1*/
 			  scu_size_2;		/* lv 2*/
 
-struct
+struct stv_irq_t
 {
 	UINT8 vblank_out;
 	UINT8 vblank_in;
@@ -539,7 +539,7 @@ static UINT8 stv_SMPC_r8(const address_space *space, int offset)
 
 	if (offset == 0x33) return_data = saturn_region;
 
-	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space->cpu->tag, cpu_get_pc(space->cpu), offset, offset>>1, return_data);
+	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), offset, offset>>1, return_data);
 
 
 	return return_data;
@@ -770,7 +770,7 @@ static void stv_SMPC_w8(const address_space *space, int offset, UINT8 data)
 
 				break;
 			default:
-				if(LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: undocumented Command %02x\n", space->cpu->tag, cpu_get_pc(space->cpu), data);
+				if(LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: undocumented Command %02x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), data);
 		}
 
 		// we've processed the command, clear status flag
@@ -1221,7 +1221,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		   stv_scu[40] != 0xffffffff)
 		{
 			if(LOG_SCU) logerror("cpu %s (PC=%08X) IRQ mask reg set %08x = %d%d%d%d|%d%d%d%d|%d%d%d%d|%d%d%d%d\n",
-			space->cpu->tag, cpu_get_pc(space->cpu),
+			space->cpu->tag.cstr(), cpu_get_pc(space->cpu),
 			stv_scu[offset],
 			stv_scu[offset] & 0x8000 ? 1 : 0, /*A-Bus irq*/
 			stv_scu[offset] & 0x4000 ? 1 : 0, /*<reserved>*/
@@ -1846,17 +1846,17 @@ static WRITE32_HANDLER( stv_scsp_regs_w32 )
  * Enter into Radiant Silver Gun specific menu for a test...                       */
 static WRITE32_HANDLER( minit_w )
 {
-	logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->cpu->tag, cpu_get_pc(space->cpu),data);
+	logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu),data);
 	cpuexec_boost_interleave(space->machine, minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
 	cpuexec_trigger(space->machine, 1000);
-	sh2_set_frt_input(cputag_get_cpu(space->machine, "slave"), PULSE_LINE);
+	sh2_set_frt_input(devtag_get_device(space->machine, "slave"), PULSE_LINE);
 }
 
 static WRITE32_HANDLER( sinit_w )
 {
-	logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->cpu->tag, cpu_get_pc(space->cpu),data);
+	logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu),data);
 	cpuexec_boost_interleave(space->machine, sinit_boost_timeslice, ATTOTIME_IN_USEC(sinit_boost));
-	sh2_set_frt_input(cputag_get_cpu(space->machine, "maincpu"), PULSE_LINE);
+	sh2_set_frt_input(devtag_get_device(space->machine, "maincpu"), PULSE_LINE);
 }
 
 static UINT32 backup[64*1024/4];
@@ -2172,8 +2172,8 @@ static void saturn_init_driver(running_machine *machine, int rgn)
 	saturn_region = rgn;
 
 	// set compatible options
-	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
-	sh2drc_set_options(cputag_get_cpu(machine, "slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	sh2drc_set_options(devtag_get_device(machine, "slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	/* get the current date/time from the core */
 	mame_get_current_datetime(machine, &systime);

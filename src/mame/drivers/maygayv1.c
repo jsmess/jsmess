@@ -124,7 +124,7 @@ Todo:
 Find lamps/reels after UPD changes.
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "video/awpvid.h"
 #include "cpu/mcs51/mcs51.h"
@@ -969,8 +969,8 @@ static MACHINE_START( maygayv1 )
 
 //  duart_68681_init(DUART_CLOCK, duart_irq_handler, duart_tx);
 
-	i8051_set_serial_tx_callback(cputag_get_cpu(machine, "soundcpu"), data_from_i8031);
-	i8051_set_serial_rx_callback(cputag_get_cpu(machine, "soundcpu"), data_to_i8031);
+	i8051_set_serial_tx_callback(devtag_get_device(machine, "soundcpu"), data_from_i8031);
+	i8051_set_serial_rx_callback(devtag_get_device(machine, "soundcpu"), data_to_i8031);
 }
 
 static MACHINE_RESET( maygayv1 )
@@ -1106,6 +1106,6 @@ static DRIVER_INIT( screenpl )
 	p1 = p3 = 0xff;
 }
 
-GAME( 1991, screenpl, 0,        maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (ver. 4.0)",               GAME_IMPERFECT_SOUND|GAME_REQUIRES_ARTWORK )
-GAME( 1991, screenp1, screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (ver. 1.9)",               GAME_IMPERFECT_SOUND|GAME_REQUIRES_ARTWORK )
-GAME( 1991, screenp2, screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (ver. 1.9, Isle of Man)",  GAME_IMPERFECT_SOUND|GAME_REQUIRES_ARTWORK )
+GAME( 1991, screenpl, 0,        maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (ver. 4.0)",               GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK )
+GAME( 1991, screenp1, screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (ver. 1.9)",               GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK )
+GAME( 1991, screenp2, screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (ver. 1.9, Isle of Man)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK )

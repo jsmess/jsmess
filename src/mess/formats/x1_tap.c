@@ -19,7 +19,7 @@
  *
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "x1_tap.h"
 
 #define WAVE_HIGH		 0x5a9e

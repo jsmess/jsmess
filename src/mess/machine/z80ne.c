@@ -8,7 +8,7 @@
 ***********************************************************************/
 
 /* Core includes */
-#include "driver.h"
+#include "emu.h"
 #include "devintrf.h"
 #include "includes/z80ne.h"
 
@@ -741,7 +741,7 @@ READ8_DEVICE_HANDLER(lx390_reset_bank)
 	offs_t pc;
 
 	/* if PC is not in range, we are under integrated debugger control, DON'T SWAP */
-	pc = cpu_get_pc(cputag_get_cpu(device->machine, "z80ne"));
+	pc = cpu_get_pc(devtag_get_device(device->machine, "z80ne"));
 	if((pc >= 0xf000) && (pc <=0xffff))
 	{
 		LOG(("lx390_reset_bank, reset memory bank 1\n"));

@@ -636,7 +636,7 @@ struct dmk_tag
 
 static struct dmk_tag *get_dmk_tag(floppy_image *floppy)
 {
-	return floppy_tag(floppy);
+	return (dmk_tag *)floppy_tag(floppy);
 }
 
 
@@ -746,7 +746,7 @@ static floperr_t coco_dmk_format_track(floppy_image *floppy, int head, int track
 	track_data = (UINT8 *) track_data_v;
 
 	/* set up sector map */
-	sector_map = malloc(sectors * sizeof(*sector_map));
+	sector_map = (int*)malloc(sectors * sizeof(*sector_map));
 	if (!sector_map)
 	{
 		err = FLOPPY_ERROR_OUTOFMEMORY;
@@ -1127,7 +1127,7 @@ FLOPPY_CONSTRUCT(coco_dmk_construct)
 		coco_dmk_interpret_header(floppy, &heads, &tracks, &track_size);
 	}
 
-	tag = floppy_create_tag(floppy, sizeof(struct dmk_tag));
+	tag = (dmk_tag *)floppy_create_tag(floppy, sizeof(struct dmk_tag));
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
 	tag->heads = heads;

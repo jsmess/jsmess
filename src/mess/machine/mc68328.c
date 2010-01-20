@@ -7,7 +7,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/mc68328.h"
 #include "mc68328.h"
@@ -2798,7 +2798,7 @@ static DEVICE_START( mc68328 )
 {
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
 
-    mc68328->iface = device->static_config;
+    mc68328->iface = (const mc68328_interface*)device->static_config;
 
     mc68328->gptimer[0] = timer_alloc(device->machine, mc68328_timer1_hit, 0);
     mc68328->gptimer[1] = timer_alloc(device->machine, mc68328_timer2_hit, 0);

@@ -8,7 +8,7 @@
 
 #include <stddef.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "device.h"
 #include "mslegacy.h"
 
@@ -87,5 +87,5 @@ iodevice_t device_typeid(const char *name)
 		if (!mame_stricmp(name, device_info_array[i].name) || !mame_stricmp(name, device_info_array[i].shortname))
 			return device_info_array[i].type;
 	}
-	return -1;
+	return (iodevice_t)-1;
 }

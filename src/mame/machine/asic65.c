@@ -4,7 +4,7 @@
  *
  *************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/atarig42.h"
 #include "cpu/tms32010/tms32010.h"
 #include "asic65.h"
@@ -131,7 +131,7 @@ void asic65_config(running_machine *machine, int asictype)
 	asic65.type = asictype;
 	asic65.yorigin = 0x1800;
 	if (asic65.type == ASIC65_ROMBASED)
-		asic65.cpu = cputag_get_cpu(machine, "asic65");
+		asic65.cpu = devtag_get_device(machine, "asic65");
 }
 
 

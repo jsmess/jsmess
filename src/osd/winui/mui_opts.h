@@ -16,7 +16,7 @@
 
 #include "osdcomm.h"
 #include "options.h"
-#include "inputseq.h" /* for input_seq definition */
+#include "emu.h" /* for input_seq definition */
 #include <video.h> /* for MAX_SCREENS Definition*/
 
 #ifdef MESS

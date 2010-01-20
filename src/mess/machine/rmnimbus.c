@@ -11,7 +11,7 @@
 */
 
 
-#include "driver.h"
+#include "emu.h"
 #include "memory.h"
 #include "cpu/i86/i86.h"
 #include "debug/debugcpu.h"
@@ -396,7 +396,7 @@ static void handle_eoi(running_machine *machine,int data)
 			case 0x0d:	i186.intr.in_service &= ~0x20;	break;
 			case 0x0e:	i186.intr.in_service &= ~0x40;	break;
 			case 0x0f:	i186.intr.in_service &= ~0x80;	break;
-			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", cpu_get_pc(cputag_get_cpu(machine, MAINCPU_TAG)), data & 0x1f);
+			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", cpu_get_pc(devtag_get_device(machine, MAINCPU_TAG)), data & 0x1f);
 		}
 		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", attotime_to_double(timer_get_time(machine)), data & 0x1f);
 	}
@@ -596,7 +596,7 @@ static void internal_timer_update(running_machine *machine,
 		diff = new_control ^ t->control;
 		if (diff & 0x001c)
 		  logerror("%05X:ERROR! -unsupported timer mode %04X\n",
-			   cpu_get_pc(cputag_get_cpu(machine, MAINCPU_TAG)), new_control);
+			   cpu_get_pc(devtag_get_device(machine, MAINCPU_TAG)), new_control);
 
 		/* if we have real changes, update things */
 		if (diff != 0)
@@ -695,7 +695,7 @@ static void update_dma_control(running_machine *machine, int which, int new_cont
 	diff = new_control ^ d->control;
 	if ((LOG_DMA) && (diff & 0x6811))
 	  logerror("%05X:ERROR! - unsupported DMA mode %04X\n",
-		   cpu_get_pc(cputag_get_cpu(machine, MAINCPU_TAG)), new_control);
+		   cpu_get_pc(devtag_get_device(machine, MAINCPU_TAG)), new_control);
 
 	/* if we're going live, set a timer */
 	if ((diff & 0x0002) && (new_control & 0x0002))
@@ -730,8 +730,8 @@ static void update_dma_control(running_machine *machine, int which, int new_cont
 static void drq_callback(running_machine *machine, int which)
 {
     struct dma_state *dma = &i186.dma[which];
-	const address_space *memory_space   = cpu_get_address_space(cputag_get_cpu(machine, MAINCPU_TAG), ADDRESS_SPACE_PROGRAM);
-    const address_space *io_space       = cpu_get_address_space(cputag_get_cpu(machine, MAINCPU_TAG), ADDRESS_SPACE_IO);
+	const address_space *memory_space   = cpu_get_address_space(devtag_get_device(machine, MAINCPU_TAG), ADDRESS_SPACE_PROGRAM);
+    const address_space *io_space       = cpu_get_address_space(devtag_get_device(machine, MAINCPU_TAG), ADDRESS_SPACE_IO);
     
     const address_space *src_space;
     const address_space *dest_space;
@@ -746,7 +746,7 @@ static void drq_callback(running_machine *machine, int which)
     if(!(dma->control & ST_STOP))
     {
         logerror("%05X:ERROR! - drq%d with dma channel stopped\n",
-		   cpu_get_pc(cputag_get_cpu(machine, MAINCPU_TAG)), which);
+		   cpu_get_pc(devtag_get_device(machine, MAINCPU_TAG)), which);
            
         return;
     }
@@ -866,7 +866,7 @@ READ16_HANDLER( i186_internal_port_r )
 		case 0x12:
 			if (LOG_PORTS) logerror("%05X:read 80186 interrupt poll\n", cpu_get_pc(space->cpu));
 			if (i186.intr.poll_status & 0x8000)
-				int_callback(cputag_get_cpu(space->machine, MAINCPU_TAG), 0);
+				int_callback(devtag_get_device(space->machine, MAINCPU_TAG), 0);
 			return i186.intr.poll_status;
 
 		case 0x13:
@@ -1279,7 +1279,7 @@ MACHINE_START( nimbus )
         debug_console_register_command(machine, "nimbus_intmasks", CMDFLAG_NONE, 0, 0, 0, execute_debug_intmasks);
 
         /* set up the instruction hook */
-        debug_cpu_set_instruction_hook(cputag_get_cpu(machine, MAINCPU_TAG), instruction_hook);
+        debug_cpu_set_instruction_hook(devtag_get_device(machine, MAINCPU_TAG), instruction_hook);
      
     }
 }
@@ -1331,7 +1331,7 @@ static int instruction_hook(const device_config *device, offs_t curpc)
     const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
     UINT8               *addr_ptr;
     
-    addr_ptr = memory_get_read_ptr(space,curpc);
+    addr_ptr = (UINT8*)memory_get_read_ptr(space,curpc);
         
     if ((addr_ptr !=NULL) && (addr_ptr[0]==0xCD) && (addr_ptr[1]==0xF0))
         decode_subbios(device,curpc);
@@ -1351,7 +1351,7 @@ static void decode_subbios(const device_config *device,offs_t pc)
     
     void (*dump_dssi)(const device_config *,UINT16, UINT16) = NULL;
 
-    const device_config *cpu = cputag_get_cpu(device->machine,MAINCPU_TAG);
+    const device_config *cpu = devtag_get_device(device->machine,MAINCPU_TAG);
     
     UINT16  ax = cpu_get_reg(cpu,I8086_AX);
     UINT16  bx = cpu_get_reg(cpu,I8086_BX);
@@ -1687,10 +1687,10 @@ static void decode_dssi_f_fill_area(const device_config *device,UINT16  ds, UINT
     t_nimbus_brush  *brush;
     int             cocount;
 
-    area_params = get_dssi_ptr(space,ds,si);
+    area_params = (t_area_params   *)get_dssi_ptr(space,ds,si);
     
     OUTPUT_SEGOFS("SegBrush:OfsBrush",area_params->seg_brush,area_params->ofs_brush);
-    brush=memory_get_read_ptr(space, LINEAR_ADDR(area_params->seg_brush,area_params->ofs_brush));
+    brush=(t_nimbus_brush  *)memory_get_read_ptr(space, LINEAR_ADDR(area_params->seg_brush,area_params->ofs_brush));
     
     logerror("Brush params\n");
     logerror("Style=%04X,          StyleIndex=%04X\n",brush->style,brush->style_index);
@@ -1701,7 +1701,7 @@ static void decode_dssi_f_fill_area(const device_config *device,UINT16  ds, UINT
     
     OUTPUT_SEGOFS("SegData:OfsData",area_params->seg_data,area_params->ofs_data);
     
-    addr_ptr = memory_get_read_ptr(space, LINEAR_ADDR(area_params->seg_data,area_params->ofs_data));
+    addr_ptr = (UINT16 *)memory_get_read_ptr(space, LINEAR_ADDR(area_params->seg_data,area_params->ofs_data));
     for(cocount=0; cocount < area_params->count; cocount++)
     {
         logerror("x=%d y=%d\n",addr_ptr[cocount*2],addr_ptr[(cocount*2)+1]);
@@ -1716,14 +1716,14 @@ static void decode_dssi_f_plot_character_string(const device_config *device,UINT
     t_plot_string_params   *plot_string_params;
     int             charno;
        
-    plot_string_params=get_dssi_ptr(space,ds,si);
+    plot_string_params=(t_plot_string_params   *)get_dssi_ptr(space,ds,si);
     
     OUTPUT_SEGOFS("SegFont:OfsFont",plot_string_params->seg_font,plot_string_params->ofs_font);
     OUTPUT_SEGOFS("SegData:OfsData",plot_string_params->seg_data,plot_string_params->ofs_data);
     
     logerror("x=%d, y=%d, length=%d\n",plot_string_params->x,plot_string_params->y,plot_string_params->length);
     
-    char_ptr=memory_get_read_ptr(space, LINEAR_ADDR(plot_string_params->seg_data,plot_string_params->ofs_data));
+    char_ptr=(UINT8*)memory_get_read_ptr(space, LINEAR_ADDR(plot_string_params->seg_data,plot_string_params->ofs_data));
 
     if (plot_string_params->length==0xFFFF)
         logerror("%s",char_ptr);
@@ -1739,7 +1739,7 @@ static void decode_dssi_f_set_new_clt(const device_config *device,UINT16  ds, UI
     const address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
     UINT16  *new_colours;
     int     colour;
-    new_colours=get_dssi_ptr(space,ds,si);
+    new_colours=(UINT16  *)get_dssi_ptr(space,ds,si);
     
     OUTPUT_SEGOFS("SegColours:OfsColours",ds,si);
     
@@ -1752,7 +1752,7 @@ static void decode_dssi_f_plonk_char(const device_config *device,UINT16  ds, UIN
 {
     const address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
     UINT16  *params;
-    params=get_dssi_ptr(space,ds,si);
+    params=(UINT16  *)get_dssi_ptr(space,ds,si);
     
     OUTPUT_SEGOFS("SegParams:OfsParams",ds,si);
 
@@ -1867,7 +1867,7 @@ Z80SIO, used for the keyboard interface
 
 READ8_DEVICE_HANDLER( sio_r )
 {
-    int pc=cpu_get_pc(cputag_get_cpu(device->machine,MAINCPU_TAG));
+    int pc=cpu_get_pc(devtag_get_device(device->machine,MAINCPU_TAG));
     UINT8 result = 0;
     
 	switch (offset*2)
@@ -1894,7 +1894,7 @@ READ8_DEVICE_HANDLER( sio_r )
 
 WRITE8_DEVICE_HANDLER( sio_w )
 {
-    int pc=cpu_get_pc(cputag_get_cpu(device->machine,MAINCPU_TAG));
+    int pc=cpu_get_pc(devtag_get_device(device->machine,MAINCPU_TAG));
 
     if(LOG_SIO)
         logerror("Nimbus SIOW at %08X write of %02X to %04X\n",pc,data,(offset*2)+0xF0);

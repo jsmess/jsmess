@@ -8,7 +8,7 @@
     Raphael Nabet 2004
 */
 
-#include "cpuintrf.h"
+#include "emu.h"
 #include "debugger.h"
 #include "tx0.h"
 
@@ -108,9 +108,9 @@ static int tx0_read(tx0_state *cpustate, offs_t address)
 	else if ((cpustate->lr_sel >> address) & 1)
 		/* live register (LR) */
 		return LR;
-	else
-		/* toggle switch storage (TSS) */
-		return cpustate->tss[address];
+
+	/* toggle switch storage (TSS) */
+	return cpustate->tss[address];
 }
 
 static void tx0_write(tx0_state *cpustate, offs_t address, int data)
@@ -138,7 +138,7 @@ static void tx0_init_common(const device_config *device, cpu_irq_callback irqcal
 	cpustate->ir_mask = is_64kw ? 03 : 037;
 
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 }
 
 static CPU_INIT( tx0_64kw )

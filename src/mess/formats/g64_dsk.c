@@ -36,7 +36,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "formats/flopimg.h"
 #include "devices/flopdrv.h"
 
@@ -62,7 +62,7 @@ INLINE float get_track_index(int track)
 static struct g64dsk_tag *get_tag(floppy_image *floppy)
 {
 	struct g64dsk_tag *tag;
-	tag = floppy_tag(floppy);
+	tag = (g64dsk_tag *)floppy_tag(floppy);
 	return tag;
 }
 

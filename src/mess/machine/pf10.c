@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "pf10.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/upd765.h"

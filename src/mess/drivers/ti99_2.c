@@ -77,7 +77,7 @@ Also, ti99/2 does not support external instructions better than ti99/4(a).  This
 would just have taken three extra tracks on the main board and a OR gate in an ASIC.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/tms9901.h"
 #include "cpu/tms9900/tms9900.h"
 

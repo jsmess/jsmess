@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/bk.h"
 
 UINT16 *bk0010_video_ram;

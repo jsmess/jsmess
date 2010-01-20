@@ -9,7 +9,7 @@
  *
  ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/pit8253.h"
 #include "includes/mz700.h"
 
@@ -49,7 +49,7 @@ PALETTE_INIT( mz700 )
 VIDEO_UPDATE( mz700 )
 {
 	int offs;
-	mz_state *mz = screen->machine->driver_data;
+	mz_state *mz = (mz_state *)screen->machine->driver_data;
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
@@ -76,13 +76,13 @@ VIDEO_UPDATE( mz700 )
 
 VIDEO_START( mz800 )
 {
-	mz_state *mz = machine->driver_data;
+	mz_state *mz = (mz_state *)machine->driver_data;
 	gfx_element_set_source(machine->gfx[0], mz->cgram);
 }
 
 VIDEO_UPDATE( mz800 )
 {
-	mz_state *mz = screen->machine->driver_data;
+	mz_state *mz = (mz_state *)screen->machine->driver_data;
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
@@ -125,7 +125,7 @@ VIDEO_UPDATE( mz800 )
 
 WRITE8_HANDLER( mz800_cgram_w )
 {
-	mz_state *mz = space->machine->driver_data;
+	mz_state *mz = (mz_state *)space->machine->driver_data;
 	mz->cgram[offset] = data;
 
 	gfx_element_mark_dirty(space->machine->gfx[0], offset/8);

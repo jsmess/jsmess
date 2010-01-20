@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
@@ -160,7 +160,7 @@ static INPUT_PORTS_START( llc1 )
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("=") PORT_CODE(KEYCODE_EQUALS)	// this alone acts like Enter and gives no result with Shift
 INPUT_PORTS_END
 
-INPUT_PORTS_START( k7659 )
+extern INPUT_PORTS_START( k7659 )
 	PORT_START("A1")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)

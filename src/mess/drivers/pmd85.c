@@ -169,7 +169,7 @@ I/O ports
 
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/wave.h"
 #include "devices/cassette.h"
@@ -537,7 +537,7 @@ static const cassette_config pmd85_cassette_config =
 {
 	pmd85_pmd_format,
 	&pmd85_cassette_options,
-	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
 };
 
 

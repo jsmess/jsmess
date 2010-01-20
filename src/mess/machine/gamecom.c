@@ -1,5 +1,5 @@
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/gamecom.h"
 #include "cpu/sm8500/sm8500.h"
 #include "image.h"
@@ -542,14 +542,14 @@ static void gamecom_dma_init(running_machine *machine)
 	case 0x04:
 		/* Extend RAM->VRAM */
 		gamecom_dma.source_width = 64;
-		gamecom_dma.source_bank = memory_get_read_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xE000 );
+		gamecom_dma.source_bank = (UINT8*)memory_get_read_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xE000 );
 		gamecom_dma.dest_bank = &gamecom_vram[(gamecom_internal_registers[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x06:
 		/* VRAM->Extend RAM */
 		gamecom_dma.source_bank = &gamecom_vram[(gamecom_internal_registers[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
 		gamecom_dma.dest_width = 64;
-		gamecom_dma.dest_bank = memory_get_read_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xE000 );
+		gamecom_dma.dest_bank = (UINT8*)memory_get_read_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xE000 );
 		break;
 	}
 	gamecom_dma.source_current = gamecom_dma.source_width * gamecom_dma.source_y;
@@ -693,8 +693,8 @@ void gamecom_update_timers( const device_config *device, int cycles )
 
 DRIVER_INIT( gamecom )
 {
-	gamecom_cpu = cputag_get_cpu(machine, "maincpu");
-	gamecom_iram = devtag_get_info_ptr(machine, "maincpu", CPUINFO_PTR_SM8500_INTERNAL_RAM);
+	gamecom_cpu = devtag_get_device(machine, "maincpu");
+	gamecom_iram = (UINT8*)devtag_get_info_ptr(machine, "maincpu", CPUINFO_PTR_SM8500_INTERNAL_RAM);
 	gamecom_clock_timer = timer_alloc(machine,  gamecom_clock_timer_callback , NULL);
 }
 

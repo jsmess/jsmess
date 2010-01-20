@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i8255a.h"
 #include "machine/terminal.h"

@@ -102,6 +102,7 @@
 
 *****************************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
 #include "hd6309.h"
 
@@ -522,7 +523,7 @@ static CPU_INIT( hd6309 )
 	m68_state->irq_callback = irqcallback;
 	m68_state->device = device;
 
-	m68_state->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m68_state->program = device->space(AS_PROGRAM);
 
 	/* setup regtable */
 
@@ -583,7 +584,7 @@ static void set_irq_line(m68_state_t *m68_state, int irqline, int state)
 	{
 		if (m68_state->nmi_state == state) return;
 		m68_state->nmi_state = state;
-		LOG(("HD6309 '%s' set_irq_line (NMI) %d (PC=%4.4X)\n", m68_state->device->tag, state, pPC.d));
+		LOG(("HD6309 '%s' set_irq_line (NMI) %d (PC=%4.4X)\n", m68_state->device->tag.cstr(), state, pPC.d));
 		if( state == CLEAR_LINE ) return;
 
 		/* if the stack was not yet initialized */
@@ -621,7 +622,7 @@ static void set_irq_line(m68_state_t *m68_state, int irqline, int state)
 	}
 	else if (irqline < 2)
 	{
-		LOG(("HD6309 '%s' set_irq_line %d, %d (PC=%4.4X)\n", m68_state->device->tag, irqline, state, pPC.d));
+		LOG(("HD6309 '%s' set_irq_line %d, %d (PC=%4.4X)\n", m68_state->device->tag.cstr(), irqline, state, pPC.d));
 		m68_state->irq_state[irqline] = state;
 		if (state == CLEAR_LINE) return;
 		check_irq_lines(m68_state);

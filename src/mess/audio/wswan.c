@@ -8,7 +8,7 @@
 
 **************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/wswan.h"
 #include "streams.h"
 

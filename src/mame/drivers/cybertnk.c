@@ -2,8 +2,21 @@
 
 Cyber Tank HW (c) 1987 Coreland Technology
 
-WIP driver by Angelo Salese
+preliminary driver by Angelo Salese
 
+Maybe it has some correlation with WEC Le Mans HW? (supposely that was originally done by Coreland too)
+
+TODO:
+- sprite ram (very likely that it can do zooming);
+- road emulation;
+- tilemap video registers;
+- color banking for the tilemaps;
+- ROM "SS5" is missing? Or it's a sound chip that's labelled SS5?
+- dual screen output.
+
+============================================================================================
+
+(note: the following notes are from "PS")
 - Communications
 Master slave comms looks like shared RAM.
 The slave tests these RAM banks all using the same routine at 0x000006E6
@@ -64,10 +77,6 @@ Unmapped read/write by CPU2 of 0xa005, 0xa006 This looks like loop overrun too,
 or maybe caused by the initial base offset which is the same as the loop increments it.
 Sub at CPU2:01B7, the block process starts at base 8020h and increments by 20h each time.
 It overruns the top of RAM on the last iteration.
-
-TODO:
--Rom "SS5" is missing?Or it's a sound chip that's labelled SS5?
--Paletteram is likely to be buffered,the two banks are really similar.
 
 ============================================================================================
 Cyber Tank
@@ -169,19 +178,17 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 
 *******************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/8950intf.h"
 
 static tilemap_t *tx_tilemap;
-static UINT16 *tx_vram;
-static UINT16 *shared_ram;
+static UINT16 *tx_vram,*bg_vram,*fg_vram,*spr_ram;
 static UINT16 *io_ram;
 
-#define LOG_UNKNOWN_WRITE logerror("unknown io write CPU '%s':%08x  0x%08x 0x%04x & 0x%04x\n", space->cpu->tag, cpu_get_pc(space->cpu), offset*2, data, mem_mask);
-#define IGNORE_MISSING_ROM 1
+#define LOG_UNKNOWN_WRITE logerror("unknown io write CPU '%s':%08x  0x%08x 0x%04x & 0x%04x\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu), offset*2, data, mem_mask);
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
@@ -196,41 +203,234 @@ static TILE_GET_INFO( get_tx_tile_info )
 static VIDEO_START( cybertnk )
 {
 	tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows,8,8,128,32);
+	tilemap_set_transparent_pen(tx_tilemap,0);
 }
 
 static VIDEO_UPDATE( cybertnk )
 {
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+
+	{
+		int count,x,y;
+		const gfx_element *gfx = screen->machine->gfx[2];
+
+		count = 0;
+
+		for (y=0;y<64;y++)
+		{
+			for (x=0;x<128;x++)
+			{
+				UINT16 tile = bg_vram[count] & 0x1fff;
+				UINT16 color = (fg_vram[count] & 0xe000) >> 13;
+
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,color+0x1c0,0,0,x*8,(y*8));
+
+				count++;
+
+			}
+		}
+	}
+
+	{
+		int count,x,y;
+		const gfx_element *gfx = screen->machine->gfx[1];
+
+		count = 0;
+
+		for (y=0;y<64;y++)
+		{
+			for (x=0;x<128;x++)
+			{
+				UINT16 tile = fg_vram[count] & 0x1fff;
+				UINT16 color = (fg_vram[count] & 0xe000) >> 13;
+
+				drawgfx_transpen(bitmap,cliprect,gfx,tile,color+0x1c0,0,0,x*8,(y*8),0);
+
+				count++;
+
+			}
+		}
+	}
+
+	/* non-tile based spriteram (BARE-BONES, looks pretty complex) */
+	if(1)
+	{
+		const UINT8 *blit_ram = memory_region(screen->machine,"spr_gfx");
+		int offs,x,y,z,xsize,ysize,yi,xi,col_bank;
+		UINT32 spr_offs;
+
+		for(offs=0;offs<0x1000/2;offs+=8)
+		{
+			z = (spr_ram[offs+(0x6/2)] & 0xffff);
+			if(z == 0xffff)
+				continue;
+			x = (spr_ram[offs+(0xa/2)] & 0x1ff);
+			y = (spr_ram[offs+(0x4/2)] & 0xff);
+			spr_offs = (((spr_ram[offs+(0x0/2)] & 7) << 16) | (spr_ram[offs+(0x2/2)])) << 2;
+			xsize = ((spr_ram[offs+(0xc/2)] & 0x000f)+1) << 3; //obviously wrong!
+			ysize = (spr_ram[offs+(0x0/2)] & 0x0078) >> 2; //obviously wrong!
+			col_bank = (spr_ram[offs+(0x0/2)] & 0xff00) >> 8;
+
+			for(yi = 0;yi < ysize;yi++)
+			{
+				for(xi=0;xi < xsize;xi+=8)
+				{
+					UINT32 color;
+					UINT16 dot;
+					int shift_pen;
+					int x_dec; //helpers
+
+					color = ((blit_ram[spr_offs+0] & 0xff) << 24);
+					color|= ((blit_ram[spr_offs+1] & 0xff) << 16);
+					color|= ((blit_ram[spr_offs+2] & 0xff) << 8);
+					color|= ((blit_ram[spr_offs+3] & 0xff) << 0);
+
+					shift_pen = 28;
+					x_dec = 0;
+
+					while(x_dec < 4 && x_dec+xi <= xsize)
+					{
+						dot = (color >> shift_pen) & 0xf;
+						if(dot != 0) // transparent pen
+						{
+							dot|= col_bank<<4;
+							if(((x+x_dec+xi) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+								*BITMAP_ADDR16(bitmap, y+yi, x+x_dec+xi) = screen->machine->pens[dot];
+						}
+						shift_pen -= 8;
+						x_dec++;
+					}
+
+					shift_pen = 24;
+					x_dec = 4;
+
+					while(x_dec < 8 && x_dec+xi <= xsize)
+					{
+						dot = (color >> shift_pen) & 0xf;
+						if(dot != 0) // transparent pen
+						{
+							dot|= col_bank<<4;
+							if(((x+x_dec+xi) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+								*BITMAP_ADDR16(bitmap, y+yi, x+x_dec+xi) = screen->machine->pens[dot];
+						}
+						shift_pen -= 8;
+						x_dec++;
+					}
+
+					spr_offs+=4;
+				}
+			}
+		}
+	}
+
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
+
+
+//0x62 0x9a 1c2d0
+//0x62 0x9a 1e1e4
+//0x20 0x9c 2011c
+
+if(0) //sprite gfx debug viewer
+{
+	int x,y,count;
+	static int test_x, test_y, start_offs,color_pen;
+	const UINT8 *blit_ram = memory_region(screen->machine,"spr_gfx");
+
+	if(input_code_pressed(screen->machine, KEYCODE_Z))
+		test_x++;
+
+	if(input_code_pressed(screen->machine, KEYCODE_X))
+		test_x--;
+
+	if(input_code_pressed(screen->machine, KEYCODE_A))
+		test_y++;
+
+	if(input_code_pressed(screen->machine, KEYCODE_S))
+		test_y--;
+
+	if(input_code_pressed(screen->machine, KEYCODE_Q))
+		start_offs+=0x200;
+
+	if(input_code_pressed(screen->machine, KEYCODE_W))
+		start_offs-=0x200;
+
+	if(input_code_pressed_once(screen->machine, KEYCODE_T))
+		start_offs+=0x20000;
+
+	if(input_code_pressed_once(screen->machine, KEYCODE_Y))
+		start_offs-=0x20000;
+
+	if(input_code_pressed(screen->machine, KEYCODE_E))
+		start_offs+=4;
+
+	if(input_code_pressed(screen->machine, KEYCODE_R))
+		start_offs-=4;
+
+	if(input_code_pressed(screen->machine, KEYCODE_D))
+		color_pen++;
+
+	if(input_code_pressed(screen->machine, KEYCODE_F))
+		color_pen--;
+
+	popmessage("%02x %02x %04x %02x",test_x,test_y,start_offs,color_pen);
+
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+
+	count = (start_offs);
+
+	for(y=0;y<test_y;y++)
+	{
+		for(x=0;x<test_x;x+=8)
+		{
+			UINT32 color;
+			UINT8 dot;
+
+			color = ((blit_ram[count+0] & 0xff) << 24);
+			color|= ((blit_ram[count+1] & 0xff) << 16);
+			color|= ((blit_ram[count+2] & 0xff) << 8);
+			color|= ((blit_ram[count+3] & 0xff) << 0);
+
+			dot = (color & 0xf0000000) >> 28;
+			*BITMAP_ADDR16(bitmap, y, x+0) = screen->machine->pens[dot+(color_pen<<4)];
+
+			dot = (color & 0x0f000000) >> 24;
+			*BITMAP_ADDR16(bitmap, y, x+4) = screen->machine->pens[dot+(color_pen<<4)];
+
+			dot = (color & 0x00f00000) >> 20;
+			*BITMAP_ADDR16(bitmap, y, x+1) = screen->machine->pens[dot+(color_pen<<4)];
+
+			dot = (color & 0x000f0000) >> 16;
+			*BITMAP_ADDR16(bitmap, y, x+5) = screen->machine->pens[dot+(color_pen<<4)];
+
+			dot = (color & 0x0000f000) >> 12;
+			*BITMAP_ADDR16(bitmap, y, x+2) = screen->machine->pens[dot+(color_pen<<4)];
+
+			dot = (color & 0x00000f00) >> 8;
+			*BITMAP_ADDR16(bitmap, y, x+6) = screen->machine->pens[dot+(color_pen<<4)];
+
+			dot = (color & 0x000000f0) >> 4;
+			*BITMAP_ADDR16(bitmap, y, x+3) = screen->machine->pens[dot+(color_pen<<4)];
+
+			dot = (color & 0x0000000f) >> 0;
+			*BITMAP_ADDR16(bitmap, y, x+7) = screen->machine->pens[dot+(color_pen<<4)];
+
+			count+=4;
+		}
+	}
+}
+
 	return 0;
 }
 
 static DRIVER_INIT( cybertnk )
 {
-#ifdef IGNORE_MISSING_ROM
-	UINT16 *ROM = (UINT16*)memory_region(machine, "maincpu");
 
-	/* nop the rom checksum branch */
-	ROM[0x1546/2] = 0x4e71;
-	ROM[0x1548/2] = 0x4e71;
-	ROM[0x154a/2] = 0x4e71;
-	ROM[0x154c/2] = 0x4e71;
-#endif
 }
 
 static WRITE16_HANDLER( tx_vram_w )
 {
 	COMBINE_DATA(&tx_vram[offset]);
 	tilemap_mark_tile_dirty(tx_tilemap,offset);
-}
-
-static WRITE16_HANDLER( share_w )
-{
-	COMBINE_DATA(&shared_ram[offset]);
-}
-
-static READ16_HANDLER( share_r )
-{
-	return shared_ram[offset];
 }
 
 static READ16_HANDLER( io_r )
@@ -244,18 +444,18 @@ static READ16_HANDLER( io_r )
 		// 0x001100D5 is controller data
 		// 0x00110004 low is controller data ready
 		case 4/2:
-			switch( (io_ram[7/2]) & 0xff )
+			switch( (io_ram[6/2]) & 0xff )
 			{
 				case 0:
-					io_ram[0xd5/2] = input_port_read(space->machine, "TRAVERSE");
+					io_ram[0xd4/2] = input_port_read(space->machine, "TRAVERSE");
 					break;
 
 				case 0x20:
-					io_ram[0xd5/2] = input_port_read(space->machine, "ELEVATE");
+					io_ram[0xd4/2] = input_port_read(space->machine, "ELEVATE");
 					break;
 
 				case 0x40:
-					io_ram[0xd5/2] = input_port_read(space->machine, "ACCEL");
+					io_ram[0xd4/2] = input_port_read(space->machine, "ACCEL");
 					break;
 
 				case 0x42:
@@ -263,11 +463,11 @@ static READ16_HANDLER( io_r )
 					// controller return value is stored in $42(a6)
 					// but I don't see it referenced again.
 					popmessage("unknown controller device 0x42");
-					io_ram[0xd5/2] = 0;
+					io_ram[0xd4/2] = 0;
 					break;
 
 				case 0x60:
-					io_ram[0xd5/2] = input_port_read(space->machine, "HANDLE");
+					io_ram[0xd4/2] = input_port_read(space->machine, "HANDLE");
 					break;
 
 				default:
@@ -278,13 +478,13 @@ static READ16_HANDLER( io_r )
 		case 6/2:
 			return input_port_read(space->machine, "IN0"); // high half
 
-		case 9/2:
+		case 8/2:
 			return input_port_read(space->machine, "IN0"); // low half
 
-		case 0xb/2:
+		case 0xa/2:
 			return input_port_read(space->machine, "DSW2");
 
-		case 0xd5/2:
+		case 0xd4/2:
 			return io_ram[offset]; // controller data
 
 		default:
@@ -299,9 +499,9 @@ static WRITE16_HANDLER( io_w )
 {
 	COMBINE_DATA(&io_ram[offset]);
 
-	switch( offset*2 )
+	switch( offset )
 	{
-		case 0:
+		case 0/2:
 			// sound data
 			if (ACCESSING_BITS_0_7)
 				cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
@@ -309,36 +509,36 @@ static WRITE16_HANDLER( io_w )
 				LOG_UNKNOWN_WRITE
 			break;
 
-		case 2:
+		case 2/2:
 			if (ACCESSING_BITS_0_7)
 				;//watchdog ? written in similar context to CPU1 @ 0x140002
 			else
 				LOG_UNKNOWN_WRITE
 			break;
 
-		case 6:
+		case 6/2:
 			if (ACCESSING_BITS_0_7)
 				;//select controller device
 			else
 				;//blank inputs
 			break;
 
-		case 8:
+		case 8/2:
 			if (ACCESSING_BITS_8_15)
 				;//blank inputs
 			else
 				LOG_UNKNOWN_WRITE
 			break;
 
-		case 0xc:
-			if (ACCESSING_BITS_0_7)
-				// This seems to only be written after each irq1 and irq2
-				logerror("irq wrote %04x\n", data);
-			else
-				LOG_UNKNOWN_WRITE
+		case 0xc/2:
+			//if (ACCESSING_BITS_0_7)
+				// This seems to only be written after each irq1 and irq2, irq ack?
+				//logerror("irq wrote %04x\n", data);
+			//else
+			//  LOG_UNKNOWN_WRITE
 			break;
 
-		case 0xd4:
+		case 0xd4/2:
 			if ( ACCESSING_BITS_0_7 )
 				;// controller device data
 			else
@@ -349,14 +549,14 @@ static WRITE16_HANDLER( io_w )
 		// Maybe this is for lamps and stuff, or
 		// maybe just debug.
 		// They are all written in a block at 0x00000944
-		case 0x42:
-		case 0x44:
-		case 0x48:
-		case 0x4a:
-		case 0x4c:
-		case 0x80:
-		case 0x82:
-		case 0x84:
+		case 0x42/2:
+		case 0x44/2:
+		case 0x48/2:
+		case 0x4a/2:
+		case 0x4c/2:
+		case 0x80/2:
+		case 0x82/2:
+		case 0x84/2:
 			break;
 
 		default:
@@ -373,10 +573,11 @@ static READ8_HANDLER( soundport_r )
 static ADDRESS_MAP_START( master_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM /*Work RAM*/
-	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM_WRITE(tx_vram_w) AM_BASE(&tx_vram)
-	AM_RANGE(0x0c4000, 0x0cffff) AM_RAM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(share_r, share_w) AM_BASE(&shared_ram)
+	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_BASE(&spr_ram) // non-tile based sprite ram
+	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE(tx_vram_w) AM_BASE(&tx_vram)
+	AM_RANGE(0x0c4000, 0x0c5fff) AM_RAM AM_BASE(&bg_vram)
+	AM_RANGE(0x0c8000, 0x0c9fff) AM_RAM AM_BASE(&fg_vram)
+	AM_RANGE(0x0e0000, 0x0e0fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x110000, 0x1101ff) AM_READWRITE(io_r,io_w) AM_BASE(&io_ram)
 ADDRESS_MAP_END
@@ -385,14 +586,15 @@ static ADDRESS_MAP_START( slave_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM /*Work RAM*/
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(share_r, share_w)
-	AM_RANGE(0x140002, 0x140003) AM_NOP /*Watchdog? Written during loops and interrupts*/
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("sharedram")
+	AM_RANGE(0x140000, 0x140003) AM_NOP /*Watchdog? Written during loops and interrupts*/
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff ) AM_ROM
 	AM_RANGE(0x8000, 0x9fff ) AM_RAM
 	AM_RANGE(0xa001, 0xa001 ) AM_READ(soundport_r)
+	AM_RANGE(0xa005, 0xa006 ) AM_NOP
 	AM_RANGE(0xa000, 0xa001 ) AM_DEVREADWRITE("ym1", y8950_r, y8950_w)
 	AM_RANGE(0xc000, 0xc001 ) AM_DEVREADWRITE("ym2", y8950_r, y8950_w)
 ADDRESS_MAP_END
@@ -514,29 +716,16 @@ static const gfx_layout tile_8x8x4 =
 	8,8,
 	RGN_FRAC(1,4),
     4,
-    { RGN_FRAC(0,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(3,4) },
+    { RGN_FRAC(3,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(0,4) },
     { STEP8(0,1) },
     { STEP8(0,8) },
     8*8
 };
 
-static const gfx_layout tile_16x16x4 =
-{
-	16,16,
-	RGN_FRAC(1,4),
-    4,
-    { RGN_FRAC(0,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(3,4) },
-    { STEP16(0,1) },
-    { STEP16(0,16) },
-    32*8
-};
-
 static GFXDECODE_START( cybertnk )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8x4,     0x1400, 16 ) /*Pal offset???*/
 	GFXDECODE_ENTRY( "gfx2", 0, tile_8x8x4,     0,      0x400 )
-	GFXDECODE_ENTRY( "gfx2", 0, tile_16x16x4,   0,      0x400 )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_8x8x4,     0,      0x400 )
-	GFXDECODE_ENTRY( "gfx3", 0, tile_16x16x4,   0,      0x400 )
 GFXDECODE_END
 
 static INTERRUPT_GEN( master_irq )
@@ -581,7 +770,7 @@ static MACHINE_DRIVER_START( cybertnk )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 32*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 
 	MDRV_GFXDECODE(cybertnk)
 	MDRV_PALETTE_LENGTH(0x4000)
@@ -611,8 +800,8 @@ MACHINE_DRIVER_END
 
 ROM_START( cybertnk )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "p1a",   0x00000, 0x20000, BAD_DUMP CRC(de7ff83a) SHA1(64a34443b532db24ec2c86f0e288eaf12a2212af) )
-	ROM_LOAD16_BYTE( "p2a",   0x00001, 0x20000, BAD_DUMP CRC(9b6afa26) SHA1(387a6eb6e5da9752869fcc6433cc7516a28d6d30) )
+	ROM_LOAD16_BYTE( "p1a.37",   0x00000, 0x20000, CRC(be1abd16) SHA1(6ad01516301b44899971000c36f7e21070c3d2da) )
+	ROM_LOAD16_BYTE( "p2a.36",   0x00001, 0x20000, CRC(5290c89a) SHA1(5a11671505214c20770e2938dab1ee82a030b457) )
 
 	ROM_REGION( 0x20000, "slave", 0 )
 	ROM_LOAD16_BYTE( "subl",   0x00000, 0x10000, CRC(3814a2eb) SHA1(252800b21f5cfada34ef5208cda33088daab132b) )
@@ -621,19 +810,15 @@ ROM_START( cybertnk )
 	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "ss1",    0x0000, 0x8000, CRC(c3ba160b) SHA1(cfbfcad443ff83cd4e707f045a650417aca03d85) )
 
-	ROM_REGION( 0x80000, "ym1", 0 )
+	ROM_REGION( 0x80000, "ym1", ROMREGION_ERASEFF )
 	ROM_LOAD( "ss2",    0x00000, 0x20000, CRC(da4b8733) SHA1(177372a53fd49629d1cda83bdd324ee90fbcdbb5) )
 	/*The following two are identical*/
 	ROM_LOAD( "ss3",    0x20000, 0x20000, CRC(cecdea53) SHA1(7e6a6499cab4720f4b6d6d8988bb9dd5766511ab) )
 	ROM_LOAD( "ss4",    0x40000, 0x20000, CRC(cecdea53) SHA1(7e6a6499cab4720f4b6d6d8988bb9dd5766511ab) )
 	//ss5?
 
-	ROM_REGION( 0x80000, "ym2", 0 )
-	ROM_LOAD( "ss2",    0x00000, 0x20000, CRC(da4b8733) SHA1(177372a53fd49629d1cda83bdd324ee90fbcdbb5) )
-	/*The following two are identical*/
-	ROM_LOAD( "ss3",    0x20000, 0x20000, CRC(cecdea53) SHA1(7e6a6499cab4720f4b6d6d8988bb9dd5766511ab) )
-	ROM_LOAD( "ss4",    0x40000, 0x20000, CRC(cecdea53) SHA1(7e6a6499cab4720f4b6d6d8988bb9dd5766511ab) )
-	//ss5?
+	ROM_REGION( 0x80000, "ym2", ROMREGION_ERASEFF )
+	ROM_COPY( "ym1", 0x00000, 0x00000, 0x60000 )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD( "s09", 0x00000, 0x10000, CRC(69e6470c) SHA1(8e7db6988366cae714fff72449623a7977af1db1) )
@@ -653,29 +838,30 @@ ROM_START( cybertnk )
 	ROM_LOAD( "s07", 0x20000, 0x10000, CRC(70220567) SHA1(44b48ded8581a6d78b27a3af833f62413ff31c76) )
 	ROM_LOAD( "s08", 0x30000, 0x10000, CRC(988c4fcb) SHA1(68d32be70605ad5415f2b6aeabbd92e269f0c9af) )
 
-	/*The following ROM regions aren't checked yet*/
-	ROM_REGION( 0x200000, "user1", 0 )
-	ROM_LOAD( "c01" , 0x000000, 0x20000, CRC(f7021069) SHA1(67835750f39effd362ccaee381765afce8fa16b2) )
-	ROM_LOAD( "c02" , 0x020000, 0x20000, CRC(665e193c) SHA1(12c116da0a2d4e881d8598727ff63299fb98c6d2) )
-	ROM_LOAD( "c03" , 0x040000, 0x20000, CRC(f230d700) SHA1(60fdba4b0fe4df5507e999bed917da93c6cd9a9c) )
-	ROM_LOAD( "c04" , 0x060000, 0x20000, CRC(999fd57d) SHA1(3e8b8dac595555419831784a27f95420e10b58bd) )
-	ROM_LOAD( "c05" , 0x080000, 0x20000, CRC(9bafb49c) SHA1(6deddbaa44c8e11e0ac73a5330935a9a260b5d43) )
-	ROM_LOAD( "c06" , 0x0a0000, 0x20000, CRC(e60de7a2) SHA1(9daa820eefddf079e3940341acc316b1f19ba7ed) )
-	ROM_LOAD( "c07" , 0x0c0000, 0x20000, CRC(e7cf992a) SHA1(610b2c78a16d8a9d420b1513e2dcfa693f1d8b42) )
-	ROM_LOAD( "c08" , 0x0e0000, 0x20000, CRC(ce0343b9) SHA1(ef511a04709c49250b32c5b47a6f5024af8acc5b) )
-	ROM_LOAD( "c09" , 0x100000, 0x20000, CRC(63a443d1) SHA1(9c0fdca3f8e65dc984ec3c089b379c5a61066630) )
-	ROM_LOAD( "c10" , 0x120000, 0x20000, CRC(01331635) SHA1(8af7fbe2609b6d96bcd63d884cf92095593130ff) )
-	ROM_LOAD( "c11" , 0x140000, 0x20000, CRC(d46ccfa3) SHA1(c872bc5a25f0b574cb2f9d3b1dff36c3eff751b4) )
-	ROM_LOAD( "c12" , 0x160000, 0x20000, CRC(c3c39c4a) SHA1(93f3572dd62ef7a92044345249efb0d9ec99bdf9) )
-	ROM_LOAD( "c13" , 0x180000, 0x20000, CRC(0f366b92) SHA1(2361ac9b1309d5fbd1dec93ca5aecdf45deaeaed) )
-	ROM_LOAD( "c14" , 0x1a0000, 0x20000, CRC(406d5a0d) SHA1(51e4e85d9c63ef687671fbb213b14d66930070ce) )
-	ROM_LOAD( "c15" , 0x1c0000, 0x20000, CRC(ad681c70) SHA1(84c6589464103091b39f1ccdbfed10bf538452f3) )
-	ROM_LOAD( "c16" , 0x1e0000, 0x20000, CRC(1f44dbb6) SHA1(ea1368d6367a2de6d5e6764f8ab705b182d6d276) )
+	/* TODO: fix the rom loading accordingly*/
+	ROM_REGION( 0x200000, "spr_gfx", 0 )
+	ROM_LOAD32_BYTE( "c01.93" , 0x180001, 0x20000, CRC(b5ee3de2) SHA1(77b9a2818f36826891e510e8550f1025bacfa496) )
+	ROM_LOAD32_BYTE( "c02.92" , 0x180000, 0x20000, CRC(1f857d79) SHA1(f410d50970c10814b80baab27cbe69965bf0ccc0) )
+	ROM_LOAD32_BYTE( "c03.91" , 0x180003, 0x20000, CRC(d70a93e2) SHA1(e64bb10c58b27def4882f3006784be56de11b812) )
+	ROM_LOAD32_BYTE( "c04.90" , 0x180002, 0x20000, CRC(04d6fdc2) SHA1(56f8091c1a010014e951f5f47084e1400006123e) )
+	ROM_LOAD32_BYTE( "c05.102", 0x100001, 0x20000, CRC(3f537490) SHA1(12d6545d29dda9f88019040fa33c73a22a2a213b) )
+	ROM_LOAD32_BYTE( "c06.101", 0x100000, 0x20000, CRC(ff69c6a4) SHA1(badd20d26ba771780aebf733e1fbd1d37aa66f9b) )
+	ROM_LOAD32_BYTE( "c07.100", 0x100003, 0x20000, CRC(5e8eba75) SHA1(6d0c1916517802acf808c8edc8e0b6074bdc90be) )
+	ROM_LOAD32_BYTE( "c08.98" , 0x100002, 0x20000, CRC(f0820ddd) SHA1(7fb6c7d66ff96148f14921bc8d0cc0c65ffce4c4) )
+	ROM_LOAD32_BYTE( "c09.109", 0x080001, 0x20000, CRC(080f87c3) SHA1(aedebc22ff03d4cc710e71ca14e09c7808f59c72) ) //correct
+	ROM_LOAD32_BYTE( "c10.108", 0x080000, 0x20000, CRC(777c6a62) SHA1(4684d1c5d88b37ecb20002b7aa4814bf566e7d4b) )
+	ROM_LOAD32_BYTE( "c11.107", 0x080003, 0x20000, CRC(330ca5a1) SHA1(4409da231a5abcec8c7d2d66eefdfd2019a322db) )
+	ROM_LOAD32_BYTE( "c12.106", 0x080002, 0x20000, CRC(c1ec8e61) SHA1(09f2f4ddc100e5675c9bd82c200718fb0b69655e) )
+	ROM_LOAD32_BYTE( "c13.119", 0x000001, 0x20000, CRC(4e22a7e0) SHA1(69cc7dd528b8af0c28b448285768a3ed079099ba) )
+	ROM_LOAD32_BYTE( "c14.118", 0x000000, 0x20000, CRC(bdbd6232) SHA1(94b0741d5eced558723dda32a89aa2b747cdcbbd) )
+	ROM_LOAD32_BYTE( "c15.117", 0x000003, 0x20000, CRC(f163d768) SHA1(e54e31a6f956f7de52b59bcdd0cd4ac1662b5664) )
+	ROM_LOAD32_BYTE( "c16.116", 0x000002, 0x20000, CRC(5e5017c4) SHA1(586cd729630f00cbaf10d1036edebed1672bc532) )
 
-	ROM_REGION( 0x200000, "user2", 0 )
+	ROM_REGION( 0x200000, "road_data", 0 )
 	ROM_LOAD16_BYTE( "road_chl" , 0x000000, 0x20000, CRC(862b109c) SHA1(9f81918362218ddc0a6bf0a5317c5150e514b699) )
 	ROM_LOAD16_BYTE( "road_chh" , 0x000001, 0x20000, CRC(9dedc988) SHA1(10bae1be0e35320872d4994f7e882cd1de988c90) )
 
+	/*The following ROM regions aren't checked yet*/
 	ROM_REGION( 0x30000, "user3", 0 )
 	ROM_LOAD( "t1",   0x00000, 0x08000, CRC(24890512) SHA1(2a6c9d39ca0c1c8316e85d9f565f6b3922d596b2) )
 	ROM_LOAD( "t2",   0x08000, 0x08000, CRC(5a10480d) SHA1(f17598442091dae14abe3505957d94793f3ed886))
@@ -694,4 +880,4 @@ ROM_START( cybertnk )
 	ROM_LOAD( "ic30", 0x0260, 0x0020, CRC(2bb6033f) SHA1(eb994108734d7d04f8e293eca21bb3051a63cfe9) )
 ROM_END
 
-GAME( 1990, cybertnk,  0,       cybertnk,  cybertnk,  cybertnk, ROT0, "Coreland", "Cyber Tank (v1.04)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1988, cybertnk,  0,       cybertnk,  cybertnk,  cybertnk, ROT0, "Coreland", "Cyber Tank (v1.04)", GAME_NO_SOUND|GAME_NOT_WORKING )

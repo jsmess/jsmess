@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i86/i86.h"
 
 static ADDRESS_MAP_START(dms5000_mem, ADDRESS_SPACE_PROGRAM, 16)

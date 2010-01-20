@@ -9,7 +9,7 @@
 #ifndef APPLDRIV_H
 #define APPLDRIV_H
 
-#include "mame.h"
+#include "emu.h"
 
 void apple525_set_lines(const device_config *device,UINT8 lines);
 void apple525_set_enable_lines(const device_config *device,int enable_mask);

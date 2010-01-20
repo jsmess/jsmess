@@ -219,7 +219,7 @@ collisions, one is for sprite/sprite collisions.
     02D0 - 02FF RAM (not used by UVI, can be used by CPU)
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/arcadia.h"
 
 static const UINT8 chars[0x40][8]={

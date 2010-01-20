@@ -95,9 +95,9 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
 #include "adsp2100.h"
-#include <stddef.h>
 
 
 /***************************************************************************
@@ -706,9 +706,9 @@ static adsp2100_state *adsp21xx_init(const device_config *device, cpu_irq_callba
 
 	/* fetch device parameters */
 	adsp->device = device;
-	adsp->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	adsp->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
-	adsp->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	adsp->program = device->space(AS_PROGRAM);
+	adsp->data = device->space(AS_DATA);
+	adsp->io = device->space(AS_IO);
 
 	/* copy function pointers from the config */
 	if (config != NULL)
@@ -924,11 +924,11 @@ static int create_tables(void)
 
 	/* allocate the tables */
 	if (!reverse_table)
-		reverse_table = (UINT16 *)malloc(0x4000 * sizeof(UINT16));
+		reverse_table = global_alloc_array(UINT16, 0x4000);
 	if (!mask_table)
-		mask_table = (UINT16 *)malloc(0x4000 * sizeof(UINT16));
+		mask_table = global_alloc_array(UINT16, 0x4000);
 	if (!condition_table)
-		condition_table = (UINT8 *)malloc(0x1000 * sizeof(UINT8));
+		condition_table = global_alloc_array(UINT8, 0x1000);
 
 	/* handle errors */
 	if (reverse_table == NULL || mask_table == NULL || condition_table == NULL)
@@ -1010,15 +1010,15 @@ static int create_tables(void)
 static CPU_EXIT( adsp21xx )
 {
 	if (reverse_table != NULL)
-		free(reverse_table);
+		global_free(reverse_table);
 	reverse_table = NULL;
 
 	if (mask_table != NULL)
-		free(mask_table);
+		global_free(mask_table);
 	mask_table = NULL;
 
 	if (condition_table != NULL)
-		free(condition_table);
+		global_free(condition_table);
 	condition_table = NULL;
 
 #if TRACK_HOTSPOTS

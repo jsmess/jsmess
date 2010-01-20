@@ -62,7 +62,7 @@
 */
 
 /* Core includes */
-#include "driver.h"
+#include "emu.h"
 #include "includes/abc80x.h"
 
 /* Components */
@@ -209,7 +209,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_tick )
 
 static void abc800_bankswitch(running_machine *machine)
 {
-	abc800_state *state = machine->driver_data;
+	abc800_state *state = (abc800_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	if (state->fetch_charram)
@@ -226,7 +226,7 @@ static void abc800_bankswitch(running_machine *machine)
 
 static void abc802_bankswitch(running_machine *machine)
 {
-	abc802_state *state = machine->driver_data;
+	abc802_state *state = (abc802_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	if (state->lrs)
@@ -246,7 +246,7 @@ static void abc802_bankswitch(running_machine *machine)
 
 static void abc806_bankswitch(running_machine *machine)
 {
-	abc806_state *state = machine->driver_data;
+	abc806_state *state = (abc806_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT32 videoram_mask = messram_get_size(devtag_get_device(machine, "messram")) - (32 * 1024) - 1;
 	int bank;
@@ -377,7 +377,7 @@ static void abc806_bankswitch(running_machine *machine)
 
 static READ8_HANDLER( abc806_mai_r )
 {
-	abc806_state *state = space->machine->driver_data;
+	abc806_state *state = (abc806_state *)space->machine->driver_data;
 
 	int bank = offset >> 12;
 
@@ -401,7 +401,7 @@ static WRITE8_HANDLER( abc806_mao_w )
 
     */
 
-	abc806_state *state = space->machine->driver_data;
+	abc806_state *state = (abc806_state *)space->machine->driver_data;
 
 	int bank = offset >> 12;
 
@@ -453,7 +453,7 @@ static WRITE8_DEVICE_HANDLER( sio2_w )
 static READ8_HANDLER( abc800_pling_r )
 {
 	const device_config *discrete = devtag_get_device(space->machine, "discrete");
-	abc800_state *state = space->machine->driver_data;
+	abc800_state *state = (abc800_state *)space->machine->driver_data;
 
 	state->pling = !state->pling;
 
@@ -465,7 +465,7 @@ static READ8_HANDLER( abc800_pling_r )
 static READ8_HANDLER( abc802_pling_r )
 {
 	const device_config *discrete = devtag_get_device(space->machine, "discrete");
-	abc802_state *state = space->machine->driver_data;
+	abc802_state *state = (abc802_state *)space->machine->driver_data;
 
 	state->pling = !state->pling;
 
@@ -867,7 +867,7 @@ static Z80DART_INTERFACE( abc800_dart_intf )
 
 static WRITE_LINE_DEVICE_HANDLER( abc802_dart_dtrb_r )
 {
-	abc802_state *driver_state = device->machine->driver_data;
+	abc802_state *driver_state = (abc802_state *)device->machine->driver_data;
 
 	/* low RAM select */
 	driver_state->lrs = state;
@@ -877,7 +877,7 @@ static WRITE_LINE_DEVICE_HANDLER( abc802_dart_dtrb_r )
 
 static WRITE_LINE_DEVICE_HANDLER( abc802_dart_rtsb_r )
 {
-	abc802_state *driver_state = device->machine->driver_data;
+	abc802_state *driver_state = (abc802_state *)device->machine->driver_data;
 
 	/* _MUX 80/40 */
 	driver_state->mux80_40 = state;
@@ -906,7 +906,7 @@ static Z80DART_INTERFACE( abc802_dart_intf )
 
 static WRITE_LINE_DEVICE_HANDLER( abc806_dart_dtrb_w )
 {
-	abc806_state *driver_state = device->machine->driver_data;
+	abc806_state *driver_state = (abc806_state *)device->machine->driver_data;
 
 	driver_state->keydtr = state;
 
@@ -962,7 +962,7 @@ static ABCBUS_CONFIG( abc802_abcbus_config )
 
 static MACHINE_START( abc800 )
 {
-	abc800_state *state = machine->driver_data;
+	abc800_state *state = (abc800_state *)machine->driver_data;
 
 	/* find devices */
 	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
@@ -981,7 +981,7 @@ static MACHINE_START( abc800 )
 
 static MACHINE_RESET( abc800 )
 {
-	abc800_state *state = machine->driver_data;
+	abc800_state *state = (abc800_state *)machine->driver_data;
 
 	state->fetch_charram = 0;
 	abc800_bankswitch(machine);
@@ -989,7 +989,7 @@ static MACHINE_RESET( abc800 )
 
 static MACHINE_START( abc802 )
 {
-	abc802_state *state = machine->driver_data;
+	abc802_state *state = (abc802_state *)machine->driver_data;
 
 	/* find devices */
 	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
@@ -1012,7 +1012,7 @@ static MACHINE_START( abc802 )
 
 static MACHINE_RESET( abc802 )
 {
-	abc802_state *state = machine->driver_data;
+	abc802_state *state = (abc802_state *)machine->driver_data;
 
 	UINT8 config = input_port_read(machine, "CONFIG");
 
@@ -1034,7 +1034,7 @@ static MACHINE_RESET( abc802 )
 
 static MACHINE_START( abc806 )
 {
-	abc806_state *state = machine->driver_data;
+	abc806_state *state = (abc806_state *)machine->driver_data;
 
 	UINT8 *mem = memory_region(machine, Z80_TAG);
 	UINT32 videoram_size = messram_get_size(devtag_get_device(machine, "messram")) - (32 * 1024);
@@ -1072,7 +1072,7 @@ static MACHINE_START( abc806 )
 
 static MACHINE_RESET( abc806 )
 {
-	abc806_state *state = machine->driver_data;
+	abc806_state *state = (abc806_state *)machine->driver_data;
 
 	/* setup memory banking */
 	int bank;
@@ -1416,7 +1416,7 @@ ROM_END
 
 static DIRECT_UPDATE_HANDLER( abc800_direct_update_handler )
 {
-	abc800_state *state = space->machine->driver_data;
+	abc800_state *state = (abc800_state *)space->machine->driver_data;
 
 	if (address >= 0x7800 && address < 0x8000)
 	{
@@ -1442,7 +1442,7 @@ static DIRECT_UPDATE_HANDLER( abc800_direct_update_handler )
 
 static DIRECT_UPDATE_HANDLER( abc802_direct_update_handler )
 {
-	abc802_state *state = space->machine->driver_data;
+	abc802_state *state = (abc802_state *)space->machine->driver_data;
 
 	if (state->lrs)
 	{
@@ -1463,7 +1463,7 @@ static DIRECT_UPDATE_HANDLER( abc802_direct_update_handler )
 
 static DIRECT_UPDATE_HANDLER( abc806_direct_update_handler )
 {
-	abc806_state *state = space->machine->driver_data;
+	abc806_state *state = (abc806_state *)space->machine->driver_data;
 
 	if (address >= 0x7800 && address < 0x8000)
 	{

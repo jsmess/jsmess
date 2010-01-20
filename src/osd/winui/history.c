@@ -24,7 +24,7 @@
 #include <stdio.h>
 
 // MAME/MAMEUI headers
-#include "driver.h"
+#include "emu.h"
 #include "mui_util.h"
 #include "datafile.h"
 #include "history.h"

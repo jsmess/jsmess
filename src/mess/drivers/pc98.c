@@ -223,7 +223,7 @@
 
 ***************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/i8255a.h"
 #include "machine/pit8253.h"
@@ -649,12 +649,12 @@ static MACHINE_RESET(pc9801)
 {
 	UINT8 *ROM = memory_region(machine, "cpudata");
 
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
 
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, 0);
 
 	gate_a20 = 0;
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), I386_EIP, 0xffff0+0x10000);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), I386_EIP, 0xffff0+0x10000);
 
 	memory_set_bankptr(machine, "bank1", &ROM[0x20000]);
 
@@ -665,12 +665,12 @@ static MACHINE_RESET(pc9801)
 static MACHINE_RESET(pc9821)
 {
 	UINT8 *ROM = memory_region(machine, "cpudata");
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
 
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, 0);
 
 	gate_a20 = 0;
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), I386_EIP, 0xffff0+0x10000);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), I386_EIP, 0xffff0+0x10000);
 
 	memory_set_bankptr(machine, "bank1", &ROM[0x20000]);
 

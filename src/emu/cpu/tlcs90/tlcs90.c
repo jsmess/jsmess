@@ -6,8 +6,8 @@
 
 *************************************************************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
-#include "cpuexec.h"
 #include "tlcs90.h"
 
 typedef enum					{	UNKNOWN,	NOP,	EX,		EXX,	LD,		LDW,	LDA,	LDI,	LDIR,	LDD,	LDDR,	CPI,	CPIR,	CPD,	CPDR,	PUSH,	POP,	JP,		JR,		CALL,	CALLR,		RET,	RETI,	HALT,	DI,		EI,		SWI,	DAA,	CPL,	NEG,	LDAR,	RCF,	SCF,	CCF,	TSET,	BIT,	SET,	RES,	INC,	DEC,	INCX,	DECX,	INCW,	DECW,	ADD,	ADC,	SUB,	SBC,	AND,	XOR,	OR,		CP,		RLC,	RRC,	RL,		RR,		SLA,	SRA,	SLL,	SRL,	RLD,	RRD,	DJNZ,	MUL,	DIV		}	_e_op;
@@ -1132,6 +1132,7 @@ INLINE UINT8 Read##N##_8(t90_Regs *cpustate)	{ \
 INLINE UINT16 Read##N##_16(t90_Regs *cpustate)	{ \
 	switch ( cpustate->mode##N )	{ \
 		case MODE_I16:		return cpustate->r##N; \
+		case MODE_D16:		return cpustate->r##N - 1; \
 		case MODE_R16:		return r16(cpustate, cpustate->r##N); \
 		case MODE_R16D8:	return r16(cpustate, cpustate->r##N) + (INT8)cpustate->r##N##b; \
 		case MODE_R16R8:	return r16(cpustate, cpustate->r##N) + (INT8)r8(cpustate, cpustate->r##N##b); \
@@ -2669,8 +2670,8 @@ static CPU_INIT( t90 )
 	memset(cpustate, 0, sizeof(t90_Regs));
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->timer_period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(device)), 8);
 

@@ -207,7 +207,7 @@ typedef struct
 
 	int fifo_a_ptr, fifo_b_ptr, fifo_a_in, fifo_b_in;
 	UINT8 fifo_a[20], fifo_b[20];
-} gba_state;
+} gba_state_t;
 
 /*----------- defined in video/gba.c -----------*/
 

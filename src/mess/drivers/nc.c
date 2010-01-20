@@ -93,7 +93,8 @@
 
  ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "cpu/z80/z80.h"
 #include "includes/nc.h"
 #include "machine/serial.h"	/* for serial data transfers */
@@ -1456,7 +1457,7 @@ static WRITE8_HANDLER(nc200_uart_control_w)
 	}
 
 	/* bit 5 is used in disk interface */
-	LOG_DEBUG(("bit 5: PC: %04x %02x\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), data & (1 << 5)));
+	LOG_DEBUG(("bit 5: PC: %04x %02x\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), data & (1 << 5)));
 }
 
 
@@ -1475,7 +1476,7 @@ static WRITE8_HANDLER(nc200_uart_control_w)
 static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
 {
 	const device_config *fdc = devtag_get_device(space->machine, "upd765");
-	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), data));
+	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), data));
 #if 0
 	floppy_drive_set_motor_state(0, 1);
 	floppy_drive_set_ready_state(0, 1, 1);
@@ -1488,7 +1489,7 @@ static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
 /* bit 0 seems to be the same as nc100 */
 static WRITE8_HANDLER(nc200_poweroff_control_w)
 {
-	LOG_DEBUG(("nc200 power off: PC: %04x %02x\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), data));
+	LOG_DEBUG(("nc200 power off: PC: %04x %02x\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), data));
 
 	nc200_video_set_backlight(((data ^ (1 << 2)) >> 2) & 0x01);
 }

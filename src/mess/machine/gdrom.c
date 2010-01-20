@@ -4,10 +4,10 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "machine/scsidev.h"
 #include "cdrom.h"
 #include "sound/cdda.h"
-#include "state.h"
 #ifdef MESS
 #include "devices/chd_cd.h"
 #endif

@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "cpu/sc61860/sc61860.h"
 
 #include "includes/pocketc.h"
@@ -92,7 +92,7 @@ int pc1251_reset(const device_config *device)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1251 )
 {
-	const device_config *main_cpu = cputag_get_cpu(machine, "maincpu");
+	const device_config *main_cpu = devtag_get_device(machine, "maincpu");
 	UINT8 *ram = memory_region(machine, "maincpu") + 0x8000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 

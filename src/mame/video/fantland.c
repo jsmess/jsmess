@@ -58,7 +58,8 @@
 
 ***************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
+#include "includes/fantland.h"
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {

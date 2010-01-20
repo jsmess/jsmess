@@ -20,7 +20,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/a7800.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/tiasound.h"

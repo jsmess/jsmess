@@ -9,7 +9,8 @@
 #include <stdio.h>
 #include <ctype.h>
 
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "messram.h"
 
 
@@ -120,10 +121,10 @@ const char *messram_string(char *buffer, UINT32 ram)
 static DEVICE_START( messram )
 {
 	messram_state *messram = get_safe_token(device);
-	ram_config *config = device->inline_config;
+	ram_config *config = (ram_config *)device->inline_config;
 
 	/* the device named 'messram' can get ram options from command line */
-	if (strcmp(device->tag, "messram") == 0)
+	if (strcmp(device->tag.cstr(), "messram") == 0)
 	{
 		const char *ramsize_string = options_get_string(mame_options(), OPTION_RAMSIZE);
 
@@ -148,7 +149,7 @@ static DEVICE_START( messram )
 
 static DEVICE_VALIDITY_CHECK( messram )
 {
-	ram_config *config = device->inline_config;
+	ram_config *config = (ram_config *)device->inline_config;
 	const char *ramsize_string = NULL;
 	int is_valid = FALSE;
 	UINT32 specified_ram = 0;
@@ -163,7 +164,7 @@ static DEVICE_VALIDITY_CHECK( messram )
 	}
 
 	/* command line options are only parsed for the device named "messram" */
-	if (device->tag!=NULL && strcmp(device->tag, "messram") == 0)
+	if (device->tag!=NULL && strcmp(device->tag.cstr(), "messram") == 0)
 	{
 		if (mame_options()==NULL) return FALSE;
 		/* verify command line ram option */

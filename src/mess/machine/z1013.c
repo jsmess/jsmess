@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/z1013.h"
 #include "cpu/z80/z80.h"
 
@@ -34,7 +34,7 @@ DRIVER_INIT(z1013)
 
 MACHINE_RESET( z1013 )
 {
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC, 0xF000);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_PC, 0xF000);
 	z1013_keyboard_part = 0;
 	z1013_keyboard_line = 0;
 }
@@ -104,7 +104,7 @@ SNAPSHOT_LOAD( z1013 )
 	memcpy (memory_get_read_ptr(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM),  startaddr ),
 		 data+0x20, endaddr - startaddr + 1);
 
-	cpu_set_reg(cputag_get_cpu(image->machine, "maincpu"), Z80_PC, runaddr);
+	cpu_set_reg(devtag_get_device(image->machine, "maincpu"), Z80_PC, runaddr);
 
 	return INIT_PASS;
 }

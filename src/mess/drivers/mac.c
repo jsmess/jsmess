@@ -37,7 +37,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "includes/mac.h"
@@ -74,9 +74,9 @@
 
 static READ8_HANDLER(mac_asc_r)
 {
-	mac_state *mac = space->machine->driver_data;
+	mac_state *mac = (mac_state *)space->machine->driver_data;
 
-//	logerror("ASC: Read @ %x (PC %x)\n", offset, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")));
+//	logerror("ASC: Read @ %x (PC %x)\n", offset, cpu_get_pc(devtag_get_device(space->machine, "maincpu")));
 
 	switch (offset)
 	{
@@ -95,9 +95,9 @@ static WRITE8_HANDLER(mac_asc_w)
 {
 	static const device_config *dacs[2];
 	INT32 i;
-	mac_state *mac = space->machine->driver_data;
+	mac_state *mac = (mac_state *)space->machine->driver_data;
 
-//	logerror("ASC: %02x to %x (PC %x)\n", data, offset, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")));
+//	logerror("ASC: %02x to %x (PC %x)\n", data, offset, cpu_get_pc(devtag_get_device(space->machine, "maincpu")));
 
 	mac->mac_asc_regs[offset] = data;
 

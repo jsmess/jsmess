@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/c80.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -96,7 +96,7 @@ static READ8_DEVICE_HANDLER( pio1_port_a_r )
 
     */
 
-	c80_state *state = device->machine->driver_data;
+	c80_state *state = (c80_state *)device->machine->driver_data;
 
 	UINT8 data = !state->pio1_brdy << 4 | 0x07;
 
@@ -134,7 +134,7 @@ static WRITE8_DEVICE_HANDLER( pio1_port_a_w )
 
     */
 
-	c80_state *state = device->machine->driver_data;
+	c80_state *state = (c80_state *)device->machine->driver_data;
 
 	state->pio1_a5 = BIT(data, 5);
 
@@ -163,7 +163,7 @@ static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
 
     */
 
-	c80_state *state = device->machine->driver_data;
+	c80_state *state = (c80_state *)device->machine->driver_data;
 
 	if (!state->pio1_a5)
 	{
@@ -175,7 +175,7 @@ static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pio1_brdy_w )
 {
-	c80_state *driver_state = device->machine->driver_data;
+	c80_state *driver_state = (c80_state *)device->machine->driver_data;
 
 	driver_state->pio1_brdy = state;
 
@@ -226,7 +226,7 @@ static const z80_daisy_chain c80_daisy_chain[] =
 
 static MACHINE_START( c80 )
 {
-	c80_state *state = machine->driver_data;
+	c80_state *state = (c80_state *)machine->driver_data;
 
 	/* find devices */
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
@@ -244,7 +244,7 @@ static const cassette_config c80_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 };
 
 static MACHINE_DRIVER_START( c80 )

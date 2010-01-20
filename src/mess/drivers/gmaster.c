@@ -2,7 +2,7 @@
  PeT mess@utanet.at march 2002
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 //#include "vidhrdw/generic.h"
 #include "cpu/upd7810/upd7810.h"
 #include "devices/cartslot.h"

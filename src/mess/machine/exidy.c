@@ -4,7 +4,7 @@
 
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/wave.h"
@@ -386,12 +386,12 @@ Z80BIN_EXECUTE( exidy )
 		if ((execute_address != 0xc858) && autorun)
 			memory_write_word_16le(space, 0xf028, execute_address);
 
-		cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, 0xf01f);
+		cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENPC, 0xf01f);
 	}
 	else
 	{
 		if (autorun)
-			cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, execute_address);
+			cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENPC, execute_address);
 	}
 }
 
@@ -402,7 +402,7 @@ Z80BIN_EXECUTE( exidy )
 SNAPSHOT_LOAD(exidy)
 {
 	UINT8 *ptr = memory_region(image->machine, "maincpu");
-	const device_config *cpu = cputag_get_cpu(image->machine, "maincpu");
+	const device_config *cpu = devtag_get_device(image->machine, "maincpu");
 	UINT8 header[28];
 
 	/* check size */

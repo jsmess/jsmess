@@ -81,7 +81,7 @@ This signal also defails the character display period.
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "saa505x.h"
 
 

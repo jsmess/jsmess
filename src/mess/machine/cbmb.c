@@ -4,7 +4,7 @@
     peter.trauner@jk.uni-linz.ac.at
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6509.h"
 #include "sound/sid6581.h"
 #include "machine/6525tpi.h"
@@ -204,7 +204,7 @@ READ8_DEVICE_HANDLER( cbmb_keyboard_line_b )
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_c )
 {
 	int data = 0;
-	cbmb_state *state = device->machine->driver_data;
+	cbmb_state *state = (cbmb_state *)device->machine->driver_data;
 	if ((input_port_read(device->machine, "ROW0") & ~cbmb_keyline_a) ||
 				(input_port_read(device->machine, "ROW1") & ~cbmb_keyline_b))
 		 data |= 0x01;
@@ -311,7 +311,7 @@ WRITE8_DEVICE_HANDLER( cbmb_change_font )
 
 static void cbmb_common_driver_init( running_machine *machine )
 {
-	cbmb_state *state = machine->driver_data;
+	cbmb_state *state = (cbmb_state *)machine->driver_data;
 	cbmb_chargen = memory_region(machine, "maincpu") + 0x100000;
 	/*    memset(c64_memory, 0, 0xfd00); */
 
@@ -323,7 +323,7 @@ static void cbmb_common_driver_init( running_machine *machine )
 
 DRIVER_INIT( cbm600 )
 {
-	cbmb_state *state = machine->driver_data;
+	cbmb_state *state = (cbmb_state *)machine->driver_data;
 	cbmb_common_driver_init(machine);
 	state->cbm_ntsc = 1;
 	cbm600_vh_init(machine);
@@ -331,7 +331,7 @@ DRIVER_INIT( cbm600 )
 
 DRIVER_INIT( cbm600pal )
 {
-	cbmb_state *state = machine->driver_data;
+	cbmb_state *state = (cbmb_state *)machine->driver_data;
 	cbmb_common_driver_init(machine);
 	state->cbm_ntsc = 0;
 	cbm600_vh_init(machine);
@@ -339,14 +339,14 @@ DRIVER_INIT( cbm600pal )
 
 DRIVER_INIT( cbm600hu )
 {
-	cbmb_state *state = machine->driver_data;
+	cbmb_state *state = (cbmb_state *)machine->driver_data;
 	cbmb_common_driver_init(machine);
 	state->cbm_ntsc = 0;
 }
 
 DRIVER_INIT( cbm700 )
 {
-	cbmb_state *state = machine->driver_data;
+	cbmb_state *state = (cbmb_state *)machine->driver_data;
 	cbmb_common_driver_init(machine);
 	state->cbm700 = 1;
 	state->cbm_ntsc = 0;
@@ -355,7 +355,7 @@ DRIVER_INIT( cbm700 )
 
 DRIVER_INIT( p500 )
 {
-	cbmb_state *state = machine->driver_data;
+	cbmb_state *state = (cbmb_state *)machine->driver_data;
 	cbmb_common_driver_init(machine);
 	state->p500 = 1;
 	state->cbm_ntsc = 1;

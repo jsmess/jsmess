@@ -12,7 +12,7 @@ Changes:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "border.h"
 #include "eventlst.h"
 

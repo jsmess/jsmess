@@ -7,7 +7,7 @@
 #ifndef __SWCONFIG_H__
 #define __SWCONFIG_H__
 
-#include "driver.h"
+#include "emu.h"
 #include "mconfig.h"
 #include "hashfile.h"
 

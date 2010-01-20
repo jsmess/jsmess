@@ -6,7 +6,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/apple2.h"
 #include "ap2_lang.h"
 

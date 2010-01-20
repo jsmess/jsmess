@@ -531,7 +531,7 @@ static imgtoolerr_t prodos_load_volume_bitmap(imgtool_image *image, UINT8 **bitm
 	di = get_prodos_info(image);
 
 	bitmap_blocks = (di->total_blocks + (BLOCK_SIZE * 8) - 1) / (BLOCK_SIZE * 8);
-	alloc_bitmap = malloc(bitmap_blocks * BLOCK_SIZE);
+	alloc_bitmap = (UINT8*)malloc(bitmap_blocks * BLOCK_SIZE);
 	if (!alloc_bitmap)
 	{
 		err = IMGTOOLERR_OUTOFMEMORY;
@@ -809,7 +809,7 @@ static imgtoolerr_t prodos_get_next_dirent(imgtool_image *image,
 	UINT32 offset;
 	UINT8 buffer[BLOCK_SIZE];
 	const UINT8 *info_ptr;
-	mac_fork_t fork_num;
+	int fork_num;
 
 	di = get_prodos_info(image);
 	memset(ent, 0, sizeof(*ent));
@@ -942,7 +942,7 @@ static imgtoolerr_t prodos_put_dirent(imgtool_image *image,
 	UINT32 offset;
 	size_t finfo_offset;
 	UINT8 buffer[BLOCK_SIZE];
-	mac_fork_t fork_num;
+	int fork_num;
 	int needs_finfo = FALSE;
 	int needs_xfinfo = FALSE;
 	UINT8 *info_ptr;
@@ -2160,7 +2160,7 @@ static imgtoolerr_t	prodos_diskimage_getchain(imgtool_partition *partition, cons
 	imgtool_image *image = imgtool_partition_image(partition);
 	prodos_dirent ent;
 	size_t chain_pos = 0;
-	mac_fork_t fork_num;
+	int fork_num;
 
 	err = prodos_lookup_path(image, path, CREATE_NONE, NULL, &ent);
 	if (err)

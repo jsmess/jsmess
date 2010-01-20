@@ -9,7 +9,7 @@
 #ifndef __MOCKNGBD__
 #define __MOCKNGBD__
 
-#include "driver.h"
+#include "emu.h"
 
 
 /***************************************************************************

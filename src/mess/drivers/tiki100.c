@@ -23,7 +23,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/tiki100.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -45,7 +45,7 @@ INLINE const device_config *get_floppy_image(running_machine *machine, int drive
 
 static READ8_HANDLER( gfxram_r )
 {
-	tiki100_state *state = space->machine->driver_data;
+	tiki100_state *state = (tiki100_state *)space->machine->driver_data;
 
 	UINT16 addr = (offset + (state->scroll << 7)) & TIKI100_VIDEORAM_MASK;
 
@@ -54,7 +54,7 @@ static READ8_HANDLER( gfxram_r )
 
 static WRITE8_HANDLER( gfxram_w )
 {
-	tiki100_state *state = space->machine->driver_data;
+	tiki100_state *state = (tiki100_state *)space->machine->driver_data;
 
 	UINT16 addr = (offset + (state->scroll << 7)) & TIKI100_VIDEORAM_MASK;
 
@@ -63,7 +63,7 @@ static WRITE8_HANDLER( gfxram_w )
 
 static void tiki100_bankswitch(running_machine *machine)
 {
-	tiki100_state *state = machine->driver_data;
+	tiki100_state *state = (tiki100_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	if (state->vire)
@@ -116,7 +116,7 @@ static void tiki100_bankswitch(running_machine *machine)
 
 static READ8_HANDLER( keyboard_r )
 {
-	tiki100_state *state = space->machine->driver_data;
+	tiki100_state *state = (tiki100_state *)space->machine->driver_data;
 
 	static const char *const keynames[] = { "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9", "ROW10", "ROW11", "ROW12" };
 	UINT8 data = input_port_read(space->machine, keynames[state->keylatch]);
@@ -130,7 +130,7 @@ static READ8_HANDLER( keyboard_r )
 
 static WRITE8_HANDLER( keyboard_w )
 {
-	tiki100_state *state = space->machine->driver_data;
+	tiki100_state *state = (tiki100_state *)space->machine->driver_data;
 
 	state->keylatch = 0;
 }
@@ -152,7 +152,7 @@ static WRITE8_HANDLER( video_mode_w )
 
     */
 
-	tiki100_state *state = space->machine->driver_data;
+	tiki100_state *state = (tiki100_state *)space->machine->driver_data;
 
 	state->mode = data;
 
@@ -182,7 +182,7 @@ static WRITE8_HANDLER( palette_w )
 
     */
 
-	tiki100_state *state = space->machine->driver_data;
+	tiki100_state *state = (tiki100_state *)space->machine->driver_data;
 
 	state->palette = data;
 }
@@ -204,7 +204,7 @@ static WRITE8_HANDLER( system_w )
 
     */
 
-	tiki100_state *state = space->machine->driver_data;
+	tiki100_state *state = (tiki100_state *)space->machine->driver_data;
 
 	/* drive select */
 	if (BIT(data, 0)) wd17xx_set_drive(state->fd1797, 0);
@@ -407,7 +407,7 @@ INPUT_PORTS_END
 
 static VIDEO_UPDATE( tiki100 )
 {
-	tiki100_state *state = screen->machine->driver_data;
+	tiki100_state *state = (tiki100_state *)screen->machine->driver_data;
 
 	UINT16 addr = (state->scroll << 7);
 	int sx, y, pixel, mode = (state->mode >> 4) & 0x03;
@@ -514,7 +514,7 @@ static const z80pio_interface pio_intf =
 
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-	tiki100_state *state = timer->machine->driver_data;
+	tiki100_state *state = (tiki100_state *)timer->machine->driver_data;
 
 	z80ctc_trg0_w(state->z80ctc, 1);
 	z80ctc_trg0_w(state->z80ctc, 0);
@@ -549,7 +549,7 @@ static const wd17xx_interface tiki100_wd17xx_interface =
 
 static WRITE8_DEVICE_HANDLER( video_scroll_w )
 {
-	tiki100_state *state = device->machine->driver_data;
+	tiki100_state *state = (tiki100_state *)device->machine->driver_data;
 
 	state->scroll = data;
 }
@@ -578,7 +578,7 @@ static const z80_daisy_chain tiki100_daisy_chain[] =
 
 static MACHINE_START( tiki100 )
 {
-	tiki100_state *state = machine->driver_data;
+	tiki100_state *state = (tiki100_state *)machine->driver_data;
 
 	/* find devices */
 	state->fd1797 = devtag_get_device(machine, FD1797_TAG);

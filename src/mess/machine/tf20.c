@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "tf20.h"
 #include "cpu/z80/z80.h"
 #include "devices/messram.h"
@@ -351,7 +351,7 @@ static DEVICE_RESET( tf20 )
 	/* enable rom */
 	memory_install_read_bank(prg, 0x0000, 0x07ff, 0, 0x7800, "bank21");
 	memory_nop_write(prg, 0x0000, 0x07ff, 0, 0x7800);
-	memory_set_bankptr(device->machine, "bank21", cpu->region);
+	memory_set_bankptr(device->machine, "bank21", (void*)cpu->region);
 }
 
 DEVICE_GET_INFO( tf20 )

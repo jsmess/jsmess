@@ -16,7 +16,7 @@
 #include <tchar.h>
 #include <ctype.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "unzip.h"
 #include "strconv.h"
 #include "hashfile.h"
@@ -267,7 +267,7 @@ static BOOL SoftwarePicker_CalculateHash(HWND hwndPicker, int nIndex)
 			{
 				if (!mame_stricmp(zipent->filename, pFileInfo->zip_entry_name))
 				{
-					pBuffer = malloc(zipent->uncompressed_length);
+					pBuffer = (unsigned char *)malloc(zipent->uncompressed_length);
 					if (pBuffer)
 					{
 						ziperr = zip_file_decompress(zip, pBuffer, zipent->uncompressed_length);
@@ -295,7 +295,7 @@ static BOOL SoftwarePicker_CalculateHash(HWND hwndPicker, int nIndex)
 			hFileMapping = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
 			if (hFileMapping)
 			{
-				pBuffer = MapViewOfFile(hFileMapping, FILE_MAP_READ, 0, 0, 0);
+				pBuffer = (unsigned char *)MapViewOfFile(hFileMapping, FILE_MAP_READ, 0, 0, 0);
 				if (pBuffer)
 				{
 					ComputeFileHash(pPickerInfo, pFileInfo, pBuffer, nLength);
@@ -423,7 +423,8 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 	else
 		pInfo->base_name = pInfo->file_name;
 
-	ppNewIndex = realloc(pPickerInfo->file_index, (pPickerInfo->file_index_length + 1) * sizeof(*pPickerInfo->file_index));
+	if (pPickerInfo->file_index) free(pPickerInfo->file_index);
+	ppNewIndex = (file_info**)malloc((pPickerInfo->file_index_length + 1) * sizeof(*pPickerInfo->file_index));
 	if (!ppNewIndex)
 		goto error;
 
@@ -532,7 +533,7 @@ BOOL SoftwarePicker_AddDirectory(HWND hwndPicker, LPCSTR pszDirectory)
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 
 	nSearchInfoSize = sizeof(directory_search_info) + strlen(pszDirectory);
-	pSearchInfo = malloc(nSearchInfoSize);
+	pSearchInfo = (directory_search_info *)malloc(nSearchInfoSize);
 	if (!pSearchInfo)
 		return FALSE;
 	memset(pSearchInfo, 0, nSearchInfoSize);
@@ -613,7 +614,7 @@ static BOOL SoftwarePicker_AddEntry(HWND hwndPicker,
 		return TRUE;
 	}
 
-	pszFilename = alloca(strlen(pSearchInfo->directory_name) + 1 + strlen(utf8_FileName) + 1);
+	pszFilename = (LPSTR)alloca(strlen(pSearchInfo->directory_name) + 1 + strlen(utf8_FileName) + 1);
 	strcpy(pszFilename, pSearchInfo->directory_name);
 	strcat(pszFilename, "\\");
 	strcat(pszFilename, utf8_FileName);
@@ -653,7 +654,7 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 		}
 		else
 		{
-			pszFilter = alloca(strlen(pSearchInfo->directory_name) + strlen(szWildcards) + 1);
+			pszFilter = (LPSTR)alloca(strlen(pSearchInfo->directory_name) + strlen(szWildcards) + 1);
 			strcpy(pszFilter, pSearchInfo->directory_name);
 			strcat(pszFilter, szWildcards);
 			pSearchInfo->find_handle = win_find_first_file_utf8(pszFilter, &pSearchInfo->fd);
@@ -833,7 +834,7 @@ BOOL SetupSoftwarePicker(HWND hwndPicker, const struct PickerOptions *pOptions)
 	if (!SetupPicker(hwndPicker, pOptions))
 		goto error;
 
-	pPickerInfo = malloc(sizeof(*pPickerInfo));
+	pPickerInfo = (software_picker_info *)malloc(sizeof(*pPickerInfo));
 	if (!pPickerInfo)
 		goto error;
 	memset(pPickerInfo, 0, sizeof(*pPickerInfo));

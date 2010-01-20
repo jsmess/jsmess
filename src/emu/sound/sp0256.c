@@ -31,10 +31,8 @@
     section of ROM is modified.
 */
 
-#include <math.h>
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
-#include "cpuintrf.h"
 #include "sp0256.h"
 
 #define CLOCK_DIVIDER (7*6*8)
@@ -1216,7 +1214,7 @@ static DEVICE_START( sp0256 )
     /* -------------------------------------------------------------------- */
     /*  Setup the ROM.                                                      */
     /* -------------------------------------------------------------------- */
-	sp->rom = device->region;
+	sp->rom = *device->region;
 	sp0256_bitrevbuff(sp->rom, 0, 0xffff);
 }
 

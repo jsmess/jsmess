@@ -11,7 +11,6 @@
 
 #include "imgterrs.h"
 #include "corefile.h"
-#include "mamecore.h"
 
 typedef struct _imgtool_stream imgtool_stream;
 

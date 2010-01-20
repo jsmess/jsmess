@@ -11,12 +11,12 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __MEMORY_H__
 #define __MEMORY_H__
-
-#include "mamecore.h"
-#include "tokenize.h"
-#include "astring.h"
 
 
 
@@ -84,6 +84,11 @@ enum
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+/* referenced types from other classes */
+class device_config;
+struct game_driver;
+
 
 /* handler_data and subtable_data are opaque types used to hold information about a particular handler */
 typedef struct _handler_data handler_data;
@@ -215,7 +220,7 @@ struct _map_handler_data
 	memory_handler			handler;			/* a memory handler */
 	const char *			name;				/* name of the handler */
 	const char *			tag;				/* tag pointing to a reference */
-	astring *				derived_tag;		/* string used to hold derived names */
+	astring					derived_tag;		/* string used to hold derived names */
 };
 
 
@@ -224,7 +229,7 @@ typedef struct _address_map_entry address_map_entry;
 struct _address_map_entry
 {
 	address_map_entry *		next;				/* pointer to the next entry */
-	astring *				region_string;		/* string used to hold derived names */
+	astring					region_string;		/* string used to hold derived names */
 
 	offs_t					addrstart;			/* start address */
 	offs_t					addrend;			/* end address */
@@ -270,6 +275,7 @@ struct _address_table
 	UINT8					subtable_alloc;		/* number of subtables allocated */
 	subtable_data *			subtable;			/* info about each subtable */
 	handler_data *			handlers[256];		/* array of user-installed handlers */
+	running_machine *		machine;			/* pointer back to the machine */
 };
 
 

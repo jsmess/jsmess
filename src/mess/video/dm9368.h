@@ -21,7 +21,7 @@
 #ifndef __DM9368__
 #define __DM9368__
 
-#include "driver.h"
+#include "emu.h"
 #include "devcb.h"
 
 /***************************************************************************

@@ -47,7 +47,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "namco54.h"
 #include "cpu/mb88xx/mb88xx.h"
 
@@ -167,12 +167,11 @@ static DEVICE_START( namco_54xx )
 {
 	namco_54xx_config *config = (namco_54xx_config *)device->inline_config;
 	namco_54xx_state *state = get_safe_token(device);
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 
 	/* find our CPU */
-	state->cpu = cputag_get_cpu(device->machine, device_build_tag(tempstring, device, "mcu"));
+	state->cpu = devtag_get_device(device->machine, device_build_tag(tempstring, device, "mcu"));
 	assert(state->cpu != NULL);
-	astring_free(tempstring);
 
 	/* find the attached discrete sound device */
 	assert(config->discrete != NULL);

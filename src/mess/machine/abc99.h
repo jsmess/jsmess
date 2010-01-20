@@ -1,7 +1,7 @@
 #ifndef __ABC99__
 #define __ABC99__
 
-#include "driver.h"
+#include "emu.h"
 
 #define ABC99_TAG	"abc99"
 

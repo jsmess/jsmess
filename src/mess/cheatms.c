@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 
-#include "mame.h"
+#include "emu.h"
 #include "mess.h"
 #include "image.h"
 #include "cheatms.h"
@@ -35,7 +35,7 @@ static void build_crc_table(running_machine *machine)
 	free(device_crc_list);
 
 	/* allocate list with single member (0x00000000) */
-	device_crc_list = calloc(1, sizeof(UINT32));
+	device_crc_list = (UINT32*)malloc(sizeof(UINT32));
 	device_crc_list_length = 1;
 
 	for (img = image_device_first(machine->config); img != NULL; img = image_device_next(img))
@@ -59,8 +59,8 @@ static void build_crc_table(running_machine *machine)
 			{
 				if(!this_game_crc)
 					this_game_crc = crc;
-
-				device_crc_list = realloc(device_crc_list, (device_crc_list_length + 1) * sizeof(UINT32));
+				if (device_crc_list) free(device_crc_list);
+				device_crc_list = (UINT32*)malloc((device_crc_list_length + 1) * sizeof(UINT32));
 
 				device_crc_list[device_crc_list_length] = crc;
 				device_crc_list_length++;

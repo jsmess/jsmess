@@ -5,7 +5,7 @@
      www.funet.fi
  ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 #include "includes/cbm.h"
 #include "includes/c65.h"
@@ -553,7 +553,7 @@ static void c65_fdc_state(void)
 
 static void c65_fdc_w( running_machine *machine, int offset, int data )
 {
-	DBG_LOG(machine, 1, "fdc write", ("%.5x %.2x %.2x\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), offset, data));
+	DBG_LOG(machine, 1, "fdc write", ("%.5x %.2x %.2x\n", cpu_get_pc(devtag_get_device(machine, "maincpu")), offset, data));
 	switch (offset & 0xf)
 	{
 	case 0:
@@ -637,7 +637,7 @@ static int c65_fdc_r( running_machine *machine, int offset )
 		data = c65_fdc.reg[offset & 0xf];
 		break;
 	}
-	DBG_LOG(machine, 1, "fdc read", ("%.5x %.2x %.2x\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), offset, data));
+	DBG_LOG(machine, 1, "fdc read", ("%.5x %.2x %.2x\n", cpu_get_pc(devtag_get_device(machine, "maincpu")), offset, data));
 	return data;
 }
 

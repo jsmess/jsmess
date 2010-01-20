@@ -4,7 +4,7 @@
 
     Miodrag Milanovic
 */
-#include "driver.h"
+#include "emu.h"
 #include "formats/gtp_cas.h"
 
 

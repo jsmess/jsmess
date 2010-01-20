@@ -10,7 +10,7 @@
 #include <stdarg.h>
 #include <assert.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "utils.h"
 #include "image.h"
 #include "messopts.h"
@@ -110,11 +110,11 @@ void mess_predevice_init(running_machine *machine)
 			machine_config *config;
 			device_config *config_dev;
 			device_config *new_dev;
-			astring *tempstring = astring_alloc();
+			astring tempstring;
 
 			dev->machine = machine;
 
-			tokens = device_get_info_ptr(dev, DEVINFO_PTR_MACHINE_CONFIG);
+			tokens = (const machine_config_token *)device_get_info_ptr(dev, DEVINFO_PTR_MACHINE_CONFIG);
 			if (tokens != NULL)
 			{
 				config = machine_config_alloc(tokens);
@@ -135,7 +135,6 @@ void mess_predevice_init(running_machine *machine)
 				}
 				machine_config_free(config);
 			}
-			astring_free(tempstring);
 		}
 	}
 }

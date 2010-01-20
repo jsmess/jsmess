@@ -22,7 +22,7 @@ Missing:
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/electron.h"
 #include "devices/cassette.h"
@@ -171,7 +171,7 @@ static const cassette_config electron_cassette_config =
 {
 	uef_cassette_formats,
 	NULL,
-	CASSETTE_PLAY
+	(cassette_state)(CASSETTE_PLAY)
 };
 
 static MACHINE_DRIVER_START( electron )

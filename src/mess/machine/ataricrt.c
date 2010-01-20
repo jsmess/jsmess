@@ -4,7 +4,8 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "includes/atari.h"
 #include "ataridev.h"
 #include "devices/messram.h"

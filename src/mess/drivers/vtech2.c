@@ -63,7 +63,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
@@ -407,7 +407,7 @@ static const cassette_config laser_cassette_config =
 {
 	vtech2_cassette_formats,
 	NULL,
-	CASSETTE_PLAY
+	(cassette_state)(CASSETTE_PLAY)
 };
 
 static const floppy_config vtech2_floppy_config =

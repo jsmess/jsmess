@@ -28,7 +28,7 @@
  *        with my own pc1403.
  *****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 #include "includes/pocketc.h"
 #include "includes/pc1403.h"

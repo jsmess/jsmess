@@ -8,7 +8,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "ieee488.h"
 
 /***************************************************************************
@@ -109,11 +109,11 @@ INLINE void set_signal(const device_config *bus, const device_config *device, in
 
 	for ( ; daisy != NULL; daisy = daisy->next)
 	{
-		if (!strcmp(daisy->device->tag, device->tag))
+		if (!strcmp(daisy->device->tag.cstr(), device->tag.cstr()))
 		{
 			if (daisy->line[line] != state)
 			{
-				if (LOG) logerror("IEEE-488: '%s' %s %u\n", device->tag, SIGNAL_NAME[line], state);
+				if (LOG) logerror("IEEE-488: '%s' %s %u\n", device->tag.cstr(), SIGNAL_NAME[line], state);
 				daisy->line[line] = state;
 			}
 			break;
@@ -140,9 +140,9 @@ INLINE void set_data(const device_config *bus, const device_config *device, UINT
 
 	for ( ; daisy != NULL; daisy = daisy->next)
 	{
-		if (!strcmp(daisy->device->tag, device->tag))
+		if (!strcmp(daisy->device->tag.cstr(), device->tag.cstr()))
 		{
-			if (LOG) logerror("IEEE-488: '%s' DIO %02x\n", device->tag, data);
+			if (LOG) logerror("IEEE-488: '%s' DIO %02x\n", device->tag.cstr(), data);
 			daisy->dio = data;
 			break;
 		}

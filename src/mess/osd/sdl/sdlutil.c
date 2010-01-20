@@ -5,7 +5,7 @@
 //============================================================
 
 // MESS headers
-#include "driver.h"
+#include "emu.h"
 //#include "windows/config.h"
 #include "menu.h"
 #include "configms.h"

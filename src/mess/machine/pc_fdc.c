@@ -11,7 +11,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/pc_fdc.h"
 #include "machine/upd765.h"
 #include "memconv.h"

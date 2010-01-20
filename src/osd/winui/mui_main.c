@@ -23,9 +23,9 @@
 #include "winui.h"
 
 
-int WINAPI WinMain(HINSTANCE    hInstance,
+int WINAPI wWinMain(HINSTANCE    hInstance,
                    HINSTANCE    hPrevInstance,
-                   LPSTR        lpCmdLine,
+                   LPWSTR       lpCmdLine,
                    int          nCmdShow)
 {
 	return MameUIMain(hInstance, lpCmdLine, nCmdShow);

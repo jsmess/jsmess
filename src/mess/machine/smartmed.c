@@ -16,7 +16,7 @@
     Raphael Nabet 2004
 */
 
-#include "driver.h"
+#include "emu.h"
 
 #include "smartmed.h"
 
@@ -70,6 +70,24 @@ enum
 	header_len = sizeof(disk_image_header)
 };
 
+enum mode_t
+{
+	SM_M_INIT,		// initial state
+	SM_M_READ,		// read page data
+	SM_M_PROGRAM,	// program page data
+	SM_M_ERASE,		// erase block data
+	SM_M_READSTATUS,// read status
+	SM_M_READID,		// read ID
+	SM_M_30
+};
+
+enum pointer_mode_t
+{
+	SM_PM_A,		// accessing first 256-byte half of 512-byte data field
+	SM_PM_B,		// accessing second 256-byte half of 512-byte data field
+	SM_PM_C			// accessing spare field
+};
+	
 typedef struct _smartmedia_t smartmedia_t;
 struct _smartmedia_t
 {
@@ -83,22 +101,8 @@ struct _smartmedia_t
 	UINT8 *data_ptr;	// FEEPROM data area
 	UINT8 *data_uid_ptr;
 
-	enum
-	{
-		SM_M_INIT,		// initial state
-		SM_M_READ,		// read page data
-		SM_M_PROGRAM,	// program page data
-		SM_M_ERASE,		// erase block data
-		SM_M_READSTATUS,// read status
-		SM_M_READID,		// read ID
-		SM_M_30
-	} mode;				// current operation mode
-	enum
-	{
-		SM_PM_A,		// accessing first 256-byte half of 512-byte data field
-		SM_PM_B,		// accessing second 256-byte half of 512-byte data field
-		SM_PM_C			// accessing spare field
-	} pointer_mode;		// pointer mode
+	mode_t mode;				// current operation mode
+	pointer_mode_t pointer_mode;		// pointer mode
 
 	int page_addr;		// page address pointer
 	int byte_addr;		// byte address pointer

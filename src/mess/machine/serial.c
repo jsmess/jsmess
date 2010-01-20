@@ -29,7 +29,7 @@ setup serial interface software in driver and let the transfer begin */
     3. There should be at least 1 stop bit.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "serial.h"
 
 
@@ -75,7 +75,7 @@ struct _serial_t
 	unsigned long BaudRate;
 
 	/* baud rate timer */
-	void	*timer;
+	emu_timer	*timer;
 };
 
 INLINE serial_t *get_safe_token(const device_config *device)
@@ -494,7 +494,7 @@ static void serial_protocol_none_sent_char(const device_config *device)
 
 static TIMER_CALLBACK(serial_device_baud_rate_callback)
 {
-	serial_t *ser = get_safe_token(ptr);
+	serial_t *ser = get_safe_token((const device_config*)ptr);
 
 	/* receive data into receive register */
 	receive_register_update_bit(&ser->receive_reg, get_in_data_bit(ser->connection.input_state));
@@ -511,7 +511,7 @@ static TIMER_CALLBACK(serial_device_baud_rate_callback)
 	if (ser->transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)
 	{
 		/* char has been sent, execute callback */
-		serial_protocol_none_sent_char(ptr);
+		serial_protocol_none_sent_char((const device_config*)ptr);
 	}
 
 	/* other side says it is clear to send? */
@@ -542,7 +542,7 @@ static int serial_device_load_internal(const device_config *image, unsigned char
 	if (datasize!=0)
 	{
 		/* malloc memory for this data */
-		data = malloc(datasize);
+		data = (unsigned char *)malloc(datasize);
 
 		if (data!=NULL)
 		{

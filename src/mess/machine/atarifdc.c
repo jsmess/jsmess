@@ -10,7 +10,7 @@
 
 #include <ctype.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/atari.h"
 #include "ataridev.h"
@@ -155,7 +155,7 @@ static void atari_load_proc(const device_config *image)
 	int size, i;
 	const char *ext;
 
-	fdc->drv[id].image = image_malloc(image, MAXSIZE);
+	fdc->drv[id].image = (UINT8*)image_malloc(image, MAXSIZE);
 	if (!fdc->drv[id].image)
 		return;
 
@@ -180,7 +180,7 @@ static void atari_load_proc(const device_config *image)
 		return;
 	}
 	/* re allocate the buffer; we don't want to be too lazy ;) */
-    fdc->drv[id].image = image_realloc(image, fdc->drv[id].image, size);
+    fdc->drv[id].image = (UINT8*)image_realloc(image, fdc->drv[id].image, size);
 
 	ext = image_filetype(image);
     /* no extension: assume XFD format (no header) */
@@ -390,15 +390,15 @@ static void atari_load_proc(const device_config *image)
  *****************************************************************************/
 static	void make_chksum(UINT8 * chksum, UINT8 data)
 {
-	UINT8 new;
-	new = *chksum + data;
-	if (new < *chksum)
-		new++;
+	UINT8 newone;
+	newone= *chksum + data;
+	if (newone < *chksum)
+		newone++;
 
 	if (VERBOSE_CHKSUM)
-		logerror("atari chksum old $%02x + data $%02x -> new $%02x\n", *chksum, data, new);
+		logerror("atari chksum old $%02x + data $%02x -> new $%02x\n", *chksum, data, newone);
 
-	*chksum = new;
+	*chksum = newone;
 }
 
 static	void clr_serout(const device_config *device,int expect_data)

@@ -14,7 +14,7 @@
  *
  **************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/generic.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
@@ -505,11 +505,11 @@ static void s3c240x_check_pending_irq( running_machine *machine)
 		}
 		s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
 		s3c240x_irq_regs[5] = int_type; // INTOFFSET
-		cpu_set_input_line( cputag_get_cpu( machine, "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line( devtag_get_device( machine, "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		cpu_set_input_line( cputag_get_cpu( machine, "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line( devtag_get_device( machine, "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
 	}
 }
 
@@ -521,7 +521,7 @@ static void s3c240x_request_irq( running_machine *machine, UINT32 int_type)
 		s3c240x_irq_regs[0] |= (1 << int_type); // SRCPND
 		s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
 		s3c240x_irq_regs[5] = int_type; // INTOFFSET
-		cpu_set_input_line( cputag_get_cpu( machine, "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line( devtag_get_device( machine, "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{

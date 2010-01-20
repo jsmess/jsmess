@@ -6,7 +6,7 @@
 
 *********************************************************************/
 
-#include "mame.h"
+#include "emu.h"
 #include "formats/flopimg.h"
 #include "imgtoolx.h"
 #include "library.h"

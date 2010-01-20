@@ -13,7 +13,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/speaker.h"
 #include "video/vtvideo.h"
@@ -299,7 +299,7 @@ static MACHINE_RESET(vt100)
 
 	vt100_key_scan = 0;
 
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), vt100_irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), vt100_irq_callback);
 }
 
 static READ8_DEVICE_HANDLER (vt100_read_video_ram_r )

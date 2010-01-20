@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "printer.h"
 
 
@@ -47,7 +47,7 @@ void printer_output(const device_config *printer, UINT8 data)
 
 static DEVICE_IMAGE_LOAD( printer )
 {
-	const printer_config *conf = image->inline_config;
+	const printer_config *conf = (const printer_config *)image->inline_config;
 
 	/* send notify that the printer is now online */
 	if (conf != NULL && conf->online != NULL)
@@ -64,7 +64,7 @@ static DEVICE_IMAGE_LOAD( printer )
 
 static DEVICE_IMAGE_UNLOAD( printer )
 {
-	const printer_config *conf = image->inline_config;
+	const printer_config *conf = (const printer_config *)image->inline_config;
 
 	/* send notify that the printer is now offline */
 	if (conf != NULL && conf->online != NULL)

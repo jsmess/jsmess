@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/channelf.h"
 
 UINT8 channelf_val_reg = 0;

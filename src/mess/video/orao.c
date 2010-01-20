@@ -7,7 +7,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/orao.h"
 
 UINT8 *orao_video_ram;

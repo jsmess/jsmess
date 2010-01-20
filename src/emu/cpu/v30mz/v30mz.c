@@ -40,6 +40,7 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
 
 #define PC(n)		(((n)->sregs[CS]<<4)+(n)->ip)
@@ -52,14 +53,24 @@ typedef UINT32 DWORD;
 #include "v30mz.h"
 #include "nec.h"
 
-extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom);
-
 /* NEC registers */
 typedef union
 {                   /* eight general registers */
     UINT16 w[8];    /* viewed as 16 bits registers */
     UINT8  b[16];   /* or as 8 bit registers */
 } necbasicregs;
+
+typedef struct _nec_config nec_config;
+struct _nec_config
+{
+	const UINT8*	v25v35_decryptiontable; // internal decryption table
+};
+
+/* default configuration */
+static const nec_config default_config =
+{
+	NULL
+};
 
 typedef struct _v30mz_state v30mz_state;
 struct _v30mz_state
@@ -90,7 +101,11 @@ struct _v30mz_state
 	UINT32 ea;
 	UINT16 eo;
 	UINT16 e16;
+	
+	const nec_config *config;
 };
+
+extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const nec_config *config);
 
 INLINE v30mz_state *get_safe_token(const device_config *device)
 {
@@ -131,8 +146,8 @@ static CPU_RESET( nec )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->sregs[CS] = 0xffff;
 
@@ -206,7 +221,7 @@ static void external_int(v30mz_state *cpustate)
 	{
 		/* the actual vector is retrieved after pushing flags */
 		/* and clearing the IF */
-		nec_interrupt(cpustate,-1,0);
+		nec_interrupt(cpustate,(UINT32)-1,0);
 	}
 }
 
@@ -919,13 +934,17 @@ static void set_irq_line(v30mz_state *cpustate, int irqline, int state)
 
 static CPU_DISASSEMBLE( nec )
 {
-	return necv_dasm_one(buffer, pc, oprom);
+	v30mz_state *cpustate = get_safe_token(device);
+
+	return necv_dasm_one(buffer, pc, oprom, cpustate->config);
 }
 
 static void nec_init(const device_config *device, cpu_irq_callback irqcallback, int type)
 {
 	v30mz_state *cpustate = get_safe_token(device);
 
+	const nec_config *config = &default_config;
+	
 	state_save_register_device_item_array(device, 0, cpustate->regs.w);
 	state_save_register_device_item_array(device, 0, cpustate->sregs);
 
@@ -945,10 +964,11 @@ static void nec_init(const device_config *device, cpu_irq_callback irqcallback, 
 	state_save_register_device_item(device, 0, cpustate->CarryVal);
 	state_save_register_device_item(device, 0, cpustate->ParityVal);
 
+	cpustate->config = config;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 }
 
 static CPU_INIT( v30mz ) { nec_init(device, irqcallback, 3); }

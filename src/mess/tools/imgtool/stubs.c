@@ -1,11 +1,11 @@
-#include "driver.h"
+#include "emu.h"
 #include <ctype.h>
 #include <stdarg.h>
 
 /* Variables to hold the status of various game options */
 static FILE *errorlog;
 
-const game_driver *const drivers[1];
+const game_driver *const drivers[1] = { NULL };
 int rompath_extra;
 //int cheatfile;
 //const char *db_filename;

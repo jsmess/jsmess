@@ -1,5 +1,5 @@
 #include "oric_tap.h"
-#include "driver.h"
+#include "emu.h"
 
 #define ORIC_WAV_DEBUG 1
 #define LOG(x) do { if (ORIC_WAV_DEBUG) logerror x; } while (0)

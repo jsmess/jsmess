@@ -2,10 +2,9 @@
 /*    ricoh RF5C68(or clone) PCM controller              */
 /*********************************************************/
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "rf5c68.h"
-#include <math.h>
 
 
 #define  NUM_CHANNELS    (8)
@@ -93,6 +92,7 @@ static STREAM_UPDATE( rf5c68_update )
 					/* if we loop to a loop point, we're effectively dead */
 					if (sample == 0xff)
 						break;
+
 					/* trigger sample callback */
 					if(chip->sample_callback)
 						chip->sample_callback(chip->device,i);
@@ -140,15 +140,15 @@ static STREAM_UPDATE( rf5c68_update )
 static DEVICE_START( rf5c68 )
 {
 	const rf5c68_interface* intf = (const rf5c68_interface*)device->static_config;
-	
+
 	/* allocate memory for the chip */
 	rf5c68_state *chip = get_safe_token(device);
 
 	/* allocate the stream */
 	chip->stream = stream_create(device, 0, 2, device->clock / 384, chip, rf5c68_update);
-	
+
 	chip->device = device;
-	
+
 	/* set up callback */
 	if(intf != NULL)
 		chip->sample_callback = intf->sample_end_callback;

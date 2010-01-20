@@ -104,10 +104,8 @@ has twice the steps, happening twice as fast.
 
 ***************************************************************************/
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
-#include "cpuintrf.h"
-#include "cpuexec.h"
 #include "ay8910.h"
 
 /*************************************
@@ -348,7 +346,7 @@ INLINE void build_3D_table(double rl, const ay_ym_param *par, const ay_ym_param 
 	double min = 10.0,  max = 0.0;
 	double *temp;
 
-	temp = (double *)malloc(8*32*32*32*sizeof(*temp));
+	temp = global_alloc_array(double, 8*32*32*32);
 
 	for (e=0; e < 8; e++)
 		for (j1=0; j1 < 32; j1++)
@@ -395,7 +393,7 @@ INLINE void build_3D_table(double rl, const ay_ym_param *par, const ay_ym_param 
 
 	/* for (e=0;e<16;e++) printf("%d %d\n",e<<10, tab[e<<10]); */
 
-	free(temp);
+	global_free(temp);
 }
 
 INLINE void build_single_table(double rl, const ay_ym_param *par, int normalize, INT32 *tab, int zero_is_off)
@@ -529,11 +527,11 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 				if (psg->portAwrite.write)
 					devcb_call_write8(&psg->portAwrite, 0, psg->regs[AY_PORTA]);
 				else
-					logerror("warning - write %02x to 8910 '%s' Port A\n",psg->regs[AY_PORTA],psg->device->tag);
+					logerror("warning - write %02x to 8910 '%s' Port A\n",psg->regs[AY_PORTA],psg->device->tag.cstr());
 			}
 			else
 			{
-				logerror("warning: write to 8910 '%s' Port A set as input - ignored\n",psg->device->tag);
+				logerror("warning: write to 8910 '%s' Port A set as input - ignored\n",psg->device->tag.cstr());
 			}
 			break;
 		case AY_PORTB:
@@ -542,11 +540,11 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 				if (psg->portBwrite.write)
 					devcb_call_write8(&psg->portBwrite, 0, psg->regs[AY_PORTB]);
 				else
-					logerror("warning - write %02x to 8910 '%s' Port B\n",psg->regs[AY_PORTB],psg->device->tag);
+					logerror("warning - write %02x to 8910 '%s' Port B\n",psg->regs[AY_PORTB],psg->device->tag.cstr());
 			}
 			else
 			{
-				logerror("warning: write to 8910 '%s' Port B set as input - ignored\n",psg->device->tag);
+				logerror("warning: write to 8910 '%s' Port B set as input - ignored\n",psg->device->tag.cstr());
 			}
 			break;
 	}
@@ -883,7 +881,7 @@ int ay8910_read_ym(void *chip)
 	{
 	case AY_PORTA:
 		if ((psg->regs[AY_ENABLE] & 0x40) != 0)
-			logerror("warning: read from 8910 '%s' Port A set as output\n",psg->device->tag);
+			logerror("warning: read from 8910 '%s' Port A set as output\n",psg->device->tag.cstr());
 		/*
            even if the port is set as output, we still need to return the external
            data. Some games, like kidniki, need this to work.
@@ -891,15 +889,15 @@ int ay8910_read_ym(void *chip)
 		if (psg->portAread.read)
 			psg->regs[AY_PORTA] = devcb_call_read8(&psg->portAread, 0);
 		else
-			logerror("%s: warning - read 8910 '%s' Port A\n",cpuexec_describe_context(psg->device->machine),psg->device->tag);
+			logerror("%s: warning - read 8910 '%s' Port A\n",cpuexec_describe_context(psg->device->machine),psg->device->tag.cstr());
 		break;
 	case AY_PORTB:
 		if ((psg->regs[AY_ENABLE] & 0x80) != 0)
-			logerror("warning: read from 8910 '%s' Port B set as output\n",psg->device->tag);
+			logerror("warning: read from 8910 '%s' Port B set as output\n",psg->device->tag.cstr());
 		if (psg->portBread.read)
 			psg->regs[AY_PORTB] = devcb_call_read8(&psg->portBread, 0);
 		else
-			logerror("%s: warning - read 8910 '%s' Port B\n",cpuexec_describe_context(psg->device->machine),psg->device->tag);
+			logerror("%s: warning - read 8910 '%s' Port B\n",cpuexec_describe_context(psg->device->machine),psg->device->tag.cstr());
 		break;
 	}
 	return psg->regs[r];

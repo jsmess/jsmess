@@ -6,7 +6,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cdrom.h"
 #include "chd_cd.h"
 
@@ -72,7 +72,7 @@ INLINE dev_cdrom_t *get_safe_token(const device_config *device) {
 static DEVICE_IMAGE_LOAD(cdrom)
 {
 	dev_cdrom_t	*cdrom = get_safe_token(image);
-	chd_error	err = 0;
+	chd_error	err = (chd_error)0;
 	chd_file	*chd = NULL;
 
 	err = chd_open_file( image_core_file( image ), CHD_OPEN_READ, NULL, &chd );	/* CDs are never writeable */

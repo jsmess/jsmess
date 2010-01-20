@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/aquarius.h"
 
 static tilemap_t *aquarius_tilemap;

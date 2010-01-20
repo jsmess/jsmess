@@ -191,7 +191,7 @@ NOTE: On CTRG2-B, The "A" lines start at "A1". If you trace this on an
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/neogeo.h"
 #include "machine/pd4990a.h"
@@ -681,7 +681,7 @@ static CUSTOM_INPUT( get_audio_result )
 	neogeo_state *state = (neogeo_state *)field->port->machine->driver_data;
 	UINT32 ret = state->audio_result;
 
-//  if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", cpu_get_pc(cputag_get_cpu(field->port->machine, "maincpu")), ret);
+//  if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", cpu_get_pc(devtag_get_device(field->port->machine, "maincpu")), ret);
 
 	return ret;
 }
@@ -1123,7 +1123,7 @@ static MACHINE_RESET( neogeo )
 	for (offs = 0; offs < 8; offs++)
 		system_control_w(space, offs, 0, 0x00ff);
 
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 
 	neogeo_reset_rng(machine);
 

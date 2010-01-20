@@ -15,7 +15,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "harddisk.h"
 #include "harddriv.h"
 
@@ -98,7 +98,7 @@ INLINE dev_harddisk_t *get_safe_token(const device_config *device)
 static int internal_load_mess_hd(const device_config *image, const char *metadata)
 {
 	dev_harddisk_t	*harddisk = get_safe_token( image );
-	chd_error		err = 0;
+	chd_error		err = (chd_error)0;
 	int				is_writeable;
 
 	/* open the CHD file */
@@ -270,7 +270,7 @@ static DEVICE_START(mess_hd)
 {
 	dev_harddisk_t	*harddisk = get_safe_token( device );
 
-	harddisk->config = device->static_config;
+	harddisk->config = (const harddisk_callback_config*)device->static_config;
 	harddisk->chd = NULL;
 	harddisk->hard_disk_handle = NULL;
 }

@@ -17,7 +17,7 @@
  *
  **************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/generic.h"
 #include "cpu/arm7/arm7.h"
 

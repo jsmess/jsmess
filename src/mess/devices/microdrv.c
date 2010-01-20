@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "microdrv.h"
 
 static DEVICE_START(microdrv)

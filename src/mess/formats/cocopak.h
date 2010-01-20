@@ -1,7 +1,7 @@
 #ifndef COCOPAK_H
 #define COCOPAK_H
 
-#include "driver.h"
+#include "emu.h"
 
 typedef struct {
 	UINT16 length;

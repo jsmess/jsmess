@@ -15,12 +15,12 @@
 //  FILE DIALOG WRAPPERS
 //============================================================
 
-typedef enum _win_file_dialog_type win_file_dialog_type;
 enum _win_file_dialog_type
 {
 	WIN_FILE_DIALOG_OPEN = 1,
 	WIN_FILE_DIALOG_SAVE
 };
+typedef enum _win_file_dialog_type win_file_dialog_type;
 
 typedef struct _win_open_file_name win_open_file_name;
 struct _win_open_file_name

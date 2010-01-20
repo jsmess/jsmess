@@ -49,7 +49,7 @@ Nascom Memory map
 ************************************************************************/
 
 /* Core includes */
-#include "driver.h"
+#include "emu.h"
 #include "includes/nascom1.h"
 
 /* Components */

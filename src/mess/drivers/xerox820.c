@@ -24,7 +24,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/xerox820.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -84,7 +84,7 @@ static const UINT8 xerox820_keycodes[3][9][8] =
 
 static void xerox820_keyboard_scan(running_machine *machine)
 {
-	xerox820_state *state = machine->driver_data;
+	xerox820_state *state = (xerox820_state *)machine->driver_data;
 
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 	int table = 0, row, col;
@@ -137,7 +137,7 @@ static TIMER_DEVICE_CALLBACK( xerox820_keyboard_tick )
 
 static void xerox820_bankswitch(running_machine *machine, int bank)
 {
-	xerox820_state *state = machine->driver_data;
+	xerox820_state *state = (xerox820_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
 	
@@ -158,7 +158,7 @@ static void xerox820_bankswitch(running_machine *machine, int bank)
 
 static void xerox820ii_bankswitch(running_machine *machine, int bank)
 {
-	xerox820_state *state = machine->driver_data;
+	xerox820_state *state = (xerox820_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
 	
@@ -178,7 +178,7 @@ static void xerox820ii_bankswitch(running_machine *machine, int bank)
 
 static WRITE8_HANDLER( scroll_w )
 {
-	xerox820_state *state = space->machine->driver_data;
+	xerox820_state *state = (xerox820_state *)space->machine->driver_data;
 
 	state->scroll = (offset >> 8) & 0x1f;
 }
@@ -205,33 +205,33 @@ static WRITE8_HANDLER( x120_system_w )
 
 static WRITE8_HANDLER( bell_w )
 {
-//	xerox820_state *state = space->machine->driver_data;
+//	xerox820_state *state = (xerox820_state *)space->machine->driver_data;
 }
 
 static WRITE8_HANDLER( slden_w )
 {
-	xerox820_state *state = space->machine->driver_data;
+	xerox820_state *state = (xerox820_state *)space->machine->driver_data;
 
 	wd17xx_set_density(state->wd1771, offset ? DEN_MFM_HI : DEN_MFM_LO);
 }
 
 static WRITE8_HANDLER( chrom_w )
 {
-	xerox820_state *state = space->machine->driver_data;
+	xerox820_state *state = (xerox820_state *)space->machine->driver_data;
 
 	state->chrom = offset;
 }
 
 static WRITE8_HANDLER( lowlite_w )
 {
-	xerox820_state *state = space->machine->driver_data;
+	xerox820_state *state = (xerox820_state *)space->machine->driver_data;
 
 	state->lowlite = data;
 }
 
 static WRITE8_HANDLER( sync_w )
 {
-//	xerox820_state *state = space->machine->driver_data;
+//	xerox820_state *state = (xerox820_state *)space->machine->driver_data;
 
 	if (offset)
 	{
@@ -388,7 +388,7 @@ INPUT_PORTS_END
 
 static WRITE_LINE_DEVICE_HANDLER( kbpio_pbrdy_w )
 {
-	xerox820_state *driver_state = device->machine->driver_data;
+	xerox820_state *driver_state = (xerox820_state *)device->machine->driver_data;
 
 	driver_state->pbrdy = state;
 }
@@ -410,7 +410,7 @@ static READ8_DEVICE_HANDLER( kbpio_pa_r )
 
     */
 
-	xerox820_state *state = device->machine->driver_data;
+	xerox820_state *state = (xerox820_state *)device->machine->driver_data;
 
 	return (state->dsdd << 5) | (state->_8n5 << 4) | (state->pbrdy << 3);
 };
@@ -432,7 +432,7 @@ static WRITE8_DEVICE_HANDLER( kbpio_pa_w )
 
     */
 
-	xerox820_state *state = device->machine->driver_data;
+	xerox820_state *state = (xerox820_state *)device->machine->driver_data;
 
 	/* drive select */
 	int dvsel1 = BIT(data, 0);
@@ -487,7 +487,7 @@ static READ8_DEVICE_HANDLER( kbpio_pb_r )
 
     */
 
-	xerox820_state *state = device->machine->driver_data;
+	xerox820_state *state = (xerox820_state *)device->machine->driver_data;
 
 	return state->keydata;
 };
@@ -546,7 +546,7 @@ static const z80sio_interface sio_intf =
 
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-	xerox820_state *state = timer->machine->driver_data;
+	xerox820_state *state = (xerox820_state *)timer->machine->driver_data;
 
 	z80ctc_trg0_w(state->z80ctc, 1);
 	z80ctc_trg0_w(state->z80ctc, 0);
@@ -586,8 +586,8 @@ static const z80_daisy_chain xerox820_daisy_chain[] =
 
 static WRITE_LINE_DEVICE_HANDLER( xerox820_wd1771_intrq_w )
 {
-	xerox820_state *driver_state = device->machine->driver_data;
-	int halt = cpu_get_reg(cputag_get_cpu(device->machine, Z80_TAG), Z80_HALT);
+	xerox820_state *driver_state = (xerox820_state *)device->machine->driver_data;
+	int halt = cpu_get_reg(devtag_get_device(device->machine, Z80_TAG), Z80_HALT);
 
 	driver_state->fdc_irq = state;
 
@@ -599,8 +599,8 @@ static WRITE_LINE_DEVICE_HANDLER( xerox820_wd1771_intrq_w )
 
 static WRITE_LINE_DEVICE_HANDLER( xerox820_wd1771_drq_w )
 {
-	xerox820_state *driver_state = device->machine->driver_data;
-	int halt = cpu_get_reg(cputag_get_cpu(device->machine, Z80_TAG), Z80_HALT);
+	xerox820_state *driver_state = (xerox820_state *)device->machine->driver_data;
+	int halt = cpu_get_reg(devtag_get_device(device->machine, Z80_TAG), Z80_HALT);
 
 	driver_state->fdc_drq = state;
 
@@ -632,7 +632,7 @@ static COM8116_INTERFACE( com8116_intf )
 
 static VIDEO_START( xerox820 )
 {
-	xerox820_state *state = machine->driver_data;
+	xerox820_state *state = (xerox820_state *)machine->driver_data;
 
 	/* find memory regions */
 	state->char_rom = memory_region(machine, "chargen");
@@ -640,7 +640,7 @@ static VIDEO_START( xerox820 )
 
 static VIDEO_UPDATE( xerox820 )
 {
-	xerox820_state *state = screen->machine->driver_data;
+	xerox820_state *state = (xerox820_state *)screen->machine->driver_data;
 
 	static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;
@@ -689,7 +689,7 @@ static VIDEO_UPDATE( xerox820 )
 
 static void xerox820_load_proc(const device_config *image)
 {
-	xerox820_state *state = image->machine->driver_data;
+	xerox820_state *state = (xerox820_state *)image->machine->driver_data;
 
 	switch (image_length(image))
 	{
@@ -721,7 +721,7 @@ static void xerox820_load_proc(const device_config *image)
 static MACHINE_START( xerox820 )
 {
 	int drive;
-	xerox820_state *state = machine->driver_data;
+	xerox820_state *state = (xerox820_state *)machine->driver_data;
 
 	/* find devices */
 	state->kbpio = devtag_get_device(machine, Z80KBPIO_TAG);
@@ -748,7 +748,7 @@ static MACHINE_START( xerox820 )
 
 static MACHINE_START( xerox820ii )
 {
-//	xerox820_state *state = machine->driver_data;
+//	xerox820_state *state = (xerox820_state *)machine->driver_data;
 
 	MACHINE_START_CALL(xerox820);
 

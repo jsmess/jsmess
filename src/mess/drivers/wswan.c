@@ -36,7 +36,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/v30mz/nec.h"
 #include "includes/wswan.h"
 #include "devices/cartslot.h"

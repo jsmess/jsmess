@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/wave.h"
 #include "machine/i8255a.h"
@@ -142,7 +142,7 @@ static const cassette_config partner_cassette_config =
 {
 	rkp_cassette_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 };
 
 static FLOPPY_OPTIONS_START(partner)

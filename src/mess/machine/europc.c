@@ -1,10 +1,10 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/europc.h"
 #include "includes/pc.h"
 #include "machine/pcshare.h"
 #include "machine/pit8253.h"
 #include "video/pc_aga.h"
-
+#include "coreutil.h"
 
 /*
 
@@ -120,9 +120,9 @@ WRITE8_HANDLER ( europc_jim_w )
 	case 4:
 		switch(data & 0xc0)
 		{
-		case 0x00: cpu_set_clockscale(cputag_get_cpu(space->machine, "maincpu"), 1.0 / 2); break;
-		case 0x40: cpu_set_clockscale(cputag_get_cpu(space->machine, "maincpu"), 3.0 / 4); break;
-		default: cpu_set_clockscale(cputag_get_cpu(space->machine, "maincpu"), 1); break;
+		case 0x00: cpu_set_clockscale(devtag_get_device(space->machine, "maincpu"), 1.0 / 2); break;
+		case 0x40: cpu_set_clockscale(devtag_get_device(space->machine, "maincpu"), 3.0 / 4); break;
+		default: cpu_set_clockscale(devtag_get_device(space->machine, "maincpu"), 1); break;
 		}
 		break;
 	case 0xa:

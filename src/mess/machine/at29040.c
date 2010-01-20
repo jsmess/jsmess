@@ -9,7 +9,7 @@
     Raphael Nabet 2003
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "at29040.h"
 
 
@@ -38,6 +38,20 @@
     s_programming_2: the programming buffer is being written to
     s_programming_3: the programming buffer is being burnt to flash ROM
 */
+enum  s_cmd_t
+{
+	s_cmd_0 = 0x0,
+	s_cmd_1 = 0x1,
+	s_cmd_2 = 0x2
+};
+
+enum  s_pgm_t
+{
+	s_pgm_0 = 0x0,
+	s_pgm_1 = 0x1,
+	s_pgm_2 = 0x2,
+	s_pgm_3 = 0x3
+};
 static struct
 {
 	UINT8 *data_ptr;
@@ -47,21 +61,10 @@ static struct
 	unsigned int s_higher_bbl    : 1;	/* set when upper boot block lockout is enabled */
 	unsigned int s_sdp           : 1;	/* set when in software data protect mode */
 	unsigned int s_id_mode       : 1;	/* set when in chip id mode */
-	enum
-	{
-		s_cmd_0 = 0x0,
-		s_cmd_1 = 0x1,
-		s_cmd_2 = 0x2
-	} s_cmd;							/* command state */
+	s_cmd_t s_cmd;							/* command state */
 	unsigned int s_enabling_bbl  : 1;	/* set when a boot block lockout command is expecting its parameter */
 	unsigned int s_cmd_0x80_flag : 1;	/* set if 0x80 command has just been executed (some command require this prefix) */
-	enum
-	{
-		s_pgm_0 = 0x0,
-		s_pgm_1 = 0x1,
-		s_pgm_2 = 0x2,
-		s_pgm_3 = 0x3
-	} s_pgm;							/* programming state */
+	s_pgm_t s_pgm;							/* programming state */
 	unsigned int s_enabling_sdb  : 1;	/* set when a sdp enable command is in progress */
 	unsigned int s_disabling_sdb : 1;	/* set when a sdp disable command is in progress */
 

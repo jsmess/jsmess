@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/mikromik.h"
 #include "formats/basicdsk.h"
 #include "devices/flopdrv.h"
@@ -69,7 +69,7 @@
 
 static WRITE8_HANDLER( ls259_w )
 {
-	mm1_state *state = space->machine->driver_data;
+	mm1_state *state = (mm1_state *)space->machine->driver_data;
 	const address_space *program = cputag_get_address_space(space->machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
 	int d = BIT(data, 0);
 
@@ -279,7 +279,7 @@ static PALETTE_INIT( mm1 )
 
 static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 {
-	mm1_state *state = device->machine->driver_data;
+	mm1_state *state = (mm1_state *)device->machine->driver_data;
 
 	UINT8 romdata = state->char_rom[(charcode << 4) | linecount];
 
@@ -336,7 +336,7 @@ static UPD7220_INTERFACE( mm1_upd7220_intf )
 
 static VIDEO_START( mm1 )
 {
-	mm1_state *state = machine->driver_data;
+	mm1_state *state = (mm1_state *)machine->driver_data;
 
 	/* find memory regions */
 	state->char_rom = memory_region(machine, "chargen");
@@ -346,7 +346,7 @@ static VIDEO_START( mm1 )
 
 static VIDEO_UPDATE( mm1 )
 {
-	mm1_state *state = screen->machine->driver_data;
+	mm1_state *state = (mm1_state *)screen->machine->driver_data;
 
 	/* text */
 	i8275_update(state->i8275, bitmap, cliprect);
@@ -378,7 +378,7 @@ GFXDECODE_END
 
 static READ8_DEVICE_HANDLER( kb_r )
 {
-	mm1_state *state = device->machine->driver_data;
+	mm1_state *state = (mm1_state *)device->machine->driver_data;
 
 	return state->keydata;
 }
@@ -402,7 +402,7 @@ static WRITE_LINE_DEVICE_HANDLER( dma_hrq_changed )
 
 static READ8_DEVICE_HANDLER( mpsc_dack_r )
 {
-	mm1_state *state = device->machine->driver_data;
+	mm1_state *state = (mm1_state *)device->machine->driver_data;
 
 	/* clear data request */
 	i8237_dreq2_w(state->i8237, CLEAR_LINE);
@@ -412,7 +412,7 @@ static READ8_DEVICE_HANDLER( mpsc_dack_r )
 
 static WRITE8_DEVICE_HANDLER( mpsc_dack_w )
 {
-	mm1_state *state = device->machine->driver_data;
+	mm1_state *state = (mm1_state *)device->machine->driver_data;
 
 	upd7201_hai_w(device, data);
 
@@ -422,7 +422,7 @@ static WRITE8_DEVICE_HANDLER( mpsc_dack_w )
 
 static WRITE_LINE_DEVICE_HANDLER( tc_w )
 {
-	mm1_state *driver_state = device->machine->driver_data;
+	mm1_state *driver_state = (mm1_state *)device->machine->driver_data;
 
 	if (!driver_state->dack3)
 	{
@@ -437,7 +437,7 @@ static WRITE_LINE_DEVICE_HANDLER( tc_w )
 
 static WRITE_LINE_DEVICE_HANDLER( dack3_w )
 {
-	mm1_state *driver_state = device->machine->driver_data;
+	mm1_state *driver_state = (mm1_state *)device->machine->driver_data;
 
 	driver_state->dack3 = state;
 
@@ -463,7 +463,7 @@ static I8237_INTERFACE( mm1_dma8237_intf )
 
 static UPD765_DMA_REQUEST( drq_w )
 {
-	mm1_state *driver_state = device->machine->driver_data;
+	mm1_state *driver_state = (mm1_state *)device->machine->driver_data;
 
 	i8237_dreq3_w(driver_state->i8237, state);
 }
@@ -481,7 +481,7 @@ static const upd765_interface mm1_upd765_intf =
 
 static PIT8253_OUTPUT_CHANGED( itxc_w )
 {
-	mm1_state *driver_state = device->machine->driver_data;
+	mm1_state *driver_state = (mm1_state *)device->machine->driver_data;
 
 	if (!driver_state->intc)
 	{
@@ -491,7 +491,7 @@ static PIT8253_OUTPUT_CHANGED( itxc_w )
 
 static PIT8253_OUTPUT_CHANGED( irxc_w )
 {
-	mm1_state *driver_state = device->machine->driver_data;
+	mm1_state *driver_state = (mm1_state *)device->machine->driver_data;
 
 	if (!driver_state->intc)
 	{
@@ -501,7 +501,7 @@ static PIT8253_OUTPUT_CHANGED( irxc_w )
 
 static PIT8253_OUTPUT_CHANGED( auxc_w )
 {
-	mm1_state *driver_state = device->machine->driver_data;
+	mm1_state *driver_state = (mm1_state *)device->machine->driver_data;
 
 	upd7201_txcb_w(driver_state->upd7201, state);
 	upd7201_rxcb_w(driver_state->upd7201, state);
@@ -527,14 +527,14 @@ static const struct pit8253_config mm1_pit8253_intf =
 
 static WRITE_LINE_DEVICE_HANDLER( drq2_w )
 {
-	mm1_state *driver_state = device->machine->driver_data;
+	mm1_state *driver_state = (mm1_state *)device->machine->driver_data;
 
 	if (state) i8237_dreq2_w(driver_state->i8237, ASSERT_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( drq1_w )
 {
-	mm1_state *driver_state = device->machine->driver_data;
+	mm1_state *driver_state = (mm1_state *)device->machine->driver_data;
 
 	if (state) i8237_dreq1_w(driver_state->i8237, ASSERT_LINE);
 }
@@ -592,7 +592,7 @@ static I8085_CONFIG( mm1_i8085_config )
 
 static TIMER_DEVICE_CALLBACK( kbclk_tick )
 {
-	mm1_state *state = timer->machine->driver_data;
+	mm1_state *state = (mm1_state *)timer->machine->driver_data;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
 
 	UINT8 data = input_port_read(timer->machine, keynames[state->drive]);
@@ -681,7 +681,7 @@ static const floppy_config mm1_floppy_config =
 
 static MACHINE_START( mm1 )
 {
-	mm1_state *state = machine->driver_data;
+	mm1_state *state = (mm1_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* look up devices */
@@ -717,7 +717,7 @@ static MACHINE_START( mm1 )
 
 static MACHINE_RESET( mm1 )
 {
-	mm1_state *state = machine->driver_data;
+	mm1_state *state = (mm1_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
 	int i;
 

@@ -18,7 +18,7 @@
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 
 #include "devices/cartslot.h"
@@ -577,7 +577,7 @@ static WRITE16_HANDLER( genesis_TMSS_bank_w )
 
 static void alloc_sram(running_machine *machine)
 {
-	genesis_sram = alloc_array_or_die(UINT16, (genesis_sram_end - genesis_sram_start + 1) / sizeof(UINT16));
+	genesis_sram = (UINT16*)malloc((genesis_sram_end - genesis_sram_start + 1) / sizeof(UINT16));
 	image_battery_load(devtag_get_device(machine, "cart"), genesis_sram, genesis_sram_end - genesis_sram_start + 1);
 	memcpy(megadriv_backupram, genesis_sram, genesis_sram_end - genesis_sram_start + 1);
 }
@@ -1037,7 +1037,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	else if ((rawROM[0x2080] == 'E') && (rawROM[0x2081] == 'A') &&
 				(rawROM[0x2082] == 'M' || rawROM[0x2082] == 'G'))
 	{
-		tmpROMnew = malloc(length);
+		tmpROMnew = (unsigned char *)malloc(length);
 		secondhalf = &tmpROMnew[length >> 1];
 
 		if (!tmpROMnew)

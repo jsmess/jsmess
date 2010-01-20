@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "abcbus.h"
 
 #include "formats/basicdsk.h"
@@ -15,7 +15,7 @@ static abcbus_daisy_state *daisy_state;
 
 void abcbus_init(running_machine *machine, const char *cputag, const abcbus_daisy_chain *daisy)
 {
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 	abcbus_daisy_state *head = NULL;
 	abcbus_daisy_state **tailptr = &head;
 
@@ -27,14 +27,11 @@ void abcbus_init(running_machine *machine, const char *cputag, const abcbus_dais
 		(*tailptr)->device = devtag_get_device(machine, device_inherit_tag(tempstring, cputag, daisy->tag));
 		if ((*tailptr)->device == NULL)
 		{
-			astring_free(tempstring);
 			fatalerror("Unable to locate device '%s'", daisy->tag);
 		}
 		(*tailptr)->card_select = (abcbus_card_select)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_ABCBUS_CARD_SELECT);
 		tailptr = &(*tailptr)->next;
 	}
-
-	astring_free(tempstring);
 
 	daisy_state = head;
 }

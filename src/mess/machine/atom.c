@@ -15,7 +15,7 @@
 ***********************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/i8255a.h"
 #include "video/m6847.h"
 #include "machine/ctronics.h"
@@ -218,7 +218,7 @@ QUICKLOAD_LOAD(atom)
 	unsigned long exec;
 	unsigned long size;
 
-	quickload_data = malloc(quickload_size);
+	quickload_data = (unsigned char *)malloc(quickload_size);
 	if (!quickload_data)
 		return INIT_FAIL;
 
@@ -261,7 +261,7 @@ QUICKLOAD_LOAD(atom)
 
 
 	/* set new pc address */
-	cpu_set_reg( cputag_get_cpu(image->machine, "maincpu"), REG_GENPC, exec);
+	cpu_set_reg( devtag_get_device(image->machine, "maincpu"), REG_GENPC, exec);
 
 	/* free the data */
 	free(quickload_data);

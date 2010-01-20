@@ -75,7 +75,7 @@
 
 *************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/s2636.h"
 
 /*************************************
@@ -342,7 +342,7 @@ static DEVICE_START( s2636 )
 {
 	s2636_state *s2636 = get_safe_token(device);
 	const s2636_interface *intf = get_interface(device);
-	const device_config *screen = devtag_get_device(device->machine, intf->screen);
+	const device_config *screen = device->machine->device(intf->screen);
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 

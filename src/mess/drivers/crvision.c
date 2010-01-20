@@ -26,7 +26,7 @@
         * Titanic Frogger Demo 1.1
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/crvision.h"
 #include "cpu/m6502/m6502.h"
 #include "devices/cartslot.h"
@@ -287,7 +287,7 @@ static WRITE8_DEVICE_HANDLER( crvision_pia_porta_w )
         PA7     Cassette data in/out
     */
 
-	crvision_state *state = device->machine->driver_data;
+	crvision_state *state = (crvision_state *)device->machine->driver_data;
 
 	/* keyboard raster */
 	state->keylatch = ~data & 0x0f;
@@ -340,7 +340,7 @@ static READ8_DEVICE_HANDLER( crvision_pia_porta_r )
         PA7     Cassette data in/out
     */
 
-	crvision_state *state = device->machine->driver_data;
+	crvision_state *state = (crvision_state *)device->machine->driver_data;
 
 	UINT8 data = 0x7f;
 
@@ -364,7 +364,7 @@ static READ8_DEVICE_HANDLER( crvision_pia_portb_r )
         PB7     Keyboard input
     */
 
-	crvision_state *state = device->machine->driver_data;
+	crvision_state *state = (crvision_state *)device->machine->driver_data;
 
 	UINT8 data = 0xff;
 
@@ -378,7 +378,7 @@ static READ8_DEVICE_HANDLER( crvision_pia_portb_r )
 
 static READ_LINE_DEVICE_HANDLER( crvision_pia_cb1_r )
 {
-	crvision_state *state = device->machine->driver_data;
+	crvision_state *state = (crvision_state *)device->machine->driver_data;
 
 	return sn76496_ready_r(state->sn76489, 0);
 }
@@ -402,7 +402,7 @@ static WRITE8_DEVICE_HANDLER( crvision_pia_portb_w )
         PB7     SN76489 data output
     */
 
-	crvision_state *state = device->machine->driver_data;
+	crvision_state *state = (crvision_state *)device->machine->driver_data;
 
 	sn76496_w(state->sn76489, 0, data);
 }
@@ -425,7 +425,7 @@ static const pia6821_interface crvision_pia_intf =
 
 static MACHINE_START( creativision )
 {
-	crvision_state *state = machine->driver_data;
+	crvision_state *state = (crvision_state *)machine->driver_data;
 
 	/* find devices */
 	state->sn76489 = devtag_get_device(machine, SN76489_TAG);
@@ -547,7 +547,7 @@ static const cassette_config crvision_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 };
 
 static MACHINE_DRIVER_START( creativision )

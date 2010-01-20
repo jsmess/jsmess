@@ -4,7 +4,7 @@
 /* Inputs, DIPs by Stephh & R. Belmont */
 /* and preliminary sound hookup by R. Belmont + fixes by Pierpaolo Prazzoli */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
@@ -345,13 +345,13 @@ static DRIVER_INIT( silkroad )
 
 	src += tileoffset; len -=tileoffset;
 
-	buffer = alloc_array_or_die(UINT8, len);
+	buffer = auto_alloc_array(machine, UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = src[i-1];
 		memcpy(src,buffer,len);
-		free(buffer);
+		auto_free(machine, buffer);
 	}
 }
 

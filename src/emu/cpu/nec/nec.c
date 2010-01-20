@@ -103,6 +103,7 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
 
 typedef UINT8 BOOLEAN;
@@ -257,7 +258,7 @@ INLINE UINT16 fetchword(nec_state_t *nec_state)
 
 static UINT8 parity_table[256];
 
-#include "cpuintrf.h"
+#include "emu.h"
 
 static UINT8 fetchop(nec_state_t *nec_state)
 {
@@ -385,7 +386,7 @@ static void external_int(nec_state_t *nec_state)
 	{
 		/* the actual vector is retrieved after pushing flags */
 		/* and clearing the IF */
-		nec_interrupt(nec_state, -1,0);
+		nec_interrupt(nec_state, (UINT32)-1,0);
 	}
 }
 
@@ -1133,8 +1134,8 @@ static void nec_init(const device_config *device, cpu_irq_callback irqcallback, 
 
 	nec_state->irq_callback = irqcallback;
 	nec_state->device = device;
-	nec_state->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	nec_state->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	nec_state->program = device->space(AS_PROGRAM);
+	nec_state->io = device->space(AS_IO);
 }
 
 

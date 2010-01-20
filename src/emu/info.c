@@ -9,13 +9,14 @@
 
 ***************************************************************************/
 
-#include <ctype.h>
-
-#include "driver.h"
+#include "emu.h"
 #include "sound/samples.h"
 #include "info.h"
 #include "xmlfile.h"
 #include "hash.h"
+#include "config.h"
+
+#include <ctype.h>
 
 #ifdef MESS
 #include "infomess.h"
@@ -551,7 +552,6 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 
 static void print_game_sampleof(FILE *out, const game_driver *game, const machine_config *config)
 {
-#if (HAS_SAMPLES)
 	const device_config *device;
 
 	for (device = sound_first(config); device != NULL; device = sound_next(device))
@@ -573,7 +573,6 @@ static void print_game_sampleof(FILE *out, const game_driver *game, const machin
 				}
 			}
 		}
-#endif
 }
 
 
@@ -584,7 +583,6 @@ static void print_game_sampleof(FILE *out, const game_driver *game, const machin
 
 static void print_game_sample(FILE *out, const game_driver *game, const machine_config *config)
 {
-#if (HAS_SAMPLES)
 	const device_config *device;
 
 	/* iterate over sound chips looking for samples */
@@ -618,7 +616,6 @@ static void print_game_sample(FILE *out, const game_driver *game, const machine_
 				}
 			}
 		}
-#endif
 }
 
 
@@ -926,6 +923,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"<!ELEMENT " XML_ROOT " (" XML_TOP "+)>\n"
 		"\t<!ATTLIST " XML_ROOT " build CDATA #IMPLIED>\n"
 		"\t<!ATTLIST " XML_ROOT " debug (yes|no) \"no\">\n"
+		"\t<!ATTLIST " XML_ROOT " mameconfig CDATA #REQUIRED>\n"
 #ifdef MESS
 		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, ramoption*)>\n"
 #else
@@ -1058,8 +1056,9 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 #else
 		"no"
 #endif
-		"\">\n",
-		xml_normalize_string(build_version)
+		"\" mameconfig=\"%d\">\n",
+		xml_normalize_string(build_version),
+		CONFIG_VERSION
 	);
 
 	for (drvnum = 0; games[drvnum] != NULL; drvnum++)

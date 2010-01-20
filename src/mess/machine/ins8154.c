@@ -10,7 +10,7 @@
  *
  ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "ins8154.h"
 
 
@@ -44,13 +44,13 @@ struct _ins8154_t
 
 static DEVICE_START( ins8154 )
 {
-	ins8154_t *ins8154 = device->token;
+	ins8154_t *ins8154 = (ins8154_t *)device->token;
 
 	/* validate arguments */
 	assert(device->tag != NULL);
 
 	/* assign interface */
-	ins8154->intf = device->static_config;
+	ins8154->intf = (const ins8154_interface*)device->static_config;
 
 	/* register for state saving */
 	state_save_register_item(device->machine, "ins8154", device->tag, 0, ins8154->in_a);
@@ -65,7 +65,7 @@ static DEVICE_START( ins8154 )
 
 static DEVICE_RESET( ins8154 )
 {
-	ins8154_t *ins8154 = device->token;
+	ins8154_t *ins8154 = (ins8154_t *)device->token;
 
 	ins8154->in_a = 0;
 	ins8154->in_b = 0;
@@ -79,7 +79,7 @@ static DEVICE_RESET( ins8154 )
 
 READ8_DEVICE_HANDLER( ins8154_r )
 {
-	ins8154_t *i = device->token;
+	ins8154_t *i = (ins8154_t *)device->token;
 	UINT8 val = 0xff;
 
 	if (offset > 0x24)
@@ -124,7 +124,7 @@ READ8_DEVICE_HANDLER( ins8154_r )
 
 WRITE8_DEVICE_HANDLER( ins8154_porta_w )
 {
-	ins8154_t *i = device->token;
+	ins8154_t *i = (ins8154_t *)device->token;
 
 	i->out_a = data;
 
@@ -142,7 +142,7 @@ WRITE8_DEVICE_HANDLER( ins8154_porta_w )
 
 WRITE8_DEVICE_HANDLER( ins8154_portb_w )
 {
-	ins8154_t *i = device->token;
+	ins8154_t *i = (ins8154_t *)device->token;
 
 	i->out_b = data;
 
@@ -160,7 +160,7 @@ WRITE8_DEVICE_HANDLER( ins8154_portb_w )
 
 WRITE8_DEVICE_HANDLER( ins8154_w )
 {
-	ins8154_t *i = device->token;
+	ins8154_t *i = (ins8154_t *)device->token;
 
 	if (offset > 0x24)
 	{

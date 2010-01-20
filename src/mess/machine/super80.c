@@ -1,6 +1,6 @@
 /* Super80.c written by Robbbert, 2005-2009. See the MESS wiki for documentation. */
 
-#include "driver.h"
+#include "emu.h"
 //#include "cpu/z80/z80.h"
 #include "sound/wave.h"
 #include "devices/cassette.h"

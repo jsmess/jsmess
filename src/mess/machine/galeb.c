@@ -8,7 +8,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/dac.h"
 #include "includes/galeb.h"
 

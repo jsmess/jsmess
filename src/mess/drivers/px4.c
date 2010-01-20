@@ -7,7 +7,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "devices/messram.h"
 #include "machine/ctronics.h"
@@ -223,7 +223,7 @@ static READ_LINE_DEVICE_HANDLER( px4_rs232c_dcd )
 /* process interrupts */
 static void gapnit_interrupt(running_machine *machine)
 {
-	px4_state *px4 = machine->driver_data;
+	px4_state *px4 = (px4_state *)machine->driver_data;
 
 	/* any interrupts enabled and pending? */
 	if (px4->ier & px4->isr & INT0_7508)
@@ -246,7 +246,7 @@ static void gapnit_interrupt(running_machine *machine)
 /* external cassette or barcode reader input */
 static TIMER_CALLBACK( ext_cassette_read )
 {
-	px4_state *px4 = machine->driver_data;
+	px4_state *px4 = (px4_state *)machine->driver_data;
 	UINT8 result;
 	int trigger = 0;
 
@@ -285,7 +285,7 @@ static TIMER_CALLBACK( ext_cassette_read )
 /* free running counter */
 static TIMER_DEVICE_CALLBACK( frc_tick )
 {
-	px4_state *px4 = timer->machine->driver_data;
+	px4_state *px4 = (px4_state *)timer->machine->driver_data;
 
 	px4->frc_value++;
 
@@ -299,7 +299,7 @@ static TIMER_DEVICE_CALLBACK( frc_tick )
 /* input capture register low command trigger */
 static READ8_HANDLER( px4_icrlc_r )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	logerror("%s: px4_icrlc_r\n", cpuexec_describe_context(space->machine));
 
 	/* latch value */
@@ -311,7 +311,7 @@ static READ8_HANDLER( px4_icrlc_r )
 /* control register 1 */
 static WRITE8_HANDLER( px4_ctrl1_w )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	int baud;
 
 	logerror("%s: px4_ctrl1_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
@@ -331,7 +331,7 @@ static WRITE8_HANDLER( px4_ctrl1_w )
 /* input capture register high command trigger */
 static READ8_HANDLER( px4_icrhc_r )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 
 	logerror("%s: px4_icrhc_r\n", cpuexec_describe_context(space->machine));
 
@@ -341,7 +341,7 @@ static READ8_HANDLER( px4_icrhc_r )
 /* command register */
 static WRITE8_HANDLER( px4_cmdr_w )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 
 	logerror("%s: px4_cmdr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
@@ -356,7 +356,7 @@ static WRITE8_HANDLER( px4_cmdr_w )
 /* input capture register low barcode trigger */
 static READ8_HANDLER( px4_icrlb_r )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 
 	logerror("%s: px4_icrlb_r\n", cpuexec_describe_context(space->machine));
 
@@ -366,7 +366,7 @@ static READ8_HANDLER( px4_icrlb_r )
 /* control register 2 */
 static WRITE8_HANDLER( px4_ctrl2_w )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 
 	logerror("%s: px4_ctrl2_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
@@ -389,7 +389,7 @@ static WRITE8_HANDLER( px4_ctrl2_w )
 /* input capture register high barcode trigger */
 static READ8_HANDLER( px4_icrhb_r )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	logerror("%s: px4_icrhb_r\n", cpuexec_describe_context(space->machine));
 
 	/* clear icf interrupt */
@@ -402,7 +402,7 @@ static READ8_HANDLER( px4_icrhb_r )
 /* interrupt status register */
 static READ8_HANDLER( px4_isr_r )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	logerror("%s: px4_isr_r\n", cpuexec_describe_context(space->machine));
 
 	return px4->isr;
@@ -411,7 +411,7 @@ static READ8_HANDLER( px4_isr_r )
 /* interrupt enable register */
 static WRITE8_HANDLER( px4_ier_w )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	logerror("%s: px4_ier_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	px4->ier = data;
@@ -421,7 +421,7 @@ static WRITE8_HANDLER( px4_ier_w )
 /* status register */
 static READ8_HANDLER( px4_str_r )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	UINT8 result = 0;
 
 	logerror("%s: px4_str_r\n", cpuexec_describe_context(space->machine));
@@ -438,7 +438,7 @@ static READ8_HANDLER( px4_str_r )
 /* helper function to map rom capsules */
 static void install_rom_capsule(const address_space *space, int size, const char *region)
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 
 	/* ram, part 1 */
 	memory_install_readwrite_bank(space, 0x0000, 0xdfff - size, 0, 0, "bank1");
@@ -465,7 +465,7 @@ static void install_rom_capsule(const address_space *space, int size, const char
 /* bank register */
 static WRITE8_HANDLER( px4_bankr_w )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	logerror("%s: px4_bankr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
@@ -506,7 +506,7 @@ static WRITE8_HANDLER( px4_bankr_w )
 /* serial io register */
 static READ8_HANDLER( px4_sior_r )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	logerror("%s: px4_sior_r\n", cpuexec_describe_context(space->machine));
 	logerror("sior = 0x%02x\n", px4->sior);
 
@@ -516,7 +516,7 @@ static READ8_HANDLER( px4_sior_r )
 /* serial io register */
 static WRITE8_HANDLER( px4_sior_w )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	logerror("%s: px4_sior_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	px4->sior = data;
@@ -619,7 +619,7 @@ static WRITE8_HANDLER( px4_sior_w )
 /* vram start address register */
 static WRITE8_HANDLER( px4_vadr_w )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	logerror("%s: px4_vadr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	px4->vadr = data;
@@ -628,7 +628,7 @@ static WRITE8_HANDLER( px4_vadr_w )
 /* y offset register */
 static WRITE8_HANDLER( px4_yoff_w )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	logerror("%s: px4_yoff_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	px4->yoff = data;
@@ -653,7 +653,7 @@ static WRITE8_HANDLER( px4_spur_w )
 
 static TIMER_CALLBACK( transmit_data )
 {
-	px4_state *px4 = machine->driver_data;
+	px4_state *px4 = (px4_state *)machine->driver_data;
 
 	if (ART_TX_ENABLED)
 	{
@@ -663,7 +663,7 @@ static TIMER_CALLBACK( transmit_data )
 
 static TIMER_CALLBACK( receive_data )
 {
-	px4_state *px4 = machine->driver_data;
+	px4_state *px4 = (px4_state *)machine->driver_data;
 
 	if (ART_RX_ENABLED)
 	{
@@ -687,7 +687,7 @@ static WRITE8_HANDLER( px4_ctgif_w )
 /* art data input register */
 static READ8_HANDLER( px4_artdir_r )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	logerror("%s: px4_artdir_r\n", cpuexec_describe_context(space->machine));
 
 	return px4->artdir;
@@ -696,7 +696,7 @@ static READ8_HANDLER( px4_artdir_r )
 /* art data output register */
 static WRITE8_HANDLER( px4_artdor_w )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	logerror("%s: px4_artdor_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	/* clear ready */
@@ -708,7 +708,7 @@ static WRITE8_HANDLER( px4_artdor_w )
 /* art status register */
 static READ8_HANDLER( px4_artsr_r )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	UINT8 result = 0;
 
 	logerror("%s: px4_artsr_r\n", cpuexec_describe_context(space->machine));
@@ -721,7 +721,7 @@ static READ8_HANDLER( px4_artsr_r )
 /* art mode register */
 static WRITE8_HANDLER( px4_artmr_w )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	logerror("%s: px4_artmr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	px4->artmr = data;
@@ -730,7 +730,7 @@ static WRITE8_HANDLER( px4_artmr_w )
 /* io status register */
 static READ8_HANDLER( px4_iostr_r )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	UINT8 result = 0;
 
 	logerror("%s: px4_iostr_r\n", cpuexec_describe_context(space->machine));
@@ -750,7 +750,7 @@ static READ8_HANDLER( px4_iostr_r )
 /* art command register */
 static WRITE8_HANDLER( px4_artcr_w )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	logerror("%s: px4_artcr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	px4->artcr = data;
@@ -782,7 +782,7 @@ static WRITE8_HANDLER( px4_artcr_w )
 /* switch register */
 static WRITE8_HANDLER( px4_swr_w )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	logerror("%s: px4_swr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	px4->swr = data;
@@ -791,7 +791,7 @@ static WRITE8_HANDLER( px4_swr_w )
 /* io control register */
 static WRITE8_HANDLER( px4_ioctlr_w )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 
 	logerror("%s: px4_ioctlr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
@@ -816,7 +816,7 @@ static WRITE8_HANDLER( px4_ioctlr_w )
 
 static TIMER_DEVICE_CALLBACK( upd7508_1sec_callback )
 {
-	px4_state *px4 = timer->machine->driver_data;
+	px4_state *px4 = (px4_state *)timer->machine->driver_data;
 
 	/* adjust interrupt status */
 	px4->interrupt_status |= UPD7508_INT_ONE_SECOND;
@@ -831,7 +831,7 @@ static TIMER_DEVICE_CALLBACK( upd7508_1sec_callback )
 
 static INPUT_CHANGED( key_callback )
 {
-	px4_state *px4 = field->port->machine->driver_data;
+	px4_state *px4 = (px4_state *)field->port->machine->driver_data;
 	UINT32 oldvalue = oldval * field->mask, newvalue = newval * field->mask;
 	UINT32 delta = oldvalue ^ newvalue;
 	int i, scancode = 0xff, down = 0;
@@ -873,7 +873,7 @@ static INPUT_CHANGED( key_callback )
 
 static WRITE8_HANDLER( px4_ramdisk_address_w )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 
 	switch (offset)
 	{
@@ -885,7 +885,7 @@ static WRITE8_HANDLER( px4_ramdisk_address_w )
 
 static READ8_HANDLER( px4_ramdisk_data_r )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	UINT8 ret = 0xff;
 
 	if (px4->ramdisk_address < 0x20000)
@@ -906,7 +906,7 @@ static READ8_HANDLER( px4_ramdisk_data_r )
 
 static WRITE8_HANDLER( px4_ramdisk_data_w )
 {
-	px4_state *px4 = space->machine->driver_data;
+	px4_state *px4 = (px4_state *)space->machine->driver_data;
 
 	if (px4->ramdisk_address < 0x20000)
 		px4->ramdisk[px4->ramdisk_address] = data;
@@ -922,7 +922,7 @@ static READ8_HANDLER( px4_ramdisk_control_r )
 
 static NVRAM_HANDLER( px4_ramdisk )
 {
-	px4_state *px4 = machine->driver_data;
+	px4_state *px4 = (px4_state *)machine->driver_data;
 
 	if (read_or_write)
 		mame_fwrite(file, px4->ramdisk, 0x20000);
@@ -938,7 +938,7 @@ static NVRAM_HANDLER( px4_ramdisk )
 
 static VIDEO_UPDATE( px4 )
 {
-	px4_state *px4 = screen->machine->driver_data;
+	px4_state *px4 = (px4_state *)screen->machine->driver_data;
 
 	/* display enabled? */
 	if (BIT(px4->yoff, 7))
@@ -987,7 +987,7 @@ static VIDEO_UPDATE( px4 )
 
 static DRIVER_INIT( px4 )
 {
-	px4_state *px4 = machine->driver_data;
+	px4_state *px4 = (px4_state *)machine->driver_data;
 
 	/* find devices */
 	px4->ram = devtag_get_device(machine, "messram");
@@ -1020,7 +1020,7 @@ static DRIVER_INIT( px4 )
 
 static DRIVER_INIT( px4p )
 {
-	px4_state *px4 = machine->driver_data;
+	px4_state *px4 = (px4_state *)machine->driver_data;
 
 	DRIVER_INIT_CALL(px4);
 
@@ -1030,7 +1030,7 @@ static DRIVER_INIT( px4p )
 
 static MACHINE_RESET( px4 )
 {
-	px4_state *px4 = machine->driver_data;
+	px4_state *px4 = (px4_state *)machine->driver_data;
 
 	px4->artsr = ART_TXRDY | ART_TXEMPTY;
 }
@@ -1259,7 +1259,7 @@ static const cassette_config px4_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
 };
 
 static MACHINE_DRIVER_START( px4 )

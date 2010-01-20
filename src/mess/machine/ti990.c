@@ -4,7 +4,7 @@
     Emulation for a few generic aspects of TI990
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "ti990.h"
 
 /*

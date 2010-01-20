@@ -8,7 +8,7 @@
 
  ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 #define COMPIS_PALETTE_SIZE           16
 /*

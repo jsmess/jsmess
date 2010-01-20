@@ -24,7 +24,7 @@
     Raphael Nabet, 2004.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "ti99_4x.h"
 #include "99_peb.h"
 #include "99_usbsm.h"

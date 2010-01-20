@@ -13,7 +13,7 @@
 #ifdef WIN32
 #include <windows.h>
 #endif /* WIN32 */
-
+#include "emu.h"
 #include "utils.h"
 #include "core.h"
 #include "testmess.h"

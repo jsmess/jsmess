@@ -11,7 +11,7 @@
 #include "unzip.h"
 #include "corestr.h"
 #include "xmlfile.h"
-#include "driver.h"
+#include "emu.h"
 #include "hash.h"
 #include "messram.h"
 
@@ -29,7 +29,7 @@ struct _multicart_private
 typedef struct _multicart_load_state multicart_load_state;
 struct _multicart_load_state
 {
-	multicart *			multicart;
+	multicart_t *			multicart;
 	zip_file *			zip;
 	xml_data_node *			layout_xml;
 	xml_data_node *			resources_node;
@@ -181,7 +181,7 @@ static multicart_open_error load_rom_resource(multicart_load_state *state, xml_d
 	resource->length = header->uncompressed_length;
 
 	/* allocate bytes for this resource */
-	resource->ptr = pool_malloc(state->multicart->data->pool, resource->length);
+	resource->ptr = pool_malloc_lib(state->multicart->data->pool, resource->length);
 	if (resource->ptr == NULL)
 		return MCERR_OUT_OF_MEMORY;
 
@@ -196,7 +196,7 @@ static multicart_open_error load_rom_resource(multicart_load_state *state, xml_d
 		char calc_sha[256];
 
 		memset(calc_sha, 0, sizeof(calc_sha));
-		hash_compute(&calc_sha[0], resource->ptr, resource->length, HASH_SHA1);
+		hash_compute(&calc_sha[0], (const unsigned char*)resource->ptr, resource->length, HASH_SHA1);
 
 		if ((strncmp(sha1, &calc_sha[2], 20)))
 		{
@@ -232,7 +232,7 @@ static multicart_open_error load_ram_resource(multicart_load_state *state, xml_d
 		return MCERR_INVALID_RAM_SPEC;
 
 	/* allocate bytes for this resource */
-	resource->ptr = pool_malloc(state->multicart->data->pool, resource->length);
+	resource->ptr = pool_malloc_lib(state->multicart->data->pool, resource->length);
 	if (resource->ptr == NULL)
 		return MCERR_OUT_OF_MEMORY;
 
@@ -251,7 +251,7 @@ static multicart_open_error load_ram_resource(multicart_load_state *state, xml_d
 
 			/* Save the file name so that we can write the contents on unloading.
                If the RAM resource has no filename, we know that it was volatile only. */
-			resource->filename = pool_strdup(state->multicart->data->pool, astring_c(ram_pathname));
+			resource->filename = pool_strdup_lib(state->multicart->data->pool, astring_c(ram_pathname));
 			if (resource->filename == NULL)
 				return MCERR_OUT_OF_MEMORY;
 
@@ -284,14 +284,14 @@ static multicart_open_error load_resource(multicart_load_state *state, xml_data_
 		return MCERR_XML_ERROR;
 
 	/* allocate memory for the resource */
-	resource = pool_malloc(state->multicart->data->pool, sizeof(*resource));
+	resource = (multicart_resource *)pool_malloc_lib(state->multicart->data->pool, sizeof(*resource));
 	if (resource == NULL)
 		return MCERR_OUT_OF_MEMORY;
 	memset(resource, 0, sizeof(*resource));
 	resource->type = resource_type;
 
 	/* copy id */
-	resource->id = pool_strdup(state->multicart->data->pool, id);
+	resource->id = pool_strdup_lib(state->multicart->data->pool, id);
 	if (resource->id == NULL)
 		return MCERR_OUT_OF_MEMORY;
 
@@ -353,7 +353,7 @@ static multicart_open_error load_all_resources(multicart_load_state *state)
     be freed on multicart_close.
 -------------------------------------------------*/
 
-static multicart_open_error save_ram_resources(multicart *cart)
+static multicart_open_error save_ram_resources(multicart_t *cart)
 {
 	const multicart_resource *resource;
 
@@ -395,7 +395,7 @@ static multicart_open_error load_socket(multicart_load_state *state, xml_data_no
 		return MCERR_INVALID_RESOURCE_REF;
 
 	/* create the socket */
-	socket = pool_malloc(state->multicart->data->pool, sizeof(*socket));
+	socket = (multicart_socket *)pool_malloc_lib(state->multicart->data->pool, sizeof(*socket));
 	if (socket == NULL)
 		return MCERR_OUT_OF_MEMORY;
 	memset(socket, 0, sizeof(*socket));
@@ -403,7 +403,7 @@ static multicart_open_error load_socket(multicart_load_state *state, xml_data_no
 	socket->ptr = resource->ptr;
 
 	/* copy id */
-	socket->id = pool_strdup(state->multicart->data->pool, id);
+	socket->id = pool_strdup_lib(state->multicart->data->pool, id);
 	if (socket->id == NULL)
 		return MCERR_OUT_OF_MEMORY;
 
@@ -416,7 +416,7 @@ static multicart_open_error load_socket(multicart_load_state *state, xml_data_no
 	else
 	{
 		/* allocate bytes for this socket */
-		socket->ptr = pool_malloc(state->multicart->data->pool, resource->length);
+		socket->ptr = pool_malloc_lib(state->multicart->data->pool, resource->length);
 		if (socket->ptr == NULL)
 			return MCERR_OUT_OF_MEMORY;
 
@@ -459,7 +459,7 @@ static multicart_open_error load_all_sockets(multicart_load_state *state)
     multicart_open - opens a multicart
 -------------------------------------------------*/
 
-multicart_open_error multicart_open(const char *filename, const char *gamedrv, multicart_load_flags load_flags, multicart **cart)
+multicart_open_error multicart_open(const char *filename, const char *gamedrv, multicart_load_flags load_flags, multicart_t **cart)
 {
 	multicart_open_error err;
 	zip_error ziperr;
@@ -470,7 +470,7 @@ multicart_open_error multicart_open(const char *filename, const char *gamedrv, m
 	char *layout_text = NULL;
 
 	/* allocate an object pool */
-	pool = pool_alloc(NULL);
+	pool = pool_alloc_lib(NULL);
 	if (pool == NULL)
 	{
 		err = MCERR_OUT_OF_MEMORY;
@@ -478,7 +478,7 @@ multicart_open_error multicart_open(const char *filename, const char *gamedrv, m
 	}
 
 	/* allocate the multicart */
-	state.multicart = pool_malloc(pool, sizeof(*state.multicart));
+	state.multicart = (multicart_t*)pool_malloc_lib(pool, sizeof(*state.multicart));
 	if (state.multicart == NULL)
 	{
 		err = MCERR_OUT_OF_MEMORY;
@@ -487,7 +487,7 @@ multicart_open_error multicart_open(const char *filename, const char *gamedrv, m
 	memset(state.multicart, 0, sizeof(*state.multicart));
 
 	/* allocate the multicart's private data */
-	state.multicart->data = pool_malloc(pool, sizeof(*state.multicart->data));
+	state.multicart->data = (multicart_private*)pool_malloc_lib(pool, sizeof(*state.multicart->data));
 	if (state.multicart->data == NULL)
 	{
 		err = MCERR_OUT_OF_MEMORY;
@@ -514,7 +514,7 @@ multicart_open_error multicart_open(const char *filename, const char *gamedrv, m
 	}
 
 	/* reserve space for the layout text */
-	layout_text = malloc(header->uncompressed_length + 1);
+	layout_text = (char*)malloc(header->uncompressed_length + 1);
 	if (layout_text == NULL)
 	{
 		err = MCERR_OUT_OF_MEMORY;
@@ -547,14 +547,14 @@ multicart_open_error multicart_open(const char *filename, const char *gamedrv, m
 
 	/* get the PCB resource_type */
 	pcb_type = xml_get_attribute_string(state.pcb_node, "type", "");
-	state.multicart->pcb_type = pool_strdup(state.multicart->data->pool, pcb_type);
+	state.multicart->pcb_type = pool_strdup_lib(state.multicart->data->pool, pcb_type);
 	if (state.multicart->pcb_type == NULL)
 	{
 		err = MCERR_OUT_OF_MEMORY;
 		goto done;
 	}
 
-	state.multicart->gamedrv_name = pool_strdup(state.multicart->data->pool, gamedrv);
+	state.multicart->gamedrv_name = pool_strdup_lib(state.multicart->data->pool, gamedrv);
 	if (state.multicart->gamedrv_name == NULL)
 	{
 		err = MCERR_OUT_OF_MEMORY;
@@ -577,7 +577,7 @@ multicart_open_error multicart_open(const char *filename, const char *gamedrv, m
 
 done:
 	if (pool != NULL)
-		pool_free(pool);
+		pool_free_lib(pool);
 	if (state.zip != NULL)
 		zip_file_close(state.zip);
 	if (layout_text != NULL)
@@ -599,8 +599,8 @@ done:
     multicart_close - closes a multicart
 -------------------------------------------------*/
 
-void multicart_close(multicart *cart)
+void multicart_close(multicart_t *cart)
 {
 	save_ram_resources(cart);
-	pool_free(cart->data->pool);
+	pool_free_lib(cart->data->pool);
 }

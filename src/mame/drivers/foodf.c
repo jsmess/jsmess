@@ -73,7 +73,7 @@
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "sound/pokey.h"
@@ -121,7 +121,7 @@ static TIMER_DEVICE_CALLBACK( scanline_update )
        mystery yet */
 
 	/* INT 1 is on 32V */
-	atarigen_scanline_int_gen(cputag_get_cpu(timer->machine, "maincpu"));
+	atarigen_scanline_int_gen(devtag_get_device(timer->machine, "maincpu"));
 
 	/* advance to the next interrupt */
 	scanline += 64;

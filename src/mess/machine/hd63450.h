@@ -2,7 +2,7 @@
     Hitachi HD63450 DMA Controller
 */
 
-#include "driver.h"
+#include "emu.h"
 
 typedef struct _hd63450_interface hd63450_intf;
 struct _hd63450_interface

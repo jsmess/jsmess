@@ -14,7 +14,7 @@
 #include <AvailabilityMacros.h>
 
 // MAME headers
-#include "driver.h"
+#include "emu.h"
 #include "debug/debugvw.h"
 
 

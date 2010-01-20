@@ -16,7 +16,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/i8255a.h"
 #include "amico2k.lh"

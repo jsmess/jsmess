@@ -24,7 +24,7 @@
             VIDEO (AB1) 9
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "video/newport.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -38,7 +38,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog(running_machine *machine, int n_level, c
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), buf );
+		logerror( "%08x: %s", cpu_get_pc(devtag_get_device(machine, "maincpu")), buf );
 	}
 }
 

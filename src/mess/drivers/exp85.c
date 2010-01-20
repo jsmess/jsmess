@@ -17,7 +17,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/exp85.h"
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
@@ -124,7 +124,7 @@ static WRITE8_DEVICE_HANDLER( i8355_a_w )
 
     */
 
-	exp85_state *state = device->machine->driver_data;
+	exp85_state *state = (exp85_state *)device->machine->driver_data;
 
 	/* tape control */
 	state->tape_control = BIT(data, 0);
@@ -145,14 +145,14 @@ static I8355_INTERFACE( i8355_intf )
 
 static WRITE_LINE_DEVICE_HANDLER( exp85_sod_w )
 {
-	exp85_state *driver_state = device->machine->driver_data;
+	exp85_state *driver_state = (exp85_state *)device->machine->driver_data;
 
 	cassette_output(driver_state->cassette, state ? -1.0 : +1.0);
 }
 
 static READ_LINE_DEVICE_HANDLER( exp85_sid_r )
 {
-	exp85_state *driver_state = device->machine->driver_data;
+	exp85_state *driver_state = (exp85_state *)device->machine->driver_data;
 
 	int data = 1;
 
@@ -176,7 +176,7 @@ static I8085_CONFIG( exp85_i8085_config )
 
 static MACHINE_START( exp85 )
 {
-	exp85_state *state = machine->driver_data;
+	exp85_state *state = (exp85_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* setup memory banking */
@@ -197,7 +197,7 @@ static const cassette_config exp85_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 };
 
 static MACHINE_DRIVER_START( exp85 )

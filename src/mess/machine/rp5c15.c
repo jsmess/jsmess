@@ -122,8 +122,8 @@ static void rtc_add_month(const device_config*);
 
 static TIMER_CALLBACK(rtc_alarm_pulse)
 {
-	const device_config* device = ptr;
-	rp5c15_t* rtc = device->token;
+	const device_config* device = (const device_config*)ptr;
+	rp5c15_t* rtc = (rp5c15_t*)device->token;
 
 	if(rtc->pulse16_state == 0)  // low
 	{
@@ -149,11 +149,11 @@ static TIMER_CALLBACK(rtc_alarm_pulse)
 
 static DEVICE_START( rp5c15 )
 {
-	rp5c15_t* rtc = device->token;
+	rp5c15_t* rtc = (rp5c15_t*)device->token;
 	mame_system_time systm;
 	mame_system_tm time;
 
-	rtc->intf = device->static_config;
+	rtc->intf = (const rp5c15_intf*)device->static_config;
 
 	rtc->alarm_callback = rtc->intf->alarm_irq_callback;
 
@@ -194,7 +194,7 @@ static DEVICE_START( rp5c15 )
 
 static int rp5c15_read(const device_config* device, int offset, UINT16 mem_mask)
 {
-	rp5c15_t* rtc = device->token;
+	rp5c15_t* rtc = (rp5c15_t*)device->token;
 	if((rtc->mode & 0x01) == 0x00)  // BANK 0 selected
 	{
 		switch(offset)
@@ -266,7 +266,7 @@ static int rp5c15_read(const device_config* device, int offset, UINT16 mem_mask)
 
 static void rp5c15_write(const device_config* device, int offset, int data, UINT16 mem_mask)
 {
-	rp5c15_t* rtc = device->token;
+	rp5c15_t* rtc = (rp5c15_t*)device->token;
 	if(offset == 13)
 	{
 		rtc->mode = data & 0x0f;
@@ -361,7 +361,7 @@ static void rp5c15_write(const device_config* device, int offset, int data, UINT
 
 static void rtc_add_second(const device_config* device)  // add one second to current time
 {
-	rp5c15_t* rtc = device->token;
+	rp5c15_t* rtc = (rp5c15_t*)device->token;
 
 	if((rtc->mode & 0x08) == 0x00) // if timer is not enabled
 		return;
@@ -378,7 +378,7 @@ static void rtc_add_second(const device_config* device)  // add one second to cu
 
 static void rtc_add_minute(const device_config* device)
 {
-	rp5c15_t* rtc = device->token;
+	rp5c15_t* rtc = (rp5c15_t*)device->token;
 
 	rtc->systime.min_1++;
 	if(rtc->systime.min_1 < 10)
@@ -403,7 +403,7 @@ static void rtc_add_minute(const device_config* device)
 
 static void rtc_add_day(const device_config* device)
 {
-	rp5c15_t* rtc = device->token;
+	rp5c15_t* rtc = (rp5c15_t*)device->token;
 	int d,m;
 
 	rtc->systime.dayofweek++;
@@ -471,7 +471,7 @@ static void rtc_add_day(const device_config* device)
 
 static void rtc_add_month(const device_config* device)
 {
-	rp5c15_t* rtc = device->token;
+	rp5c15_t* rtc = (rp5c15_t*)device->token;
 
 	rtc->systime.month_1++;
 	if(rtc->systime.month_1 < 10 && rtc->systime.month_10 < 1)

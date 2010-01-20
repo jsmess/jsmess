@@ -19,7 +19,6 @@
 
         mame_execute() [mame.c]
             - calls mame_validitychecks() [validity.c] to perform validity checks on all compiled drivers
-            - calls setjmp to prepare for deep error handling
             - begins resource tracking (level 1)
             - calls create_machine [mame.c] to initialize the running_machine structure
             - calls init_machine() [mame.c]
@@ -74,8 +73,9 @@
 
 ***************************************************************************/
 
+#include "emu.h"
+#include "emuopts.h"
 #include "osdepend.h"
-#include "driver.h"
 #include "config.h"
 #include "cheat.h"
 #include "debugger.h"
@@ -85,10 +85,10 @@
 #include "uimenu.h"
 #include "uiinput.h"
 #include "streams.h"
+#include "crsshair.h"
+#include "validity.h"
 #include "debug/debugcon.h"
 
-#include <stdarg.h>
-#include <setjmp.h>
 #include <time.h>
 
 
@@ -96,18 +96,6 @@
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-typedef struct _region_info region_info;
-struct _region_info
-{
-	region_info *	next;
-	astring *		name;
-	UINT32			length;
-	UINT32			flags;
-	UINT8			padding[32 - 2 * sizeof(void *) - 2 * sizeof(UINT32)];
-	UINT8			base[1];
-};
-
 
 typedef struct _callback_item callback_item;
 struct _callback_item
@@ -133,7 +121,7 @@ struct _mame_private
 	UINT8			hard_reset_pending;
 	UINT8			exit_pending;
 	const game_driver *new_driver_pending;
-	astring *		saveload_pending_file;
+	astring			saveload_pending_file;
 	const char *	saveload_searchpath;
 	emu_timer *		soft_reset_timer;
 	mame_file *		logfile;
@@ -151,11 +139,7 @@ struct _mame_private
 
 	/* list of memory regions, and a map for lookups */
 	region_info	*	regionlist;
-	tagmap *		regionmap;
-
-	/* error recovery and exiting */
-	jmp_buf			fatal_error_jmpbuf;
-	int				fatal_error_jmpbuf_valid;
+	tagmap_t<region_info *> regionmap;
 
 	/* random number seed */
 	UINT32			rand_seed;
@@ -194,21 +178,19 @@ const char mame_disclaimer[] =
 	"images is a violation of copyright law and should be promptly reported to the\n"
 	"authors so that appropriate legal action can be taken.\n";
 
+/* a giant string buffer for temporary strings */
+static char giant_string_buffer[65536] = { 0 };
+
 
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-extern int mame_validitychecks(const game_driver *driver);
-
 static int parse_ini_file(core_options *options, const char *name, int priority);
 
-static running_machine *create_machine(const game_driver *driver);
-static void destroy_machine(running_machine *machine);
 static void init_machine(running_machine *machine);
 static TIMER_CALLBACK( soft_reset );
-static void free_callback_list(callback_item **cb);
 
 static void saveload_init(running_machine *machine);
 static void handle_save(running_machine *machine);
@@ -231,8 +213,9 @@ INLINE void eat_all_cpu_cycles(running_machine *machine)
 {
 	const device_config *cpu;
 
-	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
-		cpu_eat_cycles(cpu, 1000000000);
+    if(machine->cpuexec_data)
+		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
+			cpu_eat_cycles(cpu, 1000000000);
 }
 
 
@@ -259,15 +242,14 @@ int mame_execute(core_options *options)
 		running_machine *machine;
 		mame_private *mame;
 		callback_item *cb;
-		astring *gamename;
+		astring gamename;
 
 		/* specify the mame_options */
 		mame_opts = options;
 
 		/* convert the specified gamename to a driver */
-		gamename = core_filename_extract_base(astring_alloc(), options_get_string(mame_options(), OPTION_GAMENAME), TRUE);
-		driver = driver_get_name(astring_c(gamename));
-		astring_free(gamename);
+		core_filename_extract_base(&gamename, options_get_string(mame_options(), OPTION_GAMENAME), TRUE);
+		driver = driver_get_name(gamename);
 
 		/* if no driver, use the internal empty driver */
 		if (driver == NULL)
@@ -287,7 +269,7 @@ int mame_execute(core_options *options)
 		mame_parse_ini_files(mame_options(), driver);
 
 		/* create the machine structure and driver */
-		machine = create_machine(driver);
+		machine = global_alloc(running_machine(driver));
 		mame = machine->mame_data;
 
 		/* start in the "pre-init phase" */
@@ -296,20 +278,13 @@ int mame_execute(core_options *options)
 		/* looooong term: remove this */
 		global_machine = machine;
 
-		init_resource_tracking();
-
-		/* use setjmp/longjmp for deep error recovery */
-		mame->fatal_error_jmpbuf_valid = TRUE;
-		error = setjmp(mame->fatal_error_jmpbuf);
-		if (error == 0)
+		/* use try/catch for deep error recovery */
+		try
 		{
 			int settingsloaded;
 
 			/* move to the init phase */
 			mame->current_phase = MAME_PHASE_INIT;
-
-			/* start tracking resources for real */
-			begin_resource_tracking();
 
 			/* if we have a logfile, set up the callback */
 			mame->logerror_callback_list = NULL;
@@ -332,17 +307,12 @@ int mame_execute(core_options *options)
 			ui_display_startup_screens(machine, firstrun, !settingsloaded);
 			firstrun = FALSE;
 
-			/* start resource tracking; note that soft_reset assumes it can */
-			/* call end_resource_tracking followed by begin_resource_tracking */
-			/* to clear out resources allocated between resets */
-			begin_resource_tracking();
-
 			/* perform a soft reset -- this takes us to the running phase */
 			soft_reset(machine, NULL, 0);
 
 			/* run the CPUs until a reset or exit */
 			mame->hard_reset_pending = FALSE;
-			while ((!mame->hard_reset_pending && !mame->exit_pending) || mame->saveload_pending_file != NULL)
+			while ((!mame->hard_reset_pending && !mame->exit_pending) || mame->saveload_pending_file.len() != 0)
 			{
 				profiler_mark_start(PROFILER_EXTRA);
 
@@ -364,32 +334,36 @@ int mame_execute(core_options *options)
 			/* and out via the exit phase */
 			mame->current_phase = MAME_PHASE_EXIT;
 
-			/* stop tracking resources at this level */
-			end_resource_tracking();
-
 			/* save the NVRAM and configuration */
 			sound_mute(machine, TRUE);
 			nvram_save(machine);
 			config_save_settings(machine);
 		}
-		mame->fatal_error_jmpbuf_valid = FALSE;
+		catch (emu_fatalerror &fatal)
+		{
+			mame_printf_error("%s\n", fatal.string());
+			error = MAMERR_FATALERROR;
+			if (fatal.exitcode() != 0)
+				error = fatal.exitcode();
+		}
+		catch (emu_exception &)
+		{
+			mame_printf_error("Caught unhandled emulator exception\n");
+			error = MAMERR_FATALERROR;
+		}
+		catch (std::bad_alloc &)
+		{
+			mame_printf_error("Out of memory!\n");
+			error = MAMERR_FATALERROR;
+		}
 
 		/* call all exit callbacks registered */
 		for (cb = mame->exit_callback_list; cb; cb = cb->next)
 			(*cb->func.exit)(machine);
 
-		/* close all inner resource tracking */
-		exit_resource_tracking();
-
 		/* close the logfile */
 		if (mame->logfile != NULL)
 			mame_fclose(mame->logfile);
-
-		/* free our callback lists */
-		free_callback_list(&mame->exit_callback_list);
-		free_callback_list(&mame->pause_callback_list);
-		free_callback_list(&mame->reset_callback_list);
-		free_callback_list(&mame->frame_callback_list);
 
 		/* grab data from the MAME structure before it goes away */
 		if (mame->new_driver_pending != NULL)
@@ -400,7 +374,7 @@ int mame_execute(core_options *options)
 		exit_pending = mame->exit_pending;
 
 		/* destroy the machine */
-		destroy_machine(machine);
+		global_free(machine);
 
 		/* reset the options */
 		mame_opts = NULL;
@@ -449,7 +423,7 @@ void add_frame_callback(running_machine *machine, void (*callback)(running_machi
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_frame_callback at init time!");
 
 	/* allocate memory */
-	cb = alloc_or_die(callback_item);
+	cb = auto_alloc(machine, callback_item);
 
 	/* add us to the end of the list */
 	cb->func.frame = callback;
@@ -472,7 +446,7 @@ void add_reset_callback(running_machine *machine, void (*callback)(running_machi
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_reset_callback at init time!");
 
 	/* allocate memory */
-	cb = alloc_or_die(callback_item);
+	cb = auto_alloc(machine, callback_item);
 
 	/* add us to the end of the list */
 	cb->func.reset = callback;
@@ -495,7 +469,7 @@ void add_pause_callback(running_machine *machine, void (*callback)(running_machi
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_pause_callback at init time!");
 
 	/* allocate memory */
-	cb = alloc_or_die(callback_item);
+	cb = auto_alloc(machine, callback_item);
 
 	/* add us to the end of the list */
 	cb->func.pause = callback;
@@ -518,7 +492,7 @@ void add_exit_callback(running_machine *machine, void (*callback)(running_machin
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_exit_callback at init time!");
 
 	/* allocate memory */
-	cb = alloc_or_die(callback_item);
+	cb = auto_alloc(machine, callback_item);
 
 	/* add us to the head of the list */
 	cb->func.exit = callback;
@@ -646,18 +620,15 @@ static void set_saveload_filename(running_machine *machine, const char *filename
 	mame_private *mame = machine->mame_data;
 
 	/* free any existing request and allocate a copy of the requested name */
-	if (mame->saveload_pending_file != NULL)
-		astring_free(mame->saveload_pending_file);
-
 	if (osd_is_absolute_path(filename))
 	{
 		mame->saveload_searchpath = NULL;
-		mame->saveload_pending_file = astring_dupc(filename);
+		mame->saveload_pending_file.cpy(filename);
 	}
 	else
 	{
 		mame->saveload_searchpath = SEARCHPATH_STATE;
-		mame->saveload_pending_file = astring_assemble_4(astring_alloc(), machine->basename, PATH_SEPARATOR, filename, ".sta");
+		mame->saveload_pending_file.cpy(machine->basename).cat(PATH_SEPARATOR).cat(filename).cat(".sta");
 	}
 }
 
@@ -714,7 +685,7 @@ int mame_is_save_or_load_pending(running_machine *machine)
 	/* we can't check for saveload_pending_file here because it will bypass */
 	/* required UI screens if a state is queued from the command line */
 	mame_private *mame = machine->mame_data;
-	return (mame->saveload_pending_file != NULL);
+	return (mame->saveload_pending_file.len() != 0);
 }
 
 
@@ -769,6 +740,31 @@ int mame_is_paused(running_machine *machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    region_info - constructor for a memory region
+-------------------------------------------------*/
+
+region_info::region_info(running_machine *_machine, const char *_name, UINT32 _length, UINT32 _flags)
+	: machine(_machine),
+	  next(NULL),
+	  name(_name),
+	  length(_length),
+	  flags(_flags)
+{
+	base.u8 = auto_alloc_array(_machine, UINT8, _length);
+}
+
+
+/*-------------------------------------------------
+    ~region_info - memory region destructor
+-------------------------------------------------*/
+
+region_info::~region_info()
+{
+	auto_free(machine, base.v);
+}
+
+
+/*-------------------------------------------------
     memory_region_alloc - allocates memory for a
     region
 -------------------------------------------------*/
@@ -781,27 +777,23 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
 
     /* make sure we don't have a region of the same name; also find the end of the list */
     for (infoptr = &mame->regionlist; *infoptr != NULL; infoptr = &(*infoptr)->next)
-    	if (astring_cmpc((*infoptr)->name, name) == 0)
+    	if ((*infoptr)->name.cmp(name) == 0)
     		fatalerror("memory_region_alloc called with duplicate region name \"%s\"\n", name);
 
 	/* allocate the region */
-	info = (region_info *)alloc_array_or_die(UINT8, sizeof(*info) + length);
-	info->next = NULL;
-	info->name = astring_dupc(name);
-	info->length = length;
-	info->flags = flags;
+	info = auto_alloc(machine, region_info(machine, name, length, flags));
 
 	/* attempt to put is in the hash table */
-	tagerr = tagmap_add_unique_hash(mame->regionmap, name, info, FALSE);
+	tagerr = mame->regionmap.add_unique_hash(name, info, FALSE);
 	if (tagerr == TMERR_DUPLICATE)
 	{
-		region_info *match = (region_info *)tagmap_find_hash_only(mame->regionmap, name);
-		fatalerror("Memory region '%s' has same hash as tag '%s'; please change one of them", name, astring_c(match->name));
+		region_info *match = mame->regionmap.find_hash_only(name);
+		fatalerror("Memory region '%s' has same hash as tag '%s'; please change one of them", name, match->name.cstr());
 	}
 
 	/* hook us into the list */
 	*infoptr = info;
-	return info->base;
+	return info->base.u8;
 }
 
 
@@ -817,19 +809,36 @@ void memory_region_free(running_machine *machine, const char *name)
 
 	/* find the region */
 	for (infoptr = &mame->regionlist; *infoptr != NULL; infoptr = &(*infoptr)->next)
-		if (astring_cmpc((*infoptr)->name, name) == 0)
+		if ((*infoptr)->name.cmp(name) == 0)
 		{
 			region_info *info = *infoptr;
 
 			/* remove us from the list and the map */
 			*infoptr = info->next;
-			tagmap_remove(mame->regionmap, astring_c(info->name));
+			mame->regionmap.remove(info->name);
 
 			/* free the region */
-			astring_free(info->name);
-			free(info);
+			auto_free(machine, info);
 			break;
 		}
+}
+
+
+/*-------------------------------------------------
+    memory_region_info - return a pointer to the
+    information struct for a given memory region
+-------------------------------------------------*/
+
+region_info *memory_region_info(running_machine *machine, const char *name)
+{
+	mame_private *mame = machine->mame_data;
+
+    /* NULL tag always fails */
+    if (name == NULL)
+    	return NULL;
+
+    /* look up the region and return the base */
+    return mame->regionmap.find_hash_only(name);
 }
 
 
@@ -840,16 +849,8 @@ void memory_region_free(running_machine *machine, const char *name)
 
 UINT8 *memory_region(running_machine *machine, const char *name)
 {
-	mame_private *mame = machine->mame_data;
-	region_info *info;
-
-    /* NULL tag always fails */
-    if (name == NULL)
-    	return NULL;
-
-    /* look up the region and return the base */
-	info = (region_info *)tagmap_find_hash_only(mame->regionmap, name);
-	return (info != NULL) ? info->base : NULL;
+	const region_info *region = machine->region(name);
+	return (region != NULL) ? region->base.u8 : NULL;
 }
 
 
@@ -860,16 +861,8 @@ UINT8 *memory_region(running_machine *machine, const char *name)
 
 UINT32 memory_region_length(running_machine *machine, const char *name)
 {
-	mame_private *mame = machine->mame_data;
-	region_info *info;
-
-    /* NULL tag always fails */
-    if (name == NULL)
-    	return 0;
-
-    /* look up the region and return the length */
-	info = (region_info *)tagmap_find_hash_only(mame->regionmap, name);
-	return (info != NULL) ? info->length : 0;
+	const region_info *region = machine->region(name);
+	return (region != NULL) ? region->length : NULL;
 }
 
 
@@ -880,16 +873,8 @@ UINT32 memory_region_length(running_machine *machine, const char *name)
 
 UINT32 memory_region_flags(running_machine *machine, const char *name)
 {
-	mame_private *mame = machine->mame_data;
-	region_info *info;
-
-    /* NULL tag always fails */
-    if (name == NULL)
-    	return 0;
-
-    /* look up the region and return the flags */
-	info = (region_info *)tagmap_find_hash_only(mame->regionmap, name);
-	return (info != NULL) ? info->flags : 0;
+	const region_info *region = machine->region(name);
+	return (region != NULL) ? region->flags : NULL;
 }
 
 
@@ -900,20 +885,10 @@ UINT32 memory_region_flags(running_machine *machine, const char *name)
 
 const char *memory_region_next(running_machine *machine, const char *name)
 {
-	mame_private *mame = machine->mame_data;
-	region_info *info;
-
-	/* if there's nothing in this class, fail immediately */
-	if (mame->regionlist == NULL)
-		return NULL;
-
-	/* NULL means return the first */
-    if (name == NULL)
-    	return astring_c(mame->regionlist->name);
-
-    /* look up the region and return the next guy */
-	info = (region_info *)tagmap_find_hash_only(mame->regionmap, name);
-	return (info != NULL && info->next != NULL) ? astring_c(info->next->name) : NULL;
+	if (name == NULL)
+		return (machine->mame_data->regionlist != NULL) ? machine->mame_data->regionlist->name : NULL;
+	const region_info *region = machine->region(name);
+	return (region != NULL && region->next != NULL) ? region->next->name.cstr() : NULL;
 }
 
 
@@ -1120,56 +1095,6 @@ void mame_printf_log(const char *format, ...)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    fatalerror - print a message and escape back
-    to the OSD layer
--------------------------------------------------*/
-
-DECL_NORETURN static void fatalerror_common(running_machine *machine, int exitcode, const char *buffer) ATTR_NORETURN;
-
-static void fatalerror_common(running_machine *machine, int exitcode, const char *buffer)
-{
-	/* output and return */
-	mame_printf_error("%s\n", giant_string_buffer);
-
-	/* break into the debugger if attached */
-	osd_break_into_debugger(giant_string_buffer);
-
-	/* longjmp back if we can; otherwise, exit */
-	if (machine != NULL && machine->mame_data != NULL && machine->mame_data->fatal_error_jmpbuf_valid)
-		longjmp(machine->mame_data->fatal_error_jmpbuf, exitcode);
-	else
-		exit(exitcode);
-}
-
-
-void CLIB_DECL fatalerror(const char *text, ...)
-{
-	running_machine *machine = global_machine;
-	va_list arg;
-
-	/* dump to the buffer; assume no one writes >2k lines this way */
-	va_start(arg, text);
-	vsnprintf(giant_string_buffer, GIANT_STRING_BUFFER_SIZE, text, arg);
-	va_end(arg);
-
-	fatalerror_common(machine, MAMERR_FATALERROR, giant_string_buffer);
-}
-
-
-void CLIB_DECL fatalerror_exitcode(running_machine *machine, int exitcode, const char *text, ...)
-{
-	va_list arg;
-
-	/* dump to the buffer; assume no one writes >2k lines this way */
-	va_start(arg, text);
-	vsnprintf(giant_string_buffer, GIANT_STRING_BUFFER_SIZE, text, arg);
-	va_end(arg);
-
-	fatalerror_common(machine, exitcode, giant_string_buffer);
-}
-
-
-/*-------------------------------------------------
     popmessage - pop up a user-visible message
 -------------------------------------------------*/
 
@@ -1186,7 +1111,7 @@ void CLIB_DECL popmessage(const char *format, ...)
 
 		/* dump to the buffer */
 		va_start(arg, format);
-		vsnprintf(giant_string_buffer, GIANT_STRING_BUFFER_SIZE, format, arg);
+		vsnprintf(giant_string_buffer, ARRAY_LENGTH(giant_string_buffer), format, arg);
 		va_end(arg);
 
 		/* pop it in the UI */
@@ -1219,7 +1144,7 @@ void CLIB_DECL logerror(const char *format, ...)
 
 			/* dump to the buffer */
 			va_start(arg, format);
-			vsnprintf(giant_string_buffer, GIANT_STRING_BUFFER_SIZE, format, arg);
+			vsnprintf(giant_string_buffer, ARRAY_LENGTH(giant_string_buffer), format, arg);
 			va_end(arg);
 
 			/* log to all callbacks */
@@ -1310,7 +1235,6 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 		const game_driver *gparent = (parent != NULL) ? driver_get_clone(parent) : NULL;
 		const device_config *device;
 		machine_config *config;
-		astring *sourcename;
 
 		/* parse "vertical.ini" or "horizont.ini" */
 		if (driver->flags & ORIENTATION_SWAP_XY)
@@ -1332,14 +1256,13 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 		machine_config_free(config);
 
 		/* next parse "source/<sourcefile>.ini"; if that doesn't exist, try <sourcefile>.ini */
-		sourcename = core_filename_extract_base(astring_alloc(), driver->source_file, TRUE);
-		astring_insc(sourcename, 0, "source" PATH_SEPARATOR);
-		if (!parse_ini_file(options, astring_c(sourcename), OPTION_PRIORITY_SOURCE_INI))
+		astring sourcename;
+		core_filename_extract_base(&sourcename, driver->source_file, TRUE)->ins(0, "source" PATH_SEPARATOR);
+		if (!parse_ini_file(options, sourcename, OPTION_PRIORITY_SOURCE_INI))
 		{
-			core_filename_extract_base(sourcename, driver->source_file, TRUE);
-			parse_ini_file(options, astring_c(sourcename), OPTION_PRIORITY_SOURCE_INI);
+			core_filename_extract_base(&sourcename, driver->source_file, TRUE);
+			parse_ini_file(options, sourcename, OPTION_PRIORITY_SOURCE_INI);
 		}
-		astring_free(sourcename);
 
 		/* then parent the grandparent, parent, and game-specific INIs */
 		if (gparent != NULL)
@@ -1360,16 +1283,14 @@ static int parse_ini_file(core_options *options, const char *name, int priority)
 {
 	file_error filerr;
 	mame_file *file;
-	astring *fname;
 
 	/* don't parse if it has been disabled */
 	if (!options_get_bool(options, OPTION_READCONFIG))
 		return FALSE;
 
 	/* open the file; if we fail, that's ok */
-	fname = astring_assemble_2(astring_alloc(), name, ".ini");
-	filerr = mame_fopen_options(options, SEARCHPATH_INI, astring_c(fname), OPEN_FLAG_READ, &file);
-	astring_free(fname);
+	astring fname(name, ".ini");
+	filerr = mame_fopen_options(options, SEARCHPATH_INI, fname, OPEN_FLAG_READ, &file);
 	if (filerr != FILERR_NONE)
 		return FALSE;
 
@@ -1382,92 +1303,100 @@ static int parse_ini_file(core_options *options, const char *name, int priority)
 
 
 /*-------------------------------------------------
-    create_machine - create the running machine
+    running_machine - create the running machine
     object and initialize it based on options
 -------------------------------------------------*/
 
-static running_machine *create_machine(const game_driver *driver)
+running_machine::running_machine(const game_driver *driver)
+	: config(NULL),
+	  firstcpu(NULL),
+	  gamedrv(driver),
+	  basename(NULL),
+	  primary_screen(NULL),
+	  palette(NULL),
+	  pens(NULL),
+	  colortable(NULL),
+	  shadow_table(NULL),
+	  priority_bitmap(NULL),
+	  sample_rate(0),
+	  debug_flags(0),
+	  mame_data(NULL),
+	  cpuexec_data(NULL),
+	  timer_data(NULL),
+	  state_data(NULL),
+	  memory_data(NULL),
+	  palette_data(NULL),
+	  tilemap_data(NULL),
+	  streams_data(NULL),
+	  devices_data(NULL),
+	  romload_data(NULL),
+	  sound_data(NULL),
+	  input_data(NULL),
+	  input_port_data(NULL),
+	  ui_input_data(NULL),
+	  cheat_data(NULL),
+	  debugcpu_data(NULL),
+	  debugvw_data(NULL),
+	  generic_machine_data(NULL),
+	  generic_video_data(NULL),
+	  generic_audio_data(NULL),
+#ifdef MESS
+	  images_data(NULL),
+	  ui_mess_data(NULL),
+#endif /* MESS */
+	  driver_data(NULL)
 {
-	running_machine *machine;
-
-	/* allocate memory for the machine */
-	machine = (running_machine *)malloc(sizeof(*machine));
-	if (machine == NULL)
-		goto error;
-	memset(machine, 0, sizeof(*machine));
-
-	/* allocate memory for the internal mame_data */
-	machine->mame_data = (mame_private *)malloc(sizeof(*machine->mame_data));
-	if (machine->mame_data == NULL)
-		goto error;
-	memset(machine->mame_data, 0, sizeof(*machine->mame_data));
-
-	/* allocate memory for the memory region map */
-	machine->mame_data->regionmap = tagmap_alloc();
-	if (machine->mame_data->regionmap == NULL)
-		goto error;
-
-	/* initialize the driver-related variables in the machine */
-	machine->gamedrv = driver;
-	machine->basename = mame_strdup(driver->name);
-	machine->config = machine_config_alloc(driver->machine_config);
-
-	/* allocate the driver data */
-	if (machine->config->driver_data_size != 0)
+	try
 	{
-		machine->driver_data = malloc(machine->config->driver_data_size);
-		if (machine->driver_data == NULL)
-			goto error;
-		memset(machine->driver_data, 0, machine->config->driver_data_size);
+		memset(&portlist, 0, sizeof(portlist));
+		memset(gfx, 0, sizeof(gfx));
+		memset(&generic, 0, sizeof(generic));
+
+		/* allocate memory for the internal mame_data */
+		mame_data = auto_alloc_clear(this, mame_private);
+
+		/* initialize the driver-related variables in the machine */
+		basename = mame_strdup(driver->name);
+		config = machine_config_alloc(driver->machine_config);
+
+		/* allocate the driver data */
+		if (config->driver_data_size != 0)
+			driver_data = auto_alloc_array_clear(this, UINT8, config->driver_data_size);
+
+		/* find devices */
+		firstcpu = cpu_first(config);
+		primary_screen = video_screen_first(config);
+
+		/* attach this machine to all the devices in the configuration */
+		device_list_attach_machine(this);
+
+		/* fetch core options */
+		sample_rate = options_get_int(mame_options(), OPTION_SAMPLERATE);
+		debug_flags = options_get_bool(mame_options(), OPTION_DEBUG) ? (DEBUG_FLAG_ENABLED | DEBUG_FLAG_CALL_HOOK) : 0;
 	}
-
-	/* find devices */
-	machine->firstcpu = cpu_first(machine->config);
-	machine->primary_screen = video_screen_first(machine->config);
-
-	/* attach this machine to all the devices in the configuration */
-	device_list_attach_machine(machine);
-
-	/* fetch core options */
-	machine->sample_rate = options_get_int(mame_options(), OPTION_SAMPLERATE);
-	machine->debug_flags = options_get_bool(mame_options(), OPTION_DEBUG) ? (DEBUG_FLAG_ENABLED | DEBUG_FLAG_CALL_HOOK) : 0;
-
-	return machine;
-
-error:
-	if (machine->driver_data != NULL)
-		free(machine->driver_data);
-	if (machine->config != NULL)
-		machine_config_free((machine_config *)machine->config);
-	if (machine->mame_data != NULL)
-		free(machine->mame_data);
-	if (machine != NULL)
-		free(machine);
-	return NULL;
+	catch (std::bad_alloc &)
+	{
+		if (driver_data != NULL)
+			auto_free(this, driver_data);
+		if (config != NULL)
+			machine_config_free((machine_config *)config);
+		if (mame_data != NULL)
+			auto_free(this, mame_data);
+	}
 }
 
 
 /*-------------------------------------------------
-    destroy_machine - free the machine data
+    ~running_machine - free the machine data
 -------------------------------------------------*/
 
-static void destroy_machine(running_machine *machine)
+running_machine::~running_machine()
 {
-	assert(machine == global_machine);
+	assert(this == global_machine);
 
-	if (machine->driver_data != NULL)
-		free(machine->driver_data);
-	if (machine->config != NULL)
-		machine_config_free((machine_config *)machine->config);
-	if (machine->mame_data != NULL)
-	{
-		if (machine->mame_data->regionmap != NULL)
-			tagmap_free(machine->mame_data->regionmap);
-		free(machine->mame_data);
-	}
-	if (machine->basename != NULL)
-		free((void *)machine->basename);
-	free(machine);
+	if (config != NULL)
+		machine_config_free((machine_config *)config);
+
 	global_machine = NULL;
 }
 
@@ -1597,11 +1526,6 @@ static TIMER_CALLBACK( soft_reset )
 	/* temporarily in the reset phase */
 	mame->current_phase = MAME_PHASE_RESET;
 
-	/* a bit gross -- back off of the resource tracking, and put it back at the end */
-	assert(get_resource_tag() == 2);
-	end_resource_tracking();
-	begin_resource_tracking();
-
 	/* call all registered reset callbacks */
 	for (cb = machine->mame_data->reset_callback_list; cb; cb = cb->next)
 		(*cb->func.reset)(machine);
@@ -1619,21 +1543,6 @@ static TIMER_CALLBACK( soft_reset )
 
 	/* allow 0-time queued callbacks to run before any CPUs execute */
 	timer_execute_timers(machine);
-}
-
-
-/*-------------------------------------------------
-    free_callback_list - free a list of callbacks
--------------------------------------------------*/
-
-static void free_callback_list(callback_item **cb)
-{
-	while (*cb)
-	{
-		callback_item *temp = *cb;
-		*cb = (*cb)->next;
-		free(temp);
-	}
 }
 
 
@@ -1671,7 +1580,7 @@ static void handle_save(running_machine *machine)
 	mame_file *file;
 
 	/* if no name, bail */
-	if (mame->saveload_pending_file == NULL)
+	if (mame->saveload_pending_file.len() == 0)
 	{
 		mame->saveload_schedule_callback = NULL;
 		return;
@@ -1690,10 +1599,10 @@ static void handle_save(running_machine *machine)
 	}
 
 	/* open the file */
-	filerr = mame_fopen(mame->saveload_searchpath, astring_c(mame->saveload_pending_file), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+	filerr = mame_fopen(mame->saveload_searchpath, mame->saveload_pending_file, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 	if (filerr == FILERR_NONE)
 	{
-		astring *fullname = astring_dupc(mame_file_full_name(file));
+		astring fullname(mame_file_full_name(file));
 		state_save_error staterr;
 
 		/* write the save state */
@@ -1725,17 +1634,15 @@ static void handle_save(running_machine *machine)
 		/* close and perhaps delete the file */
 		mame_fclose(file);
 		if (staterr != STATERR_NONE)
-			osd_rmfile(astring_c(fullname));
-		astring_free(fullname);
+			osd_rmfile(fullname);
 	}
 	else
 		popmessage("Error: Failed to create save state file.");
 
 	/* unschedule the save */
 cancel:
-	astring_free(mame->saveload_pending_file);
+	mame->saveload_pending_file.reset();
 	mame->saveload_searchpath = NULL;
-	mame->saveload_pending_file = NULL;
 	mame->saveload_schedule_callback = NULL;
 }
 
@@ -1751,7 +1658,7 @@ static void handle_load(running_machine *machine)
 	mame_file *file;
 
 	/* if no name, bail */
-	if (mame->saveload_pending_file == NULL)
+	if (mame->saveload_pending_file.len() == 0)
 	{
 		mame->saveload_schedule_callback = NULL;
 		return;
@@ -1771,7 +1678,7 @@ static void handle_load(running_machine *machine)
 	}
 
 	/* open the file */
-	filerr = mame_fopen(mame->saveload_searchpath, astring_c(mame->saveload_pending_file), OPEN_FLAG_READ, &file);
+	filerr = mame_fopen(mame->saveload_searchpath, mame->saveload_pending_file, OPEN_FLAG_READ, &file);
 	if (filerr == FILERR_NONE)
 	{
 		state_save_error staterr;
@@ -1814,8 +1721,7 @@ static void handle_load(running_machine *machine)
 
 	/* unschedule the load */
 cancel:
-	astring_free(mame->saveload_pending_file);
-	mame->saveload_pending_file = NULL;
+	mame->saveload_pending_file.reset();
 	mame->saveload_schedule_callback = NULL;
 }
 

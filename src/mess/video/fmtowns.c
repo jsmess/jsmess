@@ -84,7 +84,7 @@
  * 
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/pic8259.h"
 #include "devices/messram.h"
 #include "includes/fmtowns.h"
@@ -1230,7 +1230,7 @@ void draw_text_layer(running_machine* machine,bitmap_t* bitmap, const rectangle*
 static TIMER_CALLBACK( towns_vblank_end )
 {
 	// here we'll clear the vsync signal, I presume it goes low on it's own eventually
-	const device_config* dev = ptr;
+	const device_config* dev = (const device_config*)ptr;
 	pic8259_set_irq_line(dev,3,0);  // IRQ11 = VSync
 }
 

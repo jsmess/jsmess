@@ -63,7 +63,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "m6847.h"
 
 #include "debug/debugcpu.h"
@@ -1760,14 +1760,14 @@ static void set_dirty(mc6847_state *mc6847)
 
 static STATE_POSTLOAD( mc6847_postload )
 {
-	set_dirty(param);
+	set_dirty((mc6847_state *)param);
 }
 
 static DEVICE_START( mc6847 )
 {
 	mc6847_state *mc6847 = get_safe_token(device);
-	const mc6847_interface *intf = device->static_config;
-	const mc6847_config *cfg = device->inline_config;
+	const mc6847_interface *intf = (mc6847_interface *)device->static_config;
+	const mc6847_config *cfg = (mc6847_config *)device->inline_config;
 
 	const m6847_variant *v;
 	UINT32 frequency;

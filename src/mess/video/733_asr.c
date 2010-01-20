@@ -20,7 +20,7 @@
     Raphael Nabet 2003
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "733_asr.h"
 
 #define MAX_ASR 1

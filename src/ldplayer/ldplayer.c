@@ -9,7 +9,7 @@
 
 **************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "uimenu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/laserdsc.h"
@@ -62,7 +62,7 @@ enum
  *
  *************************************/
 
-static astring *filename;
+static astring filename;
 
 static input_port_value last_controls;
 static UINT8 playing;
@@ -83,7 +83,6 @@ static void (*execute_command)(const device_config *laserdisc, int command);
 
 static void free_string(running_machine *machine)
 {
-	astring_free(filename);
 }
 
 
@@ -123,7 +122,7 @@ static chd_file *get_disc(const device_config *device)
 					if (chderr == CHDERR_NONE)
 					{
 						set_disk_handle(device->machine, "laserdisc", image_file, image_chd);
-						filename = astring_dupc(dir->name);
+						filename.cpy(dir->name);
 						add_exit_callback(device->machine, free_string);
 						break;
 					}
@@ -264,7 +263,7 @@ static MACHINE_RESET( ldplayer )
 	timer_set(machine, attotime_zero, NULL, 0, autoplay);
 
 	/* indicate the name of the file we opened */
-	popmessage("Opened %s\n", astring_c(filename));
+	popmessage("Opened %s\n", filename.cstr());
 }
 
 
@@ -284,7 +283,7 @@ INLINE void pr8210_add_command(UINT8 command)
 
 static TIMER_CALLBACK( pr8210_bit_off_callback )
 {
-	const device_config *laserdisc = ptr;
+	const device_config *laserdisc = (const device_config *)ptr;
 
 	/* deassert the control line */
 	laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, CLEAR_LINE);
@@ -294,7 +293,7 @@ static TIMER_CALLBACK( pr8210_bit_off_callback )
 static TIMER_CALLBACK( pr8210_bit_callback )
 {
 	attotime duration = ATTOTIME_IN_MSEC(30);
-	const device_config *laserdisc = ptr;
+	const device_config *laserdisc = (const device_config *)ptr;
 	UINT8 bitsleft = param >> 16;
 	UINT8 data = param;
 

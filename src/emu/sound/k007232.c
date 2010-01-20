@@ -23,10 +23,9 @@ added external port callback, and functions to set the volume of the channels
 */
 
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "k007232.h"
-#include <math.h>
 
 
 #define  KDAC_A_PCM_MAX    (2)		/* Channels per chip */
@@ -312,9 +311,9 @@ static DEVICE_START( k007232 )
 
 	/* Set up the chips */
 
-	info->pcmbuf[0] = device->region;
-	info->pcmbuf[1] = device->region;
-	info->pcmlimit  = device->regionbytes;
+	info->pcmbuf[0] = *device->region;
+	info->pcmbuf[1] = *device->region;
+	info->pcmlimit  = device->region->bytes();
 
 	info->clock = device->clock;
 

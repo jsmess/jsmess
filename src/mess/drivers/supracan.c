@@ -20,7 +20,7 @@ Known unemulated graphical effects:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "devices/cartslot.h"
@@ -71,7 +71,7 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%06x: %s", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), buf );
+		logerror( "%06x: %s", cpu_get_pc(devtag_get_device(machine, "maincpu")), buf );
 	}
 }
 #else
@@ -624,8 +624,8 @@ static WRITE16_HANDLER( supracan_sound_w )
 				if ( ! supracan_m6502_reset )
 				{
 					/* Reset and enable the sound cpu */
-					//cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, CLEAR_LINE);
-					//cputag_reset( space->machine, "soundcpu" );
+					//cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, CLEAR_LINE);					
+					//device_reset(devtag_get_device(space->machine, "soundcpu"));
 				}
 			}
 			else

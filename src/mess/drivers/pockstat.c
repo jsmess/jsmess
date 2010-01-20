@@ -28,7 +28,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "devices/cartslot.h"
@@ -304,19 +304,19 @@ static void ps_intc_set_interrupt_line(running_machine *machine, UINT32 line, in
 	}
 	if(intc_regs.hold & intc_regs.enable & PS_INT_IRQ_MASK)
 	{
-		cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(devtag_get_device(machine, "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(devtag_get_device(machine, "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
 	}
 	if(intc_regs.hold & intc_regs.enable & PS_INT_FIQ_MASK)
 	{
-		cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), ARM7_FIRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(devtag_get_device(machine, "maincpu"), ARM7_FIRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), ARM7_FIRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(devtag_get_device(machine, "maincpu"), ARM7_FIRQ_LINE, CLEAR_LINE);
 	}
 }
 
@@ -884,7 +884,7 @@ static MACHINE_START( pockstat )
 
 static MACHINE_RESET( pockstat )
 {
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, 0x4000000);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENPC, 0x4000000);
 
 	ps_flash_write_enable_count = 0;
 	ps_flash_write_count = 0;

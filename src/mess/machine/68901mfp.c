@@ -376,7 +376,7 @@ static void take_interrupt(const device_config *device, UINT16 mask)
 
 static TIMER_CALLBACK( gpio_poll_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	mc68901_t *mc68901 = get_safe_token(device);
 
 	UINT8 gpio = devcb_call_read8(&mc68901->in_gpio_func, 0);
@@ -591,7 +591,7 @@ static void serial_receive(const device_config *device)
 
 static TIMER_CALLBACK( rx_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 
 	serial_receive(device);
 }
@@ -831,7 +831,7 @@ static void serial_transmit(const device_config *device)
 
 static TIMER_CALLBACK( tx_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 
 	serial_transmit(device);
 }
@@ -1449,10 +1449,10 @@ static void timer_input(const device_config *device, int index, int value)
     TIMER_CALLBACK( timer_a )
 -------------------------------------------------*/
 
-static TIMER_CALLBACK( timer_a ) { timer_count(ptr, MC68901_TIMER_A); }
-static TIMER_CALLBACK( timer_b ) { timer_count(ptr, MC68901_TIMER_B); }
-static TIMER_CALLBACK( timer_c ) { timer_count(ptr, MC68901_TIMER_C); }
-static TIMER_CALLBACK( timer_d ) { timer_count(ptr, MC68901_TIMER_D); }
+static TIMER_CALLBACK( timer_a ) { timer_count((const device_config *)ptr, MC68901_TIMER_A); }
+static TIMER_CALLBACK( timer_b ) { timer_count((const device_config *)ptr, MC68901_TIMER_B); }
+static TIMER_CALLBACK( timer_c ) { timer_count((const device_config *)ptr, MC68901_TIMER_C); }
+static TIMER_CALLBACK( timer_d ) { timer_count((const device_config *)ptr, MC68901_TIMER_D); }
 
 /*-------------------------------------------------
     mc68901_get_vector - get interrupt vector
@@ -1460,7 +1460,7 @@ static TIMER_CALLBACK( timer_d ) { timer_count(ptr, MC68901_TIMER_D); }
 
 int mc68901_get_vector(const device_config *device)
 {
-	mc68901_t *mc68901 = get_safe_token(device);
+	mc68901_t *mc68901 = (mc68901_t *)get_safe_token(device);
 
 	int ch;
 
@@ -1534,7 +1534,7 @@ WRITE_LINE_DEVICE_HANDLER( mc68901_tx_clock_w )
 
 static DEVICE_START( mc68901 )
 {
-	mc68901_t *mc68901 = device->token;
+	mc68901_t *mc68901 = (mc68901_t *)device->token;
 	const mc68901_interface *intf = get_interface(device);
 
 	/* resolve callbacks */

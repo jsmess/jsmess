@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/terminal.h"
@@ -49,7 +49,7 @@ static MACHINE_RESET(dual68)
 
 	memcpy((UINT8*)dual68_ram,user1,0x2000);
 
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 }
 
 static WRITE8_DEVICE_HANDLER( dual68_kbd_put )

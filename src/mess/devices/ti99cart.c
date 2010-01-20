@@ -7,7 +7,7 @@
     Michael Zapf, 2009
 
 *********************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "ti99cart.h"
 #include "cartslot.h"
 #include "machine/ti99_4x.h"
@@ -409,7 +409,7 @@ static void set_pointers(const device_config *pcb, int index)
 static DEVICE_START(ti99_pcb_none)
 {
 	/* device is ti99_cartslot:cartridge:pcb */
-//  printf("DEVICE_START(ti99_pcb_none), tag of device=%s\n", device->tag);
+//  printf("DEVICE_START(ti99_pcb_none), tag of device=%s\n", device->tag.cstr());
 	set_pointers(device, get_index_from_tagname(device->owner)-1);
 }
 
@@ -422,7 +422,7 @@ static DEVICE_START(ti99_pcb_none)
 static DEVICE_START(ti99_pcb_std)
 {
 	/* device is ti99_cartslot:cartridge:pcb */
-//  printf("DEVICE_START(ti99_pcb_std), tag of device=%s\n", device->tag);
+//  printf("DEVICE_START(ti99_pcb_std), tag of device=%s\n", device->tag.cstr());
 	set_pointers(device, get_index_from_tagname(device->owner)-1);
 }
 
@@ -556,7 +556,7 @@ static int disassemble_std(const device_config *image)
 static DEVICE_START(ti99_pcb_paged)
 {
 	/* device is ti99_cartslot:cartridge:pcb */
-//  printf("DEVICE_START(ti99_pcb_paged), tag of device=%s\n", device->tag);
+//  printf("DEVICE_START(ti99_pcb_paged), tag of device=%s\n", device->tag.cstr());
 	set_pointers(device, get_index_from_tagname(device->owner)-1);
 }
 
@@ -573,9 +573,9 @@ static READ16_DEVICE_HANDLER( read_cart_paged )
 	UINT16 *rombank;
 
 	if (cartridge->rom_page==0)
-		rombank = cartridge->rom_ptr;
+		rombank = (UINT16*)cartridge->rom_ptr;
 	else
-		rombank = cartridge->rom2_ptr;
+		rombank = (UINT16*)cartridge->rom2_ptr;
 
 	if (rombank==NULL)
 	{
@@ -620,9 +620,9 @@ static READ8_DEVICE_HANDLER( read_cart_paged8 )
 	UINT8 *rombank;
 
 	if (cartridge->rom_page==0)
-		rombank = cartridge->rom_ptr;
+		rombank = (UINT8 *)cartridge->rom_ptr;
 	else
-		rombank = cartridge->rom2_ptr;
+		rombank = (UINT8 *)cartridge->rom2_ptr;
 
 	if (rombank==NULL)
 		value = 0;
@@ -1196,7 +1196,7 @@ static int assemble_mbx(const device_config *image)
 static DEVICE_START(ti99_pcb_paged379i)
 {
 	/* device is ti99_cartslot:cartridge:pcb */
-//  printf("DEVICE_START(ti99_pcb_paged379i), tag of device=%s\n", device->tag);
+//  printf("DEVICE_START(ti99_pcb_paged379i), tag of device=%s\n", device->tag.cstr());
 	set_pointers(device, get_index_from_tagname(device->owner)-1);
 }
 
@@ -1373,7 +1373,7 @@ static int assemble_paged379i(const device_config *image)
 static DEVICE_START(ti99_pcb_pagedcru)
 {
 	/* device is ti99_cartslot:cartridge:pcb */
-//  printf("DEVICE_START(ti99_pcb_paged379i), tag of device=%s\n", device->tag);
+//  printf("DEVICE_START(ti99_pcb_paged379i), tag of device=%s\n", device->tag.cstr());
 	set_pointers(device, get_index_from_tagname(device->owner)-1);
 }
 
@@ -1850,14 +1850,13 @@ static DEVICE_GET_INFO(ti99_cartridge_pcb_pagedcru)
 */
 static DEVICE_START( ti99_cartridge )
 {
-	cartslot_t *cart = device->token;
-	astring *tempstring = astring_alloc();
+	cartslot_t *cart = (cartslot_t *)device->token;
+	astring tempstring;
 
 	/* find the PCB device */
 	cart->pcb_device = devtag_get_device(
 		device->machine,
 		device_build_tag(tempstring, device, TAG_PCB));
-	astring_free(tempstring);
 }
 
 /*
@@ -2342,7 +2341,7 @@ static int load_legacy(const device_config *image)
 				// printf("** is 99/8\n");
 				if (savembx==TRUE)
 				{
-					cartmbx8 = malloc(0x400);
+					cartmbx8 = (UINT8*)malloc(0x400);
 					memcpy(cartmbx8, cart8rom + 0x0c00, 0x400);
 					filesize = image_fread(image, cart8rom, maxrom);
 					memcpy(cart8rom + 0xc00, cartmbx8, 0x400);
@@ -2359,7 +2358,7 @@ static int load_legacy(const device_config *image)
 			{
 				if (savembx==TRUE)
 				{
-					cartmbx = malloc(0x400);
+					cartmbx = (UINT16*)malloc(0x400);
 					memcpy(cartmbx, cartrom + 0x0600, 0x400);
 					filesize = image_fread(image, cartrom, maxrom);
 					memcpy(cartrom + 0x0600, cartmbx, 0x400);
@@ -2609,7 +2608,7 @@ READ16_DEVICE_HANDLER( ti99_multicart_r )
 	cart = &cartslots->cartridge[slot];
 
 	/* Idle the CPU */
-        cpu_adjust_icount(cputag_get_cpu(device->machine, "maincpu"),-4);
+        cpu_adjust_icount(devtag_get_device(device->machine, "maincpu"),-4);
 
 	// Alternatively:
 	// cpu_spinuntil_time(device->machine->firstcpu, ATTOTIME_IN_USEC(6));
@@ -2663,7 +2662,7 @@ WRITE16_DEVICE_HANDLER( ti99_multicart_w )
 	cart = &cartslots->cartridge[slot];
 
 	/* Idle the CPU */
-        cpu_adjust_icount(cputag_get_cpu(device->machine, "maincpu"),-4);
+        cpu_adjust_icount(devtag_get_device(device->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(device->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	/* Handle legacy mode. */
@@ -2772,7 +2771,7 @@ READ8_DEVICE_HANDLER(ti99_multicart8_r)
 	cart = &cartslots->cartridge[slot];
 
 	/* Idle the CPU. TODO: Check whether this is correct for this machine. */
-        cpu_adjust_icount(cputag_get_cpu(device->machine, "maincpu"),-4);
+        cpu_adjust_icount(devtag_get_device(device->machine, "maincpu"),-4);
 
 	/* Handle legacy mode. */
 	if (in_legacy_mode(device))
@@ -2811,7 +2810,7 @@ WRITE8_DEVICE_HANDLER(ti99_multicart8_w)
 	cart = &cartslots->cartridge[slot];
 
 	/* Idle the CPU. TODO: Check whether this is correct for this machine. */
-        cpu_adjust_icount(cputag_get_cpu(device->machine, "maincpu"),-4);
+        cpu_adjust_icount(devtag_get_device(device->machine, "maincpu"),-4);
 
 	/* Handle legacy mode. */
 	if (in_legacy_mode(device))

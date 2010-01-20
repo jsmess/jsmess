@@ -31,8 +31,7 @@
 
 ***************************************************************************/
 
-#include <math.h>
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "qsound.h"
 
@@ -108,8 +107,8 @@ static DEVICE_START( qsound )
 	qsound_state *chip = get_safe_token(device);
 	int i;
 
-	chip->sample_rom = (QSOUND_SRC_SAMPLE *)device->region;
-	chip->sample_rom_length = device->regionbytes;
+	chip->sample_rom = (QSOUND_SRC_SAMPLE *)*device->region;
+	chip->sample_rom_length = device->region->bytes();
 
 	memset(chip->channel, 0, sizeof(chip->channel));
 

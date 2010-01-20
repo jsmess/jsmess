@@ -29,7 +29,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/pc_hdc.h"
 #include "machine/8237dma.h"
 #include "devices/harddriv.h"
@@ -738,7 +738,7 @@ static void pc_hdc_select_w(int n, int data)
 
 static void pc_hdc_control_w(running_machine *machine, int n, int data)
 {
-	int irq = irq = (dip[n] & 0x40) ? 5 : 2;
+	int irq = (dip[n] & 0x40) ? 5 : 2;
 
 	if (LOG_HDC_STATUS)
 		logerror("pc_hdc_control_w(): Control write pc=0x%08x data=%d\n", (unsigned) cpu_get_reg(machine->firstcpu, REG_GENPC), data);

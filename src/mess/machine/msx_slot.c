@@ -17,7 +17,8 @@
  * - fmsx painter.rom
  */
 
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "machine/i8255a.h"
 #include "includes/msx_slot.h"
 #include "includes/msx.h"

@@ -6,7 +6,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "memconv.h"
 #include "includes/crtc6845.h"
 #include "video/pc_video.h"

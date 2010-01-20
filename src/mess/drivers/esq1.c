@@ -52,7 +52,7 @@ TODO:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/es5503.h"
 #include "machine/68681.h"

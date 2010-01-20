@@ -12,7 +12,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/elf.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "devices/cassette.h"
@@ -43,14 +43,14 @@ static READ8_DEVICE_HANDLER( dispon_r )
 
 static READ8_HANDLER( data_r )
 {
-	elf2_state *state = space->machine->driver_data;
+	elf2_state *state = (elf2_state *)space->machine->driver_data;
 
 	return state->data;
 }
 
 static WRITE8_HANDLER( data_w )
 {
-	elf2_state *state = space->machine->driver_data;
+	elf2_state *state = (elf2_state *)space->machine->driver_data;
 
 	dm9368_w(state->dm9368_l, 0, data & 0x0f);
 	dm9368_w(state->dm9368_h, 0, data >> 4);
@@ -58,7 +58,7 @@ static WRITE8_HANDLER( data_w )
 
 static WRITE8_HANDLER( memory_w )
 {
-	elf2_state *state = space->machine->driver_data;
+	elf2_state *state = (elf2_state *)space->machine->driver_data;
 
 	if (LOAD(space->machine))
 	{
@@ -166,7 +166,7 @@ static CDP1802_EF_READ( elf2_ef_r )
         EF4     input switch
     */
 
-	elf2_state *state = device->machine->driver_data;
+	elf2_state *state = (elf2_state *)device->machine->driver_data;
 
 	UINT8 flags = 0x0f;
 
@@ -195,7 +195,7 @@ static WRITE_LINE_DEVICE_HANDLER( elf2_q_w )
 
 static READ8_DEVICE_HANDLER( elf2_dma_r )
 {
-	elf2_state *state = device->machine->driver_data;
+	elf2_state *state = (elf2_state *)device->machine->driver_data;
 
 	return state->data;
 }
@@ -214,7 +214,7 @@ static CDP1802_INTERFACE( elf2_config )
 
 static WRITE_LINE_DEVICE_HANDLER( mm74c923_da_w )
 {
-	elf2_state *driver_state = device->machine->driver_data;
+	elf2_state *driver_state = (elf2_state *)device->machine->driver_data;
 
 	if (state)
 	{
@@ -247,7 +247,7 @@ static MM74C922_INTERFACE( keyboard_intf )
 
 static VIDEO_UPDATE( elf2 )
 {
-	elf2_state *state = screen->machine->driver_data;
+	elf2_state *state = (elf2_state *)screen->machine->driver_data;
 
 	cdp1861_update(state->cdp1861, bitmap, cliprect);
 
@@ -256,7 +256,7 @@ static VIDEO_UPDATE( elf2 )
 
 static WRITE_LINE_DEVICE_HANDLER( elf2_efx_w )
 {
-	elf2_state *driver_state = device->machine->driver_data;
+	elf2_state *driver_state = (elf2_state *)device->machine->driver_data;
 
 	driver_state->cdp1861_efx = state;
 }
@@ -274,7 +274,7 @@ static CDP1861_INTERFACE( elf2_cdp1861_intf )
 
 static MACHINE_START( elf2 )
 {
-	elf2_state *state = machine->driver_data;
+	elf2_state *state = (elf2_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
@@ -305,7 +305,7 @@ static const cassette_config elf_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 };
 
 static MACHINE_DRIVER_START( elf2 )

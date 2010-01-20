@@ -95,7 +95,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/decocrpt.h"
 #include "machine/eeprom.h"
 #include "sound/ymz280b.h"
@@ -683,7 +683,7 @@ static void descramble_sound( running_machine *machine )
 	/* the same as simpl156 / heavy smash? */
 	UINT8 *rom = memory_region(machine, "ymz");
 	int length = memory_region_length(machine, "ymz");
-	UINT8 *buf1 = alloc_array_or_die(UINT8, length);
+	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
 
 	UINT32 x;
 
@@ -703,7 +703,7 @@ static void descramble_sound( running_machine *machine )
 
 	memcpy(rom,buf1,length);
 
-	free (buf1);
+	auto_free (machine, buf1);
 }
 
 static READ32_HANDLER( avengrgs_speedup_r )
@@ -719,11 +719,11 @@ static READ32_HANDLER( avengrgs_speedup_r )
 static DRIVER_INIT( avengrgs )
 {
 	// init options
-	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
 
 	// set up speed cheat
-	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x3234);
-	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x32dc);
+	sh2drc_add_pcflush(devtag_get_device(machine, "maincpu"), 0x3234);
+	sh2drc_add_pcflush(devtag_get_device(machine, "maincpu"), 0x32dc);
 
 	mainCpuIsArm = 0;
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );
@@ -735,7 +735,7 @@ static DRIVER_INIT( mlc )
 	/* The timing in the ARM core isn't as accurate as it should be, so bump up the
         effective clock rate here to compensate otherwise we have slowdowns in
         Skull Fung where there probably shouldn't be. */
-	cpu_set_clockscale(cputag_get_cpu(machine, "maincpu"), 2.0f);
+	cpu_set_clockscale(devtag_get_device(machine, "maincpu"), 2.0f);
 	mainCpuIsArm = 1;
 	deco156_decrypt(machine);
 	descramble_sound(machine);

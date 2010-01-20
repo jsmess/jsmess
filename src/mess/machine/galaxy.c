@@ -7,7 +7,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/galaxy.h"
 #include "devices/cassette.h"
@@ -69,7 +69,7 @@ static IRQ_CALLBACK ( galaxy_irq_callback )
 
 static void galaxy_setup_snapshot (running_machine *machine, const UINT8 * data, UINT32 size)
 {
-	const device_config *cpu = cputag_get_cpu(machine, "maincpu");
+	const device_config *cpu = devtag_get_device(machine, "maincpu");
 
 	switch (size)
 	{
@@ -186,7 +186,7 @@ MACHINE_RESET( galaxy )
 	if (input_port_read(machine, "ROM2"))
 		memory_set_bankptr(machine,"bank10", memory_region(machine, "maincpu") + 0x1000);
 
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), galaxy_irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), galaxy_irq_callback);
 	galaxy_interrupts_enabled = TRUE;
 }
 
@@ -200,7 +200,7 @@ MACHINE_RESET( galaxyp )
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), galaxy_irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), galaxy_irq_callback);
 
 	ROM[0x0037] = 0x29;
 	ROM[0x03f9] = 0xcd;

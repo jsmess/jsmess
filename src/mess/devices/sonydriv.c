@@ -36,7 +36,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/applefdc.h"
 #include "sonydriv.h"
 #include "formats/ap_dsk35.h"
@@ -114,7 +114,7 @@ static void load_track_data(const device_config *device,int floppy_select)
 	cur_image = floppy_get_device_by_type(device->machine, FLOPPY_TYPE_SONY, floppy_select);
 
 	track_size = floppy_get_track_size(flopimg_get_image(cur_image), f->head, floppy_drive_get_current_track(cur_image));
-	new_data = image_realloc(cur_image, f->loadedtrack_data, track_size);
+	new_data = (UINT8*)image_realloc(cur_image, f->loadedtrack_data, track_size);
 	if (!new_data)
 		return;
 

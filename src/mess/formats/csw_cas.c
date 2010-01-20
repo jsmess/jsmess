@@ -22,14 +22,14 @@ Offset  Value   Type    Description
 
 #include <string.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "zlib.h"
 #include "formats/csw_cas.h"
 
 
 #define CSW_WAV_FREQUENCY	44100
 
-static const UINT8 CSW_HEADER[22] = { "Compressed Square Wave" };
+static const UINT8 CSW_HEADER[] = { "Compressed Square Wave" };
 
 static UINT32 get_leuint32(const void *ptr)
 {
@@ -93,7 +93,7 @@ int 		bsize=0;
 	//from here on down for now I am assuming it is compressed csw file.
 	in_ptr = (UINT8*) casdata+0x34+HeaderExtensionLength;
 
-	gz_ptr = malloc( 8 );
+	gz_ptr = (UINT8*)malloc( 8 );
 
 
 	d_stream.next_in = (unsigned char *)in_ptr;
@@ -211,7 +211,7 @@ int		i;
 	//from here on down for now I am assuming it is compressed csw file.
 	in_ptr = (UINT8*) bytes+0x34+HeaderExtensionLength;
 
-	gz_ptr = malloc( 8 );
+	gz_ptr = (UINT8*)malloc( 8 );
 
 
 	d_stream.next_in = (unsigned char *)in_ptr;

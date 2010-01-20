@@ -69,7 +69,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "devconv.h"
 #include "machine/pci.h"
 
@@ -136,7 +136,7 @@ READ32_DEVICE_HANDLER( pci_32le_r )
 	}
 
 	if (LOG_PCI)
-		logerror("pci_32le_r('%s'): offset=%d result=0x%08X\n", device->tag, offset, result);
+		logerror("pci_32le_r('%s'): offset=%d result=0x%08X\n", device->tag.cstr(), offset, result);
 
 	return result;
 }
@@ -150,7 +150,7 @@ WRITE32_DEVICE_HANDLER( pci_32le_w )
 	offset %= 2;
 
 	if (LOG_PCI)
-		logerror("pci_32le_w('%s'): offset=%d data=0x%08X\n", device->tag, offset, data);
+		logerror("pci_32le_w('%s'): offset=%d data=0x%08X\n", device->tag.cstr(), offset, data);
 
 	switch (offset)
 	{
@@ -218,7 +218,7 @@ static DEVICE_START( pci_bus )
 	/* find all our devices */
 	for (devicenum = 0; devicenum < ARRAY_LENGTH(pcibus->device); devicenum++)
 		if (pcibus->config->device[devicenum].devtag != NULL)
-			pcibus->device[devicenum] = devtag_get_device(device->machine, pcibus->config->device[devicenum].devtag);
+			pcibus->device[devicenum] = device->machine->device(pcibus->config->device[devicenum].devtag);
 
 	/* register pci states */
 	state_save_register_device_item(device, 0, pcibus->address);

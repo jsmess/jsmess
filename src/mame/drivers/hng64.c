@@ -447,7 +447,7 @@ or Fatal Fury for example).
 */
 
 #define MASTER_CLOCK 50000000
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/nec/nec.h"
 #include "deprecat.h"
@@ -983,14 +983,12 @@ static READ32_HANDLER( tcram_r )
 	return hng64_tcram[offset];
 }
 
-/* Some games (namely sams64 after the title screen) tests bit 15 of this to be high, unknown purpose (vblank? related to the display list?). */
+/* Some games (namely sams64 after the title screen) tests bit 15 of this to be high,
+   unknown purpose (vblank? related to the display list?). */
 static READ32_HANDLER( unk_vreg_r )
 {
 	static UINT32 toggle;
-
-	toggle^=0x8000;
-
-	return toggle | (mame_rand(space->machine) & 2);
+	return ++toggle;
 }
 
 
@@ -1669,7 +1667,7 @@ static GFXDECODE_START( hng64 )
 	GFXDECODE_ENTRY( "textures", 0, hng64_texlayout,     0x0, 0x10 )  /* textures */
 GFXDECODE_END
 
-static void hng64_reorder(UINT8* gfxregion, size_t gfxregionsize)
+static void hng64_reorder(running_machine *machine, UINT8* gfxregion, size_t gfxregionsize)
 {
 	// by default 2 4bpp tiles are stored in each 8bpp tile, this makes decoding in MAME harder than it needs to be
 	// reorder them
@@ -1677,7 +1675,7 @@ static void hng64_reorder(UINT8* gfxregion, size_t gfxregionsize)
 	int i;
 	UINT8 tilesize = 4*8; // 4 bytes per line, 8 lines
 
-	buffer = alloc_array_or_die(UINT8, gfxregionsize);
+	buffer = auto_alloc_array(machine, UINT8, gfxregionsize);
 
 	for (i=0;i<gfxregionsize/2;i+=tilesize)
 	{
@@ -1687,14 +1685,14 @@ static void hng64_reorder(UINT8* gfxregion, size_t gfxregionsize)
 
 	memcpy(gfxregion, buffer, gfxregionsize);
 
-	free (buffer);
+	auto_free (machine, buffer);
 
 }
 
 
 static DRIVER_INIT( hng64_reorder_gfx )
 {
-	hng64_reorder(memory_region(machine,"scrtile"), memory_region_length(machine, "scrtile"));
+	hng64_reorder(machine, memory_region(machine,"scrtile"), memory_region_length(machine, "scrtile"));
 }
 
 #define HACK_REGION
@@ -1814,12 +1812,12 @@ static INTERRUPT_GEN( irq_start )
 static MACHINE_START(hyperneo)
 {
 	/* set the fastest DRC options */
-	mips3drc_set_options(cputag_get_cpu(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	mips3drc_set_options(devtag_get_device(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x00ffffff, FALSE, hng_mainram);
-	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x04000000, 0x05ffffff, TRUE,  hng_cart);
-	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
+	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x00ffffff, FALSE, hng_mainram);
+	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x04000000, 0x05ffffff, TRUE,  hng_cart);
+	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
 }
 
 
@@ -2020,9 +2018,9 @@ ROM_START( sams64 )
 	ROMX_LOAD( "002-vt01a.17", 0x0000000, 0x400000, CRC(403fd7fd) SHA1(9bdadbeb4cd13c4c4e89a1c233af9eaaa46f8fdf), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "002-vt02a.18", 0x0000002, 0x400000, CRC(e1885905) SHA1(6b16083c50e887aebe2baf95bf56697c239970f2), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "002-vt03a.19", 0x0000004, 0x400000, CRC(2074a6a6) SHA1(9a5e8259d1e19d2b43878c24ca06afba5ee5e316), ROM_GROUPWORD | ROM_SKIP(4) )
-	ROMX_LOAD( "002-vt04a.20", 0x0400000, 0x400000, CRC(aefc4d94) SHA1(f9d8222d4320ccf9f3c7c0ef307e03c8f34ea530), ROM_GROUPWORD | ROM_SKIP(4) )
-	ROMX_LOAD( "002-vt05a.21", 0x0400002, 0x400000, CRC(d32ee9cb) SHA1(a768dfc15899924eb05eccbf8e85cb29c7b60396), ROM_GROUPWORD | ROM_SKIP(4) )
-	ROMX_LOAD( "002-vt06a.22", 0x0400004, 0x400000, CRC(13bf3636) SHA1(7c704bf66b571350207bccc7a2d6ed1ec9de4cd5), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "002-vt04a.20", 0x0c00000, 0x400000, CRC(aefc4d94) SHA1(f9d8222d4320ccf9f3c7c0ef307e03c8f34ea530), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "002-vt05a.21", 0x0c00002, 0x400000, CRC(d32ee9cb) SHA1(a768dfc15899924eb05eccbf8e85cb29c7b60396), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "002-vt06a.22", 0x0c00004, 0x400000, CRC(13bf3636) SHA1(7c704bf66b571350207bccc7a2d6ed1ec9de4cd5), ROM_GROUPWORD | ROM_SKIP(4) )
 
 	ROM_REGION( 0x1000000, "samples", 0 ) /* Sound Samples? */
 	ROM_LOAD( "002-sd01a.77", 0x0000000, 0x400000, CRC(6215036b) SHA1(ded71dce98b7f7ef78ef32d966a292bbf0d15332) )
@@ -2067,7 +2065,7 @@ ROM_START( xrally )
 	ROM_LOAD( "003-tx04a.16", 0x0c00000, 0x400000, CRC(16d7805b) SHA1(4cc7b2375832c2f9f20fe882e604a2a52bf07f6f) )
 
 	/* X,Y,Z Vertex ROMs */
-	ROM_REGION( 0x1800000, "verts", 0 )
+	ROM_REGION( 0x0c00000, "verts", 0 )
 	ROMX_LOAD( "003-vt01a.17", 0x0000000, 0x400000, CRC(3e5e275d) SHA1(74f5ec88c258bc224e271f7abeb02d6485e27d8c), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "003-vt02a.18", 0x0000002, 0x400000, CRC(da7b956e) SHA1(c57cbb8c51145ae224faba5b6a1a7e61cb2bee64), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "003-vt03a.19", 0x0000004, 0x400000, CRC(4fe72cb7) SHA1(9f8e662f0656f201924834d1ee78498d4223745e), ROM_GROUPWORD | ROM_SKIP(4) )
@@ -2121,7 +2119,7 @@ ROM_START( bbust2 )
 	ROM_LOAD( "004-tx04a.16", 0x0c00000, 0x400000, CRC(b5f0ef01) SHA1(646bfb17b9e81aecf8db33d3a021f7769b262eda) )
 
 	/* X,Y,Z Vertex ROMs */
-	ROM_REGION( 0x1800000, "verts", 0 )
+	ROM_REGION( 0x0c00000, "verts", 0 )
 	ROMX_LOAD( "004-vt01a.17", 0x0000000, 0x400000, CRC(25ebbf9b) SHA1(b7c3fb9ee9cf75824d908e7a94970282f1845d5d), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "004-vt02a.18", 0x0000002, 0x400000, CRC(279fc216) SHA1(eb90cc347745491c1d1b1fb611fd6e227310731c), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "004-vt03a.19", 0x0000004, 0x400000, CRC(e0cf6a42) SHA1(dd09b3d05739cf030c820cd7dbaea2e7262764ab), ROM_GROUPWORD | ROM_SKIP(4) )
@@ -2199,9 +2197,9 @@ ROM_START( sams64_2 )
 	ROMX_LOAD( "005vt01a.17", 0x0000000, 0x400000, CRC(48a61479) SHA1(ef982b1ecc6dfca2ad989391afcc1b3d1e7fe652), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "005vt02a.18", 0x0000002, 0x400000, CRC(ba9100c8) SHA1(f7704fb8e5310ea7d0e6ae6b8935717ec9119b6d), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "005vt03a.19", 0x0000004, 0x400000, CRC(f54a28de) SHA1(c445cf7fee71a516065cf37e05b898208f48b17e), ROM_GROUPWORD | ROM_SKIP(4) )
-	ROMX_LOAD( "005vt04a.20", 0x0400000, 0x400000, CRC(57ad79c7) SHA1(bc382317323c1f8a31b69ae3100d3bba6b5d0838), ROM_GROUPWORD | ROM_SKIP(4) )
-	ROMX_LOAD( "005vt05a.21", 0x0400002, 0x400000, CRC(49c82bec) SHA1(09255279edb9a204bbe1cce8cef58d5c81e86d1f), ROM_GROUPWORD | ROM_SKIP(4) )
-	ROMX_LOAD( "005vt06a.22", 0x0400004, 0x400000, CRC(7ba05b6c) SHA1(729c1d182d74998dd904b587a2405f55af9825e0), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "005vt04a.20", 0x0c00000, 0x400000, CRC(57ad79c7) SHA1(bc382317323c1f8a31b69ae3100d3bba6b5d0838), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "005vt05a.21", 0x0c00002, 0x400000, CRC(49c82bec) SHA1(09255279edb9a204bbe1cce8cef58d5c81e86d1f), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "005vt06a.22", 0x0c00004, 0x400000, CRC(7ba05b6c) SHA1(729c1d182d74998dd904b587a2405f55af9825e0), ROM_GROUPWORD | ROM_SKIP(4) )
 
 	ROM_REGION( 0x1000000, "samples", 0 ) /* Sound Samples? */
 	ROM_LOAD( "005sd01a.77", 0x0000000, 0x400000, CRC(8f68150f) SHA1(a1e5efdfd1ed29f81e25c8da669851ddb7b0c826) )
@@ -2354,14 +2352,14 @@ ROM_START( buriki )
 ROM_END
 
 /* Bios */
-GAME( 1997, hng64,  0,        hng64, hng64, hng64,      ROT0, "SNK", "Hyper NeoGeo 64 Bios", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_IS_BIOS_ROOT )
+GAME( 1997, hng64,    0,      hng64, hng64, hng64,      ROT0, "SNK", "Hyper NeoGeo 64 Bios", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_IS_BIOS_ROOT )
 
 /* Games */
-GAME( 1997, roadedge, hng64,  hng64, hng64, hng64_race, ROT0, "SNK", "Roads Edge / Round Trip (rev.B)",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 001 */
-GAME( 1998, sams64,   hng64,  hng64, hng64, ss64,       ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 002 */
-GAME( 1998, xrally,   hng64,  hng64, hng64, hng64_race, ROT0, "SNK", "Xtreme Rally / Off Beat Racer!",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 003 */
-GAME( 1998, bbust2,   hng64,  hng64, bbust2,hng64_shoot,ROT0, "SNK", "Beast Busters 2nd Nightmare",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 004 */
-GAME( 1998, sams64_2, hng64,  hng64, hng64, ss64,       ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 005 */
-GAME( 1998, fatfurwa, hng64,  hng64, hng64, fatfurwa,   ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", GAME_NOT_WORKING|GAME_NO_SOUND )	/* 006 */
-GAME( 1999, buriki,   hng64,  hng64, hng64, fatfurwa,   ROT0, "SNK", "Buriki One (rev.B)",				  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 007 */
+GAME( 1997, roadedge, hng64,  hng64, hng64,  hng64_race,  ROT0, "SNK", "Roads Edge / Round Trip (rev.B)",		  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 001 */
+GAME( 1998, sams64,   hng64,  hng64, hng64,  ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", GAME_NOT_WORKING|GAME_NO_SOUND )	/* 002 */
+GAME( 1998, xrally,   hng64,  hng64, hng64,  hng64_race,  ROT0, "SNK", "Xtreme Rally / Off Beat Racer!",		  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 003 */
+GAME( 1998, bbust2,   hng64,  hng64, bbust2, hng64_shoot, ROT0, "SNK", "Beast Busters 2nd Nightmare",			  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 004 */
+GAME( 1998, sams64_2, hng64,  hng64, hng64,  ss64,        ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden", GAME_NOT_WORKING|GAME_NO_SOUND )	/* 005 */
+GAME( 1998, fatfurwa, hng64,  hng64, hng64,  fatfurwa,    ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)",		  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 006 */
+GAME( 1999, buriki,   hng64,  hng64, hng64,  fatfurwa,    ROT0, "SNK", "Buriki One (rev.B)",					  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 007 */
 

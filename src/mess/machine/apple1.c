@@ -44,7 +44,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/apple1.h"
 #include "machine/6821pia.h"
 #include "cpu/m6502/m6502.h"
@@ -226,7 +226,7 @@ SNAPSHOT_LOAD(apple1)
 	/* Read the snapshot data into a temporary array */
 	if (filesize < SNAP_HEADER_LEN)
 		return INIT_FAIL;
-	snapbuf = image_ptr(image);
+	snapbuf = (UINT8*)image_ptr(image);
 	if (!snapbuf)
 		return INIT_FAIL;
 

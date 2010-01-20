@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 
 static ADDRESS_MAP_START(d6809_mem, ADDRESS_SPACE_PROGRAM, 8)

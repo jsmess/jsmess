@@ -92,7 +92,7 @@
   - emulation of serial hardware
   - emulation of other hardware...?
  ******************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 // upd765 interface
 #include "machine/upd765.h"
@@ -770,7 +770,7 @@ static DRIVER_INIT(pcw)
 {
 	pcw_boot = 0;
 
-	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), 0, 0x0ff);
+	cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), 0, 0x0ff);
 
 
 	/* lower 4 bits are interrupt counter */

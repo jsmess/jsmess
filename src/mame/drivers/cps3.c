@@ -319,7 +319,7 @@ Notes:
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cdrom.h"
 #include "cpu/sh2/sh2.h"
 #include "machine/intelfsh.h"
@@ -694,7 +694,7 @@ static DRIVER_INIT( cps3 )
 	if (!cps3_user5region) cps3_user5region = auto_alloc_array(machine, UINT8, USER5REGION_LENGTH);
 
 	// set strict verify
-	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_STRICT_VERIFY);
+	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_STRICT_VERIFY);
 
 	cps3_decrypt_bios(machine);
 	decrypted_gamerom = auto_alloc_array(machine, UINT32, 0x1000000/4);

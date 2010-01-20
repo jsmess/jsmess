@@ -6,7 +6,7 @@
 #include "osdmess.h"
 #include "utils.h"
 #include "strconv.h"
-#include "mame.h"
+#include "emu.h"
 #include "unicode.h"
 
 //============================================================

@@ -6,7 +6,7 @@
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/nb1413m3.h"
 
 
@@ -62,12 +62,12 @@ WRITE8_HANDLER( nbmj8900_palette_type1_w )
 	palette_set_color_rgb(space->machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
+#ifdef UNUSED_FUNCTION
 READ8_HANDLER( nbmj8900_palette_type2_r )
 {
 	return nbmj8900_palette[offset];
 }
 
-#ifdef UNUSED_FUNCTION
 WRITE8_HANDLER( nbmj8900_palette_type2_w )
 {
 	int r, g, b;

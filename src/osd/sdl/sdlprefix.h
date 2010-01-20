@@ -13,6 +13,12 @@
 // System specific defines
 //============================================================
 
+/* Only problems ... */
+#ifdef SDLMAME_WIN32
+#define _SDL_main_h
+#endif
+
+
 #ifdef __APPLE__
 #define SDLMAME_DARWIN 1
 #endif /* __APPLE__ */

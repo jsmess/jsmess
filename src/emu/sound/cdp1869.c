@@ -1,5 +1,4 @@
-#include "driver.h"
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "sound/cdp1869.h"
@@ -882,11 +881,11 @@ static DEVICE_START( cdp1869 )
 	cdp1869->wnoff = 1;
 
 	/* get the screen device */
-	cdp1869->screen = devtag_get_device(device->machine, cdp1869->intf->screen_tag);
+	cdp1869->screen = device->machine->device(cdp1869->intf->screen_tag);
 	assert(cdp1869->screen != NULL);
 
 	/* get the CPU device */
-	cdp1869->cpu = cputag_get_cpu(device->machine, cdp1869->intf->cpu_tag);
+	cdp1869->cpu = device->machine->device(cdp1869->intf->cpu_tag);
 	assert(cdp1869->cpu != NULL);
 
 	/* allocate predisplay timer */

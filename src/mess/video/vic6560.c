@@ -7,7 +7,7 @@
 
 #include <math.h>
 #include <stdio.h>
-#include "driver.h"
+#include "emu.h"
 #include "utils.h"
 
 #include "vic6560.h"

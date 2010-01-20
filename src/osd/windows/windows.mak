@@ -54,14 +54,6 @@
 # uncomment next line to use cygwin compiler
 # CYGWIN_BUILD = 1
 
-# uncomment next line to enable multi-monitor stubs on Windows 95/NT
-# you will need to find multimon.h and put it into your include
-# path in order to make this work
-# WIN95_MULTIMON = 1
-
-# uncomment next line to enable a Unicode build
-# UNICODE = 1
-
 # set this to the minimum Direct3D version to support (8 or 9)
 # DIRECT3D = 9
 
@@ -73,19 +65,6 @@
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
 ###########################################################################
-
-
-#-------------------------------------------------
-# overrides
-#-------------------------------------------------
-
-# turn on unicode for all 64-bit builds regardless
-ifndef UNICODE
-ifdef PTR64
-UNICODE = 1
-endif
-endif
-
 
 
 #-------------------------------------------------
@@ -129,6 +108,7 @@ endif
 ifdef MSVC_BUILD
 
 VCONV = $(WINOBJ)/vconv$(EXE)
+VCONVPREFIX = $(subst /,\,$(VCONV))
 
 # append a 'v' prefix if nothing specified
 ifndef PREFIX
@@ -136,10 +116,10 @@ PREFIX = v
 endif
 
 # replace the various compilers with vconv.exe prefixes
-CC = @$(VCONV) gcc -I.
-LD = @$(VCONV) ld /profile
-AR = @$(VCONV) ar
-RC = @$(VCONV) windres
+CC = @$(VCONVPREFIX) gcc -I.
+LD = @$(VCONVPREFIX) ld /profile
+AR = @$(VCONVPREFIX) ar
+RC = @$(VCONVPREFIX) windres
 
 # make sure we use the multithreaded runtime
 ifdef DEBUG
@@ -155,20 +135,26 @@ LDFLAGS += /LTCG
 AR += /LTCG
 endif
 
+# disable warnings and link against bufferoverflowu for 64-bit targets
 ifdef PTR64
 CCOMFLAGS += /wd4267
+LIBS += -lbufferoverflowu
 endif
+
+# enable exception handling for C++
+CPPONLYFLAGS += /EHsc
 
 # disable function pointer warnings in C++ which are evil to work around
 CPPONLYFLAGS += /wd4191 /wd4060 /wd4065 /wd4640
 
+# disable warning about exception specifications
+CPPONLYFLAGS += /wd4290
+
 # explicitly set the entry point for UNICODE builds
-ifdef UNICODE
 LDFLAGS += /ENTRY:wmainCRTStartup
-endif
 
 # add some VC++-specific defines
-DEFS += -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DXML_STATIC -D__inline__=__inline -Dsnprintf=_snprintf
+DEFS += -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DXML_STATIC -Dsnprintf=_snprintf
 
 # make msvcprep into a pre-build step
 OSPREBUILD = $(VCONV)
@@ -213,18 +199,16 @@ CURPATH = ./
 # define the x64 ABI to be Windows
 DEFS += -DX64_WINDOWS_ABI
 
+# enable UNICODE flags
+DEFS += -DUNICODE -D_UNICODE
+LDFLAGS += -municode
+
 # map all instances of "main" to "utf8_main"
 DEFS += -Dmain=utf8_main
 
 # debug build: enable guard pages on all memory allocations
 ifdef DEBUG
 DEFS += -DMALLOC_DEBUG
-LDFLAGS += -Wl,--allow-multiple-definition
-endif
-
-# enable UNICODE flags for unicode builds
-ifdef UNICODE
-DEFS += -DUNICODE -D_UNICODE
 endif
 
 
@@ -236,18 +220,16 @@ endif
 # add our prefix files to the mix
 CCOMFLAGS += -include $(WINSRC)/winprefix.h
 
-ifdef WIN95_MULTIMON
-CCOMFLAGS += -DWIN95_MULTIMON
+# for 32-bit apps, add unicows for Unicode support on Win9x
+ifndef PTR64
+LIBS += -lunicows
 endif
+
+# ensure we statically link the gcc runtime lib
+LDFLAGS += -static-libgcc
 
 # add the windows libraries
-LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
-
-ifdef CPP_COMPILE
-ifndef MSVC_BUILD
-LIBS += -lsupc++
-endif
-endif
+LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi -ldinput8
 
 ifeq ($(DIRECTINPUT),8)
 LIBS += -ldinput8
@@ -255,14 +237,6 @@ CCOMFLAGS += -DDIRECTINPUT_VERSION=0x0800
 else
 LIBS += -ldinput
 CCOMFLAGS += -DDIRECTINPUT_VERSION=0x0700
-endif
-
-ifdef PTR64
-ifdef MSVC_BUILD
-LIBS += -lbufferoverflowu
-else
-DEFS += -D_COM_interface=struct
-endif
 endif
 
 
@@ -281,13 +255,7 @@ OSDCOREOBJS = \
 	$(WINOBJ)/wintime.o \
 	$(WINOBJ)/winutf8.o \
 	$(WINOBJ)/winutil.o \
-	$(WINOBJ)/winwork.o \
-
-# if malloc debugging is enabled, include the necessary code
-ifneq ($(findstring MALLOC_DEBUG,$(DEFS)),)
-OSDCOREOBJS += \
-	$(WINOBJ)/winalloc.o
-endif
+	$(WINOBJ)/winwork.o
 
 
 
@@ -372,4 +340,3 @@ $(RESFILE): $(WINSRC)/mame.rc $(WINOBJ)/mamevers.rc
 $(WINOBJ)/mamevers.rc: $(BUILDOUT)/verinfo$(BUILD_EXE) $(SRC)/version.c
 	@echo Emitting $@...
 	@"$(BUILDOUT)/verinfo$(BUILD_EXE)" -b windows $(SRC)/version.c > $@
-

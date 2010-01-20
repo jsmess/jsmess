@@ -10,7 +10,7 @@ TODO:
 */
 
 
-#include "driver.h"
+#include "emu.h"
 #include "911_vdt.h"
 #include "911_chr.h"
 #include "911_key.h"
@@ -91,7 +91,7 @@ typedef struct vdt_t
 	unsigned int cursor_address;		/* current cursor address (controlled by the computer, affects both display and I/O protocol) */
 	unsigned int cursor_address_mask;	/* 1023 for 960-char model, 2047 for 1920-char model */
 
-	void *beep_timer;					/* beep clock (beeps ends when timer times out) */
+	emu_timer *beep_timer;					/* beep clock (beeps ends when timer times out) */
 	/*void *blink_clock;*/				/* cursor blink clock */
 
 	UINT8 keyboard_data;				/* last code pressed on keyboard */

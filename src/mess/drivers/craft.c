@@ -4,7 +4,7 @@
     Skeleton driver by MooglyGuy
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/avr8/avr8.h"
 #include "sound/dac.h"
 
@@ -250,7 +250,7 @@ static TIMER_CALLBACK( ocr1a_timer_compare )
     avr8_maybe_start_timer_1(&regs);
 
     // Inaccurate
-    cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), AVR8_INT_T1COMPA, ASSERT_LINE);
+    cpu_set_input_line(devtag_get_device(machine, "maincpu"), AVR8_INT_T1COMPA, ASSERT_LINE);
 }
 
 static TIMER_CALLBACK( ocr1b_timer_compare )
@@ -259,7 +259,7 @@ static TIMER_CALLBACK( ocr1b_timer_compare )
     avr8_maybe_start_timer_1(&regs);
 
     // Inaccurate
-    cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), AVR8_INT_T1COMPB, ASSERT_LINE);
+    cpu_set_input_line(devtag_get_device(machine, "maincpu"), AVR8_INT_T1COMPB, ASSERT_LINE);
 }
 
 static READ8_HANDLER( avr8_read )

@@ -6,7 +6,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cococart.h"
 #include "cartslot.h"
 
@@ -84,7 +84,7 @@ static DEVICE_START(coco_cartridge)
 	const device_config *cartslot;
 	coco_cartridge_t *cococart = get_token(device);
 	const cococart_config *config = (const cococart_config *) device->inline_config;
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 
 	/* initialize */
 	memset(cococart, 0, sizeof(*cococart));
@@ -96,8 +96,7 @@ static DEVICE_START(coco_cartridge)
 		cococart->pcb = cartslot_get_pcb(cartslot);
 		if (cococart->pcb == NULL)
 		{
-			device_delay_init(device);
-			astring_free(tempstring);
+			device_delay_init(device);			
 			return;
 		}
 
@@ -115,8 +114,6 @@ static DEVICE_START(coco_cartridge)
 	cococart->halt_line.timer		= timer_alloc(device->machine, halt_timer_callback, (void *) device);
 	cococart->halt_line.delay		= 7;
 	cococart->halt_line.callback	= config->halt_callback;
-
-	astring_free(tempstring);
 }
 
 

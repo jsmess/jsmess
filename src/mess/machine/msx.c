@@ -11,7 +11,7 @@
  * - wd2793, nms8255
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/i8255a.h"
 #include "includes/msx_slot.h"
 #include "includes/msx.h"
@@ -102,7 +102,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	}
 
 	if( id == -1 ) {
-		logerror ("error: invalid cart tag '%s'\n", image->tag);
+		//logerror ("error: invalid cart tag '%s'\n", image->tag);
 		return INIT_FAIL;
 	}
 
@@ -118,7 +118,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	while (size_aligned < size) {
 		size_aligned *= 2;
 	}
-	mem = image_malloc (image, size_aligned);
+	mem = (UINT8*)image_malloc (image, size_aligned);
 	if (!mem) {
 		logerror ("cart #%d: error: failed to allocate memory for cartridge\n",
 						id);
@@ -166,7 +166,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	if (!type && size_aligned != 0x10000)
 	{
 		size_aligned = 0x10000;
-		mem = image_realloc(image, mem, 0x10000);
+		mem = (UINT8*)image_realloc(image, mem, 0x10000);
 		if (!mem) {
 			logerror ("cart #%d: error: cannot allocate memory\n", id);
 			return INIT_FAIL;
@@ -250,7 +250,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	memset (state, 0, sizeof (slot_state));
 
 	state->type = type;
-	sramfile = image_malloc(image, strlen (image_filename (image) + 1));
+	sramfile = (char*)image_malloc(image, strlen (image_filename (image) + 1));
 
 	if (sramfile) {
 		char *ext;
@@ -288,7 +288,7 @@ DEVICE_IMAGE_UNLOAD (msx_cart)
 	}
 
 	if( id == -1 ) {
-		logerror ("error: invalid cart tag '%s'\n", image->tag);
+		//logerror ("error: invalid cart tag '%s'\n", image->tag);
 		return;
 	}
 
@@ -485,11 +485,11 @@ DRIVER_INIT( msx )
 		msx1.cart_state[i] = cart_state[i];
 	}
 
-	cpu_set_input_line_vector (cputag_get_cpu(machine, "maincpu"), 0, 0xff);
+	cpu_set_input_line_vector (devtag_get_device(machine, "maincpu"), 0, 0xff);
 
 	msx_memory_init (machine);
 
-	z80_set_cycle_tables( cputag_get_cpu(machine, "maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
+	z80_set_cycle_tables( devtag_get_device(machine, "maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
 }
 
 INTERRUPT_GEN( msx2_interrupt )

@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/amiga.h"
 #include "devices/flopdrv.h"
 #include "formats/ami_dsk.h"
@@ -291,7 +291,7 @@ static TIMER_CALLBACK(fdc_sync_proc)
 	int				cur_pos;
 	int				sector;
 	int				time;
-	amiga_fdc_t *fdc = get_safe_token(ptr);
+	amiga_fdc_t *fdc = get_safe_token((const device_config*)ptr);
 
 	/* if floppy got ejected, stop */
 	if ( fdc->fdc_status[drive].disk_changed )
@@ -300,7 +300,7 @@ static TIMER_CALLBACK(fdc_sync_proc)
 	if ( fdc->fdc_status[drive].motor_on == 0 )
 		goto bail;
 
-	cur_pos = fdc_get_curpos( ptr, drive );
+	cur_pos = fdc_get_curpos( (const device_config*)ptr, drive );
 
 	if ( cur_pos <= ( GAP_TRACK_BYTES + 6 ) )
 	{
@@ -311,7 +311,7 @@ static TIMER_CALLBACK(fdc_sync_proc)
 		sector = ( cur_pos - ( GAP_TRACK_BYTES + 6 ) ) / ONE_SECTOR_BYTES;
 	}
 
-	setup_fdc_buffer( ptr, drive );
+	setup_fdc_buffer( (const device_config*)ptr, drive );
 
 	if ( cur_pos < 2 )
 		cur_pos = 2;
@@ -341,7 +341,7 @@ bail:
 static TIMER_CALLBACK(fdc_dma_proc)
 {
 	int drive = param;
-	amiga_fdc_t *fdc = get_safe_token(ptr);
+	amiga_fdc_t *fdc = get_safe_token((const device_config*)ptr);
 	
 	/* if DMA got disabled by the time we got here, stop operations */
 	if ( ( CUSTOM_REG(REG_DSKLEN) & 0x8000 ) == 0 )
@@ -357,7 +357,7 @@ static TIMER_CALLBACK(fdc_dma_proc)
 	if ( fdc->fdc_status[drive].motor_on == 0 )
 		goto bail;
 
-	setup_fdc_buffer( ptr, drive );
+	setup_fdc_buffer( (const device_config*)ptr, drive );
 
 	if ( CUSTOM_REG(REG_DSKLEN) & 0x4000 ) /* disk write case, unsupported yet */
 	{
@@ -661,7 +661,7 @@ static TIMER_CALLBACK(fdc_rev_proc)
 	int drive = param;
 	int time;
 	const device_config *cia;
-	amiga_fdc_t *fdc = get_safe_token(ptr);
+	amiga_fdc_t *fdc = get_safe_token((const device_config*)ptr);
 
 	/* Issue a index pulse when a disk revolution completes */
 	cia = devtag_get_device(machine, "cia_1");

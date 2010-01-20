@@ -13,7 +13,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/spectrum.h"
 #include "eventlst.h"
 #include "video/border.h"

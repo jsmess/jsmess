@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/z1013.h"
 
 UINT8 *z1013_video_ram;

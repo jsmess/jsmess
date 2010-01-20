@@ -8,7 +8,7 @@
 
 #include <string.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "utils.h"
 #include "formats/oric_dsk.h"
 #include "formats/basicdsk.h"
@@ -42,7 +42,7 @@ struct oricdsk_tag
 static struct oricdsk_tag *get_tag(floppy_image *floppy)
 {
 	struct oricdsk_tag *tag;
-	tag = floppy_tag(floppy);
+	tag = (oricdsk_tag *)floppy_tag(floppy);
 	return tag;
 }
 

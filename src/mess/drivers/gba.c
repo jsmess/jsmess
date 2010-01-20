@@ -14,7 +14,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "state.h"
 #include "video/generic.h"
 #include "cpu/arm7/arm7.h"
@@ -35,7 +35,7 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), buf );
+		logerror( "%08x: %s", cpu_get_pc(devtag_get_device(machine, "maincpu")), buf );
 	}
 }
 
@@ -73,7 +73,7 @@ static void dma_exec(running_machine *machine, FPTR ch);
 
 static void gba_request_irq(running_machine *machine, UINT32 int_type)
 {
-	gba_state *gba_state = machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 
 	// set flag for later recovery
 	gba_state->IF |= int_type;
@@ -85,8 +85,8 @@ static void gba_request_irq(running_machine *machine, UINT32 int_type)
 		// master enable?
 		if (gba_state->IME & 1)
 		{
-			cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
-			cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
+			cpu_set_input_line(devtag_get_device(machine, "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+			cpu_set_input_line(devtag_get_device(machine, "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
 		}
 	}
 }
@@ -96,7 +96,7 @@ static TIMER_CALLBACK( dma_complete )
 	int ctrl;
 	FPTR ch;
 	static UINT32 ch_int[4] = { INT_DMA0, INT_DMA1, INT_DMA2, INT_DMA3 };
-	gba_state *gba_state = machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 
 	ch = param;
 
@@ -141,8 +141,8 @@ static void dma_exec(running_machine *machine, FPTR ch)
 	int ctrl;
 	int srcadd, dstadd;
 	UINT32 src, dst;
-	const address_space *space = cpu_get_address_space(cputag_get_cpu(machine, "maincpu"), ADDRESS_SPACE_PROGRAM);
-	gba_state *gba_state = machine->driver_data;
+	const address_space *space = cpu_get_address_space(devtag_get_device(machine, "maincpu"), ADDRESS_SPACE_PROGRAM);
+	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 
 	src = gba_state->dma_src[ch];
 	dst = gba_state->dma_dst[ch];
@@ -273,7 +273,7 @@ static void dma_exec(running_machine *machine, FPTR ch)
 
 static void audio_tick(running_machine *machine, int ref)
 {
-	gba_state *gba_state = machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 
 	if (!(gba_state->SOUNDCNT_X & 0x80))
 	{
@@ -365,7 +365,7 @@ static TIMER_CALLBACK(timer_expire)
 {
 	static UINT32 tmr_ints[4] = { INT_TM0_OVERFLOW, INT_TM1_OVERFLOW, INT_TM2_OVERFLOW, INT_TM3_OVERFLOW };
 	FPTR tmr = (FPTR) param;
-	gba_state *gba_state = machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 
 //  printf("Timer %d expired, SOUNDCNT_H %04x\n", tmr, gba_state->SOUNDCNT_H);
 
@@ -488,7 +488,7 @@ static TIMER_CALLBACK(timer_expire)
 
 static TIMER_CALLBACK(handle_irq)
 {
-	gba_state *gba_state = machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 
 	gba_request_irq(machine, gba_state->IF);
 
@@ -500,7 +500,7 @@ static READ32_HANDLER( gba_io_r )
 	UINT32 retval = 0;
 	running_machine *machine = space->machine;
 	const device_config *gb_device = devtag_get_device(space->machine, "custom");
-	gba_state *gba_state = machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 
 	switch( offset )
 	{
@@ -1018,7 +1018,7 @@ static WRITE32_HANDLER( gba_io_w )
 {
 	running_machine *machine = space->machine;
 	const device_config *gb_device = devtag_get_device(space->machine, "custom");
-	gba_state *gba_state = machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 
 	switch( offset )
 	{
@@ -1780,7 +1780,7 @@ static WRITE32_HANDLER( gba_io_w )
 				// if we still have interrupts, yank the IRQ line again
 				if (gba_state->IF)
 				{
-					timer_adjust_oneshot(gba_state->irq_timer, cpu_clocks_to_attotime(cputag_get_cpu(machine, "maincpu"), 120), 0);
+					timer_adjust_oneshot(gba_state->irq_timer, cpu_clocks_to_attotime(devtag_get_device(machine, "maincpu"), 120), 0);
 				}
 			}
 			break;
@@ -1823,7 +1823,7 @@ static WRITE32_HANDLER( gba_io_w )
 					gba_state->HALTCNT = data & 0x000000ff;
 
 					// either way, wait for an IRQ
-					cpu_spinuntil_int(cputag_get_cpu(machine, "maincpu"));
+					cpu_spinuntil_int(devtag_get_device(machine, "maincpu"));
 				}
 			}
 			if( (mem_mask) & 0xffff0000 )
@@ -1867,7 +1867,7 @@ INLINE UINT32 COMBINE_DATA32_16(UINT32 prev, UINT32 data, UINT32 mem_mask)
 static WRITE32_HANDLER(gba_pram_w)
 {
 	running_machine *machine = space->machine;
-	gba_state *gba_state = machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 
 	gba_state->gba_pram[offset] = COMBINE_DATA32_16(gba_state->gba_pram[offset], data, mem_mask);
 }
@@ -1875,7 +1875,7 @@ static WRITE32_HANDLER(gba_pram_w)
 static WRITE32_HANDLER(gba_vram_w)
 {
 	running_machine *machine = space->machine;
-	gba_state *gba_state = machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 
 	gba_state->gba_vram[offset] = COMBINE_DATA32_16(gba_state->gba_vram[offset], data, mem_mask);
 }
@@ -1883,7 +1883,7 @@ static WRITE32_HANDLER(gba_vram_w)
 static WRITE32_HANDLER(gba_oam_w)
 {
 	running_machine *machine = space->machine;
-	gba_state *gba_state = machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 
 	gba_state->gba_oam[offset] = COMBINE_DATA32_16(gba_state->gba_oam[offset], data, mem_mask);
 }
@@ -1893,9 +1893,9 @@ static ADDRESS_MAP_START( gbadvance_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x02000000, 0x0203ffff) AM_RAM AM_MIRROR(0xfc0000)
 	AM_RANGE(0x03000000, 0x03007fff) AM_RAM AM_MIRROR(0xff8000)
 	AM_RANGE(0x04000000, 0x040003ff) AM_READWRITE( gba_io_r, gba_io_w )
-	AM_RANGE(0x05000000, 0x050003ff) AM_RAM_WRITE(gba_pram_w) AM_BASE_MEMBER(gba_state, gba_pram)	// Palette RAM
-	AM_RANGE(0x06000000, 0x06017fff) AM_RAM_WRITE(gba_vram_w) AM_BASE_MEMBER(gba_state, gba_vram)	// VRAM
-	AM_RANGE(0x07000000, 0x070003ff) AM_RAM_WRITE(gba_oam_w) AM_BASE_MEMBER(gba_state, gba_oam)	// OAM
+	AM_RANGE(0x05000000, 0x050003ff) AM_RAM_WRITE(gba_pram_w) AM_BASE_MEMBER(gba_state_t, gba_pram)	// Palette RAM
+	AM_RANGE(0x06000000, 0x06017fff) AM_RAM_WRITE(gba_vram_w) AM_BASE_MEMBER(gba_state_t, gba_vram)	// VRAM
+	AM_RANGE(0x07000000, 0x070003ff) AM_RAM_WRITE(gba_oam_w) AM_BASE_MEMBER(gba_state_t, gba_oam)	// OAM
 	AM_RANGE(0x08000000, 0x09ffffff) AM_ROM AM_REGION("cartridge", 0)	// cartridge ROM (mirror 0)
 	AM_RANGE(0x0a000000, 0x0bffffff) AM_ROM AM_REGION("cartridge", 0)	// cartridge ROM (mirror 1)
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_ROM AM_REGION("cartridge", 0)	// final mirror
@@ -1919,7 +1919,7 @@ INPUT_PORTS_END
 static TIMER_CALLBACK( perform_hbl )
 {
 	int ch, ctrl;
-	gba_state *gba_state = machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 	int scanline = video_screen_get_vpos(machine->primary_screen);
 
 	// draw only visible scanlines
@@ -1950,7 +1950,7 @@ static TIMER_CALLBACK( perform_hbl )
 static TIMER_CALLBACK( perform_scan )
 {
 	int scanline;
-	gba_state *gba_state = machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 
 	// clear hblank and raster IRQ flags
 	gba_state->DISPSTAT &= ~(DISPSTAT_HBL|DISPSTAT_VCNT);
@@ -2009,7 +2009,7 @@ static MACHINE_RESET( gba )
 	const device_config *gb_a_r = devtag_get_device(machine, "direct_a_right");
 	const device_config *gb_b_l = devtag_get_device(machine, "direct_b_left");
 	const device_config *gb_b_r = devtag_get_device(machine, "direct_b_right");
-	gba_state *gba_state = machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 
 	memset(gba_state, 0, sizeof(gba_state));
 	gba_state->SOUNDBIAS = 0x0200;
@@ -2051,7 +2051,7 @@ static MACHINE_RESET( gba )
 
 static MACHINE_START( gba )
 {
-	gba_state *gba_state = machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 
 	/* add a hook for battery save */
 	add_exit_callback(machine, gba_machine_stop);
@@ -2098,21 +2098,21 @@ ROM_END
 
 static READ32_HANDLER( sram_r )
 {
-	gba_state *gba_state = space->machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)space->machine->driver_data;
 
 	return gba_state->gba_sram[offset];
 }
 
 static WRITE32_HANDLER( sram_w )
 {
-	gba_state *gba_state = space->machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)space->machine->driver_data;
 
 	COMBINE_DATA(&gba_state->gba_sram[offset]);
 }
 
 static READ32_HANDLER( flash64k_r )
 {
-	gba_state *gba_state = space->machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)space->machine->driver_data;
 	switch( gba_state->flash64k_state )
 	{
 		case FLASH_IDLEBYTE0:
@@ -2141,7 +2141,7 @@ static READ32_HANDLER( flash64k_r )
 
 static WRITE32_HANDLER( flash64k_w )
 {
-	gba_state *gba_state = space->machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)space->machine->driver_data;
 
 	switch( gba_state->flash64k_state )
 	{
@@ -2247,7 +2247,7 @@ static WRITE32_HANDLER( flash64k_w )
 static READ32_HANDLER( eeprom_r )
 {
 	UINT32 out;
-	gba_state *gba_state = space->machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)space->machine->driver_data;
 
 	switch (gba_state->eeprom_state)
 	{
@@ -2299,7 +2299,7 @@ static READ32_HANDLER( eeprom_r )
 
 static WRITE32_HANDLER( eeprom_w )
 {
-	gba_state *gba_state = space->machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)space->machine->driver_data;
 
 	if (~mem_mask == 0x0000ffff)
 	{
@@ -2371,7 +2371,7 @@ static WRITE32_HANDLER( eeprom_w )
 
 			if (gba_state->eeprom_bits == 0)
 			{
-				mame_printf_verbose("%08x: EEPROM: %02x to %x\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), gba_state->eep_data, gba_state->eeprom_addr );
+				mame_printf_verbose("%08x: EEPROM: %02x to %x\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), gba_state->eep_data, gba_state->eeprom_addr );
 				gba_state->gba_eeprom[gba_state->eeprom_addr] = gba_state->eep_data;
 				gba_state->eeprom_addr++;
 				gba_state->eep_data = 0;
@@ -2394,7 +2394,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 {
 	UINT8 *ROM = memory_region(image->machine, "cartridge");
 	int i;
-	gba_state *gba_state = image->machine->driver_data;
+	gba_state_t *gba_state = (gba_state_t *)image->machine->driver_data;
 
 	nvsize = 0;
 	nvptr = (UINT8 *)NULL;
@@ -2410,13 +2410,13 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 
 			if (image_length(image) <= (16*1024*1024))
 			{
-				memory_install_read32_handler(cpu_get_address_space(cputag_get_cpu(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_r);
-				memory_install_write32_handler(cpu_get_address_space(cputag_get_cpu(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_w);
+				memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_r);
+				memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_w);
 			}
 			else
 			{
-				memory_install_read32_handler(cpu_get_address_space(cputag_get_cpu(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_r);
-				memory_install_write32_handler(cpu_get_address_space(cputag_get_cpu(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_w);
+				memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_r);
+				memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_w);
 			}
 			break;
 		}
@@ -2425,8 +2425,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			nvptr = (UINT8 *)&gba_state->gba_sram;
 			nvsize = 0x10000;
 
-			memory_install_read32_handler(cpu_get_address_space(cputag_get_cpu(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_r);
-			memory_install_write32_handler(cpu_get_address_space(cputag_get_cpu(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_w);
+			memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_r);
+			memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_w);
 			break;
 		}
 		else if (!memcmp(&ROM[i], "FLASH1M_", 8))
@@ -2439,8 +2439,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			nvptr = (UINT8 *)&gba_state->gba_flash64k;
 			nvsize = 0x10000;
 
-			memory_install_read32_handler(cpu_get_address_space(cputag_get_cpu(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe007fff, 0, 0, flash64k_r);
-			memory_install_write32_handler(cpu_get_address_space(cputag_get_cpu(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe007fff, 0, 0, flash64k_w);
+			memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe007fff, 0, 0, flash64k_r);
+			memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe007fff, 0, 0, flash64k_w);
 			break;
 		}
 		else if (!memcmp(&ROM[i], "SIIRTC_V", 8))
@@ -2483,7 +2483,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 }
 
 static MACHINE_DRIVER_START( gbadv )
-	MDRV_DRIVER_DATA(gba_state)
+	MDRV_DRIVER_DATA(gba_state_t)
 
 	MDRV_CPU_ADD("maincpu", ARM7, 16777216)
 	MDRV_CPU_PROGRAM_MAP(gbadvance_map)

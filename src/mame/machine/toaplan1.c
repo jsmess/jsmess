@@ -3,7 +3,7 @@
                 ------------------------------------
  ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
@@ -233,7 +233,7 @@ WRITE16_HANDLER( toaplan1_reset_sound )
 	{
 		logerror("PC:%04x  Resetting Sound CPU and Sound chip (%08x)\n", cpu_get_previouspc(space->cpu), data);
 		devtag_reset(space->machine, "ymsnd");
-		if (cputag_get_cpu(space->machine, "audiocpu") != NULL && cpu_get_type(cputag_get_cpu(space->machine, "audiocpu")) == CPU_Z80)
+		if (devtag_get_device(space->machine, "audiocpu") != NULL && cpu_get_type(devtag_get_device(space->machine, "audiocpu")) == CPU_Z80)
 			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
@@ -311,7 +311,7 @@ void toaplan1_driver_savestate(running_machine *machine)
 	state_save_register_global(machine, toaplan1_unk_reset_port);
 }
 
-MACHINE_RESET( zerozone )	/* Hack for ZeroWing and OutZone. See the video driver */
+MACHINE_RESET( zerowing )	/* Hack for ZeroWing and OutZone. See the video driver */
 {
 	MACHINE_RESET_CALL(toaplan1);
 	toaplan1_unk_reset_port = 1;

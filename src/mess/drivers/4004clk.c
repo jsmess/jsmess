@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i4004/i4004.h"
 #include "sound/dac.h"
 #include "4004clk.lh"
@@ -51,7 +51,7 @@ INLINE void output_set_neon_value(int index, int value)
 
 static void update_nixie(running_machine *machine)
 {
-	_4004clk_state *state = machine->driver_data;
+	_4004clk_state *state = (_4004clk_state *)machine->driver_data;
 
 	output_set_nixie_value(5,nixie_to_num(((state->nixie[2] & 3)<<8) | (state->nixie[1] << 4) | state->nixie[0]));
 	output_set_nixie_value(4,nixie_to_num((state->nixie[4] << 6) | (state->nixie[3] << 2) | (state->nixie[2] >>2)));
@@ -63,7 +63,7 @@ static void update_nixie(running_machine *machine)
 
 static WRITE8_HANDLER(nixie_w)
 {
-	_4004clk_state *state = space->machine->driver_data;
+	_4004clk_state *state = (_4004clk_state *)space->machine->driver_data;
 	state->nixie[offset] = data;
 	update_nixie(space->machine);
 }
@@ -78,7 +78,7 @@ static WRITE8_HANDLER(neon_w)
 
 static WRITE8_HANDLER(relays_w)
 {
-	_4004clk_state *state = space->machine->driver_data;
+	_4004clk_state *state = (_4004clk_state *)space->machine->driver_data;
 	dac_data_w(state->dac, (data & 1) ? 0x80 : 0x40); //tick - tock
 }
 
@@ -122,14 +122,14 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK(timer_callback)
 {
-	_4004clk_state *state = machine->driver_data;
-	i4004_set_test(cputag_get_cpu(machine, "maincpu"),state->timer);
+	_4004clk_state *state = (_4004clk_state *)machine->driver_data;
+	i4004_set_test(devtag_get_device(machine, "maincpu"),state->timer);
 	state->timer^=1;
 }
 
 static MACHINE_START(4004clk)
 {
-	_4004clk_state *state = machine->driver_data;
+	_4004clk_state *state = (_4004clk_state *)machine->driver_data;
 	state->timer = 0;
 	state->dac = devtag_get_device(machine, "dac");
 

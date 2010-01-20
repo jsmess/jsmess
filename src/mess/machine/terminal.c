@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "machine/terminal.h"
 
 /***************************************************************************
@@ -379,7 +379,7 @@ UINT8 terminal_keyboard_handler(running_machine *machine, devcb_resolved_write8 
 
 static TIMER_CALLBACK(keyboard_callback)
 {
-	terminal_state *term = get_safe_token(ptr);
+	terminal_state *term = get_safe_token((const device_config *)ptr);
 	term->last_code = terminal_keyboard_handler(machine, &term->terminal_keyboard_func, term->last_code, &term->scan_line);
 }
 

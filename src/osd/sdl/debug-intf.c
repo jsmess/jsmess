@@ -15,7 +15,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "debug-cb.h"
 #include "debug-intf.h"
 #include "debug-sup.h"

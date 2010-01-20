@@ -12,6 +12,7 @@
 #include <ctype.h>
 #include <time.h>
 
+#include "emu.h"
 #include "osdcore.h"
 #include "osdmess.h"
 #include "utils.h"

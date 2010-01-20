@@ -13,7 +13,7 @@
 #include "formats/cassimg.h"
 
 
-typedef enum
+enum _cassette_state
 {
 	/* this part of the state is controlled by the UI */
 	CASSETTE_STOPPED			= 0,
@@ -31,7 +31,9 @@ typedef enum
 	CASSETTE_MASK_MOTOR			= 4,
 	CASSETTE_MASK_SPEAKER		= 8,
 	CASSETTE_MASK_DRVSTATE		= 12
-} cassette_state;
+};
+
+typedef enum _cassette_state cassette_state;
 
 
 /***************************************************************************

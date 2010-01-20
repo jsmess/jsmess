@@ -39,7 +39,7 @@ icq3250a-d
 
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6805/m6805.h"
 #include "includes/comquest.h"
 #include "devices/cartslot.h"

@@ -7,7 +7,7 @@
     04/05/2008 Created by Miodrag Milanovic
 
 *********************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "devices/flopdrv.h"
 #include "formats/trd_dsk.h"
 #include "machine/wd17xx.h"
@@ -314,7 +314,7 @@ static DEVICE_START( beta_disk )
 	assert(device->tag != NULL);
 
 	/* find our WD179x */
-	astring_printf(tempstring, "%s:%s", device->tag, "wd179x");
+	astring_printf(tempstring, "%s:%s", device->tag.cstr(), "wd179x");
 	beta->wd179x = devtag_get_device(device->machine, astring_c(tempstring));
 
 	astring_free(tempstring);

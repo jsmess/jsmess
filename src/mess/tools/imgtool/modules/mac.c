@@ -93,7 +93,7 @@
 #include <limits.h>
 #include <stddef.h>
 
-#include "utils.h"
+#include "emu.h"
 #include "osdepend.h"
 #include "imgtoolx.h"
 #include "macutil.h"
@@ -904,7 +904,7 @@ struct mac_l2_imgref
 /*
     MFS Master Directory Block
 */
-typedef struct mfs_mdb
+typedef struct mfs_mdb_t
 {
 	UINT8    sigWord[2];	/* volume signature - always $D2D7 */
 	UINT32BE crDate;		/* date and time of volume creation */
@@ -939,12 +939,12 @@ typedef struct mfs_mdb
                             was that the disk utility could rely on the tag
                             data to rebuild the link array if it should ever
                             be corrupted. */
-} mfs_mdb;
+} mfs_mdb_;
 
 /*
     HFS Master Directory Block
 */
-typedef struct hfs_mdb
+typedef struct hfs_mdb_t
 {
 /* First fields are similar to MFS, though several fields have a different meaning */
 	UINT8    sigWord[2];	/* volume signature - always $D2D7 */
@@ -996,13 +996,13 @@ typedef struct hfs_mdb
 	hfs_extent_3 xtExtRec;	/* extent record for extents overflow file */
 	UINT32BE ctFlSize;		/* size (in bytes) of catalog file */
 	hfs_extent_3 ctExtRec;	/* extent record for catalog file */
-} hfs_mdb;
+} hfs_mdb_t;
 
 /* to save a little stack space, we use the same buffer for MDB and next blocks */
 typedef union img_open_buf
 {
-	mfs_mdb mfs_mdb;
-	hfs_mdb hfs_mdb;
+	mfs_mdb_t mfs_mdb;
+	hfs_mdb_t hfs_mdb;
 	UINT8 raw[512];
 } img_open_buf;
 
@@ -1700,7 +1700,7 @@ static imgtoolerr_t mfs_update_mdb(mac_l2_imgref *l2_img)
 	imgtoolerr_t err;
 	union
 	{
-		mfs_mdb mfs_mdb;
+		mfs_mdb_t mfs_mdb;
 		UINT8 raw[512];
 	} buf;
 
@@ -2926,14 +2926,14 @@ typedef struct hfs_cat_enumerator
 
     Return imgtool error code
 */
-static imgtoolerr_t hfs_open_extents_file(mac_l2_imgref *l2_img, const hfs_mdb *mdb, mac_fileref *fileref)
+static imgtoolerr_t hfs_open_extents_file(mac_l2_imgref *l2_img, const hfs_mdb_t *mdb, mac_fileref *fileref)
 {
 	assert(l2_img->format == L2I_HFS);
 
 	fileref->l2_img = l2_img;
 
 	fileref->fileID = 3;
-	fileref->forkType = 0x00;
+	fileref->forkType = (mac_forkID)0x00;
 
 	fileref->eof = fileref->pLen = get_UINT32BE(mdb->xtFlSize);
 	memcpy(fileref->u.hfs.extents, mdb->xtExtRec, sizeof(hfs_extent_3));
@@ -2956,14 +2956,14 @@ static imgtoolerr_t hfs_open_extents_file(mac_l2_imgref *l2_img, const hfs_mdb *
 
     Return imgtool error code
 */
-static imgtoolerr_t hfs_open_cat_file(mac_l2_imgref *l2_img, const hfs_mdb *mdb, mac_fileref *fileref)
+static imgtoolerr_t hfs_open_cat_file(mac_l2_imgref *l2_img, const hfs_mdb_t *mdb, mac_fileref *fileref)
 {
 	assert(l2_img->format == L2I_HFS);
 
 	fileref->l2_img = l2_img;
 
 	fileref->fileID = 4;
-	fileref->forkType = 0x00;
+	fileref->forkType = (mac_forkID)0x00;
 
 	fileref->eof = fileref->pLen = get_UINT32BE(mdb->ctFlSize);
 	memcpy(fileref->u.hfs.extents, mdb->ctExtRec, sizeof(hfs_extent_3));
@@ -2989,8 +2989,8 @@ static imgtoolerr_t hfs_open_cat_file(mac_l2_imgref *l2_img, const hfs_mdb *mdb,
 */
 static int hfs_extentKey_compare(const void *p1, const void *p2)
 {
-	const hfs_extentKey *key1 = p1;
-	const hfs_extentKey *key2 = p2;
+	const hfs_extentKey *key1 = (const hfs_extentKey*)p1;
+	const hfs_extentKey *key2 = (const hfs_extentKey*)p2;
 
 	/* let's keep it simple for now */
 	return memcmp(key1, key2, sizeof(hfs_extentKey));
@@ -3010,8 +3010,8 @@ static int hfs_extentKey_compare(const void *p1, const void *p2)
 */
 static int hfs_catKey_compare(const void *p1, const void *p2)
 {
-	const hfs_catKey *key1 = p1;
-	const hfs_catKey *key2 = p2;
+	const hfs_catKey *key1 = (const hfs_catKey *)p1;
+	const hfs_catKey *key2 = (const hfs_catKey *)p2;
 
 	if (get_UINT32BE(key1->parID) != get_UINT32BE(key2->parID))
 		return (get_UINT32BE(key1->parID) < get_UINT32BE(key2->parID)) ? -1 : +1;
@@ -3174,7 +3174,7 @@ static imgtoolerr_t hfs_get_cat_record_data(mac_l2_imgref *l2_img, void *rec_raw
 
 	assert(l2_img->format == L2I_HFS);
 
-	lrec_key = rec_raw;
+	lrec_key = (hfs_catKey*)rec_raw;
 	/* check that key is long enough to hold it all */
 	if ((lrec_key->keyLen+1) < (offsetof(hfs_catKey, cName) + lrec_key->cName[0] + 1))
 		return IMGTOOLERR_CORRUPTIMAGE;
@@ -3183,7 +3183,7 @@ static imgtoolerr_t hfs_get_cat_record_data(mac_l2_imgref *l2_img, void *rec_raw
 	err = BT_get_keyed_record_data(&l2_img->u.hfs.cat_BT, rec_raw, rec_len, &rec_data_raw, &rec_data_len);
 	if (err)
 		return err;
-	lrec_data = rec_data_raw;
+	lrec_data = (hfs_catData*)rec_data_raw;
 
 	/* extract record type */
 	if (rec_data_len < 2)
@@ -3568,7 +3568,7 @@ static imgtoolerr_t hfs_file_get_nth_block_address(mac_fileref *fileref, UINT32 
 		if (extents_BT_rec == NULL)
 			return IMGTOOLERR_CORRUPTIMAGE;
 
-		found_key = extents_BT_rec;
+		found_key = (hfs_extentKey*)extents_BT_rec;
 		/* check that this record concerns the correct file */
 		if ((found_key->forkType != fileref->forkType)
 			|| (get_UINT32BE(found_key->fileID) != fileref->fileID))
@@ -3582,7 +3582,7 @@ static imgtoolerr_t hfs_file_get_nth_block_address(mac_fileref *fileref, UINT32 
 			return err;
 		if (cur_extents_len < 3*sizeof(hfs_extent))
 			return IMGTOOLERR_CORRUPTIMAGE;
-		cur_extents = cur_extents_raw;
+		cur_extents = (hfs_extent*)cur_extents_raw;
 
 		/* pick correct extent in record */
 		for (i=0; i<3; i++)
@@ -3956,18 +3956,20 @@ static imgtoolerr_t BT_get_keyed_record_data(mac_BTref *BTref, void *rec_ptr, in
 
     Return imgtool error code
 */
+typedef struct data_nodes_t
+{
+	void *buf;
+	UINT32 node_num;
+	UINT32 cur_rec;
+	UINT32 num_recs;
+} data_nodes_t;
 static imgtoolerr_t BT_check(mac_BTref *BTref, int is_extent)
 {
 	UINT16 node_numRecords;
 	BTHeaderRecord *header_rec;
 	UINT8 *bitmap;
-	struct
-	{
-		void *buf;
-		UINT32 node_num;
-		UINT32 cur_rec;
-		UINT32 num_recs;
-	} *data_nodes;
+
+	data_nodes_t *data_nodes;
 	int i, j;
 	UINT32 cur_node, prev_node;
 	void *rec1, *rec2;
@@ -4044,7 +4046,7 @@ static imgtoolerr_t BT_check(mac_BTref *BTref, int is_extent)
 
 	/* alloc buffer for reconstructed bitmap */
 	map_len = (totalNodes + 7) / 8;
-	bitmap = malloc(map_len);
+	bitmap = (UINT8*)malloc(map_len);
 	if (! bitmap)
 		return IMGTOOLERR_OUTOFMEMORY;
 	memset(bitmap, 0, map_len);
@@ -4062,7 +4064,7 @@ static imgtoolerr_t BT_check(mac_BTref *BTref, int is_extent)
 	else
 	{
 		/* alloc array of buffers for catalog data nodes */
-		data_nodes = malloc(sizeof(data_nodes[0]) * BTref->treeDepth);
+		data_nodes = (data_nodes_t *)malloc(sizeof(data_nodes_t) * BTref->treeDepth);
 		if (! data_nodes)
 		{
 			err = IMGTOOLERR_OUTOFMEMORY;
@@ -4239,7 +4241,7 @@ static imgtoolerr_t BT_check(mac_BTref *BTref, int is_extent)
 				if (err)
 					goto bail;
 
-				extentKey = rec1;
+				extentKey = (hfs_extentKey*)rec1;
 				if ((extentKey->keyLength < 7) || (extentKey->forkType != 0) || (get_UINT32BE(extentKey->fileID) != 3)
 						|| (get_UINT16BE(extentKey->startBlock) != maxExtentAB))
 					/* the key is corrupt or does not concern the extent
@@ -4260,7 +4262,7 @@ static imgtoolerr_t BT_check(mac_BTref *BTref, int is_extent)
 						extentEOL = TRUE;
 					else
 					{
-						extentData = rec1_data;
+						extentData = (hfs_extent*)rec1_data;
 
 						for (j=0; j<3; j++)
 							maxExtentAB += get_UINT16BE(extentData[j].numABlks);
@@ -6069,7 +6071,7 @@ static int load_icon(UINT32 *dest, const void *resource_fork, UINT64 resource_fo
 	total_length = frame_length * (has_mask ? 2 : 1);
 
 	/* attempt to fetch resource */
-	src = mac_get_resource(resource_fork, resource_fork_length, resource_type,
+	src = (const UINT8*)mac_get_resource(resource_fork, resource_fork_length, resource_type,
 		resource_id, &resource_length);
 	if (src && (resource_length == total_length))
 	{

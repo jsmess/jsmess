@@ -7,7 +7,7 @@
     Juergen Buchmueller <pullmoll@t-online.de>, Jan 2000
 
 ******************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 
 #include "includes/mekd2.h"

@@ -14,7 +14,7 @@ be written to RAM if RAM was switched in.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"

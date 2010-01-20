@@ -280,7 +280,7 @@ Timings:
 
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
@@ -419,7 +419,7 @@ static const cassette_config lviv_cassette_config =
 {
 	lviv_lvt_format,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
 };
 
 

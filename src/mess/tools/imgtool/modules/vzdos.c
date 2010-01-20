@@ -98,7 +98,7 @@ static imgtoolerr_t vzdos_get_data_start(imgtool_image *img, int track, int sect
 	imgtoolerr_t ret;
 	UINT8 buffer[25]; /* enough to read the sector header */
 
-	ret = floppy_read_sector(imgtool_floppy(img), 0, track, sector_order[sector], 0, &buffer, sizeof(buffer));
+	ret = (imgtoolerr_t)floppy_read_sector(imgtool_floppy(img), 0, track, sector_order[sector], 0, &buffer, sizeof(buffer));
 	if (ret) return ret;
 
 	/* search for start of data */
@@ -121,10 +121,10 @@ static imgtoolerr_t vzdos_read_sector_data(imgtool_image *img, int track, int se
 	UINT8 buffer[DATA_SIZE + 4]; /* data + checksum */
 
 	ret = vzdos_get_data_start(img, track, sector, &data_start);
-	if (ret) return ret;
+	if (ret) return (imgtoolerr_t)ret;
 
 	ret = floppy_read_sector(imgtool_floppy(img), 0, track, sector_order[sector], data_start, &buffer, sizeof(buffer));
-	if (ret) return ret;
+	if (ret) return (imgtoolerr_t)ret;
 
 	/* verify sector checksums */
 	if (pick_integer_le(buffer, DATA_SIZE + 2, 2) != chksum16(buffer, DATA_SIZE + 2))
@@ -142,13 +142,13 @@ static imgtoolerr_t vzdos_write_sector_data(imgtool_image *img, int track, int s
 	UINT8 buffer[DATA_SIZE + 4]; /* data + checksum */
 
 	ret = vzdos_get_data_start(img, track, sector, &data_start);
-	if (ret) return ret;
+	if (ret) return (imgtoolerr_t)ret;
 
 	memcpy(buffer, data, DATA_SIZE + 2);
 	place_integer_le(buffer, DATA_SIZE + 2, 2, chksum16(data, DATA_SIZE + 2));
 
 	ret = floppy_write_sector(imgtool_floppy(img), 0, track, sector_order[sector], data_start, buffer, sizeof(buffer), 0);	/* TODO: pass ddam argument from imgtool */
-	if (ret) return ret;
+	if (ret) return (imgtoolerr_t)ret;
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -170,7 +170,7 @@ static imgtoolerr_t vzdos_get_dirent(imgtool_image *img, int index, vzdos_dirent
 	UINT8 buffer[DATA_SIZE + 2];
 
 	ret = vzdos_read_sector_data(img, 0, (int) index / 8, buffer);
-	if (ret) return ret;
+	if (ret) return (imgtoolerr_t)ret;
 
 	entry = ((index % 8) * sizeof(vzdos_dirent));
 
@@ -201,7 +201,7 @@ static imgtoolerr_t vzdos_set_dirent(imgtool_image *img, int index, vzdos_dirent
 
 	/* read current sector with entries */
 	ret = vzdos_read_sector_data(img, 0, (int) index / 8, buffer);
-	if (ret) return ret;
+	if (ret) return (imgtoolerr_t)ret;
 
 	entry = ((index % 8) * sizeof(vzdos_dirent));
 
@@ -213,7 +213,7 @@ static imgtoolerr_t vzdos_set_dirent(imgtool_image *img, int index, vzdos_dirent
 
 	/* save new sector */
 	ret = vzdos_write_sector_data(img, 0, (int) index / 8, buffer);
-	if (ret) return ret;
+	if (ret) return (imgtoolerr_t)ret;
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -227,7 +227,7 @@ static imgtoolerr_t vzdos_clear_dirent(imgtool_image *img, int index)
 	memset(&entry, 0x00, sizeof(vzdos_dirent));
 
 	ret = vzdos_set_dirent(img, index, entry);
-	if (ret) return ret;
+	if (ret) return (imgtoolerr_t)ret;
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -249,7 +249,7 @@ static imgtoolerr_t vzdos_searchentry(imgtool_image *image, const char *fname, i
 	for (i = 0; i < MAX_DIRENTS; i++) {
 
 		ret = vzdos_get_dirent(image, i, &ent);
-		if (ret) return ret;
+		if (ret) return (imgtoolerr_t)ret;
 
 		len = vzdos_get_fname_len(ent.fname) + 1;
 
@@ -278,10 +278,10 @@ static imgtoolerr_t vzdos_get_dirent_fname(imgtool_image *img, const char *fname
 	int ret, index;
 
 	ret = vzdos_searchentry(img, fname, &index);
-	if (ret) return ret;
+	if (ret) return (imgtoolerr_t)ret;
 
 	ret = vzdos_get_dirent(img, index, ent);
-	if (ret) return ret;
+	if (ret) return (imgtoolerr_t)ret;
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -293,7 +293,7 @@ static imgtoolerr_t vzdos_toggle_trackmap(imgtool_image *img, int track, int sec
 
 	/* get trackmap from image */
 	ret = vzdos_read_sector_data(img, 0, 15, buffer);
-	if (ret) return ret;
+	if (ret) return (imgtoolerr_t)ret;
 
 	value = (int) (floor((track * 16 + sector) / 8) - 1);
 	bit   = 0x01 << ((track * 16 + sector) % 8);
@@ -304,7 +304,7 @@ static imgtoolerr_t vzdos_toggle_trackmap(imgtool_image *img, int track, int sec
 		buffer[value-1] |= bit;
 
 	ret = vzdos_write_sector_data(img, 0, 15, buffer);
-	if (ret) return ret;
+	if (ret) return (imgtoolerr_t)ret;
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -329,7 +329,7 @@ static imgtoolerr_t vzdos_get_trackmap(imgtool_image *img, int track, int sector
 
 	/* get trackmap from image */
 	ret = vzdos_read_sector_data(img, 0, 15, buffer);
-	if (ret) return ret;
+	if (ret) return (imgtoolerr_t)ret;
 
 	value = (int) (floor((track * 16 + sector) / 8) - 1);
 	bit   = 0x01 << ((track * 16 + sector) % 8);
@@ -350,7 +350,7 @@ static imgtoolerr_t vzdos_free_trackmap(imgtool_image *img, int *track, int *sec
 	for (*track = 1; *track < 40; (*track)++) {
 		for (*sector = 0; *sector < 16; (*sector)++) {
 			ret = vzdos_get_trackmap(img, *track, *sector, &used);
-			if (ret) return ret;
+			if (ret) return (imgtoolerr_t)ret;
 			if (!used) return IMGTOOLERR_SUCCESS;
 		}
 	}
@@ -377,7 +377,7 @@ static imgtoolerr_t vzdos_write_formatted_sector(imgtool_image *img, int track, 
 	sector_data[12] = (UINT8) track + sector;	/* checksum-8 */
 
 	ret = floppy_write_sector(imgtool_floppy(img), 0, track, sector_order[sector], 0, sector_data, sizeof(sector_data), 0);	/* TODO: pass ddam argument from imgtool */
-	if (ret) return ret;
+	if (ret) return (imgtoolerr_t)ret;
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -538,7 +538,7 @@ static imgtoolerr_t vzdos_diskimage_deletefile(imgtool_partition *partition, con
 	ret = vzdos_get_dirent_fname(img, fname, &entry);
 	if (ret) return ret;
 
-	ret = floppy_read_sector(imgtool_floppy(img), 0, entry.start_track, sector_order[entry.start_sector], 24, &buffer, DATA_SIZE + 2);
+	ret = (imgtoolerr_t)floppy_read_sector(imgtool_floppy(img), 0, entry.start_track, sector_order[entry.start_sector], 24, &buffer, DATA_SIZE + 2);
 	if (ret) return ret;
 
 	filesize = entry.end_address - entry.start_address;
@@ -600,7 +600,7 @@ static imgtoolerr_t vzdos_diskimage_deletefile(imgtool_partition *partition, con
 		sector = next_sector;
 
 		if (filesize > 0) {
-			ret = floppy_read_sector(imgtool_floppy(img), 0, track, sector_order[sector], 24, &buffer, DATA_SIZE + 2);
+			ret = (imgtoolerr_t)floppy_read_sector(imgtool_floppy(img), 0, track, sector_order[sector], 24, &buffer, DATA_SIZE + 2);
 			if (ret) return ret;
 		}
 
@@ -636,7 +636,7 @@ static imgtoolerr_t vzdos_writefile(imgtool_partition *partition, int offset, im
 		return ret;
 	}
 
-	ret = stream_seek(sourcef, offset, SEEK_SET);
+	ret = (imgtoolerr_t)stream_seek(sourcef, offset, SEEK_SET);
 	if (ret) return ret;
 
 	/* check if there is enough space */

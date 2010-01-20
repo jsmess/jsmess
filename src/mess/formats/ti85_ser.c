@@ -1,5 +1,5 @@
 
-#include "driver.h"
+#include "emu.h"
 #include "ti85_ser.h"
 
 enum
@@ -337,7 +337,7 @@ static int ti85_convert_file_data_to_serial_stream (const device_config *device,
 	number_of_entries = (file_data[0x3b]==0x1d) ? 3 : ti85_variables_count(file_data, file_size);
 	if (!number_of_entries) return 0;
 
-	serial_data->variables = malloc(sizeof(ti85_serial_variable)*number_of_entries);
+	serial_data->variables = (ti85_serial_variable*)malloc(sizeof(ti85_serial_variable)*number_of_entries);
 	if (!serial_data->variables) return 0;
 
 	for (i=0; i<number_of_entries; i++)
@@ -847,7 +847,7 @@ static void ti85_receive_variables (const device_config *device)
 						ti85serial->var_file_size = 0x39;
 					}
 				}
-				temp = malloc (ti85serial->var_file_size+ti85serial->var_data[0]+2+ti85serial->var_data[2]+ti85serial->var_data[3]*256+2);
+				temp = (UINT8*)malloc (ti85serial->var_file_size+ti85serial->var_data[0]+2+ti85serial->var_data[2]+ti85serial->var_data[3]*256+2);
 				if (temp)
 				{
 					memcpy (temp, ti85serial->var_file_data, ti85serial->var_file_size);
@@ -922,7 +922,7 @@ static void ti85_receive_backup (const device_config *device)
 				ti85serial->backup_data_size[0] = ti85serial->receive_data[4] + ti85serial->receive_data[5]*256;
 				ti85serial->backup_data_size[1] = ti85serial->receive_data[7] + ti85serial->receive_data[8]*256;
 				ti85serial->backup_data_size[2] = ti85serial->receive_data[9] + ti85serial->receive_data[10]*256;
-				ti85serial->backup_file_data = malloc (0x42+0x06+ti85serial->backup_data_size[0]+ti85serial->backup_data_size[1]+ti85serial->backup_data_size[2]+0x02);
+				ti85serial->backup_file_data = (UINT8*)malloc (0x42+0x06+ti85serial->backup_data_size[0]+ti85serial->backup_data_size[1]+ti85serial->backup_data_size[2]+0x02);
 				if(!ti85serial->backup_file_data)
 				{
 					ti85serial->backup_variable_number = 0;
@@ -1098,7 +1098,7 @@ static void ti85_receive_screen (const device_config *device)
 				filerr = mame_fopen(SEARCHPATH_IMAGE, image_file_name, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &image_file);
 				if (filerr == FILERR_NONE)
 				{
-					image_file_data = malloc (0x49+1008);
+					image_file_data = (UINT8*)malloc (0x49+1008);
 					if(!image_file_data)
 					{
 						ti85_free_serial_data_memory(device);

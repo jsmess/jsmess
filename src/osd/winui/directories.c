@@ -316,7 +316,7 @@ static BOOL Directories_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 			/* Copy the string to our own buffer so that we can mutilate it */
 			_tcscpy(buf, t_s);
 
-			g_pDirInfo[i].m_Path = malloc(sizeof(tPath));
+			g_pDirInfo[i].m_Path = (tPath*)malloc(sizeof(tPath));
 			if (!g_pDirInfo[i].m_Path)
 				goto error;
 
@@ -756,14 +756,14 @@ BOOL BrowseForDirectory(HWND hwnd, LPCTSTR pStartDir, TCHAR* pResult)
 			_sntprintf(pResult, MAX_PATH, TEXT("%s"), buf);
 			bResult = TRUE;
 		}
-		IMalloc_Free(piMalloc, pItemIDList);
+//		IMalloc_Free(piMalloc, pItemIDList);
 	}
 	else
 	{
 		bResult = FALSE;
 	}
 
-	IMalloc_Release(piMalloc);
+	//IMalloc_Release(piMalloc);
 	return bResult;
 }
 

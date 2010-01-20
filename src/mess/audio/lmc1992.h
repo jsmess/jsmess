@@ -24,7 +24,7 @@
 #ifndef __LMC1992_AUDIO__
 #define __LMC1992_AUDIO__
 
-#include "driver.h"
+#include "emu.h"
 
 #define LMC1992		DEVICE_GET_INFO_NAME(lmc1992)
 

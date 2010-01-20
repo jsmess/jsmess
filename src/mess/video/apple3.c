@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/apple3.h"
 #include "devices/messram.h"
 

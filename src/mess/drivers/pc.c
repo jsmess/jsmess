@@ -108,7 +108,7 @@ TODO: Which clock signals are available in a PC Jr?
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/nec/nec.h"
 #include "cpu/i86/i86.h"
 #include "sound/speaker.h"
@@ -1645,7 +1645,7 @@ static const cassette_config ibm5150_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 };
 
 static GFXDECODE_START( ibm5150 )

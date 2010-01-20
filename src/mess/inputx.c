@@ -9,9 +9,8 @@
 #include <ctype.h>
 #include <assert.h>
 #include <wctype.h>
+#include "emu.h"
 #include "inputx.h"
-#include "inptport.h"
-#include "mame.h"
 
 #include "debug/debugcon.h"
 
@@ -429,10 +428,9 @@ static const char *code_point_string(running_machine *machine, unicode_char ch)
 			else if (ch >= UCHAR_MAMEKEY_BEGIN)
 			{
 				/* try to obtain a codename with input_code_name(); this can result in an empty string */
-				astring *astr = astring_alloc();
+				astring astr;
 				input_code_name(machine, astr, (input_code) ch - UCHAR_MAMEKEY_BEGIN);
-				snprintf(buf, ARRAY_LENGTH(buf), "%s", astring_c(astr));
-				astring_free(astr);
+				snprintf(buf, ARRAY_LENGTH(buf), "%s", astr.cstr());
 			}
 			else
 			{

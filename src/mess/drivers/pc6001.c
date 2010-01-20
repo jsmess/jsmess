@@ -88,7 +88,7 @@ irq vector 16: tests ppi port c, writes the result to $feca. ;vblank
 
 *********************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255a.h"
 #include "machine/msm8251.h"
@@ -818,7 +818,7 @@ static MACHINE_RESET(pc6001)
 	port_c_8255=0;
 	//pc6001_video_ram =  pc6001_ram;
 
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"),pc6001_irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"),pc6001_irq_callback);
 	cas_switch = 0;
 	cas_offset = 0;
 }
@@ -828,7 +828,7 @@ static MACHINE_RESET(pc6001m2)
 	port_c_8255=0;
 	//pc6001_video_ram =  pc6001_ram;
 
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"),pc6001_irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"),pc6001_irq_callback);
 	cas_switch = 0;
 	cas_offset = 0;
 
@@ -872,7 +872,7 @@ static const cassette_config pc6001_cassette_config =
 {
 	pc6001_cassette_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 };
 
 static MACHINE_DRIVER_START( pc6001 )

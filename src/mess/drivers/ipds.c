@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "video/i8275.h"
 
@@ -56,7 +56,7 @@ const i8275_interface ipds_i8275_interface = {
 
 static MACHINE_RESET(ipds) 
 {
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), I8085_PC, 0x0000);		
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), I8085_PC, 0x0000);		
 }
 
 static VIDEO_UPDATE( ipds )

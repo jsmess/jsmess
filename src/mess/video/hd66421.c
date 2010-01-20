@@ -6,7 +6,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "hd66421.h"
 
 #define LOG_LEVEL  1

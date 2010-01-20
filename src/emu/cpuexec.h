@@ -11,11 +11,12 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __CPUEXEC_H__
 #define __CPUEXEC_H__
-
-#include "cpuintrf.h"
-#include "timer.h"
 
 
 /***************************************************************************
@@ -135,24 +136,19 @@ struct _cpu_class_header
 
 #define INTERRUPT_GEN(func)		void func(const device_config *device)
 
-/* return a pointer to the given CPU by tag */
-#define cputag_get_cpu(mach, tag)										devtag_get_device(mach, tag)
-
 /* helpers for using machine/cputag instead of cpu objects */
-#define cputag_reset(mach, tag)											devtag_reset(mach, tag)
-#define cputag_get_index(mach, tag)										cpu_get_index(cputag_get_cpu(mach, tag))
-#define cputag_get_address_space(mach, tag, space)						cpu_get_address_space(cputag_get_cpu(mach, tag), space)
-#define cputag_suspend(mach, tag, reason, eat)							cpu_suspend(cputag_get_cpu(mach, tag), reason, eat)
-#define cputag_resume(mach, tag, reason)								cpu_resume(cputag_get_cpu(mach, tag), reason)
-#define cputag_is_suspended(mach, tag, reason)							cpu_is_suspended(cputag_get_cpu(mach, tag), reason)
-#define cputag_get_clock(mach, tag)										cpu_get_clock(cputag_get_cpu(mach, tag))
-#define cputag_set_clock(mach, tag, clock)								cpu_set_clock(cputag_get_cpu(mach, tag), clock)
-#define cputag_clocks_to_attotime(mach, tag, clocks)					cpu_clocks_to_attotime(cputag_get_cpu(mach, tag), clocks)
-#define cputag_attotime_to_clocks(mach, tag, duration)					cpu_attotime_to_clocks(cputag_get_cpu(mach, tag), duration)
-#define cputag_get_local_time(mach, tag)								cpu_get_local_time(cputag_get_cpu(mach, tag))
-#define cputag_get_total_cycles(mach, tag)								cpu_get_total_cycles(cputag_get_cpu(mach, tag))
-#define cputag_set_input_line(mach, tag, line, state)					cpu_set_input_line(cputag_get_cpu(mach, tag), line, state)
-#define cputag_set_input_line_and_vector(mach, tag, line, state, vec)	cpu_set_input_line_and_vector(cputag_get_cpu(mach, tag), line, state, vec)
+#define cputag_get_address_space(mach, tag, spc)						(mach)->device(tag)->space(spc)
+#define cputag_suspend(mach, tag, reason, eat)							cpu_suspend((mach)->device(tag), reason, eat)
+#define cputag_resume(mach, tag, reason)								cpu_resume((mach)->device(tag), reason)
+#define cputag_is_suspended(mach, tag, reason)							cpu_is_suspended((mach)->device(tag), reason)
+#define cputag_get_clock(mach, tag)										cpu_get_clock((mach)->device(tag))
+#define cputag_set_clock(mach, tag, clock)								cpu_set_clock((mach)->device(tag), clock)
+#define cputag_clocks_to_attotime(mach, tag, clocks)					cpu_clocks_to_attotime((mach)->device(tag), clocks)
+#define cputag_attotime_to_clocks(mach, tag, duration)					cpu_attotime_to_clocks((mach)->device(tag), duration)
+#define cputag_get_local_time(mach, tag)								cpu_get_local_time((mach)->device(tag))
+#define cputag_get_total_cycles(mach, tag)								cpu_get_total_cycles((mach)->device(tag))
+#define cputag_set_input_line(mach, tag, line, state)					cpu_set_input_line((mach)->device(tag), line, state)
+#define cputag_set_input_line_and_vector(mach, tag, line, state, vec)	cpu_set_input_line_and_vector((mach)->device(tag), line, state, vec)
 
 
 
@@ -345,10 +341,7 @@ INLINE cpu_debug_data *cpu_get_debug_data(const device_config *device)
 
 INLINE const address_space *cpu_get_address_space(const device_config *device, int spacenum)
 {
-	/* it is faster to pull this from the pre-fetched data, but only after we've started */
-	if (device->token != NULL)
-		return device->space[spacenum];
-	return memory_find_address_space(device, spacenum);
+	return device->space(spacenum);
 }
 
 #endif	/* __CPUEXEC_H__ */

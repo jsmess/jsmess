@@ -116,7 +116,7 @@
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 
@@ -465,14 +465,14 @@ static void	wd17xx_set_intrq(const device_config *device)
 /* set intrq after delay */
 static TIMER_CALLBACK( wd17xx_command_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	wd17xx_set_intrq(device);
 }
 
 /* set drq after delay */
 static TIMER_CALLBACK( wd17xx_data_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	wd17xx_set_drq(device);
 }
 
@@ -993,7 +993,7 @@ static void wd17xx_verify_seek(const device_config *device)
 /* callback to initiate read sector */
 static TIMER_CALLBACK( wd17xx_read_sector_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	wd1770_state *w = get_safe_token(device);
 
 	/* ok, start that read! */
@@ -1012,7 +1012,7 @@ static TIMER_CALLBACK( wd17xx_read_sector_callback )
 /* callback to initiate write sector */
 static TIMER_CALLBACK(wd17xx_write_sector_callback)
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	wd1770_state *w = get_safe_token(device);
 
 	/* ok, start that write! */
@@ -1802,7 +1802,7 @@ static DEVICE_START( wd1770 )
 
 	assert(device->static_config != NULL);
 
-	w->intf = device->static_config;
+	w->intf = (const wd17xx_interface*)device->static_config;
 
 	w->status = STA_1_TRACK0;
 	w->density = DEN_MFM_LO;

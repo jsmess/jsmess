@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/gamecom.h"
 
 #define Y_PIXELS 200

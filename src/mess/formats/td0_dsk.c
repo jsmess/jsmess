@@ -13,7 +13,7 @@
  */
 
 #include <string.h>
-#include "driver.h"
+#include "emu.h"
 #include "formats/flopimg.h"
 #include "devices/flopdrv.h"
 
@@ -30,7 +30,7 @@ struct td0dsk_tag
 static struct td0dsk_tag *get_tag(floppy_image *floppy)
 {
 	struct td0dsk_tag *tag;
-	tag = floppy_tag(floppy);
+	tag = (td0dsk_tag *)floppy_tag(floppy);
 	return tag;
 }
 

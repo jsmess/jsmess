@@ -12,7 +12,8 @@
 #include <tchar.h>
 
 // MAME/MESS headers
-#include "mame.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "menu.h"
 #include "ui.h"
 #include "messres.h"
@@ -994,9 +995,9 @@ static void change_device(HWND wnd, const device_config *device, int is_save)
 	{
 		// mount the image
 		if (is_save)
-			err = image_create(device, filename, image_device_get_indexed_creatable_format(device, create_format), create_args);
+			err = (image_error_t)image_create(device, filename, image_device_get_indexed_creatable_format(device, create_format), create_args);
 		else
-			err = image_load(device, filename);
+			err = (image_error_t)image_load(device, filename);
 
 		// error?
 		if (err)
@@ -1469,11 +1470,10 @@ static void prepare_menus(HWND wnd)
 
 		append_menu_uistring(sub_menu, flags_for_exists,	new_item + DEVOPTION_CLOSE,	UI_unmount);
 
-#if HAS_WAVE
 		if ((img->type == CASSETTE) && !strcmp(info.file_extensions, "wav"))
 		{
 			cassette_state state;
-			state = image_exists(img) ? (cassette_get_state(img) & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED;
+			state = (cassette_state)(image_exists(img) ? (cassette_get_state(img) & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED);
 			append_menu_uistring(sub_menu, MF_SEPARATOR, 0, -1);
 			append_menu_uistring(sub_menu, flags_for_exists	| ((state == CASSETTE_STOPPED)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_STOPPAUSE,	UI_pauseorstop);
 			append_menu_uistring(sub_menu, flags_for_exists	| ((state == CASSETTE_PLAY)		? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_PLAY,			UI_play);
@@ -1481,7 +1481,6 @@ static void prepare_menus(HWND wnd)
 			append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_REWIND,		UI_rewind);
 			append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_FASTFORWARD,	UI_fastforward);
 		}
-#endif /* HAS_WAVE */
 		s = image_exists(img) ? image_filename(img) : ui_getstring(UI_emptyslot);
 		flags = MF_POPUP;
 
@@ -1587,7 +1586,6 @@ static void device_command(HWND wnd, const device_config *img, int devoption)
 			break;
 
 		default:
-#if HAS_WAVE
 			if (img->type == CASSETTE)
 			{
 				switch(devoption)
@@ -1613,7 +1611,6 @@ static void device_command(HWND wnd, const device_config *img, int devoption)
 						break;
 				}
 			}
-#endif /* HAS_WAVE */
 			break;
 	}
 }
@@ -2080,7 +2077,7 @@ static HMODULE win_resource_module(void)
 	if (module == NULL)
 	{
 		MEMORY_BASIC_INFORMATION info;
-		if ((VirtualQuery(win_resource_module, &info, sizeof(info))) == sizeof(info))
+		if ((VirtualQuery((const void*)win_resource_module, &info, sizeof(info))) == sizeof(info))
 			module = (HMODULE)info.AllocationBase;
 	}
 	return module;

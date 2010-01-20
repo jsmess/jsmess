@@ -12,7 +12,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mips/psx.h"
 #include "devices/snapquik.h"
 #include "devices/chd_cd.h"
@@ -364,7 +364,7 @@ static int load_psf( const device_config *cpu, unsigned char *p_n_file, int n_le
 		}
 
 		n_uncompressed = 0x200000;
-		p_n_uncompressed = malloc( n_uncompressed );
+		p_n_uncompressed = (unsigned char *)malloc( n_uncompressed );
 
 		if( uncompress( p_n_uncompressed, &n_uncompressed, p_n_compressed, n_compressed ) != Z_OK )
 		{
@@ -388,7 +388,7 @@ static DIRECT_UPDATE_HANDLER( psx_setopbase )
 {
 	if( address == 0x80030000 )
 	{
-		const device_config *cpu = cputag_get_cpu(space->machine, "maincpu");
+		const device_config *cpu = devtag_get_device(space->machine, "maincpu");
 
 		memory_set_direct_update_handler( space, NULL );
 
@@ -416,7 +416,7 @@ static QUICKLOAD_LOAD( psx_exe_load )
 	const address_space *space = cputag_get_address_space( image->machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 	exe_size = 0;
-	exe_buffer = malloc( quickload_size );
+	exe_buffer = (UINT8*)malloc( quickload_size );
 	if( exe_buffer == NULL )
 	{
 		logerror( "psx_exe_load: out of memory\n" );

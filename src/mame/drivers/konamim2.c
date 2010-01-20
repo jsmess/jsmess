@@ -186,7 +186,7 @@ Notes:
 */
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cdrom.h"
 #include "cpu/powerpc/ppc.h"
 
@@ -317,7 +317,7 @@ static WRITE64_HANDLER(unk4_w)
 	{
 		if (data & 0x800000)
 		{
-			mame_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", space->cpu->tag, cpu_get_pc(space->cpu));
+			mame_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", space->cpu->tag.cstr(), cpu_get_pc(space->cpu));
 			cputag_set_input_line(space->machine, "sub", INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 
@@ -1075,7 +1075,7 @@ static READ64_HANDLER(cpu_r)
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r = (UINT64)((space->cpu != cputag_get_cpu(space->machine, "maincpu")) ? 0x80000000 : 0);
+		r = (UINT64)((space->cpu != devtag_get_device(space->machine, "maincpu")) ? 0x80000000 : 0);
 		//r |= 0x40000000;  // sets Video-LowRes !?
 		return r << 32;
 	}

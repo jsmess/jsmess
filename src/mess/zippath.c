@@ -10,7 +10,8 @@
 
 #include "zippath.h"
 #include "unzip.h"
-#include "osdmess.h"
+#include "emu.h"
+#include "osdcore.h"
 
 
 /***************************************************************************
@@ -807,7 +808,7 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 					if (rdent == NULL)
 					{
 						/* we've found a new directory; add this to returned_dirlist */
-						rdent = malloc(sizeof(*rdent) + (separator - relpath));
+						rdent = (zippath_returned_directory*)malloc(sizeof(*rdent) + (separator - relpath));
 						rdent->next = directory->returned_dirlist;
 						memcpy(rdent->name, relpath, (separator - relpath) * sizeof(rdent->name[0]));
 						rdent->name[separator - relpath] = '\0';

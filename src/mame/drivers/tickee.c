@@ -16,7 +16,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/tms34010/tms34010.h"
 #include "machine/ticket.h"
 #include "video/tlc34076.h"
@@ -224,14 +224,14 @@ static READ16_HANDLER( rapidfir_transparent_r )
 }
 
 
-void rapidfir_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
+static void rapidfir_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	if (address < 0x800000)
 		memcpy(shiftreg, &tickee_vram[TOWORD(address)], TOBYTE(0x2000));
 }
 
 
-void rapidfir_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
+static void rapidfir_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	if (address < 0x800000)
 		memcpy(&tickee_vram[TOWORD(address)], shiftreg, TOBYTE(0x2000));

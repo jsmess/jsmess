@@ -7,7 +7,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "kr2376.h"
 
 static const UINT8 KR2376_KEY_CODES[3][8][11] =
@@ -201,7 +201,7 @@ static void detect_keypress(const device_config *device)
 
 static TIMER_CALLBACK( kr2376_scan_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 
 	change_output_lines(device);
 	clock_scan_counters(device);
@@ -343,7 +343,7 @@ static DEVICE_START( kr2376 )
 	assert(device != NULL);
 	assert(device->tag != NULL);
 
-	kr2376->intf = device->static_config;
+	kr2376->intf = (const kr2376_interface*)device->static_config;
 
 	assert(kr2376->intf != NULL);
 	assert(kr2376->intf->clock > 0);

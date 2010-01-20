@@ -7,7 +7,7 @@
 #ifndef __CONFIGMS_H__
 #define __CONFIGMS_H__
 
-#include "mamecore.h"
+#include "emu.h"
 
 void mess_config_init(running_machine *machine);
 

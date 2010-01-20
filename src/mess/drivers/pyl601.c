@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "video/mc6845.h"
 #include "devices/flopdrv.h"
@@ -325,7 +325,7 @@ static MACHINE_RESET(pyl601)
 	memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") + 0xf000);
 	memory_set_bankptr(machine, "bank6", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf000);
 
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 }
 
 static VIDEO_START( pyl601 )

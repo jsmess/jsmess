@@ -18,7 +18,7 @@ Historical notes: TI made several last minute design changes.
     * early TI99/4 prototypes were designed for a tms9985, not a tms9900.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/tms9900/tms9900.h"
 #include "sound/sn76496.h"

@@ -5,7 +5,7 @@
 */
 
 #include <math.h>
-#include "driver.h"
+#include "emu.h"
 
 #include "tms9901.h"
 
@@ -111,7 +111,7 @@ struct _tms9901_t
 	int pio_output_mirror;
 
 	/* clock registers */
-	void *timer;			/* MESS timer, used to emulate the decrementer register */
+	emu_timer *timer;			/* MESS timer, used to emulate the decrementer register */
 
 	int clockinvl;			/* clock interval, loaded in decrementer when it reaches 0.
                               0 means decrementer off */
@@ -587,7 +587,7 @@ static DEVICE_START( tms9901 )
 	assert(device->tag != NULL);
 	assert(device->static_config != NULL);
 
-	tms->intf = device->static_config;
+	tms->intf = (const tms9901_interface*)device->static_config;
 
 	tms->timer = timer_alloc(device->machine, decrementer_callback, (void *) device);
 

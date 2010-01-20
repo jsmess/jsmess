@@ -13,7 +13,7 @@
 #ifndef _AT45DBXX_H_
 #define _AT45DBXX_H_
 
-#include "driver.h"
+#include "emu.h"
 
 
 /***************************************************************************

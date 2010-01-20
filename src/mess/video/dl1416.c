@@ -38,7 +38,7 @@
  *
  ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "dl1416.h"
 
 
@@ -205,7 +205,7 @@ WRITE_LINE_DEVICE_HANDLER( dl1416_cu_w )
 WRITE8_DEVICE_HANDLER( dl1416_data_w )
 {
 	dl1416_state *chip = get_safe_token(device);
-	const dl1416_interface *intf = device->inline_config;
+	const dl1416_interface *intf = (const dl1416_interface *)device->inline_config;
 
 	offset &= 0x03; /* A0-A1 */
 	data &= 0x7f;   /* D0-D6 */

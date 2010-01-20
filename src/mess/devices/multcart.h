@@ -55,8 +55,8 @@ struct _multicart_socket
 
 typedef struct _multicart_private multicart_private;
 
-typedef struct _multicart multicart;
-struct _multicart
+typedef struct _multicart_t multicart_t;
+struct _multicart_t
 {
 	const multicart_resource *	resources;
 	const multicart_socket *	sockets;
@@ -92,9 +92,9 @@ const char *multicart_error_text(multicart_open_error error);
 ***************************************************************************/
 
 /* opens a multicart */
-multicart_open_error multicart_open(const char *filename, const char *drvname, multicart_load_flags load_flags, multicart **cart);
+multicart_open_error multicart_open(const char *filename, const char *drvname, multicart_load_flags load_flags, multicart_t **cart);
 
 /* closes a multicart */
-void multicart_close(multicart *cart);
+void multicart_close(multicart_t *cart);
 
 #endif /* __MULTCART_H__ */

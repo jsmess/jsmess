@@ -17,7 +17,7 @@
     IRQ 7 = 35d4 (jump 840120)
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "video/generic.h"
 

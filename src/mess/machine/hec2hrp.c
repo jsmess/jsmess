@@ -33,7 +33,7 @@
            Adjust the one shot and A/D timing (sn76477)
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
 #include "sound/sn76477.h"   /* for sn sound*/
@@ -260,7 +260,7 @@ static int counter_write=0; /* Attente de quelque cycles avant demettre en route
  		 /* Bit 6 => motor ON/OFF => for cassette state!*/
          if (write_cassette==0)
 			{
-			 cassette_set_state(cassette_device_image(space->machine) , CASSETTE_PLAY || CASSETTE_SPEAKER_ENABLED);
+			 cassette_set_state(cassette_device_image(space->machine) , (cassette_state)(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED));
 			}
        }
        else

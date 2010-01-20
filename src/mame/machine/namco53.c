@@ -52,7 +52,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "namco53.h"
 #include "cpu/mb88xx/mb88xx.h"
 
@@ -173,14 +173,13 @@ static DEVICE_START( namco_53xx )
 {
 	const namco_53xx_interface *config = (const namco_53xx_interface *)device->static_config;
 	namco_53xx_state *state = get_safe_token(device);
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 
 	assert(config != NULL);
 
 	/* find our CPU */
-	state->cpu = cputag_get_cpu(device->machine, device_build_tag(tempstring, device, "mcu"));
+	state->cpu = devtag_get_device(device->machine, device_build_tag(tempstring, device, "mcu"));
 	assert(state->cpu != NULL);
-	astring_free(tempstring);
 
 	/* resolve our read/write callbacks */
 	devcb_resolve_read8(&state->k, &config->k, device);

@@ -1,7 +1,7 @@
-#include "driver.h"
+#include "emu.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
-
+#include "crsshair.h"
 #include "includes/cbm.h"
 #include "formats/cbm_tap.h"
 
@@ -379,7 +379,7 @@ static int general_cbm_loadsnap( const device_config *image, const char *file_ty
 		address = 2049;
 	snapshot_size -= 2;
 
-	data = malloc(snapshot_size);
+	data = (UINT8*)malloc(snapshot_size);
 	if (!data)
 		goto error;
 
@@ -519,5 +519,5 @@ const cassette_config cbm_cassette_config =
 {
 	cbm_cassette_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 };

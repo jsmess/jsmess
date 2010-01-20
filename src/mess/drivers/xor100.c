@@ -16,7 +16,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/xor100.h"
 #include "cpu/z80/z80.h"
 #include "formats/basicdsk.h"
@@ -41,7 +41,7 @@ enum
 
 static void xor100_bankswitch(running_machine *machine)
 {
-	xor100_state *state = machine->driver_data;
+	xor100_state *state = (xor100_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	const device_config *messram = devtag_get_device(machine, "messram");
 	int banks = messram_get_size(messram) / 0x10000;
@@ -120,7 +120,7 @@ static WRITE8_HANDLER( mmu_w )
 
     */
 
-	xor100_state *state = space->machine->driver_data;
+	xor100_state *state = (xor100_state *)space->machine->driver_data;
 
 	state->bank = data & 0x07;
 
@@ -129,7 +129,7 @@ static WRITE8_HANDLER( mmu_w )
 
 static WRITE8_HANDLER( prom_toggle_w )
 {
-	xor100_state *state = space->machine->driver_data;
+	xor100_state *state = (xor100_state *)space->machine->driver_data;
 
 	switch (state->mode)
 	{
@@ -142,7 +142,7 @@ static WRITE8_HANDLER( prom_toggle_w )
 
 static READ8_HANDLER( prom_disable_r )
 {
-	xor100_state *state = space->machine->driver_data;
+	xor100_state *state = (xor100_state *)space->machine->driver_data;
 
 	state->mode = EPROM_F800;
 
@@ -182,7 +182,7 @@ static READ8_HANDLER( fdc_wait_r )
 
     */
 
-	xor100_state *state = space->machine->driver_data;
+	xor100_state *state = (xor100_state *)space->machine->driver_data;
 
 	if (!state->fdc_irq && !state->fdc_drq)
 	{
@@ -210,7 +210,7 @@ static WRITE8_HANDLER( fdc_dcont_w )
 
     */
 
-	xor100_state *state = space->machine->driver_data;
+	xor100_state *state = (xor100_state *)space->machine->driver_data;
 
 	/* drive select */
 	if (BIT(data, 0)) wd17xx_set_drive(state->wd1795, 0);
@@ -239,7 +239,7 @@ static WRITE8_HANDLER( fdc_dsel_w )
 
     */
 
-	xor100_state *state = space->machine->driver_data;
+	xor100_state *state = (xor100_state *)space->machine->driver_data;
 
 	switch (data & 0x03)
 	{
@@ -363,7 +363,7 @@ INPUT_PORTS_END
 
 static WRITE_LINE_DEVICE_HANDLER( com5016_fr_w )
 {
-	xor100_state *driver_state = device->machine->driver_data;
+	xor100_state *driver_state = (xor100_state *)device->machine->driver_data;
 
 	msm8251_transmit_clock(driver_state->i8251_a);
 	msm8251_receive_clock(driver_state->i8251_a);
@@ -371,7 +371,7 @@ static WRITE_LINE_DEVICE_HANDLER( com5016_fr_w )
 
 static WRITE_LINE_DEVICE_HANDLER( com5016_ft_w )
 {
-	xor100_state *driver_state = device->machine->driver_data;
+	xor100_state *driver_state = (xor100_state *)device->machine->driver_data;
 
 	msm8251_transmit_clock(driver_state->i8251_b);
 	msm8251_receive_clock(driver_state->i8251_b);
@@ -423,7 +423,7 @@ static READ8_DEVICE_HANDLER( i8255_pc_r )
 
     */
 
-	xor100_state *driver_state = device->machine->driver_data;
+	xor100_state *driver_state = (xor100_state *)device->machine->driver_data;
 	UINT8 data = 0;
 
 	/* on line */
@@ -480,7 +480,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 static WRITE_LINE_DEVICE_HANDLER( fdc_irq_w )
 {
-	xor100_state *driver_state = device->machine->driver_data;
+	xor100_state *driver_state = (xor100_state *)device->machine->driver_data;
 
 	driver_state->fdc_irq = state;
 	z80ctc_trg0_w(driver_state->z80ctc, state);
@@ -494,7 +494,7 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_irq_w )
 
 static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
 {
-	xor100_state *driver_state = device->machine->driver_data;
+	xor100_state *driver_state = (xor100_state *)device->machine->driver_data;
 
 	driver_state->fdc_drq = state;
 
@@ -516,7 +516,7 @@ static const wd17xx_interface wd1795_intf =
 
 static WRITE8_DEVICE_HANDLER( xor100_kbd_put )
 {
-	xor100_state *state = device->machine->driver_data;
+	xor100_state *state = (xor100_state *)device->machine->driver_data;
 
 	msm8251_receive_character(state->i8251_b, data);
 }
@@ -530,7 +530,7 @@ static GENERIC_TERMINAL_INTERFACE( xor100_terminal_intf )
 
 static MACHINE_START( xor100 )
 {
-	xor100_state *state = machine->driver_data;
+	xor100_state *state = (xor100_state *)machine->driver_data;
 	const device_config *messram = devtag_get_device(machine, "messram");
 	int banks = messram_get_size(messram) / 0x10000;
 
@@ -558,7 +558,7 @@ static MACHINE_START( xor100 )
 
 static MACHINE_RESET( xor100 )
 {
-	xor100_state *state = machine->driver_data;
+	xor100_state *state = (xor100_state *)machine->driver_data;
 
 	state->mode = EPROM_0000;
 

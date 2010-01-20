@@ -168,14 +168,12 @@
 
 ***************************************************************************/
 
+#include "emu.h"
+#include "debugger.h"
 #include "drcuml.h"
 #include "drcbeut.h"
-#include "debugger.h"
 #include "x86emit.h"
-#include "eminline.h"
 #include "x86log.h"
-#include <math.h>
-#include <stddef.h>
 
 
 
@@ -327,7 +325,7 @@ static void debug_log_hashjmp(int mode, offs_t pc);
 ***************************************************************************/
 
 /* globally-accessible interface to the backend */
-const drcbe_interface drcbe_x64_be_interface =
+extern const drcbe_interface drcbe_x64_be_interface =
 {
 	drcbex64_alloc,
 	drcbex64_free,
@@ -716,7 +714,7 @@ static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, const 
 	/* get address spaces and accessors */
 	for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 	{
-		drcbe->space[spacenum] = memory_find_address_space(device, spacenum);
+		drcbe->space[spacenum] = device->space(spacenum);
 		if (drcbe->space[spacenum] != NULL)
 			drcbe->accessors[spacenum] = drcbe->space[spacenum]->accessors;
 	}

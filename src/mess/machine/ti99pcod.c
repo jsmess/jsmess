@@ -70,7 +70,7 @@
     "pcode_g0.bin" (64 KiB). The switch is turned off by default. Check the
     switch position if the Master Title Screen does not appear as expected.
 */
-#include "driver.h"
+#include "emu.h"
 #include "99_peb.h"
 #include "devices/ti99cart.h"
 #include "ti99_4x.h"

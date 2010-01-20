@@ -7,7 +7,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8008/i8008.h"
 #include "machine/teleprinter.h"
 
@@ -66,7 +66,7 @@ static IRQ_CALLBACK ( mod8_irq_callback )
 
 static MACHINE_RESET(mod8)
 {
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), mod8_irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), mod8_irq_callback);
 }
 
 static WRITE8_DEVICE_HANDLER( mod8_kbd_put )

@@ -2,7 +2,7 @@
  PeT mess@utanet.at
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/ssystem3.h"
 
 static struct {
@@ -22,7 +22,7 @@ void ssystem3_lcd_write(running_machine *machine, int clock, int data)
     ssystem3_lcd.data[ssystem3_lcd.count/8]&=~(1<<(ssystem3_lcd.count&7));
     if (data) ssystem3_lcd.data[ssystem3_lcd.count/8]|=1<<(ssystem3_lcd.count&7);
     if (ssystem3_lcd.count+1==40) {
-      logerror("%.4x lcd %02x%02x%02x%02x%02x\n",(int)cpu_get_pc(cputag_get_cpu(machine, "maincpu")),
+      logerror("%.4x lcd %02x%02x%02x%02x%02x\n",(int)cpu_get_pc(devtag_get_device(machine, "maincpu")),
 	       ssystem3_lcd.data[0], ssystem3_lcd.data[1], ssystem3_lcd.data[2], ssystem3_lcd.data[3], ssystem3_lcd.data[4]);
     }
     ssystem3_lcd.count=(ssystem3_lcd.count+1)%40;

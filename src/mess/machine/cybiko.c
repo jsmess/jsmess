@@ -10,7 +10,8 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "includes/cybiko.h"
 
 //#include "cpu/h8s2xxx/h8s2xxx.h"

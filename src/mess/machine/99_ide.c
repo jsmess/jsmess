@@ -17,7 +17,7 @@
     Raphael Nabet, 2002-2004.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/idectrl.h"
 #include "machine/rtc65271.h"
 #include "ti99_4x.h"

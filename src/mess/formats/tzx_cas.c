@@ -38,7 +38,7 @@ We are currently using the numbers from the TZX specification...
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "formats/tzx_cas.h"
 
 
@@ -82,7 +82,7 @@ static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen )
 	int pos = sizeof(TZX_HEADER) + 2;
 	int max_block_count = INITIAL_MAX_BLOCK_COUNT;
 
-	blocks = alloc_array_clear_or_die(UINT8*, max_block_count);
+	blocks = (UINT8**)malloc(max_block_count);
 	block_count = 0;
 
 	while (pos < caslen)
@@ -96,7 +96,7 @@ static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen )
 			int	old_max_block_count = max_block_count;
 
 			max_block_count = max_block_count + BLOCK_COUNT_INCREMENTS;
-			blocks = auto_alloc_array(NULL /*machine*/, UINT8*, max_block_count);	// SHOULD NOT BE USING auto_alloc_array()
+			blocks = (UINT8**)malloc(max_block_count);	// SHOULD NOT BE USING auto_alloc_array()
 			memcpy(blocks, old_blocks, old_max_block_count * sizeof(UINT8*));
 		}
 

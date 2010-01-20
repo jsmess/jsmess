@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/t11/t11.h"
 #include "sound/wave.h"
 #include "includes/bk.h"
@@ -164,7 +164,7 @@ static const cassette_config bk0010_cassette_config =
 {
 	/*rk8_cassette_formats*/cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 };
 
 

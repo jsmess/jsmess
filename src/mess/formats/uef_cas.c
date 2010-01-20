@@ -12,7 +12,7 @@ Not nice, but it works...
 
 #include <string.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "zlib.h"
 #include "formats/uef_cas.h"
 
@@ -114,7 +114,7 @@ static int uef_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 		if ( in_ptr == NULL ) {
 			goto cleanup;
 		}
-		gz_ptr = malloc( inflate_size );
+		gz_ptr = (UINT8 *)malloc( inflate_size );
 
 		d_stream.zalloc = 0;
 		d_stream.zfree = 0;

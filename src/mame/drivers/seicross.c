@@ -42,7 +42,7 @@ This info came from http://www.ne.jp/asahi/cc-sakura/akkun/old/fryski.html
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/ay8910.h"
@@ -102,7 +102,7 @@ static WRITE8_DEVICE_HANDLER( friskyt_portB_w )
 {
 //logerror("PC %04x: 8910 port B = %02x\n",cpu_get_pc(space->cpu),data);
 	/* bit 0 is IRQ enable */
-	cpu_interrupt_enable(cputag_get_cpu(device->machine, "maincpu"), data & 1);
+	cpu_interrupt_enable(devtag_get_device(device->machine, "maincpu"), data & 1);
 
 	/* bit 1 flips screen */
 

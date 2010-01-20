@@ -411,7 +411,7 @@ static UINT32 block_checksum(UINT8 *buffer, int length)
 /* Returns the total number of blocks in the image */
 static int get_total_blocks(imgtool_image *img)
 {
-	amiga_floppy *f = imgtool_image_extra_bytes(img);
+	amiga_floppy *f = (amiga_floppy *)imgtool_image_extra_bytes(img);
 
 	return 2 * 80 * f->sectors;
 }

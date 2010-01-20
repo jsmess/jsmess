@@ -5,7 +5,7 @@
         04/08/2009 Initial driver by Miodrag Milanovic
 
 ****************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "includes/busicom.h"
 
 // Printer font 34x44 as provided by MIT Media Lab

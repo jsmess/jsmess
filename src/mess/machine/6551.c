@@ -12,7 +12,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "6551.h"
 #include "machine/serial.h"
 
@@ -98,7 +98,7 @@ static void acia_6551_in_callback(running_machine *machine, int id, unsigned lon
 
 static TIMER_CALLBACK(acia_6551_timer_callback)
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	acia6551_t *acia = get_token(device);
 
 	/* get bit received from other side and update receive register */

@@ -2,7 +2,7 @@
 //
 //  fileio.c - SDL file access functions
 //
-//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -28,7 +28,7 @@
 #include <errno.h>
 
 // MAME headers
-#include "osdepend.h"
+#include "osdcore.h"
 
 #if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
 #define PATHSEPCH '\\'
@@ -49,7 +49,7 @@ static UINT32 create_path_recursive(char *path);
 struct _osd_file
 {
 	int		handle;
-	char 		filename[1];
+	char		filename[1];
 };
 
 
@@ -108,7 +108,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	tmpstr = NULL;
 
 	// allocate a file object, plus space for the converted filename
-	*file = malloc(sizeof(**file) + sizeof(char) * strlen(path));
+	*file = (osd_file *) malloc(sizeof(**file) + sizeof(char) * strlen(path));
 	if (*file == NULL)
 	{
 		filerr = FILERR_OUT_OF_MEMORY;
@@ -136,15 +136,15 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 		filerr = FILERR_INVALID_ACCESS;
 		goto error;
 	}
-	
-	tmpstr = malloc(strlen((*file)->filename)+1);
+
+	tmpstr = (char *) malloc(strlen((*file)->filename)+1);
 	strcpy(tmpstr, (*file)->filename);
 
 	// does path start with an environment variable?
 	if (tmpstr[0] == '$')
 	{
 		char *envval;
-		envstr = malloc(strlen(tmpstr)+1); 
+		envstr = (char *) malloc(strlen(tmpstr)+1);
 
 		strcpy(envstr, tmpstr);
 
@@ -161,8 +161,8 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 		{
 			j = strlen(envval) + strlen(tmpstr) + 1;
 			free(tmpstr);
-			tmpstr = malloc(j);
-	
+			tmpstr = (char *) malloc(j);
+
 			// start with the value of $HOME
 			strcpy(tmpstr, envval);
 			// replace the null with a path separator again
@@ -171,7 +171,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 			strcat(tmpstr, &envstr[i]);
 		}
 		else
-			fprintf(stderr, "Warning: Environment variable %s not found.\n", envstr);
+			fprintf(stderr, "Warning: osd_open environment variable %s not found.\n", envstr);
 		free(envstr);
 	}
 
@@ -258,7 +258,7 @@ file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 count, U
 	if (result < 0)
 #elif defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_OS2)
 	lseek(file->handle, (UINT32)offset&0xffffffff, SEEK_SET);
-	result = read(file->handle, buffer, count); 
+	result = read(file->handle, buffer, count);
 	if (result < 0)
 #elif defined(SDLMAME_UNIX)
 	result = pread64(file->handle, buffer, count, offset);
@@ -286,7 +286,7 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 c
 	if (!result)
 #elif defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_OS2)
 	lseek(file->handle, (UINT32)offset&0xffffffff, SEEK_SET);
-	result = write(file->handle, buffer, count); 
+	result = write(file->handle, buffer, count);
 	if (!result)
 #elif defined(SDLMAME_UNIX)
 	result = pwrite64(file->handle, buffer, count, offset);
@@ -322,7 +322,7 @@ file_error osd_rmfile(const char *filename)
 {
 	if (unlink(filename) == -1)
 	{
-		return error_to_file_error(errno);                                                
+		return error_to_file_error(errno);
 	}
 
 	return FILERR_NONE;
@@ -374,7 +374,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 /*============================================================ */
 /*      osd_is_path_separator */
 /*============================================================ */
-        
+
 static int osd_is_path_separator(char c)
 {
         return (c == '/') || (c == '\\');
@@ -386,7 +386,7 @@ static int osd_is_path_separator(char c)
 int osd_is_absolute_path(const char *path)
 {
         int result;
-        
+
         if (osd_is_path_separator(path[0]))
                 result = TRUE;
 #if !defined(SDLMAME_WIN32) && !defined(SDLMAME_OS2)
@@ -401,12 +401,12 @@ int osd_is_absolute_path(const char *path)
         else
                 result = FALSE;
         return result;
-}       
+}
 
 /* not used anywhere */
-#if 0 
+#if 0
 //============================================================
-//	osd_mkdir
+//  osd_mkdir
 //============================================================
 
 file_error osd_mkdir(const char *dir)
@@ -424,7 +424,7 @@ file_error osd_mkdir(const char *dir)
 }
 
 //============================================================
-//	osd_rmdir
+//  osd_rmdir
 //============================================================
 
 static file_error osd_rmdir(const char *dir)
@@ -442,7 +442,7 @@ static file_error osd_rmdir(const char *dir)
 #ifdef MESS
 
 //============================================================
-//	osd_copyfile
+//  osd_copyfile
 //  FIXME: this will not work with blanks in filename ...
 //============================================================
 
@@ -470,7 +470,7 @@ osd_directory_entry *osd_stat(const char *path)
 	#else
 	struct stat64 st;
 	#endif
-	
+
 	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2)
 	err = stat(path, &st);
 	#else
@@ -486,7 +486,7 @@ osd_directory_entry *osd_stat(const char *path)
 	result->name = ((char *) result) + sizeof(*result);
 	result->type = S_ISDIR(st.st_mode) ? ENTTYPE_DIR : ENTTYPE_FILE;
 	result->size = (UINT64)st.st_size;
-	
+
 	return result;
 }
 #endif

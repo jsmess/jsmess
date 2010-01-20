@@ -211,9 +211,8 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
-#include "cpuexec.h"
-#include "eminline.h"
 #include "e132xs.h"
 
 #ifdef MAME_DEBUG
@@ -1545,8 +1544,8 @@ static void hyperstone_init(const device_config *device, cpu_irq_callback irqcal
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 	cpustate->timer = timer_alloc(device->machine, e132xs_timer_callback, (void *)device);
 	cpustate->clock_scale_mask = scale_mask;
 }
@@ -1652,8 +1651,8 @@ static CPU_RESET( hyperstone )
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->opcodexor = save_opcodexor;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 	cpustate->timer = save_timer;
 
 	cpustate->tr_clocks_per_tick = 2;

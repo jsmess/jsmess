@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/aquarius.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
@@ -388,7 +388,7 @@ static const cassette_config aquarius_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 };
 
 static MACHINE_DRIVER_START( aquarius )

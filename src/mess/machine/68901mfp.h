@@ -37,7 +37,7 @@
 #ifndef __MC68901__
 #define __MC68901__
 
-#include "driver.h"
+#include "emu.h"
 #include "devcb.h"
 
 /***************************************************************************

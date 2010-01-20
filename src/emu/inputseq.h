@@ -11,10 +11,12 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __INPUTSEQ_H__
 #define __INPUTSEQ_H__
-
-#include "input.h"
 
 
 /***************************************************************************
@@ -89,10 +91,10 @@ int input_seq_poll(running_machine *machine, input_seq *finalseq);
 /* ----- strings and tokenization ----- */
 
 /* generate the friendly name of an input sequence */
-astring *input_seq_name(running_machine *machine, astring *string, const input_seq *seq);
+astring &input_seq_name(running_machine *machine, astring &string, const input_seq *seq);
 
 /* convert an input sequence to tokens, returning the length */
-astring *input_seq_to_tokens(running_machine *machine, astring *string, const input_seq *seq);
+astring &input_seq_to_tokens(running_machine *machine, astring &string, const input_seq *seq);
 
 /* convert a set of tokens back to an input sequence */
 int input_seq_from_tokens(running_machine *machine, const char *string, input_seq *seq);

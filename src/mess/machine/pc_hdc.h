@@ -1,7 +1,7 @@
 #ifndef PC_HDC_H
 #define PC_HDC_H
 
-#include "driver.h"
+#include "emu.h"
 
 int pc_hdc_setup(running_machine *machine, void (*hdc_set_irq_func)(running_machine *,int,int));
 

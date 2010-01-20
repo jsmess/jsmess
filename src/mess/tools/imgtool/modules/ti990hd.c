@@ -1400,7 +1400,7 @@ static imgtoolerr_t ti990_image_nextenum(imgtool_directory *enumeration, imgtool
 			iter->level--;
 	}
 
-	return 0;
+	return (imgtoolerr_t)0;
 }
 
 /*
@@ -1424,7 +1424,7 @@ static imgtoolerr_t ti990_image_freespace(imgtool_partition *partition, UINT64 *
 
 	if ((totadus+2031)/2032 != image->sec0.tbm)
 		/*return IMGTOOLERR_CORRUPTIMAGE;*/
-		return 0;
+		return (imgtoolerr_t)0;
 
 	adu = 0;
 	record = 0;
@@ -1814,5 +1814,5 @@ static imgtoolerr_t ti990_image_create(imgtool_image *image, imgtool_stream *f, 
 		if (write_sector_logical(f, i, & geometry, empty_sec))
 			return IMGTOOLERR_WRITEERROR;
 
-	return 0;
+	return (imgtoolerr_t)0;
 }

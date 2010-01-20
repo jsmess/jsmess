@@ -22,7 +22,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "mc6845.h"
 
 
@@ -330,9 +330,9 @@ WRITE8_DEVICE_HANDLER( mc6845_register_w )
 	}
 
 	/* display message if the Mode Control register is not zero */
-//	if ((mc6845->register_address_latch == 0x08) && (mc6845->mode_control != 0))
-//		if (!supports_transparent[mc6845->device_type])
-//			popmessage("Mode Control %02X is not supported!!!", mc6845->mode_control);
+	if ((mc6845->register_address_latch == 0x08) && (mc6845->mode_control != 0))
+		if (!supports_transparent[mc6845->device_type])
+			popmessage("Mode Control %02X is not supported!!!", mc6845->mode_control);
 
 	recompute_parameters(mc6845, FALSE);
 }
@@ -846,10 +846,10 @@ void mc6845_update(const device_config *device, bitmap_t *bitmap, const rectangl
 		if (mc6845->intf->end_update != NULL)
 			mc6845->intf->end_update(device, bitmap, cliprect, param);
 
-//		popmessage(NULL);
+		popmessage(NULL);
 	}
-//	else
-//		popmessage("Invalid MC6845 screen parameters - display disabled!!!");
+	else
+		popmessage("Invalid MC6845 screen parameters - display disabled!!!");
 }
 
 
@@ -860,7 +860,6 @@ static void common_start(const device_config *device, int device_type)
 
 	/* validate arguments */
 	assert(device != NULL);
-	assert(device->tag != NULL);
 
 	mc6845->intf = (const mc6845_interface *)device->static_config;
 	mc6845->device_type = device_type;
@@ -881,7 +880,7 @@ static void common_start(const device_config *device, int device_type)
 		mc6845->hpixels_per_column = mc6845->intf->hpixels_per_column;
 
 		/* get the screen device */
-		mc6845->screen = devtag_get_device(device->machine, mc6845->intf->screen_tag);
+		mc6845->screen = device->machine->device(mc6845->intf->screen_tag);
 		assert(mc6845->screen != NULL);
 
 		/* create the timers */

@@ -58,7 +58,7 @@ Hardware:   PPIA 8255
 ***************************************************************************/
 
 /* Core includes */
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 
 /* Components */

@@ -63,7 +63,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "coco6847.h"
 
 #include "debug/debugcpu.h"

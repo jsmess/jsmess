@@ -1,17 +1,17 @@
-#include "driver.h"
+#include "emu.h"
 #include "sound/cdp1869.h"
 #include "includes/tmc600.h"
 
 WRITE8_HANDLER( tmc600_vismac_register_w )
 {
-	tmc600_state *state = space->machine->driver_data;
+	tmc600_state *state = (tmc600_state *)space->machine->driver_data;
 
 	state->vismac_reg_latch = data;
 }
 
 WRITE8_DEVICE_HANDLER( tmc600_vismac_data_w )
 {
-	tmc600_state *state = device->machine->driver_data;
+	tmc600_state *state = (tmc600_state *)device->machine->driver_data;
 
 	switch (state->vismac_reg_latch)
 	{
@@ -46,14 +46,14 @@ WRITE8_DEVICE_HANDLER( tmc600_vismac_data_w )
 
 static TIMER_DEVICE_CALLBACK( blink_tick )
 {
-	tmc600_state *state = timer->machine->driver_data;
+	tmc600_state *state = (tmc600_state *)timer->machine->driver_data;
 
 	state->blink = !state->blink;
 }
 
 static UINT8 tmc600_get_color(running_machine *machine, UINT16 pma)
 {
-	tmc600_state *state = machine->driver_data;
+	tmc600_state *state = (tmc600_state *)machine->driver_data;
 
 	UINT16 pageaddr = pma & TMC600_PAGE_RAM_MASK;
 	UINT8 color = state->color_ram[pageaddr];
@@ -68,7 +68,7 @@ static UINT8 tmc600_get_color(running_machine *machine, UINT16 pma)
 
 static READ8_DEVICE_HANDLER( tmc600_page_ram_r )
 {
-	tmc600_state *state = device->machine->driver_data;
+	tmc600_state *state = (tmc600_state *)device->machine->driver_data;
 
 	UINT16 addr = offset & TMC600_PAGE_RAM_MASK;
 
@@ -77,7 +77,7 @@ static READ8_DEVICE_HANDLER( tmc600_page_ram_r )
 
 static WRITE8_DEVICE_HANDLER( tmc600_page_ram_w )
 {
-	tmc600_state *state = device->machine->driver_data;
+	tmc600_state *state = (tmc600_state *)device->machine->driver_data;
 
 	UINT16 addr = offset & TMC600_PAGE_RAM_MASK;
 
@@ -87,7 +87,7 @@ static WRITE8_DEVICE_HANDLER( tmc600_page_ram_w )
 
 static CDP1869_CHAR_RAM_READ( tmc600_char_ram_r )
 {
-	tmc600_state *state = device->machine->driver_data;
+	tmc600_state *state = (tmc600_state *)device->machine->driver_data;
 
 	UINT16 pageaddr = pma & TMC600_PAGE_RAM_MASK;
 	UINT8 column = state->page_ram[pageaddr];
@@ -125,7 +125,7 @@ static CDP1869_INTERFACE( tmc600_cdp1869_intf )
 
 static VIDEO_START( tmc600 )
 {
-	tmc600_state *state = machine->driver_data;
+	tmc600_state *state = (tmc600_state *)machine->driver_data;
 
 	/* allocate memory */
 
@@ -153,7 +153,7 @@ static VIDEO_START( tmc600 )
 
 static VIDEO_UPDATE( tmc600 )
 {
-	tmc600_state *state = screen->machine->driver_data;
+	tmc600_state *state = (tmc600_state *)screen->machine->driver_data;
 
 	cdp1869_update(state->cdp1869, bitmap, cliprect);
 

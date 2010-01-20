@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/kc.h"
 #include "eventlst.h"
 #include "devices/messram.h"

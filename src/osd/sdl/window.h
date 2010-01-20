@@ -18,6 +18,7 @@
 #include "sdlsync.h"
 
 #include "osd_opengl.h"
+#include "osdsdl.h"
 
 // I don't like this, but we're going to get spurious "cast to integer of different size" warnings on
 // at least one architecture without doing it this way.
@@ -36,10 +37,10 @@ struct _sdl_window_info
 {
 	// Pointer to next window
 	sdl_window_info *	next;
-	
+
 	// Pointer to machine
 	running_machine *	machine;
-	
+
 	// Draw Callbacks
 	int (*create)(sdl_window_info *window, int width, int height);
 	void (*resize)(sdl_window_info *window, int width, int height);
@@ -57,7 +58,7 @@ struct _sdl_window_info
 	sdl_monitor_info *	monitor;
 	int					fullscreen;
 	int			index;
-	
+
 	// diverse flags
 	int					minwidth, minheight;
 	int					maxwidth, maxheight;
@@ -85,17 +86,20 @@ struct _sdl_window_info
 
 	int					totalColors;		// total colors from machine/sdl_window_config
 	int					start_viewscreen;
-	
+
 	// per window modes ...
 	int					scale_mode;
-	
+
 	// GL specific
 	int					prescale;
-	int					prescale_effect;
-	
+
 #if (SDL_VERSION_ATLEAST(1,3,0))
 	// Needs to be here as well so we can identify window
 	SDL_WindowID		window_id;
+	// These are used in combine resizing events ... #if SDL13_COMBINE_RESIZE
+	int 				resize_width;
+	int					resize_height;
+	osd_ticks_t			last_resize;
 #endif
 };
 
@@ -126,7 +130,6 @@ void sdlwindow_video_window_update(running_machine *machine, sdl_window_info *wi
 void sdlwindow_blit_surface_size(sdl_window_info *window, int window_width, int window_height);
 void sdlwindow_toggle_full_screen(running_machine *machine, sdl_window_info *window);
 void sdlwindow_modify_prescale(running_machine *machine, sdl_window_info *window, int dir);
-void sdlwindow_modify_effect(running_machine *machine, sdl_window_info *window, int dir);
 void sdlwindow_toggle_draw(running_machine *machine, sdl_window_info *window);
 void sdlwindow_resize(sdl_window_info *window, INT32 width, INT32 height);
 void sdlwindow_clear(sdl_window_info *window);

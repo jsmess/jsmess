@@ -213,14 +213,14 @@ FLOPPY_IDENTIFY( coupe_sad_identify )
 
 static int coupe_sdf_get_heads_per_disk(floppy_image *floppy)
 {
-	struct sdf_tag *tag = floppy_tag(floppy);
+	struct sdf_tag *tag = (sdf_tag *)floppy_tag(floppy);
 	return tag->heads;
 }
 
 
 static int coupe_sdf_get_tracks_per_disk(floppy_image *floppy)
 {
-	struct sdf_tag *tag = floppy_tag(floppy);
+	struct sdf_tag *tag = (sdf_tag *)floppy_tag(floppy);
 	return tag->tracks;
 }
 
@@ -234,7 +234,7 @@ static UINT32 coupe_sdf_get_track_size(floppy_image *floppy, int head, int track
 static floperr_t coupe_sdf_get_offset(floppy_image *floppy,
 	int head, int track, UINT64 *offset)
 {
-	struct sdf_tag *tag = floppy_tag(floppy);
+	struct sdf_tag *tag = (sdf_tag *)floppy_tag(floppy);
 
 	if (head > tag->heads || track > tag->tracks)
 		return FLOPPY_ERROR_SEEKERROR;
@@ -448,7 +448,7 @@ FLOPPY_CONSTRUCT( coupe_sdf_construct )
 		coupe_sdf_interpret_header(floppy, &heads, &tracks);
 	}
 
-	tag = floppy_create_tag(floppy, sizeof(struct sdf_tag));
+	tag = (sdf_tag *)floppy_create_tag(floppy, sizeof(struct sdf_tag));
 
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;

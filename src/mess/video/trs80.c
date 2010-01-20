@@ -5,7 +5,7 @@
   Functions to emulate the video hardware of the TRS80.
 
 ***************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "includes/trs80.h"
 
 /* Bit assignment for "trs80_mode"

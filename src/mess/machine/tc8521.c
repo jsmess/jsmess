@@ -75,7 +75,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "tc8521.h"
 
 
@@ -295,7 +295,7 @@ static void tc8521_alarm_check(const device_config *device)
 
 static TIMER_CALLBACK(tc8521_timer_callback)
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	tc8521_t *rtc = get_token(device);
 
 	/* Assumption how it works */

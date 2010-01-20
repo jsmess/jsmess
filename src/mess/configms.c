@@ -4,7 +4,7 @@
 
 ****************************************************************************/
 
-#include "mame.h"
+#include "emu.h"
 #include "configms.h"
 #include "config.h"
 #include "xmlfile.h"

@@ -21,7 +21,7 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
 #include "includes/galaxy.h"
@@ -158,7 +158,7 @@ static const cassette_config galaxy_cassette_config =
 {
 	gtp_cassette_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 };
 
 

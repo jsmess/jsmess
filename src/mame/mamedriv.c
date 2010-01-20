@@ -15,7 +15,7 @@
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 
 #ifndef DRIVER_RECURSIVE
 
@@ -241,7 +241,7 @@ const game_driver * const drivers[] =
 	DRIVER( chewing )	/* ?? unknown */
 	DRIVER( catacomb )	/* 1982 MTM Games */
 	DRIVER( ckongg )	/* 1981 bootleg */
-	DRIVER( kkgalax )	/* 1981 bootleg */
+	DRIVER( ckongmc )	/* 1981 bootleg */
 	DRIVER( porter )	/* 1982 bootleg (Arcade TV Game List - P.98, Left, 15 from bottom) */
 	DRIVER( vstars )	/* 19?? Competitive Video? */
 	DRIVER( tdpgal )	/* 1983 Design Labs / Thomas Automatics */
@@ -1185,6 +1185,7 @@ const game_driver * const drivers[] =
 	DRIVER( multigmb )	/* 1992 */
 	DRIVER( multigm2 )	/* 1992 */
 	DRIVER( multigm3 )	/* 19?? */
+	DRIVER( multigmt )
 	DRIVER( cham24 )	/* 2002 */
 
 	/* Nintendo Super System Games */
@@ -1237,6 +1238,7 @@ const game_driver * const drivers[] =
 	DRIVER( invad2ct )	/* 851 (c) 1980 Midway */
 	DRIVER( invadpt2 )	/* 852 [1980] Taito */
 	DRIVER( invaddlx )	/* 852 [1980] Midway */
+	DRIVER( vortex )	/* 852 [1980] Zilec Electronics Ltd. */
 	DRIVER( moonbase )	/* Zeta - Nichibutsu */
 						/* 870 - Space Invaders Deluxe cocktail */
 	DRIVER( searthin )	/* bootleg */
@@ -2026,14 +2028,15 @@ const game_driver * const drivers[] =
 	DRIVER( dondokod )	/* 1989.?? B95 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( dondokodu )	/* 1989.?? B95 (c) 1989 Taito America Corporation (US) */
 	DRIVER( dondokodj )	/* 1989.07 B95 (c) 1989 Taito Corporation (Japan) */
-	DRIVER( megab )		/* 1989.?? C11 (c) 1989 Taito Corporation Japan (World) */
-	DRIVER( megabj )	/* 1989.11 C11 (c) 1989 Taito Corporation (Japan) */
+	DRIVER( megablst )	/* 1989.?? C11 (c) 1989 Taito Corporation Japan (World) */
+	DRIVER( megablstu )	/* 1989.?? C11 (c) 1989 Taito America Corporation (US) */
+	DRIVER( megablstj )	/* 1989.11 C11 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( thundfox )	/* 1990.?? C28 (c) 1990 Taito Corporation Japan (World) */
 	DRIVER( thundfoxu )	/* 1990.06 C28 (c) 1990 Taito America Corporation (US) */
 	DRIVER( thundfoxj )	/* 1990.07 C28 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( cameltry )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
 	DRIVER( cameltrya )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
-	DRIVER( cameltryua )/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
+	DRIVER( cameltryau )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
 	DRIVER( cameltryj )	/* 1990.04 C38 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( qtorimon )	/* 1990.02 C41 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( liquidk )	/* 1990.?? C49 (c) 1990 Taito Corporation Japan (World) */
@@ -4843,6 +4846,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* UX9 1985.05 Geinoujin Shikaku Shiken */
 
 	/* Data East LD games */
+	DRIVER( begas )		/* (c) 1983 */
+	DRIVER( begas1 )	/* (c) 1983 */
 	DRIVER( cobra )		/* (c) 1984 */
 	DRIVER( rblaster )	/* (c) 1985 */
 
@@ -5234,6 +5239,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( venus )		/* bootleg */
 	DRIVER( trackfld )	/* GX361 (c) 1983 */
 	DRIVER( trackfldc )	/* GX361 (c) 1983 + Centuri license */
+	DRIVER( trackfldnz )/* (c) 1982 Goldberg Enterprizes Inc. */
 	DRIVER( hyprolym )	/* GX361 (c) 1983 */
 	DRIVER( hyprolymb )	/* bootleg */
 	DRIVER( atlantol )	/* bootleg */
@@ -6586,6 +6592,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( exctsccr )	/* (c) 1983 Alpha Denshi Co. */
 	DRIVER( exctsccra )	/* (c) 1983 Alpha Denshi Co. */
 	DRIVER( exctsccrj )	/* (c) 1983 Alpha Denshi Co. */
+	DRIVER( exctsccrj2 )/* (c) 1983 Alpha Denshi Co. */
 	DRIVER( exctsccrb )	/* bootleg */
 	DRIVER( exctscc2 )	/* (c) 1984 Alpha Denshi Co. */
 	DRIVER( talbot )	/* Volt Electronics */
@@ -7635,6 +7642,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( wits )		/* (c) 1989 Athena (Visco license) */
 	DRIVER( thunderl )	/* (c) 1990 Seta + Romstar or Visco license (DSW) */
 	DRIVER( wiggie )	/* (c) 1994 Promat (not genuine seta hardware, but based on thunderl code) */
+	DRIVER( superbar )	/* (c) 1994 Promat (not genuine seta hardware, but based on thunderl code) */
 	DRIVER( jockeyc )	/* (c) 1990 [Seta] (Visco license) */
 	DRIVER( rezon )		/* (c) 1991 Allumer */
 	DRIVER( rezont )	/* (c) 1991 Allumer / Taito */
@@ -8571,6 +8579,7 @@ Other Sun games
 	DRIVER( skattv )	/* (c) 1994 */
 	DRIVER( skattva )	/* (c) 1995 */
 	DRIVER( fashiong )	/* (c) 1997 */
+	DRIVER( fstation )	/* (c) 2000 */
 
 	/* Other games on adp hardware */
 	DRIVER( funlddlx )	/* (c) 1999 */
@@ -8603,6 +8612,7 @@ Other Sun games
 	DRIVER( coronatn )	/* (c) 1999 */
 
 	/* Other Games */
+	DRIVER( vega )		/* (c) 19?? Olympia? */
 	DRIVER( astinvad )	/* (c) 1980 Stern */
 	DRIVER( kosmokil )	/* bootleg */
 	DRIVER( kamikaze )	/* Leijac Corporation */
@@ -8616,6 +8626,7 @@ Other Sun games
 	DRIVER( spacedem )	/* (c) 1980 Fortrek + made by Nintendo */
 	DRIVER( omegrace )	/* (c) 1981 Midway */
 	DRIVER( deltrace )	/* bootleg */
+	DRIVER( monzagp )	/* (c) 1981 Olympia */
 	DRIVER( dday )		/* (c) 1982 Olympia */
 	DRIVER( ddayc )		/* (c) 1982 Olympia + Centuri license */
 	DRIVER( hexa )		/* D. R. Korea */
@@ -8868,6 +8879,7 @@ Other Sun games
 	DRIVER( botss )		/* (c) 1992 Microprose Games Inc. */
 	DRIVER( stankatk )	/* (c) 1992 Microprose Games Inc. */
 	DRIVER( dynadice )	/* ? */
+	DRIVER( atamanot )	/* (c) 1983 Yachiyo Denki / Uni Enterprize */
 	DRIVER( ssingles )	/* Yachiyo? */
 	DRIVER( tcl )		/* (c) 1995 Uniwang */
 	DRIVER( othello )	/* (c) 1984 Success */
@@ -9074,6 +9086,9 @@ Other Sun games
 	DRIVER( galaxi )	/* (c) 2000 BRL S.R.L. Bologna */
 	DRIVER( magjoker )	/* (c) 2000 BRL S.R.L. Bologna */
 	DRIVER( dwarfd )	/* (c) 198? Electro-Sports */
+	DRIVER( quarterh )	/* (c) 1983 Electro-Sports */
+	DRIVER( quarterha )	/* (c) 1983 Electro-Sports */
+	DRIVER( quarterhb )	/* (c) 1983 Electro-Sports */
 	DRIVER( trvquest )	/* (c) 1984 Sunn / Techstar */
 	DRIVER( wheelfir )	/* (c) 199? TCH */
 	DRIVER( littlerb )	/* (c) 1993 TCH */
@@ -9216,6 +9231,7 @@ Other Sun games
 	DRIVER( trvhang )	/* (c) 1984 SMS MFG CORP */
 	DRIVER( trvhanga )	/* (c) 1984 SMS MFG CORP */
 	DRIVER( sureshot )	/* (c) 1985 SMS MFG CORP */
+	DRIVER( secondch )  /* (c) 1985 SMS MFG CORP */
 	DRIVER( skylncr )	/* (c) 1995 Bordun International */
 	DRIVER( butrfly )	/* (c) 1995 Bordun International */
 	DRIVER( madzoo )	/* (c) 1995 Bordun International */

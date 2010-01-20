@@ -1,7 +1,7 @@
 // don't include this into the makefile
 // it is included in vic6567.c yet
 
-#include "driver.h"
+#include "emu.h"
 #include "vic4567.h"
 
 #define VERBOSE_LEVEL 0

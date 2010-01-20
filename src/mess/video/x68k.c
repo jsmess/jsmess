@@ -25,7 +25,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/x68k.h"
 #include "machine/68901mfp.h"
 #include "devices/messram.h"
@@ -485,7 +485,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 		}
 		break;
 	}
-//  logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")),data,offset);
+//  logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",cpu_get_pc(devtag_get_device(space->machine, "maincpu")),data,offset);
 }
 
 READ16_HANDLER( x68k_crtc_r )
@@ -501,7 +501,7 @@ READ16_HANDLER( x68k_crtc_r )
 
 	if(offset < 24)
 	{
-//      logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")),x68k_sys.crtc.reg[offset],offset);
+//      logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",cpu_get_pc(devtag_get_device(space->machine, "maincpu")),x68k_sys.crtc.reg[offset],offset);
 		switch(offset)
 		{
 		case 9:

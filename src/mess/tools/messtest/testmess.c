@@ -10,6 +10,8 @@
 #include <ctype.h>
 #include <setjmp.h>
 
+#include "emu.h"
+#include "emuopts.h"
 #include "testmess.h"
 #include "inputx.h"
 #include "pile.h"
@@ -132,7 +134,7 @@ struct _messtest_testcase
 
 
 typedef struct _messtest_specific_state messtest_specific_state;
-struct messtest_specific_state
+struct _messtest_specific_state
 {
 	messtest_testcase testcase;
 	int command_count;
@@ -480,7 +482,7 @@ void osd_stop_audio_stream(void)
 void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int samples_this_frame)
 {
 	if (wavptr && (machine->sample_rate != 0))
-		wav_add_data_16(wavptr, buffer, samples_this_frame * 2);
+		wav_add_data_16((wav_file*)wavptr, buffer, samples_this_frame * 2);
 }
 
 
@@ -1288,7 +1290,7 @@ static void node_image(xml_data_node *node, messtest_command_type_t command)
 	attr_node = xml_get_attribute(node, "preload");
 	preload = attr_node ? atoi(attr_node->value) : 0;
 	if (preload)
-		new_command.command_type += 2;
+		new_command.command_type = (messtest_command_type_t) (new_command.command_type + 2);
 
 	/* 'filename' attribute */
 	attr_node = xml_get_attribute(node, "filename");
@@ -1359,7 +1361,7 @@ static void node_memverify(xml_data_node *node)
 
 	pile_init(&pile);
 	messtest_get_data(node, &pile);
-	new_buffer = pool_malloc(command_pool, pile_size(&pile));
+	new_buffer = pool_malloc_lib(command_pool, pile_size(&pile));
 	memcpy(new_buffer, pile_getptr(&pile), pile_size(&pile));
 	new_command.u.verify_args.verify_data = new_buffer;
 	new_command.u.verify_args.verify_data_size = pile_size(&pile);
@@ -1389,7 +1391,7 @@ static void node_imageverify(xml_data_node *node)
 
 	pile_init(&pile);
 	messtest_get_data(node, &pile);
-	new_buffer = pool_malloc(command_pool, pile_size(&pile));
+	new_buffer = pool_malloc_lib(command_pool, pile_size(&pile));
 	memcpy(new_buffer, pile_getptr(&pile), pile_size(&pile));
 	new_command.u.verify_args.verify_data = new_buffer;
 	new_command.u.verify_args.verify_data_size = pile_size(&pile);
@@ -1407,7 +1409,7 @@ static void node_imageverify(xml_data_node *node)
 static void verify_end_handler(const void *buffer, size_t size)
 {
 	void *new_buffer;
-	new_buffer = pool_malloc(command_pool, size);
+	new_buffer = pool_malloc_lib(command_pool, size);
 	memcpy(new_buffer, buffer, size);
 
 	new_command.u.verify_args.verify_data = new_buffer;
@@ -1475,7 +1477,7 @@ void node_testmess(xml_data_node *node)
 	int result;
 
 	pile_init(&command_pile);
-	command_pool = pool_alloc(NULL);
+	command_pool = pool_alloc_lib(NULL);
 
 	memset(&new_command, 0, sizeof(new_command));
 	command_count = 0;
@@ -1565,5 +1567,5 @@ void node_testmess(xml_data_node *node)
 
 	report_testcase_ran(result);
 	pile_delete(&command_pile);
-	pool_free(command_pool);
+	pool_free_lib(command_pool);
 }

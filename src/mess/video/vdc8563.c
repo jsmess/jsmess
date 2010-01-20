@@ -14,7 +14,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <assert.h>
-#include "driver.h"
+#include "emu.h"
 
 #include "includes/crtc6845.h" // include only several register defines
 #include "vdc8563.h"

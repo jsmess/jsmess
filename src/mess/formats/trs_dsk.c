@@ -1,5 +1,5 @@
 #include <string.h>
-#include "driver.h"
+#include "emu.h"
 #include "formats/trs_dsk.h"
 #include "formats/basicdsk.h"
 #include "formats/coco_dsk.h"

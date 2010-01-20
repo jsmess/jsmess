@@ -70,9 +70,10 @@
   based on testing. Got rid of R->OldNoise and fixed taps accordingly.
   Added stereo support for game gear.
 
-  11/01/2010 : Lord Nightmare
+  11/15/2010 : Lord Nightmare
   Fix an issue with SN76489 and SN76489A having the wrong periodic noise periods.
-  Note that properly emulating the noise cycle accurately may require extensive rewriting.
+  Note that properly emulating the noise cycle bit timing accurately may require
+  extensive rewriting.
 
   TODO: * Implement the TMS9919 which is an earlier version, possibly
           lacking the /8 clock divider, of the SN76489, and hence would
@@ -86,9 +87,10 @@
         * Implement periodic noise as using a pointer to a table rather than a
           self feeding lfsr. Kold666's recording of dorunrun proves this is the
           right way.
+        * Fix the whitenoise bit timing so that dorunrun matches Kold666's PCB sample.
 ***************************************************************************/
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "sn76496.h"
 

@@ -190,7 +190,7 @@ C64 SERIAL BUS
     5)  Tei minimum must be 80us for external device to be a listener.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cbmiec.h"
 
 /***************************************************************************
@@ -277,11 +277,11 @@ INLINE void set_signal(const device_config *iec, const device_config *device, in
 
 	for ( ; daisy != NULL; daisy = daisy->next)
 	{
-		if (!strcmp(daisy->device->tag, device->tag))
+		if (!strcmp(daisy->device->tag.cstr(), device->tag.cstr()))
 		{
 			if (daisy->line[line] != state)
 			{
-				if (LOG) logerror("CBM IEC: '%s' %s %u\n", device->tag, SIGNAL_NAME[line], state);
+				if (LOG) logerror("CBM IEC: '%s' %s %u\n", device->tag.cstr(), SIGNAL_NAME[line], state);
 				daisy->line[line] = state;
 			}
 			break;

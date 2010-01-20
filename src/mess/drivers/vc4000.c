@@ -45,7 +45,7 @@ elektor TV Game Computer which is a kind of developer machine for the VC4000.
 Go to the bottom to see the game list and emulation status of each.
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/s2650/s2650.h"
 
 #include "includes/vc4000.h"
@@ -276,7 +276,7 @@ QUICKLOAD_LOAD(vc4000)
 	int read_;
 
 	quick_length = image_length(image);
-	quick_data = malloc(quick_length);
+	quick_data = (UINT8*)malloc(quick_length);
 	if (!quick_data)
 		return INIT_FAIL;
 

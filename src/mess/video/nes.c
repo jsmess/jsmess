@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/ppu2c0x.h"
 #include "includes/nes.h"
 #include "machine/nes_mmc.h"
@@ -75,7 +75,7 @@ PALETTE_INIT( nes )
 
 VIDEO_UPDATE( nes )
 {
-	nes_state *state = screen->machine->driver_data;
+	nes_state *state = (nes_state *)screen->machine->driver_data;
 
 	/* render the ppu */
 	ppu2c0x_render( state->ppu, bitmap, 0, 0, 0, 0 );

@@ -108,7 +108,7 @@
     74(4Ah) FM-TOWNS MARTY
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i386/i386.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
@@ -456,7 +456,7 @@ static WRITE8_HANDLER(towns_floppy_w)
 				floppy_drive_set_ready_state(floppy_get_device(space->machine, towns_selected_drive-1), data & 0x10,0);
 			}
 			wd17xx_set_side(fdc,(data & 0x04)>>2);
-			wd17xx_set_density(fdc,(data & 0x02)>>1);
+			wd17xx_set_density(fdc,(DENSITY)((data & 0x02)>>1));
 			towns_fdc_irq6mask = data & 0x01;
 			logerror("FDC: write %02x to offset 0x08\n",data);
 			break;
@@ -1023,7 +1023,7 @@ static UINT8 towns_cd_get_track(running_machine* machine)
 
 static TIMER_CALLBACK( towns_cdrom_read_byte )
 {
-	const device_config* device = ptr;
+	const device_config* device = (const device_config* )ptr;
 	int masked;
 	// TODO: support software transfers, for now DMA is assumed.
 
@@ -1957,7 +1957,7 @@ static DRIVER_INIT( towns )
 	// CD-ROM init
 	towns_cd.read_timer = timer_alloc(machine,towns_cdrom_read_byte,(void*)devtag_get_device(machine,"dma_1"));
 
-	cpu_set_irq_callback(cputag_get_cpu(machine,"maincpu"), towns_irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine,"maincpu"), towns_irq_callback);
 }
 
 static DRIVER_INIT( marty )
@@ -1974,7 +1974,7 @@ static MACHINE_RESET( towns )
 	towns_ankcg_enable = 0x00;
 	towns_mainmem_enable = 0x00;
 	towns_ram_enable = 0x00;
-	towns_update_video_banks(cpu_get_address_space(cputag_get_cpu(machine,"maincpu"),ADDRESS_SPACE_PROGRAM));
+	towns_update_video_banks(cpu_get_address_space(devtag_get_device(machine,"maincpu"),ADDRESS_SPACE_PROGRAM));
 	towns_kb_status = 0x18;
 	towns_kb_irq1_enable = 0;
 	towns_pad_mask = 0x7f;

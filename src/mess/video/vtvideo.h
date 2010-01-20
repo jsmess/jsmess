@@ -13,7 +13,7 @@
 #ifndef __VT_VIDEO__
 #define __VT_VIDEO__
 
-#include "driver.h"
+#include "emu.h"
 #include "devcb.h"
 
 /***************************************************************************

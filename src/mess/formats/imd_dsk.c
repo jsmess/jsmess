@@ -7,7 +7,7 @@
 *********************************************************************/
 
 #include <string.h>
-#include "driver.h"
+#include "emu.h"
 #include "formats/flopimg.h"
 #include "devices/flopdrv.h"
 
@@ -23,7 +23,7 @@ struct imddsk_tag
 static struct imddsk_tag *get_tag(floppy_image *floppy)
 {
 	struct imddsk_tag *tag;
-	tag = floppy_tag(floppy);
+	tag = (imddsk_tag *)floppy_tag(floppy);
 	return tag;
 }
 

@@ -10,7 +10,7 @@
 #define IOPROCS_H
 
 #include <stdlib.h>
-#include "mamecore.h"
+#include "emu.h"
 
 
 

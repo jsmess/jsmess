@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "sound/es5506.h"
 #include "includes/taito_f3.h"
 #include "taito_en.h"
@@ -74,7 +74,7 @@ static TIMER_DEVICE_CALLBACK( taito_en_timer_callback )
 	/* Only cause IRQ if the mask is set to allow it */
 	if (m68681_imr & 0x08)
 	{
-		cpu_set_input_line_vector(cputag_get_cpu(timer->machine, "audiocpu"), 6, vector_reg);
+		cpu_set_input_line_vector(devtag_get_device(timer->machine, "audiocpu"), 6, vector_reg);
 		cputag_set_input_line(timer->machine, "audiocpu", 6, ASSERT_LINE);
 		imr_status |= 0x08;
 	}
@@ -229,7 +229,7 @@ static WRITE16_HANDLER(es5510_dsp_w)
 
 static UINT16 *sound_ram;
 
-ADDRESS_MAP_START( f3_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( f3_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_MIRROR(0x30000) AM_SHARE("share1") AM_BASE(&sound_ram)
 	AM_RANGE(0x140000, 0x140fff) AM_READWRITE(f3_68000_share_r, f3_68000_share_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("ensoniq", es5505_r, es5505_w)
@@ -257,7 +257,7 @@ static SOUND_RESET( taito_f3_soundsystem_reset )
 	sound_ram[3]=ROM[0x80003];
 
 	/* reset CPU to catch any banking of startup vectors */
-	device_reset(cputag_get_cpu(machine, "audiocpu"));
+	device_reset(devtag_get_device(machine, "audiocpu"));
 	//cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 }
 

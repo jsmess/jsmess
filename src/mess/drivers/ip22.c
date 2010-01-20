@@ -38,7 +38,7 @@
 *
 \*********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "sound/cdda.h"
 #include "machine/sgi.h"
@@ -69,7 +69,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror("%08x: %s", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), buf);
+		logerror("%08x: %s", cpu_get_pc(devtag_get_device(machine, "maincpu")), buf);
 	}
 }
 
@@ -1202,7 +1202,7 @@ static MACHINE_RESET( ip225015 )
 
 	nPBUS_DMA_Active = 0;
 
-	mips3drc_set_options(cputag_get_cpu(machine, "maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
+	mips3drc_set_options(devtag_get_device(machine, "maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
 }
 
 static void dump_chain(const address_space *space, UINT32 ch_base)
@@ -1338,7 +1338,7 @@ static void scsi_irq(running_machine *machine, int state)
 
 				dump_chain(space, nHPC_SCSI0Descriptor);
 
-				printf("PC is %08x\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")));
+				printf("PC is %08x\n", cpu_get_pc(devtag_get_device(machine, "maincpu")));
 				printf("DMA to device: length %x xie %d eox %d\n", length, xie, eox);
 
 				if (length <= 0x4000)

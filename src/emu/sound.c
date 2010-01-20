@@ -9,7 +9,8 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "osdepend.h"
 #include "streams.h"
 #include "config.h"
@@ -314,9 +315,9 @@ static DEVICE_START( sound )
 	/* if no state registered for saving, we can't save */
 	if (num_regs == 0)
 	{
-		logerror("Sound chip '%s' did not register any state to save!\n", device->tag);
+		logerror("Sound chip '%s' did not register any state to save!\n", device->tag.cstr());
 		if (device->machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
-			fatalerror("Sound chip '%s' did not register any state to save!", device->tag);
+			fatalerror("Sound chip '%s' did not register any state to save!", device->tag.cstr());
 	}
 }
 
@@ -345,7 +346,7 @@ static DEVICE_CUSTOM_CONFIG( sound )
 
 			/* allocate a new route */
 			for (routeptr = &config->routelist; *routeptr != NULL; routeptr = &(*routeptr)->next) ;
-			*routeptr = alloc_or_die(sound_route);
+			*routeptr = global_alloc(sound_route);
 			(*routeptr)->next = NULL;
 			(*routeptr)->output = output;
 			(*routeptr)->input = input;
@@ -360,7 +361,7 @@ static DEVICE_CUSTOM_CONFIG( sound )
 			{
 				sound_route *temp = config->routelist;
 				config->routelist = temp->next;
-				free(temp);
+				global_free(temp);
 			}
 			break;
 	}
@@ -420,9 +421,9 @@ DEVICE_GET_INFO( sound )
 
 static void route_sound(running_machine *machine)
 {
-	astring *tempstring = astring_alloc();
 	const device_config *curspeak;
 	const device_config *sound;
+	astring tempstring;
 	int outputnum;
 
 	/* first count up the inputs for each speaker */
@@ -435,7 +436,7 @@ static void route_sound(running_machine *machine)
 		/* iterate over all routes */
 		for (route = config->routelist; route != NULL; route = route->next)
 		{
-			const device_config *target_device = devtag_get_device(machine, route->target);
+			const device_config *target_device = machine->device(route->target);
 
 			/* if neither found, it's fatal */
 			if (target_device == NULL)
@@ -472,7 +473,7 @@ static void route_sound(running_machine *machine)
 		/* iterate over all routes */
 		for (route = config->routelist; route != NULL; route = route->next)
 		{
-			const device_config *target_device = devtag_get_device(machine, route->target);
+			const device_config *target_device = machine->device(route->target);
 			int inputnum = route->input;
 			sound_stream *stream;
 			int streamoutput;
@@ -487,14 +488,14 @@ static void route_sound(running_machine *machine)
 						speaker_info *speakerinfo = get_safe_token(target_device);
 
 						/* generate text for the UI */
-						astring_printf(tempstring, "Speaker '%s': %s '%s'", target_device->tag, device_get_name(sound), sound->tag);
+						tempstring.printf("Speaker '%s': %s '%s'", target_device->tag.cstr(), device_get_name(sound), sound->tag.cstr());
 						if (numoutputs > 1)
-							astring_catprintf(tempstring, " Ch.%d", outputnum);
+							tempstring.catprintf(" Ch.%d", outputnum);
 
 						/* fill in the input data on this speaker */
 						speakerinfo->input[speakerinfo->inputs].gain = route->gain;
 						speakerinfo->input[speakerinfo->inputs].default_gain = route->gain;
-						speakerinfo->input[speakerinfo->inputs].name = auto_strdup(machine, astring_c(tempstring));
+						speakerinfo->input[speakerinfo->inputs].name = auto_strdup(machine, tempstring);
 
 						/* connect the output to the input */
 						if (stream_device_output_to_stream_output(sound, outputnum, &stream, &streamoutput))
@@ -514,9 +515,6 @@ static void route_sound(running_machine *machine)
 				}
 		}
 	}
-
-	/* free up our temporary string */
-	astring_free(tempstring);
 }
 
 

@@ -36,7 +36,7 @@
 
  ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "coco_vhd.h"
 #include "includes/coco.h"
 #include "devices/messram.h"

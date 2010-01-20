@@ -75,7 +75,7 @@ Notes:
 */
 
 /* Core includes */
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/abc80.h"
 
@@ -167,7 +167,7 @@ static const UINT8 abc80_keycodes[7*4][8] =
 
 static void abc80_keyboard_scan(running_machine *machine)
 {
-	abc80_state *state = machine->driver_data;
+	abc80_state *state = (abc80_state *)machine->driver_data;
 
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6" };
 	int table = 0, row, col;
@@ -362,7 +362,7 @@ static INTERRUPT_GEN( abc80_nmi_interrupt )
 
 static TIMER_DEVICE_CALLBACK( z80pio_astb_tick )
 {
-	abc80_state *state = timer->machine->driver_data;
+	abc80_state *state = (abc80_state *)timer->machine->driver_data;
 
 	/* toggle ASTB every other video line */
 	state->z80pio_astb = !state->z80pio_astb;
@@ -389,7 +389,7 @@ static READ8_DEVICE_HANDLER( abc80_pio_port_a_r )
 
     */
 
-	abc80_state *state = device->machine->driver_data;
+	abc80_state *state = (abc80_state *)device->machine->driver_data;
 
 	return (state->key_strobe << 7) | state->key_data;
 };
@@ -411,7 +411,7 @@ static READ8_DEVICE_HANDLER( abc80_pio_port_b_r )
 
     */
 
-	abc80_state *state = device->machine->driver_data;
+	abc80_state *state = (abc80_state *)device->machine->driver_data;
 
 	/* cassette data */
 	UINT8 data = (cassette_input(state->cassette) > +1.0) ? 0x80 : 0;
@@ -436,7 +436,7 @@ static WRITE8_DEVICE_HANDLER( abc80_pio_port_b_w )
 
     */
 
-	abc80_state *state = device->machine->driver_data;
+	abc80_state *state = (abc80_state *)device->machine->driver_data;
 
 	/* cassette motor */
 	cassette_change_state(state->cassette, BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -474,7 +474,7 @@ static ABCBUS_CONFIG( abcbus_config )
 
 static MACHINE_START( abc80 )
 {
-	abc80_state *state = machine->driver_data;
+	abc80_state *state = (abc80_state *)machine->driver_data;
 
 	/* configure RAM expansion */
 	memory_configure_bank(machine, "bank1", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);

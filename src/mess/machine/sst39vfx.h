@@ -12,7 +12,7 @@
 #ifndef _SST39VFX_H_
 #define _SST39VFX_H_
 
-#include "driver.h"
+#include "emu.h"
 
 /***************************************************************************
     TYPE DEFINITIONS

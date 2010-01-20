@@ -30,7 +30,7 @@
  */
 
 
-#include "driver.h"
+#include "emu.h"
 #include "mc6843.h"
 #include "devices/flopdrv.h"
 
@@ -808,7 +808,7 @@ static DEVICE_START( mc6843 )
 {
 	mc6843_t* mc6843 = get_safe_token( device );
 
-	mc6843->iface = device->static_config;
+	mc6843->iface = (const mc6843_interface*)device->static_config;
 
 	mc6843->timer_cont = timer_alloc( device->machine, mc6843_cont, (void*) device) ;
 

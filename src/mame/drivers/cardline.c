@@ -16,7 +16,7 @@
 ***********************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
 
@@ -31,7 +31,7 @@ static UINT8 *colorram;
 					(colorram[index+offset]&0x80)>>7,\
 					0,0,\
 					x<<3, y<<3,\
-					transparency?transparency:-1);
+					transparency?transparency:(UINT32)-1);
 
 static VIDEO_UPDATE( cardline )
 {

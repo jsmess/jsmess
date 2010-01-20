@@ -10,7 +10,7 @@
 #include "pool.h"
 #include "expat.h"
 #include "device.h"
-
+#include "emuopts.h"
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -148,7 +148,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 	iodevice_t device;
 	int i;
 
-	switch(state->pos++)
+	switch(state->pos)
 	{
 		case POS_ROOT:
 			if (!strcmp(tagname, "hashfile"))
@@ -227,12 +227,12 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				/* do we use this hash? */
 				if (!state->selector_proc || state->selector_proc(state->hashfile, state->param, name, hash_string))
 				{
-					hi = pool_malloc(state->hashfile->pool, sizeof(hash_info));
+					hi = (hash_info*)pool_malloc_lib(state->hashfile->pool, sizeof(hash_info));
 					if (!hi)
 						return;
 					memset(hi, 0, sizeof(*hi));
 
-					hi->longname = pool_strdup(state->hashfile->pool, name);
+					hi->longname = pool_strdup_lib(state->hashfile->pool, name);
 					if (!hi->longname)
 						return;
 
@@ -266,6 +266,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				state->text_dest = text_dest;
 			break;
 	}
+	state->pos = (hash_parse_position) (state->pos + 1);
 }
 
 
@@ -279,7 +280,8 @@ static void end_handler(void *data, const char *name)
 	struct hash_parse_state *state = (struct hash_parse_state *) data;
 	state->text_dest = NULL;
 
-	switch(--state->pos)
+	state->pos = (hash_parse_position) (state->pos - 1);
+	switch(state->pos)
 	{
 		case POS_ROOT:
 		case POS_HASH:
@@ -313,7 +315,7 @@ static void data_handler(void *data, const XML_Char *s, int len)
 		text = *state->text_dest;
 
 		text_len = text ? strlen(text) : 0;
-		text = pool_realloc(state->hashfile->pool, text, text_len + len + 1);
+		text = (char*)pool_realloc_lib(state->hashfile->pool, text, text_len + len + 1);
 		if (!text)
 			return;
 
@@ -390,7 +392,7 @@ static void preload_use_proc(hash_file *hashfile, void *param, hash_info *hi)
 {
 	hash_info **new_preloaded_hashes;
 
-	new_preloaded_hashes = pool_realloc(hashfile->pool, hashfile->preloaded_hashes,
+	new_preloaded_hashes = (hash_info **)pool_realloc_lib(hashfile->pool, hashfile->preloaded_hashes,
 		(hashfile->preloaded_hash_count + 1) * sizeof(*new_preloaded_hashes));
 	if (!new_preloaded_hashes)
 		return;
@@ -414,12 +416,12 @@ hash_file *hashfile_open_options(core_options *opts, const char *sysname, int is
 	object_pool *pool = NULL;
 
 	/* create a pool for this hash file */
-	pool = pool_alloc(error_proc);
+	pool = pool_alloc_lib(error_proc);
 	if (!pool)
 		goto error;
 
 	/* allocate space for this hash file */
-	hashfile = (hash_file *) pool_malloc(pool, sizeof(*hashfile));
+	hashfile = (hash_file *) pool_malloc_lib(pool, sizeof(*hashfile));
 	if (!hashfile)
 		goto error;
 
@@ -469,7 +471,7 @@ void hashfile_close(hash_file *hashfile)
 {
 	if (hashfile->file)
 		mame_fclose(hashfile->file);
-	pool_free(hashfile->pool);
+	pool_free_lib(hashfile->pool);
 }
 
 
@@ -580,7 +582,8 @@ static void *expat_malloc(size_t size)
 
 static void *expat_realloc(void *ptr, size_t size)
 {
-	return realloc(ptr, size);
+	if (ptr) free(ptr);
+	return malloc(size);
 }
 
 static void expat_free(void *ptr)

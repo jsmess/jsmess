@@ -4,7 +4,7 @@
     Raphael Nabet, 2004
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/pdp1/tx0.h"
 #include "includes/tx0.h"
 #include "video/crt.h"

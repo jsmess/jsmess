@@ -29,7 +29,7 @@
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/atari.h"

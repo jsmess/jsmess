@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/scmp/scmp.h"
 #include "elekscmp.lh"
 

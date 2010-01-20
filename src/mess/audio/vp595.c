@@ -7,7 +7,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "vp595.h"
 #include "sound/cdp1863.h"
 

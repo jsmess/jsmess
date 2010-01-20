@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255a.h"
 #include "machine/wd17xx.h"
@@ -144,7 +144,7 @@ static const cassette_config pk8020_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_PLAY
+	(cassette_state)(CASSETTE_PLAY)
 };
 
 static FLOPPY_OPTIONS_START(pk8020)

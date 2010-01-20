@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6800/m6800.h"
 
 static ADDRESS_MAP_START(et3400_mem, ADDRESS_SPACE_PROGRAM, 8)

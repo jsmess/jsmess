@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/c128.h"
 #include "includes/c64.h"
 #include "includes/cbm.h"
@@ -421,12 +421,12 @@ void c128_bankswitch_64( running_machine *machine, int reset )
 
 	if ((!c64_game && c64_exrom) || (charen && (loram || hiram)))
 	{
-		memory_install_read8_handler(cpu_get_address_space(cputag_get_cpu(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, c128_read_io);
+		memory_install_read8_handler(cpu_get_address_space(devtag_get_device(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, c128_read_io);
 		c128_write_io = 1;
 	}
 	else
 	{
-		memory_install_read_bank(cpu_get_address_space(cputag_get_cpu(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, "bank5");
+		memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, "bank5");
 		c128_write_io = 0;
 		if ((!charen && (loram || hiram)))
 			memory_set_bankptr(machine, "bank13", c64_chargen);
@@ -640,17 +640,17 @@ static void c128_bankswitch_128( running_machine *machine, int reset )
 		else
 			c128_ram_top = 0x10000;
 
-		memory_install_read8_handler(cpu_get_address_space(cputag_get_cpu(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xff00, 0xff04, 0, 0, c128_mmu8722_ff00_r);
+		memory_install_read8_handler(cpu_get_address_space(devtag_get_device(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xff00, 0xff04, 0, 0, c128_mmu8722_ff00_r);
 
 		if (MMU_IO_ON)
 		{
 			c128_write_io = 1;
-			memory_install_read8_handler(cpu_get_address_space(cputag_get_cpu(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, c128_read_io);
+			memory_install_read8_handler(cpu_get_address_space(devtag_get_device(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, c128_read_io);
 		}
 		else
 		{
 			c128_write_io = 0;
-			memory_install_read_bank(cpu_get_address_space(cputag_get_cpu(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, "bank13");
+			memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, "bank13");
 		}
 
 
@@ -762,8 +762,8 @@ static void c128_bankswitch( running_machine *machine, int reset )
              * driver used to work with this behavior, so I am doing this hack
              * where I set CPU #1's PC to 0x1100 on reset.
              */
-			if (cpu_get_reg(cputag_get_cpu(machine, "m8502"), REG_GENPC) == 0x0000)
-				cpu_set_reg(cputag_get_cpu(machine, "m8502"), REG_GENPC, 0x1100);
+			if (cpu_get_reg(devtag_get_device(machine, "m8502"), REG_GENPC) == 0x0000)
+				cpu_set_reg(devtag_get_device(machine, "m8502"), REG_GENPC, 0x1100);
 		}
 		mmu_cpu = MMU_CPU8502;
 		return;

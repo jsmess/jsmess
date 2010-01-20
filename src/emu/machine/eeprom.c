@@ -3,7 +3,7 @@
  *
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/eeprom.h"
 
 #define VERBOSE 0
@@ -152,9 +152,9 @@ static void eeprom_write(const device_config *device, int bit)
 			if (eestate->serial_buffer[i] == '1') address |= 1;
 		}
 		if (eestate->intf->data_bits == 16)
-			eestate->data_bits = memory_read_word(device->space[0], address * 2);
+			eestate->data_bits = memory_read_word(device->space(), address * 2);
 		else
-			eestate->data_bits = memory_read_byte(device->space[0], address);
+			eestate->data_bits = memory_read_byte(device->space(), address);
 		eestate->read_address = address;
 		eestate->clock_count = 0;
 		eestate->sending = 1;
@@ -176,9 +176,9 @@ logerror("EEPROM erase address %02x\n",address);
 		if (eestate->locked == 0)
 		{
 			if (eestate->intf->data_bits == 16)
-				memory_write_word(device->space[0], address * 2, 0x0000);
+				memory_write_word(device->space(), address * 2, 0x0000);
 			else
-				memory_write_byte(device->space[0], address, 0x00);
+				memory_write_byte(device->space(), address, 0x00);
 		}
 		else
 logerror("Error: EEPROM is locked\n");
@@ -205,9 +205,9 @@ logerror("EEPROM write %04x to address %02x\n",data,address);
 		if (eestate->locked == 0)
 		{
 			if (eestate->intf->data_bits == 16)
-				memory_write_word(device->space[0], address * 2, data);
+				memory_write_word(device->space(), address * 2, data);
 			else
-				memory_write_byte(device->space[0], address, 0x00);
+				memory_write_byte(device->space(), address, data);
 		}
 		else
 logerror("Error: EEPROM is locked\n");
@@ -296,9 +296,9 @@ WRITE_LINE_DEVICE_HANDLER( eeprom_set_clock_line )
 				{
 					eestate->read_address = (eestate->read_address + 1) & ((1 << eestate->intf->address_bits) - 1);
 					if (eestate->intf->data_bits == 16)
-						eestate->data_bits = memory_read_word(device->space[0], eestate->read_address * 2);
+						eestate->data_bits = memory_read_word(device->space(), eestate->read_address * 2);
 					else
-						eestate->data_bits = memory_read_byte(device->space[0], eestate->read_address);
+						eestate->data_bits = memory_read_byte(device->space(), eestate->read_address);
 					eestate->clock_count = 0;
 logerror("EEPROM read %04x from address %02x\n",eestate->data_bits,eestate->read_address);
 				}
@@ -323,19 +323,19 @@ static DEVICE_NVRAM( eeprom )
 
 	if (read_or_write)
 	{
-		UINT8 *buffer = alloc_array_or_die(UINT8, eeprom_bytes);
+		UINT8 *buffer = auto_alloc_array(device->machine, UINT8, eeprom_bytes);
 		for (offs = 0; offs < eeprom_bytes; offs++)
-			buffer[offs] = memory_read_byte(device->space[0], offs);
+			buffer[offs] = memory_read_byte(device->space(), offs);
 		mame_fwrite(file, buffer, eeprom_bytes);
-		free(buffer);
+		auto_free(device->machine, buffer);
 	}
 	else if (file != NULL)
 	{
-		UINT8 *buffer = alloc_array_or_die(UINT8, eeprom_bytes);
+		UINT8 *buffer = auto_alloc_array(device->machine, UINT8, eeprom_bytes);
 		mame_fread(file, buffer, eeprom_bytes);
 		for (offs = 0; offs < eeprom_bytes; offs++)
-			memory_write_byte(device->space[0], offs, buffer[offs]);
-		free(buffer);
+			memory_write_byte(device->space(), offs, buffer[offs]);
+		auto_free(device->machine, buffer);
 	}
 	else
 	{
@@ -348,32 +348,30 @@ static DEVICE_NVRAM( eeprom )
 			default_value = config->default_value;
 		for (offs = 0; offs < eeprom_length; offs++)
 			if (eestate->intf->data_bits == 8)
-				memory_write_byte(device->space[0], offs, default_value);
+				memory_write_byte(device->space(), offs, default_value);
 			else
-				memory_write_word(device->space[0], offs * 2, default_value);
+				memory_write_word(device->space(), offs * 2, default_value);
 
 		/* handle hard-coded data from the driver */
 		if (config->default_data != NULL)
 			for (offs = 0; offs < config->default_data_size; offs++)
-				memory_write_byte(device->space[0], offs, config->default_data[offs]);
+				memory_write_byte(device->space(), offs, config->default_data[offs]);
 
 		/* populate from a memory region if present */
 		if (device->region != NULL)
 		{
-			UINT32 region_flags = memory_region_flags(device->machine, device->tag);
-
-			if (device->regionbytes != eeprom_bytes)
-				fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)", device->tag, eeprom_bytes);
-			if (eestate->intf->data_bits == 8 && (region_flags & ROMREGION_WIDTHMASK) != ROMREGION_8BIT)
-				fatalerror("eeprom region '%s' needs to be an 8-bit region", device->tag);
-			if (eestate->intf->data_bits == 16 && ((region_flags & ROMREGION_WIDTHMASK) != ROMREGION_16BIT || (region_flags & ROMREGION_ENDIANMASK) != ROMREGION_BE))
-				fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region (flags=%08x)", device->tag, region_flags);
+			if (device->region->length != eeprom_bytes)
+				fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)", device->tag.cstr(), eeprom_bytes);
+			if (eestate->intf->data_bits == 8 && (device->region->flags & ROMREGION_WIDTHMASK) != ROMREGION_8BIT)
+				fatalerror("eeprom region '%s' needs to be an 8-bit region", device->tag.cstr());
+			if (eestate->intf->data_bits == 16 && ((device->region->flags & ROMREGION_WIDTHMASK) != ROMREGION_16BIT || (device->region->flags & ROMREGION_ENDIANMASK) != ROMREGION_BE))
+				fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region (flags=%08x)", device->tag.cstr(), device->region->flags);
 
 			for (offs = 0; offs < eeprom_length; offs++)
 				if (eestate->intf->data_bits == 8)
-					memory_write_byte(device->space[0], offs, device->region[offs]);
+					memory_write_byte(device->space(), offs, device->region->base.u8[offs]);
 				else
-					memory_write_word(device->space[0], offs * 2, ((UINT16 *)device->region)[offs]);
+					memory_write_word(device->space(), offs * 2, device->region->base.u16[offs]);
 		}
 	}
 }
@@ -395,8 +393,8 @@ static DEVICE_START( eeprom )
 
 	eestate->serial_count = 0;
 	eestate->latch = 0;
-	eestate->reset_line = ASSERT_LINE;
-	eestate->clock_line = ASSERT_LINE;
+	eestate->reset_line = CLEAR_LINE;
+	eestate->clock_line = CLEAR_LINE;
 	eestate->read_address = 0;
 	eestate->sending = 0;
 	if (eestate->intf->cmd_unlock) eestate->locked = 1;

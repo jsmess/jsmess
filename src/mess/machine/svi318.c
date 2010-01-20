@@ -5,7 +5,7 @@
 **
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "video/mc6845.h"
 #include "includes/svi318.h"
 #include "cpu/z80/z80.h"
@@ -117,7 +117,7 @@ DEVICE_IMAGE_LOAD( svi318_cart )
 
 	size = MAX(0x8000,image_length(image));
 
-	p = image_malloc(image, size);
+	p = (UINT8*)image_malloc(image, size);
 	if (!p)
 		return INIT_FAIL;
 
@@ -427,7 +427,7 @@ VIDEO_UPDATE( svi328_806 )
 	}
 	else
 	{
-		fatalerror("Unknown screen '%s'\n", screen->tag);
+		fatalerror("Unknown screen '%s'\n", screen->tag.cstr());
 	}
 	return 0;
 }
@@ -572,7 +572,7 @@ static const UINT8 cc_ex[0x100] = {
 DRIVER_INIT( svi318 )
 {
 	/* z80 stuff */
-	z80_set_cycle_tables( cputag_get_cpu(machine, "maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
+	z80_set_cycle_tables( devtag_get_device(machine, "maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
 
 	memset(&svi, 0, sizeof (svi) );
 
@@ -581,7 +581,7 @@ DRIVER_INIT( svi318 )
 		svi.svi318 = 1;
 	}
 
-	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), 0, 0xff);
+	cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), 0, 0xff);
 
 	/* memory */
 	svi.empty_bank = auto_alloc_array(machine, UINT8, 0x8000);

@@ -62,7 +62,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
@@ -539,7 +539,7 @@ static MACHINE_START( coleco )
 static MACHINE_RESET( coleco )
 {
 	last_state = 0;
-	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), INPUT_LINE_IRQ0, 0xff);
+	cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), INPUT_LINE_IRQ0, 0xff);
 	memset(&memory_region(machine, "maincpu")[0x6000], 0xff, 0x400);	// initialize RAM
 }
 

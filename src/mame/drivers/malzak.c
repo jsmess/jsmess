@@ -62,7 +62,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/sn76477.h"
 #include "video/s2636.h"
@@ -151,7 +151,7 @@ static WRITE8_HANDLER( port40_w )
 //  Bits 1-3 are all set high upon death, until the game continues
 //  Bit 6 is used only in Malzak II, and is set high after checking
 //        the selected version
-//  logerror("S2650 [0x%04x]: port 0x40 write: 0x%02x\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), data);
+//  logerror("S2650 [0x%04x]: port 0x40 write: 0x%02x\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), data);
 	memory_set_bank(space->machine, "bank1", (data & 0x40) >> 6);
 }
 

@@ -1,6 +1,6 @@
 #include <string.h>
 #include "mz_cas.h"
-#include "driver.h"
+#include "emu.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0

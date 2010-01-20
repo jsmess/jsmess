@@ -17,7 +17,7 @@ would commence ($C00000).
 ***************************************************************************/
 
 /* Core includes */
-#include "driver.h"
+#include "emu.h"
 #include "includes/amiga.h"
 
 /* Components */

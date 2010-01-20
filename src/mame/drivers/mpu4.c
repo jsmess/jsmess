@@ -243,12 +243,11 @@ IRQ line connected to CPU
 TODO: - Fix lamp timing, MAME doesn't update fast enough to see everything
       - Distinguish door switches using manual
 ***********************************************************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 
 #include "deprecat.h"
-#include "timer.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
@@ -446,7 +445,7 @@ static MACHINE_RESET( mpu4 )
 		memory_configure_bank(machine, "bank1", 0, 8, &rom[0x01000], 0x10000);
 
 		memory_set_bank(machine, "bank1",0);
-		device_reset(cputag_get_cpu(machine, "maincpu"));
+		device_reset(devtag_get_device(machine, "maincpu"));
 	}
 
 }

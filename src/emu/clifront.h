@@ -14,6 +14,8 @@
 #ifndef __CLIFRONT_H__
 #define __CLIFRONT_H__
 
+#include "options.h"
+
 
 /***************************************************************************
     CONSTANTS
@@ -36,7 +38,6 @@
 #define CLIOPTION_VERIFYROMS			"verifyroms"
 #define CLIOPTION_VERIFYSAMPLES			"verifysamples"
 #define CLIOPTION_ROMIDENT				"romident"
-#define CLIOPTION_LISTMEDIA				"listmedia"
 
 
 

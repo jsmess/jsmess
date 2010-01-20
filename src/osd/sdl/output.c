@@ -14,8 +14,7 @@
 #include <unistd.h>
 
 // MAME headers
-#include "osdepend.h"
-#include "driver.h"
+#include "emu.h"
 
 // MAMEOS headers
 #include "output.h"
@@ -30,7 +29,7 @@
 
 /*
  * Using long/int should be sufficient on all
- * architectures. 
+ * architectures.
  */
 
 
@@ -75,11 +74,11 @@ PID_CAST osd_getpid(void)
 void sdloutput_init(running_machine *machine)
 {
 	int fildes;
-	
+
 	add_exit_callback(machine, sdloutput_exit);
 
 	fildes = open(SDLMAME_OUTPUT, O_RDWR | O_NONBLOCK);
-	
+
 	if (fildes < 0)
 	{
 		output = NULL;
@@ -88,12 +87,12 @@ void sdloutput_init(running_machine *machine)
 	else
 	{
 		output = fdopen(fildes, "w");
-		
+
 		mame_printf_verbose("ouput: opened output notifier file %s\n", SDLMAME_OUTPUT);
 		fprintf(output, "MAME " PID_FMT " START %s\n", osd_getpid(), machine->gamedrv->name);
 		fflush(output);
 	}
-	
+
 	output_set_notifier(NULL, notifier_callback, NULL);
 }
 
@@ -129,7 +128,7 @@ static void notifier_callback(const char *outname, INT32 value, void *param)
 
 #else  /* SDLMAME_WIN32 */
 
-#include "driver.h"
+#include "emu.h"
 
 //============================================================
 //  Stub for win32

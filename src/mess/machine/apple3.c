@@ -13,7 +13,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/apple3.h"
 #include "includes/apple2.h"
 #include "cpu/m6502/m6502.h"
@@ -297,7 +297,7 @@ static void apple3_setbank(running_machine *machine,const char *mame_bank, UINT1
 	if (LOG_MEMORY)
 	{
 		#ifdef PTR64
-		logerror("\tbank %s --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - messram_get_ptr(devtag_get_device(machine, "messram")));
+		//logerror("\tbank %s --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - messram_get_ptr(devtag_get_device(machine, "messram")));
 		#else
 		logerror("\tbank %s --> %02x/%04x [0x%08x]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - messram_get_ptr(devtag_get_device(machine, "messram")));
 		#endif

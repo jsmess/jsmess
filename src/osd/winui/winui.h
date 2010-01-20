@@ -17,7 +17,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <commctrl.h>
 #include <commdlg.h>
-#include <driver.h>
+#include "emu.h"
 #include "pool.h"
 #include "screenshot.h"
 
@@ -116,7 +116,7 @@ void SetStatusBarText(int part_index, const char *message);
 void SetStatusBarTextF(int part_index, const char *fmt, ...) ATTR_PRINTF(2,3);
 
 int MameUIMain(HINSTANCE	hInstance,
-                   LPSTR    lpCmdLine,
+                   LPWSTR    lpCmdLine,
                    int      nCmdShow);
 
 BOOL MouseHasBeenMoved(void);

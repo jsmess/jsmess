@@ -385,7 +385,7 @@ static imgtoolerr_t concept_image_nextenum(imgtool_directory *enumeration, imgto
 		iter->index++;
 	}
 
-	return 0;
+	return (imgtoolerr_t)0;
 }
 
 /*
@@ -454,7 +454,7 @@ static imgtoolerr_t concept_image_readfile(imgtool_partition *partition, const c
 			return IMGTOOLERR_WRITEERROR;
 	}
 
-	return 0;
+	return (imgtoolerr_t)0;
 }
 
 #if 0

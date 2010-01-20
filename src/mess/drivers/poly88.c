@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
 #include "sound/wave.h"
@@ -139,7 +139,7 @@ static const cassette_config poly88_cassette_config =
 {
 	cassette_default_formats,
 	&poly88_cassette_options,
-	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
 };
 
 

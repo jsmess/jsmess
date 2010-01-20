@@ -15,7 +15,7 @@ and should be verified against real hardware.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "6530miot.h"
 
 
@@ -102,7 +102,7 @@ INLINE void update_irqstate(const device_config *device)
 	if (miot->port[1].out_func != NULL)
 		(*miot->port[1].out_func)(device, out, out);
 	else
-		logerror("6530MIOT chip %s: Port B is being written to but has no handler.\n", device->tag);
+		logerror("6530MIOT chip %s: Port B is being written to but has no handler.\n", device->tag.cstr());
 }
 
 
@@ -137,7 +137,7 @@ INLINE UINT8 get_timer(miot6530_state *miot)
 
 static TIMER_CALLBACK( timer_end_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	miot6530_state *miot = get_safe_token(device);
 
 	assert(miot->timerstate != TIMER_IDLE);
@@ -227,7 +227,7 @@ WRITE8_DEVICE_HANDLER( miot6530_w )
 			if (port->out_func != NULL)
 				(*port->out_func)(device, data, olddata);
 			else
-				logerror("6530MIOT chip %s: Port %c is being written to but has no handler.  PC: %08X - %02X\n", device->tag, 'A' + (offset & 1), cpu_get_pc(device->machine->firstcpu), data);
+				logerror("6530MIOT chip %s: Port %c is being written to but has no handler.  PC: %08X - %02X\n", device->tag.cstr(), 'A' + (offset & 1), cpu_get_pc(device->machine->firstcpu), data);
 		}
 	}
 }
@@ -289,7 +289,7 @@ READ8_DEVICE_HANDLER( miot6530_r )
 				port->in = (*port->in_func)(device, port->in);
 			}
 			else
-				logerror("6530MIOT chip %s: Port %c is being read but has no handler.  PC: %08X\n", device->tag, 'A' + (offset & 1), cpu_get_pc(device->machine->firstcpu));
+				logerror("6530MIOT chip %s: Port %c is being read but has no handler.  PC: %08X\n", device->tag.cstr(), 'A' + (offset & 1), cpu_get_pc(device->machine->firstcpu));
 
 			/* apply the DDR to the result */
 			val = (out & port->ddr) | (port->in & ~port->ddr);
@@ -384,7 +384,7 @@ static DEVICE_START( miot6530 )
 	assert(device->tag != NULL);
 
 	/* set static values */
-	miot->intf = device->static_config;
+	miot->intf = (const miot6530_interface*)device->static_config;
 	miot->clock = device->clock;
 
 	/* configure the ports */

@@ -19,7 +19,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/sh4/sh4.h"
 #include "cpu/arm7/arm7core.h"

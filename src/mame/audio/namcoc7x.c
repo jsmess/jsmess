@@ -26,7 +26,7 @@
     Thanks to Cync and Cap for invaluable assistance.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m37710/m37710.h"
 #include "deprecat.h"
 #include "audio/namcoc7x.h"
@@ -88,7 +88,7 @@ void namcoc7x_on_driver_init(running_machine *machine)
 	memset(pROM, 0, 4);
 
 	// install speedup cheat
-	for (cpu = cputag_get_cpu(machine, "maincpu"); cpu != NULL; cpu = cpu->typenext)
+	for (cpu = devtag_get_device(machine, "maincpu"); cpu != NULL; cpu = cpu->typenext)
 		if (cpu_get_type(cpu) == CPU_M37702)
 			memory_install_readwrite16_handler(cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM), 0x82, 0x83, 0, 0, speedup_r, speedup_w);
 }

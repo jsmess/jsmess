@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/z80pio.h"
 #include "includes/kramermc.h"
 

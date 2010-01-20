@@ -12,8 +12,6 @@
 #ifndef __SDLSYNC__
 #define __SDLSYNC__
 
-#ifndef SDLMAME_WIN32
-
 /***************************************************************************
     SYNCHRONIZATION INTERFACES - Events
 ***************************************************************************/
@@ -53,7 +51,7 @@ osd_event *osd_event_alloc(int manualreset, int initialstate);
     Return value:
 
         TRUE:  The event was signalled
-        FALSE: A timeout occurred 
+        FALSE: A timeout occurred
 -----------------------------------------------------------------------------*/
 int osd_event_wait(osd_event *event, osd_ticks_t timeout);
 
@@ -67,7 +65,7 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout);
 
     Return value:
 
-	    None
+        None
 -----------------------------------------------------------------------------*/
 void osd_event_reset(osd_event *event);
 
@@ -81,11 +79,11 @@ void osd_event_reset(osd_event *event);
 
     Return value:
 
-	    None
-	    
-	Notes:
-	
-	    All threads waiting for the event will be signalled.
+        None
+
+    Notes:
+
+        All threads waiting for the event will be signalled.
 -----------------------------------------------------------------------------*/
 void osd_event_set(osd_event *event);
 
@@ -151,10 +149,10 @@ int osd_thread_adjust_priority(osd_thread *thread, int adjust);
 
     Parameters:
 
-        thread - A pointer to a previously created thread 
+        thread - A pointer to a previously created thread
                  or NULL for main thread
         mask   - bitmask to which cpus to bind
-        		 i.e. 0x01 1st cpu, 0x02, 2nd cpu, 0x04 3rd cpu
+                 i.e. 0x01 1st cpu, 0x02, 2nd cpu, 0x04 3rd cpu
 
     Return value:
 
@@ -177,59 +175,18 @@ int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask);
 void osd_thread_wait_free(osd_thread *thread);
 
 
-/*-----------------------------------------------------------------------------
-    osd_num_processors: return the number of processors
+//============================================================
+//  Scalable Locks
+//============================================================
 
-    Parameters:
+typedef struct _osd_scalable_lock osd_scalable_lock;
 
-        None.
+osd_scalable_lock *osd_scalable_lock_alloc(void);
 
-    Return value:
+INT32 osd_scalable_lock_acquire(osd_scalable_lock *lock);
 
-        Number of processors
------------------------------------------------------------------------------*/
-int osd_num_processors(void);
+void osd_scalable_lock_release(osd_scalable_lock *lock, INT32 myslot);
 
-#else
-
-// standard windows headers
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <process.h>
-
-/*-----------------------------------------------------------------------------
-    INLINE implementation of WIN events
------------------------------------------------------------------------------*/
-
-typedef void osd_event;
-
-INLINE osd_event *osd_event_alloc(int manualreset, int initialstate)
-{
-	return (void *) CreateEvent(NULL, manualreset, initialstate, NULL);
-}
-
-INLINE int osd_event_wait(osd_event *event, osd_ticks_t timeout)
-{
-	int ret = WaitForSingleObject((HANDLE) event, timeout * 1000 / osd_ticks_per_second());
-	return ( ret == WAIT_OBJECT_0);
-}
-
-INLINE void osd_event_reset(osd_event *event)
-{
-	ResetEvent((HANDLE) event);
-}
-
-INLINE void osd_event_set(osd_event *event)
-{
-	SetEvent((HANDLE) event);
-}
-
-INLINE void osd_event_free(osd_event *event)
-{
-	CloseHandle((HANDLE) event);
-}
-
-
-#endif	/* SDLMAME_WIN32 */
+void osd_scalable_lock_free(osd_scalable_lock *lock);
 
 #endif	/* __SDLSYNC__ */

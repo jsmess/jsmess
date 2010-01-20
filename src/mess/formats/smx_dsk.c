@@ -10,7 +10,7 @@
 
 #include "formats/smx_dsk.h"
 #include "formats/basicdsk.h"
-#include "driver.h"
+#include "emu.h"
 
 static FLOPPY_IDENTIFY(smx_dsk_identify)
 {

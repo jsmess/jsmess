@@ -10,7 +10,7 @@
 
 #include "formats/svi_dsk.h"
 #include "formats/basicdsk.h"
-#include "driver.h"
+#include "emu.h"
 
 static FLOPPY_IDENTIFY(svi_dsk_identify)
 {

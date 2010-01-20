@@ -14,8 +14,6 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-#include "mame.h"
-#include "input.h"
 #include "xmlfile.h"
 
 
@@ -25,6 +23,8 @@
  *  Constants
  *
  *************************************/
+
+#define CONFIG_VERSION			10
 
 enum
 {

@@ -16,7 +16,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/wave.h"
 #include "includes/oric.h"
@@ -349,7 +349,7 @@ static const cassette_config oric_cassette_config =
 {
 	oric_cassette_formats,
 	NULL,
-	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED)
 };
 
 static const centronics_interface oric_centronics_config =

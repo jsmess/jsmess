@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "modules.h"
 
 #ifndef MODULES_RECURSIVE

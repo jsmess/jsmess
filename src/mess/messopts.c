@@ -4,9 +4,10 @@
 
 ****************************************************************************/
 
-#include "mame.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "options.h"
-#include "driver.h"
+#include "emu.h"
 #include "pool.h"
 #include "config.h"
 #include "xmlfile.h"

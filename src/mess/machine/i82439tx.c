@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "i82439tx.h"
 
 
@@ -213,7 +213,7 @@ void i82439tx_pci_write(const device_config *busdevice, const device_config *dev
 static DEVICE_START( i82439tx )
 {
 	i82439tx_state *i82439tx = get_safe_token(device);
-	i82439tx_config *config = device->inline_config;
+	i82439tx_config *config = (i82439tx_config *)device->inline_config;
 
 	/* get address space we are working on */
 	const device_config *cpu = devtag_get_device(device->machine, config->cputag);

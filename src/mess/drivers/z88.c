@@ -13,7 +13,7 @@
 
  ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/z88.h"
 #include "sound/speaker.h"
@@ -554,7 +554,7 @@ static  READ8_HANDLER(z88_port_r)
 			{
 				z88_blink.z88_state = Z88_SNOOZE;
 				/* spin cycles until rtc timer */
-				cpu_spinuntil_trigger( cputag_get_cpu(space->machine, "maincpu"), Z88_SNOOZE_TRIGGER);
+				cpu_spinuntil_trigger( devtag_get_device(space->machine, "maincpu"), Z88_SNOOZE_TRIGGER);
 
 				logerror("z88 entering snooze!\n");
 			}

@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/mikro80.h"
 
 UINT8 *mikro80_video_ram;

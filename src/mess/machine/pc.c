@@ -11,7 +11,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/pc.h"
 
 #include "machine/i8255a.h"
@@ -72,7 +72,7 @@ READ8_HANDLER(pc_page_r)
 
 WRITE8_HANDLER(pc_page_w)
 {
-	pc_state *st = space->machine->driver_data;
+	pc_state *st = (pc_state *)space->machine->driver_data;
 	switch(offset % 4)
 	{
 	case 1:
@@ -90,7 +90,7 @@ WRITE8_HANDLER(pc_page_w)
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 {
-	pc_state *st = device->machine->driver_data;
+	pc_state *st = (pc_state *)device->machine->driver_data;
 	cpu_set_input_line(st->maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
@@ -101,7 +101,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 static READ8_HANDLER( pc_dma_read_byte )
 {
 	UINT8 result;
-	pc_state *st = space->machine->driver_data;
+	pc_state *st = (pc_state *)space->machine->driver_data;
 	offs_t page_offset = (((offs_t) st->dma_offset[0][st->dma_channel]) << 16)
 		& 0x0F0000;
 
@@ -112,7 +112,7 @@ static READ8_HANDLER( pc_dma_read_byte )
 
 static WRITE8_HANDLER( pc_dma_write_byte )
 {
-	pc_state *st = space->machine->driver_data;
+	pc_state *st = (pc_state *)space->machine->driver_data;
 	offs_t page_offset = (((offs_t) st->dma_offset[0][st->dma_channel]) << 16)
 		& 0x0F0000;
 
@@ -146,7 +146,7 @@ static WRITE8_DEVICE_HANDLER( pc_dma8237_hdc_dack_w )
 
 static WRITE8_DEVICE_HANDLER( pc_dma8237_0_dack_w )
 {
-	pc_state *st = device->machine->driver_data;
+	pc_state *st = (pc_state *)device->machine->driver_data;
 	st->u73_q2 = 0;
 	i8237_dreq0_w( st->dma8237, st->u73_q2 );
 }
@@ -159,7 +159,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma8237_out_eop )
 
 static void set_dma_channel(const device_config *device, int channel, int state)
 {
-	pc_state *st = device->machine->driver_data;
+	pc_state *st = (pc_state *)device->machine->driver_data;
 
 	if (!state) st->dma_channel = channel;
 }
@@ -249,7 +249,7 @@ const struct pic8259_interface pcjr_pic8259_config =
  *************************************************************************/
 UINT8 pc_speaker_get_spk(running_machine *machine)
 {
-	pc_state *st = machine->driver_data;
+	pc_state *st = (pc_state *)machine->driver_data;
 	return st->pc_spkrdata & st->pc_input;
 }
 
@@ -257,7 +257,7 @@ UINT8 pc_speaker_get_spk(running_machine *machine)
 void pc_speaker_set_spkrdata(running_machine *machine, UINT8 data)
 {
 	const device_config *speaker = devtag_get_device(machine, "speaker");
-	pc_state *st = machine->driver_data;
+	pc_state *st = (pc_state *)machine->driver_data;
 	st->pc_spkrdata = data ? 1 : 0;
 	speaker_level_w( speaker, pc_speaker_get_spk(machine) );
 }
@@ -266,7 +266,7 @@ void pc_speaker_set_spkrdata(running_machine *machine, UINT8 data)
 void pc_speaker_set_input(running_machine *machine, UINT8 data)
 {
 	const device_config *speaker = devtag_get_device(machine, "speaker");
-	pc_state *st = machine->driver_data;
+	pc_state *st = (pc_state *)machine->driver_data;
 	st->pc_input = data ? 1 : 0;
 	speaker_level_w( speaker, pc_speaker_get_spk(machine) );
 }
@@ -280,14 +280,14 @@ void pc_speaker_set_input(running_machine *machine, UINT8 data)
 
 static PIT8253_OUTPUT_CHANGED( ibm5150_pit8253_out0_changed )
 {
-	pc_state *st = device->machine->driver_data;
+	pc_state *st = (pc_state *)device->machine->driver_data;
 	pic8259_set_irq_line(st->pic8259, 0, state);
 }
 
 
 static PIT8253_OUTPUT_CHANGED( ibm5150_pit8253_out1_changed )
 {
-	pc_state *st = device->machine->driver_data;
+	pc_state *st = (pc_state *)device->machine->driver_data;
  	/* Trigger DMA channel #0 */
 	if ( st->out1 == 0 && state == 1 && st->u73_q2 == 0 )
 	{
@@ -352,13 +352,13 @@ const struct pit8253_config pcjr_pit8253_config =
 /* called when a interrupt is set/cleared from com hardware */
 static INS8250_INTERRUPT( pc_com_interrupt_1 )
 {
-	pc_state *st = device->machine->driver_data;
+	pc_state *st = (pc_state *)device->machine->driver_data;
 	pic8259_set_irq_line(st->pic8259, 4, state);
 }
 
 static INS8250_INTERRUPT( pc_com_interrupt_2 )
 {
-	pc_state *st = device->machine->driver_data;
+	pc_state *st = (pc_state *)device->machine->driver_data;
 	pic8259_set_irq_line(st->pic8259, 3, state);
 }
 
@@ -496,7 +496,7 @@ static TIMER_CALLBACK( pcjr_keyb_signal_callback )
 
 static void pcjr_set_keyb_int(running_machine *machine, int state)
 {
-	pc_state *st = machine->driver_data;
+	pc_state *st = (pc_state *)machine->driver_data;
 	if ( state )
 	{
 		UINT8	data = pc_keyb_read();
@@ -612,7 +612,7 @@ static READ8_DEVICE_HANDLER (ibm5150_ppi_porta_r)
 {
 	int data = 0xFF;
 	running_machine *machine = device->machine;
-	pc_state *st = device->machine->driver_data;
+	pc_state *st = (pc_state *)device->machine->driver_data;
 
 	/* KB port A */
 	if (st->ppi_keyboard_clear)
@@ -665,7 +665,7 @@ static READ8_DEVICE_HANDLER (ibm5150_ppi_portb_r )
 
 static READ8_DEVICE_HANDLER ( ibm5150_ppi_portc_r )
 {
-	pc_state *st = device->machine->driver_data;
+	pc_state *st = (pc_state *)device->machine->driver_data;
 	int timer2_output = pit8253_get_output( st->pit8253, 2 );
 	int data=0xff;
 	running_machine *machine = device->machine;
@@ -745,7 +745,7 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_porta_w )
 
 static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portb_w )
 {
-	pc_state *st = device->machine->driver_data;
+	pc_state *st = (pc_state *)device->machine->driver_data;
 	const device_config *keyboard = devtag_get_device(device->machine, "keyboard");
 
 	/* KB controller port B */
@@ -782,7 +782,7 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portc_w )
 
 WRITE8_HANDLER( ibm5150_kb_set_clock_signal )
 {
-	pc_state *st = space->machine->driver_data;
+	pc_state *st = (pc_state *)space->machine->driver_data;
 	const device_config *keyboard = devtag_get_device(space->machine, "keyboard");
 
 	if ( st->ppi_clock_signal != data )
@@ -816,7 +816,7 @@ WRITE8_HANDLER( ibm5150_kb_set_clock_signal )
 
 WRITE8_HANDLER( ibm5150_kb_set_data_signal )
 {
-	pc_state *st = space->machine->driver_data;
+	pc_state *st = (pc_state *)space->machine->driver_data;
 	const device_config *keyboard = devtag_get_device(space->machine, "keyboard");
 
 	st->ppi_data_signal = data;
@@ -842,7 +842,7 @@ static READ8_DEVICE_HANDLER (ibm5160_ppi_porta_r)
 {
 	int data = 0xFF;
 	running_machine *machine = device->machine;
-	pc_state *st = device->machine->driver_data;
+	pc_state *st = (pc_state *)device->machine->driver_data;
 
 	/* KB port A */
 	if (st->ppi_keyboard_clear)
@@ -869,7 +869,7 @@ static READ8_DEVICE_HANDLER (ibm5160_ppi_porta_r)
 
 static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
 {
-	pc_state *st = device->machine->driver_data;
+	pc_state *st = (pc_state *)device->machine->driver_data;
 	int timer2_output = pit8253_get_output( st->pit8253, 2 );
 	int data=0xff;
 	running_machine *machine = device->machine;
@@ -903,7 +903,7 @@ static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
 
 static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 {
-	pc_state *st = device->machine->driver_data;
+	pc_state *st = (pc_state *)device->machine->driver_data;
 	const device_config *keyboard = devtag_get_device(device->machine, "keyboard");
 
 	/* PPI controller port B*/
@@ -942,7 +942,7 @@ static READ8_DEVICE_HANDLER (pc_ppi_porta_r)
 {
 	int data = 0xFF;
 	running_machine *machine = device->machine;
-	pc_state *st = device->machine->driver_data;
+	pc_state *st = (pc_state *)device->machine->driver_data;
 
 	/* KB port A */
 	if (st->ppi_keyboard_clear)
@@ -969,7 +969,7 @@ static READ8_DEVICE_HANDLER (pc_ppi_porta_r)
 
 static WRITE8_DEVICE_HANDLER( pc_ppi_portb_w )
 {
-	pc_state *st = device->machine->driver_data;
+	pc_state *st = (pc_state *)device->machine->driver_data;
 	/* PPI controller port B*/
 	st->ppi_portb = data;
 	st->ppi_portc_switch_high = data & 0x08;
@@ -997,7 +997,7 @@ I8255A_INTERFACE( pc_ppi8255_interface )
 
 static WRITE8_DEVICE_HANDLER ( pcjr_ppi_portb_w )
 {
-	pc_state *st = device->machine->driver_data;
+	pc_state *st = (pc_state *)device->machine->driver_data;
 	/* KB controller port B */
 	st->ppi_portb = data;
 	st->ppi_portc_switch_high = data & 0x08;
@@ -1035,7 +1035,7 @@ static READ8_DEVICE_HANDLER (pcjr_ppi_porta_r )
  */
 static READ8_DEVICE_HANDLER ( pcjr_ppi_portc_r )
 {
-	pc_state *st = device->machine->driver_data;
+	pc_state *st = (pc_state *)device->machine->driver_data;
 	int timer2_output = pit8253_get_output( devtag_get_device(device->machine, "pit8253"), 2 );
 	int data=0xff;
 
@@ -1090,7 +1090,7 @@ I8255A_INTERFACE( pcjr_ppi8255_interface )
 
 static void pc_fdc_interrupt(running_machine *machine, int state)
 {
-	pc_state *st = machine->driver_data;
+	pc_state *st = (pc_state *)machine->driver_data;
 	if ( st->pic8259 ) {
 		pic8259_set_irq_line(st->pic8259, 6, state);
 	}
@@ -1098,7 +1098,7 @@ static void pc_fdc_interrupt(running_machine *machine, int state)
 
 static void pc_fdc_dma_drq(running_machine *machine, int state, int read_)
 {
-	pc_state *st = machine->driver_data;
+	pc_state *st = (pc_state *)machine->driver_data;
 	i8237_dreq2_w( st->dma8237, state);
 }
 
@@ -1126,7 +1126,7 @@ static const struct pc_fdc_interface pcjr_fdc_interface_nc =
 
 
 static void pc_set_irq_line(running_machine *machine,int irq, int state) {
-	pc_state *st = machine->driver_data;
+	pc_state *st = (pc_state *)machine->driver_data;
 	pic8259_set_irq_line(st->pic8259, irq, state);
 }
 
@@ -1314,7 +1314,7 @@ DRIVER_INIT( pc_vga )
 
 static IRQ_CALLBACK(pc_irq_callback)
 {
-	pc_state *st = device->machine->driver_data;
+	pc_state *st = (pc_state *)device->machine->driver_data;
 	return pic8259_acknowledge( st->pic8259 );
 }
 
@@ -1328,7 +1328,7 @@ MACHINE_START( pc )
 MACHINE_RESET( pc )
 {
 	const device_config *speaker = devtag_get_device(machine, "speaker");
-	pc_state *st = machine->driver_data;
+	pc_state *st = (pc_state *)machine->driver_data;
 	memset(st,0,sizeof(st));
 	st->maincpu = devtag_get_device(machine, "maincpu" );
 	cpu_set_irq_callback(st->maincpu, pc_irq_callback);
@@ -1357,7 +1357,7 @@ MACHINE_START( pcjr )
 MACHINE_RESET( pcjr )
 {
 	const device_config *speaker = devtag_get_device(machine, "speaker");
-	pc_state *st = machine->driver_data;
+	pc_state *st = (pc_state *)machine->driver_data;
 	memset(st,0,sizeof(st));
 	st->maincpu = devtag_get_device(machine, "maincpu" );
 	cpu_set_irq_callback(st->maincpu, pc_irq_callback);

@@ -81,7 +81,7 @@ Optional (on expansion card) (Viper)
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "video/awpvid.h"
@@ -180,7 +180,7 @@ static INTERRUPT_GEN( timer_irq )
 
 	    sc1_Inputs[2] = input_port_read(device->machine,"STROBE0");
 
-		generic_pulse_irq_line(cputag_get_cpu(device->machine, "maincpu"), M6809_IRQ_LINE);
+		generic_pulse_irq_line(devtag_get_device(device->machine, "maincpu"), M6809_IRQ_LINE);
 	}
 }
 
@@ -277,7 +277,7 @@ static WRITE8_HANDLER( mmtr_w )
 			if ( changed & (1 << i) )
 			{
 				Mechmtr_update(i, cycles, data & (1 << i) );
-				generic_pulse_irq_line(cputag_get_cpu(space->machine, "maincpu"), M6809_FIRQ_LINE);
+				generic_pulse_irq_line(devtag_get_device(space->machine, "maincpu"), M6809_FIRQ_LINE);
 			}
 		}
 	}
@@ -662,7 +662,7 @@ static void decode_sc1(running_machine *machine,const char *rom_region)
 
 	rom = memory_region(machine,rom_region);
 
-	tmp = alloc_array_or_die(UINT8, 0x10000);
+	tmp = auto_alloc_array(machine, UINT8, 0x10000);
 
 	{
 		int i;
@@ -704,7 +704,7 @@ static void decode_sc1(running_machine *machine,const char *rom_region)
 
 			rom[newaddress] = codec_data[ tmp[address] ];
 		}
-		free( tmp );
+		auto_free( machine, tmp );
 	}
 }
 // machine start (called only once) /////////////////////////////////////////////////

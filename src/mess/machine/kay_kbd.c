@@ -15,7 +15,7 @@
  *
  ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/beep.h"
 #include "kay_kbd.h"
 
@@ -292,7 +292,7 @@ MACHINE_RESET( kay_kbd )
  ******************************************************/
 INTERRUPT_GEN( kay_kbd_interrupt )
 {
-	int mod, row, col, chg, new;
+	int mod, row, col, chg, newval;
 	static int lastrow = 0, mask = 0x00, key = 0x00, repeat = 0, repeater = 0;
 
 	if( repeat )
@@ -307,18 +307,18 @@ INTERRUPT_GEN( kay_kbd_interrupt )
 	}
 
 	row = 9;
-	new = input_port_read(device->machine, "ROW9");
-	chg = keyrows[row] ^ new;
+	newval = input_port_read(device->machine, "ROW9");
+	chg = keyrows[row] ^ newval;
 
-	if (!chg) { new = input_port_read(device->machine, "ROW8"); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read(device->machine, "ROW7"); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read(device->machine, "ROW6"); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read(device->machine, "ROW5"); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read(device->machine, "ROW4"); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read(device->machine, "ROW3"); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read(device->machine, "ROW2"); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read(device->machine, "ROW1"); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read(device->machine, "ROW0"); chg = keyrows[--row] ^ new; }
+	if (!chg) { newval = input_port_read(device->machine, "ROW8"); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = input_port_read(device->machine, "ROW7"); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = input_port_read(device->machine, "ROW6"); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = input_port_read(device->machine, "ROW5"); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = input_port_read(device->machine, "ROW4"); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = input_port_read(device->machine, "ROW3"); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = input_port_read(device->machine, "ROW2"); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = input_port_read(device->machine, "ROW1"); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = input_port_read(device->machine, "ROW0"); chg = keyrows[--row] ^ newval; }
 	if (!chg) --row;
 
 	if (row >= 0)
@@ -331,7 +331,7 @@ INTERRUPT_GEN( kay_kbd_interrupt )
 		if( row == 3 && chg == 0x80 )
 			set_led_status(device->machine, 1, (keyrows[3] & 0x80) ? 0 : 1);
 
-		if (new & chg)	/* key(s) pressed ? */
+		if (newval & chg)	/* key(s) pressed ? */
 		{
 			mod = 0;
 
@@ -347,13 +347,13 @@ INTERRUPT_GEN( kay_kbd_interrupt )
 			if (keyrows[3] & 0x80)
 				mod |= 4;
 
-			/* find new key */
+			/* find newval key */
 			mask = 0x01;
 			for (col = 0; col < 8; col ++)
 			{
 				if (chg & mask)
 				{
-					new &= mask;
+					newval &= mask;
 					key = keyboard[mod][row][col];
 					break;
 				}
@@ -367,11 +367,11 @@ INTERRUPT_GEN( kay_kbd_interrupt )
 			else
 			if( (row == 0) && (chg == 0x04) ) /* Ctrl-@ (NUL) */
 				kay_kbd_in(device->machine, 0);
-			keyrows[row] |= new;
+			keyrows[row] |= newval;
 		}
 		else
 		{
-			keyrows[row] = new;
+			keyrows[row] = newval;
 		}
 		repeat = repeater;
 	}

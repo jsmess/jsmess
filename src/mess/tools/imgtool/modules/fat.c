@@ -606,7 +606,7 @@ static imgtoolerr_t fat_load_fat(imgtool_partition *partition, UINT8 **fat_table
 	table_size = disk_info->sectors_per_fat * disk_info->fat_count * FAT_SECLEN;
 
 	/* allocate the table with extra bytes, in case we "overextend" our reads */
-	table = malloc(table_size + sizeof(UINT64));
+	table = (UINT8*)malloc(table_size + sizeof(UINT64));
 	if (!table)
 	{
 		err = IMGTOOLERR_OUTOFMEMORY;
@@ -1505,7 +1505,8 @@ static imgtoolerr_t fat_construct_dirent(const char *filename, creation_policy_t
 				case 0:
 				case 32:
 					/* need to grow */
-					new_created_entry = (UINT8 *) realloc(created_entry, created_entry_len + FAT_DIRENT_SIZE);
+					if (created_entry) free(created_entry);
+					new_created_entry = (UINT8 *) malloc(created_entry_len + FAT_DIRENT_SIZE);
 					if (!new_created_entry)
 					{
 						err = IMGTOOLERR_OUTOFMEMORY;
@@ -1557,8 +1558,8 @@ static imgtoolerr_t fat_construct_dirent(const char *filename, creation_policy_t
 		/* the short filename suffices; remove the LFN stuff */
 		memcpy(created_entry, created_entry + created_entry_len - FAT_DIRENT_SIZE, FAT_DIRENT_SIZE);
 		created_entry_len = FAT_DIRENT_SIZE;
-
-		new_created_entry = (UINT8 *) realloc(created_entry, created_entry_len);
+		if (created_entry) free(created_entry);
+		new_created_entry = (UINT8 *) malloc(created_entry_len);
 		if (!new_created_entry)
 		{
 			err = IMGTOOLERR_OUTOFMEMORY;

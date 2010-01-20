@@ -31,7 +31,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/cosmicos.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "devices/cassette.h"
@@ -47,7 +47,7 @@
 
 static READ8_DEVICE_HANDLER( video_off_r )
 {
-	cosmicos_state *state = device->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)device->machine->driver_data;
 	UINT8 data = 0;
 
 	if (!state->q)
@@ -60,7 +60,7 @@ static READ8_DEVICE_HANDLER( video_off_r )
 
 static READ8_DEVICE_HANDLER( video_on_r )
 {
-	cosmicos_state *state = device->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)device->machine->driver_data;
 	UINT8 data = 0;
 
 	if (!state->q)
@@ -73,7 +73,7 @@ static READ8_DEVICE_HANDLER( video_on_r )
 
 static WRITE8_DEVICE_HANDLER( audio_latch_w )
 {
-	cosmicos_state *state = device->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)device->machine->driver_data;
 
 	if (state->q)
 	{
@@ -83,7 +83,7 @@ static WRITE8_DEVICE_HANDLER( audio_latch_w )
 
 static READ8_HANDLER( hex_keyboard_r )
 {
-	cosmicos_state *state = space->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)space->machine->driver_data;
 	static const char *const keynames[] = { "ROW1", "ROW2", "ROW3", "ROW4" };
 	UINT8 data = 0;
 	int i;
@@ -106,14 +106,14 @@ static READ8_HANDLER( hex_keyboard_r )
 
 static WRITE8_HANDLER( hex_keylatch_w )
 {
-	cosmicos_state *state = space->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)space->machine->driver_data;
 
 	state->keylatch = data & 0x0f;
 }
 
 static READ8_HANDLER( reset_counter_r )
 {
-	cosmicos_state *state = space->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)space->machine->driver_data;
 
 	state->counter = 0;
 
@@ -122,7 +122,7 @@ static READ8_HANDLER( reset_counter_r )
 
 static WRITE8_HANDLER( segment_w )
 {
-	cosmicos_state *state = space->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)space->machine->driver_data;
 
 	state->counter++;
 
@@ -139,14 +139,14 @@ static WRITE8_HANDLER( segment_w )
 
 static READ8_HANDLER( data_r )
 {
-	cosmicos_state *state = space->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)space->machine->driver_data;
 
 	return state->data;
 }
 
 static WRITE8_HANDLER( display_w )
 {
-	cosmicos_state *state = space->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)space->machine->driver_data;
 
 	state->segment = data;
 }
@@ -174,7 +174,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( data )
 {
-	cosmicos_state *state = field->port->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)field->port->machine->driver_data;
 	UINT8 data = input_port_read(field->port->machine, "DATA");
 	int i;
 
@@ -190,7 +190,7 @@ static INPUT_CHANGED( data )
 
 static INPUT_CHANGED( enter )
 {
-	cosmicos_state *state = field->port->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)field->port->machine->driver_data;
 
 	if (!newval && (state->cdp1802_mode == CDP1802_MODE_LOAD))
 	{
@@ -205,7 +205,7 @@ static INPUT_CHANGED( single_step )
 
 static void set_cdp1802_mode(running_machine *machine, cdp1802_control_mode mode)
 {
-	cosmicos_state *state = machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)machine->driver_data;
 
 	state->cdp1802_mode = mode;
 
@@ -246,7 +246,7 @@ static INPUT_CHANGED( reset ) {	if (!newval) set_cdp1802_mode(field->port->machi
 
 static void clear_input_data(running_machine *machine)
 {
-	cosmicos_state *state = machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)machine->driver_data;
 	int i;
 
 	state->data = 0;
@@ -264,7 +264,7 @@ static INPUT_CHANGED( clear_data )
 
 static void set_ram_mode(running_machine *machine)
 {
-	cosmicos_state *state = machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	if (state->ram_disable)
@@ -289,7 +289,7 @@ static void set_ram_mode(running_machine *machine)
 
 static INPUT_CHANGED( memory_protect )
 {
-	cosmicos_state *state = field->port->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)field->port->machine->driver_data;
 
 	state->ram_protect = newval;
 
@@ -298,7 +298,7 @@ static INPUT_CHANGED( memory_protect )
 
 static INPUT_CHANGED( memory_disable )
 {
-	cosmicos_state *state = field->port->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)field->port->machine->driver_data;
 
 	state->ram_disable = newval;
 
@@ -362,7 +362,7 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK( digit_tick )
 {
-	cosmicos_state *state = timer->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)timer->machine->driver_data;
 
 	state->digit = !state->digit;
 
@@ -376,14 +376,14 @@ static TIMER_DEVICE_CALLBACK( int_tick )
 
 static WRITE_LINE_DEVICE_HANDLER( cosmicos_dmaout_w )
 {
-	cosmicos_state *driver_state = device->machine->driver_data;
+	cosmicos_state *driver_state = (cosmicos_state *)device->machine->driver_data;
 
 	driver_state->dmaout = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cosmicos_efx_w )
 {
-	cosmicos_state *driver_state = device->machine->driver_data;
+	cosmicos_state *driver_state = (cosmicos_state *)device->machine->driver_data;
 
 	driver_state->efx = state;
 }
@@ -407,7 +407,7 @@ static CDP1864_INTERFACE( cosmicos_cdp1864_intf )
 
 static VIDEO_UPDATE( cosmicos )
 {
-	cosmicos_state *state = screen->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)screen->machine->driver_data;
 
 	cdp1864_update(state->cdp1864, bitmap, cliprect);
 
@@ -418,7 +418,7 @@ static VIDEO_UPDATE( cosmicos )
 
 static CDP1802_MODE_READ( cosmicos_mode_r )
 {
-	cosmicos_state *state = device->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)device->machine->driver_data;
 
 	return state->cdp1802_mode;
 }
@@ -432,7 +432,7 @@ static CDP1802_EF_READ( cosmicos_ef_r )
         EF4     ENTER
     */
 
-	cosmicos_state *state = device->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)device->machine->driver_data;
 	UINT8 special = input_port_read(device->machine, "SPECIAL");
 	UINT8 flags = 0x0f;
 
@@ -461,7 +461,7 @@ static CDP1802_EF_READ( cosmicos_ef_r )
 
 static CDP1802_SC_WRITE( cosmicos_sc_w )
 {
-	cosmicos_state *driver_state = device->machine->driver_data;
+	cosmicos_state *driver_state = (cosmicos_state *)device->machine->driver_data;
 
 	if (driver_state->sc1 && !sc1)
 	{
@@ -479,7 +479,7 @@ static CDP1802_SC_WRITE( cosmicos_sc_w )
 
 static WRITE_LINE_DEVICE_HANDLER( cosmicos_q_w )
 {
-	cosmicos_state *driver_state = device->machine->driver_data;
+	cosmicos_state *driver_state = (cosmicos_state *)device->machine->driver_data;
 
 	/* cassette */
 	cassette_output(driver_state->cassette, state ? +1.0 : -1.0);
@@ -495,7 +495,7 @@ static WRITE_LINE_DEVICE_HANDLER( cosmicos_q_w )
 
 static READ8_DEVICE_HANDLER( cosmicos_dma_r )
 {
-	cosmicos_state *state = device->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)device->machine->driver_data;
 
 	return state->data;
 }
@@ -514,7 +514,7 @@ static CDP1802_INTERFACE( cosmicos_config )
 
 static MACHINE_START( cosmicos )
 {
-	cosmicos_state *state = machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
@@ -592,7 +592,7 @@ static const cassette_config cosmicos_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 };
 
 static MACHINE_DRIVER_START( cosmicos )
@@ -653,7 +653,7 @@ ROM_END
 
 static DIRECT_UPDATE_HANDLER( cosmicos_direct_update_handler )
 {
-	cosmicos_state *state = space->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)space->machine->driver_data;
 
 	if (state->boot)
 	{

@@ -104,7 +104,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/micronic.h"
 #include "cpu/z80/z80.h"
 #include "video/hd61830.h"
@@ -136,7 +136,7 @@ static VIDEO_START( micronic )
 
 static VIDEO_UPDATE( micronic )
 {
-	micronic_state *state = screen->machine->driver_data;
+	micronic_state *state = (micronic_state *)screen->machine->driver_data;
 
 	hd61830_update(state->hd61830, bitmap, cliprect);
 
@@ -145,7 +145,7 @@ static VIDEO_UPDATE( micronic )
 
 static MACHINE_START( micronic )
 {
-	micronic_state *state = machine->driver_data;
+	micronic_state *state = (micronic_state *)machine->driver_data;
 
 	/* find devices */
 	state->hd61830 = devtag_get_device(machine, HD61830_TAG);

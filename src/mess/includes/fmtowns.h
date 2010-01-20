@@ -1,7 +1,7 @@
 #ifndef FMTOWNS_H_
 #define FMTOWNS_H_
 
-#include "driver.h"
+#include "emu.h"
 
 READ8_HANDLER( towns_gfx_high_r );
 WRITE8_HANDLER( towns_gfx_high_w );

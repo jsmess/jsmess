@@ -26,7 +26,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/generic.h"
 #include "cpu/spc700/spc700.h"
 #include "cpu/superfx/superfx.h"

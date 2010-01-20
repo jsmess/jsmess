@@ -1,7 +1,7 @@
 #ifndef __CONKORT__
 #define __CONKORT__
 
-#include "driver.h"
+#include "emu.h"
 
 /***************************************************************************
     MACROS / CONSTANTS

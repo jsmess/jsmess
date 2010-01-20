@@ -7,8 +7,7 @@
 
 */
 
-#include "driver.h"
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "audio/cdp1863.h"

@@ -8,7 +8,7 @@
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "upd7002.h"
 
 
@@ -72,7 +72,7 @@ READ8_DEVICE_HANDLER ( uPD7002_EOC_r )
 
 static TIMER_CALLBACK(uPD7002_conversioncomplete)
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	uPD7002_t *uPD7002 = get_safe_token(device);
 
 	int counter_value = param;
@@ -184,7 +184,7 @@ static DEVICE_START( uPD7002 )
 	assert(device->tag != NULL);
 	assert(device->static_config != NULL);
 
-	uPD7002->intf = device->static_config;
+	uPD7002->intf = (const uPD7002_interface*)device->static_config;
 	uPD7002->status = 0;
 	uPD7002->data1 = 0;
 	uPD7002->data0 = 0;

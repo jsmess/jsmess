@@ -6,7 +6,7 @@
 
 *********************************************************************/
 
-#include "mame.h"
+#include "emu.h"
 #include "formats/z80ne_dsk.h"
 #include "formats/basicdsk.h"
 #include "devices/flopdrv.h"
@@ -95,7 +95,7 @@ static const char needle_deleted_data_f8[] = "\x00\x00\x00\x00\x00\x00\x00\x00\x
 
 static struct dmk_tag *get_dmk_tag(floppy_image *floppy)
 {
-	return floppy_tag(floppy);
+	return (dmk_tag *)floppy_tag(floppy);
 }
 
 
@@ -209,7 +209,7 @@ static floperr_t z80ne_dmk_format_track(floppy_image *floppy, int head, int trac
 	track_data = (UINT8 *) track_data_v;
 
 	/* set up sector map */
-	sector_map = malloc(sectors * sizeof(*sector_map));
+	sector_map = (int*)malloc(sectors * sizeof(*sector_map));
 	if (!sector_map)
 	{
 		err = FLOPPY_ERROR_OUTOFMEMORY;
@@ -238,7 +238,7 @@ static floperr_t z80ne_dmk_format_track(floppy_image *floppy, int head, int trac
 			             sector_length +
 			             DMK_DATA_CRC_LEN +
 			             DMK_DATA_GAP_LEN);
-	local_sector = malloc(local_sector_size);
+	local_sector = (UINT8*)malloc(local_sector_size);
 	if (!local_sector)
 	{
 		err = FLOPPY_ERROR_OUTOFMEMORY;
@@ -412,7 +412,7 @@ static floperr_t z80ne_dmk_seek_sector_in_track(floppy_image *floppy, int head, 
 			             DMK_ID_GAP_LEN +
 			             DMK_DAM_LEN +
 			             DMK_DATA_GAP_LEN);
-	local_idam = malloc(local_idam_size);
+	local_idam = (UINT8*)malloc(local_idam_size);
 	if (!local_idam)
 	{
 		err = FLOPPY_ERROR_OUTOFMEMORY;
@@ -601,7 +601,7 @@ static floperr_t internal_z80ne_dmk_read_sector(floppy_image *floppy, int head, 
 
 	/* set up a local physical sector space (DAM + data + crc + GAP) */
 	local_sector_size = (DMK_DAM_LEN + sector_length + DMK_DATA_CRC_LEN + DMK_DATA_GAP_LEN);
-	local_sector = malloc(local_sector_size);
+	local_sector = (UINT8*)malloc(local_sector_size);
 	if (!local_sector)
 	{
 		err = FLOPPY_ERROR_OUTOFMEMORY;
@@ -656,7 +656,7 @@ static floperr_t internal_z80ne_dmk_write_sector(floppy_image *floppy, int head,
 
 	/* set up a local physical sector space */
 	local_sector_size = (DMK_DAM_LEN + sector_length + DMK_DATA_CRC_LEN + DMK_DATA_GAP_LEN);
-	local_sector = malloc(local_sector_size);
+	local_sector = (UINT8*)malloc(local_sector_size);
 	if (!local_sector)
 	{
 		err = FLOPPY_ERROR_OUTOFMEMORY;
@@ -783,7 +783,7 @@ FLOPPY_CONSTRUCT(z80ne_dmk_construct)
 		z80ne_dmk_interpret_header(floppy, &heads, &tracks, &sectors, &track_size);
 	}
 
-	tag = floppy_create_tag(floppy, sizeof(struct dmk_tag));
+	tag = (dmk_tag*)floppy_create_tag(floppy, sizeof(struct dmk_tag));
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
 	tag->heads = heads;

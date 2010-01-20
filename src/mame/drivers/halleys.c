@@ -157,7 +157,7 @@ Video sync   6 F   Video sync                 Post   6 F   Post
 //**************************************************************************
 // Compiler Directives
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
 #include "deprecat.h"
@@ -1947,7 +1947,7 @@ static MACHINE_DRIVER_START( halleys )
 	// video hardware
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(59.50)	/* verified on PCB */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(SCREEN_WIDTH, SCREEN_HEIGHT)

@@ -41,7 +41,7 @@ Note about clickable artwork: it seems the horizontal coordinates can vary
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "glasgow.lh"
 #include "sound/beep.h"

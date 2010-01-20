@@ -57,10 +57,8 @@
             not being addressed properly, causing pitch fluctuation.
 */
 
-#include <math.h>
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
-#include "cpuintrf.h"
 #include "ymf278b.h"
 
 #define VERBOSE 0
@@ -288,6 +286,21 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 
 			for (j = 0; j < samples; j++)
 			{
+				if(slot->stepptr >= slot->endaddr)
+				{
+					slot->stepptr = slot->stepptr - slot->endaddr + slot->loopaddr;
+					// If the step is bigger than the loop, finish the sample forcibly
+					if(slot->stepptr >= slot->endaddr)
+					{
+						slot->env_vol = 256U<<23;
+						slot->env_vol_step = 0;
+						slot->env_vol_lim = 0;
+						slot->active = 0;
+						slot->stepptr = 0;
+						slot->step = 0;
+					}
+				}
+
 				switch (slot->bits)
 				{
 					case 8: 	// 8 bit
@@ -312,20 +325,6 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 
 				// update frequency
 				slot->stepptr += slot->step;
-				if(slot->stepptr >= slot->endaddr)
-				{
-					slot->stepptr = slot->stepptr - slot->endaddr + slot->loopaddr;
-					// If the step is bigger than the loop, finish the sample forcibly
-					if(slot->stepptr >= slot->endaddr)
-					{
-						slot->env_vol = 256U<<23;
-						slot->env_vol_step = 0;
-						slot->env_vol_lim = 0;
-						slot->active = 0;
-						slot->stepptr = 0;
-						slot->step = 0;
-					}
-				}
 
 				// update envelope
 				slot->env_vol += slot->env_vol_step;
@@ -669,7 +668,7 @@ WRITE8_DEVICE_HANDLER( ymf278b_w )
 
 static void ymf278b_init(const device_config *device, YMF278BChip *chip, void (*cb)(const device_config *, int))
 {
-	chip->rom = device->region;
+	chip->rom = *device->region;
 	chip->irq_callback = cb;
 	chip->timer_a = timer_alloc(device->machine, ymf278b_timer_a_tick, chip);
 	chip->timer_b = timer_alloc(device->machine, ymf278b_timer_b_tick, chip);

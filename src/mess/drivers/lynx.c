@@ -6,7 +6,7 @@
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/lynx.h"
 
@@ -139,7 +139,7 @@ ROM_END
 
 static QUICKLOAD_LOAD( lynx )
 {
-	const device_config *cpu = cputag_get_cpu(image->machine, "maincpu");
+	const device_config *cpu = devtag_get_device(image->machine, "maincpu");
 	const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *data = NULL;
 	UINT8 *rom = memory_region(image->machine, "maincpu");
@@ -158,7 +158,7 @@ static QUICKLOAD_LOAD( lynx )
 	length = header[5] | (header[4]<<8);
 	length -= 10;
 
-	data = malloc(length);
+	data = (UINT8*)malloc(length);
 
 	if (image_fread(image, data, length) != length)
 		return INIT_FAIL;

@@ -583,7 +583,7 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "machine/eeprom.h"
@@ -7596,7 +7596,7 @@ static DRIVER_INIT( cps2 )
 	state->scancount = 0;
 	state->cps2networkpresent = 0;
 
-	cpu_set_clockscale(cputag_get_cpu(machine, "maincpu"), 0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
+	cpu_set_clockscale(devtag_get_device(machine, "maincpu"), 0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
 static DRIVER_INIT( ssf2tb )

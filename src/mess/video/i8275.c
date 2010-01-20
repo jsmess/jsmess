@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "i8275.h"
 
 #define I8275_COMMAND_RESET				0
@@ -501,7 +501,7 @@ static DEVICE_START( i8275 )
 	assert(device->tag != NULL);
 	assert(device->static_config != NULL);
 
-	i8275->intf = device->static_config;
+	i8275->intf = (const i8275_interface*)device->static_config;
 
 	assert(i8275->intf->display_pixels != NULL);
 

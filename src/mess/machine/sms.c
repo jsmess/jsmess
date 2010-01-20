@@ -1,4 +1,5 @@
-#include "driver.h"
+#include "emu.h"
+#include "crsshair.h"
 #include "image.h"
 #include "includes/sms.h"
 #include "video/smsvdp.h"
@@ -200,7 +201,7 @@ static UINT8 sms_vdp_hcount( running_machine *machine )
 		time_end = attotime_zero;
 	else
 		time_end = video_screen_get_time_until_pos(screen, vpos, max_hpos);
-	calc_cycles = cpu_attotime_to_clocks(cputag_get_cpu(machine, "maincpu"), time_end);
+	calc_cycles = cpu_attotime_to_clocks(devtag_get_device(machine, "maincpu"), time_end);
 
 	/* equation got from SMSPower forum, posted by Flubba. */
 	tmp = ((590 - (calc_cycles * 3)) / 4) & 0xff;
@@ -1418,7 +1419,7 @@ MACHINE_RESET( sms )
 	if (sms_state.has_fm)
 		sms_state.fm_detect = 0x01;
 
-	sms_state.mapper_ram = memory_get_write_ptr(space, 0xdffc);
+	sms_state.mapper_ram = (UINT8*)memory_get_write_ptr(space, 0xdffc);
 
 	sms_state.bios_port = 0;
 
@@ -1520,7 +1521,7 @@ WRITE8_HANDLER( sms_store_control_w )
 	else
 	{
 		/* Pull reset line of CPU #0 low */
-		device_reset(cputag_get_cpu(space->machine, "maincpu"));
+		device_reset(devtag_get_device(space->machine, "maincpu"));
 		cputag_suspend(space->machine, "maincpu", SUSPEND_REASON_HALT, 1);
 	}
 	sms_state.store_control = data;

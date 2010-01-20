@@ -11,18 +11,23 @@
 
 #pragma once
 
+#ifndef __EMU_H__
+#error Dont include this file directly; include emu.h instead.
+#endif
+
 #ifndef __DEVINTRF_H__
 #define __DEVINTRF_H__
 
-#include "mamecore.h"
-#include "romload.h"
-#include "memory.h"
-#include "tagmap.h"
 
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
+
+/* forward references */
+struct rom_entry;
+union machine_config_token;
+
 
 /* device classes */
 enum _device_class
@@ -166,7 +171,7 @@ enum
 #define DEVICE_VALIDITY_CHECK_CALL(name)	DEVICE_VALIDITY_CHECK_NAME(name)(driver, device)
 
 #define DEVICE_CUSTOM_CONFIG_NAME(name)		device_custom_config_##name
-#define DEVICE_CUSTOM_CONFIG(name)			const union _machine_config_token *DEVICE_CUSTOM_CONFIG_NAME(name)(const device_config *device, UINT32 entrytype, const union _machine_config_token *tokens)
+#define DEVICE_CUSTOM_CONFIG(name)			const machine_config_token *DEVICE_CUSTOM_CONFIG_NAME(name)(const device_config *device, UINT32 entrytype, const machine_config_token *tokens)
 #define DEVICE_CUSTOM_CONFIG_CALL(name)		DEVICE_CUSTOM_CONFIG_NAME(name)(device, entrytype, tokens)
 
 
@@ -183,15 +188,14 @@ enum
 
 
 /* shorthand for accessing devices by machine/type/tag */
-#define devtag_get_device(mach,tag)							device_list_find_by_tag(&(mach)->config->devicelist, tag)
+#define devtag_get_device(mach,tag)							(mach)->device(tag)
 
-#define devtag_reset(mach,tag)								device_reset(devtag_get_device(mach, tag))
-#define devtag_get_address_space(mach,tag,space)
+#define devtag_reset(mach,tag)								device_reset((mach)->device(tag))
 
-#define devtag_get_info_int(mach,tag,state)					device_get_info_int(devtag_get_device(mach, tag), state)
-#define devtag_get_info_ptr(mach,tag,state)					device_get_info_ptr(devtag_get_device(mach, tag), state)
-#define devtag_get_info_fct(mach,tag,state)					device_get_info_fct(devtag_get_device(mach, tag), state)
-#define devtag_get_info_string(mach,tag,state)				device_get_info_string(devtag_get_device(mach, tag), state)
+#define devtag_get_info_int(mach,tag,state)					device_get_info_int((mach)->device(tag), state)
+#define devtag_get_info_ptr(mach,tag,state)					device_get_info_ptr((mach)->device(tag), state)
+#define devtag_get_info_fct(mach,tag,state)					device_get_info_fct((mach)->device(tag), state)
+#define devtag_get_info_string(mach,tag,state)				device_get_info_string((mach)->device(tag), state)
 
 
 /* shorthand for getting standard data about device types */
@@ -236,12 +240,12 @@ enum
 ***************************************************************************/
 
 /* forward-declare these types */
-typedef union _deviceinfo deviceinfo;
+class device_config;
+union deviceinfo;
 
 
 /* a device contract */
-typedef struct _device_contract device_contract;
-struct _device_contract
+struct device_contract
 {
 	const char *	name;			/* name of this contract */
 	UINT32			size;			/* size of this contract in bytes */
@@ -257,7 +261,7 @@ typedef INT32 (*device_execute_func)(const device_config *device, INT32 clocks);
 typedef void (*device_reset_func)(const device_config *device);
 typedef void (*device_nvram_func)(const device_config *device, mame_file *file, int read_or_write);
 typedef int (*device_validity_check_func)(const game_driver *driver, const device_config *device);
-typedef const union _machine_config_token *(*device_custom_config_func)(const device_config *device, UINT32 entrytype, const union _machine_config_token *tokens);
+typedef const machine_config_token *(*device_custom_config_func)(const device_config *device, UINT32 entrytype, const machine_config_token *tokens);
 
 
 /* a device_type is simply a pointer to its get_info function */
@@ -265,7 +269,7 @@ typedef device_get_info_func device_type;
 
 
 /* the actual deviceinfo union */
-union _deviceinfo
+union deviceinfo
 {
 	INT64					i;							/* generic integers */
 	void *					p;							/* generic pointers */
@@ -280,7 +284,7 @@ union _deviceinfo
 	device_custom_config_func custom_config;			/* DEVINFO_FCT_CUSTOM_CONFIG */
 	device_nvram_func		nvram;						/* DEVINFO_FCT_NVRAM */
 	const rom_entry *		romregion;					/* DEVINFO_PTR_ROM_REGION */
-	const union _machine_config_token *machine_config;	/* DEVINFO_PTR_MACHINE_CONFIG */
+	const machine_config_token *machine_config;			/* DEVINFO_PTR_MACHINE_CONFIG */
 	const device_contract *	contract_list;				/* DEVINFO_PTR_CONTRACT_LIST */
 	const addrmap8_token *	internal_map8;				/* DEVINFO_PTR_INTERNAL_MEMORY_MAP */
 	const addrmap16_token *	internal_map16;				/* DEVINFO_PTR_INTERNAL_MEMORY_MAP */
@@ -294,8 +298,32 @@ union _deviceinfo
 
 
 /* the configuration for a general device */
-struct _device_config
+enum device_space
 {
+	AS_PROGRAM = 0,
+	AS_DATA = 1,
+	AS_IO = 2
+};
+
+class region_info;
+
+class device_config
+{
+	DISABLE_COPYING(device_config);
+
+public:	// private eventually
+	const address_space *	addrspace[ADDRESS_SPACES];	/* auto-discovered address spaces */
+
+public:
+	device_config(const device_config *owner, device_type type, const char *tag, UINT32 clock);
+	~device_config();
+
+	inline const address_space *space(int index = 0) const;
+	inline const address_space *space(device_space index) const;
+
+	const region_info *subregion(const char *tag) const;
+	const device_config *subdevice(const char *tag) const;
+
 	/* device relationships (always valid) */
 	device_config *			next;					/* next device (of any type/class) */
 	device_config *			owner;					/* device that owns us, or NULL if nobody */
@@ -303,6 +331,7 @@ struct _device_config
 	device_config *			classnext;				/* next device of the same class */
 
 	/* device properties (always valid) */
+	astring 				tag;					/* tag for this instance */
 	device_type				type;					/* device type */
 	device_class			devclass;				/* device class */
 
@@ -319,22 +348,16 @@ struct _device_config
 	UINT8					started;				/* TRUE if the start function has succeeded */
 	void *					token;					/* token if device is live */
 	UINT32					tokenbytes;				/* size of the token data allocated */
-	UINT8 *					region;					/* pointer to region with the device's tag, or NULL */
-	UINT32					regionbytes;			/* size of the region, in bytes */
-	const address_space *	space[ADDRESS_SPACES];	/* auto-discovered address spaces */
 	device_execute_func 	execute;				/* quick pointer to execute callback */
-
-	/* tag (always valid; at end because it is variable-length) */
-	char					tag[1];					/* tag for this instance */
+	const region_info *		region;					/* our device-local region */
 };
 
 
 /* an object that contains a list of devices */
-typedef struct _device_list device_list;
-struct _device_list
+struct device_list
 {
-	device_config *			head;					/* head of the list */
-	tagmap *				map;					/* map for fast lookups */
+	device_config *				head;				/* head of the list */
+	tagmap_t<device_config *>	map;		/* map for fast lookups */
 };
 
 
@@ -359,10 +382,10 @@ device_config *device_list_add(device_list *devlist, const device_config *owner,
 void device_list_remove(device_list *devlist, const char *tag);
 
 /* build a tag that combines the device's name and the given tag */
-const char *device_build_tag(astring *dest, const device_config *device, const char *tag);
+astring &device_build_tag(astring &dest, const device_config *device, const char *tag);
 
 /* build a tag with the same device prefix as the source tag*/
-const char *device_inherit_tag(astring *dest, const char *sourcetag, const char *tag);
+astring &device_inherit_tag(astring &dest, const char *sourcetag, const char *tag);
 
 /* find a given contract on a device */
 const device_contract *device_get_contract(const device_config *device, const char *name);
@@ -474,12 +497,25 @@ const char *devtype_get_info_string(device_type type, UINT32 state);
 INLINE const device_config *device_list_find_by_tag(const device_list *devlist, const char *tag)
 {
 	/* if we have a map, use it */
-	if (devlist->map != NULL)
-		return (const device_config *)tagmap_find_hash_only(devlist->map, tag);
-
-	/* otherwise, go the slow route */
-	return device_list_find_by_tag_slow(devlist, tag);
+	return devlist->map.find_hash_only(tag);
 }
+
+
+/*-------------------------------------------------
+    space - return an address space within a
+    device
+-------------------------------------------------*/
+
+inline const address_space *device_config::space(int index) const
+{
+	return (addrspace[index] != NULL) ? addrspace[index] : memory_find_address_space(this, index);
+}
+
+inline const address_space *device_config::space(device_space index) const
+{
+	return space(static_cast<int>(index));
+}
+
 
 
 #endif	/* __DEVINTRF_H__ */

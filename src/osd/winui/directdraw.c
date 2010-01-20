@@ -151,7 +151,7 @@ BOOL DirectDraw_Initialize(void)
 	if (g_hDLL == NULL)
 		return FALSE;
 
-	ddc = (ddc_proc)GetProcAddress(g_hDLL, "DirectDrawCreate");
+	ddc = (ddc_proc)GetProcAddress((HINSTANCE)g_hDLL, "DirectDrawCreate");
 	if (ddc == NULL)
 		return FALSE;
 
@@ -165,11 +165,11 @@ BOOL DirectDraw_Initialize(void)
 		return FALSE;
 	}
 
-	hr = IDirectDraw_QueryInterface(pDirectDraw1, &IID_IDirectDraw4, (void**)&g_pDirectDraw4);
+	hr = IDirectDraw_QueryInterface(pDirectDraw1, IID_IDirectDraw4, (void**)&g_pDirectDraw4);
 	if (FAILED(hr))
 	{
 		g_pDirectDraw4 = NULL;
-		hr = IDirectDraw_QueryInterface(pDirectDraw1, &IID_IDirectDraw2, (void**)&g_pDirectDraw2);
+		hr = IDirectDraw_QueryInterface(pDirectDraw1, IID_IDirectDraw2, (void**)&g_pDirectDraw2);
 		if (FAILED(hr))
 		{
 			ErrorMsg("Query Interface for DirectDraw 2 failed: %s", DirectXDecodeError(hr));
@@ -198,7 +198,7 @@ BOOL DirectDraw_Initialize(void)
 	   function to retrieve (see the following text).
 	   For this example, we use the ANSI version.
 	 */
-	pDDEnumEx = (LPDIRECTDRAWENUMERATEEX) GetProcAddress(g_hDLL, SDirectDrawEnumerateEx);
+	pDDEnumEx = (LPDIRECTDRAWENUMERATEEX) GetProcAddress((HINSTANCE)g_hDLL, SDirectDrawEnumerateEx);
 
 	/*
 	   If the function is there, call it to enumerate all display devices
@@ -213,7 +213,7 @@ BOOL DirectDraw_Initialize(void)
 	{
 		LPDIRECTDRAWENUMERATE lpDDEnum;
 
-		lpDDEnum = (LPDIRECTDRAWENUMERATE) GetProcAddress(g_hDLL, SDirectDrawEnumerate);
+		lpDDEnum = (LPDIRECTDRAWENUMERATE) GetProcAddress((HINSTANCE)g_hDLL, SDirectDrawEnumerate);
 		/*
 		 * We must be running on an old version of ddraw. Therefore, 
 		 * by definiton, multimon isn't supported. Fall back on
@@ -275,7 +275,7 @@ void DirectDraw_Close(void)
 
 	if (g_hDLL)
 	{
-		FreeLibrary(g_hDLL);
+		FreeLibrary((HINSTANCE)g_hDLL);
 		g_hDLL = NULL;
 	}
 }
@@ -322,7 +322,7 @@ static BOOL WINAPI DDEnumInfo(GUID FAR *lpGUID,
 							  LPVOID	lpContext,
 							  HMONITOR	hm)
 {
-	g_Displays[g_nNumDisplays].name = malloc((_tcslen(lpDriverDescription) + 1) * sizeof(TCHAR));
+	g_Displays[g_nNumDisplays].name = (TCHAR*)malloc((_tcslen(lpDriverDescription) + 1) * sizeof(TCHAR));
 	_tcscpy(g_Displays[g_nNumDisplays].name, lpDriverDescription);
 	
 	if (lpGUID == NULL)

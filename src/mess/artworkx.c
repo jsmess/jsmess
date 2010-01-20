@@ -8,8 +8,8 @@
 
 #include <ctype.h>
 
-#include "mame.h"
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "artworkx.h"
 #include "image.h"
 #include "png.h"

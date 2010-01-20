@@ -7,7 +7,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "com8116.h"
 
 /***************************************************************************
@@ -70,7 +70,7 @@ WRITE8_DEVICE_HANDLER( com8116_str_w )
 {
 	com8116_t *com8116 = get_safe_token(device);
 
-	if (LOG) logerror("COM8116 '%s' Receiver Divider %01x\n", device->tag, data & 0x0f);
+	if (LOG) logerror("COM8116 '%s' Receiver Divider %01x\n", device->tag.cstr(), data & 0x0f);
 
 	com8116->fr = data & 0x0f;
 
@@ -85,7 +85,7 @@ WRITE8_DEVICE_HANDLER( com8116_stt_w )
 {
 	com8116_t *com8116 = get_safe_token(device);
 
-	if (LOG) logerror("COM8116 '%s' Transmitter Divider %01x\n", device->tag, data & 0x0f);
+	if (LOG) logerror("COM8116 '%s' Transmitter Divider %01x\n", device->tag.cstr(), data & 0x0f);
 
 	com8116->ft = data & 0x0f;
 
@@ -98,7 +98,7 @@ WRITE8_DEVICE_HANDLER( com8116_stt_w )
 
 static TIMER_CALLBACK( fx4_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	com8116_t *com8116 = get_safe_token(device);
 
 	devcb_call_write_line(&com8116->out_fx4_func, 1);
@@ -110,7 +110,7 @@ static TIMER_CALLBACK( fx4_tick )
 
 static TIMER_CALLBACK( fr_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	com8116_t *com8116 = get_safe_token(device);
 
 	devcb_call_write_line(&com8116->out_fr_func, 1);
@@ -122,7 +122,7 @@ static TIMER_CALLBACK( fr_tick )
 
 static TIMER_CALLBACK( ft_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	com8116_t *com8116 = get_safe_token(device);
 
 	devcb_call_write_line(&com8116->out_ft_func, 1);

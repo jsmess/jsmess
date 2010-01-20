@@ -34,6 +34,7 @@
 
 *****************************************************************************/
 
+#include "emu.h"
 #include "debugger.h"
 #include "konami.h"
 
@@ -404,7 +405,7 @@ static CPU_INIT( konami )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	state_save_register_device_item(device, 0, PC);
 	state_save_register_device_item(device, 0, U);

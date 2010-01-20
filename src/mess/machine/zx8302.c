@@ -19,7 +19,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "zx8302.h"
 #include "devices/microdrv.h"
 #include <time.h>
@@ -194,7 +194,7 @@ WRITE8_DEVICE_HANDLER( zx8302_irq_acknowledge_w )
 
 static TIMER_CALLBACK( zx8302_ipc_tick )
 {
-	zx8302_t *zx8302 = get_safe_token(ptr);
+	zx8302_t *zx8302 = get_safe_token((const device_config *)ptr);
 
 	zx8302->baudx4 = !zx8302->baudx4;
 	devcb_call_write_line(&zx8302->out_baudx4_func, zx8302->baudx4);
@@ -310,13 +310,13 @@ WRITE_LINE_DEVICE_HANDLER( zx8302_comdata_w )
 
 static TIMER_CALLBACK( zx8302_delayed_ipc_command )
 {
-	zx8302_t *zx8302 = get_safe_token(ptr);
+	zx8302_t *zx8302 = get_safe_token((const device_config *)ptr);
 
 	zx8302->idr = param;
 	zx8302->ipc_state = ZX8302_IPC_START;
 	zx8302->ipc_rx = 0;
 
-	zx8302_ipc_comm_tick(ptr);
+	zx8302_ipc_comm_tick((const device_config *)ptr);
 }
 
 /*-------------------------------------------------
@@ -367,34 +367,34 @@ static WRITE_LINE_DEVICE_HANDLER( zx8302_txd )
 
 static TIMER_CALLBACK( zx8302_txd_tick )
 {
-	zx8302_t *zx8302 = get_safe_token(ptr);
+	zx8302_t *zx8302 = get_safe_token((const device_config *)ptr);
 
 	switch (zx8302->tx_bits)
 	{
 	case ZX8302_TXD_START:
 		if (!(zx8302->irq & ZX8302_INT_TRANSMIT))
 		{
-			zx8302_txd(ptr, 0);
+			zx8302_txd((const device_config *)ptr, 0);
 			zx8302->tx_bits++;
 		}
 		break;
 
 	default:
-		zx8302_txd(ptr, BIT(zx8302->tdr, 0));
+		zx8302_txd((const device_config *)ptr, BIT(zx8302->tdr, 0));
 		zx8302->tdr >>= 1;
 		zx8302->tx_bits++;
 		break;
 
 	case ZX8302_TXD_STOP:
-		zx8302_txd(ptr, 1);
+		zx8302_txd((const device_config *)ptr, 1);
 		zx8302->tx_bits++;
 		break;
 
 	case ZX8302_TXD_STOP2:
-		zx8302_txd(ptr, 1);
+		zx8302_txd((const device_config *)ptr, 1);
 		zx8302->tx_bits = ZX8302_TXD_START;
 		zx8302->status &= ~ZX8302_STATUS_TX_BUFFER_FULL;
-		zx8302_interrupt(ptr, ZX8302_INT_TRANSMIT);
+		zx8302_interrupt((const device_config *)ptr, ZX8302_INT_TRANSMIT);
 		break;
 	}
 }
@@ -438,7 +438,7 @@ WRITE8_DEVICE_HANDLER( zx8302_control_w )
 
 static TIMER_CALLBACK( zx8302_rtc_tick )
 {
-	zx8302_t *zx8302 = get_safe_token(ptr);
+	zx8302_t *zx8302 = get_safe_token((const device_config *)ptr);
 
 	zx8302->ctr++;
 }
@@ -483,11 +483,11 @@ WRITE8_DEVICE_HANDLER( zx8302_rtc_w )
 
 static TIMER_CALLBACK( zx8302_gap_tick )
 {
-	zx8302_t *zx8302 = get_safe_token(ptr);
+	zx8302_t *zx8302 = get_safe_token((const device_config *)ptr);
 
 	if (zx8302->mdv_motor)
 	{
-		zx8302_interrupt(ptr, ZX8302_INT_GAP);
+		zx8302_interrupt((const device_config *)ptr, ZX8302_INT_GAP);
 	}
 }
 

@@ -31,7 +31,7 @@
            Adjust the one shot and A/D timing (sn76477)
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/sn76477.h"   // for sn sound
 
 #include "includes/hec2hrp.h"

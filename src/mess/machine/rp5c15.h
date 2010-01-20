@@ -5,7 +5,7 @@
 #ifndef RP5C15_H_
 #define RP5C15_H_
 
-#include "driver.h"
+#include "emu.h"
 
 typedef struct rp5c15_interface rp5c15_intf;
 struct rp5c15_interface

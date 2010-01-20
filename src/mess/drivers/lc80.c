@@ -18,7 +18,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/lc80.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -154,7 +154,7 @@ static WRITE8_DEVICE_HANDLER( pio1_port_a_w )
 
     */
 
-	lc80_state *state = device->machine->driver_data;
+	lc80_state *state = (lc80_state *)device->machine->driver_data;
 
 	state->segment = BITSWAP8(~data, 4, 3, 1, 6, 7, 5, 0, 2);
 
@@ -178,7 +178,7 @@ static READ8_DEVICE_HANDLER( pio1_port_b_r )
 
     */
 
-	lc80_state *state = device->machine->driver_data;
+	lc80_state *state = (lc80_state *)device->machine->driver_data;
 
 	return (cassette_input(state->cassette) < +0.0);
 }
@@ -200,7 +200,7 @@ static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
 
     */
 
-	lc80_state *state = device->machine->driver_data;
+	lc80_state *state = (lc80_state *)device->machine->driver_data;
 
 	/* tape output */
 	cassette_output(state->cassette, BIT(data, 1) ? +1.0 : -1.0);
@@ -246,7 +246,7 @@ static READ8_DEVICE_HANDLER( pio2_port_b_r )
 
     */
 
-	lc80_state *state = device->machine->driver_data;
+	lc80_state *state = (lc80_state *)device->machine->driver_data;
 	UINT8 data = 0xf0;
 	int i;
 
@@ -289,7 +289,7 @@ static const z80_daisy_chain lc80_daisy_chain[] =
 
 static MACHINE_START( lc80 )
 {
-	lc80_state *state = machine->driver_data;
+	lc80_state *state = (lc80_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
@@ -350,7 +350,7 @@ static const cassette_config lc80_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 };
 
 static MACHINE_DRIVER_START( lc80 )

@@ -16,7 +16,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/zx.h"
 #include "sound/dac.h"
@@ -111,7 +111,7 @@ static TIMER_CALLBACK(zx_ula_nmi)
 
 	r.min_y = r.max_y = ula_scanline_count;
 	bitmap_fill(bitmap, &r, 1);
-//  logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R), (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC));
+//  logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_R), (unsigned) cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_PC));
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	if (++ula_scanline_count == height)
 		ula_scanline_count = 0;
@@ -127,7 +127,7 @@ static TIMER_CALLBACK(zx_ula_irq)
      */
 	if (ula_irq_active)
 	{
-//      logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R), (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC));
+//      logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_R), (unsigned) cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_PC));
 
 		ula_irq_active = 0;
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
@@ -145,13 +145,13 @@ void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT
 	{
 		bitmap_t *bitmap = machine->generic.tmpbitmap;
 		UINT16 y, *scanline;
-		UINT16 ireg = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_I) << 8;
+		UINT16 ireg = cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_I) << 8;
 		UINT8 data, *chrgen, creg;
 
 		if (param)
-			creg = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_B);
+			creg = cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_B);
 		else
-			creg = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_C);
+			creg = cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_C);
 
 		chrgen = memory_region(machine, region);
 

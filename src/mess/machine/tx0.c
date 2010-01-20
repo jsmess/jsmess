@@ -4,7 +4,7 @@
     Raphael Nabet, 2004
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/pdp1/tx0.h"
 #include "includes/tx0.h"
 #include "video/crt.h"
@@ -58,57 +58,68 @@ static typewriter_t typewriter;
 static emu_timer *dis_timer;
 
 
+enum state_t
+{
+	MTS_UNSELECTED,
+	MTS_SELECTING,
+	MTS_SELECTED,
+	MTS_UNSELECTING
+};
+enum backspace_state_t
+{
+	MTBSS_STATE0,
+	MTBSS_STATE1,
+	MTBSS_STATE2,
+	MTBSS_STATE3,
+	MTBSS_STATE4,
+	MTBSS_STATE5,
+	MTBSS_STATE6
+};
+enum state_2_t
+{
+	MTRDS_STATE0,
+	MTRDS_STATE1,
+	MTRDS_STATE2,
+	MTRDS_STATE3,
+	MTRDS_STATE4,
+	MTRDS_STATE5,
+	MTRDS_STATE6
+};
+enum state_3_t
+{
+	MTWTS_STATE0,
+	MTWTS_STATE1,
+	MTWTS_STATE2,
+	MTWTS_STATE3
+};
+
+enum irg_pos_t
+{
+	MTIRGP_START,
+	MTIRGP_ENDMINUS1,
+	MTIRGP_END
+};
 /* magnetic tape unit registers */
 typedef struct magtape_t
 {
 	const device_config *img;		/* image descriptor */
 
-	enum
-	{
-		MTS_UNSELECTED,
-		MTS_SELECTING,
-		MTS_SELECTED,
-		MTS_UNSELECTING
-	} state;
+	state_t state;
 
 	int command;
 	int binary_flag;
 
 	union
 	{
-		enum
-		{
-			MTBSS_STATE0,
-			MTBSS_STATE1,
-			MTBSS_STATE2,
-			MTBSS_STATE3,
-			MTBSS_STATE4,
-			MTBSS_STATE5,
-			MTBSS_STATE6
-		} backspace_state;
+		backspace_state_t backspace_state;
 		struct
 		{
-			enum
-			{
-				MTRDS_STATE0,
-				MTRDS_STATE1,
-				MTRDS_STATE2,
-				MTRDS_STATE3,
-				MTRDS_STATE4,
-				MTRDS_STATE5,
-				MTRDS_STATE6
-			} state;
+			state_2_t state;
 			int space_flag;
 		} read;
 		struct
 		{
-			enum
-			{
-				MTWTS_STATE0,
-				MTWTS_STATE1,
-				MTWTS_STATE2,
-				MTWTS_STATE3
-			} state;
+			state_3_t state;
 			int counter;
 		} write;
 	} u;
@@ -116,12 +127,7 @@ typedef struct magtape_t
 	int sel_pending;
 	int cpy_pending;
 
-	enum
-	{
-		MTIRGP_START,
-		MTIRGP_ENDMINUS1,
-		MTIRGP_END
-	} irg_pos;			/* position relative to inter-record gap */
+	irg_pos_t irg_pos;			/* position relative to inter-record gap */
 
 	int long_parity;
 
@@ -323,20 +329,20 @@ static TIMER_CALLBACK(reader_callback)
 			if (data & 0100)
 			{
 				/* read current AC */
-				ac = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), TX0_AC);
+				ac = cpu_get_reg(devtag_get_device(machine, "maincpu"), TX0_AC);
 				/* cycle right */
 				ac = (ac >> 1) | ((ac & 1) << 17);
 				/* shuffle and insert data into AC */
 				ac = (ac /*& 0333333*/) | ((data & 001) << 17) | ((data & 002) << 13) | ((data & 004) << 9) | ((data & 010) << 5) | ((data & 020) << 1) | ((data & 040) >> 3);
 				/* write modified AC */
-				cpu_set_reg(cputag_get_cpu(machine, "maincpu"), TX0_AC, ac);
+				cpu_set_reg(devtag_get_device(machine, "maincpu"), TX0_AC, ac);
 
 				tape_reader.rc = (tape_reader.rc+1) & 3;
 
 				if (tape_reader.rc == 0)
 				{	/* IO complete */
 					tape_reader.rcl = 0;
-					cpu_set_reg(cputag_get_cpu(machine, "maincpu"), TX0_IO_COMPLETE, 0);
+					cpu_set_reg(devtag_get_device(machine, "maincpu"), TX0_IO_COMPLETE, 0);
 				}
 			}
 		}
@@ -354,7 +360,7 @@ static TIMER_CALLBACK(reader_callback)
 */
 static TIMER_CALLBACK(puncher_callback)
 {
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), TX0_IO_COMPLETE, 0);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), TX0_IO_COMPLETE, 0);
 }
 
 /*
@@ -442,7 +448,7 @@ static void typewriter_out(running_machine *machine, UINT8 data)
 */
 static TIMER_CALLBACK(prt_callback)
 {
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), TX0_IO_COMPLETE, 0);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), TX0_IO_COMPLETE, 0);
 }
 
 /*
@@ -468,7 +474,7 @@ void tx0_io_prt(const device_config *device)
 */
 static TIMER_CALLBACK(dis_callback)
 {
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), TX0_IO_COMPLETE, 0);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), TX0_IO_COMPLETE, 0);
 }
 
 /*
@@ -582,7 +588,7 @@ DEVICE_IMAGE_UNLOAD( tx0_magtape )
 		if ((magtape.state == MTS_SELECTED) || ((magtape.state == MTS_SELECTING) && (magtape.command == 2)))
 		{	/* unit has become unavailable */
 			magtape.state = MTS_UNSELECTING;
-			cpu_set_reg(cputag_get_cpu(image->machine, "maincpu"), TX0_PF, cpu_get_reg(cputag_get_cpu(image->machine, "maincpu"), TX0_PF) | PF_RWC);
+			cpu_set_reg(devtag_get_device(image->machine, "maincpu"), TX0_PF, cpu_get_reg(devtag_get_device(image->machine, "maincpu"), TX0_PF) | PF_RWC);
 			schedule_unselect();
 		}
 	}
@@ -991,7 +997,7 @@ static void magtape_callback(const device_config *device)
 				else
 				{
 					buf = magtape.long_parity;
-					magtape.state = MTWTS_STATE3;
+					magtape.state = (state_t)MTWTS_STATE3;
 					magtape.u.write.counter = 150;
 				}
 				break;
@@ -1124,7 +1130,7 @@ static void tx0_keyboard(running_machine *machine)
             previous LR */
 			lr = (1 << 17) | ((charcode & 040) << 10) | ((charcode & 020) << 8) | ((charcode & 010) << 6) | ((charcode & 004) << 4) | ((charcode & 002) << 2) | ((charcode & 001) << 1);
 			/* write modified LR */
-			cpu_set_reg(cputag_get_cpu(machine, "maincpu"), TX0_LR, lr);
+			cpu_set_reg(devtag_get_device(machine, "maincpu"), TX0_LR, lr);
 			tx0_typewriter_drawchar(machine, charcode);	/* we want to echo input */
 			break;
 		}
@@ -1160,31 +1166,31 @@ INTERRUPT_GEN( tx0_interrupt )
 
 		if (control_transitions & tx0_stop_cyc0)
 		{
-			cpu_set_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_STOP_CYC0, !cpu_get_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_STOP_CYC0));
+			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_STOP_CYC0, !cpu_get_reg(devtag_get_device(device->machine, "maincpu"), TX0_STOP_CYC0));
 		}
 		if (control_transitions & tx0_stop_cyc1)
 		{
-			cpu_set_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_STOP_CYC1, !cpu_get_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_STOP_CYC1));
+			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_STOP_CYC1, !cpu_get_reg(devtag_get_device(device->machine, "maincpu"), TX0_STOP_CYC1));
 		}
 		if (control_transitions & tx0_gbl_cm_sel)
 		{
-			cpu_set_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_GBL_CM_SEL, !cpu_get_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_GBL_CM_SEL));
+			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_GBL_CM_SEL, !cpu_get_reg(devtag_get_device(device->machine, "maincpu"), TX0_GBL_CM_SEL));
 		}
 		if (control_transitions & tx0_stop)
 		{
-			cpu_set_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_RUN, 0);
-			cpu_set_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_RIM, 0);
+			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RUN, 0);
+			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RIM, 0);
 		}
 		if (control_transitions & tx0_restart)
 		{
-			cpu_set_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_RUN, 1);
-			cpu_set_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_RIM, 0);
+			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RUN, 1);
+			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RIM, 0);
 		}
 		if (control_transitions & tx0_read_in)
 		{	/* set cpu to read instructions from perforated tape */
-			cpu_set_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_RESET, 0);
-			cpu_set_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_RUN, 0);
-			cpu_set_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_RIM, 1);
+			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RESET, 0);
+			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RUN, 0);
+			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RIM, 1);
 		}
 		if (control_transitions & tx0_toggle_dn)
 		{
@@ -1202,16 +1208,16 @@ INTERRUPT_GEN( tx0_interrupt )
 		{
 			if (tsr_index >= 2)
 			{
-				UINT32 cm_sel = (UINT32) cpu_get_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_CM_SEL);
-				cpu_set_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_CM_SEL, cm_sel ^ (1 << (tsr_index - 2)));
+				UINT32 cm_sel = (UINT32) cpu_get_reg(devtag_get_device(device->machine, "maincpu"), TX0_CM_SEL);
+				cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_CM_SEL, cm_sel ^ (1 << (tsr_index - 2)));
 			}
 		}
 		if (control_transitions & tx0_lr_sel)
 		{
 			if (tsr_index >= 2)
 			{
-				UINT32 lr_sel = (UINT32) cpu_get_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_LR_SEL);
-				cpu_set_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_LR_SEL, (lr_sel ^ (1 << (tsr_index - 2))));
+				UINT32 lr_sel = (UINT32) cpu_get_reg(devtag_get_device(device->machine, "maincpu"), TX0_LR_SEL);
+				cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_LR_SEL, (lr_sel ^ (1 << (tsr_index - 2))));
 			}
 		}
 
@@ -1227,7 +1233,7 @@ INTERRUPT_GEN( tx0_interrupt )
 
 		/* update toggle switch register */
 		if (tsr_transitions)
-			cpu_set_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_TBR+tsr_index, cpu_get_reg(cputag_get_cpu(device->machine, "maincpu"), TX0_TBR+tsr_index) ^ tsr_transitions);
+			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_TBR+tsr_index, cpu_get_reg(devtag_get_device(device->machine, "maincpu"), TX0_TBR+tsr_index) ^ tsr_transitions);
 
 		/* remember new state of toggle switch register keys */
 		old_tsr_keys = tsr_keys;

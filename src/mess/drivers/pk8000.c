@@ -7,7 +7,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255a.h"
 #include "devices/cassette.h"
@@ -303,7 +303,7 @@ static IRQ_CALLBACK(pk8000_irq_callback)
 static MACHINE_RESET(pk8000)
 {
 	pk8000_set_bank(machine,0);
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), pk8000_irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), pk8000_irq_callback);
 }
 
 static VIDEO_START( pk8000 )
@@ -320,7 +320,7 @@ static const cassette_config pk8000_cassette_config =
 {
 	fmsx_cassette_formats,
 	NULL,
-	CASSETTE_PLAY
+	(cassette_state)(CASSETTE_PLAY)
 };
 
 static MACHINE_DRIVER_START( pk8000 )

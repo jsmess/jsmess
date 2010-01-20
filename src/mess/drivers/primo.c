@@ -104,7 +104,7 @@ Interrupts:
 
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "includes/primo.h"
@@ -242,7 +242,7 @@ static const cassette_config primo_cassette_config =
 {
 	primo_ptp_format,
 	&primo_cassette_options,
-	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
 };
 
 static CBM_IEC_DAISY( cbm_iec_daisy )

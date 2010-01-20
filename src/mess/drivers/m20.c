@@ -1,6 +1,6 @@
 /* Olivetti M20 skeleton driver, by incog (19/05/2009) */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z8000/z8000.h"
 
 #define MAIN_CLOCK 4000000 /* 4 MHz */

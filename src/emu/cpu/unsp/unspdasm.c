@@ -6,7 +6,7 @@
 *
 \**************************/
 
-#include "cpuintrf.h"
+#include "emu.h"
 #include <stdarg.h>
 
 static char *output;

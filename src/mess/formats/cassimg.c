@@ -9,7 +9,7 @@
 
 #include <string.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "utils.h"
 #include "pool.h"
 #include "formats/cassimg.h"
@@ -85,7 +85,7 @@ static cassette_image *cassette_init(running_machine *machine,const struct Casse
 {
 	cassette_image *cassette;
 
-	cassette = malloc(sizeof(struct _cassette_image));
+	cassette = (cassette_image *)malloc(sizeof(struct _cassette_image));
 	if (!cassette)
 		return NULL;
 
@@ -94,7 +94,7 @@ static cassette_image *cassette_init(running_machine *machine,const struct Casse
 	cassette->io.file = file;
 	cassette->io.procs = procs;
 	cassette->flags = flags;
-	cassette->pool = pool_alloc(NULL);
+	cassette->pool = pool_alloc_lib(NULL);
 	cassette->machine = machine;
 	return cassette;
 }
@@ -282,7 +282,7 @@ void cassette_close(cassette_image *cassette)
 {
 	if ((cassette->flags & CASSETTE_FLAG_DIRTY) && (cassette->flags & CASSETTE_FLAG_SAVEONEXIT))
 		cassette_save(cassette);
-	pool_free(cassette->pool);
+	pool_free_lib(cassette->pool);
 	free(cassette);
 }
 
@@ -398,7 +398,7 @@ static casserr_t lookup_sample(cassette_image *cassette, int channel, size_t sam
 
 		/* allocate new blocks */
 		new_block_count = sample_block + 1;
-		new_blocks = pool_realloc(cassette->pool, cassette->blocks, new_block_count * sizeof(cassette->blocks[0]));
+		new_blocks = (struct sample_block *)pool_realloc_lib(cassette->pool, cassette->blocks, new_block_count * sizeof(cassette->blocks[0]));
 		if (!new_blocks)
 			return CASSETTE_ERROR_OUTOFMEMORY;
 
@@ -417,7 +417,7 @@ static casserr_t lookup_sample(cassette_image *cassette, int channel, size_t sam
 
 		new_block_sample_count = SAMPLES_PER_BLOCK;
 
-		new_block = pool_realloc(cassette->pool, block->block, new_block_sample_count * sample_size);
+		new_block = (INT32*)pool_realloc_lib(cassette->pool, block->block, new_block_sample_count * sample_size);
 		if (!new_block)
 			return CASSETTE_ERROR_OUTOFMEMORY;
 
@@ -477,7 +477,7 @@ casserr_t cassette_get_samples(cassette_image *cassette, int channel,
 		sum /= (ranges.channel_last + 1 - ranges.channel_first);
 
 		/* and write out the result */
-		dest_ptr = samples;
+		dest_ptr = (UINT8*)samples;
 		dest_ptr += waveform_bytes_per_sample(waveform_flags) * sample_index;
 		switch(waveform_bytes_per_sample(waveform_flags))
 		{
@@ -541,7 +541,7 @@ casserr_t cassette_put_samples(cassette_image *cassette, int channel,
 	{
 		/* figure out the source pointer */
 		d = map_double(sample_count, ranges.sample_first, ranges.sample_last + 1, sample_index);
-		source_ptr = samples;
+		source_ptr = (const UINT8*)samples;
 		source_ptr += ((size_t) d) * sample_bytes;
 
 		/* compute the value that we are writing */
@@ -722,7 +722,7 @@ casserr_t cassette_put_modulated_data(cassette_image *cassette, int channel, dou
 	double *time_displacement)
 {
 	casserr_t err;
-	const UINT8 *data_bytes = data;
+	const UINT8 *data_bytes = (const UINT8 *)data;
 	const INT8 *wave_bytes;
 	size_t wave_bytes_length;
 	double total_displacement = 0.0;
@@ -802,7 +802,7 @@ casserr_t cassette_read_modulated_data(cassette_image *cassette, int channel, do
 	else
 	{
 		buffer_length = MIN(length, 100000);
-		alloc_buffer = malloc(buffer_length);
+		alloc_buffer = (UINT8*)malloc(buffer_length);
 		if (!alloc_buffer)
 		{
 			err = CASSETTE_ERROR_OUTOFMEMORY;
@@ -936,7 +936,7 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 			goto done;
 		}
 		cassette_image_read(cassette, bytes, 0, size);
-		sample_count = args.chunk_sample_calc(bytes, (int) size);
+		sample_count = args.chunk_sample_calc((const UINT8*)bytes, (int) size);
 
 		if (args.header_samples < 0)
 			args.header_samples = sample_count;
@@ -949,7 +949,7 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 	sample_count += args.header_samples + args.trailer_samples;
 
 	/* allocate a buffer for the completed samples */
-	samples = malloc(sample_count * sizeof(*samples));
+	samples = (INT16*)malloc(sample_count * sizeof(*samples));
 	if (!samples)
 	{
 		err = CASSETTE_ERROR_OUTOFMEMORY;
@@ -974,7 +974,7 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 		cassette_image_read(cassette, chunk, offset, args.chunk_size);
 		offset += args.chunk_size;
 
-		length = args.fill_wave(samples + pos, sample_count - pos, chunk);
+		length = args.fill_wave(samples + pos, sample_count - pos, (UINT8*)chunk);
 		if (length < 0)
 		{
 			err = CASSETTE_ERROR_INVALIDIMAGE;

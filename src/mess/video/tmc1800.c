@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/tmc1800.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1861.h"
@@ -9,7 +9,7 @@
 
 static WRITE_LINE_DEVICE_HANDLER( tmc1800_efx_w )
 {
-	tmc1800_state *driver_state = device->machine->driver_data;
+	tmc1800_state *driver_state = (tmc1800_state *)device->machine->driver_data;
 
 	driver_state->cdp1861_efx = state;
 }
@@ -25,7 +25,7 @@ static CDP1861_INTERFACE( tmc1800_cdp1861_intf )
 
 static VIDEO_UPDATE( tmc1800 )
 {
-	tmc1800_state *state = screen->machine->driver_data;
+	tmc1800_state *state = (tmc1800_state *)screen->machine->driver_data;
 
 	cdp1861_update(state->cdp1861, bitmap, cliprect);
 
@@ -36,28 +36,28 @@ static VIDEO_UPDATE( tmc1800 )
 
 static READ_LINE_DEVICE_HANDLER( rdata_r )
 {
-	tmc2000_state *state = device->machine->driver_data;
+	tmc2000_state *state = (tmc2000_state *)device->machine->driver_data;
 
 	return BIT(state->color, 2);
 }
 
 static READ_LINE_DEVICE_HANDLER( bdata_r )
 {
-	tmc2000_state *state = device->machine->driver_data;
+	tmc2000_state *state = (tmc2000_state *)device->machine->driver_data;
 
 	return BIT(state->color, 1);
 }
 
 static READ_LINE_DEVICE_HANDLER( gdata_r )
 {
-	tmc2000_state *state = device->machine->driver_data;
+	tmc2000_state *state = (tmc2000_state *)device->machine->driver_data;
 
 	return BIT(state->color, 0);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( tmc2000_efx_w )
 {
-	tmc2000_state *driver_state = device->machine->driver_data;
+	tmc2000_state *driver_state = (tmc2000_state *)device->machine->driver_data;
 
 	driver_state->cdp1864_efx = state;
 }
@@ -81,7 +81,7 @@ static CDP1864_INTERFACE( tmc2000_cdp1864_intf )
 
 static VIDEO_UPDATE( tmc2000 )
 {
-	tmc2000_state *state = screen->machine->driver_data;
+	tmc2000_state *state = (tmc2000_state *)screen->machine->driver_data;
 
 	cdp1864_update(state->cdp1864, bitmap, cliprect);
 
@@ -92,7 +92,7 @@ static VIDEO_UPDATE( tmc2000 )
 
 static WRITE_LINE_DEVICE_HANDLER( oscnano_efx_w )
 {
-	oscnano_state *driver_state = device->machine->driver_data;
+	oscnano_state *driver_state = (oscnano_state *)device->machine->driver_data;
 
 	driver_state->cdp1864_efx = state;
 }
@@ -116,7 +116,7 @@ static CDP1864_INTERFACE( oscnano_cdp1864_intf )
 
 static VIDEO_UPDATE( oscnano )
 {
-	oscnano_state *state = screen->machine->driver_data;
+	oscnano_state *state = (oscnano_state *)screen->machine->driver_data;
 
 	cdp1864_update(state->cdp1864, bitmap, cliprect);
 

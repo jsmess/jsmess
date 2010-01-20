@@ -4,9 +4,7 @@
 *
 ******************************************************************************/
 
-#include <math.h>
-
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "ym2151.h"
 
@@ -1506,9 +1504,7 @@ void * ym2151_init(const device_config *device, int clock, int rate)
 {
 	YM2151 *PSG;
 
-	PSG = (YM2151 *)malloc(sizeof(YM2151));
-	if (PSG == NULL)
-		return NULL;
+	PSG = auto_alloc(device->machine, YM2151);
 
 	memset(PSG, 0, sizeof(YM2151));
 
@@ -1559,7 +1555,7 @@ void ym2151_shutdown(void *_chip)
 {
 	YM2151 *chip = (YM2151 *)_chip;
 
-	free (chip);
+	auto_free (chip->device->machine, chip);
 
 	if (cymfile)
 		fclose (cymfile);

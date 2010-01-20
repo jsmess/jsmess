@@ -9,7 +9,7 @@
 #ifndef __AP2_SLOT__
 #define __AP2_SLOT__
 
-#include "driver.h"
+#include "emu.h"
 
 
 /***************************************************************************

@@ -51,8 +51,9 @@
 #include <stdarg.h>
 
 // MAME headers
-#include "driver.h"
+#include "emu.h"
 #include "clifront.h"
+#include "emuopts.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -260,7 +261,7 @@ static void winui_output_error(void *param, const char *format, va_list argptr)
 //  utf8_main
 //============================================================
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
 	char *ext;
 

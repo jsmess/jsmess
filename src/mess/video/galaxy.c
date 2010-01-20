@@ -8,7 +8,7 @@
   01/03/2008 - Update by Miodrag Milanovic to make Galaksija video work with new SVN code
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/galaxy.h"
 #include "cpu/z80/z80.h"
 
@@ -29,11 +29,11 @@ static TIMER_CALLBACK( gal_video )
 		if ((gal_cnt >= 48 * 2) && (gal_cnt < 48 * 210))  // display on screen just first 208 lines
 		{
 			UINT8 mode = (galaxy_latch_value >> 1) & 1; // bit 2 latch represents mode
-			UINT16 addr = (cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_I) << 8) | cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R) | ((galaxy_latch_value & 0x80) ^ 0x80);
+			UINT16 addr = (cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_I) << 8) | cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_R) | ((galaxy_latch_value & 0x80) ^ 0x80);
   			if (mode == 0)
 			{
   				// Text mode
-	  			if (first == 0 && (cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R) & 0x1f) == 0)
+	  			if (first == 0 && (cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_R) & 0x1f) == 0)
 				{
 		  			// Due to a fact that on real processor latch value is set at
 		  			// the end of last cycle we need to skip dusplay of double
@@ -62,7 +62,7 @@ static TIMER_CALLBACK( gal_video )
 			}
 			else
 			{ // Graphics mode
-	  			if (first < 4 && (cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R) & 0x1f) == 0)
+	  			if (first < 4 && (cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_R) & 0x1f) == 0)
 				{
 		  			// Due to a fact that on real processor latch value is set at
 		  			// the end of last cycle we need to skip dusplay of 4 times

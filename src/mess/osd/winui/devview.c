@@ -13,7 +13,7 @@
 #include <winuser.h>
 #include <tchar.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "devview.h"
 #include "optionsms.h"
 #include "strconv.h"
@@ -214,7 +214,7 @@ BOOL DevView_SetDriver(HWND hwndDevView, const software_config *config)
 			image_device_info info = image_device_getinfo(pDevViewInfo->config->mconfig, dev);
 
 			s = tstring_from_utf8(info.name);
-			ppszDevices[i] = alloca((_tcslen(s) + 1) * sizeof(TCHAR));
+			ppszDevices[i] = (WCHAR*)alloca((_tcslen(s) + 1) * sizeof(TCHAR));
 			_tcscpy(ppszDevices[i], s);
 			free(s);
 			i++;
@@ -351,7 +351,7 @@ static BOOL DevView_Setup(HWND hwndDevView)
 	struct DevViewInfo *pDevViewInfo;
 
 	// allocate the device view info
-	pDevViewInfo = malloc(sizeof(struct DevViewInfo));
+	pDevViewInfo = (DevViewInfo*)malloc(sizeof(struct DevViewInfo));
 	if (!pDevViewInfo)
 		return FALSE;
 	memset(pDevViewInfo, 0, sizeof(*pDevViewInfo));

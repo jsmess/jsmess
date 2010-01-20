@@ -43,7 +43,7 @@ It's only taken 25 years to get around to emulating it...
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
 #include "tec1.lh"

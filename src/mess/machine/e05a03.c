@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "e05a03.h"
 
 
@@ -68,7 +68,7 @@ INLINE e05a03_state *get_safe_token(const device_config *device)
 static DEVICE_START( e05a03 )
 {
 	e05a03_state *e05a03 = get_safe_token(device);
-	const e05a03_interface *intf = device->static_config;
+	const e05a03_interface *intf = (const e05a03_interface *)device->static_config;
 
 	/* validate some basic stuff */
 	assert(device->static_config != NULL);

@@ -9,7 +9,7 @@
 ******************************************************************************/
 
 #include <ctype.h>
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/sn76496.h"
 #include "sound/tms5220.h"
@@ -153,7 +153,7 @@ static int vdusel = 0;
 static int vdudriverset(running_machine *machine)
 {
 	int PC;
-	PC = cpu_get_pc(cputag_get_cpu(machine, "maincpu")); // this needs to be set to the 6502 program counter
+	PC = cpu_get_pc(devtag_get_device(machine, "maincpu")); // this needs to be set to the 6502 program counter
 	return (((PC >= 0xc000) && (PC <= 0xdfff)) || ((pagedRAM) && ((PC >= 0xa000) && (PC <= 0xafff))));
 }
 
@@ -447,7 +447,7 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 static int bbcm_vdudriverset(running_machine *machine)
 {
 	int PC;
-	PC = cpu_get_pc(cputag_get_cpu(machine, "maincpu"));
+	PC = cpu_get_pc(devtag_get_device(machine, "maincpu"));
 	return ((PC >= 0xc000) && (PC <= 0xdfff));
 }
 
@@ -1485,7 +1485,7 @@ static void	bbc_i8271_interrupt(const device_config *device, int state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
             it would clear - to be checked */
-			cpu_set_input_line(cputag_get_cpu(device->machine, "maincpu"), INPUT_LINE_NMI,PULSE_LINE);
+			cpu_set_input_line(devtag_get_device(device->machine, "maincpu"), INPUT_LINE_NMI,PULSE_LINE);
 		}
 	}
 

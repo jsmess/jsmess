@@ -7,7 +7,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/68681.h"
 
@@ -257,7 +257,7 @@ static MACHINE_START(cat)
 }
 static MACHINE_RESET(cat)
 {
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), cat_int_ack);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), cat_int_ack);
 	timer_adjust_periodic(keyboard_timer, attotime_zero, 0, ATTOTIME_IN_HZ(120));
 }
 

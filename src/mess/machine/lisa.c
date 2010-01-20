@@ -36,7 +36,7 @@
     Raphael Nabet, 2000-2003
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/lisa.h"
 #include "machine/6522via.h"
 #include "machine/applefdc.h"
@@ -83,10 +83,12 @@ typedef struct real_mmu_entry
 } real_mmu_entry;
 
 /* MMU regs translated into a more efficient format */
+enum mmu_entry_t { RAM_stack_r, RAM_r, RAM_stack_rw, RAM_rw, IO, invalid, special_IO };
+
 typedef struct mmu_entry
 {
 	offs_t sorg;	/* (real_sorg & 0x0fff) << 9 */
-	enum { RAM_stack_r, RAM_r, RAM_stack_rw, RAM_rw, IO, invalid, special_IO } type;	/* <-> (real_slim & 0x0f00) */
+	mmu_entry_t type;	/* <-> (real_slim & 0x0f00) */
 	int slim;	/* (~ ((real_slim & 0x00ff) << 9)) & 0x01ffff */
 } mmu_entry;
 
@@ -180,6 +182,13 @@ static enum
 	mac_xl		/* same as above with modified video */
 } lisa_model;
 
+enum floppy_hardware_t
+{
+	twiggy,			/* twiggy drives (Lisa 1) */
+	sony_lisa2,		/* 3.5'' drive with LisaLite adapter (Lisa 2) */
+	sony_lisa210	/* 3.5'' drive with modified fdc hardware (Lisa 2/10, Mac XL) */
+} ;
+
 static struct
 {
 	unsigned int has_fast_timers : 1;	/* I/O board VIAs are clocked at 1.25 MHz (?) instead of .5 MHz (?) (Lisa 2/10, Mac XL) */
@@ -195,12 +204,7 @@ static struct
                                         Maybe the schematics are wrong, and PH2 is CPUCK/8.
                                         Maybe the board uses a 6522 variant with different
                                         timings. */
-	enum
-	{
-		twiggy,			/* twiggy drives (Lisa 1) */
-		sony_lisa2,		/* 3.5'' drive with LisaLite adapter (Lisa 2) */
-		sony_lisa210	/* 3.5'' drive with modified fdc hardware (Lisa 2/10, Mac XL) */
-	} floppy_hardware;
+	floppy_hardware_t floppy_hardware;
 	unsigned int has_double_sided_floppy : 1;	/* true on lisa 1 and *hacked* lisa 2/10 / Mac XL */
 	unsigned int has_mac_xl_video : 1;	/* modified video for MacXL */
 } lisa_features;
@@ -304,11 +308,19 @@ static int mouse_data_offset;	/* current offset for mouse data in FIFO (!) */
 
 static int COPS_force_unplug;		/* force unplug keyboard/mouse line for COPS (comes from VIA) */
 
-static void *mouse_timer = NULL;	/* timer called for mouse setup */
+static emu_timer *mouse_timer = NULL;	/* timer called for mouse setup */
 
 static int hold_COPS_data;	/* mirrors the state of CA2 - COPS does not send data until it is low */
 
 static int NMIcode;
+
+enum clock_mode_t
+{
+	clock_timer_disable = 0,
+	timer_disable = 1,
+	timer_interrupt = 2,	/* timer underflow generates interrupt */
+	timer_power_on = 3		/* timer underflow turns system on if it is off and gens interrupt */
+};			/* clock mode */
 
 /* clock registers */
 static struct
@@ -327,13 +339,8 @@ static struct
 	int tenths;		/* tenths of second (BCD : 0-9) */
 
 	int clock_write_ptr;	/* clock byte to be written next (-1 if clock write disabled) */
-	enum
-	{
-		clock_timer_disable = 0,
-		timer_disable = 1,
-		timer_interrupt = 2,	/* timer underflow generates interrupt */
-		timer_power_on = 3		/* timer underflow turns system on if it is off and gens interrupt */
-	} clock_mode;			/* clock mode */
+	
+	enum clock_mode_t clock_mode;
 } clock_regs;
 
 
@@ -430,7 +437,7 @@ static void scan_keyboard(running_machine *machine)
 						if (keycode == NMIcode)
 						{	/* generate NMI interrupt */
 							cputag_set_input_line(machine, "maincpu", M68K_IRQ_7, PULSE_LINE);
-							cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
+							cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
 						}
 #endif
 						COPS_queue_data(machine, & keycode, 1);
@@ -632,7 +639,7 @@ static TIMER_CALLBACK(read_COPS_command)
 				/* should never happen */
 			}
 
-			clock_regs.clock_mode = immediate & 0x3;
+			clock_regs.clock_mode = (clock_mode_t)(immediate & 0x3);
 			break;
 
 #if 0
@@ -971,7 +978,7 @@ static DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 
 	}
 
-	if (cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), M68K_SR) & 0x2000)
+	if (cpu_get_reg(devtag_get_device(space->machine, "maincpu"), M68K_SR) & 0x2000)
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 
@@ -981,7 +988,7 @@ static DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 		/* add revelant origin -> address */
 		offs_t mapped_address = (mmu_regs[the_seg][segment].sorg + seg_offset) & 0x1fffff;
 
-		switch (mmu_regs[the_seg][segment].type)
+		switch ((mmu_entry_t)mmu_regs[the_seg][segment].type)
 		{
 
 		case RAM_r:
@@ -1515,7 +1522,7 @@ READ16_HANDLER ( lisa_r )
 		}
 	}
 
-	if (cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), M68K_SR) & 0x2000)
+	if (cpu_get_reg(devtag_get_device(space->machine, "maincpu"), M68K_SR) & 0x2000)
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 
@@ -1619,12 +1626,12 @@ READ16_HANDLER ( lisa_r )
 					if ((time_in_frame >= 364) && (time_in_frame <= 375))
 					{
 						answer = videoROM_ptr[videoROM_address|0x80] << 8;
-  				logerror("reading1 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), time_in_frame);
+  				logerror("reading1 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(devtag_get_device(space->machine, "maincpu")), time_in_frame);
 					}
 					else
 					{
 						answer = videoROM_ptr[videoROM_address] << 8;
-  				logerror("reading2 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), time_in_frame);
+  				logerror("reading2 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(devtag_get_device(space->machine, "maincpu")), time_in_frame);
 					}
 				}
 
@@ -1723,7 +1730,7 @@ WRITE16_HANDLER ( lisa_w )
 		}
 	}
 
-	if (cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), M68K_SR) & 0x2000)
+	if (cpu_get_reg(devtag_get_device(space->machine, "maincpu"), M68K_SR) & 0x2000)
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 
@@ -1885,19 +1892,19 @@ INLINE void cpu_board_control_access(running_machine *machine, offs_t offset)
 		seg &= ~2;
 		break;
 	case 0x0010:	/* SETUP register SET */
-    	logerror("setup SET PC=%x\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")));
+    	logerror("setup SET PC=%x\n", cpu_get_pc(devtag_get_device(machine, "maincpu")));
 		setup = 1;
 		break;
 	case 0x0012:	/* SETUP register RESET */
-    	logerror("setup UNSET PC=%x\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")));
+    	logerror("setup UNSET PC=%x\n", cpu_get_pc(devtag_get_device(machine, "maincpu")));
 		setup = 0;
 		break;
 	case 0x001A:	/* Enable Vertical Retrace Interrupt */
-    	logerror("enable retrace PC=%x\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")));
+    	logerror("enable retrace PC=%x\n", cpu_get_pc(devtag_get_device(machine, "maincpu")));
 		VTMSK = 1;
 		break;
 	case 0x0018:	/* Disable Vertical Retrace Interrupt */
-    	logerror("disable retrace PC=%x\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")));
+    	logerror("disable retrace PC=%x\n", cpu_get_pc(devtag_get_device(machine, "maincpu")));
 		VTMSK = 0;
 		set_VTIR(machine, 2);
 		break;
@@ -2033,7 +2040,7 @@ static READ16_HANDLER ( lisa_IO_r )
 			else
 						answer |= 0x04;
 			/* huh... we need to emulate some other bits */
-			 logerror("read status PC=%x val=%x\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), answer);
+			 logerror("read status PC=%x val=%x\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), answer);
 
 			break;
 		}

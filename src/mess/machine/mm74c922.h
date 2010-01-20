@@ -34,7 +34,7 @@
 #ifndef __MM74C922__
 #define __MM74C922__
 
-#include "driver.h"
+#include "emu.h"
 #include "devcb.h"
 
 /***************************************************************************

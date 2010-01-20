@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 /* Core includes */
-#include "driver.h"
+#include "emu.h"
 #include "memconv.h"
 #include "devconv.h"
 #include "includes/bebox.h"

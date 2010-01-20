@@ -63,6 +63,7 @@
  *
  */
 
+#include "emu.h"
 #include "debugger.h"
 #include "psx.h"
 
@@ -1636,7 +1637,7 @@ static CPU_INIT( psxcpu )
 
 	psxcpu->irq_callback = irqcallback;
 	psxcpu->device = device;
-	psxcpu->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	psxcpu->program = device->space(AS_PROGRAM);
 
 	mips_state_register( "psxcpu", device );
 }

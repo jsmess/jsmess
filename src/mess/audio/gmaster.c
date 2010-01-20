@@ -4,9 +4,9 @@
 
 #include <assert.h>
 #include <math.h>
-#include "driver.h"
+#include "emu.h"
 #include "streams.h"
-#include "mame.h"
+#include "emu.h"
 #include "timer.h"
 #include "cpu/upd7810/upd7810.h"
 

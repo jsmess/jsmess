@@ -79,7 +79,7 @@ change from 1 to 0.
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
 #include "machine/6530miot.h"
@@ -318,7 +318,7 @@ static const cassette_config kim1_cassette_config =
 {
 	kim1_cassette_formats,
 	NULL,
-	CASSETTE_STOPPED
+	(cassette_state)(CASSETTE_STOPPED)
 };
 
 

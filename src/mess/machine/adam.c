@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/tms9928a.h"
 #include "includes/adam.h"
 #include "devices/flopdrv.h"

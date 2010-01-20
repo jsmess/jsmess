@@ -7,7 +7,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "upd7201.h"
 
 
@@ -148,7 +148,7 @@ WRITE_LINE_DEVICE_HANDLER( upd7201_txcb_w )
 static DEVICE_START( upd7201 )
 {
 	upd7201_state *upd7201 = get_safe_token(device);
-	const upd7201_interface *intf = device->static_config;
+	const upd7201_interface *intf = (const upd7201_interface *)device->static_config;
 
 	assert(device->static_config != NULL);
 

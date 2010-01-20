@@ -43,8 +43,7 @@ Unmapped registers:
 */
 
 
-#include <math.h>
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "c140.h"
 
@@ -476,7 +475,7 @@ static DEVICE_START( c140 )
 
 	info->stream = stream_create(device,0,2,info->sample_rate,info,update_stereo);
 
-	info->pRom=device->region;
+	info->pRom=*device->region;
 
 	/* make decompress pcm table */		//2000.06.26 CAB
 	{

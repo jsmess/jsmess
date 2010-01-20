@@ -15,7 +15,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/pc8801.h"
 #include "machine/ctronics.h"
 #include "machine/i8255a.h"
@@ -46,7 +46,7 @@ static int FM_IRQ_save;
 
 WRITE8_HANDLER( pc88_rtc_w )
 {
-	pc88_state *state = space->machine->driver_data;
+	pc88_state *state = (pc88_state *)space->machine->driver_data;
 
 	/* real time clock */
 	upd1990a_c0_w(state->upd1990a, BIT(data, 0));
@@ -129,7 +129,7 @@ static void pc8801_init_interrupt(running_machine *machine)
 	interrupt_level_reg = 0;
 	interrupt_mask_reg = 0xf8;
 	interrupt_trig_reg = 0x0;
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), pc8801_interrupt_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), pc8801_interrupt_callback);
 }
 
 WRITE8_HANDLER( pc88sr_outport_30 )
@@ -142,7 +142,7 @@ WRITE8_HANDLER( pc88sr_outport_40 )
 {
 	/* bit 3,4,6 not implemented */
 	/* bit 7 incorrect behavior */
-	pc88_state *state = space->machine->driver_data;
+	pc88_state *state = (pc88_state *)space->machine->driver_data;
 	const device_config *speaker = devtag_get_device(space->machine, "beep");
 
 	/* printer */
@@ -174,7 +174,7 @@ WRITE8_HANDLER( pc88sr_outport_40 )
 READ8_HANDLER( pc88sr_inport_40 )
 {
 	/* bit 2 not implemented */
-	pc88_state *state = space->machine->driver_data;
+	pc88_state *state = (pc88_state *)space->machine->driver_data;
 	UINT8 r;
 
 	r = centronics_busy_r(state->centronics);
@@ -253,7 +253,7 @@ static void select_extmem(char **r,char **w,UINT8 *ret_ctrl)
       if(*r!=NULL) { \
 	logerror("read multiple bank of extension memory.\n"); \
       } else { \
-	*r=(x); \
+	*r=(char*)(x); \
       } \
     } \
   } while(0);
@@ -264,7 +264,7 @@ static void select_extmem(char **r,char **w,UINT8 *ret_ctrl)
       if(*w!=NULL) { \
 	logerror("write multiple bank of extension memory.\n"); \
       } else { \
-	*w=(x); \
+	*w=(char*)(x); \
       } \
     } \
   } while(0);
@@ -566,7 +566,7 @@ static void pc8801_init_bank(running_machine *machine, int hireso)
       return;
     }
     if(num80!=0 || num88!=0 || numIO!=0) {
-      extRAM=alloc_array_or_die(UINT8, num80*0x8000+num88*0x20000+numIO*0x100000);
+      extRAM=(UINT8*)malloc(num80*0x8000+num88*0x20000+numIO*0x100000);
       e=extRAM;
       for(i=0;i<num80;i++) {
 	ext_bank_80[i]=e;
@@ -650,14 +650,14 @@ static void pc88sr_ch_reset(running_machine *machine, int hireso)
 
 static READ8_DEVICE_HANDLER( cpu_8255_c_r )
 {
-	pc88_state *state = device->machine->driver_data;
+	pc88_state *state = (pc88_state *)device->machine->driver_data;
 
 	return state->i8255_1_pc >> 4;
 }
 
 static WRITE8_DEVICE_HANDLER( cpu_8255_c_w )
 {
-	pc88_state *state = device->machine->driver_data;
+	pc88_state *state = (pc88_state *)device->machine->driver_data;
 
 	state->i8255_0_pc = data;
 }
@@ -674,14 +674,14 @@ I8255A_INTERFACE( pc8801_8255_config_0 )
 
 static READ8_DEVICE_HANDLER( fdc_8255_c_r )
 {
-	pc88_state *state = device->machine->driver_data;
+	pc88_state *state = (pc88_state *)device->machine->driver_data;
 
 	return state->i8255_0_pc >> 4;
 }
 
 static WRITE8_DEVICE_HANDLER( fdc_8255_c_w )
 {
-	pc88_state *state = device->machine->driver_data;
+	pc88_state *state = (pc88_state *)device->machine->driver_data;
 
 	state->i8255_1_pc = data;
 }
@@ -698,14 +698,14 @@ I8255A_INTERFACE( pc8801_8255_config_1 )
 
 static TIMER_CALLBACK( pc8801fd_upd765_tc_to_zero )
 {
-	pc88_state *state = machine->driver_data;
+	pc88_state *state = (pc88_state *)machine->driver_data;
 
 	upd765_tc_w(state->upd765, 0);
 }
 
 READ8_HANDLER( pc8801fd_upd765_tc )
 {
-	pc88_state *state = space->machine->driver_data;
+	pc88_state *state = (pc88_state *)space->machine->driver_data;
 
 	upd765_tc_w(state->upd765, 1);
 	timer_set(space->machine,  attotime_zero, NULL, 0, pc8801fd_upd765_tc_to_zero );
@@ -730,7 +730,7 @@ static void pc8801_init_5fd(running_machine *machine)
 	else
 		cputag_resume(machine, "sub", SUSPEND_REASON_DISABLE);
 
-	cpu_set_input_line_vector(cputag_get_cpu(machine, "sub"), 0, 0);
+	cpu_set_input_line_vector(devtag_get_device(machine, "sub"), 0, 0);
 
 	floppy_mon_w(floppy_get_device(machine, 0), CLEAR_LINE);
 	floppy_mon_w(floppy_get_device(machine, 1), CLEAR_LINE);
@@ -761,7 +761,7 @@ void pc88sr_sound_interupt(const device_config *device, int irq)
 
 READ8_HANDLER( pc88_kanji_r )
 {
-	pc88_state *state = space->machine->driver_data;
+	pc88_state *state = (pc88_state *)space->machine->driver_data;
 
 	UINT8 *kanji = memory_region(space->machine, "gfx1");
 	UINT32 addr = (state->kanji << 1) | !offset;
@@ -771,7 +771,7 @@ READ8_HANDLER( pc88_kanji_r )
 
 WRITE8_HANDLER( pc88_kanji_w )
 {
-	pc88_state *state = space->machine->driver_data;
+	pc88_state *state = (pc88_state *)space->machine->driver_data;
 
 	switch (offset)
 	{
@@ -787,7 +787,7 @@ WRITE8_HANDLER( pc88_kanji_w )
 
 READ8_HANDLER( pc88_kanji2_r )
 {
-	pc88_state *state = space->machine->driver_data;
+	pc88_state *state = (pc88_state *)space->machine->driver_data;
 
 	UINT8 *kanji2 = memory_region(space->machine, "kanji2");
 	UINT32 addr = (state->kanji2 << 1) | !offset;
@@ -797,7 +797,7 @@ READ8_HANDLER( pc88_kanji2_r )
 
 WRITE8_HANDLER( pc88_kanji2_w )
 {
-	pc88_state *state = space->machine->driver_data;
+	pc88_state *state = (pc88_state *)space->machine->driver_data;
 
 	switch (offset)
 	{
@@ -815,7 +815,7 @@ WRITE8_HANDLER( pc88_kanji2_w )
 
 MACHINE_START( pc88srl )
 {
-	pc88_state *state = machine->driver_data;
+	pc88_state *state = (pc88_state *)machine->driver_data;
 
 	/* find devices */
 	state->upd765 = devtag_get_device(machine, UPD765_TAG);

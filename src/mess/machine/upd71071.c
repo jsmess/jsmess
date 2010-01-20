@@ -77,7 +77,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/upd71071.h"
 
 struct upd71071_reg
@@ -114,8 +114,8 @@ struct _upd71071_t
 static TIMER_CALLBACK(dma_transfer_timer)
 {
 	// single byte or word transfer
-	const device_config* device = ptr;
-	upd71071_t* dmac = device->token;
+	const device_config* device = (const device_config*)ptr;
+	upd71071_t* dmac = (upd71071_t*)device->token;
 	const address_space* space = cputag_get_address_space(device->machine,dmac->intf->cputag,ADDRESS_SPACE_PROGRAM);
 	int channel = param;
 	UINT16 data = 0;  // data to transfer
@@ -171,7 +171,7 @@ static TIMER_CALLBACK(dma_transfer_timer)
 
 void upd71071_soft_reset(const device_config* device)
 {
-	upd71071_t* dmac = device->token;
+	upd71071_t* dmac = (upd71071_t*)device->token;
 	int x;
 
 	// Does not change base/current address, count, or buswidth
@@ -189,7 +189,7 @@ void upd71071_soft_reset(const device_config* device)
 
 int upd71071_dmarq(const device_config* device, int state,int channel)
 {
-	upd71071_t* dmac = device->token;
+	upd71071_t* dmac = (upd71071_t*)device->token;
 
 	if(state != 0)
 	{
@@ -231,10 +231,10 @@ int upd71071_dmarq(const device_config* device, int state,int channel)
 
 static DEVICE_START(upd71071)
 {
-	upd71071_t* dmac = device->token;
+	upd71071_t* dmac = (upd71071_t*)device->token;
 	int x;
 
-	dmac->intf = device->static_config;
+	dmac->intf = (const upd71071_intf*)device->static_config;
 	for(x=0;x<4;x++)
 	{
 		dmac->timer[x] = timer_alloc(device->machine,dma_transfer_timer,(void*)device);
@@ -244,7 +244,7 @@ static DEVICE_START(upd71071)
 
 static READ8_DEVICE_HANDLER(upd71071_read)
 {
-	upd71071_t* dmac = device->token;
+	upd71071_t* dmac = (upd71071_t*)device->token;
 	UINT8 ret = 0;
 
 	logerror("DMA: read from register %02x\n",offset);
@@ -322,7 +322,7 @@ static READ8_DEVICE_HANDLER(upd71071_read)
 
 static WRITE8_DEVICE_HANDLER(upd71071_write)
 {
-	upd71071_t* dmac = device->token;
+	upd71071_t* dmac = (upd71071_t*)device->token;
 
 	switch(offset)
 	{

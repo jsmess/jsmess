@@ -15,7 +15,7 @@ TODO:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/wswan.h"
 #include "devices/cartslot.h"
 #include "image.h"
@@ -266,8 +266,8 @@ MACHINE_RESET( wswan )
 	/* Initialize VDP */
 	memset( &wswan_vdp, 0, sizeof( wswan_vdp ) );
 
-	wswan_vdp.vram = memory_get_read_ptr( space, 0 );
-	wswan_vdp.palette_vram = memory_get_read_ptr( space, ( system_type == WSC ) ? 0xFE00 : 0 );
+	wswan_vdp.vram = (UINT8*)memory_get_read_ptr( space, 0 );
+	wswan_vdp.palette_vram = (UINT8*)memory_get_read_ptr( space, ( system_type == WSC ) ? 0xFE00 : 0 );
 	wswan_vdp.current_line = 145;  /* Randomly chosen, beginning of VBlank period to give cart some time to boot up */
 	wswan_vdp.new_display_vertical = ROMMap[ROMBanks-1][0xfffc] & 0x01;
 	wswan_vdp.display_vertical = ~wswan_vdp.new_display_vertical;
@@ -1378,7 +1378,7 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 	UINT32 ii;
 	const char *sram_str;
 
-	ws_ram = memory_get_read_ptr( cputag_get_address_space( image->machine, "maincpu", ADDRESS_SPACE_PROGRAM ), 0 );
+	ws_ram = (UINT8*) memory_get_read_ptr( cputag_get_address_space( image->machine, "maincpu", ADDRESS_SPACE_PROGRAM ), 0 );
 	memset( ws_ram, 0, 0xFFFF );
 	ROMBanks = image_length( image ) / 65536;
 

@@ -10,7 +10,7 @@
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/mc146818.h"
@@ -729,7 +729,7 @@ static const cassette_config bbc_cassette_config =
 {
 	bbc_cassette_formats,
 	NULL,
-	CASSETTE_PLAY
+	(cassette_state)(CASSETTE_PLAY)
 };
 
 

@@ -2,7 +2,7 @@
 //
 //  testkey.c - A small utility to analyze SDL keycodes
 //
-//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -22,14 +22,14 @@
 
 // Check whether SDL has compat interface
 #if defined(SDL_AllocSurface) || (!SDL_VERSION_ATLEAST(1,3,0))
-#define SDL_HAS_COMPAT 		1
+#define SDL_HAS_COMPAT		1
 #else
-#define SDL_HAS_COMPAT 		0
+#define SDL_HAS_COMPAT		0
 #endif
 
 typedef struct _key_lookup_table key_lookup_table;
 
-struct _key_lookup_table 
+struct _key_lookup_table
 {
 	int code;
 	const char *name;
@@ -38,19 +38,19 @@ struct _key_lookup_table
 #if SDL_HAS_COMPAT
 #if (SDL_VERSION_ATLEAST(1,3,0))
 #define KE(x) { SDL_SCANCODE_ ## x, "SDL_SCANCODE_" #x },
-#define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H) 
+#define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H)
 #define KE7(A, B, C, D, E, F, G) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G)
 #define KE5(A, B, C, D, E) KE(A) KE(B) KE(C) KE(D) KE(E)
-#define KE3(A, B, C) KE(A) KE(B) KE(C) 
+#define KE3(A, B, C) KE(A) KE(B) KE(C)
 
 
 static key_lookup_table sdl_lookup[] =
 {
-	KE7(UNKNOWN,	BACKSPACE,	TAB,		CLEAR,		RETURN,		PAUSE,		ESCAPE		)
+	KE7(UNKNOWN,	BACKSPACE,	TAB,			CLEAR,		RETURN,		PAUSE,		ESCAPE		)
 	KE(SPACE)
-	KE5(COMMA,		MINUS,		PERIOD,		SLASH,		0			)
+	KE5(COMMA,		MINUS,		PERIOD,			SLASH,		0			)
 	KE8(1,			2,			3,				4,			5,			6,			7,			8			)
-	KE3(9,			SEMICOLON,		EQUALS)
+	KE5(9,			SEMICOLON,	EQUALS, 		PRINTSCREEN,	AC_REFRESH)
 	KE5(LEFTBRACKET,BACKSLASH,	RIGHTBRACKET,	A,			B			)
 	KE8(C,			D,			E,				F,			G,			H,			I,			J			)
 	KE8(K,			L,			M,				N,			O,			P,			Q,			R			)
@@ -61,15 +61,13 @@ static key_lookup_table sdl_lookup[] =
 	KE8(END,		PAGEUP,		PAGEDOWN,		F1,			F2,			F3,			F4,			F5			)
 	KE8(F6,			F7,			F8,				F9,			F10,		F11,		F12,		F13			)
 	KE8(F14,		F15,		NUMLOCKCLEAR,	CAPSLOCK,	SCROLLLOCK,	RSHIFT,		LSHIFT,		RCTRL		)
-	KE5(LCTRL,		RALT,		LALT,			LGUI,		RGUI)
-	KE(PRINTSCREEN)
-	KE(MENU)
-	KE(UNDO)
+	KE7(LCTRL,		RALT,		LALT,			LGUI,		RGUI,		KP_DECIMAL,	APPLICATION)
+	KE5(MENU, NONUSBACKSLASH, UNDO, APOSTROPHE, GRAVE )
 	{-1, ""}
 };
 #else
 #define KE(x) { SDLK_ ## x, "SDLK_" #x },
-#define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H) 
+#define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H)
 
 static key_lookup_table sdl_lookup[] =
 {
@@ -103,7 +101,7 @@ static key_lookup_table sdl_lookup[] =
 	KE8(LCTRL,		RALT,		LALT,			RMETA,		LMETA,		LSUPER,		RSUPER,		MODE		)
 	KE8(COMPOSE,	HELP,		PRINT,			SYSREQ,		BREAK,		MENU,		POWER,		EURO		)
 	KE(UNDO)
-	KE(LAST)		
+	KE(LAST)
 	{-1, ""}
 };
 #endif
@@ -157,8 +155,8 @@ int main(int argc, char *argv[])
 #else
 						lookup_key_name(sdl_lookup, event.key.keysym.sym),
 #endif
-						(int) event.key.keysym.scancode, 
-						(int) event.key.keysym.unicode, 
+						(int) event.key.keysym.scancode,
+						(int) event.key.keysym.unicode,
 						buf);
 			}
 			break;
@@ -171,8 +169,8 @@ int main(int argc, char *argv[])
 #else
 					lookup_key_name(sdl_lookup, event.key.keysym.sym),
 #endif
-					(int) event.key.keysym.scancode, 
-					(int) event.key.keysym.unicode, 
+					(int) event.key.keysym.scancode,
+					(int) event.key.keysym.unicode,
 					buf);
 			break;
 		}

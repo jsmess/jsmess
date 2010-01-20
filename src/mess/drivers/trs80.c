@@ -140,7 +140,7 @@ There don't seem to be any JV1 boot disks for Model III/4.
 ***************************************************************************/
 
 /* Core includes */
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
 #include "machine/ctronics.h"
@@ -527,7 +527,7 @@ static const cassette_config trs80l2_cassette_config =
 {
 	trs80l2_cassette_formats,
 	NULL,
-	CASSETTE_PLAY
+	(cassette_state)(CASSETTE_PLAY)
 };
 
 static const ay31015_config trs80_ay31015_config =

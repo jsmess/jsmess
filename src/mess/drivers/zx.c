@@ -38,7 +38,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
@@ -370,14 +370,14 @@ static const cassette_config zx80_cassette_config =
 {
 	zx80_o_format,
 	&zx81_cassette_options,
-	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
 };
 
 static const cassette_config zx81_cassette_config =
 {
 	zx81_p_format,
 	&zx81_cassette_options,
-	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
 };
 
 

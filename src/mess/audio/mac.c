@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/mac.h"
 #include "streams.h"
 #include "devices/messram.h"

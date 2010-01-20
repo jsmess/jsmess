@@ -7,7 +7,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cdp1871.h"
 
 /***************************************************************************
@@ -242,7 +242,7 @@ static void detect_keypress(const device_config *device)
 
 static TIMER_CALLBACK( cdp1871_scan_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 
 	change_output_lines(device);
 	clock_scan_counters(device);

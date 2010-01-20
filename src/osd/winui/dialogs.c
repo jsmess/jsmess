@@ -98,7 +98,7 @@ INT_PTR CALLBACK ResetDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 
 	case WM_HELP:
 		/* User clicked the ? from the upper right on a control */
-		HelpFunction(((LPHELPINFO)lParam)->hItemHandle, MAMEUICONTEXTHELP, HH_TP_HELP_WM_HELP, GetHelpIDs());
+		HelpFunction((HWND)((LPHELPINFO)lParam)->hItemHandle, MAMEUICONTEXTHELP, HH_TP_HELP_WM_HELP, GetHelpIDs());
 		break;
 
 	case WM_CONTEXTMENU:
@@ -279,7 +279,7 @@ INT_PTR CALLBACK InterfaceDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 
 	case WM_HELP:
 		/* User clicked the ? from the upper right on a control */
-		HelpFunction(((LPHELPINFO)lParam)->hItemHandle, MAMEUICONTEXTHELP, HH_TP_HELP_WM_HELP, GetHelpIDs());
+		HelpFunction((HWND)((LPHELPINFO)lParam)->hItemHandle, MAMEUICONTEXTHELP, HH_TP_HELP_WM_HELP, GetHelpIDs());
 		break;
 
 	case WM_CONTEXTMENU:
@@ -545,7 +545,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 	}
 	case WM_HELP:
 		// User clicked the ? from the upper right on a control
-		HelpFunction(((LPHELPINFO)lParam)->hItemHandle, MAMEUICONTEXTHELP,
+		HelpFunction((HWND)((LPHELPINFO)lParam)->hItemHandle, MAMEUICONTEXTHELP,
 					 HH_TP_HELP_WM_HELP, GetHelpIDs());
 		break;
 

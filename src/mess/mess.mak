@@ -145,7 +145,7 @@ SOUNDS += AY8910
 SOUNDS += YM2151
 SOUNDS += YM2203
 SOUNDS += YM2413
-#SOUNDS += YM2608
+SOUNDS += YM2608
 SOUNDS += YM2610
 SOUNDS += YM2610B
 SOUNDS += YM2612
@@ -246,9 +246,6 @@ SOUNDS += TMS5200
 
 DRVLIBS = \
 	$(MESSOBJ)/messdriv.o \
-	$(MESSOBJ)/messsoft.o \
-	$(MESSOBJ)/softlist.o \
-	$(MESSOBJ)/software.a \
 	$(MESSOBJ)/3do.a \
 	$(MESSOBJ)/acorn.a \
 	$(MESSOBJ)/amiga.a \
@@ -323,6 +320,7 @@ DRVLIBS = \
 	$(MESSOBJ)/mattel.a \
 	$(MESSOBJ)/mchester.a \
 	$(MESSOBJ)/memotech.a \
+	$(MESSOBJ)/messsoft.o \
 	$(MESSOBJ)/mgu.a \
 	$(MESSOBJ)/microkey.a \
 	$(MESSOBJ)/mit.a \
@@ -364,6 +362,8 @@ DRVLIBS = \
 	$(MESSOBJ)/sinclair.a \
 	$(MESSOBJ)/skeleton.a \
 	$(MESSOBJ)/snk.a \
+	$(MESSOBJ)/softlist.o \
+	$(MESSOBJ)/software.a \
 	$(MESSOBJ)/sony.a \
 	$(MESSOBJ)/sord.a \
 	$(MESSOBJ)/special.a \

@@ -51,7 +51,7 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	UINT8 *cache = NULL;
 	chd_file *chd = NULL;
-	int rc;
+	chd_error rc;
 	UINT64 logicalbytes;
 	int hunknum, totalhunks;
 	char metadata[256];
@@ -93,7 +93,7 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 
 	/* write the metadata */
 	sprintf(metadata, HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, seclen);
-	err = chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1, 0);
+	err = (imgtoolerr_t)chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1, 0);
 	if (rc != CHDERR_NONE)
 	{
 		err = map_chd_error(rc);
@@ -101,7 +101,7 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 	}
 
 	/* alloc and zero buffer */
-	cache = malloc(hunksize);
+	cache = (UINT8*)malloc(hunksize);
 	if (!cache)
 	{
 		err = IMGTOOLERR_OUTOFMEMORY;
@@ -200,7 +200,7 @@ imgtoolerr_t imghd_read(struct mess_hard_disk_file *disk, UINT32 lbasector, void
 {
 	UINT32 reply;
 	reply = hard_disk_read(disk->hard_disk, lbasector, buffer);
-	return reply ? IMGTOOLERR_SUCCESS : map_chd_error(reply);
+	return (imgtoolerr_t)(reply ? IMGTOOLERR_SUCCESS : map_chd_error((chd_error)reply));
 }
 
 
@@ -214,7 +214,7 @@ imgtoolerr_t imghd_write(struct mess_hard_disk_file *disk, UINT32 lbasector, con
 {
 	UINT32 reply;
 	reply = hard_disk_write(disk->hard_disk, lbasector, buffer);
-	return reply ? IMGTOOLERR_SUCCESS : map_chd_error(reply);
+	return (imgtoolerr_t)(reply ? IMGTOOLERR_SUCCESS : map_chd_error((chd_error)reply));
 }
 
 

@@ -111,18 +111,7 @@
 /*    YM2610B : PSG:3ch FM:6ch ADPCM(18.5KHz):6ch DeltaT ADPCM:1ch      */
 /************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
-#include <math.h>
-
-#ifndef __RAINE__
-#include "sndintrf.h"		/* use M.A.M.E. */
-#else
-#include "deftypes.h"		/* use RAINE */
-#include "support.h"		/* use RAINE */
-#endif
+#include "emu.h"
 #include "fm.h"
 
 
@@ -2264,14 +2253,11 @@ void * ym2203_init(void *param, const device_config *device, int clock, int rate
 	YM2203 *F2203;
 
 	/* allocate ym2203 state space */
-	if( (F2203 = (YM2203 *)malloc(sizeof(YM2203)))==NULL)
-		return NULL;
-	/* clear */
-	memset(F2203,0,sizeof(YM2203));
+	F2203 = auto_alloc_clear(device->machine, YM2203);
 
 	if( !init_tables() )
 	{
-		free( F2203 );
+		auto_free( device->machine, F2203 );
 		return NULL;
 	}
 
@@ -2298,7 +2284,7 @@ void ym2203_shutdown(void *chip)
 	YM2203 *FM2203 = (YM2203 *)chip;
 
 	FMCloseTable();
-	free(FM2203);
+	auto_free(FM2203->OPN.ST.device->machine, FM2203);
 }
 
 /* YM2203 I/O interface */
@@ -3487,14 +3473,11 @@ void * ym2608_init(void *param, const device_config *device, int clock, int rate
 	YM2608 *F2608;
 
 	/* allocate extend state space */
-	if( (F2608 = (YM2608 *)malloc(sizeof(YM2608)))==NULL)
-		return NULL;
-	/* clear */
-	memset(F2608,0,sizeof(YM2608));
+	F2608 = auto_alloc_clear(device->machine, YM2608);
 	/* allocate total level table (128kb space) */
 	if( !init_tables() )
 	{
-		free( F2608 );
+		auto_free( device->machine, F2608 );
 		return NULL;
 	}
 
@@ -3542,7 +3525,7 @@ void ym2608_shutdown(void *chip)
 	YM2608 *F2608 = (YM2608 *)chip;
 
 	FMCloseTable();
-	free(F2608);
+	auto_free(F2608->OPN.ST.device->machine, F2608);
 }
 
 /* reset one of chips */
@@ -4172,14 +4155,11 @@ void *ym2610_init(void *param, const device_config *device, int clock, int rate,
 	YM2610 *F2610;
 
 	/* allocate extend state space */
-	if( (F2610 = (YM2610 *)malloc(sizeof(YM2610)))==NULL)
-		return NULL;
-	/* clear */
-	memset(F2610,0,sizeof(YM2610));
+	F2610 = auto_alloc_clear(device->machine, YM2610);
 	/* allocate total level table (128kb space) */
 	if( !init_tables() )
 	{
-		free( F2610 );
+		auto_free( device->machine, F2610 );
 		return NULL;
 	}
 
@@ -4219,7 +4199,7 @@ void ym2610_shutdown(void *chip)
 	YM2610 *F2610 = (YM2610 *)chip;
 
 	FMCloseTable();
-	free(F2610);
+	auto_free(F2610->OPN.ST.device->machine, F2610);
 }
 
 /* reset one of chip */

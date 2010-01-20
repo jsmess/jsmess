@@ -10,7 +10,7 @@
 
 #include "formats/exidydsk.h"
 #include "formats/basicdsk.h"
-#include "driver.h"
+#include "emu.h"
 
 static FLOPPY_IDENTIFY(exi_dsk_identify)
 {

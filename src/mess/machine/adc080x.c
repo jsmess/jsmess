@@ -7,7 +7,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "adc080x.h"
 
 typedef struct _adc080x_t adc080x_t;
@@ -42,7 +42,7 @@ INLINE adc080x_t *get_safe_token(const device_config *device)
 
 static TIMER_CALLBACK( cycle_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	adc080x_t *adc080x = get_safe_token(device);
 
 	if (!adc080x->start)
@@ -140,7 +140,7 @@ static DEVICE_START( adc080x )
 	assert(device != NULL);
 	assert(device->tag != NULL);
 
-	adc080x->intf = device->static_config;
+	adc080x->intf = (const adc080x_interface*)device->static_config;
 
 	assert(adc080x->intf != NULL);
 	assert(device->clock > 0);

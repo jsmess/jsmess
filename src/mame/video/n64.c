@@ -6,8 +6,7 @@
     Many improvements by angrylion, Ziggy, Gonetz, Orkin
 */
 
-#include <math.h>
-#include "driver.h"
+#include "emu.h"
 #include "includes/n64.h"
 
 #define LOG_RDP_EXECUTION		0
@@ -538,7 +537,7 @@ VIDEO_START(n64)
 
 	for (i = 0; i < 0x4000; i++)
 	{
-		gamma_dither_table[i] = sqrt(i);
+		gamma_dither_table[i] = sqrt((float)i);
 		gamma_dither_table[i] <<= 1;
 	}
 

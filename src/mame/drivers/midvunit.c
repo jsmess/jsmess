@@ -18,7 +18,7 @@
 
 **************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "audio/dcs.h"
@@ -74,7 +74,7 @@ static MACHINE_RESET( midvunit )
 	dcs_reset_w(0);
 
 	memcpy(ram_base, memory_region(machine, "user1"), 0x20000*4);
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 
 	timer[0] = devtag_get_device(machine, "timer0");
 	timer[1] = devtag_get_device(machine, "timer1");
@@ -87,7 +87,7 @@ static MACHINE_RESET( midvplus )
 	dcs_reset_w(0);
 
 	memcpy(ram_base, memory_region(machine, "user1"), 0x20000*4);
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 
 	timer[0] = devtag_get_device(machine, "timer0");
 	timer[1] = devtag_get_device(machine, "timer1");

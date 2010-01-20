@@ -9,13 +9,13 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/samcoupe.h"
 
 
 static void draw_mode4_line(const device_config *screen, bitmap_t *bitmap, int y)
 {
-	coupe_asic *asic = screen->machine->driver_data;
+	coupe_asic *asic = (coupe_asic *)screen->machine->driver_data;
 	int x;
 
 	for (x = 0; x < 256;)
@@ -58,7 +58,7 @@ static void draw_mode4_line(const device_config *screen, bitmap_t *bitmap, int y
 
 static void draw_mode3_line(const device_config *screen, bitmap_t *bitmap, int y)
 {
-	coupe_asic *asic = screen->machine->driver_data;
+	coupe_asic *asic = (coupe_asic *)screen->machine->driver_data;
 	int x;
 
 	for (x = 0; x < 512;)
@@ -101,7 +101,7 @@ static void draw_mode3_line(const device_config *screen, bitmap_t *bitmap, int y
 
 static void draw_mode2_line(const device_config *screen, bitmap_t *bitmap, int y)
 {
-	coupe_asic *asic = screen->machine->driver_data;
+	coupe_asic *asic = (coupe_asic *)screen->machine->driver_data;
 	int b, scrx = 0;
 	UINT16 ink = 127, pap = 0;
 	UINT8 *attr = screen->machine->generic.videoram.u8 + 32*192 + y*32;
@@ -128,7 +128,7 @@ static void draw_mode2_line(const device_config *screen, bitmap_t *bitmap, int y
 
 static void draw_mode1_line(const device_config *screen, bitmap_t *bitmap, int y)
 {
-	coupe_asic *asic = screen->machine->driver_data;
+	coupe_asic *asic = (coupe_asic *)screen->machine->driver_data;
 	int block, x = 0;
 
 	/* get base address of attribute and data values */
@@ -163,7 +163,7 @@ static void draw_mode1_line(const device_config *screen, bitmap_t *bitmap, int y
 VIDEO_UPDATE( samcoupe )
 {
 	int scanline = video_screen_get_vpos(screen);
-	coupe_asic *asic = screen->machine->driver_data;
+	coupe_asic *asic = (coupe_asic *)screen->machine->driver_data;
 
 	/* line interrupt? */
 	if (asic->line_int == scanline)

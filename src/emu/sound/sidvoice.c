@@ -1,5 +1,4 @@
-#include <math.h>
-
+#include "emu.h"
 #include "sidvoice.h"
 #include "sid.h"
 #include "sidenvel.h"

@@ -9,7 +9,7 @@
 #ifndef _THOMSON_H_
 #define _THOMSON_H_
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/mc6846.h"

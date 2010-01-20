@@ -4,8 +4,8 @@
    Written by Ville Linde
 */
 
+#include "emu.h"
 #include "debugger.h"
-#include "cpuintrf.h"
 #include "tms32051.h"
 
 #define INTERRUPT_INT1		0
@@ -225,8 +225,8 @@ static CPU_INIT( tms )
 	tms32051_state *cpustate = get_safe_token(device);
 
 	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->data = device->space(AS_DATA);
 }
 
 static CPU_RESET( tms )

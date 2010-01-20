@@ -23,7 +23,7 @@
     Raphael Nabet, 1999-2004.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/wd17xx.h"
 #include "smc92x4.h"
 #include "ti99_4x.h"
@@ -61,7 +61,7 @@ static int DVENA;
 /* on rising edge, sets DVENA for 4.23 seconds on rising edge */
 static int motor_on;
 /* count 4.23s from rising edge of motor_on */
-static void *motor_on_timer;
+static emu_timer *motor_on_timer;
 
 /*
     call this when the state of DSKhold or DRQ/IRQ or DVENA change
@@ -135,7 +135,7 @@ static UINT64 ti99_translate_offset(floppy_image *floppy, const struct basicdsk_
 static int ti99_tracktranslate(const device_config *image, floppy_image *floppy, int physical_track)
 {
 	struct ti99_geometry *geometry;
-	geometry = floppy_tag(floppy);
+	geometry = (ti99_geometry *)floppy_tag(floppy);
 
 	if (use_80_track_drives && (geometry->tracksperside <= 40))
 		return physical_track/2;
@@ -325,7 +325,7 @@ static FLOPPY_CONSTRUCT(ti99_floppy_construct)
 	int success;
 	floperr_t err;
 
-	geometry1 = floppy_create_tag(floppy, sizeof(*geometry1));
+	geometry1 = (ti99_geometry *)floppy_create_tag(floppy, sizeof(*geometry1));
 
 	ti99_guess_geometry(floppy, geometry1, NULL, &success);
 	if (! success)

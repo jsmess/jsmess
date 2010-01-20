@@ -9,7 +9,7 @@ DMAC controller.
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/amiga.h"
 #include "amigacd.h"
 #include "machine/6525tpi.h"

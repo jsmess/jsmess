@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "cpu/tms34010/tms34010.h"
 #include "sound/ay8910.h"
@@ -102,7 +102,7 @@ static WRITE8_HANDLER( tms_w )
 	if ((offset & 1) == 0)
 		lastdata = data;
 	else
-		tms34010_host_w(cputag_get_cpu(space->machine, "tms"), offset >> 1, (lastdata << 8) | data);
+		tms34010_host_w(devtag_get_device(space->machine, "tms"), offset >> 1, (lastdata << 8) | data);
 }
 
 static READ8_HANDLER( tms_r )
@@ -110,7 +110,7 @@ static READ8_HANDLER( tms_r )
 	static UINT16 data;
 
 	if ((offset & 1) == 0)
-		data = tms34010_host_r(cputag_get_cpu(space->machine, "tms"), offset >> 1);
+		data = tms34010_host_r(devtag_get_device(space->machine, "tms"), offset >> 1);
 
 	return data >> ((offset & 1) ? 0 : 8);
 }

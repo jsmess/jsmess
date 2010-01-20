@@ -118,7 +118,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/tms5220.h"
@@ -148,7 +148,7 @@ static void scanline_update(const device_config *screen, int scanline)
 
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
-		atarigen_6502_irq_gen(cputag_get_cpu(screen->machine, "audiocpu"));
+		atarigen_6502_irq_gen(devtag_get_device(screen->machine, "audiocpu"));
 	else
 		atarigen_6502_irq_ack_r(space, 0);
 }
@@ -173,7 +173,7 @@ static MACHINE_RESET( gauntlet )
 	atarigen_slapstic_reset(&state->atarigen);
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
 	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 32);
-	atarigen_sound_io_reset(cputag_get_cpu(machine, "audiocpu"));
+	atarigen_sound_io_reset(devtag_get_device(machine, "audiocpu"));
 }
 
 
@@ -1617,7 +1617,7 @@ static void gauntlet_common_init(running_machine *machine, int slapstic, int vin
 	gauntlet_state *state = (gauntlet_state *)machine->driver_data;
 	UINT8 *rom = memory_region(machine, "maincpu");
 	state->atarigen.eeprom_default = NULL;
-	atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), 0x038000, 0, slapstic);
+	atarigen_slapstic_init(devtag_get_device(machine, "maincpu"), 0x038000, 0, slapstic);
 
 	/* swap the top and bottom halves of the main CPU ROM images */
 	atarigen_swap_mem(rom + 0x000000, rom + 0x008000, 0x8000);
@@ -1652,7 +1652,7 @@ static DRIVER_INIT( gauntlet2 )
 static DRIVER_INIT( vindctr2 )
 {
 	UINT8 *gfx2_base = memory_region(machine, "gfx2");
-	UINT8 *data = alloc_array_or_die(UINT8, 0x8000);
+	UINT8 *data = auto_alloc_array(machine, UINT8, 0x8000);
 	int i;
 
 	gauntlet_common_init(machine, 118, 1);
@@ -1660,13 +1660,13 @@ static DRIVER_INIT( vindctr2 )
 	/* highly strange -- the address bits on the chip at 2J (and only that
        chip) are scrambled -- this is verified on the schematics! */
 
-		memcpy(data, &gfx2_base[0x88000], 0x8000);
-		for (i = 0; i < 0x8000; i++)
-		{
-			int srcoffs = (i & 0x4000) | ((i << 11) & 0x3800) | ((i >> 3) & 0x07ff);
-			gfx2_base[0x88000 + i] = data[srcoffs];
-		}
-		free(data);
+	memcpy(data, &gfx2_base[0x88000], 0x8000);
+	for (i = 0; i < 0x8000; i++)
+	{
+		int srcoffs = (i & 0x4000) | ((i << 11) & 0x3800) | ((i >> 3) & 0x07ff);
+		gfx2_base[0x88000 + i] = data[srcoffs];
+	}
+	auto_free(machine, data);
 }
 
 

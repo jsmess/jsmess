@@ -72,7 +72,7 @@
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/6850acia.h"
 #include "machine/meters.h"
 #include "cpu/z80/z80.h"
@@ -1665,7 +1665,7 @@ static DRIVER_INIT( bfcobra )
 	UINT8 *rom;
 	UINT8 *tmp;
 
-	tmp = alloc_array_or_die(UINT8, 0x8000);
+	tmp = auto_alloc_array(machine, UINT8, 0x8000);
 	rom = memory_region(machine, "audiocpu") + 0x8000;
 	memcpy(tmp, rom, 0x8000);
 
@@ -1685,7 +1685,7 @@ static DRIVER_INIT( bfcobra )
 		rom[addr] = data;
 	}
 
-	free(tmp);
+	auto_free(machine, tmp);
 
 	init_ram(machine);
 

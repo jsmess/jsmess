@@ -180,7 +180,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "deprecat.h"
 #include "devices/appldriv.h"

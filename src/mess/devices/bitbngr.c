@@ -8,7 +8,7 @@
 
 #include <math.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "bitbngr.h"
 #include "printer.h"
 

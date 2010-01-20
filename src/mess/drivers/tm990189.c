@@ -37,7 +37,7 @@
     Raphael Nabet 2003
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/tms9900/tms9900.h"
 #include "machine/tms9901.h"
 #include "machine/tms9902.h"
@@ -53,16 +53,16 @@ static int ic_state;
 static int digitsel;
 static int segment;
 
-static void *displayena_timer;
+static emu_timer *displayena_timer;
 #define displayena_duration ATTOTIME_IN_USEC(4500)	/* Can anyone confirm this? 74LS123 connected to C=0.1uF and R=100kOhm */
 static UINT8 segment_state[10];
 static UINT8 old_segment_state[10];
 static UINT8 LED_state;
 
-static void *joy1x_timer;
-static void *joy1y_timer;
-static void *joy2x_timer;
-static void *joy2y_timer;
+static emu_timer *joy1x_timer;
+static emu_timer *joy1y_timer;
+static emu_timer *joy2x_timer;
+static emu_timer *joy2y_timer;
 
 enum
 {
@@ -363,7 +363,7 @@ static TIMER_CALLBACK(rs232_input_callback)
 
 	if (/*rs232_rts &&*/ /*(mame_ftell(rs232_fp) < mame_fsize(rs232_fp))*/1)
 	{
-		if (image_fread(ptr, &buf, 1) == 1)
+		if (image_fread((const device_config*)ptr, &buf, 1) == 1)
 			tms9902_push_data(devtag_get_device(machine, "tms9902"), buf);
 	}
 }

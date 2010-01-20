@@ -16,7 +16,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "video/saa5050.h"
 
 #define SAA5050_DBLHI   0x0001
@@ -347,7 +347,7 @@ static DEVICE_START( saa5050 )
 	saa5050_state *saa5050 = get_safe_token(device);
 	const saa5050_interface *intf = get_interface(device);
 
-	saa5050->screen = devtag_get_device(device->machine, intf->screen);
+	saa5050->screen = device->machine->device(intf->screen);
 	saa5050->gfxnum = intf->gfxnum;
 	saa5050->x = intf->x;
 	saa5050->y = intf->y;

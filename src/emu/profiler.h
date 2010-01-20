@@ -24,7 +24,6 @@
 #ifndef __PROFILER_H__
 #define __PROFILER_H__
 
-#include "astring.h"
 
 
 /***************************************************************************
@@ -130,7 +129,7 @@ extern profiler_state global_profiler;
 #define profiler_mark_end()		do { } while (0)
 #define profiler_start()		do { } while (0)
 #define profiler_stop()			do { } while (0)
-#define profiler_get_text(x,s)	astring_reset(s)
+#define profiler_get_text(x,s)	(s).reset()
 
 #endif
 
@@ -150,7 +149,7 @@ void _profiler_mark_start(int type);
 void _profiler_mark_end(void);
 
 /* return the current text in an astring */
-astring *_profiler_get_text(running_machine *machine, astring *string);
+astring &_profiler_get_text(running_machine *machine, astring &string);
 
 
 #endif	/* __PROFILER_H__ */

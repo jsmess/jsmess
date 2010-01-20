@@ -8,7 +8,7 @@
     Raphael Nabet 2003
 */
 
-#include "driver.h"
+#include "emu.h"
 
 #include "990_dk.h"
 #include "formats/basicdsk.h"
@@ -16,6 +16,9 @@
 
 #define MAX_FLOPPIES 4
 
+enum buf_mode_t { 
+	bm_off, bm_read, bm_write 
+};
 static struct
 {
 	running_machine *machine;
@@ -29,7 +32,7 @@ static struct
 
 	UINT8 buf[128];
 	int buf_pos;
-	enum { bm_off, bm_read, bm_write } buf_mode;
+	buf_mode_t buf_mode;
 	int unit;
 	int head;
 	int sector;

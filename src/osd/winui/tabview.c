@@ -22,7 +22,7 @@
 
 // MAME/MAMEUI headers
 #include "tabview.h"
-#include "driver.h"
+#include "emu.h"
 #include "mui_util.h"
 #include "strconv.h"
 
@@ -292,7 +292,7 @@ void TabView_Reset(HWND hwndTabView)
 				return;
 			tci.pszText = t_text;
 			TabCtrl_InsertItem(hwndTabView, i, &tci);
-			free(t_text);
+//			free(t_text);
 		}
 	}
 	TabView_UpdateSelection(hwndTabView);

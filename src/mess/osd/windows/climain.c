@@ -9,18 +9,9 @@
 #undef wmain
 #endif
 
-#ifdef __GNUC__
-int __declspec(dllimport) mess_cli_main(int argc, char **argv);
-
-int main(int argc, char *argv[])
-{
-	return mess_cli_main(argc, argv);
-}
-#else
 int __declspec(dllimport) mess_cli_main(int argc, TCHAR **argv);
 
-int _tmain(int argc, TCHAR*argv[])
+extern "C" int _tmain(int argc, TCHAR*argv[])
 {
 	return mess_cli_main(argc, argv);
 }
-#endif

@@ -11,7 +11,7 @@
     Interfacing it with the tms5110 would make sense, too.
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "spchroms.h"
 
 static UINT8 *speechrom_data = NULL;	/* pointer to speech ROM data */

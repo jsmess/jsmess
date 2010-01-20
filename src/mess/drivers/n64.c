@@ -7,7 +7,7 @@
     Porting from Mupen64 by Harmony
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"

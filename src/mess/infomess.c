@@ -8,7 +8,7 @@
 
 #include <ctype.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "sound/samples.h"
 #include "info.h"
 #include "hash.h"
@@ -123,7 +123,7 @@ void print_game_ramoptions(FILE *out, const game_driver *game, const machine_con
 
 	for (device = ram_first(config); device != NULL; device = ram_next(device))
 	{
-		ram_config *config = device->inline_config;
+		ram_config *config = (ram_config *)device->inline_config;
 		fprintf(out, "\t\t<ramoption default=\"1\">%u</ramoption>\n",  messram_parse_string(config->default_size));
 		if (config->extra_options != NULL)
 		{

@@ -1,9 +1,7 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/hng64.h"
 
-#include <math.h>
 #include "drawgfxm.h"
-#include "tilemap.h"
 
 #define MAKE_MAME_REEEEAAALLLL_SLOW 0
 
@@ -1678,6 +1676,8 @@ struct polygon
 	INT8 texIndex;				// Which texture to draw from (0x00-0x0f)
 	INT8 texType;				// How to index into the texture
 	UINT32 palOffset;			// The base offset where this object's palette starts.
+
+	UINT32 debugColor;			// Will go away someday.  Used to explicitly color polygons for debugging.
 };
 
 static void setIdentity(float *matrix);
@@ -1698,6 +1698,34 @@ static float uToF(UINT16 input);
 ////////////////////
 // 3d 'Functions' //
 ////////////////////
+
+void printPacket(const UINT16* packet, int hex)
+{
+	if (hex)
+	{
+		printf("Packet : %04x %04x  2:%04x %04x  4:%04x %04x  6:%04x %04x  8:%04x %04x  10:%04x %04x  12:%04x %04x  14:%04x %04x\n",
+				packet[0],  packet[1],
+				packet[2],  packet[3],
+				packet[4],  packet[5],
+				packet[6],  packet[7],
+				packet[8],  packet[9],
+				packet[10], packet[11],
+				packet[12], packet[13],
+				packet[14], packet[15]);
+	}
+	else
+	{
+		printf("Packet : %04x %3.4f  2:%3.4f %3.4f  4:%3.4f %3.4f  6:%3.4f %3.4f  8:%3.4f %3.4f  10:%3.4f %3.4f  12:%3.4f %3.4f  14:%3.4f %3.4f\n",
+				packet[0],            uToF(packet[1] )*128,
+				uToF(packet[2] )*128, uToF(packet[3] )*128,
+				uToF(packet[4] )*128, uToF(packet[5] )*128,
+				uToF(packet[6] )*128, uToF(packet[7] )*128,
+				uToF(packet[8] )*128, uToF(packet[9] )*128,
+				uToF(packet[10])*128, uToF(packet[11])*128,
+				uToF(packet[12])*128, uToF(packet[13])*128,
+				uToF(packet[14])*128, uToF(packet[15])*128);
+	}
+}
 
 // Operation 0001
 // Camera transformation.
@@ -1768,10 +1796,6 @@ static void set3dFlags(const UINT16* packet)
     // [15] - ???? ... ? ''  ''
     ////////////*/
 	paletteState3d = (packet[8] & 0xff00) >> 8;
-	/* FIXME: Buriki One door colors in attract mode still aren't quite right, investigate... */
-	/* FIXME: This really isn't correct - commenting out this line fixes the palette in roadedge snk intro */
-	/*        But Xrally likes the offset...  */
-	paletteState3d += ((hng64_3dregs[0x00/4] & 0x2000) >> 9); /* Palette is + 0x0800 in buriki. */
 }
 
 // Operation 0012
@@ -1858,9 +1882,9 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
     // [10] - xxxx ... Transformation matrix
     // [11] - xxxx ... Transformation matrix
     // [12] - xxxx ... Transformation matrix
-    // [13] - ???? ... Transformation matrix
-    // [14] - ???? ... Transformation matrix
-    // [15] - ???? ... Transformation matrix
+    // [13] - xxxx ... Transformation matrix
+    // [14] - xxxx ... Transformation matrix
+    // [15] - xxxx ... Transformation matrix
     ////////////*/
 	int k, l, m;
 
@@ -1896,6 +1920,13 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 	threeDRoms = (UINT16*)(memory_region(machine, "verts"));
 	threeDPointer = &threeDRoms[threeDOffset * 3];
+
+	if (threeDOffset >= 0x0c00000 && hng64_mcu_type == SHOOT_MCU)
+	{
+		printf("Strange geometry packet: (ignoring)\n");
+		printPacket(packet, 1);
+		return;
+	}
 
 	// Debug - ajg
 	/*
@@ -1943,11 +1974,11 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
     // [3]  - lower word of sub-address 3
     // [4]  - lower word of sub-address 4
     // [5]  - ???? always 0 ????
-    // [6]  - number of triangles in sub-address 1 block
-    // [7]  - number of triangles in sub-address 2 block
+    // [6]  - number of chunks in sub-address 1 block
+    // [7]  - number of chunks in sub-address 2 block
     // [8]  - ???? always 0 ????
-    // [9]  - number of triangles in sub-address 3 block
-    // [10] - number of triangles in sub-address 4 block
+    // [9]  - number of chunks in sub-address 3 block
+    // [10] - number of chunks in sub-address 4 block
     // [11] - ? definitely used.
     // [12] - ? definitely used.
     // [13] - ? definitely used.
@@ -1998,7 +2029,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	/* For all 4 polygon chunks */
 	for (k = 0; k < 4; k++)
 	{
-		threeDPointer = &threeDRoms[address[k] * 3];
+		UINT16* chunkOffset = &threeDRoms[address[k] * 3];
 		for (l = 0; l < size[k]; l++)
 		{
 			////////////////////////////////////////////
@@ -2008,45 +2039,66 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
             // SINGLE POLY CHUNK FORMAT
             // [0] ??-- - ???? unused ????
             // [0] --xx - chunk type
-            // [1] x--- - 'texture type' (or UV-mapping style)?
-            // [1] -??- - ???? '18' for untextured buildings in fatfurwa ????
+            // [1] ?--- - unknown flags
+            // [1] -x-- - Explicit palette lookup when not dynamic.  What's it used for when dynamic is on?
+            // [1] --?- - unknown
             // [1] ---x - texture index
             // [2] ???? - used in fatfurwa 'hng64' & everywhere in roadedge
             /////////////////////////*/
 			UINT8 chunkLength = 0;
-			UINT8 chunkType = threeDPointer[0] & 0x00ff;
+			UINT8 chunkType = chunkOffset[0] & 0x00ff;
+
+			// Debug - Colors polygons with certain flags bright blue! ajg
+			//if (chunkOffset[2] & 0x00f0)
+			//  polys[*numPolys].debugColor = 0xff0000ff;
 
 			// Debug - ajg
-			//printf("%d (%08x) : %04x %04x %04x ", k, address[k]*3*2, threeDPointer[0], threeDPointer[1], threeDPointer[2]);
+			//printf("%d (%08x) : %04x %04x %04x ", k, address[k]*3*2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
 			//break;
 
 			// Debug - ajg
-			//if ((threeDPointer[0] & 0xff00) != 0x0000)
-			//{
-			//  printf("!!! Doesn't appear to be a valid chunk !!!\n");
-			//  continue;
-			//}
+			if (chunkOffset[0] & 0xff00)
+			{
+				printf("It's crazy that you got here!\n");
+				continue;
+			}
 
-			// Get which texture this polygon refers to...
-			// In fatfur it's 0xc for the smooth-shaded earth - maybe this is for all things with alpha - check the hair at some point.
-			//                0x9 for the untextured buildings
-			//                0xd for the 'explosion' of the HNG64
-			//            and 0x8 everywhere else...
-			//        they're 0x8 in the buriki intro too (those are 66-byte chunks!)
-			polys[*numPolys].texType = ((threeDPointer[1] & 0xf000) >> 4 >> 8);
+			// TEXTURE
+			// FIXME: This is completely incorrect - these are flags, not overall 'types'
+			polys[*numPolys].texType = ((chunkOffset[1] & 0xf000) >> 12);
 
+			// The texture index is correct, but this texture type stuff isn't.
 			if (polys[*numPolys].texType == 0x8 || polys[*numPolys].texType == 0xc)		//  || polys[*numPolys].texType == 0x9
 			{
-				polys[*numPolys].texIndex = threeDPointer[1] & 0x000f;
+				polys[*numPolys].texIndex = chunkOffset[1] & 0x000f;
 			}
 			else
 			{
 				polys[*numPolys].texIndex = -1;
 			}
 
-			// Set the polygon's palette offset
-			// TODO: Figure this out for real.  It doesn't work like this in roadedge.
-			polys[*numPolys].palOffset = paletteState3d * 0x80;
+			// PALETTE
+			polys[*numPolys].palOffset = 0;
+
+			/* FIXME: This really isn't correct - commenting out this line fixes the palette in roadedge snk intro */
+			/*        There must be something set globally somewhere.  */
+			if (hng64_3dregs[0x00/4] & 0x2000)
+			{
+				polys[*numPolys].palOffset += 0x800;
+			}
+
+			// Apply the dynamic palette offset if its flag is set, otherwise use the fixed one from the ROM
+			if ((packet[1] & 0x0100))
+			{
+				polys[*numPolys].palOffset += paletteState3d * 0x80;
+				/* TODO: Does the explicit palette bit do anything when the dynamic palette flag is on? */
+			}
+			else
+            {
+				UINT8 explicitPaletteValue = (chunkOffset[1] & 0x0f00) >> 8;
+				polys[*numPolys].palOffset += explicitPaletteValue * 0x80;
+			}
+
 
 			switch(chunkType)
 			{
@@ -2067,21 +2119,21 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			case 0x0f:	// 0000 1111
 				for (m = 0; m < 3; m++)
 				{
-					polys[*numPolys].vert[m].worldCoords[0] = uToF(threeDPointer[3 + (9*m)]);
-					polys[*numPolys].vert[m].worldCoords[1] = uToF(threeDPointer[4 + (9*m)]);
-					polys[*numPolys].vert[m].worldCoords[2] = uToF(threeDPointer[5 + (9*m)]);
+					polys[*numPolys].vert[m].worldCoords[0] = uToF(chunkOffset[3 + (9*m)]);
+					polys[*numPolys].vert[m].worldCoords[1] = uToF(chunkOffset[4 + (9*m)]);
+					polys[*numPolys].vert[m].worldCoords[2] = uToF(chunkOffset[5 + (9*m)]);
 					polys[*numPolys].vert[m].worldCoords[3] = 1.0f;
 					polys[*numPolys].n = 3;
 
-					// threeDPointer[6 + (9*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-					polys[*numPolys].vert[m].texCoords[0] = uToF(threeDPointer[7 + (9*m)]);
-					polys[*numPolys].vert[m].texCoords[1] = uToF(threeDPointer[8 + (9*m)]);
+					// chunkOffset[6 + (9*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
+					polys[*numPolys].vert[m].texCoords[0] = uToF(chunkOffset[7 + (9*m)]);
+					polys[*numPolys].vert[m].texCoords[1] = uToF(chunkOffset[8 + (9*m)]);
 					polys[*numPolys].vert[m].texCoords[2] = 0.0f;
 					polys[*numPolys].vert[m].texCoords[3] = 1.0f;
 
-					polys[*numPolys].vert[m].normal[0] = uToF(threeDPointer[9  + (9*m)]);
-					polys[*numPolys].vert[m].normal[1] = uToF(threeDPointer[10 + (9*m)] );
-					polys[*numPolys].vert[m].normal[2] = uToF(threeDPointer[11 + (9*m)] );
+					polys[*numPolys].vert[m].normal[0] = uToF(chunkOffset[9  + (9*m)]);
+					polys[*numPolys].vert[m].normal[1] = uToF(chunkOffset[10 + (9*m)] );
+					polys[*numPolys].vert[m].normal[2] = uToF(chunkOffset[11 + (9*m)] );
 					polys[*numPolys].vert[m].normal[3] = 0.0f;
 
 					// !!! DUMB !!!
@@ -2091,9 +2143,9 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				}
 
 				// Redundantly called, but it works...
-				polys[*numPolys].faceNormal[0] = uToF(threeDPointer[30]);
-				polys[*numPolys].faceNormal[1] = uToF(threeDPointer[31]);
-				polys[*numPolys].faceNormal[2] = uToF(threeDPointer[32]);
+				polys[*numPolys].faceNormal[0] = uToF(chunkOffset[30]);
+				polys[*numPolys].faceNormal[1] = uToF(chunkOffset[31]);
+				polys[*numPolys].faceNormal[2] = uToF(chunkOffset[32]);
 				polys[*numPolys].faceNormal[3] = 0.0f;
 
 				chunkLength = 33;
@@ -2107,21 +2159,21 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			case 0x2e:	// 0010 1110
 				for (m = 0; m < 3; m++)
 				{
-					polys[*numPolys].vert[m].worldCoords[0] = uToF(threeDPointer[3 + (6*m)]);
-					polys[*numPolys].vert[m].worldCoords[1] = uToF(threeDPointer[4 + (6*m)]);
-					polys[*numPolys].vert[m].worldCoords[2] = uToF(threeDPointer[5 + (6*m)]);
+					polys[*numPolys].vert[m].worldCoords[0] = uToF(chunkOffset[3 + (6*m)]);
+					polys[*numPolys].vert[m].worldCoords[1] = uToF(chunkOffset[4 + (6*m)]);
+					polys[*numPolys].vert[m].worldCoords[2] = uToF(chunkOffset[5 + (6*m)]);
 					polys[*numPolys].vert[m].worldCoords[3] = 1.0f;
 					polys[*numPolys].n = 3;
 
-					// threeDPointer[6 + (6*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-					polys[*numPolys].vert[m].texCoords[0] = uToF(threeDPointer[7 + (6*m)]);
-					polys[*numPolys].vert[m].texCoords[1] = uToF(threeDPointer[8 + (6*m)]);
+					// chunkOffset[6 + (6*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
+					polys[*numPolys].vert[m].texCoords[0] = uToF(chunkOffset[7 + (6*m)]);
+					polys[*numPolys].vert[m].texCoords[1] = uToF(chunkOffset[8 + (6*m)]);
 					polys[*numPolys].vert[m].texCoords[2] = 0.0f;
 					polys[*numPolys].vert[m].texCoords[3] = 1.0f;
 
-					polys[*numPolys].vert[m].normal[0] = uToF(threeDPointer[21]);
-					polys[*numPolys].vert[m].normal[1] = uToF(threeDPointer[22]);
-					polys[*numPolys].vert[m].normal[2] = uToF(threeDPointer[23]);
+					polys[*numPolys].vert[m].normal[0] = uToF(chunkOffset[21]);
+					polys[*numPolys].vert[m].normal[1] = uToF(chunkOffset[22]);
+					polys[*numPolys].vert[m].normal[2] = uToF(chunkOffset[23]);
 					polys[*numPolys].vert[m].normal[3] = 0.0f;
 
 					// !!! DUMB !!!
@@ -2144,35 +2196,36 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			case 0x87:	// 1000 0111
 			case 0x97:	// 1001 0111
 			case 0xd7:	// 1101 0111
+			case 0xc7:	// 1100 0111
 				// Copy over the proper vertices from the previous triangle...
 				memcpy(&polys[*numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
 				memcpy(&polys[*numPolys].vert[2], &lastPoly.vert[2], sizeof(struct polyVert));
 
 				// Fill in the appropriate data...
-				polys[*numPolys].vert[0].worldCoords[0] = uToF(threeDPointer[3]);
-				polys[*numPolys].vert[0].worldCoords[1] = uToF(threeDPointer[4]);
-				polys[*numPolys].vert[0].worldCoords[2] = uToF(threeDPointer[5]);
+				polys[*numPolys].vert[0].worldCoords[0] = uToF(chunkOffset[3]);
+				polys[*numPolys].vert[0].worldCoords[1] = uToF(chunkOffset[4]);
+				polys[*numPolys].vert[0].worldCoords[2] = uToF(chunkOffset[5]);
 				polys[*numPolys].vert[0].worldCoords[3] = 1.0f;
 				polys[*numPolys].n = 3;
 
-				// threeDPointer[6] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-				polys[*numPolys].vert[0].texCoords[0] = uToF(threeDPointer[7]);
-				polys[*numPolys].vert[0].texCoords[1] = uToF(threeDPointer[8]);
+				// chunkOffset[6] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
+				polys[*numPolys].vert[0].texCoords[0] = uToF(chunkOffset[7]);
+				polys[*numPolys].vert[0].texCoords[1] = uToF(chunkOffset[8]);
 				polys[*numPolys].vert[0].texCoords[2] = 0.0f;
 				polys[*numPolys].vert[0].texCoords[3] = 1.0f;
 
-				polys[*numPolys].vert[0].normal[0] = uToF(threeDPointer[9]);
-				polys[*numPolys].vert[0].normal[1] = uToF(threeDPointer[10]);
-				polys[*numPolys].vert[0].normal[2] = uToF(threeDPointer[11]);
+				polys[*numPolys].vert[0].normal[0] = uToF(chunkOffset[9]);
+				polys[*numPolys].vert[0].normal[1] = uToF(chunkOffset[10]);
+				polys[*numPolys].vert[0].normal[2] = uToF(chunkOffset[11]);
 				polys[*numPolys].vert[0].normal[3] = 0.0f;
 
 				polys[*numPolys].vert[0].light[0] = polys[*numPolys].vert[0].texCoords[0] * 255.0f;
 				polys[*numPolys].vert[0].light[1] = polys[*numPolys].vert[0].texCoords[1] * 255.0f;
 				polys[*numPolys].vert[0].light[2] = polys[*numPolys].vert[0].texCoords[2] * 255.0f;
 
-				polys[*numPolys].faceNormal[0] = uToF(threeDPointer[12]);
-				polys[*numPolys].faceNormal[1] = uToF(threeDPointer[13]);
-				polys[*numPolys].faceNormal[2] = uToF(threeDPointer[14]);
+				polys[*numPolys].faceNormal[0] = uToF(chunkOffset[12]);
+				polys[*numPolys].faceNormal[1] = uToF(chunkOffset[13]);
+				polys[*numPolys].faceNormal[2] = uToF(chunkOffset[14]);
 				polys[*numPolys].faceNormal[3] = 0.0f;
 
 				chunkLength = 15;
@@ -2189,15 +2242,15 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				memcpy(&polys[*numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
 				memcpy(&polys[*numPolys].vert[2], &lastPoly.vert[2], sizeof(struct polyVert));
 
-				polys[*numPolys].vert[0].worldCoords[0] = uToF(threeDPointer[3]);
-				polys[*numPolys].vert[0].worldCoords[1] = uToF(threeDPointer[4]);
-				polys[*numPolys].vert[0].worldCoords[2] = uToF(threeDPointer[5]);
+				polys[*numPolys].vert[0].worldCoords[0] = uToF(chunkOffset[3]);
+				polys[*numPolys].vert[0].worldCoords[1] = uToF(chunkOffset[4]);
+				polys[*numPolys].vert[0].worldCoords[2] = uToF(chunkOffset[5]);
 				polys[*numPolys].vert[0].worldCoords[3] = 1.0f;
 				polys[*numPolys].n = 3;
 
-				// threeDPointer[6] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-				polys[*numPolys].vert[0].texCoords[0] = uToF(threeDPointer[7]);
-				polys[*numPolys].vert[0].texCoords[1] = uToF(threeDPointer[8]);
+				// chunkOffset[6] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
+				polys[*numPolys].vert[0].texCoords[0] = uToF(chunkOffset[7]);
+				polys[*numPolys].vert[0].texCoords[1] = uToF(chunkOffset[8]);
 				polys[*numPolys].vert[0].texCoords[2] = 0.0f;
 				polys[*numPolys].vert[0].texCoords[3] = 1.0f;
 
@@ -2222,10 +2275,10 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				/* DEBUG
                 printf("0x?6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
                 for (m = 0; m < 13; m++)
-                    printf("%04x ", threeDPointer[m]);
+                    printf("%04x ", chunkOffset[m]);
                 printf("\n");
                 for (m = 0; m < 13; m++)
-                    printf("%3.4f ", uToF(threeDPointer[m]));
+                    printf("%3.4f ", uToF(chunkOffset[m]));
                 printf("\n\n");
                 */
 
@@ -2323,55 +2376,13 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				}
 			}
 
-			/*
-            // DEBUG
-            if (chunkLength == (9 << 1))
-            {
-                mame_printf_debug("Chunk : ");
-                for (int a = 0; a < chunkLength; a+=2)
-                    mame_printf_debug("%.2x%.2x ", threeDPointer[a], threeDPointer[a+1]);
-                mame_printf_debug("\n");
-            }
-            // END DEBUG
-            */
-
 			// Advance to the next polygon chunk...
-			threeDPointer += chunkLength;
+			chunkOffset += chunkLength;
 
 			(*numPolys)++;
 		}
 	}
 }
-
-#ifdef UNUSED_FUNCTION
-void printPacket(const UINT16* packet, int hex)
-{
-	if (hex)
-	{
-		printf("Packet : %04x %04x  2:%04x %04x  4:%04x %04x  6:%04x %04x  8:%04x %04x  10:%04x %04x  12:%04x %04x  14:%04x %04x\n",
-				packet[0],  packet[1],
-				packet[2],  packet[3],
-				packet[4],  packet[5],
-				packet[6],  packet[7],
-				packet[8],  packet[9],
-				packet[10], packet[11],
-				packet[12], packet[13],
-				packet[14], packet[15]);
-	}
-	else
-	{
-		printf("Packet : %04x %3.4f  2:%3.4f %3.4f  4:%3.4f %3.4f  6:%3.4f %3.4f  8:%3.4f %3.4f  10:%3.4f %3.4f  12:%3.4f %3.4f  14:%3.4f %3.4f\n",
-				packet[0],            uToF(packet[1] )*128,
-				uToF(packet[2] )*128, uToF(packet[3] )*128,
-				uToF(packet[4] )*128, uToF(packet[5] )*128,
-				uToF(packet[6] )*128, uToF(packet[7] )*128,
-				uToF(packet[8] )*128, uToF(packet[9] )*128,
-				uToF(packet[10])*128, uToF(packet[11])*128,
-				uToF(packet[12])*128, uToF(packet[13])*128,
-				uToF(packet[14])*128, uToF(packet[15])*128);
-	}
-}
-#endif
 
 void hng64_command3d(running_machine* machine, const UINT16* packet)
 {
@@ -2379,7 +2390,7 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 
 	/* A temporary place to put some polygons.  This will optimize away if the compiler's any good. */
 	int numPolys = 0;
-	struct polygon* polys = (struct polygon*)malloc(sizeof(struct polygon) * (1024*5));
+	struct polygon* polys = auto_alloc_array(machine, struct polygon, 1024*5);
 
 	//printf("packet type : %04x\n", packet[0]);
 	switch (packet[0])
@@ -2396,15 +2407,18 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		break;
 
 	case 0x0011:	// Palette / Model flags?
-		//printPacket(packet, 1);
+		//printPacket(packet, 1); printf("\n");
 		set3dFlags(packet);
 		break;
 
 	case 0x0012:	// Projection Matrix
+		//printPacket(packet, 1);
 		setCameraProjectionMatrix(packet);
 		break;
 
 	case 0x0100:	// Geometry
+	case 0x0101:	// Similar to 0x0100, but throws a strange packet in every now and again.
+		//printPacket(packet, 1);
 		recoverPolygonBlock(machine, packet, polys, &numPolys);
 
 		/* Immeditately rasterize the chunk's polygons into the display buffer */
@@ -2420,14 +2434,11 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		numPolys = 0;
 		break;
 
-	case 0x0101:	// Geometry of a different type - bbust2.
-		break;
-
 	case 0x0102:	// Geometry of a different type - sams games.
 		break;
 
 	case 0x1000:	// Unknown: Some sort of global flags?
-		//printPacket(packet, 1);
+		//printPacket(packet, 1); printf("\n");
 		break;
 
 	case 0x1001:	// Unknown: Some sort of global flags (a group of 4, actually)?
@@ -2439,7 +2450,7 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		break;
 	}
 
-	free(polys);
+	auto_free(machine, polys);
 }
 
 static void clear3d(running_machine *machine)
@@ -2825,7 +2836,7 @@ static void DrawWireframe(running_machine *machine, struct polygon *p)
 /**     Output: none                                                **/
 /*********************************************************************/
 INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
-										  int textureType, int palOffset, int texIndex,
+										  int textureType, int palOffset, int texIndex, int debugColor,
 										  int x_start, int x_end, int y, float z_start, float z_delta,
 										  float w_start, float w_delta, float r_start, float r_delta,
 										  float g_start, float g_delta, float b_start, float b_delta,
@@ -2852,9 +2863,15 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 			t_coord = t_start / w_start;
 			s_coord = s_start / w_start;
 
-			// GET THE TEXTURE INDEX
-			if (texIndex >= 0)
+			// DEBUG COLOR MODE
+			if (debugColor != 0x00000000)
 			{
+				*cb = debugColor;
+				*db = z_start;
+			}
+			else if (texIndex >= 0)
+			{
+				// TEXTURED
 				if (textureType == 0x8 || textureType == 0xc)
 					paletteEntry = textureOffset[(((int)(s_coord*1024.0f))*1024 + (int)(t_coord*1024.0f))];
 				else
@@ -2863,17 +2880,15 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 				// Naieve Alpha Implementation (?) - don't draw if you're at texture index 0...
 				if (paletteEntry != 0)
 				{
-					// Greyscale texture - for Buriki...
-					// *BITMAP_ADDR32(Color, y, x_start) = MAKE_ARGB(255, (UINT8)paletteEntry, (UINT8)paletteEntry, (UINT8)paletteEntry);
-
-					// *BITMAP_ADDR32(Color, y, x_start) = machine->pens[palOffset + paletteEntry];
+					// Greyscale texture test.
+					// *cb = MAKE_ARGB(255, (UINT8)paletteEntry, (UINT8)paletteEntry, (UINT8)paletteEntry);
 					*cb = machine->pens[palOffset + paletteEntry];
 					*db = z_start;
 				}
 			}
 			else
 			{
-				// *BITMAP_ADDR32(Color, y, x_start) = MAKE_ARGB(255, (UINT8)(r_start/w_start), (UINT8)(g_start/w_start), (UINT8)(b_start/w_start));
+				// UNTEXTURED
 				*cb = MAKE_ARGB(255, (UINT8)(r_start/w_start), (UINT8)(g_start/w_start), (UINT8)(b_start/w_start));
 				*db = z_start;
 			}
@@ -2924,7 +2939,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 											float A[4], float B[4], float C[4],
 											float Ca[3], float Cb[3], float Cc[3], // PER-VERTEX RGB COLORS
 											float Ta[2], float Tb[2], float Tc[2], // PER-VERTEX (S,T) TEX-COORDS
-											int textureType, int palOffset, int texIndex)
+											int textureType, int palOffset, int texIndex, int debugColor)
 {
 	// Get our order of points by increasing y-coord
 	float *p_min = ((A[1] <= B[1]) && (A[1] <= C[1])) ? A : ((B[1] <= A[1]) && (B[1] <= C[1])) ? B : C;
@@ -3115,7 +3130,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 
 		// Pass the horizontal line to the filler, this could be put in the routine
 		// then interpolate for the next values of x and z
-		FillSmoothTexPCHorizontalLine(machine, textureType, palOffset, texIndex,
+		FillSmoothTexPCHorizontalLine(machine, textureType, palOffset, texIndex, debugColor,
 			x_start, x_end, y_min, z_interp_x, z_delta_x, w_interp_x, w_delta_x,
 			r_interp_x, r_delta_x, g_interp_x, g_delta_x, b_interp_x, b_delta_x,
 			s_interp_x, s_delta_x, t_interp_x, t_delta_x);
@@ -3195,7 +3210,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 
 		// Pass the horizontal line to the filler, this could be put in the routine
 		// then interpolate for the next values of x and z
-		FillSmoothTexPCHorizontalLine(machine, textureType, palOffset, texIndex,
+		FillSmoothTexPCHorizontalLine(machine, textureType, palOffset, texIndex, debugColor,
 			x_start, x_end, y_mid, z_interp_x, z_delta_x, w_interp_x, w_delta_x,
 			r_interp_x, r_delta_x, g_interp_x, g_delta_x, b_interp_x, b_delta_x,
 			s_interp_x, s_delta_x, t_interp_x, t_delta_x);
@@ -3231,7 +3246,7 @@ static void drawShaded(running_machine *machine, struct polygon *p)
 										p->vert[0].clipCoords, p->vert[j].clipCoords, p->vert[j+1].clipCoords,
 										p->vert[0].light,      p->vert[j].light,      p->vert[j+1].light,
 										p->vert[0].texCoords,  p->vert[j].texCoords,  p->vert[j+1].texCoords,
-										p->texType, p->palOffset, p->texIndex);
+										p->texType, p->palOffset, p->texIndex, p->debugColor);
 
 	}
 }

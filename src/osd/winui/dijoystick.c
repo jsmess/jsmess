@@ -352,12 +352,12 @@ static BOOL DIJoystick_Available(void)
 	}
 
 	/* Are there any joysticks attached? */
-	if (IsEqualGUID(&guidDevice, &guidNULL))
+	if (IsEqualGUID(guidDevice, guidNULL))
 	{
 		return FALSE;
 	}
 
-	hr = IDirectInput_CreateDevice(di, &guidDevice, &didTemp, NULL);
+	hr = IDirectInput_CreateDevice(di, guidDevice, &didTemp, NULL);
 	if (FAILED(hr))
 	{
 		return FALSE;
@@ -365,7 +365,7 @@ static BOOL DIJoystick_Available(void)
 
 	/* Determine if DX5 is available by a QI for a DX5 interface. */
 	hr = IDirectInputDevice_QueryInterface(didTemp,
-										   &IID_IDirectInputDevice2,
+										   IID_IDirectInputDevice2,
 										   (void**)&didJoystick);
 	if (FAILED(hr))
 	{
@@ -527,7 +527,7 @@ static void InitJoystick(joystick_type *joystick)
 	joystick->is_light_gun = (_tcscmp(joystick->name, TEXT("ACT LABS GS (ACT LABS GS)")) == 0);
 
 	/* get a did1 interface first... */
-	hr = IDirectInput_CreateDevice(di, &joystick->guidDevice, &didTemp, NULL);
+	hr = IDirectInput_CreateDevice(di, joystick->guidDevice, &didTemp, NULL);
 	if (FAILED(hr))
 	{
 		ErrorMsg("DirectInput CreateDevice() joystick failed: %s\n", DirectXDecodeError(hr));
@@ -536,7 +536,7 @@ static void InitJoystick(joystick_type *joystick)
 	
 	/* get a did2 interface to work with polling (most) joysticks */
 	hr = IDirectInputDevice_QueryInterface(didTemp,
-										   &IID_IDirectInputDevice2,
+										   IID_IDirectInputDevice2,
 										   (void**)&joystick->did);
 
 	/* dispose of the temp interface */

@@ -10,7 +10,6 @@
 #define UTILS_H
 
 #include <string.h>
-#include "mamecore.h"
 
 /* -----------------------------------------------------------------------
  * strncpyz

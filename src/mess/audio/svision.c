@@ -4,7 +4,7 @@
  PeT mess@utanet.at
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "streams.h"
 #include "includes/svision.h"
 

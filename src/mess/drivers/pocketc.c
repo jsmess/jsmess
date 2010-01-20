@@ -4,7 +4,7 @@
  PeT mess@utanet.at May 2000
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/sc61860/sc61860.h"
 
 #include "includes/pocketc.h"
@@ -795,7 +795,7 @@ MACHINE_DRIVER_END
 
 static NVRAM_HANDLER( pc1260 )
 {
-	const device_config *main_cpu = cputag_get_cpu(machine, "maincpu");
+	const device_config *main_cpu = devtag_get_device(machine, "maincpu");
 	UINT8 *ram = memory_region(machine, "maincpu") + 0x4000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 

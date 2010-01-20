@@ -4,7 +4,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/vindictr.h"
 #include "includes/thunderj.h"
 
@@ -187,7 +187,7 @@ void vindictr_scanline_update(const device_config *screen, int scanline)
 				break;
 
 			case 6:		/* /VIRQ */
-				atarigen_scanline_int_gen(cputag_get_cpu(screen->machine, "maincpu"));
+				atarigen_scanline_int_gen(devtag_get_device(screen->machine, "maincpu"));
 				break;
 
 			case 7:		/* /PFVS */

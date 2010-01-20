@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 
 #include "machine/pit8253.h"
 #include "machine/pc_lpt.h"

@@ -71,7 +71,8 @@ The start address of a cart may be found at 800404. It is normally 802000.
 ***************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
+#include "emuopts.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mips/r3000.h"
 #include "cpu/jaguar/jaguar.h"
@@ -130,13 +131,13 @@ static IRQ_CALLBACK(jaguar_irq_callback)
 
 static MACHINE_RESET( jaguar )
 {
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), jaguar_irq_callback);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), jaguar_irq_callback);
 
 	protection_check = 0;
 
 	/* Set up pointers for Jaguar logo */
 	memcpy(jaguar_shared_ram, rom_base, 0x10);
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, rom_base[1]);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENPC, rom_base[1]);
 
 #if 0
 	/* set up main CPU RAM/ROM banks */
@@ -158,8 +159,8 @@ static MACHINE_RESET( jaguar )
 	jaguar_dsp_resume(machine);
 
 	/* halt the CPUs */
-	jaguargpu_ctrl_w(cputag_get_cpu(machine, "gpu"), G_CTRL, 0, 0xffffffff);
-	jaguardsp_ctrl_w(cputag_get_cpu(machine, "audiocpu"), D_CTRL, 0, 0xffffffff);
+	jaguargpu_ctrl_w(devtag_get_device(machine, "gpu"), G_CTRL, 0, 0xffffffff);
+	jaguardsp_ctrl_w(devtag_get_device(machine, "audiocpu"), D_CTRL, 0, 0xffffffff);
 
 	joystick_data = 0xffffffff;
 	eeprom_bit_count = 0;
@@ -284,7 +285,7 @@ static READ32_HANDLER( jaguar_eeprom_cs )
 
 static READ32_HANDLER( gpuctrl_r )
 {
-	UINT32 result = jaguargpu_ctrl_r(cputag_get_cpu(space->machine, "gpu"), offset);
+	UINT32 result = jaguargpu_ctrl_r(devtag_get_device(space->machine, "gpu"), offset);
 	if (protection_check != 1) return result;
 
 	protection_check++;
@@ -296,7 +297,7 @@ static READ32_HANDLER( gpuctrl_r )
 static WRITE32_HANDLER( gpuctrl_w )
 {
 	if ((!protection_check) && (offset == 5) && (data == 1)) protection_check++;
-	jaguargpu_ctrl_w(cputag_get_cpu(space->machine, "gpu"), offset, data, mem_mask);
+	jaguargpu_ctrl_w(devtag_get_device(space->machine, "gpu"), offset, data, mem_mask);
 }
 
 
@@ -309,13 +310,13 @@ static WRITE32_HANDLER( gpuctrl_w )
 
 static READ32_HANDLER( dspctrl_r )
 {
-	return jaguardsp_ctrl_r(cputag_get_cpu(space->machine, "audiocpu"), offset);
+	return jaguardsp_ctrl_r(devtag_get_device(space->machine, "audiocpu"), offset);
 }
 
 
 static WRITE32_HANDLER( dspctrl_w )
 {
-	jaguardsp_ctrl_w(cputag_get_cpu(space->machine, "audiocpu"), offset, data, mem_mask);
+	jaguardsp_ctrl_w(devtag_get_device(space->machine, "audiocpu"), offset, data, mem_mask);
 }
 
 
@@ -700,7 +701,7 @@ static QUICKLOAD_LOAD( jaguar )
 	}
 
 	/* Transfer control to image */
-	cpu_set_reg(cputag_get_cpu(image->machine, "maincpu"), REG_GENPC, quickload_begin);
+	cpu_set_reg(devtag_get_device(image->machine, "maincpu"), REG_GENPC, quickload_begin);
 	return INIT_PASS;
 }
 
@@ -731,7 +732,7 @@ static DEVICE_IMAGE_LOAD( jaguar )
 	cart_base[0x102] = 1;
 
 	/* Transfer control to the bios */
-	cpu_set_reg(cputag_get_cpu(image->machine, "maincpu"), REG_GENPC, rom_base[1]);
+	cpu_set_reg(devtag_get_device(image->machine, "maincpu"), REG_GENPC, rom_base[1]);
 	return INIT_PASS;
 }
 

@@ -121,7 +121,7 @@
 
 ****************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"
 #include "includes/nes.h"
@@ -1556,7 +1556,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 
 int nes_mapper_reset( running_machine *machine, int mmc_num )
 {
-	nes_state *state = machine->driver_data;
+	nes_state *state = (nes_state *)machine->driver_data;
 	int err = 0, i;
 	const mmc *mapper;
 
@@ -1622,7 +1622,7 @@ void nes_mapper_init(const mmc_intf *intf)
 // WIP code
 int nes_unif_reset( running_machine *machine, const char *board )
 {
-	nes_state *state = machine->driver_data;
+	nes_state *state = (nes_state *)machine->driver_data;
 	int err = 0;
 	const unif *unif_board;
 

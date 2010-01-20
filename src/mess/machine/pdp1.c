@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/pdp1/pdp1.h"
 #include "includes/pdp1.h"
 
@@ -582,8 +582,8 @@ static TIMER_CALLBACK(reader_callback)
 					tape_reader.rcl = 0;
 					if (tape_reader.rcp)
 					{
-						cpu_set_reg(cputag_get_cpu(machine, "maincpu"), PDP1_IO, tape_reader.rb);	/* transfer reader buffer to IO */
-						pdp1_pulse_iot_done(cputag_get_cpu(machine, "maincpu"));
+						cpu_set_reg(devtag_get_device(machine, "maincpu"), PDP1_IO, tape_reader.rb);	/* transfer reader buffer to IO */
+						pdp1_pulse_iot_done(devtag_get_device(machine, "maincpu"));
 					}
 					else
 						io_status |= io_st_ptr;
@@ -608,7 +608,7 @@ static TIMER_CALLBACK(puncher_callback)
 	io_status |= io_st_ptp;
 	if (nac)
 	{
-		pdp1_pulse_iot_done(cputag_get_cpu(machine, "maincpu"));
+		pdp1_pulse_iot_done(devtag_get_device(machine, "maincpu"));
 	}
 }
 
@@ -905,7 +905,7 @@ static TIMER_CALLBACK(tyo_callback)
 	io_status |= io_st_tyo;
 	if (nac)
 	{
-		pdp1_pulse_iot_done(cputag_get_cpu(machine, "maincpu"));
+		pdp1_pulse_iot_done(devtag_get_device(machine, "maincpu"));
 	}
 }
 
@@ -1021,7 +1021,7 @@ static void iot_tyi(const device_config *device, int op2, int nac, int mb, int *
 */
 static TIMER_CALLBACK(dpy_callback)
 {
-	pdp1_pulse_iot_done(cputag_get_cpu(machine, "maincpu"));
+	pdp1_pulse_iot_done(devtag_get_device(machine, "maincpu"));
 }
 
 
@@ -1047,7 +1047,7 @@ static void iot_dpy(const device_config *device, int op2, int nac, int mb, int *
 	{
 		io_status |= io_st_pen;
 
-		cpu_set_reg(cputag_get_cpu(device->machine, "maincpu"), PDP1_PF3, 1);
+		cpu_set_reg(devtag_get_device(device->machine, "maincpu"), PDP1_PF3, 1);
 	}
 
 	if (nac)
@@ -1201,9 +1201,9 @@ static void iot_dcc(const device_config *device, int op2, int nac, int mb, int *
 		if (parallel_drum.wc)
 			delay = attotime_add(delay, PARALLEL_DRUM_WORD_TIME);
 	} while (parallel_drum.wc);
-	cpu_adjust_icount(cputag_get_cpu(device->machine, "maincpu"),-cputag_attotime_to_clocks(device->machine, "maincpu", delay));
+	cpu_adjust_icount(devtag_get_device(device->machine, "maincpu"),-cputag_attotime_to_clocks(device->machine, "maincpu", delay));
 	/* if no error, skip */
-	cpu_set_reg(cputag_get_cpu(device->machine, "maincpu"), PDP1_PC, cpu_get_reg(cputag_get_cpu(device->machine, "maincpu"), PDP1_PC)+1);
+	cpu_set_reg(devtag_get_device(device->machine, "maincpu"), PDP1_PC, cpu_get_reg(devtag_get_device(device->machine, "maincpu"), PDP1_PC)+1);
 }
 
 static void iot_dra(const device_config *device, int op2, int nac, int mb, int *io, int ac)
@@ -1332,7 +1332,7 @@ static void pdp1_keyboard(running_machine *machine)
 			#if USE_SBS
 				cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0);	/* interrupt it, baby */
 			#endif
-			cpu_set_reg(cputag_get_cpu(machine, "maincpu"), PDP1_PF1, 1);
+			cpu_set_reg(devtag_get_device(machine, "maincpu"), PDP1_PF1, 1);
 			pdp1_typewriter_drawchar(machine, typewriter.tb);	/* we want to echo input */
 			break;
 		}
@@ -1483,7 +1483,7 @@ INTERRUPT_GEN( pdp1_interrupt )
 			pdp1_pulse_start_clear(device);	/* pulse Start Clear line */
 			cpu_set_reg(device, PDP1_PC, (  cpu_get_reg(device, PDP1_TA) & 0170000)
 										|  (cpu_get_reg(device, PDP1_PC) & 0007777));	/* transfer ETA to EPC */
-			/*cpu_set_reg(cputag_get_cpu(machine, "maincpu"), PDP1_MA, cpu_get_reg(cputag_get_cpu(machine, "maincpu"), PDP1_PC));*/
+			/*cpu_set_reg(devtag_get_device(machine, "maincpu"), PDP1_MA, cpu_get_reg(devtag_get_device(machine, "maincpu"), PDP1_PC));*/
 			cpu_set_reg(device, PDP1_EXD, cpu_get_reg(device, PDP1_EXTEND_SW));
 			cpu_set_reg(device, PDP1_OV, 0);		/* right??? */
 			cpu_set_reg(device, PDP1_RUN, 0);

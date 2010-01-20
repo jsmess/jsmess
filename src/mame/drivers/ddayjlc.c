@@ -51,7 +51,7 @@ $842f = lives
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
@@ -638,7 +638,7 @@ static DRIVER_INIT( ddayjlc )
 	{
 		UINT32 oldaddr, newadr, length,j;
 		UINT8 *src, *dst, *temp;
-		temp = alloc_array_or_die(UINT8, 0x10000);
+		temp = auto_alloc_array(machine, UINT8, 0x10000);
 		src = temp;
 		dst = memory_region(machine, "gfx1");
 		length = memory_region_length(machine, "gfx1");
@@ -652,7 +652,7 @@ static DRIVER_INIT( ddayjlc )
 			newadr += 32;
 			oldaddr += 16;
 		}
-		free(temp);
+		auto_free(machine, temp);
 	}
 
 	memory_configure_bank(machine, "bank1", 0, 3, memory_region(machine, "user1"), 0x4000);

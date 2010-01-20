@@ -28,7 +28,7 @@
     Raphael Nabet, Brett Wyer, 2003-2005
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/concept.h"
 #include "devices/flopdrv.h"

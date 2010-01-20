@@ -11,7 +11,7 @@
 
 ***************************************************************************/
 
-#include "sndintrf.h"
+#include "emu.h"
 #include "streams.h"
 #include "ay8910.h"
 #include "2610intf.h"
@@ -150,7 +150,7 @@ static DEVICE_START( ym2610 )
 	void *pcmbufa,*pcmbufb;
 	int  pcmsizea,pcmsizeb;
 	ym2610_state *info = get_safe_token(device);
-	astring *name = astring_alloc();
+	astring name;
 	sound_type type = sound_get_type(device);
 
 	info->intf = intf;
@@ -165,12 +165,11 @@ static DEVICE_START( ym2610 )
 	/* stream system initialize */
 	info->stream = stream_create(device,0,2,rate,info,(type == SOUND_YM2610) ? ym2610_stream_update : ym2610b_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = device->region;
-	pcmsizea = device->regionbytes;
-	astring_printf(name, "%s.deltat", device->tag);
-	pcmbufb  = (void *)(memory_region(device->machine, astring_c(name)));
-	pcmsizeb = memory_region_length(device->machine, astring_c(name));
-	astring_free(name);
+	pcmbufa  = *device->region;
+	pcmsizea = device->region->bytes();
+	name.printf("%s.deltat", device->tag.cstr());
+	pcmbufb  = (void *)(memory_region(device->machine, name));
+	pcmsizeb = memory_region_length(device->machine, name);
 	if (pcmbufb == NULL || pcmsizeb == 0)
 	{
 		pcmbufb = pcmbufa;

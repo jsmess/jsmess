@@ -11,7 +11,7 @@
     Raphael Nabet, 2004
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "tms3556.h"
 
 static struct

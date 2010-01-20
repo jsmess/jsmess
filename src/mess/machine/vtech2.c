@@ -13,7 +13,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/vtech2.h"
 #include "devices/flopdrv.h"
 #include "devices/cassette.h"

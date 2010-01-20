@@ -5,7 +5,7 @@
 */
 
 #include <math.h>
-#include "driver.h"
+#include "emu.h"
 
 #include "tms9902.h"
 
@@ -90,7 +90,7 @@ struct _tms9902_t
 	unsigned int TMR : 8;		/* interval timer */
 
 	/* clock registers */
-	void *timer;			/* MESS timer, used to emulate the decrementer register */
+	emu_timer *timer;			/* MESS timer, used to emulate the decrementer register */
 
 	/* Pointer to interface */
 	const tms9902_interface *intf;
@@ -636,7 +636,7 @@ static DEVICE_START( tms9902 )
 	assert(device->tag != NULL);
 	assert(device->static_config != NULL);
 
-	tms9902->intf = device->static_config;
+	tms9902->intf = (const tms9902_interface*)device->static_config;
 
 	tms9902->clock_rate = tms9902->intf->clock_rate;
 

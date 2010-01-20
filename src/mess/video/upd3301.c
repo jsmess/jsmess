@@ -20,7 +20,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "upd3301.h"
 
 /***************************************************************************
@@ -153,7 +153,7 @@ static void set_interrupt(const device_config *device, int state)
 {
 	upd3301_t *upd3301 = get_safe_token(device);
 
-	if (LOG) logerror("UPD3301 '%s' Interrupt: %u\n", device->tag, state);
+	if (LOG) logerror("UPD3301 '%s' Interrupt: %u\n", device->tag.cstr(), state);
 
 	devcb_call_write_line(&upd3301->out_int_func, state);
 
@@ -171,7 +171,7 @@ static void set_drq(const device_config *device, int state)
 {
 	upd3301_t *upd3301 = get_safe_token(device);
 
-	if (LOG) logerror("UPD3301 '%s' DRQ: %u\n", device->tag, state);
+	if (LOG) logerror("UPD3301 '%s' DRQ: %u\n", device->tag.cstr(), state);
 
 	devcb_call_write_line(&upd3301->out_drq_func, state);
 }
@@ -258,8 +258,8 @@ static void recompute_parameters(const device_config *device)
 
 	if (LOG)
 	{
-		if (LOG) logerror("UPD3301 '%s' Screen: %u x %u @ %f Hz\n", device->tag, horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
-		if (LOG) logerror("UPD3301 '%s' Visible Area: (%u, %u) - (%u, %u)\n", device->tag, visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+		if (LOG) logerror("UPD3301 '%s' Screen: %u x %u @ %f Hz\n", device->tag.cstr(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+		if (LOG) logerror("UPD3301 '%s' Visible Area: (%u, %u) - (%u, %u)\n", device->tag.cstr(), visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 	}
 
 	video_screen_configure(upd3301->screen, horiz_pix_total, vert_pix_total, &visarea, refresh);
@@ -274,10 +274,10 @@ static void recompute_parameters(const device_config *device)
 
 static TIMER_CALLBACK( vrtc_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	upd3301_t *upd3301 = get_safe_token(device);
 
-	//if (LOG) logerror("UPD3301 '%s' VRTC: %u\n", device->tag, param);
+	if (LOG) logerror("UPD3301 '%s' VRTC: %u\n", device->tag.cstr(), param);
 
 	devcb_call_write_line(&upd3301->out_vrtc_func, param);
 	upd3301->vrtc = param;
@@ -297,10 +297,10 @@ static TIMER_CALLBACK( vrtc_tick )
 
 static TIMER_CALLBACK( hrtc_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	upd3301_t *upd3301 = get_safe_token(device);
 
-	//if (LOG) logerror("UPD3301 '%s' HRTC: %u\n", device->tag, param);
+	if (LOG) logerror("UPD3301 '%s' HRTC: %u\n", device->tag.cstr(), param);
 
 	devcb_call_write_line(&upd3301->out_hrtc_func, param);
 	upd3301->hrtc = param;
@@ -350,31 +350,31 @@ WRITE8_DEVICE_HANDLER( upd3301_w )
 			case 0:
 				upd3301->dma_mode = BIT(data, 7);
 				upd3301->h = (data & 0x7f) + 2;
-				if (LOG) logerror("UPD3301 '%s' DMA Mode: %s\n", device->tag, upd3301->dma_mode ? "character" : "burst");
-				if (LOG) logerror("UPD3301 '%s' H: %u\n", device->tag, upd3301->h);
+				if (LOG) logerror("UPD3301 '%s' DMA Mode: %s\n", device->tag.cstr(), upd3301->dma_mode ? "character" : "burst");
+				if (LOG) logerror("UPD3301 '%s' H: %u\n", device->tag.cstr(), upd3301->h);
 				break;
 
 			case 1:
 				upd3301->b = ((data >> 6) + 1) * 16;
 				upd3301->l = (data & 0x3f) + 1;
-				if (LOG) logerror("UPD3301 '%s' B: %u\n", device->tag, upd3301->b);
-				if (LOG) logerror("UPD3301 '%s' L: %u\n", device->tag, upd3301->l);
+				if (LOG) logerror("UPD3301 '%s' B: %u\n", device->tag.cstr(), upd3301->b);
+				if (LOG) logerror("UPD3301 '%s' L: %u\n", device->tag.cstr(), upd3301->l);
 				break;
 
 			case 2:
 				upd3301->s = BIT(data, 7);
 				upd3301->c = (data >> 4) & 0x03;
 				upd3301->r = (data & 0x1f) + 1;
-				if (LOG) logerror("UPD3301 '%s' S: %u\n", device->tag, upd3301->s);
-				if (LOG) logerror("UPD3301 '%s' C: %u\n", device->tag, upd3301->c);
-				if (LOG) logerror("UPD3301 '%s' R: %u\n", device->tag, upd3301->r);
+				if (LOG) logerror("UPD3301 '%s' S: %u\n", device->tag.cstr(), upd3301->s);
+				if (LOG) logerror("UPD3301 '%s' C: %u\n", device->tag.cstr(), upd3301->c);
+				if (LOG) logerror("UPD3301 '%s' R: %u\n", device->tag.cstr(), upd3301->r);
 				break;
 
 			case 3:
 				upd3301->v = (data >> 5) + 1;
 				upd3301->z = (data & 0x1f) + 2;
-				if (LOG) logerror("UPD3301 '%s' V: %u\n", device->tag, upd3301->v);
-				if (LOG) logerror("UPD3301 '%s' Z: %u\n", device->tag, upd3301->z);
+				if (LOG) logerror("UPD3301 '%s' V: %u\n", device->tag.cstr(), upd3301->v);
+				if (LOG) logerror("UPD3301 '%s' Z: %u\n", device->tag.cstr(), upd3301->z);
 				recompute_parameters(device);
 				break;
 
@@ -383,10 +383,10 @@ WRITE8_DEVICE_HANDLER( upd3301_w )
 				upd3301->at0 = BIT(data, 6);
 				upd3301->sc = BIT(data, 5);
 				upd3301->a = (data & 0x1f) + 1;
-				if (LOG) logerror("UPD3301 '%s' AT1: %u\n", device->tag, upd3301->at1);
-				if (LOG) logerror("UPD3301 '%s' AT0: %u\n", device->tag, upd3301->at0);
-				if (LOG) logerror("UPD3301 '%s' SC: %u\n", device->tag, upd3301->sc);
-				if (LOG) logerror("UPD3301 '%s' A: %u\n", device->tag, upd3301->a);
+				if (LOG) logerror("UPD3301 '%s' AT1: %u\n", device->tag.cstr(), upd3301->at1);
+				if (LOG) logerror("UPD3301 '%s' AT0: %u\n", device->tag.cstr(), upd3301->at0);
+				if (LOG) logerror("UPD3301 '%s' SC: %u\n", device->tag.cstr(), upd3301->sc);
+				if (LOG) logerror("UPD3301 '%s' A: %u\n", device->tag.cstr(), upd3301->a);
 
 				upd3301->mode = MODE_NONE;
 				break;
@@ -400,12 +400,12 @@ WRITE8_DEVICE_HANDLER( upd3301_w )
 			{
 			case 0:
 				upd3301->cx = data & 0x7f;
-				if (LOG) logerror("UPD3301 '%s' CX: %u\n", device->tag, upd3301->cx);
+				if (LOG) logerror("UPD3301 '%s' CX: %u\n", device->tag.cstr(), upd3301->cx);
 				break;
 
 			case 1:
 				upd3301->cy = data & 0x3f;
-				if (LOG) logerror("UPD3301 '%s' CY: %u\n", device->tag, upd3301->cy);
+				if (LOG) logerror("UPD3301 '%s' CY: %u\n", device->tag.cstr(), upd3301->cy);
 
 				upd3301->mode = MODE_NONE;
 				break;
@@ -415,7 +415,7 @@ WRITE8_DEVICE_HANDLER( upd3301_w )
 			break;
 
 		default:
-			if (LOG) logerror("UPD3301 '%s' Invalid Parameter Byte %02x!\n", device->tag, data);
+			if (LOG) logerror("UPD3301 '%s' Invalid Parameter Byte %02x!\n", device->tag.cstr(), data);
 		}
 		break;
 
@@ -426,45 +426,45 @@ WRITE8_DEVICE_HANDLER( upd3301_w )
 		switch (data & 0xe0)
 		{
 		case UPD3301_COMMAND_RESET:
-			if (LOG) logerror("UPD3301 '%s' Reset\n", device->tag);
+			if (LOG) logerror("UPD3301 '%s' Reset\n", device->tag.cstr());
 			upd3301->mode = MODE_RESET;
 			set_display(device, 0);
 			set_interrupt(device, 0);
 			break;
 
 		case UPD3301_COMMAND_START_DISPLAY:
-			if (LOG) logerror("UPD3301 '%s' Start Display\n", device->tag);
+			if (LOG) logerror("UPD3301 '%s' Start Display\n", device->tag.cstr());
 			set_display(device, 1);
 			reset_counters(device);
 			break;
 
 		case UPD3301_COMMAND_SET_INTERRUPT_MASK:
-			if (LOG) logerror("UPD3301 '%s' Set Interrupt Mask\n", device->tag);
+			if (LOG) logerror("UPD3301 '%s' Set Interrupt Mask\n", device->tag.cstr());
 			upd3301->me = BIT(data, 0);
 			upd3301->mn = BIT(data, 1);
-			if (LOG) logerror("UPD3301 '%s' ME: %u\n", device->tag, upd3301->me);
-			if (LOG) logerror("UPD3301 '%s' MN: %u\n", device->tag, upd3301->mn);
+			if (LOG) logerror("UPD3301 '%s' ME: %u\n", device->tag.cstr(), upd3301->me);
+			if (LOG) logerror("UPD3301 '%s' MN: %u\n", device->tag.cstr(), upd3301->mn);
 			break;
 
 		case UPD3301_COMMAND_READ_LIGHT_PEN:
-			if (LOG) logerror("UPD3301 '%s' Read Light Pen\n", device->tag);
+			if (LOG) logerror("UPD3301 '%s' Read Light Pen\n", device->tag.cstr());
 			upd3301->mode = MODE_READ_LIGHT_PEN;
 			break;
 
 		case UPD3301_COMMAND_LOAD_CURSOR_POSITION:
-			if (LOG) logerror("UPD3301 '%s' Load Cursor Position\n", device->tag);
+			if (LOG) logerror("UPD3301 '%s' Load Cursor Position\n", device->tag.cstr());
 			upd3301->mode = MODE_LOAD_CURSOR_POSITION;
 			upd3301->cm = BIT(data, 0);
-			if (LOG) logerror("UPD3301 '%s' CM: %u\n", device->tag, upd3301->cm);
+			if (LOG) logerror("UPD3301 '%s' CM: %u\n", device->tag.cstr(), upd3301->cm);
 			break;
 
 		case UPD3301_COMMAND_RESET_INTERRUPT:
-			if (LOG) logerror("UPD3301 '%s' Reset Interrupt\n", device->tag);
+			if (LOG) logerror("UPD3301 '%s' Reset Interrupt\n", device->tag.cstr());
 			set_interrupt(device, 0);
 			break;
 
 		case UPD3301_COMMAND_RESET_COUNTERS:
-			if (LOG) logerror("UPD3301 '%s' Reset Counters\n", device->tag);
+			if (LOG) logerror("UPD3301 '%s' Reset Counters\n", device->tag.cstr());
 			upd3301->mode = MODE_RESET_COUNTERS;
 			reset_counters(device);
 			break;

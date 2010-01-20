@@ -275,7 +275,7 @@ PCB Layouts missing
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "machine/i8255a.h"
@@ -1011,7 +1011,7 @@ static const cassette_config msx_cassette_config =
 {
 	fmsx_cassette_formats,
 	NULL,
-	CASSETTE_PLAY
+	(cassette_state)(CASSETTE_PLAY)
 };
 
 static const floppy_config msx_floppy_config =

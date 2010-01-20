@@ -134,8 +134,7 @@ bits(7:4) and bit(24)), X, and Y:
 #ifndef EXPAND_RASTERIZERS
 #define EXPAND_RASTERIZERS
 
-#include "driver.h"
-#include "eminline.h"
+#include "emu.h"
 #include "profiler.h"
 #include "video/poly.h"
 #include "video/rgbutil.h"
@@ -4540,9 +4539,9 @@ static DEVICE_START( voodoo )
 
 	/* set the type, and initialize the chip mask */
 	v->index = device_list_index(&device->machine->config->devicelist, device->type, device->tag);
-	v->screen = devtag_get_device(device->machine, config->screen);
+	v->screen = device->machine->device(config->screen);
 	assert_always(v->screen != NULL, "Unable to find screen attached to voodoo");
-	v->cpu = cputag_get_cpu(device->machine, config->cputag);
+	v->cpu = device->machine->device(config->cputag);
 	assert_always(v->cpu != NULL, "Unable to find CPU attached to voodoo");
 	v->type = config->type;
 	v->chipmask = 0x01;

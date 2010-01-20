@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include <stdarg.h>
-#include "driver.h"
+#include "emu.h"
 #include "devices/cassette.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255a.h"
@@ -48,7 +48,7 @@ static void dai_update_memory(running_machine *machine, int dai_rom_bank)
 
 static TIMER_CALLBACK(dai_bootstrap_callback)
 {
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, 0xc000);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENPC, 0xc000);
 }
 
 static UINT8 dai_keyboard_scan_mask = 0;

@@ -2,7 +2,7 @@
 //
 //  sdldir.c - SDL core directory access functions
 //
-//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -66,7 +66,7 @@ static osd_dir_entry_type get_attributes_stat(const char *file)
 #if defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_OS2)
 	struct stat st;
 	if(stat(file, &st))
-		return 0;
+		return (osd_dir_entry_type) 0;
 #else
 	struct stat64 st;
 	if(stat64(file, &st))
@@ -107,20 +107,20 @@ osd_directory *osd_opendir(const char *dirname)
 	char *tmpstr, *envstr;
 	int i, j;
 
-	dir = malloc(sizeof(osd_directory));
+	dir = (osd_directory *) malloc(sizeof(osd_directory));
 	if (dir)
 	{
 		memset(dir, 0, sizeof(osd_directory));
 		dir->fd = NULL;
 	}
 
-	tmpstr = malloc(strlen(dirname)+1);
+	tmpstr = (char *) malloc(strlen(dirname)+1);
 	strcpy(tmpstr, dirname);
 
 	if (tmpstr[0] == '$')
 	{
 		char *envval;
-		envstr = malloc(strlen(tmpstr)+1); 
+		envstr = (char *) malloc(strlen(tmpstr)+1);
 
 		strcpy(envstr, tmpstr);
 
@@ -137,8 +137,8 @@ osd_directory *osd_opendir(const char *dirname)
 		{
 			j = strlen(envval) + strlen(tmpstr) + 1;
 			free(tmpstr);
-			tmpstr = malloc(j);
-	
+			tmpstr = (char *) malloc(j);
+
 			// start with the value of $HOME
 			strcpy(tmpstr, envval);
 			// replace the null with a path separator again
@@ -147,7 +147,7 @@ osd_directory *osd_opendir(const char *dirname)
 			strcat(tmpstr, &envstr[i]);
 		}
 		else
-			fprintf(stderr, "Warning: Environment variable %s not found.\n", envstr);
+			fprintf(stderr, "Warning: osd_opendir environment variable %s not found.\n", envstr);
 		free(envstr);
 	}
 

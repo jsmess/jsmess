@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/kramermc.h"
 
 #define KRAMERMC_VIDEO_MEMORY		0xFC00

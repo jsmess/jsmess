@@ -178,7 +178,7 @@
 
 *************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "includes/slapstic.h"
 #include "cpu/m68000/m68000.h"
@@ -807,7 +807,7 @@ static FILE *slapsticlog;
 
 void slapstic_init(running_machine *machine, int chip)
 {
-	cpu_type cputype = cpu_get_type(cputag_get_cpu(machine, "maincpu"));
+	cpu_type cputype = cpu_get_type(devtag_get_device(machine, "maincpu"));
 
 	/* only a small number of chips are known to exist */
 	if (chip < 101 || chip > 118)

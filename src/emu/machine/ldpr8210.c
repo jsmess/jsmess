@@ -18,6 +18,7 @@
 
 *************************************************************************/
 
+#include "emu.h"
 #include "ldcore.h"
 #include "cpu/mcs48/mcs48.h"
 
@@ -338,7 +339,7 @@ const ldplayer_interface pr8210_interface =
 
 static void pr8210_init(laserdisc_state *ld)
 {
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 	attotime curtime = timer_get_time(ld->device->machine);
 	ldplayer_data *player = ld->player;
 
@@ -350,8 +351,8 @@ static void pr8210_init(laserdisc_state *ld)
 	player->slowtrg = curtime;
 
 	/* find our CPU */
-	player->cpu = cputag_get_cpu(ld->device->machine, device_build_tag(tempstring, ld->device, "pr8210"));
-	astring_free(tempstring);
+	player->cpu = ld->device->subdevice("pr8210");
+	assert(player->cpu != NULL);
 
 	/* we don't have the Simutrek player overrides */
 	player->simutrek.cpu = NULL;
@@ -1071,7 +1072,7 @@ void simutrek_set_audio_squelch(const device_config *device, int state)
 
 static void simutrek_init(laserdisc_state *ld)
 {
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 	ldplayer_data *player = ld->player;
 
 	/* standard PR-8210 initialization */
@@ -1082,8 +1083,7 @@ static void simutrek_init(laserdisc_state *ld)
 	player->simutrek.data_ready = 1;
 
 	/* find the Simutrek CPU */
-	player->simutrek.cpu = cputag_get_cpu(ld->device->machine, device_build_tag(tempstring, ld->device, "simutrek"));
-	astring_free(tempstring);
+	player->simutrek.cpu = ld->device->machine->device(device_build_tag(tempstring, ld->device, "simutrek"));
 }
 
 

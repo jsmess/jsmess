@@ -130,7 +130,7 @@ Flags: 80=high score, 40=first bonus, 20=interval bonus, 10=?
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "namco50.h"
 #include "cpu/mb88xx/mb88xx.h"
 
@@ -281,12 +281,11 @@ ROM_END
 static DEVICE_START( namco_50xx )
 {
 	namco_50xx_state *state = get_safe_token(device);
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 
 	/* find our CPU */
-	state->cpu = cputag_get_cpu(device->machine, device_build_tag(tempstring, device, "mcu"));
+	state->cpu = devtag_get_device(device->machine, device_build_tag(tempstring, device, "mcu"));
 	assert(state->cpu != NULL);
-	astring_free(tempstring);
 }
 
 

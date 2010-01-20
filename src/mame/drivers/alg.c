@@ -20,7 +20,7 @@
 
 **************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "render.h"
 #include "includes/amiga.h"
@@ -47,8 +47,8 @@ static int get_lightgun_pos(const device_config *screen, int player, int *x, int
 {
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 
-	int xpos = input_port_read_safe(screen->machine, (player == 0) ? "GUN1X" : "GUN2X", -1);
-	int ypos = input_port_read_safe(screen->machine, (player == 0) ? "GUN1Y" : "GUN2Y", -1);
+	int xpos = input_port_read_safe(screen->machine, (player == 0) ? "GUN1X" : "GUN2X", 0xffffffff);
+	int ypos = input_port_read_safe(screen->machine, (player == 0) ? "GUN1Y" : "GUN2Y", 0xffffffff);
 
 	if (xpos == -1 || ypos == -1)
 		return FALSE;
@@ -685,7 +685,7 @@ static DRIVER_INIT( palr1 )
 {
 	UINT32 length = memory_region_length(machine, "user2");
 	UINT8 *rom = memory_region(machine, "user2");
-	UINT8 *original = alloc_array_or_die(UINT8, length);
+	UINT8 *original = auto_alloc_array(machine, UINT8, length);
 	UINT32 srcaddr;
 
 	memcpy(original, rom, length);
@@ -696,7 +696,7 @@ static DRIVER_INIT( palr1 )
 		if (srcaddr & 0x8000) dstaddr ^= 0x4000;
 		rom[dstaddr] = original[srcaddr];
 	}
-	free(original);
+	auto_free(machine, original);
 
 	alg_init(machine);
 }
@@ -705,7 +705,7 @@ static DRIVER_INIT( palr3 )
 {
 	UINT32 length = memory_region_length(machine, "user2");
 	UINT8 *rom = memory_region(machine, "user2");
-	UINT8 *original = alloc_array_or_die(UINT8, length);
+	UINT8 *original = auto_alloc_array(machine, UINT8, length);
 	UINT32 srcaddr;
 
 	memcpy(original, rom, length);
@@ -715,7 +715,7 @@ static DRIVER_INIT( palr3 )
 		if (srcaddr & 0x2000) dstaddr ^= 0x1000;
 		rom[dstaddr] = original[srcaddr];
 	}
-	free(original);
+	auto_free(machine, original);
 
 	alg_init(machine);
 }
@@ -724,7 +724,7 @@ static DRIVER_INIT( palr6 )
 {
 	UINT32 length = memory_region_length(machine, "user2");
 	UINT8 *rom = memory_region(machine, "user2");
-	UINT8 *original = alloc_array_or_die(UINT8, length);
+	UINT8 *original = auto_alloc_array(machine, UINT8, length);
 	UINT32 srcaddr;
 
 	memcpy(original, rom, length);
@@ -736,7 +736,7 @@ static DRIVER_INIT( palr6 )
 		dstaddr ^= 0x20000;
 		rom[dstaddr] = original[srcaddr];
 	}
-	free(original);
+	auto_free(machine, original);
 
 	alg_init(machine);
 }

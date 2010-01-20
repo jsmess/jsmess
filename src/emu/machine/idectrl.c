@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "idectrl.h"
 #include "debugger.h"
 
@@ -1801,14 +1801,14 @@ static DEVICE_START( ide_controller )
 
 	/* set MAME harddisk handle */
 	config = (const ide_config *)device->inline_config;
-	ide->handle = get_disk_handle(device->machine, (config->master != NULL) ? config->master : device->tag);
+	ide->handle = get_disk_handle(device->machine, (config->master != NULL) ? config->master : device->tag.cstr());
 	ide->disk = hard_disk_open(ide->handle);
 	assert_always(config->slave == NULL, "IDE controller does not yet support slave drives\n");
 
 	/* find the bus master space */
 	if (config->bmcpu != NULL)
 	{
-		ide->dma_space = memory_find_address_space(cputag_get_cpu(device->machine, config->bmcpu), config->bmspace);
+		ide->dma_space = device->machine->device(config->bmcpu)->space(config->bmspace);
 		assert_always(ide->dma_space != NULL, "IDE controller bus master space not found!");
 		ide->dma_address_xor = (ide->dma_space->endianness == ENDIANNESS_LITTLE) ? 0 : 3;
 	}

@@ -255,7 +255,7 @@ static void common_start(const device_config *device, SAM6883_VERSION device_typ
 	assert(device->tag != NULL);
 	assert(device->static_config != NULL);
 
-	sam->intf = device->static_config;
+	sam->intf = (const sam6883_interface*)device->static_config;
 
 	sam->type = device_type;
 

@@ -20,7 +20,7 @@ insert a new coin after the game is over if you want another play.
 According to Alexandre, there are more games for this board, but not
 found/dumped yet. */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"
@@ -156,13 +156,13 @@ static DRIVER_INIT(pesadelo)
 	}
 
 	// address line swap
-	buf = alloc_array_or_die(UINT8, memsize);
+	buf = auto_alloc_array(machine, UINT8, memsize);
 	memcpy(buf, mem, memsize);
 	for ( i = 0; i < memsize; i++ )
 	{
 		mem[BITSWAP16(i,11,9,8,13,14,15,12,7,6,5,4,3,2,1,0,10)] = buf[i];
 	}
-	free(buf);
+	auto_free(machine, buf);
 
 }
 

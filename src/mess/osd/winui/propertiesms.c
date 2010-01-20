@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <tchar.h>
 
-#include "driver.h"
+#include "emu.h"
 #include "image.h"
 #include "screenshot.h"
 #include "datamap.h"
@@ -409,7 +409,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 	// we can only do something meaningful if there is more than one option
 	if (device != NULL)
 	{
-		ram_config *config = device->inline_config;
+		ram_config *config = (ram_config *)device->inline_config;
 
 		// identify the current amount of RAM
 		this_ram_string = options_get_string(opts, OPTION_RAMSIZE);

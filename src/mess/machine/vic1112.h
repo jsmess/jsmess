@@ -12,7 +12,7 @@
 #ifndef __VIC1112__
 #define __VIC1112__
 
-#include "driver.h"
+#include "emu.h"
 
 /***************************************************************************
     MACROS / CONSTANTS

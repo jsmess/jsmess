@@ -1,12 +1,12 @@
 /**************************\
 *
-*   SunPlus u'nSP skeleton
+*   SunPlus u'nSP core
 *
 *    by Harmony
 *
 \**************************/
 
-#include "cpuintrf.h"
+#include "emu.h"
 #include "debugger.h"
 #include "unsp.h"
 
@@ -29,7 +29,6 @@ static void unsp_set_irq_line(unsp_state *unsp, int irqline, int state);
 #define OPN		((op >> 3) & 7)
 #define OPB		(op & 7)
 #define OPIMM	(op & 0x3f)
-#define OP2X	((OP0 < 14 && OP1 == 4 && (OPN >= 1 && OPN <= 3)) || (OP0 == 15 && (OP1 == 1 || OP1 == 2)))
 
 #define UNSP_LPC			(((UNSP_REG(SR) & 0x3f) << 16) | UNSP_REG(PC))
 
@@ -83,6 +82,12 @@ static void unsp_set_irq_line(unsp_state *unsp, int irqline, int state);
 			lres = r0 & r1; \
 			unsp_update_nz(unsp, lres); \
 			break
+
+#define WRITEBACK_OPA \
+		if(OP0 != 4 && OP0 < 12) \
+		{ \
+			UNSP_REG_I(OPA) = (UINT16)lres; \
+		}
 
 /*****************************************************************************/
 
@@ -281,10 +286,7 @@ static CPU_EXECUTE( unsp )
 							unimplemented_opcode(unsp, op);
 							break;
 					}
-					if(OP0 != 4 && OP0 < 12)
-					{
-						UNSP_REG_I(OPA) = (UINT16)lres;
-					}
+					WRITEBACK_OPA;
 					break;
 
 				// r, imm6
@@ -298,10 +300,7 @@ static CPU_EXECUTE( unsp )
 							unimplemented_opcode(unsp, op);
 							break;
 					}
-					if(OP0 != 4 && OP0 < 12)
-					{
-						UNSP_REG_I(OPA) = (UINT16)lres;
-					}
+					WRITEBACK_OPA;
 					break;
 
 				// Pop / Interrupt return
@@ -381,10 +380,7 @@ static CPU_EXECUTE( unsp )
 									unimplemented_opcode(unsp, op);
 									break;
 							}
-							if(OP0 != 4 && OP0 < 12)
-							{
-								UNSP_REG_I(OPA) = (UINT16)lres;
-							}
+							WRITEBACK_OPA;
 							break;
 						case 1: // r, [<ds:>r--]
 							r0 = UNSP_REG_I(OPA);
@@ -400,10 +396,7 @@ static CPU_EXECUTE( unsp )
 									break;
 							}
 							UNSP_REG_I(OPB)--;
-							if(OP0 != 4 && OP0 < 12)
-							{
-								UNSP_REG_I(OPA) = (UINT16)lres;
-							}
+							WRITEBACK_OPA;
 							break;
 						case 2: // r, [<ds:>r++]
 							r0 = UNSP_REG_I(OPA);
@@ -419,10 +412,7 @@ static CPU_EXECUTE( unsp )
 									break;
 							}
 							UNSP_REG_I(OPB)++;
-							if(OP0 != 4 && OP0 < 12)
-							{
-								UNSP_REG_I(OPA) = (UINT16)lres;
-							}
+							WRITEBACK_OPA;
 							break;
 						case 3: // r, [<ds:>++r]
 							UNSP_REG_I(OPB)++;
@@ -435,10 +425,7 @@ static CPU_EXECUTE( unsp )
 									unimplemented_opcode(unsp, op);
 									break;
 							}
-							if(OP0 != 4 && OP0 < 12)
-							{
-								UNSP_REG_I(OPA) = (UINT16)lres;
-							}
+							WRITEBACK_OPA;
 							break;
 					}
 					break;
@@ -458,10 +445,7 @@ static CPU_EXECUTE( unsp )
 									unimplemented_opcode(unsp, op);
 									break;
 							}
-							if(OP0 != 4 && OP0 < 12)
-							{
-								UNSP_REG_I(OPA) = (UINT16)lres;
-							}
+							WRITEBACK_OPA;
 							break;
 
 						// ALU, 16-bit Immediate
@@ -478,10 +462,7 @@ static CPU_EXECUTE( unsp )
 										unimplemented_opcode(unsp, op);
 										break;
 								}
-								if(OP0 != 4 && OP0 < 12)
-								{
-									UNSP_REG_I(OPA) = (UINT16)lres;
-								}
+								WRITEBACK_OPA;
 							}
 							else
 							{
@@ -501,10 +482,7 @@ static CPU_EXECUTE( unsp )
 									unimplemented_opcode(unsp, op);
 									break;
 							}
-							if(OP0 != 4 && OP0 < 12)
-							{
-								UNSP_REG_I(OPA) = (UINT16)lres;
-							}
+							WRITEBACK_OPA;
 							break;
 
 						// ALU, Direct 16
@@ -849,11 +827,11 @@ static CPU_SET_INFO( unsp )
 			unsp_set_irq_line(unsp, state - CPUINFO_INT_INPUT_STATE, (int)info->i);
 			break;
 
-        case CPUINFO_INT_REGISTER + UNSP_SP:            UNSP_REG(SP) = info->i;    	break;
+        case CPUINFO_INT_REGISTER + UNSP_SP:            UNSP_REG(SP) = info->i; 	break;
         case CPUINFO_INT_REGISTER + UNSP_R1:            UNSP_REG(R1) = info->i;     break;
         case CPUINFO_INT_REGISTER + UNSP_R2:            UNSP_REG(R2) = info->i;     break;
         case CPUINFO_INT_REGISTER + UNSP_R3:            UNSP_REG(R3) = info->i;     break;
-        case CPUINFO_INT_REGISTER + UNSP_R4:            UNSP_REG(R4) = info->i;    	break;
+        case CPUINFO_INT_REGISTER + UNSP_R4:            UNSP_REG(R4) = info->i; 	break;
         case CPUINFO_INT_REGISTER + UNSP_BP:            UNSP_REG(BP) = info->i;     break;
         case CPUINFO_INT_REGISTER + UNSP_SR:            UNSP_REG(SR) = info->i;     break;
         case CPUINFO_INT_PC: /* Intentional fallthrough */
@@ -863,7 +841,7 @@ static CPU_SET_INFO( unsp )
         	break;
         case CPUINFO_INT_REGISTER + UNSP_IRQ:           unsp->irq = info->i;    	break;
         case CPUINFO_INT_REGISTER + UNSP_FIQ:           unsp->fiq = info->i;        break;
-        case CPUINFO_INT_REGISTER + UNSP_SB:            unsp->sb = info->i;    	    break;
+        case CPUINFO_INT_REGISTER + UNSP_SB:            unsp->sb = info->i; 	    break;
     }
 }
 
@@ -876,7 +854,7 @@ CPU_GET_INFO( unsp )
         case CPUINFO_INT_CONTEXT_SIZE:          info->i = sizeof(unsp_state);   break;
         case CPUINFO_INT_INPUT_LINES:           info->i = 0;                    break;
         case CPUINFO_INT_DEFAULT_IRQ_VECTOR:    info->i = 0;                    break;
-        case DEVINFO_INT_ENDIANNESS:            info->i = ENDIANNESS_BIG;    	break;
+        case DEVINFO_INT_ENDIANNESS:            info->i = ENDIANNESS_BIG;   	break;
         case CPUINFO_INT_CLOCK_MULTIPLIER:      info->i = 1;                    break;
         case CPUINFO_INT_CLOCK_DIVIDER:         info->i = 1;                    break;
         case CPUINFO_INT_MIN_INSTRUCTION_BYTES: info->i = 2;                    break;
@@ -917,11 +895,11 @@ CPU_GET_INFO( unsp )
         case CPUINFO_PTR_INSTRUCTION_COUNTER:   info->icount = &unsp->icount;               	break;
 
         /* --- the following bits of info are returned as NULL-terminated strings --- */
-        case DEVINFO_STR_NAME:                  strcpy(info->s, "u'nSP");             	break;
-        case DEVINFO_STR_FAMILY:                strcpy(info->s, "u'nSP");                	break;
+        case DEVINFO_STR_NAME:                  strcpy(info->s, "u'nSP");           	break;
+        case DEVINFO_STR_FAMILY:                strcpy(info->s, "u'nSP");               	break;
         case DEVINFO_STR_VERSION:               strcpy(info->s, "1.0");                 		break;
         case DEVINFO_STR_SOURCE_FILE:           strcpy(info->s, __FILE__);              break;
-        case DEVINFO_STR_CREDITS:              	strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+        case DEVINFO_STR_CREDITS:           	strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 
         case CPUINFO_STR_FLAGS:                         strcpy(info->s, " ");                   break;
 

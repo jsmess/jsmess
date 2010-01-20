@@ -52,7 +52,7 @@
            FOR file (for forth screen data)
 */
 
-#include "driver.h"
+#include "emu.h"
 
 #include "devices/cassette.h"
 #include "formats/hect_tap.h"
@@ -240,7 +240,7 @@ static const cassette_config hector_cassette_config =
 {
 	hector_cassette_formats,
 	&hector_cassette_options,
-	CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER)
 };
 
 /* Discrete Sound */

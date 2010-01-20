@@ -17,7 +17,7 @@ software_config *software_config_alloc(int driver_index, core_options *opts, has
 	software_config *config;
 
 	// allocate the software_config
-	config = alloc_clear_or_die(software_config);
+	config = (software_config *)malloc(sizeof(software_config));
 
 	// allocate the machine config
 	config->mconfig = machine_config_alloc(drivers[driver_index]->machine_config);

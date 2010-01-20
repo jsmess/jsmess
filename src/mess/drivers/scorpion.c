@@ -144,7 +144,7 @@ http://www.z88forever.org.uk/zxplus3e/
 
 *******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/spectrum.h"
 #include "eventlst.h"
 #include "devices/snapquik.h"
@@ -224,7 +224,7 @@ static void scorpion_update_memory(running_machine *machine)
 
 static DIRECT_UPDATE_HANDLER( scorpion_direct )
 {
-	UINT16 pc = cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), REG_GENPCBASE);
+	UINT16 pc = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), REG_GENPCBASE);
 	if (betadisk_is_active(beta))
 	{
 		if (pc >= 0x4000)

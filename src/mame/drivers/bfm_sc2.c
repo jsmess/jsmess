@@ -136,7 +136,7 @@ Adder hardware:
         * Fix RS232 protocol
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6809/m6809.h"
 
 #include "video/bfm_adr2.h"
@@ -1434,7 +1434,7 @@ static void decode_mainrom(running_machine *machine, const char *rom_region)
 
 	rom = memory_region(machine, rom_region);
 
-	tmp = alloc_array_or_die(UINT8, 0x10000);
+	tmp = auto_alloc_array(machine, UINT8, 0x10000);
 	{
 		int i;
 		long address;
@@ -1475,7 +1475,7 @@ static void decode_mainrom(running_machine *machine, const char *rom_region)
 
 			rom[newaddress] = codec_data[ tmp[address] ];
 		}
-		free(tmp);
+		auto_free(machine, tmp);
 	}
 }
 

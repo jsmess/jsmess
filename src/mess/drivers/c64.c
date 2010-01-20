@@ -322,7 +322,7 @@ is that Edu64-1 was a standard PET64/CBMB4064 with a different name, while
 the Edu64-1 used the full C64 BIOS. Confirmations are needed, anyway.
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
 #include "sound/dac.h"

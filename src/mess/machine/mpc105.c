@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "mpc105.h"
 #include "machine/pci.h"
 #include "devices/messram.h"

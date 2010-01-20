@@ -5,7 +5,7 @@
     Apple 5.25" floppy drive emulation (to be interfaced with applefdc.c)
 
 *********************************************************************/
-#include "driver.h"
+#include "emu.h"
 #include "appldriv.h"
 #include "flopdrv.h"
 #include "formats/ap2_dsk.h"

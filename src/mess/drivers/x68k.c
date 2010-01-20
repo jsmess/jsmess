@@ -118,7 +118,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/68901mfp.h"
 #include "machine/i8255a.h"
@@ -1662,15 +1662,15 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 	if(messram_get_ptr(devtag_get_device(machine, "messram"))[v] != 0x02)  // normal vector for bus errors points to 02FF0540
 	{
 		int addr = (messram_get_ptr(devtag_get_device(machine, "messram"))[0x09] << 24) | (messram_get_ptr(devtag_get_device(machine, "messram"))[0x08] << 16) |(messram_get_ptr(devtag_get_device(machine, "messram"))[0x0b] << 8) | messram_get_ptr(devtag_get_device(machine, "messram"))[0x0a];
-		int sp = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), REG_GENSP);
-		int pc = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC);
-		int sr = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), M68K_SR);
-		//int pda = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), M68K_PREF_DATA);
+		int sp = cpu_get_reg(devtag_get_device(machine, "maincpu"), REG_GENSP);
+		int pc = cpu_get_reg(devtag_get_device(machine, "maincpu"), REG_GENPC);
+		int sr = cpu_get_reg(devtag_get_device(machine, "maincpu"), M68K_SR);
+		//int pda = cpu_get_reg(devtag_get_device(machine, "maincpu"), M68K_PREF_DATA);
 		if(strcmp(machine->gamedrv->name,"x68030") == 0)
 		{  // byte order varies on the 68030
 			addr = (messram_get_ptr(devtag_get_device(machine, "messram"))[0x0b] << 24) | (messram_get_ptr(devtag_get_device(machine, "messram"))[0x0a] << 16) |(messram_get_ptr(devtag_get_device(machine, "messram"))[0x09] << 8) | messram_get_ptr(devtag_get_device(machine, "messram"))[0x08];
 		}
-		cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENSP, sp - 14);
+		cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENSP, sp - 14);
 		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-11] = (val & 0xff000000) >> 24;
 		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-12] = (val & 0x00ff0000) >> 16;
 		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-9] = (val & 0x0000ff00) >> 8;
@@ -1681,7 +1681,7 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-2] = (pc & 0x000000ff);  // place PC onto the stack
 		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-5] = (sr & 0xff00) >> 8;
 		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-6] = (sr & 0x00ff);  // place SR onto the stack
-		cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, addr);  // real exceptions seem to take too long to be acknowledged
+		cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENPC, addr);  // real exceptions seem to take too long to be acknowledged
 		popmessage("Expansion access [%08x]: PC jump to %08x", val, addr);
 	}
 }
@@ -2475,7 +2475,7 @@ static MACHINE_RESET( x68000 )
 	}
 
 	// reset CPU
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 }
 
 static MACHINE_START( x68000 )
@@ -2565,7 +2565,7 @@ static DRIVER_INIT( x68000 )
 
 	mfp_init();
 
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), x68k_int_ack);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), x68k_int_ack);
 
 	// init keyboard
 	x68k_sys.keyboard.delay = 500;  // 3*100+200

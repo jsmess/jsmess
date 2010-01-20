@@ -6,7 +6,7 @@
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "devices/thomflop.h"
 #include "formats/thom_dsk.h"
 #include "includes/thomson.h"
@@ -103,7 +103,7 @@ static int to7_get_cassette ( running_machine *machine )
 			if ( bitpos >= to7_k7_bitsize )
 				bitpos = to7_k7_bitsize -1;
 			VLOG (( "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i\n",
-				cpu_get_previouspc(cputag_get_cpu(machine, "maincpu")), attotime_to_double(timer_get_time(machine)), state, pos, bitpos,
+				cpu_get_previouspc(devtag_get_device(machine, "maincpu")), attotime_to_double(timer_get_time(machine)), state, pos, bitpos,
 				to7_k7_bits[ bitpos ] ));
 			return to7_k7_bits[ bitpos ];
 		}
@@ -124,7 +124,7 @@ static int to7_get_cassette ( running_machine *machine )
 			}
 			k = ( chg >= 13 ) ? 1 : 0;
 			VLOG (( "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i (%i)\n",
-				cpu_get_previouspc(cputag_get_cpu(machine, "maincpu")), attotime_to_double(timer_get_time(machine)), state, pos, bitpos,
+				cpu_get_previouspc(devtag_get_device(machine, "maincpu")), attotime_to_double(timer_get_time(machine)), state, pos, bitpos,
 				k, chg ));
 			return k;
 		}
@@ -152,7 +152,7 @@ static WRITE8_DEVICE_HANDLER ( to7_set_cassette_motor )
 	double pos = cassette_get_position(img);
 
 	LOG (( "$%04x %f to7_set_cassette_motor: cassette motor %s bitpos=%i\n",
-	       cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu")), attotime_to_double(timer_get_time(img->machine)), data ? "off" : "on",
+	       cpu_get_previouspc(devtag_get_device(device->machine, "maincpu")), attotime_to_double(timer_get_time(img->machine)), data ? "off" : "on",
 	       (int) (pos / TO7_BIT_LENGTH) ));
 
 	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED && !data && pos > 0.3 )
@@ -202,7 +202,7 @@ static int mo5_get_cassette ( running_machine *machine )
 		hbit = hbit >= 0;
 
 		VLOG (( "$%04x %f mo5_get_cassette: state=$%X pos=%f hbitpos=%i hbit=%i\n",
-			cpu_get_previouspc(cputag_get_cpu(machine, "maincpu")), attotime_to_double(timer_get_time(machine)), state, pos,
+			cpu_get_previouspc(devtag_get_device(machine, "maincpu")), attotime_to_double(timer_get_time(machine)), state, pos,
 			(int) (pos / MO5_HBIT_LENGTH), hbit ));
 		return hbit;
 	}
@@ -227,7 +227,7 @@ static WRITE8_DEVICE_HANDLER ( mo5_set_cassette_motor )
 	double pos = cassette_get_position(img);
 
 	LOG (( "$%04x %f mo5_set_cassette_motor: cassette motor %s hbitpos=%i\n",
-	       cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), data ? "off" : "on",
+	       cpu_get_previouspc(devtag_get_device(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), data ? "off" : "on",
 	       (int) (pos / MO5_HBIT_LENGTH) ));
 
 	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED &&  !data && pos > 0.3 )
@@ -796,7 +796,7 @@ static WRITE8_DEVICE_HANDLER ( to7_io_porta_out )
 	int tx  = data & 1;
 	int dtr = ( data & 2 ) ? 1 : 0;
 
-	LOG_IO(( "$%04x %f to7_io_porta_out: tx=%i, dtr=%i\n",  cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), tx, dtr ));
+	LOG_IO(( "$%04x %f to7_io_porta_out: tx=%i, dtr=%i\n",  cpu_get_previouspc(devtag_get_device(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), tx, dtr ));
 	if ( dtr )
 		to7_io_line.State |=  SERIAL_STATE_DTR;
 	else
@@ -820,7 +820,7 @@ static READ8_DEVICE_HANDLER( to7_io_porta_in )
 	else
 		cts = !centronics_busy_r(printer);
 
-	LOG_IO(( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), to7_io_mode(device->machine), cts, dsr, rd ));
+	LOG_IO(( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", cpu_get_previouspc(devtag_get_device(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), to7_io_mode(device->machine), cts, dsr, rd ));
 
 	return (dsr ? 0x20 : 0) | (cts ? 0x40 : 0) | (rd ? 0x80: 0);
 }
@@ -831,7 +831,7 @@ static WRITE8_DEVICE_HANDLER( to7_io_portb_out )
 {
 	const device_config *printer = devtag_get_device(device->machine, "centronics");
 
-	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
+	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(devtag_get_device(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
 
 	/* set 8-bit data */
 	centronics_data_w(printer, 0, data);
@@ -843,7 +843,7 @@ static WRITE8_DEVICE_HANDLER( to7_io_cb2_out )
 {
 	const device_config *printer = devtag_get_device(device->machine, "centronics");
 
-	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
+	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc(devtag_get_device(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
 
 	/* send STROBE to printer */
 	centronics_strobe_w(printer, data);
@@ -1354,7 +1354,7 @@ READ8_HANDLER ( to7_midi_r )
 		/* bit 6:     parity error (ignored) */
 		/* bit 7:     interrupt */
 		LOG_MIDI(( "$%04x %f to7_midi_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, irq=%i)\n",
-			  cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), to7_midi_status,
+			  cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), to7_midi_status,
 			  (to7_midi_status & ACIA_6850_RDRF) ? 1 : 0,
 			  (to7_midi_status & ACIA_6850_TDRE) ? 1 : 0,
 			  (to7_midi_status & ACIA_6850_OVRN) ? 1 : 0,
@@ -1372,7 +1372,7 @@ READ8_HANDLER ( to7_midi_r )
 			to7_midi_status &= ~ACIA_6850_OVRN;
 		to7_midi_overrun = 0;
 		LOG_MIDI(( "$%04x %f to7_midi_r: read data $%02X\n",
-			  cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), data ));
+			  cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), data ));
 		to7_midi_update_irq( space->machine );
 		return data;
 	}
@@ -1380,7 +1380,7 @@ READ8_HANDLER ( to7_midi_r )
 
 	default:
 		logerror( "$%04x to7_midi_r: invalid offset %i\n",
-			  cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")),  offset );
+			  cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")),  offset );
 		return 0;
 	}
 }
@@ -1399,7 +1399,7 @@ WRITE8_HANDLER ( to7_midi_w )
 		if ( (data & 3) == 3 )
 		{
 			/* reset */
-			LOG_MIDI(( "$%04x %f to7_midi_w: reset (data=$%02X)\n", cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), data ));
+			LOG_MIDI(( "$%04x %f to7_midi_w: reset (data=$%02X)\n", cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), data ));
 			to7_midi_overrun = 0;
 			to7_midi_status = 2;
 			to7_midi_intr = 0;
@@ -1416,7 +1416,7 @@ WRITE8_HANDLER ( to7_midi_w )
 				static const int stop[8] = { 2,2,1,1,2,1,1,1 };
 				static const char parity[8] = { 'e','o','e','o','-','-','e','o' };
 				LOG_MIDI(( "$%04x %f to7_midi_w: set control to $%02X (bits=%i, stop=%i, parity=%c, intr in=%i out=%i)\n",
-					  cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)),
+					  cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)),
 					  data,
 					  bits[ (data >> 2) & 7 ],
 					  stop[ (data >> 2) & 7 ],
@@ -1430,7 +1430,7 @@ WRITE8_HANDLER ( to7_midi_w )
 
 
 	case 1: /* output data */
-		LOG_MIDI(( "$%04x %f to7_midi_w: write data $%02X\n", cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), data ));
+		LOG_MIDI(( "$%04x %f to7_midi_w: write data $%02X\n", cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), data ));
 		if ( data == 0x55 )
 			/* cable-detect: shortcut */
 			chardev_fake_in( to7_midi_chardev, 0x55 );
@@ -1444,7 +1444,7 @@ WRITE8_HANDLER ( to7_midi_w )
 
 
 	default:
-		logerror( "$%04x to7_midi_w: invalid offset %i (data=$%02X) \n", cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), offset, data );
+		logerror( "$%04x to7_midi_w: invalid offset %i (data=$%02X) \n", cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), offset, data );
 	}
 }
 
@@ -1615,7 +1615,7 @@ MACHINE_START ( to7 )
 static WRITE8_DEVICE_HANDLER ( to770_sys_cb2_out )
 {
 	/* video overlay: black pixels are transparent and show TV image underneath */
-	LOG(( "$%04x to770_sys_cb2_out: video overlay %i\n", cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu")), data ));
+	LOG(( "$%04x to770_sys_cb2_out: video overlay %i\n", cpu_get_previouspc(devtag_get_device(device->machine, "maincpu")), data ));
 }
 
 
@@ -1758,7 +1758,7 @@ READ8_HANDLER ( to770_gatearray_r )
 	case 2: return (lt3 << 7) | (inil << 6);
 	case 3: return (init << 7);
 	default:
-		logerror( "$%04x to770_gatearray_r: invalid offset %i\n", cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), offset );
+		logerror( "$%04x to770_gatearray_r: invalid offset %i\n", cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), offset );
 		return 0;
 	}
 }
@@ -1990,7 +1990,7 @@ READ8_HANDLER ( mo5_gatearray_r )
 	case 2: return (lt3 << 7) | (inil << 6);
 	case 3: return (init << 7);
 	default:
-		logerror( "$%04x mo5_gatearray_r: invalid offset %i\n",  cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), offset );
+		logerror( "$%04x mo5_gatearray_r: invalid offset %i\n",  cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), offset );
 		return 0;
 	}
 }
@@ -2238,14 +2238,14 @@ MACHINE_START ( mo5 )
 
 WRITE8_HANDLER ( to9_ieee_w )
 {
-	logerror( "$%04x %f to9_ieee_w: unhandled write $%02X to register %i\n", cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), data, offset );
+	logerror( "$%04x %f to9_ieee_w: unhandled write $%02X to register %i\n", cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), data, offset );
 }
 
 
 
 READ8_HANDLER  ( to9_ieee_r )
 {
-	logerror( "$%04x %f to9_ieee_r: unhandled read from register %i\n", cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), offset );
+	logerror( "$%04x %f to9_ieee_r: unhandled read from register %i\n", cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), offset );
 	return 0;
 }
 
@@ -2276,7 +2276,7 @@ READ8_HANDLER ( to9_gatearray_r )
 	case 2: return (lt3 << 7) | (inil << 6);
 	case 3: return (v.init << 7) | (init << 6); /* != TO7/70 */
 	default:
-		logerror( "$%04x to9_gatearray_r: invalid offset %i\n", cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), offset );
+		logerror( "$%04x to9_gatearray_r: invalid offset %i\n", cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), offset );
 		return 0;
 	}
 }
@@ -2371,7 +2371,7 @@ READ8_HANDLER  ( to9_vreg_r )
 
 WRITE8_HANDLER ( to9_vreg_w )
 {
-	LOG_VIDEO(( "$%04x %f to9_vreg_w: off=%i ($%04X) data=$%02X\n", cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), offset, 0xe7da + offset, data ));
+	LOG_VIDEO(( "$%04x %f to9_vreg_w: off=%i ($%04X) data=$%02X\n", cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), offset, 0xe7da + offset, data ));
 
 	switch ( offset )
 	{
@@ -2669,7 +2669,7 @@ READ8_HANDLER ( to9_kbd_r )
 		/* bit 7:     interrupt */
 
 		LOG_KBD(( "$%04x %f to9_kbd_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, pe=%i, irq=%i)\n",
-			  cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), to9_kbd_status,
+			  cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), to9_kbd_status,
 			  (to9_kbd_status & ACIA_6850_RDRF) ? 1 : 0,
 			  (to9_kbd_status & ACIA_6850_TDRE) ? 1 : 0,
 			  (to9_kbd_status & ACIA_6850_OVRN) ? 1 : 0,
@@ -2684,12 +2684,12 @@ READ8_HANDLER ( to9_kbd_r )
 		else
 			to9_kbd_status &= ~(ACIA_6850_OVRN | ACIA_6850_RDRF);
 		to9_kbd_overrun = 0;
-		LOG_KBD(( "$%04x %f to9_kbd_r: read data $%02X\n", cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), to9_kbd_in ));
+		LOG_KBD(( "$%04x %f to9_kbd_r: read data $%02X\n", cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), to9_kbd_in ));
 		to9_kbd_update_irq(space->machine);
 		return to9_kbd_in;
 
 	default:
-		logerror( "$%04x to9_kbd_r: invalid offset %i\n", cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")),  offset );
+		logerror( "$%04x to9_kbd_r: invalid offset %i\n", cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")),  offset );
 		return 0;
 	}
 }
@@ -2711,7 +2711,7 @@ WRITE8_HANDLER ( to9_kbd_w )
 			to9_kbd_overrun = 0;
 			to9_kbd_status = ACIA_6850_TDRE;
 			to9_kbd_intr = 0;
-			LOG_KBD(( "$%04x %f to9_kbd_w: reset (data=$%02X)\n", cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), data ));
+			LOG_KBD(( "$%04x %f to9_kbd_w: reset (data=$%02X)\n", cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), data ));
 		}
 		else
 		{
@@ -2725,7 +2725,7 @@ WRITE8_HANDLER ( to9_kbd_w )
 			to9_kbd_intr = data >> 5;
 
 			LOG_KBD(( "$%04x %f to9_kbd_w: set control to $%02X (parity=%i, intr in=%i out=%i)\n",
-				  cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)),
+				  cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)),
 				  data, to9_kbd_parity, to9_kbd_intr >> 2,
 				  (to9_kbd_intr & 3) ? 1 : 0 ));
 		}
@@ -2756,19 +2756,19 @@ WRITE8_HANDLER ( to9_kbd_w )
 		case 0xFE: to9_kbd_periph = 0; break;
 
 		default:
-			logerror( "$%04x %f to9_kbd_w: unknown kbd command %02X\n", cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), data );
+			logerror( "$%04x %f to9_kbd_w: unknown kbd command %02X\n", cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), data );
 		}
 
 		thom_set_caps_led( space->machine, !to9_kbd_caps );
 
 		LOG(( "$%04x %f to9_kbd_w: kbd command %02X (caps=%i, pad=%i, periph=%i)\n",
-		      cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), data,
+		      cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), data,
 		      to9_kbd_caps, to9_kbd_pad, to9_kbd_periph ));
 
 		break;
 
 	default:
-		logerror( "$%04x to9_kbd_w: invalid offset %i (data=$%02X) \n", cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), offset, data );
+		logerror( "$%04x to9_kbd_w: invalid offset %i (data=$%02X) \n", cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), offset, data );
 	}
 }
 
@@ -3833,12 +3833,12 @@ READ8_HANDLER ( to8_gatearray_r )
 		break;
 
 	default:
-		logerror( "$%04x to8_gatearray_r: invalid offset %i\n", cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), offset );
+		logerror( "$%04x to8_gatearray_r: invalid offset %i\n", cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), offset );
 		res = 0;
 	}
 
 	LOG_VIDEO(( "$%04x %f to8_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
-		  cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)),
+		  cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)),
 		  offset, 0xe7e4 + offset, res, to7_lightpen ));
 
 	return res;
@@ -3849,7 +3849,7 @@ READ8_HANDLER ( to8_gatearray_r )
 WRITE8_HANDLER ( to8_gatearray_w )
 {
 	LOG_VIDEO(( "$%04x %f to8_gatearray_w: off=%i ($%04X) data=$%02X\n",
-		  cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)),
+		  cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)),
 		  offset, 0xe7e4 + offset, data ));
 
 	switch ( offset )
@@ -3881,7 +3881,7 @@ WRITE8_HANDLER ( to8_gatearray_w )
 
 	default:
 		logerror( "$%04x to8_gatearray_w: invalid offset %i (data=$%02X)\n",
-			  cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), offset, data );
+			  cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), offset, data );
 	}
 }
 
@@ -3930,7 +3930,7 @@ READ8_HANDLER  ( to8_vreg_r )
 WRITE8_HANDLER ( to8_vreg_w )
 {
 	LOG_VIDEO(( "$%04x %f to8_vreg_w: off=%i ($%04X) data=$%02X\n",
-		  cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)),
+		  cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)),
 		  offset, 0xe7da + offset, data ));
 
 	switch ( offset )
@@ -3986,7 +3986,7 @@ static READ8_DEVICE_HANDLER ( to8_sys_porta_in )
 {
 	int ktest = to8_kbd_ktest (device->machine);
 
-	LOG_KBD(( "$%04x %f: to8_sys_porta_in ktest=%i\n", cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), ktest ));
+	LOG_KBD(( "$%04x %f: to8_sys_porta_in ktest=%i\n", cpu_get_previouspc(devtag_get_device(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), ktest ));
 
 	return ktest;
 }
@@ -4553,7 +4553,7 @@ static WRITE8_DEVICE_HANDLER ( mo6_game_porta_out )
 {
 	const device_config *printer = devtag_get_device(device->machine, "centronics");
 
-	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
+	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(devtag_get_device(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
 
 	/* centronics data */
 	centronics_data_w(printer, 0, data);
@@ -4565,7 +4565,7 @@ static WRITE8_DEVICE_HANDLER ( mo6_game_cb2_out )
 {
 	const device_config *printer = devtag_get_device(device->machine, "centronics");
 
-	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
+	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc(devtag_get_device(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
 
 	/* centronics strobe */
 	centronics_strobe_w(printer, data);
@@ -4768,12 +4768,12 @@ READ8_HANDLER ( mo6_gatearray_r )
 		break;
 
 	default:
-		logerror( "$%04x mo6_gatearray_r: invalid offset %i\n", cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), offset );
+		logerror( "$%04x mo6_gatearray_r: invalid offset %i\n", cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), offset );
 		res = 0;
 	}
 
 	LOG_VIDEO(( "$%04x %f mo6_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
-		  cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)),
+		  cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)),
 		  offset, 0xa7e4 + offset, res, to7_lightpen ));
 
 	return res;
@@ -4784,7 +4784,7 @@ READ8_HANDLER ( mo6_gatearray_r )
 WRITE8_HANDLER ( mo6_gatearray_w )
 {
 	LOG_VIDEO(( "$%04x %f mo6_gatearray_w: off=%i ($%04X) data=$%02X\n",
-		  cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)),
+		  cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)),
 		  offset, 0xa7e4 + offset, data ));
 
 	switch ( offset )
@@ -4814,7 +4814,7 @@ WRITE8_HANDLER ( mo6_gatearray_w )
 		break;
 
 	default:
-		logerror( "$%04x mo6_gatearray_w: invalid offset %i (data=$%02X)\n", cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), offset, data );
+		logerror( "$%04x mo6_gatearray_w: invalid offset %i (data=$%02X)\n", cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), offset, data );
 	}
 }
 
@@ -4851,7 +4851,7 @@ READ8_HANDLER ( mo6_vreg_r )
 WRITE8_HANDLER ( mo6_vreg_w )
 {
 	LOG_VIDEO(( "$%04x %f mo6_vreg_w: off=%i ($%04X) data=$%02X\n",
-		  cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)),
+		  cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)),
 		  offset, 0xa7da + offset, data ));
 
 	switch ( offset )
@@ -5005,7 +5005,7 @@ READ8_HANDLER ( mo5nr_net_r )
 	if ( to7_controller_type )
 		return to7_floppy_r ( space, offset );
 
-	logerror( "$%04x %f mo5nr_net_r: read from reg %i\n", cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), offset );
+	logerror( "$%04x %f mo5nr_net_r: read from reg %i\n", cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), offset );
 
 	return 0;
 }
@@ -5018,7 +5018,7 @@ WRITE8_HANDLER ( mo5nr_net_w )
 		to7_floppy_w ( space, offset, data );
 	else
 		logerror( "$%04x %f mo5nr_net_w: write $%02X to reg %i\n",
-			  cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), data, offset );
+			  cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), attotime_to_double(timer_get_time(space->machine)), data, offset );
 }
 
 

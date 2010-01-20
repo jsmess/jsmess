@@ -13,7 +13,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "image.h"
 #include "ui.h"
 #include "uimenu.h"
@@ -380,7 +380,7 @@ static int create_new_image(const device_config *device, const char *directory, 
 		case ENTTYPE_FILE:
 			/* a file exists here - ask for permission from the user */
 			child_menu = ui_menu_alloc(device->machine, menu_confirm_save_as, NULL);
-			child_menustate = ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
+			child_menustate = (confirm_save_as_menu_state*)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
 			child_menustate->yes = yes;
 			ui_menu_stack_push(child_menu);
 			do_create = FALSE;
@@ -805,7 +805,7 @@ static void menu_file_selector(running_machine *machine, ui_menu *menu, void *pa
 				case SELECTOR_ENTRY_TYPE_CREATE:
 					/* create */
 					child_menu = ui_menu_alloc(machine, menu_file_create, NULL);
-					child_menustate = ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
+					child_menustate = (file_create_menu_state*)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
 					child_menustate->manager_menustate = menustate->manager_menustate;
 					ui_menu_stack_push(child_menu);
 					break;
@@ -821,7 +821,7 @@ static void menu_file_selector(running_machine *machine, ui_menu *menu, void *pa
 						break;
 					}
 					astring_cpyc(menustate->manager_menustate->current_directory, entry->fullpath);
-					ui_menu_reset(menu, 0);
+					ui_menu_reset(menu, (ui_menu_reset_options)0);
 					break;
 
 				case SELECTOR_ENTRY_TYPE_FILE:
@@ -979,7 +979,7 @@ void ui_mess_menu_file_manager(running_machine *machine, ui_menu *menu, void *pa
 
 			/* push the menu */
 			child_menu = ui_menu_alloc(machine, menu_file_selector, NULL);
-			child_menustate = ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
+			child_menustate = (file_selector_menu_state *)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
 			child_menustate->manager_menustate = menustate;
 			ui_menu_stack_push(child_menu);
 		}

@@ -31,7 +31,7 @@
 
  ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8255a.h"

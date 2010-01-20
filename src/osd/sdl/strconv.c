@@ -2,7 +2,7 @@
 //
 //  strconv.c - SDL (POSIX) string conversion
 //
-//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -16,9 +16,8 @@
 
 #include <stdlib.h>
 
-// MAME headers
-#include "restrack.h"
-#include "mame.h"
+// MAMEOS headers
+#include "strconv.h"
 #include "unicode.h"
 
 #ifdef SDLMAME_WIN32

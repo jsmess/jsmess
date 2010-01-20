@@ -66,7 +66,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cococart.h"
 #include "flopdrv.h"
 #include "includes/coco.h"
@@ -183,7 +183,7 @@ INLINE rtc_type_t real_time_clock(const device_config *device)
 	rtc_type_t result;
 	fdc_t *fdc = get_token(device);
 
-	result = (int) input_port_read_safe(device->machine, "real_time_clock", RTC_NONE);
+	result = (rtc_type_t) input_port_read_safe(device->machine, "real_time_clock", RTC_NONE);
 
 	/* check to make sure we don't have any invalid values */
 	if (((result == RTC_DISTO) && (fdc->disto_msm6242 == NULL))
@@ -227,8 +227,8 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
 static DEVICE_START(fdc)
 {
 	fdc_t *fdc = get_token(device);
-	astring *tempstring = astring_alloc();
-	const fdc_hardware_type *hwtype = device_get_info_ptr(device, FDCINFO_PTR_HWTYPE);
+	astring tempstring;
+	const fdc_hardware_type *hwtype = (const fdc_hardware_type *)device_get_info_ptr(device, FDCINFO_PTR_HWTYPE);
 
 	/* initialize variables */
 	memset(fdc, 0, sizeof(*fdc));
@@ -240,8 +240,6 @@ static DEVICE_START(fdc)
 	fdc->wd17xx			= devtag_get_device(device->machine, device_build_tag(tempstring, device, WD_TAG));
 
 	assert(fdc->wd17xx != NULL);
-
-	astring_free(tempstring);
 }
 
 

@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "emu.h"
 #include "includes/pocketc.h"
 
 /* PC126x

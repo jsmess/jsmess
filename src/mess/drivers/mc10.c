@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/dac.h"
 #include "video/m6847.h"
@@ -41,7 +41,7 @@ struct _mc10_state
 
 static READ8_HANDLER( mc10_bfff_r )
 {
-	mc10_state *mc10 = space->machine->driver_data;
+	mc10_state *mc10 = (mc10_state *)space->machine->driver_data;
 	UINT8 result = 0xff;
 
 	if (!BIT(mc10->keyboard_strobe, 0)) result &= input_port_read(space->machine, "pb0");
@@ -58,7 +58,7 @@ static READ8_HANDLER( mc10_bfff_r )
 
 static WRITE8_HANDLER( mc10_bfff_w )
 {
-	mc10_state *mc10 = space->machine->driver_data;
+	mc10_state *mc10 = (mc10_state *)space->machine->driver_data;
 
 	/* bit 2 to 6, mc6847 mode lines */
 	mc6847_gm2_w(mc10->mc6847, BIT(data, 2));
@@ -80,20 +80,20 @@ static WRITE8_HANDLER( mc10_bfff_w )
 /* keyboard strobe */
 static READ8_HANDLER( mc10_port1_r )
 {
-	mc10_state *mc10 = space->machine->driver_data;
+	mc10_state *mc10 = (mc10_state *)space->machine->driver_data;
 	return mc10->keyboard_strobe;
 }
 
 /* keyboard strobe */
 static WRITE8_HANDLER( mc10_port1_w )
 {
-	mc10_state *mc10 = space->machine->driver_data;
+	mc10_state *mc10 = (mc10_state *)space->machine->driver_data;
 	mc10->keyboard_strobe = data;
 }
 
 static READ8_HANDLER( mc10_port2_r )
 {
-	mc10_state *mc10 = space->machine->driver_data;
+	mc10_state *mc10 = (mc10_state *)space->machine->driver_data;
 	UINT8 result = 0xef;
 
 	/* bit 1, keyboard line pa6 */
@@ -113,7 +113,7 @@ static READ8_HANDLER( mc10_port2_r )
 
 static WRITE8_HANDLER( mc10_port2_w )
 {
-	mc10_state *mc10 = space->machine->driver_data;
+	mc10_state *mc10 = (mc10_state *)space->machine->driver_data;
 
 	/* bit 0, cassette & printer output */
 	cassette_output(mc10->cassette, BIT(data, 0) ? +1.0 : -1.0);
@@ -126,7 +126,7 @@ static WRITE8_HANDLER( mc10_port2_w )
 
 static READ8_DEVICE_HANDLER( mc10_mc6847_videoram_r )
 {
-	mc10_state *mc10 = device->machine->driver_data;
+	mc10_state *mc10 = (mc10_state *)device->machine->driver_data;
 
 	mc6847_inv_w(device, BIT(mc10->ram[offset], 6));
 	mc6847_as_w(device, BIT(mc10->ram[offset], 7));
@@ -136,7 +136,7 @@ static READ8_DEVICE_HANDLER( mc10_mc6847_videoram_r )
 
 static VIDEO_UPDATE( mc10 )
 {
-	mc10_state *mc10 = screen->machine->driver_data;
+	mc10_state *mc10 = (mc10_state *)screen->machine->driver_data;
 	return mc6847_update(mc10->mc6847, bitmap, cliprect);
 }
 
@@ -147,7 +147,7 @@ static VIDEO_UPDATE( mc10 )
 
 static DRIVER_INIT( mc10 )
 {
-	mc10_state *mc10 = machine->driver_data;
+	mc10_state *mc10 = (mc10_state *)machine->driver_data;
 	const address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* initialize keyboard strobe */
@@ -380,7 +380,7 @@ static const cassette_config mc10_cassette_config =
 {
 	coco_cassette_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 };
 
 static const mc6847_interface mc10_mc6847_intf =

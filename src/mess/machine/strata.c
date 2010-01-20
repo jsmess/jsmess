@@ -11,7 +11,7 @@
     Raphael Nabet 2004, based on MAME's intelfsh.c core
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "strata.h"
 
 #define MAX_STRATA	1
@@ -28,24 +28,25 @@
 #define BLOCK_ADDRESS_SHIFT	17
 #define BYTE_ADDRESS_MASK	0x01ffff
 
+enum mode_t
+{
+	FM_NORMAL,		// normal read/write
+	FM_READID,		// read ID
+	FM_READQUERY,	// read query
+	FM_READSTATUS,	// read status
+	FM_WRITEPART1,	// first half of programming, awaiting second
+	FM_WRBUFPART1,	// first part of write to buffer, awaiting second
+	FM_WRBUFPART2,	// second part of write to buffer, awaiting third
+	FM_WRBUFPART3,	// third part of write to buffer, awaiting fourth
+	FM_WRBUFPART4,	// fourth part of write to buffer
+	FM_CLEARPART1,	// first half of clear, awaiting second
+	FM_SETLOCK,		// first half of set master lock/set block lock
+	FM_CONFPART1,	// first half of configuration, awaiting second
+	FM_WRPROTPART1	// first half of protection program, awaiting second
+};
 static struct
 {
-	enum
-	{
-		FM_NORMAL,		// normal read/write
-		FM_READID,		// read ID
-		FM_READQUERY,	// read query
-		FM_READSTATUS,	// read status
-		FM_WRITEPART1,	// first half of programming, awaiting second
-		FM_WRBUFPART1,	// first part of write to buffer, awaiting second
-		FM_WRBUFPART2,	// second part of write to buffer, awaiting third
-		FM_WRBUFPART3,	// third part of write to buffer, awaiting fourth
-		FM_WRBUFPART4,	// fourth part of write to buffer
-		FM_CLEARPART1,	// first half of clear, awaiting second
-		FM_SETLOCK,		// first half of set master lock/set block lock
-		FM_CONFPART1,	// first half of configuration, awaiting second
-		FM_WRPROTPART1	// first half of protection program, awaiting second
-	} mode;				// current operation mode
+	mode_t mode;				// current operation mode
 	int hard_unlock;	// 1 if RP* pin is at Vhh (not fully implemented)
 	int status;			// current status
 	int master_lock;	// master lock flag

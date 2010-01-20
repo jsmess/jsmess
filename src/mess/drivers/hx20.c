@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6800/m6800.h"
 
 static ADDRESS_MAP_START(ehx20_mem, ADDRESS_SPACE_PROGRAM, 8)

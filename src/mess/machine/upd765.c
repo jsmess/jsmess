@@ -26,7 +26,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "machine/upd765.h"
 
 
@@ -330,7 +330,7 @@ static void upd765_seek_complete(const device_config *device)
 
 static TIMER_CALLBACK(upd765_seek_timer_callback)
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	upd765_t *fdc = get_safe_token(device);
 	/* seek complete */
 	upd765_seek_complete(device);
@@ -417,7 +417,7 @@ static void upd765_timer_func(const device_config *device, int timer_type)
 
 static TIMER_CALLBACK(upd765_timer_callback)
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	upd765_timer_func(device,param);
 }
 
@@ -1412,7 +1412,7 @@ static int upd765_read_data_stop(const device_config *device)
 
 static TIMER_CALLBACK(upd765_continue_command)
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	upd765_t *fdc = get_safe_token(device);
 	if ((fdc->upd765_phase == UPD765_EXECUTION_PHASE_READ) ||
 		(fdc->upd765_phase == UPD765_EXECUTION_PHASE_WRITE))
@@ -2304,9 +2304,9 @@ static void common_start(const device_config *device, int device_type)
 	assert(device->tag != NULL);
 	assert(device->static_config != NULL);
 
-	fdc->intf = device->static_config;
+	fdc->intf = (const upd765_interface*)device->static_config;
 
-	fdc->version = device_type;
+	fdc->version = (UPD765_VERSION)device_type;
 	fdc->timer = timer_alloc(device->machine, upd765_timer_callback, (void*)device);
 	fdc->seek_timer = timer_alloc(device->machine, upd765_seek_timer_callback, (void*)device);
 	fdc->command_timer = timer_alloc(device->machine, upd765_continue_command, (void*)device);

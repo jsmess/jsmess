@@ -6,7 +6,7 @@
  *
  *************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "pc_joy.h"
 #include "memconv.h"
 

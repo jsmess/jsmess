@@ -9,7 +9,7 @@
 #undef i386
 #endif /* i386 */
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"
 #include "cpu/i386/i386.h"

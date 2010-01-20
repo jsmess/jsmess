@@ -503,7 +503,7 @@ DIP locations verified for:
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/arkanoid.h"
 #include "sound/ay8910.h"
@@ -877,7 +877,7 @@ static MACHINE_DRIVER_START( arkanoid )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_12MHz/4/2) /* YM2149 clock is 3mhz, pin 26 is low so 3mhz/2 */
+	MDRV_SOUND_ADD("aysnd", YM2149, XTAL_12MHz/4/2) /* YM2149 clock is 3mhz, pin 26 is low so 3mhz/2 */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_DRIVER_END
@@ -1304,7 +1304,7 @@ static DRIVER_INIT( block2 )
 	// the graphics on this bootleg have the data scrambled
 	int tile;
 	UINT8* srcgfx = memory_region(machine,"gfx1");
-	UINT8* buffer = alloc_array_or_die(UINT8, 0x18000);
+	UINT8* buffer = auto_alloc_array(machine, UINT8, 0x18000);
 
 	for (tile = 0; tile < 0x3000; tile++)
 	{
@@ -1328,7 +1328,7 @@ static DRIVER_INIT( block2 )
 
 	memcpy(srcgfx, buffer, 0x18000);
 
-	free(buffer);
+	auto_free(machine, buffer);
 
 	state->bootleg_id = BLOCK2;
 	arkanoid_bootleg_init(machine);

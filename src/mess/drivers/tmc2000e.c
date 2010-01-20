@@ -29,7 +29,7 @@
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/tmc2000e.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "devices/printer.h"
@@ -80,7 +80,7 @@ static WRITE8_HANDLER( io_select_w )
 
 static WRITE8_HANDLER( keyboard_latch_w )
 {
-	tmc2000e_state *state = space->machine->driver_data;
+	tmc2000e_state *state = (tmc2000e_state *)space->machine->driver_data;
 
 	state->keylatch = data;
 }
@@ -128,28 +128,28 @@ INPUT_PORTS_END
 
 static READ_LINE_DEVICE_HANDLER( rdata_r )
 {
-	tmc2000e_state *state = device->machine->driver_data;
+	tmc2000e_state *state = (tmc2000e_state *)device->machine->driver_data;
 
 	return BIT(state->color, 2);
 }
 
 static READ_LINE_DEVICE_HANDLER( bdata_r )
 {
-	tmc2000e_state *state = device->machine->driver_data;
+	tmc2000e_state *state = (tmc2000e_state *)device->machine->driver_data;
 
 	return BIT(state->color, 1);
 }
 
 static READ_LINE_DEVICE_HANDLER( gdata_r )
 {
-	tmc2000e_state *state = device->machine->driver_data;
+	tmc2000e_state *state = (tmc2000e_state *)device->machine->driver_data;
 
 	return BIT(state->color, 0);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( tmc2000e_efx_w )
 {
-	tmc2000e_state *driver_state = device->machine->driver_data;
+	tmc2000e_state *driver_state = (tmc2000e_state *)device->machine->driver_data;
 
 	driver_state->cdp1864_efx = state;
 }
@@ -173,7 +173,7 @@ static CDP1864_INTERFACE( tmc2000e_cdp1864_intf )
 
 static VIDEO_UPDATE( tmc2000e )
 {
-	tmc2000e_state *state = screen->machine->driver_data;
+	tmc2000e_state *state = (tmc2000e_state *)screen->machine->driver_data;
 
 	cdp1864_update(state->cdp1864, bitmap, cliprect);
 
@@ -196,7 +196,7 @@ static CDP1802_MODE_READ( tmc2000e_mode_r )
 
 static CDP1802_EF_READ( tmc2000e_ef_r )
 {
-	tmc2000e_state *state = device->machine->driver_data;
+	tmc2000e_state *state = (tmc2000e_state *)device->machine->driver_data;
 
 	UINT8 flags = 0x0f;
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
@@ -225,7 +225,7 @@ static CDP1802_EF_READ( tmc2000e_ef_r )
 
 static WRITE_LINE_DEVICE_HANDLER( tmc2000e_q_w )
 {
-	tmc2000e_state *driver_state = device->machine->driver_data;
+	tmc2000e_state *driver_state = (tmc2000e_state *)device->machine->driver_data;
 
 	// turn CDP1864 sound generator on/off
 
@@ -244,7 +244,7 @@ static WRITE_LINE_DEVICE_HANDLER( tmc2000e_q_w )
 
 static WRITE8_DEVICE_HANDLER( tmc2000e_dma_w )
 {
-	tmc2000e_state *state = device->machine->driver_data;
+	tmc2000e_state *state = (tmc2000e_state *)device->machine->driver_data;
 
 	state->color = (state->colorram[offset & 0x3ff]) & 0x07; // 0x04 = R, 0x02 = B, 0x01 = G
 
@@ -266,7 +266,7 @@ static CDP1802_INTERFACE( tmc2000e_config )
 
 static MACHINE_START( tmc2000e )
 {
-	tmc2000e_state *state = machine->driver_data;
+	tmc2000e_state *state = (tmc2000e_state *)machine->driver_data;
 
 	/* allocate color RAM */
 	state->colorram = auto_alloc_array(machine, UINT8, TMC2000E_COLORRAM_SIZE);
@@ -283,7 +283,7 @@ static MACHINE_START( tmc2000e )
 
 static MACHINE_RESET( tmc2000e )
 {
-	tmc2000e_state *state = machine->driver_data;
+	tmc2000e_state *state = (tmc2000e_state *)machine->driver_data;
 
 	device_reset(state->cdp1864);
 
@@ -298,7 +298,7 @@ static const cassette_config tmc2000_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 };
 static FLOPPY_OPTIONS_START(tmc2000e)
 	// dsk

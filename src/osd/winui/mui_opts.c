@@ -32,7 +32,8 @@
 #include <sys/stat.h>
 #include <math.h>
 #include <direct.h>
-#include <driver.h>
+#include <emu.h>
+#include <emuopts.h>
 #include <stddef.h>
 #include <tchar.h>
 
@@ -523,7 +524,7 @@ core_options *CreateGameOptions(int driver_index)
 BOOL OptionsInit()
 {
 	// create a memory pool for our data
-	options_memory_pool = pool_alloc(memory_error);
+	options_memory_pool = pool_alloc_lib(memory_error);
 	if (!options_memory_pool)
 		return FALSE;
 
@@ -545,7 +546,7 @@ BOOL OptionsInit()
 		while(perGameOptions[game_option_count].name)
 			game_option_count++;
 
-		driver_per_game_options = (options_entry *) pool_malloc(options_memory_pool,
+		driver_per_game_options = (options_entry *) pool_malloc_lib(options_memory_pool,
 			(game_option_count * driver_list_get_count(drivers) + 1) * sizeof(*driver_per_game_options));
 
 		for (i = 0; i < driver_list_get_count(drivers); i++)
@@ -557,7 +558,7 @@ BOOL OptionsInit()
 				snprintf(buffer, ARRAY_LENGTH(buffer), "%s%s", drivers[i]->name, perGameOptions[j].name);
 
 				memset(ent, 0, sizeof(*ent));
-				ent->name = pool_strdup(options_memory_pool, buffer);
+				ent->name = pool_strdup_lib(options_memory_pool, buffer);
 				ent->defvalue = perGameOptions[j].defvalue;
 				ent->flags = perGameOptions[j].flags;
 				ent->description = perGameOptions[j].description;
@@ -574,7 +575,7 @@ BOOL OptionsInit()
 	// set up folders
 	size_folder_filters = 1;
 	num_folder_filters = 0;
-	folder_filters = (folder_filter_type *) pool_malloc(options_memory_pool, size_folder_filters * sizeof(*folder_filters));
+	folder_filters = (folder_filter_type *) pool_malloc_lib(options_memory_pool, size_folder_filters * sizeof(*folder_filters));
 #endif
 	// now load the options and settings
 	LoadOptionsAndSettings();
@@ -594,7 +595,7 @@ void OptionsExit(void)
 	settings = NULL;
 
 	// free the memory pool
-	pool_free(options_memory_pool);
+	pool_free_lib(options_memory_pool);
 	options_memory_pool = NULL;
 }
 
@@ -2821,10 +2822,10 @@ void save_options(OPTIONS_TYPE opt_type, core_options *opts, int game_num)
 		if (OPTIONS_VERTICAL == opt_type) {
 			//since VERTICAL and HORIZONTAL are equally ranked
 			//we need to subtract 2 from vertical to also get to global
-			baseopts = load_options(opt_type - 2, game_num);
+			baseopts = load_options((OPTIONS_TYPE)(opt_type - 2), game_num);
 		}
 		else {
-			baseopts = load_options(opt_type - 1, game_num);
+			baseopts = load_options((OPTIONS_TYPE)(opt_type - 1), game_num);
 		}
 	}
 

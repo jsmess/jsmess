@@ -84,7 +84,7 @@ Notes:
 
 */
 
-#include "driver.h"
+#include "emu.h"
 #include "conkort.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
@@ -842,7 +842,7 @@ ROM_END
 
 static DEVICE_START( luxor_55_10828 )
 {
-	slow_t *conkort = device->token;
+	slow_t *conkort = (slow_t *)device->token;
 
 	/* find our CPU */
 	conkort->cpu = device_find_child_by_tag(device, Z80_TAG);
@@ -910,7 +910,7 @@ DEVICE_GET_INFO( luxor_55_10828 )
 
 static DEVICE_START( luxor_55_21046 )
 {
-	fast_t *conkort = device->token;
+	fast_t *conkort = (fast_t *)device->token;
 
 	/* find our CPU */
 	conkort->cpu = device_find_child_by_tag(device, Z80_TAG);
@@ -933,7 +933,7 @@ static DEVICE_START( luxor_55_21046 )
 
 static DEVICE_RESET( luxor_55_21046 )
 {
-	fast_t *conkort = device->token;
+	fast_t *conkort = (fast_t *)device->token;
 
 	floppy_mon_w(conkort->image0, CLEAR_LINE);
 	floppy_mon_w(conkort->image1, CLEAR_LINE);

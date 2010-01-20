@@ -80,7 +80,7 @@ other supported games as well.
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/nec/nec.h"
 #include "deprecat.h"
@@ -219,8 +219,8 @@ static WRITE16_HANDLER( m72_main_mcu_w)
 		protection_ram[offset] = val;
 		cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
 		/* Line driven, most likely by write line */
-		//timer_set(space->machine, cpu_clocks_to_attotime(cputag_get_cpu(space->machine, "mcu"), 2), NULL, 0, mcu_irq0_clear);
-		//timer_set(space->machine, cpu_clocks_to_attotime(cputag_get_cpu(space->machine, "mcu"), 0), NULL, 0, mcu_irq0_raise);
+		//timer_set(space->machine, cpu_clocks_to_attotime(devtag_get_device(space->machine, "mcu"), 2), NULL, 0, mcu_irq0_clear);
+		//timer_set(space->machine, cpu_clocks_to_attotime(devtag_get_device(space->machine, "mcu"), 0), NULL, 0, mcu_irq0_raise);
 	}
 	else
 		timer_call_after_resynch( space->machine, protection_ram, (offset<<16) | val, delayed_ram16_w);

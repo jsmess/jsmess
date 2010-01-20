@@ -161,7 +161,7 @@
 #define CLOCK_B	XTAL_8MHz
 #define CLOCK_C	XTAL_19_6608MHz
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2413intf.h"
 
@@ -606,7 +606,7 @@ static MACHINE_RESET( magicard )
 	UINT16 *src    = (UINT16*)memory_region( machine, "maincpu" );
 	UINT16 *dst    = magicram;
 	memcpy (dst, src, 0x80000);
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	device_reset(devtag_get_device(machine, "maincpu"));
 }
 
 

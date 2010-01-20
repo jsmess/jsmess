@@ -2,7 +2,7 @@
  * Nec PC-6001 cassette format handling
  */
 
-#include "driver.h"
+#include "emu.h"
 #include "p6001_cas.h"
 
 #define WAVE_HIGH		 0x5a9e

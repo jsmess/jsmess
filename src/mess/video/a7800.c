@@ -20,7 +20,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 
 #include "includes/a7800.h"
@@ -498,7 +498,7 @@ WRITE8_HANDLER( a7800_MARIA_w )
 			maria_palette[0][3] = data;
 			break;
 		case 0x04:
-			cpu_spinuntil_trigger(cputag_get_cpu(space->machine, "maincpu"), TRIGGER_HSYNC);
+			cpu_spinuntil_trigger(devtag_get_device(space->machine, "maincpu"), TRIGGER_HSYNC);
 			maria_wsync=1;
 			break;
 

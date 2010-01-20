@@ -50,7 +50,7 @@ DD10 DD14  DD18     H5            DD21
 
 *******************************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
@@ -75,7 +75,7 @@ static NVRAM_HANDLER( dderby )
 static WRITE8_HANDLER( dderby_sound_w )
 {
 	soundlatch_w(space,0,data);
-	cpu_set_input_line(cputag_get_cpu(space->machine, "audiocpu"), 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 static UINT8 io_port[8];

@@ -10,7 +10,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "includes/oric.h"
 
 static void oric_vh_update_flash(void);
@@ -168,7 +168,7 @@ static void oric_vh_update_attribute(running_machine *machine,int c)
 				if (oric_ram)
 					vh_state.char_base = oric_ram + (unsigned long)0x09800;
 				else
-					vh_state.char_base = memory_get_read_ptr(space, 0x09800);
+					vh_state.char_base = (unsigned char *)memory_get_read_ptr(space, 0x09800);
 
 				/* changing the mode also changes the position of the standard charset
                 and alternative charset */
@@ -181,7 +181,7 @@ static void oric_vh_update_attribute(running_machine *machine,int c)
 				if (oric_ram)
 					vh_state.char_base = oric_ram + (unsigned long)0x0b400;
 				else
-					vh_state.char_base = memory_get_read_ptr(space, 0x0b400);
+					vh_state.char_base = (unsigned char *)memory_get_read_ptr(space, 0x0b400);
 
 				/* changing the mode also changes the position of the standard charset
                 and alternative charset */

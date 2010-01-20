@@ -7,7 +7,7 @@ used in the Neogeo pocket color.
 
 ******************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "k1ge.h"
 
 typedef struct k1ge k1ge_t;
@@ -757,7 +757,7 @@ static void k2ge_draw( const device_config *device, int line )
 
 static TIMER_CALLBACK( k1ge_hblank_on_timer_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	k1ge_t *k1ge = get_safe_token( device );
 
 	if ( k1ge->hblank_pin_w.write != NULL )
@@ -767,7 +767,7 @@ static TIMER_CALLBACK( k1ge_hblank_on_timer_callback )
 
 static TIMER_CALLBACK( k1ge_timer_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	k1ge_t *k1ge = get_safe_token( device );
 	int y = video_screen_get_vpos( k1ge->screen );
 
@@ -824,7 +824,7 @@ static DEVICE_START( k1ge )
 {
 	k1ge_t *k1ge = get_safe_token( device );
 
-	k1ge->intf = device->static_config;
+	k1ge->intf = (const k1ge_interface*)device->static_config;
 
 	devcb_resolve_write8( &k1ge->vblank_pin_w, &k1ge->intf->vblank_pin_w, device );
 	devcb_resolve_write8( &k1ge->hblank_pin_w, &k1ge->intf->hblank_pin_w, device );

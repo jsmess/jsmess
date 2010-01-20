@@ -10,10 +10,10 @@
 #include <assert.h>
 #include <string.h>
 
+#include "emu.h"
 #include "osdepend.h"
 #include "library.h"
 #include "pool.h"
-#include "mame.h"
 
 struct _imgtool_library
 {
@@ -30,12 +30,12 @@ imgtool_library *imgtool_library_create(void)
 	object_pool *pool;
 
 	/* create a memory pool */
-	pool = pool_alloc(NULL);
+	pool = pool_alloc_lib(NULL);
 	if (!pool)
 		goto error;
 
 	/* allocate the main structure */
-	library = pool_malloc(pool, sizeof(struct _imgtool_library));
+	library = (imgtool_library *)pool_malloc_lib(pool, sizeof(struct _imgtool_library));
 	if (!library)
 		goto error;
 
@@ -47,7 +47,7 @@ imgtool_library *imgtool_library_create(void)
 
 error:
 	if (pool)
-		pool_free(pool);
+		pool_free_lib(pool);
 	return NULL;
 }
 
@@ -55,7 +55,7 @@ error:
 
 void imgtool_library_close(imgtool_library *library)
 {
-	pool_free(library->pool);
+	pool_free_lib(library->pool);
 }
 
 
@@ -66,7 +66,7 @@ static void imgtool_library_add_class(imgtool_library *library, const imgtool_cl
 	char *s1, *s2;
 
 	/* allocate the module and place it in the chain */
-	module = imgtool_library_malloc(library, sizeof(*module));
+	module = (imgtool_module *)imgtool_library_malloc(library, sizeof(*module));
 	memset(module, 0, sizeof(*module));
 	module->previous = library->last;
 	if (library->last)
@@ -77,7 +77,7 @@ static void imgtool_library_add_class(imgtool_library *library, const imgtool_cl
 
 	/* extensions have a weird format */
 	s1 = imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_FILE_EXTENSIONS);
-	s2 = imgtool_library_malloc(library, strlen(s1) + 1);
+	s2 = (char*)imgtool_library_malloc(library, strlen(s1) + 1);
 	strcpy(s2, s1);
 	module->extensions = s2;
 
@@ -103,7 +103,7 @@ static void imgtool_library_add_class(imgtool_library *library, const imgtool_cl
 	module->list_partitions				= (imgtoolerr_t (*)(imgtool_image *, imgtool_partition_info *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_LIST_PARTITIONS);
 	module->block_size					= imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_BLOCK_SIZE);
 	module->createimage_optguide		= (const option_guide *) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE);
-	module->createimage_optspec			= imgtool_library_strdup_allow_null(library, imgtool_get_info_ptr(imgclass, IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC));
+	module->createimage_optspec			= imgtool_library_strdup_allow_null(library, (const char*)imgtool_get_info_ptr(imgclass, IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC));
 	module->image_extra_bytes			+= imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES);
 }
 
@@ -264,14 +264,14 @@ imgtool_module *imgtool_library_index(imgtool_library *library, int i)
 
 void *imgtool_library_malloc(imgtool_library *library, size_t mem)
 {
-	return pool_malloc(library->pool, mem);
+	return pool_malloc_lib(library->pool, mem);
 }
 
 
 
 char *imgtool_library_strdup(imgtool_library *library, const char *s)
 {
-	return pool_strdup(library->pool, s);
+	return pool_strdup_lib(library->pool, s);
 }
 
 

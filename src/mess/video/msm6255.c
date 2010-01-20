@@ -7,7 +7,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "msm6255.h"
 
 /***************************************************************************
@@ -380,7 +380,7 @@ static DEVICE_START( msm6255 )
 	msm6255_t *msm6255 = get_safe_token(device);
 
 	/* resolve callbacks */
-	msm6255->intf = device->static_config;
+	msm6255->intf = (const msm6255_interface*)device->static_config;
 	assert(msm6255->intf->char_ram_r != NULL);
 
 	/* get the screen */

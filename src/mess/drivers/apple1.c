@@ -67,7 +67,7 @@ $F000-$FFFF:    ROM address space
 
 **********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "includes/apple1.h"
@@ -213,7 +213,7 @@ static const cassette_config apple1_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED
+	(cassette_state)(CASSETTE_STOPPED)
 };
 
 /* machine definition */

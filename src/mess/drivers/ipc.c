@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "cpu/i8085/i8085.h"
 
 static ADDRESS_MAP_START(ipc_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -26,7 +26,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(ipc) 
 {
-	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), I8085_PC, 0xE800);	
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), I8085_PC, 0xE800);	
 }
 
 static VIDEO_START( ipc )

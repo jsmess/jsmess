@@ -6,7 +6,7 @@
 
 *********************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "image.h"
 #include "ui.h"
 #include "uimenu.h"
@@ -18,17 +18,12 @@
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-enum _tape_control_command
-{
-	TAPECMD_NULL = 0,
-	TAPECMD_STOP,
-	TAPECMD_PLAY,
-	TAPECMD_RECORD,
-	TAPECMD_REWIND,
-	TAPECMD_FAST_FORWARD
-};
-typedef enum _tape_control_command tape_control_command;
+#define TAPECMD_NULL			((void *) 0x0000)
+#define TAPECMD_STOP			((void *) 0x0001)
+#define TAPECMD_PLAY			((void *) 0x0002)
+#define TAPECMD_RECORD			((void *) 0x0003)
+#define TAPECMD_REWIND			((void *) 0x0004)
+#define TAPECMD_FAST_FORWARD	((void *) 0x0005)
 
 
 
@@ -131,19 +126,19 @@ static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, 
 			NULL);
 
 		/* pause or stop */
-		ui_menu_item_append(menu, ui_getstring(UI_pauseorstop), NULL, 0, (void *) TAPECMD_STOP);
+		ui_menu_item_append(menu, ui_getstring(UI_pauseorstop), NULL, 0, TAPECMD_STOP);
 
 		/* play */
-		ui_menu_item_append(menu, ui_getstring(UI_play), NULL, 0, (void *) TAPECMD_PLAY);
+		ui_menu_item_append(menu, ui_getstring(UI_play), NULL, 0, TAPECMD_PLAY);
 
 		/* record */
-		ui_menu_item_append(menu, ui_getstring(UI_record), NULL, 0, (void *) TAPECMD_RECORD);
+		ui_menu_item_append(menu, ui_getstring(UI_record), NULL, 0, TAPECMD_RECORD);
 
 		/* rewind */
-		ui_menu_item_append(menu, ui_getstring(UI_rewind), NULL, 0, (void *) TAPECMD_REWIND);
+		ui_menu_item_append(menu, ui_getstring(UI_rewind), NULL, 0, TAPECMD_REWIND);
 
 		/* fast forward */
-		ui_menu_item_append(menu, ui_getstring(UI_fastforward), NULL, 0, (void *) TAPECMD_FAST_FORWARD);
+		ui_menu_item_append(menu, ui_getstring(UI_fastforward), NULL, 0, TAPECMD_FAST_FORWARD);
 	}
 	else
 	{
@@ -183,12 +178,12 @@ void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *pa
 			index--;
 		}
 		menustate->device = device;
-		ui_menu_reset(menu, 0);
+		ui_menu_reset(menu, (ui_menu_reset_options)0);
 	}
 
 	/* rebuild the menu - we have to do this so that the counter updates */
 	ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_POSITION);
-	menu_tape_control_populate(machine, menu, state);
+	menu_tape_control_populate(machine, menu, (tape_control_menu_state*)state);
 
 	/* process the menu */
 	event = ui_menu_process(machine, menu, 0);
@@ -215,33 +210,27 @@ void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *pa
 				break;
 
 			case IPT_UI_SELECT:
-				switch((tape_control_command) event->itemref)
 				{
-					case TAPECMD_NULL:
-						break;
-
-					case TAPECMD_STOP:
+					if (event->itemref==TAPECMD_NULL) {
+					}
+					else if (event->itemref==TAPECMD_STOP) {
 						cassette_change_state(menustate->device, CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
-						break;
-
-					case TAPECMD_PLAY:
+					}
+					else if (event->itemref==TAPECMD_PLAY) {
 						cassette_change_state(menustate->device, CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
-						break;
-
-					case TAPECMD_RECORD:
+					}
+					else if (event->itemref==TAPECMD_RECORD) {
 						cassette_change_state(menustate->device, CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
-						break;
-
-					case TAPECMD_REWIND:
+					}
+					else if (event->itemref==TAPECMD_REWIND) {
 						t0 = cassette_get_position(menustate->device);
 						cassette_seek(menustate->device, ((int) t0 > 0 ? -1 : 0), SEEK_CUR);
-						break;
-
-					case TAPECMD_FAST_FORWARD:
+					}
+					else if (event->itemref==TAPECMD_FAST_FORWARD) {
 						t0 = cassette_get_position(menustate->device);
 						t1 = cassette_get_length(menustate->device);
 						cassette_seek(menustate->device, ((int) t0 < (int) t1 ? +1 : 0), SEEK_CUR);
-						break;
+					}
 				}
 				break;
 		}

@@ -4,7 +4,7 @@
 */
 
 #include <math.h>
-#include "driver.h"
+#include "emu.h"
 #include "tms9901.h"
 #include "mm58274c.h"
 #include "video/v9938.h"
@@ -130,7 +130,7 @@ enum
 };
 
 /* tms9995_ICount: used to implement memory waitstates (hack) */
-/* NPW 23-Feb-2004 - externs no longer needed because we now use cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),) */
+/* NPW 23-Feb-2004 - externs no longer needed because we now use cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),) */
 
 
 
@@ -197,7 +197,7 @@ MACHINE_RESET( geneve )
 
 	/* read config */
 	has_speech = (input_port_read(machine, "CFG") >> config_speech_bit) & config_speech_mask;
-	fdc_kind = (input_port_read(machine, "CFG") >> config_fdc_bit) & config_fdc_mask;
+	fdc_kind = (fdc_kind_t)((input_port_read(machine, "CFG") >> config_fdc_bit) & config_fdc_mask);
 	has_ide = (input_port_read(machine, "CFG") >> config_ide_bit) & config_ide_mask;
 	has_rs232 = (input_port_read(machine, "CFG") >> config_rs232_bit) & config_rs232_mask;
 	has_usb_sm = (input_port_read(machine, "CFG") >> config_usbsm_bit) & config_usbsm_mask;
@@ -242,7 +242,7 @@ MACHINE_RESET( geneve )
 		ti99_usbsm_reset(machine, TRUE);
 
 	/* reset CPU */
-	cputag_reset(machine, "maincpu");
+	device_reset(devtag_get_device(machine, "maincpu"));
 }
 
 /*
@@ -301,7 +301,7 @@ static void intb_callback(running_machine *machine, int state)
 */
 static  READ8_HANDLER ( geneve_speech_r )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-8);		/* this is just a minimum, it can be more */
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-8);		/* this is just a minimum, it can be more */
 
 	return tms5220_status_r(devtag_get_device(space->machine, "tms5220"), offset);
 }
@@ -329,7 +329,7 @@ static void speech_kludge_callback(int dummy)
 */
 static WRITE8_HANDLER ( geneve_speech_w )
 {
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-32*4);		/* this is just an approx. minimum, it can be much more */
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-32*4);		/* this is just an approx. minimum, it can be much more */
 
 #if 1
 	/* the stupid design of the tms5220 core means that ready is cleared when
@@ -343,7 +343,7 @@ static WRITE8_HANDLER ( geneve_speech_w )
 
 		logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
 
-		cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-cycles_to_ready);
+		cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-cycles_to_ready);
 		timer_set(space->machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
 	}
 #endif

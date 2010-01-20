@@ -63,7 +63,7 @@
 //      Implement an inter-sector delay during the FORMAT command (format happens too quickly now)
 //
 
-#include "driver.h"
+#include "emu.h"
 #include "devices/harddriv.h"
 #include "includes/corvushd.h"
 #include <ctype.h>

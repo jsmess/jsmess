@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "climess.h"
 #include "output.h"
 #include "hash.h"
@@ -55,9 +55,6 @@ int info_listdevices(core_options *opts, const char *gamename)
 	const char *shortname;
 	char paren_shortname[16];
 
-	/* since we expand the machine driver, we need to set things up */
-	init_resource_tracking();
-
 	i = 0;
 
 	mame_printf_info(" SYSTEM      DEVICE NAME (brief)   IMAGE FILE EXTENSIONS SUPPORTED    \n");
@@ -96,9 +93,6 @@ int info_listdevices(core_options *opts, const char *gamename)
 		}
 		i++;
 	}
-
-	/* clean up our tracked resources */
-	exit_resource_tracking();
 	return 0;
 }
 #endif
@@ -122,9 +116,6 @@ int info_listdevices(core_options *options, const char *gamename)
 	const char *name;
 	const char *shortname;
 	char paren_shortname[16];
-
-	/* since we expand the machine driver, we need to set things up */
-	init_resource_tracking();
 
 	printf(" SYSTEM      DEVICE NAME (brief)   IMAGE FILE EXTENSIONS SUPPORTED    \n");
 	printf("----------  --------------------  ------------------------------------\n");
@@ -167,9 +158,6 @@ int info_listdevices(core_options *options, const char *gamename)
 			count++;
 			machine_config_free(config);
 		}
-
-	/* clean up our tracked resources */
-	exit_resource_tracking();
 
 	if (!count)
 		printf("There are no Computers or Consoles named %s\n", gamename);
