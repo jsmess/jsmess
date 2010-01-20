@@ -42,7 +42,7 @@ struct _software_list
 
 #define SOFTWARE_LIST_NAME(name)					software_list_##name
 #define SOFTWARE_NAME(name)							software_##name
-#define SOFTWARE_LIST(name,desc)					const software_list SOFTWARE_LIST_NAME(name) = { __FILE__, #name, desc, software_##name };
+#define SOFTWARE_LIST(name,desc)					extern const software_list SOFTWARE_LIST_NAME(name) = { __FILE__, #name, desc, software_##name };
 #define SOFTWARE_LIST_START(name)	\
 	static const software_entry SOFTWARE_NAME(name)[] = {
 
