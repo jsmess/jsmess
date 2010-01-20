@@ -70,7 +70,7 @@ enum
 	header_len = sizeof(disk_image_header)
 };
 
-enum mode_t
+enum sm_mode_t
 {
 	SM_M_INIT,		// initial state
 	SM_M_READ,		// read page data
@@ -81,7 +81,7 @@ enum mode_t
 	SM_M_30
 };
 
-enum pointer_mode_t
+enum pointer_sm_mode_t
 {
 	SM_PM_A,		// accessing first 256-byte half of 512-byte data field
 	SM_PM_B,		// accessing second 256-byte half of 512-byte data field
@@ -101,8 +101,8 @@ struct _smartmedia_t
 	UINT8 *data_ptr;	// FEEPROM data area
 	UINT8 *data_uid_ptr;
 
-	mode_t mode;				// current operation mode
-	pointer_mode_t pointer_mode;		// pointer mode
+	sm_mode_t mode;				// current operation mode
+	pointer_sm_mode_t pointer_mode;		// pointer mode
 
 	int page_addr;		// page address pointer
 	int byte_addr;		// byte address pointer

@@ -28,7 +28,7 @@
 #define BLOCK_ADDRESS_SHIFT	17
 #define BYTE_ADDRESS_MASK	0x01ffff
 
-enum mode_t
+enum fm_mode_t
 {
 	FM_NORMAL,		// normal read/write
 	FM_READID,		// read ID
@@ -46,7 +46,7 @@ enum mode_t
 };
 static struct
 {
-	mode_t mode;				// current operation mode
+	fm_mode_t mode;				// current operation mode
 	int hard_unlock;	// 1 if RP* pin is at Vhh (not fully implemented)
 	int status;			// current status
 	int master_lock;	// master lock flag
