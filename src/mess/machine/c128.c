@@ -21,6 +21,12 @@
 #include "video/vic6567.h"
 #include "video/vdc8563.h"
 
+static UINT8 c128_mmu[0x0b];
+static const int c128_mmu_helper[4] =
+{0x400, 0x1000, 0x2000, 0x4000};
+static int mmu_cpu;
+static int mmu_page0, mmu_page1;
+
 #define VERBOSE_LEVEL 0
 #define DBG_LOG( MACHINE, N, M, A ) \
 	do { \
@@ -176,13 +182,35 @@ static void c128_vic_interrupt( running_machine *machine, int level )
 #endif
 }
 
+static WRITE_LINE_DEVICE_HANDLER( cia0_cnt_w )
+{
+	const device_config *serbus = devtag_get_device(device->machine, "iec");
+
+	if (BIT(c128_mmu[5], 3))
+	{
+		/* fast clock out */
+		cbm_iec_srq_w(serbus, device, state);
+	}
+}
+
+static WRITE_LINE_DEVICE_HANDLER( cia0_sp_w )
+{
+	const device_config *serbus = devtag_get_device(device->machine, "iec");
+
+	if (BIT(c128_mmu[5], 3))
+	{
+		/* fast data out */
+		cbm_iec_data_w(serbus, device, state);
+	}
+}
+
 const mos6526_interface c128_ntsc_cia0 =
 {
 	60,
 	DEVCB_LINE(c128_cia0_interrupt),
 	DEVCB_NULL,	/* pc_func */
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_LINE(cia0_cnt_w),
+	DEVCB_LINE(cia0_sp_w),
 	DEVCB_HANDLER(c128_cia0_port_a_r),
 	DEVCB_NULL,
 	DEVCB_HANDLER(c128_cia0_port_b_r),
@@ -202,6 +230,22 @@ const mos6526_interface c128_pal_cia0 =
 	DEVCB_HANDLER(c128_cia0_port_b_w)
 };
 
+WRITE_LINE_DEVICE_HANDLER( c128_iec_srq_w )
+{
+	if (!BIT(c128_mmu[5], 3))
+	{
+		mos6526_flag_w(device, state);
+		mos6526_cnt_w(device, state);
+	}
+}
+
+WRITE_LINE_DEVICE_HANDLER( c128_iec_data_w )
+{
+	if (!BIT(c128_mmu[5], 3))
+	{
+		mos6526_sp_w(device, state);
+	}
+}
 
 /*
  * CIA 1 - Port A
@@ -459,12 +503,6 @@ void c128_bankswitch_64( running_machine *machine, int reset )
 	exrom = c64_exrom;
 	game =c64_game;
 }
-
-static UINT8 c128_mmu[0x0b];
-static const int c128_mmu_helper[4] =
-{0x400, 0x1000, 0x2000, 0x4000};
-static int mmu_cpu;
-static int mmu_page0, mmu_page1;
 
 #define MMU_PAGE1 ((((c128_mmu[10]&0xf)<<8)|c128_mmu[9])<<8)
 #define MMU_PAGE0 ((((c128_mmu[8]&0xf)<<8)|c128_mmu[7])<<8)

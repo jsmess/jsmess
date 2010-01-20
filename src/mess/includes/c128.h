@@ -65,5 +65,7 @@ void c128_m6510_port_write(const device_config *device, UINT8 direction, UINT8 d
 extern const mos6526_interface c128_ntsc_cia0, c128_pal_cia0;
 extern const mos6526_interface c128_ntsc_cia1, c128_pal_cia1;
 
+WRITE_LINE_DEVICE_HANDLER( c128_iec_srq_w );
+WRITE_LINE_DEVICE_HANDLER( c128_iec_data_w );
 
 #endif /* C128_H_ */

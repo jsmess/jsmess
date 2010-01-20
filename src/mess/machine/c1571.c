@@ -7,6 +7,19 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+
+	- toggle WPRT line on disk change
+	- save state
+	- D71 disks
+	- CP/M disks
+    - power LED
+    - activity LED
+
+*/
+
 #include "emu.h"
 #include "c1571.h"
 #include "cpu/m6502/m6502.h"
@@ -50,7 +63,7 @@ typedef struct _c1571_t c1571_t;
 struct _c1571_t
 {
 	/* abstractions */
-	int address;
+	int address;						/* device number */
 	UINT8 track_buffer[TRACK_BUFFER_SIZE];				/* track data buffer */
 	int track_len;						/* track length */
 	int buffer_pos;						/* current byte position within track buffer */
@@ -67,8 +80,9 @@ struct _c1571_t
 	int soe;							/* s? output enable */
 	int mode;							/* mode (0 = write, 1 = read) */
 
-	int data_out;
-	int atn_ack;
+	int data_out;						/* serial data out */
+	int atn_ack;						/* attention acknowledge */
+	int ser_dir;						/* fast serial direction */
 
 	/* interrupts */
 	int via0_irq;						/* VIA #0 interrupt request */
@@ -191,7 +205,10 @@ WRITE_LINE_DEVICE_HANDLER( c1571_iec_srq_w )
 {
 	c1571_t *c1571 = get_safe_token(device);
 
-	mos6526_cnt_w(c1571->cia, state);
+	if (!c1571->ser_dir)
+	{
+		mos6526_cnt_w(c1571->cia, state);
+	}
 }
 
 /*-------------------------------------------------
@@ -202,7 +219,10 @@ WRITE_LINE_DEVICE_HANDLER( c1571_iec_data_w )
 {
 	c1571_t *c1571 = get_safe_token(device);
 
-	mos6526_sp_w(c1571->cia, state);
+	if (!c1571->ser_dir)
+	{
+		mos6526_sp_w(c1571->cia, state);
+	}
 }
 
 /*-------------------------------------------------
@@ -289,8 +309,15 @@ static READ8_DEVICE_HANDLER( via0_pa_r )
     */
 
 	c1571_t *c1571 = get_safe_token(device->owner);
+	UINT8 data = 0;
 
-	return floppy_tk00_r(c1571->image);
+	/* track 0 sense */
+	data |= floppy_tk00_r(c1571->image);
+
+	/* byte ready */
+	data |= c1571->byte << 7;
+
+	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( via0_pa_w )
@@ -320,8 +347,14 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
 	device_set_clock(c1571->via0, clock);
 	device_set_clock(c1571->via1, clock);
 
-	/* side */
+	/* fast serial direction */
+	c1571->ser_dir = BIT(data, 1);
+
+	/* side select */
 	wd17xx_set_side(c1571->wd1770, BIT(data, 2));
+
+	/* attention out */
+	cbm_iec_atn_w(c1571->serial_bus, device->owner, !BIT(data, 6));
 }
 
 static READ8_DEVICE_HANDLER( via0_pb_r )
@@ -398,16 +431,16 @@ static const via6522_interface c1571_via0_intf =
 {
 	DEVCB_HANDLER(via0_pa_r),
 	DEVCB_HANDLER(via0_pb_r),
+	DEVCB_NULL, /* ATN IN */
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_NULL, /* _WPRT */
 	DEVCB_NULL,
 
 	DEVCB_HANDLER(via0_pa_w),
 	DEVCB_HANDLER(via0_pb_w),
-	DEVCB_NULL, /* ATN IN */
 	DEVCB_NULL,
-	DEVCB_NULL, /* _WPRT */
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL,
 
 	DEVCB_LINE(via0_irq_w)
@@ -443,7 +476,9 @@ static READ8_DEVICE_HANDLER( yb_r )
 
     */
 
-	return 0;
+	c1571_t *c1571 = get_safe_token(device->owner);
+
+	return c1571->data & 0xff;
 }
 
 static WRITE8_DEVICE_HANDLER( yb_w )
@@ -488,6 +523,7 @@ static READ8_DEVICE_HANDLER( via1_pb_r )
 	data |= !floppy_wpt_r(c1571->image) << 4;
 
 	/* SYNC detect line */
+	data |= !((c1571->data & SYNC_MARK) == SYNC_MARK) << 7;
 
 	return data;
 }
@@ -583,7 +619,7 @@ static const via6522_interface c1571_via1_intf =
 {
 	DEVCB_HANDLER(yb_r),
 	DEVCB_HANDLER(via1_pb_r),
-	DEVCB_NULL, /* BYTE READY */
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -615,21 +651,27 @@ static WRITE_LINE_DEVICE_HANDLER( cia_cnt_w )
 {
 	c1571_t *c1571 = get_safe_token(device->owner);
 
-	/* fast clock out */
-	cbm_iec_srq_w(c1571->serial_bus, device->owner, state);
+	if (c1571->ser_dir)
+	{
+		/* fast clock out */
+		cbm_iec_srq_w(c1571->serial_bus, device->owner, state);
+	}
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cia_sp_w )
 {
 	c1571_t *c1571 = get_safe_token(device->owner);
 
-	/* fast data out */
-	cbm_iec_data_w(c1571->serial_bus, device->owner, state);
+	if (c1571->ser_dir)
+	{
+		/* fast data out */
+		cbm_iec_data_w(c1571->serial_bus, device->owner, state);
+	}
 }
 
 static MOS6526_INTERFACE( c1571_cia_intf )
 {
-	10,
+	0,
 	DEVCB_LINE(cia_irq_w),
 	DEVCB_NULL,
 	DEVCB_LINE(cia_cnt_w),

@@ -581,14 +581,16 @@ static const m6502_interface c128_m8502_interface =
 
 static CBM_IEC_DAISY( c128_iec_bus )
 {
-	{ "cia_1", DEVCB_DEVICE_LINE("cia_0", mos6526_flag_w) },
+	{ "cia_0", DEVCB_DEVICE_LINE("cia_0", c128_iec_srq_w), DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE("cia_0", c128_iec_data_w) },
+	{ "cia_1" },
 	{ C1571_IEC("c1571") },
 	{ NULL}
 };
 
 static CBM_IEC_DAISY( c128d81_iec_bus )
 {
-	{ "cia_1", DEVCB_DEVICE_LINE("cia_0", mos6526_flag_w) },
+	{ "cia_0", DEVCB_DEVICE_LINE("cia_0", c128_iec_srq_w), DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE("cia_0", c128_iec_data_w) },
+	{ "cia_1" },
 	{ C1581_IEC("c1563") },
 	{ NULL}
 };

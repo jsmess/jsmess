@@ -46,10 +46,11 @@
 typedef struct _c1581_t c1581_t;
 struct _c1581_t
 {
-	int address;
+	int address;						/* device number */
 
-	int data_out;
-	int atn_ack;
+	int data_out;						/* serial data out */
+	int atn_ack;						/* attention acknowledge */
+	int ser_dir;						/* fast serial direction */
 
 	/* devices */
 	const device_config *cpu;
@@ -104,7 +105,10 @@ WRITE_LINE_DEVICE_HANDLER( c1581_iec_srq_w )
 {
 	c1581_t *c1581 = get_safe_token(device);
 
-	mos6526_cnt_w(c1581->cia, state);
+	if (!c1581->ser_dir)
+	{
+		mos6526_cnt_w(c1581->cia, state);
+	}
 }
 
 /*-------------------------------------------------
@@ -115,7 +119,10 @@ WRITE_LINE_DEVICE_HANDLER( c1581_iec_data_w )
 {
 	c1581_t *c1581 = get_safe_token(device);
 
-	mos6526_sp_w(c1581->cia, state);
+	if (!c1581->ser_dir)
+	{
+		mos6526_sp_w(c1581->cia, state);
+	}
 }
 
 /*-------------------------------------------------
@@ -285,23 +292,32 @@ static WRITE8_DEVICE_HANDLER( cia_pb_w )
 	cbm_iec_clk_w(c1581->serial_bus, device->owner, !clk_out);
 
 	/* attention acknowledge */
-	c1581->atn_ack = BIT(data, 4);
+	c1581->atn_ack = atn_ack;
+
+	/* fast serial direction */
+	c1581->ser_dir = BIT(data, 5);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cia_cnt_w )
 {
 	c1581_t *c1581 = get_safe_token(device->owner);
 
-	/* fast clock out */
-	cbm_iec_srq_w(c1581->serial_bus, device->owner, state);
+	if (c1581->ser_dir)
+	{
+		/* fast clock out */
+		cbm_iec_srq_w(c1581->serial_bus, device->owner, state);
+	}
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cia_sp_w )
 {
 	c1581_t *c1581 = get_safe_token(device->owner);
 
-	/* fast data out */
-	cbm_iec_data_w(c1581->serial_bus, device->owner, state);
+	if (c1581->ser_dir)
+	{
+		/* fast data out */
+		cbm_iec_data_w(c1581->serial_bus, device->owner, state);
+	}
 }
 
 static MOS8520_INTERFACE( cia_intf )
