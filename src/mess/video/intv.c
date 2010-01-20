@@ -399,7 +399,7 @@ static void copy_sprites_to_background(running_machine *machine, bitmap_t *bitma
                     continue;
                 }
 
-                currentPixel = *BITMAP_ADDR16(bitmap, nextY, nextX);
+                currentPixel = (*BITMAP_ADDR16(bitmap, nextY, nextX) -1) >> 1;
 
                 //check for foreground collision
                 if (currentPixel & FOREGROUND_BIT) {
