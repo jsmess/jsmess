@@ -48,6 +48,20 @@
 #define CMD_BUF_SIZE    32
 #define DATA_BUF_SIZE   512
 
+#define SCSI_CMD_FORMAT_UNIT    0x04
+#define SCSI_COMMAND_INQUIRY    0x12
+#define SCSI_CMD_MODE_SELECT    0x15
+#define SCSI_CMD_READ_CAPACITY  0x25
+#define SCSI_CMD_READ_DEFECT    0x37
+#define SCSI_CMD_BUFFER_WRITE   0x3B
+#define SCSI_CMD_BUFFER_READ    0x3C
+
+#define RW_BUFFER_HEAD_BYTES    0x04
+
+#define IS_COMMAND(cmd)         (bus->command[0]==cmd)
+#define IS_READ_COMMAND()       ((bus->command[0]==0x08) || (bus->command[0]==0x28) || (bus->command[0]==0xa8))
+#define IS_WRITE_COMMAND()      ((bus->command[0]==0x0a) || (bus->command[0]==0x2a))
+
 
 /***************************************************************************
     INTERFACE

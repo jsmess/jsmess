@@ -1,8 +1,8 @@
-﻿0.136.1
+0.136.1
 
 New System Drivers Supported:
 -----------------------------
-(none)
+- Research Machines Nimbus [Phill Harvey-Smith]
 
 
 
@@ -59,7 +59,7 @@ New System Drivers Supported:
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
-- Ausbaufähiger Mikrocomputer mit dem U 880 (Huebler/Everts) [Curt Coder]
+- Ausbauf�higer Mikrocomputer mit dem U 880 (Huebler/Everts) [Curt Coder]
 - Hector 2HR+ [JJ Stacino]
 - Hector 2HR [JJ Stacino]
 - Hector HRX [JJ Stacino]

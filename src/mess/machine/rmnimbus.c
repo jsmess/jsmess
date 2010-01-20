@@ -37,16 +37,16 @@
 #define LATCH_INTS          1
 #define LOG_PORTS           0
 #define LOG_INTERRUPTS      0
-#define LOG_INTERRUPTS_EXT  1
+#define LOG_INTERRUPTS_EXT  0
 #define LOG_TIMER           0
 #define LOG_OPTIMIZATION    0
-#define LOG_DMA             1
+#define LOG_DMA             0
 #define CPU_RESUME_TRIGGER	7123
 #define LOG_KEYBOARD        0
 #define LOG_SIO             0
 #define LOG_DISK_FDD        0
-#define LOG_DISK_HDD        1
-#define LOG_DISK            1
+#define LOG_DISK_HDD        0
+#define LOG_DISK            0
 #define LOG_PC8031          0
 #define LOG_PC8031_186      0
 #define LOG_PC8031_PORT     0
@@ -717,11 +717,11 @@ static void update_dma_control(running_machine *machine, int which, int new_cont
 		/* otherwise, set a timer */
 		else
 		{
-			if (LOG_DMA) logerror("Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
-
 			d->finished = 0;
 		}
 	}
+
+    if (LOG_DMA) logerror("Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
 
 	/* set the new control register */
 	d->control = new_control;
@@ -2163,6 +2163,8 @@ static void hdc_post_rw(running_machine *machine)
     
     if((nimbus_drives.reg410_in & HDC_REQ_MASK)==0)
         set_scsi_line(hdc,SCSI_LINE_ACK,0);
+
+    nimbus_drives.drq_ff=0;
 }
 
 static void hdc_drq(running_machine *machine)
@@ -2170,13 +2172,13 @@ static void hdc_drq(running_machine *machine)
     if(HDC_DRQ_ENABLED() && nimbus_drives.drq_ff)
     {
         drq_callback(machine,1);
-        nimbus_drives.drq_ff=0;
     }
 }
 
 void nimbus_scsi_linechange(const device_config *device, UINT8 line, UINT8 state)
 {
     UINT8   mask = 0;
+    UINT8   last = 0;
     
     switch (line)
     {
@@ -2186,6 +2188,8 @@ void nimbus_scsi_linechange(const device_config *device, UINT8 line, UINT8 state
         case SCSI_LINE_BSY   : mask=HDC_BSY_MASK; break;
         case SCSI_LINE_MSG   : mask=HDC_MSG_MASK; break;
     }
+    
+    last=nimbus_drives.reg410_in & mask;
     
     if(state)
         nimbus_drives.reg410_in|=mask;
@@ -2202,7 +2206,7 @@ void nimbus_scsi_linechange(const device_config *device, UINT8 line, UINT8 state
             if(HDC_IRQ_ENABLED() && ((~nimbus_drives.reg410_in & HDC_INT_TRIGGER)==HDC_INT_TRIGGER))
                 generate_disk_int(device->machine); 
     
-            if((nimbus_drives.reg410_in & HDC_CD_MASK)==HDC_CD_MASK)
+            if(((nimbus_drives.reg410_in & HDC_CD_MASK)==HDC_CD_MASK) && (last!=0))
             {   
                 nimbus_drives.drq_ff=1;
                 hdc_drq(device->machine);
