@@ -241,7 +241,7 @@ static void set_cdp1802_mode(running_machine *machine, cdp1802_control_mode mode
 
 static INPUT_CHANGED( run )   { if (!newval) set_cdp1802_mode(field->port->machine, CDP1802_MODE_RUN); }
 static INPUT_CHANGED( load )  { if (!newval) set_cdp1802_mode(field->port->machine, CDP1802_MODE_LOAD); }
-static INPUT_CHANGED( pause ) {	if (!newval) set_cdp1802_mode(field->port->machine, CDP1802_MODE_PAUSE); }
+static INPUT_CHANGED( cosmicos_pause ) {	if (!newval) set_cdp1802_mode(field->port->machine, CDP1802_MODE_PAUSE); }
 static INPUT_CHANGED( reset ) {	if (!newval) set_cdp1802_mode(field->port->machine, CDP1802_MODE_RESET); }
 
 static void clear_input_data(running_machine *machine)
@@ -321,7 +321,7 @@ static INPUT_PORTS_START( cosmicos )
 	PORT_BIT( 0x002, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Single Step") PORT_CHANGED(single_step, 0)
 	PORT_BIT( 0x004, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_NAME("Run") PORT_CHANGED(run, 0)
 	PORT_BIT( 0x008, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME("Load") PORT_CHANGED(load, 0)
-	PORT_BIT( 0x010, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_NAME(DEF_STR( Pause )) PORT_CHANGED(pause, 0)
+	PORT_BIT( 0x010, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_NAME(DEF_STR( Pause )) PORT_CHANGED(cosmicos_pause, 0)
 	PORT_BIT( 0x020, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED(reset, 0)
 	PORT_BIT( 0x040, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("Clear Data") PORT_CHANGED(clear_data, 0)
 	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_NAME("Memory Protect") PORT_CHANGED(memory_protect, 0) PORT_TOGGLE
