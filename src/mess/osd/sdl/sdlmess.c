@@ -130,7 +130,7 @@ char *osd_dirname(const char *filename)
 		return NULL;
 
 	// allocate space for it
-	dirname = malloc(strlen(filename) + 1);
+	dirname = (char*)malloc(strlen(filename) + 1);
 	if (!dirname)
 		return NULL;
 

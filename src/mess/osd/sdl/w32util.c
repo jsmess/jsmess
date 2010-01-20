@@ -34,6 +34,24 @@ CHAR *astring_from_utf8(const char *utf8string)
 }
 
 //============================================================
+//  wstring_from_utf8
+//============================================================
+
+WCHAR *wstring_from_utf8(const char *utf8string)
+{
+	int char_count;
+	WCHAR *result;
+
+	// convert MAME string (UTF-8) to UTF-16
+	char_count = MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, NULL, 0);
+	result = (WCHAR *)malloc(char_count * sizeof(*result));
+	if (result != NULL)
+		MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, result, char_count);
+
+	return result;
+}
+
+//============================================================
 //  win_attributes_to_entry_type
 //============================================================
 

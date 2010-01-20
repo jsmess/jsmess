@@ -10,9 +10,9 @@
 #ifndef _SCSIBUS_H_
 #define _SCSIBUS_H_
 
+#include "emu.h"
 #include "machine/scsidev.h"
-#include "devcb.h"
-#include "driver.h"
+
 
 /***************************************************************************
     MACROS

@@ -7,6 +7,7 @@
     
 */
 
+#include "emu.h"
 #include "machine/scsi.h"
 #include "machine/scsibus.h"
 
@@ -516,12 +517,12 @@ static void scsi_out_line_req(const device_config *device, UINT8 state)
 
 static TIMER_CALLBACK(req_timer_callback)
 {
-    scsi_out_line_change_now(ptr, SCSI_LINE_REQ, param);
+    scsi_out_line_change_now((const device_config *)ptr, SCSI_LINE_REQ, param);
 }
 
 static TIMER_CALLBACK(ack_timer_callback)
 {
-    set_scsi_line_now(ptr, SCSI_LINE_ACK, param);
+    set_scsi_line_now((const device_config *)ptr, SCSI_LINE_ACK, param);
 }
 
 
@@ -653,7 +654,7 @@ static DEVICE_START( scsibus )
     scsibus_t               *bus = get_token(device);
     
 	assert(device->static_config != NULL);
-    bus->interface = device->static_config;
+    bus->interface = (const SCSIBus_interface*)device->static_config;
     
 	memset(bus->devices, 0, sizeof(bus->devices));
     
