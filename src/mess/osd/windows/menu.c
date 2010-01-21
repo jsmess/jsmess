@@ -1752,7 +1752,7 @@ static int invoke_command(HWND wnd, UINT command)
 
 	switch(command)
 	{
-		case ID_FILE_LOADSTATE:
+		case ID_FILE_LOADSTATE_NEWUI:
 			state_load(wnd, window->machine);
 			break;
 
@@ -1768,7 +1768,7 @@ static int invoke_command(HWND wnd, UINT command)
 			video_save_active_screen_snapshots(window->machine);
 			break;
 
-		case ID_FILE_EXIT:
+		case ID_FILE_EXIT_NEWUI:
 			mame_schedule_exit(window->machine);
 			break;
 
@@ -1870,7 +1870,7 @@ static int invoke_command(HWND wnd, UINT command)
 			video_set_frameskip(-1);
 			break;
 
-		case ID_HELP_ABOUT:
+		case ID_HELP_ABOUT_NEWUI:
 			help_about_mess(wnd);
 			break;
 
