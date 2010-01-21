@@ -7,8 +7,8 @@
 #-------------------------------------------------
 # messtest executable name
 MESSUINAME = messui
-MESSUI = $(PREFIX)$(PREFIXSDL)$(MESSUINAME)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(EXE)
-BUILD += $(MESSUI)
+MESSUIEXE = $(PREFIX)$(PREFIXSDL)$(MESSUINAME)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(EXE)
+BUILD += $(MESSUIEXE)
 WINUISRC = $(SRC)/osd/winui
 WINUIOBJ = $(OBJ)/osd/winui
 
@@ -128,6 +128,6 @@ $(WINUIOBJ)/mamevers.rc: $(OBJ)/build/verinfo$(EXE) $(SRC)/version.c
 	@echo Emitting $@...
 	@"$(VERINFO)" -b mess $(SRC)/version.c  > $@
 
-$(MESSUI): $(WINUIOBJS) $(VERSIONOBJ) $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBDASM) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE_NOMAIN) $(RESFILEUI)
+$(MESSUIEXE): $(WINUIOBJS) $(VERSIONOBJ) $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBDASM) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE_NOMAIN) $(RESFILEUI)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) -mwindows  $^ $(LIBS) $(EXPAT) -o $@

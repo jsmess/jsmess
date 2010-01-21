@@ -6,6 +6,9 @@
 #
 ###########################################################################
 
+ifndef MESSUI
+MESSUI = 0
+endif
 
 # build the executable names
 RCFLAGS += -DMESS
@@ -50,5 +53,6 @@ $(MESS_WINOBJ)/%.res: $(MESS_WINSRC)/%.rc
 #-------------------------------------------------
 # For building UI include ui.mak
 #-------------------------------------------------
-
+ifneq ($(MESSUI),0)
 include $(SRC)/mess/osd/winui/winui.mak
+endif
