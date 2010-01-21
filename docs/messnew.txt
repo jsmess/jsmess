@@ -28,6 +28,8 @@ System Driver Changes:
 
 - [MIKROMIK] Fixed memory banking regression. [Curt Coder]
 
+- [SCV] Implemented upd177c audio. [plgDavid]
+
 
 
 Imgtool Changes:
