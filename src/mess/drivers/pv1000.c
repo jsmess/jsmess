@@ -11,6 +11,7 @@
 
 static UINT8 *pv1000_ram;
 static UINT8 pv1000_io_regs[8];
+static UINT8 pv1000_tmp;
 
 
 static WRITE8_HANDLER( pv1000_io_w );
@@ -44,20 +45,40 @@ static READ8_HANDLER( pv1000_io_r )
 
 	switch ( offset )
 	{
+	case 0x04:
+		/* Bit 1 = 1 => to pass checks in Amidar? */
+		/* Bit 0 = 0 => done reading joystick interface? */
+		data &= 0xFE;
+		if ( ( pv1000_io_regs[5] & 0x1F ) == 0x00 )
+		{
+			if ( pv1000_tmp == 0 )
+			{
+				data = ( data & 0xFD ) | 0x01;
+			}
+			pv1000_tmp = 0;
+		}
+		else
+		{
+			pv1000_tmp = 1;
+		}
+		break;
 	case 0x05:
-		/* This input stuff is not working yet */
+		data = 0;
 		if ( pv1000_io_regs[5] & 0x08 )
 		{
 			data = input_port_read( space->machine, "IN3" );
 		}
 		if ( pv1000_io_regs[5] & 0x04 )
 		{
+			data = input_port_read( space->machine, "IN2" );
 		}
 		if ( pv1000_io_regs[5] & 0x02 )
 		{
+			data = input_port_read( space->machine, "IN1" );
 		}
 		if ( pv1000_io_regs[5] & 0x01 )
 		{
+			data = input_port_read( space->machine, "IN0" );
 		}
 		break;
 	}
@@ -67,7 +88,25 @@ static READ8_HANDLER( pv1000_io_r )
 
 
 static INPUT_PORTS_START( pv1000 )
-	PORT_START("IN3")
+	PORT_START( "IN0" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(2)
+
+	PORT_START( "IN1" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
+
+	PORT_START( "IN2" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
+
+	PORT_START( "IN3" )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -148,6 +187,13 @@ static INTERRUPT_GEN( pv1000_irq )
 }
 
 
+static MACHINE_RESET( pv1000 )
+{
+	pv1000_io_regs[5] = 0;
+	pv1000_tmp = 0;
+}
+
+
 static const gfx_layout pv1000_3bpp_gfx =
 {
 	8, 8,			/* 8x8 characters */
@@ -173,6 +219,8 @@ static MACHINE_DRIVER_START( pv1000 )
 
 	MDRV_CPU_VBLANK_INT("screen", pv1000_irq)
 
+	MDRV_MACHINE_RESET( pv1000 )
+
 	MDRV_SCREEN_ADD( "screen", RASTER )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MDRV_SCREEN_REFRESH_RATE( 60 )
@@ -183,7 +231,7 @@ static MACHINE_DRIVER_START( pv1000 )
 	MDRV_PALETTE_INIT( pv1000 )
 	MDRV_GFXDECODE( pv1000 )
 
-	/* D65010G031 - Video & sound chip */
+	/* uPD4016c / D65010G031 - Video & sound chip */
 	MDRV_VIDEO_UPDATE( pv1000 )
 
 	/* Cartridge slot */
