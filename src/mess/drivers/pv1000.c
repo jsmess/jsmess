@@ -16,11 +16,13 @@ static UINT8 pv1000_tmp;
 
 static WRITE8_HANDLER( pv1000_io_w );
 static READ8_HANDLER( pv1000_io_r );
+static WRITE8_HANDLER( pv1000_gfxram_w );
+
 
 static ADDRESS_MAP_START( pv1000, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x3fff ) AM_MIRROR( 0x4000 ) AM_ROM AM_REGION( "cart", 0 )
 	AM_RANGE( 0xb800, 0xbbff ) AM_RAM AM_BASE( &pv1000_ram )
-	AM_RANGE( 0xbc00, 0xbfff ) AM_RAM AM_REGION( "gfxram", 0 )
+	AM_RANGE( 0xbc00, 0xbfff ) AM_RAM_WRITE( pv1000_gfxram_w ) AM_REGION( "gfxram", 0 )
 ADDRESS_MAP_END
 
 
@@ -28,6 +30,15 @@ static ADDRESS_MAP_START( pv1000_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK( 0xff )
 	AM_RANGE( 0xf8, 0xff ) AM_READWRITE( pv1000_io_r, pv1000_io_w )
 ADDRESS_MAP_END
+
+
+static WRITE8_HANDLER( pv1000_gfxram_w )
+{
+	UINT8 *gfxram = memory_region( space->machine, "gfxram" );
+
+	gfxram[ offset ] = data;
+	gfx_element_mark_dirty(space->machine->gfx[1], offset/32);
+}
 
 
 static WRITE8_HANDLER( pv1000_io_w )
