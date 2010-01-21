@@ -619,7 +619,7 @@ static void state_dialog(HWND wnd, win_file_dialog_type dlgtype,
 		mameproc(machine, state_filename);
 	}
 	if (dir)
-		free(dir);
+		global_free(dir);
 }
 
 
@@ -708,7 +708,7 @@ static void format_combo_changed(dialog_box *dialog, HWND dlgwnd, NMHDR *notific
 				has_option ? guide : NULL,
 				has_option ? optspec : NULL);
 		}
-		free(buf1);
+		global_free(buf1);
 	}
 }
 
@@ -1084,13 +1084,13 @@ static HMENU find_sub_menu(HMENU menu, const char *menutext, int create_sub_menu
 		{
 			if (!get_menu_item_string(menu, ++i, TRUE, &sub_menu, buf, ARRAY_LENGTH(buf)))
 			{
-				free(t_menutext);
+				global_free(t_menutext);
 				return NULL;
 			}
 		}
 		while(_tcscmp(t_menutext, buf));
 
-		free(t_menutext);
+		global_free(t_menutext);
 
 		if (!sub_menu && create_sub_menu)
 		{
@@ -1150,7 +1150,7 @@ static void append_menu_utf8(HMENU menu, UINT flags, UINT_PTR id, const char *st
 	TCHAR *t_str = str ? tstring_from_utf8(str) : NULL;
 	AppendMenu(menu, flags, id, t_str);
 	if (t_str)
-		free(t_str);
+		global_free(t_str);
 }
 
 
@@ -1439,7 +1439,7 @@ static void prepare_menus(HWND wnd)
 		TCHAR *t_view_name = tstring_from_utf8(view_name);
 		InsertMenu(video_menu, i, MF_BYPOSITION | (i == view_index ? MF_CHECKED : 0),
 			ID_VIDEO_VIEW_0 + i, t_view_name);
-		free(t_view_name);
+		global_free(t_view_name);
 		i++;
 	}
 
@@ -1648,7 +1648,7 @@ static void help_display(HWND wnd, const char *chapter)
 	{
 		TCHAR *t_chapter = tstring_from_utf8(chapter);
 		htmlhelp(wnd, t_chapter, 0 /*HH_DISPLAY_TOPIC*/, 0);
-		free(t_chapter);
+		global_free(t_chapter);
 	}
 }
 
@@ -1994,7 +1994,7 @@ static void set_menu_text(HMENU menu_bar, int command, const char *text)
 	SetMenuItemInfo(menu_bar, command, FALSE, &mii);
 
 	// cleanup
-	free(t_text);
+	global_free(t_text);
 }
 
 

@@ -69,12 +69,12 @@ file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *ba
 	GetTempPath(ARRAY_LENGTH(tempbuf), tempbuf);
 	t_filename = tstring_from_utf8(basename);
 	_tcscat(tempbuf, t_filename);
-	free(t_filename);
+	global_free(t_filename);
 	DeleteFile(tempbuf);
 
 	u_tempbuf = utf8_from_tstring(tempbuf);
 	snprintf(buffer, buffer_len, "%s", u_tempbuf);
-	free(u_tempbuf);
+	global_free(u_tempbuf);
 
 	return FILERR_NONE;
 }
@@ -127,7 +127,7 @@ osd_directory_entry *osd_stat(const char *path)
 
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
-	result = (osd_directory_entry *) malloc(sizeof(*result) + strlen(path) + 1);
+	result = (osd_directory_entry *)global_alloc_array_clear(UINT8,sizeof(*result) + strlen(path) + 1);
 	if (!result)
 		goto done;
 	strcpy(((char *) result) + sizeof(*result), path);
@@ -137,7 +137,7 @@ osd_directory_entry *osd_stat(const char *path)
 
 done:
 	if (t_path != NULL)
-		free(t_path);
+		global_free(t_path);
 	return result;
 }
 
@@ -168,7 +168,7 @@ char *osd_dirname(const char *filename)
 		return NULL;
 
 	// allocate space for it
-	dirname = (char*)malloc(strlen(filename) + 1);
+	dirname = (char*)global_alloc_array_clear(char,strlen(filename) + 1);
 	if (!dirname)
 		return NULL;
 
@@ -249,7 +249,7 @@ file_error osd_get_full_path(char **dst, const char *path)
 
 done:
 	if (t_path != NULL)
-		free(t_path);
+		global_free(t_path);
 	return err;
 }
 
@@ -277,7 +277,7 @@ file_error osd_mkdir(const char *dir)
 
 done:
 	if (tempstr)
-		free(tempstr);
+		global_free(tempstr);
 	return filerr;
 }
 
@@ -305,7 +305,7 @@ file_error osd_rmdir(const char *dir)
 
 done:
 	if (tempstr)
-		free(tempstr);
+		global_free(tempstr);
 	return filerr;
 }
 
@@ -336,7 +336,7 @@ file_error osd_getcurdir(char *buffer, size_t buffer_len)
 
 done:
 	if (tempstr)
-		free(tempstr);
+		global_free(tempstr);
 	return filerr;
 }
 
@@ -364,7 +364,7 @@ file_error osd_setcurdir(const char *dir)
 
 done:
 	if (tempstr)
-		free(tempstr);
+		global_free(tempstr);
 	return filerr;
 }
 
