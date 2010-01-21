@@ -442,7 +442,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 
 error:
 	if (pInfo)
-		free(pInfo);
+		global_free(pInfo);
 	return FALSE;
 }
 
