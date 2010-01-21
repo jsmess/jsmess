@@ -21,6 +21,36 @@
 #include "video/vic6567.h"
 #include "video/vdc8563.h"
 
+#define MMU_PAGE1 ((((c128_mmu[10]&0xf)<<8)|c128_mmu[9])<<8)
+#define MMU_PAGE0 ((((c128_mmu[8]&0xf)<<8)|c128_mmu[7])<<8)
+#define MMU_VIC_ADDR ((c128_mmu[6]&0xc0)<<10)
+#define MMU_RAM_RCR_ADDR ((c128_mmu[6]&0x30)<<14)
+#define MMU_SIZE (c128_mmu_helper[c128_mmu[6]&3])
+#define MMU_BOTTOM (c128_mmu[6]&4)
+#define MMU_TOP (c128_mmu[6]&8)
+#define MMU_CPU8502 (c128_mmu[5]&1)	   /* else z80 */
+/* fastio output (c128_mmu[5]&8) else input */
+#define MMU_FSDIR (c128_mmu[5]&0x08)
+#define MMU_GAME_IN (c128_mmu[5]&0x10)
+#define MMU_EXROM_IN (c128_mmu[5]&0x20)
+#define MMU_64MODE (c128_mmu[5]&0x40)
+#define MMU_40_IN (c128_mmu[5]&0x80)
+
+#define MMU_RAM_CR_ADDR ((c128_mmu[0]&0xc0)<<10)
+#define MMU_RAM_LO (c128_mmu[0]&2)	   /* else rom at 0x4000 */
+#define MMU_RAM_MID ((c128_mmu[0]&0xc)==0xc)	/* 0x8000 - 0xbfff */
+#define MMU_ROM_MID ((c128_mmu[0]&0xc)==0)
+#define MMU_EXTERNAL_ROM_MID ((c128_mmu[0]&0xc)==8)
+#define MMU_INTERNAL_ROM_MID ((c128_mmu[0]&0xc)==4)
+
+#define MMU_IO_ON (!(c128_mmu[0]&1))   /* io window at 0xd000 */
+#define MMU_ROM_HI ((c128_mmu[0]&0x30)==0)	/* rom at 0xc000 */
+#define MMU_EXTERNAL_ROM_HI ((c128_mmu[0]&0x30)==0x20)
+#define MMU_INTERNAL_ROM_HI ((c128_mmu[0]&0x30)==0x10)
+#define MMU_RAM_HI ((c128_mmu[0]&0x30)==0x30)
+
+#define MMU_RAM_ADDR (MMU_RAM_RCR_ADDR|MMU_RAM_CR_ADDR)
+
 static UINT8 c128_mmu[0x0b];
 static const int c128_mmu_helper[4] =
 {0x400, 0x1000, 0x2000, 0x4000};
@@ -73,6 +103,7 @@ static UINT8 c64_port_data;
 
 static UINT8 c128_keyline[3] = {0xff, 0xff, 0xff};
 
+static int c128_cnt1 = 1, c128_sp1 = 1, c128_data_out = 0;
 static int c128_va1617;
 static int c128_cia1_on;
 static UINT8 vicirq;
@@ -182,26 +213,42 @@ static void c128_vic_interrupt( running_machine *machine, int level )
 #endif
 }
 
+static void c128_iec_data_w(running_machine *machine)
+{
+	const device_config *cia_1 = devtag_get_device(machine, "cia_1");
+	const device_config *iec = devtag_get_device(machine, "iec");
+	int data = !c128_data_out;
+
+	/* fast serial data */
+//	if (MMU_FSDIR) data &= c128_sp1;
+	
+	cbm_iec_data_w(iec, cia_1, data);
+}
+
+static void c128_iec_srq_w(running_machine *machine)
+{
+	const device_config *cia_1 = devtag_get_device(machine, "cia_1");
+	const device_config *iec = devtag_get_device(machine, "iec");
+	int srq = 1;
+	
+	/* fast serial clock */
+//	if (MMU_FSDIR) srq &= c128_cnt1;
+
+	cbm_iec_srq_w(iec, cia_1, srq);
+}
+
 static WRITE_LINE_DEVICE_HANDLER( cia0_cnt_w )
 {
-	const device_config *serbus = devtag_get_device(device->machine, "iec");
-
-	if (BIT(c128_mmu[5], 3))
-	{
-		/* fast clock out */
-		cbm_iec_srq_w(serbus, device, state);
-	}
+	/* fast clock out */
+	c128_cnt1 = state;
+	c128_iec_srq_w(device->machine);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cia0_sp_w )
 {
-	const device_config *serbus = devtag_get_device(device->machine, "iec");
-
-	if (BIT(c128_mmu[5], 3))
-	{
-		/* fast data out */
-		cbm_iec_data_w(serbus, device, state);
-	}
+	/* fast data out */
+	c128_sp1 = state;
+	c128_iec_data_w(device->machine);
 }
 
 const mos6526_interface c128_ntsc_cia0 =
@@ -232,7 +279,7 @@ const mos6526_interface c128_pal_cia0 =
 
 WRITE_LINE_DEVICE_HANDLER( c128_iec_srq_w )
 {
-	if (!BIT(c128_mmu[5], 3))
+	if (!MMU_FSDIR)
 	{
 		mos6526_flag_w(device, state);
 		mos6526_cnt_w(device, state);
@@ -241,7 +288,7 @@ WRITE_LINE_DEVICE_HANDLER( c128_iec_srq_w )
 
 WRITE_LINE_DEVICE_HANDLER( c128_iec_data_w )
 {
-	if (!BIT(c128_mmu[5], 3))
+	if (!MMU_FSDIR)
 	{
 		mos6526_sp_w(device, state);
 	}
@@ -289,9 +336,13 @@ static WRITE8_DEVICE_HANDLER( c128_cia1_port_a_w )
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
 	const device_config *serbus = devtag_get_device(device->machine, "iec");
 
-	cbm_iec_clk_w(serbus, device, !(data & 0x10));
-	cbm_iec_data_w(serbus, device, !(data & 0x20));
-	cbm_iec_atn_w(serbus, device, !(data & 0x08));
+	c128_data_out = BIT(data, 5);
+	c128_iec_data_w(device->machine);
+
+	cbm_iec_clk_w(serbus, device, !BIT(data, 4));
+
+	cbm_iec_atn_w(serbus, device, !BIT(data, 3));
+
 	c64_vicaddr = c64_memory + helper[data & 0x03];
 	c128_vicaddr = c64_memory + helper[data & 0x03] + c128_va1617;
 }
@@ -503,35 +554,6 @@ void c128_bankswitch_64( running_machine *machine, int reset )
 	exrom = c64_exrom;
 	game =c64_game;
 }
-
-#define MMU_PAGE1 ((((c128_mmu[10]&0xf)<<8)|c128_mmu[9])<<8)
-#define MMU_PAGE0 ((((c128_mmu[8]&0xf)<<8)|c128_mmu[7])<<8)
-#define MMU_VIC_ADDR ((c128_mmu[6]&0xc0)<<10)
-#define MMU_RAM_RCR_ADDR ((c128_mmu[6]&0x30)<<14)
-#define MMU_SIZE (c128_mmu_helper[c128_mmu[6]&3])
-#define MMU_BOTTOM (c128_mmu[6]&4)
-#define MMU_TOP (c128_mmu[6]&8)
-#define MMU_CPU8502 (c128_mmu[5]&1)	   /* else z80 */
-/* fastio output (c128_mmu[5]&8) else input */
-#define MMU_GAME_IN (c128_mmu[5]&0x10)
-#define MMU_EXROM_IN (c128_mmu[5]&0x20)
-#define MMU_64MODE (c128_mmu[5]&0x40)
-#define MMU_40_IN (c128_mmu[5]&0x80)
-
-#define MMU_RAM_CR_ADDR ((c128_mmu[0]&0xc0)<<10)
-#define MMU_RAM_LO (c128_mmu[0]&2)	   /* else rom at 0x4000 */
-#define MMU_RAM_MID ((c128_mmu[0]&0xc)==0xc)	/* 0x8000 - 0xbfff */
-#define MMU_ROM_MID ((c128_mmu[0]&0xc)==0)
-#define MMU_EXTERNAL_ROM_MID ((c128_mmu[0]&0xc)==8)
-#define MMU_INTERNAL_ROM_MID ((c128_mmu[0]&0xc)==4)
-
-#define MMU_IO_ON (!(c128_mmu[0]&1))   /* io window at 0xd000 */
-#define MMU_ROM_HI ((c128_mmu[0]&0x30)==0)	/* rom at 0xc000 */
-#define MMU_EXTERNAL_ROM_HI ((c128_mmu[0]&0x30)==0x20)
-#define MMU_INTERNAL_ROM_HI ((c128_mmu[0]&0x30)==0x10)
-#define MMU_RAM_HI ((c128_mmu[0]&0x30)==0x30)
-
-#define MMU_RAM_ADDR (MMU_RAM_RCR_ADDR|MMU_RAM_CR_ADDR)
 
 /* typical z80 configuration
    0x3f 0x3f 0x7f 0x3e 0x7e 0xb0 0x0b 0x00 0x00 0x01 0x00 */
@@ -836,8 +858,13 @@ WRITE8_HANDLER( c128_mmu8722_port_w )
 	case 10:
 		c128_mmu[offset] = data;
 		break;
-	case 0:
 	case 5:
+		c128_mmu[offset] = data;
+		c128_bankswitch (space->machine, 0);
+		c128_iec_srq_w(space->machine);
+		c128_iec_data_w(space->machine);
+		break;
+	case 0:
 	case 6:
 		c128_mmu[offset] = data;
 		c128_bankswitch (space->machine, 0);

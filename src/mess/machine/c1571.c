@@ -83,6 +83,8 @@ struct _c1571_t
 	int data_out;						/* serial data out */
 	int atn_ack;						/* attention acknowledge */
 	int ser_dir;						/* fast serial direction */
+	int sp_out;							/* fast serial data out */
+	int cnt_out;						/* fast serial clock out */
 
 	/* interrupts */
 	int via0_irq;						/* VIA #0 interrupt request */
@@ -119,6 +121,31 @@ INLINE c1571_config *get_safe_config(const device_config *device)
 	assert(device != NULL);
 	assert((device->type == C1570) || (device->type == C1571) || (device->type == C1571CR));
 	return (c1571_config *)device->inline_config;
+}
+
+INLINE void iec_data_w(const device_config *device)
+{
+	c1571_t *c1571 = get_safe_token(device->owner);
+
+	int atn = cbm_iec_atn_r(c1571->serial_bus);
+	int data = !c1571->data_out & !(c1571->atn_ack ^ !atn);
+	
+	/* fast serial data */
+	if (c1571->ser_dir) data &= c1571->sp_out;
+	
+	cbm_iec_data_w(c1571->serial_bus, device->owner, data);
+}
+
+INLINE void iec_srq_w(const device_config *device)
+{
+	c1571_t *c1571 = get_safe_token(device->owner);
+
+	int srq = 1;
+	
+	/* fast serial clock */
+	if (c1571->ser_dir) srq &= c1571->cnt_out;
+
+	cbm_iec_srq_w(c1571->serial_bus, device->owner, srq);
 }
 
 /***************************************************************************
@@ -349,6 +376,8 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
 
 	/* fast serial direction */
 	c1571->ser_dir = BIT(data, 1);
+	iec_data_w(device);
+	iec_srq_w(device);
 
 	/* side select */
 	wd17xx_set_side(c1571->wd1770, BIT(data, 2));
@@ -411,20 +440,15 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 
 	c1571_t *c1571 = get_safe_token(device->owner);
 
-	int data_out = BIT(data, 1);
-	int clk_out = BIT(data, 3);
-	int atn_ack = BIT(data, 4);
+	/* attention acknowledge */
+	c1571->atn_ack = BIT(data, 4);
 
 	/* data out */
-	int serial_data = !data_out && !(atn_ack ^ !cbm_iec_atn_r(c1571->serial_bus));
-	cbm_iec_data_w(c1571->serial_bus, device->owner, serial_data);
-	c1571->data_out = data_out;
+	c1571->data_out = BIT(data, 1);
+	iec_data_w(device);
 
 	/* clock out */
-	cbm_iec_clk_w(c1571->serial_bus, device->owner, !clk_out);
-
-	/* attention acknowledge */
-	c1571->atn_ack = atn_ack;
+	cbm_iec_clk_w(c1571->serial_bus, device->owner, !BIT(data, 3));
 }
 
 static const via6522_interface c1571_via0_intf =
@@ -651,22 +675,18 @@ static WRITE_LINE_DEVICE_HANDLER( cia_cnt_w )
 {
 	c1571_t *c1571 = get_safe_token(device->owner);
 
-	if (c1571->ser_dir)
-	{
-		/* fast clock out */
-		cbm_iec_srq_w(c1571->serial_bus, device->owner, state);
-	}
+	/* fast serial clock out */
+	c1571->cnt_out = state;
+	iec_srq_w(device);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cia_sp_w )
 {
 	c1571_t *c1571 = get_safe_token(device->owner);
 
-	if (c1571->ser_dir)
-	{
-		/* fast data out */
-		cbm_iec_data_w(c1571->serial_bus, device->owner, state);
-	}
+	/* fast serial data out */
+	c1571->sp_out = state;
+	iec_data_w(device);
 }
 
 static MOS6526_INTERFACE( c1571_cia_intf )
@@ -857,6 +877,9 @@ static DEVICE_RESET( c1571 )
 	device_reset(c1571->via1);
 	device_reset(c1571->cia);
 	device_reset(c1571->wd1770);
+
+	c1571->sp_out = 1;
+	c1571->cnt_out = 1;
 }
 
 /*-------------------------------------------------
