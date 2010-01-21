@@ -40,15 +40,11 @@ static UINT16 video_flags;
 static UINT16 tilemap_flags[4],tilemap_mode[4];
 static UINT16 irq_mask;
 
-static UINT16 supracan_video_regs[256];
+static UINT32 roz_base_addr;
+static UINT16 roz_mode;
+static UINT32 roz_scrollx, roz_scrolly;
 
-#define ACAN_VID_LAYER_EN	0x024/2
-#define ACAN_VID_XFORM32A_H	0x184/2
-#define ACAN_VID_XFORM32A_L	0x186/2
-#define ACAN_VID_XFORM32B_H	0x188/2
-#define ACAN_VID_XFORM32B_L	0x18a/2
-#define ACAN_VID_XFORM16A	0x18c/2
-#define ACAN_VID_XFORM16B	0x192/2
+static UINT16 supracan_video_regs[256];
 
 static READ16_HANDLER( supracan_unk1_r );
 static WRITE16_HANDLER( supracan_soundram_w );
@@ -127,26 +123,63 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = (supracan_vram[count] & 0x0400) ? 1 : 0;
 			pal = (supracan_vram[count] & 0xf000) >> 12;
 
-			if(size == 64)
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly,0);
+			if(tilemap_flags[layer] & 0x20) //wrap-around enable
 			{
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly,0);
-				if(tilemap_flags[layer] & 0x20) //wrap-around enable
-				{
-					drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+512,(y*8)-scrolly,0);
-					drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly+512,0);
-					drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+512,(y*8)-scrolly+512,0);
-				}
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+size*8,(y*8)-scrolly,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly+size*8,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+size*8,(y*8)-scrolly+size*8,0);
 			}
-			else
-			{
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly,0);
-				if(tilemap_flags[layer] & 0x20) //wrap-around enable
-				{
-					drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+256,(y*8)-scrolly,0);
-					drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly+256,0);
-					drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+256,(y*8)-scrolly+256,0);
-				}
-			}
+			count++;
+		}
+	}
+}
+
+/* probably similar to the regular tilemap layers with extra features */
+/* 0x0402 Boom Zoo */
+/* 0x2603 / 0x6623 Super Dragon Force */
+/* 0x4020 BIOS logo */
+static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	UINT32 count;
+	int x,y;
+	int scrollx,scrolly;
+	int region;
+//	int gfx_mode;
+	int size;
+//	UINT16 tile_bank;
+
+	switch(roz_mode & 3) //FIXME: fix gfx bpp order
+	{
+		case 0: return; //1bpp! Used on BIOS logo
+		case 1: region = 2; break;
+		case 2: region = 1; break;
+		case 3: region = 0; break;
+	}
+
+	size = roz_mode & 0x200 ? 64 : 32;
+
+	count = (roz_base_addr);
+	scrollx = (roz_scrollx >> 8) & 0x1ff;
+	scrolly = (roz_scrolly >> 8) & 0x1ff;
+
+	//roz_mode & 0x20 enables roz capabilities
+
+	for (y=0;y<size;y++)
+	{
+		for (x=0;x<size;x++)
+		{
+			int tile, flipx, flipy, pal;
+			tile = (supracan_vram[count] & 0x03ff);
+			flipx = (supracan_vram[count] & 0x0800) ? 1 : 0;
+			flipy = (supracan_vram[count] & 0x0400) ? 1 : 0;
+			pal = (supracan_vram[count] & 0xf000) >> 12;
+
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly,0);
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+size*8,(y*8)-scrolly,0);
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly+size*8,0);
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+size*8,(y*8)-scrolly+size*8,0);
+
 			count++;
 		}
 	}
@@ -283,6 +316,9 @@ static VIDEO_UPDATE( supracan )
 		}
 	}
 #endif
+
+	if(video_flags & 4)
+		draw_roz(screen->machine,bitmap,cliprect);
 
 	if(video_flags & 0x20) //guess, not tested
 		draw_tilemap(screen->machine,bitmap,cliprect,2);
@@ -624,7 +660,7 @@ static WRITE16_HANDLER( supracan_sound_w )
 				if ( ! supracan_m6502_reset )
 				{
 					/* Reset and enable the sound cpu */
-					//cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, CLEAR_LINE);					
+					//cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, CLEAR_LINE);
 					//device_reset(devtag_get_device(space->machine, "soundcpu"));
 				}
 			}
@@ -749,15 +785,9 @@ static WRITE16_HANDLER( supracan_video_w )
 				video_screen_configure(space->machine->primary_screen, 348, 256, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds);
 			}
 			break;
-		case 0x20/2:
-			spr_base_addr = data << 2;
-			break;
-		case 0x22/2:
-			spr_limit = data+1;
-			break;
-		case 0x26/2:
-			spr_flags = data;
-			break;
+		case 0x20/2: spr_base_addr = data << 2; break;
+		case 0x22/2: spr_limit = data+1; break;
+		case 0x26/2: spr_flags = data; break;
 		case 0x100/2: tilemap_flags[0] = data; break;
 		case 0x104/2: tilemap_scrollx[0] = data; break;
 		case 0x106/2: tilemap_scrolly[0] = data; break;
@@ -773,16 +803,16 @@ static WRITE16_HANDLER( supracan_video_w )
 		case 0x146/2: tilemap_scrolly[2] = data; break;
 		case 0x148/2: tilemap_base_addr[2] = (data) << 1; break;
 		case 0x14a/2: tilemap_mode[2] = data; break;
-		// Affine transforms of some sort?
-		case ACAN_VID_XFORM32A_H:
-		case ACAN_VID_XFORM32A_L:
-		case ACAN_VID_XFORM32B_H:
-		case ACAN_VID_XFORM32B_L:
-		case ACAN_VID_XFORM16A:
-		case ACAN_VID_XFORM16B:
-			//printf( "%1.4f %1.4f %1.4f %1.4f\n", (INT32)((supracan_video_regs[ACAN_VID_XFORM32A_H] << 16) | supracan_video_regs[ACAN_VID_XFORM32A_L]) / 65536.0f, (INT32)((supracan_video_regs[ACAN_VID_XFORM32B_H] << 16) | supracan_video_regs[ACAN_VID_XFORM32B_L]) / 65536.0f, supracan_video_regs[ACAN_VID_XFORM16A] / 256.0f, supracan_video_regs[ACAN_VID_XFORM16B] / 256.0f);
-			break;
-		case 0x1f0/2:
+
+		/* 0x180-0x19f are roz tilemap related regs */
+		case 0x180/2: roz_mode = data; break;
+		case 0x184/2: roz_scrollx = (data << 16) | (roz_scrollx & 0xffff); break;
+		case 0x186/2: roz_scrollx = (data) | (roz_scrollx & 0xffff0000); break;
+		case 0x188/2: roz_scrolly = (data << 16) | (roz_scrolly & 0xffff); break;
+		case 0x18a/2: roz_scrolly = (data) | (roz_scrolly & 0xffff0000); break;
+		case 0x194/2: roz_base_addr = (data) << 1; break;
+
+		case 0x1f0/2: //FIXME: this register is mostly not understood
 			irq_mask = (data & 8) ? 0 : 1;
 			break;
 		default:
