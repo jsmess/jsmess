@@ -17,6 +17,15 @@ Known unemulated graphical effects:
   "A'Can"
 - The A'Can logo should have a scrolling ROZ layer beneath it
 
+baseball game debug trick:
+wpset e90020,1f,w
+do pc=5ac40
+...
+do pc=5acd4
+wpclear
+bp 0269E4
+[ff7be4] <- 0x269ec
+bpclear
 
 ***************************************************************************/
 
@@ -139,6 +148,7 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 /* 0x0402 Boom Zoo */
 /* 0x2603 / 0x6623 Super Dragon Force */
 /* 0x4020 BIOS logo */
+/* 0x06*/
 static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT32 count;
