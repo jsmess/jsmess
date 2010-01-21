@@ -213,26 +213,26 @@ static void c128_vic_interrupt( running_machine *machine, int level )
 #endif
 }
 
-static void c128_iec_data_w(running_machine *machine)
+static void c128_iec_data_out_w(running_machine *machine)
 {
 	const device_config *cia_1 = devtag_get_device(machine, "cia_1");
 	const device_config *iec = devtag_get_device(machine, "iec");
 	int data = !c128_data_out;
 
 	/* fast serial data */
-//	if (MMU_FSDIR) data &= c128_sp1;
+	if (MMU_FSDIR) data &= c128_sp1;
 	
 	cbm_iec_data_w(iec, cia_1, data);
 }
 
-static void c128_iec_srq_w(running_machine *machine)
+static void c128_iec_srq_out_w(running_machine *machine)
 {
 	const device_config *cia_1 = devtag_get_device(machine, "cia_1");
 	const device_config *iec = devtag_get_device(machine, "iec");
 	int srq = 1;
 	
 	/* fast serial clock */
-//	if (MMU_FSDIR) srq &= c128_cnt1;
+	if (MMU_FSDIR) srq &= c128_cnt1;
 
 	cbm_iec_srq_w(iec, cia_1, srq);
 }
@@ -241,14 +241,14 @@ static WRITE_LINE_DEVICE_HANDLER( cia0_cnt_w )
 {
 	/* fast clock out */
 	c128_cnt1 = state;
-	c128_iec_srq_w(device->machine);
+	c128_iec_srq_out_w(device->machine);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cia0_sp_w )
 {
 	/* fast data out */
 	c128_sp1 = state;
-	c128_iec_data_w(device->machine);
+	c128_iec_data_out_w(device->machine);
 }
 
 const mos6526_interface c128_ntsc_cia0 =
@@ -337,7 +337,7 @@ static WRITE8_DEVICE_HANDLER( c128_cia1_port_a_w )
 	const device_config *serbus = devtag_get_device(device->machine, "iec");
 
 	c128_data_out = BIT(data, 5);
-	c128_iec_data_w(device->machine);
+	c128_iec_data_out_w(device->machine);
 
 	cbm_iec_clk_w(serbus, device, !BIT(data, 4));
 
@@ -861,8 +861,8 @@ WRITE8_HANDLER( c128_mmu8722_port_w )
 	case 5:
 		c128_mmu[offset] = data;
 		c128_bankswitch (space->machine, 0);
-		c128_iec_srq_w(space->machine);
-		c128_iec_data_w(space->machine);
+		c128_iec_srq_out_w(space->machine);
+		c128_iec_data_out_w(space->machine);
 		break;
 	case 0:
 	case 6:

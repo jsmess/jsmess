@@ -24,6 +24,8 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
+- [C128] Fast IEC serial bus is now supported with a 1571. [Curt Coder]
+
 - [MIKROMIK] Fixed memory banking regression. [Curt Coder]
 
 
@@ -39,7 +41,8 @@ Source Changes:
 - The core is based on MAME 0.136.1.  This incorporates all features of the
   update to this core.  [MAME team]
 
-- [CIA6526] Refactored interface, and added SP/CNT callbacks. [Curt Coder]
+- [CIA6526] Refactored interface, added SP/CNT callbacks, and fixed serial
+  port transfer. [Curt Coder]
 
 
 

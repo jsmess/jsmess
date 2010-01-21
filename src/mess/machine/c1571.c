@@ -11,6 +11,7 @@
 
 	TODO:
 
+	- 1541/1571 Alignment shows drive speed as 266 rpm, should be 310
 	- toggle WPRT line on disk change
 	- save state
 	- D71 disks
@@ -37,8 +38,8 @@
 #define LOG 0
 
 #define M6502_TAG		"u1"
-#define M6522_0_TAG		"u4"
-#define M6522_1_TAG		"u9"
+#define M6522_0_TAG		"u9"
+#define M6522_1_TAG		"u4"
 #define M6526_TAG		"u20"
 #define WD1770_TAG		"u11"
 
@@ -125,7 +126,7 @@ INLINE c1571_config *get_safe_config(const device_config *device)
 
 INLINE void iec_data_w(const device_config *device)
 {
-	c1571_t *c1571 = get_safe_token(device->owner);
+	c1571_t *c1571 = get_safe_token(device);
 
 	int atn = cbm_iec_atn_r(c1571->serial_bus);
 	int data = !c1571->data_out & !(c1571->atn_ack ^ !atn);
@@ -133,19 +134,19 @@ INLINE void iec_data_w(const device_config *device)
 	/* fast serial data */
 	if (c1571->ser_dir) data &= c1571->sp_out;
 	
-	cbm_iec_data_w(c1571->serial_bus, device->owner, data);
+	cbm_iec_data_w(c1571->serial_bus, device, data);
 }
 
 INLINE void iec_srq_w(const device_config *device)
 {
-	c1571_t *c1571 = get_safe_token(device->owner);
+	c1571_t *c1571 = get_safe_token(device);
 
 	int srq = 1;
 	
 	/* fast serial clock */
 	if (c1571->ser_dir) srq &= c1571->cnt_out;
 
-	cbm_iec_srq_w(c1571->serial_bus, device->owner, srq);
+	cbm_iec_srq_w(c1571->serial_bus, device, srq);
 }
 
 /***************************************************************************
@@ -217,11 +218,9 @@ static TIMER_CALLBACK( bit_tick )
 WRITE_LINE_DEVICE_HANDLER( c1571_iec_atn_w )
 {
 	c1571_t *c1571 = get_safe_token(device);
-	int data_out = !c1571->data_out && !(c1571->atn_ack ^ !state);
 
 	via_ca1_w(c1571->via0, !state);
-
-	cbm_iec_data_w(c1571->serial_bus, device, data_out);
+	iec_data_w(device);
 }
 
 /*-------------------------------------------------
@@ -283,10 +282,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c1571_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
-	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE(WD1770_TAG, wd17xx_r, wd17xx_w)
-	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE(M6526_TAG, mos6526_r, mos6526_w)
+	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x03f0) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x03f0) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE(WD1770_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x3ff0) AM_DEVREADWRITE(M6526_TAG, mos6526_r, mos6526_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("c1571", 0)
 ADDRESS_MAP_END
 
@@ -342,7 +341,7 @@ static READ8_DEVICE_HANDLER( via0_pa_r )
 	data |= floppy_tk00_r(c1571->image);
 
 	/* byte ready */
-	data |= c1571->byte << 7;
+	data |= !(c1571->byte && c1571->soe) << 7;
 
 	return data;
 }
@@ -376,8 +375,8 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
 
 	/* fast serial direction */
 	c1571->ser_dir = BIT(data, 1);
-	iec_data_w(device);
-	iec_srq_w(device);
+	iec_data_w(device->owner);
+	iec_srq_w(device->owner);
 
 	/* side select */
 	wd17xx_set_side(c1571->wd1770, BIT(data, 2));
@@ -445,7 +444,7 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 
 	/* data out */
 	c1571->data_out = BIT(data, 1);
-	iec_data_w(device);
+	iec_data_w(device->owner);
 
 	/* clock out */
 	cbm_iec_clk_w(c1571->serial_bus, device->owner, !BIT(data, 3));
@@ -621,6 +620,13 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 	}
 }
 
+static READ_LINE_DEVICE_HANDLER( byte_ready_r )
+{
+	c1571_t *c1571 = get_safe_token(device->owner);
+
+	return !(c1571->byte && c1571->soe);
+}
+
 static WRITE_LINE_DEVICE_HANDLER( soe_w )
 {
 	c1571_t *c1571 = get_safe_token(device->owner);
@@ -643,7 +649,7 @@ static const via6522_interface c1571_via1_intf =
 {
 	DEVCB_HANDLER(yb_r),
 	DEVCB_HANDLER(via1_pb_r),
-	DEVCB_NULL,
+	DEVCB_LINE(byte_ready_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -677,7 +683,7 @@ static WRITE_LINE_DEVICE_HANDLER( cia_cnt_w )
 
 	/* fast serial clock out */
 	c1571->cnt_out = state;
-	iec_srq_w(device);
+	iec_srq_w(device->owner);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cia_sp_w )
@@ -686,7 +692,7 @@ static WRITE_LINE_DEVICE_HANDLER( cia_sp_w )
 
 	/* fast serial data out */
 	c1571->sp_out = state;
-	iec_data_w(device);
+	iec_data_w(device->owner);
 }
 
 static MOS6526_INTERFACE( c1571_cia_intf )
@@ -718,8 +724,8 @@ static const wd17xx_interface c1571_wd1770_intf =
 -------------------------------------------------*/
 
 static FLOPPY_OPTIONS_START( c1571 )
-	FLOPPY_OPTION( c1571, "g64", "Commodore 1571 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
-//  FLOPPY_OPTION( c1571, "d64", "Commodore 1571 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
+	FLOPPY_OPTION( c1571, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
+//  FLOPPY_OPTION( c1571, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
 //  FLOPPY_OPTION( c1571, "d71", "Commodore 1571 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
 FLOPPY_OPTIONS_END
 

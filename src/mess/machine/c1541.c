@@ -127,6 +127,7 @@
 
     TODO:
 
+	- drive speed is 300 rpm, should be 310
 	- ROM version selection
     - allocate track buffer runtime
     - accurate timing
@@ -895,6 +896,13 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 	}
 }
 
+static READ_LINE_DEVICE_HANDLER( byte_ready_r )
+{
+	c1541_t *c1541 = get_safe_token(device->owner);
+
+	return !(c1541->byte && c1541->soe);
+}
+
 static WRITE_LINE_DEVICE_HANDLER( soe_w )
 {
 	c1541_t *c1541 = get_safe_token(device->owner);
@@ -917,7 +925,7 @@ static const via6522_interface c1541_via1_intf =
 {
 	DEVCB_HANDLER(yb_r),
 	DEVCB_HANDLER(via1_pb_r),
-	DEVCB_NULL, /* BYTE READY */
+	DEVCB_LINE(byte_ready_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

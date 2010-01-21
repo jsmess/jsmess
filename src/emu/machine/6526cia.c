@@ -573,7 +573,6 @@ WRITE_LINE_DEVICE_HANDLER( mos6526_cnt_w )
 
 			if (cia->shift == 8)
 			{
-				logerror("MOS6526 '%s' SDR received %02x\n", device->tag.cstr(), cia->serial);
 				cia->sdr = cia->serial;
 				cia->serial = 0;
 				cia->shift = 0;
@@ -838,7 +837,6 @@ WRITE8_DEVICE_HANDLER( mos6526_w )
 
 		/* serial data ready */
 		case CIA_SDR:
-			logerror("MOS6526 '%s' SDR write %02x\n", device->tag.cstr(), data);
 			cia->sdr = data;
 			if (cia->timer[0].mode & 0x40)
 				cia->loaded = 1;
