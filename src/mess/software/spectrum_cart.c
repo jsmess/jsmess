@@ -15,8 +15,8 @@
 #define PCB_ZXCALL      (PCB_ZXC1 | PCB_ZXC2 | PCB_ZXC3)  // by multiple designs
 #define PCB_DROY        0x08                              // Droy's 32 Kbytes cartridge
 #define PCB_ZXFLASH     0x10                              // Droy's ZX-Flash 512 Kbytes cartridge
-#define PCB_HUEHN       0x20                              // Scott-Falk H??hn's 512 Kbytes cartridge
-#define PCB_SCARTIF2    0x40                              // Jos?? Leandro Novell??n Mart??nez' Super Cartucho IF2 512 Kbytes cartridge
+#define PCB_HUEHN       0x20                              // Scott-Falk Hühn's 512 Kbytes cartridge
+#define PCB_SCARTIF2    0x40                              // José Leandro Novellón Martínez' Super Cartucho IF2 512 Kbytes cartridge
 
 #define ZX48_ONLY       0x80000000                        // Cartridge cannot run on an unexpanded ZX Spectrum
 
@@ -48,7 +48,7 @@ SOFTWARE_START( set ) \
     ROM_LOAD(name, offset, length, hash) \
 SOFTWARE_END
 
-/* ZX-FLASH, H??hn's and Super Cartucho IF2 cartridges support up to 512 Kbytes of data */
+/* ZX-FLASH, Hühn's and Super Cartucho IF2 cartridges support up to 512 Kbytes of data */
 #define ZXSPECTRUM_ROM512K_LOAD( set, name, offset, length, hash )  \
 SOFTWARE_START( set ) \
     ROM_REGION( 0x80000, CARTRIDGE_REGION_ROM, ROMREGION_ERASEFF ) \
@@ -77,7 +77,8 @@ ZXSPECTRUM_ROM_LOAD( starwars, "starwars.rom", 0x0000, 0x4000, CRC(732c6f5d) SHA
 ZXSPECTRUM_ROM_LOAD( starwara, "starwara.rom", 0x0000, 0x4000, CRC(90b61858) SHA1(29cbda204ea20d42429a723afe2d00b9edd0a04d) )
 ZXSPECTRUM_ROM_LOAD( dethstar, "dethstar.rom", 0x0000, 0x4000, CRC(9f74021f) SHA1(852757985b73bca7fee06dcaaa4be5a89c11fbc0) )
 
-ZXSPECTRUM_ROM32K_LOAD( knlrdroy, "knlrdroy.rom", 0x0000, 0x8000, CRC(7bcd642c) SHA1(0c1aeeabd77b179b343f86e1ccd89f340bfbb1f3) )
+ZXSPECTRUM_ROM32K_LOAD(  knlrdroy, "knlrdroy.rom", 0x0000, 0x8000,  CRC(7bcd642c) SHA1(0c1aeeabd77b179b343f86e1ccd89f340bfbb1f3) )
+ZXSPECTRUM_ROM512K_LOAD( zxfldroy, "zxfldroy.rom", 0x0000, 0x80000, CRC(d9b4aef9) SHA1(71bf98d94a6c69a0df039f63b7cb7eb459662756) )
 
 ZXSPECTRUM_ROM512K_LOAD( if2huehn, "if2huehn.rom", 0x0000, 0x40000, CRC(f49ad814) SHA1(7296a140c02231e8e7562e711d8d1523e6a20a9e) )
 
@@ -86,6 +87,10 @@ ZXSPECTRUM_ROM512K_LOAD( scartif2, "cartucho.rom", 0x0000, 0x40000, CRC(ec348b91
 ZXSPECTRUM_ROM_LOAD( copier,  "Copier.rom",     0x0000, 0x2000, CRC(d8c5429a) SHA1(f44abcc7d582b85de3938956067c9461c1d9d296) )
 ZXSPECTRUM_ROM_LOAD( ramtest, "RAM_Tester.rom", 0x0000, 0x2000, CRC(5d2b7ad6) SHA1(3c762943e472f1fd8c40d8b34cbebcf9c9c5da72) )
 ZXSPECTRUM_ROM_LOAD( romtest, "ROM_Tester.rom", 0x0000, 0x2000, CRC(d8511d55) SHA1(8f3549f8cc57da2962de06e5344e5accef8e84b8) )
+
+ZXSPECTRUM_ROM256K_LOAD( if1ldsv, "IF1_LoadSave.rom", 0x0000, 0x4000, CRC(7bea2b39) SHA1(1141062a3f6caab84c98c1a0fd40786c212c797c) )
+ZXSPECTRUM_ROM256K_LOAD( if1load, "IF1_Load.rom",     0x0000, 0x4000, CRC(0badac9c) SHA1(8d14e24133a12ca4d3539501bd410b7f8a6c9947) )
+ZXSPECTRUM_ROM256K_LOAD( if1save, "IF1_Save.rom",     0x0000, 0x4000, CRC(42210c80) SHA1(a26e80690cda09e74842321b6f2962d9aba988a7) )
 
 ZXSPECTRUM_ROM256K_LOAD( 128,        "128.rom",           0x0000, 0x8000,  CRC(ab78b08a) SHA1(5096bd50a2f5ff0f1ec618e80ac0dde4f7adf25c) )
 ZXSPECTRUM_ROM256K_LOAD( 128p,       "128+.rom",          0x0000, 0x8000,  CRC(023e670a) SHA1(a897b33fe5286cf028db73920fa3575d45c616ea) )
@@ -108,6 +113,14 @@ ZXSPECTRUM_ROM256K_LOAD( 128spm_i1e1,  "SP128M_IF1_ED1.rom",  0x0000, 0x10000, C
 ZXSPECTRUM_ROM256K_LOAD( 128spmp_i1e1, "SP128M+_IF1_ED1.rom", 0x0000, 0x10000, CRC(f601349c) SHA1(a0a2db9bdb454f7fcb07a0de26f7529e06d026c4) )
 ZXSPECTRUM_ROM256K_LOAD( 128spm_i1e2,  "SP128M_IF1_ED2.rom",  0x0000, 0x10000, CRC(8e0db55e) SHA1(6ec5d0fbb6d743fa6fda9820ca41e939e246ef8e) )
 ZXSPECTRUM_ROM256K_LOAD( 128spmp_i1e2, "SP128M+_IF1_ED2.rom", 0x0000, 0x10000, CRC(8508ffc1) SHA1(b622238fd34866b489a41536466f961df4d771c6) )
+
+ZXSPECTRUM_ROM256K_LOAD( zx80,    "S48_ZX80.rom",     0x0000, 0x4000, CRC(cec2b9a0) SHA1(b3e60937cb6ecc76f40695c3b8addab079584fe2) )
+ZXSPECTRUM_ROM256K_LOAD( zx80_8k, "S48_ZX80_8K.rom",  0x0000, 0x4000, CRC(8a00fc8e) SHA1(448e0e69804dfabc8fa58b4c5ed176d6a6b3c1c3) )
+ZXSPECTRUM_ROM256K_LOAD( zx80p,   "S48_ZX80+.rom",    0x0000, 0x4000, CRC(25d50e2b) SHA1(5577274ae4fdc873304cdfc8d0a9b5969147b6e1) )
+ZXSPECTRUM_ROM256K_LOAD( zx81_e1, "S48_ZX81_ED1.rom", 0x0000, 0x4000, CRC(d43cabfe) SHA1(5a58aea225bb3898321f0fe6ee8c83a5e25be84d) )
+ZXSPECTRUM_ROM256K_LOAD( zx81_e2, "S48_ZX81_ED2.rom", 0x0000, 0x4000, CRC(31654c55) SHA1(f64c85b6f07349a0aa0e2351709a89b9152b7908) )
+ZXSPECTRUM_ROM256K_LOAD( zx81p,   "S48_ZX81+.rom",    0x0000, 0x4000, CRC(f9e23fcc) SHA1(a4a2ccceeb1cf059058e474d64d72a51e2ed1b8b) )
+
 
 ZXSPECTRUM_ROM256K_LOAD( 48_i1e1,    "48_IF1_ED1.rom",    0x0000, 0x8000,  CRC(d7e990ac) SHA1(e67e3def822a5b32775fcca02e46a0726c2d41f8) )
 ZXSPECTRUM_ROM256K_LOAD( 48_i1e2,    "48_IF1_ED2.rom",    0x0000, 0x8000,  CRC(ea535630) SHA1(9b6257b0f33590bd554fb41297e555f618f7fa0b) )
@@ -150,19 +163,20 @@ SOFTWARE_LIST_START( spectrum_cart )
    The 32 Kbytes PCB description and usage are described at http://www.speccy.org/trastero/cosas/droy/cartuchos/cartuchos_s.htm
    and the 512Kb version is described at http://www.speccy.org/trastero/cosas/droy/zxflash/zxflashcart_e.htm
 */
-    SOFTWARE( knlrdroy, 0, 2002, "<Homebrew>", "Knight Lore (Droy 32Kb PCB)", PCB_DROY, 0 )
+    SOFTWARE( knlrdroy, 0, 2002, "<Homebrew>", "Droy's 32Kb Cartridge Demo (Knight Lore conversion)", PCB_DROY,    0 )
+    SOFTWARE( zxfldroy, 0, 2005, "<Homebrew>", "Droy's 512Kb Multicartridge Demo",                    PCB_ZXFLASH, 0 )
 
 /*
-   The following conversion demonstrates the bank switching capabilities of Scott-Falk H??hn's PCB.
+   The following conversion demonstrates the bank switching capabilities of Scott-Falk Hühn's PCB.
    The 512 Kbytes PCB description and usage are described at http://s-huehn.de/spectrum/hardware2.htm#if2rom
 */
-    SOFTWARE( if2huehn, 0, 2007, "<Homebrew>", "512Kb Multicart Demo (H??hn PCB)", PCB_HUEHN, 0 ) // This demo cartridge uses just 16 of the 32 available banks
+    SOFTWARE( if2huehn, 0, 2007, "<Homebrew>", "Hühn's 512Kb Multicartridge Demo", PCB_HUEHN, 0 ) // This demo cartridge uses just 16 of the 32 available banks
 
 /*
-   The following conversion demonstrates the bank switching capabilities of Jos?? Leandro Novell??n Mart??nez' PCB.
+   The following conversion demonstrates the bank switching capabilities of José Leandro Novellón Martínez' PCB.
    The 512 Kbytes PCB description and usage are described at http://www.speccy.org/trastero/cosas/JL/if2/IF2-1.html
 */
-    SOFTWARE( scartif2, 0, 2004, "<Homebrew>", "512Kb Multicart Demo (Super Cartucho IF2 PCB)", PCB_SCARTIF2, 0 ) // This demo cartridge uses just 16 of the 32 available banks
+    SOFTWARE( scartif2, 0, 2004, "<Homebrew>", "Super Cartucho IF2 512Kb Multicartridge Demo", PCB_SCARTIF2, 0 ) // This demo cartridge uses just 16 of the 32 available banks
 
 /*
    The following cartridges demonstrate the bank switching capabilities of Paul Farrow's ZXCx PCBs.
@@ -171,6 +185,10 @@ SOFTWARE_LIST_START( spectrum_cart )
     SOFTWARE( copier,       0,       1988, "<Homebrew>", "Microdrive/Cassette Copier v1.04",                                                   PCB_ZXC23,            0)
     SOFTWARE( ramtest,      0,       2008, "<Homebrew>", "ZX Spectrum 48/128/+2 RAM Tester v2.05",                                             PCB_ZXCALL,           0)
     SOFTWARE( romtest,      0,       2009, "<Homebrew>", "ZX Spectrum 48/128/+2 ROM Tester v1.03",                                             PCB_ZXC23,            0)
+
+    SOFTWARE( if1ldsv,      0,       2004, "<Homebrew>", "Load & Save through ZX Interface 1 RS232 v1.02",                                     PCB_ZXCALL,           0)
+    SOFTWARE( if1load,      if1ldsv, 2004, "<Homebrew>", "Load through ZX Interface 1 RS232 v1.02",                                            PCB_ZXCALL,           0)
+    SOFTWARE( if1save,      if1ldsv, 2004, "<Homebrew>", "Save through ZX Interface 1 RS232 v1.02",                                            PCB_ZXCALL,           0)
 
     SOFTWARE( 128,          0,       2008, "<Homebrew>", "ZX Spectrum 128 Emulator v1.11A",                                                    ZX48_ONLY|PCB_ZXC23,  0)
     SOFTWARE( 128p,         128,     2008, "<Homebrew>", "Bug Free ZX Spectrum 128 Emulator v1.11a",                                           ZX48_ONLY|PCB_ZXC23,  0)
@@ -201,6 +219,13 @@ SOFTWARE_LIST_START( spectrum_cart )
 
     SOFTWARE( 128spm_i1e2,  128sp,   2008, "<Homebrew>", "Modified ZX Spectrum 128 (Spain) + ZX Interface 1 (Ed. 2) Emulator v1.04O",          ZX48_ONLY|PCB_ZXC23,  0)
     SOFTWARE( 128spmp_i1e2, 128sp,   2008, "<Homebrew>", "Modified Bug Free ZX Spectrum 128 (Spain) + ZX Interface 1 (Ed. 2) Emulator v1.04o", ZX48_ONLY|PCB_ZXC23,  0)
+
+    SOFTWARE( zx80,             0,   2007, "<Homebrew>", "ZX80 Emulator v3.05",                                                                ZX48_ONLY|PCB_ZXCALL, 0) // To work correctly this cart needs additional circuitry
+    SOFTWARE( zx80_8k,       zx80,   2007, "<Homebrew>", "ZX80 (New ROM) Emulator v3.05",                                                      ZX48_ONLY|PCB_ZXCALL, 0) // To work correctly this cart needs additional circuitry
+    SOFTWARE( zx80p,         zx80,   2007, "<Homebrew>", "Bug Free ZX80 Emulator v3.05",                                                       ZX48_ONLY|PCB_ZXCALL, 0) // To work correctly this cart needs additional circuitry
+    SOFTWARE( zx81_e1,          0,   2007, "<Homebrew>", "ZX81 (Ed. 1) Emulator v3.08",                                                        ZX48_ONLY|PCB_ZXCALL, 0) // To work correctly this cart needs additional circuitry
+    SOFTWARE( zx81_e2,    zx81_e1,   2007, "<Homebrew>", "ZX81 (Ed. 2) Emulator v3.08",                                                        ZX48_ONLY|PCB_ZXCALL, 0) // To work correctly this cart needs additional circuitry
+    SOFTWARE( zx81p,      zx81_e1,   2007, "<Homebrew>", "Bug Free ZX81 Emulator v3.08",                                                       ZX48_ONLY|PCB_ZXCALL, 0) // To work correctly this cart needs additional circuitry
 
     SOFTWARE( 48_i1e1,      0,       2008, "<Homebrew>", "ZX Spectrum + ZX Interface 1 (Ed. 1) v1.01",                                         PCB_ZXC23,            0)
     SOFTWARE( 48_i1e2,      48_i1e1, 2008, "<Homebrew>", "ZX Spectrum + ZX Interface 1 (Ed. 2) v1.01",                                         PCB_ZXC23,            0)
