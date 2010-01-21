@@ -35,7 +35,7 @@
 
 static BOOL FilterAvailable(int driver_index);
 
-const FOLDERDATA g_folderData[] =
+extern const FOLDERDATA g_folderData[] =
 {
 	{"All Systems",     "allgames",          FOLDER_ALLGAMES,     IDI_FOLDER,				0,             0,            NULL,                       NULL,              TRUE },
 	{"Available",       "available",         FOLDER_AVAILABLE,    IDI_FOLDER_AVAILABLE,     F_AVAILABLE,   0,            NULL,                       FilterAvailable,              TRUE },
@@ -65,7 +65,7 @@ const FOLDERDATA g_folderData[] =
 };
 
 /* list of filter/control Id pairs */
-const FILTER_ITEM g_filterList[] =
+extern const FILTER_ITEM g_filterList[] =
 {
 	{ F_COMPUTER,     IDC_FILTER_COMPUTER,    DriverIsComputer, TRUE },
 	{ F_CONSOLE,      IDC_FILTER_CONSOLE,     DriverIsComputer, FALSE },
@@ -81,7 +81,7 @@ const FILTER_ITEM g_filterList[] =
 	{ 0 }
 };
 
-const DIRECTORYINFO g_directoryInfo[] =
+extern const DIRECTORYINFO g_directoryInfo[] =
 {
 	{ "ROMs",                  GetRomDirs,         SetRomDirs,         TRUE,  DIRDLG_ROMS },
 	{ "Software",              GetSoftwareDirs,    SetSoftwareDirs,    TRUE,  DIRDLG_SOFTWARE },
@@ -111,7 +111,7 @@ const DIRECTORYINFO g_directoryInfo[] =
 	{ NULL }
 };
 
-const SPLITTERINFO g_splitterInfo[] =
+extern const SPLITTERINFO g_splitterInfo[] =
 {
 	{ 0.2,	IDC_SPLITTER,	IDC_TREE,	IDC_LIST,		AdjustSplitter1Rect },
 	{ 0.4,	IDC_SPLITTER2,	IDC_LIST,	IDC_SWLIST,		AdjustSplitter1Rect },
@@ -120,7 +120,7 @@ const SPLITTERINFO g_splitterInfo[] =
 	{ -1 }
 };
 
-const MAMEHELPINFO g_helpInfo[] =
+extern const MAMEHELPINFO g_helpInfo[] =
 {
 	{ ID_HELP_CONTENTS,		TRUE,	"mess.chm::/html/mess_overview.htm" },
 	{ ID_HELP_RELEASE,		TRUE,	"mess.chm" },
@@ -128,7 +128,7 @@ const MAMEHELPINFO g_helpInfo[] =
 	{ -1 }
 };
 
-const PROPERTYSHEETINFO g_propSheets[] =
+extern const PROPERTYSHEETINFO g_propSheets[] =
 {
 	{ FALSE,	NULL,					IDD_PROP_GAME,			GamePropertiesDialogProc },
 	{ FALSE,	NULL,					IDD_PROP_AUDIT,			GameAuditDialogProc },
@@ -146,7 +146,7 @@ const PROPERTYSHEETINFO g_propSheets[] =
 	{ FALSE }
 };
 
-const ICONDATA g_iconData[] =
+extern const ICONDATA g_iconData[] =
 {
 	{ IDI_WIN_NOROMS,			"noroms" },
 	{ IDI_WIN_ROMS,				"roms" },
@@ -164,8 +164,8 @@ const ICONDATA g_iconData[] =
 	{ 0 }
 };
 
-const TCHAR g_szPlayGameString[] = TEXT("&Run %s");
-const char g_szGameCountString[] = "%d systems";
+extern const TCHAR g_szPlayGameString[] = TEXT("&Run %s");
+extern const char g_szGameCountString[] = "%d systems";
 static const char g_szHistoryFileName[] = "sysinfo.dat";
 static const char g_szMameInfoFileName[] = "messinfo.dat";
 

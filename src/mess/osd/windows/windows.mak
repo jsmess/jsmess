@@ -47,3 +47,8 @@ $(MESS_WINOBJ)/%.res: $(MESS_WINSRC)/%.rc
 	@echo Compiling resources $<...
 	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir mess/$(OSD) -o $@ -i $<
 
+#-------------------------------------------------
+# For building UI include ui.mak
+#-------------------------------------------------
+
+include $(SRC)/mess/osd/winui/winui.mak

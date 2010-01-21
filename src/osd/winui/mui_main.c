@@ -16,9 +16,12 @@
 
 // import the main() from MAME, but rename it so we can call it indirectly
 #undef main
+#undef wmain
 #define main mame_main
+#define wmain mame_main
 #include "windows/main.c"
 #undef main
+#undef wmain
 
 #include "winui.h"
 
