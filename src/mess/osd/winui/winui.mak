@@ -61,7 +61,7 @@ WINUIOBJS += \
 
 
 # add resource file
-RESFILE = $(MESS_WINUIOBJ)/messui.res
+RESFILEUI = $(MESS_WINUIOBJ)/messui.res
 
 #-------------------------------------------------
 # rules for creating helpids.c 
@@ -128,6 +128,6 @@ $(WINUIOBJ)/mamevers.rc: $(OBJ)/build/verinfo$(EXE) $(SRC)/version.c
 	@echo Emitting $@...
 	@"$(VERINFO)" -b mess $(SRC)/version.c  > $@
 
-$(MESSUI): $(WINUIOBJS) $(VERSIONOBJ) $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBDASM) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE_NOMAIN) $(RESFILE)
+$(MESSUI): $(WINUIOBJS) $(VERSIONOBJ) $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBDASM) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE_NOMAIN) $(RESFILEUI)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) -mwindows  $^ $(LIBS) $(EXPAT) -o $@
