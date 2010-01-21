@@ -257,7 +257,6 @@ static DEVICE_START( ieee488 )
 	const ieee488_daisy_chain *daisy = get_interface(device);
 	int i;
 
-	astring *tempstring = astring_alloc();
 	ieee488_daisy_state *head = NULL;
 	ieee488_daisy_state **tailptr = &head;
 
@@ -272,7 +271,6 @@ static DEVICE_START( ieee488 )
 
 		if ((*tailptr)->device == NULL)
 		{
-			astring_free(tempstring);
 			fatalerror("Unable to locate device '%s'", daisy->tag);
 		}
 
@@ -299,8 +297,6 @@ static DEVICE_START( ieee488 )
 	}
 
 	ieee488->daisy_state = head;
-
-	astring_free(tempstring);
 
 	/* register for state saving */
 //	state_save_register_device_item(device, 0, ieee488->);

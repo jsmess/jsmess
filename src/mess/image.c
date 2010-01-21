@@ -712,10 +712,10 @@ static image_error_t load_image_by_path(image_slot_data *image, UINT32 open_flag
 {
     file_error filerr = FILERR_NOT_FOUND;
     image_error_t err = IMAGE_ERROR_FILENOTFOUND;
-    astring *revised_path = astring_alloc();
+    astring revised_path;
 
     /* attempt to read the file */
-    filerr = zippath_fopen(path, open_flags, &image->file, revised_path);
+    filerr = zippath_fopen(path, open_flags, &image->file, &revised_path);
 
     /* did the open succeed? */
     switch(filerr)
@@ -754,9 +754,8 @@ static image_error_t load_image_by_path(image_slot_data *image, UINT32 open_flag
 
     /* if successful, set the file name */
     if (filerr == FILERR_NONE)
-        set_image_filename(image, astring_c(revised_path));
+        set_image_filename(image, astring_c(&revised_path));
 
-    astring_free(revised_path);
     return err;
 }
 

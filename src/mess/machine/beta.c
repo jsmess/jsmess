@@ -308,16 +308,14 @@ ROM_END
 static DEVICE_START( beta_disk )
 {
 	beta_disk_state *beta = get_safe_token(device);
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 
 	/* validate arguments */
 	assert(device->tag != NULL);
 
 	/* find our WD179x */
-	astring_printf(tempstring, "%s:%s", device->tag.cstr(), "wd179x");
-	beta->wd179x = devtag_get_device(device->machine, astring_c(tempstring));
-
-	astring_free(tempstring);
+	astring_printf(&tempstring, "%s:%s", device->tag.cstr(), "wd179x");
+	beta->wd179x = devtag_get_device(device->machine, astring_c(&tempstring));
 }
 
 /*-------------------------------------------------

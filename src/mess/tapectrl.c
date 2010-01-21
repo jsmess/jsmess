@@ -92,7 +92,7 @@ astring *tapecontrol_gettime(astring *dest, const device_config *device, int *cu
 
 static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, tape_control_menu_state *menustate)
 {
-	astring *timepos = astring_alloc();
+	astring timepos;
 	cassette_state state;
 	int count = cassette_count(machine);
 	UINT32 flags = 0;
@@ -111,7 +111,7 @@ static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, 
 		ui_menu_item_append(menu, image_typename_id(menustate->device), image_filename(menustate->device), flags, NULL);
 
 		/* state */
-		tapecontrol_gettime(timepos, menustate->device, NULL, NULL);
+		tapecontrol_gettime(&timepos, menustate->device, NULL, NULL);
 		state = cassette_get_state(menustate->device);
 		ui_menu_item_append(
 			menu,
@@ -121,7 +121,7 @@ static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, 
 					? ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? UI_playing : UI_playing_inhibited)
 					: ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? UI_recording : UI_recording_inhibited)
 					)),
-			astring_c(timepos),
+			astring_c(&timepos),
 			0,
 			NULL);
 
@@ -145,9 +145,6 @@ static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, 
 		/* no tape loaded */
 		ui_menu_item_append(menu, ui_getstring(UI_notapeimageloaded), NULL, flags, NULL);
 	}
-
-	if (timepos != NULL)
-		astring_free(timepos);
 }
 
 

@@ -363,7 +363,6 @@ static DEVICE_START( cbm_iec )
 	const cbm_iec_daisy_chain *daisy = get_interface(device);
 	int i;
 
-	astring *tempstring = astring_alloc();
 	cbm_iec_daisy_state *head = NULL;
 	cbm_iec_daisy_state **tailptr = &head;
 
@@ -377,7 +376,6 @@ static DEVICE_START( cbm_iec )
 
 		if ((*tailptr)->device == NULL)
 		{
-			astring_free(tempstring);
 			fatalerror("Unable to locate device '%s'", daisy->tag);
 		}
 
@@ -396,8 +394,6 @@ static DEVICE_START( cbm_iec )
 	}
 
 	cbm_iec->daisy_state = head;
-
-	astring_free(tempstring);
 
 	/* register for state saving */
 //  state_save_register_device_item(device, 0, cbm_iec->);

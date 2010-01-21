@@ -242,12 +242,14 @@ static multicart_open_error load_ram_resource(multicart_load_state *state, xml_d
 	{
 		if (strcmp(ram_type, "persistent")==0)
 		{
+			astring tmp;
+
 			/* Get the file name. */
 			ram_filename = xml_get_attribute_string(resource_node, "file", NULL);
 			if (ram_filename==NULL)
 				return MCERR_XML_ERROR;
 
-			ram_pathname = astring_assemble_3(astring_alloc(), state->multicart->gamedrv_name, PATH_SEPARATOR, ram_filename);
+			ram_pathname = astring_assemble_3(&tmp, state->multicart->gamedrv_name, PATH_SEPARATOR, ram_filename);
 
 			/* Save the file name so that we can write the contents on unloading.
                If the RAM resource has no filename, we know that it was volatile only. */

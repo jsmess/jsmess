@@ -304,7 +304,7 @@ static void file_create_render_extra(running_machine *machine, ui_menu *menu, vo
 
 static void menu_file_create_populate(running_machine *machine, ui_menu *menu, void *state, void *selection)
 {
-	astring *buffer = astring_alloc();
+	astring buffer;
 	file_create_menu_state *menustate = (file_create_menu_state *) state;
 	const device_config *device = menustate->manager_menustate->selected_device;
 	const image_device_format *format;
@@ -313,8 +313,8 @@ static void menu_file_create_populate(running_machine *machine, ui_menu *menu, v
 	/* append the "New Image Name" item */
 	if (selection == ITEMREF_NEW_IMAGE_NAME)
 	{
-		astring_assemble_2(buffer, menustate->filename_buffer, "_");
-		new_image_name = astring_c(buffer);
+		astring_assemble_2(&buffer, menustate->filename_buffer, "_");
+		new_image_name = astring_c(&buffer);
 	}
 	else
 	{
@@ -336,9 +336,6 @@ static void menu_file_create_populate(running_machine *machine, ui_menu *menu, v
 
 	/* set up custom render proc */
 	ui_menu_set_custom_render(menu, file_create_render_extra, ui_get_line_height() + 3.0f * UI_BOX_TB_BORDER, 0);
-
-	/* cleanup */
-	astring_free(buffer);
 }
 
 

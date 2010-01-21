@@ -404,7 +404,7 @@ static DEVICE_START( abc77 )
 	abc77_t *abc77 = (abc77_t *)device->token;
 	const abc77_interface *intf = get_interface(device);
 
-	astring *tempstring = astring_alloc();
+	astring tempstring;
 
 	/* resolve callbacks */
 	devcb_resolve_write_line(&abc77->out_txd_func, &intf->out_txd_func, device);
@@ -412,9 +412,8 @@ static DEVICE_START( abc77 )
 	devcb_resolve_write_line(&abc77->out_keydown_func, &intf->out_keydown_func, device);
 
 	/* find our CPU */
-	astring_printf(tempstring, "%s:%s", device->tag.cstr(), I8035_TAG);
-	abc77->cpu = devtag_get_device(device->machine, astring_c(tempstring));
-	astring_free(tempstring);
+	astring_printf(&tempstring, "%s:%s", device->tag.cstr(), I8035_TAG);
+	abc77->cpu = devtag_get_device(device->machine, astring_c(&tempstring));
 
 	/* allocate reset timer */
 	abc77->reset_timer = timer_alloc(device->machine, reset_tick, (FPTR *) device);

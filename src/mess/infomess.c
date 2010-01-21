@@ -129,11 +129,11 @@ void print_game_ramoptions(FILE *out, const game_driver *game, const machine_con
 		{
 			const char *s;
 
-			astring *buffer = astring_alloc();
-			astring_cpyc(buffer, config->extra_options);
-			astring_replacechr(buffer, ',', 0);
+			astring buffer;
+			astring_cpyc(&buffer, config->extra_options);
+			astring_replacechr(&buffer, ',', 0);
 
-			s = astring_c(buffer);
+			s = astring_c(&buffer);
 
 			/* try to parse each option */
 			while(*s != '\0')
@@ -141,7 +141,6 @@ void print_game_ramoptions(FILE *out, const game_driver *game, const machine_con
 				fprintf(out, "\t\t<ramoption>%u</ramoption>\n",  messram_parse_string(s));
 				s += strlen(s) + 1;
 			}
-			astring_free(buffer);
 		}
 	}
 }

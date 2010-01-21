@@ -191,11 +191,11 @@ static DEVICE_VALIDITY_CHECK( messram )
 				{
 					const char *s;
 
-					astring *buffer = astring_alloc();
-					astring_cpyc(buffer, config->extra_options);
-					astring_replacechr(buffer, ',', 0);
+					astring buffer;
+					astring_cpyc(&buffer, config->extra_options);
+					astring_replacechr(&buffer, ',', 0);
 
-					s = astring_c(buffer);
+					s = astring_c(&buffer);
 
 					/* try to parse each option */
 					while(*s != '\0')
@@ -213,8 +213,6 @@ static DEVICE_VALIDITY_CHECK( messram )
 
 						s += strlen(s) + 1;
 					}
-
-					astring_free(buffer);
 				}
 
 			} else {

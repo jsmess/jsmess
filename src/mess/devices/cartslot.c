@@ -327,7 +327,7 @@ static DEVICE_IMAGE_UNLOAD( cartslot )
 static const cartslot_pcb_type *identify_pcb(const device_config *device)
 {
 	const cartslot_config *config = get_config(device);
-	astring *pcb_name = astring_alloc();
+	astring pcb_name;
 	const cartslot_pcb_type *pcb_type = NULL;
 	multicart_t *mc;
 	int i;
@@ -339,7 +339,7 @@ static const cartslot_pcb_type *identify_pcb(const device_config *device)
 		if (me == MCERR_NONE)
 		{
 			/* this was a multicart - read from it */
-			astring_cpyc(pcb_name, mc->pcb_type);
+			astring_cpyc(&pcb_name, mc->pcb_type);
 			multicart_close(mc);
 		}
 		else
@@ -349,14 +349,14 @@ static const cartslot_pcb_type *identify_pcb(const device_config *device)
 			if (image_pcb(device) != NULL)
 			{
 				/* read from hash file */
-				astring_cpyc(pcb_name, image_pcb(device));
+				astring_cpyc(&pcb_name, image_pcb(device));
 			}
 		}
 
 		/* look for PCB type with matching name */
 		for (i = 0; (i < ARRAY_LENGTH(config->pcb_types)) && (config->pcb_types[i].name != NULL); i++)
 		{
-			if ((config->pcb_types[i].name[0] == '\0') || !strcmp(astring_c(pcb_name), config->pcb_types[i].name))
+			if ((config->pcb_types[i].name[0] == '\0') || !strcmp(astring_c(&pcb_name), config->pcb_types[i].name))
 			{
 				pcb_type = &config->pcb_types[i];
 				break;
@@ -365,7 +365,7 @@ static const cartslot_pcb_type *identify_pcb(const device_config *device)
 
 		/* check for unknown PCB type */
 		if ((mc != NULL) && (pcb_type == NULL))
-			fatalerror("Unknown PCB type \"%s\"\n", astring_c(pcb_name));
+			fatalerror("Unknown PCB type \"%s\"\n", astring_c(&pcb_name));
 	}
 	else
 	{
