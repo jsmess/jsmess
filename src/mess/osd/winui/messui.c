@@ -1315,6 +1315,7 @@ static void SoftwareTabView_OnMoveSize(void)
 	HWND hwndSoftwarePicker;
 	HWND hwndSoftwareDevView;
 	RECT rMain, rSoftwareTabView, rClient, rTab;
+	HRESULT res;
 
 	hwndSoftwareTabView = GetDlgItem(GetMainWindow(), IDC_SWTAB);
 	hwndSoftwarePicker = GetDlgItem(GetMainWindow(), IDC_SWLIST);
@@ -1335,7 +1336,7 @@ static void SoftwareTabView_OnMoveSize(void)
 	// not being covered up
 	if (GetWindowLong(hwndSoftwareTabView, GWL_STYLE) & WS_VISIBLE)
 	{
-		TabCtrl_GetItemRect(hwndSoftwareTabView, 0, &rTab);
+		res = TabCtrl_GetItemRect(hwndSoftwareTabView, 0, &rTab);
 		rClient.top += rTab.bottom - rTab.top + 4;
 	}
 

@@ -214,10 +214,11 @@ static void UpdateDirectoryList(HWND hDlg)
 	LV_ITEM Item;
 	HWND	hList  = GetDlgItem(hDlg, IDC_DIR_LIST);
 	HWND	hCombo = GetDlgItem(hDlg, IDC_DIR_COMBO);
+	HRESULT res;
 
 	/* Remove previous */
 
-	ListView_DeleteAllItems(hList);
+	res = ListView_DeleteAllItems(hList);
 
 	/* Update list */
 
@@ -228,17 +229,17 @@ static void UpdateDirectoryList(HWND hDlg)
 	if (IsMultiDir(nType))
 	{
 		Item.pszText = (TCHAR*) TEXT(DIRLIST_NEWENTRYTEXT);
-		ListView_InsertItem(hList, &Item);
+		res = ListView_InsertItem(hList, &Item);
 		for (i = DirInfo_NumDir(g_pDirInfo, nType) - 1; 0 <= i; i--)
 		{
 			Item.pszText = DirInfo_Path(g_pDirInfo, nType, i);
-			ListView_InsertItem(hList, &Item);
+			res = ListView_InsertItem(hList, &Item);
 		}
 	}
 	else
 	{
 		Item.pszText = DirInfo_Dir(g_pDirInfo, nType);
-		ListView_InsertItem(hList, &Item);
+		res = ListView_InsertItem(hList, &Item);
 	}
 
 	/* select first one */
@@ -273,6 +274,7 @@ static BOOL Directories_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 	TCHAR       *token;
 	TCHAR       buf[MAX_PATH * MAX_DIRS];
 	TCHAR*      t_s = NULL;
+	HRESULT 	res;
 
 	/* count how many dirinfos there are */
 	nDirInfoCount = 0;
@@ -302,7 +304,7 @@ static BOOL Directories_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 	LVCol.mask	  = LVCF_WIDTH;
 	LVCol.cx	  = rectClient.right - rectClient.left - GetSystemMetrics(SM_CXHSCROLL);
 	
-	ListView_InsertColumn(GetDlgItem(hDlg, IDC_DIR_LIST), 0, &LVCol);
+	res = ListView_InsertColumn(GetDlgItem(hDlg, IDC_DIR_LIST), 0, &LVCol);
 
 	/* Keep a temporary copy of the directory strings in g_pDirInfo. */
 	for (i = 0; i < nDirInfoCount; i++)

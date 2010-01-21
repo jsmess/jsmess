@@ -58,11 +58,12 @@ static void MarkChanged(HWND hDlg)
 static void AppendList(HWND hList, LPCTSTR lpItem, int nItem)
 {
     LV_ITEM Item;
+	HRESULT res;
 	memset(&Item, 0, sizeof(LV_ITEM));
 	Item.mask = LVIF_TEXT;
 	Item.pszText = (LPTSTR) lpItem;
 	Item.iItem = nItem;
-	ListView_InsertItem(hList, &Item);
+	res = ListView_InsertItem(hList, &Item);
 }
 
 
@@ -74,6 +75,7 @@ static BOOL SoftwareDirectories_OnInsertBrowse(HWND hDlg, BOOL bBrowse, LPCTSTR 
     TCHAR outbuf[MAX_PATH];
     HWND hList;
 	LPTSTR lpIn;
+	HRESULT res;
 
 	g_bModifiedSoftwarePaths = TRUE;
 
@@ -105,7 +107,7 @@ static BOOL SoftwareDirectories_OnInsertBrowse(HWND hDlg, BOOL bBrowse, LPCTSTR 
 
 	AppendList(hList, lpItem, nItem);
 	if (bBrowse)
-		ListView_DeleteItem(hList, nItem+1);
+		res = ListView_DeleteItem(hList, nItem+1);
 	MarkChanged(hDlg);
 	return TRUE;
 }
@@ -118,6 +120,7 @@ static BOOL SoftwareDirectories_OnDelete(HWND hDlg)
     int     nSelect;
     int     nItem;
     HWND    hList = GetDlgItem(hDlg, IDC_DIR_LIST);
+	HRESULT res;
 
 	g_bModifiedSoftwarePaths = TRUE;
 
@@ -130,7 +133,7 @@ static BOOL SoftwareDirectories_OnDelete(HWND hDlg)
     if (nItem == ListView_GetItemCount(hList) - 1)
         return FALSE;
 
-	ListView_DeleteItem(hList, nItem);
+	res = ListView_DeleteItem(hList, nItem);
 
     nCount = ListView_GetItemCount(hList);
     if (nCount <= 1)
@@ -282,6 +285,7 @@ static BOOL DirListReadControl(datamap *map, HWND dialog, HWND control, core_opt
 	TCHAR buffer[2048];
 	char *dir_list;
 	int i, pos, driver_index;
+	HRESULT res;
 
 	// determine the directory count; note that one item is the "<    >" entry
 	directory_count = ListView_GetItemCount(control);
@@ -303,7 +307,7 @@ static BOOL DirListReadControl(datamap *map, HWND dialog, HWND control, core_opt
 		lvi.iItem = i;
 		lvi.pszText = &buffer[pos];
 		lvi.cchTextMax = ARRAY_LENGTH(buffer) - pos;
-		ListView_GetItem(control, &lvi);
+		res = ListView_GetItem(control, &lvi);
 
 		// advance the position
 		pos += _tcslen(&buffer[pos]);
@@ -329,6 +333,7 @@ static BOOL DirListPopulateControl(datamap *map, HWND dialog, HWND control, core
 	TCHAR *s;
 	LV_COLUMN lvc;
 	RECT r;
+	HRESULT res;
 
 	// access the directory list, and convert to TCHARs
 	driver_index = PropertiesCurrentGame(dialog);
@@ -338,14 +343,14 @@ static BOOL DirListPopulateControl(datamap *map, HWND dialog, HWND control, core
 		return FALSE;
 
 	// delete all items in the list control
-	ListView_DeleteAllItems(control);
+	res = ListView_DeleteAllItems(control);
 
 	// add the column
 	GetClientRect(control, &r);
 	memset(&lvc, 0, sizeof(LVCOLUMN));
 	lvc.mask = LVCF_WIDTH;
 	lvc.cx = r.right - r.left - GetSystemMetrics(SM_CXHSCROLL);
-	ListView_InsertColumn(control, 0, &lvc);
+	res = ListView_InsertColumn(control, 0, &lvc);
 
 	// add each of the directories
 	pos = 0;

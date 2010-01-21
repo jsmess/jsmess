@@ -240,6 +240,7 @@ static BOOL SoftwarePicker_CalculateHash(HWND hwndPicker, int nIndex)
 	unsigned int nLength;
 	HANDLE hFile, hFileMapping;
 	LVFINDINFO lvfi;
+	HRESULT res;
 
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 	assert((nIndex >= 0) && (nIndex < pPickerInfo->file_index_length));
@@ -315,7 +316,7 @@ static BOOL SoftwarePicker_CalculateHash(HWND hwndPicker, int nIndex)
 		lvfi.lParam = nIndex;
 		nIndex = ListView_FindItem(hwndPicker, -1, &lvfi);
 		if (nIndex > 0)
-			ListView_RedrawItems(hwndPicker, nIndex, nIndex);
+			res = ListView_RedrawItems(hwndPicker, nIndex, nIndex);
 	}
 
 	return rc;
@@ -589,9 +590,10 @@ static void SoftwarePicker_InternalClear(software_picker_info *pPickerInfo)
 void SoftwarePicker_Clear(HWND hwndPicker)
 {
 	software_picker_info *pPickerInfo;
+	HRESULT res;
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 	SoftwarePicker_InternalClear(pPickerInfo);
-	ListView_DeleteAllItems(hwndPicker);
+	res = ListView_DeleteAllItems(hwndPicker);
 }
 
 

@@ -38,6 +38,7 @@ static int DoExchangeItem(HWND hFrom, HWND hTo, int nMinItem)
 	LV_ITEM lvi;
 	TCHAR	buf[80];
 	int 	nFrom, nTo;
+	HRESULT res;
 
 	nFrom = ListView_GetItemCount(hFrom);
 	nTo   = ListView_GetItemCount(hTo);
@@ -57,9 +58,9 @@ static int DoExchangeItem(HWND hFrom, HWND hTo, int nMinItem)
 	if (ListView_GetItem(hFrom, &lvi))
 	{
 		// Add this item to the Show and delete it from Available
-		ListView_DeleteItem(hFrom, lvi.iItem);
+		res = ListView_DeleteItem(hFrom, lvi.iItem);
 		lvi.iItem = ListView_GetItemCount(hTo);
-		ListView_InsertItem(hTo, &lvi);
+		res = ListView_InsertItem(hTo, &lvi);
 		ListView_SetItemState(hTo, lvi.iItem,
 							  LVIS_FOCUSED | LVIS_SELECTED,
 							  LVIS_FOCUSED | LVIS_SELECTED);
@@ -74,6 +75,7 @@ static void DoMoveItem( HWND hWnd, BOOL bDown)
 	LV_ITEM lvi;
 	TCHAR	buf[80];
 	int 	nMaxpos;
+	HRESULT res;
 	
 	lvi.iItem = ListView_GetNextItem(hWnd, -1, LVIS_SELECTED | LVIS_FOCUSED);
 	nMaxpos = ListView_GetItemCount(hWnd);
@@ -92,9 +94,9 @@ static void DoMoveItem( HWND hWnd, BOOL bDown)
 	if (ListView_GetItem(hWnd, &lvi))
 	{
 		// Add this item to the Show and delete it from Available
-		ListView_DeleteItem(hWnd, lvi.iItem);
+		res = ListView_DeleteItem(hWnd, lvi.iItem);
 		lvi.iItem += (bDown) ? 1 : -1;
-		ListView_InsertItem(hWnd,&lvi);
+		res = ListView_InsertItem(hWnd,&lvi);
 		ListView_SetItemState(hWnd, lvi.iItem,
 							  LVIS_FOCUSED | LVIS_SELECTED,
 							  LVIS_FOCUSED | LVIS_SELECTED);
@@ -126,6 +128,7 @@ INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 	int         i, nCount = 0;
 	LV_ITEM     lvi;
 	DWORD dwShowStyle, dwAvailableStyle, dwView;
+	HRESULT res;
 
 	switch (Msg)
 	{
@@ -177,13 +180,13 @@ INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 			if (shown[order[i]])
 			{
 				lvi.iItem = nShown;
-				ListView_InsertItem(hShown, &lvi);
+				res = ListView_InsertItem(hShown, &lvi);
 				nShown++;
 			}
 			else
 			{
 				lvi.iItem = nAvail;
-				ListView_InsertItem(hAvailable, &lvi);
+				res = ListView_InsertItem(hAvailable, &lvi);
 				nAvail++;
 			}
 		}
@@ -408,7 +411,7 @@ INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 						lvi.mask     = LVIF_PARAM;
 						lvi.pszText  = 0;
 						lvi.iItem    = i;
-						ListView_GetItem(hShown, &lvi);
+						res = ListView_GetItem(hShown, &lvi);
 						order[nCount++]   = lvi.lParam;
 						shown[lvi.lParam] = TRUE;
 					}
@@ -418,7 +421,7 @@ INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 						lvi.mask     = LVIF_PARAM;
 						lvi.pszText  = 0;
 						lvi.iItem    = i;
-						ListView_GetItem(hAvailable, &lvi);
+						res = ListView_GetItem(hAvailable, &lvi);
 						order[nCount++]   = lvi.lParam;
 						shown[lvi.lParam] = FALSE;
 					}

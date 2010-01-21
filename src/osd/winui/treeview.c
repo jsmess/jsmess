@@ -1327,6 +1327,7 @@ void ResetTreeViewFolders(void)
 	int i;
 	TVITEM tvi;
 	TVINSERTSTRUCT	tvs;
+	HRESULT res;
 
 	HTREEITEM shti; // for current child branches
 
@@ -1334,7 +1335,7 @@ void ResetTreeViewFolders(void)
 	HTREEITEM hti_parent = NULL;
 	int index_parent = -1;			
 
-	TreeView_DeleteAllItems(hTreeView);
+	res = TreeView_DeleteAllItems(hTreeView);
 
 	//dprintf("Adding folders to tree ui indices %i to %i",start_index,end_index);
 
@@ -1390,7 +1391,7 @@ void ResetTreeViewFolders(void)
 
 				tvi.hItem = hti_parent;
 				tvi.mask = TVIF_PARAM;
-				TreeView_GetItem(hTreeView,&tvi);
+				res= TreeView_GetItem(hTreeView,&tvi);
 				if (((LPTREEFOLDER)tvi.lParam) == treeFolders[treeFolders[i]->m_nParent])
 					break;
 
@@ -1427,6 +1428,7 @@ void SelectTreeViewFolder(int folder_id)
 	HWND hTreeView = GetTreeView();
 	HTREEITEM hti;
 	TVITEM tvi;
+	HRESULT res;
 
 	memset(&tvi,0,sizeof(tvi));
 
@@ -1438,11 +1440,11 @@ void SelectTreeViewFolder(int folder_id)
 
 		tvi.hItem = hti;
 		tvi.mask = TVIF_PARAM;
-		TreeView_GetItem(hTreeView,&tvi);
+		res = TreeView_GetItem(hTreeView,&tvi);
 
 		if (((LPTREEFOLDER)tvi.lParam)->m_nFolderId == folder_id)
 		{
-			TreeView_SelectItem(hTreeView,tvi.hItem);
+			res = TreeView_SelectItem(hTreeView,tvi.hItem);
 			SetCurrentFolder((LPTREEFOLDER)tvi.lParam);
 			return;
 		}
@@ -1465,9 +1467,9 @@ void SelectTreeViewFolder(int folder_id)
 	// make sure we select something
 	tvi.hItem = TreeView_GetRoot(hTreeView);
 	tvi.mask = TVIF_PARAM;
-	TreeView_GetItem(hTreeView,&tvi);
+	res = TreeView_GetItem(hTreeView,&tvi);
 
-	TreeView_SelectItem(hTreeView,tvi.hItem);
+	res = TreeView_SelectItem(hTreeView,tvi.hItem);
 	SetCurrentFolder((LPTREEFOLDER)tvi.lParam);
 
 }
@@ -1664,7 +1666,7 @@ static BOOL CreateTreeIcons()
 	if (ImageList_GetImageCount (hTreeSmall) < ICON_MAX)
 	{
 		ErrorMsg("Error with icon list--too few images.  %i < %i",
-				 ImageList_GetImageCount(hTreeSmall),ICON_MAX);
+				 ImageList_GetImageCount(hTreeSmall),(INT)ICON_MAX);
 		return FALSE;
 	}
 

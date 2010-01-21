@@ -212,7 +212,8 @@ static int TabView_GetCurrentTabIndex(HWND hwndTabView)
 
 void TabView_UpdateSelection(HWND hwndTabView)
 {
-	TabCtrl_SetCurSel(hwndTabView, TabView_GetCurrentTabIndex(hwndTabView));
+	HRESULT res;
+	res = TabCtrl_SetCurSel(hwndTabView, TabView_GetCurrentTabIndex(hwndTabView));
 }
 
 
@@ -274,10 +275,11 @@ void TabView_Reset(HWND hwndTabView)
 	TC_ITEM tci;
 	int i;
 	TCHAR* t_text;
+	HRESULT res;
 
 	pTabViewInfo = GetTabViewInfo(hwndTabView);
 
-	TabCtrl_DeleteAllItems(hwndTabView);
+	res = TabCtrl_DeleteAllItems(hwndTabView);
 
 	memset(&tci, 0, sizeof(tci));
 	tci.mask = TCIF_TEXT;
@@ -291,7 +293,7 @@ void TabView_Reset(HWND hwndTabView)
 			if( !t_text )
 				return;
 			tci.pszText = t_text;
-			TabCtrl_InsertItem(hwndTabView, i, &tci);
+			res = TabCtrl_InsertItem(hwndTabView, i, &tci);
 			global_free(t_text);
 		}
 	}
