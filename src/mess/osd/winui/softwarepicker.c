@@ -673,7 +673,7 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 			SoftwarePicker_FreeSearchInfo(pSearchInfo);
 		}
 	}
-	else if (pPickerInfo->config->hashfile && (pPickerInfo->hashes_realized
+/*	else if (pPickerInfo->config->hashfile && (pPickerInfo->hashes_realized
 		< pPickerInfo->file_index_length))
 	{
 		// time to realize some hashes
@@ -707,7 +707,7 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 				pPickerInfo->hashes_realized++;
 			}
 		}
-	}
+	}*/
 	else
 	{
 		// we are done!
@@ -744,7 +744,7 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 				return s;
 			_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
 			s = pszBuffer;
-			free(t_buf);
+			global_free(t_buf);
 			break;
 
 		case MESS_COLUMN_GOODNAME:
@@ -775,7 +775,7 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 						return s;
 					_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
 					s = pszBuffer;
-					free(t_buf);
+					global_free(t_buf);
 				}
 			}
 			break;
@@ -796,7 +796,7 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 					return s;
 				_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
 				s = pszBuffer;
-				free(t_buf);
+				global_free(t_buf);
 			}
 			break;
 	}
@@ -818,7 +818,7 @@ static LRESULT CALLBACK SoftwarePicker_WndProc(HWND hwndPicker, UINT nMessage,
 	{
 		SoftwarePicker_InternalClear(pPickerInfo);
 		SoftwarePicker_SetDriver(hwndPicker, NULL);
-		free(pPickerInfo);
+		global_free(pPickerInfo);
 	}
 
 	return rc;
@@ -849,6 +849,6 @@ BOOL SetupSoftwarePicker(HWND hwndPicker, const struct PickerOptions *pOptions)
 
 error:
 	if (pPickerInfo)
-		free(pPickerInfo);
+		global_free(pPickerInfo);
 	return FALSE;
 }

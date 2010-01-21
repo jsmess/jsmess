@@ -182,7 +182,7 @@ int MameUIVerifyRomSet(int game)
 	audit_records = audit_images(MameUIGlobal(), drivers[game], AUDIT_VALIDATE_FAST, &audit);
 	res = ProcessAuditResults(game, audit, audit_records);
 	if (audit_records > 0)
-		free(audit);
+		global_free(audit);
 
 	SetRomAuditResults(game, res);
 	return res;
@@ -199,7 +199,7 @@ int MameUIVerifySampleSet(int game)
 	audit_records = audit_samples(MameUIGlobal(), drivers[game], &audit);
 	res = ProcessAuditResults(game, audit, audit_records);
 	if (audit_records > 0)
-		free(audit);
+		global_free(audit);
 
 	SetSampleAuditResults(game, res);
 	return res;
@@ -454,7 +454,7 @@ static void CLIB_DECL DetailsPrintf(const char *fmt, ...)
 	Edit_SetSel(hEdit, textLength, textLength);
 	SendMessage( hEdit, EM_REPLACESEL, FALSE, (WPARAM)(LPCTSTR)win_tstring_strdup(t_s) );
 	
-	free(t_s);
+	global_free(t_s);
 }
 
 static const char * StatusString(int iStatus)

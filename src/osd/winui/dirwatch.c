@@ -96,7 +96,7 @@ static void DirWatcher_FreeEntry(struct DirWatcherEntry *pEntry)
 {
 	if (pEntry->hDir)
 		CloseHandle(pEntry->hDir);
-	free(pEntry);
+	global_free(pEntry);
 }
 
 
@@ -191,7 +191,7 @@ static void DirWatcher_Signal(PDIRWATCHER pWatcher, struct DirWatcherEntry *pEnt
 			pWatcher->nMessage,
 			(pEntry->nIndex << 16) | (pEntry->nSubIndex << 0),
 			(LPARAM)(LPCTSTR) win_tstring_strdup(t_filename));
-		free(t_filename);
+		global_free(t_filename);
 	}
 
 	DirWatcher_SetupWatch(pWatcher, pEntry);
@@ -368,7 +368,7 @@ void DirWatcher_Free(PDIRWATCHER pWatcher)
 		CloseHandle(pWatcher->hRequestEvent);
 	if (pWatcher->hResponseEvent)
 		CloseHandle(pWatcher->hResponseEvent);
-	free(pWatcher);
+	global_free(pWatcher);
 }
 
 

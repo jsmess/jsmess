@@ -70,7 +70,7 @@ static void DevView_Clear(HWND hwndDevView)
 			DestroyWindow(pDevViewInfo->pEntries[i].hwndEdit);
 			DestroyWindow(pDevViewInfo->pEntries[i].hwndBrowseButton);
 		}
-		free(pDevViewInfo->pEntries);
+		global_free(pDevViewInfo->pEntries);
 		pDevViewInfo->pEntries = NULL;
 	}
 
@@ -216,7 +216,7 @@ BOOL DevView_SetDriver(HWND hwndDevView, const software_config *config)
 			s = tstring_from_utf8(info.name);
 			ppszDevices[i] = (WCHAR*)alloca((_tcslen(s) + 1) * sizeof(TCHAR));
 			_tcscpy(ppszDevices[i], s);
-			free(s);
+			global_free(s);
 			i++;
 		}
 
@@ -374,7 +374,7 @@ static void DevView_Free(HWND hwndDevView)
 	DevView_Clear(hwndDevView);
 	pDevViewInfo = GetDevViewInfo(hwndDevView);
 	DeleteObject(pDevViewInfo->hFont);
-	free(pDevViewInfo);
+	global_free(pDevViewInfo);
 }
 
 

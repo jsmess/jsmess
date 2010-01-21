@@ -47,13 +47,12 @@
 
 
 // MAME/MAMEUI headers
-#include "emu.h"
+//#include "emu.h"
 #include "emuopts.h"
 #include "osdepend.h"
 #include "unzip.h"
 #include "winutf8.h"
 #include "strconv.h"
-#include "input.h"
 #include "window.h"
 #include "winmain.h"
 
@@ -1201,7 +1200,7 @@ HICON LoadIconFromFile(const char *iconname)
 							{
 								hIcon = FormatICOInMemoryToHICON(bufferPtr, entry->uncompressed_length);
 							}
-							free(bufferPtr);
+							global_free(bufferPtr);
 						}
 					}
 					entry = zip_file_next_file(zip);
@@ -1661,7 +1660,7 @@ static void RandomSelectBackground(void)
 		ResetBackground(szFile);
 	}
 
-	free(buf);
+	global_free(buf);
 }
 
 static void SetMainTitle(void)
@@ -1977,7 +1976,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 		const input_seq *is1;
 		input_seq *is2;
 		is1 = &(GUISequenceControl[i].is);
-		is2 = GUISequenceControl[i].getiniptr();
+		//is2 = GUISequenceControl[i].getiniptr(); // MICKO-FIX
 		// FIXME
 		//input_seq_copy(is1, is2);
 		//dprintf("seq =%s is: %4i %4i %4i %4i\n",GUISequenceControl[i].name, (*is1)[0], (*is1)[1], (*is1)[2], (*is1)[3]);
@@ -2984,7 +2983,7 @@ static void CopyToolTipText(LPTOOLTIPTEXT lpttt)
 			if( !t_gameinfostatus )
 				return;
 			_tcscpy(String, t_gameinfostatus);
-			free(t_gameinfostatus);
+			global_free(t_gameinfostatus);
 		}
 	}
 	else
@@ -3237,7 +3236,7 @@ static void EnableSelection(int nGame)
 
 	UpdateScreenShot();
 
-	free(t_description);
+	global_free(t_description);
 }
 
 static void PaintBackgroundImage(HWND hWnd, HRGN hRgn, int x, int y)
@@ -3384,7 +3383,7 @@ static BOOL TreeViewNotify(LPNMHDR nm)
 
 		result = TryRenameCustomFolder(folder,szText);
 		
-		free(szText);
+		global_free(szText);
 		
 		return result;
 	}
@@ -3753,7 +3752,7 @@ static void PollGUIJoystick()
 				return;
 			CreateProcess(NULL, t_exec_command, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
 			
-			free(t_exec_command);
+			global_free(t_exec_command);
 
 			// We will not wait for the process to finish cause it might be a background task
 			// The process won't get closed when MAME32 closes either.
@@ -4547,11 +4546,11 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 				ResetBackground(t_szFile);
 				LoadBackgroundBitmap();
 				InvalidateRect(hMain, NULL, TRUE);
-				free(t_bgdir);
-				free(t_szFile);
+				global_free(t_bgdir);
+				global_free(t_szFile);
 				return TRUE;
 			}
-			free(t_bgdir);
+			global_free(t_bgdir);
 		}
 		break;
 
@@ -4871,7 +4870,7 @@ static const TCHAR *GamePicker_GetItemString(HWND hwndPicker, int nItem, int nCo
 			return s;
 		
 		_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_s);		
-		free(t_s);
+		global_free(t_s);
 		
 		s = pszBuffer;
 	}
@@ -4898,7 +4897,7 @@ static void GamePicker_EnteringItem(HWND hwndPicker, int nItem)
 		a = GlobalAddAtom(t_description);
 		SendMessage(HWND_BROADCAST, g_mame32_message, a, a);
 		GlobalDeleteAtom(a);
-		free(t_description);
+		global_free(t_description);
 	}
 
 	EnableSelection(nItem);
@@ -4974,7 +4973,7 @@ static void InitListView()
 
 	// Allow selection to change the default saved game
 	bListReady = TRUE;
-	free(t_bgdir); 
+	global_free(t_bgdir); 
 }
 
 static void AddDriverIcon(int nItem,int default_icon_index)
@@ -5394,7 +5393,7 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 	if (t_filename != NULL)
 	{
 		_sntprintf(t_filename_buffer, ARRAY_LENGTH(t_filename_buffer), TEXT("%s"), t_filename);
-		free(t_filename);
+		global_free(t_filename);
 	}
 
 	of.lStructSize       = sizeof(of);
@@ -5518,11 +5517,11 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 	}
 	
 	if( t_artdir )
-		free(t_artdir);
+		global_free(t_artdir);
 	if( t_statedir )
-		free(t_statedir);
+		global_free(t_statedir);
 	if( t_snapdir )
-		free(t_snapdir);
+		global_free(t_snapdir);
 
 	utf8_filename = utf8_from_tstring(t_filename_buffer);
 	if (utf8_filename != NULL)
@@ -5609,7 +5608,7 @@ static INT_PTR CALLBACK LanguageDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, L
 			if( !utf8_LangFile )
 				return FALSE;
 			SetLanguage(utf8_LangFile);
-			free(utf8_LangFile);
+			global_free(utf8_LangFile);
 
 		case IDCANCEL:
 			EndDialog(hDlg, 0);
@@ -5642,7 +5641,7 @@ void SetStatusBarText(int part_index, const char *message)
 	if( !t_message )
 		return;
 	SendMessage(hStatusBar, SB_SETTEXT, (WPARAM) part_index, (LPARAM)(LPCTSTR) win_tstring_strdup(t_message));
-	free(t_message);
+	global_free(t_message);
 }
 
 void SetStatusBarTextF(int part_index, const char *fmt, ...)
@@ -6267,7 +6266,7 @@ static void UpdateMenu(HMENU hMenu)
 
 		EnableMenuItem(hMenu, ID_CONTEXT_SELECT_RANDOM, MF_ENABLED);
 		
-		free(t_description);
+		global_free(t_description);
 	}
 	else
 	{
@@ -6385,7 +6384,7 @@ void InitTreeContextMenu(HMENU hTreeMenu)
 		else
 			InsertMenuItem(hMenu,i,FALSE,&mii);
 			
-		free(t_title);
+		global_free(t_title);
 	}
 
 }

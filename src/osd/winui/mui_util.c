@@ -203,7 +203,7 @@ void DisplayTextFile(HWND hWnd, const char *cName)
 	hErr = ShellExecute(hWnd, NULL, tName, NULL, NULL, SW_SHOWNORMAL);
 	if ((FPTR)hErr > 32) 
 	{
-		free(tName);
+		global_free(tName);
 		return;
 	}
 
@@ -239,7 +239,7 @@ void DisplayTextFile(HWND hWnd, const char *cName)
  
 	MessageBox(NULL, msg, tName, MB_OK);
 	
-	free(tName);
+	global_free(tName);
 }
 
 char* MyStrStrI(const char* pFirst, const char* pSrch)
@@ -557,7 +557,7 @@ void FlushFileCaches(void)
 void FreeIfAllocated(char **s)
 {
 	if (*s)
-		free(*s);
+		global_free(*s);
 	*s = NULL;
 }
 
@@ -603,7 +603,7 @@ HICON win_extract_icon_utf8(HINSTANCE inst, const char* exefilename, UINT iconin
 	
 	icon = ExtractIcon(inst, t_exefilename, iconindex);
 	
-	free(t_exefilename);
+	global_free(t_exefilename);
 	
 	return icon;
 }
@@ -668,7 +668,7 @@ DWORD win_get_current_directory_utf8(DWORD bufferlength, char* buffer)
 	if( bufferlength > 0 ) {
 		utf8_buffer = utf8_from_tstring(t_buffer);
 		if( !utf8_buffer ) {
-			free(t_buffer);
+			global_free(t_buffer);
 			return result;
 		}
 	}
@@ -676,10 +676,10 @@ DWORD win_get_current_directory_utf8(DWORD bufferlength, char* buffer)
 	strncpy(buffer, utf8_buffer, bufferlength);
 	
 	if( utf8_buffer )
-		free(utf8_buffer);
+		global_free(utf8_buffer);
 	
 	if( t_buffer )
-		free(t_buffer);
+		global_free(t_buffer);
 	
 	return result;
 }
@@ -697,7 +697,7 @@ HANDLE win_find_first_file_utf8(const char* filename, LPWIN32_FIND_DATA findfile
 	
 	result = FindFirstFile(t_filename, findfiledata);
 	
-	free(t_filename);
+	global_free(t_filename);
 	
 	return result;
 }

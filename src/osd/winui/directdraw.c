@@ -247,11 +247,11 @@ void DirectDraw_Close(void)
 	
 	for (i = 0; i < g_nNumDisplays; i++)
 	{
-		free(g_Displays[i].name);
+		global_free(g_Displays[i].name);
 		g_Displays[i].name = NULL;
 		if (g_Displays[i].lpguid != NULL)
 		{
-			free(g_Displays[i].lpguid);
+			global_free(g_Displays[i].lpguid);
 			g_Displays[i].lpguid = NULL;
 		}
 		

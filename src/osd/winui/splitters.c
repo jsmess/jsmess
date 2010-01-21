@@ -74,12 +74,12 @@ void SplittersExit(void)
 {
 	if (splitter)
 	{
-		free(splitter);
+		global_free(splitter);
 		splitter = NULL;
 	}
 	if (nSplitterOffset)
 	{
-		free(nSplitterOffset);
+		global_free(nSplitterOffset);
 		nSplitterOffset = NULL;
 	}
 }

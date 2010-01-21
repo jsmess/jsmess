@@ -22,7 +22,7 @@
 
 // MAME/MAMEUI headers
 #include "bitmask.h"
-
+#include "emu.h"
 /* Bit routines */
 static UCHAR maskTable[8] = {
 	0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01
@@ -49,7 +49,7 @@ LPBITS NewBits(UINT nLength)
 		}
 		else
 		{
-			free(lpBits);
+			global_free(lpBits);
 			lpBits = 0;
 		}
 	}
@@ -63,9 +63,9 @@ void DeleteBits(LPBITS lpBits)
 		return;
 
 	if (lpBits->m_nSize && lpBits->m_lpBits)
-		free(lpBits->m_lpBits);
+		global_free(lpBits->m_lpBits);
 
-	free(lpBits);
+	global_free(lpBits);
 }
 
 /* Test the 'nBit'th bit */

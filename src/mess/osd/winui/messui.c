@@ -712,7 +712,7 @@ static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_
 		t_filter[i] = (t_buffer[i] != '|') ? t_buffer[i] : '\0';
 	t_filter[i++] = '\0';
 	t_filter[i++] = '\0';
-	free(t_buffer);
+	global_free(t_buffer);
 
     of.lStructSize = sizeof(of);
     of.hwndOwner = GetMainWindow();
@@ -826,7 +826,7 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config *de
 			return;
 		// TODO - this should go against InternalSetSelectedSoftware()
 		SoftwarePicker_AddFile(GetDlgItem(GetMainWindow(), IDC_SWLIST), utf8_filename);
-		free(utf8_filename);
+		global_free(utf8_filename);
 	}
 
 	machine_config_free(config);
@@ -990,7 +990,7 @@ static void DevView_SetSelectedSoftware(HWND hwndDevView, int drvindex,
 		return;
 	MessSpecifyImage(drvindex, dev, utf8_filename);
 	MessRefreshPicker();
-	free(utf8_filename);
+	global_free(utf8_filename);
 }
 
 
@@ -1007,7 +1007,7 @@ static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex,
 		return t_buffer;
 
 	_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_s);
-	free(t_s);
+	global_free(t_s);
 	t_buffer = pszBuffer;
 
 	return t_buffer;

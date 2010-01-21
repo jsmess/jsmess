@@ -489,7 +489,7 @@ void InitDefaultPropertyPage(HINSTANCE hInst, HWND hWnd)
 		win_message_box_utf8(0, temp, "Error", IDOK);
 	}
 
-	free(pspage);
+	global_free(pspage);
 }
 
 /* Initilize the property pages for anything but the Default option set */
@@ -607,8 +607,8 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 		win_message_box_utf8(0, temp, "Error", IDOK);
 	}
 
-	free(t_description);
-	free(pspage);
+	global_free(t_description);
+	global_free(pspage);
 }
 
 
@@ -1997,7 +1997,7 @@ static BOOL ScreenPopulateControl(datamap *map, HWND dialog, HWND control, core_
 				return FALSE;
 			if (_tcscmp(t_option, dd.DeviceName) == 0)
 				nSelection = i+1;
-			free(t_option);
+			global_free(t_option);
 		}
 	}
 	(void)ComboBox_SetCurSel(control, nSelection);
@@ -2096,13 +2096,13 @@ static BOOL DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 	if( !t_ctrldir )
 	{
 		if( buf )
-			free(buf);
+			global_free(buf);
 		return FALSE;
 	}
 
 	_stprintf (path, TEXT("%s\\*.*"), t_ctrldir);
 	
-	free(t_ctrldir);
+	global_free(t_ctrldir);
 
 	hFind = FindFirstFile(path, &FindFileData);
 
@@ -2142,7 +2142,7 @@ static BOOL DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 	(void)ComboBox_SetCurSel(control, selected);
 	
 	if( buf )
-		free(buf);
+		global_free(buf);
 
 	return FALSE;
 }
@@ -2266,7 +2266,7 @@ static BOOL ResolutionPopulateControl(datamap *map, HWND dialog, HWND control_, 
 				}
 			}
 		}
-		free(t_screen);
+		global_free(t_screen);
 
 		(void)ComboBox_SetCurSel(sizes_control, sizes_selection);
 		(void)ComboBox_SetCurSel(refresh_control, refresh_selection);
@@ -2967,7 +2967,7 @@ static void InitializeBIOSUI(HWND hwnd)
 							return;
 						(void)ComboBox_InsertString(hCtrl, i, win_tstring_strdup(t_s));
 						(void)ComboBox_SetItemData( hCtrl, i++, biosname);
-						free(t_s);
+						global_free(t_s);
 					}
 				}
 			}
@@ -2996,7 +2996,7 @@ static void InitializeBIOSUI(HWND hwnd)
 						return;
 					(void)ComboBox_InsertString(hCtrl, i, win_tstring_strdup(t_s));
 					(void)ComboBox_SetItemData( hCtrl, i++, biosname);
-					free(t_s);
+					global_free(t_s);
 				}
 			}
 		}

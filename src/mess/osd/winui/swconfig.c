@@ -51,5 +51,5 @@ void software_config_free(software_config *config)
 		hashfile_close(config->hashfile);
 		config->hashfile = NULL;
 	}
-	free(config);
+	global_free(config);
 }

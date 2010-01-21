@@ -165,7 +165,7 @@ typedef struct
 
 typedef struct
 {
-    char        m_szTitle[256];  // Folder Title
+    char        m_szTitle[64];  // Folder Title
     UINT        m_nFolderId;    // ID
     int         m_nParent;      // Parent Folder index in treeFolders[]
     DWORD       m_dwFlags;      // Flags - Customizable and Filters
