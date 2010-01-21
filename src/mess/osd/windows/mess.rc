@@ -29,13 +29,13 @@ IDR_RUNTIME_MENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "&Load State...",              ID_FILE_LOADSTATE
+        MENUITEM "&Load State...",              ID_FILE_LOADSTATE_NEWUI
         MENUITEM "&Save State",                 ID_FILE_SAVESTATE
         MENUITEM "S&ave State As...",           ID_FILE_SAVESTATE_AS
         MENUITEM SEPARATOR
         MENUITEM "Save Sc&reenshot",            ID_FILE_SAVESCREENSHOT
         MENUITEM SEPARATOR
-        MENUITEM "&Exit",                       ID_FILE_EXIT
+        MENUITEM "&Exit",                       ID_FILE_EXIT_NEWUI
     END
     POPUP "&Edit"
     BEGIN
@@ -95,7 +95,7 @@ BEGIN
     POPUP "&Help"
     BEGIN
         MENUITEM "About This System...",        ID_HELP_ABOUTSYSTEM
-        MENUITEM "&About MESS...",              ID_HELP_ABOUT
+        MENUITEM "&About MESS...",              ID_HELP_ABOUT_NEWUI
     END
 END
 
@@ -139,7 +139,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_SLIDER,"msctls_trackbar32",TBS_BOTH | 
                     TBS_NOTICKS | WS_TABSTOP,6,24,162,15
-    PUSHBUTTON      "Play",IDC_PLAY,6,41,35,17
+    PUSHBUTTON      "Play",IDC_PLAY_NEWUI,6,41,35,17
     PUSHBUTTON      "Stop",IDC_STOP,72,41,35,17
     PUSHBUTTON      "Pause",IDC_PAUSE,132,41,35,17
     LTEXT           "",IDC_CAPTION,12,6,102,12

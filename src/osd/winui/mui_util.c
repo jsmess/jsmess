@@ -642,7 +642,7 @@ HANDLE win_create_file_utf8(const char* filename, DWORD desiredmode, DWORD share
 	result = CreateFile(t_filename, desiredmode, sharemode, securityattributes, creationdisposition,
 						flagsandattributes, templatehandle);
 
-//	free(t_filename);
+	global_free(t_filename);
 						
 	return result;
 }

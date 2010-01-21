@@ -114,7 +114,7 @@ static void DoMoveItem( HWND hWnd, BOOL bDown)
 
 INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam,
 	int nColumnMax, int *shown, int *order,
-	LPCTSTR *names, void (*pfnGetRealColumnOrder)(int *),
+	const LPCTSTR *names, void (*pfnGetRealColumnOrder)(int *),
 	void (*pfnGetColumnInfo)(int *pnOrder, int *pnShown),
 	void (*pfnSetColumnInfo)(int *pnOrder, int *pnShown))
 {

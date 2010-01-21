@@ -423,8 +423,9 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 	else
 		pInfo->base_name = pInfo->file_name;
 
-	if (pPickerInfo->file_index) free(pPickerInfo->file_index);
 	ppNewIndex = (file_info**)malloc((pPickerInfo->file_index_length + 1) * sizeof(*pPickerInfo->file_index));
+	memcpy(ppNewIndex,pPickerInfo->file_index,pPickerInfo->file_index_length * sizeof(*pPickerInfo->file_index));	
+	if (pPickerInfo->file_index) free(pPickerInfo->file_index);
 	if (!ppNewIndex)
 		goto error;
 

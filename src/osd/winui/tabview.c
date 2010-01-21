@@ -292,7 +292,7 @@ void TabView_Reset(HWND hwndTabView)
 				return;
 			tci.pszText = t_text;
 			TabCtrl_InsertItem(hwndTabView, i, &tci);
-//			global_free(t_text);
+			global_free(t_text);
 		}
 	}
 	TabView_UpdateSelection(hwndTabView);

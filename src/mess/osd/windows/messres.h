@@ -2,11 +2,11 @@
 // Microsoft Visual C++ generated include file.
 // Used by mess.rc
 //
-#define ID_FILE_LOADSTATE               101
+#define ID_FILE_LOADSTATE_NEWUI         101
 #define ID_FILE_SAVESTATE               102
 #define ID_FILE_SAVESTATE_AS            103
 #define ID_FILE_SAVESCREENSHOT          104
-#define ID_FILE_EXIT                    105
+#define ID_FILE_EXIT_NEWUI              105
 #define ID_EDIT_PASTE                   106
 #define ID_OPTIONS_HIDEMENUBAR          107
 #define ID_OPTIONS_KEYBOARD             108
@@ -40,7 +40,7 @@
 #define ID_THROTTLE_UNTHROTTLED         136
 #define ID_FRAMESKIP_AUTO               137
 #define ID_DEVICES                      138
-#define ID_HELP_ABOUT                   139
+#define ID_HELP_ABOUT_NEWUI             139
 #define ID_HELP_ABOUTSYSTEM             140
 #define IDD_TAPEDIALOG                  500
 #define IDI_ICON_CART                   1000
@@ -52,7 +52,7 @@
 #define IDI_ICON_SNAP                   1006
 #define IDR_RUNTIME_MENU                6000
 #define IDC_SLIDER                      6000
-#define IDC_PLAY                        6001
+#define IDC_PLAY_NEWUI                  6001
 #define IDC_STOP                        6002
 #define IDC_PAUSE                       6003
 #define IDC_CAPTION                     6004

@@ -1782,7 +1782,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 		return FALSE;
 
 	_tcscpy(last_directory,t_inpdir);
-	//free(t_inpdir);
+	global_free(t_inpdir);
 	hMain = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_MAIN), 0, NULL);
 	if (hMain == NULL)
 	{
@@ -1976,7 +1976,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 		const input_seq *is1;
 		input_seq *is2;
 		is1 = &(GUISequenceControl[i].is);
-		//is2 = GUISequenceControl[i].getiniptr(); // MICKO-FIX
+		is2 = GUISequenceControl[i].getiniptr();
 		// FIXME
 		//input_seq_copy(is1, is2);
 		//dprintf("seq =%s is: %4i %4i %4i %4i\n",GUISequenceControl[i].name, (*is1)[0], (*is1)[1], (*is1)[2], (*is1)[3]);

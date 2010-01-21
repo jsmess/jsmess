@@ -1124,7 +1124,7 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem)
 static HWND MyColumnDialogProc_hwndPicker;
 static int *MyColumnDialogProc_order;
 static int *MyColumnDialogProc_shown;
-/*
+
 static void MyGetRealColumnOrder(int *order)
 {
 	int i, nColumnCount;
@@ -1153,17 +1153,17 @@ static void MySetColumnInfo(int *order, int *shown)
 	pCallbacks->pfnSetColumnShown(shown);
 }
 
-	*/
+
 static INT_PTR CALLBACK MyColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	INT_PTR result = 0;
-	//int nColumnCount = Picker_GetColumnCount(MyColumnDialogProc_hwndPicker);
-	//const LPCTSTR *ppszColumnNames = Picker_GetColumnNames(MyColumnDialogProc_hwndPicker);
+	int nColumnCount = Picker_GetColumnCount(MyColumnDialogProc_hwndPicker);
+	const LPCTSTR *ppszColumnNames = Picker_GetColumnNames(MyColumnDialogProc_hwndPicker);
 
-	/*result = InternalColumnDialogProc(hDlg, Msg, wParam, lParam, nColumnCount,
+	result = InternalColumnDialogProc(hDlg, Msg, wParam, lParam, nColumnCount,
 		MyColumnDialogProc_shown, MyColumnDialogProc_order, ppszColumnNames,
 		MyGetRealColumnOrder, MyGetColumnInfo, MySetColumnInfo);
-*/
+
 	return result;
 }
 
