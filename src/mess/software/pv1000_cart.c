@@ -26,9 +26,21 @@ SOFTWARE_END
 
 
 SOFTWARE_LIST_START( pv1000_cart )
-	SOFTWARE( pooyan,   0,         1982, "Casio", "Pooyan", 0, 0 )		/* 01 */
-	SOFTWARE( amidar,   0,         1982, "Casio", "Amidar", 0, 0 )		/* 04 */
-	SOFTWARE( exitemah, 0,         1982, "Casio", "Excite Mahjong", 0, 0 )	/* 15 */
+	SOFTWARE( pooyan,   0,         1982, "Casio", "Pooyan", 0, 0 )		/* GPA-101 */
+	/* Super Cobra GPA-102 */
+	/* Tutankham GPA-103 */
+	SOFTWARE( amidar,   0,         1982, "Casio", "Amidar", 0, 0 )		/* GPA-104 */
+	/* Dig Dug GPA-105 */
+	/* Warp & Warp GPA-106 */
+	/* Turpin GPA-107 */
+	/* GPA-108 */
+	/* Pachinko-UFO GPA-109 */
+	/* Fighting Bug GPA-110 */
+	/* Space Panic GPA-111 */
+	/* Naughty Boy GPA-112 */
+	/* GPA-113 */
+	/* Dirty Chameleon GPA-114 */
+	SOFTWARE( exitemah, 0,         1982, "Casio", "Excite Mahjong", 0, 0 )	/* GPA-115 */
 SOFTWARE_LIST_END
 
 
