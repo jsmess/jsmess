@@ -267,7 +267,7 @@ static BOOL SoftwarePicker_CalculateHash(HWND hwndPicker, int nIndex)
 			{
 				if (!mame_stricmp(zipent->filename, pFileInfo->zip_entry_name))
 				{
-					pBuffer = (unsigned char *)malloc(zipent->uncompressed_length);
+					pBuffer = (unsigned char *)global_alloc_array_clear(unsigned char,zipent->uncompressed_length);
 					if (pBuffer)
 					{
 						ziperr = zip_file_decompress(zip, pBuffer, zipent->uncompressed_length);
@@ -397,7 +397,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 
 	// create the FileInfo structure
 	nSize = sizeof(file_info) + strlen(pszFilename);
-	pInfo = (file_info *) malloc(nSize);
+	pInfo = (file_info *) global_alloc_array(UINT8,nSize);
 	if (!pInfo)
 		goto error;
 	memset(pInfo, 0, nSize);
@@ -423,7 +423,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 	else
 		pInfo->base_name = pInfo->file_name;
 
-	ppNewIndex = (file_info**)malloc((pPickerInfo->file_index_length + 1) * sizeof(*pPickerInfo->file_index));
+	ppNewIndex = (file_info**)global_alloc_array(UINT8,(pPickerInfo->file_index_length + 1) * sizeof(*pPickerInfo->file_index));
 	memcpy(ppNewIndex,pPickerInfo->file_index,pPickerInfo->file_index_length * sizeof(*pPickerInfo->file_index));	
 	if (pPickerInfo->file_index) free(pPickerInfo->file_index);
 	if (!ppNewIndex)
@@ -534,7 +534,7 @@ BOOL SoftwarePicker_AddDirectory(HWND hwndPicker, LPCSTR pszDirectory)
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 
 	nSearchInfoSize = sizeof(directory_search_info) + strlen(pszDirectory);
-	pSearchInfo = (directory_search_info *)malloc(nSearchInfoSize);
+	pSearchInfo = (directory_search_info *)global_alloc_array(UINT8,nSearchInfoSize);
 	if (!pSearchInfo)
 		return FALSE;
 	memset(pSearchInfo, 0, nSearchInfoSize);
@@ -646,6 +646,7 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 
 	pSearchInfo = pPickerInfo->first_search_info;
+	
 	if (pSearchInfo)
 	{
 		// searching through directories
@@ -674,7 +675,7 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 			SoftwarePicker_FreeSearchInfo(pSearchInfo);
 		}
 	}
-/*	else if (pPickerInfo->config->hashfile && (pPickerInfo->hashes_realized
+	else if (pPickerInfo->config!= NULL && pPickerInfo->config->hashfile && (pPickerInfo->hashes_realized
 		< pPickerInfo->file_index_length))
 	{
 		// time to realize some hashes
@@ -708,7 +709,7 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 				pPickerInfo->hashes_realized++;
 			}
 		}
-	}*/
+	}
 	else
 	{
 		// we are done!
@@ -834,12 +835,10 @@ BOOL SetupSoftwarePicker(HWND hwndPicker, const struct PickerOptions *pOptions)
 
 	if (!SetupPicker(hwndPicker, pOptions))
 		goto error;
-
-	pPickerInfo = (software_picker_info *)malloc(sizeof(*pPickerInfo));
+	pPickerInfo = (software_picker_info *)global_alloc_clear(software_picker_info);
 	if (!pPickerInfo)
 		goto error;
 	memset(pPickerInfo, 0, sizeof(*pPickerInfo));
-
 	if (!SetProp(hwndPicker, software_picker_property_name, (HANDLE) pPickerInfo))
 		goto error;
 

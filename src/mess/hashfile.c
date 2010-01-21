@@ -577,16 +577,16 @@ int hashfile_verify(const char *sysname, void (*my_error_proc)(const char *messa
 
 static void *expat_malloc(size_t size)
 {
-	return malloc(size);
+	return global_alloc_array_clear(UINT8,size);
 }
 
 static void *expat_realloc(void *ptr, size_t size)
 {
-	if (ptr) free(ptr);
-	return malloc(size);
+	if (ptr) global_free(ptr);
+	return global_alloc_array_clear(UINT8,size);
 }
 
 static void expat_free(void *ptr)
 {
-	free(ptr);
+	global_free(ptr);
 }

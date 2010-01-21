@@ -304,7 +304,7 @@ void ResetWhichGamesInFolders(void)
 	UINT	i, jj, k;
 	BOOL b;
 	int nGames = driver_list_get_count(drivers);
-dprintf("ResetWhichGamesInFolders : %d [%d]\n",nGames,numFolders);
+
 	for (i = 0; i < numFolders; i++)
 	{
 		LPTREEFOLDER lpFolder = treeFolders[i];
@@ -1605,19 +1605,12 @@ BOOL InitFolders(void)
 							fExData->m_nIconId,dwFolderFlags));
 	}
 
-	dprintf("CreateAllChildFolders");
 	CreateAllChildFolders();
-dprintf("CreateTreeIcons");
 	CreateTreeIcons();
-dprintf("ResetWhichGamesInFolders");
 	ResetWhichGamesInFolders();
-dprintf("ResetTreeViewFolders");
 	ResetTreeViewFolders();
-dprintf("SelectTreeViewFolder");
 	SelectTreeViewFolder(GetSavedFolderID());
-dprintf("LoadFolderFlags");
 	LoadFolderFlags();
-	dprintf("end of InitFolders");
 	return TRUE;
 }
 
