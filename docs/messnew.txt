@@ -2,6 +2,7 @@
 
 New System Drivers Supported:
 -----------------------------
+- Casio PV-1000  [Wilbert Pol]
 - Research Machines Nimbus [Phill Harvey-Smith]
 
 
