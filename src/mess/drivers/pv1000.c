@@ -7,11 +7,16 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "devices/cartslot.h"
+#include "streams.h"
+
+
+#define SOUND_PV1000	DEVICE_GET_INFO_NAME(pv1000_sound)
 
 
 static UINT8 *pv1000_ram;
 static UINT8 pv1000_io_regs[8];
 static UINT8 pv1000_fd_data;
+static sound_stream *pv1000_sh_channel;
 
 
 static WRITE8_HANDLER( pv1000_io_w );
@@ -44,9 +49,18 @@ static WRITE8_HANDLER( pv1000_gfxram_w )
 static WRITE8_HANDLER( pv1000_io_w )
 {
 //	logerror("pv1000_io_w offset=%02x, data=%02x\n", offset, data );
-	if ( offset == 0x05 )
+	switch ( offset )
 	{
+	case 0x00:
+	case 0x01:
+	case 0x02:
+	case 0x03:
+		/* Sound i/O ports */
+		break;
+
+	case 0x05:
 		pv1000_fd_data = 1;
+		break;
 	}
 
 	pv1000_io_regs[offset] = data;
@@ -186,6 +200,39 @@ static VIDEO_UPDATE( pv1000 )
 }
 
 
+static STREAM_UPDATE( pv1000_sound_update )
+{
+	stream_sample_t *buffer = outputs[0];
+
+	while( samples > 0 )
+	{
+		*buffer = 0;
+		buffer++;
+		samples--;
+	}
+}
+
+
+static DEVICE_START( pv1000_sound )
+{
+	pv1000_sh_channel = stream_create( device, 0, 1, device->clock, 0, pv1000_sound_update );
+}
+
+
+static DEVICE_GET_INFO( pv1000_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(pv1000_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "NEC D65010G031");				break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+	}
+}
+
+
 static TIMER_DEVICE_CALLBACK( pv1000_irq )
 {
 	const device_config *cpu = devtag_get_device( timer->machine, "maincpu" );
@@ -237,8 +284,12 @@ static MACHINE_DRIVER_START( pv1000 )
 	MDRV_PALETTE_INIT( pv1000 )
 	MDRV_GFXDECODE( pv1000 )
 
-	/* uPD4016c / D65010G031 - Video & sound chip */
+	/* D65010G031 - Video & sound chip */
 	MDRV_VIDEO_UPDATE( pv1000 )
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD( "pv1000_sound", PV1000, 17897725 )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	/* Cartridge slot */
 	MDRV_CARTSLOT_ADD( "cart" )
