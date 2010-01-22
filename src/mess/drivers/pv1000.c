@@ -44,6 +44,11 @@ static WRITE8_HANDLER( pv1000_gfxram_w )
 static WRITE8_HANDLER( pv1000_io_w )
 {
 //	logerror("pv1000_io_w offset=%02x, data=%02x\n", offset, data );
+	if ( offset == 0x05 )
+	{
+		pv1000_tmp = 1;
+	}
+
 	pv1000_io_regs[offset] = data;
 }
 
@@ -59,19 +64,7 @@ static READ8_HANDLER( pv1000_io_r )
 	case 0x04:
 		/* Bit 1 = 1 => to pass checks in Amidar? */
 		/* Bit 0 = 0 => done reading joystick interface? */
-		data &= 0xFE;
-		if ( ( pv1000_io_regs[5] & 0x1F ) == 0x00 )
-		{
-			if ( pv1000_tmp == 0 )
-			{
-				data = ( data & 0xFD ) | 0x01;
-			}
-			pv1000_tmp = 0;
-		}
-		else
-		{
-			pv1000_tmp = 1;
-		}
+		data = pv1000_tmp ? 0x02 : 0x01;
 		break;
 	case 0x05:
 		data = 0;
@@ -91,6 +84,7 @@ static READ8_HANDLER( pv1000_io_r )
 		{
 			data = input_port_read( space->machine, "IN0" );
 		}
+		pv1000_tmp = 0;
 		break;
 	}
 
