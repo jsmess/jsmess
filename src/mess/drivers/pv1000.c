@@ -11,7 +11,7 @@
 
 static UINT8 *pv1000_ram;
 static UINT8 pv1000_io_regs[8];
-static UINT8 pv1000_tmp;
+static UINT8 pv1000_fd_data;
 
 
 static WRITE8_HANDLER( pv1000_io_w );
@@ -46,7 +46,7 @@ static WRITE8_HANDLER( pv1000_io_w )
 //	logerror("pv1000_io_w offset=%02x, data=%02x\n", offset, data );
 	if ( offset == 0x05 )
 	{
-		pv1000_tmp = 1;
+		pv1000_fd_data = 1;
 	}
 
 	pv1000_io_regs[offset] = data;
@@ -64,7 +64,7 @@ static READ8_HANDLER( pv1000_io_r )
 	case 0x04:
 		/* Bit 1 = 1 => to pass checks in Amidar? */
 		/* Bit 0 = 0 => done reading joystick interface? */
-		data = pv1000_tmp ? 0x02 : 0x01;
+		data = pv1000_fd_data ? 0x02 : 0x01;
 		break;
 	case 0x05:
 		data = 0;
@@ -84,7 +84,7 @@ static READ8_HANDLER( pv1000_io_r )
 		{
 			data = input_port_read( space->machine, "IN0" );
 		}
-		pv1000_tmp = 0;
+		pv1000_fd_data = 0;
 		break;
 	}
 
@@ -196,7 +196,7 @@ static TIMER_DEVICE_CALLBACK( pv1000_irq )
 static MACHINE_RESET( pv1000 )
 {
 	pv1000_io_regs[5] = 0;
-	pv1000_tmp = 0;
+	pv1000_fd_data = 0;
 }
 
 
