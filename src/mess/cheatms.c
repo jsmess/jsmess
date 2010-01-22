@@ -31,11 +31,13 @@ static void build_crc_table(running_machine *machine)
 {
 	int	listIdx;
 	const device_config *img;
+	static UINT32 *tmp_list = NULL;
 
 	free(device_crc_list);
 
 	/* allocate list with single member (0x00000000) */
 	device_crc_list = (UINT32*)malloc(sizeof(UINT32));
+	memset(device_crc_list,0,sizeof(UINT32));
 	device_crc_list_length = 1;
 
 	for (img = image_device_first(machine->config); img != NULL; img = image_device_next(img))
@@ -59,8 +61,11 @@ static void build_crc_table(running_machine *machine)
 			{
 				if(!this_game_crc)
 					this_game_crc = crc;
+					
+				tmp_list = (UINT32*)malloc((device_crc_list_length + 1) * sizeof(UINT32));
+				memcpy(tmp_list,device_crc_list,device_crc_list_length * sizeof(UINT32));
 				if (device_crc_list) free(device_crc_list);
-				device_crc_list = (UINT32*)malloc((device_crc_list_length + 1) * sizeof(UINT32));
+				device_crc_list = tmp_list;
 
 				device_crc_list[device_crc_list_length] = crc;
 				device_crc_list_length++;
