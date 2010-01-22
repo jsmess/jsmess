@@ -14,6 +14,16 @@ SOFTWARE_START( arczone )
 	ROM_LOAD( "arczone.bin", 0x0000, 0x8000, CRC(f88f2d25) SHA1(4f3022126f33964e0fb5505fa0caeaa13b995309) )
 SOFTWARE_END
 
+SOFTWARE_START( aforce )
+	ROM_REGION( 0x10000, CARTRIDGE_REGION_ROM, 0 )
+	ROM_LOAD( "aforce.bin", 0x0000, 0x10000, CRC(eca6c0ad) SHA1(aa2c3774eb48df0854d4b61997653f79a810f4cc) )
+SOFTWARE_END
+
+SOFTWARE_START( bftale )
+	ROM_REGION( 0x10000, CARTRIDGE_REGION_ROM, 0 )
+	ROM_LOAD( "bftale.bin", 0x0000, 0x10000, CRC(211d268b) SHA1(3d62acc2db46bb7b6a2909d640dec6ce095aeec3) )
+SOFTWARE_END
+
 SOFTWARE_START( c5in1 )
 	ROM_REGION( 0x10000, CARTRIDGE_REGION_ROM, 0 )
 	ROM_LOAD( "5in1.bin", 0x00000, 0x10000, CRC(ff0da355) SHA1(fb4ba6c9823808c2705f597294b784837342cbcb) )
@@ -52,6 +62,8 @@ SOFTWARE_END
 
 SOFTWARE_LIST_START( megaduck_cart )
 	SOFTWARE( arczone,  0,         1993, "Commin", "Arctic Zone", 0, 0 )
+	SOFTWARE( aforce,   0,         1993, "Commin", "Armour Force", 0, 0 )
+	SOFTWARE( bftale,   0,         1993, "Commin", "Black Forest Tale", 0, 0 )
 	SOFTWARE( c5in1,    0,         1993, "Commin", "Commin 5 in 1", 0, 0 )
 	SOFTWARE( magitowr, 0,         1993, "Sachen", "Magical Tower", 0, 0 )
 	SOFTWARE( md4in1,   0,         1993, "Sachen", "Mega Duck 4 in 1 Game", 0, 0 )
