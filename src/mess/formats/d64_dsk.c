@@ -28,12 +28,30 @@ groups of 4 bytes into groups of 5 bytes, below.
 */
 
 /*
+    Code  Error  Type   1541 error description
+    ----  -----  ----   ------------------------------
+     01    00    N/A    No error, Sektor ok.
+     02    20    Read   Header block not found
+     03    21    Seek   No sync character
+     04    22    Read   Data block not present
+     05    23    Read   Checksum error in data block
+     06    24    Write  Write verify (on format)
+     07    25    Write  Write verify error
+     08    26    Write  Write protect on
+     09    27    Seek   Checksum error in header block
+     0A    28    Write  Write error
+     0B    29    Seek   Disk ID mismatch
+     0F    74    Read   Disk Not Ready (no device 1)
+*/
+
+/*
 
     TODO:
 
-	- cleanup
-    - disk errors
 	- D71
+	- cleanup
+	- dos2_encode_gcr() function
+    - disk errors
 	- D80/D82
 	- variable gaps
 
@@ -46,45 +64,62 @@ groups of 4 bytes into groups of 5 bytes, below.
 
 #define LOG 1
 
-#define HEADER_LENGTH	0x2ac		 /* standard length for 84 half tracks */
 #define HALF_TRACKS		84
+#define SECTOR_SIZE		256
+
 #define OFFSET_INVALID	0xbadbad
 
-#define D64_MAX_TRACKS         35 * 2
-#define D64_40T_MAX_TRACKS     40 * 2
-#define D71_MAX_TRACKS         70
-#define D81_MAX_TRACKS 80
-#define D80_MAX_TRACKS 77
+#define D71_MAX_TRACKS      70
+#define D81_MAX_TRACKS		80
+#define D80_MAX_TRACKS		77
 /* Still have to investigate if these are read as 154 or as 77 in the drive... */
 /* For now we assume it's 154, but I'm not sure */
-#define D82_MAX_TRACKS 154
+#define D82_MAX_TRACKS		154
 
-static const int d64_sectors_per_track[] =
+#define D64_SIZE_35_TRACKS				174848
+#define D64_SIZE_35_TRACKS_WITH_ERRORS	175531
+#define D64_SIZE_40_TRACKS				196608
+#define D64_SIZE_40_TRACKS_WITH_ERRORS	197376
+#define D64_SIZE_42_TRACKS				205312
+#define D64_SIZE_42_TRACKS_WITH_ERRORS	206114
+#define D71_SIZE_70_TRACKS				349696
+#define D71_SIZE_70_TRACKS_WITH_ERRORS	351062
+
+static const int D64_SECTORS_PER_TRACK[] =
 {
 	21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21,
 	19, 19, 19, 19, 19, 19, 19,
 	18, 18, 18, 18, 18, 18,
 	17, 17, 17, 17, 17,
-	17, 17, 17, 17, 17,		/* only for 40 tracks d64 */
-	17, 17					/* in principle the drive could read 42 tracks */
+	17, 17, 17, 17, 17,
+	17, 17
+};
+
+static const int D64_SPEED_ZONE[] =
+{
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	2, 2, 2, 2, 2, 2, 2,
+	1, 1, 1, 1, 1, 1,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 #if 0
-static const int d71_sectors_per_track[] =
-{
-	21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21,
-	19, 19, 19, 19, 19, 19, 19,
-	18, 18, 18, 18, 18, 18,
-	17, 17, 17, 17, 17,
-	21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21,
-	19, 19, 19, 19, 19, 19, 19,
-	18, 18, 18, 18, 18, 18,
-	17, 17, 17, 17, 17
-};
 
-/* Each track in a d81 file has 40 sectors, so no need of a sectors_per_track table */
+/*
 
-static const int d80_sectors_per_track[] =
+	CBM8050/8250 Format
+
+	29sectors/track for track 1-39/78-116
+	27sectors/track for track 40-53/117-130
+	25sectors/track for track 54-64/131-141
+	23sectors/track for track 65-77/142-154
+
+	BAM on track 38 (8050 2 blocks, 8250 4 blocks, rest is free for files)
+	DIR on track 39 (1 block for header, 28 blocks for dir entries)
+
+*/
+
+static const int D80_SECTORS_PER_TRACK[] =
 {
 	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
 	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
@@ -93,7 +128,7 @@ static const int d80_sectors_per_track[] =
 	23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23
 };
 
-static const int d82_sectors_per_track[] =
+static const int D82_SECTORS_PER_TRACK[] =
 {
 	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
 	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
@@ -106,32 +141,15 @@ static const int d82_sectors_per_track[] =
 	25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25,
 	23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23
 };
-
-
-static const int max_tracks_per_format[] =
-{
-	D64_MAX_TRACKS,
-	D64_MAX_TRACKS,
-	D64_40T_MAX_TRACKS,
-	D64_40T_MAX_TRACKS,
-	D64_MAX_TRACKS,
-	D71_MAX_TRACKS,
-	D71_MAX_TRACKS,
-	D81_MAX_TRACKS,
-	D80_MAX_TRACKS,
-	D82_MAX_TRACKS,
-	0
-};
-
 #endif
 
 struct d64dsk_tag
 {
 	int heads;
 	int tracks;
-	int track_offset[HALF_TRACKS];			/* offset within data for each half track */
-	UINT32 speed_zone_offset[HALF_TRACKS];	/* speed zone for each half track */
-	int error[HALF_TRACKS];					/* DOS error code for each half track */
+	int track_offset[2][HALF_TRACKS];	/* offset within data for each half track */
+	UINT32 speed_zone[HALF_TRACKS];		/* speed zone for each half track */
+	int error[HALF_TRACKS];				/* DOS error code for each half track */
 
 	int id1, id2;
 };
@@ -158,7 +176,7 @@ static int d64_get_tracks_per_disk(floppy_image *floppy)
 	return get_tag(floppy)->tracks;
 }
 
-static floperr_t get_track_offset(floppy_image *floppy, int track, UINT64 *offset)
+static floperr_t get_track_offset(floppy_image *floppy, int head, int track, UINT64 *offset)
 {
 	struct d64dsk_tag *tag = get_tag(floppy);
 	UINT64 offs = 0;
@@ -166,7 +184,7 @@ static floperr_t get_track_offset(floppy_image *floppy, int track, UINT64 *offse
 	if ((track < 0) || (track >= tag->tracks))
 		return FLOPPY_ERROR_SEEKERROR;
 
-	offs = tag->track_offset[track];
+	offs = tag->track_offset[head][track];
 
 	if (offset)
 		*offset = offs;
@@ -228,8 +246,8 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 	UINT64 track_offset;
 
 	/* get track offset */
-	err = get_track_offset(floppy, track, &track_offset);
-
+	err = get_track_offset(floppy, head, track, &track_offset);
+logerror("D64 read head %u track %.1f\n", head, get_track_index(track));
 	if (err)
 		return err;
 
@@ -240,7 +258,7 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 		int id2 = get_tag(floppy)->id2;
 		int full_track = track / 2;
 		int dos_track = full_track + 1;
-		int sectors_per_track = d64_sectors_per_track[full_track];
+		int sectors_per_track = D64_SECTORS_PER_TRACK[full_track];
 
 		UINT16 d64_track_size = sectors_per_track * 256;
 		UINT16 gcr_track_size = 2 + (sectors_per_track * 368);
@@ -357,17 +375,50 @@ static floperr_t d64_write_track(floppy_image *floppy, int head, int track, UINT
 	return FLOPPY_ERROR_UNSUPPORTED;
 }
 
+static void d64_identify(floppy_image *floppy, int *heads, int *tracks, bool *has_errors)
+{
+	switch (floppy_image_size(floppy))
+	{
+	case D64_SIZE_35_TRACKS:				*heads = 1;	*tracks = 35; *has_errors = false; break;
+	case D64_SIZE_35_TRACKS_WITH_ERRORS:	*heads = 1;	*tracks = 35; *has_errors = true;  break;
+	case D64_SIZE_40_TRACKS:				*heads = 1; *tracks = 40; *has_errors = false; break;
+	case D64_SIZE_40_TRACKS_WITH_ERRORS:	*heads = 1;	*tracks = 40; *has_errors = true;  break;
+	case D64_SIZE_42_TRACKS:				*heads = 1;	*tracks = 42; *has_errors = false; break;
+	case D64_SIZE_42_TRACKS_WITH_ERRORS:	*heads = 1;	*tracks = 42; *has_errors = true;  break;
+	case D71_SIZE_70_TRACKS:				*heads = 2;	*tracks = 35; *has_errors = false; break;
+	case D71_SIZE_70_TRACKS_WITH_ERRORS:	*heads = 2;	*tracks = 35; *has_errors = true;  break;
+	}
+}
+
 FLOPPY_IDENTIFY( d64_dsk_identify )
 {
-	UINT64 size = floppy_image_size(floppy);
+	int heads = 0, tracks = 0;
+	bool has_errors = false;
 
-	if ((size == 0x2ab00) || (size == 0x2ab00 + 0x2ab) || (size == 0x30000) || (size == 0x30000 + 0x300))
+	*vote = 0;
+
+	d64_identify(floppy, &heads, &tracks, &has_errors);
+
+	if (heads == 1 && (tracks == 35 || tracks == 40 || tracks == 42))
 	{
 		*vote = 100;
 	}
-	else
+
+	return FLOPPY_ERROR_SUCCESS;
+}
+
+FLOPPY_IDENTIFY( d71_dsk_identify )
+{
+	int heads = 0, tracks = 0;
+	bool has_errors = false;
+
+	*vote = 0;
+
+	d64_identify(floppy, &heads, &tracks, &has_errors);
+
+	if (heads == 2 && tracks == 35)
 	{
-		*vote = 0;
+		*vote = 100;
 	}
 
 	return FLOPPY_ERROR_SUCCESS;
@@ -378,10 +429,12 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 	struct FloppyCallbacks *callbacks;
 	struct d64dsk_tag *tag;
 	UINT8 id[2];
-	UINT64 size = floppy_image_size(floppy);	// needed to set track #
+
 	int track_offset = 0;
-	int track_count = 0;
-	int i;
+	int head, track;
+	
+	int heads = 0, dos_tracks = 0;
+	bool has_errors;
 
 	if (params)
 	{
@@ -393,57 +446,54 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 
 	if (!tag) return FLOPPY_ERROR_OUTOFMEMORY;
 
-	/* number of half tracks */
-	if ((size == 0x2ab00) || (size == 0x2ab00 + 0x2ab))
-		track_count = D64_MAX_TRACKS;
+	/* identify image type */
+	d64_identify(floppy, &heads, &dos_tracks, &has_errors);
 
-	if ((size == 0x30000) || (size == 0x30000 + 0x300))
-		track_count = D64_40T_MAX_TRACKS;
+	tag->heads = heads;
+	tag->tracks = HALF_TRACKS;
 
-	if (LOG) logerror("D64 tracks: %u\n", track_count / 2);
-
-	tag->heads = 1;
-	tag->tracks = 84;
-
-	/* data offsets */
-	for (i = 0; i < tag->tracks; i++)
-	{
-		if ((i % 2) || (i >= track_count))
-		{
-			/* half track */
-			tag->track_offset[i] = OFFSET_INVALID;
-		}
-		else
-		{
-			/* full track */
-			tag->track_offset[i] = track_offset;
-			track_offset += d64_sectors_per_track[i / 2] * 0x100;
-		}
-
-		if (LOG) logerror("D64 track %.1f data offset: %04x\n", get_track_index(i), tag->track_offset[i]);
-	}
-
-	/* speed zone offsets */
-	for (i = 0; i < tag->tracks; i++)
-	{
-		if (i < 0x11)
-			tag->speed_zone_offset[2 * i] = 3;
-		else if (i < 0x18)
-			tag->speed_zone_offset[2 * i] = 2;
-		else if (i < 0x1e)
-			tag->speed_zone_offset[2 * i] = 1;
-		else
-			tag->speed_zone_offset[2 * i] = 0;
-
-		tag->speed_zone_offset[2 * i + 1] = 0;
-
-		if (LOG) logerror("D64 track %.1f speed zone: %u\n", get_track_index(i), tag->speed_zone_offset[i]);
-	}
-
-	floppy_image_read(floppy, id, get_tag(floppy)->track_offset[34] + 0xa2, 2);
+	/* read format ID from directory */
+	floppy_image_read(floppy, id, get_tag(floppy)->track_offset[0][34] + 0xa2, 2);
 
 	get_tag(floppy)->id1 = id[0];
 	get_tag(floppy)->id2 = id[1];
+
+	if (LOG)
+	{
+		logerror("D64 size: %04x\n", (UINT32)floppy_image_size(floppy));
+		logerror("D64 heads: %u\n", heads);
+		logerror("D64 tracks: %u\n", dos_tracks);
+		logerror("D64 format ID: %02x%02x\n", id[0], id[1]);
+	}
+
+	/* data offsets */
+	for (head = 0; head < heads; head++)
+	{
+		for (track = 0; track < tag->tracks; track++)
+		{
+			if ((track % 2) || ((track / 2) >= dos_tracks))
+			{
+				/* half track or out of range */
+				tag->track_offset[head][track] = OFFSET_INVALID;
+			}
+			else
+			{
+				/* full track */
+				tag->track_offset[head][track] = track_offset;
+				track_offset += D64_SECTORS_PER_TRACK[track / 2] * SECTOR_SIZE;
+			}
+
+			if (LOG) logerror("D64 head %u track %.1f data offset: %04x\n", head, get_track_index(track), tag->track_offset[head][track]);
+		}
+	}
+
+	/* speed zones */
+	for (track = 0; track < tag->tracks; track++)
+	{
+		tag->speed_zone[track] = D64_SPEED_ZONE[track / 2];
+
+		if (LOG) logerror("D64 track %.1f speed zone: %u\n", get_track_index(track), tag->speed_zone[track]);
+	}
 
 	/* set callbacks */
 	callbacks = floppy_callbacks(floppy);

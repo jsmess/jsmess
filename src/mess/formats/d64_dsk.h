@@ -12,6 +12,7 @@
 #include "formats/flopimg.h"
 
 FLOPPY_IDENTIFY( d64_dsk_identify );
+FLOPPY_IDENTIFY( d71_dsk_identify );
 FLOPPY_CONSTRUCT( d64_dsk_construct );
 
 #endif

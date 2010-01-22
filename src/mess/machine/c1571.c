@@ -81,6 +81,7 @@ struct _c1571_t
 	int stp;							/* stepping motor */
 	int soe;							/* s? output enable */
 	int mode;							/* mode (0 = write, 1 = read) */
+	int side;							/* disk side select */
 
 	int data_out;						/* serial data out */
 	int atn_ack;						/* attention acknowledge */
@@ -380,6 +381,7 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
 	iec_srq_w(device->owner);
 
 	/* side select */
+	c1571->side = BIT(data, 2);
 	wd17xx_set_side(c1571->wd1770, BIT(data, 2));
 
 	/* attention out */
@@ -598,7 +600,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 			floppy_drive_seek(c1571->image, tracks);
 
 			/* read track data */
-			floppy_drive_read_track_data_info_buffer(c1571->image, 0, c1571->track_buffer, &c1571->track_len);
+			floppy_drive_read_track_data_info_buffer(c1571->image, c1571->side, c1571->track_buffer, &c1571->track_len);
 
 			/* extract track length */
 			c1571->track_len = (c1571->track_buffer[1] << 8) | c1571->track_buffer[0];
@@ -727,7 +729,7 @@ static const wd17xx_interface c1571_wd1770_intf =
 static FLOPPY_OPTIONS_START( c1571 )
 	FLOPPY_OPTION( c1571, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
 	FLOPPY_OPTION( c1571, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
-//  FLOPPY_OPTION( c1571, "d71", "Commodore 1571 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
+	FLOPPY_OPTION( c1571, "d71", "Commodore 1571 Disk Image", d71_dsk_identify, d64_dsk_construct, NULL )
 FLOPPY_OPTIONS_END
 
 /*-------------------------------------------------
