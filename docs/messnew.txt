@@ -24,6 +24,8 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
+- [C64] Added read-only access to D64 floppies. [Fabio Priuli, Curt Coder]
+
 - [C128] Fast IEC serial bus is now supported with a 1571. [Curt Coder]
 
 - [MIKROMIK] Fixed memory banking regression. [Curt Coder]

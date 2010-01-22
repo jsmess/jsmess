@@ -25,6 +25,7 @@
 #include "c1571.h"
 #include "cpu/m6502/m6502.h"
 #include "devices/flopdrv.h"
+#include "formats/d64_dsk.h"
 #include "formats/g64_dsk.h"
 #include "machine/6522via.h"
 #include "machine/6526cia.h"
@@ -725,7 +726,7 @@ static const wd17xx_interface c1571_wd1770_intf =
 
 static FLOPPY_OPTIONS_START( c1571 )
 	FLOPPY_OPTION( c1571, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
-//  FLOPPY_OPTION( c1571, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
+	FLOPPY_OPTION( c1571, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
 //  FLOPPY_OPTION( c1571, "d71", "Commodore 1571 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
 FLOPPY_OPTIONS_END
 

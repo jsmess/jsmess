@@ -141,6 +141,7 @@
 #include "c1541.h"
 #include "cpu/m6502/m6502.h"
 #include "devices/flopdrv.h"
+#include "formats/d64_dsk.h"
 #include "formats/g64_dsk.h"
 #include "machine/6522via.h"
 #include "machine/cbmiec.h"
@@ -945,8 +946,8 @@ static const via6522_interface c1541_via1_intf =
 -------------------------------------------------*/
 
 static FLOPPY_OPTIONS_START( c1541 )
-//  FLOPPY_OPTION( c1541, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
 	FLOPPY_OPTION( c1541, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
+	FLOPPY_OPTION( c1541, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
 FLOPPY_OPTIONS_END
 
 /*-------------------------------------------------
