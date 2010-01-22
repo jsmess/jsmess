@@ -398,6 +398,7 @@ DRVLIBS = \
 #-------------------------------------------------
 
 $(MESSOBJ)/shared.a: \
+	$(MESS_DEVICES)/imagedev.o	\
 	$(MAME_MACHINE)/pckeybrd.o	\
 	$(MESS_AUDIO)/lmc1992.o		\
 	$(MESS_AUDIO)/mea8000.o		\

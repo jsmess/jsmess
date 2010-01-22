@@ -47,7 +47,6 @@ struct _image_slot_data
     device_image_load_func load;
     device_image_create_func create;
     device_image_unload_func unload;
-    device_image_verify_func verify;
 
     /* error related info */
     image_error_t err;
@@ -241,7 +240,6 @@ void image_init(running_machine *machine)
         slot->load = (device_image_load_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_LOAD);
         slot->create = (device_image_create_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_CREATE);
         slot->unload = (device_image_unload_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_UNLOAD);
-        slot->verify = (device_image_verify_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_VERIFY);
 
 		/* sodftware list and entry */
 		slot->software_list_ptr = software_list_get_by_name( device_get_info_string(slot->dev, DEVINFO_STR_SOFTWARE_LIST) );
@@ -402,15 +400,6 @@ int image_device_count(const machine_config *config)
 static void get_device_name(const device_config *device, char *buffer, size_t buffer_len)
 {
     const char *name = NULL;
-    device_get_name_func get_name;
-
-    if (name == NULL)
-    {
-        /* first try a get_name function */
-        get_name = (device_get_name_func) device_get_info_fct_offline(device, DEVINFO_FCT_GET_NAME);
-        if (get_name != NULL)
-            name = get_name(device, buffer, buffer_len);
-    }
 
     if (name == NULL)
     {
@@ -815,7 +804,6 @@ static int image_load_internal(const device_config *image, const char *path,
 {
     running_machine *machine = image->machine;
     image_error_t err;
-    const void *buffer;
     UINT32 open_plan[4];
     int i;
     image_slot_data *slot = find_image_slot(image);
@@ -887,26 +875,6 @@ static int image_load_internal(const device_config *image, const char *path,
     {
         slot->err = IMAGE_ERROR_FILENOTFOUND;
         goto done;
-    }
-
-    /* if applicable, call device verify */
-    if ((slot->verify != NULL) && !image_has_been_created(image))
-    {
-        /* access the memory */
-        buffer = image_ptr(image);
-        if (!buffer)
-        {
-            slot->err = IMAGE_ERROR_OUTOFMEMORY;
-            goto done;
-        }
-
-        /* verify the file */
-        err = (image_error_t)(*slot->verify)((const UINT8*)buffer, core_fsize(slot->file));
-        if (err)
-        {
-            slot->err = IMAGE_ERROR_INVALIDIMAGE;
-            goto done;
-        }
     }
 
     /* call device load or create */
