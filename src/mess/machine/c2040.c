@@ -11,6 +11,7 @@
 #include "c2040.h"
 #include "cpu/m6502/m6502.h"
 #include "devices/flopdrv.h"
+#include "formats/d64_dsk.h"
 #include "formats/g64_dsk.h"
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
@@ -792,9 +793,7 @@ static const riot6532_interface c8050_riot2_intf =
 -------------------------------------------------*/
 
 static FLOPPY_OPTIONS_START( c2040 )
-//	FLOPPY_OPTION( c2040, "d67", "Commodore 2040 (DOS 1) Disk Image", d67_dsk_identify, d67_dsk_construct, NULL )
-//  FLOPPY_OPTION( c2040, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
-	FLOPPY_OPTION( c2040, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
+	FLOPPY_OPTION( c2040, "d67", "Commodore 2040 (DOS 1) Disk Image", d67_dsk_identify, d64_dsk_construct, NULL )
 FLOPPY_OPTIONS_END
 
 /*-------------------------------------------------
@@ -802,7 +801,7 @@ FLOPPY_OPTIONS_END
 -------------------------------------------------*/
 
 static FLOPPY_OPTIONS_START( c3040 )
-//  FLOPPY_OPTION( c3040, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
+	FLOPPY_OPTION( c3040, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
 	FLOPPY_OPTION( c3040, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
 FLOPPY_OPTIONS_END
 
@@ -811,7 +810,7 @@ FLOPPY_OPTIONS_END
 -------------------------------------------------*/
 
 static FLOPPY_OPTIONS_START( c8050 )
-//	FLOPPY_OPTION( c8050, "d80", "Commodore 8050 Disk Image", d80_dsk_identify, d80_dsk_construct, NULL )
+	FLOPPY_OPTION( c8050, "d80", "Commodore 8050 Disk Image", d80_dsk_identify, d64_dsk_construct, NULL )
 FLOPPY_OPTIONS_END
 
 /*-------------------------------------------------
@@ -819,8 +818,8 @@ FLOPPY_OPTIONS_END
 -------------------------------------------------*/
 
 static FLOPPY_OPTIONS_START( c8250 )
-//	FLOPPY_OPTION( c8250, "d80", "Commodore 8050 Disk Image", d80_dsk_identify, d80_dsk_construct, NULL )
-//	FLOPPY_OPTION( c8250, "d82", "Commodore 8250/SFD1001 Disk Image", d82_dsk_identify, d82_dsk_construct, NULL )
+	FLOPPY_OPTION( c8250, "d80", "Commodore 8050 Disk Image", d80_dsk_identify, d64_dsk_construct, NULL )
+	FLOPPY_OPTION( c8250, "d82", "Commodore 8250/SFD1001 Disk Image", d82_dsk_identify, d64_dsk_construct, NULL )
 FLOPPY_OPTIONS_END
 
 /*-------------------------------------------------
