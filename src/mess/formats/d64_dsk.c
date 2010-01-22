@@ -48,7 +48,6 @@ groups of 4 bytes into groups of 5 bytes, below.
 
     TODO:
 
-	- D71
 	- cleanup
 	- dos2_encode_gcr() function
     - disk errors
@@ -64,7 +63,9 @@ groups of 4 bytes into groups of 5 bytes, below.
 
 #define LOG 1
 
-#define HALF_TRACKS		84
+#define MAX_HEADS		2
+#define MAX_TRACKS		84
+#define MAX_SECTORS		802
 #define SECTOR_SIZE		256
 
 #define OFFSET_INVALID	0xbadbad
@@ -145,13 +146,14 @@ static const int D82_SECTORS_PER_TRACK[] =
 
 struct d64dsk_tag
 {
-	int heads;
-	int tracks;
-	int track_offset[2][HALF_TRACKS];	/* offset within data for each half track */
-	UINT32 speed_zone[HALF_TRACKS];		/* speed zone for each half track */
-	int error[HALF_TRACKS];				/* DOS error code for each half track */
+	int heads;									/* number of physical heads */
+	int tracks;									/* number of physical tracks */
+	int dos_tracks;								/* number of logical tracks */
+	int track_offset[MAX_HEADS][MAX_TRACKS];	/* offset within image for each physical track */
+	UINT32 speed_zone[MAX_TRACKS];				/* speed zone for each physical track */
+	int error[MAX_SECTORS];						/* error code for each logical sector */
 
-	int id1, id2;
+	UINT8 id1, id2;								/* DOS disk format ID */
 };
 
 INLINE float get_track_index(int track)
@@ -247,7 +249,7 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 
 	/* get track offset */
 	err = get_track_offset(floppy, head, track, &track_offset);
-logerror("D64 read head %u track %.1f\n", head, get_track_index(track));
+
 	if (err)
 		return err;
 
@@ -267,6 +269,9 @@ logerror("D64 read head %u track %.1f\n", head, get_track_index(track));
 		UINT8 gcr_track_data[gcr_track_size];
 
 		UINT8 sector_checksum;
+
+		/* track numbers continue on the flip side */
+		if (head == 1) dos_track += get_tag(floppy)->dos_tracks;
 
 		if (buflen < gcr_track_size) fatalerror("D64 track buffer too small: %u!\n", (UINT32)buflen);
 
@@ -450,7 +455,8 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 	d64_identify(floppy, &heads, &dos_tracks, &has_errors);
 
 	tag->heads = heads;
-	tag->tracks = HALF_TRACKS;
+	tag->tracks = MAX_TRACKS;
+	tag->dos_tracks = dos_tracks;
 
 	/* read format ID from directory */
 	floppy_image_read(floppy, id, get_tag(floppy)->track_offset[0][34] + 0xa2, 2);
