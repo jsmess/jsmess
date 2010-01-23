@@ -996,7 +996,30 @@ int MameUIMain(HINSTANCE    hInstance,
 	{
 		/* Rename main because gcc will use it instead of WinMain even with -mwindows */
 		extern int /*DECL_SPEC*/ utf8_main(int, char**);
-		exit(utf8_main(__argc, __argv));
+		char **utf8_argv;
+		int i, rc;
+
+		/* convert arguments to UTF-8 */
+		utf8_argv = (char **) malloc(__argc * sizeof(*__targv));
+		if (utf8_argv == NULL)
+			return 999;
+		for (i = 0; i < __argc; i++)
+		{
+			utf8_argv[i] = utf8_from_tstring(__targv[i]);
+			dprintf("%d %s",i,utf8_argv[i]);
+			if (utf8_argv[i] == NULL)
+				return 999;
+		}
+
+		/* run utf8_main */
+		rc = utf8_main(__argc, utf8_argv);
+
+		/* free arguments */
+		for (i = 0; i < __argc; i++)
+			global_free(utf8_argv[i]);
+		global_free(utf8_argv);
+		
+		exit(rc);
 	}
 	if (!Win32UI_init(hInstance, lpCmdLine, nCmdShow))
 		return 1;
