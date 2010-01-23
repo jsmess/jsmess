@@ -268,7 +268,7 @@ static int GetMessIcon(int drvindex, int nSoftwareType)
     int nIconPos = 0;
     HICON hIcon = 0;
     const game_driver *drv;
-    char buffer[32];
+    char buffer[10000];
 	const char *iconname;
 
 	assert(drvindex >= 0);
@@ -404,8 +404,8 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 
 void MessUpdateSoftwareList(void)
 {
-	HWND hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
-	MyFillSoftwareList(Picker_GetSelectedItem(hwndList), TRUE);
+	//HWND hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
+	//MyFillSoftwareList(Picker_GetSelectedItem(hwndList), TRUE);
 }
 
 
@@ -415,7 +415,7 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 	machine_config *config;
 	const device_config *dev;
 	int nPos;
-	char szMessage[256];
+	char szMessage[10000];
 	LPCSTR pszSoftware;
 	BOOL bResult = FALSE;
 
@@ -646,7 +646,7 @@ static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_
 {
     BOOL success;
     OPENFILENAME of;
-    char szFilter[2048];
+    char szFilter[20480];
     LPSTR s;
 	const char *typname;
     int i;
@@ -869,36 +869,36 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 	mess_image_type imagetypes[64];
 	HWND hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
 	int drvindex = Picker_GetSelectedItem(hwndList);
-	astring *as = astring_alloc();
+	astring as;
 
 	/* Get the path to the currently mounted image */
-	zippath_parent(as, GetSelectedSoftware(drvindex, config, dev));
-	s = (TCHAR*)astring_c(as);
+	zippath_parent(&as, GetSelectedSoftware(drvindex, config, dev));
+	s = (TCHAR*)astring_c(&as);
 
 	/* See if an image was loaded, and that the path still exists */
-	if ((!osd_opendir(astring_c(as))) || (astring_chr(as, 0, ':') == -1))
+	if ((!osd_opendir(astring_c(&as))) || (astring_chr(&as, 0, ':') == -1))
 	{
 		/* Get the path from the software tab */
-		astring_cpyc(as, GetExtraSoftwarePaths(drvindex));
+		astring_cpyc(&as, GetExtraSoftwarePaths(drvindex));
 
 		/* We only want the first path; throw out the rest */
-		i = astring_chr(as, 0, ';');
-		if (i > 0) astring_substr(as, 0, i);
-		s = (TCHAR*)astring_c(as);
+		i = astring_chr(&as, 0, ';');
+		if (i > 0) astring_substr(&as, 0, i);
+		s = (TCHAR*)astring_c(&as);
 
 		/* Make sure a folder was specified in the tab, and that it exists */
-		if ((!osd_opendir(astring_c(as))) || (astring_chr(as, 0, ':') == -1))
+		if ((!osd_opendir(astring_c(&as))) || (astring_chr(&as, 0, ':') == -1))
 		{
 			/* Get the path from the system-wide software setting in the drop-down directory setup */
-			astring_cpyc(as, GetSoftwareDirs());
+			astring_cpyc(&as, GetSoftwareDirs());
 
 			/* We only want the first path; throw out the rest */
-			i = astring_chr(as, 0, ';');
-			if (i > 0) astring_substr(as, 0, i);
-			s = (TCHAR*)astring_c(as);
+			i = astring_chr(&as, 0, ';');
+			if (i > 0) astring_substr(&as, 0, i);
+			s = (TCHAR*)astring_c(&as);
 
 			/* Make sure a folder was specified in the tab, and that it exists */
-			if ((!osd_opendir(astring_c(as))) || (astring_chr(as, 0, ':') == -1))
+			if ((!osd_opendir(astring_c(&as))) || (astring_chr(&as, 0, ':') == -1))
 			{
 				/* Default to emu directory */
 				char mess_directory[1024];
@@ -906,13 +906,12 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 				s = (TCHAR*)mess_directory;
 
 				/* If software folder exists, use it instead */
-				zippath_combine(as, mess_directory, "software");
-				if (osd_opendir(astring_c(as))) s = (TCHAR*)astring_c(as);
+				zippath_combine(&as, mess_directory, "software");
+				if (osd_opendir(astring_c(&as))) s = (TCHAR*)astring_c(&as);
 			}
 		}
 	}
 
-	astring_free(as);
 	SetupImageTypes(config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
 	bResult = CommonFileImageDialog(s, GetOpenFileName, pszFilename, config, imagetypes);
 
@@ -937,29 +936,29 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 	mess_image_type imagetypes[64];
 	HWND hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
 	int drvindex = Picker_GetSelectedItem(hwndList);
-	astring *as = astring_alloc();
+	astring as;
 
 	/* Get the path from the software tab */
-	astring_cpyc(as, GetExtraSoftwarePaths(drvindex));
+	astring_cpyc(&as, GetExtraSoftwarePaths(drvindex));
 
 	/* We only want the first path; throw out the rest */
-	i = astring_chr(as, 0, ';');
-	if (i > 0) astring_substr(as, 0, i);
-	s = (TCHAR*)astring_c(as);
+	i = astring_chr(&as, 0, ';');
+	if (i > 0) astring_substr(&as, 0, i);
+	s = (TCHAR*)astring_c(&as);
 
 	/* Make sure a folder was specified in the tab, and that it exists */
-	if ((!osd_opendir(astring_c(as))) || (astring_chr(as, 0, ':') == -1))
+	if ((!osd_opendir(astring_c(&as))) || (astring_chr(&as, 0, ':') == -1))
 	{
 		/* Get the path from the system-wide software setting in the drop-down directory setup */
-		astring_cpyc(as, GetSoftwareDirs());
+		astring_cpyc(&as, GetSoftwareDirs());
 
 		/* We only want the first path; throw out the rest */
-		i = astring_chr(as, 0, ';');
-		if (i > 0) astring_substr(as, 0, i);
-		s = (TCHAR*)astring_c(as);
+		i = astring_chr(&as, 0, ';');
+		if (i > 0) astring_substr(&as, 0, i);
+		s = (TCHAR*)astring_c(&as);
 
 		/* Make sure a folder was specified in the tab, and that it exists */
-		if ((!osd_opendir(astring_c(as))) || (astring_chr(as, 0, ':') == -1))
+		if ((!osd_opendir(astring_c(&as))) || (astring_chr(&as, 0, ':') == -1))
 		{
 			/* Default to emu directory */
 			char mess_directory[1024];
@@ -967,12 +966,10 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 			s = (TCHAR*) mess_directory;
 
 			/* If software folder exists, use it instead */
-			zippath_combine(as, mess_directory, "software");
-			if (osd_opendir(astring_c(as))) s = (TCHAR*)astring_c(as);
+			zippath_combine(&as, mess_directory, "software");
+			if (osd_opendir(astring_c(&as))) s = (TCHAR*)astring_c(&as);
 		}
 	}
-
-	astring_free(as);
 
 	SetupImageTypes(config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
 	bResult = CommonFileImageDialog(s, GetSaveFileName, pszFilename, config, imagetypes);

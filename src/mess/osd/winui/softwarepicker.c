@@ -47,7 +47,7 @@ struct _file_info
 
 	const char *zip_entry_name;
 	const char *base_name;
-	char file_name[1];
+	char file_name[2];
 };
 
 typedef struct _directory_search_info directory_search_info;
@@ -56,7 +56,7 @@ struct _directory_search_info
 	directory_search_info *next;
 	HANDLE find_handle;
 	WIN32_FIND_DATA fd;
-	char directory_name[1];
+	char directory_name[2];
 };
 
 typedef struct _software_picker_info software_picker_info;
@@ -268,7 +268,7 @@ static BOOL SoftwarePicker_CalculateHash(HWND hwndPicker, int nIndex)
 			{
 				if (!mame_stricmp(zipent->filename, pFileInfo->zip_entry_name))
 				{
-					pBuffer = (unsigned char *)global_alloc_array_clear(unsigned char,zipent->uncompressed_length);
+					pBuffer = (unsigned char *)malloc(zipent->uncompressed_length);
 					if (pBuffer)
 					{
 						ziperr = zip_file_decompress(zip, pBuffer, zipent->uncompressed_length);
@@ -277,7 +277,7 @@ static BOOL SoftwarePicker_CalculateHash(HWND hwndPicker, int nIndex)
 							ComputeFileHash(pPickerInfo, pFileInfo, pBuffer, zipent->uncompressed_length);
 							rc = TRUE;
 						}
-						free(pBuffer);
+						global_free(pBuffer);
 					}
 				}
 				zipent = zip_file_next_file(zip);
@@ -398,7 +398,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 
 	// create the FileInfo structure
 	nSize = sizeof(file_info) + strlen(pszFilename);
-	pInfo = (file_info *) global_alloc_array(UINT8,nSize);
+	pInfo = (file_info *) malloc(nSize);
 	if (!pInfo)
 		goto error;
 	memset(pInfo, 0, nSize);
@@ -424,9 +424,9 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 	else
 		pInfo->base_name = pInfo->file_name;
 
-	ppNewIndex = (file_info**)global_alloc_array(UINT8,(pPickerInfo->file_index_length + 1) * sizeof(*pPickerInfo->file_index));
+	ppNewIndex = (file_info**)malloc((pPickerInfo->file_index_length + 1) * sizeof(*pPickerInfo->file_index));
 	memcpy(ppNewIndex,pPickerInfo->file_index,pPickerInfo->file_index_length * sizeof(*pPickerInfo->file_index));	
-	if (pPickerInfo->file_index) free(pPickerInfo->file_index);
+	if (pPickerInfo->file_index) global_free(pPickerInfo->file_index);
 	if (!ppNewIndex)
 		goto error;
 
@@ -535,7 +535,7 @@ BOOL SoftwarePicker_AddDirectory(HWND hwndPicker, LPCSTR pszDirectory)
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 
 	nSearchInfoSize = sizeof(directory_search_info) + strlen(pszDirectory);
-	pSearchInfo = (directory_search_info *)global_alloc_array(UINT8,nSearchInfoSize);
+	pSearchInfo = (directory_search_info *)malloc(nSearchInfoSize);
 	if (!pSearchInfo)
 		return FALSE;
 	memset(pSearchInfo, 0, nSearchInfoSize);
@@ -559,7 +559,7 @@ static void SoftwarePicker_FreeSearchInfo(directory_search_info *pSearchInfo)
 {
 	if (pSearchInfo->find_handle != INVALID_HANDLE_VALUE)
 		FindClose(pSearchInfo->find_handle);
-	free(pSearchInfo);
+	global_free(pSearchInfo);
 }
 
 
@@ -570,7 +570,7 @@ static void SoftwarePicker_InternalClear(software_picker_info *pPickerInfo)
 	int i;
 
 	for (i = 0; i < pPickerInfo->file_index_length; i++)
-		free(pPickerInfo->file_index[i]);
+		global_free(pPickerInfo->file_index[i]);
 
 	while(pPickerInfo->first_search_info)
 	{
@@ -613,7 +613,7 @@ static BOOL SoftwarePicker_AddEntry(HWND hwndPicker,
 		return FALSE;
 
 	if (!strcmp(utf8_FileName, ".") || !strcmp(utf8_FileName, "..")) {
-		free(utf8_FileName);
+		global_free(utf8_FileName);
 		return TRUE;
 	}
 
@@ -627,7 +627,7 @@ static BOOL SoftwarePicker_AddEntry(HWND hwndPicker,
 	else
 		rc = SoftwarePicker_InternalAddFile(hwndPicker, pszFilename, FALSE);
 
-		free(utf8_FileName);
+		global_free(utf8_FileName);
 	return rc;
 }
 
@@ -837,7 +837,8 @@ BOOL SetupSoftwarePicker(HWND hwndPicker, const struct PickerOptions *pOptions)
 
 	if (!SetupPicker(hwndPicker, pOptions))
 		goto error;
-	pPickerInfo = (software_picker_info *)global_alloc_clear(software_picker_info);
+	pPickerInfo = (software_picker_info *)malloc(sizeof(software_picker_info));
+	memset(pPickerInfo,0,sizeof(sizeof(software_picker_info*)));
 	if (!pPickerInfo)
 		goto error;
 	memset(pPickerInfo, 0, sizeof(*pPickerInfo));

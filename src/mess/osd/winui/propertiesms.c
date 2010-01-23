@@ -438,11 +438,11 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 		{
 			const char *s;
 
-			astring *buffer = astring_alloc();
-			astring_cpyc(buffer, config->extra_options);
-			astring_replacechr(buffer, ',', 0);
+			astring buffer;
+			astring_cpyc(&buffer, config->extra_options);
+			astring_replacechr(&buffer, ',', 0);
 
-			s = astring_c(buffer);
+			s = astring_c(&buffer);
 
 			/* try to parse each option */
 			while(*s != '\0')
@@ -468,7 +468,6 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 
 				s += strlen(s) + 1;
 			}
-			astring_free(buffer);
 		}
 
 		// set the combo box
