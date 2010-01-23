@@ -47,7 +47,7 @@
 
 
 // MAME/MAMEUI headers
-//#include "emu.h"
+#include "emu.h"
 #include "emuopts.h"
 #include "osdepend.h"
 #include "unzip.h"

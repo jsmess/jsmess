@@ -18,11 +18,13 @@
 ***************************************************************************/
 
 // standard windows headers
+#define CINTERFACE
 #define COBJMACROS
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
 #include <shlobj.h>
+#undef CINTERFACE
 
 // standard C headers
 #include <sys/stat.h>
@@ -758,14 +760,14 @@ BOOL BrowseForDirectory(HWND hwnd, LPCTSTR pStartDir, TCHAR* pResult)
 			_sntprintf(pResult, MAX_PATH, TEXT("%s"), buf);
 			bResult = TRUE;
 		}
-//		IMalloc_Free(piMalloc, pItemIDList);
+		IMalloc_Free(piMalloc, pItemIDList);
 	}
 	else
 	{
 		bResult = FALSE;
 	}
 
-	//IMalloc_Release(piMalloc);
+	IMalloc_Release(piMalloc);
 	return bResult;
 }
 

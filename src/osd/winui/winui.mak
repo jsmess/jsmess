@@ -32,7 +32,7 @@
 # WIN95_MULTIMON = 1
 
 # uncomment next line to enable a Unicode build
-# UNICODE = 1
+UNICODE = 1
 
 # set this to the minimum Direct3D version to support (8 or 9)
 ifndef DIRECT3D
@@ -56,9 +56,9 @@ endif
 #-------------------------------------------------
 
 ifdef PTR64
-EMULATOR = $(FULLNAME)ui64$(EXE)
+EMULATOR = $(NAME)ui64$(EXE)
 else
-EMULATOR = $(FULLNAME)ui32$(EXE)
+EMULATOR = $(NAME)ui32$(EXE)
 endif
 
 
@@ -191,7 +191,11 @@ ifdef UNICODE
 DEFS += -DUNICODE -D_UNICODE
 endif
 
+# ensure we statically link the gcc runtime lib
+LDFLAGS += -static-libgcc
 
+# add unicode flag to emulator linking only
+LDFLAGSEMULATOR += -municode
 
 #-------------------------------------------------
 # Windows-specific flags and libraries
@@ -232,12 +236,6 @@ LDFLAGSEMULATOR += \
 	-lkernel32 \
 	-lshell32 \
 	-lcomdlg32 \
-
-
-ifdef PTR64
-LIBS += -lbufferoverflowu
-endif
-
 
 
 #-------------------------------------------------
@@ -362,7 +360,7 @@ TOOLS += ledutil$(EXE)
 #-------------------------------------------------
 
 $(UISRC)/helpids.c : $(UIOBJ)/mkhelp$(EXE) $(UISRC)/resource.h $(UISRC)/resource.hm $(UISRC)/mameui.rc
-	$(UIOBJ)/mkhelp$(EXE) $(UISRC)/mameui.rc >$@
+	@"$(UIOBJ)/mkhelp$(EXE)" $(UISRC)/mameui.rc >$@
 
 # rule to build the generator
 $(UIOBJ)/mkhelp$(EXE): $(UIOBJ)/mkhelp.o $(LIBOCORE)
@@ -412,7 +410,7 @@ $(RESFILE): $(UISRC)/mameui.rc $(UIOBJ)/mamevers.rc
 
 $(UIOBJ)/mamevers.rc: $(OBJ)/build/verinfo$(EXE) $(SRC)/version.c
 	@echo Emitting $@...
-	@$(OBJ)/build/verinfo$(EXE) -b winui $(SRC)/version.c > $@
+	@"$(OBJ)/build/verinfo$(EXE)" -b winui $(SRC)/version.c > $@
 
 
 
