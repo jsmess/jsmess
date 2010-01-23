@@ -4,8 +4,8 @@
  *
  ****************************************************************************/
 
-#ifndef SPECTRUM_H
-#define SPECTRUM_H
+#ifndef __SPECTRUM_H__
+#define __SPECTRUM_H__
 
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
@@ -46,28 +46,6 @@
 #define TS2068_RIGHT_BORDER  96   /* Number of right hand border pixels */
 #define TS2068_SCREEN_WIDTH (TS2068_LEFT_BORDER + TS2068_DISPLAY_XSIZE + TS2068_RIGHT_BORDER)
 
-typedef enum
-{
-	TIMEX_CART_NONE,
-	TIMEX_CART_DOCK,
-	TIMEX_CART_EXROM,
-	TIMEX_CART_HOME
-} TIMEX_CART_TYPE;
-
-/*----------- defined in machine/spectrum.c -----------*/
-extern TIMEX_CART_TYPE timex_cart_type;
-extern UINT8 timex_cart_chunks;
-extern UINT8 * timex_cart_data;
-
-DEVICE_IMAGE_LOAD( timex_cart );
-DEVICE_IMAGE_UNLOAD( timex_cart );
-
-extern MACHINE_RESET( spectrum );
-
-extern SNAPSHOT_LOAD( spectrum );
-extern QUICKLOAD_LOAD( spectrum );
-
-
 /*----------- defined in drivers/spectrum.c -----------*/
 extern unsigned char *spectrum_screen_location;
 
@@ -75,6 +53,7 @@ INPUT_PORTS_EXTERN( spectrum );
 INPUT_PORTS_EXTERN( spec_plus );
 
 MACHINE_DRIVER_EXTERN( spectrum );
+extern MACHINE_RESET( spectrum );
 
 extern READ8_HANDLER(spectrum_port_1f_r);
 extern READ8_HANDLER(spectrum_port_7f_r);
@@ -118,4 +97,4 @@ extern VIDEO_UPDATE( ts2068 );
 
 extern VIDEO_UPDATE( tc2048 );
 
-#endif /* SPECTRUM_H */
+#endif /* __SPECTRUM_H__ */

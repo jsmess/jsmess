@@ -154,6 +154,7 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "formats/tzx_cas.h"
+#include "formats/spec_snqk.h"
 
 unsigned char *spectrum_screen_location = NULL;
 
@@ -196,6 +197,24 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 	}
 
 	spectrum_PreviousFE = data;
+}
+
+static DIRECT_UPDATE_HANDLER(spectrum_direct)
+{
+    /* Hack for correct handling 0xffff interrupt vector */
+    if (address == 0x0001)
+        if (cpu_get_reg(devtag_get_device(space->machine, "maincpu"), REG_GENPCBASE)==0xffff)
+        {
+            cpu_set_reg(devtag_get_device(space->machine, "maincpu"), Z80_PC, 0xfff4);
+            return 0xfff4;
+        }
+    return address;
+}
+
+MACHINE_RESET( spectrum )
+{
+    const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+    memory_set_direct_update_handler(space, spectrum_direct);
 }
 
 static ADDRESS_MAP_START (spectrum_mem, ADDRESS_SPACE_PROGRAM, 8)

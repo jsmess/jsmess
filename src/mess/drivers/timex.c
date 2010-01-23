@@ -154,8 +154,14 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "sound/speaker.h"
 #include "sound/ay8910.h"
 #include "formats/tzx_cas.h"
+#include "formats/spec_snqk.h"
+#include "formats/timex_dck.h"
 #include "machine/beta.h"
 #include "devices/messram.h"
+
+TIMEX_CART_TYPE timex_cart_type = TIMEX_CART_NONE;
+UINT8 timex_cart_chunks = 0x00;
+UINT8 *timex_cart_data;
 
 static const ay8910_interface spectrum_ay_interface =
 {

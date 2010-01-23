@@ -1314,11 +1314,12 @@ $(MESSOBJ)/sinclair.a:			\
 	$(MESS_DRIVERS)/scorpion.o	\
 	$(MESS_DRIVERS)/atm.o		\
 	$(MESS_DRIVERS)/pentagon.o	\
-	$(MESS_MACHINE)/spectrum.o	\
 	$(MESS_FORMATS)/trd_dsk.o	\
 	$(MESS_MACHINE)/beta.o		\
 	$(MESS_FORMATS)/zx81_p.o	\
 	$(MESS_FORMATS)/tzx_cas.o	\
+	$(MESS_FORMATS)/spec_snqk.o	\
+	$(MESS_FORMATS)/timex_dck.o	\
 	$(MESS_DRIVERS)/ql.o		\
 	$(MESS_VIDEO)/zx8301.o		\
 	$(MESS_MACHINE)/zx8302.o	\
