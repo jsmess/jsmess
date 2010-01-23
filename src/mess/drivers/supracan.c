@@ -109,7 +109,7 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 	int region;
 	int gfx_mode;
 	int size;
-	UINT16 tile_bank;
+	UINT16 tile_bank,pal_bank;
 
 	count = (tilemap_base_addr[layer]);
 	/* FIXME: I guess that this truly controls tilemap paging. */
@@ -126,11 +126,11 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 
 	switch(gfx_mode)
 	{
-		case 7:  region = 2; tile_bank = 0x1c00; break;
-		case 4:  region = 0; tile_bank = 0x400;  break;
-		case 2:  region = 1; tile_bank = 0x400;  break;
-		case 0:  region = 1; tile_bank = 0;      break;
-		default: region = 1; tile_bank = 0;      break;
+		case 7:  region = 2; tile_bank = 0x1c00; pal_bank = 0x38; break;
+		case 4:  region = 0; tile_bank = 0x400;  pal_bank = 0x00; break;
+		case 2:  region = 1; tile_bank = 0x400;  pal_bank = 0x00; break;
+		case 0:  region = 1; tile_bank = 0;      pal_bank = 0x00; break;
+		default: region = 1; tile_bank = 0;      pal_bank = 0x00; break;
 	}
 
 
@@ -142,7 +142,7 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 			tile = (supracan_vram[count] & 0x03ff) + tile_bank;
 			flipx = (supracan_vram[count] & 0x0800) ? 1 : 0;
 			flipy = (supracan_vram[count] & 0x0400) ? 1 : 0;
-			pal = (supracan_vram[count] & 0xf000) >> 12;
+			pal = ((supracan_vram[count] & 0xf000) >> 12) + pal_bank;
 
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly,0);
 			if(tilemap_flags[layer] & 0x20) //wrap-around enable
@@ -803,9 +803,9 @@ static WRITE16_HANDLER( supracan_video_w )
 				{
 					if(data & 0x0100) //dma 0x00 fill (or fixed value?)
 					{
-						//memory_write_word(space, acan_sprdma_regs.dst, 0);
-						//acan_sprdma_regs.dst+=2;
-						memset(supracan_vram,0x00,0x020000);
+						memory_write_word(space, acan_sprdma_regs.dst, 0);
+						acan_sprdma_regs.dst+=2;
+						//memset(supracan_vram,0x00,0x020000);
 					}
 					else
 					{
@@ -941,7 +941,7 @@ static const gfx_layout supracan_gfx2bpp =
 static GFXDECODE_START( supracan )
 	GFXDECODE_ENTRY( "ram_gfx",  0, supracan_gfx8bpp,   0, 1 )
 	GFXDECODE_ENTRY( "ram_gfx",  0, supracan_gfx4bpp,   0, 0x10 )
-	GFXDECODE_ENTRY( "ram_gfx",  0, supracan_gfx2bpp,   0, 0x10 )
+	GFXDECODE_ENTRY( "ram_gfx",  0, supracan_gfx2bpp,   0, 0x40 )
 GFXDECODE_END
 
 static INTERRUPT_GEN( supracan_irq )
