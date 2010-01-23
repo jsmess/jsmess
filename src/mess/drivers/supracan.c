@@ -117,6 +117,7 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 	{
 		case 7:  region = 2; tile_bank = 0x1c00; break;
 		case 4:  region = 0; tile_bank = 0x400;  break;
+		case 2:  region = 1; tile_bank = 0x400;  break;
 		case 0:  region = 1; tile_bank = 0;      break;
 		default: region = 1; tile_bank = 0;      break;
 	}
@@ -148,7 +149,7 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 /* 0x0402 Boom Zoo */
 /* 0x2603 / 0x6623 Super Dragon Force */
 /* 0x4020 BIOS logo */
-/* 0x06*/
+/* */
 static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT32 count;
@@ -169,7 +170,7 @@ static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle
 
 	size = roz_mode & 0x200 ? 64 : 32;
 
-	count = (roz_base_addr);
+	count = (0);
 	scrollx = (roz_scrollx >> 8) & 0x1ff;
 	scrolly = (roz_scrolly >> 8) & 0x1ff;
 
@@ -180,10 +181,10 @@ static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle
 		for (x=0;x<size;x++)
 		{
 			int tile, flipx, flipy, pal;
-			tile = (supracan_vram[count] & 0x03ff);
-			flipx = (supracan_vram[count] & 0x0800) ? 1 : 0;
-			flipy = (supracan_vram[count] & 0x0400) ? 1 : 0;
-			pal = (supracan_vram[count] & 0xf000) >> 12;
+			tile = (supracan_vram[roz_base_addr | (count & 0x3ff)] & 0x03ff);
+			flipx = (supracan_vram[roz_base_addr | (count & 0x3ff)] & 0x0800) ? 1 : 0;
+			flipy = (supracan_vram[roz_base_addr | (count & 0x3ff)] & 0x0400) ? 1 : 0;
+			pal = (supracan_vram[roz_base_addr | (count & 0x3ff)] & 0xf000) >> 12;
 
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly,0);
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+size*8,(y*8)-scrolly,0);
@@ -757,12 +758,15 @@ static WRITE16_HANDLER( supracan_video_w )
 			acan_sprdma_regs.count = data;
 			break;
 		case 0x1e/2:
-			//printf("%08x %08x %04x %04x\n",acan_sprdma_regs.src,acan_sprdma_regs.dst,acan_sprdma_regs.count,data);
+			printf("* %08x %08x %04x %04x\n",acan_sprdma_regs.src,acan_sprdma_regs.dst,acan_sprdma_regs.count,data);
 			verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_sprdma_regs.src, acan_sprdma_regs.dst, acan_sprdma_regs.count + 1, data);
 
 			/* TODO: what's 0x2000 and 0x4000 for? */
 			if(data & 0x8000)
 			{
+				if(data & 0x2000 || data & 0x4000)
+					acan_sprdma_regs.dst |= 0xf40000;
+
 				for(i = 0; i <= acan_sprdma_regs.count; i++)
 				{
 					if(data & 0x0100) //dma 0x00 fill (or fixed value?)
