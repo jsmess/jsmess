@@ -14,8 +14,20 @@ f00000 - bit 15 is probably vblank bit.
 
 Known unemulated graphical effects:
 - The green blob of the A'Can logo should slide out from beneath the word
-  "A'Can"
-- The A'Can logo should have a scrolling ROZ layer beneath it
+  "A'Can";
+- Unemulated 1bpp ROZ mode, used by the Super A'Can BIOS logo;
+- Priorities;
+- Boom Zoo: missing window effect applied on sprites;
+- Sango Fighter: Missing rowscroll effect;
+- Sango Fighter: sprites doesn't get drawn on the far right of the screen;
+- Sango Fighter: sprites have some bad gaps of black;
+- Sango Fighter: Missing black masking on the top-down edges of the screen on gameplay?
+- Sango Fighter: intro looks bogus, dunno what's supposed to draw...
+- Super Taiwanese Baseball League: Missing window effect applied on a tilemap;
+- Super Taiwanese Baseball League: Unemulated paging mode;
+- Super Dragon Force: sprite y masking limit looks wrong;
+- Super Dragon Force: priority issues with the text;
+- Super Dragon Force: wrong ysize on character select screen;
 
 baseball game debug trick:
 wpset e90020,1f,w
@@ -52,6 +64,7 @@ static UINT16 irq_mask;
 static UINT32 roz_base_addr;
 static UINT16 roz_mode;
 static UINT32 roz_scrollx, roz_scrolly;
+static UINT16 roz_tile_bank;
 
 static UINT16 supracan_video_regs[256];
 
@@ -99,18 +112,16 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 	UINT16 tile_bank;
 
 	count = (tilemap_base_addr[layer]);
-	size = (video_flags & 0x100) ? 64 : 32;
-	/* FIXME: swap scrollx / scrolly */
-	if(size == 64)
-	{
-		scrolly = (tilemap_scrolly[layer] & 0x800) ? ((tilemap_scrolly[layer] & 0x1ff) - 0x200) : (tilemap_scrolly[layer] & 0x1ff);
-		scrollx = (tilemap_scrollx[layer] & 0x800) ? ((tilemap_scrollx[layer] & 0x1ff) - 0x200) : (tilemap_scrollx[layer] & 0x1ff);
-	}
+	/* FIXME: I guess that this truly controls tilemap paging. */
+	if((tilemap_flags[layer] & 0x0f00) == 0xa00)
+		size = 128;
 	else
-	{
-		scrolly = (tilemap_scrolly[layer] & 0x800) ? ((tilemap_scrolly[layer] & 0xff) - 0x100) : (tilemap_scrolly[layer] & 0xff);
-		scrollx = (tilemap_scrollx[layer] & 0x800) ? ((tilemap_scrollx[layer] & 0xff) - 0x100) : (tilemap_scrollx[layer] & 0xff);
-	}
+		size = (video_flags & 0x100) ? 64 : 32;
+
+	/* FIXME: swap scrollx / scrolly */
+	scrolly = (tilemap_scrolly[layer] & 0x800) ? ((tilemap_scrolly[layer] & (size*8-1)) - size*8) : (tilemap_scrolly[layer] & (size*8-1));
+	scrollx = (tilemap_scrollx[layer] & 0x800) ? ((tilemap_scrollx[layer] & (size*8-1)) - size*8) : (tilemap_scrollx[layer] & (size*8-1));
+
 	gfx_mode = (tilemap_mode[layer] & 0x7000) >> 12;
 
 	switch(gfx_mode)
@@ -155,10 +166,10 @@ static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle
 	UINT32 count;
 	int x,y;
 	int scrollx,scrolly;
-	int region = 0;
+	int region;
 //	int gfx_mode;
 	int size;
-//	UINT16 tile_bank;
+	UINT16 tile_bank;
 
 	switch(roz_mode & 3) //FIXME: fix gfx bpp order
 	{
@@ -176,15 +187,17 @@ static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle
 
 	//roz_mode & 0x20 enables roz capabilities
 
+ 	tile_bank = (roz_tile_bank & 0xf000) >> 3; //FIXME: check this
+
 	for (y=0;y<size;y++)
 	{
 		for (x=0;x<size;x++)
 		{
 			int tile, flipx, flipy, pal;
-			tile = (supracan_vram[roz_base_addr | (count & 0x3ff)] & 0x03ff);
-			flipx = (supracan_vram[roz_base_addr | (count & 0x3ff)] & 0x0800) ? 1 : 0;
-			flipy = (supracan_vram[roz_base_addr | (count & 0x3ff)] & 0x0400) ? 1 : 0;
-			pal = (supracan_vram[roz_base_addr | (count & 0x3ff)] & 0xf000) >> 12;
+			tile = (supracan_vram[roz_base_addr | (count & 0x7ff)] & 0x03ff) | tile_bank;
+			flipx = (supracan_vram[roz_base_addr | (count & 0x7ff)] & 0x0800) ? 1 : 0;
+			flipy = (supracan_vram[roz_base_addr | (count & 0x7ff)] & 0x0400) ? 1 : 0;
+			pal = (supracan_vram[roz_base_addr | (count & 0x7ff)] & 0xf000) >> 12;
 
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly,0);
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+size*8,(y*8)-scrolly,0);
@@ -206,7 +219,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	int col;
 	int i;
 	int spr_base;
-	int hflip;
+	int hflip,vflip;
 	int region;
 	//UINT8 *sprdata = (UINT8*)(&supracan_vram[0x1d000/2]);
 
@@ -234,6 +247,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		spr_offs = supracan_vram[i+3] << 2;
 		bank = (supracan_vram[i+1] & 0xf000) >> 12;
 		hflip = (supracan_vram[i+1] & 0x0800) ? 1 : 0;
+		vflip = (supracan_vram[i+1] & 0x0400) ? 1 : 0;
 
 		if(supracan_vram[i+2] & 0x100)
 			x-=256;
@@ -328,9 +342,6 @@ static VIDEO_UPDATE( supracan )
 	}
 #endif
 
-	if(video_flags & 4)
-		draw_roz(screen->machine,bitmap,cliprect);
-
 	if(video_flags & 0x20) //guess, not tested
 		draw_tilemap(screen->machine,bitmap,cliprect,2);
 
@@ -350,6 +361,10 @@ static VIDEO_UPDATE( supracan )
 	}
 	if(video_flags & 8)
 		draw_sprites(screen->machine,bitmap,cliprect);
+
+	if(video_flags & 4)
+		draw_roz(screen->machine,bitmap,cliprect);
+
 
 	return 0;
 }
@@ -825,6 +840,7 @@ static WRITE16_HANDLER( supracan_video_w )
 		case 0x188/2: roz_scrolly = (data << 16) | (roz_scrolly & 0xffff); break;
 		case 0x18a/2: roz_scrolly = (data) | (roz_scrolly & 0xffff0000); break;
 		case 0x194/2: roz_base_addr = (data) << 1; break;
+		case 0x196/2: roz_tile_bank = data; break; //tile bank
 
 		case 0x1f0/2: //FIXME: this register is mostly not understood
 			irq_mask = (data & 8) ? 0 : 1;
