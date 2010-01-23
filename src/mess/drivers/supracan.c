@@ -169,7 +169,7 @@ static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle
 	UINT32 count;
 	int x,y;
 	int scrollx,scrolly;
-	int region;
+	int region = 0;
 //	int gfx_mode;
 	int xsize,ysize;
 	UINT16 tile_bank;
