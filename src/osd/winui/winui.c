@@ -1006,7 +1006,6 @@ int MameUIMain(HINSTANCE    hInstance,
 		for (i = 0; i < __argc; i++)
 		{
 			utf8_argv[i] = utf8_from_tstring(__targv[i]);
-			dprintf("%d %s",i,utf8_argv[i]);
 			if (utf8_argv[i] == NULL)
 				return 999;
 		}
