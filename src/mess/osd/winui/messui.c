@@ -873,7 +873,7 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 
 	/* Get the path to the currently mounted image */
 	zippath_parent(&as, GetSelectedSoftware(drvindex, config, dev));
-	s = (TCHAR*)astring_c(&as);
+	s = tstring_from_utf8(astring_c(&as));
 
 	/* See if an image was loaded, and that the path still exists */
 	if ((!osd_opendir(astring_c(&as))) || (astring_chr(&as, 0, ':') == -1))
@@ -884,7 +884,7 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 		/* We only want the first path; throw out the rest */
 		i = astring_chr(&as, 0, ';');
 		if (i > 0) astring_substr(&as, 0, i);
-		s = (TCHAR*)astring_c(&as);
+		s = tstring_from_utf8(astring_c(&as));
 
 		/* Make sure a folder was specified in the tab, and that it exists */
 		if ((!osd_opendir(astring_c(&as))) || (astring_chr(&as, 0, ':') == -1))
@@ -895,7 +895,7 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 			/* We only want the first path; throw out the rest */
 			i = astring_chr(&as, 0, ';');
 			if (i > 0) astring_substr(&as, 0, i);
-			s = (TCHAR*)astring_c(&as);
+			s = tstring_from_utf8(astring_c(&as));
 
 			/* Make sure a folder was specified in the tab, and that it exists */
 			if ((!osd_opendir(astring_c(&as))) || (astring_chr(&as, 0, ':') == -1))
@@ -903,11 +903,11 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 				/* Default to emu directory */
 				char mess_directory[1024];
 				osd_get_emulator_directory(mess_directory, ARRAY_LENGTH(mess_directory));
-				s = (TCHAR*)mess_directory;
+				s = tstring_from_utf8(mess_directory);
 
 				/* If software folder exists, use it instead */
 				zippath_combine(&as, mess_directory, "software");
-				if (osd_opendir(astring_c(&as))) s = (TCHAR*)astring_c(&as);
+				if (osd_opendir(astring_c(&as))) s = tstring_from_utf8(astring_c(&as));
 			}
 		}
 	}
@@ -944,7 +944,7 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 	/* We only want the first path; throw out the rest */
 	i = astring_chr(&as, 0, ';');
 	if (i > 0) astring_substr(&as, 0, i);
-	s = (TCHAR*)astring_c(&as);
+	s = tstring_from_utf8(astring_c(&as));
 
 	/* Make sure a folder was specified in the tab, and that it exists */
 	if ((!osd_opendir(astring_c(&as))) || (astring_chr(&as, 0, ':') == -1))
@@ -955,7 +955,7 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 		/* We only want the first path; throw out the rest */
 		i = astring_chr(&as, 0, ';');
 		if (i > 0) astring_substr(&as, 0, i);
-		s = (TCHAR*)astring_c(&as);
+		s = tstring_from_utf8(astring_c(&as));
 
 		/* Make sure a folder was specified in the tab, and that it exists */
 		if ((!osd_opendir(astring_c(&as))) || (astring_chr(&as, 0, ':') == -1))
@@ -963,11 +963,11 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 			/* Default to emu directory */
 			char mess_directory[1024];
 			osd_get_emulator_directory(mess_directory, ARRAY_LENGTH(mess_directory));
-			s = (TCHAR*) mess_directory;
+			s = tstring_from_utf8(mess_directory);
 
 			/* If software folder exists, use it instead */
 			zippath_combine(&as, mess_directory, "software");
-			if (osd_opendir(astring_c(&as))) s = (TCHAR*)astring_c(&as);
+			if (osd_opendir(astring_c(&as))) s = tstring_from_utf8(astring_c(&as));
 		}
 	}
 
