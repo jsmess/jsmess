@@ -150,6 +150,9 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+size*8,(y*8)-scrolly,0);
 				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly+size*8,0);
 				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+size*8,(y*8)-scrolly+size*8,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx-size*8,(y*8)-scrolly,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly-size*8,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx-size*8,(y*8)-scrolly-size*8,0);
 			}
 			count++;
 		}
@@ -168,7 +171,7 @@ static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle
 	int scrollx,scrolly;
 	int region;
 //	int gfx_mode;
-	int size;
+	int xsize,ysize;
 	UINT16 tile_bank;
 
 	switch(roz_mode & 3) //FIXME: fix gfx bpp order
@@ -179,7 +182,15 @@ static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle
 		case 3: region = 0; break;
 	}
 
-	size = roz_mode & 0x200 ? 64 : 32;
+	if((roz_mode & 0xe00) == 0xc00)
+	{
+		xsize = 64;
+		ysize = 64;
+	}
+	else
+	{
+		xsize = ysize = roz_mode & 0x200 ? 64 : 32;
+	}
 
 	count = (0);
 	scrollx = (roz_scrollx >> 8) & 0x1ff;
@@ -189,20 +200,20 @@ static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle
 
  	tile_bank = (roz_tile_bank & 0xf000) >> 3; //FIXME: check this
 
-	for (y=0;y<size;y++)
+	for (y=0;y<ysize;y++)
 	{
-		for (x=0;x<size;x++)
+		for (x=0;x<xsize;x++)
 		{
 			int tile, flipx, flipy, pal;
-			tile = (supracan_vram[roz_base_addr | (count & 0x7ff)] & 0x03ff) | tile_bank;
-			flipx = (supracan_vram[roz_base_addr | (count & 0x7ff)] & 0x0800) ? 1 : 0;
-			flipy = (supracan_vram[roz_base_addr | (count & 0x7ff)] & 0x0400) ? 1 : 0;
-			pal = (supracan_vram[roz_base_addr | (count & 0x7ff)] & 0xf000) >> 12;
+			tile = (supracan_vram[roz_base_addr | (count & 0xfff)] & 0x03ff) | tile_bank;
+			flipx = (supracan_vram[roz_base_addr | (count & 0xfff)] & 0x0800) ? 1 : 0;
+			flipy = (supracan_vram[roz_base_addr | (count & 0xfff)] & 0x0400) ? 1 : 0;
+			pal = (supracan_vram[roz_base_addr | (count & 0xfff)] & 0xf000) >> 12;
 
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly,0);
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+size*8,(y*8)-scrolly,0);
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly+size*8,0);
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+size*8,(y*8)-scrolly+size*8,0);
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+xsize*8,(y*8)-scrolly,0);
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly+ysize*8,0);
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+xsize*8,(y*8)-scrolly+ysize*8,0);
 
 			count++;
 		}
@@ -468,6 +479,7 @@ static WRITE16_HANDLER( supracan_dma_w )
 //				if(data & 0x2000)
 //					acan_dma_regs.source-=2;
 				verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_dma_regs.source[ch], acan_dma_regs.dest[ch], acan_dma_regs.count[ch] + 1, data);
+
 				for(i = 0; i <= acan_dma_regs.count[ch]; i++)
 				{
 					if(data & 0x1000)
