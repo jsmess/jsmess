@@ -257,33 +257,63 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			xsize = 1 << (supracan_vram[i+1] & 7);
 			ysize = ((supracan_vram[i+0] & 0x1e00) >> 9)+1;
 
-//			if(vflip)
-
-
-			for(ytile = 0; ytile < ysize; ytile++)
+			if(vflip)
 			{
-				if(hflip)
+				for(ytile = (ysize - 1); ytile >= 0; ytile--)
 				{
-					for(xtile = (xsize - 1); xtile >= 0; xtile--)
+					if(hflip)
 					{
-						UINT16 data = supracan_vram[spr_offs/2+ytile*xsize+xtile];
-						int tile = (bank * 0x200) + (data & 0x03ff);
-						int xflip = (data & 0x0800) ? 0 : 1;
-						int yflip = (data & 0x0400) ? 1 : 0;
-						col = (data & 0xf000) >> 12;
-						drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,col,xflip,yflip,x+((xsize - 1) - xtile)*8,y+ytile*8,0);
+						for(xtile = (xsize - 1); xtile >= 0; xtile--)
+						{
+							UINT16 data = supracan_vram[spr_offs/2+ytile*xsize+xtile];
+							int tile = (bank * 0x200) + (data & 0x03ff);
+							int xflip = (data & 0x0800) ? 0 : 1;
+							int yflip = (data & 0x0400) ? 0 : 1;
+							col = (data & 0xf000) >> 12;
+							drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,col,xflip,yflip,x+((xsize - 1) - xtile)*8,y+((ysize - 1) - ytile)*8,0);
+						}
+					}
+					else
+					{
+						for(xtile = 0; xtile < xsize; xtile++)
+						{
+							UINT16 data = supracan_vram[spr_offs/2+ytile*xsize+xtile];
+							int tile = (bank * 0x200) + (data & 0x03ff);
+							int xflip = (data & 0x0800) ? 1 : 0;
+							int yflip = (data & 0x0400) ? 0 : 1;
+							col = (data & 0xf000) >> 12;
+							drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,col,xflip,yflip,x+xtile*8,y+((ysize - 1) - ytile)*8,0);
+						}
 					}
 				}
-				else
+			}
+			else
+			{
+				for(ytile = 0; ytile < ysize; ytile++)
 				{
-					for(xtile = 0; xtile < xsize; xtile++)
+					if(hflip)
 					{
-						UINT16 data = supracan_vram[spr_offs/2+ytile*xsize+xtile];
-						int tile = (bank * 0x200) + (data & 0x03ff);
-						int xflip = (data & 0x0800) ? 1 : 0;
-						int yflip = (data & 0x0400) ? 1 : 0;
-						col = (data & 0xf000) >> 12;
-						drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,col,xflip,yflip,x+xtile*8,y+ytile*8,0);
+						for(xtile = (xsize - 1); xtile >= 0; xtile--)
+						{
+							UINT16 data = supracan_vram[spr_offs/2+ytile*xsize+xtile];
+							int tile = (bank * 0x200) + (data & 0x03ff);
+							int xflip = (data & 0x0800) ? 0 : 1;
+							int yflip = (data & 0x0400) ? 1 : 0;
+							col = (data & 0xf000) >> 12;
+							drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,col,xflip,yflip,x+((xsize - 1) - xtile)*8,y+ytile*8,0);
+						}
+					}
+					else
+					{
+						for(xtile = 0; xtile < xsize; xtile++)
+						{
+							UINT16 data = supracan_vram[spr_offs/2+ytile*xsize+xtile];
+							int tile = (bank * 0x200) + (data & 0x03ff);
+							int xflip = (data & 0x0800) ? 1 : 0;
+							int yflip = (data & 0x0400) ? 1 : 0;
+							col = (data & 0xf000) >> 12;
+							drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,col,xflip,yflip,x+xtile*8,y+ytile*8,0);
+						}
 					}
 				}
 			}
