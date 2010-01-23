@@ -246,6 +246,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		---- d--- ---- ---- horizontal direction
 		---- ---- ---- -www X size
 		[2]
+		zzz- ---- ---- ---- X shrinking
 		---- ---S xxxx xxxx X offset
 		[3]
 		oooo oooo oooo oooo sprite pointer
@@ -260,6 +261,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		hflip = (supracan_vram[i+1] & 0x0800) ? 1 : 0;
 		vflip = (supracan_vram[i+1] & 0x0400) ? 1 : 0;
 
+		/* FIXME: Sango Fighter doesn't like this, check why ... */
 		if(supracan_vram[i+2] & 0x100)
 			x-=256;
 
