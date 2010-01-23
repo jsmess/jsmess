@@ -656,6 +656,6 @@ ROM_END
 
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT    COMPANY  FULLNAME                 FLAGS */
-CONS( 199?, scv,     0,      0,      scv,     scv,   0,      "Epoch", "Super Cassette Vision", GAME_IMPERFECT_SOUND )
-CONS( 199?, scv_pal, scv,    0,      scv_pal, scv,   0,      "Yeno",  "Super Cassette Vision (PAL)", GAME_IMPERFECT_SOUND )
+CONS( 1984, scv,     0,      0,      scv,     scv,   0,      "Epoch", "Super Cassette Vision", GAME_IMPERFECT_SOUND )
+CONS( 198?, scv_pal, scv,    0,      scv_pal, scv,   0,      "Yeno",  "Super Cassette Vision (PAL)", GAME_IMPERFECT_SOUND )
 

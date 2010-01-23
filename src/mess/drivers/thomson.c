@@ -865,7 +865,7 @@ MACHINE_DRIVER_END
 
 COMP ( 1984, to770, 0, 0, to770, to770, 0, "Thomson", "TO7/70", 0 )
 
-COMP ( 1984, to770a, to770, 0, to770a, to770a, 0, "Thomson", "TO7/70 arabic", 0 )
+COMP ( 1984, to770a, to770, 0, to770a, to770a, 0, "Thomson", "TO7/70 (Arabic)", 0 )
 
 
 /************************* MO5 / MO5E *********************************

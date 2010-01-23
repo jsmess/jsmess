@@ -145,8 +145,6 @@ static MACHINE_DRIVER_START(zexall)
 
     /* video hardware */
     //MDRV_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
-
-    /* sound hardware */
 	MDRV_IMPORT_FROM( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
 
@@ -170,6 +168,6 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                            FLAGS */
-COMP( 199?, zexall,   0,          0,      zexall,   zexall, zexall,      "Frank Cringle",        "Zexall z80 test suite", 0 )
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
+COMP( 2009, zexall,   0,          0,      zexall,   zexall, zexall,      "Frank Cringle & MESSDEV",   "ZEXALL Z80 instruction set exerciser (modified for MESS)", 0 )
 
