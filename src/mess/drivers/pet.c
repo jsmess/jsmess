@@ -661,7 +661,7 @@ static IEEE488_DAISY( ieee488_daisy )
 static MACHINE_DRIVER_START( pet_general )
 	MDRV_DRIVER_DATA(pet_state)
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 7833600)        /* 7.8336 MHz */
+	MDRV_CPU_ADD("maincpu", M6502, XTAL_8MHz/8)
 	MDRV_CPU_PROGRAM_MAP(pet_mem)
 	MDRV_CPU_VBLANK_INT("screen", pet_frame_interrupt)
 
