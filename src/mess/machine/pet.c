@@ -40,25 +40,6 @@ static int pet_keyline_select;
 static emu_timer *datasette1_timer;
 static emu_timer *datasette2_timer;
 
-
-static READ8_HANDLER( pet_mc6845_register_r )
-{
-	const device_config *devconf = devtag_get_device(space->machine, "crtc");
-	return mc6845_register_r(devconf, offset);
-}
-
-static WRITE8_HANDLER( pet_mc6845_register_w )
-{
-	const device_config *devconf = devtag_get_device(space->machine, "crtc");
-	mc6845_register_w(devconf, offset, data);
-}
-
-static WRITE8_HANDLER( pet_mc6845_address_w )
-{
-	const device_config *devconf = devtag_get_device(space->machine, "crtc");
-	mc6845_address_w(devconf, offset, data);
-}
-
 /* pia at 0xe810
    port a
     7 sense input (low for diagnostics)
@@ -73,7 +54,7 @@ static WRITE8_HANDLER( pet_mc6845_address_w )
   cb1 video sync in
   cb2 cassette 1 motor out
 */
-static READ8_DEVICE_HANDLER( pet_pia0_port_a_read )
+static READ8_DEVICE_HANDLER( pia0_pa_r )
 {
 	/*
 
@@ -111,7 +92,7 @@ static READ8_DEVICE_HANDLER( pet_pia0_port_a_read )
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( pet_pia0_port_a_write )
+static WRITE8_DEVICE_HANDLER( pia0_pa_w )
 {
 	/*
 
@@ -128,6 +109,7 @@ static WRITE8_DEVICE_HANDLER( pet_pia0_port_a_write )
 
 	*/
 
+	/* key */
 	pet_keyline_select = data & 0x0f;
 }
 
@@ -166,7 +148,7 @@ static READ8_DEVICE_HANDLER( kin_r )
 }
 
 /* Keyboard handling for business keyboard */
-static READ8_DEVICE_HANDLER( petb_pia0_port_b_read )
+static READ8_DEVICE_HANDLER( petb_kin_r )
 {
 	UINT8 data = 0xff;
 	pet_state *state = (pet_state *)device->machine->driver_data;
@@ -196,7 +178,7 @@ static READ8_DEVICE_HANDLER( petb_pia0_port_b_read )
 }
 
 /* NOT WORKING - Just placeholder */
-static READ8_DEVICE_HANDLER( cass_1_r )
+static READ8_DEVICE_HANDLER( cass1_r )
 {
 	// cassette 1 read
 	return (cassette_input(devtag_get_device(device->machine, "cassette1")) > +0.0) ? 1 : 0;
@@ -209,7 +191,7 @@ static WRITE8_DEVICE_HANDLER( eoi_w )
 	ieee488_eoi_w(ieeebus, device, data);
 }
 
-static WRITE8_DEVICE_HANDLER( cass_motor_1_w )
+static WRITE8_DEVICE_HANDLER( cass1_motor_w )
 {
 	if (!data)
 	{
@@ -222,6 +204,48 @@ static WRITE8_DEVICE_HANDLER( cass_motor_1_w )
 		timer_reset(datasette1_timer, attotime_never);
 	}
 }
+
+static WRITE_LINE_DEVICE_HANDLER( pia0_irq_w )
+{
+	pet_state *driver_state = (pet_state *)device->machine->driver_data;
+
+	driver_state->pia0_irq = state;
+	int level = (driver_state->pia0_irq | driver_state->pia1_irq | driver_state->via_irq) ? ASSERT_LINE : CLEAR_LINE;
+
+	cpu_set_input_line(device->machine->firstcpu, INPUT_LINE_IRQ0, level);
+}
+
+const pia6821_interface pet_pia0 =
+{
+	DEVCB_HANDLER(pia0_pa_r),		/* in_a_func */
+	DEVCB_HANDLER(kin_r),			/* in_b_func */
+	DEVCB_HANDLER(cass1_r),			/* in_ca1_func */
+	DEVCB_NULL,						/* in_cb1_func */
+	DEVCB_NULL,						/* in_ca2_func */
+	DEVCB_NULL,						/* in_cb2_func */
+	DEVCB_HANDLER(pia0_pa_w),		/* out_a_func */
+	DEVCB_NULL,						/* out_b_func */
+	DEVCB_HANDLER(eoi_w),			/* out_ca2_func */
+	DEVCB_HANDLER(cass1_motor_w),	/* out_cb2_func */
+	DEVCB_LINE(pia0_irq_w),			/* irq_a_func */
+	DEVCB_LINE(pia0_irq_w)			/* irq_b_func */
+};
+
+const pia6821_interface petb_pia0 =
+{
+	DEVCB_HANDLER(pia0_pa_r),		/* in_a_func */
+	DEVCB_HANDLER(petb_kin_r),		/* in_b_func */
+	DEVCB_HANDLER(cass1_r),			/* in_ca1_func */
+	DEVCB_NULL,						/* in_cb1_func */
+	DEVCB_NULL,						/* in_ca2_func */
+	DEVCB_NULL,						/* in_cb2_func */
+	DEVCB_HANDLER(pia0_pa_w),		/* out_a_func */
+	DEVCB_NULL,						/* out_b_func */
+	DEVCB_HANDLER(eoi_w),			/* out_ca2_func */
+	DEVCB_HANDLER(cass1_motor_w),	/* out_cb2_func */
+	DEVCB_LINE(pia0_irq_w),			/* irq_a_func */
+	DEVCB_LINE(pia0_irq_w)			/* irq_b_func */
+};
 
 /* pia at 0xe820 (ieee488)
    port a data in
@@ -268,16 +292,6 @@ static WRITE8_DEVICE_HANDLER( dav_w )
 	ieee488_dav_w(ieeebus, device, data);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pia0_irq_w )
-{
-	pet_state *driver_state = (pet_state *)device->machine->driver_data;
-
-	driver_state->pia0_irq = state;
-	int level = (driver_state->pia0_irq | driver_state->pia1_irq | driver_state->via_irq) ? ASSERT_LINE : CLEAR_LINE;
-
-	cpu_set_input_line(device->machine->firstcpu, INPUT_LINE_IRQ0, level);
-}
-
 static WRITE_LINE_DEVICE_HANDLER( pia1_irq_w )
 {
 	pet_state *driver_state = (pet_state *)device->machine->driver_data;
@@ -287,38 +301,6 @@ static WRITE_LINE_DEVICE_HANDLER( pia1_irq_w )
 
 	cpu_set_input_line(device->machine->firstcpu, INPUT_LINE_IRQ0, level);
 }
-
-const pia6821_interface pet_pia0 =
-{
-	DEVCB_HANDLER(pet_pia0_port_a_read),	/* in_a_func */
-	DEVCB_HANDLER(kin_r),					/* in_b_func */
-	DEVCB_HANDLER(cass_1_r),				/* in_ca1_func */
-	DEVCB_NULL,								/* in_cb1_func */
-	DEVCB_NULL,								/* in_ca2_func */
-	DEVCB_NULL,								/* in_cb2_func */
-	DEVCB_HANDLER(pet_pia0_port_a_write),	/* out_a_func */
-	DEVCB_NULL,								/* out_b_func */
-	DEVCB_HANDLER(eoi_w),					/* out_ca2_func */
-	DEVCB_HANDLER(cass_motor_1_w),			/* out_cb2_func */
-	DEVCB_LINE(pia0_irq_w),					/* irq_a_func */
-	DEVCB_LINE(pia0_irq_w)					/* irq_b_func */
-};
-
-const pia6821_interface petb_pia0 =
-{
-	DEVCB_HANDLER(pet_pia0_port_a_read),	/* in_a_func */
-	DEVCB_HANDLER(petb_pia0_port_b_read),	/* in_b_func */
-	DEVCB_HANDLER(cass_1_r),				/* in_ca1_func */
-	DEVCB_NULL,								/* in_cb1_func */
-	DEVCB_NULL,								/* in_ca2_func */
-	DEVCB_NULL,								/* in_cb2_func */
-	DEVCB_HANDLER(pet_pia0_port_a_write),	/* out_a_func */
-	DEVCB_NULL,								/* out_b_func */
-	DEVCB_HANDLER(eoi_w),					/* out_ca2_func */
-	DEVCB_HANDLER(cass_motor_1_w),			/* out_cb2_func */
-	DEVCB_LINE(pia1_irq_w),					/* irq_a_func */
-	DEVCB_LINE(pia1_irq_w)					/* irq_b_func */
-};
 
 const pia6821_interface pet_pia1 =
 {
@@ -335,13 +317,6 @@ const pia6821_interface pet_pia1 =
 	DEVCB_LINE(pia1_irq_w),					/* irq_a_func */
 	DEVCB_LINE(pia1_irq_w)					/* irq_b_func */
 };
-
-static WRITE_LINE_DEVICE_HANDLER( gb_w )
-{
-	DBG_LOG(device->machine, 1, "address line", ("%d\n", state));
-	if (state) pet_font |= 1;
-	else pet_font &= ~1;
-}
 
 /* userport, cassettes, rest ieee488
    ca1 userport
@@ -441,6 +416,13 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 	}
 }
 
+static WRITE_LINE_DEVICE_HANDLER( gb_w )
+{
+	DBG_LOG(device->machine, 1, "address line", ("%d\n", state));
+	if (state) pet_font |= 1;
+	else pet_font &= ~1;
+}
+
 static WRITE_LINE_DEVICE_HANDLER( via_irq_w )
 {
 	pet_state *driver_state = (pet_state *)device->machine->driver_data;
@@ -478,6 +460,7 @@ static WRITE8_HANDLER( cbm8096_io_w )
 	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
 	const device_config *pia_0 = devtag_get_device(space->machine, "pia_0");
 	const device_config *pia_1 = devtag_get_device(space->machine, "pia_1");
+	const device_config *mc6845 = devtag_get_device(space->machine, "crtc");
 
 	if (offset < 0x10) ;
 	else if (offset < 0x14) pia6821_w(pia_0, offset & 3, data);
@@ -486,8 +469,8 @@ static WRITE8_HANDLER( cbm8096_io_w )
 	else if (offset < 0x40) ;
 	else if (offset < 0x50) via_w(via_0, offset & 0xf, data);
 	else if (offset < 0x80) ;
-	else if (offset == 0x80) pet_mc6845_address_w(space, offset, data);
-	else if (offset == 0x81) pet_mc6845_register_w(space, offset, data);
+	else if (offset == 0x80) mc6845_address_w(mc6845, 0, data);
+	else if (offset == 0x81) mc6845_register_w(mc6845, 0, data);
 }
 
 static READ8_HANDLER( cbm8096_io_r )
@@ -495,6 +478,7 @@ static READ8_HANDLER( cbm8096_io_r )
 	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
 	const device_config *pia_0 = devtag_get_device(space->machine, "pia_0");
 	const device_config *pia_1 = devtag_get_device(space->machine, "pia_1");
+	const device_config *mc6845 = devtag_get_device(space->machine, "crtc");
 
 	int data = 0xff;
 	if (offset < 0x10) ;
@@ -504,7 +488,7 @@ static READ8_HANDLER( cbm8096_io_r )
 	else if (offset < 0x40) ;
 	else if (offset < 0x50) data = via_r(via_0, offset & 0xf);
 	else if (offset < 0x80) ;
-	else if (offset == 0x81) data = pet_mc6845_register_r(space, offset);
+	else if (offset == 0x81) data = mc6845_register_r(mc6845, 0);
 	return data;
 }
 
