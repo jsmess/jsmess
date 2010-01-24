@@ -13,10 +13,29 @@
 #define SOUND_PV1000	DEVICE_GET_INFO_NAME(pv1000_sound)
 
 
+typedef struct _pvaudio_voice pvaudio_voice;
+struct _pvaudio_voice
+{
+	UINT32 count;
+	UINT16 period;	
+	UINT8  val;	
+};
+
+
+typedef struct _pvaudio_state pvaudio_state;
+struct _pvaudio_state
+{
+	sound_stream *pv1000_sh_channel;
+
+	pvaudio_voice voice[4];
+};
+
+
 static UINT8 *pv1000_ram;
 static UINT8 pv1000_io_regs[8];
 static UINT8 pv1000_fd_data;
-static sound_stream *pv1000_sh_channel;
+static pvaudio_state g_audio;
+
 
 
 static WRITE8_HANDLER( pv1000_io_w );
@@ -48,15 +67,19 @@ static WRITE8_HANDLER( pv1000_gfxram_w )
 
 static WRITE8_HANDLER( pv1000_io_w )
 {
-//	logerror("pv1000_io_w offset=%02x, data=%02x\n", offset, data );
+	
 	switch ( offset )
 	{
 	case 0x00:
 	case 0x01:
 	case 0x02:
+		//logerror("pv1000_io_w offset=%02x, data=%02x (%03d)\n", offset, data , data);	
+		g_audio.voice[offset].period=data;
+	break;
+	
 	case 0x03:
-		/* Sound i/O ports */
-		break;
+		//currently unknown use
+	break;
 
 	case 0x05:
 		pv1000_fd_data = 1;
@@ -76,8 +99,8 @@ static READ8_HANDLER( pv1000_io_r )
 	switch ( offset )
 	{
 	case 0x04:
-		/* Bit 1 = 1 => to pass checks in Amidar? */
-		/* Bit 0 = 0 => done reading joystick interface? */
+		/* Bit 1 = 1 => Data is available in port FD */
+		/* Bit 0 = 1 => Buffer at port FD is empty */
 		data = pv1000_fd_data ? 0x02 : 0x01;
 		break;
 	case 0x05:
@@ -200,22 +223,52 @@ static VIDEO_UPDATE( pv1000 )
 }
 
 
+/*
+ plgDavid's audio implementation/analysis notes:
+ 
+ Sound appears to be 3 50/50 pulse voices made by cutting the main clock by 1024,
+ then by the value of the 6bit period registers. 
+ This creates a surprisingly accurate pitch range.
+ 
+ Note: the register periods are inverted.
+ */
+
 static STREAM_UPDATE( pv1000_sound_update )
 {
 	stream_sample_t *buffer = outputs[0];
 
-	while( samples > 0 )
+	while ( samples > 0 )
 	{
-		*buffer = 0;
+
+		*buffer=0;
+
+		for (size_t i=0;i<3;i++)
+		{
+			pvaudio_voice *v = &g_audio.voice[i];
+			UINT32 per = (0x3F-(v->period & 0x3f));
+
+			if( per != 0)//OFF!
+				*buffer += v->val * 8192;
+
+			v->count++;
+
+			if (v->count >= per)
+			{
+			   v->count = 0;
+			   v->val = !v->val;
+			}
+		}
+		
 		buffer++;
 		samples--;
 	}
+
 }
 
 
 static DEVICE_START( pv1000_sound )
 {
-	pv1000_sh_channel = stream_create( device, 0, 1, device->clock, 0, pv1000_sound_update );
+	g_audio.pv1000_sh_channel = stream_create( device, 0, 1, device->clock/1024, 0, pv1000_sound_update );
 }
 
 
@@ -300,7 +353,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( pv1000 )
-	ROM_REGION( 0x4000, "cart", ROMREGION_ERASE00 ) 
+	ROM_REGION( 0x4000, "cart", ROMREGION_ERASE00 )
 	ROM_REGION( 0x400, "gfxram", ROMREGION_ERASE00 )
 ROM_END
 
