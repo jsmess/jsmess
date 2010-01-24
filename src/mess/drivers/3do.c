@@ -108,13 +108,17 @@ Part list of Goldstar 3DO Interactive Multiplayer
 #define X601_CLOCK		XTAL_16_9344MHz
 
 
-static UINT32	*dram;
-static UINT32	*vram;
+typedef struct __3do_state _3do_state;
+struct __3do_state
+{
+	UINT32 *dram;
+	UINT32 *vram;
+};
 
 
 static ADDRESS_MAP_START( 3do_mem, ADDRESS_SPACE_PROGRAM, 32)
-	AM_RANGE(0x00000000, 0x001FFFFF) AM_RAMBANK("bank1") AM_BASE(&dram)						/* DRAM */
-	AM_RANGE(0x00200000, 0x002FFFFF) AM_RAM	AM_BASE(&vram)									/* VRAM */
+	AM_RANGE(0x00000000, 0x001FFFFF) AM_RAMBANK("bank1") AM_BASE_MEMBER(_3do_state,dram)						/* DRAM */
+	AM_RANGE(0x00200000, 0x002FFFFF) AM_RAM	AM_BASE_MEMBER(_3do_state,vram)									/* VRAM */
 	AM_RANGE(0x03000000, 0x030FFFFF) AM_ROMBANK("bank2")									/* BIOS */
 	AM_RANGE(0x03140000, 0x0315FFFF) AM_READWRITE(_3do_nvarea_r, _3do_nvarea_w)				/* NVRAM */
 	AM_RANGE(0x03180000, 0x031FFFFF) AM_READWRITE(_3do_unk_318_r, _3do_unk_318_w)			/* ???? */
@@ -138,10 +142,12 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( 3do )
 {
+	_3do_state *state = (_3do_state *)machine->driver_data;
+
 	memory_set_bankptr(machine, "bank2",memory_region(machine, "user1"));
 
 	/* configure overlay */
-	memory_configure_bank(machine, "bank1", 0, 1, dram, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, state->dram, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user1"), 0);
 
 	/* start with overlay enabled */
@@ -153,6 +159,9 @@ static MACHINE_RESET( 3do )
 
 
 static MACHINE_DRIVER_START( 3do )
+
+	MDRV_DRIVER_DATA( _3do_state )
+
 	/* Basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", ARM6, XTAL_50MHz/4 )
 	MDRV_CPU_PROGRAM_MAP( 3do_mem)
@@ -171,6 +180,9 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( 3do_pal )
+
+	MDRV_DRIVER_DATA( _3do_state )
+
 	/* Basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM6, XTAL_50MHz/4 )
 	MDRV_CPU_PROGRAM_MAP( 3do_mem)

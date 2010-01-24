@@ -1415,7 +1415,7 @@ WRITE8_HANDLER ( ti99_8_w )
 					if (! tms5220_readyq_r(devtag_get_device(space->machine, "tms5220")))
 					{
 						attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
-						double d = ceil(cputag_attotime_to_clocks(space->machine, "maincpu", time_to_ready));
+						double d = cputag_attotime_to_clocks(space->machine, "maincpu", time_to_ready);
 						int cycles_to_ready = ((int) (d + 3)) & ~3;
 
 						logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready)

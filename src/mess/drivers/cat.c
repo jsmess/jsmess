@@ -11,16 +11,25 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/68681.h"
 
-static UINT16 *cat_video_ram;
-static UINT16 *cat_sram;
-static UINT8 video_enable;
-static UINT16 pr_cont;
-static UINT8 keyboard_line;
-static emu_timer *keyboard_timer;
+typedef struct _cat_state cat_state;
+struct _cat_state
+{
+	UINT16 *video_ram;
+
+	UINT8 duart_inp;// = 0x0e;
+
+	UINT16 *sram;
+	UINT8 video_enable;
+	UINT16 pr_cont;
+	UINT8 keyboard_line;
+	emu_timer *keyboard_timer;
+};
 
 static WRITE16_HANDLER( cat_video_status_w )
 {
-	video_enable = BIT( data, 3 );
+	cat_state *state = (cat_state *)space->machine->driver_data;
+
+	state->video_enable = BIT( data, 3 );
 }
 
 static WRITE16_HANDLER( cat_test_mode_w )
@@ -43,7 +52,9 @@ static READ16_HANDLER( cat_battery_r )
 }
 static WRITE16_HANDLER( cat_printer_w )
 {
-	pr_cont = data;
+	cat_state *state = (cat_state *)space->machine->driver_data;
+
+	state->pr_cont = data;
 }
 static READ16_HANDLER( cat_floppy_r )
 {
@@ -55,17 +66,18 @@ static WRITE16_HANDLER( cat_floppy_w )
 
 static READ16_HANDLER( cat_keyboard_r )
 {
+	cat_state *state = (cat_state *)space->machine->driver_data;
 	UINT16 retVal = 0;
 	// Read country code
-	if (pr_cont == 0x0900)
+	if (state->pr_cont == 0x0900)
 	{
 		retVal = input_port_read(space->machine, "DIPSW1");
 	}
 	// Regular keyboard read
-	if (pr_cont == 0x0800 || pr_cont == 0x0a00)
+	if (state->pr_cont == 0x0800 || state->pr_cont == 0x0a00)
 	{
 		retVal=0xff00;
-		switch(keyboard_line)
+		switch(state->keyboard_line)
 		{
 			case 0x01: retVal = input_port_read(space->machine, "LINE0") << 8; break;
 			case 0x02: retVal = input_port_read(space->machine, "LINE1") << 8; break;
@@ -81,7 +93,9 @@ static READ16_HANDLER( cat_keyboard_r )
 }
 static WRITE16_HANDLER( cat_keyboard_w )
 {
-	keyboard_line = data >> 8;
+	cat_state *state = (cat_state *)space->machine->driver_data;
+
+	state->keyboard_line = data >> 8;
 }
 
 static WRITE16_HANDLER( cat_video_w )
@@ -105,9 +119,9 @@ static READ16_HANDLER( cat_something_r )
 static ADDRESS_MAP_START(cat_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM // 256 KB ROM
-	AM_RANGE(0x00040000, 0x00043fff) AM_RAM AM_BASE(&cat_sram) // SRAM powered by batery
+	AM_RANGE(0x00040000, 0x00043fff) AM_RAM AM_BASE_MEMBER(cat_state,sram) // SRAM powered by batery
 	AM_RANGE(0x00200000, 0x0027ffff) AM_ROM AM_REGION("svrom",0x0000) // SV ROM
-	AM_RANGE(0x00400000, 0x0047ffff) AM_RAM AM_BASE(&cat_video_ram) // 512 KB RAM
+	AM_RANGE(0x00400000, 0x0047ffff) AM_RAM AM_BASE_MEMBER(cat_state,video_ram) // 512 KB RAM
 	AM_RANGE(0x00600000, 0x0065ffff) AM_WRITE(cat_video_w) // Video chip
 	AM_RANGE(0x00800000, 0x00800001) AM_READWRITE(cat_floppy_r, cat_floppy_w)
 	AM_RANGE(0x00800002, 0x00800003) AM_WRITE(cat_keyboard_w)
@@ -120,12 +134,10 @@ static ADDRESS_MAP_START(cat_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x00860000, 0x00860001) AM_WRITE(cat_test_mode_w) // Test mode
 ADDRESS_MAP_END
 
-static UINT16 *swyft_video_ram;
-
 static ADDRESS_MAP_START(swyft_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0000ffff) AM_ROM // 64 KB ROM
-	AM_RANGE(0x00040000, 0x000fffff) AM_RAM AM_BASE(&swyft_video_ram)
+	AM_RANGE(0x00040000, 0x000fffff) AM_RAM AM_BASE_MEMBER(cat_state,video_ram)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -253,12 +265,17 @@ static IRQ_CALLBACK(cat_int_ack)
 
 static MACHINE_START(cat)
 {
-	keyboard_timer = timer_alloc(machine, keyboard_callback, NULL);
+	cat_state *state = (cat_state *)machine->driver_data;
+
+	state->duart_inp = 0x0e;
+	state->keyboard_timer = timer_alloc(machine, keyboard_callback, NULL);
 }
+
 static MACHINE_RESET(cat)
 {
+	cat_state *state = (cat_state *)machine->driver_data;
 	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), cat_int_ack);
-	timer_adjust_periodic(keyboard_timer, attotime_zero, 0, ATTOTIME_IN_HZ(120));
+	timer_adjust_periodic(state->keyboard_timer, attotime_zero, 0, ATTOTIME_IN_HZ(120));
 }
 
 static VIDEO_START( cat )
@@ -267,18 +284,19 @@ static VIDEO_START( cat )
 
 static VIDEO_UPDATE( cat )
 {
+	cat_state *state = (cat_state *)screen->machine->driver_data;
 	UINT16 code;
 	int y, x, b;
 
 	int addr = 0;
-	if (video_enable == 1)
+	if (state->video_enable == 1)
 	{
 		for (y = 0; y < 344; y++)
 		{
 			int horpos = 0;
 			for (x = 0; x < 42; x++)
 			{
-				code = cat_video_ram[addr++];
+				code = state->video_ram[addr++];
 				for (b = 15; b >= 0; b--)
 				{
 					*BITMAP_ADDR16(bitmap, y, horpos++) = (code >> b) & 0x01;
@@ -297,6 +315,10 @@ static TIMER_CALLBACK( swyft_reset )
 	memset(memory_get_read_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe2341), 0xff, 1);
 }
 
+static MACHINE_START(swyft)
+{
+}
+
 static MACHINE_RESET(swyft)
 {
 	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, swyft_reset);
@@ -308,6 +330,7 @@ static VIDEO_START( swyft )
 
 static VIDEO_UPDATE( swyft )
 {
+	cat_state *state = (cat_state *)screen->machine->driver_data;
 	UINT16 code;
 	int y, x, b;
 
@@ -317,7 +340,7 @@ static VIDEO_UPDATE( swyft )
 		int horpos = 0;
 		for (x = 0; x < 20; x++)
 		{
-			code = swyft_video_ram[addr++];
+			code = state->video_ram[addr++];
 			for (b = 15; b >= 0; b--)
 			{
 				*BITMAP_ADDR16(bitmap, y, horpos++) =  (code >> b) & 0x01;
@@ -336,18 +359,18 @@ static void duart_tx(const device_config *device, int channel, UINT8 data)
 {
 }
 
-static UINT8 duart_inp = 0x0e;
-
 static UINT8 duart_input(const device_config *device)
 {
-	if (duart_inp != 0)
+	cat_state *state = (cat_state *)device->machine->driver_data;
+
+	if (state->duart_inp != 0)
 	{
-		duart_inp = 0;
+		state->duart_inp = 0;
 		return 0x0e;
 	}
 	else
 	{
-		duart_inp = 0x0e;
+		state->duart_inp = 0x0e;
 		return 0x00;
 	}
 }
@@ -362,20 +385,25 @@ static const duart68681_config cat_duart68681_config =
 
 static NVRAM_HANDLER( cat )
 {
+	cat_state *state = (cat_state *)machine->driver_data;
+
 	if (read_or_write)
 	{
-		mame_fwrite(file, cat_sram, 0x4000);
+		mame_fwrite(file, state->sram, 0x4000);
 	}
 	else
 	{
 		if (file)
 		{
-			mame_fread(file, cat_sram, 0x4000);
+			mame_fread(file, state->sram, 0x4000);
 		}
 	}
 }
 
 static MACHINE_DRIVER_START( cat )
+
+	MDRV_DRIVER_DATA( cat_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000, XTAL_5MHz)
 	MDRV_CPU_PROGRAM_MAP(cat_mem)
@@ -402,10 +430,14 @@ static MACHINE_DRIVER_START( cat )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( swyft )
+
+	MDRV_DRIVER_DATA( cat_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000, XTAL_5MHz)
 	MDRV_CPU_PROGRAM_MAP(swyft_mem)
 
+	MDRV_MACHINE_START(swyft)
 	MDRV_MACHINE_RESET(swyft)
 
 	/* video hardware */

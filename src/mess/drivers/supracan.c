@@ -47,26 +47,51 @@ bpclear
 #include "devices/cartslot.h"
 #include "debugger.h"
 
-static UINT16 supracan_m6502_reset;
-static UINT8 *supracan_soundram;
-static UINT16 *supracan_soundram_16;
-static emu_timer *supracan_video_timer;
-static UINT16 *supracan_vram;
-static UINT16 spr_limit;
-static UINT32 spr_base_addr;
-static UINT8 spr_flags;
-static UINT32 tilemap_base_addr[4];
-static int tilemap_scrollx[4],tilemap_scrolly[4];
-static UINT16 video_flags;
-static UINT16 tilemap_flags[4],tilemap_mode[4];
-static UINT16 irq_mask;
+typedef struct _acan_dma_regs_t acan_dma_regs_t;
+struct _acan_dma_regs_t
+{
+	UINT32 source[2];
+	UINT32 dest[2];
+	UINT16 count[2];
+	UINT16 control[2];
+};
 
-static UINT32 roz_base_addr;
-static UINT16 roz_mode;
-static UINT32 roz_scrollx, roz_scrolly;
-static UINT16 roz_tile_bank;
+typedef struct _acan_sprdma_regs_t acan_sprdma_regs_t;
+struct _acan_sprdma_regs_t
+{
+	UINT32 src;
+	UINT32 dst;
+	UINT16 count;
+	UINT16 control;
+};
 
-static UINT16 supracan_video_regs[256];
+typedef struct _supracan_state supracan_state;
+struct _supracan_state
+{
+	acan_dma_regs_t acan_dma_regs;
+	acan_sprdma_regs_t acan_sprdma_regs;
+
+	UINT16 m6502_reset;
+	UINT8 *soundram;
+	UINT16 *soundram_16;
+	emu_timer *video_timer;
+	UINT16 *vram;
+	UINT16 spr_limit;
+	UINT32 spr_base_addr;
+	UINT8 spr_flags;
+	UINT32 tilemap_base_addr[4];
+	int tilemap_scrollx[4],tilemap_scrolly[4];
+	UINT16 video_flags;
+	UINT16 tilemap_flags[4],tilemap_mode[4];
+	UINT16 irq_mask;
+
+	UINT32 roz_base_addr;
+	UINT16 roz_mode;
+	UINT32 roz_scrollx, roz_scrolly;
+	UINT16 roz_tile_bank;
+
+	UINT16 video_regs[256];
+};
 
 static READ16_HANDLER( supracan_unk1_r );
 static WRITE16_HANDLER( supracan_soundram_w );
@@ -103,6 +128,8 @@ static VIDEO_START( supracan )
 
 static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,int layer)
 {
+	supracan_state *state = (supracan_state *)machine->driver_data;
+	UINT16 *supracan_vram = state->vram;
 	UINT32 count;
 	int x,y;
 	int scrollx,scrolly;
@@ -111,18 +138,18 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 	int size;
 	UINT16 tile_bank,pal_bank;
 
-	count = (tilemap_base_addr[layer]);
+	count = (state->tilemap_base_addr[layer]);
 	/* FIXME: I guess that this truly controls tilemap paging. */
-	if((tilemap_flags[layer] & 0x0f00) == 0xa00)
+	if((state->tilemap_flags[layer] & 0x0f00) == 0xa00)
 		size = 128;
 	else
-		size = (video_flags & 0x100) ? 64 : 32;
+		size = (state->video_flags & 0x100) ? 64 : 32;
 
 	/* FIXME: swap scrollx / scrolly */
-	scrolly = (tilemap_scrolly[layer] & 0x800) ? ((tilemap_scrolly[layer] & (size*8-1)) - size*8) : (tilemap_scrolly[layer] & (size*8-1));
-	scrollx = (tilemap_scrollx[layer] & 0x800) ? ((tilemap_scrollx[layer] & (size*8-1)) - size*8) : (tilemap_scrollx[layer] & (size*8-1));
+	scrolly = (state->tilemap_scrolly[layer] & 0x800) ? ((state->tilemap_scrolly[layer] & (size*8-1)) - size*8) : (state->tilemap_scrolly[layer] & (size*8-1));
+	scrollx = (state->tilemap_scrollx[layer] & 0x800) ? ((state->tilemap_scrollx[layer] & (size*8-1)) - size*8) : (state->tilemap_scrollx[layer] & (size*8-1));
 
-	gfx_mode = (tilemap_mode[layer] & 0x7000) >> 12;
+	gfx_mode = (state->tilemap_mode[layer] & 0x7000) >> 12;
 
 	switch(gfx_mode)
 	{
@@ -145,7 +172,7 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 			pal = ((supracan_vram[count] & 0xf000) >> 12) + pal_bank;
 
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly,0);
-			if(tilemap_flags[layer] & 0x20) //wrap-around enable
+			if(state->tilemap_flags[layer] & 0x20) //wrap-around enable
 			{
 				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+size*8,(y*8)-scrolly,0);
 				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly+size*8,0);
@@ -166,6 +193,9 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 /* */
 static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	supracan_state *state = (supracan_state *)machine->driver_data;
+	UINT16 *supracan_vram = state->vram;
+	UINT32 roz_base_addr = state->roz_base_addr;
 	UINT32 count;
 	int x,y;
 	int scrollx,scrolly;
@@ -174,7 +204,7 @@ static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle
 	int xsize,ysize;
 	UINT16 tile_bank;
 
-	switch(roz_mode & 3) //FIXME: fix gfx bpp order
+	switch(state->roz_mode & 3) //FIXME: fix gfx bpp order
 	{
 		case 0: return; //1bpp! Used on BIOS logo
 		case 1: region = 2; break;
@@ -182,23 +212,23 @@ static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle
 		case 3: region = 0; break;
 	}
 
-	if((roz_mode & 0xe00) == 0xc00)
+	if((state->roz_mode & 0xe00) == 0xc00)
 	{
 		xsize = 64;
 		ysize = 64;
 	}
 	else
 	{
-		xsize = ysize = roz_mode & 0x200 ? 64 : 32;
+		xsize = ysize = state->roz_mode & 0x200 ? 64 : 32;
 	}
 
 	count = (0);
-	scrollx = (roz_scrollx >> 8) & 0x1ff;
-	scrolly = (roz_scrolly >> 8) & 0x1ff;
+	scrollx = (state->roz_scrollx >> 8) & 0x1ff;
+	scrolly = (state->roz_scrolly >> 8) & 0x1ff;
 
 	//roz_mode & 0x20 enables roz capabilities
 
- 	tile_bank = (roz_tile_bank & 0xf000) >> 3; //FIXME: check this
+ 	tile_bank = (state->roz_tile_bank & 0xf000) >> 3; //FIXME: check this
 
 	for (y=0;y<ysize;y++)
 	{
@@ -222,6 +252,8 @@ static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	supracan_state *state = (supracan_state *)machine->driver_data;
+	UINT16 *supracan_vram = state->vram;
 	int x, y;
 	int xtile, ytile;
 	int xsize, ysize;
@@ -234,8 +266,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	int region;
 	//UINT8 *sprdata = (UINT8*)(&supracan_vram[0x1d000/2]);
 
-	spr_base = spr_base_addr;
-	region = (spr_flags & 1) ? 0 : 1; //8bpp : 4bpp
+	spr_base = state->spr_base_addr;
+	region = (state->spr_flags & 1) ? 0 : 1; //8bpp : 4bpp
 
 	/*
 		[0]
@@ -252,7 +284,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		oooo oooo oooo oooo sprite pointer
 	*/
 
-	for(i=spr_base/2;i<(spr_base+(spr_limit*8))/2;i+=4)
+	for(i=spr_base/2;i<(spr_base+(state->spr_limit*8))/2;i+=4)
 	{
 		x = supracan_vram[i+2] & 0x00ff;
 		y = supracan_vram[i+0] & 0x00ff;
@@ -336,6 +368,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static VIDEO_UPDATE( supracan )
 {
+	supracan_state *state = (supracan_state *)screen->machine->driver_data;
+
 	bitmap_fill(bitmap, cliprect, 0);
 
 #if 0
@@ -388,55 +422,38 @@ static VIDEO_UPDATE( supracan )
 	}
 #endif
 
-	if(video_flags & 0x20) //guess, not tested
+	if(state->video_flags & 0x20) //guess, not tested
 		draw_tilemap(screen->machine,bitmap,cliprect,2);
 
-	if((tilemap_flags[1] & 0x7000) < (tilemap_flags[0] & 0x7000)) //pri number?
+	if((state->tilemap_flags[1] & 0x7000) < (state->tilemap_flags[0] & 0x7000)) //pri number?
 	{
-		if(video_flags & 0x80)
+		if(state->video_flags & 0x80)
 			draw_tilemap(screen->machine,bitmap,cliprect,0);
-		if(video_flags & 0x40)
+		if(state->video_flags & 0x40)
 			draw_tilemap(screen->machine,bitmap,cliprect,1);
 	}
 	else
 	{
-		if(video_flags & 0x40)
+		if(state->video_flags & 0x40)
 			draw_tilemap(screen->machine,bitmap,cliprect,1);
-		if(video_flags & 0x80)
+		if(state->video_flags & 0x80)
 			draw_tilemap(screen->machine,bitmap,cliprect,0);
 	}
-	if(video_flags & 8)
+	if(state->video_flags & 8)
 		draw_sprites(screen->machine,bitmap,cliprect);
 
-	if(video_flags & 4)
+	if(state->video_flags & 4)
 		draw_roz(screen->machine,bitmap,cliprect);
 
 
 	return 0;
 }
 
-typedef struct
-{
-	UINT32 source[2];
-	UINT32 dest[2];
-	UINT16 count[2];
-	UINT16 control[2];
-} _acan_dma_regs_t;
-
-typedef struct
-{
-	UINT32 src;
-	UINT32 dst;
-	UINT16 count;
-	UINT16 control;
-} _acan_sprdma_regs_t;
-
-static _acan_dma_regs_t acan_dma_regs;
-static _acan_sprdma_regs_t acan_sprdma_regs;
-
 
 static WRITE16_HANDLER( supracan_dma_w )
 {
+	supracan_state *state = (supracan_state *)space->machine->driver_data;
+	acan_dma_regs_t *acan_dma_regs = &state->acan_dma_regs;
 	int i;
 	int ch;
 
@@ -446,32 +463,32 @@ static WRITE16_HANDLER( supracan_dma_w )
 	{
 		case 0x00/2: // Source address MSW
 		case 0x10/2:
-			acan_dma_regs.source[ch] &= 0x0000ffff;
-			acan_dma_regs.source[ch] |= data << 16;
+			acan_dma_regs->source[ch] &= 0x0000ffff;
+			acan_dma_regs->source[ch] |= data << 16;
 			break;
 		case 0x02/2: // Source address LSW
 		case 0x12/2:
-			acan_dma_regs.source[ch] &= 0xffff0000;
-			acan_dma_regs.source[ch] |= data;
+			acan_dma_regs->source[ch] &= 0xffff0000;
+			acan_dma_regs->source[ch] |= data;
 			break;
 		case 0x04/2: // Destination address MSW
 		case 0x14/2:
-			acan_dma_regs.dest[ch] &= 0x0000ffff;
-			acan_dma_regs.dest[ch] |= data << 16;
+			acan_dma_regs->dest[ch] &= 0x0000ffff;
+			acan_dma_regs->dest[ch] |= data << 16;
 			break;
 		case 0x06/2: // Destination address LSW
 		case 0x16/2:
-			acan_dma_regs.dest[ch] &= 0xffff0000;
-			acan_dma_regs.dest[ch] |= data;
+			acan_dma_regs->dest[ch] &= 0xffff0000;
+			acan_dma_regs->dest[ch] |= data;
 			break;
 		case 0x08/2: // Byte count
 		case 0x18/2:
-			acan_dma_regs.count[ch] = data;
+			acan_dma_regs->count[ch] = data;
 			break;
 		case 0x0a/2: // Control
 		case 0x1a/2:
 			//if(acan_dma_regs.dest != 0xf00200)
-			printf("%08x %08x %02x %04x\n",acan_dma_regs.source[ch],acan_dma_regs.dest[ch],acan_dma_regs.count[ch] + 1,data);
+			printf("%08x %08x %02x %04x\n",acan_dma_regs->source[ch],acan_dma_regs->dest[ch],acan_dma_regs->count[ch] + 1,data);
 			if(data & 0x8800)
 			{
 				//if(data != 0x9800 && data != 0x8800)
@@ -479,32 +496,32 @@ static WRITE16_HANDLER( supracan_dma_w )
 				//	fatalerror("%04x",data);
 				//}
 //				if(data & 0x2000)
-//					acan_dma_regs.source-=2;
-				verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_dma_regs.source[ch], acan_dma_regs.dest[ch], acan_dma_regs.count[ch] + 1, data);
+//					acan_dma_regs->source-=2;
+				verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_dma_regs->source[ch], acan_dma_regs->dest[ch], acan_dma_regs->count[ch] + 1, data);
 
-				for(i = 0; i <= acan_dma_regs.count[ch]; i++)
+				for(i = 0; i <= acan_dma_regs->count[ch]; i++)
 				{
 					if(data & 0x1000)
 					{
-						memory_write_word(space, acan_dma_regs.dest[ch], memory_read_word(space, acan_dma_regs.source[ch]));
-						acan_dma_regs.dest[ch]+=2;
-						acan_dma_regs.source[ch]+=2;
+						memory_write_word(space, acan_dma_regs->dest[ch], memory_read_word(space, acan_dma_regs->source[ch]));
+						acan_dma_regs->dest[ch]+=2;
+						acan_dma_regs->source[ch]+=2;
 						if(data & 0x0100)
-							if((acan_dma_regs.dest[ch] & 0xf) == 0)
-								acan_dma_regs.dest[ch]-=0x10;
+							if((acan_dma_regs->dest[ch] & 0xf) == 0)
+								acan_dma_regs->dest[ch]-=0x10;
 					}
 					else
 					{
-						memory_write_byte(space, acan_dma_regs.dest[ch], memory_read_byte(space, acan_dma_regs.source[ch]));
-						acan_dma_regs.dest[ch]++;
-						acan_dma_regs.source[ch]++;
+						memory_write_byte(space, acan_dma_regs->dest[ch], memory_read_byte(space, acan_dma_regs->source[ch]));
+						acan_dma_regs->dest[ch]++;
+						acan_dma_regs->source[ch]++;
 					}
 				}
 			}
 			else
 			{
-				verboselog(space->machine, 0, "supracan_dma_w: Unknown DMA kickoff value of %04x (other regs %08x, %08x, %d)\n", data, acan_dma_regs.source[ch], acan_dma_regs.dest[ch], acan_dma_regs.count[ch] + 1);
-				fatalerror("supracan_dma_w: Unknown DMA kickoff value of %04x (other regs %08x, %08x, %d)",data, acan_dma_regs.source[ch], acan_dma_regs.dest[ch], acan_dma_regs.count[ch] + 1);
+				verboselog(space->machine, 0, "supracan_dma_w: Unknown DMA kickoff value of %04x (other regs %08x, %08x, %d)\n", data, acan_dma_regs->source[ch], acan_dma_regs->dest[ch], acan_dma_regs->count[ch] + 1);
+				fatalerror("supracan_dma_w: Unknown DMA kickoff value of %04x (other regs %08x, %08x, %d)",data, acan_dma_regs->source[ch], acan_dma_regs->dest[ch], acan_dma_regs->count[ch] + 1);
 			}
 			break;
 	}
@@ -518,13 +535,13 @@ static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xe80208, 0xe80209 ) AM_READ_PORT("P3")
 	AM_RANGE( 0xe8020c, 0xe8020d ) AM_READ_PORT("P4")
 	AM_RANGE( 0xe80300, 0xe80301 ) AM_READ( supracan_unk1_r )
-	AM_RANGE( 0xe81000, 0xe8ffff ) AM_RAM_WRITE( supracan_soundram_w ) AM_BASE( &supracan_soundram_16 )
+	AM_RANGE( 0xe81000, 0xe8ffff ) AM_RAM_WRITE( supracan_soundram_w ) AM_BASE_MEMBER(supracan_state,soundram_16)
 	AM_RANGE( 0xe90000, 0xe9001f ) AM_WRITE( supracan_sound_w )
 	AM_RANGE( 0xe90020, 0xe9003f ) AM_WRITE( supracan_dma_w )
 	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE( supracan_video_r, supracan_video_w )
 	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE( 0xf40000, 0xf5ffff ) AM_RAM_WRITE(supracan_char_w) AM_BASE(&supracan_vram)	/* Unknown, some data gets copied here during boot */
-//	AM_RANGE( 0xf44000, 0xf441ff ) AM_RAM AM_BASE(&supracan_rozpal) /* clut data for the ROZ? */
+	AM_RANGE( 0xf40000, 0xf5ffff ) AM_RAM_WRITE(supracan_char_w) AM_BASE_MEMBER(supracan_state,vram)	/* Unknown, some data gets copied here during boot */
+//	AM_RANGE( 0xf44000, 0xf441ff ) AM_RAM AM_BASE_MEMBER(supracan_state,rozpal) /* clut data for the ROZ? */
 //	AM_RANGE( 0xf44600, 0xf44fff ) AM_RAM	/* Unknown, stuff gets written here. Zoom table?? */
 	AM_RANGE( 0xfc0000, 0xfcffff ) AM_MIRROR(0x30000) AM_RAM /* System work ram */
 ADDRESS_MAP_END
@@ -536,11 +553,14 @@ static ADDRESS_MAP_START( supracan_sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0420, 0x0420 ) AM_READNOP //AM_READ(status)
 	AM_RANGE( 0x0420, 0x0420 ) AM_WRITENOP //AM_WRITE(data)
 	AM_RANGE( 0x0422, 0x0422 ) AM_WRITENOP //AM_WRITE(address)
-	AM_RANGE( 0x1000, 0xffff ) AM_RAM AM_BASE( &supracan_soundram )
+	AM_RANGE( 0x1000, 0xffff ) AM_RAM AM_BASE_MEMBER(supracan_state,soundram )
 ADDRESS_MAP_END
 
 static WRITE16_HANDLER( supracan_char_w )
 {
+	supracan_state *state = (supracan_state *)space->machine->driver_data;
+	UINT16 *supracan_vram = state->vram;
+
 	COMBINE_DATA(&supracan_vram[offset]);
 
 	{
@@ -689,10 +709,12 @@ static PALETTE_INIT( supracan )
 
 static WRITE16_HANDLER( supracan_soundram_w )
 {
-	supracan_soundram_16[offset] = data;
+	supracan_state *state = (supracan_state *)space->machine->driver_data;
 
-	supracan_soundram[offset*2 + 1] = data & 0xff;
-	supracan_soundram[offset*2 + 0] = data >> 8;
+	state->soundram_16[offset] = data;
+
+	state->soundram[offset*2 + 1] = data & 0xff;
+	state->soundram[offset*2 + 0] = data >> 8;
 }
 
 
@@ -705,6 +727,8 @@ static READ16_HANDLER( supracan_unk1_r )
 
 static WRITE16_HANDLER( supracan_sound_w )
 {
+	supracan_state *state = (supracan_state *)space->machine->driver_data;
+
 	switch ( offset )
 	{
 		case 0x000a/2:
@@ -714,7 +738,7 @@ static WRITE16_HANDLER( supracan_sound_w )
 		case 0x001c/2:	/* Sound cpu control. Bit 0 tied to sound cpu RESET line */
 			if ( data & 0x01 )
 			{
-				if ( ! supracan_m6502_reset )
+				if ( ! state->m6502_reset )
 				{
 					/* Reset and enable the sound cpu */
 					//cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, CLEAR_LINE);
@@ -726,7 +750,7 @@ static WRITE16_HANDLER( supracan_sound_w )
 				/* Halt the sound cpu */
 				cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
 			}
-			supracan_m6502_reset = data & 0x01;
+			state->m6502_reset = data & 0x01;
 			break;
 		default:
 			//printf("supracan_sound_w: writing %04x to unknown address %08x\n", data, 0xe90000 + offset * 2 );
@@ -737,7 +761,8 @@ static WRITE16_HANDLER( supracan_sound_w )
 
 static READ16_HANDLER( supracan_video_r )
 {
-	UINT16 data = supracan_video_regs[offset];
+	supracan_state *state = (supracan_state *)space->machine->driver_data;
+	UINT16 data = state->video_regs[offset];
 
 	switch(offset)
 	{
@@ -754,19 +779,20 @@ static READ16_HANDLER( supracan_video_r )
 
 static TIMER_CALLBACK( supracan_video_callback )
 {
+	supracan_state *state = (supracan_state *)machine->driver_data;
 	int vpos = video_screen_get_vpos(machine->primary_screen);
 
 	switch( vpos )
 	{
 	case 0:
-		supracan_video_regs[0] &= 0x7fff;
+		state->video_regs[0] &= 0x7fff;
 		break;
 	case 240:
-		supracan_video_regs[0] |= 0x8000;
+		state->video_regs[0] |= 0x8000;
 		break;
 	}
 
-	timer_adjust_oneshot( supracan_video_timer, video_screen_get_time_until_pos( machine->primary_screen, ( vpos + 1 ) & 0xff, 0 ), 0 );
+	timer_adjust_oneshot( state->video_timer, video_screen_get_time_until_pos( machine->primary_screen, ( vpos + 1 ) & 0xff, 0 ), 0 );
 }
 
 /*
@@ -780,52 +806,54 @@ f0001e is the trigger
 */
 static WRITE16_HANDLER( supracan_video_w )
 {
+	supracan_state *state = (supracan_state *)space->machine->driver_data;
+	acan_sprdma_regs_t *acan_sprdma_regs = &state->acan_sprdma_regs;
 	int i;
 
 	switch(offset)
 	{
 		case 0x18/2: // Source address MSW
-			acan_sprdma_regs.src &= 0x0000ffff;
-			acan_sprdma_regs.src |= data << 16;
+			acan_sprdma_regs->src &= 0x0000ffff;
+			acan_sprdma_regs->src |= data << 16;
 			break;
 		case 0x1a/2: // Source address LSW
-			acan_sprdma_regs.src &= 0xffff0000;
-			acan_sprdma_regs.src |= data;
+			acan_sprdma_regs->src &= 0xffff0000;
+			acan_sprdma_regs->src |= data;
 			break;
 		case 0x12/2: // Destination address MSW
-			acan_sprdma_regs.dst &= 0x0000ffff;
-			acan_sprdma_regs.dst |= data << 16;
+			acan_sprdma_regs->dst &= 0x0000ffff;
+			acan_sprdma_regs->dst |= data << 16;
 			break;
 		case 0x14/2: // Destination address LSW
-			acan_sprdma_regs.dst &= 0xffff0000;
-			acan_sprdma_regs.dst |= data;
+			acan_sprdma_regs->dst &= 0xffff0000;
+			acan_sprdma_regs->dst |= data;
 			break;
 		case 0x10/2: // Byte count
-			acan_sprdma_regs.count = data;
+			acan_sprdma_regs->count = data;
 			break;
 		case 0x1e/2:
-			printf("* %08x %08x %04x %04x\n",acan_sprdma_regs.src,acan_sprdma_regs.dst,acan_sprdma_regs.count,data);
-			verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_sprdma_regs.src, acan_sprdma_regs.dst, acan_sprdma_regs.count + 1, data);
+			printf("* %08x %08x %04x %04x\n",acan_sprdma_regs->src,acan_sprdma_regs->dst,acan_sprdma_regs->count,data);
+			verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_sprdma_regs->src, acan_sprdma_regs->dst, acan_sprdma_regs->count + 1, data);
 
 			/* TODO: what's 0x2000 and 0x4000 for? */
 			if(data & 0x8000)
 			{
 				if(data & 0x2000 || data & 0x4000)
-					acan_sprdma_regs.dst |= 0xf40000;
+					acan_sprdma_regs->dst |= 0xf40000;
 
-				for(i = 0; i <= acan_sprdma_regs.count; i++)
+				for(i = 0; i <= acan_sprdma_regs->count; i++)
 				{
 					if(data & 0x0100) //dma 0x00 fill (or fixed value?)
 					{
-						memory_write_word(space, acan_sprdma_regs.dst, 0);
-						acan_sprdma_regs.dst+=2;
+						memory_write_word(space, acan_sprdma_regs->dst, 0);
+						acan_sprdma_regs->dst+=2;
 						//memset(supracan_vram,0x00,0x020000);
 					}
 					else
 					{
-						memory_write_word(space, acan_sprdma_regs.dst, memory_read_word(space, acan_sprdma_regs.src));
-						acan_sprdma_regs.dst+=2;
-						acan_sprdma_regs.src+=2;
+						memory_write_word(space, acan_sprdma_regs->dst, memory_read_word(space, acan_sprdma_regs->src));
+						acan_sprdma_regs->dst+=2;
+						acan_sprdma_regs->src+=2;
 					}
 				}
 			}
@@ -835,52 +863,52 @@ static WRITE16_HANDLER( supracan_video_w )
 			}
 			break;
 		case 0x08/2:
-			video_flags = data;
+			state->video_flags = data;
 			{
 				rectangle visarea = *video_screen_get_visible_area(space->machine->primary_screen);
 
 				visarea.min_x = visarea.min_y = 0;
 				visarea.max_y = 240 - 1;
-				visarea.max_x = ((video_flags & 0x100) ? 320 : 256) - 1;
+				visarea.max_x = ((state->video_flags & 0x100) ? 320 : 256) - 1;
 				video_screen_configure(space->machine->primary_screen, 348, 256, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds);
 			}
 			break;
-		case 0x20/2: spr_base_addr = data << 2; break;
-		case 0x22/2: spr_limit = data+1; break;
-		case 0x26/2: spr_flags = data; break;
-		case 0x100/2: tilemap_flags[0] = data; break;
-		case 0x104/2: tilemap_scrollx[0] = data; break;
-		case 0x106/2: tilemap_scrolly[0] = data; break;
-		case 0x108/2: tilemap_base_addr[0] = (data) << 1; break;
-		case 0x10a/2: tilemap_mode[0] = data; break;
-		case 0x120/2: tilemap_flags[1] = data; break;
-		case 0x124/2: tilemap_scrollx[1] = data; break;
-		case 0x126/2: tilemap_scrolly[1] = data; break;
-		case 0x128/2: tilemap_base_addr[1] = (data) << 1; break;
-		case 0x12a/2: tilemap_mode[1] = data; break;
-		case 0x140/2: tilemap_flags[2] = data; break;
-		case 0x144/2: tilemap_scrollx[2] = data; break;
-		case 0x146/2: tilemap_scrolly[2] = data; break;
-		case 0x148/2: tilemap_base_addr[2] = (data) << 1; break;
-		case 0x14a/2: tilemap_mode[2] = data; break;
+		case 0x20/2: state->spr_base_addr = data << 2; break;
+		case 0x22/2: state->spr_limit = data+1; break;
+		case 0x26/2: state->spr_flags = data; break;
+		case 0x100/2: state->tilemap_flags[0] = data; break;
+		case 0x104/2: state->tilemap_scrollx[0] = data; break;
+		case 0x106/2: state->tilemap_scrolly[0] = data; break;
+		case 0x108/2: state->tilemap_base_addr[0] = (data) << 1; break;
+		case 0x10a/2: state->tilemap_mode[0] = data; break;
+		case 0x120/2: state->tilemap_flags[1] = data; break;
+		case 0x124/2: state->tilemap_scrollx[1] = data; break;
+		case 0x126/2: state->tilemap_scrolly[1] = data; break;
+		case 0x128/2: state->tilemap_base_addr[1] = (data) << 1; break;
+		case 0x12a/2: state->tilemap_mode[1] = data; break;
+		case 0x140/2: state->tilemap_flags[2] = data; break;
+		case 0x144/2: state->tilemap_scrollx[2] = data; break;
+		case 0x146/2: state->tilemap_scrolly[2] = data; break;
+		case 0x148/2: state->tilemap_base_addr[2] = (data) << 1; break;
+		case 0x14a/2: state->tilemap_mode[2] = data; break;
 
 		/* 0x180-0x19f are roz tilemap related regs */
-		case 0x180/2: roz_mode = data; break;
-		case 0x184/2: roz_scrollx = (data << 16) | (roz_scrollx & 0xffff); break;
-		case 0x186/2: roz_scrollx = (data) | (roz_scrollx & 0xffff0000); break;
-		case 0x188/2: roz_scrolly = (data << 16) | (roz_scrolly & 0xffff); break;
-		case 0x18a/2: roz_scrolly = (data) | (roz_scrolly & 0xffff0000); break;
-		case 0x194/2: roz_base_addr = (data) << 1; break;
-		case 0x196/2: roz_tile_bank = data; break; //tile bank
+		case 0x180/2: state->roz_mode = data; break;
+		case 0x184/2: state->roz_scrollx = (data << 16) | (state->roz_scrollx & 0xffff); break;
+		case 0x186/2: state->roz_scrollx = (data) | (state->roz_scrollx & 0xffff0000); break;
+		case 0x188/2: state->roz_scrolly = (data << 16) | (state->roz_scrolly & 0xffff); break;
+		case 0x18a/2: state->roz_scrolly = (data) | (state->roz_scrolly & 0xffff0000); break;
+		case 0x194/2: state->roz_base_addr = (data) << 1; break;
+		case 0x196/2: state->roz_tile_bank = data; break; //tile bank
 
 		case 0x1f0/2: //FIXME: this register is mostly not understood
-			irq_mask = (data & 8) ? 0 : 1;
+			state->irq_mask = (data & 8) ? 0 : 1;
 			break;
 		default:
 			verboselog(space->machine, 0, "supracan_video_w: Unknown register: %08x = %04x & %04x\n", 0xf00000 + (offset << 1), data, mem_mask);
 			break;
 	}
-	supracan_video_regs[offset] = data;
+	state->video_regs[offset] = data;
 }
 
 
@@ -907,15 +935,19 @@ static DEVICE_IMAGE_LOAD( supracan_cart )
 
 static MACHINE_START( supracan )
 {
-	supracan_video_timer = timer_alloc( machine, supracan_video_callback, NULL );
+	supracan_state *state = (supracan_state *)machine->driver_data;
+
+	state->video_timer = timer_alloc( machine, supracan_video_callback, NULL );
 }
 
 
 static MACHINE_RESET( supracan )
 {
+	supracan_state *state = (supracan_state *)machine->driver_data;
+
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
-	timer_adjust_oneshot( supracan_video_timer, video_screen_get_time_until_pos( machine->primary_screen, 0, 0 ), 0 );
-	irq_mask = 0;
+	timer_adjust_oneshot( state->video_timer, video_screen_get_time_until_pos( machine->primary_screen, 0, 0 ), 0 );
+	state->irq_mask = 0;
 }
 
 static const gfx_layout supracan_gfx8bpp =
@@ -960,11 +992,16 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( supracan_irq )
 {
-	if(irq_mask)
+	supracan_state *state = (supracan_state *)device->machine->driver_data;
+
+	if(state->irq_mask)
 		cpu_set_input_line(device, 7, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( supracan )
+
+	MDRV_DRIVER_DATA( supracan_state )
+
 	MDRV_CPU_ADD( "maincpu", M68000, XTAL_10_738635MHz )		/* Correct frequency unknown */
 	MDRV_CPU_PROGRAM_MAP( supracan_mem )
 	MDRV_CPU_VBLANK_INT("screen", supracan_irq)

@@ -51,6 +51,8 @@ Source Changes:
 - [CIA6526] Refactored interface, added SP/CNT callbacks, and fixed serial
   port transfer. [Curt Coder]
 
+- Cleanups for driver_data and Standard C library usage.  [Atari Ace]
+
 
 
 0.136

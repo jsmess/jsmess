@@ -511,11 +511,11 @@ static void pdp1_draw_circle(bitmap_t *bitmap, int x, int y, int radius, int col
 	y = y*crt_window_width/01777;
 	radius = radius*crt_window_width/01777;
 
-	interval = ceil(radius/sqrt(2));
+	interval = ceil(radius/sqrt(2.));
 
 	for (a=0; a<=interval; a++)
 	{
-		int b = sqrt(radius*radius-a*a) + .5;
+		int b = sqrt((double)radius*radius-a*a) + .5;
 
 		if ((x-a >= 0) && (y-b >= 0))
 			pdp1_plot_pixel(bitmap, x-a, y-b, color_);
@@ -546,7 +546,7 @@ static void pdp1_draw_circle(bitmap_t *bitmap, int x, int y, int radius, int col
 	fx = (float)x*crt_window_width/01777;
 	fy = (float)y*crt_window_height/01777;
 
-	interval = radius/sqrt(2);
+	interval = radius/sqrt(2.);
 
 	for (x=/*ceil*/(fx-interval); x<=fx+interval; x++)
 	{

@@ -339,7 +339,7 @@ static WRITE8_HANDLER ( geneve_speech_w )
 	if (! tms5220_readyq_r(devtag_get_device(space->machine, "tms5220")))
 	{
 		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
-		int cycles_to_ready = ceil(cputag_attotime_to_clocks(space->machine, "maincpu", time_to_ready));
+		int cycles_to_ready = cputag_attotime_to_clocks(space->machine, "maincpu", time_to_ready);
 
 		logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
 

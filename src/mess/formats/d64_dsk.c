@@ -265,6 +265,12 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 	{
 		UINT8 id1 = tag->id1;
 		UINT8 id2 = tag->id2;
+		int sectors_per_track;
+		UINT16 d64_track_size;
+		UINT8 *d64_track_data;
+		UINT16 gcr_track_size;
+		UINT8 *gcr_track_data;
+		UINT64 gcr_pos = 2;
 
 		/* determine logical track number */
 		int dos_track = get_dos_track(track);
@@ -278,16 +284,15 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 		if (head == 1) dos_track += tag->dos_tracks;
 
 		/* determine number of sectors per track */
-		int sectors_per_track = d64_get_sectors_per_track(floppy, head, track); 
+		sectors_per_track = d64_get_sectors_per_track(floppy, head, track); 
 
 		/* allocate D64 track data buffer */
-		UINT16 d64_track_size = sectors_per_track * SECTOR_SIZE;
-		UINT8 d64_track_data[d64_track_size];
+		d64_track_size = sectors_per_track * SECTOR_SIZE;
+		d64_track_data = (UINT8 *)alloca(d64_track_size);
 
 		/* allocate temporary GCR track data buffer */
-		UINT16 gcr_track_size = 2 + (sectors_per_track * SECTOR_SIZE_GCR);
-		UINT8 gcr_track_data[gcr_track_size];
-		UINT64 gcr_pos = 2;
+		gcr_track_size = 2 + (sectors_per_track * SECTOR_SIZE_GCR);
+		gcr_track_data = (UINT8 *)alloca(gcr_track_size);
 		
 		if (buflen < gcr_track_size) fatalerror("D64 track buffer too small: %u!\n", (UINT32)buflen);
 

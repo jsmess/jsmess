@@ -641,12 +641,10 @@ static VIDEO_START( xerox820 )
 static VIDEO_UPDATE( xerox820 )
 {
 	xerox820_state *state = (xerox820_state *)screen->machine->driver_data;
-
-	static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=(state->scroll + 1) * 0x80,x;
 
-	framecnt++;
+	state->framecnt++;
 
 	for (y = 0; y < 24; y++)
 	{
@@ -663,7 +661,7 @@ static VIDEO_UPDATE( xerox820 )
 					chr = state->video_ram[x & XEROX820_VIDEORAM_MASK] ^ 0x80;
 
 					/* Take care of flashing characters */
-					if ((chr < 0x80) && (framecnt & 0x08))
+					if ((chr < 0x80) && (state->framecnt & 0x08))
 						chr |= 0x80;
 
 					/* get pattern of pixels for that character scanline */

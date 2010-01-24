@@ -26,6 +26,7 @@ struct _xerox820_state
 	UINT8 *video_ram;					/* video RAM */
 	UINT8 *char_rom;					/* character ROM */
 	UINT8 scroll;						/* vertical scroll */
+	UINT8 framecnt;
 	int ncset2;							/* national character set */
 	int vatt;							/* X120 video attribute */
 	int lowlite;						/* low light attribute */

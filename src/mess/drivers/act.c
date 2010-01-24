@@ -25,14 +25,20 @@
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 
-static UINT16 *act_vram,*act_scrollram,*act_ram;
-static struct
+typedef struct _act_state act_state;
+struct _act_state
 {
+	UINT16 *paletteram;
+	UINT16 *vram;
+	UINT16 *scrollram;
+	UINT16 *ram;
+
+	// xi_sys_ctrl
 	UINT8 disp_en; 		//bit 3
 	UINT8 gfx_mode; 	//bit 4
 	UINT8 fdrv_num;		//bit 6
 	UINT8 p_input_dir;	//bit 7
-}xi_sys_ctrl;
+};
 
 static VIDEO_START( act_f1 )
 {
@@ -40,6 +46,7 @@ static VIDEO_START( act_f1 )
 
 static VIDEO_UPDATE( act_f1 )
 {
+	act_state *state = (act_state *)screen->machine->driver_data;
 	int x,y,i;
 	int x_count;
 
@@ -53,8 +60,8 @@ static VIDEO_UPDATE( act_f1 )
 
 				for (i=0;i<8;i++)
 				{
-					pen[0] = (act_vram[act_scrollram[y]+x_count])>>(7-i) & 1;
-					pen[1] = (act_vram[act_scrollram[y]+x_count])>>(15-i) & 1;
+					pen[0] = (state->vram[state->scrollram[y]+x_count])>>(7-i) & 1;
+					pen[1] = (state->vram[state->scrollram[y]+x_count])>>(15-i) & 1;
 
 					color = pen[0]|pen[1]<<1;
 
@@ -76,18 +83,19 @@ static VIDEO_START( act_xi )
 
 static VIDEO_UPDATE( act_xi )
 {
+	act_state *state = (act_state *)screen->machine->driver_data;
 	int y,x,xi,yi;
 
-	if(xi_sys_ctrl.disp_en)
+	if(state->disp_en)
 		return 0;
 
-	if(xi_sys_ctrl.gfx_mode)
+	if(state->gfx_mode)
 	{
 		for (y=0;y<25;y++)
 		{
 			for (x=0;x<80;x++)
 			{
-				int tile = act_vram[(x+y*80)] & 0x03ff;
+				int tile = state->vram[(x+y*80)] & 0x03ff;
 
 				//0x8000: reverse
 				//0x4000: bright
@@ -100,7 +108,7 @@ static VIDEO_UPDATE( act_xi )
 					{
 						int color;
 
-						color = (act_ram[(tile*16)+(yi)]>>(xi) & 1) ? 7 : 0;
+						color = (state->ram[(tile*16)+(yi)]>>(xi) & 1) ? 7 : 0;
 
 						//FIXME: X should actually be multiplied by 10.
 						if((x*8+xi)<=video_screen_get_visible_area(screen)->max_x && ((y*16+yi))<video_screen_get_visible_area(screen)->max_y)
@@ -136,12 +144,13 @@ static WRITE8_HANDLER( act_sio_w )
 
 static READ8_HANDLER( act_fdc_r )
 {
+	act_state *state = (act_state *)space->machine->driver_data;
 	const device_config* dev = devtag_get_device(space->machine,"fdc");
 
 //  printf("%02x\n",offset);
 
-	floppy_mon_w(floppy_get_device(space->machine, xi_sys_ctrl.fdrv_num), CLEAR_LINE);
-	floppy_drive_set_ready_state(floppy_get_device(space->machine, xi_sys_ctrl.fdrv_num), 1,0);
+	floppy_mon_w(floppy_get_device(space->machine, state->fdrv_num), CLEAR_LINE);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, state->fdrv_num), 1,0);
 
 	switch(offset)
 	{
@@ -163,12 +172,13 @@ static READ8_HANDLER( act_fdc_r )
 
 static WRITE8_HANDLER( act_fdc_w )
 {
+	act_state *state = (act_state *)space->machine->driver_data;
 	const device_config* dev = devtag_get_device(space->machine,"fdc");
 
 //  printf("%02x %02x\n",offset,data);
 
-	floppy_mon_w(floppy_get_device(space->machine, xi_sys_ctrl.fdrv_num), CLEAR_LINE);
-	floppy_drive_set_ready_state(floppy_get_device(space->machine, xi_sys_ctrl.fdrv_num), 1,0);
+	floppy_mon_w(floppy_get_device(space->machine, state->fdrv_num), CLEAR_LINE);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, state->fdrv_num), 1,0);
 
 	switch(offset)
 	{
@@ -199,20 +209,23 @@ static const wd17xx_interface act_wd2797_interface =
 
 static READ16_HANDLER( act_pal_r )
 {
-	return space->machine->generic.paletteram.u16[offset];
+	act_state *state = (act_state *)space->machine->driver_data;
+
+	return state->paletteram[offset];
 }
 
 static WRITE16_HANDLER( act_pal_w )
 {
+	act_state *state = (act_state *)space->machine->driver_data;
 	UINT8 i,r,g,b;
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	COMBINE_DATA(&state->paletteram[offset]);
 
 	if(ACCESSING_BITS_0_7 && offset) //TODO: offset 0 looks bogus
 	{
-		i = space->machine->generic.paletteram.u16[offset] & 1;
-		r = ((space->machine->generic.paletteram.u16[offset] & 2)>>0) | i;
-		g = ((space->machine->generic.paletteram.u16[offset] & 4)>>1) | i;
-		b = ((space->machine->generic.paletteram.u16[offset] & 8)>>2) | i;
+		i = state->paletteram[offset] & 1;
+		r = ((state->paletteram[offset] & 2)>>0) | i;
+		g = ((state->paletteram[offset] & 4)>>1) | i;
+		b = ((state->paletteram[offset] & 8)>>2) | i;
 
 		palette_set_color_rgb(space->machine, offset, pal2bit(r), pal2bit(g), pal2bit(b));
 	}
@@ -220,17 +233,17 @@ static WRITE16_HANDLER( act_pal_w )
 
 static ADDRESS_MAP_START(act_f1_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x01e00,0x01fff) AM_RAM AM_BASE(&act_scrollram)
-	AM_RANGE(0xe0000,0xe001f) AM_READWRITE(act_pal_r,act_pal_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x00000,0xeffff) AM_RAM AM_BASE(&act_vram)
+	AM_RANGE(0x01e00,0x01fff) AM_RAM AM_BASE_MEMBER(act_state,scrollram)
+	AM_RANGE(0xe0000,0xe001f) AM_READWRITE(act_pal_r,act_pal_w) AM_BASE_MEMBER(act_state,paletteram)
+	AM_RANGE(0x00000,0xeffff) AM_RAM AM_BASE_MEMBER(act_state,vram)
 	AM_RANGE(0xf0000,0xf7fff) AM_RAM
 	AM_RANGE(0xf8000,0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(act_xi_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0xeffff) AM_RAM AM_BASE(&act_ram)
-	AM_RANGE(0xf0000,0xf0fff) AM_MIRROR(0x7000) AM_RAM AM_BASE(&act_vram)
+	AM_RANGE(0x00000,0xeffff) AM_RAM AM_BASE_MEMBER(act_state,ram)
+	AM_RANGE(0xf0000,0xf0fff) AM_MIRROR(0x7000) AM_RAM AM_BASE_MEMBER(act_state,vram)
 	AM_RANGE(0xf8000,0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -332,15 +345,16 @@ static READ8_DEVICE_HANDLER( act_portb_r )
 */
 static WRITE8_DEVICE_HANDLER( act_portb_w )
 {
+	act_state *state = (act_state *)device->machine->driver_data;
 	const device_config* dev = devtag_get_device(device->machine,"fdc");
 
 //  printf("PPI Port B write %02x\n",data);
-	xi_sys_ctrl.disp_en = (data & 8)>>3;
-	xi_sys_ctrl.gfx_mode = (data & 0x10)>>4;
-	xi_sys_ctrl.p_input_dir = (data & 0x80)>>7;
-	xi_sys_ctrl.fdrv_num = (data & 0x40)>>6;
+	state->disp_en = (data & 8)>>3;
+	state->gfx_mode = (data & 0x10)>>4;
+	state->p_input_dir = (data & 0x80)>>7;
+	state->fdrv_num = (data & 0x40)>>6;
 
-	wd17xx_set_drive(dev,xi_sys_ctrl.fdrv_num);
+	wd17xx_set_drive(dev,state->fdrv_num);
 	wd17xx_set_side(dev,(data & 0x04)>>2);
 }
 
@@ -473,6 +487,9 @@ static const floppy_config act_floppy_config =
 };
 
 static MACHINE_DRIVER_START( act_f1 )
+
+	MDRV_DRIVER_DATA( act_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8086, 4670000)
 	MDRV_CPU_PROGRAM_MAP(act_f1_mem)
@@ -508,6 +525,9 @@ static MACHINE_DRIVER_START( act_f1 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( act_xi )
+
+	MDRV_DRIVER_DATA( act_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8086, 4670000)
 	MDRV_CPU_PROGRAM_MAP(act_xi_mem)
