@@ -307,7 +307,7 @@ static WRITE8_HANDLER(towns_system_w)
 {
 	switch(offset)
 	{
-		case 0x00:
+		case 0x00:  // bit 7 = NMI vector protect, bit 6 = power off, bit 0 = software reset
 			logerror("SYS: port 0x20 write %02x\n",data);
 			break;
 		case 0x02:
@@ -1697,6 +1697,7 @@ static ADDRESS_MAP_START(marty_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x00680000, 0x0087ffff) AM_ROM AM_REGION("user",0x280000)  // EX ROM
   AM_RANGE(0x00a00000, 0x00a7ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x180000) // VRAM
   AM_RANGE(0x00c00000, 0x00c1ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffffffff) // Sprite RAM
+  AM_RANGE(0x00d00000, 0x00dfffff) AM_RAM // ?? - used by ssf2
   AM_RANGE(0x00e80000, 0x00efffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
   AM_RANGE(0x00f00000, 0x00f7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
   AM_RANGE(0x00f80000, 0x00f80fff) AM_DEVREADWRITE8("pcm",rf5c68_mem_r,rf5c68_mem_w,0xffffffff)  // WAVE RAM
@@ -1939,6 +1940,19 @@ static INPUT_PORTS_START( towns )
     PORT_BIT(0x00000020,IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2)
     PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED)
     PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( marty )
+  PORT_INCLUDE(towns)
+  // Consoles don't have keyboards...
+  PORT_MODIFY("key1")
+	PORT_BIT(0xffffffff,IP_ACTIVE_LOW,IPT_UNUSED)
+  PORT_MODIFY("key2")
+	PORT_BIT(0xffffffff,IP_ACTIVE_LOW,IPT_UNUSED)
+  PORT_MODIFY("key3")
+	PORT_BIT(0xffffffff,IP_ACTIVE_LOW,IPT_UNUSED)
+  PORT_MODIFY("key4")
+	PORT_BIT(0xffffffff,IP_ACTIVE_LOW,IPT_UNUSED)
 INPUT_PORTS_END
 
 static DRIVER_INIT( towns )
@@ -2194,6 +2208,6 @@ ROM_END
 /*    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    INIT    COMPANY      FULLNAME            FLAGS */
 COMP( 1989, fmtowns,  0,    	0, 		towns, 		towns, 	 towns,  "Fujitsu",   "FM-Towns",		 GAME_NOT_WORKING)
 COMP( 1989, fmtownsa, fmtowns,	0, 		towns, 		towns, 	 towns,  "Fujitsu",   "FM-Towns (alternate)", GAME_NOT_WORKING)
-CONS( 1993, fmtmarty, 0,    	0, 		marty, 		towns, 	 marty,  "Fujitsu",   "FM-Towns Marty",	 GAME_NOT_WORKING)
-CONS( 1994, carmarty, fmtmarty,	0, 		marty, 		towns, 	 towns,  "Fujitsu",   "FM-Towns Car Marty",	 GAME_NOT_WORKING)
+CONS( 1993, fmtmarty, 0,    	0, 		marty, 		marty, 	 marty,  "Fujitsu",   "FM-Towns Marty",	 GAME_NOT_WORKING)
+CONS( 1994, carmarty, fmtmarty,	0, 		marty, 		marty, 	 marty,  "Fujitsu",   "FM-Towns Car Marty",	 GAME_NOT_WORKING)
 
