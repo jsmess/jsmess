@@ -7,7 +7,6 @@ Consolidation and enhancment of documentation by Manfred Schneider based on prev
  TODO: implement the RESET key on the front panel
        find a dump of the character ROM
        convert the drawing code to tilemap
-       add MPT-03, Ormatu and Orbit clone families
 
 
  1. General
@@ -612,12 +611,12 @@ ROM_START(mratlus)
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
 ROM_END
 
-ROM_START(plldium)
+ROM_START(ormatu)
 	ROM_REGION(0x8000,"maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
 ROM_END
 
-ROM_START(ormatu)
+ROM_START(plldium)
 	ROM_REGION(0x8000,"maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
 ROM_END
@@ -872,4 +871,3 @@ CONS(1982, tunixha,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"Monaco Lei
 CONS(198?, tryomvgc,	intmpt03,  0,        arcadia,	arcadia,  arcadia,	"Tryom",		"Tryom Video Game Center", GAME_IMPERFECT_SOUND )				/* U.S.A */
 CONS(198?, orbituvi,	0,  	   0,        arcadia,	arcadia,  arcadia,	"Orbit Electronics",	"UVI Compu-Game", GAME_IMPERFECT_SOUND )					/* New Zealand */
 CONS(198?, vdmaster,	orbituvi,  0,        arcadia,	arcadia,  arcadia,	"Grandstand",		"Video Master", GAME_IMPERFECT_SOUND )						/* New Zealand */
-
