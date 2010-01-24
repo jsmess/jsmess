@@ -908,7 +908,7 @@ MACHINE_DRIVER_END
 ******************************************************************************/
 
 ROM_START(socrates)
-    ROM_REGION(0x400000, "maincpu", 0) /* can technically address 4mb of rom via bankswitching */
+    ROM_REGION(0x400000, "maincpu", ROMREGION_ERASEVAL(0xF3)) /* can technically address 4mb of rom via bankswitching; open bus area reads as 0xF3 */
     /* Socrates US NTSC */
 	/* all cart roms are 28 pin 23c1000/tc531000 128Kx8 roms */
 	/* cart port pinout:
@@ -945,7 +945,6 @@ ROM_START(socrates)
     ROM_DEFAULT_BIOS("nocart")
     ROM_LOAD("27-00817-000-000.u1", 0x00000, 0x40000, CRC(80f5aa20) SHA1(4fd1ff7f78b5dd2582d5de6f30633e4e4f34ca8f)) // Label: "(Vtech) 27-00817-000-000 // (C)1987 VIDEO TECHNOLOGY // 8811 D"
     ROM_SYSTEM_BIOS( 0, "nocart", "Socrates w/o cartridge installed")
-    ROM_FILL(0x40000, 0x3C0000, 0xf3) /* fill empty space with 0xf3 */
     ROM_SYSTEM_BIOS( 1, "maze", "Socrates w/Amazing Mazes cartridge installed")
     ROMX_LOAD("27-5050-00.u1", 0x40000, 0x20000, CRC(95B84308) SHA1(32E065E8F48BAF0126C1B9AA111C291EC644E387), ROM_BIOS(2)) // Label: "(Vtech) 27-5050-00 // TC531000CP-L332 // (C)1989 VIDEO TECHNOLOGY // 8931EAI   JAPAN"; Alt label: "(Vtech) LH53101Y // (C)1989 VIDEO TECHNOLOGY // 8934 D"; cart has an orange QC stickse
     ROM_SYSTEM_BIOS( 2, "world", "Socrates w/Around the World cartridge installed")
@@ -963,15 +962,13 @@ ROM_START(socrates)
 // Cad professor mouse is supposed to be here
 // the touch pad cartridge is supposed to be here
 
-    ROM_REGION(0x10000, "vram", 0)
-    ROM_FILL(0x0000, 0xffff, 0xff) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
+    ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
     /* english speech cart has a green QC sticker */
-    ROM_REGION(0x2000, "speechint", 0) // speech data inside of the speech chip
-    ROM_FILL(0x0000, 0x1fff, 0x00) /* fill with 00, if no speech cart is present socrates will see this */
+    ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
     ROM_LOAD_OPTIONAL("speech_internal.bin", 0x0000, 0x2000, CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // 8k on the speech chip itself
 
-	ROM_REGION(0x10000, "speechext", 0) // speech serial modules outside of the speech chip but still on speech cart
+	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
     ROM_LOAD_OPTIONAL("speech_eng_vsm1.bin", 0x0000, 0x4000, CRC(888e3ddd) SHA1(33AF6A21BA6D826071C9D48557B1C9012752570B)) // 16k in serial rom
     ROM_LOAD_OPTIONAL("speech_eng_vsm2.bin", 0x4000, 0x4000, CRC(de4ac89d) SHA1(3DFA853B02DF756A9B72DEF94A39310992EE11C7)) // 16k in serial rom
     ROM_LOAD_OPTIONAL("speech_eng_vsm3.bin", 0x8000, 0x4000, CRC(972384aa) SHA1(FFCB1D633CA6BFFC7F481EC505DA447E5B847F16)) // 16k in serial rom
@@ -979,20 +976,17 @@ ROM_START(socrates)
 ROM_END
 
 ROM_START(socratfc)
-    ROM_REGION(0x80000, "maincpu", 0)
+    ROM_REGION(0x80000, "maincpu", ROMREGION_ERASEVAL(0xF3))
     /* Socrates SAITOUT (French Canadian) NTSC */
     ROM_LOAD("27-00884-001-000.u1", 0x00000, 0x40000, CRC(042d9d21) SHA1(9ffc67b2721683b2536727d0592798fbc4d061cb)) // Label: "(Vtech) 27-00884-001-000 // (C)1988 VIDEO TECHNOLOGY // 8911 D"
-    ROM_FILL(0x40000, 0x40000, 0xf3) /* fill empty space with 0xf3 */
     ROM_LOAD_OPTIONAL("cartridge.bin", 0x40000, 0x20000, NO_DUMP)
 
-    ROM_REGION(0x10000, "vram", 0)
-    ROM_FILL(0x0000, 0xffff, 0xff) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
+    ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
-    ROM_REGION(0x2000, "speechint", 0)
-    ROM_FILL(0x0000, 0x1fff, 0x00) /* fill with 00, if no speech cart is present socrates will see this */
+    ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
     ROM_LOAD_OPTIONAL("speech_fra_internal.bin", 0x0000, 0x2000, BAD_DUMP CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // probably same on french and english speech carts
 
-    ROM_REGION(0x10000, "speechext", 0) // speech serial modules outside of the speech chip but still on speech cart
+    ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
     ROM_LOAD_OPTIONAL("speech_fra_vsm1.bin", 0x0000, 0x4000, NO_DUMP) // 16k in serial rom
     ROM_LOAD_OPTIONAL("speech_fra_vsm2.bin", 0x4000, 0x4000, NO_DUMP) // 16k in serial rom
     ROM_LOAD_OPTIONAL("speech_fra_vsm3.bin", 0x8000, 0x4000, NO_DUMP) // 16k in serial rom
