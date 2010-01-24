@@ -3,15 +3,40 @@
   PeT mess@utanet.at
   main part in video/
 
+  Refined with recording/analysis on MPT-03 (PAL UVI chip) by plgDavid
+
+  NTSC UVI sound clock: 15734Hz (arcadia)
+  PAL  UVI sound clock: 15625Hz (Soundic MPT-03 - owned by plgDavid)
 ***************************************************************************/
 
 #include "emu.h"
 #include "streams.h"
 #include "includes/arcadia.h"
 
+//known UVI audio clocks
+#define UVI_NTSC 15734
+#define UVI_PAL  15625
 
-#define VOLUME (token->reg[2]&0xf)
-#define ON (!(token->reg[2]&0x10))
+/* we need to create pulse transitions that sound 'decent'
+   with the current mess/mame interp scheme
+
+  this is not needed anymore with the new trick in streams.c
+*/
+
+#define OSAMP  1
+
+//lfsr is 9 bits long (and same as Atari TIA pure noise)
+#define LFSR_MASK (1<<8)
+
+//makes alien invaders samples noise sync.
+#define LFSR_INIT 0x00f0
+
+//lfsr states at resynch borders
+//0x01c1
+//0x01e0
+//0x00f0  //good synch
+//0x0178
+//0x01bc
 
 
 typedef struct _arcadia_sound arcadia_sound;
@@ -19,8 +44,10 @@ struct _arcadia_sound
 {
     sound_stream *channel;
     UINT8 reg[3];
-    int size, pos;
-    unsigned level;
+    int size, pos,tval,nval;
+	unsigned mode, omode;
+	unsigned volume;
+	unsigned lfsr;
 };
 
 
@@ -40,14 +67,35 @@ void arcadia_soundport_w (const device_config *device, int offset, int data)
 
 	stream_update(token->channel);
 	token->reg[offset] = data;
+
+	//logerror("arcadia_sound write:%x=%x\n",offset,data);
+
 	switch (offset)
 	{
 		case 1:
-			token->pos = 0;
-			token->level = TRUE;
-			// frequency 7874/(data+1)
-			token->size = device->machine->sample_rate*((data&0x7f)+1)/7874;
-		    break;
+			//as per Gobbler samples:
+			//the freq counter is only applied on the next change in the flip flop
+			token->size = (data & 0x7f)*OSAMP;
+			//logerror("arcadia_sound write: frq:%d\n",data);
+
+			//reset LFSR
+			if(!token->size)
+				token->lfsr = LFSR_INIT;
+		break;
+
+		case 2:
+			token->volume = (data & 0x07) * 0x800;
+			token->mode   = (data & 0x18) >> 3;
+
+			//logerror("arcadia_sound write: vol:%d mode:%d\n",token->volume,token->mode );
+
+			if (token->mode != token->omode){
+				//not 100% sure about this, maybe we should not reset anything
+				//token->pos  = 0;
+				token->tval = 0;
+			}
+			token->omode = token->mode;
+		break;
 	}
 }
 
@@ -66,14 +114,51 @@ static STREAM_UPDATE( arcadia_update )
 	for (i = 0; i < samples; i++, buffer++)
 	{
 		*buffer = 0;
-		if (token->reg[1] && token->pos <= token->size/2)
-		{
-			*buffer = 0x2ff * VOLUME; // depends on the volume between sound and noise
-		}
-		if (token->pos <= token->size)
+
+		//if minimal pitch ?
+		if (token->reg[1]){
+			switch (token->mode){
+				//dont play anything
+				case 0:break;
+
+				//tone only
+				case 1:
+					*buffer = token->volume * token->tval;
+				break;
+
+				//noise only
+				case 2:
+					*buffer = token->volume * token->nval;
+				break;
+
+				//tone AND noise (bitwise and)
+				case 3:
+					*buffer = token->volume * (token->tval & token->nval);
+				break;
+			}
+
+			//counter
 			token->pos++;
-		if (token->pos > token->size)
-			token->pos = 0;
+
+			if (token->pos >= token->size){
+
+				//calculate new noise bit (	taps: 0000T000T)
+				unsigned char newBit = token->lfsr & 1;         //first tap
+				newBit = (newBit ^ ((token->lfsr & 0x10)?1:0) );//xor with second tap
+
+				token->nval = token->lfsr & 1; //taking new output from LSB
+				token->lfsr = token->lfsr >> 1;//shifting
+
+				//insert new bit at end position (size-1) (only if non null)
+				if (newBit)
+					token->lfsr |= LFSR_MASK;
+
+				//invert tone
+				token->tval = !token->tval;
+
+				token->pos = 0;
+			}
+		}
 	}
 }
 
@@ -86,7 +171,10 @@ static STREAM_UPDATE( arcadia_update )
 static DEVICE_START(arcadia_sound)
 {
 	arcadia_sound *token = get_token(device);
-    token->channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, arcadia_update);
+    token->channel = stream_create(device, 0, 1, UVI_PAL*OSAMP, 0, arcadia_update);
+    token->lfsr    = LFSR_INIT;
+    token->tval    = 1;
+	logerror("arcadia_sound start\n");
 }
 
 

@@ -183,8 +183,39 @@ const game_driver * const drivers[] =
 	DRIVER( sgx )	   /* SuperGrafX NEC 1989	  */
 	DRIVER( pcfx )	  /* PC-FX NEC 1994	   */
 
-	DRIVER( arcadia )   /* Emerson Arcadia 2001	 */
-	DRIVER( vcg )	   /* Palladium Video-Computer-Game	*/
+	/* Arcadia 2001 family */
+	DRIVER( advsnha )		/* Advision Home Arcade	 */
+	DRIVER( bndarc )		/* Bandai Arcadia	 */
+	DRIVER( arcadia )		/* Emerson Arcadia 2001	 */
+	DRIVER( tccosmos )		/* Tele-Computer Cosmos	 */
+	DRIVER( dynavisn )		/* Dynavision	 */
+	DRIVER( ekusera )		/* Ekusera	 */
+	DRIVER( hanihac )		/* Hanimex Home Arcade Centre	 */
+	DRIVER( hmg2650 )		/* Hanimex HMG-2650	 */
+	DRIVER( intmpt03 )		/* Intelligent Game MPT-03	 */
+	DRIVER( ixl2000 )		/* Intercord XL 2000 System	 */
+	DRIVER( intervsn )		/* Intervision 2001	 */
+	DRIVER( itmcmtp3 )		/* ITMC MPT-03	 */
+	DRIVER( lvision )		/* Leisure-Vision	 */
+	DRIVER( leonardo )		/* Leonardo	 */
+	DRIVER( mratlus )		/* Mr. Altus Tele Brain	 */
+	DRIVER( ormatu )		/* Ormatu 2001	*/
+	DRIVER( plldium )		/* Palladium Video-Computer-Game	*/
+	DRIVER( polyvcg )		/* Polybrain Video Computer Game	*/
+	DRIVER( poppympt )		/* Poppy MPT-03 Tele Computer Spiel	*/
+	DRIVER( prestige )		/* Prestige Video Computer Game MPT-03	*/
+	DRIVER( rowtrn2k )		/* Rowtron 2000	*/
+	DRIVER( tvg2000 )		/* Schmid TVG 2000	 */
+	DRIVER( sheenhvc )		/* Sheen Home Video Centre 2001	 */
+	DRIVER( soundic )		/* Soundic MPT-03	 */
+	DRIVER( telefevr )		/* Tchibo Tele-Fever	 */
+	DRIVER( tempest3 )		/* Tempest MPT-03	 */
+	DRIVER( tbbympt3 )		/* Tobby MPT-03	 */
+	DRIVER( trakcvg )		/* Trakton Computer Video Game	 */
+	DRIVER( tunixha )		/* Tunix Home Arcade	 */
+	DRIVER( tryomvgc )		/* Tryom Video Game Center	 */
+	DRIVER( orbituvi )		/* UVI Compu-Game	 */
+	DRIVER( vdmaster )		/* Video Master	 */
 
 	/* Game Park */
 	DRIVER( gp32 )	/* GP32 2001 */
