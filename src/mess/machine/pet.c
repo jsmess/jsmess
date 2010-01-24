@@ -75,29 +75,80 @@ static WRITE8_HANDLER( pet_mc6845_address_w )
 */
 static READ8_DEVICE_HANDLER( pet_pia0_port_a_read )
 {
+	/*
+
+		bit		description
+
+		PA0		KEY A
+		PA1		KEY B
+		PA2		KEY C
+		PA3		KEY D
+		PA4		#1 CASS SWITCH
+		PA5		#2 CASS SWITCH
+		PA6		_EOI IN
+		PA7		DIAG JUMPER
+
+	*/
+
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
-	int data = 0xf0 | pet_keyline_select;
+	UINT8 data = 0;
 
-	if ((cassette_get_state(devtag_get_device(device->machine, "cassette1")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
-		data &= ~0x10;
+	/* key */
+	data |= pet_keyline_select;
 
-	if ((cassette_get_state(devtag_get_device(device->machine, "cassette2")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
-		data &= ~0x20;
+	/* #1 cassette switch */
+	data |= ((cassette_get_state(devtag_get_device(device->machine, "cassette1")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) << 4;
 
-	if (!ieee488_eoi_r(ieeebus))
-		data &= ~0x40;
+	/* #2 cassette switch */
+	data |= ((cassette_get_state(devtag_get_device(device->machine, "cassette2")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) << 5;
+
+	/* end or identify in */
+	data |= ieee488_eoi_r(ieeebus) << 6;
+
+	/* diagnostic jumper */
+	data |= 0x80;
 
 	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( pet_pia0_port_a_write )
 {
+	/*
+
+		bit		description
+
+		PA0		KEY A
+		PA1		KEY B
+		PA2		KEY C
+		PA3		KEY D
+		PA4		#1 CASS SWITCH
+		PA5		#2 CASS SWITCH
+		PA6		_EOI IN
+		PA7		DIAG JUMPER
+
+	*/
+
 	pet_keyline_select = data & 0x0f;
 }
 
 /* Keyboard reading/handling for regular keyboard */
-static  READ8_DEVICE_HANDLER( pet_pia0_port_b_read )
+static READ8_DEVICE_HANDLER( kin_r )
 {
+	/*
+
+		bit		description
+
+		PB0		KIN0
+		PB1		KIN1
+		PB2		KIN2
+		PB3		KIN3
+		PB4		KIN4
+		PB5		KIN5
+		PB6		KIN6
+		PB7		KIN7
+
+	*/
+
 	UINT8 data = 0xff;
 	static const char *const keynames[] = {
 		"ROW0", "ROW1", "ROW2", "ROW3", "ROW4",
@@ -145,20 +196,20 @@ static READ8_DEVICE_HANDLER( petb_pia0_port_b_read )
 }
 
 /* NOT WORKING - Just placeholder */
-static READ8_DEVICE_HANDLER( pet_pia0_ca1_in )
+static READ8_DEVICE_HANDLER( cass_1_r )
 {
 	// cassette 1 read
 	return (cassette_input(devtag_get_device(device->machine, "cassette1")) > +0.0) ? 1 : 0;
 }
 
-
-static WRITE8_DEVICE_HANDLER( pet_pia0_ca2_out )
+static WRITE8_DEVICE_HANDLER( eoi_w )
 {
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	
 	ieee488_eoi_w(ieeebus, device, data);
 }
 
-static WRITE8_DEVICE_HANDLER( pet_pia0_cb2_out )
+static WRITE8_DEVICE_HANDLER( cass_motor_1_w )
 {
 	if (!data)
 	{
@@ -172,22 +223,6 @@ static WRITE8_DEVICE_HANDLER( pet_pia0_cb2_out )
 	}
 }
 
-
-static WRITE_LINE_DEVICE_HANDLER( pet_irq )
-{
-	int level = state ? 1 : 0;
-	static int old_level = 0;
-	pet_state *driver_state = (pet_state *)device->machine->driver_data;
-	if (level != old_level)
-	{
-		DBG_LOG(device->machine, 3, "mos6502", ("irq %s\n", level ? "start" : "end"));
-		if (driver_state->superpet)
-			cputag_set_input_line(device->machine, "m6809", M6809_IRQ_LINE, level);
-		cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, level);
-		old_level = level;
-	}
-}
-
 /* pia at 0xe820 (ieee488)
    port a data in
    port b data out
@@ -196,94 +231,115 @@ static WRITE_LINE_DEVICE_HANDLER( pet_irq )
   cb1 srq in
   cb2 dav out
  */
-static READ8_DEVICE_HANDLER( pet_pia1_port_a_read )
-{
-	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
-	return ieee488_dio_r(ieeebus, 0);
-}
 
-static WRITE8_DEVICE_HANDLER( pet_pia1_port_b_write )
+static WRITE8_DEVICE_HANDLER( do_w )
 {
+	/*
+
+		bit		description
+
+		PB0		DO-1
+		PB1		DO-2
+		PB2		DO-3
+		PB3		DO-4
+		PB4		DO-5
+		PB5		DO-6
+		PB6		DO-7
+		PB7		DO-8
+
+	*/
+
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+
 	ieee488_dio_w(ieeebus, device, data);
 }
 
-static READ8_DEVICE_HANDLER( pet_pia1_ca1_read )
+static WRITE8_DEVICE_HANDLER( ndac_w )
 {
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
-	return ieee488_atn_r(ieeebus);
-}
-
-static WRITE8_DEVICE_HANDLER( pet_pia1_ca2_write )
-{
-	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	
 	ieee488_ndac_w(ieeebus, device, data);
 }
 
-static WRITE8_DEVICE_HANDLER( pet_pia1_cb2_write )
+static WRITE8_DEVICE_HANDLER( dav_w )
 {
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	
 	ieee488_dav_w(ieeebus, device, data);
 }
 
-static READ8_DEVICE_HANDLER( pet_pia1_cb1_read )
+static WRITE_LINE_DEVICE_HANDLER( pia0_irq_w )
 {
-	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
-	return ieee488_srq_r(ieeebus);
+	pet_state *driver_state = (pet_state *)device->machine->driver_data;
+
+	driver_state->pia0_irq = state;
+	int level = (driver_state->pia0_irq | driver_state->pia1_irq | driver_state->via_irq) ? ASSERT_LINE : CLEAR_LINE;
+
+	cpu_set_input_line(device->machine->firstcpu, INPUT_LINE_IRQ0, level);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( pia1_irq_w )
+{
+	pet_state *driver_state = (pet_state *)device->machine->driver_data;
+
+	driver_state->pia1_irq = state;
+	int level = (driver_state->pia0_irq | driver_state->pia1_irq | driver_state->via_irq) ? ASSERT_LINE : CLEAR_LINE;
+
+	cpu_set_input_line(device->machine->firstcpu, INPUT_LINE_IRQ0, level);
 }
 
 const pia6821_interface pet_pia0 =
 {
-	DEVCB_HANDLER(pet_pia0_port_a_read),		/* in_a_func */
-	DEVCB_HANDLER(pet_pia0_port_b_read),		/* in_b_func */
-	DEVCB_HANDLER(pet_pia0_ca1_in),			/* in_ca1_func */
-	DEVCB_NULL,						/* in_cb1_func */
-	DEVCB_NULL,						/* in_ca2_func */
-	DEVCB_NULL,						/* in_cb2_func */
-	DEVCB_HANDLER(pet_pia0_port_a_write),		/* out_a_func */
-	DEVCB_NULL,						/* out_b_func */
-	DEVCB_HANDLER(pet_pia0_ca2_out),			/* out_ca2_func */
-	DEVCB_HANDLER(pet_pia0_cb2_out),			/* out_cb2_func */
-	DEVCB_NULL,						/* irq_a_func */
-	DEVCB_LINE(pet_irq)						/* irq_b_func */
+	DEVCB_HANDLER(pet_pia0_port_a_read),	/* in_a_func */
+	DEVCB_HANDLER(kin_r),					/* in_b_func */
+	DEVCB_HANDLER(cass_1_r),				/* in_ca1_func */
+	DEVCB_NULL,								/* in_cb1_func */
+	DEVCB_NULL,								/* in_ca2_func */
+	DEVCB_NULL,								/* in_cb2_func */
+	DEVCB_HANDLER(pet_pia0_port_a_write),	/* out_a_func */
+	DEVCB_NULL,								/* out_b_func */
+	DEVCB_HANDLER(eoi_w),					/* out_ca2_func */
+	DEVCB_HANDLER(cass_motor_1_w),			/* out_cb2_func */
+	DEVCB_LINE(pia0_irq_w),					/* irq_a_func */
+	DEVCB_LINE(pia0_irq_w)					/* irq_b_func */
 };
 
 const pia6821_interface petb_pia0 =
 {
-	DEVCB_HANDLER(pet_pia0_port_a_read),		/* in_a_func */
-	DEVCB_HANDLER(petb_pia0_port_b_read),		/* in_b_func */
-	DEVCB_HANDLER(pet_pia0_ca1_in),			/* in_ca1_func */
-	DEVCB_NULL,						/* in_cb1_func */
-	DEVCB_NULL,						/* in_ca2_func */
-	DEVCB_NULL,						/* in_cb2_func */
-	DEVCB_HANDLER(pet_pia0_port_a_write),		/* out_a_func */
-	DEVCB_NULL,						/* out_b_func */
-	DEVCB_HANDLER(pet_pia0_ca2_out),			/* out_ca2_func */
-	DEVCB_HANDLER(pet_pia0_cb2_out),			/* out_cb2_func */
-	DEVCB_NULL,						/* irq_a_func */
-	DEVCB_LINE(pet_irq)						/* irq_b_func */
+	DEVCB_HANDLER(pet_pia0_port_a_read),	/* in_a_func */
+	DEVCB_HANDLER(petb_pia0_port_b_read),	/* in_b_func */
+	DEVCB_HANDLER(cass_1_r),				/* in_ca1_func */
+	DEVCB_NULL,								/* in_cb1_func */
+	DEVCB_NULL,								/* in_ca2_func */
+	DEVCB_NULL,								/* in_cb2_func */
+	DEVCB_HANDLER(pet_pia0_port_a_write),	/* out_a_func */
+	DEVCB_NULL,								/* out_b_func */
+	DEVCB_HANDLER(eoi_w),					/* out_ca2_func */
+	DEVCB_HANDLER(cass_motor_1_w),			/* out_cb2_func */
+	DEVCB_LINE(pia1_irq_w),					/* irq_a_func */
+	DEVCB_LINE(pia1_irq_w)					/* irq_b_func */
 };
 
 const pia6821_interface pet_pia1 =
 {
-	DEVCB_HANDLER(pet_pia1_port_a_read),		/* in_a_func */
-	DEVCB_NULL,						/* in_b_func */
-	DEVCB_HANDLER(pet_pia1_ca1_read),			/* in_ca1_func */
-	DEVCB_HANDLER(pet_pia1_cb1_read),			/* in_cb1_func */
-	DEVCB_NULL,						/* in_ca2_func */
-	DEVCB_NULL,						/* in_cb2_func */
-	DEVCB_NULL,						/* out_a_func */
-	DEVCB_HANDLER(pet_pia1_port_b_write),		/* out_b_func */
-	DEVCB_HANDLER(pet_pia1_ca2_write),			/* out_ca2_func */
-	DEVCB_HANDLER(pet_pia1_cb2_write),			/* out_cb2_func */
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DEVICE_HANDLER("ieee_bus", ieee488_dio_r),/* in_a_func */
+	DEVCB_NULL,								/* in_b_func */
+	DEVCB_DEVICE_LINE("ieee_bus", ieee488_atn_r),	/* in_ca1_func */
+	DEVCB_DEVICE_LINE("ieee_bus", ieee488_srq_r),	/* in_cb1_func */
+	DEVCB_NULL,								/* in_ca2_func */
+	DEVCB_NULL,								/* in_cb2_func */
+	DEVCB_NULL,								/* out_a_func */
+	DEVCB_HANDLER(do_w),					/* out_b_func */
+	DEVCB_HANDLER(ndac_w),					/* out_ca2_func */
+	DEVCB_HANDLER(dav_w),					/* out_cb2_func */
+	DEVCB_LINE(pia1_irq_w),					/* irq_a_func */
+	DEVCB_LINE(pia1_irq_w)					/* irq_b_func */
 };
 
-static WRITE8_DEVICE_HANDLER( pet_address_line_11 )
+static WRITE_LINE_DEVICE_HANDLER( gb_w )
 {
-	DBG_LOG(device->machine, 1, "address line", ("%d\n", data));
-	if (data) pet_font |= 1;
+	DBG_LOG(device->machine, 1, "address line", ("%d\n", state));
+	if (state) pet_font |= 1;
 	else pet_font &= ~1;
 }
 
@@ -304,63 +360,112 @@ static WRITE8_DEVICE_HANDLER( pet_address_line_11 )
    cb1 cassettes
    cb2 user port
  */
-static READ8_DEVICE_HANDLER( pet_via_port_b_r )
+static READ8_DEVICE_HANDLER( via_pb_r )
 {
+	/*
+
+		bit		description
+
+		PB0		_NDAC IN
+		PB1		_NRFD OUT
+		PB2		_ATN OUT
+		PB3		CASS WRITE
+		PB4		#2 CASS MOTOR
+		PB5		SYNC IN
+		PB6		_NRFD IN
+		PB7		_DAV IN
+
+	*/
+
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 	UINT8 data = 0;
 
-	if (ieee488_ndac_r(ieeebus))
-		data |= 0x01;
+	/* not data accepted in */
+	data |= ieee488_ndac_r(ieeebus);
 
-	//  data & 0x08 -> cassette write (it seems to BOTH cassettes from schematics)
+	/* sync in */
 
-	if (!(data & 0x10))
-	{
-		cassette_change_state(devtag_get_device(device->machine, "cassette2"),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-		timer_adjust_periodic(datasette2_timer, attotime_zero, 0, ATTOTIME_IN_HZ(48000));	// I put 48000 because I was given some .wav with this freq
-	}
-	else
-	{
-		cassette_change_state(devtag_get_device(device->machine, "cassette2"),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
-		timer_reset(datasette2_timer, attotime_never);
-	}
+	/* not ready for data in */
+	data |= ieee488_nrfd_r(ieeebus) << 6;
 
-	if (ieee488_nrfd_r(ieeebus))
-		data |= 0x40;
-
-	if (ieee488_dav_r(ieeebus))
-		data |= 0x80;
+	/* data valid in */
+	data |= ieee488_dav_r(ieeebus) << 7;
 
 	return data;
 }
 
 /* NOT WORKING - Just placeholder */
-static READ8_DEVICE_HANDLER( pet_via_cb1_r )
+static READ_LINE_DEVICE_HANDLER( cass_2_r )
 {
 	// cassette 2 read
 	return (cassette_input(devtag_get_device(device->machine, "cassette2")) > +0.0) ? 1 : 0;
 }
 
-
-static WRITE8_DEVICE_HANDLER( pet_via_port_b_w )
+static WRITE8_DEVICE_HANDLER( via_pb_w )
 {
+	/*
+
+		bit		description
+
+		PB0		_NDAC IN
+		PB1		_NRFD OUT
+		PB2		_ATN OUT
+		PB3		CASS WRITE
+		PB4		#2 CASS MOTOR
+		PB5		SYNC IN
+		PB6		_NRFD IN
+		PB7		_DAV IN
+
+	*/
+
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+
+	/* not ready for data out */
 	ieee488_nrfd_w(ieeebus, device, BIT(data, 1));
+
+	/* attention out */
 	ieee488_atn_w(ieeebus, device, BIT(data, 2));
+
+	/* cassette write */
+
+	/* #2 cassette motor */
+	if (BIT(data, 4))
+	{
+		cassette_change_state(devtag_get_device(device->machine, "cassette2"), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		timer_adjust_periodic(datasette2_timer, attotime_zero, 0, ATTOTIME_IN_HZ(48000));	// I put 48000 because I was given some .wav with this freq
+	}
+	else
+	{
+		cassette_change_state(devtag_get_device(device->machine, "cassette2"), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		timer_reset(datasette2_timer, attotime_never);
+	}
 }
 
+static WRITE_LINE_DEVICE_HANDLER( via_irq_w )
+{
+	pet_state *driver_state = (pet_state *)device->machine->driver_data;
+
+	driver_state->via_irq = state;
+	int level = (driver_state->pia0_irq | driver_state->pia1_irq | driver_state->via_irq) ? ASSERT_LINE : CLEAR_LINE;
+
+	cpu_set_input_line(device->machine->firstcpu, INPUT_LINE_IRQ0, level);
+}
 
 const via6522_interface pet_via =
 {
 	DEVCB_NULL,					/* in_a_func */
-	DEVCB_HANDLER(pet_via_port_b_r),		/* in_b_func */
+	DEVCB_HANDLER(via_pb_r),	/* in_b_func */
 	DEVCB_NULL,					/* in_ca1_func */
-	DEVCB_HANDLER(pet_via_cb1_r),			/* in_cb1_func */
+	DEVCB_LINE(cass_2_r),		/* in_cb1_func */
 	DEVCB_NULL,					/* in_ca2_func */
 	DEVCB_NULL,					/* in_cb2_func */
 	DEVCB_NULL,					/* out_a_func */
-	DEVCB_HANDLER(pet_via_port_b_w),		/* out_b_func */
-	DEVCB_HANDLER(pet_address_line_11)		/* out_ca2_func */
+	DEVCB_HANDLER(via_pb_w),	/* out_b_func */
+	DEVCB_NULL,					/* out_ca1_func */
+	DEVCB_LINE(gb_w),			/* out_ca2_func */
+	DEVCB_NULL,					/* out_ca2_func */
+	DEVCB_NULL,					/* out_cb2_func */
+	DEVCB_LINE(via_irq_w)		/* out_irq_func */
 };
 
 static struct {

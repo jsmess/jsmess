@@ -18,6 +18,10 @@ struct _pet_state
 	int pet_basic1; /* basic version 1 for quickloader */
 	int superpet;
 	int cbm8096;
+
+	int pia0_irq;
+	int pia1_irq;
+	int via_irq;
 };
 
 /*----------- defined in video/pet.c -----------*/

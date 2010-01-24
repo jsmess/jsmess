@@ -105,7 +105,7 @@ Keyboard: Full-sized 102 key QWERTY (19 key numeric keypad!; 4 direction
 #include "includes/cbm.h"
 #include "includes/cbmb.h"
 #include "machine/ieee488.h"
-#include "machine/c1541.h"
+#include "machine/c2040.h"
 #include "machine/cbmipt.h"
 #include "video/vic6567.h"
 #include "video/mc6845.h"
@@ -348,7 +348,7 @@ static IEEE488_DAISY( ieee488_daisy )
 {
 	{ "tpi6525_0" },
 	{ "cia" },
-	{ C2031_IEEE488("c2031") },
+	{ C2040_IEEE488("c8250") },
 	{ NULL}
 };
 
@@ -393,7 +393,7 @@ static MACHINE_DRIVER_START( cbm600 )
 
 	/* IEEE bus */
 	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MDRV_C2031_ADD("c2031", "ieee_bus", 8)
+	MDRV_C8250_ADD("c8250", "ieee_bus", 8)
 
 	MDRV_IMPORT_FROM(cbmb_cartslot)
 MACHINE_DRIVER_END
@@ -466,7 +466,7 @@ static MACHINE_DRIVER_START( p500 )
 
 	/* IEEE bus */
 	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MDRV_C2031_ADD("c2031", "ieee_bus", 8)
+	MDRV_C8250_ADD("c8250", "ieee_bus", 8)
 
 	MDRV_IMPORT_FROM(cbmb_cartslot)
 MACHINE_DRIVER_END
