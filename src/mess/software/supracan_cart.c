@@ -9,6 +9,12 @@
 #include "devices/cartslot.h"
 
 
+/* F002 - Sango Fighter */
+SOFTWARE_START( sangofgt )
+	ROM_REGION( 0x300000, CARTRIDGE_REGION_ROM, 0 )
+	ROM_LOAD( "sangofgt.bin", 0, 0x300000, CRC(a4de6dde) SHA1(f4bed63775130a75eb9c50b32e0cf50d1a7b8f50) )
+SOFTWARE_END
+
 /* F005 - Super Taiwanese Baseball League */
 SOFTWARE_START( staiwbbl )
 	ROM_REGION( 0x200000, CARTRIDGE_REGION_ROM, 0 )
@@ -33,7 +39,7 @@ SOFTWARE_END
 
 SOFTWARE_LIST_START( supracan_cart )
 	/* F001 - Fomosa Duel */
-	/* F002 - Sango Fighter */
+	SOFTWARE( sangofgt, 0, 1995, "Panda Entertainment Technology", "Sango Fighter", 0, 0 )	/* F002 */
 	/* F003 - 1995 - Funtech - The Son of Evil */
 	/* F004 - Speedy Dragon/Sonic Dragon */
 	SOFTWARE( staiwbbl, 0, 1995, "C&E Soft", "Super Taiwanese Baseball League", 0, 0 )	/* F005 */
