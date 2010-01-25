@@ -1595,6 +1595,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/dms86.o		\
 	$(MESS_DRIVERS)/codata.o	\
 	$(MESS_DRIVERS)/eti660.o	\
+	$(MESS_DRIVERS)/rvoice.o	\
 
 
 

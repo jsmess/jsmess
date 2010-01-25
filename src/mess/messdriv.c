@@ -1618,5 +1618,6 @@ const game_driver * const drivers[] =
 	DRIVER( dms5000 )
 	DRIVER( dms86 )
 	DRIVER( codata )
+	DRIVER( rvoicepc )
 
 #endif /* DRIVER_RECURSIVE */
