@@ -333,4 +333,4 @@ ROM_END
 
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT  COMPANY  FULLNAME   FLAGS */
-COMP( 1986, nimbus,     0,      0,      nimbus, nimbus, 0,   "Research Machines", "nimbus", 0)
+COMP( 1986, nimbus,     0,      0,      nimbus, nimbus, 0,   "Research Machines", "Nimbus", 0)
