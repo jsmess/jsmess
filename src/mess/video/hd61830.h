@@ -17,6 +17,8 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
+#define HD61830_TAG		"hd61830"
+
 #define HD61830 DEVICE_GET_INFO_NAME( hd61830 )
 
 #define MDRV_HD61830_ADD(_tag, _clock, _screen) \

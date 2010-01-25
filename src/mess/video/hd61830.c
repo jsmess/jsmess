@@ -162,7 +162,7 @@ WRITE8_DEVICE_HANDLER( hd61830_control_w )
 READ8_DEVICE_HANDLER( hd61830_data_r )
 {
 	hd61830_t *hd61830 = get_safe_token(device);
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, HD61830_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 data = hd61830->dor;
 
 	if (LOG) logerror("HD61380 '%s' Display Data Read %02x\n", device->tag.cstr(), hd61830->dor);
@@ -181,7 +181,7 @@ READ8_DEVICE_HANDLER( hd61830_data_r )
 WRITE8_DEVICE_HANDLER( hd61830_data_w )
 {
 	hd61830_t *hd61830 = get_safe_token(device);
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, HD61830_TAG, ADDRESS_SPACE_PROGRAM);
 	switch (hd61830->ir)
 	{
 	case HD61830_INSTRUCTION_MODE_CONTROL:
@@ -310,7 +310,7 @@ static void draw_scanline(const device_config *device, bitmap_t *bitmap, const r
 {
 	hd61830_t *hd61830 = get_safe_token(device);
 	int sx, x;
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, HD61830_TAG, ADDRESS_SPACE_PROGRAM);
 	
 	for (sx = 0; sx < hd61830->hn; sx++)
 	{

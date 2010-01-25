@@ -16,7 +16,6 @@
 //#define MC14412_TAG   "m8"
 #define RP5C01A_TAG		"m301"
 #define TCM5089_TAG		"m11"
-#define HD61830_TAG		"m18"
 #define MSM8251_TAG		"m20"
 
 typedef struct _kc85_state kc85_state;
