@@ -1,5 +1,28 @@
 /*
 
+	Commodore sector format
+
+	SYNC						FF * 5
+	08
+	ID1
+	ID2
+	TRACK						1..35 (2040), 1..77 (8050)
+	SECTOR						0..20 (2040), 0..28 (8050)
+	CHECKSUM
+	GAP 1						55 * 9 (2040), 8 (1541)
+
+	SYNC						FF * 5
+	07
+	BYTE 0
+	BYTE 1
+	254 BYTES OF DATA
+	CHECKSUM
+	GAP 2						55 * 8..19
+
+*/
+
+/*
+
  Commodore GCR format 
 
 Original    Encoded

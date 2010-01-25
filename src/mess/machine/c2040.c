@@ -7,6 +7,16 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+
+	- find GCR rom region
+	- decode GCR
+	- write
+
+*/
+
 #include "emu.h"
 #include "c2040.h"
 #include "cpu/m6502/m6502.h"
@@ -31,9 +41,35 @@
 #define M6522_TAG		"um3"
 #define M6530_TAG		"uk3"
 
+static const double C2040_BITRATE[4] =
+{
+	XTAL_16MHz/13.0,	/* tracks 1-17 */
+	XTAL_16MHz/14.0,	/* tracks 18-24 */
+	XTAL_16MHz/15.0, 	/* tracks 25-30 */
+	XTAL_16MHz/16.0		/* tracks 31-42 */
+};
+
+#define SYNC_MARK			0x3ff		/* 10 consecutive 1-bits */
+
+#define TRACK_BUFFER_SIZE	8194		/* 2 bytes track length + maximum of 8192 bytes of GCR encoded data */
+#define TRACK_DATA_START	2
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+typedef struct _c2040_unit_t c2040_unit_t;
+struct _c2040_unit_t
+{
+	int stp;								/* stepper motor */
+	UINT8 track_buffer[TRACK_BUFFER_SIZE];	/* track data buffer */
+	int track_len;							/* track length */
+	int buffer_pos;							/* current byte position within track buffer */
+	int bit_pos;							/* current bit position within track buffer byte */
+
+	/* devices */
+	const device_config *image;
+};
 
 typedef struct _c2040_t c2040_t;
 struct _c2040_t
@@ -42,6 +78,14 @@ struct _c2040_t
 	int address;						/* serial bus address - 8 */
 	int drive;							/* selected drive */
 	int side;							/* selected side */
+	c2040_unit_t unit[2];				/* drive unit */
+
+	/* track */
+	int bit_count;						/* current data byte bit counter */
+	UINT16 data;						/* data shift register */
+	int ds;								/* density select */
+	UINT8* gcr;							/* GCR encoder/decoder ROM */
+	UINT8 pi;							/* parallel data input */
 
 	/* IEEE-488 bus */
 	int nrfd_out;						/* not ready for data */
@@ -49,6 +93,8 @@ struct _c2040_t
 	int atna;							/* attention acknowledge */
 
 	/* signals */
+	int error;
+	int ready;							/* byte ready */
 	int mode;							/* mode select */
 	int rw;								/* read/write select */
 
@@ -60,7 +106,9 @@ struct _c2040_t
 	const device_config *riot2;
 	const device_config *via;
 	const device_config *bus;
-	const device_config *image[2];
+
+	/* timers */
+	emu_timer *bit_timer;
 };
 
 /***************************************************************************
@@ -87,6 +135,61 @@ INLINE c2040_config *get_safe_config(const device_config *device)
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( bit_tick )
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( bit_tick )
+{
+	const device_config *device = (device_config *)ptr;
+	c2040_t *c2040 = get_safe_token(device);
+	int ready = 1;
+
+	/* shift in data from the read head */
+	c2040->data <<= 1;
+	c2040->data |= BIT(c2040->unit[c2040->drive].track_buffer[c2040->unit[c2040->drive].buffer_pos], c2040->unit[c2040->drive].bit_pos);
+	c2040->unit[c2040->drive].bit_pos--;
+	c2040->bit_count++;
+
+	if (c2040->unit[c2040->drive].bit_pos < 0)
+	{
+		c2040->unit[c2040->drive].bit_pos = 7;
+		c2040->unit[c2040->drive].buffer_pos++;
+
+		if (c2040->unit[c2040->drive].buffer_pos > c2040->unit[c2040->drive].track_len + 1)
+		{
+			/* loop to the start of the track */
+			c2040->unit[c2040->drive].buffer_pos = TRACK_DATA_START;
+		}
+	}
+
+	if ((c2040->data & SYNC_MARK) == SYNC_MARK)
+	{
+		/* SYNC detected */
+		c2040->bit_count = 0;
+	}
+
+	if (c2040->bit_count > 7)
+	{
+		/* byte ready */
+		c2040->bit_count = 0;
+		ready = 0;
+
+		if (!(c2040->data & 0xff))
+		{
+			/* simulate weak bits with randomness */
+			c2040->data = (c2040->data & 0xff00) | (mame_rand(machine) & 0xff);
+		}
+	}
+
+	if (c2040->ready != ready)
+	{
+		via_ca1_w(c2040->via, ready);
+
+		c2040->ready = ready;
+	}
+}
 
 /*-------------------------------------------------
     c2040_ieee488_atn_w - IEEE-488 bus attention
@@ -148,29 +251,19 @@ static ADDRESS_MAP_START( c2040_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
-    ADDRESS_MAP( c3040_dos_map )
--------------------------------------------------*/
-
-static ADDRESS_MAP_START( c3040_dos_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_IMPORT_FROM(c2040_dos_map)
-	AM_RANGE(0x5000, 0x7fff) AM_ROM AM_REGION("c3040", 0x0000)
-ADDRESS_MAP_END
-
-/*-------------------------------------------------
-    ADDRESS_MAP( c3040_fdc_map )
--------------------------------------------------*/
-
-static ADDRESS_MAP_START( c3040_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_IMPORT_FROM(c2040_fdc_map)
-	AM_RANGE(0x1c00, 0x1fff) AM_ROM AM_REGION("c3040", 0x3000)
-ADDRESS_MAP_END
-
-/*-------------------------------------------------
     ADDRESS_MAP( c4040_dos_map )
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( c4040_dos_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_IMPORT_FROM(c2040_dos_map)
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0f00) AM_RAM // 6532 #1
+	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0f00) AM_RAM // 6532 #2
+	AM_RANGE(0x0200, 0x020f) AM_MIRROR(0x0d70) AM_DEVREADWRITE(M6532_0_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0280, 0x028f) AM_MIRROR(0x0d70) AM_DEVREADWRITE(M6532_1_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share3")
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share4")
 	AM_RANGE(0x5000, 0x7fff) AM_ROM AM_REGION("c4040", 0x0000)
 ADDRESS_MAP_END
 
@@ -179,7 +272,14 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( c4040_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_IMPORT_FROM(c2040_fdc_map)
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
+	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
+	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via_r, via_w)
+	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6530_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("share4")
 	AM_RANGE(0x1c00, 0x1fff) AM_ROM AM_REGION("c4040", 0x3000)
 ADDRESS_MAP_END
 
@@ -220,7 +320,14 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( sfd1001_dos_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_IMPORT_FROM(c8050_dos_map)
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0f00) AM_RAM // 6532 #1
+	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0f00) AM_RAM // 6532 #2
+	AM_RANGE(0x0200, 0x020f) AM_MIRROR(0x0d70) AM_DEVREADWRITE(M6532_0_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0280, 0x028f) AM_MIRROR(0x0d70) AM_DEVREADWRITE(M6532_1_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share3")
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share4")
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("sfd1001", 0x0000)
 ADDRESS_MAP_END
 
@@ -229,7 +336,14 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( sfd1001_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_IMPORT_FROM(c8050_fdc_map)
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
+	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
+	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via_r, via_w)
+	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6530_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("share4")
 	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION("sfd1001", 0x4000)
 ADDRESS_MAP_END
 
@@ -463,7 +577,13 @@ static READ8_DEVICE_HANDLER( c2040_via_pa_r )
 
     */
 
-	return 0;
+	c2040_t *c2040 = get_safe_token(device->owner);
+
+//	UINT16 gcr_addr = (c2040->rw << 10) | (c2040->data & 0x3ff);
+	UINT8 e = 0;//memory_region(device->machine, "c4040:c4040")[0x3400 + gcr_addr];
+	UINT16 i = c2040->data;
+
+	return (BIT(e, 6) << 7) | (BIT(i, 7) << 6) | (e & 0x30) | (BIT(e, 2) << 3) | (i & 0x04) | (e & 0x03);
 }
 
 static READ8_DEVICE_HANDLER( c2040_via_pb_r )
@@ -472,10 +592,10 @@ static READ8_DEVICE_HANDLER( c2040_via_pb_r )
 
         bit     description
 
-        PB0		SIA
-        PB1		SIB
-        PB2		SOA
-        PB3		SOB
+        PB0		S1A
+        PB1		S1B
+        PB2		S0A
+        PB3		S0B
         PB4		MTR1
         PB5		MTR0
         PB6		
@@ -484,6 +604,39 @@ static READ8_DEVICE_HANDLER( c2040_via_pb_r )
     */
 
 	return 0;
+}
+
+static void step_motor(c2040_t *c2040, int unit, int stp)
+{
+	if (c2040->unit[unit].stp != stp)
+	{
+		int tracks = 0;
+
+		switch (c2040->unit[unit].stp)
+		{
+		case 0:	if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
+		case 1:	if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
+		case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
+		case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
+		}
+
+		if (tracks != 0)
+		{
+			c2040->unit[unit].track_len = TRACK_BUFFER_SIZE;
+			c2040->unit[unit].buffer_pos = TRACK_DATA_START;
+			c2040->unit[unit].bit_pos = 7;
+			c2040->bit_count = 0;
+
+			/* step read/write head */
+			floppy_drive_seek(c2040->unit[unit].image, tracks);
+
+			/* read track data */
+			floppy_drive_read_track_data_info_buffer(c2040->unit[unit].image, c2040->side, c2040->unit[unit].track_buffer, &c2040->unit[unit].track_len);
+
+			/* extract track length */
+			c2040->unit[unit].track_len = (c2040->unit[unit].track_buffer[1] << 8) | c2040->unit[unit].track_buffer[0];
+		}
+	}
 }
 
 static WRITE8_DEVICE_HANDLER( c2040_via_pb_w )
@@ -492,16 +645,36 @@ static WRITE8_DEVICE_HANDLER( c2040_via_pb_w )
 
         bit     description
 
-        PB0		SIA
-        PB1		SIB
-        PB2		SOA
-        PB3		SOB
+        PB0		S1A
+        PB1		S1B
+        PB2		S0A
+        PB3		S0B
         PB4		MTR1
         PB5		MTR0
         PB6		
         PB7		
 
     */
+
+	c2040_t *c2040 = get_safe_token(device->owner);
+
+	/* stepper motor 1 */
+	int s1 = data & 0x03;
+	step_motor(c2040, 1, s1);
+
+	/* stepper motor 0 */
+	int s0 = (data >> 2) & 0x03;
+	step_motor(c2040, 0, s0);
+
+	/* spindle motor 1 */
+	int mtr1 = BIT(data, 4);
+	floppy_mon_w(c2040->unit[1].image, !mtr1);
+
+	/* spindle motor 0 */
+	int mtr0 = BIT(data, 5);
+	floppy_mon_w(c2040->unit[0].image, !mtr0);
+
+	timer_enable(c2040->bit_timer, mtr1 | mtr0);
 }
 
 static READ8_DEVICE_HANDLER( c8050_via_pb_r )
@@ -510,10 +683,10 @@ static READ8_DEVICE_HANDLER( c8050_via_pb_r )
 
         bit     description
 
-        PB0		SIA
-        PB1		SIB
-        PB2		SOA
-        PB3		SOB
+        PB0		S1A
+        PB1		S1B
+        PB2		S0A
+        PB3		S0B
         PB4		MTR1
         PB5		MTR0
         PB6		PULL SYNC
@@ -521,7 +694,14 @@ static READ8_DEVICE_HANDLER( c8050_via_pb_r )
 
     */
 
-	return 0;
+	c2040_t *c2040 = get_safe_token(device->owner);
+
+	UINT8 data = 0;
+
+	/* SYNC detected */
+	data |= !((c2040->data & SYNC_MARK) == SYNC_MARK) << 7;
+
+	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( c8050_via_pb_w )
@@ -530,26 +710,35 @@ static WRITE8_DEVICE_HANDLER( c8050_via_pb_w )
 
         bit     description
 
-        PB0		SIA
-        PB1		SIB
-        PB2		SOA
-        PB3		SOB
+        PB0		S1A
+        PB1		S1B
+        PB2		S0A
+        PB3		S0B
         PB4		MTR1
         PB5		MTR0
         PB6		PULL SYNC
         PB7		SYNC
 
     */
+
+	c2040_via_pb_w(device, 0, data);
 }
 
 static READ_LINE_DEVICE_HANDLER( ready_r )
 {
-	return 0;
+	c2040_t *c2040 = get_safe_token(device->owner);
+
+	return c2040->ready;
 }
 
 static READ_LINE_DEVICE_HANDLER( err_r )
 {
-	return 0;
+	c2040_t *c2040 = get_safe_token(device->owner);
+
+	//UINT16 gcr_addr = (c2040->rw << 10) | (c2040->data & 0x3ff);
+	UINT8 e = 0;//memory_region(device->machine, "c4040:c4040")[0x3400 + gcr_addr];
+
+	return (!c2040->ready & !BIT(e, 3));
 }
 
 static WRITE_LINE_DEVICE_HANDLER( mode_sel_w )
@@ -610,7 +799,7 @@ static const via6522_interface c8050_via_intf =
     riot6532_interface c2040_riot2_intf uk3
 -------------------------------------------------*/
 
-static READ8_DEVICE_HANDLER( c2040_riot2_pa_r )
+static READ8_DEVICE_HANDLER( pi_r )
 {
 	/*
 
@@ -627,10 +816,12 @@ static READ8_DEVICE_HANDLER( c2040_riot2_pa_r )
 
     */
 
-	return 0;
+	c2040_t *c2040 = get_safe_token(device->owner);
+
+	return c2040->pi;
 }
 
-static WRITE8_DEVICE_HANDLER( c2040_riot2_pa_w )
+static WRITE8_DEVICE_HANDLER( pi_w )
 {
 	/*
 
@@ -646,6 +837,10 @@ static WRITE8_DEVICE_HANDLER( c2040_riot2_pa_w )
         PA7		PI7
 
     */
+
+	c2040_t *c2040 = get_safe_token(device->owner);
+
+	c2040->pi = data;
 }
 
 static READ8_DEVICE_HANDLER( c2040_riot2_pb_r )
@@ -670,9 +865,10 @@ static READ8_DEVICE_HANDLER( c2040_riot2_pb_r )
 	UINT8 data = 0;
 
 	/* write protect sense */
-	data |= floppy_wpt_r(c2040->image[c2040->drive]) << 3;
+	data |= floppy_wpt_r(c2040->unit[c2040->drive].image) << 3;
 
-	/* TODO sync */
+	/* SYNC detected */
+	data |= !((c2040->data & SYNC_MARK) == SYNC_MARK) << 6;
 
 	return data;
 }
@@ -699,10 +895,14 @@ static WRITE8_DEVICE_HANDLER( c2040_riot2_pb_w )
 	/* drive select */
 	c2040->drive = BIT(data, 0);
 
-	/* TODO density select */
+	/* density select */
+	int ds = (data >> 1) & 0x03;
 
-	/* side select */
-	c2040->side = !BIT(data, 4);
+	if (c2040->ds != ds)
+	{
+		timer_adjust_periodic(c2040->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C2040_BITRATE[ds]/4));
+		c2040->ds = ds;
+	}
 }
 
 static READ8_DEVICE_HANDLER( c8050_riot2_pb_r )
@@ -727,7 +927,7 @@ static READ8_DEVICE_HANDLER( c8050_riot2_pb_r )
 	UINT8 data = 0;
 
 	/* write protect sense */
-	data |= floppy_wpt_r(c2040->image[c2040->drive]) << 3;
+	data |= floppy_wpt_r(c2040->unit[c2040->drive].image) << 3;
 
 	/* single/dual sided */
 	data |= (device->type == C8050) << 6;
@@ -754,10 +954,7 @@ static WRITE8_DEVICE_HANDLER( c8050_riot2_pb_w )
 
 	c2040_t *c2040 = get_safe_token(device->owner);
 
-	/* drive select */
-	c2040->drive = BIT(data, 0);
-
-	/* TODO density select */
+	c2040_riot2_pb_w(device, 0, data);
 
 	/* side select */
 	c2040->side = !BIT(data, 4);
@@ -772,18 +969,18 @@ static WRITE_LINE_DEVICE_HANDLER( c2040_riot2_irq_w )
 
 static const riot6532_interface c2040_riot2_intf =
 {
-	DEVCB_HANDLER(c2040_riot2_pa_r),
+	DEVCB_HANDLER(pi_r),
 	DEVCB_HANDLER(c2040_riot2_pb_r),
-	DEVCB_HANDLER(c2040_riot2_pa_w),
+	DEVCB_HANDLER(pi_w),
 	DEVCB_HANDLER(c2040_riot2_pb_w),
 	DEVCB_LINE(c2040_riot2_irq_w)
 };
 
 static const riot6532_interface c8050_riot2_intf =
 {
-	DEVCB_HANDLER(c2040_riot2_pa_r),
+	DEVCB_HANDLER(pi_r),
 	DEVCB_HANDLER(c8050_riot2_pb_r),
-	DEVCB_HANDLER(c2040_riot2_pa_w),
+	DEVCB_HANDLER(pi_w),
 	DEVCB_HANDLER(c8050_riot2_pb_w),
 	DEVCB_LINE(c2040_riot2_irq_w)
 };
@@ -793,16 +990,16 @@ static const riot6532_interface c8050_riot2_intf =
 -------------------------------------------------*/
 
 static FLOPPY_OPTIONS_START( c2040 )
-	FLOPPY_OPTION( c2040, "d67", "Commodore 2040 (DOS 1) Disk Image", d67_dsk_identify, d64_dsk_construct, NULL )
+	FLOPPY_OPTION( c2040, "d67", "Commodore 2040/3040 (DOS 1) Disk Image", d67_dsk_identify, d64_dsk_construct, NULL )
 FLOPPY_OPTIONS_END
 
 /*-------------------------------------------------
-    FLOPPY_OPTIONS( c3040 )
+    FLOPPY_OPTIONS( c4040 )
 -------------------------------------------------*/
 
-static FLOPPY_OPTIONS_START( c3040 )
-	FLOPPY_OPTION( c3040, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
-	FLOPPY_OPTION( c3040, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
+static FLOPPY_OPTIONS_START( c4040 )
+	FLOPPY_OPTION( c4040, "d64", "Commodore 4040 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
+	FLOPPY_OPTION( c4040, "g64", "Commodore 4040 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
 FLOPPY_OPTIONS_END
 
 /*-------------------------------------------------
@@ -839,10 +1036,10 @@ static const floppy_config c2040_floppy_config =
 };
 
 /*-------------------------------------------------
-    floppy_config c3040_floppy_config
+    floppy_config c4040_floppy_config
 -------------------------------------------------*/
 
-static const floppy_config c3040_floppy_config =
+static const floppy_config c4040_floppy_config =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -850,7 +1047,7 @@ static const floppy_config c3040_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_DRIVE_SS_80,
-	FLOPPY_OPTIONS_NAME(c3040),
+	FLOPPY_OPTIONS_NAME(c4040),
 	DO_NOT_KEEP_GEOMETRY
 };
 
@@ -907,26 +1104,6 @@ static MACHINE_DRIVER_START( c2040 )
 MACHINE_DRIVER_END
 
 /*-------------------------------------------------
-    MACHINE_DRIVER( c3040 )
--------------------------------------------------*/
-
-static MACHINE_DRIVER_START( c3040 )
-	/* DOS */
-	MDRV_CPU_ADD(M6502_DOS_TAG, M6502, XTAL_16MHz/16)
-	MDRV_CPU_PROGRAM_MAP(c3040_dos_map)
-	MDRV_RIOT6532_ADD(M6532_0_TAG, XTAL_16MHz/16, c2040_riot0_intf)
-	MDRV_RIOT6532_ADD(M6532_1_TAG, XTAL_16MHz/16, c2040_riot1_intf)
-
-	/* controller */
-	MDRV_CPU_ADD(M6502_FDC_TAG, M6502, XTAL_16MHz/16)
-	MDRV_CPU_PROGRAM_MAP(c3040_fdc_map)
-	MDRV_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, c2040_via_intf)
-	MDRV_RIOT6532_ADD(M6530_TAG, XTAL_16MHz/16, c2040_riot2_intf)
-
-	MDRV_FLOPPY_2_DRIVES_ADD(c3040_floppy_config)
-MACHINE_DRIVER_END
-
-/*-------------------------------------------------
     MACHINE_DRIVER( c4040 )
 -------------------------------------------------*/
 
@@ -943,7 +1120,7 @@ static MACHINE_DRIVER_START( c4040 )
 	MDRV_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, c2040_via_intf)
 	MDRV_RIOT6532_ADD(M6530_TAG, XTAL_16MHz/16, c2040_riot2_intf)
 
-	MDRV_FLOPPY_2_DRIVES_ADD(c3040_floppy_config)
+	MDRV_FLOPPY_2_DRIVES_ADD(c4040_floppy_config)
 MACHINE_DRIVER_END
 
 /*-------------------------------------------------
@@ -1012,7 +1189,7 @@ MACHINE_DRIVER_END
 
 ROM_START( c2040 )
 	ROM_REGION( 0x2c00, "c2040", ROMREGION_LOADBYNAME )
-	/* DOS 1 */
+	/* DOS 1.0 */
 	ROM_LOAD( "901468-06.ul1", 0x0000, 0x1000, CRC(25b5eed5) SHA1(4d9658f2e6ff3276e5c6e224611a66ce44b16fc7) )
 	ROM_LOAD( "901468-07.uh1", 0x1000, 0x1000, CRC(9b09ae83) SHA1(6a51c7954938439ca8342fc295bda050c06e1791) )
 
@@ -1024,29 +1201,15 @@ ROM_START( c2040 )
 ROM_END
 
 /*-------------------------------------------------
-    ROM( c3040 )
--------------------------------------------------*/
-
-ROM_START( c3040 )
-	ROM_REGION( 0x3c00, "c3040", ROMREGION_LOADBYNAME )
-	/* DOS 2 */
-	ROM_LOAD( "901468-11.uj1", 0x0000, 0x1000, CRC(b7157458) SHA1(8415f3159dea73161e0cef7960afa6c76953b6f8) )
-	ROM_LOAD( "901468-12.ul1", 0x1000, 0x1000, CRC(02c44ff9) SHA1(e8a94f239082d45f64f01b2d8e488d18fe659cbb) )
-	ROM_LOAD( "901468-13.uh1", 0x2000, 0x1000, CRC(cbd785b3) SHA1(6ada7904ac9d13c3f1c0a8715f9c4be1aa6eb0bb) )
-
-	/* RIOT DOS 2 */
-	ROM_LOAD( "901466-04.uk3", 0x3000, 0x0400, CRC(0ab338dc) SHA1(6645fa40b81be1ff7d1384e9b52df06a26ab0bfb) )
-
-	/* ROM GCR */
-	ROM_LOAD( "901467.uk6", 0x3400, 0x800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
-ROM_END
-
-/*-------------------------------------------------
     ROM( c4040 )
 -------------------------------------------------*/
 
 ROM_START( c4040 )
 	ROM_REGION( 0x3c00, "c4040", ROMREGION_LOADBYNAME )
+	/* DOS 2.1 */
+	ROM_LOAD( "901468-11.uj1", 0x0000, 0x1000, CRC(b7157458) SHA1(8415f3159dea73161e0cef7960afa6c76953b6f8) )
+	ROM_LOAD( "901468-12.ul1", 0x1000, 0x1000, CRC(02c44ff9) SHA1(e8a94f239082d45f64f01b2d8e488d18fe659cbb) )
+	ROM_LOAD( "901468-13.uh1", 0x2000, 0x1000, CRC(cbd785b3) SHA1(6ada7904ac9d13c3f1c0a8715f9c4be1aa6eb0bb) )
 	/* DOS 2 rev */
 	ROM_LOAD( "901468-14.uj1", 0x0000, 0x1000, CRC(bc4d4872) SHA1(ffb992b82ec913ddff7be964d7527aca3e21580c) )
 	ROM_LOAD( "901468-15.ul1", 0x1000, 0x1000, CRC(b6970533) SHA1(f702d6917fe8a798740ba4d467b500944ae7b70a) )
@@ -1140,11 +1303,16 @@ static DEVICE_START( c2040 )
 	c2040->riot2 = device_find_child_by_tag(device, M6530_TAG);
 	c2040->via = device_find_child_by_tag(device, M6522_TAG);
 	c2040->bus = devtag_get_device(device->machine, config->bus_tag);
-	c2040->image[0] = device_find_child_by_tag(device, FLOPPY_0);
-	c2040->image[1] = device_find_child_by_tag(device, FLOPPY_1);
+	c2040->unit[0].image = device_find_child_by_tag(device, FLOPPY_0);
+	c2040->unit[1].image = device_find_child_by_tag(device, FLOPPY_1);
+
+	/* find GCR ROM */
+
+	/* allocate data timer */
+	c2040->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, c2040->address);
+//	state_save_register_device_item(device, 0, c2040->);
 }
 
 /*-------------------------------------------------
@@ -1155,12 +1323,17 @@ static DEVICE_RESET( c2040 )
 {
 	c2040_t *c2040 = get_safe_token(device);
 
+	/* reset devices */
 	device_reset(c2040->cpu_dos);
 	device_reset(c2040->cpu_fdc);
 	device_reset(c2040->riot0);
 	device_reset(c2040->riot1);
 	device_reset(c2040->riot2);
 	device_reset(c2040->via);
+
+	/* toggle SO */
+	cpu_set_input_line(c2040->cpu_dos, M6502_SET_OVERFLOW, ASSERT_LINE);
+	cpu_set_input_line(c2040->cpu_dos, M6502_SET_OVERFLOW, CLEAR_LINE);
 }
 
 /*-------------------------------------------------
@@ -1203,8 +1376,8 @@ DEVICE_GET_INFO( c3040 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c3040);							break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c3040);			break;
+		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c2040);							break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(c2040);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 3040");							break;
