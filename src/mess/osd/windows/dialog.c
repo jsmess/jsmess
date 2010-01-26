@@ -1669,12 +1669,7 @@ void win_dialog_runmodal(running_machine *machine, HWND wnd, dialog_box *dialog)
 
 	// show the dialog
 	before_display_dialog(machine);
-#ifndef UNICODE
-	if (GetVersion() & 0x80000000)
-		DialogBoxIndirectParamA(NULL, (const DLGTEMPLATE*)dialog->handle, wnd, dialog_proc, (LPARAM) dialog);
-	else
-#endif // UNICODE
-		DialogBoxIndirectParamW(NULL, (const DLGTEMPLATE*)dialog->handle, wnd, dialog_proc, (LPARAM) dialog);
+	DialogBoxIndirectParamW(NULL, (const DLGTEMPLATE*)dialog->handle, wnd, dialog_proc, (LPARAM) dialog);
 	after_display_dialog(machine);
 }
 
@@ -1764,7 +1759,7 @@ BOOL win_file_dialog(running_machine *machine,
 		dialog_prime(custom_dialog);
 
 		ofn.flags |= OFN_ENABLETEMPLATEHANDLE | OFN_ENABLEHOOK;
-		ofn.instance = (HINSTANCE__*)custom_dialog->handle;
+		ofn.instance = (HINSTANCE)custom_dialog->handle;
 		ofn.custom_data = (LPARAM) custom_dialog;
 		ofn.hook = file_dialog_hook;
 	}
