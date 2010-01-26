@@ -708,6 +708,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c1571.o		\
 	$(MESS_MACHINE)/c1581.o		\
 	$(MESS_MACHINE)/c2040.o		\
+	$(MESS_MACHINE)/c8280.o		\
 	$(MESS_FORMATS)/d64_dsk.o	\
 	$(MESS_FORMATS)/g64_dsk.o	\
 	$(MESS_DRIVERS)/clcd.o		\
