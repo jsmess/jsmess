@@ -217,6 +217,32 @@ const game_driver * const drivers[] =
 	DRIVER( orbituvi )		/* UVI Compu-Game	 */
 	DRIVER( vdmaster )		/* Video Master	 */
 
+	/* Radofin 1292 Advanced Programmable Video System family */
+	DRIVER( vc4000 )	/* Interton vc4000 */
+	DRIVER( spc4000 )
+	DRIVER( cx3000tc )
+	DRIVER( tvc4000 )
+	DRIVER( 1292apvs )
+	DRIVER( 1392apvs )
+	DRIVER( mpu1000 )
+	DRIVER( mpu2000 )
+	DRIVER( pp1292 )
+	DRIVER( pp1392 )
+	DRIVER( f1392 )
+	DRIVER( fforce2 )
+	DRIVER( hmg1292 )
+	DRIVER( hmg1392 )
+	DRIVER( lnsy1392 )
+	DRIVER( vc6000 )
+	DRIVER( database )
+	DRIVER( wvmdtbse )
+	DRIVER( rwtrntcs )
+	DRIVER( telngtcs )
+	DRIVER( krvnjvtv )
+	DRIVER( oc2000 )
+	DRIVER( mpt05 )
+
+
 	/* Game Park */
 	DRIVER( gp32 )	/* GP32 2001 */
 	DRIVER( gp2x )	/* GP2X 2005 */
@@ -251,9 +277,6 @@ const game_driver * const drivers[] =
 	DRIVER( svisionp )
 	DRIVER( svisionn )
 	DRIVER( tvlinkp )
-
-	/* INTERTON */
-	DRIVER( vc4000 )	/* Interton vc4000	  */
 
 	/* BANDAI */
 	DRIVER( wswan )	 /* Bandai WonderSwan Handheld	   */
