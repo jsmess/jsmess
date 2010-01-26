@@ -171,7 +171,13 @@ typedef struct
     emu_timer *ocr1b_timer;
 } avr8_regs;
 
-static avr8_regs regs;
+
+typedef struct _craft_state craft_state;
+struct _craft_state
+{
+	avr8_regs regs;
+	int blah;
+};
 
 #define AVR8_TIMSK1_OCIE1A  0x02
 #define AVR8_TIMSK1_OCIE1B  0x04
@@ -245,9 +251,11 @@ static void avr8_maybe_start_timer_1(avr8_regs *device)
 
 static TIMER_CALLBACK( ocr1a_timer_compare )
 {
-    static int blah = 0;
-    printf( "ocr1a_timer_compare %d\n", blah++ );
-    avr8_maybe_start_timer_1(&regs);
+    craft_state *state = (craft_state *)machine->driver_data;
+    avr8_regs *regs = &state->regs;
+
+    printf( "ocr1a_timer_compare %d\n", state->blah++ );
+    avr8_maybe_start_timer_1(regs);
 
     // Inaccurate
     cpu_set_input_line(devtag_get_device(machine, "maincpu"), AVR8_INT_T1COMPA, ASSERT_LINE);
@@ -255,8 +263,11 @@ static TIMER_CALLBACK( ocr1a_timer_compare )
 
 static TIMER_CALLBACK( ocr1b_timer_compare )
 {
+    craft_state *state = (craft_state *)machine->driver_data;
+    avr8_regs *regs = &state->regs;
+
     printf( "ocr1b_timer_compare\n" );
-    avr8_maybe_start_timer_1(&regs);
+    avr8_maybe_start_timer_1(regs);
 
     // Inaccurate
     cpu_set_input_line(devtag_get_device(machine, "maincpu"), AVR8_INT_T1COMPB, ASSERT_LINE);
@@ -264,48 +275,51 @@ static TIMER_CALLBACK( ocr1b_timer_compare )
 
 static READ8_HANDLER( avr8_read )
 {
+    craft_state *state = (craft_state *)space->machine->driver_data;
+    avr8_regs *regs = &state->regs;
+
     switch( offset )
     {
         case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
         case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
         case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
         case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-            return regs.r[offset];
+            return regs->r[offset];
         case 0x24:
-            printf( "AVR8: R: regs.ddrb (%02x)\n", regs.ddrb );
-            return regs.ddrb;
+            printf( "AVR8: R: regs->ddrb (%02x)\n", regs->ddrb );
+            return regs->ddrb;
         case 0x25:
-            printf( "AVR8: R: regs.portb (%02x)\n", regs.portb );
-            return regs.portb;
+            printf( "AVR8: R: regs->portb (%02x)\n", regs->portb );
+            return regs->portb;
         case 0x27:
-            printf( "AVR8: R: regs.ddrc (%02x)\n", regs.ddrc );
-            return regs.ddrc;
+            printf( "AVR8: R: regs->ddrc (%02x)\n", regs->ddrc );
+            return regs->ddrc;
         case 0x2a:
-            printf( "AVR8: R: regs.ddrd (%02x)\n", regs.ddrd );
-            return regs.ddrd;
+            printf( "AVR8: R: regs->ddrd (%02x)\n", regs->ddrd );
+            return regs->ddrd;
         case 0x4c:
-            printf( "AVR8: R: regs.spcr (%02x)\n", regs.spcr );
-            return regs.spcr;
+            printf( "AVR8: R: regs->spcr (%02x)\n", regs->spcr );
+            return regs->spcr;
         case 0x4d:
-            printf( "AVR8: R: regs.spsr (%02x)\n", regs.spsr );
-            return regs.spsr;
+            printf( "AVR8: R: regs->spsr (%02x)\n", regs->spsr );
+            return regs->spsr;
         case 0x5d:
-            //printf( "AVR8: R: regs.spl (%02x)\n", regs.spl );
-            return regs.sp & 0x00ff;
+            //printf( "AVR8: R: regs->spl (%02x)\n", regs->spl );
+            return regs->sp & 0x00ff;
         case 0x5e:
-            //printf( "AVR8: R: regs.sph (%02x)\n", regs.sph );
-            return (regs.sp >> 8) & 0x00ff;
+            //printf( "AVR8: R: regs->sph (%02x)\n", regs->sph );
+            return (regs->sp >> 8) & 0x00ff;
         case 0x5f:
-            return regs.sreg;
+            return regs->sreg;
         case 0x6f:
-            printf( "AVR8: R: regs.timsk1 (%02x)\n", regs.timsk1 );
-            return regs.timsk1;
+            printf( "AVR8: R: regs->timsk1 (%02x)\n", regs->timsk1 );
+            return regs->timsk1;
         case 0x80:
-            printf( "AVR8: R: regs.tccr1a (%02x)\n", regs.tccr1a );
-            return regs.tccr1a;
+            printf( "AVR8: R: regs->tccr1a (%02x)\n", regs->tccr1a );
+            return regs->tccr1a;
         case 0x81:
-            printf( "AVR8: R: regs.tccr1b (%02x)\n", regs.tccr1b );
-            return regs.tccr1b;
+            printf( "AVR8: R: regs->tccr1b (%02x)\n", regs->tccr1b );
+            return regs->tccr1b;
         case 0x84:
         {
             //INT64 divisor = 1;
@@ -344,33 +358,33 @@ static READ8_HANDLER( avr8_read )
                     break;
             }
             diff /= divisor;
-            diff %= regs.ocr1a;
-            printf( "AVR8: R: regs.tcnt1l read: %04x\n",  );
+            diff %= regs->ocr1a;
+            printf( "AVR8: R: regs->tcnt1l read: %04x\n",  );
 #endif
             break;
         }
 
         case 0x85:
-            printf( "AVR8: R: regs.tcnt1h\n" );
+            printf( "AVR8: R: regs->tcnt1h\n" );
             break;
         case 0x88:
-            printf( "AVR8: R: regs.ocr1al (%02x)\n", regs.ocr1a & 0x00ff );
-            return regs.ocr1a & 0x00ff;
+            printf( "AVR8: R: regs->ocr1al (%02x)\n", regs->ocr1a & 0x00ff );
+            return regs->ocr1a & 0x00ff;
         case 0x89:
-            printf( "AVR8: R: regs.ocr1ah (%02x)\n", (regs.ocr1a >> 8) & 0x00ff );
-            return (regs.ocr1a >> 8) & 0x00ff;
+            printf( "AVR8: R: regs->ocr1ah (%02x)\n", (regs->ocr1a >> 8) & 0x00ff );
+            return (regs->ocr1a >> 8) & 0x00ff;
         case 0x8a:
-            printf( "AVR8: R: regs.ocr1bl (%02x)\n", regs.ocr1b & 0x00ff );
-            return regs.ocr1b & 0x00ff;
+            printf( "AVR8: R: regs->ocr1bl (%02x)\n", regs->ocr1b & 0x00ff );
+            return regs->ocr1b & 0x00ff;
         case 0x8b:
-            printf( "AVR8: R: regs.ocr1bh (%02x)\n", (regs.ocr1b >> 8) & 0x00ff );
-            return (regs.ocr1b >> 8) & 0x00ff;
+            printf( "AVR8: R: regs->ocr1bh (%02x)\n", (regs->ocr1b >> 8) & 0x00ff );
+            return (regs->ocr1b >> 8) & 0x00ff;
         case 0xb0:
-            printf( "AVR8: R: regs.tccr2a (%02x)\n", regs.tccr2a );
-            return regs.tccr2a;
+            printf( "AVR8: R: regs->tccr2a (%02x)\n", regs->tccr2a );
+            return regs->tccr2a;
         case 0xb1:
-            printf( "AVR8: R: regs.tccr2b (%02x)\n", regs.tccr2b );
-            return regs.tccr2b;
+            printf( "AVR8: R: regs->tccr2b (%02x)\n", regs->tccr2b );
+            return regs->tccr2b;
         default:
             printf( "AVR8: Unrecognized register read: %02x\n", offset );
     }
@@ -379,90 +393,93 @@ static READ8_HANDLER( avr8_read )
 
 static WRITE8_HANDLER( avr8_write )
 {
+    craft_state *state = (craft_state *)space->machine->driver_data;
+    avr8_regs *regs = &state->regs;
+
     switch( offset )
     {
         case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
         case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
         case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
         case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-            regs.r[offset] = data;
+            regs->r[offset] = data;
             break;
         case 0x24:
-            printf( "AVR8: W: regs.ddrb = %02x\n", data );
-            regs.ddrb = data;
+            printf( "AVR8: W: regs->ddrb = %02x\n", data );
+            regs->ddrb = data;
             break;
         case 0x25:
-            printf( "AVR8: W: regs.portb = %02x\n", data );
-            regs.portb = data;
+            printf( "AVR8: W: regs->portb = %02x\n", data );
+            regs->portb = data;
             break;
         case 0x27:
-            printf( "AVR8: W: regs.ddrc = %02x\n", data );
-            regs.ddrc = data;
+            printf( "AVR8: W: regs->ddrc = %02x\n", data );
+            regs->ddrc = data;
             break;
         case 0x2a:
-            printf( "AVR8: W: regs.ddrd = %02x\n", data );
-            regs.ddrd = data;
+            printf( "AVR8: W: regs->ddrd = %02x\n", data );
+            regs->ddrd = data;
             break;
         case 0x2b:
             dac_data_w(devtag_get_device(space->machine, "dac"), data);
             break;
         case 0x4c:
-            printf( "AVR8: W: regs.spcr = %02x\n", data );
-            regs.spcr = data;
+            printf( "AVR8: W: regs->spcr = %02x\n", data );
+            regs->spcr = data;
             break;
         case 0x4d:
-            printf( "AVR8: W: regs.spsr = %02x\n", data );
-            regs.spsr = data;
+            printf( "AVR8: W: regs->spsr = %02x\n", data );
+            regs->spsr = data;
             break;
         case 0x5d:
-            //printf( "AVR8: W: regs.sp(L) = %02x\n", data );
-            regs.sp = (regs.hidden_high << 8) | data;
+            //printf( "AVR8: W: regs->sp(L) = %02x\n", data );
+            regs->sp = (regs->hidden_high << 8) | data;
             break;
         case 0x5e:
-            //printf( "AVR8: W: regs.sp(H) = %02x\n", data );
-            regs.hidden_high = data & 0x07;
+            //printf( "AVR8: W: regs->sp(H) = %02x\n", data );
+            regs->hidden_high = data & 0x07;
             break;
         case 0x5f:
-            regs.sreg = data;
+            regs->sreg = data;
             break;
         case 0x6f:
-            printf( "AVR8: W: regs.timsk1 = %02x\n", data );
-            regs.timsk1 = data;
-            avr8_maybe_start_timer_1(&regs);
+            printf( "AVR8: W: regs->timsk1 = %02x\n", data );
+            regs->timsk1 = data;
+            avr8_maybe_start_timer_1(regs);
             break;
         case 0x80:
-            printf( "AVR8: W: regs.tccr1a = %02x\n", data );
-            regs.tccr1a = data;
+            printf( "AVR8: W: regs->tccr1a = %02x\n", data );
+            regs->tccr1a = data;
             break;
         case 0x81:
-            printf( "AVR8: W: regs.tccr1b = %02x\n", data );
-            regs.tccr1b = data;
+            printf( "AVR8: W: regs->tccr1b = %02x\n", data );
+            regs->tccr1b = data;
             break;
         case 0x88:
-            printf( "AVR8: W: regs.ocr1a(L) = %02x\n", data );
-            regs.ocr1a = (regs.hidden_high << 8) | data;
-            avr8_maybe_start_timer_1(&regs);
+            printf( "AVR8: W: regs->ocr1a(L) = %02x\n", data );
+            regs->ocr1a = (regs->hidden_high << 8) | data;
+            avr8_maybe_start_timer_1(regs);
             break;
         case 0x89:
-            printf( "AVR8: W: regs.ocr1a(H) = %02x\n", data );
-            regs.hidden_high = data;
+            printf( "AVR8: W: regs->ocr1a(H) = %02x\n", data );
+            regs->hidden_high = data;
             break;
         case 0x8a:
-            printf( "AVR8: W: regs.ocr1b(L) = %02x\n", data );
-            regs.ocr1b = (regs.hidden_high << 8) | data;
-            avr8_maybe_start_timer_1(&regs);
+            printf( "AVR8: W: regs->ocr1b(L) = %02x\n", data );
+            regs->ocr1b = (regs->hidden_high << 8) | data;
+            avr8_maybe_start_timer_1(regs);
             break;
         case 0x8b:
-            printf( "AVR8: W: regs.ocr1b(H) = %02x\n", data );
-            regs.hidden_high = data;
+            printf( "AVR8: W: regs->ocr1b(H) = %02x\n", data );
+            regs->hidden_high = data;
             break;
         case 0xb0:
-            printf( "AVR8: W: regs.tccr2a = %02x\n", data );
-            regs.tccr2a = data;
+            printf( "AVR8: W: regs->tccr2a = %02x\n", data );
+            regs->tccr2a = data;
             break;
         case 0xb1:
-            printf( "AVR8: W: regs.tccr2b = %02x\n", data );
-            regs.tccr2b = data;
+            printf( "AVR8: W: regs->tccr2b = %02x\n", data );
+            regs->tccr2b = data;
             break;
         default:
             printf( "AVR8: Unrecognized register write: %02x = %02x\n", offset, data );
@@ -506,23 +523,32 @@ static VIDEO_UPDATE( craft )
 
 static DRIVER_INIT( craft )
 {
-    regs.ocr1a_timer = timer_alloc(machine, ocr1a_timer_compare, 0);
-    regs.ocr1b_timer = timer_alloc(machine, ocr1b_timer_compare, 0);
+    craft_state *state = (craft_state *)machine->driver_data;
+    avr8_regs *regs = &state->regs;
+
+    regs->ocr1a_timer = timer_alloc(machine, ocr1a_timer_compare, 0);
+    regs->ocr1b_timer = timer_alloc(machine, ocr1b_timer_compare, 0);
 }
 
 static MACHINE_RESET( craft )
 {
-    regs.timsk1 = 0;
-    regs.tcnt1 = 0;
-    regs.ocr1a = 0;
-    regs.ocr1b = 0;
-    regs.icr1 = 0;
-    regs.last_tcnt1_cycle = 0;
+    craft_state *state = (craft_state *)machine->driver_data;
+    avr8_regs *regs = &state->regs;
+
+    regs->timsk1 = 0;
+    regs->tcnt1 = 0;
+    regs->ocr1a = 0;
+    regs->ocr1b = 0;
+    regs->icr1 = 0;
+    regs->last_tcnt1_cycle = 0;
 
     dac_data_w(devtag_get_device(machine, "dac"), 0x00);
 }
 
 static MACHINE_DRIVER_START( craft )
+
+    MDRV_DRIVER_DATA( craft_state )
+
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", AVR8, MASTER_CLOCK)
     MDRV_CPU_PROGRAM_MAP(craft_prg_map)

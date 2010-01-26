@@ -22,7 +22,11 @@
 #define VIA6522_1_TAG "via6522_1"
 #define MC6845_TAG "mc6845"
 
-static UINT8 *video_ram;
+typedef struct _ec65_state ec65_state;
+struct _ec65_state
+{
+	UINT8 *video_ram;
+};
 
 static ADDRESS_MAP_START(ec65_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -36,7 +40,7 @@ static ADDRESS_MAP_START(ec65_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe140, 0xe140) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0xe141, 0xe141) AM_DEVREADWRITE(MC6845_TAG, mc6845_register_r , mc6845_register_w)
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM // 1KB on-board RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&video_ram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(ec65_state,video_ram)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -150,12 +154,13 @@ static VIDEO_UPDATE( ec65 )
 
 static MC6845_UPDATE_ROW( ec65_update_row )
 {
+	ec65_state *state = (ec65_state *)device->machine->driver_data;
 	UINT8 *charrom = memory_region(device->machine, "chargen");
 	int column, bit;
 
 	for (column = 0; column < x_count; column++)
 	{
-		UINT8 code = video_ram[ma + column];
+		UINT8 code = state->video_ram[ma + column];
 		UINT16 addr = code << 4 | (ra & 0x0f);
 		UINT8 data = charrom[(addr & 0xfff)];
 		if (column == cursor_x)
@@ -208,6 +213,9 @@ static GFXDECODE_START( ec65 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( ec65 )
+
+    MDRV_DRIVER_DATA( ec65_state )
+
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6502, XTAL_4MHz / 4)
     MDRV_CPU_PROGRAM_MAP(ec65_mem)
@@ -239,6 +247,9 @@ static MACHINE_DRIVER_START( ec65 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ec65k )
+
+    MDRV_DRIVER_DATA( ec65_state )
+
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",G65816, XTAL_4MHz) // can use 4,2 or 1 MHz
     MDRV_CPU_PROGRAM_MAP(ec65k_mem)

@@ -16,16 +16,25 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-static const UINT8 *FNT;
+typedef struct _bcs3_state bcs3_state;
+struct _bcs3_state
+{
+	const UINT8 *fnt;
+	UINT8 *videoram;
+};
 
 static READ8_HANDLER( bcs3_videoram_r )
 {
-	return space->machine->generic.videoram.u8[offset];
+	bcs3_state *state = (bcs3_state *)space->machine->driver_data;
+
+	return state->videoram[offset];
 }
 
 static WRITE8_HANDLER( bcs3_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	bcs3_state *state = (bcs3_state *)space->machine->driver_data;
+
+	state->videoram[offset] = data;
 }
 
 static READ8_HANDLER( bcs3_keyboard_r )
@@ -60,7 +69,7 @@ static ADDRESS_MAP_START(bcs3_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xffff ) AM_RAM
-	AM_RANGE( 0x3c50, 0x3d9f ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_SIZE_GENERIC(videoram)
+	AM_RANGE( 0x3c50, 0x3d9f ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_MEMBER(bcs3_state,videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(bcs3a_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -69,7 +78,7 @@ static ADDRESS_MAP_START(bcs3a_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xefff ) AM_RAM
-	AM_RANGE( 0x3c00, 0x5a7f ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_SIZE_GENERIC(videoram)
+	AM_RANGE( 0x3c00, 0x5a7f ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_MEMBER(bcs3_state,videoram)
 	AM_RANGE( 0xf000, 0xf3ff ) AM_ROM
 ADDRESS_MAP_END
 
@@ -79,7 +88,7 @@ static ADDRESS_MAP_START(bcs3b_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xefff ) AM_RAM
-	AM_RANGE( 0x3c00, 0x657f ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_SIZE_GENERIC(videoram)
+	AM_RANGE( 0x3c00, 0x657f ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_MEMBER(bcs3_state,videoram)
 	AM_RANGE( 0xf000, 0xf3ff ) AM_ROM
 ADDRESS_MAP_END
 
@@ -89,7 +98,7 @@ static ADDRESS_MAP_START(bcs3c_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xffff ) AM_RAM
-	AM_RANGE( 0x3c00, 0x5ab3 ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_SIZE_GENERIC(videoram)
+	AM_RANGE( 0x3c00, 0x5ab3 ) AM_READWRITE(bcs3_videoram_r,bcs3_videoram_w) AM_BASE_MEMBER(bcs3_state,videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bcs3_io, ADDRESS_SPACE_IO, 8)
@@ -208,11 +217,14 @@ static MACHINE_RESET(bcs3)
 
 static VIDEO_START( bcs3 )
 {
-	FNT = memory_region(machine, "gfx1");
+	bcs3_state *state = (bcs3_state *)machine->driver_data;
+
+	state->fnt = memory_region(machine, "gfx1");
 }
 
 static VIDEO_UPDATE( bcs3 )
 {
+	bcs3_state *state = (bcs3_state *)screen->machine->driver_data;
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=0,x;
 
@@ -227,10 +239,10 @@ static VIDEO_UPDATE( bcs3 )
 			{
 				if (ra < 8)
 				{
-					chr = screen->machine->generic.videoram.u8[x] & 0x7f;
+					chr = state->videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = FNT[(chr<<3) | rat ];
+					gfx = state->fnt[(chr<<3) | rat ];
 				}
 				else
 					gfx = 0;
@@ -255,9 +267,10 @@ static VIDEO_UPDATE( bcs3 )
     with the cursor always in sight. */
 static VIDEO_UPDATE( bcs3a )
 {
+	bcs3_state *state = (bcs3_state *)screen->machine->driver_data;
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=128,x;
-	UINT16 cursor = (screen->machine->generic.videoram.u8[0x7a] | (screen->machine->generic.videoram.u8[0x7b] << 8)) - 0x3c80;	// get cursor relative position
+	UINT16 cursor = (state->videoram[0x7a] | (state->videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
 	rat = cursor / 30;
 	if (rat > 11) ma = (rat-11) * 30 + 128;
 
@@ -272,10 +285,10 @@ static VIDEO_UPDATE( bcs3a )
 			{
 				if (ra < 8)
 				{
-					chr = screen->machine->generic.videoram.u8[x] & 0x7f;
+					chr = state->videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = FNT[(chr<<3) | rat ];
+					gfx = state->fnt[(chr<<3) | rat ];
 				}
 				else
 					gfx = 0;
@@ -298,9 +311,10 @@ static VIDEO_UPDATE( bcs3a )
 
 static VIDEO_UPDATE( bcs3b )
 {
+	bcs3_state *state = (bcs3_state *)screen->machine->driver_data;
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=128,x;
-	UINT16 cursor = (screen->machine->generic.videoram.u8[0x7a] | (screen->machine->generic.videoram.u8[0x7b] << 8)) - 0x3c80;	// get cursor relative position
+	UINT16 cursor = (state->videoram[0x7a] | (state->videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
 	rat = cursor / 41;
 	if (rat > 23) ma = (rat-23) * 41 + 128;
 
@@ -315,10 +329,10 @@ static VIDEO_UPDATE( bcs3b )
 			{
 				if (ra < 8)
 				{
-					chr = screen->machine->generic.videoram.u8[x] & 0x7f;
+					chr = state->videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = FNT[(chr<<3) | rat ];
+					gfx = state->fnt[(chr<<3) | rat ];
 				}
 				else
 					gfx = 0;
@@ -341,9 +355,10 @@ static VIDEO_UPDATE( bcs3b )
 
 static VIDEO_UPDATE( bcs3c )
 {
+	bcs3_state *state = (bcs3_state *)screen->machine->driver_data;
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=0xb4,x;
-	UINT16 cursor = (screen->machine->generic.videoram.u8[0x08] | (screen->machine->generic.videoram.u8[0x09] << 8)) - 0x3c80;	// get cursor relative position
+	UINT16 cursor = (state->videoram[0x08] | (state->videoram[0x09] << 8)) - 0x3c80;	// get cursor relative position
 	rat = cursor / 30;
 	if (rat > 11) ma = (rat-11) * 30 + 0xb4;
 
@@ -358,10 +373,10 @@ static VIDEO_UPDATE( bcs3c )
 			{
 				if (ra < 8)
 				{
-					chr = screen->machine->generic.videoram.u8[x] & 0x7f;
+					chr = state->videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = FNT[(chr<<3) | rat ];
+					gfx = state->fnt[(chr<<3) | rat ];
 				}
 				else
 					gfx = 0;
@@ -402,6 +417,9 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( bcs3 )
+
+	MDRV_DRIVER_DATA( bcs3_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_5MHz /2)
 	MDRV_CPU_PROGRAM_MAP(bcs3_mem)

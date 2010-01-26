@@ -13,7 +13,14 @@
 #include "machine/msm8251.h"
 #include "devices/messram.h"
 
-static UINT8 fk1_video_rol;
+typedef struct _fk1_state fk1_state;
+struct _fk1_state
+{
+	UINT8 video_rol;
+	UINT8 int_vector;
+};
+
+
 /*
 Port A:
         Printer
@@ -154,7 +161,9 @@ static WRITE8_DEVICE_HANDLER (fk1_ppi_3_a_w )
 }
 static WRITE8_DEVICE_HANDLER (fk1_ppi_3_b_w )
 {
-	fk1_video_rol = data;
+	fk1_state *state = (fk1_state *)device->machine->driver_data;
+
+	state->video_rol = data;
 }
 static WRITE8_DEVICE_HANDLER (fk1_ppi_3_c_w )
 {
@@ -168,7 +177,9 @@ static READ8_DEVICE_HANDLER (fk1_ppi_3_a_r )
 }
 static READ8_DEVICE_HANDLER (fk1_ppi_3_b_r )
 {
-	return fk1_video_rol;
+	fk1_state *state = (fk1_state *)device->machine->driver_data;
+
+	return state->video_rol;
 }
 static READ8_DEVICE_HANDLER (fk1_ppi_3_c_r )
 {
@@ -321,12 +332,12 @@ static INPUT_PORTS_START( fk1 )
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 INPUT_PORTS_END
 
-static UINT8 int_vector;
-
 static TIMER_CALLBACK(keyboard_callback)
 {
+	fk1_state *state = (fk1_state *)machine->driver_data;
+
 	if (input_port_read(machine, "LINE0")) {
-		int_vector = 6;
+		state->int_vector = 6;
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	}
 }
@@ -344,13 +355,17 @@ static TIMER_CALLBACK(keyboard_callback)
 
 static IRQ_CALLBACK (fk1_irq_callback)
 {
-	logerror("IRQ %02x\n",int_vector*2);
-	return int_vector * 2;
+	fk1_state *state = (fk1_state *)device->machine->driver_data;
+
+	logerror("IRQ %02x\n", state->int_vector*2);
+	return state->int_vector * 2;
 }
 
 static TIMER_CALLBACK( vsync_callback )
 {
-	int_vector = 3;
+	fk1_state *state = (fk1_state *)machine->driver_data;
+
+	state->int_vector = 3;
 	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 }
 
@@ -375,14 +390,16 @@ static MACHINE_START( fk1 )
 
 static VIDEO_UPDATE( fk1 )
 {
+	fk1_state *state = (fk1_state *)screen->machine->driver_data;
  	UINT8 code;
 	int y, x, b;
+	UINT8 *ram = messram_get_ptr(devtag_get_device(screen->machine, "messram"));
 
 	for (x = 0; x < 64; x++)
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[x * 0x100 + ((y + fk1_video_rol) & 0xff) + 0x10000];
+			code = ram[x * 0x100 + ((y + state->video_rol) & 0xff) + 0x10000];
 			for (b = 0; b < 8; b++)
 			{
 				*BITMAP_ADDR16(bitmap, y, x*8+b) =  ((code << b) & 0x80) ? 1 : 0;
@@ -393,25 +410,28 @@ static VIDEO_UPDATE( fk1 )
 }
 
 static MACHINE_DRIVER_START( fk1 )
-    /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_8MHz / 2)
-    MDRV_CPU_PROGRAM_MAP(fk1_mem)
-    MDRV_CPU_IO_MAP(fk1_io)
 
-    MDRV_MACHINE_START(fk1)
-    MDRV_MACHINE_RESET(fk1)
+	MDRV_DRIVER_DATA( fk1_state )
 
-    /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu",Z80, XTAL_8MHz / 2)
+	MDRV_CPU_PROGRAM_MAP(fk1_mem)
+	MDRV_CPU_IO_MAP(fk1_io)
+
+	MDRV_MACHINE_START(fk1)
+	MDRV_MACHINE_RESET(fk1)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_UPDATE(fk1)
+	MDRV_VIDEO_UPDATE(fk1)
 
 	MDRV_PIT8253_ADD( "pit8253", fk1_pit8253_intf )
 	MDRV_I8255A_ADD( "ppi8255_1", fk1_ppi8255_interface_1 )
@@ -427,8 +447,8 @@ MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( fk1 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-    ROM_SYSTEM_BIOS( 0, "orig", "Original BIOS" )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS( 0, "orig", "Original BIOS" )
 	ROMX_LOAD( "fk1.u65", 	   0x0000, 0x0800, CRC(145561f8) SHA1(a4eb17d773e51b34620c508b6cebcb4531ae99c2), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "diag", "Diag BIOS" )
 	ROMX_LOAD( "fk1-diag.u65", 0x0000, 0x0800, CRC(e0660ae1) SHA1(6ad609049b28f27126af0a8a6224362351073dee), ROM_BIOS(2))
