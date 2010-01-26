@@ -268,7 +268,7 @@ static int GetMessIcon(int drvindex, int nSoftwareType)
     int nIconPos = 0;
     HICON hIcon = 0;
     const game_driver *drv;
-    char buffer[10000];
+    char buffer[32];
 	const char *iconname;
 
 	assert(drvindex >= 0);
@@ -404,8 +404,8 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 
 void MessUpdateSoftwareList(void)
 {
-	//HWND hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
-	//MyFillSoftwareList(Picker_GetSelectedItem(hwndList), TRUE);
+	HWND hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
+	MyFillSoftwareList(Picker_GetSelectedItem(hwndList), TRUE);
 }
 
 
@@ -415,7 +415,7 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 	machine_config *config;
 	const device_config *dev;
 	int nPos;
-	char szMessage[10000];
+	char szMessage[256];
 	LPCSTR pszSoftware;
 	BOOL bResult = FALSE;
 
@@ -646,7 +646,7 @@ static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_
 {
     BOOL success;
     OPENFILENAME of;
-    char szFilter[20480];
+    char szFilter[2048];
     LPSTR s;
 	const char *typname;
     int i;

@@ -17,7 +17,7 @@ OBJDIRS += $(WINUIOBJ)
 MESS_WINUISRC = $(SRC)/mess/osd/winui
 MESS_WINUIOBJ = $(OBJ)/mess/osd/winui
 OBJDIRS += $(MESS_WINUIOBJ)
-CFLAGS += -I$(WINUISRC) -I$(MESS_WINUISRC) -DWINUI
+CFLAGS += -I$(WINUISRC) -I$(MESS_WINUISRC)
 RCFLAGS += -DMESS
 
 #-------------------------------------------------

@@ -47,7 +47,7 @@ struct _file_info
 
 	const char *zip_entry_name;
 	const char *base_name;
-	char file_name[2];
+	char file_name[1];
 };
 
 typedef struct _directory_search_info directory_search_info;
@@ -56,7 +56,7 @@ struct _directory_search_info
 	directory_search_info *next;
 	HANDLE find_handle;
 	WIN32_FIND_DATA fd;
-	char directory_name[2];
+	char directory_name[1];
 };
 
 typedef struct _software_picker_info software_picker_info;
@@ -677,7 +677,7 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 			SoftwarePicker_FreeSearchInfo(pSearchInfo);
 		}
 	}
-	else if (pPickerInfo->config!= NULL && pPickerInfo->config->hashfile && (pPickerInfo->hashes_realized
+	else if (pPickerInfo->config->hashfile && (pPickerInfo->hashes_realized
 		< pPickerInfo->file_index_length))
 	{
 		// time to realize some hashes
@@ -837,10 +837,11 @@ BOOL SetupSoftwarePicker(HWND hwndPicker, const struct PickerOptions *pOptions)
 
 	if (!SetupPicker(hwndPicker, pOptions))
 		goto error;
-	pPickerInfo = (software_picker_info *)malloc(sizeof(software_picker_info));
-	memset(pPickerInfo,0,sizeof(sizeof(software_picker_info*)));
+
+	pPickerInfo = (software_picker_info *)malloc(sizeof(*pPickerInfo));
 	if (!pPickerInfo)
 		goto error;
+
 	memset(pPickerInfo, 0, sizeof(*pPickerInfo));
 	if (!SetProp(hwndPicker, software_picker_property_name, (HANDLE) pPickerInfo))
 		goto error;

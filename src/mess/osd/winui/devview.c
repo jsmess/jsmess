@@ -214,7 +214,7 @@ BOOL DevView_SetDriver(HWND hwndDevView, const software_config *config)
 			image_device_info info = image_device_getinfo(pDevViewInfo->config->mconfig, dev);
 
 			s = tstring_from_utf8(info.name);
-			ppszDevices[i] = (WCHAR*)alloca((_tcslen(s) + 1) * sizeof(WCHAR));
+			ppszDevices[i] = (TCHAR*)alloca((_tcslen(s) + 1) * sizeof(TCHAR));
 			_tcscpy(ppszDevices[i], s);
 			global_free(s);
 			i++;
