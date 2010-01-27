@@ -1,27 +1,17 @@
 /***************************************************************************
 
-    ACT Apricot series
+    ACT Apricot F1 series
 
     preliminary driver by Angelo Salese
-
-    TODO:
-    - I'm not entirely convinced that Apricot Xi/PC and F1/F10 should stay
-      in the same driver, they looks to have uncompatible devices and
-      probably uncompatible software too.
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "video/mc6845.h"
-#include "machine/i8255a.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
-
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 
@@ -31,13 +21,8 @@ struct _act_state
 	UINT16 *paletteram;
 	UINT16 *vram;
 	UINT16 *scrollram;
-	UINT16 *ram;
 
-	// xi_sys_ctrl
-	UINT8 disp_en; 		//bit 3
-	UINT8 gfx_mode; 	//bit 4
-	UINT8 fdrv_num;		//bit 6
-	UINT8 p_input_dir;	//bit 7
+	UINT8 fdrv_num;
 };
 
 static VIDEO_START( act_f1 )
@@ -75,66 +60,6 @@ static VIDEO_UPDATE( act_f1 )
 	}
 
 	return 0;
-}
-
-static VIDEO_START( act_xi )
-{
-}
-
-static VIDEO_UPDATE( act_xi )
-{
-	act_state *state = (act_state *)screen->machine->driver_data;
-	int y,x,xi,yi;
-
-	if(state->disp_en)
-		return 0;
-
-	if(state->gfx_mode)
-	{
-		for (y=0;y<25;y++)
-		{
-			for (x=0;x<80;x++)
-			{
-				int tile = state->vram[(x+y*80)] & 0x03ff;
-
-				//0x8000: reverse
-				//0x4000: bright
-				//0x2000: underline
-				//0x1000: strikethrough
-
-				for(yi=0;yi<16;yi++)
-				{
-					for(xi=0;xi<10;xi++)
-					{
-						int color;
-
-						color = (state->ram[(tile*16)+(yi)]>>(xi) & 1) ? 7 : 0;
-
-						//FIXME: X should actually be multiplied by 10.
-						if((x*8+xi)<=video_screen_get_visible_area(screen)->max_x && ((y*16+yi))<video_screen_get_visible_area(screen)->max_y)
-							*BITMAP_ADDR16(bitmap, y*16+yi, x*8+xi) = screen->machine->pens[color];
-					}
-				}
-			}
-		}
-	}
-	else
-	{
-		//...
-	}
-
-	return 0;
-}
-
-static READ8_HANDLER( act_sio_r )
-{
-	return mame_rand(space->machine);
-}
-
-static WRITE8_HANDLER( act_sio_w )
-{
-//  if(data)
-//  printf("Write to 66 %c\n",data);
 }
 
 //static UINT8 fdc_irq_flag;
@@ -240,27 +165,6 @@ static ADDRESS_MAP_START(act_f1_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xf8000,0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(act_xi_mem, ADDRESS_SPACE_PROGRAM, 16)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0xeffff) AM_RAM AM_BASE_MEMBER(act_state,ram)
-	AM_RANGE(0xf0000,0xf0fff) AM_MIRROR(0x7000) AM_RAM AM_BASE_MEMBER(act_state,vram)
-	AM_RANGE(0xf8000,0xfffff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( act_xi_io , ADDRESS_SPACE_IO, 16)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0003) AM_DEVREADWRITE8("pic8259_master",pic8259_r, pic8259_w,0x00ff)
-	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(act_fdc_r, act_fdc_w,0x00ff)
-	AM_RANGE(0x0048, 0x004f) AM_DEVREADWRITE8("ppi8255_0", i8255a_r, i8255a_w,0x00ff)
-//  AM_RANGE(0x0050, 0x0051) sound gen
-	AM_RANGE(0x0058, 0x005f) AM_DEVREADWRITE8("pit8253",pit8253_r,pit8253_w,0x00ff)
-	AM_RANGE(0x0060, 0x0067) AM_READWRITE8(act_sio_r,act_sio_w,0x00ff)
-	AM_RANGE(0x0068, 0x0069) AM_DEVWRITE8("crtc", mc6845_address_w,0x00ff)
-	AM_RANGE(0x006a, 0x006b) AM_DEVREADWRITE8("crtc", mc6845_register_r,mc6845_register_w,0x00ff)
-//  AM_RANGE(0x0070, 0x0073) 8089
-ADDRESS_MAP_END
-
-
 static WRITE8_HANDLER( actf1_sys_w )
 {
 //  static UINT8 cur_fdrv;
@@ -316,58 +220,6 @@ static MACHINE_RESET(act)
 }
 
 
-static const mc6845_interface mc6845_intf =
-{
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
-};
-
-static READ8_DEVICE_HANDLER( act_portb_r )
-{
-	return 0xff;
-}
-
-/*
-    x--- ---- Parallel Input Direction
-    -x-- ---- FDC Drive select
-    ---x ---- Text/GFX Mode
-    ---- x--- Display Enable
-    ---- -x-- FDC Side load
-    ---- ---x CRTC reset
-*/
-static WRITE8_DEVICE_HANDLER( act_portb_w )
-{
-	act_state *state = (act_state *)device->machine->driver_data;
-	const device_config* dev = devtag_get_device(device->machine,"fdc");
-
-//  printf("PPI Port B write %02x\n",data);
-	state->disp_en = (data & 8)>>3;
-	state->gfx_mode = (data & 0x10)>>4;
-	state->p_input_dir = (data & 0x80)>>7;
-	state->fdrv_num = (data & 0x40)>>6;
-
-	wd17xx_set_drive(dev,state->fdrv_num);
-	wd17xx_set_side(dev,(data & 0x04)>>2);
-}
-
-static I8255A_INTERFACE( ppi8255_intf )
-{
-	DEVCB_NULL,									/* Port A read */
-	DEVCB_HANDLER(act_portb_r),					/* Port B read */
-	DEVCB_NULL,									/* Port C read */
-	DEVCB_NULL,									/* Port A write */
-	DEVCB_HANDLER(act_portb_w),					/* Port B write */
-	DEVCB_NULL									/* Port C write */
-};
-
 static const gfx_layout charset_8x8 =
 {
 	8,8,
@@ -379,23 +231,8 @@ static const gfx_layout charset_8x8 =
 	8*8
 };
 
-static const gfx_layout charset_16x16 =
-{
-	10,16,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 7,6,5,4,3,2,1,0 , 15,14 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
-	16*16
-};
-
 static GFXDECODE_START( act_f1 )
 	GFXDECODE_ENTRY( "gfx",   0x00000, charset_8x8,    0x000, 1 )
-GFXDECODE_END
-
-static GFXDECODE_START( act_xi )
-	GFXDECODE_ENTRY( "gfx",   0x00000, charset_16x16,    0x000, 1 )
 GFXDECODE_END
 
 static Z80CTC_INTERFACE( ctc_intf )
@@ -433,37 +270,6 @@ static INTERRUPT_GEN( act_f1_irq )
 	//if(input_code_pressed(device->machine, KEYCODE_C))
 	//  cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x60);
 }
-
-static PIC8259_SET_INT_LINE( pc98_master_set_int_line ) {
-	//printf("%02x\n",interrupt);
-	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
-}
-
-
-static const struct pic8259_interface pic8259_master_config = {
-	pc98_master_set_int_line
-};
-
-static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
-{
-	pic8259_set_irq_line(devtag_get_device( device->machine, "pic8259_master" ), 0, state);
-}
-
-static const struct pit8253_config pit8253_config =
-{
-	{
-		{
-			4670000,				/* heartbeat IRQ */
-			pc_timer0_w
-		}, {
-			4670000,				/* dram refresh */
-			NULL
-		}, {
-			4670000,				/* pio port c pin 4, and speaker polling enough */
-			NULL
-		}
-	}
-};
 
 static FLOPPY_OPTIONS_START( act )
 	FLOPPY_OPTION( img2hd, "dsk", "2HD disk image", basicdsk_identify_default, basicdsk_construct_default,
@@ -511,9 +317,6 @@ static MACHINE_DRIVER_START( act_f1 )
 	MDRV_PALETTE_LENGTH(16)
 //  MDRV_PALETTE_INIT(black_and_white)
 
-//  MDRV_MC6845_ADD("crtc", MC6845, XTAL_3_579545MHz/2, mc6845_intf)    /* hand tuned to get ~50 fps */
-
-//  MDRV_I8255A_ADD("ppi8255_0", ppi8255_intf )
 	MDRV_WD2793_ADD("fdc", act_wd2797_interface )
 
 	MDRV_GFXDECODE(act_f1)
@@ -524,55 +327,7 @@ static MACHINE_DRIVER_START( act_f1 )
 	MDRV_FLOPPY_2_DRIVES_ADD(act_floppy_config)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( act_xi )
-
-	MDRV_DRIVER_DATA( act_state )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I8086, 4670000)
-	MDRV_CPU_PROGRAM_MAP(act_xi_mem)
-	MDRV_CPU_IO_MAP(act_xi_io)
-
-	MDRV_MACHINE_RESET(act)
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 375)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 375-1)
-	MDRV_PALETTE_LENGTH(16)
-//  MDRV_PALETTE_INIT(black_and_white)
-
-	MDRV_MC6845_ADD("crtc", MC6845, XTAL_3_579545MHz/2, mc6845_intf)	/* hand tuned to get ~50 fps */
-
-	MDRV_I8255A_ADD("ppi8255_0", ppi8255_intf )
-	MDRV_WD2793_ADD("fdc", act_wd2797_interface )
-	MDRV_PIC8259_ADD( "pic8259_master", pic8259_master_config )
-	MDRV_PIT8253_ADD( "pit8253", pit8253_config )
-
-	MDRV_GFXDECODE(act_xi)
-
-	MDRV_VIDEO_START(act_xi)
-	MDRV_VIDEO_UPDATE(act_xi)
-
-	MDRV_FLOPPY_2_DRIVES_ADD(act_floppy_config)
-MACHINE_DRIVER_END
-
 /* ROM definition */
-// not sure the ROMs are loaded correctly
-ROM_START( aprixi )
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "lo_ve007.u11", 0xfc000, 0x2000, CRC(e74e14d1) SHA1(569133b0266ce3563b21ae36fa5727308797deee) )	// Labelled LO Ve007 03.04.84
-	ROM_RELOAD(						 0xf8000, 0x2000 )
-	ROM_LOAD16_BYTE( "hi_ve007.u9",  0xfc001, 0x2000, CRC(b04fb83e) SHA1(cc2b2392f1b4c04bb6ec8ee26f8122242c02e572) )	// Labelled HI Ve007 03.04.84
-	ROM_RELOAD(						 0xf8001, 0x2000 )
-
-	ROM_REGION( 0x08000, "gfx", ROMREGION_ERASEFF )
-//  ROM_COPY( "maincpu", 0xf8800, 0x00000, 0x01000 )
-ROM_END
-
 ROM_START( aprif1 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "lo_f1_1.6.8f",  0xf8000, 0x4000, CRC(be018be2) SHA1(80b97f5b2111daf112c69b3f58d1541a4ba69da0) )	// Labelled F1 - LO Vr. 1.6
@@ -603,7 +358,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT MACHINE INPUT   INIT   COMPANY  FULLNAME                 FLAGS */
-COMP( 1984, aprixi,    0,    0,     act_xi,    act,    0, "ACT",   "Apricot Xi",            GAME_NOT_WORKING)
 COMP( 1984, aprif1,    0,    0,     act_f1,    act,    0, "ACT",   "Apricot F1",            GAME_NOT_WORKING)
 COMP( 1985, aprif10,   0,    0,     act_f1,    act,    0, "ACT",   "Apricot F10",           GAME_NOT_WORKING)
 COMP( 1984, aprifp,    0,    0,     act_f1,    act,    0, "ACT",   "Apricot Portable / FP", GAME_NOT_WORKING)

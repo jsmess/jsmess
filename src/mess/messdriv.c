@@ -314,6 +314,13 @@ const game_driver * const drivers[] =
 	DRIVER( a310 )	  /* 1988 Acorn Archimedes 310	*/
 	DRIVER( a6809 )
 
+	/* ACT */
+	DRIVER( apricot )	/* 1983 ACT */
+	DRIVER( apricotxi )	/* 1984 ACT */
+	DRIVER( aprif1 )
+	DRIVER( aprif10 )
+	DRIVER( aprifp )
+
 	/* Cambridge Computers */
 	DRIVER( z88 )	   /*	  */
 
@@ -1566,10 +1573,6 @@ const game_driver * const drivers[] =
 	DRIVER( mmd2 )
 	DRIVER( mpf1p )
 	DRIVER( stopthie )
-	DRIVER( aprixi )
-	DRIVER( aprif1 )
-	DRIVER( aprif10 )
-	DRIVER( aprifp )
 	DRIVER( amico2k )
 	DRIVER( jtc )
 	DRIVER( jtces88 )

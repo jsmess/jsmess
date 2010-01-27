@@ -248,6 +248,7 @@ DRVLIBS = \
 	$(MESSOBJ)/messdriv.o \
 	$(MESSOBJ)/3do.a \
 	$(MESSOBJ)/acorn.a \
+	$(MESSOBJ)/act.a \
 	$(MESSOBJ)/amiga.a \
 	$(MESSOBJ)/amstrad.a \
 	$(MESSOBJ)/apf.a \
@@ -539,6 +540,10 @@ $(MESSOBJ)/acorn.a:				\
 	$(MESS_VIDEO)/electron.o	\
 	$(MESS_MACHINE)/electron.o	\
 	$(MESS_DRIVERS)/electron.o	\
+
+$(MESSOBJ)/act.a:				\
+	$(MESS_DRIVERS)/apricot.o	\
+	$(MESS_DRIVERS)/apricotf.o	\
 
 $(MESSOBJ)/amiga.a:				\
 	$(MAME_VIDEO)/amiga.o		\
@@ -1538,7 +1543,6 @@ $(MESSOBJ)/zvt.a:				\
 
 $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/4004clk.o	\
-	$(MESS_DRIVERS)/act.o		\
 	$(MESS_DRIVERS)/amico2k.o	\
 	$(MESS_DRIVERS)/bob85.o		\
 	$(MESS_DRIVERS)/busicom.o	\
