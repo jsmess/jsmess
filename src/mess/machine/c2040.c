@@ -12,6 +12,7 @@
 	TODO:
 
 	- find GCR rom region
+	- read from disk
 	- write to disk
 
 */
@@ -24,13 +25,14 @@
 #include "formats/g64_dsk.h"
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
+#include "machine/mos6530.h"
 #include "machine/ieee488.h"
 
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
 
-#define LOG 0
+#define LOG 1
 
 #define M6502_DOS_TAG	"un1"
 #define M6532_0_TAG		"uc1"
@@ -54,7 +56,7 @@ static const double C2040_BITRATE[4] =
 #define TRACK_DATA_START	2
 
 #define SYNC	((c2040->sr & SYNC_MARK) == SYNC_MARK)
-#define ERROR	(!c2040->ready & !BIT(c2040->gcr_data, 3))
+#define ERROR	(!c2040->ready & !BIT(c2040->e, 3))
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -87,7 +89,8 @@ struct _c2040_t
 	UINT16 sr;							/* data shift register */
 	int ds;								/* density select */
 	UINT8* gcr;							/* GCR encoder/decoder ROM */
-	UINT8 gcr_data;						/* GCR encoder/decoded ROM data */
+	UINT8 i;							/* GCR encoder/decoded ROM address */
+	UINT8 e;							/* GCR encoder/decoded ROM data */
 	UINT8 pi;							/* parallel data input */
 
 	/* IEEE-488 bus */
@@ -153,8 +156,6 @@ INLINE void update_ieee_signals(const device_config *device)
 
 INLINE void update_gcr_data(c2040_t *c2040)
 {
-	UINT16 gcr_addr;
-
 	if (c2040->rw)
 	{
 		/*
@@ -175,7 +176,7 @@ INLINE void update_gcr_data(c2040_t *c2040)
 
 		*/
 
-		gcr_addr = (c2040->rw << 10) | (c2040->sr & 0x3ff);
+		c2040->i = (c2040->rw << 10) | (c2040->sr & 0x3ff);
 	}
 	else
 	{
@@ -197,10 +198,21 @@ INLINE void update_gcr_data(c2040_t *c2040)
 
 		*/
 
-		gcr_addr = (c2040->rw << 10) | ((c2040->pi & 0xf0) << 1) | (c2040->mode << 4) | (c2040->pi & 0x0f);
+		c2040->i = (c2040->rw << 10) | ((c2040->pi & 0xf0) << 1) | (c2040->mode << 4) | (c2040->pi & 0x0f);
 	}
 
-	//	c2040->gcr_data = c2040->gcr[gcr_addr];
+	//c2040->e = c2040->gcr[c2040->i];
+
+	if (LOG)
+	{
+		UINT16 i = c2040->i;
+		UINT8 e = c2040->e;
+		UINT8 pa = (BIT(e, 6) << 7) | (BIT(i, 7) << 6) | (e & 0x30) | (BIT(e, 2) << 3) | (i & 0x04) | (e & 0x03);
+
+		logerror("offs %04x G64 %02x READY %u PA %02x DATA %03x GCR %02x SYNC %u ERROR %u\n", c2040->unit[c2040->drive].buffer_pos, 
+			c2040->unit[c2040->drive].track_buffer[c2040->unit[c2040->drive].buffer_pos],
+			c2040->ready, pa, c2040->sr & 0x3ff, c2040->e, SYNC, ERROR);
+	}
 
 	via_cb1_w(c2040->via, ERROR);
 }
@@ -243,17 +255,11 @@ static TIMER_CALLBACK( bit_tick )
 		c2040->bit_count = 0;
 	}
 
-	if (c2040->bit_count > 7)
+	if (c2040->bit_count == 10)
 	{
 		/* byte ready */
 		c2040->bit_count = 0;
 		ready = 0;
-
-		if (!(c2040->sr & 0xff))
-		{
-			/* simulate weak bits with randomness */
-			c2040->sr = (c2040->sr & 0xff00) | (mame_rand(machine) & 0xff);
-		}
 	}
 
 	if (c2040->ready != ready)
@@ -301,8 +307,8 @@ static ADDRESS_MAP_START( c2040_dos_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_RAM // 6532 #1
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM // 6532 #2
-	AM_RANGE(0x0200, 0x020f) AM_MIRROR(0x0d70) AM_DEVREADWRITE(M6532_0_TAG, riot6532_r, riot6532_w)
-	AM_RANGE(0x0280, 0x028f) AM_MIRROR(0x0d70) AM_DEVREADWRITE(M6532_1_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0d60) AM_DEVREADWRITE(M6532_0_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d60) AM_DEVREADWRITE(M6532_1_TAG, riot6532_r, riot6532_w)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share3")
@@ -318,7 +324,7 @@ static ADDRESS_MAP_START( c2040_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
 	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via_r, via_w)
-	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6530_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0080, 0x009f) AM_MIRROR(0x0320) AM_DEVREADWRITE(M6530_TAG, mos6530_r, mos6530_w)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
@@ -334,12 +340,12 @@ static ADDRESS_MAP_START( c4040_dos_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_RAM // 6532 #1
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM // 6532 #2
-	AM_RANGE(0x0200, 0x020f) /*AM_MIRROR(0x0d70)*/ AM_DEVREADWRITE(M6532_0_TAG, riot6532_r, riot6532_w)
-	AM_RANGE(0x0280, 0x028f) /*AM_MIRROR(0x0d70)*/ AM_DEVREADWRITE(M6532_1_TAG, riot6532_r, riot6532_w)
-	AM_RANGE(0x1000, 0x13ff) /*AM_MIRROR(0x0c00)*/ AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x2000, 0x23ff) /*AM_MIRROR(0x0c00)*/ AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x3000, 0x33ff) /*AM_MIRROR(0x0c00)*/ AM_RAM AM_SHARE("share3")
-	AM_RANGE(0x4000, 0x43ff) /*AM_MIRROR(0x0c00)*/ AM_RAM AM_SHARE("share4")
+	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0d60) AM_DEVREADWRITE(M6532_0_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d60) AM_DEVREADWRITE(M6532_1_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share3")
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share4")
 	AM_RANGE(0x5000, 0x7fff) AM_ROM AM_REGION("c4040", 0x0000)
 ADDRESS_MAP_END
 
@@ -349,9 +355,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c4040_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0100) AM_RAM // 6530
-	AM_RANGE(0x0040, 0x004f) /*AM_MIRROR(0x0330)*/ AM_DEVREADWRITE(M6522_TAG, via_r, via_w)
-	AM_RANGE(0x0080, 0x008f) /*AM_MIRROR(0x0330)*/ AM_DEVREADWRITE(M6530_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
+	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via_r, via_w)
+	AM_RANGE(0x0080, 0x009f) AM_MIRROR(0x0320) AM_DEVREADWRITE(M6530_TAG, mos6530_r, mos6530_w)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
@@ -364,10 +370,10 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( c8050_dos_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0f00) AM_RAM // 6532 #1
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0f00) AM_RAM // 6532 #2
-	AM_RANGE(0x0200, 0x020f) AM_MIRROR(0x0d70) AM_DEVREADWRITE(M6532_0_TAG, riot6532_r, riot6532_w)
-	AM_RANGE(0x0280, 0x028f) AM_MIRROR(0x0d70) AM_DEVREADWRITE(M6532_1_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_RAM // 6532 #1
+	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM // 6532 #2
+	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0d60) AM_DEVREADWRITE(M6532_0_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d60) AM_DEVREADWRITE(M6532_1_TAG, riot6532_r, riot6532_w)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share3")
@@ -383,7 +389,7 @@ static ADDRESS_MAP_START( c8050_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
 	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via_r, via_w)
-	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6530_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6530_TAG, mos6530_r, mos6530_w)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
@@ -396,10 +402,10 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( sfd1001_dos_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0f00) AM_RAM // 6532 #1
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0f00) AM_RAM // 6532 #2
-	AM_RANGE(0x0200, 0x020f) AM_MIRROR(0x0d70) AM_DEVREADWRITE(M6532_0_TAG, riot6532_r, riot6532_w)
-	AM_RANGE(0x0280, 0x028f) AM_MIRROR(0x0d70) AM_DEVREADWRITE(M6532_1_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_RAM // 6532 #1
+	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM // 6532 #2
+	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0d60) AM_DEVREADWRITE(M6532_0_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d60) AM_DEVREADWRITE(M6532_1_TAG, riot6532_r, riot6532_w)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share3")
@@ -415,7 +421,7 @@ static ADDRESS_MAP_START( sfd1001_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
 	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via_r, via_w)
-	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6530_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6530_TAG, mos6530_r, mos6530_w)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
@@ -650,8 +656,8 @@ static READ8_DEVICE_HANDLER( c2040_via_pa_r )
 
 	c2040_t *c2040 = get_safe_token(device->owner);
 
-	UINT16 i = c2040->sr;
-	UINT8 e = c2040->gcr_data;
+	UINT16 i = c2040->i;
+	UINT8 e = c2040->e;
 
 	return (BIT(e, 6) << 7) | (BIT(i, 7) << 6) | (e & 0x30) | (BIT(e, 2) << 3) | (i & 0x04) | (e & 0x03);
 }
@@ -706,6 +712,8 @@ static void step_motor(c2040_t *c2040, int unit, int stp)
 			/* extract track length */
 			c2040->unit[unit].track_len = (c2040->unit[unit].track_buffer[1] << 8) | c2040->unit[unit].track_buffer[0];
 		}
+
+		c2040->unit[unit].stp = stp;
 	}
 }
 
@@ -731,22 +739,18 @@ static WRITE8_DEVICE_HANDLER( c2040_via_pb_w )
 	/* stepper motor 1 */
 	int s1 = data & 0x03;
 	step_motor(c2040, 1, s1);
-	logerror("S1 %u\n", s1);
 
 	/* stepper motor 0 */
 	int s0 = (data >> 2) & 0x03;
 	step_motor(c2040, 0, s0);
-	logerror("S0 %u\n", s1);
 
 	/* spindle motor 1 */
 	int mtr1 = BIT(data, 4);
 	floppy_mon_w(c2040->unit[1].image, !mtr1);
-	logerror("MTR1 %u\n", mtr1);
 
 	/* spindle motor 0 */
 	int mtr0 = BIT(data, 5);
 	floppy_mon_w(c2040->unit[0].image, !mtr0);
-	logerror("MTR0 %u\n", mtr0);
 
 	timer_enable(c2040->bit_timer, mtr1 | mtr0);
 }
@@ -871,7 +875,7 @@ static const via6522_interface c8050_via_intf =
 };
 
 /*-------------------------------------------------
-    riot6532_interface c2040_riot2_intf uk3
+    mos6530_interface c2040_riot2_intf uk3
 -------------------------------------------------*/
 
 static READ8_DEVICE_HANDLER( pi_r )
@@ -1042,22 +1046,22 @@ static WRITE_LINE_DEVICE_HANDLER( c2040_riot2_irq_w )
 	cpu_set_input_line(c2040->cpu_fdc, M6502_IRQ_LINE, state);
 }
 
-static const riot6532_interface c2040_riot2_intf =
+static MOS6530_INTERFACE( c2040_riot2_intf )
 {
+	DEVCB_LINE(c2040_riot2_irq_w),
 	DEVCB_HANDLER(pi_r),
-	DEVCB_HANDLER(c2040_riot2_pb_r),
 	DEVCB_HANDLER(pi_w),
-	DEVCB_HANDLER(c2040_riot2_pb_w),
-	DEVCB_LINE(c2040_riot2_irq_w)
+	DEVCB_HANDLER(c2040_riot2_pb_r),
+	DEVCB_HANDLER(c2040_riot2_pb_w)
 };
 
-static const riot6532_interface c8050_riot2_intf =
+static MOS6530_INTERFACE( c8050_riot2_intf )
 {
+	DEVCB_LINE(c2040_riot2_irq_w),
 	DEVCB_HANDLER(pi_r),
-	DEVCB_HANDLER(c8050_riot2_pb_r),
 	DEVCB_HANDLER(pi_w),
-	DEVCB_HANDLER(c8050_riot2_pb_w),
-	DEVCB_LINE(c2040_riot2_irq_w)
+	DEVCB_HANDLER(c8050_riot2_pb_r),
+	DEVCB_HANDLER(c8050_riot2_pb_w)
 };
 
 /*-------------------------------------------------
@@ -1175,7 +1179,7 @@ static MACHINE_DRIVER_START( c2040 )
 	MDRV_CPU_PROGRAM_MAP(c2040_fdc_map)
 	
 	MDRV_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, c2040_via_intf)
-	MDRV_RIOT6532_ADD(M6530_TAG, XTAL_16MHz/16, c2040_riot2_intf)
+	MDRV_MOS6530_ADD(M6530_TAG, XTAL_16MHz/16, c2040_riot2_intf)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(c2040_floppy_config)
 MACHINE_DRIVER_END
@@ -1197,7 +1201,7 @@ static MACHINE_DRIVER_START( c4040 )
 	MDRV_CPU_PROGRAM_MAP(c4040_fdc_map)
 
 	MDRV_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, c2040_via_intf)
-	MDRV_RIOT6532_ADD(M6530_TAG, XTAL_16MHz/16, c2040_riot2_intf)
+	MDRV_MOS6530_ADD(M6530_TAG, XTAL_16MHz/16, c2040_riot2_intf)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(c4040_floppy_config)
 MACHINE_DRIVER_END
@@ -1219,7 +1223,7 @@ static MACHINE_DRIVER_START( c8050 )
 	MDRV_CPU_PROGRAM_MAP(c8050_fdc_map)
 	
 	MDRV_VIA6522_ADD(M6522_TAG, XTAL_12MHz/3, c8050_via_intf)
-	MDRV_RIOT6532_ADD(M6530_TAG, XTAL_12MHz/3, c8050_riot2_intf)
+	MDRV_MOS6530_ADD(M6530_TAG, XTAL_12MHz/3, c8050_riot2_intf)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(c8050_floppy_config)
 MACHINE_DRIVER_END
@@ -1241,7 +1245,7 @@ static MACHINE_DRIVER_START( c8250 )
 	MDRV_CPU_PROGRAM_MAP(c8050_fdc_map)
 	
 	MDRV_VIA6522_ADD(M6522_TAG, XTAL_12MHz/3, c8050_via_intf)
-	MDRV_RIOT6532_ADD(M6530_TAG, XTAL_12MHz/3, c8050_riot2_intf)
+	MDRV_MOS6530_ADD(M6530_TAG, XTAL_12MHz/3, c8050_riot2_intf)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(c8250_floppy_config)
 MACHINE_DRIVER_END
@@ -1263,7 +1267,7 @@ static MACHINE_DRIVER_START( sfd1001 )
 	MDRV_CPU_PROGRAM_MAP(sfd1001_fdc_map)
 	
 	MDRV_VIA6522_ADD(M6522_TAG, XTAL_12MHz/3, c8050_via_intf)
-	MDRV_RIOT6532_ADD(M6530_TAG, XTAL_12MHz/3, c8050_riot2_intf)
+	MDRV_MOS6530_ADD(M6530_TAG, XTAL_12MHz/3, c8050_riot2_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c8250_floppy_config)
 MACHINE_DRIVER_END
@@ -1392,6 +1396,7 @@ static DEVICE_START( c2040 )
 	c2040->unit[1].image = device_find_child_by_tag(device, FLOPPY_1);
 
 	/* find GCR ROM */
+	//c2040->gcr = memory_region(device->machine, "c4040:c4040") + 0x3400;
 
 	/* allocate data timer */
 	c2040->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
