@@ -11,7 +11,6 @@
 
 	TODO:
 
-	- find GCR rom region
 	- read from disk
 	- write to disk
 
@@ -201,7 +200,7 @@ INLINE void update_gcr_data(c2040_t *c2040)
 		c2040->i = (c2040->rw << 10) | ((c2040->pi & 0xf0) << 1) | (c2040->mode << 4) | (c2040->pi & 0x0f);
 	}
 
-	//c2040->e = c2040->gcr[c2040->i];
+	c2040->e = c2040->gcr[c2040->i];
 
 	if (LOG)
 	{
@@ -1396,7 +1395,26 @@ static DEVICE_START( c2040 )
 	c2040->unit[1].image = device_find_child_by_tag(device, FLOPPY_1);
 
 	/* find GCR ROM */
-	//c2040->gcr = memory_region(device->machine, "c4040:c4040") + 0x3400;
+	astring region_name;
+
+	if ((device->type == C2040) || (device->type == C3040))
+	{
+		device_build_tag(region_name, device, "c2040");
+	}
+	else if (device->type == C4040)
+	{
+		device_build_tag(region_name, device, "c4040");
+	}
+	else if ((device->type == C8050) || (device->type == C8250))
+	{
+		device_build_tag(region_name, device, "c8050");
+	}
+	else if (device->type == SFD1001)
+	{
+		device_build_tag(region_name, device, "sfd1001");
+	}
+
+	c2040->gcr = memory_region(device->machine, region_name.cstr()) + (memory_region_length(device->machine, region_name.cstr()) - 0x800);
 
 	/* allocate data timer */
 	c2040->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
