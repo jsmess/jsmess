@@ -77,8 +77,8 @@ static const i8255a_interface apricot_i8255a_intf =
 
 static PIT8253_OUTPUT_CHANGED( apricot_pit8253_out0 )
 {
-	const device_config *pic8259 = devtag_get_device(device->machine, "pic8259");
-	pic8259_set_irq_line(pic8259, 6, state);
+	apricot_state *apricot = (apricot_state *)device->machine->driver_data;
+	pic8259_set_irq_line(apricot->pic8259, 6, state);
 }
 
 static PIT8253_OUTPUT_CHANGED( apricot_pit8253_out1 )
@@ -99,6 +99,12 @@ static const struct pit8253_config apricot_pit8253_intf =
 		{ 0 /*XTAL_4MHz / 2*/, apricot_pit8253_out2 }
 	}
 };
+
+static void apricot_sio_irq_w(const device_config *device, int state)
+{
+	apricot_state *apricot = (apricot_state *)device->machine->driver_data;
+	pic8259_set_irq_line(apricot->pic8259, 5, state);
+}
 
 static READ8_DEVICE_HANDLER( apricot_sio_r )
 {
@@ -126,7 +132,7 @@ static WRITE8_DEVICE_HANDLER( apricot_sio_w )
 
 static const z80sio_interface apricot_z80sio_intf =
 {
-	NULL,
+	apricot_sio_irq_w,
 	NULL,
 	NULL,
 	NULL,
@@ -153,6 +159,31 @@ static PIC8259_SET_INT_LINE( apricot_pic8259_interrupt )
 static const struct pic8259_interface apricot_pic8259_intf =
 {
 	apricot_pic8259_interrupt
+};
+
+
+/***************************************************************************
+    FLOPPY
+***************************************************************************/
+
+static WRITE_LINE_DEVICE_HANDLER( apricot_wd2793_intrq_w )
+{
+	apricot_state *apricot = (apricot_state *)device->machine->driver_data;
+
+	pic8259_set_irq_line(apricot->pic8259, 4, state);
+//	i8089 external terminate channel 1
+}
+
+static WRITE_LINE_DEVICE_HANDLER( apricot_wd2793_drq_w )
+{
+//	i8089 data request channel 1
+}
+
+static const wd17xx_interface apricot_wd17xx_intf =
+{
+	DEVCB_LINE(apricot_wd2793_intrq_w),
+	DEVCB_LINE(apricot_wd2793_drq_w),
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
 
@@ -353,7 +384,7 @@ static MACHINE_DRIVER_START( apricot )
 	MDRV_Z80SIO_ADD("z80sio", 0, apricot_z80sio_intf)
 
 	/* floppy */
-	MDRV_WD2793_ADD("wd2793", default_wd17xx_interface_2_drives)
+	MDRV_WD2793_ADD("wd2793", apricot_wd17xx_intf)
 	MDRV_FLOPPY_2_DRIVES_ADD(apricot_floppy_config)
 MACHINE_DRIVER_END
 
