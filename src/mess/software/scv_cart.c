@@ -62,7 +62,7 @@ SOFTWARE_END
 
 SOFTWARE_LIST_START( svc_cart )
 	SOFTWARE( astrwrs,   0,         1984, "Epoch", "Astro Wars - Invaders from Space", 0, 0 )
-	SOFTWARE( astrwrs2,  0,         1984, "Epoch", "Astro Wars II - Battle in Galaxy", 0, 0 )	/* refuses to boot */
+	/* SOFTWARE( astrwrs2,  0,         1984, "Epoch", "Astro Wars II - Battle in Galaxy", 0, 0 )	bad dump, refuses to work on real h/w */
 	/* Basic Nyuumon */
 	/* Boulder Dash */
 	/* Comic Circus */
