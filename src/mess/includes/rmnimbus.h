@@ -61,7 +61,9 @@ WRITE16_HANDLER (nimbus_io_w);
 
 /* External int vectors for chained interupts */
 #define EXTERNAL_INT_DISK       0x80
-#define EXTERNAL_INT_PC8031     0x8c
+#define EXTERNAL_INT_PC8031_8C  0x8c
+#define EXTERNAL_INT_PC8031_8E  0x8E
+#define EXTERNAL_INT_PC8031_8F  0x8F
 #define EXTERNAL_INT_Z80SIO     0x9C
 #define EXTERNAL_INT_MSM5205    0x84
 
@@ -145,7 +147,13 @@ void nimbus_scsi_linechange(const device_config *device, UINT8 line, UINT8 state
 
 /* 8031/8051 Peripheral controler */
 
-#define PC8031_RAMSIZE          0X004
+#define IPC_OUT_ADDR        0X01
+#define IPC_OUT_READ_PEND   0X02
+#define IPC_OUT_BYTE_AVAIL  0X04
+
+#define IPC_IN_ADDR         0X01
+#define IPC_IN_BYTE_AVAIL   0X02
+#define IPC_IN_READ_PEND    0X04
 
 READ8_HANDLER( pc8031_r );
 WRITE8_HANDLER( pc8031_w );

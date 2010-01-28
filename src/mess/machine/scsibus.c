@@ -13,7 +13,7 @@
 
 /* LOGLEVEL 0=no logging, 1=just commands and data, 2=everything ! */
 
-#define LOGLEVEL			1	
+#define LOGLEVEL			0	
 
 #define LOG(level,...)      if(LOGLEVEL>=level) logerror(__VA_ARGS__)
 
@@ -73,7 +73,7 @@ static void scsibus_read_data(scsibus_t   *bus)
 {  
     bus->data_last = (bus->bytes_left >= DATA_BUF_SIZE) ? DATA_BUF_SIZE : bus->bytes_left;
     
-    logerror("SCSIBUS:scsibus_read_data bus->bytes_left=%04X, bus->data_last=%04X, bus->xfer_count=%04X\n",bus->bytes_left,bus->data_last,bus->xfer_count);
+    LOG(1,"SCSIBUS:scsibus_read_data bus->bytes_left=%04X, bus->data_last=%04X, bus->xfer_count=%04X\n",bus->bytes_left,bus->data_last,bus->xfer_count);
     
     if (bus->data_last > 0)
     {
@@ -106,7 +106,6 @@ UINT8 scsi_data_r(const device_config *device)
         case SCSI_PHASE_DATAIN : 
             result=bus->data[bus->data_idx++];
             
-            if (bus->command[0]==0x37) logerror("SCSIBUS:scsi_data_r: data_idx=%04X, bytes_left=%04X, data_last=%04X\n",bus->data_idx,bus->bytes_left,bus->data_last);
             // check to see if we have reached the end of the block buffer
             // and that there is more data to read from the scsi disk
             if((bus->data_idx==DATA_BUF_SIZE) && (bus->bytes_left>0) && IS_READ_COMMAND())
@@ -265,7 +264,9 @@ static void scsibus_exec_command(const device_config *device)
     int         command_local = 0;
     int         newphase;
 
-    dump_command_bytes(bus);
+    if(LOGLEVEL)
+        dump_command_bytes(bus);
+    
     bus->is_linked=bus->command[bus->cmd_idx-1] & 0x01;
     
     // Check for locally executed commands, and if found execute them
@@ -273,7 +274,7 @@ static void scsibus_exec_command(const device_config *device)
     {
         // Format unit
         case SCSI_CMD_FORMAT_UNIT :
-            logerror("SCSIBUS: format unit bus->command[1]=%02X & 0x10\n",(bus->command[1] & 0x10));
+            LOG(1,"SCSIBUS: format unit bus->command[1]=%02X & 0x10\n",(bus->command[1] & 0x10));
             command_local=1;
             if((bus->command[1] & 0x10)==0x10)
                 SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAOUT);
@@ -286,7 +287,7 @@ static void scsibus_exec_command(const device_config *device)
             break;
             
         case SCSI_CMD_READ_DEFECT :
-            logerror("SCSIBUS: read defect list\n");
+            LOG(1,"SCSIBUS: read defect list\n");
             command_local=1;
             
             bus->data[0] = 0x00;
@@ -302,7 +303,7 @@ static void scsibus_exec_command(const device_config *device)
             
         // write buffer 
         case SCSI_CMD_BUFFER_WRITE :
-            logerror("SCSIBUS: write_buffer\n");
+            LOG(1,"SCSIBUS: write_buffer\n");
             command_local=1;
             bus->xfer_count=(bus->command[7]<<8)+bus->command[8];
             bus->data_last=bus->xfer_count;
@@ -312,7 +313,7 @@ static void scsibus_exec_command(const device_config *device)
         
         // read buffer
         case SCSI_CMD_BUFFER_READ   :
-            logerror("SCSIBUS: read_buffer\n");
+            LOG(1,"SCSIBUS: read_buffer\n");
             command_local=1;
             bus->xfer_count=(bus->command[7]<<8)+bus->command[8];
             bus->data_last=bus->xfer_count;
@@ -641,7 +642,7 @@ void init_scsibus(const device_config *device)
         // try to open the devices
         for (devno = 0; devno < scsidevs->devs_present; devno++)
         {
-            logerror("init_scsibus devno=%d \n",devno);
+            LOG(1,"init_scsibus devno=%d \n",devno);
             SCSIAllocInstance( device->machine, scsidevs->devices[devno].scsiClass, &bus->devices[scsidevs->devices[devno].scsiID], scsidevs->devices[devno].diskregion );
         }
         

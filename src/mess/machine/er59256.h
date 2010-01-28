@@ -25,18 +25,18 @@
 
 #define EEROM_WORDS         0x10
 
-#define CK_MASK             0x01
-#define DI_MASK             0x02
-#define DO_MASK             0x04
-#define CS_MASK             0x08
-
-#define ALL_MASK            (CK_MASK | DI_MASK | DO_MASK | CS_MASK)
-#define IN_MASK             (CK_MASK | DI_MASK | CS_MASK)
-
 #define CK_SHIFT            0x00
 #define DI_SHIFT            0x01
 #define DO_SHIFT            0x02
 #define CS_SHIFT            0x03
+
+#define CK_MASK             (1<<CK_SHIFT)
+#define DI_MASK             (1<<DI_SHIFT)
+#define DO_MASK             (1<<DO_SHIFT)
+#define CS_MASK             (1<<CS_SHIFT)
+
+#define ALL_MASK            (CK_MASK | DI_MASK | DO_MASK | CS_MASK)
+#define IN_MASK             (CK_MASK | DI_MASK | CS_MASK)
 
 #define GET_CK(eep)         ((eep->io_bits & CK_MASK) >> CK_SHIFT)
 #define GET_DI(eep)         ((eep->io_bits & DI_MASK) >> DI_SHIFT)
@@ -77,6 +77,7 @@
 
 #define FLAG_WRITE_EN       0x01
 #define FLAG_START_BIT      0x02
+#define FLAG_DATA_LOADED    0x04
 
 #define WRITE_ENABLED(eep)  ((eep->flags & FLAG_WRITE_EN) ? 1 : 0)
 #define STARTED(eep)        ((eep->flags & FLAG_START_BIT) ? 1 : 0)
@@ -87,6 +88,8 @@
 
 void er59256_set_iobits(const device_config *device, UINT8 newbits);
 UINT8 er59256_get_iobits(const device_config *device);
+void preload_rom(const device_config *device, UINT16 *rom_data, int count);
+UINT8 data_loaded(const device_config *device);
 DEVICE_GET_INFO( er59256 );
 
 #endif

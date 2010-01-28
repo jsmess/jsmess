@@ -50,7 +50,7 @@
 #define LOG_PC8031          0
 #define LOG_PC8031_186      0
 #define LOG_PC8031_PORT     0
-#define LOG_IOU             0
+#define LOG_IOU             1
 #define LOG_SOUND           0
 
 /* 80186 internal stuff */
@@ -166,16 +166,27 @@ static const SCSIConfigTable SCSI_dev_table =
 };
 
 /* 8031 Peripheral controler */
+static struct _ipc_interface
+{
+    UINT8   ipc_in;
+    UINT8   ipc_out;
+    UINT8   status_in;
+    UINT8   status_out;
+    UINT8   int_8c_pending;
+    UINT8   int_8e_pending;
+    UINT8   int_8f_pending;
+} ipc_interface;
 
-UINT8 pcregs[PC8031_RAMSIZE];
-UINT8 reg0C0_ptr;
-UINT8 reg0C2_ptr;
+static UINT16 def_config[16] =
+{
+    0x0280, 0x017F, 0xE822, 0x8129,
+    0x0329, 0x0000, 0x0000, 0x0000,
+    0x0000, 0x0000, 0x0000, 0x0000,
+    0x0000, 0x8796, 0x2025, 0xB9E6 
+};
 
 /* IO Unit */
-
 UINT8 iou_reg092;
-UINT8 pc8031_int_pending;
-UINT8 pc8031_inc_pending;
 
 /* Sound */
 UINT8 last_playmode;
@@ -202,7 +213,7 @@ static void hdc_drq(running_machine *machine);
 static void keyboard_reset(void);
 static TIMER_CALLBACK(keyscan_callback);
 
-static void pc8031_reset(void);
+static void pc8031_reset(running_machine *machine);
 static void iou_reset(void);
 static void sound_reset(running_machine *machine);
 
@@ -1257,7 +1268,7 @@ MACHINE_RESET(nimbus)
     fdc_reset();
     hdc_reset(machine);
     keyboard_reset();
-    pc8031_reset();
+    pc8031_reset(machine);
     sound_reset(machine);
 }
 
@@ -2096,8 +2107,6 @@ WRITE8_HANDLER( nimbus_disk_w )
             // Nimbus FDC is hard wired for double density
             wd17xx_set_density(fdc, DEN_MFM_LO);
 
-            //logerror("nimbus_drives.reg400=%02X, data=%02X, drq_ff=%d\n",reg400_old,data,nimbus_drives.drq_ff);
-
             // if we enable hdc drq with a pending condition, act on it
             if((data & HDC_DRQ_MASK) && (~reg400_old & HDC_DRQ_MASK))
                 hdc_drq(space->machine);
@@ -2199,8 +2208,6 @@ void nimbus_scsi_linechange(const device_config *device, UINT8 line, UINT8 state
     
     if(line==SCSI_LINE_REQ) 
     {
-    //logerror("nimbus_scsi_linechange(%02X,%d), ~nimbus_drives.reg410_in=%02X, mask=%02X, (~reg410 & mask)=%02X, int_enabled=%d, int_enabled=%d\n",
-    //         line,state,~nimbus_drives.reg410_in,HDC_INT_TRIGGER,(~nimbus_drives.reg410_in & HDC_INT_TRIGGER),HDC_IRQ_ENABLED(),HDC_DRQ_ENABLED());
         if (state==0)
         {
             if(HDC_IRQ_ENABLED() && ((~nimbus_drives.reg410_in & HDC_INT_TRIGGER)==HDC_INT_TRIGGER))
@@ -2219,34 +2226,28 @@ void nimbus_scsi_linechange(const device_config *device, UINT8 line, UINT8 state
 
 /* 8031/8051 Peripheral controler 80186 side */
 
-#define REG_0C2_INIT        1
-#define INC_REG0C2_PTR()    reg0C2_ptr++; if (reg0C2_ptr==PC8031_RAMSIZE) reg0C2_ptr=REG_0C2_INIT; 
-#define CLEAR_PCREGS()      memset(&pcregs[1],0,PC8031_RAMSIZE-1);             
-
-static void pc8031_reset(void)
+static void pc8031_reset(running_machine *machine)
 {
+    const device_config *er59256 = devtag_get_device(machine, ER59256_TAG);
+
     logerror("peripheral controler reset\n");
     
-    memset(&pcregs,0,sizeof(pcregs));
-    reg0C0_ptr=0;
-    reg0C2_ptr=REG_0C2_INIT;
-    pc8031_int_pending=0;
-    pc8031_inc_pending=0;
+    memset(&ipc_interface,0,sizeof(ipc_interface));
+    
+    if(!data_loaded(er59256))
+        preload_rom(er59256,def_config,ARRAY_LENGTH(def_config));
 }
 
-static void dump_pcregs(void)
+
+#if 0
+static void ipc_dumpregs()
 {
-    int regno;
-    
-    if(LOG_IOU)
-    {
-        logerror("pcregs: ");
-        for(regno=0;regno<PC8031_RAMSIZE;regno++)
-            logerror("%02X, ",pcregs[regno]);
-            
-        logerror("\n");
-    }
+    logerror("in_data=%02X, in_status=%02X, out_data=%02X, out_status=%02X\n",
+              ipc_interface.ipc_in, ipc_interface.status_in,
+              ipc_interface.ipc_out, ipc_interface.status_out);
+              
 }
+#endif
 
 READ8_HANDLER( pc8031_r ) 
 {
@@ -2255,24 +2256,20 @@ READ8_HANDLER( pc8031_r )
  
     switch(offset*2)
     {
-        case 0x00   : result=pcregs[reg0C0_ptr];  
-                      reg0C2_ptr=REG_0C2_INIT; 
-                      CLEAR_PCREGS(); 
+        case 0x00   : result=ipc_interface.ipc_out;  
+                      ipc_interface.status_in   &= ~IPC_IN_READ_PEND; 
+                      ipc_interface.status_out  &= ~IPC_OUT_BYTE_AVAIL; 
                       break;
                       
-        case 0x02   : result=pcregs[reg0C2_ptr]; 
-                      INC_REG0C2_PTR();
+        case 0x02   : result=ipc_interface.status_out;
                       break;
                       
         default : result=0; break;
     }
 
     if(LOG_PC8031_186)
-        logerror("Nimbus PCIOR %08X read of %04X returns %02X reg0C2_ptr=%02X\n",pc,(offset*2)+0xC0,result,reg0C2_ptr);
-    
-    if(LOG_PC8031_186)
-        dump_pcregs();
-    
+        logerror("Nimbus PCIOR %08X read of %04X returns %02X\n",pc,(offset*2)+0xC0,result);
+        
     return result;
 }
 
@@ -2282,23 +2279,22 @@ WRITE8_HANDLER( pc8031_w )
 
     switch(offset*2)
     {
-        case 0x00   : pcregs[reg0C0_ptr]=data; 
-                      //reg0C2_ptr=REG_0C2_INIT; 
-                      //CLEAR_PCREGS();
-                      pc8031_int_pending=1;
+        case 0x00   : ipc_interface.ipc_in=data;
+                      ipc_interface.status_in   |= IPC_IN_BYTE_AVAIL;
+                      ipc_interface.status_in   &= ~IPC_IN_ADDR;
+                      ipc_interface.status_out  |= IPC_OUT_READ_PEND;
                       break;
                       
-        case 0x02   : pcregs[reg0C2_ptr]=data; 
-                      //INC_REG0C2_PTR();  
-                      pc8031_int_pending=1;
-                      pc8031_inc_pending=1;
+        case 0x02   : ipc_interface.ipc_in=data;
+                      ipc_interface.status_in   |= IPC_IN_BYTE_AVAIL;
+                      ipc_interface.status_in   |= IPC_IN_ADDR;
+                      ipc_interface.status_out  |= IPC_OUT_READ_PEND;
                       break;
     }
 
     if(LOG_PC8031_186)
-        logerror("Nimbus PCIOW %08X write of %02X to %04X, reg0C2_ptr=%02X,\n",pc,data,(offset*2)+0xC0,reg0C2_ptr);
+        logerror("Nimbus PCIOW %08X write of %02X to %04X\n",pc,data,(offset*2)+0xC0);
 
-    dump_pcregs();
 }
 
 /* 8031/8051 Peripheral controler 8031/8051 side */
@@ -2307,47 +2303,64 @@ READ8_HANDLER( pc8031_iou_r )
 {
 	int pc=cpu_get_pc(space->cpu);
     UINT8   result;
-
-    result=pcregs[offset%PC8031_RAMSIZE];
+    
+    switch (offset & 0x01)
+    {
+        case 0x00   : result=ipc_interface.ipc_in;
+                      ipc_interface.status_out  &= ~IPC_OUT_READ_PEND; 
+                      ipc_interface.status_in   &= ~IPC_IN_BYTE_AVAIL; 
+                      break;
+                      
+        case 0x01   : result=ipc_interface.status_in;
+                      break;
+    }
+                       
+    if(((offset==2) || (offset==3)) && (iou_reg092 & PC8031_INT_ENABLE)) 
+        external_int(space->machine,0,EXTERNAL_INT_PC8031_8C);
     
     if(LOG_PC8031)
         logerror("8031: PCIOR %04X read of %04X returns %02X\n",pc,offset,result); 
-    
-    //if(offset==0x00)
-    //{
-    //    reg0C2_ptr=REG_0C2_INIT;
-    //    CLEAR_PCREGS();
-    //}
-    
-    if((offset==reg0C2_ptr) && pc8031_inc_pending)
-    {
-        INC_REG0C2_PTR();
-        pc8031_inc_pending=0;
-    }
-
-    if((iou_reg092 & PC8031_INT_ENABLE) && pc8031_int_pending)
-    {
-        pc8031_int_pending=0x00;
-        external_int(space->machine,0,EXTERNAL_INT_PC8031);
-    }
-    
+       
     return result;
 }
 
 WRITE8_HANDLER( pc8031_iou_w )
 {
-	int pc=cpu_get_pc(space->cpu);
+	int pc=cpu_get_pc(space->cpu);  
 
     if(LOG_PC8031)
         logerror("8031 PCIOW %04X write of %02X to %04X\n",pc,data,offset);
-
-    pcregs[offset%PC8031_RAMSIZE]=data;
     
-//    if(offset==0x00)
-//    {
-//        reg0C2_ptr=REG_0C2_INIT;
-//        CLEAR_PCREGS();
-//    }
+    switch(offset & 0x03)
+    {
+        case 0x00   : ipc_interface.ipc_out=data;
+                      ipc_interface.status_out  |= IPC_OUT_BYTE_AVAIL;
+                      ipc_interface.status_out  &= ~IPC_OUT_ADDR;
+                      ipc_interface.status_in   |= IPC_IN_READ_PEND;
+                      break;
+                      
+        case 0x01   : ipc_interface.ipc_out=data;
+                      ipc_interface.status_out   |= IPC_OUT_BYTE_AVAIL;
+                      ipc_interface.status_out   |= IPC_OUT_ADDR;
+                      ipc_interface.status_in    |= IPC_IN_READ_PEND;
+                      break;
+
+        case 0x02   : ipc_interface.ipc_out=data;
+                      ipc_interface.status_out  |= IPC_OUT_BYTE_AVAIL;
+                      ipc_interface.status_out  &= ~IPC_OUT_ADDR;
+                      ipc_interface.status_in   |= IPC_IN_READ_PEND;
+                      if(iou_reg092 & PC8031_INT_ENABLE)
+                        external_int(space->machine,0,EXTERNAL_INT_PC8031_8F);  
+                      break;
+                      
+        case 0x03   : ipc_interface.ipc_out=data;
+                      //ipc_interface.status_out   |= IPC_OUT_BYTE_AVAIL;
+                      ipc_interface.status_out   |= IPC_OUT_ADDR;
+                      ipc_interface.status_in    |= IPC_IN_READ_PEND;
+                      if(iou_reg092 & PC8031_INT_ENABLE)
+                        external_int(space->machine,0,EXTERNAL_INT_PC8031_8E);  
+                      break;
+    }
 }
 
 READ8_HANDLER( pc8031_port_r )
@@ -2418,7 +2431,6 @@ WRITE8_HANDLER( iou_w )
 static void iou_reset(void)
 {
     iou_reg092=0x00;
-    pc8031_int_pending=0;
 }
 
 /* 
