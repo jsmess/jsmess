@@ -16,7 +16,7 @@ SOFTWARE_END
 
 SOFTWARE_START( astrwrs2 )
 	ROM_REGION( 0x2000, CARTRIDGE_REGION_ROM, 0 )
-	ROM_LOAD( "astrwrs2.bin", 0x0000, 0x2000, CRC(19056c71) SHA1(7b1073339a4641d4e0f00b284c64fc3c6d385b7c) )
+	ROM_LOAD( "astrwrs2.bin", 0x0000, 0x2000, BAD_DUMP CRC(19056c71) SHA1(7b1073339a4641d4e0f00b284c64fc3c6d385b7c) )
 SOFTWARE_END
 
 SOFTWARE_START( elevfght )
@@ -62,7 +62,7 @@ SOFTWARE_END
 
 SOFTWARE_LIST_START( svc_cart )
 	SOFTWARE( astrwrs,   0,         1984, "Epoch", "Astro Wars - Invaders from Space", 0, 0 )
-	/* SOFTWARE( astrwrs2,  0,         1984, "Epoch", "Astro Wars II - Battle in Galaxy", 0, 0 )	bad dump, refuses to work on real h/w */
+	SOFTWARE( astrwrs2,  0,         1984, "Epoch", "Astro Wars II - Battle in Galaxy", 0, 0 )	/* bad dump? refuses to work on real h/w */
 	/* Basic Nyuumon */
 	/* Boulder Dash */
 	/* Comic Circus */
