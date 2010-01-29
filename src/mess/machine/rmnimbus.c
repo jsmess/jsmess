@@ -2302,7 +2302,7 @@ WRITE8_HANDLER( pc8031_w )
 READ8_HANDLER( pc8031_iou_r )
 {
 	int pc=cpu_get_pc(space->cpu);
-    UINT8   result;
+    UINT8   result = 0;
     
     switch (offset & 0x01)
     {
