@@ -15,6 +15,7 @@
 #include <windows.h>
 #include <commdlg.h>
 #include <tchar.h>
+#include <stdlib.h>
 
 // MESS headers
 #include "winutils.h"
