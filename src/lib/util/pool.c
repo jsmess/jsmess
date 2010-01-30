@@ -39,6 +39,7 @@
 
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include "pool.h"
 #include "coreutil.h"
 
