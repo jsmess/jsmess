@@ -21,6 +21,6 @@
 DEVICE_GET_INFO(cdrom);
 
 
-cdrom_file *mess_cd_get_cdrom_file(const device_config *device);
+cdrom_file *mess_cd_get_cdrom_file(running_device *device);
 
 #endif /* MESS_CD_H */

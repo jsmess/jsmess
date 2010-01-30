@@ -82,7 +82,7 @@ static int LED_display_window_height;
 static void hold_load(running_machine *machine);
 
 
-static const device_config *rs232_fp;
+static running_device *rs232_fp;
 static UINT8 rs232_rts;
 static emu_timer *rs232_input_timer;
 
@@ -208,7 +208,7 @@ static VIDEO_UPDATE( tm990_189 )
 
 static VIDEO_START( tm990_189_v )
 {
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 
 	/* NPW 27-Feb-2006 - ewwww gross!!! maybe this can be fixed when
@@ -344,7 +344,7 @@ static WRITE8_DEVICE_HANDLER( sys9901_shiftlight_w )
 
 static WRITE8_DEVICE_HANDLER( sys9901_spkrdrive_w )
 {
-	const device_config *speaker = devtag_get_device(device->machine, "speaker");
+	running_device *speaker = devtag_get_device(device->machine, "speaker");
 	speaker_level_w(speaker, data);
 }
 
@@ -363,7 +363,7 @@ static TIMER_CALLBACK(rs232_input_callback)
 
 	if (/*rs232_rts &&*/ /*(mame_ftell(rs232_fp) < mame_fsize(rs232_fp))*/1)
 	{
-		if (image_fread((const device_config*)ptr, &buf, 1) == 1)
+		if (image_fread((running_device*)ptr, &buf, 1) == 1)
 			tms9902_push_data(devtag_get_device(machine, "tms9902"), buf);
 	}
 }
@@ -447,7 +447,7 @@ static WRITE8_HANDLER(ext_instr_decode)
 	case 5: /* CKON: set DECKCONTROL */
 		LED_state |= 0x20;
 		{
-			const device_config *img = devtag_get_device(space->machine, "cassette");
+			running_device *img = devtag_get_device(space->machine, "cassette");
 			cassette_change_state(img, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		}
 		break;
@@ -455,7 +455,7 @@ static WRITE8_HANDLER(ext_instr_decode)
 	case 6: /* CKOF: clear DECKCONTROL */
 		LED_state &= ~0x20;
 		{
-			const device_config *img = devtag_get_device(space->machine, "cassette");
+			running_device *img = devtag_get_device(space->machine, "cassette");
 			cassette_change_state(img, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		}
 		break;
@@ -466,7 +466,7 @@ static WRITE8_HANDLER(ext_instr_decode)
 	}
 }
 
-static void idle_callback(const device_config *device, int state)
+static void idle_callback(running_device *device, int state)
 {
 	if (state)
 		LED_state |= 0x40;

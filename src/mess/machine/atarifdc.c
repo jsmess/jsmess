@@ -69,7 +69,7 @@ struct _atari_fdc_t
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
-INLINE atari_fdc_t *get_safe_token(const device_config *device)
+INLINE atari_fdc_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -148,7 +148,7 @@ static const xfd_format xfd_formats[] =
  *****************************************************************************/
 
 #define MAXSIZE 5760 * 256 + 80
-static void atari_load_proc(const device_config *image)
+static void atari_load_proc(running_device *image)
 {
 	atari_fdc_t *fdc = get_safe_token(image->owner);
 	int id = floppy_get_drive(image);
@@ -401,7 +401,7 @@ static	void make_chksum(UINT8 * chksum, UINT8 data)
 	*chksum = newone;
 }
 
-static	void clr_serout(const device_config *device,int expect_data)
+static	void clr_serout(running_device *device,int expect_data)
 {
 	atari_fdc_t *fdc = get_safe_token(device);
 	
@@ -410,7 +410,7 @@ static	void clr_serout(const device_config *device,int expect_data)
 	fdc->serout_count = expect_data + 1;
 }
 
-static void add_serout(const device_config *device,int expect_data)
+static void add_serout(running_device *device,int expect_data)
 {
 	atari_fdc_t *fdc = get_safe_token(device);
 	
@@ -418,17 +418,17 @@ static void add_serout(const device_config *device,int expect_data)
 	fdc->serout_count = expect_data + 1;
 }
 
-static void clr_serin(const device_config *device, int ser_delay)
+static void clr_serin(running_device *device, int ser_delay)
 {
 	atari_fdc_t *fdc = get_safe_token(device);
-	const device_config *pokey = devtag_get_device(device->machine, "pokey");
+	running_device *pokey = devtag_get_device(device->machine, "pokey");
 	fdc->serin_chksum = 0;
 	fdc->serin_offs = 0;
 	fdc->serin_count = 0;
 	pokey_serin_ready(pokey, ser_delay * 40);
 }
 
-static void add_serin(const device_config *device,UINT8 data, int with_checksum)
+static void add_serin(running_device *device,UINT8 data, int with_checksum)
 {
 	atari_fdc_t *fdc = get_safe_token(device);
 	fdc->serin_buff[fdc->serin_count++] = data;
@@ -436,7 +436,7 @@ static void add_serin(const device_config *device,UINT8 data, int with_checksum)
 		make_chksum(&fdc->serin_chksum, data);
 }
 
-static void ATTR_PRINTF(2,3) atari_set_frame_message(const device_config *device,const char *fmt, ...)
+static void ATTR_PRINTF(2,3) atari_set_frame_message(running_device *device,const char *fmt, ...)
 {
 	va_list arg;
 	va_start(arg, fmt);
@@ -447,7 +447,7 @@ static void ATTR_PRINTF(2,3) atari_set_frame_message(const device_config *device
 	va_end(arg);
 }
 
-static void a800_serial_command(const device_config *device)
+static void a800_serial_command(running_device *device)
 {
 	int i, drive, sector, offset;
 	atari_fdc_t *fdc = get_safe_token(device);
@@ -635,7 +635,7 @@ static void a800_serial_command(const device_config *device)
 		logerror("atari %d bytes to read\n", fdc->serin_count);
 }
 
-static void a800_serial_write(const device_config *device)
+static void a800_serial_write(running_device *device)
 {
 	int i, drive, sector, offset;
 	atari_fdc_t *fdc = get_safe_token(device);
@@ -706,7 +706,7 @@ READ8_DEVICE_HANDLER ( atari_serin_r )
 
 	if (fdc->serin_count)
 	{
-		const device_config *pokey = devtag_get_device(device->machine, "pokey");
+		running_device *pokey = devtag_get_device(device->machine, "pokey");
 
 		data = fdc->serin_buff[fdc->serin_offs];
 		ser_delay = 2 * 40;
@@ -731,7 +731,7 @@ READ8_DEVICE_HANDLER ( atari_serin_r )
 
 WRITE8_DEVICE_HANDLER ( atari_serout_w )
 {
-	const device_config *pia = devtag_get_device( device->machine, "pia" );
+	running_device *pia = devtag_get_device( device->machine, "pia" );
 	atari_fdc_t *fdc = get_safe_token(device);
 
 	/* ignore serial commands if no floppy image is specified */
@@ -814,13 +814,13 @@ static MACHINE_DRIVER_START( atari_fdc )
 	MDRV_FLOPPY_4_DRIVES_ADD(atari_floppy_config)
 MACHINE_DRIVER_END
 
-const device_config *atari_floppy_get_device_child(const device_config *device,int drive)
+running_device *atari_floppy_get_device_child(running_device *device,int drive)
 {
 	switch(drive) {
-		case 0 : return device_find_child_by_tag(device,FLOPPY_0);
-		case 1 : return device_find_child_by_tag(device,FLOPPY_1);
-		case 2 : return device_find_child_by_tag(device,FLOPPY_2);
-		case 3 : return device_find_child_by_tag(device,FLOPPY_3);
+		case 0 : return device->subdevice(FLOPPY_0);
+		case 1 : return device->subdevice(FLOPPY_1);
+		case 2 : return device->subdevice(FLOPPY_2);
+		case 3 : return device->subdevice(FLOPPY_3);
 	}
 	return NULL;
 }

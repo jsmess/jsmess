@@ -17,7 +17,7 @@ static int tty_cnt  = 0;
 
 static WRITE8_HANDLER(out_w)
 {
-	const device_config	*devconf = devtag_get_device(space->machine, TELEPRINTER_TAG);
+	running_device *devconf = devtag_get_device(space->machine, TELEPRINTER_TAG);
 
 	tty_data >>= 1;
 	tty_data |= (data & 0x01) ? 0x8000 : 0;

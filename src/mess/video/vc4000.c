@@ -77,7 +77,7 @@ static UINT8 joy1_x,joy1_y,joy2_x,joy2_y;
 
 VIDEO_START(vc4000)
 {
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 	int i;
@@ -565,7 +565,7 @@ static void vc4000_sprite_update(bitmap_t *bitmap, UINT8 *collision, SPRITE *Thi
 
 INLINE void vc4000_draw_grid(running_machine *machine, UINT8 *collision)
 {
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 	int i, j, m, x, line=vc4000_video.line-20;

@@ -97,7 +97,7 @@ typedef struct _fdc_hardware_type fdc_hardware_type;
 struct _fdc_hardware_type
 {
 	const char *name;
-	void (*update_lines)(const device_config *device);
+	void (*update_lines)(running_device *device);
 	read8_device_func ff40_r;
 	write8_device_func ff40_w;
 	unsigned initial_drq : 1;
@@ -115,12 +115,12 @@ struct _fdc_t
 	unsigned drq : 1;
 	unsigned intrq : 1;
 
-	const device_config *cococart;			/* CoCo cart slot interface */
-	const device_config *wd17xx;			/* WD17xx */
-	const device_config *ds1315;			/* DS1315 */
+	running_device *cococart;			/* CoCo cart slot interface */
+	running_device *wd17xx;			/* WD17xx */
+	running_device *ds1315;			/* DS1315 */
 
 	/* Disto RTC */
-	const device_config *disto_msm6242;		/* 6242 RTC on Disto interface */
+	running_device *disto_msm6242;		/* 6242 RTC on Disto interface */
 	offs_t msm6242_rtc_address;
 };
 
@@ -162,7 +162,7 @@ static const wd17xx_interface coco_wd17xx_interface =
     get_token
 -------------------------------------------------*/
 
-INLINE fdc_t *get_token(const device_config *device)
+INLINE fdc_t *get_token(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == COCO_CARTRIDGE_PCB_FDC_COCO) || (device->type == COCO_CARTRIDGE_PCB_FDC_DRAGON));
@@ -178,7 +178,7 @@ INLINE fdc_t *get_token(const device_config *device)
     real_time_clock
 -------------------------------------------------*/
 
-INLINE rtc_type_t real_time_clock(const device_config *device)
+INLINE rtc_type_t real_time_clock(running_device *device)
 {
 	rtc_type_t result;
 	fdc_t *fdc = get_token(device);
@@ -228,16 +228,16 @@ static DEVICE_START(fdc)
 {
 	fdc_t *fdc = get_token(device);
 	astring tempstring;
-	const fdc_hardware_type *hwtype = (const fdc_hardware_type *)device_get_info_ptr(device, FDCINFO_PTR_HWTYPE);
+	const fdc_hardware_type *hwtype = (const fdc_hardware_type *)device->get_config_ptr(FDCINFO_PTR_HWTYPE);
 
 	/* initialize variables */
 	memset(fdc, 0, sizeof(*fdc));
 	fdc->hwtype			= hwtype;
 	fdc->drq			= hwtype->initial_drq;
 	fdc->cococart		= device->owner->owner;
-	fdc->disto_msm6242	= devtag_get_device(device->machine, device_build_tag(tempstring, device, DISTO_TAG));
-	fdc->ds1315			= devtag_get_device(device->machine, device_build_tag(tempstring, device, CLOUD9_TAG));
-	fdc->wd17xx			= devtag_get_device(device->machine, device_build_tag(tempstring, device, WD_TAG));
+	fdc->disto_msm6242	= device->subdevice(DISTO_TAG);
+	fdc->ds1315			= device->subdevice(CLOUD9_TAG);
+	fdc->wd17xx			= device->subdevice(WD_TAG);
 
 	assert(fdc->wd17xx != NULL);
 }
@@ -288,7 +288,7 @@ static void general_fdc_get_info(const device_config *device, UINT32 state, devi
     controller lines
 -------------------------------------------------*/
 
-static void fdc_coco_update_lines(const device_config *device)
+static void fdc_coco_update_lines(running_device *device)
 {
 	fdc_t *fdc = get_token(device);
 
@@ -316,7 +316,7 @@ static void fdc_coco_update_lines(const device_config *device)
     dskreg
 -------------------------------------------------*/
 
-static void fdc_coco_dskreg_w(const device_config *device, UINT8 data)
+static void fdc_coco_dskreg_w(running_device *device, UINT8 data)
 {
 	fdc_t *fdc = get_token(device);
 	UINT8 drive = 0;
@@ -369,7 +369,7 @@ static void fdc_coco_dskreg_w(const device_config *device, UINT8 data)
     fdc_coco_r - function to read from CoCo FDC
 -------------------------------------------------*/
 
-static UINT8 fdc_coco_r(const device_config *device, offs_t addr)
+static UINT8 fdc_coco_r(running_device *device, offs_t addr)
 {
 	fdc_t *fdc = get_token(device);
 	UINT8 result = 0;
@@ -422,7 +422,7 @@ static UINT8 fdc_coco_r(const device_config *device, offs_t addr)
     fdc_coco_w - function to write to CoCo FDC
 -------------------------------------------------*/
 
-static void fdc_coco_w(const device_config *device, offs_t addr, UINT8 data)
+static void fdc_coco_w(running_device *device, offs_t addr, UINT8 data)
 {
 	fdc_t *fdc = get_token(device);
 
@@ -511,7 +511,7 @@ DEVICE_GET_INFO(coco_cartridge_pcb_fdc_coco)
     controller lines
 -------------------------------------------------*/
 
-static void fdc_dragon_update_lines(const device_config *device)
+static void fdc_dragon_update_lines(running_device *device)
 {
 	fdc_t *fdc = get_token(device);
 
@@ -534,7 +534,7 @@ static void fdc_dragon_update_lines(const device_config *device)
     Dragon dskreg
 -------------------------------------------------*/
 
-static void fdc_dragon_dskreg_w(const device_config *device, UINT8 data)
+static void fdc_dragon_dskreg_w(running_device *device, UINT8 data)
 {
 	fdc_t *fdc = get_token(device);
 
@@ -565,7 +565,7 @@ static void fdc_dragon_dskreg_w(const device_config *device, UINT8 data)
     fdc_dragon_r - function to read from Dragon FDC
 -------------------------------------------------*/
 
-static UINT8 fdc_dragon_r(const device_config *device, offs_t addr)
+static UINT8 fdc_dragon_r(running_device *device, offs_t addr)
 {
 	fdc_t *fdc = get_token(device);
 
@@ -594,7 +594,7 @@ static UINT8 fdc_dragon_r(const device_config *device, offs_t addr)
     fdc_dragon_w - function to write to Dragon FDC
 -------------------------------------------------*/
 
-static void fdc_dragon_w(const device_config *device, offs_t addr, UINT8 data)
+static void fdc_dragon_w(running_device *device, offs_t addr, UINT8 data)
 {
 	fdc_t *fdc = get_token(device);
 

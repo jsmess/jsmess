@@ -98,7 +98,7 @@ static TIMER_CALLBACK(lightpen_trigger)
 {
 	if (vectrex_lightpen_port & 1)
 	{
-		const device_config *via_0 = devtag_get_device(machine, "via6522_0");
+		running_device *via_0 = devtag_get_device(machine, "via6522_0");
 		via_ca1_w(via_0, 1);
 		via_ca1_w(via_0, 0);
 	}
@@ -131,13 +131,13 @@ static TIMER_CALLBACK(lightpen_trigger)
 
 READ8_HANDLER(vectrex_via_r)
 {
-	const device_config *via = devtag_get_device(space->machine, "via6522_0");
+	running_device *via = devtag_get_device(space->machine, "via6522_0");
 	return via_r(via, offset);
 }
 
 WRITE8_HANDLER(vectrex_via_w)
 {
-	const device_config *via = devtag_get_device(space->machine, "via6522_0");
+	running_device *via = devtag_get_device(space->machine, "via6522_0");
 	attotime period;
 
 	switch (offset)
@@ -295,7 +295,7 @@ static TIMER_CALLBACK(update_signal)
 
 VIDEO_START(vectrex)
 {
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 
 	x_center=((visarea->max_x - visarea->min_x) / 2) << 16;
@@ -327,7 +327,7 @@ VIDEO_START(vectrex)
 
 static void vectrex_multiplexer(running_machine *machine, int mux)
 {
-	const device_config *dac_device = devtag_get_device(machine, "dac");
+	running_device *dac_device = devtag_get_device(machine, "dac");
 
 	timer_set(machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), &analog[mux], vectrex_via_out[PORTA], update_signal);
 
@@ -401,7 +401,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 	/* Sound */
 	if (data & 0x10)
 	{
-		const device_config *ay8912 = devtag_get_device(device->machine, "ay8912");
+		running_device *ay8912 = devtag_get_device(device->machine, "ay8912");
 
 		if (data & 0x08) /* BC1 (do we select a reg or write it ?) */
 			ay8910_address_w(ay8912, 0, vectrex_via_out[PORTA]);
@@ -490,7 +490,7 @@ WRITE8_HANDLER(raaspec_led_w)
 
 VIDEO_START(raaspec)
 {
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 
 	x_center=((visarea->max_x - visarea->min_x) / 2) << 16;

@@ -50,7 +50,7 @@ struct _mb86233_state
 	UINT32			gpr[16];
 	UINT32			extport[0x30];
 
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	int icount;
 
@@ -65,7 +65,7 @@ struct _mb86233_state
 	UINT32			*Tables;
 };
 
-INLINE mb86233_state *get_safe_token(const device_config *device)
+INLINE mb86233_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -108,7 +108,7 @@ INLINE mb86233_state *get_safe_token(const device_config *device)
 static CPU_INIT( mb86233 )
 {
 	mb86233_state *cpustate = get_safe_token(device);
-	mb86233_cpu_core * _config = (mb86233_cpu_core *)device->static_config;
+	mb86233_cpu_core * _config = (mb86233_cpu_core *)device->baseconfig().static_config;
 	(void)irqcallback;
 
 	memset(cpustate, 0, sizeof( *cpustate ) );
@@ -1623,15 +1623,15 @@ CPU_GET_INFO( mb86233 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 2;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -2;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = -2;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 32;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 32;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */					break;
 

@@ -138,7 +138,7 @@ static WRITE8_HANDLER( fd5_drive_control_w )
 
 static WRITE8_HANDLER( fd5_tc_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "upd765");
+	running_device *fdc = devtag_get_device(space->machine, "upd765");
 	upd765_tc_w(fdc, 1);
 	upd765_tc_w(fdc, 0);
 }
@@ -306,8 +306,8 @@ static INTERRUPT_GEN( sord_interrupt )
 /* bit 7 is the reset/halt key */
 static READ8_HANDLER( sord_sts_r )
 {
-	const device_config *printer = devtag_get_device(space->machine, "centronics");
-	const device_config *cassette = devtag_get_device(space->machine, "cassette");
+	running_device *printer = devtag_get_device(space->machine, "centronics");
+	running_device *cassette = devtag_get_device(space->machine, "cassette");
 	UINT8 data = 0;
 
 	data |= cassette_input(cassette) >= 0 ? 1 : 0;
@@ -324,8 +324,8 @@ static READ8_HANDLER( sord_sts_r )
 /* bit 1 is cassette remote */
 static WRITE8_HANDLER( sord_com_w )
 {
-	const device_config *printer = devtag_get_device(space->machine, "centronics");
-	const device_config *cassette = devtag_get_device(space->machine, "cassette");
+	running_device *printer = devtag_get_device(space->machine, "centronics");
+	running_device *cassette = devtag_get_device(space->machine, "cassette");
 
 	/* cassette data */
 	cassette_output(cassette, BIT(data, 0) ? -1.0 : 1.0);

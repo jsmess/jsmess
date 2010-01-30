@@ -132,7 +132,7 @@ static UINT64 ti99_translate_offset(floppy_image *floppy, const struct basicdsk_
 /*
     support for 48TPI disks in 96TPI drives
 */
-static int ti99_tracktranslate(const device_config *image, floppy_image *floppy, int physical_track)
+static int ti99_tracktranslate(running_device *image, floppy_image *floppy, int physical_track)
 {
 	struct ti99_geometry *geometry;
 	geometry = (ti99_geometry *)floppy_tag(floppy);
@@ -353,7 +353,7 @@ FLOPPY_OPTIONS_END
 static void ti99_install_tracktranslate_procs(running_machine *machine)
 {
 	int id;
-	const device_config *image;
+	running_device *image;
 
 	for (id=0; id<MAX_FLOPPIES; id++)
 	{
@@ -442,7 +442,7 @@ static const ti99_peb_card_handlers_t fdc_handlers =
 */
 void ti99_fdc_reset(running_machine *machine)
 {
-	const device_config *fdc = devtag_get_device(machine, "wd179x");
+	running_device *fdc = devtag_get_device(machine, "wd179x");
 	ti99_disk_DSR = memory_region(machine, region_dsr) + offset_fdc_dsr;
 	DSEL = 0;
 	DSKnum = -1;
@@ -499,7 +499,7 @@ static int fdc_cru_r(running_machine *machine, int offset)
 */
 static void fdc_cru_w(running_machine *machine, int offset, int data)
 {
-	const device_config *fdc = devtag_get_device(machine, "wd179x");
+	running_device *fdc = devtag_get_device(machine, "wd179x");
 
 	switch (offset)
 	{
@@ -579,7 +579,7 @@ static void fdc_cru_w(running_machine *machine, int offset, int data)
 */
 static  READ8_HANDLER(fdc_mem_r)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = devtag_get_device(space->machine, "wd179x");
 
 	switch (offset)
 	{
@@ -601,7 +601,7 @@ static  READ8_HANDLER(fdc_mem_r)
 */
 static WRITE8_HANDLER(fdc_mem_w)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = devtag_get_device(space->machine, "wd179x");
 
 	data ^= 0xFF;	/* inverted data bus */
 
@@ -653,7 +653,7 @@ static const ti99_peb_card_handlers_t ccfdc_handlers =
 #if HAS_99CCFDC
 void ti99_ccfdc_reset(running_machine *machine)
 {
-	const device_config *fdc = devtag_get_device(machine, "wd179x");
+	running_device *fdc = devtag_get_device(machine, "wd179x");
 
 	ti99_disk_DSR = memory_region(machine, region_dsr) + offset_ccfdc_dsr;
 	DSEL = 0;
@@ -707,7 +707,7 @@ static int ccfdc_cru_r(int offset)
 */
 static void ccfdc_cru_w(running_machine *machine, int offset, int data)
 {
-	const device_config *fdc = devtag_get_device(machine, "wd179x");
+	running_device *fdc = devtag_get_device(machine, "wd179x");
 
 	switch (offset)
 	{
@@ -868,7 +868,7 @@ static UINT8 *bwg_ram;
 */
 void ti99_bwg_reset(running_machine *machine)
 {
-	const device_config *fdc = devtag_get_device(machine, "wd179x");
+	running_device *fdc = devtag_get_device(machine, "wd179x");
 
 	ti99_disk_DSR = memory_region(machine, region_dsr) + offset_bwg_dsr;
         bwg_ram = memory_region(machine, region_dsr) + offset_bwg_ram;
@@ -925,7 +925,7 @@ static int bwg_cru_r(running_machine *machine, int offset)
 */
 static void bwg_cru_w(running_machine *machine, int offset, int data)
 {
-	const device_config *fdc = devtag_get_device(machine, "wd179x");
+	running_device *fdc = devtag_get_device(machine, "wd179x");
 
 	switch (offset)
 	{
@@ -1042,7 +1042,7 @@ static void bwg_cru_w(running_machine *machine, int offset, int data)
 */
 static  READ8_HANDLER(bwg_mem_r)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = devtag_get_device(space->machine, "wd179x");
 
 	int reply = 0;
 
@@ -1087,7 +1087,7 @@ static  READ8_HANDLER(bwg_mem_r)
 */
 static WRITE8_HANDLER(bwg_mem_w)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = devtag_get_device(space->machine, "wd179x");
 
 	if (offset < 0x1c00)
 		;

@@ -13,7 +13,7 @@ struct _vcs80_state
 	int keyclk;
 
 	/* devices */
-	const device_config *z80pio;
+	running_device *z80pio;
 };
 
 #endif

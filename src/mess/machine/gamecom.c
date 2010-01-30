@@ -70,7 +70,7 @@ static gamecom_sound_t gamecom_sound;
 
 //static const int gamecom_timer_limit[8] = { 2/2, 1024/2, 2048/2, 4096/2, 8192/2, 16384/2, 32768/2, 65536/2 };
 static const int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32768, 65536 };
-static const device_config *gamecom_cpu;
+static running_device *gamecom_cpu;
 
 
 static void gamecom_dma_init(running_machine *machine);
@@ -565,7 +565,7 @@ static void gamecom_dma_init(running_machine *machine)
    Their usage is also not explained properly in the manuals. Guess we'll have to wait
    for them to show up in some rom images...
  */
-void gamecom_handle_dma( const device_config *device, int cycles )
+void gamecom_handle_dma( running_device *device, int cycles )
 {
 	unsigned y_count, x_count;
 	/* If not enabled, ignore */
@@ -659,7 +659,7 @@ void gamecom_handle_dma( const device_config *device, int cycles )
 	cputag_set_input_line(device->machine, "maincpu", DMA_INT, ASSERT_LINE );
 }
 
-void gamecom_update_timers( const device_config *device, int cycles )
+void gamecom_update_timers( running_device *device, int cycles )
 {
 	if ( gamecom_timer[0].enabled )
 	{
@@ -694,7 +694,7 @@ void gamecom_update_timers( const device_config *device, int cycles )
 DRIVER_INIT( gamecom )
 {
 	gamecom_cpu = devtag_get_device(machine, "maincpu");
-	gamecom_iram = (UINT8*)devtag_get_info_ptr(machine, "maincpu", CPUINFO_PTR_SM8500_INTERNAL_RAM);
+	gamecom_iram = (UINT8*)machine->device("maincpu")->get_config_ptr(CPUINFO_PTR_SM8500_INTERNAL_RAM);
 	gamecom_clock_timer = timer_alloc(machine,  gamecom_clock_timer_callback , NULL);
 }
 

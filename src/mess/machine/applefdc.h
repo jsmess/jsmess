@@ -40,12 +40,12 @@
 typedef struct _applefdc_interface applefdc_interface;
 struct _applefdc_interface
 {
-	void (*set_lines)(const device_config *device, UINT8 lines);
-	void (*set_enable_lines)(const device_config *device, int enable_mask);
+	void (*set_lines)(running_device *device, UINT8 lines);
+	void (*set_enable_lines)(running_device *device, int enable_mask);
 
-	UINT8 (*read_data)(const device_config *device);
-	void (*write_data)(const device_config *device, UINT8 data);
-	int (*read_status)(const device_config *device);
+	UINT8 (*read_data)(running_device *device);
+	void (*write_data)(running_device *device, UINT8 data);
+	int (*read_status)(running_device *device);
 };
 
 
@@ -68,7 +68,7 @@ READ8_DEVICE_HANDLER(applefdc_r);
 WRITE8_DEVICE_HANDLER(applefdc_w);
 
 /* accessor */
-UINT8 applefdc_get_lines(const device_config *device);
+UINT8 applefdc_get_lines(running_device *device);
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

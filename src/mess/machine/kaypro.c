@@ -8,12 +8,12 @@
 #include "devices/flopdrv.h"
 
 
-static const device_config *kayproii_z80pio_g;
-static const device_config *kayproii_z80pio_s;
-static const device_config *kaypro_z80sio;
-static const device_config *kaypro2x_z80sio;
-static const device_config *kaypro_printer;
-static const device_config *kaypro_fdc;
+static running_device *kayproii_z80pio_g;
+static running_device *kayproii_z80pio_s;
+static running_device *kaypro_z80sio;
+static running_device *kaypro2x_z80sio;
+static running_device *kaypro_printer;
+static running_device *kaypro_fdc;
 
 static UINT8 kaypro_system_port;
 
@@ -26,7 +26,7 @@ static UINT8 kaypro_system_port;
 
 ************************************************************/
 
-static void kaypro_interrupt(const device_config *device, int state)
+static void kaypro_interrupt(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, state);
 }
@@ -412,7 +412,7 @@ MACHINE_RESET( kaypro2x )
 
 QUICKLOAD_LOAD( kayproii )
 {
-	const device_config *cpu = devtag_get_device(image->machine, "maincpu");
+	running_device *cpu = devtag_get_device(image->machine, "maincpu");
 	UINT8 *RAM = memory_region(image->machine, "rambank");
 	UINT16 i;
 	UINT8 data;
@@ -439,7 +439,7 @@ QUICKLOAD_LOAD( kayproii )
 QUICKLOAD_LOAD( kaypro2x )
 {
 	const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const device_config *cpu = devtag_get_device(image->machine, "maincpu");
+	running_device *cpu = devtag_get_device(image->machine, "maincpu");
 	UINT8 *RAM = memory_region(image->machine, "rambank");
 	UINT16 i;
 	UINT8 data;

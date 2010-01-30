@@ -108,7 +108,7 @@ struct _dma8257_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE i8257_t *get_safe_token(const device_config *device)
+INLINE i8257_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -116,18 +116,18 @@ INLINE i8257_t *get_safe_token(const device_config *device)
 	return (i8257_t *) device->token;
 }
 
-INLINE const i8257_interface *get_interface(const device_config *device)
+INLINE const i8257_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == I8257));
-	return (const i8257_interface *) device->static_config;
+	return (const i8257_interface *) device->baseconfig().static_config;
 }
 
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
 
-static void set_hrq(const device_config *device, int state)
+static void set_hrq(running_device *device, int state)
 {
 	i8257_t *i8257 = get_safe_token(device);
 
@@ -136,7 +136,7 @@ static void set_hrq(const device_config *device, int state)
 	devcb_call_write_line(&i8257->out_hrq_func, state);
 }
 
-static void set_tc(const device_config *device, int state)
+static void set_tc(running_device *device, int state)
 {
 	i8257_t *i8257 = get_safe_token(device);
 
@@ -148,7 +148,7 @@ static void set_tc(const device_config *device, int state)
 	}
 }
 
-static void set_mark(const device_config *device, int state)
+static void set_mark(running_device *device, int state)
 {
 	i8257_t *i8257 = get_safe_token(device);
 
@@ -160,7 +160,7 @@ static void set_mark(const device_config *device, int state)
 	}
 }
 
-static void set_dack(const device_config *device, int active_channel)
+static void set_dack(running_device *device, int active_channel)
 {
 	i8257_t *i8257 = get_safe_token(device);
 	int ch;
@@ -175,7 +175,7 @@ static void set_dack(const device_config *device, int active_channel)
 	}
 }
 
-static int sample_drq(const device_config *device)
+static int sample_drq(running_device *device)
 {
 	i8257_t *i8257 = get_safe_token(device);
 	int ch;
@@ -191,7 +191,7 @@ static int sample_drq(const device_config *device)
 	return 0;
 }
 
-static void resolve_priorities(const device_config *device)
+static void resolve_priorities(running_device *device)
 {
 	i8257_t *i8257 = get_safe_token(device);
 	int i;
@@ -211,7 +211,7 @@ static void resolve_priorities(const device_config *device)
 	}
 }
 
-static void dma_read(const device_config *device)
+static void dma_read(running_device *device)
 {
 	i8257_t *i8257 = get_safe_token(device);
 
@@ -235,7 +235,7 @@ static void dma_read(const device_config *device)
 	}
 }
 
-static void dma_write(const device_config *device)
+static void dma_write(running_device *device)
 {
 	i8257_t *i8257 = get_safe_token(device);
 
@@ -265,7 +265,7 @@ static void dma_write(const device_config *device)
 
 static TIMER_CALLBACK( dma_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	i8257_t *i8257 = get_safe_token(device);
 	int drq = 0;
 
@@ -582,7 +582,7 @@ WRITE_LINE_DEVICE_HANDLER( i8257_ready_w )
 	if (LOG) logerror("I8257 '%s' Ready: %u\n", device->tag.cstr(), state);
 }
 
-static void drq_w(const device_config *device, int ch, int state)
+static void drq_w(running_device *device, int ch, int state)
 {
 	i8257_t *i8257 = get_safe_token(device);
 
@@ -608,7 +608,7 @@ WRITE_LINE_DEVICE_HANDLER( i8257_drq3_w ) { drq_w(device, 3, state); }
 static DEVICE_START( i8257 )
 {
 	i8257_t *i8257 = get_safe_token(device);
-	i8257_interface *intf = (i8257_interface *)device->static_config;
+	i8257_interface *intf = (i8257_interface *)device->baseconfig().static_config;
 	int ch;
 
 	/* resolve callbacks */

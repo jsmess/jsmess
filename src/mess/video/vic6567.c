@@ -801,7 +801,7 @@ READ8_HANDLER ( vic2_port_r )
 VIDEO_START( vic2 )
 {
 	int i;
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 

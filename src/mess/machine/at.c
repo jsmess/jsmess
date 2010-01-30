@@ -87,7 +87,7 @@ static UINT8 at_speaker_get_spk(void)
 
 static void at_speaker_set_spkrdata(running_machine *machine, UINT8 data)
 {
-	const device_config *speaker = devtag_get_device(machine, "speaker");
+	running_device *speaker = devtag_get_device(machine, "speaker");
 	at_spkrdata = data ? 1 : 0;
 	speaker_level_w( speaker, at_speaker_get_spk() );
 }
@@ -95,7 +95,7 @@ static void at_speaker_set_spkrdata(running_machine *machine, UINT8 data)
 
 static void at_speaker_set_input(running_machine *machine, UINT8 data)
 {
-	const device_config *speaker = devtag_get_device(machine, "speaker");
+	running_device *speaker = devtag_get_device(machine, "speaker");
 	at_speaker_input = data ? 1 : 0;
 	speaker_level_w( speaker, at_speaker_get_spk() );
 }
@@ -299,7 +299,7 @@ static WRITE_LINE_DEVICE_HANDLER( at_dma8237_out_eop ) {
 	pc_fdc_set_tc_state( device->machine, state );
 }
 
-static void set_dma_channel(const device_config *device, int channel, int state)
+static void set_dma_channel(running_device *device, int channel, int state)
 {
 	if (!state) dma_channel = channel;
 }
@@ -355,7 +355,7 @@ static INS8250_INTERRUPT( at_com_interrupt_2 )
 
 /* called when com registers read/written - used to update peripherals that
 are connected */
-static void at_com_refresh_connected_common(const device_config *device, int n, int data)
+static void at_com_refresh_connected_common(running_device *device, int n, int data)
 {
 	/* mouse connected to this port? */
 	if (input_port_read(device->machine, "DSW2") & (0x80>>n))
@@ -425,7 +425,7 @@ static void at_fdc_dma_drq(running_machine *machine, int state, int read_)
 	i8237_dreq2_w( st->dma8237_1, state);
 }
 
-static const device_config *at_get_device(running_machine *machine)
+static running_device *at_get_device(running_machine *machine)
 {
 	return devtag_get_device(machine, "upd765");
 }
@@ -504,7 +504,7 @@ static READ8_HANDLER( at_kbdc8042_p2_r )
 static WRITE8_HANDLER( at_kbdc8042_p2_w )
 {
 	at_state *st = (at_state *)space->machine->driver_data;
-	const device_config *keyboard = devtag_get_device(space->machine, "keyboard");
+	running_device *keyboard = devtag_get_device(space->machine, "keyboard");
 
 	//logerror("%04x: writing $%02x to P2\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), data );
 

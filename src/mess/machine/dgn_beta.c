@@ -718,7 +718,7 @@ static READ8_DEVICE_HANDLER(d_pia1_pa_r)
 static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
 {
 	int	HALT_DMA;
-	const device_config *fdc = devtag_get_device(device->machine, "wd179x");
+	running_device *fdc = devtag_get_device(device->machine, "wd179x");
 
 	/* Only play with halt line if halt bit changed since last write */
 	if((data & 0x80) != d_pia1_pa_last)
@@ -902,9 +902,9 @@ static WRITE_LINE_DEVICE_HANDLER( d_pia2_irq_b )
 /* CPU 0 */
 static void cpu0_recalc_irq(running_machine *machine, int state)
 {
-	const device_config *pia_0 = devtag_get_device( machine, "pia_0" );
-	const device_config *pia_1 = devtag_get_device( machine, "pia_1" );
-	const device_config *pia_2 = devtag_get_device( machine, "pia_2" );
+	running_device *pia_0 = devtag_get_device( machine, "pia_0" );
+	running_device *pia_1 = devtag_get_device( machine, "pia_1" );
+	running_device *pia_2 = devtag_get_device( machine, "pia_2" );
 	UINT8 pia0_irq_a = pia6821_get_irq_a(pia_0);
 	UINT8 pia1_irq_a = pia6821_get_irq_a(pia_1);
 	UINT8 pia1_irq_b = pia6821_get_irq_b(pia_1);
@@ -923,7 +923,7 @@ static void cpu0_recalc_irq(running_machine *machine, int state)
 
 static void cpu0_recalc_firq(running_machine *machine, int state)
 {
-	const device_config *pia_0 = devtag_get_device( machine, "pia_0" );
+	running_device *pia_0 = devtag_get_device( machine, "pia_0" );
 	UINT8 pia0_irq_b = pia6821_get_irq_b(pia_0);
 	UINT8 FIRQ;
 
@@ -973,7 +973,7 @@ const wd17xx_interface dgnbeta_wd17xx_interface =
 READ8_HANDLER(dgnbeta_wd2797_r)
 {
 	int result = 0;
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = devtag_get_device(space->machine, "wd179x");
 
 	switch(offset & 0x03)
 	{
@@ -999,7 +999,7 @@ READ8_HANDLER(dgnbeta_wd2797_r)
 
 WRITE8_HANDLER(dgnbeta_wd2797_w)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = devtag_get_device(space->machine, "wd179x");
 
     switch(offset & 0x3)
 	{
@@ -1059,7 +1059,7 @@ static void ScanInKeyboard(void)
 /* VBlank inturrupt */
 void dgn_beta_frame_interrupt (running_machine *machine, int data)
 {
-	const device_config *pia_2 = devtag_get_device( machine, "pia_2" );
+	running_device *pia_2 = devtag_get_device( machine, "pia_2" );
 
 	/* Set PIA line, so it recognises inturrupt */
 	if (!data)
@@ -1094,10 +1094,10 @@ void dgn_beta_line_interrupt (int data)
 
 static void dgnbeta_reset(running_machine *machine)
 {
-	const device_config *fdc = devtag_get_device(machine, "wd179x");
-	const device_config *pia_0 = devtag_get_device( machine, "pia_0" );
-	const device_config *pia_1 = devtag_get_device( machine, "pia_1" );
-	const device_config *pia_2 = devtag_get_device( machine, "pia_2" );
+	running_device *fdc = devtag_get_device(machine, "wd179x");
+	running_device *pia_0 = devtag_get_device( machine, "pia_0" );
+	running_device *pia_1 = devtag_get_device( machine, "pia_1" );
+	running_device *pia_2 = devtag_get_device( machine, "pia_2" );
 
 	system_rom = memory_region(machine, "maincpu");
 

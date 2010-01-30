@@ -212,7 +212,7 @@ static BOOL SoftwareDirectories_OnEndLabelEdit(HWND hDlg, NMHDR* pNMHDR)
 
 BOOL PropSheetFilter_Config(const machine_config *drv, const game_driver *gamedrv)
 {
-	return (device_list_first(&drv->devicelist, MESSRAM)!=NULL) || DriverHasDevice(gamedrv, IO_PRINTER);
+	return (drv->devicelist.first(MESSRAM)!=NULL) || DriverHasDevice(gamedrv, IO_PRINTER);
 }
 
 
@@ -407,7 +407,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 	cfg = machine_config_alloc(gamedrv->machine_config);
 
 	// identify how many options that we have
-	device = device_list_first(&cfg->devicelist, MESSRAM);
+	device = cfg->devicelist.first(MESSRAM);
 
 	EnableWindow(control, (device != NULL));
 	i = 0;

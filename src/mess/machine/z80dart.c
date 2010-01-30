@@ -181,14 +181,14 @@ struct _z80dart_t
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static int z80dart_irq_state(const device_config *device);
-static void z80dart_irq_reti(const device_config *device);
+static int z80dart_irq_state(running_device *device);
+static void z80dart_irq_reti(running_device *device);
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE z80dart_t *get_safe_token(const device_config *device)
+INLINE z80dart_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -196,11 +196,11 @@ INLINE z80dart_t *get_safe_token(const device_config *device)
 	return (z80dart_t *)device->token;
 }
 
-INLINE const z80dart_interface *get_interface(const device_config *device)
+INLINE const z80dart_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == Z80DART));
-	return (const z80dart_interface *) device->static_config;
+	return (const z80dart_interface *) device->baseconfig().static_config;
 }
 
 /***************************************************************************
@@ -223,7 +223,7 @@ INLINE const z80dart_interface *get_interface(const device_config *device)
     check_interrupts - control interrupt line
 -------------------------------------------------*/
 
-static void check_interrupts(const device_config *device)
+static void check_interrupts(running_device *device)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	int state = (z80dart_irq_state(device) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;
@@ -235,7 +235,7 @@ static void check_interrupts(const device_config *device)
     take_interrupt - trigger interrupt
 -------------------------------------------------*/
 
-static void take_interrupt(const device_config *device, int channel, int level)
+static void take_interrupt(running_device *device, int channel, int level)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
@@ -340,7 +340,7 @@ static int get_tx_word_length(dart_channel *ch)
     reset_channel - reset channel status
 -------------------------------------------------*/
 
-static void reset_channel(const device_config *device, int channel)
+static void reset_channel(running_device *device, int channel)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
@@ -413,7 +413,7 @@ static int character_completed(dart_channel *ch)
     detect_parity_error - detect parity error
 -------------------------------------------------*/
 
-static void detect_parity_error(const device_config *device, int channel)
+static void detect_parity_error(running_device *device, int channel)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
@@ -449,7 +449,7 @@ static void detect_parity_error(const device_config *device, int channel)
     detect_framing_error - detect framing error
 -------------------------------------------------*/
 
-static void detect_framing_error(const device_config *device, int channel)
+static void detect_framing_error(running_device *device, int channel)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
@@ -480,7 +480,7 @@ static void detect_framing_error(const device_config *device, int channel)
     receive - receive serial data
 -------------------------------------------------*/
 
-static void receive(const device_config *device, int channel)
+static void receive(running_device *device, int channel)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
@@ -572,7 +572,7 @@ static void receive(const device_config *device, int channel)
     transmit - transmit serial data
 -------------------------------------------------*/
 
-static void transmit(const device_config *device, int channel)
+static void transmit(running_device *device, int channel)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
@@ -903,7 +903,7 @@ WRITE8_DEVICE_HANDLER( z80dart_d_w )
     z80dart_receive_data - receive data word
 -------------------------------------------------*/
 
-void z80dart_receive_data(const device_config *device, int channel, UINT8 data)
+void z80dart_receive_data(running_device *device, int channel, UINT8 data)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
@@ -964,7 +964,7 @@ void z80dart_receive_data(const device_config *device, int channel, UINT8 data)
     cts_w - clear to send handler
 -------------------------------------------------*/
 
-static void cts_w(const device_config *device, int channel, int state)
+static void cts_w(running_device *device, int channel, int state)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
@@ -1023,7 +1023,7 @@ WRITE_LINE_DEVICE_HANDLER( z80dart_ctsb_w )
     dcd_w - data carrier detected handler
 -------------------------------------------------*/
 
-static void dcd_w(const device_config *device, int channel, int state)
+static void dcd_w(running_device *device, int channel, int state)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
@@ -1083,7 +1083,7 @@ WRITE_LINE_DEVICE_HANDLER( z80dart_dcdb_w )
     ri_w - ring indicator handler
 -------------------------------------------------*/
 
-static void ri_w(const device_config *device, int channel, int state)
+static void ri_w(running_device *device, int channel, int state)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
@@ -1220,7 +1220,7 @@ WRITE_LINE_DEVICE_HANDLER( z80dart_rxtxcb_w )
 
 static TIMER_CALLBACK( rxca_tick )
 {
-	z80dart_rxca_w((const device_config *)ptr, 1);
+	z80dart_rxca_w((running_device *)ptr, 1);
 }
 
 /*-------------------------------------------------
@@ -1229,7 +1229,7 @@ static TIMER_CALLBACK( rxca_tick )
 
 static TIMER_CALLBACK( txca_tick )
 {
-	z80dart_txca_w((const device_config *)ptr, 1);
+	z80dart_txca_w((running_device *)ptr, 1);
 }
 
 /*-------------------------------------------------
@@ -1238,14 +1238,14 @@ static TIMER_CALLBACK( txca_tick )
 
 static TIMER_CALLBACK( rxtxcb_tick )
 {
-	z80dart_rxtxcb_w((const device_config *)ptr, 1);
+	z80dart_rxtxcb_w((running_device *)ptr, 1);
 }
 
 /*-------------------------------------------------
     z80dart_irq_state - get interrupt status
 -------------------------------------------------*/
 
-static int z80dart_irq_state(const device_config *device)
+static int z80dart_irq_state(running_device *device)
 {
 	z80dart_t *z80dart = get_safe_token( device );
 	int state = 0;
@@ -1276,7 +1276,7 @@ static int z80dart_irq_state(const device_config *device)
     z80dart_irq_ack - interrupt acknowledge
 -------------------------------------------------*/
 
-static int z80dart_irq_ack(const device_config *device)
+static int z80dart_irq_ack(running_device *device)
 {
 	z80dart_t *z80dart = get_safe_token( device );
 	int i;
@@ -1309,7 +1309,7 @@ static int z80dart_irq_ack(const device_config *device)
     z80dart_irq_reti - return from interrupt
 -------------------------------------------------*/
 
-static void z80dart_irq_reti(const device_config *device)
+static void z80dart_irq_reti(running_device *device)
 {
 	z80dart_t *z80dart = get_safe_token( device );
 	int i;
@@ -1385,7 +1385,7 @@ WRITE8_DEVICE_HANDLER( z80dart_ba_cd_w )
 static DEVICE_START( z80dart )
 {
 	z80dart_t *z80dart = get_safe_token(device);
-	const z80dart_interface *intf = (const z80dart_interface *)device->static_config;
+	const z80dart_interface *intf = (const z80dart_interface *)device->baseconfig().static_config;
 	int channel;
 
 	/* resolve callbacks */

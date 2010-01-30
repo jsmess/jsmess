@@ -146,7 +146,7 @@ static WRITE8_HANDLER (led_w)
 //  UINT8 caps_led = BIT(data,4);
 }
 
-INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
+INLINE running_device *get_floppy_image(running_machine *machine, int drive)
 {
 	return floppy_get_device(machine, drive);
 }
@@ -162,7 +162,7 @@ static WRITE8_HANDLER( floppy_w )
 	// bit 1 is TC state
 	// bit 2 is drive selected
 	// bit 3 is motor state
-	const device_config *floppy = devtag_get_device(space->machine, "upd765");
+	running_device *floppy = devtag_get_device(space->machine, "upd765");
 	if (BIT(data,0)==0) {
 		//reset
 		upd765_reset(floppy,0);
@@ -325,7 +325,7 @@ static MACHINE_RESET(pyl601)
 	memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") + 0xf000);
 	memory_set_bankptr(machine, "bank6", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf000);
 
-	device_reset(devtag_get_device(machine, "maincpu"));
+	devtag_get_device(machine, "maincpu")->reset();
 }
 
 static VIDEO_START( pyl601 )
@@ -334,7 +334,7 @@ static VIDEO_START( pyl601 )
 
 static VIDEO_UPDATE( pyl601 )
 {
-	const device_config *mc6845 = devtag_get_device(screen->machine, "crtc");
+	running_device *mc6845 = devtag_get_device(screen->machine, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }

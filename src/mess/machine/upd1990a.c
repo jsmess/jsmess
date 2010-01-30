@@ -68,7 +68,7 @@ struct _upd1990a_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE upd1990a_t *get_safe_token(const device_config *device)
+INLINE upd1990a_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -76,11 +76,11 @@ INLINE upd1990a_t *get_safe_token(const device_config *device)
 	return (upd1990a_t *)device->token;
 }
 
-INLINE const upd1990a_interface *get_interface(const device_config *device)
+INLINE const upd1990a_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == UPD1990A));
-	return (const upd1990a_interface *) device->static_config;
+	return (const upd1990a_interface *) device->baseconfig().static_config;
 }
 
 INLINE UINT8 convert_to_bcd(int val)
@@ -444,7 +444,7 @@ static void advance_seconds(upd1990a_t *upd1990a)
 
 static TIMER_CALLBACK( clock_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	upd1990a_t *upd1990a = get_safe_token(device);
 
 	advance_seconds(upd1990a);
@@ -456,7 +456,7 @@ static TIMER_CALLBACK( clock_tick )
 
 static TIMER_CALLBACK( tp_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	upd1990a_t *upd1990a = get_safe_token(device);
 
 	upd1990a->tp = !upd1990a->tp;
@@ -472,7 +472,7 @@ static TIMER_CALLBACK( tp_tick )
 
 static TIMER_CALLBACK( data_out_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	upd1990a_t *upd1990a = get_safe_token(device);
 
 	upd1990a->data_out = !upd1990a->data_out;

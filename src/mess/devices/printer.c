@@ -20,7 +20,7 @@
     is ready
 -------------------------------------------------*/
 
-int printer_is_ready(const device_config *printer)
+int printer_is_ready(running_device *printer)
 {
 	/* if there is a file attached to it, it's online */
 	return image_exists(printer) != 0;
@@ -32,7 +32,7 @@ int printer_is_ready(const device_config *printer)
     printer_output - outputs data to a printer
 -------------------------------------------------*/
 
-void printer_output(const device_config *printer, UINT8 data)
+void printer_output(running_device *printer, UINT8 data)
 {
 	if (image_exists(printer))
 	{
@@ -47,7 +47,7 @@ void printer_output(const device_config *printer, UINT8 data)
 
 static DEVICE_IMAGE_LOAD( printer )
 {
-	const printer_config *conf = (const printer_config *)image->inline_config;
+	const printer_config *conf = (const printer_config *)image->baseconfig().inline_config;
 
 	/* send notify that the printer is now online */
 	if (conf != NULL && conf->online != NULL)
@@ -64,7 +64,7 @@ static DEVICE_IMAGE_LOAD( printer )
 
 static DEVICE_IMAGE_UNLOAD( printer )
 {
-	const printer_config *conf = (const printer_config *)image->inline_config;
+	const printer_config *conf = (const printer_config *)image->baseconfig().inline_config;
 
 	/* send notify that the printer is now offline */
 	if (conf != NULL && conf->online != NULL)

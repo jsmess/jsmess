@@ -21,7 +21,7 @@
 
 static READ8_DEVICE_HANDLER( ins8154_b1_port_a_r )
 {
-	const device_config *ttl74145 = devtag_get_device(device->machine, "ic8_7445");
+	running_device *ttl74145 = devtag_get_device(device->machine, "ic8_7445");
 	UINT8 key_line = ttl74145_r(ttl74145, 0, 0);
 
 	switch (key_line)
@@ -52,7 +52,7 @@ static WRITE8_DEVICE_HANDLER( ins8154_b1_port_a_w )
 
 static WRITE8_DEVICE_HANDLER( acrnsys1_led_segment_w )
 {
-	const device_config *ttl74145 = devtag_get_device(device->machine, "ic8_7445");
+	running_device *ttl74145 = devtag_get_device(device->machine, "ic8_7445");
 	UINT8 key_line = ttl74145_r(ttl74145, 0, 0);
 
 	output_set_digit_value(key_line, data);

@@ -62,7 +62,7 @@ static UINT8 scrambler;
 */
 static READ8_HANDLER( cassette_r )
 {
-	const device_config *cassette = devtag_get_device(space->machine, "cassette");
+	running_device *cassette = devtag_get_device(space->machine, "cassette");
 	return (cassette_input(cassette) < +0.0) ? 0 : 1;
 }
 
@@ -74,8 +74,8 @@ static READ8_HANDLER( cassette_r )
 */
 static WRITE8_HANDLER( cassette_w )
 {
-	const device_config *speaker = devtag_get_device(space->machine, "speaker");
-	const device_config *cassette = devtag_get_device(space->machine, "cassette");
+	running_device *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *cassette = devtag_get_device(space->machine, "cassette");
 
 	speaker_level_w(speaker, BIT(data, 0));
 	cassette_output(cassette, BIT(data, 0) ? +1.0 : -1.0);
@@ -96,7 +96,7 @@ static WRITE8_HANDLER( cassette_w )
 */
 static READ8_HANDLER( vsync_r )
 {
-	const device_config *screen = space->machine->primary_screen;
+	running_device *screen = space->machine->primary_screen;
 	return video_screen_get_vblank(screen) ? 0 : 1;
 }
 

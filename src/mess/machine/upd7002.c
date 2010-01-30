@@ -55,7 +55,7 @@ struct _uPD7002_t
  Implementation
 *****************************************************************************/
 
-INLINE uPD7002_t *get_safe_token(const device_config *device)
+INLINE uPD7002_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -72,7 +72,7 @@ READ8_DEVICE_HANDLER ( uPD7002_EOC_r )
 
 static TIMER_CALLBACK(uPD7002_conversioncomplete)
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	uPD7002_t *uPD7002 = get_safe_token(device);
 
 	int counter_value = param;
@@ -182,9 +182,9 @@ static DEVICE_START( uPD7002 )
 
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(device->static_config != NULL);
+	assert(device->baseconfig().static_config != NULL);
 
-	uPD7002->intf = (const uPD7002_interface*)device->static_config;
+	uPD7002->intf = (const uPD7002_interface*)device->baseconfig().static_config;
 	uPD7002->status = 0;
 	uPD7002->data1 = 0;
 	uPD7002->data0 = 0;

@@ -90,8 +90,8 @@ static struct i186_state
 } i186;
 
 static struct {
-	const device_config	*pic8259_master;
-	const device_config	*pic8259_slave;
+	running_device *pic8259_master;
+	running_device *pic8259_slave;
 } compis_devices;
 
 /* Keyboard */
@@ -276,7 +276,7 @@ static void compis_keyb_init(void)
 /*-------------------------------------------------------------------------*/
 static void compis_fdc_reset(running_machine *machine)
 {
-	const device_config *fdc = devtag_get_device(machine, "upd765");
+	running_device *fdc = devtag_get_device(machine, "upd765");
 
 	upd765_reset(fdc, 0);
 
@@ -286,7 +286,7 @@ static void compis_fdc_reset(running_machine *machine)
 
 static void compis_fdc_tc(running_machine *machine, int state)
 {
-	const device_config *fdc = devtag_get_device(machine, "upd765");
+	running_device *fdc = devtag_get_device(machine, "upd765");
 	/* Terminal count if iSBX-218A has DMA enabled */
   	if (input_port_read(machine, "DSW1"))
 	{
@@ -323,7 +323,7 @@ const upd765_interface compis_fdc_interface =
 
 READ16_HANDLER (compis_fdc_dack_r)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "upd765");
+	running_device *fdc = devtag_get_device(space->machine, "upd765");
 	UINT16 data;
 	data = 0xffff;
 	/* DMA acknowledge if iSBX-218A has DMA enabled */
@@ -337,7 +337,7 @@ READ16_HANDLER (compis_fdc_dack_r)
 
 WRITE16_HANDLER (compis_fdc_w)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "upd765");
+	running_device *fdc = devtag_get_device(space->machine, "upd765");
 	switch(offset)
 	{
 		case 2:
@@ -351,7 +351,7 @@ WRITE16_HANDLER (compis_fdc_w)
 
 READ16_HANDLER (compis_fdc_r)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "upd765");
+	running_device *fdc = devtag_get_device(space->machine, "upd765");
 	UINT16 data;
 	data = 0xffff;
 	switch(offset)
@@ -476,7 +476,7 @@ WRITE16_DEVICE_HANDLER ( compis_osp_pit_w )
 /*-------------------------------------------------------------------------*/
 /*  USART 8251                                                             */
 /*-------------------------------------------------------------------------*/
-static void compis_usart_rxready(const device_config *device, int state)
+static void compis_usart_rxready(running_device *device, int state)
 {
 #if 0
 	if (state)
@@ -493,13 +493,13 @@ const msm8251_interface compis_usart_interface=
 
 READ16_HANDLER ( compis_usart_r )
 {
-	const device_config *uart = devtag_get_device(space->machine, "uart");
+	running_device *uart = devtag_get_device(space->machine, "uart");
 	return msm8251_data_r(uart, offset);
 }
 
 WRITE16_HANDLER ( compis_usart_w )
 {
-	const device_config *uart = devtag_get_device(space->machine, "uart");
+	running_device *uart = devtag_get_device(space->machine, "uart");
 	switch (offset)
 	{
 		case 0x00:

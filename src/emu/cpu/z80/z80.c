@@ -148,7 +148,7 @@ struct _z80_state
 	UINT8			after_ei;			/* are we in the EI shadow? */
 	UINT32			ea;
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 	int				icount;
@@ -163,7 +163,7 @@ struct _z80_state
 	const UINT8 *	cc_ex;
 };
 
-INLINE z80_state *get_safe_token(const device_config *device)
+INLINE z80_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -3463,8 +3463,8 @@ static CPU_INIT( z80 )
 
 	/* Reset registers to their initial values */
 	memset(z80, 0, sizeof(*z80));
-	if (device->static_config != NULL)
-		z80->daisy = z80daisy_init(device, (const z80_daisy_chain *)device->static_config);
+	if (device->baseconfig().static_config != NULL)
+		z80->daisy = z80daisy_init(device, (const z80_daisy_chain *)device->baseconfig().static_config);
 	z80->irq_callback = irqcallback;
 	z80->device = device;
 	z80->program = device->space(AS_PROGRAM);
@@ -3653,7 +3653,7 @@ static CPU_SET_INFO( z80 )
 	}
 }
 
-void z80_set_cycle_tables(const device_config *device, const UINT8 *op, const UINT8 *cb, const UINT8 *ed, const UINT8 *xy, const UINT8 *xycb, const UINT8 *ex)
+void z80_set_cycle_tables(running_device *device, const UINT8 *op, const UINT8 *cb, const UINT8 *ed, const UINT8 *xy, const UINT8 *xycb, const UINT8 *ex)
 {
 	z80_state *z80 = get_safe_token(device);
 
@@ -3687,12 +3687,12 @@ CPU_GET_INFO( z80 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 16;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:			info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 16;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:			info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 16;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:				info->i = 0;							break;
 
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = z80->nmi_state;				break;
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = z80->irq_state;				break;

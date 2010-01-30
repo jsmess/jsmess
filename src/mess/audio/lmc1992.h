@@ -72,8 +72,8 @@ enum
 
 DEVICE_GET_INFO(lmc1992);
 
-void lmc1992_clock_w(const device_config *device, int level);
-void lmc1992_data_w(const device_config *device, int level);
-void lmc1992_enable_w(const device_config *device, int level);
+void lmc1992_clock_w(running_device *device, int level);
+void lmc1992_data_w(running_device *device, int level);
+void lmc1992_enable_w(running_device *device, int level);
 
 #endif

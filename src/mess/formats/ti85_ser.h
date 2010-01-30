@@ -9,7 +9,7 @@
 DEVICE_GET_INFO(ti85serial);
 DEVICE_GET_INFO(ti86serial);
 
-extern void ti85_update_serial(const device_config *device);
+extern void ti85_update_serial(running_device *device);
 
 #define MDRV_TI85SERIAL_ADD( _tag ) \
 		MDRV_DEVICE_ADD( _tag, TI85SERIAL, 0 )

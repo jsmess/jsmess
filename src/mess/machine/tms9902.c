@@ -105,15 +105,15 @@ enum
 	register_select_LDCTRL = 0x8
 };
 
-static void initiate_transmit(const device_config *device);
-static void set_brk(const device_config *device, int state);
+static void initiate_transmit(running_device *device);
+static void set_brk(running_device *device, int state);
 static DEVICE_RESET( tms9902 );
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE tms9902_t *get_token(const device_config *device)
+INLINE tms9902_t *get_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == TMS9902);
@@ -124,7 +124,7 @@ INLINE tms9902_t *get_token(const device_config *device)
 /*
     should be called after any change to int_state or enabled_ints.
 */
-static void field_interrupts(const device_config *device)
+static void field_interrupts(running_device *device)
 {
 	tms9902_t *tms9902 = get_token(device);
 	int new_int = (tms9902->DSCH && tms9902->DSCENB)
@@ -148,7 +148,7 @@ static void field_interrupts(const device_config *device)
     state == 0: CTS* is inactive (high)
     state != 0: CTS* is active (low)
 */
-void tms9902_set_cts(const device_config *device, int state)
+void tms9902_set_cts(running_device *device, int state)
 {
 	tms9902_t *tms9902 = get_token(device);
 	state = state != 0;
@@ -176,7 +176,7 @@ void tms9902_set_cts(const device_config *device, int state)
     state == 0: DSR* is inactive (high)
     state != 0: DSR* is active (low)
 */
-void tms9902_set_dsr(const device_config *device, int state)
+void tms9902_set_dsr(running_device *device, int state)
 {
 	tms9902_t *tms9902 = get_token(device);
 	state = state != 0;
@@ -190,7 +190,7 @@ void tms9902_set_dsr(const device_config *device, int state)
 }
 
 
-void tms9902_push_data(const device_config *device, int data)
+void tms9902_push_data(running_device *device, int data)
 {
 	tms9902_t *tms9902 = get_token(device);
 	tms9902->RBR = data;
@@ -211,7 +211,7 @@ void tms9902_push_data(const device_config *device, int data)
 */
 static TIMER_CALLBACK(decrementer_callback)
 {
-	const device_config *device = (const device_config *) ptr;
+	running_device *device = (running_device *) ptr;
 	tms9902_t *tms9902 = get_token(device);
 
 	if (tms9902->TIMELP)
@@ -223,7 +223,7 @@ static TIMER_CALLBACK(decrementer_callback)
 /*
     load the content of clockinvl into the decrementer
 */
-static void reload_interval_timer(const device_config *device)
+static void reload_interval_timer(running_device *device)
 {
 	tms9902_t *tms9902 = get_token(device);
 	if (tms9902->TMR)
@@ -240,7 +240,7 @@ static void reload_interval_timer(const device_config *device)
 }
 
 
-static void set_rts(const device_config *device, int state)
+static void set_rts(running_device *device, int state)
 {
 	tms9902_t *tms9902 = get_token(device);
 	/*state = state != 0;*/
@@ -255,7 +255,7 @@ static void set_rts(const device_config *device, int state)
 }
 
 
-static void set_brk(const device_config *device, int state)
+static void set_brk(running_device *device, int state)
 {
 	tms9902_t *tms9902 = get_token(device);
 	/*state = state != 0;*/
@@ -270,7 +270,7 @@ static void set_brk(const device_config *device, int state)
 }
 
 
-static void initiate_transmit(const device_config *device)
+static void initiate_transmit(running_device *device)
 {
 	tms9902_t *tms9902 = get_token(device);
 
@@ -634,9 +634,9 @@ static DEVICE_START( tms9902 )
 
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(device->static_config != NULL);
+	assert(device->baseconfig().static_config != NULL);
 
-	tms9902->intf = (const tms9902_interface*)device->static_config;
+	tms9902->intf = (const tms9902_interface*)device->baseconfig().static_config;
 
 	tms9902->clock_rate = tms9902->intf->clock_rate;
 

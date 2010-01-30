@@ -126,7 +126,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*upd7220_command) (const device_config *device);
+typedef void (*upd7220_command) (running_device *device);
 
 typedef struct _upd7220_t upd7220_t;
 struct _upd7220_t
@@ -137,7 +137,7 @@ struct _upd7220_t
 	devcb_resolved_write_line	out_blank_func;
 	upd7220_display_pixels_func display_func;
 
-	const device_config *screen;	/* screen */
+	running_device *screen;	/* screen */
 
 	int clock;						/* device clock */
 
@@ -194,7 +194,7 @@ struct _upd7220_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE upd7220_t *get_safe_token(const device_config *device)
+INLINE upd7220_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -202,11 +202,11 @@ INLINE upd7220_t *get_safe_token(const device_config *device)
 	return (upd7220_t *)device->token;
 }
 
-INLINE const upd7220_interface *get_interface(const device_config *device)
+INLINE const upd7220_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == UPD7220));
-	return (const upd7220_interface *) device->static_config;
+	return (const upd7220_interface *) device->baseconfig().static_config;
 }
 
 INLINE void fifo_clear(upd7220_t *upd7220)
@@ -321,7 +321,7 @@ static void update_vsync_timer(upd7220_t *upd7220, int state)
 
 static TIMER_CALLBACK( vsync_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	upd7220_t *upd7220 = get_safe_token(device);
 
 	if (param)
@@ -360,7 +360,7 @@ static void update_hsync_timer(upd7220_t *upd7220, int state)
 
 static TIMER_CALLBACK( hsync_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	upd7220_t *upd7220 = get_safe_token(device);
 
 	devcb_call_write_line(&upd7220->out_hsync_func, param);
@@ -390,7 +390,7 @@ static void update_blank_timer(upd7220_t *upd7220, int state)
 
 static TIMER_CALLBACK( blank_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	upd7220_t *upd7220 = get_safe_token(device);
 
 	if (param)
@@ -411,7 +411,7 @@ static TIMER_CALLBACK( blank_tick )
     recompute_parameters -
 -------------------------------------------------*/
 
-static void recompute_parameters(const device_config *device)
+static void recompute_parameters(running_device *device)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 
@@ -561,7 +561,7 @@ static int translate_command(UINT8 data)
     process_fifo - process a single byte in FIFO
 -------------------------------------------------*/
 
-static void process_fifo(const device_config *device)
+static void process_fifo(running_device *device)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 	UINT8 data;
@@ -934,7 +934,7 @@ WRITE_LINE_DEVICE_HANDLER( upd7220_lpen_w )
     draw_text_line - draw text scanline
 -------------------------------------------------*/
 
-static void draw_text_line(const device_config *device, bitmap_t *bitmap, UINT32 addr, int y, int wd)
+static void draw_text_line(running_device *device, bitmap_t *bitmap, UINT32 addr, int y, int wd)
 {
 }
 
@@ -950,7 +950,7 @@ INLINE void get_text_partition(upd7220_t *upd7220, int index, UINT32 *sad, UINT1
     update_text - update text mode screen
 -------------------------------------------------*/
 
-static void update_text(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+static void update_text(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 
@@ -977,7 +977,7 @@ static void update_text(const device_config *device, bitmap_t *bitmap, const rec
     draw_graphics_line - draw graphics scanline
 -------------------------------------------------*/
 
-static void draw_graphics_line(const device_config *device, bitmap_t *bitmap, UINT32 addr, int y, int wd)
+static void draw_graphics_line(running_device *device, bitmap_t *bitmap, UINT32 addr, int y, int wd)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -1003,7 +1003,7 @@ INLINE void get_graphics_partition(upd7220_t *upd7220, int index, UINT32 *sad, U
     update_graphics - update graphics mode screen
 -------------------------------------------------*/
 
-static void update_graphics(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+static void update_graphics(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 
@@ -1034,7 +1034,7 @@ static void update_graphics(const device_config *device, bitmap_t *bitmap, const
     upd7220_update - update screen
 -------------------------------------------------*/
 
-void upd7220_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+void upd7220_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 

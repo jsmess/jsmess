@@ -121,25 +121,25 @@ struct _sed1330_t
 	int ov;						/* graphics mode layer composition */
 
 	/* devices */
-	const device_config *screen;
+	running_device *screen;
 };
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE sed1330_t *get_safe_token(const device_config *device)
+INLINE sed1330_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
 	return (sed1330_t *)device->token;
 }
 
-INLINE const sed1330_interface *get_interface(const device_config *device)
+INLINE const sed1330_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == SED1330));
-	return (const sed1330_interface *) device->static_config;
+	return (const sed1330_interface *) device->baseconfig().static_config;
 }
 
 INLINE void increment_csr(sed1330_t *sed1330)
@@ -616,7 +616,7 @@ static void update_text(sed1330_t *sed1330, bitmap_t *bitmap, const rectangle *c
     sed1330_update - update screen
 -------------------------------------------------*/
 
-void sed1330_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+void sed1330_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	sed1330_t *sed1330 = get_safe_token(device);
 

@@ -16,7 +16,7 @@ struct _poly880_state
 	UINT8 segment;
 
 	/* devices */
-	const device_config *cassette;
+	running_device *cassette;
 };
 
 #endif

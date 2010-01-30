@@ -45,14 +45,14 @@ DEVICE_GET_INFO(at45db081);
 DEVICE_GET_INFO(at45db161);
 
 // pins
-void at45dbxx_pin_cs(const device_config *device, int data);
-void at45dbxx_pin_sck(const device_config *device,  int data);
-void at45dbxx_pin_si(const device_config *device,  int data);
-int  at45dbxx_pin_so(const device_config *device);
+void at45dbxx_pin_cs(running_device *device, int data);
+void at45dbxx_pin_sck(running_device *device,  int data);
+void at45dbxx_pin_si(running_device *device,  int data);
+int  at45dbxx_pin_so(running_device *device);
 
 // load/save
-void at45dbxx_load(const device_config *device, mame_file *file);
-void at45dbxx_save(const device_config *device, mame_file *file);
+void at45dbxx_load(running_device *device, mame_file *file);
+void at45dbxx_save(running_device *device, mame_file *file);
 
 // non-volatile ram handler
 //NVRAM_HANDLER( at45dbxx );

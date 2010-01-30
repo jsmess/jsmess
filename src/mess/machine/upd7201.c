@@ -31,7 +31,7 @@ struct _upd7201_state
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE upd7201_state *get_safe_token(const device_config *device)
+INLINE upd7201_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -148,9 +148,9 @@ WRITE_LINE_DEVICE_HANDLER( upd7201_txcb_w )
 static DEVICE_START( upd7201 )
 {
 	upd7201_state *upd7201 = get_safe_token(device);
-	const upd7201_interface *intf = (const upd7201_interface *)device->static_config;
+	const upd7201_interface *intf = (const upd7201_interface *)device->baseconfig().static_config;
 
-	assert(device->static_config != NULL);
+	assert(device->baseconfig().static_config != NULL);
 
 	/* resolve callbacks */
 	devcb_resolve_write_line(&upd7201->out_int_func, &intf->out_int_func, device);

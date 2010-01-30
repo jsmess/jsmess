@@ -32,11 +32,11 @@
 typedef struct _tf20_state tf20_state;
 struct _tf20_state
 {
-	const device_config *ram;
-	const device_config *upd765a;
-	const device_config *upd7201;
-	const device_config *floppy_0;
-	const device_config *floppy_1;
+	running_device *ram;
+	running_device *upd765a;
+	running_device *upd7201;
+	running_device *floppy_0;
+	running_device *floppy_1;
 };
 
 
@@ -44,7 +44,7 @@ struct _tf20_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tf20_state *get_safe_token(const device_config *device)
+INLINE tf20_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -319,25 +319,25 @@ ROM_END
 static DEVICE_START( tf20 )
 {
 	tf20_state *tf20 = get_safe_token(device);
-	const device_config *cpu = device_find_child_by_tag(device, "tf20");
+	running_device *cpu = device->subdevice("tf20");
 
 	cpu_set_irq_callback(cpu, tf20_irq_ack);
 
 	/* ram device */
-	tf20->ram = device_find_child_by_tag(device, "ram");
+	tf20->ram = device->subdevice("ram");
 
 	/* make sure its already running */
 	if (!tf20->ram->started)
 	{
-		device_delay_init(device);
+		//device_delay_init(device);
 		return;
 	}
 
 	/* locate child devices */
-	tf20->upd765a = device_find_child_by_tag(device, "5a");
-	tf20->upd7201 = device_find_child_by_tag(device, "3a");
-	tf20->floppy_0 = device_find_child_by_tag(device, FLOPPY_0);
-	tf20->floppy_1 = device_find_child_by_tag(device, FLOPPY_1);
+	tf20->upd765a = device->subdevice("5a");
+	tf20->upd7201 = device->subdevice("3a");
+	tf20->floppy_0 = device->subdevice(FLOPPY_0);
+	tf20->floppy_1 = device->subdevice(FLOPPY_1);
 
 	/* enable second half of ram */
 	memory_set_bankptr(device->machine, "bank22", messram_get_ptr(tf20->ram) + 0x8000);
@@ -345,7 +345,7 @@ static DEVICE_START( tf20 )
 
 static DEVICE_RESET( tf20 )
 {
-	const device_config *cpu = device_find_child_by_tag(device, "tf20");
+	running_device *cpu = device->subdevice("tf20");
 	const address_space *prg = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 
 	/* enable rom */

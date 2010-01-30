@@ -33,8 +33,8 @@ struct _tiki100_state
 	int keylatch;
 
 	/* devices */
-	const device_config *fd1797;
-	const device_config *z80ctc;
+	running_device *fd1797;
+	running_device *z80ctc;
 };
 
 #endif

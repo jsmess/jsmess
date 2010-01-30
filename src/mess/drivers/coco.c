@@ -694,7 +694,7 @@ INPUT_PORTS_END
   Bitbanger port
 ***************************************************************************/
 
-static int coco_bitbanger_filter(const device_config *img, const int *pulses, int total_pulses, int total_duration)
+static int coco_bitbanger_filter(running_device *img, const int *pulses, int total_pulses, int total_duration)
 {
 	int i;
 	int result = 0;

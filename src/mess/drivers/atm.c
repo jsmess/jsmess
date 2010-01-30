@@ -11,7 +11,7 @@
 #include "devices/messram.h"
 
 static int ROMSelection;
-static const device_config* beta;
+static running_device* beta;
 
 static DIRECT_UPDATE_HANDLER( atm_direct )
 {

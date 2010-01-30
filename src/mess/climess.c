@@ -37,67 +37,6 @@ void mess_display_help(void)
 		"See config.txt and windows.txt for usage instructions.\n");
 }
 
-/* New listmedia is below - left this here just in case.. */
-#if 0
-/*-------------------------------------------------
-    info_listdevices - list all devices in MESS
--------------------------------------------------*/
-
-int info_listdevices(core_options *opts, const char *gamename)
-{
-	int i;
-	machine_config *config;
-	const device_config *dev;
-	image_device_info info;
-	const char *src;
-	const char *driver_name;
-	const char *name;
-	const char *shortname;
-	char paren_shortname[16];
-
-	i = 0;
-
-	mame_printf_info(" SYSTEM      DEVICE NAME (brief)   IMAGE FILE EXTENSIONS SUPPORTED    \n");
-	mame_printf_info("----------  --------------------  ------------------------------------\n");
-
-	while (drivers[i])
-	{
-		if (!core_strwildcmp(gamename, drivers[i]->name))
-		{
-			/* allocate the machine config */
-			config = machine_config_alloc(drivers[i]->machine_config);
-
-			driver_name = drivers[i]->name;
-
-			for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
-			{
-				info = image_device_getinfo(config, dev);
-
-				src = info.file_extensions;
-				name = info.instance_name;
-				shortname = info.brief_instance_name;
-
-				sprintf(paren_shortname, "(%s)", shortname);
-
-				mame_printf_info("%-13s%-12s%-8s   ", driver_name, name, paren_shortname);
-				driver_name = " ";
-
-				while (src && *src)
-				{
-					mame_printf_info(".%-5s", src);
-					src += strlen(src) + 1;
-				}
-				mame_printf_info("\n");
-			}
-			machine_config_free(config);
-		}
-		i++;
-	}
-	return 0;
-}
-#endif
-
-
 /*-------------------------------------------------
     cli_info_listdevices - output the list of
     devices referenced by a given game or set of
@@ -109,7 +48,7 @@ int info_listmedia(core_options *options, const char *gamename)
 	int count = 0, devcount;
 	int drvindex;
 	machine_config *config;
-	const device_config *dev;
+	device_config *dev;
 	image_device_info info;
 	const char *src;
 	const char *driver_name;
@@ -131,26 +70,29 @@ int info_listmedia(core_options *options, const char *gamename)
 
 			devcount = 0;
 
-			for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
+			for (dev = config->devicelist.first(); dev != NULL; dev = dev->next)
 			{
-				info = image_device_getinfo(config, dev);
+				if (is_image_device(dev))
+				{				
+					info = image_device_getinfo(config, dev);
 
-				src = info.file_extensions;
-				name = info.instance_name;
-				shortname = info.brief_instance_name;
+					src = info.file_extensions;
+					name = info.instance_name;
+					shortname = info.brief_instance_name;
 
-				sprintf(paren_shortname, "(%s)", shortname);
+					sprintf(paren_shortname, "(%s)", shortname);
 
-				printf("%-13s%-12s%-8s   ", driver_name, name, paren_shortname);
-				driver_name = " ";
+					printf("%-13s%-12s%-8s   ", driver_name, name, paren_shortname);
+					driver_name = " ";
 
-				while (src && *src)
-				{
-					printf(".%-5s", src);
-					src += strlen(src) + 1;
-					devcount++;
+					while (src && *src)
+					{
+						printf(".%-5s", src);
+						src += strlen(src) + 1;
+						devcount++;
+					}
+					printf("\n");
 				}
-				printf("\n");
 			}
 			if (!devcount)
 				printf("%-13s(none)\n",driver_name);

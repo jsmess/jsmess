@@ -38,7 +38,7 @@ struct _e0516_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE e0516_t *get_safe_token(const device_config *device)
+INLINE e0516_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -55,7 +55,7 @@ INLINE e0516_t *get_safe_token(const device_config *device)
 
 static TIMER_CALLBACK( clock_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	e0516_t *e0516 = get_safe_token(device);
 
 	e0516->reg[E0516_REGISTER_SECOND]++;

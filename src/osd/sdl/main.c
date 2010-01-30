@@ -14,6 +14,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <tchar.h>
+#include <stdlib.h>
 
 // MAMEOS headers
 #include "strconv.h"
@@ -44,7 +45,7 @@ extern "C" int _tmain(int argc, TCHAR **argv)
 #endif
 
 	/* convert arguments to UTF-8 */
-	utf8_argv = (char **) malloc(argc * sizeof(*argv));
+	utf8_argv = (char **) osd_malloc(argc * sizeof(*argv));
 	if (utf8_argv == NULL)
 		return 999;
 	for (i = 0; i < argc; i++)
@@ -60,7 +61,7 @@ extern "C" int _tmain(int argc, TCHAR **argv)
 	/* free arguments */
 	for (i = 0; i < argc; i++)
 		free(utf8_argv[i]);
-	free(utf8_argv);
+	osd_free(utf8_argv);
 
 #ifdef MALLOC_DEBUG
 	{

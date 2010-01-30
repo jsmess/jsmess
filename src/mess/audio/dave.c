@@ -96,7 +96,7 @@ struct _dave_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE dave_t *get_token(const device_config *device)
+INLINE dave_t *get_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(sound_get_type(device) == SOUND_DAVE);
@@ -105,11 +105,11 @@ INLINE dave_t *get_token(const device_config *device)
 
 
 
-INLINE const dave_interface *get_interface(const device_config *device)
+INLINE const dave_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert(sound_get_type(device) == SOUND_DAVE);
-	return (const dave_interface *) device->static_config;
+	return (const dave_interface *) device->baseconfig().static_config;
 }
 
 
@@ -117,7 +117,7 @@ INLINE const dave_interface *get_interface(const device_config *device)
     PROTOTYPES
 ***************************************************************************/
 
-static void dave_set_external_int_state(const device_config *device, int IntID, int State);
+static void dave_set_external_int_state(running_device *device, int IntID, int State);
 static TIMER_CALLBACK(dave_1khz_callback);
 static STREAM_UPDATE(dave_update_sound);
 
@@ -196,7 +196,7 @@ static DEVICE_RESET( dave_sound )
     dave_refresh_ints
 -------------------------------------------------*/
 
-static void dave_refresh_ints(const device_config *device)
+static void dave_refresh_ints(running_device *device)
 {
 	dave_t *dave = get_token(device);
 	int int_wanted;
@@ -212,7 +212,7 @@ static void dave_refresh_ints(const device_config *device)
     dave_refresh_selectable_int
 -------------------------------------------------*/
 
-static void dave_refresh_selectable_int(const device_config *device)
+static void dave_refresh_selectable_int(running_device *device)
 {
 	dave_t *dave = get_token(device);
 
@@ -258,7 +258,7 @@ static void dave_refresh_selectable_int(const device_config *device)
 
 static TIMER_CALLBACK(dave_1khz_callback)
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	dave_t *dave = get_token(device);
 
 	/* time over - want int */
@@ -658,7 +658,7 @@ WRITE8_DEVICE_HANDLER ( dave_reg_w )
     dave_set_reg
 -------------------------------------------------*/
 
-void dave_set_reg(const device_config *device, offs_t offset, UINT8 data)
+void dave_set_reg(running_device *device, offs_t offset, UINT8 data)
 {
 	dave_t *dave = get_token(device);
 	dave->Regs[offset & 0x01f] = data;
@@ -722,7 +722,7 @@ READ8_DEVICE_HANDLER( dave_reg_r )
     triggered
 -------------------------------------------------*/
 
-static void dave_set_external_int_state(const device_config *device, int IntID, int State)
+static void dave_set_external_int_state(running_device *device, int IntID, int State)
 {
 	dave_t *dave = get_token(device);
 

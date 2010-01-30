@@ -349,7 +349,7 @@ VIDEO_START( arcadia )
 	}
 
 	{
-		const device_config *screen = video_screen_first(machine->config);
+		running_device *screen = video_screen_first(machine);
 		int width = video_screen_get_width(screen);
 		int height = video_screen_get_height(screen);
 		arcadia_video.bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
@@ -643,7 +643,7 @@ static void arcadia_draw_sprites(running_machine *machine, bitmap_t *bitmap)
 
 INTERRUPT_GEN( arcadia_video_line )
 {
-	const device_config *screen = video_screen_first(device->machine->config);
+	running_device *screen = video_screen_first(device->machine);
 	int width = video_screen_get_width(screen);
 
 	if (arcadia_video.ad_delay<=0)

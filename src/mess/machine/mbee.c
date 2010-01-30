@@ -14,11 +14,11 @@
 
 static UINT8 mbee_vsync;
 static UINT8 fdc_status = 0;
-static const device_config *mbee_fdc;
-static const device_config *mbee_z80pio;
-static const device_config *mbee_speaker;
-static const device_config *mbee_cassette;
-static const device_config *mbee_printer;
+static running_device *mbee_fdc;
+static running_device *mbee_z80pio;
+static running_device *mbee_speaker;
+static running_device *mbee_cassette;
+static running_device *mbee_printer;
 
 /***********************************************************
 
@@ -224,7 +224,7 @@ INTERRUPT_GEN( mbee_interrupt )
 
 Z80BIN_EXECUTE( mbee )
 {
-	const device_config *cpu = devtag_get_device(machine, "maincpu");
+	running_device *cpu = devtag_get_device(machine, "maincpu");
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_write_word_16le(space, 0xa6, execute_address);			/* fix the EXEC command */
@@ -242,7 +242,7 @@ Z80BIN_EXECUTE( mbee )
 
 QUICKLOAD_LOAD( mbee )
 {
-	const device_config *cpu = devtag_get_device(image->machine, "maincpu");
+	running_device *cpu = devtag_get_device(image->machine, "maincpu");
 	const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 i, j;
 	UINT8 data, sw = input_port_read(image->machine, "CONFIG") & 1;	/* reading the dipswitch: 1 = autorun */

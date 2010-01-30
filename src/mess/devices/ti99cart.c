@@ -13,7 +13,7 @@
 #include "machine/ti99_4x.h"
 #include "multcart.h"
 
-typedef int assmfct(const device_config *);
+typedef int assmfct(running_device *);
 
 enum
 {
@@ -84,9 +84,9 @@ typedef enum _slotc_type_t
 } slotc_type_t;
 
 /* Function declaration; the function itself is in the later part of this file. */
-static UINT8 cartridge_grom_read_legacy(const device_config *cartsys, int cart_offset);
-static void unload_legacy(const device_config *image);
-static int load_legacy(const device_config *image);
+static UINT8 cartridge_grom_read_legacy(running_device *cartsys, int cart_offset);
+static void unload_legacy(running_device *image);
+static int load_legacy(running_device *image);
 
 /* Access to the pcb. Contained in the token of the pcb instance. */
 struct _ti99_pcb_t
@@ -120,7 +120,7 @@ struct _ti99_pcb_t
 };
 typedef struct _ti99_pcb_t ti99_pcb_t;
 
-static int in_legacy_mode(const device_config *device)
+static int in_legacy_mode(running_device *device)
 {
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)device->token;
 	if ((cartslots->legacy_slots>0) &&  (cartslots->multi_slots==0))
@@ -164,7 +164,7 @@ static int in_legacy_mode(const device_config *device)
     Interestingly, cartridge subroutines are found nevertheless, even when
     the cartridge is plugged into a higher slot.
 */
-void ti99_cartridge_slot_set(const device_config *cartsys, int slotnumber)
+void ti99_cartridge_slot_set(running_device *cartsys, int slotnumber)
 {
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
 	assert(slotnumber>=0 && slotnumber<=255);
@@ -180,14 +180,14 @@ void ti99_cartridge_slot_set(const device_config *cartsys, int slotnumber)
     Called from the machine driver, taking the dipswitch setting.
     We take slot numbers from 0 (automatic mode) to the maximum.
 */
-void ti99_lock_cartridge_slot(const device_config *cartsys, int slotnumber)
+void ti99_lock_cartridge_slot(running_device *cartsys, int slotnumber)
 {
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
 	assert(slotnumber>=0 && slotnumber<=255);
 	cartslots->fixed_slot = slotnumber-1; /* auto = -1 */
 }
 
-static int slot_is_empty(const device_config *cartsys, int slotnumber)
+static int slot_is_empty(running_device *cartsys, int slotnumber)
 {
 	cartridge_t *cart;
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
@@ -199,7 +199,7 @@ static int slot_is_empty(const device_config *cartsys, int slotnumber)
 	return FALSE;
 }
 
-static void clear_slot(const device_config *cartsys, int slotnumber)
+static void clear_slot(running_device *cartsys, int slotnumber)
 {
 	cartridge_t *cart;
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
@@ -227,7 +227,7 @@ static void clear_slot(const device_config *cartsys, int slotnumber)
     Note that the GROM access mechanism is identical for all cartridge
     types.
 */
-UINT8 ti99_cartridge_grom_read(const device_config *device, int cart_offset)
+UINT8 ti99_cartridge_grom_read(running_device *device, int cart_offset)
 {
 	UINT8 value;
 	int slot;
@@ -289,7 +289,7 @@ UINT8 ti99_cartridge_grom_read(const device_config *device, int cart_offset)
     <name><number>, i.e. the number is the longest string from the right
     which can be interpreted as a number.
 */
-static int get_index_from_tagname(const device_config *image)
+static int get_index_from_tagname(running_device *image)
 {
 	const char *tag = image->tag;
 	int maxlen = strlen(tag);
@@ -303,11 +303,11 @@ static int get_index_from_tagname(const device_config *image)
 /*
     Common routine to assemble cartridges from resources.
 */
-static cartridge_t *assemble_common(const device_config *cartslot)
+static cartridge_t *assemble_common(running_device *cartslot)
 {
 	/* Pointer to the cartridge structure. */
 	cartridge_t *cartridge;
-	const device_config *cartsys = cartslot->owner;
+	running_device *cartsys = cartslot->owner;
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
 
 	void *socketcont;
@@ -381,21 +381,21 @@ static cartridge_t *assemble_common(const device_config *cartslot)
 	return cartridge;
 }
 
-static void set_pointers(const device_config *pcb, int index)
+static void set_pointers(running_device *pcb, int index)
 {
-	const device_config *cartsys = pcb->owner->owner;
+	running_device *cartsys = pcb->owner->owner;
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
 	ti99_pcb_t *pcb_def = (ti99_pcb_t *)pcb->token;
 
-	pcb_def->read = (read16_device_func) device_get_info_fct(pcb, TI99CARTINFO_FCT_6000_R);
-	pcb_def->write = (write16_device_func) device_get_info_fct(pcb, TI99CARTINFO_FCT_6000_W);
-	pcb_def->read8 = (read8_device_func) device_get_info_fct(pcb, TI99CARTINFO_FCT_6000_R8);
-	pcb_def->write8 = (write8_device_func) device_get_info_fct(pcb, TI99CARTINFO_FCT_6000_W8);
-	pcb_def->cruread = (read8_device_func) device_get_info_fct(pcb, TI99CARTINFO_FCT_CRU_R);
-	pcb_def->cruwrite = (write8_device_func) device_get_info_fct(pcb, TI99CARTINFO_FCT_CRU_W);
+	pcb_def->read = (read16_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_6000_R);
+	pcb_def->write = (write16_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_6000_W);
+	pcb_def->read8 = (read8_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_6000_R8);
+	pcb_def->write8 = (write8_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_6000_W8);
+	pcb_def->cruread = (read8_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_CRU_R);
+	pcb_def->cruwrite = (write8_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_CRU_W);
 
-	pcb_def->assemble = (assmfct *)device_get_info_fct(pcb, TI99CART_FCT_ASSM);
-	pcb_def->disassemble = (assmfct *)device_get_info_fct(pcb, TI99CART_FCT_DISASSM);
+	pcb_def->assemble = (assmfct *)pcb->get_config_fct(TI99CART_FCT_ASSM);
+	pcb_def->disassemble = (assmfct *)pcb->get_config_fct(TI99CART_FCT_DISASSM);
 
 	pcb_def->cartridge = &cartslots->cartridge[index];
 	pcb_def->cartridge->pcb = pcb;
@@ -489,7 +489,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_std8 )
     The standard cartridge assemble routine. We just call the common
     function here.
 */
-static int assemble_std(const device_config *image)
+static int assemble_std(running_device *image)
 {
 	cartridge_t *cart;
 //  printf("assemble_std, %s\n", image->tag);
@@ -505,12 +505,12 @@ static int assemble_std(const device_config *image)
     As it seems, we can use the same function for the disassembling of all
     cartridge types.
 */
-static int disassemble_std(const device_config *image)
+static int disassemble_std(running_device *image)
 {
 	int slotnumber;
 	int i;
 	cartridge_t *cart;
-	const device_config *cartsys = image->owner;
+	running_device *cartsys = image->owner;
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
 
 	slotnumber = get_index_from_tagname(image)-1;
@@ -654,7 +654,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_paged8 )
 /*
     We require paged modules to have at least those two rom banks.
 */
-static int assemble_paged(const device_config *image)
+static int assemble_paged(running_device *image)
 {
 	cartridge_t *cart;
 
@@ -824,7 +824,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_minimem8 )
 }
 
 
-static int assemble_minimem(const device_config *image)
+static int assemble_minimem(running_device *image)
 {
 	cartridge_t *cart;
 
@@ -1037,7 +1037,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_super8 )
 }
 
 
-static int assemble_super(const device_config *image)
+static int assemble_super(running_device *image)
 {
 	cartridge_t *cart;
 //  printf("assemble_super, %s\n", image->tag);
@@ -1161,7 +1161,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_mbx8 )
 }
 
 
-static int assemble_mbx(const device_config *image)
+static int assemble_mbx(running_device *image)
 {
 	cartridge_t *cart;
 
@@ -1334,7 +1334,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_paged379i8 )
 /*
     Paged379i modules have one EPROM dump.
 */
-static int assemble_paged379i(const device_config *image)
+static int assemble_paged379i(running_device *image)
 {
 	cartridge_t *cart;
 
@@ -1498,7 +1498,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_cru_paged )
 /*
     Pagedcru modules have one EPROM dump.
 */
-static int assemble_pagedcru(const device_config *image)
+static int assemble_pagedcru(running_device *image)
 {
 	cartridge_t *cart;
 
@@ -1854,9 +1854,7 @@ static DEVICE_START( ti99_cartridge )
 	astring tempstring;
 
 	/* find the PCB device */
-	cart->pcb_device = devtag_get_device(
-		device->machine,
-		device_build_tag(tempstring, device, TAG_PCB));
+	cart->pcb_device = device->subdevice(TAG_PCB);
 }
 
 /*
@@ -1866,8 +1864,8 @@ static DEVICE_START( ti99_cartridge )
 */
 static DEVICE_IMAGE_LOAD( ti99_cartridge )
 {
-	const device_config *pcbdev = cartslot_get_pcb(image);
-	const device_config *cartsys = image->owner;
+	running_device *pcbdev = cartslot_get_pcb(image);
+	running_device *cartsys = image->owner;
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
 
 	int result;
@@ -1918,7 +1916,7 @@ static DEVICE_IMAGE_LOAD( ti99_cartridge )
 */
 static DEVICE_IMAGE_UNLOAD( ti99_cartridge )
 {
-	const device_config *pcbdev;
+	running_device *pcbdev;
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)image->owner->token;
 
 	if (image->token == NULL)
@@ -1979,7 +1977,7 @@ static DEVICE_IMAGE_UNLOAD( ti99_cartridge )
   - Both modes may change on plugging and unplugging.
 ******************************************************************************/
 
-static UINT8 cartridge_grom_read_legacy(const device_config *cartsys, int cart_offset)
+static UINT8 cartridge_grom_read_legacy(running_device *cartsys, int cart_offset)
 {
 	int slot;
 	cartridge_t *cartridge;
@@ -2216,9 +2214,9 @@ static WRITE8_DEVICE_HANDLER( ti99_cart_w_legacy8 )
 }
 
 
-static int load_legacy(const device_config *image)
+static int load_legacy(running_device *image)
 {
-	const device_config *cartsys = image->owner;
+	running_device *cartsys = image->owner;
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
 
 	/* Some comments originally in machine/ti99_4x.c */
@@ -2434,10 +2432,10 @@ static int load_legacy(const device_config *image)
 	return INIT_PASS;
 }
 
-static void unload_legacy(const device_config *image)
+static void unload_legacy(running_device *image)
 {
 	int i;
-	const device_config *cartsys = image->owner;
+	running_device *cartsys = image->owner;
 
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
 

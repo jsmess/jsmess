@@ -44,9 +44,9 @@ struct _bw2_state
 	UINT8 *video_ram;
 
 	/* devices */
-	const device_config *msm8251;
-	const device_config *msm6255;
-	const device_config *centronics;
+	running_device *msm8251;
+	running_device *msm6255;
+	running_device *centronics;
 };
 
 #endif

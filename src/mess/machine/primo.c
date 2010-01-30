@@ -105,7 +105,7 @@ READ8_HANDLER( primo_be_1_r )
 READ8_HANDLER( primo_be_2_r )
 {
 	UINT8 data = 0xff;
-	const device_config *serbus = devtag_get_device(space->machine, "serial_bus");
+	running_device *serbus = devtag_get_device(space->machine, "serial_bus");
 
 	// bit 7, 6 - not used
 
@@ -135,7 +135,7 @@ READ8_HANDLER( primo_be_2_r )
 
 WRITE8_HANDLER( primo_ki_1_w )
 {
-	const device_config *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = devtag_get_device(space->machine, "speaker");
 	// bit 7 - NMI generator enable/disable
 	primo_nmi = (data & 0x80) ? 1 : 0;
 
@@ -172,7 +172,7 @@ WRITE8_HANDLER( primo_ki_1_w )
 
 WRITE8_HANDLER( primo_ki_2_w )
 {
-	const device_config *serbus = devtag_get_device(space->machine, "serial_bus");
+	running_device *serbus = devtag_get_device(space->machine, "serial_bus");
 
 	// bit 7, 6 - not used
 
@@ -269,7 +269,7 @@ MACHINE_RESET( primob )
 static void primo_setup_pss (running_machine *machine, UINT8* snapshot_data, UINT32 snapshot_size)
 {
 	int i;
-	const device_config *speaker = devtag_get_device(machine, "speaker");
+	running_device *speaker = devtag_get_device(machine, "speaker");
 
 	/* Z80 registers */
 

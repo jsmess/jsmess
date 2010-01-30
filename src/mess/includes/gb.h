@@ -55,7 +55,7 @@ WRITE8_HANDLER( gb_ie_w );
 DEVICE_START(gb_cart);
 DEVICE_IMAGE_LOAD(gb_cart);
 INTERRUPT_GEN( gb_scanline_interrupt );
-void gb_timer_callback(const device_config *device, int cycles);
+void gb_timer_callback(running_device *device, int cycles);
 WRITE8_HANDLER( gbc_io2_w );
 READ8_HANDLER( gbc_io2_r );
 MACHINE_START( gb );

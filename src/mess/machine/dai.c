@@ -30,7 +30,7 @@ UINT8 dai_osc_volume[3];
 static UINT8 dai_paddle_select;
 static UINT8 dai_paddle_enable;
 static UINT8 dai_cassette_motor[2];
-static const device_config *dai_tms5501;
+static running_device *dai_tms5501;
 
 
 /* Memory */
@@ -53,7 +53,7 @@ static TIMER_CALLBACK(dai_bootstrap_callback)
 
 static UINT8 dai_keyboard_scan_mask = 0;
 
-static UINT8 dai_keyboard_read (const device_config *device)
+static UINT8 dai_keyboard_read (running_device *device)
 {
 	UINT8 data = 0x00;
 	int i;
@@ -67,12 +67,12 @@ static UINT8 dai_keyboard_read (const device_config *device)
 	return data;
 }
 
-static void dai_keyboard_write (const device_config *device, UINT8 data)
+static void dai_keyboard_write (running_device *device, UINT8 data)
 {
 	dai_keyboard_scan_mask = data;
 }
 
-static void dai_interrupt_callback(const device_config *device, int intreq, UINT8 vector)
+static void dai_interrupt_callback(running_device *device, int intreq, UINT8 vector)
 {
 	if (intreq)
 		cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE, vector);

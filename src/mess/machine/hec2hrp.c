@@ -46,7 +46,7 @@
 static void Mise_A_Jour_Etat(int Adresse, int Value );
 static void Update_Sound(const address_space *space, UINT8 data);
 
-static const device_config *cassette_device_image(running_machine *machine);
+static running_device *cassette_device_image(running_machine *machine);
 
 /* Stat for the register in 0x3000*/
 static UINT8 state3000=0;
@@ -296,7 +296,7 @@ static int counter_write=0; /* Attente de quelque cycles avant demettre en route
 }
 WRITE8_HANDLER( hector_color_b_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = devtag_get_device(space->machine, "discrete");
        	hector_color[1] =  data        & 0x07;
 	hector_color[3] = (data >> 3)  & 0x07;
 
@@ -312,7 +312,7 @@ WRITE8_HANDLER( hector_color_b_w )
  Cassette Handling
 ******************************************************************************/
 
-static const device_config *cassette_device_image(running_machine *machine)
+static running_device *cassette_device_image(running_machine *machine)
 {
 	return devtag_get_device(machine, "cassette");
 }
@@ -558,7 +558,7 @@ static void Init_Value_SN76477_Hector(void)
 void Update_Sound(const address_space *space, UINT8 data)
 {
 	/* keep device*/
-	const device_config *sn76477 = devtag_get_device(space->machine, "sn76477");
+	running_device *sn76477 = devtag_get_device(space->machine, "sn76477");
 
 	/* MIXER*/
 	sn76477_mixer_a_w(sn76477, ((ValMixer & 0x04)==4) ? 1 : 0);

@@ -173,7 +173,7 @@ struct _tms32025_state
 	int		mHackIgnoreARP;			 /* special handling for lst, lst1 instructions */
 	int		waiting_for_serial_frame;
 
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *data;
 	const address_space *io;
@@ -182,7 +182,7 @@ struct _tms32025_state
 	UINT16 *datamap[0x200];
 };
 
-INLINE tms32025_state *get_safe_token(const device_config *device)
+INLINE tms32025_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -2327,15 +2327,15 @@ CPU_GET_INFO( tms32025 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1*CLK;						break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 5*CLK;						break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -1;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = -1;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 17;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = -1;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = -1;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 16;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 16;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = -1;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 16;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 17;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = -1;					break;
 
 		case CPUINFO_INT_INPUT_STATE + TMS32025_INT0:		info->i = (cpustate->IFR & 0x01) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + TMS32025_INT1:		info->i = (cpustate->IFR & 0x02) ? ASSERT_LINE : CLEAR_LINE; break;

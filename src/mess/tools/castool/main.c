@@ -8,6 +8,9 @@
 
 ***************************************************************************/
 
+#ifdef WIN32
+#include "winutils.h"
+#endif
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -18,9 +21,6 @@
 #include "emu.h"
 #include "mess.h"
 #include "fileio.h"
-#ifdef WIN32
-#include "winutils.h"
-#endif
 
 #include "devices/cassette.h"
 
@@ -125,11 +125,7 @@ static void display_formats(void)
 	}
 }
 
-#ifdef WIN32
-int CLIB_DECL utf8_main(int argc, char *argv[])
-#else
 int CLIB_DECL main(int argc, char *argv[])
-#endif
 {
 	int i;
 	int found =0;
@@ -137,7 +133,7 @@ int CLIB_DECL main(int argc, char *argv[])
 	cassette_image *cassette;
 	FILE *f;
 #ifdef WIN32
-	win_expand_wildcards(&argc, &argv);
+	//win_expand_wildcards(&argc, &argv);
 #endif /* WIN32 */
 
 	if (argc > 1)

@@ -16,7 +16,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*online_func)(const device_config *device, int state);
+typedef void (*online_func)(running_device *device, int state);
 
 typedef struct _printer_config printer_config;
 struct _printer_config
@@ -40,10 +40,10 @@ struct _printer_config
 ***************************************************************************/
 
 /* checks to see if a printer is ready */
-int printer_is_ready(const device_config *printer);
+int printer_is_ready(running_device *printer);
 
 /* outputs data to a printer */
-void printer_output(const device_config *printer, UINT8 data);
+void printer_output(running_device *printer, UINT8 data);
 
 /* device getinfo function */
 DEVICE_GET_INFO(printer);

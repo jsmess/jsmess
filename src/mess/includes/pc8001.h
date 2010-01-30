@@ -21,12 +21,12 @@ struct _pc8001_state
 	int color;
 
 	/* devices */
-	const device_config *i8257;
-	const device_config *upd1990a;
-	const device_config *upd3301;
-	const device_config *cassette;
-	const device_config *centronics;
-	const device_config *speaker;
+	running_device *i8257;
+	running_device *upd1990a;
+	running_device *upd3301;
+	running_device *cassette;
+	running_device *centronics;
+	running_device *speaker;
 };
 
 #endif

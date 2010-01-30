@@ -81,7 +81,7 @@ struct _c2040_unit_t
 	int bit_pos;							/* bit position within track buffer byte */
 
 	/* devices */
-	const device_config *image;
+	running_device *image;
 };
 
 typedef struct _c2040_t c2040_t;
@@ -113,13 +113,13 @@ struct _c2040_t
 	int rw;								/* read/write select */
 
 	/* devices */
-	const device_config *cpu_dos;
-	const device_config *cpu_fdc;
-	const device_config *riot0;
-	const device_config *riot1;
-	const device_config *miot;
-	const device_config *via;
-	const device_config *bus;
+	running_device *cpu_dos;
+	running_device *cpu_fdc;
+	running_device *riot0;
+	running_device *riot1;
+	running_device *miot;
+	running_device *via;
+	running_device *bus;
 
 	/* timers */
 	emu_timer *bit_timer;
@@ -129,7 +129,7 @@ struct _c2040_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE c2040_t *get_safe_token(const device_config *device)
+INLINE c2040_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -138,15 +138,15 @@ INLINE c2040_t *get_safe_token(const device_config *device)
 	return (c2040_t *)device->token;
 }
 
-INLINE c2040_config *get_safe_config(const device_config *device)
+INLINE c2040_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == C2040) || (device->type == C3040) || (device->type == C4040) || 
 		(device->type == C8050) || (device->type == C8250) || (device->type == SFD1001));
-	return (c2040_config *)device->inline_config;
+	return (c2040_config *)device->baseconfig().inline_config;
 }
 
-INLINE void update_ieee_signals(const device_config *device)
+INLINE void update_ieee_signals(running_device *device)
 {
 	c2040_t *c2040 = get_safe_token(device);
 
@@ -235,7 +235,7 @@ INLINE void update_gcr_data(c2040_t *c2040)
 
 static TIMER_CALLBACK( bit_tick )
 {
-	const device_config *device = (device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	c2040_t *c2040 = get_safe_token(device);
 	int ready = 1;
 
@@ -307,7 +307,7 @@ WRITE_LINE_DEVICE_HANDLER( c2040_ieee488_ifc_w )
 {
 	if (!state)
 	{
-		device_reset(device);
+		device->reset();
 	}
 }
 
@@ -898,7 +898,7 @@ static const via6522_interface c8050_via_intf =
     mos6530_interface miot_intf uk3
 -------------------------------------------------*/
 
-static UINT8 pi_r(const device_config *device, UINT8 olddata)
+static UINT8 pi_r(running_device *device, UINT8 olddata)
 {
 	/*
 
@@ -920,7 +920,7 @@ static UINT8 pi_r(const device_config *device, UINT8 olddata)
 	return c2040->pi;
 }
 
-static void pi_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+static void pi_w(running_device *device, UINT8 newdata, UINT8 olddata)
 {
 	/*
 
@@ -942,7 +942,7 @@ static void pi_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 	c2040->pi = newdata;
 }
 
-static UINT8 miot_pb_r(const device_config *device, UINT8 olddata)
+static UINT8 miot_pb_r(running_device *device, UINT8 olddata)
 {
 	/*
 
@@ -972,7 +972,7 @@ static UINT8 miot_pb_r(const device_config *device, UINT8 olddata)
 	return data;
 }
 
-static void miot_pb_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+static void miot_pb_w(running_device *device, UINT8 newdata, UINT8 olddata)
 {
 	/*
 
@@ -1019,7 +1019,7 @@ static const miot6530_interface miot_intf =
     mos6530_interface c8050_miot_intf uk3
 -------------------------------------------------*/
 
-static UINT8 c8050_miot_pb_r(const device_config *device, UINT8 olddata)
+static UINT8 c8050_miot_pb_r(running_device *device, UINT8 olddata)
 {
 	/*
 
@@ -1049,7 +1049,7 @@ static UINT8 c8050_miot_pb_r(const device_config *device, UINT8 olddata)
 	return data;
 }
 
-static void c8050_miot_pb_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+static void c8050_miot_pb_w(running_device *device, UINT8 newdata, UINT8 olddata)
 {
 	/*
 
@@ -1404,40 +1404,40 @@ static DEVICE_START( c2040 )
 	c2040->address = config->address - 8;
 
 	/* find our CPU */
-	c2040->cpu_dos = device_find_child_by_tag(device, M6502_TAG);
-	c2040->cpu_fdc = device_find_child_by_tag(device, M6504_TAG);
+	c2040->cpu_dos = device->subdevice(M6502_TAG);
+	c2040->cpu_fdc = device->subdevice(M6504_TAG);
 
 	/* find devices */
-	c2040->riot0 = device_find_child_by_tag(device, M6532_0_TAG);
-	c2040->riot1 = device_find_child_by_tag(device, M6532_1_TAG);
-	c2040->miot = device_find_child_by_tag(device, M6530_TAG);
-	c2040->via = device_find_child_by_tag(device, M6522_TAG);
+	c2040->riot0 = device->subdevice(M6532_0_TAG);
+	c2040->riot1 = device->subdevice(M6532_1_TAG);
+	c2040->miot = device->subdevice(M6530_TAG);
+	c2040->via = device->subdevice(M6522_TAG);
 	c2040->bus = devtag_get_device(device->machine, config->bus_tag);
-	c2040->unit[0].image = device_find_child_by_tag(device, FLOPPY_0);
-	c2040->unit[1].image = device_find_child_by_tag(device, FLOPPY_1);
+	c2040->unit[0].image = device->subdevice(FLOPPY_0);
+	c2040->unit[1].image = device->subdevice(FLOPPY_1);
 
 	/* find GCR ROM */
-	astring region_name;
+	running_device *region_dev = NULL;
 
 	if ((device->type == C2040) || (device->type == C3040))
 	{
-		device_build_tag(region_name, device, C2040_REGION);
+		region_dev = device->subdevice(C2040_REGION);
 	}
 	else if (device->type == C4040)
 	{
-		device_build_tag(region_name, device, C4040_REGION);
+		region_dev = device->subdevice(C4040_REGION);
 	}
 	else if ((device->type == C8050) || (device->type == C8250))
 	{
-		device_build_tag(region_name, device, C8050_REGION);
+		region_dev = device->subdevice(C8050_REGION);
 	}
 	else if (device->type == SFD1001)
 	{
-		device_build_tag(region_name, device, SFD1001_REGION);
+		region_dev = device->subdevice(SFD1001_REGION);
 	}
 
-	c2040->gcr = memory_region(device->machine, region_name.cstr()) + 
-		memory_region_length(device->machine, region_name.cstr()) - 0x800;
+	c2040->gcr = memory_region(device->machine, region_dev->tag.cstr()) + 
+		memory_region_length(device->machine, region_dev->tag.cstr()) - 0x800;
 
 	/* allocate data timer */
 	c2040->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
@@ -1455,12 +1455,12 @@ static DEVICE_RESET( c2040 )
 	c2040_t *c2040 = get_safe_token(device);
 
 	/* reset devices */
-	device_reset(c2040->cpu_dos);
-	device_reset(c2040->cpu_fdc);
-	device_reset(c2040->riot0);
-	device_reset(c2040->riot1);
-	device_reset(c2040->miot);
-	device_reset(c2040->via);
+	c2040->cpu_dos->reset();
+	c2040->cpu_fdc->reset();
+	c2040->riot0->reset();
+	c2040->riot1->reset();
+	c2040->miot->reset();
+	c2040->via->reset();
 
 	/* toggle SO */
 	cpu_set_input_line(c2040->cpu_dos, M6502_SET_OVERFLOW, ASSERT_LINE);

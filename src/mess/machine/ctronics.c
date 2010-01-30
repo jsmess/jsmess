@@ -25,7 +25,7 @@ static TIMER_CALLBACK( busy_callback );
 typedef struct _centronics_state centronics_state;
 struct _centronics_state
 {
-	const device_config *printer;
+	running_device *printer;
 
 	devcb_resolved_write_line out_ack_func;
 	devcb_resolved_write_line out_busy_func;
@@ -46,7 +46,7 @@ struct _centronics_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE centronics_state *get_safe_token(const device_config *device)
+INLINE centronics_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -86,10 +86,10 @@ MACHINE_DRIVER_END
 static DEVICE_START( centronics )
 {
 	centronics_state *centronics = get_safe_token(device);
-	const centronics_interface *intf = (const centronics_interface *)device->static_config;
+	const centronics_interface *intf = (const centronics_interface *)device->baseconfig().static_config;
 
 	/* validate some basic stuff */
-	assert(device->static_config != NULL);
+	assert(device->baseconfig().static_config != NULL);
 
 	/* set some initial values */
 	centronics->pe = FALSE;
@@ -98,7 +98,7 @@ static DEVICE_START( centronics )
 	centronics->strobe = TRUE;
 
 	/* get printer device */
-	centronics->printer = device_find_child_by_tag(device, "printer");
+	centronics->printer = device->subdevice("printer");
 
 	/* resolve callbacks */
 	devcb_resolve_write_line(&centronics->out_ack_func, &intf->out_ack_func, device);
@@ -153,7 +153,7 @@ DEVICE_GET_INFO( centronics )
     sets us busy when the printer goes offline
 -------------------------------------------------*/
 
-void centronics_printer_online(const device_config *device, int state)
+void centronics_printer_online(running_device *device, int state)
 {
 	centronics_state *centronics = get_safe_token(device->owner);
 
@@ -231,7 +231,7 @@ READ8_DEVICE_HANDLER( centronics_data_r )
     set_line - helper to set individual bits
 -------------------------------------------------*/
 
-static void set_line(const device_config *device, int line, int state)
+static void set_line(running_device *device, int line, int state)
 {
 	centronics_state *centronics = get_safe_token(device);
 
@@ -283,7 +283,7 @@ WRITE_LINE_DEVICE_HANDLER( centronics_strobe_w )
 
 WRITE_LINE_DEVICE_HANDLER( centronics_prime_w )
 {
-	assert(((const centronics_interface *)device->static_config)->is_ibmpc == FALSE);
+	assert(((const centronics_interface *)device->baseconfig().static_config)->is_ibmpc == FALSE);
 
 	/* reset printer if line is low */
 	if (state == FALSE)
@@ -298,7 +298,7 @@ WRITE_LINE_DEVICE_HANDLER( centronics_prime_w )
 
 WRITE_LINE_DEVICE_HANDLER( centronics_init_w )
 {
-	assert(((const centronics_interface *)device->static_config)->is_ibmpc == TRUE);
+	assert(((const centronics_interface *)device->baseconfig().static_config)->is_ibmpc == TRUE);
 
 	/* reset printer if line is low */
 	if (state == FALSE)
@@ -313,7 +313,7 @@ WRITE_LINE_DEVICE_HANDLER( centronics_init_w )
 WRITE_LINE_DEVICE_HANDLER( centronics_autofeed_w )
 {
 	centronics_state *centronics = get_safe_token(device);
-	assert(((const centronics_interface *)device->static_config)->is_ibmpc == TRUE);
+	assert(((const centronics_interface *)device->baseconfig().static_config)->is_ibmpc == TRUE);
 
 	centronics->auto_fd = state;
 }

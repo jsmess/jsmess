@@ -27,17 +27,17 @@
 #ifndef __ADC080X__
 #define __ADC080X__
 
-typedef void (*adc080x_on_eoc_changed_func) (const device_config *device, int level);
-#define ADC080X_ON_EOC_CHANGED(name) void name(const device_config *device, int level)
+typedef void (*adc080x_on_eoc_changed_func) (running_device *device, int level);
+#define ADC080X_ON_EOC_CHANGED(name) void name(running_device *device, int level)
 
-typedef double (*adc080x_vref_pos_read) (const device_config *device);
-#define ADC080X_VREF_POSITIVE_READ(name) double name(const device_config *device)
+typedef double (*adc080x_vref_pos_read) (running_device *device);
+#define ADC080X_VREF_POSITIVE_READ(name) double name(running_device *device)
 
-typedef double (*adc080x_vref_neg_read) (const device_config *device);
-#define ADC080X_VREF_NEGATIVE_READ(name) double name(const device_config *device)
+typedef double (*adc080x_vref_neg_read) (running_device *device);
+#define ADC080X_VREF_NEGATIVE_READ(name) double name(running_device *device)
 
-typedef double (*adc080x_input_read) (const device_config *device, int channel);
-#define ADC080X_INPUT_READ(name) double name(const device_config *device, int channel)
+typedef double (*adc080x_input_read) (running_device *device, int channel);
+#define ADC080X_INPUT_READ(name) double name(running_device *device, int channel)
 
 #define ADC0808		DEVICE_GET_INFO_NAME(adc0808)
 #define ADC0809		DEVICE_GET_INFO_NAME(adc0809)
@@ -74,10 +74,10 @@ DEVICE_GET_INFO( adc0808 );
 DEVICE_GET_INFO( adc0809 );
 
 /* address latching */
-void adc080x_ale_w(const device_config *device, int level, int address);
+void adc080x_ale_w(running_device *device, int level, int address);
 
 /* start conversion */
-void adc080x_start_w(const device_config *device, int level);
+void adc080x_start_w(running_device *device, int level);
 
 /* conversion data */
 READ8_DEVICE_HANDLER( adc080x_data_r );

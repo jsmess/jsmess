@@ -52,7 +52,7 @@ WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_c );
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_a );
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_b );
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_c );
-void cbmb_irq(const device_config *device, int level);
+void cbmb_irq(running_device *device, int level);
 
 WRITE8_DEVICE_HANDLER( cbmb_change_font );
 

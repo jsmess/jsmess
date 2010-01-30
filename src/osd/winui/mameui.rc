@@ -36,7 +36,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Menu
 //
 
-IDR_MAIN_MENU MENU 
+IDR_MAIN_MENU MENU DISCARDABLE 
 BEGIN
     POPUP "&File"
     BEGIN
@@ -52,7 +52,7 @@ BEGIN
     END
 END
 
-IDR_UI_MENU MENU 
+IDR_UI_MENU MENU DISCARDABLE
 BEGIN
     POPUP "&File"
     BEGIN
@@ -270,12 +270,12 @@ END
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE 
+1 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE 
+2 TEXTINCLUDE MOVEABLE PURE  
 BEGIN
     "#define NOWINRES\r\n"
     "#include ""windows.h""\r\n"
@@ -283,7 +283,7 @@ BEGIN
     "\0"
 END
 
-3 TEXTINCLUDE 
+3 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "#include ""mamevers.rc"" // Version block\r\n"
     "\r\n"
@@ -354,8 +354,8 @@ IDI_WIN_PCRD            ICON        			"res/win_pcrd.ico"
 // Dialog
 //
 
-IDD_ABOUT DIALOG  0, 0, 296, 129
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_ABOUT DIALOG DISCARDABLE 0, 0, 296, 129
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 #ifdef MESS
 CAPTION "About MESS"
 #else
@@ -392,8 +392,8 @@ BEGIN
     CONTROL         "",IDC_ABOUT,"Static",SS_BITMAP | SS_SUNKEN,7,7,16,14
 END
 
-IDD_DIRECTX DIALOG  0, 0, 236, 69
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_DIRECTX DIALOG DISCARDABLE 0, 0, 236, 69
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 #ifdef MESS
 CAPTION "MESS"
 #else
@@ -407,7 +407,7 @@ BEGIN
                     ES_AUTOHSCROLL | ES_READONLY
 END
 
-IDD_AUDIT DIALOG  0, 0, 283, 188
+IDD_AUDIT DIALOG DISCARDABLE 0, 0, 283, 188
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "File Audit"
 FONT 8, "MS Shell Dlg"
@@ -438,7 +438,7 @@ BEGIN
                     NOT WS_TABSTOP
 END
 
-IDD_DIRECTORIES DIALOG  0, 0, 230, 107
+IDD_DIRECTORIES DIALOG DISCARDABLE 0, 0, 230, 107
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Directories"
 FONT 8, "MS Shell Dlg"
@@ -458,7 +458,7 @@ BEGIN
     PUSHBUTTON      "Delete",IDC_DIR_DELETE,173,87,50,14
 END
 
-IDD_COLUMNS DIALOG  0, 0, 302, 145
+IDD_COLUMNS DIALOG DISCARDABLE 0, 0, 302, 145
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Customize Fields"
 FONT 8, "MS Shell Dlg"
@@ -566,7 +566,7 @@ BEGIN
                     0,0,HIDC_USE_DEFAULT
 END
 
-IDD_PROP_GAME DIALOG  0, 0, 220, 276
+IDD_PROP_GAME DIALOG DISCARDABLE 0, 0, 220, 276
 STYLE WS_CHILD | WS_CAPTION
 CAPTION "General"
 FONT 8, "MS Shell Dlg"
@@ -599,7 +599,7 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,19,218,177,1
 END
 
-IDD_PROP_AUDIT DIALOG  0, 0, 220, 240
+IDD_PROP_AUDIT DIALOG DISCARDABLE 0, 0, 220, 240
 STYLE WS_CHILD | WS_CAPTION
 CAPTION "Audit"
 FONT 8, "MS Shell Dlg"
@@ -1025,13 +1025,13 @@ END
 
 #ifdef MESS
 IDD_FILTERS DIALOGEX 0, 0, 190, 196
-STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | 
+STYLE DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | 
     WS_SYSMENU
 EXSTYLE WS_EX_CONTEXTHELP
 CAPTION "System Filters"
 #else
 IDD_FILTERS DIALOGEX 0, 0, 190, 182
-STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | 
+STYLE DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | 
     WS_SYSMENU
 EXSTYLE WS_EX_CONTEXTHELP
 CAPTION "Game Filters"
@@ -1229,7 +1229,7 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,98,45,50,14
 END
 
-IDD_CUSTOM_FILE DIALOG  0, 0, 190, 135
+IDD_CUSTOM_FILE DIALOG DISCARDABLE 0, 0, 190, 135
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Add Game To Custom Folder"
 FONT 8, "MS Shell Dlg"
@@ -1472,14 +1472,14 @@ IDC_CURSOR_HSPLIT       CURSOR                  "res\\splith.cur"
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE  
 BEGIN
     IDS_UI_FILE             "Contains commands for working with the selected items"
     IDS_UI_VIEW             "Contains commands for manipulating the view"
     IDS_UI_OPTIONS          "Contains commands for user interface options"
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_UI_HELP             "Contains commands for displaying help"
     IDS_VIEW_TOOLBAR        "Show or hide the toolbar"
@@ -1494,7 +1494,7 @@ BEGIN
     IDS_VIEW_SPACER3        "Spacer"
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_VIEW_LARGEICONS     "Display items by using large icons."
     IDS_VIEW_SMALLICONS     "Display items by using small icons."
@@ -1511,7 +1511,7 @@ BEGIN
                             "Customize which columns are used in the game list"
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     ID_FILE_EXIT            "Exit the application"
 #ifdef MESS
@@ -1537,7 +1537,7 @@ BEGIN
 #endif
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     ID_OPTIONS_RESET_DEFAULTS "Allow restoring options to 'sane' values."
     ID_OPTIONS_INTERFACE    "Customize interface options."
@@ -1571,7 +1571,7 @@ BEGIN
 #endif
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     ID_CONTEXT_RESET_PLAYTIME "Reset time played for selected item"
     ID_CONTEXT_RESET_PLAYCOUNT "Reset number of plays for selected item"
@@ -1584,7 +1584,7 @@ BEGIN
 #endif
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     ID_VIEW_TAB_CABINET     "Select Cabinet tab"
     ID_VIEW_TAB_MARQUEE     "Select Marquee tab"
@@ -1603,7 +1603,7 @@ BEGIN
     ID_VIEW_FULLSCREEN      "Toggle Fullscreen mode"
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
 #ifdef MESS
     ID_CUSTOMIZE_FIELDS     "Customize which columns are used in the system list"
@@ -1634,7 +1634,7 @@ BEGIN
     ID_VIEW_TAB_FLYER       "Select Flyer tab"
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
 #ifdef MESS
     ID_VIEW_BYGAME          "Sort items by system"
@@ -1656,7 +1656,7 @@ BEGIN
     ID_SORT_DESCENDING      "Sort column in descending (Z-A) order"
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     ID_FOLDER_SOURCEPROPERTIES 
                             "Display properties for all games in this source file"

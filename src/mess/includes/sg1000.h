@@ -38,9 +38,9 @@ struct _sg1000_state
 	int fdc_index;
 
 	/* devices */
-	const device_config *upd765;
-	const device_config *centronics;
-	const device_config *cassette;
+	running_device *upd765;
+	running_device *centronics;
+	running_device *cassette;
 };
 
 #endif

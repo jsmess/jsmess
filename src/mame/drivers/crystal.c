@@ -337,13 +337,13 @@ static READ32_HANDLER(PIO_r)
 
 static WRITE32_HANDLER(PIO_w)
 {
-	const device_config *ds1302 = devtag_get_device(space->machine, "rtc");
+	running_device *ds1302 = devtag_get_device(space->machine, "rtc");
 	UINT32 RST = data & 0x01000000;
 	UINT32 CLK = data & 0x02000000;
 	UINT32 DAT = data & 0x10000000;
 
 	if (!RST)
-		device_reset(ds1302);
+		ds1302->reset();
 
 	ds1302_dat_w(ds1302, 0, DAT ? 1 : 0);
 	ds1302_clk_w(ds1302, 0, CLK ? 1 : 0);

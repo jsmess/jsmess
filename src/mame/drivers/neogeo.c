@@ -390,7 +390,7 @@ static void start_interrupt_timers( running_machine *machine )
  *
  *************************************/
 
-static void audio_cpu_irq(const device_config *device, int assert)
+static void audio_cpu_irq(running_device *device, int assert)
 {
 	neogeo_state *state = (neogeo_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, 0, assert ? ASSERT_LINE : CLEAR_LINE);
@@ -1123,7 +1123,7 @@ static MACHINE_RESET( neogeo )
 	for (offs = 0; offs < 8; offs++)
 		system_control_w(space, offs, 0, 0x00ff);
 
-	device_reset(devtag_get_device(machine, "maincpu"));
+	machine->device("maincpu")->reset();
 
 	neogeo_reset_rng(machine);
 

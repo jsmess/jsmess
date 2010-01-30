@@ -20,9 +20,9 @@ struct _jtc_state
 	UINT8 *color_ram_b;
 
 	/* devices */
-	const device_config *cassette;
-	const device_config *speaker;
-	const device_config *centronics;
+	running_device *cassette;
+	running_device *speaker;
+	running_device *centronics;
 };
 
 #endif

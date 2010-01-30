@@ -52,12 +52,12 @@ READ8_HANDLER(pc1403_asic_read)
     return data;
 }
 
-void pc1403_outa(const device_config *device, int data)
+void pc1403_outa(running_device *device, int data)
 {
     outa=data;
 }
 
-int pc1403_ina(const device_config *device)
+int pc1403_ina(running_device *device)
 {
     UINT8 data=outa;
 
@@ -124,19 +124,19 @@ int pc1403_inb(void)
 }
 #endif
 
-void pc1403_outc(const device_config *device, int data)
+void pc1403_outc(running_device *device, int data)
 {
     pc1403_portc = data;
 //    logerror("%g pc %.4x outc %.2x\n", attotime_to_double(timer_get_time(device->machine)), cpu_get_pc(devtag_get_device(device->machine, "maincpu")), data);
 }
 
 
-int pc1403_brk(const device_config *device)
+int pc1403_brk(running_device *device)
 {
 	return (input_port_read(device->machine, "EXTRA") & 0x01);
 }
 
-int pc1403_reset(const device_config *device)
+int pc1403_reset(running_device *device)
 {
 	return (input_port_read(device->machine, "EXTRA") & 0x02);
 }
@@ -144,7 +144,7 @@ int pc1403_reset(const device_config *device)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1403 )
 {
-	const device_config *main_cpu = devtag_get_device(machine, "maincpu");
+	running_device *main_cpu = devtag_get_device(machine, "maincpu");
 	UINT8 *ram = memory_region(machine, "maincpu") + 0x8000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 

@@ -27,9 +27,9 @@
 typedef struct _apricot_state apricot_state;
 struct _apricot_state
 {
-	const device_config *pic8259;
-	const device_config *wd2793;
-	const device_config *mc6845;
+	running_device *pic8259;
+	running_device *wd2793;
+	running_device *mc6845;
 
 	int video_mode;
 	int display_on;
@@ -100,7 +100,7 @@ static const struct pit8253_config apricot_pit8253_intf =
 	}
 };
 
-static void apricot_sio_irq_w(const device_config *device, int state)
+static void apricot_sio_irq_w(running_device *device, int state)
 {
 	apricot_state *apricot = (apricot_state *)device->machine->driver_data;
 	pic8259_set_irq_line(apricot->pic8259, 5, state);
@@ -266,7 +266,7 @@ static const mc6845_interface apricot_mc6845_intf =
 static DRIVER_INIT( apricot )
 {
 	apricot_state *apricot = (apricot_state *)machine->driver_data;
-	const device_config *maincpu = devtag_get_device(machine, "maincpu");
+	running_device *maincpu = devtag_get_device(machine, "maincpu");
 	const address_space *prg = cpu_get_address_space(maincpu, ADDRESS_SPACE_PROGRAM);
 
 	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));

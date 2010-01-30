@@ -32,7 +32,7 @@ struct _i4004_state
 	UINT8	TEST; // Test PIN status
 	PAIR	PC; // It is in fact one of ADDR regs
 
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *data;
 	const address_space *io;
@@ -86,7 +86,7 @@ static const cpu_state_table state_table_template =
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE i4004_state *get_safe_token(const device_config *device)
+INLINE i4004_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -191,7 +191,7 @@ INLINE void POP_STACK(i4004_state *cpustate)
 	cpustate->pc_pos = (cpustate->pc_pos - 1) & cpustate->addr_mask;
 }
 
-void i4004_set_test(const device_config *device, UINT8 val)
+void i4004_set_test(running_device *device, UINT8 val)
 {
 	i4004_state *cpustate = get_safe_token(device);
 	cpustate->TEST = val;
@@ -577,17 +577,17 @@ CPU_GET_INFO( i4004 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 8;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 16;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 12;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 		info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 12;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: 		info->i = 0;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 12;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:			info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 12;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:			info->i = 0;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 8;							break; // Only lower 4 bits used
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 6;							break; // 4 I/O for each ROM chip and 4 OUT for each RAM
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;							break; // There could be 4 chips in 16 banks for RAM
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 8;							break; // Only lower 4 bits used
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 6;							break; // 4 I/O for each ROM chip and 4 OUT for each RAM
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:				info->i = 0;							break; // There could be 4 chips in 16 banks for RAM
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(i4004);				break;

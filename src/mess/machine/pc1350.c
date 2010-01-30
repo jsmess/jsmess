@@ -9,22 +9,22 @@ static UINT8 outa,outb;
 
 static int power=1; /* simulates pressed cce when mess is started */
 
-void pc1350_outa(const device_config *device, int data)
+void pc1350_outa(running_device *device, int data)
 {
 	outa=data;
 }
 
-void pc1350_outb(const device_config *device, int data)
+void pc1350_outb(running_device *device, int data)
 {
 	outb=data;
 }
 
-void pc1350_outc(const device_config *device, int data)
+void pc1350_outc(running_device *device, int data)
 {
 
 }
 
-int pc1350_ina(const device_config *device)
+int pc1350_ina(running_device *device)
 {
 	running_machine *machine = device->machine;
 	int data = outa;
@@ -77,13 +77,13 @@ int pc1350_ina(const device_config *device)
 	return data;
 }
 
-int pc1350_inb(const device_config *device)
+int pc1350_inb(running_device *device)
 {
 	int data=outb;
 	return data;
 }
 
-int pc1350_brk(const device_config *device)
+int pc1350_brk(running_device *device)
 {
 	return (input_port_read(device->machine, "EXTRA") & 0x01);
 }
@@ -91,7 +91,7 @@ int pc1350_brk(const device_config *device)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1350 )
 {
-	const device_config *main_cpu = devtag_get_device(machine, "maincpu");
+	running_device *main_cpu = devtag_get_device(machine, "maincpu");
 	UINT8 *ram = memory_region(machine, "maincpu") + 0x2000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 

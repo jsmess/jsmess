@@ -53,39 +53,39 @@ struct _ieee488_daisy_chain
 DEVICE_GET_INFO( ieee488 );
 
 /* end or identify */
-void ieee488_eoi_w(const device_config *bus, const device_config *device, int state);
+void ieee488_eoi_w(running_device *bus, running_device *device, int state);
 READ_LINE_DEVICE_HANDLER( ieee488_eoi_r );
 
 /* data valid */
-void ieee488_dav_w(const device_config *bus, const device_config *device, int state);
+void ieee488_dav_w(running_device *bus, running_device *device, int state);
 READ_LINE_DEVICE_HANDLER( ieee488_dav_r );
 
 /* not ready for data */
-void ieee488_nrfd_w(const device_config *bus, const device_config *device, int state);
+void ieee488_nrfd_w(running_device *bus, running_device *device, int state);
 READ_LINE_DEVICE_HANDLER( ieee488_nrfd_r );
 
 /* not data accepted */
-void ieee488_ndac_w(const device_config *bus, const device_config *device, int state);
+void ieee488_ndac_w(running_device *bus, running_device *device, int state);
 READ_LINE_DEVICE_HANDLER( ieee488_ndac_r );
 
 /* interface clear */
-void ieee488_ifc_w(const device_config *bus, const device_config *device, int state);
+void ieee488_ifc_w(running_device *bus, running_device *device, int state);
 READ_LINE_DEVICE_HANDLER( ieee488_ifc_r );
 
 /* service request */
-void ieee488_srq_w(const device_config *bus, const device_config *device, int state);
+void ieee488_srq_w(running_device *bus, running_device *device, int state);
 READ_LINE_DEVICE_HANDLER( ieee488_srq_r );
 
 /* attention */
-void ieee488_atn_w(const device_config *bus, const device_config *device, int state);
+void ieee488_atn_w(running_device *bus, running_device *device, int state);
 READ_LINE_DEVICE_HANDLER( ieee488_atn_r );
 
 /* remote enable */
-void ieee488_ren_w(const device_config *bus, const device_config *device, int state);
+void ieee488_ren_w(running_device *bus, running_device *device, int state);
 READ_LINE_DEVICE_HANDLER( ieee488_ren_r );
 
 /* data */
 READ8_DEVICE_HANDLER( ieee488_dio_r );
-void ieee488_dio_w(const device_config *bus, const device_config *device, UINT8 data);
+void ieee488_dio_w(running_device *bus, running_device *device, UINT8 data);
 
 #endif

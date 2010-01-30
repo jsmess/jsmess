@@ -28,8 +28,8 @@ struct _i82439tx_config
 
 DEVICE_GET_INFO( i82439tx );
 
-UINT32 i82439tx_pci_read(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 mem_mask);
-void i82439tx_pci_write(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 data, UINT32 mem_mask);
+UINT32 i82439tx_pci_read(running_device *busdevice, running_device *device, int function, int offset, UINT32 mem_mask);
+void i82439tx_pci_write(running_device *busdevice, running_device *device, int function, int offset, UINT32 data, UINT32 mem_mask);
 
 
 /***************************************************************************

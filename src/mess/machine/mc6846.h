@@ -28,7 +28,7 @@ struct _mc6846_interface
   write8_device_func out_cto_func; /* 1-bit output */
 
   /* timer interrupt */
-  void ( * irq_func ) ( const device_config *device, int state );
+  void ( * irq_func ) ( running_device *device, int state );
 };
 
 
@@ -54,16 +54,16 @@ extern READ8_DEVICE_HANDLER  ( mc6846_r );
 extern WRITE8_DEVICE_HANDLER ( mc6846_w );
 
 /* asynchronous write from outside world into interrupt-generating pins */
-extern void mc6846_set_input_cp1 ( const device_config *device, int data );
-extern void mc6846_set_input_cp2 ( const device_config *device, int data );
+extern void mc6846_set_input_cp1 ( running_device *device, int data );
+extern void mc6846_set_input_cp2 ( running_device *device, int data );
 
 /* polling from outside world */
-extern UINT8  mc6846_get_output_port ( const device_config *device );
-extern UINT8  mc6846_get_output_cto  ( const device_config *device );
-extern UINT8  mc6846_get_output_cp2  ( const device_config *device );
+extern UINT8  mc6846_get_output_port ( running_device *device );
+extern UINT8  mc6846_get_output_cto  ( running_device *device );
+extern UINT8  mc6846_get_output_cp2  ( running_device *device );
 
 /* partial access to internal state */
-extern UINT16 mc6846_get_preset ( const device_config *device ); /* timer interval - 1 in us */
+extern UINT16 mc6846_get_preset ( running_device *device ); /* timer interval - 1 in us */
 
 #endif
 

@@ -78,7 +78,7 @@ struct _vhd_info
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE vhd_info *get_safe_token(const device_config *device)
+INLINE vhd_info *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -111,7 +111,7 @@ static DEVICE_IMAGE_LOAD( coco_vhd )
 
 
 
-static void coco_vhd_readwrite(const device_config *device, UINT8 data)
+static void coco_vhd_readwrite(running_device *device, UINT8 data)
 {
 	vhd_info *vhd = get_safe_token(device);
 	int result;

@@ -7,11 +7,10 @@ preliminary driver by Angelo Salese
 Maybe it has some correlation with WEC Le Mans HW? (supposely that was originally done by Coreland too)
 
 TODO:
-- sprite ram (very likely that it can do zooming);
+- sprite emulation (very likely that it can do zooming);
 - road emulation;
-- tilemap video registers;
-- color banking for the tilemaps;
-- ROM "SS5" is missing? Or it's a sound chip that's labelled SS5?
+- tilemap scrolling /-color banking;
+- inputs doesn't work in-game?
 - dual screen output.
 
 ============================================================================================
@@ -216,14 +215,14 @@ static VIDEO_UPDATE( cybertnk )
 
 		count = 0;
 
-		for (y=0;y<64;y++)
+		for (y=0;y<32;y++)
 		{
 			for (x=0;x<128;x++)
 			{
 				UINT16 tile = bg_vram[count] & 0x1fff;
 				UINT16 color = (fg_vram[count] & 0xe000) >> 13;
 
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color+0x1c0,0,0,x*8,(y*8));
+				drawgfx_transpen(bitmap,cliprect,gfx,tile,color+0x194,0,0,x*8,(y*8),0);
 
 				count++;
 
@@ -237,7 +236,7 @@ static VIDEO_UPDATE( cybertnk )
 
 		count = 0;
 
-		for (y=0;y<64;y++)
+		for (y=0;y<32;y++)
 		{
 			for (x=0;x<128;x++)
 			{
@@ -256,29 +255,41 @@ static VIDEO_UPDATE( cybertnk )
 	if(1)
 	{
 		const UINT8 *blit_ram = memory_region(screen->machine,"spr_gfx");
-		int offs,x,y,z,xsize,ysize,yi,xi,col_bank;
-		UINT32 spr_offs;
+		int offs,x,y,z,xsize,ysize,yi,xi,col_bank,fx,zoom;
+		UINT32 spr_offs,spr_offs_helper;
+		int xf,yf,xz,yz;
 
 		for(offs=0;offs<0x1000/2;offs+=8)
 		{
 			z = (spr_ram[offs+(0x6/2)] & 0xffff);
-			if(z == 0xffff)
+			if(z == 0xffff || spr_ram[offs+(0x0/2)] == 0x0000) //TODO: check the correct bit
 				continue;
-			x = (spr_ram[offs+(0xa/2)] & 0x1ff);
+			x = (spr_ram[offs+(0xa/2)] & 0x3ff);
 			y = (spr_ram[offs+(0x4/2)] & 0xff);
+			if(spr_ram[offs+(0x4/2)] & 0x100)
+				y = 0x100 - y;
 			spr_offs = (((spr_ram[offs+(0x0/2)] & 7) << 16) | (spr_ram[offs+(0x2/2)])) << 2;
-			xsize = ((spr_ram[offs+(0xc/2)] & 0x000f)+1) << 3; //obviously wrong!
-			ysize = (spr_ram[offs+(0x0/2)] & 0x0078) >> 2; //obviously wrong!
+			xsize = ((spr_ram[offs+(0xc/2)] & 0x000f)+1) << 3;
+			ysize = (spr_ram[offs+(0x8/2)] & 0x00ff)+1;
+			fx = (spr_ram[offs+(0xa/2)] & 0x8000) >> 15;
+			zoom = (spr_ram[offs+(0xc/2)] & 0xff00) >> 8;
+
 			col_bank = (spr_ram[offs+(0x0/2)] & 0xff00) >> 8;
+
+			xf = 0;
+			yf = 0;
+			xz = 0;
+			yz = 0;
 
 			for(yi = 0;yi < ysize;yi++)
 			{
+				xf = xz = 0;
+				spr_offs_helper = spr_offs;
 				for(xi=0;xi < xsize;xi+=8)
 				{
 					UINT32 color;
 					UINT16 dot;
-					int shift_pen;
-					int x_dec; //helpers
+					int shift_pen, x_dec; //helpers
 
 					color = ((blit_ram[spr_offs+0] & 0xff) << 24);
 					color|= ((blit_ram[spr_offs+1] & 0xff) << 16);
@@ -294,11 +305,29 @@ static VIDEO_UPDATE( cybertnk )
 						if(dot != 0) // transparent pen
 						{
 							dot|= col_bank<<4;
-							if(((x+x_dec+xi) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
-								*BITMAP_ADDR16(bitmap, y+yi, x+x_dec+xi) = screen->machine->pens[dot];
+							if(fx)
+							{
+								if(((x+xsize-(xz)) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+									*BITMAP_ADDR16(bitmap, y+yz, x+xsize-(xz)) = screen->machine->pens[dot];
+							}
+							else
+							{
+								if(((x+xz) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+									*BITMAP_ADDR16(bitmap, y+yz, x+xz) = screen->machine->pens[dot];
+							}
 						}
-						shift_pen -= 8;
-						x_dec++;
+						xf+=zoom;
+						if(xf >= 0x100)
+						{
+							xz++;
+							xf-=0x100;
+						}
+						else
+						{
+							shift_pen -= 8;
+							x_dec++;
+							if(xf >= 0x80) { xz++; xf-=0x80; }
+						}
 					}
 
 					shift_pen = 24;
@@ -310,15 +339,42 @@ static VIDEO_UPDATE( cybertnk )
 						if(dot != 0) // transparent pen
 						{
 							dot|= col_bank<<4;
-							if(((x+x_dec+xi) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
-								*BITMAP_ADDR16(bitmap, y+yi, x+x_dec+xi) = screen->machine->pens[dot];
+							if(fx)
+							{
+								if(((x+xsize-(xz)) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+									*BITMAP_ADDR16(bitmap, y+yz, x+xsize-(xz)) = screen->machine->pens[dot];
+							}
+							else
+							{
+								if(((x+x_dec+xi) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+									*BITMAP_ADDR16(bitmap, y+yz, x+xz) = screen->machine->pens[dot];
+							}
 						}
-						shift_pen -= 8;
-						x_dec++;
+						xf+=zoom;
+						if(xf >= 0x100)
+						{
+							xz++;
+							xf-=0x100;
+						}
+						else
+						{
+							shift_pen -= 8;
+							x_dec++;
+							if(xf >= 0x80) { xz++; xf-=0x80; }
+						}
 					}
 
 					spr_offs+=4;
 				}
+				yf+=zoom;
+				if(yf >= 0x100)
+				{
+					yi--;
+					yz++;
+					spr_offs = spr_offs_helper;
+					yf-=0x100;
+				}
+				if(yf >= 0x80) { yz++; yf-=0x80; }
 			}
 		}
 	}
@@ -462,7 +518,7 @@ static READ16_HANDLER( io_r )
 					// only once I think, during init at 0x00000410
 					// controller return value is stored in $42(a6)
 					// but I don't see it referenced again.
-					popmessage("unknown controller device 0x42");
+					//popmessage("unknown controller device 0x42");
 					io_ram[0xd4/2] = 0;
 					break;
 
@@ -470,8 +526,8 @@ static READ16_HANDLER( io_r )
 					io_ram[0xd4/2] = input_port_read(space->machine, "HANDLE");
 					break;
 
-				default:
-					popmessage("unknown controller device");
+				//default:
+					//popmessage("unknown controller device");
 			}
 			return 0;
 
@@ -489,7 +545,7 @@ static READ16_HANDLER( io_r )
 
 		default:
 		{
-			popmessage("unknown io read 0x%08x", offset);
+			//popmessage("unknown io read 0x%08x", offset);
 			return io_ram[offset];
 		}
 	}
@@ -549,6 +605,7 @@ static WRITE16_HANDLER( io_w )
 		// Maybe this is for lamps and stuff, or
 		// maybe just debug.
 		// They are all written in a block at 0x00000944
+		case 0x40/2:
 		case 0x42/2:
 		case 0x44/2:
 		case 0x48/2:
@@ -557,6 +614,7 @@ static WRITE16_HANDLER( io_w )
 		case 0x80/2:
 		case 0x82/2:
 		case 0x84/2:
+			popmessage("%02x %02x %02x %02x %02x %02x %02x",io_ram[0x40/2],io_ram[0x42/2],io_ram[0x44/2],io_ram[0x46/2],io_ram[0x48/2],io_ram[0x4a/2],io_ram[0x4c/2]);
 			break;
 
 		default:
@@ -585,7 +643,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slave_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM /*Work RAM*/
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM
+	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x140000, 0x140003) AM_NOP /*Watchdog? Written during loops and interrupts*/
 ADDRESS_MAP_END
@@ -728,6 +786,7 @@ static GFXDECODE_START( cybertnk )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_8x8x4,     0,      0x400 )
 GFXDECODE_END
 
+#if 0
 static INTERRUPT_GEN( master_irq )
 {
 	switch(cpu_getiloops(device))
@@ -745,6 +804,7 @@ static INTERRUPT_GEN( slave_irq )
 		case 1: cpu_set_input_line(device,1,HOLD_LINE); break;
 	}
 }
+#endif
 
 static const y8950_interface y8950_config = {
 	0 /* TODO */
@@ -753,11 +813,13 @@ static const y8950_interface y8950_config = {
 static MACHINE_DRIVER_START( cybertnk )
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)
 	MDRV_CPU_PROGRAM_MAP(master_mem)
-	MDRV_CPU_VBLANK_INT_HACK(master_irq,2)
+//  MDRV_CPU_VBLANK_INT_HACK(master_irq,2)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("slave", M68000,20000000/2)
 	MDRV_CPU_PROGRAM_MAP(slave_mem)
-	MDRV_CPU_VBLANK_INT_HACK(slave_irq,2)
+//  MDRV_CPU_VBLANK_INT_HACK(slave_irq,2)
+	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,3579500)
 	MDRV_CPU_PROGRAM_MAP(sound_mem)
@@ -808,17 +870,15 @@ ROM_START( cybertnk )
 	ROM_LOAD16_BYTE( "subh",   0x00001, 0x10000, CRC(1af7ad58) SHA1(450c65289729d74cd4d17e11be16469246e61b7d) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "ss1",    0x0000, 0x8000, CRC(c3ba160b) SHA1(cfbfcad443ff83cd4e707f045a650417aca03d85) )
+	ROM_LOAD( "ss5.37",    0x0000, 0x8000, CRC(c3ba160b) SHA1(cfbfcad443ff83cd4e707f045a650417aca03d85) )
 
-	ROM_REGION( 0x80000, "ym1", ROMREGION_ERASEFF )
-	ROM_LOAD( "ss2",    0x00000, 0x20000, CRC(da4b8733) SHA1(177372a53fd49629d1cda83bdd324ee90fbcdbb5) )
-	/*The following two are identical*/
-	ROM_LOAD( "ss3",    0x20000, 0x20000, CRC(cecdea53) SHA1(7e6a6499cab4720f4b6d6d8988bb9dd5766511ab) )
-	ROM_LOAD( "ss4",    0x40000, 0x20000, CRC(cecdea53) SHA1(7e6a6499cab4720f4b6d6d8988bb9dd5766511ab) )
-	//ss5?
+	ROM_REGION( 0x40000, "ym1", ROMREGION_ERASEFF )
+	ROM_LOAD( "ss1.10",    0x00000, 0x20000, CRC(27d1cf94) SHA1(26246f217192bcfa39692df6d388640d385e9ed9) )
+	ROM_LOAD( "ss3.11",    0x20000, 0x20000, CRC(a327488e) SHA1(b55357101e392f50f0cf75cf496a3ff4b79b2633) )
 
 	ROM_REGION( 0x80000, "ym2", ROMREGION_ERASEFF )
-	ROM_COPY( "ym1", 0x00000, 0x00000, 0x60000 )
+	ROM_LOAD( "ss2.31",    0x00000, 0x20000, CRC(27d1cf94) SHA1(26246f217192bcfa39692df6d388640d385e9ed9) )
+	ROM_LOAD( "ss4.32",    0x20000, 0x20000, CRC(a327488e) SHA1(b55357101e392f50f0cf75cf496a3ff4b79b2633) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD( "s09", 0x00000, 0x10000, CRC(69e6470c) SHA1(8e7db6988366cae714fff72449623a7977af1db1) )
@@ -880,4 +940,4 @@ ROM_START( cybertnk )
 	ROM_LOAD( "ic30", 0x0260, 0x0020, CRC(2bb6033f) SHA1(eb994108734d7d04f8e293eca21bb3051a63cfe9) )
 ROM_END
 
-GAME( 1988, cybertnk,  0,       cybertnk,  cybertnk,  cybertnk, ROT0, "Coreland", "Cyber Tank (v1.04)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1988, cybertnk,  0,       cybertnk,  cybertnk,  cybertnk, ROT0, "Coreland", "Cyber Tank (v1.04)", GAME_NOT_WORKING )

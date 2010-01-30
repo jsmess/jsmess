@@ -563,7 +563,7 @@ static mess_input_code *build_codes(running_machine *machine, const input_port_c
     natural keyboard setup of a set of input ports
 -------------------------------------------------*/
 
-int mess_validate_input_ports(int drivnum, const machine_config *config, const input_port_list *portlist)
+int mess_validate_input_ports(int drivnum, const machine_config *config, const ioport_list &portlist)
 {
 	int error = FALSE;
 
@@ -672,7 +672,7 @@ void inputx_init(running_machine *machine)
 	/* posting keys directly only makes sense for a computer */
 	if (machine->gamedrv->flags & GAME_COMPUTER)
 	{
-		codes = build_codes(machine, machine->portlist.head);
+		codes = build_codes(machine, machine->portlist.first());
 		setup_keybuffer(machine);
 	}
 }
@@ -1418,7 +1418,7 @@ int input_has_input_class(running_machine *machine, int inputclass)
 	const input_port_config *port;
 	const input_field_config *field;
 
-	for (port = machine->portlist.head; port != NULL; port = port->next)
+	for (port = machine->portlist.first(); port != NULL; port = port->next)
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -1443,7 +1443,7 @@ int input_count_players(running_machine *machine)
 	int joystick_count;
 
 	joystick_count = 0;
-	for (port = machine->portlist.head; port != NULL; port = port->next)
+	for (port = machine->portlist.first(); port != NULL; port = port->next)
 	{
 		for (field = port->fieldlist;  field != NULL; field = field->next)
 		{
@@ -1474,7 +1474,7 @@ int input_category_active(running_machine *machine, int category)
 	assert(category >= 1);
 
 	/* loop through the input ports */
-	for (port = machine->portlist.head; port != NULL; port = port->next)
+	for (port = machine->portlist.first(); port != NULL; port = port->next)
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{

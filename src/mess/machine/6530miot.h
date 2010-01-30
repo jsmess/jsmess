@@ -12,8 +12,8 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef UINT8 (*miot_read_func)(const device_config *device, UINT8 olddata);
-typedef void (*miot_write_func)(const device_config *device, UINT8 newdata, UINT8 olddata);
+typedef UINT8 (*miot_read_func)(running_device *device, UINT8 olddata);
+typedef void (*miot_write_func)(running_device *device, UINT8 newdata, UINT8 olddata);
 
 
 typedef struct _miot6530_interface miot6530_interface;
@@ -44,14 +44,14 @@ struct _miot6530_interface
 READ8_DEVICE_HANDLER( miot6530_r );
 WRITE8_DEVICE_HANDLER( miot6530_w );
 
-void miot6530_porta_in_set(const device_config *device, UINT8 data, UINT8 mask);
-void miot6530_portb_in_set(const device_config *device, UINT8 data, UINT8 mask);
+void miot6530_porta_in_set(running_device *device, UINT8 data, UINT8 mask);
+void miot6530_portb_in_set(running_device *device, UINT8 data, UINT8 mask);
 
-UINT8 miot6530_porta_in_get(const device_config *device);
-UINT8 miot6530_portb_in_get(const device_config *device);
+UINT8 miot6530_porta_in_get(running_device *device);
+UINT8 miot6530_portb_in_get(running_device *device);
 
-UINT8 miot6530_porta_out_get(const device_config *device);
-UINT8 miot6530_portb_out_get(const device_config *device);
+UINT8 miot6530_porta_out_get(running_device *device);
+UINT8 miot6530_portb_out_get(running_device *device);
 
 
 /* ----- device interface ----- */

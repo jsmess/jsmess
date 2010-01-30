@@ -38,7 +38,7 @@ struct _messram_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE messram_state *get_safe_token(const device_config *device)
+INLINE messram_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -121,7 +121,7 @@ const char *messram_string(char *buffer, UINT32 ram)
 static DEVICE_START( messram )
 {
 	messram_state *messram = get_safe_token(device);
-	ram_config *config = (ram_config *)device->inline_config;
+	ram_config *config = (ram_config *)device->baseconfig().inline_config;
 
 	/* the device named 'messram' can get ram options from command line */
 	if (strcmp(device->tag.cstr(), "messram") == 0)
@@ -276,14 +276,14 @@ DEVICE_GET_INFO( messram )
     IMPLEMENTATION
 ***************************************************************************/
 
-UINT32 messram_get_size(const device_config *device)
+UINT32 messram_get_size(running_device *device)
 {
 	messram_state *messram = get_safe_token(device);
 	return messram->size;
 }
 
 
-UINT8 *messram_get_ptr(const device_config *device)
+UINT8 *messram_get_ptr(running_device *device)
 {
 	messram_state *messram = get_safe_token(device);
 	return messram->ram;
@@ -291,7 +291,7 @@ UINT8 *messram_get_ptr(const device_config *device)
 
 
 #ifdef UNUSED_FUNCTION
-void messram_dump(const device_config *device, const char *filename)
+void messram_dump(running_device *device, const char *filename)
 {
 	messram_state *messram = get_safe_token(device);
 	file_error filerr;

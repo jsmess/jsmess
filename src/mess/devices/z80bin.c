@@ -26,7 +26,7 @@
     memory
 -------------------------------------------------*/
 
-static int z80bin_load_file(const device_config *image, const char *file_type, UINT16 *exec_addr, UINT16 *start_addr, UINT16 *end_addr )
+static int z80bin_load_file(running_device *image, const char *file_type, UINT16 *exec_addr, UINT16 *start_addr, UINT16 *end_addr )
 {
 	int ch;
 	UINT16 args[3];
@@ -113,7 +113,7 @@ static QUICKLOAD_LOAD( z80bin )
 	/* is this file executable? */
 	if (exec_addr != 0xffff)
 	{
-		config = (const z80bin_config *) image->inline_config;
+		config = (const z80bin_config *) image->baseconfig().inline_config;
 
 		/* check to see if autorun is on (I hate how this works) */
 		autorun = input_port_read_safe(image->machine, "CONFIG", 0xFF) & 1;

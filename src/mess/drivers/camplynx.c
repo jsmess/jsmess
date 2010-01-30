@@ -84,7 +84,7 @@
 typedef struct _camplynx_state camplynx_state;
 struct _camplynx_state
 {
-	const device_config *mc6845;
+	running_device *mc6845;
 };
 
 /* These bankswitch handlers are very incomplete, just enough to get the

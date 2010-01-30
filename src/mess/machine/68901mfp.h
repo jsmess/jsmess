@@ -108,7 +108,7 @@ READ8_DEVICE_HANDLER( mc68901_register_r );
 WRITE8_DEVICE_HANDLER( mc68901_register_w );
 
 /* get interrupt vector */
-int mc68901_get_vector(const device_config *device) ATTR_NONNULL(1);
+int mc68901_get_vector(running_device *device) ATTR_NONNULL(1);
 
 /* write to Timer A input (pin 19) */
 WRITE_LINE_DEVICE_HANDLER( mc68901_tai_w ) ATTR_NONNULL(1);

@@ -452,7 +452,7 @@ static WRITE_LINE_DEVICE_HANDLER( fm7_fdc_drq_w )
 
 static READ8_HANDLER( fm7_fdc_r )
 {
-	const device_config* dev = devtag_get_device(space->machine,"fdc");
+	running_device* dev = devtag_get_device(space->machine,"fdc");
 	UINT8 ret = 0;
 
 	switch(offset)
@@ -486,7 +486,7 @@ static READ8_HANDLER( fm7_fdc_r )
 
 static WRITE8_HANDLER( fm7_fdc_w )
 {
-	const device_config* dev = devtag_get_device(space->machine,"fdc");
+	running_device* dev = devtag_get_device(space->machine,"fdc");
 	switch(offset)
 	{
 		case 0:
@@ -774,7 +774,7 @@ static READ8_HANDLER( fm7_cassette_printer_r )
 	// bit 0: printer busy
 	UINT8 ret = 0x00;
 	double data = cassette_input(devtag_get_device(space->machine,"cass"));
-	const device_config* printer_dev = devtag_get_device(space->machine,"lpt");
+	running_device* printer_dev = devtag_get_device(space->machine,"lpt");
 	UINT8 pdata;
 	int x;
 
@@ -1376,7 +1376,7 @@ static IRQ_CALLBACK(fm7_sub_irq_ack)
 	return -1;
 }
 
-static void fm77av_fmirq(const device_config* device,int irq)
+static void fm77av_fmirq(running_device* device,int irq)
 {
 	if(irq == 1)
 	{

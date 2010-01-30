@@ -75,7 +75,7 @@ static int tms9995_mode;
 
     IDE interrupt callback
 */
-void ti99_ide_interrupt(const device_config *device, int state)
+void ti99_ide_interrupt(running_device *device, int state)
 {
 	ide_irq = state;
 	if (cru_register & cru_reg_int_en)
@@ -87,7 +87,7 @@ void ti99_ide_interrupt(const device_config *device, int state)
 
     clock interrupt callback
 */
-void ti99_clk_interrupt_callback(const device_config *device, int state)
+void ti99_clk_interrupt_callback(running_device *device, int state)
 {
 	clk_irq = state;
 	ti99_peb_set_ila_bit(device->machine, inta_ide_clk_bit, state);
@@ -184,7 +184,7 @@ static void ide_cru_w(running_machine *machine, int offset, int data)
 static READ8_HANDLER(ide_mem_r)
 {
 	int reply = 0;
-	const device_config *ide_rtc = devtag_get_device(space->machine, "ide_rtc");
+	running_device *ide_rtc = devtag_get_device(space->machine, "ide_rtc");
 
 	if ((offset <= 0xff) && (sram_enable == sram_enable_dip))
 	{	/* registers */
@@ -209,7 +209,7 @@ static READ8_HANDLER(ide_mem_r)
 		case 2:		/* IDE registers set 1 (CS1Fx) */
 			if (tms9995_mode ? (!(offset & 1)) : (offset & 1))
 			{	/* first read triggers 16-bit read cycle */
-				const device_config *ide_device = devtag_get_device(space->machine, "ide");
+				running_device *ide_device = devtag_get_device(space->machine, "ide");
 				input_latch = (! (offset & 0x10)) ? ide_bus_r(ide_device, 0, (offset >> 1) & 0x7) : 0;
 			}
 
@@ -221,7 +221,7 @@ static READ8_HANDLER(ide_mem_r)
 		case 3:		/* IDE registers set 2 (CS3Fx) */
 			if (tms9995_mode ? (!(offset & 1)) : (offset & 1))
 			{	/* first read triggers 16-bit read cycle */
-				const device_config *ide_device = devtag_get_device(space->machine, "ide");
+				running_device *ide_device = devtag_get_device(space->machine, "ide");
 				input_latch = (! (offset & 0x10)) ? ide_bus_r(ide_device, 1, (offset >> 1) & 0x7) : 0;
 			}
 
@@ -248,7 +248,7 @@ static READ8_HANDLER(ide_mem_r)
 */
 static WRITE8_HANDLER(ide_mem_w)
 {
-	const device_config *ide_rtc = devtag_get_device(space->machine, "ide_rtc");
+	running_device *ide_rtc = devtag_get_device(space->machine, "ide_rtc");
 
 	if (cru_register & cru_reg_page_switching)
 	{
@@ -291,7 +291,7 @@ static WRITE8_HANDLER(ide_mem_w)
 
 			if (tms9995_mode ? (offset & 1) : (!(offset & 1)))
 			{	/* second write triggers 16-bit write cycle */
-				const device_config *ide_device = devtag_get_device(space->machine, "ide");
+				running_device *ide_device = devtag_get_device(space->machine, "ide");
 				ide_bus_w(ide_device, 0, (offset >> 1) & 0x7, output_latch);
 			}
 			break;
@@ -311,7 +311,7 @@ static WRITE8_HANDLER(ide_mem_w)
 
 			if (tms9995_mode ? (offset & 1) : (!(offset & 1)))
 			{	/* second write triggers 16-bit write cycle */
-				const device_config *ide_device = devtag_get_device(space->machine, "ide");
+				running_device *ide_device = devtag_get_device(space->machine, "ide");
 				ide_bus_w(ide_device, 1, (offset >> 1) & 0x7, output_latch);
 			}
 			break;

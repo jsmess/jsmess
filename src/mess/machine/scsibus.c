@@ -43,15 +43,15 @@ struct _scsibus_t
     UINT8       initialised;
 };
 
-static void set_scsi_line_now(const device_config *device, UINT8 line, UINT8 state);
-static void set_scsi_line_ack(const device_config *device, UINT8 state);
-static void scsi_in_line_changed(const device_config *device, UINT8 line, UINT8 state);
-static void scsi_out_line_change(const device_config *device, UINT8 line, UINT8 state);
-static void scsi_out_line_change_now(const device_config *device, UINT8 line, UINT8 state);
-static void scsi_out_line_req(const device_config *device, UINT8 state);
+static void set_scsi_line_now(running_device *device, UINT8 line, UINT8 state);
+static void set_scsi_line_ack(running_device *device, UINT8 state);
+static void scsi_in_line_changed(running_device *device, UINT8 line, UINT8 state);
+static void scsi_out_line_change(running_device *device, UINT8 line, UINT8 state);
+static void scsi_out_line_change_now(running_device *device, UINT8 line, UINT8 state);
+static void scsi_out_line_req(running_device *device, UINT8 state);
 static TIMER_CALLBACK(req_timer_callback);
 static TIMER_CALLBACK(ack_timer_callback);
-static void scsi_change_phase(const device_config *device, UINT8 newphase);
+static void scsi_change_phase(running_device *device, UINT8 newphase);
 
 static const char *const linenames[] = 
 {
@@ -63,7 +63,7 @@ static const char *const phasenames[] =
     "data out", "data in", "command", "status", "none", "none", "message out", "message in", "bus free","select"
 };
 
-INLINE scsibus_t *get_token(const device_config *device)
+INLINE scsibus_t *get_token(running_device *device)
 {
 	assert(device->type == SCSIBUS);
 	return (scsibus_t *) device->token;
@@ -96,7 +96,7 @@ static void scsibus_write_data(scsibus_t   *bus)
 
 /* SCSI Bus read/write */
 
-UINT8 scsi_data_r(const device_config *device)
+UINT8 scsi_data_r(running_device *device)
 {
     scsibus_t   *bus = get_token(device);
     UINT8       result = 0;
@@ -129,7 +129,7 @@ UINT8 scsi_data_r(const device_config *device)
     return result;
 }
 
-void scsi_data_w(const device_config *device, UINT8 data)
+void scsi_data_w(running_device *device, UINT8 data)
 {
     scsibus_t   *bus = get_token(device);
 
@@ -179,14 +179,14 @@ void scsi_data_w(const device_config *device, UINT8 data)
 
 /* Get/Set lines */
 
-UINT8 get_scsi_lines(const device_config *device)
+UINT8 get_scsi_lines(running_device *device)
 {
     scsibus_t   *bus = get_token(device);
     
     return bus->linestate;
 }
 
-UINT8 get_scsi_line(const device_config *device, UINT8 lineno)
+UINT8 get_scsi_line(running_device *device, UINT8 lineno)
 {
     scsibus_t   *bus = get_token(device);
     UINT8       result=0;
@@ -208,7 +208,7 @@ UINT8 get_scsi_line(const device_config *device, UINT8 lineno)
     return result;
 }
 
-void set_scsi_line(const device_config *device, UINT8 line, UINT8 state)
+void set_scsi_line(running_device *device, UINT8 line, UINT8 state)
 {
     scsibus_t   *bus = get_token(device);   
     UINT8       changed;
@@ -226,7 +226,7 @@ void set_scsi_line(const device_config *device, UINT8 line, UINT8 state)
     }
 }
 
-static void set_scsi_line_now(const device_config *device, UINT8 line, UINT8 state)
+static void set_scsi_line_now(running_device *device, UINT8 line, UINT8 state)
 {
     scsibus_t   *bus = get_token(device);   
 
@@ -238,7 +238,7 @@ static void set_scsi_line_now(const device_config *device, UINT8 line, UINT8 sta
     scsi_in_line_changed(device,line,state);
 }
 
-void set_scsi_line_ack(const device_config *device, UINT8 state)
+void set_scsi_line_ack(running_device *device, UINT8 state)
 {
     scsibus_t   *bus = get_token(device);   
     
@@ -258,7 +258,7 @@ void dump_command_bytes(scsibus_t   *bus)
     logerror("\n\n");
 }
 
-static void scsibus_exec_command(const device_config *device)
+static void scsibus_exec_command(running_device *device)
 {
     scsibus_t   *bus = get_token(device);   
     int         command_local = 0;
@@ -371,7 +371,7 @@ static int dataout_done(scsibus_t   *bus)
     return result;
 }
 
-static void scsi_in_line_changed(const device_config *device, UINT8 line, UINT8 state)
+static void scsi_in_line_changed(running_device *device, UINT8 line, UINT8 state)
 {
     scsibus_t   *bus = get_token(device);   
 
@@ -485,7 +485,7 @@ static void scsi_in_line_changed(const device_config *device, UINT8 line, UINT8 
     }
 }
 
-static void scsi_out_line_change(const device_config *device, UINT8 line, UINT8 state)
+static void scsi_out_line_change(running_device *device, UINT8 line, UINT8 state)
 {
     if(line==SCSI_LINE_REQ)
         scsi_out_line_req(device,state);
@@ -493,7 +493,7 @@ static void scsi_out_line_change(const device_config *device, UINT8 line, UINT8 
         scsi_out_line_change_now(device,line,state);
 }
 
-static void scsi_out_line_change_now(const device_config *device, UINT8 line, UINT8 state)
+static void scsi_out_line_change_now(running_device *device, UINT8 line, UINT8 state)
 {    
     scsibus_t   *bus = get_token(device);   
 
@@ -508,7 +508,7 @@ static void scsi_out_line_change_now(const device_config *device, UINT8 line, UI
         bus->interface->line_change_cb(device,line,state);
 }
 
-static void scsi_out_line_req(const device_config *device, UINT8 state)
+static void scsi_out_line_req(running_device *device, UINT8 state)
 {
     scsibus_t   *bus = get_token(device);   
     
@@ -518,16 +518,16 @@ static void scsi_out_line_req(const device_config *device, UINT8 state)
 
 static TIMER_CALLBACK(req_timer_callback)
 {
-    scsi_out_line_change_now((const device_config *)ptr, SCSI_LINE_REQ, param);
+    scsi_out_line_change_now((running_device *)ptr, SCSI_LINE_REQ, param);
 }
 
 static TIMER_CALLBACK(ack_timer_callback)
 {
-    set_scsi_line_now((const device_config *)ptr, SCSI_LINE_ACK, param);
+    set_scsi_line_now((running_device *)ptr, SCSI_LINE_ACK, param);
 }
 
 
-UINT8 get_scsi_phase(const device_config *device)
+UINT8 get_scsi_phase(running_device *device)
 {
     scsibus_t   *bus = get_token(device);   
 
@@ -535,7 +535,7 @@ UINT8 get_scsi_phase(const device_config *device)
 }
 
 
-static void scsi_change_phase(const device_config *device, UINT8 newphase)
+static void scsi_change_phase(running_device *device, UINT8 newphase)
 {
     scsibus_t   *bus = get_token(device);   
 
@@ -631,7 +631,7 @@ int get_scsi_cmd_len(int cbyte)
 	return 6;
 }
 
-void init_scsibus(const device_config *device)
+void init_scsibus(running_device *device)
 {
     scsibus_t               *bus = get_token(device);
     const SCSIConfigTable   *scsidevs = bus->interface->scsidevs;
@@ -654,8 +654,8 @@ static DEVICE_START( scsibus )
 {
     scsibus_t               *bus = get_token(device);
     
-	assert(device->static_config != NULL);
-    bus->interface = (const SCSIBus_interface*)device->static_config;
+	assert(device->baseconfig().static_config != NULL);
+    bus->interface = (const SCSIBus_interface*)device->baseconfig().static_config;
     
 	memset(bus->devices, 0, sizeof(bus->devices));
     

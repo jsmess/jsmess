@@ -108,7 +108,7 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( kim1_reset )
 {
 	if (newval == 0)
-		device_reset(field->port->machine->firstcpu);
+		field->port->machine->firstcpu->reset();
 }
 
 
@@ -157,7 +157,7 @@ static INPUT_PORTS_START( kim1 )
 INPUT_PORTS_END
 
 
-static UINT8 kim1_u2_read_a(const device_config *device, UINT8 olddata)
+static UINT8 kim1_u2_read_a(running_device *device, UINT8 olddata)
 {
 	UINT8	data = 0xff;
 
@@ -177,7 +177,7 @@ static UINT8 kim1_u2_read_a(const device_config *device, UINT8 olddata)
 }
 
 
-static void kim1_u2_write_a(const device_config *device, UINT8 newdata, UINT8 olddata)
+static void kim1_u2_write_a(running_device *device, UINT8 newdata, UINT8 olddata)
 {
 	UINT8 idx = ( kim1_u2_port_b >> 1 ) & 0x0f;
 
@@ -192,7 +192,7 @@ static void kim1_u2_write_a(const device_config *device, UINT8 newdata, UINT8 ol
 }
 
 
-static UINT8 kim1_u2_read_b(const device_config *device, UINT8 olddata)
+static UINT8 kim1_u2_read_b(running_device *device, UINT8 olddata)
 {
 	if ( miot6530_portb_out_get(device) & 0x20 )
 		return 0xFF;
@@ -201,7 +201,7 @@ static UINT8 kim1_u2_read_b(const device_config *device, UINT8 olddata)
 }
 
 
-static void kim1_u2_write_b(const device_config *device, UINT8 newdata, UINT8 olddata)
+static void kim1_u2_write_b(running_device *device, UINT8 newdata, UINT8 olddata)
 {
 	kim1_u2_port_b = newdata;
 
@@ -224,24 +224,24 @@ static const miot6530_interface kim1_u2_miot6530_interface =
 };
 
 
-static UINT8 kim1_u3_read_a(const device_config *device, UINT8 olddata)
+static UINT8 kim1_u3_read_a(running_device *device, UINT8 olddata)
 {
 	return 0xFF;
 }
 
 
-static void kim1_u3_write_a(const device_config *device, UINT8 newdata, UINT8 olddata)
+static void kim1_u3_write_a(running_device *device, UINT8 newdata, UINT8 olddata)
 {
 }
 
 
-static UINT8 kim1_u3_read_b(const device_config *device, UINT8 olddata)
+static UINT8 kim1_u3_read_b(running_device *device, UINT8 olddata)
 {
 	return 0xFF;
 }
 
 
-static void kim1_u3_write_b(const device_config *device, UINT8 newdata, UINT8 olddata)
+static void kim1_u3_write_b(running_device *device, UINT8 newdata, UINT8 olddata)
 {
 }
 

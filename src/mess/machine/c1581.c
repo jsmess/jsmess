@@ -53,18 +53,18 @@ struct _c1581_t
 	int ser_dir;						/* fast serial direction */
 
 	/* devices */
-	const device_config *cpu;
-	const device_config *cia;
-	const device_config *wd1770;
-	const device_config *serial_bus;
-	const device_config *image;
+	running_device *cpu;
+	running_device *cia;
+	running_device *wd1770;
+	running_device *serial_bus;
+	running_device *image;
 };
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE c1581_t *get_safe_token(const device_config *device)
+INLINE c1581_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -72,11 +72,11 @@ INLINE c1581_t *get_safe_token(const device_config *device)
 	return (c1581_t *)device->token;
 }
 
-INLINE c1581_config *get_safe_config(const device_config *device)
+INLINE c1581_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == C1581) || (device->type == C1563));
-	return (c1581_config *)device->inline_config;
+	return (c1581_config *)device->baseconfig().inline_config;
 }
 
 /***************************************************************************
@@ -133,7 +133,7 @@ WRITE_LINE_DEVICE_HANDLER( c1581_iec_reset_w )
 {
 	if (!state)
 	{
-		device_reset(device);
+		device->reset();
 	}
 }
 
@@ -435,13 +435,13 @@ static DEVICE_START( c1581 )
 	c1581->address = config->address - 8;
 
 	/* find our CPU */
-	c1581->cpu = device_find_child_by_tag(device, M6502_TAG);
+	c1581->cpu = device->subdevice(M6502_TAG);
 
 	/* find devices */
-	c1581->cia = device_find_child_by_tag(device, M8520_TAG);
-	c1581->wd1770 = device_find_child_by_tag(device, WD1770_TAG);
+	c1581->cia = device->subdevice(M8520_TAG);
+	c1581->wd1770 = device->subdevice(WD1770_TAG);
 	c1581->serial_bus = devtag_get_device(device->machine, config->serial_bus_tag);
-	c1581->image = device_find_child_by_tag(device, FLOPPY_0);
+	c1581->image = device->subdevice(FLOPPY_0);
 
 	/* set floppy density */
 	wd17xx_set_density(c1581->wd1770, DEN_MFM_LO);
@@ -457,9 +457,9 @@ static DEVICE_RESET( c1581 )
 {
 	c1581_t *c1581 = get_safe_token(device);
 
-	device_reset(c1581->cpu);
-	device_reset(c1581->cia);
-	device_reset(c1581->wd1770);
+	c1581->cpu->reset();
+	c1581->cia->reset();
+	c1581->wd1770->reset();
 }
 
 /*-------------------------------------------------

@@ -14,13 +14,13 @@
 
 /*----------- defined in machine/pc1350.c -----------*/
 
-void pc1350_outa(const device_config *device, int data);
-void pc1350_outb(const device_config *device, int data);
-void pc1350_outc(const device_config *device, int data);
+void pc1350_outa(running_device *device, int data);
+void pc1350_outb(running_device *device, int data);
+void pc1350_outc(running_device *device, int data);
 
-int pc1350_brk(const device_config *device);
-int pc1350_ina(const device_config *device);
-int pc1350_inb(const device_config *device);
+int pc1350_brk(running_device *device);
+int pc1350_ina(running_device *device);
+int pc1350_inb(running_device *device);
 
 MACHINE_START( pc1350 );
 NVRAM_HANDLER( pc1350 );

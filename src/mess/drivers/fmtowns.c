@@ -350,7 +350,7 @@ static WRITE8_HANDLER(towns_sys6c_w)
 
 static READ8_HANDLER(towns_dma1_r)
 {
-	const device_config* dev = devtag_get_device(space->machine,"dma_1");
+	running_device* dev = devtag_get_device(space->machine,"dma_1");
 
 	logerror("DMA#1: read register %i\n",offset);
 	return upd71071_r(dev,offset);
@@ -358,7 +358,7 @@ static READ8_HANDLER(towns_dma1_r)
 
 static WRITE8_HANDLER(towns_dma1_w)
 {
-	const device_config* dev = devtag_get_device(space->machine,"dma_1");
+	running_device* dev = devtag_get_device(space->machine,"dma_1");
 
 	logerror("DMA#1: wrote 0x%02x to register %i\n",data,offset);
 	upd71071_w(dev,offset,data);
@@ -366,7 +366,7 @@ static WRITE8_HANDLER(towns_dma1_w)
 
 static READ8_HANDLER(towns_dma2_r)
 {
-	const device_config* dev = devtag_get_device(space->machine,"dma_2");
+	running_device* dev = devtag_get_device(space->machine,"dma_2");
 
 	logerror("DMA#2: read register %i\n",offset);
 	return upd71071_r(dev,offset);
@@ -374,7 +374,7 @@ static READ8_HANDLER(towns_dma2_r)
 
 static WRITE8_HANDLER(towns_dma2_w)
 {
-	const device_config* dev = devtag_get_device(space->machine,"dma_2");
+	running_device* dev = devtag_get_device(space->machine,"dma_2");
 
 	logerror("DMA#2: wrote 0x%02x to register %i\n",data,offset);
 	upd71071_w(dev,offset,data);
@@ -398,7 +398,7 @@ static WRITE_LINE_DEVICE_HANDLER( towns_mb8877a_drq_w )
 
 static READ8_HANDLER(towns_floppy_r)
 {
-	const device_config* fdc = devtag_get_device(space->machine,"fdc");
+	running_device* fdc = devtag_get_device(space->machine,"fdc");
 
 	switch(offset)
 	{
@@ -427,7 +427,7 @@ static READ8_HANDLER(towns_floppy_r)
 
 static WRITE8_HANDLER(towns_floppy_w)
 {
-	const device_config* fdc = devtag_get_device(space->machine,"fdc");
+	running_device* fdc = devtag_get_device(space->machine,"fdc");
 
 	switch(offset)
 	{
@@ -492,13 +492,13 @@ static WRITE8_HANDLER(towns_floppy_w)
 
 static UINT16 towns_fdc_dma_r(running_machine* machine)
 {
-	const device_config* fdc = devtag_get_device(machine,"fdc");
+	running_device* fdc = devtag_get_device(machine,"fdc");
 	return wd17xx_data_r(fdc,0);
 }
 
 static void towns_fdc_dma_w(running_machine* machine, UINT16 data)
 {
-	const device_config* fdc = devtag_get_device(machine,"fdc");
+	running_device* fdc = devtag_get_device(machine,"fdc");
 	wd17xx_data_w(fdc,0,data);
 }
 
@@ -520,7 +520,7 @@ static void towns_fdc_dma_w(running_machine* machine, UINT16 data)
  */
 static void towns_kb_sendcode(running_machine* machine, UINT8 scancode, int release)
 {
-	const device_config* dev = devtag_get_device(machine,"pic8259_master");
+	running_device* dev = devtag_get_device(machine,"pic8259_master");
 
 	switch(release)
 	{
@@ -651,7 +651,7 @@ static READ8_HANDLER(towns_port60_r)
 
 static WRITE8_HANDLER(towns_port60_w)
 {
-	const device_config* dev = devtag_get_device(space->machine,"pic8259_master");
+	running_device* dev = devtag_get_device(space->machine,"pic8259_master");
 
 	if(data & 0x80)
 	{
@@ -1008,8 +1008,8 @@ static void towns_cd_set_status(running_machine* machine, UINT8 st0, UINT8 st1, 
 
 static UINT8 towns_cd_get_track(running_machine* machine)
 {
-	const device_config* cdrom = devtag_get_device(machine,"cdrom");
-	const device_config* cdda = devtag_get_device(machine,"cdda");
+	running_device* cdrom = devtag_get_device(machine,"cdrom");
+	running_device* cdda = devtag_get_device(machine,"cdda");
 	UINT32 lba = cdda_get_audio_lba(cdda);
 	UINT8 track;
 
@@ -1023,7 +1023,7 @@ static UINT8 towns_cd_get_track(running_machine* machine)
 
 static TIMER_CALLBACK( towns_cdrom_read_byte )
 {
-	const device_config* device = (const device_config* )ptr;
+	running_device* device = (running_device* )ptr;
 	int masked;
 	// TODO: support software transfers, for now DMA is assumed.
 
@@ -1071,7 +1071,7 @@ static TIMER_CALLBACK( towns_cdrom_read_byte )
 	}
 }
 
-static void towns_cdrom_read(const device_config* device)
+static void towns_cdrom_read(running_device* device)
 {
 	// MODE 1 read
 	// load data into buffer to be sent via DMA1 channel 3
@@ -1162,7 +1162,7 @@ static void towns_cdrom_read(const device_config* device)
 	}
 }
 
-static void towns_cdrom_play_cdda(const device_config* device)
+static void towns_cdrom_play_cdda(running_device* device)
 {
 	// PLAY AUDIO
 	// Plays CD-DA audio from the specified MSF
@@ -1170,7 +1170,7 @@ static void towns_cdrom_play_cdda(const device_config* device)
 	//          3 bytes: starting MSF of audio to play
 	//          3 bytes: ending MSF of audio to play (can span multiple tracks)
 	UINT32 lba1,lba2;
-	const device_config* cdda = devtag_get_device(device->machine,"cdda");
+	running_device* cdda = devtag_get_device(device->machine,"cdda");
 
 	lba1 = towns_cd.parameter[7] << 16;
 	lba1 += towns_cd.parameter[6] << 8;
@@ -1189,7 +1189,7 @@ static void towns_cdrom_play_cdda(const device_config* device)
 	towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
 }
 
-static void towns_cdrom_execute_command(const device_config* device)
+static void towns_cdrom_execute_command(running_device* device)
 {
 	if(mess_cd_get_cdrom_file(device) == NULL)
 	{  // No CD in drive
@@ -1576,8 +1576,8 @@ static READ8_HANDLER(towns_41ff_r)
 
 static IRQ_CALLBACK( towns_irq_callback )
 {
-	const device_config* pic1 = devtag_get_device(device->machine,"pic8259_master");
-	const device_config* pic2 = devtag_get_device(device->machine,"pic8259_slave");
+	running_device* pic1 = devtag_get_device(device->machine,"pic8259_master");
+	running_device* pic2 = devtag_get_device(device->machine,"pic8259_slave");
 	int r;
 
 	r = pic8259_acknowledge(pic2);
@@ -1590,9 +1590,9 @@ static IRQ_CALLBACK( towns_irq_callback )
 }
 
 // YM3438 interrupt (IRQ 13)
-void towns_fm_irq(const device_config* device, int irq)
+void towns_fm_irq(running_device* device, int irq)
 {
-	const device_config* pic = devtag_get_device(device->machine,"pic8259_slave");
+	running_device* pic = devtag_get_device(device->machine,"pic8259_slave");
 	if(irq)
 	{
 		towns_fm_irq_flag = 1;
@@ -1606,9 +1606,9 @@ void towns_fm_irq(const device_config* device, int irq)
 }
 
 // PCM interrupt (IRQ 13)
-void towns_pcm_irq(const device_config* device, int channel)
+void towns_pcm_irq(running_device* device, int channel)
 {
-	const device_config* pic = devtag_get_device(device->machine,"pic8259_slave");
+	running_device* pic = devtag_get_device(device->machine,"pic8259_slave");
 
 	towns_pcm_irq_flag = 1;
 	towns_pcm_channel_flag |= (1 << channel);
@@ -1624,7 +1624,7 @@ static PIC8259_SET_INT_LINE( towns_pic_irq )
 
 static PIC8259_SET_INT_LINE( towns_slave_pic_irq )
 {
-	const device_config* dev = devtag_get_device(device->machine,"pic8259_master");
+	running_device* dev = devtag_get_device(device->machine,"pic8259_master");
 
 	pic8259_set_irq_line(dev,7,interrupt);
 //  logerror("PIC#2: set IRQ line to %i\n",interrupt);
@@ -1632,7 +1632,7 @@ static PIC8259_SET_INT_LINE( towns_slave_pic_irq )
 
 static PIT8253_OUTPUT_CHANGED( towns_pit_out0_changed )
 {
-	const device_config* dev = devtag_get_device(device->machine,"pic8259_master");
+	running_device* dev = devtag_get_device(device->machine,"pic8259_master");
 
 	if(towns_timer_mask & 0x01)
 	{
@@ -1642,7 +1642,7 @@ static PIT8253_OUTPUT_CHANGED( towns_pit_out0_changed )
 
 static PIT8253_OUTPUT_CHANGED( towns_pit_out1_changed )
 {
-//  const device_config* dev = devtag_get_device(device->machine,"pic8259_master");
+//  running_device* dev = devtag_get_device(device->machine,"pic8259_master");
 
 	if(towns_timer_mask & 0x02)
 	{

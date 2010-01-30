@@ -144,13 +144,13 @@ struct _upd765_t
 };
 
 //static void upd765_setup_data_request(unsigned char Data);
-static void upd765_setup_command(const device_config *device);
+static void upd765_setup_command(running_device *device);
 static TIMER_CALLBACK(upd765_continue_command);
-static int upd765_sector_count_complete(const device_config *device);
-static void upd765_increment_sector(const device_config *device);
-static void upd765_update_state(const device_config *device);
-static void upd765_set_dma_drq(const device_config *device,int state);
-static void upd765_set_int(const device_config *device,int state);
+static int upd765_sector_count_complete(running_device *device);
+static void upd765_increment_sector(running_device *device);
+static void upd765_update_state(running_device *device);
+static void upd765_set_dma_drq(running_device *device,int state);
+static void upd765_set_int(running_device *device,int state);
 
 static const INT8 upd765_cmd_size[32] =
 {
@@ -158,7 +158,7 @@ static const INT8 upd765_cmd_size[32] =
 	1,9,1,1,1,1,9,1,1,9,1,1,1,9,1,1
 };
 
-INLINE upd765_t *get_safe_token(const device_config *device)
+INLINE upd765_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -166,9 +166,9 @@ INLINE upd765_t *get_safe_token(const device_config *device)
 	return (upd765_t *)device->token;
 }
 
-static const device_config *current_image(const device_config *device)
+static running_device *current_image(running_device *device)
 {
-	const device_config *image = NULL;
+	running_device *image = NULL;
 	upd765_t *fdc = get_safe_token(device);
 
 	if (!fdc->intf->get_image)
@@ -176,7 +176,7 @@ static const device_config *current_image(const device_config *device)
 		if (fdc->intf->floppy_drive_tags[fdc->drive] != NULL)
 		{
 			if (device->owner != NULL)
-				image = device_find_child_by_tag(device->owner, fdc->intf->floppy_drive_tags[fdc->drive]);
+				image = device->owner->subdevice(fdc->intf->floppy_drive_tags[fdc->drive]);
 			else
 				image = devtag_get_device(device->machine, fdc->intf->floppy_drive_tags[fdc->drive]);
 		}
@@ -188,7 +188,7 @@ static const device_config *current_image(const device_config *device)
 	return image;
 }
 
-static void upd765_setup_drive_and_side(const device_config *device)
+static void upd765_setup_drive_and_side(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	/* drive index upd765 sees */
@@ -199,7 +199,7 @@ static void upd765_setup_drive_and_side(const device_config *device)
 
 
 /* setup status register 0 based on data in status register 1 and 2 */
-static void upd765_setup_st0(const device_config *device)
+static void upd765_setup_st0(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	/* clear completition status bits, drive bits and side bits */
@@ -225,19 +225,19 @@ static int upd765_n_to_bytes(int n)
 	return 1<<(n+7);
 }
 
-static void upd765_set_data_request(const device_config *device)
+static void upd765_set_data_request(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	fdc->FDC_main |= 0x080;
 }
 
-static void upd765_clear_data_request(const device_config *device)
+static void upd765_clear_data_request(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	fdc->FDC_main &= ~0x080;
 }
 
-static void upd765_seek_complete(const device_config *device)
+static void upd765_seek_complete(running_device *device)
 {
 	/* tested on Amstrad CPC */
 
@@ -292,7 +292,7 @@ static void upd765_seek_complete(const device_config *device)
         This indicates it is always ready!!!!!
     */
 
-	const device_config *img = current_image(device);
+	running_device *img = current_image(device);
 	upd765_t *fdc = get_safe_token(device);
 
 	fdc->pcn[fdc->drive] = fdc->ncn;
@@ -330,7 +330,7 @@ static void upd765_seek_complete(const device_config *device)
 
 static TIMER_CALLBACK(upd765_seek_timer_callback)
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	upd765_t *fdc = get_safe_token(device);
 	/* seek complete */
 	upd765_seek_complete(device);
@@ -338,7 +338,7 @@ static TIMER_CALLBACK(upd765_seek_timer_callback)
 	timer_reset(fdc->seek_timer, attotime_never);
 }
 
-static void upd765_timer_func(const device_config *device, int timer_type)
+static void upd765_timer_func(running_device *device, int timer_type)
 {
 	upd765_t *fdc = get_safe_token(device);
 	/* type 0 = data transfer mode in execution phase */
@@ -417,7 +417,7 @@ static void upd765_timer_func(const device_config *device, int timer_type)
 
 static TIMER_CALLBACK(upd765_timer_callback)
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	upd765_timer_func(device,param);
 }
 
@@ -427,7 +427,7 @@ In this driver, the first NMI calls the handler function, furthur NMI's are
 effectively disabled by reading the data before the NMI int can be set.
 */
 
-static void upd765_setup_timed_generic(const device_config *device, int timer_type, attotime duration)
+static void upd765_setup_timed_generic(running_device *device, int timer_type, attotime duration)
 {
 	upd765_t *fdc = get_safe_token(device);
 
@@ -445,30 +445,30 @@ static void upd765_setup_timed_generic(const device_config *device, int timer_ty
 }
 
 /* setup data request */
-static void upd765_setup_timed_data_request(const device_config *device, int bytes)
+static void upd765_setup_timed_data_request(running_device *device, int bytes)
 {
 	/* setup timer to trigger in UPD765_DATA_RATE us */
 	upd765_setup_timed_generic(device, 0, ATTOTIME_IN_USEC(32-27)	/*UPD765_DATA_RATE)*bytes*/);
 }
 
 /* setup result data request */
-static void upd765_setup_timed_result_data_request(const device_config *device)
+static void upd765_setup_timed_result_data_request(running_device *device)
 {
 	upd765_setup_timed_generic(device, 2, ATTOTIME_IN_USEC(UPD765_DATA_RATE*2));
 }
 
 
 /* sets up a timer to issue a seek complete in signed_tracks time */
-static void upd765_setup_timed_int(const device_config *device,int signed_tracks)
+static void upd765_setup_timed_int(running_device *device,int signed_tracks)
 {
 	upd765_t *fdc = get_safe_token(device);
 	/* setup timer to signal after seek time is complete */
 	timer_adjust_oneshot(fdc->seek_timer, double_to_attotime(fdc->srt_in_ms*abs(signed_tracks)*0.001), 0);
 }
 
-static void upd765_seek_setup(const device_config *device, int is_recalibrate)
+static void upd765_seek_setup(running_device *device, int is_recalibrate)
 {
-	const device_config *img;
+	running_device *img;
 	int signed_tracks;
 	upd765_t *fdc = get_safe_token(device);
 
@@ -570,7 +570,7 @@ static void upd765_seek_setup(const device_config *device, int is_recalibrate)
 
 
 
-static void upd765_setup_execution_phase_read(const device_config *device, char *ptr, int size)
+static void upd765_setup_execution_phase_read(running_device *device, char *ptr, int size)
 {
 	upd765_t *fdc = get_safe_token(device);
 
@@ -584,7 +584,7 @@ static void upd765_setup_execution_phase_read(const device_config *device, char 
 	upd765_setup_timed_data_request(device, 1);
 }
 
-static void upd765_setup_execution_phase_write(const device_config *device, char *ptr, int size)
+static void upd765_setup_execution_phase_write(running_device *device, char *ptr, int size)
 {
 	upd765_t *fdc = get_safe_token(device);
 
@@ -600,7 +600,7 @@ static void upd765_setup_execution_phase_write(const device_config *device, char
 }
 
 
-static void upd765_setup_result_phase(const device_config *device, int byte_count)
+static void upd765_setup_result_phase(running_device *device, int byte_count)
 {
 	upd765_t *fdc = get_safe_token(device);
 
@@ -614,7 +614,7 @@ static void upd765_setup_result_phase(const device_config *device, int byte_coun
 	upd765_setup_timed_result_data_request(device);
 }
 
-void upd765_idle(const device_config *device)
+void upd765_idle(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 
@@ -629,7 +629,7 @@ void upd765_idle(const device_config *device)
 
 
 /* change flags */
-static void upd765_change_flags(const device_config *device,unsigned int flags, unsigned int mask)
+static void upd765_change_flags(running_device *device,unsigned int flags, unsigned int mask)
 {
 	unsigned int new_flags;
 	unsigned int changed_flags;
@@ -655,7 +655,7 @@ static void upd765_change_flags(const device_config *device,unsigned int flags, 
 
 
 /* set int output */
-static void upd765_set_int(const device_config *device, int state)
+static void upd765_set_int(running_device *device, int state)
 {
 	if (LOG_INTERRUPT)
 		logerror("upd765_set_int(): state=%d\n", state);
@@ -665,7 +665,7 @@ static void upd765_set_int(const device_config *device, int state)
 
 
 /* set dma request output */
-static void upd765_set_dma_drq(const device_config *device, int state)
+static void upd765_set_dma_drq(running_device *device, int state)
 {
 	upd765_change_flags(device, state ? UPD765_DMA_DRQ : 0, UPD765_DMA_DRQ);
 }
@@ -700,7 +700,7 @@ is not ready.
 /* done when ready state of drive changes */
 /* this ignores if command is active, in which case command should terminate immediatly
 with error */
-static void upd765_set_ready_change_callback(const device_config *controller, const device_config *img, int state)
+static void upd765_set_ready_change_callback(running_device *controller, running_device *img, int state)
 {
 	upd765_t *fdc = get_safe_token(controller);
 	int drive = floppy_get_drive(img);
@@ -779,7 +779,7 @@ skip it.
 if SK==1, and we are executing a read deleted data command, and a data mark is found,
 skip it. */
 
-static int upd765_read_skip_sector(const device_config *device)
+static int upd765_read_skip_sector(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	/* skip set? */
@@ -823,10 +823,10 @@ static int upd765_read_skip_sector(const device_config *device)
   - if the index is seen twice while it is searching for a sector, then the sector cannot be found
 */
 
-static void upd765_get_next_id(const device_config *device, chrn_id *id)
+static void upd765_get_next_id(running_device *device, chrn_id *id)
 {
 	upd765_t *fdc = get_safe_token(device);
-	const device_config *img = current_image(device);
+	running_device *img = current_image(device);
 
 	/* get next id from disc */
 	floppy_drive_get_next_id(img, fdc->side,id);
@@ -841,10 +841,10 @@ static void upd765_get_next_id(const device_config *device, chrn_id *id)
 	}
 }
 
-static int upd765_get_matching_sector(const device_config *device)
+static int upd765_get_matching_sector(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
-	const device_config *img = current_image(device);
+	running_device *img = current_image(device);
 	chrn_id id;
 
 	/* number of times we have seen index hole */
@@ -919,7 +919,7 @@ static int upd765_get_matching_sector(const device_config *device)
 	return 0;
 }
 
-static void upd765_read_complete(const device_config *device)
+static void upd765_read_complete(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 /* causes problems!!! - need to fix */
@@ -956,10 +956,10 @@ static void upd765_read_complete(const device_config *device)
 	upd765_setup_result_phase(device,7);
 }
 
-static void upd765_read_data(const device_config *device)
+static void upd765_read_data(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
-	const device_config *img = current_image(device);
+	running_device *img = current_image(device);
 
 	if (!(floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY)))
 	{
@@ -1039,10 +1039,10 @@ static void upd765_read_data(const device_config *device)
 }
 
 
-static void upd765_format_track(const device_config *device)
+static void upd765_format_track(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
-	const device_config *img = current_image(device);
+	running_device *img = current_image(device);
 
 	/* write protected? */
 	if (floppy_wpt_r(img) == CLEAR_LINE)
@@ -1066,7 +1066,7 @@ static void upd765_format_track(const device_config *device)
     upd765_setup_execution_phase_write(device, &fdc->format_data[0], 4);
 }
 
-static void upd765_read_a_track(const device_config *device)
+static void upd765_read_a_track(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	int data_size;
@@ -1104,14 +1104,14 @@ static void upd765_read_a_track(const device_config *device)
 	upd765_setup_execution_phase_read(device,fdc->data_buffer, data_size);
 }
 
-static int upd765_just_read_last_sector_on_track(const device_config *device)
+static int upd765_just_read_last_sector_on_track(running_device *device)
 {
 	if (floppy_drive_get_flag_state(current_image(device), FLOPPY_DRIVE_INDEX))
 		return 1;
 	return 0;
 }
 
-static void upd765_write_complete(const device_config *device)
+static void upd765_write_complete(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 
@@ -1150,7 +1150,7 @@ static void upd765_write_complete(const device_config *device)
 }
 
 
-static void upd765_write_data(const device_config *device)
+static void upd765_write_data(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	if (!(floppy_drive_get_flag_state(current_image(device), FLOPPY_DRIVE_READY)))
@@ -1195,7 +1195,7 @@ static void upd765_write_data(const device_config *device)
 
 
 /* return true if we have read all sectors, false if not */
-static int upd765_sector_count_complete(const device_config *device)
+static int upd765_sector_count_complete(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 /* this is not correct?? */
@@ -1332,7 +1332,7 @@ static int upd765_sector_count_complete(const device_config *device)
 	return 0;
 }
 
-static void	upd765_increment_sector(const device_config *device)
+static void	upd765_increment_sector(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	/* multi-track? */
@@ -1371,7 +1371,7 @@ static void	upd765_increment_sector(const device_config *device)
 the data is not skipped. The data is read, but the control mark is set and the read is stopped */
 /* if SK==0, and we are executing a read deleted data command, and a data sector is found,
 the data is not skipped. The data is read, but the control mark is set and the read is stopped */
-static int upd765_read_data_stop(const device_config *device)
+static int upd765_read_data_stop(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	/* skip not set? */
@@ -1412,7 +1412,7 @@ static int upd765_read_data_stop(const device_config *device)
 
 static TIMER_CALLBACK(upd765_continue_command)
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	upd765_t *fdc = get_safe_token(device);
 	if ((fdc->upd765_phase == UPD765_EXECUTION_PHASE_READ) ||
 		(fdc->upd765_phase == UPD765_EXECUTION_PHASE_WRITE))
@@ -1536,7 +1536,7 @@ static TIMER_CALLBACK(upd765_continue_command)
 }
 
 
-static int upd765_get_command_byte_count(const device_config *device)
+static int upd765_get_command_byte_count(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	fdc->command = fdc->upd765_command_bytes[0] & 0x01f;
@@ -1602,7 +1602,7 @@ static int upd765_get_command_byte_count(const device_config *device)
 
 
 
-void upd765_update_state(const device_config *device)
+void upd765_update_state(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	switch (fdc->upd765_phase) {
@@ -1797,7 +1797,7 @@ WRITE8_DEVICE_HANDLER(upd765_data_w)
 	}
 }
 
-static void upd765_setup_invalid(const device_config *device)
+static void upd765_setup_invalid(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 
@@ -1806,7 +1806,7 @@ static void upd765_setup_invalid(const device_config *device)
 	upd765_setup_result_phase(device,1);
 }
 
-static void upd765_setup_command(const device_config *device)
+static void upd765_setup_command(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 
@@ -1835,7 +1835,7 @@ static void upd765_setup_command(const device_config *device)
 		"Lock"						/* [14] */
 	};
 
-	const device_config *img;
+	running_device *img;
 	const char *cmd = NULL;
 	chrn_id id;
 
@@ -2186,7 +2186,7 @@ READ8_DEVICE_HANDLER(upd765_dack_r)
 }
 
 
-void upd765_reset(const device_config *device, int offset)
+void upd765_reset(running_device *device, int offset)
 {
 	upd765_t *fdc = get_safe_token(device);
 
@@ -2218,10 +2218,10 @@ void upd765_reset(const device_config *device, int offset)
 		{
 			if (fdc->intf->floppy_drive_tags[i]!=NULL)
 			{
-				const device_config *img;
+				running_device *img;
 
 				if (device->owner != NULL)
-					img = device_find_child_by_tag(device->owner, fdc->intf->floppy_drive_tags[i]);
+					img = device->owner->subdevice(fdc->intf->floppy_drive_tags[i]);
 				else
 					img = devtag_get_device(device->machine, fdc->intf->floppy_drive_tags[i]);
 
@@ -2295,16 +2295,16 @@ WRITE_LINE_DEVICE_HANDLER( upd765_ready_w )
 
 /* Device Interface */
 
-static void common_start(const device_config *device, int device_type)
+static void common_start(running_device *device, int device_type)
 {
 	upd765_t *fdc = get_safe_token(device);
 	// validate arguments
 
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(device->static_config != NULL);
+	assert(device->baseconfig().static_config != NULL);
 
-	fdc->intf = (const upd765_interface*)device->static_config;
+	fdc->intf = (const upd765_interface*)device->baseconfig().static_config;
 
 	fdc->version = (UPD765_VERSION)device_type;
 	fdc->timer = timer_alloc(device->machine, upd765_timer_callback, (void*)device);
@@ -2347,10 +2347,10 @@ static DEVICE_RESET( upd765 )
 	for (i = 0; i < 4; i++) {
 		if (fdc->intf->floppy_drive_tags[i]!=NULL)
 		{
-			const device_config *img;
+			running_device *img;
 
 			if (device->owner != NULL)
-				img = device_find_child_by_tag(device->owner, fdc->intf->floppy_drive_tags[i]);
+				img = device->owner->subdevice(fdc->intf->floppy_drive_tags[i]);
 			else
 				img = devtag_get_device(device->machine, fdc->intf->floppy_drive_tags[i]);
 

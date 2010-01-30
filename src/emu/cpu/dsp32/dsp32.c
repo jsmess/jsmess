@@ -183,8 +183,8 @@ struct _dsp32_state
 	int				icount;
 	UINT8			lastpins;
 	UINT32			ppc;
-	void			(*output_pins_changed)(const device_config *device, UINT32 pins);
-	const device_config *device;
+	void			(*output_pins_changed)(running_device *device, UINT32 pins);
+	running_device *device;
 	const address_space *program;
 };
 
@@ -202,7 +202,7 @@ static CPU_RESET( dsp32c );
     STATE ACCESSORS
 ***************************************************************************/
 
-INLINE dsp32_state *get_safe_token(const device_config *device)
+INLINE dsp32_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -313,7 +313,7 @@ static void update_pcr(dsp32_state *cpustate, UINT16 newval)
 
 static CPU_INIT( dsp32c )
 {
-	const dsp32_config *configdata = (const dsp32_config *)device->static_config;
+	const dsp32_config *configdata = (const dsp32_config *)device->baseconfig().static_config;
 	dsp32_state *cpustate = get_safe_token(device);
 
 	/* copy in config data */
@@ -499,7 +499,7 @@ INLINE void dma_store(dsp32_state *cpustate)
 }
 
 
-void dsp32c_pio_w(const device_config *device, int reg, int data)
+void dsp32c_pio_w(running_device *device, int reg, int data)
 {
 	dsp32_state *cpustate = get_safe_token(device);
 	UINT16 mask;
@@ -578,7 +578,7 @@ void dsp32c_pio_w(const device_config *device, int reg, int data)
     PARALLEL INTERFACE READS
 ***************************************************************************/
 
-int dsp32c_pio_r(const device_config *device, int reg)
+int dsp32c_pio_r(running_device *device, int reg)
 {
 	dsp32_state *cpustate = get_safe_token(device);
 	UINT16 mask, result = 0xffff;
@@ -740,15 +740,15 @@ CPU_GET_INFO( dsp32c )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 4;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 4;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 24;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 24;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + DSP32_IRQ0:		info->i = 0;							break;
 		case CPUINFO_INT_INPUT_STATE + DSP32_IRQ1:		info->i = 0;							break;

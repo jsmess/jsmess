@@ -48,7 +48,7 @@ static TIMER_CALLBACK(bitbanger_overthreshhold);
     get_token - safely gets the bitbanger data
 -------------------------------------------------*/
 
-INLINE bitbanger_token *get_token(const device_config *device)
+INLINE bitbanger_token *get_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -62,12 +62,12 @@ INLINE bitbanger_token *get_token(const device_config *device)
     get_config - safely gets the bitbanger config
 -------------------------------------------------*/
 
-INLINE const bitbanger_config *get_config(const device_config *device)
+INLINE const bitbanger_config *get_config(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type == BITBANGER);
-	return (const bitbanger_config *) device->static_config;
+	return (const bitbanger_config *) device->baseconfig().static_config;
 }
 
 
@@ -101,7 +101,7 @@ static DEVICE_START(bitbanger)
     bitbanger_analyze
 -------------------------------------------------*/
 
-static void bitbanger_analyze(const device_config *device)
+static void bitbanger_analyze(running_device *device)
 {
 	int i, factor, total_duration;
 	double smallest_pulse;
@@ -149,7 +149,7 @@ static void bitbanger_analyze(const device_config *device)
     bitbanger_addpulse
 -------------------------------------------------*/
 
-static void bitbanger_addpulse(const device_config *device, double pulse_width)
+static void bitbanger_addpulse(running_device *device, double pulse_width)
 {
 	bitbanger_token *bi = get_token(device);
 	const bitbanger_config *config = get_config(device);
@@ -174,7 +174,7 @@ static void bitbanger_addpulse(const device_config *device, double pulse_width)
 
 static TIMER_CALLBACK(bitbanger_overthreshhold)
 {
-	const device_config *device = (const device_config *) ptr;
+	running_device *device = (running_device *) ptr;
 	bitbanger_token *bi = get_token(device);
 
 	bitbanger_addpulse(device, attotime_to_double(timer_get_time(machine)) - bi->last_pulse_time);
@@ -189,7 +189,7 @@ static TIMER_CALLBACK(bitbanger_overthreshhold)
     port
 -------------------------------------------------*/
 
-void bitbanger_output(const device_config *device, int value)
+void bitbanger_output(running_device *device, int value)
 {
 	bitbanger_token *bi = get_token(device);
 	const bitbanger_config *config = get_config(device);

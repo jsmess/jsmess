@@ -85,7 +85,7 @@ static UINT32 nHPC_SCSI0Descriptor, nHPC_SCSI0DMACtrl;
 
 static READ32_HANDLER( hpc_r )
 {
-	const device_config *scc;
+	running_device *scc;
 	running_machine *machine = space->machine;
 
 	offset <<= 2;
@@ -202,8 +202,8 @@ static READ32_HANDLER( hpc_r )
 
 static WRITE32_HANDLER( hpc_w )
 {
-	const device_config *scc;
-	const device_config *eeprom;
+	running_device *scc;
+	running_device *eeprom;
 	running_machine *machine = space->machine;
 
 	eeprom = devtag_get_device(space->machine, "eeprom");

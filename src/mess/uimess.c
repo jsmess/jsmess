@@ -160,17 +160,21 @@ static void process_natural_keyboard(running_machine *machine)
 int ui_mess_handler_ingame(running_machine *machine)
 {
 	int ui_disabled;
-	const device_config *dev;
+	running_device *dev;
 
 	/* run display routine for devices */
 	if (mame_get_phase(machine) == MAME_PHASE_RUNNING)
 	{
-		for (dev = image_device_first(machine->config); dev != NULL; dev = image_device_next(dev))
+	
+		for (dev = machine->devicelist.first(); dev != NULL; dev = dev->next)
 		{
-			device_display_func display = (device_display_func) device_get_info_fct(dev, DEVINFO_FCT_DISPLAY);
-			if (display != NULL)
+			if (is_image_device(dev))
 			{
-				(*display)(dev);
+				device_display_func display = (device_display_func) dev->get_config_fct(DEVINFO_FCT_DISPLAY);
+				if (display != NULL)
+				{
+					(*display)(dev);
+				}
 			}
 		}
 	}
@@ -237,7 +241,7 @@ int ui_mess_handler_ingame(running_machine *machine)
 
 static astring *image_info_astring(running_machine *machine, astring *string)
 {
-	const device_config *img;
+	running_device *img;
 
 	astring_printf(string, "%s\n\n", machine->gamedrv->description);
 
@@ -249,48 +253,51 @@ static astring *image_info_astring(running_machine *machine, astring *string)
 	}
 #endif
 
-	for (img = image_device_first(machine->config); img != NULL; img = image_device_next(img))
+	for (img = machine->devicelist.first(); img != NULL; img = img->next)
 	{
-		const char *name = image_filename(img);
-		if (name != NULL)
+		if (is_image_device(img))
 		{
-			const char *base_filename;
-			const char *info;
-			char *base_filename_noextension;
-
-			base_filename = image_basename(img);
-			base_filename_noextension = strip_extension(base_filename);
-
-			/* display device type and filename */
-			astring_catprintf(string, "%s: %s\n", image_typename_id(img), base_filename);
-
-			/* display long filename, if present and doesn't correspond to name */
-			info = image_longname(img);
-			if (info && (!base_filename_noextension || mame_stricmp(info, base_filename_noextension)))
-				astring_catprintf(string, "%s\n", info);
-
-			/* display manufacturer, if available */
-			info = image_manufacturer(img);
-			if (info != NULL)
+			const char *name = image_filename(img);
+			if (name != NULL)
 			{
-				astring_catprintf(string, "%s", info);
-				info = stripspace(image_year(img));
-				if (info && *info)
-					astring_catprintf(string, ", %s", info);
-				astring_catprintf(string,"\n");
+				const char *base_filename;
+				const char *info;
+				char *base_filename_noextension;
+
+				base_filename = image_basename(img);
+				base_filename_noextension = strip_extension(base_filename);
+
+				/* display device type and filename */
+				astring_catprintf(string, "%s: %s\n", image_typename_id(img), base_filename);
+
+				/* display long filename, if present and doesn't correspond to name */
+				info = image_longname(img);
+				if (info && (!base_filename_noextension || mame_stricmp(info, base_filename_noextension)))
+					astring_catprintf(string, "%s\n", info);
+
+				/* display manufacturer, if available */
+				info = image_manufacturer(img);
+				if (info != NULL)
+				{
+					astring_catprintf(string, "%s", info);
+					info = stripspace(image_year(img));
+					if (info && *info)
+						astring_catprintf(string, ", %s", info);
+					astring_catprintf(string,"\n");
+				}
+
+				/* display playable information, if available */
+				info = image_playable(img);
+				if (info != NULL)
+					astring_catprintf(string, "%s\n", info);
+
+				if (base_filename_noextension != NULL)
+					free(base_filename_noextension);
 			}
-
-			/* display playable information, if available */
-			info = image_playable(img);
-			if (info != NULL)
-				astring_catprintf(string, "%s\n", info);
-
-			if (base_filename_noextension != NULL)
-				free(base_filename_noextension);
-		}
-		else
-		{
-			astring_catprintf(string, "%s: ---\n", image_typename_id(img));
+			else
+			{
+				astring_catprintf(string, "%s: ---\n", image_typename_id(img));
+			}
 		}
 	}
 	return string;
@@ -433,7 +440,7 @@ void ui_mess_main_menu_populate(running_machine *machine, ui_menu *menu)
 	int has_keyboard = FALSE;
 
 	/* scan the input port array to see what options we need to enable */
-	for (port = machine->portlist.head; port != NULL; port = port->next)
+	for (port = machine->portlist.first(); port != NULL; port = port->next)
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -449,7 +456,7 @@ void ui_mess_main_menu_populate(running_machine *machine, ui_menu *menu)
 	ui_menu_item_append(menu, "File Manager", NULL, 0, (void*)ui_mess_menu_file_manager);
 
   	/* add tape control menu */
-	if (device_list_first(&machine->config->devicelist, CASSETTE))
+	if (machine->devicelist.first(CASSETTE))
 		ui_menu_item_append(menu, "Tape Control", NULL, 0, (void*)ui_mess_menu_tape_control);
 
   	/* add keyboard mode menu */

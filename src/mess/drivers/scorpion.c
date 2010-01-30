@@ -188,7 +188,7 @@ static int scorpion_256_port_1ffd_data = 0;
 
 static int ROMSelection;
 
-static const device_config* beta;
+static running_device* beta;
 
 //static UINT8 *rom_pointer;
 

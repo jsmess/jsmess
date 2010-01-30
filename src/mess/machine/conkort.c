@@ -121,11 +121,11 @@ struct _slow_t
 	int wait_enable;		/* wait enable */
 
 	/* devices */
-	const device_config *cpu;
-	const device_config *z80pio;
-	const device_config *wd1791;
-	const device_config *image0;
-	const device_config *image1;
+	running_device *cpu;
+	running_device *z80pio;
+	running_device *wd1791;
+	running_device *image0;
+	running_device *image1;
 };
 
 typedef struct _fast_t fast_t;
@@ -136,25 +136,25 @@ struct _fast_t
 	int fdc_irq;			/* FDC interrupt */
 
 	/* devices */
-	const device_config *cpu;
-	const device_config *z80dma;
-	const device_config *wd1793;
-	const device_config *image0;
-	const device_config *image1;
+	running_device *cpu;
+	running_device *z80dma;
+	running_device *wd1793;
+	running_device *image0;
+	running_device *image1;
 };
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE slow_t *get_safe_token_slow(const device_config *device)
+INLINE slow_t *get_safe_token_slow(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
 	return (slow_t *)device->token;
 }
 
-INLINE fast_t *get_safe_token_fast(const device_config *device)
+INLINE fast_t *get_safe_token_fast(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -163,13 +163,13 @@ INLINE fast_t *get_safe_token_fast(const device_config *device)
 
 INLINE slow_t *get_safe_token_machine_slow(running_machine *machine)
 {
-   	const device_config *device = devtag_get_device(machine, CONKORT_TAG);
+   	running_device *device = devtag_get_device(machine, CONKORT_TAG);
 	return get_safe_token_slow(device);
 }
 
 INLINE fast_t *get_safe_token_machine_fast(running_machine *machine)
 {
-   	const device_config *device = devtag_get_device(machine, CONKORT_TAG);
+   	running_device *device = devtag_get_device(machine, CONKORT_TAG);
 	return get_safe_token_fast(device);
 }
 
@@ -845,13 +845,13 @@ static DEVICE_START( luxor_55_10828 )
 	slow_t *conkort = (slow_t *)device->token;
 
 	/* find our CPU */
-	conkort->cpu = device_find_child_by_tag(device, Z80_TAG);
+	conkort->cpu = device->subdevice(Z80_TAG);
 
 	/* find devices */
-	conkort->z80pio = device_find_child_by_tag(device, Z80PIO_TAG);
-	conkort->wd1791 = device_find_child_by_tag(device, WD1791_TAG);
-	conkort->image0 = device_find_child_by_tag(device, FLOPPY_0);
-	conkort->image1 = device_find_child_by_tag(device, FLOPPY_1);
+	conkort->z80pio = device->subdevice(Z80PIO_TAG);
+	conkort->wd1791 = device->subdevice(WD1791_TAG);
+	conkort->image0 = device->subdevice(FLOPPY_0);
+	conkort->image1 = device->subdevice(FLOPPY_1);
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, conkort->status);
@@ -913,13 +913,13 @@ static DEVICE_START( luxor_55_21046 )
 	fast_t *conkort = (fast_t *)device->token;
 
 	/* find our CPU */
-	conkort->cpu = device_find_child_by_tag(device, Z80_TAG);
+	conkort->cpu = device->subdevice(Z80_TAG);
 
 	/* find devices */
-	conkort->z80dma = device_find_child_by_tag(device, Z80DMA_TAG);
-	conkort->wd1793 = device_find_child_by_tag(device, SAB1793_TAG);
-	conkort->image0 = device_find_child_by_tag(device, FLOPPY_0);
-	conkort->image1 = device_find_child_by_tag(device, FLOPPY_1);
+	conkort->z80dma = device->subdevice(Z80DMA_TAG);
+	conkort->wd1793 = device->subdevice(SAB1793_TAG);
+	conkort->image0 = device->subdevice(FLOPPY_0);
+	conkort->image1 = device->subdevice(FLOPPY_1);
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, conkort->status);

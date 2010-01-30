@@ -304,7 +304,7 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 
 TIMER_CALLBACK(x68k_crtc_vblank_irq)
 {
-	const device_config *x68k_mfp = devtag_get_device(machine, MC68901_TAG);
+	running_device *x68k_mfp = devtag_get_device(machine, MC68901_TAG);
 	int val = param;
 	attotime irq_time;
 	int vblank_line;

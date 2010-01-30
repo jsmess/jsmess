@@ -14,7 +14,7 @@ static UINT8 *ccs_ram;
 
 static WRITE8_HANDLER(ccs2422_terminal_w)
 {
-	const device_config	*devconf = devtag_get_device(space->machine, "terminal");
+	running_device *devconf = devtag_get_device(space->machine, "terminal");
 	terminal_write(devconf,0,data);
 }
 

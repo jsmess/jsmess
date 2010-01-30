@@ -84,7 +84,7 @@
 #include "devices/printer.h"
 #include "devices/messram.h"
 
-static const device_config *cassette_device_image(running_machine *machine)
+static running_device *cassette_device_image(running_machine *machine)
 {
 	return devtag_get_device(machine, CASSETTE_TAG);
 }
@@ -178,7 +178,7 @@ static void scan_keyboard(running_machine *machine)
 	{
 		if (keycode != keylatch)
 		{
-			const device_config *z80dart = devtag_get_device(machine, Z80DART_TAG);
+			running_device *z80dart = devtag_get_device(machine, Z80DART_TAG);
 
 			z80dart_dcdb_w(z80dart, 0);
 			z80dart_receive_data(z80dart, Z80DART_CH_B, keycode);
@@ -190,7 +190,7 @@ static void scan_keyboard(running_machine *machine)
 	{
 		if (keylatch)
 		{
-			const device_config *z80dart = devtag_get_device(machine, Z80DART_TAG);
+			running_device *z80dart = devtag_get_device(machine, Z80DART_TAG);
 
 			z80dart_dcdb_w(z80dart, 1);
 			z80dart_receive_data(z80dart, Z80DART_CH_B, 0);
@@ -452,7 +452,7 @@ static WRITE8_DEVICE_HANDLER( sio2_w )
 
 static READ8_HANDLER( abc800_pling_r )
 {
-	const device_config *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = devtag_get_device(space->machine, "discrete");
 	abc800_state *state = (abc800_state *)space->machine->driver_data;
 
 	state->pling = !state->pling;
@@ -464,7 +464,7 @@ static READ8_HANDLER( abc800_pling_r )
 
 static READ8_HANDLER( abc802_pling_r )
 {
-	const device_config *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = devtag_get_device(space->machine, "discrete");
 	abc802_state *state = (abc802_state *)space->machine->driver_data;
 
 	state->pling = !state->pling;
@@ -726,7 +726,7 @@ static ABC77_INTERFACE( abc800_abc77_intf )
 
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-	const device_config *z80ctc = devtag_get_device(timer->machine, Z80CTC_TAG);
+	running_device *z80ctc = devtag_get_device(timer->machine, Z80CTC_TAG);
 
 	z80ctc_trg0_w(z80ctc, 1);
 	z80ctc_trg0_w(z80ctc, 0);
@@ -740,7 +740,7 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
 {
-	//const device_config *z80sio = devtag_get_device(device->machine, Z80SIO_TAG);
+	//running_device *z80sio = devtag_get_device(device->machine, Z80SIO_TAG);
 
 	UINT8 sb = input_port_read(device->machine, "SB");
 
@@ -762,7 +762,7 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )
 {
-	//const device_config *z80sio = devtag_get_device(device->machine, Z80SIO_TAG);
+	//running_device *z80sio = devtag_get_device(device->machine, Z80SIO_TAG);
 
 	UINT8 sb = input_port_read(device->machine, "SB");
 
@@ -782,7 +782,7 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
 {
-	const device_config *z80dart = devtag_get_device(device->machine, Z80DART_TAG);
+	running_device *z80dart = devtag_get_device(device->machine, Z80DART_TAG);
 
 	/* connected to DART channel A clock inputs */
 	z80dart_rxca_w(z80dart, state);
@@ -800,7 +800,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 /* Z80 SIO/2 */
 
-static void sio_interrupt(const device_config *device, int state)
+static void sio_interrupt(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, state);
 }
@@ -822,7 +822,7 @@ static WRITE8_DEVICE_HANDLER( sio_serial_transmit )
 	}
 }
 
-static int sio_serial_receive( const device_config *device, int channel )
+static int sio_serial_receive( running_device *device, int channel )
 {
 	if (channel == 1)
 	{

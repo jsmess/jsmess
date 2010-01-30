@@ -162,7 +162,7 @@ Dip locations verified with manual for docastle, dorunrun and dowild.
 
 
 /* Read/Write Handlers */
-static void idsoccer_adpcm_int( const device_config *device )
+static void idsoccer_adpcm_int( running_device *device )
 {
 	docastle_state *state = (docastle_state *)device->machine->driver_data;
 
@@ -643,16 +643,16 @@ static MACHINE_DRIVER_START( docastle )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489, 4000000)
+	MDRV_SOUND_ADD("sn1", SN76489A, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("sn2", SN76489, 4000000)
+	MDRV_SOUND_ADD("sn2", SN76489A, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("sn3", SN76489, 4000000)
+	MDRV_SOUND_ADD("sn3", SN76489A, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("sn4", SN76489, 4000000)
+	MDRV_SOUND_ADD("sn4", SN76489A, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 

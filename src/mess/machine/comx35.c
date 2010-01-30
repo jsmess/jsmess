@@ -160,7 +160,7 @@ static UINT8 read_expansion(running_machine *machine)
 	return result;
 }
 
-static const device_config *printer_device(running_machine *machine)
+static running_device *printer_device(running_machine *machine)
 {
 	return devtag_get_device(machine, "printer");
 }
@@ -209,7 +209,7 @@ const wd17xx_interface comx35_wd17xx_interface =
 static UINT8 fdc_r(const address_space *space)
 {
 	comx35_state *state = (comx35_state *)space->machine->driver_data;
-	const device_config *fdc = devtag_get_device(space->machine, WD1770_TAG);
+	running_device *fdc = devtag_get_device(space->machine, WD1770_TAG);
 
 	UINT8 data;
 
@@ -227,7 +227,7 @@ static UINT8 fdc_r(const address_space *space)
 
 static void fdc_w(const address_space *space, UINT8 data)
 {
-	const device_config *fdc = devtag_get_device(space->machine, WD1770_TAG);
+	running_device *fdc = devtag_get_device(space->machine, WD1770_TAG);
 	/*
 
         bit     description
@@ -435,7 +435,7 @@ static void set_active_bank(running_machine *machine)
 
 	case BANK_80_COLUMNS:
 		{
-			const device_config *mc6845 = devtag_get_device(machine, MC6845_TAG);
+			running_device *mc6845 = devtag_get_device(machine, MC6845_TAG);
 
 			memory_install_read_bank(program, 0xc000, 0xc7ff, 0, 0, "bank1"); // ROM
 			memory_unmap_write(program, 0xc000, 0xc7ff, 0, 0); // ROM
@@ -709,7 +709,7 @@ INPUT_CHANGED( comx35_reset )
 
 /* Quickload */
 
-static void image_fread_memory(const device_config *image, UINT16 addr, UINT32 count)
+static void image_fread_memory(running_device *image, UINT16 addr, UINT32 count)
 {
 	void *ptr = memory_get_write_ptr(cputag_get_address_space(image->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), addr);
 

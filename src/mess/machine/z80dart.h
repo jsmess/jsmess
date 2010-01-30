@@ -125,7 +125,7 @@ WRITE_LINE_DEVICE_HANDLER( z80dart_ctsa_w );
 WRITE_LINE_DEVICE_HANDLER( z80dart_ctsb_w );
 
 /* receive data byte HACK */
-void z80dart_receive_data(const device_config *device, int channel, UINT8 data);
+void z80dart_receive_data(running_device *device, int channel, UINT8 data);
 
 DEVICE_GET_INFO( z80dart );
 

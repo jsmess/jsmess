@@ -36,7 +36,7 @@ UINT8 atom_8255_portc;
 /* I am not sure if this is correct, the atom appears to have a 2.4 kHz timer used for reading tapes?? */
 static int	timer_state = 0;
 
-static const device_config *cassette_device_image(running_machine *machine)
+static running_device *cassette_device_image(running_machine *machine)
 {
 	return devtag_get_device(machine, "cassette");
 }
@@ -91,7 +91,7 @@ I8255A_INTERFACE( atom_8255_int )
 
 static int previous_i8271_int_state = 0;
 
-static void atom_8271_interrupt_callback(const device_config *device, int state)
+static void atom_8271_interrupt_callback(running_device *device, int state)
 {
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and
@@ -290,7 +290,7 @@ READ8_DEVICE_HANDLER ( atom_8255_portb_r )
 
 READ8_DEVICE_HANDLER ( atom_8255_portc_r )
 {
-	const device_config *mc6847 = devtag_get_device(device->machine, "mc6847");
+	running_device *mc6847 = devtag_get_device(device->machine, "mc6847");
 
 	atom_8255_portc &= 0x0f;
 
@@ -328,7 +328,7 @@ READ8_DEVICE_HANDLER ( atom_8255_portc_r )
 
 WRITE8_DEVICE_HANDLER( atom_8255_porta_w )
 {
-	const device_config *mc6847 = devtag_get_device(device->machine, "mc6847");
+	running_device *mc6847 = devtag_get_device(device->machine, "mc6847");
 
 	mc6847_ag_w(mc6847, BIT(data, 4));
 	mc6847_gm0_w(mc6847, BIT(data, 5));
@@ -345,7 +345,7 @@ WRITE8_DEVICE_HANDLER ( atom_8255_portb_w )
 
 WRITE8_DEVICE_HANDLER(atom_8255_portc_w)
 {
-	const device_config *mc6847 = devtag_get_device(device->machine, "mc6847");
+	running_device *mc6847 = devtag_get_device(device->machine, "mc6847");
 
 	speaker_level_w(device, BIT(data, 2));
 	mc6847_css_w(mc6847, BIT(data, 3));
@@ -413,6 +413,6 @@ READ8_DEVICE_HANDLER( atom_mc6847_videoram_r )
 
 VIDEO_UPDATE( atom )
 {
-	const device_config *mc6847 = devtag_get_device(screen->machine, "mc6847");
+	running_device *mc6847 = devtag_get_device(screen->machine, "mc6847");
 	return mc6847_update(mc6847, bitmap, cliprect);
 }

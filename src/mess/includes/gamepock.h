@@ -13,6 +13,6 @@ WRITE8_HANDLER( gamepock_port_b_w );
 READ8_HANDLER( gamepock_port_b_r );
 READ8_HANDLER( gamepock_port_c_r );
 
-int gamepock_io_callback( const device_config *device, int ioline, int state );
+int gamepock_io_callback( running_device *device, int ioline, int state );
 
 #endif

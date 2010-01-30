@@ -52,7 +52,7 @@ static void psxexe_conv32( UINT32 *p_uint32 )
 		( p_uint8[ 3 ] << 24 );
 }
 
-static int load_psxexe( const device_config *cpu, unsigned char *p_n_file, int n_len )
+static int load_psxexe( running_device *cpu, unsigned char *p_n_file, int n_len )
 {
 	struct PSXEXE_HEADER
 	{
@@ -144,7 +144,7 @@ static int load_psxexe( const device_config *cpu, unsigned char *p_n_file, int n
 	return 0;
 }
 
-static void cpe_set_register( const device_config *cpu, int n_reg, int n_value )
+static void cpe_set_register( running_device *cpu, int n_reg, int n_value )
 {
 	if( n_reg < 0x80 && ( n_reg % 4 ) == 0 )
 	{
@@ -187,7 +187,7 @@ static void cpe_set_register( const device_config *cpu, int n_reg, int n_value )
 	}
 }
 
-static int load_cpe( const device_config *cpu, unsigned char *p_n_file, int n_len )
+static int load_cpe( running_device *cpu, unsigned char *p_n_file, int n_len )
 {
 	if( n_len >= 4 &&
 		memcmp( p_n_file, "CPE\001", 4 ) == 0 )
@@ -321,7 +321,7 @@ static int load_cpe( const device_config *cpu, unsigned char *p_n_file, int n_le
 	return 0;
 }
 
-static int load_psf( const device_config *cpu, unsigned char *p_n_file, int n_len )
+static int load_psf( running_device *cpu, unsigned char *p_n_file, int n_len )
 {
 	int n_return;
 	unsigned long n_crc;
@@ -388,7 +388,7 @@ static DIRECT_UPDATE_HANDLER( psx_setopbase )
 {
 	if( address == 0x80030000 )
 	{
-		const device_config *cpu = devtag_get_device(space->machine, "maincpu");
+		running_device *cpu = devtag_get_device(space->machine, "maincpu");
 
 		memory_set_direct_update_handler( space, NULL );
 
@@ -999,7 +999,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( psx )
 {
-	const device_config *cdrom_dev = devtag_get_device(machine, "cdrom");
+	running_device *cdrom_dev = devtag_get_device(machine, "cdrom");
 	if( cdrom_dev )
 	{
 		psx_cdrom = mess_cd_get_cdrom_file(cdrom_dev);
@@ -1056,7 +1056,7 @@ static INPUT_PORTS_START( psx )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2) PORT_NAME("P2 L2")
 INPUT_PORTS_END
 
-static void spu_irq(const device_config *device, UINT32 data)
+static void spu_irq(running_device *device, UINT32 data)
 {
 	psx_irq_set(device->machine, data);
 }

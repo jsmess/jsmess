@@ -103,7 +103,7 @@ static void idle_callback(int state)
 }
 #endif
 
-static void rset_callback(const device_config *device)
+static void rset_callback(running_device *device)
 {
 	ti990_cpuboard_reset();
 
@@ -113,7 +113,7 @@ static void rset_callback(const device_config *device)
 	/* clear controller panel and smi fault LEDs */
 }
 
-static void lrex_callback(const device_config *device)
+static void lrex_callback(running_device *device)
 {
 	/* right??? */
 	ti990_hold_load(device->machine);

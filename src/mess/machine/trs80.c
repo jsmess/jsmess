@@ -63,11 +63,11 @@ static UINT8 sector[4] = {0, }; 			/* current sector per drive */
 
 static UINT8 cassette_data;
 static emu_timer *cassette_data_timer;
-static const device_config *trs80_printer;
-static const device_config *trs80_ay31015;
-static const device_config *trs80_cass;
-static const device_config *trs80_speaker;
-static const device_config *trs80_fdc;
+static running_device *trs80_printer;
+static running_device *trs80_ay31015;
+static running_device *trs80_cass;
+static running_device *trs80_speaker;
+static running_device *trs80_fdc;
 
 static TIMER_CALLBACK( cassette_data_callback )
 {

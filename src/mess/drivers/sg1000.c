@@ -684,7 +684,7 @@ static WRITE_LINE_DEVICE_HANDLER( sf7000_fdc_interrupt )
 	driver_state->fdc_irq = state;
 }
 
-static void sf7000_fdc_index_callback(const device_config *controller, const device_config *img, int state)
+static void sf7000_fdc_index_callback(running_device *controller, running_device *img, int state)
 {
 	sg1000_state *driver_state = (sg1000_state *)img->machine->driver_data;
 

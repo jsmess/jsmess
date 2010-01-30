@@ -1053,7 +1053,7 @@ static READ8_HANDLER(pcw16_timer_interrupt_counter_r)
 
 static WRITE8_HANDLER(pcw16_system_control_w)
 {
-	const device_config *speaker = devtag_get_device(space->machine, "beep");
+	running_device *speaker = devtag_get_device(space->machine, "beep");
 	//logerror("0x0f8: function: %d\n",data);
 
 	/* lower 4 bits define function code */
@@ -1199,7 +1199,7 @@ static void	pcw16_fdc_interrupt(running_machine *machine, int state)
 	pcw16_trigger_fdc_int(machine);
 }
 
-static const device_config * pcw16_get_device(running_machine *machine)
+static running_device * pcw16_get_device(running_machine *machine)
 {
 	return devtag_get_device(machine, "upd765");
 }
@@ -1331,7 +1331,7 @@ static void pcw16_reset(running_machine *machine)
 
 static MACHINE_START( pcw16 )
 {
-	const device_config *speaker = devtag_get_device(machine, "beep");
+	running_device *speaker = devtag_get_device(machine, "beep");
 	pcw16_system_status = 0;
 	pcw16_interrupt_counter = 0;
 

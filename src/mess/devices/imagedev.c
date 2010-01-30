@@ -37,7 +37,7 @@ struct _image_t
     IMPLEMENTATION
 ***************************************************************************/
 
-INLINE image_t *get_safe_token(const device_config *device)
+INLINE image_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -54,7 +54,7 @@ static DEVICE_START( image )
 {
 	image_t *image = get_safe_token(device);	
 	
-	image->intf = (const image_interface*)device->static_config;
+	image->intf = (const image_interface*)device->baseconfig().static_config;
 	
 }
 

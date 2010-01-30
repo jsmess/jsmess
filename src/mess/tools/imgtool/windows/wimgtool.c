@@ -93,7 +93,7 @@ static imgtoolerr_t foreach_selected_item(HWND window,
 	struct foreach_entry *first_entry = NULL;
 	struct foreach_entry *last_entry = NULL;
 	struct foreach_entry *entry;
-
+	HRESULT res;
 	info = get_wimgtool_info(window);
 
 	if (info->image)
@@ -111,7 +111,7 @@ static imgtoolerr_t foreach_selected_item(HWND window,
 				{
 					item.mask = LVIF_PARAM;
 					item.iItem = selected_index;
-					ListView_GetItem(info->listview, &item);
+					res = ListView_GetItem(info->listview, &item);
 					selected_item = item.lParam;
 				}
 			}
@@ -515,11 +515,12 @@ static imgtoolerr_t refresh_image(HWND window)
 	imgtool_partition_features features;
 	char path_separator;
 	TCHAR *tempstr;
+	HRESULT res;
 
 	info = get_wimgtool_info(window);
 	size_buf[0] = '\0';
 
-	ListView_DeleteAllItems(info->listview);
+	res = ListView_DeleteAllItems(info->listview);
 
 	if (info->image)
 	{
@@ -1687,6 +1688,7 @@ static imgtoolerr_t double_click(HWND window)
 	DWORD pos;
 	imgtool_dirent entry;
 	int selected_item;
+	HRESULT res;
 
 	info = get_wimgtool_info(window);
 
@@ -1696,7 +1698,7 @@ static imgtoolerr_t double_click(HWND window)
 	GetWindowRect(info->listview, &r);
 	htinfo.pt.x = pt.x - r.left;
 	htinfo.pt.y = pt.y - r.top;
-	ListView_HitTest(info->listview, &htinfo);
+	res = ListView_HitTest(info->listview, &htinfo);
 
 	if (htinfo.flags & LVHT_ONITEM)
 	{
@@ -1704,7 +1706,7 @@ static imgtoolerr_t double_click(HWND window)
 
 		item.mask = LVIF_PARAM;
 		item.iItem = htinfo.iItem;
-		ListView_GetItem(info->listview, &item);
+		res = ListView_GetItem(info->listview, &item);
 
 		selected_item = item.lParam;
 
@@ -1738,6 +1740,7 @@ static BOOL context_menu(HWND window, LONG x, LONG y)
 	LVHITTESTINFO hittest;
 	BOOL rc = FALSE;
 	HMENU menu;
+	HRESULT res;
 
 	info = get_wimgtool_info(window);
 
@@ -1745,7 +1748,7 @@ static BOOL context_menu(HWND window, LONG x, LONG y)
 	hittest.pt.x = x;
 	hittest.pt.y = y;
 	ScreenToClient(info->listview, &hittest.pt);
-	ListView_HitTest(info->listview, &hittest);
+	res = ListView_HitTest(info->listview, &hittest);
 
 	if (hittest.flags & LVHT_ONITEM)
 	{

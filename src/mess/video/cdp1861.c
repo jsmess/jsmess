@@ -29,7 +29,7 @@ struct _cdp1861_t
 	devcb_resolved_write_line	out_dmao_func;
 	devcb_resolved_write_line	out_efx_func;
 
-	const device_config *screen;	/* screen */
+	running_device *screen;	/* screen */
 	bitmap_t *bitmap;				/* bitmap */
 
 	int disp;						/* display enabled */
@@ -42,14 +42,14 @@ struct _cdp1861_t
 	emu_timer *efx_timer;			/* EFx timer */
 	emu_timer *dma_timer;			/* DMA timer */
 
-	const device_config *cpu;
+	running_device *cpu;
 };
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE cdp1861_t *get_safe_token(const device_config *device)
+INLINE cdp1861_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -57,11 +57,11 @@ INLINE cdp1861_t *get_safe_token(const device_config *device)
 	return (cdp1861_t *)device->token;
 }
 
-INLINE const cdp1861_interface *get_interface(const device_config *device)
+INLINE const cdp1861_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == CDP1861));
-	return (const cdp1861_interface *) device->static_config;
+	return (const cdp1861_interface *) device->baseconfig().static_config;
 }
 
 /***************************************************************************
@@ -74,7 +74,7 @@ INLINE const cdp1861_interface *get_interface(const device_config *device)
 
 static TIMER_CALLBACK( cdp1861_int_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	cdp1861_t *cdp1861 = get_safe_token(device);
 
 	int scanline = video_screen_get_vpos(cdp1861->screen);
@@ -105,7 +105,7 @@ static TIMER_CALLBACK( cdp1861_int_tick )
 
 static TIMER_CALLBACK( cdp1861_efx_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	cdp1861_t *cdp1861 = get_safe_token(device);
 
 	int scanline = video_screen_get_vpos(cdp1861->screen);
@@ -140,7 +140,7 @@ static TIMER_CALLBACK( cdp1861_efx_tick )
 
 static TIMER_CALLBACK( cdp1861_dma_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	cdp1861_t *cdp1861 = get_safe_token(device);
 
 	int scanline = video_screen_get_vpos(cdp1861->screen);
@@ -228,7 +228,7 @@ WRITE8_DEVICE_HANDLER( cdp1861_dma_w )
     cdp1861_update - update screen
 -------------------------------------------------*/
 
-void cdp1861_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+void cdp1861_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	cdp1861_t *cdp1861 = get_safe_token(device);
 

@@ -288,7 +288,7 @@ static DEVICE_GET_INFO( pv1000_sound )
 
 static TIMER_DEVICE_CALLBACK( pv1000_irq )
 {
-	const device_config *cpu = devtag_get_device( timer->machine, "maincpu" );
+	running_device *cpu = devtag_get_device( timer->machine, "maincpu" );
 	cpu_set_input_line(cpu, 0, HOLD_LINE);
 }
 

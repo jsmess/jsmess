@@ -1,11 +1,10 @@
-#include <stdlib.h>
-#include "emu.h"
-#include "osdepend.h"
-
 #ifdef WIN32
 #include <windows.h>
 #endif
 
+#include <stdlib.h>
+#include "emu.h"
+#include "osdepend.h"
 void osd_set_mastervolume(int attenuation)
 {
 }
@@ -14,7 +13,7 @@ void osd_customize_input_type_list(input_type_desc *typelist)
 {
 }
 
-void osd_wait_for_debugger(const device_config *device, int firststop)
+void osd_wait_for_debugger(running_device *device, int firststop)
 {
 }
 

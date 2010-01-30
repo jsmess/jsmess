@@ -58,7 +58,7 @@ void decode_command(er59256_t *er59256);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE er59256_t *get_token(const device_config *device)
+INLINE er59256_t *get_token(running_device *device)
 {
 	assert(device->type == ER59256);
 	return (er59256_t *) device->token;
@@ -69,7 +69,7 @@ INLINE er59256_t *get_token(const device_config *device)
     IMPLEMENTATION
 ***************************************************************************/
 
-void preload_rom(const device_config *device, UINT16 *rom_data, int count)
+void preload_rom(running_device *device, UINT16 *rom_data, int count)
 {
 	er59256_t *er59256 = get_token(device);
     int WordNo;
@@ -87,7 +87,7 @@ void preload_rom(const device_config *device, UINT16 *rom_data, int count)
     logerror("\n");
 }
 
-UINT8 data_loaded(const device_config *device)
+UINT8 data_loaded(running_device *device)
 {
 	er59256_t *er59256 = get_token(device);
 
@@ -117,7 +117,7 @@ static DEVICE_STOP( er59256 )
     /* Save contents of eerom */
 }
 
-void er59256_set_iobits(const device_config *device, UINT8 newbits)
+void er59256_set_iobits(running_device *device, UINT8 newbits)
 {
 	er59256_t *er59256 = get_token(device);
     //UINT32  bit;
@@ -186,7 +186,7 @@ void er59256_set_iobits(const device_config *device, UINT8 newbits)
     }
 }
 
-UINT8 er59256_get_iobits(const device_config *device)
+UINT8 er59256_get_iobits(running_device *device)
 {
     er59256_t *er59256 = get_token(device);
     

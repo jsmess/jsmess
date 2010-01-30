@@ -70,7 +70,7 @@ static VIDEO_UPDATE( act_f1 )
 static READ8_HANDLER( act_fdc_r )
 {
 	act_state *state = (act_state *)space->machine->driver_data;
-	const device_config* dev = devtag_get_device(space->machine,"fdc");
+	running_device* dev = devtag_get_device(space->machine,"fdc");
 
 //  printf("%02x\n",offset);
 
@@ -98,7 +98,7 @@ static READ8_HANDLER( act_fdc_r )
 static WRITE8_HANDLER( act_fdc_w )
 {
 	act_state *state = (act_state *)space->machine->driver_data;
-	const device_config* dev = devtag_get_device(space->machine,"fdc");
+	running_device* dev = devtag_get_device(space->machine,"fdc");
 
 //  printf("%02x %02x\n",offset,data);
 
@@ -168,7 +168,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( actf1_sys_w )
 {
 //  static UINT8 cur_fdrv;
-//  const device_config* dev = devtag_get_device(space->machine,"fdc");
+//  running_device* dev = devtag_get_device(space->machine,"fdc");
 
 	switch(offset)
 	{

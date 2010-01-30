@@ -126,7 +126,7 @@ struct _zx8302_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE zx8302_t *get_safe_token(const device_config *device)
+INLINE zx8302_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -134,11 +134,11 @@ INLINE zx8302_t *get_safe_token(const device_config *device)
 	return (zx8302_t *)device->token;
 }
 
-INLINE const zx8302_interface *get_interface(const device_config *device)
+INLINE const zx8302_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == ZX8302));
-	return (const zx8302_interface *) device->static_config;
+	return (const zx8302_interface *) device->baseconfig().static_config;
 }
 
 /***************************************************************************
@@ -149,7 +149,7 @@ INLINE const zx8302_interface *get_interface(const device_config *device)
     zx8302_interrupt - interrupt line manager
 -------------------------------------------------*/
 
-static void zx8302_interrupt(const device_config *device, UINT8 line)
+static void zx8302_interrupt(running_device *device, UINT8 line)
 {
 	zx8302_t *zx8302 = get_safe_token(device);
 
@@ -194,7 +194,7 @@ WRITE8_DEVICE_HANDLER( zx8302_irq_acknowledge_w )
 
 static TIMER_CALLBACK( zx8302_ipc_tick )
 {
-	zx8302_t *zx8302 = get_safe_token((const device_config *)ptr);
+	zx8302_t *zx8302 = get_safe_token((running_device *)ptr);
 
 	zx8302->baudx4 = !zx8302->baudx4;
 	devcb_call_write_line(&zx8302->out_baudx4_func, zx8302->baudx4);
@@ -204,7 +204,7 @@ static TIMER_CALLBACK( zx8302_ipc_tick )
     zx8302_ipc_comm_tick - IPC serial transfer
 -------------------------------------------------*/
 
-static void zx8302_ipc_comm_tick(const device_config *device)
+static void zx8302_ipc_comm_tick(running_device *device)
 {
 	/*
 
@@ -310,13 +310,13 @@ WRITE_LINE_DEVICE_HANDLER( zx8302_comdata_w )
 
 static TIMER_CALLBACK( zx8302_delayed_ipc_command )
 {
-	zx8302_t *zx8302 = get_safe_token((const device_config *)ptr);
+	zx8302_t *zx8302 = get_safe_token((running_device *)ptr);
 
 	zx8302->idr = param;
 	zx8302->ipc_state = ZX8302_IPC_START;
 	zx8302->ipc_rx = 0;
 
-	zx8302_ipc_comm_tick((const device_config *)ptr);
+	zx8302_ipc_comm_tick((running_device *)ptr);
 }
 
 /*-------------------------------------------------
@@ -367,34 +367,34 @@ static WRITE_LINE_DEVICE_HANDLER( zx8302_txd )
 
 static TIMER_CALLBACK( zx8302_txd_tick )
 {
-	zx8302_t *zx8302 = get_safe_token((const device_config *)ptr);
+	zx8302_t *zx8302 = get_safe_token((running_device *)ptr);
 
 	switch (zx8302->tx_bits)
 	{
 	case ZX8302_TXD_START:
 		if (!(zx8302->irq & ZX8302_INT_TRANSMIT))
 		{
-			zx8302_txd((const device_config *)ptr, 0);
+			zx8302_txd((running_device *)ptr, 0);
 			zx8302->tx_bits++;
 		}
 		break;
 
 	default:
-		zx8302_txd((const device_config *)ptr, BIT(zx8302->tdr, 0));
+		zx8302_txd((running_device *)ptr, BIT(zx8302->tdr, 0));
 		zx8302->tdr >>= 1;
 		zx8302->tx_bits++;
 		break;
 
 	case ZX8302_TXD_STOP:
-		zx8302_txd((const device_config *)ptr, 1);
+		zx8302_txd((running_device *)ptr, 1);
 		zx8302->tx_bits++;
 		break;
 
 	case ZX8302_TXD_STOP2:
-		zx8302_txd((const device_config *)ptr, 1);
+		zx8302_txd((running_device *)ptr, 1);
 		zx8302->tx_bits = ZX8302_TXD_START;
 		zx8302->status &= ~ZX8302_STATUS_TX_BUFFER_FULL;
-		zx8302_interrupt((const device_config *)ptr, ZX8302_INT_TRANSMIT);
+		zx8302_interrupt((running_device *)ptr, ZX8302_INT_TRANSMIT);
 		break;
 	}
 }
@@ -438,7 +438,7 @@ WRITE8_DEVICE_HANDLER( zx8302_control_w )
 
 static TIMER_CALLBACK( zx8302_rtc_tick )
 {
-	zx8302_t *zx8302 = get_safe_token((const device_config *)ptr);
+	zx8302_t *zx8302 = get_safe_token((running_device *)ptr);
 
 	zx8302->ctr++;
 }
@@ -483,11 +483,11 @@ WRITE8_DEVICE_HANDLER( zx8302_rtc_w )
 
 static TIMER_CALLBACK( zx8302_gap_tick )
 {
-	zx8302_t *zx8302 = get_safe_token((const device_config *)ptr);
+	zx8302_t *zx8302 = get_safe_token((running_device *)ptr);
 
 	if (zx8302->mdv_motor)
 	{
-		zx8302_interrupt((const device_config *)ptr, ZX8302_INT_GAP);
+		zx8302_interrupt((running_device *)ptr, ZX8302_INT_GAP);
 	}
 }
 
@@ -496,7 +496,7 @@ static TIMER_CALLBACK( zx8302_gap_tick )
     index of the selected microdrive
 -------------------------------------------------*/
 
-static int zx8302_get_selected_microdrive(const device_config *device)
+static int zx8302_get_selected_microdrive(running_device *device)
 {
 	zx8302_t *zx8302 = get_safe_token(device);
 
@@ -515,7 +515,7 @@ static int zx8302_get_selected_microdrive(const device_config *device)
     status of the selected microdrive
 -------------------------------------------------*/
 
-static UINT8 zx8302_get_microdrive_status(const device_config *device)
+static UINT8 zx8302_get_microdrive_status(running_device *device)
 {
 	zx8302_t *zx8302 = get_safe_token(device);
 

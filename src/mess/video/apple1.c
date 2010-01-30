@@ -370,7 +370,7 @@ attotime apple1_vh_dsp_time_to_ready (running_machine *machine)
            still use it to find what fraction of the current scanline
            period has elapsed. */
 		double current_hfrac = video_screen_get_hpos(machine->primary_screen) /
-							   video_screen_get_width(video_screen_first(machine->config));
+							   video_screen_get_width(video_screen_first(machine));
 		if (current_hfrac < cursor_hfrac)
 			return double_to_attotime(scanline_period * (cursor_hfrac - current_hfrac));
 	}

@@ -57,8 +57,8 @@ DEVICE_GET_INFO(sst39vf020);
 DEVICE_GET_INFO(sst39vf400a);
 
 // get base/size
-UINT8* sst39vfx_get_base( const device_config *device );
-UINT32 sst39vfx_get_size( const device_config *device );
+UINT8* sst39vfx_get_base( running_device *device );
+UINT32 sst39vfx_get_size( running_device *device );
 
 // read/write handler
 #if 0
@@ -67,8 +67,8 @@ WRITE8_HANDLER( sst39vfx_w );
 #endif
 
 // load/save
-void sst39vfx_load(const device_config *device, mame_file *file);
-void sst39vfx_save(const device_config *device, mame_file *file);
+void sst39vfx_load(running_device *device, mame_file *file);
+void sst39vfx_save(running_device *device, mame_file *file);
 
 // non-volatile ram handler
 //NVRAM_HANDLER( sst39vfx );

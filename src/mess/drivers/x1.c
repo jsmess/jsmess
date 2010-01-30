@@ -721,7 +721,7 @@ static void cmt_command( running_machine* machine, UINT8 cmd )
 
 static TIMER_CALLBACK( cmt_wind_timer )
 {
-	const device_config* cmt = devtag_get_device(machine,"cass");
+	running_device* cmt = devtag_get_device(machine,"cass");
 	switch(cmt_current_cmd)
 	{
 		case 0x03:
@@ -818,7 +818,7 @@ static WRITE8_HANDLER( sub_io_w )
 	logerror("SUB: Command byte 0x%02x\n",data);
 }
 
-static int x1_keyboard_irq_state(const device_config* device)
+static int x1_keyboard_irq_state(running_device* device)
 {
 	if(key_irq_flag != 0)
 		return Z80_DAISY_INT;
@@ -826,7 +826,7 @@ static int x1_keyboard_irq_state(const device_config* device)
 	return 0;
 }
 
-static int x1_keyboard_irq_ack(const device_config* device)
+static int x1_keyboard_irq_ack(running_device* device)
 {
 	key_irq_flag = 0;
 	cputag_set_input_line(device->machine,"maincpu",INPUT_LINE_IRQ0,CLEAR_LINE);
@@ -913,7 +913,7 @@ static WRITE8_HANDLER( rom_data_w )
 
 static READ8_HANDLER( x1_fdc_r )
 {
-	const device_config* dev = devtag_get_device(space->machine,"fdc");
+	running_device* dev = devtag_get_device(space->machine,"fdc");
 	//UINT8 ret = 0;
 
 	switch(offset+0xff8)
@@ -939,7 +939,7 @@ static READ8_HANDLER( x1_fdc_r )
 
 static WRITE8_HANDLER( x1_fdc_w )
 {
-	const device_config* dev = devtag_get_device(space->machine,"fdc");
+	running_device* dev = devtag_get_device(space->machine,"fdc");
 
 	switch(offset+0xff8)
 	{

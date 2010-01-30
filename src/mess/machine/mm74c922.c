@@ -53,18 +53,18 @@ struct _mm74c922_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE mm74c922_t *get_safe_token(const device_config *device)
+INLINE mm74c922_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
 	return (mm74c922_t *)device->token;
 }
 
-INLINE const mm74c922_interface *get_interface(const device_config *device)
+INLINE const mm74c922_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == MM74C922) || (device->type == MM74C923));
-	return (const mm74c922_interface *) device->static_config;
+	return (const mm74c922_interface *) device->baseconfig().static_config;
 }
 
 /***************************************************************************
@@ -76,7 +76,7 @@ INLINE const mm74c922_interface *get_interface(const device_config *device)
     state
 -------------------------------------------------*/
 
-static void change_output_lines(const device_config *device)
+static void change_output_lines(running_device *device)
 {
 	mm74c922_t *mm74c922 = get_safe_token(device);
 
@@ -95,7 +95,7 @@ static void change_output_lines(const device_config *device)
     scan counters
 -------------------------------------------------*/
 
-static void clock_scan_counters(const device_config *device)
+static void clock_scan_counters(running_device *device)
 {
 	mm74c922_t *mm74c922 = get_safe_token(device);
 
@@ -110,7 +110,7 @@ static void clock_scan_counters(const device_config *device)
     detect_keypress - detect key press
 -------------------------------------------------*/
 
-static void detect_keypress(const device_config *device)
+static void detect_keypress(running_device *device)
 {
 	mm74c922_t *mm74c922 = get_safe_token(device);
 
@@ -157,7 +157,7 @@ static void detect_keypress(const device_config *device)
 
 static TIMER_CALLBACK( mm74c922_scan_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 
 	change_output_lines(device);
 	clock_scan_counters(device);

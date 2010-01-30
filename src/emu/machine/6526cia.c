@@ -72,7 +72,7 @@ struct _cia_port
 
 struct _cia_state
 {
-	const device_config *device;
+	running_device *device;
 	devcb_resolved_write_line out_irq_func;
 	devcb_resolved_write_line out_pc_func;
 	devcb_resolved_write_line out_cnt_func;
@@ -108,25 +108,25 @@ struct _cia_state
 ***************************************************************************/
 
 static TIMER_CALLBACK( cia_timer_proc );
-static void cia_timer_underflow(const device_config *device, int timer);
+static void cia_timer_underflow(running_device *device, int timer);
 static TIMER_CALLBACK( cia_clock_tod_callback );
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE cia_state *get_token(const device_config *device)
+INLINE cia_state *get_token(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == MOS6526R1) || (device->type == MOS6526R2) || (device->type == MOS8520));
 	return (cia_state *) device->token;
 }
 
-INLINE const mos6526_interface *get_interface(const device_config *device)
+INLINE const mos6526_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == MOS6526R1) || (device->type == MOS6526R2) || (device->type == MOS8520));
-	return (mos6526_interface *) device->static_config;
+	return (mos6526_interface *) device->baseconfig().static_config;
 }
 
 /***************************************************************************
@@ -137,7 +137,7 @@ INLINE const mos6526_interface *get_interface(const device_config *device)
     cia_set_port_mask_value
 -------------------------------------------------*/
 
-void cia_set_port_mask_value(const device_config *device, int port, int data)
+void cia_set_port_mask_value(running_device *device, int port, int data)
 {
 	cia_state *cia = get_token(device);
 	cia->port[port].mask_value = data;
@@ -211,7 +211,7 @@ static DEVICE_VALIDITY_CHECK( cia )
     cia_update_pc - pulse /pc output
 -------------------------------------------------*/
 
-static void cia_update_pc(const device_config *device)
+static void cia_update_pc(running_device *device)
 {
 	cia_state *cia = get_token(device);
 
@@ -224,7 +224,7 @@ static void cia_update_pc(const device_config *device)
     cia_update_interrupts
 -------------------------------------------------*/
 
-static void cia_update_interrupts(const device_config *device)
+static void cia_update_interrupts(running_device *device)
 {
 	UINT8 new_irq;
 	cia_state *cia = get_token(device);
@@ -315,7 +315,7 @@ static UINT16 cia_get_timer(cia_timer *timer)
     cia_timer_bump
 -------------------------------------------------*/
 
-static void cia_timer_bump(const device_config *device, int timer)
+static void cia_timer_bump(running_device *device, int timer)
 {
 	cia_state *cia = get_token(device);
 
@@ -331,7 +331,7 @@ static void cia_timer_bump(const device_config *device, int timer)
     cia_timer_underflow
 -------------------------------------------------*/
 
-static void cia_timer_underflow(const device_config *device, int timer)
+static void cia_timer_underflow(running_device *device, int timer)
 {
 	cia_state *cia = get_token(device);
 
@@ -481,7 +481,7 @@ static void cia6526_increment(cia_state *cia)
     cia_clock_tod - Update TOD on CIA A
 -------------------------------------------------*/
 
-static void cia_clock_tod(const device_config *device)
+static void cia_clock_tod(running_device *device)
 {
 	cia_state *cia;
 
@@ -516,7 +516,7 @@ static void cia_clock_tod(const device_config *device)
 
 static TIMER_CALLBACK( cia_clock_tod_callback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	cia_clock_tod(device);
 }
 

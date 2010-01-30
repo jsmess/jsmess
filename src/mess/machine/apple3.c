@@ -26,7 +26,7 @@
 
 UINT32 apple3_flags;
 
-static void apple3_update_drives(const device_config *device);
+static void apple3_update_drives(running_device *device);
 
 static UINT8 via_0_a;
 static UINT8 via_0_b;
@@ -118,8 +118,8 @@ static void apple3_profile_w(offs_t offset, UINT8 data)
 
 static READ8_HANDLER( apple3_c0xx_r )
 {
-	const device_config *acia = devtag_get_device(space->machine, "acia");
-	const device_config *fdc = devtag_get_device(space->machine, "fdc");
+	running_device *acia = devtag_get_device(space->machine, "acia");
+	running_device *fdc = devtag_get_device(space->machine, "fdc");
 	UINT8 result = 0xFF;
 
 	switch(offset)
@@ -203,8 +203,8 @@ static READ8_HANDLER( apple3_c0xx_r )
 
 static WRITE8_HANDLER( apple3_c0xx_w )
 {
-	const device_config *acia = devtag_get_device(space->machine, "acia");
-	const device_config *fdc = devtag_get_device(space->machine, "fdc");
+	running_device *acia = devtag_get_device(space->machine, "acia");
+	running_device *fdc = devtag_get_device(space->machine, "fdc");
 	switch(offset)
 	{
 		case 0x10: case 0x11: case 0x12: case 0x13:
@@ -263,7 +263,7 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 
 INTERRUPT_GEN( apple3_interrupt )
 {
-	const device_config *via_1 = devtag_get_device(device->machine, "via6522_1");
+	running_device *via_1 = devtag_get_device(device->machine, "via6522_1");
 
 	via_ca2_w(via_1, (AY3600_keydata_strobe_r() & 0x80) ? 1 : 0);
 	via_cb1_w(via_1, video_screen_get_vblank(device->machine->primary_screen));
@@ -457,8 +457,8 @@ static void apple3_update_memory(running_machine *machine)
 
 	/* reinstall VIA handlers */
 	{
-		const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
-		const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
+		running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
+		running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
 		memory_install_read8_device_handler(space, via_0, 0xFFD0, 0xFFDF, 0, 0, via_r);
 		memory_install_write8_device_handler(space, via_0, 0xFFD0, 0xFFDF, 0, 0, via_w);
 		memory_install_read8_device_handler(space, via_1, 0xFFE0, 0xFFEF, 0, 0, via_r);
@@ -487,7 +487,7 @@ static WRITE8_DEVICE_HANDLER(apple3_via_0_out_b) { apple3_via_out(device->machin
 static WRITE8_DEVICE_HANDLER(apple3_via_1_out_a) { apple3_via_out(device->machine, &via_1_a, data); }
 static WRITE8_DEVICE_HANDLER(apple3_via_1_out_b) { apple3_via_out(device->machine, &via_1_b, data); }
 
-static void apple2_via_1_irq_func(const device_config *device, int state)
+static void apple2_via_1_irq_func(running_device *device, int state)
 {
 	if (!via_1_irq && state)
 	{
@@ -663,7 +663,7 @@ static DIRECT_UPDATE_HANDLER( apple3_opbase )
 
 
 
-static void apple3_update_drives(const device_config *device)
+static void apple3_update_drives(running_device *device)
 {
 	int enable_mask = 0x00;
 
@@ -691,7 +691,7 @@ static void apple3_update_drives(const device_config *device)
 
 
 
-static void apple3_set_enable_lines(const device_config *device,int enable_mask)
+static void apple3_set_enable_lines(running_device *device,int enable_mask)
 {
 	apple3_enable_mask = enable_mask;
 	apple3_update_drives(device);

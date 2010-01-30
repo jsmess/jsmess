@@ -29,7 +29,7 @@ DEVICE_GET_INFO(acia6551);
 READ8_DEVICE_HANDLER(acia_6551_r);
 WRITE8_DEVICE_HANDLER(acia_6551_w);
 
-void acia_6551_connect_to_serial_device(const device_config *device, const device_config *image);
+void acia_6551_connect_to_serial_device(running_device *device, running_device *image);
 
 
 #endif /* __6551_H__ */

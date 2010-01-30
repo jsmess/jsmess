@@ -1240,7 +1240,7 @@ static void model3_init(running_machine *machine, int step)
 
 	// copy the 68k vector table into RAM
 	memcpy(model3_soundram, memory_region(machine, "audiocpu")+0x80000, 16);
-	device_reset(devtag_get_device(machine, "audiocpu"));
+	machine->device("audiocpu")->reset();
 
 	model3_machine_init(step);	// step 1.5
 	model3_tap_reset();
@@ -1369,7 +1369,7 @@ static WRITE64_HANDLER( model3_ctrl_w )
 		case 0:
 			if (ACCESSING_BITS_56_63)
 			{
-				const device_config *device = devtag_get_device(space->machine, "eeprom");
+				running_device *device = devtag_get_device(space->machine, "eeprom");
 				int reg = (data >> 56) & 0xff;
 				eeprom_write_bit(device, (reg & 0x20) ? 1 : 0);
 				eeprom_set_clock_line(device, (reg & 0x80) ? ASSERT_LINE : CLEAR_LINE);
@@ -4642,7 +4642,7 @@ ADDRESS_MAP_END
 
 static int scsp_last_line = 0;
 
-static void scsp_irq(const device_config *device, int irq)
+static void scsp_irq(running_device *device, int irq)
 {
 	if (irq > 0)
 	{

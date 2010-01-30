@@ -600,7 +600,7 @@ static MACHINE_START( adam )
 
 static MACHINE_RESET( adam )
 {
-	const device_config *img;
+	running_device *img;
 
 	img = devtag_get_device(machine, "cart");
 

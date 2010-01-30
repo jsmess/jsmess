@@ -599,7 +599,7 @@ typedef struct
 
 typedef struct
 {
-	const device_config *device;
+	running_device *device;
 	void *		param;				/* this chip parameter  */
 	double		freqbase;			/* frequency base       */
 	int			timer_prescaler;	/* timer prescaler      */
@@ -1680,7 +1680,7 @@ INLINE void CSMKeyControll(FM_OPN *OPN, FM_CH *CH)
 
 #ifdef __STATE_H__
 /* FM channel save , internal state only */
-static void FMsave_state_channel(const device_config *device,FM_CH *CH,int num_ch)
+static void FMsave_state_channel(running_device *device,FM_CH *CH,int num_ch)
 {
 	int slot , ch;
 
@@ -1700,7 +1700,7 @@ static void FMsave_state_channel(const device_config *device,FM_CH *CH,int num_c
 	}
 }
 
-static void FMsave_state_st(const device_config *device,FM_ST *ST)
+static void FMsave_state_st(running_device *device,FM_ST *ST)
 {
 #if FM_BUSY_FLAG_SUPPORT
 	state_save_register_device_item(device, 0, ST->busy_expiry_time.seconds );
@@ -1996,7 +1996,7 @@ static void init_timetables(FM_OPN *OPN, double freqbase)
 	}
 
 	/* there are 2048 FNUMs that can be generated using FNUM/BLK registers
-	but LFO works with one more bit of a precision so we really need 4096 elements */
+    but LFO works with one more bit of a precision so we really need 4096 elements */
 	/* calculate fnumber -> increment counter table */
 	for(i = 0; i < 4096; i++)
 	{
@@ -2111,7 +2111,7 @@ static void init_tables(void)
 		o = o / (ENV_STEP/4);
 
 		n = (int)(2.0*o);
-		if (n&1)     		/* round to nearest */
+		if (n&1)    		/* round to nearest */
 			n = (n>>1)+1;
 		else
 			n = n>>1;
@@ -2283,8 +2283,8 @@ void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length)
 		lt += ((out_fm[5]>>0) & OPN->pan[10]);
 		rt += ((out_fm[5]>>0) & OPN->pan[11]);
 
-//		Limit( lt, MAXOUT, MINOUT );
-//		Limit( rt, MAXOUT, MINOUT );
+//      Limit( lt, MAXOUT, MINOUT );
+//      Limit( rt, MAXOUT, MINOUT );
 
 		#ifdef SAVE_SAMPLE
 			SAVE_ALL_CHANNELS
@@ -2345,7 +2345,7 @@ void ym2612_postload(void *chip)
 	}
 }
 
-static void YM2612_save_state(YM2612 *F2612, const device_config *device)
+static void YM2612_save_state(YM2612 *F2612, running_device *device)
 {
 	state_save_register_device_item_array(device, 0, F2612->REGS);
 	FMsave_state_st(device,&F2612->OPN.ST);
@@ -2360,7 +2360,7 @@ static void YM2612_save_state(YM2612 *F2612, const device_config *device)
 #endif /* _STATE_H */
 
 /* initialize YM2612 emulator(s) */
-void * ym2612_init(void *param, const device_config *device, int clock, int rate,
+void * ym2612_init(void *param, running_device *device, int clock, int rate,
                FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler)
 {
 	YM2612 *F2612;

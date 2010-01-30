@@ -468,7 +468,7 @@ void CreateSourceFolders(int parent_index)
 			LPTREEFOLDER lpTemp;
 			lpTemp = NewFolder(s, next_folder_id, parent_index, IDI_SOURCE, 
 				               GetFolderFlags(numFolders));
-			ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)global_alloc_clear(EXFOLDERDATA) ;
+			ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
 			memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
 
 			ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
@@ -519,7 +519,7 @@ void CreateScreenFolders(int parent_index)
 			LPTREEFOLDER lpTemp;
 			lpTemp = NewFolder(s, next_folder_id, parent_index, IDI_FOLDER, 
 				               GetFolderFlags(numFolders));
-			ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)global_alloc_clear(EXFOLDERDATA) ;
+			ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
 			memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
 
 			ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
@@ -577,7 +577,7 @@ void CreateManufacturerFolders(int parent_index)
 					// nope, it's a manufacturer we haven't seen before, make it.
 					lpTemp = NewFolder(t, next_folder_id, parent_index, IDI_MANUFACTURER, 
 									   GetFolderFlags(numFolders));
-					ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)global_alloc_clear(EXFOLDERDATA) ;
+					ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
 					memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
 
 					ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
@@ -943,11 +943,11 @@ static void CreateDeviceFolders(int parent_index, device_class dev_class, int ic
 		}
 
 		// enumerate through all devices
-		for (device = device_list_class_first(&config->devicelist, dev_class); device != NULL;
-			device = device_list_class_next(device, dev_class))
+		for (device = config->devicelist.first(); device != NULL;
+			device = device->next)
 		{
 			// get the name
-			const char *dev_name = device_get_name(device);
+			const char *dev_name = device->name();
 
 			// do we have a folder for this device?
 			folder = NULL;
@@ -965,16 +965,16 @@ static void CreateDeviceFolders(int parent_index, device_class dev_class, int ic
 			{
 				LPTREEFOLDER lpTemp;
 
-				lpTemp = NewFolder(device_get_name(device), next_folder_id, parent_index, icon_id,
+				lpTemp = NewFolder(device->name(), next_folder_id, parent_index, icon_id,
  								   GetFolderFlags(numFolders));
-				ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)global_alloc_clear(EXFOLDERDATA) ;
+				ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
 				memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
 
 				ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
 				ExtraFolderData[next_folder_id]->m_nIconId = icon_id;
 				ExtraFolderData[next_folder_id]->m_nParent = treeFolders[parent_index]->m_nFolderId;
 				ExtraFolderData[next_folder_id]->m_nSubIconId = -1;
-				strcpy( ExtraFolderData[next_folder_id]->m_szTitle, device_get_name(device) );
+				strcpy( ExtraFolderData[next_folder_id]->m_szTitle, device->name() );
 				ExtraFolderData[next_folder_id++]->m_dwFlags = 0;
 				AddFolder(lpTemp);
 				folder = treeFolders[nFolder++];
@@ -1011,11 +1011,11 @@ void CreateDeficiencyFolders(int parent_index)
 	int nGames = driver_list_get_count(drivers);
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 
-	// create our two subfolders
-	LPTREEFOLDER lpProt, lpWrongCol, lpImpCol, lpImpGraph, lpMissSnd, lpImpSnd, lpFlip;
+	// create our subfolders
+	LPTREEFOLDER lpProt, lpWrongCol, lpImpCol, lpImpGraph, lpMissSnd, lpImpSnd, lpFlip, lpArt;
 	lpProt = NewFolder("Unemulated Protection", next_folder_id, parent_index, IDI_FOLDER,
  					   GetFolderFlags(numFolders));
-	ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)global_alloc_clear(EXFOLDERDATA) ;
+	ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
 	memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
 
 	ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
@@ -1027,7 +1027,7 @@ void CreateDeficiencyFolders(int parent_index)
 	AddFolder(lpProt);
 	lpWrongCol = NewFolder("Wrong Colors", next_folder_id, parent_index, IDI_FOLDER,
  					   GetFolderFlags(numFolders));
-	ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)global_alloc_clear(EXFOLDERDATA) ;
+	ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
 	memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
 
 	ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
@@ -1040,7 +1040,7 @@ void CreateDeficiencyFolders(int parent_index)
 
 	lpImpCol = NewFolder("Imperfect Colors", next_folder_id, parent_index, IDI_FOLDER,
  					   GetFolderFlags(numFolders));
-	ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)global_alloc_clear(EXFOLDERDATA) ;
+	ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
 	memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
 
 	ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
@@ -1053,7 +1053,7 @@ void CreateDeficiencyFolders(int parent_index)
 
 	lpImpGraph = NewFolder("Imperfect Graphics", next_folder_id, parent_index, IDI_FOLDER,
  					   GetFolderFlags(numFolders));
-	ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)global_alloc_clear(EXFOLDERDATA) ;
+	ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
 	memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
 
 	ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
@@ -1066,7 +1066,7 @@ void CreateDeficiencyFolders(int parent_index)
 
 	lpMissSnd = NewFolder("Missing Sound", next_folder_id, parent_index, IDI_FOLDER,
  					   GetFolderFlags(numFolders));
-	ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)global_alloc_clear(EXFOLDERDATA) ;
+	ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
 	memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
 
 	ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
@@ -1079,7 +1079,7 @@ void CreateDeficiencyFolders(int parent_index)
 
 	lpImpSnd = NewFolder("Imperfect Sound", next_folder_id, parent_index, IDI_FOLDER,
  					   GetFolderFlags(numFolders));
-	ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)global_alloc_clear(EXFOLDERDATA) ;
+	ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
 	memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
 
 	ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
@@ -1092,7 +1092,7 @@ void CreateDeficiencyFolders(int parent_index)
 
 	lpFlip = NewFolder("No Cocktail", next_folder_id, parent_index, IDI_FOLDER,
  					   GetFolderFlags(numFolders));
-	ExtraFolderData[next_folder_id] =(EXFOLDERDATA*) global_alloc_clear(EXFOLDERDATA) ;
+	ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
 	memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
 
 	ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
@@ -1103,6 +1103,18 @@ void CreateDeficiencyFolders(int parent_index)
 	ExtraFolderData[next_folder_id++]->m_dwFlags = 0;
 	AddFolder(lpFlip);
 
+	lpArt = NewFolder("Requires Artwork", next_folder_id, parent_index, IDI_FOLDER,
+ 					   GetFolderFlags(numFolders));
+	ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA) );
+	memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
+
+	ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
+	ExtraFolderData[next_folder_id]->m_nIconId = IDI_FOLDER;
+	ExtraFolderData[next_folder_id]->m_nParent = lpFolder->m_nFolderId;
+	ExtraFolderData[next_folder_id]->m_nSubIconId = -1;
+	strcpy( ExtraFolderData[next_folder_id]->m_szTitle, "Requires Artwork" );
+	ExtraFolderData[next_folder_id++]->m_dwFlags = 0;
+	AddFolder(lpArt);
 	// no games in top level folder
 	SetAllBits(lpFolder->m_lpGameBits,FALSE);
 
@@ -1136,6 +1148,10 @@ void CreateDeficiencyFolders(int parent_index)
 		{
 			AddGame(lpFlip,jj);
 		}
+		if (drivers[jj]->flags & GAME_REQUIRES_ARTWORK)
+		{
+			AddGame(lpArt,jj);
+		}		
 	}
 }
 
@@ -1155,7 +1171,7 @@ void CreateDumpingFolders(int parent_index)
 	LPTREEFOLDER lpBad, lpNo;
 	lpBad = NewFolder("Bad Dump", next_folder_id, parent_index, IDI_FOLDER,
  					   GetFolderFlags(numFolders));
-	ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)global_alloc_clear(EXFOLDERDATA) ;
+	ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
 	memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
 
 	ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
@@ -1167,7 +1183,7 @@ void CreateDumpingFolders(int parent_index)
 	AddFolder(lpBad);
 	lpNo = NewFolder("No Dump", next_folder_id, parent_index, IDI_FOLDER,
  					   GetFolderFlags(numFolders));
-	ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)global_alloc_clear(EXFOLDERDATA) ;
+	ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
 	memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
 
 	ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
@@ -1260,7 +1276,7 @@ void CreateYearFolders(int parent_index)
 			LPTREEFOLDER lpTemp;
 			lpTemp = NewFolder(s, next_folder_id, parent_index, IDI_YEAR,
  							   GetFolderFlags(numFolders));
-			ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)global_alloc_clear(EXFOLDERDATA) ;
+			ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
 			memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
 
 			ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
@@ -2132,7 +2148,7 @@ BOOL TryAddExtraFolderAndChildren(int parent_index)
 					lpTemp = NewFolder(name,current_id,parent_index,
  									   ExtraFolderData[id]->m_nSubIconId,
  									   GetFolderFlags(numFolders) | F_CUSTOM);
-					ExtraFolderData[current_id] = (EXFOLDERDATA*)global_alloc_clear(EXFOLDERDATA) ;
+					ExtraFolderData[current_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
 					memset(ExtraFolderData[current_id], 0, sizeof(EXFOLDERDATA));
 
 					ExtraFolderData[current_id]->m_nFolderId = current_id - MAX_EXTRA_FOLDERS;

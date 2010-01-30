@@ -47,8 +47,8 @@ struct _prof80_state
 	UINT8 gripc;			/* GRIP status */
 
 	/* devices */
-	const device_config *upd765;
-	const device_config *upd1990a;
+	running_device *upd765;
+	running_device *upd1990a;
 
 	/* timers */
 	emu_timer	*floppy_motor_off_timer;
@@ -70,10 +70,10 @@ struct _prof80_state
 	int flash;				/* flash */
 
 	/* devices */
-	const device_config *mc6845;
-	const device_config *ppi8255;
-	const device_config *z80sti;
-	const device_config *centronics;
+	running_device *mc6845;
+	running_device *ppi8255;
+	running_device *z80sti;
+	running_device *centronics;
 };
 
 #endif

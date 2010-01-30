@@ -151,6 +151,10 @@ typedef struct _generic_video_private generic_video_private;
 typedef struct _generic_audio_private generic_audio_private;
 
 
+// template specializations
+typedef tagged_list<region_info> region_list;
+
+
 /* output channel callback */
 typedef void (*output_callback_func)(void *param, const char *format, va_list argptr);
 
@@ -177,6 +181,9 @@ public:
 	operator UINT64 *() const { return (this != NULL) ? base.u64 : NULL; }
 
 	UINT32 bytes() const { return (this != NULL) ? length : 0; }
+
+	endianness_t endianness() const { return ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE) ? ENDIANNESS_LITTLE : ENDIANNESS_BIG; }
+	UINT8 width() const { return 1 << ((flags & ROMREGION_WIDTHMASK) >> 8); }
 
 	region_info *			next;
 	astring					name;
@@ -215,18 +222,20 @@ public:
 	running_machine(const game_driver *driver);
 	~running_machine();
 
-	inline const device_config *device(const char *tag);
+	inline running_device *device(const char *tag);
 	inline const input_port_config *port(const char *tag);
 	inline const region_info *region(const char *tag);
 
 	resource_pool			respool;			/* pool of resources for this machine */
+	region_list				regionlist;			/* list of memory regions */
+	device_list				devicelist;			/* list of running devices */
 
 	/* configuration data */
 	const machine_config *	config;				/* points to the constructed machine_config */
-	input_port_list			portlist;			/* points to a list of input port configurations */
+	ioport_list				portlist;			/* points to a list of input port configurations */
 
 	/* CPU information */
-	const device_config *	firstcpu;			/* first CPU (allows for quick iteration via typenext) */
+	running_device *	firstcpu;			/* first CPU (allows for quick iteration via typenext) */
 
 	/* game-related information */
 	const game_driver *		gamedrv;			/* points to the definition of the game machine */
@@ -234,7 +243,7 @@ public:
 
 	/* video-related information */
 	gfx_element *			gfx[MAX_GFX_ELEMENTS];/* array of pointers to graphic sets (chars, sprites) */
-	const device_config *	primary_screen;		/* the primary screen device, or NULL if screenless */
+	running_device *	primary_screen;		/* the primary screen device, or NULL if screenless */
 	palette_t *				palette;			/* global palette object */
 
 	/* palette-related information */
@@ -391,13 +400,10 @@ int mame_is_paused(running_machine *machine);
 /* ----- memory region management ----- */
 
 /* allocate a new memory region */
-UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 length, UINT32 flags);
+region_info *memory_region_alloc(running_machine *machine, const char *name, UINT32 length, UINT32 flags);
 
 /* free an allocated memory region */
 void memory_region_free(running_machine *machine, const char *name);
-
-/* return a pointer to the information struct for a given memory region */
-region_info *memory_region_info(running_machine *machine, const char *name);
 
 /* return a pointer to a specified memory region */
 UINT8 *memory_region(running_machine *machine, const char *name);
@@ -472,19 +478,19 @@ void mame_get_current_datetime(running_machine *machine, mame_system_time *systi
     INLINE FUNCTIONS
 ***************************************************************************/
 
-inline const device_config *running_machine::device(const char *tag)
+inline running_device *running_machine::device(const char *tag)
 {
-	return device_list_find_by_tag(&config->devicelist, tag);
+	return devicelist.find(tag);
 }
 
 inline const input_port_config *running_machine::port(const char *tag)
 {
-	return input_port_by_tag(&portlist, tag);
+	return portlist.find(tag);
 }
 
 inline const region_info *running_machine::region(const char *tag)
 {
-	return memory_region_info(this, tag);
+	return regionlist.find(tag);
 }
 
 

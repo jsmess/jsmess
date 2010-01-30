@@ -34,13 +34,13 @@ struct _i960_state_t {
 	int immediate_irq, immediate_vector, immediate_pri;
 
 	cpu_irq_callback irq_cb;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 
 	int icount;
 };
 
-INLINE i960_state_t *get_safe_token(const device_config *device)
+INLINE i960_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -2130,23 +2130,23 @@ CPU_GET_INFO( i960 )
 	case CPUINFO_INT_MAX_INSTRUCTION_BYTES:		info->i           = 8;							break;
 
 		// Bus sizes
-	case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;						break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:	info->i = 32;						break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:	info->i = 0;						break;
+	case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;						break;
+	case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;						break;
+	case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:	info->i = 0;						break;
 	case CPUINFO_INT_LOGADDR_WIDTH_PROGRAM:	info->i = 0;						break;
-	case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;						break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;						break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;						break;
+	case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;						break;
+	case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;						break;
+	case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;						break;
 	case CPUINFO_INT_LOGADDR_WIDTH_DATA:	info->i = 0;						break;
-	case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;						break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;						break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;						break;
+	case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;						break;
+	case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;						break;
+	case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;						break;
 	case CPUINFO_INT_LOGADDR_WIDTH_IO:		info->i = 0;						break;
 
 		// Internal maps
-	case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map32 = NULL;break;
-	case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map32 = NULL;break;
-	case CPUINFO_PTR_INTERNAL_MEMORY_MAP_IO:		info->internal_map32 = NULL;break;
+	case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map32 = NULL;break;
+	case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map32 = NULL;break;
+	case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_IO:		info->internal_map32 = NULL;break;
 
 		// CPU misc parameters
 	case DEVINFO_STR_NAME:					strcpy(info->s, "i960KB");							break;
@@ -2219,13 +2219,13 @@ CPU_GET_INFO( i960 )
 
 // call from any read/write handler for a memory area that can't be bursted
 // on the real hardware (e.g. Model 2's interrupt control registers)
-void i960_noburst(const device_config *device)
+void i960_noburst(running_device *device)
 {
 	i960_state_t *i960 = get_safe_token(device);
 	i960->bursting = 0;
 }
 
-void i960_stall(const device_config *device)
+void i960_stall(running_device *device)
 {
 	i960_state_t *i960 = get_safe_token(device);
 	i960->IP = i960->PIP;

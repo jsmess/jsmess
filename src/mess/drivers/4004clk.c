@@ -16,7 +16,7 @@ struct __4004clk_state
 {
 	UINT16 nixie[16];
 	UINT8 timer;
-	const device_config *dac;
+	running_device *dac;
 };
 
 static READ8_HANDLER(data_r)

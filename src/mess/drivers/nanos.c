@@ -26,7 +26,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(nanos_tc_w)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "upd765");
+	running_device *fdc = devtag_get_device(space->machine, "upd765");
 	upd765_tc_w(fdc, BIT(data,1));
 }
 
@@ -80,7 +80,7 @@ static const z80pio_interface pio2_intf =
 
 /* Z80-SIO Interface */
 
-static void z80daisy_interrupt(const device_config *device, int state)
+static void z80daisy_interrupt(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, state);
 }

@@ -93,7 +93,7 @@ static READ8_HANDLER(mac_asc_r)
 
 static WRITE8_HANDLER(mac_asc_w)
 {
-	static const device_config *dacs[2];
+	static running_device *dacs[2];
 	INT32 i;
 	mac_state *mac = (mac_state *)space->machine->driver_data;
 
@@ -202,7 +202,7 @@ static UINT32 rbv_toggle = 0;
 static READ16_HANDLER ( mac_rbv_r )
 {
 	int data;
-	const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
+	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
 
 	logerror("rbv_r: %x, mask %x\n", offset, mem_mask);
 
@@ -231,7 +231,7 @@ static READ16_HANDLER ( mac_rbv_r )
 
 static WRITE16_HANDLER ( mac_rbv_w )
 {
-	const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
+	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
 
 	logerror("rbv_w: %x to offset %x, mask %x\n", data, offset, mem_mask);
 
@@ -251,7 +251,7 @@ static UINT32 v8_palette[256];
 static READ16_HANDLER ( mac_v8_r )
 {
 	int data, viaoffs;
-	const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
+	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
 
 	printf("v8_r: %x, mask %x (PC %x)\n", offset*2, mem_mask, cpu_get_pc(space->cpu));
 
@@ -272,7 +272,7 @@ static READ16_HANDLER ( mac_v8_r )
 
 static WRITE16_HANDLER ( mac_v8_w )
 {
-	const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
+	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
 	int viaoffs;
 
 	printf("v8_w: %x to offset %x, mask %x (PC %x)\n", data, offset*2, mem_mask, cpu_get_pc(space->cpu));
@@ -343,7 +343,7 @@ static UINT32 sonora_palette[256];
 static READ16_HANDLER ( mac_sonora_r )
 {
 	int data, viaoffs;
-	const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
+	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
 
 	printf("sonora_r: %x, mask %x (PC %x)\n", offset*2, mem_mask, cpu_get_pc(space->cpu));
 
@@ -364,7 +364,7 @@ static READ16_HANDLER ( mac_sonora_r )
 
 static WRITE16_HANDLER ( mac_sonora_w )
 {
-	const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
+	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
 	int viaoffs;
 
 	printf("sonora_w: %x to offset %x, mask %x (PC %x)\n", data, offset*2, mem_mask, cpu_get_pc(space->cpu));

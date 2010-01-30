@@ -22,7 +22,7 @@ struct _amu880_state
 	const UINT8 *char_rom;
 
 	/* devices */
-	const device_config *cassette;
+	running_device *cassette;
 };
 
 #endif

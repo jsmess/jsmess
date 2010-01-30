@@ -19,7 +19,7 @@
 static int nc_card_size;
 
 /* save card data back */
-static void	nc_card_save(const device_config *image)
+static void	nc_card_save(running_device *image)
 {
 	/* if there is no data to write, quit */
 	if (!nc_card_ram || !nc_card_size)
@@ -54,7 +54,7 @@ static int nc_card_calculate_mask(int size)
 
 
 /* load card image */
-static int nc_card_load(const device_config *image, unsigned char **ptr)
+static int nc_card_load(running_device *image, unsigned char **ptr)
 {
 	int datasize;
 	unsigned char *data;

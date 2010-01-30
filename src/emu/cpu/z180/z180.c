@@ -115,7 +115,7 @@ struct _z180_state
 	UINT32	ea;
 	z80_daisy_state *daisy;
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *iospace;
 	cpu_state_table state;
@@ -125,7 +125,7 @@ struct _z180_state
 	UINT8 *cc[6];
 };
 
-INLINE z180_state *get_safe_token(const device_config *device)
+INLINE z180_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -2015,8 +2015,8 @@ static CPU_INIT( z180 )
 {
 	z180_state *cpustate = get_safe_token(device);
 	cpustate->daisy = NULL;
-	if (device->static_config)
-		cpustate->daisy = z80daisy_init(device, (const z80_daisy_chain *)device->static_config);
+	if (device->baseconfig().static_config)
+		cpustate->daisy = z80daisy_init(device, (const z80_daisy_chain *)device->baseconfig().static_config);
 	cpustate->irq_callback = irqcallback;
 
 	SZHVC_add = auto_alloc_array(device->machine, UINT8, 2*256*256);
@@ -2547,12 +2547,12 @@ CPU_GET_INFO( z180 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 16;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 20;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 		info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 20;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: 		info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 16;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:				info->i = 0;							break;
 
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_state;			break;
 		case CPUINFO_INT_INPUT_STATE + Z180_INT0:		info->i = cpustate->irq_state[0];		break;

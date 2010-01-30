@@ -68,7 +68,7 @@ void arm7_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*wr
 #define ARM7REG(reg)        cpustate->sArmRegister[reg]
 #define ARM7_ICOUNT         cpustate->iCount
 
-INLINE arm_state *get_safe_token(const device_config *device)
+INLINE arm_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -262,7 +262,7 @@ static CPU_RESET( pxa255 )
 
 static CPU_RESET( sa1110 )
 {
-	arm_state *cpustate = (arm_state *)device->token;
+	arm_state *cpustate = get_safe_token(device);
 
 	// must call core reset
 	arm7_core_reset(device);
@@ -403,15 +403,15 @@ CPU_GET_INFO( arm7 )
         case CPUINFO_INT_MIN_CYCLES:                    info->i = 3;                            break;
         case CPUINFO_INT_MAX_CYCLES:                    info->i = 4;                            break;
 
-        case CPUINFO_INT_DATABUS_WIDTH_PROGRAM: info->i = 32;                   break;
-        case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;                   break;
-        case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;                    break;
-        case CPUINFO_INT_DATABUS_WIDTH_DATA:    info->i = 0;                    break;
-        case CPUINFO_INT_ADDRBUS_WIDTH_DATA:    info->i = 0;                    break;
-        case CPUINFO_INT_ADDRBUS_SHIFT_DATA:    info->i = 0;                    break;
-        case CPUINFO_INT_DATABUS_WIDTH_IO:      info->i = 0;                    break;
-        case CPUINFO_INT_ADDRBUS_WIDTH_IO:      info->i = 0;                    break;
-        case CPUINFO_INT_ADDRBUS_SHIFT_IO:      info->i = 0;                    break;
+        case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;                   break;
+        case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;                   break;
+        case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;                    break;
+        case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:    info->i = 0;                    break;
+        case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:    info->i = 0;                    break;
+        case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:    info->i = 0;                    break;
+        case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:      info->i = 0;                    break;
+        case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:      info->i = 0;                    break;
+        case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:      info->i = 0;                    break;
 
         /* interrupt lines/exceptions */
         case CPUINFO_INT_INPUT_STATE + ARM7_IRQ_LINE:                   info->i = cpustate->pendingIrq; break;

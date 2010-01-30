@@ -143,7 +143,7 @@ WRITE8_HANDLER( pc88sr_outport_40 )
 	/* bit 3,4,6 not implemented */
 	/* bit 7 incorrect behavior */
 	pc88_state *state = (pc88_state *)space->machine->driver_data;
-	const device_config *speaker = devtag_get_device(space->machine, "beep");
+	running_device *speaker = devtag_get_device(space->machine, "beep");
 
 	/* printer */
 	centronics_strobe_w(state->centronics, BIT(data, 0));
@@ -629,7 +629,7 @@ static void fix_V1V2(void)
 
 static void pc88sr_ch_reset(running_machine *machine, int hireso)
 {
-	const device_config *speaker = devtag_get_device(machine, "beep");
+	running_device *speaker = devtag_get_device(machine, "beep");
 	int a;
 
 	a=input_port_read(machine, "CFG");
@@ -748,7 +748,7 @@ static void pc88sr_init_fmsound(void)
   FM_IRQ_save=0;
 }
 
-void pc88sr_sound_interupt(const device_config *device, int irq)
+void pc88sr_sound_interupt(running_device *device, int irq)
 {
 	FM_IRQ_save=irq;
 	if(FM_IRQ_save && enable_FM_IRQ)

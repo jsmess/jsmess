@@ -417,7 +417,7 @@ static void vdc8563_monotext_screenrefresh (running_machine *machine, bitmap_t *
 	int w=CRTC6845_CHAR_COLUMNS;
 	int h=CRTC6845_CHAR_LINES;
 	int height=CRTC6845_CHAR_HEIGHT;
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 
 	rect.min_x = video_screen_get_visible_area(screen)->min_x;
 	rect.max_x = video_screen_get_visible_area(screen)->max_x;
@@ -461,7 +461,7 @@ static void vdc8563_text_screenrefresh (running_machine *machine, bitmap_t *bitm
 	int w=CRTC6845_CHAR_COLUMNS;
 	int h=CRTC6845_CHAR_LINES;
 	int height=CRTC6845_CHAR_HEIGHT;
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 
 	rect.min_x = video_screen_get_visible_area(screen)->min_x;
 	rect.max_x = video_screen_get_visible_area(screen)->max_x;
@@ -525,7 +525,7 @@ static void vdc8563_graphic_screenrefresh (running_machine *machine, bitmap_t *b
 	int w=CRTC6845_CHAR_COLUMNS;
 	int h=CRTC6845_CHAR_LINES;
 	int height=CRTC6845_CHAR_HEIGHT;
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 
 	rect.min_x = video_screen_get_visible_area(screen)->min_x;
 	rect.max_x = video_screen_get_visible_area(screen)->max_x;

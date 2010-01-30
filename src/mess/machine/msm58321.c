@@ -75,7 +75,7 @@ struct _msm58321_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE msm58321_t *get_safe_token(const device_config *device)
+INLINE msm58321_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -83,11 +83,11 @@ INLINE msm58321_t *get_safe_token(const device_config *device)
 	return (msm58321_t *)device->token;
 }
 
-INLINE const msm58321_interface *get_interface(const device_config *device)
+INLINE const msm58321_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == MSM58321RS);
-	return (const msm58321_interface *) device->static_config;
+	return (const msm58321_interface *) device->baseconfig().static_config;
 }
 
 /***************************************************************************
@@ -298,7 +298,7 @@ WRITE_LINE_DEVICE_HANDLER( msm58321_test_w )
 
 static TIMER_CALLBACK( busy_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	msm58321_t *msm58321 = get_safe_token(device);
 
 	devcb_call_write_line(&msm58321->out_busy_func, msm58321->busy);

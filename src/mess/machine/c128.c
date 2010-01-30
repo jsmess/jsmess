@@ -111,7 +111,7 @@ static UINT8 vicirq;
 static void c128_nmi( running_machine *machine )
 {
 	static int nmilevel = 0;
-	const device_config *cia_1 = devtag_get_device(machine, "cia_1");
+	running_device *cia_1 = devtag_get_device(machine, "cia_1");
 	int cia1irq = mos6526_irq_r(cia_1);
 
 	if (nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
@@ -196,14 +196,14 @@ static void c128_irq( running_machine *machine, int level )
 	}
 }
 
-static void c128_cia0_interrupt( const device_config *device, int level )
+static void c128_cia0_interrupt( running_device *device, int level )
 {
 	c128_irq (device->machine, level || vicirq);
 }
 
 static void c128_vic_interrupt( running_machine *machine, int level )
 {
-	const device_config *cia_0 = devtag_get_device(machine, "cia_0");
+	running_device *cia_0 = devtag_get_device(machine, "cia_0");
 #if 1
 	if (level != vicirq)
 	{
@@ -215,8 +215,8 @@ static void c128_vic_interrupt( running_machine *machine, int level )
 
 static void c128_iec_data_out_w(running_machine *machine)
 {
-	const device_config *cia_1 = devtag_get_device(machine, "cia_1");
-	const device_config *iec = devtag_get_device(machine, "iec");
+	running_device *cia_1 = devtag_get_device(machine, "cia_1");
+	running_device *iec = devtag_get_device(machine, "iec");
 	int data = !c128_data_out;
 
 	/* fast serial data */
@@ -227,8 +227,8 @@ static void c128_iec_data_out_w(running_machine *machine)
 
 static void c128_iec_srq_out_w(running_machine *machine)
 {
-	const device_config *cia_1 = devtag_get_device(machine, "cia_1");
-	const device_config *iec = devtag_get_device(machine, "iec");
+	running_device *cia_1 = devtag_get_device(machine, "cia_1");
+	running_device *iec = devtag_get_device(machine, "iec");
 	int srq = 1;
 	
 	/* fast serial clock */
@@ -320,7 +320,7 @@ WRITE_LINE_DEVICE_HANDLER( c128_iec_data_w )
 static READ8_DEVICE_HANDLER( c128_cia1_port_a_r )
 {
 	UINT8 value = 0xff;
-	const device_config *serbus = devtag_get_device(device->machine, "iec");
+	running_device *serbus = devtag_get_device(device->machine, "iec");
 
 	if (!cbm_iec_clk_r(serbus))
 		value &= ~0x40;
@@ -334,7 +334,7 @@ static READ8_DEVICE_HANDLER( c128_cia1_port_a_r )
 static WRITE8_DEVICE_HANDLER( c128_cia1_port_a_w )
 {
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
-	const device_config *serbus = devtag_get_device(device->machine, "iec");
+	running_device *serbus = devtag_get_device(device->machine, "iec");
 
 	c128_data_out = BIT(data, 5);
 	c128_iec_data_out_w(device->machine);
@@ -347,7 +347,7 @@ static WRITE8_DEVICE_HANDLER( c128_cia1_port_a_w )
 	c128_vicaddr = c64_memory + helper[data & 0x03] + c128_va1617;
 }
 
-static void c128_cia1_interrupt( const device_config *device, int level )
+static void c128_cia1_interrupt( running_device *device, int level )
 {
 	c128_nmi(device->machine);
 }
@@ -396,11 +396,11 @@ static READ8_HANDLER( c128_dma8726_port_r )
 
 WRITE8_HANDLER( c128_write_d000 )
 {
-	const device_config *cia_0 = devtag_get_device(space->machine, "cia_0");
-	const device_config *cia_1 = devtag_get_device(space->machine, "cia_1");
-	const device_config *sid = devtag_get_device(space->machine, "sid6581");
+	running_device *cia_0 = devtag_get_device(space->machine, "cia_0");
+	running_device *cia_1 = devtag_get_device(space->machine, "cia_1");
+	running_device *sid = devtag_get_device(space->machine, "sid6581");
 
-	UINT8 c64_port6510 = (UINT8) devtag_get_info_int(space->machine, "maincpu", CPUINFO_INT_M6510_PORT);
+	UINT8 c64_port6510 = (UINT8) space->machine->device("maincpu")->get_runtime_int(CPUINFO_INT_M6510_PORT);
 
 	if (!c128_write_io)
 	{
@@ -451,9 +451,9 @@ WRITE8_HANDLER( c128_write_d000 )
 
 static READ8_HANDLER( c128_read_io )
 {
-	const device_config *cia_0 = devtag_get_device(space->machine, "cia_0");
-	const device_config *cia_1 = devtag_get_device(space->machine, "cia_1");
-	const device_config *sid = devtag_get_device(space->machine, "sid6581");
+	running_device *cia_0 = devtag_get_device(space->machine, "cia_0");
+	running_device *cia_1 = devtag_get_device(space->machine, "cia_1");
+	running_device *sid = devtag_get_device(space->machine, "sid6581");
 
 	if (offset < 0x400)
 		return vic2_port_r(space, offset & 0x3ff);
@@ -493,7 +493,7 @@ void c128_bankswitch_64( running_machine *machine, int reset )
 	if (!c64mode)
 		return;
 
-	data = (UINT8) devtag_get_info_int(machine, "maincpu", CPUINFO_INT_M6510_PORT) & 0x07;
+	data = (UINT8) machine->device("maincpu")->get_runtime_int(CPUINFO_INT_M6510_PORT) & 0x07;
 	if ((data == old) && (exrom == c64_exrom) && (game == c64_game) && !reset)
 		return;
 
@@ -1021,7 +1021,7 @@ WRITE8_HANDLER( c128_write_ff05 )
  */
 static int c128_dma_read(running_machine *machine, int offset)
 {
-	UINT8 c64_port6510 = (UINT8) devtag_get_info_int(machine, "maincpu", CPUINFO_INT_M6510_PORT);
+	UINT8 c64_port6510 = (UINT8) machine->device("maincpu")->get_runtime_int(CPUINFO_INT_M6510_PORT);
 
 	/* main memory configuration to include */
 	if (c64mode)
@@ -1044,7 +1044,7 @@ static int c128_dma_read(running_machine *machine, int offset)
 
 static int c128_dma_read_color(running_machine *machine, int offset)
 {
-	UINT8 c64_port6510 = (UINT8) devtag_get_info_int(machine, "maincpu", CPUINFO_INT_M6510_PORT);
+	UINT8 c64_port6510 = (UINT8) machine->device("maincpu")->get_runtime_int(CPUINFO_INT_M6510_PORT);
 
 	if (c64mode)
 		return c64_colorram[offset & 0x3ff] & 0xf;
@@ -1060,7 +1060,7 @@ static int c128_dma_read_color(running_machine *machine, int offset)
 
 static emu_timer *datasette_timer;
 
-void c128_m6510_port_write( const device_config *device, UINT8 direction, UINT8 data )
+void c128_m6510_port_write( running_device *device, UINT8 direction, UINT8 data )
 {
 	/* if line is marked as input then keep current value */
 	data = (c64_port_data & ~direction) | (data & direction);
@@ -1105,7 +1105,7 @@ void c128_m6510_port_write( const device_config *device, UINT8 direction, UINT8 
 	c64_memory[0x001] = memory_read_byte( cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 1 );
 }
 
-UINT8 c128_m6510_port_read( const device_config *device, UINT8 direction )
+UINT8 c128_m6510_port_read( running_device *device, UINT8 direction )
 {
 	UINT8 data = c64_port_data;
 

@@ -168,13 +168,13 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( dc_console )
 {
-	const device_config *aica = devtag_get_device(machine, "aica");
+	running_device *aica = devtag_get_device(machine, "aica");
 	MACHINE_RESET_CALL(dc);
 	aica_set_ram_base(aica, dc_sound_ram, 2*1024*1024);
 	dreamcast_atapi_reset(machine);
 }
 
-static void aica_irq(const device_config *device, int irq)
+static void aica_irq(running_device *device, int irq)
 {
 	cputag_set_input_line(device->machine, "soundcpu", ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }

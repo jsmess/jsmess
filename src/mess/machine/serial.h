@@ -220,12 +220,12 @@ void serial_helper_setup(void);
 /*******************************************************************************/
 /**** SERIAL DEVICE ****/
 
-unsigned long serial_device_get_state(const device_config *device);
+unsigned long serial_device_get_state(running_device *device);
 
 /* connect this device to the emulated serial chip */
 /* id is the serial device to connect to */
 /* connection is the serial connection to connect to the serial device */
-void serial_device_connect(const device_config *image, struct serial_connection *connection);
+void serial_device_connect(running_device *image, struct serial_connection *connection);
 
 #define SERIAL	DEVICE_GET_INFO_NAME(serial)
 
@@ -237,9 +237,9 @@ DEVICE_GET_INFO( serial );
 DEVICE_START(serial);
 DEVICE_IMAGE_LOAD(serial);
 
-void serial_device_setup(const device_config *image, int baud_rate, int num_data_bits, int stop_bit_count, int parity_code);
+void serial_device_setup(running_device *image, int baud_rate, int num_data_bits, int stop_bit_count, int parity_code);
 
 /* set the transmit state of the serial device */
-void serial_device_set_transmit_state(const device_config *image, int state);
+void serial_device_set_transmit_state(running_device *image, int state);
 
 #endif /* SERIAL_H_ */

@@ -111,7 +111,7 @@ static UINT8 *buffer;					/* data buffer */
 static UINT8 *buffer_ptr = 0;			/* data pointer */
 static UINT8 hdc_control;
 static void (*hdc_set_irq)(running_machine *,int,int);
-static const device_config *pc_hdc_dma8237;
+static running_device *pc_hdc_dma8237;
 
 
 static const char *const hdc_command_names[] =
@@ -218,7 +218,7 @@ int pc_hdc_setup(running_machine *machine, void (*hdc_set_irq_func)(running_mach
 }
 
 
-void pc_hdc_set_dma8237_device( const device_config *dma8237 )
+void pc_hdc_set_dma8237_device( running_device *dma8237 )
 {
 	pc_hdc_dma8237 = dma8237;
 }
@@ -226,7 +226,7 @@ void pc_hdc_set_dma8237_device( const device_config *dma8237 )
 
 static hard_disk_file *pc_hdc_file(running_machine *machine, int id)
 {
-	const device_config *img = NULL;
+	running_device *img = NULL;
 
 	switch( id )
 	{

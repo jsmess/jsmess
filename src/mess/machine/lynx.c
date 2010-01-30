@@ -1924,7 +1924,7 @@ INTERRUPT_GEN( lynx_frame_int )
 		lynx_rotate=input_port_read(device->machine, "ROTATION") & 0x03;
 }
 
-void lynx_crc_keyword(const device_config *image)
+void lynx_crc_keyword(running_device *image)
 {
     const char *info;
 

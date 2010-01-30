@@ -21,22 +21,22 @@ struct apple525_disk
 	UINT8 track_data[APPLE2_NIBBLE_SIZE * APPLE2_SECTOR_COUNT];
 };
 
-INLINE const appledriv_config *get_config(const device_config *device)
+INLINE const appledriv_config *get_config(running_device *device)
 {
 	assert(device != NULL);
-	return (const appledriv_config *) device->inline_config;
+	return (const appledriv_config *) device->baseconfig().inline_config;
 }
 
 static int apple525_enable_mask = 1;
 
-void apple525_set_enable_lines(const device_config *device,int enable_mask)
+void apple525_set_enable_lines(running_device *device,int enable_mask)
 {
 	apple525_enable_mask = enable_mask;
 }
 
 /* ----------------------------------------------------------------------- */
 
-static void apple525_load_current_track(const device_config *image)
+static void apple525_load_current_track(running_device *image)
 {
 	int len;
 	struct apple525_disk *disk;
@@ -49,7 +49,7 @@ static void apple525_load_current_track(const device_config *image)
 	disk->track_dirty = 0;
 }
 
-static void apple525_save_current_track(const device_config *image, int unload)
+static void apple525_save_current_track(running_device *image, int unload)
 {
 	int len;
 	struct apple525_disk *disk;
@@ -66,7 +66,7 @@ static void apple525_save_current_track(const device_config *image, int unload)
 		disk->track_loaded = 0;
 }
 
-static void apple525_seek_disk(const device_config *img, struct apple525_disk *disk, signed int step)
+static void apple525_seek_disk(running_device *img, struct apple525_disk *disk, signed int step)
 {
 	int track;
 	int pseudo_track;
@@ -94,7 +94,7 @@ static void apple525_seek_disk(const device_config *img, struct apple525_disk *d
 		disk->tween_tracks = 0;
 }
 
-static void apple525_disk_set_lines(const device_config *device,const device_config *image, UINT8 new_state)
+static void apple525_disk_set_lines(running_device *device,running_device *image, UINT8 new_state)
 {
 	struct apple525_disk *cur_disk;
 	UINT8 old_state;
@@ -142,10 +142,10 @@ int apple525_get_count(running_machine *machine) {
 	return cnt;
 }
 
-void apple525_set_lines(const device_config *device,UINT8 lines)
+void apple525_set_lines(running_device *device,UINT8 lines)
 {
 	int i, count;
-	const device_config *image;
+	running_device *image;
 
 	count = apple525_get_count(device->machine);
 	for (i = 0; i < count; i++)
@@ -160,7 +160,7 @@ void apple525_set_lines(const device_config *device,UINT8 lines)
 }
 
 /* reads/writes a byte; write_value is -1 for read only */
-static UINT8 apple525_process_byte(const device_config *img, int write_value)
+static UINT8 apple525_process_byte(running_device *img, int write_value)
 {
 	UINT8 read_value;
 	struct apple525_disk *disk;
@@ -209,7 +209,7 @@ static UINT8 apple525_process_byte(const device_config *img, int write_value)
 	return read_value;
 }
 
-static const device_config *apple525_selected_image(running_machine *machine)
+static running_device *apple525_selected_image(running_machine *machine)
 {
 	int i,count;
 
@@ -223,25 +223,25 @@ static const device_config *apple525_selected_image(running_machine *machine)
 	return NULL;
 }
 
-UINT8 apple525_read_data(const device_config *device)
+UINT8 apple525_read_data(running_device *device)
 {
-	const device_config *image;
+	running_device *image;
 	image = apple525_selected_image(device->machine);
 	return image ? apple525_process_byte(image, -1) : 0xFF;
 }
 
-void apple525_write_data(const device_config *device,UINT8 data)
+void apple525_write_data(running_device *device,UINT8 data)
 {
-	const device_config *image;
+	running_device *image;
 	image = apple525_selected_image(device->machine);
 	if (image)
 		apple525_process_byte(image, data);
 }
 
-int apple525_read_status(const device_config *device)
+int apple525_read_status(running_device *device)
 {
 	int i, count, result = 0;
-	const device_config *image;
+	running_device *image;
 
 	count = apple525_get_count(device->machine);
 

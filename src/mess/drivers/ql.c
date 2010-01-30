@@ -106,7 +106,7 @@ static WRITE8_HANDLER( ipc_port2_w )
 
     */
 
-	const device_config *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = devtag_get_device(space->machine, "speaker");
 	ql_state *state = (ql_state *)space->machine->driver_data;
 
 	int ipl = (BIT(data, 2) << 1) | BIT(data, 3);

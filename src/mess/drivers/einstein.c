@@ -94,8 +94,8 @@
 typedef struct _einstein_state einstein_state;
 struct _einstein_state
 {
-	const device_config *color_screen;
-	const device_config *ctc;
+	running_device *color_screen;
+	running_device *ctc;
 
 	int rom_enabled;
 	int interrupt;
@@ -107,8 +107,8 @@ struct _einstein_state
 	UINT8 keyboard_data;
 
 	/* 80 column device */
-	const device_config *mc6845;
-	const device_config *crtc_screen;
+	running_device *mc6845;
+	running_device *crtc_screen;
 	UINT8 *crtc_ram;
 };
 
@@ -181,7 +181,7 @@ static READ8_HANDLER( einstein_80col_state_r )
 
 static DEVICE_START( einstein_daisy ) { }
 
-static int einstein_keyboard_daisy_irq_state(const device_config *device)
+static int einstein_keyboard_daisy_irq_state(running_device *device)
 {
 	einstein_state *einstein = (einstein_state *)device->machine->driver_data;
 
@@ -191,7 +191,7 @@ static int einstein_keyboard_daisy_irq_state(const device_config *device)
 	return 0;
 }
 
-static int einstein_keyboard_daisy_irq_ack(const device_config *device)
+static int einstein_keyboard_daisy_irq_ack(running_device *device)
 {
 	return 0xf7;
 }
@@ -219,7 +219,7 @@ static DEVICE_GET_INFO( einstein_keyboard_daisy )
 	}
 }
 
-static int einstein_adc_daisy_irq_state(const device_config *device)
+static int einstein_adc_daisy_irq_state(running_device *device)
 {
 	einstein_state *einstein = (einstein_state *)device->machine->driver_data;
 
@@ -229,7 +229,7 @@ static int einstein_adc_daisy_irq_state(const device_config *device)
 	return 0;
 }
 
-static int einstein_adc_daisy_irq_ack(const device_config *device)
+static int einstein_adc_daisy_irq_ack(running_device *device)
 {
 	return 0xfb;
 }
@@ -257,7 +257,7 @@ static DEVICE_GET_INFO( einstein_adc_daisy )
 	}
 }
 
-static int einstein_fire_daisy_irq_state(const device_config *device)
+static int einstein_fire_daisy_irq_state(running_device *device)
 {
 	einstein_state *einstein = (einstein_state *)device->machine->driver_data;
 
@@ -267,7 +267,7 @@ static int einstein_fire_daisy_irq_state(const device_config *device)
 	return 0;
 }
 
-static int einstein_fire_daisy_irq_ack(const device_config *device)
+static int einstein_fire_daisy_irq_ack(running_device *device)
 {
 	return 0xfd;
 }
@@ -422,13 +422,13 @@ static TIMER_DEVICE_CALLBACK( einstein_ctc_trigger_callback )
 
 static WRITE_LINE_DEVICE_HANDLER( einstein_serial_transmit_clock )
 {
-	const device_config *uart = devtag_get_device(device->machine, IC_I060);
+	running_device *uart = devtag_get_device(device->machine, IC_I060);
 	msm8251_transmit_clock(uart);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( einstein_serial_receive_clock )
 {
-	const device_config *uart = devtag_get_device(device->machine, IC_I060);
+	running_device *uart = devtag_get_device(device->machine, IC_I060);
 	msm8251_receive_clock(uart);
 }
 
@@ -458,7 +458,7 @@ static WRITE8_HANDLER( einstein_rom_w )
 
 static READ8_HANDLER( einstein_kybintmsk_r )
 {
-	const device_config *printer = devtag_get_device(space->machine, "centronics");
+	running_device *printer = devtag_get_device(space->machine, "centronics");
 	einstein_state *einstein = (einstein_state *)space->machine->driver_data;
 	UINT8 data = 0;
 
@@ -561,7 +561,7 @@ static MACHINE_START( einstein )
 static MACHINE_RESET( einstein )
 {
 	einstein_state *einstein = (einstein_state *)machine->driver_data;
-	const device_config *floppy;
+	running_device *floppy;
 	UINT8 config = input_port_read(machine, "config");
 
 	/* save pointers to our devices */

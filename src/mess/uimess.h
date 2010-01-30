@@ -43,7 +43,7 @@ void ui_mess_menu_file_manager(running_machine *machine, ui_menu *menu, void *pa
 
 /* tape control */
 void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *parameter, void *state);
-astring *tapecontrol_gettime(astring *dest, const device_config *device, int *curpos, int *endpos);
+astring *tapecontrol_gettime(astring *dest, running_device *device, int *curpos, int *endpos);
 
 /* paste */
 void ui_mess_paste(running_machine *machine);

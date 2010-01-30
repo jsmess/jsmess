@@ -53,15 +53,15 @@ struct _vp550_t
 	int channels;						/* number of channels */
 
 	/* devices */
-	const device_config *cdp1863[MAX_CHANNELS];
-	const device_config *sync_timer;
+	running_device *cdp1863[MAX_CHANNELS];
+	running_device *sync_timer;
 };
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE vp550_t *get_safe_token(const device_config *device)
+INLINE vp550_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -159,7 +159,7 @@ static WRITE8_DEVICE_HANDLER( vp550_sync_w )
     or uninstall write handlers
 -------------------------------------------------*/
 
-void vp550_install_write_handlers(const device_config *device, const address_space *program, int enabled)
+void vp550_install_write_handlers(running_device *device, const address_space *program, int enabled)
 {
 	vp550_t *vp550 = get_safe_token(device);
 
@@ -188,7 +188,7 @@ void vp550_install_write_handlers(const device_config *device, const address_spa
     or uninstall write handlers
 -------------------------------------------------*/
 
-void vp551_install_write_handlers(const device_config *device, const address_space *program, int enabled)
+void vp551_install_write_handlers(running_device *device, const address_space *program, int enabled)
 {
 }
 
@@ -257,11 +257,11 @@ static DEVICE_START( vp551 )
 	vp550_t *vp550 = get_safe_token(device);
 
 	/* look up devices */
-	vp550->cdp1863[CHANNEL_A] = device_find_child_by_tag(device, CDP1863_A_TAG);
-	vp550->cdp1863[CHANNEL_B] = device_find_child_by_tag(device, CDP1863_B_TAG);
-	vp550->cdp1863[CHANNEL_C] = device_find_child_by_tag(device, CDP1863_C_TAG);
-	vp550->cdp1863[CHANNEL_D] = device_find_child_by_tag(device, CDP1863_D_TAG);
-	vp550->sync_timer = device_find_child_by_tag(device, "sync");
+	vp550->cdp1863[CHANNEL_A] = device->subdevice(CDP1863_A_TAG);
+	vp550->cdp1863[CHANNEL_B] = device->subdevice(CDP1863_B_TAG);
+	vp550->cdp1863[CHANNEL_C] = device->subdevice(CDP1863_C_TAG);
+	vp550->cdp1863[CHANNEL_D] = device->subdevice(CDP1863_D_TAG);
+	vp550->sync_timer = device->subdevice("sync");
 
 	/* set initial values */
 	vp550->channels = 4;
@@ -276,8 +276,8 @@ static DEVICE_RESET( vp550 )
 	vp550_t *vp550 = get_safe_token(device);
 
 	/* reset chips */
-	device_reset(vp550->cdp1863[CHANNEL_A]);
-	device_reset(vp550->cdp1863[CHANNEL_B]);
+	vp550->cdp1863[CHANNEL_A]->reset();
+	vp550->cdp1863[CHANNEL_B]->reset();
 
 	/* disable interrupt timer */
 	timer_device_enable(vp550->sync_timer, 0);
@@ -297,8 +297,8 @@ static DEVICE_RESET( vp551 )
 	DEVICE_RESET_CALL(vp550);
 
 	/* reset chips */
-	device_reset(vp550->cdp1863[CHANNEL_C]);
-	device_reset(vp550->cdp1863[CHANNEL_D]);
+	vp550->cdp1863[CHANNEL_C]->reset();
+	vp550->cdp1863[CHANNEL_D]->reset();
 }
 
 /*-------------------------------------------------

@@ -84,7 +84,7 @@ are attached to two switches. The keys appear twice in the keyboard matrix.
 typedef struct _kb_keytr_state kb_keytr_state;
 struct _kb_keytr_state
 {
-	const device_config *cpu;
+	running_device *cpu;
 
 	devcb_resolved_write_line out_clock_func;
 	devcb_resolved_write_line out_data_func;
@@ -106,7 +106,7 @@ struct _kb_keytr_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE kb_keytr_state *get_safe_token(const device_config *device)
+INLINE kb_keytr_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -602,10 +602,10 @@ ROM_END
 static DEVICE_START( kb_keytr )
 {
 	kb_keytr_state *keytronic = get_safe_token(device);
-	const kb_keytronic_interface *intf = (const kb_keytronic_interface *)device->static_config;
+	const kb_keytronic_interface *intf = (const kb_keytronic_interface *)device->baseconfig().static_config;
 
 	/* find our cpu */
-	keytronic->cpu = device_find_child_by_tag(device, "kb_keytr");
+	keytronic->cpu = device->subdevice("kb_keytr");
 
 	/* some basic checks */
 	assert(keytronic->cpu != NULL);

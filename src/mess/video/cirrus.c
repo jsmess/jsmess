@@ -150,7 +150,7 @@ const struct pc_svga_interface cirrus_svga_interface =
  *
  *************************************/
 
-UINT32 cirrus5430_pci_read(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 mem_mask)
+UINT32 cirrus5430_pci_read(running_device *busdevice, running_device *device, int function, int offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 
@@ -183,7 +183,7 @@ UINT32 cirrus5430_pci_read(const device_config *busdevice, const device_config *
 
 
 
-void cirrus5430_pci_write(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 data, UINT32 mem_mask)
+void cirrus5430_pci_write(running_device *busdevice, running_device *device, int function, int offset, UINT32 data, UINT32 mem_mask)
 {
 	if (LOG_PCIACCESS)
 		logerror("cirrus5430_pci_write(): function=%d offset=0x%02X data=0x%04X\n", function, offset, data);

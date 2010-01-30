@@ -74,10 +74,10 @@ struct _c1551_t
 	int mode;							/* mode (0 = write, 1 = read) */
 
 	/* devices */
-	const device_config *cpu;
-	const device_config *tpi0;
-	const device_config *tpi1;
-	const device_config *image;
+	running_device *cpu;
+	running_device *tpi0;
+	running_device *tpi1;
+	running_device *image;
 
 	/* timers */
 	emu_timer *bit_timer;
@@ -87,7 +87,7 @@ struct _c1551_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE c1551_t *get_safe_token(const device_config *device)
+INLINE c1551_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -105,7 +105,7 @@ INLINE c1551_t *get_safe_token(const device_config *device)
 
 static TIMER_CALLBACK( bit_tick )
 {
-	const device_config *device = (device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	c1551_t *c1551 = get_safe_token(device);
 	int byte = 0;
 
@@ -472,12 +472,12 @@ static DEVICE_START( c1551 )
 	c1551_t *c1551 = get_safe_token(device);
 
 	/* find our CPU */
-	c1551->cpu = device_find_child_by_tag(device, M6510T_TAG);
+	c1551->cpu = device->subdevice(M6510T_TAG);
 
 	/* find devices */
-	c1551->tpi0 = device_find_child_by_tag(device, M6525_TAG);
-	c1551->tpi1 = device_find_child_by_tag(device, M6523_TAG);
-	c1551->image = device_find_child_by_tag(device, FLOPPY_0);
+	c1551->tpi0 = device->subdevice(M6525_TAG);
+	c1551->tpi1 = device->subdevice(M6523_TAG);
+	c1551->image = device->subdevice(FLOPPY_0);
 
 	/* allocate track buffer */
 //  c1551->track_buffer = auto_alloc_array(device->machine, UINT8, TRACK_BUFFER_SIZE);

@@ -360,26 +360,26 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static void duarta_irq_handler(const device_config *device, UINT8 vector)
+static void duarta_irq_handler(running_device *device, UINT8 vector)
 {
 	verboselog(device->machine, 0, "duarta_irq_handler\n");
 	cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, HOLD_LINE, M68K_INT_ACK_AUTOVECTOR);
 };
 
-static UINT8 duarta_input(const device_config *device)
+static UINT8 duarta_input(running_device *device)
 {
 	verboselog(device->machine, 0, "duarta_input\n");
 	return 0;
 }
 
-static void duarta_output(const device_config *device, UINT8 data)
+static void duarta_output(running_device *device, UINT8 data)
 {
 	verboselog(device->machine, 0, "duarta_output: RTS: %d, DTR: %d\n", data & 1, (data & 4) >> 2);
 }
 
-static void duarta_tx(const device_config *device, int channel, UINT8 data)
+static void duarta_tx(running_device *device, int channel, UINT8 data)
 {
-	const device_config	*devconf = devtag_get_device(device->machine, "terminal");
+	running_device *devconf = devtag_get_device(device->machine, "terminal");
 	verboselog(device->machine, 0, "duarta_tx: %02x\n", data);
 	terminal_write(devconf,0,data);
 }
@@ -392,24 +392,24 @@ static const duart68681_config sgi_ip2_duart68681a_config =
 	duarta_output
 };
 
-static void duartb_irq_handler(const device_config *device, UINT8 vector)
+static void duartb_irq_handler(running_device *device, UINT8 vector)
 {
 	verboselog(device->machine, 0, "duartb_irq_handler\n");
 	cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, HOLD_LINE, M68K_INT_ACK_AUTOVECTOR);
 };
 
-static UINT8 duartb_input(const device_config *device)
+static UINT8 duartb_input(running_device *device)
 {
 	verboselog(device->machine, 0, "duartb_input\n");
 	return 0;
 }
 
-static void duartb_output(const device_config *device, UINT8 data)
+static void duartb_output(running_device *device, UINT8 data)
 {
 	verboselog(device->machine, 0, "duartb_output: RTS: %d, DTR: %d\n", data & 1, (data & 4) >> 2);
 }
 
-static void duartb_tx(const device_config *device, int channel, UINT8 data)
+static void duartb_tx(running_device *device, int channel, UINT8 data)
 {
 	verboselog(device->machine, 0, "duartb_tx: %02x\n", data);
 }
@@ -500,7 +500,7 @@ static DRIVER_INIT( sgi_ip2 )
 	UINT32 *dst = mainram;
 	memcpy(dst, src, 8);
 
-	device_reset(devtag_get_device(machine, "maincpu"));
+	devtag_get_device(machine, "maincpu")->reset();
 
 	mc146818_init(machine, MC146818_IGNORE_CENTURY);
 }

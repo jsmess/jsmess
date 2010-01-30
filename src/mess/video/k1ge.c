@@ -14,13 +14,13 @@ typedef struct k1ge k1ge_t;
 struct k1ge
 {
 	const k1ge_interface *intf;
-	const device_config *screen;
+	running_device *screen;
 	devcb_resolved_write8 vblank_pin_w;
 	devcb_resolved_write8 hblank_pin_w;
 	UINT8 *vram;
 	UINT8 wba_h, wba_v, wsi_h, wsi_v;
 
-	void (*draw)( const device_config *device, int line );
+	void (*draw)( running_device *device, int line );
 
 	emu_timer *timer;
 	emu_timer *hblank_on_timer;
@@ -58,7 +58,7 @@ PALETTE_INIT( k2ge )
 }
 
 
-INLINE k1ge_t *get_safe_token( const device_config *device )
+INLINE k1ge_t *get_safe_token( running_device *device )
 {
 	assert( device != NULL );
 	assert( device->token != NULL );
@@ -269,7 +269,7 @@ INLINE void k1ge_draw_sprite_plane( k1ge_t *k1ge, UINT16 *p, UINT16 priority, in
 }
 
 
-static void k1ge_draw( const device_config *device, int line )
+static void k1ge_draw( running_device *device, int line )
 {
 	k1ge_t *k1ge = get_safe_token( device );
 	UINT16 *p = BITMAP_ADDR16( k1ge->bitmap, line, 0 );
@@ -632,7 +632,7 @@ INLINE void k2ge_k1ge_draw_sprite_plane( k1ge_t *k1ge, UINT16 *p, UINT16 priorit
 }
 
 
-static void k2ge_draw( const device_config *device, int line )
+static void k2ge_draw( running_device *device, int line )
 {
 	k1ge_t *k1ge = get_safe_token( device );
 	UINT16 *p = BITMAP_ADDR16( k1ge->bitmap, line, 0 );
@@ -757,7 +757,7 @@ static void k2ge_draw( const device_config *device, int line )
 
 static TIMER_CALLBACK( k1ge_hblank_on_timer_callback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	k1ge_t *k1ge = get_safe_token( device );
 
 	if ( k1ge->hblank_pin_w.write != NULL )
@@ -767,7 +767,7 @@ static TIMER_CALLBACK( k1ge_hblank_on_timer_callback )
 
 static TIMER_CALLBACK( k1ge_timer_callback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	k1ge_t *k1ge = get_safe_token( device );
 	int y = video_screen_get_vpos( k1ge->screen );
 
@@ -812,7 +812,7 @@ static TIMER_CALLBACK( k1ge_timer_callback )
 }
 
 
-void k1ge_update( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect )
+void k1ge_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	k1ge_t *k1ge = get_safe_token( device );
 
@@ -824,7 +824,7 @@ static DEVICE_START( k1ge )
 {
 	k1ge_t *k1ge = get_safe_token( device );
 
-	k1ge->intf = (const k1ge_interface*)device->static_config;
+	k1ge->intf = (const k1ge_interface*)device->baseconfig().static_config;
 
 	devcb_resolve_write8( &k1ge->vblank_pin_w, &k1ge->intf->vblank_pin_w, device );
 	devcb_resolve_write8( &k1ge->hblank_pin_w, &k1ge->intf->hblank_pin_w, device );

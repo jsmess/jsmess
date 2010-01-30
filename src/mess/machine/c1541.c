@@ -206,11 +206,11 @@ struct _c1541_t
 	int ndac_out;						/* not data accepted */
 
 	/* devices */
-	const device_config *cpu;
-	const device_config *via0;
-	const device_config *via1;
-	const device_config *bus;
-	const device_config *image;
+	running_device *cpu;
+	running_device *via0;
+	running_device *via1;
+	running_device *bus;
+	running_device *image;
 
 	/* timers */
 	emu_timer *bit_timer;
@@ -220,7 +220,7 @@ struct _c1541_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE c1541_t *get_safe_token(const device_config *device)
+INLINE c1541_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -228,11 +228,11 @@ INLINE c1541_t *get_safe_token(const device_config *device)
 	return (c1541_t *)device->token;
 }
 
-INLINE c1541_config *get_safe_config(const device_config *device)
+INLINE c1541_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == C1540) || (device->type == C1541) || (device->type == C1541C) || (device->type == C1541II) || (device->type == C2031));
-	return (c1541_config *)device->inline_config;
+	return (c1541_config *)device->baseconfig().inline_config;
 }
 
 /***************************************************************************
@@ -245,7 +245,7 @@ INLINE c1541_config *get_safe_config(const device_config *device)
 
 static TIMER_CALLBACK( bit_tick )
 {
-	const device_config *device = (device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	c1541_t *c1541 = get_safe_token(device);
 	int byte = 0;
 
@@ -319,7 +319,7 @@ WRITE_LINE_DEVICE_HANDLER( c1541_iec_reset_w )
 {
 	if (!state)
 	{
-		device_reset(device);
+		device->reset();
 	}
 }
 
@@ -352,7 +352,7 @@ WRITE_LINE_DEVICE_HANDLER( c2031_ieee488_ifc_w )
 {
 	if (!state)
 	{
-		device_reset(device);
+		device->reset();
 	}
 }
 
@@ -1099,13 +1099,13 @@ static DEVICE_START( c1541 )
 	c1541->address = config->address - 8;
 
 	/* find our CPU */
-	c1541->cpu = device_find_child_by_tag(device, M6502_TAG);
+	c1541->cpu = device->subdevice(M6502_TAG);
 
 	/* find devices */
-	c1541->via0 = device_find_child_by_tag(device, M6522_0_TAG);
-	c1541->via1 = device_find_child_by_tag(device, M6522_1_TAG);
+	c1541->via0 = device->subdevice(M6522_0_TAG);
+	c1541->via1 = device->subdevice(M6522_1_TAG);
 	c1541->bus = devtag_get_device(device->machine, config->bus_tag);
-	c1541->image = device_find_child_by_tag(device, FLOPPY_0);
+	c1541->image = device->subdevice(FLOPPY_0);
 
 	/* allocate track buffer */
 //  c1541->track_buffer = auto_alloc_array(device->machine, UINT8, TRACK_BUFFER_SIZE);
@@ -1143,9 +1143,9 @@ static DEVICE_RESET( c1541 )
 {
 	c1541_t *c1541 = get_safe_token(device);
 
-	device_reset(c1541->cpu);
-	device_reset(c1541->via0);
-	device_reset(c1541->via1);
+	c1541->cpu->reset();
+	c1541->via0->reset();
+	c1541->via1->reset();
 }
 
 /*-------------------------------------------------

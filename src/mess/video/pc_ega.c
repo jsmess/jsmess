@@ -453,7 +453,7 @@ located at I/O port 0x3CE, and a data register located at I/O port 0x3CF.
 
 static struct
 {
-	const device_config	*crtc_ega;
+	running_device *crtc_ega;
 	crtc_ega_update_row_func	update_row;
 
 	/* Video memory and related variables */
@@ -612,7 +612,7 @@ static VIDEO_START( pc_ega )
 	const address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 	const address_space *spaceio = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO);
 
-	buswidth = cpu_get_databus_width(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+	buswidth = machine->firstcpu->databus_width(AS_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:
@@ -775,7 +775,7 @@ static CRTC_EGA_UPDATE_ROW( pc_ega_text )
 }
 
 
-static void pc_ega_change_mode( const device_config *device )
+static void pc_ega_change_mode( running_device *device )
 {
 	int clock, pixels;
 

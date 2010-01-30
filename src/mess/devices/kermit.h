@@ -33,7 +33,7 @@ extern DEVICE_GET_INFO( kermit );
 
 /* call this when the emulated machine has read the last byte sent by
    Kermit through the send call-back */
-extern void kermit_byte_transmitted( const device_config *device );
+extern void kermit_byte_transmitted( running_device *device );
 
 /* call this when the emulated machine sends a byte to Kermit */
-extern void kermit_receive_byte( const device_config *device, UINT8 data );
+extern void kermit_receive_byte( running_device *device, UINT8 data );

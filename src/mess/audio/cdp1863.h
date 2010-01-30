@@ -37,6 +37,6 @@ DEVICE_GET_INFO( cdp1863 );
 WRITE8_DEVICE_HANDLER( cdp1863_str_w );
 
 /* output enable */
-void cdp1863_oe_w(const device_config *device, int level);
+void cdp1863_oe_w(running_device *device, int level);
 
 #endif

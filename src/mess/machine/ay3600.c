@@ -290,17 +290,17 @@ static UINT8 keymodreg;
 
 INLINE int a2_has_keypad(running_machine *machine)
 {
-	return input_port_by_tag(&machine->portlist, "keypad_1") != NULL;
+	return machine->portlist.find("keypad_1") != NULL;
 }
 
 INLINE int a2_has_reset_dip(running_machine *machine)
 {
-	return input_port_by_tag(&machine->portlist, "reset_dip") != NULL;
+	return machine->portlist.find("reset_dip") != NULL;
 }
 
 INLINE int a2_has_repeat(running_machine *machine)
 {
-	return input_port_by_tag(&machine->portlist, "keyb_repeat") != NULL;
+	return machine->portlist.find("keyb_repeat") != NULL;
 }
 
 INLINE int a2_has_capslock(running_machine *machine)

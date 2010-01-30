@@ -241,7 +241,7 @@ static int ti99_4p_internal_rom6_enable;
 static UINT16 *ti99_4p_internal_ROM6;
 
 /* Pointer to the cartridge system for the 99/8 */
-static const device_config *multicart8;
+static running_device *multicart8;
 
 /* ti99/8 hardware */
 static UINT8 ti99_8_enable_rom_and_ports;
@@ -261,7 +261,7 @@ static UINT8 *sRAM_ptr_8;
 /* NPW 23-Feb-2004 - externs no longer needed because we now use cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),) */
 
 /* Link to the cartridge system. */
-static const device_config *cartslots;
+static running_device *cartslots;
 
 /*===========================================================================*/
 /*
@@ -2249,7 +2249,7 @@ static WRITE8_DEVICE_HANDLER( ti99_8_PTGEN )
 */
 static WRITE8_DEVICE_HANDLER( ti99_CS_motor )
 {
-	const device_config *img;
+	running_device *img;
 
 	if ( ti99_model != model_99_8 )
 	{

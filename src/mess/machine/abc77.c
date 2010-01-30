@@ -20,7 +20,7 @@ struct _abc77_t
 	devcb_resolved_write_line	out_clock_func;
 	devcb_resolved_write_line	out_keydown_func;
 
-	const device_config *cpu;		/* CPU of the 8035 */
+	running_device *cpu;		/* CPU of the 8035 */
 
 	int txd;						/* transmit data */
 	int keylatch;					/* keyboard row latch */
@@ -36,18 +36,18 @@ struct _abc77_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE abc77_t *get_safe_token(const device_config *device)
+INLINE abc77_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
 	return (abc77_t *)device->token;
 }
 
-INLINE const abc77_interface *get_interface(const device_config *device)
+INLINE const abc77_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == ABC77));
-	return (const abc77_interface *) device->static_config;
+	return (const abc77_interface *) device->baseconfig().static_config;
 }
 
 /***************************************************************************
@@ -77,7 +77,7 @@ DISCRETE_SOUND_END
 
 static TIMER_DEVICE_CALLBACK( clock_tick )
 {
-	const device_config *device = devtag_get_device(timer->machine, ABC77_TAG);
+	running_device *device = devtag_get_device(timer->machine, ABC77_TAG);
 	abc77_t *abc77 = get_safe_token(device);
 
 	abc77->clock = !abc77->clock;
@@ -91,7 +91,7 @@ static TIMER_DEVICE_CALLBACK( clock_tick )
 
 static TIMER_CALLBACK( reset_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	abc77_t *abc77 = get_safe_token(device);
 
 	cpu_set_input_line(abc77->cpu, INPUT_LINE_RESET, CLEAR_LINE);
@@ -103,7 +103,7 @@ static TIMER_CALLBACK( reset_tick )
 
 static READ8_HANDLER( abc77_clock_r )
 {
-	const device_config *device = devtag_get_device(space->machine, ABC77_TAG);
+	running_device *device = devtag_get_device(space->machine, ABC77_TAG);
 	abc77_t *abc77 = get_safe_token(device);
 
 	return abc77->clock;
@@ -115,7 +115,7 @@ static READ8_HANDLER( abc77_clock_r )
 
 static READ8_HANDLER( abc77_data_r )
 {
-	const device_config *device = devtag_get_device(space->machine, ABC77_TAG);
+	running_device *device = devtag_get_device(space->machine, ABC77_TAG);
 	abc77_t *abc77 = get_safe_token(device);
 
 	static const char *const keynames[] = { "ABC77_X0", "ABC77_X1", "ABC77_X2", "ABC77_X3", "ABC77_X4", "ABC77_X5", "ABC77_X6", "ABC77_X7", "ABC77_X8", "ABC77_X9", "ABC77_X10", "ABC77_X11" };
@@ -129,8 +129,8 @@ static READ8_HANDLER( abc77_data_r )
 
 static WRITE8_HANDLER( abc77_data_w )
 {
-	const device_config *device = devtag_get_device(space->machine, ABC77_TAG);
-	const device_config *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *device = devtag_get_device(space->machine, ABC77_TAG);
+	running_device *discrete = devtag_get_device(space->machine, "discrete");
 	abc77_t *abc77 = get_safe_token(device);
 
 	abc77->keylatch = data & 0x0f;

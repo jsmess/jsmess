@@ -27,13 +27,13 @@
 	const msm6255_interface (_name) =
 
 #define MSM6255_CHAR_RAM_READ(_name) \
-	UINT8 _name(const device_config *device, UINT16 ma, UINT8 ra)
+	UINT8 _name(running_device *device, UINT16 ma, UINT8 ra)
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef UINT8 (*msm6255_char_ram_read_func)(const device_config *device, UINT16 ma, UINT8 ra);
+typedef UINT8 (*msm6255_char_ram_read_func)(running_device *device, UINT16 ma, UINT8 ra);
 
 typedef struct _msm6255_interface msm6255_interface;
 struct _msm6255_interface
@@ -58,6 +58,6 @@ READ8_DEVICE_HANDLER ( msm6255_register_r );
 WRITE8_DEVICE_HANDLER ( msm6255_register_w );
 
 /* updates the screen */
-void msm6255_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
+void msm6255_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 #endif

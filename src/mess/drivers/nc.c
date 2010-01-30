@@ -779,7 +779,7 @@ static const unsigned long baud_rate_table[]=
 
 static TIMER_CALLBACK(nc_serial_timer_callback)
 {
-	const device_config *uart = devtag_get_device(machine, "uart");
+	running_device *uart = devtag_get_device(machine, "uart");
 
 	msm8251_transmit_clock(uart);
 	msm8251_receive_clock(uart);
@@ -813,7 +813,7 @@ static WRITE8_HANDLER(nc_uart_control_w)
 /* same for nc100 and nc200 */
 static void	nc_printer_update(running_machine *machine, UINT8 data)
 {
-	const device_config *printer = devtag_get_device(machine, "centronics");
+	running_device *printer = devtag_get_device(machine, "centronics");
 	centronics_strobe_w(printer, BIT(data, 6));
 }
 
@@ -850,7 +850,7 @@ static WRITE8_HANDLER(nc100_uart_control_w)
 }
 
 
-static void	nc100_tc8521_alarm_callback(const device_config *device, int state)
+static void	nc100_tc8521_alarm_callback(running_device *device, int state)
 {
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and
@@ -871,7 +871,7 @@ static void	nc100_tc8521_alarm_callback(const device_config *device, int state)
 	previous_alarm_state = state;
 }
 
-static void nc100_txrdy_callback(const device_config *device, int state)
+static void nc100_txrdy_callback(running_device *device, int state)
 {
 	nc_irq_latch &= ~(1 << 1);
 
@@ -888,7 +888,7 @@ static void nc100_txrdy_callback(const device_config *device, int state)
 	nc_update_interrupts(device->machine);
 }
 
-static void nc100_rxrdy_callback(const device_config *device, int state)
+static void nc100_rxrdy_callback(running_device *device, int state)
 {
 	nc_irq_latch &= ~(1<<0);
 
@@ -952,7 +952,7 @@ static MACHINE_RESET( nc100 )
 	nc_common_open_stream_for_reading(machine);
 
 	{
-		const device_config *rtc = devtag_get_device(machine, "rtc");
+		running_device *rtc = devtag_get_device(machine, "rtc");
 		tc8521_load_stream(rtc, file);
 	}
 
@@ -968,7 +968,7 @@ static void nc100_machine_stop(running_machine *machine)
 {
 	nc_common_open_stream_for_writing(machine);
 	{
-		const device_config *rtc = devtag_get_device(machine, "rtc");
+		running_device *rtc = devtag_get_device(machine, "rtc");
 		tc8521_save_stream(rtc, file);
 	}
 	nc_common_store_memory_to_stream(machine);
@@ -1005,7 +1005,7 @@ static WRITE8_HANDLER(nc100_poweroff_control_w)
 /* nc100 version of card/battery status */
 static  READ8_HANDLER(nc100_card_battery_status_r)
 {
-	const device_config *printer = devtag_get_device(space->machine, "centronics");
+	running_device *printer = devtag_get_device(space->machine, "centronics");
 	int nc_card_battery_status = 0x0fc;
 
 	/* printer */
@@ -1256,7 +1256,7 @@ static void nc200_refresh_uart_interrupt(running_machine *machine)
 	nc_update_interrupts(machine);
 }
 
-static void nc200_txrdy_callback(const device_config *device, int state)
+static void nc200_txrdy_callback(running_device *device, int state)
 {
 //  nc200_uart_interrupt_irq &=~(1<<0);
 //
@@ -1268,7 +1268,7 @@ static void nc200_txrdy_callback(const device_config *device, int state)
 //  nc200_refresh_uart_interrupt(device->machine);
 }
 
-static void nc200_rxrdy_callback(const device_config *device, int state)
+static void nc200_rxrdy_callback(running_device *device, int state)
 {
 	nc200_uart_interrupt_irq &=~(1<<1);
 
@@ -1434,7 +1434,7 @@ static  READ8_HANDLER(nc200_card_battery_status_r)
 
 static READ8_HANDLER(nc200_printer_status_r)
 {
-	const device_config *printer = devtag_get_device(space->machine, "centronics");
+	running_device *printer = devtag_get_device(space->machine, "centronics");
 	UINT8 result = 0;
 
 	result |= centronics_busy_r(printer);
@@ -1475,7 +1475,7 @@ static WRITE8_HANDLER(nc200_uart_control_w)
 
 static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "upd765");
+	running_device *fdc = devtag_get_device(space->machine, "upd765");
 	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), data));
 #if 0
 	floppy_drive_set_motor_state(0, 1);
@@ -1629,7 +1629,7 @@ INPUT_PORTS_END
 /* Serial */
 static DEVICE_IMAGE_LOAD( nc_serial )
 {
-	const device_config *uart = devtag_get_device(image->machine, "uart");
+	running_device *uart = devtag_get_device(image->machine, "uart");
 
 	/* filename specified */
 	if (device_load_serial(image)==INIT_PASS)

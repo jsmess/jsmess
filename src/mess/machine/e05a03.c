@@ -51,7 +51,7 @@ struct _e05a03_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE e05a03_state *get_safe_token(const device_config *device)
+INLINE e05a03_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -68,10 +68,10 @@ INLINE e05a03_state *get_safe_token(const device_config *device)
 static DEVICE_START( e05a03 )
 {
 	e05a03_state *e05a03 = get_safe_token(device);
-	const e05a03_interface *intf = (const e05a03_interface *)device->static_config;
+	const e05a03_interface *intf = (const e05a03_interface *)device->baseconfig().static_config;
 
 	/* validate some basic stuff */
-	assert(device->static_config != NULL);
+	assert(device->baseconfig().static_config != NULL);
 
 	/* resolve callbacks */
 	devcb_resolve_write_line(&e05a03->out_nlq_lp_func, &intf->out_nlq_lp_func, device);

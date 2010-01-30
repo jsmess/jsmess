@@ -463,7 +463,7 @@ static void I386OP(decode_two_byte)(i386_state *cpustate)
 
 static UINT64 i386_debug_segbase(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
-	const device_config *device = (const device_config *)ref;
+	running_device *device = (running_device *)ref;
 	i386_state *cpustate = get_safe_token(device);
 	UINT32 result;
 	I386_SREG seg;
@@ -484,7 +484,7 @@ static UINT64 i386_debug_segbase(void *globalref, void *ref, UINT32 params, cons
 
 static UINT64 i386_debug_seglimit(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
-	const device_config *device = (const device_config *)ref;
+	running_device *device = (running_device *)ref;
 	i386_state *cpustate = get_safe_token(device);
 	UINT32 result = 0;
 	I386_SREG seg;
@@ -509,7 +509,7 @@ static CPU_DEBUG_INIT( i386 )
 
 static STATE_POSTLOAD( i386_postload )
 {
-	const device_config *device = (const device_config *)param;
+	running_device *device = (running_device *)param;
 	i386_state *cpustate = get_safe_token(device);
 	int i;
 	for (i = 0; i < 6; i++)
@@ -885,17 +885,17 @@ CPU_GET_INFO( i386 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 40;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_LOGADDR_WIDTH_PROGRAM: info->i = 32;					break;
 		case CPUINFO_INT_PAGE_SHIFT_PROGRAM:	info->i = 12;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 32;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 32;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE:					info->i = CLEAR_LINE;					break;
 

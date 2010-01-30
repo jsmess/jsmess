@@ -742,7 +742,7 @@ static WRITE16_HANDLER( supracan_sound_w )
 				{
 					/* Reset and enable the sound cpu */
 					//cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, CLEAR_LINE);
-					//device_reset(devtag_get_device(space->machine, "soundcpu"));
+					//devtag_get_device(space->machine, "soundcpu")->reset();
 				}
 			}
 			else

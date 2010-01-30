@@ -19,8 +19,8 @@ struct _c80_state
 	int pio1_brdy;
 
 	/* devices */
-	const device_config *z80pio;
-	const device_config *cassette;
+	running_device *z80pio;
+	running_device *cassette;
 };
 
 #endif

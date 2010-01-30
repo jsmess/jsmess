@@ -36,7 +36,7 @@
 #include "sound/ay8910.h"
 #include "devices/messram.h"
 
-INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
+INLINE running_device *get_floppy_image(running_machine *machine, int drive)
 {
 	return floppy_get_device(machine, drive);
 }

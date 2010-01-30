@@ -32,7 +32,7 @@ struct _scmp_state
 	UINT8	ER;
 	UINT8	SR;
 
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	const address_space *io;
 	cpu_state_table 	state;
@@ -82,7 +82,7 @@ static const cpu_state_table state_table_template =
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE scmp_state *get_safe_token(const device_config *device)
+INLINE scmp_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -528,8 +528,8 @@ static CPU_INIT( scmp )
 {
 	scmp_state *cpustate = get_safe_token(device);
 
-	if (device->static_config != NULL)
-		cpustate->config = *(scmp_config *)device->static_config;
+	if (device->baseconfig().static_config != NULL)
+		cpustate->config = *(scmp_config *)device->baseconfig().static_config;
 	/* set up the state table */
 	cpustate->state = state_table_template;
 	cpustate->state.baseptr = cpustate;
@@ -617,17 +617,17 @@ CPU_GET_INFO( scmp )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 5;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 131593;						break; // DLY instruction max time
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 		info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 16;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: 		info->i = 0;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:			info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 0;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 0;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:			info->i = 0;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 0;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 0;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:				info->i = 0;							break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(scmp);				break;

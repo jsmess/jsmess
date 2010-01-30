@@ -602,7 +602,7 @@ static TIMER_CALLBACK( i824x_hblank_callback )
 
 VIDEO_START( odyssey2 )
 {
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 

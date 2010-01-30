@@ -40,7 +40,7 @@ typedef struct _ieee488_daisy_state ieee488_daisy_state;
 struct _ieee488_daisy_state
 {
 	ieee488_daisy_state			*next;			/* next device */
-	const device_config			*device;		/* associated device */
+	running_device *device;		/* associated device */
 
 	int line[SIGNAL_COUNT];						/* control lines' state */
 	UINT8 dio;									/* data lines' state */
@@ -58,7 +58,7 @@ struct _ieee488_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE ieee488_t *get_safe_token(const device_config *device)
+INLINE ieee488_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -66,14 +66,14 @@ INLINE ieee488_t *get_safe_token(const device_config *device)
 	return (ieee488_t *)device->token;
 }
 
-INLINE const ieee488_daisy_chain *get_interface(const device_config *device)
+INLINE const ieee488_daisy_chain *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == IEEE488);
-	return (const ieee488_daisy_chain *) device->static_config;
+	return (const ieee488_daisy_chain *) device->baseconfig().static_config;
 }
 
-INLINE int get_signal(const device_config *bus, int line)
+INLINE int get_signal(running_device *bus, int line)
 {
 	ieee488_t *ieee488 = get_safe_token(bus);
 	ieee488_daisy_state *daisy = ieee488->daisy_state;
@@ -87,7 +87,7 @@ INLINE int get_signal(const device_config *bus, int line)
 	return state;
 }
 
-INLINE int get_data(const device_config *bus)
+INLINE int get_data(running_device *bus)
 {
 	ieee488_t *ieee488 = get_safe_token(bus);
 	ieee488_daisy_state *daisy = ieee488->daisy_state;
@@ -101,7 +101,7 @@ INLINE int get_data(const device_config *bus)
 	return data;
 }
 
-INLINE void set_signal(const device_config *bus, const device_config *device, int line, int state)
+INLINE void set_signal(running_device *bus, running_device *device, int line, int state)
 {
 	ieee488_t *ieee488 = get_safe_token(bus);
 	ieee488_daisy_state *daisy = ieee488->daisy_state;
@@ -133,7 +133,7 @@ INLINE void set_signal(const device_config *bus, const device_config *device, in
 		get_signal(bus, IFC), get_signal(bus, SRQ), get_signal(bus, ATN), get_signal(bus, REN), get_data(bus));
 }
 
-INLINE void set_data(const device_config *bus, const device_config *device, UINT8 data)
+INLINE void set_data(running_device *bus, running_device *device, UINT8 data)
 {
 	ieee488_t *ieee488 = get_safe_token(bus);
 	ieee488_daisy_state *daisy = ieee488->daisy_state;
@@ -157,7 +157,7 @@ INLINE void set_data(const device_config *bus, const device_config *device, UINT
     IMPLEMENTATION
 ***************************************************************************/
 
-void ieee488_eoi_w(const device_config *bus, const device_config *device, int state)
+void ieee488_eoi_w(running_device *bus, running_device *device, int state)
 {
 	set_signal(bus, device, EOI, state);
 }
@@ -167,7 +167,7 @@ READ_LINE_DEVICE_HANDLER( ieee488_eoi_r )
 	return get_signal(device, EOI);
 }
 
-void ieee488_dav_w(const device_config *bus, const device_config *device, int state)
+void ieee488_dav_w(running_device *bus, running_device *device, int state)
 {
 	set_signal(bus, device, DAV, state);
 }
@@ -177,7 +177,7 @@ READ_LINE_DEVICE_HANDLER( ieee488_dav_r )
 	return get_signal(device, DAV);
 }
 
-void ieee488_nrfd_w(const device_config *bus, const device_config *device, int state)
+void ieee488_nrfd_w(running_device *bus, running_device *device, int state)
 {
 	set_signal(bus, device, NRFD, state);
 }
@@ -187,7 +187,7 @@ READ_LINE_DEVICE_HANDLER( ieee488_nrfd_r )
 	return get_signal(device, NRFD);
 }
 
-void ieee488_ndac_w(const device_config *bus, const device_config *device, int state)
+void ieee488_ndac_w(running_device *bus, running_device *device, int state)
 {
 	set_signal(bus, device, NDAC, state);
 }
@@ -197,7 +197,7 @@ READ_LINE_DEVICE_HANDLER( ieee488_ndac_r )
 	return get_signal(device, NDAC);
 }
 
-void ieee488_ifc_w(const device_config *bus, const device_config *device, int state)
+void ieee488_ifc_w(running_device *bus, running_device *device, int state)
 {
 	set_signal(bus, device, IFC, state);
 }
@@ -207,7 +207,7 @@ READ_LINE_DEVICE_HANDLER( ieee488_ifc_r )
 	return get_signal(device, IFC);
 }
 
-void ieee488_srq_w(const device_config *bus, const device_config *device, int state)
+void ieee488_srq_w(running_device *bus, running_device *device, int state)
 {
 	set_signal(bus, device, SRQ, state);
 }
@@ -217,7 +217,7 @@ READ_LINE_DEVICE_HANDLER( ieee488_srq_r )
 	return get_signal(device, SRQ);
 }
 
-void ieee488_atn_w(const device_config *bus, const device_config *device, int state)
+void ieee488_atn_w(running_device *bus, running_device *device, int state)
 {
 	set_signal(bus, device, ATN, state);
 }
@@ -227,7 +227,7 @@ READ_LINE_DEVICE_HANDLER( ieee488_atn_r )
 	return get_signal(device, ATN);
 }
 
-void ieee488_ren_w(const device_config *bus, const device_config *device, int state)
+void ieee488_ren_w(running_device *bus, running_device *device, int state)
 {
 	set_signal(bus, device, REN, state);
 }
@@ -242,7 +242,7 @@ READ8_DEVICE_HANDLER( ieee488_dio_r )
 	return get_data(device);
 }
 
-void ieee488_dio_w(const device_config *bus, const device_config *device, UINT8 data)
+void ieee488_dio_w(running_device *bus, running_device *device, UINT8 data)
 {
 	set_data(bus, device, data);
 }

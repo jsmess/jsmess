@@ -98,7 +98,7 @@ static WRITE8_DEVICE_HANDLER (specialist_8255_portb_w )
 }
 static WRITE8_DEVICE_HANDLER (specialist_8255_portc_w )
 {
-	const device_config *dac_device = devtag_get_device(device->machine, "dac");
+	running_device *dac_device = devtag_get_device(device->machine, "dac");
 
 	specialist_8255_portc = data;
 
@@ -253,13 +253,13 @@ const struct pit8253_config specimx_pit8253_intf =
 
 MACHINE_START( specimx )
 {
-	const device_config *fdc = devtag_get_device(machine, "wd1793");
+	running_device *fdc = devtag_get_device(machine, "wd1793");
 	wd17xx_set_density (fdc,DEN_FM_HI);
 }
 
 static TIMER_CALLBACK( setup_pit8253_gates )
 {
-	const device_config *pit8253 = devtag_get_device(machine, "pit8253");
+	running_device *pit8253 = devtag_get_device(machine, "pit8253");
 
 	pit8253_gate_w(pit8253, 0, 0);
 	pit8253_gate_w(pit8253, 1, 0);
@@ -281,7 +281,7 @@ READ8_HANDLER ( specimx_disk_ctrl_r )
 
 WRITE8_HANDLER( specimx_disk_ctrl_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *fdc = devtag_get_device(space->machine, "wd1793");
 
 	switch(offset)
 	{
@@ -419,7 +419,7 @@ READ8_HANDLER ( erik_disk_reg_r )
 
 WRITE8_HANDLER( erik_disk_reg_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *fdc = devtag_get_device(space->machine, "wd1793");
 
 	wd17xx_set_side (fdc,data & 1);
 	wd17xx_set_drive(fdc,(data >> 1) & 1);

@@ -91,7 +91,7 @@ static WRITE8_HANDLER ( rset_callback )
 
 static WRITE8_HANDLER ( ckon_ckof_callback )
 {
-	const device_config *maincpu = devtag_get_device(space->machine, "maincpu");
+	running_device *maincpu = devtag_get_device(space->machine, "maincpu");
 	ti990_ckon_ckof_callback(maincpu, (offset & 0x1000) ? 1 : 0);
 }
 

@@ -33,8 +33,8 @@ struct _ql_state
 	int baudx4;
 
 	/* devices */
-	const device_config *zx8301;
-	const device_config *zx8302;
+	running_device *zx8301;
+	running_device *zx8302;
 };
 
 #endif

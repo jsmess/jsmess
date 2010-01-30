@@ -216,7 +216,7 @@ static const int word_length[4] = { 5, 6, 7, 8 };
 
 
 
-INLINE mc6854_t* get_safe_token( const device_config *device )
+INLINE mc6854_t* get_safe_token( running_device *device )
 {
 	assert( device != NULL );
 	assert( device->token != NULL );
@@ -230,7 +230,7 @@ INLINE mc6854_t* get_safe_token( const device_config *device )
 
 
 /* MC6854 fills bit queue */
-static void mc6854_send_bits( const device_config *device, UINT32 data, int len, int zi )
+static void mc6854_send_bits( running_device *device, UINT32 data, int len, int zi )
 {
 	mc6854_t* mc6854 = get_safe_token( device );
 	attotime expire;
@@ -279,7 +279,7 @@ static void mc6854_send_bits( const device_config *device, UINT32 data, int len,
 
 
 /* CPU push -> tfifo[0] -> ... -> tfifo[FIFO_SIZE-1] -> pop */
-static void mc6854_tfifo_push( const device_config *device, UINT8 data )
+static void mc6854_tfifo_push( running_device *device, UINT8 data )
 {
 	mc6854_t* mc6854 = get_safe_token( device );
 	int i;
@@ -311,7 +311,7 @@ static void mc6854_tfifo_push( const device_config *device, UINT8 data )
 
 
 /* CPU asks for normal frame termination */
-static void mc6854_tfifo_terminate( const device_config *device )
+static void mc6854_tfifo_terminate( running_device *device )
 {
 	mc6854_t* mc6854 = get_safe_token( device );
 
@@ -332,7 +332,7 @@ static void mc6854_tfifo_terminate( const device_config *device )
 /* call-back to refill the bit-stream from the FIFO */
 static TIMER_CALLBACK(mc6854_tfifo_cb)
 {
-	const device_config* device = (const device_config*) ptr;
+	running_device* device = (running_device*) ptr;
 	mc6854_t* mc6854 = get_safe_token( device );
 	int i, data = mc6854->tfifo[ FIFO_SIZE - 1 ];
 
@@ -436,7 +436,7 @@ static TIMER_CALLBACK(mc6854_tfifo_cb)
 
 
 
-static void mc6854_tfifo_clear( const device_config *device )
+static void mc6854_tfifo_clear( running_device *device )
 {
 	mc6854_t* mc6854 = get_safe_token( device );
 	memset( mc6854->tfifo, 0, sizeof( mc6854->tfifo ) );
@@ -452,7 +452,7 @@ static void mc6854_tfifo_clear( const device_config *device )
 
 
 /* MC6854 pushes a field in the FIFO */
-static void mc6854_rfifo_push( const device_config *device, UINT8 d )
+static void mc6854_rfifo_push( running_device *device, UINT8 d )
 {
 	mc6854_t* mc6854 = get_safe_token( device );
 	int i, blen = 8;
@@ -534,7 +534,7 @@ static void mc6854_rfifo_push( const device_config *device, UINT8 d )
 
 
 
-static void mc6854_rfifo_terminate( const device_config *device )
+static void mc6854_rfifo_terminate( running_device *device )
 {
 	mc6854_t* mc6854 = get_safe_token( device );
 	/* mark most recently pushed byte as the last one of the frame */
@@ -556,7 +556,7 @@ static void mc6854_rfifo_terminate( const device_config *device )
 
 
 /* CPU pops the FIFO */
-static UINT8 mc6854_rfifo_pop( const device_config *device )
+static UINT8 mc6854_rfifo_pop( running_device *device )
 {
 	mc6854_t* mc6854 = get_safe_token( device );
 	int i, data = mc6854->rfifo[ FIFO_SIZE - 1 ];
@@ -585,7 +585,7 @@ static UINT8 mc6854_rfifo_pop( const device_config *device )
 
 
 /* MC6854 makes fields from bits */
-void mc6854_set_rx( const device_config *device, int bit )
+void mc6854_set_rx( running_device *device, int bit )
 {
 	mc6854_t* mc6854 = get_safe_token( device );
 	int fieldlen = ( mc6854->rstate < 6 ) ? 8 : RWL;
@@ -653,7 +653,7 @@ void mc6854_set_rx( const device_config *device, int bit )
 
 
 
-static void mc6854_rfifo_clear( const device_config *device )
+static void mc6854_rfifo_clear( running_device *device )
 {
 	mc6854_t* mc6854 = get_safe_token( device );
 	memset( mc6854->rfifo, 0, sizeof( mc6854->rfifo ) );
@@ -666,7 +666,7 @@ static void mc6854_rfifo_clear( const device_config *device )
 
 
 
-int mc6854_send_frame( const device_config *device, UINT8* data, int len )
+int mc6854_send_frame( running_device *device, UINT8* data, int len )
 {
 	mc6854_t* mc6854 = get_safe_token( device );
 	if ( mc6854->rstate > 1 || mc6854->tstate > 1 || RTS )
@@ -700,7 +700,7 @@ int mc6854_send_frame( const device_config *device, UINT8* data, int len )
 
 
 
-void mc6854_set_cts( const device_config *device, int data )
+void mc6854_set_cts( running_device *device, int data )
 {
 	mc6854_t* mc6854 = get_safe_token( device );
 	if ( ! mc6854->cts && data )
@@ -715,7 +715,7 @@ void mc6854_set_cts( const device_config *device, int data )
 
 
 
-void mc6854_set_dcd( const device_config *device, int data )
+void mc6854_set_dcd( running_device *device, int data )
 {
 	mc6854_t* mc6854 = get_safe_token( device );
 	if ( ! mc6854->dcd && data )
@@ -995,7 +995,7 @@ static DEVICE_START( mc6854 )
 {
 	mc6854_t* mc6854 = get_safe_token( device );
 
-	mc6854->iface = (const mc6854_interface*)device->static_config;
+	mc6854->iface = (const mc6854_interface*)device->baseconfig().static_config;
 
 	mc6854->ttimer = timer_alloc( device->machine, mc6854_tfifo_cb , (void*) device );
 

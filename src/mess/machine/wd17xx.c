@@ -318,7 +318,7 @@ struct _wd1770_state
 	emu_timer *timer_cmd, *timer_data, *timer_rs, *timer_ws;
 
 	/* this is the drive currently selected */
-	const device_config *drive;
+	running_device *drive;
 
 	/* this is the head currently selected */
 	UINT8 hd;
@@ -350,16 +350,16 @@ const wd17xx_interface default_wd17xx_interface_2_drives =
     PROTOTYPES
 ***************************************************************************/
 
-static void wd17xx_complete_command(const device_config *device, int delay);
-static void wd17xx_timed_data_request(const device_config *device);
-static void wd17xx_index_pulse_callback(const device_config *controller, const device_config *img, int state);
+static void wd17xx_complete_command(running_device *device, int delay);
+static void wd17xx_timed_data_request(running_device *device);
+static void wd17xx_index_pulse_callback(running_device *controller, running_device *img, int state);
 
 
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE wd1770_state *get_safe_token(const device_config *device)
+INLINE wd1770_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -395,7 +395,7 @@ static void calc_crc(UINT16 *crc, UINT8 value)
 	*crc = *crc ^ l;
 }
 
-static int wd17xx_has_side_select(const device_config *device)
+static int wd17xx_has_side_select(running_device *device)
 {
 	return (device->type == WD1773 || device->type == WD1793 || device->type == WD2793);
 }
@@ -418,7 +418,7 @@ static int wd17xx_get_datarate_in_us(DENSITY density)
 ***************************************************************************/
 
 /* clear a data request */
-static void wd17xx_clear_drq(const device_config *device)
+static void wd17xx_clear_drq(running_device *device)
 {
 	wd1770_state *w = get_safe_token(device);
 
@@ -429,7 +429,7 @@ static void wd17xx_clear_drq(const device_config *device)
 }
 
 /* set data request */
-static void wd17xx_set_drq(const device_config *device)
+static void wd17xx_set_drq(running_device *device)
 {
 	wd1770_state *w = get_safe_token(device);
 
@@ -443,7 +443,7 @@ static void wd17xx_set_drq(const device_config *device)
 }
 
 /* clear interrupt request */
-static void	wd17xx_clear_intrq(const device_config *device)
+static void	wd17xx_clear_intrq(running_device *device)
 {
 	wd1770_state *w = get_safe_token(device);
 
@@ -452,7 +452,7 @@ static void	wd17xx_clear_intrq(const device_config *device)
 }
 
 /* set interrupt request */
-static void	wd17xx_set_intrq(const device_config *device)
+static void	wd17xx_set_intrq(running_device *device)
 {
 	wd1770_state *w = get_safe_token(device);
 
@@ -465,19 +465,19 @@ static void	wd17xx_set_intrq(const device_config *device)
 /* set intrq after delay */
 static TIMER_CALLBACK( wd17xx_command_callback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	wd17xx_set_intrq(device);
 }
 
 /* set drq after delay */
 static TIMER_CALLBACK( wd17xx_data_callback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	wd17xx_set_drq(device);
 }
 
 
-static void wd17xx_set_busy(const device_config *device, attotime duration)
+static void wd17xx_set_busy(running_device *device, attotime duration)
 {
 	wd1770_state *w = get_safe_token(device);
 
@@ -489,7 +489,7 @@ static void wd17xx_set_busy(const device_config *device, attotime duration)
 
 /* BUSY COUNT DOESN'T WORK PROPERLY! */
 
-static void wd17xx_command_restore(const device_config *device)
+static void wd17xx_command_restore(running_device *device)
 {
 	wd1770_state *w = get_safe_token(device);
 	UINT8 step_counter;
@@ -540,7 +540,7 @@ static void wd17xx_command_restore(const device_config *device)
     Write an entire track. Formats which do not define a write_track
     function pointer will cause a silent return.
 */
-static void write_track(const device_config *device)
+static void write_track(running_device *device)
 {
 	wd1770_state *w = get_safe_token(device);
 #if 0
@@ -581,7 +581,7 @@ static void write_track(const device_config *device)
 
 
 /* read an entire track */
-static void read_track(const device_config *device)
+static void read_track(running_device *device)
 {
 	wd1770_state *w = get_safe_token(device);
 #if 0
@@ -719,7 +719,7 @@ static void read_track(const device_config *device)
 
 
 /* read the next data address mark */
-static void wd17xx_read_id(const device_config *device)
+static void wd17xx_read_id(running_device *device)
 {
 	chrn_id id;
 	wd1770_state *w = get_safe_token(device);
@@ -776,7 +776,7 @@ static void wd17xx_read_id(const device_config *device)
 
 
 
-static void wd17xx_index_pulse_callback(const device_config *controller, const device_config *img, int state)
+static void wd17xx_index_pulse_callback(running_device *controller, running_device *img, int state)
 {
 	wd1770_state *w = get_safe_token(controller);
 
@@ -791,7 +791,7 @@ static void wd17xx_index_pulse_callback(const device_config *controller, const d
 
 
 
-static int wd17xx_locate_sector(const device_config *device)
+static int wd17xx_locate_sector(running_device *device)
 {
 	UINT8 revolution_count;
 	chrn_id id;
@@ -838,7 +838,7 @@ static int wd17xx_locate_sector(const device_config *device)
 }
 
 
-static int wd17xx_find_sector(const device_config *device)
+static int wd17xx_find_sector(running_device *device)
 {
 	wd1770_state *w = get_safe_token(device);
 	if ( wd17xx_locate_sector(device) )
@@ -860,7 +860,7 @@ static int wd17xx_find_sector(const device_config *device)
 
 
 /* read a sector */
-static void wd17xx_read_sector(const device_config *device)
+static void wd17xx_read_sector(running_device *device)
 {
 	wd1770_state *w = get_safe_token(device);
 	w->data_offset = 0;
@@ -893,7 +893,7 @@ when the last byte has been read it causes problems - same byte read again
 or bytes missed */
 /* TJL - I have add a parameter to allow the emulation to specify the delay
 */
-static void wd17xx_complete_command(const device_config *device, int delay)
+static void wd17xx_complete_command(running_device *device, int delay)
 {
 	int usecs;
 	wd1770_state *w = get_safe_token(device);
@@ -920,7 +920,7 @@ static void wd17xx_complete_command(const device_config *device, int delay)
 
 
 
-static void wd17xx_write_sector(const device_config *device)
+static void wd17xx_write_sector(running_device *device)
 {
 	wd1770_state *w = get_safe_token(device);
 	/* at this point, the disc is write enabled, and data
@@ -947,7 +947,7 @@ static void wd17xx_write_sector(const device_config *device)
 
 
 /* verify the seek operation by looking for a id that has a matching track value */
-static void wd17xx_verify_seek(const device_config *device)
+static void wd17xx_verify_seek(running_device *device)
 {
 	UINT8 revolution_count;
 	chrn_id id;
@@ -993,7 +993,7 @@ static void wd17xx_verify_seek(const device_config *device)
 /* callback to initiate read sector */
 static TIMER_CALLBACK( wd17xx_read_sector_callback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	wd1770_state *w = get_safe_token(device);
 
 	/* ok, start that read! */
@@ -1012,7 +1012,7 @@ static TIMER_CALLBACK( wd17xx_read_sector_callback )
 /* callback to initiate write sector */
 static TIMER_CALLBACK(wd17xx_write_sector_callback)
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	wd1770_state *w = get_safe_token(device);
 
 	/* ok, start that write! */
@@ -1059,7 +1059,7 @@ static TIMER_CALLBACK(wd17xx_write_sector_callback)
 
 
 /* setup a timed data request - data request will be triggered in a few usecs time */
-static void wd17xx_timed_data_request(const device_config *device)
+static void wd17xx_timed_data_request(running_device *device)
 {
 	int usecs;
 	wd1770_state *w = get_safe_token(device);
@@ -1073,7 +1073,7 @@ static void wd17xx_timed_data_request(const device_config *device)
 
 
 /* setup a timed read sector - read sector will be triggered in a few usecs time */
-static void wd17xx_timed_read_sector_request(const device_config *device)
+static void wd17xx_timed_read_sector_request(running_device *device)
 {
 	int usecs;
 	wd1770_state *w = get_safe_token(device);
@@ -1087,7 +1087,7 @@ static void wd17xx_timed_read_sector_request(const device_config *device)
 
 
 /* setup a timed write sector - write sector will be triggered in a few usecs time */
-static void wd17xx_timed_write_sector_request(const device_config *device)
+static void wd17xx_timed_write_sector_request(running_device *device)
 {
 	int usecs;
 	wd1770_state *w = get_safe_token(device);
@@ -1104,7 +1104,7 @@ static void wd17xx_timed_write_sector_request(const device_config *device)
 ***************************************************************************/
 
 /* use this to determine which drive is controlled by WD */
-void wd17xx_set_drive(const device_config *device, UINT8 drive)
+void wd17xx_set_drive(running_device *device, UINT8 drive)
 {
 	wd1770_state *w = get_safe_token(device);
 
@@ -1114,7 +1114,7 @@ void wd17xx_set_drive(const device_config *device, UINT8 drive)
 	if (w->intf->floppy_drive_tags[drive] != NULL)
 	{
 		if (device->owner != NULL) {
-			w->drive = device_find_child_by_tag(device->owner, w->intf->floppy_drive_tags[drive]);
+			w->drive = device->owner->subdevice(w->intf->floppy_drive_tags[drive]);
 			if (w->drive == NULL) {
 				w->drive = devtag_get_device(device->machine, w->intf->floppy_drive_tags[drive]);
 			}
@@ -1124,7 +1124,7 @@ void wd17xx_set_drive(const device_config *device, UINT8 drive)
 	}
 }
 
-void wd17xx_set_side(const device_config *device, UINT8 head)
+void wd17xx_set_side(running_device *device, UINT8 head)
 {
 	wd1770_state *w = get_safe_token(device);
 
@@ -1137,7 +1137,7 @@ void wd17xx_set_side(const device_config *device, UINT8 head)
 	w->hd = head;
 }
 
-void wd17xx_set_density(const device_config *device, DENSITY density)
+void wd17xx_set_density(running_device *device, DENSITY density)
 {
 	wd1770_state *w = get_safe_token(device);
 
@@ -1150,7 +1150,7 @@ void wd17xx_set_density(const device_config *device, DENSITY density)
 	w->density = density;
 }
 
-void wd17xx_set_pause_time(const device_config *device, int usec)
+void wd17xx_set_pause_time(running_device *device, int usec)
 {
 	wd1770_state *w = get_safe_token(device);
 	w->pause_time = usec;
@@ -1800,9 +1800,9 @@ static DEVICE_START( wd1770 )
 {
 	wd1770_state *w = get_safe_token(device);
 
-	assert(device->static_config != NULL);
+	assert(device->baseconfig().static_config != NULL);
 
-	w->intf = (const wd17xx_interface*)device->static_config;
+	w->intf = (const wd17xx_interface*)device->baseconfig().static_config;
 
 	w->status = STA_1_TRACK0;
 	w->density = DEN_MFM_LO;
@@ -1851,10 +1851,10 @@ static DEVICE_RESET( wd1770 )
 	for (i = 0; i < 4; i++)
 	{
 		if(w->intf->floppy_drive_tags[i]!=NULL) {
-			const device_config *img = NULL;
+			running_device *img = NULL;
 
 			if (device->owner != NULL)
-				img = device_find_child_by_tag(device->owner, w->intf->floppy_drive_tags[i]);
+				img = device->owner->subdevice(w->intf->floppy_drive_tags[i]);
 				if (img == NULL) {
 					img = devtag_get_device(device->machine, w->intf->floppy_drive_tags[i]);
 				}
@@ -1878,7 +1878,7 @@ static DEVICE_RESET( wd1770 )
 	wd17xx_command_restore(device);
 }
 
-void wd17xx_reset(const device_config *device)
+void wd17xx_reset(running_device *device)
 {
 	DEVICE_RESET_CALL( wd1770 );
 }

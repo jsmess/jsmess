@@ -253,7 +253,7 @@ static const cpu_state_table state_table_template =
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE cop400_state *get_safe_token(const device_config *device)
+INLINE cop400_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -878,11 +878,11 @@ static TIMER_CALLBACK( microbus_tick )
     INITIALIZATION
 ***************************************************************************/
 
-static void cop400_init(const device_config *device, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, int has_counter, int has_inil)
+static void cop400_init(running_device *device, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, int has_counter, int has_inil)
 {
 	cop400_state *cpustate = get_safe_token(device);
 
-	cpustate->intf = (cop400_interface *) device->static_config;
+	cpustate->intf = (cop400_interface *) device->baseconfig().static_config;
 
 	/* find address spaces */
 
@@ -955,7 +955,7 @@ static void cop400_init(const device_config *device, UINT8 g_mask, UINT8 d_mask,
 	state_save_register_device_item(device, 0, cpustate->idle);
 }
 
-static void cop410_init_opcodes(const device_config *device)
+static void cop410_init_opcodes(running_device *device)
 {
 	cop400_state *cpustate = get_safe_token(device);
 	int i;
@@ -986,7 +986,7 @@ static void cop410_init_opcodes(const device_config *device)
 	cpustate->opcode_map = COP410_OPCODE_MAP;
 }
 
-static void cop420_init_opcodes(const device_config *device)
+static void cop420_init_opcodes(running_device *device)
 {
 	cop400_state *cpustate = get_safe_token(device);
 	int i;
@@ -1021,7 +1021,7 @@ static void cop420_init_opcodes(const device_config *device)
 	cpustate->opcode_map = COP420_OPCODE_MAP;
 }
 
-static void cop444_init_opcodes(const device_config *device)
+static void cop444_init_opcodes(running_device *device)
 {
 	cop400_state *cpustate = get_safe_token(device);
 	int i;
@@ -1355,7 +1355,7 @@ static CPU_SET_INFO( cop400 )
 static CPU_GET_INFO( cop400 )
 {
 	cop400_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
-	cop400_interface *intf = (device != NULL && device->static_config != NULL) ? (cop400_interface *)device->static_config : NULL;
+	cop400_interface *intf = (devconfig->static_config != NULL) ? (cop400_interface *)devconfig->static_config : NULL;
 
 	switch (state)
 	{
@@ -1371,15 +1371,15 @@ static CPU_GET_INFO( cop400 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;											break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 2;											break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 8;											break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			/* set per-core */										break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:			info->i = 0;											break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 8; /* really 4 */								break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			/* set per-core */										break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:			info->i = 0;											break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 8;											break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 9;											break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;											break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 8;											break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			/* set per-core */										break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:			info->i = 0;											break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 8; /* really 4 */								break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			/* set per-core */										break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:			info->i = 0;											break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 8;											break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 9;											break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:				info->i = 0;											break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cop400);				break;
@@ -1392,8 +1392,8 @@ static CPU_GET_INFO( cop400 )
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;						break;
 		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state_table;				break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	/* set per-core */										break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		/* set per-core */										break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	/* set per-core */										break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		/* set per-core */										break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "COP400");								break;
@@ -1415,8 +1415,8 @@ CPU_GET_INFO( cop410 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 9;											break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 5;											break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 9;											break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 5;											break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop410);						break;
@@ -1424,8 +1424,8 @@ CPU_GET_INFO( cop410 )
 		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop410);	break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_512b);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_32b);		break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_512b);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_32b);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "COP410");								break;
@@ -1462,7 +1462,7 @@ CPU_GET_INFO( cop401 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = NULL;								break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = NULL;								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "COP401");								break;
@@ -1478,8 +1478,8 @@ CPU_GET_INFO( cop420 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 10;											break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 6;											break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 10;											break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 6;											break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop420);						break;
@@ -1487,8 +1487,8 @@ CPU_GET_INFO( cop420 )
 		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop420);	break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_1kb);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_64b);		break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_1kb);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_64b);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "COP420");								break;
@@ -1543,7 +1543,7 @@ CPU_GET_INFO( cop402 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = NULL;								break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = NULL;								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "COP402");								break;
@@ -1559,8 +1559,8 @@ CPU_GET_INFO( cop444 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 11;											break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 7;											break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 11;											break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 7;											break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop444);						break;
@@ -1568,8 +1568,8 @@ CPU_GET_INFO( cop444 )
 		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop444);	break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_128b);		break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_128b);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "COP444");								break;
@@ -1607,12 +1607,12 @@ CPU_GET_INFO( cop424 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 10;											break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 6;											break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 10;											break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 6;											break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_1kb);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_64b);		break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_1kb);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_64b);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "COP424");								break;
@@ -1660,7 +1660,7 @@ CPU_GET_INFO( cop404 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = NULL;								break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = NULL;								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "COP404");								break;

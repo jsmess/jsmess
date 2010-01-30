@@ -565,7 +565,7 @@ struct _cdi_state
 	UINT16 *planea;
 	UINT16 *planeb;
 
-	const device_config *dmadac[2];
+	running_device *dmadac[2];
 
 	UINT8 timer_set;
 	emu_timer *test_timer;
@@ -4464,8 +4464,8 @@ static VIDEO_START(cdi)
 static VIDEO_UPDATE(cdi)
 {
 	cdi_state *state = (cdi_state *)screen->machine->driver_data;
-	const device_config *main_screen = devtag_get_device(screen->machine, "screen");
-	const device_config *lcd_screen = devtag_get_device(screen->machine, "lcd");
+	running_device *main_screen = devtag_get_device(screen->machine, "screen");
+	running_device *lcd_screen = devtag_get_device(screen->machine, "lcd");
 
 	if (screen == main_screen)
 	{
@@ -4615,7 +4615,7 @@ static MACHINE_RESET( cdi )
 	cdi_state *state = (cdi_state *)machine->driver_data;
 	UINT16 *src   = (UINT16*)memory_region(machine, "maincpu");
 	UINT16 *dst   = state->planea;
-	const device_config *cdrom_dev = devtag_get_device(machine, "cdrom");
+	running_device *cdrom_dev = devtag_get_device(machine, "cdrom");
 	memcpy(dst, src, 0x8);
 
 	scc68070_init(machine, &state->scc68070_regs);
@@ -4628,7 +4628,7 @@ static MACHINE_RESET( cdi )
 		cdda_set_cdrom(devtag_get_device(machine, "cdda"), state->cdic_regs.cd);
 	}
 
-	device_reset(devtag_get_device(machine, "maincpu"));
+	devtag_get_device(machine, "maincpu")->reset();
 
 	state->dmadac[0] = devtag_get_device(machine, "dac1");
 	state->dmadac[1] = devtag_get_device(machine, "dac2");

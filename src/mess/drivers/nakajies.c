@@ -198,7 +198,7 @@ disabled). Perhaps power on/off related??
 typedef struct _nakajies_state nakajies_state;
 struct _nakajies_state {
 	/* Device lookups */
-	const device_config *cpu;
+	running_device *cpu;
 
 	/* IRQ handling */
 	UINT8	irq_enabled;

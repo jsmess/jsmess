@@ -134,7 +134,7 @@ INPUT_PORTS_END
 
 static READ8_HANDLER( jupiter_io_r )
 {
-	const device_config *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = devtag_get_device(space->machine, "speaker");
 	UINT8 data = 0xff;
 
 	if ( ( offset & 0xff ) != 0xfe )
@@ -184,7 +184,7 @@ static READ8_HANDLER( jupiter_io_r )
 
 static WRITE8_HANDLER( jupiter_port_fe_w )
 {
-	const device_config *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = devtag_get_device(space->machine, "speaker");
 //  cassette_output( devtag_get_device(machine, "cassette"), 1 );
 	speaker_level_w(speaker,1);
 }

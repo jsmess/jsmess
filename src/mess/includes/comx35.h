@@ -71,7 +71,7 @@ struct _comx35_state
 	emu_timer *reset_timer;	/* power on reset timer */
 
 	/* devices */
-	const device_config *cassette;
+	running_device *cassette;
 };
 
 /* ---------- defined in machine/comx35.c ---------- */

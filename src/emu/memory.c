@@ -398,7 +398,7 @@ static void memory_init_locate(running_machine *machine);
 static void memory_exit(running_machine *machine);
 
 /* address map helpers */
-static void map_detokenize(memory_private *memdata, address_map *map, const game_driver *driver, const char *devtag, const addrmap_token *tokens);
+static void map_detokenize(memory_private *memdata, address_map *map, const game_driver *driver, const device_config *devconfig, const addrmap_token *tokens);
 
 /* memory mapping helpers */
 static void space_map_range(address_space *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name);
@@ -823,24 +823,6 @@ void memory_init(running_machine *machine)
 }
 
 
-/*-------------------------------------------------
-    memory_find_address_space - find an address
-    space in our internal list; for faster access
-    use device->space[] after device is started
--------------------------------------------------*/
-
-const address_space *memory_find_address_space(const device_config *device, int spacenum)
-{
-	memory_private *memdata = device->machine->memory_data;
-	const address_space *space;
-
-	for (space = memdata->spacelist; space != NULL; space = space->next)
-		if (space->cpu == device && space->spacenum == spacenum)
-			return space;
-	return NULL;
-}
-
-
 
 /***************************************************************************
     ADDRESS MAPS
@@ -851,27 +833,23 @@ const address_space *memory_find_address_space(const device_config *device, int 
     address map for a device's address space
 -------------------------------------------------*/
 
-address_map *address_map_alloc(const device_config *device, const game_driver *driver, int spacenum, void *memdata)
+address_map *address_map_alloc(const device_config *devconfig, const game_driver *driver, int spacenum, void *memdata)
 {
-	const addrmap_token *internal_map;
-	const addrmap_token *default_map;
-	address_map *map;
-
-	map = global_alloc_clear(address_map);
+	address_map *map = global_alloc_clear(address_map);
 
 	/* append the internal device map (first so it takes priority) */
-	internal_map = (const addrmap_token *)device_get_info_ptr(device, DEVINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
+	const addrmap_token *internal_map = devconfig->internal_map(spacenum);
 	if (internal_map != NULL)
-		map_detokenize((memory_private *)memdata, map, driver, device->tag, internal_map);
+		map_detokenize((memory_private *)memdata, map, driver, devconfig, internal_map);
 
 	/* construct the standard map */
-	if (device->address_map[spacenum] != NULL)
-		map_detokenize((memory_private *)memdata, map, driver, device->tag, device->address_map[spacenum]);
+	if (devconfig->address_map[spacenum] != NULL)
+		map_detokenize((memory_private *)memdata, map, driver, devconfig, devconfig->address_map[spacenum]);
 
 	/* append the default device map (last so it can be overridden) */
-	default_map = (const addrmap_token *)device_get_info_ptr(device, DEVINFO_PTR_DEFAULT_MEMORY_MAP + spacenum);
+	const addrmap_token *default_map = devconfig->default_map(spacenum);
 	if (default_map != NULL)
-		map_detokenize((memory_private *)memdata, map, driver, device->tag, default_map);
+		map_detokenize((memory_private *)memdata, map, driver, devconfig, default_map);
 
 	return map;
 }
@@ -1333,7 +1311,7 @@ UINT64 *_memory_install_handler64(const address_space *space, offs_t addrstart, 
     but explicitly for 8-bit handlers
 -------------------------------------------------*/
 
-UINT8 *_memory_install_device_handler8(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, const char *rhandler_name, write8_device_func whandler, const char *whandler_name, int handlerunitmask)
+UINT8 *_memory_install_device_handler8(const address_space *space, running_device *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, const char *rhandler_name, write8_device_func whandler, const char *whandler_name, int handlerunitmask)
 {
 	address_space *spacerw = (address_space *)space;
 	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
@@ -1354,7 +1332,7 @@ UINT8 *_memory_install_device_handler8(const address_space *space, const device_
     above but explicitly for 16-bit handlers
 -------------------------------------------------*/
 
-UINT16 *_memory_install_device_handler16(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, const char *rhandler_name, write16_device_func whandler, const char *whandler_name, int handlerunitmask)
+UINT16 *_memory_install_device_handler16(const address_space *space, running_device *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, const char *rhandler_name, write16_device_func whandler, const char *whandler_name, int handlerunitmask)
 {
 	address_space *spacerw = (address_space *)space;
 	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
@@ -1375,7 +1353,7 @@ UINT16 *_memory_install_device_handler16(const address_space *space, const devic
     above but explicitly for 32-bit handlers
 -------------------------------------------------*/
 
-UINT32 *_memory_install_device_handler32(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, const char *rhandler_name, write32_device_func whandler, const char *whandler_name, int handlerunitmask)
+UINT32 *_memory_install_device_handler32(const address_space *space, running_device *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, const char *rhandler_name, write32_device_func whandler, const char *whandler_name, int handlerunitmask)
 {
 	address_space *spacerw = (address_space *)space;
 	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
@@ -1396,7 +1374,7 @@ UINT32 *_memory_install_device_handler32(const address_space *space, const devic
     above but explicitly for 64-bit handlers
 -------------------------------------------------*/
 
-UINT64 *_memory_install_device_handler64(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, const char *rhandler_name, write64_device_func whandler, const char *whandler_name, int handlerunitmask)
+UINT64 *_memory_install_device_handler64(const address_space *space, running_device *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, const char *rhandler_name, write64_device_func whandler, const char *whandler_name, int handlerunitmask)
 {
 	address_space *spacerw = (address_space *)space;
 	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
@@ -1703,7 +1681,7 @@ static void memory_init_spaces(running_machine *machine)
 {
 	memory_private *memdata = machine->memory_data;
 	address_space **nextptr = (address_space **)&memdata->spacelist;
-	const device_config *device;
+	running_device *device;
 	int spacenum;
 
 	/* create a global watchpoint-filled table */
@@ -1711,16 +1689,16 @@ static void memory_init_spaces(running_machine *machine)
 	memset(memdata->wptable, STATIC_WATCHPOINT, 1 << LEVEL1_BITS);
 
 	/* loop over devices */
-	for (device = machine->config->devicelist.head; device != NULL; device = device->next)
+	for (device = machine->devicelist.first(); device != NULL; device = device->next)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-			if (device_get_addrbus_width(device, spacenum) > 0)
+			if (device->addrbus_width(spacenum) > 0)
 			{
 				address_space *space = auto_alloc_clear(machine, address_space);
 				int logbits = cpu_get_logaddr_width(device, spacenum);
-				int ashift = device_get_addrbus_shift(device, spacenum);
-				int abits = device_get_addrbus_width(device, spacenum);
-				int dbits = device_get_databus_width(device, spacenum);
-				int endianness = device_get_endianness(device);
+				int ashift = device->baseconfig().addrbus_shift(spacenum);
+				int abits = device->addrbus_width(spacenum);
+				int dbits = device->databus_width(spacenum);
+				endianness_t endianness = device->endianness();
 				int accessorindex = (dbits == 8) ? 0 : (dbits == 16) ? 1 : (dbits == 32) ? 2 : 3;
 				int entrynum;
 
@@ -1799,6 +1777,9 @@ static void memory_init_spaces(running_machine *machine)
 				/* link us in */
 				*nextptr = space;
 				nextptr = (address_space **)&space->next;
+
+				/* notify the deveice */
+				device->set_address_space(spacenum, space);
 			}
 }
 
@@ -1824,7 +1805,7 @@ static void memory_init_preflight(running_machine *machine)
 		int entrynum;
 
 		/* allocate the address map */
-		space->map = address_map_alloc(space->cpu, machine->gamedrv, space->spacenum, memdata);
+		space->map = address_map_alloc(&space->cpu->baseconfig(), machine->gamedrv, space->spacenum, memdata);
 
 		/* extract global parameters specified by the map */
 		space->unmap = (space->map->unmapval == 0) ? 0 : ~0;
@@ -1926,7 +1907,7 @@ static void memory_init_populate(running_machine *machine)
 static void memory_init_map_entry(address_space *space, const address_map_entry *entry, read_or_write readorwrite)
 {
 	const map_handler_data *handler = (readorwrite == ROW_READ) ? &entry->read : &entry->write;
-	const device_config *device;
+	running_device *device;
 
 	/* based on the handler type, alter the bits, name, funcptr, and object */
 	switch (handler->type)
@@ -2225,7 +2206,7 @@ static void memory_exit(running_machine *machine)
 		fatalerror("%s: %s AM_RANGE(0x%x, 0x%x) setting %s already set!\n", driver->source_file, driver->name, entry->addrstart, entry->addrend, #field); \
 	} while (0)
 
-static void map_detokenize(memory_private *memdata, address_map *map, const game_driver *driver, const char *devtag, const addrmap_token *tokens)
+static void map_detokenize(memory_private *memdata, address_map *map, const game_driver *driver, const device_config *devconfig, const addrmap_token *tokens)
 {
 	address_map_entry **firstentryptr;
 	address_map_entry **entryptr;
@@ -2267,7 +2248,7 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 
 			/* including */
 			case ADDRMAP_TOKEN_INCLUDE:
-				map_detokenize(memdata, map, driver, devtag, TOKEN_GET_PTR(tokens, tokenptr));
+				map_detokenize(memdata, map, driver, devconfig, TOKEN_GET_PTR(tokens, tokenptr));
 				for (entryptr = &map->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next) ;
 				entry = NULL;
 				break;
@@ -2322,7 +2303,7 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 					entry->read.name = TOKEN_GET_STRING(tokens);
 				}
 				if (entry->read.type == AMH_DEVICE_HANDLER || entry->read.type == AMH_PORT || entry->read.type == AMH_BANK)
-					entry->read.tag = device_inherit_tag(entry->read.derived_tag, devtag, TOKEN_GET_STRING(tokens));
+					entry->read.tag = devconfig->siblingtag(entry->read.derived_tag, TOKEN_GET_STRING(tokens));
 				break;
 
 			case ADDRMAP_TOKEN_WRITE:
@@ -2336,7 +2317,7 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 					entry->write.name = TOKEN_GET_STRING(tokens);
 				}
 				if (entry->write.type == AMH_DEVICE_HANDLER || entry->write.type == AMH_PORT || entry->write.type == AMH_BANK)
-					entry->write.tag = device_inherit_tag(entry->write.derived_tag, devtag, TOKEN_GET_STRING(tokens));
+					entry->write.tag = devconfig->siblingtag(entry->write.derived_tag, TOKEN_GET_STRING(tokens));
 				break;
 
 			case ADDRMAP_TOKEN_READWRITE:
@@ -2357,8 +2338,8 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 				if (entry->read.type == AMH_DEVICE_HANDLER || entry->read.type == AMH_PORT || entry->read.type == AMH_BANK)
 				{
 					const char *basetag = TOKEN_GET_STRING(tokens);
-					entry->read.tag = device_inherit_tag(entry->read.derived_tag, devtag, basetag);
-					entry->write.tag = device_inherit_tag(entry->write.derived_tag, devtag, basetag);
+					entry->read.tag = devconfig->siblingtag(entry->read.derived_tag, basetag);
+					entry->write.tag = devconfig->siblingtag(entry->write.derived_tag, basetag);
 				}
 				break;
 
@@ -2366,7 +2347,7 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 				check_entry_field(region);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->rgnoffs, 32);
-				entry->region = device_inherit_tag(entry->region_string, devtag, TOKEN_GET_STRING(tokens));
+				entry->region = devconfig->siblingtag(entry->region_string, TOKEN_GET_STRING(tokens));
 				break;
 
 			case ADDRMAP_TOKEN_SHARE:

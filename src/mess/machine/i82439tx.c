@@ -27,7 +27,7 @@ struct _i82439tx_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE i82439tx_state *get_safe_token(const device_config *device)
+INLINE i82439tx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -41,7 +41,7 @@ INLINE i82439tx_state *get_safe_token(const device_config *device)
     IMPLEMENTATION
 ***************************************************************************/
 
-static void i82439tx_configure_memory(const device_config *device, UINT8 val, offs_t begin, offs_t end)
+static void i82439tx_configure_memory(running_device *device, UINT8 val, offs_t begin, offs_t end)
 {
 	i82439tx_state *i82439tx = get_safe_token(device);
 
@@ -70,7 +70,7 @@ static void i82439tx_configure_memory(const device_config *device, UINT8 val, of
     PCI INTERFACE
 ***************************************************************************/
 
-UINT32 i82439tx_pci_read(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 mem_mask)
+UINT32 i82439tx_pci_read(running_device *busdevice, running_device *device, int function, int offset, UINT32 mem_mask)
 {
 	i82439tx_state *i82439tx = get_safe_token(device);
 	UINT32 result = 0;
@@ -123,7 +123,7 @@ UINT32 i82439tx_pci_read(const device_config *busdevice, const device_config *de
 	return result;
 }
 
-void i82439tx_pci_write(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 data, UINT32 mem_mask)
+void i82439tx_pci_write(running_device *busdevice, running_device *device, int function, int offset, UINT32 data, UINT32 mem_mask)
 {
 	i82439tx_state *i82439tx = get_safe_token(device);
 
@@ -213,10 +213,10 @@ void i82439tx_pci_write(const device_config *busdevice, const device_config *dev
 static DEVICE_START( i82439tx )
 {
 	i82439tx_state *i82439tx = get_safe_token(device);
-	i82439tx_config *config = (i82439tx_config *)device->inline_config;
+	i82439tx_config *config = (i82439tx_config *)device->baseconfig().inline_config;
 
 	/* get address space we are working on */
-	const device_config *cpu = devtag_get_device(device->machine, config->cputag);
+	running_device *cpu = devtag_get_device(device->machine, config->cputag);
 	assert(cpu != NULL);
 
 	i82439tx->space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);

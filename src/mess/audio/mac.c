@@ -47,7 +47,7 @@ struct _mac_sound
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE mac_sound *get_token(const device_config *device)
+INLINE mac_sound *get_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(sound_get_type(device) == SOUND_MAC_SOUND);
@@ -121,7 +121,7 @@ static DEVICE_START(mac_sound)
 /*
     Set the sound enable flag (VIA port line)
 */
-void mac_enable_sound(const device_config *device, int on)
+void mac_enable_sound(running_device *device, int on)
 {
 	mac_sound *token = get_token(device);
 	token->sample_enable = on;
@@ -132,7 +132,7 @@ void mac_enable_sound(const device_config *device, int on)
 /*
     Set the current sound buffer (one VIA port line)
 */
-void mac_set_sound_buffer(const device_config *device, int buffer)
+void mac_set_sound_buffer(running_device *device, int buffer)
 {
 	mac_sound *token = get_token(device);
 
@@ -147,7 +147,7 @@ void mac_set_sound_buffer(const device_config *device, int buffer)
 /*
     Set the current sound volume (3 VIA port line)
 */
-void mac_set_volume(const device_config *device, int volume)
+void mac_set_volume(running_device *device, int volume)
 {
 	mac_sound *token = get_token(device);
 
@@ -161,7 +161,7 @@ void mac_set_volume(const device_config *device, int volume)
 /*
     Fetch one byte from sound buffer and put it to sound output (called every scanline)
 */
-void mac_sh_updatebuffer(const device_config *device)
+void mac_sh_updatebuffer(running_device *device)
 {
 	mac_sound *token = get_token(device);
 	UINT16 *base = token->mac_snd_buf_ptr;

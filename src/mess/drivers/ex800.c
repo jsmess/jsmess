@@ -180,7 +180,7 @@ static INPUT_CHANGED( online_switch )
 
 static MACHINE_START(ex800)
 {
-	const device_config *speaker = devtag_get_device(machine, "beep");
+	running_device *speaker = devtag_get_device(machine, "beep");
 	/* Setup beep */
 	beep_set_state(speaker, 0);
 	beep_set_frequency(speaker, 4000); /* measured at 4000 Hz */
@@ -239,7 +239,7 @@ static WRITE8_HANDLER(ex800_portb_w)
 
 static WRITE8_HANDLER(ex800_portc_w)
 {
-	const device_config *speaker = devtag_get_device(space->machine, "beep");
+	running_device *speaker = devtag_get_device(space->machine, "beep");
 	if (data & 0x80)
 		beep_set_state(speaker, 0);
 	else

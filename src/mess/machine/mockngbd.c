@@ -56,7 +56,7 @@ struct _mockingboard_token
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE mockingboard_token *get_token(const device_config *device)
+INLINE mockingboard_token *get_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == MOCKINGBOARD);
@@ -144,8 +144,8 @@ READ8_DEVICE_HANDLER(mockingboard_r)
 
 WRITE8_DEVICE_HANDLER(mockingboard_w)
 {
-	const device_config *ay8910_1 = devtag_get_device(device->machine, "ay8910.1");
-	const device_config *ay8910_2 = devtag_get_device(device->machine, "ay8910.2");
+	running_device *ay8910_1 = devtag_get_device(device->machine, "ay8910.1");
+	running_device *ay8910_2 = devtag_get_device(device->machine, "ay8910.2");
 	mockingboard_token *token = get_token(device);
 
 	if (LOG_MOCKINGBOARD)
@@ -158,7 +158,7 @@ WRITE8_DEVICE_HANDLER(mockingboard_w)
 			switch (data)
 			{
 				case 0x00: /* reset */
-					device_reset(ay8910_1);
+					ay8910_1->reset();
 					break;
 				case 0x04: /* make inactive */
 					break;
@@ -183,7 +183,7 @@ WRITE8_DEVICE_HANDLER(mockingboard_w)
 			switch (data)
 			{
 				case 0x00: /* reset */
-					device_reset(ay8910_2);
+					ay8910_2->reset();
 					break;
 				case 0x04: /* make inactive */
 					break;

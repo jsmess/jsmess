@@ -22,8 +22,8 @@ struct _mz_state
 {
 	int mz700;				/* 1 if running on an mz700 */
 
-	const device_config *pit;
-	const device_config *ppi;
+	running_device *pit;
+	running_device *ppi;
 
 	int cursor_timer;
 	int other_timer;

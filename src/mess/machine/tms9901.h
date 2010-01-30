@@ -33,8 +33,8 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*tms9901_int_callback_func)(const device_config *device, int intreq, int ic);
-#define TMS9901_INT_CALLBACK(name)	void name(const device_config *device, int intreq, int ic )
+typedef void (*tms9901_int_callback_func)(running_device *device, int intreq, int ic);
+#define TMS9901_INT_CALLBACK(name)	void name(running_device *device, int intreq, int ic )
 
 typedef struct _tms9901_interface tms9901_interface;
 struct _tms9901_interface
@@ -51,7 +51,7 @@ struct _tms9901_interface
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void tms9901_set_single_int(const device_config *device, int pin_number, int state);
+void tms9901_set_single_int(running_device *device, int pin_number, int state);
 
 DEVICE_GET_INFO(tms9901);
 

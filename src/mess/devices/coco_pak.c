@@ -17,8 +17,8 @@
 typedef struct _coco_pak_pcb_t coco_pak_pcb_t;
 struct _coco_pak_pcb_t
 {
-	const device_config *cococart;
-	const device_config *cart;
+	running_device *cococart;
+	running_device *cart;
 };
 
 
@@ -26,7 +26,7 @@ struct _coco_pak_pcb_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE coco_pak_pcb_t *get_token(const device_config *device)
+INLINE coco_pak_pcb_t *get_token(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == COCO_CARTRIDGE_PCB_PAK) || (device->type == COCO_CARTRIDGE_PCB_PAK_BANKED16K));
@@ -111,7 +111,7 @@ DEVICE_GET_INFO(coco_cartridge_pcb_pak)
     banked_pak_set_bank - function to set the bank
 -------------------------------------------------*/
 
-static void banked_pak_set_bank(const device_config *device, UINT32 bank)
+static void banked_pak_set_bank(running_device *device, UINT32 bank)
 {
 	coco_pak_pcb_t *pak_pcb = get_token(device);
 	UINT64 pos;

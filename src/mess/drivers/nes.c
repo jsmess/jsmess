@@ -170,7 +170,7 @@ static const nes_interface nes_apu_interface =
 };
 
 
-static void ppu_nmi(const device_config *device, int *ppu_regs)
+static void ppu_nmi(running_device *device, int *ppu_regs)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }

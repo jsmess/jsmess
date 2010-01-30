@@ -239,7 +239,7 @@ static VIDEO_START( spc1000 )
 
 static VIDEO_UPDATE( spc1000 )
 {
-	const device_config *mc6847 = devtag_get_device(screen->machine, "mc6847");
+	running_device *mc6847 = devtag_get_device(screen->machine, "mc6847");
 	return mc6847_update(mc6847, bitmap, cliprect);
 }
 

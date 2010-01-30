@@ -49,23 +49,23 @@ struct _cbm_iec_daisy_chain
 DEVICE_GET_INFO( cbm_iec );
 
 /* service request */
-void cbm_iec_srq_w(const device_config *iec, const device_config *device, int state);
+void cbm_iec_srq_w(running_device *iec, running_device *device, int state);
 READ_LINE_DEVICE_HANDLER( cbm_iec_srq_r );
 
 /* attention */
-void cbm_iec_atn_w(const device_config *iec, const device_config *device, int state);
+void cbm_iec_atn_w(running_device *iec, running_device *device, int state);
 READ_LINE_DEVICE_HANDLER( cbm_iec_atn_r );
 
 /* clock */
-void cbm_iec_clk_w(const device_config *iec, const device_config *device, int state);
+void cbm_iec_clk_w(running_device *iec, running_device *device, int state);
 READ_LINE_DEVICE_HANDLER( cbm_iec_clk_r );
 
 /* data */
-void cbm_iec_data_w(const device_config *iec, const device_config *device, int state);
+void cbm_iec_data_w(running_device *iec, running_device *device, int state);
 READ_LINE_DEVICE_HANDLER( cbm_iec_data_r );
 
 /* reset */
-void cbm_iec_reset_w(const device_config *iec, const device_config *device, int state);
+void cbm_iec_reset_w(running_device *iec, running_device *device, int state);
 READ_LINE_DEVICE_HANDLER( cbm_iec_reset_r );
 
 #endif

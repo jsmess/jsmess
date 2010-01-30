@@ -279,7 +279,7 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 }
 
 /* does not do anything yet */
-static void avigo_tc8521_alarm_int(const device_config *device, int state)
+static void avigo_tc8521_alarm_int(running_device *device, int state)
 {
 //#if 0
 	avigo_irq &=~(1<<5);
@@ -774,7 +774,7 @@ static  READ8_HANDLER(avigo_ad_data_r)
 
 static WRITE8_HANDLER(avigo_speaker_w)
 {
-	const device_config *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = devtag_get_device(space->machine, "speaker");
 	UINT8 previous_speaker;
 
 	previous_speaker = avigo_speaker_data;

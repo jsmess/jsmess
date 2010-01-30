@@ -164,7 +164,7 @@ const ttl74145_interface sym1_ttl74145_intf =
 ******************************************************************************/
 
 
-static void sym1_irq(const device_config *device, int level)
+static void sym1_irq(running_device *device, int level)
 {
 	cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, level);
 }
@@ -297,5 +297,5 @@ MACHINE_RESET( sym1 )
 	memory_install_read_bank(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),0xf800, 0xffff, 0, 0, "bank1");
 	memory_nop_write(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),0xf800, 0xffff, 0, 0);
 	memory_set_bankptr(machine, "bank1", sym1_monitor + 0x800);
-	device_reset(devtag_get_device(machine, "maincpu"));
+	devtag_get_device(machine, "maincpu")->reset();
 }

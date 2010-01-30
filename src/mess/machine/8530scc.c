@@ -40,17 +40,17 @@ struct _scc8530_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE scc8530_t *get_token(const device_config *device)
+INLINE scc8530_t *get_token(running_device *device)
 {
 	assert(device->type == SCC8530);
 	return (scc8530_t *) device->token;
 }
 
 
-INLINE const scc8530_interface *get_interface(const device_config *device)
+INLINE const scc8530_interface *get_interface(running_device *device)
 {
 	assert(device->type == SCC8530);
-	return (const scc8530_interface *) device->inline_config;
+	return (const scc8530_interface *) device->baseconfig().inline_config;
 }
 
 
@@ -74,7 +74,7 @@ static DEVICE_START( scc8530 )
     scc_set_status
 -------------------------------------------------*/
 
-void scc8530_set_status(const device_config *device, int status)
+void scc8530_set_status(running_device *device, int status)
 {
 	scc8530_t *scc = get_token(device);
 	scc->status = status;
@@ -86,7 +86,7 @@ void scc8530_set_status(const device_config *device, int status)
     scc_acknowledge
 -------------------------------------------------*/
 
-static void scc_acknowledge(const device_config *device)
+static void scc_acknowledge(running_device *device)
 {
 	const scc8530_interface *intf = get_interface(device);
 	if ((intf != NULL) && (intf->acknowledge != NULL))
@@ -99,7 +99,7 @@ static void scc_acknowledge(const device_config *device)
     scc_getareg
 -------------------------------------------------*/
 
-static int scc_getareg(const device_config *device)
+static int scc_getareg(running_device *device)
 {
 	scc8530_t *scc = get_token(device);
 
@@ -114,7 +114,7 @@ static int scc_getareg(const device_config *device)
     scc_getareg
 -------------------------------------------------*/
 
-static int scc_getbreg(const device_config *device)
+static int scc_getbreg(running_device *device)
 {
 	scc8530_t *scc = get_token(device);
 
@@ -137,7 +137,7 @@ static int scc_getbreg(const device_config *device)
     scc_putareg
 -------------------------------------------------*/
 
-static void scc_putareg(const device_config *device, int data)
+static void scc_putareg(running_device *device, int data)
 {
 	scc8530_t *scc = get_token(device);
 
@@ -156,7 +156,7 @@ static void scc_putareg(const device_config *device, int data)
     scc_putbreg
 -------------------------------------------------*/
 
-static void scc_putbreg(const device_config *device, int data)
+static void scc_putbreg(running_device *device, int data)
 {
 	scc8530_t *scc = get_token(device);
 
@@ -175,7 +175,7 @@ static void scc_putbreg(const device_config *device, int data)
     scc8530_get_reg_a
 -------------------------------------------------*/
 
-UINT8 scc8530_get_reg_a(const device_config *device, int reg)
+UINT8 scc8530_get_reg_a(running_device *device, int reg)
 {
 	scc8530_t *scc = get_token(device);
 	return scc->reg_val_a[reg];
@@ -187,7 +187,7 @@ UINT8 scc8530_get_reg_a(const device_config *device, int reg)
     scc8530_get_reg_b
 -------------------------------------------------*/
 
-UINT8 scc8530_get_reg_b(const device_config *device, int reg)
+UINT8 scc8530_get_reg_b(running_device *device, int reg)
 {
 	scc8530_t *scc = get_token(device);
 	return scc->reg_val_b[reg];
@@ -199,7 +199,7 @@ UINT8 scc8530_get_reg_b(const device_config *device, int reg)
     scc8530_set_reg_a
 -------------------------------------------------*/
 
-void scc8530_set_reg_a(const device_config *device, int reg, UINT8 data)
+void scc8530_set_reg_a(running_device *device, int reg, UINT8 data)
 {
 	scc8530_t *scc = get_token(device);
 	scc->reg_val_a[reg] = data;
@@ -211,7 +211,7 @@ void scc8530_set_reg_a(const device_config *device, int reg, UINT8 data)
     scc8530_set_reg_a
 -------------------------------------------------*/
 
-void scc8530_set_reg_b(const device_config *device, int reg, UINT8 data)
+void scc8530_set_reg_b(running_device *device, int reg, UINT8 data)
 {
 	scc8530_t *scc = get_token(device);
 	scc->reg_val_b[reg] = data;

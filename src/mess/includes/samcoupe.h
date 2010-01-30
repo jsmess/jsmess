@@ -43,7 +43,7 @@ struct _coupe_asic
 
 /*----------- defined in drivers/samcoupe.c -----------*/
 
-void samcoupe_irq(const device_config *device, UINT8 src);
+void samcoupe_irq(running_device *device, UINT8 src);
 
 
 /*----------- defined in machine/samcoupe.c -----------*/

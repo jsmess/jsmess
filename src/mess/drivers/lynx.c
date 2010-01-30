@@ -139,7 +139,7 @@ ROM_END
 
 static QUICKLOAD_LOAD( lynx )
 {
-	const device_config *cpu = devtag_get_device(image->machine, "maincpu");
+	running_device *cpu = devtag_get_device(image->machine, "maincpu");
 	const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *data = NULL;
 	UINT8 *rom = memory_region(image->machine, "maincpu");

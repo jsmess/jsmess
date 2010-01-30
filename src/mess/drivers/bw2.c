@@ -41,7 +41,7 @@
 #include "video/msm6255.h"
 #include "devices/messram.h"
 
-static const device_config *get_floppy_image(running_machine *machine, int drive)
+static running_device *get_floppy_image(running_machine *machine, int drive)
 {
 	return floppy_get_device(machine, drive);
 }
@@ -252,7 +252,7 @@ static WRITE_LINE_DEVICE_HANDLER( bw2_wd17xx_drq_w )
 static READ8_HANDLER( bw2_wd2797_r )
 {
 	UINT8 result = 0xff;
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = devtag_get_device(space->machine, "wd179x");
 
 	switch (offset & 0x03)
 	{
@@ -275,7 +275,7 @@ static READ8_HANDLER( bw2_wd2797_r )
 
 static WRITE8_HANDLER( bw2_wd2797_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = devtag_get_device(space->machine, "wd179x");
 	switch (offset & 0x3)
 	{
 		case 0:
@@ -313,7 +313,7 @@ static WRITE8_HANDLER( bw2_wd2797_w )
 
 static WRITE8_DEVICE_HANDLER( bw2_8255_a_w )
 {
-	const device_config *fdc = devtag_get_device(device->machine, "wd179x");
+	running_device *fdc = devtag_get_device(device->machine, "wd179x");
 	/*
 
         PA0     KB0 Keyboard line select 0
@@ -516,7 +516,7 @@ static DRIVER_INIT( bw2 )
 static MACHINE_START( bw2 )
 {
 	bw2_state *state = (bw2_state *) machine->driver_data;
-	const device_config *fdc = devtag_get_device(machine, "wd179x");
+	running_device *fdc = devtag_get_device(machine, "wd179x");
 
 	wd17xx_set_density(fdc,DEN_MFM_LO);
 

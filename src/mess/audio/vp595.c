@@ -26,14 +26,14 @@ typedef struct _vp595_t vp595_t;
 struct _vp595_t
 {
 	/* devices */
-	const device_config *cdp1863;
+	running_device *cdp1863;
 };
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE vp595_t *get_safe_token(const device_config *device)
+INLINE vp595_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -73,7 +73,7 @@ static WRITE8_DEVICE_HANDLER( vp595_cdp1863_w )
     or uninstall write handlers
 -------------------------------------------------*/
 
-void vp595_install_write_handlers(const device_config *device, const address_space *io, int enabled)
+void vp595_install_write_handlers(running_device *device, const address_space *io, int enabled)
 {
 	vp595_t *vp595 = get_safe_token(device);
 
@@ -105,7 +105,7 @@ static DEVICE_START( vp595 )
 	vp595_t *vp595 = get_safe_token(device);
 
 	/* look up devices */
-	vp595->cdp1863 = device_find_child_by_tag(device, CDP1863_TAG);
+	vp595->cdp1863 = device->subdevice(CDP1863_TAG);
 
 	/* HACK workaround */
 	cdp1863_set_clk2(vp595->cdp1863, CDP1863_XTAL);

@@ -43,7 +43,7 @@ DEVICE_GET_INFO( k2ge );
 WRITE8_DEVICE_HANDLER( k1ge_w );
 READ8_DEVICE_HANDLER( k1ge_r );
 
-void k1ge_update( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect );
+void k1ge_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect );
 
 #endif
 

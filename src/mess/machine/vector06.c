@@ -161,24 +161,24 @@ static TIMER_CALLBACK(reset_check_callback)
 	UINT8 val = input_port_read(machine, "RESET");
 	if ((val & 1)==1) {
 		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x10000);
-		device_reset(devtag_get_device(machine, "maincpu"));
+		devtag_get_device(machine, "maincpu")->reset();
 	}
 	if ((val & 2)==2) {
 		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
-		device_reset(devtag_get_device(machine, "maincpu"));
+		devtag_get_device(machine, "maincpu")->reset();
 	}
 }
 
 WRITE8_HANDLER(vector06_disc_w)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *fdc = devtag_get_device(space->machine, "wd1793");
 	wd17xx_set_side (fdc,((data & 4) >> 2) ^ 1);
  	wd17xx_set_drive(fdc,data & 1);
 }
 
 MACHINE_START( vector06 )
 {
-	const device_config *fdc = devtag_get_device(machine, "wd1793");
+	running_device *fdc = devtag_get_device(machine, "wd1793");
 	wd17xx_set_density (fdc, DEN_FM_HI);
 	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, reset_check_callback);
 }

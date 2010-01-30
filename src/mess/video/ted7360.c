@@ -943,7 +943,7 @@ READ8_HANDLER ( ted7360_port_r )
 
 VIDEO_START( ted7360 )
 {
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 

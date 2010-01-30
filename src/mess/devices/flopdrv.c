@@ -70,21 +70,21 @@ struct _floppy_drive
 	/* index pulse timer */
 	void	*index_timer;
 	/* index pulse callback */
-	void	(*index_pulse_callback)(const device_config *controller,const device_config *image, int state);
+	void	(*index_pulse_callback)(running_device *controller,running_device *image, int state);
 	/* rotation per minute => gives index pulse frequency */
 	float rpm;
 
-	void	(*ready_state_change_callback)(const device_config *controller,const device_config *img, int state);
+	void	(*ready_state_change_callback)(running_device *controller,running_device *img, int state);
 
 	int id_index;
 
-	const device_config *controller;
+	running_device *controller;
 
 	floppy_image *floppy;
 	int track;
-	void (*load_proc)(const device_config *image);
-	void (*unload_proc)(const device_config *image);
-	int (*tracktranslate_proc)(const device_config *image, floppy_image *floppy, int physical_track);
+	void (*load_proc)(running_device *image);
+	void (*unload_proc)(running_device *image);
+	int (*tracktranslate_proc)(running_device *image, floppy_image *floppy, int physical_track);
 	void *custom_data;
 	int floppy_drive_type;
 };
@@ -119,7 +119,7 @@ static const floppy_error_map errmap[] =
 extern DEVICE_GET_INFO(apple525);
 extern DEVICE_GET_INFO(sonydriv);
 
-INLINE floppy_drive *get_safe_token(const device_config *device)
+INLINE floppy_drive *get_safe_token(running_device *device)
 {
 	assert( device != NULL );
 	assert( device->token != NULL );
@@ -127,24 +127,24 @@ INLINE floppy_drive *get_safe_token(const device_config *device)
 	return (floppy_drive *) device->token;
 }
 
-floppy_image *flopimg_get_image(const device_config *image)
+floppy_image *flopimg_get_image(running_device *image)
 {
 	return get_safe_token(image)->floppy;
 }
 
-void *flopimg_get_custom_data(const device_config *image)
+void *flopimg_get_custom_data(running_device *image)
 {
 	floppy_drive *flopimg = get_safe_token( image );
 	return flopimg->custom_data;
 }
 
-void flopimg_alloc_custom_data(const device_config *image,void *custom)
+void flopimg_alloc_custom_data(running_device *image,void *custom)
 {
 	floppy_drive *flopimg = get_safe_token( image );
 	flopimg->custom_data = custom;
 }
 
-static void flopimg_seek_callback(const device_config *image, int physical_track)
+static void flopimg_seek_callback(running_device *image, int physical_track)
 {
 	floppy_drive *flopimg = get_safe_token( image );
 	if (!flopimg || !flopimg->floppy)
@@ -157,7 +157,7 @@ static void flopimg_seek_callback(const device_config *image, int physical_track
 	flopimg->track = physical_track;
 }
 
-static int flopimg_get_sectors_per_track(const device_config *image, int side)
+static int flopimg_get_sectors_per_track(running_device *image, int side)
 {
 	floperr_t err;
 	int sector_count;
@@ -172,7 +172,7 @@ static int flopimg_get_sectors_per_track(const device_config *image, int side)
 	return sector_count;
 }
 
-static void flopimg_get_id_callback(const device_config *image, chrn_id *id, int id_index, int side)
+static void flopimg_get_id_callback(running_device *image, chrn_id *id, int id_index, int side)
 {
 	floppy_drive *flopimg;
 	int cylinder, sector, N;
@@ -208,22 +208,22 @@ static void log_readwrite(const char *name, int head, int track, int sector, con
 
 static int image_fseek_thunk(void *file, INT64 offset, int whence)
 {
-	return image_fseek((const device_config *) file, offset, whence);
+	return image_fseek((running_device *) file, offset, whence);
 }
 
 static size_t image_fread_thunk(void *file, void *buffer, size_t length)
 {
-	return image_fread((const device_config *) file, buffer, length);
+	return image_fread((running_device *) file, buffer, length);
 }
 
 static size_t image_fwrite_thunk(void *file, const void *buffer, size_t length)
 {
-	return image_fwrite((const device_config *) file, buffer, length);
+	return image_fwrite((running_device *) file, buffer, length);
 }
 
 static UINT64 image_fsize_thunk(void *file)
 {
-	return image_length((const device_config *) file);
+	return image_length((running_device *) file);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -237,14 +237,14 @@ struct io_procs mess_ioprocs =
 	image_fsize_thunk
 };
 
-static void floppy_drive_set_geometry_absolute(const device_config *img, int tracks, int sides)
+static void floppy_drive_set_geometry_absolute(running_device *img, int tracks, int sides)
 {
 	floppy_drive *pDrive = get_safe_token( img );
 	pDrive->max_track = tracks;
 	pDrive->num_sides = sides;
 }
 
-void floppy_drive_set_geometry(const device_config *img, floppy_type_t type)
+void floppy_drive_set_geometry(running_device *img, floppy_type_t type)
 {
 	int max_track, num_sides;
 
@@ -279,7 +279,7 @@ void floppy_drive_set_geometry(const device_config *img, floppy_type_t type)
 static TIMER_CALLBACK(floppy_drive_index_callback);
 
 /* this is called on device init */
-static void floppy_drive_init(const device_config *img)
+static void floppy_drive_init(running_device *img)
 {
 	floppy_drive *pDrive = get_safe_token( img );
 
@@ -290,7 +290,7 @@ static void floppy_drive_init(const device_config *img)
 	pDrive->index_timer = timer_alloc(img->machine, floppy_drive_index_callback, (void *) img);
 	pDrive->idx = 0;
 
-	floppy_drive_set_geometry(img, ((floppy_config*)img->static_config)->floppy_type);
+	floppy_drive_set_geometry(img, ((floppy_config*)img->baseconfig().static_config)->floppy_type);
 
 	/* initialise id index - not so important */
 	pDrive->id_index = 0;
@@ -308,7 +308,7 @@ static void floppy_drive_init(const device_config *img)
 }
 
 /* index pulses at rpm/60 Hz, and stays high 1/20th of time */
-static void floppy_drive_index_func(const device_config *img)
+static void floppy_drive_index_func(running_device *img)
 {
 	floppy_drive *drive = get_safe_token( img );
 
@@ -333,7 +333,7 @@ static void floppy_drive_index_func(const device_config *img)
 
 static TIMER_CALLBACK(floppy_drive_index_callback)
 {
-	const device_config *image = (const device_config *) ptr;
+	running_device *image = (running_device *) ptr;
 	floppy_drive_index_func(image);
 }
 
@@ -341,7 +341,7 @@ static TIMER_CALLBACK(floppy_drive_index_callback)
 /* IO_FLOPPY device functions */
 
 /* set flag state */
-void floppy_drive_set_flag_state(const device_config *img, int flag, int state)
+void floppy_drive_set_flag_state(running_device *img, int flag, int state)
 {
 	floppy_drive *drv = get_safe_token( img );
 	int prev_state;
@@ -375,7 +375,7 @@ void floppy_drive_set_flag_state(const device_config *img, int flag, int state)
 /* for pc, drive is always ready, for amstrad,pcw,spectrum it is only ready under
 a fixed set of circumstances */
 /* use this to set ready state of drive */
-void floppy_drive_set_ready_state(const device_config *img, int state, int flag)
+void floppy_drive_set_ready_state(running_device *img, int state, int flag)
 {
 	floppy_drive *drive = get_safe_token(img);
 
@@ -408,7 +408,7 @@ void floppy_drive_set_ready_state(const device_config *img, int state, int flag)
 }
 
 /* get flag state */
-int	floppy_drive_get_flag_state(const device_config *img, int flag)
+int	floppy_drive_get_flag_state(running_device *img, int flag)
 {
 	floppy_drive *drv = get_safe_token( img );
 	int drive_flags;
@@ -427,7 +427,7 @@ int	floppy_drive_get_flag_state(const device_config *img, int flag)
 }
 
 
-void floppy_drive_seek(const device_config *img, signed int signed_tracks)
+void floppy_drive_seek(running_device *img, signed int signed_tracks)
 {
 	floppy_drive *pDrive;
 
@@ -461,7 +461,7 @@ void floppy_drive_seek(const device_config *img, signed int signed_tracks)
 
 
 /* this is not accurate. But it will do for now */
-int	floppy_drive_get_next_id(const device_config *img, int side, chrn_id *id)
+int	floppy_drive_get_next_id(running_device *img, int side, chrn_id *id)
 {
 	floppy_drive *pDrive;
 	int spt;
@@ -496,7 +496,7 @@ int	floppy_drive_get_next_id(const device_config *img, int side, chrn_id *id)
 	return (spt == 0) ? 0 : 1;
 }
 
-void floppy_drive_read_track_data_info_buffer(const device_config *img, int side, void *ptr, int *length )
+void floppy_drive_read_track_data_info_buffer(running_device *img, int side, void *ptr, int *length )
 {
 	floppy_drive *flopimg;
 	if (image_exists(img))
@@ -509,7 +509,7 @@ void floppy_drive_read_track_data_info_buffer(const device_config *img, int side
 	}
 }
 
-void floppy_drive_write_track_data_info_buffer(const device_config *img, int side, const void *ptr, int *length )
+void floppy_drive_write_track_data_info_buffer(running_device *img, int side, const void *ptr, int *length )
 {
 	floppy_drive *flopimg;
 	if (image_exists(img))
@@ -522,7 +522,7 @@ void floppy_drive_write_track_data_info_buffer(const device_config *img, int sid
 	}
 }
 
-void floppy_drive_format_sector(const device_config *img, int side, int sector_index,int c,int h, int r, int n, int filler)
+void floppy_drive_format_sector(running_device *img, int side, int sector_index,int c,int h, int r, int n, int filler)
 {
 	if (image_exists(img))
 	{
@@ -531,7 +531,7 @@ void floppy_drive_format_sector(const device_config *img, int side, int sector_i
 	}
 }
 
-void floppy_drive_read_sector_data(const device_config *img, int side, int index1, void *ptr, int length)
+void floppy_drive_read_sector_data(running_device *img, int side, int index1, void *ptr, int length)
 {
 	floppy_drive *flopimg;
 	if (image_exists(img))
@@ -548,7 +548,7 @@ void floppy_drive_read_sector_data(const device_config *img, int side, int index
 	}
 }
 
-void floppy_drive_write_sector_data(const device_config *img, int side, int index1, const void *ptr,int length, int ddam)
+void floppy_drive_write_sector_data(running_device *img, int side, int index1, const void *ptr,int length, int ddam)
 {
 	floppy_drive *flopimg;
 	if (image_exists(img))
@@ -564,51 +564,51 @@ void floppy_drive_write_sector_data(const device_config *img, int side, int inde
 	}
 }
 
-void floppy_install_load_proc(const device_config *image, void (*proc)(const device_config *image))
+void floppy_install_load_proc(running_device *image, void (*proc)(running_device *image))
 {
 	floppy_drive *flopimg = get_safe_token( image );
 	flopimg->load_proc = proc;
 }
 
-void floppy_install_unload_proc(const device_config *image, void (*proc)(const device_config *image))
+void floppy_install_unload_proc(running_device *image, void (*proc)(running_device *image))
 {
 	floppy_drive *flopimg = get_safe_token( image );
 	flopimg->unload_proc = proc;
 }
 
-void floppy_install_tracktranslate_proc(const device_config *image, int (*proc)(const device_config *image, floppy_image *floppy, int physical_track))
+void floppy_install_tracktranslate_proc(running_device *image, int (*proc)(running_device *image, floppy_image *floppy, int physical_track))
 {
 	floppy_drive *flopimg = get_safe_token( image );
 	flopimg->tracktranslate_proc = proc;
 }
 
 /* set the callback for the index pulse */
-void floppy_drive_set_index_pulse_callback(const device_config *img, void (*callback)(const device_config *controller,const device_config *image, int state))
+void floppy_drive_set_index_pulse_callback(running_device *img, void (*callback)(running_device *controller,running_device *image, int state))
 {
 	floppy_drive *pDrive = get_safe_token( img );
 	pDrive->index_pulse_callback = callback;
 }
 
 
-void floppy_drive_set_ready_state_change_callback(const device_config *img, void (*callback)(const device_config *controller,const device_config *img, int state))
+void floppy_drive_set_ready_state_change_callback(running_device *img, void (*callback)(running_device *controller,running_device *img, int state))
 {
 	floppy_drive *pDrive = get_safe_token( img );
 	pDrive->ready_state_change_callback = callback;
 }
 
-int	floppy_drive_get_current_track(const device_config *img)
+int	floppy_drive_get_current_track(running_device *img)
 {
 	floppy_drive *drv = get_safe_token( img );
 	return drv->current_track;
 }
 
-void floppy_drive_set_rpm(const device_config *img, float rpm)
+void floppy_drive_set_rpm(running_device *img, float rpm)
 {
 	floppy_drive *drv = get_safe_token( img );
 	drv->rpm = rpm;
 }
 
-void floppy_drive_set_controller(const device_config *img, const device_config *controller)
+void floppy_drive_set_controller(running_device *img, running_device *controller)
 {
 	floppy_drive *drv = get_safe_token( img );
 	drv->controller = controller;
@@ -618,7 +618,7 @@ void floppy_drive_set_controller(const device_config *img, const device_config *
 DEVICE_START( floppy )
 {
 	floppy_drive *floppy = get_safe_token( device );
-	floppy->config = (const floppy_config*)device->static_config;
+	floppy->config = (const floppy_config*)device->baseconfig().static_config;
 	floppy_drive_init(device);
 
 	floppy->drive_id = floppy_get_drive(device);
@@ -641,7 +641,7 @@ DEVICE_START( floppy )
 	devcb_resolve_write_line(&floppy->out_rdy_func, &floppy->config->out_rdy_func, device);
 }
 
-static int internal_floppy_device_load(const device_config *image, int create_format, option_resolution *create_args)
+static int internal_floppy_device_load(running_device *image, int create_format, option_resolution *create_args)
 {
 	floperr_t err;
 	floppy_drive *flopimg;
@@ -653,7 +653,7 @@ static int internal_floppy_device_load(const device_config *image, int create_fo
 	flopimg = get_safe_token( image );
 
 	/* figure out the floppy options */
-	floppy_options = ((floppy_config*)image->static_config)->formats;
+	floppy_options = ((floppy_config*)image->baseconfig().static_config)->formats;
 
 	if (image_has_been_created(image))
 	{
@@ -672,7 +672,7 @@ static int internal_floppy_device_load(const device_config *image, int create_fo
 		if (err)
 			goto error;
 	}
-	if (((floppy_config*)image->static_config)->keep_drive_geometry==DO_NOT_KEEP_GEOMETRY && floppy_callbacks(flopimg->floppy)->get_heads_per_disk && floppy_callbacks(flopimg->floppy)->get_tracks_per_disk)
+	if (((floppy_config*)image->baseconfig().static_config)->keep_drive_geometry==DO_NOT_KEEP_GEOMETRY && floppy_callbacks(flopimg->floppy)->get_heads_per_disk && floppy_callbacks(flopimg->floppy)->get_tracks_per_disk)
 	{
 		floppy_drive_set_geometry_absolute(image,
 			floppy_get_tracks_per_disk(flopimg->floppy),
@@ -719,7 +719,7 @@ DEVICE_IMAGE_UNLOAD( floppy )
 	flopimg->floppy = NULL;
 }
 
-const device_config *floppy_get_device(running_machine *machine,int drive)
+running_device *floppy_get_device(running_machine *machine,int drive)
 {
 	switch(drive) {
 		case 0 : return devtag_get_device(machine,FLOPPY_0);
@@ -730,35 +730,35 @@ const device_config *floppy_get_device(running_machine *machine,int drive)
 	return NULL;
 }
 
-const device_config *floppy_get_device_owner(const device_config *device,int drive)
+running_device *floppy_get_device_owner(running_device *device,int drive)
 {
 	switch(drive) {
-		case 0 : return device_find_child_by_tag(device->owner,FLOPPY_0);
-		case 1 : return device_find_child_by_tag(device->owner,FLOPPY_1);
-		case 2 : return device_find_child_by_tag(device->owner,FLOPPY_2);
-		case 3 : return device_find_child_by_tag(device->owner,FLOPPY_3);
+		case 0 : return device->owner->subdevice(FLOPPY_0);
+		case 1 : return device->owner->subdevice(FLOPPY_1);
+		case 2 : return device->owner->subdevice(FLOPPY_2);
+		case 3 : return device->owner->subdevice(FLOPPY_3);
 	}
 	return NULL;
 }
 
-int floppy_get_drive_type(const device_config *image)
+int floppy_get_drive_type(running_device *image)
 {
 	floppy_drive *flopimg = get_safe_token( image );
 	return flopimg->floppy_drive_type;
 }
 
-void floppy_set_type(const device_config *image,int ftype)
+void floppy_set_type(running_device *image,int ftype)
 {
 	floppy_drive *flopimg = get_safe_token( image );
 	flopimg->floppy_drive_type = ftype;
 }
 
-const device_config *floppy_get_device_by_type(running_machine *machine,int ftype,int drive)
+running_device *floppy_get_device_by_type(running_machine *machine,int ftype,int drive)
 {
 	int i;
 	int cnt = 0;
 	for (i=0;i<4;i++) {
-		const device_config *disk = floppy_get_device(machine,i);
+		running_device *disk = floppy_get_device(machine,i);
 		if (floppy_get_drive_type(disk)==ftype) {
 			if (cnt==drive) {
 				return disk;
@@ -769,7 +769,7 @@ const device_config *floppy_get_device_by_type(running_machine *machine,int ftyp
 	return NULL;
 }
 
-int floppy_get_drive(const device_config *image)
+int floppy_get_drive(running_device *image)
 {
 	int drive =0;
 	if (strcmp(image->tag, FLOPPY_0) == 0) drive = 0;
@@ -779,11 +779,11 @@ int floppy_get_drive(const device_config *image)
 	return drive;
 }
 
-int floppy_get_drive_by_type(const device_config *image,int ftype)
+int floppy_get_drive_by_type(running_device *image,int ftype)
 {
 	int i,drive =0;
 	for (i=0;i<4;i++) {
-		const device_config *disk = floppy_get_device(image->machine,i);
+		running_device *disk = floppy_get_device(image->machine,i);
 		if (floppy_get_drive_type(disk)==ftype) {
 			if (image==disk) {
 				return drive;

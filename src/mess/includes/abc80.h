@@ -74,8 +74,8 @@ struct _abc80_state
 	const UINT8 *attr_prom;		/* character attribute PROM */
 
 	/* devices */
-	const device_config *z80pio;
-	const device_config *cassette;
+	running_device *z80pio;
+	running_device *cassette;
 };
 
 /*----------- defined in video/abc80.c -----------*/

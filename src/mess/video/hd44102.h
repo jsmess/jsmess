@@ -53,6 +53,6 @@ READ8_DEVICE_HANDLER( hd44102_r );
 WRITE8_DEVICE_HANDLER( hd44102_w );
 
 /* screen update */
-void hd44102_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
+void hd44102_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 #endif

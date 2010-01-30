@@ -14,10 +14,10 @@
 typedef struct _pc_state pc_state;
 struct _pc_state
 {
-	const device_config *maincpu;
-	const device_config	*pic8259;
-	const device_config	*dma8237;
-	const device_config	*pit8253;
+	running_device *maincpu;
+	running_device *pic8259;
+	running_device *dma8237;
+	running_device *pit8253;
 	/* U73 is an LS74 - dual flip flop */
 	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */
 	UINT8	u73_q2;

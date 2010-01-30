@@ -10,22 +10,22 @@ static UINT8 outa,outb;
 
 static int power=1; /* simulates pressed cce when mess is started */
 
-void pc1251_outa(const device_config *device, int data)
+void pc1251_outa(running_device *device, int data)
 {
 	outa=data;
 }
 
-void pc1251_outb(const device_config *device, int data)
+void pc1251_outb(running_device *device, int data)
 {
 	outb=data;
 }
 
-void pc1251_outc(const device_config *device, int data)
+void pc1251_outc(running_device *device, int data)
 {
 
 }
 
-int pc1251_ina(const device_config *device)
+int pc1251_ina(running_device *device)
 {
 	int data = outa;
 	running_machine *machine = device->machine;
@@ -69,7 +69,7 @@ int pc1251_ina(const device_config *device)
 	return data;
 }
 
-int pc1251_inb(const device_config *device)
+int pc1251_inb(running_device *device)
 {
 	int data = outb;
 
@@ -79,12 +79,12 @@ int pc1251_inb(const device_config *device)
 	return data;
 }
 
-int pc1251_brk(const device_config *device)
+int pc1251_brk(running_device *device)
 {
 	return (input_port_read(device->machine, "EXTRA") & 0x01);
 }
 
-int pc1251_reset(const device_config *device)
+int pc1251_reset(running_device *device)
 {
 	return (input_port_read(device->machine, "EXTRA") & 0x02);
 }
@@ -92,7 +92,7 @@ int pc1251_reset(const device_config *device)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1251 )
 {
-	const device_config *main_cpu = devtag_get_device(machine, "maincpu");
+	running_device *main_cpu = devtag_get_device(machine, "maincpu");
 	UINT8 *ram = memory_region(machine, "maincpu") + 0x8000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 

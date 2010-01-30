@@ -76,8 +76,8 @@
   Fix an issue with SN76489 and SN76489A having the wrong periodic noise periods.
   Note that properly emulating the noise cycle bit timing accurately may require
   extensive rewriting.
-  
-  17/01/2010: Lord Nightmare
+
+  24/01/2010: Lord Nightmare
   Implement periodic noise as forcing one of the XNOR or XOR taps to 1 or 0 respectively.
   Thanks to PlgDavid for providing samples which helped immensely here.
   Added true clock divider emulation, so sn94624 and sn76494 run 8x faster than
@@ -125,7 +125,7 @@ struct _sn76496_state
 };
 
 
-INLINE sn76496_state *get_safe_token(const device_config *device)
+INLINE sn76496_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -334,7 +334,7 @@ static void SN76496_set_gain(sn76496_state *R,int gain)
 
 
 
-static int SN76496_init(const device_config *device, sn76496_state *R, int stereo)
+static int SN76496_init(running_device *device, sn76496_state *R, int stereo)
 {
 	int sample_rate = device->clock/2;
 	int i;
@@ -373,7 +373,7 @@ static int SN76496_init(const device_config *device, sn76496_state *R, int stere
 }
 
 
-static void generic_start(const device_config *device, int feedbackmask, int noisetap1, int noisetap2, int feedbackinvert, int negate, int stereo, int clockdivider)
+static void generic_start(running_device *device, int feedbackmask, int noisetap1, int noisetap2, int feedbackinvert, int negate, int stereo, int clockdivider)
 {
 	sn76496_state *chip = get_safe_token(device);
 
@@ -388,7 +388,7 @@ static void generic_start(const device_config *device, int feedbackmask, int noi
 	chip->Negate = negate;
 	chip->Stereo = stereo;
 	chip->ClockDivider = clockdivider;
-	chip->CurrentClock = clockdivider-1; 
+	chip->CurrentClock = clockdivider-1;
 
 	state_save_register_device_item_array(device, 0, chip->VolTable);
 	state_save_register_device_item_array(device, 0, chip->Register);

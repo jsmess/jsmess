@@ -17,9 +17,9 @@ struct _lc80_state
 	UINT8 segment;
 
 	/* devices */
-	const device_config *z80pio2;
-	const device_config *speaker;
-	const device_config *cassette;
+	running_device *z80pio2;
+	running_device *speaker;
+	running_device *cassette;
 };
 
 #endif

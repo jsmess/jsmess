@@ -728,7 +728,7 @@ static MACHINE_RESET( tmc1800 )
 	tmc1800_state *state = (tmc1800_state *)machine->driver_data;
 
 	/* reset CDP1861 */
-	device_reset(state->cdp1861);
+	state->cdp1861->reset();
 }
 
 // OSCOM 1000B
@@ -788,7 +788,7 @@ static MACHINE_RESET( tmc2000 )
 	tmc2000_state *state = (tmc2000_state *)machine->driver_data;
 
 	/* reset CDP1864 */
-	device_reset(state->cdp1864);
+	state->cdp1864->reset();
 
 	/* enable monitor mirror at 0x0000 */
 	memory_set_bank(machine, "bank1", TMC2000_BANK_ROM);
@@ -832,7 +832,7 @@ static MACHINE_RESET( oscnano )
 	oscnano_state *state = (oscnano_state *)machine->driver_data;
 
 	/* reset CDP1864 */
-	device_reset(state->cdp1864);
+	state->cdp1864->reset();
 
 	/* enable ROM */
 	memory_set_bank(machine, "bank1", OSCNANO_BANK_ROM);
@@ -1011,7 +1011,7 @@ static QUICKLOAD_LOAD( tmc1800 )
 
 static TIMER_CALLBACK(setup_beep)
 {
-	const device_config *speaker = devtag_get_device(machine, "beep");
+	running_device *speaker = devtag_get_device(machine, "beep");
 	beep_set_state(speaker, 0);
 	beep_set_frequency( speaker, 0 );
 }

@@ -177,7 +177,7 @@ struct _gb_sound_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE gb_sound_t *get_token(const device_config *device)
+INLINE gb_sound_t *get_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(sound_get_type(device) == SOUND_GAMEBOY);
@@ -225,7 +225,7 @@ READ8_DEVICE_HANDLER( gb_sound_r )
 	}
 }
 
-static void gb_sound_w_internal(const device_config *device, int offset, UINT8 data )
+static void gb_sound_w_internal(running_device *device, int offset, UINT8 data )
 {
 	gb_sound_t *gb = get_token(device);
 

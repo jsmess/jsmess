@@ -83,7 +83,7 @@ struct _kr2376_t
 	emu_timer *scan_timer;			/* keyboard scan timer */
 };
 
-INLINE kr2376_t *get_safe_token(const device_config *device)
+INLINE kr2376_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -94,7 +94,7 @@ INLINE kr2376_t *get_safe_token(const device_config *device)
 /*-------------------------------------------------
     kr2376_set_input_pin - set an input pin
 -------------------------------------------------*/
-void kr2376_set_input_pin( const device_config *device, kr2376_input_pin_t pin, int data )
+void kr2376_set_input_pin( running_device *device, kr2376_input_pin_t pin, int data )
 {
 	kr2376_t *kr2376 = get_safe_token(device);
 
@@ -112,7 +112,7 @@ void kr2376_set_input_pin( const device_config *device, kr2376_input_pin_t pin, 
 /*-------------------------------------------------
     kr2376_get_output_pin - get the status of an output pin
 -------------------------------------------------*/
-int kr2376_get_output_pin( const device_config *device, kr2376_output_pin_t pin )
+int kr2376_get_output_pin( running_device *device, kr2376_output_pin_t pin )
 {
 	kr2376_t	*kr2376 = get_safe_token(device);
 
@@ -120,7 +120,7 @@ int kr2376_get_output_pin( const device_config *device, kr2376_output_pin_t pin 
 }
 
 
-static void change_output_lines(const device_config *device)
+static void change_output_lines(running_device *device)
 {
 	kr2376_t *kr2376 = get_safe_token(device);
 
@@ -139,7 +139,7 @@ static void change_output_lines(const device_config *device)
 	}
 }
 
-static void clock_scan_counters(const device_config *device)
+static void clock_scan_counters(running_device *device)
 {
 	kr2376_t *kr2376 = get_safe_token(device);
 
@@ -157,7 +157,7 @@ static void clock_scan_counters(const device_config *device)
 	}
 }
 
-static void detect_keypress(const device_config *device)
+static void detect_keypress(running_device *device)
 {
 	kr2376_t *kr2376= get_safe_token(device);
 
@@ -201,7 +201,7 @@ static void detect_keypress(const device_config *device)
 
 static TIMER_CALLBACK( kr2376_scan_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 
 	change_output_lines(device);
 	clock_scan_counters(device);
@@ -343,7 +343,7 @@ static DEVICE_START( kr2376 )
 	assert(device != NULL);
 	assert(device->tag != NULL);
 
-	kr2376->intf = (const kr2376_interface*)device->static_config;
+	kr2376->intf = (const kr2376_interface*)device->baseconfig().static_config;
 
 	assert(kr2376->intf != NULL);
 	assert(kr2376->intf->clock > 0);

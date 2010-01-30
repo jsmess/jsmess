@@ -33,8 +33,8 @@
 #ifndef __KR2376__
 #define __KR2376__
 
-typedef void (*kr2376_on_strobe_changed_func) (const device_config *device, int level);
-#define KR2376_ON_STROBE_CHANGED(name) void name(const device_config *device, int level)
+typedef void (*kr2376_on_strobe_changed_func) (running_device *device, int level);
+#define KR2376_ON_STROBE_CHANGED(name) void name(running_device *device, int level)
 
 #define KR2376		DEVICE_GET_INFO_NAME(kr2376)
 
@@ -83,10 +83,10 @@ INPUT_PORTS_EXTERN( kr2376 );
 READ8_DEVICE_HANDLER( kr2376_data_r );
 
 /* Set an input pin */
-void kr2376_set_input_pin( const device_config *device, kr2376_input_pin_t pin, int data );
+void kr2376_set_input_pin( running_device *device, kr2376_input_pin_t pin, int data );
 
 
 /* Get an output pin */
-int kr2376_get_output_pin( const device_config *device, kr2376_output_pin_t pin );
+int kr2376_get_output_pin( running_device *device, kr2376_output_pin_t pin );
 
 #endif

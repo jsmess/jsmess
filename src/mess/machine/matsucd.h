@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 /* initialization */
-void matsucd_init( const device_config *cdrom_device, const char *cdda_tag );
+void matsucd_init( running_device *cdrom_device, const char *cdda_tag );
 
 
 /* signaling */

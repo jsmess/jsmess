@@ -141,7 +141,7 @@ typedef struct {
 #define COM_INT_PENDING_MODEM_STATUS_REGISTER 0x0008
 
 
-INLINE ins8250_t *get_safe_token(const device_config *device)
+INLINE ins8250_t *get_safe_token(running_device *device)
 {
 	assert( device != NULL );
 	assert( device->token != NULL );
@@ -156,7 +156,7 @@ INLINE ins8250_t *get_safe_token(const device_config *device)
 
 
 /* setup iir with the priority id */
-static void ins8250_setup_iir(const device_config *device)
+static void ins8250_setup_iir(running_device *device)
 {
 	ins8250_t	*ins8250 = get_safe_token(device);
 
@@ -186,7 +186,7 @@ static void ins8250_setup_iir(const device_config *device)
 
 
 /* ints will continue to be set for as long as there are ints pending */
-static void ins8250_update_interrupt(const device_config *device)
+static void ins8250_update_interrupt(running_device *device)
 {
 	ins8250_t	*ins8250 = get_safe_token(device);
 	int state;
@@ -222,7 +222,7 @@ static void ins8250_update_interrupt(const device_config *device)
 
 
 /* set pending bit and trigger int */
-static void ins8250_trigger_int(const device_config *device, int flag)
+static void ins8250_trigger_int(running_device *device, int flag)
 {
 	ins8250_t	*ins8250 = get_safe_token(device);
 
@@ -234,7 +234,7 @@ static void ins8250_trigger_int(const device_config *device, int flag)
 
 /* clear pending bit, if any ints are pending, then int will be triggered, otherwise it
 will be cleared */
-static void ins8250_clear_int(const device_config *device, int flag)
+static void ins8250_clear_int(running_device *device, int flag)
 {
 	ins8250_t	*ins8250 = get_safe_token(device);
 
@@ -480,7 +480,7 @@ READ8_DEVICE_HANDLER( ins8250_r )
 
 
 
-void ins8250_receive(const device_config *device, int data)
+void ins8250_receive(running_device *device, int data)
 {
 	ins8250_t	*ins8250 = get_safe_token(device);
 
@@ -514,7 +514,7 @@ void ins8250_receive(const device_config *device, int data)
 /**************************************************************************
  *  change the modem status register
  **************************************************************************/
-void ins8250_handshake_in(const device_config *device, int new_msr)
+void ins8250_handshake_in(running_device *device, int new_msr)
 {
 	ins8250_t	*ins8250 = get_safe_token(device);
 
@@ -539,11 +539,11 @@ void ins8250_handshake_in(const device_config *device, int new_msr)
 }
 
 
-static void common_start( const device_config *device, int device_type )
+static void common_start( running_device *device, int device_type )
 {
 	ins8250_t	*ins8250 = get_safe_token(device);
 
-	ins8250->interface = (const ins8250_interface*)device->static_config;
+	ins8250->interface = (const ins8250_interface*)device->baseconfig().static_config;
 	ins8250->device_type = device_type;
 }
 

@@ -20,8 +20,8 @@ struct _tmc1800_state
 	int keylatch;			/* key latch */
 
 	/* devices */
-	const device_config *cdp1861;
-	const device_config *cassette;
+	running_device *cdp1861;
+	running_device *cassette;
 };
 
 typedef struct _osc1000b_state osc1000b_state;
@@ -34,7 +34,7 @@ struct _osc1000b_state
 	int keylatch;			/* key latch */
 
 	/* devices */
-	const device_config *cassette;
+	running_device *cassette;
 };
 
 typedef struct _tmc2000_state tmc2000_state;
@@ -51,8 +51,8 @@ struct _tmc2000_state
 	int keylatch;			/* key latch */
 
 	/* devices */
-	const device_config *cdp1864;
-	const device_config *cassette;
+	running_device *cdp1864;
+	running_device *cassette;
 };
 
 typedef struct _oscnano_state oscnano_state;
@@ -72,8 +72,8 @@ struct _oscnano_state
 	emu_timer *ef4_timer;	/* EF4 line RC timer */
 
 	/* devices */
-	const device_config *cdp1864;
-	const device_config *cassette;
+	running_device *cdp1864;
+	running_device *cassette;
 };
 
 /* ---------- defined in video/tmc1800.c ---------- */

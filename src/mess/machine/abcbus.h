@@ -99,10 +99,10 @@ enum
 
 /* macros */
 #define ABCBUS_CARD_SELECT_NAME(name)	abcbus_card_select_##name
-#define ABCBUS_CARD_SELECT(name)		void ABCBUS_CARD_SELECT_NAME(name)(const device_config *device, UINT8 data)
+#define ABCBUS_CARD_SELECT(name)		void ABCBUS_CARD_SELECT_NAME(name)(running_device *device, UINT8 data)
 
 /* per-device callback functions */
-typedef void (*abcbus_card_select)(const device_config *device, UINT8 data);
+typedef void (*abcbus_card_select)(running_device *device, UINT8 data);
 
 /* daisy chain structure */
 typedef struct _abcbus_daisy_chain abcbus_daisy_chain;

@@ -297,7 +297,7 @@ static UINT8 mc6845_cursor[16];				// cursor shape
 static UINT8 mc6845_reg[20];				/* registers */
 static UINT8 mc6845_ind;				/* register index */
 static const UINT8 mc6845_mask[]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
-static const device_config *mc6845;
+static running_device *mc6845;
 static UINT8 framecnt=0;
 static UINT8 speed,flash;
 static UINT16 cursor;

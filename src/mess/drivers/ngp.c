@@ -133,12 +133,12 @@ struct _ngp_state {
 		UINT8	command[2];
 	} flash_chip[2];
 
-	const device_config *tlcs900;
-	const device_config *z80;
-	const device_config *t6w28;
-	const device_config *dac_l;
-	const device_config *dac_r;
-	const device_config *k1ge;
+	running_device *tlcs900;
+	running_device *z80;
+	running_device *t6w28;
+	running_device *dac_l;
+	running_device *dac_r;
+	running_device *k1ge;
 };
 
 
@@ -237,7 +237,7 @@ static WRITE8_HANDLER( ngp_io_w )
 		{
 		case 0x55:		/* Enable Z80 */
 			cpu_resume( state->z80, SUSPEND_REASON_HALT );
-			device_reset( state->z80 );
+			state->z80->reset();
 			cpu_set_input_line( state->z80, 0, CLEAR_LINE );
 			break;
 		case 0xAA:		/* Disable Z80 */

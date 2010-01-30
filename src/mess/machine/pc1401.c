@@ -24,23 +24,23 @@ UINT8 pc1401_portc;
 
 static int power = 1; /* simulates pressed cce when mess is started */
 
-void pc1401_outa(const device_config *device, int data)
+void pc1401_outa(running_device *device, int data)
 {
 	outa=data;
 }
 
-void pc1401_outb(const device_config *device, int data)
+void pc1401_outb(running_device *device, int data)
 {
 	outb=data;
 }
 
-void pc1401_outc(const device_config *device, int data)
+void pc1401_outc(running_device *device, int data)
 {
 	//logerror("%g outc %.2x\n", attotime_to_double(timer_get_time(machine)), data);
 	pc1401_portc=data;
 }
 
-int pc1401_ina(const device_config *device)
+int pc1401_ina(running_device *device)
 {
 	int data = outa;
 
@@ -92,7 +92,7 @@ int pc1401_ina(const device_config *device)
 	return data;
 }
 
-int pc1401_inb(const device_config *device)
+int pc1401_inb(running_device *device)
 {
 	int data=outb;
 
@@ -102,12 +102,12 @@ int pc1401_inb(const device_config *device)
 	return data;
 }
 
-int pc1401_brk(const device_config *device)
+int pc1401_brk(running_device *device)
 {
 	return (input_port_read(device->machine, "EXTRA") & 0x01);
 }
 
-int pc1401_reset(const device_config *device)
+int pc1401_reset(running_device *device)
 {
 	return (input_port_read(device->machine, "EXTRA") & 0x02);
 }
@@ -115,7 +115,7 @@ int pc1401_reset(const device_config *device)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1401 )
 {
-	const device_config *main_cpu = devtag_get_device(machine, "maincpu");
+	running_device *main_cpu = devtag_get_device(machine, "maincpu");
 	UINT8 *ram = memory_region(machine, "maincpu")+0x2000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 

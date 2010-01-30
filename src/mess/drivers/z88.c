@@ -400,7 +400,7 @@ blink w: 03b6 03
 
 static WRITE8_HANDLER(z88_port_w)
 {
-	const device_config *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = devtag_get_device(space->machine, "speaker");
 	unsigned char port;
 
 	port = offset & 0x0ff;

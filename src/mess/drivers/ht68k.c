@@ -37,28 +37,28 @@ static MACHINE_RESET(ht68k)
 
 	memcpy((UINT8*)ht68k_ram,user1,0x8000);
 
-	device_reset(devtag_get_device(machine, "maincpu"));
+	devtag_get_device(machine, "maincpu")->reset();
 }
 
-static void duart_irq_handler(const device_config *device, UINT8 vector)
+static void duart_irq_handler(running_device *device, UINT8 vector)
 {
 	cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_3, HOLD_LINE, M68K_INT_ACK_AUTOVECTOR);
 }
 
-static void duart_tx(const device_config *device, int channel, UINT8 data)
+static void duart_tx(running_device *device, int channel, UINT8 data)
 {
-	const device_config	*devconf = devtag_get_device(device->machine, "terminal");
+	running_device *devconf = devtag_get_device(device->machine, "terminal");
 	terminal_write(devconf,0,data);
 }
 
-static UINT8 duart_input(const device_config *device)
+static UINT8 duart_input(running_device *device)
 {
 	return 0;
 }
 
-static void duart_output(const device_config *device, UINT8 data)
+static void duart_output(running_device *device, UINT8 data)
 {
-	const device_config *fdc = devtag_get_device(device->machine, "wd1770");
+	running_device *fdc = devtag_get_device(device->machine, "wd1770");
 	wd17xx_set_side(fdc,BIT(data,3) ? 0 : 1);
 	if (BIT(data,7)==0) {
  		wd17xx_set_drive(fdc,0);

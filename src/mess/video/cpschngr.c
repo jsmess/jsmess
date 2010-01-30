@@ -808,7 +808,7 @@ static void cps1_render_sprites(running_machine *machine, bitmap_t *bitmap, cons
 }
 
 
-static void cps1_render_stars(const device_config *screen, bitmap_t *bitmap,const rectangle *cliprect)
+static void cps1_render_stars(running_device *screen, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 	UINT8 *stars_rom = memory_region(screen->machine, "stars");

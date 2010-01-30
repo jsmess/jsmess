@@ -119,7 +119,7 @@ static int input_item_from_serial_number(running_machine *machine, int serial_nu
 	const input_setting_config *this_setting = NULL;
 
 	i = 0;
-	for (this_port = machine->portlist.head; (i != serial_number) && (this_port != NULL); this_port = this_port->next)
+	for (this_port = machine->portlist.first(); (i != serial_number) && (this_port != NULL); this_port = this_port->next)
 	{
 		i++;
 		for (this_field = this_port->fieldlist; (i != serial_number) && (this_field != NULL); this_field = this_field->next)
@@ -161,7 +161,7 @@ static int serial_number_from_input_item(running_machine *machine, const input_p
 	const input_setting_config *this_setting;
 
 	i = 0;
-	for (this_port = machine->portlist.head; this_port != NULL; this_port = this_port->next)
+	for (this_port = machine->portlist.first(); this_port != NULL; this_port = this_port->next)
 	{
 		if ((port == this_port) && (field == NULL) && (setting == NULL))
 			return i;
@@ -226,7 +226,7 @@ static void customize_input(running_machine *machine, HWND wnd, const char *titl
 		win_dialog_add_separator(dlg);
 	}
 
-	for (port = machine->portlist.head; port != NULL; port = port->next)
+	for (port = machine->portlist.first(); port != NULL; port = port->next)
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -380,7 +380,7 @@ static void customize_switches(running_machine *machine, HWND wnd, int title_str
 	if (!dlg)
 		goto done;
 
-	for (port = machine->portlist.head; port != NULL; port = port->next)
+	for (port = machine->portlist.first(); port != NULL; port = port->next)
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -520,7 +520,7 @@ static void customize_analogcontrols(running_machine *machine, HWND wnd)
 	if (!dlg)
 		goto done;
 
-	for (port = machine->portlist.head; port != NULL; port = port->next)
+	for (port = machine->portlist.first(); port != NULL; port = port->next)
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -647,7 +647,7 @@ static void state_save(running_machine *machine)
 
 struct file_dialog_params
 {
-	const device_config *dev;
+	running_device *dev;
 	int *create_format;
 	option_resolution **create_args;
 };
@@ -656,7 +656,7 @@ static void format_combo_changed(dialog_box *dialog, HWND dlgwnd, NMHDR *notific
 {
 	HWND wnd;
 	int format_combo_val;
-	const device_config *dev;
+	running_device *dev;
 	const option_guide *guide;
 	const char *optspec;
 	struct file_dialog_params *params;
@@ -728,7 +728,7 @@ static void storeval_option_resolution(void *storeval_param, int val)
 {
 	option_resolution *resolution;
 	struct storeval_optres_params *params;
-	const device_config *dev;
+	running_device *dev;
 	char buf[16];
 
 	params = (struct storeval_optres_params *) storeval_param;
@@ -757,7 +757,7 @@ static void storeval_option_resolution(void *storeval_param, int val)
 //  build_option_dialog
 //============================================================
 
-static dialog_box *build_option_dialog(const device_config *dev, char *filter, size_t filter_len, int *create_format, option_resolution **create_args)
+static dialog_box *build_option_dialog(running_device *dev, char *filter, size_t filter_len, int *create_format, option_resolution **create_args)
 {
 	dialog_box *dialog;
 	const option_guide *guide_entry;
@@ -908,14 +908,14 @@ static int add_filter_entry(char *dest, size_t dest_len, const char *description
 //  build_generic_filter
 //============================================================
 
-static void build_generic_filter(const device_config *device, int is_save, char *filter, size_t filter_len)
+static void build_generic_filter(running_device *device, int is_save, char *filter, size_t filter_len)
 {
 	char *s;
 
 	const char *file_extension;
 
 	/* copy the string */
-	file_extension = device_get_info_string(device, DEVINFO_STR_IMAGE_FILE_EXTENSIONS);
+	file_extension = device->get_config_string(DEVINFO_STR_IMAGE_FILE_EXTENSIONS);
 
 	// start writing the filter
 	s = filter;
@@ -939,7 +939,7 @@ static void build_generic_filter(const device_config *device, int is_save, char 
 //  change_device
 //============================================================
 
-static void change_device(HWND wnd, const device_config *device, int is_save)
+static void change_device(HWND wnd, running_device *device, int is_save)
 {
 	dialog_box *dialog = NULL;
 	char filter[2048];
@@ -1196,7 +1196,7 @@ static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
 	int child_count = 0;
 
 	use_input_categories = 0;
-	for (port = machine->portlist.head; port != NULL; port = port->next)
+	for (port = machine->portlist.first(); port != NULL; port = port->next)
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -1215,7 +1215,7 @@ static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
 	if (use_input_categories)
 	{
 		// using input categories
-		for (port = machine->portlist.head; port != NULL; port = port->next)
+		for (port = machine->portlist.first(); port != NULL; port = port->next)
 		{
 			for (field = port->fieldlist; field != NULL; field = field->next)
 			{
@@ -1314,7 +1314,7 @@ static void prepare_menus(HWND wnd)
 	UINT flags;
 	UINT flags_for_exists;
 	UINT flags_for_writing;
-	const device_config *img;
+	running_device *img;
 	int has_config, has_dipswitch, has_keyboard, has_analog, has_misc;
 	const input_port_config *port;
 	const input_field_config *field;
@@ -1351,7 +1351,7 @@ static void prepare_menus(HWND wnd)
 	has_misc		= input_has_input_class(window->machine, INPUT_CLASS_MISC);
 
 	has_analog = 0;
-	for (port = window->machine->portlist.head; port != NULL; port = port->next)
+	for (port = window->machine->portlist.first(); port != NULL; port = port->next)
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -1406,7 +1406,7 @@ static void prepare_menus(HWND wnd)
 	// if we are using categorized input, we need to properly checkmark the categories
 	if (use_input_categories)
 	{
-		for (port = window->machine->portlist.head; port != NULL; port = port->next)
+		for (port = window->machine->portlist.first(); port != NULL; port = port->next)
 		{
 			for (field = port->fieldlist; field != NULL; field = field->next)
 			{
@@ -1448,44 +1448,47 @@ static void prepare_menus(HWND wnd)
 	remove_menu_items(device_menu);
 
 	// then set up the actual devices
-	for (img = image_device_first(window->machine->config); img != NULL; img = image_device_next(img))
+	for ( img = window->machine->devicelist.first();  img != NULL;  img =  img->next)
 	{
-		image_device_info info = image_device_getinfo(window->machine->config, img);
-
-		new_item = ID_DEVICE_0 + (image_absolute_index(img) * DEVOPTION_MAX);
-		flags_for_exists = MF_STRING;
-
-		if (!image_exists(img))
-			flags_for_exists |= MF_GRAYED;
-
-		flags_for_writing = flags_for_exists;
-		if (!image_is_writable(img))
-			flags_for_writing |= MF_GRAYED;
-
-		sub_menu = CreateMenu();
-		append_menu_uistring(sub_menu, MF_STRING,		new_item + DEVOPTION_OPEN,		UI_mount);
-
-		if (info.creatable)
-			append_menu_uistring(sub_menu, MF_STRING,	new_item + DEVOPTION_CREATE,	UI_create);
-
-		append_menu_uistring(sub_menu, flags_for_exists,	new_item + DEVOPTION_CLOSE,	UI_unmount);
-
-		if ((img->type == CASSETTE) && !strcmp(info.file_extensions, "wav"))
+		if (is_image_device( img))
 		{
-			cassette_state state;
-			state = (cassette_state)(image_exists(img) ? (cassette_get_state(img) & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED);
-			append_menu_uistring(sub_menu, MF_SEPARATOR, 0, -1);
-			append_menu_uistring(sub_menu, flags_for_exists	| ((state == CASSETTE_STOPPED)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_STOPPAUSE,	UI_pauseorstop);
-			append_menu_uistring(sub_menu, flags_for_exists	| ((state == CASSETTE_PLAY)		? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_PLAY,			UI_play);
-			append_menu_uistring(sub_menu, flags_for_writing	| ((state == CASSETTE_RECORD)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_RECORD,		UI_record);
-			append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_REWIND,		UI_rewind);
-			append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_FASTFORWARD,	UI_fastforward);
-		}
-		s = image_exists(img) ? image_filename(img) : ui_getstring(UI_emptyslot);
-		flags = MF_POPUP;
+			image_device_info info = image_device_getinfo(window->machine->config, img);
 
-		snprintf(buf, ARRAY_LENGTH(buf), "%s: %s", image_typename_id(img), s);
-		append_menu_utf8(device_menu, flags, (UINT_PTR) sub_menu, buf);
+			new_item = ID_DEVICE_0 + (image_absolute_index(img) * DEVOPTION_MAX);
+			flags_for_exists = MF_STRING;
+
+			if (!image_exists(img))
+				flags_for_exists |= MF_GRAYED;
+
+			flags_for_writing = flags_for_exists;
+			if (!image_is_writable(img))
+				flags_for_writing |= MF_GRAYED;
+
+			sub_menu = CreateMenu();
+			append_menu_uistring(sub_menu, MF_STRING,		new_item + DEVOPTION_OPEN,		UI_mount);
+
+			if (info.creatable)
+				append_menu_uistring(sub_menu, MF_STRING,	new_item + DEVOPTION_CREATE,	UI_create);
+
+			append_menu_uistring(sub_menu, flags_for_exists,	new_item + DEVOPTION_CLOSE,	UI_unmount);
+
+			if ((img->type == CASSETTE) && !strcmp(info.file_extensions, "wav"))
+			{
+				cassette_state state;
+				state = (cassette_state)(image_exists(img) ? (cassette_get_state(img) & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED);
+				append_menu_uistring(sub_menu, MF_SEPARATOR, 0, -1);
+				append_menu_uistring(sub_menu, flags_for_exists	| ((state == CASSETTE_STOPPED)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_STOPPAUSE,	UI_pauseorstop);
+				append_menu_uistring(sub_menu, flags_for_exists	| ((state == CASSETTE_PLAY)		? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_PLAY,			UI_play);
+				append_menu_uistring(sub_menu, flags_for_writing	| ((state == CASSETTE_RECORD)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_RECORD,		UI_record);
+				append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_REWIND,		UI_rewind);
+				append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_FASTFORWARD,	UI_fastforward);
+			}
+			s = image_exists(img) ? image_filename(img) : ui_getstring(UI_emptyslot);
+			flags = MF_POPUP;
+
+			snprintf(buf, ARRAY_LENGTH(buf), "%s: %s", image_typename_id(img), s);
+			append_menu_utf8(device_menu, flags, (UINT_PTR) sub_menu, buf);
+		}
 	}
 }
 
@@ -1569,7 +1572,7 @@ void win_toggle_menubar(void)
 //  device_command
 //============================================================
 
-static void device_command(HWND wnd, const device_config *img, int devoption)
+static void device_command(HWND wnd, running_device *img, int devoption)
 {
 	switch(devoption)
 	{
@@ -1682,7 +1685,7 @@ static void help_about_thissystem(running_machine *machine, HWND wnd)
 //  decode_deviceoption
 //============================================================
 
-static const device_config *decode_deviceoption(running_machine *machine, int command, int *devoption)
+static running_device *decode_deviceoption(running_machine *machine, int command, int *devoption)
 {
 	int absolute_index;
 
@@ -1737,7 +1740,7 @@ static int invoke_command(HWND wnd, UINT command)
 {
 	int handled = 1;
 	int dev_command;
-	const device_config *img;
+	running_device *img;
 	UINT16 category;
 	const char *section;
 	const input_field_config *field;

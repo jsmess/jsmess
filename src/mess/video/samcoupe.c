@@ -13,7 +13,7 @@
 #include "includes/samcoupe.h"
 
 
-static void draw_mode4_line(const device_config *screen, bitmap_t *bitmap, int y)
+static void draw_mode4_line(running_device *screen, bitmap_t *bitmap, int y)
 {
 	coupe_asic *asic = (coupe_asic *)screen->machine->driver_data;
 	int x;
@@ -56,7 +56,7 @@ static void draw_mode4_line(const device_config *screen, bitmap_t *bitmap, int y
 	}
 }
 
-static void draw_mode3_line(const device_config *screen, bitmap_t *bitmap, int y)
+static void draw_mode3_line(running_device *screen, bitmap_t *bitmap, int y)
 {
 	coupe_asic *asic = (coupe_asic *)screen->machine->driver_data;
 	int x;
@@ -99,7 +99,7 @@ static void draw_mode3_line(const device_config *screen, bitmap_t *bitmap, int y
 	}
 }
 
-static void draw_mode2_line(const device_config *screen, bitmap_t *bitmap, int y)
+static void draw_mode2_line(running_device *screen, bitmap_t *bitmap, int y)
 {
 	coupe_asic *asic = (coupe_asic *)screen->machine->driver_data;
 	int b, scrx = 0;
@@ -126,7 +126,7 @@ static void draw_mode2_line(const device_config *screen, bitmap_t *bitmap, int y
 	}
 }
 
-static void draw_mode1_line(const device_config *screen, bitmap_t *bitmap, int y)
+static void draw_mode1_line(running_device *screen, bitmap_t *bitmap, int y)
 {
 	coupe_asic *asic = (coupe_asic *)screen->machine->driver_data;
 	int block, x = 0;

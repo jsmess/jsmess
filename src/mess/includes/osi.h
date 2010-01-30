@@ -27,7 +27,7 @@ struct _osi_state
 	int fdc_index;
 
 	/* devices */
-	const device_config *cassette;
+	running_device *cassette;
 };
 
 /* ---------- defined in video/osi.c ---------- */

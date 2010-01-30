@@ -32,10 +32,10 @@ enum
 #define QUICKLOAD	DEVICE_GET_INFO_NAME(quickload)
 
 #define SNAPSHOT_LOAD_NAME(name)	snapshot_load_##name
-#define SNAPSHOT_LOAD(name)			int SNAPSHOT_LOAD_NAME(name)(const device_config *image, const char *file_type, int snapshot_size)
+#define SNAPSHOT_LOAD(name)			int SNAPSHOT_LOAD_NAME(name)(running_device *image, const char *file_type, int snapshot_size)
 
 #define QUICKLOAD_LOAD_NAME(name)	quickload_load_##name
-#define QUICKLOAD_LOAD(name)		int QUICKLOAD_LOAD_NAME(name)(const device_config *image, const char *file_type, int quickload_size)
+#define QUICKLOAD_LOAD(name)		int QUICKLOAD_LOAD_NAME(name)(running_device *image, const char *file_type, int quickload_size)
 
 
 
@@ -43,7 +43,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef int (*snapquick_load_func)(const device_config *device, const char *file_type, int file_size);
+typedef int (*snapquick_load_func)(running_device *device, const char *file_type, int file_size);
 
 typedef struct _snapquick_config snapquick_config;
 struct _snapquick_config

@@ -21,8 +21,8 @@ struct _tmc2000e_state
 	int reset;				/* reset activated */
 
 	/* devices */
-	const device_config *cdp1864;
-	const device_config *cassette;
+	running_device *cdp1864;
+	running_device *cassette;
 };
 
 #endif

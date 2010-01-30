@@ -15,8 +15,8 @@ struct _exp85_state
 	int tape_control;
 
 	/* devices */
-	const device_config *cassette;
-	const device_config *speaker;
+	running_device *cassette;
+	running_device *speaker;
 };
 
 #endif

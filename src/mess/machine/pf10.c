@@ -29,7 +29,7 @@ struct _pf10_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE pf10_state *get_safe_token(const device_config *device)
+INLINE pf10_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);

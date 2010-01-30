@@ -24,7 +24,7 @@ struct _beta_state
 	emu_timer *led_refresh_timer;
 
 	/* devices */
-	const device_config *speaker;
+	running_device *speaker;
 };
 
 #endif

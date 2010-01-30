@@ -89,7 +89,7 @@ struct _rp5c01a_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE rp5c01a_t *get_safe_token(const device_config *device)
+INLINE rp5c01a_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -97,11 +97,11 @@ INLINE rp5c01a_t *get_safe_token(const device_config *device)
 	return (rp5c01a_t *)device->token;
 }
 
-INLINE const rp5c01a_interface *get_interface(const device_config *device)
+INLINE const rp5c01a_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == RP5C01A));
-	return (const rp5c01a_interface *) device->static_config;
+	return (const rp5c01a_interface *) device->baseconfig().static_config;
 }
 
 /***************************************************************************
@@ -306,7 +306,7 @@ static void advance_seconds(rp5c01a_t *rp5c01a)
 
 static TIMER_CALLBACK( clock_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	rp5c01a_t *rp5c01a = get_safe_token(device);
 
 	advance_seconds(rp5c01a);
@@ -318,7 +318,7 @@ static TIMER_CALLBACK( clock_tick )
 
 static TIMER_CALLBACK( alarm_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	rp5c01a_t *rp5c01a = get_safe_token(device);
 
 	devcb_call_write_line(&rp5c01a->out_alarm_func, 0);

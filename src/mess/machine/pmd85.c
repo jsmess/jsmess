@@ -906,7 +906,7 @@ DRIVER_INIT ( c2717 )
 
 static TIMER_CALLBACK( setup_machine_state )
 {
-	const device_config *pit8253 = devtag_get_device(machine, "pit8253");
+	running_device *pit8253 = devtag_get_device(machine, "pit8253");
 
 	pit8253_gate_w(pit8253, 0, 1);
 	pit8253_gate_w(pit8253, 1, 1);

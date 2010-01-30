@@ -67,65 +67,65 @@ typedef struct chrn_id
 #define FLOPPY_DRIVE_INDEX						0x0020
 
 /* a callback which will be executed if the ready state of the drive changes e.g. not ready->ready, ready->not ready */
-void floppy_drive_set_ready_state_change_callback(const device_config *img, void (*callback)(const device_config *controller,const device_config *img, int state));
+void floppy_drive_set_ready_state_change_callback(running_device *img, void (*callback)(running_device *controller,running_device *img, int state));
 
-void floppy_drive_set_index_pulse_callback(const device_config *img, void (*callback)(const device_config *controller,const device_config *image, int state));
+void floppy_drive_set_index_pulse_callback(running_device *img, void (*callback)(running_device *controller,running_device *image, int state));
 
 /* set flag state */
-int floppy_drive_get_flag_state(const device_config *img, int flag);
+int floppy_drive_get_flag_state(running_device *img, int flag);
 /* get flag state */
-void floppy_drive_set_flag_state(const device_config *img, int flag, int state);
+void floppy_drive_set_flag_state(running_device *img, int flag, int state);
 /* get current physical track drive is on */
-int floppy_drive_get_current_track(const device_config *img);
+int floppy_drive_get_current_track(running_device *img);
 
 /* get next id from track, 1 if got a id, 0 if no id was got */
-int floppy_drive_get_next_id(const device_config *img, int side, chrn_id *);
+int floppy_drive_get_next_id(running_device *img, int side, chrn_id *);
 /* set ready state of drive. If flag == 1, set ready state only if drive present,
 disk is in drive, and motor is on. Otherwise set ready state to the state passed */
-void floppy_drive_set_ready_state(const device_config *img, int state, int flag);
+void floppy_drive_set_ready_state(running_device *img, int state, int flag);
 
 /* seek up or down */
-void floppy_drive_seek(const device_config *img, signed int signed_tracks);
+void floppy_drive_seek(running_device *img, signed int signed_tracks);
 
-void floppy_drive_read_track_data_info_buffer(const device_config *img, int side, void *ptr, int *length );
-void floppy_drive_write_track_data_info_buffer(const device_config *img, int side, const void *ptr, int *length );
-void floppy_drive_format_sector(const device_config *img, int side, int sector_index, int c, int h, int r, int n, int filler);
-void floppy_drive_read_sector_data(const device_config *img, int side, int index1, void *pBuffer, int length);
-void floppy_drive_write_sector_data(const device_config *img, int side, int index1, const void *pBuffer, int length, int ddam);
+void floppy_drive_read_track_data_info_buffer(running_device *img, int side, void *ptr, int *length );
+void floppy_drive_write_track_data_info_buffer(running_device *img, int side, const void *ptr, int *length );
+void floppy_drive_format_sector(running_device *img, int side, int sector_index, int c, int h, int r, int n, int filler);
+void floppy_drive_read_sector_data(running_device *img, int side, int index1, void *pBuffer, int length);
+void floppy_drive_write_sector_data(running_device *img, int side, int index1, const void *pBuffer, int length, int ddam);
 
 /* set motor speed to get correct index pulses
    standard RPM are 300 RPM (common) and 360 RPM
    Note: this actually only works for soft sectored disks: one index pulse per
    track.
 */
-void floppy_drive_set_rpm(const device_config *image, float rpm);
+void floppy_drive_set_rpm(running_device *image, float rpm);
 
-void floppy_drive_set_controller(const device_config *img, const device_config *controller);
+void floppy_drive_set_controller(running_device *img, running_device *controller);
 
-floppy_image *flopimg_get_image(const device_config *image);
+floppy_image *flopimg_get_image(running_device *image);
 
 /* hack for apple II; replace this when we think of something better */
-void floppy_install_unload_proc(const device_config *image, void (*proc)(const device_config *image));
+void floppy_install_unload_proc(running_device *image, void (*proc)(running_device *image));
 
-void floppy_install_load_proc(const device_config *image, void (*proc)(const device_config *image));
+void floppy_install_load_proc(running_device *image, void (*proc)(running_device *image));
 
 /* hack for TI99; replace this when we think of something better */
-void floppy_install_tracktranslate_proc(const device_config *image, int (*proc)(const device_config *image, floppy_image *floppy, int physical_track));
+void floppy_install_tracktranslate_proc(running_device *image, int (*proc)(running_device *image, floppy_image *floppy, int physical_track));
 
-const device_config *floppy_get_device(running_machine *machine,int drive);
-const device_config *floppy_get_device_owner(const device_config *device,int drive);
-const device_config *floppy_get_device_by_type(running_machine *machine,int ftype,int drive);
-int floppy_get_drive_type(const device_config *image);
-void floppy_set_type(const device_config *image,int ftype);
+running_device *floppy_get_device(running_machine *machine,int drive);
+running_device *floppy_get_device_owner(running_device *device,int drive);
+running_device *floppy_get_device_by_type(running_machine *machine,int ftype,int drive);
+int floppy_get_drive_type(running_device *image);
+void floppy_set_type(running_device *image,int ftype);
 int floppy_get_count(running_machine *machine);
 
-int floppy_get_drive(const device_config *image);
-int floppy_get_drive_by_type(const device_config *image,int ftype);
+int floppy_get_drive(running_device *image);
+int floppy_get_drive_by_type(running_device *image,int ftype);
 
-void *flopimg_get_custom_data(const device_config *image);
-void flopimg_alloc_custom_data(const device_config *image,void *custom);
+void *flopimg_get_custom_data(running_device *image);
+void flopimg_alloc_custom_data(running_device *image,void *custom);
 
-void floppy_drive_set_geometry(const device_config *img, floppy_type_t type);
+void floppy_drive_set_geometry(running_device *img, floppy_type_t type);
 
 /* drive select lines */
 WRITE_LINE_DEVICE_HANDLER( floppy_ds0_w );

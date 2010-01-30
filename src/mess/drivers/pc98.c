@@ -925,7 +925,7 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 	memory_write_byte(space, page_offset + offset, data);
 }
 
-static void set_dma_channel(const device_config *device, int channel, int state)
+static void set_dma_channel(running_device *device, int channel, int state)
 {
 	if (!state) dma_channel = channel;
 }

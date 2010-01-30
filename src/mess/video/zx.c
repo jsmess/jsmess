@@ -45,7 +45,7 @@ static int offs1 = 0;
  */
 void zx_ula_bkgnd(running_machine *machine, int color)
 {
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 	const rectangle *visarea = video_screen_get_visible_area(screen);
@@ -104,7 +104,7 @@ static TIMER_CALLBACK(zx_ula_nmi)
      * An NMI is issued on the ZX81 every 64us for the blanked
      * scanlines at the top and bottom of the display.
      */
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 	int height = video_screen_get_height(screen);
 	rectangle r = *video_screen_get_visible_area(screen);
 	bitmap_t *bitmap = machine->generic.tmpbitmap;
@@ -136,7 +136,7 @@ static TIMER_CALLBACK(zx_ula_irq)
 
 void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT8 param)
 {
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 	int offs0 = offs & 0x7fff;
 	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 chr = rom[offs0];

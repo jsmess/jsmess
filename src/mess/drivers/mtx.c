@@ -222,7 +222,7 @@ static const z80_daisy_chain mtx_daisy_chain[] =
 
 static TIMER_DEVICE_CALLBACK( ctc_c0_tick )
 {
-	const device_config *z80ctc = devtag_get_device(timer->machine, "z80ctc");
+	running_device *z80ctc = devtag_get_device(timer->machine, "z80ctc");
 
 	z80ctc_trg0_w(z80ctc, 1);
 	z80ctc_trg0_w(z80ctc, 0);
@@ -230,7 +230,7 @@ static TIMER_DEVICE_CALLBACK( ctc_c0_tick )
 
 static TIMER_DEVICE_CALLBACK( ctc_c1_c2_tick )
 {
-	const device_config *z80ctc = devtag_get_device(timer->machine, "z80ctc");
+	running_device *z80ctc = devtag_get_device(timer->machine, "z80ctc");
 
 	z80ctc_trg1_w(z80ctc, 1);
 	z80ctc_trg1_w(z80ctc, 0);

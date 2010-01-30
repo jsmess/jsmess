@@ -11,17 +11,17 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*tms9902_int_callback_func)(const device_config *device, int INT);
-#define TMS9902_INT_CALLBACK(name)	void name(const device_config *device, int INT )
+typedef void (*tms9902_int_callback_func)(running_device *device, int INT);
+#define TMS9902_INT_CALLBACK(name)	void name(running_device *device, int INT )
 
-typedef void (*tms9902_rst_callback_func)(const device_config *device, int RTS);
-#define TMS9902_RST_CALLBACK(name)	void name(const device_config *device, int RTS )
+typedef void (*tms9902_rst_callback_func)(running_device *device, int RTS);
+#define TMS9902_RST_CALLBACK(name)	void name(running_device *device, int RTS )
 
-typedef void (*tms9902_brk_callback_func)(const device_config *device, int RTS);
-#define TMS9902_BRK_CALLBACK(name)	void name(const device_config *device, int BRK )
+typedef void (*tms9902_brk_callback_func)(running_device *device, int RTS);
+#define TMS9902_BRK_CALLBACK(name)	void name(running_device *device, int BRK )
 
-typedef void (*tms9902_xmit_callback_func)(const device_config *device, int data);
-#define TMS9902_XMIT_CALLBACK(name)	void name(const device_config *device, int data )
+typedef void (*tms9902_xmit_callback_func)(running_device *device, int data);
+#define TMS9902_XMIT_CALLBACK(name)	void name(running_device *device, int data )
 
 
 typedef struct _tms9902_interface tms9902_interface;
@@ -39,10 +39,10 @@ struct _tms9902_interface
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void tms9902_set_cts(const device_config *device, int state);
-void tms9902_set_dsr(const device_config *device, int state);
+void tms9902_set_cts(running_device *device, int state);
+void tms9902_set_dsr(running_device *device, int state);
 
-void tms9902_push_data(const device_config *device, int data);
+void tms9902_push_data(running_device *device, int data);
 
 DEVICE_GET_INFO(tms9902);
 

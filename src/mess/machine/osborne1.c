@@ -75,9 +75,9 @@ WRITE8_HANDLER( osborne1_1000_w )
 READ8_HANDLER( osborne1_2000_r )
 {
 	UINT8	data = 0xFF;
-	const device_config *fdc = devtag_get_device(space->machine, "mb8877");
-	const device_config *pia_0 = devtag_get_device(space->machine, "pia_0" );
-	const device_config *pia_1 = devtag_get_device(space->machine, "pia_1" );
+	running_device *fdc = devtag_get_device(space->machine, "mb8877");
+	running_device *pia_0 = devtag_get_device(space->machine, "pia_0" );
+	running_device *pia_1 = devtag_get_device(space->machine, "pia_1" );
 
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled )
@@ -125,9 +125,9 @@ READ8_HANDLER( osborne1_2000_r )
 
 WRITE8_HANDLER( osborne1_2000_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "mb8877");
-	const device_config *pia_0 = devtag_get_device(space->machine, "pia_0" );
-	const device_config *pia_1 = devtag_get_device(space->machine, "pia_1" );
+	running_device *fdc = devtag_get_device(space->machine, "mb8877");
+	running_device *pia_0 = devtag_get_device(space->machine, "pia_0" );
+	running_device *pia_1 = devtag_get_device(space->machine, "pia_1" );
 
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled )
@@ -284,7 +284,7 @@ static WRITE8_DEVICE_HANDLER( video_pia_out_cb2_dummy )
 
 static WRITE8_DEVICE_HANDLER( video_pia_port_a_w )
 {
-	const device_config *fdc = devtag_get_device(device->machine, "mb8877");
+	running_device *fdc = devtag_get_device(device->machine, "mb8877");
 
 	osborne1.new_start_x = data >> 1;
 	wd17xx_set_density(fdc, ( data & 0x01 ) ? DEN_FM_LO : DEN_FM_HI );
@@ -295,7 +295,7 @@ static WRITE8_DEVICE_HANDLER( video_pia_port_a_w )
 
 static WRITE8_DEVICE_HANDLER( video_pia_port_b_w )
 {
-	const device_config *fdc = devtag_get_device(device->machine, "mb8877");
+	running_device *fdc = devtag_get_device(device->machine, "mb8877");
 
 	osborne1.new_start_y = data & 0x1F;
 	osborne1.beep = ( data & 0x20 ) ? 1 : 0;
@@ -351,8 +351,8 @@ const pia6821_interface osborne1_video_pia_config =
 static TIMER_CALLBACK(osborne1_video_callback)
 {
 	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const device_config *speaker = devtag_get_device(space->machine, "beep");
-	const device_config *pia_1 = devtag_get_device(space->machine, "pia_1");
+	running_device *speaker = devtag_get_device(space->machine, "beep");
+	running_device *pia_1 = devtag_get_device(space->machine, "pia_1");
 	int y = video_screen_get_vpos(machine->primary_screen);
 
 	/* Check for start of frame */
@@ -416,18 +416,18 @@ static TIMER_CALLBACK(osborne1_video_callback)
 
 static TIMER_CALLBACK( setup_osborne1 )
 {
-	const device_config *speaker = devtag_get_device(machine, "beep");
-	const device_config *pia_1 = devtag_get_device(machine, "pia_1");
+	running_device *speaker = devtag_get_device(machine, "beep");
+	running_device *pia_1 = devtag_get_device(machine, "pia_1");
 
 	beep_set_state( speaker, 0 );
 	beep_set_frequency( speaker, 300 /* 60 * 240 / 2 */ );
 	pia6821_ca1_w( pia_1, 0, 0 );
 }
 
-static void osborne1_load_proc(const device_config *image)
+static void osborne1_load_proc(running_device *image)
 {
 	int size = image_length( image );
-	const device_config *fdc = devtag_get_device(image->machine, "mb8877");
+	running_device *fdc = devtag_get_device(image->machine, "mb8877");
 
 	switch( size )
 	{
@@ -496,13 +496,13 @@ DRIVER_INIT( osborne1 )
 ****************************************************************/
 
 
-static int osborne1_daisy_irq_state(const device_config *device)
+static int osborne1_daisy_irq_state(running_device *device)
 {
     return ( osborne1.pia_1_irq_state ? Z80_DAISY_INT : 0 );
 }
 
 
-static int osborne1_daisy_irq_ack(const device_config *device)
+static int osborne1_daisy_irq_ack(running_device *device)
 {
     /* Enable ROM and I/O when IRQ is acknowledged */
     UINT8	old_bankswitch = osborne1.bankswitch;
@@ -514,7 +514,7 @@ static int osborne1_daisy_irq_ack(const device_config *device)
     return 0xF8;
 }
 
-static void osborne1_daisy_irq_reti(const device_config *device)
+static void osborne1_daisy_irq_reti(running_device *device)
 {
 }
 

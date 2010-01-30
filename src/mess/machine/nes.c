@@ -60,7 +60,7 @@ static void nes_machine_stop(running_machine *machine);
     FUNCTIONS
 ***************************************************************************/
 
-static const device_config *cartslot_image( running_machine *machine )
+static running_device *cartslot_image( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	return state->cart;
@@ -186,7 +186,7 @@ static void init_nes_core( running_machine *machine )
 	memcpy(nes_battery_ram, battery_data, BATTERY_SIZE);
 }
 
-int nes_ppu_vidaccess( const device_config *device, int address, int data )
+int nes_ppu_vidaccess( running_device *device, int address, int data )
 {
 	/* TODO: this is a bit of a hack, needed to get Argus, ASO, etc to work */
 	/* but, B-Wings, submath (j) seem to use this location differently... */
@@ -221,7 +221,7 @@ MACHINE_RESET( nes )
 	in_0.shift = 0;
 	in_1.shift = 0;
 	
-	device_reset(devtag_get_device(machine, "maincpu"));
+	devtag_get_device(machine, "maincpu")->reset();
 }
 
 emu_timer	*nes_irq_timer;
@@ -926,7 +926,7 @@ void nes_partialhash( char *dest, const unsigned char *data, unsigned long lengt
 }
 
 
-static void nes_load_proc(const device_config *image)
+static void nes_load_proc(running_device *image)
 {
 	nes_fds.sides = 0;	
 	
@@ -938,7 +938,7 @@ static void nes_load_proc(const device_config *image)
 	return;
 }
 
-static void nes_unload_proc(const device_config *image)
+static void nes_unload_proc(running_device *image)
 {
 	/* TODO: should write out changes here as well */
 	nes_fds.sides =  0;

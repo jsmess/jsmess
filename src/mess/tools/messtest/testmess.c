@@ -226,7 +226,7 @@ static void dump_screenshot(running_machine *machine, int write_file)
 		if (filerr == FILERR_NONE)
 		{
 			/* choose a screen */
-			const device_config *screen = video_screen_first(machine->config);
+			running_device *screen = video_screen_first(machine);
 			while((screen != NULL) && !render_is_live_screen(screen))
 			{
 				screen = video_screen_next(screen);
@@ -497,7 +497,7 @@ static const input_setting_config *find_switch(running_machine *machine, const c
 
 	/* find switch with the name */
 	found = FALSE;
-	for (port = machine->portlist.head; !found && (port != NULL); port = port->next)
+	for (port = machine->portlist.first(); !found && (port != NULL); port = port->next)
 	{
 		for (field = port->fieldlist; !found && (field != NULL); field = field->next)
 		{
@@ -705,9 +705,9 @@ static void command_image_preload(running_machine *machine)
 
 
 
-static const device_config *find_device_by_identity(running_machine *machine, const messtest_device_identity *ident)
+static running_device *find_device_by_identity(running_machine *machine, const messtest_device_identity *ident)
 {
-	const device_config *device = NULL;
+	running_device *device = NULL;
 
 	/* look up the image slot */
 	if (ident->type == IO_UNKNOWN)
@@ -731,7 +731,7 @@ static const device_config *find_device_by_identity(running_machine *machine, co
 
 static void command_image_loadcreate(running_machine *machine)
 {
-	const device_config *image;
+	running_device *image;
 	const char *filename;
 	const char *format_name;
 	char buf[128];
@@ -883,7 +883,7 @@ static void command_verify_image(running_machine *machine)
 	size_t verify_data_size;
 	size_t offset, offset_start, offset_end;
 	const char *filename;
-	const device_config *image;
+	running_device *image;
 	FILE *f;
 	UINT8 c;
 	char filename_buf[512];
@@ -941,14 +941,14 @@ static void command_verify_image(running_machine *machine)
 
 static void command_trace(running_machine *machine)
 {
-	const device_config *cpu;
+	running_device *cpu;
 	int cpunum = 0;
 	FILE *file;
 	char filename[256];
 
-	for (cpu = cpu_first(machine->config); cpu != NULL; cpu = cpu_next(cpu))
+	for (cpu = cpu_first(machine); cpu != NULL; cpu = cpu_next(cpu))
 	{
-		if (cpu_next(cpu_first(machine->config)) == NULL)
+		if (cpu_next(cpu_first(machine)) == NULL)
 			snprintf(filename, ARRAY_LENGTH(filename), "_%s.tr", current_testcase.name);
 		else
 			snprintf(filename, ARRAY_LENGTH(filename), "_%s.%d.tr", current_testcase.name, cpunum);

@@ -69,7 +69,7 @@ static IRQ_CALLBACK ( galaxy_irq_callback )
 
 static void galaxy_setup_snapshot (running_machine *machine, const UINT8 * data, UINT32 size)
 {
-	const device_config *cpu = devtag_get_device(machine, "maincpu");
+	running_device *cpu = devtag_get_device(machine, "maincpu");
 
 	switch (size)
 	{

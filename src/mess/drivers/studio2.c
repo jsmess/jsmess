@@ -406,7 +406,7 @@ static CDP1802_EF_READ( studio2_ef_r )
 
 static WRITE_LINE_DEVICE_HANDLER( studio2_q_w )
 {
-	const device_config *speaker = devtag_get_device(device->machine, "beep");
+	running_device *speaker = devtag_get_device(device->machine, "beep");
 	beep_set_state(speaker, state);
 }
 
@@ -486,7 +486,7 @@ static MACHINE_RESET( studio2 )
 	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
 
 	/* reset CDP1861 */
-	device_reset(state->cdp1861);
+	state->cdp1861->reset();
 }
 
 static MACHINE_START( mpt02 )
@@ -511,7 +511,7 @@ static MACHINE_RESET( mpt02 )
 	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
 
 	/* reset CDP1864 */
-	device_reset(state->cdp1864);
+	state->cdp1864->reset();
 }
 
 static DEVICE_IMAGE_LOAD( studio2_cart )
@@ -681,7 +681,7 @@ ROM_END
 
 static TIMER_CALLBACK( setup_beep )
 {
-	const device_config *speaker = devtag_get_device(machine, "beep");
+	running_device *speaker = devtag_get_device(machine, "beep");
 	beep_set_state(speaker, 0);
 	beep_set_frequency(speaker, 300);
 }

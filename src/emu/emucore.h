@@ -21,6 +21,12 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+// some cleanups for Solaris for things defined in stdlib.h
+#ifdef SDLMAME_SOLARIS
+#undef si_status
+#undef WWORD
+#endif
+
 // standard C++ includes
 #include <exception>
 
@@ -30,6 +36,7 @@
 #include "corestr.h"
 #include "astring.h"
 #include "bitmap.h"
+#include "tagmap.h"
 
 
 
@@ -90,7 +97,7 @@ union generic_ptr
 
 
 // PAIR is an endian-safe union useful for representing 32-bit CPU registers
-typedef union
+union PAIR
 {
 #ifdef LSB_FIRST
 	struct { UINT8 l,h,h2,h3; } b;
@@ -105,11 +112,11 @@ typedef union
 #endif
 	UINT32 d;
 	INT32 sd;
-} PAIR;
+};
 
 
 // PAIR64 is a 64-bit extension of a PAIR
-typedef union
+union PAIR64
 {
 #ifdef LSB_FIRST
 	struct { UINT8 l,h,h2,h3,h4,h5,h6,h7; } b;
@@ -128,7 +135,7 @@ typedef union
 #endif
 	UINT64 q;
 	INT64 sq;
-} PAIR64;
+};
 
 
 
@@ -137,15 +144,18 @@ typedef union
 ***************************************************************************/
 
 // constants for expression endianness
-#define ENDIANNESS_LITTLE				0
-#define ENDIANNESS_BIG					1
+enum endianness_t
+{
+	ENDIANNESS_LITTLE,
+	ENDIANNESS_BIG
+};
 
 
 // declare native endianness to be one or the other
 #ifdef LSB_FIRST
-#define ENDIANNESS_NATIVE				ENDIANNESS_LITTLE
+const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_LITTLE;
 #else
-#define ENDIANNESS_NATIVE				ENDIANNESS_BIG
+const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_BIG;
 #endif
 
 
@@ -172,7 +182,7 @@ typedef union
     COMMON MACROS
 ***************************************************************************/
 
-// more for defining a copy constructor and assignment operator to prevent copying
+// macro for defining a copy constructor and assignment operator to prevent copying
 #define DISABLE_COPYING(_Type) \
 private: \
 	_Type(const _Type &); \
@@ -301,6 +311,114 @@ public:
 private:
 	char text[1024];
 	int code;
+};
+
+
+
+/***************************************************************************
+    COMMON TEMPLATES
+***************************************************************************/
+
+template<class T> class tagged_list
+{
+	DISABLE_COPYING(tagged_list);
+
+	T *head;
+	T **tailptr;
+	tagmap_t<T *> map;
+
+public:
+	tagged_list() :
+		head(NULL),
+		tailptr(&head) { }
+
+	virtual ~tagged_list()
+	{
+		while (head != NULL)
+			remove(head);
+	}
+
+	T *first() const { return head; }
+
+	int count() const
+	{
+		int num = 0;
+		for (T *cur = head; cur != NULL; cur = cur->next)
+			num++;
+		return num;
+	}
+
+	int index(T *object) const
+	{
+		int num = 0;
+		for (T *cur = head; cur != NULL; cur = cur->next)
+			if (cur == object)
+				return num;
+			else
+				num++;
+		return -1;
+	}
+
+	int index(const char *tag) const
+	{
+		T *object = find(tag);
+		return (object != NULL) ? index(object) : -1;
+	}
+
+	T *prepend(const char *tag, T *object, bool replace_if_duplicate = false)
+	{
+		if (map.add_unique_hash(tag, object, replace_if_duplicate) != TMERR_NONE)
+			throw emu_fatalerror("Error adding object named '%s'", tag);
+		object->next = head;
+		head = object;
+		if (tailptr == &head)
+			tailptr = &object->next;
+		return object;
+	}
+
+	T *append(const char *tag, T *object, bool replace_if_duplicate = false)
+	{
+		if (map.add_unique_hash(tag, object, replace_if_duplicate) != TMERR_NONE)
+			throw emu_fatalerror("Error adding object named '%s'", tag);
+		*tailptr = object;
+		object->next = NULL;
+		tailptr = &object->next;
+		return object;
+	}
+
+	void remove(T *object)
+	{
+		for (T **objectptr = &head; *objectptr != NULL; objectptr = &(*objectptr)->next)
+			if (*objectptr == object)
+			{
+				*objectptr = object->next;
+				if (tailptr == &object->next)
+					tailptr = objectptr;
+				map.remove(object);
+				global_free(object);
+				return;
+			}
+	}
+
+	void remove(const char *tag)
+	{
+		T *object = find(tag);
+		if (object != NULL)
+			remove(object);
+	}
+
+	T *find(const char *tag) const
+	{
+		return map.find_hash_only(tag);
+	}
+
+	T *find(int index) const
+	{
+		for (T *cur = head; cur != NULL; cur = cur->next)
+			if (index-- == 0)
+				return cur;
+		return NULL;
+	}
 };
 
 

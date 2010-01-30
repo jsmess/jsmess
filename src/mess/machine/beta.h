@@ -11,10 +11,10 @@
 #define __BETA_H__
 
 
-int betadisk_is_active(const device_config *device);
-void betadisk_enable(const device_config *device);
-void betadisk_disable(const device_config *device);
-void betadisk_clear_status(const device_config *device);
+int betadisk_is_active(running_device *device);
+void betadisk_enable(running_device *device);
+void betadisk_disable(running_device *device);
+void betadisk_clear_status(running_device *device);
 
 #define BETA_DISK_TAG	"beta"
 

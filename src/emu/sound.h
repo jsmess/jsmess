@@ -34,15 +34,15 @@
 
 /* these functions are macros primarily due to include file ordering */
 /* plus, they are very simple */
-#define sound_count(config)					device_list_items(&(config)->devicelist, SOUND)
-#define sound_first(config)					device_list_first(&(config)->devicelist, SOUND)
-#define sound_next(previous)				((previous)->typenext)
+#define sound_count(config)					(config)->devicelist.count(SOUND)
+#define sound_first(config)					(config)->devicelist.first(SOUND)
+#define sound_next(previous)				(previous)->typenext()
 
 /* these functions are macros primarily due to include file ordering */
 /* plus, they are very simple */
-#define speaker_output_count(config)		device_list_items(&(config)->devicelist, SPEAKER_OUTPUT)
-#define speaker_output_first(config)		device_list_first(&(config)->devicelist, SPEAKER_OUTPUT)
-#define speaker_output_next(previous)		((previous)->typenext)
+#define speaker_output_count(config)		(config)->devicelist.count(SPEAKER_OUTPUT)
+#define speaker_output_first(config)		(config)->devicelist.first(SPEAKER_OUTPUT)
+#define speaker_output_next(previous)		(previous)->typenext()
 
 
 
@@ -172,7 +172,7 @@ const char *sound_get_user_gain_name(running_machine *machine, int index);
 
 
 /* driver gain controls on chip outputs */
-void sound_set_output_gain(const device_config *device, int output, float gain);
+void sound_set_output_gain(running_device *device, int output, float gain);
 
 
 /* ----- sound speaker device interface ----- */
@@ -192,10 +192,15 @@ DEVICE_GET_INFO( speaker_output );
     specified sound chip
 -------------------------------------------------*/
 
-INLINE sound_type sound_get_type(const device_config *device)
+INLINE sound_type sound_get_type(const device_config *devconfig)
 {
-	const sound_config *config = (const sound_config *)device->inline_config;
+	const sound_config *config = (const sound_config *)devconfig->inline_config;
 	return config->type;
+}
+
+INLINE sound_type sound_get_type(running_device *device)
+{
+	return sound_get_type(&device->baseconfig());
 }
 
 

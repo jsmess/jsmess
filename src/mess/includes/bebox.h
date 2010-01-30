@@ -50,9 +50,9 @@ WRITE64_HANDLER( bebox_page_w );
 WRITE64_HANDLER( bebox_80000480_w );
 WRITE64_HANDLER( bebox_flash_w );
 
-void bebox_ide_interrupt(const device_config *device, int state);
+void bebox_ide_interrupt(running_device *device, int state);
 
-UINT32 scsi53c810_pci_read(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 mem_mask);
-void scsi53c810_pci_write(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 data, UINT32 mem_mask);
+UINT32 scsi53c810_pci_read(running_device *busdevice, running_device *device, int function, int offset, UINT32 mem_mask);
+void scsi53c810_pci_write(running_device *busdevice, running_device *device, int function, int offset, UINT32 data, UINT32 mem_mask);
 
 #endif /* BEBOX_H_ */

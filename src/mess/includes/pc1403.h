@@ -16,13 +16,13 @@
 
 extern UINT8 pc1403_portc;
 
-int pc1403_reset(const device_config *device);
-int pc1403_brk(const device_config *device);
-void pc1403_outa(const device_config *device, int data);
-//void pc1403_outb(const device_config *device, int data);
-void pc1403_outc(const device_config *device, int data);
-int pc1403_ina(const device_config *device);
-//int pc1403_inb(const device_config *device);
+int pc1403_reset(running_device *device);
+int pc1403_brk(running_device *device);
+void pc1403_outa(running_device *device, int data);
+//void pc1403_outb(running_device *device, int data);
+void pc1403_outc(running_device *device, int data);
+int pc1403_ina(running_device *device);
+//int pc1403_inb(running_device *device);
 
 DRIVER_INIT( pc1403 );
 NVRAM_HANDLER( pc1403 );

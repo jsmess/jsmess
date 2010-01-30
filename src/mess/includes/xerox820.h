@@ -39,9 +39,9 @@ struct _xerox820_state
 	int dsdd;							/* double sided disk detect */
 
 	/* devices */
-	const device_config *kbpio;
-	const device_config *z80ctc;
-	const device_config *wd1771;
+	running_device *kbpio;
+	running_device *z80ctc;
+	running_device *wd1771;
 };
 
 #endif

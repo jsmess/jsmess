@@ -157,7 +157,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma8237_out_eop )
 	pc_fdc_set_tc_state( device->machine, state == ASSERT_LINE ? 0 : 1 );
 }
 
-static void set_dma_channel(const device_config *device, int channel, int state)
+static void set_dma_channel(running_device *device, int channel, int state)
 {
 	pc_state *st = (pc_state *)device->machine->driver_data;
 
@@ -256,7 +256,7 @@ UINT8 pc_speaker_get_spk(running_machine *machine)
 
 void pc_speaker_set_spkrdata(running_machine *machine, UINT8 data)
 {
-	const device_config *speaker = devtag_get_device(machine, "speaker");
+	running_device *speaker = devtag_get_device(machine, "speaker");
 	pc_state *st = (pc_state *)machine->driver_data;
 	st->pc_spkrdata = data ? 1 : 0;
 	speaker_level_w( speaker, pc_speaker_get_spk(machine) );
@@ -265,7 +265,7 @@ void pc_speaker_set_spkrdata(running_machine *machine, UINT8 data)
 
 void pc_speaker_set_input(running_machine *machine, UINT8 data)
 {
-	const device_config *speaker = devtag_get_device(machine, "speaker");
+	running_device *speaker = devtag_get_device(machine, "speaker");
 	pc_state *st = (pc_state *)machine->driver_data;
 	st->pc_input = data ? 1 : 0;
 	speaker_level_w( speaker, pc_speaker_get_spk(machine) );
@@ -364,7 +364,7 @@ static INS8250_INTERRUPT( pc_com_interrupt_2 )
 
 /* called when com registers read/written - used to update peripherals that
 are connected */
-static void pc_com_refresh_connected_common(const device_config *device, int n, int data)
+static void pc_com_refresh_connected_common(running_device *device, int n, int data)
 {
 	/* mouse connected to this port? */
 	if (input_port_read(device->machine, "DSW2") & (0x80>>n))
@@ -746,7 +746,7 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_porta_w )
 static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portb_w )
 {
 	pc_state *st = (pc_state *)device->machine->driver_data;
-	const device_config *keyboard = devtag_get_device(device->machine, "keyboard");
+	running_device *keyboard = devtag_get_device(device->machine, "keyboard");
 
 	/* KB controller port B */
 	st->ppi_portb = data;
@@ -783,7 +783,7 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portc_w )
 WRITE8_HANDLER( ibm5150_kb_set_clock_signal )
 {
 	pc_state *st = (pc_state *)space->machine->driver_data;
-	const device_config *keyboard = devtag_get_device(space->machine, "keyboard");
+	running_device *keyboard = devtag_get_device(space->machine, "keyboard");
 
 	if ( st->ppi_clock_signal != data )
 	{
@@ -817,7 +817,7 @@ WRITE8_HANDLER( ibm5150_kb_set_clock_signal )
 WRITE8_HANDLER( ibm5150_kb_set_data_signal )
 {
 	pc_state *st = (pc_state *)space->machine->driver_data;
-	const device_config *keyboard = devtag_get_device(space->machine, "keyboard");
+	running_device *keyboard = devtag_get_device(space->machine, "keyboard");
 
 	st->ppi_data_signal = data;
 
@@ -904,7 +904,7 @@ static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
 static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 {
 	pc_state *st = (pc_state *)device->machine->driver_data;
-	const device_config *keyboard = devtag_get_device(device->machine, "keyboard");
+	running_device *keyboard = devtag_get_device(device->machine, "keyboard");
 
 	/* PPI controller port B*/
 	st->ppi_portb = data;
@@ -1102,7 +1102,7 @@ static void pc_fdc_dma_drq(running_machine *machine, int state, int read_)
 	i8237_dreq2_w( st->dma8237, state);
 }
 
-static const device_config * pc_get_device(running_machine *machine )
+static running_device * pc_get_device(running_machine *machine )
 {
 	return devtag_get_device(machine, "upd765");
 }
@@ -1327,7 +1327,7 @@ MACHINE_START( pc )
 
 MACHINE_RESET( pc )
 {
-	const device_config *speaker = devtag_get_device(machine, "speaker");
+	running_device *speaker = devtag_get_device(machine, "speaker");
 	pc_state *st = (pc_state *)machine->driver_data;
 	memset(st,0,sizeof(st));
 	st->maincpu = devtag_get_device(machine, "maincpu" );
@@ -1356,7 +1356,7 @@ MACHINE_START( pcjr )
 
 MACHINE_RESET( pcjr )
 {
-	const device_config *speaker = devtag_get_device(machine, "speaker");
+	running_device *speaker = devtag_get_device(machine, "speaker");
 	pc_state *st = (pc_state *)machine->driver_data;
 	memset(st,0,sizeof(st));
 	st->maincpu = devtag_get_device(machine, "maincpu" );

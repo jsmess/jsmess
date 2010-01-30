@@ -1072,7 +1072,7 @@ static const m6847_variant variants[] =
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE mc6847_state *get_safe_token(const device_config *device)
+INLINE mc6847_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -1088,13 +1088,13 @@ INLINE mc6847_state *get_safe_token(const device_config *device)
  *
  *************************************/
 
-static UINT32 color(const device_config *device, int c)
+static UINT32 color(running_device *device, int c)
 {
 	mc6847_state *mc6847 = get_safe_token(device);
 	return mc6847->palette[c];
 }
 
-static int attr_index_from_attribute(const device_config *device, UINT8 attr)
+static int attr_index_from_attribute(running_device *device, UINT8 attr)
 {
 	int result;
 
@@ -1106,7 +1106,7 @@ static int attr_index_from_attribute(const device_config *device, UINT8 attr)
 	return result;
 }
 
-static UINT8 attribute_from_attr_index(const device_config *device, int attr_index)
+static UINT8 attribute_from_attr_index(running_device *device, int attr_index)
 {
 	/* sanity check */
 	assert(attr_index >= 0);
@@ -1397,7 +1397,7 @@ static int get_beamx(mc6847_state *mc6847)
 }
 
 
-static void execute_m6847_dumpscanline(const device_config *device, int ref, int params, const char **param)
+static void execute_m6847_dumpscanline(running_device *device, int ref, int params, const char **param)
 {
 	mc6847_state *mc6847 = get_safe_token(device);
 
@@ -1500,7 +1500,7 @@ static const UINT8 *find_char(const m6847_variant *v,
 
 
 
-static void build_fontdata(const device_config *device, const m6847_variant *v)
+static void build_fontdata(running_device *device, const m6847_variant *v)
 {
 	mc6847_state *mc6847 = get_safe_token(device);
 
@@ -1537,7 +1537,7 @@ static void build_fontdata(const device_config *device, const m6847_variant *v)
  *
  *************************************/
 
-static void graphics_color_64(const device_config *device, UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
+static void graphics_color_64(running_device *device, UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
 {
 	int x;
 	UINT8 byte, attr;
@@ -1557,7 +1557,7 @@ static void graphics_color_64(const device_config *device, UINT32 *RESTRICT line
 
 
 
-static void graphics_color_128(const device_config *device, UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
+static void graphics_color_128(running_device *device, UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
 {
 	int x;
 	UINT8 byte, attr;
@@ -1577,7 +1577,7 @@ static void graphics_color_128(const device_config *device, UINT32 *RESTRICT lin
 
 
 
-static void graphics_bw_128(const device_config *device, UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
+static void graphics_bw_128(running_device *device, UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
 {
 	int x;
 	UINT8 byte, attr;
@@ -1605,7 +1605,7 @@ static void graphics_bw_128(const device_config *device, UINT32 *RESTRICT line, 
 
 
 
-static void graphics_bw_256(const device_config *device, UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
+static void graphics_bw_256(running_device *device, UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
 {
 	int x;
 	UINT8 byte, attr;
@@ -1633,7 +1633,7 @@ static void graphics_bw_256(const device_config *device, UINT32 *RESTRICT line, 
 
 
 
-static void (*const graphics_modes[8])(const device_config *device, UINT32 *line, const m6847_pixel *video_data) =
+static void (*const graphics_modes[8])(running_device *device, UINT32 *line, const m6847_pixel *video_data) =
 {
 	graphics_color_64,	graphics_bw_128,
 	graphics_color_128,	graphics_bw_128,
@@ -1643,7 +1643,7 @@ static void (*const graphics_modes[8])(const device_config *device, UINT32 *line
 
 
 
-static void text_mode(const device_config *device, int scanline, UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
+static void text_mode(running_device *device, int scanline, UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
 {
 	mc6847_state *mc6847 = get_safe_token(device);
 	int x;
@@ -1688,7 +1688,7 @@ static void text_mode(const device_config *device, int scanline, UINT32 *RESTRIC
 
 
 
-static void render_scanline(const device_config *device, bitmap_t *bitmap, int scanline)
+static void render_scanline(running_device *device, bitmap_t *bitmap, int scanline)
 {
 	mc6847_state *mc6847 = get_safe_token(device);
 	UINT32 border_color;
@@ -1766,8 +1766,8 @@ static STATE_POSTLOAD( mc6847_postload )
 static DEVICE_START( mc6847 )
 {
 	mc6847_state *mc6847 = get_safe_token(device);
-	const mc6847_interface *intf = (mc6847_interface *)device->static_config;
-	const mc6847_config *cfg = (mc6847_config *)device->inline_config;
+	const mc6847_interface *intf = (mc6847_interface *)device->baseconfig().static_config;
+	const mc6847_config *cfg = (mc6847_config *)device->baseconfig().inline_config;
 
 	const m6847_variant *v;
 	UINT32 frequency;
@@ -1775,8 +1775,8 @@ static DEVICE_START( mc6847 )
 	double total_scanlines;
 
 	/* validate some basic stuff */
-	assert(device->static_config != NULL);
-	assert(device->inline_config != NULL);
+	assert(device->baseconfig().static_config != NULL);
+	assert(device->baseconfig().inline_config != NULL);
 
 	/* identify proper M6847 variant */
 	assert(cfg->type < ARRAY_LENGTH(variants));
@@ -1996,7 +1996,7 @@ READ_LINE_DEVICE_HANDLER( mc6847_hs_r )
 }
 
 
-void mc6847_set_palette(const device_config *device, UINT32 *palette)
+void mc6847_set_palette(running_device *device, UINT32 *palette)
 {
 	mc6847_state *mc6847 = get_safe_token(device);
 	mc6847->has_custom_palette = 1;
@@ -2152,7 +2152,7 @@ INPUT_PORTS_END
 
 
 
-UINT32 mc6847_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+UINT32 mc6847_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	mc6847_state *mc6847 = get_safe_token(device);
 	int row, i;
@@ -2213,7 +2213,7 @@ static UINT64 divide_mame_time(attotime dividend, attotime divisor)
 
 
 
-static attotime interval(const device_config *device, m6847_timing_type timing)
+static attotime interval(running_device *device, m6847_timing_type timing)
 {
 	mc6847_state *mc6847 = get_safe_token(device);
 	attotime result;
@@ -2235,7 +2235,7 @@ static attotime interval(const device_config *device, m6847_timing_type timing)
 
 
 
-UINT64 m6847_time(const device_config *device, m6847_timing_type timing)
+UINT64 m6847_time(running_device *device, m6847_timing_type timing)
 {
 	attotime current_time = timer_get_time(device->machine);
 	attotime divisor = interval(device, timing);
@@ -2244,7 +2244,7 @@ UINT64 m6847_time(const device_config *device, m6847_timing_type timing)
 
 
 
-attotime m6847_time_until(const device_config *device, m6847_timing_type timing, UINT64 target_time)
+attotime m6847_time_until(running_device *device, m6847_timing_type timing, UINT64 target_time)
 {
 	attotime target_mame_time, current_time;
 	target_mame_time = attotime_mul(interval(device, timing), target_time);
@@ -2258,7 +2258,7 @@ attotime m6847_time_until(const device_config *device, m6847_timing_type timing,
 
 
 
-attotime m6847_scanline_time(const device_config *device, int scanline)
+attotime m6847_scanline_time(running_device *device, int scanline)
 {
 	mc6847_state *mc6847 = get_safe_token(device);
 
@@ -2279,7 +2279,7 @@ void m6847_set_dirty(void) { set_dirty(); }
 int m6847_get_scanline(void) { return get_scanline(); }
 #endif
 
-int mc6847_get_scanline(const device_config *device)
+int mc6847_get_scanline(running_device *device)
 {
 	mc6847_state *mc6847 = get_safe_token(device);
 	return get_scanline(mc6847) - mc6847->top_border_scanlines;

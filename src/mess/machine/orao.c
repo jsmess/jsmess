@@ -73,7 +73,7 @@ WRITE8_HANDLER( orao_io_w )
 {
 	if (offset == 0x0800)
 	{
-		const device_config *dac_device = devtag_get_device(space->machine, "dac");
+		running_device *dac_device = devtag_get_device(space->machine, "dac");
 		dac_data_w(dac_device, data); //beeper
 	}
 }

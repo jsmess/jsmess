@@ -49,7 +49,7 @@ UINT8 *c65_interface;
 static void c65_nmi( running_machine *machine )
 {
 	static int nmilevel = 0;
-	const device_config *cia_1 = devtag_get_device(machine, "cia_1");
+	running_device *cia_1 = devtag_get_device(machine, "cia_1");
 	int cia1irq = mos6526_irq_r(cia_1);
 
 	if (nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
@@ -116,7 +116,7 @@ static void c65_irq( running_machine *machine, int level )
 }
 
 /* is this correct for c65 as well as c64? */
-static void c65_cia0_interrupt( const device_config *device, int level )
+static void c65_cia0_interrupt( running_device *device, int level )
 {
 	c65_irq (device->machine, level || vicirq);
 }
@@ -124,7 +124,7 @@ static void c65_cia0_interrupt( const device_config *device, int level )
 /* is this correct for c65 as well as c64? */
 static void c65_vic_interrupt( running_machine *machine, int level )
 {
-	const device_config *cia_0 = devtag_get_device(machine, "cia_0");
+	running_device *cia_0 = devtag_get_device(machine, "cia_0");
 #if 1
 	if (level != vicirq)
 	{
@@ -186,7 +186,7 @@ const mos6526_interface c65_pal_cia0 =
 static READ8_DEVICE_HANDLER( c65_cia1_port_a_r )
 {
 	UINT8 value = 0xff;
-	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
+	running_device *serbus = devtag_get_device(device->machine, "serial_bus");
 
 	if (!cbm_iec_clk_r(serbus))
 		value &= ~0x40;
@@ -200,7 +200,7 @@ static READ8_DEVICE_HANDLER( c65_cia1_port_a_r )
 static WRITE8_DEVICE_HANDLER( c65_cia1_port_a_w )
 {
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
-	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
+	running_device *serbus = devtag_get_device(device->machine, "serial_bus");
 
 	cbm_iec_atn_w(serbus, device, !BIT(data, 3));
 	cbm_iec_clk_w(serbus, device, !BIT(data, 4));
@@ -691,8 +691,8 @@ static WRITE8_HANDLER( c65_ram_expansion_w )
 
 static WRITE8_HANDLER( c65_write_io )
 {
-	const device_config *sid_0 = devtag_get_device(space->machine, "sid_r");
-	const device_config *sid_1 = devtag_get_device(space->machine, "sid_l");
+	running_device *sid_0 = devtag_get_device(space->machine, "sid_r");
+	running_device *sid_1 = devtag_get_device(space->machine, "sid_l");
 
 	switch (offset & 0xf00)
 	{
@@ -734,8 +734,8 @@ static WRITE8_HANDLER( c65_write_io )
 
 static WRITE8_HANDLER( c65_write_io_dc00 )
 {
-	const device_config *cia_0 = devtag_get_device(space->machine, "cia_0");
-	const device_config *cia_1 = devtag_get_device(space->machine, "cia_1");
+	running_device *cia_0 = devtag_get_device(space->machine, "cia_0");
+	running_device *cia_1 = devtag_get_device(space->machine, "cia_1");
 
 	switch (offset & 0xf00)
 	{
@@ -754,8 +754,8 @@ static WRITE8_HANDLER( c65_write_io_dc00 )
 
 static READ8_HANDLER( c65_read_io )
 {
-	const device_config *sid_0 = devtag_get_device(space->machine, "sid_r");
-	const device_config *sid_1 = devtag_get_device(space->machine, "sid_l");
+	running_device *sid_0 = devtag_get_device(space->machine, "sid_r");
+	running_device *sid_1 = devtag_get_device(space->machine, "sid_l");
 
 	switch (offset & 0xf00)
 	{
@@ -796,8 +796,8 @@ static READ8_HANDLER( c65_read_io )
 
 static READ8_HANDLER( c65_read_io_dc00 )
 {
-	const device_config *cia_0 = devtag_get_device(space->machine, "cia_0");
-	const device_config *cia_1 = devtag_get_device(space->machine, "cia_1");
+	running_device *cia_0 = devtag_get_device(space->machine, "cia_0");
+	running_device *cia_1 = devtag_get_device(space->machine, "cia_1");
 
 	switch (offset & 0x300)
 	{
@@ -883,7 +883,7 @@ void c65_bankswitch( running_machine *machine )
 	static int old = -1;
 	int data, loram, hiram, charen;
 
-	data = (UINT8) devtag_get_info_int(machine, "maincpu", CPUINFO_INT_M6510_PORT);
+	data = (UINT8) machine->device("maincpu")->get_runtime_int(CPUINFO_INT_M6510_PORT);
 	if (data == old)
 		return;
 

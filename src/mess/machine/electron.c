@@ -15,7 +15,7 @@
 ULA electron_ula;
 static emu_timer *electron_tape_timer;
 
-static const device_config *cassette_device_image( running_machine *machine )
+static running_device *cassette_device_image( running_machine *machine )
 {
 	return devtag_get_device(machine, "cassette");
 }
@@ -179,7 +179,7 @@ static const UINT16 electron_screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 
 
 WRITE8_HANDLER( electron_ula_w )
 {
-	const device_config *speaker = devtag_get_device(space->machine, "beep");
+	running_device *speaker = devtag_get_device(space->machine, "beep");
 	int i = electron_palette_offset[(( offset >> 1 ) & 0x03)];
 	logerror( "ULA: write offset %02x <- %02x\n", offset & 0x0f, data );
 	switch( offset & 0x0f )
@@ -317,7 +317,7 @@ void electron_interrupt_handler(running_machine *machine, int mode, int interrup
 
 static TIMER_CALLBACK(setup_beep)
 {
-	const device_config *speaker = devtag_get_device(machine, "beep");
+	running_device *speaker = devtag_get_device(machine, "beep");
 	beep_set_state( speaker, 0 );
 	beep_set_frequency( speaker, 300 );
 }

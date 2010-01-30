@@ -109,9 +109,9 @@ static UINT8 read_cfg1( running_machine *machine )
   p7 serial data in, serial bus 5
 */
 
-void c16_m7501_port_write( const device_config *device, UINT8 direction, UINT8 data )
+void c16_m7501_port_write( running_device *device, UINT8 direction, UINT8 data )
 {
-	const device_config *serbus = devtag_get_device(device->machine, "iec");
+	running_device *serbus = devtag_get_device(device->machine, "iec");
 
 	/* bit zero then output 0 */
 	cbm_iec_atn_w(serbus, device, !(data & 0x04));
@@ -123,11 +123,11 @@ void c16_m7501_port_write( const device_config *device, UINT8 direction, UINT8 d
 	cassette_change_state(devtag_get_device(device->machine, "cassette"), (data & 0x08) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
-UINT8 c16_m7501_port_read( const device_config *device, UINT8 direction )
+UINT8 c16_m7501_port_read( running_device *device, UINT8 direction )
 {
 	UINT8 data = 0xff;
-	UINT8 c16_port7501 = (UINT8) devtag_get_info_int(device->machine, "maincpu", CPUINFO_INT_M6510_PORT);
-	const device_config *serbus = devtag_get_device(device->machine, "iec");
+	UINT8 c16_port7501 = (UINT8) device->machine->device("maincpu")->get_runtime_int(CPUINFO_INT_M6510_PORT);
+	running_device *serbus = devtag_get_device(device->machine, "iec");
 
 	if ((c16_port7501 & 0x01) || !cbm_iec_data_r(serbus))
 		data &= ~0x80;
@@ -515,7 +515,7 @@ MACHINE_START( c16 )
 MACHINE_RESET( c16 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const device_config *sid = devtag_get_device(space->machine, "sid");
+	running_device *sid = devtag_get_device(space->machine, "sid");
 
 	c364_speech_reset(machine);
 
@@ -561,7 +561,7 @@ MACHINE_RESET( c16 )
 
 	if (has_c1551 || has_iec8)		/* IEC8 on || C1551 */
 	{
-		const device_config *tpi = devtag_get_device(machine, "tpi6535_tpi_2");
+		running_device *tpi = devtag_get_device(machine, "tpi6535_tpi_2");
 		memory_install_write8_device_handler(space, tpi, 0xfee0, 0xfeff, 0, 0, tpi6525_w);
 		memory_install_read8_device_handler(space, tpi, 0xfee0, 0xfeff, 0, 0, tpi6525_r);
 	}
@@ -571,7 +571,7 @@ MACHINE_RESET( c16 )
 	}
 	if (has_iec9)					/* IEC9 on */
 	{
-		const device_config *tpi = devtag_get_device(machine, "tpi6535_tpi_3");
+		running_device *tpi = devtag_get_device(machine, "tpi6535_tpi_3");
 		memory_install_write8_device_handler(space, tpi, 0xfec0, 0xfedf, 0, 0, tpi6525_w);
 		memory_install_read8_device_handler(space, tpi, 0xfec0, 0xfedf, 0, 0, tpi6525_r);
 	}

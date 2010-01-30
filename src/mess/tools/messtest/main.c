@@ -6,15 +6,15 @@
 
 *********************************************************************/
 
+#ifdef WIN32
+#include "winutils.h"
+#endif
 #include <time.h>
 
 #include "core.h"
 #include "hashfile.h"
 #include "emuopts.h"
 #include "../imgtool/imgtool.h"
-#ifdef _WIN32
-#include "winutils.h"
-#endif
 
 extern int mame_validitychecks(int game);
 

@@ -95,13 +95,13 @@ struct _c1571_t
 	int cia_irq;						/* CIA interrupt request */
 
 	/* devices */
-	const device_config *cpu;
-	const device_config *via0;
-	const device_config *via1;
-	const device_config *cia;
-	const device_config *wd1770;
-	const device_config *serial_bus;
-	const device_config *image;
+	running_device *cpu;
+	running_device *via0;
+	running_device *via1;
+	running_device *cia;
+	running_device *wd1770;
+	running_device *serial_bus;
+	running_device *image;
 
 	/* timers */
 	emu_timer *bit_timer;
@@ -111,7 +111,7 @@ struct _c1571_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE c1571_t *get_safe_token(const device_config *device)
+INLINE c1571_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -119,14 +119,14 @@ INLINE c1571_t *get_safe_token(const device_config *device)
 	return (c1571_t *)device->token;
 }
 
-INLINE c1571_config *get_safe_config(const device_config *device)
+INLINE c1571_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == C1570) || (device->type == C1571) || (device->type == C1571CR));
-	return (c1571_config *)device->inline_config;
+	return (c1571_config *)device->baseconfig().inline_config;
 }
 
-INLINE void iec_data_w(const device_config *device)
+INLINE void iec_data_w(running_device *device)
 {
 	c1571_t *c1571 = get_safe_token(device);
 
@@ -139,7 +139,7 @@ INLINE void iec_data_w(const device_config *device)
 	cbm_iec_data_w(c1571->serial_bus, device, data);
 }
 
-INLINE void iec_srq_w(const device_config *device)
+INLINE void iec_srq_w(running_device *device)
 {
 	c1571_t *c1571 = get_safe_token(device);
 
@@ -161,7 +161,7 @@ INLINE void iec_srq_w(const device_config *device)
 
 static TIMER_CALLBACK( bit_tick )
 {
-	const device_config *device = (device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	c1571_t *c1571 = get_safe_token(device);
 	int byte = 0;
 
@@ -261,7 +261,7 @@ WRITE_LINE_DEVICE_HANDLER( c1571_iec_reset_w )
 {
 	if (!state)
 	{
-		device_reset(device);
+		device->reset();
 	}
 }
 
@@ -370,10 +370,10 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
 	/* 1/2 MHz */
 	UINT32 clock = BIT(data, 5) ? XTAL_16MHz/8 : XTAL_16MHz/16;
 
-	device_set_clock(c1571->cpu, clock);
-	device_set_clock(c1571->cia, clock);
-	device_set_clock(c1571->via0, clock);
-	device_set_clock(c1571->via1, clock);
+	c1571->cpu->set_clock(clock);
+	c1571->cia->set_clock(clock);
+	c1571->via0->set_clock(clock);
+	c1571->via1->set_clock(clock);
 
 	/* fast serial direction */
 	c1571->ser_dir = BIT(data, 1);
@@ -854,15 +854,15 @@ static DEVICE_START( c1571 )
 	c1571->address = config->address - 8;
 
 	/* find our CPU */
-	c1571->cpu = device_find_child_by_tag(device, M6502_TAG);
+	c1571->cpu = device->subdevice(M6502_TAG);
 
 	/* find devices */
-	c1571->via0 = device_find_child_by_tag(device, M6522_0_TAG);
-	c1571->via1 = device_find_child_by_tag(device, M6522_1_TAG);
-	c1571->cia = device_find_child_by_tag(device, M6526_TAG);
-	c1571->wd1770 = device_find_child_by_tag(device, WD1770_TAG);
+	c1571->via0 = device->subdevice(M6522_0_TAG);
+	c1571->via1 = device->subdevice(M6522_1_TAG);
+	c1571->cia = device->subdevice(M6526_TAG);
+	c1571->wd1770 = device->subdevice(WD1770_TAG);
 	c1571->serial_bus = devtag_get_device(device->machine, config->serial_bus_tag);
-	c1571->image = device_find_child_by_tag(device, FLOPPY_0);
+	c1571->image = device->subdevice(FLOPPY_0);
 
 	/* set floppy density */
 	wd17xx_set_density(c1571->wd1770, DEN_MFM_LO);
@@ -881,11 +881,11 @@ static DEVICE_RESET( c1571 )
 {
 	c1571_t *c1571 = get_safe_token(device);
 
-	device_reset(c1571->cpu);
-	device_reset(c1571->via0);
-	device_reset(c1571->via1);
-	device_reset(c1571->cia);
-	device_reset(c1571->wd1770);
+	c1571->cpu->reset();
+	c1571->via0->reset();
+	c1571->via1->reset();
+	c1571->cia->reset();
+	c1571->wd1770->reset();
 
 	c1571->sp_out = 1;
 	c1571->cnt_out = 1;

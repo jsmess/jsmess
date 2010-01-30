@@ -114,7 +114,7 @@ struct _upd71071_t
 static TIMER_CALLBACK(dma_transfer_timer)
 {
 	// single byte or word transfer
-	const device_config* device = (const device_config*)ptr;
+	running_device* device = (running_device*)ptr;
 	upd71071_t* dmac = (upd71071_t*)device->token;
 	const address_space* space = cputag_get_address_space(device->machine,dmac->intf->cputag,ADDRESS_SPACE_PROGRAM);
 	int channel = param;
@@ -169,7 +169,7 @@ static TIMER_CALLBACK(dma_transfer_timer)
 	}
 }
 
-void upd71071_soft_reset(const device_config* device)
+void upd71071_soft_reset(running_device* device)
 {
 	upd71071_t* dmac = (upd71071_t*)device->token;
 	int x;
@@ -187,7 +187,7 @@ void upd71071_soft_reset(const device_config* device)
 	dmac->reg.request = 0;
 }
 
-int upd71071_dmarq(const device_config* device, int state,int channel)
+int upd71071_dmarq(running_device* device, int state,int channel)
 {
 	upd71071_t* dmac = (upd71071_t*)device->token;
 
@@ -234,7 +234,7 @@ static DEVICE_START(upd71071)
 	upd71071_t* dmac = (upd71071_t*)device->token;
 	int x;
 
-	dmac->intf = (const upd71071_intf*)device->static_config;
+	dmac->intf = (const upd71071_intf*)device->baseconfig().static_config;
 	for(x=0;x<4;x++)
 	{
 		dmac->timer[x] = timer_alloc(device->machine,dma_transfer_timer,(void*)device);

@@ -29,7 +29,7 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( junior_reset )
 {
 	if (newval == 0)
-		device_reset(field->port->machine->firstcpu);
+		field->port->machine->firstcpu->reset();
 }
 
 

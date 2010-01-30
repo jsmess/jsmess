@@ -38,7 +38,7 @@ struct _i82371ab_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE i82371ab_state *get_safe_token(const device_config *device)
+INLINE i82371ab_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -52,7 +52,7 @@ INLINE i82371ab_state *get_safe_token(const device_config *device)
     PCI INTERFACE
 ***************************************************************************/
 
-static UINT32 i82371ab_pci_isa_r(const device_config *busdevice, const device_config *device, int offset, UINT32 mem_mask)
+static UINT32 i82371ab_pci_isa_r(running_device *busdevice, running_device *device, int offset, UINT32 mem_mask)
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
 	UINT32 result = i82371ab->regs[0][offset];
@@ -62,7 +62,7 @@ static UINT32 i82371ab_pci_isa_r(const device_config *busdevice, const device_co
 	return result;
 }
 
-void i82371ab_pci_isa_w(const device_config *busdevice, const device_config *device, int offset, UINT32 data, UINT32 mem_mask)
+void i82371ab_pci_isa_w(running_device *busdevice, running_device *device, int offset, UINT32 data, UINT32 mem_mask)
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
 
@@ -83,7 +83,7 @@ void i82371ab_pci_isa_w(const device_config *busdevice, const device_config *dev
 	}
 }
 
-static UINT32 i82371ab_pci_ide_r(const device_config *busdevice, const device_config *device, int offset, UINT32 mem_mask)
+static UINT32 i82371ab_pci_ide_r(running_device *busdevice, running_device *device, int offset, UINT32 mem_mask)
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
 	UINT32 result = i82371ab->regs[1][offset];
@@ -93,7 +93,7 @@ static UINT32 i82371ab_pci_ide_r(const device_config *busdevice, const device_co
 	return result;
 }
 
-void i82371ab_pci_ide_w(const device_config *busdevice, const device_config *device, int offset, UINT32 data, UINT32 mem_mask)
+void i82371ab_pci_ide_w(running_device *busdevice, running_device *device, int offset, UINT32 data, UINT32 mem_mask)
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
 
@@ -114,7 +114,7 @@ void i82371ab_pci_ide_w(const device_config *busdevice, const device_config *dev
 	}
 }
 
-static UINT32 i82371ab_pci_usb_r(const device_config *busdevice, const device_config *device, int offset, UINT32 mem_mask)
+static UINT32 i82371ab_pci_usb_r(running_device *busdevice, running_device *device, int offset, UINT32 mem_mask)
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
 	UINT32 result = i82371ab->regs[2][offset];
@@ -124,7 +124,7 @@ static UINT32 i82371ab_pci_usb_r(const device_config *busdevice, const device_co
 	return result;
 }
 
-void i82371ab_pci_usb_w(const device_config *busdevice, const device_config *device, int offset, UINT32 data, UINT32 mem_mask)
+void i82371ab_pci_usb_w(running_device *busdevice, running_device *device, int offset, UINT32 data, UINT32 mem_mask)
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
 
@@ -145,7 +145,7 @@ void i82371ab_pci_usb_w(const device_config *busdevice, const device_config *dev
 	}
 }
 
-static UINT32 i82371ab_pci_acpi_r(const device_config *busdevice, const device_config *device, int offset, UINT32 mem_mask)
+static UINT32 i82371ab_pci_acpi_r(running_device *busdevice, running_device *device, int offset, UINT32 mem_mask)
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
 	UINT32 result = i82371ab->regs[3][offset];
@@ -155,7 +155,7 @@ static UINT32 i82371ab_pci_acpi_r(const device_config *busdevice, const device_c
 	return result;
 }
 
-void i82371ab_pci_acpi_w(const device_config *busdevice, const device_config *device, int offset, UINT32 data, UINT32 mem_mask)
+void i82371ab_pci_acpi_w(running_device *busdevice, running_device *device, int offset, UINT32 data, UINT32 mem_mask)
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
 
@@ -176,7 +176,7 @@ void i82371ab_pci_acpi_w(const device_config *busdevice, const device_config *de
 	}
 }
 
-UINT32 i82371ab_pci_read(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 mem_mask)
+UINT32 i82371ab_pci_read(running_device *busdevice, running_device *device, int function, int offset, UINT32 mem_mask)
 {
 	switch (function)
 	{
@@ -191,7 +191,7 @@ UINT32 i82371ab_pci_read(const device_config *busdevice, const device_config *de
 	return 0;
 }
 
-void i82371ab_pci_write(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 data, UINT32 mem_mask)
+void i82371ab_pci_write(running_device *busdevice, running_device *device, int function, int offset, UINT32 data, UINT32 mem_mask)
 {
 	switch (function)
 	{

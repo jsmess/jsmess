@@ -47,7 +47,7 @@ typedef struct _GROM_port_t GROM_port_t;
 struct _cartridge_t
 {
 	/* PCB device associated to this cartridge. If NULL, the slot is empty. */
-	const device_config *pcb;
+	running_device *pcb;
 
         /* GROM buffer size. */
         int grom_size;
@@ -83,9 +83,9 @@ struct _cartridge_t
 typedef struct _cartridge_t cartridge_t;
 
 /* Functions to be called from the console. */
-void   ti99_cartridge_slot_set(const device_config *cartsys, int slotnumber);
-void   ti99_lock_cartridge_slot(const device_config *cartsys, int slotnumber);
-UINT8  ti99_cartridge_grom_read(const device_config *cartsys, int offset);
+void   ti99_cartridge_slot_set(running_device *cartsys, int slotnumber);
+void   ti99_lock_cartridge_slot(running_device *cartsys, int slotnumber);
+UINT8  ti99_cartridge_grom_read(running_device *cartsys, int offset);
 
 DEVICE_GET_INFO(ti99_multicart);
 

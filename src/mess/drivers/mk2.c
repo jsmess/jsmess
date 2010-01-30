@@ -97,7 +97,7 @@ static MACHINE_START( mk2 )
 }
 
 
-static UINT8 mk2_read_a(const device_config *device, UINT8 olddata)
+static UINT8 mk2_read_a(running_device *device, UINT8 olddata)
 {
 	int data=0xff;
 	int help=input_port_read(device->machine, "BLACK")|input_port_read(device->machine, "WHITE"); // looks like white and black keys are the same!
@@ -130,7 +130,7 @@ static UINT8 mk2_read_a(const device_config *device, UINT8 olddata)
 }
 
 
-static void mk2_write_a(const device_config *device, UINT8 newdata, UINT8 olddata)
+static void mk2_write_a(running_device *device, UINT8 newdata, UINT8 olddata)
 {
 	int temp = miot6530_portb_out_get(device);
 
@@ -141,15 +141,15 @@ static void mk2_write_a(const device_config *device, UINT8 newdata, UINT8 olddat
 }
 
 
-static UINT8 mk2_read_b(const device_config *device, UINT8 olddata)
+static UINT8 mk2_read_b(running_device *device, UINT8 olddata)
 {
 	return 0xff&~0x40; // chip select mapped to pb6
 }
 
 
-static void mk2_write_b(const device_config *device, UINT8 newdata, UINT8 olddata)
+static void mk2_write_b(running_device *device, UINT8 newdata, UINT8 olddata)
 {
-	const device_config *dac_device = devtag_get_device(device->machine, "dac");
+	running_device *dac_device = devtag_get_device(device->machine, "dac");
 
 	if ((newdata&0x06)==0x06)
 		dac_data_w(dac_device,newdata&1?80:0);

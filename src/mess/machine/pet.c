@@ -71,7 +71,7 @@ static READ8_DEVICE_HANDLER( pia0_pa_r )
 
 	*/
 
-	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 	UINT8 data = 0;
 
 	/* key */
@@ -186,7 +186,7 @@ static READ8_DEVICE_HANDLER( cass1_r )
 
 static WRITE8_DEVICE_HANDLER( eoi_w )
 {
-	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 	
 	ieee488_eoi_w(ieeebus, device, data);
 }
@@ -273,21 +273,21 @@ static WRITE8_DEVICE_HANDLER( do_w )
 
 	*/
 
-	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 
 	ieee488_dio_w(ieeebus, device, data);
 }
 
 static WRITE8_DEVICE_HANDLER( ndac_w )
 {
-	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 	
 	ieee488_ndac_w(ieeebus, device, data);
 }
 
 static WRITE8_DEVICE_HANDLER( dav_w )
 {
-	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 	
 	ieee488_dav_w(ieeebus, device, data);
 }
@@ -352,7 +352,7 @@ static READ8_DEVICE_HANDLER( via_pb_r )
 
 	*/
 
-	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 	UINT8 data = 0;
 
 	/* not data accepted in */
@@ -393,7 +393,7 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 
 	*/
 
-	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 
 	/* not ready for data out */
 	ieee488_nrfd_w(ieeebus, device, BIT(data, 1));
@@ -457,10 +457,10 @@ static struct {
 
 static WRITE8_HANDLER( cbm8096_io_w )
 {
-	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
-	const device_config *pia_0 = devtag_get_device(space->machine, "pia_0");
-	const device_config *pia_1 = devtag_get_device(space->machine, "pia_1");
-	const device_config *mc6845 = devtag_get_device(space->machine, "crtc");
+	running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
+	running_device *pia_0 = devtag_get_device(space->machine, "pia_0");
+	running_device *pia_1 = devtag_get_device(space->machine, "pia_1");
+	running_device *mc6845 = devtag_get_device(space->machine, "crtc");
 
 	if (offset < 0x10) ;
 	else if (offset < 0x14) pia6821_w(pia_0, offset & 3, data);
@@ -475,10 +475,10 @@ static WRITE8_HANDLER( cbm8096_io_w )
 
 static READ8_HANDLER( cbm8096_io_r )
 {
-	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
-	const device_config *pia_0 = devtag_get_device(space->machine, "pia_0");
-	const device_config *pia_1 = devtag_get_device(space->machine, "pia_1");
-	const device_config *mc6845 = devtag_get_device(space->machine, "crtc");
+	running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
+	running_device *pia_0 = devtag_get_device(space->machine, "pia_0");
+	running_device *pia_1 = devtag_get_device(space->machine, "pia_1");
+	running_device *mc6845 = devtag_get_device(space->machine, "crtc");
 
 	int data = 0xff;
 	if (offset < 0x10) ;
@@ -669,7 +669,7 @@ WRITE8_HANDLER( superpet_w )
 
 static TIMER_CALLBACK( pet_interrupt )
 {
-	const device_config *pia_0 = devtag_get_device(machine, "pia_0");
+	running_device *pia_0 = devtag_get_device(machine, "pia_0");
 	static int level = 0;
 
 	pia6821_cb1_w(pia_0, 0, level);
@@ -680,7 +680,7 @@ static TIMER_CALLBACK( pet_interrupt )
 /* NOT WORKING - Just placeholder */
 static TIMER_CALLBACK( pet_tape1_timer )
 {
-	const device_config *pia_0 = devtag_get_device(machine, "pia_0");
+	running_device *pia_0 = devtag_get_device(machine, "pia_0");
 //  cassette 1
 	UINT8 data = (cassette_input(devtag_get_device(machine, "cassette1")) > +0.0) ? 1 : 0;
 	pia6821_ca1_w(pia_0, 0, data);
@@ -689,7 +689,7 @@ static TIMER_CALLBACK( pet_tape1_timer )
 /* NOT WORKING - Just placeholder */
 static TIMER_CALLBACK( pet_tape2_timer )
 {
-	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
+	running_device *via_0 = devtag_get_device(machine, "via6522_0");
 //  cassette 2
 	UINT8 data = (cassette_input(devtag_get_device(machine, "cassette2")) > +0.0) ? 1 : 0;
 	via_cb1_w(via_0, data);
@@ -777,8 +777,8 @@ DRIVER_INIT( superpet )
 MACHINE_RESET( pet )
 {
 	pet_state *state = (pet_state *)machine->driver_data;
-	const device_config *ieeebus = devtag_get_device(machine, "ieee_bus");
-	const device_config *scapegoat = devtag_get_device(machine, "pia_0");
+	running_device *ieeebus = devtag_get_device(machine, "ieee_bus");
+	running_device *scapegoat = devtag_get_device(machine, "pia_0");
 
 	if (state->superpet)
 	{
@@ -812,7 +812,7 @@ MACHINE_RESET( pet )
 
 //removed	cbm_drive_0_config (input_port_read(machine, "CFG") & 2 ? IEEE : 0, 8);
 //removed	cbm_drive_1_config (input_port_read(machine, "CFG") & 1 ? IEEE : 0, 9);
-	device_reset(devtag_get_device(machine, "maincpu"));
+	devtag_get_device(machine, "maincpu")->reset();
 
 	ieee488_ren_w(ieeebus, scapegoat, 0);
 	ieee488_ifc_w(ieeebus, scapegoat, 0);

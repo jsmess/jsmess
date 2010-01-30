@@ -605,7 +605,7 @@ static VIDEO_UPDATE( socrates )
 
 static WRITE8_HANDLER(socrates_sound_w)
 {
-	const device_config *socr_snd = devtag_get_device(space->machine, "soc_snd");
+	running_device *socr_snd = devtag_get_device(space->machine, "soc_snd");
 	switch(offset)
 	{
 		case 0:

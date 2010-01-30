@@ -72,18 +72,18 @@ struct _mos6530_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE mos6530_t *get_safe_token(const device_config *device)
+INLINE mos6530_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
 	return (mos6530_t *)device->token;
 }
 
-INLINE const mos6530_interface *get_interface(const device_config *device)
+INLINE const mos6530_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == MOS6530);
-	return (const mos6530_interface *) device->static_config;
+	return (const mos6530_interface *) device->baseconfig().static_config;
 }
 
 INLINE UINT8 read_port(mos6530_t *mos6530, int port)
@@ -115,7 +115,7 @@ INLINE void write_port(mos6530_t *mos6530, int port, UINT8 data)
 
 static TIMER_CALLBACK( timer_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	mos6530_t *mos6530 = get_safe_token(device);
 
 	if (mos6530->counter == 0xff)

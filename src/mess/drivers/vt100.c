@@ -83,7 +83,7 @@ static TIMER_CALLBACK(keyboard_callback)
 static WRITE8_HANDLER(vt100_keyboard_w)
 {
 
-	const device_config *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = devtag_get_device(space->machine, "speaker");
 
 	output_set_value("online_led",BIT(data,5) ? 0 : 1);
 	output_set_value("local_led", BIT(data,5));
@@ -261,7 +261,7 @@ INPUT_PORTS_END
 
 static VIDEO_UPDATE( vt100 )
 {
-	const device_config	*devconf = devtag_get_device(screen->machine, "vt100_video");
+	running_device *devconf = devtag_get_device(screen->machine, "vt100_video");
 	vt_video_update( devconf, bitmap, cliprect);
 	return 0;
 }

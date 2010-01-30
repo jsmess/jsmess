@@ -46,7 +46,7 @@
 typedef struct _hd44102_t hd44102_t;
 struct _hd44102_t
 {
-	const device_config *screen;	/* screen */
+	running_device *screen;	/* screen */
 
 	UINT8 ram[4][50];				/* display memory */
 
@@ -63,18 +63,18 @@ struct _hd44102_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE hd44102_t *get_safe_token(const device_config *device)
+INLINE hd44102_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
 	return (hd44102_t *)device->token;
 }
 
-INLINE hd44102_config *get_safe_config(const device_config *device)
+INLINE hd44102_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == HD44102);
-	return (hd44102_config *)device->inline_config;
+	return (hd44102_config *)device->baseconfig().inline_config;
 }
 
 /***************************************************************************
@@ -204,7 +204,7 @@ static WRITE8_DEVICE_HANDLER( hd44102_data_w )
     hd44102_update - update screen
 -------------------------------------------------*/
 
-void hd44102_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+void hd44102_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	hd44102_t *hd44102 = get_safe_token(device);
 	const hd44102_config *config = get_safe_config(device);

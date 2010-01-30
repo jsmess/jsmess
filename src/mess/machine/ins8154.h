@@ -19,8 +19,8 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*ins8154_irq_func)(const device_config *device, int state);
-#define INS8154_IRQ(name)	void name(const device_config *device, int state )
+typedef void (*ins8154_irq_func)(running_device *device, int state);
+#define INS8154_IRQ(name)	void name(running_device *device, int state )
 
 /******************* Interface **********************************************/
 

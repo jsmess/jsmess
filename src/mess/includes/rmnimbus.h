@@ -78,10 +78,10 @@ extern const z80sio_interface sio_intf;
 READ8_DEVICE_HANDLER( sio_r );
 WRITE8_DEVICE_HANDLER( sio_w );
 
-void sio_interrupt(const device_config *device, int state);
+void sio_interrupt(running_device *device, int state);
 //WRITE8_DEVICE_HANDLER( sio_dtr_w );
 WRITE8_DEVICE_HANDLER( sio_serial_transmit );
-int sio_serial_receive( const device_config *device, int channel );
+int sio_serial_receive( running_device *device, int channel );
 
 /* Floppy/Fixed drive interface */
 
@@ -98,7 +98,7 @@ WRITE8_HANDLER( nimbus_disk_w );
 #define HARDDISK0_TAG           "harddisk0"
 #define SCSIBUS_TAG             "scsibus"
 
-void nimbus_scsi_linechange(const device_config *device, UINT8 line, UINT8 state); 
+void nimbus_scsi_linechange(running_device *device, UINT8 line, UINT8 state); 
 
 /* Masks for writes to port 0x400 */
 #define FDC_DRIVE0_MASK 0x01
@@ -209,7 +209,7 @@ WRITE8_HANDLER( sound_ay8910_portb_w );
 
 #define MSM5205_TAG             "msm5205"
 
-void nimbus_msm5205_vck(const device_config *device);
+void nimbus_msm5205_vck(running_device *device);
 
 #define LINEAR_ADDR(seg,ofs)    ((seg<<4)+ofs)
 

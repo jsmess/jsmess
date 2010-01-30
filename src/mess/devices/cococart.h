@@ -58,9 +58,9 @@ typedef enum _cococart_line_value cococart_line_value;
 typedef struct _cococart_config cococart_config;
 struct _cococart_config
 {
-	void (*cart_callback)(const device_config *device, int line);
-	void (*nmi_callback)(const device_config *device, int line);
-	void (*halt_callback)(const device_config *device, int line);
+	void (*cart_callback)(running_device *device, int line);
+	void (*nmi_callback)(running_device *device, int line);
+	void (*halt_callback)(running_device *device, int line);
 };
 
 
@@ -85,10 +85,10 @@ DEVICE_GET_INFO(coco_cartridge_pcb_orch90);
 DEVICE_GET_INFO(coco_cartridge_pcb_rs232);
 
 /* sets a cartridge line */
-void coco_cartridge_set_line(const device_config *device, cococart_line line, cococart_line_value value);
+void coco_cartridge_set_line(running_device *device, cococart_line line, cococart_line_value value);
 
 /* hack to support twiddling the Q line */
-void coco_cartridge_twiddle_q_lines(const device_config *device);
+void coco_cartridge_twiddle_q_lines(running_device *device);
 
 
 /***************************************************************************

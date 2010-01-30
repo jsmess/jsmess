@@ -147,7 +147,7 @@ static UINT8 apple2gs_mouse_x;
 static UINT8 apple2gs_mouse_y;
 static INT8  apple2gs_mouse_dx;
 static INT8  apple2gs_mouse_dy;
-static const device_config *apple2gs_cur_slot6_image;
+static running_device *apple2gs_cur_slot6_image;
 static emu_timer *apple2gs_scanline_timer;
 static emu_timer *apple2gs_clock_timer;
 static emu_timer *apple2gs_qsecond_timer;
@@ -336,7 +336,7 @@ static void apple2gs_remove_irq(running_machine *machine, UINT8 irq_mask)
 	}
 }
 
-void apple2gs_doc_irq(const device_config *device, int state)
+void apple2gs_doc_irq(running_device *device, int state)
 {
 	if (state)
 	{
@@ -862,7 +862,7 @@ static READ8_HANDLER( gssnd_r )
 			}
 			else
 			{
-				const device_config *es5503 = devtag_get_device(space->machine, "es5503");
+				running_device *es5503 = devtag_get_device(space->machine, "es5503");
 				sndglu_dummy_read = es5503_r(es5503, sndglu_addr);
 			}
 
@@ -902,7 +902,7 @@ static WRITE8_HANDLER( gssnd_w )
 			}
 			else
 			{
-				const device_config *es5503 = devtag_get_device(space->machine, "es5503");
+				running_device *es5503 = devtag_get_device(space->machine, "es5503");
 				es5503_w(es5503, sndglu_addr, data);
 			}
 
@@ -956,7 +956,7 @@ static int apple2gs_get_vpos(running_machine *machine)
 static READ8_HANDLER( apple2gs_c0xx_r )
 {
 	UINT8 result;
-	const device_config *scc;
+	running_device *scc;
 
 	offset &= 0xFF;
 
@@ -1099,7 +1099,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 
 static WRITE8_HANDLER( apple2gs_c0xx_w )
 {
-	const device_config *scc;
+	running_device *scc;
 
 	offset &= 0xFF;
 

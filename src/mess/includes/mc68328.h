@@ -125,7 +125,7 @@ struct _mc68328_interface
 
     write16_device_func out_spim_func;      /* 16-bit output */
     read16_device_func  in_spim_func;       /* 16-bit input */
-    void (*spim_xch_trigger)( const device_config *device );    /* SPIM exchange trigger */
+    void (*spim_xch_trigger)( running_device *device );    /* SPIM exchange trigger */
 };
 #define MC68328_INTERFACE(name) const mc68328_interface (name)=
 
@@ -153,8 +153,8 @@ READ16_DEVICE_HANDLER(  mc68328_r );
     EXTERNAL I/O LINES
 ***************************************************************************/
 
-void mc68328_set_penirq_line(const device_config *device, int state);
-void mc68328_set_port_d_lines(const device_config *device, UINT8 state, int bit);
+void mc68328_set_penirq_line(running_device *device, int state);
+void mc68328_set_port_d_lines(running_device *device, UINT8 state, int bit);
 
 /***************************************************************************
     DEVICE INTERFACE

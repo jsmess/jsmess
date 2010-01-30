@@ -159,7 +159,7 @@ static void microtan_set_irq_line(running_machine *machine)
     cputag_set_input_line(machine, "maincpu", 0, via_0_irq_line | via_1_irq_line | kbd_irq_line);
 }
 
-static const device_config *cassette_device_image(running_machine *machine)
+static running_device *cassette_device_image(running_machine *machine)
 {
 	return devtag_get_device(machine, "cassette");
 }
@@ -231,7 +231,7 @@ static WRITE8_DEVICE_HANDLER (via_0_out_cb2 )
     LOG(("microtan_via_0_out_cb2 %d\n", data));
 }
 
-static void via_0_irq(const device_config *device, int state)
+static void via_0_irq(running_device *device, int state)
 {
     LOG(("microtan_via_0_irq %d\n", state));
     via_0_irq_line = state;
@@ -303,7 +303,7 @@ static WRITE8_DEVICE_HANDLER ( via_1_out_cb2 )
     LOG(("microtan_via_1_out_cb2 %d\n", data));
 }
 
-static void via_1_irq(const device_config *device, int state)
+static void via_1_irq(running_device *device, int state)
 {
     LOG(("microtan_via_1_irq %d\n", state));
     via_1_irq_line = state;
@@ -340,7 +340,7 @@ const via6522_interface microtan_via6522_1 =
 static TIMER_CALLBACK(microtan_read_cassette)
 {
 	double level = cassette_input(cassette_device_image(machine));
-	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
+	running_device *via_0 = devtag_get_device(machine, "via6522_0");
 
 	LOG(("microtan_read_cassette: %g\n", level));
 	if (level < -0.07)
@@ -714,9 +714,9 @@ static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buf
 {
     UINT8 *RAM = memory_region(machine, "maincpu");
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
-	const device_config *via_1 = devtag_get_device(machine, "via6522_1");
-	const device_config *ay8910 = devtag_get_device(machine, "ay8910.1");
+	running_device *via_0 = devtag_get_device(machine, "via6522_0");
+	running_device *via_1 = devtag_get_device(machine, "via6522_1");
+	running_device *ay8910 = devtag_get_device(machine, "ay8910.1");
 
     /* check for .DMP file format */
     if (snapshot_size == 8263)

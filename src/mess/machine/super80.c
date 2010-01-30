@@ -16,17 +16,17 @@
 
 UINT8 super80_shared=0xff;
 UINT8 *super80_colorram;
-static const device_config *super80_z80pio;
-static const device_config *super80_speaker;
-static const device_config *super80_cassette;
-static const device_config *super80_printer;
+static running_device *super80_z80pio;
+static running_device *super80_speaker;
+static running_device *super80_cassette;
+static running_device *super80_printer;
 
 /**************************** PIO ******************************************************************************/
 
 static UINT8 keylatch;
 
 /* This activates when Control + C + 4 pressed */
-static void super80_pio_interrupt(const device_config *device, int state)
+static void super80_pio_interrupt(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, state );
 }

@@ -63,7 +63,7 @@ MACHINE_RESET( pecom )
 
 WRITE8_HANDLER( pecom_bank_w )
 {
-	const device_config *cdp1869 = devtag_get_device(space->machine, CDP1869_TAG);
+	running_device *cdp1869 = devtag_get_device(space->machine, CDP1869_TAG);
 	const address_space *space2 = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(space->machine, "maincpu");
 	memory_install_write_bank(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
@@ -114,7 +114,7 @@ static CDP1802_MODE_READ( pecom64_mode_r )
 	return (cdp1802_control_mode)state->cdp1802_mode;
 }
 
-static const device_config *cassette_device_image(running_machine *machine)
+static running_device *cassette_device_image(running_machine *machine)
 {
 	return devtag_get_device(machine, "cassette");
 }

@@ -34,10 +34,10 @@ struct _mc1000_state
 	UINT8 mc6847_attr;
 
 	/* devices */
-	const device_config *mc6845;
-	const device_config *mc6847;
-	const device_config *centronics;
-	const device_config *cassette;
+	running_device *mc6845;
+	running_device *mc6847;
+	running_device *centronics;
+	running_device *cassette;
 };
 
 #endif

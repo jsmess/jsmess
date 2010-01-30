@@ -132,7 +132,7 @@ static WRITE8_DEVICE_HANDLER(COPS_via_out_a);
 static WRITE8_DEVICE_HANDLER(COPS_via_out_b);
 static WRITE8_DEVICE_HANDLER(COPS_via_out_ca2);
 static WRITE8_DEVICE_HANDLER(COPS_via_out_cb2);
-static void COPS_via_irq_func(const device_config *device, int val);
+static void COPS_via_irq_func(running_device *device, int val);
 static READ8_DEVICE_HANDLER(parallel_via_in_b);
 
 static int KBIR;	/* COPS VIA interrupt pending */
@@ -347,7 +347,7 @@ static struct
 
 INLINE void COPS_send_data_if_possible(running_machine *machine)
 {
-	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
+	running_device *via_0 = devtag_get_device(machine, "via6522_0");
 
 	if ((! hold_COPS_data) && fifo_size && (! COPS_Ready))
 	{
@@ -535,7 +535,7 @@ static TIMER_CALLBACK(handle_mouse)
 static TIMER_CALLBACK(read_COPS_command)
 {
 	int command;
-	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
+	running_device *via_0 = devtag_get_device(machine, "via6522_0");
 
 	COPS_Ready = 0;
 
@@ -827,7 +827,7 @@ static READ8_DEVICE_HANDLER(COPS_via_in_b)
 
 static WRITE8_DEVICE_HANDLER(COPS_via_out_b)
 {
-	const device_config *via_0 = devtag_get_device(device->machine, "via6522_0");
+	running_device *via_0 = devtag_get_device(device->machine, "via6522_0");
 
 	/* pull-up */
 	data |= (~ via_r(via_0, VIA_DDRA)) & 0x01;
@@ -853,11 +853,11 @@ static WRITE8_DEVICE_HANDLER(COPS_via_out_b)
 
 static WRITE8_DEVICE_HANDLER(COPS_via_out_cb2)
 {
-	const device_config *speaker = devtag_get_device(device->machine, "speaker");
+	running_device *speaker = devtag_get_device(device->machine, "speaker");
 	speaker_level_w(speaker, data);
 }
 
-static void COPS_via_irq_func(const device_config *device, int val)
+static void COPS_via_irq_func(running_device *device, int val)
 {
 	if (KBIR != val)
 	{
@@ -1188,7 +1188,7 @@ MACHINE_RESET( lisa )
 	init_COPS(machine);
 
 	{
-		const device_config *via_0 = devtag_get_device(machine, "via6522_0");
+		running_device *via_0 = devtag_get_device(machine, "via6522_0");
 		COPS_via_out_ca2(via_0, 0, 0);	/* VIA core forgets to do so */
 	}
 
@@ -1325,7 +1325,7 @@ INLINE void lisa_fdc_ttl_glue_access(running_machine *machine, offs_t offset)
 			MT1 = offset & 1;
 			if (MT1 && ! oldMT1)
 			{
-				const device_config *fdc = devtag_get_device(machine, "fdc");
+				running_device *fdc = devtag_get_device(machine, "fdc");
 
 				PWM_floppy_motor_speed = (PWM_floppy_motor_speed << 1) & 0xff;
 				if (applefdc_get_lines(fdc) & APPLEFDC_PH0)
@@ -1362,7 +1362,7 @@ INLINE void lisa_fdc_ttl_glue_access(running_machine *machine, offs_t offset)
 READ8_HANDLER ( lisa_fdc_io_r )
 {
 	int answer=0;
-	const device_config *fdc = devtag_get_device(space->machine, "fdc");
+	running_device *fdc = devtag_get_device(space->machine, "fdc");
 
 	switch ((offset & 0x0030) >> 4)
 	{
@@ -1389,7 +1389,7 @@ READ8_HANDLER ( lisa_fdc_io_r )
 
 WRITE8_HANDLER ( lisa_fdc_io_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "fdc");
+	running_device *fdc = devtag_get_device(space->machine, "fdc");
 
 	switch ((offset & 0x0030) >> 4)
 	{
@@ -1923,8 +1923,8 @@ INLINE void cpu_board_control_access(running_machine *machine, offs_t offset)
 
 static READ16_HANDLER ( lisa_IO_r )
 {
-	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
-	const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
+	running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
+	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
 	int answer=0;
 
 	switch ((offset & 0x7000) >> 12)
@@ -2052,8 +2052,8 @@ static READ16_HANDLER ( lisa_IO_r )
 
 static WRITE16_HANDLER ( lisa_IO_w )
 {
-	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
-	const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
+	running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
+	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
 
 	switch ((offset & 0x7000) >> 12)
 	{

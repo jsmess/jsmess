@@ -23,7 +23,7 @@
 struct _aescartridge_t
 {
 	/* PCB device associated to this cartridge. If NULL, the slot is empty. */
-	const device_config *pcb;
+	running_device *pcb;
 };
 typedef struct _aescartridge_t aescartridge_t;
 

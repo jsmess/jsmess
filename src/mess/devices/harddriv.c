@@ -76,7 +76,7 @@ struct _dev_harddisk_t
 };
 
 
-INLINE dev_harddisk_t *get_safe_token(const device_config *device)
+INLINE dev_harddisk_t *get_safe_token(running_device *device)
 {
 	assert( device != NULL );
 	assert( device->token != NULL );
@@ -95,7 +95,7 @@ INLINE dev_harddisk_t *get_safe_token(const device_config *device)
  *
  *************************************/
 
-static int internal_load_mess_hd(const device_config *image, const char *metadata)
+static int internal_load_mess_hd(running_device *image, const char *metadata)
 {
 	dev_harddisk_t	*harddisk = get_safe_token( image );
 	chd_error		err = (chd_error)0;
@@ -232,7 +232,7 @@ static DEVICE_IMAGE_UNLOAD( mess_hd )
  *
  *************************************/
 
-hard_disk_file *mess_hd_get_hard_disk_file(const device_config *device)
+hard_disk_file *mess_hd_get_hard_disk_file(running_device *device)
 {
 	dev_harddisk_t	*harddisk = get_safe_token( device );
 
@@ -247,7 +247,7 @@ hard_disk_file *mess_hd_get_hard_disk_file(const device_config *device)
  *
  *************************************/
 
-chd_file *mess_hd_get_chd_file(const device_config *device)
+chd_file *mess_hd_get_chd_file(running_device *device)
 {
 	chd_file *result = NULL;
 	hard_disk_file *hd_file;
@@ -270,7 +270,7 @@ static DEVICE_START(mess_hd)
 {
 	dev_harddisk_t	*harddisk = get_safe_token( device );
 
-	harddisk->config = (const harddisk_callback_config*)device->static_config;
+	harddisk->config = (const harddisk_callback_config*)device->baseconfig().static_config;
 	harddisk->chd = NULL;
 	harddisk->hard_disk_handle = NULL;
 }

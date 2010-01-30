@@ -20,7 +20,7 @@
 typedef struct _lx800_state lx800_state;
 struct _lx800_state
 {
-	const device_config *speaker;
+	running_device *speaker;
 };
 
 
@@ -112,7 +112,7 @@ static WRITE_LINE_DEVICE_HANDLER( lx800_paperempty_led_w )
 
 static WRITE_LINE_DEVICE_HANDLER( lx800_reset_w )
 {
-	device_reset(devtag_get_device(device->machine, "maincpu"));
+	devtag_get_device(device->machine, "maincpu")->reset();
 }
 
 

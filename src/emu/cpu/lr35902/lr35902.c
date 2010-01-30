@@ -65,7 +65,7 @@ typedef struct {
 	int	irq_state;
 	int	ei_delay;
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	int icount;
 	/* Timer stuff */
@@ -113,7 +113,7 @@ union _lr35902_state {
 	lr35902_8BitRegs b;
 };
 
-INLINE lr35902_state *get_safe_token(const device_config *device)
+INLINE lr35902_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -191,7 +191,7 @@ static CPU_INIT( lr35902 )
 {
 	lr35902_state *cpustate = get_safe_token(device);
 
-	cpustate->w.config = (const lr35902_cpu_core *) device->static_config;
+	cpustate->w.config = (const lr35902_cpu_core *) device->baseconfig().static_config;
 	cpustate->w.irq_callback = irqcallback;
 	cpustate->w.device = device;
 	cpustate->w.program = device->space(AS_PROGRAM);
@@ -427,15 +427,15 @@ CPU_GET_INFO( lr35902 )
 	case CPUINFO_INT_MIN_CYCLES:					info->i = 1;	/* right? */			break;
 	case CPUINFO_INT_MAX_CYCLES:					info->i = 16;	/* right? */			break;
 
-	case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
-	case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
-	case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 16;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
+	case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
+	case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;					break;
+	case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
+	case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+	case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+	case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+	case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
+	case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 16;					break;
+	case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
 
 	case CPUINFO_INT_SP:							info->i = cpustate->w.SP;					break;
 	case CPUINFO_INT_PC:							info->i = cpustate->w.PC;					break;

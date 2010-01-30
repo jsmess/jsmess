@@ -47,14 +47,14 @@ struct _vip_state
 	int keylatch;					/* key latch */
 
 	/* devices */
-	const device_config *cdp1861;
-	const device_config *cdp1862;
-	const device_config *cdp1863;
-	const device_config *cassette;
-	const device_config *beeper;
-	const device_config *vp595;
-	const device_config *vp550;
-	const device_config *vp551;
+	running_device *cdp1861;
+	running_device *cdp1862;
+	running_device *cdp1863;
+	running_device *cassette;
+	running_device *beeper;
+	running_device *vp595;
+	running_device *vp550;
+	running_device *vp551;
 };
 
 #endif

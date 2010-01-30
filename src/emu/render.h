@@ -145,11 +145,8 @@ enum
 ***************************************************************************/
 
 /* convenience macros for adding items to the UI container */
-#define render_ui_add_point(x0,y0,diam,argb,flags)				render_container_add_line(render_container_get_ui(), x0, y0, x0, y0, diam, argb, flags)
-#define render_ui_add_line(x0,y0,x1,y1,diam,argb,flags)			render_container_add_line(render_container_get_ui(), x0, y0, x1, y1, diam, argb, flags)
-#define render_ui_add_rect(x0,y0,x1,y1,argb,flags)				render_container_add_quad(render_container_get_ui(), x0, y0, x1, y1, argb, NULL, flags)
-#define render_ui_add_quad(x0,y0,x1,y1,argb,tex,flags)			render_container_add_quad(render_container_get_ui(), x0, y0, x1, y1, argb, tex, flags)
-#define render_ui_add_char(x0,y0,ht,asp,argb,font,ch)			render_container_add_char(render_container_get_ui(), x0, y0, ht, asp, argb, font, ch)
+#define render_container_add_point(c, x0,y0,diam,argb,flags)	render_container_add_line(c, x0, y0, x0, y0, diam, argb, flags)
+#define render_container_add_rect(c, x0,y0,x1,y1,argb,flags)	render_container_add_quad(c, x0, y0, x1, y1, argb, NULL, flags)
 
 /* convenience macros for adding items to a screen container */
 #define render_screen_add_point(scr,x0,y0,diam,argb,flags)		render_container_add_line(render_container_get_screen(scr), x0, y0, x0, y0, diam, argb, flags)
@@ -163,6 +160,11 @@ enum
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+// forward definitions
+class running_device;
+class device_config;
+
 
 /*-------------------------------------------------
     callbacks
@@ -325,7 +327,7 @@ struct _render_container_user_settings
 void render_init(running_machine *machine);
 
 /* return a boolean indicating if the screen is live */
-int render_is_live_screen(const device_config *screen);
+int render_is_live_screen(running_device *screen);
 
 /* return the smallest maximum update rate across all targets */
 float render_get_max_update_rate(void);
@@ -447,6 +449,7 @@ render_container *render_container_get_ui(void);
 
 /* return a pointer to the container for the given screen */
 render_container *render_container_get_screen(const device_config *screen);
+render_container *render_container_get_screen(running_device *screen);
 
 /* add a line item to the specified container */
 void render_container_add_line(render_container *container, float x0, float y0, float x1, float y1, float width, rgb_t argb, UINT32 flags);

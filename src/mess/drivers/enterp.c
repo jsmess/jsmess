@@ -179,7 +179,7 @@ static const dave_interface enterprise_dave_interface =
 
 static MACHINE_RESET( enterprise )
 {
-	const device_config *fdc = devtag_get_device(machine, "wd1770");
+	running_device *fdc = devtag_get_device(machine, "wd1770");
 	cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), 0, 0xff);
 
 	wd17xx_set_density(fdc, DEN_FM_HI);
@@ -238,7 +238,7 @@ static READ8_HANDLER( exdos_card_r )
 */
 static WRITE8_HANDLER( exdos_card_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd1770");
+	running_device *fdc = devtag_get_device(space->machine, "wd1770");
 
 	/* drive */
 	if (BIT(data, 0)) wd17xx_set_drive(fdc, 0);

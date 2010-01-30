@@ -1977,7 +1977,7 @@ static void gb_timer_increment( running_machine *machine )
 	}
 }
 
-void gb_timer_callback(const device_config *device, int cycles)
+void gb_timer_callback(running_device *device, int cycles)
 {
 	UINT16 old_gb_divcount = gb_driver_data.divcount;
 	gb_driver_data.divcount += cycles;

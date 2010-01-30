@@ -327,7 +327,7 @@ static const z80pio_interface pio2_intf =
 
 /* Z80-SIO Interface */
 
-static void z80daisy_interrupt(const device_config *device, int state)
+static void z80daisy_interrupt(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, state);
 }

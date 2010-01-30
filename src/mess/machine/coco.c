@@ -555,7 +555,7 @@ const sam6883_interface coco3_sam_intf =
   changing to make it worthy of Microsoft.
 ***************************************************************************/
 
-static int load_pak_into_region(const device_config *image, int *pakbase, int *paklen, UINT8 *mem, int segaddr, int seglen)
+static int load_pak_into_region(running_device *image, int *pakbase, int *paklen, UINT8 *mem, int segaddr, int seglen)
 {
 	if (*paklen)
 	{
@@ -645,7 +645,7 @@ static void pak_load_trailer(running_machine *machine, const pak_decodedtrailer 
 	sam6883_set_state(state->sam, trailer->sam, 0x7fff);
 }
 
-static int generic_pak_load(const device_config *image, int rambase_index, int rombase_index, int pakbase_index)
+static int generic_pak_load(running_device *image, int rambase_index, int rombase_index, int pakbase_index)
 {
 	UINT8 *ROM;
 	UINT8 *rambase;
@@ -1173,25 +1173,25 @@ static int coco_hiresjoy_ry( running_machine *machine )
 #define SOUNDMUX_STATUS_SEL2	2
 #define SOUNDMUX_STATUS_SEL1	1
 
-static const device_config *cassette_device_image(running_machine *machine)
+static running_device *cassette_device_image(running_machine *machine)
 {
 	coco_state *state = (coco_state *)machine->driver_data;
 	return state->cassette_device;
 }
 
-static const device_config *bitbanger_image(running_machine *machine)
+static running_device *bitbanger_image(running_machine *machine)
 {
 	coco_state *state = (coco_state *)machine->driver_data;
 	return state->bitbanger_device;
 }
 
-static const device_config *printer_image(running_machine *machine)
+static running_device *printer_image(running_machine *machine)
 {
 	coco_state *state = (coco_state *)machine->driver_data;
 	return state->printer_device;
 }
 
-static const device_config *cococart_device(running_machine *machine)
+static running_device *cococart_device(running_machine *machine)
 {
 	coco_state *state = (coco_state *)machine->driver_data;
 	return state->cococart_device;
@@ -1283,7 +1283,7 @@ READ8_HANDLER ( dgnalpha_psg_porta_read )
 
 WRITE8_HANDLER( dgnalpha_psg_porta_write )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd2797");
+	running_device *fdc = devtag_get_device(space->machine, "wd2797");
 	/* Bits 0..3 are the drive select lines for the internal floppy interface */
 	/* Bit 4 is the motor on, in the real hardware these are inverted on their way to the drive */
 	/* Bits 5,6,7 are connected to /DDEN, ENP and 5/8 on the WD2797 */
@@ -1678,7 +1678,7 @@ static WRITE8_DEVICE_HANDLER( dragon64_pia1_pb_w )
 
 static WRITE8_DEVICE_HANDLER( dgnalpha_pia2_pa_w )
 {
-	const device_config *ay8912 = devtag_get_device(device->machine, "ay8912");
+	running_device *ay8912 = devtag_get_device(device->machine, "ay8912");
 	int	bc_flags;		/* BCDDIR/BC1, as connected to PIA2 port a bits 0 and 1 */
 
 	/* If bit 2 of the pia2 ddra is 1 then this pin is an output so use it */
@@ -1766,7 +1766,7 @@ static WRITE_LINE_DEVICE_HANDLER( dgnalpha_fdc_drq_w )
 /* The Dragon Alpha hardware reverses the order of the WD2797 registers */
 READ8_HANDLER(dgnalpha_wd2797_r)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd2797");
+	running_device *fdc = devtag_get_device(space->machine, "wd2797");
 	int result = 0;
 
 	switch(offset & 0x03)
@@ -1792,7 +1792,7 @@ READ8_HANDLER(dgnalpha_wd2797_r)
 
 WRITE8_HANDLER(dgnalpha_wd2797_w)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd2797");
+	running_device *fdc = devtag_get_device(space->machine, "wd2797");
     switch(offset & 0x3)
 	{
 		case 0:
@@ -2513,7 +2513,7 @@ WRITE8_HANDLER(coco3_gime_w)
 			{
 				if (coco3_gimereg[0] & 0x04)
 				{
-					const device_config *device = cococart_device(space->machine);
+					running_device *device = cococart_device(space->machine);
 					memory_install_read8_device_handler(space, device, 0xFF40, 0xFF5F, 0, 0, coco_cartridge_r);
 					memory_install_write8_device_handler(space, device, 0xFF40, 0xFF5F, 0, 0, coco_cartridge_w);
 				}
@@ -2715,7 +2715,7 @@ static SAM6883_SET_MAP_TYPE( coco3_sam_set_maptype )
     coco_cart_w - call for CART line
 -------------------------------------------------*/
 
-void coco_cart_w(const device_config *device, int data)
+void coco_cart_w(running_device *device, int data)
 {
 	coco_state *state = (coco_state *)device->machine->driver_data;
 	pia6821_cb1_w(state->pia_1, 0, data ? ASSERT_LINE : CLEAR_LINE);
@@ -2727,7 +2727,7 @@ void coco_cart_w(const device_config *device, int data)
     in addition will raise the GIME interrupt
 -------------------------------------------------*/
 
-void coco3_cart_w(const device_config *device, int data)
+void coco3_cart_w(running_device *device, int data)
 {
 	coco3_raise_interrupt(device->machine, COCO3_INT_EI0, data ? ASSERT_LINE : CLEAR_LINE);
 	coco_cart_w(device, data);
@@ -2739,7 +2739,7 @@ void coco3_cart_w(const device_config *device, int data)
     coco_halt_w - sets the HALT line
 -------------------------------------------------*/
 
-void coco_halt_w(const device_config *device, int data)
+void coco_halt_w(running_device *device, int data)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -2750,7 +2750,7 @@ void coco_halt_w(const device_config *device, int data)
     coco_nmi_w - sets the NMI
 -------------------------------------------------*/
 
-void coco_nmi_w(const device_config *device, int data)
+void coco_nmi_w(running_device *device, int data)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, data ? ASSERT_LINE : CLEAR_LINE);
 }

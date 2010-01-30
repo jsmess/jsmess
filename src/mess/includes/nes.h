@@ -25,9 +25,9 @@
 typedef struct _nes_state nes_state;
 struct _nes_state
 {
-	const device_config *ppu;
-	const device_config *sound;
-	const device_config *cart;
+	running_device *ppu;
+	running_device *sound;
+	running_device *cart;
 };
 
 
@@ -101,7 +101,7 @@ DRIVER_INIT( famicom );
 READ8_HANDLER( nes_IN0_r );
 READ8_HANDLER( nes_IN1_r );
 
-int nes_ppu_vidaccess( const device_config *device, int address, int data );
+int nes_ppu_vidaccess( running_device *device, int address, int data );
 
 void nes_partialhash(char *dest, const unsigned char *data,
 	unsigned long length, unsigned int functions);

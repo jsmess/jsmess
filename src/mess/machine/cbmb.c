@@ -68,7 +68,7 @@ static UINT8 *cbmb_memory;
  */
 READ8_DEVICE_HANDLER( cbmb_tpi0_port_a_r )
 {
-	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 	UINT8 data = 0;
 
 	if (ieee488_nrfd_r(ieeebus))
@@ -94,7 +94,7 @@ READ8_DEVICE_HANDLER( cbmb_tpi0_port_a_r )
 
 WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_a_w )
 {
-	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 
 	ieee488_nrfd_w(ieeebus, device, BIT(data, 7));
 	ieee488_ndac_w(ieeebus, device, BIT(data, 6));
@@ -106,7 +106,7 @@ WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_a_w )
 
 READ8_DEVICE_HANDLER( cbmb_tpi0_port_b_r )
 {
-	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 	UINT8 data = 0;
 
 	if (ieee488_srq_r(ieeebus))
@@ -120,7 +120,7 @@ READ8_DEVICE_HANDLER( cbmb_tpi0_port_b_r )
 
 WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_b_w )
 {
-	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 
 	ieee488_srq_w(ieeebus, device, BIT(data, 1));
 	ieee488_ifc_w(ieeebus, device, BIT(data, 0));
@@ -240,7 +240,7 @@ READ8_DEVICE_HANDLER( cbmb_keyboard_line_c )
 	return data ^0xff;
 }
 
-void cbmb_irq( const device_config *device, int level )
+void cbmb_irq( running_device *device, int level )
 {
 	static int old_level = 0;
 
@@ -263,13 +263,13 @@ void cbmb_irq( const device_config *device, int level )
  */
 static READ8_DEVICE_HANDLER( cbmb_cia_port_a_r )
 {
-	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 	return ieee488_dio_r(ieeebus, 0);
 }
 
 static WRITE8_DEVICE_HANDLER( cbmb_cia_port_a_w )
 {
-	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 	ieee488_dio_w(ieeebus, device, data);
 }
 
@@ -372,7 +372,7 @@ MACHINE_RESET( cbmb )
 static TIMER_CALLBACK(cbmb_frame_interrupt)
 {
 	static int level = 0;
-	const device_config *tpi_0 = devtag_get_device(machine, "tpi6525_0");
+	running_device *tpi_0 = devtag_get_device(machine, "tpi6525_0");
 
 #if 0
 	int controller1 = input_port_read(machine, "CTRLSEL") & 0x07;

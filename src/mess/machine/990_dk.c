@@ -41,7 +41,7 @@ static struct
 
 	struct
 	{
-		const device_config *img;
+		running_device *img;
 		int phys_cylinder;
 		int log_cylinder[2];
 		int seclen;
@@ -95,7 +95,7 @@ static void fd800_field_interrupt(void)
 		(*fd800.interrupt_callback)(fd800.machine, (fd800.stat_reg & status_interrupt) && ! fd800.interrupt_f_f);
 }
 
-static void fd800_unload_proc(const device_config *image)
+static void fd800_unload_proc(running_device *image)
 {
 	int unit = floppy_get_drive(image);
 

@@ -22,9 +22,9 @@
 static void device_dirs_load(running_machine *machine, int config_type, xml_data_node *parentnode)
 {
 	xml_data_node *node;
-	const device_config *dev;
+	running_device *dev;
 	image_device_info info;
-	const device_config *image;
+	running_device *image;
 	const char *dev_instance;
 	const char *working_directory;
 
@@ -37,11 +37,15 @@ static void device_dirs_load(running_machine *machine, int config_type, xml_data
 
 			if ((dev_instance != NULL) && (dev_instance[0] != '\0'))
 			{
-				for (dev = image_device_first(machine->config); (image == NULL) && (dev != NULL); dev = image_device_next(dev))
+			
+				for (dev = machine->devicelist.first(); dev != NULL; dev = dev->next)
 				{
-					info = image_device_getinfo(machine->config, dev);
-					if (!strcmp(dev_instance, info.instance_name))
-						image = dev;
+					if (is_image_device(dev))
+					{
+						info = image_device_getinfo(machine->config, dev);
+						if (!strcmp(dev_instance, info.instance_name))
+							image = dev;
+					}
 				}
 
 				if (image != NULL)
@@ -66,24 +70,27 @@ static void device_dirs_save(running_machine *machine, int config_type, xml_data
 {
 	xml_data_node *node;
 	image_device_info info;
-	const device_config *image;
+	running_device *image;
 	const char *dev_instance;
 
 	/* only care about game-specific data */
 	if (config_type == CONFIG_TYPE_GAME)
 	{
-		for (image = image_device_first(machine->config); image != NULL; image = image_device_next(image))
+		for (image = machine->devicelist.first(); image != NULL; image = image->next)
 		{
-			info = image_device_getinfo(machine->config, image);
-			dev_instance = info.instance_name;
-
-			node = xml_add_child(parentnode, "device", NULL);
-			if (node != NULL)
+			if (is_image_device(image))
 			{
-				xml_set_attribute(node, "instance", dev_instance);
-				xml_set_attribute(node, "directory", image_working_directory(image));
+				info = image_device_getinfo(machine->config, image);
+				dev_instance = info.instance_name;
+
+				node = xml_add_child(parentnode, "device", NULL);
+				if (node != NULL)
+				{
+					xml_set_attribute(node, "instance", dev_instance);
+					xml_set_attribute(node, "directory", image_working_directory(image));
+				}
 			}
-		}
+		}		
 	}
 }
 

@@ -37,13 +37,13 @@ struct _mm1_state
 	int tc;
 
 	/* devices */
-	const device_config		*i8212;
-	const device_config		*i8237;
-	const device_config		*i8275;
-	const device_config		*upd765;
-	const device_config		*upd7201;
-	const device_config		*upd7220;
-	const device_config		*speaker;
+	running_device *i8212;
+	running_device *i8237;
+	running_device *i8275;
+	running_device *upd765;
+	running_device *upd7201;
+	running_device *upd7220;
+	running_device *speaker;
 };
 
 #endif

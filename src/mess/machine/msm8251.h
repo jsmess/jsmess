@@ -44,11 +44,11 @@ typedef struct _msm8251_interface msm8251_interface;
 struct _msm8251_interface
 {
 	/* state of txrdy output */
-	void	(*tx_ready_callback)(const device_config *device, int state);
+	void	(*tx_ready_callback)(running_device *device, int state);
 	/* state of txempty output */
-	void	(*tx_empty_callback)(const device_config *device, int state);
+	void	(*tx_empty_callback)(running_device *device, int state);
 	/* state of rxrdy output */
-	void	(*rx_ready_callback)(const device_config *device, int state);
+	void	(*rx_ready_callback)(running_device *device, int state);
 };
 
 
@@ -76,13 +76,13 @@ WRITE8_DEVICE_HANDLER(msm8251_control_w);
 /* The 8251 has seperate transmit and receive clocks */
 /* use these two functions to update the msm8251 for each clock */
 /* on NC100 system, the clocks are the same */
-void msm8251_transmit_clock(const device_config *device);
-void msm8251_receive_clock(const device_config *device);
+void msm8251_transmit_clock(running_device *device);
+void msm8251_receive_clock(running_device *device);
 
 /* connecting to serial output */
-void msm8251_connect_to_serial_device(const device_config *device, const device_config *image);
-void msm8251_connect(const device_config *device, struct serial_connection *other_connection);
+void msm8251_connect_to_serial_device(running_device *device, running_device *image);
+void msm8251_connect(running_device *device, struct serial_connection *other_connection);
 
-void msm8251_receive_character(const device_config *device, UINT8 ch);
+void msm8251_receive_character(running_device *device, UINT8 ch);
 
 #endif /* __MSM8251_H__ */

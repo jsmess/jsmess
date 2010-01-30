@@ -243,7 +243,7 @@ static READ8_HANDLER( sound_status_r )
 	return 0xf;
 }
 
-static void sound_nmi( const device_config *device )
+static void sound_nmi( running_device *device )
 {
 	lethal_state *state = (lethal_state *)device->machine->driver_data;
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
@@ -609,7 +609,7 @@ static MACHINE_RESET( lethalen )
 
 	memory_set_bankptr(machine, "bank2", &prgrom[0x48000]);
 	/* force reset again to read proper reset vector */
-	device_reset(devtag_get_device(machine, "maincpu"));
+	machine->device("maincpu")->reset();
 
 	for (i = 0; i < 4; i++)
 		state->layer_colorbase[i] = 0;

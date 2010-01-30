@@ -23,14 +23,14 @@ struct _beta_disk_state
 	UINT8 betadisk_status;
 	UINT8 betadisk_active;
 
-	const device_config *wd179x;
+	running_device *wd179x;
 };
 
 
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
-INLINE beta_disk_state *get_safe_token(const device_config *device)
+INLINE beta_disk_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -39,28 +39,28 @@ INLINE beta_disk_state *get_safe_token(const device_config *device)
 }
 
 
-int betadisk_is_active(const device_config *device)
+int betadisk_is_active(running_device *device)
 {
 	beta_disk_state *beta = get_safe_token(device);
 
 	return beta->betadisk_active;
 }
 
-void betadisk_enable(const device_config *device)
+void betadisk_enable(running_device *device)
 {
 	beta_disk_state *beta = get_safe_token(device);
 
 	beta->betadisk_active = 1;
 }
 
-void betadisk_disable(const device_config *device)
+void betadisk_disable(running_device *device)
 {
 	beta_disk_state *beta = get_safe_token(device);
 
 	beta->betadisk_active = 0;
 }
 
-void betadisk_clear_status(const device_config *device)
+void betadisk_clear_status(running_device *device)
 {
 	beta_disk_state *beta = get_safe_token(device);
 

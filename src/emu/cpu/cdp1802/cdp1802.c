@@ -116,7 +116,7 @@ static const cpu_state_table state_table_template =
 	state_array					/* array of entries */
 };
 
-INLINE cdp1802_state *get_safe_token(const device_config *device)
+INLINE cdp1802_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -224,7 +224,7 @@ INLINE void cdp1802_long_skip(cdp1802_state *cpustate, int taken)
 	}
 }
 
-static void cdp1802_sample_ef(const device_config *device)
+static void cdp1802_sample_ef(running_device *device)
 {
 	cdp1802_state *cpustate = get_safe_token(device);
 
@@ -238,7 +238,7 @@ static void cdp1802_sample_ef(const device_config *device)
 	}
 }
 
-static void cdp1802_output_state_code(const device_config *device)
+static void cdp1802_output_state_code(running_device *device)
 {
 	cdp1802_state *cpustate = get_safe_token(device);
 
@@ -276,7 +276,7 @@ static void cdp1802_output_state_code(const device_config *device)
 	}
 }
 
-static void cdp1802_run(const device_config *device)
+static void cdp1802_run(running_device *device)
 {
 	cdp1802_state *cpustate = get_safe_token(device);
 
@@ -965,7 +965,7 @@ static CPU_INIT( cdp1802 )
 	cdp1802_state *cpustate = get_safe_token(device);
 	int i;
 
-	cpustate->intf = (cdp1802_interface *) device->static_config;
+	cpustate->intf = (cdp1802_interface *) device->baseconfig().static_config;
 
 	/* resolve callbacks */
 	devcb_resolve_write_line(&cpustate->out_q_func, &cpustate->intf->out_q_func, device);
@@ -1096,15 +1096,15 @@ CPU_GET_INFO( cdp1802 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = CDP1802_CYCLES_EXECUTE * 2;	break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = CDP1802_CYCLES_EXECUTE * 3;	break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;									break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;									break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;									break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;									break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;									break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;									break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;									break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 3;									break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;									break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;									break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;									break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;									break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;									break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;									break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;									break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;									break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 3;									break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;									break;
 
 		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_INT:		info->i = cpustate->irq;	break;
 		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_DMAIN:	info->i = cpustate->dmain;	break;

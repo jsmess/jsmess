@@ -32,7 +32,7 @@ extern VIDEO_UPDATE( vc4000 );
 
 DEVICE_GET_INFO( vc4000_sound );
 
-void vc4000_soundport_w (const device_config *device, int mode, int data);
+void vc4000_soundport_w (running_device *device, int mode, int data);
 
 
 #endif /* VC4000_H_ */

@@ -35,7 +35,7 @@ struct _cdp1862_t
 	devcb_resolved_read_line		in_bd_func;
 	devcb_resolved_read_line		in_gd_func;
 
-	const device_config *screen;	/* screen */
+	running_device *screen;	/* screen */
 	bitmap_t *bitmap;				/* bitmap */
 
 	int bgcolor;					/* background color */
@@ -46,7 +46,7 @@ struct _cdp1862_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE cdp1862_t *get_safe_token(const device_config *device)
+INLINE cdp1862_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -62,9 +62,9 @@ INLINE cdp1862_t *get_safe_token(const device_config *device)
     initialize_palette - palette initialization
 -------------------------------------------------*/
 
-static void initialize_palette(const device_config *device)
+static void initialize_palette(running_device *device)
 {
-	const cdp1862_interface *intf = (const cdp1862_interface *)device->static_config;
+	const cdp1862_interface *intf = (const cdp1862_interface *)device->baseconfig().static_config;
 	int i;
 
 	double res_total = intf->chr_r + intf->chr_g + intf->chr_b + intf->chr_bkg;
@@ -157,7 +157,7 @@ WRITE_LINE_DEVICE_HANDLER( cdp1862_con_w )
     cdp1862_update - screen update
 -------------------------------------------------*/
 
-void cdp1862_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+void cdp1862_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	cdp1862_t *cdp1862 = get_safe_token(device);
 
@@ -172,7 +172,7 @@ void cdp1862_update(const device_config *device, bitmap_t *bitmap, const rectang
 static DEVICE_START( cdp1862 )
 {
 	cdp1862_t *cdp1862 = get_safe_token(device);
-	const cdp1862_interface *intf = (const cdp1862_interface *)device->static_config;
+	const cdp1862_interface *intf = (const cdp1862_interface *)device->baseconfig().static_config;
 
 	/* resolve callbacks */
 	devcb_resolve_read_line(&cdp1862->in_rd_func, &intf->in_rd_func, device);

@@ -147,7 +147,7 @@ static VIDEO_START( ec65 )
 
 static VIDEO_UPDATE( ec65 )
 {
-	const device_config *mc6845 = devtag_get_device(screen->machine, MC6845_TAG);
+	running_device *mc6845 = devtag_get_device(screen->machine, MC6845_TAG);
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }

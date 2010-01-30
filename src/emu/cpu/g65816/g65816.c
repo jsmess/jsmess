@@ -91,7 +91,7 @@ TODO general:
 #include "emu.h"
 #include "g65816.h"
 
-INLINE g65816i_cpu_struct *get_safe_token(const device_config *device)
+INLINE g65816i_cpu_struct *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -402,7 +402,7 @@ static CPU_SET_INFO( g65816 )
 
 
 
-void g65816_set_read_vector_callback(const device_config *device, read8_space_func read_vector)
+void g65816_set_read_vector_callback(running_device *device, read8_space_func read_vector)
 {
 	g65816i_cpu_struct *cpustate = get_safe_token(device);
 	READ_VECTOR = read_vector;
@@ -430,15 +430,15 @@ CPU_GET_INFO( g65816 )
 		case CPUINFO_INT_MIN_CYCLES:				info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:				info->i = 20; /* rough guess */			break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 24;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:	info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 24;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:	info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:	info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:	info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + G65816_LINE_IRQ:		info->i = LINE_IRQ;					break;
 		case CPUINFO_INT_INPUT_STATE + G65816_LINE_NMI:		info->i = LINE_NMI;					break;

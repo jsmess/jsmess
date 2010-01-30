@@ -43,7 +43,7 @@ static void xor100_bankswitch(running_machine *machine)
 {
 	xor100_state *state = (xor100_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	const device_config *messram = devtag_get_device(machine, "messram");
+	running_device *messram = devtag_get_device(machine, "messram");
 	int banks = messram_get_size(messram) / 0x10000;
 
 	switch (state->mode)
@@ -159,7 +159,7 @@ static WRITE8_DEVICE_HANDLER( baud_w )
 
 static WRITE8_DEVICE_HANDLER( i8251_b_data_w )
 {
-	const device_config	*terminal = devtag_get_device(device->machine, TERMINAL_TAG);
+	running_device *terminal = devtag_get_device(device->machine, TERMINAL_TAG);
 
 	msm8251_data_w(device, 0, data);
 	terminal_write(terminal, 0, data);
@@ -531,7 +531,7 @@ static GENERIC_TERMINAL_INTERFACE( xor100_terminal_intf )
 static MACHINE_START( xor100 )
 {
 	xor100_state *state = (xor100_state *)machine->driver_data;
-	const device_config *messram = devtag_get_device(machine, "messram");
+	running_device *messram = devtag_get_device(machine, "messram");
 	int banks = messram_get_size(messram) / 0x10000;
 
 	/* find devices */

@@ -107,7 +107,7 @@ static const UINT8 sam_video_mode_row_pitches[] =
  Implementation
 *****************************************************************************/
 
-INLINE sam6883_t *get_safe_token(const device_config *device)
+INLINE sam6883_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -115,7 +115,7 @@ INLINE sam6883_t *get_safe_token(const device_config *device)
 	return (sam6883_t *)device->token;
 }
 
-static void update_sam(const device_config *device)
+static void update_sam(running_device *device)
 {
 	sam6883_t *sam = get_safe_token(device);
 	UINT16 xorval;
@@ -144,11 +144,11 @@ static void update_sam(const device_config *device)
 
 static STATE_POSTLOAD( update_sam_postload )
 {
-	const device_config *device = (const device_config *)param;
+	running_device *device = (running_device *)param;
 	update_sam(device);
 }
 
-void sam6883_set_state(const device_config *device, UINT16 state, UINT16 mask)
+void sam6883_set_state(running_device *device, UINT16 state, UINT16 mask)
 {
 	sam6883_t *sam = get_safe_token(device);
 	sam->state &= ~mask;
@@ -184,7 +184,7 @@ WRITE8_DEVICE_HANDLER( sam6883_da_w )
 }
 #endif
 
-const UINT8 *sam6883_videoram(const device_config *device,int scanline)
+const UINT8 *sam6883_videoram(running_device *device,int scanline)
 {
 	sam6883_t *sam = get_safe_token(device);
 	const UINT8 *ram_base;
@@ -228,34 +228,34 @@ const UINT8 *sam6883_videoram(const device_config *device,int scanline)
 	return &ram_base[video_position];
 }
 
-UINT8 sam6883_memorysize(const device_config *device)
+UINT8 sam6883_memorysize(running_device *device)
 {
 	sam6883_t *sam = get_safe_token(device);
 	return (sam->state & 0x6000) / 0x2000;
 }
 
-UINT8 sam6883_pagemode(const device_config *device)
+UINT8 sam6883_pagemode(running_device *device)
 {
 	sam6883_t *sam = get_safe_token(device);
 	return (sam->state & 0x0400) / 0x0400;
 }
 
-UINT8 sam6883_maptype(const device_config *device)
+UINT8 sam6883_maptype(running_device *device)
 {
 	sam6883_t *sam = get_safe_token(device);
 	return (sam->state & 0x8000) / 0x8000;
 }
 
 /* Device Interface */
-static void common_start(const device_config *device, SAM6883_VERSION device_type)
+static void common_start(running_device *device, SAM6883_VERSION device_type)
 {
 	sam6883_t *sam = get_safe_token(device);
 	// validate arguments
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(device->static_config != NULL);
+	assert(device->baseconfig().static_config != NULL);
 
-	sam->intf = (const sam6883_interface*)device->static_config;
+	sam->intf = (const sam6883_interface*)device->baseconfig().static_config;
 
 	sam->type = device_type;
 

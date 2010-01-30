@@ -76,7 +76,7 @@ static unsigned int rotation_speed;		/* drive rotation speed - ignored if ext_sp
 */
 typedef struct
 {
-	const device_config *img;
+	running_device *img;
 	mame_file *fd;
 
 	unsigned int ext_speed_control : 1;	/* is motor rotation controlled by external device ? */
@@ -103,10 +103,10 @@ static int sony_enable2(void)
 	return (sony_lines & SONY_CA1) && (sony_lines & SONY_LSTRB);
 }
 
-static void load_track_data(const device_config *device,int floppy_select)
+static void load_track_data(running_device *device,int floppy_select)
 {
 	int track_size;
-	const device_config *cur_image;
+	running_device *cur_image;
 	UINT8 *new_data;
 	floppy *f;
 
@@ -128,9 +128,9 @@ static void load_track_data(const device_config *device,int floppy_select)
 
 
 
-static void save_track_data(const device_config *device, int floppy_select)
+static void save_track_data(running_device *device, int floppy_select)
 {
-	const device_config *cur_image;
+	running_device *cur_image;
 	floppy *f;
 	int len;
 
@@ -147,10 +147,10 @@ static void save_track_data(const device_config *device, int floppy_select)
 
 
 
-UINT8 sony_read_data(const device_config *device)
+UINT8 sony_read_data(running_device *device)
 {
 	UINT8 result = 0;
-	const device_config *cur_image;
+	running_device *cur_image;
 	floppy *f;
 
 	if (sony_enable2() || (! sony_floppy_enable))
@@ -170,9 +170,9 @@ UINT8 sony_read_data(const device_config *device)
 
 
 
-void sony_write_data(const device_config *device,UINT8 data)
+void sony_write_data(running_device *device,UINT8 data)
 {
-	const device_config *cur_image;
+	running_device *cur_image;
 	floppy *f;
 
 	f = &sony_floppy[sony_floppy_select];
@@ -188,7 +188,7 @@ void sony_write_data(const device_config *device,UINT8 data)
 
 
 
-static int sony_rpm(floppy *f, const device_config *cur_image)
+static int sony_rpm(floppy *f, running_device *cur_image)
 {
 	int result = 0;
 
@@ -241,12 +241,12 @@ static int sony_rpm(floppy *f, const device_config *cur_image)
 	return result;
 }
 
-int sony_read_status(const device_config *device)
+int sony_read_status(running_device *device)
 {
 	int result = 1;
 	int action;
 	floppy *f;
-	const device_config *cur_image;
+	running_device *cur_image;
 
 	action = ((sony_lines & (SONY_CA1 | SONY_CA0)) << 2) | (sony_sel_line << 1) | ((sony_lines & SONY_CA2) >> 2);
 
@@ -348,11 +348,11 @@ int sony_read_status(const device_config *device)
 	return result;
 }
 
-static void sony_doaction(const device_config *device)
+static void sony_doaction(running_device *device)
 {
 	int action;
 	floppy *f;
-	const device_config *cur_image;
+	running_device *cur_image;
 
 	action = ((sony_lines & (SONY_CA1 | SONY_CA0)) << 2) | ((sony_lines & SONY_CA2) >> 2) | (sony_sel_line << 1);
 
@@ -413,7 +413,7 @@ static void sony_doaction(const device_config *device)
 	}
 }
 
-void sony_set_lines(const device_config *device,UINT8 lines)
+void sony_set_lines(running_device *device,UINT8 lines)
 {
 	int old_sony_lines = sony_lines;
 
@@ -430,7 +430,7 @@ void sony_set_lines(const device_config *device,UINT8 lines)
 		logerror("sony_set_lines(): %d\n", lines);
 }
 
-void sony_set_enable_lines(const device_config *device,int enable_mask)
+void sony_set_enable_lines(running_device *device,int enable_mask)
 {
 	switch (enable_mask)
 	{
@@ -452,7 +452,7 @@ void sony_set_enable_lines(const device_config *device,int enable_mask)
 		logerror("sony_set_enable_lines(): %d\n", enable_mask);
 }
 
-void sony_set_sel_line(const device_config *device,int sel)
+void sony_set_sel_line(running_device *device,int sel)
 {
 	sony_sel_line = sel ? 1 : 0;
 
@@ -475,7 +475,7 @@ static DEVICE_START( sonydriv_floppy )
 static DEVICE_IMAGE_UNLOAD( sonydriv_floppy )
 {
 	int id;
-	const device_config *fdc;
+	running_device *fdc;
 
 	/* locate the FDC */
 	fdc = devtag_get_device(image->machine, "fdc");

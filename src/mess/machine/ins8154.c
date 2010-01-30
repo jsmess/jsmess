@@ -50,7 +50,7 @@ static DEVICE_START( ins8154 )
 	assert(device->tag != NULL);
 
 	/* assign interface */
-	ins8154->intf = (const ins8154_interface*)device->static_config;
+	ins8154->intf = (const ins8154_interface*)device->baseconfig().static_config;
 
 	/* register for state saving */
 	state_save_register_item(device->machine, "ins8154", device->tag, 0, ins8154->in_a);

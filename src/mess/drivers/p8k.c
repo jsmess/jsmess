@@ -202,7 +202,7 @@ static VIDEO_UPDATE( p8k )
 
 ****************************************************************************/
 
-static void p8k_daisy_interrupt(const device_config *device, int state)
+static void p8k_daisy_interrupt(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, state);
 }
@@ -213,7 +213,7 @@ static WRITE_LINE_DEVICE_HANDLER( p8k_dma_irq_w )
 {
 	if (state)
 	{
-		const device_config *i8272 = devtag_get_device(device->machine, "i8272");
+		running_device *i8272 = devtag_get_device(device->machine, "i8272");
 		upd765_tc_w(i8272, state);
 	}
 
@@ -351,14 +351,14 @@ static const z80_daisy_chain p8k_daisy_chain[] =
 
 static WRITE_LINE_DEVICE_HANDLER( p8k_i8272_irq_w )
 {
-	const device_config *z80pio = devtag_get_device(device->machine, "z80pio_2");
+	running_device *z80pio = devtag_get_device(device->machine, "z80pio_2");
 
 	z80pio_p_w(z80pio, 1, (state) ? 0x10 : 0x00);
 }
 
 static UPD765_DMA_REQUEST( p8k_i8272_drq_w )
 {
-	const device_config *z80dma = devtag_get_device(device->machine, "z80dma");
+	running_device *z80dma = devtag_get_device(device->machine, "z80dma");
 
 	z80dma_rdy_w(z80dma, state);
 }
@@ -390,7 +390,7 @@ static const floppy_config p8k_floppy_config =
 
 ****************************************************************************/
 
-static void p8k_16_daisy_interrupt(const device_config *device, int state)
+static void p8k_16_daisy_interrupt(running_device *device, int state)
 {
 	// this must be studied a little bit more :-)
 }

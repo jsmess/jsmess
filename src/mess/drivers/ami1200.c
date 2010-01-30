@@ -91,7 +91,7 @@ static WRITE32_HANDLER( aga_overlay_w )
 static WRITE8_DEVICE_HANDLER( cd32_cia_0_porta_w )
 {
 	/* bit 1 = cd audio mute */
-	const device_config *cdda = devtag_get_device(device->machine, "cdda");
+	running_device *cdda = devtag_get_device(device->machine, "cdda");
 
 	if (cdda != NULL)
 		sound_set_output_gain(cdda, 0, BIT(data, 0) ? 0.0 : 1.0 );

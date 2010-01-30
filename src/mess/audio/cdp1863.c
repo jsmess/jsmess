@@ -28,7 +28,7 @@ struct _cdp1863_t
 	int incr;						/* initial wave state */
 };
 
-INLINE cdp1863_t *get_safe_token(const device_config *device)
+INLINE cdp1863_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -61,7 +61,7 @@ WRITE8_DEVICE_HANDLER( cdp1863_str_w )
 
 /* Output Enable */
 
-void cdp1863_oe_w(const device_config *device, int level)
+void cdp1863_oe_w(running_device *device, int level)
 {
 	cdp1863_t *cdp1863 = get_safe_token(device);
 
@@ -71,7 +71,7 @@ void cdp1863_oe_w(const device_config *device, int level)
 }
 
 #ifdef UNUSED_FUNCTION
-static void cdp1863_sound_update(const device_config *device, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static void cdp1863_sound_update(running_device *device, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
 {
 	cdp1863_t *cdp1863 = get_safe_token(device);
 
@@ -136,7 +136,7 @@ static DEVICE_START( cdp1863 )
 	assert(device != NULL);
 	assert(device->tag != NULL);
 
-	cdp1863->intf = device->static_config;
+	cdp1863->intf = device->baseconfig().static_config;
 
 	assert(cdp1863->intf != NULL);
 	assert((cdp1863->intf->clock1 > 0) || (cdp1863->intf->clock2 > 0));

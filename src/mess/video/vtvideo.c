@@ -31,7 +31,7 @@ struct _vt_video_t
 	devcb_resolved_read8		in_ram_func;
 	devcb_resolved_write8		clear_video_interrupt;
 
-	const device_config *screen;	/* screen */
+	running_device *screen;	/* screen */
 	UINT8 *gfx;		/* content of char rom */
 
     int lba7;
@@ -53,7 +53,7 @@ struct _vt_video_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE vt_video_t *get_safe_token(const device_config *device)
+INLINE vt_video_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -61,11 +61,11 @@ INLINE vt_video_t *get_safe_token(const device_config *device)
 	return (vt_video_t *)device->token;
 }
 
-INLINE const vt_video_interface *get_interface(const device_config *device)
+INLINE const vt_video_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 //  assert((device->type == dc012));
-	return (const vt_video_interface *) device->static_config;
+	return (const vt_video_interface *) device->baseconfig().static_config;
 }
 
 /***************************************************************************
@@ -155,7 +155,7 @@ WRITE8_DEVICE_HANDLER( vt_video_brightness_w )
 	//palette_set_color_rgb(device->machine, 1, data, data, data);
 }
 
-static void vt_video_display_char(const device_config *device,bitmap_t *bitmap, UINT8 code,
+static void vt_video_display_char(running_device *device,bitmap_t *bitmap, UINT8 code,
 	int x, int y,UINT8 scroll_region,UINT8 display_type)
 {
 	UINT8 line=0;
@@ -209,7 +209,7 @@ static void vt_video_display_char(const device_config *device,bitmap_t *bitmap, 
 	}
 }
 
-void vt_video_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+void vt_video_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	vt_video_t *vt = get_safe_token(device);
 
@@ -267,7 +267,7 @@ void vt_video_update(const device_config *device, bitmap_t *bitmap, const rectan
 -------------------------------------------------*/
 static TIMER_CALLBACK(lba7_change)
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	vt_video_t *vt = get_safe_token(device);
 
 	vt->lba7 = (vt->lba7) ? 0 : 1;

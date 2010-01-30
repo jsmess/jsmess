@@ -15,13 +15,13 @@
 /*----------- defined in machine/pc1401.c -----------*/
 
 extern UINT8 pc1401_portc;
-int pc1401_reset(const device_config *device);
-int pc1401_brk(const device_config *device);
-void pc1401_outa(const device_config *device, int data);
-void pc1401_outb(const device_config *device, int data);
-void pc1401_outc(const device_config *device, int data);
-int pc1401_ina(const device_config *device);
-int pc1401_inb(const device_config *device);
+int pc1401_reset(running_device *device);
+int pc1401_brk(running_device *device);
+void pc1401_outa(running_device *device, int data);
+void pc1401_outb(running_device *device, int data);
+void pc1401_outc(running_device *device, int data);
+int pc1401_ina(running_device *device);
+int pc1401_inb(running_device *device);
 
 DRIVER_INIT( pc1401 );
 NVRAM_HANDLER( pc1401 );

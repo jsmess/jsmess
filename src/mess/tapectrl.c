@@ -31,7 +31,7 @@ typedef struct _tape_control_menu_state tape_control_menu_state;
 struct _tape_control_menu_state
 {
 	int index;
-	const device_config *device;
+	running_device *device;
 };
 
 
@@ -48,12 +48,12 @@ struct _tape_control_menu_state
 INLINE int cassette_count( running_machine *machine )
 {
 	int count = 0;
-	const device_config *device = device_list_first( &machine->config->devicelist, CASSETTE );
+	running_device *device = machine->devicelist.first(CASSETTE );
 
 	while ( device )
 	{
 		count++;
-		device = device_list_next ( device, CASSETTE );
+		device = device->typenext();
 	}
 	return count;
 }
@@ -63,7 +63,7 @@ INLINE int cassette_count( running_machine *machine )
     representation of the time
 -------------------------------------------------*/
 
-astring *tapecontrol_gettime(astring *dest, const device_config *device, int *curpos, int *endpos)
+astring *tapecontrol_gettime(astring *dest, running_device *device, int *curpos, int *endpos)
 {
 	double t0, t1;
 
@@ -167,11 +167,11 @@ void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *pa
 	if (menustate->device == NULL)
 	{
 		int index = menustate->index;
-		const device_config *device = device_list_first( &machine->config->devicelist, CASSETTE );
+		running_device *device = machine->devicelist.first( CASSETTE );
 
 		while ( index > 0 && device )
 		{
-			device = device_list_next ( device, CASSETTE );
+			device = device->typenext();
 			index--;
 		}
 		menustate->device = device;

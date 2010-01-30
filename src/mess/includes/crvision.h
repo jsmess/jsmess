@@ -19,8 +19,8 @@ struct _crvision_state
 	int keylatch;
 
 	/* devices */
-	const device_config *sn76489;
-	const device_config *cassette;
+	running_device *sn76489;
+	running_device *cassette;
 };
 
 #endif

@@ -63,16 +63,16 @@ static const char * StatusString(int iStatus);
 #define SAMPLES_NOT_USED    3
 #define MAX_AUDITBOX_TEXT	0x7FFFFFFE
 
-static HWND hAudit;
-static int rom_index;
-static int roms_correct;
-static int roms_incorrect;
-static int sample_index;
-static int samples_correct;
-static int samples_incorrect;
+static volatile HWND hAudit;
+static volatile int rom_index;
+static volatile int roms_correct;
+static volatile int roms_incorrect;
+static volatile int sample_index;
+static volatile int samples_correct;
+static volatile int samples_incorrect;
 
-static BOOL bPaused = FALSE;
-static BOOL bCancel = FALSE;
+static volatile BOOL bPaused = FALSE;
+static volatile BOOL bCancel = FALSE;
 
 /***************************************************************************
     External functions  
@@ -268,7 +268,6 @@ static INT_PTR CALLBACK AuditWindowProc(HWND hDlg, UINT Msg, WPARAM wParam, LPAR
 		rom_index = 0;
 		hThread = CreateThread(NULL, 0, AuditThreadProc, hDlg, 0, &dwThreadID);
 		return 1;
-
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
@@ -277,8 +276,8 @@ static INT_PTR CALLBACK AuditWindowProc(HWND hDlg, UINT Msg, WPARAM wParam, LPAR
 			if (hThread)
 			{
 				bCancel = TRUE;
-				if (GetExitCodeThread(hThread, &dwExitCode) && dwExitCode == STILL_ACTIVE)
-				{
+				if (GetExitCodeThread(hThread, &dwExitCode) && (dwExitCode == STILL_ACTIVE))
+				{					
 					PostMessage(hDlg, WM_COMMAND, wParam, lParam);
 					return 1;
 				}
@@ -302,7 +301,7 @@ static INT_PTR CALLBACK AuditWindowProc(HWND hDlg, UINT Msg, WPARAM wParam, LPAR
 		}
 		return 1;
 	}
-	return 0;
+	return 0;	
 }
 
 /* Callback for the Audit property sheet */

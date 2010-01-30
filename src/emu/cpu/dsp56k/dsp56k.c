@@ -165,7 +165,7 @@ static void set_irq_line(dsp56k_core* cpustate, int irqline, int state)
 /***************************************************************************
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
-static void agu_init(dsp56k_core* cpustate, const device_config *device)
+static void agu_init(dsp56k_core* cpustate, running_device *device)
 {
 	/* save states - dsp56k_agu members */
 	state_save_register_device_item(device, 0, cpustate->AGU.r0);
@@ -183,7 +183,7 @@ static void agu_init(dsp56k_core* cpustate, const device_config *device)
 	state_save_register_device_item(device, 0, cpustate->AGU.temp);
 }
 
-static void alu_init(dsp56k_core* cpustate, const device_config *device)
+static void alu_init(dsp56k_core* cpustate, running_device *device)
 {
 	/* save states - dsp56k_alu members */
 	state_save_register_device_item(device, 0, cpustate->ALU.x);
@@ -232,7 +232,7 @@ static CPU_INIT( dsp56k )
 	state_save_register_device_item(device, 0, cpustate->HI.trxl);
 	state_save_register_device_item(device, 0, cpustate->HI.bootstrap_offset);
 
-	//cpustate->config = device->static_config;
+	//cpustate->config = device->baseconfig().static_config;
 	//cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
@@ -452,15 +452,15 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;	// ?
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 8;							break;	// ?
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 16;							break;	/* 1-5 */
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 16;							break;	/* 1-5 */
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 		info->i = -1;							break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:			info->i = -1;							break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 16;							break;	/* 1-5 */
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 16;							break;	/* 1-5 */
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: 		info->i = -1;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 16;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 16;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:			info->i = -1;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 0;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 0;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:				info->i = 0;							break;
 
 		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODA:	info->i = DSP56K_IRQ_MODA;				break;
 		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODB:	info->i = DSP56K_IRQ_MODB;				break;
@@ -535,9 +535,9 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_FCT_WRITE:							info->write = NULL;						break;
 		case CPUINFO_FCT_READOP:						info->readop = NULL;					break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:
 			info->internal_map16 = ADDRESS_MAP_NAME(dsp56156_x_data_map);						break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
 			info->internal_map16 = ADDRESS_MAP_NAME(dsp56156_program_map);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

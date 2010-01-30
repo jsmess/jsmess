@@ -138,7 +138,7 @@ struct _r3000_state
 	int			interrupt_cycles;
 	int			hasfpu;
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 
 	/* endian-dependent load/store */
@@ -162,7 +162,7 @@ struct _r3000_state
 	size_t		dcache_size;
 };
 
-INLINE r3000_state *get_safe_token(const device_config *device)
+INLINE r3000_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -300,7 +300,7 @@ static void set_irq_line(r3000_state *r3000, int irqline, int state)
 
 static CPU_INIT( r3000 )
 {
-	const r3000_cpu_core *configdata = (const r3000_cpu_core *)device->static_config;
+	const r3000_cpu_core *configdata = (const r3000_cpu_core *)device->baseconfig().static_config;
 	r3000_state *r3000 = get_safe_token(device);
 
 	/* allocate memory */
@@ -1179,15 +1179,15 @@ static CPU_GET_INFO( r3000 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;									break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 40;									break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 29;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 29;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;							break;
 
 		case CPUINFO_INT_INPUT_STATE + R3000_IRQ0:		info->i = (r3000->cpr[0][COP0_Cause] & 0x400) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + R3000_IRQ1:		info->i = (r3000->cpr[0][COP0_Cause] & 0x800) ? ASSERT_LINE : CLEAR_LINE; break;

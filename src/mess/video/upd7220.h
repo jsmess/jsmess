@@ -53,8 +53,8 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*upd7220_display_pixels_func)(const device_config *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data);
-#define UPD7220_DISPLAY_PIXELS(name) void name(const device_config *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data)
+typedef void (*upd7220_display_pixels_func)(running_device *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data);
+#define UPD7220_DISPLAY_PIXELS(name) void name(running_device *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data)
 
 typedef struct _upd7220_interface upd7220_interface;
 struct _upd7220_interface
@@ -100,6 +100,6 @@ WRITE_LINE_DEVICE_HANDLER( upd7220_ext_sync_w );
 WRITE_LINE_DEVICE_HANDLER( upd7220_lpen_w );
 
 /* screen update */
-void upd7220_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
+void upd7220_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 #endif

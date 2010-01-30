@@ -334,7 +334,7 @@ READ8_HANDLER(apple2_c0xx_r)
 		};
 		UINT8 result = 0x00;
 		int slotnum;
-		const device_config *slotdevice;
+		running_device *slotdevice;
 
 		offset &= 0xFF;
 
@@ -378,7 +378,7 @@ WRITE8_HANDLER(apple2_c0xx_w)
 		apple2_c07x_w
 	};
 	int slotnum;
-	const device_config *slotdevice;
+	running_device *slotdevice;
 
 	offset &= 0xFF;
 
@@ -995,7 +995,7 @@ READ8_HANDLER ( apple2_c03x_r )
 	{
 		if (!offset)
 		{
-			const device_config *speaker_device = devtag_get_device(space->machine, "a2speaker");
+			running_device *speaker_device = devtag_get_device(space->machine, "a2speaker");
 
 			if (a2_speaker_state == 1)
 			{
@@ -1161,7 +1161,7 @@ static int apple2_fdc_has_525(running_machine *machine)
 	return apple525_get_count(machine) > 0;
 }
 
-static void apple2_fdc_set_lines(const device_config *device, UINT8 lines)
+static void apple2_fdc_set_lines(running_device *device, UINT8 lines)
 {
 	if (apple2_fdc_diskreg & 0x40)
 	{
@@ -1183,7 +1183,7 @@ static void apple2_fdc_set_lines(const device_config *device, UINT8 lines)
 
 
 
-static void apple2_fdc_set_enable_lines(const device_config *device,int enable_mask)
+static void apple2_fdc_set_enable_lines(running_device *device,int enable_mask)
 {
 	int slot5_enable_mask = 0;
 	int slot6_enable_mask = 0;
@@ -1208,7 +1208,7 @@ static void apple2_fdc_set_enable_lines(const device_config *device,int enable_m
 
 
 
-static UINT8 apple2_fdc_read_data(const device_config *device)
+static UINT8 apple2_fdc_read_data(running_device *device)
 {
 	UINT8 result = 0x00;
 
@@ -1233,7 +1233,7 @@ static UINT8 apple2_fdc_read_data(const device_config *device)
 
 
 
-static void apple2_fdc_write_data(const device_config *device, UINT8 data)
+static void apple2_fdc_write_data(running_device *device, UINT8 data)
 {
 	if (apple2_fdc_diskreg & 0x40)
 	{
@@ -1255,7 +1255,7 @@ static void apple2_fdc_write_data(const device_config *device, UINT8 data)
 
 
 
-static int apple2_fdc_read_status(const device_config *device)
+static int apple2_fdc_read_status(running_device *device)
 {
 	int result = 0;
 

@@ -32,7 +32,7 @@ struct _crtc_ega_t
 {
 	int device_type;
 	const crtc_ega_interface *intf;
-	const device_config *screen;
+	running_device *screen;
 
 	/* ega/vga register file */
 	UINT8	horiz_char_total;	/* 0x00 */
@@ -110,7 +110,7 @@ static void update_vblank_changed_timers(crtc_ega_t *crtc_ega);
 
 
 /* makes sure that the passed in device is the right type */
-INLINE crtc_ega_t *get_safe_token(const device_config *device)
+INLINE crtc_ega_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -417,7 +417,7 @@ static void update_vblank_changed_timers(crtc_ega_t *crtc_ega)
 
 static TIMER_CALLBACK( de_changed_timer_cb )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -429,7 +429,7 @@ static TIMER_CALLBACK( de_changed_timer_cb )
 
 static TIMER_CALLBACK( vsync_on_timer_cb )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -439,7 +439,7 @@ static TIMER_CALLBACK( vsync_on_timer_cb )
 
 static TIMER_CALLBACK( vsync_off_timer_cb )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -451,7 +451,7 @@ static TIMER_CALLBACK( vsync_off_timer_cb )
 
 static TIMER_CALLBACK( hsync_on_timer_cb )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -461,7 +461,7 @@ static TIMER_CALLBACK( hsync_on_timer_cb )
 
 static TIMER_CALLBACK( hsync_off_timer_cb )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -473,7 +473,7 @@ static TIMER_CALLBACK( hsync_off_timer_cb )
 
 static TIMER_CALLBACK( vblank_on_timer_cb )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -485,7 +485,7 @@ static TIMER_CALLBACK( vblank_on_timer_cb )
 
 static TIMER_CALLBACK( vblank_off_timer_cb )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -496,7 +496,7 @@ static TIMER_CALLBACK( vblank_off_timer_cb )
 
 
 
-UINT16 crtc_ega_get_ma(const device_config *device)
+UINT16 crtc_ega_get_ma(running_device *device)
 {
 	UINT16 ret;
 	crtc_ega_t *crtc_ega = get_safe_token(device);
@@ -526,7 +526,7 @@ UINT16 crtc_ega_get_ma(const device_config *device)
 }
 
 
-UINT8 crtc_ega_get_ra(const device_config *device)
+UINT8 crtc_ega_get_ra(running_device *device)
 {
 	UINT8 ret;
 	crtc_ega_t *crtc_ega = get_safe_token(device);
@@ -550,7 +550,7 @@ UINT8 crtc_ega_get_ra(const device_config *device)
 
 static TIMER_CALLBACK( light_pen_latch_timer_cb )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
 	crtc_ega->light_pen_addr = crtc_ega_get_ma(device);
@@ -558,7 +558,7 @@ static TIMER_CALLBACK( light_pen_latch_timer_cb )
 }
 
 
-void crtc_ega_assert_light_pen_input(const device_config *device)
+void crtc_ega_assert_light_pen_input(running_device *device)
 {
 	int y, x;
 	int char_x;
@@ -591,7 +591,7 @@ void crtc_ega_assert_light_pen_input(const device_config *device)
 }
 
 
-void crtc_ega_set_clock(const device_config *device, int clock)
+void crtc_ega_set_clock(running_device *device, int clock)
 {
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
@@ -606,7 +606,7 @@ void crtc_ega_set_clock(const device_config *device, int clock)
 }
 
 
-void crtc_ega_set_hpixels_per_column(const device_config *device, int hpixels_per_column)
+void crtc_ega_set_hpixels_per_column(running_device *device, int hpixels_per_column)
 {
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
@@ -652,7 +652,7 @@ static void update_cursor_state(crtc_ega_t *crtc_ega)
 }
 
 
-void crtc_ega_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+void crtc_ega_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 	assert(bitmap != NULL);
@@ -714,7 +714,7 @@ void crtc_ega_update(const device_config *device, bitmap_t *bitmap, const rectan
 
 
 /* device interface */
-static void common_start(const device_config *device, int device_type)
+static void common_start(running_device *device, int device_type)
 {
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
@@ -723,7 +723,7 @@ static void common_start(const device_config *device, int device_type)
 	assert(device->tag != NULL);
 	assert(device->clock > 0);
 
-	crtc_ega->intf = (const crtc_ega_interface*)device->static_config;
+	crtc_ega->intf = (const crtc_ega_interface*)device->baseconfig().static_config;
 	crtc_ega->device_type = device_type;
 
 	if (crtc_ega->intf != NULL)

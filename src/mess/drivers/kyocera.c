@@ -80,7 +80,7 @@
 #include "sound/speaker.h"
 #include "devices/messram.h"
 
-static const device_config *cassette_device_image(running_machine *machine)
+static running_device *cassette_device_image(running_machine *machine)
 {
 	return devtag_get_device(machine, CASSETTE_TAG);
 }

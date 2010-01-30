@@ -21,11 +21,11 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef int (*uPD7002_get_analogue_func)(const device_config *device, int channel_number);
-#define UPD7002_GET_ANALOGUE(name)	int name(const device_config *device, int channel_number )
+typedef int (*uPD7002_get_analogue_func)(running_device *device, int channel_number);
+#define UPD7002_GET_ANALOGUE(name)	int name(running_device *device, int channel_number )
 
-typedef void (*uPD7002_eoc_func)(const device_config *device, int data);
-#define UPD7002_EOC(name)	void name(const device_config *device, int data )
+typedef void (*uPD7002_eoc_func)(running_device *device, int data);
+#define UPD7002_EOC(name)	void name(running_device *device, int data )
 
 
 typedef struct _uPD7002_interface uPD7002_interface;

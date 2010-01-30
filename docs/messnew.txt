@@ -45,7 +45,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.136.1.  This incorporates all features of the
+- The core is based on MAME 0.136u2.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - [CIA6526] Refactored interface, added SP/CNT callbacks, and fixed serial

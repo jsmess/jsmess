@@ -36,19 +36,19 @@ struct _c8280_t
 	int address;						/* bus address - 8 */
 
 	/* devices */
-	const device_config *cpu_dos;
-	const device_config *cpu_fdc;
-	const device_config *riot0;
-	const device_config *riot1;
-	const device_config *bus;
-	const device_config *image[2];
+	running_device *cpu_dos;
+	running_device *cpu_fdc;
+	running_device *riot0;
+	running_device *riot1;
+	running_device *bus;
+	running_device *image[2];
 };
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE c8280_t *get_safe_token(const device_config *device)
+INLINE c8280_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -56,11 +56,11 @@ INLINE c8280_t *get_safe_token(const device_config *device)
 	return (c8280_t *)device->token;
 }
 
-INLINE c8280_config *get_safe_config(const device_config *device)
+INLINE c8280_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == C8280);
-	return (c8280_config *)device->inline_config;
+	return (c8280_config *)device->baseconfig().inline_config;
 }
 
 /***************************************************************************
@@ -83,7 +83,7 @@ WRITE_LINE_DEVICE_HANDLER( c8280_ieee488_ifc_w )
 {
 	if (!state)
 	{
-		device_reset(device);
+		device->reset();
 	}
 }
 
@@ -193,8 +193,8 @@ static DEVICE_START( c8280 )
 	c8280->address = config->address - 8;
 
 	/* find our CPU */
-	c8280->cpu_dos = device_find_child_by_tag(device, M6502_DOS_TAG);
-	c8280->cpu_fdc = device_find_child_by_tag(device, M6502_FDC_TAG);
+	c8280->cpu_dos = device->subdevice(M6502_DOS_TAG);
+	c8280->cpu_fdc = device->subdevice(M6502_FDC_TAG);
 }
 
 /*-------------------------------------------------
@@ -205,8 +205,8 @@ static DEVICE_RESET( c8280 )
 {
 	c8280_t *c8280 = get_safe_token(device);
 
-	device_reset(c8280->cpu_dos);
-	device_reset(c8280->cpu_fdc);
+	c8280->cpu_dos->reset();
+	c8280->cpu_fdc->reset();
 }
 
 /*-------------------------------------------------

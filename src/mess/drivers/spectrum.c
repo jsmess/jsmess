@@ -172,7 +172,7 @@ int spectrum_PreviousFE = 0;
 
 WRITE8_HANDLER(spectrum_port_fe_w)
 {
-	const device_config *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = devtag_get_device(space->machine, "speaker");
 	unsigned char Changed;
 
 	Changed = spectrum_PreviousFE^data;

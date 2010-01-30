@@ -85,7 +85,7 @@ static WRITE_LINE_DEVICE_HANDLER( apf_mc6847_fs_w )
 
 static VIDEO_UPDATE( apf )
 {
-	const device_config *mc6847 = devtag_get_device(screen->machine, "mc6847");
+	running_device *mc6847 = devtag_get_device(screen->machine, "mc6847");
 	return mc6847_update(mc6847, bitmap, cliprect);
 }
 
@@ -141,7 +141,7 @@ static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_a_func)
 static WRITE8_DEVICE_HANDLER( apf_m1000_pia_out_b_func )
 {
 	apf_state *state = (apf_state *)device->machine->driver_data;
-	const device_config *mc6847 = devtag_get_device(device->machine, "mc6847");
+	running_device *mc6847 = devtag_get_device(device->machine, "mc6847");
 
 	/* bit 7..4 video control -- TODO: bit 5 and 4? */
 	mc6847_ag_w(mc6847, BIT(data, 7));
@@ -160,7 +160,7 @@ static WRITE_LINE_DEVICE_HANDLER(apf_m1000_pia_out_ca2_func)
 
 static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_cb2_func)
 {
-	const device_config *speaker = devtag_get_device(device->machine, "speaker");
+	running_device *speaker = devtag_get_device(device->machine, "speaker");
 	speaker_level_w(speaker, data);
 }
 
@@ -369,7 +369,7 @@ static MACHINE_START( apf_imagination )
 static WRITE8_HANDLER(apf_dischw_w)
 {
 	int drive;
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = devtag_get_device(space->machine, "wd179x");
 
 	/* bit 3 is index of drive to select */
 	drive = (data>>3) & 0x01;

@@ -178,7 +178,7 @@ static MACHINE_RESET( jaguar )
 ********************************************************************/
 static mame_file *jaguar_nvram_fopen( running_machine *machine, UINT32 openflags)
 {
-	const device_config *image = devtag_get_device(machine, "cart");
+	running_device *image = devtag_get_device(machine, "cart");
 	astring *fname;
 	file_error filerr;
 	mame_file *file;
@@ -196,20 +196,18 @@ static mame_file *jaguar_nvram_fopen( running_machine *machine, UINT32 openflags
 static void jaguar_nvram_load(running_machine *machine)
 {
 	mame_file *nvram_file = NULL;
-	const device_config *device;
+	running_device *device;
 
-	for (device = (device_config *)machine->config->devicelist.head; device != NULL; device = device->next)
+	for (device = machine->devicelist.first(); device != NULL; device = device->next)
 	{
-		device_nvram_func nvram = (device_nvram_func)device_get_info_fct(device, DEVINFO_FCT_NVRAM);
+		device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
 		if (nvram != NULL)
 		{
 			if (nvram_file == NULL)
 				nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_READ);
-			if (nvram_file != NULL) 
-				(*nvram)(device, nvram_file, 0);		
+			(*nvram)(device, nvram_file, 0);
 		}
-	}
-
+	}	
 	if (nvram_file != NULL)
 		mame_fclose(nvram_file);
 }
@@ -218,16 +216,16 @@ static void jaguar_nvram_load(running_machine *machine)
 static void jaguar_nvram_save(running_machine *machine)
 {
 	mame_file *nvram_file = NULL;
-	const device_config *device;
-	for (device = (device_config *)machine->config->devicelist.head; device != NULL; device = device->next)
+	running_device *device;
+	
+	for (device = machine->devicelist.first(); device != NULL; device = device->next)
 	{
-		device_nvram_func nvram = (device_nvram_func)device_get_info_fct(device, DEVINFO_FCT_NVRAM);
+		device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
 		if (nvram != NULL)
 		{
 			if (nvram_file == NULL)
 				nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			if (nvram_file != NULL)
-				(*nvram)(device, nvram_file, 1);		
+			(*nvram)(device, nvram_file, 1);
 		}
 	}
 
@@ -249,7 +247,7 @@ static NVRAM_HANDLER( jaguar )
 
 static WRITE32_HANDLER( jaguar_eeprom_w )
 {
-	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
 	eeprom_bit_count++;
 	if (eeprom_bit_count != 9)		/* kill extra bit at end of address */
 	{
@@ -260,14 +258,14 @@ static WRITE32_HANDLER( jaguar_eeprom_w )
 
 static READ32_HANDLER( jaguar_eeprom_clk )
 {
-	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
 	eeprom_set_clock_line(eeprom,PULSE_LINE);	/* get next bit when reading */
 	return 0;
 }
 
 static READ32_HANDLER( jaguar_eeprom_cs )
 {
-	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
 	eeprom_set_cs_line(eeprom,ASSERT_LINE);	/* must do at end of an operation */
 	eeprom_set_cs_line(eeprom,CLEAR_LINE);		/* enable chip for next operation */
 	eeprom_write_bit(eeprom,1);			/* write a start bit */

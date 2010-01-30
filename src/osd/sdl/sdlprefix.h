@@ -27,6 +27,15 @@
 
 #if defined(__sun__) && defined(__svr4__)
 #define SDLMAME_SOLARIS 1
+#undef _XOPEN_SOURCE
+#undef _XOPEN_VERSION
+#undef _XOPEN_SOURCE_EXTENDED
+#undef _XPG6
+#undef _XPG5
+#undef _XPG4_2
+
+#define _XOPEN_SOURCE
+#define _XOPEN_VERSION 4
 
 #elif defined(__irix__) || defined(__sgi)
 #define SDLMAME_IRIX 1
@@ -46,26 +55,6 @@
 #endif
 
 #endif /* SDLMAME_UNIX */
-
-//============================================================
-// malloc debugging
-//============================================================
-
-#ifdef MALLOC_DEBUG
-#include <stdlib.h>
-
-// override malloc to track file/line
-void* malloc_file_line(size_t size, const char *file, int line);
-void* calloc_file_line(size_t size, size_t count, const char *FILE, int line);
-void * realloc_file_line(void *memory, size_t size, const char *file, int line);
-
-#undef malloc
-#define malloc(x) malloc_file_line(x, __FILE__, __LINE__)
-#undef calloc
-#define calloc(x,y) calloc_file_line(x, y, __FILE__, __LINE__)
-#undef realloc
-#define realloc(x,y) realloc_file_line(x, y, __FILE__, __LINE__)
-#endif
 
 #ifdef _MSC_VER
 void *__cdecl _alloca(size_t);

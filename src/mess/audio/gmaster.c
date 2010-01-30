@@ -20,7 +20,7 @@ struct _gmaster_sound
 };
 
 
-static gmaster_sound *get_token(const device_config *device)
+static gmaster_sound *get_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(sound_get_type(device) == SOUND_GMASTER);
@@ -28,7 +28,7 @@ static gmaster_sound *get_token(const device_config *device)
 }
 
 
-int gmaster_io_callback(const device_config *device, int ioline, int state)
+int gmaster_io_callback(running_device *device, int ioline, int state)
 {	/* comes across with cpu device - need to use sound device */
 	gmaster_sound *token = get_token(devtag_get_device(device->machine, "custom"));
 

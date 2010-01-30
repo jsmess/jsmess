@@ -176,7 +176,7 @@ UINT8 duart_outport; // most recent duart output
 } dectalk={ {0}};
 
 /* Devices */
-static void duart_irq_handler(const device_config *device, UINT8 vector)
+static void duart_irq_handler(running_device *device, UINT8 vector)
 {
 		cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, HOLD_LINE, M68K_INT_ACK_AUTOVECTOR);
 		//cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
@@ -185,7 +185,7 @@ static void duart_irq_handler(const device_config *device, UINT8 vector)
 
  static UINT8 hack_self_test = 0; // temp variable for hack below
 
-static UINT8 duart_input(const device_config *device)
+static UINT8 duart_input(running_device *device)
 {
 	UINT8 data = 0;
 	data |= dectalk.duart_inport&0xF;
@@ -195,7 +195,7 @@ static UINT8 duart_input(const device_config *device)
 	return data;
 }
 
-static void duart_output(const device_config *device, UINT8 data)
+static void duart_output(running_device *device, UINT8 data)
 {
 	dectalk.duart_outport = data;
 #ifdef SERIAL_TO_STDERR
@@ -203,9 +203,9 @@ static void duart_output(const device_config *device, UINT8 data)
 #endif
 }
 
-static void duart_tx(const device_config *device, int channel, UINT8 data)
+static void duart_tx(running_device *device, int channel, UINT8 data)
 {
-	const device_config	*devconf = devtag_get_device(device->machine, "terminal");
+	running_device *devconf = devtag_get_device(device->machine, "terminal");
 	terminal_write(devconf,0,data);
 #ifdef SERIAL_TO_STDERR
 	fprintf(stderr, "%02X ",data);
@@ -295,7 +295,7 @@ static UINT16 dectalk_outfifo_r ( running_machine *machine )
 }
 
 /* Machine reset and friends: stuff that needs setting up which IS directly affected by reset */
-static void dectalk_reset(const device_config *device)
+static void dectalk_reset(running_device *device)
 {
 	hack_self_test = 0; // hack
 	// stuff that is DIRECTLY affected by the RESET line
@@ -672,7 +672,7 @@ INPUT_PORTS_END
 static TIMER_CALLBACK( outfifo_read_cb )
 {
 	UINT16 data;
-	const device_config *speaker = devtag_get_device(machine, "dac");
+	running_device *speaker = devtag_get_device(machine, "dac");
 	data = dectalk_outfifo_r(machine);
 #ifdef VERBOSE
 	if (data!= 0x8000) logerror("sample output: %04X\n", data);

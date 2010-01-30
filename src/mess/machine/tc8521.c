@@ -135,7 +135,7 @@ struct _tc8521_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE tc8521_t *get_token(const device_config *device)
+INLINE tc8521_t *get_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == TC8521);
@@ -143,11 +143,11 @@ INLINE tc8521_t *get_token(const device_config *device)
 }
 
 
-INLINE const tc8521_interface *get_interface(const device_config *device)
+INLINE const tc8521_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == TC8521);
-	return (tc8521_interface *) device->static_config;
+	return (tc8521_interface *) device->baseconfig().static_config;
 }
 
 
@@ -182,7 +182,7 @@ static const UINT8 rtc_write_masks[16*4]=
     supplied file
 -------------------------------------------------*/
 
-void tc8521_load_stream(const device_config *device, mame_file *file)
+void tc8521_load_stream(running_device *device, mame_file *file)
 {
 	tc8521_t *rtc = get_token(device);
 
@@ -201,7 +201,7 @@ void tc8521_load_stream(const device_config *device, mame_file *file)
     supplied file
 -------------------------------------------------*/
 
-void tc8521_save_stream(const device_config *device, mame_file *file)
+void tc8521_save_stream(running_device *device, mame_file *file)
 {
 	tc8521_t *rtc = get_token(device);
 
@@ -219,7 +219,7 @@ void tc8521_save_stream(const device_config *device, mame_file *file)
     tc8521_set_alarm_output
 -------------------------------------------------*/
 
-static void tc8521_set_alarm_output(const device_config *device)
+static void tc8521_set_alarm_output(running_device *device)
 {
 	tc8521_t *rtc = get_token(device);
 	const tc8521_interface *rtc_interface = get_interface(device);
@@ -266,7 +266,7 @@ static void tc8521_set_alarm_output(const device_config *device)
     tc8521_alarm_check
 -------------------------------------------------*/
 
-static void tc8521_alarm_check(const device_config *device)
+static void tc8521_alarm_check(running_device *device)
 {
 	tc8521_t *rtc = get_token(device);
 
@@ -295,7 +295,7 @@ static void tc8521_alarm_check(const device_config *device)
 
 static TIMER_CALLBACK(tc8521_timer_callback)
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	tc8521_t *rtc = get_token(device);
 
 	/* Assumption how it works */

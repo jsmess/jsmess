@@ -326,7 +326,7 @@ MACHINE_START( msx )
 
 MACHINE_START( msx2 )
 {
-	const device_config *fdc = devtag_get_device(machine, "wd179x");
+	running_device *fdc = devtag_get_device(machine, "wd179x");
 	wd17xx_set_density (fdc,DEN_FM_HI);
 	msx1.dsk_stat = 0x7f;
 }
@@ -517,7 +517,7 @@ INTERRUPT_GEN( msx_interrupt )
 ** The I/O funtions
 */
 
-static const device_config *cassette_device_image(running_machine *machine)
+static running_device *cassette_device_image(running_machine *machine)
 {
 	return devtag_get_device(machine, "cassette");
 }
@@ -643,7 +643,7 @@ WRITE8_HANDLER (msx_fmpac_w)
 {
 	if (msx1.opll_active)
 	{
-		const device_config *ym = devtag_get_device(space->machine, "ym2413");
+		running_device *ym = devtag_get_device(space->machine, "ym2413");
 
 		if (offset == 1)
 			ym2413_w (ym, 1, data);
@@ -663,19 +663,19 @@ WRITE8_HANDLER (msx_rtc_latch_w)
 
 WRITE8_HANDLER (msx_rtc_reg_w)
 {
-	const device_config *rtc = devtag_get_device(space->machine, "rtc");
+	running_device *rtc = devtag_get_device(space->machine, "rtc");
 	tc8521_w(rtc, msx1.rtc_latch, data);
 }
 
 READ8_HANDLER (msx_rtc_reg_r)
 {
-	const device_config *rtc = devtag_get_device(space->machine, "rtc");
+	running_device *rtc = devtag_get_device(space->machine, "rtc");
 	return tc8521_r(rtc, msx1.rtc_latch);
 }
 
 NVRAM_HANDLER( msx2 )
 {
-	const device_config *rtc = devtag_get_device(machine, "rtc");
+	running_device *rtc = devtag_get_device(machine, "rtc");
 	if (file)
 	{
 		if (read_or_write)

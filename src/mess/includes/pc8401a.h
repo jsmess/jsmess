@@ -36,10 +36,10 @@ struct _pc8401a_state
 	UINT8 *video_ram;		/* LCD video RAM */
 	UINT8 *crt_ram;			/* CRT video RAM */
 
-	const device_config *upd1990a;
-	const device_config *sed1330;
-	const device_config *mc6845;
-	const device_config *lcd;
+	running_device *upd1990a;
+	running_device *sed1330;
+	running_device *mc6845;
+	running_device *lcd;
 };
 
 /* ---------- defined in video/pc8401a.c ---------- */

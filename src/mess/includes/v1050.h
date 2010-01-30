@@ -62,16 +62,16 @@ struct _v1050_state
 	UINT8 attr;					/* attribute latch */
 
 	/* devices */
-	const device_config *i8214;
-	const device_config *msm58321;
-	const device_config *i8255a_crt_z80;
-	const device_config *i8255a_crt_m6502;
-	const device_config *i8251_kb;
-	const device_config *i8251_sio;
-	const device_config *mb8877;
-	const device_config *mc6845;
-	const device_config *centronics;
-	const device_config *timer_sio;
+	running_device *i8214;
+	running_device *msm58321;
+	running_device *i8255a_crt_z80;
+	running_device *i8255a_crt_m6502;
+	running_device *i8251_kb;
+	running_device *i8251_sio;
+	running_device *mb8877;
+	running_device *mc6845;
+	running_device *centronics;
+	running_device *timer_sio;
 };
 
 /*----------- defined in drivers/v1050.c -----------*/

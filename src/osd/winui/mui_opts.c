@@ -2289,9 +2289,12 @@ static file_error SaveSettingsFile(core_options *opts, core_options *baseopts, c
 	{
 		filerr = core_fopen(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 		if (filerr == FILERR_NONE)
-		{
+		{	
+			#ifdef MESS
 			options_output_ini_file(opts, file);	/* required for MESS */
-//			options_output_diff_ini_file(opts, baseopts, file);
+			#else
+			options_output_diff_ini_file(opts, baseopts, file);
+			#endif
 			core_fclose(file);
 		}
 	}

@@ -15,30 +15,30 @@
 	MDRV_DEVICE_CONFIG(_intrf)
 
 /* callback definitions */
-typedef void * (*crtc_ega_begin_update_func)(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
-#define CRTC_EGA_BEGIN_UPDATE(name)	void *name(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+typedef void * (*crtc_ega_begin_update_func)(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
+#define CRTC_EGA_BEGIN_UPDATE(name)	void *name(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 
-typedef void (*crtc_ega_update_row_func)(const device_config *device, bitmap_t *bitmap,
+typedef void (*crtc_ega_update_row_func)(running_device *device, bitmap_t *bitmap,
 					   				   const rectangle *cliprect, UINT16 ma, UINT8 ra,
 					   				   UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
-#define CRTC_EGA_UPDATE_ROW(name)		void name(const device_config *device, bitmap_t *bitmap,	\
+#define CRTC_EGA_UPDATE_ROW(name)		void name(running_device *device, bitmap_t *bitmap,	\
 					   						  const rectangle *cliprect, UINT16 ma, UINT8 ra,					\
 					   						  UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 
-typedef void (*crtc_ega_end_update_func)(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, void *param);
-#define CRTC_EGA_END_UPDATE(name)		void name(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, void *param)
+typedef void (*crtc_ega_end_update_func)(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, void *param);
+#define CRTC_EGA_END_UPDATE(name)		void name(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, void *param)
 
-typedef void (*crtc_ega_on_de_changed_func)(const device_config *device, int display_enabled);
-#define CRTC_EGA_ON_DE_CHANGED(name)	void name(const device_config *device, int display_enabled)
+typedef void (*crtc_ega_on_de_changed_func)(running_device *device, int display_enabled);
+#define CRTC_EGA_ON_DE_CHANGED(name)	void name(running_device *device, int display_enabled)
 
-typedef void (*crtc_ega_on_hsync_changed_func)(const device_config *device, int hsync);
-#define CRTC_EGA_ON_HSYNC_CHANGED(name)	void name(const device_config *device, int hsync)
+typedef void (*crtc_ega_on_hsync_changed_func)(running_device *device, int hsync);
+#define CRTC_EGA_ON_HSYNC_CHANGED(name)	void name(running_device *device, int hsync)
 
-typedef void (*crtc_ega_on_vsync_changed_func)(const device_config *device, int vsync);
-#define CRTC_EGA_ON_VSYNC_CHANGED(name)	void name(const device_config *device, int vsync)
+typedef void (*crtc_ega_on_vsync_changed_func)(running_device *device, int vsync);
+#define CRTC_EGA_ON_VSYNC_CHANGED(name)	void name(running_device *device, int vsync)
 
-typedef void (*crtc_ega_on_vblank_changed_func)(const device_config *device, int vblank);
-#define CRTC_EGA_ON_VBLANK_CHANGED(name) void name(const device_config *device, int vblank)
+typedef void (*crtc_ega_on_vblank_changed_func)(running_device *device, int vblank);
+#define CRTC_EGA_ON_VBLANK_CHANGED(name) void name(running_device *device, int vblank)
 
 
 /* interface */
@@ -89,24 +89,24 @@ READ8_DEVICE_HANDLER( crtc_ega_register_r );
 WRITE8_DEVICE_HANDLER( crtc_ega_register_w );
 
 /* return the current value on the MA0-MA15 pins */
-UINT16 crtc_ega_get_ma(const device_config *device);
+UINT16 crtc_ega_get_ma(running_device *device);
 
 /* return the current value on the RA0-RA4 pins */
-UINT8 crtc_ega_get_ra(const device_config *device);
+UINT8 crtc_ega_get_ra(running_device *device);
 
 /* simulates the LO->HI clocking of the light pen pin (pin 3) */
-void crtc_ega_assert_light_pen_input(const device_config *device);
+void crtc_ega_assert_light_pen_input(running_device *device);
 
 /* set the clock (pin 21) of the chip */
-void crtc_ega_set_clock(const device_config *device, int clock);
+void crtc_ega_set_clock(running_device *device, int clock);
 
 /* set number of pixels per video memory address */
-void crtc_ega_set_hpixels_per_column(const device_config *device, int hpixels_per_column);
+void crtc_ega_set_hpixels_per_column(running_device *device, int hpixels_per_column);
 
 /* updates the screen -- this will call begin_update(),
    followed by update_row() reapeatedly and after all row
    updating is complete, end_update() */
-void crtc_ega_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
+void crtc_ega_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 
 #endif

@@ -36,16 +36,16 @@ enum
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE sst39vfx_t *get_token(const device_config *device)
+INLINE sst39vfx_t *get_token(running_device *device)
 {
 	assert(device != NULL);
 	return (sst39vfx_t *) device->token;
 }
 
-INLINE const sst39vfx_config *get_config(const device_config *device)
+INLINE const sst39vfx_config *get_config(running_device *device)
 {
 	assert(device != NULL);
-	return (const sst39vfx_config *) device->inline_config;
+	return (const sst39vfx_config *) device->baseconfig().inline_config;
 }
 
 
@@ -53,7 +53,7 @@ INLINE const sst39vfx_config *get_config(const device_config *device)
     IMPLEMENTATION
 ***************************************************************************/
 
-static void common_start(const device_config *device, int device_type)
+static void common_start(running_device *device, int device_type)
 {
 	sst39vfx_t *flash = get_token(device);
 	const sst39vfx_config *config = get_config(device);
@@ -87,13 +87,13 @@ static DEVICE_START( sst39vf400a )
 	common_start(device, TYPE_SST39VF400A);
 }
 
-UINT8* sst39vfx_get_base( const device_config *device)
+UINT8* sst39vfx_get_base( running_device *device)
 {
 	sst39vfx_t *flash = get_token(device);
 	return flash->data;
 }
 
-UINT32 sst39vfx_get_size( const device_config *device)
+UINT32 sst39vfx_get_size( running_device *device)
 {
 	sst39vfx_t *flash = get_token(device);
 	return flash->size;
@@ -119,7 +119,7 @@ WRITE8_HANDLER( sst39vfx_w )
 }
 #endif
 
-static void sst39vfx_swap( const device_config *device)
+static void sst39vfx_swap( running_device *device)
 {
 	int i, j;
 	UINT8 *base, temp[8];
@@ -133,7 +133,7 @@ static void sst39vfx_swap( const device_config *device)
 	}
 }
 
-void sst39vfx_load(const device_config *device, mame_file *file)
+void sst39vfx_load(running_device *device, mame_file *file)
 {
 	sst39vfx_t *flash = get_token(device);
 
@@ -142,7 +142,7 @@ void sst39vfx_load(const device_config *device, mame_file *file)
 	if (flash->swap) sst39vfx_swap(device);
 }
 
-void sst39vfx_save(const device_config *device, mame_file *file)
+void sst39vfx_save(running_device *device, mame_file *file)
 {
 	sst39vfx_t *flash = get_token(device);
 

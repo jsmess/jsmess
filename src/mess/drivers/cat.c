@@ -350,16 +350,16 @@ static VIDEO_UPDATE( swyft )
 	return 0;
 }
 
-static void duart_irq_handler(const device_config *device, UINT8 vector)
+static void duart_irq_handler(running_device *device, UINT8 vector)
 {
 	logerror("duart_irq_handler\n");
 }
 
-static void duart_tx(const device_config *device, int channel, UINT8 data)
+static void duart_tx(running_device *device, int channel, UINT8 data)
 {
 }
 
-static UINT8 duart_input(const device_config *device)
+static UINT8 duart_input(running_device *device)
 {
 	cat_state *state = (cat_state *)device->machine->driver_data;
 

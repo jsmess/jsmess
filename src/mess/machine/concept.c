@@ -47,7 +47,7 @@ static WRITE8_DEVICE_HANDLER(via_out_a);
 static READ8_DEVICE_HANDLER(via_in_b);
 static WRITE8_DEVICE_HANDLER(via_out_b);
 static WRITE8_DEVICE_HANDLER(via_out_cb2);
-static void via_irq_func(const device_config *device, int state);
+static void via_irq_func(running_device *device, int state);
 
 
 const via6522_interface concept_via6522_intf =
@@ -267,7 +267,7 @@ static WRITE8_DEVICE_HANDLER(via_out_cb2)
 /*
     VIA irq -> 68k level 5
 */
-static void via_irq_func(const device_config *device, int state)
+static void via_irq_func(running_device *device, int state)
 {
 	concept_set_interrupt(device->machine, TIMINT_level, state);
 }
@@ -378,7 +378,7 @@ READ16_HANDLER(concept_io_r)
 			/* NVIA versatile system interface */
 			LOG(("concept_io_r: VIA read at address 0x03%4.4x\n", offset << 1));
 			{
-				const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
+				running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
 				return via_r(via_0, offset & 0xf);
 			}
 			break;
@@ -491,7 +491,7 @@ WRITE16_HANDLER(concept_io_w)
 		case 3:
 			/* NVIA versatile system interface */
 			{
-				const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
+				running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
 				via_w(via_0, offset & 0xf, data);
 			}
 			break;
@@ -605,7 +605,7 @@ const wd17xx_interface concept_wd17xx_interface =
 
 static  READ8_HANDLER(concept_fdc_reg_r)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = devtag_get_device(space->machine, "wd179x");
 	switch (offset)
 	{
 	case 0:
@@ -635,7 +635,7 @@ static  READ8_HANDLER(concept_fdc_reg_r)
 static WRITE8_HANDLER(concept_fdc_reg_w)
 {
 	int current_drive;
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = devtag_get_device(space->machine, "wd179x");
 	switch (offset)
 	{
 	case 0:

@@ -125,7 +125,7 @@ MACHINE_RESET( a7800 )
 	/* pokey cartridge */
 	if (a7800_cart_type & 0x01)
 	{
-		const device_config *pokey = devtag_get_device(machine, "pokey");
+		running_device *pokey = devtag_get_device(machine, "pokey");
 		memory_install_read8_device_handler(space, pokey, 0x4000, 0x7FFF, 0, 0, pokey_r);
 		memory_install_write8_device_handler(space, pokey, 0x4000, 0x7FFF, 0, 0, pokey_w);
 	}
@@ -348,7 +348,7 @@ WRITE8_HANDLER( a7800_cart_w )
 		}
 		else if(a7800_cart_type & 0x01)
 		{
-			const device_config *pokey = devtag_get_device(space->machine, "pokey");
+			running_device *pokey = devtag_get_device(space->machine, "pokey");
 			pokey_w(pokey, offset, data);
 		}
 		else

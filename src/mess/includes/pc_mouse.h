@@ -25,7 +25,7 @@ typedef enum
 INS8250_HANDSHAKE_OUT( pc_mouse_handshake_in );
 
 // set base for input port
-void pc_mouse_set_serial_port(const device_config *ins8250);
+void pc_mouse_set_serial_port(running_device *ins8250);
 void pc_mouse_initialise(running_machine *machine);
 
 INPUT_PORTS_EXTERN( pc_mouse_mousesystems );

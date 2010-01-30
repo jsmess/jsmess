@@ -219,7 +219,7 @@ typedef struct _cbm_iec_daisy_state cbm_iec_daisy_state;
 struct _cbm_iec_daisy_state
 {
 	cbm_iec_daisy_state			*next;			/* next device */
-	const device_config			*device;		/* associated device */
+	running_device *device;		/* associated device */
 
 	int line[SIGNAL_COUNT];						/* serial signal states */
 
@@ -236,7 +236,7 @@ struct _cbm_iec_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE cbm_iec_t *get_safe_token(const device_config *device)
+INLINE cbm_iec_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -244,14 +244,14 @@ INLINE cbm_iec_t *get_safe_token(const device_config *device)
 	return (cbm_iec_t *)device->token;
 }
 
-INLINE const cbm_iec_daisy_chain *get_interface(const device_config *device)
+INLINE const cbm_iec_daisy_chain *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == CBM_IEC);
-	return (const cbm_iec_daisy_chain *) device->static_config;
+	return (const cbm_iec_daisy_chain *) device->baseconfig().static_config;
 }
 
-INLINE int get_signal(const device_config *device, int line)
+INLINE int get_signal(running_device *device, int line)
 {
 	cbm_iec_t *cbm_iec = get_safe_token(device);
 	cbm_iec_daisy_state *daisy = cbm_iec->daisy_state;
@@ -269,7 +269,7 @@ INLINE int get_signal(const device_config *device, int line)
 	return state;
 }
 
-INLINE void set_signal(const device_config *iec, const device_config *device, int line, int state)
+INLINE void set_signal(running_device *iec, running_device *device, int line, int state)
 {
 	cbm_iec_t *cbm_iec = get_safe_token(iec);
 	cbm_iec_daisy_state *daisy = cbm_iec->daisy_state;
@@ -303,7 +303,7 @@ INLINE void set_signal(const device_config *iec, const device_config *device, in
     IMPLEMENTATION
 ***************************************************************************/
 
-void cbm_iec_srq_w(const device_config *iec, const device_config *device, int state)
+void cbm_iec_srq_w(running_device *iec, running_device *device, int state)
 {
 	set_signal(iec, device, SRQ, state);
 }
@@ -313,7 +313,7 @@ READ_LINE_DEVICE_HANDLER( cbm_iec_srq_r )
 	return get_signal(device, SRQ);
 }
 
-void cbm_iec_atn_w(const device_config *iec, const device_config *device, int state)
+void cbm_iec_atn_w(running_device *iec, running_device *device, int state)
 {
 	set_signal(iec, device, ATN, state);
 }
@@ -323,7 +323,7 @@ READ_LINE_DEVICE_HANDLER( cbm_iec_atn_r )
 	return get_signal(device, ATN);
 }
 
-void cbm_iec_clk_w(const device_config *iec, const device_config *device, int state)
+void cbm_iec_clk_w(running_device *iec, running_device *device, int state)
 {
 	set_signal(iec, device, CLK, state);
 }
@@ -333,7 +333,7 @@ READ_LINE_DEVICE_HANDLER( cbm_iec_clk_r )
 	return get_signal(device, CLK);
 }
 
-void cbm_iec_data_w(const device_config *iec, const device_config *device, int state)
+void cbm_iec_data_w(running_device *iec, running_device *device, int state)
 {
 	set_signal(iec, device, DATA, state);
 }
@@ -343,7 +343,7 @@ READ_LINE_DEVICE_HANDLER( cbm_iec_data_r )
 	return get_signal(device, DATA);
 }
 
-void cbm_iec_reset_w(const device_config *iec, const device_config *device, int state)
+void cbm_iec_reset_w(running_device *iec, running_device *device, int state)
 {
 	set_signal(iec, device, RESET, state);
 }

@@ -17,7 +17,7 @@
 #include "devices/flopdrv.h"
 
 
-static const device_config *exidy_ay31015;
+static running_device *exidy_ay31015;
 
 static UINT8 exidy_fe = 0xff;
 static UINT8 exidy_keyboard_line;
@@ -47,7 +47,7 @@ The serial code (which was never connected to the outside) is disabled for now.
 static emu_timer *cassette_timer;
 
 
-static const device_config *cassette_device_image(running_machine *machine)
+static running_device *cassette_device_image(running_machine *machine)
 {
 	if (exidy_fe & 0x20)
 		return devtag_get_device(machine, "cassette2");
@@ -256,8 +256,8 @@ WRITE8_HANDLER(exidy_fe_w)
 
 WRITE8_HANDLER(exidy_ff_w)
 {
-	const device_config *printer = devtag_get_device(space->machine, "centronics");
-	const device_config *dac_device = devtag_get_device(space->machine, "dac");
+	running_device *printer = devtag_get_device(space->machine, "centronics");
+	running_device *dac_device = devtag_get_device(space->machine, "dac");
 	/* reading the config switch */
 	switch (input_port_read(space->machine, "CONFIG") & 0x06)
 	{
@@ -333,7 +333,7 @@ READ8_HANDLER(exidy_ff_r)
     This uses bit 7. The other bits have been set high (=nothing plugged in).
     This fixes those games that use a joystick. */
 
-	const device_config *printer = devtag_get_device(space->machine, "centronics");
+	running_device *printer = devtag_get_device(space->machine, "centronics");
 	UINT8 data=0x7f;
 
 	/* bit 7 = printer busy
@@ -402,7 +402,7 @@ Z80BIN_EXECUTE( exidy )
 SNAPSHOT_LOAD(exidy)
 {
 	UINT8 *ptr = memory_region(image->machine, "maincpu");
-	const device_config *cpu = devtag_get_device(image->machine, "maincpu");
+	running_device *cpu = devtag_get_device(image->machine, "maincpu");
 	UINT8 header[28];
 
 	/* check size */

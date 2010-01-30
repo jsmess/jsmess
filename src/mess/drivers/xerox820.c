@@ -685,7 +685,7 @@ static VIDEO_UPDATE( xerox820 )
 	return 0;
 }
 
-static void xerox820_load_proc(const device_config *image)
+static void xerox820_load_proc(running_device *image)
 {
 	xerox820_state *state = (xerox820_state *)image->machine->driver_data;
 

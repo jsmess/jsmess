@@ -61,7 +61,7 @@ static MACHINE_RESET(ipds)
 
 static VIDEO_UPDATE( ipds )
 {
-    const device_config	*devconf = devtag_get_device(screen->machine, "i8275");
+    running_device *devconf = devtag_get_device(screen->machine, "i8275");
 	i8275_update( devconf, bitmap, cliprect);
 	VIDEO_UPDATE_CALL ( generic_bitmapped );
 	return 0;

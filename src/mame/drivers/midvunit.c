@@ -41,7 +41,7 @@ static UINT8 adc_shift;
 static UINT16 last_port0;
 static UINT8 shifter_state;
 
-static const device_config *timer[2];
+static running_device *timer[2];
 static double timer_rate;
 
 static UINT32 *tms32031_control;
@@ -74,7 +74,7 @@ static MACHINE_RESET( midvunit )
 	dcs_reset_w(0);
 
 	memcpy(ram_base, memory_region(machine, "user1"), 0x20000*4);
-	device_reset(devtag_get_device(machine, "maincpu"));
+	machine->device("maincpu")->reset();
 
 	timer[0] = devtag_get_device(machine, "timer0");
 	timer[1] = devtag_get_device(machine, "timer1");
@@ -87,7 +87,7 @@ static MACHINE_RESET( midvplus )
 	dcs_reset_w(0);
 
 	memcpy(ram_base, memory_region(machine, "user1"), 0x20000*4);
-	device_reset(devtag_get_device(machine, "maincpu"));
+	machine->device("maincpu")->reset();
 
 	timer[0] = devtag_get_device(machine, "timer0");
 	timer[1] = devtag_get_device(machine, "timer1");
@@ -459,7 +459,7 @@ static WRITE32_HANDLER( midvplus_misc_w )
  *
  *************************************/
 
-static void midvplus_xf1_w(const device_config *device, UINT8 val)
+static void midvplus_xf1_w(running_device *device, UINT8 val)
 {
 	static int lastval;
 //  mame_printf_debug("xf1_w = %d\n", val);

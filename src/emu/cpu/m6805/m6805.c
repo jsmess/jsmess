@@ -61,13 +61,13 @@ typedef struct
 
 	UINT16	pending_interrupts; /* MB */
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 	int 	irq_state[9];		/* KW Additional lines for HD63705 */
 	int		nmi_state;
 } m6805_Regs;
 
-INLINE m6805_Regs *get_safe_token(const device_config *device)
+INLINE m6805_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -442,7 +442,7 @@ static void Interrupt( m6805_Regs *cpustate )
 	}
 }
 
-static void state_register(m6805_Regs *cpustate, const char *type, const device_config *device)
+static void state_register(m6805_Regs *cpustate, const char *type, running_device *device)
 {
 	state_save_register_device_item(device, 0, A);
 	state_save_register_device_item(device, 0, PC);
@@ -924,15 +924,15 @@ CPU_GET_INFO( m6805 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 10;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 12;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 12;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + M6805_IRQ_LINE:	info->i = cpustate->irq_state[M6805_IRQ_LINE]; break;
 
@@ -1064,7 +1064,7 @@ CPU_GET_INFO( hd63705 )
 		case CPUINFO_INT_INPUT_STATE + HD63705_INT_ADCONV:	info->i = cpustate->irq_state[HD63705_INT_ADCONV];	break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		info->i = cpustate->irq_state[HD63705_INT_NMI];		break;
 
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16; break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(hd63705);	break;

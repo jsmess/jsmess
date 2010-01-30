@@ -242,7 +242,7 @@ READ8_HANDLER ( pc8300_io_r )
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
 	static UINT8 speaker_state = 0;
-	const device_config *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = devtag_get_device(space->machine, "speaker");
 
 	if (offs == 0xf5)
 	{
@@ -314,7 +314,7 @@ READ8_HANDLER ( pow3000_io_r )
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
 	static UINT8 speaker_state = 0;
-	const device_config *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = devtag_get_device(space->machine, "speaker");
 
 	if (offs == 0x7e)
 	{
@@ -399,7 +399,7 @@ WRITE8_HANDLER ( zx81_io_w )
     FE = turn on NMI generator
     FF = write HSYNC and cass data */
 
-	const device_config *screen = video_screen_first(space->machine->config);
+	running_device *screen = video_screen_first(space->machine);
 	int height = video_screen_get_height(screen);
 	UINT8 offs = offset & 0xff;
 

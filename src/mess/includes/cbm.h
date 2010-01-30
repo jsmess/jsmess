@@ -17,10 +17,10 @@
 
 /* keyboard lines */
 extern UINT8 c64_keyline[10];
-void cbm_common_interrupt( const device_config *device );
+void cbm_common_interrupt( running_device *device );
 
-UINT8 cbm_common_cia0_port_a_r( const device_config *device, UINT8 output_b );
-UINT8 cbm_common_cia0_port_b_r( const device_config *device, UINT8 output_a );
+UINT8 cbm_common_cia0_port_a_r( running_device *device, UINT8 output_b );
+UINT8 cbm_common_cia0_port_b_r( running_device *device, UINT8 output_a );
 
 
 /***********************************************

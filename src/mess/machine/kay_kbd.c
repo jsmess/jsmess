@@ -164,7 +164,7 @@ INPUT_PORTS_START( kay_kbd )
 INPUT_PORTS_END
 
 static void kay_kbd_in( running_machine *machine, UINT8 data );
-static const device_config *kay_kbd_beeper;
+static running_device *kay_kbd_beeper;
 static UINT8 kbd_buff[16];
 static UINT8 kbd_head = 0;
 static UINT8 kbd_tail = 0;

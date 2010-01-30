@@ -70,8 +70,8 @@
 #define AY3600_INTERFACE(name) \
 	const ay3600_interface (name) =
 
-typedef UINT16 (*ay3600_y_r)(const device_config *device, int x);
-#define AY3600_Y_READ(name) UINT16 name(const device_config *device, int x)
+typedef UINT16 (*ay3600_y_r)(running_device *device, int x);
+#define AY3600_Y_READ(name) UINT16 name(running_device *device, int x)
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -100,6 +100,6 @@ struct _ay3600_interface
 DEVICE_GET_INFO( ay3600pro002 );
 
 /* data read */
-UINT16 ay3600_b_r(const device_config *device);
+UINT16 ay3600_b_r(running_device *device);
 
 #endif

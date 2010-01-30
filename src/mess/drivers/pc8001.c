@@ -432,7 +432,7 @@ static MACHINE_START( pc8001 )
 {
 	pc8001_state *state = (pc8001_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	const device_config *messram = devtag_get_device(machine, "messram");
+	running_device *messram = devtag_get_device(machine, "messram");
 
 	/* look up devices */
 	state->i8257 = devtag_get_device(machine, I8257_TAG);

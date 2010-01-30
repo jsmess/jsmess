@@ -20,9 +20,9 @@ struct _mpf1_state
 	emu_timer *led_refresh_timer;
 
 	/* devices */
-	const device_config *z80ctc;
-	const device_config *speaker;
-	const device_config *cassette;
+	running_device *z80ctc;
+	running_device *speaker;
+	running_device *cassette;
 };
 
 #endif

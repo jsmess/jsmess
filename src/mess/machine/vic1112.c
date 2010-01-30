@@ -31,16 +31,16 @@ struct _vic1112_t
 	int via1_irq;						/* VIA #1 interrupt request */
 
 	/* devices */
-	const device_config *via0;
-	const device_config *via1;
-	const device_config *bus;
+	running_device *via0;
+	running_device *via1;
+	running_device *bus;
 };
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE vic1112_t *get_safe_token(const device_config *device)
+INLINE vic1112_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -48,11 +48,11 @@ INLINE vic1112_t *get_safe_token(const device_config *device)
 	return (vic1112_t *)device->token;
 }
 
-INLINE vic1112_config *get_safe_config(const device_config *device)
+INLINE vic1112_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == VIC1112);
-	return (vic1112_config *)device->inline_config;
+	return (vic1112_config *)device->baseconfig().inline_config;
 }
 
 /***************************************************************************
@@ -299,13 +299,13 @@ static DEVICE_START( vic1112 )
 	const address_space *program = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
-	vic1112->via0 = device_find_child_by_tag(device, M6522_0_TAG);
-	vic1112->via1 = device_find_child_by_tag(device, M6522_1_TAG);
+	vic1112->via0 = device->subdevice(M6522_0_TAG);
+	vic1112->via1 = device->subdevice(M6522_1_TAG);
 	vic1112->bus = devtag_get_device(device->machine, config->bus_tag);
 
 	/* set VIA clocks */
-	device_set_clock(vic1112->via0, cpu_get_clock(device->machine->firstcpu));
-	device_set_clock(vic1112->via1, cpu_get_clock(device->machine->firstcpu));
+	vic1112->via0->set_clock(cpu_get_clock(device->machine->firstcpu));
+	vic1112->via1->set_clock(cpu_get_clock(device->machine->firstcpu));
 
 	/* map VIAs to memory */
 	memory_install_readwrite8_device_handler(program, vic1112->via0, 0x9800, 0x980f, 0, 0, via_r, via_w);
@@ -331,8 +331,8 @@ static DEVICE_RESET( vic1112 )
 	vic1112_t *vic1112 = get_safe_token(device);
 
 	/* reset VIAs */
-	device_reset(vic1112->via0);
-	device_reset(vic1112->via1);
+	vic1112->via0->reset();
+	vic1112->via1->reset();
 
 	/* _IFC */
 	ieee488_ifc_w(vic1112->bus, device, 0);

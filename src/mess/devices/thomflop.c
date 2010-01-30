@@ -115,7 +115,7 @@ static int thom_floppy_make_addr( chrn_id id, UINT8* dst, int sector_size )
 
 
 /* build a sector, with header & space */
-static int thom_floppy_make_sector( const device_config* img, chrn_id id, UINT8* dst, int sector_size )
+static int thom_floppy_make_sector( running_device* img, chrn_id id, UINT8* dst, int sector_size )
 {
 	if ( sector_size == 128 )
 	{
@@ -146,7 +146,7 @@ static int thom_floppy_make_sector( const device_config* img, chrn_id id, UINT8*
 
 
 /* build a whole track */
-static int thom_floppy_make_track( const device_config* img, UINT8* dst, int sector_size, int side )
+static int thom_floppy_make_track( running_device* img, UINT8* dst, int sector_size, int side )
 {
 	UINT8 space = ( sector_size == 128 ) ? 0xff : 0;
 	UINT8* org = dst;
@@ -222,7 +222,7 @@ static int thom_qdd_make_addr( int sector, UINT8* dst )
 
 
 /* build a sector, with header */
-static int thom_qdd_make_sector( const device_config* img, int sector, UINT8* dst )
+static int thom_qdd_make_sector( running_device* img, int sector, UINT8* dst )
 {
 	int i;
 	dst[ 0 ] = 0x5a;
@@ -236,7 +236,7 @@ static int thom_qdd_make_sector( const device_config* img, int sector, UINT8* ds
 
 
 /* build a whole disk */
-static int thom_qdd_make_disk ( const device_config* img, UINT8* dst )
+static int thom_qdd_make_disk ( running_device* img, UINT8* dst )
 {
 	UINT8* org = dst;
 	int i;
@@ -273,7 +273,7 @@ static UINT8 to7_5p14_select;
 
 static READ8_HANDLER ( to7_5p14_r )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd2793");
+	running_device *fdc = devtag_get_device(space->machine, "wd2793");
 
 	if ( offset < 4 )
 		return wd17xx_r( fdc, offset );
@@ -288,7 +288,7 @@ static READ8_HANDLER ( to7_5p14_r )
 
 static WRITE8_HANDLER( to7_5p14_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd2793");
+	running_device *fdc = devtag_get_device(space->machine, "wd2793");
 	if ( offset < 4 )
 		wd17xx_w( fdc, offset, data );
 	else if ( offset == 8 )
@@ -332,7 +332,7 @@ static WRITE8_HANDLER( to7_5p14_w )
 
 static void to7_5p14_reset( running_machine *machine )
 {
-	const device_config *fdc = devtag_get_device(machine, "wd2793");
+	running_device *fdc = devtag_get_device(machine, "wd2793");
 	LOG(( "to7_5p14_reset: CD 90-640 controller\n" ));
 	wd17xx_reset(fdc);
 }
@@ -420,7 +420,7 @@ static WRITE8_HANDLER( to7_5p14sd_w )
 			   attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), offset, data );
 }
 
-static void to7_5p14_index_pulse_callback( const device_config *controller,const device_config *image, int state )
+static void to7_5p14_index_pulse_callback( running_device *controller,running_device *image, int state )
 {
 	mc6843_set_index_pulse( devtag_get_device(image->machine, "mc6843"), state );
 }
@@ -431,7 +431,7 @@ static void to7_5p14sd_reset( running_machine *machine )
 	LOG(( "to7_5p14sd_reset: CD 90-015 controller\n" ));
 	for ( i = 0; i < floppy_get_count( machine ); i++ )
 	{
-		const device_config * img = floppy_get_device( machine, i );
+		running_device * img = floppy_get_device( machine, i );
 		if (img) {
 			floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
 			floppy_drive_set_rpm( img, 300. );
@@ -521,7 +521,7 @@ static struct _to7qdd
 
 
 
-static void to7_qdd_index_pulse_cb ( const device_config *controller,const device_config *image, int state )
+static void to7_qdd_index_pulse_cb ( running_device *controller,running_device *image, int state )
 {
 	to7qdd->index_pulse = state;
 
@@ -538,7 +538,7 @@ static void to7_qdd_index_pulse_cb ( const device_config *controller,const devic
 
 
 
-static const device_config * to7_qdd_image ( running_machine *machine )
+static running_device * to7_qdd_image ( running_machine *machine )
 {
 	return floppy_get_device( machine, 0 );
 }
@@ -721,7 +721,7 @@ static READ8_HANDLER ( to7_qdd_r )
 	case 8: /* floppy status */
 	{
 		UINT8 data = 0;
-		const device_config* img = to7_qdd_image(space->machine);
+		running_device* img = to7_qdd_image(space->machine);
 		if ( ! image_exists( img ) )
 			data |= 0x40; /* disk present */
 		if ( to7qdd->index_pulse )
@@ -837,7 +837,7 @@ static void to7_qdd_reset( running_machine *machine )
 
 	for ( i = 0; i < floppy_get_count( machine ); i++ )
 	{
-		const device_config * img = floppy_get_device( machine, i );
+		running_device * img = floppy_get_device( machine, i );
 		if (img) {
 			floppy_drive_set_index_pulse_callback( img, to7_qdd_index_pulse_cb );
 			floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
@@ -939,14 +939,14 @@ static emu_timer* thmfc_floppy_cmd;
 
 
 
-static const device_config * thmfc_floppy_image ( running_machine *machine )
+static running_device * thmfc_floppy_image ( running_machine *machine )
 {
 	return floppy_get_device( machine, thmfc1->drive );
 }
 
 
 
-static int thmfc_floppy_is_qdd ( const device_config *image )
+static int thmfc_floppy_is_qdd ( running_device *image )
 {
 	if (image==NULL) return 0;
 	if (!image_exists(image)) return 0;
@@ -955,7 +955,7 @@ static int thmfc_floppy_is_qdd ( const device_config *image )
 
 
 
-static void thmfc_floppy_index_pulse_cb ( const device_config *controller,const device_config *image, int state )
+static void thmfc_floppy_index_pulse_cb ( running_device *controller,running_device *image, int state )
 {
 	if ( image != thmfc_floppy_image(image->machine) )
 		return;
@@ -987,7 +987,7 @@ static void thmfc_floppy_index_pulse_cb ( const device_config *controller,const 
 
 static int thmfc_floppy_find_sector ( running_machine *machine, chrn_id* dst )
 {
-	const device_config* img = thmfc_floppy_image(machine);
+	running_device* img = thmfc_floppy_image(machine);
 	chrn_id id;
 	int r = 0;
 
@@ -1030,7 +1030,7 @@ static void thmfc_floppy_cmd_complete( running_machine *machine )
 
 	if ( thmfc1->op == THMFC1_OP_WRITE_SECT )
 	{
-		const device_config * img = thmfc_floppy_image(machine);
+		running_device * img = thmfc_floppy_image(machine);
 		floppy_drive_write_sector_data( img, thmfc1->side, thmfc1->sector_id, thmfc1->data + 3, thmfc1->data_size - 3, 0 );
                 thom_floppy_active( machine, 1 );
 	}
@@ -1174,7 +1174,7 @@ static void thmfc_floppy_qdd_write_byte ( running_machine *machine, UINT8 data )
 			if ( i >= 0 )
 			{
 				/* got an id & a data field => write */
-				const device_config * img = thmfc_floppy_image(machine);
+				running_device * img = thmfc_floppy_image(machine);
 				int sector = (int) thmfc1->data[ i + 1 ] * 256 +
 					(int) thmfc1->data[ i + 2 ];
 
@@ -1235,7 +1235,7 @@ static void thmfc_floppy_format_byte ( running_machine *machine, UINT8 data )
 			if ( !memcmp ( thmfc1->data, header, sizeof( header ) ) )
 			{
 				/* got id field => format */
-				const device_config * img = thmfc_floppy_image(machine);
+				running_device * img = thmfc_floppy_image(machine);
 				UINT8 track  = thmfc1->data[4];
 				UINT8 side   = thmfc1->data[5];
 				UINT8 sector = thmfc1->data[6];
@@ -1270,7 +1270,7 @@ READ8_HANDLER ( thmfc_floppy_r )
 	case 1: /* STAT1 */
 	{
 		UINT8 data = 0;
-		const device_config * img = thmfc_floppy_image(space->machine);
+		running_device * img = thmfc_floppy_image(space->machine);
 		int flags = floppy_drive_get_flag_state( img, -1 );
 		if ( thmfc_floppy_is_qdd(img) )
 		{
@@ -1436,7 +1436,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 
 	case 2: /* CMD2 */
 	{
-		const device_config * img;
+		running_device * img;
 		int seek = 0, motor;
 		thmfc1->drive = data & 2;
 
@@ -1535,7 +1535,7 @@ void thmfc_floppy_reset( running_machine *machine )
 
 	for ( i = 0; i < floppy_get_count( machine ); i++ )
 	{
-		const device_config * img = floppy_get_device( machine, i );
+		running_device * img = floppy_get_device( machine, i );
 		if (img) {
 			floppy_drive_set_index_pulse_callback( img, thmfc_floppy_index_pulse_cb );
 			floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
@@ -1660,7 +1660,7 @@ static TIMER_CALLBACK( ans )
 
 */
 
-static void to7_network_got_frame( const device_config *device, UINT8* data, int length )
+static void to7_network_got_frame( running_device *device, UINT8* data, int length )
 {
 	int i;
 	LOG(( "%f to7_network_got_frame:", attotime_to_double(timer_get_time(device->machine)) ));

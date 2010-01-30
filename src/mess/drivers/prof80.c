@@ -999,7 +999,7 @@ static UPD1990A_INTERFACE( prof80_upd1990a_intf )
 
 /* UPD765 Interface */
 
-static void prof80_fdc_index_callback(const device_config *controller, const device_config *img, int state)
+static void prof80_fdc_index_callback(running_device *controller, running_device *img, int state)
 {
 	prof80_state *driver_state = (prof80_state *)img->machine->driver_data;
 

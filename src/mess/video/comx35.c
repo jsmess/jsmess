@@ -119,17 +119,17 @@ static VIDEO_START( comx35 )
 
 static VIDEO_UPDATE( comx35 )
 {
-	const device_config *screen_40 = devtag_get_device(screen->machine, SCREEN_TAG);
+	running_device *screen_40 = devtag_get_device(screen->machine, SCREEN_TAG);
 
 	if (screen == screen_40)
 	{
-		const device_config *cdp1869 = devtag_get_device(screen->machine, CDP1869_TAG);
+		running_device *cdp1869 = devtag_get_device(screen->machine, CDP1869_TAG);
 
 		cdp1869_update(cdp1869, bitmap, cliprect);
 	}
 	else
 	{
-		const device_config *mc6845 = devtag_get_device(screen->machine, MC6845_TAG);
+		running_device *mc6845 = devtag_get_device(screen->machine, MC6845_TAG);
 
 		mc6845_update(mc6845, bitmap, cliprect);
 	}

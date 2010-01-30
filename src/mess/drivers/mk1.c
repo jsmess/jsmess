@@ -162,7 +162,7 @@ static MACHINE_START( mk1 )
 }
 
 
-static void mk1_interrupt( const device_config *device, UINT16 addr, int level )
+static void mk1_interrupt( running_device *device, UINT16 addr, int level )
 {
 	cpu_set_input_line_vector(devtag_get_device(device->machine, "maincpu"), 0, addr );
 	cputag_set_input_line(device->machine,"maincpu", 0, level ? F8_INT_INTR : F8_INT_NONE );

@@ -54,12 +54,12 @@ struct _abc800_state
 	int pling;					/* pling */
 
 	/* devices */
-	const device_config *z80ctc;
-	const device_config *z80dart;
-	const device_config *z80sio;
-	const device_config *abc77;
-	const device_config *mc6845;
-	const device_config *cassette;
+	running_device *z80ctc;
+	running_device *z80dart;
+	running_device *z80sio;
+	running_device *abc77;
+	running_device *mc6845;
+	running_device *cassette;
 };
 
 typedef struct _abc802_state abc802_state;
@@ -80,12 +80,12 @@ struct _abc802_state
 	int pling;					/* pling */
 
 	/* devices */
-	const device_config *z80ctc;
-	const device_config *z80dart;
-	const device_config *z80sio;
-	const device_config *abc77;
-	const device_config *mc6845;
-	const device_config *cassette;
+	running_device *z80ctc;
+	running_device *z80dart;
+	running_device *z80sio;
+	running_device *abc77;
+	running_device *mc6845;
+	running_device *cassette;
 };
 
 typedef struct _abc806_state abc806_state;
@@ -120,13 +120,13 @@ struct _abc806_state
 	int d_vsync;			/* delayed vertical sync */
 
 	/* devices */
-	const device_config *z80ctc;
-	const device_config *z80dart;
-	const device_config *z80sio;
-	const device_config *mc6845;
-	const device_config *abc77;
-	const device_config *e0516;
-	const device_config *cassette;
+	running_device *z80ctc;
+	running_device *z80dart;
+	running_device *z80sio;
+	running_device *mc6845;
+	running_device *abc77;
+	running_device *e0516;
+	running_device *cassette;
 };
 
 /*----------- defined in video/abc800.c -----------*/

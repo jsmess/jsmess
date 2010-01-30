@@ -70,7 +70,7 @@ DRIVER_INIT( orion128 )
 
 MACHINE_START( orion128 )
 {
-	const device_config *fdc = devtag_get_device(machine, "wd1793");
+	running_device *fdc = devtag_get_device(machine, "wd1793");
 
 	wd17xx_set_density (fdc,DEN_FM_HI);
 	orion_video_mode_mask = 7;
@@ -187,7 +187,7 @@ MACHINE_RESET ( orion128 )
 
 static WRITE8_HANDLER ( orion_disk_control_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *fdc = devtag_get_device(space->machine, "wd1793");
 
 	wd17xx_set_side(fdc,((data & 0x10) >> 4) ^ 1);
  	wd17xx_set_drive(fdc,data & 3);
@@ -195,7 +195,7 @@ static WRITE8_HANDLER ( orion_disk_control_w )
 
 READ8_HANDLER ( orion128_floppy_r )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *fdc = devtag_get_device(space->machine, "wd1793");
 
 	switch(offset)
 	{
@@ -213,7 +213,7 @@ READ8_HANDLER ( orion128_floppy_r )
 
 WRITE8_HANDLER ( orion128_floppy_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *fdc = devtag_get_device(space->machine, "wd1793");
 
 	switch(offset)
 	{
@@ -263,7 +263,7 @@ DRIVER_INIT( orionz80 )
 
 MACHINE_START( orionz80 )
 {
-	const device_config *fdc = devtag_get_device(machine, "wd1793");
+	running_device *fdc = devtag_get_device(machine, "wd1793");
 
 	wd17xx_set_density (fdc,DEN_FM_HI);
 	mc146818_init(machine, MC146818_IGNORE_CENTURY);
@@ -273,7 +273,7 @@ MACHINE_START( orionz80 )
 static UINT8 orion_speaker;
 WRITE8_HANDLER ( orionz80_sound_w )
 {
-	const device_config *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = devtag_get_device(space->machine, "speaker");
 	if (orion_speaker == 0)
 	{
 		orion_speaker = data;
@@ -288,7 +288,7 @@ WRITE8_HANDLER ( orionz80_sound_w )
 
 static WRITE8_HANDLER ( orionz80_sound_fe_w )
 {
-	const device_config *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = devtag_get_device(space->machine, "speaker");
 	speaker_level_w(speaker,(data>>4) & 0x01);
 }
 
@@ -451,7 +451,7 @@ DRIVER_INIT( orionpro )
 
 MACHINE_START( orionpro )
 {
-	const device_config *fdc = devtag_get_device(machine, "wd1793");
+	running_device *fdc = devtag_get_device(machine, "wd1793");
 	wd17xx_set_density (fdc,DEN_FM_HI);
 }
 
@@ -589,7 +589,7 @@ MACHINE_RESET ( orionpro )
 
 READ8_HANDLER ( orionpro_io_r )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *fdc = devtag_get_device(space->machine, "wd1793");
 
 	switch (offset & 0xff)
 	{
@@ -623,7 +623,7 @@ READ8_HANDLER ( orionpro_io_r )
 
 WRITE8_HANDLER ( orionpro_io_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *fdc = devtag_get_device(space->machine, "wd1793");
 
 	switch (offset & 0xff)
 	{

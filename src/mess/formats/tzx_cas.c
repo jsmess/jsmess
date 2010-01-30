@@ -60,9 +60,9 @@ static const UINT8 TZX_HEADER[8] = { 'Z','X','T','a','p','e','!',0x1a };
   Initialized by tzx_cas_get_wave_size, used (and cleaned up) by tzx_cas_fill_wave
  */
 
-static INT16	wave_data;
-static int	block_count;
-static UINT8**	blocks;
+static INT16	wave_data = 0;
+static int	block_count = 0;
+static UINT8**	blocks = NULL;
 static float t_scale = 1;  /* for scaling T-states to the 4MHz CPC */
 
 static void toggle_wave_data(void)
@@ -83,6 +83,7 @@ static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen )
 	int max_block_count = INITIAL_MAX_BLOCK_COUNT;
 
 	blocks = (UINT8**)malloc(max_block_count);
+	memset(blocks,0,max_block_count);
 	block_count = 0;
 
 	while (pos < caslen)
@@ -94,10 +95,12 @@ static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen )
 		{
 			void	*old_blocks = blocks;
 			int	old_max_block_count = max_block_count;
-
+			printf("realoc");
 			max_block_count = max_block_count + BLOCK_COUNT_INCREMENTS;
-			blocks = (UINT8**)malloc(max_block_count);	// SHOULD NOT BE USING auto_alloc_array()
+			blocks = (UINT8**)malloc(max_block_count);	// SHOULD NOT BE USING auto_alloc_array()			
+			memset(blocks,0,max_block_count);
 			memcpy(blocks, old_blocks, old_max_block_count * sizeof(UINT8*));
+			if (blocks) free(old_blocks);
 		}
 
 		blocks[block_count] = (UINT8*)&casdata[pos];
@@ -183,7 +186,6 @@ static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen )
 
 		block_count++;
 	}
-	free(blocks);
 }
 
 INLINE int millisec_to_samplecount( int millisec )

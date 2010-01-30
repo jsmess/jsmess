@@ -83,7 +83,7 @@ enum format_t
 /* disk drive unit descriptor */
 typedef struct hd_unit_t
 {
-	const device_config *img;						/* image descriptor */
+	running_device *img;						/* image descriptor */
 	format_t format;
 	hard_disk_file *hd_handle;		/* mame hard disk descriptor - only if format == format_mame */
 	unsigned int wp : 1;					/* TRUE if disk is write-protected */
@@ -167,7 +167,7 @@ static const UINT16 w_mask[8] =
 static hdc_t hdc;
 
 
-static int get_id_from_device( const device_config *device )
+static int get_id_from_device( running_device *device )
 {
 	int id = -1;
 

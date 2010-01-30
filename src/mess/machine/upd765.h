@@ -37,11 +37,11 @@ typedef enum
 #define UPD765_DAM_DELETED_DATA 0x0f8
 #define UPD765_DAM_DATA 0x0fb
 
-typedef void (*upd765_dma_drq_func)(const device_config *device, int state,int read_write);
-#define UPD765_DMA_REQUEST(name)	void name(const device_config *device, int state,int read_write )
+typedef void (*upd765_dma_drq_func)(running_device *device, int state,int read_write);
+#define UPD765_DMA_REQUEST(name)	void name(running_device *device, int state,int read_write )
 
-typedef const device_config *(*upd765_get_image_func)(const device_config *device, int floppy_index);
-#define UPD765_GET_IMAGE(name)	const device_config *name(const device_config *device, int floppy_index )
+typedef running_device *(*upd765_get_image_func)(running_device *device, int floppy_index);
+#define UPD765_GET_IMAGE(name)	running_device *name(running_device *device, int floppy_index )
 
 
 typedef struct upd765_interface
@@ -84,7 +84,7 @@ WRITE8_DEVICE_HANDLER(upd765_dack_w);
 READ8_DEVICE_HANDLER(upd765_dack_r);
 
 /* reset upd765 */
-void upd765_reset(const device_config *device, int);
+void upd765_reset(running_device *device, int);
 
 /* reset pin of upd765 */
 WRITE_LINE_DEVICE_HANDLER(upd765_reset_w);
@@ -95,7 +95,7 @@ WRITE_LINE_DEVICE_HANDLER(upd765_tc_w);
 /* set upd765 ready input*/
 WRITE_LINE_DEVICE_HANDLER(upd765_ready_w);
 
-void upd765_idle(const device_config *device);
+void upd765_idle(running_device *device);
 
 /*********************/
 /* STATUS REGISTER 1 */

@@ -96,7 +96,7 @@ INLINE void pc8801_plot_pixel( bitmap_t *bitmap, int x, int y, UINT32 color )
 
 void pc8801_video_init( running_machine *machine, int hireso )
 {
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 

@@ -32,7 +32,7 @@ typedef struct _bitbanger_config bitbanger_config;
 struct _bitbanger_config
 {
 	/* filter function; returns non-zero if input accepted */
-	int (*filter)(const device_config *device, const int *pulses, int total_pulses, int total_duration);
+	int (*filter)(running_device *device, const int *pulses, int total_pulses, int total_duration);
 	double pulse_threshhold;			/* the maximum duration pulse that we will consider */
 	double pulse_tolerance;				/* deviation tolerance for pulses */
 	int minimum_pulses;					/* the minimum amount of pulses before we start analyzing */
@@ -48,7 +48,7 @@ struct _bitbanger_config
 ***************************************************************************/
 
 /* outputs data to a bitbanger port */
-void bitbanger_output(const device_config *device, int value);
+void bitbanger_output(running_device *device, int value);
 
 /* device getinfo function */
 DEVICE_GET_INFO(bitbanger);

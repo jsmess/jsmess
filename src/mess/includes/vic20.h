@@ -21,13 +21,13 @@ struct _vic20_state
 	int key_col;
 
 	/* devices */
-	const device_config *via0;
-	const device_config *via1;
-	const device_config *iec;
-	const device_config *cassette;
+	running_device *via0;
+	running_device *via1;
+	running_device *iec;
+	running_device *cassette;
 
 	/* timers */
-	const device_config *cassette_timer;
+	running_device *cassette_timer;
 };
 
 #endif

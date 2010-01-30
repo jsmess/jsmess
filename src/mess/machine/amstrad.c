@@ -549,7 +549,7 @@ static void amstrad_plus_dma_parse(running_machine *machine, int channel)
 	{
 	case 0x0000:  // Load PSG register
 		{
-			const device_config *ay8910 = devtag_get_device(machine, "ay");
+			running_device *ay8910 = devtag_get_device(machine, "ay");
 			ay8910_address_w(ay8910, 0, (command & 0x0f00) >> 8);
 			ay8910_data_w(ay8910, 0, command & 0x00ff);
 			ay8910_address_w(ay8910, 0, prev_reg);
@@ -1306,7 +1306,7 @@ VIDEO_START( amstrad )
 
 VIDEO_UPDATE( amstrad )
 {
-	const device_config *mc6845 = devtag_get_device(screen->machine, "mc6845" );
+	running_device *mc6845 = devtag_get_device(screen->machine, "mc6845" );
 	mc6845_update( mc6845, bitmap, cliprect );
 	return 0;
 }
@@ -2294,8 +2294,8 @@ Expansion Peripherals Read/Write -   -   -   -   -   0   -   -   -   -   -   -  
 
 READ8_HANDLER ( amstrad_cpc_io_r )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "upd765");
-	const device_config *mc6845 = devtag_get_device(space->machine, "mc6845" );
+	running_device *fdc = devtag_get_device(space->machine, "upd765");
+	running_device *mc6845 = devtag_get_device(space->machine, "mc6845" );
 
 	unsigned char data = 0xFF;
 	unsigned int r1r0 = (unsigned int)((offset & 0x0300) >> 8);
@@ -2431,8 +2431,8 @@ static void amstrad_plus_seqcheck(int data)
 /* Offset handler for write */
 WRITE8_HANDLER ( amstrad_cpc_io_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "upd765");
-	const device_config *mc6845 = devtag_get_device(space->machine, "mc6845");
+	running_device *fdc = devtag_get_device(space->machine, "upd765");
+	running_device *mc6845 = devtag_get_device(space->machine, "mc6845");
 
 	static int printer_bit8_selected = FALSE;
 
@@ -2476,7 +2476,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 			/* printer port bit 8 */
 			if (printer_bit8_selected && amstrad_system_type == SYSTEM_PLUS)
 			{
-				const device_config *printer = devtag_get_device(space->machine, "centronics");
+				running_device *printer = devtag_get_device(space->machine, "centronics");
 				centronics_d7_w(printer, BIT(data, 3));
 				printer_bit8_selected = FALSE;
 			}
@@ -2500,7 +2500,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 	{
 		if ((offset & (1<<12)) == 0)
 		{
-			const device_config *printer = devtag_get_device(space->machine, "centronics");
+			running_device *printer = devtag_get_device(space->machine, "centronics");
 
 			/* CPC has a 7-bit data port, bit 8 is the STROBE signal */
 			centronics_data_w(printer, 0, data & 0x7f);
@@ -2593,8 +2593,8 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 static void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSnapshot)
 {
 	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const device_config *mc6845 = devtag_get_device(space->machine, "mc6845" );
-	const device_config *ay8910 = devtag_get_device(machine, "ay");
+	running_device *mc6845 = devtag_get_device(space->machine, "mc6845" );
+	running_device *ay8910 = devtag_get_device(machine, "ay");
 	int RegData;
 	int i;
 
@@ -2864,7 +2864,7 @@ static unsigned char amstrad_Psg_FunctionSelected;
 static void update_psg(running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const device_config *ay8910 = devtag_get_device(machine, "ay");
+	running_device *ay8910 = devtag_get_device(machine, "ay");
 
 	if(aleste_mode & 0x20)  // RTC selected
 	{
@@ -2964,7 +2964,7 @@ READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 /* Set b6 with Parallel/Printer port ready */
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		const device_config *printer = devtag_get_device(device->machine, "centronics");
+		running_device *printer = devtag_get_device(device->machine, "centronics");
 		data |= centronics_busy_r(printer) << 6;
 	}
 /* Set b4-b1 50Hz/60Hz state and manufacturer name defined by links on PCB */
@@ -3259,7 +3259,7 @@ static void amstrad_common_init(running_machine *machine)
 	memory_install_write_bank(space, 0xc000, 0xdfff, 0, 0, "bank15");
 	memory_install_write_bank(space, 0xe000, 0xffff, 0, 0, "bank16");
 
-	device_reset(devtag_get_device(space->machine, "maincpu"));
+	devtag_get_device(space->machine, "maincpu")->reset();
 	if ( amstrad_system_type == SYSTEM_CPC || amstrad_system_type == SYSTEM_ALESTE )
 		cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), 0, 0xff);
 	else

@@ -52,7 +52,7 @@ static emu_timer *tec1_kbd_timer;
 static UINT8 tec1_kbd=0;
 static UINT8 tec1_segment=0;
 static UINT8 tec1_digit=0;
-static const device_config *tec1_speaker;
+static running_device *tec1_speaker;
 
 
 /***************************************************************************

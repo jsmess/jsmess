@@ -242,7 +242,7 @@ MACHINE_RESET( geneve )
 		ti99_usbsm_reset(machine, TRUE);
 
 	/* reset CPU */
-	device_reset(devtag_get_device(machine, "maincpu"));
+	devtag_get_device(machine, "maincpu")->reset();
 }
 
 /*

@@ -119,10 +119,10 @@ static UINT32 bebox_interrupts;
 static UINT32 bebox_crossproc_interrupts;
 
 static struct {
-	const device_config	*pic8259_master;
-	const device_config	*pic8259_slave;
-	const device_config	*dma8237_1;
-	const device_config	*dma8237_2;
+	running_device *pic8259_master;
+	running_device *pic8259_slave;
+	running_device *dma8237_1;
+	running_device *dma8237_2;
 } bebox_devices;
 
 
@@ -422,14 +422,14 @@ static void bebox_fdc_dma_drq(running_machine *machine, int state, int read_)
 }
 
 
-static const device_config *bebox_fdc_get_image(running_machine *machine, int floppy_index)
+static running_device *bebox_fdc_get_image(running_machine *machine, int floppy_index)
 {
 	/* the BeBox boot ROM seems to query for floppy #1 when it should be
      * querying for floppy #0 */
 	return floppy_get_device(machine, 0);
 }
 
-static const device_config * bebox_get_device(running_machine *machine )
+static running_device * bebox_get_device(running_machine *machine )
 {
 	return devtag_get_device(machine, "smc37c78");
 }
@@ -495,7 +495,7 @@ const struct pic8259_interface bebox_pic8259_slave_config = {
  *
  *************************************/
 
-static const device_config *ide_device(running_machine *machine)
+static running_device *ide_device(running_machine *machine)
 {
 	return devtag_get_device(machine, "ide");
 }
@@ -538,7 +538,7 @@ WRITE64_HANDLER( bebox_800003F0_w )
 }
 
 
-void bebox_ide_interrupt(const device_config *device, int state)
+void bebox_ide_interrupt(running_device *device, int state)
 {
 	bebox_set_irq_bit(device->machine, 7, state);
 	if ( bebox_devices.pic8259_master ) {
@@ -737,7 +737,7 @@ static WRITE_LINE_DEVICE_HANDLER( bebox_dma8237_out_eop ) {
 	pc_fdc_set_tc_state( device->machine, state );
 }
 
-static void set_dma_channel(const device_config *device, int channel, int state)
+static void set_dma_channel(running_device *device, int channel, int state)
 {
 	if (!state) dma_channel = channel;
 }
@@ -778,7 +778,7 @@ I8237_INTERFACE( bebox_dma8237_2_config )
  *
  *************************************/
 
-static void bebox_timer0_w(const device_config *device, int state)
+static void bebox_timer0_w(running_device *device, int state)
 {
 	if ( bebox_devices.pic8259_master ) {
 		pic8259_set_irq_line(bebox_devices.pic8259_master, 0, state);
@@ -959,7 +959,7 @@ static void scsi53c810_dma_callback(running_machine *machine, UINT32 src, UINT32
 }
 
 
-UINT32 scsi53c810_pci_read(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 mem_mask)
+UINT32 scsi53c810_pci_read(running_device *busdevice, running_device *device, int function, int offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 
@@ -984,7 +984,7 @@ UINT32 scsi53c810_pci_read(const device_config *busdevice, const device_config *
 }
 
 
-void scsi53c810_pci_write(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 data, UINT32 mem_mask)
+void scsi53c810_pci_write(running_device *busdevice, running_device *device, int function, int offset, UINT32 data, UINT32 mem_mask)
 {
 	offs_t addr;
 

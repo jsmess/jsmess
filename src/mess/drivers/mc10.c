@@ -24,9 +24,9 @@
 typedef struct _mc10_state mc10_state;
 struct _mc10_state
 {
-	const device_config *mc6847;
-	const device_config *dac;
-	const device_config *cassette;
+	running_device *mc6847;
+	running_device *dac;
+	running_device *cassette;
 
 	UINT8 *ram;
 	UINT32 ram_size;

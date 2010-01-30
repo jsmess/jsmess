@@ -61,7 +61,7 @@ static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 	memory_set_bank(space->machine, "bank1", data & 0x07);
 }
 
-static void m5205_int1( const device_config *device )
+static void m5205_int1( running_device *device )
 {
 	cps_state *state = (cps_state *)device->machine->driver_data;
 
@@ -72,7 +72,7 @@ static void m5205_int1( const device_config *device )
 		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void m5205_int2( const device_config *device )
+static void m5205_int2( running_device *device )
 {
 	cps_state *state = (cps_state *)device->machine->driver_data;
 
@@ -692,7 +692,7 @@ static const msm5205_interface msm5205_interface2 =
 static MACHINE_START( fcrash )
 {
 	cps_state *state = (cps_state *)machine->driver_data;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = memory_region(machine, "soundcpu");
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 

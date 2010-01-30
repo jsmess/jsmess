@@ -33,12 +33,12 @@
 DEVICE_GET_INFO(pcf8593);
 
 /* pins */
-void pcf8593_pin_scl(const device_config *device, int data);
-void pcf8593_pin_sda_w(const device_config *device, int data);
-int  pcf8593_pin_sda_r(const device_config *device);
+void pcf8593_pin_scl(running_device *device, int data);
+void pcf8593_pin_sda_w(running_device *device, int data);
+int  pcf8593_pin_sda_r(running_device *device);
 
 /* load/save */
-void pcf8593_load(const device_config *device, mame_file *file);
-void pcf8593_save(const device_config *device, mame_file *file);
+void pcf8593_load(running_device *device, mame_file *file);
+void pcf8593_save(running_device *device, mame_file *file);
 
 #endif /* __PCF8593_H__ */

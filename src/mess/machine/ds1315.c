@@ -52,8 +52,8 @@ static const UINT8 ds1315_pattern[] =
     PROTOTYPES
 ***************************************************************************/
 
-static void ds1315_fill_raw_data(const device_config *device);
-static void ds1315_input_raw_data(const device_config *device);
+static void ds1315_fill_raw_data(running_device *device);
+static void ds1315_input_raw_data(running_device *device);
 
 
 
@@ -61,7 +61,7 @@ static void ds1315_input_raw_data(const device_config *device);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE ds1315_t *get_token(const device_config *device)
+INLINE ds1315_t *get_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == DS1315);
@@ -190,7 +190,7 @@ WRITE8_DEVICE_HANDLER ( ds1315_w_data )
     ds1315_fill_raw_data
 -------------------------------------------------*/
 
-static void ds1315_fill_raw_data(const device_config *device)
+static void ds1315_fill_raw_data(running_device *device)
 {
 	/* This routine will (hopefully) call a standard 'C' library routine to get the current
        date and time and then fill in the raw data struct.
@@ -228,7 +228,7 @@ static void ds1315_fill_raw_data(const device_config *device)
     ds1315_input_raw_data
 -------------------------------------------------*/
 
-static void ds1315_input_raw_data(const device_config *device)
+static void ds1315_input_raw_data(running_device *device)
 {
 	/* This routine is called when new date and time has been written to the
        clock chip. Currently we ignore setting the date and time in the clock

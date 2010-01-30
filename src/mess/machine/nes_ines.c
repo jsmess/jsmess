@@ -236,7 +236,7 @@ static void mapper4_set_chr( running_machine *machine, UINT8 chr, int chr_base, 
 }
 
 /* Here, IRQ counter decrements every scanline. */
-static void mapper4_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void mapper4_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
@@ -339,7 +339,7 @@ static WRITE8_HANDLER( mapper4_w )
 
 *************************************************************/
 
-static void mapper5_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void mapper5_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 #if 1
 	if (scanline == 0)
@@ -912,7 +912,7 @@ static WRITE8_HANDLER( mapper5_w )
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
 we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
 there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void ffe_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void ffe_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	/* 114 is the number of cycles per scanline */
 	/* TODO: change to reflect the actual number of cycles spent */
@@ -1021,7 +1021,7 @@ static WRITE8_HANDLER( mapper8_w )
 
 *************************************************************/
 
-static void mapper9_latch (const device_config *device, offs_t offset)
+static void mapper9_latch (running_device *device, offs_t offset)
 {
 	if ((offset & 0x3ff0) == 0x0fd0)
 	{
@@ -1453,7 +1453,7 @@ static WRITE8_HANDLER( mapper15_w )
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
 we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
 there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void bandai_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void bandai_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	/* 114 is the number of cycles per scanline */
 	/* TODO: change to reflect the actual number of cycles spent */
@@ -1591,7 +1591,7 @@ static WRITE8_HANDLER( mapper17_l_w )
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
 we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
 there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void jaleco_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void jaleco_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	/* Increment & check the IRQ scanline counter */
 	if (IRQ_enable)
@@ -1736,7 +1736,7 @@ static WRITE8_HANDLER( mapper18_w )
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
 we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
 there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void namcot_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void namcot_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	if (IRQ_enable)
 	{
@@ -1844,7 +1844,7 @@ static WRITE8_HANDLER( mapper19_w )
 
 *************************************************************/
 
-static void fds_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void fds_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	if (IRQ_enable_latch)
 		cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
@@ -1969,7 +1969,7 @@ WRITE8_HANDLER( nes_fds_w )
 
 *************************************************************/
 
-static void konami_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void konami_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	/* Increment & check the IRQ scanline counter */
 	if (IRQ_enable && (++IRQ_count == 0x100))
@@ -2600,7 +2600,7 @@ static WRITE8_HANDLER( mapper34_w )
 
 *************************************************************/
 
-static void mapper35_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void mapper35_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE && IRQ_enable)
 	{
@@ -2756,7 +2756,7 @@ static WRITE8_HANDLER( mapper39_w )
 
 *************************************************************/
 
-static void mapper40_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void mapper40_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	if (IRQ_enable)
 	{
@@ -3172,7 +3172,7 @@ static WRITE8_HANDLER( mapper49_m_w )
 
 *************************************************************/
 
-static void mapper50_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void mapper50_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	if (IRQ_enable)
 	{
@@ -3535,7 +3535,7 @@ static WRITE8_HANDLER( mapper62_w )
 
 *************************************************************/
 
-static void mapper64_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void mapper64_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	if (!IRQ_mode)	// we are in scanline mode!
 	{
@@ -3712,7 +3712,7 @@ static WRITE8_HANDLER( mapper64_w )
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
 we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
 there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void irem_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void irem_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	if (IRQ_enable)
 	{
@@ -3814,7 +3814,7 @@ static WRITE8_HANDLER( mapper66_w )
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
 we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
 there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void mapper67_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void mapper67_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	/* TODO: change to reflect the actual number of cycles spent: both using 114 or cycling 114,114,113
     produces a 1-line glitch in Fantasy Zone 2: it really requires the counter to be updated each CPU cycle! */
@@ -3986,7 +3986,7 @@ static WRITE8_HANDLER( mapper68_w )
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
 we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
 there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void mapper69_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void mapper69_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	/* TODO: change to reflect the actual number of cycles spent */
 	if ((IRQ_enable & 0x80) && (IRQ_enable & 0x01))
@@ -5250,7 +5250,7 @@ static WRITE8_HANDLER( mapper104_w )
 
 *************************************************************/
 
-static void mapper106_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void mapper106_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	if (IRQ_enable)
 	{
@@ -5641,7 +5641,7 @@ static WRITE8_HANDLER( mapper115_w )
 
 *************************************************************/
 
-static void mapper117_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void mapper117_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 //  if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
@@ -9391,7 +9391,7 @@ static WRITE8_HANDLER( mapper221_w )
 *************************************************************/
 
 /* Scanline based IRQ ? */
-static void mapper222_irq( const device_config *device, int scanline, int vblank, int blanked )
+static void mapper222_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 	{

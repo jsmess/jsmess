@@ -50,10 +50,10 @@ struct _qx10_state
 	UINT8	cmosram[0x800];
 
 	/* devices */
-	const device_config *pic8259_master;
-	const device_config *pic8259_slave;
-	const device_config *dma8237_1;
-	const device_config *upd765;
+	running_device *pic8259_master;
+	running_device *pic8259_slave;
+	running_device *dma8237_1;
+	running_device *upd765;
 };
 
 /*

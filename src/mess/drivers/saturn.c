@@ -1827,7 +1827,7 @@ static READ32_HANDLER( stv_sh2_soundram_r )
 
 static READ32_HANDLER( stv_scsp_regs_r32 )
 {
-	const device_config *scsp = devtag_get_device(space->machine, "scsp");
+	running_device *scsp = devtag_get_device(space->machine, "scsp");
 
 	offset <<= 1;
 	return (scsp_r(scsp, offset+1, 0xffff) | (scsp_r(scsp, offset, 0xffff)<<16));
@@ -1835,7 +1835,7 @@ static READ32_HANDLER( stv_scsp_regs_r32 )
 
 static WRITE32_HANDLER( stv_scsp_regs_w32 )
 {
-	const device_config *scsp = devtag_get_device(space->machine, "scsp");
+	running_device *scsp = devtag_get_device(space->machine, "scsp");
 
 	offset <<= 1;
 	scsp_w(scsp, offset, data>>16, mem_mask >> 16);
@@ -2041,7 +2041,7 @@ SCU register[40] is for IRQ masking.
 
 /* to do, update bios idle skips so they work better with this arrangement.. */
 
-static const device_config *vblank_out_timer,*scan_timer,*t1_timer;
+static running_device *vblank_out_timer,*scan_timer,*t1_timer;
 static int h_sync,v_sync;
 static int cur_scan;
 
@@ -2353,7 +2353,7 @@ GFXDECODE_END
 static const sh2_cpu_core sh2_conf_master = { 0 };
 static const sh2_cpu_core sh2_conf_slave  = { 1 };
 
-static void scsp_irq(const device_config *device, int irq)
+static void scsp_irq(running_device *device, int irq)
 {
 	// don't bother the 68k if it's off
 	if (!en_68k)

@@ -714,7 +714,7 @@ static void vic3_draw_bitplanes(running_machine *machine)
 	UINT8 colors[8];
 #endif
 	rectangle vis;
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 
 	if (VIC3_LINES==400) { /* interlaced! */

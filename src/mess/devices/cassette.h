@@ -53,17 +53,17 @@ struct cassette_config_t
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-cassette_state cassette_get_state(const device_config *cassette);
-void cassette_set_state(const device_config *cassette, cassette_state state);
-void cassette_change_state(const device_config *cassette, cassette_state state, cassette_state mask);
+cassette_state cassette_get_state(running_device *cassette);
+void cassette_set_state(running_device *cassette, cassette_state state);
+void cassette_change_state(running_device *cassette, cassette_state state, cassette_state mask);
 
-double cassette_input(const device_config *cassette);
-void cassette_output(const device_config *cassette, double value);
+double cassette_input(running_device *cassette);
+void cassette_output(running_device *cassette, double value);
 
-cassette_image *cassette_get_image(const device_config *cassette);
-double cassette_get_position(const device_config *cassette);
-double cassette_get_length(const device_config *cassette);
-void cassette_seek(const device_config *cassette, double time, int origin);
+cassette_image *cassette_get_image(running_device *cassette);
+double cassette_get_position(running_device *cassette);
+double cassette_get_length(running_device *cassette);
+void cassette_seek(running_device *cassette, double time, int origin);
 
 #define CASSETTE	DEVICE_GET_INFO_NAME(cassette)
 DEVICE_GET_INFO(cassette);

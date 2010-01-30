@@ -86,10 +86,10 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void er59256_set_iobits(const device_config *device, UINT8 newbits);
-UINT8 er59256_get_iobits(const device_config *device);
-void preload_rom(const device_config *device, UINT16 *rom_data, int count);
-UINT8 data_loaded(const device_config *device);
+void er59256_set_iobits(running_device *device, UINT8 newbits);
+UINT8 er59256_get_iobits(running_device *device);
+void preload_rom(running_device *device, UINT16 *rom_data, int count);
+UINT8 data_loaded(running_device *device);
 DEVICE_GET_INFO( er59256 );
 
 #endif

@@ -30,7 +30,7 @@ struct _adc080x_t
 	emu_timer *cycle_timer;				/* cycle timer */
 };
 
-INLINE adc080x_t *get_safe_token(const device_config *device)
+INLINE adc080x_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -42,7 +42,7 @@ INLINE adc080x_t *get_safe_token(const device_config *device)
 
 static TIMER_CALLBACK( cycle_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	adc080x_t *adc080x = get_safe_token(device);
 
 	if (!adc080x->start)
@@ -86,7 +86,7 @@ static TIMER_CALLBACK( cycle_tick )
 
 /* Address Latch Enable */
 
-void adc080x_ale_w(const device_config *device, int level, int address)
+void adc080x_ale_w(running_device *device, int level, int address)
 {
 	adc080x_t *adc080x = get_safe_token(device);
 
@@ -100,7 +100,7 @@ void adc080x_ale_w(const device_config *device, int level, int address)
 
 /* Start Conversion */
 
-void adc080x_start_w(const device_config *device, int level)
+void adc080x_start_w(running_device *device, int level)
 {
 	adc080x_t *adc080x = get_safe_token(device);
 
@@ -140,7 +140,7 @@ static DEVICE_START( adc080x )
 	assert(device != NULL);
 	assert(device->tag != NULL);
 
-	adc080x->intf = (const adc080x_interface*)device->static_config;
+	adc080x->intf = (const adc080x_interface*)device->baseconfig().static_config;
 
 	assert(adc080x->intf != NULL);
 	assert(device->clock > 0);

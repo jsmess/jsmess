@@ -425,25 +425,28 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 	config = machine_config_alloc(drivers[drvindex]->machine_config);
 
 	nPos = 0;
-	for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
+	for (dev = config->devicelist.first(); dev != NULL; dev = dev->next)
 	{
-		image_device_info info = image_device_getinfo(config, dev);
+		if (is_image_device(dev))
+		{	
+			image_device_info info = image_device_getinfo(config, dev);
 
-		// confirm any mandatory devices are loaded
-		if (info.must_be_loaded)
-		{
-			pszSoftware = GetSelectedSoftware(drvindex, config, dev);
-			if (!pszSoftware || !*pszSoftware)
+			// confirm any mandatory devices are loaded
+			if (info.must_be_loaded)
 			{
-				snprintf(szMessage, ARRAY_LENGTH(szMessage),
-					"System '%s' requires that device %s must have an image to load\n",
-					drivers[drvindex]->description,
-					device_typename(info.type));
-				goto done;
+				pszSoftware = GetSelectedSoftware(drvindex, config, dev);
+				if (!pszSoftware || !*pszSoftware)
+				{
+					snprintf(szMessage, ARRAY_LENGTH(szMessage),
+						"System '%s' requires that device %s must have an image to load\n",
+						drivers[drvindex]->description,
+						device_typename(info.type));
+					goto done;
+				}
 			}
-		}
 
-		nPos++;
+			nPos++;
+		}
 	}
 	bResult = TRUE;
 
@@ -492,11 +495,14 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 	// if device is NULL, this is a special case; try to find existing image
 	if (device == NULL)
 	{
-		for (device = image_device_first(config->mconfig); device != NULL; device = image_device_next(device))
+		for (device = config->mconfig->devicelist.first(); device != NULL;device = device->next)
 		{
-			s = GetSelectedSoftware(drvindex, config->mconfig, device);
-			if ((s != NULL) && !mame_stricmp(s, pszFilename))
-				break;
+			if (is_image_device(device))
+			{			
+				s = GetSelectedSoftware(drvindex, config->mconfig, device);
+				if ((s != NULL) && !mame_stricmp(s, pszFilename))
+					break;
+			}
 		}
 	}
 
@@ -512,11 +518,14 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 
 		if (file_extension != NULL)
 		{
-			for (device = image_device_first(config->mconfig); device != NULL; device = image_device_next(device))
+			for (device = config->mconfig->devicelist.first(); device != NULL;device = device->next)
 			{
-				s = GetSelectedSoftware(drvindex, config->mconfig, device);
-				if (is_null_or_empty(s) && image_device_uses_file_extension(device, file_extension))
-					break;
+				if (is_image_device(device))
+				{			
+					s = GetSelectedSoftware(drvindex, config->mconfig, device);
+					if (is_null_or_empty(s) && image_device_uses_file_extension(device, file_extension))
+						break;
+				}
 			}
 		}
 	}
@@ -541,11 +550,14 @@ static void MessRemoveImage(int drvindex, const char *pszFilename)
 	const device_config *device;
 	const char *s;
 
-	for (device = image_device_first(config->mconfig); device != NULL; device = image_device_next(device))
+	for (device = config->mconfig->devicelist.first(); device != NULL;device = device->next)
 	{
-		s = GetSelectedSoftware(drvindex, config->mconfig, device);
-		if ((s != NULL) && !strcmp(pszFilename, s))
-			MessSpecifyImage(drvindex, device, NULL);
+		if (is_image_device(device))
+		{	
+			s = GetSelectedSoftware(drvindex, config->mconfig, device);
+			if ((s != NULL) && !strcmp(pszFilename, s))
+				MessSpecifyImage(drvindex, device, NULL);
+		}
 	}
 }
 
@@ -578,24 +590,27 @@ static void MessRefreshPicker(void)
 	// be problematic
 	ListView_SetItemState(hwndSoftware, -1, 0, LVIS_SELECTED);
 
-	for (dev = image_device_first(config->mconfig); dev != NULL; dev = image_device_next(dev))
+	for (dev = config->mconfig->devicelist.first(); dev != NULL;dev = dev->next)
 	{
-		pszSoftware = GetSelectedSoftware(config->driver_index, config->mconfig, dev);
-		if (pszSoftware && *pszSoftware)
-		{
-			i = SoftwarePicker_LookupIndex(hwndSoftware, pszSoftware);
-			if (i < 0)
+		if (is_image_device(dev))
+		{		
+			pszSoftware = GetSelectedSoftware(config->driver_index, config->mconfig, dev);
+			if (pszSoftware && *pszSoftware)
 			{
-				SoftwarePicker_AddFile(hwndSoftware, pszSoftware);
 				i = SoftwarePicker_LookupIndex(hwndSoftware, pszSoftware);
-			}
-			if (i >= 0)
-			{
-				memset(&lvfi, 0, sizeof(lvfi));
-				lvfi.flags = LVFI_PARAM;
-				lvfi.lParam = i;
-				i = ListView_FindItem(hwndSoftware, -1, &lvfi);
-				ListView_SetItemState(hwndSoftware, i, LVIS_SELECTED, LVIS_SELECTED);
+				if (i < 0)
+				{
+					SoftwarePicker_AddFile(hwndSoftware, pszSoftware);
+					i = SoftwarePicker_LookupIndex(hwndSoftware, pszSoftware);
+				}
+				if (i >= 0)
+				{
+					memset(&lvfi, 0, sizeof(lvfi));
+					lvfi.flags = LVFI_PARAM;
+					lvfi.lParam = i;
+					i = ListView_FindItem(hwndSoftware, -1, &lvfi);
+					ListView_SetItemState(hwndSoftware, i, LVIS_SELECTED, LVIS_SELECTED);
+				}
 			}
 		}
 	}
@@ -767,12 +782,15 @@ static void SetupImageTypes(const machine_config *config, mess_image_type *types
 	if (dev == NULL)
 	{
 		/* special case; all non-printer devices */
-		for (dev = image_device_first(config); dev != NULL; dev = image_device_next(dev))
+		for (dev = config->devicelist.first(); dev != NULL;dev = dev->next)
 		{
-			image_device_info info = image_device_getinfo(config, dev);
+			if (is_image_device(dev))
+			{	
+				image_device_info info = image_device_getinfo(config, dev);
 
-			if (info.type != IO_PRINTER)
-				SetupImageTypes(config, &types[num_extensions], count - num_extensions, FALSE, dev);
+				if (info.type != IO_PRINTER)
+					SetupImageTypes(config, &types[num_extensions], count - num_extensions, FALSE, dev);
+			}
 		}
 
 	}

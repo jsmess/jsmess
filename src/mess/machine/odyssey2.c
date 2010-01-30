@@ -37,7 +37,7 @@ static void odyssey2_switch_banks(running_machine *machine)
 	}
 }
 
-void odyssey2_the_voice_lrq_callback(const device_config *device, int state) {
+void odyssey2_the_voice_lrq_callback(running_device *device, int state) {
 	the_voice_lrq_state = state;
 }
 

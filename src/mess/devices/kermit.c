@@ -102,7 +102,7 @@ typedef struct {
 
 	emu_timer* resend;           /* auto-resend packet */
 
-	const device_config* image;  /* underlying image */
+	running_device* image;  /* underlying image */
 
 	running_machine *machine;
 	kermit_config* conf;
@@ -399,7 +399,7 @@ static void kermit_reset( kermit* state )
 
 
 /* emulated machine sends a byte to the outside (us) */
-void kermit_receive_byte( const device_config *device, UINT8 data )
+void kermit_receive_byte( running_device *device, UINT8 data )
 {
 	kermit* state = (kermit*) device->token;
 
@@ -608,7 +608,7 @@ void kermit_receive_byte( const device_config *device, UINT8 data )
 	}
 }
 
-void kermit_byte_transmitted( const device_config *device )
+void kermit_byte_transmitted( running_device *device )
 {
 	kermit* state = (kermit*) device->token;
 
@@ -636,7 +636,7 @@ static DEVICE_START( kermit )
 	kermit* state = (kermit*) device->token;
 	LOG(( "kermit: start\n" ));
 	state->image = NULL;
-	state->conf = (kermit_config*) device->static_config;
+	state->conf = (kermit_config*) device->baseconfig().static_config;
 	state->machine = device->machine;
 	state->resend = timer_alloc(device->machine,  kermit_resend_cb, state );
 	kermit_reset( state );

@@ -27,8 +27,8 @@ struct _tmc600_state
 	int keylatch;			/* key latch */
 
 	/* devices */
-	const device_config *cdp1869;
-	const device_config *cassette;
+	running_device *cdp1869;
+	running_device *cassette;
 };
 
 /* ---------- defined in video/tmc600.c ---------- */

@@ -68,7 +68,7 @@ struct _upd3301_t
 	upd3301_display_pixels_func		display_func;
 
 	/* screen drawing */
-	const device_config *screen;	/* screen */
+	running_device *screen;	/* screen */
 	bitmap_t *bitmap;				/* bitmap */
 	int y;							/* current scanline */
 	int hrtc;						/* horizontal retrace */
@@ -126,7 +126,7 @@ struct _upd3301_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE upd3301_t *get_safe_token(const device_config *device)
+INLINE upd3301_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -134,11 +134,11 @@ INLINE upd3301_t *get_safe_token(const device_config *device)
 	return (upd3301_t *)device->token;
 }
 
-INLINE const upd3301_interface *get_interface(const device_config *device)
+INLINE const upd3301_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == UPD3301));
-	return (const upd3301_interface *) device->static_config;
+	return (const upd3301_interface *) device->baseconfig().static_config;
 }
 
 /***************************************************************************
@@ -149,7 +149,7 @@ INLINE const upd3301_interface *get_interface(const device_config *device)
     set_interrupt - set interrupt line state
 -------------------------------------------------*/
 
-static void set_interrupt(const device_config *device, int state)
+static void set_interrupt(running_device *device, int state)
 {
 	upd3301_t *upd3301 = get_safe_token(device);
 
@@ -167,7 +167,7 @@ static void set_interrupt(const device_config *device, int state)
     set_drq - set data request line state
 -------------------------------------------------*/
 
-static void set_drq(const device_config *device, int state)
+static void set_drq(running_device *device, int state)
 {
 	upd3301_t *upd3301 = get_safe_token(device);
 
@@ -180,7 +180,7 @@ static void set_drq(const device_config *device, int state)
     set_display - set display state
 -------------------------------------------------*/
 
-static void set_display(const device_config *device, int state)
+static void set_display(running_device *device, int state)
 {
 	upd3301_t *upd3301 = get_safe_token(device);
 
@@ -198,7 +198,7 @@ static void set_display(const device_config *device, int state)
     reset_counters - reset screen counters
 -------------------------------------------------*/
 
-static void reset_counters(const device_config *device)
+static void reset_counters(running_device *device)
 {
 	set_interrupt(device, 0);
 	set_drq(device, 0);
@@ -240,7 +240,7 @@ static void update_vrtc_timer(upd3301_t *upd3301, int state)
     geometry parameters
 -------------------------------------------------*/
 
-static void recompute_parameters(const device_config *device)
+static void recompute_parameters(running_device *device)
 {
 	upd3301_t *upd3301 = get_safe_token(device);
 
@@ -274,7 +274,7 @@ static void recompute_parameters(const device_config *device)
 
 static TIMER_CALLBACK( vrtc_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	upd3301_t *upd3301 = get_safe_token(device);
 
 	if (LOG) logerror("UPD3301 '%s' VRTC: %u\n", device->tag.cstr(), param);
@@ -297,7 +297,7 @@ static TIMER_CALLBACK( vrtc_tick )
 
 static TIMER_CALLBACK( hrtc_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	upd3301_t *upd3301 = get_safe_token(device);
 
 	if (LOG) logerror("UPD3301 '%s' HRTC: %u\n", device->tag.cstr(), param);
@@ -507,7 +507,7 @@ READ_LINE_DEVICE_HANDLER( upd3301_vrtc_r )
     draw_row - draw character row
 -------------------------------------------------*/
 
-static void draw_row(const device_config *device, bitmap_t *bitmap)
+static void draw_row(running_device *device, bitmap_t *bitmap)
 {
 	upd3301_t *upd3301 = get_safe_token(device);
 	int sx, lc;
@@ -576,7 +576,7 @@ WRITE8_DEVICE_HANDLER( upd3301_dack_w )
     upd3301_update - screen update
 -------------------------------------------------*/
 
-void upd3301_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+void upd3301_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	upd3301_t *upd3301 = get_safe_token(device);
 

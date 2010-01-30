@@ -76,7 +76,7 @@ struct _hd61830_t
 	int cp;						/* cursor position */
 
 	/* devices */
-	const device_config *screen;
+	running_device *screen;
 
 	/* timers */
 	emu_timer *busy_timer;
@@ -86,18 +86,18 @@ struct _hd61830_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE hd61830_t *get_safe_token(const device_config *device)
+INLINE hd61830_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
 	return (hd61830_t *)device->token;
 }
 
-INLINE hd61830_config *get_safe_config(const device_config *device)
+INLINE hd61830_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == HD61830);
-	return (hd61830_config *)device->inline_config;
+	return (hd61830_config *)device->baseconfig().inline_config;
 }
 
 /***************************************************************************
@@ -110,7 +110,7 @@ INLINE hd61830_config *get_safe_config(const device_config *device)
 
 static TIMER_CALLBACK( busy_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	hd61830_t *hd61830 = get_safe_token(device);
 
 	/* clear busy flag */
@@ -306,7 +306,7 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
     draw_scanline - draw one scanline
 -------------------------------------------------*/
 
-static void draw_scanline(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int y, UINT16 ra)
+static void draw_scanline(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int y, UINT16 ra)
 {
 	hd61830_t *hd61830 = get_safe_token(device);
 	int sx, x;
@@ -328,7 +328,7 @@ static void draw_scanline(const device_config *device, bitmap_t *bitmap, const r
     update_graphics - draw graphics mode screen
 -------------------------------------------------*/
 
-static void update_graphics(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+static void update_graphics(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	hd61830_t *hd61830 = get_safe_token(device);
 	int y;
@@ -350,7 +350,7 @@ static void update_graphics(const device_config *device, bitmap_t *bitmap, const
     hd61830_update - update screen
 -------------------------------------------------*/
 
-void hd61830_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+void hd61830_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	hd61830_t *hd61830 = get_safe_token(device);
 

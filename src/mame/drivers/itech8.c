@@ -647,7 +647,7 @@ static WRITE8_HANDLER( itech8_nmi_ack_w )
 }
 
 
-static void generate_sound_irq(const device_config *device, int state)
+static void generate_sound_irq(running_device *device, int state)
 {
 	cputag_set_input_line(device->machine, "soundcpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -677,7 +677,7 @@ static MACHINE_RESET( itech8 )
 	if (main_cpu_type == CPU_M6809 || main_cpu_type == CPU_HD6309)
 	{
 		memory_set_bankptr(machine, "bank1", &memory_region(machine, "maincpu")[0x4000]);
-		device_reset(devtag_get_device(machine, "maincpu"));
+		machine->device("maincpu")->reset();
 	}
 
 	/* reset the palette chip */

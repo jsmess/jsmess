@@ -64,7 +64,7 @@ struct _i8275_t
 	devcb_resolved_write_line	out_drq_func;
 	devcb_resolved_write_line	out_irq_func;
 
-	const device_config *screen;
+	running_device *screen;
 
 	const i8275_interface *intf;
 
@@ -127,7 +127,7 @@ struct _i8275_t
 	UINT8 last_data;
 };
 
-INLINE i8275_t *get_safe_token(const device_config *device)
+INLINE i8275_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -137,7 +137,7 @@ INLINE i8275_t *get_safe_token(const device_config *device)
 
 
 /* Register Access */
-static UINT8 i8275_get_parameter_light_pen(const device_config *device, offs_t offset)
+static UINT8 i8275_get_parameter_light_pen(running_device *device, offs_t offset)
 {
 	i8275_t *i8275 = get_safe_token(device);
 	UINT8 val = 0;
@@ -188,7 +188,7 @@ READ8_DEVICE_HANDLER( i8275_r )
 	return val;
 }
 
-static void i8275_recompute_parameters(const device_config *device)
+static void i8275_recompute_parameters(running_device *device)
 {
 	i8275_t *i8275 = get_safe_token(device);
 	int horiz_pix_total = 0;
@@ -210,7 +210,7 @@ static void i8275_recompute_parameters(const device_config *device)
 				video_screen_get_frame_period(i8275->screen).attoseconds);
 }
 
-static void i8275_set_parameter_reset(const device_config *device, offs_t offset, UINT8 data)
+static void i8275_set_parameter_reset(running_device *device, offs_t offset, UINT8 data)
 {
 	i8275_t *i8275 = get_safe_token(device);
 	switch(offset) {
@@ -235,7 +235,7 @@ static void i8275_set_parameter_reset(const device_config *device, offs_t offset
 	}
 }
 
-static void i8275_set_parameter_cursor(const device_config *device, offs_t offset, UINT8 data)
+static void i8275_set_parameter_cursor(running_device *device, offs_t offset, UINT8 data)
 {
 	i8275_t *i8275 = get_safe_token(device);
 	switch(offset) {
@@ -325,7 +325,7 @@ WRITE8_DEVICE_HANDLER( i8275_w )
 }
 
 
-static void i8275_draw_char_line(const device_config *device)
+static void i8275_draw_char_line(running_device *device)
 {
 	i8275_t *i8275 = get_safe_token(device);
 	int xpos = 0;
@@ -460,7 +460,7 @@ WRITE8_DEVICE_HANDLER( i8275_dack_w )
 }
 
 /* Screen Update */
-void i8275_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+void i8275_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	i8275_t *i8275 = get_safe_token(device);
 	i8275->ypos = 0;
@@ -499,9 +499,9 @@ static DEVICE_START( i8275 )
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(device->static_config != NULL);
+	assert(device->baseconfig().static_config != NULL);
 
-	i8275->intf = (const i8275_interface*)device->static_config;
+	i8275->intf = (const i8275_interface*)device->baseconfig().static_config;
 
 	assert(i8275->intf->display_pixels != NULL);
 

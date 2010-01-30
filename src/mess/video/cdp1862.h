@@ -86,6 +86,6 @@ WRITE_LINE_DEVICE_HANDLER( cdp1862_con_w ) ATTR_NONNULL(1);
 WRITE8_DEVICE_HANDLER( cdp1862_dma_w ) ATTR_NONNULL(1);
 
 /* screen update */
-void cdp1862_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect) ATTR_NONNULL(1) ATTR_NONNULL(2) ATTR_NONNULL(3);
+void cdp1862_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect) ATTR_NONNULL(1) ATTR_NONNULL(2) ATTR_NONNULL(3);
 
 #endif

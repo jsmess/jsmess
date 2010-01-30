@@ -183,7 +183,7 @@ static void int3_lower_local1_irq(UINT8 source_mask)
 
 static READ32_HANDLER( hpc3_pbus6_r )
 {
-	const device_config *lpt = devtag_get_device(space->machine, "lpt_0");
+	running_device *lpt = devtag_get_device(space->machine, "lpt_0");
 	UINT8 ret8;
 	running_machine *machine = space->machine;
 
@@ -258,7 +258,7 @@ static READ32_HANDLER( hpc3_pbus6_r )
 
 static WRITE32_HANDLER( hpc3_pbus6_w )
 {
-	const device_config *lpt = devtag_get_device(space->machine, "lpt_0");
+	running_device *lpt = devtag_get_device(space->machine, "lpt_0");
 	char cChar;
 	running_machine *machine = space->machine;
 

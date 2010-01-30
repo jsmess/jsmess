@@ -195,7 +195,7 @@ WRITE8_HANDLER( laser_bank_select_w )
     }
 }
 
-static const device_config *vtech2_cassette_image(running_machine *machine)
+static running_device *vtech2_cassette_image(running_machine *machine)
 {
 	return devtag_get_device(machine, "cassette");
 }
@@ -302,7 +302,7 @@ static int mra_bank(running_machine *machine, int bank, int offs)
  ************************************************/
 static void mwa_bank(running_machine *machine, int bank, int offs, int data)
 {
-	const device_config *speaker = devtag_get_device(machine, "speaker");
+	running_device *speaker = devtag_get_device(machine, "speaker");
 	offs += 0x4000 * laser_bank[bank];
     switch (laser_bank[bank])
     {
@@ -361,7 +361,7 @@ DEVICE_IMAGE_UNLOAD( laser_cart )
 	memset(&mem[0x30000], 0xff, 0x10000);
 }
 
-static const device_config *laser_file(running_machine *machine)
+static running_device *laser_file(running_machine *machine)
 {
 	return devtag_get_device( machine, laser_drive ? FLOPPY_1 : FLOPPY_0 );
 }

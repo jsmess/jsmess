@@ -53,6 +53,6 @@ READ8_DEVICE_HANDLER( hd61830_data_r );
 WRITE8_DEVICE_HANDLER( hd61830_data_w );
 
 /* screen update */
-void hd61830_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
+void hd61830_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 #endif

@@ -157,10 +157,10 @@ typedef struct _vtech1_state vtech1_state;
 struct _vtech1_state
 {
 	/* devices */
-	const device_config *mc6847;
-	const device_config *speaker;
-	const device_config *cassette;
-	const device_config *printer;
+	running_device *mc6847;
+	running_device *speaker;
+	running_device *cassette;
+	running_device *printer;
 
 	UINT8 *ram;
 	UINT32 ram_size;
@@ -249,7 +249,7 @@ static SNAPSHOT_LOAD( vtech1 )
 
 static Z80BIN_EXECUTE( vtech1 )
 {
-	const device_config *cpu = devtag_get_device(machine, "maincpu");
+	running_device *cpu = devtag_get_device(machine, "maincpu");
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* A Microsoft Basic program needs some manipulation before it can be run.
@@ -294,7 +294,7 @@ static Z80BIN_EXECUTE( vtech1 )
 /***************************************************************************
     FLOPPY DRIVE
 ***************************************************************************/
-static void vtech1_load_proc(const device_config *image)
+static void vtech1_load_proc(running_device *image)
 {
 	vtech1_state *vtech1 = (vtech1_state *)image->machine->driver_data;
 	int id = floppy_get_drive(image);

@@ -47,7 +47,7 @@
 
 */
 
-INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
+INLINE running_device *get_floppy_image(running_machine *machine, int drive)
 {
 	return floppy_get_device(machine, drive);
 }

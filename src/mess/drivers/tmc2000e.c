@@ -285,7 +285,7 @@ static MACHINE_RESET( tmc2000e )
 {
 	tmc2000e_state *state = (tmc2000e_state *)machine->driver_data;
 
-	device_reset(state->cdp1864);
+	state->cdp1864->reset();
 
 	cputag_set_input_line(machine, CDP1802_TAG, INPUT_LINE_RESET, PULSE_LINE);
 

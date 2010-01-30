@@ -19,7 +19,7 @@ static TIMER_CALLBACK(dis_callback);
 /* tape reader registers */
 typedef struct tape_reader_t
 {
-	const device_config *fd;	/* file descriptor of tape image */
+	running_device *fd;	/* file descriptor of tape image */
 
 	int motor_on;	/* 1-bit reader motor on */
 
@@ -35,7 +35,7 @@ static tape_reader_t tape_reader;
 /* tape puncher registers */
 typedef struct tape_puncher_t
 {
-	const device_config *fd;	/* file descriptor of tape image */
+	running_device *fd;	/* file descriptor of tape image */
 
 	emu_timer *timer;	/* timer to generate completion pulses */
 } tape_puncher_t;
@@ -46,7 +46,7 @@ static tape_puncher_t tape_puncher;
 /* typewriter registers */
 typedef struct typewriter_t
 {
-	const device_config *fd;	/* file descriptor of output image */
+	running_device *fd;	/* file descriptor of output image */
 
 	emu_timer *prt_timer;/* timer to generate completion pulses */
 } typewriter_t;
@@ -102,7 +102,7 @@ enum irg_pos_t
 /* magnetic tape unit registers */
 typedef struct magtape_t
 {
-	const device_config *img;		/* image descriptor */
+	running_device *img;		/* image descriptor */
 
 	state_t state;
 
@@ -366,7 +366,7 @@ static TIMER_CALLBACK(puncher_callback)
 /*
     Initiate read of a 6-bit word from tape
 */
-void tx0_io_r1l(const device_config *device)
+void tx0_io_r1l(running_device *device)
 {
 	begin_tape_read(0);
 }
@@ -374,7 +374,7 @@ void tx0_io_r1l(const device_config *device)
 /*
     Initiate read of a 18-bit word from tape (used in read-in mode)
 */
-void tx0_io_r3l(const device_config *device)
+void tx0_io_r3l(running_device *device)
 {
 	begin_tape_read(1);
 }
@@ -382,7 +382,7 @@ void tx0_io_r3l(const device_config *device)
 /*
     Write a 7-bit word to tape (7th bit clear)
 */
-void tx0_io_p6h(const device_config *device)
+void tx0_io_p6h(running_device *device)
 {
 	int ac;
 
@@ -397,7 +397,7 @@ void tx0_io_p6h(const device_config *device)
 /*
     Write a 7-bit word to tape (7th bit set)
 */
-void tx0_io_p7h(const device_config *device)
+void tx0_io_p7h(running_device *device)
 {
 	int ac;
 
@@ -454,7 +454,7 @@ static TIMER_CALLBACK(prt_callback)
 /*
     prt io callback
 */
-void tx0_io_prt(const device_config *device)
+void tx0_io_prt(running_device *device)
 {
 	int ac;
 	int ch;
@@ -480,7 +480,7 @@ static TIMER_CALLBACK(dis_callback)
 /*
     Plot one point on crt
 */
-void tx0_io_dis(const device_config *device)
+void tx0_io_dis(running_device *device)
 {
 	int ac;
 	int x;
@@ -594,7 +594,7 @@ DEVICE_IMAGE_UNLOAD( tx0_magtape )
 	}
 }
 
-static void magtape_callback(const device_config *device)
+static void magtape_callback(running_device *device)
 {
 	UINT8 buf = 0;
 	int lr;
@@ -1034,7 +1034,7 @@ static void magtape_callback(const device_config *device)
 	}
 }
 
-void tx0_sel(const device_config *device)
+void tx0_sel(running_device *device)
 {
 	magtape.sel_pending = TRUE;
 
@@ -1046,7 +1046,7 @@ void tx0_sel(const device_config *device)
 	}
 }
 
-void tx0_io_cpy(const device_config *device)
+void tx0_io_cpy(running_device *device)
 {
 	switch (magtape.state)
 	{
@@ -1080,7 +1080,7 @@ void tx0_io_cpy(const device_config *device)
 
     IO devices should reset
 */
-void tx0_io_reset_callback(const device_config *device)
+void tx0_io_reset_callback(running_device *device)
 {
 	tape_reader.rcl = tape_reader.rc = 0;
 	if (tape_reader.timer)

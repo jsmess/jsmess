@@ -51,7 +51,7 @@ typedef struct
 	void (*stch_cb)( running_machine *machine, int level );	/* Status changed callback */
 	void (*scor_cb)( running_machine *machine, int level );	/* Subcode ready callback */
 	cdrom_file *cdrom;
-	const device_config *cdda;
+	running_device *cdda;
 	emu_timer *frame_timer;
 } matsucd;
 
@@ -62,7 +62,7 @@ static matsucd cd;
 
 static TIMER_CALLBACK(matsu_subcode_proc);
 
-void matsucd_init( const device_config *cdrom_device, const char *cdda_tag )
+void matsucd_init( running_device *cdrom_device, const char *cdda_tag )
 {
 	memset(&cd, 0, sizeof( matsucd ) );
 
@@ -137,7 +137,7 @@ int matsucd_get_next_byte( UINT8 *data )
 
 static void matsucd_cdda_stop( running_machine *machine )
 {
-	const device_config *cdda = cdda_from_cdrom(machine, cd.cdrom);
+	running_device *cdda = cdda_from_cdrom(machine, cd.cdrom);
 
 	if (cdda != NULL)
 	{
@@ -148,7 +148,7 @@ static void matsucd_cdda_stop( running_machine *machine )
 
 static void matsucd_cdda_play( running_machine *machine, UINT32 lba, UINT32 num_blocks )
 {
-	const device_config *cdda = cdda_from_cdrom(machine, cd.cdrom);
+	running_device *cdda = cdda_from_cdrom(machine, cd.cdrom);
 	if (cdda != NULL)
 	{
 		cdda_start_audio(cdda, lba, num_blocks);
@@ -158,7 +158,7 @@ static void matsucd_cdda_play( running_machine *machine, UINT32 lba, UINT32 num_
 
 static void matsucd_cdda_pause( running_machine *machine, int pause )
 {
-	const device_config *cdda = cdda_from_cdrom(machine, cd.cdrom);
+	running_device *cdda = cdda_from_cdrom(machine, cd.cdrom);
 	if (cdda != NULL)
 	{
 		cdda_pause_audio(cdda, pause);
@@ -176,7 +176,7 @@ static void matsucd_cdda_pause( running_machine *machine, int pause )
 
 static UINT8 matsucd_cdda_getstatus( running_machine *machine, UINT32 *lba )
 {
-	const device_config *cdda = cdda_from_cdrom(machine, cd.cdrom);
+	running_device *cdda = cdda_from_cdrom(machine, cd.cdrom);
 
 	if ( lba ) *lba = 0;
 
@@ -280,7 +280,7 @@ static void matsucd_set_status( running_machine *machine, UINT8 status )
 
 static TIMER_CALLBACK(matsu_subcode_proc)
 {
-	const device_config *cdda = cdda_from_cdrom(machine, cd.cdrom);
+	running_device *cdda = cdda_from_cdrom(machine, cd.cdrom);
 
 	(void)param;
 

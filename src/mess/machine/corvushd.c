@@ -1176,7 +1176,7 @@ static hard_disk_file *corvus_hdc_file(running_machine *machine, int id) {
 	static const char *const tags[] = {
 		"harddisk1"
 	};
-	const device_config *img;
+	running_device *img;
 
 	/* Only one harddisk supported right now */
 	assert ( id == 0 );

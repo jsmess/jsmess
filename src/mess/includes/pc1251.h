@@ -15,14 +15,14 @@
 
 /*----------- defined in machine/pc1251.c -----------*/
 
-void pc1251_outa(const device_config *device, int data);
-void pc1251_outb(const device_config *device, int data);
-void pc1251_outc(const device_config *device, int data);
+void pc1251_outa(running_device *device, int data);
+void pc1251_outb(running_device *device, int data);
+void pc1251_outc(running_device *device, int data);
 
-int pc1251_reset(const device_config *device);
-int pc1251_brk(const device_config *device);
-int pc1251_ina(const device_config *device);
-int pc1251_inb(const device_config *device);
+int pc1251_reset(running_device *device);
+int pc1251_brk(running_device *device);
+int pc1251_ina(running_device *device);
+int pc1251_inb(running_device *device);
 
 DRIVER_INIT( pc1251 );
 NVRAM_HANDLER( pc1251 );

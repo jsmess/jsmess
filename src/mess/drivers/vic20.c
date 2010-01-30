@@ -526,8 +526,8 @@ static MACHINE_START( vic20_common )
 	state->cassette_timer = devtag_get_device(machine, TIMER_C1530_TAG);
 
 	/* set VIA clocks */
-	device_set_clock(state->via0, cputag_get_clock(machine, M6502_TAG));
-	device_set_clock(state->via1, cputag_get_clock(machine, M6502_TAG));
+	state->via0->set_clock(cputag_get_clock(machine, M6502_TAG));
+	state->via1->set_clock(cputag_get_clock(machine, M6502_TAG));
 
 	/* memory expansions */
 	switch (messram_get_size(devtag_get_device(machine, "messram")))

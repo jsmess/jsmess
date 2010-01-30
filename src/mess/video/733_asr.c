@@ -171,7 +171,7 @@ void asr733_init(running_machine *machine)
 
 int asr733_init_term(running_machine *machine, int unit, void (*int_callback)(running_machine *, int state))
 {
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 	const rectangle *visarea = video_screen_get_visible_area(screen);

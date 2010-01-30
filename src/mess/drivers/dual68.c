@@ -15,7 +15,7 @@ static UINT16* dual68_ram;
 
 static WRITE16_HANDLER(dual68_terminal_w)
 {
-	const device_config	*devconf = devtag_get_device(space->machine, "terminal");
+	running_device *devconf = devtag_get_device(space->machine, "terminal");
 	terminal_write(devconf,0,data >> 8);
 }
 
@@ -49,7 +49,7 @@ static MACHINE_RESET(dual68)
 
 	memcpy((UINT8*)dual68_ram,user1,0x2000);
 
-	device_reset(devtag_get_device(machine, "maincpu"));
+	devtag_get_device(machine, "maincpu")->reset();
 }
 
 static WRITE8_DEVICE_HANDLER( dual68_kbd_put )

@@ -70,7 +70,7 @@ typedef struct _px4_state px4_state;
 struct _px4_state
 {
 	/* internal ram */
-	const device_config *ram;
+	running_device *ram;
 
 	/* gapnit register */
 	UINT8 ctrl1;
@@ -108,20 +108,20 @@ struct _px4_state
 	UINT8 interrupt_status;
 
 	/* centronics printer */
-	const device_config *printer;
+	running_device *printer;
 
 	/* external ramdisk */
 	offs_t ramdisk_address;
 	UINT8 *ramdisk;
 
 	/* external cassette/barcode reader */
-	const device_config *ext_cas;
+	running_device *ext_cas;
 	emu_timer *ext_cas_timer;
 	int ear_last_state;
 
 	/* external devices */
-	const device_config *sio_device;
-	const device_config *rs232c_device;
+	running_device *sio_device;
+	running_device *rs232c_device;
 };
 
 

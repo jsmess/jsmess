@@ -92,7 +92,7 @@ const ttl74145_interface default_ttl74145 =
     IMPLEMENTATION
 ***************************************************************************/
 
-INLINE ttl74145_t *get_safe_token(const device_config *device)
+INLINE ttl74145_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -143,11 +143,11 @@ READ16_DEVICE_HANDLER( ttl74145_r )
 
 static DEVICE_START( ttl74145 )
 {
-	const ttl74145_interface *intf = (const ttl74145_interface *)device->static_config;
+	const ttl74145_interface *intf = (const ttl74145_interface *)device->baseconfig().static_config;
 	ttl74145_t *ttl74145 = get_safe_token(device);
 
 	/* validate arguments */
-	assert(device->static_config != NULL);
+	assert(device->baseconfig().static_config != NULL);
 
 	/* initialize with 0 */
 	ttl74145->number = 0;

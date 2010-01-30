@@ -150,7 +150,7 @@ struct _mcs48_state
 	UINT16		a11;				/* A11 value, either 0x000 or 0x800 */
 
 	cpu_irq_callback irq_callback;
-	const device_config *device;
+	running_device *device;
 	int			icount;
 
 	/* Memory spaces */
@@ -269,7 +269,7 @@ static int check_irqs(mcs48_state *cpustate);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE mcs48_state *get_safe_token(const device_config *device)
+INLINE mcs48_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -893,7 +893,7 @@ static const mcs48_ophandler opcode_table[256]=
     mcs48_init - generic MCS-48 initialization
 -------------------------------------------------*/
 
-static void mcs48_init(const device_config *device, cpu_irq_callback irqcallback, UINT8 feature_mask, UINT16 romsize)
+static void mcs48_init(running_device *device, cpu_irq_callback irqcallback, UINT8 feature_mask, UINT16 romsize)
 {
 	mcs48_state *cpustate = get_safe_token(device);
 
@@ -1192,7 +1192,7 @@ static CPU_EXECUTE( mcs48 )
     read
 -------------------------------------------------*/
 
-UINT8 upi41_master_r(const device_config *device, UINT8 a0)
+UINT8 upi41_master_r(running_device *device, UINT8 a0)
 {
 	mcs48_state *cpustate = get_safe_token(device);
 
@@ -1218,7 +1218,7 @@ UINT8 upi41_master_r(const device_config *device, UINT8 a0)
 
 static TIMER_CALLBACK( master_callback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	mcs48_state *cpustate = get_safe_token(device);
 	UINT8 a0 = (param >> 8) & 1;
 	UINT8 data = param;
@@ -1241,7 +1241,7 @@ static TIMER_CALLBACK( master_callback )
 		cpustate->sts |= STS_F1;
 }
 
-void upi41_master_w(const device_config *device, UINT8 a0, UINT8 data)
+void upi41_master_w(running_device *device, UINT8 a0, UINT8 data)
 {
 	timer_call_after_resynch(device->machine, (void *)device, (a0 << 8) | data, master_callback);
 }
@@ -1382,15 +1382,15 @@ static CPU_GET_INFO( mcs48 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 3;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 12;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:			info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:			/*info->i = 6 or 7 or 8;*/				break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:			info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 9;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 12;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:			info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			/*info->i = 6 or 7 or 8;*/				break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:			info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 9;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:				info->i = 0;							break;
 
 		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_IRQ:	info->i = cpustate->irq_state ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_EA:	info->i = cpustate->ea;					break;
@@ -1407,8 +1407,8 @@ static CPU_GET_INFO( mcs48 )
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state;	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	/* set per-core */						break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		/* set per-core */						break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	/* set per-core */						break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		/* set per-core */						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							/* set per-core */						break;
@@ -1439,12 +1439,12 @@ static CPU_GET_INFO( mcs48 )
     CPU-SPECIFIC CONTEXT ACCESS
 ***************************************************************************/
 
-static void mcs48_generic_get_info(const device_config *device, UINT32 state, cpuinfo *info, UINT8 features, int romsize, int ramsize, const char *name)
+static void mcs48_generic_get_info(const device_config *devconfig, running_device *device, UINT32 state, cpuinfo *info, UINT8 features, int romsize, int ramsize, const char *name)
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:
 			if (ramsize == 64)
 				info->i = 6;
 			else if (ramsize == 128)
@@ -1477,7 +1477,7 @@ static void mcs48_generic_get_info(const device_config *device, UINT32 state, cp
 			break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
 			if (romsize == 0)
 				info->internal_map8 = NULL;
 			else if (romsize == 1024)
@@ -1490,7 +1490,7 @@ static void mcs48_generic_get_info(const device_config *device, UINT32 state, cp
 				fatalerror("mcs48_generic_get_info: Invalid RAM size");
 			break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:
 			if (ramsize == 64)
 				info->internal_map8 = ADDRESS_MAP_NAME(data_6bit);
 			else if (ramsize == 128)
@@ -1515,26 +1515,26 @@ static void mcs48_generic_get_info(const device_config *device, UINT32 state, cp
 
 
 /* Official Intel MCS-48 parts */
-CPU_GET_INFO( i8035 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE,    0,  64, "I8035"); }
-CPU_GET_INFO( i8048 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64, "I8048"); }
-CPU_GET_INFO( i8648 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64, "I8648"); }
-CPU_GET_INFO( i8748 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64, "I8748"); }
-CPU_GET_INFO( i8039 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE,    0, 128, "I8039"); }
-CPU_GET_INFO( i8049 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 2048, 128, "I8049"); }
-CPU_GET_INFO( i8749 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 2048, 128, "I8749"); }
-CPU_GET_INFO( i8040 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE,    0, 256, "I8040"); }
-CPU_GET_INFO( i8050 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 4096, 256, "I8050"); }
+CPU_GET_INFO( i8035 )  { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE,    0,  64, "I8035"); }
+CPU_GET_INFO( i8048 )  { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE, 1024,  64, "I8048"); }
+CPU_GET_INFO( i8648 )  { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE, 1024,  64, "I8648"); }
+CPU_GET_INFO( i8748 )  { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE, 1024,  64, "I8748"); }
+CPU_GET_INFO( i8039 )  { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE,    0, 128, "I8039"); }
+CPU_GET_INFO( i8049 )  { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE, 2048, 128, "I8049"); }
+CPU_GET_INFO( i8749 )  { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE, 2048, 128, "I8749"); }
+CPU_GET_INFO( i8040 )  { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE,    0, 256, "I8040"); }
+CPU_GET_INFO( i8050 )  { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE, 4096, 256, "I8050"); }
 
 
 /* Official Intel UPI-41 parts */
-CPU_GET_INFO( i8041 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 1024, 128, "I8041"); }
-CPU_GET_INFO( i8741 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 1024, 128, "I8741"); }
-CPU_GET_INFO( i8042 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 2048, 256, "I8042"); }
-CPU_GET_INFO( i8242 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 2048, 256, "I8242"); }
-CPU_GET_INFO( i8742 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 2048, 256, "I8742"); }
+CPU_GET_INFO( i8041 )  { mcs48_generic_get_info(devconfig, device, state, info, UPI41_FEATURE, 1024, 128, "I8041"); }
+CPU_GET_INFO( i8741 )  { mcs48_generic_get_info(devconfig, device, state, info, UPI41_FEATURE, 1024, 128, "I8741"); }
+CPU_GET_INFO( i8042 )  { mcs48_generic_get_info(devconfig, device, state, info, UPI41_FEATURE, 2048, 256, "I8042"); }
+CPU_GET_INFO( i8242 )  { mcs48_generic_get_info(devconfig, device, state, info, UPI41_FEATURE, 2048, 256, "I8242"); }
+CPU_GET_INFO( i8742 )  { mcs48_generic_get_info(devconfig, device, state, info, UPI41_FEATURE, 2048, 256, "I8742"); }
 
 
 /* Clones */
-CPU_GET_INFO( mb8884 ) { mcs48_generic_get_info(device, state, info, MCS48_FEATURE,    0,  64, "MB8884"); }
-CPU_GET_INFO( n7751 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64, "N7751"); }
-CPU_GET_INFO( m58715 ) { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 2048, 128, "M58715"); }
+CPU_GET_INFO( mb8884 ) { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE,    0,  64, "MB8884"); }
+CPU_GET_INFO( n7751 )  { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE, 1024,  64, "N7751"); }
+CPU_GET_INFO( m58715 ) { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE, 2048, 128, "M58715"); }

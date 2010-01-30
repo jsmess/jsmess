@@ -39,21 +39,21 @@ struct _i8214_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE i8214_t *get_safe_token(const device_config *device)
+INLINE i8214_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
 	return (i8214_t *)device->token;
 }
 
-INLINE const i8214_interface *get_interface(const device_config *device)
+INLINE const i8214_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == I8214));
-	return (const i8214_interface *) device->static_config;
+	return (const i8214_interface *) device->baseconfig().static_config;
 }
 
-INLINE void trigger_interrupt(const device_config *device, int level)
+INLINE void trigger_interrupt(running_device *device, int level)
 {
 	i8214_t *i8214 = get_safe_token(device);
 
@@ -72,7 +72,7 @@ INLINE void trigger_interrupt(const device_config *device, int level)
 	devcb_call_write_line(&i8214->out_int_func, CLEAR_LINE);
 }
 
-INLINE void check_interrupt(const device_config *device)
+INLINE void check_interrupt(running_device *device)
 {
 	i8214_t *i8214 = get_safe_token(device);
 	int level;

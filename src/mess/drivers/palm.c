@@ -28,7 +28,7 @@ static UINT16 spim_data;
 static INPUT_CHANGED( pen_check )
 {
     UINT8 button = input_port_read(field->port->machine, "PENB");
-    const device_config *mc68328_device = devtag_get_device(field->port->machine, "dragonball");
+    running_device *mc68328_device = devtag_get_device(field->port->machine, "dragonball");
     if(button)
     {
         mc68328_set_penirq_line(mc68328_device, 1);
@@ -42,7 +42,7 @@ static INPUT_CHANGED( pen_check )
 static INPUT_CHANGED( button_check )
 {
     UINT8 button_state = input_port_read(field->port->machine, "PORTD");
-    const device_config *mc68328_device = devtag_get_device(field->port->machine, "dragonball");
+    running_device *mc68328_device = devtag_get_device(field->port->machine, "dragonball");
 
     mc68328_set_port_d_lines(mc68328_device, button_state, (int)(FPTR)param);
 }
@@ -72,7 +72,7 @@ static READ16_DEVICE_HANDLER( palm_spim_in )
     return spim_data;
 }
 
-static void palm_spim_exchange( const device_config *device )
+static void palm_spim_exchange( running_device *device )
 {
     UINT8 x = input_port_read(device->machine, "PENX");
     UINT8 y = input_port_read(device->machine, "PENY");
@@ -107,7 +107,7 @@ static MACHINE_RESET( palm )
     memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, messram_get_size(devtag_get_device(machine, "messram")));
     memcpy(messram_get_ptr(devtag_get_device(machine, "messram")), bios, 0x20000);
 
-    device_reset(devtag_get_device(machine, "maincpu"));
+    devtag_get_device(machine, "maincpu")->reset();
 }
 
 

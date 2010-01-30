@@ -227,7 +227,7 @@ static const ym2151_interface ym2151_config =
 	crimfght_snd_bankswitch_w
 };
 
-static void volume_callback( const device_config *device, int v )
+static void volume_callback( running_device *device, int v )
 {
 	k007232_set_volume(device, 0, (v & 0x0f) * 0x11, 0);
 	k007232_set_volume(device, 1, 0, (v >> 4) * 0x11);
@@ -426,6 +426,6 @@ static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 	memory_set_bank(device->machine, "bank2", lines & 0x0f);
 }
 
-GAME( 1989, crimfght,  0,        crimfght, crimfght, 0, ROT0, "k007232", "Crime Fighters (US 4 players)", GAME_SUPPORTS_SAVE )
-GAME( 1989, crimfght2, crimfght, crimfght, crimfgtj, 0, ROT0, "k007232", "Crime Fighters (World 2 Players)", GAME_SUPPORTS_SAVE )
-GAME( 1989, crimfghtj, crimfght, crimfght, crimfgtj, 0, ROT0, "k007232", "Crime Fighters (Japan 2 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1989, crimfght,  0,        crimfght, crimfght, 0, ROT0, "Konami", "Crime Fighters (US 4 players)", GAME_SUPPORTS_SAVE )
+GAME( 1989, crimfght2, crimfght, crimfght, crimfgtj, 0, ROT0, "Konami", "Crime Fighters (World 2 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1989, crimfghtj, crimfght, crimfght, crimfgtj, 0, ROT0, "Konami", "Crime Fighters (Japan 2 Players)", GAME_SUPPORTS_SAVE )

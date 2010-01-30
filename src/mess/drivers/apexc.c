@@ -548,7 +548,7 @@ static PALETTE_INIT( apexc )
 static VIDEO_START( apexc )
 {
 	apexc_state *state = (apexc_state *)machine->driver_data;
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 

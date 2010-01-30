@@ -77,10 +77,10 @@
 #include "emuopts.h"
 #include "osdepend.h"
 #include "config.h"
-#include "cheat.h"
 #include "debugger.h"
 #include "profiler.h"
 #include "render.h"
+#include "cheat.h"
 #include "ui.h"
 #include "uimenu.h"
 #include "uiinput.h"
@@ -136,10 +136,6 @@ struct _mame_private
 	/* load/save */
 	void			(*saveload_schedule_callback)(running_machine *);
 	attotime		saveload_schedule_time;
-
-	/* list of memory regions, and a map for lookups */
-	region_info	*	regionlist;
-	tagmap_t<region_info *> regionmap;
 
 	/* random number seed */
 	UINT32			rand_seed;
@@ -211,7 +207,7 @@ static void logfile_callback(running_machine *machine, const char *buffer);
 
 INLINE void eat_all_cpu_cycles(running_machine *machine)
 {
-	const device_config *cpu;
+	running_device *cpu;
 
     if(machine->cpuexec_data)
 		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
@@ -544,7 +540,7 @@ void mame_schedule_exit(running_machine *machine)
 	if (started_empty && options_get_string(mame_options(), OPTION_GAMENAME)[0] != 0)
 	{
 		options_set_string(mame_options(), OPTION_GAMENAME, "", OPTION_PRIORITY_CMDLINE);
-		ui_menu_force_game_select(machine);
+		ui_menu_force_game_select(machine, render_container_get_ui());
 	}
 
 	/* otherwise, exit for real */
@@ -769,31 +765,15 @@ region_info::~region_info()
     region
 -------------------------------------------------*/
 
-UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 length, UINT32 flags)
+region_info *memory_region_alloc(running_machine *machine, const char *name, UINT32 length, UINT32 flags)
 {
-	mame_private *mame = machine->mame_data;
-	region_info **infoptr, *info;
-	tagmap_error tagerr;
-
     /* make sure we don't have a region of the same name; also find the end of the list */
-    for (infoptr = &mame->regionlist; *infoptr != NULL; infoptr = &(*infoptr)->next)
-    	if ((*infoptr)->name.cmp(name) == 0)
-    		fatalerror("memory_region_alloc called with duplicate region name \"%s\"\n", name);
+    region_info *info = machine->regionlist.find(name);
+    if (info != NULL)
+		fatalerror("memory_region_alloc called with duplicate region name \"%s\"\n", name);
 
 	/* allocate the region */
-	info = auto_alloc(machine, region_info(machine, name, length, flags));
-
-	/* attempt to put is in the hash table */
-	tagerr = mame->regionmap.add_unique_hash(name, info, FALSE);
-	if (tagerr == TMERR_DUPLICATE)
-	{
-		region_info *match = mame->regionmap.find_hash_only(name);
-		fatalerror("Memory region '%s' has same hash as tag '%s'; please change one of them", name, match->name.cstr());
-	}
-
-	/* hook us into the list */
-	*infoptr = info;
-	return info->base.u8;
+	return machine->regionlist.append(name, global_alloc(region_info(machine, name, length, flags)));
 }
 
 
@@ -804,41 +784,7 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
 
 void memory_region_free(running_machine *machine, const char *name)
 {
-	mame_private *mame = machine->mame_data;
-	region_info **infoptr;
-
-	/* find the region */
-	for (infoptr = &mame->regionlist; *infoptr != NULL; infoptr = &(*infoptr)->next)
-		if ((*infoptr)->name.cmp(name) == 0)
-		{
-			region_info *info = *infoptr;
-
-			/* remove us from the list and the map */
-			*infoptr = info->next;
-			mame->regionmap.remove(info->name);
-
-			/* free the region */
-			auto_free(machine, info);
-			break;
-		}
-}
-
-
-/*-------------------------------------------------
-    memory_region_info - return a pointer to the
-    information struct for a given memory region
--------------------------------------------------*/
-
-region_info *memory_region_info(running_machine *machine, const char *name)
-{
-	mame_private *mame = machine->mame_data;
-
-    /* NULL tag always fails */
-    if (name == NULL)
-    	return NULL;
-
-    /* look up the region and return the base */
-    return mame->regionmap.find_hash_only(name);
+	machine->regionlist.remove(name);
 }
 
 
@@ -886,7 +832,7 @@ UINT32 memory_region_flags(running_machine *machine, const char *name)
 const char *memory_region_next(running_machine *machine, const char *name)
 {
 	if (name == NULL)
-		return (machine->mame_data->regionlist != NULL) ? machine->mame_data->regionlist->name : NULL;
+		return (machine->regionlist.first() != NULL) ? machine->regionlist.first()->name.cstr() : NULL;
 	const region_info *region = machine->region(name);
 	return (region != NULL && region->next != NULL) ? region->next->name.cstr() : NULL;
 }
@@ -1348,7 +1294,6 @@ running_machine::running_machine(const game_driver *driver)
 {
 	try
 	{
-		memset(&portlist, 0, sizeof(portlist));
 		memset(gfx, 0, sizeof(gfx));
 		memset(&generic, 0, sizeof(generic));
 
@@ -1363,12 +1308,12 @@ running_machine::running_machine(const game_driver *driver)
 		if (config->driver_data_size != 0)
 			driver_data = auto_alloc_array_clear(this, UINT8, config->driver_data_size);
 
-		/* find devices */
-		firstcpu = cpu_first(config);
-		primary_screen = video_screen_first(config);
-
 		/* attach this machine to all the devices in the configuration */
-		device_list_attach_machine(this);
+		devicelist.import_config_list(config->devicelist, *this);
+
+		/* find devices */
+		firstcpu = cpu_first(this);
+		primary_screen = video_screen_first(this);
 
 		/* fetch core options */
 		sample_rate = options_get_int(mame_options(), OPTION_SAMPLERATE);
@@ -1468,7 +1413,7 @@ static void init_machine(running_machine *machine)
 #endif /* MESS */
 
 	/* start up the devices */
-	device_list_start(machine);
+	machine->devicelist.start_all();
 
 	/* call the game driver's init function */
 	/* this is where decryption is done and memory maps are altered */

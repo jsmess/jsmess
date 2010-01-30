@@ -36,7 +36,7 @@
 typedef struct _cartslot_t cartslot_t;
 struct _cartslot_t
 {
-	const device_config *pcb_device;
+	running_device *pcb_device;
 	multicart_t *mc;
 };
 
@@ -70,13 +70,13 @@ struct _cartslot_config
 DEVICE_GET_INFO(cartslot);
 
 /* accesses the PCB associated with this cartslot */
-const device_config *cartslot_get_pcb(const device_config *device);
+running_device *cartslot_get_pcb(running_device *device);
 
 /* accesses a particular socket */
-void *cartslot_get_socket(const device_config *device, const char *socket_name);
+void *cartslot_get_socket(running_device *device, const char *socket_name);
 
 /* accesses a particular socket; gets the length of the associated resource */
-int cartslot_get_resource_length(const device_config *device, const char *socket_name);
+int cartslot_get_resource_length(running_device *device, const char *socket_name);
 
 
 /***************************************************************************

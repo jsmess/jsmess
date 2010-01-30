@@ -53,7 +53,7 @@ struct _dave_interface
 
 DEVICE_GET_INFO(dave_sound);
 
-void dave_set_reg(const device_config *device, offs_t offset, UINT8 data);
+void dave_set_reg(running_device *device, offs_t offset, UINT8 data);
 
 READ8_DEVICE_HANDLER ( dave_reg_r );
 WRITE8_DEVICE_HANDLER ( dave_reg_w );

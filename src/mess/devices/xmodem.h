@@ -33,7 +33,7 @@ extern DEVICE_GET_INFO( xmodem );
 
 /* call when the emulated machine has read the last byte sent by
    XMODEM through the send call-back */
-extern void xmodem_byte_transmitted( const device_config *device );
+extern void xmodem_byte_transmitted( running_device *device );
 
 /* call when the emulated machine sends a byte to XMODEM */
-extern void xmodem_receive_byte( const device_config *device, UINT8 data );
+extern void xmodem_receive_byte( running_device *device, UINT8 data );

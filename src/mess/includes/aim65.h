@@ -23,11 +23,11 @@
 
 /*----------- defined in machine/aim65.c -----------*/
 
-void aim65_update_ds1(const device_config *device, int digit, int data);
-void aim65_update_ds2(const device_config *device, int digit, int data);
-void aim65_update_ds3(const device_config *device, int digit, int data);
-void aim65_update_ds4(const device_config *device, int digit, int data);
-void aim65_update_ds5(const device_config *device, int digit, int data);
+void aim65_update_ds1(running_device *device, int digit, int data);
+void aim65_update_ds2(running_device *device, int digit, int data);
+void aim65_update_ds3(running_device *device, int digit, int data);
+void aim65_update_ds4(running_device *device, int digit, int data);
+void aim65_update_ds5(running_device *device, int digit, int data);
 
 WRITE8_DEVICE_HANDLER(aim65_pia_a_w);
 WRITE8_DEVICE_HANDLER(aim65_pia_b_w);

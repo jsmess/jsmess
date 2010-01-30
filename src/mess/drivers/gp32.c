@@ -268,7 +268,7 @@ static void s3c240x_lcd_render_16( running_machine *machine)
 
 static TIMER_CALLBACK( s3c240x_lcd_timer_exp )
 {
-	const device_config *screen = machine->primary_screen;
+	running_device *screen = machine->primary_screen;
 	verboselog( machine, 2, "LCD timer callback\n");
 	s3c240x_lcd.vpos = video_screen_get_vpos( screen);
 	s3c240x_lcd.hpos = video_screen_get_hpos( screen);
@@ -328,7 +328,7 @@ static READ32_HANDLER( s3c240x_lcd_r )
 
 static void s3c240x_lcd_configure( running_machine *machine)
 {
-	const device_config *screen = machine->primary_screen;
+	running_device *screen = machine->primary_screen;
 	UINT32 vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk;
 	double framerate, vclk;
 	rectangle visarea;
@@ -357,7 +357,7 @@ static void s3c240x_lcd_configure( running_machine *machine)
 
 static void s3c240x_lcd_start( running_machine *machine)
 {
-	const device_config *screen = machine->primary_screen;
+	running_device *screen = machine->primary_screen;
 	verboselog( machine, 1, "LCD start\n");
 	s3c240x_lcd_configure( machine);
 	s3c240x_lcd_dma_init( machine);
@@ -967,7 +967,7 @@ static void smc_init( running_machine *machine)
 
 static UINT8 smc_read( running_machine *machine)
 {
-	const device_config *smartmedia = devtag_get_device( machine, "smartmedia");
+	running_device *smartmedia = devtag_get_device( machine, "smartmedia");
 	UINT8 data;
 	data = smartmedia_data_r( smartmedia);
 	verboselog( machine, 5, "smc_read %08X\n", data);
@@ -979,7 +979,7 @@ static void smc_write( running_machine *machine, UINT8 data)
 	verboselog( machine, 5, "smc_write %08X\n", data);
 	if ((smc.chip) && (!smc.read))
 	{
-		const device_config *smartmedia = devtag_get_device( machine, "smartmedia");
+		running_device *smartmedia = devtag_get_device( machine, "smartmedia");
 		if (smc.cmd_latch)
 		{
 			verboselog( machine, 5, "smartmedia_command_w %08X\n", data);
@@ -1107,7 +1107,7 @@ static READ32_HANDLER( s3c240x_gpio_r )
 		// PDDAT
 		case 0x24 / 4 :
 		{
-			const device_config *smartmedia = devtag_get_device( machine, "smartmedia");
+			running_device *smartmedia = devtag_get_device( machine, "smartmedia");
 			// smartmedia
 			data = (data & ~0x000003C0);
 			if (!smc.busy) data = data | 0x00000200;
@@ -1119,7 +1119,7 @@ static READ32_HANDLER( s3c240x_gpio_r )
 		// PEDAT
 		case 0x30 / 4 :
 		{
-			const device_config *smartmedia = devtag_get_device( machine, "smartmedia");
+			running_device *smartmedia = devtag_get_device( machine, "smartmedia");
 			// smartmedia
 			data = (data & ~0x0000003C);
 			if (smc.cmd_latch) data = data | 0x00000020;
@@ -1633,7 +1633,7 @@ static WRITE32_HANDLER( s3c240x_iis_w )
 			}
 			if (s3c240x_iis.fifo_index == 2)
 			{
-				const device_config *dac[2];
+				running_device *dac[2];
 				dac[0] = devtag_get_device( machine, "dac1");
 				dac[1] = devtag_get_device( machine, "dac2");
 				s3c240x_iis.fifo_index = 0;

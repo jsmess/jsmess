@@ -43,7 +43,7 @@ WRITE_LINE_DEVICE_HANDLER( vp550_q_w ) ATTR_NONNULL(1);
 WRITE_LINE_DEVICE_HANDLER( vp550_sc1_w ) ATTR_NONNULL(1);
 
 /* install write handlers */
-void vp550_install_write_handlers(const device_config *device, const address_space *program, int enabled) ATTR_NONNULL(1) ATTR_NONNULL(2);
-void vp551_install_write_handlers(const device_config *device, const address_space *program, int enabled) ATTR_NONNULL(1) ATTR_NONNULL(2);
+void vp550_install_write_handlers(running_device *device, const address_space *program, int enabled) ATTR_NONNULL(1) ATTR_NONNULL(2);
+void vp551_install_write_handlers(running_device *device, const address_space *program, int enabled) ATTR_NONNULL(1) ATTR_NONNULL(2);
 
 #endif /* __VP550__ */

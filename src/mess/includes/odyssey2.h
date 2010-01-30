@@ -67,7 +67,7 @@ READ8_HANDLER( odyssey2_getbus );
 WRITE8_HANDLER ( odyssey2_putbus );
 
 READ8_HANDLER( odyssey2_t0_r );
-void odyssey2_the_voice_lrq_callback( const device_config *device, int state );
+void odyssey2_the_voice_lrq_callback( running_device *device, int state );
 
 READ8_HANDLER ( g7400_bus_r );
 WRITE8_HANDLER ( g7400_bus_w );

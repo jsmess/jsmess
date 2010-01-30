@@ -99,7 +99,7 @@ struct _tms5501_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE tms5501_t *get_token(const device_config *device)
+INLINE tms5501_t *get_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == TMS5501);
@@ -107,11 +107,11 @@ INLINE tms5501_t *get_token(const device_config *device)
 }
 
 
-INLINE const tms5501_interface *get_interface(const device_config *device)
+INLINE const tms5501_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == TMS5501);
-	return (const tms5501_interface *) device->static_config;
+	return (const tms5501_interface *) device->baseconfig().static_config;
 }
 
 static const UINT8 timer_name[] = { TMS5501_TIMER_0_INT, TMS5501_TIMER_1_INT, TMS5501_TIMER_2_INT, TMS5501_TIMER_3_INT, TMS5501_TIMER_4_INT };
@@ -145,7 +145,7 @@ static int find_first_bit(int value)
     tms5501_field_interrupts
 -------------------------------------------------*/
 
-static void tms5501_field_interrupts(const device_config *device)
+static void tms5501_field_interrupts(running_device *device)
 {
 	static const UINT8 int_vectors[] = { 0xc7, 0xcf, 0xd7, 0xdf, 0xe7, 0xef, 0xf7, 0xff };
 
@@ -198,7 +198,7 @@ static void tms5501_field_interrupts(const device_config *device)
     tms5501_timer_decrementer
 -------------------------------------------------*/
 
-static void tms5501_timer_decrementer(const device_config *device, UINT8 mask)
+static void tms5501_timer_decrementer(running_device *device, UINT8 mask)
 {
 	tms5501_t *tms = get_token(device);
 
@@ -215,7 +215,7 @@ static void tms5501_timer_decrementer(const device_config *device, UINT8 mask)
 
 static TIMER_CALLBACK(tms5501_timer_decrementer_callback)
 {
-	const device_config *device = (const device_config *) ptr;
+	running_device *device = (running_device *) ptr;
 	UINT8 mask = param;
 
 	tms5501_timer_decrementer(device, mask);
@@ -226,7 +226,7 @@ static TIMER_CALLBACK(tms5501_timer_decrementer_callback)
     tms5501_timer_reload
 -------------------------------------------------*/
 
-static void tms5501_timer_reload(const device_config *device, int timer)
+static void tms5501_timer_reload(running_device *device, int timer)
 {
 	tms5501_t *tms = get_token(device);
 	const tms5501_interface *intf = get_interface(device);
@@ -308,7 +308,7 @@ static DEVICE_START( tms5501 )
     tms5501_set_pio_bit_7
 -------------------------------------------------*/
 
-void tms5501_set_pio_bit_7 (const device_config *device, UINT8 data)
+void tms5501_set_pio_bit_7 (running_device *device, UINT8 data)
 {
 	tms5501_t *tms = get_token(device);
 
@@ -333,7 +333,7 @@ void tms5501_set_pio_bit_7 (const device_config *device, UINT8 data)
     tms5501_sensor
 -------------------------------------------------*/
 
-void tms5501_sensor (const device_config *device, UINT8 data)
+void tms5501_sensor (running_device *device, UINT8 data)
 {
 	tms5501_t *tms = get_token(device);
 
@@ -439,7 +439,7 @@ WRITE8_DEVICE_HANDLER( tms5501_w )
 			LOG_TMS5501(device, "Command register write", data);
 
 			if (data & TMS5501_RESET)
-				device_reset(device);
+				device->reset();
 			break;
 		case 0x05:
 			/* Serial rate register

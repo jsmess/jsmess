@@ -160,13 +160,13 @@ static const eeprom_interface qsound_eeprom_interface =
 
 static READ16_HANDLER( cps1_eeprom_port_r )
 {
-	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
 	return eeprom_read_bit(eeprom);
 }
 
 static WRITE16_HANDLER( cps1_eeprom_port_w )
 {
-	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
 		/*
@@ -337,7 +337,7 @@ GFXDECODE_END
 
 
 
-static void cps1_irq_handler_mus(const device_config *device, int irq)
+static void cps1_irq_handler_mus(running_device *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }

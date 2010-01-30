@@ -625,27 +625,27 @@ static char *GameInfoCPU(UINT nIndex)
 
 	ZeroMemory(buf, sizeof(buf));
 
-	cpu = device_list_class_first(&config->devicelist, DEVICE_CLASS_CPU_CHIP);
+	cpu = config->devicelist.first(DEVICE_CLASS_CPU_CHIP);
 	while (cpu != NULL)
 	{
 		if (cpu->clock >= 1000000)
 		{
 			sprintf(&buf[strlen(buf)], "%s %d.%06d MHz",
-				cpu_get_name(cpu),
+				cpu->name(),
 				cpu->clock / 1000000,
 				cpu->clock % 1000000);
 		}
 		else
 		{
 			sprintf(&buf[strlen(buf)], "%s %d.%03d kHz",
-				cpu_get_name(cpu),
+				cpu->name(),
 				cpu->clock / 1000,
 				cpu->clock % 1000);
 		}
 
 		strcat(buf, "\n");
 
-		cpu = device_list_class_next(cpu, DEVICE_CLASS_CPU_CHIP);
+		cpu = cpu->typenext();
     }
 
 	/* Free the structure */
@@ -662,27 +662,29 @@ static char *GameInfoSound(UINT nIndex)
 	const device_config *sound;
 
 	buf[0] = 0;
-
+	
 	/* iterate over sound chips */
-	sound = device_list_class_first(&config->devicelist, DEVICE_CLASS_SOUND_CHIP);
+	sound = config->devicelist.first(DEVICE_CLASS_SOUND_CHIP);
 	while(sound != NULL)
 	{
 		int clock,count;
 		device_type sound_type_;
+		char tmpname[1024];
+
+		sprintf(tmpname,"%s",sound->name());
 
 		sound_type_ = sound_get_type(sound);
 		clock = sound->clock;
 
 		count = 1;
-		sound = device_list_class_next(sound, DEVICE_CLASS_SOUND_CHIP);
-
+		sound = sound->typenext();
 		/* Matching chips at the same clock are aggregated */
 		while (sound != NULL
 			&& sound_get_type(sound) == sound_type_
 			&& sound->clock == clock)
 		{
 			count++;
-			sound = device_list_class_next(sound, DEVICE_CLASS_SOUND_CHIP);
+			sound = sound->typenext();
 		}
 
 		if (count > 1)
@@ -690,7 +692,7 @@ static char *GameInfoSound(UINT nIndex)
 			sprintf(&buf[strlen(buf)],"%dx",count);
 		}
 
-		sprintf(&buf[strlen(buf)],"%s",devtype_get_name(sound_type_));
+		sprintf(&buf[strlen(buf)],"%s",tmpname);
 
 		if (clock)
 		{
@@ -833,6 +835,12 @@ const char *GameInfoStatus(int driver_index, BOOL bRomStatus)
 						strcat(buffer, "\r\n");
 					strcat(buffer, "Screen flipping is not supported");
 				}
+ 				if (drivers[driver_index]->flags & GAME_REQUIRES_ARTWORK)
+				{
+					if (*buffer != '\0')
+						strcat(buffer, "\r\n");
+					strcat(buffer, "Game requires artwork");
+				}				
  			}
 			else
 			{
@@ -880,6 +888,12 @@ const char *GameInfoStatus(int driver_index, BOOL bRomStatus)
 						strcat(buffer, "\r\n");
 					strcat(buffer, "Screen flipping is not supported");
 				}
+				if (drivers[driver_index]->flags & GAME_REQUIRES_ARTWORK)
+				{
+					if (*buffer != '\0')
+						strcat(buffer, "\r\n");
+					strcat(buffer, "Game requires artwork");
+				}				
 			}
 		}
 		else
@@ -945,6 +959,12 @@ const char *GameInfoStatus(int driver_index, BOOL bRomStatus)
 				strcat(buffer, "\r\n");
 			strcat(buffer, "Screen flipping is not supported");
 		}
+		if (drivers[driver_index]->flags & GAME_REQUIRES_ARTWORK)
+		{
+			if (*buffer != '\0')
+				strcat(buffer, "\r\n");
+			strcat(buffer, "Game requires artwork");
+		}		
 	}
 	return buffer;
 }
@@ -1950,15 +1970,17 @@ static BOOL RotatePopulateControl(datamap *map, HWND dialog, HWND control, core_
 static BOOL ScreenReadControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
 {
 	char screen_option_name[32];
-	const char *screen_option_value;
+	TCHAR *screen_option_value;
 	int selected_screen;
 	int screen_option_index;
+	const char *op_val;
 
 	selected_screen = GetSelectedScreen(dialog);
 	screen_option_index = ComboBox_GetCurSel(control);
-	screen_option_value = (const char *) ComboBox_GetItemData(control, screen_option_index);
+	screen_option_value = (TCHAR*) ComboBox_GetItemData(control, screen_option_index);
 	snprintf(screen_option_name, ARRAY_LENGTH(screen_option_name), "screen%d", selected_screen);
-	options_set_string(opts, screen_option_name, screen_option_value, OPTION_PRIORITY_CMDLINE);
+	op_val = utf8_from_tstring(screen_option_value);
+	options_set_string(opts, screen_option_name, op_val, OPTION_PRIORITY_CMDLINE);
 	return FALSE;
 }
 
@@ -2608,8 +2630,7 @@ static void SetYM3812Enabled(HWND hWnd, int nIndex)
 	{
 		enabled = FALSE;
 
-		for (sound = device_list_class_first(&config->devicelist, DEVICE_CLASS_SOUND_CHIP); sound != NULL;
-			sound = device_list_class_next(sound, DEVICE_CLASS_SOUND_CHIP))
+		for (sound = config->devicelist.first(DEVICE_CLASS_SOUND_CHIP); sound != NULL; sound = sound->next)
 		{
 			if (nIndex <= -1
 				||  sound->type == SOUND_YM3812

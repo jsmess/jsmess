@@ -19,8 +19,8 @@
 
 typedef struct i8271_interface
 {
-	void (*interrupt)(const device_config *device, int state);
-	void (*dma_request)(const device_config *device, int state, int read_);
+	void (*interrupt)(running_device *device, int state);
+	void (*dma_request)(running_device *device, int state, int read_);
 	const char *floppy_drive_tags[2];
 } i8271_interface;
 

@@ -28,7 +28,7 @@ static TIMER_CALLBACK( req_delay )
 	sasi->status_port |= 0x01;
 }
 
-static unsigned char SASIReadByte(const device_config* device)
+static unsigned char SASIReadByte(running_device* device)
 {
 	//int ret;
 	unsigned char val;
@@ -38,7 +38,7 @@ static unsigned char SASIReadByte(const device_config* device)
 	return val;
 }
 
-static void SASIWriteByte(const device_config* device, unsigned char val)
+static void SASIWriteByte(running_device* device, unsigned char val)
 {
 	image_fwrite(device,&val,1);
 }

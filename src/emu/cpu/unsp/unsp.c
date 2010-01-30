@@ -10,7 +10,7 @@
 #include "debugger.h"
 #include "unsp.h"
 
-INLINE unsp_state *get_safe_token(const device_config *device)
+INLINE unsp_state *get_safe_token(running_device *device)
 {
     assert(device != NULL);
     assert(device->token != NULL);
@@ -116,7 +116,7 @@ static CPU_INIT( unsp )
     memset(unsp->r, 0, sizeof(UINT16) * UNSP_GPR_COUNT);
 
     unsp->device = device;
-    unsp->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+    unsp->program = device->space(AS_PROGRAM);
     unsp->irq = 0;
     unsp->fiq = 0;
 }
@@ -862,15 +862,15 @@ CPU_GET_INFO( unsp )
         case CPUINFO_INT_MIN_CYCLES:            info->i = 5;                    break;
         case CPUINFO_INT_MAX_CYCLES:            info->i = 5;                    break;
 
-        case CPUINFO_INT_DATABUS_WIDTH_PROGRAM: info->i = 16;                   break;
-        case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 23;                   break;
-        case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;                    break;
-        case CPUINFO_INT_DATABUS_WIDTH_DATA:    info->i = 0;                    break;
-        case CPUINFO_INT_ADDRBUS_WIDTH_DATA:    info->i = 0;                    break;
-        case CPUINFO_INT_ADDRBUS_SHIFT_DATA:    info->i = 0;                    break;
-        case CPUINFO_INT_DATABUS_WIDTH_IO:      info->i = 0;                    break;
-        case CPUINFO_INT_ADDRBUS_WIDTH_IO:      info->i = 0;                    break;
-        case CPUINFO_INT_ADDRBUS_SHIFT_IO:      info->i = 0;                    break;
+        case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;                   break;
+        case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 23;                   break;
+        case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;                    break;
+        case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:    info->i = 0;                    break;
+        case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:    info->i = 0;                    break;
+        case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:    info->i = 0;                    break;
+        case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:      info->i = 0;                    break;
+        case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:      info->i = 0;                    break;
+        case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:      info->i = 0;                    break;
 
         case CPUINFO_INT_REGISTER + UNSP_SP:	info->i = UNSP_REG(SP);			break;
         case CPUINFO_INT_REGISTER + UNSP_R1:	info->i = UNSP_REG(R1);			break;

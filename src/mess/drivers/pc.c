@@ -1432,7 +1432,7 @@ static const unsigned i86_address_mask = 0x000fffff;
 
 #if defined(ADLIB)
 /* irq line not connected to pc on adlib cards (and compatibles) */
-static void pc_irqhandler(const device_config *device, int linestate) {}
+static void pc_irqhandler(running_device *device, int linestate) {}
 
 static const ym3812_interface pc_ym3812_interface =
 {

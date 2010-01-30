@@ -43,7 +43,7 @@ static UINT32 timer_clks[4] = { 16777216, 16777216/64, 16777216/256, 16777216/10
 
 static UINT8 *nvptr;
 static UINT32 nvsize = 0;
-static const device_config *nvimage;
+static running_device *nvimage;
 
 static void gba_machine_stop(running_machine *machine)
 {
@@ -291,13 +291,13 @@ static void audio_tick(running_machine *machine, int ref)
 
 			if (gba_state->SOUNDCNT_H & 0x100)
 			{
-				const device_config *dac_device = devtag_get_device(machine, "direct_a_left");
+				running_device *dac_device = devtag_get_device(machine, "direct_a_left");
 
 				dac_signed_data_w(dac_device, gba_state->fifo_a[gba_state->fifo_a_ptr]^0x80);
 			}
 			if (gba_state->SOUNDCNT_H & 0x200)
 			{
-				const device_config *dac_device = devtag_get_device(machine, "direct_a_right");
+				running_device *dac_device = devtag_get_device(machine, "direct_a_right");
 
 				dac_signed_data_w(dac_device, gba_state->fifo_a[gba_state->fifo_a_ptr]^0x80);
 			}
@@ -331,13 +331,13 @@ static void audio_tick(running_machine *machine, int ref)
 
 			if (gba_state->SOUNDCNT_H & 0x1000)
 			{
-				const device_config *dac_device = devtag_get_device(machine, "direct_b_left");
+				running_device *dac_device = devtag_get_device(machine, "direct_b_left");
 
 				dac_signed_data_w(dac_device, gba_state->fifo_b[gba_state->fifo_b_ptr]^0x80);
 			}
 			if (gba_state->SOUNDCNT_H & 0x2000)
 			{
-				const device_config *dac_device = devtag_get_device(machine, "direct_b_right");
+				running_device *dac_device = devtag_get_device(machine, "direct_b_right");
 
 				dac_signed_data_w(dac_device, gba_state->fifo_b[gba_state->fifo_b_ptr]^0x80);
 			}
@@ -499,7 +499,7 @@ static READ32_HANDLER( gba_io_r )
 {
 	UINT32 retval = 0;
 	running_machine *machine = space->machine;
-	const device_config *gb_device = devtag_get_device(space->machine, "custom");
+	running_device *gb_device = devtag_get_device(space->machine, "custom");
 	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 
 	switch( offset )
@@ -1017,7 +1017,7 @@ static READ32_HANDLER( gba_io_r )
 static WRITE32_HANDLER( gba_io_w )
 {
 	running_machine *machine = space->machine;
-	const device_config *gb_device = devtag_get_device(space->machine, "custom");
+	running_device *gb_device = devtag_get_device(space->machine, "custom");
 	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 
 	switch( offset )
@@ -1417,8 +1417,8 @@ static WRITE32_HANDLER( gba_io_w )
 				// DAC A reset?
 				if (data & 0x0800)
 				{
-					const device_config *gb_a_l = devtag_get_device(machine, "direct_a_left");
-					const device_config *gb_a_r = devtag_get_device(machine, "direct_a_right");
+					running_device *gb_a_l = devtag_get_device(machine, "direct_a_left");
+					running_device *gb_a_r = devtag_get_device(machine, "direct_a_right");
 
 					gba_state->fifo_a_ptr = 17;
 					gba_state->fifo_a_in = 17;
@@ -1429,8 +1429,8 @@ static WRITE32_HANDLER( gba_io_w )
 				// DAC B reset?
 				if (data & 0x8000)
 				{
-					const device_config *gb_b_l = devtag_get_device(machine, "direct_b_left");
-					const device_config *gb_b_r = devtag_get_device(machine, "direct_b_right");
+					running_device *gb_b_l = devtag_get_device(machine, "direct_b_left");
+					running_device *gb_b_r = devtag_get_device(machine, "direct_b_right");
 
 					gba_state->fifo_b_ptr = 17;
 					gba_state->fifo_b_in = 17;
@@ -1442,11 +1442,11 @@ static WRITE32_HANDLER( gba_io_w )
 		case 0x0084/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				const device_config *gb_a_l = devtag_get_device(machine, "direct_a_left");
-				const device_config *gb_a_r = devtag_get_device(machine, "direct_a_right");
-				const device_config *gb_b_l = devtag_get_device(machine, "direct_b_left");
-				const device_config *gb_b_r = devtag_get_device(machine, "direct_b_right");
-				const device_config *gb_device = devtag_get_device(space->machine, "custom");
+				running_device *gb_a_l = devtag_get_device(machine, "direct_a_left");
+				running_device *gb_a_r = devtag_get_device(machine, "direct_a_right");
+				running_device *gb_b_l = devtag_get_device(machine, "direct_b_left");
+				running_device *gb_b_r = devtag_get_device(machine, "direct_b_right");
+				running_device *gb_device = devtag_get_device(space->machine, "custom");
 
 				gb_sound_w(gb_device, 0x16, data);
 				if ((data & 0x80) && !(gba_state->SOUNDCNT_X & 0x80))
@@ -2005,10 +2005,10 @@ static TIMER_CALLBACK( perform_scan )
 
 static MACHINE_RESET( gba )
 {
-	const device_config *gb_a_l = devtag_get_device(machine, "direct_a_left");
-	const device_config *gb_a_r = devtag_get_device(machine, "direct_a_right");
-	const device_config *gb_b_l = devtag_get_device(machine, "direct_b_left");
-	const device_config *gb_b_r = devtag_get_device(machine, "direct_b_right");
+	running_device *gb_a_l = devtag_get_device(machine, "direct_a_left");
+	running_device *gb_a_r = devtag_get_device(machine, "direct_a_right");
+	running_device *gb_b_l = devtag_get_device(machine, "direct_b_left");
+	running_device *gb_b_r = devtag_get_device(machine, "direct_b_right");
 	gba_state_t *gba_state = (gba_state_t *)machine->driver_data;
 
 	memset(gba_state, 0, sizeof(gba_state));

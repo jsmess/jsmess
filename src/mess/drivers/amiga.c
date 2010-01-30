@@ -48,14 +48,14 @@ static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w );
 
 static READ16_HANDLER( amiga_clock_r )
 {
-	const device_config *rtc = devtag_get_device(space->machine, "rtc");
+	running_device *rtc = devtag_get_device(space->machine, "rtc");
 	return msm6242_r(rtc, offset / 2);
 }
 
 
 static WRITE16_HANDLER( amiga_clock_w )
 {
-	const device_config *rtc = devtag_get_device(space->machine, "rtc");
+	running_device *rtc = devtag_get_device(space->machine, "rtc");
 	msm6242_w(rtc, offset / 2, data);
 }
 

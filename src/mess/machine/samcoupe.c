@@ -257,7 +257,7 @@ MACHINE_RESET( samcoupe )
 	if (input_port_read(machine, "config") & 0x01)
 	{
 		/* install RTC */
-		const device_config *rtc = devtag_get_device(machine, "sambus_clock");
+		running_device *rtc = devtag_get_device(machine, "sambus_clock");
 		memory_install_readwrite8_device_handler(spaceio, rtc, 0xef, 0xef, 0xffff, 0xff00, samcoupe_rtc_r, samcoupe_rtc_w);
 	}
 	else

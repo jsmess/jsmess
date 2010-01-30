@@ -38,14 +38,14 @@ typedef struct _mc6854_interface mc6854_interface;
 struct _mc6854_interface
 {
   /* low-level, bit-based interface */
-  void ( * out_tx  ) ( const device_config *device, int state ); /* transmit bit */
+  void ( * out_tx  ) ( running_device *device, int state ); /* transmit bit */
 
   /* high-level, frame-based interface */
-  void ( * out_frame ) ( const device_config *device, UINT8* data, int length );
+  void ( * out_frame ) ( running_device *device, UINT8* data, int length );
 
   /* control lines */
-  void ( * out_rts ) ( const device_config *device, int state ); /* 1 = transmitting, 0 = idle */
-  void ( * out_dtr ) ( const device_config *device, int state ); /* 1 = data transmit ready, 0 = busy */
+  void ( * out_rts ) ( running_device *device, int state ); /* 1 = transmitting, 0 = idle */
+  void ( * out_dtr ) ( running_device *device, int state ); /* 1 = data transmit ready, 0 = busy */
 };
 
 
@@ -66,13 +66,13 @@ extern READ8_DEVICE_HANDLER  ( mc6854_r );
 extern WRITE8_DEVICE_HANDLER ( mc6854_w );
 
 /* low-level, bit-based interface */
-extern void mc6854_set_rx ( const device_config *device, int state );
+extern void mc6854_set_rx ( running_device *device, int state );
 
 /* high-level, frame-based interface */
-extern int mc6854_send_frame( const device_config *device, UINT8* data, int length ); /* ret -1 if busy */
+extern int mc6854_send_frame( running_device *device, UINT8* data, int length ); /* ret -1 if busy */
 
 /* control lines */
-extern void mc6854_set_cts ( const device_config *device, int state ); /* 1 = clear-to-send, 0 = busy */
-extern void mc6854_set_dcd ( const device_config *device, int state ); /* 1 = carrier, 0 = no carrier */
+extern void mc6854_set_cts ( running_device *device, int state ); /* 1 = clear-to-send, 0 = busy */
+extern void mc6854_set_dcd ( running_device *device, int state ); /* 1 = carrier, 0 = no carrier */
 
 #endif

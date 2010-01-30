@@ -479,7 +479,7 @@ static READ8_HANDLER ( pc_aga_mda_r )
 	UINT8 data = 0xFF;
 
 	if ( aga.mode == AGA_MONO ) {
-		const device_config *devconf = devtag_get_device(space->machine, MDA_MC6845_NAME);
+		running_device *devconf = devtag_get_device(space->machine, MDA_MC6845_NAME);
 		switch( offset )
 		{
 		case 0: case 2: case 4: case 6:
@@ -501,7 +501,7 @@ static READ8_HANDLER ( pc_aga_mda_r )
 static WRITE8_HANDLER ( pc_aga_mda_w )
 {
 	if ( aga.mode == AGA_MONO ) {
-		const device_config *devconf = devtag_get_device(space->machine, AGA_MC6845_NAME);
+		running_device *devconf = devtag_get_device(space->machine, AGA_MC6845_NAME);
 		switch( offset )
 		{
 			case 0: case 2: case 4: case 6:
@@ -534,7 +534,7 @@ static READ8_HANDLER ( pc_aga_cga_r )
 	UINT8 data = 0xFF;
 
 	if ( aga.mode == AGA_COLOR ) {
-		const device_config *devconf = devtag_get_device(space->machine, AGA_MC6845_NAME);
+		running_device *devconf = devtag_get_device(space->machine, AGA_MC6845_NAME);
 		switch( offset ) {
 		case 0: case 2: case 4: case 6:
 			/* return last written mc6845 address value here? */
@@ -580,7 +580,7 @@ static void pc_aga_set_palette_luts(void) {
 static WRITE8_HANDLER ( pc_aga_cga_w )
 {
 	if ( aga.mode == AGA_COLOR ) {
-		const device_config *devconf = devtag_get_device(space->machine, AGA_MC6845_NAME);
+		running_device *devconf = devtag_get_device(space->machine, AGA_MC6845_NAME);
 
 		switch(offset) {
 		case 0: case 2: case 4: case 6:
@@ -661,7 +661,7 @@ static WRITE16_HANDLER ( pc16le_aga_cga_w ) { write16le_with_write8_handler(pc_a
 
 void pc_aga_set_mode(running_machine *machine, AGA_MODE mode)
 {
-	const device_config *devconf = devtag_get_device(machine, AGA_MC6845_NAME);
+	running_device *devconf = devtag_get_device(machine, AGA_MC6845_NAME);
 
 	aga.mode = mode;
 
@@ -681,7 +681,7 @@ void pc_aga_set_mode(running_machine *machine, AGA_MODE mode)
 VIDEO_START( pc_aga )
 {
 	const address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
-	int buswidth = cpu_get_databus_width(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+	int buswidth = machine->firstcpu->databus_width(AS_PROGRAM);
 
 	switch(buswidth)
 	{
@@ -719,7 +719,7 @@ VIDEO_START( pc200 )
 
 	VIDEO_START_CALL(pc_aga);
 
-	buswidth = cpu_get_databus_width(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+	buswidth = machine->firstcpu->databus_width(AS_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:
@@ -741,7 +741,7 @@ VIDEO_START( pc200 )
 
 static VIDEO_UPDATE( mc6845_aga )
 {
-	const device_config	*devconf = devtag_get_device(screen->machine, AGA_MC6845_NAME);
+	running_device *devconf = devtag_get_device(screen->machine, AGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 
 	return 0;

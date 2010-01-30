@@ -106,7 +106,7 @@ struct _dl1416_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE dl1416_state *get_safe_token(const device_config *device)
+INLINE dl1416_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -125,8 +125,8 @@ static DEVICE_START( dl1416 )
 	dl1416_state *dl1416 = get_safe_token(device);
 
 	/* validate arguments */
-	assert(((const dl1416_interface *)(device->inline_config))->type >= DL1416B);
-	assert(((const dl1416_interface *)(device->inline_config))->type < MAX_DL1416_TYPES);
+	assert(((const dl1416_interface *)(device->baseconfig().inline_config))->type >= DL1416B);
+	assert(((const dl1416_interface *)(device->baseconfig().inline_config))->type < MAX_DL1416_TYPES);
 
 	/* register for state saving */
 	state_save_register_item(device->machine, "dl1416", device->tag, 0, dl1416->chip_enable);
@@ -205,7 +205,7 @@ WRITE_LINE_DEVICE_HANDLER( dl1416_cu_w )
 WRITE8_DEVICE_HANDLER( dl1416_data_w )
 {
 	dl1416_state *chip = get_safe_token(device);
-	const dl1416_interface *intf = (const dl1416_interface *)device->inline_config;
+	const dl1416_interface *intf = (const dl1416_interface *)device->baseconfig().inline_config;
 
 	offset &= 0x03; /* A0-A1 */
 	data &= 0x7f;   /* D0-D6 */

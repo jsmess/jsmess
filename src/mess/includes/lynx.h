@@ -33,7 +33,7 @@ INTERRUPT_GEN( lynx_frame_int );
 
 /* These functions are also needed for the Quickload */
 int lynx_verify_cart (char *header, int kind);
-void lynx_crc_keyword(const device_config *image);
+void lynx_crc_keyword(running_device *image);
 
 MACHINE_DRIVER_EXTERN( lynx_cartslot );
 

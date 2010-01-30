@@ -317,7 +317,7 @@ static MACHINE_RESET( eti660 )
 	timer_set(machine, ATTOTIME_IN_MSEC(0), NULL, 0, set_cpu_mode);
 
 	/* reset CDP1864 */
-	device_reset(state->cdp1864);
+	state->cdp1864->reset();
 }
 
 /* Machine Drivers */

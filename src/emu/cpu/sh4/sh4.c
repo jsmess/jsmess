@@ -30,7 +30,7 @@
 
 CPU_DISASSEMBLE( sh4 );
 
-INLINE SH4 *get_safe_token(const device_config *device)
+INLINE SH4 *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -3384,7 +3384,7 @@ static CPU_EXECUTE( sh4 )
 
 static CPU_INIT( sh4 )
 {
-	const struct sh4_config *conf = (const struct sh4_config *)device->static_config;
+	const struct sh4_config *conf = (const struct sh4_config *)device->baseconfig().static_config;
 	SH4 *sh4 = get_safe_token(device);
 
 	sh4_common_init(device);
@@ -3607,7 +3607,7 @@ static CPU_SET_INFO( sh4 )
 	}
 }
 
-void sh4_set_ftcsr_callback(const device_config *device, sh4_ftcsr_callback callback)
+void sh4_set_ftcsr_callback(running_device *device, sh4_ftcsr_callback callback)
 {
 	SH4 *sh4 = get_safe_token(device);
 	sh4->ftcsr_read_callback = callback;
@@ -3691,17 +3691,17 @@ CPU_GET_INFO( sh4 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;						break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 4;						break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:		info->i = 64;				break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 	info->i = 32;				break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 	info->i = 0;				break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:		info->i = 0;				break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:		info->i = 0;				break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:		info->i = 0;				break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 64;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:		info->i = 64;				break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 	info->i = 32;				break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: 	info->i = 0;				break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:		info->i = 0;				break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:		info->i = 0;				break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:		info->i = 0;				break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 64;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map64 = ADDRESS_MAP_NAME(sh4_internal_map); break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map64 = ADDRESS_MAP_NAME(sh4_internal_map); break;
 
 		case CPUINFO_INT_INPUT_STATE + SH4_IRL0:		info->i = sh4->irq_line_state[SH4_IRL0]; break;
 		case CPUINFO_INT_INPUT_STATE + SH4_IRL1:		info->i = sh4->irq_line_state[SH4_IRL1]; break;

@@ -20,7 +20,7 @@ struct _teleprinter_state
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
-INLINE teleprinter_state *get_safe_token(const device_config *device)
+INLINE teleprinter_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -29,11 +29,11 @@ INLINE teleprinter_state *get_safe_token(const device_config *device)
 	return (teleprinter_state *)device->token;
 }
 
-INLINE const teleprinter_interface *get_interface(const device_config *device)
+INLINE const teleprinter_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == GENERIC_TELEPRINTER);
-	return (const teleprinter_interface *) device->static_config;
+	return (const teleprinter_interface *) device->baseconfig().static_config;
 }
 
 /***************************************************************************
@@ -172,7 +172,7 @@ static const UINT8 teleprinter_font[128*8] =
   0x2a,0x15,0x2a,0x15,0x2a,0x15,0x2a,0x15
 };
 
-static void teleprinter_scroll_line(const device_config *device)
+static void teleprinter_scroll_line(running_device *device)
 {
 	teleprinter_state *term = get_safe_token(device);
 
@@ -180,7 +180,7 @@ static void teleprinter_scroll_line(const device_config *device)
 	memset(term->buffer + TELEPRINTER_WIDTH*(TELEPRINTER_HEIGHT-1),0,TELEPRINTER_WIDTH);
 }
 
-static void teleprinter_write_char(const device_config *device,UINT8 data) {
+static void teleprinter_write_char(running_device *device,UINT8 data) {
 	teleprinter_state *term = get_safe_token(device);
 
 	term->buffer[(TELEPRINTER_HEIGHT-1)*TELEPRINTER_WIDTH+term->x_pos] = data;
@@ -191,7 +191,7 @@ static void teleprinter_write_char(const device_config *device,UINT8 data) {
 	}
 }
 
-static void teleprinter_clear(const device_config *device) {
+static void teleprinter_clear(running_device *device) {
 	teleprinter_state *term = get_safe_token(device);
 
 	memset(term->buffer,0,TELEPRINTER_WIDTH*TELEPRINTER_HEIGHT);
@@ -218,7 +218,7 @@ WRITE8_DEVICE_HANDLER ( teleprinter_write )
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
-void generic_teleprinter_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+void generic_teleprinter_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 code;
 	int y, c, x, b;
@@ -243,7 +243,7 @@ void generic_teleprinter_update(const device_config *device, bitmap_t *bitmap, c
 
 static TIMER_CALLBACK(keyboard_callback)
 {
-	teleprinter_state *term = get_safe_token((const device_config *)ptr);
+	teleprinter_state *term = get_safe_token((running_device *)ptr);
 	term->last_code = terminal_keyboard_handler(machine, &term->teleprinter_keyboard_func, term->last_code, &term->scan_line);
 }
 
@@ -257,7 +257,7 @@ static VIDEO_START( teleprinter )
 
 static VIDEO_UPDATE(teleprinter )
 {
-	const device_config	*devconf = devtag_get_device(screen->machine, TELEPRINTER_TAG);
+	running_device *devconf = devtag_get_device(screen->machine, TELEPRINTER_TAG);
 	generic_teleprinter_update( devconf, bitmap, cliprect);
 	return 0;
 }

@@ -59,7 +59,7 @@ struct _msm6255_t
 {
 	const msm6255_interface *intf;	/* interface */
 
-	const device_config *screen;	/* screen */
+	running_device *screen;	/* screen */
 
 	UINT8 ir;						/* instruction register */
 	UINT8 mor;						/* mode control register */
@@ -80,7 +80,7 @@ struct _msm6255_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE msm6255_t *get_safe_token(const device_config *device)
+INLINE msm6255_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -199,7 +199,7 @@ WRITE8_DEVICE_HANDLER( msm6255_register_w )
     update_cursor - update cursor state
 -------------------------------------------------*/
 
-static void update_cursor(const device_config *device)
+static void update_cursor(running_device *device)
 {
 	msm6255_t *msm6255 = get_safe_token(device);
 
@@ -247,7 +247,7 @@ static void update_cursor(const device_config *device)
     draw_scanline - draw one scanline
 -------------------------------------------------*/
 
-static void draw_scanline(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int y, UINT16 ma, UINT8 ra)
+static void draw_scanline(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int y, UINT16 ma, UINT8 ra)
 {
 	msm6255_t *msm6255 = get_safe_token(device);
 
@@ -289,7 +289,7 @@ static void draw_scanline(const device_config *device, bitmap_t *bitmap, const r
     update_graphics - draw graphics mode screen
 -------------------------------------------------*/
 
-static void update_graphics(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+static void update_graphics(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	msm6255_t *msm6255 = get_safe_token(device);
 
@@ -318,7 +318,7 @@ static void update_graphics(const device_config *device, bitmap_t *bitmap, const
     update_text - draw text mode screen
 -------------------------------------------------*/
 
-static void update_text(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+static void update_text(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	msm6255_t *msm6255 = get_safe_token(device);
 
@@ -350,7 +350,7 @@ static void update_text(const device_config *device, bitmap_t *bitmap, const rec
     update_text - draw screen
 -------------------------------------------------*/
 
-void msm6255_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+void msm6255_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	msm6255_t *msm6255 = get_safe_token(device);
 
@@ -380,7 +380,7 @@ static DEVICE_START( msm6255 )
 	msm6255_t *msm6255 = get_safe_token(device);
 
 	/* resolve callbacks */
-	msm6255->intf = (const msm6255_interface*)device->static_config;
+	msm6255->intf = (const msm6255_interface*)device->baseconfig().static_config;
 	assert(msm6255->intf->char_ram_r != NULL);
 
 	/* get the screen */

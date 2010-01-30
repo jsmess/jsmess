@@ -27,8 +27,8 @@ struct _studio2_state
 	UINT8 color;
 
 	/* devices */
-	const device_config *cdp1861;
-	const device_config *cdp1864;
+	running_device *cdp1861;
+	running_device *cdp1864;
 };
 
 typedef struct _st2_header st2_header;

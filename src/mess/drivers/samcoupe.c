@@ -61,7 +61,7 @@
 
 static READ8_HANDLER( samcoupe_disk_r )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd1772");
+	running_device *fdc = devtag_get_device(space->machine, "wd1772");
 
 	/* drive and side is encoded into bit 5 and 3 */
 	wd17xx_set_drive(fdc, (offset >> 4) & 1);
@@ -81,7 +81,7 @@ static READ8_HANDLER( samcoupe_disk_r )
 
 static WRITE8_HANDLER( samcoupe_disk_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd1772");
+	running_device *fdc = devtag_get_device(space->machine, "wd1772");
 
 	/* drive and side is encoded into bit 5 and 3 */
 	wd17xx_set_drive(fdc, (offset >> 4) & 1);
@@ -99,7 +99,7 @@ static WRITE8_HANDLER( samcoupe_disk_w )
 
 static READ8_HANDLER( samcoupe_pen_r )
 {
-	const device_config *scr = space->machine->primary_screen;
+	running_device *scr = space->machine->primary_screen;
 	UINT8 data;
 
 	if (offset & 0x100)
@@ -207,7 +207,7 @@ static WRITE8_HANDLER( samcoupe_midi_w )
 
 static READ8_HANDLER( samcoupe_keyboard_r )
 {
-	const device_config *cassette = devtag_get_device(space->machine, "cassette");
+	running_device *cassette = devtag_get_device(space->machine, "cassette");
 	UINT8 data = 0x1f;
 
 	/* bit 0-4, keyboard input */
@@ -245,8 +245,8 @@ static READ8_HANDLER( samcoupe_keyboard_r )
 
 static WRITE8_HANDLER( samcoupe_border_w )
 {
-	const device_config *cassette = devtag_get_device(space->machine, "cassette");
-	const device_config *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *cassette = devtag_get_device(space->machine, "cassette");
+	running_device *speaker = devtag_get_device(space->machine, "speaker");
 	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
 
 	asic->border = data;
@@ -335,7 +335,7 @@ static TIMER_CALLBACK( irq_off )
 	asic->status |= param;
 }
 
-void samcoupe_irq(const device_config *device, UINT8 src)
+void samcoupe_irq(running_device *device, UINT8 src)
 {
 	coupe_asic *asic = (coupe_asic *)device->machine->driver_data;
 

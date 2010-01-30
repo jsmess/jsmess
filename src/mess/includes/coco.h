@@ -32,15 +32,15 @@
 typedef struct _coco_state coco_state;
 struct _coco_state
 {
-	const device_config *cococart_device;
-	const device_config *cassette_device;
-	const device_config *bitbanger_device;
-	const device_config *printer_device;
-	const device_config *dac;
-	const device_config *sam;
-	const device_config *pia_0;
-	const device_config *pia_1;
-	const device_config *pia_2;
+	running_device *cococart_device;
+	running_device *cassette_device;
+	running_device *bitbanger_device;
+	running_device *printer_device;
+	running_device *dac;
+	running_device *sam;
+	running_device *pia_0;
+	running_device *pia_1;
+	running_device *pia_2;
 };
 
 
@@ -114,10 +114,10 @@ void coco3_horizontal_sync_callback(running_machine *machine,int data);
 void coco3_field_sync_callback(running_machine *machine,int data);
 void coco3_gime_field_sync_callback(running_machine *machine);
 
-void coco_cart_w(const device_config *device, int data);
-void coco3_cart_w(const device_config *device, int data);
-void coco_nmi_w(const device_config *device, int data);
-void coco_halt_w(const device_config *device, int data);
+void coco_cart_w(running_device *device, int data);
+void coco3_cart_w(running_device *device, int data);
+void coco_nmi_w(running_device *device, int data);
+void coco_halt_w(running_device *device, int data);
 
 /* Compusense Dragon Plus board */
 READ8_HANDLER ( dgnplus_reg_r );

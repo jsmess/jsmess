@@ -26,12 +26,12 @@ struct _xor100_state
 	int fdc_dden;
 
 	/* devices */
-	const device_config *i8251_a;
-	const device_config *i8251_b;
-	const device_config *wd1795;
-	const device_config *z80ctc;
-	const device_config *cassette;
-	const device_config *centronics;
+	running_device *i8251_a;
+	running_device *i8251_b;
+	running_device *wd1795;
+	running_device *z80ctc;
+	running_device *cassette;
+	running_device *centronics;
 };
 
 #endif

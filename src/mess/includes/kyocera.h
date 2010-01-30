@@ -34,13 +34,13 @@ struct _kc85_state
 	/* peripheral state */
 	int iosel;				/* serial interface select */
 
-	const device_config *hd44102[10];
-	const device_config *im6042;
-	const device_config *upd1990a;
-	const device_config *mc14412;
-	const device_config *centronics;
-	const device_config *speaker;
-	const device_config *cassette;
+	running_device *hd44102[10];
+	running_device *im6042;
+	running_device *upd1990a;
+	running_device *mc14412;
+	running_device *centronics;
+	running_device *speaker;
+	running_device *cassette;
 };
 
 typedef struct _tandy200_state tandy200_state;
@@ -57,13 +57,13 @@ struct _tandy200_state
 	int buzzer;				/* buzzer select */
 	int bell;				/* bell output */
 
-	const device_config *hd61830;
-	const device_config *im6042;
-	const device_config *mc14412;
-	const device_config *tcm5089;
-	const device_config *centronics;
-	const device_config *speaker;
-	const device_config *cassette;
+	running_device *hd61830;
+	running_device *im6042;
+	running_device *mc14412;
+	running_device *tcm5089;
+	running_device *centronics;
+	running_device *speaker;
+	running_device *cassette;
 };
 
 /* ---------- defined in video/kyocera.c ---------- */

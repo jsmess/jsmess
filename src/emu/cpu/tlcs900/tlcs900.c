@@ -72,7 +72,7 @@ struct _tlcs900_state
 	int icount;
 	int regbank;
 	cpu_irq_callback irqcallback;
-	const device_config *device;
+	running_device *device;
 	const address_space *program;
 };
 
@@ -204,7 +204,7 @@ struct _tlcs900_state
 #define WRMEML(addr,data)		{ UINT32 dl = data; WRMEMW(addr,dl); WRMEMW(addr+2,(dl >> 16)); }
 
 
-INLINE tlcs900_state *get_safe_token( const device_config *device )
+INLINE tlcs900_state *get_safe_token( running_device *device )
 {
 	assert( device != NULL );
 	assert( device->token != NULL );
@@ -219,7 +219,7 @@ static CPU_INIT( tlcs900 )
 {
 	tlcs900_state *cpustate = get_safe_token(device);
 
-	cpustate->intf = (const tlcs900_interface *)device->static_config;
+	cpustate->intf = (const tlcs900_interface *)device->baseconfig().static_config;
 	cpustate->irqcallback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space( AS_PROGRAM );
@@ -1140,9 +1140,9 @@ CPU_GET_INFO( tlcs900h )
 	case CPUINFO_INT_MAX_CYCLES:					info->i = 1; break; /* FIXME */
 	case CPUINFO_INT_INPUT_LINES:					info->i = 1; break;
 
-	case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 8; break;
-	case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 24; break;
-	case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:			info->i = 0; break;
+	case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 8; break;
+	case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 24; break;
+	case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:			info->i = 0; break;
 
 	case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:
 	case CPUINFO_INT_INPUT_STATE + TLCS900_NMI:		info->i = cpustate->level[TLCS900_NMI]; break;
@@ -1184,7 +1184,7 @@ CPU_GET_INFO( tlcs900h )
 	case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tlcs900); break;
 	case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tlcs900); break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount; break;
-	case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(tlcs900_mem); break;
+	case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(tlcs900_mem); break;
 
 	case CPUINFO_STR_REGISTER + TLCS900_PC:			sprintf( info->s, "PC:%08x", cpustate->pc.d ); break;
 	case CPUINFO_STR_REGISTER + TLCS900_SR:			sprintf( info->s, "SR:%c%d%c%d%c%c%c%c%c%c%c%c",

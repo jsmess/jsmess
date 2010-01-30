@@ -32,9 +32,9 @@ struct _b2m_state
 	UINT8 vblank_state;
 
 	/* devices */
-	const device_config *fdc;
-	const device_config *pic;
-	const device_config *speaker;
+	running_device *fdc;
+	running_device *pic;
+	running_device *speaker;
 };
 
 /*----------- defined in machine/b2m.c -----------*/

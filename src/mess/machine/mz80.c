@@ -72,7 +72,7 @@ static UINT8 speaker_level = 0;
 static UINT8 prev_state = 0;
 static PIT8253_OUTPUT_CHANGED( pit_out0_changed )
 {
-	const device_config *speaker = devtag_get_device(device->machine, "speaker");
+	running_device *speaker = devtag_get_device(device->machine, "speaker");
 	if((prev_state==0) && (state==1)) {
 		speaker_level ^= 1;
 	}
@@ -118,7 +118,7 @@ READ8_HANDLER(mz80k_strobe_r)
 }
 WRITE8_HANDLER(mz80k_strobe_w)
 {
-	const device_config *pit = devtag_get_device(space->machine, "pit8253");
+	running_device *pit = devtag_get_device(space->machine, "pit8253");
 	pit8253_gate_w(pit,0,data);
 }
 

@@ -94,11 +94,11 @@ struct _newbrain_state
 	emu_timer *pwrup_timer;	/* power up timer */
 
 	/* devices */
-	const device_config *mc6850;
-	const device_config *z80ctc;
-	const device_config *upd765;
-	const device_config *cassette1;
-	const device_config *cassette2;
+	running_device *mc6850;
+	running_device *z80ctc;
+	running_device *upd765;
+	running_device *cassette1;
+	running_device *cassette2;
 };
 
 /* ---------- defined in video/newbrain.c ---------- */

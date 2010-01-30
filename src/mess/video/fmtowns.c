@@ -459,7 +459,7 @@ READ8_HANDLER(towns_video_5c8_r)
 
 WRITE8_HANDLER(towns_video_5c8_w)
 {
-	const device_config* dev = devtag_get_device(space->machine,"pic8259_slave");
+	running_device* dev = devtag_get_device(space->machine,"pic8259_slave");
 	switch(offset)
 	{
 		case 0x02:  // 0x5ca - VSync clear?
@@ -1230,13 +1230,13 @@ void draw_text_layer(running_machine* machine,bitmap_t* bitmap, const rectangle*
 static TIMER_CALLBACK( towns_vblank_end )
 {
 	// here we'll clear the vsync signal, I presume it goes low on it's own eventually
-	const device_config* dev = (const device_config*)ptr;
+	running_device* dev = (running_device*)ptr;
 	pic8259_set_irq_line(dev,3,0);  // IRQ11 = VSync
 }
 
 INTERRUPT_GEN( towns_vsync_irq )
 {
-	const device_config* dev = devtag_get_device(device->machine,"pic8259_slave");
+	running_device* dev = devtag_get_device(device->machine,"pic8259_slave");
 	pic8259_set_irq_line(dev,3,1);  // IRQ11 = VSync
 	timer_set(device->machine,video_screen_get_time_until_vblank_end(device->machine->primary_screen),(void*)dev,0,towns_vblank_end);
 	if(towns_sprite_reg[1] & 0x80)  // if sprites are enabled, then sprites are drawn on this layer.

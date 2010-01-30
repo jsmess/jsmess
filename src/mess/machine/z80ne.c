@@ -30,9 +30,9 @@ static UINT8 lx383_key[LX383_KEYS];
 static int   lx383_downsampler;
 static int   nmi_delay_counter;
 static int   reset_delay_counter;
-static const device_config *z80ne_ay31015;
+static running_device *z80ne_ay31015;
 static UINT8 lx385_ctrl = 0x1f;
-static const device_config *lx388_kr2376;
+static running_device *lx388_kr2376;
 
 
 
@@ -73,7 +73,7 @@ static struct _wd17xx_state {
 	UINT8 head;  /* current head */
 } wd17xx_state;
 
-static const device_config *cassette_device_image(running_machine *machine)
+static running_device *cassette_device_image(running_machine *machine)
 {
 	if (lx385_ctrl & 0x08)
 		return devtag_get_device(machine, "cassetteb");
@@ -395,7 +395,7 @@ MACHINE_RESET(z80netb)
 
 MACHINE_RESET(z80netf)
 {
-	const device_config *z80ne_fdc;
+	running_device *z80ne_fdc;
 
 	LOG(("In MACHINE_RESET z80netf\n"));
 	reset_lx390_banking(machine);
@@ -661,7 +661,7 @@ READ8_DEVICE_HANDLER( lx388_mc6847_videoram_r )
 
 VIDEO_UPDATE( lx388 )
 {
-	const device_config *mc6847 = devtag_get_device(screen->machine, "mc6847");
+	running_device *mc6847 = devtag_get_device(screen->machine, "mc6847");
 	return mc6847_update(mc6847, bitmap, cliprect);
 }
 
@@ -676,7 +676,7 @@ READ8_HANDLER(lx388_data_r)
 
 READ8_HANDLER( lx388_read_field_sync )
 {
-	const device_config *mc6847 = devtag_get_device(space->machine, "mc6847");
+	running_device *mc6847 = devtag_get_device(space->machine, "mc6847");
 	return mc6847_fs_r(mc6847) << 7;
 }
 

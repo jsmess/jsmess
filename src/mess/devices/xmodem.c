@@ -66,7 +66,7 @@ typedef struct {
 	UINT16  pos;                 /* position in block, including header */
 	UINT8   state;               /* one of XMODEM_ */
 
-	const device_config* image;  /* underlying image */
+	running_device* image;  /* underlying image */
 
 	emu_timer* timer;            /* used to send periodic NAKs */
 
@@ -160,7 +160,7 @@ static void xmodem_make_idle( xmodem* state )
 }
 
 /* emulated machine has read the last byte we sent */
-void xmodem_byte_transmitted( const device_config *device )
+void xmodem_byte_transmitted( running_device *device )
 {
 	xmodem* state = (xmodem*) device->token;
 	if ( (state->state == XMODEM_SENDING) && (state->pos < 132) )
@@ -171,7 +171,7 @@ void xmodem_byte_transmitted( const device_config *device )
 }
 
 /* emulated machine sends a byte to the outside (us) */
-void xmodem_receive_byte( const device_config *device, UINT8 data )
+void xmodem_receive_byte( running_device *device, UINT8 data )
 {
 	xmodem* state = (xmodem*) device->token;
 	switch ( state->state )
@@ -297,7 +297,7 @@ static DEVICE_START( xmodem )
 	LOG(( "xmodem: start\n" ));
 	state->state = XMODEM_NOIMAGE;
 	state->image = NULL;
-	state->conf = (xmodem_config*) device->static_config;
+	state->conf = (xmodem_config*) device->baseconfig().static_config;
 	state->machine = device->machine;
 	state->timer = timer_alloc(device->machine,  xmodem_nak_cb, state );
 }

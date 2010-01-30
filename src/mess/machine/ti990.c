@@ -37,7 +37,7 @@ void ti990_set_int_line(running_machine *machine, int line, int state)
 		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 }
 
-void ti990_set_int2(const device_config *device, int state)
+void ti990_set_int2(running_device *device, int state)
 {
 	ti990_set_int_line(device->machine, 2, state);
 }
@@ -101,7 +101,7 @@ void ti990_line_interrupt(running_machine *machine)
 		ti990_set_int_line(machine, 5, 1);
 }
 
-void ti990_ckon_ckof_callback(const device_config *device, int state)
+void ti990_ckon_ckof_callback(running_device *device, int state)
 {
 	ckon_state = state;
 	if (! ckon_state)

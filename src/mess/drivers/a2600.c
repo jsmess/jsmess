@@ -106,7 +106,7 @@ static struct DPC {
 	emu_timer	*oscillator;
 } dpc;
 
-static UINT8* extra_RAM;
+static region_info* extra_RAM;
 static UINT8* bank_base[5];
 static UINT8* ram_base;
 static UINT8* riot_ram;
@@ -678,7 +678,7 @@ static void mode3E_switch(running_machine *machine, UINT16 offset, UINT8 data)
 }
 static void mode3E_RAM_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
-	ram_base = extra_RAM + 0x200 * ( data & 0x3F );
+	ram_base = extra_RAM->base.u8 + 0x200 * ( data & 0x3F );
 	memory_set_bankptr(machine,"bank1", ram_base );
 	mode3E_ram_enabled = 1;
 }
@@ -792,43 +792,43 @@ static READ8_HANDLER(modeSS_r)
 		switch ( modeSS_byte & 0x1C )
 		{
 		case 0x00:
-			bank_base[1] = extra_RAM + 2 * 0x800;
+			bank_base[1] = extra_RAM->base.u8 + 2 * 0x800;
 			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "maincpu") + 0x1800 : memory_region(space->machine, "user1");
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x04:
-			bank_base[1] = extra_RAM;
+			bank_base[1] = extra_RAM->base.u8;
 			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "maincpu") + 0x1800 : memory_region(space->machine, "user1");
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x08:
-			bank_base[1] = extra_RAM + 2 * 0x800;
-			bank_base[2] = extra_RAM;
+			bank_base[1] = extra_RAM->base.u8 + 2 * 0x800;
+			bank_base[2] = extra_RAM->base.u8;
 			modeSS_high_ram_enabled = 1;
 			break;
 		case 0x0C:
-			bank_base[1] = extra_RAM;
-			bank_base[2] = extra_RAM + 2 * 0x800;
+			bank_base[1] = extra_RAM->base.u8;
+			bank_base[2] = extra_RAM->base.u8 + 2 * 0x800;
 			modeSS_high_ram_enabled = 1;
 			break;
 		case 0x10:
-			bank_base[1] = extra_RAM + 2 * 0x800;
+			bank_base[1] = extra_RAM->base.u8 + 2 * 0x800;
 			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "maincpu") + 0x1800 : memory_region(space->machine, "user1");
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x14:
-			bank_base[1] = extra_RAM + 0x800;
+			bank_base[1] = extra_RAM->base.u8 + 0x800;
 			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "maincpu") + 0x1800 : memory_region(space->machine, "user1");
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x18:
-			bank_base[1] = extra_RAM + 2 * 0x800;
-			bank_base[2] = extra_RAM + 0x800;
+			bank_base[1] = extra_RAM->base.u8 + 2 * 0x800;
+			bank_base[2] = extra_RAM->base.u8 + 0x800;
 			modeSS_high_ram_enabled = 1;
 			break;
 		case 0x1C:
-			bank_base[1] = extra_RAM + 0x800;
-			bank_base[2] = extra_RAM + 2 * 0x800;
+			bank_base[1] = extra_RAM->base.u8 + 0x800;
+			bank_base[2] = extra_RAM->base.u8 + 2 * 0x800;
 			modeSS_high_ram_enabled = 1;
 			break;
 		}
@@ -838,7 +838,7 @@ static READ8_HANDLER(modeSS_r)
 		/* Check if we should stop the tape */
 		if ( cpu_get_pc(devtag_get_device(space->machine, "maincpu")) == 0x00FD )
 		{
-			const device_config *img = devtag_get_device(space->machine, "cassette");
+			running_device *img = devtag_get_device(space->machine, "cassette");
 			if ( img )
 			{
 				cassette_change_state(img, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -1563,7 +1563,7 @@ static const struct tia_interface tia_interface_pal =
 
 static MACHINE_START( a2600 )
 {
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 	current_screen_height = video_screen_get_height(screen);
 	extra_RAM = memory_region_alloc( machine, "user2", 0x8600, ROM_REQUIRED );
 	tia_init( machine, &tia_interface );
@@ -1573,7 +1573,7 @@ static MACHINE_START( a2600 )
 
 static MACHINE_START( a2600p )
 {
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 	current_screen_height = video_screen_get_height(screen);
 	extra_RAM = memory_region_alloc( machine, "user2", 0x8600, ROM_REQUIRED );
 	tia_init( machine, &tia_interface_pal );
@@ -1875,7 +1875,7 @@ static MACHINE_RESET( a2600 )
 
 	case modeSS:
 		memory_install_read8_handler(space, 0x1000, 0x1fff, 0, 0, modeSS_r);
-		bank_base[1] = extra_RAM + 2 * 0x800;
+		bank_base[1] = extra_RAM->base.u8 + 2 * 0x800;
 		bank_base[2] = CART;
 		memory_set_bankptr(machine, "bank1", bank_base[1] );
 		memory_set_bankptr(machine, "bank2", bank_base[2] );
@@ -1948,7 +1948,7 @@ static MACHINE_RESET( a2600 )
 	}
 
 	/* Banks may have changed, reset the cpu so it uses the correct reset vector */
-	device_reset( devtag_get_device(machine, "maincpu") );
+	devtag_get_device(machine, "maincpu")->reset();
 }
 
 

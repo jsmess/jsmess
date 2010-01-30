@@ -8,7 +8,7 @@ MACHINE_RESET( amigacd );
 /* 6525tpi */
 READ8_DEVICE_HANDLER( amigacd_tpi6525_portc_r );
 WRITE8_DEVICE_HANDLER( amigacd_tpi6525_portb_w );
-void amigacd_tpi6525_irq(const device_config *device, int level);
+void amigacd_tpi6525_irq(running_device *device, int level);
 
 
 #endif /* __AMIGACD_H__ */

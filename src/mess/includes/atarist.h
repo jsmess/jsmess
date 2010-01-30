@@ -129,10 +129,10 @@ struct _atarist_state
 	int dmasnd_active;
 
 	/* devices */
-	const device_config *mc68901;
-	const device_config *lmc1992;
-	const device_config *wd1772;
-	const device_config *centronics;
+	running_device *mc68901;
+	running_device *lmc1992;
+	running_device *wd1772;
+	running_device *centronics;
 
 	/* timers */
 	emu_timer *glue_timer;

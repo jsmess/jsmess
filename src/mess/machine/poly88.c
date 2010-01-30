@@ -234,7 +234,7 @@ INTERRUPT_GEN( poly88_interrupt )
 	int_vector = 0xf7;
 	cpu_set_input_line(device, 0, HOLD_LINE);
 }
-static void poly88_usart_rxready (const device_config *device, int state)
+static void poly88_usart_rxready (running_device *device, int state)
 {
 	//int_vector = 0xe7;
 	//cpu_set_input_line(device, 0, HOLD_LINE);
@@ -329,6 +329,6 @@ SNAPSHOT_LOAD( poly88 )
 		}
 		pos+=recordLen;
 	}
-	device_reset(devtag_get_device(image->machine, "uart"));
+	devtag_get_device(image->machine, "uart")->reset();
 	return INIT_PASS;
 }

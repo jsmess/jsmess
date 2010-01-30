@@ -55,6 +55,6 @@ READ8_DEVICE_HANDLER( sed1330_data_r );
 WRITE8_DEVICE_HANDLER( sed1330_data_w );
 
 /* screen update */
-void sed1330_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
+void sed1330_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 #endif

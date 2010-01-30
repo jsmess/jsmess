@@ -208,16 +208,18 @@ BOOL DevView_SetDriver(HWND hwndDevView, const software_config *config)
 		// get the names of all of the devices
 		ppszDevices = (LPTSTR *) alloca(nDevCount * sizeof(*ppszDevices));
 		i = 0;
-
-		for (dev = image_device_first(pDevViewInfo->config->mconfig); dev != NULL; dev = image_device_next(dev))
+		for (dev = pDevViewInfo->config->mconfig->devicelist.first();dev != NULL;dev = dev->next)
 		{
-			image_device_info info = image_device_getinfo(pDevViewInfo->config->mconfig, dev);
+			if (is_image_device(dev))
+			{	
+				image_device_info info = image_device_getinfo(pDevViewInfo->config->mconfig, dev);
 
-			s = tstring_from_utf8(info.name);
-			ppszDevices[i] = (TCHAR*)alloca((_tcslen(s) + 1) * sizeof(TCHAR));
-			_tcscpy(ppszDevices[i], s);
-			global_free(s);
-			i++;
+				s = tstring_from_utf8(info.name);
+				ppszDevices[i] = (TCHAR*)alloca((_tcslen(s) + 1) * sizeof(TCHAR));
+				_tcscpy(ppszDevices[i], s);
+				global_free(s);
+				i++;
+			}
 		}
 
 		// Calculate the requisite size for the device column
@@ -245,43 +247,46 @@ BOOL DevView_SetDriver(HWND hwndDevView, const software_config *config)
 		DevView_GetColumns(hwndDevView, &nStaticPos, &nStaticWidth,
 			&nEditPos, &nEditWidth, &nButtonPos, &nButtonWidth);
 
-		for (dev = image_device_first(pDevViewInfo->config->mconfig); dev != NULL; dev = image_device_next(dev))
+		for (dev = pDevViewInfo->config->mconfig->devicelist.first();dev != NULL;dev = dev->next)
 		{
-			image_device_info info = image_device_getinfo(pDevViewInfo->config->mconfig, dev);
+			if (is_image_device(dev))
+			{	
+				image_device_info info = image_device_getinfo(pDevViewInfo->config->mconfig, dev);
 
-			pEnt->dev = dev;
+				pEnt->dev = dev;
 
-			pEnt->hwndStatic = win_create_window_ex_utf8(0, "STATIC", info.name,
-				WS_VISIBLE | WS_CHILD, nStaticPos, y, nStaticWidth, nHeight,
-				hwndDevView, NULL, NULL, NULL);
+				pEnt->hwndStatic = win_create_window_ex_utf8(0, "STATIC", info.name,
+					WS_VISIBLE | WS_CHILD, nStaticPos, y, nStaticWidth, nHeight,
+					hwndDevView, NULL, NULL, NULL);
 
-			pEnt->hwndEdit = win_create_window_ex_utf8(0, "EDIT", "",
-				WS_VISIBLE | WS_CHILD | WS_BORDER | ES_AUTOHSCROLL, nEditPos, y, nEditWidth, nHeight,
-				hwndDevView, NULL, NULL, NULL);
+				pEnt->hwndEdit = win_create_window_ex_utf8(0, "EDIT", "",
+					WS_VISIBLE | WS_CHILD | WS_BORDER | ES_AUTOHSCROLL, nEditPos, y, nEditWidth, nHeight,
+					hwndDevView, NULL, NULL, NULL);
 
-			pEnt->hwndBrowseButton = win_create_window_ex_utf8(0, "BUTTON", "...",
-				WS_VISIBLE | WS_CHILD, nButtonPos, y, nButtonWidth, nHeight,
-				hwndDevView, NULL, NULL, NULL);
+				pEnt->hwndBrowseButton = win_create_window_ex_utf8(0, "BUTTON", "...",
+					WS_VISIBLE | WS_CHILD, nButtonPos, y, nButtonWidth, nHeight,
+					hwndDevView, NULL, NULL, NULL);
 
-			if (pEnt->hwndStatic)
-			{
-				SendMessage(pEnt->hwndStatic, WM_SETFONT, (WPARAM) pDevViewInfo->hFont, TRUE);
+				if (pEnt->hwndStatic)
+				{
+					SendMessage(pEnt->hwndStatic, WM_SETFONT, (WPARAM) pDevViewInfo->hFont, TRUE);
+				}
+				if (pEnt->hwndEdit)
+				{
+					SendMessage(pEnt->hwndEdit, WM_SETFONT, (WPARAM) pDevViewInfo->hFont, TRUE);
+					l = (LONG_PTR) DevView_EditWndProc;
+					l = SetWindowLongPtr(pEnt->hwndEdit, GWLP_WNDPROC, l);
+					pEnt->pfnEditWndProc = (WNDPROC) l;
+					SetWindowLongPtr(pEnt->hwndEdit, GWLP_USERDATA, (LONG_PTR) pEnt);
+				}
+				if (pEnt->hwndBrowseButton)
+				{
+					SetWindowLongPtr(pEnt->hwndBrowseButton, GWLP_USERDATA, (LONG_PTR) pEnt);
+				}
+
+				y += nHeight;
+				pEnt++;
 			}
-			if (pEnt->hwndEdit)
-			{
-				SendMessage(pEnt->hwndEdit, WM_SETFONT, (WPARAM) pDevViewInfo->hFont, TRUE);
-				l = (LONG_PTR) DevView_EditWndProc;
-				l = SetWindowLongPtr(pEnt->hwndEdit, GWLP_WNDPROC, l);
-				pEnt->pfnEditWndProc = (WNDPROC) l;
-				SetWindowLongPtr(pEnt->hwndEdit, GWLP_USERDATA, (LONG_PTR) pEnt);
-			}
-			if (pEnt->hwndBrowseButton)
-			{
-				SetWindowLongPtr(pEnt->hwndBrowseButton, GWLP_USERDATA, (LONG_PTR) pEnt);
-			}
-
-			y += nHeight;
-			pEnt++;
 		}
 	}
 

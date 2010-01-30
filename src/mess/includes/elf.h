@@ -17,11 +17,11 @@ struct _elf2_state
 	UINT8 data;
 
 	/* devices */
-	const device_config *cdp1861;
-	const device_config *mm74c923;
-	const device_config *dm9368_l;
-	const device_config *dm9368_h;
-	const device_config *cassette;
+	running_device *cdp1861;
+	running_device *mm74c923;
+	running_device *dm9368_l;
+	running_device *dm9368_h;
+	running_device *cassette;
 };
 
 #endif

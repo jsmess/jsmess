@@ -136,7 +136,7 @@ void vic6561_init (int (*dma_read) (running_machine *machine, int), int (*dma_re
 
 static VIDEO_START( vic6560 )
 {
-	const device_config *screen = video_screen_first(machine->config);
+	running_device *screen = video_screen_first(machine);
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 

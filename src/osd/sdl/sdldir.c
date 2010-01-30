@@ -9,21 +9,23 @@
 //
 //============================================================
 
+#ifndef _LARGEFILE64_SOURCE
 #define _LARGEFILE64_SOURCE
+#endif
+
 #ifdef SDLMAME_LINUX
 #define __USE_LARGEFILE64
 #endif
 #ifndef SDLMAME_BSD
+#ifdef _XOPEN_SOURCE
+#undef _XOPEN_SOURCE
+#endif
 #define _XOPEN_SOURCE 500
 #endif
 
-#include <sys/types.h>
+//#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #ifndef __USE_BSD
 #define __USE_BSD	// to get DT_xxx on Linux
 #endif
@@ -31,6 +33,7 @@
 #include <dirent.h>
 
 #include "osdcore.h"
+#include "sdlos.h"
 
 #if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
 #define PATHSEPCH '\\'
@@ -70,7 +73,7 @@ static osd_dir_entry_type get_attributes_stat(const char *file)
 #else
 	struct stat64 st;
 	if(stat64(file, &st))
-		return 0;
+		return ENTTYPE_NONE;
 #endif
 
 #ifdef SDLMAME_WIN32
@@ -107,20 +110,20 @@ osd_directory *osd_opendir(const char *dirname)
 	char *tmpstr, *envstr;
 	int i, j;
 
-	dir = (osd_directory *) malloc(sizeof(osd_directory));
+	dir = (osd_directory *) osd_malloc(sizeof(osd_directory));
 	if (dir)
 	{
 		memset(dir, 0, sizeof(osd_directory));
 		dir->fd = NULL;
 	}
 
-	tmpstr = (char *) malloc(strlen(dirname)+1);
+	tmpstr = (char *) osd_malloc(strlen(dirname)+1);
 	strcpy(tmpstr, dirname);
 
 	if (tmpstr[0] == '$')
 	{
 		char *envval;
-		envstr = (char *) malloc(strlen(tmpstr)+1);
+		envstr = (char *) osd_malloc(strlen(tmpstr)+1);
 
 		strcpy(envstr, tmpstr);
 
@@ -132,12 +135,12 @@ osd_directory *osd_opendir(const char *dirname)
 
 		envstr[i] = '\0';
 
-		envval = getenv(&envstr[1]);
+		envval = osd_getenv(&envstr[1]);
 		if (envval != NULL)
 		{
 			j = strlen(envval) + strlen(tmpstr) + 1;
-			free(tmpstr);
-			tmpstr = (char *) malloc(j);
+			osd_free(tmpstr);
+			tmpstr = (char *) osd_malloc(j);
 
 			// start with the value of $HOME
 			strcpy(tmpstr, envval);
@@ -148,19 +151,19 @@ osd_directory *osd_opendir(const char *dirname)
 		}
 		else
 			fprintf(stderr, "Warning: osd_opendir environment variable %s not found.\n", envstr);
-		free(envstr);
+		osd_free(envstr);
 	}
 
 	dir->fd = opendir(tmpstr);
 
 	if (dir && (dir->fd == NULL))
 	{
-		free(dir);
+		osd_free(dir);
 		dir = NULL;
 	}
 
 	if (tmpstr)
-	  free(tmpstr);
+	  osd_free(tmpstr);
 	return dir;
 }
 
@@ -199,6 +202,6 @@ void osd_closedir(osd_directory *dir)
 {
 	if (dir->fd != NULL)
 		closedir(dir->fd);
-	free(dir);
+	osd_free(dir);
 }
 

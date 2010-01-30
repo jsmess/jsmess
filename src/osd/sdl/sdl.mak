@@ -33,7 +33,8 @@
 
 # NO_OPENGL = 1
 
-# uncomment next line to build without X11 support
+# uncomment next line to build without X11 support (TARGETOS=unix only)
+# this also implies, that no debugger will be builtin.
 
 # NO_X11 = 1
 
@@ -52,12 +53,18 @@ USE_DISPATCH_GL = 1
 # There is no need to play with this option unless you are doing
 # active development on sdlmame or SDL.
 
-ifneq ($(TARGETOS),win32)
-
+ifeq ($(TARGETOS),win32)
 #SDL_INSTALL_ROOT = /usr/local/sdl13w32
+else
 #SDL_INSTALL_ROOT = /usr/local/sdl13
 #SDL_INSTALL_ROOT = /usr/local/test
 endif
+
+# uncomment and change the next line to build the gtk debugger for win32
+# Get what you need here: http://www.gtk.org/download-windows.html
+# GTK_INSTALL_ROOT = y:/couriersud/win/gtk-32
+
+
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
@@ -84,7 +91,6 @@ ifeq ($(DISTRO),ubuntu-intrepid)
 # Force gcc-4.2 on ubuntu-intrepid
 CC = @gcc -V 4.2
 LD = g++-4.2
-#LDFLAGS += -lsupc++ -static-libgcc
 else
 ifeq ($(DISTRO),gcc44-generic)
 CC = @gcc -V 4.4
@@ -118,83 +124,120 @@ endif
 # compile and linking flags
 #-------------------------------------------------
 
-ifdef SYMBOLS
-ifdef BIGENDIAN
-ifeq ($(TARGETOS),macosx)
-CCOMFLAGS += -mlong-branch
-endif	# macosx
-endif	# PPC
-endif	# SYMBOLS
-
-# add an ARCH define
-DEFS += "-DSDLMAME_ARCH=$(ARCHOPTS)" -DSYNC_IMPLEMENTATION=$(SYNC_IMPLEMENTATION)
-
-# add SDLMAME TARGETOS definitions
+# add SDLMAME BASE_TARGETOS definitions
 
 ifeq ($(TARGETOS),unix)
+BASE_TARGETOS = unix
+SYNC_IMPLEMENTATION = tc
+endif
+
+ifeq ($(TARGETOS),linux)
+BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = tc
 endif
 
 ifeq ($(TARGETOS),freebsd)
-TARGETOS = unix
-SYNC_IMPLEMENTATION = ntc
+BASE_TARGETOS = unix
+SYNC_IMPLEMENTATION = tc
+DEFS += -DNO_AFFINITY_NP
+# /usr/local/include is not considered a system include directory
+# on FreeBSD. GL.h resides there and throws warnings
+CCOMFLAGS += -isystem /usr/local/include
+# No clue here. There is a popmessage(NULL) in uimenu.c which
+# triggers a non-null format warning on FreeBSD only.
+CCOMFLAGS += -Wno-format
 endif
 
 ifeq ($(TARGETOS),openbsd)
-TARGETOS = unix
+BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = ntc
 endif
 
 ifeq ($(TARGETOS),solaris)
-DEFS += -DNO_AFFINITY_NP -DNO_DEBUGGER -DSDLMAME_X11 -DSDLMAME_UNIX
+BASE_TARGETOS = unix
+DEFS += -DNO_AFFINITY_NP -UHAVE_VSNPRINTF -DNO_vsnprintf
 SYNC_IMPLEMENTATION = tc
 endif
 
-ifeq ($(TARGETOS),unix)
-DEFS += -DSDLMAME_UNIX
-ifndef NO_X11
-DEFS += -DSDLMAME_X11
-else
-DEFS += -DSDLMAME_NO_X11 -DNO_DEBUGGER
-endif
-endif
-
 ifeq ($(TARGETOS),macosx)
+BASE_TARGETOS = macosx
 DEFS += -DSDLMAME_UNIX -DSDLMAME_MACOSX
+DEBUGOBJS = $(SDLOBJ)/debugosx.o
 SYNC_IMPLEMENTATION = ntc
+SDLMAIN = $(SDLOBJ)/SDLMain_tmpl.o
+SDLUTILMAIN = $(SDLOBJ)/SDLMain_tmpl.o
 MAINLDFLAGS = -Xlinker -all_load
+NO_X11 = 1
 ifdef BIGENDIAN
-PPC=1
-endif
-ifdef PPC
-ifdef PTR64
+ifdef SYMBOLS
+CCOMFLAGS += -mlong-branch
+endif	# SYMBOLS
+ifeq ($(PTR64),1)
 CCOMFLAGS += -arch ppc64
 LDFLAGS += -arch ppc64
 else
 CCOMFLAGS += -arch ppc
 LDFLAGS += -arch ppc
 endif
-else
-ifdef PTR64
+else	# BIGENDIAN
+ifeq ($(PTR64),1)
 CCOMFLAGS += -arch x86_64
 LDFLAGS += -arch x86_64
 else
 CCOMFLAGS += -m32 -arch i386
 LDFLAGS += -m32 -arch i386
 endif
-endif
+endif	# BIGENDIAN
+
 endif
 
 ifeq ($(TARGETOS),win32)
-DEFS += -DSDLMAME_WIN32 -DNO_DEBUGGER -DX64_WINDOWS_ABI
+BASE_TARGETOS = win32
 SYNC_IMPLEMENTATION = win32
+NO_X11 = 1
+DEFS += -DSDLMAME_WIN32 -DX64_WINDOWS_ABI
+LIBGL = -lopengl32
+SDLMAIN = $(SDLOBJ)/main.o
+# needed for unidasm
+LDFLAGS += -Wl,--allow-multiple-definition
+
+# do we have GTK ?
+ifndef GTK_INSTALL_ROOT
+NO_DEBUGGER = 1
+else
+DEBUGOBJS = $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
+LIBS += -lgtk-win32-2.0 -lgdk-win32-2.0 -lgmodule-2.0 -lglib-2.0 -lgobject-2.0 \
+	-lpango-1.0 -latk-1.0 -lgdk_pixbuf-2.0
+CCOMFLAGS += -mms-bitfields \
+	-I$(GTK_INSTALL_ROOT)/include/gtk-2.0 -I$(GTK_INSTALL_ROOT)/include/glib-2.0 \
+	-I$(GTK_INSTALL_ROOT)/include/cairo -I$(GTK_INSTALL_ROOT)/include/pango-1.0 \
+	-I$(GTK_INSTALL_ROOT)/include/atk-1.0 \
+	-I$(GTK_INSTALL_ROOT)/lib/glib-2.0/include -I$(GTK_INSTALL_ROOT)/lib/gtk-2.0/include
+LDFLAGS += -L$(GTK_INSTALL_ROOT)/lib
+endif # GTK_INSTALL_ROOT
+
+# enable UNICODE
+DEFS += -Dmain=utf8_main -DUNICODE -D_UNICODE
+LDFLAGS += -municode
+
 endif
 
 ifeq ($(TARGETOS),os2)
-DEFS += -DSDLMAME_OS2 -DNO_DEBUGGER
+BASE_TARGETOS = os2
+DEFS += -DSDLMAME_OS2
 SYNC_IMPLEMENTATION = os2
+NO_DEBUGGER = 1
+NO_X11 = 1
 # OS/2 can't have OpenGL (aww)
 NO_OPENGL = 1
+endif
+
+#-------------------------------------------------
+# Sanity checks
+#-------------------------------------------------
+
+ifeq ($(BASE_TARGETOS),)
+$(error $(TARGETOS) not supported !)
 endif
 
 #-------------------------------------------------
@@ -206,8 +249,6 @@ SDLOBJ = $(OBJ)/osd/$(OSD)
 
 OBJDIRS += $(SDLOBJ)
 
-SDLMAIN =
-
 #-------------------------------------------------
 # OSD core library
 #-------------------------------------------------
@@ -216,7 +257,8 @@ OSDCOREOBJS = \
 	$(SDLOBJ)/strconv.o	\
 	$(SDLOBJ)/sdldir.o	\
 	$(SDLOBJ)/sdlfile.o 	\
-	$(SDLOBJ)/sdlos_$(TARGETOS).o	\
+	$(SDLOBJ)/sdlmisc_$(BASE_TARGETOS).o	\
+	$(SDLOBJ)/sdlos_$(BASE_TARGETOS).o	\
 	$(SDLOBJ)/sdlsync_$(SYNC_IMPLEMENTATION).o     \
 	$(SDLOBJ)/sdlwork.o
 
@@ -226,15 +268,25 @@ OSDOBJS = \
 	$(SDLMAIN) \
 	$(SDLOBJ)/sdlmain.o \
 	$(SDLOBJ)/input.o \
-	$(SDLOBJ)/sound.o  $(SDLOBJ)/video.o \
-	$(SDLOBJ)/drawsdl.o $(SDLOBJ)/window.o $(SDLOBJ)/output.o \
+	$(SDLOBJ)/sound.o  \
+	$(SDLOBJ)/video.o \
+	$(SDLOBJ)/drawsdl.o \
+	$(SDLOBJ)/window.o \
+	$(SDLOBJ)/output.o
 
-
-#	$(SDLMAIN) \
-
+# Add SDL1.3 support
 ifdef SDL_INSTALL_ROOT
 OSDOBJS += $(SDLOBJ)/draw13.o
 endif
+
+# add an ARCH define
+DEFS += "-DSDLMAME_ARCH=$(ARCHOPTS)" -DSYNC_IMPLEMENTATION=$(SYNC_IMPLEMENTATION)
+
+#-------------------------------------------------
+# Generic defines and additions
+#-------------------------------------------------
+
+OSDCLEAN = sdlclean
 
 # add the debugger includes
 CCOMFLAGS += -Isrc/debug
@@ -242,119 +294,89 @@ CCOMFLAGS += -Isrc/debug
 # add the prefix file
 CCOMFLAGS += -include $(SDLSRC)/sdlprefix.h
 
-ifdef NO_OPENGL
-DEFS += -DUSE_OPENGL=0
-LIBGL=
-else
-OSDOBJS += $(SDLOBJ)/drawogl.o $(SDLOBJ)/gl_shader_tool.o $(SDLOBJ)/gl_shader_mgr.o
-DEFS += -DUSE_OPENGL=1
-ifeq ($(TARGETOS),win32)
-LIBGL=-lGL
-else
-ifdef USE_DISPATCH_GL
-DEFS += -DUSE_DISPATCH_GL=1
-else
-LIBGL=-lGL
-endif
-endif
-endif
-
 #-------------------------------------------------
-# specific configurations
+# BASE_TARGETOS specific configurations
 #-------------------------------------------------
 
-# Unix: add the necessary libraries
-ifeq ($(TARGETOS),unix)
+#-------------------------------------------------
+# Unix
+#-------------------------------------------------
+ifeq ($(BASE_TARGETOS),unix)
 
+DEFS += -DSDLMAME_UNIX
+DEBUGOBJS = $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
+LIBGL = -lGL
+ifeq ($(NO_X11),1)
+NO_DEBUGGER = 1
+endif
+
+ifneq (,$(findstring ppc,$(UNAME)))
 # override for preprocessor weirdness on PPC Linux
-ifdef powerpc
-CCOMFLAGS += -Upowerpc
+CFLAGS += -Upowerpc
+SUPPORTSM32M64 = 1
 endif
 
-ifndef USE_DISPATCH_GL
-ifdef MESA_INSTALL_ROOT
-LIBS += -L$(MESA_INSTALL_ROOT)/lib
-LDFLAGS += -Wl,-rpath=$(MESA_INSTALL_ROOT)/lib
-CCOMFLAGS += -I$(MESA_INSTALL_ROOT)/include
+ifneq (,$(findstring amd64,$(UNAME)))
+SUPPORTSM32M64 = 1
+endif
+ifneq (,$(findstring x86_64,$(UNAME)))
+SUPPORTSM32M64 = 1
+endif
+ifneq (,$(findstring i386,$(UNAME)))
+SUPPORTSM32M64 = 1
+endif
+
+ifeq ($(SUPPORTSM32M64),1)
+ifeq ($(PTR64),1)
+CCOMFLAGS += -m64
+LDFLAGS += -m64
+else
+CCOMFLAGS += -m32
+LDFLAGS += -m32
 endif
 endif
 
 ifndef SDL_INSTALL_ROOT
 CCOMFLAGS += `sdl-config --cflags`
-LIBS += -lm `sdl-config --libs` $(LIBGL)
+LIBS += -lm `sdl-config --libs`
 else
 CCOMFLAGS += -I$(SDL_INSTALL_ROOT)/include -D_GNU_SOURCE=1
-#LIBS += -L/opt/intel/cce/9.1.051/lib  -limf -L$(SDL_INSTALL_ROOT)/lib -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL $(LIBGL)
-LIBS += -lm -L$(SDL_INSTALL_ROOT)/lib -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL -lpthread $(LIBGL)
+LIBS += -lm -L$(SDL_INSTALL_ROOT)/lib -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL
 endif
 
-ifndef NO_X11
-LIBS += -lX11 -lXinerama
-endif
-
-# the new debugger relies on GTK+ in addition to the base SDLMAME needs
-# Non-X11 builds can not use the debugger
-ifndef NO_X11
-OSDCOREOBJS += $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
-CCOMFLAGS += `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gconf-2.0`
-LIBS += `pkg-config --libs gtk+-2.0` `pkg-config --libs gconf-2.0`
-CCOMFLAGS += -DGTK_DISABLE_DEPRECATED
-else
-OSDCOREOBJS += $(SDLOBJ)/debugwin.o
-endif # NO_X11
-
-# make sure we can find X headers
-CCOMFLAGS += -I/usr/X11/include -I/usr/X11R6/include -I/usr/openwin/include
-# some systems still put important things in a different prefix
-ifndef NO_X11
-LIBS += -L/usr/X11/lib -L/usr/X11R6/lib -L/usr/openwin/lib
-endif
 endif # Unix
 
-# Solaris: add the necessary object
-ifeq ($(TARGETOS),solaris)
-OSDCOREOBJS += $(SDLOBJ)/debugwin.o
-
-# explicitly add some libs on Solaris
-LIBS += -lSDL -lX11 -lXinerama -lm
-endif # Solaris
+#-------------------------------------------------
+# Windows
+#-------------------------------------------------
 
 # Win32: add the necessary libraries
-ifeq ($(TARGETOS),win32)
+ifeq ($(BASE_TARGETOS),win32)
+
+# Add to osdcoreobjs so tools will build
+OSDCOREOBJS += $(SDLMAIN)
 
 ifdef SDL_INSTALL_ROOT
 CCOMFLAGS += -I$(SDL_INSTALL_ROOT)/include
 LIBS += -L$(SDL_INSTALL_ROOT)/lib
-# -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL $(LIBGL)
+#-Wl,-rpath,$(SDL_INSTALL_ROOT)/lib
 endif
 
+# LIBS += -lmingw32 -lSDL
+# Static linking
 
-OSDCOREOBJS += $(SDLOBJ)/main.o
-SDLMAIN = $(SDLOBJ)/main.o
-DEFS += -Dmain=utf8_main
-
-# enable UNICODE flags
-DEFS += -DUNICODE -D_UNICODE
-LDFLAGS += -municode
-
-# at least compile some stubs to link it
-OSDCOREOBJS += $(SDLOBJ)/debugwin.o
-
-#LIBS += -lmingw32 -lSDL -lopengl32
-
-# ensure we statically link the gcc runtime lib
 LDFLAGS += -static-libgcc
-
-# Static linking of SDL
 LIBS += -Wl,-Bstatic -lSDL -Wl,-Bdynamic
-LIBS += -lopengl32 -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
+LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
 
 endif	# Win32
 
-# Mac OS X: add the necessary libraries
-ifeq ($(TARGETOS),macosx)
-OSDCOREOBJS += $(SDLOBJ)/osxutils.o
-OSDOBJS += $(SDLOBJ)/SDLMain_tmpl.o
+#-------------------------------------------------
+# Mac OS X
+#-------------------------------------------------
+
+ifeq ($(BASE_TARGETOS),macosx)
+#OSDCOREOBJS += $(SDLOBJ)/osxutils.o
 
 ifndef MACOSX_USE_LIBSDL
 # Compile using framework (compile using libSDL is the exception)
@@ -370,46 +392,110 @@ CCOMFLAGS += `sdl-config --cflags | sed 's:/SDL::'` -DNO_SDL_GLEXT
 LIBS += `sdl-config --libs | sed 's/-lSDLmain//'` -lpthread
 endif
 
-SDLMAIN = $(SDLOBJ)/SDLMain_tmpl.o
-
-# the newest debugger uses Cocoa
-OSDOBJS += $(SDLOBJ)/debugosx.o
 endif	# Mac OS X
 
-# OS2: add the necessary libraries
-ifeq ($(TARGETOS),os2)
-OSDCOREOBJS += $(SDLOBJ)/debugwin.o
+#-------------------------------------------------
+# OS/2
+#-------------------------------------------------
+
+ifeq ($(BASE_TARGETOS),os2)
 
 CCOMFLAGS += `sdl-config --cflags`
 LIBS += `sdl-config --libs`
 
+endif # OS2
+
+#-------------------------------------------------
+# Debugging
+#-------------------------------------------------
+
+ifeq ($(NO_DEBUGGER),1)
+DEFS += -DNO_DEBUGGER
+# debugwin compiles into a stub ...
+OSDOBJS += $(SDLOBJ)/debugwin.o
+else
+OSDOBJS += $(DEBUGOBJS)
+endif # NO_DEBUGGER
+
+#-------------------------------------------------
+# OPENGL
+#-------------------------------------------------
+
+ifeq ($(NO_OPENGL),1)
+DEFS += -DUSE_OPENGL=0
+else
+OSDOBJS += $(SDLOBJ)/drawogl.o $(SDLOBJ)/gl_shader_tool.o $(SDLOBJ)/gl_shader_mgr.o
+DEFS += -DUSE_OPENGL=1
+ifeq ($(USE_DISPATCH_GL),1)
+DEFS += -DUSE_DISPATCH_GL=1
+else
+LIBS += $(LIBGL)
+endif
+endif
+
+ifneq ($(USE_DISPATCH_GL),1)
+ifdef MESA_INSTALL_ROOT
+LIBS += -L$(MESA_INSTALL_ROOT)/lib
+LDFLAGS += -Wl,-rpath=$(MESA_INSTALL_ROOT)/lib
+CCOMFLAGS += -I$(MESA_INSTALL_ROOT)/include
+endif
+endif
+
+#-------------------------------------------------
+# X11
+#-------------------------------------------------
+
+ifeq ($(NO_X11),1)
+DEFS += -DSDLMAME_NO_X11
+else
+# Default libs
+DEFS += -DSDLMAME_X11
+LIBS += -lX11 -lXinerama
+
+# the new debugger relies on GTK+ in addition to the base SDLMAME needs
+# Non-X11 builds can not use the debugger
+CCOMFLAGS += `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gconf-2.0`
+LIBS += `pkg-config --libs gtk+-2.0` `pkg-config --libs gconf-2.0`
+#CCOMFLAGS += -DGTK_DISABLE_DEPRECATED
+
+# some systems still put important things in a different prefix
+LIBS += -L/usr/X11/lib -L/usr/X11R6/lib -L/usr/openwin/lib
+# make sure we can find X headers
+CCOMFLAGS += -I/usr/X11/include -I/usr/X11R6/include -I/usr/openwin/include
+endif # NO_X11
+
+#-------------------------------------------------
+# Dependencies
+#-------------------------------------------------
+
+# due to quirks of using /bin/sh, we need to explicitly specify the current path
+CURPATH = ./
+
+ifeq ($(BASE_TARGETOS),os2)
 # to avoid name clash of '_brk'
 $(OBJ)/emu/cpu/h6280/6280dasm.o : CDEFS += -D__STRICT_ANSI__
 endif # OS2
 
-OSDCLEAN = sdlclean
-
-TOOLS += \
-	testkeys$(EXE)
-
 # drawSDL depends on the core software renderer, so make sure it exists
-$(SDLOBJ)/drawsdl.o : $(SRC)/emu/rendersw.c
+$(SDLOBJ)/drawsdl.o : $(SRC)/emu/rendersw.c $(SDLSRC)/drawogl.c $(SDLSRC)/texcopy.c
 
-$(SDLOBJ)/drawogl.o : $(SDLSRC)/drawogl.c $(SDLSRC)/texcopy.c
-
-# draw13 depends
+# draw13 depends on blit13.h
 $(SDLOBJ)/draw13.o : $(SDLSRC)/blit13.h
 
-# due to quirks of using /bin/sh, we need to explicitly specify the current path
-CURPATH = ./
+#$(OSDCOREOBJS): $(SDLSRC)/sdl.mak
+
+#$(OSDOBJS): $(SDLSRC)/sdl.mak
 
 $(LIBOCORE): $(OSDCOREOBJS)
 
 $(LIBOSD): $(OSDOBJS)
 
 #-------------------------------------------------
-# testkeys
+# Tools
 #-------------------------------------------------
+
+TOOLS += \
+	testkeys$(EXE)
 
 $(SDLOBJ)/testkeys.o: $(SDLSRC)/testkeys.c
 	@echo Compiling $<...
@@ -418,12 +504,20 @@ $(SDLOBJ)/testkeys.o: $(SDLSRC)/testkeys.c
 TESTKEYSOBJS = \
 	$(SDLOBJ)/testkeys.o \
 
-testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL) $(LIBOCORE)
+testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL) $(LIBOCORE) $(SDLUTILMAIN)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
-sdlclean:
-	rm -f .depend
+#-------------------------------------------------
+# clean up
+#-------------------------------------------------
+
+$(OSDCLEAN):
+	@rm -f .depend_*
+
+#-------------------------------------------------
+# various support targets
+#-------------------------------------------------
 
 testlib:
 	-echo LIBS: $(LIBS)
@@ -431,15 +525,25 @@ testlib:
 	-echo CORE: $(OSDCOREOBJS)
 
 ifneq ($(TARGETOS),win32)
-depend:
-	rm -f .depend
+BUILD_VERSION = $(shell grep 'build_version\[\] =' src/version.c | sed -e "s/.*= \"//g" -e "s/ .*//g")
+DISTFILES = test_dist.sh whatsnew.txt whatsnew_$(BUILD_VERSION).txt makefile  docs/ src/
+EXCLUDES = -x "*/.svn/*"
+
+zip:
+	zip -rq ../mame_$(BUILD_VERSION).zip $(DISTFILES) $(EXCLUDES)
+
+DEPENDFILE = .depend_$(EMULATOR)
+
+makedepend:
+	@echo Generating $(DEPENDFILE)
+	rm -f $(DEPENDFILE)
 	@for i in `find src -name "*.c"` ; do \
 		echo processing $$i; \
 		mt=`echo $$i | sed -e "s/\\.c/\\.o/" -e "s!^src/!$(OBJ)/!"` ; \
 		g++ -MM -MT $$mt $(CDEFS) $(CCOMFLAGS) $$i 2>/dev/null \
-		| sed -e "s!$$i!!g" >> .depend ; \
+		| sed -e "s!$$i!!g" >> $(DEPENDFILE) ; \
 	done
 
--include .depend
+-include $(DEPENDFILE)
 
 endif

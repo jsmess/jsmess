@@ -503,7 +503,7 @@ If you have the source listing or the Rom dump, please send us.
 	int i, buffer, /*byteCount,*/ sectorNmbr, /*sectorCount,*/ currentSector;
 	UINT8 kbcode;
 	static const UINT8 interleave[8] = {0,5,2,7,4,1,6,3};
-	const device_config *image;
+	running_device *image;
 	UINT8 *ram;
 
 	ram = memory_region(machine, "maincpu");

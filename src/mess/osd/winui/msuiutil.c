@@ -25,12 +25,15 @@ BOOL DriverHasDevice(const game_driver *gamedrv, iodevice_t type)
 	// allocate the machine config
 	config = machine_config_alloc(gamedrv->machine_config);
 
-	for (device = image_device_first(config); device != NULL; device = image_device_next(device))
+	for (device = config->devicelist.first(); device != NULL;device = device->next)
 	{
-		if (image_device_getinfo(config, device).type == type)
-		{
-			b = TRUE;
-			break;
+		if (is_image_device(device))
+		{			
+			if (image_device_getinfo(config, device).type == type)
+			{
+				b = TRUE;
+				break;
+			}
 		}
 	}
 

@@ -42,7 +42,7 @@ void spchroms_config(running_machine *machine, const spchroms_interface *intf)
 /*
     Read 'count' bits serially from speech ROM
 */
-int spchroms_read(const device_config *device, int count)
+int spchroms_read(running_device *device, int count)
 {
 	int val;
 
@@ -80,7 +80,7 @@ int spchroms_read(const device_config *device, int count)
 /*
     Write an address nibble to speech ROM
 */
-void spchroms_load_address(const device_config *device, int data)
+void spchroms_load_address(running_device *device, int data)
 {
 	/* tms5220 data sheet says that if we load only one 4-bit nibble, it won't work.
       This code does not care about this. */
@@ -93,7 +93,7 @@ void spchroms_load_address(const device_config *device, int data)
 /*
     Perform a read and branch command
 */
-void spchroms_read_and_branch(const device_config *device)
+void spchroms_read_and_branch(running_device *device)
 {
 	/* tms5220 data sheet says that if more than one speech ROM (tms6100) is present,
       there is a bus contention.  This code does not care about this. */

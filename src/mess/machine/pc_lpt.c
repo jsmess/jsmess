@@ -23,7 +23,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_lpt_ack_w );
 typedef struct _pc_lpt_state pc_lpt_state;
 struct _pc_lpt_state
 {
-	const device_config *centronics;
+	running_device *centronics;
 
 	devcb_resolved_write_line out_irq_func;
 
@@ -59,7 +59,7 @@ MACHINE_DRIVER_END
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE pc_lpt_state *get_safe_token(const device_config *device)
+INLINE pc_lpt_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -76,20 +76,18 @@ INLINE pc_lpt_state *get_safe_token(const device_config *device)
 static DEVICE_START( pc_lpt )
 {
 	pc_lpt_state *lpt = get_safe_token(device);
-	const pc_lpt_interface *intf = (const pc_lpt_interface *)device->static_config;
-	astring tempstring;
-
+	const pc_lpt_interface *intf = (const pc_lpt_interface *)device->baseconfig().static_config;
 	/* validate some basic stuff */
-	assert(device->static_config != NULL);
+	assert(device->baseconfig().static_config != NULL);
 
 	/* get centronics device */
-	lpt->centronics = devtag_get_device(device->machine, device_build_tag(tempstring, device, "centronics"));
+	lpt->centronics = device->subdevice("centronics");
 	assert(lpt->centronics != NULL);
 
 	/* make sure it's running */
 	if (!lpt->centronics->started)
 	{
-		device_delay_init(device);
+		//device_delay_init(device);
 		return;
 	}
 

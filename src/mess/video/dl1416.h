@@ -33,7 +33,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*dl1416_update_func)(const device_config *device, int digit, int data);
+typedef void (*dl1416_update_func)(running_device *device, int digit, int data);
 
 typedef struct _dl1416_interface dl1416_interface;
 struct _dl1416_interface

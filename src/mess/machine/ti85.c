@@ -469,7 +469,7 @@ READ8_HANDLER ( ti85_port_0006_r )
 
 READ8_HANDLER ( ti85_port_0007_r )
 {
-	const device_config *ti85serial = devtag_get_device(space->machine,"ti85serial");
+	running_device *ti85serial = devtag_get_device(space->machine,"ti85serial");
 
 	ti85_update_serial(ti85serial);
 	return (ti85_white_out<<3)
@@ -622,8 +622,8 @@ WRITE8_HANDLER ( ti85_port_0006_w )
 
 WRITE8_HANDLER ( ti85_port_0007_w )
 {
-	const device_config *speaker = devtag_get_device(space->machine, "speaker");
-	const device_config *ti85serial = devtag_get_device(space->machine, "ti85serial");
+	running_device *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *ti85serial = devtag_get_device(space->machine, "ti85serial");
 
 	speaker_level_w(speaker,( (data>>2)|(data>>3) )&0x01 );
 	ti85_red_out=(data>>2)&0x01;

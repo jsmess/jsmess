@@ -121,7 +121,7 @@ struct _cdp1871_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE cdp1871_t *get_safe_token(const device_config *device)
+INLINE cdp1871_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -129,11 +129,11 @@ INLINE cdp1871_t *get_safe_token(const device_config *device)
 	return (cdp1871_t *)device->token;
 }
 
-INLINE const cdp1871_interface *get_interface(const device_config *device)
+INLINE const cdp1871_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == CDP1871));
-	return (const cdp1871_interface *) device->static_config;
+	return (const cdp1871_interface *) device->baseconfig().static_config;
 }
 
 /***************************************************************************
@@ -145,7 +145,7 @@ INLINE const cdp1871_interface *get_interface(const device_config *device)
     state
 -------------------------------------------------*/
 
-static void change_output_lines(const device_config *device)
+static void change_output_lines(running_device *device)
 {
 	cdp1871_t *cdp1871 = get_safe_token(device);
 
@@ -169,7 +169,7 @@ static void change_output_lines(const device_config *device)
     scan counters
 -------------------------------------------------*/
 
-static void clock_scan_counters(const device_config *device)
+static void clock_scan_counters(running_device *device)
 {
 	cdp1871_t *cdp1871 = get_safe_token(device);
 
@@ -194,7 +194,7 @@ static void clock_scan_counters(const device_config *device)
     detect_keypress - detect key press
 -------------------------------------------------*/
 
-static void detect_keypress(const device_config *device)
+static void detect_keypress(running_device *device)
 {
 	cdp1871_t *cdp1871 = get_safe_token(device);
 
@@ -242,7 +242,7 @@ static void detect_keypress(const device_config *device)
 
 static TIMER_CALLBACK( cdp1871_scan_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 
 	change_output_lines(device);
 	clock_scan_counters(device);

@@ -30,13 +30,13 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef int (*device_image_load_func)(const device_config *image);
-typedef int (*device_image_create_func)(const device_config *image, int format_type, option_resolution *format_options);
-typedef void (*device_image_unload_func)(const device_config *image);
-typedef void (*device_display_func)(const device_config *image);
+typedef int (*device_image_load_func)(running_device *image);
+typedef int (*device_image_create_func)(running_device *image, int format_type, option_resolution *format_options);
+typedef void (*device_image_unload_func)(running_device *image);
+typedef void (*device_display_func)(running_device *image);
 typedef void (*device_image_partialhash_func)(char *, const unsigned char *, unsigned long, unsigned int);
-typedef const char *(*device_get_name_func)(const device_config *device, char *buffer, size_t buffer_length);
-typedef void (*device_get_image_devices_func)(const device_config *device, device_list *devlist);
+typedef const char *(*device_get_name_func)(running_device *device, char *buffer, size_t buffer_length);
+typedef void (*device_get_image_devices_func)(running_device *device, device_list *devlist);
 
 typedef enum
 {
@@ -162,11 +162,8 @@ void image_unload_all(running_machine *machine);
 
 /* ----- image device enumeration ----- */
 
-/* return the first device in the list that supports images */
-const device_config *image_device_first(const machine_config *config);
-
-/* return the next device in the list that supports images */
-const device_config *image_device_next(const device_config *prevdevice);
+int is_image_device(running_device *device);
+int is_image_device(const device_config *device);
 
 /* counts the number of devices that support images */
 int image_device_count(const machine_config *config);
@@ -174,28 +171,30 @@ int image_device_count(const machine_config *config);
 /* ----- analysis ----- */
 
 /* returns info on a device - can be called by front end code */
+image_device_info image_device_getinfo(const machine_config *config, running_device *device);
 image_device_info image_device_getinfo(const machine_config *config, const device_config *device);
 
 /* checks to see if a particular devices uses a certain file extension */
+int image_device_uses_file_extension(running_device *device, const char *file_extension);
 int image_device_uses_file_extension(const device_config *device, const char *file_extension);
 
 /* compute a hash, using this device's partial hash if appropriate */
-void image_device_compute_hash(char *dest, const device_config *device,
+void image_device_compute_hash(char *dest, running_device *device,
     const void *data, size_t length, unsigned int functions);
 
 /* ----- creation formats ----- */
 
 /* accesses the creation option guide */
-const option_guide *image_device_get_creation_option_guide(const device_config *device);
+const option_guide *image_device_get_creation_option_guide(running_device *device);
 
 /* accesses the image formats available for image creation */
-const image_device_format *image_device_get_creatable_formats(const device_config *device);
+const image_device_format *image_device_get_creatable_formats(running_device *device);
 
 /* accesses a specific image format available for image creation by index */
-const image_device_format *image_device_get_indexed_creatable_format(const device_config *device, int index);
+const image_device_format *image_device_get_indexed_creatable_format(running_device *device, int index);
 
 /* accesses a specific image format available for image creation by name */
-const image_device_format *image_device_get_named_creatable_format(const device_config *device, const char *format_name);
+const image_device_format *image_device_get_named_creatable_format(running_device *device, const char *format_name);
 
 
 
@@ -208,21 +207,21 @@ const image_device_format *image_device_get_named_creatable_format(const device_
 ****************************************************************************/
 
 /* can be called by front ends */
-int image_load(const device_config *img, const char *name);
-int image_create(const device_config *img, const char *name, const image_device_format *create_format, option_resolution *create_args);
-void image_unload(const device_config *img);
+int image_load(running_device *img, const char *name);
+int image_create(running_device *img, const char *name, const image_device_format *create_format, option_resolution *create_args);
+void image_unload(running_device *img);
 
 /* special call - only use from core */
-int image_finish_load(const device_config *device);
+int image_finish_load(running_device *device);
 
 /* used to retrieve error information during image loading */
-const char *image_error(const device_config *img);
+const char *image_error(running_device *img);
 
 /* used to set the error that occured during image loading */
-void image_seterror(const device_config *img, image_error_t err, const char *message);
+void image_seterror(running_device *img, image_error_t err, const char *message);
 
 /* used to display a message while loading */
-void image_message(const device_config *device, const char *format, ...) ATTR_PRINTF(2,3);
+void image_message(running_device *device, const char *format, ...) ATTR_PRINTF(2,3);
 
 
 
@@ -232,40 +231,40 @@ void image_message(const device_config *device, const char *format, ...) ATTR_PR
   These provide information about the device; and about the mounted image
 ****************************************************************************/
 
-int image_exists(const device_config *image);
-int image_slotexists(const device_config *image);
+int image_exists(running_device *image);
+int image_slotexists(running_device *image);
 
-core_file *image_core_file(const device_config *image);
-const char *image_typename_id(const device_config *image);
-const char *image_filename(const device_config *image);
-const char *image_basename(const device_config *image);
-const char *image_basename_noext(const device_config *image);
-const char *image_filetype(const device_config *image);
-const char *image_filedir(const device_config *image);
-const char *image_working_directory(const device_config *image);
-void image_set_working_directory(const device_config *image, const char *working_directory);
-UINT64 image_length(const device_config *image);
-const char *image_hash(const device_config *image);
-UINT32 image_crc(const device_config *image);
+core_file *image_core_file(running_device *image);
+const char *image_typename_id(running_device *image);
+const char *image_filename(running_device *image);
+const char *image_basename(running_device *image);
+const char *image_basename_noext(running_device *image);
+const char *image_filetype(running_device *image);
+const char *image_filedir(running_device *image);
+const char *image_working_directory(running_device *image);
+void image_set_working_directory(running_device *image, const char *working_directory);
+UINT64 image_length(running_device *image);
+const char *image_hash(running_device *image);
+UINT32 image_crc(running_device *image);
 
-int image_is_writable(const device_config *image);
-int image_has_been_created(const device_config *image);
-void image_make_readonly(const device_config *image);
+int image_is_writable(running_device *image);
+int image_has_been_created(running_device *image);
+void image_make_readonly(running_device *image);
 
-UINT32 image_fread(const device_config *image, void *buffer, UINT32 length);
-UINT32 image_fwrite(const device_config *image, const void *buffer, UINT32 length);
-int image_fseek(const device_config *image, INT64 offset, int whence);
-UINT64 image_ftell(const device_config *image);
-int image_fgetc(const device_config *image);
-char *image_fgets(const device_config *image, char *s, UINT32 length);
-int image_feof(const device_config *image);
+UINT32 image_fread(running_device *image, void *buffer, UINT32 length);
+UINT32 image_fwrite(running_device *image, const void *buffer, UINT32 length);
+int image_fseek(running_device *image, INT64 offset, int whence);
+UINT64 image_ftell(running_device *image);
+int image_fgetc(running_device *image);
+char *image_fgets(running_device *image, char *s, UINT32 length);
+int image_feof(running_device *image);
 
-void *image_ptr(const device_config *image);
+void *image_ptr(running_device *image);
 
 
-UINT8 *image_get_software_region(const device_config *image, const char *tag);
-UINT32 image_get_software_region_length(const device_config *image, const char *tag);
-const software_entry *image_software_entry(const device_config *image);
+UINT8 *image_get_software_region(running_device *image, const char *tag);
+UINT32 image_get_software_region_length(running_device *image, const char *tag);
+const software_entry *image_software_entry(running_device *image);
 
 
 
@@ -277,10 +276,10 @@ const software_entry *image_software_entry(const device_config *image);
   able to eliminate the need for a unload function.
 ****************************************************************************/
 
-void *image_malloc(const device_config *img, size_t size) ATTR_MALLOC;
-char *image_strdup(const device_config *img, const char *src) ATTR_MALLOC;
-void *image_realloc(const device_config *img, void *ptr, size_t size);
-void image_freeptr(const device_config *img, void *ptr);
+void *image_malloc(running_device *img, size_t size) ATTR_MALLOC;
+char *image_strdup(running_device *img, const char *src) ATTR_MALLOC;
+void *image_realloc(running_device *img, void *ptr, size_t size);
+void image_freeptr(running_device *img, void *ptr);
 
 
 
@@ -291,12 +290,12 @@ void image_freeptr(const device_config *img, void *ptr);
   pertaining to that image in the CRC database
 ****************************************************************************/
 
-const char *image_longname(const device_config *device);
-const char *image_manufacturer(const device_config *device);
-const char *image_year(const device_config *device);
-const char *image_playable(const device_config *device);
-const char *image_pcb(const device_config *device);
-const char *image_extrainfo(const device_config *device);
+const char *image_longname(running_device *device);
+const char *image_manufacturer(running_device *device);
+const char *image_year(running_device *device);
+const char *image_playable(running_device *device);
+const char *image_pcb(running_device *device);
+const char *image_extrainfo(running_device *device);
 
 
 
@@ -310,8 +309,8 @@ const char *image_extrainfo(const device_config *device);
 void image_battery_load_by_name(const char *filename, void *buffer, int length);
 void image_battery_save_by_name(const char *filename, const void *buffer, int length);
 
-void image_battery_load(const device_config *img, void *buffer, int length);
-void image_battery_save(const device_config *img, const void *buffer, int length);
+void image_battery_load(running_device *img, void *buffer, int length);
+void image_battery_save(running_device *img, const void *buffer, int length);
 
 
 /****************************************************************************
@@ -320,8 +319,8 @@ void image_battery_save(const device_config *img, const void *buffer, int length
   These provide various ways of indexing images
 ****************************************************************************/
 
-int image_absolute_index(const device_config *image);
-const device_config *image_from_absolute_index(running_machine *machine, int absolute_index);
+int image_absolute_index(running_device *image);
+running_device *image_from_absolute_index(running_machine *machine, int absolute_index);
 
 
 
@@ -330,15 +329,15 @@ const device_config *image_from_absolute_index(running_machine *machine, int abs
 ****************************************************************************/
 
 #define DEVICE_IMAGE_LOAD_NAME(name)        device_load_##name
-#define DEVICE_IMAGE_LOAD(name)             int DEVICE_IMAGE_LOAD_NAME(name)(const device_config *image)
+#define DEVICE_IMAGE_LOAD(name)             int DEVICE_IMAGE_LOAD_NAME(name)(running_device *image)
 
 #define DEVICE_IMAGE_CREATE_NAME(name)      device_create_##name
-#define DEVICE_IMAGE_CREATE(name)           int DEVICE_IMAGE_CREATE_NAME(name)(const device_config *image, int create_format, option_resolution *create_args)
+#define DEVICE_IMAGE_CREATE(name)           int DEVICE_IMAGE_CREATE_NAME(name)(running_device *image, int create_format, option_resolution *create_args)
 
 #define DEVICE_IMAGE_UNLOAD_NAME(name)      device_unload_##name
-#define DEVICE_IMAGE_UNLOAD(name)           void DEVICE_IMAGE_UNLOAD_NAME(name)(const device_config *image)
+#define DEVICE_IMAGE_UNLOAD(name)           void DEVICE_IMAGE_UNLOAD_NAME(name)(running_device *image)
 
 #define DEVICE_GET_IMAGE_DEVICES_NAME(name) device_get_image_devices_##name
-#define DEVICE_GET_IMAGE_DEVICES(name)      void DEVICE_GET_IMAGE_DEVICES_NAME(name)(const device_config *device, device_list *devlist)
+#define DEVICE_GET_IMAGE_DEVICES(name)      void DEVICE_GET_IMAGE_DEVICES_NAME(name)(running_device *device, device_list *devlist)
 
 #endif /* __IMAGE_H__ */

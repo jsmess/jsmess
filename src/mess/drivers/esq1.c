@@ -57,7 +57,7 @@ TODO:
 #include "sound/es5503.h"
 #include "machine/68681.h"
 
-static void esq1_doc_irq(const device_config *device, int state)
+static void esq1_doc_irq(running_device *device, int state)
 {
 }
 
@@ -114,17 +114,17 @@ ADDRESS_MAP_END
 // OP5 = metronome hi
 // OP6/7 = tape out
 
-static void duart_irq_handler(const device_config *device, UINT8 vector)
+static void duart_irq_handler(running_device *device, UINT8 vector)
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
 };
 
-static UINT8 duart_input(const device_config *device)
+static UINT8 duart_input(running_device *device)
 {
 	return 0;
 }
 
-static void duart_output(const device_config *device, UINT8 data)
+static void duart_output(running_device *device, UINT8 data)
 {
 	int bank = ((data >> 1) & 0x7);
 
@@ -133,7 +133,7 @@ static void duart_output(const device_config *device, UINT8 data)
 	memory_set_bankptr(device->machine, "osbank", memory_region(device->machine, "osrom") + (bank * 0x1000) );
 }
 
-static void duart_tx(const device_config *device, int channel, UINT8 data)
+static void duart_tx(running_device *device, int channel, UINT8 data)
 {
 	if ((data != 0) && (channel == 1)) printf("[%d]: %02x %c\n", channel, data, data);
 }

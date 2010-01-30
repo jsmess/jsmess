@@ -250,7 +250,7 @@ static READ8_HANDLER( osi600_keyboard_r )
 
 static WRITE8_HANDLER( osi600_keyboard_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = devtag_get_device(space->machine, "discrete");
 	osi_state *state = (osi_state *)space->machine->driver_data;
 
 	state->keylatch = data;
@@ -282,7 +282,7 @@ static WRITE8_HANDLER( osi600_ctrl_w )
 
     */
 
-	const device_config *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = devtag_get_device(space->machine, "discrete");
 	osi_state *state = (osi_state *)space->machine->driver_data;
 
 	state->_32 = BIT(data, 0);
@@ -293,7 +293,7 @@ static WRITE8_HANDLER( osi600_ctrl_w )
 
 static WRITE8_HANDLER( osi630_ctrl_w )
 {
-	const device_config *speaker = devtag_get_device(space->machine, "beep");
+	running_device *speaker = devtag_get_device(space->machine, "beep");
 	/*
 
         bit     description
@@ -314,7 +314,7 @@ static WRITE8_HANDLER( osi630_ctrl_w )
 
 static WRITE8_HANDLER( osi630_sound_w )
 {
-	const device_config *speaker = devtag_get_device(space->machine, "beep");
+	running_device *speaker = devtag_get_device(space->machine, "beep");
 	if (data) beep_set_frequency(speaker, 49152/data);
 }
 
@@ -354,7 +354,7 @@ static WRITE8_HANDLER( osi630_sound_w )
     C011 ACIAIO         DISK CONTROLLER ACIA I/O PORT
 */
 
-static void osi470_index_callback(const device_config *controller, const device_config *img, int state)
+static void osi470_index_callback(running_device *controller, running_device *img, int state)
 {
 	osi_state *driver_state = (osi_state *)img->machine->driver_data;
 
@@ -922,7 +922,7 @@ ROM_END
 
 static TIMER_CALLBACK( setup_beep )
 {
-	const device_config *speaker = devtag_get_device(machine, "beep");
+	running_device *speaker = devtag_get_device(machine, "beep");
 	beep_set_state(speaker, 0);
 	beep_set_frequency(speaker, 300);
 }

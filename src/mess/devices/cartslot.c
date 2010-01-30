@@ -27,7 +27,7 @@ typedef enum _process_mode process_mode;
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE cartslot_t *get_token(const device_config *device)
+INLINE cartslot_t *get_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == CARTSLOT);
@@ -35,13 +35,19 @@ INLINE cartslot_t *get_token(const device_config *device)
 }
 
 
-INLINE const cartslot_config *get_config(const device_config *device)
+INLINE const cartslot_config *get_config(running_device *device)
+{
+	assert(device != NULL);
+	assert(device->type == CARTSLOT);
+	return (const cartslot_config *) device->baseconfig().inline_config;
+}
+
+INLINE const cartslot_config *get_config_dev(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->type == CARTSLOT);
 	return (const cartslot_config *) device->inline_config;
 }
-
 
 /***************************************************************************
     IMPLEMENTATION
@@ -51,7 +57,7 @@ INLINE const cartslot_config *get_config(const device_config *device)
     load_cartridge
 -------------------------------------------------*/
 
-static int load_cartridge(const device_config *device, const rom_entry *romrgn, const rom_entry *roment, process_mode mode)
+static int load_cartridge(running_device *device, const rom_entry *romrgn, const rom_entry *roment, process_mode mode)
 {
 	const char *region;
 	const char *type;
@@ -60,7 +66,7 @@ static int load_cartridge(const device_config *device, const rom_entry *romrgn, 
 	UINT8 *ptr;
 	UINT8 clear_val;
 	int datawidth, littleendian, i, j;
-	const device_config *cpu;
+	running_device *cpu;
 
 	region = ROMREGION_GETTAG(romrgn);
 	offset = ROM_GETOFFSET(roment);
@@ -104,8 +110,8 @@ static int load_cartridge(const device_config *device, const rom_entry *romrgn, 
 		cpu = devtag_get_device(device->machine, type);
 		if (cpu != NULL)
 		{
-			datawidth = cpu_get_databus_width(cpu, ADDRESS_SPACE_PROGRAM) / 8;
-			littleendian = (cpu_get_endianness(cpu) == ENDIANNESS_LITTLE);
+			datawidth = cpu->databus_width(AS_PROGRAM) / 8;
+			littleendian = (cpu->endianness() == ENDIANNESS_LITTLE);
 		}
 
 		/* swap the endianness if we need to */
@@ -140,7 +146,7 @@ static int load_cartridge(const device_config *device, const rom_entry *romrgn, 
     process_cartridge
 -------------------------------------------------*/
 
-static int process_cartridge(const device_config *image, process_mode mode)
+static int process_cartridge(running_device *image, process_mode mode)
 {
 	const rom_source *source;
 	const rom_entry *romrgn, *roment;
@@ -177,7 +183,7 @@ static int process_cartridge(const device_config *image, process_mode mode)
     cartslot_get_pcb
 -------------------------------------------------*/
 
-const device_config *cartslot_get_pcb(const device_config *device)
+running_device *cartslot_get_pcb(running_device *device)
 {
 	cartslot_t *cart = get_token(device);
 	return cart->pcb_device;
@@ -188,7 +194,7 @@ const device_config *cartslot_get_pcb(const device_config *device)
     cartslot_get_socket
 -------------------------------------------------*/
 
-void *cartslot_get_socket(const device_config *device, const char *socket_name)
+void *cartslot_get_socket(running_device *device, const char *socket_name)
 {
 	cartslot_t *cart = get_token(device);
 	void *result = NULL;
@@ -214,7 +220,7 @@ void *cartslot_get_socket(const device_config *device, const char *socket_name)
     cartslot_get_resource_length
 -------------------------------------------------*/
 
-int cartslot_get_resource_length(const device_config *device, const char *socket_name)
+int cartslot_get_resource_length(running_device *device, const char *socket_name)
 {
 	cartslot_t *cart = get_token(device);
 	int result = 0;
@@ -257,9 +263,7 @@ static DEVICE_START( cartslot )
 	}
 
 	/* find the PCB (if there is one) */
-	cart->pcb_device = devtag_get_device(
-		device->machine,
-		device_build_tag(tempstring, device, TAG_PCB));
+	cart->pcb_device = device->subdevice(TAG_PCB);
 
 done:
 	return;
@@ -324,7 +328,7 @@ static DEVICE_IMAGE_UNLOAD( cartslot )
     identify_pcb
 -------------------------------------------------*/
 
-static const cartslot_pcb_type *identify_pcb(const device_config *device)
+static const cartslot_pcb_type *identify_pcb(running_device *device)
 {
 	const cartslot_config *config = get_config(device);
 	astring pcb_name;
@@ -388,12 +392,7 @@ static DEVICE_GET_IMAGE_DEVICES(cartslot)
 	pcb_type = identify_pcb(device);
 	if (pcb_type != NULL)
 	{
-		device_list_add(
-			devlist,
-			device,
-			pcb_type->devtype,
-			device_build_tag(tempstring, device, TAG_PCB),
-			0);
+		//devlist->append(TAG_PCB, global_alloc(running_device(&device->baseconfig(), pcb_type->devtype, TAG_PCB, 0)));
 	}
 }
 
@@ -417,7 +416,7 @@ DEVICE_GET_INFO( cartslot )
 		case DEVINFO_INT_IMAGE_RESET_ON_LOAD:		info->i = 1; break;
 		case DEVINFO_INT_IMAGE_MUST_BE_LOADED:
 			if ( device && device->inline_config) {
-				info->i = get_config(device)->must_be_loaded;
+				info->i = get_config_dev(device)->must_be_loaded;
 			} else {
 				info->i = 0;
 			}
@@ -429,8 +428,8 @@ DEVICE_GET_INFO( cartslot )
 		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(cartslot);		break;
 		case DEVINFO_FCT_GET_IMAGE_DEVICES:			info->f = (genf *) DEVICE_GET_IMAGE_DEVICES_NAME(cartslot);	break;
 		case DEVINFO_FCT_IMAGE_PARTIAL_HASH:
-			if ( device && device->inline_config && get_config(device)->device_partialhash) {
-				info->f = (genf *) get_config(device)->device_partialhash;
+			if ( device && device->inline_config && get_config_dev(device)->device_partialhash) {
+				info->f = (genf *) get_config_dev(device)->device_partialhash;
 			} else {
 				info->f = NULL;
 			}
@@ -441,9 +440,9 @@ DEVICE_GET_INFO( cartslot )
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Cartslot"); break;
 		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__); break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:
-			if ( device && device->inline_config && get_config(device)->extensions )
+			if ( device && device->inline_config && get_config_dev(device)->extensions )
 			{
-				strcpy(info->s, get_config(device)->extensions);
+				strcpy(info->s, get_config_dev(device)->extensions);
 			}
 			else
 			{
@@ -451,9 +450,9 @@ DEVICE_GET_INFO( cartslot )
 			}
 			break;
 		case DEVINFO_STR_SOFTWARE_LIST:
-			if ( device && device->inline_config && get_config(device)->software_list_name )
+			if ( device && device->inline_config && get_config_dev(device)->software_list_name )
 			{
-				strcpy(info->s, get_config(device)->software_list_name );
+				strcpy(info->s, get_config_dev(device)->software_list_name );
 			}
 			break;
 	}

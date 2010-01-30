@@ -166,14 +166,14 @@ static WRITE8_HANDLER(gzu_w)
 
 static READ8_HANDLER(devices_r)
 {
-	const device_config *ppi1 = devtag_get_device(space->machine, "ppi8255_1");
-	const device_config *ppi2 = devtag_get_device(space->machine, "ppi8255_2");
-	const device_config *ppi3 = devtag_get_device(space->machine, "ppi8255_3");
-	const device_config *pit = devtag_get_device(space->machine, "pit8253");
-	const device_config *pic = devtag_get_device(space->machine, "pic8259");
-	const device_config *rs232 = devtag_get_device(space->machine, "rs232");
-	const device_config *lan = devtag_get_device(space->machine, "lan");
-	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *ppi1 = devtag_get_device(space->machine, "ppi8255_1");
+	running_device *ppi2 = devtag_get_device(space->machine, "ppi8255_2");
+	running_device *ppi3 = devtag_get_device(space->machine, "ppi8255_3");
+	running_device *pit = devtag_get_device(space->machine, "pit8253");
+	running_device *pic = devtag_get_device(space->machine, "pic8259");
+	running_device *rs232 = devtag_get_device(space->machine, "rs232");
+	running_device *lan = devtag_get_device(space->machine, "lan");
+	running_device *fdc = devtag_get_device(space->machine, "wd1793");
 
 	switch(offset & 0x38)
 	{
@@ -205,14 +205,14 @@ static READ8_HANDLER(devices_r)
 
 static WRITE8_HANDLER(devices_w)
 {
-	const device_config *ppi1 = devtag_get_device(space->machine, "ppi8255_1");
-	const device_config *ppi2 = devtag_get_device(space->machine, "ppi8255_2");
-	const device_config *ppi3 = devtag_get_device(space->machine, "ppi8255_3");
-	const device_config *pit = devtag_get_device(space->machine, "pit8253");
-	const device_config *pic = devtag_get_device(space->machine, "pic8259");
-	const device_config *rs232 = devtag_get_device(space->machine, "rs232");
-	const device_config *lan = devtag_get_device(space->machine, "lan");
-	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *ppi1 = devtag_get_device(space->machine, "ppi8255_1");
+	running_device *ppi2 = devtag_get_device(space->machine, "ppi8255_2");
+	running_device *ppi3 = devtag_get_device(space->machine, "ppi8255_3");
+	running_device *pit = devtag_get_device(space->machine, "pit8253");
+	running_device *pic = devtag_get_device(space->machine, "pic8259");
+	running_device *rs232 = devtag_get_device(space->machine, "rs232");
+	running_device *lan = devtag_get_device(space->machine, "lan");
+	running_device *fdc = devtag_get_device(space->machine, "wd1793");
 
 	switch(offset & 0x38)
 	{
@@ -874,7 +874,7 @@ static WRITE8_DEVICE_HANDLER(pk8020_portc_w)
 
 static WRITE8_DEVICE_HANDLER(pk8020_portb_w)
 {
-	const device_config *fdc = devtag_get_device(device->machine, "wd1793");
+	running_device *fdc = devtag_get_device(device->machine, "wd1793");
 	wd17xx_set_side(fdc,BIT(data,4));
 	if (BIT(data,0)) {
  		wd17xx_set_drive(fdc,0);
@@ -905,7 +905,7 @@ I8255A_INTERFACE( pk8020_ppi8255_interface_1 )
 
 static WRITE8_DEVICE_HANDLER(pk8020_2_portc_w)
 {
-	const device_config *speaker = devtag_get_device(device->machine, "speaker");
+	running_device *speaker = devtag_get_device(device->machine, "speaker");
 
 	sound_gate = BIT(data,3);
 
@@ -934,7 +934,7 @@ I8255A_INTERFACE( pk8020_ppi8255_interface_3 )
 
 static PIT8253_OUTPUT_CHANGED(pk8020_pit_out0)
 {
-	const device_config *speaker = devtag_get_device(device->machine, "speaker");
+	running_device *speaker = devtag_get_device(device->machine, "speaker");
 
 	sound_level = state;
 
@@ -986,7 +986,7 @@ static IRQ_CALLBACK(pk8020_irq_callback)
 
 MACHINE_RESET( pk8020 )
 {
-	const device_config *fdc = devtag_get_device(machine, "wd1793");
+	running_device *fdc = devtag_get_device(machine, "wd1793");
 	pk8020_set_bank(machine,0);
 	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), pk8020_irq_callback);
 

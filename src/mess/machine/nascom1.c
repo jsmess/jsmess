@@ -30,7 +30,7 @@
  *
  *************************************/
 
-static const device_config *nascom1_hd6402;
+static running_device *nascom1_hd6402;
 static int nascom1_tape_size = 0;
 static UINT8 *nascom1_tape_image = NULL;
 static int nascom1_tape_index = 0;
@@ -82,7 +82,7 @@ READ8_HANDLER( nascom2_fdc_select_r )
 
 WRITE8_HANDLER( nascom2_fdc_select_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *fdc = devtag_get_device(space->machine, "wd1793");
 	nascom2_fdc.select = data;
 
 	logerror("nascom2_fdc_select_w: %02x\n", data);
@@ -274,7 +274,7 @@ MACHINE_RESET( nascom1 )
 
 MACHINE_RESET( nascom2 )
 {
-	const device_config *fdc = devtag_get_device(machine, "wd1793");
+	running_device *fdc = devtag_get_device(machine, "wd1793");
 
 	wd17xx_set_density(fdc,DEN_FM_HI);
 

@@ -36,18 +36,18 @@ struct _i8212_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE i8212_t *get_safe_token(const device_config *device)
+INLINE i8212_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
 	return (i8212_t *)device->token;
 }
 
-INLINE const i8212_interface *get_interface(const device_config *device)
+INLINE const i8212_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == I8212));
-	return (const i8212_interface *) device->static_config;
+	return (const i8212_interface *) device->baseconfig().static_config;
 }
 
 /***************************************************************************

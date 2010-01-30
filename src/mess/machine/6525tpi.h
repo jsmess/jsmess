@@ -45,7 +45,7 @@ struct _tpi6525_interface
 	write8_device_func out_c_func;
 	write8_device_func out_ca_func;
 	write8_device_func out_cb_func;
-	void (*irq_func)(const device_config *device, int level);
+	void (*irq_func)(running_device *device, int level);
 };
 
 
@@ -78,15 +78,15 @@ WRITE8_DEVICE_HANDLER( tpi6525_portb_w );
 READ8_DEVICE_HANDLER( tpi6525_portc_r );
 WRITE8_DEVICE_HANDLER( tpi6525_portc_w );
 
-void tpi6525_irq0_level(const device_config *device, int level);
-void tpi6525_irq1_level(const device_config *device, int level);
-void tpi6525_irq2_level(const device_config *device, int level);
-void tpi6525_irq3_level(const device_config *device, int level);
-void tpi6525_irq4_level(const device_config *device, int level);
+void tpi6525_irq0_level(running_device *device, int level);
+void tpi6525_irq1_level(running_device *device, int level);
+void tpi6525_irq2_level(running_device *device, int level);
+void tpi6525_irq3_level(running_device *device, int level);
+void tpi6525_irq4_level(running_device *device, int level);
 
-UINT8 tpi6525_get_ddr_a(const device_config *device);
-UINT8 tpi6525_get_ddr_b(const device_config *device);
-UINT8 tpi6525_get_ddr_c(const device_config *device);
+UINT8 tpi6525_get_ddr_a(running_device *device);
+UINT8 tpi6525_get_ddr_b(running_device *device);
+UINT8 tpi6525_get_ddr_c(running_device *device);
 
 
 #endif /* __TPI6525_H__ */

@@ -26,7 +26,7 @@ static struct mpc105_info *mpc105;
 
 static void mpc105_update_memory(running_machine *machine)
 {
-	const device_config *cpu;
+	running_device *cpu;
 	int bank;
 	offs_t begin, end;
 	char bank_str[10];
@@ -37,7 +37,7 @@ static void mpc105_update_memory(running_machine *machine)
 	if (mpc105->bank_base > 0)
 	{
 		/* TODO: Fix me properly! changing all cpus???? */
-		for (cpu = cpu_first(machine->config); cpu != NULL; cpu = cpu_next(cpu))
+		for (cpu = cpu_first(machine); cpu != NULL; cpu = cpu_next(cpu))
 		{
 			const address_space *space = cpu_get_address_space( cpu, ADDRESS_SPACE_PROGRAM );
 
@@ -68,7 +68,7 @@ static void mpc105_update_memory(running_machine *machine)
 				if (mpc105->bank_base > 0)
 				{
 					/* TODO: Fix me properly! changing all cpus??? */
-					for (cpu = cpu_first(machine->config); cpu != NULL; cpu = cpu_next(cpu))
+					for (cpu = cpu_first(machine); cpu != NULL; cpu = cpu_next(cpu))
 					{
 						const address_space *space = cpu_get_address_space( cpu, ADDRESS_SPACE_PROGRAM );
 
@@ -87,7 +87,7 @@ static void mpc105_update_memory(running_machine *machine)
 
 
 
-UINT32 mpc105_pci_read(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 mem_mask)
+UINT32 mpc105_pci_read(running_device *busdevice, running_device *device, int function, int offset, UINT32 mem_mask)
 {
 	UINT32 result;
 
@@ -163,7 +163,7 @@ UINT32 mpc105_pci_read(const device_config *busdevice, const device_config *devi
 
 
 
-void mpc105_pci_write(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 data, UINT32 mem_mask)
+void mpc105_pci_write(running_device *busdevice, running_device *device, int function, int offset, UINT32 data, UINT32 mem_mask)
 {
 	int i;
 	running_machine *machine = busdevice->machine;

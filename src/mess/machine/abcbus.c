@@ -7,7 +7,7 @@ typedef struct _abcbus_daisy_state abcbus_daisy_state;
 struct _abcbus_daisy_state
 {
 	abcbus_daisy_state *	next;			/* next device */
-	const device_config *	device;			/* associated device */
+	running_device *	device;			/* associated device */
 	abcbus_card_select		card_select;	/* card select callback */
 };
 
@@ -24,12 +24,12 @@ void abcbus_init(running_machine *machine, const char *cputag, const abcbus_dais
 	{
 		*tailptr = auto_alloc(machine, abcbus_daisy_state);
 		(*tailptr)->next = NULL;
-		(*tailptr)->device = devtag_get_device(machine, device_inherit_tag(tempstring, cputag, daisy->tag));
+		(*tailptr)->device = devtag_get_device(machine,  machine->device(cputag)->siblingtag(tempstring, daisy->tag));
 		if ((*tailptr)->device == NULL)
 		{
 			fatalerror("Unable to locate device '%s'", daisy->tag);
 		}
-		(*tailptr)->card_select = (abcbus_card_select)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_ABCBUS_CARD_SELECT);
+		(*tailptr)->card_select = (abcbus_card_select)(*tailptr)->device->get_config_fct(DEVINFO_FCT_ABCBUS_CARD_SELECT);
 		tailptr = &(*tailptr)->next;
 	}
 
@@ -51,7 +51,7 @@ READ8_HANDLER( abcbus_reset_r )
 
 	/* loop over all devices and call their reset function */
 	for ( ; daisy != NULL; daisy = daisy->next)
-		device_reset(daisy->device);
+		daisy->device->reset();
 
 	/* uninstall I/O handlers */
 	memory_nop_readwrite(cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_IO), ABCBUS_INP, ABCBUS_OUT, 0x18, 0);

@@ -33,25 +33,25 @@ struct _dm9368_t
 
 	int rbi;
 
-	const device_config *rbo_device;
+	running_device *rbo_device;
 };
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE dm9368_t *get_safe_token(const device_config *device)
+INLINE dm9368_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
 	return (dm9368_t *)device->token;
 }
 
-INLINE dm9368_config *get_safe_config(const device_config *device)
+INLINE dm9368_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == DM9368);
-	return (dm9368_config *)device->inline_config;
+	return (dm9368_config *)device->baseconfig().inline_config;
 }
 
 /***************************************************************************

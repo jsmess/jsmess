@@ -24,8 +24,8 @@
 DEVICE_GET_INFO( mess_hd );
 DEVICE_GET_INFO( mess_ide );
 
-hard_disk_file *mess_hd_get_hard_disk_file(const device_config *device);
-chd_file *mess_hd_get_chd_file(const device_config *device);
+hard_disk_file *mess_hd_get_hard_disk_file(running_device *device);
+chd_file *mess_hd_get_chd_file(running_device *device);
 
 struct harddisk_callback_config
 {

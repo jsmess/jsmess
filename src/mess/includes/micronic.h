@@ -8,7 +8,7 @@
 typedef struct _micronic_state micronic_state;
 struct _micronic_state
 {
-	const device_config *hd61830;
+	running_device *hd61830;
 };
 
 #endif

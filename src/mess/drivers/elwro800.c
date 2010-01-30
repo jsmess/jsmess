@@ -83,7 +83,7 @@ static const struct upd765_interface elwro800jr_upd765_interface =
 
 static WRITE8_HANDLER(elwro800jr_fdc_control_w)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "upd765");
+	running_device *fdc = devtag_get_device(space->machine, "upd765");
 
 	floppy_mon_w(floppy_get_device(space->machine, 0), !BIT(data, 0));
 	floppy_mon_w(floppy_get_device(space->machine, 1), !BIT(data, 1));
@@ -170,13 +170,13 @@ static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 
 static READ8_DEVICE_HANDLER(i8255_port_c_r)
 {
-	const device_config *printer = devtag_get_device(device->machine, "centronics");
+	running_device *printer = devtag_get_device(device->machine, "centronics");
 	return (centronics_ack_r(printer) << 2);
 }
 
 static WRITE8_DEVICE_HANDLER(i8255_port_c_w)
 {
-	const device_config *printer = devtag_get_device(device->machine, "centronics");
+	running_device *printer = devtag_get_device(device->machine, "centronics");
 	centronics_strobe_w(printer, (data >> 7) & 0x01);
 }
 
@@ -277,13 +277,13 @@ static READ8_HANDLER(elwro800jr_io_r)
 	else if (!BIT(cs,2))
 	{
 		// CS55
-		const device_config *ppi = devtag_get_device(space->machine, "ppi8255");
+		running_device *ppi = devtag_get_device(space->machine, "ppi8255");
 		return i8255a_r(ppi, (offset & 0x03) ^ 0x03);
 	}
 	else if (!BIT(cs,3))
 	{
 		// CSFDC
-		const device_config *fdc = devtag_get_device(space->machine, "upd765");
+		running_device *fdc = devtag_get_device(space->machine, "upd765");
 		if (offset & 1)
 		{
 			return upd765_data_r(fdc,0);
@@ -296,7 +296,7 @@ static READ8_HANDLER(elwro800jr_io_r)
 	else if (!BIT(cs,4))
 	{
 		// CS51
-		const device_config *usart = devtag_get_device(space->machine, "msm8251");
+		running_device *usart = devtag_get_device(space->machine, "msm8251");
 		if (offset & 1)
 		{
 			return msm8251_status_r(usart, 0);
@@ -335,13 +335,13 @@ static WRITE8_HANDLER(elwro800jr_io_w)
 	else if (!BIT(cs,2))
 	{
 		// CS55
-		const device_config *ppi = devtag_get_device(space->machine, "ppi8255");
+		running_device *ppi = devtag_get_device(space->machine, "ppi8255");
 		i8255a_w(ppi, (offset & 0x03) ^ 0x03, data);
 	}
 	else if (!BIT(cs,3))
 	{
 		// CSFDC
-		const device_config *fdc = devtag_get_device(space->machine, "upd765");
+		running_device *fdc = devtag_get_device(space->machine, "upd765");
 		if (offset & 1)
 		{
 			upd765_data_w(fdc, 0, data);
@@ -350,7 +350,7 @@ static WRITE8_HANDLER(elwro800jr_io_w)
 	else if (!BIT(cs,4))
 	{
 		// CS51
-		const device_config *usart = devtag_get_device(space->machine, "msm8251");
+		running_device *usart = devtag_get_device(space->machine, "msm8251");
 		if (offset & 1)
 		{
 			msm8251_control_w(usart, 0, data);

@@ -65,15 +65,15 @@ extern DEVICE_GET_INFO(wd2793);
 extern DEVICE_GET_INFO(wd177x);
 extern DEVICE_GET_INFO(mb8877);
 
-void wd17xx_reset(const device_config *device);
+void wd17xx_reset(running_device *device);
 
 /* the following are not strictly part of the wd179x hardware/emulation
 but will be put here for now until the flopdrv code has been finalised more */
-void wd17xx_set_drive(const device_config *device, UINT8);		/* set drive wd179x is accessing */
-void wd17xx_set_side(const device_config *device, UINT8);		/* set side wd179x is accessing */
-void wd17xx_set_density(const device_config *device, DENSITY);	/* set density */
+void wd17xx_set_drive(running_device *device, UINT8);		/* set drive wd179x is accessing */
+void wd17xx_set_side(running_device *device, UINT8);		/* set side wd179x is accessing */
+void wd17xx_set_density(running_device *device, DENSITY);	/* set density */
 
-void wd17xx_set_pause_time(const device_config *device, int usec); /* default is 40 usec if not set */
+void wd17xx_set_pause_time(running_device *device, int usec); /* default is 40 usec if not set */
 
 READ8_DEVICE_HANDLER( wd17xx_status_r );
 READ8_DEVICE_HANDLER( wd17xx_track_r );

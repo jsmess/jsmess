@@ -15,7 +15,7 @@ struct _pecom_state
 	UINT8 *charram;			/* character generator ROM */
 	int cdp1802_mode;		/* CPU mode */
 	int dma;				/* memory refresh DMA */
-	const device_config *cdp1869;
+	running_device *cdp1869;
 
 	/* timers */
 	emu_timer *reset_timer;	/* power on reset timer */

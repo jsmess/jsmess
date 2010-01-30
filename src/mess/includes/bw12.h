@@ -41,10 +41,10 @@ struct _bw12_state
 	int motor1;
 
 	/* devices */
-	const device_config *pia6821;
-	const device_config *mc6845;
-	const device_config *upd765;
-	const device_config *centronics;
+	running_device *pia6821;
+	running_device *mc6845;
+	running_device *upd765;
+	running_device *centronics;
 
 	/* timers */
 	emu_timer	*floppy_motor_off_timer;

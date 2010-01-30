@@ -1,6 +1,8 @@
 
 #include "dview.h"
+#ifndef SDLMAME_WIN32
 #include <gconf/gconf-client.h>
+#endif
 
 G_DEFINE_TYPE(DView, dview, GTK_TYPE_CONTAINER);
 
@@ -13,7 +15,7 @@ static gboolean dview_expose(GtkWidget *wdv, GdkEventExpose *event)
 	UINT32 i, j, xx, yy;
 	GdkColor bg, fg;
 
-	vsize = debug_view_get_visible_size(dv->dw);
+	vsize = debug_view_get_visible_size(dv->view);
 
 	bg.red = bg.green = bg.blue = 0xffff;
 	gdk_gc_set_rgb_fg_color(dv->gc, &bg);
@@ -26,7 +28,7 @@ static gboolean dview_expose(GtkWidget *wdv, GdkEventExpose *event)
 						   dv->vsz, dv->hsz);
 	}
 
-	viewdata = debug_view_get_chars(dv->dw);
+	viewdata = debug_view_get_chars(dv->view);
 
 	yy = wdv->style->ythickness;
 	for(j=0; j<vsize.y; j++) {
@@ -104,12 +106,12 @@ static void dview_hadj_changed(GtkAdjustment *adj, DView *dv)
 	debug_view_xy pos;
 	UINT32 v = (UINT32)(adj->value);
 
-	pos = debug_view_get_visible_position(dv->dw);
+	pos = debug_view_get_visible_position(dv->view);
 
 	if (v != pos.x)
 	{
 		pos.x = v;
-		debug_view_set_visible_position(dv->dw, pos);
+		debug_view_set_visible_position(dv->view, pos);
 		gtk_widget_queue_draw(GTK_WIDGET(dv));
 	}
 }
@@ -119,12 +121,12 @@ static void dview_vadj_changed(GtkAdjustment *adj, DView *dv)
 	debug_view_xy pos;
 	UINT32 v = (UINT32)(adj->value);
 
-	pos = debug_view_get_visible_position(dv->dw);
+	pos = debug_view_get_visible_position(dv->view);
 
 	if (v != pos.y)
 	{
 		pos.y = v;
-		debug_view_set_visible_position(dv->dw, pos);
+		debug_view_set_visible_position(dv->view, pos);
 		gtk_widget_queue_draw(GTK_WIDGET(dv));
 	}
 }
@@ -135,7 +137,7 @@ static void dview_realize(GtkWidget *wdv)
 	gint attributes_mask;
 	DView *dv;
 
-	GTK_WIDGET_SET_FLAGS(wdv, GTK_REALIZED);
+	GTK_WIDGET_SET_FLAGS(wdv, GTK_REALIZED | GTK_CAN_FOCUS);
 	dv = DVIEW(wdv);
 
 	attributes.window_type = GDK_WINDOW_CHILD;
@@ -146,7 +148,9 @@ static void dview_realize(GtkWidget *wdv)
 	attributes.wclass = GDK_INPUT_OUTPUT;
 	attributes.visual = gtk_widget_get_visual(wdv);
 	attributes.colormap = gtk_widget_get_colormap(wdv);
-	attributes.event_mask = gtk_widget_get_events(wdv) | GDK_EXPOSURE_MASK;
+	attributes.event_mask = gtk_widget_get_events(wdv) | GDK_EXPOSURE_MASK
+			| GDK_BUTTON_PRESS_MASK | GDK_KEY_PRESS_MASK
+			| GDK_FOCUS_CHANGE_MASK;
 
 	attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
 
@@ -166,22 +170,22 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 	int ovs = dv->vs;
 	debug_view_xy size, pos, col, vsize;
 
-	pos = debug_view_get_visible_position(dv->dw);
-	size = debug_view_get_total_size(dv->dw);
+	pos = debug_view_get_visible_position(dv->view);
+	size = debug_view_get_total_size(dv->view);
 
 	dv->tr = size.y;
 	dv->tc = size.x;
 
-	dv->hs = size.x*dvc->fixedfont_width > aw;
-	dv->vs = size.y*dvc->fixedfont_height > ah;
+	dv->hs = (size.x*dvc->fixedfont_width > aw ? 1 : 0);
+	dv->vs = (size.y*dvc->fixedfont_height > ah ? 1 : 0);
 
 	if(dv->hs)
 		ah -= dv->hsz;
 	if(dv->vs)
 		aw -= dv->vsz;
 
-	dv->hs = size.x*dvc->fixedfont_width > aw;
-	dv->vs = size.y*dvc->fixedfont_height > ah;
+	dv->hs = (size.x*dvc->fixedfont_width > aw ? 1 : 0);
+	dv->vs = (size.y*dvc->fixedfont_height > ah ? 1 : 0);
 
 	ah = allocation->height - (dv->hs ? dv->hsz : 0);
 	aw = allocation->width  - (dv->vs ? dv->vsz : 0);
@@ -210,8 +214,14 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		vsize.x = size.x-pos.x;
 	}
 
-	debug_view_set_visible_position(dv->dw, pos);
-	debug_view_set_visible_size(dv->dw, vsize);
+	{
+		GdkGeometry x;
+		x.max_width = size.x*dvc->fixedfont_width;
+		x.max_height = -1;
+		gdk_window_set_geometry_hints( wdv->window,&x, GDK_HINT_MAX_SIZE  );
+	}
+	debug_view_set_visible_position(dv->view, pos);
+	debug_view_set_visible_size(dv->view, vsize);
 
 	if(GTK_WIDGET_REALIZED(wdv))
 		gdk_window_move_resize(wdv->window,
@@ -240,7 +250,7 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		dv->hadj->page_increment = span;
 		dv->hadj->page_size = span;
 		gtk_adjustment_changed(dv->hadj);
-		debug_view_set_visible_position(dv->dw, pos);
+		debug_view_set_visible_position(dv->view, pos);
 	} else {
 		if(ohs)
 			gtk_widget_hide(dv->hscrollbar);
@@ -268,7 +278,7 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		dv->vadj->page_increment = span;
 		dv->vadj->page_size = span;
 		gtk_adjustment_changed(dv->vadj);
-		debug_view_set_visible_position(dv->dw, pos);
+		debug_view_set_visible_position(dv->view, pos);
 	} else {
 		if(ovs)
 			gtk_widget_hide(dv->vscrollbar);
@@ -283,14 +293,14 @@ static void dview_size_request(GtkWidget *wdv, GtkRequisition *req)
 	int vs = 0, hs = 0;
 	debug_view_xy size;
 
-	size = debug_view_get_total_size(dv->dw);
+	size = debug_view_get_total_size(dv->view);
 
 	if(size.x > 50) {
 		size.x = 50;
 		hs = 1;
 	}
-	if(size.y > 20) {
-		size.y = 20;
+	if(size.y > 5) {
+		size.y = 5;
 		vs = 1;
 	}
 	req->width = size.x*dvc->fixedfont_width+2*wdv->style->xthickness;
@@ -320,6 +330,7 @@ static void dview_forall(GtkContainer *dvc, gboolean include_internals, GtkCallb
 
 static void dview_class_init(DViewClass *dvc)
 {
+#ifndef SDLMAME_WIN32
     GConfClient *conf = gconf_client_get_default();
     char *name = 0;
     dvc->fixedfont = 0;
@@ -333,6 +344,7 @@ static void dview_class_init(DViewClass *dvc)
     }
 
     if(!dvc->fixedfont)
+#endif
 		dvc->fixedfont = pango_font_description_from_string("Monospace 10");
 
     if(!dvc->fixedfont) {
@@ -363,7 +375,7 @@ static void dview_init(DView *dv)
 											 pango_font_metrics_get_descent(metrics));
 	}
 
-	dv->dw = 0;
+	dv->view = 0;
 	gtk_widget_modify_font(GTK_WIDGET(dv), dvc->fixedfont);
 	dv->playout = gtk_widget_create_pango_layout(GTK_WIDGET(dv), 0);
 	pango_layout_set_font_description(dv->playout, dvc->fixedfont);
@@ -401,8 +413,8 @@ GtkWidget *dview_new(const gchar *widget_name, const gchar *string1, const gchar
 	return wdv;
 }
 
-void dview_set_debug_view(DView *dv, running_machine *machine, int type, debug_view **dwp)
+void dview_set_debug_view(DView *dv, running_machine *machine, int type)
 {
-	dv->dw = debug_view_alloc(machine, type, dview_update, dv);
-	*dwp = dv->dw;
+	dv->view = debug_view_alloc(machine, type, dview_update, dv);
+	dv->dv_type = type;
 }

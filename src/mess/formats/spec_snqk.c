@@ -707,7 +707,7 @@ void spectrum_setup_z80(running_machine *machine, unsigned char *pSnapshot, unsi
 
 		if ((z80_type == SPECTRUM_Z80_SNAPSHOT_128K) || ((z80_type == SPECTRUM_Z80_SNAPSHOT_TS2068) && !strcmp(machine->gamedrv->name,"ts2068")))
 		{
-			const device_config *ay8912 = devtag_get_device(machine, "ay8912");
+			running_device *ay8912 = devtag_get_device(machine, "ay8912");
 
 			/* Only set up sound registers for 128K machine or TS2068! */
 			for (i = 0; i < 16; i++)

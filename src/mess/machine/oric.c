@@ -214,14 +214,14 @@ static void oric_psg_connection_refresh(running_machine *machine)
 			/* write register data */
 			case 2:
 			{
-				const device_config *ay8912 = devtag_get_device(machine, "ay8912");
+				running_device *ay8912 = devtag_get_device(machine, "ay8912");
 				ay8910_data_w(ay8912, 0, oric_via_port_a_data);
 			}
 			break;
 			/* write register index */
 			case 3:
 			{
-				const device_config *ay8912 = devtag_get_device(machine, "ay8912");
+				running_device *ay8912 = devtag_get_device(machine, "ay8912");
 				ay8910_address_w(ay8912, 0, oric_via_port_a_data);
 			}
 			break;
@@ -244,7 +244,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_a_func )
 	if (oric_psg_control==0)
 	{
 		/* if psg not selected, write to printer */
-		const device_config *printer = devtag_get_device(device->machine, "centronics");
+		running_device *printer = devtag_get_device(device->machine, "centronics");
 		centronics_data_w(printer, 0, data);
 	}
 }
@@ -271,7 +271,7 @@ PB7
  */
 
 
-static const device_config *cassette_device_image(running_machine *machine)
+static running_device *cassette_device_image(running_machine *machine)
 {
 	return devtag_get_device(machine, "cassette");
 }
@@ -282,7 +282,7 @@ static TIMER_CALLBACK(oric_refresh_tape)
 {
 	int data;
 	int input_port_9;
-	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
+	running_device *via_0 = devtag_get_device(machine, "via6522_0");
 
 	data = 0;
 
@@ -308,7 +308,7 @@ static TIMER_CALLBACK(oric_refresh_tape)
 static unsigned char previous_portb_data = 0;
 static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 {
-	const device_config *printer = devtag_get_device(device->machine, "centronics");
+	running_device *printer = devtag_get_device(device->machine, "centronics");
 
 	/* KEYBOARD */
 	oric_keyboard_line = data & 0x07;
@@ -372,7 +372,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_cb2_func )
 }
 
 
-static void	oric_via_irq_func(const device_config *device, int state)
+static void	oric_via_irq_func(running_device *device, int state)
 {
 	oric_irqs &= ~(1<<0);
 
@@ -462,7 +462,7 @@ CALL &320 to start, or use BOBY rom.
 
 static void oric_install_apple2_interface(running_machine *machine)
 {
-	const device_config *fdc = devtag_get_device(machine, "fdc");
+	running_device *fdc = devtag_get_device(machine, "fdc");
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (oric_is_telestrat)
@@ -584,7 +584,7 @@ static WRITE8_HANDLER(apple2_v2_interface_w)
 /* APPLE 2 INTERFACE V2 */
 static void oric_install_apple2_v2_interface(running_machine *machine)
 {
-	const device_config *fdc = devtag_get_device(machine, "fdc");
+	running_device *fdc = devtag_get_device(machine, "fdc");
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_read8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_r);
@@ -705,8 +705,8 @@ static WRITE_LINE_DEVICE_HANDLER( oric_jasmin_wd179x_drq_w )
 
 static READ8_HANDLER (oric_jasmin_r)
 {
-	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
+	running_device *fdc = devtag_get_device(space->machine, "wd179x");
 	unsigned char data = 0x0ff;
 
 	switch (offset & 0x0f)
@@ -736,8 +736,8 @@ static READ8_HANDLER (oric_jasmin_r)
 
 static WRITE8_HANDLER(oric_jasmin_w)
 {
-	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
+	running_device *fdc = devtag_get_device(space->machine, "wd179x");
 	switch (offset & 0x0f)
 	{
 		/* microdisc floppy disc interface */
@@ -924,7 +924,7 @@ static void	oric_microdisc_set_mem_0x0c000(running_machine *machine)
 READ8_HANDLER (oric_microdisc_r)
 {
 	unsigned char data = 0x0ff;
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = devtag_get_device(space->machine, "wd179x");
 
 	switch (offset & 0x0ff)
 	{
@@ -952,7 +952,7 @@ READ8_HANDLER (oric_microdisc_r)
 
 		default:
 			{
-				const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
+				running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
 				data = via_r(via_0, offset & 0x0f);
 			}
 			break;
@@ -964,7 +964,7 @@ READ8_HANDLER (oric_microdisc_r)
 
 WRITE8_HANDLER(oric_microdisc_w)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = devtag_get_device(space->machine, "wd179x");
 	switch (offset & 0x0ff)
 	{
 		/* microdisc floppy disc interface */
@@ -1012,7 +1012,7 @@ WRITE8_HANDLER(oric_microdisc_w)
 
 		default:
 			{
-				const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
+				running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
 				via_w(via_0, offset & 0x0f, data);
 			}
 			break;
@@ -1150,13 +1150,13 @@ MACHINE_RESET( oric )
 		}
 		break;
 	}
-	device_reset(devtag_get_device(machine, "maincpu"));
+	devtag_get_device(machine, "maincpu")->reset();
 }
 
 
 READ8_HANDLER ( oric_IO_r )
 {
-	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
+	running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
 	switch (input_port_read(space->machine, "FLOPPY") & 0x07)
 	{
 		default:
@@ -1194,7 +1194,7 @@ READ8_HANDLER ( oric_IO_r )
 
 WRITE8_HANDLER ( oric_IO_w )
 {
-	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
+	running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
 	switch (input_port_read(space->machine, "FLOPPY") & 0x07)
 	{
 		default:
@@ -1384,7 +1384,7 @@ static WRITE8_DEVICE_HANDLER(telestrat_via2_out_b_func)
 }
 
 
-static void	telestrat_via2_irq_func(const device_config *device, int state)
+static void	telestrat_via2_irq_func(running_device *device, int state)
 {
     oric_irqs &=~(1<<2);
 

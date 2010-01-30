@@ -225,7 +225,7 @@ static void ComputeFileHash(software_picker_info *pPickerInfo,
 	functions = hashfile_functions_used(pPickerInfo->config->hashfile, info.type);
 
 	// compute the hash
-	image_device_compute_hash(pFileInfo->hash_string, pFileInfo->device, pBuffer, nLength, functions);
+	//image_device_compute_hash(pFileInfo->hash_string, pFileInfo->device, pBuffer, nLength, functions);
 }
 
 
@@ -385,10 +385,13 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 		pszExtension = strrchr(pszFilename, '.');
 	if ((pszExtension != NULL) && (pPickerInfo->config != NULL))
 	{
-		for (device = image_device_first(pPickerInfo->config->mconfig); device != NULL; device = image_device_next(device))
+		for (device = pPickerInfo->config->mconfig->devicelist.first(); device != NULL;device = device->next)
 		{
-			if (image_device_uses_file_extension(device, pszExtension))
-				break;
+			if (is_image_device(device))
+			{		
+				if (image_device_uses_file_extension(device, pszExtension))
+					break;
+			}
 		}
 	}
 

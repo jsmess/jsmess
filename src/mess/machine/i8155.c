@@ -111,18 +111,18 @@ struct _i8155_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE i8155_t *get_safe_token(const device_config *device)
+INLINE i8155_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
 	return (i8155_t *)device->token;
 }
 
-INLINE const i8155_interface *get_interface(const device_config *device)
+INLINE const i8155_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == I8155);
-	return (const i8155_interface *) device->static_config;
+	return (const i8155_interface *) device->baseconfig().static_config;
 }
 
 INLINE UINT8 get_timer_mode(i8155_t *i8155)
@@ -232,7 +232,7 @@ INLINE void write_port(i8155_t *i8155, int port, UINT8 data)
 
 static TIMER_CALLBACK( counter_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	i8155_t *i8155 = get_safe_token(device);
 
 	/* count down */

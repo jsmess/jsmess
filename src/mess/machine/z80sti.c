@@ -180,14 +180,14 @@ struct _z80sti_t
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static int z80sti_irq_state(const device_config *device);
-static void z80sti_irq_reti(const device_config *device);
+static int z80sti_irq_state(running_device *device);
+static void z80sti_irq_reti(running_device *device);
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE z80sti_t *get_safe_token(const device_config *device)
+INLINE z80sti_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -195,11 +195,11 @@ INLINE z80sti_t *get_safe_token(const device_config *device)
 	return (z80sti_t *)device->token;
 }
 
-INLINE const z80sti_interface *get_interface(const device_config *device)
+INLINE const z80sti_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type == Z80STI));
-	return (const z80sti_interface *) device->static_config;
+	return (const z80sti_interface *) device->baseconfig().static_config;
 }
 
 /***************************************************************************
@@ -252,7 +252,7 @@ static void serial_receive(z80sti_t *z80sti)
 
 static TIMER_CALLBACK( rx_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	z80sti_t *z80sti = get_safe_token(device);
 
 	serial_receive(z80sti);
@@ -272,7 +272,7 @@ static void serial_transmit(z80sti_t *z80sti)
 
 static TIMER_CALLBACK( tx_tick )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	z80sti_t *z80sti = get_safe_token(device);
 
 	serial_transmit(z80sti);
@@ -563,7 +563,7 @@ WRITE_LINE_DEVICE_HANDLER( z80sti_tc_w )
     timer_count - timer count down
 -------------------------------------------------*/
 
-static void timer_count(const device_config *device, int index)
+static void timer_count(running_device *device, int index)
 {
 	z80sti_t *z80sti = get_safe_token(device);
 
@@ -604,16 +604,16 @@ static void timer_count(const device_config *device, int index)
     TIMER_CALLBACK( timer_# )
 -------------------------------------------------*/
 
-static TIMER_CALLBACK( timer_a ) { timer_count((const device_config *)ptr, TIMER_A); }
-static TIMER_CALLBACK( timer_b ) { timer_count((const device_config *)ptr, TIMER_B); }
-static TIMER_CALLBACK( timer_c ) { timer_count((const device_config *)ptr, TIMER_C); }
-static TIMER_CALLBACK( timer_d ) { timer_count((const device_config *)ptr, TIMER_D); }
+static TIMER_CALLBACK( timer_a ) { timer_count((running_device *)ptr, TIMER_A); }
+static TIMER_CALLBACK( timer_b ) { timer_count((running_device *)ptr, TIMER_B); }
+static TIMER_CALLBACK( timer_c ) { timer_count((running_device *)ptr, TIMER_C); }
+static TIMER_CALLBACK( timer_d ) { timer_count((running_device *)ptr, TIMER_D); }
 
 /*-------------------------------------------------
     gpip_input - GPIP input line write
 -------------------------------------------------*/
 
-static void gpip_input(const device_config *device, int bit, int state)
+static void gpip_input(running_device *device, int bit, int state)
 {
 	z80sti_t *z80sti = get_safe_token(device);
 
@@ -652,7 +652,7 @@ WRITE_LINE_DEVICE_HANDLER( z80sti_i7_w ) { gpip_input(device, 7, state); }
     z80sti_irq_state - get interrupt status
 -------------------------------------------------*/
 
-static int z80sti_irq_state(const device_config *device)
+static int z80sti_irq_state(running_device *device)
 {
 	z80sti_t *z80sti = get_safe_token(device);
 	int state = 0, i;
@@ -682,7 +682,7 @@ static int z80sti_irq_state(const device_config *device)
     z80sti_irq_ack - interrupt acknowledge
 -------------------------------------------------*/
 
-static int z80sti_irq_ack(const device_config *device)
+static int z80sti_irq_ack(running_device *device)
 {
 	z80sti_t *z80sti = get_safe_token(device);
 	int i;
@@ -721,7 +721,7 @@ static int z80sti_irq_ack(const device_config *device)
     z80sti_irq_reti - return from interrupt
 -------------------------------------------------*/
 
-static void z80sti_irq_reti(const device_config *device)
+static void z80sti_irq_reti(running_device *device)
 {
 	z80sti_t *z80sti = get_safe_token(device);
 	int i;
@@ -755,7 +755,7 @@ static void z80sti_irq_reti(const device_config *device)
 static DEVICE_START( z80sti )
 {
 	z80sti_t *z80sti = get_safe_token(device);
-	const z80sti_interface *intf = (const z80sti_interface *)device->static_config;
+	const z80sti_interface *intf = (const z80sti_interface *)device->baseconfig().static_config;
 
 	/* resolve callbacks */
 	devcb_resolve_read8(&z80sti->in_gpio_func, &intf->in_gpio_func, device);

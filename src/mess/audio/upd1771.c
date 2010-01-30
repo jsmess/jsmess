@@ -64,7 +64,7 @@ struct _upd1771_state
 };
 
 
-INLINE upd1771_state *get_safe_token(const device_config *device)
+INLINE upd1771_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -210,7 +210,7 @@ static STREAM_UPDATE( upd1771c_update )
 
 static TIMER_CALLBACK( upd1771c_callback )
 {
-	const device_config *device = (const device_config *)ptr;
+	running_device *device = (running_device *)ptr;
 	upd1771_state *state = get_safe_token( device );
 
 	devcb_call_write_line( &state->ack_out_func, 1 );
@@ -219,7 +219,7 @@ static TIMER_CALLBACK( upd1771c_callback )
 
 static DEVICE_START( upd1771c )
 {
-	const upd1771_interface *intf = (const upd1771_interface *)device->static_config;
+	const upd1771_interface *intf = (const upd1771_interface *)device->baseconfig().static_config;
 	upd1771_state *state = get_safe_token( device );
 	int sample_rate = device->clock / 4;
 

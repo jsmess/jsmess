@@ -419,7 +419,7 @@ static UINT8 prev_state = 0;
 
 static PIT8253_OUTPUT_CHANGED( pit_out0_changed )
 {
-	const device_config *speaker = devtag_get_device(device->machine, "speaker");
+	running_device *speaker = devtag_get_device(device->machine, "speaker");
 	if((prev_state==0) && (state==1)) {
 		speaker_level ^= 1;
 	}
@@ -479,7 +479,7 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
  */
 static READ8_DEVICE_HANDLER( pio_port_c_r )
 {
-	const device_config *cas = devtag_get_device(device->machine, "cassette");
+	running_device *cas = devtag_get_device(device->machine, "cassette");
 	mz_state *mz = (mz_state *)device->machine->driver_data;
 	UINT8 data = 0;
 
@@ -501,7 +501,7 @@ static READ8_DEVICE_HANDLER( pio_port_c_r )
 
 static WRITE8_DEVICE_HANDLER( pio_port_a_w )
 {
-	const device_config *timer = devtag_get_device(device->machine, "cursor");
+	running_device *timer = devtag_get_device(device->machine, "cursor");
 
 	LOG(2,"mz700_pio_port_a_w",("%02X\n", data),device->machine);
 
@@ -564,14 +564,14 @@ static UINT8 mz800_palette_bank;
     Z80 PIO
 ***************************************************************************/
 
-static void mz800_z80pio_irq(const device_config *device, int which)
+static void mz800_z80pio_irq(running_device *device, int which)
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, which);
 }
 
 static READ8_DEVICE_HANDLER( mz800_z80pio_port_a_r )
 {
-	const device_config *printer = devtag_get_device(device->machine, "centronics");
+	running_device *printer = devtag_get_device(device->machine, "centronics");
 	UINT8 result = 0;
 
 	result |= centronics_busy_r(printer);
@@ -583,7 +583,7 @@ static READ8_DEVICE_HANDLER( mz800_z80pio_port_a_r )
 
 static WRITE8_DEVICE_HANDLER( mz800_z80pio_port_a_w )
 {
-	const device_config *printer = devtag_get_device(device->machine, "centronics");
+	running_device *printer = devtag_get_device(device->machine, "centronics");
 
 	centronics_prime_w(printer, BIT(data, 6));
 	centronics_strobe_w(printer, BIT(data, 7));
@@ -591,7 +591,7 @@ static WRITE8_DEVICE_HANDLER( mz800_z80pio_port_a_w )
 
 static WRITE8_DEVICE_HANDLER( mz800_printer_data_w )
 {
-	const device_config *printer = devtag_get_device(device->machine, "centronics");
+	running_device *printer = devtag_get_device(device->machine, "centronics");
 	centronics_data_w(printer, 0, data);
 }
 

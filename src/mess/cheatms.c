@@ -30,7 +30,7 @@ UINT32 this_game_crc = 0;
 static void build_crc_table(running_machine *machine)
 {
 	int	listIdx;
-	const device_config *img;
+	running_device *img;
 	static UINT32 *tmp_list = NULL;
 
 	free(device_crc_list);
@@ -40,35 +40,38 @@ static void build_crc_table(running_machine *machine)
 	memset(device_crc_list,0,sizeof(UINT32));
 	device_crc_list_length = 1;
 
-	for (img = image_device_first(machine->config); img != NULL; img = image_device_next(img))
+	for (img = machine->devicelist.first(); img != NULL; img = img->next)
 	{
-		if (image_exists(img))
+		if (is_image_device(img))
 		{
-			UINT32	crc = image_crc(img);
-			int		isUnique = 1;
-
-			for(listIdx = 0; listIdx < device_crc_list_length; listIdx++)
+			if (image_exists(img))
 			{
-				if(device_crc_list[listIdx] == crc)
+				UINT32	crc = image_crc(img);
+				int		isUnique = 1;
+
+				for(listIdx = 0; listIdx < device_crc_list_length; listIdx++)
 				{
-					isUnique = 0;
+					if(device_crc_list[listIdx] == crc)
+					{
+						isUnique = 0;
 
-					break;
+						break;
+					}
 				}
-			}
 
-			if(isUnique)
-			{
-				if(!this_game_crc)
-					this_game_crc = crc;
-					
-				tmp_list = (UINT32*)malloc((device_crc_list_length + 1) * sizeof(UINT32));
-				memcpy(tmp_list,device_crc_list,device_crc_list_length * sizeof(UINT32));
-				if (device_crc_list) free(device_crc_list);
-				device_crc_list = tmp_list;
+				if(isUnique)
+				{
+					if(!this_game_crc)
+						this_game_crc = crc;
+						
+					tmp_list = (UINT32*)malloc((device_crc_list_length + 1) * sizeof(UINT32));
+					memcpy(tmp_list,device_crc_list,device_crc_list_length * sizeof(UINT32));
+					if (device_crc_list) free(device_crc_list);
+					device_crc_list = tmp_list;
 
-				device_crc_list[device_crc_list_length] = crc;
-				device_crc_list_length++;
+					device_crc_list[device_crc_list_length] = crc;
+					device_crc_list_length++;
+				}
 			}
 		}
 	}

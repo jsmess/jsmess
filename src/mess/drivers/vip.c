@@ -681,13 +681,13 @@ static MACHINE_RESET( vip )
 	const address_space *io = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_IO);
 
 	/* reset auxiliary chips */
-	device_reset(state->cdp1861);
-	device_reset(state->cdp1862);
+	state->cdp1861->reset();
+	state->cdp1862->reset();
 
 	/* reset devices */
-	device_reset(state->vp595);
-	device_reset(state->vp550);
-	device_reset(state->vp551);
+	state->vp595->reset();
+	state->vp550->reset();
+	state->vp551->reset();
 
 	/* configure video */
 	switch (input_port_read(machine, "VIDEO"))

@@ -33,13 +33,13 @@
 #include "990_tap.h"
 #include "image.h"
 
-static void update_interrupt(const device_config *device);
+static void update_interrupt(running_device *device);
 
 #define MAX_TAPE_UNIT 4
 
 typedef struct tape_unit_t
 {
-	const device_config *img;		/* image descriptor */
+	running_device *img;		/* image descriptor */
 	unsigned int bot : 1;	/* TRUE if we are at the beginning of tape */
 	unsigned int eot : 1;	/* TRUE if we are at the end of tape */
 	unsigned int wp : 1;	/* TRUE if tape is write-protected */
@@ -110,7 +110,7 @@ static const UINT16 w_mask[8] =
 	0xf3ff		/* Don't overwrite reserved bits */
 };
 
-int tape_get_id(const device_config *image)
+int tape_get_id(running_device *image)
 {
 	int drive =0;
 	if (strcmp(image->tag, "tape0") == 0) drive = 0;
@@ -123,7 +123,7 @@ int tape_get_id(const device_config *image)
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
-INLINE tap_990_t *get_safe_token(const device_config *device)
+INLINE tap_990_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -185,7 +185,7 @@ DEVICE_IMAGE_UNLOAD( ti990_tape )
     Parse the tape select lines, and return the corresponding tape unit.
     (-1 if none)
 */
-static int cur_tape_unit(const device_config *device)
+static int cur_tape_unit(running_device *device)
 {
 	int reply;
 	tap_990_t *tpc = get_safe_token(device);
@@ -210,7 +210,7 @@ static int cur_tape_unit(const device_config *device)
 /*
     Update interrupt state
 */
-static void update_interrupt(const device_config *device)
+static void update_interrupt(running_device *device)
 {
 	tap_990_t *tpc = get_safe_token(device);
 	if (tpc->intf->interrupt_callback)
@@ -222,7 +222,7 @@ static void update_interrupt(const device_config *device)
 /*
     Handle the read binary forward command: read the next record on tape.
 */
-static void cmd_read_binary_forward(const device_config *device)
+static void cmd_read_binary_forward(running_device *device)
 {
 	UINT8 buffer[256];
 	int reclen;
@@ -448,7 +448,7 @@ update_registers:
 /*
     Handle the record skip forward command: skip a specified number of records.
 */
-static void cmd_record_skip_forward(const device_config *device)
+static void cmd_record_skip_forward(running_device *device)
 {
 	UINT8 buffer[4];
 	int reclen;
@@ -584,7 +584,7 @@ update_registers:
 /*
     Handle the record skip reverse command: skip a specified number of records backwards.
 */
-static void cmd_record_skip_reverse(const device_config *device)
+static void cmd_record_skip_reverse(running_device *device)
 {
 	UINT8 buffer[4];
 	int reclen;
@@ -742,7 +742,7 @@ update_registers:
 /*
     Handle the rewind command: rewind to BOT.
 */
-static void cmd_rewind(const device_config *device)
+static void cmd_rewind(running_device *device)
 {
 	tap_990_t *tpc = get_safe_token(device);
 	int tap_sel = cur_tape_unit(device);
@@ -790,7 +790,7 @@ static void cmd_rewind(const device_config *device)
 /*
     Handle the rewind and offline command: disable the tape unit.
 */
-static void cmd_rewind_and_offline(const device_config *device)
+static void cmd_rewind_and_offline(running_device *device)
 {
 	tap_990_t *tpc = get_safe_token(device);
 	int tap_sel = cur_tape_unit(device);
@@ -829,7 +829,7 @@ static void cmd_rewind_and_offline(const device_config *device)
 /*
     Handle the read transport status command: return the current tape status.
 */
-static void read_transport_status(const device_config *device)
+static void read_transport_status(running_device *device)
 {
 	tap_990_t *tpc = get_safe_token(device);
 	int tap_sel = cur_tape_unit(device);
@@ -870,7 +870,7 @@ static void read_transport_status(const device_config *device)
 /*
     Parse command code and execute the command.
 */
-static void execute_command(const device_config *device)
+static void execute_command(running_device *device)
 {
 	/* hack */
 	tap_990_t *tpc = get_safe_token(device);
@@ -1041,10 +1041,10 @@ DEVICE_START(tap_990)
 {
 	tap_990_t *tpc = get_safe_token(device);
 	/* verify that we have an interface assigned */
-	assert(device->static_config != NULL);
+	assert(device->baseconfig().static_config != NULL);
 	
 	/* copy interface pointer */
-	tpc->intf = (const ti990_tpc_interface*)device->static_config;
+	tpc->intf = (const ti990_tpc_interface*)device->baseconfig().static_config;
 	
 	memset(tpc->w, 0, sizeof(tpc->w));
 	/* The PE bit is always set for the MT3200 (but not MT1600) */

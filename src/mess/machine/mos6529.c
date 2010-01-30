@@ -30,18 +30,18 @@ struct _mos6529_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE mos6529_t *get_safe_token(const device_config *device)
+INLINE mos6529_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
 	return (mos6529_t *)device->token;
 }
 
-INLINE const mos6529_interface *get_interface(const device_config *device)
+INLINE const mos6529_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == MOS6529);
-	return (const mos6529_interface *) device->static_config;
+	return (const mos6529_interface *) device->baseconfig().static_config;
 }
 
 /***************************************************************************

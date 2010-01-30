@@ -79,7 +79,7 @@ DEVICE_GET_INFO( smsvdp );
 
 /* prototypes */
 
-UINT32 sms_vdp_update( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect );
+UINT32 sms_vdp_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect );
 READ8_DEVICE_HANDLER( sms_vdp_vcount_r );
 READ8_DEVICE_HANDLER( sms_vdp_hcount_latch_r );
 WRITE8_DEVICE_HANDLER( sms_vdp_hcount_latch_w );
@@ -87,7 +87,7 @@ READ8_DEVICE_HANDLER( sms_vdp_data_r );
 WRITE8_DEVICE_HANDLER( sms_vdp_data_w );
 READ8_DEVICE_HANDLER( sms_vdp_ctrl_r );
 WRITE8_DEVICE_HANDLER( sms_vdp_ctrl_w );
-void sms_vdp_set_ggsmsmode( const device_config *device, int mode );
-UINT8 sms_vdp_area_brightness( const device_config *device, int x, int y, int x_range, int y_range );
+void sms_vdp_set_ggsmsmode( running_device *device, int mode );
+UINT8 sms_vdp_area_brightness( running_device *device, int x, int y, int x_range, int y_range );
 
 #endif /* __SMSVDP_H__ */

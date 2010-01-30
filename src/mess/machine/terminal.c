@@ -20,7 +20,7 @@ struct _terminal_state
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
-INLINE terminal_state *get_safe_token(const device_config *device)
+INLINE terminal_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
@@ -29,11 +29,11 @@ INLINE terminal_state *get_safe_token(const device_config *device)
 	return (terminal_state *)device->token;
 }
 
-INLINE const terminal_interface *get_interface(const device_config *device)
+INLINE const terminal_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->type == GENERIC_TERMINAL);
-	return (const terminal_interface *) device->static_config;
+	return (const terminal_interface *) device->baseconfig().static_config;
 }
 
 /***************************************************************************
@@ -172,7 +172,7 @@ static const UINT8 terminal_font[256*16] =
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-static void terminal_scroll_line(const device_config *device)
+static void terminal_scroll_line(running_device *device)
 {
 	terminal_state *term = get_safe_token(device);
 
@@ -180,7 +180,7 @@ static void terminal_scroll_line(const device_config *device)
 	memset(term->buffer + TERMINAL_WIDTH*(TERMINAL_HEIGHT-1),0,TERMINAL_WIDTH);
 }
 
-static void terminal_write_char(const device_config *device,UINT8 data) {
+static void terminal_write_char(running_device *device,UINT8 data) {
 	terminal_state *term = get_safe_token(device);
 
 	term->buffer[term->y_pos*TERMINAL_WIDTH+term->x_pos] = data;
@@ -195,7 +195,7 @@ static void terminal_write_char(const device_config *device,UINT8 data) {
 	}
 }
 
-static void terminal_clear(const device_config *device) {
+static void terminal_clear(running_device *device) {
 	terminal_state *term = get_safe_token(device);
 
 	memset(term->buffer,0,TERMINAL_WIDTH*TERMINAL_HEIGHT);
@@ -244,7 +244,7 @@ WRITE8_DEVICE_HANDLER ( terminal_write )
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
-void generic_terminal_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+void generic_terminal_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 code;
 	int y, c, x, b;
@@ -379,7 +379,7 @@ UINT8 terminal_keyboard_handler(running_machine *machine, devcb_resolved_write8 
 
 static TIMER_CALLBACK(keyboard_callback)
 {
-	terminal_state *term = get_safe_token((const device_config *)ptr);
+	terminal_state *term = get_safe_token((running_device *)ptr);
 	term->last_code = terminal_keyboard_handler(machine, &term->terminal_keyboard_func, term->last_code, &term->scan_line);
 }
 
@@ -393,7 +393,7 @@ static VIDEO_START( terminal )
 
 static VIDEO_UPDATE(terminal )
 {
-	const device_config	*devconf = devtag_get_device(screen->machine, TERMINAL_TAG);
+	running_device *devconf = devtag_get_device(screen->machine, TERMINAL_TAG);
 	generic_terminal_update( devconf, bitmap, cliprect);
 	return 0;
 }
