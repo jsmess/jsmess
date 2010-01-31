@@ -653,7 +653,7 @@ static const struct CassetteFormat tzx_cassette_format =
 
 static const struct CassetteFormat tap_cassette_format =
 {
-	"tap",
+	"tap,blk",
 	tap_cassette_identify,
 	tap_cassette_load,
 	NULL
