@@ -37,6 +37,8 @@
       does a 1->0 transition, any write to the i/o space accesses 2 or 3 banks gradients of the bitmap RAM
       with a single write (generally used for layer clearances and bitmap-style sprites).
       Any i/o read disables this extended bitmap ram.
+    - I/O port $700 bit 7 of X1 Turbo is a sound (dip-)switch / jumper setting. I don't know yet what is for,
+      but King's Knight needs it to be active otherwise it refuses to boot.
 
 =================================================================================================
 
@@ -1374,7 +1376,8 @@ static READ8_HANDLER( x1turbo_io_r )
 {
 	io_bank_mode = 0; //any read disables the extended mode.
 
-	if(offset == 0x0700 || offset == 0x0701)		{ return ym2151_r(devtag_get_device(space->machine, "ym"), offset-0x0700); }
+	if(offset == 0x0700)							{ return (ym2151_r(devtag_get_device(space->machine, "ym"), offset-0x0700) & 0x7f) | (input_port_read(space->machine, "SOUND_SW") & 0x80); }
+	else if(offset == 0x0701)		                { return ym2151_r(devtag_get_device(space->machine, "ym"), offset-0x0700); }
 	else if(offset >= 0x0704 && offset <= 0x0707)   { return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
 	else if(offset == 0x0e03)                    	{ return x1_rom_r(space, 0); }
 	else if(offset >= 0x0e80 && offset <= 0x0e83)	{ return x1_kanji_r(space, offset-0xe80); }
@@ -1620,6 +1623,11 @@ static INPUT_PORTS_START( x1 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED(ipl_reset,0) PORT_NAME("IPL reset")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED(nmi_reset,0) PORT_NAME("NMI reset")
 
+	PORT_START("SOUND_SW") //FIXME: this is X1Turbo specific
+	PORT_DIPNAME( 0x80, 0x80, "OPM Sound Setting?" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_START("SYSTEM")
 	PORT_DIPNAME( 0x10, 0x10, "unk" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
@@ -1647,7 +1655,7 @@ static INPUT_PORTS_START( x1 )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "Sound Setting?" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -2080,7 +2088,7 @@ static MACHINE_RESET( x1 )
 }
 
 static MACHINE_START( x1 )
-{	
+{
 	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(16), NULL, 0, cmt_wind_timer);
 }
