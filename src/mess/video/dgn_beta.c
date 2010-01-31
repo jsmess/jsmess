@@ -87,27 +87,27 @@ the access to the video memory is unclear to me at the moment.
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
 
-//#define LOG_VIDEO
+#define LOG_VIDEO
 
 /* Names for 6845 regs, to save having to remember their offsets */
 /* perhaps these should move into 6845 header ? */
 typedef enum {
 	H_TOTAL = 0,		// Horizontal total
 	H_DISPLAYED,		// Horizontal displayed
-	H_SYNC_POS,		// Horizontal sync pos
+	H_SYNC_POS,		    // Horizontal sync pos
 	H_SYNC_WIDTH,		// Horizontal sync width
-	V_TOTAL,		// Vertical total
+	V_TOTAL,		    // Vertical total
 	V_TOTAL_ADJ,		// Vertical total adjust
 	V_DISPLAYED,		// Vertical displayed
-	V_SYNC_POS,		// Vertical sync pos
-	INTERLACE,		// Interlace
-	MAX_SCAN,		// Maximum scan line
-	CURS_START,		// Cursor start pos
-	CURS_END,		// Cursor end pos
+	V_SYNC_POS,		    // Vertical sync pos
+	INTERLACE,		    // Interlace
+	MAX_SCAN,		    // Maximum scan line
+	CURS_START,		    // Cursor start pos
+	CURS_END,		    // Cursor end pos
 	START_ADDR_H,		// Start address High
 	START_ADDR_L,		// Start address low
-	CURS_H,			// Cursor addr High
-	CURS_L			// CURSOR addr Low
+	CURS_H,			    // Cursor addr High
+	CURS_L			    // CURSOR addr Low
 } m6845_regs;
 
 static int beta_6845_RA = 0;
@@ -120,8 +120,8 @@ static int beta_DE      = 0;
 //static BETA_VID_MODES VIDMODE = TEXT_40x25;
 
 /* Debugging variables */
-static int LogRegWrites	= 0;	// Log register writes to debug console.
-static int BoxColour		= 1;
+static int LogRegWrites	= 1;	// Log register writes to debug console.
+static int BoxColour	= 1;
 static int BoxMinX		= 100;
 static int BoxMinY		= 100;
 static int BoxMaxX		= 500;
@@ -141,12 +141,12 @@ static void execute_beta_vid_limits(running_machine *machine, int ref, int param
 static void execute_beta_vid_clkmax(running_machine *machine, int ref, int params, const char *param[]);
 
 static bitmap_t	*bit;
-static int MinAddr	= 0xFFFF;
-static int MaxAddr	= 0x0000;
-static int MinX	= 0xFFFF;
-static int MaxX	= 0x0000;
-static int MinY	= 0xFFFF;
-static int MaxY	= 0x0000;
+static int MinAddr	    = 0xFFFF;
+static int MaxAddr	    = 0x0000;
+static int MinX	        = 0xFFFF;
+static int MaxX	        = 0x0000;
+static int MinY	        = 0xFFFF;
+static int MaxY	        = 0x0000;
 
 static int VidAddr		= 0;	// Last address reg written
 
@@ -156,12 +156,12 @@ static void beta_Set_VSync(running_machine *machine, int offset, int data);
 static void beta_Set_DE(int offset, int data);
 
 static const struct m6845_interface beta_m6845_interface = {
-	0,		// Memory Address register
+	0,		        // Memory Address register
 	beta_Set_RA,	// Row Address register
 	beta_Set_HSync,	// Horizontal status
 	beta_Set_VSync,	// Vertical status
 	beta_Set_DE,	// Display Enabled status
-	0,		// Cursor status
+	0,		        // Cursor status
 	0
 };
 
@@ -253,8 +253,8 @@ static void beta_Set_HSync(running_machine *machine, int offset, int data)
 
 	if(!beta_HSync)
 	{
-		int HT=m6845_get_register(H_TOTAL);			// Get H total
-		int HS=m6845_get_register(H_SYNC_POS);		// Get Hsync pos
+		int HT=m6845_get_register(H_TOTAL);			    // Get H total
+		int HS=m6845_get_register(H_SYNC_POS);		    // Get Hsync pos
 		int HW=m6845_get_register(H_SYNC_WIDTH)&0xF;	// Hsync width (in chars)
 
 		beta_scr_y++;
@@ -311,7 +311,7 @@ void dgnbeta_init_video(running_machine *machine)
 	/* initialise 6845 */
 	m6845_config(&beta_m6845_interface);
 	m6845_set_personality(M6845_PERSONALITY_HD6845S);
-
+    
 	GCtrl=0;
 
 	machine->generic.videoram.u8=messram_get_ptr(devtag_get_device(machine, "messram"));
@@ -334,6 +334,12 @@ void dgnbeta_init_video(running_machine *machine)
 		debug_console_register_command(machine, "beta_vid_clkmax", CMDFLAG_NONE, 0, 0, 1, execute_beta_vid_clkmax);
 	}
 	LogRegWrites=0;
+}
+
+void dgnbeta_video_reset(running_machine *machine)
+{
+    logerror("dgnbeta_video_reset\n");
+    m6845_reset();
 }
 
 /**************************/
@@ -385,7 +391,7 @@ static void plot_text_pixel(int x, int y,int Dot,int Colour, int CharsPerLine, b
 static void beta_plot_char_line(running_machine *machine, int x,int y, bitmap_t *bitmap)
 {
 	int CharsPerLine	= m6845_get_register(H_DISPLAYED);	// Get chars per line.
-	unsigned char *data 	= memory_region(machine, "gfx1");		// ptr to char rom
+	unsigned char *data = memory_region(machine, "gfx1");		// ptr to char rom
 	int Dot;
 	unsigned char data_byte;
 	int char_code;
@@ -707,8 +713,8 @@ WRITE8_HANDLER(dgnbeta_6845_w)
 	else
 	{
 		m6845_address_w(offset,data);
-		VidAddr=data;				/* Record reg being written to */
-	}
+		VidAddr=data;				        /* Record reg being written to */
+    }
 	if (LogRegWrites)
 		RegLog(space->machine, offset,data);
 }
@@ -753,12 +759,12 @@ static void RegLog(running_machine *machine, int offset, int data)
 		case CURS_END		: sprintf(RegName,"Cusrsor End  "); break;
 		case START_ADDR_H	: sprintf(RegName,"Start Addr H "); break;
 		case START_ADDR_L	: sprintf(RegName,"Start Addr L "); break;
-		case CURS_H		: sprintf(RegName,"Cursor H     "); break;
-		case CURS_L		: sprintf(RegName,"Cursor L     "); break;
+		case CURS_H		    : sprintf(RegName,"Cursor H     "); break;
+		case CURS_L		    : sprintf(RegName,"Cursor L     "); break;
 	}
 
 	if(offset&0x1)
-		debug_console_printf(machine, "6845 write Reg %s Addr=%3d Data=%3d ($%2.2X) \n",RegName,VidAddr,data,data);
+		debug_console_printf(machine, "6845 write Reg %s Addr=%3d Data=%3d ($%02X) \n",RegName,VidAddr,data,data);
 }
 
 static void execute_beta_vid_fill(running_machine *machine, int ref, int params, const char *param[])

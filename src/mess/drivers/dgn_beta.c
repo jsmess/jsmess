@@ -152,13 +152,13 @@ static ADDRESS_MAP_START( dgnbeta_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xE000, 0xEFFF) 	AM_RAMBANK("bank15")
 	AM_RANGE(0xF000, 0xFBFF) 	AM_RAMBANK("bank16")
 	AM_RANGE(0xfC00, 0xfC1F)	AM_NOP
-	AM_RANGE(0xFC20, 0xFC23)	AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
-	AM_RANGE(0xFC24, 0xFC27)	AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
+	AM_RANGE(0xFC20, 0xFC23)	AM_DEVREADWRITE(PIA_0_TAG, pia6821_r, pia6821_w)
+	AM_RANGE(0xFC24, 0xFC27)	AM_DEVREADWRITE(PIA_1_TAG, pia6821_r, pia6821_w)
 	AM_RANGE(0xFC28, 0xfC7F)	AM_NOP
 	AM_RANGE(0xfc80, 0xfc81)	AM_READWRITE(dgnbeta_6845_r	,dgnbeta_6845_w)
 	AM_RANGE(0xfc82, 0xfC9F)	AM_NOP
-	AM_RANGE(0xFCA0, 0xFCA3)	AM_READNOP AM_WRITE(dgnbeta_colour_ram_w)		/* 4x4bit colour ram for graphics modes */
-	AM_RANGE(0xFCC0, 0xFCC3)	AM_DEVREADWRITE("pia_2", pia6821_r, pia6821_w)
+	AM_RANGE(0xFCA0, 0xFCA3)	AM_READNOP AM_WRITE(dgnbeta_colour_ram_w)		    /* 4x4bit colour ram for graphics modes */
+	AM_RANGE(0xFCC0, 0xFCC3)	AM_DEVREADWRITE(PIA_2_TAG, pia6821_r, pia6821_w)
 	AM_RANGE(0xfcC4, 0xfcdf)	AM_NOP
 	AM_RANGE(0xfce0, 0xfce3)	AM_READWRITE(dgnbeta_wd2797_r	,dgnbeta_wd2797_w)	/* Onboard disk interface */
 	AM_RANGE(0xfce4, 0xfdff)	AM_NOP
@@ -318,11 +318,11 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( dgnbeta )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
+	MDRV_CPU_ADD(MAINCPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(dgnbeta_map)
 
 	/* both cpus in the beta share the same address/data busses */
-	MDRV_CPU_ADD("dma", M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
+	MDRV_CPU_ADD(DMACPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(dgnbeta_map)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -330,7 +330,7 @@ static MACHINE_DRIVER_START( dgnbeta )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(100))
 
 	MDRV_MACHINE_START( dgnbeta )
-
+    
 	/* video hardware */
 
 	MDRV_SCREEN_SIZE(700,550)
@@ -343,11 +343,11 @@ static MACHINE_DRIVER_START( dgnbeta )
 
 	MDRV_VIDEO_UPDATE( dgnbeta )
 
-	MDRV_PIA6821_ADD( "pia_0", dgnbeta_pia_intf[0] )
-	MDRV_PIA6821_ADD( "pia_1", dgnbeta_pia_intf[1] )
-	MDRV_PIA6821_ADD( "pia_2", dgnbeta_pia_intf[2] )
+	MDRV_PIA6821_ADD( PIA_0_TAG, dgnbeta_pia_intf[0] )
+	MDRV_PIA6821_ADD( PIA_1_TAG, dgnbeta_pia_intf[1] )
+	MDRV_PIA6821_ADD( PIA_2_TAG, dgnbeta_pia_intf[2] )
 
-	MDRV_WD179X_ADD("wd179x", dgnbeta_wd17xx_interface )
+	MDRV_WD179X_ADD(FDC_TAG, dgnbeta_wd17xx_interface )
 
 	MDRV_FLOPPY_4_DRIVES_ADD(dgnbeta_floppy_config)
 
@@ -363,7 +363,7 @@ static MACHINE_DRIVER_START( dgnbeta )
 MACHINE_DRIVER_END
 
 ROM_START(dgnbeta)
-	ROM_REGION(0x4000,"maincpu",0)
+	ROM_REGION(0x4000,MAINCPU_TAG,0)
     ROM_SYSTEM_BIOS( 0, "bootrom", "Dragon beta OS9 boot rom (1984)" )
 	ROMX_LOAD("beta_bt.rom"		,0x0000	,0x4000	,CRC(4c54c1de) SHA1(141d9fcd2d187c305dff83fce2902a30072aed76), ROM_BIOS(1))
     ROM_SYSTEM_BIOS( 1, "testrom", "Dragon beta test rom (1984?)" )
