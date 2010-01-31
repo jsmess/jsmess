@@ -73,7 +73,8 @@ void wd17xx_set_drive(running_device *device, UINT8);		/* set drive wd179x is ac
 void wd17xx_set_side(running_device *device, UINT8);		/* set side wd179x is accessing */
 void wd17xx_set_density(running_device *device, DENSITY);	/* set density */
 
-void wd17xx_set_pause_time(running_device *device, int usec); /* default is 40 usec if not set */
+void wd17xx_set_pause_time(running_device *device, int usec);       /* default is 40 usec if not set */
+void wd17xx_set_complete_command_delay(running_device *device, int usec);   /* default is 12 usec if not set */
 
 READ8_DEVICE_HANDLER( wd17xx_status_r );
 READ8_DEVICE_HANDLER( wd17xx_track_r );

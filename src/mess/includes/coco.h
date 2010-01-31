@@ -90,6 +90,7 @@ MACHINE_START( dragon32 );
 MACHINE_START( dragon64 );
 MACHINE_START( tanodr64 );
 MACHINE_START( dgnalpha );
+MACHINE_RESET( dgnalpha );
 MACHINE_START( coco );
 MACHINE_START( coco2 );
 MACHINE_START( coco3 );

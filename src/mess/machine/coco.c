@@ -1747,12 +1747,10 @@ static WRITE_LINE_DEVICE_HANDLER( dgnalpha_fdc_intrq_w )
 		{
 			if (pia6821_get_output_ca2_z(cstate->pia_2))
 				cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
-		}
+        }
 	}
 	else
-	{
 		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
-	}
 }
 
 /* The DRQ line goes through pia2 cb1, in exactly the same way as DRQ from DragonDos does */
@@ -1805,7 +1803,7 @@ WRITE8_HANDLER(dgnalpha_wd2797_w)
 			wd17xx_track_w(fdc, 0, data);
 			break;
 		case 3:
-			wd17xx_command_w(fdc, 0, data);
+            wd17xx_command_w(fdc, 0, data);
 
 			/* disk head is encoded in the command byte */
 			wd17xx_set_side(fdc,(data & 0x02) ? 1 : 0);
@@ -2895,8 +2893,14 @@ MACHINE_START( dgnalpha )
 	init.printer_out_		= printer_out_dragon;
 
 	generic_coco12_dragon_init(machine, &init);
+}
 
-	/* dgnalpha_just_reset, is here to flag that we should ignore the first irq generated */
+MACHINE_RESET( dgnalpha )
+{
+	running_device *fdc = devtag_get_device(machine, "wd2797");
+	wd17xx_set_complete_command_delay(fdc,20);
+ 
+    /* dgnalpha_just_reset, is here to flag that we should ignore the first irq generated */
 	/* by the WD2797, it is reset to 0 after the first inurrupt */
 	dgnalpha_just_reset=1;
 }

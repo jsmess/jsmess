@@ -270,9 +270,9 @@ static ADDRESS_MAP_START( dgnalpha_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff00, 0xff03) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
 	AM_RANGE(0xff04, 0xff07) AM_DEVREADWRITE("acia", acia_6551_r, acia_6551_w)
 	AM_RANGE(0xff20, 0xff23) AM_DEVREADWRITE("pia_1", pia6821_r, coco_pia_1_w)
-	AM_RANGE(0xff24, 0xff27) AM_DEVREADWRITE("pia_2", pia6821_r, pia6821_w) 	/* Third PIA on Dragon Alpha */
+	AM_RANGE(0xff24, 0xff27) AM_DEVREADWRITE("pia_2", pia6821_r, pia6821_w) 	    /* Third PIA on Dragon Alpha */
 	AM_RANGE(0Xff28, 0xff2b) AM_READWRITE(dgnalpha_modem_r, dgnalpha_modem_w)		/* Modem, dummy to stop eror log ! */
-	AM_RANGE(0xff2c, 0xff2f) AM_READWRITE(dgnalpha_wd2797_r, dgnalpha_wd2797_w)				/* Alpha onboard disk interface */
+	AM_RANGE(0xff2c, 0xff2f) AM_READWRITE(dgnalpha_wd2797_r, dgnalpha_wd2797_w)	/* Alpha onboard disk interface */
 	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE("coco_cartslot", coco_cartridge_r, coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE("sam", sam6883_w)
@@ -928,6 +928,7 @@ static MACHINE_DRIVER_START( dgnalpha )
 
 	MDRV_MACHINE_START( dgnalpha )
 	MDRV_DRIVER_DATA( coco_state )
+    MDRV_MACHINE_RESET( dgnalpha )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
