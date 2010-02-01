@@ -172,7 +172,7 @@ static parallel_drum_t parallel_drum;
 static DIRECT_UPDATE_HANDLER(setOPbasefunc)
 {
 	/* just to get rid of the warnings */
-	return -1;
+	return ~1;
 }
 
 
