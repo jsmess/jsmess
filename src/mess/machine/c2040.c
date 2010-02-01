@@ -1421,30 +1421,26 @@ static DEVICE_START( c2040 )
 	c2040->unit[1].image = device->subdevice(FLOPPY_1);
 
 	/* find GCR ROM */
+	const region_info *region = device->subregion(C4040_REGION);
+
 	if ((device->type == C2040) || (device->type == C3040))
 	{
-		astring region_name(device->tag, ":", C2040_REGION);
-		c2040->gcr = memory_region(device->machine, region_name.cstr()) + 
-			memory_region_length(device->machine, region_name.cstr()) - 0x800;
+		region = device->subregion(C2040_REGION);
 	}
 	else if (device->type == C4040)
 	{
-		astring region_name(device->tag, ":", C4040_REGION);
-		c2040->gcr = memory_region(device->machine, region_name.cstr()) + 
-			memory_region_length(device->machine, region_name.cstr()) - 0x800;
+		region = device->subregion(C4040_REGION);
 	}
 	else if ((device->type == C8050) || (device->type == C8250))
 	{
-		astring region_name(device->tag, ":", C8050_REGION);
-		c2040->gcr = memory_region(device->machine, region_name.cstr()) + 
-			memory_region_length(device->machine, region_name.cstr()) - 0x800;
+		region = device->subregion(C8050_REGION);
 	}
 	else if (device->type == SFD1001)
 	{
-		astring region_name(device->tag, ":", SFD1001_REGION);
-		c2040->gcr = memory_region(device->machine, region_name.cstr()) + 
-			memory_region_length(device->machine, region_name.cstr()) - 0x800;
+		region = device->subregion(SFD1001_REGION);
 	}
+
+	c2040->gcr = region->base.u8 + region->length - 0x800;
 
 	/* allocate data timer */
 	c2040->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
