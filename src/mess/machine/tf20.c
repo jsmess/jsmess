@@ -75,8 +75,8 @@ static READ8_HANDLER( tf20_rom_disable )
 	tf20_state *tf20 = get_safe_token(space->cpu->owner);
 	const address_space *prg = cpu_get_address_space(space->cpu, ADDRESS_SPACE_PROGRAM);
 
-	memory_install_readwrite_bank(prg, 0x0000, 0x7fff, 0, 0,"bank21");
-	memory_set_bankptr(space->machine, "bank21", messram_get_ptr(tf20->ram));
+	/* switch in ram */
+	memory_install_ram(prg, 0x0000, 0x7fff, 0, 0, messram_get_ptr(tf20->ram));
 
 	/* clear tc */
 	upd765_tc_w(tf20->upd765a, CLEAR_LINE);
@@ -320,6 +320,7 @@ static DEVICE_START( tf20 )
 {
 	tf20_state *tf20 = get_safe_token(device);
 	running_device *cpu = device->subdevice("tf20");
+	const address_space *prg = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 
 	cpu_set_irq_callback(cpu, tf20_irq_ack);
 
@@ -328,10 +329,7 @@ static DEVICE_START( tf20 )
 
 	/* make sure its already running */
 	if (!tf20->ram->started)
-	{
-		//device_delay_init(device);
-		return;
-	}
+		throw device_missing_dependencies();
 
 	/* locate child devices */
 	tf20->upd765a = device->subdevice("5a");
@@ -340,7 +338,7 @@ static DEVICE_START( tf20 )
 	tf20->floppy_1 = device->subdevice(FLOPPY_1);
 
 	/* enable second half of ram */
-	memory_set_bankptr(device->machine, "bank22", messram_get_ptr(tf20->ram) + 0x8000);
+	memory_install_ram(prg, 0x8000, 0xffff, 0, 0, messram_get_ptr(tf20->ram) + 0x8000);
 }
 
 static DEVICE_RESET( tf20 )
@@ -349,9 +347,7 @@ static DEVICE_RESET( tf20 )
 	const address_space *prg = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 
 	/* enable rom */
-	memory_install_read_bank(prg, 0x0000, 0x07ff, 0, 0x7800, "bank21");
-	memory_nop_write(prg, 0x0000, 0x07ff, 0, 0x7800);
-	memory_set_bankptr(device->machine, "bank21", (void*)cpu->region);
+	memory_install_rom(prg, 0x0000, 0x07ff, 0, 0x7800, cpu->region->base.v);
 }
 
 DEVICE_GET_INFO( tf20 )
