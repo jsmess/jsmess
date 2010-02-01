@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
+#include "emu.h"
 #include "softlist.h"
 #include "devices/cartslot.h"
 
@@ -264,9 +264,9 @@ MEGADRIVE_ROM_LOAD( addamfam,  "mpr-16147.bin",                                 
 MEGADRIVE_ROM_LOAD( addamfamb, "addams family, the (usa) (beta).bin",                                                    0x000000, 0x100000,  CRC(2803a5ca) SHA1(34deb427637d0458ce229b4fe3e55ad7901a0a34) )
 MEGADRIVE_ROM_LOAD( addamfamb1,"addams family, the (usa) (beta) (alt).bin",                                              0x000000, 0x100000,  CRC(3a173e1f) SHA1(632b321b860021f8a473fccc7bf8a03bd9c2d581) )
 MEGADRIVE_ROM_LOAD( addfamv,   "addams family values (euro).bin",                                                        0x000000, 0x200000,  CRC(b906b992) SHA1(b7f138e7658a0151ad154ddaed18aea10e114c46) )
-MEGADRIVE_ROM_LOAD( advbatp10, "adventures of batman & robin, the (prototype - apr 27, 1995).bin",                       0x000000, 0x200000,  CRC(fdac8190) SHA1(1a2bece0e3f66dcdd44b555ce45deda510b8ca3a) )
-MEGADRIVE_ROM_LOAD( advbatp11, "adventures of batman & robin, the (prototype - apr 28, 1995).bin",                       0x000000, 0x200000,  CRC(27a1524b) SHA1(2e41a3b9c64d93de1d05c830f6d8471edfc2090c) )
-MEGADRIVE_ROM_LOAD( advbatp12, "adventures of batman & robin, the (prototype - may 01, 1995).bin",                       0x000000, 0x200000,  CRC(589aa203) SHA1(10467cc121afd7d74699b3ab6b7243b370c09e47) )
+MEGADRIVE_ROM_LOAD( advbatrp10, "adventures of batman & robin, the (prototype - apr 27, 1995).bin",                      0x000000, 0x200000,  CRC(fdac8190) SHA1(1a2bece0e3f66dcdd44b555ce45deda510b8ca3a) )
+MEGADRIVE_ROM_LOAD( advbatrp11, "adventures of batman & robin, the (prototype - apr 28, 1995).bin",                      0x000000, 0x200000,  CRC(27a1524b) SHA1(2e41a3b9c64d93de1d05c830f6d8471edfc2090c) )
+MEGADRIVE_ROM_LOAD( advbatrp12, "adventures of batman & robin, the (prototype - may 01, 1995).bin",                      0x000000, 0x200000,  CRC(589aa203) SHA1(10467cc121afd7d74699b3ab6b7243b370c09e47) )
 MEGADRIVE_ROM_LOAD( advbatr,   "mpr-18019.bin",                                                                          0x000000, 0x200000,  CRC(355e8c39) SHA1(c08c48236c38263df8ea38a5820d16644bddb1a2) )
 MEGADRIVE_ROM_LOAD( advbatrp1, "adventures of batman & robin, the (prototype - apr 06, 1995).bin",                       0x000000, 0x200000,  CRC(f05cf389) SHA1(bb7ed12f68a7df4956891338d6db0f29acb0f5df) )
 MEGADRIVE_ROM_LOAD( advbatrp2, "adventures of batman & robin, the (prototype - apr 10, 1995).bin",                       0x000000, 0x200000,  CRC(d4f3a070) SHA1(27b06143ca3d31504e75429610acc34be4bbe514) )
