@@ -2680,7 +2680,7 @@ static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 			for (sound = sound_first(config); sound != NULL; sound = sound_next(sound))
 			{
 				if (sound_get_type(sound) == SOUND_SAMPLES
-					//||  sound_get_type(sound) == SOUND_VLM5030
+					||  sound_get_type(sound) == SOUND_VLM5030
 					)
 				{
 					enabled = TRUE;
