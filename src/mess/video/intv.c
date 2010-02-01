@@ -62,7 +62,7 @@ VIDEO_START( intv )
 
 
 static int sprites_collide(int spriteNum0, int spriteNum1) {
-    UINT8 x1, x2, y1, y2, w1, w2, h1, h2, x0, y0, r0y, r1y,
+    INT16 x1, x2, y1, y2, w1, w2, h1, h2, x0, y0, r0y, r1y,
           width, height, x, y;
 
     struct intv_sprite_type* s1 = &intv_sprite[spriteNum0];
