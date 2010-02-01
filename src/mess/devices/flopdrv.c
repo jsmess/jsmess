@@ -295,7 +295,7 @@ static void floppy_drive_init(running_device *img)
 	/* initialise id index - not so important */
 	pDrive->id_index = 0;
 	/* initialise track */
-	pDrive->current_track = 1;
+	pDrive->current_track = 0;
 
 	/* default RPM */
 	pDrive->rpm = 300;
