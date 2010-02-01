@@ -544,6 +544,7 @@ $(MESSOBJ)/acorn.a:				\
 $(MESSOBJ)/act.a:				\
 	$(MESS_DRIVERS)/apricot.o	\
 	$(MESS_DRIVERS)/apricotf.o	\
+	$(MESS_FORMATS)/apridisk.o	\
 
 $(MESSOBJ)/amiga.a:				\
 	$(MAME_VIDEO)/amiga.o		\

@@ -18,6 +18,7 @@
 #include "video/mc6845.h"
 #include "devices/messram.h"
 #include "devices/flopdrv.h"
+#include "formats/apridisk.h"
 
 
 /***************************************************************************
@@ -277,9 +278,9 @@ static DRIVER_INIT( apricot )
 
 	cpu_set_irq_callback(maincpu, apricot_irq_ack);
 
-	apricot->pic8259 = devtag_get_device(machine, "pic8259");
-	apricot->wd2793 = devtag_get_device(machine, "wd2793");
-	apricot->mc6845 = devtag_get_device(machine, "mc6845");
+	apricot->pic8259 = devtag_get_device(machine, "ic31");
+	apricot->wd2793 = devtag_get_device(machine, "ic68");
+	apricot->mc6845 = devtag_get_device(machine, "ic30");
 
 	apricot->video_mode = 0;
 	apricot->display_on = 1;
@@ -298,15 +299,17 @@ static ADDRESS_MAP_START( apricot_mem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( apricot_io, ADDRESS_SPACE_IO, 16 )
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0x00ff)
-	AM_RANGE(0x40, 0x47) AM_DEVREADWRITE8("wd2793", wd17xx_r, wd17xx_w, 0x00ff)
-	AM_RANGE(0x48, 0x4f) AM_DEVREADWRITE8("i8255a", i8255a_r, i8255a_w, 0x00ff)
-	AM_RANGE(0x50, 0x51) AM_DEVWRITE8("sn76489", sn76496_w, 0x00ff)
-	AM_RANGE(0x58, 0x5f) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0x00ff)
-	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE8("z80sio", apricot_sio_r, apricot_sio_w, 0x00ff)
-	AM_RANGE(0x68, 0x69) AM_DEVWRITE8("mc6845", mc6845_address_w, 0x00ff)
-	AM_RANGE(0x6a, 0x6b) AM_DEVREADWRITE8("mc6845", mc6845_register_r, mc6845_register_w, 0x00ff)
-//	AM_RANGE(0x70, 0x73) 8089
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("ic31", pic8259_r, pic8259_w, 0x00ff)
+	AM_RANGE(0x40, 0x47) AM_DEVREADWRITE8("ic68", wd17xx_r, wd17xx_w, 0x00ff)
+	AM_RANGE(0x48, 0x4f) AM_DEVREADWRITE8("ic17", i8255a_r, i8255a_w, 0x00ff)
+	AM_RANGE(0x50, 0x51) AM_MIRROR(0x06) AM_DEVWRITE8("ic7", sn76496_w, 0x00ff)
+	AM_RANGE(0x58, 0x5f) AM_DEVREADWRITE8("ic16", pit8253_r, pit8253_w, 0x00ff)
+	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE8("ic15", apricot_sio_r, apricot_sio_w, 0x00ff)
+	AM_RANGE(0x68, 0x69) AM_MIRROR(0x04) AM_DEVWRITE8("ic30", mc6845_address_w, 0x00ff)
+	AM_RANGE(0x6a, 0x6b) AM_MIRROR(0x04) AM_DEVREADWRITE8("ic30", mc6845_register_r, mc6845_register_w, 0x00ff)
+//	AM_RANGE(0x70, 0x71) AM_MIRROR(0x04) 8089 channel attention 1
+//	AM_RANGE(0x72, 0x73) AM_MIRROR(0x04) 8089 channel attention 2
+	AM_RANGE(0x78, 0x7f) AM_NOP /* unavailable */
 ADDRESS_MAP_END
 
 
@@ -334,6 +337,18 @@ static PALETTE_INIT( apricot )
     MACHINE DRIVERS
 ***************************************************************************/
 
+static FLOPPY_OPTIONS_START( apricot )
+	FLOPPY_OPTION
+	(
+		apridisk, "dsk", "ACT Apricot disk image", apridisk_identify, apridisk_construct,
+		HEADS(1-[2])
+		TRACKS(70/[80])
+		SECTORS([9]/18)
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1])
+	)
+FLOPPY_OPTIONS_END
+
 static const floppy_config apricot_floppy_config =
 {
 	DEVCB_NULL,
@@ -342,7 +357,7 @@ static const floppy_config apricot_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_DRIVE_SS_40,
-	FLOPPY_OPTIONS_NAME(default),
+	FLOPPY_OPTIONS_NAME(apricot),
 	DO_NOT_KEEP_GEOMETRY
 };
 
@@ -353,6 +368,8 @@ static MACHINE_DRIVER_START( apricot )
 	MDRV_CPU_ADD("maincpu", I8086, XTAL_15MHz / 3)
 	MDRV_CPU_PROGRAM_MAP(apricot_mem)
 	MDRV_CPU_IO_MAP(apricot_io)
+
+//	MDRV_CPU_ADD("ic71", I8089, XTAL_15MHz / 3)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -366,11 +383,11 @@ static MACHINE_DRIVER_START( apricot )
 
 	MDRV_VIDEO_UPDATE(apricot)
 
-	MDRV_MC6845_ADD("mc6845", MC6845, XTAL_15MHz / 10, apricot_mc6845_intf)
+	MDRV_MC6845_ADD("ic30", MC6845, XTAL_15MHz / 10, apricot_mc6845_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sn76489", SN76489, XTAL_4MHz / 2)
+	MDRV_SOUND_ADD("ic7", SN76489, XTAL_4MHz / 2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* internal ram */
@@ -378,13 +395,13 @@ static MACHINE_DRIVER_START( apricot )
 	MDRV_RAM_DEFAULT_SIZE("256k")
 	MDRV_RAM_EXTRA_OPTIONS("384k,512k") /* with 1 or 2 128k expansion boards */
 
-	MDRV_I8255A_ADD("i8255a", apricot_i8255a_intf)
-	MDRV_PIC8259_ADD("pic8259", apricot_pic8259_intf)
-	MDRV_PIT8253_ADD("pit8253", apricot_pit8253_intf)
-	MDRV_Z80SIO_ADD("z80sio", 0, apricot_z80sio_intf)
+	MDRV_I8255A_ADD("ic17", apricot_i8255a_intf)
+	MDRV_PIC8259_ADD("ic31", apricot_pic8259_intf)
+	MDRV_PIT8253_ADD("ic16", apricot_pit8253_intf)
+	MDRV_Z80SIO_ADD("ic15", 0, apricot_z80sio_intf)
 
 	/* floppy */
-	MDRV_WD2793_ADD("wd2793", apricot_wd17xx_intf)
+	MDRV_WD2793_ADD("ic68", apricot_wd17xx_intf)
 	MDRV_FLOPPY_2_DRIVES_ADD(apricot_floppy_config)
 MACHINE_DRIVER_END
 
