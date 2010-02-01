@@ -488,7 +488,9 @@ READ8_DEVICE_HANDLER( sms_vdp_ctrl_r )
 		if (smsvdp->int_callback)
 			smsvdp->int_callback(device->machine, CLEAR_LINE);
 	}
-	return temp;
+
+	/* low 5 bits return non-zero data (it fixes PGA Tour Golf course map introduction) */
+	return temp | 0x1f;
 }
 
 

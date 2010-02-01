@@ -46,7 +46,11 @@ System Driver Changes:
 
 - [SCV] Implemented upd177c audio. [plgDavid]
 
+- [SMS] Fixed PGA Tour Golf freeze based on Flubba's & RetroRalph's 
+  research (bug #1911). [Enik Land]
+
 - [TX0] Fixed disassembly in the debugger. [Robbbert]
+
 
 
 Imgtool Changes:
