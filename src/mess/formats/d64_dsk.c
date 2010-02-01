@@ -4,17 +4,17 @@
 
 	SYNC						FF * 5
 	08
-	ID1
-	ID2
-	TRACK						1..35 (2040), 1..77 (8050)
+	CHECKSUM					sector ^ track ^ id2 ^ id1
 	SECTOR						0..20 (2040), 0..28 (8050)
-	CHECKSUM
-	GAP 1						55 * 9 (2040), 8 (1541)
+	TRACK						1..35 (2040), 1..77 (8050), 1..70 (1571)
+	ID2
+	ID1
+	GAP 1						55 * 9 (2040), 55 * 8 (1541)
 
 	SYNC						FF * 5
 	07
-	BYTE 0
-	BYTE 1
+	NEXT TRACK
+	NEXT SECTOR
 	254 BYTES OF DATA
 	CHECKSUM
 	GAP 2						55 * 8..19
@@ -64,7 +64,7 @@ groups of 4 bytes into groups of 5 bytes, below.
 #include "formats/d64_dsk.h"
 #include "devices/flopdrv.h"
 
-#define LOG 1
+#define LOG 0
 
 #define MAX_HEADS			2
 #define MAX_TRACKS			84
@@ -403,7 +403,7 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 			gcr_pos += 5;
 
 			/* Inter-sector gap */
-			// "In tests that the author conducted on a real 1541 disk, gap sizes of 8  to  19 bytes were seen."
+			// "In tests that the author conducted on a real 1541 disk, gap sizes of 8 to 19 bytes were seen."
 			// Here we put 14 as an average...
 			for (i = 0; i < 14; i++)
 				gcr_track_data[gcr_pos + i] = 0x55;

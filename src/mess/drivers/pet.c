@@ -388,7 +388,7 @@ normal keyboards?
 #include "machine/cbmipt.h"
 #include "video/mc6845.h"
 #include "devices/messram.h"
-#include "machine/c1541.h"
+#include "machine/c2040.h"
 
 /* devices config */
 #include "includes/cbm.h"
@@ -648,7 +648,7 @@ static IEEE488_DAISY( ieee488_daisy )
 	{ "pia_0" },
 	{ "pia_1", DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER("pia_1", pia6821_cb1_w), DEVCB_DEVICE_HANDLER("pia_1", pia6821_ca1_w), DEVCB_NULL },
 	{ "via6522_0" },
-	{ C2031_IEEE488("c2031") },
+	{ C2040_IEEE488("c4040") },
 	{ NULL}
 };
 
@@ -693,7 +693,7 @@ static MACHINE_DRIVER_START( pet_general )
 
 	/* IEEE bus */
 	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MDRV_C2031_ADD("c2031", "ieee_bus", 8)
+	MDRV_C4040_ADD("c4040", "ieee_bus", 8)
 MACHINE_DRIVER_END
 
 

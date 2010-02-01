@@ -42,6 +42,8 @@ System Driver Changes:
 
 - [PDP1] Fixed crash when debugger invoked (bug #1371]. [Robbbert]
 
+- [PET] Changed floppy drive to Commodore 4040. [Curt Coder]
+
 - [SCV] Implemented upd177c audio. [plgDavid]
 
 - [TX0] Fixed disassembly in the debugger. [Robbbert]
@@ -63,6 +65,8 @@ Source Changes:
 
 - Cleanups for driver_data and Standard C library usage.  [Atari Ace]
 
+- Placed floppy drive head initially on track 0 to fix alignment issues 
+  with Commodore drives, where physical track 1 is a half track. [Curt Coder]
 
 
 0.136

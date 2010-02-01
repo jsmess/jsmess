@@ -11,8 +11,6 @@
 
 	TODO:
 
-	- e21t18s00
-	- read from disk
 	- 8050 clock generator
 	- write to disk
 	- save state
@@ -111,6 +109,7 @@ struct _c2040_t
 	int ready;							/* byte ready */
 	int mode;							/* mode select */
 	int rw;								/* read/write select */
+	int miot_irq;						/* MIOT interrupt */
 
 	/* devices */
 	running_device *cpu_dos;
@@ -219,7 +218,7 @@ INLINE void update_gcr_data(c2040_t *c2040)
 		int ready = !(c2040->bit_count==9);
 		int error = !(ready | BIT(c2040->e, 3));
 
-		logerror("offs %04x G64 %02x READY %u PA %02x DATA %03x GCR %02x SYNC %u ERROR %u I %04x\n", c2040->unit[c2040->drive].buffer_pos, 
+		logerror("offs %04x/%04x G64 %02x READY %u PA %02x DATA %03x GCR %02x SYNC %u ERROR %u I %04x\n", c2040->unit[c2040->drive].buffer_pos-1, c2040->unit[c2040->drive].track_len,
 			c2040->unit[c2040->drive].track_buffer[c2040->unit[c2040->drive].buffer_pos],
 			ready, pa, c2040->sr & 0x3ff, c2040->e, SYNC, error, c2040->i);
 	}
@@ -255,7 +254,7 @@ static TIMER_CALLBACK( bit_tick )
 		c2040->unit[c2040->drive].bit_pos = 7;
 		c2040->unit[c2040->drive].buffer_pos++;
 
-		if (c2040->unit[c2040->drive].buffer_pos > c2040->unit[c2040->drive].track_len + 1)
+		if (c2040->unit[c2040->drive].buffer_pos == c2040->unit[c2040->drive].track_len + 2)
 		{
 			/* loop to the start of the track */
 			c2040->unit[c2040->drive].buffer_pos = TRACK_DATA_START;
@@ -279,9 +278,9 @@ static TIMER_CALLBACK( bit_tick )
 	{
 		/* set byte ready flag */
 		c2040->ready = ready;
-		via_ca1_w(c2040->via, ready);
 	}
 
+	via_ca1_w(c2040->via, ready);
 	via_cb1_w(c2040->via, ERROR);
 }
 
@@ -670,8 +669,9 @@ static READ8_DEVICE_HANDLER( via_pa_r )
 
 	UINT16 i = c2040->i;
 	UINT8 e = c2040->e;
+	UINT8 data = (BIT(e, 6) << 7) | (BIT(i, 7) << 6) | (e & 0x33) | (BIT(e, 2) << 3) | (i & 0x04);
 
-	return (BIT(e, 6) << 7) | (BIT(i, 7) << 6) | (e & 0x33) | (BIT(e, 2) << 3) | (i & 0x04);
+	return data;
 }
 
 static READ8_DEVICE_HANDLER( via_pb_r )
@@ -722,7 +722,7 @@ static void step_motor(c2040_t *c2040, int unit, int stp)
 			floppy_drive_read_track_data_info_buffer(c2040->unit[unit].image, c2040->side, c2040->unit[unit].track_buffer, &c2040->unit[unit].track_len);
 
 			/* extract track length */
-			c2040->unit[unit].track_len = (c2040->unit[unit].track_buffer[1] << 8) | c2040->unit[unit].track_buffer[0];
+			c2040->unit[unit].track_len = 2 + ((c2040->unit[unit].track_buffer[1] << 8) | c2040->unit[unit].track_buffer[0]);
 		}
 
 		c2040->unit[unit].stp = stp;
@@ -1004,7 +1004,11 @@ static void miot_pb_w(running_device *device, UINT8 newdata, UINT8 olddata)
 	}
 
 	/* interrupt */
-	cpu_set_input_line(c2040->cpu_fdc, M6502_IRQ_LINE, BIT(newdata, 7) ? CLEAR_LINE : ASSERT_LINE);
+	if (c2040->miot_irq != BIT(newdata, 7))
+	{
+		cpu_set_input_line(c2040->cpu_fdc, M6502_IRQ_LINE, BIT(newdata, 7) ? CLEAR_LINE : ASSERT_LINE);
+		c2040->miot_irq = BIT(newdata, 7);
+	}
 }
 
 static const miot6530_interface miot_intf =
@@ -1417,27 +1421,30 @@ static DEVICE_START( c2040 )
 	c2040->unit[1].image = device->subdevice(FLOPPY_1);
 
 	/* find GCR ROM */
-	running_device *region_dev = NULL;
-
 	if ((device->type == C2040) || (device->type == C3040))
 	{
-		region_dev = device->subdevice(C2040_REGION);
+		astring region_name(device->tag, ":", C2040_REGION);
+		c2040->gcr = memory_region(device->machine, region_name.cstr()) + 
+			memory_region_length(device->machine, region_name.cstr()) - 0x800;
 	}
 	else if (device->type == C4040)
 	{
-		region_dev = device->subdevice(C4040_REGION);
+		astring region_name(device->tag, ":", C4040_REGION);
+		c2040->gcr = memory_region(device->machine, region_name.cstr()) + 
+			memory_region_length(device->machine, region_name.cstr()) - 0x800;
 	}
 	else if ((device->type == C8050) || (device->type == C8250))
 	{
-		region_dev = device->subdevice(C8050_REGION);
+		astring region_name(device->tag, ":", C8050_REGION);
+		c2040->gcr = memory_region(device->machine, region_name.cstr()) + 
+			memory_region_length(device->machine, region_name.cstr()) - 0x800;
 	}
 	else if (device->type == SFD1001)
 	{
-		region_dev = device->subdevice(SFD1001_REGION);
+		astring region_name(device->tag, ":", SFD1001_REGION);
+		c2040->gcr = memory_region(device->machine, region_name.cstr()) + 
+			memory_region_length(device->machine, region_name.cstr()) - 0x800;
 	}
-
-	c2040->gcr = memory_region(device->machine, region_dev->tag.cstr()) + 
-		memory_region_length(device->machine, region_dev->tag.cstr()) - 0x800;
 
 	/* allocate data timer */
 	c2040->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
