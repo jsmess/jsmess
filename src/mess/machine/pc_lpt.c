@@ -84,13 +84,6 @@ static DEVICE_START( pc_lpt )
 	lpt->centronics = device->subdevice("centronics");
 	assert(lpt->centronics != NULL);
 
-	/* make sure it's running */
-	if (!lpt->centronics->started)
-	{
-		//device_delay_init(device);
-		return;
-	}
-
 	/* resolve callbacks */
 	devcb_resolve_write_line(&lpt->out_irq_func, &intf->out_irq_func, device);
 

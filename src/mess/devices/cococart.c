@@ -95,10 +95,7 @@ static DEVICE_START(coco_cartridge)
 	{
 		cococart->pcb = cartslot_get_pcb(cartslot);
 		if (cococart->pcb == NULL)
-		{
-			//device_delay_init(device);			
-			return;
-		}
+			throw device_missing_dependencies();
 
 		cococart->pcb_r = (read8_device_func) cococart->pcb->get_config_fct(COCOCARTINFO_FCT_FF40_R);
 		cococart->pcb_w = (write8_device_func) cococart->pcb->get_config_fct(COCOCARTINFO_FCT_FF40_W);
