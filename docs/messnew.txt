@@ -25,18 +25,26 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
+
+- [APEXC] Fixed disassembly in the debugger. [Robbbert]
+
 - [C64] Added read-only access to D64 floppies. [Fabio Priuli, Curt Coder]
 
 - [C128] Added read-only access to double-sided D71 floppies. [Curt Coder]
 
 - [C128] Fast IEC serial bus is now supported with a 1571. [Curt Coder]
 
+- [INTV] Fixed collision detection. [H@P]
+
 - [MIKROMIK] Fixed memory banking regression. [Curt Coder]
 
 - [ODYSSEY2] Fixed shape of $ character (bug #1582). [Justin Kerk]
 
+- [PDP1] Fixed crash when debugger invoked (bug #1371]. [Robbbert]
+
 - [SCV] Implemented upd177c audio. [plgDavid]
 
+- [TX0] Fixed disassembly in the debugger. [Robbbert]
 
 
 Imgtool Changes:
