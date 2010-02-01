@@ -64,9 +64,6 @@ static void iot_011(running_device *device, int op2, int nac, int mb, int *io, i
 
 static void iot_cks(running_device *device, int op2, int nac, int mb, int *io, int ac);
 
-/* pointer to pdp-1 RAM */
-static int *pdp1_memory;
-
 
 /*
     devices which are known to generate a completion pulse (source: maintainance manual 9-??,
@@ -169,13 +166,6 @@ static parallel_drum_t parallel_drum;
 #define PARALLEL_DRUM_ROTATION_TIME ATTOTIME_IN_NSEC(8500*4096)
 
 
-static DIRECT_UPDATE_HANDLER(setOPbasefunc)
-{
-	/* just to get rid of the warnings */
-	return ~1;
-}
-
-
 pdp1_reset_param_t pdp1_reset_param =
 {
 	{	/* external iot handlers.  NULL means that the iot is unimplemented, unless there are
@@ -212,12 +202,12 @@ pdp1_reset_param_t pdp1_reset_param =
 
 MACHINE_RESET( pdp1 )
 {
-	int config;
+	int cfg;
 
-	config = input_port_read(machine, "CFG");
-	pdp1_reset_param.extend_support = (config >> pdp1_config_extend_bit) & pdp1_config_extend_mask;
-	pdp1_reset_param.hw_mul_div = (config >> pdp1_config_hw_mul_div_bit) & pdp1_config_hw_mul_div_mask;
-	pdp1_reset_param.type_20_sbs = (config >> pdp1_config_type_20_sbs_bit) & pdp1_config_type_20_sbs_mask;
+	cfg = input_port_read(machine, "CFG");
+	pdp1_reset_param.extend_support = (cfg >> pdp1_config_extend_bit) & pdp1_config_extend_mask;
+	pdp1_reset_param.hw_mul_div = (cfg >> pdp1_config_hw_mul_div_bit) & pdp1_config_hw_mul_div_mask;
+	pdp1_reset_param.type_20_sbs = (cfg >> pdp1_config_type_20_sbs_bit) & pdp1_config_type_20_sbs_mask;
 
 	/* reset device state */
 	tape_reader.rcl = tape_reader.rc = 0;
@@ -245,7 +235,6 @@ static void pdp1_machine_stop(running_machine *machine)
 MACHINE_START( pdp1 )
 {
 	UINT8 *dst;
-	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 	static const unsigned char fontdata6x8[pdp1_fontdata_size] =
 	{	/* ASCII characters */
@@ -372,14 +361,9 @@ MACHINE_START( pdp1 )
 		0x00,
 	};
 
-	/* set up memory regions */
-	pdp1_memory = auto_alloc_array(machine, int, 0x40000 / sizeof(int));
-
 	/* set up our font */
 	dst = memory_region(machine, "gfx1");
 	memcpy(dst, fontdata6x8, pdp1_fontdata_size);
-
-	memory_set_direct_update_handler(space, setOPbasefunc);
 
 	add_exit_callback(machine, pdp1_machine_stop);
 	
@@ -387,19 +371,6 @@ MACHINE_START( pdp1 )
 	tape_puncher.timer = timer_alloc(machine, puncher_callback, NULL);
 	typewriter.tyo_timer = timer_alloc(machine, tyo_callback, NULL);
 	dpy_timer = timer_alloc(machine, dpy_callback, NULL);	
-}
-
-
-READ18_HANDLER(pdp1_read_mem)
-{
-	return pdp1_memory ? pdp1_memory[offset] : 0;
-}
-
-
-WRITE18_HANDLER(pdp1_write_mem)
-{
-	if (pdp1_memory)
-		pdp1_memory[offset] = data;
 }
 
 

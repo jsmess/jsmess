@@ -59,31 +59,12 @@ and the java source).
  */
 
 
-
-
-
-/* every memory handler is the same for now */
-
-/* note: MEMORY HANDLERS used everywhere, since we don't need bytes, we
- * need 18 bit words, the handler functions return integers, so it should
- * be all right to use them.
- * This gives sometimes IO warnings!
- */
-#ifdef SUPPORT_ODD_WORD_SIZES
-#define pdp1_read_mem SMH_RAM
-#define pdp1_write_mem SMH_RAM
-#endif
 static ADDRESS_MAP_START(pdp1_map, ADDRESS_SPACE_PROGRAM, 32)
-#if 0
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(pdp1_read_mem, pdp1_write_mem)
-#else
-	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(pdp1_read_mem, pdp1_write_mem)
-#endif
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pdp1 )
-
-    PORT_START("SPACEWAR")		/* 0: spacewar controllers */
+	PORT_START("SPACEWAR")		/* 0: spacewar controllers */
 	PORT_BIT( ROTATE_LEFT_PLAYER1, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_NAME("Spin Left Player 1") PORT_CODE(KEYCODE_A) PORT_CODE(JOYCODE_X_LEFT_SWITCH)
 	PORT_BIT( ROTATE_RIGHT_PLAYER1, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_NAME("Spin Right Player 1") PORT_CODE(KEYCODE_S) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)
 	PORT_BIT( THRUST_PLAYER1, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Thrust Player 1") PORT_CODE(KEYCODE_D) PORT_CODE(JOYCODE_BUTTON1)
@@ -110,27 +91,27 @@ static INPUT_PORTS_START( pdp1 )
 	PORT_BIT(pdp1_single_step, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("single step") PORT_CODE(KEYCODE_STOP)
 	PORT_BIT(pdp1_single_inst, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("single inst") PORT_CODE(KEYCODE_SLASH)
 
-    PORT_START("SENSE")		/* 2: operator control panel sense switches */
+	PORT_START("SENSE")		/* 2: operator control panel sense switches */
 	PORT_DIPNAME(	  040, 000, "Sense Switch 1") PORT_CODE(KEYCODE_1_PAD)
-    PORT_DIPSETTING(    000, DEF_STR( Off ) )
-    PORT_DIPSETTING(    040, DEF_STR( On ) )
+	PORT_DIPSETTING(    000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    040, DEF_STR( On ) )
 	PORT_DIPNAME(	  020, 000, "Sense Switch 2") PORT_CODE(KEYCODE_2_PAD)
-    PORT_DIPSETTING(    000, DEF_STR( Off ) )
-    PORT_DIPSETTING(    020, DEF_STR( On ) )
+	PORT_DIPSETTING(    000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    020, DEF_STR( On ) )
 	PORT_DIPNAME(	  010, 000, "Sense Switch 3") PORT_CODE(KEYCODE_3_PAD)
-    PORT_DIPSETTING(    000, DEF_STR( Off ) )
-    PORT_DIPSETTING(    010, DEF_STR( On ) )
+	PORT_DIPSETTING(    000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    010, DEF_STR( On ) )
 	PORT_DIPNAME(	  004, 000, "Sense Switch 4") PORT_CODE(KEYCODE_4_PAD)
-    PORT_DIPSETTING(    000, DEF_STR( Off ) )
-    PORT_DIPSETTING(    004, DEF_STR( On ) )
+	PORT_DIPSETTING(    000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    004, DEF_STR( On ) )
 	PORT_DIPNAME(	  002, 002, "Sense Switch 5") PORT_CODE(KEYCODE_5_PAD)
-    PORT_DIPSETTING(    000, DEF_STR( Off ) )
-    PORT_DIPSETTING(    002, DEF_STR( On ) )
+	PORT_DIPSETTING(    000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    002, DEF_STR( On ) )
 	PORT_DIPNAME(	  001, 000, "Sense Switch 6") PORT_CODE(KEYCODE_6_PAD)
-    PORT_DIPSETTING(    000, DEF_STR( Off ) )
-    PORT_DIPSETTING(    001, DEF_STR( On ) )
+	PORT_DIPSETTING(    000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    001, DEF_STR( On ) )
 
-    PORT_START("TSTADD")		/* 3: operator control panel test address switches */
+	PORT_START("TSTADD")		/* 3: operator control panel test address switches */
 	PORT_BIT( 0100000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Extension Test Address Switch 3") PORT_CODE(KEYCODE_1)
 	PORT_BIT( 0040000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Extension Test Address Switch 4") PORT_CODE(KEYCODE_2)
 	PORT_BIT( 0020000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Extension Test Address Switch 5") PORT_CODE(KEYCODE_3)
@@ -148,11 +129,11 @@ static INPUT_PORTS_START( pdp1 )
    	PORT_BIT( 0000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Address Switch 17") PORT_CODE(KEYCODE_E)
    	PORT_BIT( 0000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Address Switch 18") PORT_CODE(KEYCODE_R)
 
-    PORT_START("TWDMSB")		/* 4: operator control panel test word switches MSB */
+	PORT_START("TWDMSB")		/* 4: operator control panel test word switches MSB */
 	PORT_BIT(    0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Word Switch 1") PORT_CODE(KEYCODE_A)
 	PORT_BIT(    0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Word Switch 2") PORT_CODE(KEYCODE_S)
 
-    PORT_START("TWDLSB")		/* 5: operator control panel test word switches LSB */
+	PORT_START("TWDLSB")		/* 5: operator control panel test word switches LSB */
 	PORT_BIT( 0100000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Word Switch 3") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0040000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Word Switch 4") PORT_CODE(KEYCODE_F)
 	PORT_BIT( 0020000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Word Switch 5") PORT_CODE(KEYCODE_G)
@@ -174,9 +155,9 @@ static INPUT_PORTS_START( pdp1 )
         Note that I can see 2 additional keys whose purpose is unknown to me.
         The caps look like "MAR REL" for the leftmost one and "MAR SET" for
         rightmost one: maybe they were used to set the margin (I don't have the
-        manual for the typewriter).
-    */
-    PORT_START("TWR0")		/* 6: typewriter codes 00-17 */
+        manual for the typewriter). */
+
+	PORT_START("TWR0")		/* 6: typewriter codes 00-17 */
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(Space)") PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 \"") PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2 '") PORT_CODE(KEYCODE_2)
@@ -188,7 +169,7 @@ static INPUT_PORTS_START( pdp1 )
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8 >") PORT_CODE(KEYCODE_8)
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9 (up arrow)") PORT_CODE(KEYCODE_9)
 
-    PORT_START("TWR1")		/* 7: typewriter codes 20-37 */
+	PORT_START("TWR1")		/* 7: typewriter codes 20-37 */
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 (right arrow)") PORT_CODE(KEYCODE_0)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S)
@@ -202,7 +183,7 @@ static INPUT_PORTS_START( pdp1 )
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(", =") PORT_CODE(KEYCODE_COMMA)
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab Key") PORT_CODE(KEYCODE_TAB)
 
-    PORT_START("TWR2")		/* 8: typewriter codes 40-57 */
+	PORT_START("TWR2")		/* 8: typewriter codes 40-57 */
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(non-spacing middle dot) _") PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K)
@@ -218,7 +199,7 @@ static INPUT_PORTS_START( pdp1 )
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(non-spacing overstrike) |") PORT_CODE(KEYCODE_OPENBRACE)
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("( [") PORT_CODE(KEYCODE_MINUS)
 
-    PORT_START("TWR3")		/* 9: typewriter codes 60-77 */
+	PORT_START("TWR3")		/* 9: typewriter codes 60-77 */
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)
@@ -238,21 +219,21 @@ static INPUT_PORTS_START( pdp1 )
 
 	PORT_START("CFG")		/* 10: pseudo-input port with config */
 	PORT_DIPNAME( 0x0003, 0x0002, "RAM size")
-    PORT_DIPSETTING(   0x0000, "4kw" )
-    PORT_DIPSETTING(   0x0001, "32kw")
-    PORT_DIPSETTING(   0x0002, "64kw")
+	PORT_DIPSETTING(   0x0000, "4kw" )
+	PORT_DIPSETTING(   0x0001, "32kw")
+	PORT_DIPSETTING(   0x0002, "64kw")
 	PORT_DIPNAME( 0x0004, 0x0000, "Hardware multiply")
-    PORT_DIPSETTING(   0x0000, DEF_STR( Off ) )
-    PORT_DIPSETTING(   0x0004, DEF_STR( On ) )
+	PORT_DIPSETTING(   0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x0004, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0008, 0x0000, "Hardware divide")
-    PORT_DIPSETTING(   0x0000, DEF_STR( Off ) )
-    PORT_DIPSETTING(   0x0008, DEF_STR( On ) )
+	PORT_DIPSETTING(   0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x0008, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0010, 0x0000, "Type 20 sequence break system")
-    PORT_DIPSETTING(   0x0000, DEF_STR( Off ) )
-    PORT_DIPSETTING(   0x0010, DEF_STR( On ) )
+	PORT_DIPSETTING(   0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x0010, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0020, 0x0000, "Type 32 light pen") PORT_CODE(KEYCODE_ENTER_PAD)
-    PORT_DIPSETTING(   0x0000, DEF_STR( Off ) )
-    PORT_DIPSETTING(   0x0020, DEF_STR( On ) )
+	PORT_DIPSETTING(   0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x0020, DEF_STR( On ) )
 
 	PORT_START("LIGHTPEN")	/* 11: pseudo-input port with lightpen status */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("select larger light pen tip") PORT_CODE(KEYCODE_PLUS_PAD)
@@ -264,8 +245,6 @@ static INPUT_PORTS_START( pdp1 )
 
 	PORT_START("LIGHTY") /* 13: lightpen - Y AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_RESET
-
-
 INPUT_PORTS_END
 
 
