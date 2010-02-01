@@ -8,10 +8,6 @@
 #define TX0_H_
 
 
-#define READ18_HANDLER(name) READ32_HANDLER(name)
-#define WRITE18_HANDLER(name) WRITE32_HANDLER(name)
-
-
 /*----------- defined in machine/tx0.c -----------*/
 
 MACHINE_START( tx0 );

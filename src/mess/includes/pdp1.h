@@ -8,14 +8,6 @@
 #define PDP1_H_
 
 
-/* should go into memory.h */
-#define READ18_HANDLER(name) READ32_HANDLER(name)
-#define WRITE18_HANDLER(name) WRITE32_HANDLER(name)
-
-#define MEMORY_READ_START18(name) MEMORY_READ32_START(name)
-#define MEMORY_WRITE_START18(name) MEMORY_WRITE32_START(name)
-
-
 /* defines for each bit and mask in input port "CSW" */
 enum
 {
@@ -106,9 +98,6 @@ extern pdp1_reset_param_t pdp1_reset_param;
 
 MACHINE_START( pdp1 );
 MACHINE_RESET( pdp1 );
-
-READ18_HANDLER ( pdp1_read_mem );
-WRITE18_HANDLER ( pdp1_write_mem );
 
 DEVICE_START( pdp1_tape );
 DEVICE_IMAGE_LOAD( pdp1_tape );
