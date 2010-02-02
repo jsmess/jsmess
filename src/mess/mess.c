@@ -61,6 +61,26 @@ void mess_predevice_init(running_machine *machine)
 
 			if ((image_name != NULL) && (image_name[0] != '\0'))
 			{
+				int result = INIT_FAIL;
+				
+				/* try to load this image */
+				result = image_load(image, image_name);
+
+				/* did the image load fail? */
+				if (result)
+				{
+					/* retrieve image error message */
+					const char *image_err = image_error(image);
+
+					/* unload all images */
+					image_unload_all(machine);
+
+					/* FIXME: image_name is always empty in this message because of the image_unload_all() call */
+					fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s\n",
+						info.name,
+						osd_basename((char *) image_name),
+						image_err);
+				}
 			}
 			else
 			{
@@ -95,38 +115,6 @@ void mess_postdevice_init(running_machine *machine)
     {
         if (is_image_device(device))
 		{
-			const char *image_name;
-			int result = INIT_FAIL;
-			image_device_info info;
-			
-			/* get the device info */
-			info = image_device_getinfo(machine->config, device);
-
-			/* is an image specified for this image */
-			image_name = mess_get_device_option(&info);
-
-			if ((image_name != NULL) && (image_name[0] != '\0'))
-			{
-				/* try to load this image */
-				result = image_load(device, image_name);
-
-				/* did the image load fail? */
-				if (result)
-				{
-					/* retrieve image error message */
-					const char *image_err = image_error(device);
-
-					/* unload all images */
-					image_unload_all(machine);
-
-					/* FIXME: image_name is always empty in this message because of the image_unload_all() call */
-					fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s\n",
-						info.name,
-						osd_basename((char *) image_name),
-						image_err);
-				}
-			}
-	
 			image_finish_load(device);
 		}
 	}

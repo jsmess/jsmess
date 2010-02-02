@@ -770,7 +770,6 @@ static int image_load_internal(running_device *image, const char *path,
     int is_create, int create_format, option_resolution *create_args)
 {
     running_machine *machine = image->machine;
-    image_error_t err;
     UINT32 open_plan[4];
     int i;
     image_slot_data *slot = find_image_slot(image);
@@ -849,10 +848,6 @@ static int image_load_internal(running_device *image, const char *path,
     {
         slot->create_format = create_format;
         slot->create_args = create_args;
-
-        err = (image_error_t)image_finish_load(image);
-        if (err)
-            goto done;
     }
 
     /* success! */
