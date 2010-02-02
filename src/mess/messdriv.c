@@ -844,6 +844,7 @@ const game_driver * const drivers[] =
 	DRIVER( ht1080z2 ) /* Hradstechnika Szvetkezet HT-1080Z Series II */
 	DRIVER( ht108064 ) /* Hradstechnika Szvetkezet HT-1080Z/64 */
 	DRIVER( radionic )  /* Radionic */
+	DRIVER( tandy2k )
 
 	DRIVER( coco )	  /* Color Computer	   */
 	DRIVER( cocoe )	 /* Color Computer (Extended BASIC 1.0)	  */

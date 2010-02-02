@@ -15,10 +15,11 @@ Systems Promoted from GAME_NOT_WORKING:
 
 Skeleton drivers: 
 -----------------
+- Contel Codata Corporation Codata
 - Digital Microsystems DMS-86
 - Digital Microsystems DMS-5000
 - Digital Microsystems ZSBC-3
-- Contel Codata Corporation Codata
+- Tandy 2000 [Curt Coder]
 - Xerox 820-II [Curt Coder]
 - Xerox 16/8 [Curt Coder]
 

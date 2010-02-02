@@ -1604,6 +1604,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/eti660.o	\
 	$(MESS_DRIVERS)/rvoice.o	\
 	$(MESS_DRIVERS)/fidelz80.o	\
+	$(MESS_DRIVERS)/tandy2k.o	\
 
 
 
