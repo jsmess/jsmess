@@ -11,9 +11,12 @@
 
 	TODO:
 
-	- 8050 clock generator
-	- write to disk
+	- 8050 e27
 	- save state
+	- remove via_pb_r
+	- write to disk
+	- alloca buffers
+	- activity/error LEDs
 
 */
 
@@ -47,21 +50,11 @@
 #define C8050_REGION	"c8050"
 #define SFD1001_REGION	"sfd1001"
 
-static const double C2040_BITRATE[4] =
-{
-	XTAL_16MHz/13.0,	/* tracks 1-17 */
-	XTAL_16MHz/14.0,	/* tracks 18-24 */
-	XTAL_16MHz/15.0, 	/* tracks 25-30 */
-	XTAL_16MHz/16.0		/* tracks 31-42 */
-};
+#define SYNC \
+	(!(((c2040->sr & G64_SYNC_MARK) == G64_SYNC_MARK) & c2040->rw))
 
-#define SYNC_MARK			0x3ff		/* 10 consecutive 1-bits */
-
-#define TRACK_BUFFER_SIZE	8194		/* 2 bytes track length + maximum of 8192 bytes of GCR encoded data */
-#define TRACK_DATA_START	2
-
-#define SYNC	(!(((c2040->sr & SYNC_MARK) == SYNC_MARK) & c2040->rw))
-#define ERROR	(!(c2040->ready | BIT(c2040->e, 3)))
+#define ERROR \
+	(!(c2040->ready | BIT(c2040->e, 3)))
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -73,7 +66,7 @@ struct _c2040_unit_t
 	int stp;								/* stepper motor phase */
 
 	/* track */
-	UINT8 track_buffer[TRACK_BUFFER_SIZE];	/* track data buffer */
+	UINT8 track_buffer[G64_BUFFER_SIZE];	/* track data buffer */
 	int track_len;							/* track length */
 	int buffer_pos;							/* byte position within track buffer */
 	int bit_pos;							/* bit position within track buffer byte */
@@ -218,7 +211,7 @@ INLINE void update_gcr_data(c2040_t *c2040)
 		int ready = !(c2040->bit_count==9);
 		int error = !(ready | BIT(c2040->e, 3));
 
-		logerror("offs %04x/%04x G64 %02x READY %u PA %02x DATA %03x GCR %02x SYNC %u ERROR %u I %04x\n", c2040->unit[c2040->drive].buffer_pos-1, c2040->unit[c2040->drive].track_len,
+		logerror("d %u offs %04x/%04x G64 %02x READY %u PA %02x DATA %03x GCR %02x SYNC %u ERROR %u I %04x\n", c2040->drive, c2040->unit[c2040->drive].buffer_pos-1, c2040->unit[c2040->drive].track_len,
 			c2040->unit[c2040->drive].track_buffer[c2040->unit[c2040->drive].buffer_pos],
 			ready, pa, c2040->sr & 0x3ff, c2040->e, SYNC, error, c2040->i);
 	}
@@ -257,7 +250,7 @@ static TIMER_CALLBACK( bit_tick )
 		if (c2040->unit[c2040->drive].buffer_pos == c2040->unit[c2040->drive].track_len + 2)
 		{
 			/* loop to the start of the track */
-			c2040->unit[c2040->drive].buffer_pos = TRACK_DATA_START;
+			c2040->unit[c2040->drive].buffer_pos = G64_DATA_START;
 		}
 	}
 
@@ -278,6 +271,11 @@ static TIMER_CALLBACK( bit_tick )
 	{
 		/* set byte ready flag */
 		c2040->ready = ready;
+	}
+
+	if ((device->type == C8050) || (device->type == C8250) || (device->type == SFD1001))
+	{
+		cpu_set_input_line(c2040->cpu_fdc, M6502_SET_OVERFLOW, ready);
 	}
 
 	via_ca1_w(c2040->via, ready);
@@ -335,7 +333,7 @@ static ADDRESS_MAP_START( c2040_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
 	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via_r, via_w)
-	AM_RANGE(0x0080, 0x009f) AM_MIRROR(0x0320) AM_DEVREADWRITE(M6530_TAG, miot6530_r, miot6530_w)
+	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6530_TAG, miot6530_r, miot6530_w)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
@@ -368,7 +366,7 @@ static ADDRESS_MAP_START( c4040_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
 	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via_r, via_w)
-	AM_RANGE(0x0080, 0x009f) AM_MIRROR(0x0320) AM_DEVREADWRITE(M6530_TAG, miot6530_r, miot6530_w)
+	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6530_TAG, miot6530_r, miot6530_w)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
@@ -710,8 +708,8 @@ static void step_motor(c2040_t *c2040, int unit, int stp)
 
 		if (tracks != 0)
 		{
-			c2040->unit[unit].track_len = TRACK_BUFFER_SIZE;
-			c2040->unit[unit].buffer_pos = TRACK_DATA_START;
+			c2040->unit[unit].track_len = G64_BUFFER_SIZE;
+			c2040->unit[unit].buffer_pos = G64_DATA_START;
 			c2040->unit[unit].bit_pos = 7;
 			c2040->bit_count = 0;
 
@@ -722,7 +720,7 @@ static void step_motor(c2040_t *c2040, int unit, int stp)
 			floppy_drive_read_track_data_info_buffer(c2040->unit[unit].image, c2040->side, c2040->unit[unit].track_buffer, &c2040->unit[unit].track_len);
 
 			/* extract track length */
-			c2040->unit[unit].track_len = 2 + ((c2040->unit[unit].track_buffer[1] << 8) | c2040->unit[unit].track_buffer[0]);
+			c2040->unit[unit].track_len = G64_DATA_START + ((c2040->unit[unit].track_buffer[1] << 8) | c2040->unit[unit].track_buffer[0]);
 		}
 
 		c2040->unit[unit].stp = stp;
@@ -1072,13 +1070,33 @@ static void c8050_miot_pb_w(running_device *device, UINT8 newdata, UINT8 olddata
 
 	c2040_t *c2040 = get_safe_token(device->owner);
 
-	miot_pb_w(device, 0, newdata);
+	/* drive select */
+	if ((device->type == C8050) || (device->type == C8250))
+	{
+//TODO	c2040->drive = BIT(newdata, 0);
+	}
+
+	/* density select */
+	int ds = (newdata >> 1) & 0x03;
+
+	if (c2040->ds != ds)
+	{
+		timer_adjust_periodic(c2040->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C8050_BITRATE[ds]));
+		c2040->ds = ds;
+	}
 
 	/* side select */
-	c2040->side = !BIT(newdata, 4);
+	if ((device->type == C8250) || (device->type == SFD1001))
+	{
+		c2040->side = !BIT(newdata, 4);
+	}
 
 	/* interrupt */
-	cpu_set_input_line(c2040->cpu_fdc, M6502_IRQ_LINE, BIT(newdata, 7) ? CLEAR_LINE : ASSERT_LINE);
+	if (c2040->miot_irq != BIT(newdata, 7))
+	{
+		cpu_set_input_line(c2040->cpu_fdc, M6502_IRQ_LINE, BIT(newdata, 7) ? CLEAR_LINE : ASSERT_LINE);
+		c2040->miot_irq = BIT(newdata, 7);
+	}
 }
 
 static const miot6530_interface c8050_miot_intf =
@@ -1301,7 +1319,7 @@ MACHINE_DRIVER_END
     ROM( c2040 )
 -------------------------------------------------*/
 
-ROM_START( c2040 )
+ROM_START( c2040 ) // schematic 320806
 	ROM_REGION( 0x2c00, C2040_REGION, ROMREGION_LOADBYNAME )
 	/* DOS 1.0 */
 	ROM_LOAD( "901468-06.ul1", 0x0000, 0x1000, CRC(25b5eed5) SHA1(4d9658f2e6ff3276e5c6e224611a66ce44b16fc7) )
@@ -1311,14 +1329,14 @@ ROM_START( c2040 )
 	ROM_LOAD( "901466-02.uk3", 0x2000, 0x0400, NO_DUMP )
 
 	/* ROM GCR */
-	ROM_LOAD( "901467.uk6", 0x2400, 0x0800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
+	ROM_LOAD( "901467.uk6",    0x2400, 0x0800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
 ROM_END
 
 /*-------------------------------------------------
     ROM( c4040 )
 -------------------------------------------------*/
 
-ROM_START( c4040 )
+ROM_START( c4040 ) // schematic ?
 	ROM_REGION( 0x3c00, C4040_REGION, ROMREGION_LOADBYNAME )
 	/* DOS 2.1 */
 	ROM_LOAD( "901468-11.uj1", 0x0000, 0x1000, CRC(b7157458) SHA1(8415f3159dea73161e0cef7960afa6c76953b6f8) )
@@ -1333,7 +1351,7 @@ ROM_START( c4040 )
 	ROM_LOAD( "901466-04.uk3", 0x3000, 0x0400, CRC(0ab338dc) SHA1(6645fa40b81be1ff7d1384e9b52df06a26ab0bfb) )
 
 	/* ROM GCR */
-	ROM_LOAD( "901467.uk6", 0x3400, 0x800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
+	ROM_LOAD( "901467.uk6",    0x3400, 0x0800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
 ROM_END
 
 /*-------------------------------------------------
@@ -1368,30 +1386,30 @@ ROM_START( c8050 ) // schematic 8050001
 	ROM_LOAD( "901888-01.uh1", 0x2000, 0x2000, CRC(de9b6132) SHA1(2e6c2d7ca934e5c550ad14bd5e9e7749686b7af4) )
 
 	/* controller */
-	ROM_LOAD( "901483-03.uk3", 0x4000, 0x400, CRC(9e83fa70) SHA1(e367ea8a5ddbd47f13570088427293138a10784b) )
-	ROM_LOAD( "901483-04.uk3", 0x4000, 0x400, NO_DUMP )
-	ROM_LOAD( "901884-01.uk3", 0x4000, 0x400, NO_DUMP )
-	ROM_LOAD( "901885-04.uk3", 0x4000, 0x400, CRC(bab998c9) SHA1(0dc9a3b60f1b866c63eebd882403532fc59fe57f) )
-	ROM_LOAD( "901869-01.uk3", 0x4000, 0x400, CRC(2915327a) SHA1(3a9a80f72ce76e5f5c72513f8ef7553212912ae3) )
+	ROM_LOAD( "901483-03.uk3", 0x4000, 0x0400, CRC(9e83fa70) SHA1(e367ea8a5ddbd47f13570088427293138a10784b) )
+	ROM_LOAD( "901483-04.uk3", 0x4000, 0x0400, NO_DUMP )
+	ROM_LOAD( "901884-01.uk3", 0x4000, 0x0400, NO_DUMP )
+	ROM_LOAD( "901885-04.uk3", 0x4000, 0x0400, CRC(bab998c9) SHA1(0dc9a3b60f1b866c63eebd882403532fc59fe57f) )
+	ROM_LOAD( "901869-01.uk3", 0x4000, 0x0400, CRC(2915327a) SHA1(3a9a80f72ce76e5f5c72513f8ef7553212912ae3) )
 	
 	/* GCR decoder */
-	ROM_LOAD( "901467.uk6", 0x4400, 0x800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
+	ROM_LOAD( "901467.uk6",    0x4400, 0x0800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
 ROM_END
 
 /*-------------------------------------------------
     ROM( sfd1001 )
 -------------------------------------------------*/
 
-ROM_START( sfd1001 ) // schematic 
+ROM_START( sfd1001 ) // schematic 251406
 	ROM_REGION( 0x5000, SFD1001_REGION, ROMREGION_LOADBYNAME )
-	ROM_LOAD( "901887-01.1j", 0x0000, 0x2000, CRC(0073b8b2) SHA1(b10603195f240118fe5fb6c6dfe5c5097463d890) )
-	ROM_LOAD( "901888-01.3j", 0x2000, 0x2000, CRC(de9b6132) SHA1(2e6c2d7ca934e5c550ad14bd5e9e7749686b7af4) )
+	ROM_LOAD( "901887-01.1j",  0x0000, 0x2000, CRC(0073b8b2) SHA1(b10603195f240118fe5fb6c6dfe5c5097463d890) )
+	ROM_LOAD( "901888-01.3j",  0x2000, 0x2000, CRC(de9b6132) SHA1(2e6c2d7ca934e5c550ad14bd5e9e7749686b7af4) )
 
 	/* controller */
 	ROM_LOAD( "251257-02a.u2", 0x4000, 0x0800, CRC(b51150de) SHA1(3b954eb34f7ea088eed1d33ebc6d6e83a3e9be15) )
 
 	/* GCR decoder */
-	ROM_LOAD( "901467.5c", 0x4800, 0x800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
+	ROM_LOAD( "901467.5c",     0x4800, 0x0800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
 ROM_END
 
 /*-------------------------------------------------
@@ -1465,7 +1483,7 @@ static DEVICE_RESET( c2040 )
 	c2040->miot->reset();
 	c2040->via->reset();
 
-	/* toggle SO */
+	/* toggle M6502 SO */
 	cpu_set_input_line(c2040->cpu_dos, M6502_SET_OVERFLOW, ASSERT_LINE);
 	cpu_set_input_line(c2040->cpu_dos, M6502_SET_OVERFLOW, CLEAR_LINE);
 }

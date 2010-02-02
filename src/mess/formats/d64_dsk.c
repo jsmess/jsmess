@@ -1,59 +1,16 @@
-/*
+/*********************************************************************
 
-	Commodore sector format
+    formats/d64_dsk.c
 
-	SYNC						FF * 5
-	08
-	CHECKSUM					sector ^ track ^ id2 ^ id1
-	SECTOR						0..20 (2040), 0..28 (8050)
-	TRACK						1..35 (2040), 1..77 (8050), 1..70 (1571)
-	ID2
-	ID1
-	GAP 1						55 * 9 (2040), 55 * 8 (1541)
+    Floppy format code for Commodore 2040/8050 type disk images
 
-	SYNC						FF * 5
-	07
-	NEXT TRACK
-	NEXT SECTOR
-	254 BYTES OF DATA
-	CHECKSUM
-	GAP 2						55 * 8..19
-
-*/
-
-/*
-
- Commodore GCR format 
-
-Original    Encoded
-4 bits      5 bits
-
-0000    ->  01010 = 0x0a
-0001    ->  01011 = 0x0b
-0010    ->  10010 = 0x12
-0011    ->  10011 = 0x13
-0100    ->  01110 = 0x0e
-0101    ->  01111 = 0x0f
-0110    ->  10110 = 0x16
-0111    ->  10111 = 0x17
-1000    ->  01001 = 0x09
-1001    ->  11001 = 0x19
-1010    ->  11010 = 0x1a
-1011    ->  11011 = 0x1b
-1100    ->  01101 = 0x0d
-1101    ->  11101 = 0x1d
-1110    ->  11110 = 0x1e
-1111    ->  10101 = 0x15
-
-We use the encoded values in bytes because we use them to encode
-groups of 4 bytes into groups of 5 bytes, below.
-
-*/
+*********************************************************************/
 
 /*
 
     TODO:
 
+	- D81 geometry translation
     - disk errors
 	- variable gaps
 
@@ -63,6 +20,10 @@ groups of 4 bytes into groups of 5 bytes, below.
 #include "formats/flopimg.h"
 #include "formats/d64_dsk.h"
 #include "devices/flopdrv.h"
+
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
 
 #define LOG 0
 
@@ -74,12 +35,26 @@ groups of 4 bytes into groups of 5 bytes, below.
 
 #define INVALID_OFFSET		0xbadbad
 
+#define D64_SIZE_35_TRACKS				 174848
+#define D64_SIZE_35_TRACKS_WITH_ERRORS	 175531
+#define D64_SIZE_40_TRACKS				 196608
+#define D64_SIZE_40_TRACKS_WITH_ERRORS	 197376
+#define D64_SIZE_42_TRACKS				 205312
+#define D64_SIZE_42_TRACKS_WITH_ERRORS	 206114
+#define D67_SIZE_35_TRACKS				 176640
+#define D71_SIZE_70_TRACKS				 349696
+#define D71_SIZE_70_TRACKS_WITH_ERRORS	 351062
+#define D80_SIZE_77_TRACKS				 533248
+#define D82_SIZE_154_TRACKS				1066496
+
 enum
 {
 	DOS1,
 	DOS2,
-	DOS27
+	DOS25
 };
+
+static const char *const DOS_VERSION[] = { "1.0", "2.0", "2.5" };
 
 enum
 {
@@ -97,17 +72,26 @@ enum
 	ERROR_74,		/* disk not ready (no device 1) */
 };
 
-#define D64_SIZE_35_TRACKS				 174848
-#define D64_SIZE_35_TRACKS_WITH_ERRORS	 175531
-#define D64_SIZE_40_TRACKS				 196608
-#define D64_SIZE_40_TRACKS_WITH_ERRORS	 197376
-#define D64_SIZE_42_TRACKS				 205312
-#define D64_SIZE_42_TRACKS_WITH_ERRORS	 206114
-#define D67_SIZE_35_TRACKS				 176640
-#define D71_SIZE_70_TRACKS				 349696
-#define D71_SIZE_70_TRACKS_WITH_ERRORS	 351062
-#define D80_SIZE_77_TRACKS				 533248
-#define D82_SIZE_154_TRACKS				1066496
+static const UINT8 bin_2_gcr[] =
+{
+	0x0a, 0x0b, 0x12, 0x13, 0x0e, 0x0f, 0x16, 0x17,
+	0x09, 0x19, 0x1a, 0x1b, 0x0d, 0x1d, 0x1e, 0x15
+};
+
+/* This could be of use if we ever implement saving in .d64 format, to convert back GCR -> d64 */
+/*
+static const int gcr_2_bin[] =
+{
+    -1, -1,   -1,   -1,
+    -1, -1,   -1,   -1,
+    -1, 0x08, 0x00, 0x01,
+    -1, 0x0c, 0x04, 0x05,
+    -1, -1,   0x02, 0x03,
+    -1, 0x0f, 0x06, 0x07,
+    -1, 0x09, 0x0a, 0x0b,
+    -1, 0x0d, 0x0e, -1
+};
+*/
 
 static const int DOS1_SECTORS_PER_TRACK[] =
 {
@@ -139,7 +123,7 @@ static const int DOS2_SECTORS_PER_TRACK[] =
 	17, 17
 };
 
-static const int DOS27_SECTORS_PER_TRACK[] =
+static const int DOS25_SECTORS_PER_TRACK[] =
 {
 	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
 	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,		/* 1-39 */
@@ -149,7 +133,7 @@ static const int DOS27_SECTORS_PER_TRACK[] =
 	23, 23, 23, 23, 23, 23, 23														/* 78-84 */
 };
 
-static const int DOS27_SPEED_ZONE[] =
+static const int DOS25_SPEED_ZONE[] =
 {
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,	/* 1-39 */
@@ -158,6 +142,10 @@ static const int DOS27_SPEED_ZONE[] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,						/* 65-77 */
 	0, 0, 0, 0, 0, 0, 0											/* 78-84 */
 };
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 struct d64dsk_tag
 {
@@ -172,27 +160,48 @@ struct d64dsk_tag
 	UINT8 id1, id2;								/* DOS disk format ID */
 };
 
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE struct d64dsk_tag *get_tag(floppy_image *floppy)
+{
+	return (d64dsk_tag *)floppy_tag(floppy);
+}
+
 INLINE float get_dos_track(int track)
 {
 	return ((float)track / 2) + 1;
 }
 
-static struct d64dsk_tag *get_tag(floppy_image *floppy)
-{
-	struct d64dsk_tag *tag;
-	tag = (d64dsk_tag *)floppy_tag(floppy);
-	return tag;
-}
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    d64_get_heads_per_disk - returns the number
+	of heads in the disk image
+-------------------------------------------------*/
 
 static int d64_get_heads_per_disk(floppy_image *floppy)
 {
 	return get_tag(floppy)->heads;
 }
 
+/*-------------------------------------------------
+    d64_get_tracks_per_disk - returns the number
+	of DOS tracks in the disk image
+-------------------------------------------------*/
+
 static int d64_get_tracks_per_disk(floppy_image *floppy)
 {
 	return get_tag(floppy)->tracks;
 }
+
+/*-------------------------------------------------
+    d64_get_sectors_per_track - returns the number
+	of sectors per given track
+-------------------------------------------------*/
 
 static int d64_get_sectors_per_track(floppy_image *floppy, int head, int track)
 {
@@ -202,11 +211,16 @@ static int d64_get_sectors_per_track(floppy_image *floppy, int head, int track)
 	{
 	case DOS1:	sectors_per_track = DOS1_SECTORS_PER_TRACK[track / 2]; break;
 	case DOS2:	sectors_per_track = DOS2_SECTORS_PER_TRACK[track / 2]; break;
-	case DOS27:	sectors_per_track = DOS27_SECTORS_PER_TRACK[track];     break;
+	case DOS25:	sectors_per_track = DOS25_SECTORS_PER_TRACK[track];    break;
 	}
 
 	return sectors_per_track;
 }
+
+/*-------------------------------------------------
+    get_track_offset - returns the offset within
+	the disk image for a given track
+-------------------------------------------------*/
 
 static floperr_t get_track_offset(floppy_image *floppy, int head, int track, UINT64 *offset)
 {
@@ -224,32 +238,45 @@ static floperr_t get_track_offset(floppy_image *floppy, int head, int track, UIN
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-static const int bin_2_gcr[] =
-{
-	0x0a, 0x0b, 0x12, 0x13, 0x0e, 0x0f, 0x16, 0x17,
-	0x09, 0x19, 0x1a, 0x1b, 0x0d, 0x1d, 0x1e, 0x15
-};
-
-/* This could be of use if we ever implement saving in .d64 format, to convert back GCR -> d64 */
-/*
-static const int gcr_2_bin[] =
-{
-    -1, -1,   -1,   -1,
-    -1, -1,   -1,   -1,
-    -1, 0x08, 0x00, 0x01,
-    -1, 0x0c, 0x04, 0x05,
-    -1, -1,   0x02, 0x03,
-    -1, 0x0f, 0x06, 0x07,
-    -1, 0x09, 0x0a, 0x0b,
-    -1, 0x0d, 0x0e, -1
-};
-*/
+/*-------------------------------------------------
+    gcr_double_2_gcr - GCR decodes given data
+-------------------------------------------------*/
 
 /* gcr_double_2_gcr takes 4 bytes (a, b, c, d) and shuffles their nibbles to obtain 5 bytes in dest */
 /* The result is basically res = (enc(a) << 15) | (enc(b) << 10) | (enc(c) << 5) | enc(d)
  * with res being 5 bytes long and enc(x) being the GCR encode of x.
  * In fact, we store the result as five separate bytes in the dest argument
  */
+
+/*
+
+ Commodore GCR format 
+
+Original    Encoded
+4 bits      5 bits
+
+0000    ->  01010 = 0x0a
+0001    ->  01011 = 0x0b
+0010    ->  10010 = 0x12
+0011    ->  10011 = 0x13
+0100    ->  01110 = 0x0e
+0101    ->  01111 = 0x0f
+0110    ->  10110 = 0x16
+0111    ->  10111 = 0x17
+1000    ->  01001 = 0x09
+1001    ->  11001 = 0x19
+1010    ->  11010 = 0x1a
+1011    ->  11011 = 0x1b
+1100    ->  01101 = 0x0d
+1101    ->  11101 = 0x1d
+1110    ->  11110 = 0x1e
+1111    ->  10101 = 0x15
+
+We use the encoded values in bytes because we use them to encode
+groups of 4 bytes into groups of 5 bytes, below.
+
+*/
+
 static void gcr_double_2_gcr(UINT8 a, UINT8 b, UINT8 c, UINT8 d, UINT8 *dest)
 {
 	UINT8 gcr[8];
@@ -271,6 +298,34 @@ static void gcr_double_2_gcr(UINT8 a, UINT8 b, UINT8 c, UINT8 d, UINT8 *dest)
 	dest[3] = (gcr[4] << 7) | (gcr[5] << 2) | (gcr[6] >> 3);
 	dest[4] = (gcr[6] << 5) | gcr[7];
 }
+
+/*-------------------------------------------------
+    d64_read_track - reads a full track from the
+	disk image
+-------------------------------------------------*/
+
+/*
+
+	Commodore sector format
+
+	SYNC						FF * 5
+	08
+	CHECKSUM					sector ^ track ^ id2 ^ id1
+	SECTOR						0..20 (2040), 0..28 (8050)
+	TRACK						1..35 (2040), 1..77 (8050), 1..70 (1571)
+	ID2
+	ID1
+	GAP 1						55 * 9 (2040), 55 * 8 (1541)
+
+	SYNC						FF * 5
+	07
+	NEXT TRACK
+	NEXT SECTOR
+	254 BYTES OF DATA
+	CHECKSUM
+	GAP 2						55 * 8..19
+
+*/
 
 static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
 {
@@ -298,7 +353,7 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 		/* determine logical track number */
 		int dos_track = get_dos_track(track);
 		
-		if (tag->dos == DOS27)
+		if (tag->dos == DOS25)
 		{
 			dos_track = track + 1;
 		}
@@ -422,10 +477,19 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 	return FLOPPY_ERROR_SUCCESS;
 }
 
+/*-------------------------------------------------
+    d64_write_track - writes a full track to the
+	disk image
+-------------------------------------------------*/
+
 static floperr_t d64_write_track(floppy_image *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
 {
 	return FLOPPY_ERROR_UNSUPPORTED;
 }
+
+/*-------------------------------------------------
+    d64_identify - identifies the disk image
+-------------------------------------------------*/
 
 static void d64_identify(floppy_image *floppy, int *dos, int *heads, int *tracks, bool *has_errors)
 {
@@ -447,12 +511,16 @@ static void d64_identify(floppy_image *floppy, int *dos, int *heads, int *tracks
 	case D71_SIZE_70_TRACKS_WITH_ERRORS:	*dos = DOS2;  *heads = 2; *tracks = 35; *has_errors = true;  break;
 
 	/* 8050 */
-	case D80_SIZE_77_TRACKS:				*dos = DOS27; *heads = 1; *tracks = 77; *has_errors = false; break;
+	case D80_SIZE_77_TRACKS:				*dos = DOS25; *heads = 1; *tracks = 77; *has_errors = false; break;
 
 	/* 8250/SFD1001 */
-	case D82_SIZE_154_TRACKS:				*dos = DOS27; *heads = 2; *tracks = 77; *has_errors = false; break;
+	case D82_SIZE_154_TRACKS:				*dos = DOS25; *heads = 2; *tracks = 77; *has_errors = false; break;
 	}
 }
+
+/*-------------------------------------------------
+    FLOPPY_IDENTIFY( d64_dsk_identify )
+-------------------------------------------------*/
 
 FLOPPY_IDENTIFY( d64_dsk_identify )
 {
@@ -471,6 +539,10 @@ FLOPPY_IDENTIFY( d64_dsk_identify )
 	return FLOPPY_ERROR_SUCCESS;
 }
 
+/*-------------------------------------------------
+    FLOPPY_IDENTIFY( d67_dsk_identify )
+-------------------------------------------------*/
+
 FLOPPY_IDENTIFY( d67_dsk_identify )
 {
 	*vote = 0;
@@ -482,6 +554,10 @@ FLOPPY_IDENTIFY( d67_dsk_identify )
 
 	return FLOPPY_ERROR_SUCCESS;
 }
+
+/*-------------------------------------------------
+    FLOPPY_IDENTIFY( d71_dsk_identify )
+-------------------------------------------------*/
 
 FLOPPY_IDENTIFY( d71_dsk_identify )
 {
@@ -500,6 +576,10 @@ FLOPPY_IDENTIFY( d71_dsk_identify )
 	return FLOPPY_ERROR_SUCCESS;
 }
 
+/*-------------------------------------------------
+    FLOPPY_IDENTIFY( d80_dsk_identify )
+-------------------------------------------------*/
+
 FLOPPY_IDENTIFY( d80_dsk_identify )
 {
 	*vote = 0;
@@ -512,6 +592,10 @@ FLOPPY_IDENTIFY( d80_dsk_identify )
 	return FLOPPY_ERROR_SUCCESS;
 }
 
+/*-------------------------------------------------
+    FLOPPY_IDENTIFY( d82_dsk_identify )
+-------------------------------------------------*/
+
 FLOPPY_IDENTIFY( d82_dsk_identify )
 {
 	*vote = 0;
@@ -523,6 +607,10 @@ FLOPPY_IDENTIFY( d82_dsk_identify )
 
 	return FLOPPY_ERROR_SUCCESS;
 }
+
+/*-------------------------------------------------
+    FLOPPY_CONSTRUCT( d64_dsk_construct )
+-------------------------------------------------*/
 
 FLOPPY_CONSTRUCT( d64_dsk_construct )
 {
@@ -559,6 +647,7 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 		logerror("D64 size: %04x\n", (UINT32)floppy_image_size(floppy));
 		logerror("D64 heads: %u\n", heads);
 		logerror("D64 tracks: %u\n", dos_tracks);
+		logerror("D64 DOS version: %s\n", DOS_VERSION[dos]);
 	}
 
 	/* determine track data offsets */
@@ -566,7 +655,7 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 	{
 		for (track = 0; track < tag->tracks; track++)
 		{
-			if (dos == DOS27)
+			if (dos == DOS25)
 			{
 				if (track >= dos_tracks)
 				{
@@ -576,9 +665,9 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 				else
 				{
 					tag->track_offset[head][track] = track_offset;
-					track_offset += DOS27_SECTORS_PER_TRACK[track] * SECTOR_SIZE;
+					track_offset += DOS25_SECTORS_PER_TRACK[track] * SECTOR_SIZE;
 	
-					if (LOG) logerror("D64 head %u track %u data offset: %04x\n", head, track, tag->track_offset[head][track]);
+					if (LOG) logerror("D64 head %u track %u data offset: %04x\n", head, track + 1, tag->track_offset[head][track]);
 				}
 			}
 			else
@@ -607,11 +696,11 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 	/* determine speed zones */
 	for (track = 0; track < tag->tracks; track++)
 	{
-		if (dos == DOS27)
+		if (dos == DOS25)
 		{
-			tag->speed_zone[track] = DOS27_SPEED_ZONE[track];
+			tag->speed_zone[track] = DOS25_SPEED_ZONE[track];
 
-			if (LOG) logerror("D64 track %u speed zone: %u\n", track, tag->speed_zone[track]);
+			if (LOG) logerror("D64 track %u speed zone: %u\n", track + 1, tag->speed_zone[track]);
 		}
 		else
 		{
@@ -622,7 +711,13 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 	}
 
 	/* read format ID from directory */
-	if (dos == DOS27)
+	/*
+	id1, id2 are the same for extended d64 (i.e. with error tables), for d67 and for d71
+
+	for d81 they are at track 40 bytes 0x17 & 0x18
+	for d80 & d82 they are at track 39 bytes 0x18 & 0x19
+	*/
+	if (dos == DOS25)
 		floppy_image_read(floppy, id, tag->track_offset[0][39] + 0x18, 2);
 	else
 		floppy_image_read(floppy, id, tag->track_offset[0][34] + 0xa2, 2);
@@ -642,10 +737,3 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 
 	return FLOPPY_ERROR_SUCCESS;
 }
-
-/*
-id1, id2 are the same for extended d64 (i.e. with error tables), for d67 and for d71
-
-for d81 they are at track 40 bytes 0x17 & 0x18
-for d80 & d82 they are at track 39 bytes 0x18 & 0x19
-*/

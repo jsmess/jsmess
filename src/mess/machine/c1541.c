@@ -158,19 +158,6 @@
 #define M6522_1_TAG		"ucd4"
 #define TIMER_BIT_TAG	"ue7"
 
-static const double C1541_BITRATE[4] =
-{
-	XTAL_16MHz/13.0,	/* tracks 1-17 */
-	XTAL_16MHz/14.0,	/* tracks 18-24 */
-	XTAL_16MHz/15.0, 	/* tracks 25-30 */
-	XTAL_16MHz/16.0		/* tracks 31-42 */
-};
-
-#define SYNC_MARK			0x3ff		/* 10 consecutive 1-bits */
-
-#define TRACK_BUFFER_SIZE	8194		/* 2 bytes track length + maximum of 8192 bytes of GCR encoded data */
-#define TRACK_DATA_START	2
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -180,7 +167,7 @@ struct _c1541_t
 {
 	/* abstractions */
 	int address;						/* serial bus address - 8 */
-	UINT8 track_buffer[TRACK_BUFFER_SIZE];				/* track data buffer */
+	UINT8 track_buffer[G64_BUFFER_SIZE];				/* track data buffer */
 	int track_len;						/* track length */
 	int buffer_pos;						/* current byte position within track buffer */
 	int bit_pos;						/* current bit position within track buffer byte */
@@ -263,11 +250,11 @@ static TIMER_CALLBACK( bit_tick )
 		if (c1541->buffer_pos > c1541->track_len + 1)
 		{
 			/* loop to the start of the track */
-			c1541->buffer_pos = TRACK_DATA_START;
+			c1541->buffer_pos = G64_DATA_START;
 		}
 	}
 
-	if ((c1541->data & SYNC_MARK) == SYNC_MARK)
+	if ((c1541->data & G64_SYNC_MARK) == G64_SYNC_MARK)
 	{
 		/* SYNC detected */
 		c1541->bit_count = 0;
@@ -822,7 +809,7 @@ static READ8_DEVICE_HANDLER( via1_pb_r )
 	data |= !floppy_wpt_r(c1541->image) << 4;
 
 	/* SYNC detect line */
-	data |= !(c1541->mode && ((c1541->data & SYNC_MARK) == SYNC_MARK)) << 7;
+	data |= !(c1541->mode && ((c1541->data & G64_SYNC_MARK) == G64_SYNC_MARK)) << 7;
 
 	return data;
 }
@@ -865,8 +852,8 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 
 		if (tracks != 0)
 		{
-			c1541->track_len = TRACK_BUFFER_SIZE;
-			c1541->buffer_pos = TRACK_DATA_START;
+			c1541->track_len = G64_BUFFER_SIZE;
+			c1541->buffer_pos = G64_DATA_START;
 			c1541->bit_pos = 7;
 			c1541->bit_count = 0;
 
@@ -877,7 +864,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 			floppy_drive_read_track_data_info_buffer(c1541->image, 0, c1541->track_buffer, &c1541->track_len);
 
 			/* extract track length */
-			c1541->track_len = (c1541->track_buffer[1] << 8) | c1541->track_buffer[0];
+			c1541->track_len = G64_DATA_START + ((c1541->track_buffer[1] << 8) | c1541->track_buffer[0]);
 		}
 
 		c1541->stp = stp;
@@ -892,7 +879,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 	/* density select */
 	if (c1541->ds != ds)
 	{
-		timer_adjust_periodic(c1541->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C1541_BITRATE[ds]/4));
+		timer_adjust_periodic(c1541->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C2040_BITRATE[ds]/4));
 		c1541->ds = ds;
 	}
 }
@@ -1108,13 +1095,13 @@ static DEVICE_START( c1541 )
 	c1541->image = device->subdevice(FLOPPY_0);
 
 	/* allocate track buffer */
-//  c1541->track_buffer = auto_alloc_array(device->machine, UINT8, TRACK_BUFFER_SIZE);
+//  c1541->track_buffer = auto_alloc_array(device->machine, UINT8, G64_BUFFER_SIZE);
 
 	/* allocate data timer */
 	c1541->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
 
 	/* register for state saving */
-//  state_save_register_device_item_pointer(device, 0, c1541->track_buffer, TRACK_BUFFER_SIZE);
+//  state_save_register_device_item_pointer(device, 0, c1541->track_buffer, G64_BUFFER_SIZE);
 	state_save_register_device_item(device, 0, c1541->address);
 	state_save_register_device_item(device, 0, c1541->track_len);
 	state_save_register_device_item(device, 0, c1541->buffer_pos);

@@ -1,31 +1,10 @@
-/*
+/*********************************************************************
 
-  Bytes: $0000-0007: File signature "GCR-1541"
-               0008: G64 version (presently only $00 defined)
-               0009: Number of tracks in image (usually $54, decimal 84)
-          000A-000B: Size of each stored track in bytes (usually  7928,  or
-                     $1EF8 in LO/HI format.
+    formats/g64_dsk.c
 
-  Bytes: $000C-000F: Offset  to  stored  track  1.0  ($000002AC,  in  LO/HI
-                     format, see below for more)
-          0010-0013: Offset to stored track 1.5 ($00000000)
-          0014-0017: Offset to stored track 2.0 ($000021A6)
-             ...
-          0154-0157: Offset to stored track 42.0 ($0004F8B6)
-          0158-015B: Offset to stored track 42.5 ($00000000)
+    Floppy format code for Commodore 1541 GCR disk images
 
-  Bytes: $015C-015F: Speed zone entry for track 1 ($03,  in  LO/HI  format,
-                     see below for more)
-          0160-0163: Speed zone entry for track 1.5 ($03)
-             ...
-          02A4-02A7: Speed zone entry for track 42 ($00)
-          02A8-02AB: Speed zone entry for track 42.5 ($00)
-
-  Bytes: $02AC-02AD: Actual size of stored track (7692 or $1E0C,  in  LO/HI
-                     format)
-          02AE-02AE+$1E0C: Track data
-
-*/
+*********************************************************************/
 
 /*
 
@@ -40,40 +19,71 @@
 #include "formats/flopimg.h"
 #include "devices/flopdrv.h"
 
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
 #define LOG 0
 
 #define HEADER_LENGTH	0x2ac				/* standard length for 84 half tracks */
 #define MAX_TRACKS		84
 
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 struct g64dsk_tag
 {
 	int version;
+	int heads;								/* number of physical heads */
 	int tracks;								/* number of physical tracks */
 	UINT16 track_size;						/* size of each track */
 	UINT32 track_offset[MAX_TRACKS];		/* offset within data for each track */
 	UINT32 speed_zone_offset[MAX_TRACKS];	/* offset within data for each track */
 };
 
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE struct g64dsk_tag *get_tag(floppy_image *floppy)
+{
+	return (g64dsk_tag *)floppy_tag(floppy);
+}
+
 INLINE float get_dos_track(int track)
 {
 	return ((float)track / 2) + 1;
 }
 
-static struct g64dsk_tag *get_tag(floppy_image *floppy)
-{
-	struct g64dsk_tag *tag = (g64dsk_tag *)floppy_tag(floppy);
-	return tag;
-}
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    g64_get_heads_per_disk - returns the number
+	of heads in the disk image
+-------------------------------------------------*/
 
 static int g64_get_heads_per_disk(floppy_image *floppy)
 {
-	return 1;
+	return get_tag(floppy)->heads;
 }
+
+/*-------------------------------------------------
+    g64_get_tracks_per_disk - returns the number
+	of DOS tracks in the disk image
+-------------------------------------------------*/
 
 static int g64_get_tracks_per_disk(floppy_image *floppy)
 {
 	return get_tag(floppy)->tracks;
 }
+
+/*-------------------------------------------------
+    get_track_offset - returns the offset within
+	the disk image for a given track
+-------------------------------------------------*/
 
 static floperr_t get_track_offset(floppy_image *floppy, int track, UINT64 *offset)
 {
@@ -90,6 +100,11 @@ static floperr_t get_track_offset(floppy_image *floppy, int track, UINT64 *offse
 
 	return FLOPPY_ERROR_SUCCESS;
 }
+
+/*-------------------------------------------------
+	g64_read_track - reads a full track from the
+	disk image
+-------------------------------------------------*/
 
 static floperr_t g64_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
 {
@@ -122,10 +137,19 @@ static floperr_t g64_read_track(floppy_image *floppy, int head, int track, UINT6
 	return FLOPPY_ERROR_SUCCESS;
 }
 
+/*-------------------------------------------------
+	g64_write_track - writes a full track to the
+	disk image
+-------------------------------------------------*/
+
 static floperr_t g64_write_track(floppy_image *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
 {
 	return FLOPPY_ERROR_UNSUPPORTED;
 }
+
+/*-------------------------------------------------
+	FLOPPY_IDENTIFY( g64_dsk_identify )
+-------------------------------------------------*/
 
 FLOPPY_IDENTIFY( g64_dsk_identify )
 {
@@ -144,6 +168,41 @@ FLOPPY_IDENTIFY( g64_dsk_identify )
 
 	return FLOPPY_ERROR_SUCCESS;
 }
+
+/*-------------------------------------------------
+	FLOPPY_CONSTRUCT( g64_dsk_construct )
+-------------------------------------------------*/
+
+/*
+
+	G64 File Header Format
+
+  Bytes: $0000-0007: File signature "GCR-1541"
+               0008: G64 version (presently only $00 defined)
+               0009: Number of tracks in image (usually $54, decimal 84)
+          000A-000B: Size of each stored track in bytes (usually  7928,  or
+                     $1EF8 in LO/HI format.
+
+  Bytes: $000C-000F: Offset  to  stored  track  1.0  ($000002AC,  in  LO/HI
+                     format, see below for more)
+          0010-0013: Offset to stored track 1.5 ($00000000)
+          0014-0017: Offset to stored track 2.0 ($000021A6)
+             ...
+          0154-0157: Offset to stored track 42.0 ($0004F8B6)
+          0158-015B: Offset to stored track 42.5 ($00000000)
+
+  Bytes: $015C-015F: Speed zone entry for track 1 ($03,  in  LO/HI  format,
+                     see below for more)
+          0160-0163: Speed zone entry for track 1.5 ($03)
+             ...
+          02A4-02A7: Speed zone entry for track 42 ($00)
+          02A8-02AB: Speed zone entry for track 42.5 ($00)
+
+  Bytes: $02AC-02AD: Actual size of stored track (7692 or $1E0C,  in  LO/HI
+                     format)
+          02AE-02AE+$1E0C: Track data
+
+*/
 
 FLOPPY_CONSTRUCT( g64_dsk_construct )
 {
@@ -169,6 +228,7 @@ FLOPPY_CONSTRUCT( g64_dsk_construct )
 	if (LOG) logerror("G64 version: %u\n", tag->version);
 
 	/* number of half tracks */
+	tag->heads = 1;
 	tag->tracks = header[9];
 	if (LOG) logerror("G64 tracks: %u\n", tag->tracks);
 
