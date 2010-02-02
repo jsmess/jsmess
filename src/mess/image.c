@@ -85,6 +85,8 @@ struct _image_slot_data
 
     /* pointer */
     void *ptr;
+	
+	int not_init_phase;
 };
 
 
@@ -196,6 +198,8 @@ void image_init(running_machine *machine)
 
         slot = &machine->images_data->slots[indx];
 
+		slot->not_init_phase = 1;
+		
         /* create a memory pool, and allocated strings */
         slot->mempool = pool_alloc_lib(memory_error);
         slot->name = astring_alloc();
@@ -770,6 +774,7 @@ static int image_load_internal(running_device *image, const char *path,
     int is_create, int create_format, option_resolution *create_args)
 {
     running_machine *machine = image->machine;
+    image_error_t err;
     UINT32 open_plan[4];
     int i;
     image_slot_data *slot = find_image_slot(image);
@@ -848,6 +853,12 @@ static int image_load_internal(running_device *image, const char *path,
     {
         slot->create_format = create_format;
         slot->create_args = create_args;
+
+		if (slot->not_init_phase) {
+			err = (image_error_t)image_finish_load(image);
+			if (err)
+				goto done;
+		}
     }
 
     /* success! */
@@ -908,6 +919,7 @@ int image_finish_load(running_device *device)
     slot->is_loading = 0;
     slot->create_format = 0;
     slot->create_args = NULL;
+	slot->not_init_phase = 1;
     return err;
 }
 
@@ -1774,8 +1786,6 @@ const char *image_pcb(running_device *device)
     return slot->pcb;
 }
 
-
-
 /*-------------------------------------------------
     image_extrainfo
 -------------------------------------------------*/
@@ -1922,4 +1932,10 @@ int image_absolute_index(running_device *image)
 running_device *image_from_absolute_index(running_machine *machine, int absolute_index)
 {
     return machine->images_data->slots[absolute_index].dev;
+}
+
+void set_init_phase(running_device *device)
+{
+    image_slot_data *slot = find_image_slot(device);
+	slot->not_init_phase = 0;
 }

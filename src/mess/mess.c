@@ -63,6 +63,9 @@ void mess_predevice_init(running_machine *machine)
 			{
 				int result = INIT_FAIL;
 				
+				/* mark init state */
+				set_init_phase(image);
+				
 				/* try to load this image */
 				result = image_load(image, image_name);
 
@@ -73,8 +76,7 @@ void mess_predevice_init(running_machine *machine)
 					const char *image_err = image_error(image);
 
 					/* unload all images */
-					image_unload_all(machine);
-
+					image_unload_all(machine);					
 					/* FIXME: image_name is always empty in this message because of the image_unload_all() call */
 					fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s\n",
 						info.name,

@@ -260,7 +260,7 @@ char *image_fgets(running_device *image, char *s, UINT32 length);
 int image_feof(running_device *image);
 
 void *image_ptr(running_device *image);
-
+void set_init_phase(running_device *device);
 
 UINT8 *image_get_software_region(running_device *image, const char *tag);
 UINT32 image_get_software_region_length(running_device *image, const char *tag);
