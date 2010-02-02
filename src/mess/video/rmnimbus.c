@@ -140,7 +140,7 @@ READ16_HANDLER (nimbus_video_io_r)
     }
 
     if(debug_on & DEBUG_TEXT)
-        logerror("Nimbus video IOR at pc=%08X from %04X mask=%04X, data=%04X\n",pc,(offset*2),mem_mask,result);
+        logerror("Nimbus video IOR at %05X from %04X mask=%04X, data=%04X\n",pc,(offset*2),mem_mask,result);
     
     return result;
 }
@@ -160,7 +160,7 @@ WRITE16_HANDLER (nimbus_video_io_w)
     int pc=cpu_get_pc(space->cpu);
 
     if(debug_on & DEBUG_TEXT)
-        logerror("Nimbus video IOW at %08X write of %04X to %04X mask=%04X\n",pc,data,(offset*2),mem_mask);
+        logerror("Nimbus video IOW at %05X write of %04X to %04X mask=%04X\n",pc,data,(offset*2),mem_mask);
 
     if(debug_on & DEBUG_DB)
         logerror("dw %05X,%05X\n",(offset*2),data);
@@ -190,10 +190,10 @@ WRITE16_HANDLER (nimbus_video_io_w)
         case    reg022  : vidregs[reg022]=data; break;
         case    reg024  : vidregs[reg024]=data; break;
         case    reg026  : vidregs[reg026]=data; write_reg_026(); break;
-        case    reg028  : vidregs[reg028]=data; change_palette(space->machine,0,data); break;
-        case    reg02A  : vidregs[reg02A]=data; change_palette(space->machine,1,data); break;
-        case    reg02C  : vidregs[reg02C]=data; change_palette(space->machine,2,data); break;
-        case    reg02E  : vidregs[reg02E]=data; change_palette(space->machine,3,data); break;
+        case    reg028  : vidregs[reg028]=data; change_palette(space->machine,(IS_80COL ? 0 : 0),data); break;
+        case    reg02A  : vidregs[reg02A]=data; change_palette(space->machine,(IS_80COL ? 1 : 4),data); break;
+        case    reg02C  : vidregs[reg02C]=data; change_palette(space->machine,(IS_80COL ? 2 : 8),data); break;
+        case    reg02E  : vidregs[reg02E]=data; change_palette(space->machine,(IS_80COL ? 3 : 12),data); break;
         
         default         : break;
     }
@@ -204,6 +204,8 @@ static void set_pixel(UINT16 x, UINT16 y, UINT8 colour)
     if(debug_on & (DEBUG_TEXT | DEBUG_PIXEL))
         logerror("set_pixel(x=%04X, y=%04X, colour=%04X), IS_XOR=%02X\n",x,y,colour,IS_XOR);
     
+    if(IS_80COL)
+        colour&=0x03;
 
     if((x<SCREEN_WIDTH_PIXELS) && (y<SCREEN_HEIGHT_LINES))
     {
@@ -212,6 +214,12 @@ static void set_pixel(UINT16 x, UINT16 y, UINT8 colour)
         else
             video_mem[x][y]=colour;
     }
+}
+
+static void set_pixel40(UINT16 x, UINT16 y, UINT8 colour)
+{
+    set_pixel((x*2),y,colour);
+    set_pixel((x*2)+1,y,colour);
 }
 
 static void write_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width)
@@ -236,14 +244,10 @@ static void write_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width)
         //logerror("write_pixel_line: data=%04X, mask=%04X, shifts=%02X, bpp=%02X colour=%02X\n",data,mask,shifts,bpp,colour); 
         
         if(IS_80COL)
-        {
             set_pixel(pixel_x,y,colour);
-        }
         else
-        {
-            set_pixel((pixel_x*2),y,colour);
-            set_pixel((pixel_x*2)+1,y,colour);
-        }
+            set_pixel40(pixel_x,y,colour);
+
         shifts-=bpp;
     }
 }
@@ -306,7 +310,8 @@ static void write_pixel_data(UINT16 x, UINT16 y, UINT16    data)
                           break;
                       
             case 0x02   : bpp=1; pixel_mask=0x0080;
-                          write_pixel_line(x,y,data,8); break;
+                          write_pixel_line(x,y,data,8); 
+                          break;
         
             case 0x03   : bpp=1; 
                           set_pixel(x,y,FG_COLOUR); 
@@ -316,7 +321,7 @@ static void write_pixel_data(UINT16 x, UINT16 y, UINT16    data)
                           write_pixel_line(x,y,((data & 0xFF) & ((data & 0xFF00)>>8)),8); 
                           break;
         
-            case 0x05   : move_pixel_line(x,y,data,8);
+            case 0x05   : move_pixel_line(x,y,data,16);
                           break;
         
             case 0x06   : bpp=2; pixel_mask=0xC000;
@@ -328,7 +333,7 @@ static void write_pixel_data(UINT16 x, UINT16 y, UINT16    data)
                           break;   
         }
     }
-    else
+    else /* 40 Col */
     {
         switch (vidregs[reg022] & WIDTH_MASK)
         {
@@ -341,7 +346,8 @@ static void write_pixel_data(UINT16 x, UINT16 y, UINT16    data)
                           break;
                       
             case 0x02   : bpp=1; pixel_mask=0x0080;
-                          write_pixel_line(x,y,data,8); break;
+                          set_pixel40(x,y,FG_COLOUR);
+                          break;
         
             case 0x03   : bpp=1; 
                           set_pixel(x,y,FG_COLOUR); 
@@ -381,10 +387,7 @@ static void write_reg_012(void)
     // I dunno if this is actually what is happening as the regs seem to be write only....
     // doing this however does seem to make some programs (worms from the welcom disk)
     // work correctly.
-    if(IS_80COL)
-        vidregs[reg002]=vidregs[reg012];
-    else
-        vidregs[reg002]=vidregs[reg012]/2; 
+    vidregs[reg002]=vidregs[reg012];
 
     write_pixel_data(vidregs[reg012],vidregs[reg00C],FG_COLOUR);
 }
@@ -399,16 +402,12 @@ static void write_reg_01A(void)
     write_pixel_data(++vidregs[reg002],vidregs[reg00C],vidregs[reg01A]);  
 }
 
-static void write_reg_01C()
+static void write_reg_01C(void)
 {
     // I dunno if this is actually what is happening as the regs seem to be write only....
     // doing this however does seem to make some programs (welcome from the welcom disk, 
-    // and others using the standard RM box menus) work correctly.
-    
-    if(IS_80COL)
-        vidregs[reg00C]=vidregs[reg01C];
-    else
-        vidregs[reg00C]=vidregs[reg01C]/2; 
+    // and others using the standard RM box menus) work correctly.   
+    vidregs[reg00C]=vidregs[reg01C];
 
     write_pixel_data(vidregs[reg002],vidregs[reg01C],FG_COLOUR);
 }
@@ -432,15 +431,22 @@ static void change_palette(running_machine *machine, UINT8 first, UINT16 colours
     UINT16  mask;
     UINT8   shifts;
     UINT8   paletteidx;
+    UINT8   colourmax;
     
-    shifts=12;
-    mask=0xF000;
-    for(colourno=first; colourno<SCREEN_NO_COLOURS; colourno+=4)
+    shifts=0;
+    mask=0x000F;
+    
+    colourmax=IS_80COL ? 1 : 4;
+    
+    for(colourno=first; colourno<(first+4); colourno++)
     {
         paletteidx=(colours & mask) >> shifts;
         palette_set_color_rgb(machine, colourno, nimbus_palette[paletteidx][RED], nimbus_palette[paletteidx][GREEN], nimbus_palette[paletteidx][BLUE]);
-        mask=mask>>4;
-        shifts-=4;
+        
+        if(debug_on & DEBUG_TEXT)
+            logerror("set colourno[%02X](r,g,b)=(%02X,%02X,%02X), paletteidx=%02X\n",colourno, nimbus_palette[paletteidx][RED], nimbus_palette[paletteidx][GREEN], nimbus_palette[paletteidx][BLUE],paletteidx);
+        mask=mask<<4;
+        shifts+=4;
     }
 }
 
@@ -462,10 +468,17 @@ static void video_regdump(running_machine *machine, int ref, int params, const c
     int regno;
     
     for(regno=0;regno<0x08;regno++)
+    {
         debug_console_printf(machine,"reg%03X=%04X reg%03X=%04X reg%03X=%04X\n",
                 regno*2,vidregs[regno],
                 (regno+0x08)*2,vidregs[regno+0x08],
                 (regno+0x10)*2,vidregs[regno+0x10]);
+
+        logerror("reg%03X=%04X reg%03X=%04X reg%03X=%04X\n",
+                regno*2,vidregs[regno],
+                (regno+0x08)*2,vidregs[regno+0x08],
+                (regno+0x10)*2,vidregs[regno+0x10]);
+    }
 }
 
 VIDEO_START( nimbus )

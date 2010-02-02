@@ -80,9 +80,12 @@ static const msm5205_interface msm5205_config =
 
 static const SCSIConfigTable nimbus_scsi_dev_table =
 {
-	1,                                      /* 1 SCSI device */
+	4,                                      /* 4 SCSI devices */
 	{
 		{ SCSI_ID_0, HARDDISK0_TAG, SCSI_DEVICE_HARDDISK },
+		{ SCSI_ID_1, HARDDISK1_TAG, SCSI_DEVICE_HARDDISK },
+		{ SCSI_ID_2, HARDDISK2_TAG, SCSI_DEVICE_HARDDISK },
+		{ SCSI_ID_3, HARDDISK3_TAG, SCSI_DEVICE_HARDDISK },
 	}
 };
 
@@ -291,6 +294,9 @@ static MACHINE_DRIVER_START( nimbus )
 	MDRV_FLOPPY_4_DRIVES_ADD(nimbus_floppy_config)
     
     MDRV_HARDDISK_ADD(HARDDISK0_TAG)
+    MDRV_HARDDISK_ADD(HARDDISK1_TAG)
+    MDRV_HARDDISK_ADD(HARDDISK2_TAG)
+    MDRV_HARDDISK_ADD(HARDDISK3_TAG)
     MDRV_SCSIBUS_ADD(SCSIBUS_TAG, scsibus_config)
     
     MDRV_RAM_ADD("messram")

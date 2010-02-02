@@ -96,6 +96,10 @@ WRITE8_HANDLER( nimbus_disk_w );
 
 /* SASI harddisk interface */
 #define HARDDISK0_TAG           "harddisk0"
+#define HARDDISK1_TAG           "harddisk1"
+#define HARDDISK2_TAG           "harddisk2"
+#define HARDDISK3_TAG           "harddisk3"
+
 #define SCSIBUS_TAG             "scsibus"
 
 void nimbus_scsi_linechange(running_device *device, UINT8 line, UINT8 state); 
