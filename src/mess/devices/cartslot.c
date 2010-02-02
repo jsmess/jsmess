@@ -392,7 +392,30 @@ static DEVICE_GET_IMAGE_DEVICES(cartslot)
 	pcb_type = identify_pcb(device);
 	if (pcb_type != NULL)
 	{
-		//devlist->append(TAG_PCB, global_alloc(running_device(&device->baseconfig(), pcb_type->devtype, TAG_PCB, 0)));
+		const device_config *cfg = new device_config(&device->baseconfig(), pcb_type->devtype, TAG_PCB, 0);
+		running_device *dev = devlist->append(device->subtag(tempstring,TAG_PCB), new running_device(*machine, *cfg));
+		
+		const machine_config_token *tokens = (const machine_config_token *)dev->get_config_ptr(DEVINFO_PTR_MACHINE_CONFIG);
+		machine_config *config;
+		const device_config *config_dev;
+		running_device *new_dev = NULL;
+		if (tokens != NULL)
+		{
+			config = machine_config_alloc(tokens);
+			for (config_dev = config->devicelist.first(); config_dev != NULL; config_dev = config_dev->next)
+			{					
+				device_config *new_cfg = new device_config(cfg, config_dev->type, config_dev->tag, config_dev->clock);
+				new_cfg->static_config = config_dev->static_config;
+				memcpy(
+					new_cfg->inline_config,
+					config_dev->inline_config,
+					new_cfg->get_config_int(DEVINFO_INT_INLINE_CONFIG_BYTES));								
+				new_dev = devlist->append(dev->subtag(tempstring,config_dev->tag), new running_device(*machine, *new_cfg));
+				new_dev->owner = dev;
+			}
+			machine_config_free(config);
+		}
+
 	}
 }
 
