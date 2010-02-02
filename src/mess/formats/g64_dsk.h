@@ -30,10 +30,10 @@ const int C2040_BITRATE[] =
 
 const int C8050_BITRATE[] =
 {
-	XTAL_12MHz/3/4,	/* tracks 65-84 */
-	XTAL_12MHz/3/5,	/* tracks 54-65 */
-	XTAL_12MHz/3/6, /* tracks 40-53 */
-	XTAL_12MHz/3/7	/* tracks  1-39 */
+	XTAL_12MHz/3/5,	/* tracks 65-84 */
+	XTAL_12MHz/3/6,	/* tracks 54-65 */
+	XTAL_12MHz/3/7, /* tracks 40-53 */
+	XTAL_12MHz/3/8	/* tracks  1-39 */
 };
 
 /***************************************************************************
