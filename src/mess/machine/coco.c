@@ -2845,6 +2845,27 @@ static void generic_coco12_dragon_init(running_machine *machine, const machine_i
 	generic_init_machine(machine, init);
 }
 
+/******* Lightgun Setup **********/
+
+static void update_lightgun( running_machine *machine )
+{
+	/* is there a Diecom Light Gun either in Left or in Right Port? */
+	UINT8 ctrl = input_port_read_safe(machine, "ctrl_sel", 0x00);
+	int is_lightgun = ((ctrl & 0x0f) == 0x03 || (ctrl & 0xf0) == 0x30) ? 1 :0;
+
+	crosshair_set_screen(machine, 0, is_lightgun ? CROSSHAIR_SCREEN_ALL : CROSSHAIR_SCREEN_NONE);
+}
+
+INPUT_CHANGED( coco_joystick_mode_changed )
+{
+	update_lightgun(field->port->machine);
+}
+
+static TIMER_CALLBACK( update_lightgun_timer_callback )
+{
+	update_lightgun(machine);
+}
+
 /******* Machine Setups Dragons **********/
 
 MACHINE_START( dragon32 )
@@ -2857,6 +2878,9 @@ MACHINE_START( dragon32 )
 	init.printer_out_		= printer_out_dragon;
 
 	generic_coco12_dragon_init(machine, &init);
+
+	/* need to specify lightgun crosshairs */
+	timer_set(machine, attotime_zero, NULL, 0, update_lightgun_timer_callback);
 }
 
 MACHINE_START( dragon64 )
@@ -2869,6 +2893,9 @@ MACHINE_START( dragon64 )
 	init.printer_out_		= printer_out_dragon;
 
 	generic_coco12_dragon_init(machine, &init);
+
+	/* need to specify lightgun crosshairs */
+	timer_set(machine, attotime_zero, NULL, 0, update_lightgun_timer_callback);
 }
 
 MACHINE_START( tanodr64 )
@@ -2881,6 +2908,9 @@ MACHINE_START( tanodr64 )
 	init.printer_out_		= printer_out_dragon;
 
 	generic_coco12_dragon_init(machine, &init);
+
+	/* need to specify lightgun crosshairs */
+	timer_set(machine, attotime_zero, NULL, 0, update_lightgun_timer_callback);
 }
 
 MACHINE_START( dgnalpha )
@@ -2893,6 +2923,9 @@ MACHINE_START( dgnalpha )
 	init.printer_out_		= printer_out_dragon;
 
 	generic_coco12_dragon_init(machine, &init);
+
+	/* need to specify lightgun crosshairs */
+	timer_set(machine, attotime_zero, NULL, 0, update_lightgun_timer_callback);
 }
 
 MACHINE_RESET( dgnalpha )
@@ -2900,9 +2933,12 @@ MACHINE_RESET( dgnalpha )
 	running_device *fdc = devtag_get_device(machine, "wd2797");
 	wd17xx_set_complete_command_delay(fdc,20);
  
-    /* dgnalpha_just_reset, is here to flag that we should ignore the first irq generated */
+	/* dgnalpha_just_reset, is here to flag that we should ignore the first irq generated */
 	/* by the WD2797, it is reset to 0 after the first inurrupt */
 	dgnalpha_just_reset=1;
+
+	/* need to specify lightgun crosshairs */
+	timer_set(machine, attotime_zero, NULL, 0, update_lightgun_timer_callback);
 }
 
 const wd17xx_interface dgnalpha_wd17xx_interface =
@@ -2936,6 +2972,9 @@ MACHINE_START( coco2 )
 	init.printer_out_		= printer_out_coco;
 
 	generic_coco12_dragon_init(machine, &init);
+
+	/* need to specify lightgun crosshairs */
+	timer_set(machine, attotime_zero, NULL, 0, update_lightgun_timer_callback);
 }
 
 MACHINE_RESET( coco3 )
@@ -2957,25 +2996,6 @@ MACHINE_RESET( coco3 )
 static STATE_POSTLOAD( coco3_state_postload )
 {
 	coco3_mmu_update(machine, 0, 8);
-}
-
-static void update_lightgun( running_machine *machine )
-{
-	/* is there a Diecom Light Gun either in Left or in Right Port? */
-	UINT8 ctrl = input_port_read_safe(machine, "ctrl_sel", 0x00);
-	int is_lightgun = ((ctrl & 0x0f) == 0x03 || (ctrl & 0xf0) == 0x30) ? 1 :0;
-
-	crosshair_set_screen(machine, 0, is_lightgun ? CROSSHAIR_SCREEN_ALL : CROSSHAIR_SCREEN_NONE);
-}
-
-INPUT_CHANGED( coco_joystick_mode_changed )
-{
-	update_lightgun(field->port->machine);
-}
-
-static TIMER_CALLBACK( update_lightgun_timer_callback )
-{
-	update_lightgun(machine);
 }
 
 MACHINE_START( coco3 )

@@ -559,7 +559,7 @@ static INPUT_PORTS_START( coco )
 	PORT_CATEGORY_ITEM(  0x30, "Diecom Light Gun Adaptor",		23 ) PORT_CONDITION("ctrl_sel", 0x0f, PORTCOND_NOTEQUALS, 0x03)
 
 	PORT_START("hires_intf")
-	PORT_CONFNAME( 0x07, 0x00, "Hi-Res Joystick Interfaces" )// PORT_CHANGED( coco_joystick_mode_changed, 0 )
+	PORT_CONFNAME( 0x07, 0x00, "Hi-Res Joystick Interfaces" )
 	PORT_CONFSETTING(    0x00, "None" )
 	PORT_CONFSETTING(    0x01, "Hi-Res in Right Port" )                     PORT_CONDITION("ctrl_sel", 0x0f, PORTCOND_EQUALS, 0x01)
 	PORT_CONFSETTING(    0x02, "Hi-Res CoCoMax 3 Style in Right Port" )     PORT_CONDITION("ctrl_sel", 0x0f, PORTCOND_EQUALS, 0x01)
