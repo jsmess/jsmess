@@ -41,15 +41,12 @@ void mess_predevice_init(running_machine *machine)
 	running_device *image;
 	image_device_info info;
 	device_get_image_devices_func get_image_devices;
-	device_list *devlist;
 
 	/* initialize natural keyboard support */
 	inputx_init(machine);
 
 	/* init all devices */
 	image_init(machine);
-
-	devlist = &machine->devicelist;
 
 	/* make sure that any required devices have been allocated */
     for (image = machine->devicelist.first(); image != NULL; image = image->next)
@@ -77,7 +74,7 @@ void mess_predevice_init(running_machine *machine)
 			/* get image-specific hardware */
 			get_image_devices = (device_get_image_devices_func) image->get_config_fct(DEVINFO_FCT_GET_IMAGE_DEVICES);
 			if (get_image_devices != NULL)
-				(*get_image_devices)(image, machine, devlist);
+				(*get_image_devices)(image);
 		}	
 	}
 }
