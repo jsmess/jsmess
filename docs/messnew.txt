@@ -4,7 +4,8 @@ New System Drivers Supported:
 -----------------------------
 - Casio PV-1000  [Wilbert Pol, plgDavid]
 - Research Machines Nimbus [Phill Harvey-Smith]
-
+- Iskra-1031 [Miodrag Milanovic]
+- EC-1841 [Miodrag Milanovic]
 
 
 Systems Promoted from GAME_NOT_WORKING:

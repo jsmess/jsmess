@@ -233,6 +233,7 @@ static struct
 	UINT8	palette_lut_2bpp[4];
 	UINT8	vsync;
 	UINT8	hsync;
+	UINT8   p3df;
 } cga;
 
 
@@ -1179,6 +1180,28 @@ static void pc_cga_plantronics_w(running_machine *machine, int data)
  *
  *************************************************************************/
 
+WRITE8_HANDLER ( char_ram_w )
+{
+	UINT8 *gfx = memory_region(space->machine, "gfx1");	
+	logerror("write char ram %04x %02x\n",offset,data);
+	gfx[offset + 0x0000] = data;
+	gfx[offset + 0x0800] = data;
+	gfx[offset + 0x1000] = data;
+	gfx[offset + 0x1800] = data;
+}
+
+WRITE16_HANDLER( char_ram_16le_w ) { write16le_with_write8_handler(char_ram_w, space, offset, data, mem_mask); }
+WRITE32_HANDLER( char_ram_32_w )   { write32le_with_write8_handler(char_ram_w, space, offset, data, mem_mask); }
+
+READ8_HANDLER ( char_ram_r )
+{
+	UINT8 *gfx = memory_region(space->machine, "gfx1");	
+	return gfx[offset];
+}
+
+READ16_HANDLER( char_ram_16le_r ) { return read16le_with_read8_handler(char_ram_r, space, offset, mem_mask); }
+READ32_HANDLER( char_ram_32_r )   { return read32le_with_read8_handler(char_ram_r, space, offset, mem_mask); }
+
 static READ8_HANDLER( pc_cga8_r )
 {
 	running_device *devconf = devtag_get_device(space->machine, CGA_MC6845_NAME);
@@ -1193,6 +1216,9 @@ static READ8_HANDLER( pc_cga8_r )
 			break;
 		case 10:
 			data = cga.vsync | ( ( data & 0x40 ) >> 4 ) | cga.hsync;
+			break;			
+		case 0x0f:
+			data = cga.p3df;
 			break;
     }
 	return data;
@@ -1222,6 +1248,54 @@ static WRITE8_HANDLER( pc_cga8_w )
 	case 0x0d:
 		pc_cga_plantronics_w(space->machine, data);
 		break;
+	case 0x0f:
+		// Not sure if some all CGA cards have ability to upload char definition
+		UINT8 buswidth = space->machine->firstcpu->databus_width(AS_PROGRAM);
+		const address_space *space_prg = cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+		cga.p3df = data;
+		if (data & 1) {	
+			switch(buswidth)
+			{
+				case 8:
+					memory_install_readwrite8_handler(space_prg, 0xb8000, 0xb87ff, 0, 0, char_ram_r,char_ram_w );
+					break;
+
+				case 16:
+					memory_install_readwrite16_handler(space_prg, 0xb8000, 0xb87ff, 0, 0, char_ram_16le_r,char_ram_16le_w );
+					break;
+
+				case 32:
+					memory_install_readwrite32_handler(space_prg, 0xb8000, 0xb87ff, 0, 0, char_ram_32_r,char_ram_32_w );
+					break;
+
+				default:
+					fatalerror("CGA:  Bus width %d not supported\n", buswidth);
+					break;
+			}				
+		} else {			
+			memory_install_read_bank(space_prg, 0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
+			switch(buswidth)
+			{
+				case 8:
+					memory_install_write8_handler(space_prg, 0xb8000, 0xbbfff, 0, 0x04000, pc_video_videoram_w );
+					break;
+
+				case 16:
+					memory_install_write16_handler(space_prg, 0xb8000, 0xbbfff, 0, 0x04000, pc_video_videoram16le_w );
+					break;
+
+				case 32:
+					memory_install_write32_handler(space_prg, 0xb8000, 0xbbfff, 0, 0x04000, pc_video_videoram32_w );
+					break;
+
+				default:
+					fatalerror("CGA:  Bus width %d not supported\n", buswidth);
+					break;
+			}
+		
+		}
+		break;
+		
 	}
 }
 

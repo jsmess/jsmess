@@ -281,6 +281,7 @@ static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
 #endif
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE(pc16le_rtc_r,				pc16le_rtc_w)
 	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x00ff)
+	AM_RANGE(0x02b0, 0x02bf) AM_RAM
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc16le_HDC1_r,			pc16le_HDC1_w)
@@ -2401,6 +2402,71 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_RAM_DEFAULT_SIZE("640K")
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( iskr1031 )
+	MDRV_DRIVER_DATA(pc_state)
+	/* basic machine hardware */
+	MDRV_CPU_PC(pc16, pc16, I8086, 4772720, pc_frame_interrupt)
+
+	MDRV_QUANTUM_TIME(HZ(60))
+
+	MDRV_MACHINE_START(pc)
+	MDRV_MACHINE_RESET(pc)
+
+	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
+
+	MDRV_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
+
+	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+
+	MDRV_I8255A_ADD( "ppi8255", ibm5160_ppi8255_interface )
+
+	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
+
+	/* video hardware */
+	MDRV_IMPORT_FROM( pcvideo_cga )
+	MDRV_GFXDECODE(ibm5150)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+#ifdef ADLIB
+	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
+	MDRV_SOUND_CONFIG(pc_ym3812_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+#endif
+#ifdef GAMEBLASTER
+	MDRV_SOUND_ADD("saa1099.1", SAA1099, 4772720)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ADD("saa1099.2", SAA1099, 4772720)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+#endif
+
+	/* keyboard */
+	MDRV_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+
+	/* printer */
+	MDRV_PC_LPT_ADD("lpt_0", pc_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_1", pc_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
+
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("640K")
+MACHINE_DRIVER_END
+
+
+
 #if 0
 	//pcjr roms? (incomplete dump, most likely 64 kbyte)
 	// basic c1.20
@@ -2945,6 +3011,44 @@ ROM_START( dgone )
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
+ROM_START( iskr1031 )
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
+	ROM_SYSTEM_BIOS(0, "v1", "v1")
+	ROMX_LOAD( "150-02.bin", 0xfc000, 0x2000, CRC(e33fb974) SHA1(f5f3ece67c025c0033716ff516e1a34fbeb32749), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "150-03.bin", 0xfc001, 0x2000, CRC(8c482258) SHA1(90ef48955e0df556dc06a000a797ef42ccf430c5), ROM_SKIP(1) | ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "v2", "v2")
+	ROMX_LOAD( "150-06.bin", 0xfc000, 0x2000, CRC(1adbf969) SHA1(08c0a0fc50a75e6207b1987bae389cca60893eac), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "150-07.bin", 0xfc001, 0x2000, CRC(0dc4b65a) SHA1(c96f066251a7343eac8113ea9dcb2cb12d0334d5), ROM_SKIP(1) | ROM_BIOS(2))
+	
+	ROM_REGION(0x2000,"gfx1", 0)	
+	// Here CGA rom with cyrillic support should be added
+	ROM_LOAD( "rus_cga.bin", 0x0000, 0x2000, BAD_DUMP CRC(f23c2425) SHA1(fd40daf0aa629f479b40ca9ac7aea369fa020af6))
+ROM_END
+
+ROM_START( ec1841 )
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
+	ROM_SYSTEM_BIOS(0, "v1", "v1")
+	ROMX_LOAD( "18410112.bin", 0xfc000, 0x0800, CRC(77957396) SHA1(785f1dceb6e2b4618f5c5f0af15eb74a8c951448), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "18410113.bin", 0xfc001, 0x0800, CRC(768bd3d5) SHA1(2e948f2ad262de306d889b7964c3f1aad45ff5bc), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "18410114.bin", 0xfd000, 0x0800, CRC(47722b58) SHA1(a6339ee8af516f834826b7828a5cf79cb650480c), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "18410115.bin", 0xfd001, 0x0800, CRC(b585b5ea) SHA1(d0ebed586eb13031477c2e071c50416682f80489), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "18410116.bin", 0xfe000, 0x0800, CRC(28a07db4) SHA1(17fbcd60dacd1d3f8d8355db429f97e4d1d1ac88), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "18410117.bin", 0xfe001, 0x0800, CRC(928bda26) SHA1(ee889184067e2680b29a8ef1c3a76cf5afd4c78d), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "18410118.bin", 0xff000, 0x0800, CRC(75ca7d7e) SHA1(6356426820c5326a7893a437d54b02f250ef8609), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "18410119.bin", 0xff001, 0x0800, CRC(8a9d593e) SHA1(f3936d2cb4e6d130dd732973f126c3aa20612463), ROM_SKIP(1) | ROM_BIOS(1))	
+	ROM_SYSTEM_BIOS(1, "v2", "v2")
+	ROMX_LOAD( "18410212.bin", 0xfc000, 0x0800, CRC(619dbdcf) SHA1(ece1943569b44b1b81246f9d47d62b9b11680a52), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "18410213.bin", 0xfc001, 0x0800, CRC(e3c10128) SHA1(d6ed743ebe9c130925c9f17aad1a45db9194c967), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "18410214.bin", 0xfd000, 0x0800, CRC(f8517e5e) SHA1(8034cd6ff5778365dc9daa494524f1753a74f1ed), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "18410215.bin", 0xfd001, 0x0800, CRC(8538c52a) SHA1(ee981ce90870b6546a18f2a2e64d71b0038ce0dd), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "18410216.bin", 0xfe000, 0x0800, CRC(3d1d1e67) SHA1(c527e29796537787c0f6c329f3c203f6131ca77f), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "18410217.bin", 0xfe001, 0x0800, CRC(1b985264) SHA1(5ddcb9c13564be208c5068c105444a87159c67ee), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "18410218.bin", 0xff000, 0x0800, CRC(75ca7d7e) SHA1(6356426820c5326a7893a437d54b02f250ef8609), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "18410219.bin", 0xff001, 0x0800, CRC(61aae23d) SHA1(7b3aa24a63ee31b194297eb1e61c3827edfcb95a), ROM_SKIP(1) | ROM_BIOS(2))	
+	ROM_REGION(0x2000,"gfx1", 0)	
+	// On real machine looks like RAM is here, since it is owerwritten during runtime
+ROM_END
+
 
 /***************************************************************************
 
@@ -2980,4 +3084,7 @@ COMP(  1987,	pc,		ibm5150,	0,	pccga,	    pccga,	pccga,	    "Generic",  "PC (CGA)
 COMP ( 1987,	pcmda,		ibm5150,	0,	pcmda,      pcmda,	ibm5150,    "Generic",  "PC (MDA)" , 0)
 COMP ( 1987,    pcherc,		ibm5150,	0,	pcherc,     pcmda,      ibm5150,    "Generic",  "PC (Hercules)" , 0)
 COMP ( 1987,	xtvga,		ibm5150,	0,	xtvga,      xtvga,	pc_vga,	    "Generic",  "PC/XT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING)
+
+COMP ( 1987,	iskr1031,	ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "Iskra-1031" , GAME_NOT_WORKING)
+COMP ( 1987,	ec1841,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "EC-1841" , GAME_NOT_WORKING)
 
