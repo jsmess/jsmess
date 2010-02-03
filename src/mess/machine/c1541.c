@@ -348,10 +348,10 @@ WRITE_LINE_DEVICE_HANDLER( c2031_ieee488_ifc_w )
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( c1540_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1540", 0x0000)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM AM_REGION("c1540", 0x0000)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -359,10 +359,10 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( c1541_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1541", 0x0000)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM AM_REGION("c1541", 0x0000)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -370,10 +370,10 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( c1541c_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1541c", 0x0000)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM AM_REGION("c1541c", 0x0000)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -381,10 +381,10 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( c1541ii_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1541ii", 0x0000)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM AM_REGION("c1541ii", 0x0000)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -392,10 +392,10 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( c2031_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c2031", 0x0000)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
+	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM AM_REGION("c2031", 0x0000)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
