@@ -2960,6 +2960,9 @@ MACHINE_START( coco )
 	init.printer_out_		= printer_out_coco;
 
 	generic_coco12_dragon_init(machine, &init);
+
+	/* need to specify lightgun crosshairs */
+	timer_set(machine, attotime_zero, NULL, 0, update_lightgun_timer_callback);
 }
 
 MACHINE_START( coco2 )
