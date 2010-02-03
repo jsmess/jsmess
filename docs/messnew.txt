@@ -6,6 +6,7 @@ New System Drivers Supported:
 - Research Machines Nimbus [Phill Harvey-Smith]
 - Iskra-1031 [Miodrag Milanovic]
 - EC-1841 [Miodrag Milanovic]
+- EC-1845 [Miodrag Milanovic]
 
 
 Systems Promoted from GAME_NOT_WORKING:

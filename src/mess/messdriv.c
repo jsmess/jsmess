@@ -588,6 +588,7 @@ const game_driver * const drivers[] =
 	DRIVER( xtvga )	 /* 198? PC-XT (VGA, MF2 Keyboard)	   */
 	DRIVER( iskr1031 ) 
 	DRIVER( ec1841 ) 
+	DRIVER( ec1845 ) 
 	/* AT */
 	DRIVER( ibm5170 )   /* 1984 IBM PC/AT 5170, original 6 MHz model	*/
 	DRIVER( ibm5170a )  /* 1985 IBM PC/AT 5170, enhanced 8 MHz model	*/

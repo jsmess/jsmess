@@ -3049,6 +3049,20 @@ ROM_START( ec1841 )
 	// On real machine looks like RAM is here, since it is owerwritten during runtime
 ROM_END
 
+ROM_START( ec1845 )
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
+	ROMX_LOAD( "184500.bin", 0xfc000, 0x0800, CRC(7c472ef7) SHA1(3af53f27b49bbc731bf51f9300fbada23a1bfcfc), ROM_SKIP(1))
+	ROMX_LOAD( "184501.bin", 0xfc001, 0x0800, CRC(db240dc6) SHA1(d7bb022213d09bbf2a8107fe4f1cd27b23939e18), ROM_SKIP(1))
+	ROMX_LOAD( "184502.bin", 0xfd000, 0x0800, CRC(149e7e29) SHA1(7f2a297588fef1bc750c57e6ae0d5acf3d27c486), ROM_SKIP(1))
+	ROMX_LOAD( "184503.bin", 0xfd001, 0x0800, CRC(e28cbd74) SHA1(cf1fba4e67c8e1dd8cdda547118e84b704029b03), ROM_SKIP(1))
+	ROMX_LOAD( "184504.bin", 0xfe000, 0x0800, CRC(55fa7a1d) SHA1(58f7abab08b9d2f0a1c1636e11bb72af2694c95f), ROM_SKIP(1))
+	ROMX_LOAD( "184505.bin", 0xfe001, 0x0800, CRC(c807e3f5) SHA1(08117e449f0d04f96041cff8d34893f500f3760d), ROM_SKIP(1))
+	ROMX_LOAD( "184506.bin", 0xff000, 0x0800, CRC(24f5c27c) SHA1(7822dd7f715ef00ccf6d8408be8bbfe01c2eba20), ROM_SKIP(1))
+	ROMX_LOAD( "184507.bin", 0xff001, 0x0800, CRC(75122203) SHA1(7b0fbdf1315230633e39574ac7360163bc7361e1), ROM_SKIP(1))
+	ROM_REGION(0x2000,"gfx1", 0)	
+	// On real machine looks like RAM is here, since it is owerwritten during runtime
+ROM_END
+
 
 /***************************************************************************
 
@@ -3085,6 +3099,7 @@ COMP ( 1987,	pcmda,		ibm5150,	0,	pcmda,      pcmda,	ibm5150,    "Generic",  "PC 
 COMP ( 1987,    pcherc,		ibm5150,	0,	pcherc,     pcmda,      ibm5150,    "Generic",  "PC (Hercules)" , 0)
 COMP ( 1987,	xtvga,		ibm5150,	0,	xtvga,      xtvga,	pc_vga,	    "Generic",  "PC/XT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING)
 
-COMP ( 1987,	iskr1031,	ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "Iskra-1031" , GAME_NOT_WORKING)
+COMP ( 1989,	iskr1031,	ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "Iskra-1031" , GAME_NOT_WORKING)
 COMP ( 1987,	ec1841,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "EC-1841" , GAME_NOT_WORKING)
+COMP ( 1989,	ec1845,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "EC-1845" , GAME_NOT_WORKING)
 
