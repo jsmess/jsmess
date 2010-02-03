@@ -646,6 +646,47 @@ static const riot6532_interface riot1_intf =
     via6522_interface via_intf um3
 -------------------------------------------------*/
 
+static void read_current_track(c2040_t *c2040, int unit)
+{
+	c2040->unit[unit].track_len = G64_BUFFER_SIZE;
+	c2040->unit[unit].buffer_pos = G64_DATA_START;
+	c2040->unit[unit].bit_pos = 7;
+	c2040->bit_count = 0;
+
+	/* read track data */
+	floppy_drive_read_track_data_info_buffer(c2040->unit[unit].image, c2040->side, c2040->unit[unit].track_buffer, &c2040->unit[unit].track_len);
+
+	/* extract track length */
+	c2040->unit[unit].track_len = G64_DATA_START + ((c2040->unit[unit].track_buffer[1] << 8) | c2040->unit[unit].track_buffer[0]);
+}
+
+static void step_motor(c2040_t *c2040, int unit, int stp)
+{
+	if (c2040->unit[unit].stp != stp)
+	{
+		int tracks = 0;
+
+		switch (c2040->unit[unit].stp)
+		{
+		case 0:	if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
+		case 1:	if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
+		case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
+		case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
+		}
+
+		if (tracks != 0)
+		{
+			/* step read/write head */
+			floppy_drive_seek(c2040->unit[unit].image, tracks);
+
+			/* read new track data */
+			read_current_track(c2040, unit);
+		}
+
+		c2040->unit[unit].stp = stp;
+	}
+}
+
 static READ8_DEVICE_HANDLER( via_pa_r )
 {
 	/*
@@ -690,41 +731,6 @@ static READ8_DEVICE_HANDLER( via_pb_r )
     */
 
 	return 0;
-}
-
-static void step_motor(c2040_t *c2040, int unit, int stp)
-{
-	if (c2040->unit[unit].stp != stp)
-	{
-		int tracks = 0;
-
-		switch (c2040->unit[unit].stp)
-		{
-		case 0:	if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
-		case 1:	if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
-		case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
-		case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
-		}
-
-		if (tracks != 0)
-		{
-			c2040->unit[unit].track_len = G64_BUFFER_SIZE;
-			c2040->unit[unit].buffer_pos = G64_DATA_START;
-			c2040->unit[unit].bit_pos = 7;
-			c2040->bit_count = 0;
-
-			/* step read/write head */
-			floppy_drive_seek(c2040->unit[unit].image, tracks);
-
-			/* read track data */
-			floppy_drive_read_track_data_info_buffer(c2040->unit[unit].image, c2040->side, c2040->unit[unit].track_buffer, &c2040->unit[unit].track_len);
-
-			/* extract track length */
-			c2040->unit[unit].track_len = G64_DATA_START + ((c2040->unit[unit].track_buffer[1] << 8) | c2040->unit[unit].track_buffer[0]);
-		}
-
-		c2040->unit[unit].stp = stp;
-	}
 }
 
 static WRITE8_DEVICE_HANDLER( via_pb_w )
@@ -824,6 +830,33 @@ static const via6522_interface via_intf =
     via6522_interface c8050_via_intf um3
 -------------------------------------------------*/
 
+static void c8050_step_motor(c2040_t *c2040, int unit, int stp)
+{
+	if (c2040->unit[unit].stp != stp)
+	{
+		int tracks = 0;
+
+		switch (c2040->unit[unit].stp)
+		{
+		case 0:	if (stp == 1) tracks++; else if (stp == 2) tracks--; break;
+		case 1:	if (stp == 3) tracks++; else if (stp == 0) tracks--; break;
+		case 2: if (stp == 0) tracks++; else if (stp == 3) tracks--; break;
+		case 3: if (stp == 2) tracks++; else if (stp == 1) tracks--; break;
+		}
+
+		if (tracks != 0)
+		{
+			/* step read/write head */
+			floppy_drive_seek(c2040->unit[unit].image, tracks);
+
+			/* read new track data */
+			read_current_track(c2040, unit);
+		}
+
+		c2040->unit[unit].stp = stp;
+	}
+}
+
 static READ8_DEVICE_HANDLER( c8050_via_pb_r )
 {
 	/*
@@ -868,7 +901,25 @@ static WRITE8_DEVICE_HANDLER( c8050_via_pb_w )
 
     */
 
-	via_pb_w(device, offset, data);
+	c2040_t *c2040 = get_safe_token(device->owner);
+
+	/* stepper motor 1 */
+	int s1 = data & 0x03;
+	c8050_step_motor(c2040, 1, s1);
+
+	/* stepper motor 0 */
+	int s0 = (data >> 2) & 0x03;
+	c8050_step_motor(c2040, 0, s0);
+
+	/* spindle motor 1 */
+	int mtr1 = BIT(data, 4);
+	floppy_mon_w(c2040->unit[1].image, !mtr1);
+
+	/* spindle motor 0 */
+	int mtr0 = BIT(data, 5);
+	floppy_mon_w(c2040->unit[0].image, !mtr0);
+
+	timer_enable(c2040->bit_timer, mtr1 | mtr0);
 
 	/* TODO pull sync */
 }
