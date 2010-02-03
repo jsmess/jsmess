@@ -1988,16 +1988,6 @@ VIDEO_UPDATE(m6847)
  *
  *************************************/
 
-static UINT64 divide_mame_time(attotime dividend, attotime divisor)
-{
-	/* TODO: it should not be necessary to use floating point here */
-	double dividend_dbl = attotime_to_double(dividend);
-	double divisor_dbl = attotime_to_double(divisor);
-	return (UINT64) (dividend_dbl / divisor_dbl);
-}
-
-
-
 static attotime interval(m6847_timing_type timing)
 {
 	attotime result;
@@ -2019,25 +2009,9 @@ static attotime interval(m6847_timing_type timing)
 
 
 
-UINT64 coco6847_time(running_machine *machine, m6847_timing_type timing)
+attotime coco6847_time_delay(running_machine *machine, m6847_timing_type timing, UINT64 time_delay)
 {
-	attotime current_time = timer_get_time(machine);
-	attotime divisor = interval(timing);
-	return divide_mame_time(current_time, divisor);
-}
-
-
-
-attotime coco6847_time_until(running_machine *machine, m6847_timing_type timing, UINT64 target_time)
-{
-	attotime target_mame_time, current_time;
-	target_mame_time = attotime_mul(interval(timing), target_time);
-	current_time = timer_get_time(machine);
-
-	if (attotime_compare(target_mame_time, current_time) < 0)
-		fatalerror("coco6847_time_until(): cannot target past times");
-
-	return attotime_sub(target_mame_time, current_time);
+	return attotime_mul(interval(timing), time_delay);
 }
 
 

@@ -53,7 +53,8 @@ System Driver Changes:
 
 - [TX0] Fixed disassembly in the debugger. [Robbbert]
 
-
+- [COCO3] Fixed broken Coco3 high-res timer emulation 
+  (bug #1913) [John W. Linville]
 
 Imgtool Changes:
 ----------------

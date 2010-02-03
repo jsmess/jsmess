@@ -142,18 +142,7 @@ UINT32 mc6847_update(running_device *device, bitmap_t *bitmap, const rectangle *
 
 void mc6847_set_palette(running_device *device, UINT32 *palette);
 
-/* hack for the coco until the 6883sam can be updated */
-int mc6847_get_scanline(running_device *device);
-
-
 void m6847_video_changed(void);
-
-/* timing functions */
-UINT64 m6847_time(running_device *device, m6847_timing_type timing);
-attotime m6847_time_until(running_device *device, m6847_timing_type timing, UINT64 target_time);
-
-/* CoCo 3 hooks */
-attotime m6847_scanline_time(running_device *device, int scanline);
 
 INPUT_PORTS_EXTERN( m6847_artifacting );
 

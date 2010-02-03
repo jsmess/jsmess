@@ -2183,10 +2183,9 @@ static emu_timer *coco3_gime_timer;
 static void coco3_timer_reset(running_machine *machine)
 {
 	/* reset the timer; take the value stored in $FF94-5 and start the timer ticking */
-	UINT64 current_time;
 	UINT16 timer_value;
 	m6847_timing_type timing;
-	attotime target_time;
+	attotime delay_time;
 
 	/* value is from 0-4095 */
 	timer_value = ((coco3_gimereg[4] & 0x0F) * 0x100) | coco3_gimereg[5];
@@ -2202,16 +2201,13 @@ static void coco3_timer_reset(running_machine *machine)
 		/* choose which timing clock source */
 		timing = (coco3_gimereg[1] & 0x20) ? M6847_CLOCK : M6847_HSYNC;
 
-		/* determine the current time */
-		current_time = coco6847_time(machine, timing);
-
-		/* calculate the time */
-		target_time = coco6847_time_until(machine, timing, current_time + timer_value);
+		/* determine the delay time */
+		delay_time = coco6847_time_delay(machine, timing, timer_value);
 		if (LOG_TIMER)
-			logerror("coco3_reset_timer(): target_time=%g\n", attotime_to_double(target_time));
+			logerror("coco3_reset_timer(): delay_time=%g\n", attotime_to_double(delay_time));
 
 		/* and adjust the timer */
-		timer_adjust_oneshot(coco3_gime_timer, target_time, 0);
+		timer_adjust_oneshot(coco3_gime_timer, delay_time, 0);
 	}
 	else
 	{

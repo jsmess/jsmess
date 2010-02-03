@@ -76,8 +76,7 @@ int m6847_get_horizontal_sync(running_machine *machine);
 int m6847_get_field_sync(running_machine *machine);
 
 /* timing functions */
-UINT64 coco6847_time(running_machine *machine,m6847_timing_type timing);
-attotime coco6847_time_until(running_machine *machine, m6847_timing_type timing, UINT64 target_time);
+attotime coco6847_time_delay(running_machine *machine, m6847_timing_type timing, UINT64 target_time);
 
 /* CoCo 3 hooks */
 attotime coco6847_scanline_time(int scanline);
