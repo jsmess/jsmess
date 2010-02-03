@@ -16,6 +16,7 @@
 */
 
 #include "emu.h"
+#include "g64_dsk.h"
 #include "formats/flopimg.h"
 #include "devices/flopdrv.h"
 
@@ -121,10 +122,10 @@ static floperr_t g64_read_track(floppy_image *floppy, int head, int track, UINT6
 
 	if (track_offset)
 	{
-		if (buflen < (tag->track_size + 2)) fatalerror("G64 track buffer too small: %u!\n", (UINT32)buflen);
+		if (buflen < (tag->track_size + G64_DATA_START)) fatalerror("G64 track buffer too small: %u!\n", (UINT32)buflen);
 
 		/* read track */
-		floppy_image_read(floppy, buffer, track_offset, tag->track_size + 2);
+		floppy_image_read(floppy, buffer, track_offset, tag->track_size + G64_DATA_START);
 	}
 	else
 	{

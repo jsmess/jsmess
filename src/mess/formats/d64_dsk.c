@@ -17,6 +17,7 @@
 */
 
 #include "emu.h"
+#include "g64_dsk.h"
 #include "formats/flopimg.h"
 #include "formats/d64_dsk.h"
 #include "devices/flopdrv.h"
@@ -369,7 +370,7 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 		d64_track_data = (UINT8 *)alloca(d64_track_size);
 
 		/* allocate temporary GCR track data buffer */
-		gcr_track_size = 2 + (sectors_per_track * SECTOR_SIZE_GCR);
+		gcr_track_size = sectors_per_track * SECTOR_SIZE_GCR;
 		gcr_track_data = (UINT8 *)alloca(gcr_track_size);
 		
 		if (buflen < gcr_track_size) fatalerror("D64 track buffer too small: %u!\n", (UINT32)buflen);
@@ -466,7 +467,7 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 		}
 
 		/* copy GCR track data to buffer */
-		memcpy(buffer, gcr_track_data, gcr_track_size);
+		memcpy(buffer, gcr_track_data, gcr_track_size + G64_DATA_START);
 	}
 	else	/* half tracks */
 	{
