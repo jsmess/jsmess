@@ -2094,6 +2094,10 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 
 static void Win32UI_exit()
 {
+	#ifdef MESS
+	MySoftwareListClose();
+	#endif
+	
     if (g_bDoBroadcast == TRUE)
     {
         ATOM a = GlobalAddAtom(TEXT(""));

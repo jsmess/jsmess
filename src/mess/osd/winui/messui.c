@@ -346,7 +346,15 @@ static BOOL AddSoftwarePickerDirs(HWND hwndPicker, LPCSTR pszDirectories, LPCSTR
 	return TRUE;
 }
 
-
+void MySoftwareListClose(void)
+{
+	// free the machine config, if necessary
+	if (config != NULL)
+	{
+		software_config_free(config);
+		config = NULL;
+	}
+}
 
 void MyFillSoftwareList(int drvindex, BOOL bForce)
 {

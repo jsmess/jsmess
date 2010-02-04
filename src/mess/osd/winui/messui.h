@@ -15,5 +15,6 @@ BOOL MessCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify);
 void MessReadMountedSoftware(int nGame);
 BOOL CreateMessIcons(void);
 BOOL MessApproveImageList(HWND hParent, int nDriver);
+void MySoftwareListClose(void);
 
 #endif // __MESSUI_H__
