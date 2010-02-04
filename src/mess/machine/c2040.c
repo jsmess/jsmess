@@ -11,11 +11,13 @@
 
 	TODO:
 
-	- 8050 e27
-	- save state
+	- 8050 illegal track or sector 0,255
+	- 4040 bumps head before reading directory
+	- Micropolis 8x50 stepper motor is same as 4040, except it takes 4 pulses to step a track instead of 1
+	- save states
 	- remove via_pb_r
 	- write to disk
-	- alloca buffers
+	- allocate buffers dynamically
 	- activity/error LEDs
 
 */
@@ -64,6 +66,7 @@ typedef struct _c2040_unit_t c2040_unit_t;
 struct _c2040_unit_t
 {
 	int stp;								/* stepper motor phase */
+	int mtr;								/* spindle motor on */
 
 	/* track */
 	UINT8 track_buffer[G64_BUFFER_SIZE];	/* track data buffer */
@@ -211,7 +214,7 @@ INLINE void update_gcr_data(c2040_t *c2040)
 		int ready = !(c2040->bit_count==9);
 		int error = !(ready | BIT(c2040->e, 3));
 
-		logerror("d %u offs %04x/%04x G64 %02x READY %u PA %02x DATA %03x GCR %02x SYNC %u ERROR %u I %04x\n", c2040->drive, c2040->unit[c2040->drive].buffer_pos-1, c2040->unit[c2040->drive].track_len,
+		logerror("d %u offs %04x/%04x G64 %02x READY %u PA %02x DATA %03x GCR %02x SYNC %u ERROR %u I %04x\n", c2040->drive, c2040->unit[c2040->drive].buffer_pos, c2040->unit[c2040->drive].track_len,
 			c2040->unit[c2040->drive].track_buffer[c2040->unit[c2040->drive].buffer_pos],
 			ready, pa, c2040->sr & 0x3ff, c2040->e, SYNC, error, c2040->i);
 	}
@@ -247,7 +250,7 @@ static TIMER_CALLBACK( bit_tick )
 		c2040->unit[c2040->drive].bit_pos = 7;
 		c2040->unit[c2040->drive].buffer_pos++;
 
-		if (c2040->unit[c2040->drive].buffer_pos == c2040->unit[c2040->drive].track_len + 2)
+		if (c2040->unit[c2040->drive].buffer_pos >= c2040->unit[c2040->drive].track_len)
 		{
 			/* loop to the start of the track */
 			c2040->unit[c2040->drive].buffer_pos = G64_DATA_START;
@@ -271,15 +274,15 @@ static TIMER_CALLBACK( bit_tick )
 	{
 		/* set byte ready flag */
 		c2040->ready = ready;
-	}
 
-	if ((device->type == C8050) || (device->type == C8250) || (device->type == SFD1001))
-	{
-		cpu_set_input_line(c2040->cpu_fdc, M6502_SET_OVERFLOW, ready);
-	}
+		via_ca1_w(c2040->via, ready);
+		via_cb1_w(c2040->via, ERROR);
 
-	via_ca1_w(c2040->via, ready);
-	via_cb1_w(c2040->via, ERROR);
+		if ((device->type == C8050) || (device->type == C8250) || (device->type == SFD1001))
+		{
+			cpu_set_input_line(c2040->cpu_fdc, M6502_SET_OVERFLOW, ready ? CLEAR_LINE : ASSERT_LINE);
+		}
+	}
 }
 
 /*-------------------------------------------------
@@ -660,7 +663,23 @@ static void read_current_track(c2040_t *c2040, int unit)
 	c2040->unit[unit].track_len = G64_DATA_START + ((c2040->unit[unit].track_buffer[1] << 8) | c2040->unit[unit].track_buffer[0]);
 }
 
-static void step_motor(c2040_t *c2040, int unit, int stp)
+static void spindle_motor(c2040_t *c2040, int unit, int mtr)
+{
+	if (c2040->unit[unit].mtr != mtr)
+	{
+		if (mtr)
+		{
+			/* read track data */
+			read_current_track(c2040, unit);
+		}
+
+		floppy_mon_w(c2040->unit[unit].image, !mtr);
+
+		c2040->unit[unit].mtr = mtr;
+	}
+}
+
+static void micropolis_step_motor(c2040_t *c2040, int unit, int stp)
 {
 	if (c2040->unit[unit].stp != stp)
 	{
@@ -754,19 +773,19 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 
 	/* stepper motor 1 */
 	int s1 = data & 0x03;
-	step_motor(c2040, 1, s1);
+	micropolis_step_motor(c2040, 1, s1);
 
 	/* stepper motor 0 */
 	int s0 = (data >> 2) & 0x03;
-	step_motor(c2040, 0, s0);
+	micropolis_step_motor(c2040, 0, s0);
 
 	/* spindle motor 1 */
 	int mtr1 = BIT(data, 4);
-	floppy_mon_w(c2040->unit[1].image, !mtr1);
+	spindle_motor(c2040, 1, mtr1);
 
 	/* spindle motor 0 */
 	int mtr0 = BIT(data, 5);
-	floppy_mon_w(c2040->unit[0].image, !mtr0);
+	spindle_motor(c2040, 0, mtr0);
 
 	timer_enable(c2040->bit_timer, mtr1 | mtr0);
 }
@@ -830,9 +849,9 @@ static const via6522_interface via_intf =
     via6522_interface c8050_via_intf um3
 -------------------------------------------------*/
 
-static void c8050_step_motor(c2040_t *c2040, int unit, int stp)
+static void mpi_step_motor(c2040_t *c2040, int unit, int mtr, int stp)
 {
-	if (c2040->unit[unit].stp != stp)
+	if (!mtr && (c2040->unit[unit].stp != stp))
 	{
 		int tracks = 0;
 
@@ -903,21 +922,21 @@ static WRITE8_DEVICE_HANDLER( c8050_via_pb_w )
 
 	c2040_t *c2040 = get_safe_token(device->owner);
 
-	/* stepper motor 1 */
-	int s1 = data & 0x03;
-	c8050_step_motor(c2040, 1, s1);
-
-	/* stepper motor 0 */
-	int s0 = (data >> 2) & 0x03;
-	c8050_step_motor(c2040, 0, s0);
-
 	/* spindle motor 1 */
 	int mtr1 = BIT(data, 4);
-	floppy_mon_w(c2040->unit[1].image, !mtr1);
+	spindle_motor(c2040, 1, mtr1);
 
 	/* spindle motor 0 */
 	int mtr0 = BIT(data, 5);
-	floppy_mon_w(c2040->unit[0].image, !mtr0);
+	spindle_motor(c2040, 0, mtr0);
+
+	/* stepper motor 1 */
+	int s1 = data & 0x03;
+	mpi_step_motor(c2040, 0, mtr1, s1);
+
+	/* stepper motor 0 */
+	int s0 = (data >> 2) & 0x03;
+	mpi_step_motor(c2040, 0, mtr0, s0);
 
 	timer_enable(c2040->bit_timer, mtr1 | mtr0);
 
@@ -1082,7 +1101,7 @@ static UINT8 c8050_miot_pb_r(running_device *device, UINT8 olddata)
         PB1		DS0
         PB2		DS1
         PB3		WPS
-        PB4		ODD HD, SIDE SELECT (0=78-154, 1=1-77)
+        PB4		DRIVE TYPE (0=2A, 1=2C)
         PB5
         PB6		(0=DS, 1=SS)
         PB7		M6504 IRQ
@@ -1095,6 +1114,9 @@ static UINT8 c8050_miot_pb_r(running_device *device, UINT8 olddata)
 
 	/* write protect sense */
 	data |= floppy_wpt_r(c2040->unit[c2040->drive].image) << 3;
+
+	/* drive type */
+	data |= 0x10;
 
 	/* single/dual sided */
 	data |= (device->type == C8050) << 6;
@@ -1112,7 +1134,7 @@ static void c8050_miot_pb_w(running_device *device, UINT8 newdata, UINT8 olddata
         PB1		DS0
         PB2		DS1
         PB3		WPS
-        PB4		ODD HD, SIDE SELECT (0=78-154, 1=1-77)
+        PB4		ODD HD (0=78-154, 1=1-77)
         PB5
         PB6		(0=DS, 1=SS)
         PB7		M6504 IRQ
@@ -1124,7 +1146,7 @@ static void c8050_miot_pb_w(running_device *device, UINT8 newdata, UINT8 olddata
 	/* drive select */
 	if ((device->type == C8050) || (device->type == C8250))
 	{
-//TODO	c2040->drive = BIT(newdata, 0);
+		c2040->drive = BIT(newdata, 0);
 	}
 
 	/* density select */
@@ -1430,8 +1452,8 @@ ROM_START( c8050 ) // schematic 8050001
 	ROM_LOAD( "901482-03.ul1", 0x0000, 0x2000, CRC(09a609b9) SHA1(166d8bfaaa9c4767f9b17ad63fc7ae77c199a64e) )
 	ROM_LOAD( "901482-04.uh1", 0x2000, 0x2000, CRC(1bcf9df9) SHA1(217f4a8b348658bb365f4a1de21ecbaa6402b1c0) )
 	/* 2364-091 ROM DOS 2.5 rev */
-	ROM_LOAD( "901482-07.ul1", 0x0000, 0x2000, CRC(c7532d90) SHA1(0b6d1e55afea612516df5f07f4a6dccd3bd73963) )
-	ROM_LOAD( "901482-06.uh1", 0x2000, 0x2000, CRC(3cbd2756) SHA1(7f5fbed0cddb95138dd99b8fe84fddab900e3650) )
+	ROM_LOAD( "901482-06.ul1", 0x0000, 0x2000, CRC(3cbd2756) SHA1(7f5fbed0cddb95138dd99b8fe84fddab900e3650) )
+	ROM_LOAD( "901482-07.uh1", 0x2000, 0x2000, CRC(c7532d90) SHA1(0b6d1e55afea612516df5f07f4a6dccd3bd73963) )
 	/* 2364 ROM DOS 2.7 */
 	ROM_LOAD( "901887-01.ul1", 0x0000, 0x2000, CRC(0073b8b2) SHA1(b10603195f240118fe5fb6c6dfe5c5097463d890) )
 	ROM_LOAD( "901888-01.uh1", 0x2000, 0x2000, CRC(de9b6132) SHA1(2e6c2d7ca934e5c550ad14bd5e9e7749686b7af4) )

@@ -22,18 +22,18 @@
 
 const int C2040_BITRATE[] =
 {
-	XTAL_16MHz/13,	/* tracks 31-42 */
-	XTAL_16MHz/14,	/* tracks 25-30 */
+	XTAL_16MHz/16,	/* tracks  1-17 */
 	XTAL_16MHz/15, 	/* tracks 18-24 */
-	XTAL_16MHz/16	/* tracks  1-17 */
+	XTAL_16MHz/14,	/* tracks 25-30 */
+	XTAL_16MHz/13	/* tracks 31-42 */
 };
 
 const int C8050_BITRATE[] =
 {
-	XTAL_12MHz/3/5,	/* tracks 65-84 */
-	XTAL_12MHz/3/6,	/* tracks 54-65 */
-	XTAL_12MHz/3/7, /* tracks 40-53 */
-	XTAL_12MHz/3/8	/* tracks  1-39 */
+	XTAL_12MHz/3/16,	/* tracks  1-39 */
+	XTAL_12MHz/3/15,	/* tracks 40-53 */
+	XTAL_12MHz/3/14,	/* tracks 54-65 */
+	XTAL_12MHz/3/13		/* tracks 65-84 */
 };
 
 /***************************************************************************

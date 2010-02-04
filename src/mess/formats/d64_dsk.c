@@ -349,7 +349,7 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 		UINT8 *d64_track_data;
 		UINT16 gcr_track_size;
 		UINT8 *gcr_track_data;
-		UINT64 gcr_pos = 2;
+		UINT64 gcr_pos = G64_DATA_START;
 
 		/* determine logical track number */
 		int dos_track = get_dos_track(track);
@@ -719,7 +719,7 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 	for d80 & d82 they are at track 39 bytes 0x18 & 0x19
 	*/
 	if (dos == DOS25)
-		floppy_image_read(floppy, id, tag->track_offset[0][39] + 0x18, 2);
+		floppy_image_read(floppy, id, tag->track_offset[0][38] + 0x18, 2);
 	else
 		floppy_image_read(floppy, id, tag->track_offset[0][34] + 0xa2, 2);
 	
