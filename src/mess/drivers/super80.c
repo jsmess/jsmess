@@ -1,4 +1,179 @@
-/* Super80.c written by Robbbert, 2005-2009. See the MESS wiki for documentation. */
+/* 
+Super80.c written by Robbbert, 2005-2009. See the MESS sysinfo and wiki for usage documentation. Below for the most technical bits:
+
+= Architecture (super80):
+
+  * Z80 @ 2MHz
+  * 16k, 32k or 48k RAM (0000-BFFF)
+  * 12k ROM (C000-EFFF)
+  * 3.5k RAM (F000-FDFF), comes with the "64k ram" modification
+  * 0.5k RAM (FE00-FFFF) for Chipspeed colour board
+
+= Architecture (super80v):
+
+  * Z80 @ 2MHz
+  * 16k, 32k or 48k RAM (0000-BFFF)
+  * 12k ROM (C000-EFFF)
+  * 2k Video RAM (F000-F7FF) banked with Colour RAM (modified Chipspeed board)
+  * 2k PCG RAM (F800-FFFF) banked with Character Generator ROM
+
+= Super80 ports:
+
+  port $F0: General Purpose output port
+  	Bit 0 - cassette output
+  	Bit 1 - cassette relay control; 0=relay on
+  	Bit 2 - turns screen on and off;0=screen off
+  	Bit 3 - Available for user projects [We will use it for sound]
+  	Bit 4 - Available for user projects
+  	Bit 5 - cassette LED; 0=LED on
+  	Bit 6/7 - not decoded
+  
+  port $F1: Video page output port
+  	Bit 0 - not decoded [we will use it for video switching]
+  	Bits 1 to 7 - choose video page to display
+  	Bit 1 controls A9, bit 2 does A10, etc
+  
+  port $F2: General purpose input port
+  	Bit 0 - cassette input
+  	Bit 1 - Available for user projects
+  	Bit 2 - Available for user projects
+  	Bit 3 - not decoded
+  	Bit 4 - Switch A [These switches are actual DIP switches on the motherboard]
+  	Bit 5 - Switch B
+  	Bit 6 - Switch C
+  	Bit 7 - Switch D
+
+= Super80v ports:
+
+  port $10: MC6845 control port
+  
+  port $11: MC6845 data port
+  
+  port $F0: General Purpose output port
+  	Bit 0 - cassette output
+  	Bit 1 - Cassette relay control; 0=relay on
+  	Bit 2 - Colour banking (0 = Colour Ram, 1 = Video Ram)
+  	Bit 3 - Sound
+  	Bit 4 - PCG banking (0 = PROM, 1 = PCG)
+  	Bit 5 - cassette LED; 0=LED on
+  	Bit 6/7 - not decoded
+  
+  port $F2: General purpose input port - same as for Super80.
+
+= Cassette information:
+
+The standard cassette system uses sequences of 1200 Hz and 2400 Hz to represent a 0 or a 1 respectivly.
+This is identical to the Exidy Sorcerer and the Microbee. Data rates available are 300, 400, 600, and 1200 baud.
+The user has to adjust some bytes in memory in order to select a different baud rate.
+
+  BDF8	BDF9	Baud
+  ---------------------
+  F8	4	300
+  BA	3	400
+  7C	2	600
+  3E	1	1200
+
+The enhanced Monitor roms (those not supplied by Dick Smith) have extra commands to change the rates
+without the tedium of manually modifying memory.
+
+When saving, the OS toggles the cassette bit (bit 0 of port F0) at the required frequencies directly.
+
+When loading, the signal passes through a filter, then into a 4046 PLL (Phase-Locked-Loop) chip.
+This acts as a frequency-to-voltage converter. The output of this device is passed to the "+" input
+of a LM311 op-amp. The "-" input is connected to a 10-turn trimpot, which is adjusted by the owner
+at construction time. It sets the switching midpoint voltage. Voltages above a certain level become
+a "1" level at the output, while voltages below become a "0" level. This output in turn connects
+to the cassette input bit of port F2.
+
+The monitor loading routine (at C066 in most monitor roms), waits for a high-to-low transition
+(the low is the beginning of the start bit), then waits for half a bit, checks it is still low,
+waits for a full bit, then reads the state (this is the first bit), then cycles between waiting
+a bit and reading the next, until a full byte has been constructed. Lastly, the stop bit is
+checked that it is at a high level.
+
+This means that we cannot attempt to convert frequency to voltage ourselves, since the OS only
+"looks" once a bit. The solution is to use a mame timer running at a high enough rate (200 kHz)
+to read the wave state. While the wave state stays constant, a counter is incremented. When the
+state changes, the output is set according to how far the counter has progressed. The counter is
+then reset ready for the next wave state. The code for this is in the TIMER_CALLBACK.
+
+A kit was produced by ETI magazine, which plugged into the line from your cassette player earphone
+socket. The computer line was plugged into this box instead of the cassette player. The box was
+fitted with a speaker and a volume control. You could listen to the tones, to assist with head
+alignment, and with debugging. In RMESS, a config switch has been provided so that you can turn
+this sound on or off as needed.
+
+= About the 1 MHz / 2 MHz switching:
+
+The original hardware runs with a 2 MHz clock, but operates in an unusual way. There is no video
+processor chip, just a huge bunch of TTL chips. The system spends half the time running the CPU,
+and half the time displaying the picture. The timing will activate the BUSREQ line, and the CPU will
+finish its current instruction, activate the BUSACK line, and go to sleep. The video circuits will
+read the video RAM and show the picture. At the end, the BUSREQ line is released, and processing can
+continue.
+
+The processing time occurs during the black parts of the screen, therefore half the screen will be
+black unless you expand the image with the monitor's controls. This method ensures that there will
+be no memory contention, and thus, no snow. The processor will run at 2 MHz pulsed at 48.8 Hz, which
+is an effective speed of 1 MHz.
+
+When saving or loading a cassette file, this pulsing would cause the save tone to be modulated with
+a loud hum. When loading, the synchronisation to the start bit could be missed, causing errors.
+Therefore the screen can be turned off via an output bit. This disables the BUSREQ control, which
+in turn prevents screen refresh, and gives the processor a full uninterrupted 2 MHz speed.
+
+MAME does not emulate BUSREQ or BUSACK. Further, a real system would display a blank screen by not
+updating the video. In MAME, the display continues to show. It just doesn't update.
+
+To obtain accurate timing, the video update routine will toggle the HALT line on alternate frames.
+Although physically incorrect, it is the only way to accurately emulate the speed change function.
+The video update routine emulates the blank screen by filling it with spaces.
+
+For the benefit of those who like to experiment, config switches have been provided in RMESS to
+allow you to leave the screen on at all times, and to always run at 2 MHz if desired. These options
+cannot exist in real hardware.
+
+= Quickload:
+
+This was not a standard feature. It is a hardware facility I added to my machine when age threatened
+to kill off my cassette player and tapes. The tapes were loaded up one last time, and transferred to
+a hard drive on a surplus 386 PC, in binary format (NOT a wave file). Special roms were made to allow
+loading and saving to the S-100 board and its ports. These ports were plugged into the 386 via cables.
+A QBASIC program on the 386 monitored the ports and would save and load files when requested by the
+Super-80. This worked (and still works) very well, and is a huge improvement over the cassette, both
+speedwise and accuracy-wise.
+
+The modified rom had the autorun option built in. Autorun was never available for cassettes.
+
+In MESS, the same file format is used - I can transfer files between MESS and the 386 seamlessly.
+MESS has one difference - the program simply appears in memory without the processor being aware
+of it. To accomplish autorun therefore requires that the processor pc register be set to the start
+address of the program. BASIC programs may need some preprocessing before they can be started. This
+is not necessary on a Super-80 or a Microbee, but is needed on any system running Microsoft BASIC,
+such as the Exidy Sorcerer or the VZ-200.
+
+In MESS, quickload is available for all Super80 variants (otherwise you would not have any games
+to play). MESS features a config switch so the user can turn autorun on or off as desired.
+
+
+= Start of Day circuit:
+
+When the computer is turned on or reset, the Z80 will want to start executing at 0000. Since this is
+RAM, this is not a good idea. The SOD circuit forcibly disables the RAM and enables the ROMs, so they
+will appear to be at 0000. Thus, the computer will boot.
+
+The Master Reset signal (power-on or Reset button pushed), triggers a flipflop that disables RAM and
+causes C000 to FFFF to appear at 0000 to 3FFF. This will be reset (back to normal) when A14 and A15
+are high, and /M1 is active. This particular combination occurs on all ROM variants, when reading the
+fifth byte in the ROM. In reality, the switchover can take place any time between the 4th byte until
+the computer has booted up. This is because the low RAM does not contain any system areas.
+
+Since MAME does not emulate /M1, a banking scheme has had to be used. Bank 0 is normal RAM. Bank 1
+points to the ROMs. When a machine reset occurs, bank 1 is switched in. A timer is triggered, and
+after 4 bytes are read, bank 0 is selected. The timer is as close as can be to real operation of the
+hardware.
+
+*/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
