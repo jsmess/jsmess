@@ -11,8 +11,9 @@
 
 	TODO:
 
-	- 8050 illegal track or sector 0,255
+	- 8050 cannot load anything except directory
 	- 4040 bumps head before reading directory
+	- 2040 DOS 1 FDC rom
 	- Micropolis 8x50 stepper motor is same as 4040, except it takes 4 pulses to step a track instead of 1
 	- save states
 	- remove via_pb_r
@@ -933,7 +934,7 @@ static WRITE8_DEVICE_HANDLER( c8050_via_pb_w )
 
 	/* stepper motor 1 */
 	int s1 = data & 0x03;
-	mpi_step_motor(c2040, 0, mtr1, s1);
+	mpi_step_motor(c2040, 1, mtr1, s1);
 
 	/* stepper motor 0 */
 	int s0 = (data >> 2) & 0x03;
@@ -1120,7 +1121,10 @@ static UINT8 c8050_miot_pb_r(running_device *device, UINT8 olddata)
 	data |= 0x10;
 
 	/* single/dual sided */
-	data |= (device->type == C8050) << 6;
+	if (device->owner->type == C8050)
+	{
+		data |= 0x40;
+	}
 
 	return data;
 }
@@ -1145,7 +1149,7 @@ static void c8050_miot_pb_w(running_device *device, UINT8 newdata, UINT8 olddata
 	c2040_t *c2040 = get_safe_token(device->owner);
 
 	/* drive select */
-	if ((device->type == C8050) || (device->type == C8250))
+	if ((device->owner->type == C8050) || (device->owner->type == C8250))
 	{
 		c2040->drive = BIT(newdata, 0);
 	}
@@ -1160,7 +1164,7 @@ static void c8050_miot_pb_w(running_device *device, UINT8 newdata, UINT8 olddata
 	}
 
 	/* side select */
-	if ((device->type == C8250) || (device->type == SFD1001))
+	if ((device->owner->type == C8250) || (device->owner->type == SFD1001))
 	{
 		c2040->side = !BIT(newdata, 4);
 	}
@@ -1186,7 +1190,8 @@ static const miot6530_interface c8050_miot_intf =
 -------------------------------------------------*/
 
 static FLOPPY_OPTIONS_START( c2040 )
-	FLOPPY_OPTION( c2040, "d67", "Commodore 2040/3040 (DOS 1) Disk Image", d67_dsk_identify, d64_dsk_construct, NULL )
+	FLOPPY_OPTION( c2040, "d67", "Commodore 2040/3040 Disk Image", d67_dsk_identify, d64_dsk_construct, NULL )
+	FLOPPY_OPTION( c2040, "g64", "Commodore 2040/3040 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
 FLOPPY_OPTIONS_END
 
 /*-------------------------------------------------
