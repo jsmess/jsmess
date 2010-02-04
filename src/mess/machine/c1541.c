@@ -165,32 +165,37 @@
 typedef struct _c1541_t c1541_t;
 struct _c1541_t
 {
-	/* abstractions */
-	int address;						/* serial bus address - 8 */
-	UINT8 track_buffer[G64_BUFFER_SIZE];				/* track data buffer */
-	int track_len;						/* track length */
-	int buffer_pos;						/* current byte position within track buffer */
-	int bit_pos;						/* current bit position within track buffer byte */
-	int bit_count;						/* current data byte bit counter */
-	UINT16 data;						/* data shift register */
-
-	/* signals */
-	UINT8 yb;							/* GCR data byte to write */
-	int byte;							/* byte ready */
-	int atna;							/* attention acknowledge */
-	int ds;								/* density select */
-	int stp;							/* stepping motor */
-	int soe;							/* s? output enable */
-	int mode;							/* mode (0 = write, 1 = read) */
-	int via0_irq;						/* VIA #0 interrupt request */
-	int via1_irq;						/* VIA #1 interrupt request */
-
-	/* serial bus */
-	int data_out;						/* serial bus data output */
+	/* IEC bus */
+	int address;							/* device address - 8 */
+	int atna;								/* attention acknowledge */
+	int data_out;							/* serial bus data output */
 
 	/* IEEE-488 bus */
-	int nrfd_out;						/* not ready for data */
-	int ndac_out;						/* not data accepted */
+	int nrfd_out;							/* not ready for data */
+	int ndac_out;							/* not data accepted */
+
+	/* motors */
+	int stp;								/* stepper motor phase */
+	int mtr;								/* spindle motor on */
+	
+	/* track */
+	UINT8 track_buffer[G64_BUFFER_SIZE];	/* track data buffer */
+	int track_len;							/* track length */
+	int buffer_pos;							/* current byte position within track buffer */
+	int bit_pos;							/* current bit position within track buffer byte */
+	int bit_count;							/* current data byte bit counter */
+	UINT16 data;							/* data shift register */
+	UINT8 yb;								/* GCR data byte to write */
+
+	/* signals */
+	int ds;									/* density select */
+	int soe;								/* s? output enable */
+	int byte;								/* byte ready */
+	int mode;								/* mode (0 = write, 1 = read) */
+
+	/* interrupts */
+	int via0_irq;							/* VIA #0 interrupt request */
+	int via1_irq;							/* VIA #1 interrupt request */
 
 	/* devices */
 	running_device *cpu;
@@ -732,6 +737,64 @@ static const via6522_interface c2031_via0_intf =
     via6522_interface c1541_via1_intf
 -------------------------------------------------*/
 
+static void read_current_track(c1541_t *c1541)
+{
+	c1541->track_len = G64_BUFFER_SIZE;
+	c1541->buffer_pos = G64_DATA_START;
+	c1541->bit_pos = 7;
+	c1541->bit_count = 0;
+
+	/* read track data */
+	floppy_drive_read_track_data_info_buffer(c1541->image, 0, c1541->track_buffer, &c1541->track_len);
+
+	/* extract track length */
+	c1541->track_len = G64_DATA_START + ((c1541->track_buffer[1] << 8) | c1541->track_buffer[0]);
+}
+
+static void spindle_motor(c1541_t *c1541, int mtr)
+{
+	if (c1541->mtr != mtr)
+	{
+		if (mtr)
+		{
+			/* read track data */
+			read_current_track(c1541);
+		}
+
+		floppy_mon_w(c1541->image, !mtr);
+		timer_enable(c1541->bit_timer, mtr);
+
+		c1541->mtr = mtr;
+	}
+}
+
+static void step_motor(c1541_t *c1541, int stp)
+{
+	if (c1541->stp != stp)
+	{
+		int tracks = 0;
+
+		switch (c1541->stp)
+		{
+		case 0:	if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
+		case 1:	if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
+		case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
+		case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
+		}
+
+		if (tracks != 0)
+		{
+			/* step read/write head */
+			floppy_drive_seek(c1541->image, tracks);
+
+			/* read new track data */
+			read_current_track(c1541);
+		}
+
+		c1541->stp = stp;
+	}
+}
+
 static WRITE_LINE_DEVICE_HANDLER( via1_irq_w )
 {
 	c1541_t *c1541 = get_safe_token(device->owner);
@@ -833,50 +896,19 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 
 	c1541_t *c1541 = get_safe_token(device->owner);
 
-	int stp = data & 0x03;
-	int ds = (data >> 5) & 0x03;
-	int mtr = BIT(data, 2);
-
 	/* stepper motor */
-	if (c1541->stp != stp)
-	{
-		int tracks = 0;
-
-		switch (c1541->stp)
-		{
-		case 0:	if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
-		case 1:	if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
-		case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
-		case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
-		}
-
-		if (tracks != 0)
-		{
-			c1541->track_len = G64_BUFFER_SIZE;
-			c1541->buffer_pos = G64_DATA_START;
-			c1541->bit_pos = 7;
-			c1541->bit_count = 0;
-
-			/* step read/write head */
-			floppy_drive_seek(c1541->image, tracks);
-
-			/* read track data */
-			floppy_drive_read_track_data_info_buffer(c1541->image, 0, c1541->track_buffer, &c1541->track_len);
-
-			/* extract track length */
-			c1541->track_len = G64_DATA_START + ((c1541->track_buffer[1] << 8) | c1541->track_buffer[0]);
-		}
-
-		c1541->stp = stp;
-	}
+	int stp = data & 0x03;
+	step_motor(c1541, stp);
 
 	/* spindle motor */
-	floppy_mon_w(c1541->image, !mtr);
-	timer_enable(c1541->bit_timer, mtr);
+	int mtr = BIT(data, 2);
+	spindle_motor(c1541, mtr);
 
 	/* activity LED */
 
 	/* density select */
+	int ds = (data >> 5) & 0x03;
+
 	if (c1541->ds != ds)
 	{
 		timer_adjust_periodic(c1541->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C2040_BITRATE[ds]/4));

@@ -65,6 +65,7 @@
 typedef struct _c2040_unit_t c2040_unit_t;
 struct _c2040_unit_t
 {
+	/* motors */
 	int stp;								/* stepper motor phase */
 	int mtr;								/* spindle motor on */
 
@@ -87,7 +88,7 @@ struct _c2040_t
 	int side;							/* selected side */
 
 	/* IEEE-488 bus */
-	int address;						/* bus address - 8 */
+	int address;						/* device address - 8 */
 	int rfdo;							/* not ready for data output */
 	int daco;							/* not data accepted output */
 	int atna;							/* attention acknowledge */

@@ -44,21 +44,24 @@
 typedef struct _c1551_t c1551_t;
 struct _c1551_t
 {
-	UINT8 track_buffer[G64_BUFFER_SIZE];				/* track data buffer */
-	int track_len;						/* track length */
-	int buffer_pos;						/* current byte position within track buffer */
-	int bit_pos;						/* current bit position within track buffer byte */
-	int bit_count;						/* current data byte bit counter */
-	UINT16 data;						/* data shift register */
+	/* motors */
+	int stp;								/* stepper motor phase */
+	int mtr;								/* spindle motor on */
+	
+	/* track */
+	UINT8 track_buffer[G64_BUFFER_SIZE];	/* track data buffer */
+	int track_len;							/* track length */
+	int buffer_pos;							/* current byte position within track buffer */
+	int bit_pos;							/* current bit position within track buffer byte */
+	int bit_count;							/* current data byte bit counter */
+	UINT16 data;							/* data shift register */
+	UINT8 yb;								/* GCR data byte to write */
 
 	/* signals */
-	UINT8 yb;							/* GCR data byte to write */
-	int byte;							/* byte ready */
-	int atna;							/* attention acknowledge */
-	int ds;								/* density select */
-	int stp;							/* stepping motor */
-	int soe;							/* s? output enable */
-	int mode;							/* mode (0 = write, 1 = read) */
+	int ds;									/* density select */
+	int soe;								/* s? output enable */
+	int byte;								/* byte ready */
+	int mode;								/* mode (0 = write, 1 = read) */
 
 	/* devices */
 	running_device *cpu;
@@ -140,20 +143,78 @@ static TIMER_CALLBACK( bit_tick )
     c1551_port_r - M6510T port read
 -------------------------------------------------*/
 
+static void read_current_track(c1551_t *c1551)
+{
+	c1551->track_len = G64_BUFFER_SIZE;
+	c1551->buffer_pos = G64_DATA_START;
+	c1551->bit_pos = 7;
+	c1551->bit_count = 0;
+
+	/* read track data */
+	floppy_drive_read_track_data_info_buffer(c1551->image, 0, c1551->track_buffer, &c1551->track_len);
+
+	/* extract track length */
+	c1551->track_len = G64_DATA_START + ((c1551->track_buffer[1] << 8) | c1551->track_buffer[0]);
+}
+
+static void spindle_motor(c1551_t *c1551, int mtr)
+{
+	if (c1551->mtr != mtr)
+	{
+		if (mtr)
+		{
+			/* read track data */
+			read_current_track(c1551);
+		}
+
+		floppy_mon_w(c1551->image, !mtr);
+		timer_enable(c1551->bit_timer, mtr);
+
+		c1551->mtr = mtr;
+	}
+}
+
+static void step_motor(c1551_t *c1551, int stp)
+{
+	if (c1551->stp != stp)
+	{
+		int tracks = 0;
+
+		switch (c1551->stp)
+		{
+		case 0:	if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
+		case 1:	if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
+		case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
+		case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
+		}
+
+		if (tracks != 0)
+		{
+			/* step read/write head */
+			floppy_drive_seek(c1551->image, tracks);
+
+			/* read new track data */
+			read_current_track(c1551);
+		}
+
+		c1551->stp = stp;
+	}
+}
+
 static READ8_DEVICE_HANDLER( c1551_port_r )
 {
 	/*
 
         bit     description
 
-        P0      STEP0
-        P1      STEP1
-        P2      MOTOR ON
-        P3      ACT
-        P4      WPRT
+        P0      STP0A
+        P1      STP0B
+        P2      MTR0
+        P3      ACT0
+        P4      WPS
         P5      DS0
         P6      DS1
-        P7      BYTE READY
+        P7      BYTE LTCHED
 
     */
 
@@ -163,7 +224,7 @@ static READ8_DEVICE_HANDLER( c1551_port_r )
 	/* write protect sense */
 	data |= !floppy_wpt_r(c1551->image) << 4;
 	
-	/* byte ready */
+	/* byte latched */
 	data |= !(c1551->soe && c1551->byte) << 7;
 
 	return data;
@@ -179,63 +240,32 @@ static WRITE8_DEVICE_HANDLER( c1551_port_w )
 
         bit     description
 
-        P0      STEP0
-        P1      STEP1
-        P2      MOTOR ON
-        P3      ACT
-        P4      WPRT
+        P0      STP0A
+        P1      STP0B
+        P2      MTR0
+        P3      ACT0
+        P4      WPS
         P5      DS0
         P6      DS1
-        P7      BYTE READY
+        P7      BYTE LTCHED
 
     */
 
 	c1551_t *c1551 = get_safe_token(device->owner);
 
-	int stp = data & 0x03;
-	int ds = (data >> 5) & 0x03;
-	int mtr = BIT(data, 2);
-
 	/* stepper motor */
-	if (c1551->stp != stp)
-	{
-		int tracks = 0;
-
-		switch (c1551->stp)
-		{
-		case 0:	if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
-		case 1:	if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
-		case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
-		case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
-		}
-
-		if (tracks != 0)
-		{
-			c1551->track_len = G64_BUFFER_SIZE;
-			c1551->buffer_pos = G64_DATA_START;
-			c1551->bit_pos = 7;
-			c1551->bit_count = 0;
-
-			/* step read/write head */
-			floppy_drive_seek(c1551->image, tracks);
-
-			/* read track data */
-			floppy_drive_read_track_data_info_buffer(c1551->image, 0, c1551->track_buffer, &c1551->track_len);
-
-			/* extract track length */
-			c1551->track_len = G64_DATA_START + ((c1551->track_buffer[1] << 8) | c1551->track_buffer[0]);
-		}
-
-		c1551->stp = stp;
-	}
+	int stp = data & 0x03;
+	step_motor(c1551, stp);
 
 	/* spindle motor */
-	floppy_mon_w(c1551->image, !mtr);
-	timer_enable(c1551->bit_timer, mtr);
+	int mtr = BIT(data, 2);
+	spindle_motor(c1551, mtr);
 
 	/* activity LED */
 
 	/* density select */
+	int ds = (data >> 5) & 0x03;
+
 	if (c1551->ds != ds)
 	{
 		timer_adjust_periodic(c1551->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C2040_BITRATE[ds]/4));
@@ -264,14 +294,14 @@ static READ8_DEVICE_HANDLER( c1551_tpi_pa_r )
 
         bit     description
 
-        PA0     6523 P0
-        PA1     6523 P1
-        PA2     6523 P2
-        PA3     6523 P3
-        PA4     6523 P4
-        PA5     6523 P5
-        PA6     6523 P6
-        PA7     6523 P7
+        PA0     TCBM PA0
+        PA1     TCBM PA1
+        PA2     TCBM PA2
+        PA3     TCBM PA3
+        PA4     TCBM PA4
+        PA5     TCBM PA5
+        PA6     TCBM PA6
+        PA7     TCBM PA7
 
     */
 
@@ -284,14 +314,14 @@ static WRITE8_DEVICE_HANDLER( c1551_tpi_pa_w )
 
         bit     description
 
-        PA0     6523 P0
-        PA1     6523 P1
-        PA2     6523 P2
-        PA3     6523 P3
-        PA4     6523 P4
-        PA5     6523 P5
-        PA6     6523 P6
-        PA7     6523 P7
+        PA0     TCBM PA0
+        PA1     TCBM PA1
+        PA2     TCBM PA2
+        PA3     TCBM PA3
+        PA4     TCBM PA4
+        PA5     TCBM PA5
+        PA6     TCBM PA6
+        PA7     TCBM PA7
 
     */
 }
@@ -346,14 +376,14 @@ static READ8_DEVICE_HANDLER( c1551_tpi_pc_r )
 
         bit     description
 
-        PC0     6523 _IRQ
-        PC1     6523 _RES
-        PC2     interface J1
-        PC3     6523 pin 20
-        PC4     SOE
+        PC0     TCBM STATUS0
+        PC1     TCBM STATUS1
+        PC2     TCBM DEV
+        PC3     TCBM ACK
+        PC4     MODE
         PC5     JP1
         PC6     _SYNC
-        PC7     6523 phi2
+        PC7     TCBM DAV
 
     */
 
@@ -372,14 +402,14 @@ static WRITE8_DEVICE_HANDLER( c1551_tpi_pc_w )
 
         bit     description
 
-        PC0     6523 _IRQ
-        PC1     6523 _RES
-        PC2     interface J1
-        PC3     6523 pin 20
-        PC4     SOE
+        PC0     TCBM STATUS0
+        PC1     TCBM STATUS1
+        PC2     TCBM DEV
+        PC3     TCBM ACK
+        PC4     MODE
         PC5     JP1
         PC6     _SYNC
-        PC7     6523 phi2
+        PC7     TCBM DAV
 
     */
 
@@ -445,7 +475,7 @@ MACHINE_DRIVER_END
     ROM( c1551 )
 -------------------------------------------------*/
 
-ROM_START( c1551 )
+ROM_START( c1551 ) // schematic 251860
 	ROM_REGION( 0x4000, "c1551", ROMREGION_LOADBYNAME )
 	ROM_LOAD( "318001-01.u4", 0x0000, 0x4000, CRC(6d16d024) SHA1(fae3c788ad9a6cc2dbdfbcf6c0264b2ca921d55e) )
 ROM_END
@@ -481,7 +511,6 @@ static DEVICE_START( c1551 )
 	state_save_register_device_item(device, 0, c1551->data);
 	state_save_register_device_item(device, 0, c1551->yb);
 	state_save_register_device_item(device, 0, c1551->byte);
-	state_save_register_device_item(device, 0, c1551->atna);
 	state_save_register_device_item(device, 0, c1551->ds);
 	state_save_register_device_item(device, 0, c1551->stp);
 	state_save_register_device_item(device, 0, c1551->soe);
