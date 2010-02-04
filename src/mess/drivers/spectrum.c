@@ -806,6 +806,19 @@ ROM_START(compani1)
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
+ROM_START(spektrbk)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("spektr-bk001.rom", 0x0000, 0x4000, CRC(c011eecc) SHA1(35fdc8cd083e50452655997a997873627b131520))
+	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+ROM_END
+
+ROM_START(zvezda)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD( "2764-near-cpu_red.bin", 0x0000, 0x2000, CRC(a4ae4938) SHA1(ea1763b9dee29381ddcf882fbc4e404ba5366942))
+	ROM_LOAD( "2764-far-cpu_blue.bin", 0x2000, 0x2000, CRC(ebab64bc) SHA1(8c98a8b6e927b02cf602c20a1b50838e60f7785b))
+	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+ROM_END
+
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
 COMP( 1982, spectrum, 0,        0,		spectrum,		spectrum,	0,	"Sinclair Research",	"ZX Spectrum" , 0)
 COMP( 1987, spec80k,  spectrum, 0,		spectrum,		spectrum,	0,	"",	"ZX Spectrum 80K" , GAME_COMPUTER_MODIFIED)
@@ -836,3 +849,5 @@ COMP( 199?, orizon,   spectrum, 0,		spectrum,		spectrum,	0,	"",	"Orizon-Micro" ,
 COMP( 1993, quorum48, spectrum, 0,		spectrum,		spectrum,	0,	"",	"Kvorum 48K" , GAME_NOT_WORKING)
 COMP( 1993, magic6,   spectrum, 0,		spectrum,		spectrum,	0,	"",	"Magic 6" , GAME_NOT_WORKING)	// keyboard should be spectrum, but image was not clear
 COMP( 1990, compani1, spectrum, 0,		spectrum,		spectrum,	0,	"",	"Kompanion 1" , 0)		// no keyboard images found
+COMP( 1990, spektrbk, spectrum, 0,		spectrum,		spectrum,	0,	"",	"Spektr BK-001" , 0)
+COMP( 1990, zvezda,   spectrum, 0,		spectrum,		spectrum,	0,	"",	"Zvezda" , 0)

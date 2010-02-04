@@ -7,7 +7,8 @@ New System Drivers Supported:
 - Iskra-1031 [Miodrag Milanovic]
 - EC-1841 [Miodrag Milanovic]
 - EC-1845 [Miodrag Milanovic]
-
+- Spektr BK-001 [Miodrag Milanovic]
+- Zvezda [Miodrag Milanovic]
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
@@ -24,7 +25,7 @@ Skeleton drivers:
 - Tandy 2000 [Curt Coder]
 - Xerox 820-II [Curt Coder]
 - Xerox 16/8 [Curt Coder]
-
+- BestZX
 
 System Driver Changes:
 ----------------------

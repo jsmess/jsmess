@@ -474,6 +474,11 @@ ROM_START(quorum)
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
+ROM_START(bestzx)
+	ROM_REGION(0x020000, "maincpu", 0)
+	ROM_LOAD( "bestzx.rom", 0x010000, 0x10000, CRC(fc7936e8) SHA1(0d6378c51b2f08a3e2b4c75e64c76c15ae5dc76d))
+ROM_END
+	
 ROM_START( kay1024 )
 	ROM_REGION(0x020000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "v1", "ver 1")
@@ -491,3 +496,4 @@ COMP( 1994, scorpion, spec128,	 0,	scorpion,	spec_plus,	0,		"Zonov and Co.",		"S
 COMP( 1991, profi,    spec128,	 0,	profi,  	spec_plus,	0,		"Kondor and Kramis",		"Profi", GAME_NOT_WORKING )
 COMP( 1998, kay1024,  spec128,	 0,	scorpion,	spec_plus,	0,		"NEMO",		"Kay 1024", GAME_NOT_WORKING )
 COMP( ????, quorum,   spec128,	 0,	quorum, 	spec_plus,	0,		"",		"Quorum", GAME_NOT_WORKING )
+COMP( ????, bestzx,   spec128,	 0,	scorpion, 	spec_plus,	0,		"",		"BestZX", GAME_NOT_WORKING )

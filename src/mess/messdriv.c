@@ -663,6 +663,7 @@ const game_driver * const drivers[] =
 	DRIVER( pent1024 )
 	DRIVER( atm )
 	DRIVER( atmtb2 )
+	DRIVER( bestzx )
 
 	DRIVER( ql )	/* 1984 Sinclair QL (UK)	*/
 	DRIVER( ql_us )	 /* 1984 Sinclair QL (USA)	   */
@@ -1362,6 +1363,8 @@ const game_driver * const drivers[] =
 	DRIVER( quorum48 )  /* 1993 Kvorum 48K	   */
 	DRIVER( magic6 )	/* 1993 Magic 6	  */
 	DRIVER( compani1 )  /* 1990 Kompanion 1	  */
+	DRIVER( spektrbk )  /* 1990 Spektr BK-001 */
+	DRIVER( zvezda )  /* 1990 Zvezda */
 
 	/* Kramer */
 	DRIVER(kramermc)	/* 1987 Kramer MC	*/
