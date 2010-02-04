@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "memory.h"
+#include "debugger.h"
 #include "cpu/i86/i86.h"
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
@@ -52,6 +53,12 @@
 #define LOG_PC8031_PORT     0
 #define LOG_IOU             1
 #define LOG_SOUND           0
+
+/* Debugging */
+
+UINT32  debug_flags;
+
+#define DMA_BREAK           0x0000001
 
 /* 80186 internal stuff */
 struct mem_state
@@ -195,6 +202,7 @@ static void drq_callback(running_machine *machine, int which);
 
 static void execute_debug_irq(running_machine *machine, int ref, int params, const char *param[]);
 static void execute_debug_intmasks(running_machine *machine, int ref, int params, const char *param[]);
+static void nimbus_debug(running_machine *machine, int ref, int params, const char *param[]);
 
 static int instruction_hook(running_device *device, offs_t curpc);
 static void decode_subbios(running_device *device,offs_t pc);
@@ -202,6 +210,7 @@ static void decode_dssi_f_fill_area(running_device *device,UINT16  ds, UINT16 si
 static void decode_dssi_f_plot_character_string(running_device *device,UINT16  ds, UINT16 si);
 static void decode_dssi_f_set_new_clt(running_device *device,UINT16  ds, UINT16 si);
 static void decode_dssi_f_plonk_char(running_device *device,UINT16  ds, UINT16 si);
+static void decode_dssi_f_rw_sectors(running_device *device,UINT16  ds, UINT16 si);
 
 static void fdc_reset(void);
 static void generate_disk_int(running_machine *machine);
@@ -685,7 +694,7 @@ static TIMER_CALLBACK(dma_timer_callback)
 	/* check for interrupt generation */
 	if (d->control & 0x0100)
 	{
-		if (LOG_DMA) logerror("DMA%d timer callback - requesting interrupt: count = %04X, source = %04X\n", which, d->count, d->source);
+		if (LOG_DMA>1) logerror("DMA%d timer callback - requesting interrupt: count = %04X, source = %04X\n", which, d->count, d->source);
 		i186.intr.request |= 0x04 << which;
 		update_interrupt_state(machine);
 	}
@@ -733,6 +742,8 @@ static void update_dma_control(running_machine *machine, int which, int new_cont
 	}
 
     if (LOG_DMA) logerror("Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
+    if (debug_flags & DMA_BREAK)
+        debugger_break(machine);
 
 	/* set the new control register */
 	d->control = new_control;
@@ -751,7 +762,7 @@ static void drq_callback(running_machine *machine, int which)
     UINT8   dma_byte;
     UINT8   incdec_size;
 
-    if (LOG_DMA)
+    if (LOG_DMA>1)
         logerror("Control=%04X, src=%05X, dest=%05X, count=%04X\n",dma->control,dma->source,dma->dest,dma->count);
 
     if(!(dma->control & ST_STOP))
@@ -812,7 +823,7 @@ static void drq_callback(running_machine *machine, int which)
     // Interrupt if count is zero, and interrupt flag set
     if((dma->control & INTERRUPT_ON_ZERO) && (dma->count==0))
     {
-		if (LOG_DMA) logerror("DMA%d - requesting interrupt: count = %04X, source = %04X\n", which, dma->count, dma->source);
+		if (LOG_DMA>1) logerror("DMA%d - requesting interrupt: count = %04X, source = %04X\n", which, dma->count, dma->source);
 		i186.intr.request |= 0x04 << which;
 		update_interrupt_state(machine);      
     }
@@ -1288,11 +1299,14 @@ MACHINE_START( nimbus )
 	{
 		debug_console_register_command(machine, "nimbus_irq", CMDFLAG_NONE, 0, 0, 2, execute_debug_irq);
         debug_console_register_command(machine, "nimbus_intmasks", CMDFLAG_NONE, 0, 0, 0, execute_debug_intmasks);
+        debug_console_register_command(machine, "nimbus_debug", CMDFLAG_NONE, 0, 0, 1, nimbus_debug);
 
         /* set up the instruction hook */
         debug_cpu_set_instruction_hook(devtag_get_device(machine, MAINCPU_TAG), instruction_hook);
      
     }
+    
+    debug_flags=0;
 }
 
 static void execute_debug_irq(running_machine *machine, int ref, int params, const char *param[])
@@ -1331,6 +1345,19 @@ static void execute_debug_intmasks(running_machine *machine, int ref, int params
     debug_console_printf(machine,"i186.intr.request   = %04X\n",i186.intr.request);
     debug_console_printf(machine,"i186.intr.ack_mask  = %04X\n",i186.intr.ack_mask);
     debug_console_printf(machine,"i186.intr.in_service= %04X\n",i186.intr.in_service);
+}
+
+static void nimbus_debug(running_machine *machine, int ref, int params, const char *param[])
+{
+    if(params>0)
+    {   
+        sscanf(param[0],"%d",&debug_flags);        
+    }
+    else
+    {
+        debug_console_printf(machine,"Error usage : nimbus_debug <debuglevel>\n");
+        debug_console_printf(machine,"Current debuglevel=%02X\n",debug_flags);
+    }
 }
 
 /*-----------------------------------------------
@@ -1436,8 +1463,8 @@ static void decode_subbios(running_device *device,offs_t pc)
                 case 1  : set_func("f_initialise_unit"); break;
                 case 2  : set_func("f_pseudo_init_unit"); break;
                 case 3  : set_func("f_get_device_status"); break;
-                case 4  : set_func("f_read_n_sectors"); break;
-                case 5  : set_func("f_write_n_sectors"); break;
+                case 4  : set_func("f_read_n_sectors"); dump_dssi=&decode_dssi_f_rw_sectors; break;
+                case 5  : set_func("f_write_n_sectors"); dump_dssi=&decode_dssi_f_rw_sectors;  break;
                 case 6  : set_func("f_verify_n_sectors"); break;
                 case 7  : set_func("f_media_check"); break;
                 case 8  : set_func("f_recalibrate"); break;
@@ -1770,6 +1797,19 @@ static void decode_dssi_f_plonk_char(running_device *device,UINT16  ds, UINT16 s
     logerror("plonked_char=%c\n",params[0]);
 }
 
+static void decode_dssi_f_rw_sectors(running_device *device,UINT16  ds, UINT16 si)
+{
+    const address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
+    UINT16  *params;
+    int     param_no;
+    
+    params=(UINT16  *)get_dssi_ptr(space,ds,si);
+    
+    for(param_no=0;param_no<16;param_no++)
+        logerror("%04X ",params[param_no]);
+        
+    logerror("\n");
+}
 
 READ16_HANDLER( nimbus_io_r )
 {
@@ -2054,7 +2094,7 @@ READ8_HANDLER( nimbus_disk_r )
 			break;
 	}
 
-    if(LOG_DISK_FDD)
+    if(LOG_DISK_FDD && ((offset*2)<=0x10))
         logerror("Nimbus FDCR at pc=%08X from %04X data=%02X\n",pc,(offset*2)+0x400,result);
 
     if((LOG_DISK_HDD) && ((offset*2)>=0x10))
@@ -2090,7 +2130,7 @@ WRITE8_HANDLER( nimbus_disk_w )
     int                 pc=cpu_get_pc(space->cpu);
     UINT8               reg400_old = nimbus_drives.reg400;
     
-    if(LOG_DISK_FDD)
+    if(LOG_DISK_FDD && ((offset*2)<=0x10))
         logerror("Nimbus FDCW at %05X write of %02X to %04X\n",pc,data,(offset*2)+0x400);
 
     if((LOG_DISK_HDD) && (((offset*2)>=0x10) || (offset==0)))

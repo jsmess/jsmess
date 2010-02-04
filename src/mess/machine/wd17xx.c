@@ -119,6 +119,9 @@
       
       This should probably be considdered a minor hack but it does seem to work !
 
+    2009-02-04 Phill Harvey-Smith
+    - Added multiple sector write as the RM Nimbus needs it.
+
     TODO:
         - Multiple record write
         - What happens if a track is read that doesn't have any id's on it?
@@ -1464,8 +1467,10 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		if ((data & ~FDC_MASK_TYPE_II) == FDC_READ_SEC)
 		{
 			if (VERBOSE)
+            {
 				logerror("wd17xx_command_w $%02X READ_SEC\n", data);
-
+                logerror("cmd=%02X, trk=%02X, sec=%02X, dat=%02X\n",w->command,w->track,w->sector,w->data);
+            }
 			w->read_cmd = data;
 			w->command = data & ~FDC_MASK_TYPE_II;
 			w->command_type = TYPE_II;
@@ -1481,7 +1486,10 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		if ((data & ~FDC_MASK_TYPE_II) == FDC_WRITE_SEC)
 		{
 			if (VERBOSE)
+            {
 				logerror("wd17xx_command_w $%02X WRITE_SEC\n", data);
+                logerror("cmd=%02X, trk=%02X, sec=%02X, dat=%02X\n",w->command,w->track,w->sector,w->data);
+            }
 
 			w->write_cmd = data;
 			w->command = data & ~FDC_MASK_TYPE_II;
@@ -1771,8 +1779,28 @@ WRITE8_DEVICE_HANDLER( wd17xx_data_w )
 
 			w->data_offset = 0;
 
-			wd17xx_complete_command(device, DELAY_DATADONE);
-		}
+            
+			/* Check we should handle the next sector for a multi record write */
+			if ( w->command_type == TYPE_II && w->command == FDC_WRITE_SEC && ( w->write_cmd & 0x10 ) ) 
+            {
+				w->sector++;
+				if (wd17xx_locate_sector(device))
+				{
+					w->data_count = w->sector_length;
+
+					w->status |= STA_2_BUSY;
+					w->busy_count = 0;
+
+					wd17xx_timed_data_request(device);
+				}
+            }
+            else
+            {
+                wd17xx_complete_command(device, DELAY_DATADONE);
+                if (VERBOSE)
+					logerror("wd17xx_data_w(): multi data write completed\n");
+            }
+        }
 		else
 		{
 			/* yes... setup a timed data request */

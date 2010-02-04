@@ -76,9 +76,8 @@ UINT8 video_mem[SCREEN_WIDTH_PIXELS][SCREEN_HEIGHT_LINES];
 UINT16  vidregs[NO_VIDREGS];
 
 UINT8   bpp;            // Bits / pixel
-UINT8   ppb;            // Pixels / byte
 UINT16  pixel_mask;
-UINT8   border_colour;
+UINT8   hs_count;
 
 int debug_on;
 
@@ -93,7 +92,7 @@ static void write_reg_014(void);
 static void write_reg_01A(void);
 static void write_reg_01C(void);
 static void write_reg_026(void);
-static void change_palette(running_machine *machine, UINT8 first, UINT16 colours);
+static void change_palette(running_machine *machine, UINT8 bank, UINT16 colours, UINT8 regno);
 
 static void video_debug(running_machine *machine, int ref, int params, const char *param[]);
 static void video_regdump(running_machine *machine, int ref, int params, const char *param[]);
@@ -132,7 +131,7 @@ READ16_HANDLER (nimbus_video_io_r)
         case    reg022  : result=vidregs[reg022]; break;
         case    reg024  : result=vidregs[reg024]; break;
         case    reg026  : result=vidregs[reg026]; break;
-        case    reg028  : result=vidregs[reg028]; break;
+        case    reg028  : result=hs_count; break; //result=vidregs[reg028]; break;
         case    reg02A  : result=vidregs[reg02A]; break;
         case    reg02C  : result=vidregs[reg02C]; break;
         case    reg02E  : result=vidregs[reg02E]; break;
@@ -190,10 +189,10 @@ WRITE16_HANDLER (nimbus_video_io_w)
         case    reg022  : vidregs[reg022]=data; break;
         case    reg024  : vidregs[reg024]=data; break;
         case    reg026  : vidregs[reg026]=data; write_reg_026(); break;
-        case    reg028  : vidregs[reg028]=data; change_palette(space->machine,(IS_80COL ? 0 : 0),data); break;
-        case    reg02A  : vidregs[reg02A]=data; change_palette(space->machine,(IS_80COL ? 1 : 4),data); break;
-        case    reg02C  : vidregs[reg02C]=data; change_palette(space->machine,(IS_80COL ? 2 : 8),data); break;
-        case    reg02E  : vidregs[reg02E]=data; change_palette(space->machine,(IS_80COL ? 3 : 12),data); break;
+        case    reg028  : change_palette(space->machine,0,data,reg028); break;
+        case    reg02A  : change_palette(space->machine,1,data,reg02A); break;
+        case    reg02C  : change_palette(space->machine,2,data,reg02C); break;
+        case    reg02E  : change_palette(space->machine,3,data,reg02E); break;
         
         default         : break;
     }
@@ -282,7 +281,7 @@ static void move_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width)
     011 
     100 4bpp, must be a 16 bit word, of which the upper byte is a mask anded with the lower byte
               containing the pixel data for two pixels.
-    101
+    101 Move pixel data at x,reg020 to x,y, used for scrolling.
     110 4bpp, 16 bit word containing the pixel data for 4 pixels.
     111
     
@@ -419,26 +418,34 @@ static void write_reg_01C(void)
 
 static void write_reg_026(void)
 {
-    border_colour=vidregs[reg026] & 0x0F;
-
     if(debug_on & DEBUG_TEXT)
-        logerror("reg 026 write, border_colour=%02X\n",border_colour);
+        logerror("reg 026 write, border_colour=%02X\n",vidregs[reg026] & 0x0F);
 }
 
-static void change_palette(running_machine *machine, UINT8 first, UINT16 colours)
+static void change_palette(running_machine *machine, UINT8 bank, UINT16 colours, UINT8 regno)
 {
     UINT8   colourno;
     UINT16  mask;
     UINT8   shifts;
     UINT8   paletteidx;
     UINT8   colourmax;
+    UINT8   first;
     
+    // for the register's data has changed update it, and then update the pallette, else do nothing.
+    if(vidregs[regno]!=colours)
+        vidregs[regno]=colours;
+    else
+        return;
+    
+    // Setup parameters for pallette change
+    colourmax=IS_80COL ? 1 : 4;
+    first=IS_80COL ? bank : bank*4;
+
     shifts=0;
     mask=0x000F;
     
-    colourmax=IS_80COL ? 1 : 4;
-    
-    for(colourno=first; colourno<(first+4); colourno++)
+    // loop over changing colours
+    for(colourno=first; colourno<(first+colourmax); colourno++)
     {
         paletteidx=(colours & mask) >> shifts;
         palette_set_color_rgb(machine, colourno, nimbus_palette[paletteidx][RED], nimbus_palette[paletteidx][GREEN], nimbus_palette[paletteidx][BLUE]);
@@ -520,9 +527,9 @@ VIDEO_UPDATE( nimbus )
         *BITMAP_ADDR16(bitmap, YCoord, XCoord)=video_mem[XCoord][YCoord];
     }
 
-    vidregs[reg028]++;
-    if((vidregs[reg028] & 0x000F)>0x0A)
-        vidregs[reg028]&=0xFFF0;
+    hs_count++;
+    if((hs_count & 0x000F)>0x0A)
+        hs_count&=0xFFF0;
 
     return 0;
 }
