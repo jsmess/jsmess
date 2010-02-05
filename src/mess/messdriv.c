@@ -845,6 +845,8 @@ const game_driver * const drivers[] =
 	DRIVER( trs80l2 )   /* TRS-80 Model I - Level II BASIC	  */
 	DRIVER( sys80 )	 /* EACA System 80	   */
 	DRIVER( lnw80 )	 /* LNW Research LNW-80	  */
+	DRIVER( trs80m2 )
+	DRIVER( trs80m216 )
 	DRIVER( trs80m3 )   /* TRS-80 Model III - Radio Shack/Tandy	 */
 	DRIVER( trs80m4 )
 	DRIVER( trs80m4p )

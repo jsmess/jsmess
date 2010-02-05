@@ -603,6 +603,9 @@ static MACHINE_DRIVER_START( model1 )		// model I, level II
 	MDRV_AY31015_ADD( "tr1602", trs80_ay31015_config )
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( model2 )
+	MDRV_IMPORT_FROM(model1)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( model3 )
 	MDRV_IMPORT_FROM( model1 )
@@ -741,6 +744,61 @@ ROM_START(lnw80)
 	ROM_FILL(0, 0x4400, 0xff)	/* 0x4000 for trs80_gfxram + 0x400 for videoram */
 ROM_END
 
+ROM_START(trs80m2)
+	ROM_REGION(0x10000, "maincpu",0)
+	ROM_LOAD("8043216.u11", 0x0000, 0x0800, CRC(7017a373) SHA1(1c7127fcc99fc351a40d3a3199ba478e783c452e))
+
+	ROM_REGION(0x800, "gfx1",0)
+	ROM_LOAD("8043316.u9",  0x0000, 0x0800, CRC(04425b03) SHA1(32a29dc202b7fcf21838289cc3bffc51ef943dab))
+ROM_END
+
+/*
+
+	TRS-80 Model II/16 Z80 CPU Board ROM
+
+	It would seem that every processor board I find has a different ROM on it!  It seems that the early ROMs 
+	don't boot directly from a hard drive.  But there seems to be many versions of ROMs.  I've placed them in 
+	order of serial number in the list below.  There also appears to be at least two board revisions, "C" and "D".
+
+	cpu_c8ff.bin/hex:
+	Mask Programmable PROM, Equivilant to Intel 2716 EPROM, with checksum C8FF came from a cpu board with 
+	serial number 120353 out of a Model II with serial number 2002102 and catalog number 26-6002.  The board 
+	was labeled, "Revision C".  This appears to be an early ROM and according to a very helpful fellow 
+	collector, Aaron in Australia, doesn't allow boot directly from a hard disk.
+
+	cpu_9733.bin/hex:
+	An actual SGS-Ates (Now STMicroelectronics) 2716 EPROM, with checksum 9733 came from a cpu board with 
+	serial number 161993 out of a pile of random cards that I have.  I don't know what machine it originated 
+	from.  The board was labeled, "Revision C".  This appears to be a later ROM in that it is able to boot 
+	directly from an 8MB hard disk.  The EPROM had a windows sticker on it labeled, "U54".
+
+	cpu_2119.bin/hex:
+	An actual Texas Instruments 2716 EPROM, with checksum 2119 came from a cpu board with serial number 
+	178892 out of a Model 16 with serial number 64014509 and catalog number 26-4002.  The board was labeled,
+	"Revision D".  This appears to be a later ROM and does appear to allow boot directly from an 8MB hard disk.
+
+	cpu_2bff.bin/hex:
+	Mask Programmable PROM, Equivilant to Intel 2716 EPROM, with checksum 2BFF came from a cpu board with 
+	serial number 187173 our of a pile of random cards that I have.  I don't know what machine it originated 
+	from.  The board was labeled, "Revision D".  This appears to be a later ROM in that it is able to boot 
+	directly from an 8MB hard disk.
+
+*/
+ROM_START(trs80m216)
+	ROM_REGION(0x10000, "maincpu",0)
+	ROM_SYSTEM_BIOS(0, "c8ff", "S/N 120353")
+	ROMX_LOAD("cpu_c8ff.u11",   0x0000, 0x0800, CRC(7017a373) SHA1(1c7127fcc99fc351a40d3a3199ba478e783c452e), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "9733", "S/N 161993")
+	ROMX_LOAD("cpu_9733.u11",   0x0000, 0x0800, CRC(823924b1) SHA1(aee0625bcbd8620b28ab705e15ad9bea804c8476), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "2119", "S/N 64014509")
+	ROMX_LOAD("cpu_2119.u11",   0x0000, 0x0800, CRC(7a663049) SHA1(f308439ce266df717bfe79adcdad6024b4faa141), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(3, "2bff", "S/N 187173")
+	ROMX_LOAD("cpu_2bff.u11",   0x0000, 0x0800, CRC(c6c71d8b) SHA1(7107e2cbbe769851a4460680c2deff8e76a101b5), ROM_BIOS(4))
+
+	ROM_REGION(0x800, "gfx1",0)
+	ROM_LOAD("8043316.u9",  0x0000, 0x0800, CRC(04425b03) SHA1(32a29dc202b7fcf21838289cc3bffc51ef943dab))
+ROM_END
+
 ROM_START(trs80m3)
 /* ROMS we have and are missing:
 HAVE    TRS-80 Model III Level 1 ROM (U104)
@@ -866,6 +924,8 @@ COMP( 1978, trs80l2,  trs80,	0,	model1,   trs80,   trs80l2,  "Tandy Radio Shack"
 COMP( 1983, radionic, trs80,	0,	radionic, trs80,   trs80,    "Komtek",  "Radionic" , 0 )
 COMP( 1980, sys80,    trs80,	0,	sys80,    trs80,   trs80l2,  "EACA Computers Ltd.","System-80" , 0 )
 COMP( 1981, lnw80,    trs80,	0,	lnw80,    trs80m3, lnw80,    "LNW Research","LNW-80", 0 )
+COMP( 1979, trs80m2,  trs80,	0,	model2,   trs80m3, trs80m4,  "Tandy Radio Shack",  "TRS-80 Model II", GAME_NOT_WORKING )
+COMP( 1979, trs80m216,trs80,	0,	model2,   trs80m3, trs80m4,  "Tandy Radio Shack",  "TRS-80 Model II/16", GAME_NOT_WORKING )
 COMP( 1980, trs80m3,  trs80,	0,	model3,   trs80m3, trs80m4,  "Tandy Radio Shack",  "TRS-80 Model III", 0 )
 COMP( 1980, trs80m4,  trs80,	0,	model4,   trs80m3, trs80m4,  "Tandy Radio Shack",  "TRS-80 Model 4", 0 )
 COMP( 1983, trs80m4p, trs80,	0,	model4p,  trs80m3, trs80m4p, "Tandy Radio Shack",  "TRS-80 Model 4P", 0 )

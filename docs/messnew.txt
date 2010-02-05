@@ -13,6 +13,7 @@ New System Drivers Supported:
 - PK8020 Neiva, PK8020 Kontur [Miodrag Milanovic]
 
 
+
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
 - Victory MPT-02 and clones [Curt Coder]
@@ -21,14 +22,16 @@ Systems Promoted from GAME_NOT_WORKING:
 
 Skeleton drivers: 
 -----------------
+- BestZX
 - Contel Codata Corporation Codata
 - Digital Microsystems DMS-86
 - Digital Microsystems DMS-5000
 - Digital Microsystems ZSBC-3
 - Tandy 2000 [Curt Coder]
+- TRS-80 Model II [Curt Coder]
+- TRS-80 Model II/16 [Curt Coder]
 - Xerox 820-II [Curt Coder]
 - Xerox 16/8 [Curt Coder]
-- BestZX
 
 
 
