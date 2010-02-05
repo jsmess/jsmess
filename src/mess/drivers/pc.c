@@ -3102,6 +3102,17 @@ ROM_START( mk88 )
 	// Here CGA rom with cyrillic support should be added
 ROM_END
 
+ROM_START( poisk1 )
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
+	ROM_LOAD( "poisk.bin", 0xfe000, 0x2000, CRC(1a85f671) SHA1(f0e59b2c4d92164abca55a96a58071ce869ff988))
+ROM_END
+
+ROM_START( poisk2 )
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
+	ROMX_LOAD( "poisk2-low.rom", 0xfc000, 0x2000, CRC(0eb2ea7f) SHA1(67bb5fec53ebfa2a5cad2a3d3d595678d6023024), ROM_SKIP(1) )  
+	ROMX_LOAD( "poisk2-hi.rom",  0xfc001, 0x2000, CRC(22197297) SHA1(506c7e63027f734d62ef537f484024548546011f), ROM_SKIP(1) )  
+	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)		
+ROM_END
 /***************************************************************************
 
   Game driver(s)
@@ -3142,4 +3153,6 @@ COMP ( 1987,	ec1840,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "EC-1840
 COMP ( 1987,	ec1841,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "EC-1841" , GAME_NOT_WORKING)
 COMP ( 1989,	ec1845,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "EC-1845" , GAME_NOT_WORKING)
 COMP ( 1989,	mk88,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "MK-88" , GAME_NOT_WORKING)
+COMP ( 1990,	poisk1,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "Poisk-1" , GAME_NOT_WORKING)
+COMP ( 1990,	poisk2,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "Poisk-2" , GAME_NOT_WORKING)
 
