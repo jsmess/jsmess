@@ -273,6 +273,7 @@ static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", i8255a_r, i8255a_w, 0xffff)
+	AM_RANGE(0x0070, 0x007f) AM_RAM // needed for Poisk-2
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,				pc_page_w, 0xffff)
 	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8( pc_nmi_enable_w, 0x00ff )
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc16le_JOY_r,				pc16le_JOY_w)
@@ -281,7 +282,7 @@ static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
 #endif
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE(pc16le_rtc_r,				pc16le_rtc_w)
 	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x00ff)
-	AM_RANGE(0x02b0, 0x02bf) AM_RAM
+	AM_RANGE(0x02b0, 0x02bf) AM_RAM // needed for EC-18xx
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc16le_HDC1_r,			pc16le_HDC1_w)
@@ -3112,6 +3113,7 @@ ROM_START( poisk2 )
 	ROMX_LOAD( "poisk2-low.rom", 0xfc000, 0x2000, CRC(0eb2ea7f) SHA1(67bb5fec53ebfa2a5cad2a3d3d595678d6023024), ROM_SKIP(1) )  
 	ROMX_LOAD( "poisk2-hi.rom",  0xfc001, 0x2000, CRC(22197297) SHA1(506c7e63027f734d62ef537f484024548546011f), ROM_SKIP(1) )  
 	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)		
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 /***************************************************************************
 
@@ -3154,5 +3156,5 @@ COMP ( 1987,	ec1841,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "EC-1841
 COMP ( 1989,	ec1845,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "EC-1845" , GAME_NOT_WORKING)
 COMP ( 1989,	mk88,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "MK-88" , GAME_NOT_WORKING)
 COMP ( 1990,	poisk1,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "Poisk-1" , GAME_NOT_WORKING)
-COMP ( 1990,	poisk2,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "Poisk-2" , GAME_NOT_WORKING)
+COMP ( 1991,	poisk2,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "Poisk-2" , GAME_NOT_WORKING)
 
