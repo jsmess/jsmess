@@ -528,20 +528,40 @@ MACHINE_DRIVER_END
 /* ROM definition */
 ROM_START( special )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-    ROM_SYSTEM_BIOS(0, "2nd", "2nd rev.")
-    ROMX_LOAD( "special2.rom", 0xc000, 0x1000, CRC(FEDFBC37) SHA1(b79474833bbf558c39493dec3e8eabf9885c7c7c), ROM_BIOS(1))
-    ROM_SYSTEM_BIOS(1, "1st", "1st rev.")
-    ROMX_LOAD( "special1.rom", 0xc000, 0x1000, CRC(217414BD) SHA1(345cd1410fbca8f75421d12d1419f27f81cd35d6), ROM_BIOS(2))
-    ROM_SYSTEM_BIOS(2, "3rd", "3rd rev.")
-    ROMX_LOAD( "special3.rom", 0xc000, 0x1400, CRC(85F08629) SHA1(69b00b897a32087133076886d0d9d83ed5944469), ROM_BIOS(3))
-    ROM_SYSTEM_BIOS(3, "7th", "7th rev.")
-    ROMX_LOAD( "special7.rom", 0xc000, 0x2000, CRC(FBE3438A) SHA1(83ca8f77f908d1c2f5c486c27d587d738bdde922), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(0, "2nd", "2nd rev.")
+	ROMX_LOAD( "monitor2_1.rom", 0xc000, 0x0800, CRC(52abde77) SHA1(66ba2ef9eac14a5c0df510224ea25fd5745399cd), ROM_BIOS(1))
+	ROMX_LOAD( "monitor2_2.rom", 0xc800, 0x0800, CRC(c425f719) SHA1(1c322591b4e5c8b01b81362c6801aa6fd9fc1492), ROM_BIOS(1))
+	ROMX_LOAD( "monitor2_3.rom", 0xd000, 0x0800, CRC(d804aeba) SHA1(1585f354719c25e1f59c7cb8b3a3f5d309a7e8fb), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "2rom", "2nd rev. rom disk")
+	ROMX_LOAD( "monitor2_1.rom",  0xc000, 0x0800, CRC(52abde77) SHA1(66ba2ef9eac14a5c0df510224ea25fd5745399cd), ROM_BIOS(2))
+	ROMX_LOAD( "m2_rom-disk.rom", 0xc800, 0x0800, CRC(7bd3d476) SHA1(232341755ae794f8aab4f6181c8d499a66016af2), ROM_BIOS(2))
+	ROMX_LOAD( "monitor2_3.rom",  0xd000, 0x0800, CRC(d804aeba) SHA1(1585f354719c25e1f59c7cb8b3a3f5d309a7e8fb), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "1b", "1st rev. + BASIC")
+	ROMX_LOAD( "root.rom", 0xc000, 0x0800, CRC(62de741d) SHA1(6c6a29d4340b0b1230c708f9c04ff2ed1c012a76), ROM_BIOS(3))
+	ROMX_LOAD( "pzu2.rom", 0xc800, 0x0800, CRC(49937e13) SHA1(872ae5a7c3496d4404cdd577caa2236424016c66), ROM_BIOS(3))
+	ROMX_LOAD( "pzu3.rom", 0xd000, 0x0800, CRC(dc817a08) SHA1(8101fe924386f38c10ef929e6dea5a83fcf34600), ROM_BIOS(3))
+	ROMX_LOAD( "pzu4.rom", 0xd800, 0x0800, CRC(6793ba23) SHA1(3a27b5dbc6561ea7af5fb30513dc83ec64f1d94c), ROM_BIOS(3))
+	ROMX_LOAD( "pzu5.rom", 0xe000, 0x0800, CRC(13a1a0dc) SHA1(3a0818cb8f36c2c5a9b9916669538ad1702a7710), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(3, "1st", "1st rev.")
+    ROMX_LOAD( "special1.rom", 0xc000, 0x1000, CRC(217414BD) SHA1(345cd1410fbca8f75421d12d1419f27f81cd35d6), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(4, "2col", "2nd rev. color")
+	ROMX_LOAD( "col_mon2.rom",   0xc000, 0x0800, CRC(8cebb1b5) SHA1(0c912a25220de8c5135e16c443e4796e6bb6f805), ROM_BIOS(5))
+	ROMX_LOAD( "monitor2_2.rom", 0xc800, 0x0800, CRC(c425f719) SHA1(1c322591b4e5c8b01b81362c6801aa6fd9fc1492), ROM_BIOS(5))
+	ROMX_LOAD( "monitor2_3.rom", 0xd000, 0x0800, CRC(d804aeba) SHA1(1585f354719c25e1f59c7cb8b3a3f5d309a7e8fb), ROM_BIOS(5))   
+ROM_END
+
+ROM_START( specialm )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "pzu1-m.rom", 0xc000, 0x0800, CRC(61e94485) SHA1(dbe212dcd377cb8cd16000516cd4b3b760ce779e))
+	ROM_LOAD( "pzu2-m.rom", 0xc800, 0x0800, CRC(83d76815) SHA1(9d139eaa6ca6b241fa9fac94ede72abb56d83674))
+	ROM_LOAD( "pzu3-m.rom", 0xd000, 0x0800, CRC(2121ad65) SHA1(b43811d058d818f8c1cee59b405b515f96958656))
+	ROM_LOAD( "pzu4-m.rom", 0xd800, 0x0800, CRC(8bf8218e) SHA1(bd1174c384b04a40dfcaa35aa373c5070304f37b))
 ROM_END
 
 ROM_START( specialp )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
     ROM_LOAD( "special6.rom", 0xc000, 0x1000, CRC(f0c5a0ac) SHA1(50b53bd7c05117930aa84653a9ea0fc0c6f0f496) )
- ROM_END
+ROM_END
 
 ROM_START( lik )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -557,6 +577,8 @@ ROM_START( specimx )
     ROMX_LOAD( "specimx.rom", 0x10000, 0xb800,  CRC(DB68F9B1) SHA1(c79888449f8a605267ec3e10dcc8e6e6f43b3a95), ROM_BIOS(1))
     ROM_SYSTEM_BIOS(1, "NC", "NC")
     ROMX_LOAD( "ncrdy.rom",   0x10000, 0x10000, CRC(5D04C522) SHA1(d7daa7fe14cd8e0c6f87fd6453ec3e94ea2c259f) ,ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "RAMFOS", "RAMFOS")
+	ROMX_LOAD( "ramfos.rom",  0x10000, 0x3000, CRC(83e19df4) SHA1(20e5e53eb45729a24c1c7c63e114dbd14e3c4184) ,ROM_BIOS(3))
 ROM_END
 
 ROM_START( erik )
@@ -568,6 +590,7 @@ ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT       INIT        COMPANY              FULLNAME       FLAGS */
 COMP( 1985, special,    0,     	0, 		special, 	special, 	special,    "", 				 "Specialist",		0)
+COMP( 1985, specialm,   special,0, 		special, 	special, 	special,    "", 				 "Specialist M",		0)
 COMP( 1985, specialp,   special,0, 		specialp, 	specialp, 	special,    "", 				 "Specialist + hires graph",		0)
 COMP( 1985, lik,    	special,0, 		special, 	lik,		special,    "", 				 "Lik",		 		0)
 COMP( 1985, specimx,   	special,0, 		specimx, 	specimx, 	specimx,	"", 				 "Specialist MX", 	0)

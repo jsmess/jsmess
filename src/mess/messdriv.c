@@ -1255,6 +1255,7 @@ const game_driver * const drivers[] =
 
 	/* Specialist */
 	DRIVER( special )
+	DRIVER( specialm )
 	DRIVER( specialp )
 	DRIVER( lik )
 	DRIVER( erik )
