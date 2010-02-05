@@ -690,10 +690,6 @@ static MACHINE_DRIVER_START( pet_general )
 	/* pias */
 	MDRV_PIA6821_ADD( "pia_0", pet_pia0)
 	MDRV_PIA6821_ADD( "pia_1", pet_pia1)
-
-	/* IEEE bus */
-	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MDRV_C4040_ADD("c4040", "ieee_bus", 8)
 MACHINE_DRIVER_END
 
 
@@ -706,6 +702,10 @@ static MACHINE_DRIVER_START( pet )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
 	MDRV_RAM_EXTRA_OPTIONS("8K,16K")
+
+	/* IEEE bus */
+	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
+	MDRV_C4040_ADD("c4040", "ieee_bus", 8)
 MACHINE_DRIVER_END
 
 
@@ -723,6 +723,10 @@ static MACHINE_DRIVER_START( pet2001 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("8K")
 	MDRV_RAM_EXTRA_OPTIONS("4K")
+
+	/* IEEE bus */
+	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
+	MDRV_C4040_ADD("c4040", "ieee_bus", 8)
 MACHINE_DRIVER_END
 
 
@@ -749,7 +753,10 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( pet80 )
-	MDRV_IMPORT_FROM( pet )
+	MDRV_IMPORT_FROM( pet_general )
+	MDRV_QUICKLOAD_ADD("quickload", cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MDRV_IMPORT_FROM(pet_cartslot)
+
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( pet80_mem)
 
@@ -770,8 +777,12 @@ static MACHINE_DRIVER_START( pet80 )
 	MDRV_IMPORT_FROM(pet4_cartslot)
 
 	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
+
+	/* IEEE bus */
+	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
+	MDRV_C8050_ADD("c4040", "ieee_bus", 8)
 MACHINE_DRIVER_END
 
 

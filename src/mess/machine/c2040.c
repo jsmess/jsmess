@@ -11,8 +11,6 @@
 
 	TODO:
 
-	- 8050 cannot load anything except directory
-	- 4040 bumps head before reading directory
 	- 2040 DOS 1 FDC rom
 	- Micropolis 8x50 stepper motor is same as 4040, except it takes 4 pulses to step a track instead of 1
 	- save states

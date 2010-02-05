@@ -10,6 +10,8 @@ New System Drivers Supported:
 - Spektr BK-001 [Miodrag Milanovic]
 - Zvezda [Miodrag Milanovic]
 
+
+
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
 - Victory MPT-02 and clones [Curt Coder]
@@ -26,6 +28,8 @@ Skeleton drivers:
 - Xerox 820-II [Curt Coder]
 - Xerox 16/8 [Curt Coder]
 - BestZX
+
+
 
 System Driver Changes:
 ----------------------
@@ -46,7 +50,8 @@ System Driver Changes:
 
 - [PDP1] Fixed crash when debugger invoked (bug #1371]. [Robbbert]
 
-- [PET] Changed floppy drive to Commodore 4040. [Curt Coder]
+- [PET] Changed floppy drive to Commodore 4040 for 2001/30xx/40xx series.
+  Changed floppy drive to Commodore 8050 for 80xx series. [Curt Coder]
 
 - [SCV] Implemented upd177c audio. [plgDavid]
 
@@ -57,6 +62,8 @@ System Driver Changes:
 
 - [COCO3] Fixed broken Coco3 high-res timer emulation 
   (bug #1913) [John W. Linville]
+
+
 
 Imgtool Changes:
 ----------------
@@ -71,6 +78,10 @@ Source Changes:
 
 - [CIA6526] Refactored interface, added SP/CNT callbacks, and fixed serial
   port transfer. [Curt Coder]
+  
+- [C4040] Implemented read-only access to D64/D67/G64 images. [Curt Coder]
+
+- [C8050] Implemented read-only access to D80 images. [Curt Coder]
 
 - Cleanups for driver_data and Standard C library usage.  [Atari Ace]
 
