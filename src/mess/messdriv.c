@@ -587,6 +587,7 @@ const game_driver * const drivers[] =
 
 	DRIVER( xtvga )	 /* 198? PC-XT (VGA, MF2 Keyboard)	   */
 	DRIVER( iskr1031 ) 
+	DRIVER( ec1840 ) 	
 	DRIVER( ec1841 ) 	
 	DRIVER( ec1845 ) 
 	DRIVER( mk88 ) 
