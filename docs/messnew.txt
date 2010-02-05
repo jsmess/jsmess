@@ -9,6 +9,7 @@ New System Drivers Supported:
 - EC-1845 [Miodrag Milanovic]
 - Spektr BK-001 [Miodrag Milanovic]
 - Zvezda [Miodrag Milanovic]
+- MK-88 [Miodrag Milanovic]
 
 
 

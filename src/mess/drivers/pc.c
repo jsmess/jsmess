@@ -3062,6 +3062,22 @@ ROM_START( ec1845 )
 ROM_END
 
 
+ROM_START( mk88 )
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
+	ROM_DEFAULT_BIOS("v392")
+	ROM_SYSTEM_BIOS(0, "v290", "v2.90")
+	ROMX_LOAD( "mk88m.bin", 0xfc000, 0x2000, CRC(09c9da3b) SHA1(d1e7ad23b5f5b3576ad128c1198294129754f39f), ROM_BIOS(1))
+	ROMX_LOAD( "mk88b.bin", 0xfe000, 0x2000, CRC(8a922476) SHA1(c19c3644ab92fd12e13f32b410cd26e3c844a03b), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "v391", "v3.91")
+	ROMX_LOAD( "mkm.bin", 0xfc000, 0x2000, CRC(65f979e8) SHA1(13e85be9bc8ceb5ab9e559e7d0089e26fbbb84fc), ROM_BIOS(2))
+	ROMX_LOAD( "mkb.bin", 0xfe000, 0x2000, CRC(830a0447) SHA1(11bc200fdbcfbbe335f4c282020750c0b5ca4167), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "v392", "v3.92")
+	ROMX_LOAD( "m88.bin", 0xfc000, 0x2000, CRC(fe1b4e36) SHA1(fcb420af0ff09a7d43fcb9b7d0b0233a2071c159), ROM_BIOS(3))
+	ROMX_LOAD( "b88.bin", 0xfe000, 0x2000, CRC(58a418df) SHA1(216398d4e4302ee7efcc2c8f9ff9d8a1161229ea), ROM_BIOS(3))
+	ROM_REGION(0x2000,"gfx1", 0)	
+	// Here CGA rom with cyrillic support should be added
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -3100,4 +3116,5 @@ COMP ( 1987,	xtvga,		ibm5150,	0,	xtvga,      xtvga,	pc_vga,	    "Generic",  "PC/
 COMP ( 1989,	iskr1031,	ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "Iskra-1031" , GAME_NOT_WORKING)
 COMP ( 1987,	ec1841,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "EC-1841" , GAME_NOT_WORKING)
 COMP ( 1989,	ec1845,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "EC-1845" , GAME_NOT_WORKING)
+COMP ( 1989,	mk88,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "MK-88" , GAME_NOT_WORKING)
 
