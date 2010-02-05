@@ -1302,6 +1302,8 @@ const game_driver * const drivers[] =
 
 	/* PK-8020 */
 	DRIVER (korvet)
+	DRIVER (kontur)
+	DRIVER (neiva)
 
 	/* Vector-06c */
 	DRIVER (vector06)

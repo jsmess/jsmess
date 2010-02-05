@@ -10,6 +10,7 @@ New System Drivers Supported:
 - Zvezda [Miodrag Milanovic]
 - MK-88 [Miodrag Milanovic]
 - Poisk-1, Poisk-2 [Miodrag Milanovic]
+- PK8020 Neiva, PK8020 Kontur [Miodrag Milanovic]
 
 
 Systems Promoted from GAME_NOT_WORKING:
