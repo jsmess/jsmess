@@ -562,7 +562,7 @@ FLOPPY_IDENTIFY( d67_dsk_identify )
 
 FLOPPY_IDENTIFY( d71_dsk_identify )
 {
-	int heads = 0, tracks = 0, dos;
+	int heads = 0, tracks = 0, dos = -1;
 	bool has_errors = false;
 
 	*vote = 0;

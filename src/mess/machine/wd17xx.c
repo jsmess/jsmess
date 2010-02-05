@@ -421,12 +421,13 @@ static int wd17xx_get_datarate_in_us(DENSITY density)
 {
 	switch (density)
 	{
-		case DEN_FM_LO:  return 128; break;
-		case DEN_FM_HI:	 return  64; break;
+		case DEN_FM_LO:  return 128;
+		case DEN_FM_HI:	 return  64;
 		default:
-		case DEN_MFM_LO: return  32; break;
-		case DEN_MFM_HI: return  16; break;
+		case DEN_MFM_LO: return  32;
+		case DEN_MFM_HI: return  16;
 	}
+	return 32;
 }
 
 
