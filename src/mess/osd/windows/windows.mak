@@ -7,7 +7,7 @@
 ###########################################################################
 
 ifndef MESSUI
-MESSUI = 0
+MESSUI = 1
 endif
 
 # build the executable names
