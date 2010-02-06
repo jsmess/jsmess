@@ -13,8 +13,6 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG 0
-
 #define D81_SIZE	819200
 
 /***************************************************************************
@@ -71,9 +69,7 @@
 
 UINT64 d81_translate_offset(floppy_image *floppy, const struct basicdsk_geometry *geom, int track, int head, int sector)
 {
-	UINT64 offset = ((track * 20) + (!head * 10) + (sector - 1)) * 512;
-
-	if (LOG) logerror("D81 offset %06x: track %u head %u sector %u\n", (UINT32)offset, track, head, sector);
+	UINT64 offset = (track * 20) + (!head * 10) + sector;
 
 	return offset;
 }
@@ -92,6 +88,31 @@ FLOPPY_IDENTIFY( d81_dsk_identify )
 /*-------------------------------------------------
     FLOPPY_CONSTRUCT( d81_dsk_construct )
 -------------------------------------------------*/
+
+/*
+PER TRACK ORGANIZATION:
+
+      Hex 4E written as a gap, with 10 sectors of data, with full gaps written for motor speed variation. 
+
+PER SECTOR ORGANIZATION:
+
+      MFM Encoding
+      12 Bytes of Hex 00
+      3 Bytes of Hex A1 (Data Hex A1, Clock Hex 0A)
+      1 Byte of Hex FE (ID Address Mark)
+      1 Byte (Track Number)
+      1 Byte (Side Number)
+      1 Byte (Sector Number)
+      1 Byte (Sector Length, 02 for 512 Byte Sectors)
+      2 Bytes CRC (Cyclic Redundancy Check)
+      22 Bytes of Hex 22
+      12 Bytes of Hex 00
+      3 Bytes of Hex A1 (Data Hex A1, Clock Hex 0A)
+      1 Byte of Hex FB (Data Address Mark)
+      512 Bytes of Data
+      2 Bytes of CRC (Cyclic Redundancy Check)
+      38 Bytes of Hex 4E
+*/
 
 FLOPPY_CONSTRUCT( d81_dsk_construct )
 {
