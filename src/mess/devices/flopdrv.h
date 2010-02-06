@@ -146,6 +146,8 @@ READ_LINE_DEVICE_HANDLER( floppy_wpt_r );
 /* track 0 detect */
 READ_LINE_DEVICE_HANDLER( floppy_tk00_r );
 
+/* disk changed */
+READ_LINE_DEVICE_HANDLER( floppy_dskchg_r );
 
 #define FLOPPY	DEVICE_GET_INFO_NAME(floppy)
 DEVICE_GET_INFO(floppy);

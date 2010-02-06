@@ -95,6 +95,9 @@ Source Changes:
 - Placed floppy drive head initially on track 0 to fix alignment issues 
   with Commodore drives, where physical track 1 is a half track. [Curt Coder]
 
+- Implemented 'disk changed' floppy drive signal. [Curt Coder]
+
+
 
 0.136
 

@@ -8,7 +8,6 @@
   - set unit id
 
   TODO:
-    - Disk change handling.
     - Override write protect if disk image has been opened in read mode
 */
 
@@ -50,6 +49,7 @@ struct _floppy_drive
 	int tk00; /* track 00 */
 	int wpt;  /* write protect */
 	int rdy;  /* ready */
+	int dskchg;		/* disk changed */
 
 	/* drive select logic */
 	int drive_id;
@@ -452,6 +452,9 @@ void floppy_drive_seek(running_device *img, signed int signed_tracks)
 	pDrive->tk00 = (pDrive->current_track == 0) ? CLEAR_LINE : ASSERT_LINE;
 	devcb_call_write_line(&pDrive->out_tk00_func, pDrive->tk00);
 
+	/* clear disk changed flag */
+	pDrive->dskchg = ASSERT_LINE;
+
 	/* inform disk image of step operation so it can cache information */
 	if (image_exists(img))
 		flopimg_seek_callback(img, pDrive->current_track);
@@ -633,6 +636,9 @@ DEVICE_START( floppy )
 	/* motor off */
 	floppy->mon = ASSERT_LINE;
 
+	/* disk changed */
+	floppy->dskchg = CLEAR_LINE;
+
 	/* resolve callbacks */
 	devcb_resolve_write_line(&floppy->out_idx_func, &floppy->config->out_idx_func, device);
 	devcb_resolve_read_line(&floppy->in_mon_func, &floppy->config->in_mon_func, device);
@@ -717,6 +723,9 @@ DEVICE_IMAGE_UNLOAD( floppy )
 
 	floppy_close(flopimg->floppy);
 	flopimg->floppy = NULL;
+
+	/* disk changed */
+	flopimg->dskchg = CLEAR_LINE;
 }
 
 running_device *floppy_get_device(running_machine *machine,int drive)
@@ -954,6 +963,12 @@ READ_LINE_DEVICE_HANDLER( floppy_tk00_r )
 	return drive->tk00;
 }
 
+/* disk changed */
+READ_LINE_DEVICE_HANDLER( floppy_dskchg_r )
+{
+	floppy_drive *drive = get_safe_token(device);
+	return drive->dskchg;
+}
 
 /*************************************
  *
