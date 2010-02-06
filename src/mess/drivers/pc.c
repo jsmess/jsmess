@@ -3168,7 +3168,7 @@ ROM_START( mk88 )
 	ROM_SYSTEM_BIOS(2, "v392", "v3.92")
 	ROMX_LOAD( "m88.bin", 0xfc000, 0x2000, CRC(fe1b4e36) SHA1(fcb420af0ff09a7d43fcb9b7d0b0233a2071c159), ROM_BIOS(3))
 	ROMX_LOAD( "b88.bin", 0xfe000, 0x2000, CRC(58a418df) SHA1(216398d4e4302ee7efcc2c8f9ff9d8a1161229ea), ROM_BIOS(3))
-	ROM_REGION(0x2000,"gfx1", 0)	
+	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)	
 	// Here CGA rom with cyrillic support should be added
 ROM_END
 
