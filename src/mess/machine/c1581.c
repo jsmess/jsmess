@@ -9,10 +9,38 @@
 
 /*
 
+	http://www.unusedino.de/ec64/technical/aay/c1581/ro81main.htm
+
     TODO:
 
-	- floppy access
-	- disk change
+	- fast serial on C128
+	- CRC error after reading DAM
+
+		patch these to make loading work:
+			cd31: 60
+			cfa9: ea ea
+
+			
+		routine at 84AE returns error -> 74 drive not ready
+
+		Drive initialisieren, LED einschalten ($c3ca) Initialize Drive, turn on LED ($ c3ca)
+
+		Einsprung von $82B9 , $868E , $9702 , $993F : Leaping from $ 82B9, $ 868E, $ 9702, $ 993F:
+
+		82A2: A9 00     LDA #$00 82A2: A9 00 LDA # $ 00
+		82A4: 85 40     STA $40          (keine sichtbare Verwendung) 82A4: 85 40 STA $ 40 (no apparent use)
+		82A6: 8D A4 02  STA $02A4        (Drivenummer ?) 82A6: 8D A4 02 STA $ 02A4 (drive number?)
+
+		82A9: 8D A3 02  STA $02A3        Anzahl Laufwerke = 0 (= 1 Laufwerk) 82A9: 8D A3 02 STA $ 02A3 Drive count = 0 (= 1 drive)
+		82AC: 20 AE 84  JSR $84AE        ggf. Partition initialisieren 82AC: 20 AE initialize 84 JSR $ 84AE partition if necessary
+		82AF: F0 05     BEQ $82B6        OK. 82AF: F0 05 BEQ $ 82B6 OK. ==> ==>
+		82B1: A9 74     LDA #$74         74, DRIVE NOT READY 82B1: A9 74 LDA # $ 74 74, DRIVE NOT READY
+		82B3: 20 7C 80  JSR $807C        Ende 82B3: 20 7C 80 JSR $ 807C End
+
+		Einsprung von $82AF: Leaping from $ 82AF:
+
+		82B6: 4C F6 81  JMP $81F6        Drive-LED-Flag setzen 82B6: set 4C F6 81 JMP $ 81F6 Drive LED flag
+
     - power LED
     - activity LED
 
@@ -237,8 +265,8 @@ static READ8_DEVICE_HANDLER( cia_pa_r )
 	/* device number */
 	data |= c1581->address << 3;
 
-	/* TODO disk change */
-	//data |= 0x80;
+	/* disk change */
+	data |= floppy_dskchg_r(c1581->image) << 7;
 
 	return data;
 }
