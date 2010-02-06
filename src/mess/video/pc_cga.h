@@ -20,4 +20,5 @@ READ16_HANDLER( pc1512_16le_r );
 WRITE16_HANDLER( pc1512_16le_w );
 WRITE16_HANDLER( pc1512_videoram16le_w );
 
+MACHINE_DRIVER_EXTERN( pcvideo_poisk2 );
 

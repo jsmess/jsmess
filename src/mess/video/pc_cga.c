@@ -172,6 +172,8 @@ static WRITE_LINE_DEVICE_HANDLER( cga_vsync_changed );
 static VIDEO_START( pc1512 );
 static VIDEO_UPDATE( mc6845_pc1512 );
 
+static VIDEO_START( cga_poisk2 );
+static VIDEO_UPDATE( cga_poisk2 );
 
 static const mc6845_interface mc6845_cga_intf =
 {
@@ -200,6 +202,12 @@ MACHINE_DRIVER_START( pcvideo_cga )
 
 	MDRV_VIDEO_START( pc_cga )
 	MDRV_VIDEO_UPDATE( mc6845_cga )
+MACHINE_DRIVER_END
+
+MACHINE_DRIVER_START( pcvideo_poisk2 )
+	MDRV_IMPORT_FROM( pcvideo_cga )
+	MDRV_VIDEO_START( cga_poisk2 )
+	MDRV_VIDEO_UPDATE( cga_poisk2 )
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( pcvideo_pc1512 )
@@ -518,6 +526,31 @@ static VIDEO_UPDATE( mc6845_cga )
 	return 0;
 }
 
+
+static VIDEO_START( cga_poisk2 )
+{
+	VIDEO_START_CALL(pc_cga);
+	cga.chr_gen = memory_region( machine, "gfx1" ) + 0x0000;	
+}
+
+static VIDEO_UPDATE( cga_poisk2 )
+{
+	UINT8 *gfx = memory_region(screen->machine, "gfx1");
+	running_device *devconf = devtag_get_device(screen->machine, CGA_MC6845_NAME);
+	mc6845_update( devconf, bitmap, cliprect);
+
+	/* Check for changes in font dipsetting */
+	switch ( CGA_FONT & 0x01 )
+	{
+	case 0:
+		cga.chr_gen = gfx + 0x0800;
+		break;
+	case 1:
+		cga.chr_gen = gfx + 0x0000;
+		break;
+	}
+	return 0;
+}
 
 /***************************************************************************
   Draw text mode with 40x25 characters (default) with high intensity bg.

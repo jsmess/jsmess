@@ -5,6 +5,7 @@ New System Drivers Supported:
 - Casio PV-1000  [Wilbert Pol, plgDavid]
 - Research Machines Nimbus [Phill Harvey-Smith]
 - Iskra-1031 [Miodrag Milanovic]
+- Iskra-1030M [Miodrag Milanovic]
 - EC-1840, EC-1841, EC-1845 [Miodrag Milanovic]
 - Spektr BK-001 [Miodrag Milanovic]
 - Zvezda [Miodrag Milanovic]

@@ -1322,6 +1322,18 @@ static IRQ_CALLBACK(pc_irq_callback)
 MACHINE_START( pc )
 {
 	pc_fdc_init( machine, &fdc_interface_nc );
+	
+	FILE *f = fopen("CGAN.DAT","rb");
+	UINT8 data[4096];
+	fread(data,1,4096,f);
+	fclose(f);
+	f = fopen("POISK.CGA","wb");
+	int i;
+	for(i=0;i<4096;i+=2) {
+		fwrite(data+i,1,1,f);
+	}
+	fclose(f);
+	
 }
 
 

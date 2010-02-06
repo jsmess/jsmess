@@ -2467,6 +2467,69 @@ static MACHINE_DRIVER_START( iskr1031 )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( poisk2 )
+	MDRV_DRIVER_DATA(pc_state)
+	/* basic machine hardware */
+	MDRV_CPU_PC(pc16, pc16, I8086, 4772720, pc_frame_interrupt)
+
+	MDRV_QUANTUM_TIME(HZ(60))
+
+	MDRV_MACHINE_START(pc)
+	MDRV_MACHINE_RESET(pc)
+
+	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
+
+	MDRV_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
+
+	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+
+	MDRV_I8255A_ADD( "ppi8255", ibm5160_ppi8255_interface )
+
+	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
+
+	/* video hardware */
+	MDRV_IMPORT_FROM( pcvideo_poisk2 )
+	MDRV_GFXDECODE(ibm5150)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+#ifdef ADLIB
+	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
+	MDRV_SOUND_CONFIG(pc_ym3812_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+#endif
+#ifdef GAMEBLASTER
+	MDRV_SOUND_ADD("saa1099.1", SAA1099, 4772720)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ADD("saa1099.2", SAA1099, 4772720)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+#endif
+
+	/* keyboard */
+	MDRV_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+
+	/* printer */
+	MDRV_PC_LPT_ADD("lpt_0", pc_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_1", pc_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
+
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("640K")
+MACHINE_DRIVER_END
+
 
 #if 0
 	//pcjr roms? (incomplete dump, most likely 64 kbyte)
@@ -3014,7 +3077,6 @@ ROM_END
 
 ROM_START( iskr1031 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
-	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_SYSTEM_BIOS(0, "v1", "v1")
 	ROMX_LOAD( "150-02.bin", 0xfc000, 0x2000, CRC(e33fb974) SHA1(f5f3ece67c025c0033716ff516e1a34fbeb32749), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "150-03.bin", 0xfc001, 0x2000, CRC(8c482258) SHA1(90ef48955e0df556dc06a000a797ef42ccf430c5), ROM_SKIP(1) | ROM_BIOS(1))
@@ -3023,8 +3085,15 @@ ROM_START( iskr1031 )
 	ROMX_LOAD( "150-07.bin", 0xfc001, 0x2000, CRC(0dc4b65a) SHA1(c96f066251a7343eac8113ea9dcb2cb12d0334d5), ROM_SKIP(1) | ROM_BIOS(2))
 	
 	ROM_REGION(0x2000,"gfx1", 0)	
-	// Here CGA rom with cyrillic support should be added
-	ROM_LOAD( "rus_cga.bin", 0x0000, 0x2000, BAD_DUMP CRC(f23c2425) SHA1(fd40daf0aa629f479b40ca9ac7aea369fa020af6))
+	ROM_LOAD( "iskra-1031_font.bin", 0x0000, 0x2000, CRC(f4d62e80) SHA1(ad7e81a0c9abc224671422bbcf6f6262da92b510))
+ROM_END
+
+ROM_START( iskr1030m )
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
+	ROMX_LOAD( "iskra-1030m_0.rom", 0xfc000, 0x2000, CRC(0d698e19) SHA1(2fe117c9f4f8c4b59085d5a41f919d743c425fdd), ROM_SKIP(1))
+	ROMX_LOAD( "iskra-1030m_1.rom", 0xfc001, 0x2000, CRC(fe808337) SHA1(b0b7ebe14324ada8aa9a6926a82b18e80f78a257), ROM_SKIP(1))
+	ROM_REGION(0x2000,"gfx1", 0)	
+	ROM_LOAD( "iskra-1030m.chr", 0x0000, 0x2000, CRC(50b162eb) SHA1(5bd7cb1705a69bd16115a4c9ed1c2748a5c8ad51))
 ROM_END
 
 ROM_START( ec1840 )
@@ -3105,15 +3174,42 @@ ROM_END
 
 ROM_START( poisk1 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
-	ROM_LOAD( "poisk.bin", 0xfe000, 0x2000, CRC(1a85f671) SHA1(f0e59b2c4d92164abca55a96a58071ce869ff988))
+	ROM_LOAD( "b_hd_v11.rf2", 0xc8000, 0x0800, CRC(a19c39b2) SHA1(57faa56b320abf801fedbed578cf97d253e5b777)) // HDD controller
+  
+	ROM_LOAD( "b_ngmd_n.rf2", 0x0000, 0x0800, CRC(967e172a) SHA1(95117c40fd9f624fee08ccf37f615b16ff249688)) // Floppy
+	ROM_LOAD( "b_ngmd_t.rf2", 0x0000, 0x0800, CRC(630010b1) SHA1(50876fe4f5f4f32a242faa70f9154574cd315ec4)) // Floppy
+	ROM_LOAD( "biosp1s.rf4",  0xfe000, 0x2000, CRC(1a85f671) SHA1(f0e59b2c4d92164abca55a96a58071ce869ff988)) // Main BIOS
+	ROM_LOAD( "boot_net.rf4", 0x0000, 0x2000, CRC(316c2030) SHA1(d043325596455772252e465b85321f1b5c529d0b)) // NET BUIS
+
+	// probably card BIOSes
+	ROM_LOAD( "p1_t_i_o.rf4", 0x0000, 0x2000, CRC(18a781de) SHA1(7267970ee27e3ea1d972bee8e74b17bac1051619))
+	ROM_LOAD( "p1_t_pls.rf4", 0x0000, 0x2000, CRC(c8210ffb) SHA1(f2d1a6c90e4708bcc56186b2fb906fa852667084))
+	ROM_LOAD( "p1_t_pol.rf4", 0x0000, 0x2000, CRC(c8210ffb) SHA1(f2d1a6c90e4708bcc56186b2fb906fa852667084))
+	ROM_LOAD( "p1_t_ram.rf4", 0x0000, 0x2000, CRC(e42f5a61) SHA1(ce2554eae8f0d2b6d482890dd198cf7e2d29c655))
 ROM_END
 
 ROM_START( poisk2 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
-	ROMX_LOAD( "poisk2-low.rom", 0xfc000, 0x2000, CRC(0eb2ea7f) SHA1(67bb5fec53ebfa2a5cad2a3d3d595678d6023024), ROM_SKIP(1) )  
-	ROMX_LOAD( "poisk2-hi.rom",  0xfc001, 0x2000, CRC(22197297) SHA1(506c7e63027f734d62ef537f484024548546011f), ROM_SKIP(1) )  
+	ROM_SYSTEM_BIOS(0, "v20", "v2.0")
+	ROMX_LOAD( "b_p2_20h.rf4", 0xfc001, 0x2000, CRC(d53189b7) SHA1(ace40f1a40642b51fe5d2874acef81e48768b23b), ROM_SKIP(1) | ROM_BIOS(1))  
+	ROMX_LOAD( "b_p2_20l.rf4", 0xfc000, 0x2000, CRC(2d61fcc9) SHA1(11873c8741ba37d6c2fe1f482296aece514b7618), ROM_SKIP(1) | ROM_BIOS(1))  
+	ROM_SYSTEM_BIOS(1, "v21", "v2.1")
+	ROMX_LOAD( "b_p2_21h.rf4", 0xfc001, 0x2000, CRC(22197297) SHA1(506c7e63027f734d62ef537f484024548546011f), ROM_SKIP(1) | ROM_BIOS(2))  
+	ROMX_LOAD( "b_p2_21l.rf4", 0xfc000, 0x2000, CRC(0eb2ea7f) SHA1(67bb5fec53ebfa2a5cad2a3d3d595678d6023024), ROM_SKIP(1) | ROM_BIOS(2))  
+	ROM_SYSTEM_BIOS(2, "v24", "v2.4")
+	ROMX_LOAD( "b_p2_24h.rf4", 0xfc001, 0x2000, CRC(ea842c9e) SHA1(dcdbf27374149dae0ef76d410cc6c615d9b99372), ROM_SKIP(1) | ROM_BIOS(3))  
+	ROMX_LOAD( "b_p2_24l.rf4", 0xfc000, 0x2000, CRC(02f21250) SHA1(f0b133fb4470bddf2f7bf59688cf68198ed8ce55), ROM_SKIP(1) | ROM_BIOS(3))  
+	ROM_SYSTEM_BIOS(3, "v21d", "v2.1d")
+	ROMX_LOAD( "opp2_1h.rf4", 0xfc001, 0x2000, CRC(b7cd7f4f) SHA1(ac473822fb44d7b898d628732cf0a27fcb4d26d6), ROM_SKIP(1) | ROM_BIOS(4))  
+	ROMX_LOAD( "opp2_1l.rf4", 0xfc000, 0x2000, CRC(1971dca3) SHA1(ecd61cc7952af834d8abc11db372c3e70775489d), ROM_SKIP(1) | ROM_BIOS(4))  
+	ROM_SYSTEM_BIOS(4, "v22d", "v2.2d")
+	ROMX_LOAD( "opp2_2h.rf4", 0xfc001, 0x2000, CRC(b9e3a5cc) SHA1(0a28afbff612471ee81d69a98789e75253c57a30), ROM_SKIP(1) | ROM_BIOS(5))  	
+	ROMX_LOAD( "opp2_2l.rf4", 0xfc000, 0x2000, CRC(6877aad6) SHA1(1d0031d044beb4f9f321e3c8fdedf57467958900), ROM_SKIP(1) | ROM_BIOS(5))  
+	ROM_SYSTEM_BIOS(5, "v23d", "v2.3d")
+	ROMX_LOAD( "opp2_3h.rf4", 0xfc001, 0x2000, CRC(ac7d4f06) SHA1(858d6e084a38814280b3e29fb54971f4f532e484), ROM_SKIP(1) | ROM_BIOS(6))  
+	ROMX_LOAD( "opp2_3l.rf4", 0xfc000, 0x2000, CRC(3c877ea1) SHA1(0753168659653538311c0ad1df851cbbdba426f4), ROM_SKIP(1) | ROM_BIOS(6))  			
 	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)		
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
+	ROM_LOAD( "p2_ecga.rf4", 0x0000, 0x2000, CRC(d537f665) SHA1(d70f085b9b0cbd53df7c3122fbe7592998ba8fed))
 ROM_END
 /***************************************************************************
 
@@ -3151,10 +3247,11 @@ COMP ( 1987,    pcherc,		ibm5150,	0,	pcherc,     pcmda,      ibm5150,    "Generi
 COMP ( 1987,	xtvga,		ibm5150,	0,	xtvga,      xtvga,	pc_vga,	    "Generic",  "PC/XT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING)
 
 COMP ( 1989,	iskr1031,	ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "Iskra-1031" , GAME_NOT_WORKING)
+COMP ( 1989,	iskr1030m,	ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "Iskra-1030M" , GAME_NOT_WORKING)
 COMP ( 1987,	ec1840,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "EC-1840" , GAME_NOT_WORKING)
 COMP ( 1987,	ec1841,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "EC-1841" , GAME_NOT_WORKING)
 COMP ( 1989,	ec1845,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "EC-1845" , GAME_NOT_WORKING)
 COMP ( 1989,	mk88,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "MK-88" , GAME_NOT_WORKING)
 COMP ( 1990,	poisk1,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "Poisk-1" , GAME_NOT_WORKING)
-COMP ( 1991,	poisk2,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "Poisk-2" , GAME_NOT_WORKING)
+COMP ( 1991,	poisk2,		ibm5150,	0,	poisk2,        pccga,	pccga,	    "",  "Poisk-2" , GAME_NOT_WORKING)
 
