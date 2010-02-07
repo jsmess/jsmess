@@ -139,14 +139,14 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 	UINT16 tile_bank,pal_bank;
 
 	count = (state->tilemap_base_addr[layer]);
-	/* FIXME: I guess that this truly controls tilemap paging. */
-	if((state->tilemap_flags[layer] & 0x0f00) == 0xa00)
+
+	switch(state->tilemap_flags[layer] & 0x0f00)
 	{
-		xsize = 128;
-		ysize = 32;
+		case 0x600: xsize = 64; ysize = 32; break;
+		case 0xa00:	xsize = 128; ysize = 32; break;
+		case 0xc00: xsize = 64; ysize = 64; break;
+		default: xsize = 32; ysize = 32; break;
 	}
-	else
-		xsize = ysize = (state->video_flags & 0x100) ? 64 : 32;
 
 	scrollx = (state->tilemap_scrollx[layer] & 0x800) ? ((state->tilemap_scrollx[layer] & (xsize*8-1)) - xsize*8) : (state->tilemap_scrollx[layer] & (xsize*8-1));
 	scrolly = (state->tilemap_scrolly[layer] & 0x800) ? ((state->tilemap_scrolly[layer] & (ysize*8-1)) - ysize*8) : (state->tilemap_scrolly[layer] & (ysize*8-1));
@@ -155,7 +155,7 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 
 	switch(gfx_mode)
 	{
-		case 7:  region = 2; tile_bank = 0x1c00; pal_bank = 0x38; break;
+		case 7:  region = 2; tile_bank = 0x1c00; pal_bank = 0x00; break;
 		case 4:  region = 0; tile_bank = 0x400;  pal_bank = 0x00; break;
 		case 2:  region = 1; tile_bank = 0x400;  pal_bank = 0x00; break;
 		case 0:  region = 1; tile_bank = 0;      pal_bank = 0x00; break;
@@ -182,6 +182,8 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx-xsize*8,(y*8)-scrolly,0);
 				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly-ysize*8,0);
 				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx-xsize*8,(y*8)-scrolly-ysize*8,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+xsize*8,(y*8)-scrolly-ysize*8,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx-xsize*8,(y*8)-scrolly+ysize*8,0);
 			}
 			count++;
 		}
