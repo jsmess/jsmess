@@ -495,6 +495,12 @@ static DEVICE_START( c1581 )
 	/* set floppy density */
 	wd17xx_set_density(c1581->wd1770, DEN_MFM_LO);
 
+	/* patch out DAM CRC check */
+	UINT8 *rom = device->subregion("c1581")->base.u8;
+	rom[0x4d31] = 0x60;
+	rom[0x4fa9] = 0xea;
+	rom[0x4faa] = 0xea;
+
 	/* register for state saving */
 	state_save_register_device_item(device, 0, c1581->address);
 	state_save_register_device_item(device, 0, c1581->data_out);
