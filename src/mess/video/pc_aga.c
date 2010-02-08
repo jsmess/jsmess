@@ -736,6 +736,9 @@ VIDEO_START( pc200 )
 			fatalerror("AGA:  Bus width %d not supported\n", buswidth);
 			break;
 	}
+	
+	aga.mda_chr_gen = memory_region(machine, "gfx1");
+	aga.cga_chr_gen = memory_region(machine, "gfx1") + 0x1000;	
 }
 
 
