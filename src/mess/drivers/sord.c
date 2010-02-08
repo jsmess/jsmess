@@ -58,9 +58,17 @@
 /* PI-5 interface is required. mode 2 of the 8255 is used to communicate with the FD-5 */
 
 
-static MACHINE_RESET( sord_m5 );
+typedef struct _sord_state sord_state;
+struct _sord_state
+{
+	UINT8 fd5_databus;
+	int fd5_port_0x020_data;
+	int obfa;
+	int ibfa;
+	int intra;
+};
 
-static UINT8 fd5_databus;
+static MACHINE_RESET( sord_m5 );
 
 static ADDRESS_MAP_START( sord_fd5_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x03fff) AM_ROM	/* internal rom */
@@ -68,25 +76,25 @@ static ADDRESS_MAP_START( sord_fd5_mem , ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
-static int obfa,ibfa, intra;
-static int fd5_port_0x020_data;
-
 /* stb and ack automatically set on read/write? */
 static WRITE8_HANDLER(fd5_communication_w)
 {
+	sord_state *state = (sord_state *)space->machine->driver_data;
+
 	cpu_yield(space->cpu);
 
-	fd5_port_0x020_data = data;
+	state->fd5_port_0x020_data = data;
 	LOG(("fd5 0x020: %02x %04x\n",data,cpu_get_pc(space->cpu)));
 }
 
 static  READ8_HANDLER(fd5_communication_r)
 {
+	sord_state *state = (sord_state *)space->machine->driver_data;
 	int data;
 
 	cpu_yield(space->cpu);
 
-	data = (obfa<<3)|(ibfa<<2)|2;
+	data = (state->obfa<<3)|(state->ibfa<<2)|2;
 	LOG(("fd5 0x030: %02x %04x\n",data, cpu_get_pc(space->cpu)));
 
 	return data;
@@ -94,22 +102,26 @@ static  READ8_HANDLER(fd5_communication_r)
 
 static READ8_HANDLER(fd5_data_r)
 {
+	sord_state *state = (sord_state *)space->machine->driver_data;
+
 	cpu_yield(space->cpu);
 
-	LOG(("fd5 0x010 r: %02x %04x\n",fd5_databus,cpu_get_pc(space->cpu)));
+	LOG(("fd5 0x010 r: %02x %04x\n",state->fd5_databus,cpu_get_pc(space->cpu)));
 
 	ppi8255_set_port_c(devtag_get_device(space->machine, "ppi8255"), 0x50);
 	ppi8255_set_port_c(devtag_get_device(space->machine, "ppi8255"), 0x10);
 	ppi8255_set_port_c(devtag_get_device(space->machine, "ppi8255"), 0x50);
 
-	return fd5_databus;
+	return state->fd5_databus;
 }
 
 static WRITE8_HANDLER(fd5_data_w)
 {
+	sord_state *state = (sord_state *)space->machine->driver_data;
+
 	LOG(("fd5 0x010 w: %02x %04x\n",data,cpu_get_pc(space->cpu)));
 
-	fd5_databus = data;
+	state->fd5_databus = data;
 
 	/* set stb on data write */
 	ppi8255_set_port_c(devtag_get_device(space->machine, "ppi8255"), 0x50);
@@ -185,9 +197,11 @@ static MACHINE_RESET( sord_m5_fd5 )
 
 static READ8_DEVICE_HANDLER(sord_ppi_porta_r)
 {
+	sord_state *state = (sord_state *)device->machine->driver_data;
+
 	cpu_yield(devtag_get_device(device->machine, "maincpu"));
 
-	return fd5_databus;
+	return state->fd5_databus;
 }
 
 static READ8_DEVICE_HANDLER(sord_ppi_portb_r)
@@ -201,6 +215,8 @@ static READ8_DEVICE_HANDLER(sord_ppi_portb_r)
 
 static READ8_DEVICE_HANDLER(sord_ppi_portc_r)
 {
+	sord_state *state = (sord_state *)device->machine->driver_data;
+
 	cpu_yield(devtag_get_device(device->machine, "maincpu"));
 
 	LOG(("m5 read from pi5 port c %04x\n", cpu_get_pc(devtag_get_device(device->machine, "maincpu"))));
@@ -222,19 +238,21 @@ static READ8_DEVICE_HANDLER(sord_ppi_portc_r)
 	/* FD5 bit 1 -> M5 bit 0 */
 	return (
 			/* FD5 bit 0-> M5 bit 2 */
-			((fd5_port_0x020_data & 0x01)<<2) |
+			((state->fd5_port_0x020_data & 0x01)<<2) |
 			/* FD5 bit 2-> M5 bit 1 */
-			((fd5_port_0x020_data & 0x04)>>1) |
+			((state->fd5_port_0x020_data & 0x04)>>1) |
 			/* FD5 bit 1-> M5 bit 0 */
-			((fd5_port_0x020_data & 0x02)>>1)
+			((state->fd5_port_0x020_data & 0x02)>>1)
 			);
 }
 
 static WRITE8_DEVICE_HANDLER(sord_ppi_porta_w)
 {
+	sord_state *state = (sord_state *)device->machine->driver_data;
+
 	cpu_yield(devtag_get_device(device->machine, "maincpu"));
 
-	fd5_databus = data;
+	state->fd5_databus = data;
 }
 
 static WRITE8_DEVICE_HANDLER(sord_ppi_portb_w)
@@ -261,9 +279,11 @@ static WRITE8_DEVICE_HANDLER(sord_ppi_portb_w)
 
 static WRITE8_DEVICE_HANDLER(sord_ppi_portc_w)
 {
-	obfa = (data & 0x80) ? 1 : 0;
-	intra = (data & 0x08) ? 1 : 0;
-	ibfa = (data & 0x20) ? 1 : 0;
+	sord_state *state = (sord_state *)device->machine->driver_data;
+
+	state->obfa = (data & 0x80) ? 1 : 0;
+	state->intra = (data & 0x08) ? 1 : 0;
+	state->ibfa = (data & 0x20) ? 1 : 0;
 
 	cpu_yield(devtag_get_device(device->machine, "maincpu"));
 	LOG(("m5 write to pi5 port c: %02x %04x\n", data, cpu_get_pc(devtag_get_device(device->machine, "maincpu"))));
@@ -517,6 +537,9 @@ static MACHINE_RESET( sord_m5 )
 
 
 static MACHINE_DRIVER_START( sord_m5 )
+
+	MDRV_DRIVER_DATA( sord_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/4)
 	MDRV_CPU_PROGRAM_MAP(sord_m5_mem)

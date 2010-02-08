@@ -11,33 +11,42 @@
 #include "cpu/i8008/i8008.h"
 #include "machine/teleprinter.h"
 
-static UINT16 tty_data;
-static UINT8 tty_key_data;
-static int tty_cnt  = 0;
+typedef struct _mod8_state mod8_state;
+struct _mod8_state
+{
+	UINT16 tty_data;
+	UINT8 tty_key_data;
+	int tty_cnt;
+};
 
 static WRITE8_HANDLER(out_w)
 {
+	mod8_state *state = (mod8_state *)space->machine->driver_data;
 	running_device *devconf = devtag_get_device(space->machine, TELEPRINTER_TAG);
 
-	tty_data >>= 1;
-	tty_data |= (data & 0x01) ? 0x8000 : 0;
-	tty_cnt++;
-	if (tty_cnt==10) {
-		teleprinter_write(devconf,0,(tty_data >> 7) & 0x7f);
-		tty_cnt = 0;
+	state->tty_data >>= 1;
+	state->tty_data |= (data & 0x01) ? 0x8000 : 0;
+	state->tty_cnt++;
+	if (state->tty_cnt==10) {
+		teleprinter_write(devconf,0,(state->tty_data >> 7) & 0x7f);
+		state->tty_cnt = 0;
 	}
 }
 
 static WRITE8_HANDLER(tty_w)
 {
-	tty_data = 0;
-	tty_cnt = 0;
+	mod8_state *state = (mod8_state *)space->machine->driver_data;
+
+	state->tty_data = 0;
+	state->tty_cnt = 0;
 }
 
 static READ8_HANDLER(tty_r)
 {
-	UINT8 d = tty_key_data & 0x01;
-	tty_key_data >>= 1;
+	mod8_state *state = (mod8_state *)space->machine->driver_data;
+	UINT8 d = state->tty_key_data & 0x01;
+
+	state->tty_key_data >>= 1;
 	return d;
 }
 
@@ -71,7 +80,9 @@ static MACHINE_RESET(mod8)
 
 static WRITE8_DEVICE_HANDLER( mod8_kbd_put )
 {
-	tty_key_data = data ^ 0xff;
+	mod8_state *state = (mod8_state *)device->machine->driver_data;
+
+	state->tty_key_data = data ^ 0xff;
 	cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
 }
 
@@ -81,6 +92,9 @@ static GENERIC_TELEPRINTER_INTERFACE( mod8_teleprinter_intf )
 };
 
 static MACHINE_DRIVER_START( mod8 )
+
+    MDRV_DRIVER_DATA( mod8_state )
+
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8008, 800000)
     MDRV_CPU_PROGRAM_MAP(mod8_mem)

@@ -10,25 +10,25 @@
 #include "machine/beta.h"
 #include "devices/messram.h"
 
-static int ROMSelection;
-static running_device* beta;
-
 static DIRECT_UPDATE_HANDLER( atm_direct )
 {
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	running_device *beta = devtag_get_device(space->machine, BETA_DISK_TAG);
 	UINT16 pc = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), REG_GENPCBASE);
 
 	if (beta->started && betadisk_is_active(beta))
 	{
 		if (pc >= 0x4000)
 		{
-			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ? 1 : 0;
+			state->ROMSelection = ((state->port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable(beta);
 			memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-			memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu") + 0x010000 + (ROMSelection<<14));
+			memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu") + 0x010000 + (state->ROMSelection<<14));
 		}
-	} else if (((pc & 0xff00) == 0x3d00) && (ROMSelection==1))
+	}
+	else if (((pc & 0xff00) == 0x3d00) && (state->ROMSelection==1))
 	{
-		ROMSelection = 3;
+		state->ROMSelection = 3;
 		if (beta->started)
 			betadisk_enable(beta);
 
@@ -36,10 +36,10 @@ static DIRECT_UPDATE_HANDLER( atm_direct )
 	if((address>=0x0000) && (address<=0x3fff))
 	{
 		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-		if (ROMSelection == 3) {
+		if (state->ROMSelection == 3) {
 			direct->raw = direct->decrypted =  memory_region(space->machine, "maincpu") + 0x018000 ;
 		} else {
-			direct->raw = direct->decrypted =  memory_region(space->machine, "maincpu") + 0x010000 + (ROMSelection<<14);
+			direct->raw = direct->decrypted =  memory_region(space->machine, "maincpu") + 0x010000 + (state->ROMSelection<<14);
 		}
 		memory_set_bankptr(space->machine, "bank1", direct->raw);
 		return ~0;
@@ -49,30 +49,36 @@ static DIRECT_UPDATE_HANDLER( atm_direct )
 
 static void atm_update_memory(running_machine *machine)
 {
-	spectrum_screen_location = messram_get_ptr(devtag_get_device(machine, "messram")) + ((spectrum_128_port_7ffd_data & 8) ? (7<<14) : (5<<14));
+	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	running_device *beta = devtag_get_device(machine, BETA_DISK_TAG);
+	UINT8 *messram = messram_get_ptr(devtag_get_device(machine, "messram"));
 
-	memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + ((spectrum_128_port_7ffd_data & 0x07) * 0x4000));
+	state->screen_location = messram + ((state->port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
-	if (beta->started && betadisk_is_active(beta) && !( spectrum_128_port_7ffd_data & 0x10 ) )
+	memory_set_bankptr(machine, "bank4", messram + ((state->port_7ffd_data & 0x07) * 0x4000));
+
+	if (beta->started && betadisk_is_active(beta) && !( state->port_7ffd_data & 0x10 ) )
 	{
-		ROMSelection = 3;
+		state->ROMSelection = 3;
 	}
 	else {
 		/* ROM switching */
-		ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ;
+		state->ROMSelection = ((state->port_7ffd_data>>4) & 0x01) ;
 	}
 	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x010000 + (ROMSelection<<14));
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x010000 + (state->ROMSelection<<14));
 }
 
 static WRITE8_HANDLER(atm_port_7ffd_w)
 {
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+
 	/* disable paging */
-	if (spectrum_128_port_7ffd_data & 0x20)
+	if (state->port_7ffd_data & 0x20)
 		return;
 
 	/* store new state */
-	spectrum_128_port_7ffd_data = data;
+	state->port_7ffd_data = data;
 
 	/* update memory */
 	atm_update_memory(space->machine);
@@ -93,8 +99,10 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( atm )
 {
+	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	UINT8 *messram = messram_get_ptr(devtag_get_device(machine, "messram"));
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	beta = devtag_get_device(machine, BETA_DISK_TAG);
+	running_device *beta = devtag_get_device(machine, BETA_DISK_TAG);
 
 	memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
 	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
@@ -106,15 +114,16 @@ static MACHINE_RESET( atm )
 
 	memory_set_direct_update_handler( space, atm_direct );
 
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,128*1024);
+	memset(messram,0,128*1024);
 
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + (5<<14));
+	memory_set_bankptr(machine, "bank2", messram + (5<<14));
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + (2<<14));
+	memory_set_bankptr(machine, "bank3", messram + (2<<14));
 
-	spectrum_128_port_7ffd_data = 0;
+	state->port_7ffd_data = 0;
+	state->port_1ffd_data = -1;
 
 	atm_update_memory(machine);
 }

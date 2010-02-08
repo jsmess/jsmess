@@ -184,39 +184,34 @@ D6-D7 - not used. ( yet ? )
 
 /* rom 0=zx128, 1=zx48, 2 = service monitor, 3=tr-dos */
 
-static int scorpion_256_port_1ffd_data = 0;
-
-static int ROMSelection;
-
-static running_device* beta;
-
-//static UINT8 *rom_pointer;
-
 static void scorpion_update_memory(running_machine *machine)
 {
+	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	UINT8 *messram = messram_get_ptr(devtag_get_device(machine, "messram"));
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	spectrum_screen_location = messram_get_ptr(devtag_get_device(machine, "messram")) + ((spectrum_128_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
-	memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + (((spectrum_128_port_7ffd_data & 0x07) | ((scorpion_256_port_1ffd_data & 0x10)>>1)) * 0x4000));
+	state->screen_location = messram + ((state->port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
-	if ((scorpion_256_port_1ffd_data & 0x01)==0x01)
+	memory_set_bankptr(machine, "bank4", messram + (((state->port_7ffd_data & 0x07) | ((state->port_1ffd_data & 0x10)>>1)) * 0x4000));
+
+	if ((state->port_1ffd_data & 0x01)==0x01)
 	{
 		memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram"))+(8<<14));
+		memory_set_bankptr(machine, "bank1", messram+(8<<14));
 		logerror("RAM\n");
 	}
 	else
 	{
-		if ((scorpion_256_port_1ffd_data & 0x02)==0x02)
+		if ((state->port_1ffd_data & 0x02)==0x02)
 		{
-			ROMSelection = 2;
+			state->ROMSelection = 2;
 		}
 		else
 		{
-			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ? 1 : 0;
+			state->ROMSelection = ((state->port_7ffd_data>>4) & 0x01) ? 1 : 0;
 		}
 		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x010000 + (ROMSelection<<14));
+		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x010000 + (state->ROMSelection<<14));
 	}
 
 
@@ -224,26 +219,29 @@ static void scorpion_update_memory(running_machine *machine)
 
 static DIRECT_UPDATE_HANDLER( scorpion_direct )
 {
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	running_device *beta = devtag_get_device(space->machine, BETA_DISK_TAG);
 	UINT16 pc = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), REG_GENPCBASE);
+
 	if (betadisk_is_active(beta))
 	{
 		if (pc >= 0x4000)
 		{
-			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ? 1 : 0;
+			state->ROMSelection = ((state->port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable(beta);
 			memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-			memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu") + 0x010000 + (ROMSelection<<14));
+			memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu") + 0x010000 + (state->ROMSelection<<14));
 		}
-	} else if (((pc & 0xff00) == 0x3d00) && (ROMSelection==1))
+	}
+	else if (((pc & 0xff00) == 0x3d00) && (state->ROMSelection==1))
 	{
-		ROMSelection = 3;
+		state->ROMSelection = 3;
 		betadisk_enable(beta);
-
 	}
 	if((address>=0x0000) && (address<=0x3fff))
 	{
 		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-		direct->raw = direct->decrypted =  memory_region(space->machine, "maincpu") + 0x010000 + (ROMSelection<<14);
+		direct->raw = direct->decrypted =  memory_region(space->machine, "maincpu") + 0x010000 + (state->ROMSelection<<14);
 		memory_set_bankptr(space->machine, "bank1", direct->raw);
 		return ~0;
 	}
@@ -252,9 +250,11 @@ static DIRECT_UPDATE_HANDLER( scorpion_direct )
 
 static TIMER_CALLBACK(nmi_check_callback)
 {
+	spectrum_state *state = (spectrum_state *)machine->driver_data;
+
 	if ((input_port_read(machine, "NMI") & 1)==1)
 	{
-		scorpion_256_port_1ffd_data |= 0x02;
+		state->port_1ffd_data |= 0x02;
 		scorpion_update_memory(machine);
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
@@ -262,12 +262,14 @@ static TIMER_CALLBACK(nmi_check_callback)
 
 static WRITE8_HANDLER(scorpion_port_7ffd_w)
 {
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+
 	/* disable paging */
-	if (spectrum_128_port_7ffd_data & 0x20)
+	if (state->port_7ffd_data & 0x20)
 		return;
 
 	/* store new state */
-	spectrum_128_port_7ffd_data = data;
+	state->port_7ffd_data = data;
 
 	/* update memory */
 	scorpion_update_memory(space->machine);
@@ -275,10 +277,12 @@ static WRITE8_HANDLER(scorpion_port_7ffd_w)
 
 static WRITE8_HANDLER(scorpion_port_1ffd_w)
 {
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+
 	/* if paging not disabled */
-	if ((spectrum_128_port_7ffd_data & 0x20)==0)
+	if ((state->port_7ffd_data & 0x20)==0)
 	{
-		scorpion_256_port_1ffd_data = data;
+		state->port_1ffd_data = data;
 		scorpion_update_memory(space->machine);
 	}
 }
@@ -300,27 +304,28 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( scorpion )
 {
+	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	UINT8 *messram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	running_device *beta = devtag_get_device(machine, BETA_DISK_TAG);
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	beta = devtag_get_device(machine, BETA_DISK_TAG);
 
 	memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
 
 	betadisk_disable(beta);
 	betadisk_clear_status(beta);
 
-	memory_set_direct_update_handler(space, scorpion_direct );
+	memory_set_direct_update_handler(space, scorpion_direct);
 
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,256*1024);
+	memset(messram,0,256*1024);
 
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + (5<<14));
+	memory_set_bankptr(machine, "bank2", messram + (5<<14));
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + (2<<14));
+	memory_set_bankptr(machine, "bank3", messram + (2<<14));
 
-	spectrum_128_port_7ffd_data = 0;
-	scorpion_256_port_1ffd_data = 0;
-
+	state->port_7ffd_data = 0;
+	state->port_1ffd_data = 0;
 	scorpion_update_memory(machine);
 }
 static MACHINE_START( scorpion )

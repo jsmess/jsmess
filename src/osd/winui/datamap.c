@@ -25,6 +25,7 @@
 #include <tchar.h>
 
 // standard C headers
+#include <stdlib.h>
 #include <stdarg.h>
 #include <ctype.h>
 #include <assert.h>

@@ -156,8 +156,6 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "formats/tzx_cas.h"
 #include "formats/spec_snqk.h"
 
-unsigned char *spectrum_screen_location = NULL;
-
 /****************************************************************************************************/
 /* Spectrum 48k functions */
 
@@ -168,14 +166,13 @@ unsigned char *spectrum_screen_location = NULL;
  bit 2-0: border colour
 */
 
-int spectrum_PreviousFE = 0;
-
 WRITE8_HANDLER(spectrum_port_fe_w)
 {
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
 	running_device *speaker = devtag_get_device(space->machine, "speaker");
 	unsigned char Changed;
 
-	Changed = spectrum_PreviousFE^data;
+	Changed = state->port_fe_data^data;
 
 	/* border colour changed? */
 	if ((Changed & 0x07)!=0)
@@ -196,7 +193,7 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 		cassette_output(devtag_get_device(space->machine, "cassette"), (data & (1<<3)) ? -1.0 : +1.0);
 	}
 
-	spectrum_PreviousFE = data;
+	state->port_fe_data = data;
 }
 
 static DIRECT_UPDATE_HANDLER(spectrum_direct)
@@ -213,13 +210,17 @@ static DIRECT_UPDATE_HANDLER(spectrum_direct)
 
 MACHINE_RESET( spectrum )
 {
-    const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-    memory_set_direct_update_handler(space, spectrum_direct);
+	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	memory_set_direct_update_handler(space, spectrum_direct);
+	state->port_7ffd_data = -1;
+	state->port_1ffd_data = -1;
 }
 
 static ADDRESS_MAP_START (spectrum_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_BASE(&spectrum_video_ram )
+	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_BASE_MEMBER(spectrum_state,video_ram)
 	AM_RANGE(0x5b00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -314,7 +315,10 @@ READ8_HANDLER(spectrum_port_df_r)
 
 static  READ8_HANDLER ( spectrum_port_ula_r )
 {
-	return video_screen_get_vpos(space->machine->primary_screen)<193 ? spectrum_video_ram[(video_screen_get_vpos(space->machine->primary_screen)&0xf8)<<2]:0xff;
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	int vpos = video_screen_get_vpos(space->machine->primary_screen);
+
+	return vpos<193 ? state->video_ram[(vpos&0xf8)<<2]:0xff;
 }
 
 /* ports are not decoded full.
@@ -526,6 +530,9 @@ static const cassette_config spectrum_cassette_config =
 };
 
 MACHINE_DRIVER_START( spectrum )
+
+	MDRV_DRIVER_DATA( spectrum_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(spectrum_mem)

@@ -30,6 +30,11 @@
 #include "utils.h"
 
 
+int timex_cart_type;
+UINT8 timex_cart_chunks;
+UINT8 *timex_cart_data;
+
+
 
 DEVICE_IMAGE_LOAD( timex_cart )
 {

@@ -170,21 +170,21 @@ static const ay8910_interface spectrum_ay_interface =
 /****************************************************************************************************/
 /* Spectrum 128 specific functions */
 
-int spectrum_128_port_7ffd_data = -1;
-
 static WRITE8_HANDLER(spectrum_128_port_7ffd_w)
 {
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+
    /* D0-D2: RAM page located at 0x0c000-0x0ffff */
    /* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
    /* D4 - ROM select - which rom paged into 0x0000-0x03fff */
    /* D5 - Disable paging */
 
 	/* disable paging? */
-	if (spectrum_128_port_7ffd_data & 0x20)
+	if (state->port_7ffd_data & 0x20)
 			return;
 
 	/* store new state */
-	spectrum_128_port_7ffd_data = data;
+	state->port_7ffd_data = data;
 
 	/* update memory */
 	spectrum_128_update_memory(space->machine);
@@ -192,31 +192,33 @@ static WRITE8_HANDLER(spectrum_128_port_7ffd_w)
 
 void spectrum_128_update_memory(running_machine *machine)
 {
+	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	UINT8 *messram = messram_get_ptr(devtag_get_device(machine, "messram"));
 	unsigned char *ChosenROM;
 	int ROMSelection;
 
-	if (spectrum_128_port_7ffd_data & 8)
+	if (state->port_7ffd_data & 8)
 	{
-			spectrum_screen_location = messram_get_ptr(devtag_get_device(machine, "messram")) + (7<<14);
+		state->screen_location = messram + (7<<14);
 	}
 	else
 	{
-			spectrum_screen_location = messram_get_ptr(devtag_get_device(machine, "messram")) + (5<<14);
+		state->screen_location = messram + (5<<14);
 	}
 
 	/* select ram at 0x0c000-0x0ffff */
 	{
-			int ram_page;
-			unsigned char *ram_data;
+		int ram_page;
+		unsigned char *ram_data;
 
-			ram_page = spectrum_128_port_7ffd_data & 0x07;
-			ram_data = messram_get_ptr(devtag_get_device(machine, "messram")) + (ram_page<<14);
+		ram_page = state->port_7ffd_data & 0x07;
+		ram_data = messram + (ram_page<<14);
 
-			memory_set_bankptr(machine, "bank4", ram_data);
+		memory_set_bankptr(machine, "bank4", ram_data);
 	}
 
 	/* ROM switching */
-	ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01);
+	ROMSelection = ((state->port_7ffd_data>>4) & 0x01);
 
 	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
 
@@ -227,7 +229,10 @@ void spectrum_128_update_memory(running_machine *machine)
 
 static  READ8_HANDLER ( spectrum_128_ula_r )
 {
-	return video_screen_get_vpos(space->machine->primary_screen)<193 ? spectrum_screen_location[0x1800|(video_screen_get_vpos(space->machine->primary_screen)&0xf8)<<2]:0xff;
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	int vpos = video_screen_get_vpos(space->machine->primary_screen);
+
+	return vpos<193 ? state->screen_location[0x1800|(vpos&0xf8)<<2]:0xff;
 }
 
 static ADDRESS_MAP_START (spectrum_128_io, ADDRESS_SPACE_IO, 8)
@@ -250,20 +255,24 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( spectrum_128 )
 {
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,128*1024);
+	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	UINT8 *messram = messram_get_ptr(devtag_get_device(machine, "messram"));
+
+	memset(messram,0,128*1024);
 	/* 0x0000-0x3fff always holds ROM */
 
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + (5<<14));
+	memory_set_bankptr(machine, "bank2", messram + (5<<14));
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + (2<<14));
-
-	/* set initial ram config */
-	spectrum_128_port_7ffd_data = 0;
-	spectrum_128_update_memory(machine);
+	memory_set_bankptr(machine, "bank3", messram + (2<<14));
 
 	MACHINE_RESET_CALL(spectrum);
+
+	/* set initial ram config */
+	state->port_7ffd_data = 0;
+	state->port_1ffd_data = -1;
+	spectrum_128_update_memory(machine);
 }
 
 /* F4 Character Displayer */

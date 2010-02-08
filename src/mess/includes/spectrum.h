@@ -46,8 +46,27 @@
 #define TS2068_RIGHT_BORDER  96   /* Number of right hand border pixels */
 #define TS2068_SCREEN_WIDTH (TS2068_LEFT_BORDER + TS2068_DISPLAY_XSIZE + TS2068_RIGHT_BORDER)
 
+typedef struct _spectrum_state spectrum_state;
+struct _spectrum_state
+{
+	int port_fe_data;
+	int port_7ffd_data;
+	int port_1ffd_data;	/* scorpion and plus3 */
+	int port_ff_data; /* Display enhancement control */
+	int port_f4_data; /* Horizontal Select Register */
+
+	/* video support */
+	int frame_number;    /* Used for handling FLASH 1 */
+	int flash_invert;
+	UINT8 retrace_cycles;
+	UINT8 *video_ram;
+	UINT8 *screen_location;
+
+	int ROMSelection;
+};
+
+
 /*----------- defined in drivers/spectrum.c -----------*/
-extern unsigned char *spectrum_screen_location;
 
 INPUT_PORTS_EXTERN( spectrum );
 INPUT_PORTS_EXTERN( spec_plus );
@@ -60,26 +79,19 @@ extern READ8_HANDLER(spectrum_port_7f_r);
 extern READ8_HANDLER(spectrum_port_df_r);
 extern READ8_HANDLER(spectrum_port_fe_r);
 extern WRITE8_HANDLER(spectrum_port_fe_w);
-extern int spectrum_PreviousFE;
 
 /*----------- defined in drivers/spec128.c -----------*/
 MACHINE_DRIVER_EXTERN( spectrum_128 );
 
 extern void spectrum_128_update_memory(running_machine *machine);
-extern int spectrum_128_port_7ffd_data;
 
 /*----------- defined in drivers/specpls3.c -----------*/
-extern int spectrum_plus3_port_1ffd_data;
 extern void spectrum_plus3_update_memory(running_machine *machine);
 
 /*----------- defined in drivers/timex.c -----------*/
 extern void ts2068_update_memory(running_machine *machine);
-extern int ts2068_port_ff_data;
-extern int ts2068_port_f4_data;
 
 /*----------- defined in video/spectrum.c -----------*/
-extern int spectrum_frame_number;    /* Used for handling FLASH 1 */
-extern int spectrum_flash_invert;
 
 extern PALETTE_INIT( spectrum );
 
@@ -88,8 +100,6 @@ extern VIDEO_START( spectrum_128 );
 
 extern VIDEO_UPDATE( spectrum );
 extern VIDEO_EOF( spectrum );
-
-extern unsigned char *spectrum_video_ram;
 
 /*----------- defined in video/timex.c -----------*/
 extern VIDEO_EOF( ts2068 );

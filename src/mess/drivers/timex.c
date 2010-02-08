@@ -159,10 +159,6 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "machine/beta.h"
 #include "devices/messram.h"
 
-TIMEX_CART_TYPE timex_cart_type = TIMEX_CART_NONE;
-UINT8 timex_cart_chunks = 0x00;
-UINT8 *timex_cart_data;
-
 static const ay8910_interface spectrum_ay_interface =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -174,23 +170,26 @@ static const ay8910_interface spectrum_ay_interface =
 /* TS2048 specific functions */
 
 
-int ts2068_port_ff_data = -1; /* Display enhancement control */
-int ts2068_port_f4_data = -1; /* Horizontal Select Register */
-
 static  READ8_HANDLER(ts2068_port_f4_r)
 {
-		return ts2068_port_f4_data;
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+
+	return state->port_f4_data;
 }
 
 static WRITE8_HANDLER(ts2068_port_f4_w)
 {
-		ts2068_port_f4_data = data;
-		ts2068_update_memory(space->machine);
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+
+	state->port_f4_data = data;
+	ts2068_update_memory(space->machine);
 }
 
 static  READ8_HANDLER(ts2068_port_ff_r)
 {
-		return ts2068_port_ff_data;
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+
+	return state->port_ff_data;
 }
 
 static WRITE8_HANDLER(ts2068_port_ff_w)
@@ -201,9 +200,11 @@ static WRITE8_HANDLER(ts2068_port_ff_w)
            Bit  6   17ms Interrupt Inhibit
            Bit  7   Cartridge (0) / EXROM (1) select
         */
-		ts2068_port_ff_data = data;
-		ts2068_update_memory(space->machine);
-		logerror("Port %04x write %02x\n", offset, data);
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+
+	state->port_ff_data = data;
+	ts2068_update_memory(space->machine);
+	logerror("Port %04x write %02x\n", offset, data);
 }
 
 /*******************************************************************
@@ -226,6 +227,8 @@ static WRITE8_HANDLER(ts2068_port_ff_w)
  *******************************************************************/
 void ts2068_update_memory(running_machine *machine)
 {
+	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	UINT8 *messram = messram_get_ptr(devtag_get_device(machine, "messram"));
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	unsigned char *ChosenROM, *ExROM, *DOCK;
 
@@ -233,9 +236,9 @@ void ts2068_update_memory(running_machine *machine)
 
 	ExROM = memory_region(machine, "maincpu") + 0x014000;
 
-	if (ts2068_port_f4_data & 0x01)
+	if (state->port_f4_data & 0x01)
 	{
-		if (ts2068_port_ff_data & 0x80)
+		if (state->port_ff_data & 0x80)
 		{
 				memory_install_read_bank(space, 0x0000, 0x1fff, 0, 0, "bank1");
 				memory_unmap_write(space, 0x0000, 0x1fff, 0, 0);
@@ -272,9 +275,9 @@ void ts2068_update_memory(running_machine *machine)
 		logerror("0000-1fff HOME\n");
 	}
 
-	if (ts2068_port_f4_data & 0x02)
+	if (state->port_f4_data & 0x02)
 	{
-		if (ts2068_port_ff_data & 0x80)
+		if (state->port_ff_data & 0x80)
 		{
 			memory_set_bankptr(machine, "bank2", ExROM);
 			memory_install_read_bank(space, 0x2000, 0x3fff, 0, 0, "bank2");
@@ -310,9 +313,9 @@ void ts2068_update_memory(running_machine *machine)
 		logerror("2000-3fff HOME\n");
 	}
 
-	if (ts2068_port_f4_data & 0x04)
+	if (state->port_f4_data & 0x04)
 	{
-		if (ts2068_port_ff_data & 0x80)
+		if (state->port_ff_data & 0x80)
 		{
 			memory_set_bankptr(machine, "bank3", ExROM);
 			memory_install_read_bank(space, 0x4000, 0x5fff, 0, 0, "bank3");
@@ -340,16 +343,16 @@ void ts2068_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")));
-		memory_set_bankptr(machine, "bank11", messram_get_ptr(devtag_get_device(machine, "messram")));
+		memory_set_bankptr(machine, "bank3", messram);
+		memory_set_bankptr(machine, "bank11", messram);
 		memory_install_read_bank(space, 0x4000, 0x5fff, 0, 0, "bank3");
 		memory_install_write_bank(space, 0x4000, 0x5fff, 0, 0, "bank11");
 		logerror("4000-5fff RAM\n");
 	}
 
-	if (ts2068_port_f4_data & 0x08)
+	if (state->port_f4_data & 0x08)
 	{
-		if (ts2068_port_ff_data & 0x80)
+		if (state->port_ff_data & 0x80)
 		{
 			memory_set_bankptr(machine, "bank4", ExROM);
 			memory_install_read_bank(space, 0x6000, 0x7fff, 0, 0, "bank4");
@@ -377,16 +380,16 @@ void ts2068_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
-		memory_set_bankptr(machine, "bank12", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
+		memory_set_bankptr(machine, "bank4", messram + 0x2000);
+		memory_set_bankptr(machine, "bank12", messram + 0x2000);
 		memory_install_read_bank(space, 0x6000, 0x7fff, 0, 0, "bank4");
 		memory_install_write_bank(space, 0x6000, 0x7fff, 0, 0, "bank12");
 		logerror("6000-7fff RAM\n");
 	}
 
-	if (ts2068_port_f4_data & 0x10)
+	if (state->port_f4_data & 0x10)
 	{
-		if (ts2068_port_ff_data & 0x80)
+		if (state->port_ff_data & 0x80)
 		{
 			memory_set_bankptr(machine, "bank5", ExROM);
 			memory_install_read_bank(space, 0x8000, 0x9fff, 0, 0, "bank5");
@@ -414,16 +417,16 @@ void ts2068_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank5", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
-		memory_set_bankptr(machine, "bank13", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+		memory_set_bankptr(machine, "bank5", messram + 0x4000);
+		memory_set_bankptr(machine, "bank13", messram + 0x4000);
 		memory_install_read_bank(space, 0x8000, 0x9fff, 0, 0,"bank5");
 		memory_install_write_bank(space, 0x8000, 0x9fff, 0, 0,"bank13");
 		logerror("8000-9fff RAM\n");
 	}
 
-	if (ts2068_port_f4_data & 0x20)
+	if (state->port_f4_data & 0x20)
 	{
-		if (ts2068_port_ff_data & 0x80)
+		if (state->port_ff_data & 0x80)
 		{
 			memory_set_bankptr(machine, "bank6", ExROM);
 			memory_install_read_bank(space, 0xa000, 0xbfff, 0, 0, "bank6");
@@ -452,16 +455,16 @@ void ts2068_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank6", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x6000);
-		memory_set_bankptr(machine, "bank14", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x6000);
+		memory_set_bankptr(machine, "bank6", messram + 0x6000);
+		memory_set_bankptr(machine, "bank14", messram + 0x6000);
 		memory_install_read_bank(space, 0xa000, 0xbfff, 0, 0, "bank6");
 		memory_install_write_bank(space, 0xa000, 0xbfff, 0, 0, "bank14");
 		logerror("a000-bfff RAM\n");
 	}
 
-	if (ts2068_port_f4_data & 0x40)
+	if (state->port_f4_data & 0x40)
 	{
-		if (ts2068_port_ff_data & 0x80)
+		if (state->port_ff_data & 0x80)
 		{
 			memory_set_bankptr(machine, "bank7", ExROM);
 			memory_install_read_bank(space, 0xc000, 0xdfff, 0, 0, "bank7");
@@ -489,16 +492,16 @@ void ts2068_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank7", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
-		memory_set_bankptr(machine, "bank15", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+		memory_set_bankptr(machine, "bank7", messram + 0x8000);
+		memory_set_bankptr(machine, "bank15", messram + 0x8000);
 		memory_install_read_bank(space, 0xc000, 0xdfff, 0, 0, "bank7");
 		memory_install_write_bank(space, 0xc000, 0xdfff, 0, 0, "bank15");
 		logerror("c000-dfff RAM\n");
 	}
 
-	if (ts2068_port_f4_data & 0x80)
+	if (state->port_f4_data & 0x80)
 	{
-		if (ts2068_port_ff_data & 0x80)
+		if (state->port_ff_data & 0x80)
 		{
 			memory_set_bankptr(machine, "bank8", ExROM);
 			memory_install_read_bank(space, 0xe000, 0xffff, 0, 0, "bank8");
@@ -526,15 +529,15 @@ void ts2068_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank8", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xa000);
-		memory_set_bankptr(machine, "bank16", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xa000);
+		memory_set_bankptr(machine, "bank8", messram + 0xa000);
+		memory_set_bankptr(machine, "bank16", messram + 0xa000);
 		memory_install_read_bank(space, 0xe000, 0xffff, 0, 0, "bank8");
 		memory_install_write_bank(space, 0xe000, 0xffff, 0, 0, "bank16");
 		logerror("e000-ffff RAM\n");
 	}
 }
 
-static ADDRESS_MAP_START (ts2068_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(ts2068_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x1f, 0x1f) AM_READ( spectrum_port_1f_r ) AM_MIRROR(0xff00)
 	AM_RANGE(0x7f, 0x7f) AM_READ( spectrum_port_7f_r ) AM_MIRROR(0xff00)
 	AM_RANGE(0xdf, 0xdf) AM_READ( spectrum_port_df_r ) AM_MIRROR(0xff00)
@@ -545,7 +548,7 @@ static ADDRESS_MAP_START (ts2068_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xff, 0xff) AM_READWRITE( ts2068_port_ff_r,ts2068_port_ff_w ) AM_MIRROR(0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (ts2068_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(ts2068_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x1fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank9")
 	AM_RANGE(0x2000, 0x3fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank10")
 	AM_RANGE(0x4000, 0x5fff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank11")
@@ -559,11 +562,13 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( ts2068 )
 {
-	ts2068_port_ff_data = 0;
-	ts2068_port_f4_data = 0;
-	ts2068_update_memory(machine);
+	spectrum_state *state = (spectrum_state *)machine->driver_data;
 
+	state->port_ff_data = 0;
+	state->port_f4_data = 0;
+	ts2068_update_memory(machine);
 	MACHINE_RESET_CALL(spectrum);
+
 }
 
 
@@ -571,13 +576,15 @@ static MACHINE_RESET( ts2068 )
 /* TC2048 specific functions */
 
 
-static WRITE8_HANDLER (tc2048_port_ff_w)
+static WRITE8_HANDLER( tc2048_port_ff_w )
 {
-		ts2068_port_ff_data = data;
-		logerror("Port %04x write %02x\n", offset, data);
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+
+	state->port_ff_data = data;
+	logerror("Port %04x write %02x\n", offset, data);
 }
 
-static ADDRESS_MAP_START (tc2048_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(tc2048_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff)
 	AM_RANGE(0x1f, 0x1f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
 	AM_RANGE(0x7f, 0x7f) AM_READ(spectrum_port_7f_r) AM_MIRROR(0xff00)
@@ -585,17 +592,20 @@ static ADDRESS_MAP_START (tc2048_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(ts2068_port_ff_r,tc2048_port_ff_w)  AM_MIRROR(0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (tc2048_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(tc2048_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x3fff) AM_ROM
 	AM_RANGE( 0x4000, 0xffff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 ADDRESS_MAP_END
 
 static MACHINE_RESET( tc2048 )
 {
-	memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")));
-	ts2068_port_ff_data = 0;
+	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	UINT8 *messram = messram_get_ptr(devtag_get_device(machine, "messram"));
 
+	memory_set_bankptr(machine, "bank1", messram);
+	memory_set_bankptr(machine, "bank2", messram);
+	state->port_ff_data = 0;
+	state->port_f4_data = -1;
 	MACHINE_RESET_CALL(spectrum);
 }
 

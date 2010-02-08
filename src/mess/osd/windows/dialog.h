@@ -34,7 +34,11 @@ void *win_dialog_malloc(dialog_box *dialog, size_t size);
 char *win_dialog_strdup(dialog_box *dialog, const char *s);
 WCHAR *win_dialog_wcsdup(dialog_box *dialog, const WCHAR *s);
 
+#ifdef UNICODE
 #define win_dialog_tcsdup	win_dialog_wcsdup
+#else
+#define win_dialog_tcsdup	win_dialog_strdup
+#endif
 
 /* dialog operations */
 void win_dialog_runmodal(running_machine *machine, HWND wnd, dialog_box *dialog);

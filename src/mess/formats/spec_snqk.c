@@ -52,18 +52,19 @@ void spectrum_setup_sp(running_machine *machine, unsigned char *pSnapshot, unsig
  *******************************************************************/
 static void spectrum_update_paging(running_machine *machine)
 {
-    if (spectrum_128_port_7ffd_data == -1)
+    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    if (state->port_7ffd_data == -1)
         return;
-    if (spectrum_plus3_port_1ffd_data == -1)
+    if (state->port_1ffd_data == -1)
         spectrum_128_update_memory(machine);
 
     else
     {
-        if (spectrum_128_port_7ffd_data & 0x10)
+        if (state->port_7ffd_data & 0x10)
             /* Page in Spec 48K basic ROM */
-            spectrum_plus3_port_1ffd_data = 0x04;
+            state->port_1ffd_data = 0x04;
         else
-            spectrum_plus3_port_1ffd_data = 0;
+            state->port_1ffd_data = 0;
         spectrum_plus3_update_memory(machine);
     }
 }
@@ -71,9 +72,10 @@ static void spectrum_update_paging(running_machine *machine)
 /* Page in the 48K Basic ROM. Used when running 48K snapshots on a 128K machine. */
 static void spectrum_page_basicrom(running_machine *machine)
 {
-    if (spectrum_128_port_7ffd_data == -1)
+    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    if (state->port_7ffd_data == -1)
         return;
-    spectrum_128_port_7ffd_data |= 0x10;
+    state->port_7ffd_data |= 0x10;
     spectrum_update_paging(machine);
 }
 
@@ -156,6 +158,7 @@ error:
  *******************************************************************/
 void spectrum_setup_sp(running_machine *machine, unsigned char *pSnapshot, unsigned long SnapshotSize)
 {
+	spectrum_state *state = (spectrum_state *)machine->driver_data;
 	int i;
 	UINT8 lo, hi, data;
 	UINT16 offset, size;
@@ -220,7 +223,7 @@ void spectrum_setup_sp(running_machine *machine, unsigned char *pSnapshot, unsig
 		logerror("Unknown meaning of word on position 32: %04x.\n", (hi << 8) | lo);
 
 	/* Set border colour */
-	spectrum_PreviousFE = (spectrum_PreviousFE & 0xf8) | (pSnapshot[34] & 0x07);
+	state->port_fe_data = (state->port_fe_data & 0xf8) | (pSnapshot[34] & 0x07);
 	EventList_Reset();
 	border_set_last_color(pSnapshot[34] & 0x07);
 	border_force_redraw();
@@ -294,13 +297,14 @@ void spectrum_setup_sp(running_machine *machine, unsigned char *pSnapshot, unsig
  *******************************************************************/
 void spectrum_setup_sna(running_machine *machine, unsigned char *pSnapshot, unsigned long SnapshotSize)
 {
+	spectrum_state *state = (spectrum_state *)machine->driver_data;
 	int i, j, usedbanks[8];
 	long bank_offset;
 	unsigned char lo, hi, data;
 	unsigned short addr;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	if ((SnapshotSize != 49179) && (spectrum_128_port_7ffd_data == -1))
+	if ((SnapshotSize != 49179) && (state->port_7ffd_data == -1))
 	{
 		logerror("Can't load 128K .SNA file into 48K machine\n");
 		return;
@@ -349,7 +353,7 @@ void spectrum_setup_sna(running_machine *machine, unsigned char *pSnapshot, unsi
 	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IM, data);
 
 	/* Set border colour */
-	spectrum_PreviousFE = (spectrum_PreviousFE & 0xf8) | (pSnapshot[26] & 0x07);
+	state->port_fe_data = (state->port_fe_data & 0xf8) | (pSnapshot[26] & 0x07);
 	EventList_Reset();
 	border_set_last_color(pSnapshot[26] & 0x07);
 	border_force_redraw();
@@ -364,7 +368,7 @@ void spectrum_setup_sna(running_machine *machine, unsigned char *pSnapshot, unsi
 	else
 	{
 		/* 128K Snapshot */
-		spectrum_128_port_7ffd_data = (pSnapshot[49181] & 0x0ff);
+		state->port_7ffd_data = (pSnapshot[49181] & 0x0ff);
 		spectrum_update_paging(machine);
 	}
 
@@ -399,15 +403,15 @@ void spectrum_setup_sna(running_machine *machine, unsigned char *pSnapshot, unsi
 
 		usedbanks[5] = 1;				/* 0x4000-0x7fff */
 		usedbanks[2] = 1;				/* 0x8000-0xbfff */
-		usedbanks[spectrum_128_port_7ffd_data & 0x07] = 1;	/* Banked memory */
+		usedbanks[state->port_7ffd_data & 0x07] = 1;	/* Banked memory */
 
 		for (i = 0; i < 8; i++)
 		{
 			if (!usedbanks[i])
 			{
 				logerror("Loading bank %d from offset %ld\n", i, bank_offset);
-				spectrum_128_port_7ffd_data &= 0xf8;
-				spectrum_128_port_7ffd_data += i;
+				state->port_7ffd_data &= 0xf8;
+				state->port_7ffd_data += i;
 				spectrum_update_paging(machine);
 				for (j = 0; j < 16384; j++)
 					memory_write_byte(space,j + 49152, pSnapshot[bank_offset + j]);
@@ -416,7 +420,7 @@ void spectrum_setup_sna(running_machine *machine, unsigned char *pSnapshot, unsi
 		}
 
 		/* Reset paging */
-		spectrum_128_port_7ffd_data = (pSnapshot[49181] & 0x0ff);
+		state->port_7ffd_data = (pSnapshot[49181] & 0x0ff);
 		spectrum_update_paging(machine);
 
 		/* program counter */
@@ -544,6 +548,7 @@ static SPECTRUM_Z80_SNAPSHOT_TYPE spectrum_identify_z80 (unsigned char *pSnapsho
 /* now supports 48k & 128k .Z80 files */
 void spectrum_setup_z80(running_machine *machine, unsigned char *pSnapshot, unsigned long SnapshotSize)
 {
+	spectrum_state *state = (spectrum_state *)machine->driver_data;
 	int i;
 	unsigned char lo, hi, data;
 	SPECTRUM_Z80_SNAPSHOT_TYPE z80_type;
@@ -564,7 +569,7 @@ void spectrum_setup_z80(running_machine *machine, unsigned char *pSnapshot, unsi
 				break;
 		case SPECTRUM_Z80_SNAPSHOT_128K:
 				logerror("128K .Z80 file\n");
-				if (spectrum_128_port_7ffd_data == -1)
+				if (state->port_7ffd_data == -1)
 				{
 					logerror("Not a 48K .Z80 file\n");
 					return;
@@ -611,7 +616,7 @@ void spectrum_setup_z80(running_machine *machine, unsigned char *pSnapshot, unsi
 	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_R, data);
 
 	/* Set border colour */
-	spectrum_PreviousFE = (spectrum_PreviousFE & 0xf8) | ((pSnapshot[12] & 0x0e) >> 1);
+	state->port_fe_data = (state->port_fe_data & 0xf8) | ((pSnapshot[12] & 0x0e) >> 1);
 	EventList_Reset();
 	border_set_last_color((pSnapshot[12] & 0x0e) >> 1);
 	border_force_redraw();
@@ -749,7 +754,7 @@ void spectrum_setup_z80(running_machine *machine, unsigned char *pSnapshot, unsi
 				if ((page >= 3) && (page <= 10))
 				{
 					/* Page the appropriate bank into 0xc000 - 0xfff */
-					spectrum_128_port_7ffd_data = page - 3;
+					state->port_7ffd_data = page - 3;
 					spectrum_update_paging(machine);
 					Dest = 0x0c000;
 				}
@@ -783,22 +788,22 @@ void spectrum_setup_z80(running_machine *machine, unsigned char *pSnapshot, unsi
 		}
 		while ((pSource - pSnapshot) < SnapshotSize);
 
-		if ((spectrum_128_port_7ffd_data != -1) && (z80_type != SPECTRUM_Z80_SNAPSHOT_48K))
+		if ((state->port_7ffd_data != -1) && (z80_type != SPECTRUM_Z80_SNAPSHOT_48K))
 		{
 			/* Set up paging */
-			spectrum_128_port_7ffd_data = (pSnapshot[35] & 0x0ff);
+			state->port_7ffd_data = (pSnapshot[35] & 0x0ff);
 			spectrum_update_paging(machine);
 		}
 		if ((z80_type == SPECTRUM_Z80_SNAPSHOT_48K) && !strcmp(machine->gamedrv->name,"ts2068"))
 		{
-			ts2068_port_f4_data = 0x03;
-			ts2068_port_ff_data = 0x00;
+			state->port_f4_data = 0x03;
+			state->port_ff_data = 0x00;
 			ts2068_update_memory(machine);
 		}
 		if (z80_type == SPECTRUM_Z80_SNAPSHOT_TS2068 && !strcmp(machine->gamedrv->name,"ts2068"))
 		{
-			ts2068_port_f4_data = pSnapshot[35];
-			ts2068_port_ff_data = pSnapshot[36];
+			state->port_f4_data = pSnapshot[35];
+			state->port_ff_data = pSnapshot[36];
 			ts2068_update_memory(machine);
 		}
 	}

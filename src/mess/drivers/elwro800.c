@@ -35,16 +35,18 @@
  *  State/Globals
  *
  *************************************/
-static UINT8 elwro800_df_on_databus = 0xdf;
 
 typedef struct _elwro800_state elwro800_state;
 struct _elwro800_state
 {
+	spectrum_state spectrum;
+
 	/* RAM mapped at 0 */
 	UINT8 ram_at_0000;
 
 	/* NR signal */
 	UINT8 NR;
+	UINT8 df_on_databus;
 };
 
 /*************************************
@@ -59,7 +61,7 @@ static DIRECT_UPDATE_HANDLER(elwro800_direct_handler)
 	elwro800_state *state = (elwro800_state *)space->machine->driver_data;
 	if (state->ram_at_0000 && address == 0x66)
 	{
-		direct->raw = direct->decrypted = &elwro800_df_on_databus;
+		direct->raw = direct->decrypted = &state->df_on_databus;
 		direct->bytemask = 0;
 		return ~0;
 	}
@@ -104,6 +106,7 @@ static WRITE8_HANDLER(elwro800jr_fdc_control_w)
 static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 {
 	UINT8 *prom = memory_region(machine, "proms") + 0x200;
+	UINT8 *messram = messram_get_ptr(devtag_get_device(machine, "messram"));
 	UINT8 cs;
 	UINT8 ls175;
 	elwro800_state *state = (elwro800_state *)machine->driver_data;
@@ -128,7 +131,7 @@ static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 	else
 	{
 		// RAM
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
+		memory_set_bankptr(machine, "bank1", messram);
 		memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
 		state->ram_at_0000 = 1;
 	}
@@ -141,18 +144,18 @@ static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000); /* RAM */
+		memory_set_bankptr(machine, "bank2", messram + 0x2000); /* RAM */
 		memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, "bank2");
 	}
 
 	if (BIT(ls175,2))
 	{
 		// relok
-		spectrum_screen_location = messram_get_ptr(devtag_get_device(machine, "messram")) + 0xe000;
+		state->spectrum.screen_location = messram + 0xe000;
 	}
 	else
 	{
-		spectrum_screen_location = messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000;
+		state->spectrum.screen_location = messram + 0x4000;
 	}
 
 	state->NR = BIT(ls175,3);
@@ -507,9 +510,16 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(elwro800)
 {
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, 64*1024);
+	elwro800_state *state = (elwro800_state *)machine->driver_data;
+	UINT8 *messram = messram_get_ptr(devtag_get_device(machine, "messram"));
 
-	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+	state->df_on_databus = 0xdf;
+	memset(messram, 0, 64*1024);
+
+	memory_set_bankptr(machine, "bank3", messram + 0x4000);
+
+	state->spectrum.port_7ffd_data = 0;
+	state->spectrum.port_1ffd_data = -1;
 
 	// this is a reset of ls175 in mmu
 	elwro800jr_mmu_w(machine, 0);
