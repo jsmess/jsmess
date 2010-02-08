@@ -10,7 +10,7 @@
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
 
-typedef enum
+enum
 {
 	TIMEX_CART_NONE,
 	TIMEX_CART_DOCK,
