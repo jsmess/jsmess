@@ -388,30 +388,6 @@ INLINE wd1770_state *get_safe_token(running_device *device)
 /***************************************************************************
     HELPER FUNCTIONS
 ***************************************************************************/
-
-/* calculate CRC for data address marks or sector data */
-static void calc_crc(UINT16 *crc, UINT8 value)
-{
-	UINT8 l, h;
-
-	l = value ^ (*crc >> 8);
-	*crc = (*crc & 0xff) | (l << 8);
-	l >>= 4;
-	l ^= (*crc >> 8);
-	*crc <<= 8;
-	*crc = (*crc & 0xff00) | l;
-	l = (l << 4) | (l >> 4);
-	h = l;
-	l = (l << 2) | (l >> 6);
-	l &= 0x1f;
-	*crc = *crc ^ (l << 8);
-	l = h & 0xf0;
-	*crc = *crc ^ (l << 8);
-	l = (h << 1) | (h >> 7);
-	l &= 0xe0;
-	*crc = *crc ^ l;
-}
-
 static int wd17xx_has_side_select(running_device *device)
 {
 	return (device->type == WD1773 || device->type == WD1793 || device->type == WD2793);
@@ -681,10 +657,10 @@ static void read_track(running_device *device)
 				s = *pdst++ = w->dam_list[w->dam_cnt][2]; /* sector number */
 				l = *pdst++ = w->dam_list[w->dam_cnt][3]; /* sector length code */
 				w->dam_cnt++;
-				calc_crc(&crc, t);	/* build CRC */
-				calc_crc(&crc, h);	/* build CRC */
-				calc_crc(&crc, s);	/* build CRC */
-				calc_crc(&crc, l);	/* build CRC */
+				crc = ccitt_crc16_one(crc, t);	/* build CRC */
+				crc = ccitt_crc16_one(crc, h);	/* build CRC */
+				crc = ccitt_crc16_one(crc, s);	/* build CRC */
+				crc = ccitt_crc16_one(crc, l);	/* build CRC */
 				l = (l == 0) ? 128 : l << 8;
 			}
 			else if (d == 0xfb)// data address mark ?
@@ -708,7 +684,7 @@ static void read_track(running_device *device)
 					return;
 				}
 				for (i = 0; i < l; i++) // build CRC of all data
-					calc_crc(&crc, *pdst++);
+					crc = ccitt_crc16_one(crc, *pdst++);
 				cnt -= l;
 			}
 			psrc += 2;
@@ -754,19 +730,19 @@ static void wd17xx_read_id(running_device *device)
 
 		/* for MFM */
 		/* crc includes 3x0x0a1, and 1x0x0fe (id mark) */
-		calc_crc(&crc,0x0a1);
-		calc_crc(&crc,0x0a1);
-		calc_crc(&crc,0x0a1);
-		calc_crc(&crc,0x0fe);
+		crc = ccitt_crc16_one(crc,0x0a1);
+		crc = ccitt_crc16_one(crc,0x0a1);
+		crc = ccitt_crc16_one(crc,0x0a1);
+		crc = ccitt_crc16_one(crc,0x0fe);
 
 		w->buffer[0] = id.C;
 		w->buffer[1] = id.H;
 		w->buffer[2] = id.R;
 		w->buffer[3] = id.N;
-		calc_crc(&crc, w->buffer[0]);
-		calc_crc(&crc, w->buffer[1]);
-		calc_crc(&crc, w->buffer[2]);
-		calc_crc(&crc, w->buffer[3]);
+		crc = ccitt_crc16_one(crc, w->buffer[0]);
+		crc = ccitt_crc16_one(crc, w->buffer[1]);
+		crc = ccitt_crc16_one(crc, w->buffer[2]);
+		crc = ccitt_crc16_one(crc, w->buffer[3]);
 		/* crc is stored hi-byte followed by lo-byte */
 		w->buffer[4] = crc>>8;
 		w->buffer[5] = crc & 255;
