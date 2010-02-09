@@ -32,8 +32,8 @@
 #define LOG 0
 
 #define M6510T_TAG		"u2"
-#define M6525_TAG		"u3"
-#define M6523_TAG		"ci_u2"
+#define M6523_0_TAG		"u3"
+#define M6523_1_TAG		"ci_u2"
 
 #define FLOPPY_TAG		"c1551_floppy"
 
@@ -44,6 +44,12 @@
 typedef struct _c1551_t c1551_t;
 struct _c1551_t
 {
+	/* TCBM bus */
+	int address;							/* device address - 8 */
+	int status;								/* status */
+	int dav;								/* data valid */
+	int ack;								/* acknowledge */
+
 	/* motors */
 	int stp;								/* stepper motor phase */
 	int mtr;								/* spindle motor on */
@@ -83,6 +89,13 @@ INLINE c1551_t *get_safe_token(running_device *device)
 	assert(device->token != NULL);
 	assert(device->type == C1551);
 	return (c1551_t *)device->token;
+}
+
+INLINE c1551_config *get_safe_config(running_device *device)
+{
+	assert(device != NULL);
+	assert(device->type == C1551);
+	return (c1551_config *)device->baseconfig().inline_config;
 }
 
 /***************************************************************************
@@ -261,7 +274,7 @@ static WRITE8_DEVICE_HANDLER( c1551_port_w )
 	int mtr = BIT(data, 2);
 	spindle_motor(c1551, mtr);
 
-	/* activity LED */
+	/* TODO activity LED */
 
 	/* density select */
 	int ds = (data >> 5) & 0x03;
@@ -280,15 +293,15 @@ static WRITE8_DEVICE_HANDLER( c1551_port_w )
 static ADDRESS_MAP_START( c1551_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0001) AM_DEVREADWRITE(M6510T_TAG, c1551_port_r, c1551_port_w)
 	AM_RANGE(0x0002, 0x07ff) AM_RAM
-	AM_RANGE(0x4000, 0x4007) AM_DEVREADWRITE(M6525_TAG, tpi6525_r, tpi6525_w)
+	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_DEVREADWRITE(M6523_0_TAG, tpi6525_r, tpi6525_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1551", 0)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
-    tpi6525_interface c1551_tpi_intf
+    tpi6525_interface tpi0_intf
 -------------------------------------------------*/
 
-static READ8_DEVICE_HANDLER( c1551_tpi_pa_r )
+static READ8_DEVICE_HANDLER( tpi0_pa_r )
 {
 	/*
 
@@ -305,10 +318,12 @@ static READ8_DEVICE_HANDLER( c1551_tpi_pa_r )
 
     */
 
-	return 0;
+	c1551_t *c1551 = get_safe_token(device->owner);
+
+	return tpi6525_porta_r(c1551->tpi1, 0);
 }
 
-static WRITE8_DEVICE_HANDLER( c1551_tpi_pa_w )
+static WRITE8_DEVICE_HANDLER( tpi0_pa_w )
 {
 	/*
 
@@ -324,9 +339,13 @@ static WRITE8_DEVICE_HANDLER( c1551_tpi_pa_w )
         PA7     TCBM PA7
 
     */
+
+	c1551_t *c1551 = get_safe_token(device->owner);
+
+	tpi6525_porta_w(c1551->tpi1, 0, data);
 }
 
-static READ8_DEVICE_HANDLER( c1551_tpi_pb_r )
+static READ8_DEVICE_HANDLER( tpi0_pb_r )
 {
 	/*
 
@@ -348,7 +367,7 @@ static READ8_DEVICE_HANDLER( c1551_tpi_pb_r )
 	return c1551->data & 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( c1551_tpi_pb_w )
+static WRITE8_DEVICE_HANDLER( tpi0_pb_w )
 {
 	/*
 
@@ -370,7 +389,7 @@ static WRITE8_DEVICE_HANDLER( c1551_tpi_pb_w )
 	c1551->yb = data;
 }
 
-static READ8_DEVICE_HANDLER( c1551_tpi_pc_r )
+static READ8_DEVICE_HANDLER( tpi0_pc_r )
 {
 	/*
 
@@ -390,13 +409,16 @@ static READ8_DEVICE_HANDLER( c1551_tpi_pc_r )
 	c1551_t *c1551 = get_safe_token(device->owner);
 	UINT8 data = 0;
 
+	/* JP1 */
+	data |= c1551->address << 5;
+
 	/* SYNC detect line */
 	data |= !(c1551->mode && ((c1551->data & G64_SYNC_MARK) == G64_SYNC_MARK)) << 6;
 
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( c1551_tpi_pc_w )
+static WRITE8_DEVICE_HANDLER( tpi0_pc_w )
 {
 	/*
 
@@ -415,18 +437,164 @@ static WRITE8_DEVICE_HANDLER( c1551_tpi_pc_w )
 
 	c1551_t *c1551 = get_safe_token(device->owner);
 
-	/* SOE */
-	c1551->soe = BIT(data, 4);
+	/* TCBM status */
+	c1551->status = data & 0x03;
+
+	/* TODO TCBM device number */
+
+	/* TODO TCBM acknowledge */
+
+	/* read/write mode */
+	c1551->mode = BIT(data, 4);
+
+	/* TODO TCBM data valid */
 }
 
-static const tpi6525_interface c1551_tpi_intf =
+static const tpi6525_interface tpi0_intf =
 {
-	c1551_tpi_pa_r,
-	c1551_tpi_pb_r,
-	c1551_tpi_pc_r,
-	c1551_tpi_pa_w,
-	c1551_tpi_pb_w,
-	c1551_tpi_pc_w,
+	tpi0_pa_r,
+	tpi0_pb_r,
+	tpi0_pc_r,
+	tpi0_pa_w,
+	tpi0_pb_w,
+	tpi0_pc_w,
+	NULL,
+	NULL,
+	NULL
+};
+
+/*-------------------------------------------------
+    tpi6525_interface tpi1_intf
+-------------------------------------------------*/
+
+static READ8_DEVICE_HANDLER( tpi1_pa_r )
+{
+	/*
+
+        bit     description
+
+        PA0     TCBM PA0
+        PA1     TCBM PA1
+        PA2     TCBM PA2
+        PA3     TCBM PA3
+        PA4     TCBM PA4
+        PA5     TCBM PA5
+        PA6     TCBM PA6
+        PA7     TCBM PA7
+
+    */
+
+	c1551_t *c1551 = get_safe_token(device->owner);
+
+	return tpi6525_porta_r(c1551->tpi0, 0);
+}
+
+static WRITE8_DEVICE_HANDLER( tpi1_pa_w )
+{
+	/*
+
+        bit     description
+
+        PA0     TCBM PA0
+        PA1     TCBM PA1
+        PA2     TCBM PA2
+        PA3     TCBM PA3
+        PA4     TCBM PA4
+        PA5     TCBM PA5
+        PA6     TCBM PA6
+        PA7     TCBM PA7
+
+    */
+
+	c1551_t *c1551 = get_safe_token(device->owner);
+
+	tpi6525_porta_w(c1551->tpi0, 0, data);
+}
+
+static READ8_DEVICE_HANDLER( tpi1_pb_r )
+{
+	/*
+
+        bit     description
+
+        PB0     STATUS0
+        PB1     STATUS1
+        PB2     
+        PB3     
+        PB4     
+        PB5     
+        PB6     
+        PB7     
+
+    */
+
+	return 0;
+}
+
+static WRITE8_DEVICE_HANDLER( tpi1_pb_w )
+{
+	/*
+
+        bit     description
+
+        PB0     STATUS0
+        PB1     STATUS1
+        PB2     
+        PB3     
+        PB4     
+        PB5     
+        PB6     
+        PB7     
+
+    */
+}
+
+static READ8_DEVICE_HANDLER( tpi1_pc_r )
+{
+	/*
+
+        bit     description
+
+        PC0     
+        PC1     
+        PC2     
+        PC3     
+        PC4     
+        PC5     
+        PC6     TCBM ACK
+        PC7     TCBM DAV
+
+    */
+
+	return 0;
+}
+
+static WRITE8_DEVICE_HANDLER( tpi1_pc_w )
+{
+	/*
+
+        bit     description
+
+        PC0     
+        PC1     
+        PC2     
+        PC3     
+        PC4     
+        PC5     
+        PC6     TCBM ACK
+        PC7     TCBM DAV
+
+    */
+}
+
+static const tpi6525_interface tpi1_intf =
+{
+	tpi1_pa_r,
+	tpi1_pb_r,
+	tpi1_pc_r,
+	tpi1_pa_w,
+	tpi1_pb_w,
+	tpi1_pc_w,
 	NULL,
 	NULL,
 	NULL
@@ -437,8 +605,8 @@ static const tpi6525_interface c1551_tpi_intf =
 -------------------------------------------------*/
 
 static FLOPPY_OPTIONS_START( c1551 )
-	FLOPPY_OPTION( c1551, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
-	FLOPPY_OPTION( c1551, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
+	FLOPPY_OPTION( c1551, "g64", "Commodore 1551 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL )
+	FLOPPY_OPTION( c1551, "d64", "Commodore 1551 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL )
 FLOPPY_OPTIONS_END
 
 /*-------------------------------------------------
@@ -465,8 +633,8 @@ static MACHINE_DRIVER_START( c1551 )
 	MDRV_CPU_ADD(M6510T_TAG, M6510T, 2000000)
 	MDRV_CPU_PROGRAM_MAP(c1551_map)
 
-	MDRV_TPI6525_ADD(M6525_TAG, c1551_tpi_intf)
-//  MDRV_MOS6523_ADD(M6523_TAG, 2000000, c1551_mos6523_intf)
+	MDRV_TPI6525_ADD(M6523_0_TAG, tpi0_intf) // 6523
+	MDRV_TPI6525_ADD(M6523_1_TAG, tpi1_intf) // 6523
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_TAG, c1551_floppy_config)
 MACHINE_DRIVER_END
@@ -487,13 +655,18 @@ ROM_END
 static DEVICE_START( c1551 )
 {
 	c1551_t *c1551 = get_safe_token(device);
+	const c1551_config *config = get_safe_config(device);
+
+	/* set address */
+	assert((config->address > 7) && (config->address < 10));
+	c1551->address = config->address - 8;
 
 	/* find our CPU */
 	c1551->cpu = device->subdevice(M6510T_TAG);
 
 	/* find devices */
-	c1551->tpi0 = device->subdevice(M6525_TAG);
-	c1551->tpi1 = device->subdevice(M6523_TAG);
+	c1551->tpi0 = device->subdevice(M6523_0_TAG);
+	c1551->tpi1 = device->subdevice(M6523_1_TAG);
 	c1551->image = device->subdevice(FLOPPY_0);
 
 	/* allocate track buffer */
@@ -523,6 +696,12 @@ static DEVICE_START( c1551 )
 
 static DEVICE_RESET( c1551 )
 {
+	c1551_t *c1551 = get_safe_token(device);
+
+	c1551->cpu->reset();
+	c1551->tpi0->reset();
+
+	c1551->soe = 1;
 }
 
 /*-------------------------------------------------
