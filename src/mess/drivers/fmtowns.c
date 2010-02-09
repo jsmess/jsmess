@@ -138,7 +138,7 @@ static UINT8* towns_cmos;
 UINT32* towns_vram;
 UINT8* towns_gfxvram;
 UINT8* towns_txtvram;
-UINT8* towns_sprram;
+//UINT8* towns_sprram;
 static int towns_selected_drive;
 static UINT8 towns_fdc_irq6mask;
 static UINT8* towns_serial_rom;
@@ -1961,7 +1961,7 @@ static DRIVER_INIT( towns )
 	towns_cmos = auto_alloc_array(machine,UINT8,0x2000);
 	towns_gfxvram = auto_alloc_array(machine,UINT8,0x80000);
 	towns_txtvram = auto_alloc_array(machine,UINT8,0x20000);
-	towns_sprram = auto_alloc_array(machine,UINT8,0x20000);
+	//towns_sprram = auto_alloc_array(machine,UINT8,0x20000);
 	towns_serial_rom = auto_alloc_array(machine,UINT8,256/8);
 	towns_init_serial_rom(machine);
 	towns_init_rtc();
