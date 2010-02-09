@@ -55,6 +55,8 @@ struct _spectrum_state
 	int port_ff_data; /* Display enhancement control */
 	int port_f4_data; /* Horizontal Select Register */
 
+	int floppy;
+	
 	/* video support */
 	int frame_number;    /* Used for handling FLASH 1 */
 	int flash_invert;

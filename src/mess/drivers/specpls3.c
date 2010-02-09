@@ -184,13 +184,15 @@ static const int spectrum_plus3_memory_selections[]=
 
 static WRITE8_HANDLER(spectrum_plus3_port_3ffd_w)
 {
-	if (~input_port_read(space->machine, "CONFIG") & 0x20)
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	if (state->floppy==1)
 		upd765_data_w(devtag_get_device(space->machine, "upd765"), 0,data);
 }
 
 static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
 {
-	if (input_port_read(space->machine, "CONFIG") & 0x20)
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	if (state->floppy==0)
 		return 0xff;
 	else
 		return upd765_data_r(devtag_get_device(space->machine, "upd765"), 0);
@@ -199,10 +201,11 @@ static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
 
 static  READ8_HANDLER(spectrum_plus3_port_2ffd_r)
 {
-		if (input_port_read(space->machine, "CONFIG") & 0x20)
-				return 0xff;
-		else
-				return upd765_status_r(devtag_get_device(space->machine, "upd765"), 0);
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	if (state->floppy==0)
+			return 0xff;
+	else
+			return upd765_status_r(devtag_get_device(space->machine, "upd765"), 0);
 }
 
 
@@ -364,6 +367,18 @@ static MACHINE_RESET( spectrum_plus3 )
 	spectrum_plus3_update_memory(machine);
 }
 
+static DRIVER_INIT( plus3 )
+{
+	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	state->floppy = 1;
+}
+
+static DRIVER_INIT( plus2 )
+{
+	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	state->floppy = 0;
+}
+
 static const floppy_config specpls3_floppy_config =
 {
 	DEVCB_NULL,
@@ -485,9 +500,9 @@ ROM_START(sp3eata)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE         INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1987, specpl2a, spec128,  0,		spectrum_plus3, spec_plus,	0,		"Amstrad plc",          "ZX Spectrum +2a" , 0 )
-COMP( 1987, specpls3, spec128,  0,		spectrum_plus3, spec_plus,	0,		"Amstrad plc",          "ZX Spectrum +3" , 0 )
-COMP( 2000, specpl3e, spec128,  0,		spectrum_plus3, spec_plus,	0,		"Amstrad plc",          "ZX Spectrum +3e" , GAME_COMPUTER_MODIFIED )
-COMP( 2002, sp3e8bit, spec128,  0,		spectrum_plus3, spec_plus,	0,		"Amstrad plc",          "ZX Spectrum +3e 8bit IDE" , GAME_COMPUTER_MODIFIED )
-COMP( 2002, sp3eata,  spec128,  0,		spectrum_plus3, spec_plus,	0,		"Amstrad plc",          "ZX Spectrum +3e 8bit ZXATASP" , GAME_COMPUTER_MODIFIED )
-COMP( 2002, sp3ezcf,  spec128,  0,		spectrum_plus3, spec_plus,	0,		"Amstrad plc",          "ZX Spectrum +3e 8bit ZXCF" , GAME_COMPUTER_MODIFIED )
+COMP( 1987, specpl2a, spec128,  0,		spectrum_plus3, spec_plus,	plus2,	"Amstrad plc",          "ZX Spectrum +2a" , 0 )
+COMP( 1987, specpls3, spec128,  0,		spectrum_plus3, spec_plus,	plus3,	"Amstrad plc",          "ZX Spectrum +3" , 0 )
+COMP( 2000, specpl3e, spec128,  0,		spectrum_plus3, spec_plus,	plus3,	"Amstrad plc",          "ZX Spectrum +3e" , GAME_COMPUTER_MODIFIED )
+COMP( 2002, sp3e8bit, spec128,  0,		spectrum_plus3, spec_plus,	plus3,	"Amstrad plc",          "ZX Spectrum +3e 8bit IDE" , GAME_COMPUTER_MODIFIED )
+COMP( 2002, sp3eata,  spec128,  0,		spectrum_plus3, spec_plus,	plus3,	"Amstrad plc",          "ZX Spectrum +3e 8bit ZXATASP" , GAME_COMPUTER_MODIFIED )
+COMP( 2002, sp3ezcf,  spec128,  0,		spectrum_plus3, spec_plus,	plus3,	"Amstrad plc",          "ZX Spectrum +3e 8bit ZXCF" , GAME_COMPUTER_MODIFIED )
