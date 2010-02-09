@@ -559,25 +559,6 @@ static mess_input_code *build_codes(running_machine *machine, const input_port_c
 ***************************************************************************/
 
 /*-------------------------------------------------
-    mess_validate_input_ports - validates the
-    natural keyboard setup of a set of input ports
--------------------------------------------------*/
-
-int mess_validate_input_ports(int drivnum, const machine_config *config, const ioport_list &portlist)
-{
-	int error = FALSE;
-
-	if (drivers[drivnum]->flags & GAME_COMPUTER)
-	{
-		/* unused hook */
-	}
-
-	return error;
-}
-
-
-
-/*-------------------------------------------------
     mess_validate_natural_keyboard_statics -
     validates natural keyboard static data
 -------------------------------------------------*/

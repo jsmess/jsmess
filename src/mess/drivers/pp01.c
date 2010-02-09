@@ -253,4 +253,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT	 COMPANY                  FULLNAME   FLAGS */
-COMP( 198?, pp01, 	0, 	 	0,		pp01, 		pp01, 		pp01, 	 "ZVT",					 "PP-01",	 GAME_NOT_WORKING)
+COMP( 198?, pp01, 	0, 	 	0,		pp01, 		pp01, 		pp01, 	 "ZVT",					 "PP-01",	 GAME_NOT_WORKING | GAME_NO_SOUND)

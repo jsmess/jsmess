@@ -290,6 +290,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1985, ec65,  0,       0, 		ec65, 	ec65, 	 0,  	  	 "Elektor Electronics",   "EC-65",		GAME_NOT_WORKING)
-COMP( 1985, ec65k, ec65,    0, 		ec65k, 	ec65, 	 0,  	   	 "Elektor Electronics",   "EC-65K",		GAME_NOT_WORKING)
+COMP( 1985, ec65,  0,       0, 		ec65, 	ec65, 	 0,  	  	 "Elektor Electronics",   "EC-65",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1985, ec65k, ec65,    0, 		ec65k, 	ec65, 	 0,  	   	 "Elektor Electronics",   "EC-65K",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

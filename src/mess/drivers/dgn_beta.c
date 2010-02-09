@@ -378,4 +378,4 @@ ROM_START(dgnbeta)
 ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY             FULLNAME                    FLAGS */
-COMP( 1984, dgnbeta,    0,      0,      dgnbeta,    dgnbeta,    0,      "Dragon Data Ltd",  "Dragon Beta Prototype",    0 )
+COMP( 1984, dgnbeta,    0,      0,      dgnbeta,    dgnbeta,    0,      "Dragon Data Ltd",  "Dragon Beta Prototype",    GAME_NO_SOUND )

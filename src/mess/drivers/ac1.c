@@ -193,6 +193,6 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT  COMPANY                 FULLNAME   FLAGS */
-COMP( 1984, ac1,     0,      0, 	ac1, 	ac1, 	ac1,  "Frank Heyder", "Amateurcomputer AC1 Berlin",		 0)
-COMP( 1984, ac1_32,  ac1,    0, 	ac1_32,	ac1, 	ac1,  "Frank Heyder", "Amateurcomputer AC1 Berlin (32 lines)",		 0)
-COMP( 1984, ac1scch, ac1,    0, 	ac1_32,	ac1, 	ac1,  "Frank Heyder", "Amateurcomputer AC1 SCCH",		 0)
+COMP( 1984, ac1,     0,      0, 	ac1, 	ac1, 	ac1,  "Frank Heyder", "Amateurcomputer AC1 Berlin",		 GAME_NO_SOUND)
+COMP( 1984, ac1_32,  ac1,    0, 	ac1_32,	ac1, 	ac1,  "Frank Heyder", "Amateurcomputer AC1 Berlin (32 lines)",		 GAME_NO_SOUND)
+COMP( 1984, ac1scch, ac1,    0, 	ac1_32,	ac1, 	ac1,  "Frank Heyder", "Amateurcomputer AC1 SCCH",		 GAME_NO_SOUND)

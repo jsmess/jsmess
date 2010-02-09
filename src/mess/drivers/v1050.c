@@ -1259,4 +1259,4 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                             FULLNAME        FLAGS */
-COMP( 1983, v1050,	0,		0,		v1050,	v1050,	0,		"Visual Technology Incorporated",	"Visual 1050",	GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1983, v1050,	0,		0,		v1050,	v1050,	0,		"Visual Technology Incorporated",	"Visual 1050",	GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NO_SOUND)

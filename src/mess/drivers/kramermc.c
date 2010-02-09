@@ -145,4 +145,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT  				 COMPANY                 FULLNAME   FLAGS */
-COMP( 1987, kramermc,     0,      0, 	kramermc, 	kramermc, 	kramermc,"Manfred Kramer", "Kramer MC",		 0)
+COMP( 1987, kramermc,     0,      0, 	kramermc, 	kramermc, 	kramermc,"Manfred Kramer", "Kramer MC",		 GAME_NO_SOUND)

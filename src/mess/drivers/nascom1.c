@@ -428,5 +428,5 @@ ROM_END
  *************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT       COMPANY                     FULLNAME        FLAGS */
-COMP( 1978, nascom1,    0,          0,      nascom1,    nascom1,    nascom1,   "Nascom Microcomputers",    "Nascom 1",     0 )
-COMP( 1979, nascom2,    nascom1,    0,      nascom2,    nascom2,    nascom1,   "Nascom Microcomputers",    "Nascom 2",     0 )
+COMP( 1978, nascom1,    0,          0,      nascom1,    nascom1,    nascom1,   "Nascom Microcomputers",    "Nascom 1",     GAME_NO_SOUND )
+COMP( 1979, nascom2,    nascom1,    0,      nascom2,    nascom2,    nascom1,   "Nascom Microcomputers",    "Nascom 2",     GAME_NO_SOUND )

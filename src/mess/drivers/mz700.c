@@ -530,4 +530,4 @@ COMP( 1984, mz800,    0,        0,      mz800,    mz800,    mz800,  "Sharp",    
 COMP( 1984, mz1500,   0,        0,      mz800,    mz800,    mz800,  "Sharp",     "MZ-1500", GAME_NOT_WORKING )	// Japanese version of the MZ-800
 
 // MZ-2500 probably needs a separate driver...
-COMP( 1985, mz2500,   0,        0,      mz2500,   0,        0,      "Sharp",     "MZ-2500", GAME_NOT_WORKING )
+COMP( 1985, mz2500,   0,        0,      mz2500,   0,        0,      "Sharp",     "MZ-2500", GAME_NOT_WORKING | GAME_NO_SOUND)

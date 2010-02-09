@@ -901,5 +901,5 @@ ROM_START(apexc)
 ROM_END
 
 /*         YEAR     NAME        PARENT          COMPAT  MACHINE     INPUT   INIT  COMPANY     FULLNAME */
-//COMP(      1951,    apexc53,    0,            0,      apexc53,    apexc,  apexc, "Booth", "All Purpose Electronic X-ray Computer (as described in 1953)" , GAME_NOT_WORKING)
-COMP(      1955,    apexc,	/*apexc53*/0,	0,	apexc,      apexc,  apexc, "Booth", "All Purpose Electronic X-ray Computer (as described in 1957)" , 0)
+//COMP(      1951,    apexc53,    0,            0,      apexc53,    apexc,  apexc, "Booth", "All Purpose Electronic X-ray Computer (as described in 1953)" , GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP(      1955,    apexc,	/*apexc53*/0,	0,	apexc,      apexc,  apexc, "Booth", "All Purpose Electronic X-ray Computer (as described in 1957)" , GAME_NO_SOUND)

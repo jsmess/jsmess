@@ -403,7 +403,7 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 	while(drv != NULL)
 	{
 		AddSoftwarePickerDirs(hwndSoftwarePicker, GetSoftwareDirs(), drv->name);
-		drv = mess_next_compatible_driver(drv);
+		drv = driver_get_compatible(drv);
 	}
 	AddSoftwarePickerDirs(hwndSoftwarePicker, GetExtraSoftwarePaths(drvindex), NULL);
 }

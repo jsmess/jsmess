@@ -929,4 +929,4 @@ ROM_END
 
 /*    YEAR  NAME     PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY                                              FULLNAME      FLAGS */
 CONS( 2004, batman,  0,        0,        batman,   batman,   batman,   "JAKKS Pacific, Inc. / HotGen, Ltd.",                "The Batman", GAME_NO_SOUND )
-CONS( 2007, vii,     0,        0,        vii,      vii,      vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",        GAME_NOT_WORKING )
+CONS( 2007, vii,     0,        0,        vii,      vii,      vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",        GAME_NOT_WORKING | GAME_NO_SOUND)

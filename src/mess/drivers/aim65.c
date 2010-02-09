@@ -269,4 +269,4 @@ ROM_END
 ***************************************************************************/
 
 /*   YEAR  NAME         PARENT  COMPAT  MACHINE  INPUT   INIT    COMPANY     FULLNAME  FLAGS */
-COMP(1977, aim65,		0,      0,      aim65,   aim65,  0,      "Rockwell", "AIM 65", 0)
+COMP(1977, aim65,		0,      0,      aim65,   aim65,  0,      "Rockwell", "AIM 65", GAME_NO_SOUND )

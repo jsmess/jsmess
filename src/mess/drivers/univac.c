@@ -77,4 +77,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 198?, uts20,  0,       0, 	uts20, 	uts20, 	 0,  	   	 "Sperry Univac",   "UTS-20", GAME_NOT_WORKING)
+COMP( 198?, uts20,  0,       0, 	uts20, 	uts20, 	 0,  	   	 "Sperry Univac",   "UTS-20", GAME_NOT_WORKING | GAME_NO_SOUND)

@@ -1190,7 +1190,7 @@ static int image_checkhash(image_slot_data *image)
         do
         {
             rc = read_hash_config(drv->name, image);
-            drv = mess_next_compatible_driver(drv);
+            drv = driver_get_compatible(drv);
         }
         while(rc && (drv != NULL));
     }
@@ -1630,7 +1630,7 @@ static void setup_working_directory(image_slot_data *image)
         gamedrv = image->dev->machine->gamedrv;
         while(gamedrv && !try_change_working_directory(image, gamedrv->name))
         {
-            gamedrv = mess_next_compatible_driver(gamedrv);
+            gamedrv = driver_get_compatible(gamedrv);
         }
     }
 }

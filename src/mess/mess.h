@@ -64,16 +64,4 @@ int mess_validitychecks(void);
 void mess_predevice_init(running_machine *machine);
 void mess_postdevice_init(running_machine *machine);
 
-
-/* --------------------------------------------------------------------------------------------- */
-
-/* This call is used to return the next compatible driver with respect to
- * software images.  It is usable both internally and from front ends
- */
-const game_driver *mess_next_compatible_driver(const game_driver *drv);
-int mess_count_compatible_drivers(const game_driver *drv);
-
-/* --------------------------------------------------------------------------------------------- */
-
-
 #endif /* __MESS_H__ */

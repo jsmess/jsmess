@@ -886,4 +886,4 @@ ROM_START( bw2 )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   INIT    COMPANY      FULLNAME  FLAGS */
-COMP( 1985, bw2,    0,      0,      bw2,      bw2,    bw2,    "Bondwell",  "BW 2",   0 )
+COMP( 1985, bw2,    0,      0,      bw2,      bw2,    bw2,    "Bondwell",  "BW 2",   GAME_NO_SOUND )

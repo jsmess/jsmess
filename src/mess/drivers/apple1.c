@@ -279,4 +279,4 @@ ROM_END
 
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY             FULLNAME */
-COMP( 1976,	apple1,	0,		0,		apple1,		apple1,		apple1,	"Apple Computer",	"Apple I" , 0)
+COMP( 1976,	apple1,	0,		0,		apple1,		apple1,		apple1,	"Apple Computer",	"Apple I" ,  GAME_NO_SOUND )

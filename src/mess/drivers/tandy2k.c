@@ -78,4 +78,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1983, tandy2k,  0,       0, 	tandy2k, 	tandy2k, 	 0,  "Tandy Radio Shack",   "Tandy 2000",		GAME_NOT_WORKING )
+COMP( 1983, tandy2k,  0,       0, 	tandy2k, 	tandy2k, 	 0,  "Tandy Radio Shack",   "Tandy 2000",		GAME_NOT_WORKING | GAME_NO_SOUND)

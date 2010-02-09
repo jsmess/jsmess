@@ -193,4 +193,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 198?, micronic,  0,       0, 	micronic, 	micronic, 	 0,  "Victor Micronic",   "Micronic 1000",		GAME_NOT_WORKING)
+COMP( 198?, micronic,  0,       0, 	micronic, 	micronic, 	 0,  "Victor Micronic",   "Micronic 1000",		GAME_NOT_WORKING | GAME_NO_SOUND)

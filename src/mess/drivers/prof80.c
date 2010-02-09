@@ -1429,7 +1429,7 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                 FULLNAME                FLAGS */
-COMP( 1984, prof80,     0,		0,		prof80,	prof80,	0,		"Conitec Datensysteme",	"PROF-80",				GAME_NOT_WORKING )
+COMP( 1984, prof80,     0,		0,		prof80,	prof80,	0,		"Conitec Datensysteme",	"PROF-80",				GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1984, prof80g21,	prof80,	0,		grip2,	grip,	0,		"Conitec Datensysteme",	"PROF-80 (GRIP-2.1)",	GAME_NOT_WORKING )
 COMP( 1984, prof80g25,	prof80,	0,		grip2,	grip,	0,		"Conitec Datensysteme",	"PROF-80 (GRIP-2.5)",	GAME_NOT_WORKING )
 COMP( 1984, prof80g26,	prof80,	0,		grip2,	grip,	0,		"Conitec Datensysteme",	"PROF-80 (GRIP-2.6)",	GAME_NOT_WORKING )

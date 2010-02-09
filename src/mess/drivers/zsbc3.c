@@ -71,5 +71,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   			FULLNAME       FLAGS */
-COMP( 1980, zsbc3,  0,       0, 		zsbc3, 	zsbc3, 	 0,  	  "Digital Microsystems",   "ZSBC-3",		GAME_NOT_WORKING)
+COMP( 1980, zsbc3,  0,       0, 		zsbc3, 	zsbc3, 	 0,  	  "Digital Microsystems",   "ZSBC-3",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

@@ -532,5 +532,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( ????, nanos,  0,       0, 	nanos, 	nanos, 	 0,  	  "Ingenieurhochschule fur Seefahrt Warnemunde/Wustrow",   "Nanos",		GAME_NOT_WORKING)
+COMP( ????, nanos,  0,       0, 	nanos, 	nanos, 	 0,  	  "Ingenieurhochschule fur Seefahrt Warnemunde/Wustrow",   "Nanos",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

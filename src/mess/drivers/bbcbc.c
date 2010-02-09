@@ -198,4 +198,4 @@ ROM_END
 ***************************************************************************/
 
 /*   YEAR  NAME  PARENT  COMPAT  MACHINE INPUT  INIT  COMPANY  FULLNAME  FLAGS */
-CONS(1985, bbcbc,     0, 0,      bbcbc,  bbcbc, 0,    "BBC",   "Bridge Companion", 0 )
+CONS(1985, bbcbc,     0, 0,      bbcbc,  bbcbc, 0,    "BBC",   "Bridge Companion", GAME_NO_SOUND )

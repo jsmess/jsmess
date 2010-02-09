@@ -153,4 +153,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY  FULLNAME  FLAGS */
-COMP( 1984, px8,  0,      0,      px8,     px8,   0,    "Epson", "PX-8",   GAME_NOT_WORKING )
+COMP( 1984, px8,  0,      0,      px8,     px8,   0,    "Epson", "PX-8",   GAME_NOT_WORKING | GAME_NO_SOUND )

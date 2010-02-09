@@ -115,5 +115,5 @@ static ACIA6850_INTERFACE( acia_intf )
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1980, votrtnt,   0,          0,      votrtnt,   votrtnt, 0,     "Votrax",        "Type 'N Talk",                        GAME_NOT_WORKING )
+COMP( 1980, votrtnt,   0,          0,      votrtnt,   votrtnt, 0,     "Votrax",        "Type 'N Talk",                        GAME_NOT_WORKING | GAME_NO_SOUND)
 

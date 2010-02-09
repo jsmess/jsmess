@@ -235,5 +235,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY FULLNAME        FLAGS */
-CONS( 1991, 3do,        0,      0,      3do,        3do,	0,      "3DO",  "3DO (NTSC)",   GAME_NOT_WORKING )
-CONS( 1991, 3do_pal,    3do,    0,      3do_pal,    3do,	0,      "3DO",  "3DO (PAL)",    GAME_NOT_WORKING )
+CONS( 1991, 3do,        0,      0,      3do,        3do,	0,      "3DO",  "3DO (NTSC)",   GAME_NOT_WORKING | GAME_NO_SOUND )
+CONS( 1991, 3do_pal,    3do,    0,      3do_pal,    3do,	0,      "3DO",  "3DO (PAL)",    GAME_NOT_WORKING | GAME_NO_SOUND )

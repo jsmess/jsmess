@@ -942,7 +942,7 @@ COMP( 1988, pc8801ma2,		pc8801,	0,     pc88srh,  pc88sr,  0,    "NEC",  "PC-8801
 //COMP( 1989, pc8801fe2,    pc8801, 0,     pc88srh,  pc88sr,  0,    "NEC",  "PC-8801FE2", GAME_NOT_WORKING )
 COMP( 1989, pc8801mc,		pc8801,	0,     pc88srh,  pc88sr,  0,    "NEC",  "PC-8801MC", GAME_NOT_WORKING )
 
-COMP( 1987, pc88va,			0,		0,     pc88va,   pc88sr,  0,    "NEC",  "PC-88VA", GAME_NOT_WORKING )
+COMP( 1987, pc88va,			0,		0,     pc88va,   pc88sr,  0,    "NEC",  "PC-88VA", GAME_NOT_WORKING | GAME_NO_SOUND)
 //COMP( 1988, pc88va2,      pc88va, 0,     pc88va,   pc88sr,  0,    "NEC",  "PC-88VA2", GAME_NOT_WORKING )
 //COMP( 1988, pc88va3,      pc88va, 0,     pc88va,   pc88sr,  0,    "NEC",  "PC-88VA3", GAME_NOT_WORKING )
 

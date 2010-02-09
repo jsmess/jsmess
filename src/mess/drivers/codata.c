@@ -65,5 +65,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( ????, codata,  0,       0, 	codata, 	codata, 	 0,   "Contel Codata Corporation",   "Codata",		GAME_NOT_WORKING)
+COMP( ????, codata,  0,       0, 	codata, 	codata, 	 0,   "Contel Codata Corporation",   "Codata",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

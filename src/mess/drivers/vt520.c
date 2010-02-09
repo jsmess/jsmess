@@ -92,5 +92,5 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE   INPUT    INIT     COMPANY   FULLNAME       FLAGS */
 //COMP( 1993, vt510,  0,       0,   vt520,  vt520,   0,          "DEC",   "VT510",      GAME_NOT_WORKING)
-COMP( 1994, vt520,  0,       0, 	vt520, 	vt520, 	 0,  	   	 "DEC",   "VT520",		GAME_NOT_WORKING)
+COMP( 1994, vt520,  0,       0, 	vt520, 	vt520, 	 0,  	   	 "DEC",   "VT520",		GAME_NOT_WORKING | GAME_NO_SOUND)
 //COMP( 1994, vt525,  0,       0,   vt520,  vt520,   0,          "DEC",   "VT525",      GAME_NOT_WORKING)

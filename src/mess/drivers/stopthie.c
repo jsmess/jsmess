@@ -72,5 +72,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY            FULLNAME      FLAGS */
-CONS( 1979, stopthie,   0,      0,      stopthie,   stopthie,  0,      "Parker Brothers", "Stop Thief", GAME_NOT_WORKING )
+CONS( 1979, stopthie,   0,      0,      stopthie,   stopthie,  0,      "Parker Brothers", "Stop Thief", GAME_NOT_WORKING | GAME_NO_SOUND)
 

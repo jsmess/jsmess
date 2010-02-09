@@ -125,26 +125,3 @@ void mess_postdevice_init(running_machine *machine)
 	add_exit_callback(machine, image_unload_all);
 }
 
-const game_driver *mess_next_compatible_driver(const game_driver *drv)
-{
-	if (driver_get_clone(drv))
-		drv = driver_get_clone(drv);
-	else if (drv->compatible_with)
-		drv = driver_get_name(drv->compatible_with);
-	else
-		drv = NULL;
-	return drv;
-}
-
-
-
-int mess_count_compatible_drivers(const game_driver *drv)
-{
-	int count = 0;
-	while(drv)
-	{
-		count++;
-		drv = mess_next_compatible_driver(drv);
-	}
-	return count;
-}

@@ -69,5 +69,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, pmi80,  0,       0, 	pmi80, 	pmi80, 	 0,  	   	 "Tesla",   "PMI-80",		GAME_NOT_WORKING)
+COMP( 1982, pmi80,  0,       0, 	pmi80, 	pmi80, 	 0,  	   	 "Tesla",   "PMI-80",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

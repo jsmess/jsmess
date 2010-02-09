@@ -70,5 +70,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, sys2900,  0,       0, 	sys2900, 	sys2900, 	 0,  "Systems Group",   "System 2900",		GAME_NOT_WORKING)
+COMP( ????, sys2900,  0,       0, 	sys2900, 	sys2900, 	 0,  "Systems Group",   "System 2900",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

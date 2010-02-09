@@ -782,7 +782,7 @@ static void command_image_loadcreate(running_machine *machine)
 	}
 
 	success = FALSE;
-	for (gamedrv = machine->gamedrv; !success && gamedrv; gamedrv = mess_next_compatible_driver(gamedrv))
+	for (gamedrv = machine->gamedrv; !success && gamedrv; gamedrv = driver_get_compatible(gamedrv))
 	{
 		/* assemble the full path */
 		filepath = assemble_software_path(astring_alloc(), gamedrv, filename);

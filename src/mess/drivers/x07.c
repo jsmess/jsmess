@@ -71,4 +71,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME    FLAGS */
-COMP( 1983, x07,    0,      0,       x07,       x07,     0,      "Canon",  "X-07",     GAME_NOT_WORKING)
+COMP( 1983, x07,    0,      0,       x07,       x07,     0,      "Canon",  "X-07",     GAME_NOT_WORKING | GAME_NO_SOUND)

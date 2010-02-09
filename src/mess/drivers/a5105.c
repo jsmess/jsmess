@@ -70,5 +70,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, a5105,  0,       0, 	a5105, 	a5105, 	 0,  	  	 "BIC",   "A5105",		GAME_NOT_WORKING)
+COMP( ????, a5105,  0,       0, 	a5105, 	a5105, 	 0,  	  	 "BIC",   "A5105",		GAME_NOT_WORKING | GAME_NO_SOUND)
 
