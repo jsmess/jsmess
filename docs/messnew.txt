@@ -45,7 +45,7 @@ System Driver Changes:
 
 - [C128] Added read-only access to double-sided D71 floppies. [Curt Coder]
 
-- [C128] Fast IEC serial bus is now supported with a 1571. [Curt Coder]
+- [C128] Fast IEC serial bus is now supported with a 1571/1581. [Curt Coder]
 
 - [INTV] Fixed collision detection. [H@P]
 
@@ -83,7 +83,9 @@ Source Changes:
 
 - [CIA6526] Refactored interface, added SP/CNT callbacks, and fixed serial
   port transfer. [Curt Coder]
-  
+
+- [C1581] Implemented read-only access to D81 images. [Curt Coder]  
+
 - [C4040] Implemented read-only access to D64/D67/G64 images. [Curt Coder]
 
 - [C8050] Implemented read-only access to D80 images. [Curt Coder]
