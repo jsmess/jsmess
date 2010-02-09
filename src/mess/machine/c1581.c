@@ -9,13 +9,12 @@
 
 /*
 
-	http://www.unusedino.de/ec64/technical/aay/c1581/ro81main.htm
-
     TODO:
 
-	- fast serial on C128
     - power LED
     - activity LED
+
+	http://www.unusedino.de/ec64/technical/aay/c1581/ro81main.htm
 
 */
 
@@ -488,6 +487,9 @@ static DEVICE_RESET( c1581 )
 	c1581->cpu->reset();
 	c1581->cia->reset();
 	c1581->wd1770->reset();
+
+	c1581->sp_out = 1;
+	c1581->cnt_out = 1;
 }
 
 /*-------------------------------------------------
