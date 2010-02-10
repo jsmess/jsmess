@@ -12,6 +12,8 @@
 #include "snescart.h"
 
 
+#define SNES_CART_DEBUG 0
+
 /****** Strings for Cart Header Logging ******/
 
 #define UNK "Unknown"
@@ -380,8 +382,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		image_fseek(image, offset, SEEK_SET);
 	}
 
-	/* We need to take a sample to test what mode we need to be in (the
-    sample has to be quite large to cope with large carts in ExHiRom) */
+	/* We need to take a sample to test what mode we need to be in (the sample has to be quite large to cope with large carts in ExHiRom) */
 	image_fread(image, temp_buffer, 0x40ffff);
 	image_fseek(image, offset, SEEK_SET);	/* Rewind */
 
@@ -415,15 +416,21 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		snes_cart.sram_max = 0x20000;
 	}
 
+	if (SNES_CART_DEBUG) printf("mode %d\n", snes_cart.mode);
+
 	/* Loading data */
 	ROM = memory_region(image->machine, "cart");
 	length = image_fread(image, ROM, snes_rom_size - offset);
+
+	if (SNES_CART_DEBUG) printf("size %08X\n", snes_rom_size - offset);
 
 	/* FIXME: Insert crc check here */
 
 	/* How many blocks of data are available to be loaded? */
 	total_blocks = ((snes_rom_size - offset) / (snes_cart.mode & 0x05 ? 0x8000 : 0x10000));
 	read_blocks = 0;
+
+	if (SNES_CART_DEBUG) printf("blocks %d\n", total_blocks);
 
 	/* Loading all the data blocks from cart, we only partially cover banks 0x00 to 0x7f. Therefore, we
      * have to mirror the blocks until we reach the end. E.g. for a 11Mbits image (44 blocks), we proceed
@@ -500,7 +507,6 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 			{
 				/* Loading data */
 				memcpy(&snes_ram[0x400000 + read_blocks * 0x10000], &ROM[0x400000 + read_blocks * 0x10000], 0x10000);
-				memcpy(&snes_ram[0x1000000 + read_blocks * 0x10000], &snes_ram[0x400000 + read_blocks * 0x10000], 0x10000);
 				/* Mirroring */
 				memcpy(&snes_ram[0x8000 + read_blocks * 0x10000], &snes_ram[0x408000 + read_blocks * 0x10000], 0x8000);
 				read_blocks++;
