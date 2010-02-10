@@ -622,9 +622,9 @@ static WRITE8_DEVICE_HANDLER( riot1_pb_w )
 
     */
 
-	/* TODO active led 1 */
+	/* TODO activity led 1 */
 
-	/* TODO active led 0 */
+	/* TODO activity led 0 */
 
 	/* TODO error led */
 }
@@ -667,21 +667,21 @@ static void spindle_motor(c2040_t *c2040, int unit, int mtr)
 {
 	if (c2040->unit[unit].mtr != mtr)
 	{
-		if (mtr)
+		if (!mtr)
 		{
 			/* read track data */
 			read_current_track(c2040, unit);
 		}
 
-		floppy_mon_w(c2040->unit[unit].image, !mtr);
+		floppy_mon_w(c2040->unit[unit].image, mtr);
 
 		c2040->unit[unit].mtr = mtr;
 	}
 }
 
-static void micropolis_step_motor(c2040_t *c2040, int unit, int stp)
+static void micropolis_step_motor(c2040_t *c2040, int unit, int mtr, int stp)
 {
-	if (c2040->unit[unit].stp != stp)
+	if (!mtr && (c2040->unit[unit].stp != stp))
 	{
 		int tracks = 0;
 
@@ -771,14 +771,6 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 
 	c2040_t *c2040 = get_safe_token(device->owner);
 
-	/* stepper motor 1 */
-	int s1 = data & 0x03;
-	micropolis_step_motor(c2040, 1, s1);
-
-	/* stepper motor 0 */
-	int s0 = (data >> 2) & 0x03;
-	micropolis_step_motor(c2040, 0, s0);
-
 	/* spindle motor 1 */
 	int mtr1 = BIT(data, 4);
 	spindle_motor(c2040, 1, mtr1);
@@ -787,7 +779,15 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 	int mtr0 = BIT(data, 5);
 	spindle_motor(c2040, 0, mtr0);
 
-	timer_enable(c2040->bit_timer, mtr1 | mtr0);
+	/* stepper motor 1 */
+	int s1 = data & 0x03;
+	micropolis_step_motor(c2040, 1, mtr1, s1);
+
+	/* stepper motor 0 */
+	int s0 = (data >> 2) & 0x03;
+	micropolis_step_motor(c2040, 0, mtr0, s0);
+
+	timer_enable(c2040->bit_timer, !mtr1 | !mtr0);
 }
 
 static READ_LINE_DEVICE_HANDLER( ready_r )
@@ -938,9 +938,7 @@ static WRITE8_DEVICE_HANDLER( c8050_via_pb_w )
 	int s0 = (data >> 2) & 0x03;
 	mpi_step_motor(c2040, 0, mtr0, s0);
 
-	timer_enable(c2040->bit_timer, mtr1 | mtr0);
-
-	/* TODO pull sync */
+	timer_enable(c2040->bit_timer, !mtr1 | !mtr0);
 }
 
 static const via6522_interface c8050_via_intf =
@@ -1563,6 +1561,9 @@ static DEVICE_RESET( c2040 )
 	/* toggle M6502 SO */
 	cpu_set_input_line(c2040->cpu_dos, M6502_SET_OVERFLOW, ASSERT_LINE);
 	cpu_set_input_line(c2040->cpu_dos, M6502_SET_OVERFLOW, CLEAR_LINE);
+
+	/* turn off spindle motors */
+	c2040->unit[0].mtr = c2040->unit[1].mtr = 1;
 }
 
 /*-------------------------------------------------

@@ -496,9 +496,9 @@ static void spindle_motor(c1571_t *c1571, int mtr)
 	}
 }
 
-static void step_motor(c1571_t *c1571, int stp)
+static void step_motor(c1571_t *c1571, int mtr, int stp)
 {
-	if (c1571->stp != stp)
+	if (mtr & (c1571->stp != stp))
 	{
 		int tracks = 0;
 
@@ -620,13 +620,13 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 
 	c1571_t *c1571 = get_safe_token(device->owner);
 
-	/* stepper motor */
-	int stp = data & 0x03;
-	step_motor(c1571, stp);
-
 	/* spindle motor */
 	int mtr = BIT(data, 2);
 	spindle_motor(c1571, mtr);
+
+	/* stepper motor */
+	int stp = data & 0x03;
+	step_motor(c1571, mtr, stp);
 
 	/* activity LED */
 
