@@ -445,6 +445,7 @@ static WRITE_LINE_DEVICE_HANDLER( cgenie_fdc_intrq_w )
 
 const wd17xx_interface cgenie_wd17xx_interface =
 {
+	DEVCB_NULL,
 	DEVCB_LINE(cgenie_fdc_intrq_w),
 	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}

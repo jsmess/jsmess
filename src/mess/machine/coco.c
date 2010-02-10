@@ -2043,7 +2043,7 @@ static void setup_memory_map(running_machine *machine)
 	int	 	wbank;			/* bank no to go in this block */
 	UINT8 		*offset;		/* offset into coco rom for rom mapping */
 	char	bank[10];
-		
+
 	/* Set last RAM block dependent on map type */
 	if (maptype)
 		last_ram_block=15;
@@ -2378,11 +2378,11 @@ static void coco3_mmu_update(running_machine *machine, int lowblock, int hiblock
 	UINT8 *readbank;
 	UINT8 *cart_rom = memory_region(machine, "cart");
 	char bank[10];
-	
+
 	for (i = lowblock; i <= hiblock; i++)
 	{
 		sprintf(bank,"bank%d",i+1);
-		
+
 		offset = coco3_mmu_translate(machine, i, 0);
 		if (offset & 0x80000000)
 		{
@@ -2396,12 +2396,12 @@ static void coco3_mmu_update(running_machine *machine, int lowblock, int hiblock
 		else
 		{
 			/* offset into normal RAM */
-			readbank = &messram_get_ptr(devtag_get_device(machine, "messram"))[offset];			
+			readbank = &messram_get_ptr(devtag_get_device(machine, "messram"))[offset];
 			memory_install_write_bank(space, bank_info[i].start, bank_info[i].end, 0, 0, bank);
 		}
 
 		/* set up the banks */
-		memory_set_bankptr(machine, bank, readbank);		
+		memory_set_bankptr(machine, bank, readbank);
 
 		if (LOG_MMU)
 		{
@@ -2928,7 +2928,7 @@ MACHINE_RESET( dgnalpha )
 {
 	running_device *fdc = devtag_get_device(machine, "wd2797");
 	wd17xx_set_complete_command_delay(fdc,20);
- 
+
 	/* dgnalpha_just_reset, is here to flag that we should ignore the first irq generated */
 	/* by the WD2797, it is reset to 0 after the first inurrupt */
 	dgnalpha_just_reset=1;
@@ -2939,6 +2939,7 @@ MACHINE_RESET( dgnalpha )
 
 const wd17xx_interface dgnalpha_wd17xx_interface =
 {
+	DEVCB_NULL,
 	DEVCB_LINE(dgnalpha_fdc_intrq_w),
 	DEVCB_LINE(dgnalpha_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}

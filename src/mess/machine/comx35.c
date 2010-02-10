@@ -201,6 +201,7 @@ static WRITE_LINE_DEVICE_HANDLER( comx35_fdc_drq_w )
 
 const wd17xx_interface comx35_wd17xx_interface =
 {
+	DEVCB_NULL,
 	DEVCB_LINE(comx35_fdc_intrq_w),
 	DEVCB_LINE(comx35_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
