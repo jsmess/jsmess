@@ -598,6 +598,7 @@ static WRITE_LINE_DEVICE_HANDLER( concept_fdc_drq_w )
 
 const wd17xx_interface concept_wd17xx_interface =
 {
+	DEVCB_NULL,
 	DEVCB_LINE(concept_fdc_intrq_w),
 	DEVCB_LINE(concept_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}

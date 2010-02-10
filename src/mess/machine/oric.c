@@ -982,8 +982,6 @@ WRITE8_HANDLER(oric_microdisc_w)
 			break;
 		case 0x04:
 		{
-			DENSITY density;
-
 			port_314_w = data;
 
 			//logerror("port_314_w: %02x\n",data);
@@ -1058,6 +1056,7 @@ static WRITE_LINE_DEVICE_HANDLER( oric_wd179x_drq_w )
 
 const wd17xx_interface oric_wd17xx_interface =
 {
+	DEVCB_NULL,
 	DEVCB_LINE(oric_wd179x_intrq_w),
 	DEVCB_LINE(oric_wd179x_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}

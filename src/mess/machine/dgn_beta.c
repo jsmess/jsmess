@@ -942,6 +942,7 @@ static WRITE_LINE_DEVICE_HANDLER( dgnbeta_fdc_drq_w )
 
 const wd17xx_interface dgnbeta_wd17xx_interface =
 {
+	DEVCB_NULL,
 	DEVCB_DEVICE_LINE(PIA_2_TAG, dgnbeta_fdc_intrq_w),
 	DEVCB_LINE(dgnbeta_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
