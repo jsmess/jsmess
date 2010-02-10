@@ -158,7 +158,7 @@ static INPUT_PORTS_START( snes )
 	PORT_CONFSETTING(   0x0, DEF_STR( No ) )
 	PORT_CONFSETTING(   0x1, DEF_STR( Yes ) )
 
-#ifdef MAME_DEBUG
+#ifdef SNES_LAYER_DEBUG
 	PORT_START("DEBUG1")	/* debug switches */
 	PORT_DIPNAME( 0x3, 0x0, "Browse tiles" )
 	PORT_DIPSETTING(   0x0, DEF_STR( Off ) )
