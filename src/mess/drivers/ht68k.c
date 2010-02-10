@@ -96,6 +96,7 @@ static WRITE_LINE_DEVICE_HANDLER( ht68k_fdc_intrq_w )
 
 static const wd17xx_interface ht68k_wd17xx_interface =
 {
+	DEVCB_NULL,
 	DEVCB_LINE(ht68k_fdc_intrq_w),
 	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}

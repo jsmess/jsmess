@@ -168,6 +168,14 @@ static const floppy_config pk8020_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+static const wd17xx_interface pk8020_wd17xx_interface =
+{
+	DEVCB_LINE_VCC,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	{ FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3 }
+};
+
 /* F4 Character Displayer */
 static const gfx_layout pk8020_charlayout =
 {
@@ -219,7 +227,7 @@ static MACHINE_DRIVER_START( pk8020 )
 	MDRV_MSM8251_ADD( "rs232", default_msm8251_interface)
 	MDRV_MSM8251_ADD( "lan", default_msm8251_interface)
 
-	MDRV_WD1793_ADD( "wd1793", default_wd17xx_interface )
+	MDRV_WD1793_ADD( "wd1793", pk8020_wd17xx_interface )
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -243,9 +251,9 @@ ROM_START( korvet )
 	ROM_REGION( 0x16000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("v11")
 	ROM_SYSTEM_BIOS(0, "v11", "v1.1")
-	ROMX_LOAD( "korvet11.rom", 0x10000, 0x6000, CRC(81bdc2af) SHA1(c3484c3f1f3d252475979283c073286b8661d2b9), ROM_BIOS(1))	
+	ROMX_LOAD( "korvet11.rom", 0x10000, 0x6000, CRC(81bdc2af) SHA1(c3484c3f1f3d252475979283c073286b8661d2b9), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v20", "v2.0")
-	ROMX_LOAD( "korvet20.rom", 0x10000, 0x6000, CRC(d6c36a45) SHA1(dba67e63457251814ad5c0fe6bb6d584eea5c7d2), ROM_BIOS(2))	
+	ROMX_LOAD( "korvet20.rom", 0x10000, 0x6000, CRC(d6c36a45) SHA1(dba67e63457251814ad5c0fe6bb6d584eea5c7d2), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "cpm", "cpm")
 	ROMX_LOAD( "cpm.rom",      0x10000, 0x4000, CRC(7a38d7f6) SHA1(fec6623291a38990b003e818683cd5edfb494c36), ROM_BIOS(3))
 	ROM_REGION( 0x2000, "gfx1", 0 )
@@ -271,7 +279,7 @@ ROM_START( kontur )
 	ROM_LOAD( "kontur.fnt", 0x0000, 0x2000, CRC(14d33790) SHA1(6d5fcb214805c5fc44ef98a97219158ff7826ac0))
 ROM_END
 
-    
+
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */

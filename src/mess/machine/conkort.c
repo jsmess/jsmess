@@ -615,8 +615,8 @@ static WRITE8_DEVICE_HANDLER( conkort_pio_port_b_w )
 	slow_t *conkort = get_safe_token_machine_slow(device->machine);
 
 	/* disk density */
-	wd17xx_set_density(conkort->wd1791, BIT(data, 3) ? DEN_FM_HI : DEN_FM_LO);
 	conkort->fdc_dden = BIT(data, 3);
+	wd17xx_dden_w(conkort->wd1791, conkort->fdc_dden);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( conkort_pio_ardy_w )
@@ -737,6 +737,7 @@ static WRITE_LINE_DEVICE_HANDLER( slow_wd1791_drq_w )
 
 static const wd17xx_interface slow_wd17xx_interface =
 {
+	DEVCB_NULL,
 	DEVCB_LINE(slow_wd1791_intrq_w),
 	DEVCB_LINE(slow_wd1791_drq_w),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
@@ -746,6 +747,7 @@ static const wd17xx_interface slow_wd17xx_interface =
 
 static const wd17xx_interface fast_wd17xx_interface =
 {
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE(Z80DMA_TAG, z80dma_rdy_w),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }

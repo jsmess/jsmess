@@ -254,7 +254,7 @@ const struct pit8253_config specimx_pit8253_intf =
 MACHINE_START( specimx )
 {
 	running_device *fdc = devtag_get_device(machine, "wd1793");
-	wd17xx_set_density (fdc,DEN_FM_HI);
+	wd17xx_dden_w(fdc, ASSERT_LINE);
 }
 
 static TIMER_CALLBACK( setup_pit8253_gates )
@@ -423,12 +423,5 @@ WRITE8_HANDLER( erik_disk_reg_w )
 
 	wd17xx_set_side (fdc,data & 1);
 	wd17xx_set_drive(fdc,(data >> 1) & 1);
-	if((data >>2) & 1)
-	{
-		wd17xx_set_density (fdc,DEN_FM_LO);
-	}
-	else
-	{
-		wd17xx_set_density (fdc,DEN_FM_HI);
-	}
+	wd17xx_dden_w(fdc, BIT(data, 2));
 }

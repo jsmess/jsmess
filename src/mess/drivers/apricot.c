@@ -182,6 +182,7 @@ static WRITE_LINE_DEVICE_HANDLER( apricot_wd2793_drq_w )
 
 static const wd17xx_interface apricot_wd17xx_intf =
 {
+	DEVCB_LINE_GND,
 	DEVCB_LINE(apricot_wd2793_intrq_w),
 	DEVCB_LINE(apricot_wd2793_drq_w),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }

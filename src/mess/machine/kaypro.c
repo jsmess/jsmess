@@ -68,7 +68,7 @@ static WRITE8_DEVICE_HANDLER( pio_system_w )
 		memory_set_bankptr(mem->machine, "bank3", memory_region(mem->machine, "rambank"));
 	}
 
-	wd17xx_set_density(kaypro_fdc, (DENSITY)((data & 0x20) ? 0 : 1));
+	wd17xx_dden_w(kaypro_fdc, BIT(data, 5));
 
 	centronics_strobe_w(kaypro_printer, BIT(data, 4));
 
@@ -179,7 +179,7 @@ WRITE8_HANDLER( kaypro2x_system_port_w )
 		memory_set_bankptr(mem->machine, "bank3", memory_region(mem->machine, "rambank"));
 	}
 
-	wd17xx_set_density(kaypro_fdc, (DENSITY)((data & 0x20) ? 0 : 1));
+	wd17xx_dden_w(kaypro_fdc, BIT(data, 5));
 
 	centronics_strobe_w(kaypro_printer, BIT(data, 3));
 

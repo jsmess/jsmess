@@ -295,7 +295,6 @@ static WRITE8_HANDLER( to7_5p14_w )
 	{
 		/* drive select */
 		int drive = -1, side = 0;
-		DENSITY dens;
 
 		switch ( data & 7 )
 		{
@@ -308,8 +307,7 @@ static WRITE8_HANDLER( to7_5p14_w )
 			logerror( "%f $%04x to7_5p14_w: invalid drive select pattern $%02X\n", attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), data );
 		}
 
-		dens = (data & 0x80) ? DEN_FM_LO : DEN_MFM_LO;
-		wd17xx_set_density( fdc, dens );
+		wd17xx_dden_w(fdc, BIT(data, 7));
 
 		to7_5p14_select = data;
 
@@ -320,7 +318,7 @@ static WRITE8_HANDLER( to7_5p14_w )
 			wd17xx_set_side( fdc, side );
 			LOG(( "%f $%04x to7_5p14_w: $%02X set drive=%i side=%i density=%s\n",
 			      attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")),
-			      data, drive, side, (dens == DEN_FM_LO) ? "FM" : "MFM" ));
+			      data, drive, side, (BIT(data, 7) ? "FM" : "MFM")));
 		}
 	}
 	else
@@ -1332,14 +1330,13 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 
 	case 0: /* CMD0 */
 	{
-		DENSITY dens = (data & 0x20) ? DEN_FM_LO : DEN_MFM_LO;
 		int wsync = (data >> 4) & 1;
 		int qdd = thmfc_floppy_is_qdd(thmfc_floppy_image(space->machine));
 		chrn_id id;
 		thmfc1->formatting = (data >> 2) & 1;
 		LOG (( "%f $%04x thmfc_floppy_w: CMD0=$%02X dens=%s wsync=%i dsync=%i fmt=%i op=%i\n",
 		       attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), data,
-		       (dens == DEN_FM_LO) ? "MF" : "MFM",
+		       (BIT(data, 5) ? "FM" : "MFM"),
 		       wsync, (data >> 3) & 1,
 		       thmfc1->formatting, data & 3 ));
 

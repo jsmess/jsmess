@@ -456,7 +456,8 @@ static WRITE8_HANDLER(towns_floppy_w)
 				floppy_drive_set_ready_state(floppy_get_device(space->machine, towns_selected_drive-1), data & 0x10,0);
 			}
 			wd17xx_set_side(fdc,(data & 0x04)>>2);
-			wd17xx_set_density(fdc,(DENSITY)((data & 0x02)>>1));
+			wd17xx_dden_w(fdc, BIT(data, 1));
+
 			towns_fdc_irq6mask = data & 0x01;
 			logerror("FDC: write %02x to offset 0x08\n",data);
 			break;
@@ -762,7 +763,7 @@ static READ32_HANDLER(towns_padport_r)
 		ret |= ((input_port_read(space->machine,"joy2") & 0x3f) << 16) | 0x00400000;
 	else
 		ret |= 0x003f0000;
-	
+
 	if(extra1 & 0x01) // Run button = left+right
 		ret &= ~0x0000000c;
 	if(extra2 & 0x01)
@@ -2029,6 +2030,7 @@ static const struct pic8259_interface towns_pic8259_slave_config =
 
 static const wd17xx_interface towns_mb8877a_interface =
 {
+	DEVCB_NULL,
 	DEVCB_DEVICE_LINE("pic8259_master",towns_mb8877a_irq_w),
 	DEVCB_DEVICE_LINE("dma_1", towns_mb8877a_drq_w),
 	{FLOPPY_0,FLOPPY_1,0,0}

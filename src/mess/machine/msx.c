@@ -326,8 +326,6 @@ MACHINE_START( msx )
 
 MACHINE_START( msx2 )
 {
-	running_device *fdc = devtag_get_device(machine, "wd179x");
-	wd17xx_set_density (fdc,DEN_FM_HI);
 	msx1.dsk_stat = 0x7f;
 }
 
@@ -734,6 +732,7 @@ static WRITE_LINE_DEVICE_HANDLER( msx_wd179x_drq_w )
 
 const wd17xx_interface msx_wd17xx_interface =
 {
+	DEVCB_LINE_VCC,
 	DEVCB_LINE(msx_wd179x_intrq_w),
 	DEVCB_LINE(msx_wd179x_drq_w),
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}

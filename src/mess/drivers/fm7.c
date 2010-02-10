@@ -1805,6 +1805,7 @@ static MACHINE_RESET(fm7)
 
 static const wd17xx_interface fm7_mb8877a_interface =
 {
+	DEVCB_NULL,
 	DEVCB_LINE(fm7_fdc_intrq_w),
 	DEVCB_LINE(fm7_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}

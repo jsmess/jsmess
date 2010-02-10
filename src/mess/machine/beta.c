@@ -89,6 +89,7 @@ static WRITE_LINE_DEVICE_HANDLER( betadisk_wd179x_drq_w )
 
 static const wd17xx_interface beta_wd17xx_interface =
 {
+	DEVCB_NULL,
 	DEVCB_LINE(betadisk_wd179x_intrq_w),
 	DEVCB_LINE(betadisk_wd179x_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
@@ -157,7 +158,7 @@ WRITE8_DEVICE_HANDLER(betadisk_param_w)
 	if (beta->betadisk_active==1) {
   		wd17xx_set_drive(beta->wd179x, data & 3);
   		wd17xx_set_side (beta->wd179x,(data & 0x10) ? 0 : 1 );
-  		wd17xx_set_density(beta->wd179x, data & 0x20 ? DEN_MFM_HI : DEN_FM_LO );
+  		wd17xx_dden_w(beta->wd179x, !BIT(data, 5));
   		if ((data & 0x04) == 0) // reset
   		{
   			wd17xx_reset(beta->wd179x);

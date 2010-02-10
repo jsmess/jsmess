@@ -817,7 +817,7 @@ static WRITE8_DEVICE_HANDLER( misc_8255_a_w )
 	floppy_drive_set_ready_state(get_floppy_image(device->machine, 1), f_motor_on, 1);
 
 	/* density select */
-	wd17xx_set_density(state->mb8877, BIT(data, 7) ? DEN_FM_LO : DEN_FM_HI);
+	wd17xx_dden_w(state->mb8877, BIT(data, 7));
 }
 
 static WRITE8_DEVICE_HANDLER( misc_8255_b_w )
@@ -1077,6 +1077,7 @@ static WRITE_LINE_DEVICE_HANDLER( v1050_mb8877_drq_w )
 
 static const wd17xx_interface v1050_wd17xx_intf =
 {
+	DEVCB_NULL,
 	DEVCB_LINE(v1050_mb8877_intrq_w),
 	DEVCB_LINE(v1050_mb8877_drq_w),
 	{FLOPPY_0,FLOPPY_1,NULL,NULL}

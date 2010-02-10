@@ -395,14 +395,10 @@ MACHINE_RESET(z80netb)
 
 MACHINE_RESET(z80netf)
 {
-	running_device *z80ne_fdc;
-
 	LOG(("In MACHINE_RESET z80netf\n"));
 	reset_lx390_banking(machine);
 	MACHINE_RESET_CALL( z80ne_base );
 	reset_lx388(machine);
-	z80ne_fdc = devtag_get_device(machine, "wd1771");
-	wd17xx_set_density (z80ne_fdc, DEN_FM_HI); /* Datarate 64 usec */
 }
 
 INPUT_CHANGED( z80ne_reset )
@@ -436,7 +432,7 @@ MACHINE_START( z80ne )
 	state_save_register_item_array( machine, "z80ne", NULL, 0, lx383_key );
 	state_save_register_item( machine, "z80ne", NULL, 0, nmi_delay_counter );
 	cassette_timer = timer_alloc(machine, z80ne_cassette_tc, NULL);
-    timer_pulse(machine,  ATTOTIME_IN_HZ(1000), NULL, 0, z80ne_kbd_scan );	
+    timer_pulse(machine,  ATTOTIME_IN_HZ(1000), NULL, 0, z80ne_kbd_scan );
 }
 
 MACHINE_START( z80net )

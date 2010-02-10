@@ -648,7 +648,7 @@ static WRITE8_HANDLER(concept_fdc_reg_w)
 		/*motor_on = (data & LC_MOTOROF_mask) == 0;*/
 		// floppy_drive_set_motor_state(floppy_get_device(machine,  current_drive), (data & LC_MOTOROF_mask) == 0 ? 1 : 0);
 		/*flp_8in = (data & LC_FLP8IN_mask) != 0;*/
-		wd17xx_set_density(fdc, (data & LC_FMMFM_mask) ? DEN_FM_LO : DEN_MFM_LO);
+		wd17xx_dden_w(fdc, BIT(data, 7));
 		floppy_drive_set_ready_state(floppy_get_device(space->machine, current_drive), 1, 0);
 		break;
 

@@ -165,7 +165,7 @@ WRITE8_HANDLER ( mbee_fdc_motor_w )
 
 	wd17xx_set_drive(mbee_fdc, data & 3);
 	wd17xx_set_side(mbee_fdc, (data & 4) ? 1 : 0);
-	wd17xx_set_density(mbee_fdc, (DENSITY)((data & 8) ? 1 : 0));
+	wd17xx_dden_w(mbee_fdc, !BIT(data, 3));
 }
 
 /***********************************************************

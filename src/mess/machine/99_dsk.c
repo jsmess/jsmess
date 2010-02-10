@@ -393,6 +393,7 @@ static WRITE_LINE_DEVICE_HANDLER( ti99_fdc_drq_w )
 
 const wd17xx_interface ti99_wd17xx_interface =
 {
+	DEVCB_NULL,
 	DEVCB_LINE(ti99_fdc_intrq_w),
 	DEVCB_LINE(ti99_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
@@ -456,7 +457,7 @@ void ti99_fdc_reset(running_machine *machine)
 	ti99_peb_set_card_handlers(0x1100, & fdc_handlers);
 	if (fdc) {
 		wd17xx_reset(fdc);		/* resets the fdc */
-		wd17xx_set_density(fdc,DEN_FM_LO);
+		wd17xx_dden_w(fdc, ASSERT_LINE);
 	}
 }
 
@@ -668,7 +669,7 @@ void ti99_ccfdc_reset(running_machine *machine)
 	ti99_peb_set_card_handlers(0x1100, & ccfdc_handlers);
 
 	wd17xx_reset(fdc);		/* initialize the floppy disk controller */
-	wd17xx_set_density(fdc,DEN_MFM_LO);
+	wd17xx_dden(fdc, CLEAR_LINE);
 }
 #endif
 
@@ -778,7 +779,7 @@ static void ccfdc_cru_w(running_machine *machine, int offset, int data)
 
 	case 10:
 		/* double density enable (active low) */
-		wd17xx_set_density(fdc,data ? DEN_FM_LO : DEN_MFM_LO);
+		wd17xx_dden(fdc, data ? ASSERT_LINE : CLEAR_LINE);
 		break;
 
 	case 11:
@@ -888,7 +889,7 @@ void ti99_bwg_reset(running_machine *machine)
 	ti99_peb_set_card_handlers(0x1100, & bwg_handlers);
 
 	wd17xx_reset(fdc);		/* initialize the floppy disk controller */
-	wd17xx_set_density(fdc,DEN_MFM_LO);
+	wd17xx_dden_w(fdc, CLEAR_LINE);
 }
 
 /*
@@ -996,7 +997,7 @@ static void bwg_cru_w(running_machine *machine, int offset, int data)
 
 	case 10:
 		/* double density enable (active low) */
-		wd17xx_set_density(fdc,data ? DEN_FM_LO : DEN_MFM_LO);
+		wd17xx_dden_w(fdc, data ? ASSERT_LINE : CLEAR_LINE);
 		break;
 
 	case 11:

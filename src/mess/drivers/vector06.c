@@ -157,6 +157,14 @@ static const floppy_config vector_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+const wd17xx_interface vector06_wd17xx_interface =
+{
+	DEVCB_LINE_VCC,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL}
+};
+
 /* Machine driver */
 static MACHINE_DRIVER_START( vector06 )
   /* basic machine hardware */
@@ -192,7 +200,7 @@ static MACHINE_DRIVER_START( vector06 )
 
 	MDRV_CASSETTE_ADD( "cassette", vector_cassette_config )
 
-	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
+	MDRV_WD1793_ADD("wd1793", vector06_wd17xx_interface)
 	MDRV_FLOPPY_2_DRIVES_ADD(vector_floppy_config)
 
 	/* cartridge */

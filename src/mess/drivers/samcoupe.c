@@ -561,6 +561,14 @@ static const floppy_config samcoupe_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+static const wd17xx_interface samcoupe_wd17xx_intf =
+{
+	DEVCB_LINE_GND,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
+};
+
 static MACHINE_DRIVER_START( samcoupe )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SAMCOUPE_XTAL_X1 / 4) /* 6 MHz */
@@ -586,7 +594,7 @@ static MACHINE_DRIVER_START( samcoupe )
 	MDRV_CENTRONICS_ADD("lpt1", standard_centronics)
 	MDRV_CENTRONICS_ADD("lpt2", standard_centronics)
 	MDRV_MSM6242_ADD("sambus_clock")
-	MDRV_WD1772_ADD("wd1772", default_wd17xx_interface_2_drives)
+	MDRV_WD1772_ADD("wd1772", samcoupe_wd17xx_intf)
 	MDRV_CASSETTE_ADD("cassette", samcoupe_cassette_config)
 
 	/* sound hardware */

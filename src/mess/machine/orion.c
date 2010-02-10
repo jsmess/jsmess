@@ -70,9 +70,6 @@ DRIVER_INIT( orion128 )
 
 MACHINE_START( orion128 )
 {
-	running_device *fdc = devtag_get_device(machine, "wd1793");
-
-	wd17xx_set_density (fdc,DEN_FM_HI);
 	orion_video_mode_mask = 7;
 }
 
@@ -263,9 +260,6 @@ DRIVER_INIT( orionz80 )
 
 MACHINE_START( orionz80 )
 {
-	running_device *fdc = devtag_get_device(machine, "wd1793");
-
-	wd17xx_set_density (fdc,DEN_FM_HI);
 	mc146818_init(machine, MC146818_IGNORE_CENTURY);
 	orion_video_mode_mask = 7;
 }
@@ -448,12 +442,6 @@ DRIVER_INIT( orionpro )
 	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,512*1024);
 }
 
-
-MACHINE_START( orionpro )
-{
-	running_device *fdc = devtag_get_device(machine, "wd1793");
-	wd17xx_set_density (fdc,DEN_FM_HI);
-}
 
 static WRITE8_HANDLER ( orionpro_memory_page_w );
 

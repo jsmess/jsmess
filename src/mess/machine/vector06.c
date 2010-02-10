@@ -178,8 +178,6 @@ WRITE8_HANDLER(vector06_disc_w)
 
 MACHINE_START( vector06 )
 {
-	running_device *fdc = devtag_get_device(machine, "wd1793");
-	wd17xx_set_density (fdc, DEN_FM_HI);
 	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, reset_check_callback);
 }
 

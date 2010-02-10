@@ -641,7 +641,7 @@ WRITE8_HANDLER( trs80m4_f4_w )
 		wd17xx_set_side(trs80_fdc,head);
 	}
 
-	wd17xx_set_density(trs80_fdc, (DENSITY)((data & 0x80) ? 1 : 0));
+	wd17xx_dden_w(trs80_fdc, !BIT(data, 7));
 }
 
 WRITE8_HANDLER( sys80_f8_w )

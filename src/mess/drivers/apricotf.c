@@ -125,13 +125,6 @@ static WRITE8_HANDLER( act_fdc_w )
 	}
 }
 
-static const wd17xx_interface act_wd2797_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	{FLOPPY_0, FLOPPY_1 }
-};
-
 static READ16_HANDLER( act_pal_r )
 {
 	act_state *state = (act_state *)space->machine->driver_data;
@@ -317,7 +310,7 @@ static MACHINE_DRIVER_START( act_f1 )
 	MDRV_PALETTE_LENGTH(16)
 //  MDRV_PALETTE_INIT(black_and_white)
 
-	MDRV_WD2793_ADD("fdc", act_wd2797_interface )
+	MDRV_WD2793_ADD("fdc", default_wd17xx_interface_2_drives )
 
 	MDRV_GFXDECODE(act_f1)
 

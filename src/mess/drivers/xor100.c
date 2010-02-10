@@ -249,7 +249,7 @@ static WRITE8_HANDLER( fdc_dsel_w )
 	case 3: state->fdc_dden = state->fdc_dden; break;
 	}
 
-	wd17xx_set_density(state->wd1795, state->fdc_dden ? DEN_FM_HI : DEN_FM_LO);
+	wd17xx_dden_w(state->wd1795, state->fdc_dden);
 }
 
 /* Memory Maps */
@@ -507,6 +507,7 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
 
 static const wd17xx_interface wd1795_intf =
 {
+	DEVCB_NULL,
 	DEVCB_LINE(fdc_irq_w),
 	DEVCB_LINE(fdc_drq_w),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }

@@ -140,7 +140,7 @@ static void xerox820_bankswitch(running_machine *machine, int bank)
 	xerox820_state *state = (xerox820_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
-	
+
 	if (bank)
 	{
 		/* ROM */
@@ -161,7 +161,7 @@ static void xerox820ii_bankswitch(running_machine *machine, int bank)
 	xerox820_state *state = (xerox820_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
-	
+
 	if (bank)
 	{
 		/* ROM */
@@ -212,7 +212,7 @@ static WRITE8_HANDLER( slden_w )
 {
 	xerox820_state *state = (xerox820_state *)space->machine->driver_data;
 
-	wd17xx_set_density(state->wd1771, offset ? DEN_MFM_HI : DEN_MFM_LO);
+	wd17xx_dden_w(state->wd1771, offset ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( chrom_w )
@@ -242,7 +242,7 @@ static WRITE8_HANDLER( sync_w )
 		/* set internal clocks for asynchronous sio A */
 	}
 }
-	
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( xerox820_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -612,6 +612,7 @@ static WRITE_LINE_DEVICE_HANDLER( xerox820_wd1771_drq_w )
 
 static const wd17xx_interface wd1771_intf =
 {
+	DEVCB_NULL,
 	DEVCB_LINE(xerox820_wd1771_intrq_w),
 	DEVCB_LINE(xerox820_wd1771_drq_w),
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
@@ -929,7 +930,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( xerox168 )
 	MDRV_IMPORT_FROM( xerox820ii )
-	
+
 	MDRV_CPU_ADD(I8086_TAG, I8086, 4770000)
     MDRV_CPU_PROGRAM_MAP(xerox168_mem)
 

@@ -994,16 +994,7 @@ WRITE8_HANDLER(oric_microdisc_w)
 			/* bit 0: enable FDC IRQ to trigger IRQ on CPU */
 			wd17xx_set_drive(fdc,(data>>5) & 0x03);
 			wd17xx_set_side(fdc,(data>>4) & 0x01);
-			if (data & (1<<3))
-			{
-				density = DEN_MFM_LO;
-			}
-			else
-			{
-				density = DEN_FM_HI;
-			}
-
-			wd17xx_set_density(fdc,density);
+			wd17xx_dden_w(fdc, !BIT(data, 3));
 
 			oric_microdisc_set_mem_0x0c000(space->machine);
 			oric_microdisc_refresh_wd179x_ints(space->machine);

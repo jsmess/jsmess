@@ -104,6 +104,7 @@ static WRITE_LINE_DEVICE_HANDLER( atarist_fdc_drq_w )
 
 static const wd17xx_interface atarist_wd17xx_interface =
 {
+	DEVCB_NULL,
 	DEVCB_LINE(atarist_fdc_intrq_w),
 	DEVCB_LINE(atarist_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
@@ -1796,7 +1797,7 @@ static DEVICE_IMAGE_LOAD( atarist_cart )
 
 static DEVICE_IMAGE_LOAD( atarist_serial )
 {
-	/* filename specified */	
+	/* filename specified */
 	if (device_load_serial(image)==INIT_PASS)
 	{
 		serial_device_setup(image, 9600, 8, 1, SERIAL_PARITY_NONE);
@@ -1825,7 +1826,7 @@ static DEVICE_GET_INFO( atarist_serial )
 
 #define MDRV_ATARIST_SERIAL_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, ATARIST_SERIAL, 0)
-	
+
 static const floppy_config atarist_floppy_config =
 {
 	DEVCB_NULL,
@@ -1894,7 +1895,7 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1024K")  // 1040ST
 	MDRV_RAM_EXTRA_OPTIONS("512K,256K") //  520ST ,260ST
-	
+
 	MDRV_ATARIST_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
@@ -1970,7 +1971,7 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1024K")  // 1040STe
 	MDRV_RAM_EXTRA_OPTIONS("512K") //  520STe
-	
+
 	MDRV_ATARIST_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
@@ -1987,7 +1988,7 @@ static MACHINE_DRIVER_START( megaste )
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("4M")  //  Mega STe 4
 	MDRV_RAM_EXTRA_OPTIONS("2M,1M") //  Mega STe 2 ,Mega STe 1
-	
+
 	MDRV_ATARIST_SERIAL_ADD("serial2")
 MACHINE_DRIVER_END
 
@@ -2042,7 +2043,7 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4M")
 	MDRV_RAM_EXTRA_OPTIONS("1M")
-	
+
 	MDRV_ATARIST_SERIAL_ADD("serial")
 	MDRV_ATARIST_SERIAL_ADD("serial2")
 MACHINE_DRIVER_END
@@ -2183,7 +2184,7 @@ ROM_START( falcon40 )
 	ROM_SYSTEM_BIOS( 0, "tos492", "TOS 4.92" )
 	ROMX_LOAD( "tos492.img", 0xe00000, 0x080000, BAD_DUMP CRC(bc8e497f) SHA1(747a38042844a6b632dcd9a76d8525fccb5eb892), ROM_BIOS(2) )
 ROM_END
-	
+
 /* System Drivers */
 
 /*     YEAR  NAME    PARENT    COMPAT   MACHINE   INPUT     INIT   COMPANY    FULLNAME */

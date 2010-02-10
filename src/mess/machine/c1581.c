@@ -85,10 +85,10 @@ INLINE void set_iec_data(running_device *device)
 
 	int atn = cbm_iec_atn_r(c1581->serial_bus);
 	int data = !c1581->data_out & !(c1581->atn_ack & !atn);
-	
+
 	/* fast serial data */
 	if (c1581->ser_dir) data &= c1581->sp_out;
-	
+
 	cbm_iec_data_w(c1581->serial_bus, device, data);
 }
 
@@ -97,7 +97,7 @@ INLINE void set_iec_srq(running_device *device)
 	c1581_t *c1581 = get_safe_token(device);
 
 	int srq = 1;
-	
+
 	/* fast serial clock */
 	if (c1581->ser_dir) srq &= c1581->cnt_out;
 
@@ -365,6 +365,7 @@ static MOS8520_INTERFACE( cia_intf )
 
 static const wd17xx_interface wd1770_intf =
 {
+	DEVCB_LINE_GND,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	{ FLOPPY_0, NULL, NULL, NULL }
@@ -463,9 +464,6 @@ static DEVICE_START( c1581 )
 	c1581->wd1770 = device->subdevice(WD1770_TAG);
 	c1581->serial_bus = devtag_get_device(device->machine, config->serial_bus_tag);
 	c1581->image = device->subdevice(FLOPPY_0);
-
-	/* set floppy density */
-	wd17xx_set_density(c1581->wd1770, DEN_MFM_LO); // _DDEN = low
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, c1581->address);

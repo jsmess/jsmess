@@ -211,7 +211,7 @@ static WRITE8_HANDLER( system_w )
 	if (BIT(data, 1)) wd17xx_set_drive(state->fd1797, 1);
 
 	/* density select */
-	wd17xx_set_density(state->fd1797, BIT(data, 4) ? DEN_FM_LO : DEN_FM_HI);
+	wd17xx_dden_w(state->fd1797, BIT(data, 4));
 
 	/* floppy motor */
 	floppy_mon_w(get_floppy_image(space->machine, 0), !BIT(data, 6));
@@ -540,6 +540,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 static const wd17xx_interface tiki100_wd17xx_interface =
 {
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }

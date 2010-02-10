@@ -1663,16 +1663,7 @@ static WRITE8_HANDLER(bbc_wd177x_status_w)
 	wd17xx_set_side(fdc,(data>>2) & 0x01);
 
 	/* set density */
-	if ((data>>3) & 0x01)
-	{
-		/* single density */
-		wd17xx_set_density(fdc,DEN_FM_HI);
-	}
-	else
-	{
-		/* double density */
-		wd17xx_set_density(fdc,DEN_MFM_LO);
-	}
+	wd17xx_dden_w(fdc, BIT(data, 3));
 
 	bbc_1770_IntEnabled=(((data>>4) & 0x01)==0);
 
@@ -1783,16 +1774,7 @@ static WRITE8_HANDLER( bbc_opus_status_w )
 	wd17xx_set_side(fdc,(data>>0) & 0x01);
 
 	/* set density */
-	if ((data>>5) & 0x01)
-	{
-		/* single density */
-		wd17xx_set_density(fdc,DEN_FM_HI);
-	}
-	else
-	{
-		/* double density */
-		wd17xx_set_density(fdc,DEN_MFM_LO);
-	}
+	wd17xx_dden_w(fdc, BIT(data, 5));
 
 	bbc_1770_IntEnabled=(data>>4) & 0x01;
 
@@ -1942,16 +1924,7 @@ WRITE8_HANDLER ( bbcm_wd1770l_write )
 	wd17xx_set_side(fdc,(data>>4) & 0x01);
 
 	/* set density */
-	if ((data>>5) & 0x01)
-	{
-		/* single density */
-		wd17xx_set_density(fdc,DEN_FM_HI);
-	}
-	else
-	{
-		/* double density */
-		wd17xx_set_density(fdc,DEN_MFM_LO);
-	}
+	wd17xx_dden_w(fdc, BIT(data, 5));
 
 //  bbc_1770_IntEnabled=(((data>>4) & 0x01)==0);
 	bbc_1770_IntEnabled=1;

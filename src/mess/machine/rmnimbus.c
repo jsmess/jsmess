@@ -1,11 +1,11 @@
-/* 
+/*
     machine/rmnimbus.c
-    
+
     Machine driver for the Research Machines Nimbus.
-    
+
     Phill Harvey-Smith
     2009-11-29.
-    
+
     80186 internal DMA/Timer/PIC code borrowed from Compis driver.
     Perhaps this needs merging into the 80186 core.....
 */
@@ -146,6 +146,7 @@ static WRITE_LINE_DEVICE_HANDLER( nimbus_fdc_drq_w );
 
 const wd17xx_interface nimbus_wd17xx_interface =
 {
+	DEVCB_LINE_GND,
 	DEVCB_LINE(nimbus_fdc_intrq_w),
 	DEVCB_LINE(nimbus_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
@@ -189,7 +190,7 @@ static UINT16 def_config[16] =
     0x0280, 0x017F, 0xE822, 0x8129,
     0x0329, 0x0000, 0x0000, 0x0000,
     0x0000, 0x0000, 0x0000, 0x0000,
-    0x0000, 0x8796, 0x2025, 0xB9E6 
+    0x0000, 0x8796, 0x2025, 0xB9E6
 };
 
 /* IO Unit */
@@ -265,10 +266,10 @@ static IRQ_CALLBACK(int_callback)
     old=i186.intr.in_service;
 
 	i186.intr.in_service |= i186.intr.ack_mask;
-	
+
     if((LOG_INTERRUPTS) && (i186.intr.in_service!=old))
         logerror("i186.intr.in_service changed from %02X to %02X\n",old,i186.intr.in_service);
-    
+
     if (i186.intr.ack_mask == 0x0001)
 	{
 		switch (i186.intr.poll_status & 0x1f)
@@ -298,18 +299,18 @@ static IRQ_CALLBACK(int_callback)
         logerror("Ext vectors : %02X %02X\n",i186.intr.ext_vector[0],i186.intr.ext_vector[1]);
         logerror("Int %02X Calling vector %02X\n",i186.intr.poll_status,vector);
     }
-    
+
     return vector;
 }
 
 
 static void update_interrupt_state(running_machine *machine)
-{   
+{
     int new_vector = 0;
     int Priority;
     int IntNo;
 
-	if (LOG_INTERRUPTS) 
+	if (LOG_INTERRUPTS)
         logerror("update_interrupt_status: req=%04X stat=%04X serv=%04X priority_mask=%4X\n", i186.intr.request, i186.intr.status, i186.intr.in_service, i186.intr.priority_mask);
 
 	/* loop over priorities */
@@ -365,7 +366,7 @@ static void update_interrupt_state(running_machine *machine)
 			{
                 if (LOG_INTERRUPTS)
                     logerror("Int%d priority=%d\n",IntNo,Priority);
-                
+
                 /* if we're already servicing something at this level, don't generate anything new */
 				if (i186.intr.in_service & (0x10 << IntNo))
 					return;
@@ -460,14 +461,14 @@ static void handle_eoi(running_machine *machine,int data)
 static void external_int(running_machine *machine, UINT16 intno, UINT8 vector)
 {
 	if (LOG_INTERRUPTS_EXT) logerror("generating external int %02X, vector %02X\n",intno,vector);
- 
+
    // Only 4 external ints
     if(intno>3)
     {
         logerror("external_int() invalid external interupt no : 0x%02X (can only be 0..3)\n",intno);
         return;
     }
-    
+
     // Only set external vector if cascade mode enabled, only valid for
     // int 0 & int 1
     if (intno<2)
@@ -475,7 +476,7 @@ static void external_int(running_machine *machine, UINT16 intno, UINT8 vector)
         if(i186.intr.ext[intno] & EXTINT_CTRL_CASCADE)
             i186.intr.ext_vector[intno]=vector;
     }
-    
+
     // Turn on the requested request bit and handle interrupt
     i186.intr.request |= (0x010 << intno);
     update_interrupt_state(machine);
@@ -552,7 +553,7 @@ static void internal_timer_update(running_machine *machine,
 	struct timer_state *t = &i186.timer[which];
 	int update_int_timer = 0;
 
-    if (LOG_TIMER) 
+    if (LOG_TIMER)
         logerror("internal_timer_update: %d, new_count=%d, new_maxA=%d, new_maxB=%d,new_control=%d\n",which,new_count,new_maxA,new_maxB,new_control);
 
 	/* if we have a new count and we're on, update things */
@@ -597,7 +598,7 @@ static void internal_timer_update(running_machine *machine,
          		new_maxB = 0x10000;
 		}
    	}
-    
+
 
 	/* handle control changes */
 	if (new_control != -1)
@@ -754,10 +755,10 @@ static void drq_callback(running_machine *machine, int which)
     struct dma_state *dma = &i186.dma[which];
 	const address_space *memory_space   = cpu_get_address_space(devtag_get_device(machine, MAINCPU_TAG), ADDRESS_SPACE_PROGRAM);
     const address_space *io_space       = cpu_get_address_space(devtag_get_device(machine, MAINCPU_TAG), ADDRESS_SPACE_IO);
-    
+
     const address_space *src_space;
     const address_space *dest_space;
-    
+
     UINT16  dma_word;
     UINT8   dma_byte;
     UINT8   incdec_size;
@@ -769,20 +770,20 @@ static void drq_callback(running_machine *machine, int which)
     {
         logerror("%05X:ERROR! - drq%d with dma channel stopped\n",
 		   cpu_get_pc(devtag_get_device(machine, MAINCPU_TAG)), which);
-           
+
         return;
     }
- 
+
     if(dma->control & DEST_MIO)
         dest_space=memory_space;
     else
         dest_space=io_space;
-    
+
     if(dma->control & SRC_MIO)
         src_space=memory_space;
     else
         src_space=io_space;
-    
+
     // Do the transfer
     if(dma->control & BYTE_WORD)
     {
@@ -796,36 +797,36 @@ static void drq_callback(running_machine *machine, int which)
         memory_write_byte(dest_space,dma->dest,dma_byte);
         incdec_size=1;
     }
-    
+
     // Increment or Decrement destination ans source pointers as needed
     switch (dma->control & DEST_INCDEC_MASK)
     {
         case DEST_DECREMENT     : dma->dest -= incdec_size;
         case DEST_INCREMENT     : dma->dest += incdec_size;
     }
-    
+
     switch (dma->control & SRC_INCDEC_MASK)
     {
         case SRC_DECREMENT     : dma->source -= incdec_size;
         case SRC_INCREMENT     : dma->source += incdec_size;
     }
-    
+
     // decrement count
     dma->count -= 1;
-    
+
     // Terminate if count is zero, and terminate flag set
     if((dma->control & TERMINATE_ON_ZERO) && (dma->count==0))
     {
         dma->control &= ~ST_STOP;
         if (LOG_DMA) logerror("DMA terminated\n");
     }
-    
+
     // Interrupt if count is zero, and interrupt flag set
     if((dma->control & INTERRUPT_ON_ZERO) && (dma->count==0))
     {
 		if (LOG_DMA>1) logerror("DMA%d - requesting interrupt: count = %04X, source = %04X\n", which, dma->count, dma->source);
 		i186.intr.request |= 0x04 << which;
-		update_interrupt_state(machine);      
+		update_interrupt_state(machine);
     }
 }
 
@@ -837,7 +838,7 @@ static void nimbus_cpu_init(running_machine *machine)
 {
 
     logerror("Machine reset\n");
-    
+
 	/* create timers here so they stick around */
 	i186.timer[0].int_timer = timer_alloc(machine, internal_timer_int, NULL);
 	i186.timer[1].int_timer = timer_alloc(machine, internal_timer_int, NULL);
@@ -861,17 +862,17 @@ static void nimbus_cpu_reset(running_machine *machine)
 	i186.intr.ext[2]			= 0x000f;
 	i186.intr.ext[3]			= 0x000f;
     i186.intr.in_service        = 0x0000;
-    
+
     /* External vectors by default to internal int 0/1 vectors */
     i186.intr.ext_vector[0]		= 0x000C;
 	i186.intr.ext_vector[1]		= 0x000D;
-	
+
     i186.intr.pending           = 0x0000;
 	i186.intr.ack_mask          = 0x0000;
 	i186.intr.request           = 0x0000;
 	i186.intr.status            = 0x0000;
 	i186.intr.poll_status       = 0x0000;
-	
+
     logerror("CPU reset done\n");
 }
 
@@ -1274,7 +1275,7 @@ WRITE16_HANDLER( i186_internal_port_w )
 MACHINE_RESET(nimbus)
 {
 	/* CPU */
-	nimbus_cpu_reset(machine); 
+	nimbus_cpu_reset(machine);
     iou_reset();
     fdc_reset();
     hdc_reset(machine);
@@ -1293,7 +1294,7 @@ MACHINE_START( nimbus )
     nimbus_cpu_init(machine);
 
     keyboard.keyscan_timer=timer_alloc(machine, keyscan_callback, NULL);
-    
+
 	/* setup debug commands */
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 	{
@@ -1303,9 +1304,9 @@ MACHINE_START( nimbus )
 
         /* set up the instruction hook */
         debug_cpu_set_instruction_hook(devtag_get_device(machine, MAINCPU_TAG), instruction_hook);
-     
+
     }
-    
+
     debug_flags=0;
 }
 
@@ -1313,35 +1314,35 @@ static void execute_debug_irq(running_machine *machine, int ref, int params, con
 {
     int IntNo;
     int Vector;
-    
+
     if(params>1)
-    {   
+    {
         sscanf(param[0],"%X",&IntNo);
         sscanf(param[1],"%X",&Vector);
 
         debug_console_printf(machine,"triggering IRQ%d, Vector=%02X\n",IntNo,Vector);
-        external_int(machine,IntNo,Vector);        
+        external_int(machine,IntNo,Vector);
     }
     else
     {
         debug_console_printf(machine,"Error, you must supply an intno and vector to trigger\n");
     }
-	
-    
+
+
 }
 
 
 static void execute_debug_intmasks(running_machine *machine, int ref, int params, const char *param[])
 {
     int IntNo;
-    
-    
+
+
     debug_console_printf(machine,"i186.intr.priority_mask=%4X\n",i186.intr.priority_mask);
     for(IntNo=0; IntNo<4; IntNo++)
     {
         debug_console_printf(machine,"extInt%d mask=%4X\n",IntNo,i186.intr.ext[IntNo]);
     }
-    
+
     debug_console_printf(machine,"i186.intr.request   = %04X\n",i186.intr.request);
     debug_console_printf(machine,"i186.intr.ack_mask  = %04X\n",i186.intr.ack_mask);
     debug_console_printf(machine,"i186.intr.in_service= %04X\n",i186.intr.in_service);
@@ -1350,8 +1351,8 @@ static void execute_debug_intmasks(running_machine *machine, int ref, int params
 static void nimbus_debug(running_machine *machine, int ref, int params, const char *param[])
 {
     if(params>0)
-    {   
-        sscanf(param[0],"%d",&debug_flags);        
+    {
+        sscanf(param[0],"%d",&debug_flags);
     }
     else
     {
@@ -1368,12 +1369,12 @@ static int instruction_hook(running_device *device, offs_t curpc)
 {
     const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
     UINT8               *addr_ptr;
-    
+
     addr_ptr = (UINT8*)memory_get_read_ptr(space,curpc);
-        
+
     if ((addr_ptr !=NULL) && (addr_ptr[0]==0xCD) && (addr_ptr[1]==0xF0))
         decode_subbios(device,curpc);
-    
+
     return 0;
 }
 
@@ -1386,32 +1387,32 @@ static void decode_subbios(running_device *device,offs_t pc)
     char    type_str[80];
     char    drv_str[80];
     char    func_str[80];
-    
+
     void (*dump_dssi)(running_device *,UINT16, UINT16) = NULL;
 
     running_device *cpu = devtag_get_device(device->machine,MAINCPU_TAG);
-    
+
     UINT16  ax = cpu_get_reg(cpu,I8086_AX);
     UINT16  bx = cpu_get_reg(cpu,I8086_BX);
     UINT16  cx = cpu_get_reg(cpu,I8086_CX);
     UINT16  ds = cpu_get_reg(cpu,I8086_DS);
     UINT16  si = cpu_get_reg(cpu,I8086_SI);
-    
+
     logerror("=======================================================================\n");
     logerror("Sub-bios call at %08X, AX=%04X, BX=%04X, CX=%04X, DS:SI=%04X:%04X\n",pc,ax,bx,cx,ds,si);
 
     set_type("invalid");
     set_drv("invalid");
     set_func("invalid");
-    
+
 
     switch (cx)
     {
-        case 0   : 
+        case 0   :
         {
             set_type("t_mummu");
             set_drv("d_mummu");
-            
+
             switch (ax)
             {
                 case 0  : set_func("f_get_version_number"); break;
@@ -1424,12 +1425,12 @@ static void decode_subbios(running_device *device,offs_t pc)
                 case 7  : set_func("f_get_copyright"); break;
             }
         }; break;
-        
-        case 1   : 
+
+        case 1   :
         {
             set_type("t_character");
             set_drv("d_printer");
-            
+
             switch(ax)
             {
                 case 0  : set_func("f_get_version_number"); break;
@@ -1443,11 +1444,11 @@ static void decode_subbios(running_device *device,offs_t pc)
                 case 8  : set_func("f_set_IO_parameters"); break;
             }
         }; break;
-        
-        case 2   : 
+
+        case 2   :
         {
             set_type("t_disk");
-            
+
             switch(bx)
             {
                 case 0  : set_drv("d_floppy"); break;
@@ -1456,10 +1457,10 @@ static void decode_subbios(running_device *device,offs_t pc)
                 case 3  : set_drv("d_rompack"); break;
                 case 4  : set_drv("d_eeprom"); break;
             }
-            
+
             switch(ax)
             {
-                case 0  : set_func("f_get_version_number"); break;            
+                case 0  : set_func("f_get_version_number"); break;
                 case 1  : set_func("f_initialise_unit"); break;
                 case 2  : set_func("f_pseudo_init_unit"); break;
                 case 3  : set_func("f_get_device_status"); break;
@@ -1470,17 +1471,17 @@ static void decode_subbios(running_device *device,offs_t pc)
                 case 8  : set_func("f_recalibrate"); break;
                 case 9  : set_func("f_motors_off"); break;
             }
-            
+
         }; break;
-        
-        case 3   : 
+
+        case 3   :
         {
             set_type("t_piconet");
             set_drv("d_piconet");
-            
+
             switch(ax)
             {
-                case 0  : set_func("f_get_version_number"); break; 
+                case 0  : set_func("f_get_version_number"); break;
                 case 1  : set_func("f_get_slave_status"); break;
                 case 2  : set_func("f_get_slave_map"); break;
                 case 3  : set_func("f_change_slave_addr"); break;
@@ -1491,43 +1492,43 @@ static void decode_subbios(running_device *device,offs_t pc)
                 case 8  : set_func("f_send_data_block"); break;
                 case 9  : set_func("f_request_data_block"); break;
                 case 10 : set_func("f_reset_slave"); break;
-           
+
             }
         }; break;
-        
-        case 4   : 
+
+        case 4   :
         {
             set_type("t_tick");
             set_drv("d_tick");
-            
+
             switch(ax)
             {
-                case 0  : set_func("f_get_version_number"); break; 
-                case 1  : set_func("f_ticks_per_second"); break; 
-                case 2  : set_func("f_link_tick_routine"); break; 
-                case 3  : set_func("f_unlink_tick_routine"); break;            
+                case 0  : set_func("f_get_version_number"); break;
+                case 1  : set_func("f_ticks_per_second"); break;
+                case 2  : set_func("f_link_tick_routine"); break;
+                case 3  : set_func("f_unlink_tick_routine"); break;
             }
         }; break;
-        
-        case 5   : 
+
+        case 5   :
         {
             set_type("t_graphics_input");
 
             switch(bx)
             {
-                case 0  : set_drv("d_mouse"); break; 
-                case 1  : set_drv("d_joystick_1"); break; 
-                case 2  : set_drv("d_joystick_2"); break; 
+                case 0  : set_drv("d_mouse"); break;
+                case 1  : set_drv("d_joystick_1"); break;
+                case 2  : set_drv("d_joystick_2"); break;
             }
-            
-            
+
+
             switch(ax)
             {
-                case 0  : set_func("f_get_version_number"); break;            
-                case 1  : set_func("f_graphics_input_cold_start"); break;	
-                case 2  : set_func("f_graphics_input_device_off"); break;	
-                case 3  : set_func("f_return_button_status"); break;		
-                case 4  : set_func("f_return_switch_and_button_stat"); break;	
+                case 0  : set_func("f_get_version_number"); break;
+                case 1  : set_func("f_graphics_input_cold_start"); break;
+                case 2  : set_func("f_graphics_input_device_off"); break;
+                case 3  : set_func("f_return_button_status"); break;
+                case 4  : set_func("f_return_switch_and_button_stat"); break;
                 case 5  : set_func("f_start_tracking"); break;
                 case 6  : set_func("f_stop_tracking"); break;
                 case 7  : set_func("f_enquire_position"); break;
@@ -1539,93 +1540,93 @@ static void decode_subbios(running_device *device,offs_t pc)
                 case 13 : set_func("f_enquire_graphics_in_misc_data"); break;
             }
         }; break;
-        
-        case 6   : 
+
+        case 6   :
         {
             set_type("t_graphics_output");
             set_drv("d_ngc_screen");
 
             switch(ax)
             {
-                case 0  : set_func("f_get_version_number");                 break; 
-                case 1  : set_func("f_graphics_output_cold_start");         break; 
-                case 2  : set_func("f_graphics_output_warm_start");         break; 
-                case 3  : set_func("f_graphics_output_off");                break; 
-                case 4  : set_func("f_reinit_graphics_output");             break; 
-                case 5  : set_func("f_polymarker");                         break; 
-                case 6  : set_func("f_polyline"); dump_dssi=&decode_dssi_f_fill_area;   break; 
-                case 7  : set_func("f_fill_area"); dump_dssi=&decode_dssi_f_fill_area; break; 
-                case 8  : set_func("f_flood_fill_area"); break; 
-                case 9  : set_func("f_plot_character_string"); dump_dssi=&decode_dssi_f_plot_character_string; break; 
-                case 10 : set_func("f_define_graphics_clipping_area"); break; 
-                case 11 : set_func("f_enquire_clipping_area_limits"); break; 
-                case 12 : set_func("f_select_graphics_clipping_area"); break; 
-                case 13 : set_func("f_enq_selctd_graphics_clip_area"); break; 
-                case 14 : set_func("f_set_clt_element"); break; 
-                case 15 : set_func("f_enquire_clt_element"); break; 
-                case 16 : set_func("f_set_new_clt"); dump_dssi=&decode_dssi_f_set_new_clt; break; 
-                case 17 : set_func("f_enquire_clt_contents"); break; 
-                case 18 : set_func("f_define_dithering_pattern"); break; 
-                case 19 : set_func("f_enquire_dithering_pattern"); break; 
-                case 20 : set_func("f_draw_sprite"); break; 
-                case 21 : set_func("f_move_sprite"); break; 
-                case 22 : set_func("f_erase_sprite"); break; 
-                case 23 : set_func("f_read_pixel"); break; 
-                case 24 : set_func("f_read_to_limit"); break; 
-                case 25 : set_func("f_read_area_pixel"); break; 
-                case 26 : set_func("f_write_area_pixel"); break; 
-                case 27 : set_func("f_copy_area_pixel"); break; 
+                case 0  : set_func("f_get_version_number");                 break;
+                case 1  : set_func("f_graphics_output_cold_start");         break;
+                case 2  : set_func("f_graphics_output_warm_start");         break;
+                case 3  : set_func("f_graphics_output_off");                break;
+                case 4  : set_func("f_reinit_graphics_output");             break;
+                case 5  : set_func("f_polymarker");                         break;
+                case 6  : set_func("f_polyline"); dump_dssi=&decode_dssi_f_fill_area;   break;
+                case 7  : set_func("f_fill_area"); dump_dssi=&decode_dssi_f_fill_area; break;
+                case 8  : set_func("f_flood_fill_area"); break;
+                case 9  : set_func("f_plot_character_string"); dump_dssi=&decode_dssi_f_plot_character_string; break;
+                case 10 : set_func("f_define_graphics_clipping_area"); break;
+                case 11 : set_func("f_enquire_clipping_area_limits"); break;
+                case 12 : set_func("f_select_graphics_clipping_area"); break;
+                case 13 : set_func("f_enq_selctd_graphics_clip_area"); break;
+                case 14 : set_func("f_set_clt_element"); break;
+                case 15 : set_func("f_enquire_clt_element"); break;
+                case 16 : set_func("f_set_new_clt"); dump_dssi=&decode_dssi_f_set_new_clt; break;
+                case 17 : set_func("f_enquire_clt_contents"); break;
+                case 18 : set_func("f_define_dithering_pattern"); break;
+                case 19 : set_func("f_enquire_dithering_pattern"); break;
+                case 20 : set_func("f_draw_sprite"); break;
+                case 21 : set_func("f_move_sprite"); break;
+                case 22 : set_func("f_erase_sprite"); break;
+                case 23 : set_func("f_read_pixel"); break;
+                case 24 : set_func("f_read_to_limit"); break;
+                case 25 : set_func("f_read_area_pixel"); break;
+                case 26 : set_func("f_write_area_pixel"); break;
+                case 27 : set_func("f_copy_area_pixel"); break;
 
-                case 29 : set_func("f_read_area_word"); break; 
-                case 30 : set_func("f_write_area_word"); break; 
-                case 31 : set_func("f_copy_area_word"); break; 
-                case 32 : set_func("f_swap_area_word"); break; 
-                case 33 : set_func("f_set_border_colour"); break; 
-                case 34 : set_func("f_enquire_border_colour"); break; 
-                case 35 : set_func("f_enquire_miscellaneous_data"); break; 
-                case 36  : set_func("f_circle"); break; 
+                case 29 : set_func("f_read_area_word"); break;
+                case 30 : set_func("f_write_area_word"); break;
+                case 31 : set_func("f_copy_area_word"); break;
+                case 32 : set_func("f_swap_area_word"); break;
+                case 33 : set_func("f_set_border_colour"); break;
+                case 34 : set_func("f_enquire_border_colour"); break;
+                case 35 : set_func("f_enquire_miscellaneous_data"); break;
+                case 36  : set_func("f_circle"); break;
 
-                case 38 : set_func("f_arc_of_ellipse"); break; 
-                case 39 : set_func("f_isin"); break; 
-                case 40 : set_func("f_icos"); break; 
-                case 41 : set_func("f_define_hatching_pattern"); break; 
-                case 42 : set_func("f_enquire_hatching_pattern"); break; 
-                case 43 : set_func("f_enquire_display_line"); break; 
-                case 44 : set_func("f_plonk_logo"); break; 
+                case 38 : set_func("f_arc_of_ellipse"); break;
+                case 39 : set_func("f_isin"); break;
+                case 40 : set_func("f_icos"); break;
+                case 41 : set_func("f_define_hatching_pattern"); break;
+                case 42 : set_func("f_enquire_hatching_pattern"); break;
+                case 43 : set_func("f_enquire_display_line"); break;
+                case 44 : set_func("f_plonk_logo"); break;
             }
         }; break;
-        
-        case 7   : 
+
+        case 7   :
         {
             set_type("t_zend");
             switch(ax)
             {
-                case 0  : set_func("f_get_version_number"); break;            
+                case 0  : set_func("f_get_version_number"); break;
             }
         }; break;
-        
-        case 8   : 
+
+        case 8   :
         {
             set_type("t_zep");
             switch(ax)
             {
-                case 0  : set_func("f_get_version_number"); break;            
+                case 0  : set_func("f_get_version_number"); break;
             }
         }; break;
-        
-        case 9   : 
+
+        case 9   :
         {
             set_type("t_raw_console");
-            
+
             switch(bx)
             {
-                case 0  : 
+                case 0  :
                 {
                     set_drv("d_screen");
-            
+
                     switch(ax)
                     {
-                        case 0  : set_func("f_get_version_number"); break;            
+                        case 0  : set_func("f_get_version_number"); break;
                         case 1  : set_func("f_plonk_char"); dump_dssi=decode_dssi_f_plonk_char; break;
                         case 2  : set_func("f_plonk_cursor"); break;
                         case 3  : set_func("f_kill_cursor"); break;
@@ -1638,14 +1639,14 @@ static void decode_subbios(running_device *device,offs_t pc)
                         case 10 : set_func("f_set_cursor_flash_rate"); break;
                     }
                 }; break;
-            
+
                 case 1  :
                 {
                     set_drv("d_keyboard");
-                    
+
                     switch(ax)
                     {
-                        case 0  : set_func("f_get_version_number"); break;            
+                        case 0  : set_func("f_get_version_number"); break;
                         case 1  : set_func("f_init_keyboard"); break;
                         case 2  : set_func("f_get_last_key_code"); break;
                         case 3  : set_func("f_get_bitmap"); break;
@@ -1653,54 +1654,54 @@ static void decode_subbios(running_device *device,offs_t pc)
                 }; break;
             }
         }; break;
-        
-        case 10   : 
+
+        case 10   :
         {
 
             set_type("t_acoustics");
-                        
+
             switch(bx)
             {
-                case 0  : 
+                case 0  :
                 {
                     set_drv("d_sound");
-            
+
                     switch(ax)
                     {
-                        case 0  : set_func("f_get_version_number"); break;            
+                        case 0  : set_func("f_get_version_number"); break;
                         case 1  : set_func("f_sound_enable"); break;
                         case 2  : set_func("f_play_note"); break;
                         case 3  : set_func("f_get_queue_status"); break;
                     }
                 }; break;
-            
+
                 case 1  :
                 {
                     set_drv("d_voice");
 
                     switch(ax)
                     {
-                        case 0  : set_func("f_get_version_number"); break;            
+                        case 0  : set_func("f_get_version_number"); break;
                         case 1  : set_func("f_talk"); break;
                         case 2  : set_func("f_wait_and_talk"); break;
                         case 3  : set_func("f_test_talking"); break;
                     }
                 }
-            }   
+            }
         }; break;
-        
-        case 11   : 
+
+        case 11   :
         {
             set_type("t_hard_sums");
             switch(ax)
             {
-                case 0  : set_func("f_get_version_number"); break;            
+                case 0  : set_func("f_get_version_number"); break;
             }
-        }; break;    
+        }; break;
     }
-    
+
     logerror("Type=%s, Driver=%s, Function=%s\n",type_str,drv_str,func_str);
-    
+
     if(dump_dssi!=NULL)
         dump_dssi(device,ds,si);
     logerror("=======================================================================\n");
@@ -1719,26 +1720,26 @@ void *get_dssi_ptr(const address_space *space, UINT16   ds, UINT16 si)
 static void decode_dssi_f_fill_area(running_device *device,UINT16  ds, UINT16 si)
 {
     const address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
- 
+
     UINT16          *addr_ptr;
     t_area_params   *area_params;
     t_nimbus_brush  *brush;
     int             cocount;
 
     area_params = (t_area_params   *)get_dssi_ptr(space,ds,si);
-    
+
     OUTPUT_SEGOFS("SegBrush:OfsBrush",area_params->seg_brush,area_params->ofs_brush);
     brush=(t_nimbus_brush  *)memory_get_read_ptr(space, LINEAR_ADDR(area_params->seg_brush,area_params->ofs_brush));
-    
+
     logerror("Brush params\n");
     logerror("Style=%04X,          StyleIndex=%04X\n",brush->style,brush->style_index);
     logerror("Colour1=%04X,        Colour2=%04X\n",brush->colour1,brush->colour2);
     logerror("transparency=%04X,   boundry_spec=%04X\n",brush->transparency,brush->boundary_spec);
     logerror("boundry colour=%04X, save colour=%04X\n",brush->boundary_colour,brush->save_colour);
-            
-    
+
+
     OUTPUT_SEGOFS("SegData:OfsData",area_params->seg_data,area_params->ofs_data);
-    
+
     addr_ptr = (UINT16 *)memory_get_read_ptr(space, LINEAR_ADDR(area_params->seg_data,area_params->ofs_data));
     for(cocount=0; cocount < area_params->count; cocount++)
     {
@@ -1749,18 +1750,18 @@ static void decode_dssi_f_fill_area(running_device *device,UINT16  ds, UINT16 si
 static void decode_dssi_f_plot_character_string(running_device *device,UINT16  ds, UINT16 si)
 {
     const address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
- 
+
     UINT8          *char_ptr;
     t_plot_string_params   *plot_string_params;
     int             charno;
-       
+
     plot_string_params=(t_plot_string_params   *)get_dssi_ptr(space,ds,si);
-    
+
     OUTPUT_SEGOFS("SegFont:OfsFont",plot_string_params->seg_font,plot_string_params->ofs_font);
     OUTPUT_SEGOFS("SegData:OfsData",plot_string_params->seg_data,plot_string_params->ofs_data);
-    
+
     logerror("x=%d, y=%d, length=%d\n",plot_string_params->x,plot_string_params->y,plot_string_params->length);
-    
+
     char_ptr=(UINT8*)memory_get_read_ptr(space, LINEAR_ADDR(plot_string_params->seg_data,plot_string_params->ofs_data));
 
     if (plot_string_params->length==0xFFFF)
@@ -1768,7 +1769,7 @@ static void decode_dssi_f_plot_character_string(running_device *device,UINT16  d
     else
         for(charno=0;charno<plot_string_params->length;charno++)
             logerror("%c",char_ptr[charno]);
-        
+
     logerror("\n");
 }
 
@@ -1778,12 +1779,12 @@ static void decode_dssi_f_set_new_clt(running_device *device,UINT16  ds, UINT16 
     UINT16  *new_colours;
     int     colour;
     new_colours=(UINT16  *)get_dssi_ptr(space,ds,si);
-    
+
     OUTPUT_SEGOFS("SegColours:OfsColours",ds,si);
-    
+
     for(colour=0;colour<16;colour++)
         logerror("colour #%02X=%04X\n",colour,new_colours[colour]);
-    
+
 }
 
 static void decode_dssi_f_plonk_char(running_device *device,UINT16  ds, UINT16 si)
@@ -1791,7 +1792,7 @@ static void decode_dssi_f_plonk_char(running_device *device,UINT16  ds, UINT16 s
     const address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
     UINT16  *params;
     params=(UINT16  *)get_dssi_ptr(space,ds,si);
-    
+
     OUTPUT_SEGOFS("SegParams:OfsParams",ds,si);
 
     logerror("plonked_char=%c\n",params[0]);
@@ -1802,21 +1803,21 @@ static void decode_dssi_f_rw_sectors(running_device *device,UINT16  ds, UINT16 s
     const address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
     UINT16  *params;
     int     param_no;
-    
+
     params=(UINT16  *)get_dssi_ptr(space,ds,si);
-    
+
     for(param_no=0;param_no<16;param_no++)
         logerror("%04X ",params[param_no]);
-        
+
     logerror("\n");
 }
 
 READ16_HANDLER( nimbus_io_r )
 {
     int pc=cpu_get_pc(space->cpu);
-    
+
     logerror("Nimbus IOR at pc=%08X from %04X mask=%04X, data=%04X\n",pc,(offset*2)+0x30,mem_mask,IOPorts[offset]);
-    
+
     switch (offset*2)
     {
         default         : return IOPorts[offset]; break;
@@ -1829,7 +1830,7 @@ WRITE16_HANDLER( nimbus_io_w )
     int pc=cpu_get_pc(space->cpu);
 
     logerror("Nimbus IOW at %08X write of %04X to %04X mask=%04X\n",pc,data,(offset*2)+0x30,mem_mask);
-    
+
     switch (offset*2)
     {
         default         : COMBINE_DATA(&IOPorts[offset]); break;
@@ -1837,15 +1838,15 @@ WRITE16_HANDLER( nimbus_io_w )
 }
 
 
-/* 
-    Keyboard emulation 
-    
+/*
+    Keyboard emulation
+
 */
 
 static void keyboard_reset(void)
 {
     memset(keyboard.keyrows,0xFF,NIMBUS_KEYROWS);
-    
+
     // Setup timer to scan keyboard.
     timer_adjust_periodic(keyboard.keyscan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(50));
 
@@ -1882,14 +1883,14 @@ static TIMER_CALLBACK(keyscan_callback)
     UINT8   mask;
     static const char *const keynames[] = {
         "KEY0", "KEY1", "KEY2", "KEY3", "KEY4",
-        "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", 
+        "KEY5", "KEY6", "KEY7", "KEY8", "KEY9",
         "KEY10"
     };
 
     for(row=0;row<NIMBUS_KEYROWS;row++)
     {
         keyrow=input_port_read(machine, keynames[row]);
-        
+
         for(mask=0x80, bitno=7;mask>0;mask=mask>>1, bitno-=1)
         {
             if(!(keyrow & mask) && (keyboard.keyrows[row] & mask))
@@ -1897,22 +1898,22 @@ static TIMER_CALLBACK(keyscan_callback)
                 if (LOG_KEYBOARD) logerror("keypress %02X\n",(row<<3)+bitno);
                 queue_scancode((row<<3)+bitno);
             }
-   
+
             if((keyrow & mask) && !(keyboard.keyrows[row] & mask))
             {
-                if (LOG_KEYBOARD) logerror("keyrelease %02X\n",0x80+(row<<3)+bitno);  
+                if (LOG_KEYBOARD) logerror("keyrelease %02X\n",0x80+(row<<3)+bitno);
                 queue_scancode(0x80+(row<<3)+bitno);
             }
         }
-        
+
         keyboard.keyrows[row]=keyrow;
     }
 }
 
 
-/* 
+/*
 
-Z80SIO, used for the keyboard interface 
+Z80SIO, used for the keyboard interface
 
 */
 
@@ -1920,14 +1921,14 @@ READ8_DEVICE_HANDLER( sio_r )
 {
     int pc=cpu_get_pc(devtag_get_device(device->machine,MAINCPU_TAG));
     UINT8 result = 0;
-    
+
 	switch (offset*2)
 	{
         case 0 :
-            result=z80sio_d_r(device, 0); 
+            result=z80sio_d_r(device, 0);
             break;
         case 2 :
-            result=z80sio_d_r(device, 1); 
+            result=z80sio_d_r(device, 1);
             break;
         case 4 :
             result=z80sio_c_r(device, 0);
@@ -1978,7 +1979,7 @@ void sio_interrupt(running_device *device, int state)
     if(state!=sio_int_state)
     {
         sio_int_state=state;
-        
+
         if(state)
             external_int(device->machine,0,EXTERNAL_INT_Z80SIO);
     }
@@ -1999,7 +2000,7 @@ int sio_serial_receive( running_device *device, int channel )
 {
 	if(channel==0)
     {
-        return keyboard_queue_read();      
+        return keyboard_queue_read();
     }
     else
         return -1;
@@ -2022,7 +2023,7 @@ static void generate_disk_int(running_machine *machine)
     if(iou_reg092 & DISK_INT_ENABLE)
     {
         external_int(machine,0,EXTERNAL_INT_DISK);
-    } 
+    }
 }
 
 static WRITE_LINE_DEVICE_HANDLER( nimbus_fdc_intrq_w )
@@ -2036,14 +2037,14 @@ static WRITE_LINE_DEVICE_HANDLER( nimbus_fdc_drq_w )
 
     if(LOG_DISK)
         logerror("nimbus_drives_drq_w(%d)\n", state);
-    
+
     if(state && FDC_DRQ_ENABLED())
         drq_callback(device->machine,1);
 }
 
-/* 
-    0x410 read bits 
-  
+/*
+    0x410 read bits
+
     0   Ready from floppy
     1   Index pulse from floppy
     2   Motor on from floppy
@@ -2059,10 +2060,10 @@ READ8_HANDLER( nimbus_disk_r )
    	int result = 0;
 	running_device *fdc = devtag_get_device(space->machine, FDC_TAG);
     running_device *hdc = devtag_get_device(space->machine, SCSIBUS_TAG);
-    
+
     int pc=cpu_get_pc(space->cpu);
     running_device *drive = devtag_get_device(space->machine, nimbus_wd17xx_interface.floppy_drive_tags[FDC_DRIVE()]);
-	
+
     switch(offset*2)
 	{
 		case 0x08 :
@@ -2082,8 +2083,8 @@ READ8_HANDLER( nimbus_disk_r )
             nimbus_drives.reg410_in &= ~FDC_BITS_410;
             nimbus_drives.reg410_in |= (FDC_MOTOR() ? FDC_MOTOR_MASKI : 0x00);
             nimbus_drives.reg410_in |= (floppy_drive_get_flag_state(drive, FLOPPY_DRIVE_INDEX) ? 0x00 : FDC_INDEX_MASK);
-            nimbus_drives.reg410_in |= (floppy_drive_get_flag_state(drive, FLOPPY_DRIVE_READY) ? FDC_READY_MASK : 0x00);      
-            
+            nimbus_drives.reg410_in |= (floppy_drive_get_flag_state(drive, FLOPPY_DRIVE_READY) ? FDC_READY_MASK : 0x00);
+
             // Flip inverted bits
             result=nimbus_drives.reg410_in ^ INV_BITS_410;
             break;
@@ -2099,14 +2100,14 @@ READ8_HANDLER( nimbus_disk_r )
 
     if((LOG_DISK_HDD) && ((offset*2)>=0x10))
         logerror("Nimbus HDCR at pc=%08X from %04X data=%02X\n",pc,(offset*2)+0x400,result);
-    
+
 
 	return result;
 }
 
 /*
     0x400 write bits
-    
+
     0   drive 0 select
     1   drive 1 select
     2   drive 2 select
@@ -2115,12 +2116,12 @@ READ8_HANDLER( nimbus_disk_r )
     5   fdc motor on
     6   hdc drq enabled
     7   fdc drq enabled
-    
+
     0x410 write bits
-    
+
     0   SCSI reset
     1   SCSI SEL
-    2   SCSI IRQ Enable 
+    2   SCSI IRQ Enable
 */
 
 WRITE8_HANDLER( nimbus_disk_w )
@@ -2129,7 +2130,7 @@ WRITE8_HANDLER( nimbus_disk_w )
     running_device *hdc = devtag_get_device(space->machine, SCSIBUS_TAG);
     int                 pc=cpu_get_pc(space->cpu);
     UINT8               reg400_old = nimbus_drives.reg400;
-    
+
     if(LOG_DISK_FDD && ((offset*2)<=0x10))
         logerror("Nimbus FDCW at %05X write of %02X to %04X\n",pc,data,(offset*2)+0x400);
 
@@ -2140,12 +2141,9 @@ WRITE8_HANDLER( nimbus_disk_w )
 	{
         case 0x00 :
             nimbus_drives.reg400=data;
-			
+
             wd17xx_set_drive(fdc,FDC_DRIVE());
             wd17xx_set_side(fdc, FDC_SIDE());
-            
-            // Nimbus FDC is hard wired for double density
-            wd17xx_set_density(fdc, DEN_MFM_LO);
 
             // if we enable hdc drq with a pending condition, act on it
             if((data & HDC_DRQ_MASK) && (~reg400_old & HDC_DRQ_MASK))
@@ -2167,7 +2165,7 @@ WRITE8_HANDLER( nimbus_disk_w )
         case 0x10 :
             hdc_ctrl_write(space->machine,data);
             break;
-    
+
         case 0x18 :
             scsi_data_w(hdc, data);
             hdc_post_rw(space->machine);
@@ -2187,19 +2185,19 @@ static void hdc_reset(running_machine *machine)
     nimbus_drives.reg410_in |= (get_scsi_line(hdc,SCSI_LINE_IO)  ? HDC_IO_MASK  : 0);
     nimbus_drives.reg410_in |= (get_scsi_line(hdc,SCSI_LINE_BSY) ? HDC_BSY_MASK : 0);
     nimbus_drives.reg410_in |= (get_scsi_line(hdc,SCSI_LINE_MSG) ? HDC_MSG_MASK : 0);
-    
+
     nimbus_drives.drq_ff=0;
 }
 
 static void hdc_ctrl_write(running_machine *machine, UINT8 data)
 {
 	running_device *hdc = devtag_get_device(machine, SCSIBUS_TAG);
-    
+
     // If we enable the HDC interupt, and an interrupt is pending, go deal with it.
-    if(((data & HDC_IRQ_MASK) && (~nimbus_drives.reg410_out & HDC_IRQ_MASK)) && 
+    if(((data & HDC_IRQ_MASK) && (~nimbus_drives.reg410_out & HDC_IRQ_MASK)) &&
        ((~nimbus_drives.reg410_in & HDC_INT_TRIGGER)==HDC_INT_TRIGGER))
         generate_disk_int(machine);
-            
+
     nimbus_drives.reg410_out=data;
 
     set_scsi_line(hdc, SCSI_LINE_RESET, (data & HDC_RESET_MASK) ? 0 : 1);
@@ -2209,7 +2207,7 @@ static void hdc_ctrl_write(running_machine *machine, UINT8 data)
 static void hdc_post_rw(running_machine *machine)
 {
     running_device *hdc = devtag_get_device(machine, SCSIBUS_TAG);
-    
+
     if((nimbus_drives.reg410_in & HDC_REQ_MASK)==0)
         set_scsi_line(hdc,SCSI_LINE_ACK,0);
 
@@ -2228,7 +2226,7 @@ void nimbus_scsi_linechange(running_device *device, UINT8 line, UINT8 state)
 {
     UINT8   mask = 0;
     UINT8   last = 0;
-    
+
     switch (line)
     {
         case SCSI_LINE_REQ   : mask=HDC_REQ_MASK; break;
@@ -2237,24 +2235,24 @@ void nimbus_scsi_linechange(running_device *device, UINT8 line, UINT8 state)
         case SCSI_LINE_BSY   : mask=HDC_BSY_MASK; break;
         case SCSI_LINE_MSG   : mask=HDC_MSG_MASK; break;
     }
-    
+
     last=nimbus_drives.reg410_in & mask;
-    
+
     if(state)
         nimbus_drives.reg410_in|=mask;
     else
         nimbus_drives.reg410_in&=~mask;
 
-    
-    if(line==SCSI_LINE_REQ) 
+
+    if(line==SCSI_LINE_REQ)
     {
         if (state==0)
         {
             if(HDC_IRQ_ENABLED() && ((~nimbus_drives.reg410_in & HDC_INT_TRIGGER)==HDC_INT_TRIGGER))
-                generate_disk_int(device->machine); 
-    
+                generate_disk_int(device->machine);
+
             if(((nimbus_drives.reg410_in & HDC_CD_MASK)==HDC_CD_MASK) && (last!=0))
-            {   
+            {
                 nimbus_drives.drq_ff=1;
                 hdc_drq(device->machine);
             }
@@ -2271,9 +2269,9 @@ static void pc8031_reset(running_machine *machine)
     running_device *er59256 = machine->device(ER59256_TAG);
 
     logerror("peripheral controler reset\n");
-    
+
     memset(&ipc_interface,0,sizeof(ipc_interface));
-    
+
     if(!data_loaded(er59256))
         preload_rom(er59256,def_config,ARRAY_LENGTH(def_config));
 }
@@ -2285,31 +2283,31 @@ static void ipc_dumpregs()
     logerror("in_data=%02X, in_status=%02X, out_data=%02X, out_status=%02X\n",
               ipc_interface.ipc_in, ipc_interface.status_in,
               ipc_interface.ipc_out, ipc_interface.status_out);
-              
+
 }
 #endif
 
-READ8_HANDLER( pc8031_r ) 
+READ8_HANDLER( pc8031_r )
 {
 	int pc=cpu_get_pc(space->cpu);
     UINT8   result;
- 
+
     switch(offset*2)
     {
-        case 0x00   : result=ipc_interface.ipc_out;  
-                      ipc_interface.status_in   &= ~IPC_IN_READ_PEND; 
-                      ipc_interface.status_out  &= ~IPC_OUT_BYTE_AVAIL; 
+        case 0x00   : result=ipc_interface.ipc_out;
+                      ipc_interface.status_in   &= ~IPC_IN_READ_PEND;
+                      ipc_interface.status_out  &= ~IPC_OUT_BYTE_AVAIL;
                       break;
-                      
+
         case 0x02   : result=ipc_interface.status_out;
                       break;
-                      
+
         default : result=0; break;
     }
 
     if(LOG_PC8031_186)
         logerror("Nimbus PCIOR %08X read of %04X returns %02X\n",pc,(offset*2)+0xC0,result);
-        
+
     return result;
 }
 
@@ -2324,7 +2322,7 @@ WRITE8_HANDLER( pc8031_w )
                       ipc_interface.status_in   &= ~IPC_IN_ADDR;
                       ipc_interface.status_out  |= IPC_OUT_READ_PEND;
                       break;
-                      
+
         case 0x02   : ipc_interface.ipc_in=data;
                       ipc_interface.status_in   |= IPC_IN_BYTE_AVAIL;
                       ipc_interface.status_in   |= IPC_IN_ADDR;
@@ -2343,34 +2341,34 @@ READ8_HANDLER( pc8031_iou_r )
 {
 	int pc=cpu_get_pc(space->cpu);
     UINT8   result = 0;
-    
+
     switch (offset & 0x01)
     {
         case 0x00   : result=ipc_interface.ipc_in;
-                      ipc_interface.status_out  &= ~IPC_OUT_READ_PEND; 
-                      ipc_interface.status_in   &= ~IPC_IN_BYTE_AVAIL; 
+                      ipc_interface.status_out  &= ~IPC_OUT_READ_PEND;
+                      ipc_interface.status_in   &= ~IPC_IN_BYTE_AVAIL;
                       break;
-                      
+
         case 0x01   : result=ipc_interface.status_in;
                       break;
     }
-                       
-    if(((offset==2) || (offset==3)) && (iou_reg092 & PC8031_INT_ENABLE)) 
+
+    if(((offset==2) || (offset==3)) && (iou_reg092 & PC8031_INT_ENABLE))
         external_int(space->machine,0,EXTERNAL_INT_PC8031_8C);
-    
+
     if(LOG_PC8031)
-        logerror("8031: PCIOR %04X read of %04X returns %02X\n",pc,offset,result); 
-       
+        logerror("8031: PCIOR %04X read of %04X returns %02X\n",pc,offset,result);
+
     return result;
 }
 
 WRITE8_HANDLER( pc8031_iou_w )
 {
-	int pc=cpu_get_pc(space->cpu);  
+	int pc=cpu_get_pc(space->cpu);
 
     if(LOG_PC8031)
         logerror("8031 PCIOW %04X write of %02X to %04X\n",pc,data,offset);
-    
+
     switch(offset & 0x03)
     {
         case 0x00   : ipc_interface.ipc_out=data;
@@ -2378,7 +2376,7 @@ WRITE8_HANDLER( pc8031_iou_w )
                       ipc_interface.status_out  &= ~IPC_OUT_ADDR;
                       ipc_interface.status_in   |= IPC_IN_READ_PEND;
                       break;
-                      
+
         case 0x01   : ipc_interface.ipc_out=data;
                       ipc_interface.status_out   |= IPC_OUT_BYTE_AVAIL;
                       ipc_interface.status_out   |= IPC_OUT_ADDR;
@@ -2390,15 +2388,15 @@ WRITE8_HANDLER( pc8031_iou_w )
                       ipc_interface.status_out  &= ~IPC_OUT_ADDR;
                       ipc_interface.status_in   |= IPC_IN_READ_PEND;
                       if(iou_reg092 & PC8031_INT_ENABLE)
-                        external_int(space->machine,0,EXTERNAL_INT_PC8031_8F);  
+                        external_int(space->machine,0,EXTERNAL_INT_PC8031_8F);
                       break;
-                      
+
         case 0x03   : ipc_interface.ipc_out=data;
                       //ipc_interface.status_out   |= IPC_OUT_BYTE_AVAIL;
                       ipc_interface.status_out   |= IPC_OUT_ADDR;
                       ipc_interface.status_in    |= IPC_IN_READ_PEND;
                       if(iou_reg092 & PC8031_INT_ENABLE)
-                        external_int(space->machine,0,EXTERNAL_INT_PC8031_8E);  
+                        external_int(space->machine,0,EXTERNAL_INT_PC8031_8E);
                       break;
     }
 }
@@ -2410,7 +2408,7 @@ READ8_HANDLER( pc8031_port_r )
     UINT8   result = 0;
 
     if(LOG_PC8031_PORT)
-        logerror("8031: PCPORTR %04X read of %04X returns %02X\n",pc,offset,result); 
+        logerror("8031: PCPORTR %04X read of %04X returns %02X\n",pc,offset,result);
 
     switch(offset)
     {
@@ -2449,7 +2447,7 @@ READ8_HANDLER( iou_r )
 
     if(LOG_IOU)
         logerror("Nimbus IOUR %08X read of %04X returns %02X\n",pc,(offset*2)+0x92,result);
-        
+
     return result;
 }
 
@@ -2473,19 +2471,19 @@ static void iou_reset(void)
     iou_reg092=0x00;
 }
 
-/* 
+/*
     Sound hardware : AY8910
-  
+
     I believe that the IO ports of the 8910 are used to control the ROMPack ports, however
     this is currently un-implemented (and may never be as I don't have any rompacks!).
-    
+
     The registers are mapped as so :
-    
+
     Address     0xE0                0xE2
     Read        Data                ????
     Write       Register Address    Data
- 
-*/    
+
+*/
 
 static void sound_reset(running_machine *machine)
 {
@@ -2503,10 +2501,10 @@ READ8_HANDLER( sound_ay8910_r )
 {
 	running_device *ay8910 = devtag_get_device(space->machine, AY8910_TAG);
     UINT8   result=0;
-    
+
     if ((offset*2)==0)
         result=ay8910_r(ay8910,0);
-        
+
     return result;
 }
 
@@ -2514,7 +2512,7 @@ WRITE8_HANDLER( sound_ay8910_w )
 {
 	int pc=cpu_get_pc(space->cpu);
 	running_device *ay8910 = devtag_get_device(space->machine, AY8910_TAG);
-    
+
     if(LOG_SOUND)
         logerror("Nimbus SoundW %05X write of %02X to %04X\n",pc,data,(offset*2)+0xE0);
 

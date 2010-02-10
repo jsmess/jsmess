@@ -101,6 +101,14 @@ static FLOPPY_OPTIONS_START(orion)
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
+static const wd17xx_interface orion_wd17xx_interface =
+{
+	DEVCB_LINE_VCC,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	{ FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3 }
+};
+
 static const floppy_config orion_floppy_config =
 {
 	DEVCB_NULL,
@@ -147,7 +155,7 @@ static MACHINE_DRIVER_START( orion128 )
 
 	MDRV_CASSETTE_ADD( "cassette", orion_cassette_config )
 
-	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )
+	MDRV_WD1793_ADD("wd1793", orion_wd17xx_interface )
 
 	MDRV_FLOPPY_4_DRIVES_ADD(orion_floppy_config)
 
@@ -211,7 +219,7 @@ static MACHINE_DRIVER_START( orionz80 )
 
 	MDRV_CASSETTE_ADD( "cassette", orion_cassette_config )
 
-	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )
+	MDRV_WD1793_ADD("wd1793", orion_wd17xx_interface )
 
 	MDRV_FLOPPY_4_DRIVES_ADD(orion_floppy_config)
 
@@ -234,7 +242,6 @@ static MACHINE_DRIVER_START( orionpro )
     MDRV_CPU_PROGRAM_MAP(orionpro_mem)
     MDRV_CPU_IO_MAP(orionpro_io)
 
-    MDRV_MACHINE_START( orionpro )
     MDRV_MACHINE_RESET( orionpro )
 
 	MDRV_I8255A_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
@@ -266,7 +273,7 @@ static MACHINE_DRIVER_START( orionpro )
 
 	MDRV_CASSETTE_ADD( "cassette", orion_cassette_config )
 
-	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )
+	MDRV_WD1793_ADD("wd1793", orion_wd17xx_interface )
 
 	MDRV_FLOPPY_4_DRIVES_ADD(orion_floppy_config)
 

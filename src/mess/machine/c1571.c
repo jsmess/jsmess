@@ -121,10 +121,10 @@ INLINE void iec_data_w(running_device *device)
 
 	int atn = cbm_iec_atn_r(c1571->serial_bus);
 	int data = !c1571->data_out & !(c1571->atn_ack ^ !atn);
-	
+
 	/* fast serial data */
 	if (c1571->ser_dir) data &= c1571->sp_out;
-	
+
 	cbm_iec_data_w(c1571->serial_bus, device, data);
 }
 
@@ -133,7 +133,7 @@ INLINE void iec_srq_w(running_device *device)
 	c1571_t *c1571 = get_safe_token(device);
 
 	int srq = 1;
-	
+
 	/* fast serial clock */
 	if (c1571->ser_dir) srq &= c1571->cnt_out;
 
@@ -734,6 +734,7 @@ static MOS6526_INTERFACE( c1571_cia_intf )
 
 static const wd17xx_interface c1571_wd1770_intf =
 {
+	DEVCB_LINE_GND,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	{ FLOPPY_0, NULL, NULL, NULL }
@@ -880,9 +881,6 @@ static DEVICE_START( c1571 )
 	c1571->wd1770 = device->subdevice(WD1770_TAG);
 	c1571->serial_bus = devtag_get_device(device->machine, config->serial_bus_tag);
 	c1571->image = device->subdevice(FLOPPY_0);
-
-	/* set floppy density */
-	wd17xx_set_density(c1571->wd1770, DEN_MFM_LO);
 
 	/* allocate data timer */
 	c1571->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);

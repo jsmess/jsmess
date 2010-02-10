@@ -37,16 +37,16 @@ static WRITE_LINE_DEVICE_HANDLER( partner_wd17xx_drq_w )
 
 const wd17xx_interface partner_wd17xx_interface =
 {
+	DEVCB_LINE_GND,
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE("dma8257", partner_wd17xx_drq_w),
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
-MACHINE_START(partner)
+MACHINE_START( partner )
 {
 	running_device *fdc = devtag_get_device(machine, "wd1793");
-	wd17xx_set_density (fdc,DEN_MFM_HI);
-	wd17xx_set_pause_time(fdc,10);
+	wd17xx_set_pause_time(fdc, 10);
 }
 
 static void partner_window_1(running_machine *machine, UINT8 bank_num, UINT16 offset,UINT8 *rom)

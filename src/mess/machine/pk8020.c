@@ -986,11 +986,8 @@ static IRQ_CALLBACK(pk8020_irq_callback)
 
 MACHINE_RESET( pk8020 )
 {
-	running_device *fdc = devtag_get_device(machine, "wd1793");
 	pk8020_set_bank(machine,0);
 	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), pk8020_irq_callback);
-
-	wd17xx_set_density (fdc,DEN_FM_HI);
 
 	sound_gate = 0;
 	sound_level = 0;

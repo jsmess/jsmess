@@ -68,6 +68,7 @@ static WRITE_LINE_DEVICE_HANDLER( nascom2_fdc_drq_w )
 
 const wd17xx_interface nascom2_wd17xx_interface =
 {
+	DEVCB_LINE_VCC,
 	DEVCB_LINE(nascom2_fdc_intrq_w),
 	DEVCB_LINE(nascom2_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
@@ -270,15 +271,6 @@ MACHINE_RESET( nascom1 )
 	ay31015_set_input_pin( nascom1_hd6402, AY31015_EPS, 1 );
 	ay31015_set_input_pin( nascom1_hd6402, AY31015_TSB, 1 );
 	ay31015_set_input_pin( nascom1_hd6402, AY31015_CS, 1 );
-}
-
-MACHINE_RESET( nascom2 )
-{
-	running_device *fdc = devtag_get_device(machine, "wd1793");
-
-	wd17xx_set_density(fdc,DEN_FM_HI);
-
-	MACHINE_RESET_CALL(nascom1);
 }
 
 DRIVER_INIT( nascom1 )

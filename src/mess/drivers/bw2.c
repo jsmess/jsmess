@@ -516,9 +516,6 @@ static DRIVER_INIT( bw2 )
 static MACHINE_START( bw2 )
 {
 	bw2_state *state = (bw2_state *) machine->driver_data;
-	running_device *fdc = devtag_get_device(machine, "wd179x");
-
-	wd17xx_set_density(fdc,DEN_MFM_LO);
 
 	/* find devices */
 	state->msm8251 = devtag_get_device(machine, MSM8251_TAG);
@@ -775,6 +772,7 @@ static const floppy_config bw2_floppy_config =
 
 static const wd17xx_interface bw2_wd17xx_interface =
 {
+	DEVCB_LINE_GND,
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
 	DEVCB_LINE(bw2_wd17xx_drq_w),
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
@@ -810,7 +808,7 @@ static DEVICE_GET_INFO( bw2_serial )
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                         break;
 		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0;                                        	break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 0;                                        	break;		
+		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 0;                                        	break;
 		default: 									DEVICE_GET_INFO_CALL(serial);	break;
 	}
 }
@@ -819,7 +817,7 @@ static DEVICE_GET_INFO( bw2_serial )
 
 #define MDRV_BW2_SERIAL_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, BW2_SERIAL, 0)
-	
+
 
 static MACHINE_DRIVER_START( bw2 )
 	MDRV_DRIVER_DATA(bw2_state)
@@ -864,7 +862,7 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
 	MDRV_RAM_EXTRA_OPTIONS("96K,128K,160K,192K,224K")
-	
+
 	MDRV_BW2_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 

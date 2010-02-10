@@ -263,7 +263,7 @@ static int	PIATaskReg;			/* Set to what PIA is set to, may not be same as TaskRe
 static int	EnableMapRegs;		/* Should we use map registers, or just map normal */
 static struct PageReg	PageRegs[MaxTasks+1][MaxPage+1];	/* 16 sets of 16 page regs, allowing for 16 seperate contexts */
                                                             /* Task 17 is power on default, when banking not enabled */
-                                                            
+
 #define is_last_page(page)  (((page==LastPage) || (page==LastPage+1)) ? 1 : 0)
 
 //
@@ -731,16 +731,8 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
 	wd17xx_set_drive(fdc, ~data & DSMask);
 
 	/* Set density of WD2797 */
-	if (data & DDenCtrl)
-	{
-		wd17xx_set_density(fdc, DEN_FM_LO);
-		LOG_DISK(("Set density low %d\n", (data & DDenCtrl)));
-	}
-	else
-	{
-		wd17xx_set_density(fdc, DEN_MFM_LO);
-		LOG_DISK(("Set density high %d\n", (data & DDenCtrl)));
-	}
+	wd17xx_dden_w(fdc, BIT(data, 6));
+	LOG_DISK(("Set density %s\n", BIT(data, 6) ? "low" : "high"));
 }
 
 static READ8_DEVICE_HANDLER(d_pia1_pb_r)
@@ -1116,11 +1108,11 @@ static void dgnbeta_reset(running_machine *machine)
 	DMA_NMI_LAST = 0x80;		/* start with DMA NMI inactive, as pulled up */
 //  DMA_NMI = CLEAR_LINE;       /* start with DMA NMI inactive */
 
-	wd17xx_set_density(fdc, DEN_MFM_LO);
+	wd17xx_dden_w(fdc, CLEAR_LINE);
 	wd17xx_set_drive(fdc, 0);
 
 	machine->generic.videoram.u8 = messram_get_ptr(devtag_get_device(machine, "messram"));		/* Point video ram at the start of physical ram */
-    
+
     dgnbeta_video_reset(machine);
     wd17xx_reset(fdc);
     wd2797_written=0;
@@ -1129,7 +1121,7 @@ static void dgnbeta_reset(running_machine *machine)
 MACHINE_START( dgnbeta )
 {
 	logerror("MACHINE_START( dgnbeta )\n");
-    
+
     dgnbeta_init_video(machine);
 
 	debug_cpu_set_dasm_override(devtag_get_device(machine, MAINCPU_TAG), CPU_DISASSEMBLE_NAME(dgnbeta_dasm_override));

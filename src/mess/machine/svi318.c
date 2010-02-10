@@ -350,12 +350,10 @@ static WRITE8_HANDLER( svi318_fdc_drive_motor_w )
 
 static WRITE8_HANDLER( svi318_fdc_density_side_w )
 {
-	//running_device *image;
 	running_device *fdc = devtag_get_device(space->machine, "wd179x");
 
-	wd17xx_set_density(fdc, data & 0x01 ? DEN_FM_LO:DEN_MFM_LO);
-
-	wd17xx_set_side(fdc, data & 0x02 ? 1:0);
+	wd17xx_dden_w(fdc, BIT(data, 0));
+	wd17xx_set_side(fdc, BIT(data, 1));
 }
 
 static READ8_HANDLER( svi318_fdc_irqdrq_r )

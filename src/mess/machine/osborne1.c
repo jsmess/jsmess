@@ -287,9 +287,9 @@ static WRITE8_DEVICE_HANDLER( video_pia_port_a_w )
 	running_device *fdc = devtag_get_device(device->machine, "mb8877");
 
 	osborne1.new_start_x = data >> 1;
-	wd17xx_set_density(fdc, ( data & 0x01 ) ? DEN_FM_LO : DEN_FM_HI );
+	wd17xx_dden_w(fdc, BIT(data, 0));
 
-	//logerror("Video pia port a write: %02X, density set to %s\n", data, data & 1 ? "DEN_FM_LO" : "DEN_FM_HI" );
+	//logerror("Video pia port a write: %02X, density set to %s\n", data, data & 1 ? "FM" : "MFM" );
 }
 
 
@@ -432,19 +432,19 @@ static void osborne1_load_proc(running_device *image)
 	switch( size )
 	{
 	case 40 * 10 * 256:
-		wd17xx_set_density( fdc, DEN_FM_LO );
+		wd17xx_dden_w(fdc, ASSERT_LINE);
 		break;
 	case 40 * 5 * 1024:
-		wd17xx_set_density( fdc, DEN_FM_HI );
+		wd17xx_dden_w(fdc, CLEAR_LINE);
 		break;
 	case 40 * 8 * 512:
-		wd17xx_set_density( fdc, DEN_FM_LO );
+		wd17xx_dden_w(fdc, ASSERT_LINE);
 		break;
 	case 40 * 18 * 128:
-		wd17xx_set_density( fdc, DEN_FM_LO );
+		wd17xx_dden_w(fdc, ASSERT_LINE);
 		break;
 	case 40 * 9 * 512:
-		wd17xx_set_density( fdc, DEN_FM_HI );
+		wd17xx_dden_w(fdc, CLEAR_LINE);
 		break;
 	}
 }

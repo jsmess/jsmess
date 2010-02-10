@@ -148,6 +148,7 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w );
 
 static const wd17xx_interface coco_wd17xx_interface =
 {
+	DEVCB_NULL,
 	DEVCB_LINE(fdc_intrq_w),
 	DEVCB_LINE(fdc_drq_w),
 	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
@@ -360,7 +361,7 @@ static void fdc_coco_dskreg_w(running_device *device, UINT8 data)
 
 	wd17xx_set_drive(fdc->wd17xx, drive);
 	wd17xx_set_side(fdc->wd17xx, head);
-	wd17xx_set_density(fdc->wd17xx, (fdc->dskreg & 0x20) ? DEN_MFM_LO : DEN_FM_LO);
+	wd17xx_dden_w(fdc->wd17xx, !BIT(fdc->dskreg, 5));
 }
 
 
@@ -484,7 +485,7 @@ DEVICE_GET_INFO(coco_cartridge_pcb_fdc_coco)
 	static MACHINE_DRIVER_START(coco_fdc)
 		MDRV_WD1773_ADD(WD_TAG, coco_wd17xx_interface)
 		MDRV_MSM6242_ADD(DISTO_TAG)
-		MDRV_DS1315_ADD(CLOUD9_TAG)		
+		MDRV_DS1315_ADD(CLOUD9_TAG)
 	MACHINE_DRIVER_END
 
 	static const fdc_hardware_type hwtype =
@@ -555,7 +556,7 @@ static void fdc_dragon_dskreg_w(running_device *device, UINT8 data)
 	if (data & 0x04)
 		wd17xx_set_drive(fdc->wd17xx, data & 0x03);
 
-	wd17xx_set_density(fdc->wd17xx, (data & 0x08) ? DEN_FM_LO: DEN_MFM_LO);
+	wd17xx_dden_w(fdc->wd17xx, BIT(data, 3));
 	fdc->dskreg = data;
 }
 

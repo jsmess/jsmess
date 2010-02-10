@@ -179,10 +179,7 @@ static const dave_interface enterprise_dave_interface =
 
 static MACHINE_RESET( enterprise )
 {
-	running_device *fdc = devtag_get_device(machine, "wd1770");
 	cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), 0, 0xff);
-
-	wd17xx_set_density(fdc, DEN_FM_HI);
 }
 
 
@@ -246,8 +243,8 @@ static WRITE8_HANDLER( exdos_card_w )
 	if (BIT(data, 2)) wd17xx_set_drive(fdc, 2);
 	if (BIT(data, 3)) wd17xx_set_drive(fdc, 3);
 
-	/* side */
 	wd17xx_set_side(fdc, BIT(data, 4));
+	wd17xx_dden_w(fdc, BIT(data, 5));
 }
 
 /***************************************************************************
@@ -427,6 +424,7 @@ INPUT_PORTS_END
 
 static const wd17xx_interface enterp_wd1770_interface =
 {
+	DEVCB_NULL,
 	DEVCB_LINE(enterp_wd1770_intrq_w),
 	DEVCB_LINE(enterp_wd1770_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
