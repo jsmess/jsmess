@@ -696,7 +696,7 @@ static void read_track(running_device *device)
 	if (device->type == WD1771)
 		w->data_count = TRKSIZE_SD;
 	else
-		w->data_count = wd17xx_dden(device) ? TRKSIZE_SD : TRKSIZE_SD;
+		w->data_count = wd17xx_dden(device) ? TRKSIZE_SD : TRKSIZE_DD;
 
 	floppy_drive_read_track_data_info_buffer( w->drive, w->hd, (char *)w->buffer, &(w->data_count) );
 
