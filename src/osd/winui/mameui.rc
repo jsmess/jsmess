@@ -944,10 +944,8 @@ BEGIN
     PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,118,222,97,14,
                     0,0,HIDC_USE_DEFAULT
 #ifdef MESS
-    CONTROL         "Skip warnings",IDC_SKIP_WARNINGS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,119,134,86,10,0
     CONTROL         "Use New UI",IDC_USE_NEW_UI,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,119,146,86,10,0
+                    BS_AUTOCHECKBOX | WS_TABSTOP,119,134,86,10,0
 #endif
 END
 
