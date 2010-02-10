@@ -99,11 +99,6 @@ keyboard with numeric keypad and built in voice synthesis capabilities.
 - Once we can add / remove devices, we shall only support c16, c116 and plus/4,
 removing the separated drivers for different floppy drives
 
-* Floppy drives:
-
-- Drives 8 & 9 supported, but limited compatibility. Real disk emulation is
-needed.
-
 * Other Peripherals:
 
 - Lightpen support is unfinished
@@ -121,7 +116,6 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
 
-#include "machine/6525tpi.h"
 #include "machine/cbmipt.h"
 #include "video/ted7360.h"
 #include "devices/messram.h"
@@ -195,8 +189,6 @@ static ADDRESS_MAP_START(c16_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE( c16_write_8000)  /*configured in c16_common_init */
 	AM_RANGE(0xc000, 0xfcff) AM_WRITE( c16_write_c000)  /*configured in c16_common_init */
 	AM_RANGE(0xfd40, 0xfd5f) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)	/* sidcard, eoroidpro ... */
-	AM_RANGE(0xfec0, 0xfedf) AM_READWRITE(c16_iec9_port_r, c16_iec9_port_w)		/*configured in c16_common_init */
-	AM_RANGE(0xfee0, 0xfeff) AM_READWRITE(c16_iec8_port_r, c16_iec8_port_w)		/*configured in c16_common_init */
 	AM_RANGE(0xff20, 0xff3d) AM_WRITE( c16_write_ff20)  /*configure in c16_common_init */
 	AM_RANGE(0xff40, 0xffff) AM_WRITE( c16_write_ff40)  /*configure in c16_common_init */
 #endif
@@ -214,8 +206,6 @@ static ADDRESS_MAP_START(plus4_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfdd0, 0xfddf) AM_WRITE( c16_select_roms) /* rom chips selection */
 #if 0
 	AM_RANGE(0xfd40, 0xfd5f) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)	/* sidcard, eoroidpro ... */
-	AM_RANGE(0xfec0, 0xfedf) AM_READWRITE(c16_iec9_port_r, c16_iec9_port_w)		/*configured in c16_common_init */
-	AM_RANGE(0xfee0, 0xfeff) AM_READWRITE(c16_iec8_port_r, c16_iec8_port_w)		/*configured in c16_common_init */
 #endif
 	AM_RANGE(0xff00, 0xff1f) AM_READWRITE(ted7360_port_r, ted7360_port_w)
 	AM_RANGE(0xff20, 0xffff) AM_READ_BANK("bank8")
@@ -238,8 +228,6 @@ static ADDRESS_MAP_START(c364_map , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfdd0, 0xfddf) AM_WRITE( c16_select_roms) /* rom chips selection */
 #if 0
 	AM_RANGE(0xfd40, 0xfd5f) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)	/* sidcard, eoroidpro ... */
-	AM_RANGE(0xfec0, 0xfedf) AM_READWRITE(c16_iec9_port_r, c16_iec9_port_w)		/*configured in c16_common_init */
-	AM_RANGE(0xfee0, 0xfeff) AM_READWRITE(c16_iec8_port_r, c16_iec8_port_w)		/*configured in c16_common_init */
 #endif
 	AM_RANGE(0xff00, 0xff1f) AM_READWRITE(ted7360_port_r, ted7360_port_w)
 	AM_RANGE(0xff20, 0xffff) AM_READ_BANK("bank8")
@@ -294,16 +282,12 @@ static INPUT_PORTS_START( c16 )
 
 	PORT_INCLUDE( c16_controls )			/* JOY0, JOY1 */
 
-	/* no real floppy */
-
 	PORT_INCLUDE( c16_config )				/* DSW0, CFG1 */
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( plus4 )
 	PORT_INCLUDE( c16 )
-
-	/* no real floppy */
 
 	PORT_MODIFY( "ROW0" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)					PORT_CHAR(0xA3)
@@ -328,8 +312,6 @@ INPUT_PORTS_END
 #if 0
 static INPUT_PORTS_START (c364)
 	PORT_INCLUDE( plus4 )
-
-	/* no real floppy */
 
 	PORT_MODIFY("CFG1")
 	PORT_BIT( 0x10, 0x10, IPT_UNUSED )			/* ntsc */
@@ -365,45 +347,6 @@ static PALETTE_INIT( c16 )
  *
  *************************************/
 
-static const tpi6525_interface c16_tpi6525_tpi_2_intf =
-{
-	NULL, //removed c1551_0_read_data,
-	NULL, //removed c1551_0_read_status,
-	NULL, //removed c1551_0_read_handshake,
-	NULL, //removed c1551_0_write_data,
-	NULL,
-	NULL, //removed c1551_0_write_handshake,
-	NULL,
-	NULL,
-	NULL
-};
-
-static const tpi6525_interface c16_tpi6525_tpi_2_c1551_intf =
-{
-	NULL, //removed c1551x_read_data,
-	NULL, //removed c1551x_read_status,
-	NULL, //removed c1551x_read_handshake,
-	NULL, //removed c1551x_write_data,
-	NULL,
-	NULL, //removed c1551x_write_handshake,
-	NULL,
-	NULL,
-	NULL
-};
-
-static const tpi6525_interface c16_tpi6525_tpi_3_intf =
-{
-	NULL, //removed c1551_1_read_data,
-	NULL, //removed c1551_1_read_status,
-	NULL, //removed c1551_1_read_handshake,
-	NULL, //removed c1551_1_write_data,
-	NULL,
-	NULL, //removed c1551_1_write_handshake,
-	NULL,
-	NULL,
-	NULL
-};
-
 static const m6502_interface c16_m7501_interface =
 {
 	NULL,					/* read_indexed_func */
@@ -427,7 +370,7 @@ static CBM_IEC_DAISY( c16_iec_1541 )
 
 static MACHINE_DRIVER_START( c16 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M7501, 1400000)        /* 7.8336 MHz */
+	MDRV_CPU_ADD("maincpu", M7501, XTAL_17_73447MHz/20)
 	MDRV_CPU_PROGRAM_MAP(c16_map)
 	MDRV_CPU_CONFIG( c16_m7501_interface )
 	MDRV_CPU_VBLANK_INT("screen", c16_frame_interrupt)
@@ -462,10 +405,6 @@ static MACHINE_DRIVER_START( c16 )
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
 
-	/* tpi */
-	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_intf)
-	MDRV_TPI6525_ADD("tpi6535_tpi_3", c16_tpi6525_tpi_3_intf)
-
 	MDRV_IMPORT_FROM(c16_cartslot)
 
 	/* IEC serial bus */
@@ -481,15 +420,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( c16c )
 	MDRV_IMPORT_FROM( c16 )
 
-	/* c16c uses 'real' floppy drive emulation from machine/vc1541.c...
-    still in progress, atm */
-	MDRV_DEVICE_REMOVE("tpi6535_tpi_2")
-	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_c1551_intf)
+	//MDRV_C1551_ADD("c1551", "maincpu", 8)
 
-	/* emulation code currently supports only one drive */
-	MDRV_DEVICE_REMOVE("tpi6535_tpi_3")
-
-//removed 	MDRV_IMPORT_FROM( cpu_c1551 )
 #ifdef CPU_SYNC
 	MDRV_QUANTUM_TIME(HZ(60))
 #else
@@ -510,16 +442,12 @@ static MACHINE_DRIVER_START( c16v )
 #else
 	MDRV_QUANTUM_TIME(HZ(300000))
 #endif
-
-	/* no c1551 in this driver */
-	MDRV_DEVICE_REMOVE("tpi6535_tpi_2")
-	MDRV_DEVICE_REMOVE("tpi6535_tpi_3")
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( plus4 )
 	MDRV_IMPORT_FROM( c16 )
-	MDRV_CPU_REPLACE( "maincpu", M7501, 1200000)
+	MDRV_CPU_REPLACE( "maincpu", M7501, XTAL_14_31818MHz/16)
 	MDRV_CPU_PROGRAM_MAP(plus4_map)
 	MDRV_CPU_CONFIG( c16_m7501_interface )
 	MDRV_SCREEN_MODIFY("screen")
@@ -536,15 +464,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( plus4c )
 	MDRV_IMPORT_FROM( plus4 )
 
-	/* plus4c uses 'real' floppy drive emulation from machine/vc1541.c...
-    still in progress, atm */
-	MDRV_DEVICE_REMOVE("tpi6535_tpi_2")
-	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_c1551_intf)
-
-	/* emulation code currently supports only one drive */
-	MDRV_DEVICE_REMOVE("tpi6535_tpi_3")
-
-//removed	MDRV_IMPORT_FROM( cpu_c1551 )
+	//MDRV_C1551_ADD("c1551", "maincpu", 8)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -571,10 +491,6 @@ static MACHINE_DRIVER_START( plus4v )
 #else
 	MDRV_QUANTUM_TIME(HZ(300000))
 #endif
-
-	/* no c1551 in this driver */
-	MDRV_DEVICE_REMOVE("tpi6535_tpi_2")
-	MDRV_DEVICE_REMOVE("tpi6535_tpi_3")
 MACHINE_DRIVER_END
 
 
@@ -599,10 +515,6 @@ MACHINE_DRIVER_END
  *  ROM definition(s)
  *
  *************************************/
-#define C1551_ROM( cpu )	\
-	ROM_REGION( 0x10000, cpu, 0 )	\
-	ROM_LOAD( "318008-01.u4", 0xc000, 0x4000, CRC(6d16d024) SHA1(fae3c788ad9a6cc2dbdfbcf6c0264b2ca921d55e) )
-
 ROM_START( c232 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "318006-01.bin", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
@@ -646,8 +558,6 @@ ROM_START( c16c )
 	ROMX_LOAD( "318004-03.bin", 0x14000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "rev4", "rev. 4" )
 	ROMX_LOAD( "318004-04.bin", 0x14000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(3) )
-
-	C1551_ROM("cpu_c1551")
 ROM_END
 
 ROM_START( c16v )
@@ -688,8 +598,6 @@ ROM_START( plus4c )
 
 	ROM_LOAD( "317053-01.bin", 0x18000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f) )
 	ROM_LOAD( "317054-01.bin", 0x1c000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693) )
-
-	C1551_ROM("cpu_c1551")
 ROM_END
 
 ROM_START( plus4v )
@@ -711,16 +619,16 @@ ROM_END
 
 COMP( 1984, c16,     0,     0,  c16,    c16,    c16,   "Commodore Business Machines Co.",  "Commodore 16 (PAL)", 0)
 COMP( 1984, c16c,    c16,   0,  c16c,   c16,    c16c,  "Commodore Business Machines Co.",  "Commodore 16 (PAL, 1551)", 0 )
-COMP( 1984, c16v,    c16,   0,  c16v,   c16,    c16v,  "Commodore Business Machines Co.",  "Commodore 16 (PAL, VC1541)", GAME_NOT_WORKING)
+COMP( 1984, c16v,    c16,   0,  c16v,   c16,    c16v,  "Commodore Business Machines Co.",  "Commodore 16 (PAL, VC1541)", 0)
 COMP( 1984, c16hun,  c16,   0,  c16,    c16,    c16,   "Commodore Business Machines Co.",  "Commodore 16 Novotrade (PAL, Hungary)", 0)
 
 COMP( 1984, c116,    c16,   0,  c16,    c16,    c16,   "Commodore Business Machines Co.",  "Commodore 116 (PAL)", 0)
 COMP( 1984, c116c,	 c16,   0,  c16c,   c16,    c16c,  "Commodore Business Machines Co.",  "Commodore 116 (PAL, 1551)", 0 )
-COMP( 1984, c116v,   c16,   0,  c16v,   c16,    c16v,  "Commodore Business Machines Co.",  "Commodore 116 (PAL, VC1541)", GAME_NOT_WORKING)
+COMP( 1984, c116v,   c16,   0,  c16v,   c16,    c16v,  "Commodore Business Machines Co.",  "Commodore 116 (PAL, VC1541)", 0)
 
 COMP( 1984, plus4,   c16,   0,  plus4,  plus4,  c16,   "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC)", 0)
 COMP( 1984, plus4c,  c16,   0,  plus4c, plus4,  c16c,  "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, 1551)", 0 )
-COMP( 1984, plus4v,  c16,   0,  plus4v, plus4,  c16v,  "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, VC1541)", GAME_NOT_WORKING)
+COMP( 1984, plus4v,  c16,   0,  plus4v, plus4,  c16v,  "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, VC1541)", 0)
 
 COMP( 1984, c232,    c16,   0,  c16,    c16,    c16,   "Commodore Business Machines Co.",  "Commodore 232 (Prototype)", 0)
 COMP( 1984, c264,    c16,   0,  c264,   plus4,  c16,   "Commodore Business Machines Co.",  "Commodore 264 (Prototype)", 0)

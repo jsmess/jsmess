@@ -24,15 +24,6 @@ extern  READ8_HANDLER(plus4_6529_port_r);
 extern WRITE8_HANDLER(c16_6529_port_w);
 extern  READ8_HANDLER(c16_6529_port_r);
 
-#if 0
-extern WRITE8_HANDLER(c16_iec9_port_w);
-extern  READ8_HANDLER(c16_iec9_port_r);
-
-extern WRITE8_HANDLER(c16_iec8_port_w);
-extern  READ8_HANDLER(c16_iec8_port_r);
-
-#endif
-
 extern WRITE8_HANDLER(c16_select_roms);
 extern WRITE8_HANDLER(c16_switch_to_rom);
 extern WRITE8_HANDLER(c16_switch_to_ram);

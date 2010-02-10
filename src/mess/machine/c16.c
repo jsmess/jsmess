@@ -13,7 +13,6 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
 
-#include "machine/6525tpi.h"
 #include "video/ted7360.h"
 #include "machine/cbmiec.h"
 
@@ -65,8 +64,6 @@ static UINT8 *c16_memory_20000;
 static UINT8 *c16_memory_24000;
 static UINT8 *c16_memory_28000;
 static UINT8 *c16_memory_2c000;
-
-static int has_c1551, has_vc1541, has_iec8, has_iec9; // Notice that iec8 & iec9 have never been implemented
 
 static UINT8 read_cfg1( running_machine *machine )
 {
@@ -451,17 +448,6 @@ static void c16_common_driver_init( running_machine *machine )
 	c16_memory_24000 = rom + 0x24000;
 	c16_memory_28000 = rom + 0x28000;
 	c16_memory_2c000 = rom + 0x2c000;
-
-	/* need to recognice non available tia6523's (iec8/9) */
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")) + (0xfdc0 % messram_get_size(devtag_get_device(machine, "messram"))), 0xff, 0x40);
-
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")) + (0xfd40 % messram_get_size(devtag_get_device(machine, "messram"))), 0xff, 0x20);
-
-//removed	if (has_c1551)		/* C1551 */
-//removed		c1551_config(machine, "cpu_c1551");
-
-//removed	if (has_vc1541)		/* VC1541 */
-//removed		cbm_drive_config(machine, type_1541, 0, 0, "cpu_vc1540", 8);
 }
 
 static void c16_driver_init( running_machine *machine )
@@ -482,28 +468,16 @@ static void c16_driver_init( running_machine *machine )
 
 DRIVER_INIT( c16 )
 {
-	has_c1551 = 0;
-	has_vc1541 = 0;
-	has_iec8 = 0;
-	has_iec9 = 0;
 	c16_driver_init(machine);
 }
 
 DRIVER_INIT( c16c )
 {
-	has_c1551 = 1;
-	has_vc1541 = 0;
-	has_iec8 = 0;
-	has_iec9 = 0;
 	c16_driver_init(machine);
 }
 
 DRIVER_INIT( c16v )
 {
-	has_c1551 = 0;
-	has_vc1541 = 1;
-	has_iec8 = 0;
-	has_iec9 = 0;
 	c16_driver_init(machine);
 }
 
@@ -558,40 +532,6 @@ MACHINE_RESET( c16 )
 
 		ted7360_set_dma (ted7360_dma_read, ted7360_dma_read_rom);
 	}
-
-	if (has_c1551 || has_iec8)		/* IEC8 on || C1551 */
-	{
-		running_device *tpi = devtag_get_device(machine, "tpi6535_tpi_2");
-		memory_install_write8_device_handler(space, tpi, 0xfee0, 0xfeff, 0, 0, tpi6525_w);
-		memory_install_read8_device_handler(space, tpi, 0xfee0, 0xfeff, 0, 0, tpi6525_r);
-	}
-	else
-	{
-		memory_nop_readwrite(space, 0xfee0, 0xfeff, 0, 0);
-	}
-	if (has_iec9)					/* IEC9 on */
-	{
-		running_device *tpi = devtag_get_device(machine, "tpi6535_tpi_3");
-		memory_install_write8_device_handler(space, tpi, 0xfec0, 0xfedf, 0, 0, tpi6525_w);
-		memory_install_read8_device_handler(space, tpi, 0xfec0, 0xfedf, 0, 0, tpi6525_r);
-	}
-	else
-	{
-		memory_nop_readwrite(space, 0xfec0, 0xfedf, 0, 0);
-	}
-//removed	if (has_c1551)		/* c1551 */
-//removed	{
-//removed		c1551_drive_reset();
-//removed	}
-//removed	if (has_vc1541)		/* vc1541 */
-//removed	{
-//removed		cbm_drive_reset(machine);
-//removed	}
-//removed	else								/* simulated drives */
-//removed	{
-//removed		cbm_drive_0_config(SERIAL, 8);
-//removed		cbm_drive_1_config(SERIAL, 9);
-//removed	}
 }
 
 
