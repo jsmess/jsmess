@@ -35,7 +35,6 @@ const options_entry mess_core_options[] =
 	{ NULL,							NULL,   OPTION_HEADER,						"MESS SPECIFIC OPTIONS" },
 	{ "ramsize;ram",				NULL,	0,									"size of RAM (if supported by driver)" },
 	{ "writeconfig;wc",				"0",	OPTION_BOOLEAN,						"writes configuration to (driver).ini on exit" },
-	{ OPTION_SKIP_WARNINGS,			"0",    OPTION_BOOLEAN,						"skip displaying the warnings screen" },
 	{ OPTION_ADDED_DEVICE_OPTIONS,	"0",	OPTION_BOOLEAN | OPTION_INTERNAL,	"device-specific options have been added" },
 	{ "natural;nat",				"0",	OPTION_BOOLEAN,						"specifies whether to use a natural keyboard or not" },
 	{ NULL }
