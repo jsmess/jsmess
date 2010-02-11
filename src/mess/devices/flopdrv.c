@@ -455,6 +455,7 @@ void floppy_drive_seek(running_device *img, signed int signed_tracks)
 
 	/* clear disk changed flag */
 	pDrive->dskchg = ASSERT_LINE;
+	//devcb_call_write_line(&flopimg->out_dskchg_func, flopimg->dskchg);
 
 	/* inform disk image of step operation so it can cache information */
 	if (image_exists(img))
@@ -700,7 +701,13 @@ error:
 	return INIT_FAIL;
 }
 
+static TIMER_CALLBACK( set_wpt )
+{
+	floppy_drive *flopimg = (floppy_drive *)ptr;
 
+	flopimg->wpt = param;
+	devcb_call_write_line(&flopimg->out_wpt_func, param);
+}
 
 DEVICE_IMAGE_LOAD( floppy )
 {
@@ -713,16 +720,19 @@ DEVICE_IMAGE_LOAD( floppy )
 			flopimg->load_proc(image);
 	}
 
-	/* set write protect status */
-	if (image_is_writable(image))
-		flopimg->wpt = ASSERT_LINE;
-	else
-		flopimg->wpt = CLEAR_LINE;
-
-	/* toggle write protect signal to simulate disk insert */
-	devcb_call_write_line(&flopimg->out_wpt_func, ASSERT_LINE);
-	devcb_call_write_line(&flopimg->out_wpt_func, CLEAR_LINE);
+	/* push disk halfway into drive */
+	flopimg->wpt = CLEAR_LINE;
 	devcb_call_write_line(&flopimg->out_wpt_func, flopimg->wpt);
+
+	/* set timer for disk load */
+	int next_wpt;
+
+	if (image_is_writable(image))
+		next_wpt = ASSERT_LINE;
+	else
+		next_wpt = CLEAR_LINE;
+
+	timer_set(image->machine, ATTOTIME_IN_MSEC(250), flopimg, next_wpt, set_wpt);
 
 	return retVal;
 }
@@ -743,10 +753,14 @@ DEVICE_IMAGE_UNLOAD( floppy )
 
 	/* disk changed */
 	flopimg->dskchg = CLEAR_LINE;
+	//devcb_call_write_line(&flopimg->out_dskchg_func, flopimg->dskchg);
 
-	/* toggle write protect signal to simulate disk eject */
-	devcb_call_write_line(&flopimg->out_wpt_func, CLEAR_LINE);
-	devcb_call_write_line(&flopimg->out_wpt_func, ASSERT_LINE);
+	/* pull disk halfway out of drive */
+	flopimg->wpt = CLEAR_LINE;
+	devcb_call_write_line(&flopimg->out_wpt_func, flopimg->wpt);
+
+	/* set timer for disk eject */
+	timer_set(image->machine, ATTOTIME_IN_MSEC(250), flopimg, ASSERT_LINE, set_wpt);
 }
 
 running_device *floppy_get_device(running_machine *machine,int drive)
