@@ -11,8 +11,7 @@
 
 	TODO:
 
-	- autoboot does not work when fast serial is used
-	- disk insert routine is not run
+	- fast serial mode is broken, bytes get skipped
 	- 1541/1571 Alignment shows drive speed as 266 rpm, should be 310
 	- CP/M disks
     - power/activity LEDs
@@ -75,6 +74,7 @@ struct _c1571_t
 	int byte;								/* byte ready */
 	int mode;								/* mode (0 = write, 1 = read) */
 	int side;								/* disk side select */
+	int clock;								/* clock speed */
 
 	/* interrupts */
 	int via0_irq;							/* VIA #0 interrupt request */
@@ -182,10 +182,12 @@ static TIMER_CALLBACK( bit_tick )
 		c1571->bit_count = 0;
 		byte = 1;
 
-		if (!(c1571->data & 0xff))
+		c1571->yb = c1571->data & 0xff;
+
+		if (!c1571->yb)
 		{
 			/* simulate weak bits with randomness */
-			c1571->data = (c1571->data & 0xff00) | (mame_rand(machine) & 0xff);
+			c1571->yb = mame_rand(machine) & 0xff;
 		}
 	}
 
@@ -444,12 +446,19 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
 	c1571_t *c1571 = get_safe_token(device->owner);
 
 	/* 1/2 MHz */
-	UINT32 clock = BIT(data, 5) ? XTAL_16MHz/8 : XTAL_16MHz/16;
+	int clock_1_2 = BIT(data, 5);
+	
+	if (c1571->clock != clock_1_2)
+	{
+		UINT32 clock = clock_1_2 ? XTAL_16MHz/8 : XTAL_16MHz/16;
 
-	c1571->cpu->set_clock(clock);
-	c1571->cia->set_clock(clock);
-	c1571->via0->set_clock(clock);
-	c1571->via1->set_clock(clock);
+		c1571->cpu->set_clock(clock);
+		c1571->cia->set_clock(clock);
+		c1571->via0->set_clock(clock);
+		c1571->via1->set_clock(clock);
+
+		c1571->clock = clock_1_2;
+	}
 
 	/* fast serial direction */
 	c1571->ser_dir = BIT(data, 1);
@@ -594,7 +603,7 @@ static READ8_DEVICE_HANDLER( yb_r )
 
 	c1571_t *c1571 = get_safe_token(device->owner);
 
-	return c1571->data & 0xff;
+	return c1571->yb;
 }
 
 static WRITE8_DEVICE_HANDLER( yb_w )
@@ -613,6 +622,10 @@ static WRITE8_DEVICE_HANDLER( yb_w )
         PA7     YB7
 
     */
+	
+	c1571_t *c1571 = get_safe_token(device->owner);
+
+	c1571->yb = data;
 }
 
 static READ8_DEVICE_HANDLER( via1_pb_r )
