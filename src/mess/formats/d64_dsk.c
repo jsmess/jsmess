@@ -10,7 +10,6 @@
 
     TODO:
 
-	- D81 geometry translation
     - disk errors
 	- variable gaps
 
@@ -649,6 +648,15 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 		logerror("D64 heads: %u\n", heads);
 		logerror("D64 tracks: %u\n", dos_tracks);
 		logerror("D64 DOS version: %s\n", DOS_VERSION[dos]);
+	}
+
+	/* clear track data offsets */
+	for (head = 0; head < MAX_HEADS; head++)
+	{
+		for (track = 0; track < MAX_TRACKS; track++)
+		{
+			tag->track_offset[head][track] = INVALID_OFFSET;
+		}
 	}
 
 	/* determine track data offsets */

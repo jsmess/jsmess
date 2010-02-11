@@ -11,8 +11,9 @@
 
 	TODO:
 
+	- autoboot does not work when fast serial is used
+	- disk insert routine is not run
 	- 1541/1571 Alignment shows drive speed as 266 rpm, should be 310
-	- toggle WPRT line on disk change
 	- CP/M disks
     - power/activity LEDs
 
@@ -38,6 +39,7 @@
 #define M6522_1_TAG		"u4"
 #define M6526_TAG		"u20"
 #define WD1770_TAG		"u11"
+#define C64H156_TAG		"u6"
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -199,6 +201,95 @@ static TIMER_CALLBACK( bit_tick )
 }
 
 /*-------------------------------------------------
+    read_current_track - read track from disk
+-------------------------------------------------*/
+
+static void read_current_track(c1571_t *c1571)
+{
+	c1571->track_len = G64_BUFFER_SIZE;
+	c1571->buffer_pos = G64_DATA_START;
+	c1571->bit_pos = 7;
+	c1571->bit_count = 0;
+
+	/* read track data */
+	floppy_drive_read_track_data_info_buffer(c1571->image, c1571->side, c1571->track_buffer, &c1571->track_len);
+
+	/* extract track length */
+	c1571->track_len = G64_DATA_START + ((c1571->track_buffer[1] << 8) | c1571->track_buffer[0]);
+}
+
+/*-------------------------------------------------
+    set_side - set disk side
+-------------------------------------------------*/
+
+static void set_side(c1571_t *c1571, int side)
+{
+	if (c1571->side != side)
+	{
+		c1571->side = side;
+		wd17xx_set_side(c1571->wd1770, side);
+
+		if (c1571->mtr)
+		{
+			/* read track data */
+			read_current_track(c1571);
+		}
+	}
+}
+
+/*-------------------------------------------------
+    spindle_motor - spindle motor control
+-------------------------------------------------*/
+
+static void spindle_motor(c1571_t *c1571, int mtr)
+{
+	if (c1571->mtr != mtr)
+	{
+		if (mtr)
+		{
+			/* read track data */
+			read_current_track(c1571);
+		}
+
+		floppy_mon_w(c1571->image, !mtr);
+		timer_enable(c1571->bit_timer, mtr);
+
+		c1571->mtr = mtr;
+	}
+}
+
+/*-------------------------------------------------
+    step_motor - stepper motor control
+-------------------------------------------------*/
+
+static void step_motor(c1571_t *c1571, int stp)
+{
+	if (c1571->mtr & (c1571->stp != stp))
+	{
+		int tracks = 0;
+
+		switch (c1571->stp)
+		{
+		case 0:	if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
+		case 1:	if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
+		case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
+		case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
+		}
+
+		if (tracks != 0)
+		{
+			/* step read/write head */
+			floppy_drive_seek(c1571->image, tracks);
+
+			/* read new track data */
+			read_current_track(c1571);
+		}
+
+		c1571->stp = stp;
+	}
+}
+
+/*-------------------------------------------------
     c1571_iec_atn_w - serial bus attention
 -------------------------------------------------*/
 
@@ -292,7 +383,7 @@ static ADDRESS_MAP_START( c1571cr_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
-    via6522_interface c1571_via0_intf
+    via6522_interface via0_intf
 -------------------------------------------------*/
 
 static WRITE_LINE_DEVICE_HANDLER( via0_irq_w )
@@ -366,9 +457,9 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
 	iec_srq_w(device->owner);
 
 	/* side select */
-	c1571->side = BIT(data, 2);
-	wd17xx_set_side(c1571->wd1770, BIT(data, 2));
-
+	int side = BIT(data, 2);
+	set_side(c1571, side);
+	
 	/* attention out */
 	cbm_iec_atn_w(c1571->serial_bus, device->owner, !BIT(data, 6));
 }
@@ -438,13 +529,27 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 	cbm_iec_clk_w(c1571->serial_bus, device->owner, !BIT(data, 3));
 }
 
-static const via6522_interface c1571_via0_intf =
+static READ_LINE_DEVICE_HANDLER( atn_in_r )
+{
+	c1571_t *c1571 = get_safe_token(device->owner);
+
+	return !cbm_iec_atn_r(c1571->serial_bus);
+}
+
+static READ_LINE_DEVICE_HANDLER( wprt_r )
+{
+	c1571_t *c1571 = get_safe_token(device->owner);
+
+	return !floppy_wpt_r(c1571->image);
+}
+
+static const via6522_interface via0_intf =
 {
 	DEVCB_HANDLER(via0_pa_r),
 	DEVCB_HANDLER(via0_pb_r),
-	DEVCB_NULL, /* ATN IN */
+	DEVCB_LINE(atn_in_r),
 	DEVCB_NULL,
-	DEVCB_NULL, /* _WPRT */
+	DEVCB_LINE(wprt_r),
 	DEVCB_NULL,
 
 	DEVCB_HANDLER(via0_pa_w),
@@ -458,66 +563,8 @@ static const via6522_interface c1571_via0_intf =
 };
 
 /*-------------------------------------------------
-    via6522_interface c1571_via1_intf
+    via6522_interface via1_intf
 -------------------------------------------------*/
-
-static void read_current_track(c1571_t *c1571)
-{
-	c1571->track_len = G64_BUFFER_SIZE;
-	c1571->buffer_pos = G64_DATA_START;
-	c1571->bit_pos = 7;
-	c1571->bit_count = 0;
-
-	/* read track data */
-	floppy_drive_read_track_data_info_buffer(c1571->image, c1571->side, c1571->track_buffer, &c1571->track_len);
-
-	/* extract track length */
-	c1571->track_len = G64_DATA_START + ((c1571->track_buffer[1] << 8) | c1571->track_buffer[0]);
-}
-
-static void spindle_motor(c1571_t *c1571, int mtr)
-{
-	if (c1571->mtr != mtr)
-	{
-		if (mtr)
-		{
-			/* read track data */
-			read_current_track(c1571);
-		}
-
-		floppy_mon_w(c1571->image, !mtr);
-		timer_enable(c1571->bit_timer, mtr);
-
-		c1571->mtr = mtr;
-	}
-}
-
-static void step_motor(c1571_t *c1571, int mtr, int stp)
-{
-	if (mtr & (c1571->stp != stp))
-	{
-		int tracks = 0;
-
-		switch (c1571->stp)
-		{
-		case 0:	if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
-		case 1:	if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
-		case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
-		case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
-		}
-
-		if (tracks != 0)
-		{
-			/* step read/write head */
-			floppy_drive_seek(c1571->image, tracks);
-
-			/* read new track data */
-			read_current_track(c1571);
-		}
-
-		c1571->stp = stp;
-	}
-}
 
 static WRITE_LINE_DEVICE_HANDLER( via1_irq_w )
 {
@@ -622,7 +669,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 
 	/* stepper motor */
 	int stp = data & 0x03;
-	step_motor(c1571, mtr, stp);
+	step_motor(c1571, stp);
 
 	/* TODO activity LED */
 
@@ -661,7 +708,7 @@ static WRITE_LINE_DEVICE_HANDLER( mode_w )
 	c1571->mode = state;
 }
 
-static const via6522_interface c1571_via1_intf =
+static const via6522_interface via1_intf =
 {
 	DEVCB_HANDLER(yb_r),
 	DEVCB_HANDLER(via1_pb_r),
@@ -681,7 +728,7 @@ static const via6522_interface c1571_via1_intf =
 };
 
 /*-------------------------------------------------
-    mos6526_interface c1571_cia_intf
+    mos6526_interface cia_intf
 -------------------------------------------------*/
 
 static WRITE_LINE_DEVICE_HANDLER( cia_irq_w )
@@ -711,7 +758,7 @@ static WRITE_LINE_DEVICE_HANDLER( cia_sp_w )
 	iec_data_w(device->owner);
 }
 
-static MOS6526_INTERFACE( c1571_cia_intf )
+static MOS6526_INTERFACE( cia_intf )
 {
 	0,
 	DEVCB_LINE(cia_irq_w),
@@ -725,10 +772,10 @@ static MOS6526_INTERFACE( c1571_cia_intf )
 };
 
 /*-------------------------------------------------
-    wd17xx_interface c1571_wd1770_intf
+    wd17xx_interface wd1770_intf
 -------------------------------------------------*/
 
-static const wd17xx_interface c1571_wd1770_intf =
+static const wd17xx_interface wd1770_intf =
 {
 	DEVCB_LINE_GND,
 	DEVCB_NULL,
@@ -750,12 +797,19 @@ FLOPPY_OPTIONS_END
     floppy_config c1570_floppy_config
 -------------------------------------------------*/
 
+static WRITE_LINE_DEVICE_HANDLER( wpt_w )
+{
+	c1571_t *c1571 = get_safe_token(device->owner);
+
+	via_ca2_w(c1571->via0, !state);
+}
+
 static const floppy_config c1570_floppy_config =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_LINE(wpt_w),
 	DEVCB_NULL,
 	FLOPPY_DRIVE_SS_80,
 	FLOPPY_OPTIONS_NAME(c1571),
@@ -771,7 +825,7 @@ static const floppy_config c1571_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_LINE(wpt_w),
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(c1571),
@@ -786,10 +840,10 @@ static MACHINE_DRIVER_START( c1570 )
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(c1570_map)
 
-	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/8, c1571_via0_intf)
-	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/8, c1571_via1_intf)
-	MDRV_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/8, c1571_cia_intf)
-	MDRV_WD1770_ADD(WD1770_TAG, c1571_wd1770_intf)
+	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/8, via0_intf)
+	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/8, via1_intf)
+	MDRV_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/8, cia_intf)
+	MDRV_WD1770_ADD(WD1770_TAG, wd1770_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1570_floppy_config)
 MACHINE_DRIVER_END
@@ -802,10 +856,10 @@ static MACHINE_DRIVER_START( c1571 )
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(c1571_map)
 
-	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/8, c1571_via0_intf)
-	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/8, c1571_via1_intf)
-	MDRV_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/8, c1571_cia_intf)
-	MDRV_WD1770_ADD(WD1770_TAG, c1571_wd1770_intf)
+	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/8, via0_intf)
+	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/8, via1_intf)
+	MDRV_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/8, cia_intf)
+	MDRV_WD1770_ADD(WD1770_TAG, wd1770_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_config)
 MACHINE_DRIVER_END
@@ -818,10 +872,10 @@ static MACHINE_DRIVER_START( c1571cr )
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(c1571cr_map)
 
-	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/8, c1571_via0_intf)
-	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/8, c1571_via1_intf)
-	MDRV_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/8, c1571_cia_intf)
-	MDRV_WD1770_ADD(WD1770_TAG, c1571_wd1770_intf)
+	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/8, via0_intf)
+	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/8, via1_intf)
+	MDRV_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/8, cia_intf)
+	MDRV_WD1770_ADD(WD1770_TAG, wd1770_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_config)
 MACHINE_DRIVER_END

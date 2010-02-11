@@ -38,6 +38,7 @@ struct floppy_config_t
 	devcb_write_line out_tk00_func; /* track 00 */
 	devcb_write_line out_wpt_func;  /* write protect */
 	devcb_write_line out_rdy_func;  /* ready */
+//	devcb_write_line out_dskchg_func;  /* disk changed */
 
 	floppy_type_t floppy_type;
 	const struct FloppyFormat *formats;

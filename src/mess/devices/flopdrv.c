@@ -37,6 +37,7 @@ struct _floppy_drive
 	devcb_resolved_write_line out_tk00_func;
 	devcb_resolved_write_line out_wpt_func;
 	devcb_resolved_write_line out_rdy_func;
+	devcb_resolved_write_line out_dskchg_func;
 
 	/* state of input lines */
 	int drtn; /* direction */
@@ -627,24 +628,28 @@ DEVICE_START( floppy )
 	floppy->drive_id = floppy_get_drive(device);
 	floppy->active = FALSE;
 
-	/* by default we are write-protected */
-	floppy->wpt = CLEAR_LINE;
-
-	/* not at track 0 */
-	floppy->tk00 = ASSERT_LINE;
-
-	/* motor off */
-	floppy->mon = ASSERT_LINE;
-
-	/* disk changed */
-	floppy->dskchg = CLEAR_LINE;
-
 	/* resolve callbacks */
 	devcb_resolve_write_line(&floppy->out_idx_func, &floppy->config->out_idx_func, device);
 	devcb_resolve_read_line(&floppy->in_mon_func, &floppy->config->in_mon_func, device);
 	devcb_resolve_write_line(&floppy->out_tk00_func, &floppy->config->out_tk00_func, device);
 	devcb_resolve_write_line(&floppy->out_wpt_func, &floppy->config->out_wpt_func, device);
 	devcb_resolve_write_line(&floppy->out_rdy_func, &floppy->config->out_rdy_func, device);
+//	devcb_resolve_write_line(&floppy->out_dskchg_func, &floppy->config->out_dskchg_func, device);
+
+	/* by default we are not write-protected */
+	floppy->wpt = ASSERT_LINE;
+	devcb_call_write_line(&floppy->out_wpt_func, floppy->wpt);
+
+	/* not at track 0 */
+	floppy->tk00 = ASSERT_LINE;
+	devcb_call_write_line(&floppy->out_tk00_func, floppy->tk00);
+
+	/* motor off */
+	floppy->mon = ASSERT_LINE;
+
+	/* disk changed */
+	floppy->dskchg = CLEAR_LINE;
+//	devcb_call_write_line(&floppy->out_dskchg_func, floppy->dskchg);
 }
 
 static int internal_floppy_device_load(running_device *image, int create_format, option_resolution *create_args)

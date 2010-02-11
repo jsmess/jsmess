@@ -267,6 +267,107 @@ static TIMER_CALLBACK( bit_tick )
 }
 
 /*-------------------------------------------------
+    read_current_track - read track from disk
+-------------------------------------------------*/
+
+static void read_current_track(c2040_t *c2040, int unit)
+{
+	c2040->unit[unit].track_len = G64_BUFFER_SIZE;
+	c2040->unit[unit].buffer_pos = G64_DATA_START;
+	c2040->unit[unit].bit_pos = 7;
+	c2040->bit_count = 0;
+
+	/* read track data */
+	floppy_drive_read_track_data_info_buffer(c2040->unit[unit].image, c2040->side, c2040->unit[unit].track_buffer, &c2040->unit[unit].track_len);
+
+	/* extract track length */
+	c2040->unit[unit].track_len = G64_DATA_START + ((c2040->unit[unit].track_buffer[1] << 8) | c2040->unit[unit].track_buffer[0]);
+}
+
+/*-------------------------------------------------
+    spindle_motor - spindle motor control
+-------------------------------------------------*/
+
+static void spindle_motor(c2040_t *c2040, int unit, int mtr)
+{
+	if (c2040->unit[unit].mtr != mtr)
+	{
+		if (!mtr)
+		{
+			/* read track data */
+			read_current_track(c2040, unit);
+		}
+
+		floppy_mon_w(c2040->unit[unit].image, mtr);
+
+		c2040->unit[unit].mtr = mtr;
+	}
+}
+
+/*-------------------------------------------------
+    micropolis_step_motor - Micropolis stepper
+	motor control
+-------------------------------------------------*/
+
+static void micropolis_step_motor(c2040_t *c2040, int unit, int mtr, int stp)
+{
+	if (!mtr && (c2040->unit[unit].stp != stp))
+	{
+		int tracks = 0;
+
+		switch (c2040->unit[unit].stp)
+		{
+		case 0:	if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
+		case 1:	if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
+		case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
+		case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
+		}
+
+		if (tracks != 0)
+		{
+			/* step read/write head */
+			floppy_drive_seek(c2040->unit[unit].image, tracks);
+
+			/* read new track data */
+			read_current_track(c2040, unit);
+		}
+
+		c2040->unit[unit].stp = stp;
+	}
+}
+
+/*-------------------------------------------------
+    mpi_step_motor - MPI stepper motor control
+-------------------------------------------------*/
+
+static void mpi_step_motor(c2040_t *c2040, int unit, int mtr, int stp)
+{
+	if (!mtr && (c2040->unit[unit].stp != stp))
+	{
+		int tracks = 0;
+
+		switch (c2040->unit[unit].stp)
+		{
+		case 0:	if (stp == 1) tracks++; else if (stp == 2) tracks--; break;
+		case 1:	if (stp == 3) tracks++; else if (stp == 0) tracks--; break;
+		case 2: if (stp == 0) tracks++; else if (stp == 3) tracks--; break;
+		case 3: if (stp == 2) tracks++; else if (stp == 1) tracks--; break;
+		}
+
+		if (tracks != 0)
+		{
+			/* step read/write head */
+			floppy_drive_seek(c2040->unit[unit].image, tracks);
+
+			/* read new track data */
+			read_current_track(c2040, unit);
+		}
+
+		c2040->unit[unit].stp = stp;
+	}
+}
+
+/*-------------------------------------------------
     c2040_ieee488_atn_w - IEEE-488 bus attention
 -------------------------------------------------*/
 
@@ -630,63 +731,6 @@ static const riot6532_interface riot1_intf =
     via6522_interface via_intf um3
 -------------------------------------------------*/
 
-static void read_current_track(c2040_t *c2040, int unit)
-{
-	c2040->unit[unit].track_len = G64_BUFFER_SIZE;
-	c2040->unit[unit].buffer_pos = G64_DATA_START;
-	c2040->unit[unit].bit_pos = 7;
-	c2040->bit_count = 0;
-
-	/* read track data */
-	floppy_drive_read_track_data_info_buffer(c2040->unit[unit].image, c2040->side, c2040->unit[unit].track_buffer, &c2040->unit[unit].track_len);
-
-	/* extract track length */
-	c2040->unit[unit].track_len = G64_DATA_START + ((c2040->unit[unit].track_buffer[1] << 8) | c2040->unit[unit].track_buffer[0]);
-}
-
-static void spindle_motor(c2040_t *c2040, int unit, int mtr)
-{
-	if (c2040->unit[unit].mtr != mtr)
-	{
-		if (!mtr)
-		{
-			/* read track data */
-			read_current_track(c2040, unit);
-		}
-
-		floppy_mon_w(c2040->unit[unit].image, mtr);
-
-		c2040->unit[unit].mtr = mtr;
-	}
-}
-
-static void micropolis_step_motor(c2040_t *c2040, int unit, int mtr, int stp)
-{
-	if (!mtr && (c2040->unit[unit].stp != stp))
-	{
-		int tracks = 0;
-
-		switch (c2040->unit[unit].stp)
-		{
-		case 0:	if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
-		case 1:	if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
-		case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
-		case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
-		}
-
-		if (tracks != 0)
-		{
-			/* step read/write head */
-			floppy_drive_seek(c2040->unit[unit].image, tracks);
-
-			/* read new track data */
-			read_current_track(c2040, unit);
-		}
-
-		c2040->unit[unit].stp = stp;
-	}
-}
-
 static READ8_DEVICE_HANDLER( via_pa_r )
 {
 	/*
@@ -809,33 +853,6 @@ static const via6522_interface via_intf =
 /*-------------------------------------------------
     via6522_interface c8050_via_intf um3
 -------------------------------------------------*/
-
-static void mpi_step_motor(c2040_t *c2040, int unit, int mtr, int stp)
-{
-	if (!mtr && (c2040->unit[unit].stp != stp))
-	{
-		int tracks = 0;
-
-		switch (c2040->unit[unit].stp)
-		{
-		case 0:	if (stp == 1) tracks++; else if (stp == 2) tracks--; break;
-		case 1:	if (stp == 3) tracks++; else if (stp == 0) tracks--; break;
-		case 2: if (stp == 0) tracks++; else if (stp == 3) tracks--; break;
-		case 3: if (stp == 2) tracks++; else if (stp == 1) tracks--; break;
-		}
-
-		if (tracks != 0)
-		{
-			/* step read/write head */
-			floppy_drive_seek(c2040->unit[unit].image, tracks);
-
-			/* read new track data */
-			read_current_track(c2040, unit);
-		}
-
-		c2040->unit[unit].stp = stp;
-	}
-}
 
 static READ8_DEVICE_HANDLER( c8050_via_pb_r )
 {
