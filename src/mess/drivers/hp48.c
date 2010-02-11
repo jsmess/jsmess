@@ -1030,11 +1030,11 @@ static MACHINE_DRIVER_START ( hp48s )
 MACHINE_DRIVER_END
 
 
-COMP ( 1990, hp48sx, 0     , 0, hp48sx, hp48sx, hp48, "Hewlett Packard", "HP48SX", GAME_SHARE_ROMS )
-COMP ( 1991, hp48s , hp48sx, 0, hp48s,  hp48sx, hp48, "Hewlett Packard", "HP48S", GAME_SHARE_ROMS )
-COMP ( 1993, hp48gx, 0     , 0, hp48gx, hp48gx, hp48, "Hewlett Packard", "HP48GX", GAME_SHARE_ROMS )
-COMP ( 1993, hp48g , hp48gx, 0, hp48g,  hp48gx, hp48, "Hewlett Packard", "HP48G", GAME_SHARE_ROMS )
-COMP ( 1998, hp48gp, hp48gx, 0, hp48gp, hp48gx, hp48, "Hewlett Packard", "HP48G+", GAME_SHARE_ROMS )
+COMP ( 1990, hp48sx, 0     , 0, hp48sx, hp48sx, hp48, "Hewlett Packard", "HP48SX", 0 )
+COMP ( 1991, hp48s , hp48sx, 0, hp48s,  hp48sx, hp48, "Hewlett Packard", "HP48S", 0 )
+COMP ( 1993, hp48gx, 0     , 0, hp48gx, hp48gx, hp48, "Hewlett Packard", "HP48GX", 0 )
+COMP ( 1993, hp48g , hp48gx, 0, hp48g,  hp48gx, hp48, "Hewlett Packard", "HP48G", 0 )
+COMP ( 1998, hp48gp, hp48gx, 0, hp48gp, hp48gx, hp48, "Hewlett Packard", "HP48G+", 0 )
 
 COMP ( 1995, hp38g , hp48gx, 0, hp48g,  hp48gx, hp48, "Hewlett Packard", "HP38G", 0 )
 COMP ( 2000, hp39g , hp48gx, 0, hp48g,  hp48gx, hp48, "Hewlett Packard", "HP39G", GAME_NOT_WORKING )

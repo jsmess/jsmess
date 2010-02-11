@@ -740,8 +740,8 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                             FULLNAME                 FLAGS */
-COMP( 1985, a1000n, 0,      0,      a1000n, amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 1000 (NTSC)",     GAME_IMPERFECT_GRAPHICS | GAME_SHARE_ROMS )
-COMP( 1985, a1000p, a1000n, 0,      a1000p, amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 1000 (PAL)",      GAME_IMPERFECT_GRAPHICS | GAME_SHARE_ROMS)
-COMP( 1987, a500n,  0,      0,      a500n,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 500 (NTSC, OCS)", GAME_IMPERFECT_GRAPHICS | GAME_SHARE_ROMS)
-COMP( 1987, a500p,  a500n,  0,      a500p,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 500 (PAL, OCS)",  GAME_IMPERFECT_GRAPHICS | GAME_SHARE_ROMS)
+COMP( 1985, a1000n, 0,      0,      a1000n, amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 1000 (NTSC)",     GAME_IMPERFECT_GRAPHICS )
+COMP( 1985, a1000p, a1000n, 0,      a1000p, amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 1000 (PAL)",      GAME_IMPERFECT_GRAPHICS )
+COMP( 1987, a500n,  0,      0,      a500n,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 500 (NTSC, OCS)", GAME_IMPERFECT_GRAPHICS )
+COMP( 1987, a500p,  a500n,  0,      a500p,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 500 (PAL, OCS)",  GAME_IMPERFECT_GRAPHICS )
 COMP( 1991, cdtv,   0,      0,      cdtv,   cdtv,   cdtv,   "Commodore Business Machines Co.",  "CDTV (NTSC)",           GAME_IMPERFECT_GRAPHICS )
