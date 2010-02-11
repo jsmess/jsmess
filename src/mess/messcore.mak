@@ -82,7 +82,6 @@ EMUOBJS += \
 	$(MESSOBJ)/device.o		\
 	$(MESSOBJ)/hashfile.o	\
 	$(MESSOBJ)/inputx.o		\
-	$(MESSOBJ)/artworkx.o	\
 	$(MESSOBJ)/uimess.o		\
 	$(MESSOBJ)/filemngr.o	\
 	$(MESSOBJ)/tapectrl.o	\
