@@ -707,6 +707,18 @@ DEVICE_IMAGE_LOAD( floppy )
 		if (flopimg->load_proc)
 			flopimg->load_proc(image);
 	}
+
+	/* set write protect status */
+	if (image_is_writable(image))
+		flopimg->wpt = ASSERT_LINE;
+	else
+		flopimg->wpt = CLEAR_LINE;
+
+	/* toggle write protect signal to simulate disk insert */
+	devcb_call_write_line(&flopimg->out_wpt_func, ASSERT_LINE);
+	devcb_call_write_line(&flopimg->out_wpt_func, CLEAR_LINE);
+	devcb_call_write_line(&flopimg->out_wpt_func, flopimg->wpt);
+
 	return retVal;
 }
 
@@ -726,6 +738,10 @@ DEVICE_IMAGE_UNLOAD( floppy )
 
 	/* disk changed */
 	flopimg->dskchg = CLEAR_LINE;
+
+	/* toggle write protect signal to simulate disk eject */
+	devcb_call_write_line(&flopimg->out_wpt_func, CLEAR_LINE);
+	devcb_call_write_line(&flopimg->out_wpt_func, ASSERT_LINE);
 }
 
 running_device *floppy_get_device(running_machine *machine,int drive)
@@ -944,15 +960,6 @@ WRITE_LINE_DEVICE_HANDLER( floppy_wtg_w )
 READ_LINE_DEVICE_HANDLER( floppy_wpt_r )
 {
 	floppy_drive *drive = get_safe_token(device);
-
-	if (image_slotexists(device))
-	{
-		if (image_is_writable(device))
-			drive->wpt = ASSERT_LINE;
-		else
-			drive->wpt = CLEAR_LINE;
-	}
-
 	return drive->wpt;
 }
 

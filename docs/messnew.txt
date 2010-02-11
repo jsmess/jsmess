@@ -95,6 +95,9 @@ Source Changes:
 
 - Implemented 'disk changed' floppy drive signal. [Curt Coder]
 
+- Implemented floppy drive write protect signal toggling on floppy 
+  disk insert/eject. [Curt Coder]
+
 - Emulated the following Commodore floppy disk drives at hardware level:
   1551, 1571, 1581, 2040, 3040, 4040, 8050, 8250, SFD-1001. [Curt Coder]
 
