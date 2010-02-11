@@ -41,6 +41,8 @@ System Driver Changes:
 
 - [APEXC] Fixed disassembly in the debugger. [Robbbert]
 
+- [C16] Connected Commodore 1551 floppy drive. [Curt Coder]
+
 - [C64] Added read-only access to D64 floppies. [Fabio Priuli, Curt Coder]
 
 - [C128] Added read-only access to double-sided D71 floppies. [Curt Coder]
@@ -84,12 +86,6 @@ Source Changes:
 - [CIA6526] Refactored interface, added SP/CNT callbacks, and fixed serial
   port transfer. [Curt Coder]
 
-- [C1581] Implemented read-only access to D81 images. [Curt Coder]  
-
-- [C4040] Implemented read-only access to D64/D67/G64 images. [Curt Coder]
-
-- [C8050] Implemented read-only access to D80 images. [Curt Coder]
-
 - Cleanups for driver_data and Standard C library usage.  [Atari Ace]
 
 - Fixed some 'uninitialized variable' errors.  [Scott Michel]
@@ -98,6 +94,12 @@ Source Changes:
   with Commodore drives, where physical track 1 is a half track. [Curt Coder]
 
 - Implemented 'disk changed' floppy drive signal. [Curt Coder]
+
+- Emulated the following Commodore floppy disk drives at hardware level:
+  1551, 1571, 1581, 2040, 3040, 4040, 8050, 8250, SFD-1001. [Curt Coder]
+
+- Added read-only support for the following disk image formats:
+  D64, D71, D81, D80, D82. [Curt Coder]
 
 
 

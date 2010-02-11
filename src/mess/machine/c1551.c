@@ -11,8 +11,8 @@
 
 	TODO:
 
-	- byte latched is wrong
-	- 23 data block checksum error
+	- byte latching does not match hardware behavior 
+	  (CPU skips data bytes if implemented per schematics)
 	- activity LED
 
 */
@@ -163,9 +163,9 @@ static TIMER_CALLBACK( bit_tick )
 			/* simulate weak bits with randomness */
 			c1551->yb = mame_rand(machine) & 0xff;
 		}
+	
+		c1551->byte = byte;
 	}
-
-	c1551->byte = byte;
 }
 
 /*-------------------------------------------------
@@ -386,6 +386,8 @@ static READ8_DEVICE_HANDLER( tpi0_pb_r )
     */
 
 	c1551_t *c1551 = get_safe_token(device->owner);
+
+	c1551->byte = 0;
 
 	return c1551->yb;
 }
