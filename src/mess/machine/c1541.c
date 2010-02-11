@@ -284,6 +284,76 @@ static TIMER_CALLBACK( bit_tick )
 }
 
 /*-------------------------------------------------
+    read_current_track - read track from disk
+-------------------------------------------------*/
+
+static void read_current_track(c1541_t *c1541)
+{
+	c1541->track_len = G64_BUFFER_SIZE;
+	c1541->buffer_pos = G64_DATA_START;
+	c1541->bit_pos = 7;
+	c1541->bit_count = 0;
+
+	/* read track data */
+	floppy_drive_read_track_data_info_buffer(c1541->image, 0, c1541->track_buffer, &c1541->track_len);
+
+	/* extract track length */
+	c1541->track_len = G64_DATA_START + ((c1541->track_buffer[1] << 8) | c1541->track_buffer[0]);
+}
+
+/*-------------------------------------------------
+    spindle_motor - spindle motor control
+-------------------------------------------------*/
+
+static void spindle_motor(c1541_t *c1541, int mtr)
+{
+	if (c1541->mtr != mtr)
+	{
+		if (mtr)
+		{
+			/* read track data */
+			read_current_track(c1541);
+		}
+
+		floppy_mon_w(c1541->image, !mtr);
+		timer_enable(c1541->bit_timer, mtr);
+
+		c1541->mtr = mtr;
+	}
+}
+
+/*-------------------------------------------------
+    step_motor - stepper motor control
+-------------------------------------------------*/
+
+static void step_motor(c1541_t *c1541, int mtr, int stp)
+{
+	if (mtr & (c1541->stp != stp))
+	{
+		int tracks = 0;
+
+		switch (c1541->stp)
+		{
+		case 0:	if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
+		case 1:	if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
+		case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
+		case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
+		}
+
+		if (tracks != 0)
+		{
+			/* step read/write head */
+			floppy_drive_seek(c1541->image, tracks);
+
+			/* read new track data */
+			read_current_track(c1541);
+		}
+
+		c1541->stp = stp;
+	}
+}
+
+/*-------------------------------------------------
     c1541_iec_atn_w - serial bus attention
 -------------------------------------------------*/
 
@@ -486,18 +556,25 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 	c1541->atna = atna;
 }
 
+static READ_LINE_DEVICE_HANDLER( atn_in_r )
+{
+	c1541_t *c1541 = get_safe_token(device->owner);
+
+	return !cbm_iec_atn_r(c1541->bus);
+}
+
 static const via6522_interface c1541_via0_intf =
 {
 	DEVCB_HANDLER(via0_pa_r),
 	DEVCB_HANDLER(via0_pb_r),
-	DEVCB_NULL,
+	DEVCB_LINE(atn_in_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
 	DEVCB_NULL,
 	DEVCB_HANDLER(via0_pb_w),
-	DEVCB_NULL, /* ATN IN */
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -535,14 +612,14 @@ static const via6522_interface c1541c_via0_intf =
 {
 	DEVCB_HANDLER(c1541c_via0_pa_r),
 	DEVCB_HANDLER(via0_pb_r),
-	DEVCB_NULL,
+	DEVCB_LINE(atn_in_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
 	DEVCB_NULL,
 	DEVCB_HANDLER(via0_pb_w),
-	DEVCB_NULL, /* ATN IN */
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -730,64 +807,6 @@ static const via6522_interface c2031_via0_intf =
 /*-------------------------------------------------
     via6522_interface c1541_via1_intf
 -------------------------------------------------*/
-
-static void read_current_track(c1541_t *c1541)
-{
-	c1541->track_len = G64_BUFFER_SIZE;
-	c1541->buffer_pos = G64_DATA_START;
-	c1541->bit_pos = 7;
-	c1541->bit_count = 0;
-
-	/* read track data */
-	floppy_drive_read_track_data_info_buffer(c1541->image, 0, c1541->track_buffer, &c1541->track_len);
-
-	/* extract track length */
-	c1541->track_len = G64_DATA_START + ((c1541->track_buffer[1] << 8) | c1541->track_buffer[0]);
-}
-
-static void spindle_motor(c1541_t *c1541, int mtr)
-{
-	if (c1541->mtr != mtr)
-	{
-		if (mtr)
-		{
-			/* read track data */
-			read_current_track(c1541);
-		}
-
-		floppy_mon_w(c1541->image, !mtr);
-		timer_enable(c1541->bit_timer, mtr);
-
-		c1541->mtr = mtr;
-	}
-}
-
-static void step_motor(c1541_t *c1541, int mtr, int stp)
-{
-	if (mtr & (c1541->stp != stp))
-	{
-		int tracks = 0;
-
-		switch (c1541->stp)
-		{
-		case 0:	if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
-		case 1:	if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
-		case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
-		case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
-		}
-
-		if (tracks != 0)
-		{
-			/* step read/write head */
-			floppy_drive_seek(c1541->image, tracks);
-
-			/* read new track data */
-			read_current_track(c1541);
-		}
-
-		c1541->stp = stp;
-	}
-}
 
 static WRITE_LINE_DEVICE_HANDLER( via1_irq_w )
 {
