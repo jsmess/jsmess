@@ -8,12 +8,32 @@
 
 BOOL DriverIsComputer(int driver_index)
 {
-	return (drivers[driver_index]->flags & GAME_COMPUTER) != 0;
+	machine_config *config;
+	ioport_list portlist;
+	config = machine_config_alloc(drivers[driver_index]->machine_config);
+	input_port_list_init(portlist, drivers[driver_index]->ipt, NULL, 0, FALSE);
+	
+	const input_field_config *field;
+	const input_port_config *port;
+	int has_keyboard = FALSE;
+	if (portlist.first()==NULL) has_keyboard = TRUE;
+	for (port = portlist.first(); port != NULL; port = port->next)
+	{
+		for (field = port->fieldlist; field != NULL; field = field->next)
+		{
+			if (field->type == IPT_KEYBOARD)
+				has_keyboard = TRUE;
+				break;
+		}
+	}	
+	machine_config_free(config);
+	
+	return has_keyboard;
 }
 
 BOOL DriverIsModified(int driver_index)
 {
-	return (drivers[driver_index]->flags & GAME_COMPUTER_MODIFIED) != 0;
+	return (drivers[driver_index]->flags & GAME_UNOFFICIAL) != 0;
 }
 
 BOOL DriverHasDevice(const game_driver *gamedrv, iodevice_t type)

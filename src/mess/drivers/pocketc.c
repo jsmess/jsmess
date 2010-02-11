@@ -986,20 +986,20 @@ ROM_END
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE INPUT   INIT         COMPANY     FULLNAME */
 /* cpu sc61860 */
 COMP( 1982, pc1245,	0,	0,	pc1250,	pc1251,	pc1251,	 "Sharp", "Pocket Computer 1245", GAME_NOT_WORKING  | GAME_NO_SOUND )
-COMP( 1982, pc1250,	0,	0,	pc1250,	pc1251,	pc1251,	 "Sharp", "Pocket Computer 1250", GAME_NO_SOUND )
-COMP( 1982, pc1251,	pc1250,	0,	pc1251,	pc1251,	pc1251,	 "Sharp", "Pocket Computer 1251", GAME_NO_SOUND )
-COMP( 1982, pc1255,	pc1250,	0,	pc1255,	pc1251,	pc1251,	 "Sharp", "Pocket Computer 1255", GAME_NO_SOUND )
-COMP( 1983, trs80pc3,   pc1250, 0,	pc1251,	pc1251,	pc1251,	 "Tandy", "TRS-80 Pocket Computer PC-3", GAME_NO_SOUND )
+COMP( 1982, pc1250,	0,	0,	pc1250,	pc1251,	pc1251,	 "Sharp", "Pocket Computer 1250", GAME_NO_SOUND | GAME_SHARE_ROMS)
+COMP( 1982, pc1251,	pc1250,	0,	pc1251,	pc1251,	pc1251,	 "Sharp", "Pocket Computer 1251", GAME_NO_SOUND | GAME_SHARE_ROMS)
+COMP( 1982, pc1255,	pc1250,	0,	pc1255,	pc1251,	pc1251,	 "Sharp", "Pocket Computer 1255", GAME_NO_SOUND | GAME_SHARE_ROMS)
+COMP( 1983, trs80pc3,   pc1250, 0,	pc1251,	pc1251,	pc1251,	 "Tandy", "TRS-80 Pocket Computer PC-3", GAME_NO_SOUND | GAME_SHARE_ROMS)
 
-COMP( 1982, pc1260,	0,	0,	pc1260,	pc1251,	pc1251,	 "Sharp", "Pocket Computer 1260", GAME_NOT_WORKING  | GAME_NO_SOUND )
-COMP( 1982, pc1261,	pc1260,	0,	pc1261,	pc1251,	pc1251,	 "Sharp", "Pocket Computer 1261/1262", GAME_NOT_WORKING  | GAME_NO_SOUND )
+COMP( 1982, pc1260,	0,	0,	pc1260,	pc1251,	pc1251,	 "Sharp", "Pocket Computer 1260", GAME_NOT_WORKING  | GAME_NO_SOUND | GAME_SHARE_ROMS )
+COMP( 1982, pc1261,	pc1260,	0,	pc1261,	pc1251,	pc1251,	 "Sharp", "Pocket Computer 1261/1262", GAME_NOT_WORKING  | GAME_NO_SOUND | GAME_SHARE_ROMS)
 
 /* pc1261/pc1262 */
 COMP( 1984, pc1350,	0,	0,	pc1350,	pc1350,	0,	 "Sharp", "Pocket Computer 1350", GAME_NO_SOUND )
 
-COMP( 1983, pc1401,	0,	0,	pc1401,	pc1401,	pc1401,	"Sharp", "Pocket Computer 1401", GAME_NO_SOUND )
-COMP( 1984, pc1402,	pc1401,	0,	pc1402,	pc1401,	pc1401,	 "Sharp", "Pocket Computer 1402", GAME_NO_SOUND )
+COMP( 1983, pc1401,	0,	0,	pc1401,	pc1401,	pc1401,	"Sharp", "Pocket Computer 1401", GAME_NO_SOUND | GAME_SHARE_ROMS)
+COMP( 1984, pc1402,	pc1401,	0,	pc1402,	pc1401,	pc1401,	 "Sharp", "Pocket Computer 1402", GAME_NO_SOUND | GAME_SHARE_ROMS)
 
 /* 72kb rom, 32kb ram, cpu? pc1360 */
-COMP( 1986, pc1403,	0,	0,	pc1403,	pc1403,	pc1403,	 "Sharp", "Pocket Computer 1403", GAME_NOT_WORKING  | GAME_NO_SOUND )
-COMP( 198?, pc1403h,	pc1403,	0,	pc1403h,pc1403, pc1403,	 "Sharp", "Pocket Computer 1403H", GAME_NOT_WORKING  | GAME_NO_SOUND )
+COMP( 1986, pc1403,	0,	0,	pc1403,	pc1403,	pc1403,	 "Sharp", "Pocket Computer 1403", GAME_NOT_WORKING  | GAME_NO_SOUND | GAME_SHARE_ROMS)
+COMP( 198?, pc1403h,	pc1403,	0,	pc1403h,pc1403, pc1403,	 "Sharp", "Pocket Computer 1403H", GAME_NOT_WORKING  | GAME_NO_SOUND | GAME_SHARE_ROMS)

@@ -617,14 +617,14 @@ ROM_END
 
 /*    YEAR  NAME  PARENT COMPAT MACHINE INPUT   INIT      COMPANY                             FULLNAME            FLAGS */
 
-COMP( 1984, c16,     0,     0,  c16,    c16,    c16,   "Commodore Business Machines Co.",  "Commodore 16 (PAL)", 0)
-COMP( 1984, c16c,    c16,   0,  c16c,   c16,    c16c,  "Commodore Business Machines Co.",  "Commodore 16 (PAL, 1551)", 0 )
-COMP( 1984, c16v,    c16,   0,  c16v,   c16,    c16v,  "Commodore Business Machines Co.",  "Commodore 16 (PAL, VC1541)", 0)
+COMP( 1984, c16,     0,     0,  c16,    c16,    c16,   "Commodore Business Machines Co.",  "Commodore 16 (PAL)", GAME_SHARE_ROMS)
+COMP( 1984, c16c,    c16,   0,  c16c,   c16,    c16c,  "Commodore Business Machines Co.",  "Commodore 16 (PAL, 1551)", GAME_SHARE_ROMS )
+COMP( 1984, c16v,    c16,   0,  c16v,   c16,    c16v,  "Commodore Business Machines Co.",  "Commodore 16 (PAL, VC1541)", GAME_SHARE_ROMS)
 COMP( 1984, c16hun,  c16,   0,  c16,    c16,    c16,   "Commodore Business Machines Co.",  "Commodore 16 Novotrade (PAL, Hungary)", 0)
 
-COMP( 1984, c116,    c16,   0,  c16,    c16,    c16,   "Commodore Business Machines Co.",  "Commodore 116 (PAL)", 0)
-COMP( 1984, c116c,	 c16,   0,  c16c,   c16,    c16c,  "Commodore Business Machines Co.",  "Commodore 116 (PAL, 1551)", 0 )
-COMP( 1984, c116v,   c16,   0,  c16v,   c16,    c16v,  "Commodore Business Machines Co.",  "Commodore 116 (PAL, VC1541)", 0)
+COMP( 1984, c116,    c16,   0,  c16,    c16,    c16,   "Commodore Business Machines Co.",  "Commodore 116 (PAL)", GAME_SHARE_ROMS)
+COMP( 1984, c116c,	 c16,   0,  c16c,   c16,    c16c,  "Commodore Business Machines Co.",  "Commodore 116 (PAL, 1551)", GAME_SHARE_ROMS )
+COMP( 1984, c116v,   c16,   0,  c16v,   c16,    c16v,  "Commodore Business Machines Co.",  "Commodore 116 (PAL, VC1541)", GAME_SHARE_ROMS )
 
 COMP( 1984, plus4,   c16,   0,  plus4,  plus4,  c16,   "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC)", 0)
 COMP( 1984, plus4c,  c16,   0,  plus4c, plus4,  c16c,  "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, 1551)", 0 )

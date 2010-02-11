@@ -541,5 +541,5 @@ ROM_END
 COMP( 1983, oric1,     0,		0,		oric,       oric,	    0,	    "Tangerine",    "Oric 1" , 0)
 COMP( 1984, orica,     oric1,	0,		oric,	    orica,	    0,	    "Tangerine",    "Oric Atmos" , 0)
 COMP( 1985, prav8d,    oric1,	0,		prav8d,     prav8d,     0,      "Pravetz",      "Pravetz 8D", 0)
-COMP( 1989, prav8dd,   oric1,	0,		prav8d,     prav8d,     0,      "Pravetz",      "Pravetz 8D (Disk ROM)", GAME_COMPUTER_MODIFIED)
+COMP( 1989, prav8dd,   oric1,	0,		prav8d,     prav8d,     0,      "Pravetz",      "Pravetz 8D (Disk ROM)", GAME_UNOFFICIAL)
 COMP( 1986, telstrat,  oric1,	0,		telstrat,   telstrat,   0,      "Tangerine",    "Oric Telestrat", GAME_NOT_WORKING )

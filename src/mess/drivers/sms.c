@@ -829,5 +829,5 @@ CONS( 1990, sms,        0,          0,      sms2_ntsc,   sms,    sms1,     "Sega
 CONS( 1990, smspal,     sms,        0,      sms2_pal,    sms,    sms1,     "Sega",     "Master System II (PAL)",           0 )
 CONS( 1990, sms2kr,     sms,        0,      sms2_fm,     sms,    sms2kr,   "Samsung",  "Gam*Boy II (Korea)",               0 )
 
-CONS( 1990, gamegear,   0,          sms,    gamegear,    gg,     gamegear, "Sega",     "Game Gear (Europe/America)",       0 )
-CONS( 1990, gamegeaj,   gamegear,   0,      gamegear,    gg,     gamegeaj, "Sega",     "Game Gear (Japan)",                0 )
+CONS( 1990, gamegear,   0,          sms,    gamegear,    gg,     gamegear, "Sega",     "Game Gear (Europe/America)",       GAME_SHARE_ROMS )
+CONS( 1990, gamegeaj,   gamegear,   0,      gamegear,    gg,     gamegeaj, "Sega",     "Game Gear (Japan)",                GAME_SHARE_ROMS )

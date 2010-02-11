@@ -651,7 +651,7 @@ void inputx_init(running_machine *machine)
 	}
 
 	/* posting keys directly only makes sense for a computer */
-	if (machine->gamedrv->flags & GAME_COMPUTER)
+	if (input_machine_have_keyboard(machine))
 	{
 		codes = build_codes(machine, machine->portlist.first());
 		setup_keybuffer(machine);

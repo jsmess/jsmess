@@ -953,8 +953,8 @@ COMP( 1985, c128nor,   c128,  0,   c128pal,  c128ita, c128pal,  "Commodore Busin
 // we miss other countries: Spain, Belgium, etc.
 
 // the following drivers use a 1571 floppy drive
-COMP( 1985, c128dpr,   c128,  0,   c128d,    c128,    c128d,   "Commodore Business Machines Co.", "Commodore 128D (NTSC, proto)", GAME_NOT_WORKING)
-COMP( 1985, c128d,     c128,  0,   c128dpal, c128,    c128dpal,"Commodore Business Machines Co.", "Commodore 128D (PAL)", GAME_NOT_WORKING)
+COMP( 1985, c128dpr,   c128,  0,   c128d,    c128,    c128d,   "Commodore Business Machines Co.", "Commodore 128D (NTSC, proto)", GAME_NOT_WORKING | GAME_SHARE_ROMS)
+COMP( 1985, c128d,     c128,  0,   c128dpal, c128,    c128dpal,"Commodore Business Machines Co.", "Commodore 128D (PAL)", GAME_NOT_WORKING | GAME_SHARE_ROMS)
 
 // the following drivers use a 1571CR floppy drive
 COMP( 1986, c128dcr,   c128,  0,   c128dcr,  c128,    c128dcr, "Commodore Business Machines Co.", "Commodore 128DCR (NTSC)", GAME_NOT_WORKING)

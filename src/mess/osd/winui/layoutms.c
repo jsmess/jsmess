@@ -42,8 +42,8 @@ extern const FOLDERDATA g_folderData[] =
 #ifdef SHOW_UNAVAILABLE_FOLDER
 	{"Unavailable",     "unavailable",       FOLDER_UNAVAILABLE,  IDI_FOLDER_UNAVAILABLE,	0,             F_AVAILABLE,  NULL,                       FilterAvailable,              FALSE },
 #endif
-	{"Console",         "console",           FOLDER_CONSOLE,      IDI_FOLDER,				F_CONSOLE,     F_COMPUTER,   NULL,                       DriverIsComputer,  FALSE },
-	{"Computer",        "computer",          FOLDER_COMPUTER,     IDI_FOLDER,				F_COMPUTER,    F_CONSOLE,    NULL,                       DriverIsComputer,  TRUE },
+	//{"Console",         "console",           FOLDER_CONSOLE,      IDI_FOLDER,				F_CONSOLE,     F_COMPUTER,   NULL,                       DriverIsComputer,  FALSE },
+	//{"Computer",        "computer",          FOLDER_COMPUTER,     IDI_FOLDER,				F_COMPUTER,    F_CONSOLE,    NULL,                       DriverIsComputer,  TRUE },
 	{"Modified/Hacked", "modified",          FOLDER_MODIFIED,     IDI_FOLDER,				0,             0,            NULL,                       DriverIsModified,  TRUE },
 	{"Manufacturer",    "manufacturer",      FOLDER_MANUFACTURER, IDI_FOLDER_MANUFACTURER,  0,             0,            CreateManufacturerFolders },
 	{"Year",            "year",              FOLDER_YEAR,         IDI_FOLDER_YEAR,          0,             0,            CreateYearFolders },
@@ -67,8 +67,8 @@ extern const FOLDERDATA g_folderData[] =
 /* list of filter/control Id pairs */
 extern const FILTER_ITEM g_filterList[] =
 {
-	{ F_COMPUTER,     IDC_FILTER_COMPUTER,    DriverIsComputer, TRUE },
-	{ F_CONSOLE,      IDC_FILTER_CONSOLE,     DriverIsComputer, FALSE },
+	//{ F_COMPUTER,     IDC_FILTER_COMPUTER,    DriverIsComputer, TRUE },
+	//{ F_CONSOLE,      IDC_FILTER_CONSOLE,     DriverIsComputer, FALSE },
 	{ F_MODIFIED,     IDC_FILTER_MODIFIED,    DriverIsModified, TRUE },
 	{ F_CLONES,       IDC_FILTER_CLONES,      DriverIsClone, TRUE },
 	{ F_NONWORKING,   IDC_FILTER_NONWORKING,  DriverIsBroken, TRUE },

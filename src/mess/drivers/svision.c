@@ -560,12 +560,12 @@ ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT             COMPANY     FULLNAME */
 // marketed under a ton of firms and names
-CONS(1992,	svision,	0,	0,	svision,	svision,	svision,	"Watara",	"Super Vision", 0)
+CONS(1992,	svision,	0,	0,	svision,	svision,	svision,	"Watara",	"Super Vision", GAME_SHARE_ROMS)
 // svdual 2 connected via communication port
-CONS( 1992, svisions,      svision,          0,svision,  svisions,    svisions,   "Watara", "Super Vision (PeT Communication Simulation)", 0 )
+CONS( 1992, svisions,      svision,          0,svision,  svisions,    svisions,   "Watara", "Super Vision (PeT Communication Simulation)", GAME_SHARE_ROMS )
 
-CONS( 1993, svisionp,      svision,          0,svisionp,  svision,    svision,   "Watara", "Super Vision (PAL TV Link Colored)", 0 )
-CONS( 1993, svisionn,      svision,          0,svisionn,  svision,    svision,   "Watara", "Super Vision (NTSC TV Link Colored)", 0 )
+CONS( 1993, svisionp,      svision,          0,svisionp,  svision,    svision,   "Watara", "Super Vision (PAL TV Link Colored)", GAME_SHARE_ROMS )
+CONS( 1993, svisionn,      svision,          0,svisionn,  svision,    svision,   "Watara", "Super Vision (NTSC TV Link Colored)", GAME_SHARE_ROMS )
 // svtvlink (2 supervisions)
 // tvlink (pad supervision simulated)
-CONS( 199?, tvlinkp,      svision,          0,tvlinkp,  svision,    svision,   "Watara", "TV Link PAL", 0 )
+CONS( 199?, tvlinkp,      svision,          0,tvlinkp,  svision,    svision,   "Watara", "TV Link PAL", GAME_SHARE_ROMS )

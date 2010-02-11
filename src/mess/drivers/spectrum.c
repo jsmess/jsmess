@@ -828,8 +828,8 @@ ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
 COMP( 1982, spectrum, 0,        0,		spectrum,		spectrum,	0,	"Sinclair Research",	"ZX Spectrum" , 0)
-COMP( 1987, spec80k,  spectrum, 0,		spectrum,		spectrum,	0,	"",	"ZX Spectrum 80K" , GAME_COMPUTER_MODIFIED)
-COMP( 1995, specide,  spectrum, 0,		spectrum,		spectrum,	0,	"",	"ZX Spectrum IDE" , GAME_COMPUTER_MODIFIED)
+COMP( 1987, spec80k,  spectrum, 0,		spectrum,		spectrum,	0,	"",	"ZX Spectrum 80K" , GAME_UNOFFICIAL)
+COMP( 1995, specide,  spectrum, 0,		spectrum,		spectrum,	0,	"",	"ZX Spectrum IDE" , GAME_UNOFFICIAL)
 COMP( 1986, inves,    spectrum, 0,		spectrum,		spec_plus,	0,	"Investronica",	"Inves Spectrum 48K+" , 0)
 COMP( 1985, tk90x,    spectrum, 0,		spectrum,		spectrum,	0,	"Micro Digital",	"TK 90X Color Computer" , 0)
 COMP( 1986, tk95,     spectrum, 0,		spectrum,		spec_plus,	0,	"Micro Digital",	"TK 95 Color Computer" , 0)

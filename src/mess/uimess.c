@@ -181,11 +181,11 @@ int ui_mess_handler_ingame(running_machine *machine)
 
 	/* determine if we should disable the rest of the UI */
 	ui_disabled = ui_mess_use_new_ui()
-		|| ((machine->gamedrv->flags & GAME_COMPUTER) && !machine->ui_mess_data->active);
+		|| (input_machine_have_keyboard(machine) && !machine->ui_mess_data->active);
 
 
 	/* is ScrLk UI toggling applicable here? */
-	if (!ui_mess_use_new_ui() && (machine->gamedrv->flags & GAME_COMPUTER))
+	if (!ui_mess_use_new_ui() && input_machine_have_keyboard(machine))
 	{
 		/* are we toggling the UI with ScrLk? */
 		if (ui_input_pressed(machine, IPT_UI_TOGGLE_UI))
@@ -434,20 +434,8 @@ void ui_mess_menu_keyboard_mode(running_machine *machine, ui_menu *menu, void *p
 -------------------------------------------------*/
 
 void ui_mess_main_menu_populate(running_machine *machine, ui_menu *menu)
-{
-	const input_field_config *field;
-	const input_port_config *port;
-	int has_keyboard = FALSE;
-
-	/* scan the input port array to see what options we need to enable */
-	for (port = machine->portlist.first(); port != NULL; port = port->next)
-	{
-		for (field = port->fieldlist; field != NULL; field = field->next)
-		{
-			if (field->type == IPT_KEYBOARD)
-				has_keyboard = TRUE;
-		}
-	}
+{	
+	int has_keyboard = input_machine_have_keyboard(machine);
 
   	/* add image info menu */
 	ui_menu_item_append(menu, "Image Information", NULL, 0, (void*)ui_mess_menu_image_info);
