@@ -1,11 +1,21 @@
 /**********************************************************************
 
-    Commodore 1540/1541 Single Disk Drive emulation
+    Commodore 1540/1541/1541C/1541-II/2031 Single Disk Drive emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
+
+/*
+
+    TODO:
+
+	- some copy protections fail
+    - more accurate timing
+    - power/activity LEDs
+
+*/
 
 /*
 
@@ -123,20 +133,6 @@
 
 */
 
-/*
-
-    TODO:
-
-	- drive speed is 300 rpm, should be 310
-	- ROM version selection
-    - allocate track buffer runtime
-    - accurate timing
-    - D64 to G64 conversion
-    - activity led
-    - write to G64
-
-*/
-
 #include "emu.h"
 #include "c1541.h"
 #include "cpu/m6502/m6502.h"
@@ -150,8 +146,6 @@
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
-
-#define LOG 0
 
 #define M6502_TAG		"ucd5"
 #define M6522_0_TAG		"uab1"

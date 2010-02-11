@@ -13,11 +13,7 @@
 
 	- 2040 DOS 1 FDC rom
 	- Micropolis 8x50 stepper motor is same as 4040, except it takes 4 pulses to step a track instead of 1
-	- save states
-	- remove via_pb_r
-	- write to disk
-	- allocate buffers dynamically
-	- activity/error LEDs
+    - error/activity LEDs
 
 */
 
@@ -35,8 +31,6 @@
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
-
-#define LOG 0
 
 #define M6502_TAG		"un1"
 #define M6532_0_TAG		"uc1"
@@ -205,19 +199,6 @@ INLINE void update_gcr_data(c2040_t *c2040)
 	}
 
 	c2040->e = c2040->gcr[c2040->i];
-
-	if (LOG)
-	{
-		UINT16 i = c2040->i;
-		UINT8 e = c2040->e;
-		UINT8 pa = (BIT(e, 6) << 7) | (BIT(i, 7) << 6) | (e & 0x30) | (BIT(e, 2) << 3) | (i & 0x04) | (e & 0x03);
-		int ready = !(c2040->bit_count==9);
-		int error = !(ready | BIT(c2040->e, 3));
-
-		logerror("d %u offs %04x/%04x G64 %02x READY %u PA %02x DATA %03x GCR %02x SYNC %u ERROR %u I %04x\n", c2040->drive, c2040->unit[c2040->drive].buffer_pos, c2040->unit[c2040->drive].track_len,
-			c2040->unit[c2040->drive].track_buffer[c2040->unit[c2040->drive].buffer_pos],
-			ready, pa, c2040->sr & 0x3ff, c2040->e, SYNC, error, c2040->i);
-	}
 }
 
 /***************************************************************************
@@ -732,26 +713,6 @@ static READ8_DEVICE_HANDLER( via_pa_r )
 	return data;
 }
 
-static READ8_DEVICE_HANDLER( via_pb_r )
-{
-	/*
-
-        bit     description
-
-        PB0		S1A
-        PB1		S1B
-        PB2		S0A
-        PB3		S0B
-        PB4		MTR1
-        PB5		MTR0
-        PB6		
-        PB7		
-
-    */
-
-	return 0;
-}
-
 static WRITE8_DEVICE_HANDLER( via_pb_w )
 {
 	/*
@@ -829,7 +790,7 @@ static WRITE_LINE_DEVICE_HANDLER( rw_sel_w )
 static const via6522_interface via_intf =
 {
 	DEVCB_HANDLER(via_pa_r),
-	DEVCB_HANDLER(via_pb_r),
+	DEVCB_NULL,
 	DEVCB_LINE(ready_r),
 	DEVCB_LINE(err_r),
 	DEVCB_NULL,
@@ -1539,7 +1500,32 @@ static DEVICE_START( c2040 )
 	c2040->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
 
 	/* register for state saving */
-//	state_save_register_device_item(device, 0, c2040->);
+	state_save_register_device_item(device, 0, c2040->drive);
+	state_save_register_device_item(device, 0, c2040->side);
+	state_save_register_device_item(device, 0, c2040->address);
+	state_save_register_device_item(device, 0, c2040->rfdo);
+	state_save_register_device_item(device, 0, c2040->daco);
+	state_save_register_device_item(device, 0, c2040->atna);
+	state_save_register_device_item(device, 0, c2040->ds);
+	state_save_register_device_item(device, 0, c2040->bit_count);
+	state_save_register_device_item(device, 0, c2040->sr);
+	state_save_register_device_item(device, 0, c2040->pi);
+	state_save_register_device_item(device, 0, c2040->i);
+	state_save_register_device_item(device, 0, c2040->e);
+	state_save_register_device_item(device, 0, c2040->ready);
+	state_save_register_device_item(device, 0, c2040->mode);
+	state_save_register_device_item(device, 0, c2040->rw);
+	state_save_register_device_item(device, 0, c2040->miot_irq);
+	state_save_register_device_item(device, 0, c2040->unit[0].stp);
+	state_save_register_device_item(device, 0, c2040->unit[0].mtr);
+	state_save_register_device_item(device, 0, c2040->unit[0].track_len);
+	state_save_register_device_item(device, 0, c2040->unit[0].buffer_pos);
+	state_save_register_device_item(device, 0, c2040->unit[0].bit_pos);
+	state_save_register_device_item(device, 0, c2040->unit[1].stp);
+	state_save_register_device_item(device, 0, c2040->unit[1].mtr);
+	state_save_register_device_item(device, 0, c2040->unit[1].track_len);
+	state_save_register_device_item(device, 0, c2040->unit[1].buffer_pos);
+	state_save_register_device_item(device, 0, c2040->unit[1].bit_pos);
 }
 
 /*-------------------------------------------------

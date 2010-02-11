@@ -13,10 +13,8 @@
 
 	- 1541/1571 Alignment shows drive speed as 266 rpm, should be 310
 	- toggle WPRT line on disk change
-	- save state
 	- CP/M disks
-    - power LED
-    - activity LED
+    - power/activity LEDs
 
 */
 
@@ -34,8 +32,6 @@
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
-
-#define LOG 0
 
 #define M6502_TAG		"u1"
 #define M6522_0_TAG		"u9"
@@ -628,7 +624,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 	int stp = data & 0x03;
 	step_motor(c1571, mtr, stp);
 
-	/* activity LED */
+	/* TODO activity LED */
 
 	/* density select */
 	int ds = (data >> 5) & 0x03;
@@ -886,6 +882,28 @@ static DEVICE_START( c1571 )
 	c1571->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
 
 	/* register for state saving */
+	state_save_register_device_item(device, 0, c1571->address);
+	state_save_register_device_item(device, 0, c1571->data_out);
+	state_save_register_device_item(device, 0, c1571->atn_ack);
+	state_save_register_device_item(device, 0, c1571->ser_dir);
+	state_save_register_device_item(device, 0, c1571->sp_out);
+	state_save_register_device_item(device, 0, c1571->cnt_out);
+	state_save_register_device_item(device, 0, c1571->stp);
+	state_save_register_device_item(device, 0, c1571->mtr);
+	state_save_register_device_item(device, 0, c1571->track_len);
+	state_save_register_device_item(device, 0, c1571->buffer_pos);
+	state_save_register_device_item(device, 0, c1571->bit_pos);
+	state_save_register_device_item(device, 0, c1571->bit_count);
+	state_save_register_device_item(device, 0, c1571->data);
+	state_save_register_device_item(device, 0, c1571->yb);
+	state_save_register_device_item(device, 0, c1571->ds);
+	state_save_register_device_item(device, 0, c1571->soe);
+	state_save_register_device_item(device, 0, c1571->byte);
+	state_save_register_device_item(device, 0, c1571->mode);
+	state_save_register_device_item(device, 0, c1571->side);
+	state_save_register_device_item(device, 0, c1571->via0_irq);
+	state_save_register_device_item(device, 0, c1571->via1_irq);
+	state_save_register_device_item(device, 0, c1571->cia_irq);
 }
 
 /*-------------------------------------------------

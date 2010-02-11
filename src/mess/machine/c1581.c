@@ -11,8 +11,7 @@
 
     TODO:
 
-    - power LED
-    - activity LED
+    - power/activity LEDs
 
 	http://www.unusedino.de/ec64/technical/aay/c1581/ro81main.htm
 
@@ -31,8 +30,6 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG 0
-
 #define M6502_TAG		"u1"
 #define M8520_TAG		"u5"
 #define WD1770_TAG		"u4"
@@ -44,8 +41,8 @@
 typedef struct _c1581_t c1581_t;
 struct _c1581_t
 {
+	/* IEC bus */
 	int address;							/* device number */
-
 	int data_out;							/* serial data out */
 	int atn_ack;							/* attention acknowledge */
 	int ser_dir;							/* fast serial direction */

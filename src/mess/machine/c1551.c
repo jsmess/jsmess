@@ -29,8 +29,6 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG 0
-
 #define M6510T_TAG		"u2"
 #define M6523_0_TAG		"u3"
 #define M6523_1_TAG		"ci_u2"
