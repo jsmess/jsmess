@@ -3,7 +3,7 @@
 #include <ctype.h>
 #include <tchar.h>
 
-#include "osdmess.h"
+#include "osdcore.h"
 #include "utils.h"
 #include "strconv.h"
 #include "emu.h"
