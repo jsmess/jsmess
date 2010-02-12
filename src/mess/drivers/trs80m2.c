@@ -1,16 +1,21 @@
 /*
+	
+	Tandy Radio Shack TRS-80 Model II/12/16/16B/6000
+
+	http://home.iae.nl/users/pb0aia/cm/modelii.html
+
+*/
+
+/*
 
     TODO:
 
 	- BOOT ERROR DM 23 (dma controller)
-	- 40/80 char
-	- KBIRQ -> CTC TRG3
-	- main RAM banking
     - Z80 daisy chain
-	- RTC
-	- floppy DRQ
 	- keyboard CPU ROM
 	- keyboard layout
+	- main RAM banking
+	- graphics board
 
 */
 
@@ -36,14 +41,10 @@ static READ8_DEVICE_HANDLER( sio0_r )
 {
 	switch (offset)
 	{
-	case 0:
-		return z80sio_d_r(device, 0);
-	case 1:
-		return z80sio_c_r(device, 0);
-	case 2:
-		return z80sio_d_r(device, 1);
-	case 3:
-		return z80sio_c_r(device, 1);
+	case 0:	return z80sio_d_r(device, 1);
+	case 1:	return z80sio_d_r(device, 0);
+	case 2:	return z80sio_c_r(device, 1);
+	case 3:	return z80sio_c_r(device, 0);
 	}
 
 	return 0;
@@ -53,18 +54,10 @@ static WRITE8_DEVICE_HANDLER( sio0_w )
 {
 	switch (offset)
 	{
-	case 0:
-		z80sio_d_w(device, 0, data);
-		break;
-	case 1:
-		z80sio_c_w(device, 0, data);
-		break;
-	case 2:
-		z80sio_d_w(device, 1, data);
-		break;
-	case 3:
-		z80sio_c_w(device, 1, data);
-		break;
+	case 0:	z80sio_d_w(device, 1, data); break;
+	case 1:	z80sio_d_w(device, 0, data); break;
+	case 2:	z80sio_c_w(device, 1, data); break;
+	case 3:	z80sio_c_w(device, 0, data); break;
 	}
 }
 
@@ -122,12 +115,12 @@ static WRITE8_HANDLER( rom_enable_w )
 	if (BIT(data, 0))
 	{
 		/* enable BOOT ROM */
-		memory_install_rom(program, 0x0000, 0x07ff, 0, 0, rom);
+		memory_install_rom(program, 0x0000, 0x07ff, 0, 0x800, rom);
 	}
 	else
 	{
 		/* enable RAM */
-		memory_install_ram(program, 0x0000, 0x07ff, 0, 0, ram);
+		memory_install_ram(program, 0x0000, 0x0fff, 0, 0, ram);
 	}
 }
 
@@ -136,7 +129,10 @@ static READ8_HANDLER( keyboard_r )
 	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
 
 	/* clear keyboard interrupt */
-	state->kbirq = 0;
+	state->kbirq = 1;
+	z80ctc_trg3_w(state->z80ctc, state->kbirq);
+
+	state->key_bit = 0;
 
 	return state->key_data;
 }
@@ -144,6 +140,7 @@ static READ8_HANDLER( keyboard_r )
 static READ8_HANDLER( rtc_r )
 {
 	/* clear RTC interrupt */
+	cputag_set_input_line(space->machine, Z80_TAG, INPUT_LINE_NMI, CLEAR_LINE);
 
 	return 0;
 }
@@ -216,6 +213,12 @@ static WRITE8_HANDLER( nmi_w )
 	/* RTC interrupt enable */
 	state->enable_rtc_int = BIT(data, 5);
 
+	if ((state->rtc_int == 2) && state->enable_rtc_int)
+	{
+		/* trigger RTC interrupt */
+		cputag_set_input_line(space->machine, Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
+	}
+
 	/* video display enable */
 	state->blnkvid = BIT(data, 6);
 
@@ -229,6 +232,13 @@ static WRITE8_HANDLER( nmi_w )
 		/* enable RAM */
 		memory_install_ram(program, 0xf800, 0xffff, 0, 0, ram);
 	}
+}
+
+static READ8_HANDLER( keyboard_busy_r )
+{
+	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+
+	return state->kbirq;
 }
 
 static READ8_HANDLER( keyboard_data_r )
@@ -258,12 +268,32 @@ static WRITE8_HANDLER( keyboard_ctrl_w )
     */
 
 	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+	
+	int kbdata = BIT(data, 0);
+	int kbclk = BIT(data, 1);
 
-	if (BIT(data, 1))
+	if (state->key_bit == 8)
 	{
-		state->key_data <<= 1;
-		state->key_data |= BIT(data, 0);
+		if (!state->kbdata && kbdata)
+		{
+			/* trigger keyboard interrupt */
+			state->kbirq = 0;
+			z80ctc_trg3_w(state->z80ctc, state->kbirq);
+		}
 	}
+	else
+	{
+		if (!state->kbclk && kbclk)
+		{
+			/* shift in keyboard data bit */
+			state->key_data <<= 1;
+			state->key_data |= kbdata;
+			state->key_bit++;
+		}
+	}
+
+	state->kbdata = kbdata;
+	state->kbclk = kbclk;
 }
 
 static WRITE8_HANDLER( keyboard_latch_w )
@@ -291,8 +321,7 @@ static WRITE8_HANDLER( keyboard_latch_w )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0xf7ff) AM_RAM
+	AM_RANGE(0x0000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE_MEMBER(trs80m2_state, video_ram)
 ADDRESS_MAP_END
 
@@ -312,6 +341,7 @@ static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trs80m2_keyboard_io, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(keyboard_busy_r)
 	AM_RANGE(MCS48_PORT_P0, MCS48_PORT_P0) AM_READ(keyboard_data_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(keyboard_ctrl_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(keyboard_latch_w)
@@ -482,6 +512,20 @@ static WRITE_LINE_DEVICE_HANDLER( de_w )
 
 static WRITE_LINE_DEVICE_HANDLER( vsync_w )
 {
+	trs80m2_state *driver_state = (trs80m2_state *)device->machine->driver_data;
+
+	if (state) driver_state->rtc_int++;
+
+	if (driver_state->rtc_int == 2)
+	{
+		driver_state->rtc_int = 0;
+
+		if (driver_state->enable_rtc_int)
+		{
+			/* trigger RTC interrupt */
+			cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
+		}
+	}
 }
 
 static const mc6845_interface mc6845_intf = 
@@ -563,6 +607,9 @@ static READ8_DEVICE_HANDLER( pio_pa_r )
 
 	/* floppy interrupt */
 	data |= state->fdc_intrq;
+
+	/* 2-sided diskette */
+	data |= 0x02;
 
 	/* disk change */
 	data |= floppy_dskchg_r(state->floppy) << 2;
@@ -681,15 +728,11 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_intrq_w )
 	driver_state->fdc_intrq = state;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
-{
-}
-
 static const wd17xx_interface fd1791_intf =
 {
 	DEVCB_NULL,
 	DEVCB_LINE(fdc_intrq_w),
-	DEVCB_LINE(fdc_drq_w),
+	DEVCB_DEVICE_LINE(Z80DMA_TAG, z80dma_rdy_w),
 	{ FLOPPY_0, NULL, NULL, NULL }
 };
 
@@ -712,11 +755,17 @@ static MACHINE_START( trs80m2 )
 	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
-	/* setup memory banking */
-
 	/* register for state saving */
 	state_save_register_global(machine, state->key_latch);
 	state_save_register_global(machine, state->key_data);
+}
+
+static MACHINE_RESET( trs80m2 )
+{
+	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+
+	/* enable boot ROM */
+	rom_enable_w(program, 0, 1);
 }
 
 /* Machine Driver */
@@ -733,6 +782,7 @@ static MACHINE_DRIVER_START( trs80m2 )
 //	MDRV_CPU_IO_MAP(trs80m2_keyboard_io)
 
     MDRV_MACHINE_START(trs80m2)
+    MDRV_MACHINE_RESET(trs80m2)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -768,13 +818,22 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( trs80m16 )
 	MDRV_IMPORT_FROM(trs80m2)
 
+	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000_TAG, M68000, 6000000)
 	MDRV_CPU_PROGRAM_MAP(m68000_mem)
+
+	/* video hardware */
+	MDRV_PALETTE_INIT(monochrome_green)
+
+	/* internal RAM */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("256K")
+	MDRV_RAM_EXTRA_OPTIONS("512K,768K,1M")
 MACHINE_DRIVER_END
 
 /* ROMs */
 
-ROM_START(trs80m2)
+ROM_START( trs80m2 )
 	ROM_REGION( 0x800, Z80_TAG, 0 )
 	ROM_LOAD( "8043216.u11", 0x0000, 0x0800, CRC(7017a373) SHA1(1c7127fcc99fc351a40d3a3199ba478e783c452e) )
 

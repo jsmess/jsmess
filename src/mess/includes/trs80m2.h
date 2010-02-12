@@ -25,6 +25,9 @@ struct _trs80m2_state
 	/* keyboard state */
 	UINT8 key_latch;
 	UINT8 key_data;
+	int key_bit;
+	int kbclk;
+	int kbdata;
 	int kbirq;
 
 	/* video state */
