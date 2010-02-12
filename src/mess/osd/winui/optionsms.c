@@ -14,7 +14,6 @@
 #include "optionsms.h"
 #include "emuopts.h"
 #include "messopts.h"
-#include "osd/windows/configms.h"
 #include "winmain.h"
 
 #define WINGUIOPTION_SOFTWARE_COLUMN_SHOWN		"mess_column_shown"
@@ -50,7 +49,6 @@ void MessSetupGameOptions(core_options *opts, int driver_index)
 {
 	BOOL is_global = (driver_index == OPTIONS_TYPE_GLOBAL);
 	AddOptions(opts, mess_core_options, is_global);
-	AddOptions(opts, mess_win_options, is_global);
 
 	if (driver_index >= 0)
 	{
