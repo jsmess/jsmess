@@ -211,6 +211,7 @@ static MACHINE_DRIVER_START( vector06 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
+	MDRV_RAM_DEFAULT_VALUE(0x00)
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -248,6 +249,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME         PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
-COMP( 1987, vector06, 	 0,  	 	0,	vector06, 	vector06, 	vector06, "", 					 "Vector 06c",	 GAME_NOT_WORKING)
-COMP( 1987, vec1200, 	 vector06, 	0,	vector06, 	vector06, 	vector06, "", 					 "Vector 1200",	 GAME_NOT_WORKING)
-COMP( 1987, pk6128c, 	 vector06,  0,	vector06, 	vector06, 	vector06, "", 					 "PK-6128c",	 GAME_NOT_WORKING)
+COMP( 1987, vector06, 	 0,  	 	0,	vector06, 	vector06, 	0,        "", 					 "Vector 06c",	 GAME_NOT_WORKING)
+COMP( 1987, vec1200, 	 vector06, 	0,	vector06, 	vector06, 	0,        "", 					 "Vector 1200",	 GAME_NOT_WORKING)
+COMP( 1987, pk6128c, 	 vector06,  0,	vector06, 	vector06, 	0,        "", 					 "PK-6128c",	 GAME_NOT_WORKING)

@@ -61,12 +61,6 @@ I8255A_INTERFACE( orion128_ppi8255_interface_1)
 	DEVCB_HANDLER(orion_romdisk_portc_w)
 };
 
-/* Driver initialization */
-DRIVER_INIT( orion128 )
-{
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,256*1024);
-}
-
 
 MACHINE_START( orion128 )
 {
@@ -252,12 +246,6 @@ static WRITE8_HANDLER ( orionz80_floppy_rtc_w )
 }
 
 
-DRIVER_INIT( orionz80 )
-{
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,512*1024);
-}
-
-
 MACHINE_START( orionz80 )
 {
 	mc146818_init(machine, MC146818_IGNORE_CENTURY);
@@ -436,11 +424,6 @@ static UINT8 orionpro_rom2_segment;
 
 static UINT8 orionpro_dispatcher;
 UINT8 orionpro_pseudo_color;
-
-DRIVER_INIT( orionpro )
-{
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,512*1024);
-}
 
 
 static WRITE8_HANDLER ( orionpro_memory_page_w );

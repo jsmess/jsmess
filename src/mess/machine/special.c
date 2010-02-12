@@ -207,12 +207,7 @@ WRITE8_HANDLER( specimx_select_bank )
 	specimx_set_bank(space->machine, offset, data);
 }
 
-DRIVER_INIT(specimx)
-{
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,128*1024);
-}
-
-static PIT8253_OUTPUT_CHANGED(specimx_pit8253_out0_changed)
+static PIT8253_OUTPUT_CHANGED( specimx_pit8253_out0_changed )
 {
 	specimx_set_input( device->machine, 0, state );
 }
@@ -373,9 +368,8 @@ static void erik_set_bank(running_machine *machine)
 	}
 }
 
-DRIVER_INIT(erik)
+DRIVER_INIT( erik )
 {
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,192*1024);
 	erik_color_1 = 0;
 	erik_color_2 = 0;
 	erik_background = 0;

@@ -19,13 +19,8 @@ UINT8 vector06_keyboard_mask;
 UINT8 vector06_color_index;
 UINT8 vector06_video_mode;
 
-/* Driver initialization */
-DRIVER_INIT(vector06)
-{
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,64*1024);
-}
 
-static READ8_DEVICE_HANDLER (vector06_8255_portb_r )
+static READ8_DEVICE_HANDLER( vector06_8255_portb_r )
 {
 	UINT8 key = 0xff;
 	if ((vector06_keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine,"LINE0"); }

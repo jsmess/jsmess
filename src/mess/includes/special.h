@@ -22,7 +22,6 @@ extern MACHINE_RESET( special );
 extern READ8_HANDLER( specialist_keyboard_r );
 extern WRITE8_HANDLER( specialist_keyboard_w );
 
-extern DRIVER_INIT( specimx );
 extern MACHINE_RESET( specimx );
 extern MACHINE_START ( specimx );
 

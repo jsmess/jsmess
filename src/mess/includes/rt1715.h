@@ -10,7 +10,6 @@
 
 /*----------- defined in machine/rt1715.c -----------*/
 
-extern DRIVER_INIT( rt1715 );
 extern MACHINE_RESET( rt1715 );
 
 /*----------- defined in video/rt1715.c -----------*/

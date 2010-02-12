@@ -640,6 +640,7 @@ static MACHINE_DRIVER_START( apple2 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
 	MDRV_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,32K,36K,48K")
+	MDRV_RAM_DEFAULT_VALUE(0x00)
 	/* At the moment the RAM bank $C000-$FFFF is available only if you choose   */
 	/* default configuration: on real machine is present also in configurations */
 	/* with less memory, provided that the language card is installed           */
@@ -653,6 +654,7 @@ static MACHINE_DRIVER_START( apple2p )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
 	MDRV_RAM_EXTRA_OPTIONS("16K,32K,48K")
+	MDRV_RAM_DEFAULT_VALUE(0x00)
 	/* At the moment the RAM bank $C000-$FFFF is available only if you choose   */
 	/* default configuration: on real machine is present also in configurations */
 	/* with less memory, provided that the language card is installed           */
@@ -674,6 +676,7 @@ MACHINE_DRIVER_START( apple2e )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
 	MDRV_RAM_EXTRA_OPTIONS("64K")
+	MDRV_RAM_DEFAULT_VALUE(0x00)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mprof3 )

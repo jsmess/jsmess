@@ -113,7 +113,7 @@ void apple2_update_memory(running_machine *machine)
 	UINT32 rom_length, slot_length, offset;
 	bank_disposition_t bank_disposition;
 	int wh_nop = 0;
-	
+
 	/* need to build list of current info? */
 	if (!apple2_current_meminfo)
 	{
@@ -148,7 +148,7 @@ void apple2_update_memory(running_machine *machine)
 			sprintf(rbank,"bank%d",bank);
 			begin = apple2_mem_config.memmap[i].begin;
 			end_r = apple2_mem_config.memmap[i].end;
-			rh = NULL; 
+			rh = NULL;
 
 			LOG(("apple2_update_memory():  Updating RD {%06X..%06X} [#%02d] --> %08X\n",
 				begin, end_r, bank, meminfo.read_mem));
@@ -199,7 +199,7 @@ void apple2_update_memory(running_machine *machine)
 			if (begin <= end_r) {
 				if (rh) {
 					memory_install_read8_handler(space, begin, end_r, 0, 0, rh);
-				} else {				
+				} else {
 					memory_install_read_bank(space, begin, end_r, 0, 0, rbank);
 				}
 			}
@@ -1324,9 +1324,6 @@ void apple2_init_common(running_machine *machine)
 	/* state save registers */
 	state_save_register_global(machine, apple2_flags);
 	state_save_register_postload(machine, apple2_update_memory_postload, NULL);
-
-	/* apple2 behaves much better when the default memory is zero */
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, messram_get_size(devtag_get_device(machine, "messram")));
 
 	/* --------------------------------------------- *
      * set up the softswitch mask/set                *

@@ -9,7 +9,6 @@
 
 /*----------- defined in machine/ondra.c -----------*/
 
-extern DRIVER_INIT( ondra );
 extern MACHINE_START( ondra );
 extern MACHINE_RESET( ondra );
 

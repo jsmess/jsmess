@@ -23,9 +23,8 @@ static UINT8 partner_mem_page;
 static UINT8 partner_win_mem_page;
 
 /* Driver initialization */
-DRIVER_INIT(partner)
+DRIVER_INIT( partner )
 {
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,64*1024);
 	radio86_tape_value = 0x80;
 }
 

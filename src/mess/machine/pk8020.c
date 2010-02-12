@@ -26,13 +26,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data);
 static UINT8 sound_gate = 0;
 static UINT8 sound_level = 0;
 
-/* Driver initialization */
-DRIVER_INIT(pk8020)
-{
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,(64 + 4*48 + 2)*1024);
-}
 
-static READ8_HANDLER(keyboard_r)
+static READ8_HANDLER( keyboard_r )
 {
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",

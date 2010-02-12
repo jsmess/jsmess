@@ -24,7 +24,6 @@ struct _pecom_state
 
 /*----------- defined in machine/pecom.c -----------*/
 
-extern DRIVER_INIT( pecom );
 extern MACHINE_START( pecom );
 extern MACHINE_RESET( pecom );
 extern WRITE8_HANDLER( pecom_bank_w );

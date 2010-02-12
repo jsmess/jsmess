@@ -16,11 +16,6 @@
 static UINT8 pecom_caps_state = 4;
 static UINT8 pecom_prev_caps_state = 4;
 
-/* Driver initialization */
-DRIVER_INIT(pecom)
-{
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,32*1024);
-}
 
 static TIMER_CALLBACK( reset_tick )
 {

@@ -192,6 +192,7 @@ static MACHINE_DRIVER_START( pecom64 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
+	MDRV_RAM_DEFAULT_VALUE(0x00)
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -208,4 +209,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT       MACHINE     INPUT   INIT   COMPANY  FULLNAME      FLAGS */
-COMP( 1987, pecom64,     0,      0, 	pecom64, 	pecom, 	pecom, "Ei Nis", "Pecom 64",	0)
+COMP( 1987, pecom64,     0,      0, 	pecom64, 	pecom, 	0,     "Ei Nis", "Pecom 64",	0)

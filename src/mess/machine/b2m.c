@@ -277,11 +277,9 @@ static PIC8259_SET_INT_LINE( b2m_pic_set_int_line )
 }
 
 /* Driver initialization */
-DRIVER_INIT(b2m)
+DRIVER_INIT( b2m )
 {
 	b2m_state *state = (b2m_state *)machine->driver_data;
-
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,128*1024);
 	state->vblank_state = 0;
 }
 

@@ -19,11 +19,9 @@ extern UINT8 orionpro_pseudo_color;
 
 extern const i8255a_interface orion128_ppi8255_interface_1;
 
-extern DRIVER_INIT( orion128 );
 extern MACHINE_START( orion128 );
 extern MACHINE_RESET( orion128 );
 
-extern DRIVER_INIT( orionz80 );
 extern MACHINE_START( orionz80 );
 extern MACHINE_RESET( orionz80 );
 extern INTERRUPT_GEN( orionz80_interrupt );
@@ -43,7 +41,6 @@ extern WRITE8_HANDLER ( orion128_floppy_w );
 extern READ8_HANDLER ( orionz80_io_r );
 extern WRITE8_HANDLER ( orionz80_io_w );
 
-extern DRIVER_INIT( orionpro );
 extern MACHINE_RESET( orionpro );
 extern READ8_HANDLER ( orionpro_io_r );
 extern WRITE8_HANDLER ( orionpro_io_w );

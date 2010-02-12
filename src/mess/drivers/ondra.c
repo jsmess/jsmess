@@ -151,6 +151,7 @@ static MACHINE_DRIVER_START( ondra )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
+	MDRV_RAM_DEFAULT_VALUE(0x00)
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -182,6 +183,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY          FULLNAME       FLAGS */
-COMP( 1989, ondrat, 0, 		0,		ondra, 		ondra, 		ondra, 	 "Tesla",		 "Ondra",	 	0)
-COMP( 1989, ondrav, ondrat,	0,		ondra, 		ondra, 		ondra, 	 "ViLi",		 	 "Ondra ViLi",	0)
-
+COMP( 1989, ondrat, 0, 		0,		ondra, 		ondra, 		0,       "Tesla",		 "Ondra",	 	0)
+COMP( 1989, ondrav, ondrat,	0,		ondra, 		ondra, 		0,       "ViLi",		 "Ondra ViLi",	0)

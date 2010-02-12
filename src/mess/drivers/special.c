@@ -483,6 +483,7 @@ static MACHINE_DRIVER_START( specimx )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
+	MDRV_RAM_DEFAULT_VALUE(0x00)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( erik )
@@ -523,6 +524,7 @@ static MACHINE_DRIVER_START( erik )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("192K")
+	MDRV_RAM_DEFAULT_VALUE(0x00)
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -547,7 +549,7 @@ ROM_START( special )
 	ROM_SYSTEM_BIOS(4, "2col", "2nd rev. color")
 	ROMX_LOAD( "col_mon2.rom",   0xc000, 0x0800, CRC(8cebb1b5) SHA1(0c912a25220de8c5135e16c443e4796e6bb6f805), ROM_BIOS(5))
 	ROMX_LOAD( "monitor2_2.rom", 0xc800, 0x0800, CRC(c425f719) SHA1(1c322591b4e5c8b01b81362c6801aa6fd9fc1492), ROM_BIOS(5))
-	ROMX_LOAD( "monitor2_3.rom", 0xd000, 0x0800, CRC(d804aeba) SHA1(1585f354719c25e1f59c7cb8b3a3f5d309a7e8fb), ROM_BIOS(5))   
+	ROMX_LOAD( "monitor2_3.rom", 0xd000, 0x0800, CRC(d804aeba) SHA1(1585f354719c25e1f59c7cb8b3a3f5d309a7e8fb), ROM_BIOS(5))
 ROM_END
 
 ROM_START( specialm )
@@ -593,5 +595,5 @@ COMP( 1985, special,    0,     	0, 		special, 	special, 	special,    "", 				 "S
 COMP( 1985, specialm,   special,0, 		special, 	special, 	special,    "", 				 "Specialist M",		0)
 COMP( 1985, specialp,   special,0, 		specialp, 	specialp, 	special,    "", 				 "Specialist + hires graph",		0)
 COMP( 1985, lik,    	special,0, 		special, 	lik,		special,    "", 				 "Lik",		 		0)
-COMP( 1985, specimx,   	special,0, 		specimx, 	specimx, 	specimx,	"", 				 "Specialist MX", 	0)
+COMP( 1985, specimx,   	special,0, 		specimx, 	specimx, 	0,	        "", 				 "Specialist MX", 	0)
 COMP( 1994, erik,   	special,0, 		erik, 		special, 	erik, 		"", 				 "Erik", 	0)

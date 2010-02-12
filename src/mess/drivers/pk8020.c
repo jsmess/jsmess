@@ -243,6 +243,7 @@ static MACHINE_DRIVER_START( pk8020 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("258K")	//64 + 4*48 + 2
+	MDRV_RAM_DEFAULT_VALUE(0x00)
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -283,6 +284,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
-COMP( 1987, korvet,	 	0,  	 0,	pk8020, 	pk8020, 	pk8020,  "", "PK8020 Korvet",	 0)
-COMP( 1987, neiva, 	 korvet,  	 0,	pk8020, 	pk8020, 	pk8020,  "", "PK8020 Neiva",	 0)
-COMP( 1987, kontur,  korvet,  	 0,	pk8020, 	pk8020, 	pk8020,  "", "PK8020 Kontur",	 0)
+COMP( 1987, korvet,	 	0,  	 0,	pk8020, 	pk8020, 	0,       "", "PK8020 Korvet",	 0)
+COMP( 1987, neiva, 	 korvet,  	 0,	pk8020, 	pk8020, 	0,       "", "PK8020 Neiva",	 0)
+COMP( 1987, kontur,  korvet,  	 0,	pk8020, 	pk8020, 	0,       "", "PK8020 Kontur",	 0)

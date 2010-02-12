@@ -14,7 +14,6 @@
 extern const struct pit8253_config pp01_pit8253_intf;
 extern const i8255a_interface pp01_ppi8255_interface;
 extern UINT8 pp01_video_scroll;
-extern DRIVER_INIT( pp01 );
 extern MACHINE_START( pp01 );
 extern MACHINE_RESET( pp01 );
 extern WRITE8_HANDLER (pp01_mem_block_w);

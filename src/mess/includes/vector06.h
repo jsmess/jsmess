@@ -14,7 +14,6 @@
 extern const i8255a_interface vector06_ppi8255_interface;
 extern const i8255a_interface vector06_ppi8255_2_interface;
 
-extern DRIVER_INIT( vector06 );
 extern MACHINE_START( vector06 );
 extern MACHINE_RESET( vector06 );
 
