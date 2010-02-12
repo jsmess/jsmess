@@ -247,6 +247,7 @@ OSDCOREOBJS = \
 	$(WINOBJ)/strconv.o	\
 	$(WINOBJ)/windir.o \
 	$(WINOBJ)/winfile.o \
+	$(WINOBJ)/winclip.o \
 	$(WINOBJ)/winmisc.o \
 	$(WINOBJ)/winsync.o \
 	$(WINOBJ)/wintime.o \
