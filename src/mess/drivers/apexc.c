@@ -7,7 +7,6 @@
 */
 
 #include "emu.h"
-#include "mslegacy.h"
 #include "cpu/apexc/apexc.h"
 
 

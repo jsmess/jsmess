@@ -25,7 +25,6 @@ MESS_WINOBJ = $(OBJ)/mess/osd/windows
 RESFILE = $(MESS_WINOBJ)/mess.res
 
 OSDOBJS += \
-	$(MESS_WINOBJ)/configms.o	\
 	$(MESS_WINOBJ)/dialog.o	\
 	$(MESS_WINOBJ)/menu.o		\
 	$(MESS_WINOBJ)/mess.res	\
@@ -34,9 +33,7 @@ OSDOBJS += \
 $(LIBOSD): $(OSDOBJS)
 
 OSDCOREOBJS += \
-	$(OBJ)/mess/osd/windows/winmess.o	\
-	$(OBJ)/mess/osd/windows/winutils.o	\
-	$(OBJ)/mess/osd/windows/glob.o
+	$(OBJ)/mess/osd/windows/winutils.o
 
 $(LIBOCORE): $(OSDCOREOBJS)
 

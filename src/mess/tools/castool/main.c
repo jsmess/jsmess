@@ -132,9 +132,6 @@ int CLIB_DECL main(int argc, char *argv[])
 	const struct CassetteFormat * const *selected_formats = NULL;
 	cassette_image *cassette;
 	FILE *f;
-#ifdef WIN32
-	//win_expand_wildcards(&argc, &argv);
-#endif /* WIN32 */
 
 	if (argc > 1)
 	{

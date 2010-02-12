@@ -49,7 +49,4 @@ BOOL win_get_file_name_dialog(win_open_file_name *ofn);
 void win_scroll_window(HWND window, WPARAM wparam, int scroll_bar, int scroll_delta_line);
 DWORD win_get_file_attributes_utf8(const char *filename);
 
-/* expand wildcards so '*' can be used */
-void win_expand_wildcards(int *argc, char **argv[]);
-
 #endif // WINUTILS_H

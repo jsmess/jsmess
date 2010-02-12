@@ -8,6 +8,7 @@
 #define __MESSOPTS_H__
 
 #include "image.h"
+#include "options.h"
 
 /***************************************************************************
     CONSTANTS
@@ -15,7 +16,6 @@
 
 #define OPTION_RAMSIZE			"ramsize"
 #define OPTION_WRITECONFIG		"writeconfig"
-#define OPTION_NATURAL_KEYBOARD	"natural"
 
 
 

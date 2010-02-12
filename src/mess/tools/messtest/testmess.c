@@ -13,7 +13,6 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "testmess.h"
-#include "inputx.h"
 #include "pile.h"
 #include "pool.h"
 #include "sound/wavwrite.h"

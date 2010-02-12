@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "device.h"
-#include "mslegacy.h"
 
 typedef struct _mess_device_type_info mess_device_type_info;
 struct _mess_device_type_info

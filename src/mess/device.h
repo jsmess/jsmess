@@ -9,15 +9,6 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
-// MAME headers
-#include "devintrf.h"
-
-// MESS headers
-#include "osdmess.h"
-#include "opresolv.h"
-#include "image.h"
-
-
 /*************************************
  *
  *  Other

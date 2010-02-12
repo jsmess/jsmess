@@ -22,7 +22,6 @@
 #include "osdepend.h"
 #include "pool.h"
 #include "pile.h"
-#include "inputx.h"
 #include "unzip.h"
 
 #define EOLN (CRLF == 1 ? "\r" : (CRLF == 2 ? "\n" : (CRLF == 3 ? "\r\n" : NULL)))

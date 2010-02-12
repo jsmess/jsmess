@@ -14,7 +14,6 @@
 #include "fileio.h"
 #include "utils.h"
 #include "opresolv.h"
-#include "osd/osdmess.h"
 #include "softlist.h"
 
 

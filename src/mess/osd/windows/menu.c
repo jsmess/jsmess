@@ -17,12 +17,10 @@
 #include "menu.h"
 #include "ui.h"
 #include "messres.h"
-#include "inputx.h"
 #include "windows/video.h"
 #include "windows/input.h"
 #include "dialog.h"
 #include "opcntrl.h"
-#include "mslegacy.h"
 #include "strconv.h"
 #include "utils.h"
 #include "png.h"
@@ -31,7 +29,6 @@
 #include "devices/cassette.h"
 #include "windows/window.h"
 #include "uimess.h"
-#include "mslegacy.h"
 #include "winutf8.h"
 
 #ifdef UNDER_CE
@@ -519,7 +516,7 @@ static void storeval_inputport(void *param, int val)
 //  customize_switches
 //============================================================
 
-static void customize_switches(running_machine *machine, HWND wnd, int title_string_num, UINT32 ipt_name)
+static void customize_switches(running_machine *machine, HWND wnd, const char* title_string, UINT32 ipt_name)
 {
 	dialog_box *dlg;
 	const input_port_config *port;
@@ -530,7 +527,7 @@ static void customize_switches(running_machine *machine, HWND wnd, int title_str
 
 	UINT32 type;
 
-	dlg = win_dialog_init(ui_getstring(title_string_num), NULL);
+	dlg = win_dialog_init(title_string, NULL);
 	if (!dlg)
 		goto done;
 
@@ -576,7 +573,7 @@ done:
 
 static void customize_dipswitches(running_machine *machine, HWND wnd)
 {
-	customize_switches(machine, wnd, UI_dipswitches, IPT_DIPSWITCH);
+	customize_switches(machine, wnd, "Dip Switches", IPT_DIPSWITCH);
 }
 
 
@@ -587,7 +584,7 @@ static void customize_dipswitches(running_machine *machine, HWND wnd)
 
 static void customize_configuration(running_machine *machine, HWND wnd)
 {
-	customize_switches(machine, wnd, UI_configuration, IPT_CONFIG);
+	customize_switches(machine, wnd, "Driver Configuration", IPT_CONFIG);
 }
 
 
@@ -670,7 +667,7 @@ static void customize_analogcontrols(running_machine *machine, HWND wnd)
 	char buf[255];
 	static const struct dialog_layout layout = { 120, 52 };
 
-	dlg = win_dialog_init(ui_getstring(UI_analogcontrols), &layout);
+	dlg = win_dialog_init("Analog Controls", &layout);
 	if (!dlg)
 		goto done;
 
@@ -684,26 +681,26 @@ static void customize_analogcontrols(running_machine *machine, HWND wnd)
 				name = input_field_name(field);
 
 				_snprintf(buf, ARRAY_LENGTH(buf),
-					"%s %s", name, ui_getstring(UI_keyjoyspeed));
+					"%s %s", name, "Digital Speed");
 				if (win_dialog_add_adjuster(dlg, buf, settings.delta, 1, 255, FALSE, store_delta, (void *) field))
 					goto done;
 
 				_snprintf(buf, ARRAY_LENGTH(buf),
-					"%s %s", name, ui_getstring(UI_centerspeed));
+					"%s %s", name, "Autocenter Speed");
 				if (win_dialog_add_adjuster(dlg, buf, settings.centerdelta, 1, 255, FALSE, store_centerdelta, (void *) field))
 					goto done;
 
 				_snprintf(buf, ARRAY_LENGTH(buf),
-					"%s %s", name, ui_getstring(UI_reverse));
+					"%s %s", name, "Reverse");
 				if (win_dialog_add_combobox(dlg, buf, settings.reverse ? 1 : 0, store_reverse, (void *) field))
 					goto done;
-				if (win_dialog_add_combobox_item(dlg, ui_getstring(UI_off), 0))
+				if (win_dialog_add_combobox_item(dlg, "Off", 0))
 					goto done;
-				if (win_dialog_add_combobox_item(dlg, ui_getstring(UI_on), 1))
+				if (win_dialog_add_combobox_item(dlg, "On", 1))
 					goto done;
 
 				_snprintf(buf, ARRAY_LENGTH(buf),
-					"%s %s", name, ui_getstring(UI_sensitivity));
+					"%s %s", name, "Sensitivity");
 				if (win_dialog_add_adjuster(dlg, buf, settings.sensitivity, 1, 255, TRUE, store_sensitivity, (void *) field))
 					goto done;
 			}
@@ -1313,9 +1310,9 @@ static void append_menu_utf8(HMENU menu, UINT flags, UINT_PTR id, const char *st
 //  append_menu_uistring
 //============================================================
 
-static void append_menu_uistring(HMENU menu, UINT flags, UINT_PTR id, int uistring)
+static void append_menu_uistring(HMENU menu, UINT flags, UINT_PTR id, const char *uistring)
 {
-	append_menu_utf8(menu, flags, id, (uistring >= 0) ? ui_getstring(uistring) : NULL);
+	append_menu_utf8(menu, flags, id, uistring);
 }
 
 
@@ -1535,9 +1532,9 @@ static void prepare_menus(HWND wnd)
 #endif
 
 	set_command_state(menu_bar, ID_KEYBOARD_EMULATED,		(has_keyboard) ?
-																(!ui_mess_get_use_natural_keyboard(window->machine)					? MFS_CHECKED : MFS_ENABLED)
+																(!ui_get_use_natural_keyboard(window->machine)					? MFS_CHECKED : MFS_ENABLED)
 																												: MFS_GRAYED);
-	set_command_state(menu_bar, ID_KEYBOARD_NATURAL,		(has_keyboard && inputx_can_post(window->machine)) ?																(ui_mess_get_use_natural_keyboard(window->machine)					? MFS_CHECKED : MFS_ENABLED)
+	set_command_state(menu_bar, ID_KEYBOARD_NATURAL,		(has_keyboard && inputx_can_post(window->machine)) ?																(ui_get_use_natural_keyboard(window->machine)					? MFS_CHECKED : MFS_ENABLED)
 																												: MFS_GRAYED);
 	set_command_state(menu_bar, ID_KEYBOARD_CUSTOMIZE,		has_keyboard								? MFS_ENABLED : MFS_GRAYED);
 
@@ -1619,25 +1616,25 @@ static void prepare_menus(HWND wnd)
 				flags_for_writing |= MF_GRAYED;
 
 			sub_menu = CreateMenu();
-			append_menu_uistring(sub_menu, MF_STRING,		new_item + DEVOPTION_OPEN,		UI_mount);
+			append_menu_uistring(sub_menu, MF_STRING,		new_item + DEVOPTION_OPEN,		"Mount...");
 
 			if (info.creatable)
-				append_menu_uistring(sub_menu, MF_STRING,	new_item + DEVOPTION_CREATE,	UI_create);
+				append_menu_uistring(sub_menu, MF_STRING,	new_item + DEVOPTION_CREATE,	"Create...");
 
-			append_menu_uistring(sub_menu, flags_for_exists,	new_item + DEVOPTION_CLOSE,	UI_unmount);
+			append_menu_uistring(sub_menu, flags_for_exists,	new_item + DEVOPTION_CLOSE,	"Unmount");
 
 			if ((img->type == CASSETTE) && !strcmp(info.file_extensions, "wav"))
 			{
 				cassette_state state;
 				state = (cassette_state)(image_exists(img) ? (cassette_get_state(img) & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED);
-				append_menu_uistring(sub_menu, MF_SEPARATOR, 0, -1);
-				append_menu_uistring(sub_menu, flags_for_exists	| ((state == CASSETTE_STOPPED)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_STOPPAUSE,	UI_pauseorstop);
-				append_menu_uistring(sub_menu, flags_for_exists	| ((state == CASSETTE_PLAY)		? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_PLAY,			UI_play);
-				append_menu_uistring(sub_menu, flags_for_writing	| ((state == CASSETTE_RECORD)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_RECORD,		UI_record);
-				append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_REWIND,		UI_rewind);
-				append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_FASTFORWARD,	UI_fastforward);
+				append_menu_uistring(sub_menu, MF_SEPARATOR, 0, NULL);
+				append_menu_uistring(sub_menu, flags_for_exists	| ((state == CASSETTE_STOPPED)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_STOPPAUSE,	"Pause/Stop");
+				append_menu_uistring(sub_menu, flags_for_exists	| ((state == CASSETTE_PLAY)		? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_PLAY,			"Play");
+				append_menu_uistring(sub_menu, flags_for_writing	| ((state == CASSETTE_RECORD)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_RECORD,		"Record");
+				append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_REWIND,		"Rewind");
+				append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_FASTFORWARD,	"Fast Forward");
 			}
-			s = image_exists(img) ? image_filename(img) : ui_getstring(UI_emptyslot);
+			s = image_exists(img) ? image_filename(img) : "[empty slot]";
 			flags = MF_POPUP;
 
 			snprintf(buf, ARRAY_LENGTH(buf), "%s: %s", image_typename_id(img), s);
@@ -1934,11 +1931,11 @@ static int invoke_command(HWND wnd, UINT command)
 			break;
 
 		case ID_KEYBOARD_NATURAL:
-			ui_mess_set_use_natural_keyboard(window->machine, TRUE);
+			ui_set_use_natural_keyboard(window->machine, TRUE);
 			break;
 
 		case ID_KEYBOARD_EMULATED:
-			ui_mess_set_use_natural_keyboard(window->machine, FALSE);
+			ui_set_use_natural_keyboard(window->machine, FALSE);
 			break;
 
 		case ID_KEYBOARD_CUSTOMIZE:
@@ -2252,7 +2249,7 @@ int win_create_menu(running_machine *machine, HMENU *menus)
 	HMENU menu_bar = NULL;
 	HMODULE module;
 
-	if (ui_mess_use_new_ui())
+	if (ui_use_new_ui())
 	{
 		module = win_resource_module();
 		menu_bar = LoadMenu(module, MAKEINTRESOURCE(IDR_RUNTIME_MENU));
@@ -2291,7 +2288,7 @@ LRESULT CALLBACK win_mess_window_proc(HWND wnd, UINT message, WPARAM wparam, LPA
 			{
 				LONG_PTR ptr = GetWindowLongPtr(wnd, GWLP_USERDATA);
 				win_window_info *window = (win_window_info *)ptr;
-				ui_mess_paste(window->machine);
+				ui_paste(window->machine);
 			}
 			break;
 

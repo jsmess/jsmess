@@ -77,17 +77,14 @@ EMUOBJS += \
 	$(MESSOBJ)/mess.o		\
 	$(MESSOBJ)/messopts.o	\
 	$(MESSOBJ)/configms.o	\
-	$(MESSOBJ)/mesvalid.o	\
 	$(MESSOBJ)/image.o		\
 	$(MESSOBJ)/device.o		\
 	$(MESSOBJ)/hashfile.o	\
-	$(MESSOBJ)/inputx.o		\
 	$(MESSOBJ)/uimess.o		\
 	$(MESSOBJ)/filemngr.o	\
 	$(MESSOBJ)/tapectrl.o	\
 	$(MESSOBJ)/utils.o		\
 	$(MESSOBJ)/eventlst.o	\
-	$(MESSOBJ)/mslegacy.o	\
 	$(MESSOBJ)/cheatms.o	\
 	$(MESSOBJ)/opresolv.o	\
 	$(MESSOBJ)/infomess.o	\

@@ -16,7 +16,4 @@
 
 DWORD win_get_file_attributes_utf8(const char *filename);
 
-/* expand wildcards so '*' can be used */
-void win_expand_wildcards(int *argc, char **argv[]);
-
 #endif // WINUTILS_H

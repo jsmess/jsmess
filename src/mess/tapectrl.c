@@ -10,7 +10,6 @@
 #include "image.h"
 #include "ui.h"
 #include "uimenu.h"
-#include "mslegacy.h"
 #include "devices/cassette.h"
 
 
@@ -115,35 +114,35 @@ static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, 
 		state = cassette_get_state(menustate->device);
 		ui_menu_item_append(
 			menu,
-			ui_getstring((state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED
-				?	UI_stopped
+			(state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED
+				?	"stopped"
 				:	((state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY
-					? ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? UI_playing : UI_playing_inhibited)
-					: ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? UI_recording : UI_recording_inhibited)
-					)),
+					? ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? "playing" : "(playing)")
+					: ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? "recording" : "(recording)")
+					),
 			astring_c(&timepos),
 			0,
 			NULL);
 
 		/* pause or stop */
-		ui_menu_item_append(menu, ui_getstring(UI_pauseorstop), NULL, 0, TAPECMD_STOP);
+		ui_menu_item_append(menu, "Pause/Stop", NULL, 0, TAPECMD_STOP);
 
 		/* play */
-		ui_menu_item_append(menu, ui_getstring(UI_play), NULL, 0, TAPECMD_PLAY);
+		ui_menu_item_append(menu, "Play", NULL, 0, TAPECMD_PLAY);
 
 		/* record */
-		ui_menu_item_append(menu, ui_getstring(UI_record), NULL, 0, TAPECMD_RECORD);
+		ui_menu_item_append(menu, "Record", NULL, 0, TAPECMD_RECORD);
 
 		/* rewind */
-		ui_menu_item_append(menu, ui_getstring(UI_rewind), NULL, 0, TAPECMD_REWIND);
+		ui_menu_item_append(menu, "Rewind", NULL, 0, TAPECMD_REWIND);
 
 		/* fast forward */
-		ui_menu_item_append(menu, ui_getstring(UI_fastforward), NULL, 0, TAPECMD_FAST_FORWARD);
+		ui_menu_item_append(menu, "Fast Forward", NULL, 0, TAPECMD_FAST_FORWARD);
 	}
 	else
 	{
 		/* no tape loaded */
-		ui_menu_item_append(menu, ui_getstring(UI_notapeimageloaded), NULL, flags, NULL);
+		ui_menu_item_append(menu, "No Tape Image loaded", NULL, flags, NULL);
 	}
 }
 

@@ -9,10 +9,6 @@
 #ifndef __MESS_H__
 #define __MESS_H__
 
-#include <stdarg.h>
-
-//#include "image.h"
-//#include "memory.h"
 #include "configms.h"
 #include "messopts.h"
 
@@ -26,15 +22,6 @@
 
 #define LCD_FRAMES_PER_SECOND	30
 
-
-/**************************************************************************/
-
-/* Win32 defines this for vararg functions */
-#ifndef DECL_SPEC
-#define DECL_SPEC
-#endif
-
-
 /**************************************************************************/
 
 /* mess specific layout files */
@@ -46,8 +33,6 @@ extern const char layout_lcd_rot[];	/* same, for use with ROT90 or ROT270 */
 
 extern const char mess_disclaimer[];
 
-
-
 /***************************************************************************/
 
 /* IODevice Initialisation return values.  Use these to determine if */
@@ -56,9 +41,6 @@ extern const char mess_disclaimer[];
 #define INIT_FAIL 1
 #define IMAGE_VERIFY_PASS 0
 #define IMAGE_VERIFY_FAIL 1
-
-/* runs checks to see if device code is proper */
-int mess_validitychecks(void);
 
 /* these are called from mame.c */
 void mess_predevice_init(running_machine *machine);

@@ -9,9 +9,6 @@
 #ifndef __MESSDRV_H__
 #define __MESSDRV_H__
 
-#include <assert.h>
-#include "inputx.h"
-
 /******************************************************************************
  * MESS' version of the GAME() macros of MAME
  * CONS is for consoles

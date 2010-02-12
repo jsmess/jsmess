@@ -11,8 +11,6 @@
 
 #include "dialog.h"
 #include "emu.h"
-#include "mslegacy.h"
-#include "inputx.h"
 #include "utils.h"
 #include "strconv.h"
 #include "pool.h"
@@ -129,7 +127,7 @@ struct _seqselect_info
 #define DLGITEM_SCROLLBAR		((const WCHAR *) dlgitem_scrollbar)
 #define DLGITEM_COMBOBOX		((const WCHAR *) dlgitem_combobox)
 
-#define DLGTEXT_OK				ui_getstring(UI_OK)
+#define DLGTEXT_OK				"OK"
 #define DLGTEXT_APPLY			"Apply"
 #define DLGTEXT_CANCEL			"Cancel"
 
