@@ -553,7 +553,7 @@ static MACHINE_DRIVER_START( trs80m2 )
     MDRV_CPU_PROGRAM_MAP(trs80m2_mem)
     MDRV_CPU_IO_MAP(trs80m2_io)
 
-    MDRV_CPU_ADD(I8021_TAG, I8048, 100000) // Intel 8021 @ ?
+    MDRV_CPU_ADD(I8021_TAG, I8021, 100000)
     MDRV_CPU_IO_MAP(trs80m2_keyboard_io)
 
     MDRV_MACHINE_START(trs80m2)
@@ -573,8 +573,6 @@ static MACHINE_DRIVER_START( trs80m2 )
 	MDRV_VIDEO_UPDATE(trs80m2)
 
 	MDRV_MC6845_ADD(MC6845_TAG, MC6845, XTAL_12_48MHz/8, mc6845_intf)
-
-	/* sound hardware */
 
 	/* devices */
 	MDRV_WD179X_ADD(FD1791_TAG, fd1791_intf)
