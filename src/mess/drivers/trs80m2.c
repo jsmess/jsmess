@@ -2,14 +2,13 @@
 
     TODO:
 
-	- boot ROM banking
+	- BOOT ERROR DM 23 (dma controller)
+	- 40/80 char
+	- KBIRQ -> CTC TRG3
 	- main RAM banking
-	- video RAM banking
-	- video row update
     - Z80 daisy chain
 	- RTC
 	- floppy DRQ
-	- floppy DDEN
 	- keyboard CPU ROM
 	- keyboard layout
 
@@ -20,6 +19,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "cpu/mcs48/mcs48.h"
+#include "cpu/m68000/m68000.h"
 #include "devices/flopdrv.h"
 #include "devices/messram.h"
 #include "machine/ctronics.h"
@@ -68,6 +68,36 @@ static WRITE8_DEVICE_HANDLER( sio0_w )
 	}
 }
 
+static WRITE8_DEVICE_HANDLER( drvslt_w )
+{
+	/*
+
+        bit     signal		
+
+        0		DS1
+        1		DS2
+        2		DS3
+        3		DS4
+        4		
+        5		
+        6		SDSEL
+        7		FM/MFM
+
+    */
+
+	/* drive select */
+	if (!BIT(data, 0)) wd17xx_set_drive(device, 0);
+	if (!BIT(data, 1)) wd17xx_set_drive(device, 1);
+	if (!BIT(data, 2)) wd17xx_set_drive(device, 2);
+	if (!BIT(data, 3)) wd17xx_set_drive(device, 3);
+
+	/* side select */
+	wd17xx_set_side(device, !BIT(data, 6));
+
+	/* FM/MFM */
+	wd17xx_dden_w(device, BIT(data, 7));
+}
+
 static WRITE8_HANDLER( rom_enable_w )
 {
 	/*
@@ -84,15 +114,31 @@ static WRITE8_HANDLER( rom_enable_w )
         7       
 
     */
+
+	const address_space *program = cputag_get_address_space(space->machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	UINT8 *ram = messram_get_ptr(devtag_get_device(space->machine, "messram"));
+	UINT8 *rom = memory_region(space->machine, Z80_TAG);
+
+	if (BIT(data, 0))
+	{
+		/* enable BOOT ROM */
+		memory_install_rom(program, 0x0000, 0x07ff, 0, 0, rom);
+	}
+	else
+	{
+		/* enable RAM */
+		memory_install_ram(program, 0x0000, 0x07ff, 0, 0, ram);
+	}
 }
 
 static READ8_HANDLER( keyboard_r )
 {
-	/* read keyboard data */
+	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
 
 	/* clear keyboard interrupt */
-	
-	return 0;
+	state->kbirq = 0;
+
+	return state->key_data;
 }
 
 static READ8_HANDLER( rtc_r )
@@ -106,43 +152,92 @@ static READ8_HANDLER( nmi_r )
 {
 	/*
 
-        bit     signal		description
+        bit     signal				description
 
         0       
         1       
         2       
         3       
-        4					_80/40 character mode
-        5					RTC interrupt enable
-        6					video display enable
-        7       KBIRQ		keyboard interrupt
+        4		80/40 CHAR EN		80/40 character mode
+        5		ENABLE RTC INT		RTC interrupt enable
+        6		DE					display enabled
+        7       KBIRQ				keyboard interrupt
 
     */
 
-	return 0;
+	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+
+	UINT8 data = 0;
+
+	/* 80/40 character mode*/
+	data |= state->_80_40_char_en << 4;
+
+	/* RTC interrupt enable */
+	data |= state->enable_rtc_int << 5;
+
+	/* display enabled */
+	data |= state->de << 6;
+
+	/* keyboard interrupt */
+	data |= state->kbirq << 7;
+
+	return data;
 }
 
 static WRITE8_HANDLER( nmi_w )
 {
 	/*
 
-        bit     signal		description
+        bit     signal				description
 
-        0					memory bank select bit 0
-        1					memory bank select bit 1
-        2					memory bank select bit 2
-        3					memory bank select bit 3
-        4					80/40 character mode
-        5					RTC interrupt enable
-        6					video display enable
-        7					video RAM enable
+        0							memory bank select bit 0
+        1							memory bank select bit 1
+        2							memory bank select bit 2
+        3							memory bank select bit 3
+        4		80/40 CHAR EN		80/40 character mode
+        5		ENABLE RTC INT		RTC interrupt enable
+        6		BLNKVID				video display enable
+        7							video RAM enable
 
     */
+
+	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+
+	const address_space *program = cputag_get_address_space(space->machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	UINT8 *ram = messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0xf800;
+
+	/* memory bank select */
+	state->bank = data & 0x0f;
+
+	/* 80/40 character mode */
+	state->_80_40_char_en = BIT(data, 4);
+	mc6845_set_clock(state->mc6845, state->_80_40_char_en ? XTAL_12_48MHz/16 : XTAL_12_48MHz/8);
+
+	/* RTC interrupt enable */
+	state->enable_rtc_int = BIT(data, 5);
+
+	/* video display enable */
+	state->blnkvid = BIT(data, 6);
+
+	if (BIT(data, 7))
+	{
+		/* enable video RAM */
+		memory_install_ram(program, 0xf800, 0xffff, 0, 0, state->video_ram);
+	}
+	else
+	{
+		/* enable RAM */
+		memory_install_ram(program, 0xf800, 0xffff, 0, 0, ram);
+	}
 }
 
 static READ8_HANDLER( keyboard_data_r )
 {
-	return 0;
+	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+
+	static const char *const KEY_ROW[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9", "ROW10", "ROW11" };
+
+	return input_port_read(space->machine, KEY_ROW[state->key_latch]);
 }
 
 static WRITE8_HANDLER( keyboard_ctrl_w )
@@ -161,6 +256,14 @@ static WRITE8_HANDLER( keyboard_ctrl_w )
         7       
 
     */
+
+	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+
+	if (BIT(data, 1))
+	{
+		state->key_data <<= 1;
+		state->key_data |= BIT(data, 0);
+	}
 }
 
 static WRITE8_HANDLER( keyboard_latch_w )
@@ -179,19 +282,25 @@ static WRITE8_HANDLER( keyboard_latch_w )
         7       
 
     */
+
+	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+
+	state->key_latch = BITSWAP8(data, 7, 6, 5, 4, 0, 1, 2, 3) & 0x0f;
 }
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( trs80m2_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE_MEMBER(trs80m2_state, video_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trs80m2_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_r, z80pio_w)
 	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE(FD1791_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0xef, 0xef) AM_DEVWRITE(FD1791_TAG, drvslt_w)
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE(Z80SIO_TAG, sio0_r, sio0_w)
 	AM_RANGE(0xf8, 0xf8) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_r, z80dma_w)
@@ -206,6 +315,9 @@ static ADDRESS_MAP_START( trs80m2_keyboard_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MCS48_PORT_P0, MCS48_PORT_P0) AM_READ(keyboard_data_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(keyboard_ctrl_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(keyboard_latch_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( m68000_mem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -336,6 +448,36 @@ INPUT_PORTS_END
 
 static MC6845_UPDATE_ROW( trs80m2_update_row )
 {
+	trs80m2_state *state = (trs80m2_state *)device->machine->driver_data;
+
+	for (int column = 0; column < x_count; column++)
+	{
+		int bit;
+
+		UINT16 address = (state->video_ram[(ma + column) & 0x7ff] << 4) | (ra & 0x0f);
+		UINT8 data = state->char_rom[address & 0x7ff];
+
+		if (column == cursor_x)
+		{
+			data = 0xff;
+		}
+
+		for (bit = 0; bit < 8; bit++)
+		{
+			int x = (column * 8) + bit;
+
+			*BITMAP_ADDR16(bitmap, y, x) = BIT(data, 7);
+
+			data <<= 1;
+		}
+	}
+}
+
+static WRITE_LINE_DEVICE_HANDLER( de_w )
+{
+	trs80m2_state *driver_state = (trs80m2_state *)device->machine->driver_data;
+
+	driver_state->de = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( vsync_w )
@@ -349,7 +491,7 @@ static const mc6845_interface mc6845_intf =
 	NULL,
 	trs80m2_update_row,
 	NULL,
-	DEVCB_NULL,
+	DEVCB_LINE(de_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_LINE(vsync_w),
@@ -371,7 +513,14 @@ static VIDEO_UPDATE( trs80m2 )
 {
 	trs80m2_state *state = (trs80m2_state *)screen->machine->driver_data;
 
-	mc6845_update(state->mc6845, bitmap, cliprect);
+	if (state->blnkvid)
+	{
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	}
+	else
+	{
+		mc6845_update(state->mc6845, bitmap, cliprect);
+	}
 
 	return 0;
 }
@@ -415,6 +564,9 @@ static READ8_DEVICE_HANDLER( pio_pa_r )
 	/* floppy interrupt */
 	data |= state->fdc_intrq;
 
+	/* disk change */
+	data |= floppy_dskchg_r(state->floppy) << 2;
+
 	/* printer fault */
 	data |= centronics_fault_r(state->centronics) << 4;
 
@@ -433,9 +585,9 @@ static WRITE8_DEVICE_HANDLER( pio_pa_w )
 
         bit     signal		description
 
-        0					FDC INT request
-        1					2-sided diskette
-        2					disk change
+        0		INTRQ		FDC INT request
+        1		_TWOSID		2-sided diskette
+        2		_DSKCHG		disk change
         3					prime
         4					printer fault
         5					printer select
@@ -450,6 +602,11 @@ static WRITE8_DEVICE_HANDLER( pio_pa_w )
 	centronics_prime_w(state->centronics, BIT(data, 3));
 }
 
+static WRITE_LINE_DEVICE_HANDLER( strobe_w )
+{
+	centronics_strobe_w(device, !state);
+}
+
 static const z80pio_interface pio_intf =
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),				/* interrupt callback */
@@ -458,7 +615,7 @@ static const z80pio_interface pio_intf =
 	DEVCB_HANDLER(pio_pa_w),									/* port A write callback */
 	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),	/* port B write callback */
 	DEVCB_NULL,													/* port A ready callback */
-	DEVCB_DEVICE_LINE(CENTRONICS_TAG, centronics_strobe_w)		/* port B ready callback */
+	DEVCB_DEVICE_LINE(CENTRONICS_TAG, strobe_w)					/* port B ready callback */
 };
 
 /* Z80-SIO/0 Interface */
@@ -480,28 +637,42 @@ static const z80sio_interface sio_intf =
 
 /* Z80-CTC Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
+static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-}
+	trs80m2_state *state = (trs80m2_state *) timer->machine->driver_data;
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )
-{
-}
-
-static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
-{
+	z80ctc_trg0_w(state->z80ctc, 1);
+	z80ctc_trg0_w(state->z80ctc, 0);
+	
+	z80ctc_trg1_w(state->z80ctc, 1);
+	z80ctc_trg1_w(state->z80ctc, 0);
+	
+	z80ctc_trg2_w(state->z80ctc, 1);
+	z80ctc_trg2_w(state->z80ctc, 0);
 }
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,              	/* timer disables */
+	0,              								/* timer disables */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_LINE(ctc_z0_w),			/* ZC/TO0 callback */
-	DEVCB_LINE(ctc_z1_w),			/* ZC/TO1 callback */
-	DEVCB_LINE(ctc_z2_w)    		/* ZC/TO2 callback */
+	DEVCB_NULL, // DEVCB_DEVICE_LINE(Z80SIO_TAG, z80sio_rxca_w),	/* ZC/TO0 callback */
+	DEVCB_NULL, // DEVCB_DEVICE_LINE(Z80SIO_TAG, z80sio_txca_w),	/* ZC/TO1 callback */
+	DEVCB_NULL, // DEVCB_DEVICE_LINE(Z80SIO_TAG, z80sio_rxtxcb_w)	/* ZC/TO2 callback */
 };
 
 /* FD1791 Interface */
+
+static const floppy_config trs80m2_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_DRIVE_SS_80,
+	FLOPPY_OPTIONS_NAME(default),
+	DO_NOT_KEEP_GEOMETRY
+};
 
 static WRITE_LINE_DEVICE_HANDLER( fdc_intrq_w )
 {
@@ -510,12 +681,16 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_intrq_w )
 	driver_state->fdc_intrq = state;
 }
 
+static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
+{
+}
+
 static const wd17xx_interface fd1791_intf =
 {
 	DEVCB_NULL,
 	DEVCB_LINE(fdc_intrq_w),
-	DEVCB_NULL,
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
+	DEVCB_LINE(fdc_drq_w),
+	{ FLOPPY_0, NULL, NULL, NULL }
 };
 
 /* Z80 Daisy Chain */
@@ -533,6 +708,7 @@ static MACHINE_START( trs80m2 )
 	trs80m2_state *state = (trs80m2_state *)machine->driver_data;
 
 	/* find devices */
+	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
 	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
@@ -550,11 +726,11 @@ static MACHINE_DRIVER_START( trs80m2 )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
-    MDRV_CPU_PROGRAM_MAP(trs80m2_mem)
-    MDRV_CPU_IO_MAP(trs80m2_io)
+    MDRV_CPU_PROGRAM_MAP(z80_mem)
+    MDRV_CPU_IO_MAP(z80_io)
 
-    MDRV_CPU_ADD(I8021_TAG, I8021, 100000)
-    MDRV_CPU_IO_MAP(trs80m2_keyboard_io)
+//	MDRV_CPU_ADD(I8021_TAG, I8021, 100000)
+//	MDRV_CPU_IO_MAP(trs80m2_keyboard_io)
 
     MDRV_MACHINE_START(trs80m2)
 
@@ -577,14 +753,23 @@ static MACHINE_DRIVER_START( trs80m2 )
 	/* devices */
 	MDRV_WD179X_ADD(FD1791_TAG, fd1791_intf)
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
+	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(XTAL_8MHz/2/2))
 	MDRV_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
 	MDRV_Z80PIO_ADD(Z80PIO_TAG, /* XTAL_8MHz/2, */ pio_intf)
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, trs80m2_floppy_config)
 
+	/* internal RAM */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("32K")
-	MDRV_RAM_EXTRA_OPTIONS("64K")
+	MDRV_RAM_DEFAULT_SIZE("64K")
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( trs80m16 )
+	MDRV_IMPORT_FROM(trs80m2)
+
+	MDRV_CPU_ADD(M68000_TAG, M68000, 6000000)
+	MDRV_CPU_PROGRAM_MAP(m68000_mem)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -649,12 +834,16 @@ ROM_START( trs80m16 )
 
 	ROM_REGION( 0x400, I8021_TAG, 0 )
 	ROM_LOAD( "65-1991.z4", 0x0000, 0x0400, NO_DUMP )
+
+	ROM_REGION( 0x1000, M68000_TAG, 0 )
+	ROM_LOAD( "m68000.rom", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
 /* System Drivers */
 
 /*	  YEAR	NAME		PARENT		COMPAT	MACHINE		INPUT		INIT	COMPANY                 FULLNAME			FLAGS */
 COMP( 1979, trs80m2,	0,			0,		trs80m2,	trs80m2,	0,		"Tandy Radio Shack",	"TRS-80 Model II",	GAME_NO_SOUND_HW | GAME_NOT_WORKING )
-COMP( 1979, trs80m16,	trs80m2,	0,		trs80m2,	trs80m2,	0,		"Tandy Radio Shack",	"TRS-80 Model 16",	GAME_NO_SOUND_HW | GAME_NOT_WORKING )
-//COMP( 1984, trs80m16b,trs80m2,	0,		trs80m2,	trs80m2,	0,		"Tandy Radio Shack",	"TRS-80 Model 16B",	GAME_NO_SOUND_HW | GAME_NOT_WORKING )
-//COMP( 1985, tandy6k,	trs80m2,	0,		trs80m2,	trs80m2,	0,		"Tandy Radio Shack",	"Tandy 6000 HD",	GAME_NO_SOUND_HW | GAME_NOT_WORKING )
+COMP( 1982, trs80m16,	trs80m2,	0,		trs80m16,	trs80m2,	0,		"Tandy Radio Shack",	"TRS-80 Model 16",	GAME_NO_SOUND_HW | GAME_NOT_WORKING )
+//COMP( 1983, trs80m12,	trs80m2,	0,		trs80m16,	trs80m2,	0,		"Tandy Radio Shack",	"TRS-80 Model 12",	GAME_NO_SOUND_HW | GAME_NOT_WORKING )
+//COMP( 1984, trs80m16b,trs80m2,	0,		trs80m16,	trs80m2,	0,		"Tandy Radio Shack",	"TRS-80 Model 16B",	GAME_NO_SOUND_HW | GAME_NOT_WORKING )
+//COMP( 1985, tandy6k,	trs80m2,	0,		tandy6k,	trs80m2,	0,		"Tandy Radio Shack",	"Tandy 6000 HD",	GAME_NO_SOUND_HW | GAME_NOT_WORKING )
