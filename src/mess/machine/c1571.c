@@ -11,7 +11,7 @@
 
 	TODO:
 
-	- fast serial mode is broken, bytes get skipped
+	- fast serial only works with PAL C128
 	- 1541/1571 Alignment shows drive speed as 266 rpm, should be 310
 	- CP/M disks
     - power/activity LEDs
@@ -452,7 +452,7 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
 	{
 		UINT32 clock = clock_1_2 ? XTAL_16MHz/8 : XTAL_16MHz/16;
 
-		c1571->cpu->set_clock(clock);
+		cpu_set_clock(c1571->cpu, clock);
 		c1571->cia->set_clock(clock);
 		c1571->via0->set_clock(clock);
 		c1571->via1->set_clock(clock);
@@ -850,13 +850,13 @@ static const floppy_config c1571_floppy_config =
 -------------------------------------------------*/
 
 static MACHINE_DRIVER_START( c1570 )
-	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
+	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MDRV_CPU_PROGRAM_MAP(c1570_map)
 
-	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/8, via0_intf)
-	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/8, via1_intf)
-	MDRV_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/8, cia_intf)
-	MDRV_WD1770_ADD(WD1770_TAG, wd1770_intf)
+	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, via0_intf)
+	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, via1_intf)
+	MDRV_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/16, cia_intf)
+	MDRV_WD1770_ADD(WD1770_TAG, /* XTAL_16MHz/2, */ wd1770_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1570_floppy_config)
 MACHINE_DRIVER_END
@@ -866,13 +866,13 @@ MACHINE_DRIVER_END
 -------------------------------------------------*/
 
 static MACHINE_DRIVER_START( c1571 )
-	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
+	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MDRV_CPU_PROGRAM_MAP(c1571_map)
 
-	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/8, via0_intf)
-	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/8, via1_intf)
-	MDRV_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/8, cia_intf)
-	MDRV_WD1770_ADD(WD1770_TAG, wd1770_intf)
+	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, via0_intf)
+	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, via1_intf)
+	MDRV_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/16, cia_intf)
+	MDRV_WD1770_ADD(WD1770_TAG, /* XTAL_16MHz/2, */ wd1770_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_config)
 MACHINE_DRIVER_END
@@ -882,13 +882,13 @@ MACHINE_DRIVER_END
 -------------------------------------------------*/
 
 static MACHINE_DRIVER_START( c1571cr )
-	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
+	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MDRV_CPU_PROGRAM_MAP(c1571cr_map)
 
-	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/8, via0_intf)
-	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/8, via1_intf)
-	MDRV_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/8, cia_intf)
-	MDRV_WD1770_ADD(WD1770_TAG, wd1770_intf)
+	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, via0_intf)
+	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, via1_intf)
+	MDRV_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/16, cia_intf)
+	MDRV_WD1770_ADD(WD1770_TAG, /* XTAL_16MHz/2, */ wd1770_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_config)
 MACHINE_DRIVER_END
