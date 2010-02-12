@@ -5,7 +5,6 @@
 #include "sys/stat.h"
 #include "utils.h"
 #include "osdcore.h"
-#include "osdmess.h"
 
 #include "expat.h"
 

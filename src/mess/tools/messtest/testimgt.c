@@ -8,7 +8,6 @@
 
 #include "testimgt.h"
 #include "utils.h"
-#include "osdmess.h"
 #include "../imgtool/imgtool.h"
 #include "../imgtool/modules.h"
 
