@@ -1499,6 +1499,7 @@ $(MESSOBJ)/trs.a:				\
 	$(MESS_FORMATS)/trs_dsk.o	\
 	$(MESS_FORMATS)/trs_cas.o	\
 	$(MESS_DRIVERS)/trs80.o		\
+	$(MESS_DRIVERS)/trs80m2.o	\
 	$(MESS_VIDEO)/coco6847.o	\
 
 $(MESSOBJ)/unisys.a:			\
