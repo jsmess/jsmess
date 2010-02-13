@@ -57,7 +57,6 @@ void MorphToPM()
 //============================================================
 
 #include <unistd.h>
-extern char sdl_cwd[512];
 
 //============================================================
 //  OPTIONS
@@ -270,8 +269,6 @@ int main(int argc, char *argv[])
 	#ifdef SDLMAME_OS2
 	MorphToPM();
 	#endif
-
-	getcwd(sdl_cwd, 511);
 
 #if defined(SDLMAME_X11) && (SDL_MAJOR_VERSION == 1) && (SDL_MINOR_VERSION == 2)
 	if (SDL_Linked_Version()->patch < 10)

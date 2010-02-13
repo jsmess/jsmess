@@ -927,12 +927,10 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 			if ((!osd_opendir(astring_c(&as))) || (astring_chr(&as, 0, ':') == -1))
 			{
 				/* Default to emu directory */
-				char mess_directory[1024];
-				osd_get_emulator_directory(mess_directory, ARRAY_LENGTH(mess_directory));
-				s = tstring_from_utf8(mess_directory);
+				s = tstring_from_utf8(".");
 
 				/* If software folder exists, use it instead */
-				zippath_combine(&as, mess_directory, "software");
+				zippath_combine(&as, ".", "software");
 				if (osd_opendir(astring_c(&as))) s = tstring_from_utf8(astring_c(&as));
 			}
 		}
@@ -987,12 +985,10 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 		if ((!osd_opendir(astring_c(&as))) || (astring_chr(&as, 0, ':') == -1))
 		{
 			/* Default to emu directory */
-			char mess_directory[1024];
-			osd_get_emulator_directory(mess_directory, ARRAY_LENGTH(mess_directory));
-			s = tstring_from_utf8(mess_directory);
+			s = tstring_from_utf8(".");
 
 			/* If software folder exists, use it instead */
-			zippath_combine(&as, mess_directory, "software");
+			zippath_combine(&as, ".", "software");
 			if (osd_opendir(astring_c(&as))) s = tstring_from_utf8(astring_c(&as));
 		}
 	}

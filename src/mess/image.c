@@ -1636,12 +1636,10 @@ static int try_change_working_directory(image_slot_data *image, const char *subd
 
 static void setup_working_directory(image_slot_data *image)
 {
-    char mess_directory[1024];
     const game_driver *gamedrv;
 
     /* first set up the working directory to be the MESS directory */
-    osd_get_emulator_directory(mess_directory, ARRAY_LENGTH(mess_directory));
-    astring_cpyc(image->working_directory, mess_directory);
+    astring_cpyc(image->working_directory, ".");
 
     /* now try browsing down to "software" */
     if (try_change_working_directory(image, "software"))
