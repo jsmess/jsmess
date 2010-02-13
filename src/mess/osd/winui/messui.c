@@ -926,12 +926,16 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 			/* Make sure a folder was specified in the tab, and that it exists */
 			if ((!osd_opendir(astring_c(&as))) || (astring_chr(&as, 0, ':') == -1))
 			{
+				char *dst = NULL;
+	
+				osd_get_full_path(&dst,".");
 				/* Default to emu directory */
-				s = tstring_from_utf8(".");
+				s = tstring_from_utf8(dst);
 
 				/* If software folder exists, use it instead */
-				zippath_combine(&as, ".", "software");
+				zippath_combine(&as, dst, "software");
 				if (osd_opendir(astring_c(&as))) s = tstring_from_utf8(astring_c(&as));
+				global_free(dst);
 			}
 		}
 	}
@@ -984,12 +988,16 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 		/* Make sure a folder was specified in the tab, and that it exists */
 		if ((!osd_opendir(astring_c(&as))) || (astring_chr(&as, 0, ':') == -1))
 		{
+			char *dst = NULL;
+
+			osd_get_full_path(&dst,".");
 			/* Default to emu directory */
-			s = tstring_from_utf8(".");
+			s = tstring_from_utf8(dst);
 
 			/* If software folder exists, use it instead */
-			zippath_combine(&as, ".", "software");
+			zippath_combine(&as, dst, "software");
 			if (osd_opendir(astring_c(&as))) s = tstring_from_utf8(astring_c(&as));
+			global_free(dst);
 		}
 	}
 

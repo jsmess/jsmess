@@ -1637,9 +1637,11 @@ static int try_change_working_directory(image_slot_data *image, const char *subd
 static void setup_working_directory(image_slot_data *image)
 {
     const game_driver *gamedrv;
-
-    /* first set up the working directory to be the MESS directory */
-    astring_cpyc(image->working_directory, ".");
+	char *dst = NULL;
+	
+	osd_get_full_path(&dst,".");
+    /* first set up the working directory to be the MESS directory */	
+    astring_cpyc(image->working_directory, dst);
 
     /* now try browsing down to "software" */
     if (try_change_working_directory(image, "software"))
@@ -1651,6 +1653,7 @@ static void setup_working_directory(image_slot_data *image)
             gamedrv = driver_get_compatible(gamedrv);
         }
     }
+	global_free(dst);
 }
 
 
