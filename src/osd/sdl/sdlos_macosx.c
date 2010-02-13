@@ -12,6 +12,7 @@
 // standard sdl header
 #include <SDL/SDL.h>
 
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include <mach/mach.h>

@@ -14,6 +14,7 @@
 #include <sys/mman.h>
 #include <time.h>
 #include <sys/time.h>
+#include <sys/stat.h>
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_syswm.h>
