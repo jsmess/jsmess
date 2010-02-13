@@ -113,7 +113,7 @@ int CLIB_DECL main(int ac, char **av)
 		return 1;
 	}
 
-	osd_mkdir(html_directory);
+	//osd_mkdir(html_directory);
 
 	/* Head of the index html file */
 	fprintf(html, "<html>\n");

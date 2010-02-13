@@ -57,6 +57,15 @@ static int is_zip_file_separator(char c);
     PATH OPERATIONS
 ***************************************************************************/
 
+//============================================================
+//  is_path_separator
+//============================================================
+
+int is_path_separator(char c)
+{
+	return (c == '/') || (c == '\\');
+}
+
 /*-------------------------------------------------
     parse_parent_path - parses out the parent path
 -------------------------------------------------*/
@@ -68,7 +77,7 @@ static void parse_parent_path(const char *path, int *beginpos, int *endpos)
 
 	/* skip over trailing path separators */
 	pos = length - 1;
-	while((pos > 0) && osd_is_path_separator(path[pos]))
+	while((pos > 0) && is_path_separator(path[pos]))
 		pos--;
 
 	/* return endpos */
@@ -76,7 +85,7 @@ static void parse_parent_path(const char *path, int *beginpos, int *endpos)
 		*endpos = pos;
 
 	/* now skip until we find a path separator */
-	while((pos >= 0) && !osd_is_path_separator(path[pos]))
+	while((pos >= 0) && !is_path_separator(path[pos]))
 		pos--;
 
 	/* return beginpos */
@@ -136,7 +145,7 @@ astring *zippath_combine(astring *dst, const char *path1, const char *path2)
 	{
 		result = astring_cpyc(dst, path2);
 	}
-	else if ((path1[0] != '\0') && !osd_is_path_separator(path1[strlen(path1) - 1]))
+	else if ((path1[0] != '\0') && !is_path_separator(path1[strlen(path1) - 1]))
 	{
 		result = astring_assemble_3(dst, path1, PATH_SEPARATOR, path2);
 	}
@@ -217,7 +226,7 @@ static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header
 
 done:
 	if (ptr != NULL)
-		free(ptr);
+		global_free(ptr);
 	return filerr;
 }
 
@@ -372,7 +381,7 @@ static int is_root(const char *path)
 		i += 2;
 
 	/* skip path separators */
-	while (osd_is_path_separator(path[i]))
+	while (is_path_separator(path[i]))
 		i++;
 
 	return path[i] == '\0';
@@ -412,7 +421,7 @@ static int is_zip_file_separator(char c)
 
 static int is_zip_path_separator(char c)
 {
-	return is_zip_file_separator(c) || osd_is_path_separator(c);
+	return is_zip_file_separator(c) || is_path_separator(c);
 }
 
 
@@ -537,7 +546,7 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type *entry_ty
 	{
 		/* trim the path of trailing path separators */
 		i = astring_len(apath);
-		while((i > 1) && osd_is_path_separator(astring_c(apath)[i - 1]))
+		while((i > 1) && is_path_separator(astring_c(apath)[i - 1]))
 			i--;
 		apath_trimmed = astring_cpysubstr(apath_trimmed, apath, 0, i);
 
@@ -549,7 +558,7 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type *entry_ty
 		{
 			/* get the entry type and free the stat entry */
 			current_entry_type = current_entry->type;
-			free(current_entry);
+			global_free(current_entry);
 			current_entry = NULL;
 		}
 		else
@@ -703,10 +712,10 @@ void zippath_closedir(zippath_directory *directory)
 	{
 		dirlist = directory->returned_dirlist;
 		directory->returned_dirlist = directory->returned_dirlist->next;
-		free(dirlist);
+		global_free(dirlist);
 	}
 
-	free(directory);
+	global_free(directory);
 }
 
 

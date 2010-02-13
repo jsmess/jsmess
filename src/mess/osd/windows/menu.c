@@ -718,6 +718,41 @@ done:
 }
 
 
+//============================================================
+//  win_dirname
+//============================================================
+
+char *win_dirname(const char *filename)
+{
+	char *dirname;
+	char *c;
+
+	// NULL begets NULL
+	if (!filename)
+		return NULL;
+
+	// allocate space for it
+	dirname = (char*)malloc(strlen(filename) + 1);
+	if (!dirname)
+		return NULL;
+
+	// copy in the name
+	strcpy(dirname, filename);
+
+	// search backward for a slash or a colon
+	for (c = dirname + strlen(dirname) - 1; c >= dirname; c--)
+		if (*c == '\\' || *c == '/' || *c == ':')
+		{
+			// found it: NULL terminate and return
+			*(c + 1) = 0;
+			return dirname;
+		}
+
+	// otherwise, return an empty string
+	dirname[0] = 0;
+	return dirname;
+}
+
 
 //============================================================
 //  state_dialog
@@ -735,7 +770,7 @@ static void state_dialog(HWND wnd, win_file_dialog_type dlgtype,
 
 	if (state_filename[0])
 	{
-		dir = osd_dirname(state_filename);
+		dir = win_dirname(state_filename);
 	}
 	else
 	{
@@ -2301,12 +2336,4 @@ LRESULT CALLBACK win_mess_window_proc(HWND wnd, UINT message, WPARAM wparam, LPA
 			return winwindow_video_window_proc(wnd, message, wparam, lparam);
 	}
 	return 0;
-}
-
-void win_mess_dummy()
-{
-	char mess_directory[1024];
-    
-    /* first set up the working directory to be the MESS directory */
-    osd_get_emulator_directory(mess_directory, ARRAY_LENGTH(mess_directory));
 }

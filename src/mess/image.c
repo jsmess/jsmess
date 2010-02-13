@@ -1239,6 +1239,26 @@ const char *image_filename(running_device *image)
 }
 
 
+//============================================================
+//  image_filename_basename
+//============================================================
+
+static char *image_filename_basename(char *filename)
+{
+	char *c;
+
+	// NULL begets NULL
+	if (!filename)
+		return NULL;
+
+	// start at the end and return when we hit a slash or colon
+	for (c = filename + strlen(filename) - 1; c >= filename; c--)
+		if (*c == '\\' || *c == '/' || *c == ':')
+			return c + 1;
+
+	// otherwise, return the whole thing
+	return filename;
+}
 
 /*-------------------------------------------------
     image_basename
@@ -1246,7 +1266,7 @@ const char *image_filename(running_device *image)
 
 const char *image_basename(running_device *image)
 {
-    return osd_basename((char *) image_filename(image));
+    return image_filename_basename((char *) image_filename(image));
 }
 
 

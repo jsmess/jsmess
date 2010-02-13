@@ -73,7 +73,19 @@ static wimgtool_info *get_wimgtool_info(HWND window)
 	return info;
 }
 
+static DWORD win_get_file_attributes_utf8(const char *filename)
+{
+	DWORD result = ~0;
+	LPTSTR t_filename;
 
+	t_filename = tstring_from_utf8(filename);
+	if (t_filename != NULL)
+	{
+		result = GetFileAttributes(t_filename);
+		free(t_filename);
+	}
+	return result;
+}
 
 struct foreach_entry
 {
@@ -176,7 +188,7 @@ void wimgtool_report_error(HWND window, imgtoolerr_t err, const char *imagename,
 	switch(ERRORSOURCE(err))
 	{
 		case IMGTOOLERR_SRC_IMAGEFILE:
-			source = osd_basename((char *) imagename);
+			source = imgtool_basename((char *) imagename);
 			break;
 		case IMGTOOLERR_SRC_FILEONIMAGE:
 			source = filename;
@@ -657,7 +669,7 @@ static imgtoolerr_t full_refresh_image(HWND window)
 				file_title, imageinfo);
 		}
 
-		statusbar_text[0] = osd_basename((char *) info->filename);
+		statusbar_text[0] = imgtool_basename((char *) info->filename);
 		statusbar_text[1] = imgtool_image_module(info->image)->description;
 
 		free(file_title);
@@ -870,6 +882,71 @@ const imgtool_module *find_filter_module(int filter_index,
 	return NULL;
 }
 
+//============================================================
+//  win_error_to_mame_file_error
+//============================================================
+
+static file_error win_error_to_mame_file_error(DWORD error)
+{
+	file_error filerr;
+
+	// convert a Windows error to a file_error
+	switch (error)
+	{
+		case ERROR_SUCCESS:
+			filerr = FILERR_NONE;
+			break;
+
+		case ERROR_OUTOFMEMORY:
+			filerr = FILERR_OUT_OF_MEMORY;
+			break;
+
+		case ERROR_FILE_NOT_FOUND:
+		case ERROR_PATH_NOT_FOUND:
+			filerr = FILERR_NOT_FOUND;
+			break;
+
+		case ERROR_ACCESS_DENIED:
+			filerr = FILERR_ACCESS_DENIED;
+			break;
+
+		case ERROR_SHARING_VIOLATION:
+			filerr = FILERR_ALREADY_OPEN;
+			break;
+
+		default:
+			filerr = FILERR_FAILURE;
+			break;
+	}
+	return filerr;
+}
+
+//============================================================
+//  win_mkdir
+//============================================================
+
+file_error win_mkdir(const char *dir)
+{
+	file_error filerr = FILERR_NONE;
+
+	TCHAR *tempstr = tstring_from_utf8(dir);
+	if (!tempstr)
+	{
+		filerr = FILERR_OUT_OF_MEMORY;
+		goto done;
+	}
+
+	if (!CreateDirectory(tempstr, NULL))
+	{
+		filerr = win_error_to_mame_file_error(GetLastError());
+		goto done;
+	}
+
+done:
+	if (tempstr)
+		free(tempstr);
+	return filerr;
+}
 
 
 static imgtoolerr_t get_recursive_directory(imgtool_partition *partition, const char *path, LPCSTR local_path)
@@ -880,7 +957,7 @@ static imgtoolerr_t get_recursive_directory(imgtool_partition *partition, const 
 	const char *subpath;
 	char local_subpath[MAX_PATH];
 
-	if (osd_mkdir(local_path) != FILERR_NONE)
+	if (win_mkdir(local_path) != FILERR_NONE)
 	{
 		err = IMGTOOLERR_UNEXPECTED;
 		goto done;
@@ -1638,7 +1715,7 @@ static void drop_files(HWND window, HDROP drop)
 
 		// figure out the file/dir name on the image
 		snprintf(subpath, ARRAY_LENGTH(subpath), "%s%s",
-			info->current_directory ? info->current_directory : "", osd_basename(filename));
+			info->current_directory ? info->current_directory : "", imgtool_basename(filename));
 
 		if (GetFileAttributes(buffer) & FILE_ATTRIBUTE_DIRECTORY)
 			err = put_recursive_directory(info->partition, buffer, subpath);

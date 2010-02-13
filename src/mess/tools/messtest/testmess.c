@@ -775,7 +775,7 @@ static void command_image_loadcreate(running_machine *machine)
 	{
 		snprintf(buf, ARRAY_LENGTH(buf),	"%s.%s",
 			current_testcase.name, file_extensions);
-		osd_get_temp_filename(buf, ARRAY_LENGTH(buf), buf);
+		//osd_get_temp_filename(buf, ARRAY_LENGTH(buf), buf);
 		filename = buf;
 	}
 

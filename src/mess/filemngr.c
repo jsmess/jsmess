@@ -674,7 +674,8 @@ static file_error menu_file_selector_populate(running_machine *machine, ui_menu 
 	const osd_directory_entry *dirent;
 	const file_selector_entry *entry;
 	const file_selector_entry *selected_entry = NULL;
-	int count, i;
+	int i;
+	const char *volume_name;
 	image_device_info info;
 	running_device *device = menustate->manager_menustate->selected_device;
 	const char *path = astring_c(menustate->manager_menustate->current_directory);
@@ -698,11 +699,12 @@ static file_error menu_file_selector_populate(running_machine *machine, ui_menu 
 	}
 
 	/* add the drives */
-	count = osd_num_devices();
-	for (i = 0; i < count; i++)
+	i = 0;
+	while((volume_name = osd_get_volume_name(i))!=NULL)
 	{
 		append_file_selector_entry(menu, menustate, SELECTOR_ENTRY_TYPE_DRIVE,
-			osd_get_device_name(i), osd_get_device_name(i));
+			volume_name, volume_name);
+		i++;
 	}
 
 	/* build the menu for each item */

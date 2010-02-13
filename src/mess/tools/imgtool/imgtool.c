@@ -121,7 +121,22 @@ static imgtoolerr_t markerrorsource(imgtoolerr_t err)
 	return err;
 }
 
+char *imgtool_basename(char *filename)
+{
+	char *c;
 
+	// NULL begets NULL
+	if (!filename)
+		return NULL;
+
+	// start at the end and return when we hit a slash or colon
+	for (c = filename + strlen(filename) - 1; c >= filename; c--)
+		if (*c == '\\' || *c == '/' || *c == ':')
+			return c + 1;
+
+	// otherwise, return the whole thing
+	return filename;
+}
 
 /*-------------------------------------------------
     internal_error - debug function for raising
@@ -2095,7 +2110,7 @@ imgtoolerr_t imgtool_partition_put_file(imgtool_partition *partition, const char
 	char *alloc_newfname = NULL;
 
 	if (!newfname)
-		newfname = (const char *) osd_basename((char *) source);
+		newfname = (const char *) imgtool_basename((char *) source);
 
 	charset = (imgtool_charset) (int) imgtool_partition_get_info_int(partition, IMGTOOLINFO_INT_CHARSET);
 	if (charset != IMGTOOL_CHARSET_UTF8)

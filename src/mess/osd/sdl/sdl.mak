@@ -15,12 +15,6 @@ OBJDIRS += $(MESS_SDLOBJ)
 
 $(LIBOSD): $(OSDOBJS)
 
-ifeq ($(TARGETOS),win32)
-OSDCOREOBJS += \
-	$(MESS_SDLOBJ)/winutils.o \
-	$(MESS_SDLOBJ)/w32util.o
-endif
-
 $(LIBOCORE): $(OSDCOREOBJS)
 
 $(LIBOCORE_NOMAIN): $(OSDCOREOBJS:$(WINOBJ)/main.o=)

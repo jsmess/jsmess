@@ -499,7 +499,7 @@ int messtest(const struct messtest_options *opts, int *test_count, int *failure_
 	file_error filerr;
 	core_file *file;
 	int result = -1;
-	char *script_directory;
+//	char *script_directory;
 	xml_parse_options parse_options;
 	xml_parse_error parse_error;
 	xml_data_node *root_node = NULL;
@@ -518,7 +518,7 @@ int messtest(const struct messtest_options *opts, int *test_count, int *failure_
 
 	/* save the current working directory, and change to the test directory */
 	saved_directory[0] = '\0';
-	if (!opts->preserve_directory)
+/*	if (!opts->preserve_directory)
 	{
 		script_directory = osd_dirname(opts->script_filename);
 		if (script_directory)
@@ -527,7 +527,7 @@ int messtest(const struct messtest_options *opts, int *test_count, int *failure_
 			osd_setcurdir(script_directory);
 			free(script_directory);
 		}
-	}
+	}*/
 
 	/* set up parse options */
 	memset(&parse_options, 0, sizeof(parse_options));
@@ -557,8 +557,8 @@ int messtest(const struct messtest_options *opts, int *test_count, int *failure_
 
 done:
 	/* restore the directory */
-	if (saved_directory[0])
-		osd_setcurdir(saved_directory);
+//	if (saved_directory[0])
+//		osd_setcurdir(saved_directory);
 	if (file != NULL)
 		core_fclose(file);
 	if (root_node != NULL)

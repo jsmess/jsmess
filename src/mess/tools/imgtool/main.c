@@ -30,7 +30,7 @@ static void writeusage(FILE *f, int write_word_usage, const struct command *c, c
 {
 	fprintf(f, "%s %s %s %s\n",
 		(write_word_usage ? "Usage:" : "      "),
-		osd_basename(argv[0]),
+		imgtool_basename(argv[0]),
 		c->name,
 		c->usage ? c->usage : "");
 }
@@ -981,9 +981,9 @@ int CLIB_DECL main(int argc, char *argv[])
 	fprintf(stderr, "<imagename> is the image filename; can specify a ZIP file for image name\n");
 
 	fprintf(stderr, "\nExample usage:\n");
-	fprintf(stderr, "\t%s dir %s myimageinazip.zip\n", osd_basename(argv[0]), sample_format);
-	fprintf(stderr, "\t%s get %s myimage.dsk myfile.bin mynewfile.txt\n", osd_basename(argv[0]), sample_format);
-	fprintf(stderr, "\t%s getall %s myimage.dsk\n", osd_basename(argv[0]), sample_format);
+	fprintf(stderr, "\t%s dir %s myimageinazip.zip\n", imgtool_basename(argv[0]), sample_format);
+	fprintf(stderr, "\t%s get %s myimage.dsk myfile.bin mynewfile.txt\n", imgtool_basename(argv[0]), sample_format);
+	fprintf(stderr, "\t%s getall %s myimage.dsk\n", imgtool_basename(argv[0]), sample_format);
 	result = 0;
 	goto done;
 
