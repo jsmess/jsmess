@@ -12,13 +12,13 @@
 *
 *  TODO:
 *  * DUART:
-*    * DUART needs to be reset on reset line activation. as is it works ok, but it should be done anyway.
+*    * <DONE> DUART needs to be reset on reset line activation. as is it works ok, but it should be done anyway.
 *    * DUART needs its i/o pins connected as well:
 *    * pins IP0, IP2, and IP3 are connected to the primary serial port:
 *      * IP0 is CTS
 *      * IP2 is DSR
 *      * IP3 is RLS (recieved line signal, this pin is rarely used on rs232)
-*    * pins IP4, IP5 and IP6 are on jumpers on the DUART, tied high normally but jumperable low, should be handled as dipswitches:
+*    * <DONE> pins IP4, IP5 and IP6 are on jumpers on the DUART, tied high normally but jumperable low, should be handled as dipswitches:
 *      * IP4 low: skip hardware self tests
 *      * IP5 low: unknown
 *      * IP6 low: unknown
@@ -26,9 +26,9 @@
 *      * OP0 is RTS
 *      * OP2 is DTR
 *  * Actually store the X2212 nvram's eeprom data to disk rather than throwing it out on exit
-*    * is there some way i can hook this up using &generic_nvram?
-*  * emulate/simulate the MT8060 dtmf decoder as a 16-key input device? or hook it to some simple fft code?
-*  * discuss and figure out how to have an external application send data to the two serial ports to be spoken
+*    * Is there some way I can hook this up using &generic_nvram? Right now signs point to no.
+*  * emulate/simulate the MT8060 dtmf decoder as a 16-key input device? or hook it to some simple fft code? Francois Javier's fftmorse code ran full speed on a 6mhz 80286, maybe use that?
+*  * discuss and figure out how to have an external application send data to the two serial ports to be spoken (maybe using paste from clipboard?)
 *
 * LED error code list (found by experimentation and help from leeeeee):
 *    Startup Self tests:
@@ -152,8 +152,8 @@ DUART is INT level 6
 
 static struct
 {
-UINT8 data[8]; // ? what is this for?
-UINT8 nvram_local[256]; // sram tempspace on the x2214
+UINT8 data[8]; // hack to prevent gcc bitching about struct pointers. not used.
+UINT8 x2214_sram[256]; // NVRAM chip's temp sram space
 UINT8 statusLED;
 // input fifo, between m68k and tms32010
 UINT16 infifo[32]; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
@@ -248,7 +248,7 @@ static void dectalk_x2212_store( running_machine *machine )
 	UINT8 *nvram = memory_region(machine, "nvram");
 	int i;
 	for (i = 0; i < 256; i++)
-	nvram[i] = dectalk.nvram_local[i];
+	nvram[i] = dectalk.x2214_sram[i];
 #ifdef NVRAM_LOG
 	logerror("nvram store done\n");
 #endif
@@ -259,7 +259,7 @@ static void dectalk_x2212_recall( running_machine *machine )
 	UINT8 *nvram = memory_region(machine, "nvram");
 	int i;
 	for (i = 0; i < 256; i++)
-	dectalk.nvram_local[i] = nvram[i];
+	dectalk.x2214_sram[i] = nvram[i];
 #ifdef NVRAM_LOG
 	logerror("nvram recall done\n");
 #endif
@@ -297,13 +297,16 @@ static UINT16 dectalk_outfifo_r ( running_machine *machine )
 /* Machine reset and friends: stuff that needs setting up which IS directly affected by reset */
 static void dectalk_reset(running_device *device)
 {
+	const running_device *devconf = devtag_get_device(device->machine, "duart68681"); // this is probably an evil disgusting hack, and AaronGiles is gonna throttle me for doing this...
 	hack_self_test = 0; // hack
 	// stuff that is DIRECTLY affected by the RESET line
 	dectalk.statusLED = 0; // clear status led latch
 	dectalk_x2212_recall(device->machine); // nvram recall
 	dectalk.m68k_spcflags_latch = 1; // initial status is speech reset(d0) active and spc int(d6) disabled
 	dectalk.m68k_tlcflags_latch = 0; // initial status is tone detect int(d6) off, answer phone(d8) off, ring detect int(d14) off
-	// TODO: DUART is reset, "duart68681"
+	DEVICE_RESET(devconf); // reset the DUART
+	devconf = devconf; // hack to make gcc shut up about unused variables. the variable IS USED!
+	//devtag_get_device(device->machine,"duart68681")->reset(); // reset the DUART
 	// stuff that is INDIRECTLY affected by the RESET line
 	dectalk_clear_all_fifos(device->machine); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
 	dectalk_semaphore_w(device->machine, 0); // on the original dectalk pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
@@ -326,7 +329,7 @@ static MACHINE_RESET( dectalk )
 static READ8_HANDLER( nvram_read ) // read from x2212 nvram chip and possibly do recall
 {
 	UINT8 data = 0xFF;
-	data = dectalk.nvram_local[offset&0xff]; // TODO: should this be before or after a possible /RECALL? I'm guessing before.
+	data = dectalk.x2214_sram[offset&0xff]; // TODO: should this be before or after a possible /RECALL? I'm guessing before.
 #ifdef NVRAM_LOG
 		logerror("m68k: nvram read at %08X: %02X\n", offset, data);
 #endif
@@ -350,7 +353,7 @@ static WRITE8_HANDLER( nvram_write ) // write to X2212 NVRAM chip and possibly d
 #ifdef NVRAM_LOG
 	logerror("m68k: nvram write at %08X: %02X\n", offset, data&0x0f);
 #endif
-	dectalk.nvram_local[offset&0xff] = (UINT8)data&0x0f; // TODO: should this be before or after a possible /STORE? I'm guessing before.
+	dectalk.x2214_sram[offset&0xff] = (UINT8)data&0x0f; // TODO: should this be before or after a possible /STORE? I'm guessing before.
 	if (offset&0x200) // if a9 is set, do a /STORE
 	dectalk_x2212_store(space->machine);
 }
