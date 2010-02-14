@@ -142,10 +142,10 @@ UINT8 columnlatch;
 static READ8_DEVICE_HANDLER( vcc_portb_r )
 {
 	device = devtag_get_device(device->machine, "speech");
-	if (s14001a_bsy_r(device) == 0)
-		return 0;
+	if (s14001a_bsy_r(device) != 0)
+		return 0x80;
 	else
-		return 0xFF;
+		return 0;
 };
 
 static READ8_DEVICE_HANDLER( vcc_portc_r )
@@ -267,7 +267,7 @@ static MACHINE_DRIVER_START(vcc)
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speech", S14001A, 25000) // around 25khz
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_DRIVER_END
 
