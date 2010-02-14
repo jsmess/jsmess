@@ -59,9 +59,6 @@ void mess_predevice_init(running_machine *machine)
 	image_device_info info;
 	device_get_image_devices_func get_image_devices;
 
-	/* initialize natural keyboard support */
-	inputx_init(machine);
-
 	/* init all devices */
 	image_init(machine);
 
