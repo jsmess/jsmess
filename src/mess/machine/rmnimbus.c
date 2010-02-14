@@ -1943,7 +1943,7 @@ static void nimbus_bank_memory(running_machine *machine)
     map_blocks[1]  = (ramblocks[ramblock][1].blocksize==0) ? NULL : &ram[ramblocks[ramblock][1].blockbase*1024];
     map_blocks[2]  = (ramblocks[ramblock][2].blocksize==0) ? NULL : &ram[ramblocks[ramblock][2].blockbase*1024];
     
-    if(LOG_RAM) logerror("\n\nmcu_reg080=%02X, ramblock=%d, map_blocks[0]=%X, map_blocks[1]=%X, map_blocks[2]=%X\n",mcu_reg080,ramblock,(int)map_blocks[0],(int)map_blocks[1],(int)map_blocks[2]);
+    //if(LOG_RAM) logerror("\n\nmcu_reg080=%02X, ramblock=%d, map_blocks[0]=%X, map_blocks[1]=%X, map_blocks[2]=%X\n",mcu_reg080,ramblock,(int)map_blocks[0],(int)map_blocks[1],(int)map_blocks[2]);
     
     for(blockno=0;blockno<8;blockno++)
     {
@@ -1969,7 +1969,7 @@ static void nimbus_bank_memory(running_machine *machine)
 
             memory_set_bankptr(machine, bank, map_base);
             memory_install_readwrite_bank(space, memmap[blockno].start, memmap[blockno].end, 0, 0, bank);
-            if(LOG_RAM) logerror(", base=%X\n",(int)map_base);
+            //if(LOG_RAM) logerror(", base=%X\n",(int)map_base);
         }
         else
         {
