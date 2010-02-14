@@ -996,9 +996,9 @@ static INPUT_PORTS_START( gorf )
 	PORT_DIPNAME( 0x10, 0x00, "Lives per Credit" )		PORT_DIPLOCATION("S1:5")
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("S1:6")
-	PORT_DIPSETTING(    0x00, "Mission 5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( None ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("S1:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x20, "Mission 5" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("S1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1008,7 +1008,7 @@ static INPUT_PORTS_START( gorf )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( gorfg )
+static INPUT_PORTS_START( gorfpgm1g )
 	PORT_INCLUDE(gorf)
 
 	PORT_MODIFY("P4HANDLE")
@@ -1838,7 +1838,7 @@ GAME( 1980, wowg,     wow,  wow,      wowg,     wow,      ROT0,   "Midway", "Wiz
 /* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91364 ROM/RAM board */
 GAMEL(1981, gorf,     0,    gorf,     gorf,     gorf,     ROT270, "Midway", "Gorf", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_gorf  )
 GAMEL(1981, gorfpgm1, gorf, gorf,     gorf,     gorf,     ROT270, "Midway", "Gorf (program 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_gorf )
-GAMEL(1981, gorfpgm1g,gorf, gorf,     gorfg,    gorf,     ROT270, "Midway", "Gorf (program 1, with German Language ROM)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_gorf )
+GAMEL(1981, gorfpgm1g,gorf, gorf,     gorfpgm1g,gorf,     ROT270, "Midway", "Gorf (program 1, with German Language ROM)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_gorf )
 
 /* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91423 memory board */
 GAME( 1981, robby,    0,    robby,    robby,    robby,    ROT0,   "Bally Midway", "Robby Roto", GAME_SUPPORTS_SAVE )

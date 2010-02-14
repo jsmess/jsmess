@@ -114,6 +114,7 @@ struct _object_transform
 	float				xscale, yscale;		/* scale transforms */
 	render_color		color;				/* color transform */
 	int					orientation;		/* orientation transform */
+	int					no_center;			/* center the container? */
 };
 
 
@@ -166,6 +167,7 @@ public:
 	int					base_layerconfig;	/* the layer configuration at the time of first frame */
 	int					maxtexwidth;		/* maximum width of a texture */
 	int					maxtexheight;		/* maximum height of a texture */
+	render_container *	debug_containers;
 };
 
 
@@ -1640,6 +1642,22 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 		}
 	}
 
+	/* process the debug containers */
+	for (render_container *debug = target->debug_containers; debug != NULL; debug = debug->next)
+	{
+		ui_xform.xoffs = 0;
+		ui_xform.yoffs = 0;
+		ui_xform.xscale = (float) target->width;
+		ui_xform.yscale = (float) target->height;
+		ui_xform.color.r = ui_xform.color.g = ui_xform.color.b = ui_xform.color.a = 1.0f;
+		ui_xform.color.a = 0.9;
+		ui_xform.orientation = target->orientation;
+		ui_xform.no_center = TRUE;
+
+		/* add UI elements */
+		add_container_primitives(target, &target->primlist[listnum], &ui_xform, debug, BLENDMODE_ALPHA);
+	}
+
 	/* process the UI if we are the UI target */
 	if (target == render_get_ui_target())
 	{
@@ -1909,8 +1927,16 @@ static void add_container_primitives(render_target *target, render_primitive_lis
 		if (container_xform.orientation & ORIENTATION_FLIP_Y) yoffs = -yoffs;
 		container_xform.xscale = xform->xscale * xscale;
 		container_xform.yscale = xform->yscale * yscale;
-		container_xform.xoffs = xform->xscale * (0.5f - 0.5f * xscale + xoffs) + xform->xoffs;
-		container_xform.yoffs = xform->yscale * (0.5f - 0.5f * yscale + yoffs) + xform->yoffs;
+		if (xform->no_center)
+		{
+			container_xform.xoffs = xform->xscale * (xoffs) + xform->xoffs;
+			container_xform.yoffs = xform->yscale * (yoffs) + xform->yoffs;
+		}
+		else
+		{
+			container_xform.xoffs = xform->xscale * (0.5f - 0.5f * xscale + xoffs) + xform->xoffs;
+			container_xform.yoffs = xform->yscale * (0.5f - 0.5f * yscale + yoffs) + xform->yoffs;
+		}
 		container_xform.color = xform->color;
 	}
 
@@ -3152,3 +3178,67 @@ static void render_container_update_palette(render_container *container)
 		}
 	}
 }
+
+
+render_container *render_debug_alloc(render_target *target)
+{
+	render_container *container = render_container_alloc(target->machine);
+
+	container->next = target->debug_containers;
+	target->debug_containers = container;
+
+	return container;
+}
+
+
+void render_debug_free(render_target *target, render_container *container)
+{
+	if (container == target->debug_containers)
+	{
+		target->debug_containers = container->next;
+	}
+	else
+	{
+		render_container *c;
+
+		for (c = target->debug_containers; c != NULL; c = c->next)
+			if (c->next == container)
+				break;
+		c->next = container->next;
+	}
+	render_container_free(container);
+}
+
+
+void render_debug_top(render_target *target, render_container *container)
+{
+	/* remove */
+	if (container == target->debug_containers)
+	{
+		target->debug_containers = container->next;
+	}
+	else
+	{
+		render_container *c;
+
+		for (c = target->debug_containers; c != NULL; c = c->next)
+			if (c->next == container)
+				break;
+		c->next = container->next;
+	}
+	/* add to end */
+	if (target->debug_containers == NULL)
+		target->debug_containers = container;
+	else
+	{
+		render_container *c;
+
+		for (c = target->debug_containers; c != NULL; c = c->next)
+			if (c->next == NULL)
+				break;
+		c->next = container;
+	}
+	container->next = NULL;
+}
+
+

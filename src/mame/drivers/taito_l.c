@@ -836,7 +836,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kurikint_map, ADDRESS_SPACE_PROGRAM, 8 )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_MEMBER(taitol_state, shared_ram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(taitol_state, shared_ram)
 	AM_RANGE(0xa800, 0xa800) AM_READWRITE(mux_r, mux_w)
 	AM_RANGE(0xa801, 0xa801) AM_WRITE(mux_ctrl_w) AM_READNOP	// Watchdog or interrupt ack (value ignored)
 ADDRESS_MAP_END
@@ -2919,7 +2919,7 @@ static DRIVER_INIT( evilston )
 {
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 	ROM[0x72] = 0x45;	/* reti -> retn  ('dead' loop @ $1104 )*/
-	memory_install_write8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0xa7fe, 0xa7fe, 0, 0, evilston_snd_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa7fe, 0xa7fe, 0, 0, evilston_snd_w);
 }
 
 

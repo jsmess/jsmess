@@ -24,6 +24,7 @@
 #include "express.h"
 #include "debugvw.h"
 #include "debugger.h"
+#include "debugint/debugint.h"
 #include "uiinput.h"
 #include <ctype.h>
 
@@ -674,7 +675,10 @@ void debug_cpu_instruction_hook(running_device *device, offs_t curpc)
 
 			/* clear the memory modified flag and wait */
 			global->memory_modified = FALSE;
-			osd_wait_for_debugger(device, firststop);
+			if (device->machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
+				osd_wait_for_debugger(device, firststop);
+			else if (device->machine->debug_flags & DEBUG_FLAG_ENABLED)
+				debugint_wait_for_debugger(device, firststop);
 			firststop = FALSE;
 
 			/* if something modified memory, update the screen */
@@ -2000,8 +2004,9 @@ static void compute_debug_flags(running_device *device)
 	running_machine *machine = device->machine;
 	debugcpu_private *global = machine->debugcpu_data;
 
-	/* clear out all global flags by default */
-	machine->debug_flags = DEBUG_FLAG_ENABLED;
+	/* clear out global flags by default, keep DEBUG_FLAG_OSD_ENABLED */
+	machine->debug_flags &= DEBUG_FLAG_OSD_ENABLED;
+	machine->debug_flags |= DEBUG_FLAG_ENABLED;
 
 	/* if we are ignoring this CPU, or if events are pending, we're done */
 	if ((info->flags & DEBUG_FLAG_OBSERVING) == 0 || mame_is_scheduled_event_pending(machine) || mame_is_save_or_load_pending(machine))

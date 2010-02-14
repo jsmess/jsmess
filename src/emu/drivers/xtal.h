@@ -70,6 +70,7 @@ enum
 	XTAL_7_3728MHz  	= 7372800,
 	XTAL_7_8643MHz		= 7864300,		/* Used on InterFlip games as video clock */
 	XTAL_8MHz   		= 8000000,		/* Extremely common, used on 100's of PCBs */
+	XTAL_8_2MHz			= 8200000,		/* Universal Mr. Do - Model 8021 PCB */
 	XTAL_8_4672MHz		= 8467200,		/* Subsino's Ying Hua Lian */
 	XTAL_8_664MHz		= 8664000,		/* Touchmaster */
 	XTAL_8_867238MHz	= 8867238,		/* ETI-660 */
@@ -93,7 +94,7 @@ enum
 	XTAL_12MHz  		= 12000000,		/* Extremely common, used on 100's of PCBs */
 	XTAL_12_096MHz		= 12096000,		/* Some early 80's Atari games */
 	XTAL_12_288MHz  	= 12288000,		/* Sega Model 3 digital audio board */
-	XTAL_12_48MHz  		= 12480000,		/* TRS-80 Model II */
+	XTAL_12_48MHz		= 12480000,		/* TRS-80 Model II */
 	XTAL_12_5MHz		= 12500000,		/* Red Alert audio board */
 	XTAL_12_9792MHz		= 12979200,		/* Exidy 440 */
 	XTAL_13_3MHz		= 13300000,		/* BMC bowling */
@@ -114,6 +115,7 @@ enum
 	XTAL_18MHz  		= 18000000,		/* S.A.R, Ikari Warriors 3 */
 	XTAL_18_432MHz  	= 18432000,		/* Extremely common, used on 100's of PCBs */
 	XTAL_18_720MHz  	= 18720000,		/* Nokia MikroMikko 1 */
+	XTAL_19_6MHz		= 19600000,		/* Universal Mr. Do - Model 8021 PCB */
 	XTAL_19_6608MHz		= 19660800,		/* Euro League (bootleg), labeled as "UKI 19.6608 20PF" */
 	XTAL_19_923MHz		= 19923000,		/* Cinematronics vectors */
 	XTAL_19_968MHz  	= 19968000,		/* Used mostly by some Taito games */

@@ -207,7 +207,6 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 	return setenv(name, value, overwrite);
 }
 
-
 //============================================================
 //  osd_get_clipboard_text
 //============================================================
@@ -308,6 +307,12 @@ char *osd_get_clipboard_text(void)
 }
 
 //============================================================
+//  MESS specific code below
+//============================================================
+
+#ifdef MESS
+
+//============================================================
 //  osd_stat
 //============================================================
 
@@ -383,3 +388,5 @@ file_error osd_get_full_path(char **dst, const char *path)
 
 	return err;
 }
+
+#endif

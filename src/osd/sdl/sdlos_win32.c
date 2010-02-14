@@ -273,6 +273,9 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 	return result;
 }
 
+//============================================================
+//  MESS specific code below
+//============================================================
 
 //============================================================
 //  get_clipboard_text_by_format
@@ -312,7 +315,6 @@ static char *get_clipboard_text_by_format(UINT format, char *(*convert)(LPCVOID 
 	}
 	return result;
 }
-
 
 
 //============================================================
@@ -355,6 +357,8 @@ char *osd_get_clipboard_text(void)
 
 	return result;
 }
+
+#ifdef MESS
 
 //============================================================
 //  astring_from_utf8
@@ -548,3 +552,5 @@ done:
 		free(t_path);
 	return err;
 }
+
+#endif

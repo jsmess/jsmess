@@ -308,7 +308,7 @@ outputs:
 control registers
 000:          scroll x (low 8 bits)
 001: -------x scroll x (high bit)
-     ------x- enable rowscroll? (combasc)
+     ------x- enable rowscroll? (combatsc)
      ----x--- this probably selects an alternate screen layout used in combat
               school where tilemap #2 is overlayed on front and doesn't scroll.
               The 32 lines of the front layer can be individually turned on or
@@ -332,10 +332,10 @@ control registers
      --x----- might be sprite / tilemap priority (0 = sprites have priority)
               (combat school, contra, haunted castle(0/1), labyrunr)
      -x------ Chops away the leftmost and rightmost columns, switching the
-              visible area from 256 to 240 pixels. This is used by combasc on
+              visible area from 256 to 240 pixels. This is used by combatsc on
               the scrolling stages, and by labyrunr on the title screen.
               At first I thought that this enabled an extra bank of 0x40
-              sprites, needed by combasc, but labyrunr proves that this is not
+              sprites, needed by combatsc, but labyrunr proves that this is not
               the case
      x------- unknown (contra)
 004: ----xxxx bits 9-12 of the tile code. Only the bits enabled by the following
@@ -355,15 +355,15 @@ control registers
               same ones indexed by register 005). Note that an attribute bit
               can therefore be used at the same time to be BOTH a tile code bit
               and an additional effect.
-     -------x bit 3 of attribute is bit 3 of color (combasc, fastlane, flkatck)
+     -------x bit 3 of attribute is bit 3 of color (combatsc, fastlane, flkatck)
      ------x- bit 4 of attribute is tile flip X (assumption - no game uses this)
      -----x-- bit 5 of attribute is tile flip Y (flkatck)
-     ----x--- bit 6 of attribute is tile priority over sprites (combasc, hcastle,
+     ----x--- bit 6 of attribute is tile priority over sprites (combatsc, hcastle,
               labyrunr)
               Note that hcastle sets this bit for layer 0, and bit 6 of the
               attribute is also used as bit 12 of the tile code, however that
               bit is ALWAYS set throughout the game.
-              combasc uses the bit in the "graduation" scene during attract mode,
+              combatsc uses the bit in the "graduation" scene during attract mode,
               to place soldiers behind the stand.
               Use in labyrunr has not been investigated yet.
      --xx---- palette bank (both tiles and sprites, see contra)
@@ -1455,8 +1455,8 @@ void k007121_sprites_draw( running_device *device, bitmap_t *bitmap, const recta
 	}
 	else	/* all others */
 	{
-		//num = (k007121->ctrlram[0x03] & 0x40) ? 0x80 : 0x40; /* WRONG!!! (needed by combasc)  */
-		num = 0x40; // Combasc writes 70 sprites to VRAM at peak but the chip only processes the first 64.
+		//num = (k007121->ctrlram[0x03] & 0x40) ? 0x80 : 0x40; /* WRONG!!! (needed by combatsc)  */
+		num = 0x40; // combatsc writes 70 sprites to VRAM at peak but the chip only processes the first 64.
 
 		inc = 5;
 		offs[0] = 0x00;
@@ -10122,8 +10122,6 @@ static DEVICE_STOP( k001005 )
 }
 
 
-// from drivers/nwk-tr
-
 /***************************************************************************/
 /*                                                                         */
 /*                                  001604                                 */
@@ -10341,7 +10339,6 @@ void k001604_draw_front_layer( running_device *device, bitmap_t *bitmap, const r
 
 READ32_DEVICE_HANDLER( k001604_tile_r )
 {
-//  int chip = get_cgboard_id();
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
 	return k001604->tile_ram[offset];
@@ -10349,7 +10346,6 @@ READ32_DEVICE_HANDLER( k001604_tile_r )
 
 READ32_DEVICE_HANDLER( k001604_char_r )
 {
-//  int chip = get_cgboard_id();
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
 	int set, bank;
@@ -10367,9 +10363,21 @@ READ32_DEVICE_HANDLER( k001604_char_r )
 	return k001604->char_ram[addr];
 }
 
+READ32_DEVICE_HANDLER( k001604_reg_r )
+{
+	k001604_state *k001604 = k001604_get_safe_token(device);
+
+	switch (offset)
+	{
+		case 0x54/4:	return mame_rand(device->machine) << 16; break;
+		case 0x5c/4:	return mame_rand(device->machine) << 16 | mame_rand(device->machine); break;
+	}
+
+	return k001604->reg[offset];
+}
+
 WRITE32_DEVICE_HANDLER( k001604_tile_w )
 {
-//  int chip = get_cgboard_id();
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
 	int x, y;
@@ -10422,7 +10430,6 @@ WRITE32_DEVICE_HANDLER( k001604_tile_w )
 
 WRITE32_DEVICE_HANDLER( k001604_char_w )
 {
-//  int chip = get_cgboard_id();
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
 	int set, bank;
@@ -10445,7 +10452,6 @@ WRITE32_DEVICE_HANDLER( k001604_char_w )
 
 WRITE32_DEVICE_HANDLER( k001604_reg_w )
 {
-//  int chip = get_cgboard_id();
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
 	COMBINE_DATA(k001604->reg + offset);
@@ -10463,20 +10469,6 @@ WRITE32_DEVICE_HANDLER( k001604_reg_w )
 	{
 		//printf("K001604_reg_w (%d), %02X, %08X, %08X at %08X\n", chip, offset, data, mem_mask, cpu_get_pc(space->cpu));
 	}
-}
-
-READ32_DEVICE_HANDLER( k001604_reg_r )
-{
-//  int chip = get_cgboard_id();
-	k001604_state *k001604 = k001604_get_safe_token(device);
-
-	switch (offset)
-	{
-		case 0x54/4:	return mame_rand(device->machine) << 16; break;
-		case 0x5c/4:	return mame_rand(device->machine) << 16 | mame_rand(device->machine); break;
-	}
-
-	return k001604->reg[offset];
 }
 
 
@@ -10668,7 +10660,6 @@ static void update_palette_color( running_device *device, UINT32 palette_base, i
 
 READ32_DEVICE_HANDLER( k037122_sram_r )
 {
-//  int chip = get_cgboard_id();
 	k037122_state *k037122 = k037122_get_safe_token(device);
 
 	return k037122->tile_ram[offset];
@@ -10676,7 +10667,6 @@ READ32_DEVICE_HANDLER( k037122_sram_r )
 
 WRITE32_DEVICE_HANDLER( k037122_sram_w )
 {
-//  int chip = get_cgboard_id();
 	k037122_state *k037122 = k037122_get_safe_token(device);
 
 	COMBINE_DATA(k037122->tile_ram + offset);
@@ -10716,7 +10706,6 @@ WRITE32_DEVICE_HANDLER( k037122_sram_w )
 
 READ32_DEVICE_HANDLER( k037122_char_r )
 {
-//  int chip = get_cgboard_id();
 	k037122_state *k037122 = k037122_get_safe_token(device);
 	int bank = k037122->reg[0x30 / 4] & 0x7;
 
@@ -10725,7 +10714,6 @@ READ32_DEVICE_HANDLER( k037122_char_r )
 
 WRITE32_DEVICE_HANDLER( k037122_char_w )
 {
-//  int chip = get_cgboard_id();
 	k037122_state *k037122 = k037122_get_safe_token(device);
 	int bank = k037122->reg[0x30 / 4] & 0x7;
 	UINT32 addr = offset + (bank * (0x40000/4));
@@ -10736,7 +10724,6 @@ WRITE32_DEVICE_HANDLER( k037122_char_w )
 
 READ32_DEVICE_HANDLER( k037122_reg_r )
 {
-//  int chip = get_cgboard_id();
 	k037122_state *k037122 = k037122_get_safe_token(device);
 
 	switch (offset)
@@ -10751,7 +10738,6 @@ READ32_DEVICE_HANDLER( k037122_reg_r )
 
 WRITE32_DEVICE_HANDLER( k037122_reg_w )
 {
-//  int chip = get_cgboard_id();
 	k037122_state *k037122 = k037122_get_safe_token(device);
 
 	COMBINE_DATA(k037122->reg + offset);

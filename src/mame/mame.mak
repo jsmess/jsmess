@@ -120,7 +120,7 @@ CPUS += SUPERFX
 CPUS += Z8
 CPUS += I8008
 CPUS += SCMP
-
+CPUS += MN10200
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
@@ -220,7 +220,7 @@ SOUNDS += SP0256
 SOUNDS += DIGITALKER
 SOUNDS += CDP1863
 SOUNDS += CDP1864
-
+SOUNDS += ZSG2
 
 #-------------------------------------------------
 # this is the list of driver libraries that
@@ -774,7 +774,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/contra.o $(VIDEO)/contra.o \
 	$(DRIVERS)/crimfght.o $(VIDEO)/crimfght.o \
 	$(DRIVERS)/dbz.o $(VIDEO)/dbz.o \
-	$(DRIVERS)/ddrible.o $(VIDEO)/ddrible.o \
+	$(DRIVERS)/ddribble.o $(VIDEO)/ddribble.o \
 	$(DRIVERS)/djmain.o $(VIDEO)/djmain.o \
 	$(DRIVERS)/fastfred.o $(VIDEO)/fastfred.o \
 	$(DRIVERS)/fastlane.o $(VIDEO)/fastlane.o \
@@ -1142,7 +1142,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/stv.o $(DRIVERS)/stvinit.o $(MACHINE)/stvprot.o $(MACHINE)/stvcd.o \
 	$(DRIVERS)/suprloco.o $(VIDEO)/suprloco.o \
 	$(DRIVERS)/system1.o $(VIDEO)/system1.o \
-	$(DRIVERS)/system16.o $(MACHINE)/system16.o $(VIDEO)/system16.o $(VIDEO)/sys16spr.o \
+	$(DRIVERS)/system16.o $(VIDEO)/system16.o \
 	$(DRIVERS)/timetrv.o \
 	$(DRIVERS)/topshoot.o \
 	$(DRIVERS)/turbo.o $(AUDIO)/turbo.o $(VIDEO)/turbo.o \
@@ -1209,6 +1209,7 @@ $(MAMEOBJ)/seta.a: \
 $(MAMEOBJ)/sigma.a: \
 	$(DRIVERS)/nyny.o \
 	$(DRIVERS)/r2dtank.o \
+	$(DRIVERS)/sigmab52.o \
 	$(DRIVERS)/spiders.o $(AUDIO)/spiders.o \
 	$(DRIVERS)/sub.o \
 
@@ -1331,6 +1332,7 @@ $(MAMEOBJ)/taito.a: \
 	$(AUDIO)/t5182.o \
 	$(MACHINE)/taitoio.o \
 	$(VIDEO)/taitoic.o \
+	$(AUDIO)/taito_zm.o \
 
 $(MAMEOBJ)/tatsumi.a: \
 	$(DRIVERS)/kingdrby.o \
@@ -1580,6 +1582,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/multfish.o \
 	$(DRIVERS)/murogem.o \
 	$(DRIVERS)/murogmbl.o \
+	$(DRIVERS)/neptunp2.o \
 	$(DRIVERS)/news.o $(VIDEO)/news.o \
 	$(DRIVERS)/norautp.o  $(AUDIO)/norautp.o \
 	$(DRIVERS)/oneshot.o $(VIDEO)/oneshot.o \
@@ -1810,6 +1813,7 @@ $(DRIVERS)/stepstag.o:	$(LAYOUT)/stepstag.lh
 
 $(DRIVERS)/subsino.o:	$(LAYOUT)/victor5.lh \
 						$(LAYOUT)/victor21.lh \
+						$(LAYOUT)/tisub.lh \
 						$(LAYOUT)/crsbingo.lh \
 						$(LAYOUT)/sharkpy.lh \
 						$(LAYOUT)/smoto.lh

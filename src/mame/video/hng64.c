@@ -1110,7 +1110,7 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 	}
 
 	// xrally's pink tilemaps make me think this is a tilemap enable bit.
-	// pretty much every other game makes me think otherwise.
+	// fatfurwa makes me think otherwise.
 	//if (!(tileregs & 0x0040)) return;
 
 	// set the transmask so our manual copy is correct
@@ -1680,6 +1680,7 @@ struct polygon
 	INT8 texIndex;				// Which texture to draw from (0x00-0x0f)
 	INT8 texType;				// How to index into the texture
 	UINT32 palOffset;			// The base offset where this object's palette starts.
+	UINT32 palPageSize;			// The size of the palette page that is being pointed to.
 
 	UINT32 debugColor;			// Will go away someday.  Used to explicitly color polygons for debugging.
 };
@@ -1895,7 +1896,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	struct polygon lastPoly = { 0 };
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-
 	/////////////////
 	// HEADER INFO //
 	/////////////////
@@ -1949,13 +1949,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
     // [20] - ???? always 0 ????
     //////////////////////////////////////////////*/
 
-	// Debug - ajg
-	//UINT32 tdColor = 0xff000000;
-	//if (packet[1] & 0x1000)   tdColor |= 0x00ff0000;
-	//if (packet[1] & 0x2000)   tdColor |= 0x0000ff00;
-	//if (packet[1] & 0x4000)   tdColor |= 0x000000ff;
-	//if (packet[1] & 0x8000)   tdColor |= 0xffffffff;
-
 	// 3d ROM Offset
 	UINT16* threeDRoms = (UINT16*)(memory_region(machine, "verts"));
 	UINT32  threeDOffset = (((UINT32)packet[2]) << 16) | ((UINT32)packet[3]);
@@ -1968,7 +1961,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 		return;
 	}
 
-	/*
+/*
     // Debug - ajg
     printf("%08x : ", threeDOffset*3*2);
     for (int k = 0; k < 7*3; k++)
@@ -1977,8 +1970,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
         if ((k % 3) == 2) printf(" ");
     }
     printf("\n");
-    }
-    */
+*/
 
 	// There are 4 hunks per address.
 	address[0] = threeDPointer[0];
@@ -2014,6 +2006,12 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	address[1] |= (megaOffset << 16);
 	address[2] |= (megaOffset << 16);
 	address[3] |= (megaOffset << 16);
+
+	// Debug - ajg
+	//UINT32 tdColor = 0xff000000;
+	//if (threeDPointer[14] & 0x0002) tdColor |= 0x00ff0000;
+	//if (threeDPointer[14] & 0x0001) tdColor |= 0x0000ff00;
+	//if (threeDPointer[14] & 0x0000) tdColor |= 0x000000ff;
 
 	/* For all 4 polygon chunks */
 	for (int k = 0; k < 4; k++)
@@ -2055,7 +2053,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			//break;
 
 			// TEXTURE
-			/* The current thought is there may be more than just high & low res texture types, so I'm keeping texType as a UINT8. */
+			/* There may be more than just high & low res texture types, so I'm keeping texType as a UINT8. */
 			if (chunkOffset[1] & 0x1000) polys[*numPolys].texType = 0x1;
 			else						 polys[*numPolys].texType = 0x0;
 
@@ -2064,24 +2062,33 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 			// PALETTE
 			polys[*numPolys].palOffset = 0;
+			polys[*numPolys].palPageSize = 0x100;
 
-			/* FIXME: This really isn't correct - commenting out this line fixes the palette in roadedge snk intro */
+			/* FIXME: This isn't correct.
+                      Buriki & Xrally need this line.  Roads Edge needs it removed.
+                      So instead we're looking for a bit that is on for XRally & Buriki, but noone else. */
 			if (hng64_3dregs[0x00/4] & 0x2000)
 			{
 				polys[*numPolys].palOffset += 0x800;
 			}
 
-			// Apply the dynamic palette offset if its flag is set, otherwise use the fixed one from the ROM
+			//UINT16 explicitPaletteValue0 = ((chunkOffset[?] & 0x????) >> ?) * 0x800;
+			UINT16 explicitPaletteValue1 = ((chunkOffset[1] & 0x0f00) >> 8) * 0x080;
+			UINT16 explicitPaletteValue2 = ((chunkOffset[1] & 0x00f0) >> 4) * 0x008;
+
+			// The presence of 0x00f0 *probably* sets 0x10-sized palette addressing.
+			if (explicitPaletteValue2) polys[*numPolys].palPageSize = 0x10;
+
+			// Apply the dynamic palette offset if its flag is set, otherwise stick with the fixed one
 			if ((packet[1] & 0x0100))
 			{
-				polys[*numPolys].palOffset += paletteState3d * 0x80;
-				/* TODO: Does the explicit palette bit do anything when the dynamic palette flag is on? */
-			}
-			else
-			{
-				UINT8 explicitPaletteValue = (chunkOffset[1] & 0x0f00) >> 8;
-				polys[*numPolys].palOffset += explicitPaletteValue * 0x80;
-			}
+				explicitPaletteValue1 = paletteState3d * 0x80;
+				explicitPaletteValue2 = 0;      // This is probably hiding somewhere in operation 0011
+            }
+
+			polys[*numPolys].palOffset += (explicitPaletteValue1 + explicitPaletteValue2);
+
+
 
 			UINT8 chunkLength = 0;
 			switch(chunkType)
@@ -2119,11 +2126,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 					polys[*numPolys].vert[m].normal[1] = uToF(chunkOffset[10 + (9*m)] );
 					polys[*numPolys].vert[m].normal[2] = uToF(chunkOffset[11 + (9*m)] );
 					polys[*numPolys].vert[m].normal[3] = 0.0f;
-
-					// !!! DUMB !!!
-					polys[*numPolys].vert[m].light[0] = polys[*numPolys].vert[m].texCoords[0] * 255.0f;
-					polys[*numPolys].vert[m].light[1] = polys[*numPolys].vert[m].texCoords[1] * 255.0f;
-					polys[*numPolys].vert[m].light[2] = polys[*numPolys].vert[m].texCoords[2] * 255.0f;
 				}
 
 				// Redundantly called, but it works...
@@ -2159,11 +2161,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 					polys[*numPolys].vert[m].normal[1] = uToF(chunkOffset[22]);
 					polys[*numPolys].vert[m].normal[2] = uToF(chunkOffset[23]);
 					polys[*numPolys].vert[m].normal[3] = 0.0f;
-
-					// !!! DUMB !!!
-					polys[*numPolys].vert[m].light[0] = polys[*numPolys].vert[m].texCoords[0] * 255.0f;
-					polys[*numPolys].vert[m].light[1] = polys[*numPolys].vert[m].texCoords[1] * 255.0f;
-					polys[*numPolys].vert[m].light[2] = polys[*numPolys].vert[m].texCoords[2] * 255.0f;
 				}
 
 				// Redundantly called, but it works...
@@ -2203,10 +2200,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				polys[*numPolys].vert[0].normal[2] = uToF(chunkOffset[11]);
 				polys[*numPolys].vert[0].normal[3] = 0.0f;
 
-				polys[*numPolys].vert[0].light[0] = polys[*numPolys].vert[0].texCoords[0] * 255.0f;
-				polys[*numPolys].vert[0].light[1] = polys[*numPolys].vert[0].texCoords[1] * 255.0f;
-				polys[*numPolys].vert[0].light[2] = polys[*numPolys].vert[0].texCoords[2] * 255.0f;
-
 				polys[*numPolys].faceNormal[0] = uToF(chunkOffset[12]);
 				polys[*numPolys].faceNormal[1] = uToF(chunkOffset[13]);
 				polys[*numPolys].faceNormal[2] = uToF(chunkOffset[14]);
@@ -2237,11 +2230,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				polys[*numPolys].vert[0].texCoords[1] = uToF(chunkOffset[8]);
 				polys[*numPolys].vert[0].texCoords[2] = 0.0f;
 				polys[*numPolys].vert[0].texCoords[3] = 1.0f;
-
-				// !!! DUMB !!!
-				polys[*numPolys].vert[0].light[0] = polys[*numPolys].vert[0].texCoords[0] * 255.0f;
-				polys[*numPolys].vert[0].light[1] = polys[*numPolys].vert[0].texCoords[1] * 255.0f;
-				polys[*numPolys].vert[0].light[2] = polys[*numPolys].vert[0].texCoords[2] * 255.0f;
 
 				// This normal could be right, but I'm not entirely sure - there is no normal in the 18 bytes!
 				polys[*numPolys].vert[0].normal[0] = lastPoly.faceNormal[0];
@@ -2848,7 +2836,8 @@ static void DrawWireframe(running_machine *machine, struct polygon *p)
 /**     Output: none                                                **/
 /*********************************************************************/
 INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
-										  int textureType, int palOffset, int texIndex, int debugColor,
+										  int textureType, int palOffset, int palPageSize,
+										  int texIndex, int debugColor,
 										  int x_start, int x_end, int y, float z_start, float z_delta,
 										  float w_start, float w_delta, float r_start, float r_delta,
 										  float g_start, float g_delta, float b_start, float b_delta,
@@ -2859,13 +2848,8 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 
 	UINT8 paletteEntry = 0;
 	float t_coord, s_coord;
-	const UINT8 *textureOffset;
 	const UINT8 *gfx = memory_region(machine, "textures");
-
-	if (texIndex >= 0)
-		textureOffset = &gfx[texIndex * 1024 * 1024];
-	else
-		textureOffset = 0x00;
+	const UINT8 *textureOffset = &gfx[texIndex * 1024 * 1024];
 
 	for (; x_start <= x_end; x_start++)
 	{
@@ -2875,13 +2859,25 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 			t_coord = t_start / w_start;
 			s_coord = s_start / w_start;
 
-			// DEBUG COLOR MODE
-			if (debugColor != 0x00000000)
+			if ((debugColor & 0xff000000) == 0x01000000)
 			{
+				// UV COLOR MODE
+				*cb = MAKE_ARGB(255, (UINT8)(s_coord*255.0f), (UINT8)(t_coord*255.0f), (UINT8)(0));
+				*db = z_start;
+			}
+			else if ((debugColor & 0xff000000) == 0x02000000)
+			{
+				// Lit
+				*cb = MAKE_ARGB(255, (UINT8)(r_start/w_start), (UINT8)(g_start/w_start), (UINT8)(b_start/w_start));
+				*db = z_start;
+			}
+			else if ((debugColor & 0xff000000) == 0xff000000)
+			{
+				// DEBUG COLOR MODE
 				*cb = debugColor;
 				*db = z_start;
 			}
-			else if (texIndex >= 0)
+			else
 			{
 				// TEXTURED
 				if (textureType == 0x0)
@@ -2892,17 +2888,13 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 				// Naieve Alpha Implementation (?) - don't draw if you're at texture index 0...
 				if (paletteEntry != 0)
 				{
+					paletteEntry %= palPageSize;
+
 					// Greyscale texture test.
 					// *cb = MAKE_ARGB(255, (UINT8)paletteEntry, (UINT8)paletteEntry, (UINT8)paletteEntry);
 					*cb = machine->pens[palOffset + paletteEntry];
 					*db = z_start;
 				}
-			}
-			else
-			{
-				// UNTEXTURED
-				*cb = MAKE_ARGB(255, (UINT8)(r_start/w_start), (UINT8)(g_start/w_start), (UINT8)(b_start/w_start));
-				*db = z_start;
 			}
 		}
 		db++;
@@ -2951,7 +2943,8 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 											float A[4], float B[4], float C[4],
 											float Ca[3], float Cb[3], float Cc[3], // PER-VERTEX RGB COLORS
 											float Ta[2], float Tb[2], float Tc[2], // PER-VERTEX (S,T) TEX-COORDS
-											int textureType, int palOffset, int texIndex, int debugColor)
+											int textureType, int palOffset, int palPageSize,
+											int texIndex, int debugColor)
 {
 	// Get our order of points by increasing y-coord
 	float *p_min = ((A[1] <= B[1]) && (A[1] <= C[1])) ? A : ((B[1] <= A[1]) && (B[1] <= C[1])) ? B : C;
@@ -3142,7 +3135,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 
 		// Pass the horizontal line to the filler, this could be put in the routine
 		// then interpolate for the next values of x and z
-		FillSmoothTexPCHorizontalLine(machine, textureType, palOffset, texIndex, debugColor,
+		FillSmoothTexPCHorizontalLine(machine, textureType, palOffset, palPageSize, texIndex, debugColor,
 			x_start, x_end, y_min, z_interp_x, z_delta_x, w_interp_x, w_delta_x,
 			r_interp_x, r_delta_x, g_interp_x, g_delta_x, b_interp_x, b_delta_x,
 			s_interp_x, s_delta_x, t_interp_x, t_delta_x);
@@ -3222,7 +3215,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 
 		// Pass the horizontal line to the filler, this could be put in the routine
 		// then interpolate for the next values of x and z
-		FillSmoothTexPCHorizontalLine(machine, textureType, palOffset, texIndex, debugColor,
+		FillSmoothTexPCHorizontalLine(machine, textureType, palOffset, palPageSize, texIndex, debugColor,
 			x_start, x_end, y_mid, z_interp_x, z_delta_x, w_interp_x, w_delta_x,
 			r_interp_x, r_delta_x, g_interp_x, g_delta_x, b_interp_x, b_delta_x,
 			s_interp_x, s_delta_x, t_interp_x, t_delta_x);
@@ -3258,8 +3251,8 @@ static void drawShaded(running_machine *machine, struct polygon *p)
 										p->vert[0].clipCoords, p->vert[j].clipCoords, p->vert[j+1].clipCoords,
 										p->vert[0].light,      p->vert[j].light,      p->vert[j+1].light,
 										p->vert[0].texCoords,  p->vert[j].texCoords,  p->vert[j+1].texCoords,
-										p->texType, p->palOffset, p->texIndex, p->debugColor);
-
+										p->texType, p->palOffset, p->palPageSize,
+										p->texIndex, p->debugColor);
 	}
 }
 

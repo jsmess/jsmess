@@ -14,6 +14,13 @@
 #include <SDL/SDL_version.h>
 
 // standard includes
+#ifdef MESS
+#include <unistd.h>
+#endif
+#ifdef SDLMAME_OS2
+#define INCL_DOS
+#include <os2.h>
+#endif
 
 // MAME headers
 #include "osdepend.h"
@@ -36,28 +43,6 @@
 #include <X11/Xutil.h>
 #endif
 
-#ifdef SDLMAME_OS2
-#define INCL_DOS
-#include <os2.h>
-
-void MorphToPM()
-{
-  PPIB pib;
-  PTIB tib;
-
-  DosGetInfoBlocks(&tib, &pib);
-
-  // Change flag from VIO to PM:
-  if (pib->pib_ultype==2) pib->pib_ultype = 3;
-}
-#endif
-
-//============================================================
-//  LOCAL VARIABLES
-//============================================================
-
-#include <unistd.h>
-
 //============================================================
 //  OPTIONS
 //============================================================
@@ -73,6 +58,15 @@ void MorphToPM()
 #endif // MESS
 #endif // MACOSX
 #endif // INI_PATH
+
+
+//============================================================
+//  Global variables
+//============================================================
+
+//============================================================
+//  Local variables
+//============================================================
 
 static const options_entry mame_sdl_options[] =
 {
@@ -231,6 +225,23 @@ static const options_entry mame_sdl_options[] =
 	// End of list
 	{ NULL }
 };
+
+//============================================================
+//  OS2 specific
+//============================================================
+
+#ifdef SDLMAME_OS2
+void MorphToPM()
+{
+  PPIB pib;
+  PTIB tib;
+
+  DosGetInfoBlocks(&tib, &pib);
+
+  // Change flag from VIO to PM:
+  if (pib->pib_ultype==2) pib->pib_ultype = 3;
+}
+#endif
 
 //============================================================
 //  main
@@ -527,7 +538,7 @@ void osd_init(running_machine *machine)
 	defines_verbose();
 
 	if (!SDLMAME_HAS_DEBUGGER)
-		if (options_get_bool(mame_options(), OPTION_DEBUG))
+		if (machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		{
 			mame_printf_error("sdlmame: -debug not supported on X11-less builds\n\n");
 			osd_exit(machine);

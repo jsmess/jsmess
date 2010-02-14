@@ -130,8 +130,8 @@ const options_entry mame_core_options[] =
 	{ "joystick_deadzone;joy_deadzone;jdz",      "0.3",  0,          "center deadzone range for joystick where change is ignored (0.0 center, 1.0 end)" },
 	{ "joystick_saturation;joy_saturation;jsat", "0.85", 0,          "end of axis saturation range for joystick where change is ignored (0.0 center, 1.0 end)" },
 	{ "natural;nat",				 "0",		  OPTION_BOOLEAN,	 "specifies whether to use a natural keyboard or not" },
-	{ "uimodekey;umk",        		 "auto",  	  0,    		     "specifies the key used to toggle between full and partial UI mode" },
-	
+	{ "uimodekey;umk",      		 "auto",	  0,    			 "specifies the key used to toggle between full and partial UI mode" },
+
 
 	/* input autoenable options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE INPUT AUTOMATIC ENABLE OPTIONS" },
@@ -151,6 +151,7 @@ const options_entry mame_core_options[] =
 	{ "update_in_pause",             "0",         OPTION_BOOLEAN,    "keep calling video updates while in pause" },
 	{ "debug;d",                     "0",         OPTION_BOOLEAN,    "enable/disable debugger" },
 	{ "debugscript",                 NULL,        0,                 "script for debugger" },
+	{ "debug_internal;di",           "0",         OPTION_BOOLEAN,    "use the internal debugger for debugging" },
 
 	/* misc options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE MISC OPTIONS" },

@@ -1116,7 +1116,7 @@ void sdlinput_init(running_machine *machine)
 	// register the mice
 	sdlinput_register_mice(machine);
 
-	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
 	{
 		mame_printf_warning("Debug Build: Disabling input grab for -debug\n");
 		mouse_enabled = 0;
@@ -1592,7 +1592,7 @@ void osd_customize_input_type_list(input_type_desc *typelist)
 		switch (typedesc->type)
 		{
 			// configurable UI mode switch
-			case IPT_UI_TOGGLE_UI:				
+			case IPT_UI_TOGGLE_UI:
 				uimode = (const char *)options_get_string(mame_options(), SDLOPTION_UIMODEKEY);
 				if(!strcmp(uimode,"auto")) {
 					#if defined(__APPLE__) && defined(__MACH__)

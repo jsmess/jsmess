@@ -124,7 +124,6 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 	return setenv(name, value, overwrite);
 }
 
-
 #if defined(SDL_VIDEO_DRIVER_X11) && defined(SDLMAME_X11)
 
 //============================================================
@@ -228,6 +227,12 @@ char *osd_get_clipboard_text(void)
 #endif
 
 //============================================================
+//  MESS specific code below
+//============================================================
+
+#ifdef MESS
+
+//============================================================
 //  osd_stat
 //============================================================
 
@@ -241,7 +246,7 @@ osd_directory_entry *osd_stat(const char *path)
 	struct stat64 st;
 	#endif
 
-	#if defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) 
+	#if defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD)
 	err = stat(path, &st);
 	#else
 	err = stat64(path, &st);
@@ -303,3 +308,5 @@ file_error osd_get_full_path(char **dst, const char *path)
 
 	return err;
 }
+
+#endif
