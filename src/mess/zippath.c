@@ -206,7 +206,7 @@ static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header
 	zip_error ziperr;
 	void *ptr;
 
-	ptr = malloc(header->uncompressed_length);
+	ptr = global_alloc_array_clear(UINT8,header->uncompressed_length);
 	if (ptr == NULL)
 	{
 		filerr = FILERR_OUT_OF_MEMORY;
@@ -633,13 +633,12 @@ file_error zippath_opendir(const char *path, zippath_directory **directory)
 	zippath_directory *result;
 
 	/* allocate a directory */
-	result = (zippath_directory *) malloc(sizeof(*result));
+	result = (zippath_directory *) global_alloc_clear(zippath_directory);
 	if (result == NULL)
 	{
 		err = FILERR_OUT_OF_MEMORY;
 		goto done;
 	}
-	memset(result, 0, sizeof(*result));
 
 	/* resolve the path */
 	err = zippath_resolve(path, &entry_type, &result->zipfile, newpath);
@@ -817,7 +816,7 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 					if (rdent == NULL)
 					{
 						/* we've found a new directory; add this to returned_dirlist */
-						rdent = (zippath_returned_directory*)malloc(sizeof(*rdent) + (separator - relpath));
+						rdent = (zippath_returned_directory*)global_alloc_array_clear(UINT8,sizeof(*rdent) + (separator - relpath));
 						rdent->next = directory->returned_dirlist;
 						memcpy(rdent->name, relpath, (separator - relpath) * sizeof(rdent->name[0]));
 						rdent->name[separator - relpath] = '\0';
