@@ -13,6 +13,8 @@
 #define DEBUG_DB    0x02
 #define DEBUG_PIXEL 0x04
 
+#define DEBUG_SET(flags)    ((debug_on & (flags))==(flags))
+
 #define MAINCPU_TAG "maincpu"
 #define IOCPU_TAG   "iocpu"
 
@@ -66,6 +68,23 @@ WRITE16_HANDLER (nimbus_io_w);
 #define EXTERNAL_INT_PC8031_8F  0x8F
 #define EXTERNAL_INT_Z80SIO     0x9C
 #define EXTERNAL_INT_MSM5205    0x84
+
+/* Memory controler */
+#define RAM_BANK00_TAG  "bank0"
+#define RAM_BANK01_TAG  "bank1"
+#define RAM_BANK02_TAG  "bank2"
+#define RAM_BANK03_TAG  "bank3"
+#define RAM_BANK04_TAG  "bank4"
+#define RAM_BANK05_TAG  "bank5"
+#define RAM_BANK06_TAG  "bank6"
+#define RAM_BANK07_TAG  "bank7"
+
+#define HIBLOCK_BASE_MASK   0x08
+#define HIBLOCK_SELECT_MASK 0x10
+
+READ8_HANDLER( mcu_r );
+WRITE8_HANDLER( mcu_w );
+
 
 /* Z80 SIO for keyboard */
 
