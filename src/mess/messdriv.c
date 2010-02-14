@@ -606,6 +606,8 @@ const game_driver * const drivers[] =
 	DRIVER( at486 )	 /* 19?? IBM AT 486	  */
 	DRIVER( at586 )	 /* 19?? AT 586	  */
 	DRIVER( ficvt503 )	/* 1997 FIC VT-503	*/
+	DRIVER( megapc )
+	DRIVER( megapcpl )
 
 	/* 3Com / Palm / USRobotics */
 	DRIVER( pilot1k )   /* Pilot 1000 */

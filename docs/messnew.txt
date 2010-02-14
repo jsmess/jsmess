@@ -23,6 +23,8 @@ Systems Promoted from GAME_NOT_WORKING:
 
 Skeleton drivers: 
 -----------------
+- Amstrad MegaPC
+- Amstrad MegaPC Plus
 - BestZX
 - Contel Codata Corporation Codata
 - Digital Microsystems DMS-86
