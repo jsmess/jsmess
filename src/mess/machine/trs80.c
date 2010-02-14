@@ -642,6 +642,12 @@ WRITE8_HANDLER( trs80m4_f4_w )
 	}
 
 	wd17xx_dden_w(trs80_fdc, !BIT(data, 7));
+
+	/* CLEAR_LINE means to turn motors on */
+	floppy_mon_w(floppy_get_device(space->machine, 0), (data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
+	floppy_mon_w(floppy_get_device(space->machine, 1), (data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
+	floppy_mon_w(floppy_get_device(space->machine, 2), (data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
+	floppy_mon_w(floppy_get_device(space->machine, 3), (data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_HANDLER( sys80_f8_w )
@@ -903,11 +909,22 @@ WRITE8_HANDLER( trs80_motor_w )
 	}
 
 	if (drive > 3)
+	{	/* Turn motors off */
+		floppy_mon_w(floppy_get_device(space->machine, 0), ASSERT_LINE);
+		floppy_mon_w(floppy_get_device(space->machine, 1), ASSERT_LINE);
+		floppy_mon_w(floppy_get_device(space->machine, 2), ASSERT_LINE);
+		floppy_mon_w(floppy_get_device(space->machine, 3), ASSERT_LINE);
 		return;
+	}
 
 	wd17xx_set_drive(trs80_fdc,drive);
 	wd17xx_set_side(trs80_fdc,head);
 
+	/* Turn motors on */
+	floppy_mon_w(floppy_get_device(space->machine, 0), CLEAR_LINE);
+	floppy_mon_w(floppy_get_device(space->machine, 1), CLEAR_LINE);
+	floppy_mon_w(floppy_get_device(space->machine, 2), CLEAR_LINE);
+	floppy_mon_w(floppy_get_device(space->machine, 3), CLEAR_LINE);
 }
 
 /*************************************
