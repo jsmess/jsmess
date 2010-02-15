@@ -10,7 +10,7 @@
 
     TODO:
 
-	- BOOT ERROR DM 23 (dma controller)
+	- BOOT ERROR PI 24 (Defective PIO Chip)
     - Z80 daisy chain
 	- keyboard CPU ROM
 	- keyboard layout
@@ -741,6 +741,9 @@ static const wd17xx_interface fd1791_intf =
 static const z80_daisy_chain trs80m2_daisy_chain[] =
 {
 	{ Z80CTC_TAG },
+	{ Z80DMA_TAG },
+	{ Z80PIO_TAG },
+	{ Z80SIO_TAG },
 	{ NULL }
 };
 
@@ -775,6 +778,7 @@ static MACHINE_DRIVER_START( trs80m2 )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
+	MDRV_CPU_CONFIG(trs80m2_daisy_chain)
     MDRV_CPU_PROGRAM_MAP(z80_mem)
     MDRV_CPU_IO_MAP(z80_io)
 
