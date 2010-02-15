@@ -72,14 +72,9 @@ static void socrates_snd_clock(SocratesASIC *chip) /* called once per clock */
  *************************************/
 static STREAM_UPDATE( socrates_snd_pcm_update )
 {
-	INT32 mix[48000];
-	INT32 *mixp;
 	SocratesASIC *chip = (SocratesASIC *)param;
 	int i;
 
-	memset(mix, 0, sizeof(mix));
-
-	mixp = &mix[0];
 	for (i = 0; i < samples; i++)
 	{
 		socrates_snd_clock(chip);
