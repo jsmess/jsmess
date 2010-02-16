@@ -629,7 +629,7 @@ static VIDEO_UPDATE( vic20 )
 
 /* Machine Driver */
 
-INTERRUPT_GEN( vic20_raster_interrupt )
+static INTERRUPT_GEN( vic20_raster_interrupt )
 {
 	vic20_state *state = (vic20_state *)device->machine->driver_data;
 	vic656x_raster_interrupt_gen(state->vic6560);

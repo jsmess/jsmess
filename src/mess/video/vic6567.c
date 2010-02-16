@@ -2549,8 +2549,6 @@ static DEVICE_START( vic2 )
 	vic2->lightpen_x_cb = intf->x_cb;
 	vic2->lightpen_y_cb = intf->y_cb;
 
-	vic2->bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED16);
-
 	// immediately call the timer to handle the first line
 	if (vic2->type == VIC6569 || vic2->type == VIC8566)
 		timer_set(device->machine, cpu_clocks_to_attotime(vic2->cpu, 0), vic2, 0, pal_timer_callback);

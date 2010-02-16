@@ -4,8 +4,8 @@
  *
  ****************************************************************************/
 
-#ifndef C16_H_
-#define C16_H_
+#ifndef __C16_H__
+#define __C16_H__
 
 #include "devices/cartslot.h"
 
@@ -28,13 +28,13 @@ extern WRITE8_HANDLER(c16_select_roms);
 extern WRITE8_HANDLER(c16_switch_to_rom);
 extern WRITE8_HANDLER(c16_switch_to_ram);
 
-/* ted reads */
-extern int c16_read_keyboard (int databus);
-extern void c16_interrupt (running_machine *machine, int);
+/* ted reads (passed to the device interface) */
+extern UINT8 c16_read_keyboard(running_machine *machine, int databus);
+extern void c16_interrupt(running_machine *machine, int level);
+extern int c16_dma_read(running_machine *machine, int offset);
+extern int c16_dma_read_rom(running_machine *machine, int offset);
 
 extern DRIVER_INIT( c16 );
-extern DRIVER_INIT( c16c );
-extern DRIVER_INIT( c16v );
 extern MACHINE_RESET( c16 );
 extern MACHINE_START( c16 );
 extern INTERRUPT_GEN( c16_frame_interrupt );
@@ -51,4 +51,4 @@ extern void c364_speech_init(running_machine *machine);
 extern void c364_speech_reset(running_machine *machine);
 
 
-#endif /* C16_H_ */
+#endif /* __C16_H__ */

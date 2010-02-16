@@ -117,7 +117,7 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 #include "sound/sid6581.h"
 
 #include "machine/cbmipt.h"
-#include "video/ted7360.h"
+#include "audio/ted7360.h"
 #include "devices/messram.h"
 #include "machine/c1541.h"
 #include "machine/c1551.h"
@@ -180,7 +180,7 @@ static ADDRESS_MAP_START(c16_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfd10, 0xfd1f) AM_READ(c16_fd1x_r)
 	AM_RANGE(0xfd30, 0xfd3f) AM_READWRITE(c16_6529_port_r, c16_6529_port_w)		/* 6529 keyboard matrix */
 	AM_RANGE(0xfdd0, 0xfddf) AM_WRITE(c16_select_roms) /* rom chips selection */
-	AM_RANGE(0xff00, 0xff1f) AM_READWRITE(ted7360_port_r, ted7360_port_w)
+	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE("ted7360", ted7360_port_r, ted7360_port_w)
 	AM_RANGE(0xff20, 0xffff) AM_READ_BANK("bank8")
 	AM_RANGE(0xff3e, 0xff3e) AM_WRITE(c16_switch_to_rom)
 	AM_RANGE(0xff3f, 0xff3f) AM_WRITE(c16_switch_to_ram)
@@ -207,7 +207,7 @@ static ADDRESS_MAP_START(plus4_map, ADDRESS_SPACE_PROGRAM, 8)
 #if 0
 	AM_RANGE(0xfd40, 0xfd5f) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)	/* sidcard, eoroidpro ... */
 #endif
-	AM_RANGE(0xff00, 0xff1f) AM_READWRITE(ted7360_port_r, ted7360_port_w)
+	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE("ted7360", ted7360_port_r, ted7360_port_w)
 	AM_RANGE(0xff20, 0xffff) AM_READ_BANK("bank8")
 	AM_RANGE(0xff20, 0xff3d) AM_WRITEONLY
 	AM_RANGE(0xff3e, 0xff3e) AM_WRITE(c16_switch_to_rom)
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START(c364_map , ADDRESS_SPACE_PROGRAM, 8)
 #if 0
 	AM_RANGE(0xfd40, 0xfd5f) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)	/* sidcard, eoroidpro ... */
 #endif
-	AM_RANGE(0xff00, 0xff1f) AM_READWRITE(ted7360_port_r, ted7360_port_w)
+	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE("ted7360", ted7360_port_r, ted7360_port_w)
 	AM_RANGE(0xff20, 0xffff) AM_READ_BANK("bank8")
 	AM_RANGE(0xff20, 0xff3d) AM_WRITEONLY
 	AM_RANGE(0xff3e, 0xff3e) AM_WRITE(c16_switch_to_rom)
@@ -328,17 +328,86 @@ INPUT_PORTS_END
  *
  *************************************/
 
+static const unsigned char ted7360_palette[] =
+{
+/* black, white, red, cyan */
+/* purple, green, blue, yellow */
+/* orange, light orange, pink, light cyan, */
+/* light violett, light green, light blue, light yellow */
+/* these 16 colors are 8 times here in different luminance (dark..light) */
+/* taken from digitized tv screenshot */
+	0x06, 0x01, 0x03, 0x2b, 0x2b, 0x2b, 0x67, 0x0e, 0x0f, 0x00, 0x3f, 0x42,
+	0x57, 0x00, 0x6d, 0x00, 0x4e, 0x00, 0x19, 0x1c, 0x94, 0x38, 0x38, 0x00,
+	0x56, 0x20, 0x00, 0x4b, 0x28, 0x00, 0x16, 0x48, 0x00, 0x69, 0x07, 0x2f,
+	0x00, 0x46, 0x26, 0x06, 0x2a, 0x80, 0x2a, 0x14, 0x9b, 0x0b, 0x49, 0x00,
+
+	0x00, 0x03, 0x02, 0x3d, 0x3d, 0x3d, 0x75, 0x1e, 0x20, 0x00, 0x50, 0x4f,
+	0x6a, 0x10, 0x78, 0x04, 0x5c, 0x00, 0x2a, 0x2a, 0xa3, 0x4c, 0x47, 0x00,
+	0x69, 0x2f, 0x00, 0x59, 0x38, 0x00, 0x26, 0x56, 0x00, 0x75, 0x15, 0x41,
+	0x00, 0x58, 0x3d, 0x15, 0x3d, 0x8f, 0x39, 0x22, 0xae, 0x19, 0x59, 0x00,
+
+	0x00, 0x03, 0x04, 0x42, 0x42, 0x42, 0x7b, 0x28, 0x20, 0x02, 0x56, 0x59,
+	0x6f, 0x1a, 0x82, 0x0a, 0x65, 0x09, 0x30, 0x34, 0xa7, 0x50, 0x51, 0x00,
+	0x6e, 0x36, 0x00, 0x65, 0x40, 0x00, 0x2c, 0x5c, 0x00, 0x7d, 0x1e, 0x45,
+	0x01, 0x61, 0x45, 0x1c, 0x45, 0x99, 0x42, 0x2d, 0xad, 0x1d, 0x62, 0x00,
+
+	0x05, 0x00, 0x02, 0x56, 0x55, 0x5a, 0x90, 0x3c, 0x3b, 0x17, 0x6d, 0x72,
+	0x87, 0x2d, 0x99, 0x1f, 0x7b, 0x15, 0x46, 0x49, 0xc1, 0x66, 0x63, 0x00,
+	0x84, 0x4c, 0x0d, 0x73, 0x55, 0x00, 0x40, 0x72, 0x00, 0x91, 0x33, 0x5e,
+	0x19, 0x74, 0x5c, 0x32, 0x59, 0xae, 0x59, 0x3f, 0xc3, 0x32, 0x76, 0x00,
+
+	0x02, 0x01, 0x06, 0x84, 0x7e, 0x85, 0xbb, 0x67, 0x68, 0x45, 0x96, 0x96,
+	0xaf, 0x58, 0xc3, 0x4a, 0xa7, 0x3e, 0x73, 0x73, 0xec, 0x92, 0x8d, 0x11,
+	0xaf, 0x78, 0x32, 0xa1, 0x80, 0x20, 0x6c, 0x9e, 0x12, 0xba, 0x5f, 0x89,
+	0x46, 0x9f, 0x83, 0x61, 0x85, 0xdd, 0x84, 0x6c, 0xef, 0x5d, 0xa3, 0x29,
+
+	0x02, 0x00, 0x0a, 0xb2, 0xac, 0xb3, 0xe9, 0x92, 0x92, 0x6c, 0xc3, 0xc1,
+	0xd9, 0x86, 0xf0, 0x79, 0xd1, 0x76, 0x9d, 0xa1, 0xff, 0xbd, 0xbe, 0x40,
+	0xdc, 0xa2, 0x61, 0xd1, 0xa9, 0x4c, 0x93, 0xc8, 0x3d, 0xe9, 0x8a, 0xb1,
+	0x6f, 0xcd, 0xab, 0x8a, 0xb4, 0xff, 0xb2, 0x9a, 0xff, 0x88, 0xcb, 0x59,
+
+	0x02, 0x00, 0x0a, 0xc7, 0xca, 0xc9, 0xff, 0xac, 0xac, 0x85, 0xd8, 0xe0,
+	0xf3, 0x9c, 0xff, 0x92, 0xea, 0x8a, 0xb7, 0xba, 0xff, 0xd6, 0xd3, 0x5b,
+	0xf3, 0xbe, 0x79, 0xe6, 0xc5, 0x65, 0xb0, 0xe0, 0x57, 0xff, 0xa4, 0xcf,
+	0x89, 0xe5, 0xc8, 0xa4, 0xca, 0xff, 0xca, 0xb3, 0xff, 0xa2, 0xe5, 0x7a,
+
+	0x01, 0x01, 0x01, 0xff, 0xff, 0xff, 0xff, 0xf6, 0xf2, 0xd1, 0xff, 0xff,
+	0xff, 0xe9, 0xff, 0xdb, 0xff, 0xd3, 0xfd, 0xff, 0xff, 0xff, 0xff, 0xa3,
+	0xff, 0xff, 0xc1, 0xff, 0xff, 0xb2, 0xfc, 0xff, 0xa2, 0xff, 0xee, 0xff,
+	0xd1, 0xff, 0xff, 0xeb, 0xff, 0xff, 0xff, 0xf8, 0xff, 0xed, 0xff, 0xbc
+};
 
 static PALETTE_INIT( c16 )
 {
 	int i;
 
-	for ( i = 0; i < sizeof(ted7360_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, ted7360_palette[i*3], ted7360_palette[i*3+1], ted7360_palette[i*3+2]);
-	}
+	for (i = 0; i < sizeof(ted7360_palette) / 3; i++) 
+		palette_set_color_rgb(machine, i, ted7360_palette[i * 3], ted7360_palette[i * 3 + 1], ted7360_palette[i * 3 + 2]);
 }
 
+/*************************************
+ *
+ *  TED7360 interfaces
+ *
+ *************************************/
 
+static const ted7360_interface c16_ted7360_intf = {
+	"screen",
+	TED7360_PAL,
+	c16_dma_read,
+	c16_dma_read_rom,
+	c16_interrupt,
+	c16_read_keyboard
+};
+
+static const ted7360_interface plus4_ted7360_intf = {
+	"screen",
+	TED7360_NTSC,
+	c16_dma_read,
+	c16_dma_read_rom,
+	c16_interrupt,
+	c16_read_keyboard
+};
 
 
 /*************************************
@@ -368,18 +437,32 @@ static CBM_IEC_DAISY( c16_iec_1541 )
 	{ NULL}
 };
 
+static VIDEO_UPDATE( c16 )
+{
+	running_device *ted7360 = devtag_get_device(screen->machine, "ted7360");
+	ted7360_video_update(ted7360, bitmap, cliprect);
+	return 0;
+}
+
+static INTERRUPT_GEN( c16_raster_interrupt )
+{
+	running_device *ted7360 = devtag_get_device(device->machine, "ted7360");
+	ted7360_raster_interrupt_gen(ted7360);
+}
+
+
 static MACHINE_DRIVER_START( c16 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M7501, XTAL_17_73447MHz/20)
 	MDRV_CPU_PROGRAM_MAP(c16_map)
 	MDRV_CPU_CONFIG( c16_m7501_interface )
 	MDRV_CPU_VBLANK_INT("screen", c16_frame_interrupt)
-	MDRV_CPU_PERIODIC_INT(ted7360_raster_interrupt, TED7360_HRETRACERATE)
+	MDRV_CPU_PERIODIC_INT(c16_raster_interrupt, TED7360_HRETRACERATE)
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_RESET( c16 )
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(TED7360PAL_VRETRACERATE)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -389,12 +472,11 @@ static MACHINE_DRIVER_START( c16 )
 	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(ted7360_palette) / 3)
 	MDRV_PALETTE_INIT(c16)
 
-	MDRV_VIDEO_START( ted7360 )
-	MDRV_VIDEO_UPDATE( ted7360 )
+	MDRV_VIDEO_UPDATE( c16 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ted7360", TED7360, 0)
+	MDRV_TED7360_ADD("ted7360", c16_ted7360_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("sid", SID8580, TED7360PAL_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -454,6 +536,10 @@ static MACHINE_DRIVER_START( plus4 )
 	MDRV_SCREEN_REFRESH_RATE(TED7360NTSC_VRETRACERATE)
 
 	MDRV_SOUND_REPLACE("sid", SID8580, TED7360NTSC_CLOCK/4)
+
+	MDRV_DEVICE_REMOVE("ted7360")
+	MDRV_TED7360_ADD("ted7360", plus4_ted7360_intf)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
@@ -617,19 +703,19 @@ ROM_END
 
 /*    YEAR  NAME  PARENT COMPAT MACHINE INPUT   INIT      COMPANY                             FULLNAME            FLAGS */
 
-COMP( 1984, c16,     0,     0,  c16,    c16,    c16,   "Commodore Business Machines Co.",  "Commodore 16 (PAL)", 0)
-COMP( 1984, c16c,    c16,   0,  c16c,   c16,    c16c,  "Commodore Business Machines Co.",  "Commodore 16 (PAL, 1551)", 0 )
-COMP( 1984, c16v,    c16,   0,  c16v,   c16,    c16v,  "Commodore Business Machines Co.",  "Commodore 16 (PAL, VC1541)", 0)
-COMP( 1984, c16hun,  c16,   0,  c16,    c16,    c16,   "Commodore Business Machines Co.",  "Commodore 16 Novotrade (PAL, Hungary)", 0)
+COMP( 1984, c16,     0,     0,  c16,    c16,    c16,   "Commodore Business Machines",  "Commodore 16 (PAL)", 0)
+COMP( 1984, c16c,    c16,   0,  c16c,   c16,    c16,   "Commodore Business Machines",  "Commodore 16 (PAL, 1551)", 0 )
+COMP( 1984, c16v,    c16,   0,  c16v,   c16,    c16,   "Commodore Business Machines",  "Commodore 16 (PAL, VC1541)", 0)
+COMP( 1984, c16hun,  c16,   0,  c16,    c16,    c16,   "Commodore Business Machines",  "Commodore 16 Novotrade (PAL, Hungary)", 0)
 
-COMP( 1984, c116,    c16,   0,  c16,    c16,    c16,   "Commodore Business Machines Co.",  "Commodore 116 (PAL)", 0)
-COMP( 1984, c116c,	 c16,   0,  c16c,   c16,    c16c,  "Commodore Business Machines Co.",  "Commodore 116 (PAL, 1551)", 0 )
-COMP( 1984, c116v,   c16,   0,  c16v,   c16,    c16v,  "Commodore Business Machines Co.",  "Commodore 116 (PAL, VC1541)", 0 )
+COMP( 1984, c116,    c16,   0,  c16,    c16,    c16,   "Commodore Business Machines",  "Commodore 116 (PAL)", 0)
+COMP( 1984, c116c,   c16,   0,  c16c,   c16,    c16,   "Commodore Business Machines",  "Commodore 116 (PAL, 1551)", 0 )
+COMP( 1984, c116v,   c16,   0,  c16v,   c16,    c16,   "Commodore Business Machines",  "Commodore 116 (PAL, VC1541)", 0 )
 
-COMP( 1984, plus4,   c16,   0,  plus4,  plus4,  c16,   "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC)", 0)
-COMP( 1984, plus4c,  c16,   0,  plus4c, plus4,  c16c,  "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, 1551)", 0 )
-COMP( 1984, plus4v,  c16,   0,  plus4v, plus4,  c16v,  "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, VC1541)", 0)
+COMP( 1984, plus4,   c16,   0,  plus4,  plus4,  c16,   "Commodore Business Machines",  "Commodore Plus/4 (NTSC)", 0)
+COMP( 1984, plus4c,  c16,   0,  plus4c, plus4,  c16,   "Commodore Business Machines",  "Commodore Plus/4 (NTSC, 1551)", 0 )
+COMP( 1984, plus4v,  c16,   0,  plus4v, plus4,  c16,   "Commodore Business Machines",  "Commodore Plus/4 (NTSC, VC1541)", 0)
 
-COMP( 1984, c232,    c16,   0,  c16,    c16,    c16,   "Commodore Business Machines Co.",  "Commodore 232 (Prototype)", 0)
-COMP( 1984, c264,    c16,   0,  c264,   plus4,  c16,   "Commodore Business Machines Co.",  "Commodore 264 (Prototype)", 0)
-COMP( 1984, c364,    c16,   0,  c364,   plus4,  c16,   "Commodore Business Machines Co.",  "Commodore V364 (Prototype)", GAME_IMPERFECT_SOUND)
+COMP( 1984, c232,    c16,   0,  c16,    c16,    c16,   "Commodore Business Machines",  "Commodore 232 (Prototype)", 0)
+COMP( 1984, c264,    c16,   0,  c264,   plus4,  c16,   "Commodore Business Machines",  "Commodore 264 (Prototype)", 0)
+COMP( 1984, c364,    c16,   0,  c364,   plus4,  c16,   "Commodore Business Machines",  "Commodore V364 (Prototype)", GAME_IMPERFECT_SOUND)

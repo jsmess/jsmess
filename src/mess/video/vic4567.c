@@ -1980,8 +1980,6 @@ static DEVICE_START( vic3 )
 	vic3->lightpen_x_cb = intf->x_cb;
 	vic3->lightpen_y_cb = intf->y_cb;
 
-	vic3->bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED16);
-
 	vic3->screen[0] = auto_alloc_array(device->machine, UINT8, 216 * 656 / 8);
 
 	for (i = 1; i < 216; i++)

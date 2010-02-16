@@ -711,7 +711,6 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_VIDEO)/cbmb.o		\
 	$(MESS_DRIVERS)/c65.o		\
 	$(MESS_DRIVERS)/c128.o		\
-	$(MESS_VIDEO)/ted7360.o		\
 	$(MESS_MACHINE)/cbmiec.o	\
 	$(MESS_MACHINE)/c1541.o		\
 	$(MESS_MACHINE)/c1551.o		\

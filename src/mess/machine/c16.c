@@ -13,7 +13,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
 
-#include "video/ted7360.h"
+#include "audio/ted7360.h"
 #include "machine/cbmiec.h"
 
 #include "includes/c16.h"
@@ -187,7 +187,9 @@ static void c16_bankswitch( running_machine *machine )
 
 WRITE8_HANDLER( c16_switch_to_rom )
 {
-	ted7360_rom = 1;
+	running_device *ted7360 = devtag_get_device(space->machine, "ted7360");
+
+	ted7360_rom_switch_w(ted7360, 1);
 	c16_bankswitch(space->machine);
 }
 
@@ -206,24 +208,29 @@ WRITE8_HANDLER( c16_switch_to_rom )
  * 1  1  c2 high */
 WRITE8_HANDLER( c16_select_roms )
 {
+	running_device *ted7360 = devtag_get_device(space->machine, "ted7360");
+
 	lowrom = offset & 0x03;
 	highrom = (offset & 0x0c) >> 2;
-	if (ted7360_rom)
+	if (ted7360_rom_switch_r(ted7360))
 		c16_bankswitch(space->machine);
 }
 
 WRITE8_HANDLER( c16_switch_to_ram )
 {
-	ted7360_rom = 0;
+	running_device *ted7360 = devtag_get_device(space->machine, "ted7360");
+
+	ted7360_rom_switch_w(ted7360, 0);
+
 	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(devtag_get_device(space->machine, "messram")) + (0x8000 % messram_get_size(devtag_get_device(space->machine, "messram"))));
 	memory_set_bankptr(space->machine, "bank3", messram_get_ptr(devtag_get_device(space->machine, "messram")) + (0xc000 % messram_get_size(devtag_get_device(space->machine, "messram"))));
 	memory_set_bankptr(space->machine, "bank4", messram_get_ptr(devtag_get_device(space->machine, "messram")) + (0xfc00 % messram_get_size(devtag_get_device(space->machine, "messram"))));
 	memory_set_bankptr(space->machine, "bank8", messram_get_ptr(devtag_get_device(space->machine, "messram")) + (0xff20 % messram_get_size(devtag_get_device(space->machine, "messram"))));
 }
 
-int c16_read_keyboard( int databus )
+UINT8 c16_read_keyboard( running_machine *machine, int databus )
 {
-	int value = 0xff;
+	UINT8 value = 0xff;
 
 	if (!(port6529 & 0x01))
 		value &= keyline[0];
@@ -279,7 +286,7 @@ WRITE8_HANDLER( c16_6529_port_w )
 
 READ8_HANDLER( c16_6529_port_r )
 {
-	return port6529 & (c16_read_keyboard (0xff /*databus */ ) | (port6529 ^ 0xff));
+	return port6529 & (c16_read_keyboard (space->machine, 0xff /*databus */ ) | (port6529 ^ 0xff));
 }
 
 /*
@@ -373,12 +380,12 @@ READ8_HANDLER( c16_6551_port_r )
 	return data;
 }
 
-static READ8_HANDLER( ted7360_dma_read )
+int c16_dma_read( running_machine *machine, int offset )
 {
-	return messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset % messram_get_size(devtag_get_device(space->machine, "messram"))];
+	return messram_get_ptr(devtag_get_device(machine, "messram"))[offset % messram_get_size(devtag_get_device(machine, "messram"))];
 }
 
-static  READ8_HANDLER( ted7360_dma_read_rom )
+int c16_dma_read_rom( running_machine *machine, int offset )
 {
 	/* should read real c16 system bus from 0xfd00 -ff1f */
 	if (offset >= 0xc000)
@@ -398,6 +405,7 @@ static  READ8_HANDLER( ted7360_dma_read_rom )
 				return c16_memory_28000[offset & 0x7fff];
 		}
 	}
+
 	if (offset >= 0x8000)
 	{								   /* rom address in rom */
 		switch (lowrom)
@@ -413,7 +421,7 @@ static  READ8_HANDLER( ted7360_dma_read_rom )
 		}
 	}
 
-	return messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset % messram_get_size(devtag_get_device(space->machine, "messram"))];
+	return messram_get_ptr(devtag_get_device(machine, "messram"))[offset % messram_get_size(devtag_get_device(machine, "messram"))];
 }
 
 void c16_interrupt( running_machine *machine, int level )
@@ -450,35 +458,9 @@ static void c16_common_driver_init( running_machine *machine )
 	c16_memory_2c000 = rom + 0x2c000;
 }
 
-static void c16_driver_init( running_machine *machine )
-{
-	int i;
-
-	c16_common_driver_init(machine);
-
-	/* not sure this is the right place for this. ATM ted7360[] is shared by video and audio TED */
-	for(i = 0; i < 0x20; i++)
-		ted7360[i] = 0x00;
-	ted7360_rom = 1;	// FIX-ME: at start should be RAM or ROM?
-
-	ted7360_init(machine, (read_cfg1(machine) & 0x10) == 0x00);		/* is it PAL? */
-	ted7360_set_dma(ted7360_dma_read, ted7360_dma_read_rom);
-}
-
-
 DRIVER_INIT( c16 )
 {
-	c16_driver_init(machine);
-}
-
-DRIVER_INIT( c16c )
-{
-	c16_driver_init(machine);
-}
-
-DRIVER_INIT( c16v )
-{
-	c16_driver_init(machine);
+	c16_common_driver_init(machine);
 }
 
 MACHINE_START( c16 )
@@ -522,21 +504,18 @@ MACHINE_RESET( c16 )
 		memory_install_write_bank(space, 0xff40, 0xffff, 0, 0, "bank11");
 		memory_set_bankptr(machine, "bank10", messram_get_ptr(devtag_get_device(machine, "messram")) + (0xff20 % messram_get_size(devtag_get_device(machine, "messram"))));
 		memory_set_bankptr(machine, "bank11", messram_get_ptr(devtag_get_device(machine, "messram")) + (0xff40 % messram_get_size(devtag_get_device(machine, "messram"))));
-
-		ted7360_set_dma (ted7360_dma_read, ted7360_dma_read_rom);
 	}
 	else
 	{
 		memory_install_write_bank(space, 0x4000, 0xfcff, 0, 0, "bank10");
 		memory_set_bankptr(machine, "bank10", messram_get_ptr(devtag_get_device(machine, "messram")) + (0x4000 % messram_get_size(devtag_get_device(machine, "messram"))));
-
-		ted7360_set_dma (ted7360_dma_read, ted7360_dma_read_rom);
 	}
 }
 
 
 INTERRUPT_GEN( c16_frame_interrupt )
 {
+	running_device *ted7360 = devtag_get_device(device->machine, "ted7360");
 	int value, i;
 	static const char *const c16ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 
@@ -591,7 +570,7 @@ INTERRUPT_GEN( c16_frame_interrupt )
 			keyline[9] = value;
 	}
 
-	ted7360_frame_interrupt (device);
+	ted7360_frame_interrupt_gen(ted7360);
 
 	set_led_status(device->machine, 1, input_port_read(device->machine, "SPECIAL") & 0x80 ? 1 : 0);		/* Shift Lock */
 	set_led_status(device->machine, 0, input_port_read(device->machine, "SPECIAL") & 0x40 ? 1 : 0);		/* Joystick Swap */

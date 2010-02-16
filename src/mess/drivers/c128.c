@@ -1083,25 +1083,25 @@ ROM_END
 
 /*    YEAR  NAME     PARENT COMPAT MACHINE   INPUT    INIT      COMPANY                             FULLNAME            FLAGS */
 
-COMP( 1985, c128,      0,     0,   c128,     c128,    c128,     "Commodore Business Machines Co.", "Commodore 128 (NTSC)", 0)
-COMP( 1985, c128cr,    c128,  0,   c128,     c128,    c128,     "Commodore Business Machines Co.", "Commodore 128CR (NTSC, proto?)", 0)
+COMP( 1985, c128,      0,     0,   c128,     c128,    c128,     "Commodore Business Machines", "Commodore 128 (NTSC)", 0)
+COMP( 1985, c128cr,    c128,  0,   c128,     c128,    c128,     "Commodore Business Machines", "Commodore 128CR (NTSC, proto?)", 0)
 
-COMP( 1985, c128sfi,   c128,  0,   c128pal,  c128fra, c128pal,  "Commodore Business Machines Co.", "Commodore 128 (PAL, Swedish / Finnish)", 0)
-COMP( 1985, c128fino,  c128,  0,   c128pal,  c128swe, c128pal,  "Commodore Business Machines Co.", "Commodore 128 (PAL, Finland, Unconfirmed Dumps)", 0)
-COMP( 1985, c128fra,   c128,  0,   c128pal,  c128fra, c128pal,  "Commodore Business Machines Co.", "Commodore 128 (PAL, France)", 0)
-COMP( 1985, c128ger,   c128,  0,   c128pal,  c128ger, c128pal,  "Commodore Business Machines Co.", "Commodore 128 (PAL, Germany)", 0)
-COMP( 1985, c128nor,   c128,  0,   c128pal,  c128ita, c128pal,  "Commodore Business Machines Co.", "Commodore 128 (PAL, Norway)", 0)
+COMP( 1985, c128sfi,   c128,  0,   c128pal,  c128fra, c128pal,  "Commodore Business Machines", "Commodore 128 (PAL, Swedish / Finnish)", 0)
+COMP( 1985, c128fino,  c128,  0,   c128pal,  c128swe, c128pal,  "Commodore Business Machines", "Commodore 128 (PAL, Finland, Unconfirmed Dumps)", 0)
+COMP( 1985, c128fra,   c128,  0,   c128pal,  c128fra, c128pal,  "Commodore Business Machines", "Commodore 128 (PAL, France)", 0)
+COMP( 1985, c128ger,   c128,  0,   c128pal,  c128ger, c128pal,  "Commodore Business Machines", "Commodore 128 (PAL, Germany)", 0)
+COMP( 1985, c128nor,   c128,  0,   c128pal,  c128ita, c128pal,  "Commodore Business Machines", "Commodore 128 (PAL, Norway)", 0)
 // we miss other countries: Spain, Belgium, etc.
 
 // the following drivers use a 1571 floppy drive
-COMP( 1985, c128dpr,   c128,  0,   c128d,    c128,    c128d,   "Commodore Business Machines Co.", "Commodore 128D (NTSC, proto)", GAME_NOT_WORKING )
-COMP( 1985, c128d,     c128,  0,   c128dpal, c128,    c128dpal,"Commodore Business Machines Co.", "Commodore 128D (PAL)", GAME_NOT_WORKING )
+COMP( 1985, c128dpr,   c128,  0,   c128d,    c128,    c128d,   "Commodore Business Machines", "Commodore 128D (NTSC, proto)", GAME_NOT_WORKING )
+COMP( 1985, c128d,     c128,  0,   c128dpal, c128,    c128dpal,"Commodore Business Machines", "Commodore 128D (PAL)", GAME_NOT_WORKING )
 
 // the following drivers use a 1571CR floppy drive
-COMP( 1986, c128dcr,   c128,  0,   c128dcr,  c128,    c128dcr, "Commodore Business Machines Co.", "Commodore 128DCR (NTSC)", GAME_NOT_WORKING)
-COMP( 1986, c128drde,  c128,  0,   c128dcrp, c128ger, c128dcrp,"Commodore Business Machines Co.", "Commodore 128DCR (PAL, Germany)", GAME_NOT_WORKING)
-COMP( 1986, c128drit,  c128,  0,   c128dcrp, c128ita, c128dcrp,"Commodore Business Machines Co.", "Commodore 128DCR (PAL, Italy)", GAME_NOT_WORKING)
-COMP( 1986, c128drsw,  c128,  0,   c128dcrp, c128swe, c128dcrp,"Commodore Business Machines Co.", "Commodore 128DCR (PAL, Sweden)", GAME_NOT_WORKING)
+COMP( 1986, c128dcr,   c128,  0,   c128dcr,  c128,    c128dcr, "Commodore Business Machines", "Commodore 128DCR (NTSC)", GAME_NOT_WORKING)
+COMP( 1986, c128drde,  c128,  0,   c128dcrp, c128ger, c128dcrp,"Commodore Business Machines", "Commodore 128DCR (PAL, Germany)", GAME_NOT_WORKING)
+COMP( 1986, c128drit,  c128,  0,   c128dcrp, c128ita, c128dcrp,"Commodore Business Machines", "Commodore 128DCR (PAL, Italy)", GAME_NOT_WORKING)
+COMP( 1986, c128drsw,  c128,  0,   c128dcrp, c128swe, c128dcrp,"Commodore Business Machines", "Commodore 128DCR (PAL, Sweden)", GAME_NOT_WORKING)
 
 // the following driver is a c128 with 1581 floppy drive. it allows us to document 1581 firmware dumps, but it does not do much more
-COMP( 1986, c128d81,   c128,  0,   c128d81,  c128,    c128d81, "Commodore Business Machines Co.", "Commodore 128D/81 (NTSC, proto)", GAME_NOT_WORKING)
+COMP( 1986, c128d81,   c128,  0,   c128d81,  c128,    c128d81, "Commodore Business Machines", "Commodore 128D/81 (NTSC, proto)", GAME_NOT_WORKING)
