@@ -14,8 +14,8 @@
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
 #include "machine/cbmiec.h"
-#include "video/vic4567.h"
 #include "devices/messram.h"
+#include "video/vic4567.h"
 
 #define VERBOSE_LEVEL 0
 #define DBG_LOG( MACHINE, N, M, A ) \
@@ -86,7 +86,7 @@ static READ8_DEVICE_HANDLER( c65_cia0_port_a_r )
 
 static READ8_DEVICE_HANDLER( c65_cia0_port_b_r )
 {
-    UINT8 value = 0xff;
+	UINT8 value = 0xff;
 	UINT8 cia0porta = mos6526_pa_r(devtag_get_device(device->machine, "cia_0"), 0);
 
 	value &= cbm_common_cia0_port_b_r(device, cia0porta);
@@ -94,13 +94,14 @@ static READ8_DEVICE_HANDLER( c65_cia0_port_b_r )
 	if (!(c65_6511_port & 0x02))
 		value &= c65_keyline;
 
-    return value;
+	return value;
 }
 
 static WRITE8_DEVICE_HANDLER( c65_cia0_port_b_w )
 {
 //  was there lightpen support in c65 video chip?
-//  vic2_lightpen_write(data & 0x10);
+//  running_device *vic3 = devtag_get_device(device->machine, "vic3");
+//  vic3_lightpen_write(vic3, data & 0x10);
 }
 
 static void c65_irq( running_machine *machine, int level )
@@ -122,7 +123,7 @@ static void c65_cia0_interrupt( running_device *device, int level )
 }
 
 /* is this correct for c65 as well as c64? */
-static void c65_vic_interrupt( running_machine *machine, int level )
+void c65_vic_interrupt( running_machine *machine, int level )
 {
 	running_device *cia_0 = devtag_get_device(machine, "cia_0");
 #if 1
@@ -693,12 +694,13 @@ static WRITE8_HANDLER( c65_write_io )
 {
 	running_device *sid_0 = devtag_get_device(space->machine, "sid_r");
 	running_device *sid_1 = devtag_get_device(space->machine, "sid_l");
+	running_device *vic3 = devtag_get_device(space->machine, "vic3");
 
 	switch (offset & 0xf00)
 	{
 	case 0x000:
 		if (offset < 0x80)
-			vic3_port_w(space, offset & 0x7f, data);
+			vic3_port_w(vic3, offset & 0x7f, data);
 		else if (offset < 0xa0)
 			c65_fdc_w(space->machine, offset&0x1f,data);
 		else
@@ -710,7 +712,7 @@ static WRITE8_HANDLER( c65_write_io )
 	case 0x100:
 	case 0x200:
 	case 0x300:
-		vic3_palette_w(space, offset-0x100,data);
+		vic3_palette_w(vic3, offset - 0x100, data);
 		break;
 	case 0x400:
 		if (offset<0x420) /* maybe 0x20 */
@@ -756,12 +758,13 @@ static READ8_HANDLER( c65_read_io )
 {
 	running_device *sid_0 = devtag_get_device(space->machine, "sid_r");
 	running_device *sid_1 = devtag_get_device(space->machine, "sid_l");
+	running_device *vic3 = devtag_get_device(space->machine, "vic3");
 
 	switch (offset & 0xf00)
 	{
 	case 0x000:
 		if (offset < 0x80)
-			return vic3_port_r(space, offset & 0x7f);
+			return vic3_port_r(vic3, offset & 0x7f);
 		if (offset < 0xa0)
 			return c65_fdc_r(space->machine, offset&0x1f);
 		else
@@ -824,7 +827,7 @@ static int c65_io_on=0, c65_io_dc00_on=0;
 /* bit 1 external sync enable (genlock)
    bit 2 palette enable
    bit 6 vic3 c65 character set */
-static void c65_bankswitch_interface( running_machine *machine, int value )
+void c65_bankswitch_interface( running_machine *machine, int value )
 {
 	static int old = 0;
 
@@ -975,7 +978,7 @@ void c65_colorram_write( int offset, int value )
  * a15 and a14 portlines
  * 0x1000-0x1fff, 0x9000-0x9fff char rom
  */
-static int c65_dma_read( running_machine *machine, int offset )
+int c65_dma_read( running_machine *machine, int offset )
 {
 	if (!c64_game && c64_exrom)
 	{
@@ -998,7 +1001,7 @@ static int c65_dma_read( running_machine *machine, int offset )
 	return c64_vicaddr[offset & 0x3fff];
 }
 
-static int c65_dma_read_color( running_machine *machine, int offset )
+int c65_dma_read_color( running_machine *machine, int offset )
 {
 	if (c64mode)
 		return c64_colorram[offset & 0x3ff] & 0xf;
@@ -1022,8 +1025,6 @@ static void c65_common_driver_init( running_machine *machine )
 	c64_tape_on = 0;
 
 	/*memset(c64_memory + 0x40000, 0, 0x800000 - 0x40000); */
-
-	vic4567_init(machine, c64_pal, c65_dma_read, c65_dma_read_color, c65_vic_interrupt, c65_bankswitch_interface);
 }
 
 DRIVER_INIT( c65 )

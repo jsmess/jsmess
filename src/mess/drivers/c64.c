@@ -320,6 +320,11 @@ at launch to indicate standard C64 units?
 - What's the difference between Educator 64-1 and Educator 64-2? My guess
 is that Edu64-1 was a standard PET64/CBMB4064 with a different name, while
 the Edu64-1 used the full C64 BIOS. Confirmations are needed, anyway.
+
+
+
+C64DTV TODO:
+  - basically everything! it needs proper bankswitch and specific hardware bits!
  */
 
 #include "emu.h"
@@ -395,7 +400,7 @@ the Edu64-1 used the full C64 BIOS. Confirmations are needed, anyway.
 static ADDRESS_MAP_START(ultimax_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(&c64_memory)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_BASE(&c64_roml)
-	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(vic2_port_r, vic2_port_w)
+	AM_RANGE(0xd000, 0xd3ff) AM_DEVREADWRITE("vic2", vic2_port_r, vic2_port_w)
 	AM_RANGE(0xd400, 0xd7ff) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE( c64_colorram_write) AM_BASE(&c64_colorram) /* colorram  */
 	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE("cia_0", mos6526_r, mos6526_w)
@@ -494,12 +499,34 @@ INPUT_PORTS_END
  *
  *************************************/
 
+static const unsigned char c64_palette[] =
+{
+/* black, white, red, cyan */
+/* purple, green, blue, yellow */
+/* orange, brown, light red, dark gray, */
+/* medium gray, light green, light blue, light gray */
+/* taken from the vice emulator */
+	0x00, 0x00, 0x00,  0xfd, 0xfe, 0xfc,  0xbe, 0x1a, 0x24,  0x30, 0xe6, 0xc6,
+	0xb4, 0x1a, 0xe2,  0x1f, 0xd2, 0x1e,  0x21, 0x1b, 0xae,  0xdf, 0xf6, 0x0a,
+	0xb8, 0x41, 0x04,  0x6a, 0x33, 0x04,  0xfe, 0x4a, 0x57,  0x42, 0x45, 0x40,
+	0x70, 0x74, 0x6f,  0x59, 0xfe, 0x59,  0x5f, 0x53, 0xfe,  0xa4, 0xa7, 0xa2
+};
+
+static PALETTE_INIT( c64 )
+{
+	int i;
+
+	for (i = 0; i < sizeof(c64_palette) / 3; i++) 
+	{
+		palette_set_color_rgb(machine, i, c64_palette[i * 3], c64_palette[i * 3 + 1], c64_palette[i * 3 + 2]);
+	}
+}
 
 static PALETTE_INIT( pet64 )
 {
 	int i;
 	for (i = 0; i < 16; i++)
-		palette_set_color_rgb(machine, i, 0, vic2_palette[i * 3 + 1], 0);
+		palette_set_color_rgb(machine, i, 0, c64_palette[i * 3 + 1], 0);
 }
 
 
@@ -531,6 +558,110 @@ static CBM_IEC_DAISY( cbm_iec_daisy )
 	{ NULL}
 };
 
+
+/*************************************
+ *
+ *  VIC II interfaces
+ *
+ *************************************/
+
+static VIDEO_UPDATE( c64 )
+{
+	running_device *vic2 = devtag_get_device(screen->machine, "vic2");
+
+	vic2_video_update(vic2, bitmap, cliprect);
+	return 0;
+}
+
+static UINT8 c64_lightpen_x_cb( running_machine *machine )
+{
+	return input_port_read(machine, "LIGHTX") & ~0x01;
+}
+
+static UINT8 c64_lightpen_y_cb( running_machine *machine )
+{
+	return input_port_read(machine, "LIGHTY") & ~0x01;
+}
+
+static UINT8 c64_lightpen_button_cb( running_machine *machine )
+{
+	return input_port_read(machine, "OTHER") & 0x04;
+}
+
+static int c64_dma_read( running_machine *machine, int offset )
+{
+	if (!c64_game && c64_exrom)
+	{
+		if (offset < 0x3000)
+			return c64_memory[offset];
+
+		return c64_romh[offset & 0x1fff];
+	}
+
+	if (((c64_vicaddr - c64_memory + offset) & 0x7000) == 0x1000)
+		return c64_chargen[offset & 0xfff];
+
+	return c64_vicaddr[offset];
+}
+
+static int c64_dma_read_ultimax( running_machine *machine, int offset )
+{
+	if (offset < 0x3000)
+		return c64_memory[offset];
+
+	return c64_romh[offset & 0x1fff];
+}
+
+static int c64_dma_read_color( running_machine *machine, int offset )
+{
+	return c64_colorram[offset & 0x3ff] & 0xf;
+}
+
+static UINT8 c64_rdy_cb( running_machine *machine )
+{
+	return input_port_read(machine, "CTRLSEL") & 0x08;
+}
+
+static const vic2_interface c64_vic2_ntsc_intf = {
+	"screen",
+	"maincpu",
+	VIC6567,
+	c64_lightpen_x_cb,
+	c64_lightpen_y_cb,
+	c64_lightpen_button_cb,
+	c64_dma_read, 
+	c64_dma_read_color,
+	c64_vic_interrupt,
+	c64_rdy_cb
+};
+
+static const vic2_interface c64_vic2_pal_intf = {
+	"screen",
+	"maincpu",
+	VIC6569,
+	c64_lightpen_x_cb,
+	c64_lightpen_y_cb,
+	c64_lightpen_button_cb,
+	c64_dma_read, 
+	c64_dma_read_color,
+	c64_vic_interrupt,
+	c64_rdy_cb
+};
+
+static const vic2_interface ultimax_vic2_intf = {
+	"screen",
+	"maincpu",
+	VIC6567,
+	c64_lightpen_x_cb,
+	c64_lightpen_y_cb,
+	c64_lightpen_button_cb,
+	c64_dma_read_ultimax, 
+	c64_dma_read_color,
+	c64_vic_interrupt,
+	c64_rdy_cb
+};
+
+
 /*************************************
  *
  *  Machine driver
@@ -550,10 +681,19 @@ static MACHINE_DRIVER_START( c64 )
 	MDRV_MACHINE_RESET( c64 )
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( vh_vic2 )
-	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
+	MDRV_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
+
+	MDRV_PALETTE_INIT( c64 )
+	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(c64_palette) / 3)
+
+	MDRV_VIDEO_UPDATE( c64 )
+
+	MDRV_VIC2_ADD("vic2", c64_vic2_ntsc_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -592,10 +732,19 @@ static MACHINE_DRIVER_START( c64pal )
 	MDRV_MACHINE_RESET( c64 )
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( vh_vic2_pal )
-	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) /* 2500 not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES)
+	MDRV_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1)
+
+	MDRV_PALETTE_INIT( c64 )
+	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(c64_palette) / 3)
+
+	MDRV_VIDEO_UPDATE( c64 )
+
+	MDRV_VIC2_ADD("vic2", c64_vic2_pal_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -631,6 +780,9 @@ static MACHINE_DRIVER_START( ultimax )
 	MDRV_SOUND_REPLACE("sid6581", SID6581, VIC6567_CLOCK)
 	MDRV_SOUND_CONFIG(c64_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_DEVICE_REMOVE("vic2")
+	MDRV_VIC2_ADD("vic2", ultimax_vic2_intf)
 
 	MDRV_DEVICE_REMOVE("iec")
 	MDRV_DEVICE_REMOVE("c1541")
@@ -788,6 +940,20 @@ ROM_START( c64gs )
 	ROM_REGION( 0x80000, "cart", ROMREGION_ERASE00 )
 ROM_END
 
+
+// BASIC sits at 0xa000-0xc000, chargen-like chunks sit at 0x1000-0x2000, 0x9000-0xa000 and 0xd000-0xe000
+// kernel sits at 0xe000
+// from 0x10000 on there are the games
+ROM_START( c64dtv )
+	ROM_REGION( 0x220000, "maincpu", 0 )
+	ROM_LOAD( "flash.u2", 0x020000, 0x200000, CRC(b820375a) SHA1(b9f88919e2bed825eb2b2cb605977d55971b423b) )
+	// the code below is just for testing purpose... we should implement properly the rom banking!
+	ROM_COPY("maincpu", 0x2a000, 0x10000, 0x2000)
+	ROM_COPY("maincpu", 0x2e000, 0x12000, 0x2000)
+	ROM_COPY("maincpu", 0x2d000, 0x14000, 0x1000)
+ROM_END
+
+
 /***************************************************************************
 
   Game driver(s)
@@ -796,7 +962,7 @@ ROM_END
 
 /*   YEAR  NAME   PARENT COMPAT MACHINE  INPUT    INIT     COMPANY                            FULLNAME */
 
-COMP(1982, max,	    0,    0,    ultimax, c64,     ultimax, "Commodore Business Machines Co.", "Commodore Max Machine", 0)
+COMP(1982, max,	  0,    0,    ultimax, c64,     ultimax, "Commodore Business Machines Co.", "Commodore Max Machine", 0)
 
 COMP(1982, c64,     0,    0,    c64,     c64,     c64,     "Commodore Business Machines Co.", "Commodore 64 (NTSC)", 0)
 COMP(1982, c64pal,  c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines Co.", "Commodore 64 (PAL)",  0)
@@ -804,7 +970,7 @@ COMP(1982, c64jpn,  c64,  0,    c64,     c64,     c64,     "Commodore Business M
 COMP(1982, vic64s,  c64,  0,    c64pal,  vic64s,  c64pal,  "Commodore Business Machines Co.", "VIC 64S", 0)
 COMP(1982, c64swe,  c64,  0,    c64pal,  vic64s,  c64pal,  "Commodore Business Machines Co.", "Commodore 64 (Sweden/Finland)", 0)
 
-COMP(1983, pet64,	c64,  0,    pet64,   c64,     c64,     "Commodore Business Machines Co.", "PET 64 (NTSC)", 0)
+COMP(1983, pet64,	  c64,  0,    pet64,   c64,     c64,     "Commodore Business Machines Co.", "PET 64 (NTSC)", 0)
 COMP(1983, cbm4064, c64,  0,    pet64,   c64,     c64,     "Commodore Business Machines Co.", "CBM 4064 (NTSC)", 0)
 COMP(1983, edu64,   c64,  0,    pet64,   c64,     c64,     "Commodore Business Machines Co.", "Educator 64 (NTSC)", 0) // maybe different palette?
 
@@ -817,3 +983,5 @@ COMP(1986, c64cpal, c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business M
 COMP(1986, c64g,    c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines Co.", "Commodore 64G (PAL)", 0)
 
 CONS(1990, c64gs,   c64,  0,    c64gs,   c64gs,   c64gs,   "Commodore Business Machines Co.", "Commodore 64 Games System (PAL)", 0)
+
+CONS(2005, c64dtv,  c64,  0,    c64,     c64,     c64,     "The Toy:Lobster Company", "Commodore 64 Direct-to-TV (Version 2 050711)", GAME_NOT_WORKING)

@@ -252,7 +252,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c128_z80_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x1000, 0x13ff) AM_READWRITE(c64_colorram_read, c64_colorram_write)
-	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(vic2_port_r, vic2_port_w)
+	AM_RANGE(0xd000, 0xd3ff) AM_DEVREADWRITE("vic2e", vic2_port_r, vic2_port_w)
 	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)
 	AM_RANGE(0xd500, 0xd5ff) AM_READWRITE(c128_mmu8722_port_r, c128_mmu8722_port_w)
 	AM_RANGE(0xd600, 0xd7ff) AM_READWRITE(vdc8563_port_r, vdc8563_port_w)
@@ -509,17 +509,31 @@ INPUT_PORTS_END
  *
  *************************************/
 
+static const unsigned char vic2_palette[] =
+{
+/* black, white, red, cyan */
+/* purple, green, blue, yellow */
+/* orange, brown, light red, dark gray, */
+/* medium gray, light green, light blue, light gray */
+/* taken from the vice emulator */
+	0x00, 0x00, 0x00,  0xfd, 0xfe, 0xfc,  0xbe, 0x1a, 0x24,  0x30, 0xe6, 0xc6,
+	0xb4, 0x1a, 0xe2,  0x1f, 0xd2, 0x1e,  0x21, 0x1b, 0xae,  0xdf, 0xf6, 0x0a,
+	0xb8, 0x41, 0x04,  0x6a, 0x33, 0x04,  0xfe, 0x4a, 0x57,  0x42, 0x45, 0x40,
+	0x70, 0x74, 0x6f,  0x59, 0xfe, 0x59,  0x5f, 0x53, 0xfe,  0xa4, 0xa7, 0xa2
+};
 
 static PALETTE_INIT( c128 )
 {
 	int i;
 
-	for ( i = 0; i < sizeof(vic2_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, vic2_palette[i*3], vic2_palette[i*3+1], vic2_palette[i*3+2]);
+	for (i = 0; i < sizeof(vic2_palette) / 3; i++) 
+	{
+		palette_set_color_rgb(machine, i, vic2_palette[i * 3], vic2_palette[i * 3 + 1], vic2_palette[i * 3 + 2]);
 	}
 
-	for ( i = 0; i < sizeof(vdc8563_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i + sizeof(vic2_palette) / 3, vdc8563_palette[i*3], vdc8563_palette[i*3+1], vdc8563_palette[i*3+2]);
+	for (i = 0; i < sizeof(vdc8563_palette) / 3; i++) 
+	{
+		palette_set_color_rgb(machine, i + sizeof(vic2_palette) / 3, vdc8563_palette[i * 3], vdc8563_palette[i * 3 + 1], vdc8563_palette[i * 3 + 2]);
 	}
 }
 
@@ -597,6 +611,59 @@ static CBM_IEC_DAISY( c128d81_iec_bus )
 
 /*************************************
  *
+ *  VIC II interfaces
+ *
+ *************************************/
+
+static UINT8 c128_lightpen_x_cb( running_machine *machine )
+{
+	return input_port_read(machine, "LIGHTX") & ~0x01;
+}
+
+static UINT8 c128_lightpen_y_cb( running_machine *machine )
+{
+	return input_port_read(machine, "LIGHTY") & ~0x01;
+}
+
+static UINT8 c128_lightpen_button_cb( running_machine *machine )
+{
+	return input_port_read(machine, "OTHER") & 0x04;
+}
+
+static UINT8 c128_rdy_cb( running_machine *machine )
+{
+	return input_port_read(machine, "CTRLSEL") & 0x08;
+}
+
+static const vic2_interface c128_vic2_ntsc_intf = {
+	"screen",
+	"maincpu",
+	VIC8564,
+	c128_lightpen_x_cb,
+	c128_lightpen_y_cb,
+	c128_lightpen_button_cb,
+	c128_dma_read, 
+	c128_dma_read_color,
+	c128_vic_interrupt,
+	c128_rdy_cb
+};
+
+static const vic2_interface c128_vic2_pal_intf = {
+	"screen",
+	"maincpu",
+	VIC8566,
+	c128_lightpen_x_cb,
+	c128_lightpen_y_cb,
+	c128_lightpen_button_cb,
+	c128_dma_read, 
+	c128_dma_read_color,
+	c128_vic_interrupt,
+	c128_rdy_cb
+};
+
+/*************************************
+
+ *
  *  Machine driver
  *
  *************************************/
@@ -618,7 +685,7 @@ static MACHINE_DRIVER_START( c128 )
 	MDRV_MACHINE_START( c128 )
 	MDRV_MACHINE_RESET( c128 )
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -632,6 +699,8 @@ static MACHINE_DRIVER_START( c128 )
 
 	MDRV_VIDEO_START( c128 )
 	MDRV_VIDEO_UPDATE( c128 )
+
+	MDRV_VIC2_ADD("vic2e", c128_vic2_ntsc_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -690,6 +759,9 @@ static MACHINE_DRIVER_START( c128pal )
 	MDRV_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
 	MDRV_SCREEN_SIZE(VIC6569_COLUMNS * 2, VIC6569_LINES)
 	MDRV_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1)
+
+	MDRV_DEVICE_REMOVE("vic2e")
+	MDRV_VIC2_ADD("vic2e", c128_vic2_pal_intf)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("sid6581", SID6581, VIC6569_CLOCK)

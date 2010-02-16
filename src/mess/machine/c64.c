@@ -21,7 +21,6 @@
 #include "machine/6526cia.h"
 #include "machine/cbmiec.h"
 #include "video/vic6567.h"
-#include "video/vdc8563.h"
 
 #include "includes/cbm.h"
 #include "includes/c64.h"
@@ -116,7 +115,8 @@ static READ8_DEVICE_HANDLER( c64_cia0_port_b_r )
 
 static WRITE8_DEVICE_HANDLER( c64_cia0_port_b_w )
 {
-    vic2_lightpen_write(data & 0x10);
+	running_device *vic2 = devtag_get_device(device->machine, "vic2");
+	vic2_lightpen_write(vic2, data & 0x10);
 }
 
 static void c64_irq( running_machine *machine, int level )
@@ -142,7 +142,7 @@ void c64_vic_interrupt( running_machine *machine, int level )
 #if 1
 	if (level != vicirq)
 	{
-		c64_irq (machine, level || mos6526_irq_r(cia_0));
+		c64_irq(machine, level || mos6526_irq_r(cia_0));
 		vicirq = level;
 	}
 #endif
@@ -268,10 +268,11 @@ WRITE8_HANDLER( c64_write_io )
 	running_device *cia_0 = devtag_get_device(space->machine, "cia_0");
 	running_device *cia_1 = devtag_get_device(space->machine, "cia_1");
 	running_device *sid = devtag_get_device(space->machine, "sid6581");
+	running_device *vic2 = devtag_get_device(space->machine, "vic2");
 
 	c64_io_mirror[offset] = data;
 	if (offset < 0x400)
-		vic2_port_w(space, offset & 0x3ff, data);
+		vic2_port_w(vic2, offset & 0x3ff, data);
 	else if (offset < 0x800)
 		sid6581_w(sid, offset & 0x3ff, data);
 	else if (offset < 0xc00)
@@ -304,9 +305,10 @@ READ8_HANDLER( c64_read_io )
 	running_device *cia_0 = devtag_get_device(space->machine, "cia_0");
 	running_device *cia_1 = devtag_get_device(space->machine, "cia_1");
 	running_device *sid = devtag_get_device(space->machine, "sid6581");
+	running_device *vic2 = devtag_get_device(space->machine, "vic2");
 
 	if (offset < 0x400)
-		return vic2_port_r(space, offset & 0x3ff);
+		return vic2_port_r(vic2, offset & 0x3ff);
 
 	else if (offset < 0x800)
 		return sid6581_r(sid, offset & 0x3ff);
@@ -742,40 +744,6 @@ WRITE8_HANDLER( c64_colorram_write )
 	c64_colorram[offset & 0x3ff] = data | 0xf0;
 }
 
-/*
- * only 14 address lines
- * a15 and a14 portlines
- * 0x1000-0x1fff, 0x9000-0x9fff char rom
- */
-static int c64_dma_read( running_machine *machine, int offset )
-{
-	if (!c64_game && c64_exrom)
-	{
-		if (offset < 0x3000)
-			return c64_memory[offset];
-
-		return c64_romh[offset & 0x1fff];
-	}
-
-	if (((c64_vicaddr - c64_memory + offset) & 0x7000) == 0x1000)
-		return c64_chargen[offset & 0xfff];
-
-	return c64_vicaddr[offset];
-}
-
-static int c64_dma_read_ultimax( running_machine *machine, int offset )
-{
-	if (offset < 0x3000)
-		return c64_memory[offset];
-
-	return c64_romh[offset & 0x1fff];
-}
-
-static int c64_dma_read_color( running_machine *machine, int offset )
-{
-	return c64_colorram[offset & 0x3ff] & 0xf;
-}
-
 TIMER_CALLBACK( c64_tape_timer )
 {
 	double tmp = cassette_input(devtag_get_device(machine, "cassette"));
@@ -799,11 +767,6 @@ static void c64_common_driver_init( running_machine *machine )
 
 	if (c64_tape_on)
 		datasette_timer = timer_alloc(machine, c64_tape_timer, NULL);
-
-	if (ultimax)
-		vic6567_init(0, c64_pal, c64_dma_read_ultimax, c64_dma_read_color, c64_vic_interrupt);
-	else
-		vic6567_init(0, c64_pal, c64_dma_read, c64_dma_read_color, c64_vic_interrupt);
 
 	// "cyberload" tape loader check the e000-ffff ram; the init ram need to return different value
 	{

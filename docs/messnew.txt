@@ -12,6 +12,7 @@ New System Drivers Supported:
 - MK-88 [Miodrag Milanovic]
 - Poisk-1, Poisk-2 [Miodrag Milanovic]
 - PK8020 Neiva, PK8020 Kontur [Miodrag Milanovic]
+- C64 Direct-to-TV (not working) [Guru, Fabio Priuli]
 
 
 

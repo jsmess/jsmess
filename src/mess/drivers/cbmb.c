@@ -162,7 +162,7 @@ static ADDRESS_MAP_START(p500_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf8000, 0xfbfff) AM_ROM AM_BASE(&cbmb_basic)
 	AM_RANGE(0xfd000, 0xfd3ff) AM_RAM AM_BASE(&cbmb_videoram)		/* videoram */
 	AM_RANGE(0xfd400, 0xfd7ff) AM_RAM_WRITE(cbmb_colorram_w) AM_BASE(&cbmb_colorram)		/* colorram */
-	AM_RANGE(0xfd800, 0xfd8ff) AM_READWRITE(vic2_port_r, vic2_port_w)
+	AM_RANGE(0xfd800, 0xfd8ff) AM_DEVREADWRITE("vic6567", vic2_port_r, vic2_port_w)
 	/* disk units */
 	AM_RANGE(0xfda00, 0xfdaff) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)
 	/* db00 coprocessor */
@@ -311,6 +311,72 @@ static const mc6845_interface cbm700_crtc = {
 	NULL
 };
 
+/* p500 uses a VIC II chip */
+
+static const unsigned char p500_palette[] =
+{
+/* black, white, red, cyan */
+/* purple, green, blue, yellow */
+/* orange, brown, light red, dark gray, */
+/* medium gray, light green, light blue, light gray */
+/* taken from the vice emulator */
+	0x00, 0x00, 0x00,  0xfd, 0xfe, 0xfc,  0xbe, 0x1a, 0x24,  0x30, 0xe6, 0xc6,
+	0xb4, 0x1a, 0xe2,  0x1f, 0xd2, 0x1e,  0x21, 0x1b, 0xae,  0xdf, 0xf6, 0x0a,
+	0xb8, 0x41, 0x04,  0x6a, 0x33, 0x04,  0xfe, 0x4a, 0x57,  0x42, 0x45, 0x40,
+	0x70, 0x74, 0x6f,  0x59, 0xfe, 0x59,  0x5f, 0x53, 0xfe,  0xa4, 0xa7, 0xa2
+};
+
+static PALETTE_INIT( p500 )
+{
+	int i;
+
+	for (i = 0; i < sizeof(p500_palette) / 3; i++) 
+	{
+		palette_set_color_rgb(machine, i, p500_palette[i * 3], p500_palette[i * 3 + 1], p500_palette[i * 3 + 2]);
+	}
+}
+
+static VIDEO_UPDATE( p500 )
+{
+	running_device *vic2 = devtag_get_device(screen->machine, "vic6567");
+
+	vic2_video_update(vic2, bitmap, cliprect);
+	return 0;
+}
+
+static UINT8 cbmb_lightpen_x_cb( running_machine *machine )
+{
+	return input_port_read(machine, "LIGHTX") & ~0x01;
+}
+
+static UINT8 cbmb_lightpen_y_cb( running_machine *machine )
+{
+	return input_port_read(machine, "LIGHTY") & ~0x01;
+}
+
+static UINT8 cbmb_lightpen_button_cb( running_machine *machine )
+{
+	return input_port_read(machine, "OTHER") & 0x04;
+}
+
+static UINT8 cbmb_rdy_cb( running_machine *machine )
+{
+	return input_port_read(machine, "CTRLSEL") & 0x08;
+}
+
+
+static const vic2_interface p500_vic2_intf = {
+	"screen",
+	"maincpu",
+	VIC6567,
+	cbmb_lightpen_x_cb,
+	cbmb_lightpen_y_cb,
+	cbmb_lightpen_button_cb,
+	cbmb_dma_read, 
+	cbmb_dma_read_color,
+	NULL,
+	cbmb_rdy_cb
+};
 
 /*************************************
  *
@@ -444,10 +510,19 @@ static MACHINE_DRIVER_START( p500 )
 	MDRV_MACHINE_RESET( cbmb )
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( vh_vic2 )
-	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
+	MDRV_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
 	MDRV_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+
+	MDRV_PALETTE_INIT( p500 )
+	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(p500_palette) / 3)
+
+	MDRV_VIDEO_UPDATE( p500 )
+
+	MDRV_VIC2_ADD("vic6567", p500_vic2_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

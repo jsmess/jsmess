@@ -11,7 +11,6 @@
 #include "machine/6526cia.h"
 
 #include "includes/cbm.h"
-#include "video/vic6567.h"
 #include "machine/ieee488.h"
 
 #include "includes/cbmb.h"
@@ -291,7 +290,7 @@ WRITE8_HANDLER( cbmb_colorram_w )
 	cbmb_colorram[offset] = data | 0xf0;
 }
 
-static int cbmb_dma_read( running_machine *machine, int offset )
+int cbmb_dma_read( running_machine *machine, int offset )
 {
 	if (offset >= 0x1000)
 		return cbmb_videoram[offset & 0x3ff];
@@ -299,7 +298,7 @@ static int cbmb_dma_read( running_machine *machine, int offset )
 		return cbmb_chargen[offset & 0xfff];
 }
 
-static int cbmb_dma_read_color( running_machine *machine, int offset )
+int cbmb_dma_read_color( running_machine *machine, int offset )
 {
 	return cbmb_colorram[offset & 0x3ff];
 }
@@ -359,7 +358,6 @@ DRIVER_INIT( p500 )
 	cbmb_common_driver_init(machine);
 	state->p500 = 1;
 	state->cbm_ntsc = 1;
-	vic6567_init(0, 0, cbmb_dma_read, cbmb_dma_read_color, NULL);
 }
 
 MACHINE_RESET( cbmb )

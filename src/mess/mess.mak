@@ -735,6 +735,7 @@ $(MESSOBJ)/cbmshare.a:			\
 	$(MESS_MACHINE)/c128.o		\
 	$(MESS_VIDEO)/vdc8563.o		\
 	$(MESS_VIDEO)/vic6567.o		\
+	$(MESS_VIDEO)/vic4567.o		\
 
 $(MESSOBJ)/cccp.a:				\
 	$(MESS_VIDEO)/lviv.o		\

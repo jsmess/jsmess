@@ -4,26 +4,166 @@
  *
  ****************************************************************************/
 
-#ifndef VIC4567_H_
-#define VIC4567_H_
+#ifndef __VIC4567_H__
+#define __VIC4567_H__
+
+#include "devcb.h"
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef UINT8 (*vic3_lightpen_x_callback)(running_machine *machine);
+typedef UINT8 (*vic3_lightpen_y_callback)(running_machine *machine);
+typedef UINT8 (*vic3_lightpen_button_callback)(running_machine *machine);
+
+typedef int (*vic3_dma_read)(running_machine *machine, int);
+typedef int (*vic3_dma_read_color)(running_machine *machine, int);
+typedef void (*vic3_irq) (running_machine *, int);
+
+typedef void (*vic3_port_changed_callback) (running_machine *, int);
+
+typedef UINT8 (*vic3_c64mem_callback)(int offset);
+
+typedef enum
+{
+	VIC4567_NTSC,
+	VIC4567_PAL
+} vic3_type;
+
+typedef struct _vic3_interface vic3_interface;
+struct _vic3_interface
+{
+	const char         *screen;
+	const char         *cpu;
+
+	vic3_type type;
+
+	vic3_lightpen_x_callback        x_cb;
+	vic3_lightpen_y_callback        y_cb;
+	vic3_lightpen_button_callback   button_cb;
+
+	vic3_dma_read          dma_read;
+	vic3_dma_read_color    dma_read_color;
+	vic3_irq               irq;
+
+	vic3_port_changed_callback        port_changed;
+
+	vic3_c64mem_callback      c64_mem_r;
+};
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+#define VIC6567_CLOCK		(1022700 /* = 8181600 / 8) */ )
+#define VIC6569_CLOCK		( 985248 /* = 7881984 / 8) */ )
+
+#define VIC6567_CYCLESPERLINE	65
+#define VIC6569_CYCLESPERLINE	63
+
+#define VIC6567_LINES		263
+#define VIC6569_LINES		312
+
+#define VIC6567_VRETRACERATE	(59.8245100906698 /* = 1022700 / (65 * 263) */ )
+#define VIC6569_VRETRACERATE	(50.1245421245421 /* =  985248 / (63 * 312) */ )
+
+#define VIC6567_HRETRACERATE	(VIC6567_CLOCK / VIC6567_CYCLESPERLINE)
+#define VIC6569_HRETRACERATE	(VIC6569_CLOCK / VIC6569_CYCLESPERLINE)
+
+#define VIC2_HSIZE		320
+#define VIC2_VSIZE		200
+
+#define VIC6567_VISIBLELINES	235
+#define VIC6569_VISIBLELINES	284
+
+#define VIC6567_FIRST_DMA_LINE	0x30
+#define VIC6569_FIRST_DMA_LINE	0x30
+
+#define VIC6567_LAST_DMA_LINE	0xf7
+#define VIC6569_LAST_DMA_LINE	0xf7
+
+#define VIC6567_FIRST_DISP_LINE	0x29
+#define VIC6569_FIRST_DISP_LINE	0x10
+
+#define VIC6567_LAST_DISP_LINE	(VIC6567_FIRST_DISP_LINE + VIC6567_VISIBLELINES - 1)
+#define VIC6569_LAST_DISP_LINE	(VIC6569_FIRST_DISP_LINE + VIC6569_VISIBLELINES - 1)
+
+#define VIC6567_RASTER_2_EMU(a) ((a >= VIC6567_FIRST_DISP_LINE) ? (a - VIC6567_FIRST_DISP_LINE) : (a + 222))
+#define VIC6569_RASTER_2_EMU(a) (a - VIC6569_FIRST_DISP_LINE)
+
+#define VIC6567_FIRSTCOLUMN	50
+#define VIC6569_FIRSTCOLUMN	50
+
+#define VIC6567_VISIBLECOLUMNS	418
+#define VIC6569_VISIBLECOLUMNS	403
+
+#define VIC6567_X_2_EMU(a)	(a)
+#define VIC6569_X_2_EMU(a)	(a)
+
+#define VIC6567_STARTVISIBLELINES ((VIC6567_LINES - VIC6567_VISIBLELINES)/2)
+#define VIC6569_STARTVISIBLELINES 16 /* ((VIC6569_LINES - VIC6569_VISIBLELINES)/2) */
+
+#define VIC6567_FIRSTRASTERLINE 34
+#define VIC6569_FIRSTRASTERLINE 0
+
+#define VIC6567_COLUMNS 512
+#define VIC6569_COLUMNS 504
+
+
+#define VIC6567_STARTVISIBLECOLUMNS ((VIC6567_COLUMNS - VIC6567_VISIBLECOLUMNS)/2)
+#define VIC6569_STARTVISIBLECOLUMNS ((VIC6569_COLUMNS - VIC6569_VISIBLECOLUMNS)/2)
+
+#define VIC6567_FIRSTRASTERCOLUMNS 412
+#define VIC6569_FIRSTRASTERCOLUMNS 404
+
+#define VIC6569_FIRST_X 0x194
+#define VIC6567_FIRST_X 0x19c
+
+#define VIC6569_FIRST_VISIBLE_X 0x1e0
+#define VIC6567_FIRST_VISIBLE_X 0x1e8
+
+#define VIC6569_MAX_X 0x1f7
+#define VIC6567_MAX_X 0x1ff
+
+#define VIC6569_LAST_VISIBLE_X 0x17c
+#define VIC6567_LAST_VISIBLE_X 0x184
+
+#define VIC6569_LAST_X 0x193
+#define VIC6567_LAST_X 0x19b
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+DEVICE_GET_INFO( vic3 );
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define VIC3 DEVICE_GET_INFO_NAME( vic3 )
+
+#define MDRV_VIC3_ADD(_tag, _interface) \
+	MDRV_DEVICE_ADD(_tag, VIC3, 0) \
+	MDRV_DEVICE_CONFIG(_interface)
 
 
 /*----------- defined in video/vic4567.c -----------*/
 
-extern const unsigned char vic3_palette[0x100 * 3];
-
-extern void vic4567_init (running_machine *machine, int pal, int (*dma_read)(running_machine *, int),
-						  int (*dma_read_color)(running_machine *, int), void (*irq)(running_machine *, int),
-						  void (*param_port_changed)(running_machine *, int));
-
-extern INTERRUPT_GEN( vic3_raster_irq );
-
 /* to be called when writting to port */
-extern WRITE8_HANDLER ( vic3_port_w );
-WRITE8_HANDLER( vic3_palette_w );
+WRITE8_DEVICE_HANDLER( vic3_port_w );
+WRITE8_DEVICE_HANDLER( vic3_palette_w );
 
 /* to be called when reading from port */
-extern  READ8_HANDLER ( vic3_port_r );
+READ8_DEVICE_HANDLER( vic3_port_r );
+READ8_DEVICE_HANDLER( vic3_palette_red_r );
+READ8_DEVICE_HANDLER( vic3_palette_green_r );
+READ8_DEVICE_HANDLER( vic3_palette_blue_r );
+
+void vic3_raster_interrupt_gen( running_device *device );
+UINT32 vic3_video_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect );
 
 
-#endif /* VIC4567_H_ */
+#endif /* __VIC4567_H__ */
