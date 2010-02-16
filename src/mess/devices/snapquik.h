@@ -37,6 +37,11 @@ enum
 #define QUICKLOAD_LOAD_NAME(name)	quickload_load_##name
 #define QUICKLOAD_LOAD(name)		int QUICKLOAD_LOAD_NAME(name)(running_device *image, const char *file_type, int quickload_size)
 
+#define LOAD_REG(_cpu, _reg, _data) \
+        do { \
+          cpu_set_reg(_cpu, _reg, (_data)); \
+          logerror("Loading register %s\n", cpu_get_reg_string(_cpu, _reg)); \
+        } while (0)
 
 
 /***************************************************************************
